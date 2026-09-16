@@ -1,0 +1,155 @@
+name: CI
+
+# Budget. The repository is private, so every minute comes out of the
+# account's 2,000 included minutes a month, each job rounded *up* to a whole
+# minute, and priced by runner: Linux $0.006/min, Windows $0.010, macOS
+# $0.062 -- ten times Linux (docs.github.com, "Actions runner pricing",
+# checked 2026-09-23). Measured on this workspace a push cost ~2 min Ubuntu,
+# ~5 min Windows and ~2 min macOS: roughly 32 Linux-equivalent minutes, of
+# which macOS -- non-blocking -- was two thirds. At the ~15 pushes of
+# 2026-09-22 that is the month's allowance in four days.
+#
+# So:
+# - every push to main runs **Ubuntu only** (fmt, clippy, the whole suite);
+# - **Windows tests are local**: the Windows runner compiles the test
+#   targets so slowly that the job timeout is hit before a single test runs.
+#   They run on a Windows machine with `scripts/check.ps1` before pushing
+#   (fast tier) and `-Full` before a release tag (see CLAUDE.md). Here
+#   Windows only checks fmt and clippy (which compile everything), on demand
+#   and weekly as a backstop;
+# - **macOS** runs on demand and weekly only, fast test tier;
+# - a newer push cancels an older run of the same ref still in flight;
+# - documentation-only pushes run nothing.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - '.gitattributes'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
+    inputs:
+      full:
+        description: 'Also run Windows and macOS'
+        type: boolean
+        default: true
+      macos:
+        description: 'With full: also run macOS (10x the Linux price per minute)'
+        type: boolean
+        default: true
+  schedule:
+    # Mondays 04:00 UTC: the Windows/macOS backstop.
+    - cron: '0 4 * * 1'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  # Incremental compilation writes a large number of small files into
+  # `target/`, and buys nothing in CI: every job is a fresh checkout, so
+  # there is no previous build in the same job to be incremental against
+  # (`Swatinem/rust-cache` restores dependency artifacts, not incremental
+  # state). On Windows, where every file create is expensive and Defender
+  # scans each one, that is pure tax.
+  CARGO_INCREMENTAL: 0
+  # The Git LFS contract checks skip when `git-lfs` is missing; here it is
+  # installed (see the "install git-lfs" step) so a skip is a failure.
+  GITPOULPI_REQUIRE_LFS: 1
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Windows only on demand or on the weekly schedule -- see the
+        # budget note at the top. `fromJSON` because a matrix entry cannot
+        # be made conditional any other way.
+        os: ${{ fromJSON((github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.full)) && '["ubuntu-latest","windows-latest"]' || '["ubuntu-latest"]') }}
+    runs-on: ${{ matrix.os }}
+    # A hung test step otherwise runs to GitHub's 6-hour default. That is
+    # not hypothetical: a Windows `test` step sat for 3h58m before it was
+    # cancelled by hand. Ubuntu finishes in about 1m15s and Windows, when
+    # it is healthy, in a few minutes -- so 30 covers a cold cache and a
+    # slow runner while turning a hang into a red run within the hour.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      # Windows runs ~4x slower than Ubuntu on this workspace and it is not
+      # one bad step: even `cargo fmt --check`, which compiles, links and
+      # spawns nothing, takes 3x longer. The tax is file I/O and process
+      # creation, and Defender's real-time scanner sits on both -- it
+      # inspects every object file rustc emits and every `git.exe` the
+      # fixture suite spawns. Excluding the build and cargo directories
+      # takes that out of the loop.
+      #
+      # Best-effort on purpose: a runner image without the privilege (or
+      # without Defender at all) must not turn the run red, so the failure
+      # is swallowed here *and* the step is `continue-on-error`.
+      - name: exclude the build dirs from Defender real-time scanning
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          foreach ($path in @("${{ github.workspace }}\target", "$env:USERPROFILE\.cargo")) {
+            try {
+              Add-MpPreference -ExclusionPath $path -ErrorAction Stop
+              Write-Host "excluded $path"
+            } catch {
+              Write-Host "could not exclude ${path}: $($_.Exception.Message)"
+            }
+          }
+      # Windows runners ship git-lfs with Git for Windows.
+      - name: install git-lfs
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y git-lfs
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: fmt
+        run: cargo fmt --all --check
+      - name: clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      # `--no-fail-fast` because cargo otherwise stops at the first test
+      # binary that fails, and the remaining ones never run. That cost a
+      # whole round trip: when `pty_ui` failed on Windows, the driver's
+      # own self-tests (`xtask/tests/pty_driver.rs`) sat right behind it
+      # in the running order and never executed -- so the log could not
+      # answer "is the driver broken, or just the child?". A slower red
+      # run that reports everything beats a fast one that reports the
+      # first thing.
+      # No platform exclusions. The four pty-driven TUI tests used to be
+      # off on Windows, on the theory that the TUI child was silent under
+      # ConPTY. It was not: the driver was counting the ConPTY's own
+      # 27-byte preamble as the child's output, so `wait_for_first_output`
+      # returned before the TUI had drawn and every assertion after it ran
+      # against a blank grid. Fixed in xtask/src/pty/mod.rs; the gate and
+      # its GITPOULPI_SKIP_PTY_UI variable are gone.
+      # Ubuntu only: the Windows runner times out compiling the test targets
+      # (see the budget note at the top), so its tests run locally. `test`
+      # builds everything, so there is no separate `build` step.
+      - name: test
+        if: runner.os == 'Linux'
+        run: cargo test --workspace --no-fail-fast
+
+  test-macos:
+    # On demand and weekly only: ten times the Linux price per minute, and
+    # non-blocking anyway (no Mac to validate a failure against).
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.full && inputs.macos)
+    runs-on: macos-latest
+    continue-on-error: true
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # The fast tier: everything except the pty_* end-to-end targets (see
+      # `cargo run -p xtask -- test --help`).
+      - name: test
+        run: cargo run -p xtask -- test --tier fast

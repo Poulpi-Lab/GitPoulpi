@@ -1,0 +1,22 @@
+/target
+**/target
+.vscode/
+.idea/
+*.swp
+
+# Per-repo GitPoulpi state (ref filters, pending-auto-stash) - machine-local, never committed.
+.gitpoulpi/
+
+# Agent scratch: isolation worktrees live here. They are checkouts of this
+# same repo, so staging them nests a working tree inside a commit -- which
+# has already happened once by accident.
+.claude/*
+# ...except the project skills, which travel with the repo.
+!.claude/skills/
+/.cargo/config.toml
+# Perf script output (scripts/perf/README.md).
+/scripts/perf/cfg*/
+/scripts/perf/tmp-*/
+/scripts/perf/fix/
+/scripts/perf/remote.git/
+/scripts/perf/*.log

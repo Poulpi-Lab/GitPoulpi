@@ -1,0 +1,528 @@
+//! What went wrong, in enough detail to paste to someone (or an AI) who can
+//! explain it: the operation, the git command line that ran, its exit code
+//! and the tail of its stderr, or libgit2's class/code/message.
+//!
+//! Everything in an [`ErrorDetail`] has been through [`redact`], so it is
+//! safe to show, log and copy: URLs with credentials, `Authorization`
+//! headers, well-known token shapes and `password=`-style pairs never reach
+//! it. [`FailureKind`] is the best-effort reading of git's English messages
+//! that the frontends turn into a friendly sentence and a suggested action.
+//! It is only ever a hint: an unknown or localised message stays
+//! [`FailureKind::Other`] and the raw text is still there.
+
+use serde::{Deserialize, Serialize};
+
+/// How many trailing stderr lines an [`ErrorDetail`] keeps.
+pub const STDERR_TAIL_LINES: usize = 30;
+
+/// libgit2's own account of a failure.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Git2Detail {
+    /// `git_error_t` class, e.g. `Net`, `Ssh`, `Http`.
+    pub class: String,
+    /// `git_error_code`, e.g. `Auth`, `NotFound`.
+    pub code: String,
+    pub message: String,
+}
+
+/// The facts of one failed backend operation.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ErrorDetail {
+    /// What the user asked for (`Push`, `Pull`, ...), or git's subcommand
+    /// until the daemon names the operation.
+    pub operation: String,
+    /// The git command line that ran, redacted. GitPoulpi's pinned `-c`
+    /// output-shape overrides are left out: they are on every command.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub command: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub exit_code: Option<i32>,
+    /// The last [`STDERR_TAIL_LINES`] lines of stderr, redacted.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub stderr: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub git2: Option<Git2Detail>,
+}
+
+impl ErrorDetail {
+    /// A failed `git <args>`: `args` are the command's own arguments.
+    pub fn from_git(args: &[&str], exit_code: Option<i32>, stderr: &str) -> Self {
+        let command = redact(&format!("git {}", args.join(" ")));
+        ErrorDetail {
+            operation: args.first().copied().unwrap_or("git").to_string(),
+            command: Some(command),
+            exit_code,
+            stderr: tail_lines(&redact(stderr), STDERR_TAIL_LINES),
+            git2: None,
+        }
+    }
+
+    /// A libgit2 failure.
+    pub fn from_git2(
+        operation: &str,
+        class: impl Into<String>,
+        code: impl Into<String>,
+        message: &str,
+    ) -> Self {
+        ErrorDetail {
+            operation: operation.to_string(),
+            command: None,
+            exit_code: None,
+            stderr: String::new(),
+            git2: Some(Git2Detail {
+                class: class.into(),
+                code: code.into(),
+                message: redact(message),
+            }),
+        }
+    }
+
+    /// The same detail under the user-level operation's name.
+    pub fn with_operation(mut self, operation: impl Into<String>) -> Self {
+        self.operation = operation.into();
+        self
+    }
+
+    /// The best-effort reading of what failed.
+    pub fn kind(&self) -> FailureKind {
+        let mut text = self.stderr.clone();
+        if let Some(g) = &self.git2 {
+            text.push('\n');
+            text.push_str(&g.message);
+            if g.code == "Auth" || g.class == "Ssh" && g.message.contains("auth") {
+                return FailureKind::AuthFailed;
+            }
+        }
+        FailureKind::classify(&text)
+    }
+
+    /// The facts as plain text lines, for a report.
+    pub fn lines(&self) -> Vec<String> {
+        let mut out = vec![format!("operation: {}", self.operation)];
+        if let Some(c) = &self.command {
+            out.push(format!("command: {c}"));
+        }
+        if let Some(code) = self.exit_code {
+            out.push(format!("exit code: {code}"));
+        }
+        if let Some(g) = &self.git2 {
+            out.push(format!(
+                "libgit2: class={} code={} message={}",
+                g.class, g.code, g.message
+            ));
+        }
+        if !self.stderr.trim().is_empty() {
+            out.push("stderr:".to_string());
+            out.extend(self.stderr.lines().map(|l| format!("  {l}")));
+        }
+        out
+    }
+}
+
+/// What kind of failure git's message describes. The frontends map each to
+/// a sentence and, where one exists, an action.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FailureKind {
+    /// The remote has commits this branch lacks: pull first.
+    NonFastForward,
+    /// Credentials missing, wrong or refused.
+    AuthFailed,
+    /// A merge, rebase or pull stopped on conflicts.
+    MergeConflict,
+    /// Local changes would be overwritten: commit, stash or discard.
+    WouldOverwrite,
+    /// The remote could not be reached.
+    NetworkUnreachable,
+    /// Another git process holds `index.lock` (or another lock file).
+    LockExists,
+    Other,
+}
+
+impl FailureKind {
+    /// Classifies git's English stderr. Order matters: the specific
+    /// "would be overwritten" and lock messages come before the broad ones.
+    pub fn classify(stderr: &str) -> FailureKind {
+        let s = stderr.to_lowercase();
+        let has = |needles: &[&str]| needles.iter().any(|n| s.contains(n));
+        if has(&[
+            "would be overwritten by",
+            "please commit your changes or stash them",
+        ]) {
+            FailureKind::WouldOverwrite
+        } else if has(&[
+            ".lock': file exists",
+            ".lock\": file exists",
+            "another git process seems to be running",
+        ]) {
+            FailureKind::LockExists
+        } else if has(&[
+            "authentication failed",
+            "could not read username",
+            "could not read password",
+            "permission denied (publickey",
+            "permission denied (password",
+            "invalid username or password",
+            "terminal prompts disabled",
+            "the requested url returned error: 401",
+            "the requested url returned error: 403",
+            "http basic: access denied",
+            "support for password authentication was removed",
+        ]) {
+            FailureKind::AuthFailed
+        } else if has(&[
+            "could not resolve host",
+            "connection refused",
+            "connection timed out",
+            "operation timed out",
+            "network is unreachable",
+            "failed to connect to",
+            "could not connect to server",
+            "temporary failure in name resolution",
+            "connection reset",
+            "unable to access",
+        ]) {
+            FailureKind::NetworkUnreachable
+        } else if has(&[
+            "conflict (",
+            "automatic merge failed",
+            "fix conflicts and",
+            "merge conflict in",
+        ]) {
+            FailureKind::MergeConflict
+        } else if has(&[
+            "non-fast-forward",
+            "fetch first",
+            "updates were rejected because",
+            "not possible to fast-forward",
+            "divergent branches",
+            "diverging branches",
+        ]) {
+            FailureKind::NonFastForward
+        } else {
+            FailureKind::Other
+        }
+    }
+}
+
+/// The last `n` lines of `text`, trimmed of surrounding blank lines.
+pub fn tail_lines(text: &str, n: usize) -> String {
+    let lines: Vec<&str> = text.trim().lines().collect();
+    let skip = lines.len().saturating_sub(n);
+    let mut out = lines[skip..].join("\n");
+    if skip > 0 {
+        out.insert_str(0, &format!("[{skip} earlier lines omitted]\n"));
+    }
+    out
+}
+
+const MASK: &str = "***";
+
+/// Keys whose value is a secret when written `key=value` or `key: value`.
+const SECRET_KEYS: &[&str] = &[
+    "password",
+    "passwd",
+    "pwd",
+    "token",
+    "secret",
+    "api_key",
+    "apikey",
+    "api-key",
+    "access_token",
+    "private_token",
+    "private-token",
+    "client_secret",
+    "authorization",
+    "proxy-authorization",
+    "x-api-key",
+];
+
+/// `text` with credentials masked: userinfo in URLs, `Authorization`
+/// style headers, `Bearer`/`Basic` values, token-shaped words and
+/// `password=...` pairs. Idempotent, line structure preserved.
+pub fn redact(text: &str) -> String {
+    text.split_inclusive('\n')
+        .map(redact_line)
+        .collect::<String>()
+}
+
+fn redact_line(line: &str) -> String {
+    let line = redact_urls(line);
+    let line = redact_pairs(&line);
+    let line = redact_bearer(&line);
+    redact_prefixed_tokens(&line)
+}
+
+fn is_word_char(c: char) -> bool {
+    c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | '~' | '+' | '/' | '=')
+}
+
+/// `scheme://user:secret@host` becomes `scheme://***@host`.
+fn redact_urls(line: &str) -> String {
+    let mut out = String::with_capacity(line.len());
+    let mut rest = line;
+    while let Some(pos) = rest.find("://") {
+        let (head, tail) = rest.split_at(pos + 3);
+        out.push_str(head);
+        let end = tail
+            .find(|c: char| c.is_whitespace() || matches!(c, '/' | '"' | '\'' | '<' | '>'))
+            .unwrap_or(tail.len());
+        let authority = &tail[..end];
+        match authority.rfind('@') {
+            Some(at) if at > 0 => {
+                out.push_str(MASK);
+                out.push_str(&authority[at..]);
+            }
+            _ => out.push_str(authority),
+        }
+        rest = &tail[end..];
+    }
+    out.push_str(rest);
+    out
+}
+
+/// `key=value` / `key: value` for the secret keys (case-insensitive).
+fn redact_pairs(line: &str) -> String {
+    let lower = line.to_lowercase();
+    let mut out = String::with_capacity(line.len());
+    let mut i = 0;
+    let bytes = line.as_bytes();
+    while i < line.len() {
+        let mut matched = None;
+        // Only at a key boundary: start of line or after a non-word char.
+        let boundary = i == 0
+            || !line[..i]
+                .chars()
+                .next_back()
+                .is_some_and(|c| c.is_ascii_alphanumeric() || c == '_');
+        if boundary && line.is_char_boundary(i) {
+            for key in SECRET_KEYS {
+                if lower[i..].starts_with(key) {
+                    let after = i + key.len();
+                    let mut j = after;
+                    while j < bytes.len() && (bytes[j] == b' ' || bytes[j] == b'"') {
+                        j += 1;
+                    }
+                    if j < bytes.len() && (bytes[j] == b'=' || bytes[j] == b':') && j > after - 1 {
+                        // key, optional spaces, separator, optional spaces
+                        let mut k = j + 1;
+                        while k < bytes.len() && bytes[k] == b' ' {
+                            k += 1;
+                        }
+                        // A header value runs to the end of the line; a
+                        // pair's value to whitespace, `&` or a quote.
+                        let header = *key == "authorization" || *key == "proxy-authorization";
+                        let mut end = k;
+                        while end < line.len() {
+                            let c = line[end..].chars().next().unwrap();
+                            let stop = if header {
+                                c == '\n' || c == '\r' || c == '"' || c == '\''
+                            } else {
+                                c.is_whitespace() || matches!(c, '&' | '"' | '\'' | ',' | ';')
+                            };
+                            if stop {
+                                break;
+                            }
+                            end += c.len_utf8();
+                        }
+                        if end > k {
+                            matched = Some((after, j + 1, k, end));
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        match matched {
+            Some((after, sep_end, value_start, end)) => {
+                out.push_str(&line[i..after]);
+                out.push_str(&line[after..sep_end]);
+                out.push_str(&line[sep_end..value_start]);
+                out.push_str(MASK);
+                i = end;
+            }
+            None => {
+                let c = line[i..].chars().next().unwrap();
+                out.push(c);
+                i += c.len_utf8();
+            }
+        }
+    }
+    out
+}
+
+/// `Bearer abc` and `Basic abc` (any case).
+fn redact_bearer(line: &str) -> String {
+    let lower = line.to_lowercase();
+    let mut out = String::with_capacity(line.len());
+    let mut i = 0;
+    while i < line.len() {
+        let rest = &lower[i..];
+        let scheme = ["bearer ", "basic ", "token "]
+            .into_iter()
+            .find(|s| rest.starts_with(s));
+        let boundary = i == 0
+            || !line[..i]
+                .chars()
+                .next_back()
+                .is_some_and(|c| c.is_ascii_alphanumeric());
+        if let (Some(s), true) = (scheme, boundary) {
+            let value_start = i + s.len();
+            let value: String = line[value_start..]
+                .chars()
+                .take_while(|c| is_word_char(*c))
+                .collect();
+            // "basic " / "token " are ordinary words: only mask a value that
+            // looks like a credential (long enough, no plain-word look).
+            let credential = value.len() >= 12 || (s.starts_with("bearer") && value.len() >= 6);
+            if credential && !value.contains(MASK) {
+                out.push_str(&line[i..value_start]);
+                out.push_str(MASK);
+                i = value_start + value.len();
+                continue;
+            }
+        }
+        let c = line[i..].chars().next().unwrap();
+        out.push(c);
+        i += c.len_utf8();
+    }
+    out
+}
+
+/// Words that start with a known token prefix.
+fn redact_prefixed_tokens(line: &str) -> String {
+    let mut out = String::with_capacity(line.len());
+    let mut word = String::new();
+    let flush = |word: &mut String, out: &mut String| {
+        if !word.is_empty() {
+            // The prefixes are the history scanner's table (`rewrite::secrets`),
+            // so the log and the scanner mask the same shapes.
+            let is_token = crate::domain::rewrite::secrets::token_prefixes()
+                .any(|p| word.starts_with(p) && word.len() >= p.len() + 8);
+            if is_token {
+                out.push_str(MASK);
+            } else {
+                out.push_str(word);
+            }
+            word.clear();
+        }
+    };
+    for c in line.chars() {
+        if c.is_ascii_alphanumeric() || c == '_' || c == '-' {
+            word.push(c);
+        } else {
+            flush(&mut word, &mut out);
+            out.push(c);
+        }
+    }
+    flush(&mut word, &mut out);
+    out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn credentials_in_urls_are_masked() {
+        assert_eq!(
+            redact("fatal: unable to access 'https://user:hunter2@example.com/r.git/': x"),
+            "fatal: unable to access 'https://***@example.com/r.git/': x"
+        );
+        assert_eq!(
+            redact("remote https://ghp_abcdefghijklmnop@github.com/o/r"),
+            "remote https://***@github.com/o/r"
+        );
+        // No userinfo: untouched.
+        assert_eq!(
+            redact("https://github.com/o/r.git"),
+            "https://github.com/o/r.git"
+        );
+    }
+
+    #[test]
+    fn auth_headers_and_secret_pairs_are_masked() {
+        let out = redact("-c http.extraheader=Authorization: Basic dXNlcjpwYXNz\nnext line");
+        assert!(!out.contains("dXNlcjpwYXNz"), "{out}");
+        assert!(out.ends_with("next line"), "{out}");
+        let out = redact("curl -H 'Authorization: Bearer abcdef123456' x");
+        assert!(!out.contains("abcdef123456"), "{out}");
+        let out = redact("url?access_token=abc123xyz&per_page=5");
+        assert!(
+            !out.contains("abc123xyz") && out.contains("per_page=5"),
+            "{out}"
+        );
+        let out = redact("password = s3cret value");
+        assert!(!out.contains("s3cret"), "{out}");
+        let out = redact("PRIVATE-TOKEN: glpat-xxxxxxxxxxxxxxxxxxxx");
+        assert!(!out.contains("glpat-xxxx"), "{out}");
+    }
+
+    #[test]
+    fn token_shaped_words_are_masked_but_prose_is_not() {
+        let out = redact("pushed with ghp_0123456789abcdefghij to origin");
+        assert_eq!(out, "pushed with *** to origin");
+        let out = redact("key sk-ant-api03-ABCDEFGHIJKLMN end");
+        assert!(!out.contains("ABCDEFGH"), "{out}");
+        // Ordinary text survives, including words that merely contain keys.
+        let plain = "error: failed to push some refs to 'origin' (tokenizer, basic setup)";
+        assert_eq!(redact(plain), plain);
+    }
+
+    #[test]
+    fn redaction_is_idempotent() {
+        let once = redact("https://u:p@h/x Authorization: Bearer abcdefghijkl token=zzz");
+        assert_eq!(redact(&once), once);
+    }
+
+    #[test]
+    fn a_detail_never_holds_the_secret_it_was_built_from() {
+        let d = ErrorDetail::from_git(
+            &["push", "https://me:topsecret@host/r.git"],
+            Some(128),
+            "fatal: Authentication failed for 'https://me:topsecret@host/r.git/'\n",
+        );
+        let all = format!("{:?}", d);
+        assert!(!all.contains("topsecret"), "{all}");
+        assert_eq!(d.kind(), FailureKind::AuthFailed);
+    }
+
+    #[test]
+    fn stderr_is_cut_to_its_tail() {
+        let long: String = (0..100).map(|i| format!("line {i}\n")).collect();
+        let d = ErrorDetail::from_git(&["fetch"], Some(1), &long);
+        assert!(d.stderr.contains("line 99"));
+        assert!(!d.stderr.contains("line 10\n"));
+        assert!(d.stderr.starts_with("[70 earlier lines omitted]"));
+    }
+
+    #[test]
+    fn git_messages_map_to_a_friendly_kind() {
+        use FailureKind as K;
+        let cases = [
+            (
+                " ! [rejected]        main -> main (non-fast-forward)\nerror: failed to push some refs",
+                K::NonFastForward,
+            ),
+            ("hint: Updates were rejected because the tip of your current branch is behind", K::NonFastForward),
+            ("fatal: Not possible to fast-forward, aborting.", K::NonFastForward),
+            ("remote: Invalid username or password.\nfatal: Authentication failed for 'https://h/r'", K::AuthFailed),
+            ("git@h: Permission denied (publickey).\nfatal: Could not read from remote repository.", K::AuthFailed),
+            ("fatal: could not read Username for 'https://h': terminal prompts disabled", K::AuthFailed),
+            ("CONFLICT (content): Merge conflict in a.txt\nAutomatic merge failed; fix conflicts", K::MergeConflict),
+            ("error: Your local changes to the following files would be overwritten by merge:\n\ta.txt", K::WouldOverwrite),
+            ("fatal: Unable to create '/r/.git/index.lock': File exists.", K::LockExists),
+            ("fatal: unable to access 'https://h/r/': Could not resolve host: h", K::NetworkUnreachable),
+            ("ssh: connect to host h port 22: Network is unreachable", K::NetworkUnreachable),
+            ("something unexpected", K::Other),
+        ];
+        for (stderr, kind) in cases {
+            assert_eq!(FailureKind::classify(stderr), kind, "{stderr}");
+        }
+    }
+
+    #[test]
+    fn libgit2_auth_failures_are_recognized() {
+        let d = ErrorDetail::from_git2("fetch", "Http", "Auth", "authentication required");
+        assert_eq!(d.kind(), FailureKind::AuthFailed);
+    }
+}

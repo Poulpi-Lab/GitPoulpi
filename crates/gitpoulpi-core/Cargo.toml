@@ -1,0 +1,31 @@
+[package]
+name = "gitpoulpi-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "GitPoulpi domain model, GitBackend and trait. No I/O-framework dependencies."
+
+[dependencies]
+async-trait.workspace = true
+# Decodes non-UTF-8 content for `git.default_encoding` (pure Rust, no I/O).
+encoding_rs.workspace = true
+imara-diff.workspace = true
+serde.workspace = true
+regex.workspace = true
+# The content hash a script is trusted by (pure Rust, no I/O).
+sha2.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+# Tests only: the wire format `Oid` promises is JSON, so asserting on it
+# needs a JSON codec. Architecture principle 1 (no I/O-framework
+# dependencies) is about what ships, and dev-dependencies don't.
+serde_json.workspace = true
+# The workflow files are TOML; the model round-trips through it in tests.
+toml.workspace = true
+# Also tests only: `RepoRef::from_root` normalises against the real
+# filesystem, so proving it needs a real directory to normalise.
+tempfile.workspace = true

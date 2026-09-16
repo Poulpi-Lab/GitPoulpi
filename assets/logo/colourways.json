@@ -1,0 +1,284 @@
+{
+ "_comment": "The logo sprite and its colourways: the single source for the About window, the README images and the executable icon. P=body L=highlight O/K=outline W=eye white C=cheek T/R/S/B=tentacle tips. Regenerate assets with scripts/gen-logo.py.",
+ "default": "lavender",
+ "grid": [
+  "......OOOO......",
+  "....OOPPPPOO....",
+  "...OPLLPPPPPO...",
+  "..OPLLPPPPPPPO..",
+  "..OPPPPPPPPPPO..",
+  ".OPPWWPPPPWWPPO.",
+  ".OPPWKPPPPWKPPO.",
+  ".OPCPPPPPPPPCPO.",
+  ".OPPPPPOOPPPPPO.",
+  "..OPPPPPPPPPPO..",
+  ".OPOPPOPPOPPOPO.",
+  ".OPOOPOPPOPOOPO.",
+  "OPO.OPO..OPO.OPO",
+  "OPO.OPO..OPO.OPO",
+  "OTO.ORO..OSO.OBO",
+  ".O...O....O...O."
+ ],
+ "ways": [
+  {
+   "slug": "violet",
+   "body": "#8B5CF6",
+   "light": "#C4B5FD",
+   "ink": "#1E1B4B",
+   "cheek": "#F9A8D4",
+   "tips": [
+    "#14B8A6",
+    "#F97316",
+    "#EC4899",
+    "#3B82F6"
+   ]
+  },
+  {
+   "slug": "snow",
+   "body": "#EEF2F7",
+   "light": "#FFFFFF",
+   "ink": "#1E293B",
+   "cheek": "#FBCFE8",
+   "tips": [
+    "#5EEAD4",
+    "#FDBA74",
+    "#F9A8D4",
+    "#93C5FD"
+   ]
+  },
+  {
+   "slug": "orange",
+   "body": "#F97316",
+   "light": "#FED7AA",
+   "ink": "#3B1D0E",
+   "cheek": "#FB7185",
+   "tips": [
+    "#14B8A6",
+    "#8B5CF6",
+    "#EC4899",
+    "#3B82F6"
+   ]
+  },
+  {
+   "slug": "teal",
+   "body": "#14B8A6",
+   "light": "#99F6E4",
+   "ink": "#0B2E2B",
+   "cheek": "#FDA4AF",
+   "tips": [
+    "#F97316",
+    "#8B5CF6",
+    "#EC4899",
+    "#3B82F6"
+   ]
+  },
+  {
+   "slug": "charcoal",
+   "body": "#2A2C31",
+   "light": "#4B4F57",
+   "ink": "#8B93A1",
+   "cheek": "#FB7185",
+   "tips": [
+    "#94A3B8",
+    "#CBD5E1",
+    "#64748B",
+    "#E2E8F0"
+   ]
+  },
+  {
+   "slug": "ocean",
+   "body": "#2563EB",
+   "light": "#93C5FD",
+   "ink": "#0B1B45",
+   "cheek": "#F9A8D4",
+   "tips": [
+    "#14B8A6",
+    "#F97316",
+    "#EC4899",
+    "#FACC15"
+   ]
+  },
+  {
+   "slug": "magenta",
+   "body": "#D946EF",
+   "light": "#F5D0FE",
+   "ink": "#3B0A45",
+   "cheek": "#FDA4AF",
+   "tips": [
+    "#14B8A6",
+    "#F97316",
+    "#3B82F6",
+    "#FACC15"
+   ]
+  },
+  {
+   "slug": "ivory",
+   "body": "#F1EADB",
+   "light": "#FFFCF4",
+   "ink": "#3B2F25",
+   "cheek": "#F4B8A8",
+   "tips": [
+    "#7DD3C0",
+    "#F6A04D",
+    "#E98AAE",
+    "#8DB4E2"
+   ]
+  },
+  {
+   "slug": "candy",
+   "body": "#F472B6",
+   "light": "#FBCFE8",
+   "ink": "#4A0D2B",
+   "cheek": "#FB7185",
+   "tips": [
+    "#14B8A6",
+    "#8B5CF6",
+    "#3B82F6",
+    "#FACC15"
+   ]
+  },
+  {
+   "slug": "coral",
+   "body": "#EF4444",
+   "light": "#FECACA",
+   "ink": "#450A0A",
+   "cheek": "#FDA4AF",
+   "tips": [
+    "#14B8A6",
+    "#8B5CF6",
+    "#3B82F6",
+    "#FACC15"
+   ]
+  },
+  {
+   "slug": "midnight",
+   "body": "#161B2E",
+   "light": "#2E3754",
+   "ink": "#93A4C8",
+   "cheek": "#F9A8D4",
+   "tips": [
+    "#22D3EE",
+    "#38BDF8",
+    "#818CF8",
+    "#A5B4FC"
+   ]
+  },
+  {
+   "slug": "green",
+   "body": "#22C55E",
+   "light": "#BBF7D0",
+   "ink": "#052E16",
+   "cheek": "#FDA4AF",
+   "tips": [
+    "#F97316",
+    "#8B5CF6",
+    "#EC4899",
+    "#3B82F6"
+   ]
+  },
+  {
+   "slug": "cyan",
+   "body": "#06B6D4",
+   "light": "#A5F3FC",
+   "ink": "#083344",
+   "cheek": "#FDA4AF",
+   "tips": [
+    "#F97316",
+    "#8B5CF6",
+    "#EC4899",
+    "#FACC15"
+   ]
+  },
+  {
+   "slug": "pearl",
+   "body": "#E7E5E0",
+   "light": "#FAF9F6",
+   "ink": "#2F3238",
+   "cheek": "#E9C3CF",
+   "tips": [
+    "#C7C9CE",
+    "#A9ADB4",
+    "#8C9098",
+    "#70747D"
+   ]
+  },
+  {
+   "slug": "indigo",
+   "body": "#4F46E5",
+   "light": "#C7D2FE",
+   "ink": "#1E1B4B",
+   "cheek": "#F9A8D4",
+   "tips": [
+    "#14B8A6",
+    "#F97316",
+    "#EC4899",
+    "#FACC15"
+   ]
+  },
+  {
+   "slug": "lavender",
+   "body": "#A78BFA",
+   "light": "#EDE9FE",
+   "ink": "#2E1065",
+   "cheek": "#F9A8D4",
+   "tips": [
+    "#14B8A6",
+    "#F97316",
+    "#EC4899",
+    "#3B82F6"
+   ]
+  },
+  {
+   "slug": "sun",
+   "body": "#FACC15",
+   "light": "#FEF9C3",
+   "ink": "#422006",
+   "cheek": "#FB923C",
+   "tips": [
+    "#14B8A6",
+    "#8B5CF6",
+    "#EC4899",
+    "#3B82F6"
+   ]
+  },
+  {
+   "slug": "mint",
+   "body": "#34D399",
+   "light": "#D1FAE5",
+   "ink": "#064E3B",
+   "cheek": "#FDA4AF",
+   "tips": [
+    "#F97316",
+    "#8B5CF6",
+    "#EC4899",
+    "#3B82F6"
+   ]
+  },
+  {
+   "slug": "porcelain",
+   "body": "#E8EEF6",
+   "light": "#FFFFFF",
+   "ink": "#1E3A5F",
+   "cheek": "#FDA4AF",
+   "tips": [
+    "#60A5FA",
+    "#3B82F6",
+    "#2563EB",
+    "#1D4ED8"
+   ]
+  },
+  {
+   "slug": "slate",
+   "body": "#64748B",
+   "light": "#CBD5E1",
+   "ink": "#0F172A",
+   "cheek": "#F9A8D4",
+   "tips": [
+    "#14B8A6",
+    "#F97316",
+    "#EC4899",
+    "#8B5CF6"
+   ]
+  }
+ ]
+}

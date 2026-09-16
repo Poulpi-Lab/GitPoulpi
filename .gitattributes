@@ -1,0 +1,6 @@
+# Every text file is stored with LF in the repository, whatever the
+# platform or editor that wrote it. Without this, Windows tooling silently
+# turned 24 files to CRLF and two to a mix, and any whole-file rewrite then
+# showed up as tens of thousands of changed lines -- which made concurrent
+# branches conflict on every line of crates/gitpoulpi-tui/src/lib.rs.
+* text=auto eol=lf

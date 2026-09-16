@@ -1,0 +1,113 @@
+mod amend;
+pub mod b64;
+mod change_scope;
+mod conflict;
+pub mod conflict_prevention;
+mod content;
+mod diff;
+mod file_history;
+mod image_info;
+mod lfs;
+mod merge_doc;
+mod mermaid;
+mod operation;
+mod ops;
+mod reflog;
+mod refs;
+mod repo;
+mod restore;
+pub mod rewrite;
+mod rules;
+mod search;
+mod split;
+mod stash;
+mod stuck;
+mod submodule;
+mod ui_control;
+mod undo;
+mod worktree;
+
+pub use amend::{parse_git_date, CommitAmend, GitDate, ResolvedAmend};
+pub use change_scope::ChangeScope;
+pub use conflict::{
+    encode_text, ConflictEntry, ConflictKind, ConflictRefusal, ConflictResolution, ConflictSet,
+    ConflictSide, EncodeError, OperationState, ResolveOptions, StageEntry, MODE_GITLINK,
+    MODE_SYMLINK,
+};
+pub use content::{
+    commit_summary, decode_commit_text, decode_text, decode_text_lossy, fallback_encoding_name,
+    with_fallback_encoding, Blame, BlameContent, BlameLine, Blob, BlobBody, BlobBytes, BlobContent,
+    BlobSource, MAX_TEXT_BLOB_BYTES,
+};
+pub use diff::{
+    CommitStat, DiffFileList, DiffLine, DiffTarget, DiscardTarget, FileDiff, FileStatus, Hunk,
+    HunkId, LineOrigin, LineSelector, StageTarget, StatusEntry,
+};
+pub use file_history::{FileChangeKind, FileHistoryEntry, FileHistoryPage};
+pub use image_info::{sniff as sniff_image, ImageFormat, ImageInfo};
+pub use lfs::{
+    attributes_mention_lfs, describe_pointer, human_size, lfs_change, parse_lfs_patterns,
+    LfsBinary, LfsChange, LfsCloneMode, LfsDirection, LfsFetchOptions, LfsFile, LfsInstallScope,
+    LfsLock, LfsPattern, LfsPointer, LfsProgress, LfsProgressSink, LfsPushOptions, LfsRepoStatus,
+    LfsTrackOptions, LfsUnavailableReason, LFS_INSTALL_URL, LFS_MIN_VERSION, LFS_POINTER_MAX_BYTES,
+};
+pub use merge_doc::{
+    aligned_rows, classify_sides, compose_resolution, has_conflict_markers, is_whitespace_only,
+    marker_size_for, parse_merge_file_output, render_with_markers, side_changes, side_rows,
+    whitespace_choice, whitespace_resolution, AlignedRow, AlignedRows, ConflictOperation,
+    ConflictPicks, Eol, LineChange, MarkerStyle, MergeDocument, MergeJob, MergeRegion, Pick,
+    RawStage, RowMark, SideBlob, SideChanges, SideLabels, SideRow, WorktreeFileState,
+    MIN_MARKER_SIZE,
+};
+pub use mermaid::{
+    attach_refs, commits_to_tip, mermaid_git_graph, MermaidDetail, MermaidOptions,
+    MermaidOrientation,
+};
+pub use operation::{OpTraits, Operation, OperationKind};
+pub use ops::{
+    autosquash_order, normalize_reword_message, normalize_sparse_dirs, parse_fetch_refspec,
+    validate_plan, CheckoutTarget, CherryPickOptions, CherryPickOutcome, CloneOptions, ClonePhase,
+    CloneProgress, CloneProgressSink, CommitAuthor, CommitOptions, FastForwardOutcome,
+    FetchOptions, FetchOutcome, InitOptions, InteractiveRebase, LogOptions, MergeOptions,
+    MergeOutcome, PatchApplied, PatchCreated, PatchSource, PlanCommit, PullMode, PullOptions,
+    PullOutcome, PushOptions, PushOutcome, PushRejectReason, PushRejection, RebaseAction,
+    RebaseOptions, RebaseOutcome, RebasePlanDraft, RebaseRefusal, RebaseState, RebaseStep,
+    ResetMode, RevertOutcome, RewordOutcome, RewordRefusal, SparseState, TagSelection,
+    WorktreeAddOptions, WorktreeStart, FETCH_REFSPEC_NAMESPACE,
+};
+pub use reflog::{
+    reflog_refname, LostCommit, LostCommitOptions, LostCommitsPage, LostSource, ReflogEntry,
+    ReflogPage, ReflogPosition, ZERO_OID,
+};
+pub use refs::split_remote_ref;
+pub use refs::{
+    parse_remote_tag_mirror_ref, remote_tag_mirror_ref, Ref, RefKind, RefVisibility, TagSync,
+    TagWhere, REMOTE_TAG_MIRROR_PREFIX,
+};
+pub use repo::{
+    CommitGraph, CommitNode, DiscoveredRepo, Oid, Remote, RepoId, RepoRef, WorkingTree,
+};
+pub use restore::{RestoreItem, RestoreItemKind, RestoreOffer, RestoreOutcome};
+pub use rewrite::RewriteRefusal;
+pub use rules::{
+    attribute_field, attributes_set, candidate_files, rule_dir, rule_pattern, AttributesWrite,
+    RuleKind, RuleScope, Treat, INFO_ATTRIBUTES, INFO_EXCLUDE,
+};
+pub use search::{
+    parse_query, split_message, CommitMessage, CommitMessages, CommitMessagesQuery, ParsedQuery,
+    SearchHit, SearchHits, SearchKind, SearchRequest, SearchTarget,
+};
+pub use split::{
+    unassigned, validate_split, SplitCommit, SplitFile, SplitOutcome, SplitPart, SplitPiece,
+    SplitRefusal, SplitSource, WholeReason,
+};
+pub use stash::{Stash, StashId};
+pub use stuck::{AmOutcome, IndexLock, STALE_INDEX_LOCK_SECS};
+pub use submodule::{Submodule, SubmoduleState, SubmoduleUpdateOptions};
+pub use ui_control::UiControl;
+pub use undo::{
+    short, short_opt, Direction, EntrySource, EntryState, EntrySummary, FileHash, HeadState,
+    JournalListing, JournalState, ListedEntry, PathHash, RefScope, RefSnapshot, RefUpdate,
+    Snapshot, UndoOutcome, UndoRefusal, UNDO_DISABLED_MESSAGE, UNDO_PIN_PREFIX,
+};
+pub use worktree::Worktree;

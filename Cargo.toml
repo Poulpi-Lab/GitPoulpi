@@ -1,0 +1,188 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/gitpoulpi-core",
+]
+
+[workspace.package]
+version = "1.0.0-rc.1"
+edition = "2021"
+rust-version = "1.80"
+authors = ["Poulpi-Lab <poulpilab@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/Poulpi-Lab/GitPoulpi"
+
+[workspace.dependencies]
+# The internal crates that have features are declared with
+# `default-features = false`: a plain `workspace = true` would otherwise put
+# their defaults (everything on) back and a custom build (see
+# docs/user/custom-builds.md) could never turn anything off. Consumers that need a
+# crate's full behavior say `features = ["default"]` (xtask), or the specific
+# feature (`network`).
+libc = "0.2"
+gitpoulpi-core = { path = "crates/gitpoulpi-core" }
+
+async-trait = "0.1"
+clap = { version = "4", features = ["derive"] }
+clap_complete = "4"
+crossterm = "0.28"
+ratatui = "0.29"
+# The commit graph's Graph column is drawn as a real image and handed to
+# the terminal over the iTerm2 inline-image protocol, which carries a PNG.
+# Encoding only -- the bitmap is generated at exactly the pixel size it
+# will occupy, so nothing here ever decodes or resizes an image, which is
+# also why the much larger `image` crate is not pulled in.
+#
+# Author avatars are the exception this module header already predicted:
+# an avatar is a PNG or JPEG *decoded off the network*, of a size neither
+# known nor controlled by this process, so it has to go through a real
+# decoder. `png`'s `Decoder` covers the PNG half for free -- it is already
+# a dependency for encoding, and decoding is the same crate's other API.
+png = "0.18"
+# The JPEG half of avatar decoding (Gravatar serves both). `rayon` is the
+# default feature and is a real dependency (parallel scanline IDCT) that
+# buys nothing for one 80x80 image decoded a handful of times a session,
+# so it is off.
+jpeg-decoder = { version = "0.3", default-features = false }
+# Image view (`image-view` feature): GIF first frame and WebP, decoded off
+# the repository's own blobs. BMP and ICO are hand-rolled.
+gif = { version = "0.13", default-features = false, features = ["std"] }
+image-webp = { version = "0.2", default-features = false }
+# Gravatar's *current* API (docs.gravatar.com, verified 2026-09-23) is
+# emphatic that MD5 identifiers are legacy ("Don't use MD5!") and requires
+# SHA-256 of the trimmed, lowercased email for every request as of API
+# v3 -- see `gitpoulpi_tui::avatar::gravatar`'s module header for the
+# sources. RustCrypto's `sha2` rather than a hand-rolled implementation
+# (the way `terminal_image::base64` is): base64 is twenty lines with no
+# way to get the *security* property wrong, a hash function is not that,
+# and a bug here would silently address every avatar at the wrong URL.
+sha2 = { version = "0.10", default-features = false }
+# The history rewrite engine hashes the objects it re-creates (SHA-1 ids)
+# and writes them into a temporary pack (zlib). Same RustCrypto family as
+# `sha2`; `flate2` was already used by `gitpoulpi-update`.
+sha1 = "0.10"
+flate2 = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "process", "net", "io-util", "time", "signal", "fs"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+# Branch-workflow topic types may match branch names by a user regex (gitpoulpi_core::workflow).
+regex = "1"
+thiserror = "1"
+directories = "5"
+tracing = "0.1"
+tempfile = "3"
+insta = "1"
+git2 = { version = "0.19", default-features = false }
+# `git.default_encoding`: decoding non-UTF-8 file content for display.
+encoding_rs = "0.8"
+# The merge conflict editor aligns each side's real file against the merged
+# text (`gitpoulpi_core::domain::merge_doc`'s `aligned_rows`) so the A/B
+# panes line up row for row. All that needs is a line diff with git's
+# histogram heuristics; imara-diff is that and little else (a pure
+# algorithm over token slices; its only dependencies are `hashbrown` (with
+# `foldhash`) and `memchr`; it is the diff engine of gitoxide and helix).
+# `similar` / `diffy` are a heavier fit for a line-only histogram diff.
+imara-diff = "0.2"
+assert_cmd = "2"
+# Cross-platform pty: a real pty on Unix, ConPTY on Windows, behind one
+# API -- which is the whole reason the TUI driver can be the same code on
+# both (architecture principle 4). From the wezterm project, so it is
+# exercised daily by a real terminal on all three platforms.
+portable-pty = "0.9"
+# A pty hands you a byte stream, not a screen. vt100 turns that stream
+# into a cell grid that carries colors and attributes, which is what
+# lets a test assert on styling and not just on characters.
+#
+# Pinned to 0.15, not the current 0.16: 0.16 requires `unicode-width
+# ^0.2.1` while ratatui 0.29 pins `unicode-width =0.2.0`, and cargo
+# cannot satisfy both -- the resolver fails outright rather than
+# duplicating the crate, because they are the same major. 0.15 depends
+# on unicode-width 0.1, a different major, so it coexists. Revisit when
+# ratatui relaxes that `=` pin.
+vt100 = "0.15"
+# Syntax highlighting for the built-in editor, with the
+# Sublime grammars and themes syntect ships compiled in. `regex-fancy` is
+# the pure-Rust regex engine: the default `regex-onig` links the Oniguruma
+# C library, which is one more C toolchain dependency on Windows for no
+# gain a terminal editor could see. Everything else (HTML output, plist /
+# YAML grammar loading) is off -- nothing here loads a grammar at runtime.
+syntect = { version = "5", default-features = false, features = ["parsing", "default-syntaxes", "default-themes", "regex-fancy"] }
+# The clipboard, for the commit/ref context menus' Copy entries.
+#
+# Chosen over `copypasta`/`cli-clipboard` because it is the only
+# maintained crate covering Windows, macOS, X11 *and* native Wayland from
+# one API (architecture principle 4). `image-data` is off: nothing here
+# ever copies a bitmap, and it would pull the whole `image` crate in.
+# `wayland-data-control` is on, so a pure-Wayland session (Hyprland, the
+# maintainer's Linux driver) works through ext-/wlr-data-control rather than
+# needing XWayland.
+#
+# X11/Wayland selection ownership -- the classic "the clipboard empties
+# when the process exits" trap -- is handled by keeping *one* `Clipboard`
+# alive for the whole run, which is the shape arboard documents for a
+# long-running GUI/TUI. See `crates/gitpoulpi-tui/src/clipboard.rs`.
+arboard = { version = "3.6", default-features = false, features = ["wayland-data-control"] }
+
+# Avatar fetch (`gitpoulpi-tui::avatar`), same crate and TLS backend
+# `gitpoulpi-hosting` already depends on -- one HTTP story, not two. Not
+# reused *through* `gitpoulpi-hosting::HttpTransport`: that trait's
+# `HttpResponse::body` is `String`, built via `reqwest::Response::text()`,
+# which is lossy for a binary PNG/JPEG (it is UTF-8-decoded, and an
+# arbitrary byte is not valid UTF-8). Making the trait carry bytes as well
+# as text is a reasonable follow-up but is a change to a crate two other
+# agents were mid-edit on for this same batch (`where-we-are.md`), so this
+# depends on `reqwest` directly instead, at the identical version and TLS
+# feature set.
+#
+# `rustls-tls-native-roots` as well as the bundled webpki roots
+# (2026-09-25): with the bundled roots only, a machine behind
+# a TLS-inspecting corporate proxy -- whose root certificate lives in the
+# OS store, not in webpki's list -- failed every avatar fetch with
+# `InvalidCertificate(UnknownIssuer)`, and the maintainer saw initials forever.
+# With both features reqwest loads both root sets. Feature unification
+# gives `gitpoulpi-hosting`'s own `reqwest` the same fix.
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "rustls-tls-native-roots"] }
+
+[profile.dev]
+debug = 1
+
+# RSA key generation (`ssh.key_type = "rsa"`, 4096 bits) takes over a minute
+# unoptimised: build the big-integer maths with optimisations in dev and test.
+[profile.dev.package.sha2]
+opt-level = 3
+# Syntax highlighting (the editor, file and blame views, the merge editor)
+# is regex matching over every line; unoptimised it takes a minute for the
+# 40 000-line file `pty_editor_highlight_idle` opens, which is the first thing
+# to blow its budget on a loaded machine. Optimising the dependency chain
+# (not GitPoulpi's own code) in dev and test builds makes it seconds.
+[profile.dev.package.regex-automata]
+opt-level = 3
+[profile.dev.package.regex-syntax]
+opt-level = 3
+[profile.dev.package.aho-corasick]
+opt-level = 3
+[profile.dev.package.memchr]
+opt-level = 3
+
+# `release` is the maintainer's daily build, rebuilt after every merge batch:
+# tuned for build time (incremental, parallel codegen, no cross-crate LTO).
+# For a TUI the runtime cost is not noticeable. `dist` is the packaging
+# build (fat LTO, one codegen unit): slow to build, smallest/fastest binary.
+[profile.release]
+strip = true
+incremental = true
+lto = "off"
+codegen-units = 16
+
+[profile.dist]
+inherits = "release"
+incremental = false
+lto = "fat"
+codegen-units = 1
+
+# Custom builds (`cargo run -p xtask -- build-custom`): the packaging profile,
+# in its own `target/custom/` so an official `target/dist/` binary is never
+# overwritten by a subset build.
+[profile.custom]
+inherits = "dist"

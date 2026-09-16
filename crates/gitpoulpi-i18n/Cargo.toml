@@ -1,0 +1,47 @@
+[package]
+name = "gitpoulpi-i18n"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "UI translations: per-language TOML compiled by build.rs into static tables. No runtime dependencies, usable from the TUI and the CLI."
+build = "build.rs"
+# Lets the build script of a dependent (gitpoulpi-commands) read the built
+# languages as `DEP_GITPOULPI_I18N_LANGS`.
+links = "gitpoulpi_i18n"
+
+[features]
+# One feature per `locales/*.toml` (English is always built). The binaries
+# forward these; a library never enables `all-langs` on its own, so a custom
+# build's language set is never widened by feature unification.
+default = []
+all-langs = []
+lang-fr = []
+lang-es = []
+lang-pt-br = []
+lang-pt-pt = []
+lang-it = []
+lang-de = []
+lang-zh-cn = []
+lang-ja = []
+lang-ru = []
+lang-ko = []
+lang-nl = []
+lang-pl = []
+lang-uk = []
+lang-cs = []
+lang-sv = []
+lang-tr = []
+# Pseudo-locale for the layout tests; never offered to users.
+lang-qps = []
+
+[dependencies]
+sys-locale = "0.3.2"
+
+[build-dependencies]
+toml.workspace = true
+
+[dev-dependencies]
+toml.workspace = true

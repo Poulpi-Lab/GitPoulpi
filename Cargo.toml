@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/gitpoulpi-core",
     "crates/gitpoulpi-secrets",
+    "crates/gitpoulpi-i18n",
 ]
 
 [workspace.package]
@@ -23,6 +24,7 @@ repository = "https://github.com/Poulpi-Lab/GitPoulpi"
 libc = "0.2"
 gitpoulpi-core = { path = "crates/gitpoulpi-core" }
 gitpoulpi-secrets = { path = "crates/gitpoulpi-secrets" }
+gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }
 
 async-trait = "0.1"
 clap = { version = "4", features = ["derive"] }

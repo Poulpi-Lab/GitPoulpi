@@ -1,0 +1,39 @@
+[package]
+name = "gitpoulpi-testkit"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Fixture-repo builder and contract-test harness shared by every GitBackend implementation's tests, plus TUI golden-test helpers."
+
+[features]
+# Which optional management the contract checks cover (gated later).
+default = []
+lfs = []
+worktree = []
+submodule = []
+rewrite-scripts = []
+
+[dependencies]
+gitpoulpi-core.workspace = true
+tempfile.workspace = true
+# The loopback LFS lock server speaks JSON.
+serde_json.workspace = true
+# `commit_png`: fixtures with a real image in them.
+png.workspace = true
+thiserror.workspace = true
+# Only to drive `GitBackend`'s three async methods from the synchronous
+# contract checks (see `contract::block_on`). The suite itself stays
+# sync so it can be called from a plain `#[test]`.
+tokio.workspace = true
+# One-process commits for plain fixtures (`FixtureRepoBuilder::commit_*`): two
+# `git` spawns per commit cost ~200 ms on Windows. Only writes blobs, the
+# index and the commit; everything a backend is tested on still goes through
+# the real `git`. See `fast_commit` in fixture.rs.
+git2.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+# `isolate_process_env` removes its throwaway dir at process exit (`atexit`).
+libc.workspace = true

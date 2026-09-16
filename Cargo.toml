@@ -5,6 +5,7 @@ members = [
     "crates/gitpoulpi-secrets",
     "crates/gitpoulpi-pty",
     "crates/gitpoulpi-i18n",
+    "crates/gitpoulpi-testkit",
 ]
 
 [workspace.package]
@@ -27,6 +28,7 @@ gitpoulpi-core = { path = "crates/gitpoulpi-core" }
 gitpoulpi-secrets = { path = "crates/gitpoulpi-secrets" }
 gitpoulpi-pty = { path = "crates/gitpoulpi-pty" }
 gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }
+gitpoulpi-testkit = { path = "crates/gitpoulpi-testkit" }
 
 async-trait = "0.1"
 clap = { version = "4", features = ["derive"] }
@@ -169,6 +171,10 @@ opt-level = 3
 [profile.dev.package.aho-corasick]
 opt-level = 3
 [profile.dev.package.memchr]
+opt-level = 3
+[profile.dev.package.flate2]
+opt-level = 3
+[profile.dev.package.miniz_oxide]
 opt-level = 3
 
 # `release` is the maintainer's daily build, rebuilt after every merge batch:

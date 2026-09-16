@@ -6,6 +6,7 @@ members = [
     "crates/gitpoulpi-secrets",
     "crates/gitpoulpi-pty",
     "crates/gitpoulpi-i18n",
+    "crates/gitpoulpi-ipc",
     "crates/gitpoulpi-testkit",
 ]
 
@@ -30,6 +31,7 @@ gitpoulpi-config = { path = "crates/gitpoulpi-config" }
 gitpoulpi-secrets = { path = "crates/gitpoulpi-secrets" }
 gitpoulpi-pty = { path = "crates/gitpoulpi-pty" }
 gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }
+gitpoulpi-ipc = { path = "crates/gitpoulpi-ipc" }
 gitpoulpi-testkit = { path = "crates/gitpoulpi-testkit" }
 
 async-trait = "0.1"

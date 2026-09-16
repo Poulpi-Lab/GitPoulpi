@@ -345,6 +345,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-ipc"
+version = "1.0.0-rc.1"
+dependencies = [
+ "gitpoulpi-core",
+ "libc",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+ "tokio",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
 name = "gitpoulpi-pty"
 version = "1.0.0-rc.1"
 dependencies = [

@@ -1,0 +1,13 @@
+[package]
+name = "gitpoulpi-pty"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "A child process on an emulated terminal: spawn on a pty (ConPTY on Windows), read back the screen. Shared by the AI terminal mode and the xtask test driver."
+
+[dependencies]
+portable-pty.workspace = true
+vt100.workspace = true

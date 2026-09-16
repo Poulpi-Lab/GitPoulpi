@@ -159,6 +159,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-secrets"
+version = "1.0.0-rc.1"
+dependencies = [
+ "thiserror",
+]
+
+[[package]]
 name = "hashbrown"
 version = "0.15.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"

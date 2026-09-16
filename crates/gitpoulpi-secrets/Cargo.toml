@@ -1,0 +1,12 @@
+[package]
+name = "gitpoulpi-secrets"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Credential resolution: git credential-helper adapter (default) (the only source). SSH relies on the system ssh-agent, not handled here."
+
+[dependencies]
+thiserror.workspace = true

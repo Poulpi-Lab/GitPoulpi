@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "crates/gitpoulpi-core",
+    "crates/gitpoulpi-config",
     "crates/gitpoulpi-secrets",
     "crates/gitpoulpi-pty",
     "crates/gitpoulpi-i18n",
@@ -25,6 +26,7 @@ repository = "https://github.com/Poulpi-Lab/GitPoulpi"
 # feature (`network`).
 libc = "0.2"
 gitpoulpi-core = { path = "crates/gitpoulpi-core" }
+gitpoulpi-config = { path = "crates/gitpoulpi-config" }
 gitpoulpi-secrets = { path = "crates/gitpoulpi-secrets" }
 gitpoulpi-pty = { path = "crates/gitpoulpi-pty" }
 gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }

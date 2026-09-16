@@ -1,0 +1,252 @@
+profiles = []
+integrations = []
+hosting = []
+
+[general]
+default_backend = "git2"
+auto_stash = "ask"
+include_untracked_in_autostash = false
+initial_commits_in_graph = 5000
+lazy_load_commits_in_graph = true
+commits_per_lazy_page = 1000
+max_commits_in_graph = 100000
+auto_fetch_interval_minutes = 5
+auto_fetch_interval_unit = "auto"
+fetch_on_tab_open = true
+hosting_refresh_minutes = 5
+hosting_refresh_unit = "auto"
+auto_prune = false
+auto_prune_tags = false
+keep_submodules_up_to_date = false
+default_branch_name = "main"
+delete_orig_files_after_merge = false
+remember_tabs = true
+radar_enabled = true
+startup_tab_in_repo = "current-repo"
+startup_tab_outside_repo = "home"
+startup_tab_launcher = "last"
+group_worktree_tabs = true
+active_profile = ""
+external_editor = ""
+external_diff_tool = ""
+external_merge_tool = ""
+undo_depth = 100
+undo_enabled = true
+journal_outside = true
+conflict_detection = true
+
+[ui]
+language = "auto"
+translate_git_terms = false
+git_terms_english = false
+mouse_enabled = true
+theme = "system"
+graph_colorization = "lane"
+graph_lane_background = "off"
+toolbar_position = "bottom"
+toolbar_align = "start"
+toolbar_pr_pinned = true
+statusbar_position = "bottom"
+tabs_position = "top"
+graph_row_tint_strength = "medium"
+graph_color_theme = "theme"
+ref_tree = true
+graph_renderer = "auto"
+image_protocol = "auto"
+kitty_keyboard = "auto"
+color_depth = "auto"
+graph_show_stashes = true
+ref_connector = true
+log_wip_counts_in_message = true
+reveal_on_ref_click = true
+graph_ghost_ref = true
+allow_agent_view_control = true
+launch = "off"
+launch_command = ""
+tab_dir_follow = "buttons"
+terminal_launch = "auto"
+terminal_launch_command = ""
+open_in_default = ""
+launch_terminal = "auto"
+launcher_build = "current"
+relaunch_in_terminal = true
+reuse_window = true
+command_alias = ""
+command_alias_add = ""
+image_view = true
+image_view_max_mib = 32
+image_view_max_unit = "auto"
+image_view_text_fallback = "halfblock"
+image_view_pixelated_from = "2x"
+image_view_sync = true
+image_editor_default = ""
+logo_color = ""
+show_avatars = false
+avatar_sources = "gravatar_hosting"
+avatar_fallback = "identicon"
+composer_files = "expanded"
+blame_side = "right"
+column_resize = "line"
+blame_width = 46
+mouse_scroll_lines = 3
+date_locale = "system"
+date_format = "YYYY-MM-DD"
+date_word_format = "D MMMM YYYY"
+date_time_format = "YYYY-MM-DD HH:mm"
+date_verbose_format = "D MMMM YYYY HH:mm"
+diff_layout = "inline"
+pr_terminology = "auto"
+hide_finished_pr_chip = true
+diff_hunks_only = true
+diff_show_whitespace = true
+diff_word_wrap = false
+minimap = false
+mermaid_detail = "refs"
+mermaid_orientation = "lr"
+mermaid_fence = false
+mermaid_subject_width = 40
+input_color = "theme"
+input_color_custom = "#2a2a2a"
+log_columns_hidden = []
+log_columns_order = []
+commit_column_columns_visible = []
+commit_column_columns_order = []
+sidebar_sections_hidden = []
+sidebar_sections_scope = "repository"
+
+[ui.log_column_widths]
+
+[ui.commit_column_columns_widths]
+
+[credentials]
+https_mode = "credential_helper"
+
+[ssh]
+key_type = "ed25519"
+
+[git]
+default_encoding = "utf-8"
+autocrlf = "unset"
+eol = "native"
+lfs_enabled = true
+lfs_autofix_filters = true
+pull_mode = "merge"
+push_behavior = "direct"
+
+[mcp]
+enabled = true
+bind = "127.0.0.1:8808"
+allow_mutations = false
+mutation_allowlist = []
+allow_ui = true
+ui_control = "ask"
+allow_ui_propose = false
+allow_history_purge = false
+
+[ai]
+enabled = false
+default_profile = "default"
+global_instructions = ""
+
+[[ai.profiles]]
+id = "default"
+name = "Default"
+kind = "open_ai"
+model = "gpt-5"
+base_url = ""
+token_ref = "ai:default"
+command = ""
+args = []
+
+[ai.actions.commit_message]
+profile = ""
+instructions = ""
+
+[ai.actions.explain_changes]
+profile = ""
+instructions = ""
+
+[ai.actions.stash_message]
+profile = ""
+instructions = ""
+
+[ai.actions.pull_request_description]
+profile = ""
+instructions = ""
+
+[ai.actions.commit_composer]
+profile = ""
+instructions = ""
+
+[ai.actions.conflict_resolve]
+profile = ""
+instructions = ""
+
+[ai.actions.code_review]
+profile = ""
+instructions = ""
+
+[ai.actions.split_commit]
+profile = ""
+instructions = ""
+
+[ai.actions.rewrite_script]
+profile = ""
+instructions = ""
+
+[ai.actions.rewrite_rules]
+profile = ""
+instructions = ""
+
+[ai.review]
+run_in_repository = "profile"
+include_claude_md = true
+include_agents_md = true
+extra_file = ""
+
+[session]
+per_repo_state_dir = "in_git_dir"
+
+[editor]
+tab_size = 4
+eol = "auto"
+syntax_highlighting = true
+line_numbers = true
+follow_selection = true
+
+[merge]
+side_by_side_min_width = 100
+
+[repos]
+browse_root = ""
+show_hidden = false
+show_siblings = false
+
+[keybindings]
+
+[log]
+level = "info"
+retention_days = 7
+retention_unit = "auto"
+max_file_mb = 5
+max_file_unit = "auto"
+timings = true
+extended = false
+commit_count = "system-git"
+use_mailmap = true
+
+[search]
+commit_limit = 200000
+
+[rewrite]
+protected_branches = ["main", "master", "develop", "release/*"]
+external_scripts = ["shell"]
+script_timeout_ms = 5000
+script_timeout_unit = "auto"
+script_total_timeout_s = 3600
+script_total_timeout_unit = "auto"
+
+[updates]
+mode = "notify"
+channel = "stable"
+repo = "Poulpi-Lab/GitPoulpi"

@@ -794,6 +794,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-update"
+version = "1.0.0-rc.1"
+dependencies = [
+ "flate2",
+ "gitpoulpi-config",
+ "gitpoulpi-hosting",
+ "sha2",
+ "tar",
+ "tempfile",
+ "thiserror 1.0.69",
+ "tokio",
+ "xtask",
+ "zip",
+]
+
+[[package]]
 name = "group"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -1,0 +1,25 @@
+[package]
+name = "gitpoulpi-update"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "The self-updater's engine: download and verify a release archive, extract it, stage and swap the binaries (Unix rename / Windows move-aside), revert. No TUI dependencies; every file operation goes through an injected trait."
+
+[dependencies]
+gitpoulpi-config.workspace = true
+gitpoulpi-hosting.workspace = true
+thiserror.workspace = true
+sha2 = { workspace = true, features = ["std"] }
+# The same pure-Rust archive crates `xtask dist` packs with, so what one
+# writes the other reads and no tar/unzip is needed on PATH (Windows).
+flate2.workspace = true
+tar = { version = "0.4", default-features = false }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+
+[dev-dependencies]
+tempfile.workspace = true
+tokio.workspace = true
+xtask.workspace = true

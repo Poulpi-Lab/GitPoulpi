@@ -1,0 +1,34 @@
+[package]
+name = "gitpoulpi-daemon"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Background per-session daemon: owns GitBackend/session state and the IPC endpoint every frontend (TUI/CLI/MCP) connects to."
+
+[features]
+default = []
+lfs = []
+worktree = []
+submodule = []
+rewrite-scripts = []
+
+[dependencies]
+gitpoulpi-core.workspace = true
+gitpoulpi-cli-backend.workspace = true
+gitpoulpi-git2-backend.workspace = true
+gitpoulpi-ipc.workspace = true
+gitpoulpi-config.workspace = true
+gitpoulpi-session.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+gitpoulpi-testkit.workspace = true
+gitpoulpi-log.workspace = true
+tempfile.workspace = true

@@ -632,6 +632,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-daemon"
+version = "1.0.0-rc.1"
+dependencies = [
+ "gitpoulpi-cli-backend",
+ "gitpoulpi-config",
+ "gitpoulpi-core",
+ "gitpoulpi-git2-backend",
+ "gitpoulpi-ipc",
+ "gitpoulpi-log",
+ "gitpoulpi-session",
+ "gitpoulpi-testkit",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 1.0.69",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "gitpoulpi-git2-backend"
 version = "1.0.0-rc.1"
 dependencies = [

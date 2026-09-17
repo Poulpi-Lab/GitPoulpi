@@ -1,0 +1,225 @@
+//! Pins how every `OperationKind` is classified: one row per variant, with
+//! the flags (N network, R read, S shared-lock network, C can leave
+//! conflicts, J always journaled, P undo can rewrite pushed commits,
+//! H history operation) and the `ChangeScope` its mutation reports.
+
+use gitpoulpi_core::domain::OperationKind as K;
+use gitpoulpi_core::domain::OperationKind;
+use gitpoulpi_ipc::ChangeScope;
+
+const GOLDEN: &[(OperationKind, &str, &str)] = &[
+    (K::Discover, "", "ALL"),
+    (K::Init, "", "ALL"),
+    (K::Status, "R", "ALL"),
+    (K::Log, "R", "ALL"),
+    (K::CountCommits, "R", "ALL"),
+    (K::Diff, "R", "ALL"),
+    (K::DiffFiles, "R", "ALL"),
+    (K::CommitStats, "R", "ALL"),
+    (K::Search, "R", "ALL"),
+    (K::Refs, "R", "ALL"),
+    (K::Stashes, "R", "ALL"),
+    (K::Remotes, "R", "ALL"),
+    (K::Worktrees, "R", "ALL"),
+    (K::Submodules, "R", "ALL"),
+    (K::SubmoduleInit, "", "ALL"),
+    (K::SubmoduleUpdate, "", "ALL"),
+    (K::Resolve, "R", "ALL"),
+    (K::MergeBase, "R", "ALL"),
+    (K::PredictConflicts, "R", "ALL"),
+    (K::ReadBlob, "R", "ALL"),
+    (K::ReadBlobBytes, "R", "ALL"),
+    (K::Blame, "R", "ALL"),
+    (K::FileHistory, "R", "ALL"),
+    (K::ListTree, "R", "ALL"),
+    (K::StageFile, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::StageHunk, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::StageLine, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::StageFolder, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::StageAll, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::UnstageFile, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::UnstageHunk, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::UnstageLine, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::UnstageFolder, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::UnstageAll, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::Commit, "JP", "INDEX|REFS|LOG|CONFLICTS"),
+    (K::Checkout, "", "ALL"),
+    (K::Discard, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::DiscardHunk, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::DiscardLine, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::BranchCreate, "J", "REFS|LOG"),
+    (K::BranchCreateTracking, "J", "ALL"),
+    (K::BranchDelete, "J", "REFS|LOG"),
+    (K::BranchDeleteRemote, "N", "REFS|LOG"),
+    (K::BranchRename, "J", "REFS|LOG"),
+    (K::BranchSetUpstream, "J", "REFS|LOG"),
+    (K::FastForward, "J", "ALL"),
+    (K::WorktreeAdd, "", "REFS|LOG|WORKTREES"),
+    (K::PatchCreate, "R", "ALL"),
+    (K::PatchApply, "", "ALL"),
+    (K::DeleteFile, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::ConvertFiles, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::AddToGitignore, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::GitattributesTreat, "", "INDEX|WORKTREE|CONFLICTS"),
+    (K::BinaryPaths, "R", "ALL"),
+    (K::MailmapIdentities, "R", "ALL"),
+    (K::MailmapResolve, "R", "ALL"),
+    (K::MailmapAdd, "", "INDEX|WORKTREE|CONFLICTS|LOG"),
+    (K::TagCreate, "J", "REFS|LOG"),
+    (K::TagDelete, "J", "REFS|LOG"),
+    (K::TagAnnotate, "J", "REFS|LOG"),
+    (K::TagPush, "NS", "REFS|LOG"),
+    (K::TagDeleteRemote, "N", "REFS|LOG"),
+    (K::TagFetch, "N", "REFS|LOG"),
+    (K::Merge, "CJPH", "ALL"),
+    (K::Rebase, "CJPH", "ALL"),
+    (K::RebaseInteractive, "CJPH", "ALL"),
+    (K::RebasePlan, "R", "ALL"),
+    (K::RebaseState, "R", "ALL"),
+    (K::RebaseContinue, "C", "ALL"),
+    (K::RebaseSkip, "C", "ALL"),
+    (K::RebaseAbort, "", "ALL"),
+    (K::CherryPick, "CJPH", "ALL"),
+    (K::Revert, "CJPH", "ALL"),
+    (K::Reset, "J", "ALL"),
+    (K::Reword, "J", "INDEX|WORKTREE|REFS|LOG|CONFLICTS"),
+    (K::AmendCommit, "J", "INDEX|WORKTREE|REFS|LOG|CONFLICTS"),
+    (K::SplitSource, "R", "ALL"),
+    (K::SplitCommit, "J", "INDEX|WORKTREE|REFS|LOG|CONFLICTS"),
+    (K::RewritePreview, "R", "ALL"),
+    (K::RewriteApply, "JP", "INDEX|WORKTREE|REFS|LOG|CONFLICTS"),
+    (K::RewritePush, "NS", "ALL"),
+    (K::RewriteNote, "R", "ALL"),
+    (K::RewriteMaps, "R", "ALL"),
+    (K::RewritePurgeCheck, "R", "ALL"),
+    (K::RewritePurge, "", "REFS|LOG"),
+    (K::RewriteDiscard, "R", "ALL"),
+    (K::RewriteRows, "R", "ALL"),
+    (K::RewriteBlobDiff, "R", "ALL"),
+    (K::RewriteScriptCheck, "R", "ALL"),
+    (K::RewriteScriptTest, "R", "ALL"),
+    (K::RewriteTrustScript, "R", "ALL"),
+    (K::RewriteScanSecrets, "R", "ALL"),
+    (K::RewriteAnalyze, "R", "ALL"),
+    (K::RewriteCheckSigning, "R", "ALL"),
+    (K::RewriteTools, "R", "ALL"),
+    (K::StashPush, "", "INDEX|WORKTREE|LOG|STASHES|CONFLICTS"),
+    (K::StashPop, "C", "INDEX|WORKTREE|LOG|STASHES|CONFLICTS"),
+    (K::StashApply, "C", "INDEX|WORKTREE|LOG|STASHES|CONFLICTS"),
+    (K::StashDrop, "", "INDEX|WORKTREE|LOG|STASHES|CONFLICTS"),
+    (K::AutoStashStartOver, "", "ALL"),
+    (K::Fetch, "NS", "ALL"),
+    (K::FetchAll, "NS", "ALL"),
+    (K::FetchRefAsBranch, "NJ", "ALL"),
+    (K::FetchRefspec, "NS", "ALL"),
+    (K::Pull, "NCJH", "ALL"),
+    (K::Push, "NS", "ALL"),
+    (K::PushForReview, "NS", "ALL"),
+    (K::Clone, "N", "ALL"),
+    (K::RemoteAdd, "", "REFS|LOG|CONFIG"),
+    (K::RemoteRemove, "", "REFS|LOG|CONFIG"),
+    (K::RemoteRename, "", "REFS|LOG|CONFIG"),
+    (K::RemoteSetUrl, "", "REFS|LOG|CONFIG"),
+    (K::RemoteSetPushUrl, "", "REFS|LOG|CONFIG"),
+    (K::SshCommand, "R", "ALL"),
+    (K::SetSshCommand, "", "CONFIG"),
+    (K::RepoConfig, "R", "ALL"),
+    (K::Workflow, "R", "ALL"),
+    (K::FlowPlan, "R", "ALL"),
+    (K::FlowRun, "NCJP", "ALL"),
+    (K::SetRepoConfig, "J", "CONFIG"),
+    (K::SparseStatus, "R", "ALL"),
+    (K::SparseSet, "", "INDEX|WORKTREE|CONFIG"),
+    (K::SparseDisable, "", "INDEX|WORKTREE|CONFIG"),
+    (K::Conflicts, "R", "ALL"),
+    (K::ConflictEntries, "R", "ALL"),
+    (K::ConflictShow, "R", "ALL"),
+    (K::ResolveConflict, "C", "INDEX|WORKTREE|CONFLICTS"),
+    (K::ConflictUnresolve, "C", "INDEX|WORKTREE|CONFLICTS"),
+    (K::OperationState, "R", "ALL"),
+    (K::OperationAbort, "C", "ALL"),
+    (K::AmContinue, "C", "ALL"),
+    (K::AmSkip, "C", "ALL"),
+    (K::AmAbort, "", "ALL"),
+    (K::IndexLock, "R", "ALL"),
+    (K::IndexLockRemove, "", "ALL"),
+    (K::OperationSkip, "C", "ALL"),
+    (K::LfsStatus, "R", "ALL"),
+    (K::LfsFiles, "R", "ALL"),
+    (K::LfsInstall, "", "INDEX|WORKTREE|LFS"),
+    (K::LfsTrack, "", "INDEX|WORKTREE|LFS"),
+    (K::LfsUntrack, "", "INDEX|WORKTREE|LFS"),
+    (K::LfsFetch, "NS", "INDEX|WORKTREE|LFS"),
+    (K::LfsPull, "N", "ALL"),
+    (K::LfsCheckout, "N", "INDEX|WORKTREE|LFS"),
+    (K::LfsPush, "NS", "INDEX|WORKTREE|LFS"),
+    (K::LfsPrune, "", "INDEX|WORKTREE|LFS"),
+    (K::LfsLocks, "N", "ALL"),
+    (K::LfsLock, "N", "INDEX|WORKTREE|LFS"),
+    (K::LfsUnlock, "N", "INDEX|WORKTREE|LFS"),
+    (K::Hello, "", "ALL"),
+    (K::ComposeCommits, "JP", "ALL"),
+    (K::Undo, "", "ALL"),
+    (K::Redo, "", "ALL"),
+    (K::JournalState, "R", "ALL"),
+    (K::JournalList, "R", "ALL"),
+    (K::JournalRestore, "", "ALL"),
+    (K::Outside, "", "ALL"),
+    (K::Reflog, "R", "ALL"),
+    (K::ReflogRestore, "", "ALL"),
+    (K::LostCommits, "R", "ALL"),
+    (K::Shutdown, "", "ALL"),
+    (K::SetRefVisibility, "", "NONE"),
+    (K::UiAttach, "", "NONE"),
+    (K::UiPresence, "", "NONE"),
+    (K::UiReport, "", "NONE"),
+    (K::UiShow, "", "NONE"),
+    (K::UiQuery, "", "NONE"),
+    (K::JobList, "", "NONE"),
+    (K::JobCancel, "", "NONE"),
+];
+
+fn scope(names: &str) -> ChangeScope {
+    if names == "ALL" {
+        return ChangeScope::ALL;
+    }
+    if names == "NONE" {
+        return ChangeScope::NONE;
+    }
+    names.split('|').fold(ChangeScope::NONE, |acc, n| {
+        acc | match n {
+            "INDEX" => ChangeScope::INDEX,
+            "WORKTREE" => ChangeScope::WORKTREE,
+            "REFS" => ChangeScope::REFS,
+            "LOG" => ChangeScope::LOG,
+            "STASHES" => ChangeScope::STASHES,
+            "WORKTREES" => ChangeScope::WORKTREES,
+            "CONFIG" => ChangeScope::CONFIG,
+            "LFS" => ChangeScope::LFS,
+            "CONFLICTS" => ChangeScope::CONFLICTS,
+            other => panic!("unknown scope flag {other}"),
+        }
+    })
+}
+
+#[test]
+fn every_variant_has_one_golden_row() {
+    let rows: Vec<OperationKind> = GOLDEN.iter().map(|(k, _, _)| *k).collect();
+    assert_eq!(rows, OperationKind::ALL);
+}
+
+#[test]
+fn classification_matches_the_golden_table() {
+    for (kind, flags, scope_names) in GOLDEN {
+        let has = |c: char| flags.contains(c);
+        let ctx = format!("{kind:?}");
+        assert_eq!(kind.traits().network, has('N'), "{ctx}: network");
+        assert_eq!(kind.traits().read, has('R'), "{ctx}: read");
+        assert_eq!(kind.traits().shared_network, has('S'), "{ctx}: shared");
+        assert_eq!(kind.traits().can_conflict, has('C'), "{ctx}: conflicts");
+        assert_eq!(kind.traits().journaled, has('J'), "{ctx}: journaled");
+        assert_eq!(kind.traits().pushed_risk, has('P'), "{ctx}: pushed risk");
+        assert_eq!(kind.traits().history, has('H'), "{ctx}: history");
+        assert_eq!(kind.traits().scope, scope(scope_names), "{ctx}: scope");
+    }
+}

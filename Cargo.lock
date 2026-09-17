@@ -357,6 +357,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-git2-backend"
+version = "1.0.0-rc.1"
+dependencies = [
+ "async-trait",
+ "git2",
+ "gitpoulpi-cli-backend",
+ "gitpoulpi-core",
+ "gitpoulpi-testkit",
+]
+
+[[package]]
 name = "gitpoulpi-i18n"
 version = "1.0.0-rc.1"
 dependencies = [

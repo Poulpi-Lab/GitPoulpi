@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "crates/gitpoulpi-core",
+    "crates/gitpoulpi-git2-backend",
     "crates/gitpoulpi-cli-backend",
     "crates/gitpoulpi-config",
     "crates/gitpoulpi-secrets",
@@ -29,6 +30,7 @@ repository = "https://github.com/Poulpi-Lab/GitPoulpi"
 libc = "0.2"
 gitpoulpi-core = { path = "crates/gitpoulpi-core" }
 gitpoulpi-cli-backend = { path = "crates/gitpoulpi-cli-backend", default-features = false }
+gitpoulpi-git2-backend = { path = "crates/gitpoulpi-git2-backend", default-features = false }
 gitpoulpi-config = { path = "crates/gitpoulpi-config" }
 gitpoulpi-secrets = { path = "crates/gitpoulpi-secrets" }
 gitpoulpi-pty = { path = "crates/gitpoulpi-pty" }

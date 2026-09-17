@@ -1,0 +1,25 @@
+[package]
+name = "gitpoulpi-git2-backend"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "GitBackend implementation over libgit2 (git2 crate), decorating gitpoulpi-cli-backend for operations git2 doesn't support natively."
+
+[features]
+default = []
+lfs = []
+rewrite-scripts = []
+worktree = []
+submodule = []
+
+[dependencies]
+gitpoulpi-core.workspace = true
+gitpoulpi-cli-backend.workspace = true
+async-trait.workspace = true
+git2.workspace = true
+
+[dev-dependencies]
+gitpoulpi-testkit.workspace = true

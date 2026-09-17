@@ -1,0 +1,62 @@
+[package]
+name = "gitpoulpi-hosting"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Hosting and issue-tracker API clients (GitHub, GitLab, Gitea/Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack, Redmine, local Markdown issues): project listing, clone helpers, SSH key generation and upload, remote-URL provider matching."
+
+[features]
+# The only feature that opens a socket. Off, the crate still builds and
+# every client is usable over a caller-supplied `HttpTransport`, which is
+# what the tests do -- so `--no-default-features` is a genuine
+# no-network build rather than a broken one.
+default = ["network"]
+network = ["dep:reqwest"]
+# Internal: the provider-agnostic port (`client`, `model`, `project`,
+# `resolve`). Never enabled alone: it is what `github` / `gitlab` turn on.
+# With neither built, only the always-compiled helpers remain (`http`,
+# `conditional`, `ssh_key`, `web_url`, remote-URL parsing, `IntegrationKind`).
+hosting = []
+# Providers; each needs the HTTP transport.
+github = []
+gitlab = []
+azure-devops = []
+bitbucket = []
+jira = []
+trello = []
+# Gitea and Forgejo (incl. Codeberg) share one client.
+gitea = []
+linear = []
+youtrack = []
+redmine = []
+gerrit = []
+# A folder of Markdown notes as an issue source (opens no socket itself;
+# "network" is on because the shared callers build the transport).
+local-issues = []
+
+[dependencies]
+gitpoulpi-config.workspace = true
+gitpoulpi-core.workspace = true
+gitpoulpi-secrets.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+# rustls rather than native-tls: no OpenSSL to find on Linux, no
+# schannel quirks on Windows, and one TLS story on all three platforms
+# (architecture principle 4).
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "charset", "http2"], optional = true }
+# In-process ed25519 generation, so an SSH-key flow does not depend on an
+# `ssh-keygen` binary that Windows ships as an optional feature -- see
+# `ssh_key`'s module comment.
+ssh-key = { version = "0.6", default-features = false, features = ["ed25519", "p256", "rsa", "alloc", "std", "getrandom"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
+
+[dev-dependencies]
+tempfile.workspace = true
+toml.workspace = true
+tokio.workspace = true
+gitpoulpi-testkit.workspace = true

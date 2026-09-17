@@ -7,6 +7,7 @@ members = [
     "crates/gitpoulpi-config",
     "crates/gitpoulpi-log",
     "crates/gitpoulpi-secrets",
+    "crates/gitpoulpi-session",
     "crates/gitpoulpi-pty",
     "crates/gitpoulpi-i18n",
     "crates/gitpoulpi-ipc",
@@ -35,6 +36,7 @@ gitpoulpi-git2-backend = { path = "crates/gitpoulpi-git2-backend", default-featu
 gitpoulpi-config = { path = "crates/gitpoulpi-config" }
 gitpoulpi-log = { path = "crates/gitpoulpi-log" }
 gitpoulpi-secrets = { path = "crates/gitpoulpi-secrets" }
+gitpoulpi-session = { path = "crates/gitpoulpi-session" }
 gitpoulpi-pty = { path = "crates/gitpoulpi-pty" }
 gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }
 gitpoulpi-ipc = { path = "crates/gitpoulpi-ipc" }

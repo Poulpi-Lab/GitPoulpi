@@ -478,6 +478,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-session"
+version = "1.0.0-rc.1"
+dependencies = [
+ "chrono",
+ "gitpoulpi-config",
+ "gitpoulpi-core",
+ "serde",
+ "tempfile",
+ "thiserror",
+ "toml",
+]
+
+[[package]]
 name = "gitpoulpi-testkit"
 version = "1.0.0-rc.1"
 dependencies = [

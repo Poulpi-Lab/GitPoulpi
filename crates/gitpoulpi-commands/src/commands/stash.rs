@@ -1,0 +1,91 @@
+//! `gitpoulpi stash` handlers.
+
+use gitpoulpi_core::domain::{OperationKind, Stash, StashId};
+use serde_json::json;
+
+use crate::cli::StashAction;
+use crate::client::Session;
+
+use super::*;
+
+pub(super) async fn stash(session: &mut Session, action: StashAction) -> Result<Emitted, String> {
+    match action {
+        StashAction::Push { message, ai } => {
+            let message = if ai {
+                Some(crate::ai_cmd::generate_stash_message(session).await?)
+            } else {
+                message
+            };
+            let id: Option<StashId> = session
+                .call(
+                    OperationKind::StashPush,
+                    json!({ "message": message, "include_untracked": false }),
+                )
+                .await?;
+            Ok(match id {
+                Some(id) => emitted(
+                    json!({ "stash": id }),
+                    format!("stashed as stash@{{{}}}", id.0),
+                ),
+                None => emitted(
+                    json!({ "stash": null }),
+                    "No local changes to save".to_string(),
+                ),
+            })
+        }
+        StashAction::Pop { id } => {
+            let id = stash_id(id)?;
+            session
+                .call::<()>(OperationKind::StashPop, json!({ "id": id }))
+                .await?;
+            Ok(emitted(
+                json!({ "popped": id }),
+                format!("popped stash@{{{}}}", id.0),
+            ))
+        }
+        StashAction::Apply { id } => {
+            let id = stash_id(id)?;
+            session
+                .call::<()>(OperationKind::StashApply, json!({ "id": id }))
+                .await?;
+            Ok(emitted(
+                json!({ "applied": id }),
+                format!("applied stash@{{{}}}", id.0),
+            ))
+        }
+        StashAction::Drop { id } => {
+            let id = stash_id(id)?;
+            session
+                .call::<()>(OperationKind::StashDrop, json!({ "id": id }))
+                .await?;
+            Ok(emitted(
+                json!({ "dropped": id }),
+                format!("dropped stash@{{{}}}", id.0),
+            ))
+        }
+        StashAction::List => {
+            let stashes: Vec<Stash> = session.call(OperationKind::Stashes, json!({})).await?;
+            let human = stashes
+                .iter()
+                .map(|s| format!("stash@{{{}}} {}", s.id.0, s.message))
+                .collect::<Vec<_>>()
+                .join("\n");
+            Ok(emitted(to_value(&stashes)?, human))
+        }
+    }
+}
+
+/// Accepts both spellings a user is likely to paste: `2` and `stash@{2}`.
+pub(super) fn stash_id(raw: Option<String>) -> Result<StashId, String> {
+    let Some(raw) = raw else {
+        return Ok(StashId(0));
+    };
+    let trimmed = raw
+        .trim()
+        .trim_start_matches("stash@{")
+        .trim_end_matches('}');
+    trimmed
+        .parse::<u32>()
+        .map(StashId)
+        .map_err(|_| format!("`{raw}` is not a stash id"))
+}

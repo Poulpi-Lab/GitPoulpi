@@ -1,0 +1,140 @@
+//! `gitpoulpi config get|set|path`.
+//!
+//! Handled here rather than in `commands/` because none of it is a
+//! `GitBackend` operation: it reads and writes a file on this machine, so
+//! it must work outside a repository and must not start a daemon.
+//!
+//! `get` reports the value in force, **which layer it came from**
+//! (`default`/`file`/`env`/`flag`), and whether anything in GitPoulpi
+//! actually reads that key, so an ignored key can be told from a
+//! misspelled one.
+
+use gitpoulpi_config::{ConfigPaths, Overrides, Settings};
+use serde_json::json;
+
+use crate::cli::ConfigAction;
+use crate::commands::emitted;
+use crate::repo_cmd::Emitted;
+
+/// Runs one `config` action. Shared by the CLI binary and the MCP server
+/// (`config get` / `config path` are tools), so neither can reach a
+/// different answer.
+pub fn execute(action: ConfigAction, overrides: &Overrides) -> Result<Emitted, String> {
+    let paths = ConfigPaths::discover()
+        .ok_or_else(|| "could not determine this OS's config directory".to_string())?;
+    let file = paths.config_file();
+
+    match action {
+        ConfigAction::Path => Ok(emitted(
+            json!({
+                "path": file.to_string_lossy(),
+                "config_dir": paths.config_dir().to_string_lossy(),
+                "exists": file.exists(),
+            }),
+            file.display().to_string(),
+        )),
+
+        ConfigAction::Get { key } => {
+            let settings = Settings::resolve(Some(&paths), overrides).map_err(|e| e.to_string())?;
+            let value = settings.config().get(&key).map_err(|e| e.to_string())?;
+            let source = settings.source_of(&key);
+            let implemented = Settings::key_is_implemented(&key);
+            let mut human = format!("{key} = {value}  (source: {})", source.as_str());
+            if !implemented {
+                human.push_str(&format!("\nnote: {UNREAD_NOTE}"));
+            }
+            Ok(emitted(
+                json!({
+                    "key": key,
+                    "value": value,
+                    "source": source,
+                    "implemented": implemented,
+                }),
+                human,
+            ))
+        }
+
+        ConfigAction::Set { key, value } => {
+            match key.as_str() {
+                "ui.theme" => crate::theme_cmd::validate_ui_theme(&value)?,
+                "ui.graph_color_theme" => crate::theme_cmd::validate_graph_color_theme(&value)?,
+                _ => {}
+            }
+            // Deliberately the *file* layer, not the resolved one: writing
+            // back a `Settings` would bake whatever `GITPOULPI_*` variable
+            // or `--backend` flag happened to be in force into config.toml,
+            // so a one-off override would silently become permanent.
+            let stored =
+                gitpoulpi_config::set_in_file(&file, &key, &value).map_err(|e| e.to_string())?;
+            let mut human = format!("{key} = {stored}  ->  {}", file.display());
+            if let Some(note) = not_built_note(&key) {
+                human.push_str(&format!("\nnote: {note}"));
+            }
+            if !Settings::key_is_implemented(&key) {
+                human.push_str(&format!("\nnote: {UNREAD_NOTE}"));
+            }
+            Ok(emitted(
+                json!({
+                    "key": key,
+                    "value": stored,
+                    "path": file.to_string_lossy(),
+                }),
+                human,
+            ))
+        }
+    }
+}
+
+/// English on purpose: reading it from the i18n catalog (`msg::settings::*`)
+/// keeps the whole catalog blob (about 3 MiB) alive in `gitpoulpi-mcp`, which
+/// otherwise links none of it - see `docs/developer/binary-size.md`.
+const NOT_BUILT_NOTE: &str = "(not built into this binary; kept for other builds)";
+
+/// The `integrations` table (without a hosting provider) and the `ai`
+/// table (without AI) still parse and are written back faithfully, but
+/// nothing in such a binary reads them.
+fn not_built_note(key: &str) -> Option<String> {
+    let under = |table: &str| {
+        key == table
+            || key
+                .strip_prefix(table)
+                .is_some_and(|rest| rest.starts_with('.') || rest.starts_with('['))
+    };
+    if !cfg!(feature = "hosting") && under("integrations") {
+        return Some(NOT_BUILT_NOTE.to_string());
+    }
+    if !cfg!(feature = "ai") && under("ai") {
+        return Some(NOT_BUILT_NOTE.to_string());
+    }
+    None
+}
+
+const UNREAD_NOTE: &str = "nothing reads this key yet - it is stored and read back faithfully, \
+     but no component consults it. See docs/user/config-reference.md.";
+
+#[cfg(all(test, not(feature = "hosting")))]
+mod not_built_tests {
+    use super::not_built_note;
+
+    #[test]
+    fn integrations_keys_get_the_note_and_others_do_not() {
+        assert!(not_built_note("integrations").is_some());
+        assert!(not_built_note("integrations.0.url").is_some());
+        assert!(not_built_note("integrations[0].url").is_some());
+        assert!(not_built_note("ui.theme").is_none());
+    }
+}
+
+#[cfg(all(test, not(feature = "ai")))]
+mod ai_not_built_tests {
+    use super::not_built_note;
+
+    #[test]
+    fn ai_keys_get_the_note_and_others_do_not() {
+        assert!(not_built_note("ai.enabled").is_some());
+        assert!(not_built_note("ai").is_some());
+        assert!(not_built_note("ai.profiles[0].model").is_some());
+        assert!(not_built_note("aim.x").is_none());
+        assert!(not_built_note("ui.theme").is_none());
+    }
+}

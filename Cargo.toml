@@ -14,6 +14,7 @@ members = [
     "crates/gitpoulpi-i18n",
     "crates/gitpoulpi-ipc",
     "crates/gitpoulpi-daemon",
+    "crates/gitpoulpi-commands",
     "crates/gitpoulpi-testkit",
     "xtask",
 ]
@@ -48,6 +49,7 @@ gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }
 gitpoulpi-ipc = { path = "crates/gitpoulpi-ipc" }
 gitpoulpi-daemon = { path = "crates/gitpoulpi-daemon", default-features = false }
 gitpoulpi-testkit = { path = "crates/gitpoulpi-testkit" }
+gitpoulpi-commands = { path = "crates/gitpoulpi-commands", default-features = false }
 xtask = { path = "xtask" }
 
 async-trait = "0.1"
@@ -208,6 +210,12 @@ opt-level = 3
 opt-level = 3
 [profile.dev.package.miniz_oxide]
 opt-level = 3
+# clap's derived parser for the whole `gitpoulpi` command tree keeps every
+# variant's fields in one stack frame: unoptimised it outgrew a 2 MiB thread
+# stack (test threads, tokio workers in the MCP server) once the tree reached
+# the hosting metadata commands.
+[profile.dev.package.gitpoulpi-commands]
+opt-level = 1
 
 # `release` is the maintainer's daily build, rebuilt after every merge batch:
 # tuned for build time (incremental, parallel codegen, no cross-crate LTO).

@@ -1,0 +1,64 @@
+//! `gitpoulpi refs` handlers.
+
+use gitpoulpi_core::domain::{OperationKind, Ref, RefKind};
+use serde_json::{json, Value};
+
+use crate::cli::RefsAction;
+use crate::client::Session;
+
+use super::*;
+
+/// `refs hide|show|solo`: the per-repo display filter, changed through the
+/// daemon so it can tell every other frontend (`Event::RefVisibilityChanged`).
+pub(super) async fn refs(session: &mut Session, action: RefsAction) -> Result<Emitted, String> {
+    let (mode, names, clear) = match action {
+        RefsAction::Hide { names, clear } => ("hide", names, clear),
+        RefsAction::Show { names, clear } => ("show", names, clear),
+        RefsAction::Solo { names, clear } => ("solo", names, clear),
+    };
+    // Hiding or soloing something that does not exist would be remembered
+    // forever and do nothing; showing it again must stay possible (a branch
+    // can be deleted while hidden), so only the first two are checked.
+    if mode != "show" && !names.is_empty() {
+        let known = all_refs(session).await?;
+        for name in &names {
+            if !known.iter().any(|r| ref_name(&r.kind) == *name) {
+                return Err(format!("no branch, remote branch or tag named `{name}`"));
+            }
+        }
+    }
+    let state: Value = session
+        .call(
+            OperationKind::SetRefVisibility,
+            json!({ "mode": mode, "names": names, "clear": clear }),
+        )
+        .await?;
+    let count = |key: &str| state[key].as_array().map_or(0, Vec::len);
+    let human = format!("{} hidden, {} soloed", count("hidden"), count("solo"));
+    Ok(emitted(
+        json!({ "mode": mode, "names": names, "clear": clear, "hidden": state["hidden"], "solo": state["solo"] }),
+        human,
+    ))
+}
+
+pub(super) async fn all_refs(session: &mut Session) -> Result<Vec<Ref>, String> {
+    session.call(OperationKind::Refs, json!({})).await
+}
+
+/// `merge`/`rebase` take a whole `Ref`, not a name, because the backends
+/// need its target oid to report a fast-forward. Looking it up in
+/// `refs()` keeps the CLI from having to invent one.
+pub(super) async fn find_ref(session: &mut Session, name: &str) -> Result<Ref, String> {
+    let refs = all_refs(session).await?;
+    refs.into_iter()
+        .find(|r| ref_name(&r.kind) == name)
+        .ok_or_else(|| format!("no branch, remote branch or tag named `{name}`"))
+}
+
+pub(super) fn ref_name(kind: &RefKind) -> String {
+    match kind {
+        RefKind::LocalBranch { name } => name.clone(),
+        RefKind::RemoteBranch { remote, name } => format!("{remote}/{name}"),
+        RefKind::Tag { name } => name.clone(),
+    }
+}

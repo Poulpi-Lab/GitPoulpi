@@ -1,0 +1,71 @@
+[package]
+name = "gitpoulpi-commands"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+build = "build.rs"
+description = "Shared command layer: the `gitpoulpi` clap `Cli` tree, the IPC `Session` client, and `execute` -- one `GitBackend` mapping per subcommand, run by both the CLI and the MCP server so their tools can never drift apart."
+
+[features]
+default = ["full"]
+# Standalone (`cargo test -p gitpoulpi-commands`) behaves as a full build.
+full = []
+ai = []
+# Internal: "at least one hosting provider". Never enabled alone.
+hosting = []
+github = []
+gitlab = []
+azure-devops = []
+bitbucket = []
+jira = []
+trello = []
+gitea = []
+linear = []
+youtrack = []
+redmine = []
+gerrit = []
+local-issues = []
+mcp = []
+lfs = []
+worktree = []
+submodule = []
+# Nothing to fetch here; listed so `--version` reports the build faithfully.
+avatar-fetch = []
+# Nothing to decode here; listed so `--version` reports the build faithfully.
+image-view = []
+# Mermaid gitGraph output of `log --format mermaid`.
+mermaid = []
+# Provider-backed extras: only effective together with a hosting provider (`hosting`).
+radar = []
+board = []
+review = []
+# Advanced history rewriting (Rewrite: palette commands, `gitpoulpi rewrite`).
+history-rewrite = []
+# Global search (`gitpoulpi search`).
+global-search = []
+# Workspaces (`gitpoulpi workspace`, the `--workspace` flags).
+workspaces = []
+# Embedded Lua scripts in history rewrite recipes.
+rewrite-scripts = []
+
+[dependencies]
+gitpoulpi-core.workspace = true
+gitpoulpi-ipc.workspace = true
+gitpoulpi-daemon.workspace = true
+gitpoulpi-config.workspace = true
+gitpoulpi-session.workspace = true
+gitpoulpi-hosting.workspace = true
+gitpoulpi-secrets.workspace = true
+gitpoulpi-i18n.workspace = true
+clap.workspace = true
+clap_complete.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

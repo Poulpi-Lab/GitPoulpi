@@ -308,6 +308,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-cli-backend"
+version = "1.0.0-rc.1"
+dependencies = [
+ "async-trait",
+ "flate2",
+ "gitpoulpi-core",
+ "gitpoulpi-testkit",
+ "libc",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha1",
+ "sha2",
+ "tempfile",
+ "tokio",
+ "toml",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
 name = "gitpoulpi-config"
 version = "1.0.0-rc.1"
 dependencies = [
@@ -904,6 +924,17 @@ dependencies = [
  "cfg-if",
  "libc",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "sha1"
+version = "0.10.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a978451301f4db1d02937a4ab3ccce137717b81826e79b7d49ffe3244a13c3b8"
+dependencies = [
+ "cfg-if",
+ "cpufeatures",
+ "digest",
 ]
 
 [[package]]

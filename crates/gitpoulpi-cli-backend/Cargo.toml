@@ -1,0 +1,52 @@
+[package]
+name = "gitpoulpi-cli-backend"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "GitBackend implementation that shells out to the system `git` binary, parsing only machine-readable output (porcelain v2, NUL-delimited logs)."
+
+[features]
+# Placeholders until the gating slices: management of each.
+default = []
+lfs = []
+worktree = []
+submodule = []
+# History rewrite scripts: embedded Lua 5.4 (vendored C source, built by `cc`).
+rewrite-scripts = []
+
+[dependencies]
+gitpoulpi-core.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+# `git lfs locks --json` output; the rewrite run's stored plan.
+serde.workspace = true
+serde_json.workspace = true
+# History rewrite: object ids and the temporary pack (`history/`).
+sha1.workspace = true
+sha2.workspace = true
+# The workflow file: which bases are protected.
+toml.workspace = true
+flate2.workspace = true
+# S19: a private directory for the payload and key files of a signature.
+tempfile.workspace = true
+# Content rules: secret literals are searched as bytes.
+regex.workspace = true
+
+# Process-tree kill of a canceled network command (`tree_kill.rs`).
+[target.'cfg(unix)'.dependencies]
+libc.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_JobObjects",
+    "Win32_System_Threading",
+] }
+
+[dev-dependencies]
+gitpoulpi-testkit.workspace = true
+tempfile.workspace = true

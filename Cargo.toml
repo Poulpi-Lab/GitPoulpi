@@ -5,6 +5,7 @@ members = [
     "crates/gitpoulpi-git2-backend",
     "crates/gitpoulpi-cli-backend",
     "crates/gitpoulpi-config",
+    "crates/gitpoulpi-log",
     "crates/gitpoulpi-secrets",
     "crates/gitpoulpi-pty",
     "crates/gitpoulpi-i18n",
@@ -32,6 +33,7 @@ gitpoulpi-core = { path = "crates/gitpoulpi-core" }
 gitpoulpi-cli-backend = { path = "crates/gitpoulpi-cli-backend", default-features = false }
 gitpoulpi-git2-backend = { path = "crates/gitpoulpi-git2-backend", default-features = false }
 gitpoulpi-config = { path = "crates/gitpoulpi-config" }
+gitpoulpi-log = { path = "crates/gitpoulpi-log" }
 gitpoulpi-secrets = { path = "crates/gitpoulpi-secrets" }
 gitpoulpi-pty = { path = "crates/gitpoulpi-pty" }
 gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }
@@ -165,6 +167,8 @@ debug = 1
 
 # RSA key generation (`ssh.key_type = "rsa"`, 4096 bits) takes over a minute
 # unoptimised: build the big-integer maths with optimisations in dev and test.
+[profile.dev.package.num-traits]
+opt-level = 3
 [profile.dev.package.sha2]
 opt-level = 3
 # Syntax highlighting (the editor, file and blame views, the merge editor)

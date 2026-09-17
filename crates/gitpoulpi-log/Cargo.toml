@@ -1,0 +1,18 @@
+[package]
+name = "gitpoulpi-log"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "GitPoulpi application log: a tracing sink with a level, daily files, retention and redaction."
+
+[dependencies]
+gitpoulpi-core.workspace = true
+gitpoulpi-config.workspace = true
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

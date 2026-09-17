@@ -1,0 +1,50 @@
+[package]
+name = "xtask"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+publish = false
+
+# Both a library and a binary: the pty driver is a library so the TUI's
+# integration tests can `use xtask::pty`, and a binary so an agent can
+# drive the same code ad hoc with `cargo run -p xtask -- tui <script>`.
+# One implementation, two entry points -- a driver only reachable from a
+# CLI would be re-implemented in the tests within a week.
+[lib]
+name = "xtask"
+path = "src/lib.rs"
+
+[[bin]]
+name = "xtask"
+path = "src/main.rs"
+
+[dependencies]
+# `xtask perf` drives an in-process daemon over IPC and reads the spawn
+# counter, so it links the same crates the daemon binary does.
+gitpoulpi-core.workspace = true
+gitpoulpi-pty.workspace = true
+gitpoulpi-ipc.workspace = true
+# `build-custom` lists the theme families of the presets it can select.
+gitpoulpi-config.workspace = true
+gitpoulpi-daemon = { workspace = true, features = ["default"] }
+gitpoulpi-cli-backend = { workspace = true, features = ["default"] }
+gitpoulpi-git2-backend = { workspace = true, features = ["default"] }
+serde_json.workspace = true
+tokio.workspace = true
+portable-pty.workspace = true
+thiserror.workspace = true
+vt100.workspace = true
+
+# `xtask dist` packaging: pure-Rust archive and checksum code, so the task
+# runs the same on Windows and Linux with no tar/zip/sha256sum on PATH.
+flate2 = "1"
+tar = { version = "0.4", default-features = false }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+sha2 = { workspace = true, features = ["std"] }
+
+[dev-dependencies]
+# `tests/feature_contract.rs` reads the workspace's Cargo.toml files.
+toml.workspace = true
+tempfile.workspace = true

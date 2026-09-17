@@ -1,0 +1,420 @@
+//! `cargo run -p xtask -- dist`: build the binaries with the `dist`
+//! profile (fat LTO) and pack them into `target/dist/`.
+//!
+//! The archive is `gitpoulpi-<version>-<target>.zip` on Windows targets and
+//! `.tar.gz` everywhere else, next to a `.sha256` file in the format
+//! `sha256sum -c` reads. Everything here is plain Rust (no tar, zip or
+//! sha256sum on PATH), so the same task runs on Windows and Linux. The
+//! naming, the archive layout and the checksum line are pure functions with
+//! tests; only `run` touches cargo and the disk layout.
+
+use std::fs;
+use std::io::Write;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+
+use sha2::{Digest, Sha256};
+
+/// The packages (and therefore the binaries) a release ships.
+const PACKAGES: [&str; 3] = ["gitpoulpi-tui", "gitpoulpi-cli", "gitpoulpi-mcp"];
+/// The binary names those packages produce.
+const BINARIES: [&str; 4] = gitpoulpi_config::release::BINARIES;
+
+const USAGE: &str = "\
+Usage: cargo run -p xtask -- dist [--target <triple>] [--no-build]
+
+Builds gitpoulpi, gitpoulpi-tui, gitpoulpi-mcp and gitpoulpi-launch with `--profile dist` and
+writes target/dist/gitpoulpi-<version>-<target>.<zip|tar.gz> plus a .sha256
+file. Windows targets get a .zip, everything else a .tar.gz.
+
+  --target <triple>  cross-build for this target (default: the host).
+  --no-build         pack what is already in the dist profile directory.";
+
+/// One file inside the archive.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Entry {
+    /// Path relative to the archive's top-level directory.
+    pub name: String,
+    pub data: Vec<u8>,
+    pub executable: bool,
+}
+
+pub use gitpoulpi_config::release::{
+    archive_name, exe_name, installer_name, is_windows, package_stem,
+};
+
+/// The `.gitpoulpi-dist` file: it tells a running build it came from a
+/// release archive and may update itself (version and target are checked
+/// against the archive it downloads).
+pub fn marker_entry(version: &str, target: &str) -> Entry {
+    Entry {
+        name: gitpoulpi_config::release::MARKER_FILE.into(),
+        data: gitpoulpi_config::release::Marker {
+            version: version.into(),
+            target: target.into(),
+        }
+        .render()
+        .into_bytes(),
+        executable: false,
+    }
+}
+
+pub fn install_text(version: &str, target: &str) -> String {
+    let exe = |b| exe_name(b, target);
+    let (place, path_hint) = if is_windows(target) {
+        (
+            "Copy the .exe files to a folder of your choice, for example\n\
+             %LOCALAPPDATA%\\Programs\\GitPoulpi, and add that folder to your PATH\n\
+             (Settings > System > About > Advanced system settings > Environment Variables).",
+            "gitpoulpi.exe --version",
+        )
+    } else {
+        (
+            "Copy the binaries to a folder on your PATH, for example\n\
+             ~/.local/bin (`install -m 755 gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch ~/.local/bin`)\n\
+             or /usr/local/bin.",
+            "gitpoulpi --version",
+        )
+    };
+    format!(
+        "GitPoulpi {version} ({target})\n\
+         \n\
+         Contents\n\
+         \x20 {cli}      the CLI; with no subcommand it opens the terminal UI\n\
+         \x20 {tui}  the terminal UI on its own\n\
+         \x20 {mcp}  the MCP server for AI agents\n\
+         \x20 {launch}  what the shortcuts run: shows the open window, else starts one\n\
+         \n\
+         Install\n\
+         {place}\n\
+         \n\
+         Check\n\
+         \x20 {path_hint}\n\
+         \n\
+         Requirements\n\
+         \x20 A system `git` on PATH (2.30 or newer is recommended). `git-lfs` 3.0+ is\n\
+         \x20 optional and only needed for repositories that use Git LFS.\n\
+         \x20 A terminal with true color; the commit graph is drawn as an image when\n\
+         \x20 the terminal supports the Kitty or iTerm2 graphics protocols (WezTerm,\n\
+         \x20 Kitty, Ghostty) and falls back to characters otherwise.\n\
+         \n\
+         Updating: replace the binaries. A running background daemon from an older\n\
+         version is reported by the TUI; `gitpoulpi daemon restart` swaps it.\n",
+        cli = exe("gitpoulpi"),
+        tui = exe("gitpoulpi-tui"),
+        mcp = exe("gitpoulpi-mcp"),
+        launch = exe("gitpoulpi-launch"),
+    )
+}
+
+/// Lower-case hex SHA-256 of `data`.
+pub fn sha256_hex(data: &[u8]) -> String {
+    let digest = Sha256::digest(data);
+    digest.iter().map(|b| format!("{b:02x}")).collect()
+}
+
+/// One line in the format `sha256sum -c` and `shasum -a 256 -c` accept.
+pub fn checksum_line(hex: &str, file_name: &str) -> String {
+    format!("{hex}  {file_name}\n")
+}
+
+pub fn write_tar_gz(stem: &str, entries: &[Entry]) -> std::io::Result<Vec<u8>> {
+    let encoder = flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::best());
+    let mut builder = tar::Builder::new(encoder);
+    for entry in entries {
+        let mut header = tar::Header::new_gnu();
+        header.set_size(entry.data.len() as u64);
+        header.set_mode(if entry.executable { 0o755 } else { 0o644 });
+        header.set_mtime(0);
+        header.set_cksum();
+        builder.append_data(
+            &mut header,
+            format!("{stem}/{}", entry.name),
+            &entry.data[..],
+        )?;
+    }
+    builder.into_inner()?.finish()
+}
+
+pub fn write_zip(stem: &str, entries: &[Entry]) -> std::io::Result<Vec<u8>> {
+    let to_io = |e: zip::result::ZipError| std::io::Error::other(e.to_string());
+    let mut writer = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
+    for entry in entries {
+        let options = zip::write::SimpleFileOptions::default()
+            .compression_method(zip::CompressionMethod::Deflated)
+            .unix_permissions(if entry.executable { 0o755 } else { 0o644 });
+        writer
+            .start_file(format!("{stem}/{}", entry.name), options)
+            .map_err(to_io)?;
+        writer.write_all(&entry.data)?;
+    }
+    Ok(writer.finish().map_err(to_io)?.into_inner())
+}
+
+pub fn run(args: &[String]) -> Result<i32, String> {
+    let mut target: Option<String> = None;
+    let mut build = true;
+    let mut it = args.iter();
+    while let Some(arg) = it.next() {
+        match arg.as_str() {
+            "--target" => {
+                target = Some(it.next().ok_or("--target needs a triple")?.clone());
+            }
+            "--no-build" => build = false,
+            "-h" | "--help" => {
+                println!("{USAGE}");
+                return Ok(0);
+            }
+            other => return Err(format!("unknown option {other:?}\n\n{USAGE}")),
+        }
+    }
+
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .ok_or("cannot locate the workspace root")?
+        .to_path_buf();
+    let version = env!("CARGO_PKG_VERSION");
+    let host = host_triple()?;
+    let triple = target.clone().unwrap_or_else(|| host.clone());
+    let target_dir = std::env::var_os("CARGO_TARGET_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| root.join("target"));
+
+    if build {
+        let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".into());
+        let mut cmd = Command::new(cargo);
+        // A release archive shows no commit hash next to the version.
+        cmd.env("GITPOULPI_DIST", "1");
+        cmd.current_dir(&root).args(["build", "--profile", "dist"]);
+        for p in PACKAGES {
+            cmd.args(["-p", p]);
+        }
+        if let Some(t) = &target {
+            cmd.args(["--target", t]);
+        }
+        eprintln!("xtask dist: building with --profile dist (fat LTO, this takes a while)");
+        let status = cmd.status().map_err(|e| format!("cannot run cargo: {e}"))?;
+        if !status.success() {
+            return Err("cargo build --profile dist failed".into());
+        }
+    }
+
+    let bin_dir = match &target {
+        Some(t) => target_dir.join(t).join("dist"),
+        None => target_dir.join("dist"),
+    };
+
+    let mut entries = Vec::new();
+    let mut sizes = Vec::new();
+    for b in BINARIES {
+        let file = exe_name(b, &triple);
+        let data = fs::read(bin_dir.join(&file))
+            .map_err(|e| format!("cannot read {}: {e}", bin_dir.join(&file).display()))?;
+        sizes.push((file.clone(), data.len()));
+        entries.push(Entry {
+            name: file,
+            data,
+            executable: true,
+        });
+    }
+    entries.push(marker_entry(version, &triple));
+    entries.push(Entry {
+        name: "INSTALL.txt".into(),
+        data: install_text(version, &triple).into_bytes(),
+        executable: false,
+    });
+    for doc in [
+        "README.md",
+        "LICENSE",
+        crate::licenses::OUTPUT,
+        "CHANGELOG.md",
+    ] {
+        match fs::read(root.join(doc)) {
+            Ok(data) => entries.push(Entry {
+                name: doc.into(),
+                data: if doc == "README.md" {
+                    absolute_image_links(&String::from_utf8_lossy(&data)).into_bytes()
+                } else {
+                    data
+                },
+                executable: false,
+            }),
+            // The MIT notice and the third-party notices are license
+            // obligations: no archive without them.
+            Err(e) if doc == crate::licenses::OUTPUT => {
+                return Err(format!(
+                    "{doc} is missing ({e}): run `cargo run -p xtask -- licenses`"
+                ))
+            }
+            Err(e) if doc == "LICENSE" => return Err(format!("{doc} is missing ({e})")),
+            Err(_) => eprintln!("xtask dist: warning: {doc} is missing, not included"),
+        }
+    }
+
+    let stem = package_stem(version, &triple);
+    let bytes = if is_windows(&triple) {
+        write_zip(&stem, &entries)
+    } else {
+        write_tar_gz(&stem, &entries)
+    }
+    .map_err(|e| format!("cannot write the archive: {e}"))?;
+
+    let out_dir = target_dir.join("dist");
+    fs::create_dir_all(&out_dir).map_err(|e| e.to_string())?;
+    let name = archive_name(version, &triple);
+    let archive_path = out_dir.join(&name);
+    fs::write(&archive_path, &bytes).map_err(|e| e.to_string())?;
+    let checksum_path = out_dir.join(format!("{name}.sha256"));
+    fs::write(&checksum_path, checksum_line(&sha256_hex(&bytes), &name))
+        .map_err(|e| e.to_string())?;
+
+    for (file, size) in sizes {
+        println!("  {file}: {:.1} MiB", size as f64 / 1048576.0);
+    }
+    println!(
+        "{} ({:.1} MiB)\n{}",
+        archive_path.display(),
+        bytes.len() as f64 / 1048576.0,
+        checksum_path.display()
+    );
+    Ok(0)
+}
+
+/// The README's screenshots are repo-relative (`docs/user/images/x.png`),
+/// which break once the README sits in a release archive. Point them at
+/// GitHub's raw view instead of bundling the images.
+fn absolute_image_links(readme: &str) -> String {
+    const REL: &str = "](docs/user/images/";
+    const ABS: &str = "](https://github.com/Poulpi-Lab/GitPoulpi/blob/main/docs/user/images/";
+    let mut out = String::with_capacity(readme.len() + 512);
+    let mut rest = readme;
+    while let Some(i) = rest.find(REL) {
+        out.push_str(&rest[..i]);
+        out.push_str(ABS);
+        rest = &rest[i + REL.len()..];
+        match rest.find(')') {
+            Some(j) => {
+                out.push_str(&rest[..j]);
+                out.push_str("?raw=true");
+                rest = &rest[j..];
+            }
+            None => break,
+        }
+    }
+    out.push_str(rest);
+    out
+}
+
+fn host_triple() -> Result<String, String> {
+    let rustc = std::env::var("RUSTC").unwrap_or_else(|_| "rustc".into());
+    let out = Command::new(rustc)
+        .arg("-vV")
+        .output()
+        .map_err(|e| format!("cannot run rustc: {e}"))?;
+    String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .find_map(|l| l.strip_prefix("host: "))
+        .map(|s| s.trim().to_string())
+        .ok_or_else(|| "rustc -vV printed no host line".into())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn readme_images_become_absolute_urls() {
+        let out = absolute_image_links("a ![x](docs/user/images/a.png) b [d](docs/user/x.md)");
+        assert_eq!(
+            out,
+            "a ![x](https://github.com/Poulpi-Lab/GitPoulpi/blob/main/docs/user/images/a.png?raw=true) b [d](docs/user/x.md)"
+        );
+    }
+
+    use super::*;
+    use std::io::Read;
+
+    fn sample() -> Vec<Entry> {
+        vec![
+            Entry {
+                name: "gitpoulpi".into(),
+                data: b"binary".to_vec(),
+                executable: true,
+            },
+            Entry {
+                name: "INSTALL.txt".into(),
+                data: b"hello".to_vec(),
+                executable: false,
+            },
+        ]
+    }
+
+    #[test]
+    fn the_marker_names_the_version_and_target() {
+        let e = marker_entry("0.2.0", "x86_64-pc-windows-msvc");
+        assert_eq!(e.name, ".gitpoulpi-dist");
+        let m = gitpoulpi_config::release::Marker::parse(&String::from_utf8(e.data).unwrap());
+        assert_eq!(m.unwrap().target, "x86_64-pc-windows-msvc");
+    }
+
+    #[test]
+    fn install_text_names_the_files_of_that_platform() {
+        let w = install_text("0.1.0", "x86_64-pc-windows-msvc");
+        assert!(w.contains("gitpoulpi-mcp.exe") && w.contains("PATH"));
+        let l = install_text("0.1.0", "x86_64-unknown-linux-gnu");
+        assert!(l.contains("~/.local/bin") && !l.contains(".exe"));
+    }
+
+    #[test]
+    fn sha256_matches_the_known_vector_and_the_line_is_sha256sum_shaped() {
+        let hex = sha256_hex(b"abc");
+        assert_eq!(
+            hex,
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+        assert_eq!(checksum_line(&hex, "a.zip"), format!("{hex}  a.zip\n"));
+    }
+
+    #[test]
+    fn tar_gz_has_a_top_level_dir_and_keeps_modes() {
+        let bytes = write_tar_gz("gitpoulpi-0.1.0-x", &sample()).unwrap();
+        let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(&bytes[..]));
+        let mut seen = Vec::new();
+        for entry in archive.entries().unwrap() {
+            let mut entry = entry.unwrap();
+            let path = entry.path().unwrap().to_string_lossy().into_owned();
+            let mode = entry.header().mode().unwrap();
+            let mut body = Vec::new();
+            entry.read_to_end(&mut body).unwrap();
+            seen.push((path, mode, body));
+        }
+        assert_eq!(
+            seen,
+            vec![
+                (
+                    "gitpoulpi-0.1.0-x/gitpoulpi".into(),
+                    0o755,
+                    b"binary".to_vec()
+                ),
+                (
+                    "gitpoulpi-0.1.0-x/INSTALL.txt".into(),
+                    0o644,
+                    b"hello".to_vec()
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn zip_has_a_top_level_dir_and_the_contents() {
+        let bytes = write_zip("gitpoulpi-0.1.0-x", &sample()).unwrap();
+        let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
+        assert_eq!(archive.len(), 2);
+        let mut body = String::new();
+        archive
+            .by_name("gitpoulpi-0.1.0-x/INSTALL.txt")
+            .unwrap()
+            .read_to_string(&mut body)
+            .unwrap();
+        assert_eq!(body, "hello");
+        assert!(archive.by_name("gitpoulpi-0.1.0-x/gitpoulpi").is_ok());
+    }
+}

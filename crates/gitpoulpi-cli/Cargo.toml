@@ -1,0 +1,98 @@
+[package]
+name = "gitpoulpi-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "`gitpoulpi` scriptable CLI: an IPC client over gitpoulpi-ipc, auto-starting its target session's daemon on first use."
+
+[[bin]]
+name = "gitpoulpi"
+path = "src/main.rs"
+
+# `gp` is a PowerShell alias to this binary (see the user's PowerShell
+# profile), not a separate build target -- `gp` collides with PowerShell's
+# built-in Get-ItemProperty alias, so shipping a same-named .exe wouldn't
+# actually be reachable there.
+
+[features]
+default = ["full"]
+full = []
+all-langs = []
+lang-fr = []
+lang-es = []
+lang-pt-br = []
+lang-pt-pt = []
+lang-it = []
+lang-de = []
+lang-zh-cn = []
+lang-ja = []
+lang-ru = []
+lang-ko = []
+lang-nl = []
+lang-pl = []
+lang-uk = []
+lang-cs = []
+lang-sv = []
+lang-tr = []
+lang-qps = []
+ai = []
+github = []
+gitlab = []
+azure-devops = []
+bitbucket = []
+jira = []
+trello = []
+gitea = []
+linear = []
+youtrack = []
+redmine = []
+gerrit = []
+local-issues = []
+mcp = []
+lfs = []
+worktree = []
+submodule = []
+avatar-fetch = []
+image-view = []
+radar = []
+mermaid = []
+board = []
+review = []
+history-rewrite = []
+global-search = []
+workspaces = []
+# Embedded Lua for history rewrite scripts (sandboxed; off = a Script rule is refused as unsupported).
+rewrite-scripts = []
+
+[dependencies]
+gitpoulpi-core.workspace = true
+gitpoulpi-ipc.workspace = true
+gitpoulpi-tui.workspace = true
+gitpoulpi-daemon.workspace = true
+gitpoulpi-config.workspace = true
+gitpoulpi-log.workspace = true
+gitpoulpi-commands.workspace = true
+# Only to forward the `lang-*` features.
+gitpoulpi-i18n.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[build-dependencies]
+# Build script: logo colorways + Windows executable icon (assets/logo/logo_build*.rs).
+serde_json.workspace = true
+winresource = { version = "0.1", default-features = false }
+
+[dev-dependencies]
+gitpoulpi-testkit.workspace = true
+gitpoulpi-session.workspace = true
+toml.workspace = true
+assert_cmd.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tempfile.workspace = true
+# The pty driver, for `tests/pty_ui_show.rs`: it runs the `gitpoulpi`
+# binary (the TUI when it gets no subcommand) in a terminal.
+xtask.workspace = true

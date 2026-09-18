@@ -1,0 +1,44 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/purge.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ ╭ Purge old history ───────────────────────────────────────────────────────────────────────────────── ✕ ─╮ │
+│ │ Deletes the old history of a rewrite from this clone for good: the undo pins, the reflog entries that  │ │
+│ │ name it and the objects themselves.                                                                    │ │
+│ │ A secret that was pushed is leaked: rotate it first. Purging does not touch any remote.                │ │
+│ │                                                                                                        │ │
+│ │ Undo will no longer be possible for these operations:                                                  │ │
+│ │   #7 Rewrite history                                                                                   │ │
+│ │   #5 Stage file (also loses its undo)                                                                  │ │
+│ │                                                                                                        │ │
+│ │ 12 old commits and 30 old file versions are deleted from this clone.                                   │ │
+│ │ 4 reflog entries in 2 reflogs are dropped. The stash list is never touched.                            │ │
+│ │ It cannot be stopped once it starts, and it cannot be undone.                                          │ │
+│ │                                                                                                        │ │
+│ │ Nothing holds the old history any more: the purge can run.                                             │ │
+│ │                                                                                                        │ │
+│ │ After the purge, on the remotes (the purge never touches them):                                        │ │
+│ │ On origin (GitHub)                                                                                     │ │
+│ │ - Revoke the secret and issue a new one first: a secret that was pushed must be treated as leaked,     │ │
+│ │   whatever you remove afterwards.                                                                      │ │
+│ │ - Push the rewritten branches and tags, so the remote refs no longer name the old commits.             │ │
+│ │ - GitHub keeps old commits reachable by their id, in cached views and in the hidden refs it keeps      │ │
+│ │   for review requests after a force push. Follow "Removing sensitive data from a repository" in        │ │
+│ │   GitHub's documentation and contact GitHub Support (https://support.github.com/contact) to remove     │ │
+│ │   the cached views and the references in review requests and to run garbage collection.                │ │
+│ │ - Forks keep the old history: ask the owners of the forks to delete them or rewrite theirs, or ask     │ │
+│ │   GitHub Support about the fork network.                                                               │ │
+│ │ - If you can lose the review requests, issues and stars: create a new repository from the cleaned      │ │
+│ │   clone and delete the old one. It is the only way to be sure the old objects are gone without         │ │
+│ │   support.                                                                                             │ │
+│ │ - Send the note to everyone who has a clone: their copies still hold the old history and must be       │ │
+│ │   reset or cloned again.                                                                               │ │
+│ │    Copy link                                                                                           │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ Purging: Expiring reflogs (40%)                                                                        │ │
+│ │ It cannot be stopped once it starts, and it cannot be undone.                                          │ │
+│ │                                                                                                        │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

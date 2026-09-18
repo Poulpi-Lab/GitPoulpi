@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/render.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags  · 2 branches, 4 tags, 9800 commits                                    │
+│ ╭ Rules ───────────────────────────────╮ ╭ Shift dates ──────────────────────────────────────────────────╮ │
+│ │ [x] 1 Replace an author  old@exampl… │ │ Shift by   +2h                                                │ │
+│ │ [x] 2 Shift dates  +2h       ▲  ▼  ✕ │ │ Dates      Author and committer dates  ▾                      │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unna╭ Signed commits change ─────────────────────────────────────────────── ✕ ─╮              │ │
+│ ╰──────────────│                                                                          │──────────────╯ │
+│ ╭ Preview ─────│ Signed commits that change: 31 What should happen to their signatures?   │──────────────╮ │
+│ │  Summary   Co│                                                                          │              │ │
+│ │ 412 of 9800 c│ 1  Remove the signatures                                                 │              │ │
+│ │ 2 refs move, │ 2  Re-sign only the commits that were signed                             │              │ │
+│ │ Rule 1 (Repla│ 3  Re-sign every rewritten commit                                        │              │ │
+│ │ Rule 2 (Shift│ 4  Check signing                                                         │              │ │
+│ │ 31 signed com│                                                                          │              │ │
+│ │ 1 ref is alre╰──────────────────────────────────────────────────────────────────────────╯              │ │
+│ │                                                                                                        │ │
+│ │ A .mailmap fixes the display without rewriting. Use .mailmap instead?                                  │ │
+│ │  Use .mailmap                                                                                          │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ Some commits are already on a remote: a force push (with lease) will be needed.                            │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

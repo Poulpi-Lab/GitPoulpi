@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/purge.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ ╭ Purge old history ───────────────────────────────────────────────────────────────────────────────── ✕ ─╮ │
+│ │ Deletes the old history of a rewrite from this clone for good: the undo pins, the reflog entries that  │ │
+│ │ name it and the objects themselves.                                                                    │ │
+│ │ A secret that was pushed is leaked: rotate it first. Purging does not touch any remote.                │ │
+│ │                                                                                                        │ │
+│ │ Undo will no longer be possible for these operations:                                                  │ │
+│ │   #7 Rewrite history                                                                                   │ │
+│ │   #5 Stage file (also loses its undo)                                                                  │ │
+│ │                                                                                                        │ │
+│ │ 12 old commits and 30 old file versions are deleted from this clone.                                   │ │
+│ │ 4 reflog entries in 2 reflogs are dropped. The stash list is never touched.                            │ │
+│ │ It cannot be stopped once it starts, and it cannot be undone.                                          │ │
+│ │                                                                                                        │ │
+│ │ Still holding the old history (nothing was changed):                                                   │ │
+│ │   Stash stash@{0}: drop it (it is work) or keep it and accept that the old          Drop    Copy name  │ │
+│ │   history stays here                                                                                   │ │
+│ │   refs/remotes/origin/main: push the rewritten branches, then fetch                 Fetch   Copy name  │ │
+│ │   Worktree /tmp/other: check out a rewritten branch there                                   Copy name  │ │
+│ │ Fix what is listed, then check again. The purge stays unavailable until nothing is left.               │ │
+│ │                                                                                                        │ │
+│ │ After the purge, on the remotes (the purge never touches them):                                        │ │
+│ │ On origin (GitHub)                                                                                     │ │
+│ │ - Revoke the secret and issue a new one first: a secret that was pushed must be treated as leaked,     │ │
+│ │   whatever you remove afterwards.                                                                      │ │
+│ │ - Push the rewritten branches and tags, so the remote refs no longer name the old commits.             │ │
+│ │ - GitHub keeps old commits reachable by their id, in cached views and in the hidden refs it keeps      │ │
+│ │   for review requests after a force push. Follow "Removing sensitive data from a repository" in        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ Up/Down choose a row, Enter fixes it, c copies, r checks again, p purges, Esc closes                   │ │
+│ │  Purge   Check again   Close                                                                           │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

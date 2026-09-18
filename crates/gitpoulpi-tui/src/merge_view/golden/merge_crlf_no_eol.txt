@@ -1,0 +1,24 @@
+╭ Merge · src/auth/login.rs ── merging feature/login into main ────────────────────────── file 1 of 1  ‹  › ─╮
+│  ▲   ▼  Conflict 3 / 3 · 1 left  │ All: A   B   Reset  │  Base   Full file      Save   Save & resolve   ✕  │
+├─ A · Current · main (HEAD) ──────────────────────────┬─ B · Incoming · feature/login ──────────────────────┤
+│                                                   ░ B│    9     // B only                                  ↑
+│    8 }                                               │   10 }
+│    9                                                 │   11                                                ▐
+│ ┌[x] Conflict 2 ✎ edited ─────────────────────────── │ ┌[ ] Conflict 2 ✎ edited ──────────────────────────
+│ │✓10 fn a() {}                                       │ │+12 fn b() {}
+│ └─────────────────────────────────────────────────── │ └──────────────────────────────────────────────────
+│   11 // end                                          │   13 // end                                         ▐
+│ ┌[ ] Conflict 3 ──────────────────────────────────── │ ┌[ ] Conflict 3 ───────────────────────────────────
+│ │+12 const A: u8 = 1;                                │ │+14 const B: u8 = 2;                               ◆
+│ └─────────────────────────────────────────────────── │ └──────────────────────────────────────────────────
+│   13 // tail                                         │   15 // tail                                        ↓
+├─ Output · src/auth/login.rs · CRLF · UTF-8 · 1 edited · 1 left ● modified ─────────────────────────────────┤
+│11   }                                                                                                      ↑
+│12
+│13 ✎ fn a(!) {}                                                                                             ▐
+│14   // end
+│     ‹ Conflict 3 · nothing picked yet · pick from A / B, or type here ›                                    ▐
+│15   // tail                                                                                                ◆
+│     ‹ no newline at end of file ›                                                                          ↓
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+ Space line · Enter chunk · a/b/c take · s order · F7 next · F6 pane · Ctrl+S save & resolve · Esc close

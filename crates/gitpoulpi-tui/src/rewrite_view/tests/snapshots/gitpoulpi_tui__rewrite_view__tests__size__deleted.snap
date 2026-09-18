@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/size.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Rule ─────────────────────────────────────────────────────────╮ │
+│ │ Add a rule to start: authors, dates, │ │ Add a rule to edit its settings here.                         │ │
+│ │ messages, file contents...           │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │  Summary   Commits   Branches and tags   Impact   Secrets   Identities   Size                          │ │
+│ │  Analyse sizes                                                                                         │ │
+│ │ 412 commits walked, 1980 unique file versions, 900 MiB (400 MiB on disk)                               │ │
+│ │ 300 MiB are in HEAD; 600 MiB are kept only by the history.                                             │ │
+│ │ Show:  Files   Folders   Deleted   Sort:  Size   Path   Deleted first                                  │ │
+│ │ [ ]   41.0 MiB deleted        old/dump.sql                                                             │ │
+│ │ [ ]    3.0 MiB deleted        build/app.zip                                                            │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ old/dump.sql                                                                                           │ │
+│ │ First seen in a1a1a1a, last touched in b2b2b2b                                                         │ │
+│ │ 41.0 MiB in 2 versions                                                                                 │ │
+│ │  Remove from history   Remove every file over ...   Check all   Uncheck all                            │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ no rule is enabled                                                                                         │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

@@ -1,0 +1,352 @@
+---
+source: crates/gitpoulpi-tui/src/theme/snapshot_tests.rs
+expression: "dump(&theme, &buf)"
+---
+00 |          ↶ Undo ▾   ↷ Redo   ⇩ Pull ▾   ⇧ Push ▾   ⎇ Branch   🔖  Tag   📥  Stash   📤  Pop   ▣ LFS ▾   ⌕ Search|
+01 |╭🐙  GitPoulpi - Settings - Tab: sections/settings │ E… ── ✕ ─╮ Graph  Message                  Author   Date|
+02 |│ Search settings...        │ Appearance - global            │ ●  commit 1            a   2d ago|
+03 |│                           │                                │ ○  commit 2            a   2d ago|
+04 |│Current profile            │ Theme                         ↑│ ○  commit 3            a   2d ago|
+05 |│  Default profile          │    System (follows termina… ▾  │|
+06 |│                           │   Colors of the whole          │|
+07 |│Settings                   │   interface. Moving through    │ @@ -10,3 +10,3 @@|
+08 |│  General                  │   the list previews each       │    10    10  fn main() {|
+09 |│  Synchronization          │   theme; Enter keeps it, Esc   │    11       -    let x = 1;|
+10 |│  Profiles                 │   goes back. System follows    │          11 +    ╭a1b2c3d────────────────────────────╮|
+11 |│  SSH & credentials        │   the terminal's light or dark │    12    12  }   │⊕ Cherry-pick onto main    Ctrl+G y│|
+12 |│  Integrations             │   background, detected once at │                  │↺ Revert commit...         Ctrl+G v│|
+13 |│  AI                       │   start-up (Dark when it       │                  │← Reset main to this commit ›      │|
+14 |│  Agents & MCP             │   cannot be told). Your own    │                  │✎ Edit commit message...   Ctrl+G e│|
+15 |│  Appearance               │   theme files in the config    │                  │✐ Amend...                 Ctrl+G E│|
+16 |│  Log & graph              │   folder's themes/ directory   │                  │◑ Split commit...                  │|
+17 |│  Diff & editor            │   are listed last.             │                  │◈ Interactively rebase from here...│|
+18 |│  Open in                  │                                │                  │↻ Rewrite history ›                │|
+19 |│  Images                   │ Colors                         │                  │───────────────────────────────────│|
+20 |│  Keyboard & mouse         │                                │                  │↳ Create branch here...            │|
+21 |│                           │                               ↓│                  │◇ Create tag here...               │|
+22 |╰────────────────────────────────────────────────────────────╯                  │◇ Create annotated tag here...     │|
+23 |                                                                                │✓ Check out this commit            │|
+24 |                                                                                │⊞ Create worktree here...          │|
+25 |                                                                                │Create patch from this commit...   │|
+26 |                                                                                │Create patch from here to main...  │|
+27 |                                                                                │───────────────────────────────────│|
+28 |                                                                                │↺ Recover lost commits...          │|
+29 |                                                                                │⎘ Copy link to commit on remote    │|
+30 |                                                                                │⎘ Copy ›                           │|
+31 |                                                                                ╰───────────────────────────────────╯|
+
+00 000-008 -/ui.bg+ui.blend_bg
+00 009-009 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 010-010 toolbar.undo/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 011-016 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 017-018 ui.on_button+chrome.toolbar_fg/chrome.toolbar_arrow_bg
+00 019-019 -/ui.bg+ui.blend_bg
+00 020-020 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 021-021 toolbar.undo/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 022-027 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 028-028 -/ui.bg+ui.blend_bg
+00 029-029 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 030-030 toolbar.pull/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 031-036 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 037-038 ui.on_button+chrome.toolbar_fg/chrome.toolbar_arrow_bg
+00 039-039 -/ui.bg+ui.blend_bg
+00 040-040 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 041-041 toolbar.push/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 042-047 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 048-049 ui.on_button+chrome.toolbar_fg/chrome.toolbar_arrow_bg
+00 050-050 -/ui.bg+ui.blend_bg
+00 051-051 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 052-052 toolbar.branch/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 053-060 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 061-061 -/ui.bg+ui.blend_bg
+00 062-062 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 063-063 toolbar.tag/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 065-069 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 070-070 -/ui.bg+ui.blend_bg
+00 071-071 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 072-072 toolbar.stash/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 074-080 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 081-081 -/ui.bg+ui.blend_bg
+00 082-082 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 083-083 toolbar.stash/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 085-089 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 090-090 -/ui.bg+ui.blend_bg
+00 091-091 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 092-092 toolbar.lfs/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 093-099 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 100-100 -/ui.bg+ui.blend_bg
+00 101-101 -/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 102-102 toolbar.search/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 103-110 ui.on_button+chrome.toolbar_fg/ui.button+chrome.disabled_button_bg+chrome.toolbar_bg
+00 111-119 -/ui.bg+ui.blend_bg
+01 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+01 001-001 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+01 003-003 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+01 004-053 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/-
+01 054-056 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+01 057-059 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+01 060-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+01 062-062 -/ui.bg+ui.blend_bg
+01 063-107 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.bg+ui.blend_bg BOLD
+01 108-119 -/ui.bg+ui.blend_bg
+02 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+02 001-001 -/ui.input_rest
+02 002-019 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/ui.input_rest
+02 020-027 -/ui.input_rest
+02 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+02 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+02 062-062 -/ui.bg+ui.blend_bg
+02 063-063 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.bg+ui.blend_bg BOLD
+02 064-064 -/ui.bg+ui.blend_bg
+02 065-085 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.bg+ui.blend_bg
+02 086-095 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/ui.bg+ui.blend_bg
+02 096-119 -/ui.bg+ui.blend_bg
+03 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+03 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+03 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+03 062-062 -/ui.bg+ui.blend_bg
+03 063-063 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.selection+minimap.view
+03 064-064 -/ui.selection+minimap.view
+03 065-085 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.selection+minimap.view
+03 086-095 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/ui.selection+minimap.view
+03 096-119 -/ui.bg+ui.blend_bg
+04 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+04 001-015 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/- BOLD
+04 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+04 030-034 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/-
+04 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+04 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+04 062-062 -/ui.bg+ui.blend_bg
+04 063-063 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.bg+ui.blend_bg
+04 064-064 -/ui.bg+ui.blend_bg
+04 065-085 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.bg+ui.blend_bg
+04 086-095 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/ui.bg+ui.blend_bg
+04 096-119 -/ui.bg+ui.blend_bg
+05 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+05 001-017 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/-
+05 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+05 032-059 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.input_rest
+05 060-060 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/scrollbar.thumb
+05 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+05 062-119 -/ui.bg+ui.blend_bg
+06 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+06 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+06 030-050 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+06 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+06 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+06 062-119 -/ui.bg+ui.blend_bg
+07 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+07 001-008 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/- BOLD
+07 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+07 030-056 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+07 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+07 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+07 062-062 -/ui.bg+ui.blend_bg
+07 063-079 diff.hunk_fg/ui.bg+ui.blend_bg BOLD
+07 080-119 -/ui.bg+ui.blend_bg
+08 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+08 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+08 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+08 030-053 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+08 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+08 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+08 062-062 -/ui.bg+ui.blend_bg
+08 063-074 diff.gutter_fg/ui.bg+ui.blend_bg
+08 075-086 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.bg+ui.blend_bg
+08 087-119 -/ui.bg+ui.blend_bg
+09 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+09 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+09 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+09 030-057 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+09 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+09 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+09 062-062 -/ui.bg+ui.blend_bg
+09 063-074 diff.gutter_fg/ui.bg+ui.blend_bg
+09 075-089 diff.del_fg/diff.del_bg
+09 090-119 -/ui.bg+ui.blend_bg
+10 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+10 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+10 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+10 030-056 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+10 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+10 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+10 062-062 -/ui.bg+ui.blend_bg
+10 063-074 diff.gutter_fg/ui.bg+ui.blend_bg
+10 075-079 diff.add_fg/diff.add_bg
+10 080-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+10 117-119 -/ui.bg+ui.blend_bg
+11 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+11 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+11 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+11 030-059 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+11 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+11 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+11 062-062 -/ui.bg+ui.blend_bg
+11 063-074 diff.gutter_fg/ui.bg+ui.blend_bg
+11 075-076 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.bg+ui.blend_bg
+11 077-079 -/ui.bg+ui.blend_bg
+11 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+11 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.selection+minimap.view
+11 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+11 117-119 -/ui.bg+ui.blend_bg
+12 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+12 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+12 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+12 030-059 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+12 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+12 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+12 062-079 -/ui.bg+ui.blend_bg
+12 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+12 081-115 status.danger+scrollbar.marks_del+chrome.stat_del+chrome.notice+chrome.wip_del/ui.hover
+12 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+12 117-119 -/ui.bg+ui.blend_bg
+13 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+13 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+13 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+13 030-053 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+13 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+13 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+13 062-079 -/ui.bg+ui.blend_bg
+13 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+13 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+13 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+13 117-119 -/ui.bg+ui.blend_bg
+14 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+14 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+14 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+14 030-056 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+14 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+14 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+14 062-079 -/ui.bg+ui.blend_bg
+14 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+14 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+14 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+14 117-119 -/ui.bg+ui.blend_bg
+15 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+15 001-026 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.selection+minimap.view
+15 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+15 030-056 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+15 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+15 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+15 062-079 -/ui.bg+ui.blend_bg
+15 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+15 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+15 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+15 117-119 -/ui.bg+ui.blend_bg
+16 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+16 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+16 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+16 030-057 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+16 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+16 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+16 062-079 -/ui.bg+ui.blend_bg
+16 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+16 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+16 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+16 117-119 -/ui.bg+ui.blend_bg
+17 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+17 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+17 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+17 030-047 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+17 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+17 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+17 062-079 -/ui.bg+ui.blend_bg
+17 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+17 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+17 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+17 117-119 -/ui.bg+ui.blend_bg
+18 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+18 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+18 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+18 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+18 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+18 062-079 -/ui.bg+ui.blend_bg
+18 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+18 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+18 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+18 117-119 -/ui.bg+ui.blend_bg
+19 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+19 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+19 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+19 030-035 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+19 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+19 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+19 062-079 -/ui.bg+ui.blend_bg
+19 080-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+19 117-119 -/ui.bg+ui.blend_bg
+20 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+20 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+20 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+20 032-033 -/ui.bg+ui.blend_bg
+20 035-036 -/ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg
+20 038-039 -/graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg
+20 041-042 -/ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset
+20 044-045 -/ui.selection+minimap.view
+20 047-048 -/status.danger+scrollbar.marks_del+chrome.stat_del+chrome.notice+chrome.wip_del
+20 050-051 -/diff.add_bg
+20 053-054 -/diff.del_bg
+20 056-057 -/ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset
+20 059-059 -/status.success+refs.local+scrollbar.marks_add+chrome.stat_add
+20 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+20 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+20 062-079 -/ui.bg+ui.blend_bg
+20 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+20 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+20 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+20 117-119 -/ui.bg+ui.blend_bg
+21 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+21 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+21 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
+21 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+21 062-079 -/ui.bg+ui.blend_bg
+21 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+21 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+21 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+21 117-119 -/ui.bg+ui.blend_bg
+22 000-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
+22 062-079 -/ui.bg+ui.blend_bg
+22 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+22 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+22 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+22 117-119 -/ui.bg+ui.blend_bg
+23 000-079 -/ui.bg+ui.blend_bg
+23 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+23 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+23 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+23 117-119 -/ui.bg+ui.blend_bg
+24 000-079 -/ui.bg+ui.blend_bg
+24 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+24 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+24 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+24 117-119 -/ui.bg+ui.blend_bg
+25 000-079 -/ui.bg+ui.blend_bg
+25 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+25 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+25 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+25 117-119 -/ui.bg+ui.blend_bg
+26 000-079 -/ui.bg+ui.blend_bg
+26 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+26 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+26 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+26 117-119 -/ui.bg+ui.blend_bg
+27 000-079 -/ui.bg+ui.blend_bg
+27 080-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+27 117-119 -/ui.bg+ui.blend_bg
+28 000-079 -/ui.bg+ui.blend_bg
+28 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+28 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+28 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+28 117-119 -/ui.bg+ui.blend_bg
+29 000-079 -/ui.bg+ui.blend_bg
+29 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+29 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+29 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+29 117-119 -/ui.bg+ui.blend_bg
+30 000-079 -/ui.bg+ui.blend_bg
+30 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+30 081-115 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+30 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+30 117-119 -/ui.bg+ui.blend_bg
+31 000-079 -/ui.bg+ui.blend_bg
+31 080-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+chrome.dropdown_bg
+31 117-119 -/ui.bg+ui.blend_bg

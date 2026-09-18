@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/content.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Search and replace in files ──────────────────────────────────╮ │
+│ │ [x] 1 Search and replace in… ▲  ▼  ✕ │ │ Files                    all files                            │ │
+│ │                                      │ │ Look for                 Text       ▾                         │ │
+│ │                                      │ │ Find                     foo                                  │ │
+│ │                                      │ │ Regular expression      [ ]                                   │ │
+│ │                                      │ │ Match case              [x]                                   │ │
+│ │                                      │ │ Replace with             bar                                  │ │
+│ │                                      │ │ Skip files larger than   default: 50 MiB                      │ │
+│ │                                      │ │ Empty commits            Remove them  ▾                       │ │
+│ │ + Add rule ▾                         │ │ Binary files are skipped. Files over the size limit are       │ │
+│ │Recipe   (unnamed)                    │ │ skipped too, and the preview counts them.                     │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │  Summary   Commits   Branches and tags   Impact   Secrets   Identities   Size                          │ │
+│ │ The preview shows what would change before anything is touched.                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ Run the preview first.                                                                                     │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/script.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ ╭ Lua script ──────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮ │
+│ │ Script                                          │  Test on selection   2 selected commits              │ │
+│ │  1 --! name: Uppercase author names             │ 2 commits tested, 1 would change.                    │ │
+│ │  2 --! kinds: commit                            │                                                      │ │
+│ │  3 --! window: 0                                │ Commit  Change                                       │ │
+│ │  4 --! param suffix: text "Text added to each   │ abababa author name: alex -> ALEX                    │ │
+│ │  5 -- Called once per commit. Return only what  │         log: renamed one                             │ │
+│ │  6 function rewrite_commit(c, ctx)              │ cdcdcdc no change                                    │ │
+│ │  7   return {                                   │                                                      │ │
+│ │  8     author = { name = string.upper(c.author  │                                                      │ │
+│ │  9     message = c.message .. ctx.params.suffi  │                                                      │ │
+│ │ 10   }                                          │                                                      │ │
+│ │ 11 end                                          │                                                      │ │
+│ │ 12                                              │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │ OK: rewrite_commit found                        │                                                      │ │
+│ │ Parameters                                      │                                                      │ │
+│ │  Text added to each message                     │                                                      │ │
+│ │  File                         …write/script.lua │                                                      │ │
+│ │   Load from file...   Save to file...           │                                                      │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

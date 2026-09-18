@@ -1,0 +1,44 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/purge.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ ╭ Purge old history ───────────────────────────────────────────────────────────────────────────────── ✕ ─╮ │
+│ │ Deletes the old history of a rewrite from this clone for good: the undo pins, the reflog entries that  │ │
+│ │ name it and the objects themselves.                                                                    │ │
+│ │ A secret that was pushed is leaked: rotate it first. Purging does not touch any remote.                │ │
+│ │                                                                                                        │ │
+│ │ Undo will no longer be possible for these operations:                                                  │ │
+│ │   #7 Rewrite history                                                                                   │ │
+│ │   #5 Stage file (also loses its undo)                                                                  │ │
+│ │                                                                                                        │ │
+│ │ 12 old commits and 30 old file versions are deleted from this clone.                                   │ │
+│ │ 4 reflog entries in 2 reflogs are dropped. The stash list is never touched.                            │ │
+│ │ It cannot b╭ Purge for good? ───────────────────────────────────────────────────────── ✕ ─╮            │ │
+│ │            │                                                                              │            │ │
+│ │ Nothing hol│ This deletes the old history from this clone. It cannot be stopped once it   │            │ │
+│ │            │ starts, and it cannot be undone.                                             │            │ │
+│ │ After the p│                                                                              │            │ │
+│ │ On origin (│ Undo is lost for 2 operations.                                               │            │ │
+│ │ - Revoke th│   #7 Rewrite history                                                         │leaked,     │ │
+│ │   whatever │   #5 Stage file (also loses its undo)                                        │            │ │
+│ │ - Push the │                                                                              │            │ │
+│ │ - GitHub ke│ 12 old commits and 30 old file versions are deleted from this clone.         │ keeps      │ │
+│ │   for revie│ 4 reflog entries in 2 reflogs are dropped. The stash list is never touched.  │" in        │ │
+│ │   GitHub's │                                                                              │ remove     │ │
+│ │   the cache│                                                                              │            │ │
+│ │ - Forks kee│ 1  Purge for good                                                            │ or ask     │ │
+│ │   GitHub Su│ 2  Do not purge                                                              │            │ │
+│ │ - If you ca╰──────────────────────────────────────────────────────────────────────────────╯leaned      │ │
+│ │   clone and delete the old one. It is the only way to be sure the old objects are gone without         │ │
+│ │   support.                                                                                             │ │
+│ │ - Send the note to everyone who has a clone: their copies still hold the old history and must be       │ │
+│ │   reset or cloned again.                                                                               │ │
+│ │    Copy link                                                                                           │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ Up/Down choose a row, Enter fixes it, c copies, r checks again, p purges, Esc closes                   │ │
+│ │  Purge   Check again   Close                                                                           │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

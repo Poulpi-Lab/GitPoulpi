@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/purge.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Replace an author ────────────────────────────────────────────╮ │
+│ │ [x] 1 Replace an author      ▲  ▼  ✕ │ │ Name is                  anyone                               │ │
+│ │                                      │ │ Email is                 old@example.com                      │ │
+│ │                                      │ │ Regular expression      [ ]                                   │ │
+│ │                                      │ │ New name                 unchanged if empty                   │ │
+│ │                                      │ │ New email                new@example.org                      │ │
+│ │                                      │ │ Apply to                 Author and committer  ▾              │ │
+│ │                                      │ │ Also the authors of t…  [x]                                   │ │
+│ │                                      │ │ Also map trailers       [ ]                                   │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │ Rewrote 12 commits.                                                                                    │ │
+│ │ No rewritten ref was on a remote: nothing to push.                                                     │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ Undo puts every moved ref back as it was.                                                              │ │
+│ │  Undo   Purge old history...   Close                                                                   │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│                                                                                                            │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

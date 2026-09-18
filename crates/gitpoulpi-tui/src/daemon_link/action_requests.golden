@@ -1,0 +1,393 @@
+== Undo { expect: Some(4), confirmed: false }
+  Undo {"confirmed":false,"dry_run":false,"expect":4}
+  error: backend error: malformed daemon response: invalid type: null, expected struct UndoOutcome
+  ok: false
+== Redo { expect: None, confirmed: true }
+  Redo {"confirmed":true,"dry_run":false,"expect":null}
+  error: backend error: malformed daemon response: invalid type: null, expected struct UndoOutcome
+  ok: false
+== ComposeCommits { commits: [ComposedCommit { message: "one", paths: ["a.txt", "b.txt"] }, ComposedCommit { message: "two", paths: ["c.txt"] }] }
+  ComposeCommits {"commits":[{"message":"one","paths":["a.txt","b.txt"]},{"message":"two","paths":["c.txt"]}],"opts":{"amend":false,"author":null,"no_verify":false,"sign":false}}
+  message: created 0 commits
+  ok: true
+== StageFile("dir/a.txt")
+  StageFile {"target":{"File":"dir/a.txt"}}
+  ok: true
+== UnstageFile("dir/a.txt")
+  UnstageFile {"target":{"File":"dir/a.txt"}}
+  ok: true
+== StageAll
+  StageAll {"target":"All"}
+  ok: true
+== UnstageAll
+  UnstageAll {"target":"All"}
+  ok: true
+== StageFolder("dir")
+  StageFolder {"target":{"Folder":"dir"}}
+  ok: true
+== UnstageFolder("dir")
+  UnstageFolder {"target":{"Folder":"dir"}}
+  ok: true
+== StageHunk { path: "a.txt", hunk: HunkId(1) }
+  StageHunk {"target":{"Hunk":["a.txt",1]}}
+  ok: true
+== UnstageHunk { path: "a.txt", hunk: HunkId(1) }
+  UnstageHunk {"target":{"Hunk":["a.txt",1]}}
+  ok: true
+== StageLines { path: "a.txt", selector: LineSelector { hunk: HunkId(2), line_indices: [1, 3] } }
+  StageLine {"target":{"Line":["a.txt",{"hunk":2,"line_indices":[1,3]}]}}
+  ok: true
+== UnstageLines { path: "a.txt", selector: LineSelector { hunk: HunkId(2), line_indices: [1, 3] } }
+  UnstageLine {"target":{"Line":["a.txt",{"hunk":2,"line_indices":[1,3]}]}}
+  ok: true
+== DiscardFile { path: "a.txt", source: Oid([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]) }
+  Checkout {"target":{"File":{"path":"a.txt","source":"0101010101010101010101010101010101010101"}}}
+  message: discard done - Ctrl+Z to undo
+  ok: true
+== DiscardPaths(["a.txt", "dir/b.txt"])
+  Discard {"paths":["a.txt","dir/b.txt"]}
+  message: discard done - Ctrl+Z to undo
+  ok: true
+== DiscardHunk { path: "a.txt", hunk: HunkId(1) }
+  DiscardHunk {"target":{"Hunk":["a.txt",1]}}
+  message: discard done - Ctrl+Z to undo
+  ok: true
+== DiscardLines { path: "a.txt", selector: LineSelector { hunk: HunkId(2), line_indices: [1, 3] } }
+  DiscardLine {"target":{"Line":["a.txt",{"hunk":2,"line_indices":[1,3]}]}}
+  message: discard done - Ctrl+Z to undo
+  ok: true
+== Commit { message: "msg", amend: false, no_verify: false, push: false }
+  Commit {"message":"msg","opts":{"amend":false,"author":null,"no_verify":false,"sign":false}}
+  ok: true
+== Commit { message: "msg", amend: true, no_verify: true, push: false }
+  Commit {"message":"msg","opts":{"amend":true,"author":null,"no_verify":true,"sign":false}}
+  ok: true
+== Fetch("origin")
+  Fetch {"opts":{"prune":false,"prune_tags":false},"remote":"origin"}
+  message: fetched origin: 1 ref updated
+  ok: true
+== FetchAll
+  FetchAll {"opts":{"prune":false,"prune_tags":false}}
+  message: fetched every remote: 1 ref updated
+  ok: true
+== CheckoutPullRequestHead { remote: "origin", remote_ref: "pull/7/head", branch: "pr-7" }
+  FetchRefAsBranch {"branch":"pr-7","remote":"origin","remote_ref":"pull/7/head"}
+  Checkout {"target":{"Branch":"pr-7"}}
+  ok: true
+== Pull(PullOptions { mode: FastForwardOnly, remote: Some("origin") })
+  Pull {"opts":{"mode":"fast_forward_only","remote":"origin"}}
+  message: already up to date
+  ok: true
+== Push { remote: "origin", opts: PushOptions { force_with_lease: false, set_upstream: true, branch: Some("main") } }
+  Push {"opts":{"branch":"main","force_with_lease":false,"set_upstream":true},"remote":"origin"}
+  message: pushed main to origin
+  ok: true
+== PullThenPush { remote: "origin", branch: "main" }
+  Pull {"opts":{"mode":"merge","remote":"origin"}}
+  Push {"opts":{"branch":"main","force_with_lease":false,"set_upstream":false},"remote":"origin"}
+  message: pushed main to origin
+  ok: true
+== FetchThenForcePush { remote: "origin", branch: "main" }
+  Fetch {"opts":{"prune":false,"prune_tags":false},"remote":"origin"}
+  Push {"opts":{"branch":"main","force_with_lease":true,"set_upstream":false},"remote":"origin"}
+  message: force-pushed (with lease) main to origin
+  ok: true
+== CheckoutBranch("topic")
+  Checkout {"target":{"Branch":"topic"}}
+  ok: true
+== CheckoutCommit(Oid([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]))
+  Checkout {"target":{"Commit":"0202020202020202020202020202020202020202"}}
+  ok: true
+== StashPush
+  StashPush {"include_untracked":true,"message":null}
+  ok: true
+== DeleteFile("dir\\a.txt")
+  DeleteFile {"paths":["dir/a.txt"]}
+  message: delete file done - Ctrl+Z to undo
+  ok: true
+== AddToGitignore { pattern: "*.log", file: None }
+  AddToGitignore {"file":null,"pattern":"*.log"}
+  ok: true
+== StashFile("dir\\a.txt")
+  StashPush {"include_untracked":true,"message":null,"paths":["dir/a.txt"]}
+  ok: true
+== StashPushWith { message: "wip" }
+  StashPush {"include_untracked":true,"message":"wip"}
+  ok: true
+== StashPop(StashId(0))
+  StashPop {"id":0}
+  ok: true
+== StashApply(StashId(1))
+  StashApply {"id":1}
+  ok: true
+== StashDrop(StashId(2))
+  StashDrop {"id":2}
+  message: drop stash done - Ctrl+Z to undo
+  ok: true
+== AutoStashPop(StashId(0), Some(Oid([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7])))
+  StashPop {"commit":"0707070707070707070707070707070707070707","id":0}
+  ok: true
+== AutoStashDrop(StashId(1), None)
+  StashDrop {"commit":null,"id":1}
+  ok: true
+== BranchCreate { name: "topic", at: Oid([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]) }
+  BranchCreate {"at":"0303030303030303030303030303030303030303","name":"topic"}
+  Checkout {"target":{"Branch":"topic"}}
+  ok: true
+== BranchCreateTracking { local_name: "topic", upstream: "origin/topic" }
+  BranchCreateTracking {"local_name":"topic","upstream":"origin/topic"}
+  ok: true
+== BranchDelete("topic")
+  BranchDelete {"name":"topic"}
+  message: delete branch done - Ctrl+Z to undo
+  ok: true
+== BranchRename { old_name: "old", new_name: "new" }
+  BranchRename {"new_name":"new","old_name":"old"}
+  ok: true
+== TagCreate { name: "v1", at: Oid([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]) }
+  TagCreate {"annotated_message":null,"at":"0404040404040404040404040404040404040404","name":"v1"}
+  ok: true
+== TagDelete("v1")
+  TagDelete {"name":"v1"}
+  message: delete tag done - Ctrl+Z to undo
+  ok: true
+== TagCreateAnnotated { name: "v1", at: Oid([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]), message: "release" }
+  TagCreate {"annotated_message":"release","at":"0404040404040404040404040404040404040404","name":"v1"}
+  ok: true
+== BranchDeleteRemote { remote: "origin", name: "topic", and_local: None }
+  BranchDeleteRemote {"name":"topic","remote":"origin"}
+  message: deleted branch topic from origin
+  ok: true
+== BranchDeleteRemote { remote: "origin", name: "topic", and_local: Some("topic") }
+  BranchDeleteRemote {"name":"topic","remote":"origin"}
+  BranchDelete {"name":"topic"}
+  message: deleted branch topic and origin/topic
+  ok: true
+== TagAnnotate { name: "v1", message: "notes" }
+  TagAnnotate {"message":"notes","name":"v1"}
+  message: annotated tag v1
+  ok: true
+== TagPush { remote: "origin", selection: AllUnpushed }
+  TagPush {"remote":"origin","selection":"AllUnpushed"}
+  message: pushed main to origin
+  ok: true
+== TagPush { remote: "origin", selection: Named(["v1"]) }
+  TagPush {"remote":"origin","selection":{"Named":["v1"]}}
+  message: pushed main to origin
+  ok: true
+== TagDeleteRemote { remote: "origin", name: "v1" }
+  TagDeleteRemote {"name":"v1","remote":"origin"}
+  message: deleted tag v1 from origin
+  ok: true
+== TagDeleteBoth { remote: "origin", name: "v1" }
+  TagDeleteRemote {"name":"v1","remote":"origin"}
+  TagDelete {"name":"v1"}
+  message: Deleted v1 here and on origin. Undo restores it only here; do a push to put it back on origin.
+  ok: true
+== TagDeleteKeepRemote { name: "v1", remotes: ["origin"] }
+  TagDelete {"name":"v1"}
+  message: Deleted v1 here. It is still on origin: the next fetch brings it back.
+  ok: true
+== TagFetch { remote: "origin", name: "v1" }
+  TagFetch {"name":"v1","remote":"origin"}
+  message: Downloaded v1 from origin
+  ok: true
+== CheckoutThen { branch: "topic", then: StageAll }
+  Checkout {"target":{"Branch":"topic"}}
+  StageAll {"target":"All"}
+  ok: true
+== Merge(Ref { kind: LocalBranch { name: "topic" }, target: Oid([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]), visibility: Shown, is_head: false, upstream: None, tag_sync: None })
+  Merge {"from":{"is_head":false,"kind":{"LocalBranch":{"name":"topic"}},"tag_sync":null,"target":"0909090909090909090909090909090909090909","upstream":null,"visibility":"Shown"},"opts":{"fast_forward_only":false,"message":null,"no_commit":false,"no_ff":false,"squash":false}}
+  message: already up to date
+  ok: true
+== Rebase(Ref { kind: LocalBranch { name: "topic" }, target: Oid([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]), visibility: Shown, is_head: false, upstream: None, tag_sync: None })
+  Rebase {"onto":{"is_head":false,"kind":{"LocalBranch":{"name":"topic"}},"tag_sync":null,"target":"0909090909090909090909090909090909090909","upstream":null,"visibility":"Shown"},"opts":{"autosquash":false}}
+  message: rebased
+  ok: true
+== RebaseInteractive(InteractiveRebase { upstream: Some(Oid([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5])), onto: None, steps: [RebaseStep { commit: Oid([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]), action: Pick, message: None }], autosquash: false, cherry_pick: false })
+  RebaseInteractive {"request":{"autosquash":false,"cherry_pick":false,"onto":null,"steps":[{"action":"Pick","commit":"0606060606060606060606060606060606060606","message":null}],"upstream":"0505050505050505050505050505050505050505"}}
+  message: rebased
+  ok: true
+== RebaseContinue
+  RebaseContinue {}
+  message: rebase completed
+  ok: true
+== RebaseSkip
+  RebaseSkip {}
+  message: rebase completed
+  ok: true
+== RebaseAbort
+  RebaseAbort {}
+  message: rebase aborted
+  ok: true
+== OperationAbort
+  OperationAbort {}
+  message: operation aborted
+  ok: true
+== AmContinue
+  AmContinue {}
+  message: git am finished
+  ok: true
+== AmSkip
+  AmSkip {}
+  message: git am finished
+  ok: true
+== AmAbort
+  AmAbort {}
+  message: git am aborted
+  ok: true
+== IndexLockRemove
+  IndexLockRemove {}
+  message: index.lock removed
+  ok: true
+== OperationSkip
+  OperationSkip {}
+  message: operation skipped
+  ok: true
+== CherryPick(Oid([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]))
+  CherryPick {"commits":["0707070707070707070707070707070707070707"],"opts":{"no_commit":false}}
+  message: cherry-picked as 0707070
+  ok: true
+== Revert { commit: Oid([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]), mainline: None }
+  Revert {"commit":"0707070707070707070707070707070707070707","mainline":null}
+  message: revert conflicted - resolve the files, then commit
+  ok: true
+== Revert { commit: Oid([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]), mainline: Some(2) }
+  Revert {"commit":"0707070707070707070707070707070707070707","mainline":2}
+  message: revert conflicted - resolve the files, then commit
+  ok: true
+== Reset { target: Oid([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]), mode: Mixed }
+  Reset {"mode":"Mixed","target":"0808080808080808080808080808080808080808"}
+  message: reset Mixed to 0808080
+  ok: true
+== Reword { commit: Oid([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]), message: "new message" }
+  Reword {"commit":"0808080808080808080808080808080808080808","message":"new message"}
+  message: message of 0808080 edited, now 0808080, 2 commits on top re-created (previous tip 0707070: reset --soft to it to undo)
+  ok: true
+== SplitCommit { req: SplitCommit { commit: Oid([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]), parts: [SplitPart { message: "first", pieces: [Hunk { path: "a.txt", hunk: HunkId(0) }] }, SplitPart { message: "second", pieces: [File { path: "b.bin" }] }], sign: false } }
+  SplitCommit {"req":{"commit":"0808080808080808080808080808080808080808","parts":[{"message":"first","pieces":[{"hunk":0,"path":"a.txt"}]},{"message":"second","pieces":[{"path":"b.bin"}]}],"sign":false}}
+  message: Split 0808080 into 2 commits (new tip: 0a0a0a0)
+  ok: true
+== ResolveConflict { path: "a.txt", side: Theirs }
+  ResolveConflict {"path":"a.txt","resolution":{"TakeSide":"Theirs"}}
+  message: resolved a.txt using Theirs
+  ok: true
+== RemoteAdd { name: "up", url: "https://example.test/r.git" }
+  RemoteAdd {"name":"up","url":"https://example.test/r.git"}
+  message: added remote up
+  ok: true
+== RemoteRemove("up")
+  RemoteRemove {"name":"up"}
+  message: removed remote up
+  message: remove remote done - Ctrl+Z to undo
+  ok: true
+== RemoteRename { old_name: "up", new_name: "down" }
+  RemoteRename {"new_name":"down","old_name":"up"}
+  message: renamed remote up to down
+  ok: true
+== RemoteSetUrl { name: "up", url: "https://example.test/r.git" }
+  RemoteSetUrl {"name":"up","url":"https://example.test/r.git"}
+  message: up now fetches from https://example.test/r.git
+  ok: true
+== SetSshCommand { command: Some("ssh -i key") }
+  SetSshCommand {"command":"ssh -i key"}
+  message: this repository now uses ssh -i key
+  ok: true
+== SetSshCommand { command: None }
+  SetSshCommand {"command":null}
+  message: SSH key pin cleared
+  ok: true
+== SparseSet { dirs: ["src", "docs/guide"] }
+  SparseSet {"dirs":["src","docs/guide"]}
+  message: sparse checkout applied: src docs/guide
+  ok: true
+== SparseDisable
+  SparseDisable {}
+  message: sparse checkout disabled: every file is checked out
+  ok: true
+== SetRefVisibility { hidden: ["a"], solo: ["main"] }
+  SetRefVisibility {"hidden":["a"],"mode":"replace","solo":["main"]}
+  ok: true
+== RemoteSetPushUrl { name: "up", url: Some("https://example.test/p.git") }
+  RemoteSetPushUrl {"name":"up","url":"https://example.test/p.git"}
+  message: up now pushes to https://example.test/p.git
+  ok: true
+== RemoteSetPushUrl { name: "up", url: None }
+  RemoteSetPushUrl {"name":"up","url":null}
+  message: up pushes to its fetch URL
+  ok: true
+== BranchSetUpstream { branch: "topic", upstream: Some("origin/topic") }
+  BranchSetUpstream {"branch":"topic","upstream":"origin/topic"}
+  message: topic now tracks origin/topic
+  ok: true
+== BranchSetUpstream { branch: "topic", upstream: None }
+  BranchSetUpstream {"branch":"topic","upstream":null}
+  message: topic tracks nothing
+  ok: true
+== FastForward { branch: "topic", target: Oid([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]), target_label: "origin/topic" }
+  FastForward {"branch":"topic","target":"0909090909090909090909090909090909090909"}
+  message: topic already contains origin/topic
+  ok: true
+== WorktreeAdd { path: "../wt", opts: WorktreeAddOptions { start: Branch("topic"), new_branch: Some("new") } }
+  WorktreeAdd {"opts":{"new_branch":"new","start":{"Branch":"topic"}},"path":"../wt"}
+  message: added worktree ../wt (detached HEAD)
+  ok: true
+== PatchCreate { source: Commits([Oid([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]), Oid([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])]), dest: "out.patch" }
+  PatchCreate {"dest":"out.patch","source":{"Commits":["0101010101010101010101010101010101010101","0202020202020202020202020202020202020202"]}}
+  message: wrote 2 commits to out.patch
+  ok: true
+== PatchApply { path: "in.patch" }
+  PatchApply {"patch":"in.patch"}
+  message: applied patch to 1 file
+  ok: true
+== LfsInstall
+  LfsInstall {"scope":"Repository"}
+  message: Git LFS is set up for this repository
+  ok: true
+== LfsTrack { patterns: ["*.psd", "*.bin"], opts: LfsTrackOptions { lockable: false, renormalize: false } }
+  LfsTrack {"opts":{"lockable":false,"renormalize":false},"patterns":["*.psd","*.bin"]}
+  message: tracking *.psd, *.bin with LFS (.gitattributes is changed, not staged)
+  ok: true
+== LfsUntrack(["*.psd"])
+  LfsUntrack {"patterns":["*.psd"]}
+  message: no longer tracking *.psd with LFS
+  ok: true
+== LfsFetch("origin")
+  LfsFetch {"remote":"origin"}
+  message: fetched LFS objects from origin
+  ok: true
+== LfsPull("origin")
+  LfsPull {"remote":"origin"}
+  message: pulled LFS objects from origin
+  ok: true
+== LfsPush("origin")
+  LfsPush {"remote":"origin"}
+  message: pushed LFS objects to origin
+  ok: true
+== LfsFetchAll("origin")
+  LfsFetch {"opts":{"all_refs":true},"remote":"origin"}
+  message: fetched LFS objects from origin
+  ok: true
+== LfsPushAll("origin")
+  LfsPush {"opts":{"all_refs":true},"remote":"origin"}
+  message: pushed the LFS objects of every ref to origin
+  ok: true
+== LfsCheckout
+  LfsCheckout {}
+  message: checked out the LFS files
+  ok: true
+== LfsPrune
+  LfsPrune {}
+  message: pruned the local LFS store
+  ok: true
+== LfsLocks("origin")
+  message: reading the LFS locks on origin...
+  ok: true
+== LfsLock { remote: "origin", path: "big.psd" }
+  LfsLock {"path":"big.psd","remote":"origin"}
+  message: locked big.psd
+  ok: true
+== LfsUnlock { remote: "origin", path: "big.psd", force: true }
+  LfsUnlock {"force":true,"path":"big.psd","remote":"origin"}
+  message: unlocked big.psd
+  ok: true

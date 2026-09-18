@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/render.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags  · 2 branches, 4 tags, 9800 commits                                    │
+│ ╭ Rules ───────────────────────────────╮ ╭ Shift dates ──────────────────────────────────────────────────╮ │
+│ │ [x] 1 Replace an author  old@exampl… │ │ Shift by   +2h                                                │ │
+│ │ [x] 2 Shift dates  +2h       ▲  ▼  ✕ │ │ Dates      Author and committer dates  ▾                      │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │  Summary   Commits   Branches and tags   Impact   Secrets   Identities   Size                          │ │
+│ │ main  0101010 → 0202020  on origin                                                                     │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ Protected branches already pushed                                             Check all   Uncheck all  │ │
+│ │ [ ] main  (pushed)                                                                                     │ │
+│ │                                                                                                        │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ Some commits are already on a remote: a force push (with lease) will be needed.                            │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/render.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags  · 2 branches, 4 tags, 9800 commits                                    │
+│ ╭ Rules ───────────────────────────────╮ ╭ Shift dates ──────────────────────────────────────────────────╮ │
+│ │ [x] 1 Replace an author  old@exampl… │ │ Shift by   +2h                                                │ │
+│ │ [x] 2 Shift dates  +2h       ▲  ▼  ✕ │ │ Dates      Author and committer dates  ▾                      │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │ Rewrote 412 commits.                                                                                   │ │
+│ │ Send the rewritten refs to the remote                                         Check all   Uncheck all  │ │
+│ │ [ ] main  0101010 → 0202020  origin  protected                                                         │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ The remote keeps the new history even if you undo the rewrite here.                                    │ │
+│ │  Push rewritten branches   Copy the note   Open the commit map                                         │ │
+│ │ Undo puts every moved ref back as it was.                                                              │ │
+│ │  Undo   Purge old history...   Close                                                                   │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│                                                                                                            │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

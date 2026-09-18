@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/script.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ ╭ Lua script ──────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮ │
+│ │ Script                                          │  Test on selection   2 selected commits              │ │
+│ │ 1 function rewrite_commit(c, ctx)               │ Fix the problems under the script before testing.    │ │
+│ │ 2   return {                                    │                                                      │ │
+│ │ 3   )                                           │                                                      │ │
+│ │ 4 end                                           │                                                      │ │
+│ │ 5 █                                             │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │ script:3: unexpected symbol near ')'            │                                                      │ │
+│ │ Parameters                                      │                                                      │ │
+│ │ This script declares no parameters (add one wi… │                                                      │ │
+│ │  File       .gitpoulpi/rewrite/script.lua       │                                                      │ │
+│ │   Load from file...   Save to file...           │                                                      │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

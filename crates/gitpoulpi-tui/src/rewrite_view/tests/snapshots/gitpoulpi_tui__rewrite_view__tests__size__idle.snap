@@ -1,0 +1,40 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/size.rs
+expression: s
+---
+╭ Rewrite history ───────────────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                                  │
+│ ╭ Rules ───────────────────────────────────╮ ╭ Rule ───────────────────────────────────────────────────────────────╮ │
+│ │ Add a rule to start: authors, dates,     │ │ Add a rule to edit its settings here.                               │ │
+│ │ messages, file contents...               │ │                                                                     │ │
+│ │                                          │ │                                                                     │ │
+│ │                                          │ │                                                                     │ │
+│ │                                          │ │                                                                     │ │
+│ │                                          │ │                                                                     │ │
+│ │                                          │ │                                                                     │ │
+│ │                                          │ │                                                                     │ │
+│ │ + Add rule ▾                             │ │                                                                     │ │
+│ │Recipe   (unnamed)                        │ │                                                                     │ │
+│ ╰──────────────────────────────────────────╯ ╰─────────────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ─────────────────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │  Summary   Commits   Branches and tags   Impact   Secrets   Identities   Size                                    │ │
+│ │  Analyse sizes                                                                                                   │ │
+│ │ What takes room in the history: the largest files and folders, and files deleted from HEAD that the history      │ │
+│ │ still stores. Tick rows to turn them into a removal rule.                                                        │ │
+│ │ Nothing analysed yet. The analysis reads sizes and paths only, never file content, and changes nothing.          │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ │                                                                                                                  │ │
+│ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ no rule is enabled                                                                                                   │
+│  Preview   Apply                                                                                    Save ▾   Load ▾  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

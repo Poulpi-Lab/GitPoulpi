@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/identities.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Rule ─────────────────────────────────────────────────────────╮ │
+│ │ Add a rule to start: authors, dates, │ │ Add a rule to edit its settings here.                         │ │
+│ │ messages, file contents...           │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unn╭ Merge into... ───────────────────────────────────────────────────────── ✕ ─╮             │ │
+│ ╰─────────────│                                                                            │─────────────╯ │
+│ ╭ Preview ────│ Which of the 3 selected identities do the others become? Their lines are   │─────────────╮ │
+│ │  Summary   C│ added to .mailmap; the history is not changed.                             │             │ │
+│ │ Merge the na│                                                                            │lmap: the    │ │
+│ │ Log then sho│ 1  Alex Doe <alex@example.org>  (310 commits)                              │             │ │
+│ │  Merge into.│ 2  alex <alex@old.example.com>  (60 commits)                               │             │ │
+│ │             │ 3  Alexander <alex@laptop.example.com>  (22 commits)                       │             │ │
+│ │ [x] Alex Doe│                                                                            │             │ │
+│ │ [x] alex <al╰────────────────────────────────────────────────────────────────────────────╯             │ │
+│ │ [x] Alexander <alex@laptop.example.com>                                                                │ │
+│ │ [ ] Robert <bob@example.com>  mapped to Robert Roe <robert@example.org>                                │ │
+│ │ [ ] Casey Example <casey@example.com>                                                                  │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ 22 as author, 0 as committer                                                                           │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ no rule is enabled                                                                                         │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

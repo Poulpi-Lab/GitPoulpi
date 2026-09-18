@@ -14,6 +14,7 @@ members = [
     "crates/gitpoulpi-i18n",
     "crates/gitpoulpi-ipc",
     "crates/gitpoulpi-daemon",
+    "crates/gitpoulpi-tui",
     "crates/gitpoulpi-commands",
     "crates/gitpoulpi-testkit",
     "xtask",
@@ -49,6 +50,7 @@ gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }
 gitpoulpi-ipc = { path = "crates/gitpoulpi-ipc" }
 gitpoulpi-daemon = { path = "crates/gitpoulpi-daemon", default-features = false }
 gitpoulpi-testkit = { path = "crates/gitpoulpi-testkit" }
+gitpoulpi-tui = { path = "crates/gitpoulpi-tui", default-features = false }
 gitpoulpi-commands = { path = "crates/gitpoulpi-commands", default-features = false }
 xtask = { path = "xtask" }
 
@@ -198,6 +200,10 @@ opt-level = 3
 # 40 000-line file `pty_editor_highlight_idle` opens, which is the first thing
 # to blow its budget on a loaded machine. Optimising the dependency chain
 # (not GitPoulpi's own code) in dev and test builds makes it seconds.
+[profile.dev.package.syntect]
+opt-level = 3
+[profile.dev.package.fancy-regex]
+opt-level = 3
 [profile.dev.package.regex-automata]
 opt-level = 3
 [profile.dev.package.regex-syntax]
@@ -205,6 +211,8 @@ opt-level = 3
 [profile.dev.package.aho-corasick]
 opt-level = 3
 [profile.dev.package.memchr]
+opt-level = 3
+[profile.dev.package.bincode]
 opt-level = 3
 [profile.dev.package.flate2]
 opt-level = 3

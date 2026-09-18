@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/push.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Replace an author ────────────────────────────────────────────╮ │
+│ │ [x] 1 Replace an author      ▲  ▼  ✕ │ │ Name is                  anyone                               │ │
+│ │                                      │ │ Email is                 old@example.com                      │ │
+│ │                                      │ │ Regular expression      [ ]                                   │ │
+│ │                                      │ │ New name                 unchanged if empty                   │ │
+│ │                                      │ │ New email                new@example.org                      │ │
+│ │                                      │ │ Apply to                 Author and committer  ▾              │ │
+│ │                                      │ │ Also the authors of t…  [x]                                   │ │
+│ │                                      │ │ Also map trailers       [ ]                                   │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │ Rewrote 412 commits.                                                                                   │ │
+│ │ Send the rewritten refs to the remote                                         Check all   Uncheck all  │ │
+│ │ [ ] main  0101010 → 0202020  origin  protected                                                         │ │
+│ │ [x] feature  0101010 → 0202020  origin                                                                 │ │
+│ │ [x] v1  0101010 → 0202020  origin                                                                      │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ Click a path to copy it.                                                                               │ │
+│ │ Commit map  /repo/.git/gitpoulpi/rewrite/run-1/commit-map                                              │ │
+│ │ Ref map  /repo/.git/gitpoulpi/rewrite/run-1/ref-map                                                    │ │
+│ │ The remote keeps the new history even if you undo the rewrite here.                                    │ │
+│ │  Push rewritten branches   Copy the note   Open the commit map                                         │ │
+│ │ Undo puts every moved ref back as it was.                                                              │ │
+│ │  Undo   Purge old history...   Close                                                                   │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│                                                                                                            │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

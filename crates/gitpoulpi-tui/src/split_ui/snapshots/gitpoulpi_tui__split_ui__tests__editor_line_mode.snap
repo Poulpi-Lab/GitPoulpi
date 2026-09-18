@@ -1,0 +1,28 @@
+---
+source: crates/gitpoulpi-tui/src/split_ui/tests.rs
+expression: text
+---
+╭ Split commit 0303030  feat: parser and logo ─────────────────────────────────────────────────────────── ✕ ─╮
+│New commits, oldest first               │Changes  · line mode                                            3/9│
+│                                        │* M src/a.rs                                                [ * ▾] │
+│1 feat: parser and logo    ✎  ▲  ▼  ✕ 4 │*   @@ -1,3 +1,4 @@                                         [ * ▾] │
+│2 (no message)                        1 │2     + x                                                   [ 2 ▾] │
+│+ New commit                            │1     + x                                                   [ 1 ▾] │
+│                                        │1     - x                                                   [ 1 ▾] │
+│                                        │1   @@ -1,3 +1,4 @@                                         [ 1 ▾] │
+│                                        │1 M src/b.rs                                                [ 1 ▾] │
+│                                        │1   @@ -1,3 +1,4 @@                                         [ 1 ▾] │
+│                                        │1 A logo.png  binary, whole file                            [ 1 ▾] │
+│                                        │                                                                   │
+│                                        │                                                                   │
+│                                        │                                                                   │
+│                                        │                                                                   │
+│                                        │                                                                   │
+│                                        │                                                                   │
+│                                        │                                                                   │
+│                                        │                                                                   │
+│[ ] Sign commits                        │                                                                   │
+│Signatures of the rewritten commits are…│                                                                   │
+│a new commit has an empty message                                             Reset   Cancel   Split into 2 │
+│↑↓: select  │  Tab: pane  │  1-9: give to  │  n: new commit  │  m: choose  │  v: lines  │  s: sign  │  Ctrl…│
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

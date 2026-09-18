@@ -1,0 +1,24 @@
+╭ Merge · src/auth/login.rs…─ file 2 of 3  ‹  › ─╮
+│  ▲   ▼  1/3  …                     ✓ Save   ✕  │
+├  A Current·m…   B Incoming·…   Base            ┤
+│    1 use std::io;                              ↑
+│    2
+│    3 fn login(&mut self, user: &str) {         ◆
+│    4     let cfg = self.cfg.clone();
+│ ┌[x] Conflict 1 · 1st ────────────────────────
+│ │✓ 5     let token = fetch(user)?;
+│ │✓ 6     log::info!("login {user}");           ▐
+│ │✓ 7     self.metrics.inc();
+│ └───────────────────────────────────────────── ▐
+│    8     Ok(token)
+│    9     // B only                             ↓
+├─ Output · src/auth/login.rs · LF · UTF-8 · 1 …─┤
+│ 1   use std::io;                               ↑
+│ 2
+│ 3   fn login(&mut self, user: &str) {          ◆
+│ 4       let cfg = self.cfg.clone();
+│ 5 B     let token = fetch(user)?;              ▐
+│ 6 B     log::info!("login {user}");            ▐
+│ 7 B     self.metrics.inc();                    ↓
+╰────────────────────────────────────────────────╯
+ Space line · Enter chunk · a/b/c take · s order

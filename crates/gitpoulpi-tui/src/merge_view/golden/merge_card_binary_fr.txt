@@ -1,0 +1,24 @@
+╭ Merge · f ─────────────────────────────────────────────────────────────────────── fichier 1 sur 1  ‹  ›  ✕ ╮
+│                                                                                                            │
+│ Fichier binaire : les deux côtés l'ont modifié et git ne sait pas le merger ligne par ligne.               │
+│                                                                                                            │
+│ ╭ A · Courant ───────────────────╮ ╭ B · Entrant ───────────────────╮ ╭ O · Base ──────────────────────╮   │
+│ │0202020 · 2.0 KB · mode 100644  │ │0303030 · 2.0 KB · mode 100644  │ │0101010 · 2.0 KB · mode 100644  │   │
+│ ╰────────────────────────────────╯ ╰────────────────────────────────╯ ╰────────────────────────────────╯   │
+│                                                                                                            │
+│  Garder A (a)   Prendre B (b)   Prendre la base (o)   Ouvrir dans l'outil de merge (m)                     │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│ Le choix résout immédiatement le fichier (il est staged). Esc ferme sans choisir.                          │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

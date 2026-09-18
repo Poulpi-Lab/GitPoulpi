@@ -1,0 +1,5 @@
+---
+source: crates/gitpoulpi-tui/src/preferences/tests/render.rs
+expression: "top.trim_end_matches(|c: char| c == '\\u{2500}' || c == ' ')"
+---
+╭🐙  GitPoulpi - Settings - Tab: sections/settings │ Enter: change ───────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮

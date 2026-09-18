@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/script.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ ╭ Lua script ──────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮ │
+│ │ Script                                          │  Test on selection   2 selected commits              │ │
+│ │ 1 --! name: Rename                              │ Fill in the parameters first: who                    │ │
+│ │ 2 --! param who: text "Name to replace"         │                                                      │ │
+│ │ 3 --! param limit: number "How many commits"    │                                                      │ │
+│ │ 4 --! param keep: bool "Keep the committer" =   │                                                      │ │
+│ │ 5 function rewrite_commit(c, ctx) end           │                                                      │ │
+│ │ 6 █                                             │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │                                                 │                                                      │ │
+│ │ OK: rewrite_commit found                        │                                                      │ │
+│ │ Parameters                                      │                                                      │ │
+│ │  Name to replace      A value is needed.        │                                                      │ │
+│ │  How many commits     5                         │                                                      │ │
+│ │  Keep the committer  [x]                        │                                                      │ │
+│ │  File                 …oulpi/rewrite/script.lua │                                                      │ │
+│ │   Load from file...   Save to file...           │                                                      │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

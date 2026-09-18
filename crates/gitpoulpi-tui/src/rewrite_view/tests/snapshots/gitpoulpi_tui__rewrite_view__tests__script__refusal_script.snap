@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/script.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Script ───────────────────────────────────────────────────────╮ │
+│ │ [x] 1 Script  --! name: Up…  ▲  ▼  ✕ │ │ Language                 Lua (built in)  ▾                    │ │
+│ │                                      │ │ Script from              Written here  ▾                      │ │
+│ │                                      │ │ Script                   --! name: Uppercase author names (+… │ │
+│ │                                      │ │ Text added to each me…                                        │ │
+│ │                                      │ │ Checking...                                                   │ │
+│ │                                      │ │ Enter on the script opens the editor, with a live check, its  │ │
+│ │                                      │ │ parameters and a test on commits.                             │ │
+│ │                                      │ │                                                               │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │  Summary   Commits   Branches and tags   Impact   Secrets   Identities   Size                          │ │
+│ │ a script failed                                                                                        │ │
+│ │ Failed on:                                                                                             │ │
+│ │   abababa: script:4: attempt to perform arithmetic on a nil value                                      │ │
+│ │ Fix the script, try it on that commit with Test on selection, then preview again.                      │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ cannot rewrite history: a script failed (abababa: script:4: attempt to perform arithmetic on a nil value)  │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

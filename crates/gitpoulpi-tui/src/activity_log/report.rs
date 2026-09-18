@@ -1,0 +1,178 @@
+//! The blocks of text the Copy buttons put on the clipboard: made to be
+//! pasted into a chat with someone (or an AI) who has to explain a failure.
+//! Always English, always redacted, never localised.
+
+use super::feed::Entry;
+
+// i18n-scan: off
+
+/// Facts about this run: version, system, terminal, backend.
+pub(crate) fn environment() -> Vec<String> {
+    let mut out = vec![format!(
+        "GitPoulpi {}{}",
+        env!("CARGO_PKG_VERSION"),
+        gitpoulpi_ipc::build_git_sha()
+            .map(|sha| format!(" ({sha})"))
+            .unwrap_or_default()
+    )];
+    out.push(format!(
+        "os: {} {}",
+        std::env::consts::OS,
+        std::env::consts::ARCH
+    ));
+    let var = |name: &str| std::env::var(name).ok().filter(|v| !v.is_empty());
+    let mut terminal = Vec::new();
+    for name in ["TERM_PROGRAM", "TERM", "COLORTERM", "WT_SESSION"] {
+        if let Some(v) = var(name) {
+            terminal.push(format!("{name}={v}"));
+        }
+    }
+    let size = crossterm::terminal::size()
+        .map(|(w, h)| format!("{w}x{h}"))
+        .unwrap_or_else(|_| "unknown size".to_string());
+    out.push(format!("terminal: {} ({size})", terminal.join(" ")));
+    let backend = gitpoulpi_config::Settings::resolve_ambient()
+        .map(|s| format!("{:?}", s.config().general.default_backend).to_lowercase())
+        .unwrap_or_else(|_| "unknown".to_string());
+    out.push(format!("backend: {backend}"));
+    out.push(format!("git: {}", git_version()));
+    out
+}
+
+/// `git --version`, asked once on a thread of its own: the first report may
+/// not have it yet, the next one does.
+fn git_version() -> String {
+    static VERSION: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    static ASKED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+    if let Some(v) = VERSION.get() {
+        return v.clone();
+    }
+    if !ASKED.swap(true, std::sync::atomic::Ordering::SeqCst) {
+        let _ = std::thread::Builder::new()
+            .name("git-version".into())
+            .spawn(|| {
+                let text = std::process::Command::new(gitpoulpi_cli_backend::git_program())
+                    .arg("--version")
+                    .output()
+                    .ok()
+                    .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+                    .filter(|t| !t.is_empty())
+                    .unwrap_or_else(|| "not found".to_string());
+                let _ = VERSION.set(text);
+            });
+    }
+    "(still being asked)".to_string()
+}
+
+/// Starts the `git --version` probe early (opening the Activity Log, the
+/// first failure), so a report made a moment later has it.
+pub(crate) fn warm_up() {
+    let _ = git_version();
+}
+
+/// One entry as a report: header, the operation's facts, the raw message.
+pub(crate) fn entry_block(entry: &Entry) -> String {
+    let mut lines = vec!["GitPoulpi error report".to_string()];
+    lines.extend(environment());
+    lines.push(format!("time: {}", gitpoulpi_log::timestamp(entry.ts_ms)));
+    lines.push(format!("title: {}", entry.title));
+    if let Some(ms) = entry.duration_ms {
+        lines.push(format!("duration: {ms} ms"));
+    }
+    if let Some(summary) = &entry.summary {
+        lines.push(format!("reading: {summary}"));
+    }
+    lines.push(format!("message: {}", entry.message));
+    if let Some(detail) = &entry.detail {
+        lines.extend(detail.lines());
+    }
+    redacted(lines.join("\n"))
+}
+
+/// The "Copy diagnostics" block: the environment, the latest failure and the
+/// tail of the log at the level shown.
+pub(crate) fn diagnostics(
+    latest: Option<&Entry>,
+    log: &[gitpoulpi_log::Record],
+    level: gitpoulpi_log::Level,
+) -> String {
+    let mut lines = vec!["GitPoulpi diagnostics".to_string()];
+    lines.extend(environment());
+    lines.push(format!("log level shown: {}", level.as_str()));
+    if let Some(entry) = latest {
+        lines.push(String::new());
+        lines.push("latest problem:".to_string());
+        lines.push(format!("  time: {}", gitpoulpi_log::timestamp(entry.ts_ms)));
+        lines.push(format!("  title: {}", entry.title));
+        lines.push(format!("  message: {}", entry.message));
+        if let Some(detail) = &entry.detail {
+            lines.extend(detail.lines().into_iter().map(|l| format!("  {l}")));
+        }
+    }
+    lines.push(String::new());
+    lines.push(format!("last {} log lines:", log.len()));
+    let mut text = lines.join("\n");
+    text.push('\n');
+    text.push_str(&gitpoulpi_log::to_text(log));
+    redacted(text)
+}
+
+fn redacted(text: String) -> String {
+    gitpoulpi_core::redact(&text)
+}
+
+// i18n-scan: on
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::activity_log::feed::Severity;
+    use gitpoulpi_core::ErrorDetail;
+
+    #[test]
+    fn an_entry_block_names_the_command_and_stderr_and_hides_secrets() {
+        let mut entry = Entry::new(
+            Severity::Error,
+            "Push failed".into(),
+            "git push failed: fatal: Authentication failed for 'https://me:hunter2@host/r.git/'"
+                .into(),
+        );
+        entry.detail = Some(ErrorDetail::from_git(
+            &["push", "--porcelain", "origin"],
+            Some(128),
+            "fatal: Authentication failed for 'https://me:hunter2@host/r.git/'\n",
+        ));
+        let block = entry_block(&entry);
+        assert!(block.starts_with("GitPoulpi error report"), "{block}");
+        assert!(block.contains("command: git push --porcelain origin"));
+        assert!(block.contains("exit code: 128"));
+        assert!(block.contains("Authentication failed"));
+        assert!(block.contains("title: Push failed"));
+        assert!(!block.contains("hunter2"), "{block}");
+    }
+
+    #[test]
+    fn diagnostics_carry_the_environment_the_latest_problem_and_the_log() {
+        let entry = Entry::new(Severity::Error, "Pull failed".into(), "boom".into());
+        let record = gitpoulpi_log::Record {
+            ts_ms: gitpoulpi_log::now_ms(),
+            level: gitpoulpi_log::Level::Warn,
+            process: "tui".into(),
+            pid: 1,
+            target: "daemon".into(),
+            message: "token=abcdef123456 leaked?".into(),
+            repo: None,
+        };
+        let text = diagnostics(Some(&entry), &[record], gitpoulpi_log::Level::Debug);
+        assert!(text.starts_with("GitPoulpi diagnostics"));
+        assert!(text.contains(&format!("GitPoulpi {}", env!("CARGO_PKG_VERSION"))));
+        assert!(text.contains("os: "));
+        assert!(text.contains("backend: "));
+        assert!(text.contains("latest problem:"));
+        assert!(text.contains("title: Pull failed"));
+        assert!(text.contains("last 1 log lines:"));
+        assert!(text.contains("log level shown: DEBUG"));
+        assert!(text.contains("WARN"));
+        assert!(!text.contains("abcdef123456"), "{text}");
+    }
+}

@@ -1,0 +1,44 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/push.rs
+expression: "paint(&v, W, 40, None).0"
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Replace an author ────────────────────────────────────────────╮ │
+│ │ [x] 1 Replace an author      ▲  ▼  ✕ │ │ Name is                  anyone                               │ │
+│ │                                      │ │ Email is                 old@example.com                      │ │
+│ │                                      │ │ Regular expression      [ ]                                   │ │
+│ │                                      │ │ New name                 unchanged if empty                   │ │
+│ │                                      │ │ New email                new@example.org                      │ │
+│ │                                      │ │ Apply to                 Author and committer  ▾              │ │
+│ │                                      │ │ Also the authors of t…  [x]                                   │ │
+│ │                                      │ │ Also map trailers       [ ]                                   │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │ Rewrote 412 commits.                                                                                   │ │
+│ │ Send the rewritten refs to the remote                                                                  │ │
+│ │ main  origin  rejected: protected by the host                                        Fetch and review  │ │
+│ │ feature  origin  pushed                                                                                │ │
+│ │ v1  origin  rejected: the remote moved since the preview, fetch and review           Fetch and review  │ │
+│ │ odd  origin  rejected: hook declined                                                 Fetch and review  │ │
+│ │ held  origin  not pushed                                                                               │ │
+│ │ skipped  origin  skipped: protected branch                                                             │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ A remote refused an atomic push: its refs were sent one by one.                                        │ │
+│ │ The remote keeps the new history even if you undo the rewrite here.                                    │ │
+│ │  Push rewritten branches   Copy the note   Open the commit map                                         │ │
+│ │ Undo puts every moved ref back as it was.                                                              │ │
+│ │  Undo   Purge old history...   Close                                                                   │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│                                                                                                            │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

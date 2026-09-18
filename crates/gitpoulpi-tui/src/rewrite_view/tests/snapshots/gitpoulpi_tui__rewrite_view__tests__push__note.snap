@@ -1,0 +1,20 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/push.rs
+expression: text
+---
+The history of this repository was rewritten and replaced on the remote by a forced push. Your clone still has the old history. Do not push your old branches back: that would bring the old commits back.
+
+Branch main on origin: abababababab -> cdcdcdcdcdcd
+  No local work on it:
+    git fetch origin
+    git checkout main
+    git reset --hard origin/main
+  Local commits on top of the old main:
+    git fetch origin
+    git rebase --onto origin/main abababababab main
+
+Tag v1.2 on origin: 121212121212 -> 343434343434
+  Replace your copy:
+    git fetch origin +refs/tags/v1.2:refs/tags/v1.2
+
+Other branches of yours that contain old commits keep them until you rebase them onto the new history. The ids above and the commit map tell which.

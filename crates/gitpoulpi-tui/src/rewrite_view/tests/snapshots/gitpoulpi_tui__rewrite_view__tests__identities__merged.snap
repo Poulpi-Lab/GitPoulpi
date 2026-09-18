@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/identities.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Rule ─────────────────────────────────────────────────────────╮ │
+│ │ Add a rule to start: authors, dates, │ │ Add a rule to edit its settings here.                         │ │
+│ │ messages, file contents...           │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │  Summary   Commits   Branches and tags   Impact   Secrets   Identities   Size                          │ │
+│ │ Merge the names and emails one person worked under into one identity. The lines go to .mailmap: the    │ │
+│ │ Log then shows the chosen name and nothing in the history is rewritten.                                │ │
+│ │  Merge into...   Refresh   Check all   Uncheck all  0 of 5 selected                                    │ │
+│ │ Added 2 lines to .mailmap. Commit the file to share it.   Undo                                         │ │
+│ │ [ ] Alex Doe <alex@example.org>                                                                        │ │
+│ │ [ ] alex <alex@old.example.com>                                                                        │ │
+│ │ [ ] Alexander <alex@laptop.example.com>                                                                │ │
+│ │ [ ] Robert <bob@example.com>  mapped to Robert Roe <robert@example.org>                                │ │
+│ │ [ ] Casey Example <casey@example.com>                                                                  │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │ 310 as author, 12 as committer                                                                         │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ Added 2 lines to .mailmap. Commit the file to share it.                                                    │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/content.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Remove files from history ────────────────────────────────────╮ │
+│ │ [x] 1 Remove files from his… ▲  ▼  ✕ │ │ Paths or patterns   src                                       │ │
+│ │                                      │ │ Empty commits       Remove them  ▾                            │ │
+│ │                                      │ │ A pattern without a slash matches at any depth: *.log or      │ │
+│ │                                      │ │ secrets hit every folder. With a slash it starts at the top:  │ │
+│ │                                      │ │ docs/old.                                                     │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │                                      │ │                                                               │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │  Summary   Commits   Branches and tags   Impact   Secrets   Identities   Size                          │ │
+│ │ files the rewrite would change have uncommitted edits                                                  │ │
+│ │ Files with local changes:                                                                              │ │
+│ │   src/a.rs                                                                                             │ │
+│ │   src/b.rs                                                                                             │ │
+│ │ Save these changes in a commit, put them in a stash or discard them, then preview again.               │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ files the rewrite would change have uncommitted edits                                                      │
+│  Preview   Apply                                                                          Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

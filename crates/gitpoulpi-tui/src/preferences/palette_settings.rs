@@ -1,0 +1,212 @@
+//! The Settings fields as command-palette rows.
+//!
+//! The palette's `Settings: ...` rows are generated from the Preferences
+//! field model (the pool of plain `config.toml` rows, `PreferencesState::
+//! row_pool`), never listed by hand, so a new setting appears in the palette
+//! with its page row. A value is applied and persisted by the very code the
+//! page runs (`commit_bool`, `commit_choice`, `commit_text` ->
+//! `write_global`, with its live installs), on a *detached* state: the page
+//! need not be open, and nothing here keeps the screen's state.
+
+use super::*;
+use gitpoulpi_secrets::InMemoryTokens;
+
+/// How a palette row edits its setting.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum SettingKind {
+    /// `Settings: Toggle <label>`: flips it.
+    Toggle,
+    /// `Settings: <label>...`: a sub-list of these choices (shown text).
+    Choice(Vec<String>),
+    /// `Settings: <label>...`: a prompt over a whole number in `min..=max`.
+    Number { min: i64, max: i64 },
+    /// `Settings: <label>...`: a prompt over free text.
+    Text,
+    /// Needs the page (a combo, a button, a list): opens Settings on it.
+    Page,
+}
+
+/// One setting the palette can reach.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct SettingRow {
+    /// The config key (`ui.minimap`): the stable identity.
+    pub(crate) key: &'static str,
+    /// The page's own label, in the current language.
+    pub(crate) label: String,
+    pub(crate) kind: SettingKind,
+}
+
+/// A setting's value right now.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Current {
+    /// What the page shows on the row (`[x]`, `3`, the choice's text).
+    pub(crate) shown: String,
+    /// The picked option of a choice.
+    pub(crate) choice: Option<usize>,
+    /// What a prompt starts with.
+    pub(crate) text: String,
+    /// Set when the row is not editable right now, with the page's reason.
+    pub(crate) coming: Option<String>,
+}
+
+/// What to do to a setting.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum Edit {
+    Toggle,
+    Choose(usize),
+    Text(String),
+}
+
+/// Choices whose options are discovered at run time (installed terminals):
+/// the page lists them, a fixed palette sub-list cannot.
+const PAGE_ONLY: &[&str] = &["ui.launch_terminal", "ui.language"];
+
+impl PreferencesState {
+    /// A state that edits `config.toml` and nothing else: no repository,
+    /// no token store, no integration probes. What the palette applies a
+    /// setting on.
+    pub(crate) fn detached() -> Self {
+        let paths = ConfigPaths::discover();
+        let config_path = paths.as_ref().map(|p| p.config_file());
+        let mut config = config_path
+            .as_deref()
+            .map(Config::load)
+            .transpose()
+            .ok()
+            .flatten()
+            .unwrap_or_default();
+        config.integrations.clear();
+        Self::with_parts(
+            config,
+            config_path,
+            Path::new("."),
+            RepoState::default(),
+            PathBuf::new(),
+            std::sync::Arc::new(InMemoryTokens::default()),
+        )
+    }
+
+    pub(super) fn setting_rows(&self) -> Vec<SettingRow> {
+        let mut seen = std::collections::HashSet::new();
+        let mut out = Vec::new();
+        for field in self.row_pool() {
+            let Target::Global(key) = field.target else {
+                continue;
+            };
+            // A row that is "coming" today (undo depth with undo off) is still
+            // listed: running it says why it cannot be edited now.
+            let shown = !matches!(
+                field.control,
+                Control::Heading | Control::Info(_) | Control::Swatches(_)
+            );
+            if !shown || !seen.insert(key) {
+                continue;
+            }
+            let kind = if PAGE_ONLY.contains(&key) {
+                SettingKind::Page
+            } else {
+                match &field.control {
+                    Control::Toggle(_) => SettingKind::Toggle,
+                    Control::Choice { options, .. } => {
+                        SettingKind::Choice(options.iter().map(|o| field.option_label(o)).collect())
+                    }
+                    Control::Number { min, max, .. } => SettingKind::Number {
+                        min: *min,
+                        max: *max,
+                    },
+                    Control::Text(_) => SettingKind::Text,
+                    _ => SettingKind::Page,
+                }
+            };
+            out.push(SettingRow {
+                key,
+                label: field.label.clone(),
+                kind,
+            });
+        }
+        out
+    }
+
+    pub(super) fn setting_current(&self, key: &str) -> Option<Current> {
+        let field = self
+            .row_pool()
+            .into_iter()
+            .find(|f| matches!(f.target, Target::Global(k) if k == key))?;
+        Some(Current {
+            shown: field.value_text(),
+            choice: match &field.control {
+                Control::Choice { index, .. } => Some(*index),
+                _ => None,
+            },
+            text: match &field.control {
+                Control::Text(t) => t.clone(),
+                Control::Number { value, .. } => value.to_string(),
+                _ => String::new(),
+            },
+            coming: field.coming.clone(),
+        })
+    }
+
+    /// Edits `key` exactly as its page row would. `Err` carries the reason
+    /// (the page's own message for a refused value).
+    pub(super) fn apply_setting(&mut self, key: &str, edit: Edit) -> Result<String, String> {
+        self.show_page(None, Some(key))?;
+        let fields = self.fields();
+        let field = fields.get(self.field).ok_or_else(|| key.to_string())?;
+        let target = field.target.clone();
+        let ok = match (edit, &field.control) {
+            (Edit::Toggle, Control::Toggle(on)) => {
+                let next = !*on;
+                self.commit_bool(&target, next);
+                true
+            }
+            (Edit::Choose(i), Control::Choice { .. }) => {
+                self.commit_choice(&target, i);
+                true
+            }
+            (Edit::Text(draft), _) => {
+                let index = self.field;
+                self.commit_text(index, &draft)
+            }
+            _ => false,
+        };
+        let message = self.take_message().unwrap_or_default();
+        if ok {
+            Ok(message)
+        } else {
+            Err(message)
+        }
+    }
+}
+
+/// Every setting the palette offers, labels in the current language. The
+/// list does not depend on the user's file, so it never reads it.
+pub(crate) fn rows() -> Vec<SettingRow> {
+    PreferencesState::with_parts(
+        Config::default(),
+        None,
+        Path::new("."),
+        RepoState::default(),
+        PathBuf::new(),
+        std::sync::Arc::new(InMemoryTokens::default()),
+    )
+    .setting_rows()
+}
+
+/// `key`'s value now, read from `config.toml`.
+pub(crate) fn current(key: &str) -> Option<Current> {
+    PreferencesState::detached().setting_current(key)
+}
+
+/// Applies `edit` to `key` and persists it. `Ok` carries the page's
+/// confirmation (`key = value`), `Err` the reason it was refused.
+pub(crate) fn apply(key: &str, edit: Edit) -> Result<String, String> {
+    PreferencesState::detached().apply_setting(key, edit)
+}
+
+impl PreferencesState {
+    /// Opens the page on the setting `key` (selected and flashed).
+    pub(crate) fn show_setting(&mut self, key: &str) -> Result<(), String> {
+        self.show_page(None, Some(key))
+    }
+}

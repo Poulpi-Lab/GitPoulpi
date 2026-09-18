@@ -1,0 +1,38 @@
+---
+source: crates/gitpoulpi-tui/src/rewrite_view/tests/render.rs
+expression: s
+---
+╭ Rewrite history ─────────────────────────────────────────────────────────────────────────────────────── ✕ ─╮
+│ Scope  Current branch  ▾   [x] Tags                                                                        │
+│ ╭ Rules ───────────────────────────────╮ ╭ Replace an author ────────────────────────────────────────────╮ │
+│ │ [x] 1 Replace an author      ▲  ▼  ✕ │ │ Name is                  anyone                               │ │
+│ │                                      │ │ Email is                 old@example.com                      │ │
+│ │                                      │ │ Regular expression      [ ]                                   │ │
+│ │                                      │ │ New name                 unchanged if empty                   │ │
+│ │                                      │ │ New email                new@example.org                      │ │
+│ │                                      │ │ Apply to                 Author and committer  ▾              │ │
+│ │                                      │ │ Also the authors of t…  [x]                                   │ │
+│ │                                      │ │ Also map trailers       [ ]                                   │ │
+│ │ + Add rule ▾                         │ │                                                               │ │
+│ │Recipe   (unnamed)                    │ │                                                               │ │
+│ ╰──────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ │
+│ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ │  Summary   Commits   Branches and tags   Impact   Secrets   Identities   ▓▓▓░░░ Rewriting: 6120 / 9800 │ │
+│ │ Computing the new history. Nothing is changed yet.                                                     │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ │                                                                                                        │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│ A job is running.                                                                                          │
+│  Preview   Apply   Cancel                                                                 Save ▾   Load ▾  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

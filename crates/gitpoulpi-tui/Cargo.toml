@@ -1,0 +1,135 @@
+[package]
+name = "gitpoulpi-tui"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "GitPoulpi terminal UI: a ratatui/crossterm client over gitpoulpi-ipc, subscribed to daemon events for live updates."
+
+[[bin]]
+name = "gitpoulpi-tui"
+path = "src/main.rs"
+
+[features]
+default = ["full"]
+full = []
+all-langs = []
+lang-fr = []
+lang-es = []
+lang-pt-br = []
+lang-pt-pt = []
+lang-it = []
+lang-de = []
+lang-zh-cn = []
+lang-ja = []
+lang-ru = []
+lang-ko = []
+lang-nl = []
+lang-pl = []
+lang-uk = []
+lang-cs = []
+lang-sv = []
+lang-tr = []
+lang-qps = []
+ai = []
+# Internal: "at least one hosting provider". Never enabled alone.
+hosting = []
+github = []
+gitlab = []
+azure-devops = []
+bitbucket = []
+jira = []
+trello = []
+gitea = []
+linear = []
+youtrack = []
+redmine = []
+gerrit = []
+local-issues = []
+radar = []
+mermaid = []
+board = []
+review = []
+history-rewrite = []
+global-search = []
+workspaces = []
+rewrite-scripts = []
+mcp = []
+lfs = []
+worktree = []
+submodule = []
+# Author avatars fetched over HTTP (reqwest); off = initials/identicon only.
+avatar-fetch = []
+# Image preview engine (GIF, WebP, BMP, ICO decoders); PNG/JPEG stay unconditional for avatars.
+image-view = []
+
+[dependencies]
+encoding_rs.workspace = true
+# The History view merges a rename's delete + add into one diff (`history_view/rename.rs`).
+imara-diff.workspace = true
+gitpoulpi-cli-backend.workspace = true
+gitpoulpi-core.workspace = true
+gitpoulpi-ipc.workspace = true
+gitpoulpi-daemon.workspace = true
+gitpoulpi-config.workspace = true
+gitpoulpi-log.workspace = true
+tracing.workspace = true
+gitpoulpi-i18n.workspace = true
+# The Preferences screen: the token store (secrets) and the per-repo
+# settings scope (session). Both are adapters the TUI drives directly --
+# neither is a daemon concern, because neither is repository state the
+# other frontends need to agree on.
+gitpoulpi-secrets.workspace = true
+# Start a pull request (`pull_request.rs`): the same GitHub/GitLab API
+# client `gitpoulpi hosting` uses, driven directly rather than through
+# the daemon -- like the token store above, this is not repository
+# state the other frontends need to agree on.
+#
+# The provider-agnostic port (client, model, resolve) comes with this
+# crate's `github` / `gitlab` features (via `hosting`).
+gitpoulpi-hosting.workspace = true
+# The self-updater's engine (`updates::auto`): download, verify, stage, swap.
+gitpoulpi-update.workspace = true
+# `pull_request.rs` reads `[[integrations]]` out of `config.toml` itself
+# (the same forward-compatible parser `gitpoulpi-cli`'s hosting_cmd
+# uses -- `gitpoulpi-config` does not carry that table yet).
+toml.workspace = true
+gitpoulpi-session.workspace = true
+crossterm.workspace = true
+ratatui.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+png.workspace = true
+arboard.workspace = true
+# Author-avatar decoding (`avatar::decode`) and fetching (`avatar::fetch`).
+# See the root `Cargo.toml`'s comments on each for why these specific
+# crates and feature sets.
+jpeg-decoder.workspace = true
+sha2.workspace = true
+# The editor's syntax highlighting (`editor_highlight.rs`).
+syntect.workspace = true
+
+# `kitty_keyboard.rs`: a bounded poll(2) on the tty for the start-up query.
+[target.'cfg(unix)'.dependencies]
+libc.workspace = true
+
+[build-dependencies]
+# Build script: logo colorways + Windows executable icon (assets/logo/logo_build*.rs).
+serde_json.workspace = true
+# Build script: the About window's third-party crate list (build_crates.rs).
+toml.workspace = true
+winresource = { version = "0.1", default-features = false }
+
+[dev-dependencies]
+async-trait.workspace = true
+gitpoulpi-testkit.workspace = true
+tempfile.workspace = true
+insta.workspace = true
+# The pty driver, for `tests/pty_ui.rs`: those tests drive this crate's
+# own binary end to end through a terminal. It lives in xtask because it
+# is a dev task as much as a test harness (`cargo run -p xtask -- tui`),
+# and a dev-dependency here rather than a second copy of the driver.
+xtask.workspace = true

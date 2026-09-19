@@ -9,9 +9,9 @@ repository.workspace = true
 description = "Background per-session daemon: owns GitBackend/session state and the IPC endpoint every frontend (TUI/CLI/MCP) connects to."
 
 [features]
-default = []
+default = ["worktree"]
 lfs = []
-worktree = []
+worktree = ["gitpoulpi-cli-backend/worktree", "gitpoulpi-git2-backend/worktree"]
 submodule = []
 rewrite-scripts = []
 

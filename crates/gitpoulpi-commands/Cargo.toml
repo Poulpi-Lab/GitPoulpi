@@ -12,7 +12,9 @@ description = "Shared command layer: the `gitpoulpi` clap `Cli` tree, the IPC `S
 [features]
 default = ["full"]
 # Standalone (`cargo test -p gitpoulpi-commands`) behaves as a full build.
-full = []
+full = [
+    "worktree", 
+]
 ai = []
 # Internal: "at least one hosting provider". Never enabled alone.
 hosting = []
@@ -30,7 +32,7 @@ gerrit = []
 local-issues = []
 mcp = []
 lfs = []
-worktree = []
+worktree = ["gitpoulpi-daemon/worktree"]
 submodule = []
 # Nothing to fetch here; listed so `--version` reports the build faithfully.
 avatar-fetch = []

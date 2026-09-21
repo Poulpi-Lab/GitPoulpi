@@ -14,7 +14,7 @@ path = "src/main.rs"
 
 [features]
 default = ["full"]
-full = []
+full = ["worktree"]
 all-langs = []
 lang-fr = []
 lang-es = []
@@ -58,7 +58,7 @@ workspaces = []
 rewrite-scripts = []
 mcp = []
 lfs = []
-worktree = []
+worktree = ["gitpoulpi-daemon/worktree", "gitpoulpi-cli-backend/worktree"]
 submodule = []
 # Author avatars fetched over HTTP (reqwest); off = initials/identicon only.
 avatar-fetch = []

@@ -13,7 +13,7 @@ description = "Shared command layer: the `gitpoulpi` clap `Cli` tree, the IPC `S
 default = ["full"]
 # Standalone (`cargo test -p gitpoulpi-commands`) behaves as a full build.
 full = [
-    "worktree", 
+    "lfs", "worktree", 
 ]
 ai = []
 # Internal: "at least one hosting provider". Never enabled alone.
@@ -31,7 +31,7 @@ redmine = []
 gerrit = []
 local-issues = []
 mcp = []
-lfs = []
+lfs = ["gitpoulpi-daemon/lfs"]
 worktree = ["gitpoulpi-daemon/worktree"]
 submodule = []
 # Nothing to fetch here; listed so `--version` reports the build faithfully.

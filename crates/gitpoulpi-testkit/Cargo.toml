@@ -10,7 +10,7 @@ description = "Fixture-repo builder and contract-test harness shared by every Gi
 
 [features]
 # Which optional management the contract checks cover (gated later).
-default = ["worktree"]
+default = ["lfs", "worktree"]
 lfs = []
 worktree = []
 submodule = []

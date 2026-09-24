@@ -14,7 +14,7 @@ path = "src/main.rs"
 
 [features]
 default = ["full"]
-full = ["lfs", "worktree"]
+full = ["lfs", "worktree", "submodule"]
 all-langs = []
 lang-fr = []
 lang-es = []
@@ -59,7 +59,7 @@ rewrite-scripts = []
 mcp = []
 lfs = ["gitpoulpi-daemon/lfs", "gitpoulpi-cli-backend/lfs"]
 worktree = ["gitpoulpi-daemon/worktree", "gitpoulpi-cli-backend/worktree"]
-submodule = []
+submodule = ["gitpoulpi-daemon/submodule", "gitpoulpi-cli-backend/submodule"]
 # Author avatars fetched over HTTP (reqwest); off = initials/identicon only.
 avatar-fetch = []
 # Image preview engine (GIF, WebP, BMP, ICO decoders); PNG/JPEG stay unconditional for avatars.

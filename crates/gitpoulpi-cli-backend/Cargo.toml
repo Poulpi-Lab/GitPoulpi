@@ -10,7 +10,7 @@ description = "GitBackend implementation that shells out to the system `git` bin
 
 [features]
 # Placeholders until the gating slices: management of each.
-default = ["lfs", "worktree"]
+default = ["lfs", "worktree", "submodule"]
 lfs = []
 worktree = []
 submodule = []

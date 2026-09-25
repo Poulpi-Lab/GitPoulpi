@@ -14,7 +14,7 @@ path = "src/main.rs"
 
 [features]
 default = ["full"]
-full = ["lfs", "worktree", "submodule"]
+full = ["lfs", "worktree", "submodule", "avatar-fetch", "image-view"]
 all-langs = []
 lang-fr = []
 lang-es = []
@@ -61,9 +61,9 @@ lfs = ["gitpoulpi-daemon/lfs", "gitpoulpi-cli-backend/lfs"]
 worktree = ["gitpoulpi-daemon/worktree", "gitpoulpi-cli-backend/worktree"]
 submodule = ["gitpoulpi-daemon/submodule", "gitpoulpi-cli-backend/submodule"]
 # Author avatars fetched over HTTP (reqwest); off = initials/identicon only.
-avatar-fetch = []
+avatar-fetch = ["dep:reqwest"]
 # Image preview engine (GIF, WebP, BMP, ICO decoders); PNG/JPEG stay unconditional for avatars.
-image-view = []
+image-view = ["dep:gif", "dep:image-webp"]
 
 [dependencies]
 encoding_rs.workspace = true
@@ -108,7 +108,10 @@ arboard.workspace = true
 # See the root `Cargo.toml`'s comments on each for why these specific
 # crates and feature sets.
 jpeg-decoder.workspace = true
+gif = { workspace = true, optional = true }
+image-webp = { workspace = true, optional = true }
 sha2.workspace = true
+reqwest = { workspace = true, optional = true }
 # The editor's syntax highlighting (`editor_highlight.rs`).
 syntect.workspace = true
 

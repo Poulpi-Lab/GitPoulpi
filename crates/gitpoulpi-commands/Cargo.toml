@@ -13,13 +13,13 @@ description = "Shared command layer: the `gitpoulpi` clap `Cli` tree, the IPC `S
 default = ["full"]
 # Standalone (`cargo test -p gitpoulpi-commands`) behaves as a full build.
 full = [
-    "lfs", "worktree", "submodule",
+    "github", "lfs", "worktree", "submodule",
     "avatar-fetch", "image-view", 
 ]
 ai = []
 # Internal: "at least one hosting provider". Never enabled alone.
 hosting = []
-github = []
+github = ["hosting", "gitpoulpi-hosting/github"]
 gitlab = []
 azure-devops = []
 bitbucket = []

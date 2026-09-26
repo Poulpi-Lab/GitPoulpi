@@ -14,7 +14,7 @@ path = "src/main.rs"
 
 [features]
 default = ["full"]
-full = ["lfs", "worktree", "submodule", "avatar-fetch", "image-view"]
+full = ["github", "lfs", "worktree", "submodule", "avatar-fetch", "image-view"]
 all-langs = []
 lang-fr = []
 lang-es = []
@@ -36,7 +36,7 @@ lang-qps = []
 ai = []
 # Internal: "at least one hosting provider". Never enabled alone.
 hosting = []
-github = []
+github = ["hosting", "gitpoulpi-hosting/github"]
 gitlab = []
 azure-devops = []
 bitbucket = []

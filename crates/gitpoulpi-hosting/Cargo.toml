@@ -13,7 +13,7 @@ description = "Hosting and issue-tracker API clients (GitHub, GitLab, Gitea/Forg
 # every client is usable over a caller-supplied `HttpTransport`, which is
 # what the tests do -- so `--no-default-features` is a genuine
 # no-network build rather than a broken one.
-default = ["network", "github", "gitlab"]
+default = ["network", "github", "gitlab", "jira"]
 network = ["dep:reqwest"]
 # Internal: the provider-agnostic port (`client`, `model`, `project`,
 # `resolve`). Never enabled alone: it is what `github` / `gitlab` turn on.
@@ -25,7 +25,7 @@ github = ["network", "hosting"]
 gitlab = ["network", "hosting"]
 azure-devops = []
 bitbucket = []
-jira = []
+jira = ["network", "hosting"]
 trello = []
 # Gitea and Forgejo (incl. Codeberg) share one client.
 gitea = []

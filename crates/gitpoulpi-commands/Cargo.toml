@@ -14,7 +14,7 @@ default = ["full"]
 # Standalone (`cargo test -p gitpoulpi-commands`) behaves as a full build.
 full = [
     "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "local-issues", "lfs", "worktree", "submodule",
-    "avatar-fetch", "image-view", "global-search", "workspaces", 
+    "avatar-fetch", "image-view", "mermaid", "global-search", "workspaces", 
 ]
 ai = []
 # Internal: "at least one hosting provider". Never enabled alone.

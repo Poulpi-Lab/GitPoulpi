@@ -1,0 +1,438 @@
+//! Gerrit JSON to the host-agnostic model.
+
+use std::collections::BTreeMap;
+
+use serde::Deserialize;
+use serde_json::Value;
+
+use crate::model::{ChecksState, PullRequestState, PullRequestSummary};
+use crate::project::HostedProject;
+use crate::review::model::{FileStatus, PatchSet, ReviewFile, VoteLabel, VoteValue};
+
+/// `)]}'` guards every JSON answer of Gerrit against script inclusion.
+pub(super) const XSSI_PREFIX: &str = ")]}'";
+
+/// The body without the guard line.
+pub(super) fn strip_prefix(body: &str) -> &str {
+    let body = body.trim_start_matches('\u{feff}');
+    match body.strip_prefix(XSSI_PREFIX) {
+        Some(rest) => rest.trim_start_matches(['\n', '\r']),
+        None => body,
+    }
+}
+
+/// `2026-10-15 06:29:50.000000000` (UTC) as ISO-8601.
+pub(super) fn iso(stamp: &str) -> String {
+    let stamp = stamp.trim();
+    if stamp.is_empty() {
+        return String::new();
+    }
+    let (date, time) = stamp.split_once(' ').unwrap_or((stamp, "00:00:00"));
+    let time = time.split('.').next().unwrap_or(time);
+    format!("{date}T{time}Z")
+}
+
+pub use crate::review::{change_ref, patch_set_of_ref};
+
+#[derive(Deserialize, Default, Clone)]
+pub(super) struct Account {
+    #[serde(default)]
+    pub _account_id: u64,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub username: Option<String>,
+    #[serde(default)]
+    pub email: Option<String>,
+}
+
+impl Account {
+    /// The handle: user name, else the name, else the id.
+    pub fn handle(&self) -> String {
+        self.username
+            .clone()
+            .filter(|n| !n.is_empty())
+            .or_else(|| self.name.clone().filter(|n| !n.is_empty()))
+            .or_else(|| self.email.clone().filter(|n| !n.is_empty()))
+            .unwrap_or_else(|| self._account_id.to_string())
+    }
+
+    pub fn display(&self) -> String {
+        self.name
+            .clone()
+            .filter(|n| !n.is_empty())
+            .unwrap_or_else(|| self.handle())
+    }
+}
+
+#[derive(Deserialize, Default)]
+pub(super) struct CommitParent {
+    #[serde(default)]
+    pub commit: String,
+}
+
+#[derive(Deserialize, Default)]
+pub(super) struct Commit {
+    #[serde(default)]
+    pub parents: Vec<CommitParent>,
+    #[serde(default)]
+    pub message: String,
+}
+
+#[derive(Deserialize, Default)]
+pub(super) struct Revision {
+    #[serde(default)]
+    pub _number: u32,
+    #[serde(default)]
+    pub created: String,
+    #[serde(default)]
+    pub commit: Option<Commit>,
+}
+
+#[derive(Deserialize, Default)]
+pub(super) struct LabelEntry {
+    #[serde(default)]
+    pub value: Option<i32>,
+    #[serde(default)]
+    pub _account_id: u64,
+    #[serde(default)]
+    pub username: Option<String>,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub date: Option<String>,
+}
+
+#[derive(Deserialize, Default)]
+pub(super) struct LabelInfo {
+    /// `"-2": "This shall not be submitted"` (keys may carry a leading space or `+`).
+    #[serde(default)]
+    pub values: BTreeMap<String, String>,
+    #[serde(default)]
+    pub all: Vec<LabelEntry>,
+    #[serde(default)]
+    pub approved: Option<serde_json::Value>,
+    #[serde(default)]
+    pub rejected: Option<serde_json::Value>,
+    #[serde(default)]
+    pub default_value: i32,
+}
+
+#[derive(Deserialize, Default)]
+pub(super) struct Message {
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub author: Option<Account>,
+    #[serde(default)]
+    pub date: String,
+    #[serde(default)]
+    pub message: String,
+    #[serde(default)]
+    pub _revision_number: u32,
+}
+
+#[derive(Deserialize, Default)]
+pub(super) struct Reviewers {
+    #[serde(rename = "REVIEWER", default)]
+    pub reviewer: Vec<Account>,
+}
+
+#[derive(Deserialize, Default)]
+pub(super) struct ChangeInfo {
+    #[serde(default)]
+    pub _number: u64,
+    #[serde(default)]
+    pub project: String,
+    #[serde(default)]
+    pub branch: String,
+    #[serde(default)]
+    pub subject: String,
+    #[serde(default)]
+    pub status: String,
+    #[serde(default)]
+    pub work_in_progress: bool,
+    #[serde(default)]
+    pub updated: String,
+    #[serde(default)]
+    pub created: String,
+    #[serde(default)]
+    pub owner: Option<Account>,
+    #[serde(default)]
+    pub submittable: Option<bool>,
+    #[serde(default)]
+    pub mergeable: Option<bool>,
+    #[serde(default)]
+    pub insertions: Option<u32>,
+    #[serde(default)]
+    pub deletions: Option<u32>,
+    #[serde(default)]
+    pub current_revision: Option<String>,
+    #[serde(default)]
+    pub revisions: BTreeMap<String, Revision>,
+    #[serde(default)]
+    pub labels: BTreeMap<String, LabelInfo>,
+    #[serde(default)]
+    pub permitted_labels: BTreeMap<String, Vec<String>>,
+    #[serde(default)]
+    pub reviewers: Reviewers,
+    #[serde(default)]
+    pub messages: Vec<Message>,
+    #[serde(default)]
+    pub hashtags: Vec<String>,
+    /// `o=CHANGE_ACTIONS`: what the user may do to the change (`abandon`,
+    /// `wip`, ...), only the names matter.
+    #[serde(default)]
+    pub actions: BTreeMap<String, Value>,
+    #[serde(default)]
+    pub _more_changes: bool,
+}
+
+impl ChangeInfo {
+    /// The newest patch set number.
+    pub fn latest_patch_set(&self) -> u32 {
+        self.revisions
+            .values()
+            .map(|r| r._number)
+            .max()
+            .unwrap_or(1)
+    }
+
+    /// The revision (sha, data) of patch set `number`; `None` asks for the
+    /// current one.
+    pub fn revision(&self, number: Option<u32>) -> Option<(&String, &Revision)> {
+        match number {
+            Some(n) => self.revisions.iter().find(|(_, r)| r._number == n),
+            None => self
+                .current_revision
+                .as_ref()
+                .and_then(|sha| self.revisions.get_key_value(sha))
+                .or_else(|| self.revisions.iter().max_by_key(|(_, r)| r._number)),
+        }
+    }
+
+    /// The server says the change can be submitted now.
+    pub fn can_submit(&self) -> bool {
+        self.status == "NEW" && !self.work_in_progress && self.submittable == Some(true)
+    }
+
+    /// The change is open and the user is offered the abandon action.
+    pub fn can_abandon(&self) -> bool {
+        self.status == "NEW" && self.actions.contains_key("abandon")
+    }
+
+    /// The `Verified` label rolled up as the request's checks.
+    pub fn checks(&self) -> Option<ChecksState> {
+        let verified = self.labels.get("Verified")?;
+        if verified.rejected.is_some() {
+            Some(ChecksState::Failing)
+        } else if verified.approved.is_some() {
+            Some(ChecksState::Passing)
+        } else {
+            Some(ChecksState::Pending)
+        }
+    }
+
+    pub fn state(&self) -> PullRequestState {
+        match self.status.as_str() {
+            "MERGED" => PullRequestState::Merged,
+            "ABANDONED" => PullRequestState::Closed,
+            _ if self.work_in_progress => PullRequestState::Draft,
+            _ => PullRequestState::Open,
+        }
+    }
+
+    pub fn patch_sets(&self) -> Vec<PatchSet> {
+        let mut sets: Vec<PatchSet> = self
+            .revisions
+            .iter()
+            .map(|(sha, r)| PatchSet {
+                number: r._number,
+                sha: sha.clone(),
+                created_at: iso(&r.created),
+            })
+            .collect();
+        sets.sort_by_key(|p| p.number);
+        sets
+    }
+
+    /// The labels this account may vote on, with the values the server
+    /// permits for this change (`permitted_labels`), in the label's own
+    /// order.
+    pub fn vote_labels(&self, me: u64) -> Vec<VoteLabel> {
+        let mut out = Vec::new();
+        for (name, allowed) in &self.permitted_labels {
+            let Some(info) = self.labels.get(name) else {
+                continue;
+            };
+            let mut values: Vec<VoteValue> = allowed
+                .iter()
+                .filter_map(|raw| {
+                    let value = parse_vote(raw)?;
+                    let text = info
+                        .values
+                        .iter()
+                        .find(|(k, _)| parse_vote(k) == Some(value))
+                        .map(|(_, v)| v.clone())
+                        .unwrap_or_default();
+                    Some(VoteValue { value, text })
+                })
+                .collect();
+            if values.is_empty() {
+                continue;
+            }
+            values.sort_by_key(|v| v.value);
+            let current = info
+                .all
+                .iter()
+                .find(|e| e._account_id == me)
+                .and_then(|e| e.value)
+                .unwrap_or(info.default_value);
+            out.push(VoteLabel {
+                name: name.clone(),
+                values,
+                current,
+                default: info.default_value,
+            });
+        }
+        // Code-Review first, then the rest alphabetically.
+        out.sort_by(|a, b| {
+            (a.name != "Code-Review")
+                .cmp(&(b.name != "Code-Review"))
+                .then_with(|| a.name.cmp(&b.name))
+        });
+        out
+    }
+
+    pub fn summary(&self, site: &str, me: Option<&str>) -> PullRequestSummary {
+        let (_, latest) = self.revision(None).unzip();
+        let ps = latest.map(|r| r._number).unwrap_or(1);
+        let owner = self.owner.clone().unwrap_or_default();
+        let reviewers: Vec<String> = self
+            .reviewers
+            .reviewer
+            .iter()
+            .map(Account::handle)
+            .collect();
+        PullRequestSummary {
+            number: self._number,
+            iid_label: format!("#{}", self._number),
+            title: self.subject.clone(),
+            state: self.state(),
+            source_branch: change_ref(self._number, ps),
+            target_branch: self.branch.clone(),
+            source_project: None,
+            author: owner.handle(),
+            web_url: change_url(site, &self.project, self._number),
+            updated_at: iso(&self.updated),
+            review_requested: me.is_some_and(|m| reviewers.iter().any(|r| r == m))
+                && owner.handle() != me.unwrap_or_default(),
+            assignees: Vec::new(),
+            reviewers,
+            checks: self.checks(),
+            has_conflicts: self.mergeable.map(|m| !m),
+        }
+    }
+}
+
+/// `-2`, `+1`, ` 0`, `1`.
+pub(super) fn parse_vote(raw: &str) -> Option<i32> {
+    raw.trim().trim_start_matches('+').parse().ok()
+}
+
+pub(super) fn change_url(site: &str, project: &str, number: u64) -> String {
+    format!("{}/c/{project}/+/{number}", site.trim_end_matches('/'))
+}
+
+#[derive(Deserialize)]
+pub(super) struct FileInfo {
+    #[serde(default)]
+    pub status: Option<String>,
+    #[serde(default)]
+    pub old_path: Option<String>,
+    #[serde(default)]
+    pub lines_inserted: u32,
+    #[serde(default)]
+    pub lines_deleted: u32,
+}
+
+pub(super) fn map_files(files: BTreeMap<String, FileInfo>) -> Vec<ReviewFile> {
+    files
+        .into_iter()
+        .filter(|(path, _)| !path.starts_with('/'))
+        .map(|(path, f)| {
+            let status = match f.status.as_deref() {
+                Some("A") | Some("C") => FileStatus::Added,
+                Some("D") => FileStatus::Removed,
+                Some("R") => FileStatus::Renamed,
+                _ => FileStatus::Modified,
+            };
+            ReviewFile {
+                path,
+                previous_path: f.old_path.filter(|p| !p.is_empty()),
+                status,
+                additions: f.lines_inserted,
+                deletions: f.lines_deleted,
+            }
+        })
+        .collect()
+}
+
+#[derive(Deserialize, Default, Clone)]
+pub(super) struct Range {
+    #[serde(default)]
+    pub start_line: u32,
+    #[serde(default)]
+    pub end_line: u32,
+}
+
+#[derive(Deserialize, Default, Clone)]
+pub(super) struct CommentInfo {
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub patch_set: u32,
+    #[serde(default)]
+    pub line: Option<u32>,
+    #[serde(default)]
+    pub range: Option<Range>,
+    #[serde(default)]
+    pub side: Option<String>,
+    #[serde(default)]
+    pub in_reply_to: Option<String>,
+    #[serde(default)]
+    pub message: String,
+    #[serde(default)]
+    pub updated: String,
+    #[serde(default)]
+    pub author: Option<Account>,
+    #[serde(default)]
+    pub unresolved: Option<bool>,
+    /// Filled in by the reader: the file the comment was listed under.
+    #[serde(skip)]
+    pub path: String,
+    /// Filled in by the reader: a draft of the current user.
+    #[serde(skip)]
+    pub draft: bool,
+}
+
+pub(super) fn hosted_project(
+    site: &str,
+    integration_id: &str,
+    name: &str,
+    description: Option<String>,
+) -> HostedProject {
+    let base = site.trim_end_matches('/');
+    HostedProject {
+        integration_id: integration_id.to_string(),
+        id: name.to_string(),
+        name: name.rsplit('/').next().unwrap_or(name).to_string(),
+        full_name: name.to_string(),
+        description: description.filter(|d| !d.is_empty()),
+        default_branch: None,
+        web_url: Some(format!("{base}/admin/repos/{name}")),
+        ssh_url: None,
+        https_url: Some(format!("{base}/{name}")),
+        private: false,
+    }
+}

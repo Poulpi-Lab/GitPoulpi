@@ -13,7 +13,7 @@ description = "Hosting and issue-tracker API clients (GitHub, GitLab, Gitea/Forg
 # every client is usable over a caller-supplied `HttpTransport`, which is
 # what the tests do -- so `--no-default-features` is a genuine
 # no-network build rather than a broken one.
-default = ["network", "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "gerrit", "local-issues"]
+default = ["network", "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues"]
 network = ["dep:reqwest"]
 # Internal: the provider-agnostic port (`client`, `model`, `project`,
 # `resolve`). Never enabled alone: it is what `github` / `gitlab` turn on.
@@ -31,7 +31,7 @@ trello = ["network", "hosting"]
 gitea = ["network", "hosting"]
 linear = ["network", "hosting"]
 youtrack = ["network", "hosting"]
-redmine = []
+redmine = ["network", "hosting"]
 gerrit = ["network", "hosting"]
 # A folder of Markdown notes as an issue source (opens no socket itself;
 # "network" is on because the shared callers build the transport).

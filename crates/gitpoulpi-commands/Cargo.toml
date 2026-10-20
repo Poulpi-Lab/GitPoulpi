@@ -14,7 +14,7 @@ default = ["full"]
 # Standalone (`cargo test -p gitpoulpi-commands`) behaves as a full build.
 full = [
     "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "lfs", "worktree", "submodule",
-    "avatar-fetch", "image-view", "mermaid", "board", "history-rewrite", "global-search", "workspaces", 
+    "avatar-fetch", "image-view", "mermaid", "board", "history-rewrite", "global-search", "workspaces", "rewrite-scripts",
 ]
 ai = []
 # Internal: "at least one hosting provider". Never enabled alone.
@@ -52,7 +52,7 @@ global-search = []
 # Workspaces (`gitpoulpi workspace`, the `--workspace` flags).
 workspaces = []
 # Embedded Lua scripts in history rewrite recipes.
-rewrite-scripts = []
+rewrite-scripts = ["gitpoulpi-daemon/rewrite-scripts"]
 
 [dependencies]
 gitpoulpi-core.workspace = true

@@ -19,7 +19,7 @@ path = "src/main.rs"
 
 [features]
 default = ["full"]
-full = ["github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "lfs", "worktree", "submodule", "avatar-fetch", "image-view", "mermaid", "board", "history-rewrite", "global-search", "workspaces"]
+full = ["github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "lfs", "worktree", "submodule", "avatar-fetch", "image-view", "mermaid", "board", "history-rewrite", "global-search", "workspaces", "rewrite-scripts"]
 all-langs = []
 lang-fr = []
 lang-es = []
@@ -65,7 +65,7 @@ history-rewrite = ["gitpoulpi-commands/history-rewrite", "gitpoulpi-tui/history-
 global-search = ["gitpoulpi-commands/global-search", "gitpoulpi-tui/global-search"]
 workspaces = ["gitpoulpi-commands/workspaces", "gitpoulpi-tui/workspaces"]
 # Embedded Lua for history rewrite scripts (sandboxed; off = a Script rule is refused as unsupported).
-rewrite-scripts = []
+rewrite-scripts = ["gitpoulpi-commands/rewrite-scripts", "gitpoulpi-tui/rewrite-scripts"]
 
 [dependencies]
 gitpoulpi-core.workspace = true

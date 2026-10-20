@@ -9,9 +9,9 @@ repository.workspace = true
 description = "GitBackend implementation over libgit2 (git2 crate), decorating gitpoulpi-cli-backend for operations git2 doesn't support natively."
 
 [features]
-default = ["lfs", "worktree", "submodule"]
+default = ["lfs", "worktree", "submodule", "rewrite-scripts"]
 lfs = ["gitpoulpi-cli-backend/lfs"]
-rewrite-scripts = []
+rewrite-scripts = ["gitpoulpi-cli-backend/rewrite-scripts"]
 worktree = ["gitpoulpi-cli-backend/worktree"]
 submodule = ["gitpoulpi-cli-backend/submodule"]
 

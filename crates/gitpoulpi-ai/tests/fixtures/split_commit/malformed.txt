@@ -1,0 +1,1 @@
+I would split this into a parser part and a flag part.

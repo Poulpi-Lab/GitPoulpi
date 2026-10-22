@@ -1,0 +1,5 @@
+Sure! Here is the plan [as requested, see note [1]]:
+
+[{"message":"feat: parser","pieces":["H1","H2"]},{"message":"feat: --strict flag","pieces":["H3","F4"]}]
+
+Let me know if you want changes.

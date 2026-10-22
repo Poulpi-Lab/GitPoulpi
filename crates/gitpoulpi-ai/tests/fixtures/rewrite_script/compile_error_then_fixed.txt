@@ -1,0 +1,19 @@
+```lua
+--! name: Old email
+--! kinds: commit
+function rewrite_commit(c, ctx)
+  if c.author.email == "old@example.org" then
+    return { author = { email = "new@example.org" }
+  end
+end
+```
+=====
+```lua
+--! name: Old email
+--! kinds: commit
+function rewrite_commit(c, ctx)
+  if c.author.email == "old@example.org" then
+    return { author = { email = "new@example.org" } }
+  end
+end
+```

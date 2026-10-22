@@ -13,10 +13,10 @@ description = "Shared command layer: the `gitpoulpi` clap `Cli` tree, the IPC `S
 default = ["full"]
 # Standalone (`cargo test -p gitpoulpi-commands`) behaves as a full build.
 full = [
-    "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "lfs", "worktree", "submodule",
+    "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "ai", "lfs", "worktree", "submodule",
     "avatar-fetch", "image-view", "radar", "mermaid", "board", "history-rewrite", "global-search", "workspaces", "rewrite-scripts",
 ]
-ai = []
+ai = ["dep:gitpoulpi-ai", "dep:async-trait"]
 # Internal: "at least one hosting provider". Never enabled alone.
 hosting = []
 github = ["hosting", "gitpoulpi-hosting/github"]
@@ -62,6 +62,7 @@ gitpoulpi-config.workspace = true
 gitpoulpi-session.workspace = true
 gitpoulpi-hosting.workspace = true
 gitpoulpi-secrets.workspace = true
+gitpoulpi-ai = { workspace = true, features = ["network", "terminal-agent"], optional = true }
 gitpoulpi-i18n.workspace = true
 clap.workspace = true
 clap_complete.workspace = true
@@ -69,6 +70,7 @@ serde.workspace = true
 serde_json.workspace = true
 toml.workspace = true
 tokio.workspace = true
+async-trait = { workspace = true, optional = true }
 
 [dev-dependencies]
 tempfile.workspace = true

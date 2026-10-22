@@ -1070,8 +1070,10 @@ dependencies = [
 name = "gitpoulpi-commands"
 version = "1.0.0-rc.1"
 dependencies = [
+ "async-trait",
  "clap",
  "clap_complete",
+ "gitpoulpi-ai",
  "gitpoulpi-config",
  "gitpoulpi-core",
  "gitpoulpi-daemon",
@@ -1251,6 +1253,7 @@ dependencies = [
  "crossterm",
  "encoding_rs",
  "gif",
+ "gitpoulpi-ai",
  "gitpoulpi-cli-backend",
  "gitpoulpi-config",
  "gitpoulpi-core",

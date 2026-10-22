@@ -1003,6 +1003,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-ai"
+version = "1.0.0-rc.1"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "gitpoulpi-config",
+ "gitpoulpi-core",
+ "gitpoulpi-hosting",
+ "gitpoulpi-pty",
+ "gitpoulpi-secrets",
+ "gitpoulpi-testkit",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 1.0.69",
+ "tokio",
+]
+
+[[package]]
 name = "gitpoulpi-cli"
 version = "1.0.0-rc.1"
 dependencies = [

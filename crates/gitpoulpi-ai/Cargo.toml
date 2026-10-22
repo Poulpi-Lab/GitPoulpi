@@ -1,0 +1,36 @@
+[package]
+name = "gitpoulpi-ai"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "AI completion clients (OpenAI-compatible, Anthropic, local agent CLIs), per-action prompt builders and answer parsers. No TUI dependencies."
+
+[features]
+# Off, nothing here can open a socket: clients still work over a
+# caller-supplied `HttpTransport`, which is what every test does.
+default = ["network"]
+network = ["gitpoulpi-hosting/network"]
+# The terminal run mode of local agents (`agent_terminal`): drives the
+# agent's interactive screen on a pty. Off, a profile set to it fails with
+# a clear error and the pty crate is not even compiled.
+terminal-agent = ["dep:gitpoulpi-pty"]
+
+[dependencies]
+gitpoulpi-config.workspace = true
+gitpoulpi-core.workspace = true
+gitpoulpi-secrets.workspace = true
+gitpoulpi-hosting.workspace = true
+gitpoulpi-pty = { workspace = true, optional = true }
+async-trait.workspace = true
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+gitpoulpi-testkit.workspace = true

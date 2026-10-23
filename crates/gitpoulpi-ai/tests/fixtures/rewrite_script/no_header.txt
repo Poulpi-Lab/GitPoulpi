@@ -1,0 +1,5 @@
+```lua
+function rewrite_commit(c, ctx)
+  return { message = regex_replace(c.message, "WIP", "work") }
+end
+```

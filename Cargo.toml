@@ -11,6 +11,7 @@ members = [
     "crates/gitpoulpi-hosting",
     "crates/gitpoulpi-update",
     "crates/gitpoulpi-pty",
+    "crates/gitpoulpi-ai",
     "crates/gitpoulpi-i18n",
     "crates/gitpoulpi-ipc",
     "crates/gitpoulpi-daemon",
@@ -46,6 +47,7 @@ gitpoulpi-secrets = { path = "crates/gitpoulpi-secrets" }
 gitpoulpi-session = { path = "crates/gitpoulpi-session" }
 gitpoulpi-hosting = { path = "crates/gitpoulpi-hosting", default-features = false }
 gitpoulpi-pty = { path = "crates/gitpoulpi-pty" }
+gitpoulpi-ai = { path = "crates/gitpoulpi-ai", default-features = false }
 gitpoulpi-update = { path = "crates/gitpoulpi-update" }
 gitpoulpi-i18n = { path = "crates/gitpoulpi-i18n", default-features = false }
 gitpoulpi-ipc = { path = "crates/gitpoulpi-ipc" }

@@ -1,0 +1,10 @@
+--! name: Night commits to the morning
+--! kinds: commit
+--! window: 0
+-- Moves commits made between 22:00 and 06:00 one hour later.
+function rewrite_commit(c, ctx)
+  local h = hour(c.author.time, c.author.offset_minutes)
+  if h >= 22 or h < 6 then
+    return { author = { time = c.author.time + 3600 } }
+  end
+end

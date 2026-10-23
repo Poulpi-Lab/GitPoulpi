@@ -14,7 +14,7 @@ path = "src/main.rs"
 
 [features]
 default = ["full"]
-full = ["github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "lfs", "worktree", "submodule", "avatar-fetch", "image-view", "radar", "mermaid", "board", "history-rewrite", "global-search", "workspaces", "rewrite-scripts"]
+full = ["github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "ai", "lfs", "worktree", "submodule", "avatar-fetch", "image-view", "radar", "mermaid", "board", "history-rewrite", "global-search", "workspaces", "rewrite-scripts"]
 all-langs = []
 lang-fr = []
 lang-es = []
@@ -33,7 +33,7 @@ lang-cs = []
 lang-sv = []
 lang-tr = []
 lang-qps = []
-ai = []
+ai = ["dep:gitpoulpi-ai", "dep:async-trait"]
 # Internal: "at least one hosting provider". Never enabled alone.
 hosting = []
 github = ["hosting", "gitpoulpi-hosting/github"]
@@ -82,6 +82,9 @@ gitpoulpi-i18n.workspace = true
 # neither is a daemon concern, because neither is repository state the
 # other frontends need to agree on.
 gitpoulpi-secrets.workspace = true
+# AI (off by default): completion clients and prompts. See `ai_ui.rs`.
+gitpoulpi-ai = { workspace = true, features = ["network", "terminal-agent"], optional = true }
+async-trait = { workspace = true, optional = true }
 # Start a pull request (`pull_request.rs`): the same GitHub/GitLab API
 # client `gitpoulpi hosting` uses, driven directly rather than through
 # the daemon -- like the token store above, this is not repository

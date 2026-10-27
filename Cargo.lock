@@ -1123,6 +1123,7 @@ dependencies = [
  "gitpoulpi-i18n",
  "gitpoulpi-ipc",
  "gitpoulpi-log",
+ "gitpoulpi-mcp",
  "gitpoulpi-session",
  "gitpoulpi-testkit",
  "gitpoulpi-tui",

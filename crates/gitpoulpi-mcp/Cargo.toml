@@ -1,0 +1,91 @@
+[package]
+name = "gitpoulpi-mcp"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "GitPoulpi MCP server: exposes GitBackend-mirroring tools to AI agents by talking to the background daemon over gitpoulpi-ipc (stdio transport by default)."
+
+[lib]
+name = "gitpoulpi_mcp"
+path = "src/lib.rs"
+
+[[bin]]
+name = "gitpoulpi-mcp"
+path = "src/main.rs"
+
+[features]
+default = ["full"]
+full = ["github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "ai", "mcp", "lfs", "worktree", "submodule", "avatar-fetch", "image-view", "radar", "mermaid", "board", "review", "history-rewrite", "global-search", "workspaces", "rewrite-scripts"]
+all-langs = []
+lang-fr = []
+lang-es = []
+lang-pt-br = []
+lang-pt-pt = []
+lang-it = []
+lang-de = []
+lang-zh-cn = []
+lang-ja = []
+lang-ru = []
+lang-ko = []
+lang-nl = []
+lang-pl = []
+lang-uk = []
+lang-cs = []
+lang-sv = []
+lang-tr = []
+lang-qps = []
+ai = ["gitpoulpi-commands/ai"]
+github = ["gitpoulpi-commands/github"]
+gitlab = ["gitpoulpi-commands/gitlab"]
+azure-devops = ["gitpoulpi-commands/azure-devops"]
+bitbucket = ["gitpoulpi-commands/bitbucket"]
+jira = ["gitpoulpi-commands/jira"]
+trello = ["gitpoulpi-commands/trello"]
+gitea = ["gitpoulpi-commands/gitea"]
+linear = ["gitpoulpi-commands/linear"]
+youtrack = ["gitpoulpi-commands/youtrack"]
+redmine = ["gitpoulpi-commands/redmine"]
+gerrit = ["gitpoulpi-commands/gerrit"]
+local-issues = ["gitpoulpi-commands/local-issues"]
+mcp = ["gitpoulpi-commands/mcp"]
+lfs = ["gitpoulpi-commands/lfs"]
+worktree = ["gitpoulpi-commands/worktree"]
+submodule = ["gitpoulpi-commands/submodule"]
+# Nothing to fetch here; kept so every binary accepts the same feature names.
+avatar-fetch = ["gitpoulpi-commands/avatar-fetch"]
+# Nothing to decode here; kept so every binary accepts the same feature names.
+image-view = ["gitpoulpi-commands/image-view"]
+radar = ["gitpoulpi-commands/radar"]
+mermaid = ["gitpoulpi-commands/mermaid"]
+board = ["gitpoulpi-commands/board"]
+review = ["gitpoulpi-commands/review"]
+history-rewrite = ["gitpoulpi-commands/history-rewrite"]
+global-search = ["gitpoulpi-commands/global-search"]
+workspaces = ["gitpoulpi-commands/workspaces"]
+rewrite-scripts = ["gitpoulpi-commands/rewrite-scripts"]
+
+[dependencies]
+gitpoulpi-core.workspace = true
+gitpoulpi-ipc.workspace = true
+gitpoulpi-config.workspace = true
+gitpoulpi-commands.workspace = true
+# Only to forward the `lang-*` features (the MCP tools themselves are English).
+gitpoulpi-i18n.workspace = true
+clap.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+rmcp = { version = "2.2.0", features = ["server", "transport-io", "transport-streamable-http-server"] }
+hyper-util = { version = "0.1", features = ["tokio", "server", "http1", "service"] }
+tokio-util = "0.7"
+
+[build-dependencies]
+# Build script: logo colorways + Windows executable icon (assets/logo/logo_build*.rs).
+serde_json.workspace = true
+winresource = { version = "0.1", default-features = false }
+
+[dev-dependencies]
+gitpoulpi-testkit.workspace = true
+tempfile.workspace = true

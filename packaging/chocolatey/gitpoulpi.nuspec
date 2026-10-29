@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TEMPLATE, NOT PUBLISHED. see the release-and-packaging design ("Chocolatey").
+  Replace @VERSION@ here and @VERSION@ / @SHA256_WINDOWS_SETUP@ in tools/chocolateyinstall.ps1, then
+  `choco pack` in this folder and `choco install gitpoulpi -s . -y` in a VM before `choco push`.
+  The package downloads the release's Inno Setup installer; it embeds no binary, so no VERIFICATION.txt
+  is needed. Uninstall goes through Chocolatey's automatic uninstaller (the installer's registry entry).
+-->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>gitpoulpi</id>
+    <version>@VERSION@</version>
+    <title>GitPoulpi</title>
+    <authors>GitPoulpi contributors</authors>
+    <owners>@CHOCOLATEY_USER@</owners>
+    <projectUrl>https://github.com/Poulpi-Lab/GitPoulpi</projectUrl>
+    <projectSourceUrl>https://github.com/Poulpi-Lab/GitPoulpi</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/Poulpi-Lab/GitPoulpi/issues</bugTrackerUrl>
+    <docsUrl>https://github.com/Poulpi-Lab/GitPoulpi/blob/main/docs/user/README.md</docsUrl>
+    <licenseUrl>https://github.com/Poulpi-Lab/GitPoulpi/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>https://raw.githubusercontent.com/Poulpi-Lab/GitPoulpi/main/assets/logo/gitpoulpi-512.png</iconUrl>
+    <tags>git tui terminal version-control cli mcp</tags>
+    <summary>Git client for the terminal with a clickable commit graph, a CLI and an MCP server.</summary>
+    <description>GitPoulpi is a Git client for the terminal that feels like a desktop app: a commit graph you can click, drag and right-click, a command palette that reaches every feature, pull and merge requests and issues from the main code hosts and issue trackers, and the same operations as a scriptable CLI and an MCP server for AI agents. It needs a system git.</description>
+    <releaseNotes>https://github.com/Poulpi-Lab/GitPoulpi/releases/tag/releases/v@VERSION@</releaseNotes>
+    <dependencies>
+      <dependency id="git" version="2.30.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

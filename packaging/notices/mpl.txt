@@ -1,0 +1,5 @@
+{crate} - Mozilla Public License 2.0
+  The crate {crate} is used unmodified, under the Mozilla Public License 2.0
+  (full text in section 4). Its source code is available at
+  https://crates.io/crates/option-ext and https://github.com/soc/option-ext .
+  Anyone may obtain, modify and redistribute that source under the MPL-2.0.

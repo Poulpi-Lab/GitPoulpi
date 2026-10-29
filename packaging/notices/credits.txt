@@ -1,0 +1,120 @@
+GitPoulpi ships color presets. Only color values (facts about a palette) are
+used, never code or files from these projects. Each family is credited here
+with the license its repository declares and the copyright holder named in
+its license file (verified against each upstream repository, 2026-10-26).
+
+Presets with an upstream palette
+  Catppuccin (Latte, Frappe, Macchiato, Mocha) - Catppuccin Org, MIT
+    https://github.com/catppuccin/palette
+  Dracula - Dracula Theme (created by Zeno Rocha), MIT
+    https://draculatheme.com
+  Everforest - sainnhe, MIT  https://github.com/sainnhe/everforest
+  GitHub Dark / Light - Primer (GitHub, Inc.), MIT
+    https://github.com/primer/github-vscode-theme
+  Gruvbox - Pavel Pertsev (morhetz), MIT/X11
+    https://github.com/morhetz/gruvbox
+  Kanagawa (wave, Lotus) - Tommaso Laurenzi (rebelot), MIT  https://github.com/rebelot/kanagawa.nvim
+  Monokai - palette by Wimer Hazenberg (https://monokai.nl); color values as
+    published in vim-monokai (Marcin Kulik, MIT), https://github.com/ku1ik/vim-monokai
+  Nord - Sven Greb (Arctic Ice Studio), MIT  https://www.nordtheme.com ,
+    https://github.com/nordtheme/nord
+  One Dark / One Light - GitHub Inc. (Atom), MIT
+    https://github.com/atom/one-dark-syntax
+  Rose Pine (Moon, Dawn) - Rosé Pine, MIT
+    https://rosepinetheme.com , https://github.com/rose-pine/rose-pine-theme
+  Solarized - Ethan Schoonover, MIT  https://ethanschoonover.com/solarized/
+  Tokyo Night (Day) - folke, Apache-2.0 (license text in section 4)
+    https://github.com/folke/tokyonight.nvim
+  Vesper - Rauno Freiberg, MIT  https://github.com/raunofreiberg/vesper
+  VS Code Dark Modern / Light Modern - Microsoft Corporation, MIT
+    https://github.com/microsoft/vscode
+  Cyberpunk, Matrix - schemes from iTerm2-Color-Schemes (Mark Badolato, MIT),
+    https://github.com/mbadolato/iTerm2-Color-Schemes ; each scheme belongs to
+    its own author.
+
+Imported terminal palettes (https://terminalcolors.com/, which publishes no license of its
+own; each family below was checked against its upstream repository, 2026-10-21)
+  Apprentice - Romain Lafourcade (romainl), MIT
+    https://github.com/romainl/Apprentice
+  Ayu (Dark, Light, Mirage) - Ike Kurghinyan (Ike Ku), MIT
+    https://github.com/dempfi/ayu ; also Konstantin Pschera (kons.ch), MIT
+    https://github.com/ayu-theme/ayu-colors
+  Cobalt2 - Wes Bos and Roberto Achar, MIT  https://github.com/wesbos/cobalt2-vscode
+  Deus - Avery Wagar (ajmwagar), MIT  https://github.com/ajmwagar/vim-deus
+  Dracula Soft - fork of Dracula by yomed, MIT (Copyright Dracula Theme)
+    https://github.com/yomed/theme-dracula-soft
+  Everforest Light - sainnhe, MIT  https://github.com/sainnhe/everforest
+  GitHub variants (dark/light, colorblind, dimmed, high contrast, legacy) - Primer
+    (GitHub, Inc.), MIT  https://github.com/primer/github-vscode-theme
+  Gotham - Andrea Leopardi (whatyouhide), MIT  https://github.com/whatyouhide/vim-gotham
+  Gruvbox hard/soft - Pavel Pertsev (morhetz), MIT/X11 (README and package.json; the
+    repository has no LICENSE file)  https://github.com/morhetz/gruvbox
+  Iceberg - cocopon, MIT  https://github.com/cocopon/iceberg.vim
+  Jellybeans - NanoTech, MIT (stated in the file header of colors/jellybeans.vim; the
+    repository has no LICENSE file)  https://github.com/nanotech/jellybeans.vim
+  Kanagawa Dragon - Tommaso Laurenzi (rebelot), MIT  https://github.com/rebelot/kanagawa.nvim
+  Lucario - Raphael Amorim, MIT  https://github.com/raphamorim/lucario
+  Miasma - xero, CC0-1.0  https://github.com/xero/miasma.nvim
+  Moonfly, Nightfly - bluz71 and the vim-moonfly-colors / vim-nightfly-colors authors, MIT  https://github.com/bluz71/vim-moonfly-colors ,
+    https://github.com/bluz71/vim-nightfly-colors
+  Night Owl - Sarah Drasner, MIT  https://github.com/sdras/night-owl-vscode-theme
+  Nightfox - James Simpson (EdenEast), MIT  https://github.com/EdenEast/nightfox.nvim
+  Noctis - Liviu Schera, MIT  https://github.com/liviuschera/noctis
+  Nordic - Alexander van Zyl (AlexvZyl), MIT  https://github.com/AlexvZyl/nordic.nvim
+  One Half - Son A. Pham (sonph), MIT  https://github.com/sonph/onehalf
+  Panda - Siamak Mokhtari, MIT (the original Atom theme; the VS Code port has no
+    LICENSE file)  https://github.com/siamak/atom-panda-syntax
+  Posterpole - Ilya (ilof2), MIT  https://github.com/ilof2/posterpole.nvim
+  Seoul256 - Junegunn Choi, MIT (README and file headers; the repository has no LICENSE
+    file)  https://github.com/junegunn/seoul256.vim
+  Shades of Purple - Ahmad Awais, MIT
+    https://github.com/ahmadawais/shades-of-purple-vscode
+  Sonokai - sainnhe, MIT  https://github.com/sainnhe/sonokai
+  Srcery - Daniel Berg (roosta) and the Srcery contributors, MIT (portions by morhetz
+    from Gruvbox)
+    https://github.com/srcery-colors/srcery-vim
+  Tender - Jacobo Tabernero (jacoborus), MIT  https://github.com/jacoborus/tender.vim
+  Tokyo Night Moon/Storm - folke, Apache-2.0 (license text in section 4)
+    https://github.com/folke/tokyonight.nvim
+  Tomorrow - Chris Kempson, MIT  https://github.com/chriskempson/tomorrow-theme
+  Zenbones - Michael Chris Lopez (mcchrish), MIT
+    https://github.com/zenbones-theme/zenbones.nvim
+  All of these are MIT except Tokyo Night Moon/Storm (Apache-2.0) and Miasma (CC0-1.0).
+
+Lane (graph line) palettes
+  "Material": a selection of 16 of the 400 shades of the Material Design
+    color palette (Google), unchanged and in GitPoulpi's own order,
+    https://m2.material.io/design/color ; the same values are published in
+    Material Design Lite (Copyright 2015 Google Inc, Apache-2.0, license text
+    in section 4), https://github.com/google/material-design-lite
+  "Serie": branch colors of lusingander/serie, MIT
+    https://github.com/lusingander/serie
+  The other lane palettes are GitPoulpi's own or follow the theme they are
+  named after.
+
+Logo and original themes (GitPoulpi Dark/Light, Fire, Sunset)
+  Original work of the GitPoulpi authors, MIT.
+
+Permission notice for the MIT-licensed palettes and themes above
+  Each MIT-licensed family listed above (and the syntax color themes bundled in
+  syntect, see "syntect" in section 2) is covered by the following permission
+  notice, with the copyright holder named in its own entry:
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to permit
+    persons to whom the Software is furnished to do so, subject to the
+    following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+    NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+    DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+    USE OR OTHER DEALINGS IN THE SOFTWARE.

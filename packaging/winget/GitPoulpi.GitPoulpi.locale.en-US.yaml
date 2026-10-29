@@ -1,0 +1,29 @@
+# TEMPLATE, NOT PUBLISHED. see the release-and-packaging design ("winget").
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+
+PackageIdentifier: GitPoulpi.GitPoulpi
+PackageVersion: "@VERSION@"
+PackageLocale: en-US
+Publisher: GitPoulpi
+PublisherUrl: https://github.com/Poulpi-Lab/GitPoulpi
+PublisherSupportUrl: https://github.com/Poulpi-Lab/GitPoulpi/issues
+PackageName: GitPoulpi
+PackageUrl: https://github.com/Poulpi-Lab/GitPoulpi
+License: MIT
+LicenseUrl: https://github.com/Poulpi-Lab/GitPoulpi/blob/main/LICENSE
+ShortDescription: Git client for the terminal with a clickable commit graph, a CLI and an MCP server.
+Description: |-
+  GitPoulpi is a Git client for the terminal that feels like a desktop app: a commit graph you can click,
+  drag and right-click, a command palette that reaches every feature, pull and merge requests and issues
+  from GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, Linear, YouTrack and
+  Redmine, and the same operations as a scriptable CLI and an MCP server for AI agents. It needs a system git.
+Moniker: gitpoulpi
+Tags:
+  - git
+  - tui
+  - terminal
+  - version-control
+  - mcp
+ReleaseNotesUrl: https://github.com/Poulpi-Lab/GitPoulpi/releases/tag/releases/v@VERSION@
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

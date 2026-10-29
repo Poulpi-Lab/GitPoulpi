@@ -1,0 +1,41 @@
+# TEMPLATE, NOT PUBLISHED. see the release-and-packaging design ("AUR").
+#
+# AUR package built from the official release archive (no compilation). Before publishing:
+#   - replace @VERSION@ and @SHA256_LINUX_X86_64@ (the first field of the release's
+#     gitpoulpi-<version>-x86_64-unknown-linux-gnu.tar.gz.sha256) and the Maintainer line;
+#   - the repository must be public (makepkg downloads the archive anonymously);
+#   - regenerate .SRCINFO, which the AUR requires next to the PKGBUILD:
+#       makepkg --printsrcinfo > .SRCINFO
+#     and check the build in a clean chroot (`extra-x86_64-build` from devtools) or with `makepkg -si`.
+#
+# The `.gitpoulpi-dist` marker of the archive is deliberately NOT installed: without it GitPoulpi never
+# replaces its own files (the Release notes tab offers Download only), so pacman stays the only updater.
+
+# Maintainer: @MAINTAINER@
+pkgname=gitpoulpi-bin
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc="Git client for the terminal with a clickable commit graph, a command palette, hosting integrations, a CLI and an MCP server"
+arch=('x86_64')
+url="https://github.com/Poulpi-Lab/GitPoulpi"
+license=('MIT')
+# The release binaries link glibc, libgcc_s, libm and zlib dynamically; libgit2, rustls and Lua are built in.
+depends=('git' 'zlib' 'gcc-libs' 'glibc')
+optdepends=('git-lfs: repositories that use Git LFS (3.0 or newer)')
+provides=('gitpoulpi')
+conflicts=('gitpoulpi' 'gitpoulpi-git')
+# The release binaries are already stripped; there is nothing to split into a debug package.
+options=('!strip' '!debug')
+source=("https://github.com/Poulpi-Lab/GitPoulpi/releases/download/releases/v${pkgver}/gitpoulpi-${pkgver}-x86_64-unknown-linux-gnu.tar.gz")
+sha256sums=('@SHA256_LINUX_X86_64@')
+
+package() {
+    cd "gitpoulpi-${pkgver}-x86_64-unknown-linux-gnu"
+    local bin
+    for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch; do
+        install -Dm755 "${bin}" "${pkgdir}/usr/bin/${bin}"
+    done
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 THIRD-PARTY-LICENSES.txt "${pkgdir}/usr/share/licenses/${pkgname}/THIRD-PARTY-LICENSES.txt"
+    install -Dm644 README.md CHANGELOG.md INSTALL.txt -t "${pkgdir}/usr/share/doc/${pkgname}/"
+}

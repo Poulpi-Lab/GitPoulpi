@@ -1,0 +1,66 @@
+# TEMPLATE, NOT PUBLISHED. see the release-and-packaging design ("AUR").
+#
+# AUR package built from source (the tag's source archive). Before publishing:
+#   - replace @VERSION@, @SHA256_SOURCE_TARBALL@ (sha256 of the URL in `source`, for example
+#     `curl -fsSL <url> | sha256sum`) and the Maintainer line;
+#   - the repository must be public;
+#   - check the top-level folder of the tarball (`tar tzf <file> | head -1`): GitHub names it after the
+#     repository and the tag with `/` turned into `-`, which `_srcdir` below assumes;
+#   - regenerate .SRCINFO: makepkg --printsrcinfo > .SRCINFO, and build in a clean chroot.
+#
+# The build uses the `dist` profile of the official archives (fat LTO, one codegen unit): several minutes
+# and a few GB of RAM. `--release` builds faster with slightly larger binaries if that matters more.
+# No `.gitpoulpi-dist` marker is installed, so GitPoulpi never replaces its own files.
+
+# Maintainer: @MAINTAINER@
+pkgname=gitpoulpi
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc="Git client for the terminal with a clickable commit graph, a command palette, hosting integrations, a CLI and an MCP server"
+arch=('x86_64' 'aarch64')
+url="https://github.com/Poulpi-Lab/GitPoulpi"
+license=('MIT')
+depends=('git' 'zlib' 'gcc-libs' 'glibc')
+# A C compiler (base-devel) builds the vendored libgit2, ring and Lua.
+makedepends=('cargo')
+optdepends=('git-lfs: repositories that use Git LFS (3.0 or newer)')
+provides=('gitpoulpi')
+conflicts=('gitpoulpi-bin' 'gitpoulpi-git')
+# makepkg's LTO flags reach the C code built by the cc crate and can break the Rust link.
+options=('!lto')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/Poulpi-Lab/GitPoulpi/archive/refs/tags/releases/v${pkgver}.tar.gz")
+sha256sums=('@SHA256_SOURCE_TARBALL@')
+_srcdir="GitPoulpi-releases-v${pkgver}"
+
+prepare() {
+    cd "${_srcdir}"
+    export RUSTUP_TOOLCHAIN=stable
+    cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+    cd "${_srcdir}"
+    export RUSTUP_TOOLCHAIN=stable
+    export CARGO_TARGET_DIR=target
+    # GITPOULPI_DIST: the version string carries no commit hash, as in the release archives.
+    GITPOULPI_DIST=1 cargo build --frozen --profile dist -p gitpoulpi-tui -p gitpoulpi-cli -p gitpoulpi-mcp
+}
+
+check() {
+    cd "${_srcdir}"
+    export RUSTUP_TOOLCHAIN=stable
+    # The whole workspace suite drives terminals (PTY tests) and takes long; the domain and config crates
+    # are a meaningful smoke test of the toolchain.
+    cargo test --frozen -p gitpoulpi-core -p gitpoulpi-config
+}
+
+package() {
+    cd "${_srcdir}"
+    local bin
+    for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch; do
+        install -Dm755 "target/dist/${bin}" "${pkgdir}/usr/bin/${bin}"
+    done
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 THIRD-PARTY-LICENSES.txt "${pkgdir}/usr/share/licenses/${pkgname}/THIRD-PARTY-LICENSES.txt"
+    install -Dm644 README.md CHANGELOG.md -t "${pkgdir}/usr/share/doc/${pkgname}/"
+}

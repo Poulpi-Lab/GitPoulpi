@@ -1,0 +1,15 @@
+GitPoulpi - third-party licenses and credits
+============================================
+
+GitPoulpi is released under the MIT license (see the LICENSE file shipped
+next to this one). It is built on open-source software and uses color values
+from published themes. This file reproduces the notices those licenses ask
+for and credits the people behind them.
+
+It is generated: edit packaging/notices/*.txt, then run
+`cargo run -p xtask -- licenses`. It is also built into the program: About >
+Licenses in the TUI, and `gitpoulpi licenses` on the command line.
+
+GitKraken is a trademark of its respective owner. GitPoulpi is an independent
+project, not affiliated with, endorsed or sponsored by it; the name is
+mentioned only to describe compatibility and inspiration.

@@ -1,0 +1,45 @@
+# TEMPLATE, NOT PUBLISHED. see the release-and-packaging design ("winget").
+# @SHA256_WINDOWS_SETUP@ is the first field of gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe.sha256.
+#
+# winget runs the Inno Setup installer of the release (packaging/windows/gitpoulpi.iss). For the inno type winget
+# already passes /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART; Custom adds the rest:
+#   /CURRENTUSER or /ALLUSERS  picks the scope (needs `commandline` in PrivilegesRequiredOverridesAllowed, see
+#                              the plan; today the script allows `dialog`);
+#   /TASKS=...                 Start menu shortcut and PATH, no Desktop shortcut;
+#   /ALIAS= /NOSELFUPDATE      no `gp` command alias and no self-update marker. Both need the small .iss change
+#                              of the plan; until then Inno ignores them, a silent install creates the `gp`
+#                              alias and the program can update itself behind winget's back.
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+
+PackageIdentifier: GitPoulpi.GitPoulpi
+PackageVersion: "@VERSION@"
+InstallerType: inno
+UpgradeBehavior: install
+ProductCode: "{8C1D3E5A-6B7F-4A29-9E0C-47A1B2C3D4E5}_is1"
+AppsAndFeaturesEntries:
+  - DisplayName: GitPoulpi
+    Publisher: GitPoulpi
+    ProductCode: "{8C1D3E5A-6B7F-4A29-9E0C-47A1B2C3D4E5}_is1"
+Commands:
+  - gitpoulpi
+  - gitpoulpi-tui
+  - gitpoulpi-mcp
+Dependencies:
+  PackageDependencies:
+    - PackageIdentifier: Git.Git
+Installers:
+  - Architecture: x64
+    Scope: user
+    InstallerUrl: https://github.com/Poulpi-Lab/GitPoulpi/releases/download/releases/v@VERSION@/gitpoulpi-@VERSION@-x86_64-pc-windows-msvc-setup.exe
+    InstallerSha256: "@SHA256_WINDOWS_SETUP@"
+    InstallerSwitches:
+      Custom: /CURRENTUSER /TASKS="startmenu,addtopath" /ALIAS= /NOSELFUPDATE
+  - Architecture: x64
+    Scope: machine
+    InstallerUrl: https://github.com/Poulpi-Lab/GitPoulpi/releases/download/releases/v@VERSION@/gitpoulpi-@VERSION@-x86_64-pc-windows-msvc-setup.exe
+    InstallerSha256: "@SHA256_WINDOWS_SETUP@"
+    ElevationRequirement: elevatesSelf
+    InstallerSwitches:
+      Custom: /ALLUSERS /TASKS="startmenu,addtopath" /ALIAS= /NOSELFUPDATE
+ManifestType: installer
+ManifestVersion: 1.6.0

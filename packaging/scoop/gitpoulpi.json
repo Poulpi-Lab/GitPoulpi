@@ -1,0 +1,51 @@
+{
+    "##": [
+        "TEMPLATE, NOT PUBLISHED. see the release-and-packaging design (Scoop).",
+        "Replace @VERSION@ and @SHA256_WINDOWS_ZIP@ (first field of gitpoulpi-<version>-x86_64-pc-windows-msvc.zip.sha256),",
+        "then commit this file as bucket/gitpoulpi.json of a bucket repository. checkver and autoupdate keep it current.",
+        "post_install deletes the .gitpoulpi-dist marker: without it GitPoulpi never replaces its own files, so Scoop stays the only updater."
+    ],
+    "version": "@VERSION@",
+    "description": "Git client for the terminal with a clickable commit graph, a command palette, hosting integrations, a CLI and an MCP server",
+    "homepage": "https://github.com/Poulpi-Lab/GitPoulpi",
+    "license": "MIT",
+    "notes": "GitPoulpi needs a system git on the PATH (Git for Windows, or `scoop install git`).",
+    "suggest": {
+        "git": "git"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/Poulpi-Lab/GitPoulpi/releases/download/releases/v@VERSION@/gitpoulpi-@VERSION@-x86_64-pc-windows-msvc.zip",
+            "hash": "@SHA256_WINDOWS_ZIP@",
+            "extract_dir": "gitpoulpi-@VERSION@-x86_64-pc-windows-msvc"
+        }
+    },
+    "bin": [
+        "gitpoulpi.exe",
+        "gitpoulpi-tui.exe",
+        "gitpoulpi-mcp.exe"
+    ],
+    "shortcuts": [
+        [
+            "gitpoulpi-launch.exe",
+            "GitPoulpi"
+        ]
+    ],
+    "post_install": "Remove-Item \"$dir\\.gitpoulpi-dist\" -Force -ErrorAction SilentlyContinue",
+    "checkver": {
+        "url": "https://api.github.com/repos/Poulpi-Lab/GitPoulpi/releases/latest",
+        "jsonpath": "$.tag_name",
+        "regex": "releases/v([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/Poulpi-Lab/GitPoulpi/releases/download/releases/v$version/gitpoulpi-$version-x86_64-pc-windows-msvc.zip",
+                "hash": {
+                    "url": "$url.sha256"
+                },
+                "extract_dir": "gitpoulpi-$version-x86_64-pc-windows-msvc"
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+# TEMPLATE, NOT PUBLISHED. see the release-and-packaging design ("winget").
+# The three files of this folder go to microsoft/winget-pkgs as
+# manifests/g/GitPoulpi/GitPoulpi/@VERSION@/ once @VERSION@ and the hashes are filled in.
+# Check them with `winget validate --manifest <folder>` and `winget install --manifest <folder>` in a VM.
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.6.0.schema.json
+
+PackageIdentifier: GitPoulpi.GitPoulpi
+PackageVersion: "@VERSION@"
+DefaultLocale: en-US
+ManifestType: version
+ManifestVersion: 1.6.0

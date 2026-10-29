@@ -1,0 +1,137 @@
+name: Release
+
+# Runs only when a version tag is pushed (`git tag releases/v0.2.0 && git push origin releases/v0.2.0`; this
+# repository's tags are prefixed by purpose, version tags live under `releases/`), so it costs nothing
+# day to day. It builds the three binaries with `cargo run -p xtask -- dist` (fat LTO) on each OS, then
+# publishes one GitHub release carrying every archive and its .sha256. The release notes are the tag's
+# `## [x.y.z]` section of CHANGELOG.md when there is one, else GitHub's generated notes. A tag with a `-`
+# (releases/v0.2.0-rc.1) is published as a pre-release. The CI workflow stays disabled; this one is independent.
+#
+# Dry run (builds every archive and installer, publishes nothing): push a tag under another prefix, for example
+# `git tag dryrun/v0.1.0 && git push origin dryrun/v0.1.0`, then
+# `gh workflow run release.yml -f tag=dryrun/v0.1.0 -f dry_run=true` and download the run's artifacts.
+# The tag's version must equal the workspace version in Cargo.toml (the archive names come from it): the first
+# step of each build checks that. see the release-and-packaging design.
+on:
+  push:
+    tags: ['releases/v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to (re)build and publish, e.g. releases/v0.2.0'
+        required: true
+      dry_run:
+        description: 'Build and upload the artifacts only; publish no release'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  TAG: ${{ github.event.inputs.tag || github.ref_name }}
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 22.04 for an older glibc: the Linux binary then runs on more distributions.
+          - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
+          - { os: macos-latest, target: aarch64-apple-darwin }
+          - { os: macos-latest, target: x86_64-apple-darwin }
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+      # `xtask dist` names the archives after the workspace version, the installer step and the updater after
+      # the tag: a mismatch would publish assets no updater finds. Fails in seconds instead of after the build.
+      - name: Tag matches the workspace version
+        shell: bash
+        run: |
+          tag_version="${TAG##*/}"
+          tag_version="${tag_version#v}"
+          cargo_version=$(sed -n '/^\[workspace.package\]/,/^\[/s/^version = "\(.*\)"/\1/p' Cargo.toml)
+          if [ "$tag_version" != "$cargo_version" ]; then
+            echo "::error::tag $TAG names version $tag_version but Cargo.toml says $cargo_version"
+            exit 1
+          fi
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release-${{ matrix.target }}
+      - name: Build and pack
+        run: cargo run -q -p xtask -- dist --target ${{ matrix.target }}
+      # Windows only: the Inno Setup installer is compiled from the zip that
+      # `xtask dist` just wrote (packaging/windows/gitpoulpi.iss), so it
+      # installs exactly the archive's files. It lands in target/dist next to
+      # the zip and is uploaded with it.
+      - name: Windows installer (Inno Setup)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $version = ($env:TAG -replace '^.*/', '').TrimStart('v')
+          $stem = "gitpoulpi-$version-${{ matrix.target }}"
+          Expand-Archive -Path "target/dist/$stem.zip" -DestinationPath installer-src
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$version" "/DSourceDir=$PWD\installer-src\$stem" "/DOutputDir=$PWD\target\dist" packaging/windows/gitpoulpi.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
+          $setup = "$stem-setup.exe"
+          $hash = (Get-FileHash "target/dist/$setup" -Algorithm SHA256).Hash.ToLower()
+          [System.IO.File]::WriteAllText("$PWD/target/dist/$setup.sha256", "$hash  $setup`n")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.target }}
+          path: target/dist/*
+          if-no-files-found: error
+          # The release keeps the files; the artifacts are only the hand-over to the publish job (and what a
+          # dry run inspects). Short retention keeps a private repository's Actions storage quota free.
+          retention-days: 7
+
+  publish:
+    needs: build
+    # `inputs` is empty on a tag push, so only a manual dry run skips this job.
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      # The Linux and macOS installer: `curl -fsSL .../releases/latest/download/install.sh | sh`.
+      - name: Attach install.sh
+        run: cp packaging/install.sh dist/install.sh
+      - name: Release notes from CHANGELOG.md
+        id: notes
+        run: |
+          version="${TAG#releases/}"
+          version="${version#v}"
+          echo "title=GitPoulpi v$version" >> "$GITHUB_OUTPUT"
+          awk -v v="$version" '
+            /^## \[/ { if (on) exit; on = index($0, "[" v "]") > 0; next }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          if [ -s notes.md ]; then echo "generate=false" >> "$GITHUB_OUTPUT"; else echo "generate=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: ${{ steps.notes.outputs.title }}
+          body_path: ${{ steps.notes.outputs.generate == 'false' && 'notes.md' || '' }}
+          generate_release_notes: ${{ steps.notes.outputs.generate == 'true' }}
+          prerelease: ${{ contains(env.TAG, '-') }}
+          files: dist/*
+          fail_on_unmatched_files: true

@@ -19,24 +19,42 @@ path = "src/main.rs"
 [features]
 default = ["full"]
 full = ["all-langs", "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "ai", "mcp", "lfs", "worktree", "submodule", "avatar-fetch", "image-view", "radar", "mermaid", "board", "review", "history-rewrite", "global-search", "workspaces", "rewrite-scripts"]
-all-langs = []
-lang-fr = []
-lang-es = []
-lang-pt-br = []
-lang-pt-pt = []
-lang-it = []
-lang-de = []
-lang-zh-cn = []
-lang-ja = []
-lang-ru = []
-lang-ko = []
-lang-nl = []
-lang-pl = []
-lang-uk = []
-lang-cs = []
-lang-sv = []
-lang-tr = []
-lang-qps = []
+all-langs = [
+    "lang-fr",
+    "lang-es",
+    "lang-pt-br",
+    "lang-pt-pt",
+    "lang-it",
+    "lang-de",
+    "lang-zh-cn",
+    "lang-ja",
+    "lang-ru",
+    "lang-ko",
+    "lang-nl",
+    "lang-pl",
+    "lang-uk",
+    "lang-cs",
+    "lang-sv",
+    "lang-tr",
+    "lang-qps",
+]
+lang-fr = ["gitpoulpi-i18n/lang-fr"]
+lang-es = ["gitpoulpi-i18n/lang-es"]
+lang-pt-br = ["gitpoulpi-i18n/lang-pt-br"]
+lang-pt-pt = ["gitpoulpi-i18n/lang-pt-pt"]
+lang-it = ["gitpoulpi-i18n/lang-it"]
+lang-de = ["gitpoulpi-i18n/lang-de"]
+lang-zh-cn = ["gitpoulpi-i18n/lang-zh-cn"]
+lang-ja = ["gitpoulpi-i18n/lang-ja"]
+lang-ru = ["gitpoulpi-i18n/lang-ru"]
+lang-ko = ["gitpoulpi-i18n/lang-ko"]
+lang-nl = ["gitpoulpi-i18n/lang-nl"]
+lang-pl = ["gitpoulpi-i18n/lang-pl"]
+lang-uk = ["gitpoulpi-i18n/lang-uk"]
+lang-cs = ["gitpoulpi-i18n/lang-cs"]
+lang-sv = ["gitpoulpi-i18n/lang-sv"]
+lang-tr = ["gitpoulpi-i18n/lang-tr"]
+lang-qps = ["gitpoulpi-i18n/lang-qps"]
 ai = ["gitpoulpi-commands/ai"]
 github = ["gitpoulpi-commands/github"]
 gitlab = ["gitpoulpi-commands/gitlab"]

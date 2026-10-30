@@ -13,7 +13,7 @@ description = "Shared command layer: the `gitpoulpi` clap `Cli` tree, the IPC `S
 default = ["full"]
 # Standalone (`cargo test -p gitpoulpi-commands`) behaves as a full build.
 full = [
-    "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "ai", "mcp", "lfs", "worktree", "submodule",
+    "gitpoulpi-i18n/all-langs", "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues", "ai", "mcp", "lfs", "worktree", "submodule",
     "avatar-fetch", "image-view", "radar", "mermaid", "board", "review", "history-rewrite", "global-search", "workspaces", "rewrite-scripts",
 ]
 ai = ["dep:gitpoulpi-ai", "dep:async-trait"]

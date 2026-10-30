@@ -1,0 +1,507 @@
+[English](../ai.md) · [Čeština](../cs/ai.md) · [Deutsch](../de/ai.md) · [Español](../es/ai.md) · [Français](../fr/ai.md) · **Italiano** · [日本語](../ja/ai.md) · [한국어](../ko/ai.md) · [Nederlands](../nl/ai.md) · [Polski](../pl/ai.md) · [Português (Brasil)](../pt-BR/ai.md) · [Português (Portugal)](../pt-PT/ai.md) · [Русский](../ru/ai.md) · [Svenska](../sv/ai.md) · [Türkçe](../tr/ai.md) · [Українська](../uk/ai.md) · [简体中文](../zh-CN/ai.md)
+
+# Assistenza IA
+
+GitPoulpi non richiede mai un account, e **l'IA è disattivata per impostazione
+predefinita**. Quando l'IA è attiva, può scrivere messaggi di commit e di stash,
+spiegare le modifiche, scrivere le descrizioni delle pull request, suggerire
+risoluzioni dei conflitti di merge e dividere le modifiche in corso in più
+commit. Il modello è tuo: una chiave API di tua proprietà, un server locale o
+una CLI di agente già installata (come `claude -p`).
+
+Ogni controllo IA mostra la `✦` viola. Finché l'IA è disattivata:
+
+- Non viene inviato nulla da nessuna parte.
+- Non compare alcun controllo IA: nessun pulsante `✦`, nessun comando `IA:`
+  nella palette, nessuna riga di menu IA e nessun suggerimento di tasti IA. I
+  tasti IA non fanno nulla.
+- La pagina IA del repository mostra solo «L'IA è disattivata (Impostazioni > IA)».
+- Il server MCP non elenca gli strumenti `ai_*`. I comandi CLI `gitpoulpi ai ...`
+  rifiutano con lo stesso messaggio.
+
+**Attiva l'IA** ha effetto subito. Non serve riavviare.
+
+Ci sono due modi di usare l'IA con GitPoulpi:
+
+| | IA integrata (questa pagina) | Un agente esterno |
+|---|---|---|
+| Che cos'è | GitPoulpi chiede a un modello un messaggio di commit, una spiegazione, ... | Claude Code, Cursor, Codex... pilotano GitPoulpi come uno strumento |
+| Si configura in | Impostazioni > IA (`[ai]`) | la configurazione MCP dell'agente, limiti in `[mcp]` |
+| Guida | qui sotto | [MCP e agenti](mcp-and-agents.md) |
+
+## Configurare l'IA
+
+1. `Ctrl+,` > **IA** > spunta **Attiva l'IA**.
+2. I profili sono l'elenco della scheda **Profili (connessioni)**, a sinistra della
+   pagina (impilato in alto su un terminale stretto): scegline uno per modificarlo a destra (`Enter` entra
+   nelle sue righe; il comando della palette **IA: Modifica profilo...** porta
+   all'elenco). **+ Aggiungi** ne crea un altro, **Duplica** copia quello
+   selezionato (senza la sua chiave) e **Rimuovi** chiede prima conferma.
+   Scegli il **Provider** e compila i suoi campi:
+
+   | Provider | Campi | Valori predefiniti |
+   |---|---|---|
+   | **Agente locale** (nessuna chiave, nessun account proprio) | **Tipo di agente** (quale agente è), **Comando** (il programma esatto: nel tuo `PATH`, un alias o uno script wrapper, o un percorso completo), gli **Argomenti** che lo rendono non interattivo, e **Variabili d'ambiente** facoltative. Il prompt va sul suo stdin, la risposta si legge dallo stdout. | Claude Code: `claude`, `-p --model haiku` |
+   | **Anthropic** | **Chiave API**, **Modello** e **URL di base** facoltativi | `claude-sonnet-5`, `https://api.anthropic.com/v1` |
+   | **OpenAI** | **Chiave API**, Modello, URL di base | `gpt-5`, `https://api.openai.com/v1` |
+   | **OpenRouter** | **Chiave API**, Modello, URL di base | `openai/gpt-5`, `https://openrouter.ai/api/v1` |
+   | **Compatibile con OpenAI** (Ollama, LM Studio, vLLM, un gateway aziendale) | **URL di base** (`.../v1`), **Modello**, chiave facoltativa | `http://localhost:11434/v1` (Ollama; LM Studio è `http://localhost:1234/v1`), `llama3` |
+
+   **Preimpostazioni** (puoi sempre digitare un altro valore):
+
+   ![L'elenco Tipo di agente di un profilo di agente locale, con Claude Code, OpenAI Codex CLI, Gemini CLI, opencode e le altre CLI di agenti](../images/settings-ai-presets.png)
+
+   - **Agente locale > Tipo di agente** è un elenco delle CLI di agenti più
+     comuni, le più usate per prime: Claude Code, OpenAI Codex CLI, Gemini CLI,
+     opencode, Cursor Agent, GitHub Copilot CLI, Pi, Qwen Code, Aider, Goose,
+     Crush, Amp, oppure *Altro (nessun suggerimento)*. Il tipo è **separato dal
+     comando**: sceglie solo quali suggerimenti ricevi. Sceglierne uno
+     precompila **Comando** (finché è ancora il valore predefinito del tipo
+     precedente) e **Argomenti** con l'invocazione headless (`claude -p`,
+     `codex exec -`, `gemini -p ...`, ...). **Comando** è testo libero: scrivi
+     `/opt/bin/work-claude`, uno script wrapper o la destinazione di un alias e
+     il tipo, con le sue opzioni, l'elenco dei modelli e le variabili, resta.
+     Quando **Tipo di agente** è vuoto, GitPoulpi lo deduce dal comando.
+   - **Opzioni degli argomenti** aggiunge o rimuove le opzioni adatte all'uso
+     one-shot di GitPoulpi, ciascuna con una breve motivazione: nessuno
+     strumento, nessuna sessione salvata, output in testo semplice, poco
+     ragionamento, modalità di sola lettura, nessuna richiesta di permessi,
+     nessun controllo degli aggiornamenti né statistiche d'uso. L'elenco cambia
+     da agente ad agente perché gli agenti sono diversi (solo alcuni possono
+     disattivare gli strumenti dalla riga di comando; per opencode serve una
+     variabile d'ambiente). **Modello** elenca i modelli di quell'agente e
+     scrive l'opzione giusta (`--model haiku` per Claude Code, `-m gpt-6-luna`
+     per Codex, `--model provider/model` per opencode); *(predefinito - nessuna
+     opzione)* la rimuove. Amp non ha un'opzione per il modello. `aider` legge
+     il prompt da `/dev/stdin`, quindi funziona solo su Linux e macOS.
+   - Le **Variabili d'ambiente** valgono solo per il processo di quell'agente,
+     mai per GitPoulpi o per altri profili. **Aggiungi una variabile
+     d'ambiente** propone le variabili documentate che contano per quell'agente,
+     ciascuna con la sua funzione (disattivare telemetria e controllo degli
+     aggiornamenti, livello di impegno, cartella di configurazione, chiave API,
+     URL di base o host locale, ...); puoi anche digitare `NOME` o
+     `NOME=valore`. Ogni variabile ha poi la propria riga **Env NOME**: il suo valore
+     è un pulsante (premilo per digitarne uno nuovo; si salva quando lasci il
+     campo) e un pulsante **[x]** elimina la variabile. Un valore può essere `${env:NAME}` per prendere in prestito
+     una delle variabili di GitPoulpi stesso (comodo per le chiavi API, così non
+     finiscono in `config.toml`). I valori che sembrano segreti (nomi che
+     finiscono in `_KEY`, `_TOKEN`, `_SECRET`, ... o prefissi di chiave noti)
+     appaiono come pallini e si digitano da zero. I valori non vengono mai
+     registrati nei log.
+   - **Provider HTTP > Preimpostazione del provider** compila l'URL di base e un
+     modello per OpenAI, Anthropic, OpenRouter, Google Gemini, xAI, DeepSeek,
+     Mistral, Groq, Together, Fireworks, Cerebras, Perplexity, Moonshot, Qwen
+     (DashScope), Zhipu (GLM) e i server locali Ollama, LM Studio, llama.cpp,
+     vLLM, Jan e LocalAI. **Modello** è un elenco dei modelli di quel provider,
+     con testo libero ammesso.
+
+3. Premi **Prova la connessione**: *Ultima prova* riporta `connesso: il modello
+   ha risposto` oppure `non riuscita: <motivo>`.
+4. Con più profili, scegli il **Profilo predefinito** in fondo; ogni azione può
+   comunque indicare il proprio.
+
+![Il blocco Profili della pagina IA per un agente locale: Tipo di agente (Claude Code), Comando, Argomenti, Modello, due righe Env, Aggiungi e Rimuovi una variabile d'ambiente, Prova la connessione e Profilo predefinito](../images/settings-ai-agent.png)
+
+Le **chiavi API** si inseriscono con `Enter` sulla riga **Chiave API** e sono
+conservate nel credential helper del sistema (Git Credential Manager,
+libsecret / `pass`, Keychain) sotto `ai:<id del profilo>`, mai in `config.toml`.
+Senza un helper, GitPoulpi lo dice invece di far finta di conservarla.
+*Impostazioni > SSH e credenziali > Dimentica tutti i nomi utente e le password*
+le rimuove.
+
+Lo stesso in `config.toml` (tutto il resto è nel [riferimento della
+configurazione](config-reference.md#ai-ia-integrata-disattivata-per-impostazione-predefinita)):
+
+```toml
+[ai]
+enabled = true
+default_profile = "claude-code"
+
+[[ai.profiles]]
+id = "claude-code"
+name = "Claude Code"
+kind = "local_agent"      # open_ai | anthropic | open_router | open_ai_compatible | local_agent
+command = "claude"        # free: an alias, a wrapper script, an absolute path
+harness = "claude"        # which agent it is; empty = inferred from `command`
+args = ["-p", "--model", "haiku"]
+
+[ai.profiles.env]         # this agent's process only; ${env:NAME} borrows ours
+CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1"
+ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"
+```
+
+## Modalità di esecuzione: headless o terminale virtuale
+
+Un profilo di agente locale esegue il proprio agente in due modi, scelti con
+**Modalità di esecuzione** (mostrata per Claude Code, OpenAI Codex CLI e Gemini
+CLI):
+
+- **Headless (non interattiva)**, quella predefinita: la modalità a colpo
+  singolo dell'agente (`claude -p`), prompt su stdin, risposta su stdout.
+- **Interattiva (terminale virtuale)**: GitPoulpi avvia la schermata propria
+  dell'agente in un terminale nascosto, vi digita la richiesta come farebbe una
+  persona, attende la risposta e chiude l'agente. Alcuni agenti fatturano o
+  limitano la modalità headless in modo diverso da quella interattiva; quale
+  caso ti riguardi, e che cosa dicano le condizioni del provider su ciascuna
+  modalità, dipende dal provider: consulta le sue.
+
+Ogni modalità conserva i propri **Argomenti**, **Opzioni degli argomenti** e
+**Modello**: passare da una all'altra non fa perdere nulla, e la modalità
+interattiva propone solo le opzioni che hanno senso senza l'opzione headless.
+Altre due righe valgono per entrambe le modalità:
+
+- **Cartella di lavoro**: *Cartella dedicata* è una cartella vuota di proprietà
+  di GitPoulpi, quindi l'agente non vede alcun progetto e ti chiede una sola
+  volta di fidarti. *Repository corrente* dà all'agente il contesto proprio del
+  progetto (il suo `CLAUDE.md`, per esempio), e chiede la fiducia una volta per
+  repository. *Predefinita* è la cartella dedicata in modalità interattiva e,
+  in modalità headless, la cartella da cui gira GitPoulpi, come prima.
+- **Timeout (secondi)**: per quanto tempo l'agente può lavorare prima che
+  GitPoulpi rinunci e lo fermi. Se vuoto, sono 120 secondi in headless e 180 in
+  interattiva.
+
+**Alle domande del primo avvio rispondi tu.** Un agente che non è mai stato
+eseguito in una cartella chiede prima qualcosa (fidarsi della cartella,
+accedere, scegliere un tema). GitPoulpi non risponde mai al posto tuo: la
+richiesta si ferma con un messaggio, e **Apri l'agente...** (sul profilo, o
+*IA: Apri l'agente* nella palette dei comandi) apre l'agente una volta, in un
+terminale visibile, nella cartella di lavoro che userà. Rispondi alla domanda,
+chiudi l'agente e riprova; la risposta viene ricordata dall'agente.
+
+La risposta viene letta dalla trascrizione della sessione dell'agente per
+Claude Code (il suo testo esatto, cancellata poi) e dalla schermata tra due
+righe marcatore richieste nella richiesta, per Codex e Gemini. Al massimo due
+esecuzioni in terminale virtuale avvengono contemporaneamente, e premere Esc
+durante una richiesta ferma l'agente.
+
+```toml
+[[ai.profiles]]
+id = "claude-terminal"
+kind = "local_agent"
+command = "claude"
+harness = "claude"
+args = ["-p"]                       # the headless set, kept
+run_mode = "terminal"               # headless (default) | terminal
+terminal_args = ["--effort", "low"] # the interactive set
+workdir = "dedicated"               # default | dedicated | repository
+timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
+```
+
+## Istruzioni
+
+Testo che aggiungi a ciò che viene detto al modello. Il prompt integrato di ogni
+azione (che fissa il formato della risposta) viene sempre per primo e non si può
+modificare; poi quattro livelli, dal più generale al più specifico, ciascuno solo
+se non è vuoto:
+
+1. **Istruzioni globali** (ogni azione). I chip *Inserimento rapido*
+   dell'editor inseriscono frasi comuni: *Rispondi in <lingua>*,
+   *Risposte concise*, *Usa l'imperativo*, *Tono tecnico*, *Tono informale*.
+2. **Istruzioni dell'area di lavoro** (ogni azione, ogni repository
+   dell'[area di lavoro](workspaces.md#istruzioni-ia-di-unarea-di-lavoro)): per
+   tutte le azioni e, se vuoi, per singola azione. Si modificano nel modulo
+   Modifica dell'area di lavoro.
+3. **Istruzioni del repository** (ogni azione, solo questo repository), con
+   *Combina con il globale*: **Aggiungi al globale** (dopo di esse) o
+   **Sostituisci il globale** (al posto loro).
+4. **Istruzioni per l'azione** (*Generazione del messaggio di commit*,
+   *Spiega le modifiche*, *Generazione del messaggio di stash*, *Pull request*,
+   *Compositore di commit*, *Risoluzione dei conflitti*, *Revisione del codice*,
+   *Dividi un commit*), ogni blocco con i
+   propri chip nel suo editor (ad es. *Formato conventional commits*,
+   *Limite di 50 caratteri*) e il proprio elenco **Profilo** (`Predefinito (<nome>)` segue il profilo
+   predefinito).
+
+`Enter` su una riga *Istruzioni personalizzate* apre un editor su più righe
+(`Ctrl+S` salva, `Esc` annulla). Sopra il testo, una riga *Inserimento rapido*
+contiene i chip di quella sezione: clicca su uno per inserire la sua frase al
+cursore. Da tastiera, `Tab` passa alla riga, `Sinistra`/`Destra` scelgono un
+chip, `Enter` o `Spazio` lo inserisce e torna al testo (`Tab` o `Esc` tornano
+senza inserire). Un chip la cui frase è già nelle istruzioni appare attenuato e
+inserirlo di nuovo non fa nulla. Il testo è un editor completo: il clic posiziona
+il cursore, un trascinamento o `Shift`+frecce selezionano, `Ctrl+A` seleziona
+tutto, `Ctrl+C` / `Ctrl+X` copiano e tagliano la selezione, `Ctrl`+frecce
+saltano di parola, `Home` / `Fine`, `PagSu` / `PagGiù` e la rotellina del mouse
+scorrono un testo lungo. La pagina stessa mostra solo un'anteprima di ogni
+istruzione.
+
+![La pagina IA: istruzioni globali, poi i blocchi Generazione del messaggio di commit e Spiega le modifiche con un elenco dei profili e istruzioni personalizzate](../images/settings-ai.png)
+
+**Per repository**: *Impostazioni > Impostazioni specifiche del repository > IA*
+(con un repository aperto) contiene le istruzioni del repository e, per ogni
+azione, un profilo e istruzioni che prevalgono su quelli globali. Un campo vuoto
+usa l'impostazione globale (mostrata in grigio al suo interno); **Torna al
+globale** rimuove un override. Salvato nel `.gitpoulpi/repo-state.toml` del
+repository, e rispettato anche dalla CLI.
+
+![La pagina IA del repository: Istruzioni del repository con l'elenco Combina con il globale, poi un profilo e le istruzioni per ogni azione](../images/settings-repo-ai.png)
+
+### Come si combinano i livelli
+
+L'ordine di invio è: prompt integrato, **globale**, **area di lavoro**,
+**repository**, poi le istruzioni proprie dell'azione. La modalità di un livello
+decide cosa succede a quelli sopra di lui:
+
+- **Aggiungi** (il predefinito): il testo del livello viene aggiunto dopo quelli
+  più generali.
+- **Sostituisci**: il testo del livello viene usato *al posto di* ogni livello
+  più generale (il globale, e l'area di lavoro quando a sostituire è il
+  repository). Un livello senza testo non sostituisce mai nulla.
+
+Le istruzioni proprie dell'azione seguono la stessa idea: quelle globali per
+quell'azione, poi quelle dell'area di lavoro per quell'azione (aggiunte dopo, o
+al loro posto), e l'override proprio di un repository per l'azione vince su
+entrambe. L'area di lavoro usata è quella attiva nella finestra quando contiene
+il repository, altrimenti la prima area di lavoro che lo contiene; da riga di
+comando è quella in `GITPOULPI_WORKSPACE`, altrimenti la prima.
+
+Per vedere esattamente cosa viene inviato, livello per livello, esegui
+`gitpoulpi ai prompt --action <azione> --repo .` (`base`, `global`, `workspace`,
+`repository`, `task`, e il `system_prompt` finale). Non chiama nessun modello e
+funziona anche con l'IA disattivata. Imposta le istruzioni di un'area di lavoro
+da uno script con `gitpoulpi workspace set-ai-instructions <id> [--action <a>]
+[--mode append|replace] --text ...` (o `--clear`).
+
+### Variabili del prompt
+
+Ogni testo di istruzioni (globale, dell'area di lavoro, del repository, per azione) può contenere
+variabili `${nome}`. Vengono sostituite dal loro valore subito prima dell'invio
+del prompt (il testo salvato conserva i `${...}`). Un nome che non è nella
+tabella viene inviato così com'è e l'editor lo segnala; scrivi `$${` per un
+`${` letterale.
+
+| Variabile | Si espande in | Esempio |
+|---|---|---|
+| `${uilang}` | La lingua dell'interfaccia, con il suo nome inglese | `French` |
+| `${repo}` | Il nome della cartella del repository | `gitpoulpi` |
+| `${branch}` | Il branch corrente | `main` |
+| `${ref}` / `${commit}` | Sha breve del commit a cui si riferisce l'azione (*Spiega*), altrimenti HEAD | `4c0443d` |
+| `${commit_subject}` | Riga dell'oggetto di quel commit | `feat: add search` |
+| `${date}` | Data locale, ISO | `2026-10-03` |
+| `${time}` | Ora locale, `HH:MM` | `14:05` |
+| `${datetime}` | Data e ora locali | `2026-10-03 14:05` |
+| `${user}` / `${email}` | `git config user.name` / `user.email` | `Ada Lovelace` |
+| `${remote}` | Il remoto predefinito (`origin`, altrimenti il primo) | `origin` |
+| `${host}` | `github`, `gitlab`, `other` (un altro host) o `none` | `github` |
+| `${files}` | Numero di file nel diff dell'azione | `3` |
+| `${action}` | L'azione in corso | `commit_message` |
+
+Nell'editor delle istruzioni: digita `${` e un popup elenca le variabili
+corrispondenti (`Su`/`Giù` scelgono, `Enter` o `Tab` inserisce, `Esc` lo
+chiude); oppure usa l'elenco **Variabili** in basso a sinistra (`Ctrl+T`, o
+*IA: Inserisci variabile del prompt* nella palette dei comandi), che inserisce
+al cursore. Ogni voce ha una descrizione, mostrata nell'elenco e sulla riga
+sopra i pulsanti mentre ci passi sopra o la evidenzi.
+
+## Cosa può fare
+
+| Azione | Nella finestra | CLI |
+|---|---|---|
+| **Messaggio di commit** | Metti in stage le modifiche, premi la `✦` a destra del campo Riepilogo, `Ctrl+G i`, o il comando della palette `IA: Genera il messaggio di commit`. Riepilogo e descrizione vengono compilati perché tu li modifichi; non viene fatto alcun commit. | `ai commit-message` (stampa), `commit --ai` (fa il commit) |
+| **Spiega le modifiche** | La `[✦]` in alto a destra del pannello delle modifiche in corso (`Ctrl+G w`: il commit selezionato, altrimenti le modifiche in corso), o la voce *Spiega le modifiche (IA)* del menu di un commit. Un popup: le frecce scorrono, `c` copia, `Esc` chiude. | `ai explain [rev] [--wip]` |
+| **Messaggio di stash** | `Ctrl+G m` apre la richiesta dello stash; `Ctrl+G` al suo interno interroga il modello. Il comando della palette `IA: Genera il messaggio di stash` fa entrambe le cose. | `stash push --ai` |
+| **Titolo e descrizione della pull request** | *Genera titolo e descrizione* nel modulo Crea una pull request (i commit e il diff del branch vengono letti in locale). | |
+| **Risoluzione dei conflitti di merge** | Nell'editor dei conflitti di merge: il pulsante `✦ Suggerisci` della barra degli strumenti, la voce del menu con clic destro di un conflitto *✦ Suggerisci una risoluzione (IA)*, `Alt+I`, o il comando della palette `IA: Suggerisci una risoluzione del conflitto di merge`. Il suggerimento sostituisce la regione del *conflitto corrente* nel risultato come un'unica modifica (segnata come modificata, un solo passo di annullamento); nulla viene salvato o messo in stage finché non salvi. | `ai resolve-conflict <path> [--conflict N]` (stampa) |
+| **Revisione del codice** | Nella [revisione di una pull o merge request](review.md#bozza-di-revisione-ia): il pulsante `✦ Bozza di revisione...`, `s`, o il comando della palette `Revisione: ✦ Bozza di revisione...` (apre le opzioni di revisione, `Enter` avvia). Il modello legge il diff, la descrizione e i commenti esistenti della richiesta (e, per impostazione predefinita, il `CLAUDE.md` e l'`AGENTS.md` del progetto: vedi [Contesto della revisione](#contesto-della-revisione)) e propone dei commenti; tu accetti, modifichi o ignori ciascuno. Nulla raggiunge l'host prima che tu invii la revisione. | `hosting review suggest <n>` (stampa JSON, non pubblica nulla), `ai review-context` (i valori predefiniti) |
+| **Dividere un commit** | La voce *Dividi commit (IA)...* del menu di un commit, o il comando della palette `IA: Dividi il commit selezionato...`. L'editor di divisione si apre con il raggruppamento del modello già compilato; vedi sotto. | `ai split-plan <rev>` (stampa) |
+| **Script di riscrittura della cronologia** | Nel [pannello di riscrittura della cronologia](history-rewrite.md#scrivere-uno-script-con-lia): il pulsante `✦ Scrivi con l'IA...` dell'editor degli script, o il comando della palette `Riscrittura: Scrivi uno script con l'IA...`. Una finestra mostra esattamente cosa verrà inviato; lo script arriva nell'editor, contrassegnato, e non viene mai eseguito né applicato al posto tuo. | `ai rewrite-script "<istruzione>" [--sample N]` (stampa) |
+| **Regole di riscrittura della cronologia** | Nel [pannello di riscrittura della cronologia](history-rewrite.md#creare-regole-con-lia): il pulsante `✦ Crea regole con l'IA...`, `Alt+I`, o il comando della palette `Riscrittura: Crea regole con l'IA...`. Una finestra su più righe mostra esattamente cosa verrà inviato; le regole e le impostazioni arrivano nel pannello e nulla viene mostrato in anteprima né applicato al posto tuo. | `ai rewrite-rules "<descrizione>" [--context]` (stampa) |
+| **Compositore di commit** | La voce *Componi i commit (IA)...* del menu della riga WIP, `Ctrl+G C`, il comando della palette `IA: Componi commits dalle modifiche in corso...` | |
+
+`Esc` annulla una richiesta in corso (il processo di un agente locale viene terminato).
+
+### Risoluzione dei conflitti di merge
+
+Il modello riceve il percorso e il linguaggio del file, i blocchi base, corrente
+(A) e in entrata (B) del conflitto con le etichette che mostra l'editor, fino a
+20 righe di testo già unito prima e dopo, e le tue istruzioni (globali, del
+repository, e quelle di *Risoluzione dei conflitti* in Impostazioni > IA).
+Risponde con il testo risolto di quel solo conflitto in un blocco di codice; una
+risposta con marcatori di conflitto o chiacchiere al posto del codice viene
+rimandata indietro una volta, poi rifiutata. Un conflitto di oltre 40 KB circa
+non viene inviato. I controlli sono nascosti finché l'IA è disattivata, e un
+suggerimento non salva, non mette in stage e non risolve mai nulla: rivedi il
+risultato, modificalo e salva come al solito.
+
+![Il modulo di commit dopo il pulsante scintilla: un riepilogo e una descrizione scritti dal modello, pronti da modificare](../images/ai-commit-message.png)
+
+![Il popup Spiega le modifiche in corso: una spiegazione e un elenco di cose da ricontrollare](../images/ai-explain.png)
+
+### Il compositore di commit
+
+Il modello divide le modifiche in corso in più commit (ogni file modificato in
+uno solo; un piano non valido viene rimandato indietro una volta, poi rifiutato).
+Rivedi il piano prima che venga creato qualsiasi commit:
+
+![La revisione del compositore: quattro commit proposti con i loro file, e i pulsanti Reimposta, Annulla e Crea 4 commit](../images/composer.png)
+
+| Tasto | Mouse | Fa |
+|---|---|---|
+| `Su` / `Giù` (`k` / `j`) | clic su una riga | si sposta tra commit e file |
+| `Alt+Up` / `Alt+Down` (`K` / `J`), `m` | le frecce, trascinamento | sposta un commit; sposta un file in un altro commit |
+| `Destra` / `Sinistra`, `*` | la freccia della riga | espande / comprime un commit, tutti (`ui.composer_files` imposta lo stato iniziale) |
+| `e` / `Enter` | la matita | modifica il messaggio |
+| `d` / `Delete` | `drop` / `ripristina` | lascia fuori un commit (i suoi file restano non committati) |
+| `n` | `+ commit a sé` | sposta un file in un commit a sé |
+| `r` | `Reimposta` | torna al piano del modello |
+| `Ctrl+S` / `a` | `Crea N commit` | li crea, in ordine |
+| `Esc` | `Annulla` | esce, senza fare nulla |
+
+La creazione mette in stage i file di ogni commit e li committa uno dopo l'altro;
+la directory di lavoro non viene mai toccata. Un file messo in stage solo in parte
+viene committato per intero. Se un passo fallisce, si ferma e dice quanti commit
+sono stati creati.
+
+### Dividere un commit
+
+Il modello legge le modifiche del commit, numerate come le numera l'[editor di divisione](log-and-history.md#dividere-un-commit),
+e propone più commit, ciascuno con il suo messaggio; può raggruppare hunk e singole righe.
+Una risposta che lascia fuori una modifica, ne assegna una due volte o nomina qualcosa che
+non esiste viene rifiutata. In ogni caso si apre l'editor di divisione: con la proposta già
+compilata oppure, se il modello ha fallito, con il motivo in una nota, così dividi a mano.
+Non viene diviso nulla finché non premi **Dividi** (`Ctrl+S`); se il raggruppamento non va
+bene, prima sposta le modifiche, rinomina i commit o aggiungine uno. Il profilo e le
+istruzioni sono quelli di *Dividi un commit* in Impostazioni > IA.
+
+### Uno script di riscrittura della cronologia
+
+Descrivi cosa deve fare la riscrittura («sposta alla mattina dopo ogni commit fatto di
+notte», «sostituisci la mia vecchia e-mail con la nuova, solo prima del 2024») e il
+modello scrive uno [script Lua](history-rewrite.md#script-lua) per la regola Script,
+con l'intestazione, `rewrite_commit(c, ctx)` e le funzioni di supporto della sandbox.
+Il daemon compila la risposta; se non compila, l'errore torna una volta al modello.
+Ciò che ne risulta compare nell'editor: leggilo, provalo, poi genera l'anteprima.
+Dettagli e finestra sono in [Riscrittura della cronologia](history-rewrite.md#scrivere-uno-script-con-lia).
+Il profilo e le istruzioni sono quelli di *Script di riscrittura della cronologia* in
+Impostazioni > IA.
+
+### Regole di riscrittura della cronologia
+
+Descrivi con parole tue come deve essere riscritta la cronologia («sostituisci la mia vecchia
+e-mail a@b.org con c@d.org», «rimuovi secrets.txt da tutta la cronologia») e il modello propone
+un ambito, alcune impostazioni e un elenco di [regole di riscrittura](history-rewrite.md#creare-regole-con-lia)
+nel vocabolario del pannello. **Prepara soltanto**: la risposta riempie il pannello, nulla viene
+mostrato in anteprima né applicato, e una voce inutilizzabile viene elencata con il motivo, mentre
+quelle valide vengono mantenute. Una regola Script non viene mai creata in questo modo. Se vuoi,
+vengono inviati anche l'ambito, i nomi dei branch e dei tag e gli autori dei commit più recenti
+(una casella, disattivata per impostazione predefinita, visibile nel riquadro di ciò che viene
+inviato). Il profilo e le istruzioni sono quelli di *Regole di riscrittura della cronologia* in
+Impostazioni > IA.
+
+## Contesto della revisione
+
+Una bozza di revisione del codice (`✦`, o `hosting review suggest`) legge il diff, il titolo, la descrizione e i
+commenti esistenti della richiesta. Può ricevere anche le convenzioni del progetto, in un blocco
+**Project conventions** posto prima del diff, e un agente locale può lavorare dentro il repository. I valori
+predefiniti sono:
+
+| Impostazione | Predefinito | Significato |
+|---|---|---|
+| `run_in_repository` | `profile` | `profile`: decide la *Cartella di lavoro* del profilo IA. `yes`: un agente locale viene eseguito nel repository per la revisione, qualunque cosa dica il profilo. `no`: non lì (un profilo impostato su *Repository* usa invece la cartella dedicata). I profili HTTP non hanno una cartella di lavoro, quindi per loro non cambia nulla. |
+| `include_claude_md` | attivo | Fornisce al modello il `CLAUDE.md` del repository. |
+| `include_agents_md` | attivo | Fornisce al modello l'`AGENTS.md` del repository. |
+| `extra_file` | nessuno | Un file in più: un percorso relativo alla radice del repository, un percorso assoluto o un link. |
+
+Si sovrappongono come le istruzioni, con la meglio la più specifica, campo per campo: prima la tabella globale
+`[ai.review]`, poi i valori propri del repository (un campo lasciato non impostato eredita), poi le scelte di una
+singola esecuzione. Un repository non clonato conserva i propri valori per `host/project` in
+`remote-reviews.toml`, accanto alle sue bozze di revisione.
+
+Un repository può anche **disattivare** il file in più globale: il suo `no_extra_file = true` (la casella
+**Nessun file in più** in *Impostazioni specifiche del repository > IA*, nella finestra delle opzioni di ✦ Revisione e
+il flag `--no-extra-file` di `ai review-context`) significa «nessun file in più per questo repository», qualunque cosa
+indichi `[ai.review]`. Un campo **File aggiuntivo** **vuoto** non è la stessa cosa: eredita il file globale. Un file
+del repository e l'interruttore si escludono a vicenda (impostare l'uno azzera l'altro), e l'interruttore vince se un
+file modificato a mano contiene entrambi. Un vecchio `extra_file = ""` di un repository significa ancora nessuno.
+
+Da dove vengono i file:
+
+- `CLAUDE.md`, `AGENTS.md` e un file in più con percorso relativo vengono letti dalla **radice** del repository
+  sul branch di destinazione della richiesta, mai dalla copia di lavoro (che può essere su un altro branch o
+  avere modifiche locali). Con un clone, dal commit base della richiesta; senza, dall'API dell'host.
+- Un percorso assoluto viene letto da questa macchina.
+- Un link a un file di un host di codice (GitHub `.../blob/<branch>/<path>`, GitLab `.../-/blob/<branch>/<path>`,
+  Gitea e Forgejo `.../src/branch/<branch>/<path>`, oppure un link raw) viene letto tramite il profilo di
+  integrazione il cui host corrisponde, così un repository privato funziona con il token che hai già fornito. Un
+  link che nessun profilo riconosce, o qualsiasi altro indirizzo, viene scaricato in modo anonimo. Un nome di
+  branch con una barra non può essere letto da un link: usa un percorso, oppure un link su un branch senza barra.
+- Un `CLAUDE.md` o `AGENTS.md` mancante viene saltato in silenzio; un file in più mancante viene segnalato
+  (`context.problems` nel JSON della CLI).
+- Ogni file viene tagliato a **8 KB** e i file insieme a **16 KB**, con una nota visibile
+  `[CLAUDE.md cut: showing ... of ... bytes]` in ciò che legge il modello.
+
+Quando un agente locale viene eseguito nel repository, il prompt gli dice che i file di cui è stato fatto il
+checkout potrebbero non corrispondere all'head della richiesta e che fa fede il diff.
+
+Nella vista di revisione, `s` apre la finestra **✦ Opzioni di revisione** con questi valori già compilati: quelli
+del repository sopra quelli globali. Modificali solo per questa esecuzione, oppure spunta *Salva come predefiniti
+di questo repository* per conservarli (vedi [Opzioni di revisione](review.md#opzioni-di-revisione)). I valori
+predefiniti si modificano anche in *Impostazioni > IA* (il blocco *Revisione del codice*, quattro righe) e, per
+repository, in *Impostazioni specifiche del repository > IA*, dove ogni riga può *usare il globale* e un pulsante
+*Torna al globale* elimina i valori propri del repository; la ricerca nelle Impostazioni li trova
+(`Includi AGENTS.md`, `File aggiuntivo`). Tutto ciò che non si è potuto dare al modello (un file in più mancante)
+o che è stato tagliato per rientrare nei limiti viene mostrato sulla scheda della bozza.
+
+Dalla riga di comando:
+
+```sh
+gitpoulpi ai review-context                      # i valori globali e ciò che riceve una revisione
+gitpoulpi ai review-context --agents-md off      # salva un valore predefinito globale
+gitpoulpi --repo ~/work/app ai review-context --claude-md off --context-file docs/REVIEW.md
+gitpoulpi ai review-context --project github.com/acme/app --context-file https://github.com/acme/rules/blob/main/review.md
+gitpoulpi ai review-context --repo ~/work/app --reset   # torna a seguire i valori globali
+gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.md --run-in-repo no
+```
+
+`ai review-context` non richiede alcun modello e funziona con l'IA disattivata. `ai prompt --action code_review`
+stampa il contesto effettivo come `review_context`. Le stesse quattro impostazioni sono `ai.review.*` in
+`config.toml` ([riferimento](config-reference.md#ai-ia-integrata-disattivata-per-impostazione-predefinita)).
+
+## Privacy
+
+- Non viene inviato nulla finché non premi un pulsante o esegui un comando.
+  Nessuna IA in background, nessuna telemetria, nessun account GitPoulpi.
+- Cosa viene inviato: il prompt (quello integrato, poi le tue istruzioni) e il
+  diff di cui hai chiesto, troncato a circa 60 KB (con una nota che lo dice);
+  per una pull request, anche gli oggetti dei commit del branch.
+- Una richiesta di script di riscrittura della cronologia invia la tua istruzione e il
+  contratto fisso dello script (l'API della sandbox degli script). Autore, data e
+  oggetto di al massimo 20 commit partono **solo** se spunti *Invia un campione* nella
+  finestra (disattivato di base; la CLI richiede `--sample N`). Il contenuto dei file e
+  i valori segreti non vengono mai inviati.
+- Va solo al profilo scelto per quell'azione: quell'host API, o lo stdin del tuo
+  comando di agente locale (che poi fa ciò che fa quell'agente).
+- Le chiavi API sono usate dal processo `gitpoulpi` stesso e non raggiungono mai
+  il demone, gli altri client della finestra o un client MCP.
+- Il testo generato non viene mai committato, inviato (push) né applicato da solo.
+
+## Risoluzione dei problemi
+
+| Sintomo | Rimedio |
+|---|---|
+| Nessuna `✦` da nessuna parte | L'IA è disattivata: *Impostazioni > IA > Attiva l'IA*. |
+| La `✦` è grigia | Non c'è nulla in stage (messaggio di commit). |
+| *Prova la connessione*: comando non trovato | Il **Comando** dell'agente locale non è nel `PATH` che vede GitPoulpi: avvia GitPoulpi dove `claude --version` funziona, oppure dai il percorso completo. |
+| Un agente locale si blocca o mostra una schermata interattiva | In modalità *Headless*, aggiungi la sua opzione headless (`-p` per Claude Code) agli **Argomenti**, oppure scegli di nuovo il suo **Tipo di agente** per ripristinare l'invocazione headless. La schermata interattiva è lo scopo della modalità *Interattiva (terminale virtuale)*. |
+| "Use "Open the agent"..." | L'agente ha posto una domanda del primo avvio (fidarsi della cartella, accedere). Usa **Apri l'agente...** sul profilo, rispondi, chiudi l'agente e riprova. |
+| Una richiesta in terminale virtuale va in timeout | Il messaggio termina con le ultime righe della schermata dell'agente: lì compare una richiesta di permesso, un accesso o una domanda di aggiornamento. Rispondi con **Apri l'agente...**, oppure aumenta il **Timeout**. |
+| `non riuscita:` 401 | Chiave sbagliata, o chiave di un altro provider: inseriscila di nuovo. |
+| `non riuscita:` 404 | Il **Modello** non esiste lì: cancellalo per usare quello predefinito. |
+| `non riuscita:` errore di connessione (Ollama, LM Studio) | Il server non è in esecuzione, oppure l'**URL di base** ha la porta sbagliata o non ha `/v1`. |
+| La chiave mostra `(non impostata)` dopo averla digitata | Nessun credential helper: configurane uno (`git config --global credential.helper ...`) e inseriscila di nuovo. |
+| Lingua o stile sbagliati | Aggiungi istruzioni; i chip *Inserimento rapido* dell'editor lo rendono rapido. |
+| Il compositore dice che il piano non è valido | Il modello ha saltato o ripetuto un file: riprova o usa un modello più potente. |
+
+## Vecchi file di configurazione
+
+Un vecchio `config.toml` con `[[ai.presets]]` e `[ai.defaults]` si carica ancora:
+
+- Il preset predefinito di ogni azione diventa il suo `[ai.actions.<action>]`
+  (`system_prompt` diventa `instructions`).
+- Ogni vecchio preset è conservato in `[[ai.legacy_presets]]`. Impostazioni > IA
+  li mostra sotto *Vecchi preset*, con *Elimina l'archivio*.
+- Il vecchio `[preferences.ai_presets]` di un repository diventa un override del
+  repository.
+
+Il prompt integrato ora viene sempre per primo. Se un vecchio prompt copiava un
+prompt integrato, rimuovi la parte copiata e tieni solo ciò che vuoi aggiungere.

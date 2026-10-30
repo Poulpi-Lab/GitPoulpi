@@ -1,0 +1,27 @@
+git_mode = [
+]
+
+local_mode = [
+  "ai_page.chip_task_context_text",
+  "autostash.banner_applied",
+  "autostash.banner_conflicted",
+  "autostash.banner_pop_failed",
+  "help_text.git_actions_then_10",
+  "help_text.git_actions_then_11",
+  "help_text.log_pane_commit_23",
+  "help_text.merge_conflict_editor_1",
+  "input.autostash_gone",
+  "input.autostash_selected",
+  "input.drop_autostash",
+  "input.drop_stash",
+  "input.drop_stash_final",
+  "input.popping_autostash",
+  "input.popping_stash",
+  "menu_ref.applying_stash",
+  "menu_ref.confirm_drop_stash",
+  "menu_ref.popping_stash",
+  "settings_general.external_merge_tool_help",
+  "settings_general.external_merge_tool_placeholder",
+  "typed_error.needs_autostash",
+  "typed_error.pending_autostash",
+]

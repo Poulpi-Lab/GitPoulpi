@@ -1,0 +1,541 @@
+[English](../config-reference.md) · [Čeština](../cs/config-reference.md) · [Deutsch](../de/config-reference.md) · [Español](../es/config-reference.md) · [Français](../fr/config-reference.md) · [Italiano](../it/config-reference.md) · [日本語](../ja/config-reference.md) · [한국어](../ko/config-reference.md) · [Nederlands](../nl/config-reference.md) · [Polski](../pl/config-reference.md) · [Português (Brasil)](../pt-BR/config-reference.md) · [Português (Portugal)](../pt-PT/config-reference.md) · [Русский](../ru/config-reference.md) · [Svenska](../sv/config-reference.md) · [Türkçe](../tr/config-reference.md) · **Українська** · [简体中文](../zh-CN/config-reference.md)
+
+# Довідник конфігурації
+
+Усі ключі `config.toml`, їхні типові значення та призначення. Вам рідко доводиться
+редагувати файл вручну: [екран Налаштувань](settings.md) (`Ctrl+,`) записує його
+щойно ви щось змінюєте, і `gitpoulpi config set` теж.
+
+## Де він лежить і як вибирається значення
+
+| | |
+|---|---|
+| Файл | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS). `gitpoulpi config path` виводить його шлях. |
+| Інша папка | `GITPOULPI_CONFIG_DIR=<dir>` переносить усю папку конфігурації (файл, `sessions/`, файли портів демона): портативне встановлення, тест або агент, якого тримають осторонь ваших власних налаштувань. |
+| Пріоритет | вбудоване типове значення, потім `config.toml`, потім змінна `GITPOULPI_*`, потім прапорець командного рядка. Перемагає найвищий. Хибне значення (помилка в написанні варіанта у файлі, некоректна змінна) - це помилка, яку ніколи не ігнорують мовчки. |
+| Змінні | Напишіть ключ великими літерами й замініть крапки на підкреслення: `general.auto_prune` стає `GITPOULPI_GENERAL_AUTO_PRUNE`. Лише для ключів, які GitPoulpi справді читає (не для позначених нижче як *не використовується*, і не для списків на кшталт `ui.log_columns_hidden`). |
+| Прапорці | `--backend git2\|system` перевизначає `general.default_backend` для демона, якого запускає ця команда. |
+| Токени й ключі | Ніколи не в цьому файлі. Токени хостингів і API-ключі ШІ потрапляють до системного помічника облікових даних (Git Credential Manager, libsecret / `pass`, Keychain); у файлі зберігається лише посилання (`token_ref`). Без помічника збереження токена завершується повідомленням про помилку, а токен живе лише до кінця сеансу. |
+
+```
+gitpoulpi config path                          # the file, and whether it exists yet
+gitpoulpi config get general.auto_stash        # the value, the layer it came from (default/file/env/flag), and whether anything reads it
+gitpoulpi --json config get ui                 # a whole section
+gitpoulpi config set general.auto_stash always # checked against the schema, then written
+```
+
+`config set` тримає файл розрідженим (лише ключі, які хтось задав) і зберігає ключі,
+про які його не питали, але видаляє коментарі. Він відмовляється від списків і цілих
+таблиць, окрім `keybindings.*` (кілька комбінацій через пробіл; порожнє значення
+скасовує прив'язку). `[[profiles]]`, `[[integrations]]` і `[[ai.profiles]]`
+редагуйте в Налаштуваннях або вручну.
+
+У таблицях **Перезапуск** означає, що значення читається під час запуску; усе
+решта застосовується одразу (або під час наступного оновлення, fetch чи закриття
+Налаштувань).
+
+## `[general]`
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `general.default_backend` | `"git2"` | `git2` (libgit2, з переходом на програму `git` для staging, merge, rebase, stash і мережі) або `system` (лише встановлений `git`). Запущений демон зберігає свій бекенд: **перезапустіть** його (`gitpoulpi daemon restart`). |
+| `general.auto_stash` | `"ask"` | Коли локальні зміни блокують checkout, pull, merge або rebase: `ask` (діалог у TUI; CLI і MCP завершуються помилкою й називають `--autostash`), `always` (stash, виконати, pop) або `never` (відмовити). Див. [Auto-stash](log-and-history.md#auto-stash). |
+| `general.include_untracked_in_autostash` | `false` | Auto-stash забирає також невідстежувані файли. |
+| `general.initial_commits_in_graph` | `5000` | Скільки commit'ів Log завантажує спочатку (щонайменше 500). Більше значення коштує пам'яті й часу малювання на величезних репозиторіях. |
+| `general.lazy_load_commits_in_graph` | `true` | Підвантажувати старіші commit'и, коли ви прокручуєте близько до кінця. Вимкнено: Log зупиняється на початковій кількості. |
+| `general.commits_per_lazy_page` | `1000` | Commit'ів на одну фонову сторінку (щонайменше 50). |
+| `general.max_commits_in_graph` | `100000` | Де зупиняється ліниве завантаження (приблизно 300 байтів на commit); `0` = без обмеження. |
+| `general.auto_fetch_interval_minutes` | `5` | Фоновий Fetch All кожні N хвилин, від 0 до 60; `0` = вимкнено. **Перезапуск.** |
+| `general.auto_fetch_interval_unit` | `"auto"` | Одиниця, в якій Налаштування показують інтервал: `minutes`, `hours` або `auto`. Лише для показу: інтервал завжди дорівнює `auto_fetch_interval_minutes` хвилин. `auto` (і конфіг без цього ключа) вибирає найбільшу одиницю, що ділить хвилини націло (60 читається як «1 година», 45 - «45 хвилин»); непридатна одиниця ігнорується. Налаштування пишуть обидва ключі; старіший GitPoulpi ігнорує одиницю й усе одно читає хвилини. |
+| `general.fetch_on_tab_open` | `true` | Fetch All під час відкриття вкладки (пропускається, якщо GitPoulpi робив fetch цього репозиторію менш ніж 60 с тому). |
+| `general.auto_prune` | `false` | Fetch'і також чистять віддалені гілки відстеження, яких уже немає. |
+| `general.auto_prune_tags` | `false` | Fetch також видаляє локальні tag'и, які видалив remote (лише ті, що були на ньому; tag, якого ви ніколи не надсилали, лишається). Git 2.41+. |
+| `general.hosting_refresh_minutes` | `5` | Оновлення списків pull request'ів / issue та чипа на панелі інструментів, від 0 до 120; `0` = лише на вимогу й за подіями. |
+| `general.hosting_refresh_unit` | `"auto"` | Одиниця, в якій Налаштування показують оновлення: `minutes`, `hours` або `auto`, читається так само, як `general.auto_fetch_interval_unit`. Лише для показу. |
+| `general.keep_submodules_up_to_date` | `false` | Після checkout або pull виконувати `git submodule update --init --recursive`, коли підмодуль відстав. Див. [Підмодулі](submodules.md). |
+| `general.default_branch_name` | `"main"` | Перша гілка репозиторію, створеного через Init; порожнє значення віддає вибір git. Нічого не перейменовує. |
+| `general.delete_orig_files_after_merge` | `false` | Після merge, який відбувся, видаляти резервні файли `*.orig`. |
+| `general.remember_tabs` | `true` | Відкривати вкладки минулого сеансу. Якщо вимкнено, запуск усередині репозиторію відкриває лише цей репозиторій, а запуск поза ним відкриває лише «Головну». **Перезапуск.** |
+| `general.radar_enabled` | `true` | [Radar](radar.md): його вкладка, команди палітри, `Alt+R` і фонове завантаження даних. Вимкнено: усе це приховано, і для нього нічого не завантажується. Застосовується одразу; у збірці без функції `radar` не показується. |
+| `general.startup_tab_in_repo` | `"current-repo"` | Вкладка, на якій відкривається запуск, коли папка, з якої його виконано, лежить усередині репозиторію: `"current-repo"` (вкладка цього репозиторію, за потреби відкрита), `"last"` (вкладка, активна під час останнього виходу), `"home"` або `"radar"`. Репозиторій, указаний через `--repo`, завжди відкриває власну вкладку. `"last"` відкриває «Головна» при вимкненому `remember_tabs` або якщо нічого не запам'ятовано; `"radar"` відкриває «Головна», якщо Radar вимкнено або його немає в збірці. Читається один раз при запуску; потрібен перезапуск. |
+| `general.startup_tab_outside_repo` | `"home"` | Вкладка, на якій відкривається запуск, коли папка, з якої його виконано, не є репозиторієм (наприклад, папка користувача): `"home"`, `"last"` або `"radar"`. `"last"` відкриває «Головна» при вимкненому `remember_tabs` або якщо нічого не запам'ятовано; `"radar"` відкриває «Головна», якщо Radar вимкнено або його немає в збірці. Читається один раз при запуску; потрібен перезапуск. |
+| `general.startup_tab_launcher` | `"last"` | Вкладка, на якій відкривається запуск, коли GitPoulpi запущено створеним ним ярликом на робочому столі або в меню «Пуск» (він передає `--launcher`), незалежно від папки: `"home"`, `"last"` або `"radar"`. Має пріоритет над двома налаштуваннями вище. `"last"` відкриває «Головна» при вимкненому `remember_tabs` або якщо нічого не запам'ятовано; `"radar"` відкриває «Головна», якщо Radar вимкнено або його немає в збірці. Читається один раз при запуску; потрібен перезапуск. |
+| `general.group_worktree_tabs` | `true` | Тримати вкладки пов'язаних worktree репозиторію одразу після вкладки цього репозиторію: коли відкривається worktree, коли вкладку worktree відтягують геть (вона повертається на місце поруч зі своєю групою; вкладка репозиторію - голова групи, а її worktree йдуть за нею) і коли налаштування вмикають. Вимкнено: вкладки лишаються там, де ви їх поставили. |
+| `general.undo_depth` | `100` | На скільки операцій назад може відкотити Скасувати; `0` = без обмежень. |
+| `general.conflict_detection` | `true` | Завчасне виявлення конфліктів: позначка в Log, коли злиття поточної гілки в гілку, від якої її створено, спричинило б конфлікт. Обчислюється у фоні (злиття в пам'яті: ваші файли, індекс і refs не змінюються). Репозиторій може вимкнути її для себе (`[preferences] conflict_detection`). Див. [Вирішення конфліктів merge](merge-conflicts.md#запобігання-конфліктам). |
+| `general.dev_mode` | відсутній (автоматично) | Для тих, хто збирає GitPoulpi з клонованого репозиторію; ніколи не показується в Налаштуваннях. Відсутній: увімкнено, коли запущений exe лежить у `<checkout>/target/<profile>/` (`Cargo.toml` і `crates/gitpoulpi-tui` поруч із `target`). `true` / `false` задає його примусово. Режим розробника відкриває лише `ui.launcher_build`. |
+| `general.journal_outside` | `true` | Записувати те, що оболонка чи ШІ-агент роблять з гілками, tag'ами, stash'ами та HEAD, як записи історії скасувань з позначкою «зовнішнє», щоб `Ctrl+Z` міг це відкотити. Зміни файлів ніколи не фіксуються. Потрібне `undo_enabled`. Див. [Скасування й повторення](undo-redo.md#зміни-зроблені-поза-gitpoulpi). |
+| `general.undo_enabled` | `true` | `false`: жодного обліку для скасування (найшвидше), історію скасувань стирають, кнопки Скасувати/Повторити зникають. Див. [Скасування й повторення](undo-redo.md). |
+| `general.active_profile` | `""` | Ідентифікатор профілю з `[[profiles]]`, від імені якого створюються commit'и. Порожньо, або профіль із порожнім іменем чи e-mail: `user.name` / `user.email` git. |
+| `general.external_editor` | `""` | Команда для пункту файлу, що відкриває його в редакторі, напр. `code -r {file}`. Порожньо: VS Code, якщо встановлено, інакше програма системи за замовчуванням. |
+| `general.external_diff_tool` | `""` | Команда для «Відкрити в зовнішньому diff-інструменті»: `{local}` (версія commit'у / HEAD), `{remote}` (версія робочого дерева / індексу). Порожньо: `git difftool --no-prompt`. |
+| `general.external_merge_tool` | `""` | Команда для «Відкрити в зовнішньому інструменті merge» на картці конфлікту (двійковий, LFS або надто великий файл): `{base}`, `{local}` (A, поточне), `{remote}` (B, вхідне) і `{merged}` (файл, у який інструмент пише результат; GitPoulpi додає його в індекс, коли інструмент завершується успішно). Порожньо: `git mergetool --no-prompt`. |
+| `general.file_explorer` | залежно від ОС | Команда для «Показати в папці»: `{path}` (файл), `{dir}` (його папка). Типово: `explorer.exe /select,"{path}"`, `open -R "{path}"`, `xdg-open "{dir}"`. |
+
+Три шаблони команд спершу розбиваються на аргументи (`"..."` групує слово), і лише
+потім підставляються заповнювачі, тож шляхи з пробілами залишаються одним аргументом.
+Оболонка не задіяна.
+
+```toml
+[[profiles]]                # commit identities (Settings > Profiles)
+id = "work"
+name = "Work"
+author_name = "Jane Doe"
+author_email = "jane@work.example"
+```
+
+## `[ui]`
+
+**Log і граф**
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `ui.graph_renderer` | `"auto"` | `auto` (зображення там, де термінал вміє його малювати, інакше символи), `image`, `text`. **Перезапуск.** |
+| `ui.image_protocol` | `"auto"` | Як зображення (граф, аватари) потрапляють до терміналу: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = протокол Kitty в kitty, Ghostty і herdr із `kitty_graphics = true`; iTerm2 у WezTerm, iTerm2, Rio, mintty; sixel (лише аватари) у Windows Terminal, foot, Konsole, mlterm; нічого в tmux, zellij, screen і невідомих терміналах. **Перезапуск.** |
+| `ui.theme` | `"system"` | Кольорова тема: вбудований slug (`gitpoulpi theme list` показує їх усі), slug файлу в `<config>/themes/` або `system` (залежить від світлого чи темного тла терміналу, яке визначається під час запуску; старе значення `default` означає те саме). `config set` відхиляє невідомі назви. Див. [Теми](themes.md). |
+| `ui.graph_color_theme` | `"theme"` | Палітра доріжок: `theme` (брати з теми) або будь-яка назва палітри доріжок: `gitpoulpi`, `light`, `material`, `serie` та палітри інших тем. |
+| `ui.graph_lane_background` | `"off"` | `off` або `row_tint` (ледь помітна смуга кольору доріжки за графом плюс планка на її краю). **Застосунок: перемкнути підсвітку рядків графа** (`Ctrl+N Shift+T`) перемикає це; **Застосунок: змінити колірну тему графа...** (`Ctrl+N Shift+Y`) вибирає `ui.graph_color_theme`. |
+| `ui.graph_row_tint_strength` | `"medium"` | `strong`, `medium`, `subtle` (лише з `row_tint`). |
+| `ui.toolbar_position` | `"bottom"` | `top`, `bottom`, `left`, `right`. `left` і `right` малюють колонку; вікно вужче за 80 стовпців повертається до `bottom`. |
+| `ui.toolbar_align` | `"start"` | `start`, `center`, `end`: де стоять кнопки вздовж панелі (ліворуч, по центру, праворуч у рядку; угорі, по центру, внизу в колонці). |
+| `ui.toolbar_pr_pinned` | `true` | Кнопка pull request закріплена на дальньому кінці панелі інструментів; `false` залишає її серед інших кнопок. |
+| `ui.statusbar_position` | `"bottom"` | `top` (над вкладками репозиторіїв) або `bottom`. |
+| `ui.tabs_position` | `"top"` | `top`, `bottom` (останній рядок вікна, під рядком стану) або `left` (колонка біля лівого краю; за ширини менше 80 стовпців лишається вгорі). |
+| `ui.graph_show_stashes` | `true` | Рядок на кожен stash у Log. |
+| `ui.ref_connector` | `true` | Тонка лінія від мітки ref до її commit'у. |
+| `ui.column_resize` | `"line"` | Як захоплюється межа стовпця в Log, Radar і стовпці commit'ів у поданнях diff, файлу та blame. `line`: кожна межа - це проміжок в одну клітинку з маленькою позначкою в заголовку; поки курсор на межі, у заголовку чи будь-де вниз по таблиці, на всю висоту малюється тонка акцентна лінія, і перетягування з будь-якої її точки змінює ширину. `header`: без проміжку й позначки; перший символ комірки заголовка після межі підсвічується, і перетягування звідти змінює ширину (лише із заголовка). Клавіші зміни ширини й рядки палітри однакові в обох режимах. |
+| `ui.ref_tree` | `true` | Групувати гілки й tag'и за `/` у папки на бічній панелі Refs (перемикає `y`). |
+| `ui.graph_ghost_ref` | `true` | Стовпець Ref журналу показує блідий значок із назвою гілки (інакше віддаленої гілки), до якої належить commit під курсором, якщо у commit'а немає власного ref і у стовпці вистачає місця; ніколи tag. Видалена гілка виводиться з теми merge-commit'а, що її злив, і малюється закресленою. Якщо навести курсор на значок, видно його тип. |
+| `ui.reveal_on_ref_click` | `true` | Одинарне клацання по ref (гілка, tag, віддалена гілка, stash) на панелі Refs прокручує Log до його commit'у й підсвічує рядок; вибір commit'у не зсувається. |
+| `ui.log_wip_counts_in_message` | `true` | Кількість змін WIP у повідомленні WIP, поки стовпець Changes сховано. |
+| `ui.log_columns_hidden`, `ui.log_columns_order`, `ui.log_column_widths` | порожньо | Стовпці Log (`ref`, `graph`, `message`, `author`, `date`, `sha`, `changes`), записуються, коли ви ховаєте, перетягуєте чи змінюєте розмір стовпця. `message` сховати не можна. |
+| `ui.commit_column_columns_visible`, `ui.commit_column_columns_order`, `ui.commit_column_columns_widths` | порожньо | Частини [стовпця commit'ів](interface-tour.md#стовпець-commitів) поруч із diff, окремо від частин Log: показані частини за назвою (`ref`, `graph`, `message`, `author`, `date`, `changes`, `sha`; порожньо означає доріжки, повідомлення, автора й дату), їхній порядок зліва направо за тими самими назвами (порожньо означає щойно наведений порядок; пропущена назва йде далі в цьому порядку) та перетягнуті ширини в клітинках на частину (пропущена частина має автоматичну ширину); записуються, коли ви вибираєте, переміщуєте частини чи змінюєте їхній розмір. `message` сховати не можна. Файл сесії, записаний до появи цих ключів, один раз зчитується в них. |
+| `ui.sidebar_sections_hidden` | порожньо | Розділи лівої панелі, які ви сховали (`local`, `remote`, `worktrees`, `stashes`, `tags`, `pull_requests`, `issues`, `submodules`); записується з контекстного меню панелі або з палітри. Принаймні один наявний розділ завжди лишається видимим. Це типове значення: кожен репозиторій може сховати власні розділи (зберігається в його файлі стану), а цей ключ діє для репозиторію без власного вибору; його записує «Використати для всіх репозиторіїв». |
+| `ui.sidebar_sections_scope` | `"repository"` | Чий вибір визначає розділи лівої панелі: `repository` (кожен репозиторій має власний, а `ui.sidebar_sections_hidden` править за типовий) або `global` (кожен репозиторій показує `ui.sidebar_sections_hidden`, і зміна записується туди). Перемикання не втрачає жодного з наборів: вибори окремих репозиторіїв лишаються в їхніх файлах стану, поки ввімкнено `global`. Налаштування: *Розділи лівої панелі*. |
+| `ui.language` | `"auto"` | Мова інтерфейсу: `auto` (локаль системи, інакше англійська), `en`, `fr`, `es`, `pt-BR`, `pt-PT`, `it`, `de`, `zh-CN`, `ja`, `ko`, `ru`, `uk`, `pl`, `cs`, `nl`, `sv`, `tr`. **Наживо.** `GITPOULPI_LANG` перевизначає її. Мова, якої немає в цій збірці, показується англійською. **Застосунок: змінити мову...** (`Ctrl+N g`) теж її задає, з попереднім переглядом наживо. Вивід CLI і MCP залишається англійським. |
+| `ui.translate_git_terms` | `false` | `false`: commit, push, pull, stash, tag... залишаються англійськими в усіх мовах. `true`: власна лексика git вибраної мови (українською «надсилання», «схованка», «тег»...). **Наживо.** |
+| `ui.git_terms_english` | `false` | Лише ja, ko і zh-CN: показувати англійські слова git (stage, unstage, staged, unstaged...) замість їхньої транскрипції. Не діє, поки `ui.translate_git_terms` має значення `true`. **Наживо.** |
+| `ui.mouse_enabled` | `true` | `false` залишає мишу (і виділення тексту) терміналу. **Перезапуск.** |
+| `ui.mouse_scroll_lines` | `3` | Рядків Log на один крок коліщатка, від 1 до 20. **Перезапуск.** |
+| `ui.kitty_keyboard` | `"auto"` | `auto` просить у терміналу протокол клавіатури kitty (щоб працювали `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N`); `off` ніколи не просить. **Перезапуск.** |
+| `ui.logo_color` | `""` | Колірна гама логотипа у вікні «Про GitPoulpi», slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); порожнє або невідоме значення означає типове для збірки (`lavender`). Записується, коли ви клацаєте логотип або вибираєте колір у вікні «Про GitPoulpi». |
+
+**Аватари** (типово вимкнено; увімкнення надсилає Gravatar SHA-256-хеш e-mail авторів
+і запитує ваш підключений обліковий запис GitHub/GitLab)
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `ui.avatars` | `"off"` | `graph` (у колі commit'у на графі-зображенні), `author` (у стовпці Author), `off`. Старий `ui.show_avatars` (`true`) і далі читається як `author`, поки `ui.avatars` відсутній. |
+| `ui.avatar_sources` | `"gravatar_hosting"` | Порядок пошуку: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Хост GitLab опитується лише через підключений профіль. |
+| `ui.avatar_fallback` | `"identicon"` | `identicon` (генерується локально) або `initials`. На терміналі без протоколу зображень завжди використовується значок з ініціалами. |
+
+**Показ diff і редактора**
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `ui.diff_layout` | `"inline"` | `inline` або `split` (`m` у diff). |
+| `ui.diff_hunks_only` | `true` | `false` показує весь файл зі змінами на місці (`H`). |
+| `ui.diff_show_whitespace` | `true` | Показувати зміни, що стосуються лише пробілів (`s`). |
+| `ui.diff_word_wrap` | `false` | Переносити довгі рядки diff (`w`; Налаштування > Diff і редактор). |
+| `ui.minimap` | `false` | Мінікарта біля смуги прокрутки diff і редактора (`M`). |
+| `ui.mermaid_detail` | `refs` | Деталізація «Копіювати як Mermaid gitGraph» у Log: `structure`, `refs`, `subjects`, `full` (запам'ятовується з вікна; типове значення `log --format mermaid`). |
+| `ui.mermaid_orientation` | `lr` | Напрямок цього графа: `lr` (зліва направо) або `tb` (зверху вниз). |
+| `ui.mermaid_fence` | `false` | Огорнути скопійований скрипт Mermaid у блок коду `mermaid`. |
+| `ui.mermaid_subject_width` | `40` | Заголовки commit'ів обрізаються до цієї кількості символів в id Mermaid (`subjects`, `full`). |
+| `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` або `16`: скількома кольорами малювати. `auto` - це truecolor, окрім Apple Terminal (256), консолі Linux (16) і терміналів `*-256color` без `COLORTERM` (256). Наживо. Див. [Теми](themes.md). |
+| `ui.input_color` | `"theme"` | Тло текстового поля: `theme` (власне тло теми), `gray`, `blue`, `slate`, `dark`, `custom`. |
+| `ui.input_color_custom` | `"#2a2a2a"` | Колір `custom`, `#rrggbb`. |
+| `ui.composer_files` | `"expanded"` | Композер commit'ів ШІ відкривається з файлами кожної пропозиції `expanded` (розгорнутими) або `collapsed` (згорнутими). |
+| `ui.blame_side` | `"right"` | З якого боку вигляду Blame колонка анотацій (аватар, автор, вік, опис): `right` (типово) або `left`. |
+| `ui.blame_width` | `46` | Ширина колонки анотацій Blame в клітинках (від 24 до 90). Потягніть її межу або натисніть `<` / `>` у вигляді Blame; нова ширина зберігається тут. |
+| `ui.pr_terminology` | `"auto"` | `auto` (Pull Request на GitHub, Merge Request на GitLab), `pull_request`, `merge_request`. |
+| `ui.hide_finished_pr_chip` | `true` | Ховає чип панелі інструментів з останнім запитом на злиття поточної гілки, щойно його закрито або злито; натомість показується тьмяний чип «+ PR» (почати новий), так ніби в гілки його немає. `false`: чип завжди показує останній запит, незалежно від його стану. |
+
+Перемикачі diff, які ви змінюєте всередині diff, одразу зберігаються тут і
+використовуються в кожному diff, відкритому надалі.
+
+**Дати**: `ui.date_format` (`"YYYY-MM-DD"`, стовпець дати Blame / Історії файлу),
+`ui.date_time_format` (`"YYYY-MM-DD HH:mm"`, стовпець Date у Log) і
+`ui.date_verbose_format` (`"D MMMM YYYY HH:mm"`, подробиці commit'у, підказка
+стовпця Date і *Copy > Date*). Токени: `YYYY` `YY` `MMMM` `MMM` `MM` `M` `DD` `D`
+`dddd` `ddd` (день тижня, повна / скорочена форма) `HH` `mm` `ss`; усе інше
+копіюється як є. Назви місяців і днів тижня відповідають `ui.language`, а місяць,
+записаний після номера дня, стоїть у родовому відмінку там, де мова його має
+(російська, українська, польська, чеська). Послідовність `D MMMM YYYY` пишеться
+японською, китайською та корейською з року (`2024年3月5日`). `ui.date_locale`
+(`"system"` - типово, або `"english"`) залишає назви англійськими незалежно від мови.
+
+**Агенти, термінали та папка вкладки**
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `ui.allow_agent_view_control` | `true` | Чи приймає вікно `ui show` / `ui propose` від агентів узагалі (Налаштування > Агенти й MCP > *Дозволити ШІ-агентам керувати виглядом*). Вимкнено - жоден агент до нього не дістанеться. Див. [MCP та агенти](mcp-and-agents.md#показ-речей-користувачеві). |
+| `ui.launch` | `"off"` | Чи може агент відкрити вікно GitPoulpi, коли жодного не відкрито: `off`, пресет (`kitty`, `foot`, `alacritty`, `wezterm`, `wezterm-tab`, `ghostty`, `gnome-terminal`, `xdg-terminal-exec`, `windows-terminal`, `windows-terminal-tab`, `tmux`, `zellij`, `cmux`) або `custom`. |
+| `ui.launch_command` | `""` | Шаблон `custom`: `{repo}`, `{session}`, `{gitpoulpi}`. Розбивається на аргументи, без оболонки. |
+| `ui.tab_dir_follow` | `"buttons"` | `buttons` (рядок вкладок пропонує *Вийти й cd сюди*) або `auto` (кожен вихід змінює папку оболонки, а нова вкладка запускає типовий пункт *Відкрити в*). Див. [Стеження за папкою вкладки](following-the-tab-folder.md). |
+| `ui.terminal_launch` | `"auto"` | Застаріле, див. нижче та [Відкрити в](open-in.md). Як старий *Термінал тут* відкривав термінал: `auto` (пресет `ui.launch`, інакше `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), пресет або `custom`. |
+| `ui.terminal_launch_command` | `""` | Шаблон `custom`; `{repo}` - це папка. |
+| `ui.open_in` | *(відсутній)* | Список [Відкрити в](open-in.md): масив таблиць `[[ui.open_in]]` із `label` і `command`. Відсутній означає «ще не налаштовано»: список обчислюється зі застарілих ключів `ui.terminal_launch*` (значення, відмінне від `auto`, стає першим пунктом), файлового провідника ОС, мультиплексорів і терміналів, виявлених у середовищі (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...), та редакторів, знайдених у `PATH`. Перше збереження з Налаштувань записує список. `open_in = []` - порожній список. Не задається через `config set` (редагуйте файл). |
+| `ui.open_in_default` | `""` | Мітка пункту, який запускає «Відкрити в типовому»; порожнє або невідоме значення означає перший пункт. |
+| `ui.launch_terminal` | `"auto"` | Термінал, у якому ярлики (Налаштування > Загальні > Лаунчер) і перезапуск у Windows відкривають GitPoulpi. `auto` вибирає з установлених (Windows: Windows Terminal, інакше WezTerm, Alacritty, звичайна консоль; Linux: `xdg-terminal-exec`, інакше перший знайдений термінал; macOS: iTerm2, Ghostty, WezTerm або kitty, якщо встановлено, інакше Terminal), `default` - термінал системи, або id терміналу, наприклад `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal`. |
+| `ui.launcher_build` | `"current"` | Лише в режимі розробника (див. `general.dev_mode`; лише тоді показується в Налаштування > Загальні > Лаунчер, інакше ігнорується). `"current"`: ярлики й псевдонім команди запускають збірку, яка їх створила. `"newest"`: вони запускають найновішу збірку з `target/dist` і `target/release` клонованого репозиторію, вибрану під час кожного клацання, і запуск будь-якої з них ніколи їх не переписує. |
+| `ui.command_alias` | `""` | Назва команди, що запускає GitPoulpi з терміналу, наприклад `gp` (Налаштування > Загальні > Лаунчер, `gitpoulpi alias create`). Порожньо: немає. Лише літери, цифри, `-`, `_` і `.`. Це лише ім'я, яке використовує кнопка **Створити псевдонім команди**; доки ви його не створите, нічого не існує. |
+| `ui.command_alias_add` | `""` | Назва другої команди, наприклад `gpa`, що виконує `gitpoulpi --add`: вона відкриває поточну теку новою вкладкою вже запущеного GitPoulpi (Налаштування > Загальні > Лаунчер, `gitpoulpi alias create gpa --add`). Порожньо: немає. Ті самі правила імені; створюється разом із `ui.command_alias` кнопкою **Створити**. |
+| `ui.relaunch_in_terminal` | `true` | Лише Windows: якщо exe запущено подвійним клацанням у власній консолі, GitPoulpi відкривається знову в `ui.launch_terminal` і завершується. Вимкнено: залишається в цій консолі. |
+| `ui.reuse_window` | `true` | Клацання ярлика GitPoulpi (`gitpoulpi launch`) показує вікно вже відкритого GitPoulpi замість запуску ще одного. Вимкнено: кожне клацання запускає нове вікно. |
+
+**Команди `ui.open_in`** спершу розбиваються на аргументи (пробіли, `'...'`, `"..."`), а потім змінні підставляються всередині кожного аргументу, тож папка з пробілами залишається одним аргументом; оболонка не задіяна, якщо тільки команда сама її не запускає (`sh -c '... "$GITPOULPI_CWD"'`). Змінні: `${cwd}` (папка вкладки), `${repo}` (корінь репозиторію), `${name}` (назва папки без шляху), `${branch}` (порожня при відокремленому HEAD), `${web_url}` (вебсторінка віддаленого репозиторію `origin`, коли це проєкт GitHub або GitLab, інакше порожня; пункт, що її використовує, відмовляється запускатися, коли вона порожня), `${env:NAME}` (порожня, якщо не задано). Старе `{repo}` і далі означає `${cwd}`. Будь-яке інше `${...}` - це помилка з його назвою. Приклад:
+
+```toml
+[ui]
+open_in_default = "Herdr: new tab"
+
+[[ui.open_in]]
+label = "Herdr: new tab"
+command = "herdr tab create --workspace ${env:HERDR_WORKSPACE_ID} --cwd ${cwd} --focus"
+
+[[ui.open_in]]
+label = "VS Code"
+command = "code ${cwd}"
+```
+
+Застаріле: `ui.terminal_launch` і `ui.terminal_launch_command` ще читаються (вони наповнюють список, поки `ui.open_in` відсутній: `custom` стає «Terminal (custom)» із `{repo}`, переписаним на `${cwd}`, ідентифікатор пресета стає цим пресетом), але їх витіснив `ui.open_in`.
+
+### Зображення
+
+| Ключ | Типово | Значення |
+|---|---|---|
+| `ui.image_view` | `true` | Показувати двійковий файл, що є зображенням (PNG, JPEG, GIF, WebP, BMP, ...), як картинку у вигляді Diff і File View. Вимкнено: звичайне повідомлення про двійковий файл. |
+| `ui.image_view_max_mib` | `32` | Більші за це (МіБ) зображення не декодуються; натомість показується інформаційна картка. |
+| `ui.image_view_max_unit` | `"auto"` | Одиниця, в якій Налаштування показують ліміт: `mib`, `gib` (1024 МіБ) або `auto`. Лише для показу: ліміт завжди дорівнює `image_view_max_mib` МіБ, від 1 до 1024. |
+| `ui.image_view_text_fallback` | `"halfblock"` | У терміналі без протоколу зображень: `halfblock` (кольорові символи напівблоків) або `card` (лише інформаційна картка). |
+| `ui.image_view_pixelated_from` | `"2x"` | Масштаб, починаючи з якого збільшення показує квадратні пікселі замість згладжування: `1x`, `2x`, `never`. |
+| `ui.image_view_sync` | `true` | Панелі «до» і «після» мають спільний масштаб і позицію прокрутки. |
+| `ui.image_editors` | *(відсутній)* | Редактори зображень для «Редагувати в»: масив таблиць `[[ui.image_editors]]` із `label` і `command`. Відсутній означає «ще не налаштовано»: список - це редактори, виявлені на цій машині (програми в `PATH`, встановлення Flatpak, відомі папки встановлення у Windows, `/Applications` у macOS), потім типовий застосунок ОС. Перше збереження з Налаштувань записує список. `image_editors = []` - порожній список. Не задається через `config set` (редагуйте файл). |
+| `ui.image_editor_default` | `""` | Мітка редактора, який запускає «Редагувати в типовому»; порожнє або невідоме значення означає перший пункт. |
+
+**Команди `ui.image_editors`** спершу розбиваються на аргументи (пробіли, `'...'`, `"..."`), а потім змінні підставляються всередині кожного аргументу, тож шлях з пробілами залишається одним аргументом; оболонка не задіяна. Змінні: `${file}` (абсолютний шлях до зображення), `${dir}` (його папка), `${name}` (його назва файлу), `${repo}` (корінь репозиторію, порожня для тимчасової копії), `${env:NAME}` (порожня, якщо не задано). Будь-яке інше `${...}` - це помилка з його назвою. Зображення, що не є файлом робочого дерева (версія commit'у, індекс, видалений файл), відкривається як **тимчасова копія лише для читання**, тож редактор не може зачепити репозиторій. Редактори без командного рядка (Affinity Photo з Microsoft Store, деякі встановлення Photoshop) у пресетах відсутні: напишіть власний пункт. Приклад:
+
+```toml
+[ui]
+image_editor_default = "GIMP"
+
+[[ui.image_editors]]
+label = "GIMP"
+command = "gimp ${file}"
+
+[[ui.image_editors]]
+label = "Paint.NET"
+command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
+```
+
+**Поки не використовуються** (приймаються, зберігаються, але їх ніщо не читає):
+`ui.graph_colorization` (прибрано з Налаштувань;
+під час завантаження ще приймається), `ui.date_word_format` (прибрано з Налаштувань;
+під час завантаження ще приймається). Старий `ui.diff_view_mode`
+читається один раз як `diff_layout` / `diff_hunks_only`.
+
+## `[editor]`
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `editor.tab_size` | `4` | Стовпців на позицію табуляції, від 1 до 8 (редактор і diff). |
+| `editor.eol` | `"auto"` | Кінець рядка, який записує вбудований редактор: `auto` (зберегти кінець рядка файлу), `lf`, `crlf`. |
+| `editor.syntax_highlighting` | `true` | Кольори мови в редакторі. |
+| `editor.line_numbers` | `true` | Номери рядків у редакторі та diff. |
+| `editor.follow_selection` | `true` | Поки редактор відкрито, вибір іншого файлу в правій панелі відкриває його й у редакторі, попередньо запропонувавши зберегти незбережені зміни. Файл, який не можна редагувати, відкривається у звичайному вигляді; файл commit'а виводить з редактора до свого diff. |
+
+## `[merge]`
+
+Редактор конфліктів merge ([Вирішення конфліктів merge](merge-conflicts.md)). Його показує Налаштування > Diff і редактор.
+
+| Ключ | Типово | Значення |
+|---|---|---|
+| `merge.side_by_side_min_width` | `100` | Ширина області редактора в стовпцях, починаючи з якої A і B показуються поруч (довгі рядки прокручуються вбік: Shift+коліщатко, Shift+стрілки). Вужче - він показує по одному боку за раз під вкладками. `40` - найменше значення, `0` означає завжди поруч (повідомлення для менш ніж 40 стовпців залишається). Поки редактор відкритий, він ховає панелі Refs і Status, тож його область зазвичай дорівнює всьому вікну. |
+
+## `[git]`, `[credentials]`, `[ssh]`
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `git.pull_mode` | `"merge"` | Що робить Pull (кнопка, `Ctrl+G p`, `Git: Pull`): `merge` (fast-forward, коли можливо), `ff_only`, `rebase`. Завжди явно передається git. Старе `fetch_all` читається як `merge`. |
+| `git.push_behavior` | `"direct"` | `direct` надсилає на типовий remote; `ask` спершу показує меню remote'ів. |
+| `git.default_encoding` | `"utf-8"` | Кодування для тексту, що **не** є коректним UTF-8 (вміст файлів, blame, diff, повідомлення commit'ів без заголовка `encoding`): будь-яка мітка WHATWG (`windows-1252`, `shift_jis`, ...). Лише для показу; staging ніколи не перекодовує. Репозиторій може його перевизначити. |
+| `git.lfs_enabled` | `true` | Показувати Git LFS і керувати ним. Репозиторій може це перевизначити. Див. [Git LFS](lfs.md). |
+| `git.lfs_autofix_filters` | `true` | Перед pull або push репозиторію, що використовує LFS, встановлювати його фільтри LFS / хук pre-push (`git lfs install --local`, лише цей репозиторій), якщо їх немає. Див. [Git LFS](lfs.md). |
+| `git.autocrlf`, `git.eol` | `"unset"`, `"native"` | *Не використовуються*: `core.autocrlf` / `core.eol` репозиторію - це власні налаштування git, їх редагують у Налаштування > Git і кодування (або `gitpoulpi repo-config`). |
+| `credentials.https_mode` | `"credential_helper"` | Автентифікація HTTPS для fetch, pull, push, clone: `credential_helper` (git), `prompt` (ігнорувати помічників; git питає в терміналі, тож у фоновому демоні це не спрацює), `none` (лише публічні remote'и). Старі значення `encrypted_file` читаються як `credential_helper`. |
+| `ssh.key_type` | `"ed25519"` | Тип, який створює *Згенерувати пару ключів*: `ed25519`, `rsa` (4096 біт), `ecdsa` (NIST P-256); файл називається `gitpoulpi_<type>`. Сам SSH завжди використовує ваш ssh-agent і конфіг ssh. |
+| `ssh.private_key_path`, `ssh.public_key_path` | не задано | Записуються *Згенерувати пару ключів*. Коли задано `ssh.private_key_path`, fetch, pull, push і clone запускають git із `GIT_SSH_COMMAND=ssh -i "<key>" -o IdentitiesOnly=yes`; `ssh.public_key_path` робить те саме (ssh вибирає відповідний ключ агента), коли приватний шлях порожній. `GIT_SSH_COMMAND`/`GIT_SSH` у середовищі або `core.sshCommand` у конфігу git (прив'язка до репозиторію, `gitpoulpi ssh-command set --key`) мають перевагу. Читається перед кожною передачею, тож зміни діють уже наступного разу. |
+
+## `[[integrations]]` (хостинги й трекери issues)
+
+Записується через Налаштування > Інтеграції або `gitpoulpi hosting integrations add`.
+Кожен вид має клієнт (лише персональні токени, без OAuth).
+
+```toml
+[[integrations]]
+id = "corp"                         # what --id takes; the token is stored under integration:corp
+kind = "gitlab_self_managed"        # github | github_enterprise | gitlab | gitlab_self_managed | ...
+url = "https://gitlab.example.com"  # the API root is derived from it
+token_ref = "integration:corp"      # a reference, never the token
+name = "Corp GitLab"                # optional display name
+account = "me@example.com"          # optional, see below
+enabled = true                      # false: ignored for host matching
+```
+
+Власний сервер може працювати через звичайний http: `url = "http://localhost:3000"`
+зберігається так, як введено (схема й порт потрапляють у кожен запит, а remote на
+цьому хості відповідає профілю). Токен, надісланий через звичайний http,
+передається без шифрування, тож використовуйте http лише в локальній або
+довіреній мережі.
+
+`kind` також приймає `azure_devops`, `azure_devops_server`, `bitbucket`,
+`bitbucket_data_center`, `jira_cloud`, `jira_data_center`, `trello`, `gitea`, `forgejo`, `linear`, `youtrack`, `redmine` і `gerrit`
+(Gitea і Forgejo мають один клієнт; профіль Forgejo типово має `https://codeberg.org`). Jira,
+Trello, Linear, YouTrack і Redmine - лише трекери issues; Gerrit - лише для рев'ю (його зміни - це
+pull requests, issues у ньому немає). Bitbucket Cloud трекера issues не має.
+
+`account` - це несекретна ідентичність поряд із токеном, порожня й пропущена для
+більшості видів: e-mail облікового запису Atlassian для `jira_cloud` і `bitbucket`
+(порожній обліковий запис Bitbucket означає токен доступу робочого простору або
+репозиторію, що надсилається як Bearer), ключ API для `trello`, ім'я користувача для `gerrit` (токен - це його пароль HTTP,
+що надсилається як базова автентифікація HTTP). Єдиним секретом
+залишається сам токен. Для `azure_devops` `url` має вигляд
+`https://dev.azure.com/<organization>`; URL `https://<organization>.visualstudio.com`
+читається як та сама організація. Для `azure_devops_server` це корінь колекції,
+наприклад `https://tfs.example.com/tfs/DefaultCollection`.
+
+`user` (підключений обліковий запис) і `ssh` (вибір ключа профілем) записуються
+за вас. Токен береться з `GITPOULPI_TOKEN_<ID>` (id великими літерами, небуквено-цифрові
+символи замінено на `_`), інакше зі збереженого токена, інакше від вашого помічника облікових даних
+для цього хоста, коли його використовує лише один профіль (лише профілі GitHub і GitLab:
+інші види помічника облікових даних не читають). Подробиці: [Інтеграції з хостингами
+та трекерами issues](hosting-integration.md). Стара таблиця `[[hosting]]` *не використовується*.
+
+Для `local_markdown` (папка нотаток Markdown як джерело issues) `url` - це
+папка, відносна до кожного репозиторію або абсолютна, а токена немає. Її
+необов'язкова таблиця `[integrations.local]` задає `statuses` (порядок колонок дошки,
+типово `todo`, `doing`, `done`), `done_status` (типово `done`),
+`reference_prefix` (`LOC` показує `LOC-12`) і `me` (що означає «призначені мені»).
+Див. [Локальні issues і Obsidian](local-issues.md).
+
+### `[integrations.radar]` (списки на рівні облікового запису)
+
+Необов'язкова таблиця профілю code-host (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket Data Center, Gerrit; не Bitbucket Cloud). Відсутня
+означає, що кожен ключ вимкнено. Записується командою `gitpoulpi hosting integrations radar`; читається
+`gitpoulpi hosting radar` і Radar, а змінюється в Налаштування > Інтеграції (блок Radar підключеного профілю).
+
+```toml
+[integrations.radar]
+review_requests = true    # requests waiting for my review, every repository
+open_requests = false     # every open request of my namespaces
+include_drafts = false    # keep draft requests in these lists
+assigned_issues = true    # open issues assigned to me, every repository
+namespaces = ["acme"]     # orgs / groups to search for open requests
+review_mode = "ask"       # ask | clone | api
+```
+
+| Ключ | Типово | Значення |
+|---|---|---|
+| `review_requests` | `false` | Відкриті запити, що просять вашого рев'ю, незалежно від того, клоновано репозиторій чи ні |
+| `open_requests` | `false` | Усі відкриті запити вашого власного простору імен і кожної організації чи групи, до якої ви належите (або з `namespaces`), ніколи не «усе, що бачить токен» |
+| `include_drafts` | `false` | Запити-чернетки пропускаються в цих списках, якщо це не ввімкнено |
+| `assigned_issues` | `false` | Відкриті issues, призначені вам, у всіх репозиторіях |
+| `namespaces` | `[]` | Організації / групи, де шукати для `open_requests`; порожньо означає ваш власний простір імен плюс усі членства (GitHub: шукається не більше 12, GitLab: 10 груп і 10 власних проєктів, Gitea, Forgejo і Gerrit: 10; Azure DevOps бере назви проєктів, Bitbucket Data Center - ключі проєктів, Gerrit - префікси шляхів проєктів) |
+| `review_mode` | `"ask"` | Що робить рев'ю запиту, чий репозиторій не клоновано: `ask`, `clone` (клонувати, потім рев'ю) або `api` (рев'ю через API хостингу) |
+
+Відповіді кешуються для кожного профілю в `radar-account.json` поруч із
+`config.toml` на п'ять хвилин; файл є кешем, його можна безпечно видалити.
+
+## `[mcp]` (що дозволено ШІ-агентам)
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `mcp.allow_mutations` | `false` | Вимкнено: інструменти MCP, що щось змінюють, відхиляються; читання, `ui_*` і пропозиції працюють далі. `true` дозволяє агентам змінювати репозиторій. |
+| `mcp.mutation_allowlist` | `[]` | Непорожньо: змінювати щось можуть лише інструменти з цими назвами (`["stage", "commit"]`). |
+| `mcp.allow_ui` | `true` | `false`: відхиляти інструменти `ui_*`, що рухають ваше вікно (не `ui_state` / `ui_viewers`). |
+| `mcp.ui_control` | `"ask"` | `ask` (вікно показує чип, який ви підтверджуєте), `auto` (застосовується, якщо ви не зайняті), `off`. `--ui-control` у команді сервера перевизначає це для окремого агента. Стосується й `gitpoulpi ui show`. |
+| `mcp.allow_ui_propose` | `false` | Дозволити `ui_propose_*` / `gitpoulpi ui propose`: попередньо заповнені діалоги, які ви підтверджуєте самі. |
+| `mcp.allow_history_purge` | `false` | Лише в `config.toml` (рядка в Налаштуваннях немає). `true` показує агентам інструмент `rewrite_purge` (йому все одно потрібен `allow_mutations`). Вимкнено - агент не бачить інструмента взагалі: очищення остаточно видаляє стару історію переписування, її скасування та її reflog. CLI і TUI цей прапорець не обмежує. |
+| `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve` і `gitpoulpi-mcp` відмовляються запускатися з повідомленням, що називає цей ключ. Налаштування > Агенти й MCP > *Сервер MCP*. Зчитується, коли агент запускає сервер. |
+| `mcp.bind` | `"127.0.0.1:8808"` | Адреса, на якій слухає `--http`, коли ви її не вказали (`--http ADDR` / `--bind` мають перевагу). Лише loopback, якщо не задано `--allow-remote`. Порожнє значення або старе `"stdio"` означає типове. Налаштування > Агенти й MCP > *Порт сервера MCP* змінює порт і зберігає хост. |
+
+`allow_mutations`, `mutation_allowlist` і `allow_ui` обмежують лише сервер MCP;
+CLI - це ваша власна оболонка, і вони її не обмежують. Див. [MCP та
+агенти](mcp-and-agents.md#дозволи).
+
+## `[ai]` (вбудований ШІ, типово вимкнений)
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `ai.enabled` | `false` | Перемикач. Вимкнено: ніде не показується нічого, пов'язаного з ШІ, і нічого не надсилається. |
+| `ai.default_profile` | `"default"` | Ідентифікатор профілю, який використовують дії, що жодного не називають. |
+| `ai.global_instructions` | `""` | Текст, що додається до запиту кожної дії. Може містити `${repo}`, `${uilang}`, ... (див. [ШІ > Змінні запиту](ai.md#змінні-запиту)); те саме для інструкцій окремої дії та репозиторію. |
+| `ai.actions.<action>.profile` | `""` | Профіль для однієї дії; порожньо = типовий. Дії: `commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`. Робочий простір (`workspaces.toml`, `[workspace.ai_instructions]` і `[workspace.ai_overrides.<action>]`) і репозиторій можуть доповнювати чи замінювати ці інструкції: див. [ШІ](ai.md#інструкції). |
+| `ai.actions.<action>.instructions` | `""` | Текст, що додається лише для цієї дії. |
+| `ai.review.run_in_repository` | `"profile"` | `profile`, `yes` або `no`: чи працює локальний агент чернетки рев'ю коду всередині репозиторію для цього запуску, перекриваючи `workdir` профілю ШІ. Репозиторій може задати власне значення (`gitpoulpi ai review-context --repo`). Див. [ШІ > Контекст рев'ю](ai.md#контекст-ревю). |
+| `ai.review.include_claude_md` | `true` | Передати чернетці рев'ю коду `CLAUDE.md` репозиторію (корінь, прочитаний у гілці, на яку націлено запит; обрізається на 8 КБ). |
+| `ai.review.include_agents_md` | `true` | Те саме для `AGENTS.md`. |
+| `ai.review.extra_file` | `""` | Ще один файл для чернетки рев'ю коду: шлях відносно кореня репозиторію, абсолютний шлях або посилання на файл хостингу коду (читається через відповідний профіль інтеграції, інакше анонімно). Усі файли разом обрізаються на 16 КБ. |
+
+Власна таблиця репозиторію `[preferences.ai_review]` (у його `repo-state.toml` або запис репозиторію, який не клоновано, у
+`remote-reviews.toml`) приймає ті самі ключі, усі необов'язкові, плюс `no_extra_file = true`: жодного додаткового файлу
+для цього репозиторію, що б не казав `ai.review.extra_file`. Не задані ключ, не заданий `extra_file` і відсутній
+`no_extra_file` успадковують глобальне значення; задання `extra_file` файлом очищає перемикач, і навпаки.
+
+```toml
+[[ai.profiles]]
+id = "default"
+name = "Default"
+kind = "open_ai"        # open_ai | anthropic | open_router | open_ai_compatible | local_agent
+model = "gpt-5"         # empty = the kind's default
+base_url = ""           # empty = the kind's default (Ollama: http://localhost:11434/v1)
+token_ref = "ai:default"  # where the API key is stored; never the key
+command = ""            # local_agent only: the exact program ("claude", an alias, a wrapper, a path)
+harness = ""            # local_agent only: claude | codex | gemini | opencode | cursor-agent | copilot | pi | qwen | aider | goose | crush | amp | other; empty = inferred from `command`
+args = []               # local_agent only, e.g. ["-p", "--model", "haiku"]
+run_mode = "headless"   # local_agent only: headless (default) | terminal (the agent's interactive screen in a virtual terminal)
+terminal_args = []      # local_agent only: the arguments of the terminal mode (args keeps the headless set)
+workdir = "default"     # local_agent only: default | dedicated | repository (default = dedicated folder in terminal mode, GitPoulpi's folder in headless mode)
+timeout_secs = 0        # local_agent only: seconds before the agent is stopped; 0 = 120 headless, 180 terminal
+
+[ai.profiles.env]       # local_agent only, optional: variables set for that process only
+CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1"
+ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulpi's own variables
+```
+
+`harness` вибирає підказки, які пропонує Налаштування > ШІ (аргументи без інтерфейсу,
+опції, прапорець і список моделей, змінні середовища) незалежно від `command`;
+обидва ключі пропускаються у файлі, коли порожні. Значення змінних середовища
+ніколи не потрапляють до журналу, а в Налаштуваннях приховуються, якщо схожі на секрети.
+
+Налаштування > ШІ пропонує пресети для `harness`/`command`/`args`/`env` (поширені
+CLI агентів з їхніми прапорцями без інтерфейсу, прапорцем моделі та корисними змінними
+середовища) і для `kind`/`base_url`/`model` (хмарні та локальні HTTP-провайдери); див.
+[ШІ > Налаштування ШІ](ai.md#налаштування-ші).
+
+Профіль із назвою *Default* створюється, коли профілів немає. Старі файли
+`[[ai.presets]]` / `[ai.defaults]` мігруються під час завантаження й зберігаються в
+`[[ai.legacy_presets]]`. Решта: [Допомога ШІ](ai.md).
+
+## `[repos]`, `[session]`
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `repos.clone_root` | `""` | Де починається діалог Clone; порожньо = `%USERPROFILE%\source\repos` або `~/src`. |
+| `repos.browse_root` | `""` | Де відкривається Browse; порожньо = остання вибрана папка, потім домашня. |
+| `repos.show_hidden` | `false` | Вибір папки показує приховані папки (`Alt+H` перемикає й зберігає це). |
+| `repos.show_siblings` | `false` | Ліве дерево вибору папки показує також інші папки кожного відкритого рівня, як справжню ієрархію (`Alt+S` перемикає й зберігає це). |
+| `session.per_repo_state_dir` | `"in_git_dir"` | Де GitPoulpi зберігає те, що пам'ятає про один репозиторій (фільтри refs, стан згортання, особисте перевизначення робочого процесу, кеш хостингу): `in_git_dir` = `<git dir>/gitpoulpi` (спільне для всіх worktree, ніколи не видно в `git status`), `in_worktree` = `<repo>/.gitpoulpi` (єдине місце, де команда може закомітити `workflow.toml`), `user_data` = `<папка даних ОС>/repos/<name>-<id>` (`%APPDATA%\GitPoulpi\data` у Windows, `$XDG_DATA_HOME/gitpoulpi` у Linux, `~/Library/Application Support/GitPoulpi` у macOS). Старе значення `".gitpoulpi"` і далі означає `in_worktree`. Зміна нічого не переносить назад: дані зі старої `<repo>/.gitpoulpi` переміщуються в обране місце, коли вони вперше знадобляться. |
+
+## `[log]` (журнал застосунку)
+
+Те, що показує вкладка «Застосунок» Журналу активності й що цитує «Копіювати діагностику». Подробиці: [Коли щось не вдається](troubleshooting.md#коли-щось-не-вдається).
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `log.level` | `"info"` | Найдокладніший із записуваних рядків: `error`, `warn`, `info`, `debug` або `trace`. Поле рівня в Журналі активності змінює його (і зберігає тут). |
+| `log.retention_days` | `7` | Скільки днів зберігаються файли журналу, враховуючи сьогоднішній: від 1 до 3650, тобто десять років (більше чи менше значення обрізається). Це завжди кількість днів, в якій би одиниці її не показували Налаштування. Старіші файли видаляються під час запуску GitPoulpi. Файл за день також обмежує `log.max_file_mb`, тож найгірший випадок - приблизно `2 x max_file_mb x retention_days`. |
+| `log.retention_unit` | `"auto"` | Одиниця, в якій Налаштування показують `log.retention_days`: `days`, `weeks`, `months`, `years` або `auto`. Лише для показу, на строк зберігання файлів це не впливає. Тиждень - це 7 днів, місяць - 30 днів (не календарний, тож це те саме число днів, коли б його не застосували), рік - 365 днів. `auto` і конфіг, записаний до появи цього ключа, вибирають найбільшу одиницю, що ділить дні націло (14 днів читається як «2 тижні», 45 днів - «45 днів»). Одиниця, що не ділить дні (`retention_days = 10` з `weeks`), ігнорується, і показуються дні. Налаштування пишуть обидва ключі; старіший GitPoulpi ігнорує одиницю й усе одно читає дні. |
+| `log.max_file_mb` | `5` | Файл за день за такого розміру ротується в одну резервну копію `.old`, тож день ніколи не займає більше ніж удвічі більше місця. |
+| `log.max_file_unit` | `"auto"` | Одиниця, в якій Налаштування показують розмір: `mib`, `gib` (1024 МіБ) або `auto`. Лише для показу: розмір завжди дорівнює `max_file_mb` МіБ, від 1 до 1024. |
+| `log.timings` | `true` | Вкладка «Операції git» Журналу активності показує, скільки тривала кожна операція (`Push - 123 ms`: відкриття репозиторію, оновлення, fetch, pull, push, commit, checkout, merge, rebase, stash, clone). Тривалість вимірює вікно, від запиту до відповіді демона, тож вона містить шлях IPC туди й назад. Вимкнено: тривалості та записи про успішні операції сховано. Збої завжди перелічено. |
+| `log.extended` | `false` | «Розширене ведення журналу»: вкладка «Операції git» перелічує також фонові операції (періодичне оновлення, що опитує статус, auto-fetch) з їхньою тривалістю. У журнал застосунку вони завжди пишуться на рівні `debug`. |
+| `log.commit_count` | `"system-git"` | Як рядок стану дізнається загальну кількість для «завантажено / всього». `"system-git"` запускає `git rev-list --count` (один процес, на звичайному комп'ютері найшвидше: git читає файл commit-graph). `"libgit2"` рахує всередині процесу через libgit2 і нічого не запускає: оберіть його, якщо повільно стартує кожен процес командного рядка, зазвичай через антивірус із перевіркою в реальному часі; на 50 000 commit'ів це займає близько 200 мс у фоні замість 12 мс, але жоден процес не запускається. `"off"` ніколи не рахує: рядок показує лише завантажені commit'и. Застосовується одразу. Підрахунок із фільтром за шляхом завжди йде через системний git. |
+| `log.use_mailmap` | `true` | Показувати кожного автора так, як його називає `.mailmap` репозиторію (і `mailmap.file`), у Log, blame та історії файлу: демон запитує в git `%aN`/`%aE` (системний бекенд) або сам застосовує ті самі файли (бекенд libgit2), тож відповідь однакова. Збережені коміти не змінюються, і нічого не переписується. Пошук у Log за автором збігається з іменами в тому вигляді, як їх показано. Діє одразу; Log перечитує протягом свого 2-секундного опитування. |
+
+Файли називаються `gitpoulpi-YYYY-MM-DD.log` і лежать у папці стану ОС (`~/.local/state/gitpoulpi/logs` у Linux; `<cache>\logs` у Windows і macOS; `<config>/cache/logs` за `GITPOULPI_CONFIG_DIR`). Токени, паролі та заголовки `Authorization` маскуються, перш ніж щось записується.
+
+## `[search]` (пошук у робочому просторі)
+
+Те, що переглядає `gitpoulpi search` (і його інструмент MCP). Подробиці: [Робочі простори та пошук у CLI](cli-reference.md#робочі-простори-та-пошук).
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `search.commit_limit` | `200000` | Скільки commit'ів (найновіші першими, по всіх гілках, віддалених гілках і tag'ах) індекс пошуку тримає в пам'яті для кожного репозиторію: близько 100 байтів плюс повідомлення на кожен. Довшу історію обрізають на цьому місці, і відповідь каже, що вона `partial`. `0` вимикає пошук commit'ів (гілки, tag'и, stash'і та worktrees усе одно шукаються). Читається наживо: наступний пошук підкоряється зміні. |
+
+## `[rewrite]` (переписування історії)
+
+Що захищають `gitpoulpi rewrite` і майстерня переписування історії. Подробиці: [Переписування історії](history-rewrite.md).
+
+| Ключ | Типово | Значення й дія |
+|---|---|---|
+| `rewrite.protected_branches` | `["main", "master", "develop", "release/*"]` | Гілки (назви або шаблони, де `*` збігається з будь-яким текстом), які переписування не чіпає, коли їх уже надіслано, якщо запуск не перелічує їх (`--include-protected BRANCH`; `--include-all-protected` для push; прапорець для кожної гілки в майстерні). Додаються до баз, які `workflow.toml` репозиторію позначає як `protected`. Push переписування пропускає їх так само. Це власний запобіжник GitPoulpi: чи прийме force push, усе одно вирішує захист гілок хоста. Читається наживо: наступний перегляд враховує зміну. |
+| `rewrite.external_scripts` | `["shell"]` | Які мови зовнішніх скриптів може використовувати правило «Скрипт»: будь-які з `"shell"` (bash або sh; pwsh чи powershell для скриптів PowerShell), `"python"`, `"lua"` (встановлена Lua; вбудована Lua завжди ввімкнена й запису не потребує). **Зовнішній скрипт не працює в пісочниці: він виконується з вашими правами.** Мова, якої немає в списку, у майстерні сіра, а CLI, MCP і демон відмовляють (`scripts_disabled`). Навіть коли мову вказано, зовнішній скрипт із репозиторію чи спільного рецепта запускається лише після того, як ви йому довірили (`gitpoulpi rewrite script trust FILE` або питання в майстерні); довіра прив'язана до хешу вмісту скрипту, тож змінений скрипт питає знову. Щоб ввімкнути Python, відредагуйте `config.toml` (список не можна задати через `config set`): `[rewrite]`, далі `external_scripts = ["shell", "python"]`. Читається наживо. |
+| `rewrite.script_timeout_ms` | `5000` | Скільки часу зовнішній скрипт має на відповідь для одного коміту. Після тайм-ауту вбивається все дерево процесів, і переписування завершується помилкою (`script_failed` із назвою коміту); нічого не пересунуто. `0` читається як типове значення. Читається наживо. |
+| `rewrite.script_timeout_unit` | `"auto"` | Одиниця, в якій Налаштування показують ліміт часу: `milliseconds`, `seconds` або `auto`. Лише для показу: ліміт завжди дорівнює `script_timeout_ms` мілісекунд. Налаштування приймають від 1 до 600000 (десять хвилин); `0` і далі читається як типове значення. Читається наживо. |
+| `rewrite.script_total_timeout_s` | `3600` | Скільки загалом може тривати один прохід зовнішнього скрипту. `0` читається як типове значення. Читається наживо. |
+| `rewrite.script_total_timeout_unit` | `"auto"` | Одиниця, в якій Налаштування показують ліміт часу: `seconds`, `minutes`, `hours` або `auto`. Лише для показу: ліміт завжди дорівнює `script_total_timeout_s` секунд. Налаштування приймають від 1 до 86400 (доба); `0` і далі читається як типове значення. Читається наживо. |
+
+## `[updates]` (пошук новішого випуску)
+
+Що робить чип версії в рядку заголовка щодо новіших випусків. Подробиці: [Оновлення](installation.md#оновлення).
+
+| Ключ | Типово | Значення та дія |
+|---|---|---|
+| `updates.mode` | `"notify"` | `"notify"` раз на день у фоні питає GitHub, чи є новіший випуск, і перетворює чип версії на `vX.Y.Z available`. `"auto"` ще й сам завантажує та готує оновлення, якщо цю збірку встановлено з архіву випуску (перед перезапуском усе одно питає); для будь-якої іншої збірки поводиться як `"notify"`. `"off"` не робить жодного запиту. Застосовується одразу. |
+| `updates.channel` | `"stable"` | `"stable"` враховує лише повні випуски; `"prerelease"` пропонує й кандидати до випуску (`-rc.1`). Застосовується одразу. |
+| `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | `owner/name` на github.com, випуски якого перевіряються. Поки цей репозиторій приватний, GitHub відповідає 404, якщо для github.com не збережено токена (Налаштування > Інтеграції); без нього перевірка тихо не вдається й пише один рядок у журнал застосунку. |
+
+## `[keybindings]`
+
+Перепризначає скорочення TUI; редагується в Налаштування > Клавіатура й миша.
+
+```toml
+[keybindings.global]
+git_prefix = "Ctrl+B"            # default Ctrl+G
+nav_prefix = "Alt+n"             # default Ctrl+N
+settings   = ["Ctrl+,", "F2"]    # a list = alternatives
+tab_menu   = []                  # unbound
+
+[keybindings.git_prefix]         # the key pressed after the git prefix
+stage_file = "z"
+```
+
+`[keybindings.<context>] <action> = "<chord>"`; значення замінює типові комбінації
+цієї дії, а видалення рядка їх повертає. Комбінації: `Ctrl+Shift+N`, `Alt+n`,
+`F2`, `PageDown`, `Space`, `,`, `P` (= `Shift+p`). Хибний запис нічого не блокує:
+TUI ігнорує його, залишає типове значення й повідомляє про це в рядку стану.
+Контексти, ідентифікатори дій, типові значення та правила конфліктів:
+[Скорочення клавіатури](keybindings.md).
+
+## Налаштування репозиторію: `.gitpoulpi/repo-state.toml`
+
+Зберігається всередині репозиторію; папка ігнорує сама себе (`.gitignore` з `*`), тож
+ніколи не відображається як зміна. Записується TUI і CLI; вам рідко доводиться її редагувати.
+
+| Ключ | Що це | Задається через |
+|---|---|---|
+| `[preferences] encoding` | Перевизначає тут `git.default_encoding` | Налаштування > Git і кодування |
+| `[preferences] lfs_enabled` | Перевизначає тут `git.lfs_enabled` | Налаштування > Git і кодування |
+| `[preferences] profile` | Ідентифікатор `[[profiles]]`, що підписує тут commit'и; відсутній означає `general.active_profile` | випадаючий список профілів на панелі інструментів, **Репозиторій: змінити профіль...** |
+| `[preferences] autocrlf`, `eol` | *Поки не використовуються* | Налаштування > Git і кодування |
+| `[preferences] push_after_commit` | Надсилати гілку до її upstream після кожного commit'у (за відсутності вимкнено) | Налаштування > Налаштування репозиторію > Commit |
+| `[preferences] skip_hooks_by_default` | «Пропустити хуки» у формі commit'у спершу позначене (за відсутності вимкнено) | Налаштування > Налаштування репозиторію > Commit |
+| `[preferences] squash_merge` | Merge локальної гілки робить squash: кладе в індекс, без merge-commit'у (за відсутності вимкнено) | Налаштування > Налаштування репозиторію > Опції merge |
+| `[preferences] template_apply`, `template_strip_comments` | Заповнювати порожню форму commit'у шаблоном; прибирати рядки-коментарі з `#` під час commit'у (обидва вимкнені за відсутності) | Налаштування > Налаштування репозиторію > Шаблон повідомлення |
+| `[preferences] conflict_detection` | Завчасне виявлення конфліктів для цього репозиторію; за відсутності діє `general.conflict_detection` | Налаштування > Налаштування репозиторію > Запобігання конфліктам |
+| `[preferences] conflict_base_branches` | Шаблони базових гілок, по одному в рядку (`**` за відсутності) | Налаштування > Налаштування репозиторію > Запобігання конфліктам |
+| `commit-template.txt` (файл поруч із `repo-state.toml`) | Шаблон commit'у; на нього вказує `commit.template` у git | Налаштування > Налаштування репозиторію > Шаблон повідомлення |
+| `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: інструкції ШІ для цього репозиторію | Налаштування > Налаштування репозиторію > ШІ |
+| `[preferences.ai_overrides.<action>]` | `profile`, `instructions` для однієї дії тут | Налаштування > Налаштування репозиторію > ШІ |
+| `default_remote` | Remote, який використовують Push/Pull/Fetch в одне клацання | меню remote'ів, `gitpoulpi remote default <name>` |
+| `hosting_integration` | Профіль `[[integrations]]`, закріплений тут | `gitpoulpi hosting use --id` |
+| `pulls_source`, `issues_source` | Проєкт провайдера, який читають списки PR / issue, як `{ integration, project, filter }`. `filter` необов'язковий: додатковий вираз, рідний для провайдера (фрагмент Jira JQL, умова Azure WIQL, назви списків Trello), що додається через AND до запиту списку; GitHub і GitLab його ігнорують. | розділи бічної панелі, `gitpoulpi hosting link` |
+| `ref_visibility` | Приховані / виділені (solo) ref'и | бічна панель Refs, `gitpoulpi refs hide\|show\|solo` |
+| `folds`, `collapsed_*_ref_folders` | Згорнуті розділи бічної панелі та папки гілок і tag'ів. `[folds]` містить також `status_folders` (згорнуті папки дерев файлів Unstaged / Staged) і `commit_folders` (згорнуті папки дерева змінених файлів commit'у, однакові для кожного commit'у), кожен обмежений 500 шляхами, найстарші відкидаються першими | бічна панель, дерева файлів |
+| `pending_auto_stash` | Stash, який зробив GitPoulpi і ще не повернув | записується демоном; див. [Auto-stash](log-and-history.md#auto-stash) |
+
+## Інші змінні середовища
+
+| Змінна | Дія |
+|---|---|
+| `GITPOULPI_CONFIG_DIR` | Папка конфігурації (див. вище). |
+| `GITPOULPI_TOKEN_<ID>` | Токен хостингу для профілю `<ID>`, понад збережений (CI, одноразове використання). |
+| `GITPOULPI_GIT` | Виконуваний файл `git` (типово: `git` у `PATH`; у Windows - справжній `mingw64\bin\git.exe` за шимом `cmd\git.exe` Git for Windows, що заощаджує процес на кожному виклику). |
+| `GITPOULPI_LANG=fr` | Мова інтерфейсу, понад `ui.language` (будь-яке значення `ui.language`; `qps` - псевдолокаль для перекладачів). Невідоме або порожнє значення ігнорується. |
+| `GITPOULPI_TERMINAL_IMAGE=off` | Жодних зображень узагалі, що б не казала конфігурація. |
+| `GITPOULPI_TERMINAL_CELL_PX=9x21`, `GITPOULPI_TERMINAL_SUPERSAMPLE=1..4` | Підказки щодо роздільної здатності зображень (розмір клітинки в пікселях; надвибірка, типово 2, `1` заощаджує CPU). |
+| `GITPOULPI_NO_BROWSER=1` | Ніколи не запускати вебпереглядач (URL усе одно показується). |
+| `GITPOULPI_TIMING=1` | Записувати тривалість запитів у `gitpoulpi-timing.log` у тимчасовій папці (звіти про продуктивність). |
+| `GITPOULPI_NO_EXIT_PAUSE=1` | Не чекати на Enter після виходу TUI з помилкою. |

@@ -1,0 +1,655 @@
+[English](../settings.md) · [Čeština](../cs/settings.md) · [Deutsch](../de/settings.md) · [Español](../es/settings.md) · [Français](../fr/settings.md) · [Italiano](../it/settings.md) · [日本語](../ja/settings.md) · [한국어](../ko/settings.md) · [Nederlands](../nl/settings.md) · **Polski** · [Português (Brasil)](../pt-BR/settings.md) · [Português (Portugal)](../pt-PT/settings.md) · [Русский](../ru/settings.md) · [Svenska](../sv/settings.md) · [Türkçe](../tr/settings.md) · [Українська](../uk/settings.md) · [简体中文](../zh-CN/settings.md)
+
+# Ustawienia
+
+Ustawienia otwiera się skrótem `Ctrl+,`, sekwencją `Ctrl+N`, a potem `,`,
+kołem zębatym na pasku tytułu (na lewo od `×`) albo przez `Ctrl+P` > *Ustawienia*.
+Ekran Ustawień zastępuje okno na czas, gdy jest otwarty. Zamykasz go przez `✕` w prawym
+górnym rogu, `Esc` lub `q`. Pyta wcześniej tylko wtedy, gdy zamknięcie coś by zgubiło (zob.
+[Zamykanie Ustawień](#zamykanie-ustawień)).
+
+Zmiany są od razu zapisywane w `config.toml`. [Opis konfiguracji](config-reference.md)
+podaje każdy klucz, jego wartość domyślną i zmienną środowiskową. Ta strona
+opisuje sam ekran Ustawień.
+
+![Ekran Ustawień: pole wyszukiwania i lista stron po lewej, strona Ogólne po prawej](../images/settings.png)
+
+## Obsługa ekranu Ustawień
+
+| Cel | Działanie |
+|---|---|
+| Przejście między listą stron a opcjami | `Tab` / `Shift+Tab` albo kliknięcie. |
+| Poruszanie się | `j` / `k` lub klawisze strzałek. |
+| Zmiana opcji | `Enter` lub `Spacja` albo kliknięcie jej wartości. Zob. niżej. |
+| Zamknięcie | Kliknij `✕` albo naciśnij `Esc` lub `q`. Gdy otwarte jest pole, lista rozwijana lub potwierdzenie, `Esc` zamyka tylko to. |
+
+Co robi `Enter` lub `Spacja`, zależy od wiersza:
+
+- Pole wyboru zmienia stan.
+- Lista rozwijana otwiera się. Strzałki wybierają, `Enter` zatwierdza.
+- Pole tekstowe lub liczbowe zaczyna edycję. Działają strzałki, `Home`, `End`,
+  `Backspace` i `Delete`, a kliknięcie ustawia kursor. `Enter`, `Tab`,
+  `Up`, `Down` lub kliknięcie gdzie indziej zapisuje wartość. `Esc` anuluje.
+  Odrzucona wartość zostaje w polu na czerwono, a powód pokazuje pasek stanu.
+- Wiersz z przyciskami (**Utwórz**, **Usuń**, **Testuj**...) pokazuje tylko te, które mają
+  teraz zastosowanie. `Left` / `Right` wybierają jeden, `Enter` go naciska, albo kliknij.
+  Przycisk, który coś usuwa, najpierw pyta.
+
+Na każdej stronie wartości zaczynają się w jednej kolumnie, więc etykiety wyrównują się
+z lewej, a pola z prawej. Tekst lub liczba to przyciemniony pasek, wybór to pasek
+zakończony `▾`, pole wyboru to `[x]`. Długa etykieta zawija się zamiast być ucinana,
+a w wąskim oknie wartość przechodzi pod etykietę.
+
+Wyszarzony wiersz podaje powód, dla którego jest nieaktywny. Na przykład
+**Intensywność podbarwienia** jest wyszarzona, gdy **Tło ścieżek grafu** ma wartość
+**Wył.**.
+
+### Listy
+
+Strony edytujące kilka elementów tego samego rodzaju (Profile, AI, Przepływ pracy,
+Otwórz w, Obrazy) pokazują je jako **listę po lewej i pola zaznaczonego elementu po
+prawej**. W wąskim oknie lista jest nad polami. Wszędzie ma ten sam kształt:
+
+- Znacznik wiersza mówi o jego stanie: `●` aktywny profil, `★` wpis domyślny, `⚠`
+  niedokończony element (profil bez e-maila), z powodem w miejscu szczegółów.
+- Pod listą: **+ Dodaj**, **Duplikuj**, **Usuń**, `↑` i `↓`. Przycisk, który teraz nie ma
+  zastosowania (`↑` na pierwszym wierszu), jest przyciemniony. **+ Dodaj ▾** otwiera
+  listę rozwijaną, gdy strona oferuje ustawienia wstępne lub rodzaje.
+- **Usuń** najpierw pyta, z wyjątkiem elementu dodanego przed chwilą i niezmienianego.
+- Przeciągnij wiersz, by go przesunąć; pasek pokazuje, gdzie wyląduje, a `Esc` anuluje
+  przeciąganie. Dwukrotne kliknięcie przechodzi do pól elementu.
+
+| Klawisz | Działanie |
+|---|---|
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | Zaznacza element. |
+| `Insert` | Dodaje element (otwiera listę rozwijaną, jeśli jest). |
+| `Ctrl+D` | Duplikuje element. |
+| `Delete` | Usuwa element, po potwierdzeniu. |
+| `Alt+Up` / `Alt+Down` | Przesuwa element w górę lub w dół. |
+| `Enter` lub `Right` | Przechodzi do pól elementu. |
+| `Left` | Wraca do listy stron. |
+| `Alt+Left` / `Alt+Right` | Przełącza między kartą Ogólne a kartą listy (w dowolnym miejscu strony). |
+
+Każda z tych stron ma pod tytułem dwie **podkarty**, aby ustawienie strony nigdy nie było mylone z właściwością zaznaczonego elementu: **Ogólne**, własne ustawienia strony (aktywny profil, domyślny wpis, instrukcje, które dostaje każda akcja AI, szablon przepływu pracy...), oraz kartę nazwaną od elementów (**Profile**, **Profile (połączenia)**, **Wpisy**, **Edytory**, **Reguły**), która zawiera listę i pola zaznaczonego elementu. Strona otwiera się na karcie **Ogólne**; ustawienia pamiętają kartę, na której opuściłeś każdą stronę, aż do zamknięcia aplikacji, a także pozycję przewinięcia i zaznaczony wiersz każdej strony (i karty). Kliknij kartę lub naciśnij `Alt+Left` / `Alt+Right`. Wyszukiwarka, wiersze ustawień w palecie poleceń i odnośniki „ustaw w ustawieniach” otwierają kartę, na której leży ustawienie.
+Strona [Klawiatura i mysz](#klawiatura-i-mysz) ma te same dwie karty (**Ogólne**, **Skróty klawiszowe**).
+
+Klawisze można zmienić w **Klawiatura i mysz** (kontekst *preferences*, zob.
+[Skróty klawiszowe](keybindings.md)).
+
+### Edytory wielowierszowe
+
+Ustawienia zawierające wiele wierszy (na przykład ścieżki częściowego checkoutu, opis szablonu commita, gałęzie bazowe zapobiegania konfliktom i hooki przepływu pracy) otwierają się w małym edytorze klawiszem `Enter` lub kliknięciem; `Ctrl+S` zachowuje tekst, a `Esc` go porzuca. Mysz działa tam jak w każdym polu tekstowym:
+
+- Kliknięcie ustawia kursor w klikniętym miejscu.
+- Przeciągnięcie zaznacza tekst; kółko przewija.
+- Dwukrotne kliknięcie zaznacza słowo pod wskaźnikiem.
+- `Shift` + kliknięcie rozszerza zaznaczenie od kursora do wskaźnika.
+
+Klawiatura oferuje to samo: `Shift` ze strzałkami zaznacza, `Ctrl` ze strzałkami przeskakuje o słowo, `Ctrl+A` zaznacza wszystko, `Ctrl+C` i `Ctrl+X` kopiują i wycinają.
+
+### Zamykanie Ustawień
+
+`✕`, `Esc` i `q` działają tak samo. Ustawienia stosują każdą zmianę od razu, więc zwykle
+po prostu się zamykają. Pytanie **Zamknąć Ustawienia?** pojawia się tylko wtedy, gdy coś
+by przepadło:
+
+- strona **Przepływ pracy** ma niezapisane zmiany;
+- szablon commita ma niezapisane zmiany;
+- profil nie ma e-maila autora (commity, które tworzy, nie dałoby się przypisać do ciebie).
+
+Okno oferuje **Przejdź tam** (otwiera tę stronę), **Odrzuć i zamknij** lub **Zamknij mimo
+to** oraz **Anuluj**. Małe edytory wewnątrz Ustawień (tekst instrukcji AI, hook
+przepływu pracy, ścieżki częściowego checkoutu) mają własne `✕` i pytają **Odrzucić
+zmiany?** tylko wtedy, gdy ich tekst edytowano.
+
+### Okna nad Ustawieniami
+
+Wiersz tytułu pokazuje ośmiornicę i nazwę aplikacji, tak jak okno główne. Kliknij
+ośmiornicę, aby otworzyć okno O programie.
+
+Kilka okien działających w całym oknie otwiera się nad Ustawieniami i oddaje je
+w stanie, w jakim były (strona, pozycja przewijania i niezapisane zmiany Przepływu
+pracy lub szablonów zostają):
+
+- paleta poleceń (`Ctrl+P`),
+- wybór motywu (`Ctrl+N y`, **Aplikacja: Zmień motyw...**), który pokazuje każdy
+  motyw podglądem na samych Ustawieniach; `Esc` przywraca poprzedni motyw,
+- wybór języka i kolorów grafu (`Ctrl+N`, potem te same litery co w oknie głównym),
+- wyszukiwanie w obszarze roboczym (`Ctrl+Alt+F`),
+- O programie (`Ctrl+N a`, ośmiornica albo **Pomoc: O programie GitPoulpi**) oraz
+  nakładka pomocy (`?`).
+
+Każde zamkniesz przez `Esc`, jego własne `✕` albo kliknięcie poza nim. Polecenia,
+które działają na to, co zasłaniają Ustawienia (karta, gałąź, diff...), są
+wymienione w palecie, ale wyszarzone z napisem „najpierw zamknij Ustawienia”, a
+skróty `Ctrl+N` dla nich pokazują tę linię na dolnej krawędzi Ustawień: zamknij
+Ustawienia i dopiero uruchom je.
+
+`Ctrl+N` pokazuje plakietkę na każdym elemencie strony: polu wyszukiwania, liście stron (jedna plakietka, na bieżącej stronie), podkartach, liście i jej przyciskach, każdym polu widocznym na ekranie oraz krzyżyku zamykania. Naciśnij znak plakietki, a stanie się to samo co po kliknięciu tego elementu: pole tekstowe otworzy się do edycji, pole wyboru zostanie przełączone, lista rozwijana się otworzy, przycisk zostanie wykonany. `Esc` anuluje. Pole przewinięte poza ekran nie ma plakietki. Gdy piszesz w polu albo otwarta jest lista rozwijana, edytor lub wyszukiwanie, `Ctrl+N` należy do nich. Zobacz [Plakietki](keybindings.md#plakietki).
+
+### Pole wyszukiwania
+
+Pole na górze listy stron przeszukuje nazwę i opis każdej opcji na każdej
+stronie. Kliknij je albo naciśnij `/` lub `Ctrl+F` i zacznij pisać. Rozwija się
+lista trafień. Każde trafienie pokazuje opcję i jej stronę. `Up` / `Down`
+wybierają, `Enter` przechodzi do opcji, `Esc` zamyka listę.
+
+![Wyszukiwanie „diff” w Ustawieniach: pasujące opcje ze stron Log i graf, Diff i edytor oraz Git i kodowanie](../images/settings-search.png)
+
+## Ustawienia z palety poleceń
+
+Większość ustawień można zmienić bez otwierania tego ekranu: wpisz `Ustawienia:` lub `Settings:` w palecie poleceń (`Ctrl+P`). Wiersze są generowane z pól samych stron, więc nowe ustawienie pojawia się w obu miejscach.
+
+- Pole wyboru to **Ustawienia: przełącz ...**. Przełącza się od razu, a wiersz pokazuje `[x]` lub `[ ]`.
+- Lista rozwijana to **Ustawienia: ...**. `Enter` zawęża paletę do jej wartości, bieżąca jest oznaczona `bieżące`; `Enter` na wartości ją wybiera.
+- Liczba lub tekst otwiera pole z bieżącą wartością. Wartość, którą odrzuciłaby strona (nie liczba, poza zakresem), jest odrzucana tak samo, a pole pozostaje otwarte.
+- Ustawienie wymagające własnej strony (lista, combo z opcjami ustalanymi w trakcie działania) otwiera Ustawienia w tym miejscu.
+
+![Paleta poleceń przefiltrowana na Settings: z jednym wierszem na ustawienie i jego bieżącą wartością po prawej](../images/palette-settings.png)
+
+Wartość jest zapisywana w `config.toml` i stosowana dokładnie tak jak na stronie. Angielskie słowa klucza ustawienia (`remember tabs`) znajdują wiersz w każdym języku.
+
+## Strony
+
+Lista stron ma dwie grupy:
+
+- **Ustawienia**: ustawienia globalne.
+- **Ustawienia repozytorium**: ustawienia repozytorium aktywnej karty.
+  Są widoczne tylko przy otwartym repozytorium.
+
+### Ogólne
+
+![Lista rozwijana Język na stronie Ogólne: Auto i siedemnaście języków, z polem wyszukiwania](../images/settings-language.png)
+
+| Opcja | Działanie |
+|---|---|
+| **Język** | Język interfejsu: **Auto** (język systemu, w przeciwnym razie angielski), English, Français, Español, Português (Brasil), Português (Portugal), Italiano, Deutsch, 简体中文, 日本語, 한국어, Русский, Українська, Polski, Čeština, Nederlands, Svenska, Türkçe. Zmiana działa od razu, bez restartu. Nazwy miesięcy i daty w Logu podążają za nią. Zmienna środowiskowa `GITPOULPI_LANG` (na przykład `GITPOULPI_LANG=fr`) nadpisuje ten wybór. Wyjście CLI i MCP pozostaje po angielsku. |
+| **Tłumacz terminy git** | Domyślnie wyłączone: commit, push, pull, stash, tag i pozostałe terminy git zostają po angielsku w każdym języku. Włączone: używa się własnego słownictwa gita danego języka (polski: *Ściągnij*, *Wypchnij*, *Schowek*, *Znacznik*). Działa od razu. |
+| **Angielskie słowa git** | Tylko dla japońskiego, koreańskiego i chińskiego: pokazuje *stage*, *unstage*, *staged* jako angielskie słowa zamiast transkrypcji. Bez efektu, gdy włączone jest **Tłumacz terminy git**. |
+| **Pamiętaj karty** | Przy starcie otwiera ponownie karty z ostatniej sesji. Wyłączone: start w repozytorium otwiera tylko to repozytorium, a start poza repozytorium zaczyna na Home bez karty repozytorium. Wymaga restartu. |
+| **Włącz Radar** | Domyślnie włączone (`general.radar_enabled`). Wyłączone ukrywa kartę Radaru, jego polecenia palety i `Alt+R`, a w tle nic dla niego nie jest pobierane. Działa od razu. Zob. [Radar](radar.md#zamykanie-karty-lub-wyłączenie-radaru). Niewidoczne w kompilacji bez Radaru. |
+| **Karta startowa w repozytorium** | Karta, na której otwiera się start, gdy folder, z którego go uruchomiono, leży w repozytorium (`general.startup_tab_in_repo`): **Bieżące repozytorium** (domyślnie, karta tego repozytorium, w razie potrzeby otwierana), **Ostatnia karta** (karta aktywna przy ostatnim zamknięciu), **Home**, **Radar**. Repozytorium podane przez `--repo` zawsze otwiera własną kartę. **Ostatnia karta** to Home, gdy **Pamiętaj karty** jest wyłączone lub nic nie zapamiętano; **Radar** to Home, gdy Radar jest wyłączony lub nie ma go w buildzie. Czytane raz przy starcie; wymaga restartu. |
+| **Karta startowa poza repozytorium** | Karta, na której otwiera się start, gdy folder, z którego go uruchomiono, nie jest repozytorium (na przykład folder użytkownika) (`general.startup_tab_outside_repo`): **Home** (domyślnie), **Ostatnia karta**, **Radar**. **Ostatnia karta** to Home, gdy **Pamiętaj karty** jest wyłączone lub nic nie zapamiętano; **Radar** to Home, gdy Radar jest wyłączony lub nie ma go w buildzie. Czytane raz przy starcie; wymaga restartu. |
+| **Karta startowa przy uruchomieniu z systemu** | Karta, na której otwiera się start, gdy GitPoulpi uruchomiono ze skrótu na pulpicie lub w menu Start, który sam utworzył (przekazuje `--launcher`), niezależnie od folderu (`general.startup_tab_launcher`): **Ostatnia karta** (domyślnie), **Home**, **Radar**. Ma pierwszeństwo przed dwoma ustawieniami powyżej. **Ostatnia karta** to Home, gdy **Pamiętaj karty** jest wyłączone lub nic nie zapamiętano; **Radar** to Home, gdy Radar jest wyłączony lub nie ma go w buildzie. Skróty utworzone przez starszą wersję dostają ten przełącznik przy następnym starcie. Czytane raz przy starcie; wymaga restartu. W systemie Windows kopia przypięta do paska zadań również jest zapisywana na nowo przy następnym starcie, a start bez otaczającej powłoki (podwójne kliknięcie, przypięty sam plik exe) liczy się jako uruchomienie z systemu. |
+| **Grupuj karty worktree** | Domyślnie włączone (`general.group_worktree_tabs`). Karty powiązanych worktree repozytorium stoją zaraz za kartą repozytorium, a odciągnięta karta worktree wraca na to miejsce. Wyłączone zostawia karty tam, gdzie je ułożysz. Włączenie grupuje otwarte karty od nowa. |
+| **Domyślny folder klonowania** | Folder, od którego zaczyna się okno Klonuj. Puste: `%USERPROFILE%\source\repos` w Windows, `~/src` gdzie indziej. |
+| **Domyślny folder przeglądania** | Folder, w którym otwiera się Przeglądaj. Puste: ostatnio użyty folder, w przeciwnym razie katalog domowy. |
+| **Lokalizacja danych repozytorium** | Gdzie GitPoulpi przechowuje dane poszczególnych repozytoriów (`session.per_repo_state_dir`): **Wewnątrz .git** (domyślnie: nic nie pojawia się w drzewie roboczym, wszystkie worktree dzielą dane), **W drzewie roboczym** (folder `.gitpoulpi`; potrzebne, by zatwierdzić zespołowy `workflow.toml`) albo **W moim folderze danych użytkownika** (poza repozytorium). Folder `.gitpoulpi` zostawiony przez starszą wersję jest przenoszony na nowe miejsce przy pierwszej potrzebie i usuwany, gdy zostanie pusty; plik śledzony przez git (zatwierdzony `workflow.toml`) nigdy nie jest przenoszony ani usuwany i pozostaje czytelny. |
+| **Domyślna nazwa gałęzi** | Pierwsza gałąź repozytorium tworzonego przez Init. Puste: decyduje git. Nie zmienia nazw istniejących gałęzi. |
+| **Włącz proaktywne wykrywanie konfliktów** | Domyślnie włączone (`general.conflict_detection`). Ostrzega w Log, że merge bieżącej gałęzi do gałęzi, z której powstała, spowodowałby konflikt, zanim go spróbujesz. Repozytorium może to wyłączyć dla siebie na stronie **Zapobieganie konfliktom**. Zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md#zapobieganie-konfliktom). Działa po zamknięciu Ustawień. |
+| **Poziom dziennika**, **Przechowuj pliki dziennika**, **Maksymalny rozmiar pliku dziennika** | Dziennik aplikacji za Dziennikiem aktywności: najbardziej szczegółowy zapisywany poziom (`log.level`), jak długo pliki są przechowywane (liczba całkowita i jednostka, dni, tygodnie, miesiące lub lata, w jednym wierszu: kliknij liczbę, by ją wpisać, Up i Down zmieniają ją o krok, Tab przechodzi do jednostki, a Enter otwiera jej listę; najwyżej od 1 do 10 lat, domyślnie 1 tydzień, `log.retention_days` i `log.retention_unit`) oraz rozmiar, przy którym plik z jednego dnia jest rotowany (liczba i MiB lub GiB, od 1 MiB do 1 GiB, `log.max_file_mb` i `log.max_file_unit`). |
+| **Pokaż czas trwania operacji**, **Rozszerzone logowanie** | Karta Operacje git Dziennika aktywności: czas trwania każdej operacji (`log.timings`, domyślnie włączone) oraz praca w tle, odświeżanie i auto-fetch (`log.extended`, domyślnie wyłączone). Zob. [Gdy coś się nie powiedzie](troubleshooting.md#dziennik-aktywności). |
+| **Cofanie włączone**, **Głębokość historii cofania**, **Zapisuj zmiany wykonane poza GitPoulpi** | Grupa **Historia cofania**. Włącza lub wyłącza Cofanie i ustawia, ile operacji zachowuje (domyślnie 100, `0` oznacza bez limitu). Wyłączenie Cofania kasuje historię cofania, po potwierdzeniu. Ostatnia opcja zapisuje też to, co powłoka lub agent robi z gałęziami, tagami, stashami i HEAD. Zob. [Cofnij i ponów](undo-redo.md). |
+
+#### Uruchamianie z systemu (integracja z pulpitem)
+
+Grupa **Uruchamianie z systemu**, ostatnia na stronie Ogólne, tworzy skrót, który uruchamia GitPoulpi
+z menu aplikacji systemu, w wybranym terminalu.
+
+| Wiersz | Co robi |
+|---|---|
+| **Terminal dla skrótów** | `ui.launch_terminal`: **Automatycznie**, **Domyślny systemu** lub jeden z terminali znalezionych na tym komputerze (to samo wykrywanie co w **Otwórz w**). Automatycznie: Windows Terminal w Windows (w przeciwnym razie WezTerm, Alacritty, zwykła konsola), `xdg-terminal-exec` w Linuksie (Omarchy; w przeciwnym razie pierwszy znaleziony terminal), Terminal w macOS, chyba że zainstalowano iTerm2, Ghostty, WezTerm lub kitty. |
+| **Otwórz ponownie w tym terminalu po dwukrotnym kliknięciu** | Tylko Windows (`ui.relaunch_in_terminal`). Dwukrotne kliknięcie pliku exe otwiera domyślną konsolę, która źle rysuje obrazy: GitPoulpi otwiera się ponownie w wybranym terminalu, a pierwsze okno się zamyka. Nie dzieje się tak, gdy uruchomiono go z terminala. |
+| **Pokaż otwarte okno po kliknięciu** | `ui.reuse_window` (domyślnie włączone). Kliknięcie skrótu GitPoulpi (`gitpoulpi launch`) pokazuje okno już otwartego GitPoulpi zamiast uruchamiać kolejne. Nowy terminal uruchamia się tylko wtedy, gdy żaden nie jest otwarty, ustawienie jest wyłączone albo okno nie może wyjść na wierzch. Wychodzi na wierzch w Windows, w WezTerm i w Hyprland; na innych pulpitach Linuksa kliknięcie nadal uruchamia nowe okno. Nieużywane w macOS (robi to już Dock). Aby celowo otworzyć kolejne okno, przytrzymaj **Shift** podczas klikania (Windows, także na przypiętej ikonie paska zadań) albo użyj akcji **New Window** we wpisie programu startowego w Linuksie (prawy przycisk na ikonie); ze skryptu robi to `gitpoulpi launch --new-window`. |
+| **Alias polecenia** | `ui.command_alias`: lista rozwijana z pozycjami **Brak** i `gp`, albo wpisz dowolną nazwę (litery, cyfry, `-`, `_`, `.`; bez spacji i separatorów ścieżki). Przycisk **Utwórz** w wierszu sprawia, że ta nazwa uruchamia GitPoulpi (gdy alias już istnieje, zmienia się w **Usuń** i usuwa każdy alias utworzony przez GitPoulpi). Pod wierszem pojawia się ostrzeżenie, gdy nazwa uruchamia już coś innego w twoim PATH, a w Windows także gdy PowerShell ma wbudowany alias o tej nazwie (`gp` to tam `Get-ItemProperty` i wygrywa z każdym plikiem). Aliasu ani funkcji powłoki nie widać stąd: oh-my-zsh samo definiuje `gp` i wygrywa z naszym. |
+| **Alias nowej karty** | `ui.command_alias_add`: drugie polecenie, na przykład `gpa`, które otwiera bieżący folder jako nową kartę w już uruchomionym GitPoulpi (`gitpoulpi --add`) zamiast uruchamiać kolejny; gdy żadne nie działa, uruchamia GitPoulpi jak zwykle, a gdy działa kilka, pyta, do którego dołączyć. Lista rozwijana z pozycjami **Brak**, `gpa` i nazwą aliasu z dopisanym `a`, albo wpisz dowolną nazwę (te same zasady co wyżej). Jeden przycisk **Utwórz** tworzy oba polecenia, **Usuń** usuwa każde polecenie utworzone przez GitPoulpi; każde ma własny wiersz stanu. W Linuksie i macOS to dwuwierszowy skrypt, w Windows plik `.cmd`. Zob. [Dokumentacja CLI](cli-reference.md#dodawanie-folderu-do-otwartego-okna). |
+| **Dodaj GitPoulpi do PATH** | Dodaje do PATH, dla nowych terminali, folder, z którego działa GitPoulpi, i folder aliasów. Przycisk wiersza to **Dodaj** lub **Usuń**, a **Usuń** usuwa dokładnie to, co dodano. Foldery już obecne w PATH zostają nietknięte (wiersz mówi wtedy **już w PATH**). |
+| **Linux: Menu aplikacji** | Zapisuje `~/.local/share/applications/gitpoulpi.desktop` (uwzględnia `XDG_DATA_HOME`) i ikonę w `~/.local/share/icons/hicolor/256x256/apps`. W Omarchy wpis jest taki sam jak ten, który tworzy `omarchy-tui-install` (`xdg-terminal-exec --app-id=TUI.tile -e <exe>`); dla innych terminali odpowiednie polecenie (`kitty`, `wezterm start --`, `alacritty -e`, `ghostty -e`, `foot`, ...). |
+| **Linux: Pulpit** | Ten sam wpis w folderze Pulpit, jeśli go masz. |
+| **Windows: Menu Start** | `GitPoulpi.lnk` w `%APPDATA%\Microsoft\Windows\Start Menu\Programs`. Kopia przypięta do paska zadań sama podąża za zmianami ikony i koloru; jeśli jej ikona pozostanie stara, odepnij ją i przypnij ponownie (prawy przycisk na wpisie w menu Start, potem **Przypnij do paska zadań**). |
+| **Windows: Pulpit** | `GitPoulpi.lnk` na pulpicie. |
+| **macOS: Folder Aplikacje** | `~/Applications/GitPoulpi.app`, mały pakiet, który otwiera terminal z uruchomionym GitPoulpi. |
+
+Każdy wiersz pokazuje swój stan: **nie utworzono**, **utworzono**, **nieaktualny, aktualizowanie...** (plik exe
+został przeniesiony lub wybrano inny terminal; GitPoulpi sam zapisuje go od nowa w ciągu sekundy, więc rzadko to zobaczysz) lub
+„istnieje plik, który nie pochodzi od GitPoulpi” (plik o tej nazwie istnieje i nie utworzył go
+GitPoulpi, więc nigdy nie jest ruszany). **Usuń** kasuje tylko pliki utworzone przez GitPoulpi
+(mają znacznik `X-GitPoulpi=1`). Ikoną jest ośmiornica w kolorze twojego logo (okno
+O programie, klawisz `c`); w Linuksie każdy kolor ma własną nazwę ikony, więc menu aplikacji, które buforuje ikony, pokaże nowy kolor. Gdy skrót zostanie utworzony, sam pozostaje aktualny: gdy zmienisz kolor albo terminal lub plik exe się przeniesie, GitPoulpi zapisuje od nowa skróty, które utworzył (nigdy takiego, którego nie utworzył, i nigdy nie tworząc nowego), przy uruchomieniu i w trakcie działania. Nie ma przycisku Aktualizuj; jest tylko **Utwórz** (dla skrótu, którego jeszcze nie ma) i **Usuń**.
+
+**Grupowanie na pasku zadań i w docku.** GitPoulpi działa w oknie terminala, więc pasek zadań zwykle pokazuje je pod ikoną terminala, bez kropki „uruchomione” pod przypiętą ikoną GitPoulpi. Windows: skróty niosą AppUserModelID `GitPoulpi.GitPoulpi`, a GitPoulpi uruchomiony z jednego z nich nadaje oknu swojego terminala ten sam identyfikator i swoją ikonę (znajduje okno, nadając mu na chwilę unikalny tytuł, po czym przywraca tytuł), dzięki czemu okno trafia pod przypiętą ikonę GitPoulpi. Okno terminala z wieloma kartami przenosi się jako całość: wszystkie jego karty grupują się pod ikoną GitPoulpi, dopóki działa w nim GitPoulpi. Wcześniej utworzone skróty i przypięcia na pasku zadań są przepisywane tą samą synchronizacją; jeśli przypięcie nadal pokazuje ikonę terminala, odepnij je i przypnij ponownie. Linux: kitty, foot, Alacritty, WezTerm i Ghostty są uruchamiane z klasą okna `gitpoulpi`, a wpis `.desktop` ją podaje (`StartupWMClass`), więc dock grupuje okno pod ikoną programu startowego; pozostałe terminale zachowują własną ikonę. macOS: nic do zrobienia, Dock grupuje według aplikacji.
+
+![Ustawienia > Ogólne, przewinięte do grupy Uruchamianie z systemu: terminal dla skrótów i wiersz menu aplikacji](../images/settings-launcher.png)
+
+##### Alias polecenia i PATH w poszczególnych systemach
+
+| System | Alias | PATH |
+|---|---|---|
+| Linux, macOS | Dowiązanie symboliczne `~/.local/bin/<nazwa>` do `gitpoulpi-tui`. Dowiązanie nie może zawierać znacznika, więc uznaje się je za nasze, gdy jego celem jest plik o nazwie `gitpoulpi-tui`; zwykły plik albo dowiązanie do czegokolwiek innego **nie jest nasze** i nigdy nie jest zastępowane ani usuwane. | Blok między `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` a `# <<< GitPoulpi PATH <<<` w `~/.bashrc` i `~/.zshrc` (w tych, które istnieją; `~/.zshrc` w macOS, w przeciwnym razie `~/.bashrc`, gdy nie ma żadnego) oraz `~/.config/fish/conf.d/gitpoulpi-path.fish`, gdy skonfigurowano fish. Usuń kasuje blok (lub plik fish) i nic więcej. |
+| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<nazwa>.cmd`, dwuwierszowy skrót zawierający `REM X-GitPoulpi=1`. | PATH użytkownika w `HKCU\Environment`, zapisany przez PowerShell, a potem rozgłoszenie `WM_SETTINGCHANGE`, by nowe programy go widziały. Wartość `GitPoulpiPathAdded` zapisuje, co dodano, a Usuń zabiera tylko to. |
+
+Nowe terminale widzą zmianę PATH, otwarte już nie. Żadna z tych akcji nie trafia do historii cofania: nie ma dla nich Cofnij, drogą powrotną jest **Usuń**.
+
+Paleta ma te same akcje (**Uruchamianie: Utwórz skrót**, **Uruchamianie: Utwórz skrót na pulpicie**,
+**Uruchamianie: Usuń skróty**, **Uruchamianie: Utwórz alias polecenia**, **Uruchamianie: Usuń alias polecenia**,
+**Uruchamianie: Dodaj do PATH**, **Uruchamianie: Usuń z PATH**), a `gitpoulpi desktop shortcut
+status|install|remove [--where launcher|desktop|startmenu]` robi to samo ze skryptu.
+
+Polecenie palety **Aplikacja: Zmień język...** (`Ctrl+N g`) otwiera tę samą
+listę języków. Wyróżniony język jest tam podglądany na żywo; `Enter` go zachowuje,
+a `Esc` przywraca poprzedni.
+
+### Synchronizacja
+
+Jak GitPoulpi utrzymuje repozytorium w zgodzie ze zdalnymi repozytoriami i co w tym czasie
+robi z lokalnymi zmianami.
+
+![Strona Synchronizacja: interwał automatycznego pobierania jako liczba i jednostka (minuty) w jednym wierszu, a pod nim pozostałe opcje](../images/settings-quantity.png)
+
+| Opcja | Działanie |
+|---|---|
+| **Interwał auto-fetch** | Pobiera wszystkie zdalne repozytoria w tle co taki czas, liczba i jednostka (minuty lub godziny) w jednym wierszu. Domyślnie 5 minut, maksimum 60 minut (1 godzina), `0` wyłącza. `general.auto_fetch_interval_minutes` zostaje w minutach; `general.auto_fetch_interval_unit` tylko zapamiętuje sposób wyświetlania. Wymaga restartu. |
+| **Fetch po otwarciu karty** | Uruchamia w tle fetch wszystkich zdalnych, gdy otwiera się karta repozytorium. Domyślnie włączone. Repozytorium pobrane w ciągu ostatnich 60 sekund nie jest pobierane ponownie. |
+| **Auto-prune** | Fetch usuwa też gałęzie śledzące zdalne, które nie istnieją już na zdalnym repozytorium. Domyślnie wyłączone. |
+| **Auto-prune tagów** | Fetch usuwa też lokalne tagi, które zniknęły ze zdalnego repozytorium. Dotyczy tylko tagów, które tam były: tag, którego nigdy nie wypchnięto (push), zostaje. Domyślnie wyłączone, tak jak w samym git. Wymaga git 2.41 lub nowszego. CLI: `gitpoulpi fetch --prune-tags`; klucz konfiguracji `general.auto_prune_tags`. Zobacz [Gałęzie, tagi i panel Refs](log-and-history.md#gałęzie-tagi-i-panel-refs). |
+| **Aktualizuj submoduły** | Po checkout lub pull aktualizuje submoduły do commitów zapisanych w repozytorium. Zob. [Submoduły](submodules.md). |
+| **Usuń pliki „.orig” po merge** | Po zakończeniu merge usuwa pliki kopii zapasowych `*.orig`. Domyślnie wyłączone. |
+| **Auto-stash przed checkout, pull, merge lub rebase** | Co robić, gdy lokalne zmiany blokują jedną z tych operacji: **pytaj** (okno proponuje zrobienie stasha zmian, wykonanie operacji i przywrócenie stasha), **zawsze** (robi to bez pytania) lub **nigdy** (odmawia). |
+| **Uwzględnij nieśledzone pliki w auto-stash** | Automatyczny stash obejmuje też pliki nieśledzone. |
+
+Na tej stronie, w grupie **Aktualizacje**:
+
+| Opcja | Działanie |
+|---|---|
+| **Sprawdzanie aktualizacji** | Lista rozwijana (`updates.mode`): **Powiadamiaj** (domyślnie) raz dziennie sprawdza w tle i pokazuje `vX.Y.Z dostępna` na pasku tytułu; **Automatycznie** dodatkowo pobiera aktualizację w tle, gdy GitPoulpi zainstalowano z archiwum wydania (moment ponownego uruchomienia nadal wybierasz ty); **Wył.** nigdy nie wysyła zapytań. Działa od razu. Zob. [Aktualizacje](installation.md#aktualizacje). |
+| **Kanał aktualizacji** | Lista rozwijana (`updates.channel`): **Stabilny** (domyślnie) albo **Wstępny** (także wersje kandydujące). Działa od razu. |
+
+Na tej stronie, w grupie **Przepisywanie historii**, limity czasu skryptów zewnętrznych (zob. [Przepisywanie historii](history-rewrite.md)):
+
+| Opcja | Działanie |
+|---|---|
+| **Limit czasu na odpowiedź skryptu** | Ile czasu zewnętrzny skrypt ma na odpowiedź dla jednego commita, liczba i jednostka (milisekundy lub sekundy) w jednym wierszu. Domyślnie 5 sekund, od 1 milisekundy do 10 minut (`rewrite.script_timeout_ms`, `rewrite.script_timeout_unit`). Po przekroczeniu cały proces jest zatrzymywany, a przepisywanie kończy się błędem bez żadnych zmian. |
+| **Limit czasu skryptu na przebieg** | Ile może trwać jeden pełny przebieg zewnętrznego skryptu, liczba i jednostka (sekundy, minuty lub godziny). Domyślnie 1 godzina, do 24 godzin (`rewrite.script_total_timeout_s`, `rewrite.script_total_timeout_unit`). |
+
+### Profile
+
+![Strona Profile](../images/settings-profiles.png)
+
+Profile tożsamości commitów: imię i nazwisko oraz e-mail używane w commitach
+tworzonych z GitPoulpi. Karta **Ogólne** zawiera listę rozwijaną **Aktywny profil**;
+karta **Profile** to [lista](#listy) (dodawanie, duplikowanie, usuwanie, zmiana
+kolejności) z polami zaznaczonego profilu. Każdy profil ma **ID profilu**, **Nazwa profilu**, **Imię i nazwisko
+autora** i **E-mail autora**. Profil bez e-maila ma na liście `⚠`. Bez aktywnego profilu
+albo przy profilu z pustą nazwą lub e-mailem obowiązują własne `user.name`
+i `user.email` repozytorium.
+
+Przy dwóch lub więcej profilach pasek narzędzi pokazuje na prawym końcu listę
+rozwijaną profilu. Ustawia ono profil tylko dla aktywnego repozytorium. Po wyborze
+okno proponuje zapisanie tej tożsamości także w konfiguracji tego
+repozytorium. Polecenie palety to **Repozytorium: Zmień profil...**.
+
+Te profile to nie profile hostingu ze strony Integracje ani profile AI ze
+strony AI.
+
+### SSH i poświadczenia
+
+![Strona SSH i poświadczenia](../images/settings-ssh.png)
+
+SSH korzysta z systemowego `ssh`, więc ssh-agent i konfiguracja ssh nadal
+działają. GitPoulpi nigdy nie czyta materiału klucza.
+
+| Opcja | Działanie |
+|---|---|
+| **Ścieżka klucza prywatnego** | Gdy ustawiona, fetch, pull, push i clone uruchamiają git z `GIT_SSH_COMMAND=ssh -i "<key>" -o IdentitiesOnly=yes`, więc ssh proponuje tylko ten klucz. Puste: agent i konfiguracja ssh działają bez zmian. |
+| **Ścieżka klucza publicznego** | Używana tylko przy pustej ścieżce klucza prywatnego: ssh wybiera pasujący klucz trzymany przez ssh-agent (lub klucz sprzętowy). |
+| **Typ klucza** | Typ, który tworzy **Generuj parę kluczy**: `ed25519`, `rsa` (4096 bitów) lub `ecdsa` (NIST P-256). |
+| **Poświadczenia HTTPS** | Jak fetch, pull, push i clone uwierzytelniają się przez HTTPS: **credential_helper** (własny menedżer poświadczeń gita, domyślnie), **prompt** (ignoruje menedżery poświadczeń; git pyta w terminalu) lub **none** (bez poświadczeń, tylko publiczne zdalne repozytoria). |
+| **Zapomnij wszystkie nazwy użytkowników i hasła** | Usuwa każdy token zapisany przez GitPoulpi w menedżerze poświadczeń. Najpierw prosi o potwierdzenie. |
+| **Generuj parę kluczy** | Tworzy parę kluczy wybranego **Typ klucza** w `~/.ssh/gitpoulpi_<type>`, bez hasła, i zapisuje obie ścieżki. Nigdy nie nadpisuje pliku. |
+
+Ścieżki kluczy obowiązują od następnego transferu. Prefiks `~/` oznacza katalog
+domowy.
+
+Ustawienie zrobione gdzie indziej zawsze wygrywa ze ścieżkami z tej strony.
+Kolejność, od najwyższego priorytetu:
+
+1. `GIT_SSH_COMMAND` lub `GIT_SSH` w środowisku, w którym działa GitPoulpi.
+2. `core.sshCommand` w konfiguracji git repozytorium lub w globalnej
+   konfiguracji git. Pozycja *Klucz SSH...* w menu karty zapisuje to dla jednego
+   repozytorium.
+3. Dwie ścieżki kluczy z tej strony.
+4. Własne domyślne ustawienia ssh i agent.
+
+Klucz może też należeć do konta hostingu; zob.
+[Hosting i trackery zgłoszeń](hosting-integration.md#klucz-ssh-na-profil).
+
+### Integracje
+
+![Strona Integracje: dostawcy po lewej i przycisk Połącz dla GitHub](../images/settings-integrations.png)
+
+Łączy konta. Grupa **Hosting** zawiera GitHub, GitHub Enterprise, GitLab,
+GitLab Self-Managed, Azure DevOps, Azure DevOps Server, Bitbucket, Bitbucket Data Center, Gitea, Forgejo i Gerrit. Grupa **Trackery zgłoszeń** zawiera Jira Cloud, Jira Data Center, Trello, Linear, YouTrack, Redmine i Local Markdown. Każdy dostawca ma **Połącz**, pole tokenu, zakresy potrzebne tokenowi
+i odnośnik do strony tokenów hosta. Ta strona ma własny przewodnik:
+[Hosting i trackery zgłoszeń](hosting-integration.md).
+
+Nad listą dostawców są dwie opcje. Naciśnij `Up` na pierwszym dostawcy, aby do
+nich dojść.
+
+| Opcja | Działanie |
+|---|---|
+| **Odświeżanie: pull requesty i zgłoszenia** | Jak często odświeżają się listy w panelu bocznym i znacznik na pasku narzędzi, liczba i jednostka (minuty lub godziny). Domyślnie 5 minut, do 2 godzin, `0` wyłącza licznik (`general.hosting_refresh_minutes`, `general.hosting_refresh_unit`). |
+| **Terminologia żądań przeglądu** | Słowo używane dla przeglądów na hoście: **Auto (wg hosta)**, **Pull Request** lub **Merge Request**. |
+| **Ukryj chip pull requesta, gdy jest zamknięty lub scalony** | Domyślnie włączone (`ui.hide_finished_pr_chip`; na GitLabie nazywa się „merge request”). Chip na pasku narzędzi pokazuje najnowsze żądanie aktywnej gałęzi; gdy to żądanie zostanie zamknięte lub scalone, chip znika, a zamiast niego pojawia się przyciemniony chip **+ PR** (rozpocznij nowe żądanie), tak jakby gałąź go nie miała. Wyłączone: chip zawsze pokazuje najnowsze żądanie, niezależnie od jego stanu. Działa od razu. |
+
+### AI
+
+![Strona AI: Włącz AI, instrukcje globalne i bloki poszczególnych akcji](../images/settings-ai.png)
+
+Na karcie **Ogólne**: przełącznik włączający AI, profil domyślny, instrukcje,
+które dostaje każda akcja, oraz profil i instrukcje dla każdej akcji. Karta
+**Profile (połączenia)** to [lista](#listy) profili AI z wbudowaną tabelą zmiennych
+środowiskowych profilu. Blok *Przegląd kodu* na karcie Ogólne
+zawiera też wartości domyślne [kontekstu przeglądu](ai.md#kontekst-przeglądu): **Uruchom agenta w repozytorium**
+(*Ustawienie profilu*, *Tak*, *Nie*), **Dołącz CLAUDE.md**, **Dołącz AGENTS.md** i **Dodatkowy plik** (ścieżka lub
+link; puste nie dodaje nic, z przyciskiem **Przeglądaj...** pod spodem, który otwiera wybór pliku; `Enter` na przycisku to jego forma klawiaturowa). Ta strona ma własny
+przewodnik: [Wsparcie AI](ai.md).
+
+### Agenci i MCP
+
+Co agenci AI mogą robić w tym oknie i czy serwer MCP może działać. Dwa wiersze
+MCP są widoczne tylko w kompilacjach zawierających serwer; zob.
+[MCP i agenci](mcp-and-agents.md).
+
+| Opcja | Działanie |
+|---|---|
+| **Serwer MCP** | Włączone (domyślnie): agent może uruchomić serwer (`gitpoulpi mcp serve`). Wyłączone: odmawia startu. Zapisywane jako `mcp.enabled`. Zmiana działa od następnego uruchomienia serwera przez agenta; już działający serwer zachowuje swoje ustawienia. |
+| **Port serwera MCP** | Port, na którym nasłuchuje `--http`, gdy nie podano adresu, od 1 do 65535 (domyślnie 8808). Zapisywany w porcie `mcp.bind`; część hosta zostaje (`127.0.0.1`, gdy pusta). Działa od następnego uruchomienia serwera przez agenta. |
+| **Pozwól agentom AI sterować widokiem** | Pozwala agentom pokazać w tym oknie commit, plik lub powiadomienie (`ui show`). Wyłączone: żaden agent nie sięga do okna. |
+| **Pozwól agentom AI proponować zmiany do mojego potwierdzenia** | Pozwala agentom otwierać wstępnie wypełnione okna Reword, commit, gałęzi lub tagu, które potwierdzasz. Domyślnie wyłączone. Zob. [MCP i agenci](mcp-and-agents.md#uprawnienia). |
+| **Otwórz okno dla agentów**, **Polecenie uruchomienia (custom)** | Czy agent może otworzyć okno GitPoulpi, gdy żadne nie jest otwarte, i w jakim terminalu lub multiplekserze. Domyślnie wyłączone. |
+
+### Wygląd
+
+![Strona Wygląd: motyw, awatary, kolor pól tekstowych, głębia kolorów i kolory grafu (formaty dat są niżej)](../images/settings-ui.png)
+
+![Lista Motyw otwarta na stronie Wygląd z wyróżnionym motywem Jasny: cały ekran Ustawień już maluje się w tym motywie](../images/settings-appearance-theme.png)
+
+| Opcja | Działanie |
+|---|---|
+| **Motyw** | **System (zgodny z terminalem)**, motyw wbudowany albo jeden z własnych plików motywu. Wyróżniony motyw jest podglądany na żywo: `Enter` go zachowuje, `Esc` przywraca poprzedni. Pasek **Kolory** pod wierszem pokazuje obowiązujące kolory. Zob. [Motywy](themes.md). |
+| **Awatary autorów** | **wył.** (domyślnie, bez sieci), **graf** (w kropce commita) lub **autor** (w kolumnie Autor). Po włączeniu hasz e-maila każdego autora jest wysyłany do Gravatar i do dostawcy hostingu. |
+| **Źródła awatarów**, **Awatar zapasowy** | Gdzie szuka się obrazków i w jakiej kolejności. Dla autorów bez obrazka: **identicon** (generowany wzór) lub **inicjały**. |
+| **Kolor pól tekstowych**, **Własny kolor pól tekstowych** | Tło pól tekstowych: **Zgodnie z motywem** (domyślnie), stały ciemny kolor albo własny `#rrggbb`. |
+| **Głębia kolorów** | **auto** (domyślnie), **truecolor**, **256** lub **16**. Zob. [Motywy](themes.md). |
+| **Motyw kolorów grafu** | **Zgodnie z motywem** (domyślnie: własne kolory ścieżek motywu) lub dowolna paleta ścieżek. Każda paleta pokazuje kilka swoich kolorów. Zmiana obowiązuje po zamknięciu Ustawień. Polecenie palety **Aplikacja: Zmień motyw kolorów grafu...** (`Ctrl+N Shift+Y`) podgląda każdą paletę na żywo. |
+| **Tło ścieżek grafu** | **Wył.** (przezroczyste) lub **Podbarwienie wiersza**: delikatny pas koloru ścieżki za kolumną grafu, z cienkim paskiem na brzegu. |
+| **Intensywność podbarwienia** | Jak blady jest pas podbarwienia: **Mocne**, **Średnie** (domyślnie) lub **Subtelne**. Pasek na brzegu zachowuje pełny kolor. |
+| **Położenie paska narzędzi** | `ui.toolbar_position`: Gdzie leży pasek narzędzi: U góry, Na dole (domyślnie), Po lewej lub Po prawej. Po lewej i Po prawej robią z niego kolumnę obok paneli; w oknie węższym niż 80 kolumn jest rysowany na dole. Działa od razu. |
+| **Wyrównanie przycisków paska narzędzi** | `ui.toolbar_align`: Gdzie leżą przyciski wzdłuż paska: Początek (domyślnie), Środek lub Koniec. Początek to lewa strona wiersza i góra kolumny; koniec to prawa strona i dół. Działa od razu. |
+| **Przypnij przycisk pull request na końcu** | `ui.toolbar_pr_pinned`: Włączone (domyślnie): przycisk pull request leży na samym końcu paska narzędzi (po prawej, w kolumnie na dole) przy każdym wyrównaniu. Wyłączone: płynie razem z innymi przyciskami i jest z nimi wyrównany. Działa od razu. |
+| **Położenie paska stanu** | `ui.statusbar_position`: Gdzie leży pasek stanu (gałąź, liczniki, komunikaty, podpowiedzi klawiszy): U góry, nad kartami repozytoriów, lub Na dole (domyślnie). Karta Home zachowuje własny pasek stanu na dole. Działa od razu. |
+| **Położenie paska kart** | `ui.tabs_position`: Gdzie leżą karty repozytoriów: U góry (domyślnie), Na dole lub Po lewej, lista z jedną kartą w wierszu przy lewej krawędzi okna. W oknie węższym niż 80 kolumn są rysowane u góry. Obok paska narzędzi w kolumnie karty zostają na zewnątrz. Działa od razu. |
+| **Ustawienia regionalne daty/czasu** | **systemowy** (domyślnie): nazwy miesięcy i dni tygodnia w języku interfejsu. **english**: zawsze angielskie nazwy. |
+| **Format daty**, **Format daty/czasu**, **Format daty rozszerzony** | Wzorce dat dla kolumny daty w Historii pliku i Blame, dla kolumny Data w Logu oraz dla szczegółów commita. Każdy pokazuje podgląd na żywo. Znaczniki opisuje [Opis konfiguracji](config-reference.md#ui). |
+
+![Lista Motyw kolorów grafu: Zgodnie z motywem, a potem każda paleta ścieżek z kilkoma jej kolorami](../images/settings-log-graph-lanes.png)
+
+### Log i graf
+
+Jak rysowany jest graf commitów i ile commitów wczytuje Log. Kolory grafu są na
+stronie **Wygląd**.
+
+| Opcja | Działanie |
+|---|---|
+| **Renderer grafu** | **auto** rysuje obraz tam, gdzie terminal to obsługuje, a znaki gdzie indziej. **obraz** wymusza obraz, **tekst** wymusza znaki. Wymaga restartu. |
+| **Protokół obrazów** | Jak obrazy trafiają do terminala: **auto**, **kitty**, **iterm2**, **sixel** lub **none**. Wymaga restartu. |
+| **Pokaż stashe w grafie** | Wiersz dla każdego stasha w Logu. Wyłączone: stashe widać tylko w panelu bocznym. |
+| **Pokaż widmową gałąź dla najechanego commita** | Domyślnie włączone (`ui.graph_ghost_ref`). W kolumnie Ref najechany commit, który nie ma własnego refa, pokazuje wyblakłą pigułkę z nazwą gałęzi, do której należy (w razie braku jej gałąź zdalną), wywnioskowaną z historii, tam gdzie kolumna ma miejsce. Gałąź usunięta po scaleniu nadal się pokazuje, przekreślona, pod nazwą z tematu merge commita (`Merge branch 'x'`, `Merge pull request #N from owner/x`, ...); scalenia squash, rebase i fast-forward nie zostawiają takiego śladu. Tagi nigdy nie są pokazywane jako widmo. Najechanie na pigułkę pokazuje jej rodzaj. Kliknięcie nie robi nic szczególnego; gałąź tworzy polecenie palety `Git: Utwórz gałąź dla zaznaczonego commita...`. |
+| **Łącznik ref–commit** | Cienka linia od etykiety ref do kropki jej commita. |
+| **Zmiana szerokości kolumn** | `ui.column_resize`, stosowane od razu w Logu, Radarze i kolumnie commitów w widokach diffa, pliku i blame. **line** (domyślnie): każda granica kolumny to odstęp jednej komórki z małym znacznikiem w nagłówku, cienka linia akcentu rysuje się w dół całej tabeli, gdy wskaźnik jest na granicy, a przeciągnięcie z dowolnego miejsca wzdłuż niej zmienia szerokość. **header**: bez znacznika, pierwszy znak komórki nagłówka za granicą zapala się i jest jedynym miejscem, z którego można przeciągać. Klawisze zmiany szerokości (`Shift+C` w Logu, `C` w Radarze, `Tab` w kolumnie commitów) działają tak samo w obu. |
+| **Pokaż liczniki zmian WIP w opisie, gdy kolumna Changes jest ukryta** | Pokazuje liczniki zmian (`✎ 3  + 2  − 1`) w opisie wiersza WIP. Gdy kolumna Zmiany jest widoczna, liczniki trafiają tam. |
+| **Drzewo folderów gałęzi** | Grupuje gałęzie i tagi po `/` w foldery w panelu bocznym. `y` w panelu Refs przełącza. |
+| **Sekcje panelu bocznego** | Od czego zależy, które sekcje panelu bocznego są pokazane lub ukryte: **per repository** (domyślnie; każde repozytorium ma własny zestaw, globalny jest punktem wyjścia) albo **global** (jeden zestaw dla wszystkich repozytoriów). Przełączanie tam i z powrotem zachowuje oba zestawy. Zob. [mysz i gesty](mouse-and-gestures.md). (`ui.sidebar_sections_scope`) |
+| **Kliknięcie refu pokazuje go w grafie** | Pojedyncze kliknięcie refu w panelu Refs przewija Log do miejsca, na które ref wskazuje, i na chwilę podświetla wiersz (zaznaczenie commita i prawy panel pozostają bez zmian). Po wyłączeniu: kliknięcie tylko zaznacza wiersz paska bocznego. **Pokaż w grafie** działa w obu przypadkach. |
+| **Propozycje kompozytora** | Czy kompozytor commitów AI otwiera się z plikami każdej propozycji **rozwinięte** czy **zwinięte**. |
+| **Początkowe commity w grafie** | Ile commitów wczytuje Log po otwarciu repozytorium. Domyślnie 5000, minimum 500. Wyższe wartości spowalniają duże repozytoria. |
+| **Leniwe wczytywanie commitów w grafie** | Włączone: kolejne commity wczytują się w tle, gdy przewiniesz do najstarszego wczytanego commita. Wyłączone: Log zatrzymuje się na commitach początkowych. |
+| **Commity na stronę leniwego wczytywania** | Ile commitów pobiera jedno wczytanie w tle. |
+| **Maksymalna liczba commitów w grafie** | Leniwe wczytywanie zatrzymuje się na tej liczbie. `0` oznacza brak limitu. Każdy commit zajmuje około 300 bajtów pamięci. |
+| **Metoda liczenia: commity** | Jak pasek stanu ustala łączną liczbę w `wczytane / łącznie` (`log.commit_count`, lista rozwijana, działa od razu): **System git** uruchamia jeden proces `git rev-list --count` (domyślnie, zwykle najszybciej); **libgit2** liczy wewnątrz GitPoulpi i nie uruchamia procesu, dla maszyn, na których oprogramowanie antywirusowe skanuje każde polecenie i spowalnia każde wywołanie gita; **Wył.** nigdy nie liczy i pokazuje tylko wczytane commity. |
+| **Pokaż autorów przez .mailmap** | Log, blame i historia pliku pokazują każdego autora tak, jak nazywa go `.mailmap` repozytorium (`log.use_mailmap`, przełącznik, domyślnie włączony, działa od razu). Zapisane commity nigdy się nie zmieniają. Wyłączone pokazuje nazwy takie, jakie zatwierdzono. Zob. `history-rewrite.md`, *Karta Tożsamości*. |
+
+### Diff i edytor
+
+![Strona Diff i edytor](../images/settings-editor.png)
+
+| Opcja | Działanie |
+|---|---|
+| **Rozmiar tabulacji** | Kolumn na tabulator, od 1 do 8 (domyślnie 4). |
+| **Koniec linii** | Co edytor zapisuje przy zapisie: **Auto (zachowaj z pliku)**, **LF** lub **CRLF**. |
+| **Podświetlanie składni** | Kolory języka w edytorze. |
+| **Numery linii** | Kolumna numerów linii w edytorze i w diff. |
+| **Podążaj za zaznaczeniem w edytorze** | Gdy edytor jest otwarty, zaznaczenie innego pliku w prawym panelu otwiera go także w edytorze, po zapytaniu o zapisanie niezapisanych zmian. Plik, którego nie można edytować, otwiera się w zwykłym widoku. Tylko dla zmian roboczych: plik wybrany z commita opuszcza edytor na rzecz diffa tego commita. Domyślnie włączone (`editor.follow_selection`). |
+| **Zawijanie wierszy** | Zawija długie linie diff. |
+| **Domyślny układ**, **Tylko hunki**, **Pokaż zmiany tylko w białych znakach**, **Minimapa** | Początkowy stan widoku diff. Pasek widoku diff zmienia je i zapisuje. |
+| **Adnotacje Blame**, **Szerokość adnotacji Blame** | Po której stronie widoku Blame jest kolumna adnotacji (awatar, autor, wiek, opis): **right** (domyślnie) lub **left**, oraz jej szerokość w komórkach (od 24 do 90). Przeciągnięcie krawędzi kolumny w widoku Blame albo klawisze `>` / `<` zapisują tu szerokość (`ui.blame_side`, `ui.blame_width`). Zob. [Blame](log-and-history.md#blame). |
+| **Edytor merge: obok siebie od (kolumn)** | Od tej szerokości edytor merge pokazuje A i B obok siebie. Domyślnie 100, minimum 40, `0` oznacza zawsze. Poniżej A i B są kartami. Zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md). |
+| **Zewnętrzny edytor** | Polecenie dla pozycji pliku *Otwórz w edytorze*. `{file}` to ścieżka. Puste: VS Code, jeśli jest zainstalowany, w przeciwnym razie domyślna aplikacja systemu. |
+| **Zewnętrzne narzędzie diff** | Polecenie dla *Otwórz w zewnętrznym narzędziu diff*. `{local}` i `{remote}` to dwie wersje. Puste: `git difftool`. |
+| **Zewnętrzne narzędzie merge** | Polecenie dla *Otwórz w zewnętrznym narzędziu merge* na karcie konfliktu. `{base}`, `{local}`, `{remote}` i `{merged}` to pliki. Puste: `git mergetool`. |
+| **Eksplorator plików** | Polecenie dla *Pokaż w folderze*. `{path}` to plik, `{dir}` jego folder. |
+
+### Otwórz w
+
+![Strona Otwórz w, karta Wpisy: lista wpisów, edytowany wpis z etykietą i poleceniem oraz przycisk + Dodaj](../images/settings-open-in.png)
+
+Edytuje listę przycisku **Otwórz w** na pasku tytułu. Karta **Ogólne** zawiera
+przyciski folderu **Zakończ i cd tutaj**, **Wpis domyślny** i **Przywróć wykryte
+ustawienia domyślne**. Karta **Wpisy** to [lista](#listy) (każdy wpis z etykietą
+i poleceniem): **+ Dodaj ▾** oferuje ustawienia wstępne i pozycję **Własny**,
+a wpis domyślny jest oznaczony `★`. Pola zaznaczonego wpisu
+zawierają przycisk **Testuj**. Zob. [Otwórz w](open-in.md).
+
+Pierwszy wiersz, **Podążaj za folderem aktywnej karty**, ma dwie wartości:
+
+- **przyciski** (domyślnie): rząd kart pokazuje **Zakończ i cd tutaj**, gdy
+  aktywna karta nie jest folderem, w którym uruchomiono GitPoulpi.
+- **auto**: bez przycisku. Każde zakończenie zmienia folder powłoki na aktywną
+  kartę, a otwarcie nowej karty uruchamia domyślny wpis Otwórz w.
+
+Zob. [Podążanie za folderem aktywnej karty](following-the-tab-folder.md).
+
+### Obrazy
+
+Jak pokazywane są pliki obrazów i którego programu używa **Edytuj w**. Zob.
+[Obrazy](image-view.md). Karta **Ogólne** zawiera poniższe opcje podglądu,
+**Wpis domyślny** i **Przywróć wykryte ustawienia domyślne**; karta **Edytory** to
+lista edytorów obrazów. Kompilacja bez podglądu obrazów nie ma opcji podglądu.
+
+| Opcja | Działanie |
+|---|---|
+| **Podgląd obrazów** | Pokazuje plik obrazu jako obraz w widoku Diff i widoku pliku. Wyłączone: zwykła informacja o pliku binarnym. Domyślnie włączone. |
+| **Bez protokołu obrazów** | W terminalu bez protokołu obrazów w linii: **Kolory półbloków** (domyślnie) lub **Tylko karta informacyjna**. |
+| **Maks. rozmiar podglądu** | Większe obrazy nie są dekodowane; zamiast tego pokazuje się karta informacyjna. Liczba i MiB lub GiB, domyślnie 32 MiB, do 1 GiB (`ui.image_view_max_mib`, `ui.image_view_max_unit`). |
+| **Powiększ pikselowo od** | `1x`, `2x` (domyślnie) lub `never`: od tego powiększenia obraz pokazuje kwadratowe piksele zamiast wygładzonego obrazu. |
+| **Synchronizuj powiększenie i przewijanie przed/po** | Oba panele diff obrazu dzielą jedno powiększenie i jedną pozycję przewijania. Domyślnie włączone. |
+
+Karta **Edytory** to [lista](#listy) jak [Otwórz w](open-in.md): dla każdego edytora **Etykieta**, **Polecenie**, przyciski zmiennych
+`${file}` `${dir}` `${name}` `${repo}` i **Testuj na przykładowym obrazie**;
+**+ Dodaj ▾** oferuje ustawienia wstępne i pozycję **Własny**, a **Przywróć wykryte
+ustawienia** resetuje listę. Dopóki jej nie zmienisz,
+lista zawiera edytory zainstalowane na tym komputerze i domyślną aplikację
+systemu. Każda zmiana działa od razu.
+
+### Klawiatura i mysz
+
+![Strona Klawiatura i mysz: każda akcja według kontekstu z jej klawiszami, pole wyszukiwania i filtry](../images/settings-keyboard.png)
+
+**Ustawienia > Klawiatura i mysz** ma dwie karty (kliknięcie albo `Alt+Left` / `Alt+Right`).
+**Ogólne** zawiera protokół klawiatury i ustawienia myszy; **Skróty klawiszowe**
+wylicza każdy skrót według kontekstu, z polem wyszukiwania (`/`) i filtrami. W wierszu:
+
+| Klawisz | Akcja |
+|---|---|
+| `Enter` lub podwójne kliknięcie | Przechwytuje nowy klawisz. Konflikty i ostrzeżenia terminala pokazują się podczas naciskania. |
+| `a` | Dodaje klawisz alternatywny. |
+| `u` | Odpina akcję. |
+| `r` | Przywraca wiersz do domyślnego. |
+| `R` | Resetuje wszystkie skróty, po potwierdzeniu. |
+| `c` lub kliknięcie `!` w wierszu | Pokazuje akcję ze wszystkimi akcjami, z którymi koliduje jej klawisz; `Esc` znów pokazuje wszystko. Klawisz kolidujący z klawiszem innej akcji jest czerwony, ostrzeżenie dotyczące samego klawisza (terminal nie może go wysłać) pomarańczowe. |
+
+Użyj tego do rozwiązywania kolizji z tmux, AutoHotkey, herdr lub terminalem.
+Te same ustawienia znajdują się w tabeli `[keybindings]` pliku `config.toml`;
+zob. [Opis konfiguracji](config-reference.md#keybindings) i
+[Skróty klawiszowe](keybindings.md).
+
+![Strona Klawiatura i mysz po naciśnięciu c na Zakończ: klawisz q jest czerwony przy Zakończ i przy Stage lub unstage zaznaczony wiersz, dwóch kolidujących akcjach](../images/settings-keyboard-conflicts.png)
+
+Trzy opcje są na karcie **Ogólne**.
+
+| Opcja | Działanie |
+|---|---|
+| **Protokół klawiatury Kitty** | **auto** prosi terminal o protokół klawiatury kitty, dzięki czemu docierają `Ctrl+,`, `Ctrl+Enter` i `Ctrl+Shift+N`. **off** nigdy nie prosi; użyj, jeśli terminal źle działa. Wymaga restartu. |
+| **Mysz włączona** | Wyłączone zostawia mysz i zaznaczanie tekstu terminalowi. Wymaga restartu. |
+| **Linie kółka myszy** | O ile wierszy w Logu przesuwa jeden krok kółka. Wymaga restartu. |
+
+### Ustawienia repozytorium: Git i kodowanie
+
+![Strona Git i kodowanie dla tego repozytorium](../images/settings-git.png)
+
+| Opcja | Działanie |
+|---|---|
+| **Backend gita** | `git2` (libgit2, domyślnie) lub `system` (zainstalowany `git`). Globalne. Działa dla demonów uruchomionych po zmianie. |
+| **Przycisk Pull** | Co robi przycisk Pull: merge (fast-forward, jeśli możliwy), tylko fast-forward lub rebase. Globalne. Pozycje `▾` tego nie zmieniają. |
+| **Przycisk Push** | **od razu** wypycha natychmiast; **pytaj** najpierw pokazuje menu zdalnych repozytoriów. Globalne. |
+| **Domyślne kodowanie** | Kodowanie używane do pokazania tekstu, który **nie jest poprawnym UTF-8**: zawartości plików, blame, diffów i opisów commitów. Strona ma wiersz globalny i wiersz dla tego repozytorium; wiersz repozytorium wygrywa. Poprawny UTF-8 nigdy nie jest dekodowany ponownie, a staging niczego nie koduje ponownie. |
+| **core.autocrlf**, **core.eol** | Własne ustawienia git tego repozytorium. Wiersz zapisuje `core.autocrlf` lub `core.eol` w konfiguracji git repozytorium. **(dziedziczone)** usuwa wartość repozytorium, więc obowiązuje globalna konfiguracja git. `Ctrl+Z` przywraca poprzednią wartość. Odpowiednik w CLI to `gitpoulpi repo-config`. |
+| **Git LFS** | Pokazuje Git LFS w interfejsie. Zob. [Git LFS](lfs.md). |
+| **Instaluj filtry LFS przed pull i push** | Przed pull lub push uruchamia `git lfs install --local`, gdy repozytorium używa LFS, a jego filtrów brakuje. |
+| **Program git-lfs** | Wykryty program `git-lfs` (tylko do odczytu). |
+| **Zainicjuj LFS dla tego repozytorium** | Uruchamia teraz `git lfs install --local`. |
+
+### Ustawienia repozytorium: Częściowy checkout
+
+Te same elementy co w oknie Częściowy checkout (`Repozytorium: Częściowy checkout...`), jako strona ustawień tego
+repozytorium (`gitpoulpi ui show settings sparse-checkout`).
+
+| Opcja | Działanie |
+|---|---|
+| **Stan** | Czy to drzewo robocze jest częściowym checkoutem. |
+| **Katalogi do zachowania** | Jeden katalog w wierszu, względem katalogu głównego repozytorium. `Enter` (lub kliknięcie) otwiera wielowierszowy edytor: `Ctrl+S` zachowuje tekst, `Esc` go porzuca. Gdy częściowy checkout jest włączony, pole pokazuje bieżące katalogi. Tryb cone gita zna tylko katalogi (bez wzorców i pojedynczych plików), pliki w katalogu głównym są zawsze w checkoucie, a pusta lista jest odrzucana. |
+| **Rozpocznij częściowy checkout** | Wypakowuje tylko wymienione katalogi. Gdy częściowy checkout jest już włączony, ten sam przycisk nazywa się **Zastosuj listę katalogów** i stosuje edytowaną listę: katalog, który z niej zniknął, jest usuwany z katalogu roboczego. Wyszarzony, dopóki lista jest pusta. |
+| **Zakończ częściowy checkout** | Powrót do pełnego checkoutu: wszystkie pliki wracają (po potwierdzeniu). Wyszarzony, dopóki częściowy checkout jest wyłączony. |
+| **Odśwież częściowy checkout** | Stosuje bieżącą listę jeszcze raz (na przykład gdy skrypt lub inne narzędzie wypakowało pliki spoza niej). Wysyła bieżące katalogi, nie niewysłany tekst pola. Wyszarzony, dopóki częściowy checkout jest wyłączony. |
+
+Przyciski działają jak zwykłe akcje w tle (strona pokazuje „stosowanie częściowego checkoutu...”, gdy któraś trwa). Podobnie
+jak okno, nie trafiają do historii cofania: nic nie jest tracone, a **Wyłącz** przywraca każdy plik.
+
+### Ustawienia repozytorium: LFS
+
+Stan LFS tego repozytorium (`gitpoulpi ui show settings lfs`; nie ma go w kompilacji bez LFS).
+
+- **Niezainicjowany:** „Git LFS nie jest skonfigurowany w `<repozytorium>`” i przycisk **Skonfiguruj LFS tutaj**,
+  który uruchamia `git lfs install --local` (filtry i hooki tego repozytorium, nigdy twoja konfiguracja globalna; wymaga
+  `git-lfs`). Gdy `.gitattributes` repozytorium już kieruje pliki przez LFS, ale brakuje jego hooków, strona o tym
+  informuje.
+- **Zainicjowany:** „Git LFS jest skonfigurowany w `<repozytorium>`” oraz wzorce śledzone w `.gitattributes`
+  (`filter=lfs`).
+
+LFS uznaje się za **zainicjowany**, gdy repozytorium ma własne hooki LFS (hook `pre-push` lub `post-checkout`, który
+zapisuje `git lfs install --local`). Same filtry się nie liczą: `git lfs install` na poziomie użytkownika ustawia je dla każdego
+repozytorium, więc każde wyglądałoby na zainicjowane.
+
+Przycisk **`LFS ▾`** na pasku narzędzi podąża za tym samym stanem: pokazuje się tylko w repozytorium, w którym LFS jest zainicjowany lub
+które `.gitattributes` już go używa, a w zwykłym repozytorium pozostaje ukryty (oraz do czasu pierwszego odczytu LFS
+repozytorium, więc może pojawić się chwilę po jego otwarciu). Inicjowanie z tej strony sprawia, że się pojawia. Polecenia palety
+`LFS:` pozostają dostępne wszędzie, także **LFS: Zainicjuj dla tego repozytorium**.
+
+### Ustawienia repozytorium: Commit
+
+Jak zachowuje się commit tworzony w tym repozytorium (`gitpoulpi ui show settings commit`). Oba przełączniki są domyślnie
+**wyłączone** i zapisują się tylko dla tego repozytorium (`[preferences]` w
+[`repo-state.toml`](config-reference.md#ustawienia-repozytorium-gitpoulpirepo-statetoml)).
+
+| Ustawienie | Działanie |
+|---|---|
+| **Push po utworzeniu każdego commita** | Po udanym commicie wypycha bieżącą gałąź do jej upstreamu, jak zwykły push (śledzony transfer, z tekstem w toku „zatwierdzanie, potem wypychanie...”). Gałąź bez upstreamu jest zatwierdzana, ale nie wypychana, i powiadomienie o tym informuje: pierwszy push nowej gałęzi pozostaje zadaniem przycisku **Push**, który ustawia upstream. Odrzucony push otwiera zwykłą kartę odrzuconego pusha; commit zostaje. |
+| **Domyślnie omijaj hooki gita przy tworzeniu commita** | Pole **Pomiń hooki** formularza commita (obok **Popraw poprzedni commit**; `Shift+H` w panelu Status albo **Commit: Przełącz pomijanie hooków** w palecie) jest domyślnie zaznaczone, więc hooki `pre-commit` i `commit-msg` się nie uruchamiają (`git commit --no-verify`). Nadal jest to wybór dla każdego commita: po commicie wraca do tej wartości domyślnej. |
+
+Bez tej wartości domyślnej hooki commita repozytorium uruchamiają się przy każdym commicie, niezależnie od używanego backendu
+(repozytorium z hookami commita jest zatwierdzane przez systemowy `git`, bo libgit2 żadnego nie uruchamia). Hook, który się nie powiedzie,
+pokazuje swoje wyjście we wpisie Dziennika aktywności (pasek stanu mówi, że commit się nie udał) i nic nie jest zatwierdzane.
+
+### Ustawienia repozytorium: Opcje: merge
+
+Jeden przełącznik, **Squash** (domyślnie wyłączony). Gdy włączony, merge lokalnej gałęzi (menu gałęzi, przeciągnięcie, `Merge`
+w palecie) dodaje zmiany gałęzi do poczekalni bez tworzenia merge commita (`git merge --squash`): commit zostaje po twojej stronie.
+Formularz commita otwiera się z komunikatem squash gita (`SQUASH_MSG`, bez linii komentarzy), raz po każdym
+squashu. Potem nic nie jest w toku (brak `MERGE_HEAD`), więc **Przerwij** nie ma zastosowania: aby się wycofać, odrzuć zmiany
+w poczekalni. Squash, który zatrzymuje się na konfliktach, zostawia je w panelu Status jak każdy merge z konfliktem.
+Zmiany w poczekalni nie są wpisem cofania (żaden ref się nie przesunął, więc nie ma czego przywracać); polecenie CLI
+`gitpoulpi merge <branch> --squash` robi to samo, niezależnie od ustawienia.
+
+### Ustawienia repozytorium: Szablon opisu
+
+Opis, od którego zaczyna się formularz commita (`gitpoulpi ui show settings commit-template`).
+
+- **Wstaw szablon do pustego panelu commita**: *pusty* formularz commita jest wstępnie wypełniany szablonem, raz na commit
+  (ręczne wyczyszczenie jest respektowane do następnego commita).
+- **Odrzucaj linie komentarzy przy tworzeniu commita**: przy tworzeniu commita linie zaczynające się od `#` (lub od `core.commentChar`
+  repozytorium) są usuwane z opisu, tak jak zrobiłoby `git commit --cleanup=strip`. GitPoulpi tworzy commity przez
+  `-m`, którego git nie czyści, więc robi to sam. Przy wyłączonym przełączniku linia `#` zostaje w commicie.
+- **Podsumowanie** (etykieta liczy, ile zostało z 72 kolumn i ile jest ponad) oraz wielowierszowy **Opis**
+  (`Enter` lub kliknięcie otwiera edytor, `Ctrl+S` go zachowuje).
+- **Zapisz szablon** zapisuje szablon w `commit-template.txt` w folderze danych repozytorium (zob.
+  `session.per_repo_state_dir`) i ustawia `commit.template` tego repozytorium na ten plik, więc korzystają z niego także
+  `git commit` w wierszu poleceń i inne narzędzia. Jeśli `commit.template` wskazuje już inny plik, strona pokazuje ścieżkę
+  tego pliku, edytuje *ten plik* i zostawia ustawienie w spokoju.
+
+### Ustawienia repozytorium: Zapobieganie konfliktom
+
+`gitpoulpi ui show settings conflict-prevention`. Strona proaktywnego wykrywania konfliktów tego repozytorium
+(zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md#zapobieganie-konfliktom)):
+
+- **Włącz proaktywne wykrywanie konfliktów z gałęzią docelową**: domyślnie włączone. Odznaczenie wyłącza wykrywanie
+  tylko dla tego repozytorium; przełącznik globalny to **Włącz proaktywne wykrywanie konfliktów** na stronie Ogólne.
+  Oba muszą być włączone.
+- **Gałęzie bazowe** (domyślnie `**`): gałęzie, z których mogła powstać bieżąca gałąź, jeden wzorzec w wierszu
+  (`Enter` lub kliknięcie otwiera edytor, `Ctrl+S` go zachowuje). Tabela wzorców pod spodem jest ściągą:
+
+  | Wzorzec | Pasuje do |
+  |---|---|
+  | `origin/main` | tylko ta gałąź |
+  | `origin/**` | każda gałąź zdalnego `origin` |
+  | `origin/feature/**` | gałęzie `origin` zaczynające się od `feature/` |
+  | `!origin/abc` | wyklucza tę gałąź |
+
+  Gałąź lokalna to sama nazwa (`main`), a gałąź śledząca zdalną ma przed nazwą swoje zdalne (`origin/main`). `*` i `?`
+  zostają w obrębie jednego segmentu ścieżki, `**` je przekracza. Puste linie i komentarze `#` są ignorowane; lista
+  samych wykluczeń oznacza „każda gałąź oprócz tych”. Zapisywane w `repo-state.toml` i odczytywane ponownie po zamknięciu Ustawień.
+
+### Ustawienia repozytorium: AI
+
+![Strona AI repozytorium: instrukcje repozytorium z opcjami Dodaj do globalnych lub Zastąp globalne oraz profil i instrukcje dla każdej akcji](../images/settings-repo-ai.png)
+
+Profil AI tego repozytorium i instrukcje dla każdej akcji oraz *Instrukcje
+repozytorium*, które obowiązują dla każdej akcji w tym repozytorium. Puste pola
+używają globalnych ustawień AI. Zob. [Wsparcie AI](ai.md#instrukcje). Jej blok *Przegląd kodu* powtarza
+cztery wiersze kontekstu przeglądu: każdy wybór zaczyna się od *Użyj globalnych (wartość)*, pokazującego wartość
+globalną, a pusty **Dodatkowy plik** pokazuje globalny wyszarzony (i ma ten sam przycisk **Przeglądaj...**; wybór zaczyna
+w katalogu głównym repozytorium, a plik w repozytorium jest zapisywany względem niego); przełącznik **Brak dodatkowego pliku**
+wyłącza globalny plik dodatkowy dla tego repozytorium, a puste pole nadal za nim podąża; **Przywróć globalne** (widoczne, gdy repozytorium ma
+własne wartości) przywraca wszystkie. Są zapisane w pliku `repo-state.toml` tego repozytorium.
+
+### Ustawienia repozytorium: Przepływ pracy
+
+`gitpoulpi ui show settings workflow`. Przepływ pracy z gałęziami w tym repozytorium (szablon, wykrywanie, gałąź bazowa) ma własny przewodnik: [Przepływy pracy z gałęziami](branching-workflows.md#ustawienia--przepływ-pracy). Karta **Ogólne**
+zawiera to, co nie jest regułą (szablon, wykrywanie, hooki, przepływ ze zgłoszeń, miejsce zapisu); karta **Reguły** to
+[lista](#listy) w grupach (**Gałęzie bazowe**, **Typy gałęzi**, **Reguły
+zakończenia**); **+ Dodaj ▾** wybiera rodzaj, a elementy przesuwają się w obrębie swojej
+grupy. W odróżnieniu od innych stron trzyma wersję roboczą (pasek jest na obu kartach): pasek przypięty na dole strony
+pokazuje **● Niezapisane** (albo **Bez zmian**) z przyciskami **Zapisz we wspólnym
+pliku**, **Tylko dla mnie** i **Odrzuć zmiany**, a zamknięcie Ustawień z niezapisaną
+wersją roboczą najpierw pyta.
+
+## Pliki, zmienne środowiskowe i CLI
+
+- Plik ustawień to `config.toml` w katalogu konfiguracji systemu.
+  `gitpoulpi config path` wypisuje jego położenie.
+- Stan poszczególnych repozytoriów jest w `.gitpoulpi/repo-state.toml` wewnątrz
+  repozytorium.
+- `gitpoulpi config get <key>` i `gitpoulpi config set <key> <value>` czytają
+  i zapisują każde ustawienie.
+- Zmienne środowiskowe i flagi wiersza poleceń nadpisują plik.
+
+Szczegóły podaje [Opis konfiguracji](config-reference.md).

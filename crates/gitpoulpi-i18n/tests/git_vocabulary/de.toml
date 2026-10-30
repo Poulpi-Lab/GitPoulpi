@@ -1,0 +1,14 @@
+git_mode = [
+]
+
+local_mode = [
+  "ai_page.chip_task_context_text",
+  "help_keys.diff_view_replaces_22_keys",
+  "help_keys.diff_view_replaces_2_keys",
+  "help_text.log_pane_commit_23",
+  "help_text.merge_conflict_editor_1",
+  "settings_general.external_merge_tool_help",
+  "settings_general.external_merge_tool_placeholder",
+  "settings_git.pull_mode_help",
+  "typed_error.needs_autostash",
+]

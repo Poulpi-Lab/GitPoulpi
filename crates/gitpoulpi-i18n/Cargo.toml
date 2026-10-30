@@ -16,8 +16,12 @@ links = "gitpoulpi_i18n"
 # One feature per `locales/*.toml` (English is always built). The binaries
 # forward these; a library never enables `all-langs` on its own, so a custom
 # build's language set is never widened by feature unification.
-default = []
-all-langs = []
+default = ["all-langs"]
+all-langs = [
+    "lang-fr", "lang-es", "lang-pt-br", "lang-pt-pt", "lang-it", "lang-de", "lang-zh-cn",
+    "lang-ja", "lang-ru", "lang-ko", "lang-nl", "lang-pl", "lang-uk", "lang-cs", "lang-sv",
+    "lang-tr", "lang-qps",
+]
 lang-fr = []
 lang-es = []
 lang-pt-br = []

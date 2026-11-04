@@ -272,6 +272,7 @@ impl CodeSource {
     }
 
     /// Every file of the request (what the ✦ draft reads).
+    #[cfg(feature = "ai")]
     pub(super) fn all_files(&self, base: Oid, head: Oid) -> Pending<Vec<FileDiff>> {
         match self {
             Self::Git(requester) => Pending::Daemon(requester.call::<Vec<FileDiff>>(

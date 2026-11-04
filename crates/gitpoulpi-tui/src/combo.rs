@@ -493,7 +493,7 @@ impl Combo {
 
     /// Whether a click at the point does something: the field (open or
     /// close the list) or, while open, a row of the list. The pointing hand.
-    #[cfg_attr(not(feature = "radar"), allow(dead_code))] // only the Radar uses it
+    #[cfg_attr(not(all(feature = "radar", feature = "hosting")), allow(dead_code))] // only the Radar uses it
     pub(crate) fn pointer_over(&self, col: u16, row: u16) -> bool {
         let at = ratatui::layout::Position::new(col, row);
         self.field.contains(at) || (self.open && self.items.iter().any(|(r, _)| r.contains(at)))

@@ -92,7 +92,7 @@ impl RadarSlot {
         false
     }
 
-    #[cfg(feature = "review")]
+    #[cfg(all(feature = "review", feature = "hosting"))]
     pub(crate) fn host_review(&mut self, _view: Box<crate::review_view::ReviewView>) {}
 
     pub(crate) fn review_takes_palette(&self) -> bool {

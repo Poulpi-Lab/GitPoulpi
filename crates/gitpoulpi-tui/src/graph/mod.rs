@@ -31,6 +31,7 @@ mod stash;
 #[cfg(test)]
 mod tests;
 mod total;
+mod walk_filter;
 
 use ratatui::style::Color;
 
@@ -52,6 +53,7 @@ pub(crate) use raster::{avatar_picture_px, NodeAvatar, RasterRow};
 pub(crate) use stash::StashSlot;
 pub(crate) use stash::{place_stashes, GraphStash, LogEntry, LogRows};
 pub(crate) use total::{refs_key, CommitTotal, TotalShown};
+pub(crate) use walk_filter::{load_walk_filter, walk_filter};
 
 /// `ui.graph_lane_background` as this module's own enum.
 ///

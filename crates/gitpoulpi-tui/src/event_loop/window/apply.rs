@@ -241,6 +241,12 @@ impl WindowState {
             }
         }
         while let Ok(page) = self.link.log_page_rx.try_recv() {
+            // A page of another walk (the hidden-refs filter moved since it
+            // was asked for) must not reach `on_page`, which would append it
+            // at an offset that means something else now.
+            if page.log_filter_gen != self.link.log_filter_generation() {
+                continue;
+            }
             let Ok(graph) = page.result else { continue };
             // A page can bring in the base of a stash that was waiting for
             // it, and that stash's row is placed at its date -- possibly
@@ -372,7 +378,15 @@ impl WindowState {
             // A read whose content is what the window already holds is not
             // replaced and its generation is not bumped, so an idle poll
             // leaves the Log layout cache (keyed on the generations) alone.
-            let changed = self.read_hashes.apply(outcome.read_hashes);
+            // A Log read under another hidden-refs filter than the one in
+            // use is a walk of other tips: not taken, nor its hash recorded
+            // (the refresh the filter change asked for brings the right one).
+            let changed =
+                self.read_hashes
+                    .apply(outcome.read_hashes.for_filter_generation(
+                        outcome.log_filter_gen,
+                        self.link.log_filter_generation(),
+                    ));
             if changed.log {
                 self.log_result = outcome.log_result;
                 self.log_gen += 1;

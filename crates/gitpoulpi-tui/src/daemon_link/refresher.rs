@@ -12,6 +12,7 @@ use crate::redraw::NotifySend as _;
 pub(super) struct Refresher {
     pub(super) conn: LinkConn,
     pub(super) log_depth: Arc<AtomicUsize>,
+    pub(super) log_filter: LogFilterCell,
     pub(super) lfs_gate: Arc<crate::lfs_ui::LfsGate>,
     pub(super) activity: Arc<crate::activity::Activity>,
     pub(super) done_tx: tokio::sync::mpsc::UnboundedSender<(RefreshOutcome, u64)>,
@@ -55,6 +56,7 @@ impl Refresher {
         self.latest_started = Some(started_at);
         let conn = self.conn.clone();
         let log_depth = Arc::clone(&self.log_depth);
+        let log_filter = self.log_filter.clone();
         let lfs_gate = Arc::clone(&self.lfs_gate);
         let done_tx = self.done_tx.clone();
         tokio::spawn(refresh_journal(
@@ -63,7 +65,8 @@ impl Refresher {
         ));
         tokio::spawn(async move {
             let began = std::time::Instant::now();
-            let outcome = collect_refresh(&conn, &log_depth, &lfs_gate, scope, false).await;
+            let outcome =
+                collect_refresh(&conn, &log_depth, &log_filter, &lfs_gate, scope, false).await;
             // The poll and the refresh after a change: background work.
             crate::activity_log::timing_background(
                 &conn.repo.root,

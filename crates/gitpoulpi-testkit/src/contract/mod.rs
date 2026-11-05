@@ -111,6 +111,7 @@ macro_rules! for_each_contract_check {
             check_log_hidden_drops_commits_only_hidden_refs_reach,
             check_log_hidden_keeps_head_even_if_its_branch_is_hidden,
             check_log_hidden_remote_prefix_covers_nested_and_later_branches,
+            check_log_hidden_ignores_a_remote_head_symref,
             check_log_hidden_keep_overrides,
             check_log_hidden_pages_tile,
             check_log_hidden_peels_annotated_tags_and_skips_non_commit_tags,

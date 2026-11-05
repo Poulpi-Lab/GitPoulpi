@@ -148,6 +148,24 @@ pub fn check_log_hidden_remote_prefix_covers_nested_and_later_branches(backend: 
     assert!(summaries(backend, &repo, &all_refs()).contains(&"archive late 1".to_string()));
 }
 
+pub fn check_log_hidden_ignores_a_remote_head_symref(backend: &dyn GitBackend) {
+    // `git fetch` leaves `refs/remotes/<r>/HEAD` naming the default branch:
+    // a mirror, so hiding the branch hides what only it reached.
+    let repo = two_histories();
+    repo.git(&["remote", "add", "archive", "."]);
+    repo.git(&[
+        "symbolic-ref",
+        "refs/remotes/archive/HEAD",
+        "refs/remotes/archive/old-a",
+    ]);
+    let shown = summaries(
+        backend,
+        &repo,
+        &hidden(&["archive/old-a", "archive/old-b"], &[], &[]),
+    );
+    assert_eq!(sorted(shown), vec!["m1", "m2", "s1"]);
+}
+
 pub fn check_log_hidden_keep_overrides(backend: &dyn GitBackend) {
     let repo = two_histories();
     let shown = summaries(

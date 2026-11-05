@@ -17,7 +17,7 @@ pub(crate) fn filtered_tips(repo: &RepoRef, filter: &RefFilter) -> Vec<Oid> {
         &repo.root,
         &[
             "for-each-ref",
-            "--format=%(refname)%09%(objecttype)%09%(objectname)%09%(*objecttype)%09%(*objectname)",
+            "--format=%(refname)%09%(objecttype)%09%(objectname)%09%(*objecttype)%09%(*objectname)%09%(symref)",
             "refs/heads",
             "refs/tags",
             "refs/remotes",
@@ -30,6 +30,11 @@ pub(crate) fn filtered_tips(repo: &RepoRef, filter: &RefFilter) -> Vec<Oid> {
             let mut f = line.split('\t');
             let name = f.next()?;
             let (kind, id, peeled_kind, peeled_id) = (f.next()?, f.next()?, f.next()?, f.next()?);
+            // `refs/remotes/<r>/HEAD` and friends mirror another ref: not a
+            // tip of their own (hiding the branch they name must hide it).
+            if !f.next().unwrap_or_default().is_empty() {
+                return None;
+            }
             let target = match (kind, peeled_kind) {
                 ("commit", _) => id,
                 ("tag", "commit") => peeled_id,

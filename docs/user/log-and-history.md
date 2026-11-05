@@ -88,9 +88,11 @@ terminal: `gitpoulpi mailmap list|check|add`.
 - **Solo** (the `o` key, or the ref's menu, on a ref, folder or remote):
   shows only the commits of the soloed refs; solo several to see their union.
   `Shift+O` stops soloing.
-- **Hide** a ref (its menu) to take it out of the graph;
-  *Hidden n* in the Refs title counts them, **Show All** (`Shift+H`) brings
-  them back.
+- **Hide** a ref (its menu) to take it out of the graph: its pill goes and so
+  do the commits only it reaches (the checked-out commit always stays, with
+  the working-tree row). *Hidden n* in the Refs title counts them, **Show
+  All** (`Shift+H`) brings them back. The status line's total counts the
+  visible history.
 
 ## Branches, tags and the Refs sidebar
 
@@ -105,7 +107,7 @@ sidebar, or its pill in the Log) for its menu. The most useful entries:
 | Fast-forward `<branch>` to `<current>` / `<current>` to `<branch>` | Moves a branch forward when that is a fast-forward; otherwise grayed with the reason (`diverged, not a fast-forward`) |
 | Create worktree from... | Opens a linked worktree in its own tab |
 | Pull, Push, Fetch, Set upstream... | Network operations on that branch |
-| Hide / Show in graph, Solo | Display only; they hide or solo a ref without touching the repository |
+| Hide / Show in graph, Solo | Display only; they hide or solo a ref (hiding also drops the commits only that ref reaches) without touching the repository |
 | Rename, Delete | Delete asks first; a remote twin can be deleted too |
 | Copy branch name, Copy link to branch on remote | To the clipboard |
 

@@ -27,6 +27,8 @@ pub struct DaemonLink {
     /// message it would race the ticker and the log would truncate back to
     /// the initial page under a user who scrolled into page three.
     pub(super) log_depth: Arc<AtomicUsize>,
+    /// The refs the Log's walk leaves out (see `log_filter`).
+    pub(super) log_filter: LogFilterCell,
     pub outcome_rx: std_mpsc::Receiver<RefreshOutcome>,
     pub action_error_rx: std_mpsc::Receiver<String>,
     /// Non-error informational status messages an action wants surfaced
@@ -327,6 +329,26 @@ impl DaemonLink {
     pub fn set_log_depth(&self, commits: usize) {
         self.log_depth.store(commits, Ordering::Relaxed);
     }
+
+    /// Adopts the filter the Log's walk starts from (hidden refs). True when
+    /// it differs from the one in use, which also moves the generation: the
+    /// caller restarts its paging and asks for a fresh read. Answers read
+    /// under an older generation are dropped by the window.
+    pub(crate) fn set_log_filter(&self, filter: gitpoulpi_core::domain::RefFilter) -> bool {
+        self.log_filter.set(filter)
+    }
+
+    /// The generation of the filter in use; a Log answer with another one
+    /// was read for a different walk.
+    pub(crate) fn log_filter_generation(&self) -> u64 {
+        self.log_filter.generation()
+    }
+
+    /// The filter in use and its generation, for the reads the window sends
+    /// itself (the commit total).
+    pub(crate) fn log_filter(&self) -> (u64, gitpoulpi_core::domain::RefFilter) {
+        self.log_filter.snapshot()
+    }
 }
 
 /// Spawns the link's background thread and returns immediately; the first
@@ -371,6 +393,14 @@ pub(crate) fn start_at(session: String, repo: RepoRef, port_file: Option<PathBuf
     };
     let log_depth = Arc::new(AtomicUsize::new(0));
     let link_log_depth = Arc::clone(&log_depth);
+    // Seeded from the persisted visibility so the first load is already
+    // filtered (and the window's first comparison finds no change).
+    let log_filter = if repo.root == std::path::Path::new(crate::tabs::NO_REPOSITORY) {
+        LogFilterCell::default()
+    } else {
+        LogFilterCell::seeded(crate::graph::load_walk_filter(&repo.root))
+    };
+    let link_log_filter = log_filter.clone();
     let lfs_gate = Arc::new(crate::lfs_ui::LfsGate::default());
     let link_lfs_gate = Arc::clone(&lfs_gate);
     let activity = Arc::new(crate::activity::Activity::default());
@@ -397,6 +427,7 @@ pub(crate) fn start_at(session: String, repo: RepoRef, port_file: Option<PathBuf
         stats_worker: Some(stats_worker),
         split_worker: Some(split_worker),
         log_depth: link_log_depth,
+        log_filter: link_log_filter,
         lfs_gate: link_lfs_gate,
         activity: link_activity,
     };
@@ -443,6 +474,7 @@ pub(crate) fn start_at(session: String, repo: RepoRef, port_file: Option<PathBuf
         split_source_tx,
         split_source_rx,
         log_depth,
+        log_filter,
         log_page_rx,
         lfs_gate,
         activity,

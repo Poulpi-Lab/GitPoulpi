@@ -483,6 +483,29 @@ impl WindowState {
             move_table_selection(&mut self.log_state, self.log_len, 0);
         }
 
+        // The one detector of "the walk changed": whatever mutated the hidden
+        // set this frame (a click, a key, the palette, `refs hide` from a
+        // shell) shows up as a different filter. The daemon walks from the
+        // visible tips, so what the Log holds, what the lazy loader believes
+        // and the status bar's total all describe the old walk: forget them
+        // and ask for the new one. The old graph stays on screen until it
+        // lands (no blank frame); answers still on their way for the old
+        // filter are dropped by their generation (`apply.rs`).
+        let walk = crate::graph::walk_filter(
+            &self.hidden_from_graph,
+            &std::collections::BTreeSet::new(),
+            &self.solo_refs,
+        );
+        if self.link.set_log_filter(walk) {
+            self.lazy_log.restart();
+            self.link.set_log_depth(0);
+            self.commit_total.forget();
+            // The new walk must replace the held Log even when it hashes
+            // like it (a hidden ref whose commits another ref reaches).
+            self.read_hashes.forget_log();
+            self.link.request_refresh();
+        }
+
         // The Log's display order for this frame. Cheap (no clone, one
         // scan per stash), so recomputed rather than kept in step by hand.
         // Outside solo the row count follows from it directly; under solo

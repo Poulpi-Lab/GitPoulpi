@@ -185,6 +185,11 @@ fn push_all_refs(
     let mut refs: Vec<(String, Oid)> = Vec::new();
     for pattern in ["refs/heads/*", "refs/tags/*", "refs/remotes/*"] {
         for reference in git_repo.references_glob(pattern)?.flatten() {
+            // `refs/remotes/<r>/HEAD` and friends mirror another ref: not a
+            // tip of their own (hiding the branch they name must hide it).
+            if reference.kind() == Some(git2::ReferenceType::Symbolic) {
+                continue;
+            }
             let (Some(name), Ok(commit)) = (reference.name(), reference.peel_to_commit()) else {
                 // A tag of a tree or a blob: no commit, no tip.
                 continue;

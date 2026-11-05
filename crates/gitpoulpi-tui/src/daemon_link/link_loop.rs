@@ -26,6 +26,7 @@ pub(super) struct LinkChannels {
     pub(super) stats_worker: Option<StatsWorker>,
     pub(super) split_worker: Option<SplitSourceWorker>,
     pub(super) log_depth: Arc<AtomicUsize>,
+    pub(super) log_filter: LogFilterCell,
     pub(super) lfs_gate: Arc<crate::lfs_ui::LfsGate>,
     pub(super) activity: Arc<crate::activity::Activity>,
 }
@@ -89,6 +90,7 @@ pub(super) async fn link_loop_with_port(
         stats_worker,
         split_worker,
         log_depth,
+        log_filter,
         lfs_gate,
         activity,
     } = channels;
@@ -195,7 +197,15 @@ pub(super) async fn link_loop_with_port(
     let first_generation = activity.generation();
     if has_repo {
         let opened = std::time::Instant::now();
-        let mut first = collect_refresh(&conn, &log_depth, &lfs_gate, FIRST_LOAD_NOW, true).await;
+        let mut first = collect_refresh(
+            &conn,
+            &log_depth,
+            &log_filter,
+            &lfs_gate,
+            FIRST_LOAD_NOW,
+            true,
+        )
+        .await;
         crate::activity_log::timing_record(
             &conn.repo.root,
             gitpoulpi_i18n::msg::activity_log::OP_OPEN.get().to_string(),
@@ -213,6 +223,7 @@ pub(super) async fn link_loop_with_port(
     let mut refresher = Refresher {
         conn: conn.clone(),
         log_depth: Arc::clone(&log_depth),
+        log_filter: log_filter.clone(),
         lfs_gate: Arc::clone(&lfs_gate),
         activity: Arc::clone(&activity),
         done_tx: refresh_done_tx,
@@ -467,6 +478,9 @@ pub(super) async fn link_loop_with_port(
                                 // prevent.
                 let conn = conn.clone();
                 let log_page_out_tx = log_page_out_tx.clone();
+                // The filter is read here, with its generation: the page
+                // and the generation it is stamped with are one snapshot.
+                let (log_filter_gen, hidden) = log_filter.snapshot();
                 tokio::spawn(async move {
                     let result = conn.call::<CommitGraph>(OperationKind::Log,
                         serde_json::json!({
@@ -481,12 +495,17 @@ pub(super) async fn link_loop_with_port(
                                 skip: request.skip as u32,
                                 start_ref: None,
                                 all_refs: true,
+                                hidden,
                                 ..LogOptions::default()
                             }
                         }),
                     )
                     .await;
-                    let _ = log_page_out_tx.send_notify(LogPageOutcome { request, result });
+                    let _ = log_page_out_tx.send_notify(LogPageOutcome {
+                        request,
+                        result,
+                        log_filter_gen,
+                    });
                 });
                 continue;
             }

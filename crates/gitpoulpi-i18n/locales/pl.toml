@@ -5800,6 +5800,8 @@ palette_git_tab = "Dziennik aktywności: Operacje git"
 palette_app_tab = "Dziennik aktywności: Dziennik aplikacji"
 
 [git_error]
+summary_host_key = "The SSH host key of the remote is not known yet."
+hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
 title_push = "{$Push}: niepowodzenie"
 title_pull = "{$Pull}: niepowodzenie"
 title_fetch = "{$Fetch}: niepowodzenie"

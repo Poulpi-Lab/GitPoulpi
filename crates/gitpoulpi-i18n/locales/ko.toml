@@ -5795,6 +5795,8 @@ palette_git_tab = "활동 로그: Git 작업"
 palette_app_tab = "활동 로그: 애플리케이션 로그"
 
 [git_error]
+summary_host_key = "The SSH host key of the remote is not known yet."
+hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
 title_push = "{$Push} 실패"
 title_pull = "{$Pull} 실패"
 title_fetch = "{$Fetch} 실패"

@@ -5795,6 +5795,8 @@ palette_git_tab = "Registo de atividade: operações Git"
 palette_app_tab = "Registo de atividade: registo da aplicação"
 
 [git_error]
+summary_host_key = "The SSH host key of the remote is not known yet."
+hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
 title_push = { git = "Falha no {$push}", local = "Falha ao {$push}" }
 title_pull = { git = "Falha no {$pull}", local = "Falha ao {$pull}" }
 title_fetch = { git = "Falha no {$fetch}", local = "Falha ao {$fetch}" }

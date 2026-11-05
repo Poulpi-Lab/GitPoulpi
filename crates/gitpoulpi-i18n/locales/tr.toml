@@ -5802,6 +5802,8 @@ palette_git_tab = "Etkinlik Günlüğü: Git İşlemleri"
 palette_app_tab = "Etkinlik Günlüğü: Uygulama Günlüğü"
 
 [git_error]
+summary_host_key = "The SSH host key of the remote is not known yet."
+hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
 title_push = { git = "{$Push} başarısız", local = "Gönderme başarısız" }
 title_pull = { git = "{$Pull} başarısız", local = "Çekme başarısız" }
 title_fetch = { git = "{$Fetch} başarısız", local = "Getirme başarısız" }

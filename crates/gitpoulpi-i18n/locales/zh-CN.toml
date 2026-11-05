@@ -5799,6 +5799,8 @@ palette_git_tab = "活动日志：Git 操作"
 palette_app_tab = "活动日志：应用日志"
 
 [git_error]
+summary_host_key = "The SSH host key of the remote is not known yet."
+hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
 title_push = { git = "{$Push} 失败", local = "{$Push}失败" }
 title_pull = { git = "{$Pull} 失败", local = "{$Pull}失败" }
 title_fetch = { git = "{$Fetch} 失败", local = "{$Fetch}失败" }

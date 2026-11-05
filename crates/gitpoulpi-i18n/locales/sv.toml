@@ -5803,6 +5803,8 @@ palette_git_tab = "Aktivitetslogg: Git-åtgärder"
 palette_app_tab = "Aktivitetslogg: Programlogg"
 
 [git_error]
+summary_host_key = "The SSH host key of the remote is not known yet."
+hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
 title_push = "{$Push} misslyckades"
 title_pull = "{$Pull} misslyckades"
 title_fetch = "{$Fetch} misslyckades"

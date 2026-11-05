@@ -5796,6 +5796,8 @@ palette_git_tab = "Protokol aktivity: Operace gitu"
 palette_app_tab = "Protokol aktivity: Protokol aplikace"
 
 [git_error]
+summary_host_key = "The SSH host key of the remote is not known yet."
+hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
 title_push = "{$Push}: selhání"
 title_pull = "{$Pull}: selhání"
 title_fetch = "{$Fetch}: selhání"

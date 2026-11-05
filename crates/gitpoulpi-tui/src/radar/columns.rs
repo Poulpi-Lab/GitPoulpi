@@ -7,8 +7,11 @@
 use super::*;
 use crate::log_table::KEY_STEP;
 
-/// The narrowest a sizable column goes.
-pub(crate) const MIN_WIDTH: usize = 4;
+/// The narrowest a column the user sizes goes (drag, keys, stored width).
+pub(crate) const MIN_WIDTH: usize = 1;
+/// The narrowest an automatic (unsized) repository column is, and the least
+/// room its sized limit keeps.
+const AUTO_MIN: usize = 4;
 /// The widest a user-sized column goes.
 pub(crate) const MAX_WIDTH: usize = 60;
 /// What the automatic repository width stops at.
@@ -40,10 +43,10 @@ impl Drag {
 pub(crate) fn repo_width(content: usize, set: Option<u16>, window: u16) -> (usize, usize) {
     let limit = (window as usize)
         .saturating_sub(KEEP_FOR_TITLE)
-        .clamp(MIN_WIDTH, MAX_WIDTH);
+        .clamp(AUTO_MIN, MAX_WIDTH);
     let auto = content.clamp(
-        MIN_WIDTH,
-        AUTO_REPO_CAP.min((window as usize / 3).max(MIN_WIDTH)),
+        AUTO_MIN,
+        AUTO_REPO_CAP.min((window as usize / 3).max(AUTO_MIN)),
     );
     let width = match set {
         Some(w) => (w as usize).clamp(MIN_WIDTH, limit),
@@ -290,15 +293,47 @@ mod tests {
         assert_eq!(repo_width(80, None, 120).0, AUTO_REPO_CAP);
         // A narrow window caps it at a third.
         assert_eq!(repo_width(30, None, 60).0, 20);
-        assert_eq!(repo_width(1, None, 120).0, MIN_WIDTH);
+        assert_eq!(repo_width(1, None, 120).0, AUTO_MIN);
     }
 
     #[test]
     fn a_set_width_is_kept_within_the_window() {
         assert_eq!(repo_width(10, Some(30), 120).0, 30);
-        assert_eq!(repo_width(10, Some(2), 120).0, MIN_WIDTH);
+        assert_eq!(repo_width(10, Some(2), 120).0, 2);
+        assert_eq!(repo_width(10, Some(1), 120).0, 1);
+        assert_eq!(repo_width(10, Some(0), 120).0, 1);
         let (w, limit) = repo_width(10, Some(200), 100);
         assert_eq!((w, limit), (64.min(MAX_WIDTH), 64.min(MAX_WIDTH)));
+    }
+
+    #[test]
+    fn every_sized_column_goes_down_to_one_cell_but_automatic_widths_keep_their_floor() {
+        assert_eq!(author_width(9, Some(1)), 1);
+        assert_eq!(author_width(9, Some(0)), 1);
+        assert_eq!(age_width(5, Some(1)), 1);
+        assert_eq!(num_width(3, 0, Some(1)), 1);
+        assert_eq!(num_width(3, 0, Some(0)), 1);
+        assert_eq!(author_width(2, None), 2);
+        assert_eq!(age_width(3, None), 3);
+        assert_eq!(num_width(3, 3, None), 6);
+    }
+
+    #[test]
+    fn a_cell_cut_to_one_or_two_cells_never_overflows_or_splits_a_wide_glyph() {
+        for text in ["日本語", "\u{1F680}x", "abc", "a日"] {
+            for width in 1..=3 {
+                let cut = fit_pad(text, width);
+                assert_eq!(
+                    crate::display_width(&cut),
+                    width,
+                    "{text:?} at {width}: {cut:?}"
+                );
+            }
+        }
+        assert_eq!(fit_pad("日本語", 1), "\u{2026}");
+        assert_eq!(fit_pad("日本語", 2), "\u{2026} ");
+        assert_eq!(fit_pad("abc", 1), "\u{2026}");
+        assert_eq!(fit_pad("a", 1), "a");
     }
 
     #[test]

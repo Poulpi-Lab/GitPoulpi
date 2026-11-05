@@ -632,3 +632,51 @@ fn dragging_the_age_separator_sizes_the_age_column_and_it_survives_a_restart() {
     assert_eq!(header_x(&screen, "Age"), Some(age - 3), "{}", screen.text());
     quit(term);
 }
+
+/// The least width is one cell: dragging the separator far left leaves the
+/// repository column one cell wide (an ellipsis), the separator sits right
+/// after it and the title column moves left by exactly the cells given up;
+/// the width is saved as 1 and the 1-cell separator can be grabbed again.
+/// Red when the minimum is above one cell.
+#[test]
+fn dragging_the_separator_down_leaves_a_one_cell_repository_column() {
+    let mut s = setup(
+        "pty-radar-cols-one",
+        &format!("[columns]\nrepo = {NARROW}\n"),
+    );
+    open_radar(&mut s.term);
+    let screen = settled(&s.term);
+    let header = header_row(&screen);
+    let title_col = |s: &Screen| -> usize {
+        let line = s.line(header);
+        line[..line.find("Title").unwrap()].chars().count()
+    };
+    let before = title_col(&screen);
+    let (x, row) = chip_cell(&screen);
+    // Far past the least width: the pointer ends on the chip's first cell.
+    s.term
+        .drag((x + NARROW, row), (x, row))
+        .expect("drag the separator");
+    wait_file(s.config.path(), "the saved one-cell width", |f| {
+        f.contains("repo = 1\n") || f.ends_with("repo = 1")
+    });
+    let screen = s
+        .term
+        .wait_for("the title moved left", STEP, |s| {
+            s.find_all("Title").iter().any(|(_, r)| *r == header)
+                && title_col(s) == before - (usize::from(NARROW) - 1)
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    assert_eq!(text_at(&screen, x, row), "\u{2026}", "{}", screen.text());
+    assert_eq!(text_at(&screen, x + 1, header), "\u{2502}", "the tick");
+    assert_ne!(text_at(&screen, x + 1, row), "\u{2502}", "nothing at rest");
+
+    // The one-cell column's separator is still grabbable: drag it wider.
+    s.term
+        .drag((x + 1, row), (x + 5, row))
+        .expect("drag the separator again");
+    wait_file(s.config.path(), "the widened column", |f| {
+        f.contains("repo = 5")
+    });
+    quit(s.term);
+}

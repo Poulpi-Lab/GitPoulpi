@@ -385,3 +385,120 @@ fn the_number_column_is_sized_by_drag_and_kept_aligned() {
     let at = header[..header.find('#').unwrap()].chars().count();
     assert!(rows.iter().all(|x| *x == at), "{text}");
 }
+
+/// The buffer cells of row `y`, x in `from..to`.
+fn cells(buf: &ratatui::buffer::Buffer, y: u16, from: u16, to: u16) -> Vec<String> {
+    (from..to)
+        .map(|x| buf[(x, y)].symbol().to_string())
+        .collect()
+}
+
+/// A column sized down to 1 or 2 cells: a CJK author is cut to the ellipsis
+/// (and a blank) inside its own cells, never spilling into the next column,
+/// the header is cut the same way, and the separator before it stays one
+/// grabbable cell that does not cover either neighbour.
+#[test]
+fn a_one_or_two_cell_author_column_stays_inside_its_cells() {
+    const NAME: &str = "\u{65E5}\u{672C}\u{8A9E}";
+    for width in [1u16, 2] {
+        let dir = tempfile::tempdir().unwrap();
+        let (mut ui, ..) = radar(dir.path());
+        for item in &mut ui.board.items {
+            item.author = NAME.into();
+        }
+        ui.state.columns.author = Some(width);
+        let (w, h) = (150u16, 30u16);
+        let mut terminal = Terminal::new(TestBackend::new(w, h)).unwrap();
+        terminal
+            .draw(|f| {
+                let area = f.area();
+                ui.render(f, area);
+            })
+            .unwrap();
+        let buf = terminal.backend().buffer().clone();
+        let sep = rect_of(&ui, |h| h == Hit::Divider(Cell::Author));
+        assert_eq!((sep.width, ui.col_eff[1]), (1, usize::from(width)));
+        let x = sep.x + 1;
+        let mut rows = 0;
+        for y in sep.y + 1..sep.bottom() {
+            let line = cells(&buf, y, 0, w);
+            if !line.iter().any(|c| c == "\u{22EE}") {
+                continue;
+            }
+            rows += 1;
+            // Inside the column: the ellipsis then blanks, no half glyph.
+            let inside = cells(&buf, y, x, x + width);
+            assert_eq!(inside[0], "\u{2026}", "row {y}: {inside:?}");
+            assert!(inside[1..].iter().all(|c| c == " "), "row {y}: {inside:?}");
+            // Nothing of the name past the column: the gap cells are blank.
+            assert_eq!(
+                cells(&buf, y, x + width, x + width + 2),
+                [" ", " "],
+                "row {y}"
+            );
+            assert!(line.iter().all(|c| !NAME.contains(c.as_str()) || c == " "));
+            // The separator cell is the gap before the column, left blank.
+            assert_eq!(buf[(sep.x, y)].symbol(), " ", "row {y}");
+        }
+        assert!(rows >= 2, "item rows seen");
+        // The header is cut inside the column too, and the cell after it is blank.
+        let head = cells(&buf, sep.y, x, x + width + 1);
+        assert_eq!(head[usize::from(width) - 1], "\u{2026}", "{head:?}");
+        assert_eq!(head[usize::from(width)], " ", "{head:?}");
+        // The cut cells are the tooltip's, exactly the column wide.
+        let cut = ui
+            .hits
+            .iter()
+            .find(|(_, h)| matches!(h, Hit::Cut(_, Cell::Author)))
+            .map(|(r, _)| *r)
+            .expect("a cut author");
+        assert_eq!((cut.x, cut.width), (x, width));
+    }
+}
+
+/// The least width of every sized column is one cell: for a stored width, by
+/// the keys and by a drag.
+#[test]
+fn every_sizable_column_goes_down_to_one_cell() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut ui = long_named(dir.path());
+    ui.state.columns.repo = Some(1);
+    ui.state.columns.author = Some(1);
+    ui.state.columns.number = Some(1);
+    ui.state.columns.age = Some(1);
+    screen(&mut ui, 150, 30);
+    assert_eq!(ui.col_eff, [1, 1, 1, 1], "stored widths of 1 are kept");
+    for cell in [Cell::Repo, Cell::Num, Cell::Author, Cell::Age] {
+        let sep = rect_of(&ui, |h| h == Hit::Divider(cell));
+        assert_eq!(sep.width, 1, "{cell:?}");
+    }
+    // The keys narrow a column to one cell and no further.
+    ui.state.columns.repo = Some(3);
+    screen(&mut ui, 150, 30);
+    press(&mut ui, 'C');
+    press(&mut ui, '[');
+    assert_eq!(ui.state.columns.repo, Some(1));
+    press(&mut ui, '[');
+    assert_eq!(ui.state.columns.repo, Some(1));
+    // A drag far past the minimum stops at one cell.
+    for (cell, to) in [(Cell::Repo, 0u16), (Cell::Author, 149)] {
+        ui.state.columns.repo = Some(12);
+        ui.state.columns.author = Some(12);
+        screen(&mut ui, 150, 30);
+        let sep = rect_of(&ui, |h| h == Hit::Divider(cell));
+        down(&mut ui, sep, false);
+        ui.on_mouse(
+            mouse(MouseEventKind::Drag(MouseButton::Left), to, sep.y),
+            false,
+        );
+        ui.on_mouse(
+            mouse(MouseEventKind::Up(MouseButton::Left), to, sep.y),
+            false,
+        );
+        let got = match cell {
+            Cell::Repo => ui.state.columns.repo,
+            _ => ui.state.columns.author,
+        };
+        assert_eq!(got, Some(1), "{cell:?}");
+    }
+}

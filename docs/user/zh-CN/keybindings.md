@@ -620,8 +620,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Flow：继续或中止已停止的操作… |  |
 | Flow：切换分支分组 |  |
 | Flow：工作流设置… |  |
-| 远程：隐藏远程的所有分支… |  |
-| 远程：显示远程的所有分支… |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git：在 HEAD 处新建分支… | `Ctrl+G b` |
 | Git：在 HEAD 处新建 Tag… | `Ctrl+G t` |
 | Git：Push 所有未 push 的 Tag | `Ctrl+G U` |

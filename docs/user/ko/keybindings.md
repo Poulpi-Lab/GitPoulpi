@@ -647,8 +647,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Flow: 중단된 동작 계속 또는 중단... |  |
 | Flow: 브랜치 묶기 전환 |  |
 | Flow: 워크플로 설정... |  |
-| 리모트: 리모트의 모든 브랜치 숨기기... |  |
-| 리모트: 리모트의 모든 브랜치 표시... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: HEAD에 새 브랜치... | `Ctrl+G b` |
 | Git: HEAD에 새 Tag... | `Ctrl+G t` |
 | Git: push하지 않은 모든 Tag Push | `Ctrl+G U` |

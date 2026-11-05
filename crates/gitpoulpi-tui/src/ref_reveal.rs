@@ -65,7 +65,11 @@ impl RevealState {
     ) -> Option<String> {
         let (target, label) = match section.ref_kind() {
             Some(kind) => {
-                if src.hidden.contains(name) {
+                if crate::refs_tree::hidden_in_graph(
+                    src.hidden,
+                    name,
+                    kind == crate::refs_tree::RefRowKind::Remote,
+                ) {
                     return Some(msg::input::reveal_hidden(name));
                 }
                 let found = ref_menu::ref_by_display_name(src.refs, kind, name)?;

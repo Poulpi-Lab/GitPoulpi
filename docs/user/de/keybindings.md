@@ -649,8 +649,8 @@ die Standardtasten.
 | Flow: Angehaltene Aktion fortsetzen oder abbrechen... |  |
 | Flow: Gruppierte Branches umschalten |  |
 | Flow: Workflow-Einstellungen... |  |
-| Remote: Alle Branches des Remotes ausblenden... |  |
-| Remote: Alle Branches des Remotes anzeigen... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: Neuer Branch an HEAD... | `Ctrl+G b` |
 | Git: Neuer Tag an HEAD... | `Ctrl+G t` |
 | Git: Alle noch nicht gepushten Tags pushen | `Ctrl+G U` |

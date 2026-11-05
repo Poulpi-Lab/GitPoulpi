@@ -514,20 +514,34 @@ pub enum RefsAction {
     /// display filter in `repo-state.toml`, which an open TUI follows live.
     /// Names are spelled as the refs listing spells them (`feature/x`,
     /// `origin/main`, a tag name).
+    ///
+    /// `--remote <name>...` hides a whole remote (every branch of it, the
+    /// ones fetched later too): the way to look at one history without a
+    /// separate archive remote's.
     Hide {
         /// Refs to hide.
-        #[arg(required_unless_present = "clear")]
+        #[arg(required_unless_present_any = ["clear", "remote"])]
         names: Vec<String>,
-        /// Un-hide every hidden ref (in addition to any named).
+        /// Remotes to hide as a whole (names as `remote list` spells them).
+        #[arg(long, num_args = 1..)]
+        remote: Vec<String>,
+        /// Un-hide every hidden ref and remote (in addition to any named).
         #[arg(long)]
         clear: bool,
     },
     /// Show refs again: removes them from the hidden and solo sets.
+    ///
+    /// `--remote <name>...` shows a whole remote again, with every branch
+    /// of it that was hidden one by one.
     Show {
         /// Refs to show again.
-        #[arg(required_unless_present = "clear")]
+        #[arg(required_unless_present_any = ["clear", "remote"])]
         names: Vec<String>,
-        /// Reset the whole filter: nothing hidden, nothing soloed.
+        /// Remotes to show again.
+        #[arg(long, num_args = 1..)]
+        remote: Vec<String>,
+        /// Reset the whole filter: nothing hidden (remotes included),
+        /// nothing soloed.
         #[arg(long)]
         clear: bool,
     },

@@ -654,8 +654,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Flow: Continue or Abort Stopped Action... |  |
 | Flow: Toggle Grouped Branches |  |
 | Flow: Workflow Settings... |  |
-| Remote: Hide All Branches of Remote... |  |
-| Remote: Show All Branches of Remote... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: New Branch at HEAD... | `Ctrl+G b` |
 | Git: New Tag at HEAD... | `Ctrl+G t` |
 | Git: Push All Unpushed Tags | `Ctrl+G U` |

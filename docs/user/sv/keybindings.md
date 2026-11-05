@@ -656,8 +656,8 @@ Tangenterna är standardvärdena.
 | Flow: Fortsätt eller avbryt stoppad åtgärd... |  |
 | Flow: Växla grupperade grenar |  |
 | Flow: Arbetsflödesinställningar... |  |
-| Remote: Dölj alla grenar för remote... |  |
-| Remote: Visa alla grenar för remote... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: Ny gren vid HEAD... | `Ctrl+G b` |
 | Git: Ny tag vid HEAD... | `Ctrl+G t` |
 | Git: Pusha alla opushade taggar | `Ctrl+G U` |

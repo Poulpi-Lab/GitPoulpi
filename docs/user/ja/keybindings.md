@@ -620,8 +620,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Flow: 停止した操作を続行または中止... |  |
 | Flow: ブランチのグループ表示を切り替え |  |
 | Flow: ワークフロー設定... |  |
-| リモート: リモートのすべてのブランチを非表示... |  |
-| リモート: リモートのすべてのブランチを表示... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: HEAD に新規ブランチ... | `Ctrl+G b` |
 | Git: HEAD に新規Tag... | `Ctrl+G t` |
 | Git: 未pushのTagをすべてPush | `Ctrl+G U` |

@@ -491,11 +491,7 @@ impl WindowState {
         // and ask for the new one. The old graph stays on screen until it
         // lands (no blank frame); answers still on their way for the old
         // filter are dropped by their generation (`apply.rs`).
-        let walk = crate::graph::walk_filter(
-            &self.hidden_from_graph,
-            &std::collections::BTreeSet::new(),
-            &self.solo_refs,
-        );
+        let walk = crate::graph::walk_filter(&self.hidden_from_graph, &self.solo_refs);
         if self.link.set_log_filter(walk) {
             self.lazy_log.restart();
             self.link.set_log_depth(0);

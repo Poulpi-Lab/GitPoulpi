@@ -648,8 +648,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Flow: продовжити або перервати зупинену дію... |  |
 | Flow: перемкнути групування гілок |  |
 | Flow: налаштування робочого процесу... |  |
-| Remote: сховати всі гілки remote... |  |
-| Remote: показати всі гілки remote... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: нова гілка на HEAD... | `Ctrl+G b` |
 | Git: новий tag на HEAD... | `Ctrl+G t` |
 | Git: push усіх ненадісланих tag'ів | `Ctrl+G U` |

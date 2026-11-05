@@ -506,8 +506,10 @@ pub(super) fn handle(
                 }) = clicked
                 {
                     *cx.focus = Focus::Refs;
+                    let hidden = crate::refs_tree::remote_hidden(&*cx.hidden_from_graph, path);
                     cx.remote_ui.open_remote_menu(
                         path,
+                        hidden,
                         cx.refs_result.as_deref().unwrap_or(&[]),
                         col,
                         row,
@@ -536,7 +538,12 @@ pub(super) fn handle(
                         ContextMenu::new(
                             path.clone(),
                             folder_menu_entries(
-                                folder_fully_in(&*cx.hidden_from_graph, &under),
+                                folder_fully_in(&*cx.hidden_from_graph, &under)
+                                    || (section == SidebarSection::Remote
+                                        && refs_tree::hidden_through_remote(
+                                            &*cx.hidden_from_graph,
+                                            path,
+                                        )),
                                 folder_fully_in(&*cx.solo_refs, &under),
                             ),
                             col,
@@ -560,7 +567,11 @@ pub(super) fn handle(
                                     full_name,
                                     &cx.remote_ui.remotes,
                                 ),
-                                cx.hidden_from_graph.contains(full_name),
+                                refs_tree::hidden_in_graph(
+                                    &*cx.hidden_from_graph,
+                                    full_name,
+                                    section == SidebarSection::Remote,
+                                ),
                                 cx.solo_refs.contains(full_name.as_str()),
                                 unpushed_tags.contains(full_name.as_str()),
                             ),

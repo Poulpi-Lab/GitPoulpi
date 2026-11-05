@@ -653,8 +653,8 @@ zastosowania. Klawisze są domyślne.
 | Flow: Kontynuuj lub przerwij zatrzymaną akcję... |  |
 | Flow: Przełącz grupowanie gałęzi |  |
 | Flow: Ustawienia przepływu pracy... |  |
-| Zdalne: Ukryj wszystkie gałęzie zdalnego... |  |
-| Zdalne: Pokaż wszystkie gałęzie zdalnego... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: Nowa gałąź w HEAD... | `Ctrl+G b` |
 | Git: Nowy tag w HEAD... | `Ctrl+G t` |
 | Git: Push wszystkich niewypchniętych tagów | `Ctrl+G U` |

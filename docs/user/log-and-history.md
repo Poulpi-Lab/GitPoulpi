@@ -173,8 +173,15 @@ at Selected Commit...`). **Settings > Log & graph > Show a ghost branch on the
 hovered commit** turns it off; nothing is drawn where the Ref column is too narrow.
 
 **Remotes.** The `+` in the REMOTE title adds one; right-click a remote's
-name to fetch it, copy its web link, make it the default remote, hide all its
-branches, edit its URLs or remove it.
+name to fetch it, copy its web link, make it the default remote, hide it from
+the graph, edit its URLs or remove it. **Hiding a remote** (its row's eye, the
+menu's *Hide remote from graph*, or `Remote: Hide Remote in Graph...` in the
+palette) hides every branch it has now or gets later, and the commits only it
+reaches leave the Log: the way to browse one history without an unrelated
+archive remote's, and to bring that back with *Show remote in graph*. Showing a
+remote also shows the branches of it that were hidden one by one. A branch of a
+hidden remote says so on the status line if its eye is used: show the remote
+first.
 
 **Stashes.** **Stash** stashes everything (untracked files included);
 `Ctrl+G m` asks for a message first (with AI on, `Ctrl+G` inside that prompt

@@ -1080,14 +1080,14 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::Flow(crate::flow::FlowCmd::Settings),
     ),
     entry(
-        msg::palette::REMOTE_HIDE_ALL_BRANCHES_OF_REMOTE,
+        msg::palette::REMOTE_HIDE_REMOTE_IN_GRAPH,
         "",
-        PaletteCommand::HideAllBranchesOfRemote,
+        PaletteCommand::HideRemoteInGraph,
     ),
     entry(
-        msg::palette::REMOTE_SHOW_ALL_BRANCHES_OF_REMOTE,
+        msg::palette::REMOTE_SHOW_REMOTE_IN_GRAPH,
         "",
-        PaletteCommand::ShowAllBranchesOfRemote,
+        PaletteCommand::ShowRemoteInGraph,
     ),
     entry(
         msg::palette::GIT_NEW_BRANCH_AT_HEAD,

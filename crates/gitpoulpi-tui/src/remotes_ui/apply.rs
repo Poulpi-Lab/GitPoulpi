@@ -97,18 +97,17 @@ pub(crate) fn run_remote_palette_command(
         PaletteCommand::FetchRemote => {
             on_remote(RemoteUiAction::FetchRemote, msg::FETCH_WHICH.get(), ctx)
         }
-        PaletteCommand::HideAllBranchesOfRemote => on_remote(
-            RemoteUiAction::HideAllBranches,
-            msg::HIDE_ALL_WHICH.get(),
-            ctx,
-        ),
-        PaletteCommand::ShowAllBranchesOfRemote => on_remote(
-            RemoteUiAction::ShowAllBranches,
-            msg::SHOW_ALL_WHICH.get(),
-            ctx,
-        ),
+        PaletteCommand::HideRemoteInGraph => {
+            on_remote(RemoteUiAction::HideRemote, msg::HIDE_ALL_WHICH.get(), ctx)
+        }
+        PaletteCommand::ShowRemoteInGraph => {
+            on_remote(RemoteUiAction::ShowRemote, msg::SHOW_ALL_WHICH.get(), ctx)
+        }
         PaletteCommand::RemoteActions => match selected_remote {
-            Some(remote) => ctx.ui.open_remote_menu(&remote, refs, col, row),
+            Some(remote) => {
+                let hidden = crate::refs_tree::remote_hidden(&*ctx.hidden_from_graph, &remote);
+                ctx.ui.open_remote_menu(&remote, hidden, refs, col, row)
+            }
             None => *ctx.last_message = Some(msg::SELECT_REMOTE_FIRST.get().into()),
         },
         _ => {}
@@ -169,9 +168,8 @@ pub(crate) struct RemoteUiCtx<'a> {
     pub(crate) clipboard: &'a mut clipboard::Clipboard,
     pub(crate) input_mode: &'a mut InputMode,
     pub(crate) last_message: &'a mut Option<String>,
-    /// For `HideAllBranches`/`ShowAllBranches` (the remote-name menu's
-    /// bulk twin of a branch row's own hide-in-graph eye) and its
-    /// persistence - the same `hidden_from_graph`/`repo_root` the Refs
+    /// For `HideRemote`/`ShowRemote` (the remote-name menu's twin of its
+    /// row's eye) and its persistence - the same `hidden_from_graph`/`repo_root` the Refs
     /// sidebar's own hide/solo actions read and write, via
     /// `refs_tree::submit_ref_visibility`.
     pub(crate) hidden_from_graph: &'a mut std::collections::HashSet<String>,
@@ -293,28 +291,15 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
             };
             None
         }
-        RemoteUiAction::HideAllBranches(remote) => {
-            let names: Vec<String> = refs
-                .iter()
-                .filter_map(|r| match &r.kind {
-                    RefKind::RemoteBranch { remote: rem, name } if *rem == remote => {
-                        Some(format!("{rem}/{name}"))
-                    }
-                    _ => None,
-                })
-                .collect();
-            let n = names.len();
-            hidden_from_graph.extend(names);
+        RemoteUiAction::HideRemote(remote) => {
+            crate::refs_tree::set_remote_hidden(hidden_from_graph, &remote, true);
             refs_tree::submit_ref_visibility(link, hidden_from_graph, solo_refs);
-            Some(msg::branches_hidden(n as u64, &remote))
+            Some(msg::remote_hidden(&remote))
         }
-        RemoteUiAction::ShowAllBranches(remote) => {
-            let prefix = format!("{remote}/");
-            let before = hidden_from_graph.len();
-            hidden_from_graph.retain(|n| !n.starts_with(&prefix));
-            let shown = before - hidden_from_graph.len();
+        RemoteUiAction::ShowRemote(remote) => {
+            crate::refs_tree::set_remote_hidden(hidden_from_graph, &remote, false);
             refs_tree::submit_ref_visibility(link, hidden_from_graph, solo_refs);
-            Some(msg::branches_shown(shown as u64, &remote))
+            Some(msg::remote_shown(&remote))
         }
         RemoteUiAction::PinSshKey(command) => {
             let said = match &command {
@@ -381,13 +366,20 @@ pub(crate) fn submit_remote_form(
     submit: FormSubmit,
     ui: &mut RemoteUi,
     link: &DaemonLink,
+    hidden_from_graph: &mut std::collections::HashSet<String>,
+    solo_refs: &std::collections::HashSet<String>,
 ) -> String {
     for action in submit.actions {
         link.submit_action(action);
     }
     if let Some((old, new)) = submit.renamed {
         if ui.chosen_default.as_deref() == Some(old.as_str()) {
-            ui.set_chosen_default(Some(new));
+            ui.set_chosen_default(Some(new.clone()));
+        }
+        // The hide follows the remote to its new name (the flag, and the
+        // branches hidden one by one: their names carry the remote's).
+        if crate::refs_tree::rename_remote_in_hidden(hidden_from_graph, &old, &new) {
+            refs_tree::submit_ref_visibility(link, hidden_from_graph, solo_refs);
         }
     }
     submit.summary

@@ -274,9 +274,19 @@ autostash = "Čekající auto-stash: GitPoulpi odložil lokální změny, aby pr
 "refs hide" = "Skryje refs z grafu commitů („Skrýt“ v TUI): filtr zobrazení pro každý repozitář v `repo-state.toml`, který otevřené TUI sleduje živě. Názvy se zapisují tak, jak je vypisuje seznam refs (`feature/x`, `origin/main`, název tagu)"
 "refs hide --clear" = "Zruší skrytí každé skryté ref (navíc k případným pojmenovaným)"
 "refs hide --names" = "Refs ke skrytí"
+"refs hide#long" = """
+Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+
+`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
+"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
 "refs show" = "Znovu zobrazí refs: odebere je z množin skrytých a solo"
 "refs show --clear" = "Obnoví celý filtr: nic skryto, nic v solo"
 "refs show --names" = "Refs k opětovnému zobrazení"
+"refs show#long" = """
+Show refs again: removes them from the hidden and solo sets.
+
+`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
+"refs show --remote" = "Remotes to show again"
 "refs solo" = "V grafu commitů ukáže jen tyto refs (a to, čeho dosáhnou)"
 "refs solo --clear" = "Zruší solo každé ref v solo (navíc k případným pojmenovaným)"
 "refs solo --names" = "Refs pro solo"

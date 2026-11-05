@@ -280,9 +280,19 @@ redo = "Refaz a operação que `undo` acabou de desfazer, para o estado exato re
 "refs hide" = """Oculta refs do grafo de commits (o "Ocultar" do TUI): o filtro de exibição por repositório em `repo-state.toml`, que um TUI aberto acompanha ao vivo. Os nomes são escritos como a listagem de refs os escreve (`feature/x`, `origin/main`, um nome de tag)"""
 "refs hide --clear" = "Reexibe todas as refs ocultas (além das nomeadas)"
 "refs hide --names" = "Refs a ocultar"
+"refs hide#long" = """
+Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+
+`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
+"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
 "refs show" = "Mostra refs novamente: remove-as dos conjuntos de ocultas e de solo"
 "refs show --clear" = "Redefine o filtro inteiro: nada oculto, nada em solo"
 "refs show --names" = "Refs a mostrar novamente"
+"refs show#long" = """
+Show refs again: removes them from the hidden and solo sets.
+
+`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
+"refs show --remote" = "Remotes to show again"
 "refs solo" = "Mostra somente estas refs (e o que elas alcançam) no grafo de commits"
 "refs solo --clear" = "Tira do solo toda ref em solo (além das nomeadas)"
 "refs solo --names" = "Refs em solo"

@@ -189,3 +189,60 @@ fn hiding_a_ref_in_the_tui_is_visible_to_the_cli_and_the_state_file() {
 
     let _ = term.stop();
 }
+
+#[test]
+fn the_cli_hiding_a_whole_remote_reaches_a_running_tui() {
+    let repo = fixture();
+    let root = repo.root();
+    // A second history behind a remote of its own.
+    let archive = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("archive only commit")
+        .unwrap()
+        .build();
+    git(
+        root,
+        &[
+            "remote",
+            "add",
+            "archive",
+            &archive.root().to_string_lossy(),
+        ],
+    );
+    git(root, &["fetch", "-q", "archive"]);
+    let config = tempfile::tempdir().unwrap();
+    let session = "ref-vis-remote";
+    let term = common::launch(root)
+        .session(session)
+        .config_dir(config.path())
+        .size(200, 50)
+        .ready_when("the log with the archive commit", |s| {
+            s.contains("side work") && s.contains("archive only commit")
+        })
+        .spawn();
+
+    let hid = refs(
+        root,
+        session,
+        config.path(),
+        &["hide", "--remote", "archive"],
+    );
+    assert_eq!(hid["hidden_remotes"], serde_json::json!(["archive"]));
+    term.wait_for("the archive commit gone, the rest stays", STEP, |s| {
+        !s.contains("archive only commit") && s.contains("side work") && s.contains("second")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+
+    let shown = refs(
+        root,
+        session,
+        config.path(),
+        &["show", "--remote", "archive"],
+    );
+    assert_eq!(shown["hidden_remotes"], serde_json::json!([]));
+    term.wait_for("the archive commit back", STEP, |s| {
+        s.contains("archive only commit")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    let _ = term.stop();
+}

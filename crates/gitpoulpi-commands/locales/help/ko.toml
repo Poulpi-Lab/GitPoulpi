@@ -280,9 +280,19 @@ redo = "`undo`가 방금 되돌린 작업을 기록된 정확한 상태로 다�
 "refs hide" = """커밋 그래프에서 ref를 숨깁니다 (TUI의 "Hide"): `repo-state.toml`의 저장소별 표시 필터이며 열려 있는 TUI가 실시간으로 따릅니다. 이름은 ref 목록에 표시되는 방식(`feature/x`, `origin/main`, 태그 이름)으로 씁니다"""
 "refs hide --clear" = "(지정한 이름에 더해) 숨긴 모든 ref를 다시 표시합니다"
 "refs hide --names" = "숨길 ref"
+"refs hide#long" = """
+Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+
+`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
+"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
 "refs show" = "ref를 다시 표시합니다: 숨김 및 솔로 집합에서 제거합니다"
 "refs show --clear" = "필터 전체를 초기화합니다: 숨긴 것도 솔로도 없음"
 "refs show --names" = "다시 표시할 ref"
+"refs show#long" = """
+Show refs again: removes them from the hidden and solo sets.
+
+`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
+"refs show --remote" = "Remotes to show again"
 "refs solo" = "커밋 그래프에 이 ref들(과 거기서 닿는 것)만 표시합니다"
 "refs solo --clear" = "(지정한 이름에 더해) 솔로로 지정된 모든 ref의 솔로를 해제합니다"
 "refs solo --names" = "솔로로 지정할 ref"

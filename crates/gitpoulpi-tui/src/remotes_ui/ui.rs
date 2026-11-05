@@ -71,11 +71,18 @@ impl RemoteUi {
         self.menu.as_ref()?.row_action(row)?.tooltip()
     }
 
-    pub(crate) fn open_remote_menu(&mut self, name: &str, refs: &[Ref], col: u16, row: u16) {
+    pub(crate) fn open_remote_menu(
+        &mut self,
+        name: &str,
+        hidden: bool,
+        refs: &[Ref],
+        col: u16,
+        row: u16,
+    ) {
         let is_default = self.default_remote(refs).as_deref() == Some(name);
         self.menu = Some(ContextMenu::new(
             msg::menu_title(name),
-            remote_menu_entries(name, is_default),
+            remote_menu_entries(name, is_default, hidden),
             col,
             row,
         ));

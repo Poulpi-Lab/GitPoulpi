@@ -426,6 +426,19 @@ impl WindowState {
             // every remote branch on its first `/` for one frame.
             if let Ok(remotes) = outcome.remotes_result {
                 self.remote_names = remotes.iter().map(|r| r.name.clone()).collect();
+                // A removed remote takes its hide with it.
+                if !crate::refs_tree::drop_gone_remotes(
+                    &mut self.hidden_from_graph,
+                    &self.remote_names,
+                )
+                .is_empty()
+                {
+                    refs_tree::submit_ref_visibility(
+                        &self.link,
+                        &self.hidden_from_graph,
+                        &self.solo_refs,
+                    );
+                }
                 self.remote_ui.remotes = remotes;
                 // Where the avatar worker may ask GitHub which account an
                 // author is: `origin` when it is on github.com, else the

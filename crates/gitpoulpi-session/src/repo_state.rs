@@ -191,6 +191,12 @@ pub struct FoldState {
 pub struct RepoState {
     #[serde(default)]
     pub ref_visibility: BTreeMap<String, RefVisibility>,
+    /// Remotes hidden from the graph as a whole, sorted: every branch of
+    /// the remote, the ones fetched later too. A separate field and not an
+    /// entry of `ref_visibility`, so a branch that happens to be named like
+    /// the remote cannot collide with it.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub hidden_remotes: Vec<String>,
     #[serde(default)]
     pub pending_auto_stash: Option<PendingAutoStash>,
     #[serde(default)]

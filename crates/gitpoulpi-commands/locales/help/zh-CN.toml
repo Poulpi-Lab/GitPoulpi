@@ -280,9 +280,19 @@ redo = "重做 `undo` 刚刚撤回的操作，恢复到所记录的确切状态�
 "refs hide" = """从提交图中隐藏引用（TUI 的“隐藏”）：即 `repo-state.toml` 中每个仓库的显示筛选，已打开的 TUI 会实时跟随。名称的写法与引用列表一致（`feature/x`、`origin/main`、标签名）"""
 "refs hide --clear" = "取消隐藏所有已隐藏的引用（在所列名称之外）"
 "refs hide --names" = "要隐藏的引用"
+"refs hide#long" = """
+Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+
+`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
+"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
 "refs show" = "重新显示引用：将它们从隐藏集合和单独显示集合中移除"
 "refs show --clear" = "重置整个筛选：不隐藏任何内容，也不单独显示任何内容"
 "refs show --names" = "要重新显示的引用"
+"refs show#long" = """
+Show refs again: removes them from the hidden and solo sets.
+
+`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
+"refs show --remote" = "Remotes to show again"
 "refs solo" = "在提交图中只显示这些引用（及其可达的内容）"
 "refs solo --clear" = "取消单独显示所有已单独显示的引用（在所列名称之外）"
 "refs solo --names" = "要单独显示的引用"

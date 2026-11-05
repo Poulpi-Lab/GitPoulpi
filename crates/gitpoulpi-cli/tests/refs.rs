@@ -103,5 +103,49 @@ fn hiding_an_unknown_ref_is_refused_and_a_name_is_required_without_clear() {
     assert!(!bare.status.success(), "a name or --clear is required");
 }
 
+#[test]
+fn hiding_a_remote_is_persisted_whole_and_showing_it_clears_its_branches_too() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .with_remote("archive")
+        .unwrap()
+        .push_to("archive", "main")
+        .unwrap()
+        .build();
+    repo.git(&["fetch", "-q", "archive"]);
+    let root = repo.root();
+    let session = "cli-refs-remote";
+    let state_of = || {
+        let path = root.join(".git").join("gitpoulpi").join("repo-state.toml");
+        RepoState::load(&path).unwrap()
+    };
+
+    let hid = run_json(root, session, &["refs", "hide", "--remote", "archive"]);
+    assert_eq!(strings(&hid["hidden_remotes"]), ["archive"]);
+    assert_eq!(strings(&hid["remotes"]), ["archive"]);
+    assert_eq!(state_of().hidden_remotes, ["archive"]);
+    assert!(hid["hidden"].as_array().unwrap().is_empty());
+
+    // An individual hide under the remote comes back with the remote.
+    run_json(root, session, &["refs", "hide", "archive/main"]);
+    let shown = run_json(root, session, &["refs", "show", "--remote", "archive"]);
+    assert!(shown["hidden_remotes"].as_array().unwrap().is_empty());
+    assert!(shown["hidden"].as_array().unwrap().is_empty());
+    assert!(state_of().hidden_remotes.is_empty());
+
+    // `--clear` empties the hidden remotes too.
+    run_json(root, session, &["refs", "hide", "--remote", "archive"]);
+    let cleared = run_json(root, session, &["refs", "show", "--clear"]);
+    assert!(cleared["hidden_remotes"].as_array().unwrap().is_empty());
+    assert!(state_of().hidden_remotes.is_empty());
+
+    let unknown = run(root, session, &["refs", "hide", "--remote", "nowhere"]);
+    assert!(!unknown.status.success());
+    let json: Value = serde_json::from_slice(&unknown.stdout).unwrap();
+    assert!(json["error"].as_str().unwrap().contains("nowhere"));
+}
+
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();

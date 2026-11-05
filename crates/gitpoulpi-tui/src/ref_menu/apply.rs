@@ -117,8 +117,10 @@ pub(crate) fn apply_ref_context_action(
             }
         }
         RefContextAction::ToggleHideInGraph => {
-            if !hidden_from_graph.remove(&full_name) {
-                hidden_from_graph.insert(full_name.clone());
+            if let Some(note) =
+                crate::refs_tree::toggle_hide_ref(hidden_from_graph, section.ref_kind(), &full_name)
+            {
+                *last_message = Some(note);
             }
         }
         RefContextAction::ToggleSolo => {
@@ -147,6 +149,21 @@ pub(crate) fn apply_ref_context_action(
         // bulk hide/solo reaches, or a filtered-out sibling would be
         // silently skipped.
         RefContextAction::ToggleHideFolder | RefContextAction::ToggleSoloFolder => {
+            // A remote's own row hides the whole remote, and a folder under a
+            // hidden remote only says so (`refs_tree::hide_folder`).
+            if action == RefContextAction::ToggleHideFolder {
+                let is_remote_root =
+                    section == SidebarSection::Remote && remotes.contains(&full_name);
+                if let crate::refs_tree::FolderHide::Done(note) = crate::refs_tree::hide_folder(
+                    hidden_from_graph,
+                    section.ref_kind(),
+                    &full_name,
+                    is_remote_root,
+                ) {
+                    *last_message = Some(note);
+                    return;
+                }
+            }
             if let (Ok(refs), Some(kind)) = (refs_result.as_ref(), section.ref_kind()) {
                 let names = group_refs(refs, "").names(kind).to_vec();
                 let under = refs_under_folder(&names, &full_name);

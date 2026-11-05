@@ -658,8 +658,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Flow: Gestopte actie voortzetten of afbreken... |  |
 | Flow: Gegroepeerde branches omschakelen |  |
 | Flow: Workflowinstellingen... |  |
-| Remote: Alle branches van remote verbergen... |  |
-| Remote: Alle branches van remote tonen... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: Nieuwe branch op HEAD... | `Ctrl+G b` |
 | Git: Nieuwe tag op HEAD... | `Ctrl+G t` |
 | Git: Alle niet-gepushte tags pushen | `Ctrl+G U` |

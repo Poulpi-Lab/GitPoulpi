@@ -216,8 +216,8 @@ fn every_mouse_affordance_maps_to_a_palette_command() {
             R::SetUpstream { .. } | R::TypeUpstream { .. } => PaletteCommand::SetUpstream,
             R::PullThenPush { .. } => PaletteCommand::PullWithMode(PullButtonMode::Merge),
             R::ForcePush { .. } => PaletteCommand::ForcePushWithLease,
-            R::HideAllBranches(_) => PaletteCommand::HideAllBranchesOfRemote,
-            R::ShowAllBranches(_) => PaletteCommand::ShowAllBranchesOfRemote,
+            R::HideRemote(_) => PaletteCommand::HideRemoteInGraph,
+            R::ShowRemote(_) => PaletteCommand::ShowRemoteInGraph,
             R::PinSshKey(_) => PaletteCommand::PinSshKey,
             // The auto-stash dialog is the answer to an operation the palette
             // already reaches (checkout, pull, merge, rebase); its yes is
@@ -231,8 +231,9 @@ fn every_mouse_affordance_maps_to_a_palette_command() {
         reason: gitpoulpi_core::domain::PushRejectReason::NonFastForward,
         detail: None,
     };
-    let every_remote_row = crate::remote_menu_entries("o", false)
+    let every_remote_row = crate::remote_menu_entries("o", false, false)
         .into_iter()
+        .chain(crate::remote_menu_entries("o", false, true))
         .chain(crate::pull_mode_entries())
         .chain(crate::remotes_ui::lfs_menu_entries())
         .chain(crate::push_to_entries(&["o".to_string()], None))

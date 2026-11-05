@@ -654,8 +654,8 @@ Tuşlar varsayılanlardır.
 | Flow: Durdurulmuş Eyleme Devam Et veya İptal Et... |  |
 | Flow: Gruplu Dalları Aç/Kapat |  |
 | Flow: İş Akışı Ayarları... |  |
-| Remote: Uzak Deponun Tüm Dallarını Gizle... |  |
-| Remote: Uzak Deponun Tüm Dallarını Göster... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: HEAD'de Yeni Dal... | `Ctrl+G b` |
 | Git: HEAD'de Yeni Tag... | `Ctrl+G t` |
 | Git: Gönderilmemiş Tüm Tag'leri Push Et | `Ctrl+G U` |

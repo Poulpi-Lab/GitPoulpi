@@ -33,10 +33,13 @@ pub fn set(request: &Request) -> Dispatched {
         .get("names")
         .and_then(|v| serde_json::from_value(v.clone()).ok())
         .unwrap_or_default();
-    if !matches!(mode, "hide" | "show" | "solo" | "replace") {
+    if !matches!(
+        mode,
+        "hide" | "show" | "solo" | "replace" | "hide-remote" | "show-remote"
+    ) {
         return err(
             request.id,
-            format!("unknown ref visibility mode `{mode}` (hide, show, solo or replace)"),
+            format!("unknown ref visibility mode `{mode}` (hide, show, solo, hide-remote, show-remote or replace)"),
             false,
         );
     }
@@ -70,8 +73,20 @@ pub fn set(request: &Request) -> Dispatched {
         for name in listed("solo") {
             state.ref_visibility.insert(name, RefVisibility::Solo);
         }
+        // Absent leaves the hidden remotes alone: a client that predates
+        // them must not wipe what another one set.
+        if request.args.get("hidden_remotes").is_some() {
+            state.hidden_remotes = normalized(listed("hidden_remotes"));
+        }
+    } else if matches!(mode, "hide-remote" | "show-remote") {
+        apply_remotes(&mut state, mode == "hide-remote", &names, clear);
     } else {
         apply(&mut state.ref_visibility, mode, &names, clear);
+        // `hide --clear` and `show --clear` empty what hiding owns, and a
+        // hidden remote is hiding.
+        if clear && matches!(mode, "hide" | "show") {
+            state.hidden_remotes.clear();
+        }
     }
     if let Err(e) = state.save(&path) {
         return err(request.id, e.to_string(), false);
@@ -86,9 +101,43 @@ pub fn set(request: &Request) -> Dispatched {
     };
     ok(
         request.id,
-        json!({ "hidden": pick(RefVisibility::Hidden), "solo": pick(RefVisibility::Solo) }),
+        json!({
+            "hidden": pick(RefVisibility::Hidden),
+            "solo": pick(RefVisibility::Solo),
+            "hidden_remotes": state.hidden_remotes,
+        }),
         true,
     )
+}
+
+fn normalized(mut names: Vec<String>) -> Vec<String> {
+    names.sort();
+    names.dedup();
+    names
+}
+
+/// Hide (`hide == true`) or show whole remotes. Hiding sets the flag and
+/// drops the now-covered individual `<remote>/...` hides; showing clears the
+/// flag AND every individual hide under the remote (a remote whose branches
+/// were hidden one by one comes back whole). Soloed refs are left alone.
+/// `clear` with no names empties the flag set (with names it is ignored).
+fn apply_remotes(state: &mut RepoState, hide: bool, remotes: &[String], clear: bool) {
+    if clear && remotes.is_empty() {
+        state.hidden_remotes.clear();
+        return;
+    }
+    for remote in remotes {
+        let under = format!("{remote}/");
+        state
+            .ref_visibility
+            .retain(|name, v| !(*v == RefVisibility::Hidden && name.starts_with(&under)));
+        if hide {
+            state.hidden_remotes.push(remote.clone());
+        } else {
+            state.hidden_remotes.retain(|r| r != remote);
+        }
+    }
+    state.hidden_remotes = normalized(std::mem::take(&mut state.hidden_remotes));
 }
 
 /// `hide` / `solo` mark the named refs (a ref is one or the other, as in the
@@ -120,6 +169,63 @@ fn apply(map: &mut BTreeMap<String, RefVisibility>, mode: &str, names: &[String]
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn hiding_a_remote_sets_the_flag_and_absorbs_its_individual_hides() {
+        let mut state = RepoState::default();
+        apply(
+            &mut state.ref_visibility,
+            "hide",
+            &["archive/old-a".into(), "origin/main".into(), "side".into()],
+            false,
+        );
+        apply(
+            &mut state.ref_visibility,
+            "solo",
+            &["archive/old-b".into()],
+            false,
+        );
+        apply_remotes(&mut state, true, &["archive".into()], false);
+        assert_eq!(state.hidden_remotes, vec!["archive"]);
+        assert!(
+            !state.ref_visibility.contains_key("archive/old-a"),
+            "covered now"
+        );
+        assert_eq!(
+            state.ref_visibility.get("archive/old-b"),
+            Some(&RefVisibility::Solo),
+            "solo is untouched"
+        );
+        assert_eq!(
+            state.ref_visibility.get("origin/main"),
+            Some(&RefVisibility::Hidden)
+        );
+        // Twice is once.
+        apply_remotes(&mut state, true, &["archive".into()], false);
+        assert_eq!(state.hidden_remotes, vec!["archive"]);
+    }
+
+    #[test]
+    fn showing_a_remote_clears_the_flag_and_every_hide_under_it() {
+        let mut state = RepoState::default();
+        apply(
+            &mut state.ref_visibility,
+            "hide",
+            &[
+                "archive/old-a".into(),
+                "archive/old-b".into(),
+                "side".into(),
+            ],
+            false,
+        );
+        state.hidden_remotes = vec!["archive".into(), "other".into()];
+        apply_remotes(&mut state, false, &["archive".into()], false);
+        assert_eq!(state.hidden_remotes, vec!["other"]);
+        assert_eq!(state.ref_visibility.len(), 1, "only `side` is left");
+        // `clear` with no names empties the flags.
+        apply_remotes(&mut state, false, &[], true);
+        assert!(state.hidden_remotes.is_empty());
+    }
 
     #[test]
     fn hide_solo_show_and_clear() {

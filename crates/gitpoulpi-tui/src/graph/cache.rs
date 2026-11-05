@@ -218,7 +218,13 @@ pub(super) fn build(i: &LayoutInputs<'_>) -> LogLayout {
         .as_ref()
         .map(|refs| {
             refs.iter()
-                .filter(|r| !i.hidden.contains(&crate::refs_sidebar::ref_full_name(r)))
+                .filter(|r| {
+                    !crate::refs_tree::hidden_in_graph(
+                        i.hidden,
+                        &crate::refs_sidebar::ref_full_name(r),
+                        matches!(r.kind, gitpoulpi_core::domain::RefKind::RemoteBranch { .. }),
+                    )
+                })
                 .filter(|r| {
                     i.solo.is_empty() || i.solo.contains(&crate::refs_sidebar::ref_full_name(r))
                 })

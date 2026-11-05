@@ -524,10 +524,10 @@ pub(crate) enum PaletteCommand {
     PinSshKey,
     /// Repository: Sparse Checkout... - the directories dialog.
     SparseCheckout,
-    /// Hide/show every branch of a remote at once - the remote-name row's
-    /// menu entries added alongside its existing ones.
-    HideAllBranchesOfRemote,
-    ShowAllBranchesOfRemote,
+    /// Hide or show a whole remote in the graph (every branch of it, the ones
+    /// fetched later too) - the remote-name row's menu entry and its eye.
+    HideRemoteInGraph,
+    ShowRemoteInGraph,
     Undo,
     /// Drop the blocked latest undo entry from the journal (confirmed).
     UndoForget,

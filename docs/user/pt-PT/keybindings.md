@@ -652,8 +652,8 @@ As teclas são as predefinidas.
 | Flow: continuar ou abortar a ação interrompida... |  |
 | Flow: alternar o agrupamento de branches |  |
 | Flow: definições do fluxo de trabalho... |  |
-| Remoto: ocultar todas as branches do remoto... |  |
-| Remoto: mostrar todas as branches do remoto... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: nova branch em HEAD... | `Ctrl+G b` |
 | Git: nova tag em HEAD... | `Ctrl+G t` |
 | Git: Push de todas as tags não enviadas | `Ctrl+G U` |

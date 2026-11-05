@@ -424,8 +424,13 @@ pub enum OperationKind {
     /// reason as `Hello`.
     Shutdown,
     /// Hide, un-hide or solo refs in the repository's saved display filter
-    /// (`RepoState::ref_visibility`). Args `{ mode: "hide" | "show" |
-    /// "solo", names: [..], clear: bool }`; answers `{ hidden, solo }`
+    /// (`RepoState::ref_visibility`), or hide whole remotes
+    /// (`RepoState::hidden_remotes`). Args `{ mode: "hide" | "show" |
+    /// "solo" | "hide-remote" | "show-remote" | "replace", names: [..],
+    /// clear: bool }` (`replace`: `{ hidden, solo, hidden_remotes? }`, the
+    /// whole sets; an absent `hidden_remotes` leaves them untouched; `names`
+    /// of the remote modes are remote names; `clear` on `hide`/`show` also
+    /// empties the hidden remotes); answers `{ hidden, solo, hidden_remotes }`
     /// after the change. Handled by the daemon itself (never a
     /// `GitBackend` call) so it can broadcast `Event::RefVisibilityChanged`.
     /// A mutation of GitPoulpi state, not of the repository.

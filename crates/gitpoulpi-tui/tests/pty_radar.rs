@@ -473,3 +473,30 @@ fn ctrl_n_escape_cancels_the_radar_badges() {
         screen.text()
     );
 }
+
+/// `Ctrl+O` on the open Radar goes back Home (the Radar closes, the list's
+/// search is focused): it does not duplicate the Radar's own `/` and
+/// `Ctrl+F` by focusing the Radar's filter.
+#[test]
+fn ctrl_o_on_the_radar_goes_home_instead_of_searching() {
+    let mut s = setup("pty-radar-ctrl-o");
+    open_radar(&mut s.term);
+    s.term.send_keys("C-o").expect("Ctrl+O");
+    s.term
+        .wait_for("Home without the Radar", STEP, |s| {
+            s.contains("Repository Management") && !s.contains("MY PULL REQUESTS")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    // The typed text goes to the Home search (the Radar is gone, so it
+    // cannot be in its filter) and the Radar stays closed.
+    s.term.send_text("zqx").expect("type");
+    let screen = s
+        .term
+        .wait_for("the text in the Home search", STEP, |s| s.contains("zqx"))
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(
+        !screen.contains("MY PULL REQUESTS") && screen.contains("Repository Management"),
+        "{}",
+        screen.text()
+    );
+}

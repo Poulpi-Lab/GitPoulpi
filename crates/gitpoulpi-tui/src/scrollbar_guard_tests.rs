@@ -85,6 +85,52 @@ fn windows_a_list(source: &str) -> bool {
         }
         rest = after;
     }
+    windows_a_range(&squeezed)
+}
+
+/// `(first..len).take(rows)`: a window cut from a range of indexes.
+fn windows_a_range(squeezed: &str) -> bool {
+    let bytes = squeezed.as_bytes();
+    let mut from = 0;
+    while let Some(at) = squeezed[from..].find(").take(") {
+        let close = from + at;
+        from = close + 1;
+        // Walk back to the matching open parenthesis.
+        let mut depth = 0usize;
+        let mut open = None;
+        for i in (0..=close).rev() {
+            match bytes[i] {
+                b')' => depth += 1,
+                b'(' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        open = Some(i);
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        // A bare parenthesised range, not a call's arguments (`zip(a[..n]..)`);
+        // `in(` is the `for .. in (..)` of a loop.
+        let bare = |open: usize| {
+            let word = |b: u8| b.is_ascii_alphanumeric() || b == b'_';
+            open == 0
+                || !word(bytes[open - 1])
+                || (open >= 2
+                    && &bytes[open - 2..open] == b"in"
+                    && (open < 3 || !word(bytes[open - 3])))
+        };
+        if let Some(open) = open.filter(|&o| bare(o)) {
+            let inside = &squeezed[open + 1..close];
+            // A range with a variable start: `offset..list.len()`.
+            if let Some((start, _)) = inside.split_once("..") {
+                if !start.is_empty() && start != "0" && !start.contains('(') {
+                    return true;
+                }
+            }
+        }
+    }
     false
 }
 

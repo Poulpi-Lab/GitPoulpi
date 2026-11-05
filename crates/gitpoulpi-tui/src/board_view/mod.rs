@@ -209,6 +209,14 @@ pub(crate) struct BoardView {
     pub(super) offsets: Vec<usize>,
     pub(super) hbar: Option<crate::scrollbar::Track>,
     pub(super) hgrab: Option<i32>,
+    /// Each overflowing column's vertical bar as last painted, and the thumb
+    /// held (column, where on the thumb).
+    pub(super) col_bars: Vec<(usize, crate::scrollbar::Track)>,
+    pub(super) vgrab: Option<(usize, i32)>,
+    /// What the last paint scrolled the selection into view for: the column,
+    /// the card and the room. A wheel turn or a bar drag moves the window
+    /// away from the selection and it stays until this changes.
+    pub(super) followed: (usize, Option<usize>, usize, usize),
     /// Where the columns were painted, and the selected card's rect.
     pub(super) body_rect: Rect,
     /// A column and its gap, in cells (the horizontal bar's unit).
@@ -272,6 +280,9 @@ impl BoardView {
             offsets: Vec::new(),
             hbar: None,
             hgrab: None,
+            col_bars: Vec::new(),
+            vgrab: None,
+            followed: (usize::MAX, None, 0, 0),
             body_rect: Rect::default(),
             col_stride: 1,
             sel_rect: None,

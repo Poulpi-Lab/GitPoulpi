@@ -690,3 +690,72 @@ fn a_ctrl_alt_chord_is_ignored_but_the_normalized_altgr_key_acts() {
         "the normalized key opens the card menu"
     );
 }
+
+#[test]
+fn a_column_with_more_cards_than_room_has_a_bar_the_thumb_drags_and_the_window_stays_put() {
+    let mut r = rig();
+    {
+        let mut s = r.shared.lock().unwrap();
+        for n in 0..30u64 {
+            s.issues.push(issue(100 + n, "todo"));
+        }
+    }
+    r.view.refresh();
+    wait_for(&mut r.view, |v| v.load_rx.is_none());
+    let mut buf = Buffer::empty(AREA);
+    r.view.render(AREA, &mut buf);
+    assert_eq!(r.view.col_bars.len(), 1, "only the long column has a bar");
+    let (col, track) = r.view.col_bars[0];
+    assert_eq!(col, 0);
+    assert_eq!(buf[(track.rect.x, track.rect.y)].symbol(), "\u{2191}");
+    assert_eq!(
+        buf[(track.rect.x, track.rect.bottom() - 1)].symbol(),
+        "\u{2193}"
+    );
+    let selected = r.view.sel_number;
+    // The thumb dragged past the bottom: the column is at its end, nothing
+    // else moved, and the next paints keep it there.
+    let x = track.rect.x;
+    r.view.on_mouse(mouse(
+        MouseEventKind::Down(MouseButton::Left),
+        x,
+        track.rect.y + track.thumb_start,
+    ));
+    r.view.on_mouse(mouse(
+        MouseEventKind::Drag(MouseButton::Left),
+        x,
+        track.rect.bottom() + 5,
+    ));
+    r.view
+        .on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), x, 0));
+    let max = r.view.cards[0].len() - r.view.rows_per_col;
+    assert_eq!(r.view.offsets[0], max);
+    r.view.render(AREA, &mut buf);
+    r.view.render(AREA, &mut buf);
+    assert_eq!(r.view.offsets[0], max, "a paint does not undo the drag");
+    assert_eq!(r.view.sel_number, selected, "the selection did not move");
+    // The wheel over the column scrolls it back, and so does the up arrow.
+    let at = r.view.col_bars[0].1.rect;
+    r.view
+        .on_mouse(mouse(MouseEventKind::ScrollUp, at.x - 5, at.y + 1));
+    r.view.render(AREA, &mut buf);
+    assert_eq!(r.view.offsets[0], max - 1);
+    r.view
+        .on_mouse(mouse(MouseEventKind::Down(MouseButton::Left), x, at.y));
+    r.view
+        .on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), x, at.y));
+    r.view.render(AREA, &mut buf);
+    assert_eq!(r.view.offsets[0], max - 2);
+    // A key that moves the selection brings the column back to it.
+    r.view.on_key(key(KeyCode::Down));
+    r.view.render(AREA, &mut buf);
+    let row = r.view.sel_row().expect("a selected card");
+    assert!(r.view.offsets[0] <= row && row < r.view.offsets[0] + r.view.rows_per_col);
+}
+
+#[test]
+fn a_short_column_has_no_bar() {
+    let mut r = rig();
+    paint(&mut r.view);
+    assert!(r.view.col_bars.is_empty());
+}

@@ -186,7 +186,10 @@ impl MetaPicker {
         let muted = Style::default().fg(th().ui.muted).bg(th().ui.panel);
         let rows = (msg_y.saturating_sub(top) as usize).max(1);
         self.rows_visible = rows;
-        self.keep_visible();
+        if self.followed != (self.cursor, rows) {
+            self.followed = (self.cursor, rows);
+            self.keep_visible();
+        }
         self.offset = self.offset.min(self.shown.len().saturating_sub(rows));
         // Leave the rightmost column to the scrollbar.
         let row_w = inner.width.saturating_sub(1);

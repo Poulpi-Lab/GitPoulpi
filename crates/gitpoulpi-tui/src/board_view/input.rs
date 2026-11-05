@@ -519,6 +519,7 @@ impl BoardView {
 
     fn release(&mut self) -> BoardEffect {
         self.hgrab = None;
+        self.vgrab = None;
         self.edge_scroll = None;
         self.search_edit.dialog_mouse(
             Some(()),
@@ -543,11 +544,7 @@ impl BoardView {
             return;
         }
         if let Some(c) = Self::column_of_hit(hit) {
-            let len = self.cards.get(c).map_or(0, Vec::len);
-            let max = len.saturating_sub(self.rows_per_col);
-            if let Some(off) = self.offsets.get_mut(c) {
-                *off = (*off as isize + dir).clamp(0, max as isize) as usize;
-            }
+            self.scroll_column(c, dir);
         }
     }
 
@@ -558,6 +555,9 @@ impl BoardView {
 
     /// The horizontal bar's arrows, thumb and track (the shared rules).
     fn bar_mouse(&mut self, mouse: MouseEvent) -> bool {
+        if self.col_bar_mouse(mouse) {
+            return true;
+        }
         let Some(track) = self.hbar else {
             self.hgrab = None;
             return false;
@@ -583,6 +583,64 @@ impl BoardView {
                 true
             }
             _ => false,
+        }
+    }
+
+    /// A column's vertical bar: arrows step one card, the thumb drags, the
+    /// bare track jumps the thumb under the pointer. The selection stays.
+    fn col_bar_mouse(&mut self, mouse: MouseEvent) -> bool {
+        let at = (mouse.column, mouse.row).into();
+        match mouse.kind {
+            MouseEventKind::Down(MouseButton::Left) => {
+                let Some((c, track)) = self
+                    .col_bars
+                    .iter()
+                    .find(|(_, t)| t.rect.contains(at))
+                    .copied()
+                else {
+                    return false;
+                };
+                match track.press(mouse.row - track.rect.y) {
+                    crate::scrollbar::TrackPress::Arrow(step) => self.scroll_column(c, step),
+                    crate::scrollbar::TrackPress::Grab { grab, jump } => {
+                        self.vgrab = Some((c, grab));
+                        if jump {
+                            self.col_bar_drag_to(c, mouse.row);
+                        }
+                    }
+                }
+                true
+            }
+            MouseEventKind::Drag(MouseButton::Left) if self.vgrab.is_some() => {
+                if let Some((c, _)) = self.vgrab {
+                    self.col_bar_drag_to(c, mouse.row);
+                }
+                true
+            }
+            _ => false,
+        }
+    }
+
+    fn scroll_column(&mut self, c: usize, dir: isize) {
+        let len = self.cards.get(c).map_or(0, Vec::len);
+        let max = len.saturating_sub(self.rows_per_col);
+        if let Some(off) = self.offsets.get_mut(c) {
+            *off = (*off as isize + dir).clamp(0, max as isize) as usize;
+        }
+    }
+
+    fn col_bar_drag_to(&mut self, c: usize, row: u16) {
+        let (Some((_, grab)), Some((_, track))) = (
+            self.vgrab,
+            self.col_bars.iter().find(|(col, _)| *col == c).copied(),
+        ) else {
+            return;
+        };
+        let len = self.cards.get(c).map_or(0, Vec::len);
+        let pos = i32::from(row) - i32::from(track.rect.y);
+        let off = track.drag_offset(len, self.rows_per_col, grab, pos);
+        if let Some(slot) = self.offsets.get_mut(c) {
+            *slot = off;
         }
     }
 

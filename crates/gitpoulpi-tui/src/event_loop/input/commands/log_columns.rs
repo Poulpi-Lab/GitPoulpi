@@ -9,8 +9,7 @@ use crate::commit_column::Side;
 use crate::event_loop::*;
 use crate::keymap::Action as Bind;
 use crate::log_table::{
-    column_x_offsets, move_column, resize_widths, step_pick, visible_in_order, LogColumnCmd,
-    KEY_STEP,
+    move_column, resize_widths, step_pick, visible_in_order, LogColumnCmd, KEY_STEP,
 };
 use gitpoulpi_i18n::msg::log_table as msg;
 
@@ -18,14 +17,6 @@ use super::CommandCtx;
 
 fn visible(cx: &CommandCtx<'_>) -> Vec<LogColumn> {
     visible_in_order(&*cx.log_column_order, &*cx.log_column_hidden)
-}
-
-fn widths(cx: &CommandCtx<'_>) -> LogColumnWidths {
-    LogColumnWidths::for_area_width(
-        cx.log_area.width,
-        &*cx.log_column_hidden,
-        &*cx.log_column_overrides,
-    )
 }
 
 pub(in crate::event_loop) fn run(cx: &mut CommandCtx<'_>, cmd: LogColumnCmd) {
@@ -75,11 +66,10 @@ pub(in crate::event_loop) fn run(cx: &mut CommandCtx<'_>, cmd: LogColumnCmd) {
 }
 
 fn resize(cx: &mut CommandCtx<'_>, col: LogColumn, delta: i32) -> String {
-    let offsets = column_x_offsets(cx.log_area.x, &visible(cx), &widths(cx));
-    for (c, w) in resize_widths(&offsets, col, delta) {
+    for (c, w) in resize_widths(&cx.log_geo().offsets, col, delta) {
         cx.log_column_overrides.insert(c, w);
     }
-    msg::column_width(col.title(), u64::from(widths(cx).width_of(col)))
+    msg::column_width(col.title(), u64::from(cx.log_geo().widths.width_of(col)))
 }
 
 /// A key while a column is picked. `true` when taken; everything else (the

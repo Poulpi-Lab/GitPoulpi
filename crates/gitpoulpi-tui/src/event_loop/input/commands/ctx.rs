@@ -211,3 +211,16 @@ pub(in crate::event_loop) struct CommandCtx<'a> {
     pub(in crate::event_loop) worktrees_result:
         &'a mut gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Worktree>>,
 }
+
+impl CommandCtx<'_> {
+    /// The Log's column geometry right now: the one source for "where is
+    /// column X", shared with the paint (`LogColumnsGeo`).
+    pub(in crate::event_loop) fn log_geo(&self) -> crate::log_table::LogColumnsGeo {
+        crate::log_table::LogColumnsGeo::compute(
+            *self.log_area,
+            &*self.log_column_order,
+            &*self.log_column_hidden,
+            &*self.log_column_overrides,
+        )
+    }
+}

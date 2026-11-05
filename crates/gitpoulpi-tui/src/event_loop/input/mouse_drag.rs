@@ -301,18 +301,7 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
         );
     }
     if let Some(boundary_col) = *cx.dragging_log_boundary {
-        let widths = LogColumnWidths::for_area_width(
-            cx.log_area.width,
-            &*cx.log_column_hidden,
-            &*cx.log_column_overrides,
-        );
-        let visible_order: Vec<LogColumn> = cx
-            .log_column_order
-            .iter()
-            .copied()
-            .filter(|c| !cx.log_column_hidden.contains(c))
-            .collect();
-        let offsets = column_x_offsets(cx.log_area.x, &visible_order, &widths);
+        let offsets = cx.log_geo().offsets;
         // Both sides of the boundary, never just the left one (see
         // `boundary_drag_widths`). Each width is already clamped there to its
         // column's floor and to what the pair has between them, so no phantom
@@ -333,12 +322,7 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
             // `Drag`, not `Moved`, so this is the
             // only place the highlight can follow a
             // boundary that is being dragged.
-            let widths = LogColumnWidths::for_area_width(
-                cx.log_area.width,
-                &*cx.log_column_hidden,
-                &*cx.log_column_overrides,
-            );
-            let offsets = column_x_offsets(cx.log_area.x, &visible_order, &widths);
+            let offsets = cx.log_geo().offsets;
             *cx.hovered_resize_strip = log_boundary_x(&offsets, boundary_col)
                 .map(|bx| log_boundary_grab_rect(*cx.log_area, bx));
         }
@@ -349,18 +333,7 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
             drag.started = true;
         }
         if drag.started {
-            let widths = LogColumnWidths::for_area_width(
-                cx.log_area.width,
-                &*cx.log_column_hidden,
-                &*cx.log_column_overrides,
-            );
-            let visible_order: Vec<LogColumn> = cx
-                .log_column_order
-                .iter()
-                .copied()
-                .filter(|c| !cx.log_column_hidden.contains(c))
-                .collect();
-            let offsets = column_x_offsets(cx.log_area.x, &visible_order, &widths);
+            let offsets = cx.log_geo().offsets;
             let slot = drop_slot(&offsets, col);
             drag.slot = Some(slot);
             let header_row = cx.log_area.y + 1;

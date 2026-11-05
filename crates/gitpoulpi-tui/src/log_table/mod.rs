@@ -6,6 +6,7 @@
 use super::*;
 
 mod columns;
+mod geo;
 mod geometry;
 mod header_drag;
 mod keyboard;
@@ -14,6 +15,7 @@ mod row;
 mod wip;
 
 pub(crate) use columns::*;
+pub(crate) use geo::*;
 pub(crate) use geometry::*;
 pub(crate) use header_drag::*;
 pub(crate) use keyboard::*;

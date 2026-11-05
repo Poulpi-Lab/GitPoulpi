@@ -145,18 +145,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                     // The Ref column's own left edge, the same anchor the mouse path uses, so
                     // the popup lines up with the pill it expands (a hard-coded
                     // `log_area.x + 2` only coincides when Ref starts there).
-                    let widths = LogColumnWidths::for_area_width(
-                        cx.log_area.width,
-                        &*cx.log_column_hidden,
-                        &*cx.log_column_overrides,
-                    );
-                    let visible_order: Vec<LogColumn> = cx
-                        .log_column_order
-                        .iter()
-                        .copied()
-                        .filter(|c| !cx.log_column_hidden.contains(c))
-                        .collect();
-                    let anchor_col = column_x_offsets(cx.log_area.x, &visible_order, &widths)
+                    let anchor_col = cx
+                        .log_geo()
+                        .offsets
                         .iter()
                         .find(|(c, _, _)| *c == LogColumn::Ref)
                         .map(|(_, x, _)| *x)

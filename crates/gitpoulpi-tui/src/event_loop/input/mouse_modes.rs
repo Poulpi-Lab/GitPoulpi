@@ -352,6 +352,12 @@ pub(super) fn editing_commit_message(
 
 /// The AI commit-composer review: hover, click (the wheel scrolls the list).
 pub(super) fn composer_review(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<Flow> {
+    // The list's scrollbar takes its own presses and the drag of its thumb.
+    if let InputMode::ComposeCommits(form) = &mut *cx.input_mode {
+        if form.on_bar_mouse(mouse) {
+            return Ok(Flow::Handled);
+        }
+    }
     match mouse.kind {
         MouseEventKind::Moved => {
             *cx.hovered_target = find_hit_target(&*cx.hit_targets, mouse.column, mouse.row);
@@ -422,6 +428,9 @@ pub(super) fn split_commit(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Re
     if form.assign_combo_open() {
         form.on_combo_mouse(mouse);
         *cx.hovered_target = None;
+        return Ok(Flow::Handled);
+    }
+    if form.changes_bar_mouse(mouse) {
         return Ok(Flow::Handled);
     }
     let part = split_hit_at(&*cx.hit_targets, mouse.column, mouse.row);
@@ -597,6 +606,18 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
 
 /// The interactive rebase / cherry-pick popup, same rule as the others.
 pub(super) fn interactive_rebase(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<Flow> {
+    // The list's scrollbar takes its own presses and the drag of its thumb;
+    // the wheel scrolls the list under the pointer.
+    if let InputMode::InteractiveRebase(form) = &mut *cx.input_mode {
+        if form.on_bar_mouse(mouse) {
+            return Ok(Flow::Handled);
+        }
+        match mouse.kind {
+            MouseEventKind::ScrollUp => form.on_wheel(-3),
+            MouseEventKind::ScrollDown => form.on_wheel(3),
+            _ => {}
+        }
+    }
     match (mouse.kind, &mut *cx.input_mode) {
         (MouseEventKind::Moved, _) => {
             *cx.hovered_target = find_hit_target(&*cx.hit_targets, mouse.column, mouse.row);

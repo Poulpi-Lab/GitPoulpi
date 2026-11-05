@@ -766,6 +766,11 @@ impl SplitForm {
         }
     }
 
+    /// The changes list's scrollbar took this mouse event.
+    pub(crate) fn changes_bar_mouse(&self, mouse: crossterm::event::MouseEvent) -> bool {
+        self.view.bar_mouse(mouse)
+    }
+
     /// Scrolls the changes list by `delta` rows (the wheel).
     pub(crate) fn scroll_changes(&mut self, delta: isize) {
         self.view.scroll(delta);

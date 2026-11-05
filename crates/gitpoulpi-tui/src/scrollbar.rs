@@ -271,7 +271,7 @@ impl Track {
 /// jumping the thumb under the pointer, end arrows stepping one line --
 /// the same gestures `ui_kit::list_bar_press` gives the lists, kept here
 /// so each dialog is one call, not its own copy.
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
 pub(crate) struct BarDrag {
     grab: Option<i32>,

@@ -189,6 +189,17 @@ impl ComposeForm {
             }
         };
         self.window.set((offset, rows_h, rows.len()));
+        // The bar rides the frame's right border, beside the rows.
+        let track = crate::scrollbar::Track::column(
+            Rect::new(area.right() - 1, rows_top, 1, rows_h as u16),
+            rows.len(),
+            rows_h,
+            offset,
+        );
+        self.bar.set(track);
+        if let Some(track) = track {
+            crate::scrollbar::render(frame, track, true, false);
+        }
         for (slot, row) in rows.iter().skip(offset).take(rows_h).enumerate() {
             let y = rows_top + slot as u16;
             let rect = Rect::new(inner.x, y, inner.width, 1);

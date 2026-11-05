@@ -87,7 +87,9 @@ impl SentPane {
     /// none while collapsed.
     pub(super) fn body_rows(&self, lines: usize, room: u16) -> u16 {
         if self.open {
-            (lines.min(u16::MAX as usize) as u16).max(MIN_PANE).min(room)
+            (lines.min(u16::MAX as usize) as u16)
+                .max(MIN_PANE)
+                .min(room)
         } else {
             0
         }
@@ -140,7 +142,11 @@ impl SentPane {
             crate::fold_mark::COLLAPSED
         };
         let label_style = Style::default()
-            .fg(if focused { th().ui.accent } else { th().ui.text })
+            .fg(if focused {
+                th().ui.accent
+            } else {
+                th().ui.text
+            })
             .bg(head_bg)
             .add_modifier(Modifier::BOLD);
         let lr = dialog_kit::put(
@@ -207,7 +213,12 @@ impl SentPane {
         }
         // Its own scrollbar: the pane's right column, rows of the body.
         let bar = Track::vertical(
-            Rect::new(pane.x, pane.y.saturating_sub(1), pane.width, pane.height + 2),
+            Rect::new(
+                pane.x,
+                pane.y.saturating_sub(1),
+                pane.width,
+                pane.height + 2,
+            ),
             lines.len(),
             top,
         );

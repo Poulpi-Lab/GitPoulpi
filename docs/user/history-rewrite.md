@@ -634,9 +634,12 @@ workbench on a new Script rule with the dialog open. Nothing is sent before you 
   commits "Test on selection" would use (your Log selection, else the newest 20) are added so
   the model sees what your data looks like. Never file contents or the commit bodies.
   With the box off, no commit data leaves the machine.
-- **What is sent** lists the instructions (the fixed script contract, then your AI
-  instructions) and your request, and which profile receives them. `Tab` moves to it, the
-  arrows scroll it.
+- **What is sent** is a read-only pane on a slightly darker background, collapsed when the dialog
+  opens (the dialog is then short). Click its header, press `Alt+W`, or `Tab` to it and press
+  `Enter` to show it: it lists the instructions (the fixed script contract, then your AI
+  instructions) and your request, with a scrollbar of its own (drag it, use the wheel over the
+  pane, or the arrows, `PageUp`, `PageDown`, `Home` and `End` while it has the focus). The profile
+  that receives them is on the line above. The dialog grows to fit the pane, within the screen.
 - **Send** (`Tab` to it, `Enter`). While the model works the dialog waits, and `Esc` cancels
   the request. If it fails, the dialog stays with the reason so you can try again.
 

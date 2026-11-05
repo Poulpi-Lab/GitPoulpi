@@ -1663,7 +1663,7 @@ impl RewriteView {
             | RewriteHit::AiCancel
             | RewriteHit::AiClose
             | RewriteHit::AiPanel
-            | RewriteHit::AiShield => self.on_ai_press(hit, _col, _row),
+            | RewriteHit::AiShield => self.on_ai_press(hit, _col, row),
             RewriteHit::RulesAi => self.open_rules_ai(),
             RewriteHit::RaText
             | RewriteHit::RaContext

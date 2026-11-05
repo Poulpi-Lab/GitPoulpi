@@ -306,6 +306,9 @@ pub struct RepoManager {
     pub hover: Option<ManagerHit>,
     /// The number of list rows the last draw had room for, for paging.
     list_height: usize,
+    /// The list's scrollbar as the last draw painted it, and the thumb held.
+    pub(crate) bar: Option<crate::scrollbar::Track>,
+    pub(crate) bar_drag: crate::scrollbar::BarDrag,
     /// A status-bar line for a pending key prefix (`Ctrl+N`), set by the
     /// event loop each frame: the Home tab covers the window's own
     /// status bar, so the prefix's hint is shown in this view's footer.
@@ -335,6 +338,8 @@ impl RepoManager {
             message: None,
             hover: None,
             list_height: 10,
+            bar: None,
+            bar_drag: Default::default(),
             mode_hint: None,
             search_edit: Default::default(),
             radar: Default::default(),
@@ -665,6 +670,27 @@ impl RepoManager {
             }
             Some(ManagerRow::Repo { repo, .. }) => self.open_repo(repo),
             _ => ManagerAction::Handled,
+        }
+    }
+
+    /// The list's row count and first row (the page showing), for its bar.
+    pub(crate) fn list_bar_state(&self) -> (usize, usize) {
+        if self.page == HomePage::Workspaces {
+            (self.ws.rows().len(), self.ws.scroll)
+        } else {
+            (self.rows().len(), self.scroll)
+        }
+    }
+
+    /// The bar put the list's first row at `top`: it stays there until the
+    /// keyboard moves the selection.
+    pub(crate) fn set_list_scroll(&mut self, top: usize) {
+        if self.page == HomePage::Workspaces {
+            self.ws.scroll = top;
+            self.ws.follow = false;
+        } else {
+            self.scroll = top;
+            self.follow = false;
         }
     }
 

@@ -42,6 +42,7 @@ use gitpoulpi_core::domain::{Oid, OperationKind};
 use gitpoulpi_i18n::msg::rewrite_view as t;
 use gitpoulpi_ipc::rewrite::{ScriptCheckArgs, ScriptTestArgs, TrustArgs};
 
+use super::bars::BarId;
 use super::render::{bad, bold, dim, plain, row_bg, wrap, RewriteHit};
 use super::rules_form::script_header;
 use super::{FieldId, FieldInput, FieldValue, Notice, RewriteView};
@@ -1438,6 +1439,18 @@ impl RewriteView {
             let label = format!("{number:>w$}", w = gutter as usize - 1);
             dialog_kit::put(buf, box_.x, box_.y + i as u16, &label, gutter, style);
         }
+        // The bar rides the divider or the panel's border, right of the box.
+        self.paint_bar_on(
+            buf,
+            hits,
+            hovered == Some(RewriteHit::Bar(BarId::ScriptText)),
+            BarId::ScriptText,
+            (area.right(), box_.y, box_.height),
+            lines,
+            box_.height as usize,
+            top,
+            None,
+        );
         hits.push((body, RewriteHit::ScriptEditor));
         y += editor_h;
 
@@ -1490,9 +1503,25 @@ impl RewriteView {
             ScriptFocus::Param(i) => params.iter().position(|(_, p)| *p == i),
             _ => None,
         };
-        let first = focused_param
-            .map(|f| (f + 1).saturating_sub(param_rows as usize))
-            .unwrap_or(0);
+        let mut first = self.paint.script_params_top.get();
+        if !self.bar_free(BarId::ScriptParams, focused_param) {
+            first = focused_param
+                .map(|f| (f + 1).saturating_sub(param_rows as usize))
+                .unwrap_or(0);
+        }
+        first = first.min(params.len().saturating_sub(param_rows as usize));
+        self.paint.script_params_top.set(first);
+        self.paint_bar_on(
+            buf,
+            hits,
+            hovered == Some(RewriteHit::Bar(BarId::ScriptParams)),
+            BarId::ScriptParams,
+            (area.right(), y, param_rows),
+            params.len(),
+            param_rows as usize,
+            first,
+            focused_param,
+        );
         for (slot, (at, i)) in params
             .iter()
             .skip(first)
@@ -1801,6 +1830,17 @@ impl RewriteView {
         let room = area.bottom().saturating_sub(y) as usize;
         self.paint.script_rows.set(room);
         let top = ed.top.min(results.len().saturating_sub(room));
+        self.paint_bar_on(
+            buf,
+            hits,
+            hovered == Some(RewriteHit::Bar(BarId::ScriptRows)),
+            BarId::ScriptRows,
+            (area.right(), y, room as u16),
+            results.len(),
+            room,
+            top,
+            None,
+        );
         for (slot, line) in results.iter().skip(top).take(room).enumerate() {
             let index = top + slot;
             let ry = y + slot as u16;

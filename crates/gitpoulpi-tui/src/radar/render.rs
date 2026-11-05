@@ -473,6 +473,18 @@ impl RadarUi {
         self.scroll = self
             .scroll
             .min(self.rows.len().saturating_sub(height.max(1)));
+        // A list longer than its room keeps the last column for the bar.
+        self.bar = crate::scrollbar::Track::column(
+            Rect::new(body.right().saturating_sub(1), top, 1, height as u16),
+            self.rows.len(),
+            height,
+            self.scroll,
+        );
+        let body = if self.bar.is_some() {
+            Rect::new(body.x, body.y, body.width - 1, body.height)
+        } else {
+            body
+        };
         // Column widths measured over every item, so they do not jump while
         // scrolling.
         let content = self
@@ -622,6 +634,9 @@ impl RadarUi {
                     );
                 }
             }
+        }
+        if let Some(track) = self.bar {
+            crate::scrollbar::render_buf(buf, track, true, false);
         }
         // The separators last, over the rows: a thin line (or the header
         // block) while the pointer is on one or it is being sized, else the

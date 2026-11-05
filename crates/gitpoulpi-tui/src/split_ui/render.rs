@@ -59,6 +59,9 @@ pub(super) struct View {
     followed: Cell<usize>,
     flash: Cell<bool>,
     clicks: Cell<ClickPair>,
+    /// The list's scrollbar as last painted, and the thumb held.
+    pub(super) bar: Cell<Option<crate::scrollbar::Track>>,
+    bar_drag: Cell<crate::scrollbar::BarDrag>,
 }
 
 impl PartialEq for View {
@@ -72,6 +75,21 @@ impl View {
         let max = self.len.get().saturating_sub(self.height.get());
         self.top
             .set((self.top.get() as isize + delta).clamp(0, max as isize) as usize);
+    }
+
+    /// The list's scrollbar: a press on it, a drag of the thumb. `true` when
+    /// the bar took the event; the window then stays where it was put.
+    pub(super) fn bar_mouse(&self, mouse: crossterm::event::MouseEvent) -> bool {
+        let mut drag = self.bar_drag.get();
+        let top = drag.on_mouse(self.bar.get(), mouse, self.len.get(), self.top.get());
+        self.bar_drag.set(drag);
+        match top {
+            Some(top) => {
+                self.top.set(top);
+                true
+            }
+            None => false,
+        }
     }
 
     pub(super) fn flash_cross(&self) {
@@ -505,6 +523,17 @@ impl SplitForm {
         self.view.top.set(top);
         self.view.len.set(rows.len());
         self.view.height.set(h);
+        // The bar rides the editor's right border, beside the rows.
+        let track = crate::scrollbar::Track::column(
+            Rect::new(self.view.frame.get().right() - 1, right.y + 1, 1, h as u16),
+            rows.len(),
+            h,
+            top,
+        );
+        self.view.bar.set(track);
+        if let Some(track) = track {
+            crate::scrollbar::render(frame, track, true, false);
+        }
 
         let selected_rows = self.selection();
         let buf = frame.buffer_mut();

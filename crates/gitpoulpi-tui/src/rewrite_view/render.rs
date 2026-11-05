@@ -9,7 +9,7 @@
 //! The pointer reaches the same methods the keys do (`mod.rs`, `popup.rs`);
 //! this file only maps rects onto them.
 
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 
 use crate::wide_edge::Clear;
 use ratatui::buffer::Buffer;
@@ -20,6 +20,7 @@ use ratatui::Frame;
 
 use gitpoulpi_i18n::msg::rewrite_view as t;
 
+use super::bars::BarId;
 use super::{
     EditTarget, Field, FieldValue, Focus, Popup, PopupRow, PreviewTab, RewriteKeyOutcome,
     RewriteView, RuleRow, Run,
@@ -34,6 +35,8 @@ use crate::{display_width, th};
 pub(crate) enum RewriteHit {
     /// The close cross on the frame.
     Close,
+    /// A list's scrollbar (`bars.rs`).
+    Bar(super::bars::BarId),
     /// Empty room of a pane: focuses it.
     Pane(Focus),
     /// The scope dropdown.
@@ -216,6 +219,7 @@ impl RewriteHit {
         !matches!(
             self,
             RewriteHit::Pane(_)
+                | RewriteHit::Bar(_)
                 | RewriteHit::Row(_)
                 | RewriteHit::QuestionShield
                 | RewriteHit::PopupShield
@@ -293,7 +297,22 @@ pub(super) struct Paint {
     pub secrets_top: Cell<usize>,
     pub size_top: Cell<usize>,
     pub push_top: Cell<usize>,
+    /// First ref of the Refs tab's two lists.
+    pub refs_moving_top: Cell<usize>,
+    pub refs_top: Cell<usize>,
+    pub drill_top: Cell<usize>,
+    pub popup_top: Cell<usize>,
+    pub ident_pick_top: Cell<usize>,
+    pub script_params_top: Cell<usize>,
+    /// The scroll of a text tab, with the tab it belongs to.
+    pub text_top: Cell<Option<(PreviewTab, usize)>>,
     pub flash: Cell<bool>,
+    /// The scrollbars painted this frame, the thumb held (bar and where on
+    /// it), and the cursor each list had when the bar or the wheel last moved
+    /// it (`bars.rs`).
+    pub bars: RefCell<Vec<super::bars::BarReg>>,
+    pub bar_drag: Cell<Option<(super::bars::BarId, i32)>>,
+    pub anchors: RefCell<Vec<(super::bars::BarId, usize)>>,
 }
 
 /// Where a dropdown hangs from.
@@ -488,6 +507,13 @@ impl RewriteView {
     ) -> Vec<(Rect, RewriteHit)> {
         let area = area.intersection(frame.buffer_mut().area);
         self.paint.frame.set(area);
+        self.paint.bars.borrow_mut().clear();
+        if self.popup.is_none() {
+            self.paint.popup_top.set(0);
+        }
+        if self.identities.pick.is_none() {
+            self.paint.ident_pick_top.set(0);
+        }
         let mut ui = Ui {
             buf: frame.buffer_mut(),
             hovered,
@@ -677,15 +703,24 @@ impl RewriteView {
         }
         let rows = self.rule_rows();
         let list_h = (inner.height - 2) as usize;
-        let mut top = self.paint.rules_top.get();
         let cursor = self.rules.cursor;
-        if cursor < top {
-            top = cursor;
-        } else if cursor >= top + list_h {
-            top = cursor + 1 - list_h;
-        }
-        top = top.min(rows.len().saturating_sub(list_h));
+        let top = self.settle(
+            BarId::Rules,
+            Some(cursor),
+            self.paint.rules_top.get(),
+            list_h,
+            rows.len(),
+        );
         self.paint.rules_top.set(top);
+        self.paint_bar(
+            ui,
+            BarId::Rules,
+            (inner.right(), inner.y, list_h as u16),
+            rows.len(),
+            list_h,
+            top,
+            Some(cursor),
+        );
 
         if rows.is_empty() {
             let lines = wrap(t::EMPTY_RULES.get(), inner.width as usize - 1);
@@ -934,16 +969,20 @@ impl RewriteView {
             .detail_top
             .get()
             .min(fields.len().saturating_sub(1));
-        if self.detail.cursor < top {
-            top = self.detail.cursor;
-        }
-        while top < self.detail.cursor
-            && heights[top..=self.detail.cursor].iter().sum::<usize>() > rows_room
-        {
-            top += 1;
+        if !self.bar_free(BarId::Detail, Some(self.detail.cursor)) {
+            if self.detail.cursor < top {
+                top = self.detail.cursor;
+            }
+            while top < self.detail.cursor
+                && heights[top..=self.detail.cursor].iter().sum::<usize>() > rows_room
+            {
+                top += 1;
+            }
         }
         self.paint.detail_top.set(top);
         let mut all_shown = true;
+        let first_y = y;
+        let mut shown = 0usize;
         for (i, field) in fields.iter().enumerate().skip(top) {
             let h = heights[i] as u16;
             if y + h > inner.bottom() {
@@ -952,7 +991,23 @@ impl RewriteView {
             }
             self.paint_field(ui, i, field, y, h, inner, label_w, value_x, value_w);
             y += h;
+            shown += 1;
         }
+        // The fields are not all one line (an error, an open editor), so the
+        // thumb counts fields, not rows.
+        self.paint_bar(
+            ui,
+            BarId::Detail,
+            (
+                inner.right(),
+                first_y,
+                inner.bottom().saturating_sub(first_y),
+            ),
+            fields.len(),
+            shown.max(1),
+            top,
+            Some(self.detail.cursor),
+        );
         // A script's check: OK, or the first problem with its line.
         if all_shown && self.shows_check() && y < inner.bottom() {
             if let Some((line, is_bad)) =
@@ -1358,9 +1413,14 @@ impl RewriteView {
             .iter()
             .position(|(i, _, _)| *i == Some(cursor))
             .unwrap_or(0);
-        let first = (at + 1)
-            .saturating_sub(room)
-            .min(lines.len().saturating_sub(room));
+        let first = self.settle(
+            BarId::Popup,
+            Some(at),
+            self.paint.popup_top.get(),
+            room,
+            lines.len(),
+        );
+        self.paint.popup_top.set(first);
         for (slot, (index, row, heading)) in lines.iter().skip(first).take(room).enumerate() {
             let ry = popup.y + 1 + slot as u16;
             let band = Rect::new(popup.x + 1, ry, popup.width - 2, 1);
@@ -1416,6 +1476,17 @@ impl RewriteView {
             }
             hits.push((band, RewriteHit::PopupRow(*i)));
         }
+        self.paint_bar_on(
+            buf,
+            &mut hits,
+            hovered == Some(RewriteHit::Bar(BarId::Popup)),
+            BarId::Popup,
+            (popup.right() - 1, popup.y + 1, room as u16),
+            lines.len(),
+            room,
+            first,
+            Some(at),
+        );
         hits.push((bounds, RewriteHit::PopupShield));
         hits
     }
@@ -1483,7 +1554,7 @@ impl RewriteView {
 
     /// Puts `hit` into effect: the mouse's way into the same methods the
     /// keys use.
-    pub(crate) fn on_press(&mut self, hit: RewriteHit, _col: u16, _row: u16) -> RewriteKeyOutcome {
+    pub(crate) fn on_press(&mut self, hit: RewriteHit, _col: u16, row: u16) -> RewriteKeyOutcome {
         // A press anywhere but on the field being typed ends the typing.
         if self.editing.is_some() {
             let same = matches!(
@@ -1537,6 +1608,7 @@ impl RewriteView {
                 self.detail.cursor = i.min(self.detail.fields.len().saturating_sub(1));
                 self.open_field(i);
             }
+            RewriteHit::Bar(id) => self.bar_press(id, row),
             RewriteHit::Tab(tab) => {
                 self.focus = Focus::Preview;
                 self.tab = tab;
@@ -1568,7 +1640,7 @@ impl RewriteView {
             | RewriteHit::ScriptRow(_)
             | RewriteHit::ScriptAi
             | RewriteHit::ScriptPanel
-            | RewriteHit::ScriptShield => self.on_script_press(hit, _col, _row),
+            | RewriteHit::ScriptShield => self.on_script_press(hit, _col, row),
             RewriteHit::PurgeOpen => self.open_purge(false),
             RewriteHit::PurgeClose
             | RewriteHit::PurgeDone
@@ -1604,7 +1676,7 @@ impl RewriteView {
             | RewriteHit::RaCancel
             | RewriteHit::RaClose
             | RewriteHit::RaPanel
-            | RewriteHit::RaShield => self.on_rules_ai_press(hit, _col, _row),
+            | RewriteHit::RaShield => self.on_rules_ai_press(hit, _col, row),
             RewriteHit::DrillClose | RewriteHit::DrillShield => self.close_drill(),
             RewriteHit::DrillPath(i) => {
                 self.drill_focus_diff(false);
@@ -1737,7 +1809,11 @@ impl RewriteView {
     }
 
     /// The wheel over `focus`'s pane: moves its cursor.
-    pub(crate) fn on_wheel(&mut self, focus: Focus, delta: isize) {
+    pub(crate) fn on_wheel(&mut self, focus: Focus, row: u16, delta: isize) {
+        // A list that overflows scrolls under the wheel, its selection stays.
+        if self.wheel_bar(focus, row, delta) {
+            return;
+        }
         match focus {
             Focus::Rules => self.move_rule_cursor(delta),
             Focus::Detail => self.detail.move_cursor(delta),

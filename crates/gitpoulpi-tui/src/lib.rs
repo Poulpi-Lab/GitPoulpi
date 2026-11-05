@@ -190,6 +190,8 @@ mod repo_switcher;
 mod safety_panel;
 mod scroll_marks;
 mod scrollbar;
+#[cfg(test)]
+mod scrollbar_guard_tests;
 mod scrollbar_repeat;
 mod sections_scope;
 mod session_store;

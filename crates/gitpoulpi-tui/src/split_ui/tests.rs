@@ -484,6 +484,47 @@ fn paint(
     (text, hits)
 }
 
+/// The changes list outgrows its room: the shared bar rides the editor's
+/// right border, a drag on the thumb scrolls the window and the selection
+/// stays; a short list has none.
+#[test]
+fn a_long_changes_list_has_a_scrollbar_the_thumb_drags() {
+    use crossterm::event::{MouseButton, MouseEvent, MouseEventKind};
+    let mut source = source();
+    source.files = (0..40)
+        .map(|i| SplitFile {
+            path: format!("src/f{i:02}.rs").into(),
+            status: FileStatus::Modified,
+            whole_only: None,
+            hunks: vec![hunk(0)],
+        })
+        .collect();
+    let f = SplitForm::new(source);
+    let (text, _) = paint(&f, 140, 30, None);
+    let track = f.view.bar.get().expect("a bar");
+    let ev = |kind, row| MouseEvent {
+        kind,
+        column: track.rect.x,
+        row,
+        modifiers: KeyModifiers::NONE,
+    };
+    assert!(f.changes_bar_mouse(ev(
+        MouseEventKind::Down(MouseButton::Left),
+        track.rect.y + 1
+    )));
+    assert!(f.changes_bar_mouse(ev(
+        MouseEventKind::Drag(MouseButton::Left),
+        track.rect.bottom() + 9
+    )));
+    f.changes_bar_mouse(ev(MouseEventKind::Up(MouseButton::Left), 0));
+    let (after, _) = paint(&f, 140, 30, None);
+    assert_ne!(text, after, "the list scrolled");
+    assert!(after.contains("f39"), "{after}");
+    let short = form();
+    paint(&short, 140, 30, None);
+    assert!(short.view.bar.get().is_none());
+}
+
 fn hit_rect(hits: &[(Rect, SplitHit)], hit: SplitHit) -> Rect {
     hits.iter()
         .find(|(_, h)| *h == hit)

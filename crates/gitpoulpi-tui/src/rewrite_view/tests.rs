@@ -761,6 +761,7 @@ fn rows_are_asked_page_by_page_and_only_for_the_current_run() {
     assert!(v.rows.pending.is_none());
 }
 
+mod bars;
 mod content;
 mod host;
 mod identities;

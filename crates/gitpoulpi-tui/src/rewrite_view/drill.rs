@@ -18,6 +18,7 @@ use gitpoulpi_core::domain::OperationKind;
 use gitpoulpi_i18n::msg::rewrite_view as t;
 use gitpoulpi_ipc::rewrite::BlobDiffArgs;
 
+use super::bars::BarId;
 use super::render::{bad, bold, dim, plain, row_bg, wrap, RewriteHit};
 use super::rules_form::format_size;
 use super::{Notice, RewriteView};
@@ -318,10 +319,26 @@ impl RewriteView {
         // Files.
         let paths = &drill.commit.paths;
         let visible = list.height as usize;
-        let top = drill
-            .cursor
-            .saturating_sub(visible.saturating_sub(1))
-            .min(paths.len());
+        let top = self.settle(
+            BarId::DrillFiles,
+            Some(drill.cursor),
+            self.paint.drill_top.get(),
+            visible,
+            paths.len(),
+        );
+        self.paint.drill_top.set(top);
+        // The bar sits on the divider, beside the rows.
+        self.paint_bar_on(
+            buf,
+            &mut hits,
+            hovered == Some(RewriteHit::Bar(BarId::DrillFiles)),
+            BarId::DrillFiles,
+            (list.right(), list.y, list.height),
+            paths.len(),
+            visible,
+            top,
+            Some(drill.cursor),
+        );
         let mut note_rows = 0;
         for (slot, change) in paths.iter().enumerate().skip(top).take(visible) {
             let y = list.y + (slot - top) as u16;
@@ -391,6 +408,18 @@ impl RewriteView {
                 let lines = diff_lines(change);
                 let max = lines.len().saturating_sub(diff.height as usize);
                 let scroll = drill.scroll.min(max);
+                // On the panel's own border column, right of the diff.
+                self.paint_bar_on(
+                    buf,
+                    &mut hits,
+                    hovered == Some(RewriteHit::Bar(BarId::DrillDiff)),
+                    BarId::DrillDiff,
+                    (diff.right(), diff.y, diff.height),
+                    lines.len(),
+                    diff.height as usize,
+                    scroll,
+                    None,
+                );
                 for (i, line) in lines
                     .iter()
                     .skip(scroll)

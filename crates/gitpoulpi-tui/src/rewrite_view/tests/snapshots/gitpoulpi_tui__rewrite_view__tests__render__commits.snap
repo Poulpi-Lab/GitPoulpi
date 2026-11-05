@@ -19,19 +19,19 @@ expression: s
 │ ╭ Preview ───────────────────────────────────────────────────────────────────────────────────────────────╮ │
 │ │  Summary   Commits   Branches and tags   Impact   Secrets   Identities   Size                          │ │
 │ │  Changed    ▾   412 commits                                                                            │ │
-│ │ ● 0101010 → 0202020  author email: old@example.com → new@example.org                                   │ │
-│ │   0303030 → 0404040  author email: old@example.com → new@example.org                                   │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
-│ │   Loading...                                                                                           │ │
+│ │ ● 0101010 → 0202020  author email: old@example.com → new@example.org                                   ↑ │
+│ │   0303030 → 0404040  author email: old@example.com → new@example.org                                     │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                             │
+│ │   Loading...                                                                                           ↓ │
 │ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │ Some commits are already on a remote: a force push (with lease) will be needed.                            │
 │  Preview   Apply                                                                          Save ▾   Load ▾  │

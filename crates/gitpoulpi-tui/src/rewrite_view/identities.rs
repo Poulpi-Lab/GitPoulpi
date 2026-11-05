@@ -25,6 +25,7 @@ use gitpoulpi_core::domain::OperationKind;
 use gitpoulpi_i18n::msg::{rewrite_identities as m, rewrite_view as t};
 use gitpoulpi_ipc::mailmap::{AddArgs, IdentitiesArgs};
 
+use super::bars::BarId;
 use super::render::{bad, bold, dim, plain, row_bg, warn, wrap, RewriteHit, Ui};
 use super::{Focus, Notice, PreviewTab, RewriteKeyOutcome, RewriteView};
 use crate::daemon_link::Reply;
@@ -69,7 +70,7 @@ pub(crate) struct IdentitiesState {
     pub done: Option<MailmapAdded>,
     pub error: Option<String>,
     /// First row shown.
-    top: Cell<usize>,
+    pub(super) top: Cell<usize>,
 }
 
 fn show(i: &Ident) -> String {
@@ -619,14 +620,23 @@ impl RewriteView {
         let detail_h: u16 = u16::from(!counts_inline && bottom - y >= 4);
         let room = (bottom - y - detail_h) as usize;
         let cursor = self.identities.cursor.min(rows.len() - 1);
-        let mut top = self.identities.top.get();
-        if cursor < top {
-            top = cursor;
-        } else if room > 0 && cursor >= top + room {
-            top = cursor + 1 - room;
-        }
-        top = top.min(rows.len().saturating_sub(room));
+        let top = self.settle(
+            BarId::Identities,
+            Some(cursor),
+            self.identities.top.get(),
+            room,
+            rows.len(),
+        );
         self.identities.top.set(top);
+        self.paint_bar(
+            ui,
+            BarId::Identities,
+            (body.right(), y, room as u16),
+            rows.len(),
+            room,
+            top,
+            Some(cursor),
+        );
         let focused = self.focus == Focus::Preview;
         for (slot, row) in rows.iter().enumerate().skip(top).take(room) {
             let ry = y + (slot - top) as u16;
@@ -714,7 +724,25 @@ impl RewriteView {
         }
         y += 1;
         // Scrolled to keep the cursor in view when there are many.
-        let first = pick.cursor.saturating_sub(shown.saturating_sub(1));
+        let first = self.settle(
+            BarId::IdentPick,
+            Some(pick.cursor),
+            self.paint.ident_pick_top.get(),
+            shown,
+            pick.candidates.len(),
+        );
+        self.paint.ident_pick_top.set(first);
+        self.paint_bar_on(
+            buf,
+            &mut hits,
+            hovered == Some(RewriteHit::Bar(BarId::IdentPick)),
+            BarId::IdentPick,
+            (rect.right() - 1, y, shown as u16),
+            pick.candidates.len(),
+            shown,
+            first,
+            Some(pick.cursor),
+        );
         for (i, c) in pick.candidates.iter().enumerate().skip(first).take(shown) {
             if y >= rect.bottom() - 1 {
                 break;

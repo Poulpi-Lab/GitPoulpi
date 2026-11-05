@@ -140,6 +140,36 @@ fn a_long_list_scrolls_and_says_more_follow() {
 }
 
 #[test]
+fn a_long_list_has_a_bar_the_thumb_drags_and_a_short_one_has_none() {
+    let _turn = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    open("origin/main", &files(40));
+    let _ = screen();
+    let track = POPUP.lock().unwrap().as_ref().unwrap().bar.expect("a bar");
+    let ev = |kind, row| MouseEvent {
+        kind,
+        column: track.rect.x,
+        row,
+        modifiers: KeyModifiers::NONE,
+    };
+    on_mouse(ev(
+        MouseEventKind::Down(MouseButton::Left),
+        track.rect.y + 1,
+    ));
+    on_mouse(ev(
+        MouseEventKind::Drag(MouseButton::Left),
+        track.rect.bottom() + 9,
+    ));
+    on_mouse(ev(MouseEventKind::Up(MouseButton::Left), 0));
+    let shown = screen();
+    assert!(shown.contains("file40"), "dragged to the end\n{shown}");
+    assert!(is_open(), "a press on the bar does not close the popup");
+    open("origin/main", &files(3));
+    let _ = screen();
+    assert!(POPUP.lock().unwrap().as_ref().unwrap().bar.is_none());
+    close();
+}
+
+#[test]
 fn hover_lights_a_button_only_while_the_pointer_is_over_it() {
     let _turn = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
     open("origin/main", &files(1));

@@ -146,7 +146,28 @@ impl RebaseForm {
         let rows_top = inner.y + 3;
         let rows_h = (inner.height - 3 - 3) as usize;
         let display = self.display_rows();
-        let offset = (self.cursor + 1).saturating_sub(rows_h);
+        let follow = (self.cursor + 1).saturating_sub(rows_h);
+        let offset = match self.scroll.get() {
+            Some((offset, anchor)) if anchor == self.cursor => {
+                offset.min(display.len().saturating_sub(rows_h))
+            }
+            _ => {
+                self.scroll.set(None);
+                follow
+            }
+        };
+        self.window.set((offset, rows_h, display.len()));
+        // The bar rides the frame's right border, beside the rows.
+        let track = crate::scrollbar::Track::column(
+            Rect::new(area.right() - 1, rows_top, 1, rows_h as u16),
+            display.len(),
+            rows_h,
+            offset,
+        );
+        self.bar.set(track);
+        if let Some(track) = track {
+            crate::scrollbar::render(frame, track, true, false);
+        }
         let mut open_list: Option<(u16, usize)> = None;
         for (slot, (i, row)) in display
             .iter()

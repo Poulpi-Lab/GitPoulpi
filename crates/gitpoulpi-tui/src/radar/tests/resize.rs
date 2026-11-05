@@ -407,3 +407,46 @@ fn the_age_column_is_sizable() {
     ui.on_key(key(KeyCode::Char(']')));
     assert!(ui.state.columns.age.is_some());
 }
+
+/// The list outgrows its window: the shared bar rides its last column, no
+/// row reaches it, and a drag on the thumb scrolls the list without the
+/// selection pulling it back.
+#[test]
+fn a_long_list_has_a_scrollbar_the_thumb_drags() {
+    set(ColumnResize::Line);
+    let dir = tempfile::tempdir().unwrap();
+    let mut ui = long_list(dir.path());
+    let buf = buffer(&mut ui, 120, 20);
+    let track = ui.bar.expect("the list overflows, so it has a bar");
+    assert_eq!(track.rect.x, 119, "the last column");
+    assert_eq!(buf[(track.rect.x, track.rect.y)].symbol(), "\u{2191}");
+    assert_eq!(
+        buf[(track.rect.x, track.rect.bottom() - 1)].symbol(),
+        "\u{2193}"
+    );
+    assert!(
+        ui.hits.iter().all(|(r, _)| r.right() <= track.rect.x),
+        "no hit rect runs under the bar"
+    );
+    let before = ui.scroll;
+    ui.on_mouse(
+        mouse(
+            MouseEventKind::Down(MouseButton::Left),
+            track.rect.x,
+            track.rect.y + 1,
+        ),
+        false,
+    );
+    ui.on_mouse(
+        mouse(
+            MouseEventKind::Drag(MouseButton::Left),
+            0,
+            track.rect.bottom() + 9,
+        ),
+        false,
+    );
+    ui.on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), 0, 0), false);
+    buffer(&mut ui, 120, 20);
+    assert!(ui.scroll > before, "the drag scrolled the list");
+    assert!(!ui.follow, "the selection does not pull it back");
+}

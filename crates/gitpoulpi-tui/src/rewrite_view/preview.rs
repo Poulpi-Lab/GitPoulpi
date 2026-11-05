@@ -656,13 +656,9 @@ impl RewriteView {
             .map(|l| (2, l.clone(), plain()))
             .collect();
         let list = Rect::new(body.x, y, body.width, list_end - y);
-        let mut y = self.paint_text(ui, list, &items);
-        for line in wrap(hint.get(), width) {
-            if y >= body.bottom() {
-                return;
-            }
+        let y = self.paint_text(ui, list, &items);
+        for (y, line) in (y..body.bottom()).zip(wrap(hint.get(), width)) {
             ui.text(body.x + 1, y, body.width - 1, &line, dim());
-            y += 1;
         }
     }
 

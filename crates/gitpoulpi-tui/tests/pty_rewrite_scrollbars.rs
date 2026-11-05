@@ -158,14 +158,14 @@ fn the_secrets_list_has_a_bar_the_thumb_drags_the_wheel_scrolls_and_the_keys_fol
     assert_eq!(detail_path(&wheeled), detail_path(&start));
 
     // Keys: the selection moves down past the window; the list follows it.
-    for _ in 0..4 {
+    for _ in 0..8 {
         term.send_keys("PageDown").unwrap();
     }
     let keyed = term
         .wait_for("the selected finding in view", STEP, |s| {
             let Some(_) = bar_ends(s) else { return false };
             let path = detail_path(s);
-            path != detail_path(&start) && shown(s).iter().any(|l| l.contains(&path))
+            path.contains("cfg3") && shown(s).iter().any(|l| l.contains(&path))
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert_ne!(shown(&keyed), before, "the window followed the selection");

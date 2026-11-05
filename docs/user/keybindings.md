@@ -1287,7 +1287,7 @@ The palette has the same actions, for example
 
 | Key | Action |
 |---|---|
-| `Ctrl+O`, or a click on `⌂` | Go to the Home tab (on the Home tab: focus the search field) |
+| `Ctrl+O`, or a click on `⌂` | Go to the Home tab (on the Home tab: focus the search field; with the Radar or the release notes open: close it first) |
 | `Ctrl+Shift+N` | Open the Home tab with the Clone dialog |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Next / previous tab |
 | `t` | Choose a tab from a filterable list |

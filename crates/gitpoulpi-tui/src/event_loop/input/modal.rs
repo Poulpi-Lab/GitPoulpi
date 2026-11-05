@@ -422,11 +422,16 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
     // with the clone form open. Both also exist as palette
     // entries, which is architecture principle 5's escape
     // hatch. On the management tab itself, `Ctrl+O` puts
-    // the cursor in its search.
+    // the cursor in the list's search; with the Radar or the
+    // release notes open it first closes them (the Radar has
+    // its own `/` and `Ctrl+F`, so `Ctrl+O` never duplicates them).
     if km.is(Bind::GlobalHome, &key) && matches!(*cx.input_mode, InputMode::Normal) {
         match cx.management.as_mut() {
+            // Same as the Radar's own Esc (`Outcome::Close`): dropping the
+            // view drops its popups too.
             Some(manager) if manager.radar.is_open() => {
-                manager.radar.command(crate::radar::RadarCommand::Search);
+                manager.radar.close();
+                manager.search_focused = true;
             }
             // The search box is on the list: leave the notes for it.
             Some(manager) if manager.notes.is_open() => {

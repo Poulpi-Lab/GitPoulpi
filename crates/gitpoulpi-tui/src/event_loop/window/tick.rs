@@ -474,6 +474,8 @@ impl WindowState {
                 &self.status_result,
                 &self.stashes_result,
                 stash_rows_shown(self.graph_show_stashes, &self.solo_refs),
+                &self.solo_refs,
+                &self.refs_result,
             );
             self.log_len = log_len_now(
                 &self.log_result,
@@ -513,12 +515,16 @@ impl WindowState {
             &self.status_result,
             &self.stashes_result,
             stash_rows_shown(self.graph_show_stashes, &self.solo_refs),
+            &self.solo_refs,
+            &self.refs_result,
         );
         if self.solo_refs.is_empty() {
             self.log_len = self
                 .log_order
                 .len(self.log_result.as_ref().map(|g| g.nodes.len()).unwrap_or(0));
         }
+
+        self.refresh_log_hover();
 
         // Which tags no remote is known to have, computed once per
         // frame from the refs the daemon already handed us -- the same
@@ -986,6 +992,37 @@ impl WindowState {
 }
 
 impl WindowState {
+    /// Keeps the Log's hover on the row under the pointer when the rows
+    /// change under a resting pointer (a ref or a whole remote hidden or
+    /// shown, a refresh, a page, a stash): `hovered_commit` holds a commit
+    /// id and is otherwise re-resolved only by a pointer move, so the row
+    /// highlight and the tooltip kept describing a commit that is no longer
+    /// drawn there. Re-resolves the id at the same cell; an emptied row
+    /// drops the hover. Only a hover inside the Log table is touched (the
+    /// commit column and the File History list own their own rows).
+    fn refresh_log_hover(&mut self) {
+        let Some((id, column, x, y)) = self.hovered_commit else {
+            return;
+        };
+        if self.central_view != CentralView::Log || !self.log_area.contains((x, y).into()) {
+            return;
+        }
+        let now = log_row_to_index(self.log_area, self.log_state.offset(), y, self.log_len)
+            .and_then(|i| {
+                crate::log_table::log_commit_at(
+                    &self.log_result,
+                    &self.stashes_result,
+                    &self.log_order,
+                    i,
+                )
+            });
+        match now {
+            Some(now) if now == id => {}
+            Some(now) => self.hovered_commit = Some((now, column, x, y)),
+            None => self.hovered_commit = None,
+        }
+    }
+
     /// Opens the diff a Blame action asked for ("Show this commit's diff for
     /// the file") once the commit's changed files are loaded.
     pub(in crate::event_loop) fn tick_blame_diff(&mut self) {

@@ -434,6 +434,8 @@ pub(super) fn init(
         &status_result,
         &stashes_result,
         stash_rows_shown(graph_show_stashes, &solo_refs),
+        &solo_refs,
+        &refs_result,
     );
     // A new window starts without the previous repository's workflow.
     crate::flow::FlowSource::reset();

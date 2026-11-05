@@ -1080,6 +1080,8 @@ async fn stashing_through_the_link_leaves_a_clean_working_tree() {
         &after.status_result,
         &after.stashes_result,
         true,
+        &Default::default(),
+        &after.refs_result,
     );
     let head = after.log_result.as_ref().expect("log failed").nodes[0].id;
     let stash = &after.stashes_result.as_ref().unwrap()[0];

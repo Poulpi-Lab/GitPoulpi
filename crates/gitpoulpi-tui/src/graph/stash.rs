@@ -106,11 +106,27 @@ pub(crate) enum LogEntry {
 pub(crate) struct LogRows {
     wip: bool,
     slots: Vec<StashSlot>,
+    /// Under Solo the Log shows a subset of the held commits: the held
+    /// index of every shown commit, ascending. `None` shows them all. The
+    /// held list is what every `nodes.get(i)` of the event loop reads, so
+    /// `entry` answers in held indices whatever the Log draws.
+    shown: Option<std::sync::Arc<Vec<usize>>>,
 }
 
 impl LogRows {
     pub(crate) fn new(wip: bool, slots: Vec<StashSlot>) -> LogRows {
-        LogRows { wip, slots }
+        LogRows {
+            wip,
+            slots,
+            shown: None,
+        }
+    }
+
+    /// The same rows over a Solo-filtered list: `shown` is the held index of
+    /// each commit the Log draws, ascending.
+    pub(crate) fn with_shown(mut self, shown: Option<std::sync::Arc<Vec<usize>>>) -> LogRows {
+        self.shown = shown;
+        self
     }
 
     /// Whether the WIP row is the first row.
@@ -125,10 +141,23 @@ impl LogRows {
 
     /// How many rows the Log has for `commits` commits.
     pub(crate) fn len(&self, commits: usize) -> usize {
+        let commits = self.shown.as_ref().map_or(commits, |shown| shown.len());
         usize::from(self.wip) + self.slots.len() + commits
     }
 
     pub(crate) fn entry(&self, display: usize) -> LogEntry {
+        match self.shown_entry(display) {
+            LogEntry::Commit(i) => LogEntry::Commit(match &self.shown {
+                // Past the shown list: an index no held list has.
+                Some(shown) => shown.get(i).copied().unwrap_or(usize::MAX),
+                None => i,
+            }),
+            other => other,
+        }
+    }
+
+    /// `entry` with `Commit(i)` counting the shown commits.
+    fn shown_entry(&self, display: usize) -> LogEntry {
         let d = if self.wip {
             match display.checked_sub(1) {
                 Some(d) => d,
@@ -151,8 +180,26 @@ impl LogRows {
         LogEntry::Commit(d - self.slots.len())
     }
 
-    /// The display index of `nodes[i]`.
+    /// The display index of the held commit `nodes[i]`; a commit Solo hides
+    /// answers where it would sit.
     pub(crate) fn commit_display_index(&self, i: usize) -> usize {
+        let shown_index = match &self.shown {
+            Some(shown) => shown.partition_point(|&held| held < i),
+            None => i,
+        };
+        self.shown_display_index(shown_index)
+    }
+
+    /// Whether the Log draws the held commit `nodes[i]`.
+    pub(crate) fn is_shown(&self, i: usize) -> bool {
+        self.shown
+            .as_ref()
+            .map_or(true, |shown| shown.binary_search(&i).is_ok())
+    }
+
+    /// The display index of the `i`-th commit the Log draws (what a search
+    /// hit, an index of the drawn list, is).
+    pub(crate) fn shown_display_index(&self, i: usize) -> usize {
         usize::from(self.wip) + i + self.slots.iter().filter(|s| s.before <= i).count()
     }
 
@@ -160,5 +207,29 @@ impl LogRows {
     pub(crate) fn stash_display_index(&self, k: usize) -> Option<usize> {
         let slot = self.slots.get(k)?;
         Some(usize::from(self.wip) + slot.before + k)
+    }
+}
+
+#[cfg(test)]
+mod solo_rows_tests {
+    use super::*;
+
+    /// Solo draws held commits 1 and 3 of four: display rows answer in held
+    /// indices (what `nodes.get(i)` reads), not in positions of the drawn list.
+    #[test]
+    fn a_solo_filtered_log_answers_in_held_indices() {
+        let rows = LogRows::new(true, Vec::new()).with_shown(Some(std::sync::Arc::new(vec![1, 3])));
+        assert_eq!(rows.len(4), 3, "WIP plus the two shown commits");
+        assert_eq!(rows.entry(0), LogEntry::Wip);
+        assert_eq!(rows.entry(1), LogEntry::Commit(1));
+        assert_eq!(rows.entry(2), LogEntry::Commit(3));
+        assert_eq!(rows.commit_display_index(3), 2);
+        assert!(rows.is_shown(3) && !rows.is_shown(2));
+        // A search hit counts the drawn list.
+        assert_eq!(rows.shown_display_index(1), 2);
+        // Without Solo nothing changes.
+        let all = LogRows::new(false, Vec::new());
+        assert_eq!(all.entry(2), LogEntry::Commit(2));
+        assert_eq!(all.len(4), 4);
     }
 }

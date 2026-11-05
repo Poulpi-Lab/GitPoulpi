@@ -125,7 +125,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 search.current = log_search::clamp_current(search.current, hits.len());
                 if let Some(&node_index) = hits.get(search.current) {
                     cx.log_state
-                        .select(Some(cx.log_order.commit_display_index(node_index)));
+                        .select(Some(cx.log_order.shown_display_index(node_index)));
                     *cx.log_follow = true;
                 }
             }

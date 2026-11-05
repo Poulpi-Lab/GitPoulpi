@@ -269,6 +269,8 @@ impl WindowState {
                         &self.status_result,
                         &self.stashes_result,
                         stash_rows_shown(self.graph_show_stashes, &self.solo_refs),
+                        &self.solo_refs,
+                        &self.refs_result,
                     );
                     self.log_len = log_len_now(
                         &self.log_result,
@@ -493,6 +495,8 @@ impl WindowState {
                 &self.status_result,
                 &self.stashes_result,
                 stash_rows_shown(self.graph_show_stashes, &self.solo_refs),
+                &self.solo_refs,
+                &self.refs_result,
             );
             self.log_len = log_len_now(
                 &self.log_result,

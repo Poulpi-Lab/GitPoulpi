@@ -295,6 +295,9 @@ pub(crate) fn select_log_commit(
     let Some(index) = graph.nodes.iter().position(|n| n.id == commit) else {
         return false;
     };
+    if !rows.is_shown(index) {
+        return false;
+    }
     log_state.select(Some(rows.commit_display_index(index)));
     true
 }

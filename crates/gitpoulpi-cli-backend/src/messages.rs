@@ -11,64 +11,36 @@ use gitpoulpi_core::domain::{
 use gitpoulpi_core::Result;
 
 use crate::process::{read_with_retry, run, run_bytes_with_stdin, run_lenient};
+use crate::refs::peel_commits;
 
 const FIELD_SEP: u8 = 1;
 const RECORD_SEP: u8 = 2;
 
 /// Branches, remote-tracking branches, tags (peeled, commits only) and HEAD.
 fn tips(repo: &RepoRef) -> Result<Vec<Oid>> {
+    // Only `%(objectname)`: git 2.5x aborts (or exits 128) on a ref whose
+    // object is missing when asked for its type or its peeled object.
+    // `peel_commits` peels all the way, as libgit2 does; a ref that does not
+    // reach a commit (missing object, tag of a tree) is no tip.
     let listing = read_with_retry(|| {
         run(
             &repo.root,
             &[
                 "for-each-ref",
-                "--format=%(objectname) %(objecttype) %(*objectname) %(*objecttype)",
+                "--format=%(objectname)",
                 "refs/heads",
                 "refs/remotes",
                 "refs/tags",
             ],
         )
     })?;
-    let mut out: Vec<Oid> = Vec::new();
-    // Tags of tags that `%(*objectname)` peeled only one level (older git
-    // stops at the inner tag): resolved to their commit below.
-    let mut nested: Vec<&str> = Vec::new();
-    for line in listing.lines() {
-        let mut f = line.split(' ');
-        let (Some(name), Some(kind), Some(peeled), Some(peeled_kind)) =
-            (f.next(), f.next(), f.next(), f.next())
-        else {
-            continue;
-        };
-        let oid = match (kind, peeled_kind) {
-            ("commit", _) => Oid::from_hex(name),
-            // `*` fields peel a tag of a tag all the way, as libgit2 does.
-            ("tag", "commit") => Oid::from_hex(peeled),
-            ("tag", "tag") => {
-                nested.push(name);
-                None
-            }
-            _ => None,
-        };
-        out.extend(oid);
-    }
-    if !nested.is_empty() {
-        let mut stdin = String::new();
-        for tag in nested {
-            stdin.push_str(tag);
-            stdin.push_str("^{commit}\n");
-        }
-        let resolved = run_bytes_with_stdin(
-            &repo.root,
-            &["cat-file", "--batch-check=%(objectname) %(objecttype)"],
-            stdin.as_bytes(),
-        )?;
-        for line in String::from_utf8_lossy(&resolved).lines() {
-            if let Some(id) = line.strip_suffix(" commit") {
-                out.extend(Oid::from_hex(id));
-            }
-        }
-    }
+    let mut ids: Vec<Oid> = listing
+        .lines()
+        .filter_map(|l| Oid::from_hex(l.trim()))
+        .collect();
+    ids.sort_by_key(|o| o.0);
+    ids.dedup();
+    let mut out: Vec<Oid> = peel_commits(&repo.root, &ids)?.into_values().collect();
     let (ok, head) = run_lenient(
         &repo.root,
         &["rev-parse", "-q", "--verify", "HEAD^{commit}"],

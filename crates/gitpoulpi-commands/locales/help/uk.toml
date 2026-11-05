@@ -278,21 +278,21 @@ redo = "Повторює операцію, яку `undo` щойно скасув
 "redo --expect" = "Повторити, лише якщо це все ще остання скасована запис"
 "redo --yes" = "Виконати, коли повторення ризиковане; без нього код виходу 3"
 "refs hide" = """Ховає refs із графа комітів («Hide» у TUI): фільтр показу для репозиторію в `repo-state.toml`, за яким відкритий TUI слідує наживо. Назви записуються так, як їх показує список refs (`feature/x`, `origin/main`, назва тега)"""
-"refs hide --clear" = "Показати всі приховані refs (на додачу до названих)"
+"refs hide --clear" = "Показати всі приховані refs і remotes (на додачу до названих)"
 "refs hide --names" = "Refs для приховування"
+"refs hide --remote" = "Remotes, які приховати цілком (назви так, як їх пише `remote list`)"
 "refs hide#long" = """
-Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+Ховає refs із графа комітів («Hide» у TUI): фільтр показу для репозиторію в `repo-state.toml`, за яким відкритий TUI слідує наживо. Назви записуються так, як їх показує список refs (`feature/x`, `origin/main`, назва тега).
 
-`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
-"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
+`--remote <name>...` ховає remote цілком (кожну його гілку, і ті, що завантажені пізніше): так можна дивитися одну історію без історії окремого архівного remote."""
 "refs show" = "Показує refs знову: прибирає їх із наборів прихованих і solo"
-"refs show --clear" = "Скинути весь фільтр: нічого не приховано, нічого не в solo"
+"refs show --clear" = "Скинути весь фільтр: нічого не приховано (remotes теж), нічого не в solo"
 "refs show --names" = "Refs для повторного показу"
+"refs show --remote" = "Remotes, які показати знову"
 "refs show#long" = """
-Show refs again: removes them from the hidden and solo sets.
+Показує refs знову: прибирає їх із наборів прихованих і solo.
 
-`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
-"refs show --remote" = "Remotes to show again"
+`--remote <name>...` знову показує remote цілком, разом із кожною його гілкою, яку було приховано окремо."""
 "refs solo" = "Показує в графі комітів лише ці refs (і те, до чого вони сягають)"
 "refs solo --clear" = "Зняти solo з кожного ref (на додачу до названих)"
 "refs solo --names" = "Refs для solo"

@@ -108,6 +108,8 @@ chaque conflit sur ses barres de défilement. Cliquez sur une marque pour y alle
 - **Glissez la bordure inférieure** du bloc du message de commit dans le volet de
   droite.
 - **Glissez la bordure entre deux en-têtes du Log** (par défaut l'espace, depuis l'en-tête ou n'importe où le long du tableau ; Paramètres > Journal et graphe > Redimensionnement des colonnes) pour redimensionner une colonne (au clavier : `Shift+C` pour choisir une colonne, puis `]` / `[`).
+- **Double-cliquez la bordure entre deux en-têtes du Log** pour ajuster la colonne à sa gauche à son contenu (au clavier : `Shift+C` pour choisir une colonne, puis `=` ; `+` ajuste toutes les colonnes). La dernière colonne a une poignée sur sa propre dernière cellule : glissez-la pour la redimensionner, la colonne Message absorbant la différence.
+- **Faites défiler le Log latéralement** (la disposition de colonnes `scroll` ; Paramètres > Journal et graphe > Disposition des colonnes, ou la case `Défilement latéral` du sélecteur) : la molette horizontale ou `Shift`+molette sur le tableau, la barre de la bordure inférieure (glissez son curseur, appuyez sur la piste vide, cliquez ses flèches d'extrémité), ou `Shift+Left` / `Shift+Right`. Dans la disposition `fit` par défaut, les colonnes remplissent le volet et il n'y a rien à faire défiler.
 - **Glissez un en-tête du Log** pour déplacer la colonne : un fantôme de son nom suit le pointeur, l'en-tête quitté est estompé et une barre d'accent marque l'emplacement où elle atterrirait. Les colonnes bougent au relâchement ; `Échap` annule, et le pointeur montre la main ouverte pendant que vous la portez (au clavier : `Shift+C` pour choisir une colonne, puis `<` / `>`).
 
 GitPoulpi mémorise chaque taille. Voir
@@ -219,7 +221,7 @@ Voir [Hébergeurs et suivi de tickets](hosting-integration.md).
   ref du commit.
 - **Clic droit sur une pastille de ref** pour un menu avec les actions de la ref et
   celles du commit.
-- **Clic droit sur l'en-tête** pour afficher ou masquer des colonnes : une liste de cases (`[x]` / `[ ]`) avec un ✕ dans son titre ; cliquez sur une ligne ou utilisez les flèches et `Space` / `Enter`, puis fermez avec le ✕, `Échap` ou un clic ailleurs (la palette : `Affichage : Log : Choisir les colonnes à afficher`).
+- **Clic droit sur l'en-tête** pour afficher ou masquer des colonnes : une liste de cases (`[x]` / `[ ]`) avec un ✕ dans son titre ; cliquez sur une ligne ou utilisez les flèches et `Space` / `Enter`, puis fermez avec le ✕, `Échap` ou un clic ailleurs (la palette : `Affichage : Log : Choisir les colonnes à afficher`). Sous les cases : `Ajuster <colonne> à son contenu` (la colonne cliquée), `Ajuster toutes les colonnes à leur contenu` et `Réinitialiser les largeurs des colonnes`.
 - **Cliquez sur `↑`, `↓` ou `✕`** dans la barre de recherche pour aller à la
   correspondance précédente ou suivante, ou pour fermer la barre.
 - **Cliquez sur `#12`, `ABC-12` ou `AB#12`** dans un message de commit, dans le volet

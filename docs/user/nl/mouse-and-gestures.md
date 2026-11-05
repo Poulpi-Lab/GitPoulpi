@@ -94,6 +94,8 @@ Klik op een markering om erheen te gaan.
 - **Sleep de onderrand** van een Refs-sectie om haar hoogte te wijzigen.
 - **Sleep de onderrand** van het commit-berichtblok in het rechterpaneel.
 - **Sleep de rand tussen twee Log-koppen** (standaard de tussenruimte, vanaf de kop of vanaf overal in de tabel; Instellingen > Log & grafiek > Kolombreedte aanpassen) om een kolom van grootte te veranderen (toetsenbord: `Shift+C` om een kolom te kiezen, daarna `]` / `[`).
+- **Dubbelklik op de rand tussen twee Log-koppen** om de kolom links ervan aan zijn inhoud aan te passen (het toetsenbord: `Shift+C` om een kolom te kiezen, dan `=`; `+` past elke kolom aan). De laatste kolom heeft een greep op zijn eigen laatste cel: sleep om die kolom van grootte te veranderen, waarbij de kolom Bericht het verschil opvangt.
+- **Scroll de Log zijwaarts** (de kolomindeling `scroll`; Instellingen > Log & grafiek > Kolomindeling, of het selectievakje `Zijwaarts scrollen` in de keuzelijst): het horizontale wiel of `Shift`+wiel boven de tabel, de balk op de onderrand (sleep de schuif, druk op het kale spoor, klik op de pijlen aan de uiteinden), of `Shift+Links` / `Shift+Rechts`. In de standaardindeling `fit` vullen de kolommen het paneel en valt er niets te scrollen.
 - **Sleep een Log-kop** om de kolom te verplaatsen: een spook van zijn naam volgt de aanwijzer, de kop die hij verliet wordt gedimd en een accentbalk markeert de plek waar hij zou landen. De kolommen verplaatsen als je loslaat; `Esc` annuleert en de aanwijzer toont de open hand zolang je hem draagt (toetsenbord: `Shift+C` om een kolom te kiezen, daarna `<` / `>`).
 
 GitPoulpi onthoudt elke grootte. Zie
@@ -197,7 +199,7 @@ Zie [Hosting en issuetrackers](hosting-integration.md).
   ref op de commit.
 - **Klik met rechts op een refpil** voor één menu met de acties van de ref en de acties van
   de commit.
-- **Klik met rechts op de kop** om kolommen te tonen of te verbergen: een checklist (`[x]` / `[ ]`) met een ✕ in de titel; klik op een rij of gebruik de pijltoetsen en `Spatie` / `Enter`, en sluit hem met de ✕, `Esc` of een klik ernaast (het palet: `Weergave: Log: Kolommen kiezen om te tonen`).
+- **Klik met rechts op de kop** om kolommen te tonen of te verbergen: een checklist (`[x]` / `[ ]`) met een ✕ in de titel; klik op een rij of gebruik de pijltoetsen en `Spatie` / `Enter`, en sluit hem met de ✕, `Esc` of een klik ernaast (het palet: `Weergave: Log: Kolommen kiezen om te tonen`). Onder de selectievakjes: `<kolom> aan inhoud aanpassen` (de kolom waarop met rechts is geklikt), `Alle kolommen aan inhoud aanpassen` en `Kolombreedtes herstellen`.
 - **Klik op `↑`, `↓` of `✕`** in de zoekbalk om naar de vorige of volgende treffer te gaan,
   of de balk te sluiten.
 - **Klik op `#12`, `ABC-12` of `AB#12`** in een commit-bericht, in het rechterpaneel, om dat

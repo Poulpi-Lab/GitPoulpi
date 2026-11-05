@@ -109,6 +109,8 @@ tam přejdete.
 - **Táhněte spodní okraj** sekce Refs pro změnu její výšky.
 - **Táhněte spodní okraj** bloku zprávy commitu v pravém panelu.
 - **Táhněte okraj mezi dvěma záhlavími Logu** (ve výchozím stavu mezeru, ze záhlaví nebo odkudkoli z tabulky; Nastavení > Log a graf > Změna velikosti sloupců) pro změnu šířky sloupce (z klávesnice: `Shift+C` vybere sloupec, pak `]` / `[`).
+- **Dvojklik na okraj mezi dvěma záhlavími Logu** přizpůsobí sloupec nalevo jeho obsahu (z klávesnice: `Shift+C` pro výběr sloupce, pak `=`; `+` přizpůsobí všechny sloupce). Poslední sloupec má úchyt na své poslední buňce: tažením změníte jeho šířku, rozdíl převezme sloupec Zpráva.
+- **Posouvání Logu do stran** (rozložení sloupců `scroll`; Nastavení > Log a graf > Rozložení sloupců, nebo zaškrtávátko `Posouvat do stran` ve výběru sloupců): vodorovné kolečko nebo `Shift`+kolečko nad tabulkou, lišta na spodním okraji (tažením jezdce, kliknutím na prázdnou dráhu, kliknutím na koncové šipky), nebo `Shift+Left` / `Shift+Right`. Ve výchozím rozložení `fit` sloupce vyplní panel a není co posouvat.
 - **Táhněte záhlaví Logu** pro přesun sloupce: duch jeho názvu sleduje ukazatel, záhlaví, které opustil, je ztlumené a akcentní proužek označuje místo, kam by dopadl. Sloupce se přesunou při pustění; `Esc` to zruší a ukazatel během přenášení ukazuje otevřenou ruku (z klávesnice: `Shift+C` vybere sloupec, pak `<` / `>`).
 
 GitPoulpi si pamatuje každou velikost. Viz
@@ -216,7 +218,7 @@ Viz [Hostingové služby a issue trackery](hosting-integration.md).
   pro každý ref na commitu.
 - **Pravým tlačítkem na pilulku ref** otevřete jednu nabídku s akcemi ref
   a akcemi commitu.
-- **Pravým tlačítkem na záhlaví** zobrazíte nebo skryjete sloupce: zaškrtávací seznam (`[x]` / `[ ]`) s ✕ v titulku; klikněte na řádek nebo použijte šipky a `Mezerník` / `Enter`, pak ho zavřete ✕, `Esc` nebo kliknutím mimo (paleta: `Zobrazení: Log: Vybrat zobrazené sloupce`).
+- **Pravým tlačítkem na záhlaví** zobrazíte nebo skryjete sloupce: zaškrtávací seznam (`[x]` / `[ ]`) s ✕ v titulku; klikněte na řádek nebo použijte šipky a `Mezerník` / `Enter`, pak ho zavřete ✕, `Esc` nebo kliknutím mimo (paleta: `Zobrazení: Log: Vybrat zobrazené sloupce`). Pod zaškrtávátky: `Přizpůsobit <sloupec> obsahu` (sloupec, na který jste klikli pravým), `Přizpůsobit všechny sloupce obsahu` a `Obnovit šířky sloupců`.
 - **Klikněte na `↑`, `↓` nebo `✕`** ve vyhledávací liště pro přechod na
   předchozí nebo další shodu, nebo pro zavření lišty.
 - **Klikněte na `#12`, `ABC-12` nebo `AB#12`** ve zprávě commitu v pravém panelu

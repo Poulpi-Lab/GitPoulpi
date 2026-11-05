@@ -238,7 +238,8 @@ Do tego `commit --ai` i `stash push --ai`. Model jest wywoływany z procesu
 | Polecenie | Działanie |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Repozytoria i karty tej sesji. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (każde z `--clear`) | Filtr refów Logu: ukryj, pokaż ponownie, pokaż tylko te (na żywo w otwartym oknie). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (każde z `--clear`) | Filtr refów Logu: ukryj, pokaż ponownie, pokaż tylko te (na żywo w otwartym oknie). Ukryte refy znikają też z przejścia po historii: commity osiągalne tylko przez nie znikają z Logu (wyewidencjonowany commit zawsze zostaje). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Ukrywa lub pokazuje całe zdalne: każdą jego gałąź, także pobrane później. Przy ukrywaniu nazwa musi być zdalnym repozytorium. `show` zdejmuje też ukrycie gałęzi tego zdalnego ukrytych pojedynczo; `--clear` opróżnia także ukryte zdalne. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Nazwane sesje (zmiana nazwy / usunięcie odmawiają, gdy jej demon działa). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | Proces sesji w tle (alias `server`). Bez działającego demona każde polecenie uruchamia wbudowanego na czas własnego działania. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Ustawienia ([Opis konfiguracji](config-reference.md)). `config set ui.theme` i `ui.graph_color_theme` sprawdzają nazwę w rejestrze. |

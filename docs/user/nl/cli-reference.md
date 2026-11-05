@@ -237,7 +237,8 @@ Plus `commit --ai` en `stash push --ai`. Het model wordt aangeroepen vanuit het
 | Opdracht | Wat het doet |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Repositories en de tabbladen van deze sessie. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (elk met `--clear`) | Het reffilter van de Log: verbergen, weer tonen, alleen deze tonen (live in een open venster). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (elk met `--clear`) | Het reffilter van de Log: verbergen, weer tonen, alleen deze tonen (live in een open venster). Verborgen refs verlaten ook de doorloop: commits die alleen zij bereiken verdwijnen uit de Log (de uitgecheckte commit blijft altijd staan). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Hele remotes verbergen of tonen: elke branch ervan, ook de later opgehaalde. De naam moet een remote van de repository zijn (bij verbergen). `show` haalt ook branches van de remote terug die afzonderlijk verborgen waren; `--clear` leegt ook de verborgen remotes. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Benoemde sessies (hernoemen / verwijderen weigeren zolang de daemon draait). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | Het achtergrondproces van de sessie (alias `server`). Zonder draaiende daemon start elke opdracht een ingebedde voor zijn eigen levensduur. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Instellingen ([Configuratienaslag](config-reference.md)). `config set ui.theme` en `ui.graph_color_theme` controleren de naam tegen het register. |

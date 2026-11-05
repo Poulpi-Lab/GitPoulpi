@@ -235,7 +235,8 @@ takže klíče API nikdy nepřecházejí k daemonu ani klientovi MCP.
 | Příkaz | Co dělá |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Repozitáře a karty této relace. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (každý s `--clear`) | Filtr refs v Logu: skrýt, znovu zobrazit, zobrazit jen tyto (živě v otevřeném okně). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (každý s `--clear`) | Filtr refs v Logu: skrýt, znovu zobrazit, zobrazit jen tyto (živě v otevřeném okně). Skryté refs také opouštějí průchod historií: commity, kterých dosáhnou jen ony, z Logu zmizí (commit s checkoutem zůstává vždy). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Skrýt nebo zobrazit celé remotes: každou jejich větev, i ty načtené později. Název musí být remote repozitáře (při skrývání). `show` také vrátí větve remote, které byly skryty jednotlivě; `--clear` vyprázdní i skryté remotes. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Pojmenované relace (přejmenování / smazání odmítnuto, dokud jejich daemon běží). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | Proces relace na pozadí (alias `server`). Bez běžícího daemona každý příkaz spustí vestavěného na dobu svého běhu. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Nastavení ([Referenční příručka konfigurace](config-reference.md)). `config set ui.theme` a `ui.graph_color_theme` kontrolují název vůči registru. |

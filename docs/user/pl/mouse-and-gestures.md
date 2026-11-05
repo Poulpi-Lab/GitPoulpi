@@ -109,6 +109,8 @@ paskach przewijania. Kliknij znacznik, by tam przejść.
 - **Przeciągnij dolną krawędź** sekcji Refs, by zmienić jej wysokość.
 - **Przeciągnij dolną krawędź** bloku opisu commita w prawym panelu.
 - **Przeciągnij krawędź między dwoma nagłówkami Log** (domyślnie odstęp, z nagłówka lub z dowolnego miejsca w dół tabeli; Ustawienia > Log i graf > Zmiana szerokości kolumn), by zmienić rozmiar kolumny (klawiatura: `Shift+C`, by wybrać kolumnę, potem `]` / `[`).
+- **Kliknij dwukrotnie granicę między dwoma nagłówkami Log**, by dopasować kolumnę po jej lewej do jej zawartości (klawiatura: `Shift+C`, by wybrać kolumnę, potem `=`; `+` dopasowuje każdą kolumnę). Ostatnia kolumna ma uchwyt na swojej ostatniej komórce: przeciągnij go, by zmienić jej szerokość, a kolumna Opis przejmie różnicę.
+- **Przewijaj Log w poziomie** (układ kolumn `scroll`; Ustawienia > Log i graf > Układ kolumn albo pole `Przewijaj w poziomie` w oknie wyboru): pozioma rolka lub `Shift`+rolka nad tabelą, pasek na dolnej krawędzi (przeciągnij suwak, naciśnij puste tło paska, kliknij strzałki na jego końcach) albo `Shift+Left` / `Shift+Right`. W domyślnym układzie `fit` kolumny wypełniają panel i nie ma czego przewijać.
 - **Przeciągnij nagłówek Log**, by przenieść kolumnę: duszek jego nazwy podąża za wskaźnikiem, nagłówek, który opuścił, jest przyciemniony, a pasek akcentu wskazuje miejsce, w którym wyląduje. Kolumny przesuwają się po puszczeniu; `Esc` anuluje, a wskaźnik pokazuje otwartą dłoń, dopóki ją niesiesz (klawiatura: `Shift+C`, by wybrać kolumnę, potem `<` / `>`).
 
 GitPoulpi zapamiętuje każdy rozmiar. Zob.
@@ -213,7 +215,7 @@ Zob. [Hosting i trackery zgłoszeń](hosting-integration.md).
   na commicie.
 - **Kliknij plakietkę refa prawym przyciskiem**, by zobaczyć jedno menu z akcjami refa i
   akcjami commita.
-- **Kliknij nagłówek prawym przyciskiem**, by pokazać lub ukryć kolumny: lista kontrolna (`[x]` / `[ ]`) z ✕ w tytule; kliknij wiersz albo użyj strzałek i `Spacji` / `Enter`, potem zamknij ją przez ✕, `Esc` lub kliknięcie poza nią (paleta: `Widok: Log: Wybierz kolumny do pokazania`).
+- **Kliknij nagłówek prawym przyciskiem**, by pokazać lub ukryć kolumny: lista kontrolna (`[x]` / `[ ]`) z ✕ w tytule; kliknij wiersz albo użyj strzałek i `Spacji` / `Enter`, potem zamknij ją przez ✕, `Esc` lub kliknięcie poza nią (paleta: `Widok: Log: Wybierz kolumny do pokazania`). Pod polami wyboru: `Dopasuj <kolumna> do zawartości` (kolumna kliknięta prawym przyciskiem), `Dopasuj wszystkie kolumny do zawartości` i `Zresetuj szerokości kolumn`.
 - **Kliknij `↑`, `↓` lub `✕`** na pasku wyszukiwania, by przejść do poprzedniego lub następnego
   trafienia albo zamknąć pasek.
 - **Kliknij `#12`, `ABC-12` lub `AB#12`** w opisie commita, w prawym panelu,

@@ -105,6 +105,8 @@ author_email = "jane@work.example"
 | `ui.graph_ghost_ref` | `true` | Log의 Ref 열은 자체 ref가 없는 마우스를 올린 commit에, 열에 공간이 있으면, 소속 브랜치(없으면 원격 브랜치)의 이름을 흐린 알약 모양으로 표시하며, tag는 절대 표시하지 않습니다. 삭제된 브랜치는 그것을 병합한 merge commit의 제목에서 추론해 취소선으로 그립니다. 알약에 마우스를 올리면 종류가 표시됩니다. |
 | `ui.reveal_on_ref_click` | `true` | Refs 창에서 ref(브랜치, tag, 리모트 브랜치, stash)를 한 번 클릭하면 Log가 해당 commit으로 스크롤하고 행이 깜박입니다. commit 선택은 움직이지 않습니다. |
 | `ui.log_wip_counts_in_message` | `true` | 변경 열이 숨겨져 있을 때 WIP 메시지에 WIP 변경 수를 표시합니다. |
+| `ui.log_columns_layout` | `"fit"` | Log가 열을 배치하는 방식. `fit`: 보이는 모든 열이 창에 정확히 맞춰지고 `message`만 늘어나며, 창이 좁으면 열이 통째로 양보합니다. `scroll`: 열이 너비를 유지하고(`message`도), 양보하는 열이 없으며, 표가 창보다 넓으면 옆으로 스크롤됩니다. |
+| `ui.log_column_widths_scroll` | 비어 있음 | `scroll` 배치의 열 너비, 이름 -> 칸 수(`message` 허용. `fit` 배치의 것으로 `message`를 담지 않는 `ui.log_column_widths`와 다릅니다). 배치가 `scroll`일 때 열을 드래그하거나 크기를 바꾸거나 내용에 맞출 때 기록됩니다. |
 | `ui.log_columns_hidden`, `ui.log_columns_order`, `ui.log_column_widths` | 비어 있음 | Log 열(`ref`, `graph`, `message`, `author`, `date`, `sha`, `changes`). 열을 숨기거나 끌거나 크기를 바꿀 때 기록됩니다. `message`는 숨길 수 없습니다. |
 | `ui.commit_column_columns_visible`, `ui.commit_column_columns_order`, `ui.commit_column_columns_widths` | 비어 있음 | diff 옆 [commit 열](interface-tour.md#commit-열)의 부분을 Log와는 별도로 저장합니다. 표시할 부분의 이름(`ref`, `graph`, `message`, `author`, `date`, `changes`, `sha`. 비어 있으면 레인, 메시지, 작성자, 날짜), 왼쪽에서 오른쪽으로의 순서(같은 이름으로 쓰며, 비어 있으면 방금 나열한 순서이고 빠진 이름은 그 순서대로 뒤에 붙습니다), 부분별로 끌어서 정한 너비(셀 단위, 빠진 부분은 자동)이며, 부분을 고르거나 옮기거나 크기를 바꿀 때 기록됩니다. `message`는 숨길 수 없습니다. 이 키가 생기기 전에 쓰인 세션 파일은 한 번 읽어 이 키로 옮겨집니다. |
 | `ui.sidebar_sections_hidden` | 비어 있음 | 숨긴 왼쪽 창 섹션(`local`, `remote`, `worktrees`, `stashes`, `tags`, `pull_requests`, `issues`, `submodules`). 창의 오른쪽 클릭 메뉴나 팔레트에서 기록됩니다. 존재하는 섹션 중 적어도 하나는 항상 표시됩니다. 이 값은 기본값입니다. 저장소마다 자체 섹션을 숨길 수 있고(저장소의 상태 파일에 저장), 이 키는 자체 선택이 없는 저장소에 적용됩니다. *모든 저장소에 사용*이 이 키를 씁니다. |
@@ -501,6 +503,7 @@ stage_file = "z"
 | `hosting_integration` | 여기에 고정된 `[[integrations]]` 프로필 | `gitpoulpi hosting use --id` |
 | `pulls_source`, `issues_source` | PR / 이슈 목록이 읽는 제공자 프로젝트, `{ integration, project, filter }` 형태. `filter`는 선택 사항입니다: 목록 쿼리에 AND로 붙는 제공자 고유의 추가 절(Jira JQL 조각, Azure WIQL 조건, Trello 목록 이름). GitHub와 GitLab은 무시합니다. | 사이드바 섹션, `gitpoulpi hosting link` |
 | `ref_visibility` | 숨기거나 솔로로 지정한 ref | Refs 사이드바, `gitpoulpi refs hide\|show\|solo` |
+| `hidden_remotes` | 그래프에서 통째로 숨긴 리모트(모든 브랜치, 나중에 fetch하는 것 포함) | 리모트의 눈 아이콘과 메뉴, `gitpoulpi refs hide --remote` |
 | `folds`, `collapsed_*_ref_folders` | 접힌 사이드바 섹션과 브랜치 및 tag 폴더. `[folds]`에는 `status_folders`(스테이징 안 된 / 스테이징된 파일 트리의 접힌 폴더)와 `commit_folders`(commit의 변경된 파일 트리의 접힌 폴더. 모든 commit에 동일)도 있으며, 각각 500개 경로로 제한되고 오래된 것부터 삭제됩니다 | 사이드바, 파일 트리 |
 | `pending_auto_stash` | GitPoulpi가 만들었으나 아직 되돌리지 않은 stash | 데몬이 기록. [자동 stash](log-and-history.md#자동-stash) 참고 |
 

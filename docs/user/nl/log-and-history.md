@@ -60,6 +60,12 @@ Een kop slepen toont een spook van zijn naam dat de aanwijzer volgt en een accen
 
 Op het toetsenbord kiest `Shift+C` (of in het palet `Weergave: Logkolom: Kolom kiezen om te verplaatsen of de breedte te wijzigen`) een kolom, en de cel in de kop licht op. Daarna kiezen `Tab` / `Shift+Tab` een andere kolom, verplaatsen `<` / `>` haar een plaats naar links of rechts tussen de getoonde kolommen (het toetsenbordequivalent van de kop slepen), maken `]` / `[` haar breder of smaller (het equivalent van de rand slepen; de laatste kolom verschuift haar linkerrand), zet `0` alle breedtes terug op automatisch en verlaat `Esc` of `Enter` de keuze. De pijltoetsen blijven ondertussen door de commits bewegen. De volgorde en de breedtes worden net als bij slepen onthouden en zijn die van de Log zelf: de commitkolom naast een diff houdt een eigen lijst.
 
+*Aan de inhoud aanpassen.* Een **dubbelklik** op de rand van een kolom past de kolom links ervan aan zijn breedste zichtbare inhoud en zijn kop aan (brede tekens en emoji worden geteld naar de cellen die ze innemen). In de indeling Aanpassen vult de Log altijd zijn paneel, dus een kolom stopt bij wat het paneel toelaat zodra **Bericht** zijn deel houdt en elke andere kolom zijn minimale breedte: de statusregel zegt dan `Auteur heeft 34 cellen nodig, er passen er 20.` Hetzelfde via het toetsenbord: met een gekozen kolom (`Shift+C`, `Tab`) past `=` hem aan en `+` elke kolom; het palet heeft `Weergave: Logkolom: Kolom aan inhoud aanpassen` en `... Alle kolommen aan inhoud aanpassen`; de keuzelijst bij rechtsklikken toont onder de selectievakjes `<kolom> aan inhoud aanpassen` (de kolom onder de aanwijzer), `Alle kolommen aan inhoud aanpassen` en `Kolombreedtes herstellen`. **Bericht** is de flexibele kolom en heeft geen eigen breedte om aan te passen: hij neemt de ruimte die de andere overlaten.
+
+*Zijwaarts scrollen.* Standaard past elke kolom in het paneel. In de indeling **scroll** (het selectievakje `Zijwaarts scrollen (kolommen behouden hun breedte)` in de keuzelijst, Instellingen > Log & grafiek > Kolomindeling, in het palet `Weergave: Log: Zijwaarts scrollen van de kolommen aan- of uitzetten`, of `s` terwijl een kolom gekozen is) behouden de kolommen hun breedte, **Bericht** inbegrepen (daar heeft hij een eigen breedte, en aanpassen neemt zijn breedste samenvatting), geeft niets toe als het venster smal is, en mag de tabel breder zijn dan het paneel. Een balk op de onderrand scrolt hem dan: sleep de schuif, druk op het kale spoor om de schuif onder de aanwijzer te brengen, of gebruik de pijlen aan de uiteinden. Met het toetsenbord scrollen `Shift+Links` / `Shift+Rechts` per vier cellen (het palet heeft `Weergave: Log: Kolommen naar links scrollen` / `rechts`); het horizontale wiel of `Shift`+wiel boven de tabel doen hetzelfde, en een kolom kiezen (`Shift+C`, `Tab`) scrolt hem in beeld. Een tabel die smaller is dan het paneel laat rechts lege ruimte, en de balk van een geselecteerde rij loopt door tot de rand. Elke indeling houdt zijn eigen breedtes (`ui.log_column_widths` en `ui.log_column_widths_scroll`); de eerste sleep, toets of aanpassing in de indeling scroll bewaart elke kolom op de breedte die hij heeft, zodat alleen de kolom die je wijzigt verschuift. In de indeling Aanpassen zegt een aanpassing die niet in het paneel past dat, en wijst naar deze indeling.
+
+*De greep van de laatste kolom.* Ook de laatste kolom heeft een greep, op zijn eigen laatste cel (niet de rand van het paneel, die nog steeds de panelen aanpast): slepen verplaatst hem over de afstand die de aanwijzer aflegde, waarbij **Bericht** het verschil opvangt. **SHA** is standaard 8 cellen breed (de 7 cijfers en die grepencel).
+
 ![De Log met de kolom Wijzigingen getoond: elke commit toont zijn aantal bestanden en toegevoegde en verwijderde regels](../images/log-changes-column.png)
 
 ### Auteurs en `.mailmap`
@@ -83,8 +89,10 @@ geschiedenis op en schrijft `.mailmap`-regels voor je, zie `history-rewrite.md`;
 - **Solo** (de toets `o`, of het menu van de ref, op een ref, map of remote): toont alleen de
   commits van de gesoloede refs; solo er meerdere om hun vereniging te zien. `Shift+O`
   stopt met soloën.
-- **Verberg** een ref (zijn menu) om hem uit de grafiek te halen; *Verborgen n* in de titel
-  van Refs telt ze, **Alles tonen** (`Shift+H`) brengt ze terug.
+- **Verberg** een ref (zijn menu) om hem uit de grafiek te halen: zijn pil verdwijnt en
+  de commits die alleen hij bereikt ook (de uitgecheckte commit blijft altijd staan, met de
+  werkboomrij). *Verborgen n* in de titel van Refs telt ze, **Alles tonen** (`Shift+H`) brengt
+  ze terug. Het totaal op de statusregel telt de zichtbare geschiedenis.
 
 ## Branches, tags en de zijbalk Refs
 
@@ -99,7 +107,7 @@ de zijbalk, of zijn pil in de Log) voor zijn menu. De nuttigste items:
 | Fast-forward `<branch>` naar `<current>` / `<current>` naar `<branch>` | Verplaatst een branch vooruit als dat een fast-forward is; anders grijs met de reden (`uiteengelopen, geen fast-forward`) |
 | Worktree maken van... | Opent een gekoppelde worktree in een eigen tabblad |
 | Pull, Push, Fetch, Upstream instellen... | Netwerkbewerkingen op die branch |
-| In grafiek verbergen / tonen, Solo | Alleen weergave; verbergen of soloën van een ref raakt de repository niet aan |
+| In grafiek verbergen / tonen, Solo | Alleen weergave; verbergen of soloën van een ref (verbergen laat ook de commits vallen die alleen die ref bereikt) raakt de repository niet aan |
 | Hernoemen, Verwijderen | Verwijderen vraagt eerst bevestiging; de bijbehorende remote branch kan ook worden verwijderd |
 | Branchnaam kopiëren, Link naar branch op remote kopiëren | Naar het klembord |
 
@@ -157,8 +165,14 @@ weigeren wordt in rood gemeld zonder het vak te sluiten.
 Bij een commit zonder ref toont aanwijzen van zijn rij ook een vervaagde pil in de kolom Ref met de naam van de branch waartoe die behoort (anders de remote branch), afgeleid uit de geschiedenis; was die branch verwijderd, dan toont een doorgestreepte pil de naam uit de onderwerpregel van de merge-commit die hem samenvoegde; squash-merges, rebases en fast-forwards laten geen spoor na; tags worden nooit als spook getekend; wijs je de pil aan, dan zie je het soort. Er wordt niets gemaakt: gebruik hierboven de opdracht om een branch te maken. **Spookbranch tonen bij de aangewezen commit** onder Instellingen > Log & grafiek zet het uit; waar de kolom Ref te smal is, wordt niets getekend.
 
 **Remotes.** De `+` in de titel REMOTE voegt er een toe; klik met rechts op de naam van een
-remote om hem op te halen, zijn weblink te kopiëren, hem de standaardremote te maken, al zijn
-branches te verbergen, zijn URL's te bewerken of hem te verwijderen.
+remote om hem op te halen, zijn weblink te kopiëren, hem de standaardremote te maken, hem uit
+de grafiek te verbergen, zijn URL's te bewerken of hem te verwijderen. **Een remote verbergen**
+(het oog op zijn rij, *Remote in grafiek verbergen* in het menu, of `Remote: Remote in grafiek
+verbergen...` in het palet) verbergt elke branch die hij nu heeft of later krijgt, en de commits
+die alleen hij bereikt verlaten de Log: zo blader je door één geschiedenis zonder de geschiedenis
+van een niet-verwante archiefremote; haal hem terug met *Remote in grafiek tonen*. Een remote
+tonen toont ook de branches ervan die afzonderlijk verborgen waren. Een branch van een verborgen
+remote zegt dat op de statusregel als zijn oog wordt gebruikt: toon eerst de remote.
 
 **Stashes.** **Stash** zet alles in een stash (niet-gevolgde bestanden inbegrepen); `Ctrl+G m` vraagt
 eerst om een bericht (met AI aan stelt `Ctrl+G` in die prompt er een voor). Klik met rechts

@@ -594,9 +594,9 @@ preview = "önizleme"
 sidebar_sections_scope = "Sol paneldeki bölümler"
 sidebar_sections_scope_help = "Sol panelde hangi bölümlerin gösterileceği ya da gizleneceği seçimi kime ait. repository: her depo kendi kümesini tutar (genel küme başlangıç noktasıdır). global: tüm depolar için tek küme. Seçeneği değiştirmek iki kümeden hiçbirini kaybettirmez."
 # context: a Settings row; how the Log lays its columns out
-log_columns_layout = "Column layout"
+log_columns_layout = "Sütun düzeni"
 # context: help text of the Log column layout row; "fit" and "scroll" are the two choices
-log_columns_layout_help = "How the Log lays its columns out. fit: every column fits the pane and only Message flexes. scroll: columns keep their widths, Message too, and the table scrolls sideways when it is wider than the pane."
+log_columns_layout_help = "Log'un sütunlarını nasıl yerleştirdiği. fit: her sütun bölmeye sığar ve yalnızca Mesaj esner. scroll: sütunlar genişliğini korur, Mesaj da, ve tablo bölmeden genişse yana kayar."
 
 [settings_git]
 default_backend = "Git arka ucu"
@@ -748,8 +748,8 @@ pos_right = "Sağ"
 align_start = "Baş"
 align_center = "Orta"
 align_end = "Son"
-layout_fit = "Fit the pane"
-layout_scroll = "Scroll sideways"
+layout_fit = "Bölmeye sığdır"
+layout_scroll = "Yana kaydır"
 
 [reltime]
 just_now = "az önce"
@@ -1945,8 +1945,8 @@ copy_name = "Uzak depo adını kopyala"
 copy_link = "Uzak depo bağlantısını kopyala"
 set_default = "Varsayılan uzak depo yap"
 edit_remote = "{name} düzenle..."
-hide_remote_in_graph = "Hide remote from graph"
-show_remote_in_graph = "Show remote in graph"
+hide_remote_in_graph = "Uzak depoyu grafikten gizle"
+show_remote_in_graph = "Uzak depoyu grafikte göster"
 remove_remote = "{name} kaldır..."
 default_mark = "(varsayılan)"
 pull_title = "{$Pull}"
@@ -1999,8 +1999,8 @@ default_for_repo = "Bu depo için varsayılan uzak depo"
 copy_name_which = "Hangi uzak deponun adı kopyalansın?"
 copy_link_which = "Hangi uzak deponun bağlantısı kopyalansın?"
 fetch_which = "{$Fetch}: hangi uzak depo?"
-hide_all_which = "Hide which remote from the graph?"
-show_all_which = "Show which remote in the graph again?"
+hide_all_which = "Hangi uzak depo grafikten gizlensin?"
+show_all_which = "Hangi uzak depo grafikte yeniden gösterilsin?"
 select_local_branch = "önce yerel bir dal seçin veya birinde checkout yapın"
 select_remote_first = "önce UZAK bölümünde bir uzak depo seçin (veya bir Remote: komutu kullanın)"
 what_remote_name = "uzak depo adı"
@@ -2012,9 +2012,9 @@ force_confirm_fetch = { git = "{branch}, {remote} deposuna force push ile gönde
 force_confirm = { git = "{branch}, {remote} deposuna force push ile gönderilsin mi?\nLease ile: {remote}/{branch} son fetch'ten sonra ilerlediyse reddedilir. Yalnızca {remote} içinde olan commit'ler atılır.", local = "{branch}, {remote} deposuna zorla gönderilsin mi?\nLease ile: {remote}/{branch} son getirmeden sonra ilerlediyse reddedilir. Yalnızca {remote} içinde olan commit'ler atılır." }
 setting_upstream = "{branch} upstream'i {upstream} olarak ayarlanıyor..."
 unsetting_upstream = "{branch} upstream'i kaldırılıyor..."
-remote_hidden = "{remote} hidden from the graph, branches fetched later too"
-remote_shown = "{remote} shown in the graph again"
-branch_hidden_with_remote = "{name} is hidden with remote {remote}: show the remote first"
+remote_hidden = "{remote} grafikten gizlendi, sonradan fetch edilen dallar da"
+remote_shown = "{remote} grafikte yeniden gösteriliyor"
+branch_hidden_with_remote = "{name}, {remote} uzak deposuyla birlikte gizli: önce uzak depoyu gösterin"
 pinning = "bu depo {command} komutuna sabitleniyor..."
 clearing_pin = "SSH anahtarı sabitlemesi temizleniyor..."
 stashing_continuing = { git = "değişiklikler stash'leniyor, sonra devam ediliyor...", local = "değişiklikler saklanıyor, sonra devam ediliyor..." }
@@ -2358,11 +2358,11 @@ split_move_down = "{$Commit}'i Aşağı Taşı"
 split_reset = "Bölmeyi Sıfırla"
 rewrite_host_howto = "Barındırıcının Dal Korumasını Açıkla"
 rewrite_ai_rules = "YZ ile yeniden yazma kuralları oluştur"
-log_columns_fit = "Fit the Column to Its Content"
-log_columns_fit_all = "Fit All Columns to Content"
-log_scroll_left = "Scroll the Columns Left"
-log_scroll_right = "Scroll the Columns Right"
-log_columns_layout = "Scroll Sideways or Fit the Pane"
+log_columns_fit = "Sütunu İçeriğine Sığdır"
+log_columns_fit_all = "Tüm Sütunları İçeriğe Sığdır"
+log_scroll_left = "Sütunları Sola Kaydır"
+log_scroll_right = "Sütunları Sağa Kaydır"
+log_columns_layout = "Yana Kaydır veya Bölmeye Sığdır"
 
 
 [keymap_ctx]
@@ -2958,8 +2958,8 @@ remote_copy_link_to_remote = "Remote: Uzak Depo Bağlantısını Kopyala"
 remote_fetch_remote = { git = "Remote: Uzak Depoyu Fetch Et...", local = "Remote: Uzak Depoyu Getir..." }
 remote_actions_for_selected_remote = "Remote: Seçili Uzak Depo Eylemleri..."
 repository_ssh_key_for_this_repository = "Depo: Bu Depo İçin SSH Anahtarı..."
-remote_hide_remote_in_graph = "Remote: Hide Remote in Graph..."
-remote_show_remote_in_graph = "Remote: Show Remote in Graph..."
+remote_hide_remote_in_graph = "Remote: Uzak Depoyu Grafikte Gizle..."
+remote_show_remote_in_graph = "Remote: Uzak Depoyu Grafikte Göster..."
 git_new_branch_at_head = "Git: HEAD'de Yeni Dal..."
 git_new_tag_at_head = { git = "Git: HEAD'de Yeni Tag...", local = "Git: HEAD'de Yeni Etiket..." }
 git_push_all_unpushed_tags = { git = "Git: Gönderilmemiş Tüm Tag'leri Push Et", local = "Git: Gönderilmemiş Tüm Etiketleri Gönder" }
@@ -3438,11 +3438,11 @@ git_fetch_selected_tag = "Git: Seçili {$Tag} için {$Fetch}"
 # s24:begin
 rewrite_fix_message_encoding = "Yeniden Yaz: Mesaj Kodlamasını Düzelt..."
 # s24:end
-view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
-view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
-view_log_scroll_left = "View: Log: Scroll the Columns Left"
-view_log_scroll_right = "View: Log: Scroll the Columns Right"
-view_log_columns_layout = "View: Log: Toggle Scroll Sideways for the Columns"
+view_log_column_fit = "Görünüm: Log sütunu: Sütunu İçeriğine Sığdır"
+view_log_column_fit_all = "Görünüm: Log sütunu: Tüm Sütunları İçeriğe Sığdır"
+view_log_scroll_left = "Görünüm: Log: Sütunları Sola Kaydır"
+view_log_scroll_right = "Görünüm: Log: Sütunları Sağa Kaydır"
+view_log_columns_layout = "Görünüm: Log: Sütunlar için Yana Kaydırmayı Aç/Kapat"
 
 [help_section]
 rewrite = "Geçmişi yeniden yaz"
@@ -3500,7 +3500,7 @@ commit_column_1 = "satırları yana kaydır (Shift+tekerlek veya yatay tekerlek 
 commit_column_2 = "bir bölüm seç (şeritler, yazar, tarih), sonra onu genişlet veya daralt ya da tüm bölümleri otomatik genişliğe döndür; başlıktaki sınırlar da sürüklenir ve genişlikler hatırlanır"
 commit_column_3 = "fare: tıklama satırdaki {$commit} öğesini seçer, sağ tık menüsünü açar (Yukarı/Aşağı ile bir satır seçtikten sonra menü tuşu da açar)"
 commit_column_4 = "seçili bölümü sola veya sağa taşı; başlığını sürüklemek aynı işi yapar, sıra hatırlanır"
-log_columns_1 = "bir Log sütunu seç (başlık hücresi yanar); sonra sola veya sağa taşı (başlığı sürüklemek aynı işi yapar), genişlet veya daralt (sınırını sürüklemek aynı işi yapar) ya da genişliğini otomatiğe döndür. Tab / Shift+Tab başka bir sütun seçer, Esc çıkar; düzen hatırlanır"
+log_columns_1 = "bir Log sütunu seç (başlık hücresi yanar); sonra sola veya sağa taşı (başlığı sürüklemek aynı işi yapar), genişlet veya daralt (sınırını sürüklemek aynı işi yapar), genişliğini otomatiğe döndür ya da içeriğine sığdır (sınırına çift tıklamak aynı işi yapar; + her sütunu sığdırır). Tab / Shift+Tab başka bir sütun seçer, Esc çıkar; düzen hatırlanır"
 global_1 = "komut paletini aç - uygulamadaki her komut, her biri kısayoluyla; filtrelemek için yazın, gezinmek için Yukarı/Aşağı veya Ctrl+P/Ctrl+N (j/k değil: onlar yazılır), çalıştırmak için Enter. Gri satırlar şu an neden çalışamadıklarını söyler"
 global_2 = "gezinme öneki - aşağıdaki kendi bölümüne bakın"
 global_3 = "git eylemi öneki - aşağıdaki kendi bölümüne bakın"
@@ -3850,7 +3850,7 @@ split_7 = "{$commits} panelinde o {$commit}'i seçer; bir değişiklikte m veya 
 rewrite_9 = "Boyut sekmesini açar ve geçmişi analiz eder: en büyük dosyalar ve klasörler, silinmiş ama hâlâ saklanan dosyalar; işaretli satırlar kaldırma kurallarına dönüşür"
 rewrite_host_howto = { git = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla push edin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz", local = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla gönderin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz" }
 rewrite_ai_rules = "açıklamanızdan YZ ile yeniden yazma kurallarını oluşturur (hiçbir şey önizlenmez veya uygulanmaz)"
-log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
+log_columns_2 = "sütunlar genişliklerini koruyorsa Log'un sütunlarını yana kaydır (sütun seçicide, Ayarlar'da ya da bir sütun seçiliyken s ile seçilen Yana kaydır düzeni); sığdırma düzeninde her sütun bölmeye sığar"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} veya sağ tık"
@@ -4094,21 +4094,21 @@ column_width_reset = "Log sütun genişlikleri otomatiğe döndü."
 changes_files = { one = "{n} dosya", other = "{n} dosya" }
 changes_files_short = "{n}d"
 # context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
-column_fitted = "{column} fitted to its content: {cells} cells."
+column_fitted = "{column} içeriğine sığdırıldı: {cells} hücre."
 # context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
-column_fit_cut = "{column} needs {need} cells, {have} fit. Switch the columns to Scroll sideways to show it all."
+column_fit_cut = "{column} için {need} hücre gerekir, {have} hücre sığıyor. Hepsini göstermek için sütunları Yana kaydır düzenine geçirin."
 # context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
-column_fit_message = "Message takes the room the other columns leave."
+column_fit_message = "Mesaj, diğer sütunların bıraktığı yeri alır."
 # context: status line after every Log column was fitted to its content
-columns_fitted_all = "All columns fitted to their content."
+columns_fitted_all = "Tüm sütunlar içeriğine sığdırıldı."
 # context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
-columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
+columns_fit_all_cut = "İçeriğe sığdırıldı, ancak şunlar için yer yetmiyor: {columns}."
 # context: status line when a key or command scrolls the Log columns sideways but they fit the pane (the columns layout is "fit"); "Scroll sideways" is the name of the columns layout option
-columns_fit_pane = "The columns fit the pane. Switch the columns to Scroll sideways to scroll."
+columns_fit_pane = "Sütunlar bölmeye sığıyor. Kaydırmak için sütunları Yana kaydır düzenine geçirin."
 # context: status line after the Log columns layout became "scroll sideways": columns keep their widths and the table can be wider than the pane
-layout_now_scroll = "Columns keep their widths and scroll sideways."
+layout_now_scroll = "Sütunlar genişliğini korur ve yana kayar."
 # context: status line after the Log columns layout became "fit": every column fits the pane
-layout_now_fit = "Columns fit the pane."
+layout_now_fit = "Sütunlar bölmeye sığıyor."
 
 [find_bar]
 counter = "{current} / {total}"
@@ -4174,13 +4174,13 @@ changes_files = { one = "{n} dosya değişti", other = "{n} dosya değişti" }
 changes_insertions = { one = "{n} ekleme", other = "{n} ekleme" }
 changes_deletions = { one = "{n} silme", other = "{n} silme" }
 # context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
-column_menu_fit = "Fit {column} to content"
+column_menu_fit = "{column} sütununu içeriğine sığdır"
 # context: a row of the Log columns chooser that fits every column to its content
-column_menu_fit_all = "Fit all columns to content"
+column_menu_fit_all = "Tüm sütunları içeriğe sığdır"
 # context: a row of the Log columns chooser that puts every column width back to automatic
-column_menu_reset = "Reset column widths"
+column_menu_reset = "Sütun genişliklerini sıfırla"
 # context: a checkbox row of the Log columns chooser; when checked, columns keep their widths and the Log scrolls sideways instead of fitting every column into the pane
-column_menu_scroll = "Scroll sideways (columns keep their widths)"
+column_menu_scroll = "Yana kaydır (sütunlar genişliğini korur)"
 
 [overlays]
 select_tab_title = "Sekme Seç ({shown}/{total})"
@@ -5802,8 +5802,8 @@ palette_git_tab = "Etkinlik Günlüğü: Git İşlemleri"
 palette_app_tab = "Etkinlik Günlüğü: Uygulama Günlüğü"
 
 [git_error]
-summary_host_key = "The SSH host key of the remote is not known yet."
-hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
+summary_host_key = "Uzak deponun SSH ana makine anahtarı henüz bilinmiyor."
+hint_host_key = "Bir terminalde bir kez `ssh -T git@<host>` çalıştırın, parmak izini denetleyip yes yanıtını verin, sonra yeniden deneyin."
 title_push = { git = "{$Push} başarısız", local = "Gönderme başarısız" }
 title_pull = { git = "{$Pull} başarısız", local = "Çekme başarısız" }
 title_fetch = { git = "{$Fetch} başarısız", local = "Getirme başarısız" }
@@ -5819,7 +5819,7 @@ done_pull = { git = "{$Pull} tamamlandı", local = "Çekme tamamlandı" }
 summary_non_ff = "Uzak depoda sizde olmayan {$commits} var."
 hint_non_ff = { git = "Önce {$pull} yapın, sonra yeniden deneyin.", local = "Önce uzak depodan çekin, sonra yeniden deneyin." }
 summary_auth = "Uzak depo kimlik bilgilerini reddetti."
-hint_auth = "Kimlik bilgilerinizi (Ayarlar > Entegrasyonlar) veya SSH anahtarınızı denetleyin."
+hint_auth = "Kimlik bilgilerinizi (Ayarlar > Entegrasyonlar) denetleyin, anahtarınızla bir ssh-agent başlatın ya da bu depo için bir SSH anahtarı ayarlayın."
 summary_conflict = "İşlem çakışmalar yüzünden durdu."
 hint_conflict = "Çakışmaları Durum panelinde çözün, sonra devam edin."
 summary_overwrite = "Yerel değişikliklerin üzerine yazılacaktı."

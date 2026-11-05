@@ -208,7 +208,8 @@
 | コマンド | 内容 |
 |---|---|
 | `repo discover [path]`、`repo init <path> [--initial-branch B] [--bare]`、`repo open <path>`、`repo close <path>`、`repo list`、`repo recent [--prune] [--forget P]` | リポジトリと、このセッションのタブ。 |
-| `refs hide <names>...`、`refs show <names>...`、`refs solo <names>...`（いずれも `--clear` 付き） | ログの参照フィルター：非表示、再表示、これらだけを表示（開いているウィンドウに即時反映）。 |
+| `refs hide <names>...`、`refs show <names>...`、`refs solo <names>...`（いずれも `--clear` 付き） | ログの参照フィルター：非表示、再表示、これらだけを表示（開いているウィンドウに即時反映）。非表示の参照は走査からも外れ、それだけが到達できる commit はログから消えます（チェックアウト中の commit は常に残ります）。 |
+| `refs hide --remote <name>...`、`refs show --remote <name>...` | リモートをまるごと非表示または表示します：そのすべてのブランチ。あとで fetch したものも含みます。非表示にする場合、名前はリポジトリのリモートでなければなりません。`show` は、個別に非表示にされていたそのリモートのブランチも解除します。`--clear` は非表示のリモートも空にします。 |
 | `session list`、`session new <name>`、`session rename <old> <new>`、`session delete <name>` | 名前付きセッション（名前変更と削除は、そのデーモンが動作中は拒否されます）。 |
 | `daemon run`、`daemon start`、`daemon stop [--all]`、`daemon restart`、`daemon status` | セッションのバックグラウンドプロセス（別名 `server`）。デーモンが動いていない場合、各コマンドは自分の実行中だけ有効な組み込みデーモンを起動します。 |
 | `config path`、`config get <key>`、`config set <key> <value>` | 設定（[設定リファレンス](config-reference.md)）。`config set ui.theme` と `ui.graph_color_theme` は、名前をレジストリと照合します。 |

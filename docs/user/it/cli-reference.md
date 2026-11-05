@@ -240,7 +240,8 @@ Più `commit --ai` e `stash push --ai`. Il modello viene chiamato dal processo
 | Comando | Cosa fa |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Repository e schede di questa sessione. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (ciascuno con `--clear`) | Il filtro dei ref del Log: nascondi, mostra di nuovo, mostra solo questi (in tempo reale in una finestra aperta). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (ciascuno con `--clear`) | Il filtro dei ref del Log: nascondi, mostra di nuovo, mostra solo questi (in tempo reale in una finestra aperta). I ref nascosti escono anche dalla visita: i commit raggiunti solo da loro spariscono dal Log (il commit attivo resta sempre). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Nascondono o mostrano interi remoti: tutti i loro branch, anche quelli recuperati in seguito. Il nome deve essere un remoto del repository (per nascondere). `show` toglie anche i branch del remoto che erano stati nascosti uno per uno; `--clear` svuota anche i remoti nascosti. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Sessioni con nome (rename / delete rifiutano finché il suo daemon è in esecuzione). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | Il processo in background della sessione (alias `server`). Senza un daemon in esecuzione, ogni comando ne avvia uno incorporato per la propria durata. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Impostazioni ([Riferimento della configurazione](config-reference.md)). `config set ui.theme` e `ui.graph_color_theme` verificano il nome sul registro. |

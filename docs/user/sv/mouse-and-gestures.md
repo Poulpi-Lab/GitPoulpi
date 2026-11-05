@@ -109,6 +109,8 @@ rullningslister. Klicka på ett märke för att gå dit.
 - **Dra i nedre kanten** av en Refs-sektion för att ändra dess höjd.
 - **Dra i nedre kanten** av commit-meddelandeblocket i högra panelen.
 - **Dra i gränsen mellan två Log-rubriker** (som standard mellanrummet, från rubriken eller från var som helst nedåt i tabellen; Inställningar > Log & graf > Kolumnstorlek) för att ändra storlek på en kolumn (tangentbordet: `Shift+C` för att välja en kolumn, sedan `]` / `[`).
+- **Dubbelklicka på gränsen mellan två Log-rubriker** för att anpassa kolumnen till vänster om den efter dess innehåll (tangentbordet: `Shift+C` för att välja en kolumn, sedan `=`; `+` anpassar alla kolumner). Sista kolumnen har ett grepp på sin egen sista cell: dra i det för att ändra storlek på den kolumnen, så tar kolumnen Meddelande mellanskillnaden.
+- **Rulla Log i sidled** (kolumnlayouten `scroll`; Inställningar > Log & graf > Kolumnlayout, eller väljarens ruta `Rulla i sidled`): det horisontella hjulet eller `Shift`+hjul över tabellen, stapeln på nedre kanten (dra i dess handtag, tryck på det bara spåret, klicka på dess ändpilar) eller `Shift+Vänster` / `Shift+Höger`. I standardlayouten `fit` fyller kolumnerna rutan och det finns inget att rulla.
 - **Dra en Log-rubrik** för att flytta kolumnen: ett spöke av dess namn följer pekaren, rubriken den lämnade dämpas och en accentstapel markerar platsen där den skulle hamna. Kolumnerna flyttas när du släpper; `Esc` avbryter, och pekaren visar den öppna handen medan du bär den (tangentbordet: `Shift+C` för att välja en kolumn, sedan `<` / `>`).
 
 GitPoulpi kommer ihåg varje storlek. Se
@@ -216,7 +218,7 @@ Se [Värdtjänster och ärendehantering](hosting-integration.md).
   på commiten.
 - **Högerklicka på en ref-pill** för en meny med refens åtgärder och commitens
   åtgärder.
-- **Högerklicka på rubriken** för att visa eller dölja kolumner: en checklista (`[x]` / `[ ]`) med ett ✕ i titeln; klicka på en rad eller använd piltangenterna och `Space` / `Enter`, stäng den sedan med ✕, `Esc` eller ett klick utanför (paletten: `Vy: Log: välj vilka kolumner som visas`).
+- **Högerklicka på rubriken** för att visa eller dölja kolumner: en checklista (`[x]` / `[ ]`) med ett ✕ i titeln; klicka på en rad eller använd piltangenterna och `Space` / `Enter`, stäng den sedan med ✕, `Esc` eller ett klick utanför (paletten: `Vy: Log: välj vilka kolumner som visas`). Under kryssrutorna: `Anpassa <column> efter innehållet` (kolumnen du högerklickade på), `Anpassa alla kolumner efter innehållet` och `Återställ kolumnbredder`.
 - **Klicka på `↑`, `↓` eller `✕`** i sökfältet för att gå till föregående eller
   nästa träff, eller för att stänga fältet.
 - **Klicka på `#12`, `ABC-12` eller `AB#12`** i ett commit-meddelande, i högra

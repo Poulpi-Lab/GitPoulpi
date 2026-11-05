@@ -110,6 +110,8 @@ Bildlaufleisten. Klicken Sie auf eine Markierung, um dorthin zu gehen.
 - **Ziehen Sie den unteren Rand** des Blocks der Commit-Nachricht im rechten Bereich.
 - **Ziehen Sie den Rand zwischen zwei Log-Kopfzellen** (standardmäßig die Lücke, von der Kopfzeile oder von irgendwo in der Tabelle; Einstellungen > Verlauf & Graph > Spaltengröße ändern), um eine Spalte in der Größe zu
   ändern (per Tastatur: `Shift+C`, um eine Spalte zu wählen, dann `]` / `[`).
+- **Doppelklicken Sie auf den Rand zwischen zwei Log-Kopfzellen**, um die Spalte links davon an ihren Inhalt anzupassen (per Tastatur: `Shift+C`, um eine Spalte zu wählen, dann `=`; `+` passt alle Spalten an). Die letzte Spalte hat einen Griff auf ihrer eigenen letzten Zelle: Ziehen Sie ihn, um diese Spalte in der Größe zu ändern, wobei die Spalte Nachricht den Unterschied aufnimmt.
+- **Das Log seitlich scrollen** (das Spaltenlayout `scroll`; Einstellungen > Verlauf & Graph > Spaltenlayout oder das Kontrollkästchen `Seitlich scrollen` der Auswahl): das horizontale Mausrad oder `Shift`+Rad über der Tabelle, die Leiste am unteren Rand (Griff ziehen, auf die leere Schiene klicken, Endpfeile anklicken) oder `Shift+Links` / `Shift+Rechts`. Im Standardlayout `fit` füllen die Spalten den Bereich, und es gibt nichts zu scrollen.
 - **Ziehen Sie eine Log-Kopfzelle**, um die Spalte zu verschieben: Ein Schatten ihres Namens folgt dem Zeiger, die verlassene Kopfzelle wird abgedunkelt, und ein Akzentbalken markiert den Platz, an dem sie landen würde. Die Spalten wandern beim Loslassen; `Esc` bricht ab, und der Zeiger zeigt die offene Hand, solange Sie sie tragen (per Tastatur: `Shift+C`, um eine Spalte zu wählen, dann `<` / `>`).
 
 GitPoulpi merkt sich jede Größe. Siehe
@@ -223,7 +225,7 @@ Siehe [Hosting und Issue-Tracker](hosting-integration.md).
   Ref am Commit.
 - **Rechtsklick auf eine Ref-Pille** öffnet ein Menü mit den Aktionen der Ref und des
   Commits.
-- **Rechtsklick auf die Kopfzeile** blendet Spalten ein oder aus: eine Checkliste (`[x]` / `[ ]`) mit einem ✕ im Titel; klicken Sie auf eine Zeile oder nutzen Sie die Pfeiltasten und `Space` / `Enter`, und schließen Sie sie mit dem ✕, `Esc` oder einem Klick daneben (die Palette: `Ansicht: Log: Anzuzeigende Spalten wählen`).
+- **Rechtsklick auf die Kopfzeile** blendet Spalten ein oder aus: eine Checkliste (`[x]` / `[ ]`) mit einem ✕ im Titel; klicken Sie auf eine Zeile oder nutzen Sie die Pfeiltasten und `Space` / `Enter`, und schließen Sie sie mit dem ✕, `Esc` oder einem Klick daneben (die Palette: `Ansicht: Log: Anzuzeigende Spalten wählen`). Unter den Kontrollkästchen: `<Spalte> an Inhalt anpassen` (die angeklickte Spalte), `Alle Spalten an Inhalt anpassen` und `Spaltenbreiten zurücksetzen`.
 - **Klicken Sie auf `↑`, `↓` oder `✕`** in der Suchleiste, um zum vorherigen oder nächsten
   Treffer zu gehen oder die Leiste zu schließen.
 - **Klicken Sie auf `#12`, `ABC-12` oder `AB#12`** in einer Commit-Nachricht im rechten

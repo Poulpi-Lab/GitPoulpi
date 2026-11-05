@@ -208,7 +208,8 @@
 | 命令 | 作用 |
 |---|---|
 | `repo discover [path]`、`repo init <path> [--initial-branch B] [--bare]`、`repo open <path>`、`repo close <path>`、`repo list`、`repo recent [--prune] [--forget P]` | 仓库和此会话的标签页。 |
-| `refs hide <names>...`、`refs show <names>...`、`refs solo <names>...`（均可带 `--clear`） | Log 的 ref 过滤器：隐藏、重新显示、只显示这些（在已打开的窗口中实时生效）。 |
+| `refs hide <names>...`、`refs show <names>...`、`refs solo <names>...`（均可带 `--clear`） | Log 的 ref 过滤器：隐藏、重新显示、只显示这些（在已打开的窗口中实时生效）。被隐藏的引用也会退出遍历：只有它们能到达的 commit 会从 Log 中消失（已检出的 commit 始终保留）。 |
+| `refs hide --remote <name>...`、`refs show --remote <name>...` | 整体隐藏或显示远程：它的每个分支，包括之后获取的。（隐藏时）名称必须是该仓库的某个远程。`show` 还会取消被逐个隐藏的该远程分支；`--clear` 也会清空已隐藏的远程。 |
 | `session list`、`session new <name>`、`session rename <old> <new>`、`session delete <name>` | 命名会话（其守护进程运行时，重命名 / 删除会被拒绝）。 |
 | `daemon run`、`daemon start`、`daemon stop [--all]`、`daemon restart`、`daemon status` | 会话的后台进程（别名 `server`）。没有运行中的守护进程时，每条命令会在自己的生命周期内启动一个嵌入式守护进程。 |
 | `config path`、`config get <key>`、`config set <key> <value>` | 设置（[配置参考](config-reference.md)）。`config set ui.theme` 和 `ui.graph_color_theme` 会对照注册表检查名称。 |

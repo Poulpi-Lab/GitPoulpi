@@ -123,6 +123,8 @@ conflicto en sus barras de desplazamiento. Haz clic en una marca para ir allí.
   derecho.
 - **Arrastra el borde entre dos cabeceras del Log** (por defecto el hueco, desde la cabecera o desde cualquier punto de la tabla; Ajustes > Log y grafo > Redimensionado de columnas) para cambiar el tamaño de una
   columna (con el teclado: `Shift+C` para elegir una columna y luego `]` / `[`).
+- **Haz doble clic en el borde entre dos cabeceras del Log** para ajustar la columna de su izquierda a su contenido (con el teclado: `Shift+C` para elegir una columna y luego `=`; `+` ajusta todas las columnas). La última columna tiene un agarre en su propia última celda: arrástralo para cambiar el tamaño de esa columna, y la columna Mensaje absorbe la diferencia.
+- **Desplaza el Log lateralmente** (la disposición de columnas `scroll`; Ajustes > Log y grafo > Disposición de columnas, o la casilla `Desplazar lateralmente` del selector): la rueda horizontal o `Shift`+rueda sobre la tabla, la barra del borde inferior (arrastra su pulgar, pulsa la pista vacía, haz clic en sus flechas de los extremos), o `Shift+Izquierda` / `Shift+Derecha`. En la disposición `fit` por defecto las columnas llenan el panel y no hay nada que desplazar.
 - **Arrastra una cabecera del Log** para mover la columna: un fantasma de su nombre sigue al puntero, la cabecera que dejó se atenúa y una barra de acento marca el hueco donde caería. Las columnas se mueven al soltar; `Esc` cancela, y el puntero muestra la mano abierta mientras la llevas (con el teclado: `Shift+C` para elegir una columna y luego `<` / `>`).
 
 GitPoulpi recuerda cada tamaño. Consulta
@@ -237,7 +239,7 @@ Consulta [Alojamiento y gestores de issues](hosting-integration.md).
   cada ref del commit.
 - **Clic derecho en un chip de ref** para ver un menú con las acciones de la
   ref y las acciones del commit.
-- **Clic derecho en la cabecera** para mostrar u ocultar columnas: una lista de casillas (`[x]` / `[ ]`) con una ✕ en su título; haz clic en una fila o usa las flechas y `Espacio` / `Intro`, y ciérrala con la ✕, `Esc` o un clic fuera (la paleta: `Ver: Log: elegir las columnas que se muestran`).
+- **Clic derecho en la cabecera** para mostrar u ocultar columnas: una lista de casillas (`[x]` / `[ ]`) con una ✕ en su título; haz clic en una fila o usa las flechas y `Espacio` / `Intro`, y ciérrala con la ✕, `Esc` o un clic fuera (la paleta: `Ver: Log: elegir las columnas que se muestran`). Bajo las casillas: `Ajustar <columna> a su contenido` (la columna sobre la que se hizo clic derecho), `Ajustar todas las columnas a su contenido` y `Restablecer los anchos de columna`.
 - **Haz clic en `↑`, `↓` o `✕`** en la barra de búsqueda para ir a la coincidencia
   anterior o siguiente, o para cerrar la barra.
 - **Haz clic en `#12`, `ABC-12` o `AB#12`** en el mensaje de un commit, en el

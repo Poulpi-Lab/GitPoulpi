@@ -278,21 +278,21 @@ redo = "Rehace la operación que `undo` acaba de deshacer, hasta el estado exact
 "redo --expect" = "Rehace solo si esta sigue siendo la última entrada deshecha"
 "redo --yes" = "Continúa cuando el redo es arriesgado; sin esto, código de salida 3"
 "refs hide" = """Oculta refs del grafo de commits (el "Ocultar" de la TUI): el filtro de visualización por repositorio en `repo-state.toml`, que una TUI abierta sigue en vivo. Los nombres se escriben como los escribe el listado de refs (`feature/x`, `origin/main`, un nombre de tag)"""
-"refs hide --clear" = "Deja de ocultar todas las refs ocultas (además de las indicadas)"
+"refs hide --clear" = "Deja de ocultar todas las refs y remotos ocultos (además de los indicados)"
 "refs hide --names" = "Refs a ocultar"
 "refs hide#long" = """
-Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+Oculta refs del grafo de commits (el "Ocultar" de la TUI): el filtro de visualización por repositorio en `repo-state.toml`, que una TUI abierta sigue en vivo. Los nombres se escriben como los escribe el listado de refs (`feature/x`, `origin/main`, un nombre de tag).
 
-`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
-"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
+`--remote <name>...` oculta un remoto entero (todas sus ramas, también las que se obtengan después): la forma de mirar una historia sin la de un remoto de archivo aparte."""
+"refs hide --remote" = "Remotos a ocultar enteros (nombres como los escribe `remote list`)"
 "refs show" = "Vuelve a mostrar refs: las quita de los conjuntos de ocultas y de solo"
-"refs show --clear" = "Reinicia todo el filtro: nada oculto, nada en solo"
+"refs show --clear" = "Reinicia todo el filtro: nada oculto (remotos incluidos), nada en solo"
 "refs show --names" = "Refs a volver a mostrar"
 "refs show#long" = """
-Show refs again: removes them from the hidden and solo sets.
+Vuelve a mostrar refs: las quita de los conjuntos de ocultas y de solo.
 
-`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
-"refs show --remote" = "Remotes to show again"
+`--remote <name>...` vuelve a mostrar un remoto entero, con todas sus ramas que se habían ocultado una a una."""
+"refs show --remote" = "Remotos a volver a mostrar"
 "refs solo" = "Muestra solo estas refs (y lo que alcanzan) en el grafo de commits"
 "refs solo --clear" = "Deja de mostrar en solo todas las refs en solo (además de las indicadas)"
 "refs solo --names" = "Refs a mostrar en solo"

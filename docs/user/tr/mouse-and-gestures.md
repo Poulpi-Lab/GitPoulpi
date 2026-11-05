@@ -122,6 +122,8 @@ göründüğü her diğer yer için `▌`. Merge düzenleyicisi her çakışmay�
 - Sağ paneldeki commit mesajı bloğunun **alt kenarlığını sürükleyin**.
 - Bir sütunu yeniden boyutlandırmak için **iki Log başlığı arasındaki
   kenarlığı sürükleyin** (varsayılan olarak boşluk, başlıktan ya da tablonun herhangi bir yerinden; Ayarlar > Log ve grafik > Sütun yeniden boyutlandırma) (klavyede: sütunu seçmek için `Shift+C`, sonra `]` / `[`).
+- Sütunu solundaki içeriğe sığdırmak için **iki Log başlığı arasındaki kenarlığa çift tıklayın** (klavyede: sütunu seçmek için `Shift+C`, sonra `=`; `+` her sütunu sığdırır). Son sütunun kendi son hücresinde bir tutamacı vardır: o sütunu yeniden boyutlandırmak için sürükleyin, farkı Mesaj sütunu karşılar.
+- **Log'u yana kaydırın** (`scroll` sütun düzeni; Ayarlar > Log ve grafik > Sütun düzeni ya da seçicinin `Yana kaydır` onay kutusu): tabloda yatay tekerlek veya `Shift`+tekerlek, alt kenarlıktaki çubuk (tutamacını sürükleyin, boş yola basın, uç oklarına tıklayın) ya da `Shift+Left` / `Shift+Right`. Varsayılan `fit` düzeninde sütunlar bölmeyi doldurur ve kaydırılacak bir şey yoktur.
 - Sütunu taşımak için **bir Log başlığını sürükleyin**: adının bir hayaleti imleci izler, ayrıldığı başlık soluklaşır ve bir vurgu çubuğu ineceği yeri işaretler. Sütunlar bıraktığınızda taşınır; `Esc` iptal eder ve onu taşırken imleç açık el olur (klavyede: sütunu seçmek için `Shift+C`, sonra `<` / `>`).
 
 GitPoulpi her boyutu hatırlar. Bkz.
@@ -231,7 +233,7 @@ Bkz. [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md).
   için bir alt menüsü vardır.
 - Ref'in eylemlerini ve commit'in eylemlerini içeren tek bir menü için **bir ref
   hapına sağ tıklayın**.
-- Sütunları göstermek veya gizlemek için **başlığa sağ tıklayın**: başlığında ✕ bulunan bir onay listesi (`[x]` / `[ ]`); bir satıra tıklayın ya da oklarla `Space` / `Enter` kullanın, sonra ✕, `Esc` ya da dışarı bir tıklamayla kapatın (palet: `Görünüm: Log: Gösterilecek sütunları seç`).
+- Sütunları göstermek veya gizlemek için **başlığa sağ tıklayın**: başlığında ✕ bulunan bir onay listesi (`[x]` / `[ ]`); bir satıra tıklayın ya da oklarla `Space` / `Enter` kullanın, sonra ✕, `Esc` ya da dışarı bir tıklamayla kapatın (palet: `Görünüm: Log: Gösterilecek sütunları seç`). Onay kutularının altında: `<column> sütununu içeriğine sığdır` (sağ tıklanan sütun), `Tüm sütunları içeriğe sığdır` ve `Sütun genişliklerini sıfırla`.
 - Önceki veya sonraki eşleşmeye gitmek ya da çubuğu kapatmak için arama
   çubuğundaki **`↑`, `↓` veya `✕`'e tıklayın**.
 - O issue'yu veya pull request'i tarayıcıda açmak için sağ paneldeki bir commit

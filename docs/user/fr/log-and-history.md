@@ -68,6 +68,12 @@ place, Graphe en premier, et retrouvent vos largeurs quand la fenêtre s'agrandi
 
 Glisser un en-tête montre un fantôme de son nom qui suit le pointeur et une barre d'accent là où la colonne atterrirait ; l'ordre change au relâchement, et `Échap` annule. Le sélecteur ouvert par le clic droit est une liste de cases (`[x]` / `[ ]`) avec un ✕ dans son titre ; on l'atteint aussi depuis la palette (`Affichage : Log : Choisir les colonnes à afficher`), on s'y déplace avec les flèches et on coche avec `Space` / `Enter`.
 
+*Ajuster au contenu.* Un **double-clic** sur la bordure d'une colonne ajuste la colonne à sa gauche à son contenu visible le plus large et à son en-tête (les caractères larges et les emoji sont comptés selon les cellules qu'ils occupent). Dans la disposition ajustée, le Log remplit toujours son volet : une colonne s'arrête donc à ce que le volet peut lui donner une fois que **Message** garde sa part et chaque autre colonne sa largeur minimale ; la ligne d'état dit alors `Auteur demande 34 cellules, 20 tiennent.` Même chose au clavier : avec une colonne choisie (`Shift+C`, `Tab`), `=` l'ajuste et `+` ajuste toutes les colonnes ; la palette a `Affichage : Colonne du Log : Ajuster la colonne à son contenu` et `... Ajuster toutes les colonnes à leur contenu` ; le sélecteur du clic droit propose `Ajuster <colonne> à son contenu` (la colonne sous le pointeur), `Ajuster toutes les colonnes à leur contenu` et `Réinitialiser les largeurs des colonnes` sous ses cases. **Message** est la colonne flexible et n'a pas de largeur propre à ajuster : elle prend la place que les autres laissent.
+
+*Défilement latéral.* Par défaut, chaque colonne tient dans le volet. Dans la disposition **défilement** (la case `Défilement latéral (les colonnes gardent leur largeur)` du sélecteur, Paramètres > Journal et graphe > Disposition des colonnes, la commande `Affichage : Log : Activer ou désactiver le défilement latéral des colonnes` de la palette, ou `s` quand une colonne est choisie) les colonnes gardent leur largeur, **Message** comprise (elle a alors une largeur propre, et l'ajuster prend son résumé le plus large), rien n'est sacrifié quand la fenêtre est étroite, et le tableau peut être plus large que le volet. Une barre sur la bordure inférieure le fait alors défiler : glissez le curseur, appuyez sur la piste vide pour amener le curseur sous le pointeur, ou utilisez ses flèches d'extrémité. Au clavier, `Shift+Left` / `Shift+Right` font défiler de quatre cellules (la palette a `Affichage : Log : Faire défiler les colonnes vers la gauche` / `vers la droite`) ; la molette horizontale ou `Shift`+molette sur le tableau font de même, et choisir une colonne (`Shift+C`, `Tab`) la fait défiler dans la vue. Un tableau plus étroit que le volet laisse un espace vide à droite, et la bande d'une ligne sélectionnée va jusqu'à la bordure. Chaque disposition garde ses propres largeurs (`ui.log_column_widths` et `ui.log_column_widths_scroll`) ; le premier glissement, la première touche ou le premier ajustement dans la disposition défilement enregistre chaque colonne à la largeur qu'elle a, si bien que seule celle que vous changez bouge. Dans la disposition ajustée, un ajustement qui ne tient pas dans le volet le dit et renvoie à cette disposition.
+
+*La poignée de la dernière colonne.* La dernière colonne a aussi une poignée, sur sa propre dernière cellule (pas la bordure du volet, qui redimensionne toujours les volets) : un glissement la déplace de la distance parcourue par le pointeur, **Message** absorbant la différence. **SHA** fait 8 cellules par défaut (les 7 chiffres et cette cellule de poignée).
+
 Au clavier, `Shift+C` (ou `Affichage : Colonne du Log : Choisir une colonne à déplacer ou à dimensionner` dans la palette) choisit une colonne, dont la cellule d'en-tête s'allume. Ensuite `Tab` / `Shift+Tab` en choisissent une autre, `<` / `>` la déplacent d'une place vers la gauche ou la droite parmi les colonnes affichées (l'équivalent de faire glisser son en-tête), `]` / `[` l'élargissent ou la rétrécissent (l'équivalent de faire glisser sa limite ; la dernière colonne déplace son bord gauche), `0` rend toutes les largeurs automatiques, et `Échap` ou `Enter` quittent. Les flèches continuent de parcourir les commits entre-temps. L'ordre et les largeurs sont mémorisés comme après un glissement, et appartiennent au Log seul : la colonne des commits à côté d'un diff garde sa propre liste.
 
 ![Le Log avec la colonne Modifs affichée : chaque commit indique son nombre de fichiers et de lignes ajoutées et supprimées](../images/log-changes-column.png)
@@ -98,8 +104,11 @@ l'historique et écrit les lignes de `.mailmap` à votre place, voir
 - **Solo** (la touche `o`, ou le menu de la ref, sur une ref, un dossier ou un
   remote) : n'affiche que les commits des refs en solo ; mettez-en plusieurs en
   solo pour voir leur union. `Shift+O` arrête le solo.
-- **Masquer** une ref (son menu) pour la sortir du graphe ; *Masquées n* dans le
-  titre de Refs les compte, **Tout afficher** (`Shift+H`) les ramène.
+- **Masquer** une ref (son menu) pour la sortir du graphe : sa pastille disparaît,
+  et les commits que seule elle atteint aussi (le commit extrait reste toujours,
+  avec la ligne de l'arbre de travail). *Masquées n* dans le titre de Refs les
+  compte, **Tout afficher** (`Shift+H`) les ramène. Le total de la ligne d'état
+  compte l'historique visible.
 
 ## Branches, tags et le panneau Refs
 
@@ -115,7 +124,7 @@ menu. Les entrées les plus utiles :
 | Fast-forward `<branche>` vers `<courante>` / `<courante>` vers `<branche>` | Avance une branche quand c'est un fast-forward ; sinon grisé avec la raison (`diverged, not a fast-forward`) |
 | Créer un worktree depuis... | Ouvre un worktree lié dans son propre onglet |
 | Pull, Push, Fetch, Définir l'amont... | Opérations réseau sur cette branche |
-| Masquer / Afficher dans le graphe, Solo | Affichage seulement ; masquent ou mettent en solo une ref sans toucher au dépôt |
+| Masquer / Afficher dans le graphe, Solo | Affichage seulement ; masquent ou mettent en solo une ref (masquer retire aussi les commits que seule cette ref atteint) sans toucher au dépôt |
 | Renommer, Supprimer | Supprimer demande d'abord ; son jumeau distant peut aussi être supprimé |
 | Copier le nom de la branche, Copier le lien de la branche sur le distant | Vers le presse-papiers |
 
@@ -175,7 +184,14 @@ Sur un commit sans ref, survoler sa ligne affiche aussi, dans la colonne Ref, un
 
 **Remotes.** Le `+` dans le titre DISTANTES en ajoute un ; clic droit sur le nom
 d'un remote pour le fetcher, copier son lien web, en faire le remote par défaut,
-masquer toutes ses branches, modifier ses URL ou le retirer.
+le masquer du graphe, modifier ses URL ou le retirer. **Masquer un remote** (l'œil
+de sa ligne, l'entrée de menu *Masquer le distant du graphe*, ou `Distant : Masquer
+le distant du graphe...` dans la palette) masque toutes les branches qu'il a ou
+aura, et les commits que seul lui atteint quittent le Log : le moyen de parcourir
+un historique sans celui d'un remote d'archive sans rapport, et de le ramener avec
+*Afficher le distant dans le graphe*. Afficher un remote affiche aussi ses branches
+qui avaient été masquées une par une. Une branche d'un remote masqué le dit sur la
+ligne d'état si l'on clique son œil : affichez d'abord le remote.
 
 **Stashes.** **Stash** fait un stash de tout (fichiers non suivis compris) ;
 `Ctrl+G m` demande d'abord un message (avec l'IA activée, `Ctrl+G` dans cette

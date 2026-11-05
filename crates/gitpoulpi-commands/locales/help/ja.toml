@@ -278,21 +278,21 @@ redo = "`undo` が取り消した操作を、記録された状態そのまま�
 "redo --expect" = "これが取り消された最新のエントリのままである場合のみやり直します"
 "redo --yes" = "やり直しに危険がある場合でも実行します。付けない場合は終了コード 3"
 "refs hide" = """コミットグラフから参照を非表示にします（TUI の「非表示」）：`repo-state.toml` にあるリポジトリごとの表示フィルターで、開いている TUI にもすぐに反映されます。名前は参照一覧の表記で指定します（`feature/x`、`origin/main`、タグ名）"""
-"refs hide --clear" = "非表示の参照をすべて表示に戻します（指定した名前に加えて）"
+"refs hide --clear" = "非表示の参照とリモートをすべて表示に戻します（指定した名前に加えて）"
 "refs hide --names" = "非表示にする参照"
 "refs hide#long" = """
-Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+コミットグラフから参照を非表示にします（TUI の「非表示」）：`repo-state.toml` にあるリポジトリごとの表示フィルターで、開いている TUI にもすぐに反映されます。名前は参照一覧の表記で指定します（`feature/x`、`origin/main`、タグ名）。
 
-`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
-"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
+`--remote <name>...` はリモートをまるごと非表示にします（そのすべてのブランチ。あとで取得したものも）：別個のアーカイブ用リモートの履歴を除いて、一つの履歴だけを見るための手段です。"""
+"refs hide --remote" = "まるごと非表示にするリモート（名前は `remote list` の表記）"
 "refs show" = "参照を再び表示します：非表示とソロのセットから取り除きます"
-"refs show --clear" = "フィルター全体をリセットします：非表示もソロもなし"
+"refs show --clear" = "フィルター全体をリセットします：非表示（リモートを含む）もソロもなし"
 "refs show --names" = "再び表示する参照"
 "refs show#long" = """
-Show refs again: removes them from the hidden and solo sets.
+参照を再び表示します：非表示とソロのセットから取り除きます。
 
-`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
-"refs show --remote" = "Remotes to show again"
+`--remote <name>...` はリモートをまるごと再表示します。個別に非表示にされていたそのブランチもすべて表示に戻ります。"""
+"refs show --remote" = "再び表示するリモート"
 "refs solo" = "コミットグラフに、これらの参照（とそこから到達できるもの）だけを表示します"
 "refs solo --clear" = "ソロ表示中のすべての参照を解除します（指定した名前に加えて）"
 "refs solo --names" = "ソロ表示にする参照"

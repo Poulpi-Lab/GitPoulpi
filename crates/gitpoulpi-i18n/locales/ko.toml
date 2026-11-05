@@ -593,9 +593,9 @@ preview = "미리보기"
 sidebar_sections_scope = "왼쪽 창 섹션"
 sidebar_sections_scope_help = "왼쪽 창에서 표시하거나 숨긴 섹션을 누구의 선택으로 적용할지 정합니다. 저장소별: 저장소마다 자기 설정을 가집니다(전역 설정이 시작점). 전역: 모든 저장소가 하나의 설정을 씁니다. 전환해도 어느 쪽 설정도 사라지지 않습니다."
 # context: a Settings row; how the Log lays its columns out
-log_columns_layout = "Column layout"
+log_columns_layout = "열 배치"
 # context: help text of the Log column layout row; "fit" and "scroll" are the two choices
-log_columns_layout_help = "How the Log lays its columns out. fit: every column fits the pane and only Message flexes. scroll: columns keep their widths, Message too, and the table scrolls sideways when it is wider than the pane."
+log_columns_layout_help = "Log가 열을 배치하는 방식입니다. fit: 모든 열이 창에 맞춰지고 메시지만 늘어납니다. scroll: 열이 너비를 유지하며 메시지도 마찬가지이고, 표가 창보다 넓으면 옆으로 스크롤됩니다."
 
 [settings_git]
 default_backend = "Git 백엔드"
@@ -747,8 +747,8 @@ pos_right = "오른쪽"
 align_start = "시작"
 align_center = "가운데"
 align_end = "끝"
-layout_fit = "Fit the pane"
-layout_scroll = "Scroll sideways"
+layout_fit = "창에 맞춤"
+layout_scroll = "옆으로 스크롤"
 
 [reltime]
 just_now = "방금"
@@ -1943,8 +1943,8 @@ copy_name = "리모트 이름 복사"
 copy_link = "리모트 링크 복사"
 set_default = "기본 리모트로 설정"
 edit_remote = "{name} 편집..."
-hide_remote_in_graph = "Hide remote from graph"
-show_remote_in_graph = "Show remote in graph"
+hide_remote_in_graph = "그래프에서 리모트 숨기기"
+show_remote_in_graph = "그래프에 리모트 표시"
 remove_remote = "{name} 제거..."
 default_mark = "(기본)"
 pull_title = "{$Pull}"
@@ -1997,8 +1997,8 @@ default_for_repo = "이 저장소의 기본 리모트"
 copy_name_which = "어느 리모트의 이름을 복사하시겠습니까?"
 copy_link_which = "어느 리모트의 링크를 복사하시겠습니까?"
 fetch_which = "어느 리모트를 {$Fetch}하시겠습니까?"
-hide_all_which = "Hide which remote from the graph?"
-show_all_which = "Show which remote in the graph again?"
+hide_all_which = "그래프에서 숨길 리모트는?"
+show_all_which = "그래프에 다시 표시할 리모트는?"
 select_local_branch = "먼저 로컬 브랜치를 선택하거나 체크아웃하세요"
 select_remote_first = "먼저 리모트 섹션에서 리모트를 선택하세요 (또는 리모트: 명령 사용)"
 what_remote_name = "리모트 이름"
@@ -2010,9 +2010,9 @@ force_confirm_fetch = { git = "{branch}을(를) {remote}(으)로 force push하�
 force_confirm = { git = "{branch}을(를) {remote}(으)로 force push하시겠습니까?\nlease 사용: 마지막 {$fetch} 이후 {remote}/{branch}이(가) 이동했으면 거부됩니다. {remote}에만 있는 {$commit}은 버려집니다.", local = "{branch}을(를) {remote}(으)로 강제 푸시하시겠습니까?\nlease 사용: 마지막 {$fetch} 이후 {remote}/{branch}이(가) 이동했으면 거부됩니다. {remote}에만 있는 {$commit}은 버려집니다." }
 setting_upstream = "{branch}의 업스트림을 {upstream}(으)로 설정하는 중..."
 unsetting_upstream = "{branch}의 업스트림을 해제하는 중..."
-remote_hidden = "{remote} hidden from the graph, branches fetched later too"
-remote_shown = "{remote} shown in the graph again"
-branch_hidden_with_remote = "{name} is hidden with remote {remote}: show the remote first"
+remote_hidden = "{remote}을(를) 그래프에서 숨겼습니다. 나중에 {$fetch}하는 브랜치도 숨깁니다"
+remote_shown = "{remote}을(를) 그래프에 다시 표시했습니다"
+branch_hidden_with_remote = "{name}은(는) 리모트 {remote}와(과) 함께 숨겨져 있습니다. 먼저 리모트를 표시하세요"
 pinning = "이 저장소를 {command}에 고정하는 중..."
 clearing_pin = "SSH 키 고정을 해제하는 중..."
 stashing_continuing = { git = "변경 사항을 stash한 뒤 계속하는 중...", local = "변경 사항을 스태시한 뒤 계속하는 중..." }
@@ -2356,11 +2356,11 @@ split_move_down = "{$commit} 아래로 이동"
 split_reset = "분할 초기화"
 rewrite_host_howto = "호스트의 브랜치 보호를 통과하는 방법 설명"
 rewrite_ai_rules = "AI로 다시 쓰기 규칙 만들기"
-log_columns_fit = "Fit the Column to Its Content"
-log_columns_fit_all = "Fit All Columns to Content"
-log_scroll_left = "Scroll the Columns Left"
-log_scroll_right = "Scroll the Columns Right"
-log_columns_layout = "Scroll Sideways or Fit the Pane"
+log_columns_fit = "열을 내용에 맞추기"
+log_columns_fit_all = "모든 열을 내용에 맞추기"
+log_scroll_left = "열을 왼쪽으로 스크롤"
+log_scroll_right = "열을 오른쪽으로 스크롤"
+log_columns_layout = "옆으로 스크롤 / 창에 맞춤"
 
 
 [keymap_ctx]
@@ -2954,8 +2954,8 @@ remote_copy_link_to_remote = "리모트: 리모트 링크 복사"
 remote_fetch_remote = "리모트: 리모트 {$Fetch}..."
 remote_actions_for_selected_remote = "리모트: 선택한 리모트의 동작..."
 repository_ssh_key_for_this_repository = "저장소: 이 저장소의 SSH 키..."
-remote_hide_remote_in_graph = "Remote: Hide Remote in Graph..."
-remote_show_remote_in_graph = "Remote: Show Remote in Graph..."
+remote_hide_remote_in_graph = "리모트: 그래프에서 리모트 숨기기..."
+remote_show_remote_in_graph = "리모트: 그래프에 리모트 표시..."
 git_new_branch_at_head = "Git: HEAD에 새 브랜치..."
 git_new_tag_at_head = "Git: HEAD에 새 {$Tag}..."
 git_push_all_unpushed_tags = "Git: {$push}하지 않은 모든 {$Tag} {$Push}"
@@ -3436,11 +3436,11 @@ git_fetch_selected_tag = "Git: 선택한 {$Tag} {$Fetch}"
 # s24:begin
 rewrite_fix_message_encoding = "다시 쓰기: 메시지 인코딩 수정..."
 # s24:end
-view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
-view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
-view_log_scroll_left = "View: Log: Scroll the Columns Left"
-view_log_scroll_right = "View: Log: Scroll the Columns Right"
-view_log_columns_layout = "View: Log: Toggle Scroll Sideways for the Columns"
+view_log_column_fit = "보기: Log 열: 열을 내용에 맞추기"
+view_log_column_fit_all = "보기: Log 열: 모든 열을 내용에 맞추기"
+view_log_scroll_left = "보기: Log: 열을 왼쪽으로 스크롤"
+view_log_scroll_right = "보기: Log: 열을 오른쪽으로 스크롤"
+view_log_columns_layout = "보기: Log: 열 옆으로 스크롤 전환"
 
 [help_section]
 rewrite = "기록 다시 쓰기"
@@ -3498,7 +3498,7 @@ commit_column_1 = "행을 옆으로 스크롤 (Shift+휠이나 가로 휠도 동
 commit_column_2 = "부분(레인, 작성자, 날짜)을 골라 넓히거나 좁히고, 모든 부분을 자동 너비로 되돌림. 머리글의 경계도 끌 수 있고 너비는 기억됨"
 commit_column_3 = "마우스: 행 클릭으로 그 {$commit} 선택, 오른쪽 클릭은 메뉴 (위/아래로 행을 고른 뒤 메뉴 키로도 열림)"
 commit_column_4 = "선택한 부분을 왼쪽이나 오른쪽으로 이동합니다. 헤더를 드래그해도 같으며 순서는 기억됩니다"
-log_columns_1 = "Log 열을 고릅니다(헤더 칸이 밝아집니다). 고른 열은 왼쪽이나 오른쪽으로 옮기고(헤더를 드래그해도 같음), 넓히거나 좁히고(경계를 드래그해도 같음), 너비를 자동으로 되돌릴 수 있습니다. Tab / Shift+Tab으로 다른 열을 고르고 Esc로 나갑니다. 배치는 기억됩니다"
+log_columns_1 = "Log 열을 고릅니다(헤더 칸이 밝아집니다). 고른 열은 왼쪽이나 오른쪽으로 옮기고(헤더를 드래그해도 같음), 넓히거나 좁히고(경계를 드래그해도 같음), 너비를 자동으로 되돌리거나, 내용에 맞출 수 있습니다(경계를 더블클릭해도 같고, +는 모든 열을 맞춥니다). Tab / Shift+Tab으로 다른 열을 고르고 Esc로 나갑니다. 배치는 기억됩니다"
 global_1 = "명령 팔레트 열기 - 앱의 모든 명령을 단축키와 함께 표시합니다. 입력하여 필터링하고 Up/Down 또는 Ctrl+P/Ctrl+N으로 이동 (j/k는 입력됨), Enter로 실행. 회색 행은 지금 실행할 수 없는 이유를 알려 줍니다"
 global_2 = "탐색 접두 키 - 아래의 해당 섹션 참조"
 global_3 = "git 동작 접두 키 - 아래의 해당 섹션 참조"
@@ -3848,7 +3848,7 @@ split_7 = "{$commits} 창에서는 해당 {$commit} 선택. 변경 사항에서 
 rewrite_9 = "크기 탭을 열고 기록을 분석합니다: 가장 큰 파일과 폴더, 삭제됐지만 아직 저장된 파일을 보여 주며, 선택한 행은 제거 규칙이 됩니다"
 rewrite_host_howto = "호스트가 보호하는 브랜치에서 다시 쓴 기록을 통과시키는 방법을 설명합니다: 보호 해제, 새 이름으로 {$push}, 저장소 다시 만들기 중 하나이며 대신 실행해 주지는 않습니다"
 rewrite_ai_rules = "설명을 바탕으로 AI가 다시 쓰기 규칙을 만듦 (미리보기도 적용도 하지 않음)"
-log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
+log_columns_2 = "열이 너비를 유지할 때 Log의 열을 옆으로 스크롤합니다(열 선택기나 설정에서, 또는 열을 고른 상태에서 s로 고르는 옆으로 스크롤 배치). 창에 맞춤 배치에서는 모든 열이 창에 맞춰집니다"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} 또는 오른쪽 클릭"
@@ -4092,21 +4092,21 @@ column_width_reset = "Log 열 너비를 자동으로 되돌렸습니다."
 changes_files = { one = "{n}개", other = "{n}개" }
 changes_files_short = "{n}개"
 # context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
-column_fitted = "{column} fitted to its content: {cells} cells."
+column_fitted = "{column}을(를) 내용에 맞췄습니다: {cells}칸."
 # context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
-column_fit_cut = "{column} needs {need} cells, {have} fit. Switch the columns to Scroll sideways to show it all."
+column_fit_cut = "{column}은(는) {need}칸이 필요하지만 {have}칸만 들어갑니다. 전부 보려면 열을 옆으로 스크롤 배치로 바꾸세요."
 # context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
-column_fit_message = "Message takes the room the other columns leave."
+column_fit_message = "메시지는 다른 열이 남긴 공간을 차지합니다."
 # context: status line after every Log column was fitted to its content
-columns_fitted_all = "All columns fitted to their content."
+columns_fitted_all = "모든 열을 내용에 맞췄습니다."
 # context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
-columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
+columns_fit_all_cut = "내용에 맞췄지만 다음 열의 공간이 부족합니다: {columns}."
 # context: status line when a key or command scrolls the Log columns sideways but they fit the pane (the columns layout is "fit"); "Scroll sideways" is the name of the columns layout option
-columns_fit_pane = "The columns fit the pane. Switch the columns to Scroll sideways to scroll."
+columns_fit_pane = "열이 창에 맞춰져 있습니다. 스크롤하려면 열을 옆으로 스크롤 배치로 바꾸세요."
 # context: status line after the Log columns layout became "scroll sideways": columns keep their widths and the table can be wider than the pane
-layout_now_scroll = "Columns keep their widths and scroll sideways."
+layout_now_scroll = "열이 너비를 유지하며 옆으로 스크롤됩니다."
 # context: status line after the Log columns layout became "fit": every column fits the pane
-layout_now_fit = "Columns fit the pane."
+layout_now_fit = "열이 창에 맞춰집니다."
 
 [find_bar]
 counter = "{current} / {total}"
@@ -4172,13 +4172,13 @@ changes_files = { one = "파일 {n}개 변경", other = "파일 {n}개 변경" }
 changes_insertions = { one = "{n}줄 추가", other = "{n}줄 추가" }
 changes_deletions = { one = "{n}줄 삭제", other = "{n}줄 삭제" }
 # context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
-column_menu_fit = "Fit {column} to content"
+column_menu_fit = "{column}을(를) 내용에 맞춤"
 # context: a row of the Log columns chooser that fits every column to its content
-column_menu_fit_all = "Fit all columns to content"
+column_menu_fit_all = "모든 열을 내용에 맞춤"
 # context: a row of the Log columns chooser that puts every column width back to automatic
-column_menu_reset = "Reset column widths"
+column_menu_reset = "열 너비 초기화"
 # context: a checkbox row of the Log columns chooser; when checked, columns keep their widths and the Log scrolls sideways instead of fitting every column into the pane
-column_menu_scroll = "Scroll sideways (columns keep their widths)"
+column_menu_scroll = "옆으로 스크롤(열이 너비 유지)"
 
 [overlays]
 select_tab_title = "탭 선택 ({shown}/{total})"
@@ -5795,8 +5795,8 @@ palette_git_tab = "활동 로그: Git 작업"
 palette_app_tab = "활동 로그: 애플리케이션 로그"
 
 [git_error]
-summary_host_key = "The SSH host key of the remote is not known yet."
-hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
+summary_host_key = "리모트의 SSH 호스트 키를 아직 알 수 없습니다."
+hint_host_key = "터미널에서 `ssh -T git@<host>`를 한 번 실행해 지문을 확인하고 yes로 답한 뒤 다시 시도하세요."
 title_push = "{$Push} 실패"
 title_pull = "{$Pull} 실패"
 title_fetch = "{$Fetch} 실패"
@@ -5812,7 +5812,7 @@ done_pull = "{$Pull} 완료"
 summary_non_ff = "리모트에 로컬에 없는 {$commits}이(가) 있습니다."
 hint_non_ff = "먼저 {$pull}한 다음 다시 시도하세요."
 summary_auth = "리모트가 자격 증명을 거부했습니다."
-hint_auth = "설정 > 연동의 자격 증명 또는 SSH 키를 확인하세요."
+hint_auth = "설정 > 연동에서 자격 증명을 확인하거나, 키를 로드한 ssh-agent를 시작하거나, 이 저장소에 SSH 키를 설정하세요."
 summary_conflict = "충돌 때문에 중단되었습니다."
 hint_conflict = "Status 창에서 충돌을 해결한 다음 계속하세요."
 summary_overwrite = "로컬 변경 사항을 덮어쓰게 됩니다."

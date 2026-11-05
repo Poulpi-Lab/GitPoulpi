@@ -238,7 +238,8 @@ bu yüzden API anahtarları asla daemon'a veya bir MCP istemcisine geçmez.
 | Komut | Ne yapar |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Depolar ve bu oturumun sekmeleri. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (her biri `--clear` ile) | Log'un ref filtresi: gizle, yeniden göster, yalnızca bunları göster (açık bir pencerede canlı). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (her biri `--clear` ile) | Log'un ref filtresi: gizle, yeniden göster, yalnızca bunları göster (açık bir pencerede canlı). Gizlenen ref'ler yürüyüşten de çıkar: yalnızca onların ulaştığı commit'ler Log'dan kaybolur (checkout edilmiş commit hep kalır). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Uzak depoları bütünüyle gizle veya göster: tüm dalları, sonradan fetch edilenler de. Gizlemek için ad, deponun bir uzak deposu olmalıdır. `show` ayrıca o uzak deponun tek tek gizlenmiş dallarını da bırakır; `--clear` gizli uzak depoları da boşaltır. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Adlandırılmış oturumlar (daemon'u çalışırken yeniden adlandırma / silme reddedilir). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | Oturumun arka plan süreci (takma ad `server`). Çalışan bir daemon yoksa her komut, kendi ömrü boyunca gömülü bir tane başlatır. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Ayarlar ([Yapılandırma başvurusu](config-reference.md)). `config set ui.theme` ve `ui.graph_color_theme` adı kayıt defterine karşı denetler. |

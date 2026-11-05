@@ -278,21 +278,21 @@ redo = "Ponawia operację, którą `undo` właśnie cofnęło, do dokładnie zap
 "redo --expect" = "Ponawia tylko, jeśli to nadal najnowszy cofnięty wpis"
 "redo --yes" = "Kontynuuje, gdy ponowienie jest ryzykowne; bez tego kod wyjścia 3"
 "refs hide" = """Ukrywa refy w grafie commitów („Hide” w TUI): filtr wyświetlania per repozytorium w `repo-state.toml`, za którym otwarte TUI podąża na żywo. Nazwy zapisuje się tak jak na liście refów (`feature/x`, `origin/main`, nazwa tagu)"""
-"refs hide --clear" = "Odkrywa każdy ukryty ref (oprócz ewentualnych nazwanych)"
+"refs hide --clear" = "Odkrywa każdy ukryty ref i zdalne (oprócz ewentualnych nazwanych)"
 "refs hide --names" = "Refy do ukrycia"
 "refs hide#long" = """
-Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+Ukrywa refy w grafie commitów („Hide” w TUI): filtr wyświetlania per repozytorium w `repo-state.toml`, za którym otwarte TUI podąża na żywo. Nazwy zapisuje się tak jak na liście refów (`feature/x`, `origin/main`, nazwa tagu).
 
-`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
-"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
+`--remote <name>...` ukrywa całe zdalne (każdą jego gałąź, także pobrane później): sposób na obejrzenie jednej historii bez historii osobnego zdalnego archiwum."""
+"refs hide --remote" = "Zdalne do ukrycia w całości (nazwy tak, jak zapisuje je `remote list`)"
 "refs show" = "Pokazuje refy ponownie: usuwa je ze zbiorów ukrytych i solo"
-"refs show --clear" = "Resetuje cały filtr: nic ukrytego, nic w solo"
+"refs show --clear" = "Resetuje cały filtr: nic ukrytego (zdalne też), nic w solo"
 "refs show --names" = "Refy do ponownego pokazania"
 "refs show#long" = """
-Show refs again: removes them from the hidden and solo sets.
+Pokazuje refy ponownie: usuwa je ze zbiorów ukrytych i solo.
 
-`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
-"refs show --remote" = "Remotes to show again"
+`--remote <name>...` pokazuje całe zdalne ponownie, razem z każdą jego gałęzią ukrytą pojedynczo."""
+"refs show --remote" = "Zdalne do ponownego pokazania"
 "refs solo" = "Pokazuje w grafie commitów tylko te refy (i to, do czego prowadzą)"
 "refs solo --clear" = "Kończy solo dla każdego refu (oprócz ewentualnych nazwanych)"
 "refs solo --names" = "Refy do solo"

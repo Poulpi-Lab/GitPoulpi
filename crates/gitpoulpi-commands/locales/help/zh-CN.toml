@@ -278,21 +278,21 @@ redo = "重做 `undo` 刚刚撤回的操作，恢复到所记录的确切状态�
 "redo --expect" = "仅当这仍是最近一个被撤销的条目时才重做"
 "redo --yes" = "重做有风险时继续执行；不带它则退出码为 3"
 "refs hide" = """从提交图中隐藏引用（TUI 的“隐藏”）：即 `repo-state.toml` 中每个仓库的显示筛选，已打开的 TUI 会实时跟随。名称的写法与引用列表一致（`feature/x`、`origin/main`、标签名）"""
-"refs hide --clear" = "取消隐藏所有已隐藏的引用（在所列名称之外）"
+"refs hide --clear" = "取消隐藏所有已隐藏的引用和远程（在所列名称之外）"
 "refs hide --names" = "要隐藏的引用"
 "refs hide#long" = """
-Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+从提交图中隐藏引用（TUI 的“隐藏”）：即 `repo-state.toml` 中每个仓库的显示筛选，已打开的 TUI 会实时跟随。名称的写法与引用列表一致（`feature/x`、`origin/main`、标签名）。
 
-`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
-"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
+`--remote <name>...` 会整体隐藏一个远程（它的每个分支，包括之后获取的）：用于查看某一段历史，而不掺入单独的归档远程的历史。"""
+"refs hide --remote" = "要整体隐藏的远程（名称写法与 `remote list` 一致）"
 "refs show" = "重新显示引用：将它们从隐藏集合和单独显示集合中移除"
-"refs show --clear" = "重置整个筛选：不隐藏任何内容，也不单独显示任何内容"
+"refs show --clear" = "重置整个筛选：不隐藏任何内容（包括远程），也不单独显示任何内容"
 "refs show --names" = "要重新显示的引用"
 "refs show#long" = """
-Show refs again: removes them from the hidden and solo sets.
+重新显示引用：将它们从隐藏集合和单独显示集合中移除。
 
-`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
-"refs show --remote" = "Remotes to show again"
+`--remote <name>...` 会重新显示整个远程，其中被逐个隐藏的分支也一并显示。"""
+"refs show --remote" = "要重新显示的远程"
 "refs solo" = "在提交图中只显示这些引用（及其可达的内容）"
 "refs solo --clear" = "取消单独显示所有已单独显示的引用（在所列名称之外）"
 "refs solo --names" = "要单独显示的引用"

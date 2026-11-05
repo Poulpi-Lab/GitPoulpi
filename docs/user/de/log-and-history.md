@@ -64,6 +64,12 @@ Beim Ziehen einer Kopfzelle folgt ein Schatten ihres Namens dem Zeiger, und ein 
 
 Per Tastatur wählt `Shift+C` (oder in der Palette `Ansicht: Log-Spalte: Spalte zum Verschieben oder Anpassen wählen`) eine Spalte, und ihre Kopfzelle leuchtet auf. Dann wählen `Tab` / `Shift+Tab` eine andere Spalte, `<` / `>` verschieben sie um einen Platz nach links oder rechts unter den angezeigten Spalten (das Tastaturäquivalent zum Ziehen ihrer Kopfzelle), `]` / `[` verbreitern oder verschmälern sie (das Äquivalent zum Ziehen ihrer Grenze; die letzte Spalte bewegt ihren linken Rand), `0` setzt alle Breiten auf automatisch zurück, und `Esc` oder `Enter` beendet. Die Pfeiltasten bewegen sich währenddessen weiter durch die Commits. Reihenfolge und Breiten werden wie nach dem Ziehen gemerkt und gehören nur dem Log: Die Commit-Spalte neben einem Diff führt eine eigene Liste.
 
+*An den Inhalt anpassen.* Ein **Doppelklick** auf die Grenze einer Spalte passt die Spalte links davon an ihren breitesten sichtbaren Inhalt und ihre Kopfzeile an (breite Zeichen und Emoji zählen mit den Zellen, die sie belegen). Im Layout Anpassen füllt das Log immer seinen Bereich, eine Spalte hört also bei dem auf, wofür der Bereich Platz hat, sobald die **Nachricht** ihren Anteil und jede andere Spalte ihre Mindestbreite behält: Die Statuszeile sagt dann `Autor braucht 34 Zellen, 20 passen.` Dasselbe per Tastatur: Bei gewählter Spalte (`Shift+C`, `Tab`) passt `=` sie an und `+` alle Spalten; die Palette hat `Ansicht: Log-Spalte: Spalte an Inhalt anpassen` und `... Alle Spalten an Inhalt anpassen`; die Rechtsklick-Auswahl listet unter ihren Kontrollkästchen `<Spalte> an Inhalt anpassen` (die Spalte unter dem Zeiger), `Alle Spalten an Inhalt anpassen` und `Spaltenbreiten zurücksetzen`. Die **Nachricht** ist die flexible Spalte und hat keine eigene Breite zum Anpassen: Sie nimmt den Platz, den die anderen lassen.
+
+*Seitlich scrollen.* Standardmäßig passt jede Spalte in den Bereich. Im Layout **Seitlich scrollen** (das Kontrollkästchen `Seitlich scrollen (Spalten behalten ihre Breiten)` der Auswahl, Einstellungen > Verlauf & Graph > Spaltenlayout, in der Palette `Ansicht: Log: Seitliches Scrollen der Spalten umschalten` oder `s` bei gewählter Spalte) behalten die Spalten ihre Breiten, auch die **Nachricht** (sie hat dort eine eigene Breite, und das Anpassen nimmt ihre breiteste Zusammenfassung), bei schmalem Fenster wird nichts aufgegeben, und die Tabelle kann breiter als der Bereich sein. Eine Leiste am unteren Rand scrollt sie dann: Ziehen Sie den Griff, klicken Sie auf die leere Schiene, um den Griff unter den Zeiger zu holen, oder nutzen Sie ihre Endpfeile. Per Tastatur scrollen `Shift+Links` / `Shift+Rechts` um vier Zellen (die Palette hat `Ansicht: Log: Spalten nach links scrollen` / `rechts`); das horizontale Mausrad oder `Shift`+Rad über der Tabelle tun dasselbe, und das Wählen einer Spalte (`Shift+C`, `Tab`) scrollt sie ins Bild. Eine Tabelle, die schmaler als der Bereich ist, lässt rechts Leerraum, und das Band einer gewählten Zeile reicht bis zum Rand. Jedes Layout behält seine eigenen Breiten (`ui.log_column_widths` und `ui.log_column_widths_scroll`); das erste Ziehen, die erste Taste oder das erste Anpassen im Layout Seitlich scrollen speichert jede Spalte mit der Breite, die sie hat, sodass sich nur die eine bewegt, die Sie ändern. Im Layout Anpassen sagt ein Anpassen, das nicht in den Bereich passt, das und verweist auf dieses Layout.
+
+*Der Griff der letzten Spalte.* Auch die letzte Spalte hat einen Griff, auf ihrer eigenen letzten Zelle (nicht der Rand des Bereichs, der weiterhin die Bereiche in der Größe ändert): Ein Ziehen verschiebt sie um die Strecke des Zeigers, wobei die **Nachricht** den Unterschied aufnimmt. **SHA** ist standardmäßig 8 Zellen breit (die 7 Ziffern und die Griffzelle).
+
 ![Das Log mit eingeblendeter Spalte Änder.: Jeder Commit nennt die Zahl seiner Dateien und der hinzugefügten und entfernten Zeilen](../images/log-changes-column.png)
 
 ### Autoren und `.mailmap`
@@ -90,8 +96,10 @@ Namen und E-Mail-Adressen des Verlaufs und schreibt `.mailmap`-Zeilen für Sie, 
 - **Solo** (die Taste `o` oder das Menü der Ref, auf einer Ref, einem Ordner oder
   Remote): zeigt nur die Commits der Solo-Refs; mehrere im Solo zeigen ihre
   Vereinigung. `Shift+O` beendet das Solo.
-- Eine Ref **ausblenden** (ihr Menü), um sie aus dem Graphen zu nehmen; *Ausgeblendet n*
-  im Titel von Refs zählt sie, **Alle zeigen** (`Shift+H`) holt sie zurück.
+- Eine Ref **ausblenden** (ihr Menü), um sie aus dem Graphen zu nehmen: Ihre Pille verschwindet,
+  und mit ihr die Commits, die nur sie erreicht (der ausgecheckte Commit bleibt immer, mit der
+  Arbeitsbaum-Zeile). *Ausgeblendet n* im Titel von Refs zählt sie, **Alle zeigen** (`Shift+H`)
+  holt sie zurück. Die Gesamtzahl der Statuszeile zählt den sichtbaren Verlauf.
 
 ## Branches, Tags und die Refs-Seitenleiste
 
@@ -107,7 +115,7 @@ Einträge:
 | Fast-Forward `<Branch>` auf `<aktuell>` / `<aktuell>` auf `<Branch>` | Schiebt einen Branch vor, wenn das ein Fast-Forward ist; sonst ausgegraut mit dem Grund (`diverged, not a fast-forward`) |
 | Worktree erstellen aus... | Öffnet einen verknüpften Worktree in einem eigenen Tab |
 | Pull, Push, Fetch, Upstream setzen... | Netzwerkvorgänge auf diesem Branch |
-| Im Graphen ausblenden / zeigen, Solo | Nur Anzeige; blenden eine Ref aus oder stellen sie solo, ohne das Repository zu berühren |
+| Im Graphen ausblenden / zeigen, Solo | Nur Anzeige; blenden eine Ref aus (das Ausblenden nimmt auch die Commits mit, die nur diese Ref erreicht) oder stellen sie solo, ohne das Repository zu berühren |
 | Umbenennen, Löschen | Löschen fragt vorher; ein Remote-Zwilling kann ebenfalls gelöscht werden |
 | Branch-Namen kopieren, Link zum Branch auf dem Remote kopieren | In die Zwischenablage |
 
@@ -167,8 +175,8 @@ Bei einem Commit ohne Ref zeigt das Überfahren seiner Zeile außerdem eine blas
 
 **Remotes.** Das `+` im Titel REMOTE fügt eines hinzu; Rechtsklick auf den Namen
 eines Remotes, um es zu fetchen, seinen Weblink zu kopieren, es zum Standard-Remote
-zu machen, alle seine Branches auszublenden, seine URLs zu bearbeiten oder es zu
-entfernen.
+zu machen, es im Graph auszublenden, seine URLs zu bearbeiten oder es zu
+entfernen. **Ein Remote ausblenden** (das Auge seiner Zeile, im Menü *Remote im Graph ausblenden* oder in der Palette `Remote: Remote im Graph ausblenden...`) blendet jeden Branch aus, den es jetzt hat oder später bekommt, und die Commits, die nur es erreicht, verlassen das Log: so durchsuchen Sie einen Verlauf ohne den eines fremden Archiv-Remotes und holen ihn mit *Remote im Graph einblenden* zurück. Das Einblenden eines Remotes zeigt auch die Branches von ihm wieder, die einzeln ausgeblendet waren. Ein Branch eines ausgeblendeten Remotes sagt das in der Statuszeile, wenn sein Auge benutzt wird: Blenden Sie zuerst das Remote ein.
 
 **Stashes.** **Stash** stasht alles (unversionierte Dateien eingeschlossen);
 `Ctrl+G m` fragt zuerst nach einer Nachricht (bei eingeschalteter KI schlägt

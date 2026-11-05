@@ -288,7 +288,7 @@ redo = "Redo the operation `undo` just took back, to the exact state recorded (i
 "refs hide#long" = """
 Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
 
-`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
+`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without the history of a separate archive remote."""
 "refs show" = "Show refs again: removes them from the hidden and solo sets"
 "refs show --clear" = "Reset the whole filter: nothing hidden (remotes included), nothing soloed"
 "refs show --names" = "Refs to show again"

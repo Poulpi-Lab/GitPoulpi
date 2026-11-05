@@ -65,6 +65,12 @@ Trascinare un'intestazione mostra un fantasma del suo nome che segue il puntator
 
 Dalla tastiera, `Shift+C` (o `Vista: Colonna del Log: Scegli una colonna da spostare o ridimensionare` della palette) sceglie una colonna e la sua cella d'intestazione si illumina. Poi `Tab` / `Shift+Tab` scelgono un'altra colonna, `<` / `>` la spostano di un posto a sinistra o a destra tra le colonne mostrate (l'equivalente da tastiera del trascinare la sua intestazione), `]` / `[` la allargano o la restringono (l'equivalente del trascinare il suo bordo; l'ultima colonna sposta il proprio bordo sinistro), `0` riporta ogni larghezza all'automatico, e `Esc` o `Enter` esce. Nel frattempo le frecce continuano a muoversi tra i commit. L'ordine e le larghezze vengono ricordati come dopo un trascinamento e sono propri del Log: la colonna dei commit accanto a un diff ha un elenco suo.
 
+*Adatta al contenuto.* Un **doppio clic** sul bordo di una colonna adatta la colonna alla sua sinistra al suo contenuto visibile più largo e alla sua intestazione (i caratteri larghi e le emoji sono contati per le celle che occupano). Nella disposizione adattata il Log riempie sempre il suo pannello, perciò una colonna si ferma a ciò che il pannello può darle una volta che **Messaggio** ha tenuto la sua parte e ogni altra colonna la sua larghezza minima: la riga di stato dice allora `Autore richiede 34 celle, ne entrano 20.` Lo stesso da tastiera: con una colonna scelta (`Shift+C`, `Tab`), `=` la adatta e `+` adatta ogni colonna; la palette ha `Vista: Colonna del Log: Adatta la colonna al contenuto` e `... Adatta tutte le colonne al contenuto`; il selettore del clic destro elenca `Adatta <colonna> al contenuto` (la colonna sotto il puntatore), `Adatta tutte le colonne al contenuto` e `Reimposta le larghezze delle colonne` sotto le sue caselle. **Messaggio** è la colonna flessibile e non ha una larghezza propria da adattare: prende lo spazio che le altre lasciano.
+
+*Scorri lateralmente.* Per impostazione predefinita ogni colonna sta nel pannello. Nella disposizione **scroll** (la casella `Scorri lateralmente (le colonne mantengono le larghezze)` del selettore, Impostazioni > Log e grafo > Disposizione delle colonne, `Vista: Log: Attiva o disattiva lo scorrimento laterale delle colonne` della palette, oppure `s` mentre una colonna è scelta) le colonne mantengono le loro larghezze, **Messaggio** compreso (qui ha una larghezza propria, e adattarlo prende il suo riepilogo più largo), nessuna cede quando la finestra è stretta e la tabella può essere più larga del pannello. Una barra sul bordo inferiore la scorre: trascina il cursore, premi la traccia libera per portare il cursore sotto il puntatore, oppure usa le frecce alle estremità. Da tastiera `Shift+Sinistra` / `Shift+Destra` scorrono di quattro celle (la palette ha `Vista: Log: Scorri le colonne a sinistra` / `a destra`); la rotella orizzontale o `Shift`+rotella sopra la tabella fanno lo stesso, e scegliere una colonna (`Shift+C`, `Tab`) la porta in vista. Una tabella più stretta del pannello lascia spazio vuoto a destra, e la banda di una riga selezionata arriva fino al bordo. Ogni disposizione tiene le proprie larghezze (`ui.log_column_widths` e `ui.log_column_widths_scroll`); il primo trascinamento, tasto o adattamento nella disposizione scroll memorizza ogni colonna alla larghezza che ha, così si muove solo quella che cambi. Nella disposizione adattata un adattamento che non sta nel pannello lo dice e rimanda a questa disposizione.
+
+*La maniglia dell'ultima colonna.* Anche l'ultima colonna ha una maniglia, sulla sua ultima cella (non il bordo del pannello, che ridimensiona ancora i pannelli): un trascinamento la sposta della distanza percorsa dal puntatore, e **Messaggio** prende la differenza. **SHA** è larga 8 celle per impostazione predefinita (le 7 cifre e quella cella di maniglia).
+
 ![Il Log con la colonna Modif. visibile: ogni commit elenca il numero di file e le righe aggiunte e rimosse](../images/log-changes-column.png)
 
 ### Autori e `.mailmap`
@@ -92,8 +98,11 @@ scrive per te le righe del `.mailmap`, vedi `history-rewrite.md`; da terminale:
 - **Solo** (il tasto `o`, o il menu del ref, su un ref, una cartella o un remoto):
   mostra solo i commit dei ref in solo; metti in solo più ref per vederne l'unione.
   `Shift+O` termina il solo.
-- **Nascondi** un ref (dal suo menu) per toglierlo dal grafo; *Nascosti n* nel
-  titolo di Refs li conta, **Mostra tutto** (`Shift+H`) li riporta.
+- **Nascondi** un ref (dal suo menu) per toglierlo dal grafo: la sua etichetta
+  sparisce e con essa i commit raggiunti solo da lui (il commit attivo resta
+  sempre, con la riga dell'area di lavoro). *Nascosti n* nel titolo di Refs li
+  conta, **Mostra tutto** (`Shift+H`) li riporta. Il totale della riga di stato
+  conta la cronologia visibile.
 
 ## Branch, tag e la barra laterale Refs
 
@@ -109,7 +118,7 @@ più utili:
 | Fast-forward di `<branch>` a `<current>` / di `<current>` a `<branch>` | Sposta in avanti un branch quando è un fast-forward; altrimenti è grigia con il motivo (`divergente, non è un fast-forward`) |
 | Crea un worktree da... | Apre un worktree collegato in una scheda propria |
 | Pull, Push, Fetch, Imposta l'upstream... | Operazioni di rete su quel branch |
-| Nascondi / Mostra nel grafo, Solo | Solo visualizzazione; nascondono o mettono in solo un ref senza toccare il repository |
+| Nascondi / Mostra nel grafo, Solo | Solo visualizzazione; nascondono o mettono in solo un ref (nascondere toglie anche i commit raggiunti solo da quel ref) senza toccare il repository |
 | Rinomina, Elimina | Elimina chiede prima; si può eliminare anche il gemello remoto |
 | Copia il nome del branch, Copia il link del branch sul remoto | Negli appunti |
 
@@ -164,7 +173,15 @@ Su un commit senza ref, passare il puntatore sulla sua riga mostra anche, nella 
 
 **Remoti.** Il `+` nel titolo REMOTI ne aggiunge uno; clic destro sul nome di un
 remoto per fare il fetch, copiare il suo link web, renderlo il remoto predefinito,
-nascondere tutti i suoi branch, modificare i suoi URL o rimuoverlo.
+nasconderlo dal grafo, modificare i suoi URL o rimuoverlo. **Nascondere un remoto**
+(l'occhio della sua riga, la voce di menu *Nascondi il remoto dal grafo*, o
+`Remoto: Nascondi il remoto nel grafo...` nella palette) nasconde ogni branch che
+ha ora o che avrà in seguito, e i commit raggiunti solo da lui escono dal Log: il
+modo per sfogliare una cronologia senza quella di un remoto d'archivio non
+correlato; lo riporti con *Mostra il remoto nel grafo*. Mostrare un remoto mostra
+anche i suoi branch che erano stati nascosti uno per uno. Un branch di un remoto
+nascosto lo dice sulla riga di stato se si usa il suo occhio: mostra prima il
+remoto.
 
 **Stash.** **Stash** mette in stash tutto (compresi i file non tracciati);
 `Ctrl+G m` chiede prima un messaggio (con l'IA attiva, `Ctrl+G` dentro quel prompt

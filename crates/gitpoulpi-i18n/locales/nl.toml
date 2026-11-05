@@ -593,9 +593,9 @@ preview = "voorbeeld"
 sidebar_sections_scope = "Secties van het linkerpaneel"
 sidebar_sections_scope_help = "Voor wie de getoonde en verborgen secties van het linkerpaneel gelden. Per repository: elke repository houdt een eigen set (de globale is het startpunt). Globaal: één set voor alle repositories. Wisselen verliest nooit een van beide sets."
 # context: a Settings row; how the Log lays its columns out
-log_columns_layout = "Column layout"
+log_columns_layout = "Kolomindeling"
 # context: help text of the Log column layout row; "fit" and "scroll" are the two choices
-log_columns_layout_help = "How the Log lays its columns out. fit: every column fits the pane and only Message flexes. scroll: columns keep their widths, Message too, and the table scrolls sideways when it is wider than the pane."
+log_columns_layout_help = "Hoe de Log zijn kolommen indeelt. fit: elke kolom past in het paneel en alleen Bericht rekt mee. scroll: kolommen behouden hun breedte, Bericht ook, en de tabel scrollt zijwaarts als hij breder is dan het paneel."
 
 [settings_git]
 default_backend = "Git-backend"
@@ -747,8 +747,8 @@ pos_right = "Rechts"
 align_start = "Begin"
 align_center = "Midden"
 align_end = "Einde"
-layout_fit = "Fit the pane"
-layout_scroll = "Scroll sideways"
+layout_fit = "Aan paneel passen"
+layout_scroll = "Zijwaarts scrollen"
 
 [reltime]
 just_now = "zojuist"
@@ -1945,8 +1945,8 @@ copy_name = "Remotenaam kopiëren"
 copy_link = "Link naar remote kopiëren"
 set_default = "Als standaardremote instellen"
 edit_remote = "{name} bewerken..."
-hide_remote_in_graph = "Hide remote from graph"
-show_remote_in_graph = "Show remote in graph"
+hide_remote_in_graph = "Remote in grafiek verbergen"
+show_remote_in_graph = "Remote in grafiek tonen"
 remove_remote = "{name} verwijderen..."
 default_mark = "(standaard)"
 pull_title = "{$Pull}"
@@ -1999,8 +1999,8 @@ default_for_repo = "Standaardremote voor deze repository"
 copy_name_which = "De naam van welke remote kopiëren?"
 copy_link_which = "Een link naar welke remote kopiëren?"
 fetch_which = { git = "Welke remote fetchen?", local = "Welke remote ophalen?" }
-hide_all_which = "Hide which remote from the graph?"
-show_all_which = "Show which remote in the graph again?"
+hide_all_which = "Welke remote verbergen in de grafiek?"
+show_all_which = "Welke remote weer tonen in de grafiek?"
 select_local_branch = "selecteer eerst een lokale branch, of check er een uit"
 select_remote_first = "selecteer eerst een remote in de sectie REMOTE (of gebruik een Remote:-opdracht)"
 what_remote_name = "remotenaam"
@@ -2012,9 +2012,9 @@ force_confirm_fetch = { git = "{branch} force pushen naar {remote}?\nHaalt eerst
 force_confirm = { git = "{branch} force pushen naar {remote}?\nMet lease: geweigerd als {remote}/{branch} is verschoven sinds de laatste fetch. Commits die alleen {remote} heeft worden verworpen.", local = "{branch} force pushen naar {remote}?\nMet lease: geweigerd als {remote}/{branch} is verschoven sinds het laatste ophalen. Commits die alleen {remote} heeft worden verworpen." }
 setting_upstream = "upstream van {branch} instellen op {upstream}..."
 unsetting_upstream = "upstream van {branch} wissen..."
-remote_hidden = "{remote} hidden from the graph, branches fetched later too"
-remote_shown = "{remote} shown in the graph again"
-branch_hidden_with_remote = "{name} is hidden with remote {remote}: show the remote first"
+remote_hidden = "{remote} verborgen in de grafiek, later opgehaalde branches ook"
+remote_shown = "{remote} weer getoond in de grafiek"
+branch_hidden_with_remote = "{name} is verborgen met remote {remote}: toon eerst de remote"
 pinning = "deze repository vastpinnen aan {command}..."
 clearing_pin = "SSH-sleutelkoppeling wissen..."
 stashing_continuing = { git = "je wijzigingen stashen en doorgaan...", local = "je wijzigingen in {$stash} zetten en doorgaan..." }
@@ -2358,11 +2358,11 @@ split_move_down = "De {$commit} omlaag verplaatsen"
 split_reset = "De splitsing resetten"
 rewrite_host_howto = "De branchbescherming van de host uitleggen"
 rewrite_ai_rules = "Herschrijfregels maken met AI"
-log_columns_fit = "Fit the Column to Its Content"
-log_columns_fit_all = "Fit All Columns to Content"
-log_scroll_left = "Scroll the Columns Left"
-log_scroll_right = "Scroll the Columns Right"
-log_columns_layout = "Scroll Sideways or Fit the Pane"
+log_columns_fit = "Kolom aan inhoud aanpassen"
+log_columns_fit_all = "Alle kolommen aan inhoud aanpassen"
+log_scroll_left = "Kolommen naar links scrollen"
+log_scroll_right = "Kolommen naar rechts scrollen"
+log_columns_layout = "Zijwaarts scrollen of aan paneel aanpassen"
 
 
 [keymap_ctx]
@@ -2958,8 +2958,8 @@ remote_copy_link_to_remote = "Remote: Link naar remote kopiëren"
 remote_fetch_remote = { git = "Remote: Remote fetchen...", local = "Remote: Remote ophalen..." }
 remote_actions_for_selected_remote = "Remote: Acties voor geselecteerde remote..."
 repository_ssh_key_for_this_repository = "Repository: SSH-sleutel voor deze repository..."
-remote_hide_remote_in_graph = "Remote: Hide Remote in Graph..."
-remote_show_remote_in_graph = "Remote: Show Remote in Graph..."
+remote_hide_remote_in_graph = "Remote: Remote in grafiek verbergen..."
+remote_show_remote_in_graph = "Remote: Remote in grafiek tonen..."
 git_new_branch_at_head = "Git: Nieuwe branch op HEAD..."
 git_new_tag_at_head = { git = "Git: Nieuwe tag op HEAD...", local = "Git: Nieuw label op HEAD..." }
 git_push_all_unpushed_tags = { git = "Git: Alle niet-gepushte tags pushen", local = "Git: Alle niet-gepushte labels pushen" }
@@ -3438,11 +3438,11 @@ git_fetch_selected_tag = { git = "Git: Geselecteerde {$tag} fetchen", local = "G
 # s24:begin
 rewrite_fix_message_encoding = "Herschrijven: Tekencodering van berichten herstellen..."
 # s24:end
-view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
-view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
-view_log_scroll_left = "View: Log: Scroll the Columns Left"
-view_log_scroll_right = "View: Log: Scroll the Columns Right"
-view_log_columns_layout = "View: Log: Toggle Scroll Sideways for the Columns"
+view_log_column_fit = "Weergave: Logkolom: Kolom aan inhoud aanpassen"
+view_log_column_fit_all = "Weergave: Logkolom: Alle kolommen aan inhoud aanpassen"
+view_log_scroll_left = "Weergave: Log: Kolommen naar links scrollen"
+view_log_scroll_right = "Weergave: Log: Kolommen naar rechts scrollen"
+view_log_columns_layout = "Weergave: Log: Zijwaarts scrollen van de kolommen aan- of uitzetten"
 
 [help_section]
 rewrite = "Geschiedenis herschrijven"
@@ -3500,7 +3500,7 @@ commit_column_1 = "de rijen zijwaarts scrollen (Shift+wiel of een horizontaal wi
 commit_column_2 = "een deel kiezen (banen, auteur, datum) en het verbreden of versmallen, of alle delen weer automatisch maken; de grenzen van de kopregel zijn ook te slepen en de breedtes worden onthouden"
 commit_column_3 = "muis: klik op een rij om de {$commit} te kiezen, rechtsklik opent het menu (de menutoets ook, na het kiezen van een rij met Omhoog/Omlaag)"
 commit_column_4 = "het gekozen deel naar links of rechts verplaatsen; de kop slepen doet hetzelfde, en de volgorde wordt onthouden"
-log_columns_1 = "een Logkolom kiezen (de koptekstcel licht op); daarna naar links of rechts verplaatsen (de kop slepen doet hetzelfde), verbreden of versmallen (de rand slepen doet hetzelfde) of terugzetten op automatische breedte. Tab / Shift+Tab kiezen een andere kolom, Esc verlaat de keuze; de indeling wordt onthouden"
+log_columns_1 = "een Logkolom kiezen (de koptekstcel licht op); daarna naar links of rechts verplaatsen (de kop slepen doet hetzelfde), verbreden of versmallen (de rand slepen doet hetzelfde), de breedte weer automatisch maken of de kolom aan zijn inhoud aanpassen (dubbelklikken op de rand doet hetzelfde; + past elke kolom aan). Tab / Shift+Tab kiezen een andere kolom, Esc sluit af; de indeling wordt onthouden"
 global_1 = "open het opdrachtenpalet - elke opdracht in de app, elk met zijn sneltoets; typ om te filteren, omhoog/omlaag of Ctrl+P/Ctrl+N om te bewegen (niet j/k: die worden getypt), Enter om uit te voeren. Grijze rijen zeggen waarom ze nu niet kunnen draaien"
 global_2 = "het navigatieprefix - zie zijn eigen sectie hieronder"
 global_3 = "het prefix voor git-acties - zie zijn eigen sectie hieronder"
@@ -3850,7 +3850,7 @@ split_7 = "selecteert in het paneel met {$commits} die {$commit}; m of Enter op 
 rewrite_9 = "opent het tabblad Grootte en analyseert de geschiedenis: de grootste bestanden en mappen, en bestanden die zijn verwijderd maar nog worden bewaard; aangevinkte rijen worden verwijderregels"
 rewrite_host_howto = "legt uit hoe je een herschrijving door een branch krijgt die de host beschermt: de bescherming opheffen, {$push} onder een nieuwe naam, of de repository opnieuw aanmaken; er wordt niets voor je gedaan"
 rewrite_ai_rules = "maakt met AI de herschrijfregels op basis van je beschrijving (er wordt geen voorbeeld getoond en niets toegepast)"
-log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
+log_columns_2 = "de kolommen van de Log zijwaarts scrollen als ze hun breedte behouden (de indeling Zijwaarts scrollen, te kiezen in de kolomkeuze, in de Instellingen of met s terwijl een kolom gekozen is); bij de indeling Aanpassen past elke kolom in het paneel"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} of rechtsklik"
@@ -4094,21 +4094,21 @@ column_width_reset = "Breedtes van de Logkolommen weer automatisch."
 changes_files = { one = "{n} bestand", other = "{n} bestanden" }
 changes_files_short = "{n}b"
 # context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
-column_fitted = "{column} fitted to its content: {cells} cells."
+column_fitted = "{column} aan inhoud aangepast: {cells} cellen."
 # context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
-column_fit_cut = "{column} needs {need} cells, {have} fit. Switch the columns to Scroll sideways to show it all."
+column_fit_cut = "{column} heeft {need} cellen nodig, er passen er {have}. Zet de kolommen op Zijwaarts scrollen om alles te tonen."
 # context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
-column_fit_message = "Message takes the room the other columns leave."
+column_fit_message = "Bericht neemt de ruimte die de andere kolommen overlaten."
 # context: status line after every Log column was fitted to its content
-columns_fitted_all = "All columns fitted to their content."
+columns_fitted_all = "Alle kolommen aan hun inhoud aangepast."
 # context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
-columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
+columns_fit_all_cut = "Aan de inhoud aangepast, maar niet genoeg ruimte voor: {columns}."
 # context: status line when a key or command scrolls the Log columns sideways but they fit the pane (the columns layout is "fit"); "Scroll sideways" is the name of the columns layout option
-columns_fit_pane = "The columns fit the pane. Switch the columns to Scroll sideways to scroll."
+columns_fit_pane = "De kolommen passen in het paneel. Zet de kolommen op Zijwaarts scrollen om te scrollen."
 # context: status line after the Log columns layout became "scroll sideways": columns keep their widths and the table can be wider than the pane
-layout_now_scroll = "Columns keep their widths and scroll sideways."
+layout_now_scroll = "Kolommen behouden hun breedte en scrollen zijwaarts."
 # context: status line after the Log columns layout became "fit": every column fits the pane
-layout_now_fit = "Columns fit the pane."
+layout_now_fit = "Kolommen passen in het paneel."
 
 [find_bar]
 counter = "{current} van {total}"
@@ -4174,13 +4174,13 @@ changes_files = { one = "{n} bestand gewijzigd", other = "{n} bestanden gewijzig
 changes_insertions = { one = "{n} toevoeging", other = "{n} toevoegingen" }
 changes_deletions = { one = "{n} verwijdering", other = "{n} verwijderingen" }
 # context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
-column_menu_fit = "Fit {column} to content"
+column_menu_fit = "{column} aan inhoud aanpassen"
 # context: a row of the Log columns chooser that fits every column to its content
-column_menu_fit_all = "Fit all columns to content"
+column_menu_fit_all = "Alle kolommen aan inhoud aanpassen"
 # context: a row of the Log columns chooser that puts every column width back to automatic
-column_menu_reset = "Reset column widths"
+column_menu_reset = "Kolombreedtes herstellen"
 # context: a checkbox row of the Log columns chooser; when checked, columns keep their widths and the Log scrolls sideways instead of fitting every column into the pane
-column_menu_scroll = "Scroll sideways (columns keep their widths)"
+column_menu_scroll = "Zijwaarts scrollen (kolommen behouden hun breedte)"
 
 [overlays]
 select_tab_title = "Tabblad kiezen ({shown}/{total})"
@@ -5797,8 +5797,8 @@ palette_git_tab = "Activiteitenlogboek: Git-bewerkingen"
 palette_app_tab = "Activiteitenlogboek: Applicatielogboek"
 
 [git_error]
-summary_host_key = "The SSH host key of the remote is not known yet."
-hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
+summary_host_key = "De SSH-hostsleutel van de remote is nog niet bekend."
+hint_host_key = "Voer eenmalig `ssh -T git@<host>` uit in een terminal, controleer de vingerafdruk en antwoord yes, en probeer het dan opnieuw."
 title_push = "{$Push} mislukt"
 title_pull = "{$Pull} mislukt"
 title_fetch = "{$Fetch} mislukt"
@@ -5814,7 +5814,7 @@ done_pull = "{$Pull} voltooid"
 summary_non_ff = "De remote heeft {$commits} die je niet hebt."
 hint_non_ff = "Doe eerst een {$pull} en probeer het opnieuw."
 summary_auth = "De remote heeft de inloggegevens geweigerd."
-hint_auth = "Controleer je inloggegevens onder Instellingen > Integraties, of je SSH-sleutel."
+hint_auth = "Controleer je inloggegevens onder Instellingen > Integraties, start een ssh-agent met je sleutel of stel een SSH-sleutel in voor deze repository."
 summary_conflict = "Gestopt door conflicten."
 hint_conflict = "Los de conflicten op in het Statuspaneel en ga verder."
 summary_overwrite = "Lokale wijzigingen zouden worden overschreven."

@@ -65,6 +65,12 @@ Przeciąganie nagłówka pokazuje duszka jego nazwy podążającego za wskaźnik
 Z klawiatury `Shift+C` (albo polecenie palety `Widok: Kolumna Logu: Wybierz kolumnę do przesunięcia lub zmiany szerokości`) wybiera kolumnę, a jej komórka nagłówka się podświetla. Potem `Tab` / `Shift+Tab` wybierają inną kolumnę, `<` / `>` przesuwają ją o jedno miejsce w lewo lub w prawo wśród pokazanych kolumn (klawiaturowy odpowiednik przeciągnięcia jej nagłówka), `]` / `[` poszerzają lub zwężają ją (odpowiednik przeciągnięcia jej granicy; ostatnia kolumna przesuwa swoją lewą krawędź), `0` przywraca wszystkim szerokościom wartość automatyczną, a `Esc` lub `Enter` kończy. Strzałki w tym czasie nadal poruszają się po commitach. Kolejność i szerokości są zapamiętywane tak jak po przeciągnięciu i należą do samego Logu: kolumna commitów obok diffa ma własną listę.
 
 ![Log z widoczną kolumną Zmiany: każdy commit podaje liczbę plików oraz dodanych i usuniętych linii](../images/log-changes-column.png)
+*Dopasowanie do zawartości.* **Dwukrotne kliknięcie** granicy kolumny dopasowuje kolumnę po jej lewej do jej najszerszej widocznej zawartości i nagłówka (szerokie znaki i emoji liczone według zajmowanych komórek). W układzie dopasowanym Log zawsze wypełnia swój panel, więc kolumna kończy na tym, na co panel ma miejsce, gdy **Opis** zachowa swoją część, a każda inna kolumna swoją najmniejszą szerokość: linia statusu mówi wtedy `Autor potrzebuje 34 komórek, mieści się 20.` To samo z klawiatury: przy wybranej kolumnie (`Shift+C`, `Tab`) `=` dopasowuje ją, a `+` dopasowuje każdą kolumnę; paleta ma `Widok: Kolumna Logu: Dopasuj kolumnę do zawartości` i `... Dopasuj wszystkie kolumny do zawartości`; okno wyboru otwarte prawym przyciskiem pod polami wyboru wymienia `Dopasuj <kolumna> do zawartości` (kolumna pod wskaźnikiem), `Dopasuj wszystkie kolumny do zawartości` i `Zresetuj szerokości kolumn`. **Opis** jest kolumną elastyczną i nie ma własnej szerokości do dopasowania: zajmuje miejsce, które zostawiają inne.
+
+*Przewijanie w poziomie.* Domyślnie każda kolumna mieści się w panelu. W układzie **scroll** (pole `Przewijaj w poziomie (kolumny zachowują szerokości)` w oknie wyboru, Ustawienia > Log i graf > Układ kolumn, polecenie palety `Widok: Log: Przełącz przewijanie kolumn w poziomie` albo `s` przy wybranej kolumnie) kolumny zachowują swoje szerokości, **Opis** też (ma tam własną szerokość, a jego dopasowanie bierze najszersze podsumowanie), nic nie ustępuje w wąskim oknie, a tabela może być szersza niż panel. Pasek na dolnej krawędzi przewija ją wtedy: przeciągnij suwak, naciśnij puste tło paska, by przenieść suwak pod wskaźnik, albo użyj strzałek na jego końcach. Z klawiatury `Shift+Left` / `Shift+Right` przewijają o cztery komórki (paleta ma `Widok: Log: Przewiń kolumny w lewo` / `w prawo`); to samo robią pozioma rolka lub `Shift`+rolka nad tabelą, a wybranie kolumny (`Shift+C`, `Tab`) przewija ją do widoku. Tabela węższa niż panel zostawia puste miejsce po prawej, a pasmo zaznaczonego wiersza biegnie do krawędzi. Każdy układ zachowuje własne szerokości (`ui.log_column_widths` i `ui.log_column_widths_scroll`); pierwsze przeciągnięcie, klawisz lub dopasowanie w układzie scroll zapisuje każdą kolumnę z szerokością, jaką ma, więc rusza się tylko ta, którą zmieniasz. W układzie dopasowanym dopasowanie, które nie mieści się w panelu, mówi o tym i wskazuje ten układ.
+
+*Uchwyt ostatniej kolumny.* Ostatnia kolumna też ma uchwyt, na swojej ostatniej komórce (nie na krawędzi panelu, która nadal zmienia rozmiar paneli): przeciągnięcie przesuwa ją o drogę przebytą przez wskaźnik, a **Opis** przejmuje różnicę. **SHA** ma domyślnie 8 komórek szerokości (7 cyfr i komórka uchwytu).
+
 
 ### Autorzy i `.mailmap`
 
@@ -91,8 +97,11 @@ z terminala: `gitpoulpi mailmap list|check|add`.
 - **Solo** (klawisz `o` albo menu refa, na refie, folderze lub zdalnym):
   pokazuje tylko commity refów w solo; włącz solo dla kilku, by zobaczyć ich
   sumę. `Shift+O` kończy solo.
-- **Ukryj** ref (jego menu), by wyjąć go z grafu; *Ukryte n* w tytule Refs
-  je zlicza, a **Pokaż wszystko** (`Shift+H`) przywraca je.
+- **Ukryj** ref (jego menu), by wyjąć go z grafu: znika jego pigułka, a z nią
+  commity osiągalne tylko przez niego (wyewidencjonowany commit zawsze zostaje,
+  razem z wierszem drzewa roboczego). *Ukryte n* w tytule Refs je zlicza, a
+  **Pokaż wszystko** (`Shift+H`) przywraca je. Suma w linii statusu liczy
+  widoczną historię.
 
 ## Gałęzie, tagi i panel Refs
 
@@ -108,7 +117,7 @@ menu. Najprzydatniejsze pozycje:
 | Fast-forward `<branch>` do `<current>` / `<current>` do `<branch>` | Przesuwa gałąź do przodu, gdy da się to zrobić fast-forwardem; inaczej jest wyszarzone z powodem (`rozbieżne, to nie fast-forward`) |
 | Utwórz worktree z... | Otwiera dołączony worktree we własnej karcie |
 | Pull, Push, Fetch, Ustaw upstream... | Operacje sieciowe na tej gałęzi |
-| Ukryj / Pokaż w grafie, Solo | Tylko wyświetlanie; ukrywają lub izolują ref bez dotykania repozytorium |
+| Ukryj / Pokaż w grafie, Solo | Tylko wyświetlanie; ukrywają lub izolują ref (ukrycie usuwa też commity osiągalne tylko przez ten ref) bez dotykania repozytorium |
 | Zmień nazwę, Usuń | Usuń najpierw pyta; można usunąć także zdalny odpowiednik |
 | Kopiuj nazwę gałęzi, Kopiuj link do gałęzi na zdalnym | Do schowka systemowego |
 
@@ -165,8 +174,14 @@ Przy commicie bez refa najechanie na wiersz pokazuje też wyblakłą pigułkę w
 
 **Zdalne repozytoria.** Przycisk `+` w tytule ZDALNE dodaje nowe; kliknij
 nazwę zdalnego prawym przyciskiem, by wykonać fetch, skopiować jego link
-webowy, ustawić je jako domyślne, ukryć wszystkie jego gałęzie, edytować jego
-adresy URL albo je usunąć.
+webowy, ustawić je jako domyślne, ukryć je w grafie, edytować jego adresy URL
+albo je usunąć. **Ukrycie zdalnego** (oko w jego wierszu, pozycja menu
+*Ukryj zdalne w grafie* albo `Zdalne: Ukryj zdalne w grafie...` w palecie)
+ukrywa każdą jego gałąź, obecną i przyszłą, a commity osiągalne tylko przez nie
+znikają z Logu: sposób na przeglądanie jednej historii bez historii niezwiązanego
+zdalnego archiwum; przywróć je pozycją *Pokaż zdalne w grafie*. Pokazanie
+zdalnego pokazuje też jego gałęzie ukryte pojedynczo. Użycie oka gałęzi ukrytego
+zdalnego mówi o tym w linii statusu: najpierw pokaż zdalne.
 
 **Stashe.** **Stash** zapisuje w stashu wszystko (łącznie z nieśledzonymi
 plikami); `Ctrl+G m` najpierw pyta o opis (przy włączonym AI `Ctrl+G` w tym

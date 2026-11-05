@@ -593,9 +593,9 @@ preview = "vista previa"
 sidebar_sections_scope = "Secciones del panel izquierdo"
 sidebar_sections_scope_help = "De quién es la elección de secciones mostradas u ocultas del panel izquierdo. repository: cada repositorio conserva la suya (la global es su punto de partida). global: una misma para todos los repositorios. Cambiar de una a otra no hace perder ninguna."
 # context: a Settings row; how the Log lays its columns out
-log_columns_layout = "Column layout"
+log_columns_layout = "Disposición de columnas"
 # context: help text of the Log column layout row; "fit" and "scroll" are the two choices
-log_columns_layout_help = "How the Log lays its columns out. fit: every column fits the pane and only Message flexes. scroll: columns keep their widths, Message too, and the table scrolls sideways when it is wider than the pane."
+log_columns_layout_help = "Cómo dispone el Log sus columnas. fit: cada columna cabe en el panel y solo Mensaje se adapta. scroll: las columnas conservan sus anchos, Mensaje también, y la tabla se desplaza lateralmente cuando es más ancha que el panel."
 
 [settings_git]
 default_backend = "Backend de git"
@@ -747,8 +747,8 @@ pos_right = "Derecha"
 align_start = "Inicio"
 align_center = "Centro"
 align_end = "Final"
-layout_fit = "Fit the pane"
-layout_scroll = "Scroll sideways"
+layout_fit = "Ajustar al panel"
+layout_scroll = "Desplazar lateralmente"
 
 [reltime]
 just_now = "ahora mismo"
@@ -1944,8 +1944,8 @@ copy_name = "Copiar nombre del remoto"
 copy_link = "Copiar enlace del remoto"
 set_default = "Definir como remoto por defecto"
 edit_remote = "Editar {name}..."
-hide_remote_in_graph = "Hide remote from graph"
-show_remote_in_graph = "Show remote in graph"
+hide_remote_in_graph = "Ocultar remoto del grafo"
+show_remote_in_graph = "Mostrar remoto en el grafo"
 remove_remote = "Quitar {name}..."
 default_mark = "(por defecto)"
 pull_title = "{$Pull}"
@@ -1998,8 +1998,8 @@ default_for_repo = "Remoto por defecto de este repositorio"
 copy_name_which = "¿El nombre de qué remoto copiar?"
 copy_link_which = "¿El enlace de qué remoto copiar?"
 fetch_which = "¿Qué remoto {$Fetch}?"
-hide_all_which = "Hide which remote from the graph?"
-show_all_which = "Show which remote in the graph again?"
+hide_all_which = "¿Ocultar qué remoto del grafo?"
+show_all_which = "¿Mostrar de nuevo qué remoto en el grafo?"
 select_local_branch = "selecciona antes una rama local, o activa una"
 select_remote_first = "selecciona antes un remoto en la sección REMOTAS (o usa un comando Remoto:)"
 what_remote_name = "nombre del remoto"
@@ -2011,9 +2011,9 @@ force_confirm_fetch = { git = "¿Force push de {branch} a {remote}?\nPrimero hac
 force_confirm = { git = "¿Force push de {branch} a {remote}?\nCon lease: se rechaza si {remote}/{branch} se movió desde el último fetch. Se descartan los commits que solo tiene {remote}.", local = "¿Envío forzado de {branch} a {remote}?\nCon lease: se rechaza si {remote}/{branch} se movió desde la última obtención. Se descartan las confirmaciones que solo tiene {remote}." }
 setting_upstream = "fijando el upstream de {branch} a {upstream}..."
 unsetting_upstream = "quitando el upstream de {branch}..."
-remote_hidden = "{remote} hidden from the graph, branches fetched later too"
-remote_shown = "{remote} shown in the graph again"
-branch_hidden_with_remote = "{name} is hidden with remote {remote}: show the remote first"
+remote_hidden = "{remote} oculto en el grafo, también las ramas obtenidas después"
+remote_shown = "{remote} se muestra de nuevo en el grafo"
+branch_hidden_with_remote = "{name} está oculta con el remoto {remote}: muestra primero el remoto"
 pinning = "fijando este repositorio a {command}..."
 clearing_pin = "quitando la fijación de la clave SSH..."
 stashing_continuing = { git = "haciendo stash de tus cambios y continuando...", local = "guardando aparte tus cambios y continuando..." }
@@ -2357,11 +2357,11 @@ split_move_down = { git = "Bajar el {$commit}", local = "Bajar la {$commit}" }
 split_reset = "Restablecer la división"
 rewrite_host_howto = "Explicar la protección de ramas del host"
 rewrite_ai_rules = "Crear reglas de reescritura con IA"
-log_columns_fit = "Fit the Column to Its Content"
-log_columns_fit_all = "Fit All Columns to Content"
-log_scroll_left = "Scroll the Columns Left"
-log_scroll_right = "Scroll the Columns Right"
-log_columns_layout = "Scroll Sideways or Fit the Pane"
+log_columns_fit = "Ajustar la columna a su contenido"
+log_columns_fit_all = "Ajustar todas las columnas a su contenido"
+log_scroll_left = "Desplazar las columnas a la izquierda"
+log_scroll_right = "Desplazar las columnas a la derecha"
+log_columns_layout = "Desplazar lateralmente o ajustar al panel"
 
 
 [keymap_ctx]
@@ -2957,8 +2957,8 @@ remote_copy_link_to_remote = "Remoto: Copiar enlace del remoto"
 remote_fetch_remote = "Remoto: {$Fetch} remoto..."
 remote_actions_for_selected_remote = "Remoto: Acciones del remoto seleccionado..."
 repository_ssh_key_for_this_repository = "Repositorio: Clave SSH de este repositorio..."
-remote_hide_remote_in_graph = "Remote: Hide Remote in Graph..."
-remote_show_remote_in_graph = "Remote: Show Remote in Graph..."
+remote_hide_remote_in_graph = "Remoto: Ocultar remoto en el grafo..."
+remote_show_remote_in_graph = "Remoto: Mostrar remoto en el grafo..."
 git_new_branch_at_head = "Git: Rama nueva en HEAD..."
 git_new_tag_at_head = { git = "Git: {$Tag} nuevo en HEAD...", local = "Git: {$Tag} nueva en HEAD..." }
 git_push_all_unpushed_tags = { git = "Git: {$Push} todos los {$tags} sin enviar", local = "Git: {$Push} todas las {$tags} sin enviar" }
@@ -3437,11 +3437,11 @@ git_fetch_selected_tag = { git = "Git: {$Fetch} del {$Tag} seleccionado", local 
 # s24:begin
 rewrite_fix_message_encoding = "Reescritura: Corregir la codificación de mensajes..."
 # s24:end
-view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
-view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
-view_log_scroll_left = "View: Log: Scroll the Columns Left"
-view_log_scroll_right = "View: Log: Scroll the Columns Right"
-view_log_columns_layout = "View: Log: Toggle Scroll Sideways for the Columns"
+view_log_column_fit = "Ver: Columna del Log: ajustar la columna a su contenido"
+view_log_column_fit_all = "Ver: Columna del Log: ajustar todas las columnas a su contenido"
+view_log_scroll_left = "Ver: Log: desplazar las columnas a la izquierda"
+view_log_scroll_right = "Ver: Log: desplazar las columnas a la derecha"
+view_log_columns_layout = "Ver: Log: alternar el desplazamiento lateral de las columnas"
 
 [help_section]
 rewrite = "Reescritura del historial"
@@ -3499,7 +3499,7 @@ commit_column_1 = "desplazar las filas hacia los lados (Shift+rueda o una rueda 
 commit_column_2 = "elegir una parte (carriles, autor, fecha) y ensancharla o estrecharla, o devolver todas las partes al ancho automático; los límites de la cabecera también se arrastran y los anchos se recuerdan"
 commit_column_3 = { git = "ratón: clic en una fila para elegir su commit, clic derecho abre su menú (la tecla de menú también, tras elegir una fila con Arriba/Abajo)", local = "ratón: clic en una fila para elegir su confirmación, clic derecho abre su menú (la tecla de menú también, tras elegir una fila con Arriba/Abajo)" }
 commit_column_4 = "mover la parte elegida a la izquierda o a la derecha; arrastrar su encabezado hace lo mismo, y el orden se recuerda"
-log_columns_1 = "elegir una columna del Log (su celda de encabezado se ilumina); después moverla a la izquierda o a la derecha (arrastrar su encabezado hace lo mismo), ensancharla o estrecharla (arrastrar su borde hace lo mismo) o devolverla al ancho automático. Tab / Shift+Tab eligen otra columna, Esc sale; la disposición se recuerda"
+log_columns_1 = "elegir una columna del Log (su celda de encabezado se ilumina); después moverla a la izquierda o a la derecha (arrastrar su encabezado hace lo mismo), ensancharla o estrecharla (arrastrar su borde hace lo mismo), devolverla al ancho automático o ajustarla a su contenido (hacer doble clic en su borde hace lo mismo; + ajusta todas las columnas). Tab / Shift+Tab eligen otra columna, Esc sale; la disposición se recuerda"
 global_1 = "abre la paleta de comandos - todos los comandos de la app, cada uno con su atajo; escribe para filtrar, Up/Down o Ctrl+P/Ctrl+N para moverte (no j/k: esas se escriben), Enter para ejecutar. Las filas en gris dicen por qué no pueden ejecutarse ahora"
 global_2 = "el prefijo de navegación - ver su propia sección más abajo"
 global_3 = "el prefijo de acciones de git - ver su propia sección más abajo"
@@ -3849,7 +3849,7 @@ split_7 = { git = "en el panel de {$commits}, selecciona ese {$commit}; m o Ente
 rewrite_9 = "abre la pestaña Tamaño y analiza el historial: los archivos y carpetas más grandes, y los archivos eliminados que aún se conservan; las filas marcadas se convierten en reglas de eliminación"
 rewrite_host_howto = "explica cómo sortear la protección de una rama del host para publicar una reescritura: quitar la protección, hacer un {$push_noun} con otro nombre de rama o volver a crear el repositorio; no se hace nada por ti"
 rewrite_ai_rules = "crea las reglas de reescritura a partir de tu descripción con IA (no se previsualiza ni se aplica nada)"
-log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
+log_columns_2 = "desplazar lateralmente las columnas del Log cuando conservan sus anchos (la disposición Desplazar lateralmente, que se elige en el selector de columnas, en Ajustes o con s mientras hay una columna elegida); en la disposición ajustada, todas las columnas caben en el panel"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} o clic derecho"
@@ -4093,21 +4093,21 @@ column_width_reset = "Los anchos de las columnas del Log vuelven a ser automáti
 changes_files = { one = "{n} archivo", other = "{n} archivos" }
 changes_files_short = "{n}a"
 # context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
-column_fitted = "{column} fitted to its content: {cells} cells."
+column_fitted = "{column} ajustada a su contenido: {cells} celdas."
 # context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
-column_fit_cut = "{column} needs {need} cells, {have} fit. Switch the columns to Scroll sideways to show it all."
+column_fit_cut = "{column} necesita {need} celdas, caben {have}. Cambia las columnas a Desplazar lateralmente para verla entera."
 # context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
-column_fit_message = "Message takes the room the other columns leave."
+column_fit_message = "Mensaje ocupa el espacio que dejan las demás columnas."
 # context: status line after every Log column was fitted to its content
-columns_fitted_all = "All columns fitted to their content."
+columns_fitted_all = "Todas las columnas ajustadas a su contenido."
 # context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
-columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
+columns_fit_all_cut = "Ajustadas a su contenido, pero no hay sitio suficiente para: {columns}."
 # context: status line when a key or command scrolls the Log columns sideways but they fit the pane (the columns layout is "fit"); "Scroll sideways" is the name of the columns layout option
-columns_fit_pane = "The columns fit the pane. Switch the columns to Scroll sideways to scroll."
+columns_fit_pane = "Las columnas caben en el panel. Cambia las columnas a Desplazar lateralmente para desplazarlas."
 # context: status line after the Log columns layout became "scroll sideways": columns keep their widths and the table can be wider than the pane
-layout_now_scroll = "Columns keep their widths and scroll sideways."
+layout_now_scroll = "Las columnas conservan su ancho y se desplazan lateralmente."
 # context: status line after the Log columns layout became "fit": every column fits the pane
-layout_now_fit = "Columns fit the pane."
+layout_now_fit = "Las columnas caben en el panel."
 
 [find_bar]
 counter = "{current} de {total}"
@@ -4173,13 +4173,13 @@ changes_files = { one = "{n} archivo cambiado", other = "{n} archivos cambiados"
 changes_insertions = { one = "{n} inserción", other = "{n} inserciones" }
 changes_deletions = { one = "{n} eliminación", other = "{n} eliminaciones" }
 # context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
-column_menu_fit = "Fit {column} to content"
+column_menu_fit = "Ajustar {column} a su contenido"
 # context: a row of the Log columns chooser that fits every column to its content
-column_menu_fit_all = "Fit all columns to content"
+column_menu_fit_all = "Ajustar todas las columnas a su contenido"
 # context: a row of the Log columns chooser that puts every column width back to automatic
-column_menu_reset = "Reset column widths"
+column_menu_reset = "Restablecer los anchos de columna"
 # context: a checkbox row of the Log columns chooser; when checked, columns keep their widths and the Log scrolls sideways instead of fitting every column into the pane
-column_menu_scroll = "Scroll sideways (columns keep their widths)"
+column_menu_scroll = "Desplazar lateralmente (las columnas conservan su ancho)"
 
 [overlays]
 select_tab_title = "Seleccionar pestaña ({shown}/{total})"
@@ -5796,8 +5796,8 @@ palette_git_tab = "Registro de actividad: Operaciones de git"
 palette_app_tab = "Registro de actividad: Registro de la aplicación"
 
 [git_error]
-summary_host_key = "The SSH host key of the remote is not known yet."
-hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
+summary_host_key = "Aún no se conoce la clave de host SSH del remoto."
+hint_host_key = "Ejecuta `ssh -T git@<host>` una vez en un terminal, comprueba la huella y responde yes; después reintenta."
 title_push = { git = "Error en {$push}", local = "Error al {$push}" }
 title_pull = { git = "Error en {$pull}", local = "Error al {$pull}" }
 title_fetch = { git = "Error en {$fetch}", local = "Error al {$fetch}" }
@@ -5813,7 +5813,7 @@ done_pull = { git = "{$Pull} completado", local = "Traída completada" }
 summary_non_ff = "El remoto tiene {$commits} que no tienes."
 hint_non_ff = { git = "Haz primero un {$pull} y vuelve a intentarlo.", local = "Primero trae los cambios del remoto y vuelve a intentarlo." }
 summary_auth = "El remoto rechazó las credenciales."
-hint_auth = "Revisa tus credenciales en Ajustes > Integraciones, o tu clave SSH."
+hint_auth = "Revisa tus credenciales en Ajustes > Integraciones, o inicia un ssh-agent con tu clave, o define una clave SSH para este repositorio."
 summary_conflict = "Se detuvo por conflictos."
 hint_conflict = "Resuelve los conflictos en el panel Estado y continúa."
 summary_overwrite = "Se sobrescribirían cambios locales."

@@ -63,6 +63,12 @@ Att dra i en rubrik visar ett spöke av dess namn som följer pekaren och en acc
 
 Från tangentbordet väljer `Shift+C` (eller paletten med `Vy: Log-kolumn: välj en kolumn att flytta eller ändra bredd på`) en kolumn, och dess rubrikcell lyser upp. Sedan väljer `Tab` / `Shift+Tab` en annan kolumn, `<` / `>` flyttar den ett steg åt vänster eller höger bland de visade kolumnerna (tangentbordsmotsvarigheten till att dra i rubriken), `]` / `[` gör den bredare eller smalare (motsvarigheten till att dra i gränsen; den sista kolumnen flyttar sin vänstra kant), `0` ger alla bredder automatiskt värde igen och `Esc` eller `Enter` avslutar. Piltangenterna flyttar under tiden fortfarande mellan commits. Ordningen och bredderna sparas som efter en dragning och gäller bara Log: commit-kolumnen bredvid en diff har en egen lista.
 
+*Anpassa efter innehållet.* Ett **dubbelklick** på en kolumns gräns anpassar kolumnen till vänster om den efter dess bredaste synliga innehåll och dess rubrik (breda tecken och emoji räknas efter de celler de tar). I layouten fit fyller Log alltid sin ruta, så en kolumn stannar vid det som rutan har plats för när **Meddelande** behåller sin andel och varje annan kolumn sin minsta bredd: statusraden säger då `Författare behöver 34 celler, 20 ryms.` Samma sak från tangentbordet: med en kolumn vald (`Shift+C`, `Tab`) anpassar `=` den och `+` anpassar alla kolumner; paletten har `Vy: Log-kolumn: anpassa kolumnen efter innehållet` och `... anpassa alla kolumner efter innehållet`; högerklicksväljaren listar `Anpassa <column> efter innehållet` (kolumnen under pekaren), `Anpassa alla kolumner efter innehållet` och `Återställ kolumnbredder` under sina kryssrutor. **Meddelande** är den flexibla kolumnen och har ingen egen bredd att anpassa: den tar det utrymme de andra lämnar.
+
+*Rulla i sidled.* Som standard ryms varje kolumn i rutan. I layouten **scroll** (väljarens ruta `Rulla i sidled (kolumnerna behåller sina bredder)`, Inställningar > Log & graf > Kolumnlayout, paletten `Vy: Log: växla rullning i sidled för kolumnerna`, eller `s` medan en kolumn är vald) behåller kolumnerna sina bredder, **Meddelande** inräknad (den har en egen bredd där, och att anpassa den tar dess bredaste sammanfattning), inget ges upp när fönstret är smalt, och tabellen kan vara bredare än rutan. En stapel på nedre kanten rullar den då: dra i handtaget, tryck på det bara spåret för att föra handtaget under pekaren, eller använd dess ändpilar. Från tangentbordet rullar `Shift+Vänster` / `Shift+Höger` fyra celler (paletten har `Vy: Log: rulla kolumnerna åt vänster` / `höger`); det horisontella hjulet eller `Shift`+hjul över tabellen gör detsamma, och att välja en kolumn (`Shift+C`, `Tab`) rullar den till synlig. En tabell som är smalare än rutan lämnar tomt utrymme till höger, och en markerad rads band löper till kanten. Varje layout behåller sina egna bredder (`ui.log_column_widths` och `ui.log_column_widths_scroll`); första dragningen, tangenten eller anpassningen i layouten scroll lagrar varje kolumn med den bredd den har, så bara den du ändrar flyttas. I layouten fit säger en anpassning som inte ryms i rutan det och pekar på den här layouten.
+
+*Sista kolumnens grepp.* Sista kolumnen har också ett grepp, på sin egen sista cell (inte rutans kant, som fortfarande ändrar storlek på rutorna): en dragning flyttar den lika långt som pekaren färdades, och **Meddelande** tar mellanskillnaden. **SHA** är som standard 8 celler bred (de 7 siffrorna och greppcellen).
+
 ### Författare och `.mailmap`
 
 När repositoryt har en `.mailmap` (gits fil som ger en person som har committat
@@ -89,8 +95,10 @@ namn och e-postadresser och skriver `.mailmap`-rader åt dig, se
 - **Solo** (tangenten `o`, eller refens meny, på en ref, mapp eller remote):
   visar bara commits för de soloade refsen; solo flera för att se deras union.
   `Shift+O` slutar solo.
-- **Dölj** en ref (dess meny) för att ta bort den ur grafen; *Dolda n* i
-  Refs-rubriken räknar dem, **Visa alla** (`Shift+H`) tar tillbaka dem.
+- **Dölj** en ref (dess meny) för att ta bort den ur grafen: dess piller försvinner och
+  likaså commits som bara den når (den utcheckade commiten stannar alltid, med
+  arbetsträdsraden). *Dolda n* i Refs-rubriken räknar dem, **Visa alla**
+  (`Shift+H`) tar tillbaka dem. Statusradens summa räknar den synliga historiken.
 
 ## Grenar, tags och Refs-sidofältet
 
@@ -106,7 +114,7 @@ posterna:
 | Fast-forward `<gren>` till `<aktuell>` / `<aktuell>` till `<gren>` | Flyttar en gren framåt när det är en fast-forward; annars nedtonad med orsaken (`divergerat, ingen fast-forward`) |
 | Skapa worktree från... | Öppnar en länkad worktree i en egen flik |
 | Pull, Push, Fetch, Ange upstream... | Nätverksoperationer på den grenen |
-| Dölj / Visa i grafen, Solo | Bara visning; de döljer eller soloar en ref utan att röra repositoryt |
+| Dölj / Visa i grafen, Solo | Bara visning; de döljer eller soloar en ref (att dölja tar också bort commits som bara den refen når) utan att röra repositoryt |
 | Byt namn på, Ta bort | Ta bort frågar först; en remote-tvilling kan också tas bort |
 | Kopiera grennamn, Kopiera länk till grenen på remote | Till urklipp |
 
@@ -170,7 +178,14 @@ På en commit utan ref visar det också ett bleknat piller i kolumnen Ref med na
 
 **Remotes.** `+` i rubriken REMOTE lägger till en; högerklicka på en remotes
 namn för att göra fetch på den, kopiera dess webblänk, göra den till
-standard-remote, dölja alla dess grenar, ändra dess URL:er eller ta bort den.
+standard-remote, dölja den i grafen, ändra dess URL:er eller ta bort den. **Att dölja en remote**
+(radens öga, menyns *Dölj remote i grafen* eller `Remote: Dölj remote i grafen...` i
+paletten) döljer varje gren den har nu eller får senare, och commits som bara den
+når lämnar Log: sättet att bläddra i en historik utan historiken från en orelaterad
+arkiv-remote; ta tillbaka den med *Visa remote i grafen*. Att visa en
+remote visar också grenarna i den som dolts en och en. En gren i en
+dold remote säger det på statusraden om dess öga används: visa remoten
+först.
 
 **Stashes.** **Stash** stashar allt (inklusive ospårade filer); `Ctrl+G m`
 frågar först efter ett meddelande (med AI på föreslår `Ctrl+G` i den frågan

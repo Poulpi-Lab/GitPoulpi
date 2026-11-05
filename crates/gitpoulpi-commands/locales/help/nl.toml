@@ -278,21 +278,21 @@ redo = "Doe de bewerking die `undo` net terugdraaide opnieuw, naar de exact vast
 "redo --expect" = "Doe alleen opnieuw als dit nog het laatste ongedane item is"
 "redo --yes" = "Ga door als het opnieuw doen riskant is; zonder krijg je afsluitcode 3"
 "refs hide" = """Verberg refs in de commitgrafiek (het "Verbergen" van de TUI): het weergavefilter per repo in `repo-state.toml`, dat een open TUI live volgt. Namen worden gespeld zoals de refslijst ze spelt (`feature/x`, `origin/main`, een tagnaam)"""
-"refs hide --clear" = "Maak elke verborgen ref weer zichtbaar (naast eventueel genoemde)"
+"refs hide --clear" = "Maak elke verborgen ref en remote weer zichtbaar (naast eventueel genoemde)"
 "refs hide --names" = "Te verbergen refs"
 "refs hide#long" = """
-Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+Verberg refs in de commitgrafiek (het "Verbergen" van de TUI): het weergavefilter per repo in `repo-state.toml`, dat een open TUI live volgt. Namen worden gespeld zoals de refslijst ze spelt (`feature/x`, `origin/main`, een tagnaam).
 
-`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
-"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
+`--remote <naam>...` verbergt een hele remote (elke branch ervan, ook de later opgehaalde): zo bekijk je één geschiedenis zonder de geschiedenis van een aparte archiefremote."""
+"refs hide --remote" = "Remotes die als geheel verborgen worden (namen zoals `remote list` ze spelt)"
 "refs show" = "Toon refs weer: verwijdert ze uit de verborgen en solo-sets"
-"refs show --clear" = "Reset het hele filter: niets verborgen, niets solo"
+"refs show --clear" = "Reset het hele filter: niets verborgen (remotes inbegrepen), niets solo"
 "refs show --names" = "Weer te tonen refs"
 "refs show#long" = """
-Show refs again: removes them from the hidden and solo sets.
+Toon refs weer: verwijdert ze uit de verborgen en solo-sets.
 
-`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
-"refs show --remote" = "Remotes to show again"
+`--remote <naam>...` toont een hele remote weer, met elke branch ervan die afzonderlijk verborgen was."""
+"refs show --remote" = "Weer te tonen remotes"
 "refs solo" = "Toon alleen deze refs (en wat ze bereiken) in de commitgrafiek"
 "refs solo --clear" = "Heft solo op voor elke solo-ref (naast eventueel genoemde)"
 "refs solo --names" = "Refs om solo te zetten"

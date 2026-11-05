@@ -209,7 +209,8 @@ GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, L
 | 명령 | 동작 |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | 저장소와 이 세션의 탭. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (각각 `--clear` 지원) | Log의 ref 필터: 숨기기, 다시 표시, 이것들만 표시(열려 있는 창에 실시간 반영). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (각각 `--clear` 지원) | Log의 ref 필터: 숨기기, 다시 표시, 이것들만 표시(열려 있는 창에 실시간 반영). 숨긴 ref는 탐색에서도 빠집니다. 그 ref만 닿는 commit은 Log에서 사라집니다(체크아웃된 commit은 항상 남습니다). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | 리모트 전체를 숨기거나 표시합니다. 모든 브랜치가 대상이며 나중에 fetch하는 것도 포함합니다. 숨기려면 이름이 저장소의 리모트여야 합니다. `show`는 하나씩 숨겨 둔 그 리모트의 브랜치도 함께 표시하고, `--clear`는 숨긴 리모트도 비웁니다. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | 이름 있는 세션(데몬이 실행 중이면 rename / delete는 거부됩니다). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | 세션의 백그라운드 프로세스(별칭 `server`). 실행 중인 데몬이 없으면 각 명령이 자기 수명 동안 쓸 내장 데몬을 시작합니다. |
 | `config path`, `config get <key>`, `config set <key> <value>` | 설정([설정 참조](config-reference.md)). `config set ui.theme`과 `ui.graph_color_theme`은 이름을 레지스트리와 대조합니다. |

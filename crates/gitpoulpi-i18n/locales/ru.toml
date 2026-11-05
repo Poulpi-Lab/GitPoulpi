@@ -595,9 +595,9 @@ preview = "образец"
 sidebar_sections_scope = "Разделы левой панели"
 sidebar_sections_scope_help = "Чей выбор определяет, какие разделы левой панели показаны или скрыты. «По репозиториям»: у каждого репозитория свой набор (за основу берётся глобальный). «Глобально»: один набор для всех репозиториев. При переключении ни один из наборов не теряется."
 # context: a Settings row; how the Log lays its columns out
-log_columns_layout = "Column layout"
+log_columns_layout = "Раскладка колонок"
 # context: help text of the Log column layout row; "fit" and "scroll" are the two choices
-log_columns_layout_help = "How the Log lays its columns out. fit: every column fits the pane and only Message flexes. scroll: columns keep their widths, Message too, and the table scrolls sideways when it is wider than the pane."
+log_columns_layout_help = "Как Log раскладывает колонки. fit: каждая колонка умещается в панель, гибкая только Message. scroll: колонки сохраняют ширину, Message тоже, и таблица прокручивается вбок, если шире панели."
 
 [settings_git]
 default_backend = "Бэкенд git"
@@ -749,8 +749,8 @@ pos_right = "Справа"
 align_start = "В начале"
 align_center = "По центру"
 align_end = "В конце"
-layout_fit = "Fit the pane"
-layout_scroll = "Scroll sideways"
+layout_fit = "По размеру панели"
+layout_scroll = "Прокрутка вбок"
 
 [reltime]
 just_now = "только что"
@@ -1936,8 +1936,8 @@ copy_name = "Копировать имя remote"
 copy_link = "Копировать ссылку на remote"
 set_default = "Сделать remote по умолчанию"
 edit_remote = "Изменить {name}..."
-hide_remote_in_graph = "Hide remote from graph"
-show_remote_in_graph = "Show remote in graph"
+hide_remote_in_graph = "Скрыть remote из графа"
+show_remote_in_graph = "Показать remote в графе"
 remove_remote = "Удалить {name}..."
 default_mark = "(по умолчанию)"
 pull_title = "{$Pull}"
@@ -1990,8 +1990,8 @@ default_for_repo = "Remote по умолчанию для этого репоз�
 copy_name_which = "Имя какого remote копировать?"
 copy_link_which = "Ссылку на какой remote копировать?"
 fetch_which = { git = "Fetch какого remote?", local = "Какой remote загрузить?" }
-hide_all_which = "Hide which remote from the graph?"
-show_all_which = "Show which remote in the graph again?"
+hide_all_which = "Какой remote скрыть из графа?"
+show_all_which = "Какой remote снова показать в графе?"
 select_local_branch = "сначала выберите локальную ветку или переключитесь на неё"
 select_remote_first = "сначала выберите remote в разделе REMOTE (или используйте команду Remote:)"
 what_remote_name = "имя remote"
@@ -2003,9 +2003,9 @@ force_confirm_fetch = { git = "Force push {branch} в {remote}?\nСначала 
 force_confirm = { git = "Force push {branch} в {remote}?\nС lease: отклоняется, если {remote}/{branch} изменилась с последнего fetch. Commit'ы, которые есть только в {remote}, будут отброшены.", local = "Принудительно отправить {branch} в {remote}?\nС lease: отклоняется, если {remote}/{branch} изменилась после последней загрузки. Коммиты, которые есть только в {remote}, будут отброшены." }
 setting_upstream = "установка upstream для {branch}: {upstream}..."
 unsetting_upstream = "сброс upstream для {branch}..."
-remote_hidden = "{remote} hidden from the graph, branches fetched later too"
-remote_shown = "{remote} shown in the graph again"
-branch_hidden_with_remote = "{name} is hidden with remote {remote}: show the remote first"
+remote_hidden = "{remote} скрыт из графа, ветки, полученные позже, тоже"
+remote_shown = "{remote} снова показан в графе"
+branch_hidden_with_remote = "{name} скрыта вместе с remote {remote}: сначала покажите remote"
 pinning = "привязка этого репозитория к {command}..."
 clearing_pin = "снятие привязки ключа SSH..."
 stashing_continuing = { git = "изменения прячутся в stash, затем продолжение...", local = "изменения прячутся в стэш, затем продолжение..." }
@@ -2349,11 +2349,11 @@ split_move_down = "Переместить {$commit} вниз"
 split_reset = "Сбросить разделение"
 rewrite_host_howto = "Объяснить защиту ветки на хостинге"
 rewrite_ai_rules = "Создать правила переписывания с помощью ИИ"
-log_columns_fit = "Fit the Column to Its Content"
-log_columns_fit_all = "Fit All Columns to Content"
-log_scroll_left = "Scroll the Columns Left"
-log_scroll_right = "Scroll the Columns Right"
-log_columns_layout = "Scroll Sideways or Fit the Pane"
+log_columns_fit = "Подогнать колонку под содержимое"
+log_columns_fit_all = "Подогнать все колонки под содержимое"
+log_scroll_left = "Прокрутить колонки влево"
+log_scroll_right = "Прокрутить колонки вправо"
+log_columns_layout = "Прокрутка вбок или по размеру панели"
 
 
 [keymap_ctx]
@@ -2950,8 +2950,8 @@ remote_copy_link_to_remote = "Remote: копировать ссылку на rem
 remote_fetch_remote = { git = "Remote: fetch remote...", local = "Remote: загрузить remote..." }
 remote_actions_for_selected_remote = "Remote: действия для выбранного remote..."
 repository_ssh_key_for_this_repository = "Репозиторий: ключ SSH для этого репозитория..."
-remote_hide_remote_in_graph = "Remote: Hide Remote in Graph..."
-remote_show_remote_in_graph = "Remote: Show Remote in Graph..."
+remote_hide_remote_in_graph = "Remote: скрыть remote в графе..."
+remote_show_remote_in_graph = "Remote: показать remote в графе..."
 git_new_branch_at_head = "Git: новая ветка в HEAD..."
 git_new_tag_at_head = { git = "Git: новый tag в HEAD...", local = "Git: новый тег в HEAD..." }
 git_push_all_unpushed_tags = { git = "Git: push всех неотправленных tag'ов", local = "Git: отправить все неотправленные теги" }
@@ -3430,11 +3430,11 @@ git_fetch_selected_tag = "Git: {$Fetch} выбранный {$tag}"
 # s24:begin
 rewrite_fix_message_encoding = "Переписывание: исправить кодировку сообщений..."
 # s24:end
-view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
-view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
-view_log_scroll_left = "View: Log: Scroll the Columns Left"
-view_log_scroll_right = "View: Log: Scroll the Columns Right"
-view_log_columns_layout = "View: Log: Toggle Scroll Sideways for the Columns"
+view_log_column_fit = "Вид: колонка Log: подогнать колонку под содержимое"
+view_log_column_fit_all = "Вид: колонка Log: подогнать все колонки под содержимое"
+view_log_scroll_left = "Вид: Log: прокрутить колонки влево"
+view_log_scroll_right = "Вид: Log: прокрутить колонки вправо"
+view_log_columns_layout = "Вид: Log: переключить прокрутку колонок вбок"
 
 [help_section]
 rewrite = "Переписывание истории"
@@ -3493,7 +3493,7 @@ commit_column_1 = "прокрутить строки вбок (Shift+колес�
 commit_column_2 = "выбрать часть (полосы графа, автор, дата), затем расширить или сузить её, либо вернуть все части к автоматической ширине; границы в заголовке тоже перетаскиваются, ширина запоминается"
 commit_column_3 = { git = "мышь: щелчок по строке выбирает её commit, правый щелчок открывает меню (клавиша меню тоже, после выбора строки стрелками Вверх/Вниз)", local = "мышь: щелчок по строке выбирает её коммит, правый щелчок открывает меню (клавиша меню тоже, после выбора строки стрелками Вверх/Вниз)" }
 commit_column_4 = "сдвинуть выбранную часть влево или вправо; перетаскивание её заголовка делает то же, порядок запоминается"
-log_columns_1 = "выбрать колонку Log (ячейка её заголовка подсвечивается); затем сдвинуть влево или вправо (перетаскивание заголовка делает то же), расширить или сузить (перетаскивание её границы делает то же) или вернуть автоматическую ширину. Tab / Shift+Tab выбирают другую колонку, Esc выходит; раскладка запоминается"
+log_columns_1 = "выбрать колонку Log (ячейка её заголовка подсвечивается); затем сдвинуть влево или вправо (перетаскивание заголовка делает то же), расширить или сузить (перетаскивание её границы делает то же), вернуть автоматическую ширину или подогнать её под содержимое (двойной щелчок по её границе делает то же; + подгоняет все колонки). Tab / Shift+Tab выбирают другую колонку, Esc выходит; раскладка запоминается"
 global_1 = "открыть палитру команд - все команды приложения с их сочетаниями; вводите текст для фильтра, Вверх/Вниз или Ctrl+P/Ctrl+N для перемещения (не j/k: они вводятся как текст), Enter - выполнить. Серые строки объясняют, почему команда сейчас недоступна"
 global_2 = "префикс навигации - см. отдельный раздел ниже"
 global_3 = "префикс действий git - см. отдельный раздел ниже"
@@ -3843,7 +3843,7 @@ split_7 = { git = "на панели commit'ов выбирает этот commi
 rewrite_9 = "открывает вкладку «Размер» и анализирует историю: самые большие файлы и папки, а также файлы, удалённые, но всё ещё хранящиеся; отмеченные строки становятся правилами удаления"
 rewrite_host_howto = { git = "объясняет, как провести переписывание через ветку, защищённую хостингом: снять защиту, сделать push под новым именем или пересоздать репозиторий; сам ничего не делает", local = "объясняет, как провести переписывание через ветку, защищённую хостингом: снять защиту, отправить под новым именем или пересоздать репозиторий; сам ничего не делает" }
 rewrite_ai_rules = "создаёт правила переписывания по вашему описанию с помощью ИИ (без предпросмотра и без применения)"
-log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
+log_columns_2 = "прокручивать колонки Log вбок, когда они сохраняют свою ширину (раскладка «Прокрутка вбок», выбирается в списке колонок, в Настройках или клавишей s при выбранной колонке); в раскладке «По размеру панели» все колонки умещаются в панель"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} или правый щелчок"
@@ -4087,21 +4087,21 @@ column_width_reset = "Ширина колонок Log снова автомат�
 changes_files = { one = "{n} файл", few = "{n} файла", many = "{n} файлов", other = "{n} файлов" }
 changes_files_short = "{n}ф"
 # context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
-column_fitted = "{column} fitted to its content: {cells} cells."
+column_fitted = "{column} подогнана под содержимое: {cells} яч."
 # context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
-column_fit_cut = "{column} needs {need} cells, {have} fit. Switch the columns to Scroll sideways to show it all."
+column_fit_cut = "{column}: нужно {need} яч., умещается {have}. Переключите колонки на прокрутку вбок, чтобы показать всё."
 # context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
-column_fit_message = "Message takes the room the other columns leave."
+column_fit_message = "Колонка «Сообщение» занимает место, которое оставляют другие колонки."
 # context: status line after every Log column was fitted to its content
-columns_fitted_all = "All columns fitted to their content."
+columns_fitted_all = "Все колонки подогнаны под содержимое."
 # context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
-columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
+columns_fit_all_cut = "Подогнаны под содержимое, но не хватило места для: {columns}."
 # context: status line when a key or command scrolls the Log columns sideways but they fit the pane (the columns layout is "fit"); "Scroll sideways" is the name of the columns layout option
-columns_fit_pane = "The columns fit the pane. Switch the columns to Scroll sideways to scroll."
+columns_fit_pane = "Колонки умещаются в панель. Переключите колонки на прокрутку вбок, чтобы прокручивать."
 # context: status line after the Log columns layout became "scroll sideways": columns keep their widths and the table can be wider than the pane
-layout_now_scroll = "Columns keep their widths and scroll sideways."
+layout_now_scroll = "Колонки сохраняют ширину и прокручиваются вбок."
 # context: status line after the Log columns layout became "fit": every column fits the pane
-layout_now_fit = "Columns fit the pane."
+layout_now_fit = "Колонки умещаются в панель."
 
 [find_bar]
 counter = "{current} из {total}"
@@ -4167,13 +4167,13 @@ changes_files = { one = "{n} изменённый файл", few = "{n} изме
 changes_insertions = { one = "{n} добавление", few = "{n} добавления", many = "{n} добавлений", other = "{n} добавлений" }
 changes_deletions = { one = "{n} удаление", few = "{n} удаления", many = "{n} удалений", other = "{n} удалений" }
 # context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
-column_menu_fit = "Fit {column} to content"
+column_menu_fit = "Подогнать {column} под содержимое"
 # context: a row of the Log columns chooser that fits every column to its content
-column_menu_fit_all = "Fit all columns to content"
+column_menu_fit_all = "Подогнать все колонки под содержимое"
 # context: a row of the Log columns chooser that puts every column width back to automatic
-column_menu_reset = "Reset column widths"
+column_menu_reset = "Сбросить ширину колонок"
 # context: a checkbox row of the Log columns chooser; when checked, columns keep their widths and the Log scrolls sideways instead of fitting every column into the pane
-column_menu_scroll = "Scroll sideways (columns keep their widths)"
+column_menu_scroll = "Прокрутка вбок (колонки сохраняют ширину)"
 
 [overlays]
 select_tab_title = "Выбор вкладки ({shown}/{total})"
@@ -4951,7 +4951,7 @@ ai_proposed_plan = "ИИ предложил план - проверьте и с�
 ai_wrote_pr = "ИИ написал заголовок и описание"
 ai_failed = "ИИ: {why}"
 ai_canceled = "запрос к ИИ отменён"
-refs_refresh_failed = "не удалось обновить, показан последний список: {why}"
+refs_refresh_failed = "Не удалось обновить, показан последний список: {why}"
 lfs_program_installed = "установлен ({version})"
 lfs_program_too_old = "{version} слишком старая (нужна 3.0 или новее)"
 lfs_program_missing = "не установлен (https://git-lfs.com)"
@@ -5793,8 +5793,8 @@ palette_git_tab = "Журнал активности: операции git"
 palette_app_tab = "Журнал активности: журнал приложения"
 
 [git_error]
-summary_host_key = "The SSH host key of the remote is not known yet."
-hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
+summary_host_key = "Ключ SSH-хоста этого remote пока неизвестен."
+hint_host_key = "Один раз выполните `ssh -T git@<host>` в терминале, сверьте отпечаток, ответьте yes и повторите."
 title_push = { git = "{$Push}: сбой", local = "Отправка: сбой" }
 title_pull = { git = "{$Pull}: сбой", local = "Получение изменений: сбой" }
 title_fetch = { git = "{$Fetch}: сбой", local = "Загрузка: сбой" }
@@ -5810,7 +5810,7 @@ done_pull = { git = "{$Pull}: готово", local = "Получение изм�
 summary_non_ff = "В удалённом репозитории есть {$commits}, которых у вас нет."
 hint_non_ff = { git = "Сначала выполните pull, затем повторите.", local = "Сначала подтяните изменения, затем повторите." }
 summary_auth = "Удалённый репозиторий отклонил учётные данные."
-hint_auth = "Проверьте учётные данные в Настройки > Интеграции или ваш ключ SSH."
+hint_auth = "Проверьте учётные данные в Настройки > Интеграции, либо запустите ssh-agent со своим ключом, либо задайте ключ SSH для этого репозитория."
 summary_conflict = "Операция остановилась из-за конфликтов."
 hint_conflict = "Разрешите конфликты на панели Status и продолжите."
 summary_overwrite = "Локальные изменения были бы перезаписаны."

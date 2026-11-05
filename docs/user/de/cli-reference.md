@@ -239,7 +239,8 @@ aufgerufen, sodass API-Schlüssel nie zum Daemon oder einem MCP-Client gelangen.
 | Befehl | Was er tut |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Repositories und die Tabs dieser Sitzung. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (jeweils mit `--clear`) | Der Ref-Filter des Logs: ausblenden, wieder zeigen, nur diese zeigen (live in einem geöffneten Fenster). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (jeweils mit `--clear`) | Der Ref-Filter des Logs: ausblenden, wieder zeigen, nur diese zeigen (live in einem geöffneten Fenster). Ausgeblendete Refs verlassen auch den Durchlauf: Commits, die nur sie erreichen, verschwinden aus dem Log (der ausgecheckte Commit bleibt immer). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Ganze Remotes aus- oder einblenden: jeden ihrer Branches, auch die später abgerufenen. Der Name muss ein Remote des Repositorys sein (beim Ausblenden). `show` holt auch Branches des Remotes zurück, die einzeln ausgeblendet waren; `--clear` leert auch die ausgeblendeten Remotes. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Benannte Sitzungen (Umbenennen / Löschen lehnen ab, solange ihr Daemon läuft). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | Der Hintergrundprozess der Sitzung (Alias `server`). Ohne laufenden Daemon startet jeder Befehl einen eingebetteten für seine eigene Lebensdauer. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Einstellungen ([Konfigurationsreferenz](config-reference.md)). `config set ui.theme` und `ui.graph_color_theme` prüfen den Namen gegen das Register. |

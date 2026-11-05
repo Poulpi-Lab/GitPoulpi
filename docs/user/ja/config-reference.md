@@ -98,6 +98,8 @@ author_email = "jane@work.example"
 | `ui.graph_ghost_ref` | `true` | Log の Ref 列は、自分の ref を持たないホバー中の commit に、列に余裕があれば、所属ブランチ（なければリモートブランチ）の名前を淡いピルで表示します。tag は仮表示されません。削除されたブランチは、それを merge した merge commit の件名から推定され、取り消し線付きで描かれます。ピルにホバーすると種類が表示されます。 |
 | `ui.reveal_on_ref_click` | `true` | Refs ペインで参照（ブランチ、tag、リモートブランチ、stash）を 1 回クリックすると、ログがその commit までスクロールして行が点滅します。commit の選択は動きません。 |
 | `ui.log_wip_counts_in_message` | `true` | 変更列が非表示のとき、WIP のメッセージに WIP の変更数を表示します。 |
+| `ui.log_columns_layout` | `"fit"` | ログの列の並べ方。`fit`：表示中のすべての列がペインにぴったり収まり、`message` だけが伸縮します。ペインが狭いときは列ごと省かれます。`scroll`：`message` を含め列は幅を保ち、何も省かれず、ペインより広いときは表が横にスクロールします。 |
+| `ui.log_column_widths_scroll` | 空 | `scroll` レイアウトの列幅（名前 -> セル数）。`message` も指定できます（`fit` レイアウト用の `ui.log_column_widths` には `message` を入れません）。レイアウトが `scroll` のときに列をドラッグ、サイズ変更、内容に合わせると書き込まれます。 |
 | `ui.log_columns_hidden`、`ui.log_columns_order`、`ui.log_column_widths` | 空 | ログの列（`ref`、`graph`、`message`、`author`、`date`、`sha`、`changes`）です。列を非表示にしたり、ドラッグしたり、幅を変えたりすると書き込まれます。`message` は非表示にできません。 |
 | `ui.commit_column_columns_visible`、`ui.commit_column_columns_order`、`ui.commit_column_columns_widths` | 空 | diff の横にある [commit 列](interface-tour.md#commit列)の欄で、ログの欄とは別に持ちます。表示する欄を名前で（`ref`、`graph`、`message`、`author`、`date`、`changes`、`sha`。空ならレーン、メッセージ、作成者、日付）、同じ名前で指定する左から右への順序（空なら今挙げた順。省いた名前はその順で後ろに続きます）、ドラッグした幅を欄ごとのセル数で（省略した欄は自動）保存します。欄を選んだり、移動したり、幅を変えたりすると書き込まれます。`message` は非表示にできません。これらのキーができる前に書かれたセッションファイルは、一度だけここに読み込まれます。 |
 | `ui.sidebar_sections_hidden` | 空 | 非表示にした左ペインのセクション（`local`、`remote`、`worktrees`、`stashes`、`tags`、`pull_requests`、`issues`、`submodules`）で、ペインの右クリックメニューまたはパレットから書き込まれます。存在するセクションが少なくとも 1 つは必ず表示されます。 これは既定値です。各リポジトリは独自にセクションを非表示にでき（そのリポジトリの状態ファイルに保存）、このキーは独自の選択がないリポジトリに適用されます。*すべてのリポジトリに使う*がこのキーを書き込みます。 |
@@ -452,6 +454,7 @@ stage_file = "z"
 | `hosting_integration` | ここに固定された `[[integrations]]` のプロファイル | `gitpoulpi hosting use --id` |
 | `pulls_source`、`issues_source` | PR / Issue の一覧が読むプロバイダーのプロジェクトで、`{ integration, project, filter }` の形です。`filter` は省略可能で、プロバイダー固有の追加条件（Jira の JQL の断片、Azure の WIQL の条件、Trello のリスト名）を一覧のクエリに AND で加えます。GitHub と GitLab は無視します。 | サイドバーのセクション、`gitpoulpi hosting link` |
 | `ref_visibility` | 非表示 / ソロ表示の参照 | Refs サイドバー、`gitpoulpi refs hide\|show\|solo` |
+| `hidden_remotes` | グラフからまるごと非表示にしたリモート（すべてのブランチ。あとで fetch したものも） | リモートの目のアイコンとメニュー、`gitpoulpi refs hide --remote` |
 | `folds`、`collapsed_*_ref_folders` | 折りたたんだサイドバーのセクションと、ブランチおよびタグのフォルダー。`[folds]` には、`status_folders`（Unstaged / Staged のファイルツリーの折りたたんだフォルダー）と `commit_folders`（commit の変更ファイルツリーの折りたたんだフォルダーで、すべての commit で共通）も含まれ、それぞれ最大 500 パスで、古いものから捨てられます | サイドバー、ファイルツリー |
 | `pending_auto_stash` | GitPoulpi が作成し、まだ戻していない stash | デーモンが書き込みます。[自動 stash](log-and-history.md)を参照 |
 

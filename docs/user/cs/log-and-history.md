@@ -63,6 +63,12 @@ Tažení záhlaví ukáže duchy jeho názvu, který sleduje ukazatel, a akcentn
 
 Z klávesnice `Shift+C` (nebo `Zobrazení: Sloupec Logu: Vybrat sloupec k přesunu nebo změně šířky` v paletě) vybere sloupec a jeho buňka v záhlaví se rozsvítí. Pak `Tab` / `Shift+Tab` vyberou jiný sloupec, `<` / `>` ho přesunou o jedno místo doleva nebo doprava mezi zobrazenými sloupci (klávesnicový protějšek přetažení jeho záhlaví), `]` / `[` ho rozšíří nebo zúží (protějšek přetažení jeho hranice; poslední sloupec posouvá svůj levý okraj), `0` vrátí všechny šířky na automatické a `Esc` nebo `Enter` výběr ukončí. Šipky se mezitím dál pohybují po commitech. Pořadí a šířky se pamatují jako po tažení a patří samotnému Logu: sloupec commitů vedle diffu má seznam vlastní.
 
+*Přizpůsobení obsahu.* **Dvojklik** na hranici sloupce přizpůsobí sloupec nalevo jeho nejširšímu viditelnému obsahu a záhlaví (široké znaky a emoji se počítají podle buněk, které zabírají). V rozložení fit Log vždy vyplní svůj panel, takže sloupec skončí u toho, co panel unese, jakmile **Zpráva** dostane svůj podíl a každý další sloupec svou nejmenší šířku: stavový řádek pak řekne `Autor potřebuje 34 buněk, vejde se 20.` Totéž z klávesnice: s vybraným sloupcem (`Shift+C`, `Tab`) ho `=` přizpůsobí a `+` přizpůsobí všechny sloupce; paleta má `Zobrazení: Sloupec Logu: Přizpůsobit sloupec obsahu` a `... Přizpůsobit všechny sloupce obsahu`; výběr otevřený pravým tlačítkem pod zaškrtávátky nabízí `Přizpůsobit <sloupec> obsahu` (sloupec pod ukazatelem), `Přizpůsobit všechny sloupce obsahu` a `Obnovit šířky sloupců`. **Zpráva** je pružný sloupec a nemá vlastní šířku, kterou by šlo přizpůsobit: zabere místo, které ostatní nechají.
+
+*Posouvání do stran.* Ve výchozím stavu se každý sloupec vejde do panelu. V rozložení **scroll** (zaškrtávátko výběru `Posouvat do stran (sloupce si drží šířky)`, Nastavení > Log a graf > Rozložení sloupců, paleta `Zobrazení: Log: Přepnout posouvání sloupců do stran`, nebo `s` při vybraném sloupci) si sloupce drží šířky, včetně **Zprávy** (tam má šířku vlastní a její přizpůsobení vezme nejširší shrnutí), při úzkém okně se nic nevzdává a tabulka může být širší než panel. Posouvá ji lišta na spodním okraji: táhněte jezdec, kliknutím na prázdnou dráhu přesuňte jezdec pod ukazatel, nebo použijte koncové šipky. Z klávesnice `Shift+Left` / `Shift+Right` posouvají o čtyři buňky (paleta má `Zobrazení: Log: Posunout sloupce doleva` / `doprava`); totéž udělá vodorovné kolečko nebo `Shift`+kolečko nad tabulkou a výběr sloupce (`Shift+C`, `Tab`) ho posune do zorného pole. Tabulka užší než panel nechá vpravo prázdné místo a pás vybraného řádku sahá k okraji. Každé rozložení má své šířky (`ui.log_column_widths` a `ui.log_column_widths_scroll`); první tažení, klávesa nebo přizpůsobení v rozložení scroll uloží každý sloupec v jeho aktuální šířce, takže se pohne jen ten, který měníte. V rozložení fit přizpůsobení, které se do panelu nevejde, to řekne a odkáže na toto rozložení.
+
+*Úchyt posledního sloupce.* Poslední sloupec má úchyt také, na své poslední buňce (ne na okraji panelu, který dál mění velikost panelů): tažení ho posune o vzdálenost, kterou ukazatel urazil, a rozdíl převezme **Zpráva**. **SHA** je ve výchozím stavu široký 8 buněk (7 číslic a buňka úchytu).
+
 ![Log se zobrazeným sloupcem Změny: každý commit uvádí počet souborů a přidaných a odebraných řádků](../images/log-changes-column.png)
 
 ### Autoři a `.mailmap`
@@ -88,8 +94,11 @@ viz `history-rewrite.md`; z terminálu: `gitpoulpi mailmap list|check|add`.
 - **Solo** (klávesa `o`, nebo nabídka refu, na refu, složce či remote): zobrazí
   jen commity refs ve stavu solo; více refs ve stavu solo zobrazí jejich
   sjednocení. `Shift+O` solo ukončí.
-- **Skrytí** refu (jeho nabídka) ho odebere z grafu; *Skryto n* v záhlaví Refs
-  je spočítá a **Zobrazit vše** (`Shift+H`) je vrátí.
+- **Skrytí** refu (jeho nabídka) ho odebere z grafu: zmizí jeho pilulka i
+  commity, kterých dosáhne jen on (commit s checkoutem zůstává vždy, spolu s
+  řádkem pracovního stromu). *Skryto n* v záhlaví Refs je spočítá a **Zobrazit
+  vše** (`Shift+H`) je vrátí. Celkový počet na stavovém řádku počítá viditelnou
+  historii.
 
 ## Větve, tagy a postranní panel Refs
 
@@ -105,7 +114,7 @@ v Logu) otevřete jeho nabídku. Nejužitečnější položky:
 | Fast-forward `<větev>` na `<aktuální>` / `<aktuální>` na `<větev>` | Posune větev dopředu, je-li to fast-forward; jinak je zašedlá s důvodem (`rozešlo se, není to fast-forward`) |
 | Vytvořit worktree z... | Otevře propojený worktree na vlastní kartě |
 | Pull, Push, Fetch, Nastavit upstream... | Síťové operace nad danou větví |
-| Skrýt v grafu / Zobrazit v grafu, Solo | Jen zobrazení; ref skryjí nebo označí jako solo, aniž by se repozitáře dotkly |
+| Skrýt v grafu / Zobrazit v grafu, Solo | Jen zobrazení; ref skryjí nebo označí jako solo (skrytím zmizí i commity, kterých dosáhne jen ten ref), aniž by se repozitáře dotkly |
 | Přejmenovat, Smazat | Smazání se nejdřív zeptá; lze smazat i vzdáleného dvojníka |
 | Kopírovat název větve, Kopírovat odkaz na větev na remote | Do schránky |
 
@@ -166,7 +175,14 @@ U commitu bez refu se při najetí na jeho řádek ve sloupci Ref také zobrazí
 
 **Remote.** `+` v záhlaví REMOTE jeden přidá; kliknutím pravým tlačítkem na
 název remote ho můžete fetchnout, zkopírovat jeho webový odkaz, nastavit jako
-výchozí, skrýt všechny jeho větve, upravit jeho URL nebo odebrat.
+výchozí, skrýt ho v grafu, upravit jeho URL nebo odebrat. **Skrytí remote**
+(oko na jeho řádku, položka nabídky *Skrýt remote v grafu*, nebo `Remote: Skrýt
+remote v grafu...` v paletě) skryje každou větev, kterou má nyní nebo později
+získá, a commity, kterých dosáhne jen on, z Logu zmizí: způsob, jak
+procházet jednu historii bez historie nesouvisejícího archivního remote; vrátíte
+ho položkou *Zobrazit remote v grafu*. Zobrazení remote zobrazí i jeho větve,
+které byly skryty jednotlivě. Větev skrytého remote to při použití jejího oka
+řekne na stavovém řádku: nejdřív zobrazte remote.
 
 **Stashe.** **Stash** odloží vše (včetně nesledovaných souborů); `Ctrl+G m`
 se nejdřív zeptá na zprávu (se zapnutým AI ji v tomto poli navrhne `Ctrl+G`).

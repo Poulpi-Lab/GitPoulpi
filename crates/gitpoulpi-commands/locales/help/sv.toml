@@ -278,21 +278,21 @@ redo = "Gör om operationen `undo` just tog tillbaka, till det exakta sparade ti
 "redo --expect" = "Gör bara om om detta fortfarande är den senaste ångrade posten"
 "redo --yes" = "Fortsätt när omgörningen är riskabel; utan den slutkod 3"
 "refs hide" = """Dölj refs från commit-grafen (TUI:ts "Dölj"): per-repo-visningsfiltret i `repo-state.toml`, som ett öppet TUI följer direkt. Namn skrivs som refs-listan skriver dem (`feature/x`, `origin/main`, ett tag-namn)"""
-"refs hide --clear" = "Visa varje dold ref igen (utöver eventuella angivna)"
+"refs hide --clear" = "Visa varje dold ref och remote igen (utöver eventuella angivna)"
 "refs hide --names" = "Refs att dölja"
 "refs hide#long" = """
-Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+Dölj refs från commit-grafen (TUI:ts "Dölj"): per-repo-visningsfiltret i `repo-state.toml`, som ett öppet TUI följer direkt. Namn skrivs som refs-listan skriver dem (`feature/x`, `origin/main`, ett tag-namn).
 
-`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
-"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
+`--remote <name>...` döljer en hel remote (varje gren i den, även de som hämtas senare): sättet att titta på en historik utan historiken från en separat arkiv-remote."""
+"refs hide --remote" = "Remotes att dölja som helhet (namn som `remote list` skriver dem)"
 "refs show" = "Visa refs igen: tar bort dem från dolda- och solo-uppsättningarna"
-"refs show --clear" = "Återställ hela filtret: inget dolt, inget solo"
+"refs show --clear" = "Återställ hela filtret: inget dolt (remotes inräknade), inget solo"
 "refs show --names" = "Refs att visa igen"
 "refs show#long" = """
-Show refs again: removes them from the hidden and solo sets.
+Visa refs igen: tar bort dem från dolda- och solo-uppsättningarna.
 
-`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
-"refs show --remote" = "Remotes to show again"
+`--remote <name>...` visar en hel remote igen, med varje gren i den som dolts en och en."""
+"refs show --remote" = "Remotes att visa igen"
 "refs solo" = "Visa bara dessa refs (och vad de når) i commit-grafen"
 "refs solo --clear" = "Ta bort solo från varje solo-ref (utöver eventuella angivna)"
 "refs solo --names" = "Refs att göra solo"

@@ -68,6 +68,12 @@ Bir başlığı sürüklemek, imleci izleyen adının bir hayaletini ve sütunun
 
 Klavyeden `Shift+C` (veya paletteki `Görünüm: Log sütunu: taşımak veya boyutlandırmak için bir sütun seç`) bir sütun seçer ve başlık hücresi yanar. Sonra `Tab` / `Shift+Tab` başka bir sütun seçer, `<` / `>` onu gösterilen sütunlar arasında bir yer sola veya sağa taşır (başlığını sürüklemenin klavyedeki karşılığı), `]` / `[` onu genişletir veya daraltır (sınırını sürüklemenin karşılığı; son sütun sol kenarını oynatır), `0` her genişliği otomatiğe döndürür, `Esc` veya `Enter` çıkar. Bu arada oklar commit'ler arasında gezmeye devam eder. Sıra ve genişlikler bir sürüklemeninkiler gibi hatırlanır ve Log'a özeldir: bir diff'in yanındaki commit sütunu kendi listesini korur.
 
+*İçeriğe sığdırma.* Bir sütunun sınırına **çift tıklamak**, solundaki sütunu en geniş görünen içeriğine ve başlığına sığdırır (geniş karakterler ve emoji kapladıkları hücrelerle sayılır). Sığdırma düzeninde Log her zaman bölmesini doldurur; bu yüzden **Mesaj** payını, diğer her sütun da en az genişliğini aldıktan sonra bölmenin yer verebildiği kadarıyla sığdırılır: durum satırı o zaman `Yazar için 34 hücre gerekir, 20 hücre sığıyor.` der. Klavyeden aynısı: bir sütun seçiliyken (`Shift+C`, `Tab`) `=` onu, `+` her sütunu sığdırır; palette `Görünüm: Log sütunu: Sütunu İçeriğine Sığdır` ve `... Tüm Sütunları İçeriğe Sığdır` vardır; sağ tık seçicisi onay kutularının altında `<column> sütununu içeriğine sığdır` (imlecin altındaki sütun), `Tüm sütunları içeriğe sığdır` ve `Sütun genişliklerini sıfırla` satırlarını listeler. **Mesaj** esneyen sütundur ve sığdırılacak kendi genişliği yoktur: diğerlerinin bıraktığı yeri alır.
+
+*Yana kaydırma.* Varsayılan olarak her sütun bölmeye sığar. **Yana kaydır** düzeninde (seçicinin `Yana kaydır (sütunlar genişliğini korur)` onay kutusu, Ayarlar > Log ve grafik > Sütun düzeni, paletteki `Görünüm: Log: Sütunlar için Yana Kaydırmayı Aç/Kapat` ya da bir sütun seçiliyken `s`) sütunlar genişliğini korur, **Mesaj** da (orada kendi genişliği vardır ve onu sığdırmak en geniş özetini alır); pencere darken hiçbir şeyden vazgeçilmez ve tablo bölmeden genişleyebilir. Alt kenarlıktaki bir çubuk onu kaydırır: kaydırma tutamacını sürükleyin, boş yola basarak tutamacı imlecin altına getirin ya da uç oklarını kullanın. Klavyeden `Shift+Left` / `Shift+Right` dört hücre kaydırır (palette `Görünüm: Log: Sütunları Sola Kaydır` / `Sağa Kaydır` vardır); tabloda yatay tekerlek veya `Shift`+tekerlek aynısını yapar, bir sütun seçmek (`Shift+C`, `Tab`) onu görünüme kaydırır. Bölmeden dar bir tablo sağda boşluk bırakır ve seçili satırın bandı kenarlığa kadar uzanır. Her düzen kendi genişliklerini korur (`ui.log_column_widths` ve `ui.log_column_widths_scroll`); kaydırma düzenindeki ilk sürükleme, tuş veya sığdırma her sütunu sahip olduğu genişlikte saklar, böylece yalnızca değiştirdiğiniz oynar. Sığdırma düzeninde bölmeye sığmayan bir sığdırma bunu söyler ve bu düzeni işaret eder.
+
+*Son sütunun tutamacı.* Son sütunun da kendi son hücresinde bir tutamacı vardır (bölmelerin boyutunu hâlâ değiştiren bölme kenarlığı değil): sürükleme onu imlecin gittiği kadar oynatır, farkı **Mesaj** karşılar. **SHA** varsayılan olarak 8 hücre genişliğindedir (7 hane ve o tutamaç hücresi).
+
 ![Değişim sütunu gösterilen Log: her commit dosya sayısını ve eklenen ile silinen satırları listeler](../images/log-changes-column.png)
 
 ### Yazarlar ve `.mailmap`
@@ -92,8 +98,10 @@ adlarını ve e-postalarını listeler ve sizin için `.mailmap` satırları yaz
 - **Solo** (`o` tuşu veya bir ref, klasör ya da uzak depo üzerindeki ref'in
   menüsü): yalnızca solo yapılan ref'lerin commit'lerini gösterir; birleşimlerini
   görmek için birkaçını solo yapın. `Shift+O` solo'yu durdurur.
-- Bir ref'i grafikten çıkarmak için **gizleyin** (menüsünden); Refs başlığındaki
-  *Gizli n* bunları sayar, **Tümünü Göster** (`Shift+H`) geri getirir.
+- Bir ref'i grafikten çıkarmak için **gizleyin** (menüsünden): hapı gider, yalnızca
+  onun ulaştığı commit'ler de gider (checkout edilmiş commit çalışma ağacı satırıyla
+  birlikte hep kalır). Refs başlığındaki *Gizli n* bunları sayar, **Tümünü Göster**
+  (`Shift+H`) geri getirir. Durum satırının toplamı görünen geçmişi sayar.
 
 ## Dallar, tag'ler ve Refs kenar çubuğu
 
@@ -109,7 +117,7 @@ girdiler:
 | Fast-forward: `<dal>` → `<geçerli>` / `<geçerli>` → `<dal>` | Bu bir fast-forward ise bir dalı ileri taşır; değilse nedeniyle birlikte grileşir (`ayrışmış, fast-forward değil`) |
 | Worktree oluştur: ... | Bağlı bir worktree'yi kendi sekmesinde açar |
 | Pull, Push, Fetch, upstream'i ayarla... | O dal üzerinde ağ işlemleri |
-| Grafikte gizle / göster, Solo | Yalnızca görüntü; depoya dokunmadan bir ref'i gizler veya solo yapar |
+| Grafikte gizle / göster, Solo | Yalnızca görüntü; depoya dokunmadan bir ref'i gizler (gizlemek yalnızca o ref'in ulaştığı commit'leri de çıkarır) veya solo yapar |
 | Adını değiştir, Sil | Sil önce sorar; uzak karşılığı da silinebilir |
 | Dal adını kopyala, Uzak depodaki dal bağlantısını kopyala | Panoya |
 
@@ -164,8 +172,14 @@ Ref'i olmayan bir commit'te, satırının üzerine gelmek Ref sütununda ait old
 
 **Uzak depolar.** UZAK başlığındaki `+` bir tane ekler; bir uzak deponun adına
 sağ tıklayarak onu fetch edebilir, web bağlantısını kopyalayabilir, varsayılan
-uzak depo yapabilir, tüm dallarını gizleyebilir, URL'lerini düzenleyebilir veya
-kaldırabilirsiniz.
+uzak depo yapabilir, grafikten gizleyebilir, URL'lerini düzenleyebilir veya
+kaldırabilirsiniz. **Bir uzak depoyu gizlemek** (satırının gözü, menünün *Uzak depoyu
+grafikten gizle* satırı ya da paletteki `Remote: Uzak Depoyu Grafikte Gizle...`) şu
+an sahip olduğu ve sonradan edineceği her dalı gizler; yalnızca onun ulaştığı commit'ler
+Log'dan çıkar: ilgisiz bir arşiv uzak deposunun geçmişi olmadan tek bir geçmişe
+göz atmanın yolu; *Uzak depoyu grafikte göster* ile geri getirin. Bir uzak depoyu
+göstermek, tek tek gizlenmiş dallarını da gösterir. Gizli bir uzak deponun dalı,
+gözü kullanılırsa bunu durum satırında söyler: önce uzak depoyu gösterin.
 
 **Stash'ler.** **Stash** her şeyi stash'ler (izlenmeyen dosyalar dahil);
 `Ctrl+G m` önce bir mesaj sorar (YZ açıkken o istemin içindeki `Ctrl+G` bir

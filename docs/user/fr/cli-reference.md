@@ -239,7 +239,8 @@ Plus `commit --ai` et `stash push --ai`. Le modèle est appelé depuis le proces
 | Commande | Ce qu'elle fait |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Dépôts et onglets de cette session. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (chacun avec `--clear`) | Le filtre de refs du Log : masquer, réafficher, n'afficher que celles-ci (en direct dans une fenêtre ouverte). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (chacun avec `--clear`) | Le filtre de refs du Log : masquer, réafficher, n'afficher que celles-ci (en direct dans une fenêtre ouverte). Les refs masquées sortent aussi du parcours : les commits que seules elles atteignent disparaissent du Log (le commit extrait reste toujours). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Masquer ou afficher des remotes entiers : toutes leurs branches, y compris celles récupérées plus tard. Le nom doit être un remote du dépôt (pour masquer). `show` retire aussi les branches du remote qui avaient été masquées une par une ; `--clear` vide aussi les remotes masqués. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Sessions nommées (renommer / supprimer refusent tant que son démon tourne). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | Le processus d'arrière-plan de la session (alias `server`). Sans démon en cours, chaque commande en démarre un intégré pour sa propre durée de vie. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Paramètres ([Référence de configuration](config-reference.md)). `config set ui.theme` et `ui.graph_color_theme` vérifient le nom dans le registre. |

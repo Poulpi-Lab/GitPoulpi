@@ -278,21 +278,21 @@ redo = "`undo`'nun az önce geri aldığı işlemi, kaydedilen tam duruma yinele
 "redo --expect" = "Yalnızca bu hâlâ son geri alınan girdiyse yinele"
 "redo --yes" = "Yineleme riskliyse devam et; yoksa çıkış kodu 3"
 "refs hide" = """Ref'leri commit grafiğinden gizler (TUI'nin "Gizle" komutu): `repo-state.toml` içindeki depo başına görüntü filtresi, açık bir TUI bunu canlı izler. Adlar ref listesinin yazdığı gibi yazılır (`feature/x`, `origin/main`, bir tag adı)"""
-"refs hide --clear" = "Gizli her ref'i göster (adı verilenlere ek olarak)"
+"refs hide --clear" = "Gizli her ref'i ve uzak depoyu göster (adı verilenlere ek olarak)"
 "refs hide --names" = "Gizlenecek ref'ler"
 "refs hide#long" = """
-Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+Ref'leri commit grafiğinden gizler (TUI'nin "Gizle" komutu): `repo-state.toml` içindeki depo başına görüntü filtresi, açık bir TUI bunu canlı izler. Adlar ref listesinin yazdığı gibi yazılır (`feature/x`, `origin/main`, bir tag adı).
 
-`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
-"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
+`--remote <name>...` bir uzak depoyu bütünüyle gizler (tüm dalları, sonradan fetch edilenler de): ayrı bir arşiv uzak deposunun geçmişi olmadan tek bir geçmişe bakmanın yolu."""
+"refs hide --remote" = "Bütünüyle gizlenecek uzak depolar (adlar `remote list` çıktısındaki gibi)"
 "refs show" = "Ref'leri yeniden gösterir: onları gizli ve solo kümelerinden çıkarır"
-"refs show --clear" = "Tüm filtreyi sıfırla: hiçbir şey gizli değil, hiçbir şey solo değil"
+"refs show --clear" = "Tüm filtreyi sıfırla: hiçbir şey gizli değil (uzak depolar dahil), hiçbir şey solo değil"
 "refs show --names" = "Yeniden gösterilecek ref'ler"
 "refs show#long" = """
-Show refs again: removes them from the hidden and solo sets.
+Ref'leri yeniden gösterir: onları gizli ve solo kümelerinden çıkarır.
 
-`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
-"refs show --remote" = "Remotes to show again"
+`--remote <name>...` bir uzak depoyu yeniden bütünüyle gösterir; tek tek gizlenmiş dalları da dahil."""
+"refs show --remote" = "Yeniden gösterilecek uzak depolar"
 "refs solo" = "Commit grafiğinde yalnızca bu ref'leri (ve eriştiklerini) göster"
 "refs solo --clear" = "Her solo ref'in solo'sunu kaldır (adı verilenlere ek olarak)"
 "refs solo --names" = "Solo yapılacak ref'ler"

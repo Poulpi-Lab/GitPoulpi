@@ -98,6 +98,8 @@ author_email = "jane@work.example"
 | `ui.graph_ghost_ref` | `true` | Log 的 Ref 列会为没有自身 ref 的悬停 commit，在列里有空间时，显示一个淡色药丸，内含它所属分支（否则为远程分支）的名称；绝不显示 tag。已删除的分支由合并它的 merge commit 的标题推断，并以删除线绘制。悬停在药丸上会显示其类型。 |
 | `ui.reveal_on_ref_click` | `true` | 在引用窗格中点击某个引用（分支、tag、远程分支、stash）会将 Log 滚动到其 commit 并让该行闪烁；commit 的选择不会移动。 |
 | `ui.log_wip_counts_in_message` | `true` | 更改列被隐藏时，在 WIP 消息中显示 WIP 的更改数量。 |
+| `ui.log_columns_layout` | `"fit"` | Log 各列的布局方式。`fit`：每个可见列都恰好适应窗格，只有 `message` 伸缩；窗格较窄时整列会让出空间。`scroll`：各列保持宽度（`message` 也是），不会让出空间，表格比窗格宽时可横向滚动。 |
+| `ui.log_column_widths_scroll` | 空 | `scroll` 布局的列宽，名称 -> 单元格数（允许 `message`，而 `ui.log_column_widths` 仍是 `fit` 布局的，从不包含 `message`）。在布局为 `scroll` 时拖动、调整或按内容调整某一列会写入。 |
 | `ui.log_columns_hidden`, `ui.log_columns_order`, `ui.log_column_widths` | 空 | Log 的列（`ref`、`graph`、`message`、`author`、`date`、`sha`、`changes`），在你隐藏、拖动或调整某一列时写入。`message` 不能被隐藏。 |
 | `ui.commit_column_columns_visible`, `ui.commit_column_columns_order`, `ui.commit_column_columns_widths` | 空 | diff 旁 [Commit 列](interface-tour.md#commit-列)自己的各栏，与 Log 的列相互独立：显示的栏按名称列出（`ref`、`graph`、`message`、`author`、`date`、`changes`、`sha`；为空表示泳道、消息、作者和日期），它们从左到右的顺序，用同样的名称表示（为空表示刚才列出的顺序；漏掉的名称按该顺序排在后面），以及拖动得到的各栏宽度（以单元格计，未列出的栏为自动宽度），在你选择、移动或调整各栏时写入。`message` 不能被隐藏。在这些键出现之前写入的会话文件会被读取一次并导入其中。 |
 | `ui.sidebar_sections_hidden` | 空 | 你隐藏的左侧窗格分区（`local`、`remote`、`worktrees`、`stashes`、`tags`、`pull_requests`、`issues`、`submodules`），通过窗格的右键菜单或命令面板写入。至少始终会保留一个存在的分区。 这是默认值：每个仓库可以隐藏自己的分区（保存在该仓库的状态文件中），此键适用于没有自己选择的仓库；*用于所有仓库* 会写入它。 |
@@ -450,6 +452,7 @@ stage_file = "z"
 | `hosting_integration` | 固定在此处的 `[[integrations]]` 配置 | `gitpoulpi hosting use --id` |
 | `pulls_source`, `issues_source` | PR / 议题列表所读取的提供方项目，形式为 `{ integration, project, filter }`。`filter` 是可选的：提供方原生的附加子句（Jira JQL 片段、Azure WIQL 条件、Trello 列表名称），以 AND 方式附加到列表查询上；GitHub 和 GitLab 会忽略它。 | 侧栏分区，`gitpoulpi hosting link` |
 | `ref_visibility` | 隐藏 / 单独显示的引用 | 引用侧栏，`gitpoulpi refs hide\|show\|solo` |
+| `hidden_remotes` | 被整体从图中隐藏的远程（每个分支，包括之后获取的） | 远程的眼睛图标和菜单，`gitpoulpi refs hide --remote` |
 | `folds`, `collapsed_*_ref_folders` | 折叠的侧栏分区以及分支和 tag 文件夹。`[folds]` 还包含 `status_folders`（unstaged / staged 文件树中折叠的文件夹）和 `commit_folders`（某个 commit 已更改文件树中折叠的文件夹，对每个 commit 都相同），各自最多 500 个路径，超出时先丢弃最旧的 | 侧栏、文件树 |
 | `pending_auto_stash` | GitPoulpi 创建但尚未放回的 stash | 由守护进程写入；参见[自动 stash](log-and-history.md#自动-stash) |
 

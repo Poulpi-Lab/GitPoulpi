@@ -237,7 +237,8 @@ GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, L
 | Команда | Что делает |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Репозитории и вкладки этой сессии. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (у каждой есть `--clear`) | Фильтр ссылок в Log: скрыть, показать снова, показать только эти (сразу в открытом окне). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (у каждой есть `--clear`) | Фильтр ссылок в Log: скрыть, показать снова, показать только эти (сразу в открытом окне). Скрытые ссылки выпадают и из обхода: commit'ы, до которых достают только они, пропадают из Log (commit, на котором сделан checkout, остаётся всегда). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Скрыть или показать remote целиком: каждую его ветку, в том числе полученные позже. Имя должно быть remote этого репозитория (для hide). `show` также возвращает ветки этого remote, скрытые по отдельности; `--clear` очищает и скрытые remote. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Именованные сессии (переименование / удаление отклоняются, пока работает её демон). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | Фоновый процесс сессии (псевдоним `server`). Без работающего демона каждая команда запускает встроенный на время своей работы. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Настройки ([Справочник по конфигурации](config-reference.md)). `config set ui.theme` и `ui.graph_color_theme` сверяют имя с реестром. |

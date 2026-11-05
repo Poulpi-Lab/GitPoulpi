@@ -595,9 +595,9 @@ preview = "förhandsvisning"
 sidebar_sections_scope = "Avsnitt i sidopanelen"
 sidebar_sections_scope_help = "Vems val de visade och dolda avsnitten i sidopanelen är. Per repository: varje repository har sin egen uppsättning (den globala är utgångspunkten). Global: en uppsättning för alla repositories. Att växla förlorar aldrig någon av uppsättningarna."
 # context: a Settings row; how the Log lays its columns out
-log_columns_layout = "Column layout"
+log_columns_layout = "Kolumnlayout"
 # context: help text of the Log column layout row; "fit" and "scroll" are the two choices
-log_columns_layout_help = "How the Log lays its columns out. fit: every column fits the pane and only Message flexes. scroll: columns keep their widths, Message too, and the table scrolls sideways when it is wider than the pane."
+log_columns_layout_help = "Hur Log lägger ut sina kolumner. fit: varje kolumn ryms i rutan och bara Meddelande är flexibel. scroll: kolumnerna behåller sina bredder, Meddelande också, och tabellen rullar i sidled när den är bredare än rutan."
 
 [settings_git]
 default_backend = "Git-backend"
@@ -749,8 +749,8 @@ pos_right = "Höger"
 align_start = "Början"
 align_center = "Mitten"
 align_end = "Slutet"
-layout_fit = "Fit the pane"
-layout_scroll = "Scroll sideways"
+layout_fit = "Anpassa efter rutan"
+layout_scroll = "Rulla i sidled"
 
 [reltime]
 just_now = "nyss"
@@ -1946,8 +1946,8 @@ copy_name = "Kopiera remotens namn"
 copy_link = "Kopiera länk till remote"
 set_default = "Ange som standard-remote"
 edit_remote = "Redigera {name}..."
-hide_remote_in_graph = "Hide remote from graph"
-show_remote_in_graph = "Show remote in graph"
+hide_remote_in_graph = "Dölj remote i grafen"
+show_remote_in_graph = "Visa remote i grafen"
 remove_remote = "Ta bort {name}..."
 default_mark = "(standard)"
 pull_title = "{$Pull}"
@@ -2000,8 +2000,8 @@ default_for_repo = "Standard-remote för det här repositoryt"
 copy_name_which = "Kopiera namnet på vilken remote?"
 copy_link_which = "Kopiera en länk till vilken remote?"
 fetch_which = { git = "Fetch vilken remote?", local = "Hämta från vilken remote?" }
-hide_all_which = "Hide which remote from the graph?"
-show_all_which = "Show which remote in the graph again?"
+hide_all_which = "Dölj vilken remote i grafen?"
+show_all_which = "Visa vilken remote i grafen igen?"
 select_local_branch = "välj en lokal gren, eller checka ut en, först"
 select_remote_first = "välj en remote i avsnittet REMOTE först (eller använd ett Remote:-kommando)"
 what_remote_name = "remotens namn"
@@ -2013,9 +2013,9 @@ force_confirm_fetch = { git = "Force push {branch} till {remote}?\nGör först f
 force_confirm = { git = "Force push {branch} till {remote}?\nMed lease: avvisas om {remote}/{branch} har flyttats sedan senaste fetch. Commits som bara {remote} har förkastas.", local = "Force push {branch} till {remote}?\nMed lease: avvisas om {remote}/{branch} har flyttats sedan senaste hämtning. Incheckningar som bara {remote} har förkastas." }
 setting_upstream = "ställer in {branch}s upstream till {upstream}..."
 unsetting_upstream = "tar bort {branch}s upstream..."
-remote_hidden = "{remote} hidden from the graph, branches fetched later too"
-remote_shown = "{remote} shown in the graph again"
-branch_hidden_with_remote = "{name} is hidden with remote {remote}: show the remote first"
+remote_hidden = "{remote} dold i grafen, även grenar som hämtas senare"
+remote_shown = "{remote} visas i grafen igen"
+branch_hidden_with_remote = "{name} är dold med remoten {remote}: visa remoten först"
 pinning = "fäster det här repositoryt vid {command}..."
 clearing_pin = "tar bort fastsättningen av SSH-nyckeln..."
 stashing_continuing = { git = "stashar dina ändringar och fortsätter...", local = "stashar dina ändringar och fortsätter..." }
@@ -2359,11 +2359,11 @@ split_move_down = "Flytta {$commit} ned"
 split_reset = "Återställ uppdelningen"
 rewrite_host_howto = "Förklara värdens grenskydd"
 rewrite_ai_rules = "Skapa omskrivningsregler med AI"
-log_columns_fit = "Fit the Column to Its Content"
-log_columns_fit_all = "Fit All Columns to Content"
-log_scroll_left = "Scroll the Columns Left"
-log_scroll_right = "Scroll the Columns Right"
-log_columns_layout = "Scroll Sideways or Fit the Pane"
+log_columns_fit = "Anpassa kolumnen efter innehållet"
+log_columns_fit_all = "Anpassa alla kolumner efter innehållet"
+log_scroll_left = "Rulla kolumnerna åt vänster"
+log_scroll_right = "Rulla kolumnerna åt höger"
+log_columns_layout = "Rulla i sidled eller anpassa efter rutan"
 
 
 [keymap_ctx]
@@ -2960,8 +2960,8 @@ remote_copy_link_to_remote = "Remote: Kopiera länk till remote"
 remote_fetch_remote = { git = "Remote: Fetch remote...", local = "Remote: Hämta remote..." }
 remote_actions_for_selected_remote = "Remote: Åtgärder för vald remote..."
 repository_ssh_key_for_this_repository = "Repository: SSH-nyckel för det här repositoryt..."
-remote_hide_remote_in_graph = "Remote: Hide Remote in Graph..."
-remote_show_remote_in_graph = "Remote: Show Remote in Graph..."
+remote_hide_remote_in_graph = "Remote: Dölj remote i grafen..."
+remote_show_remote_in_graph = "Remote: Visa remote i grafen..."
 git_new_branch_at_head = "Git: Ny gren vid HEAD..."
 git_new_tag_at_head = { git = "Git: Ny tag vid HEAD...", local = "Git: Ny tagg vid HEAD..." }
 git_push_all_unpushed_tags = "Git: Pusha alla opushade taggar"
@@ -3440,11 +3440,11 @@ git_fetch_selected_tag = { git = "Git: Fetch vald tag", local = "Git: Hämta val
 # s24:begin
 rewrite_fix_message_encoding = "Omskrivning: Rätta meddelandenas teckenkodning..."
 # s24:end
-view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
-view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
-view_log_scroll_left = "View: Log: Scroll the Columns Left"
-view_log_scroll_right = "View: Log: Scroll the Columns Right"
-view_log_columns_layout = "View: Log: Toggle Scroll Sideways for the Columns"
+view_log_column_fit = "Vy: Log-kolumn: anpassa kolumnen efter innehållet"
+view_log_column_fit_all = "Vy: Log-kolumn: anpassa alla kolumner efter innehållet"
+view_log_scroll_left = "Vy: Log: rulla kolumnerna åt vänster"
+view_log_scroll_right = "Vy: Log: rulla kolumnerna åt höger"
+view_log_columns_layout = "Vy: Log: växla rullning i sidled för kolumnerna"
 
 [help_section]
 rewrite = "Skriv om historiken"
@@ -3502,7 +3502,7 @@ commit_column_1 = "rulla raderna i sidled (Shift+hjul eller ett horisontellt hju
 commit_column_2 = "välj en del (spår, författare, datum) och gör den bredare eller smalare, eller återställ alla delar till automatisk bredd; rubrikens gränser kan också dras, och bredderna sparas"
 commit_column_3 = { git = "mus: klicka på en rad för att välja dess commit, högerklick öppnar dess meny (menytangenten också, efter att ha valt en rad med Upp/Ned)", local = "mus: klicka på en rad för att välja dess incheckning, högerklick öppnar dess meny (menytangenten också, efter att ha valt en rad med Upp/Ned)" }
 commit_column_4 = "flytta den valda delen åt vänster eller höger; att dra dess rubrik gör detsamma, och ordningen sparas"
-log_columns_1 = "välj en Log-kolumn (dess rubrikcell lyser upp); flytta den sedan åt vänster eller höger (att dra rubriken gör detsamma), bredda eller smalna av den (att dra dess kant gör detsamma) eller ge den automatisk bredd igen. Tab / Shift+Tab väljer en annan kolumn, Esc avslutar; layouten sparas"
+log_columns_1 = "välj en Log-kolumn (dess rubrikcell lyser upp); flytta den sedan åt vänster eller höger (att dra rubriken gör detsamma), bredda eller smalna av den (att dra dess kant gör detsamma), ge den automatisk bredd igen eller anpassa den efter innehållet (att dubbelklicka på dess kant gör detsamma; + anpassar alla kolumner). Tab / Shift+Tab väljer en annan kolumn, Esc avslutar; layouten sparas"
 global_1 = "öppna kommandopaletten - varje kommando i appen, vart och ett med sitt kortkommando; skriv för att filtrera, Upp/Ned eller Ctrl+P/Ctrl+N för att flytta (inte j/k: de skrivs), Enter för att köra. Gråade rader säger varför de inte kan köras just nu"
 global_2 = "navigeringsprefixet - se dess egen sektion nedan"
 global_3 = "git-åtgärdsprefixet - se dess egen sektion nedan"
@@ -3852,7 +3852,7 @@ split_7 = "i rutan {$commits} väljer den raden; m eller Enter på en ändring l
 rewrite_9 = "öppnar fliken Storlek och analyserar historiken: de största filerna och mapparna, samt borttagna filer som ändå lagras; markerade rader blir borttagningsregler"
 rewrite_host_howto = "förklarar hur du får en omskrivning förbi en gren som värden skyddar: häv skyddet, gör en {$push_noun} under ett nytt namn eller skapa repositoryt på nytt; ingenting görs åt dig"
 rewrite_ai_rules = "skapar omskrivningsreglerna utifrån din beskrivning med AI (inget förhandsgranskas eller tillämpas)"
-log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
+log_columns_2 = "rulla Logs kolumner i sidled när de behåller sina bredder (layouten Rulla i sidled, vald i kolumnväljaren, i Inställningar eller med s medan en kolumn är vald); i layouten Anpassa ryms varje kolumn i rutan"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} eller högerklick"
@@ -4096,21 +4096,21 @@ column_width_reset = "Log-kolumnernas bredder är automatiska igen."
 changes_files = { one = "{n} fil", other = "{n} filer" }
 changes_files_short = "{n}f"
 # context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
-column_fitted = "{column} fitted to its content: {cells} cells."
+column_fitted = "{column} anpassad efter innehållet: {cells} celler."
 # context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
-column_fit_cut = "{column} needs {need} cells, {have} fit. Switch the columns to Scroll sideways to show it all."
+column_fit_cut = "{column} behöver {need} celler, {have} ryms. Växla kolumnerna till Rulla i sidled för att visa allt."
 # context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
-column_fit_message = "Message takes the room the other columns leave."
+column_fit_message = "Meddelande tar det utrymme de andra kolumnerna lämnar."
 # context: status line after every Log column was fitted to its content
-columns_fitted_all = "All columns fitted to their content."
+columns_fitted_all = "Alla kolumner anpassade efter innehållet."
 # context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
-columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
+columns_fit_all_cut = "Anpassade efter innehållet, men inte tillräckligt med plats för: {columns}."
 # context: status line when a key or command scrolls the Log columns sideways but they fit the pane (the columns layout is "fit"); "Scroll sideways" is the name of the columns layout option
-columns_fit_pane = "The columns fit the pane. Switch the columns to Scroll sideways to scroll."
+columns_fit_pane = "Kolumnerna ryms i rutan. Växla kolumnerna till Rulla i sidled för att rulla."
 # context: status line after the Log columns layout became "scroll sideways": columns keep their widths and the table can be wider than the pane
-layout_now_scroll = "Columns keep their widths and scroll sideways."
+layout_now_scroll = "Kolumnerna behåller sina bredder och rullar i sidled."
 # context: status line after the Log columns layout became "fit": every column fits the pane
-layout_now_fit = "Columns fit the pane."
+layout_now_fit = "Kolumnerna ryms i rutan."
 
 [find_bar]
 counter = "{current} av {total}"
@@ -4176,13 +4176,13 @@ changes_files = { one = "{n} fil ändrad", other = "{n} filer ändrade" }
 changes_insertions = { one = "{n} tillägg", other = "{n} tillägg" }
 changes_deletions = { one = "{n} borttagning", other = "{n} borttagningar" }
 # context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
-column_menu_fit = "Fit {column} to content"
+column_menu_fit = "Anpassa {column} efter innehållet"
 # context: a row of the Log columns chooser that fits every column to its content
-column_menu_fit_all = "Fit all columns to content"
+column_menu_fit_all = "Anpassa alla kolumner efter innehållet"
 # context: a row of the Log columns chooser that puts every column width back to automatic
-column_menu_reset = "Reset column widths"
+column_menu_reset = "Återställ kolumnbredder"
 # context: a checkbox row of the Log columns chooser; when checked, columns keep their widths and the Log scrolls sideways instead of fitting every column into the pane
-column_menu_scroll = "Scroll sideways (columns keep their widths)"
+column_menu_scroll = "Rulla i sidled (kolumnerna behåller sina bredder)"
 
 [overlays]
 select_tab_title = "Välj flik ({shown}/{total})"
@@ -5803,8 +5803,8 @@ palette_git_tab = "Aktivitetslogg: Git-åtgärder"
 palette_app_tab = "Aktivitetslogg: Programlogg"
 
 [git_error]
-summary_host_key = "The SSH host key of the remote is not known yet."
-hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
+summary_host_key = "SSH-värdnyckeln för remoten är ännu inte känd."
+hint_host_key = "Kör `ssh -T git@<host>` en gång i en terminal, kontrollera fingeravtrycket och svara yes, och försök sedan igen."
 title_push = "{$Push} misslyckades"
 title_pull = "{$Pull} misslyckades"
 title_fetch = "{$Fetch} misslyckades"
@@ -5820,7 +5820,7 @@ done_pull = "{$Pull} klar"
 summary_non_ff = { git = "Remoten har commits som du inte har.", local = "Remoten har incheckningar som du inte har." }
 hint_non_ff = "Gör en {$pull} först och försök igen."
 summary_auth = "Remoten avvisade inloggningsuppgifterna."
-hint_auth = "Kontrollera dina uppgifter under Inställningar > Integrationer, eller din SSH-nyckel."
+hint_auth = "Kontrollera dina uppgifter under Inställningar > Integrationer, eller starta en ssh-agent med din nyckel, eller ange en SSH-nyckel för det här repositoryt."
 summary_conflict = "Den stoppade på grund av konflikter."
 hint_conflict = "Lös konflikterna i Status-rutan och fortsätt sedan."
 summary_overwrite = "Lokala ändringar skulle skrivas över."

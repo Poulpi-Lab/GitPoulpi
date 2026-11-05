@@ -69,6 +69,12 @@ Al arrastrar una cabecera aparece un fantasma de su nombre que sigue al puntero 
 
 Con el teclado, `Shift+C` (o `Ver: Columna del Log: elegir una columna para moverla o ajustarla` de la paleta) elige una columna y su celda de cabecera se ilumina. Después `Tab` / `Shift+Tab` eligen otra columna, `<` / `>` la mueven un lugar a la izquierda o a la derecha entre las columnas visibles (el equivalente de arrastrar su cabecera), `]` / `[` la ensanchan o la estrechan (el equivalente de arrastrar su borde; la última columna mueve su borde izquierdo), `0` devuelve todos los anchos al modo automático y `Esc` o `Enter` salen. Mientras tanto, las flechas siguen moviéndose por los commits. El orden y los anchos se recuerdan como los de un arrastre, y son propios del Log: la columna de commits junto a un diff guarda una lista propia.
 
+*Ajustar al contenido.* Un **doble clic** en el borde de una columna ajusta la columna de su izquierda a su contenido visible más ancho y a su cabecera (los caracteres anchos y los emoji cuentan por las celdas que ocupan). En la disposición ajustada el Log siempre llena su panel, así que una columna se detiene en lo que cabe en el panel una vez que **Mensaje** conserva su parte y cada otra columna su ancho mínimo: la línea de estado dice entonces `Autor necesita 34 celdas, caben 20.` Lo mismo con el teclado: con una columna elegida (`Shift+C`, `Tab`), `=` la ajusta y `+` ajusta todas las columnas; la paleta tiene `Ver: Columna del Log: ajustar la columna a su contenido` y `... ajustar todas las columnas a su contenido`; el selector del clic derecho lista `Ajustar <columna> a su contenido` (la columna bajo el puntero), `Ajustar todas las columnas a su contenido` y `Restablecer los anchos de columna` bajo sus casillas. **Mensaje** es la columna flexible y no tiene ancho propio que ajustar: ocupa el espacio que dejan las demás.
+
+*Desplazar lateralmente.* Por defecto todas las columnas caben en el panel. En la disposición **scroll** (la casilla `Desplazar lateralmente (las columnas conservan su ancho)` del selector, Ajustes > Log y grafo > Disposición de columnas, `Ver: Log: alternar el desplazamiento lateral de las columnas` de la paleta, o `s` mientras hay una columna elegida) las columnas conservan sus anchos, **Mensaje** incluido (ahí tiene un ancho propio, y ajustarlo toma su resumen más ancho), no se cede nada cuando la ventana es estrecha y la tabla puede ser más ancha que el panel. Una barra en el borde inferior la desplaza: arrastra el pulgar, pulsa la pista vacía para traer el pulgar bajo el puntero, o usa sus flechas de los extremos. Con el teclado, `Shift+Izquierda` / `Shift+Derecha` desplazan cuatro celdas (la paleta tiene `Ver: Log: desplazar las columnas a la izquierda` / `a la derecha`); la rueda horizontal o `Shift`+rueda sobre la tabla hacen lo mismo, y elegir una columna (`Shift+C`, `Tab`) la desplaza hasta dejarla a la vista. Una tabla más estrecha que el panel deja espacio en blanco a la derecha, y la banda de una fila seleccionada llega hasta el borde. Cada disposición guarda sus propios anchos (`ui.log_column_widths` y `ui.log_column_widths_scroll`); el primer arrastre, tecla o ajuste en la disposición scroll guarda cada columna con el ancho que tiene, así que solo se mueve la que cambias. En la disposición ajustada, un ajuste que no cabe en el panel lo dice y apunta a esta disposición.
+
+*El agarre de la última columna.* La última columna también tiene un agarre, en su propia última celda (no en el borde del panel, que sigue cambiando el tamaño de los paneles): un arrastre la mueve según lo que haya recorrido el puntero, y **Mensaje** absorbe la diferencia. **SHA** mide 8 celdas por defecto (los 7 dígitos y esa celda de agarre).
+
 ![El Log con la columna Cambios visible: cada commit lista su número de archivos y de líneas añadidas y eliminadas](../images/log-changes-column.png)
 
 ### Autores y `.mailmap`
@@ -87,8 +93,11 @@ Cuando el repositorio tiene un `.mailmap` (el archivo de git que da un solo nomb
 - **Solo** (la tecla `o`, o el menú de la ref, sobre una ref, carpeta o remoto):
   muestra solo los commits de las refs en solo; pon varias en solo para ver su
   unión. `Shift+O` deja de usar solo.
-- **Ocultar** una ref (su menú) para sacarla del grafo; *Ocultas n* en el título
-  de Refs las cuenta, **Mostrar todo** (`Shift+H`) las devuelve.
+- **Ocultar** una ref (su menú) para sacarla del grafo: su píldora desaparece y
+  también los commits que solo ella alcanza (el commit con checkout siempre se
+  queda, con la fila del árbol de trabajo). *Ocultas n* en el título de Refs las
+  cuenta, **Mostrar todo** (`Shift+H`) las devuelve. El total de la línea de
+  estado cuenta el historial visible.
 
 ## Ramas, tags y la barra lateral Refs
 
@@ -104,7 +113,7 @@ entradas más útiles:
 | Fast-forward `<branch>` a `<current>` / `<current>` a `<branch>` | Avanza una rama cuando es un fast-forward; si no, queda atenuada con el motivo (`divergen, no es un avance rápido`) |
 | Crear worktree desde... | Abre un worktree vinculado en su propia pestaña |
 | Pull, Push, Fetch, Definir upstream... | Operaciones de red sobre esa rama |
-| Ocultar / Mostrar en el grafo, Solo | Solo visualización; ocultan o ponen en solo una ref sin tocar el repositorio |
+| Ocultar / Mostrar en el grafo, Solo | Solo visualización; ocultan o ponen en solo una ref (ocultar también quita los commits que solo esa ref alcanza) sin tocar el repositorio |
 | Renombrar, Eliminar | Eliminar pregunta antes; también se puede eliminar su gemela remota |
 | Copiar nombre de la rama, Copiar enlace de la rama en el remoto | Al portapapeles |
 
@@ -164,7 +173,13 @@ En un commit sin ref, pasar el puntero por su fila muestra además, en la column
 
 **Remotos.** El `+` del título REMOTAS añade uno; haz clic derecho en el nombre de
 un remoto para hacer fetch, copiar su enlace web, convertirlo en el remoto por
-defecto, ocultar todas sus ramas, editar sus URL o eliminarlo.
+defecto, ocultarlo del grafo, editar sus URL o eliminarlo. **Ocultar un remoto**
+(el ojo de su fila, *Ocultar remoto del grafo* del menú o `Remoto: Ocultar remoto en el grafo...`
+en la paleta) oculta todas las ramas que tiene ahora o que reciba después, y los
+commits que solo él alcanza salen del Log: la forma de explorar una historia sin la
+de un remoto de archivo ajeno; se recupera con *Mostrar remoto en el grafo*. Mostrar
+un remoto también muestra las ramas suyas que se habían ocultado una a una. Una rama
+de un remoto oculto lo dice en la línea de estado si se usa su ojo: muestra primero el remoto.
 
 **Stashes.** **Stash** hace stash de todo (archivos sin seguimiento incluidos);
 `Ctrl+G m` pide antes un mensaje (con la IA activada, `Ctrl+G` dentro de ese

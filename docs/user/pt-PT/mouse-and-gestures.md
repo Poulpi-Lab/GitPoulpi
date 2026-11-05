@@ -121,6 +121,8 @@ conflito nas suas barras de deslocação. Clique numa marca para ir para lá.
   direito.
 - **Arraste a margem entre dois cabeçalhos do Log** (por predefinição o espaço, a partir do cabeçalho ou de qualquer ponto da tabela; Definições > Log e grafo > Redimensionamento das colunas) para redimensionar uma
   coluna (pelo teclado: `Shift+C` para escolher uma coluna, depois `]` / `[`).
+- **Duplo clique na margem entre dois cabeçalhos do Log** para ajustar a coluna à sua esquerda ao conteúdo (pelo teclado: `Shift+C` para escolher uma coluna, depois `=`; `+` ajusta todas). A última coluna tem uma pega na sua última célula: arraste-a para redimensionar essa coluna, com a coluna Mensagem a absorver a diferença.
+- **Deslocar o Log lateralmente** (a disposição de colunas `scroll`; Definições > Log e grafo > Disposição das colunas, ou a caixa `Deslocamento lateral` do seletor): a roda horizontal ou `Shift`+roda sobre a tabela, a barra na margem inferior (arraste o cursor, prima a pista livre, clique nas setas das pontas) ou `Shift+Esquerda` / `Shift+Direita`. Na disposição `fit` predefinida as colunas preenchem o painel e não há nada para deslocar.
 - **Arraste um cabeçalho do Log** para mover a coluna: uma sombra do seu nome segue o ponteiro, o cabeçalho que deixou fica esbatido e uma barra de destaque marca o lugar onde ela ficaria. As colunas movem-se ao largar; `Esc` cancela e o ponteiro mostra a mão aberta enquanto a leva (pelo teclado: `Shift+C` para escolher uma coluna, depois `<` / `>`).
 
 O GitPoulpi memoriza todos os tamanhos. Veja
@@ -234,7 +236,7 @@ Veja [Alojamento e gestores de issues](hosting-integration.md).
   submenu por cada ref do commit.
 - **Clique com o botão direito numa pílula de ref** para ver um menu com as
   ações da ref e as ações do commit.
-- **Clique com o botão direito no cabeçalho** para mostrar ou ocultar colunas: uma lista de verificação (`[x]` / `[ ]`) com um ✕ no título; clique numa linha ou use as setas e `Espaço` / `Enter` e feche-a com o ✕, `Esc` ou um clique fora (a paleta: `Ver: Log: escolher as colunas a mostrar`).
+- **Clique com o botão direito no cabeçalho** para mostrar ou ocultar colunas: uma lista de verificação (`[x]` / `[ ]`) com um ✕ no título; clique numa linha ou use as setas e `Espaço` / `Enter` e feche-a com o ✕, `Esc` ou um clique fora (a paleta: `Ver: Log: escolher as colunas a mostrar`). Abaixo das caixas: `Ajustar <coluna> ao conteúdo` (a coluna clicada), `Ajustar todas as colunas ao conteúdo` e `Repor as larguras das colunas`.
 - **Clique em `↑`, `↓` ou `✕`** na barra de pesquisa para ir para a
   correspondência anterior ou seguinte, ou para fechar a barra.
 - **Clique em `#12`, `ABC-12` ou `AB#12`** numa mensagem de commit, no painel

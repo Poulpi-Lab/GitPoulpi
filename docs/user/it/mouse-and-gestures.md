@@ -120,6 +120,8 @@ sulle sue barre di scorrimento. Clicca un segno per andarci.
 - **Trascina il bordo inferiore** del blocco del messaggio di commit nel pannello
   destro.
 - **Trascina il bordo tra due intestazioni del Log** (per impostazione predefinita lo spazio, dall'intestazione o da qualsiasi punto della tabella; Impostazioni > Log e grafo > Ridimensionamento delle colonne) per ridimensionare una colonna (da tastiera: `Shift+C` per scegliere una colonna, poi `]` / `[`).
+- **Doppio clic sul bordo tra due intestazioni del Log** per adattare la colonna alla sua sinistra al contenuto (da tastiera: `Shift+C` per scegliere una colonna, poi `=`; `+` adatta ogni colonna). L'ultima colonna ha una maniglia sulla sua ultima cella: trascinala per ridimensionare quella colonna, e la colonna Messaggio prende la differenza.
+- **Scorri il Log lateralmente** (la disposizione `scroll` delle colonne; Impostazioni > Log e grafo > Disposizione delle colonne, o la casella `Scorri lateralmente` del selettore): la rotella orizzontale o `Shift`+rotella sopra la tabella, la barra sul bordo inferiore (trascina il cursore, premi la traccia libera, clicca le frecce alle estremità), oppure `Shift+Sinistra` / `Shift+Destra`. Nella disposizione `fit` predefinita le colonne riempiono il pannello e non c'è nulla da scorrere.
 - **Trascina un'intestazione del Log** per spostare la colonna: un fantasma del suo nome segue il puntatore, l'intestazione che ha lasciato è attenuata e una barra d'accento segna lo slot in cui finirebbe. Le colonne si spostano al rilascio; `Esc` annulla e il puntatore mostra la mano aperta mentre la porti (da tastiera: `Shift+C` per scegliere una colonna, poi `<` / `>`).
 
 GitPoulpi ricorda ogni dimensione. Vedi
@@ -228,7 +230,7 @@ Vedi [Hosting e issue tracker](hosting-integration.md).
   del commit.
 - **Clic destro su una pillola di ref** per un unico menu con le azioni del ref e
   quelle del commit.
-- **Clic destro sull'intestazione** per mostrare o nascondere le colonne: un elenco di caselle (`[x]` / `[ ]`) con una ✕ nel titolo; clicca una riga o usa le frecce e `Spazio` / `Enter`, poi chiudilo con la ✕, `Esc` o un clic fuori (la palette: `Vista: Log: Scegli le colonne da mostrare`).
+- **Clic destro sull'intestazione** per mostrare o nascondere le colonne: un elenco di caselle (`[x]` / `[ ]`) con una ✕ nel titolo; clicca una riga o usa le frecce e `Spazio` / `Enter`, poi chiudilo con la ✕, `Esc` o un clic fuori (la palette: `Vista: Log: Scegli le colonne da mostrare`). Sotto le caselle: `Adatta <colonna> al contenuto` (la colonna cliccata), `Adatta tutte le colonne al contenuto` e `Reimposta le larghezze delle colonne`.
 - **Clicca `↑`, `↓` o `✕`** nella barra di ricerca per andare al risultato
   precedente o successivo, o per chiudere la barra.
 - **Clicca `#12`, `ABC-12` o `AB#12`** in un messaggio di commit, nel pannello

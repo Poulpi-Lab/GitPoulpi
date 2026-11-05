@@ -240,7 +240,8 @@ cliente MCP.
 | Comando | O que faz |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Repositórios e os separadores desta sessão. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (cada um com `--clear`) | O filtro de refs do Log: ocultar, voltar a mostrar, mostrar só estas (em direto numa janela aberta). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (cada um com `--clear`) | O filtro de refs do Log: ocultar, voltar a mostrar, mostrar só estas (em direto numa janela aberta). As refs ocultas também saem do percurso: os commits que só elas alcançam desaparecem do Log (o commit em checkout fica sempre). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Ocultar ou mostrar remotos por inteiro: todas as suas branches, também as obtidas mais tarde. O nome tem de ser um remoto do repositório (para ocultar). `show` também retira as branches do remoto que tinham sido ocultadas uma a uma; `--clear` esvazia também os remotos ocultos. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Sessões com nome (renomear / eliminar recusam enquanto o seu daemon corre). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | O processo em segundo plano da sessão (alias `server`). Sem um daemon em execução, cada comando inicia um embebido durante a sua própria vida. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Definições ([Referência de configuração](config-reference.md)). `config set ui.theme` e `ui.graph_color_theme` verificam o nome no registo. |

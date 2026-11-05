@@ -237,7 +237,8 @@ Plus `commit --ai` och `stash push --ai`. Modellen anropas från processen
 | Kommando | Vad det gör |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Repositories och den här sessionens flikar. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (var och en med `--clear`) | Logs reffilter: dölj, visa igen, visa bara dessa (live i ett öppet fönster). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (var och en med `--clear`) | Logs reffilter: dölj, visa igen, visa bara dessa (live i ett öppet fönster). Dolda refs lämnar också genomgången: commits som bara de når försvinner ur Log (den utcheckade commiten stannar alltid). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Dölj eller visa hela remotes: varje gren i dem, även de som hämtas senare. Namnet måste vara en remote i repositoryt (för att dölja). `show` tar också bort grenar från remoten som dolts en och en; `--clear` tömmer även de dolda remotes. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Namngivna sessioner (rename / delete avvisas medan dess daemon körs). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | Sessionens bakgrundsprocess (alias `server`). Utan en körande daemon startar varje kommando en inbäddad för sin egen livstid. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Inställningar ([Konfigurationsreferens](config-reference.md)). `config set ui.theme` och `ui.graph_color_theme` kontrollerar namnet mot registret. |

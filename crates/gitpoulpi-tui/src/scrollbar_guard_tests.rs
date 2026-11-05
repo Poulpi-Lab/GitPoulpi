@@ -34,6 +34,7 @@ const BAR_MARKERS: &[&str] = &[
     "BarDrag",
     "render_buf",
     "popup_list",
+    "_bar.paint(",
     "Combo",
     "combo::",
 ];

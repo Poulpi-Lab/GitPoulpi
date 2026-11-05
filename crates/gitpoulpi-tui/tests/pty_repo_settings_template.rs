@@ -31,7 +31,7 @@ fn fixture() -> FixtureRepo {
 fn launch(repo: &Path, session: &str) -> (Terminal, tempfile::TempDir) {
     common::launch(repo)
         .session(session)
-        .size(200, 60)
+        .size(204, 60)
         .no_exit_pause()
         .ready_when("the fixture and its composer", |s| {
             s.contains("pty-template-initial") && s.contains("Skip hooks")

@@ -75,7 +75,9 @@ fn a_repository_tab_home_and_the_radar_tab_all_show_the_pointing_hand() {
             .unwrap_or_else(|| panic!("no {needle:?} on the tab bar: {bar:?}"));
         bar[..at].chars().count() as u16 + 1
     };
-    let empty = (90, 20);
+    // Not on a column grip: the last column's grip line runs down the table at
+    // x = 90 at this width.
+    let empty = (60, 20);
     // The arrow over nothing, then each tab in turn, with the arrow between
     // so every hover is a change that is written.
     for (what, spot) in [

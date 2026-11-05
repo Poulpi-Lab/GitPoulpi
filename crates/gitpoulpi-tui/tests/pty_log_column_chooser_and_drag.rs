@@ -92,7 +92,7 @@ fn the_chooser_has_real_checkboxes_a_cross_and_works_by_keys_and_clicks() {
     // Fit Author) to the last toggleable one (SHA);
     // Space unchecks it and the popup stays open.
     assert!(sha_shown(&term.screen()), "{}", term.text());
-    term.send_keys("Up Up Up Up").unwrap();
+    term.send_keys("Up Up Up Up Up").unwrap();
     term.send_text(" ").unwrap();
     term.wait_for("SHA hidden by Space", STEP, |s| {
         !sha_shown(s) && s.contains("[ ] SHA") && chooser_open(s)

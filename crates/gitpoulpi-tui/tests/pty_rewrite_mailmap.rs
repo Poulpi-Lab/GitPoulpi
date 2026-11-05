@@ -62,7 +62,7 @@ fn launch(repo: &FixtureRepo, session: &str) -> (Terminal, tempfile::TempDir) {
     let term = common::launch(repo.root())
         .session(session)
         .config_dir(config.path())
-        .size(200, 50)
+        .size(204, 50)
         .spawn();
     term.wait_for("the fixture loaded", STARTUP, |s| {
         s.contains("work by the old name") && s.contains("work by the new name")
@@ -197,7 +197,7 @@ fn an_author_rule_on_pushed_commits_offers_the_mailmap_and_opens_the_tab_with_th
     let mut term = common::launch(repo.root())
         .session("pty-mailmap-offer")
         .config_dir(config.path())
-        .size(200, 50)
+        .size(204, 50)
         .spawn();
     term.wait_for("the fixture loaded", STARTUP, |s| {
         s.contains("first by old") && s.contains("second by old")

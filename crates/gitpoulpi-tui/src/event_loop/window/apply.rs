@@ -392,8 +392,16 @@ impl WindowState {
                 self.log_gen += 1;
             }
             if changed.refs {
-                self.refs_result = outcome.refs_result;
-                self.refs_gen += 1;
+                match super::refs_update::refs_update(&self.refs_result, outcome.refs_result) {
+                    super::refs_update::RefsUpdate::Keep { why } => {
+                        self.last_message =
+                            Some(gitpoulpi_i18n::msg::window::refs_refresh_failed(&why));
+                    }
+                    super::refs_update::RefsUpdate::Replace(result) => {
+                        self.refs_result = result;
+                        self.refs_gen += 1;
+                    }
+                }
             }
             if changed.stashes {
                 self.stashes_result = outcome.stashes_result;

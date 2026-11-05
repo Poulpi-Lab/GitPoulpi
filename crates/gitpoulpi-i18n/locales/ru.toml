@@ -4910,6 +4910,7 @@ ai_proposed_plan = "ИИ предложил план - проверьте и с�
 ai_wrote_pr = "ИИ написал заголовок и описание"
 ai_failed = "ИИ: {why}"
 ai_canceled = "запрос к ИИ отменён"
+refs_refresh_failed = "не удалось обновить, показан последний список: {why}"
 lfs_program_installed = "установлен ({version})"
 lfs_program_too_old = "{version} слишком старая (нужна 3.0 или новее)"
 lfs_program_missing = "не установлен (https://git-lfs.com)"

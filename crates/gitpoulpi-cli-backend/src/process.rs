@@ -814,6 +814,93 @@ pub(crate) fn run_merge_file(repo_root: &Path, args: &[&str]) -> Result<Vec<u8>>
     }
 }
 
+/// How long a failed read waits before its one retry.
+const READ_RETRY_PAUSE: std::time::Duration = std::time::Duration::from_millis(100);
+
+/// Runs a read, and once more after a short pause if it failed (the process
+/// killed by a signal, or a non-zero exit while the repository was changing
+/// under it). A second failure is the answer: the caller gets the error with
+/// its detail (exit code, `None` for a signal, and stderr), never a retry
+/// loop. Reads only: a mutation that failed must never run twice.
+pub(crate) fn read_with_retry<T>(op: impl FnMut() -> Result<T>) -> Result<T> {
+    retry_once(op, || std::thread::sleep(READ_RETRY_PAUSE))
+}
+
+/// The policy of [`read_with_retry`], with the pause injectable.
+fn retry_once<T>(mut op: impl FnMut() -> Result<T>, pause: impl FnOnce()) -> Result<T> {
+    match op() {
+        Ok(value) => Ok(value),
+        Err(_) => {
+            pause();
+            op()
+        }
+    }
+}
+
+#[cfg(test)]
+mod retry_tests {
+    use super::*;
+
+    fn died_by_signal() -> gitpoulpi_core::Error {
+        failed_with(&["for-each-ref"], None, "")
+    }
+
+    #[test]
+    fn a_read_that_succeeds_runs_once() {
+        let mut calls = 0;
+        let mut paused = false;
+        let out = retry_once(
+            || {
+                calls += 1;
+                Ok("ok")
+            },
+            || paused = true,
+        );
+        assert_eq!(out.unwrap(), "ok");
+        assert_eq!(calls, 1);
+        assert!(!paused, "no pause without a failure");
+    }
+
+    #[test]
+    fn a_read_killed_once_is_retried_and_succeeds() {
+        let mut calls = 0;
+        let out = retry_once(
+            || {
+                calls += 1;
+                if calls == 1 {
+                    Err(died_by_signal())
+                } else {
+                    Ok("ok")
+                }
+            },
+            || {},
+        );
+        assert_eq!(out.unwrap(), "ok");
+        assert_eq!(calls, 2);
+    }
+
+    #[test]
+    fn a_read_that_fails_twice_returns_the_second_error_with_its_detail() {
+        let mut calls = 0;
+        let out: Result<()> = retry_once(
+            || {
+                calls += 1;
+                Err(if calls == 1 {
+                    failed_with(&["for-each-ref"], Some(128), "first")
+                } else {
+                    failed_with(&["for-each-ref"], None, "free(): double free detected")
+                })
+            },
+            || {},
+        );
+        let err = out.unwrap_err();
+        assert_eq!(calls, 2);
+        let detail = err.detail().expect("detail");
+        assert_eq!(detail.exit_code, None);
+        assert!(detail.stderr.contains("double free"), "{}", detail.stderr);
+    }
+}
+
 #[cfg(test)]
 mod failure_detail_tests {
     use super::*;

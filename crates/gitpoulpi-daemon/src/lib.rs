@@ -35,7 +35,7 @@ mod workflow;
 pub use backend::{backend_for, backend_from_ambient_config};
 pub use gitpoulpi_ipc::{DaemonInfo, DaemonKind};
 pub use status::{DaemonStatus, SessionDaemonInfo};
-pub use test_hook::panic_on_for_tests;
+pub use test_hook::{panic_on_for_tests, Hold};
 
 /// Forgets every in-memory rewrite plan, as a daemon restart does (the
 /// plan store is process-wide, so tests that restart a daemon in one process

@@ -16,7 +16,7 @@ use gitpoulpi_core::domain::Oid;
 use gitpoulpi_core::Result;
 
 use super::walk::{read_git, refuse, Head};
-use crate::process::{failed_with, spawn_failed};
+use crate::process::{failed_with, read_with_retry, spawn_failed};
 
 const HEADS: &str = "refs/heads/";
 const TAGS: &str = "refs/tags/";
@@ -66,14 +66,18 @@ pub(crate) fn list(root: &Path) -> Result<Refs> {
         "refs/remotes",
         "refs/gitpoulpi/remote-tags",
     ];
-    let out = read_git(root, &args).output().map_err(spawn_failed)?;
-    if !out.status.success() {
-        return Err(failed_with(
-            &args,
-            out.status.code(),
-            &String::from_utf8_lossy(&out.stderr),
-        ));
-    }
+    let out = read_with_retry(|| {
+        let out = read_git(root, &args).output().map_err(spawn_failed)?;
+        if out.status.success() {
+            Ok(out)
+        } else {
+            Err(failed_with(
+                &args,
+                out.status.code(),
+                &String::from_utf8_lossy(&out.stderr),
+            ))
+        }
+    })?;
     let mut refs = Refs::default();
     for line in String::from_utf8_lossy(&out.stdout).lines() {
         let f: Vec<&str> = line.split('\0').collect();

@@ -4921,6 +4921,7 @@ ai_proposed_plan = "die KI hat einen Plan vorgeschlagen - prüfen, dann erstelle
 ai_wrote_pr = "die KI hat Titel und Beschreibung geschrieben"
 ai_failed = "KI: {why}"
 ai_canceled = "KI-Anfrage abgebrochen"
+refs_refresh_failed = "Aktualisierung fehlgeschlagen, die letzte Liste bleibt sichtbar: {why}"
 lfs_program_installed = "installiert ({version})"
 lfs_program_too_old = "{version} ist zu alt (3.0 oder neuer nötig)"
 lfs_program_missing = "nicht installiert (https://git-lfs.com)"

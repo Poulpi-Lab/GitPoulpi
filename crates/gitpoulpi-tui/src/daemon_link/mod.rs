@@ -91,6 +91,8 @@ mod action_requests_tests;
 #[cfg(test)]
 mod commit_files_tests;
 #[cfg(test)]
+mod link_guard;
+#[cfg(test)]
 mod link_lifetime_tests;
 #[cfg(test)]
 mod outcome_tests;

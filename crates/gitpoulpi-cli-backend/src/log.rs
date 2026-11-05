@@ -3,7 +3,7 @@ use gitpoulpi_core::domain::{
 };
 use gitpoulpi_core::Result;
 
-use crate::process::{run, run_bytes, run_bytes_with_stdin};
+use crate::process::{read_with_retry, run, run_bytes, run_bytes_with_stdin};
 
 const FIELD_SEP: char = '\u{1}';
 const RECORD_SEP: char = '\u{2}';
@@ -11,19 +11,21 @@ const RECORD_SEP: char = '\u{2}';
 /// The commits a walk with a non-empty filter starts from: every branch,
 /// tag and remote-tracking ref (annotated tags peeled; a tag of a tree or a
 /// blob is no tip) the filter keeps, plus `HEAD` when it resolves. Empty
-/// for an unborn repository with no ref at all.
-pub(crate) fn filtered_tips(repo: &RepoRef, filter: &RefFilter) -> Vec<Oid> {
-    let listing = run(
-        &repo.root,
-        &[
-            "for-each-ref",
-            "--format=%(refname)%09%(objecttype)%09%(objectname)%09%(*objecttype)%09%(*objectname)%09%(symref)",
-            "refs/heads",
-            "refs/tags",
-            "refs/remotes",
-        ],
-    )
-    .unwrap_or_default();
+/// for an unborn repository with no ref at all. A listing that fails is an
+/// error, never an empty list: the Log would silently walk only `HEAD`.
+pub(crate) fn filtered_tips(repo: &RepoRef, filter: &RefFilter) -> Result<Vec<Oid>> {
+    let listing = read_with_retry(|| {
+        run(
+            &repo.root,
+            &[
+                "for-each-ref",
+                "--format=%(refname)%09%(objecttype)%09%(objectname)%09%(*objecttype)%09%(*objectname)%09%(symref)",
+                "refs/heads",
+                "refs/tags",
+                "refs/remotes",
+            ],
+        )
+    })?;
     let refs: Vec<(String, Oid)> = listing
         .lines()
         .filter_map(|line| {
@@ -49,7 +51,7 @@ pub(crate) fn filtered_tips(repo: &RepoRef, filter: &RefFilter) -> Vec<Oid> {
     )
     .ok()
     .and_then(|out| Oid::from_hex(out.trim()));
-    visible_tips(filter, &refs, head)
+    Ok(visible_tips(filter, &refs, head))
 }
 
 /// The tips as `--stdin` input: one id per line. A command line of
@@ -98,7 +100,7 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
         // Hidden refs change the walk: start from the visible tips only.
         // `--stdin` with no input would fall back to HEAD, so an empty list
         // is an empty graph without running git.
-        let tips = filtered_tips(repo, &opts.hidden);
+        let tips = filtered_tips(repo, &opts.hidden)?;
         if tips.is_empty() {
             return Ok(CommitGraph::default());
         }
@@ -180,4 +182,23 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
         .collect();
 
     Ok(CommitGraph { nodes })
+}
+
+#[cfg(test)]
+mod filtered_tips_tests {
+    use super::*;
+
+    /// A listing that fails is an error: an empty list would make the Log
+    /// walk only `HEAD` while claiming to show the filtered graph.
+    #[test]
+    fn a_failing_ref_listing_is_an_error_not_an_empty_list() {
+        let not_a_repo = tempfile::tempdir().unwrap();
+        let repo = RepoRef::from_root(not_a_repo.path());
+        let filter = RefFilter {
+            names: vec!["main".into()],
+            ..RefFilter::default()
+        };
+        let result = filtered_tips(&repo, &filter);
+        assert!(result.is_err(), "got {result:?}");
+    }
 }

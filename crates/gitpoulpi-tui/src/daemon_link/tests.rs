@@ -1,3 +1,4 @@
+use super::link_guard::LinkGuard;
 use super::*;
 use gitpoulpi_core::domain::{CommitOptions, StageTarget};
 
@@ -37,7 +38,7 @@ async fn survives_a_repo_changed_event_without_deadlocking() {
     // before the first refresh.
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
-    tokio::spawn(link_loop_with_port(
+    let link = LinkGuard::spawn(link_loop_with_port(
         daemon_handle.port,
         "daemon-link-test".to_string(),
         repo.clone(),
@@ -108,6 +109,7 @@ async fn survives_a_repo_changed_event_without_deadlocking() {
     let _ = manual_refresh_tx.send(());
     recv_with_timeout(&outcome_rx).await;
 
+    link.stop().await;
     daemon_handle.shutdown().await.unwrap();
 }
 
@@ -167,7 +169,7 @@ async fn staging_one_hunk_through_the_link_leaves_the_other_unstaged() {
     // before the first refresh.
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
-    tokio::spawn(link_loop_with_port(
+    let link = LinkGuard::spawn(link_loop_with_port(
         daemon_handle.port,
         "daemon-link-hunk-test".to_string(),
         repo.clone(),
@@ -297,6 +299,7 @@ async fn staging_one_hunk_through_the_link_leaves_the_other_unstaged() {
     assert!(left_text.contains("line19-changed"), "got {left_text}");
     assert!(!left_text.contains("line2-changed"), "got {left_text}");
 
+    link.stop().await;
     daemon_handle.shutdown().await.unwrap();
 }
 
@@ -341,7 +344,7 @@ async fn file_insight_answers_content_blame_and_history_for_a_path() {
     // before the first refresh.
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
-    tokio::spawn(link_loop_with_port(
+    let link = LinkGuard::spawn(link_loop_with_port(
         daemon_handle.port,
         "daemon-link-insight-test".to_string(),
         repo.clone(),
@@ -421,6 +424,7 @@ async fn file_insight_answers_content_blame_and_history_for_a_path() {
         _ => panic!("HistoryPage request answered with the wrong payload"),
     }
 
+    link.stop().await;
     daemon_handle.shutdown().await.unwrap();
 }
 
@@ -582,7 +586,7 @@ async fn a_stage_file_event_refreshes_status_without_log_or_lfs() {
     let (file_insight_out_tx, _file_insight_rx) = std_mpsc::channel();
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
-    tokio::spawn(link_loop_with_port(
+    let _link = LinkGuard::spawn(link_loop_with_port(
         port,
         "scoped-refresh-test".to_string(),
         repo,
@@ -743,7 +747,7 @@ async fn a_stage_all_is_sent_at_once_while_a_slow_refresh_is_in_flight() {
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
     let activity = Arc::new(crate::activity::Activity::default());
-    tokio::spawn(link_loop_with_port(
+    let _link = LinkGuard::spawn(link_loop_with_port(
         port,
         "non-queueing-test".to_string(),
         repo,
@@ -869,7 +873,7 @@ async fn a_paged_log_tiles_onto_the_initial_load_over_the_real_link() {
     let (file_insight_out_tx, _file_insight_rx) = std_mpsc::channel();
     let (log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, log_page_rx) = std_mpsc::channel();
-    tokio::spawn(link_loop_with_port(
+    let link = LinkGuard::spawn(link_loop_with_port(
         daemon_handle.port,
         "daemon-link-paging".to_string(),
         repo.clone(),
@@ -962,6 +966,7 @@ async fn a_paged_log_tiles_onto_the_initial_load_over_the_real_link() {
     );
 
     set_log_page_limit(gitpoulpi_config::DEFAULT_INITIAL_COMMITS_IN_GRAPH);
+    link.stop().await;
     daemon_handle.shutdown().await.unwrap();
 }
 
@@ -1008,7 +1013,7 @@ async fn stashing_through_the_link_leaves_a_clean_working_tree() {
     let (file_insight_out_tx, _file_insight_rx) = std_mpsc::channel();
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
-    tokio::spawn(link_loop_with_port(
+    let link = LinkGuard::spawn(link_loop_with_port(
         daemon_handle.port,
         "daemon-link-stash-test".to_string(),
         repo.clone(),
@@ -1099,6 +1104,7 @@ async fn stashing_through_the_link_leaves_a_clean_working_tree() {
          row and the pane's count read this - but it still has {left:?}"
     );
 
+    link.stop().await;
     daemon_handle.shutdown().await.unwrap();
 }
 
@@ -1185,7 +1191,7 @@ async fn a_merge_blocked_after_a_dropped_checkout_asks_instead_of_vanishing() {
     let (file_insight_out_tx, _file_insight_rx) = std_mpsc::channel();
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
-    tokio::spawn(link_loop_with_port(
+    let link = LinkGuard::spawn(link_loop_with_port(
         daemon_handle.port,
         "daemon-link-nested-autostash".to_string(),
         repo.clone(),
@@ -1255,6 +1261,7 @@ async fn a_merge_blocked_after_a_dropped_checkout_asks_instead_of_vanishing() {
     );
     assert!(action_error_rx.try_recv().is_err());
     std::env::remove_var("GITPOULPI_GENERAL_AUTO_STASH");
+    link.stop().await;
     daemon_handle.shutdown().await.unwrap();
 }
 
@@ -1293,7 +1300,7 @@ async fn two_polls_with_no_change_cause_no_layout_rebuild() {
     let (file_insight_out_tx, _file_insight_rx) = std_mpsc::channel();
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
-    tokio::spawn(link_loop_with_port(
+    let link = LinkGuard::spawn(link_loop_with_port(
         daemon_handle.port,
         "daemon-link-idle-polls".to_string(),
         repo.clone(),
@@ -1386,5 +1393,6 @@ async fn two_polls_with_no_change_cause_no_layout_rebuild() {
     assert_eq!(layout.layout_builds, 1, "idle polls must not rebuild");
     assert_eq!((log_gen, refs_gen, stashes_gen), (1, 1, 1));
 
+    link.stop().await;
     daemon_handle.shutdown().await.unwrap();
 }

@@ -6,7 +6,7 @@ use gitpoulpi_core::domain::{
 };
 use gitpoulpi_core::{Error, Result};
 
-use crate::process::run;
+use crate::process::{read_with_retry, run, run_bytes_with_stdin};
 
 pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
     // `symbolic-ref` fails (non-zero exit -> Err here) on a detached HEAD
@@ -30,45 +30,46 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
         })
         .unwrap_or_default();
 
-    let raw = run(
-        &repo.root,
-        &[
-            "for-each-ref",
-            // `%(objectname)` on an annotated tag is the tag object's own
-            // oid; `%(*objectname)` is the peeled commit oid, empty for
-            // lightweight tags, so the parser falls back to `objectname`.
-            //
-            // `%(upstream:short)` is already spelled the way
-            // `RefKind::RemoteBranch` spells a remote branch
-            // (`origin/feature/login`), and empty for untracked refs.
-            "--format=%(refname)\u{1}%(objectname)\u{1}%(*objectname)\u{1}%(upstream:short)",
-            "refs/heads",
-            "refs/remotes",
-            "refs/tags",
-            // GitPoulpi's own remote-tag mirror, walked in the same
-            // `for-each-ref` rather than a second spawn. These rows never
-            // become `Ref`s; they only fill in each tag's `tag_sync`.
-            REMOTE_TAG_MIRROR_PREFIX,
-        ],
-    )?;
+    // No `%(*objectname)`: git 2.5x aborts (SIGABRT, a double free) on a ref
+    // whose object is missing, which a repository being deleted or
+    // half-written shows for a moment. Tags are peeled below instead.
+    let raw = read_with_retry(|| {
+        run(
+            &repo.root,
+            &[
+                "for-each-ref",
+                // `%(upstream:short)` is already spelled the way
+                // `RefKind::RemoteBranch` spells a remote branch
+                // (`origin/feature/login`), and empty for untracked refs.
+                "--format=%(refname)\u{1}%(objectname)\u{1}%(upstream:short)",
+                "refs/heads",
+                "refs/remotes",
+                "refs/tags",
+                // GitPoulpi's own remote-tag mirror, walked in the same
+                // `for-each-ref` rather than a second spawn. These rows never
+                // become `Ref`s; they only fill in each tag's `tag_sync`.
+                REMOTE_TAG_MIRROR_PREFIX,
+            ],
+        )
+    })?;
+
+    let rows: Vec<(&str, Oid, &str)> = raw
+        .lines()
+        .filter_map(|line| {
+            let mut parts = line.splitn(3, '\u{1}');
+            let (refname, objectname) = (parts.next()?, parts.next()?);
+            let upstream = parts.next().unwrap_or("").trim();
+            Some((refname, Oid::from_hex(objectname.trim())?, upstream))
+        })
+        .collect();
+    let peeled = peel_tags(repo, &rows)?;
 
     // tag name -> the commits the remotes are known to have it at.
     let mut mirror: BTreeMap<String, Vec<(String, Oid)>> = BTreeMap::new();
     let mut refs: Vec<Ref> = Vec::new();
 
-    for line in raw.lines().filter(|line| !line.trim().is_empty()) {
-        let mut parts = line.splitn(4, '\u{1}');
-        let (Some(refname), Some(objectname)) = (parts.next(), parts.next()) else {
-            continue;
-        };
-        let peeled = parts.next().unwrap_or("").trim();
-        let upstream = parts.next().unwrap_or("").trim();
-        let target = if peeled.is_empty() {
-            Oid::from_hex(objectname.trim())
-        } else {
-            Oid::from_hex(peeled)
-        };
-        let Some(target) = target else { continue };
+    for (refname, listed, upstream) in rows {
+        let target = peeled.get(&listed).copied().unwrap_or(listed);
 
         if let Some((remote, tag)) = parse_remote_tag_mirror_ref(refname, &remote_names) {
             mirror
@@ -101,6 +102,49 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
     apply_tag_sync(&mut refs, &mirror);
 
     Ok(refs)
+}
+
+/// The commit each annotated tag row (a tag or a mirror of one) points at,
+/// keyed by the row's own object id. One `cat-file --batch-check` for all of
+/// them, and only when there is a tag row. An object that is missing, or
+/// that peels to something other than a commit, is left out: the row keeps
+/// its own id, as `Git2Backend` does.
+fn peel_tags(
+    repo: &RepoRef,
+    rows: &[(&str, Oid, &str)],
+) -> Result<std::collections::HashMap<Oid, Oid>> {
+    let mut ids: Vec<Oid> = rows
+        .iter()
+        .filter(|(name, _, _)| {
+            name.starts_with("refs/tags/") || name.starts_with(REMOTE_TAG_MIRROR_PREFIX)
+        })
+        .map(|(_, id, _)| *id)
+        .collect();
+    ids.sort_by_key(|id| id.0);
+    ids.dedup();
+    let mut peeled = std::collections::HashMap::new();
+    if ids.is_empty() {
+        return Ok(peeled);
+    }
+    let mut stdin = String::new();
+    for id in &ids {
+        stdin.push_str(&id.to_string());
+        stdin.push_str("^{}\n");
+    }
+    let answer = read_with_retry(|| {
+        run_bytes_with_stdin(
+            &repo.root,
+            &["cat-file", "--batch-check=%(objectname) %(objecttype)"],
+            stdin.as_bytes(),
+        )
+    })?;
+    // One answer line per input line, in order.
+    for (id, line) in ids.iter().zip(String::from_utf8_lossy(&answer).lines()) {
+        if let Some(commit) = line.strip_suffix(" commit").and_then(Oid::from_hex) {
+            peeled.insert(*id, commit);
+        }
+    }
+    Ok(peeled)
 }
 
 /// Which remotes hold `name`, split by whether they hold it **at this

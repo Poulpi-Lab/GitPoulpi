@@ -26,7 +26,7 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
-use ratatui::style::Style;
+use ratatui::style::{Modifier, Style};
 
 use gitpoulpi_core::domain::rewrite::{CommitterPolicy, PruneEmpty, Rule, Scope};
 use gitpoulpi_i18n::msg::rewrite_ai as t;
@@ -37,8 +37,38 @@ use super::script_ai::{AiSystem, AiWish};
 use super::{Focus, Notice, RewriteView};
 use crate::dialog_kit::{self, button_width, ButtonState, CheckState};
 use crate::text_edit::{Caret, KeyEdit};
-use crate::text_field::{edit_lines, offset_at, EditLook};
+use crate::text_field::{self, edit_lines, offset_at, EditLook};
 use crate::th;
+
+/// The widest the dialog grows; it is as tall as its content needs.
+const MAX_WIDTH: u16 = 100;
+/// The least rows the open "What is sent" pane gets.
+const MIN_PANE: u16 = 4;
+
+/// The tint of the "What is sent" pane: the dialog's own panel, sunk a step,
+/// so the read-only preview reads apart from the editable fields (which sit
+/// lighter) in dark and light themes alike.
+fn sent_bg() -> ratatui::style::Color {
+    let panel = th().ui.panel;
+    match panel {
+        ratatui::style::Color::Rgb(..) => {
+            let sunk = crate::lighten(panel, -14);
+            if sunk == panel {
+                crate::lighten(panel, 14)
+            } else {
+                sunk
+            }
+        }
+        // A theme that follows the terminal's own colors has nothing to
+        // sink: it uses its hover tone.
+        _ => th().ui.hover,
+    }
+}
+
+#[cfg(test)]
+pub(super) fn sent_bg_for_test() -> ratatui::style::Color {
+    sent_bg()
+}
 
 /// What the user agreed to send about the repository. All empty unless the
 /// box was ticked.
@@ -109,6 +139,8 @@ struct RulesDialog {
     replace: bool,
     focus: RulesFocus,
     scroll: usize,
+    /// The "What is sent" pane is shown (collapsed until the user opens it).
+    sent_open: bool,
     /// `None` until the window answered; `Err` when AI cannot run.
     system: Option<Result<AiSystem, String>>,
     working: bool,
@@ -128,6 +160,12 @@ pub(crate) struct RulesAiState {
     sent_rows: std::cell::Cell<usize>,
     sent_height: std::cell::Cell<usize>,
     text_area: std::cell::Cell<Rect>,
+    /// The two scrollbars as last painted (`None` while not shown) and their
+    /// drags: the description's and the "What is sent" pane's.
+    text_bar: std::cell::Cell<Option<crate::scrollbar::Track>>,
+    sent_bar: std::cell::Cell<Option<crate::scrollbar::Track>>,
+    text_drag: crate::scrollbar::BarDrag,
+    sent_drag: crate::scrollbar::BarDrag,
 }
 
 impl RulesAiState {
@@ -145,6 +183,7 @@ impl RulesDialog {
             replace: false,
             focus: RulesFocus::Text,
             scroll: 0,
+            sent_open: false,
             system: None,
             working: false,
             note: None,
@@ -536,6 +575,13 @@ impl RewriteView {
         {
             return self.rules_send();
         }
+        // Alt+W shows or hides "What is sent" from anywhere in the dialog.
+        if key.modifiers.contains(KeyModifiers::ALT)
+            && !ctrl
+            && matches!(key.code, KeyCode::Char('w') | KeyCode::Char('W'))
+        {
+            return self.rules_toggle_sent();
+        }
         match key.code {
             KeyCode::Esc => return self.close_rules_ai(),
             KeyCode::Tab => return self.rules_step_focus(1),
@@ -579,6 +625,18 @@ impl RewriteView {
                 _ => {}
             },
             RulesFocus::Sent => {
+                let open = self.rules_ai.dialog.as_ref().is_some_and(|d| d.sent_open);
+                if !open {
+                    match key.code {
+                        KeyCode::Enter | KeyCode::Char(' ') | KeyCode::Right if plain_key => {
+                            self.rules_toggle_sent()
+                        }
+                        KeyCode::Down if plain_key => self.rules_step_focus(1),
+                        KeyCode::Up if plain_key => self.rules_step_focus(-1),
+                        _ => {}
+                    }
+                    return;
+                }
                 let page = self.rules_ai.sent_height.get().max(2) as isize - 1;
                 let step = match key.code {
                     KeyCode::Up | KeyCode::Char('k') => -1,
@@ -587,7 +645,7 @@ impl RewriteView {
                     KeyCode::PageDown | KeyCode::Char(' ') => page,
                     KeyCode::Home => isize::MIN / 2,
                     KeyCode::End => isize::MAX / 2,
-                    KeyCode::Enter => return self.rules_step_focus(1),
+                    KeyCode::Enter | KeyCode::Left => return self.rules_toggle_sent(),
                     _ => return,
                 };
                 self.rules_scroll(step);
@@ -619,8 +677,75 @@ impl RewriteView {
         }
     }
 
-    pub(crate) fn on_rules_ai_wheel(&mut self, delta: isize) {
-        self.rules_scroll(delta);
+    /// Shows or hides the "What is sent" pane.
+    fn rules_toggle_sent(&mut self) {
+        if let Some(d) = self.rules_ai.dialog.as_mut() {
+            d.sent_open = !d.sent_open;
+            d.scroll = 0;
+        }
+    }
+
+    /// The wheel scrolls what is under the pointer: the description, the
+    /// "What is sent" pane, or the result list.
+    pub(crate) fn on_rules_ai_wheel(&mut self, hit: RewriteHit, delta: isize) {
+        let Some(d) = self.rules_ai.dialog.as_ref() else {
+            return;
+        };
+        if d.result.is_some() {
+            return self.rules_scroll(delta);
+        }
+        match hit {
+            RewriteHit::RaText | RewriteHit::RaTextBar => {
+                let rows = self.rules_ai.text_area.get().height as usize;
+                if let Some(d) = self.rules_ai.dialog.as_mut() {
+                    let top = (d.caret.top.get() as isize + delta).max(0) as usize;
+                    d.caret.scroll_lines_to(&d.text, top, rows);
+                }
+            }
+            RewriteHit::RaSent | RewriteHit::RaSentBar if d.sent_open => self.rules_scroll(delta),
+            _ => {}
+        }
+    }
+
+    /// A drag or release with the left button: the thumb of either bar.
+    pub(crate) fn on_rules_ai_bar_mouse(&mut self, mouse: crossterm::event::MouseEvent) {
+        self.rules_bar_mouse(mouse);
+    }
+
+    fn rules_bar_mouse(&mut self, mouse: crossterm::event::MouseEvent) {
+        let Some(d) = self.rules_ai.dialog.as_ref() else {
+            return;
+        };
+        // The description's bar.
+        let content = d.text.split('\n').count();
+        let top = d.caret.top.get();
+        let rows = self.rules_ai.text_area.get().height as usize;
+        let track = self.rules_ai.text_bar.get();
+        if let Some(new) = self.rules_ai.text_drag.on_mouse(track, mouse, content, top) {
+            if let Some(d) = self.rules_ai.dialog.as_mut() {
+                d.focus = RulesFocus::Text;
+                d.caret.scroll_lines_to(&d.text, new, rows);
+            }
+        }
+        // The pane's bar.
+        let rows_total = self.rules_ai.sent_rows.get();
+        let top = match self.rules_ai.dialog.as_ref() {
+            Some(d) => d.result.as_ref().map_or(d.scroll, |r| r.scroll),
+            None => return,
+        };
+        let track = self.rules_ai.sent_bar.get();
+        if let Some(new) = self
+            .rules_ai
+            .sent_drag
+            .on_mouse(track, mouse, rows_total, top)
+        {
+            self.rules_scroll(new as isize - top as isize);
+            if let Some(d) = self.rules_ai.dialog.as_mut() {
+                if d.result.is_none() {
+                    d.focus = RulesFocus::Sent;
+                }
+            }
+        }
     }
 
     /// Pasted text goes into the description (newlines kept).
@@ -648,6 +773,14 @@ impl RewriteView {
                 self.close_rules_ai()
             }
             RewriteHit::RaPanel => {}
+            RewriteHit::RaSentBar if !working => {
+                self.rules_bar_mouse(crossterm::event::MouseEvent {
+                    kind: crossterm::event::MouseEventKind::Down(crossterm::event::MouseButton::Left),
+                    column: col,
+                    row,
+                    modifiers: KeyModifiers::NONE,
+                });
+            }
             _ if working || result => {}
             RewriteHit::RaText => {
                 let area = self.rules_ai.text_area.get();
@@ -683,6 +816,20 @@ impl RewriteView {
                     d.focus = RulesFocus::Sent;
                 }
             }
+            RewriteHit::RaSentHead => {
+                if let Some(d) = self.rules_ai.dialog.as_mut() {
+                    d.focus = RulesFocus::Sent;
+                }
+                self.rules_toggle_sent();
+            }
+            RewriteHit::RaSentBar | RewriteHit::RaTextBar => {
+                self.rules_bar_mouse(crossterm::event::MouseEvent {
+                    kind: crossterm::event::MouseEventKind::Down(crossterm::event::MouseButton::Left),
+                    column: col,
+                    row,
+                    modifiers: KeyModifiers::NONE,
+                });
+            }
             RewriteHit::RaSend => {
                 if let Some(d) = self.rules_ai.dialog.as_mut() {
                     d.focus = RulesFocus::Send;
@@ -716,13 +863,66 @@ impl RewriteView {
         let Some(d) = &self.rules_ai.dialog else {
             return hits;
         };
-        let rect = Rect::new(
+        // The room the dialog may take; it only takes what its content needs.
+        let room = Rect::new(
             bounds.x + 4,
             bounds.y + 2,
             bounds.width.saturating_sub(8),
             bounds.height.saturating_sub(4),
         );
+        let budget = room.height.saturating_sub(2);
+        let width = room.width.min(MAX_WIDTH);
+        let wide_inner = width.saturating_sub(4);
         let title = format!("{} {}", crate::theme::AI_SPARK, r::DLG_TITLE.get());
+        if wide_inner + 2 < 40 || budget < 14 {
+            let rect = room;
+            dialog_kit::panel(buf, rect, &title);
+            if let Some(cross) =
+                crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::RaClose))
+            {
+                hits.push((cross, RewriteHit::RaClose));
+            }
+            dialog_kit::put(
+                buf,
+                rect.x + 2,
+                rect.y + 1,
+                t::DLG_TOO_SMALL.get(),
+                rect.width.saturating_sub(3),
+                dim(),
+            );
+            hits.push((rect, RewriteHit::RaPanel));
+            hits.push((bounds, RewriteHit::RaShield));
+            return hits;
+        }
+        let lines = if d.result.is_some() {
+            Vec::new()
+        } else {
+            self.rules_sent_lines(wide_inner.saturating_sub(3) as usize)
+        };
+        let rep = u16::from(self.rules_have_rules());
+        let fixed = |fh: u16, g: u16| fh + 9 + 2 * g + rep;
+        let extra = if d.sent_open { MIN_PANE } else { 0 };
+        let (field_h, gap) = [(5u16, 1u16), (3, 1), (3, 0)]
+            .into_iter()
+            .find(|&(fh, g)| fixed(fh, g) + extra <= budget)
+            .unwrap_or((3, 0));
+        let pane_room = budget.saturating_sub(fixed(field_h, gap));
+        let pane_h = if d.sent_open {
+            (lines.len() as u16).max(MIN_PANE).min(pane_room)
+        } else {
+            0
+        };
+        let inner_h = if d.result.is_some() {
+            budget
+        } else {
+            fixed(field_h, gap) + pane_h
+        };
+        let rect = Rect::new(
+            room.x + (room.width - width) / 2,
+            room.y + (room.height - (inner_h + 2)) / 2,
+            width,
+            inner_h + 2,
+        );
         dialog_kit::panel(buf, rect, &title);
         if let Some(cross) =
             crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::RaClose))
@@ -735,19 +935,6 @@ impl RewriteView {
             rect.width.saturating_sub(2),
             rect.height.saturating_sub(2),
         );
-        if inner.width < 40 || inner.height < 14 {
-            dialog_kit::put(
-                buf,
-                inner.x + 1,
-                inner.y,
-                t::DLG_TOO_SMALL.get(),
-                inner.width.saturating_sub(1),
-                dim(),
-            );
-            hits.push((rect, RewriteHit::RaPanel));
-            hits.push((bounds, RewriteHit::RaShield));
-            return hits;
-        }
         let wide = inner.width.saturating_sub(2);
         let buttons_y = inner.bottom().saturating_sub(1);
         if let Some(res) = &d.result {
@@ -765,7 +952,6 @@ impl RewriteView {
             bold(d.focus == RulesFocus::Text),
         );
         y += 1;
-        let field_h: u16 = if inner.height < 22 { 3 } else { 5 };
         let field = Rect::new(inner.x + 1, y, wide, field_h);
         let focus = d.focus == RulesFocus::Text && !d.working;
         let hit = RewriteHit::RaText;
@@ -796,10 +982,17 @@ impl RewriteView {
                 buf.set_line(body.x, y + i as u16, line, body.width);
             }
         }
+        // The description's own scrollbar, once the text outgrows the field.
+        let bar = text_field::field_track(field, &d.text, d.caret.top.get());
+        self.rules_ai.text_bar.set(bar);
+        if let Some(track) = bar {
+            crate::scrollbar::render_buf(buf, track, true, false);
+            hits.push((track.rect, RewriteHit::RaTextBar));
+        }
         hits.push((field, hit));
         y += field_h;
         dialog_kit::put(buf, inner.x + 1, y, r::DLG_HINT.get(), wide, dim());
-        y += 2;
+        y += 1 + gap;
 
         // What may go along.
         let state = |focused: bool, hot: bool| {
@@ -866,40 +1059,85 @@ impl RewriteView {
         dialog_kit::put(buf, inner.x + 1, y, &facts.join("  "), wide, dim());
         y += 1;
         dialog_kit::put(buf, inner.x + 1, y, r::DLG_FOOTER.get(), wide, dim());
-        y += 2;
+        y += 1 + gap;
 
-        // What is sent.
-        dialog_kit::put(
+        // What is sent: a pane of its own, tinted apart from the fields above
+        // it. Its header row is always there (it shows or hides the body).
+        let bg = sent_bg();
+        let head = Rect::new(inner.x + 1, y, wide, 1);
+        let head_hot = hovered == Some(RewriteHit::RaSentHead);
+        let head_bg = if head_hot { crate::lighten(bg, 10) } else { bg };
+        dialog_kit::fill(buf, head, Style::default().bg(head_bg));
+        let focused = d.focus == RulesFocus::Sent;
+        let mark = if d.sent_open {
+            crate::fold_mark::EXPANDED
+        } else {
+            crate::fold_mark::COLLAPSED
+        };
+        let label_style = Style::default()
+            .fg(if focused { th().ui.accent } else { th().ui.text })
+            .bg(head_bg)
+            .add_modifier(Modifier::BOLD);
+        let lr = dialog_kit::put(
             buf,
-            inner.x + 1,
+            head.x + 1,
             y,
-            t::DLG_SENT_LABEL.get(),
-            wide,
-            bold(d.focus == RulesFocus::Sent),
+            &format!("{mark} {}", t::DLG_SENT_LABEL.get()),
+            head.width.saturating_sub(2),
+            label_style,
         );
-        y += 1;
-        let note_y = buttons_y.saturating_sub(1);
-        let pane_h = note_y.saturating_sub(y) as usize;
-        let lines = self.rules_sent_lines(wide.saturating_sub(2) as usize);
-        self.rules_ai.sent_rows.set(lines.len());
-        self.rules_ai.sent_height.set(pane_h);
-        let top = d.scroll.min(lines.len().saturating_sub(pane_h));
-        let pane = Rect::new(inner.x + 1, y, wide, pane_h as u16);
-        for (i, (text, heading)) in lines.iter().skip(top).take(pane_h).enumerate() {
-            let style = if *heading { bold(false) } else { plain() };
-            dialog_kit::put(buf, pane.x + 1, y + i as u16, text, pane.width - 1, style);
-        }
-        if lines.len() > pane_h + top && pane_h > 0 {
+        let hint = t::DLG_SENT_KEY.get();
+        let hint_w = hint.chars().count() as u16;
+        if head.width > lr.width + hint_w + 4 {
             dialog_kit::put(
                 buf,
-                pane.right().saturating_sub(3),
-                y + pane_h as u16 - 1,
-                "\u{25BC}\u{25BC}",
-                2,
-                dim(),
+                head.right() - hint_w - 1,
+                y,
+                hint,
+                hint_w,
+                Style::default().fg(th().ui.muted).bg(head_bg),
             );
         }
-        hits.push((pane, RewriteHit::RaSent));
+        hits.push((head, RewriteHit::RaSentHead));
+        y += 1;
+        let note_y = buttons_y.saturating_sub(1);
+        self.rules_ai.sent_bar.set(None);
+        self.rules_ai.sent_rows.set(0);
+        self.rules_ai.sent_height.set(0);
+        if d.sent_open {
+            let pane_h = note_y.saturating_sub(y) as usize;
+            self.rules_ai.sent_rows.set(lines.len());
+            self.rules_ai.sent_height.set(pane_h);
+            let top = d.scroll.min(lines.len().saturating_sub(pane_h));
+            let pane = Rect::new(inner.x + 1, y, wide, pane_h as u16);
+            dialog_kit::fill(buf, pane, Style::default().bg(bg));
+            for (i, (text, heading)) in lines.iter().skip(top).take(pane_h).enumerate() {
+                let mut style = Style::default().fg(th().ui.text).bg(bg);
+                if *heading {
+                    style = style.add_modifier(Modifier::BOLD);
+                }
+                dialog_kit::put(
+                    buf,
+                    pane.x + 1,
+                    y + i as u16,
+                    text,
+                    pane.width.saturating_sub(3),
+                    style,
+                );
+            }
+            // Its own scrollbar: the pane's right column, rows of the body.
+            let bar = crate::scrollbar::Track::vertical(
+                Rect::new(pane.x, pane.y.saturating_sub(1), pane.width, pane.height + 2),
+                lines.len(),
+                top,
+            );
+            self.rules_ai.sent_bar.set(bar);
+            if let Some(track) = bar {
+                crate::scrollbar::render_buf(buf, track, true, false);
+                hits.push((track.rect, RewriteHit::RaSentBar));
+            }
+            hits.push((pane, RewriteHit::RaSent));
+        }
 
         // The note: what went wrong, or the wait.
         if d.working {
@@ -970,7 +1208,7 @@ impl RewriteView {
                 lines.push((String::new(), false));
             } else {
                 lines.extend(
-                    wrap(text, wide.saturating_sub(2) as usize)
+                    wrap(text, wide.saturating_sub(3) as usize)
                         .into_iter()
                         .map(|l| (l, *heading)),
                 );
@@ -981,17 +1219,30 @@ impl RewriteView {
         let top = res.scroll.min(lines.len().saturating_sub(pane_h));
         for (i, (text, heading)) in lines.iter().skip(top).take(pane_h).enumerate() {
             let style = if *heading { bold(false) } else { plain() };
-            dialog_kit::put(buf, inner.x + 1, inner.y + i as u16, text, wide, style);
-        }
-        if lines.len() > pane_h + top && pane_h > 0 {
             dialog_kit::put(
                 buf,
-                inner.right().saturating_sub(4),
-                inner.y + pane_h as u16 - 1,
-                "\u{25BC}\u{25BC}",
-                2,
-                dim(),
+                inner.x + 1,
+                inner.y + i as u16,
+                text,
+                wide.saturating_sub(2),
+                style,
             );
+        }
+        let bar = crate::scrollbar::Track::vertical(
+            Rect::new(
+                inner.x + 1,
+                inner.y.saturating_sub(1),
+                wide,
+                pane_h as u16 + 2,
+            ),
+            lines.len(),
+            top,
+        );
+        self.rules_ai.sent_bar.set(bar);
+        self.rules_ai.text_bar.set(None);
+        if let Some(track) = bar {
+            crate::scrollbar::render_buf(buf, track, true, false);
+            hits.push((track.rect, RewriteHit::RaSentBar));
         }
         let close = dialog_kit::button(
             buf,

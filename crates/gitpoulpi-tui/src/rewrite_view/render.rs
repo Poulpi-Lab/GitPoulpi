@@ -188,6 +188,11 @@ pub(crate) enum RewriteHit {
     RaContext,
     RaReplace,
     RaSent,
+    /// The "What is sent" header (shows or hides the pane) and the two
+    /// scrollbars of the dialog: the description's and the pane's.
+    RaSentHead,
+    RaSentBar,
+    RaTextBar,
     RaSend,
     RaCancel,
     RaClose,
@@ -225,6 +230,26 @@ impl RewriteHit {
                 | RewriteHit::AiShield
                 | RewriteHit::RaPanel
                 | RewriteHit::RaShield
+                | RewriteHit::RaSentBar
+                | RewriteHit::RaTextBar
+        )
+    }
+
+    /// A part of the ✦ Create Rules dialog (its panel included).
+    pub(crate) fn is_rules_ai(self) -> bool {
+        matches!(
+            self,
+            RewriteHit::RaText
+                | RewriteHit::RaTextBar
+                | RewriteHit::RaContext
+                | RewriteHit::RaReplace
+                | RewriteHit::RaSent
+                | RewriteHit::RaSentHead
+                | RewriteHit::RaSentBar
+                | RewriteHit::RaSend
+                | RewriteHit::RaCancel
+                | RewriteHit::RaClose
+                | RewriteHit::RaPanel
         )
     }
 
@@ -1566,6 +1591,9 @@ impl RewriteView {
             | RewriteHit::RaContext
             | RewriteHit::RaReplace
             | RewriteHit::RaSent
+            | RewriteHit::RaSentHead
+            | RewriteHit::RaSentBar
+            | RewriteHit::RaTextBar
             | RewriteHit::RaSend
             | RewriteHit::RaCancel
             | RewriteHit::RaClose

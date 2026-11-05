@@ -8220,6 +8220,7 @@ dlg_sample = { one = "Envoyer un échantillon de {n} {$commit} (auteur, date, su
 dlg_sample_off = "Désactivé : aucune donnée de {$commit} n'est envoyée, seulement votre demande."
 dlg_sample_none = { git = "Le journal n'affiche aucun {$commit} à échantillonner.", local = "Le journal n'affiche aucune {$commit} à échantillonner." }
 dlg_sent_label = "Ce qui est envoyé"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Consignes données au modèle :"
 dlg_sent_user = "Votre demande :"
 dlg_profile = "Envoyé à : {name}"

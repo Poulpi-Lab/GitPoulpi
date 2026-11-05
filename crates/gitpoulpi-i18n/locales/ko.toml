@@ -8198,6 +8198,7 @@ dlg_sample = { one = "{$commits} {n}개의 샘플 보내기 (작성자, 날짜, 
 dlg_sample_off = "꺼짐: {$commit} 데이터는 보내지 않고 요청 내용만 보냅니다."
 dlg_sample_none = "Log에 샘플로 쓸 {$commit}이 없습니다."
 dlg_sent_label = "전송되는 내용"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "모델에 주는 지침:"
 dlg_sent_user = "내 요청:"
 dlg_profile = "전송 대상: {name}"

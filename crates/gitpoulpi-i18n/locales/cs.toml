@@ -8198,6 +8198,7 @@ dlg_sample = { one = "Odeslat vzorek {n} {$commit}u (autor, datum, předmět)", 
 dlg_sample_off = "Vypnuto: neodesílají se žádná data o {$commit}ech, jen vaše zadání."
 dlg_sample_none = "Log nezobrazuje žádný {$commit}, ze kterého by šlo vzít vzorek."
 dlg_sent_label = "Co se odesílá"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Pokyny pro model:"
 dlg_sent_user = "Vaše zadání:"
 dlg_profile = "Odesláno do: {name}"

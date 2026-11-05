@@ -124,6 +124,7 @@ fn a_running_request_refuses_the_dialog() {
 fn the_dialog_shows_exactly_what_is_sent_and_the_context_is_off() {
     let (mut v, _q, _t) = open_dialog();
     chars(&mut v, "remove secrets.txt");
+    v.on_key(alt('w'));
     let s = screen(&v);
     assert!(s.contains("What is sent"), "{s}");
     assert!(s.contains("VOCABULARY-LINE"), "the system prompt\n{s}");
@@ -345,4 +346,209 @@ fn an_answer_arriving_after_the_dialog_closed_still_fills_without_running() {
     v.put_ai_rules(proposal(vec![remove("a.txt")]));
     assert_eq!(v.recipe.rules.len(), 1);
     assert_nothing_ran(&v);
+}
+
+// ----------------------------------------------- the "What is sent" pane
+
+/// A system prompt of `n` numbered lines, so the open pane must scroll.
+fn long_prompt(v: &mut RewriteView, n: usize) {
+    let prompt = (0..n)
+        .map(|i| format!("PROMPT-LINE-{i:03}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    v.set_rules_system(Ok(AiSystem {
+        prompt,
+        via: "Fake agent".into(),
+    }));
+}
+
+fn sized(v: &RewriteView, w: u16, h: u16) -> (String, Vec<(Rect, RewriteHit)>, Buffer) {
+    paint(v, w, h, None)
+}
+
+use ratatui::buffer::Buffer;
+use ratatui::layout::Rect;
+
+#[test]
+#[cfg(feature = "ai")]
+fn what_is_sent_is_collapsed_by_default_and_the_dialog_is_shorter_for_it() {
+    let (mut v, _q, _t) = open_dialog();
+    long_prompt(&mut v, 60);
+    let (text, hits, _) = sized(&v, W, H);
+    assert!(text.contains("\u{25B8} What is sent"), "{text}");
+    assert!(text.contains("Alt+W: show or hide"), "{text}");
+    assert!(!text.contains("PROMPT-LINE-000"), "{text}");
+    assert!(!hits.iter().any(|(_, h)| *h == RewriteHit::RaSent));
+    assert!(!hits.iter().any(|(_, h)| *h == RewriteHit::RaSentBar));
+    let collapsed = rect_of(&hits, RewriteHit::RaPanel).height;
+    v.on_key(alt('w'));
+    let (text, hits, _) = sized(&v, W, H);
+    assert!(text.contains("\u{25BE} What is sent"), "{text}");
+    assert!(text.contains("PROMPT-LINE-000"), "{text}");
+    let open = rect_of(&hits, RewriteHit::RaPanel).height;
+    assert!(collapsed < open, "collapsed {collapsed} < open {open}");
+    assert!(open <= H - 4, "the dialog stays on the screen");
+    v.on_key(alt('w'));
+    let (text, _, _) = sized(&v, W, H);
+    assert!(!text.contains("PROMPT-LINE-000"), "{text}");
+}
+
+/// The pane's geometry at one screen size: its own bar on its right edge,
+/// full height, clear of the text, tinted apart from the fields.
+#[cfg(feature = "ai")]
+fn check_pane(w: u16, h: u16) {
+    let (mut v, _q, _t) = open_dialog();
+    long_prompt(&mut v, 80);
+    v.on_key(alt('w'));
+    let (text, hits, buf) = sized(&v, w, h);
+    let pane = rect_of(&hits, RewriteHit::RaSent);
+    let bar = rect_of(&hits, RewriteHit::RaSentBar);
+    let panel = rect_of(&hits, RewriteHit::RaPanel);
+    assert!(pane.height >= 4, "{w}x{h}\n{text}");
+    assert_eq!(bar.x, pane.right() - 1, "{w}x{h}: the pane's right edge");
+    assert_eq!((bar.y, bar.height), (pane.y, pane.height), "{w}x{h}");
+    assert!(bar.x < panel.right() - 1, "{w}x{h}: inside the border");
+    assert_eq!(buf[(bar.x, bar.y)].symbol(), "\u{2191}", "{w}x{h}");
+    assert_eq!(
+        buf[(bar.x, bar.bottom() - 1)].symbol(),
+        "\u{2193}",
+        "{w}x{h}"
+    );
+    let thumb = (bar.y..bar.bottom())
+        .filter(|y| buf[(bar.x, *y)].bg == th().scrollbar.thumb)
+        .count();
+    assert!(thumb >= 1, "{w}x{h}: a thumb is drawn\n{text}");
+    // Text never reaches the bar column nor the cell before it.
+    for y in pane.y..pane.bottom() {
+        assert_eq!(
+            buf[(bar.x - 1, y)].symbol(),
+            " ",
+            "{w}x{h}: text under the bar"
+        );
+    }
+    // The tint: not the dialog's, not a field's.
+    let tint = buf[(pane.x + 1, pane.y)].bg;
+    assert_ne!(tint, th().ui.panel, "{w}x{h}");
+    assert_ne!(tint, crate::input_bg(false, false), "{w}x{h}");
+    assert_ne!(tint, crate::input_bg(true, false), "{w}x{h}");
+    for y in pane.y..pane.bottom() {
+        assert_eq!(buf[(pane.x, y)].bg, tint, "{w}x{h}: the whole pane");
+    }
+}
+
+#[test]
+#[cfg(feature = "ai")]
+fn the_open_pane_has_its_own_scrollbar_at_a_small_and_a_large_size() {
+    check_pane(60, 26);
+    check_pane(90, 30);
+    check_pane(200, 70);
+}
+
+#[test]
+fn the_tint_differs_from_the_dialog_and_the_fields_in_every_theme() {
+    for spec in gitpoulpi_config::theme::presets() {
+        let theme = crate::theme::Theme::from(&spec);
+        let _guard = crate::theme::override_theme(&theme);
+        let tint = super::super::rules_ai::sent_bg_for_test();
+        assert_ne!(tint, theme.ui.panel, "{}", spec.slug);
+        assert_ne!(tint, theme.ui.text, "{}", spec.slug);
+        // The themes that follow the terminal's own palette have only ANSI
+        // tones to pick from: there the pane shares the field's tone.
+        if matches!(theme.ui.panel, ratatui::style::Color::Rgb(..)) {
+            assert_ne!(tint, crate::input_bg(false, false), "{}", spec.slug);
+            assert_ne!(tint, crate::input_bg(true, false), "{}", spec.slug);
+        }
+    }
+}
+
+#[test]
+#[cfg(feature = "ai")]
+fn the_keys_toggle_the_pane_and_scroll_it() {
+    let (mut v, _q, _t) = open_dialog();
+    long_prompt(&mut v, 80);
+    // Tab reaches the header; Enter opens it.
+    for _ in 0..2 {
+        v.on_key(key(KeyCode::Tab));
+    }
+    assert!(!screen(&v).contains("PROMPT-LINE-000"));
+    v.on_key(key(KeyCode::Enter));
+    let s = screen(&v);
+    assert!(s.contains("PROMPT-LINE-000"), "{s}");
+    for _ in 0..3 {
+        v.on_key(key(KeyCode::Down));
+    }
+    let s = screen(&v);
+    assert!(
+        !s.contains("PROMPT-LINE-000") && s.contains("PROMPT-LINE-002"),
+        "{s}"
+    );
+    v.on_key(key(KeyCode::PageDown));
+    let s = screen(&v);
+    assert!(!s.contains("PROMPT-LINE-002"), "{s}");
+    v.on_key(key(KeyCode::End));
+    assert!(screen(&v).contains("PROMPT-LINE-079"));
+    v.on_key(key(KeyCode::Home));
+    assert!(screen(&v).contains("PROMPT-LINE-000"));
+    // Enter hides it again.
+    v.on_key(key(KeyCode::Enter));
+    assert!(!screen(&v).contains("PROMPT-LINE-000"));
+}
+
+#[test]
+#[cfg(feature = "ai")]
+fn the_mouse_toggles_wheels_and_drags_the_pane_scrollbar() {
+    use crossterm::event::{MouseButton, MouseEventKind};
+    let (mut v, _q, _t) = open_dialog();
+    long_prompt(&mut v, 80);
+    let (_, hits, _) = sized(&v, W, H);
+    let head = rect_of(&hits, RewriteHit::RaSentHead);
+    v.on_press(RewriteHit::RaSentHead, head.x + 3, head.y);
+    let (s, _, _) = sized(&v, W, H);
+    assert!(s.contains("PROMPT-LINE-000"), "{s}");
+    v.on_rules_ai_wheel(RewriteHit::RaSent, 3);
+    let s = screen(&v);
+    assert!(
+        !s.contains("PROMPT-LINE-000") && s.contains("PROMPT-LINE-003"),
+        "{s}"
+    );
+    // Drag the thumb to the bottom of the track.
+    let (_, hits, buf) = sized(&v, W, H);
+    let bar = rect_of(&hits, RewriteHit::RaSentBar);
+    let thumb_y = (bar.y..bar.bottom())
+        .find(|y| buf[(bar.x, *y)].bg == th().scrollbar.thumb)
+        .expect("a thumb");
+    v.on_press(RewriteHit::RaSentBar, bar.x, thumb_y);
+    let mouse = |kind, row| crossterm::event::MouseEvent {
+        kind,
+        column: bar.x,
+        row,
+        modifiers: KeyModifiers::NONE,
+    };
+    let below = bar.bottom() + 3;
+    v.on_rules_ai_bar_mouse(mouse(MouseEventKind::Drag(MouseButton::Left), below));
+    v.on_rules_ai_bar_mouse(mouse(MouseEventKind::Up(MouseButton::Left), below));
+    let s = screen(&v);
+    assert!(s.contains("PROMPT-LINE-079"), "{s}");
+    // A click on the track above the thumb jumps back up.
+    v.on_press(RewriteHit::RaSentBar, bar.x, bar.y + 1);
+    v.on_rules_ai_bar_mouse(mouse(MouseEventKind::Up(MouseButton::Left), bar.y + 1));
+    assert!(!screen(&v).contains("PROMPT-LINE-079"));
+}
+
+#[test]
+fn the_description_gets_a_scrollbar_when_the_text_outgrows_the_field() {
+    let (mut v, _q, _t) = open_dialog();
+    let (_, hits, _) = sized(&v, W, H);
+    assert!(!hits.iter().any(|(_, h)| *h == RewriteHit::RaTextBar));
+    for i in 0..9 {
+        chars(&mut v, &format!("line {i}"));
+        v.on_key(key(KeyCode::Enter));
+    }
+    let (_, hits, buf) = sized(&v, W, H);
+    let field = rect_of(&hits, RewriteHit::RaText);
+    let bar = rect_of(&hits, RewriteHit::RaTextBar);
+    assert_eq!(bar.x, field.right() - 1);
+    assert_eq!((bar.y, bar.height), (field.y, field.height));
+    assert_eq!(buf[(bar.x, bar.y)].symbol(), "\u{2191}");
+    v.on_rules_ai_wheel(RewriteHit::RaText, -3);
 }

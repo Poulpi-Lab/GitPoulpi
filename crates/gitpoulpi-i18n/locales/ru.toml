@@ -8209,6 +8209,7 @@ dlg_sample = { one = { git = "Отправить выборку commit'ов: {n}
 dlg_sample_off = { git = "Выключено: данные о commit'ах не отправляются, только ваш запрос.", local = "Выключено: данные о коммитах не отправляются, только ваш запрос." }
 dlg_sample_none = { git = "В Log нет commit'ов для выборки.", local = "В Log нет коммитов для выборки." }
 dlg_sent_label = "Что отправляется"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Инструкции для модели:"
 dlg_sent_user = "Ваш запрос:"
 dlg_profile = "Отправляется в: {name}"

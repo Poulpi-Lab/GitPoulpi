@@ -62,6 +62,10 @@ Dragging a header shows a ghost of its name following the pointer and an accent 
 
 From the keyboard, `Shift+C` (or the palette's `View: Log Column: Pick a Column to Move or Size`) picks a column and its header cell lights up. Then `Tab` / `Shift+Tab` pick another column, `<` / `>` move it one place left or right among the shown columns (the keyboard twin of dragging its header), `]` / `[` widen or narrow it (the twin of dragging its boundary; the last column moves its left edge), `0` puts every width back to automatic, and `Esc` or `Enter` leaves. The arrows still move through the commits meanwhile. The order and the widths are remembered like a drag's, and are the Log's own: the commit column beside a diff keeps a list of its own.
 
+*Fit to content.* A **double click** on a column's boundary fits the column on its left to its widest visible content and its header (wide characters and emoji counted by the cells they take). In the fit layout the Log always fills its pane, so a column stops at what the pane has room for once **Message** keeps its share and every other column its least width: the status line then says `Author needs 34 cells, 20 fit.` The same from the keyboard: with a column picked (`Shift+C`, `Tab`), `=` fits it and `+` fits every column; the palette has `View: Log Column: Fit the Column to Its Content` and `... Fit All Columns to Content`; the right-click chooser lists `Fit <column> to content` (the column under the pointer), `Fit all columns to content` and `Reset column widths` below its checkboxes. **Message** is the flexible column and has no width of its own to fit: it takes the room the others leave.
+
+*The last column's grip.* The last column has a grip too, on its own last cell (not the pane's border, which still resizes the panes): a drag moves it by how far the pointer travelled, **Message** taking up the difference. **SHA** is 8 cells wide by default (the 7 digits and that grip cell).
+
 ![The Log with the Changes column shown: each commit lists its number of files and added and removed lines](images/log-changes-column.png)
 
 ### Authors and `.mailmap`

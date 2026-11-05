@@ -387,7 +387,7 @@ pub(super) fn init(
     let log_column_hidden: std::collections::HashSet<LogColumn> = initial_log_columns.hidden;
     let log_column_overrides: std::collections::HashMap<LogColumn, u16> =
         initial_log_columns.widths;
-    let dragging_log_boundary: Option<LogColumn> = None;
+    let dragging_log_boundary: Option<LogBoundaryDrag> = None;
     // The Log "Changes" column's numbers, by commit (immutable, so never
     // stale): filled from the daemon for the rows on screen only. The
     // frame records which commits are visible; the loop asks for the ones
@@ -827,6 +827,7 @@ pub(super) fn init(
         log_column_hidden,
         log_column_overrides,
         dragging_log_boundary,
+        log_natural_widths: NaturalWidths::default(),
         commit_changes,
         changes_asked,
         visible_commit_ids: Vec::new(),

@@ -3184,6 +3184,8 @@ split_move_down = "Move the {$Commit} Down"
 split_reset = "Reset the Split"
 rewrite_host_howto = "Explain the Host's Branch Protection"
 rewrite_ai_rules = "Create Rewrite Rules with AI"
+log_columns_fit = "Fit the Column to Its Content"
+log_columns_fit_all = "Fit All Columns to Content"
 
 [keymap_ctx]
 rewrite = "Rewrite history workbench"
@@ -4330,6 +4332,8 @@ git_fetch_selected_tag = "Git: {$Fetch} Selected {$Tag}"
 # s24:begin
 rewrite_fix_message_encoding = "Rewrite: Fix Message Encoding..."
 # s24:end
+view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
+view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
 
 [help_section]
 rewrite = "Rewrite history"
@@ -4389,7 +4393,7 @@ commit_column_1 = "scroll the rows sideways (Shift+wheel or a horizontal wheel d
 commit_column_2 = "pick a part (lanes, author, date), then widen or narrow it, or put every part back to automatic; the header's boundaries also drag, and the widths are remembered"
 commit_column_3 = "mouse: click a row to pick its {$commit}, right-click opens its menu (the menu key does too, after picking a row with Up/Down)"
 commit_column_4 = "move the chosen part left or right; dragging its header does the same, and the order is remembered"
-log_columns_1 = "pick a Log column (its header cell lights up); then move it left or right (dragging its header does the same), widen or narrow it (dragging its boundary does the same), or put its width back to automatic. Tab / Shift+Tab pick another column, Esc leaves; the layout is remembered"
+log_columns_1 = "pick a Log column (its header cell lights up); then move it left or right (dragging its header does the same), widen or narrow it (dragging its boundary does the same), put its width back to automatic, or fit it to its content (double-clicking its boundary does the same; + fits every column). Tab / Shift+Tab pick another column, Esc leaves; the layout is remembered"
 global_1 = "open the command palette - every command in the app, each with its shortcut; type to filter, Up/Down or Ctrl+P/Ctrl+N to move (not j/k: those are typed), Enter to run. Grayed rows say why they can't run right now"
 global_2 = "the navigation prefix - see its own section below"
 global_3 = "the git-action prefix - see its own section below"
@@ -5012,6 +5016,16 @@ column_width_reset = "Log column widths back to automatic."
 changes_files = { one = "{n} file", other = "{n} files" }
 # context: the Changes column, shortened when narrow ("3f")
 changes_files_short = "{n}f"
+# context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
+column_fitted = "{column} fitted to its content: {cells} cells."
+# context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
+column_fit_cut = "{column} needs {need} cells, {have} fit."
+# context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
+column_fit_message = "Message takes the room the other columns leave."
+# context: status line after every Log column was fitted to its content
+columns_fitted_all = "All columns fitted to their content."
+# context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
+columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
 
 # Find bar and footer prompts (Log search).
 [find_bar]
@@ -5093,6 +5107,12 @@ changes_files = { one = "{n} file changed", other = "{n} files changed" }
 changes_insertions = { one = "{n} insertion", other = "{n} insertions" }
 # context: third phrase of the Changes tooltip: lines removed
 changes_deletions = { one = "{n} deletion", other = "{n} deletions" }
+# context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
+column_menu_fit = "Fit {column} to content"
+# context: a row of the Log columns chooser that fits every column to its content
+column_menu_fit_all = "Fit all columns to content"
+# context: a row of the Log columns chooser that puts every column width back to automatic
+column_menu_reset = "Reset column widths"
 
 # Tab picker and confirmation popup.
 [overlays]

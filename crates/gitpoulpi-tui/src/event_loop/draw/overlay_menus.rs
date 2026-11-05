@@ -14,7 +14,7 @@ pub(in crate::event_loop) struct OverlayMenusDrawCtx<'a> {
     pub(in crate::event_loop) dragging_commit_message: bool,
     pub(in crate::event_loop) dragging_divider: Option<u8>,
     pub(in crate::event_loop) dragging_list_bar: Option<(ListBar, i32)>,
-    pub(in crate::event_loop) dragging_log_boundary: Option<LogColumn>,
+    pub(in crate::event_loop) dragging_log_boundary: Option<LogBoundaryDrag>,
     pub(in crate::event_loop) dragging_log_header: Option<LogHeaderDrag>,
     /// The commit column's carried header: its title, the pointer and the
     /// insertion bar's cell.
@@ -152,7 +152,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
             frame,
             log_area,
             log_column_hidden,
-            open_menu.column_cursor(),
+            open_menu.column_menu(),
             hovered_target.as_ref(),
             frame_hits,
         );

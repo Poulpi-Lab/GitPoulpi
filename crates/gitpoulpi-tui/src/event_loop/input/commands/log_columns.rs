@@ -27,7 +27,8 @@ pub(in crate::event_loop) fn run(cx: &mut CommandCtx<'_>, cmd: LogColumnCmd) {
     *cx.focus = Focus::Log;
     *cx.commit_file_focus = false;
     if cmd == LogColumnCmd::Chooser {
-        *cx.open_menu = OpenMenu::Column(crate::log_table::first_hideable());
+        let target = (*cx.log_col_pick).filter(|c| visible(cx).contains(c));
+        *cx.open_menu = OpenMenu::Column(crate::log_table::ColumnMenu::new(target));
         return;
     }
     let order = visible(cx);
@@ -62,7 +63,62 @@ pub(in crate::event_loop) fn run(cx: &mut CommandCtx<'_>, cmd: LogColumnCmd) {
             cx.log_column_overrides.clear();
             msg::COLUMN_WIDTH_RESET.get().into()
         }
+        LogColumnCmd::FitToContent => fit_one(cx, col),
+        LogColumnCmd::FitAllToContent => fit_every(cx),
     });
+}
+
+/// Runs one row of the chooser: a checkbox toggles its column and leaves the
+/// chooser open, an action runs and closes it (`ChooserRow::closes`).
+pub(in crate::event_loop) fn run_chooser_row(
+    cx: &mut CommandCtx<'_>,
+    row: crate::log_table::ChooserRow,
+) {
+    use crate::log_table::ChooserRow;
+    if !row.actionable() {
+        return;
+    }
+    match row {
+        ChooserRow::Column(col) => {
+            if !cx.log_column_hidden.remove(&col) {
+                cx.log_column_hidden.insert(col);
+            }
+        }
+        ChooserRow::FitColumn(col) => *cx.last_message = Some(fit_one(cx, col)),
+        ChooserRow::FitAll => *cx.last_message = Some(fit_every(cx)),
+        ChooserRow::Reset => {
+            cx.log_column_overrides.clear();
+            *cx.last_message = Some(msg::COLUMN_WIDTH_RESET.get().into());
+        }
+        ChooserRow::Separator => {}
+    }
+    if row.closes() {
+        cx.open_menu.close_column_menu();
+    }
+}
+
+/// Fits one column to its content (`log_table::fit_column`); the status line
+/// it returns says what came of it.
+pub(in crate::event_loop) fn fit_one(cx: &mut CommandCtx<'_>, col: LogColumn) -> String {
+    crate::log_table::fit_column(
+        *cx.log_area,
+        &*cx.log_column_order,
+        &*cx.log_column_hidden,
+        &mut *cx.log_column_overrides,
+        cx.log_natural_widths,
+        col,
+    )
+}
+
+/// Fits every column to its content (`log_table::fit_all`).
+pub(in crate::event_loop) fn fit_every(cx: &mut CommandCtx<'_>) -> String {
+    crate::log_table::fit_all(
+        *cx.log_area,
+        &*cx.log_column_order,
+        &*cx.log_column_hidden,
+        &mut *cx.log_column_overrides,
+        cx.log_natural_widths,
+    )
 }
 
 fn resize(cx: &mut CommandCtx<'_>, col: LogColumn, delta: i32) -> String {
@@ -98,6 +154,8 @@ pub(in crate::event_loop) fn on_key(
         (Bind::LogColumnsWider, LogColumnCmd::Wider),
         (Bind::LogColumnsNarrower, LogColumnCmd::Narrower),
         (Bind::LogColumnsResetWidth, LogColumnCmd::ResetWidth),
+        (Bind::LogColumnsFit, LogColumnCmd::FitToContent),
+        (Bind::LogColumnsFitAll, LogColumnCmd::FitAllToContent),
     ] {
         if km.is(bind, &key) {
             run(cx, cmd);

@@ -2352,6 +2352,8 @@ split_move_down = "De {$commit} omlaag verplaatsen"
 split_reset = "De splitsing resetten"
 rewrite_host_howto = "De branchbescherming van de host uitleggen"
 rewrite_ai_rules = "Herschrijfregels maken met AI"
+log_columns_fit = "Fit the Column to Its Content"
+log_columns_fit_all = "Fit All Columns to Content"
 
 
 [keymap_ctx]
@@ -3427,6 +3429,8 @@ git_fetch_selected_tag = { git = "Git: Geselecteerde {$tag} fetchen", local = "G
 # s24:begin
 rewrite_fix_message_encoding = "Herschrijven: Tekencodering van berichten herstellen..."
 # s24:end
+view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
+view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
 
 [help_section]
 rewrite = "Geschiedenis herschrijven"
@@ -4076,6 +4080,16 @@ column_width = "Breedte van {column}: {cells} cellen"
 column_width_reset = "Breedtes van de Logkolommen weer automatisch."
 changes_files = { one = "{n} bestand", other = "{n} bestanden" }
 changes_files_short = "{n}b"
+# context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
+column_fitted = "{column} fitted to its content: {cells} cells."
+# context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
+column_fit_cut = "{column} needs {need} cells, {have} fit."
+# context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
+column_fit_message = "Message takes the room the other columns leave."
+# context: status line after every Log column was fitted to its content
+columns_fitted_all = "All columns fitted to their content."
+# context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
+columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
 
 [find_bar]
 counter = "{current} van {total}"
@@ -4140,6 +4154,12 @@ changes_tooltip = "{files}, {insertions}, {deletions}"
 changes_files = { one = "{n} bestand gewijzigd", other = "{n} bestanden gewijzigd" }
 changes_insertions = { one = "{n} toevoeging", other = "{n} toevoegingen" }
 changes_deletions = { one = "{n} verwijdering", other = "{n} verwijderingen" }
+# context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
+column_menu_fit = "Fit {column} to content"
+# context: a row of the Log columns chooser that fits every column to its content
+column_menu_fit_all = "Fit all columns to content"
+# context: a row of the Log columns chooser that puts every column width back to automatic
+column_menu_reset = "Reset column widths"
 
 [overlays]
 select_tab_title = "Tabblad kiezen ({shown}/{total})"

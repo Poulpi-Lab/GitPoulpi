@@ -146,6 +146,8 @@ stage_file = "z"
 | `log_columns` | `wider` | 加宽该列 | `]` |
 | `log_columns` | `narrower` | 收窄该列 | `[` |
 | `log_columns` | `reset_width` | 重置各列宽度 | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | 折叠或展开所有文件夹 | `z` |
 | `log_files` | `filter` | 筛选已更改的文件 | `/` |
 | `log_files` | `expand_all` | 展开所有文件夹 | `=` |
@@ -933,6 +935,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 视图：Log 列：加宽该列 | `]` |
 | 视图：Log 列：收窄该列 | `[` |
 | 视图：Log 列：重置各列宽度 | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | 视图：Log：选择要显示的列 |  |
 | Diff：打开所选文件的 diff | `Enter` |
 | Diff：关闭 diff 视图 | `Esc` |

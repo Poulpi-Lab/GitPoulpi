@@ -242,7 +242,10 @@ pub(in crate::event_loop) struct WindowState {
     pub(in crate::event_loop) log_col_pick: Option<LogColumn>,
     pub(in crate::event_loop) log_column_hidden: std::collections::HashSet<LogColumn>,
     pub(in crate::event_loop) log_column_overrides: std::collections::HashMap<LogColumn, u16>,
-    pub(in crate::event_loop) dragging_log_boundary: Option<LogColumn>,
+    pub(in crate::event_loop) dragging_log_boundary: Option<LogBoundaryDrag>,
+    /// What each Log column needs to show its content untruncated, measured
+    /// by the last paint (`NaturalWidths`): what "fit to content" reads.
+    pub(in crate::event_loop) log_natural_widths: NaturalWidths,
     pub(in crate::event_loop) commit_changes:
         std::collections::HashMap<Oid, gitpoulpi_core::domain::CommitStat>,
     pub(in crate::event_loop) changes_asked: std::collections::HashSet<Oid>,

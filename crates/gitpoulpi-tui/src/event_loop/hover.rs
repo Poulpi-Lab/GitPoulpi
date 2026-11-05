@@ -83,9 +83,10 @@ impl Hover<'_> {
         }
     }
 
-    pub(super) fn column_menu_item(self) -> Option<LogColumn> {
+    pub(super) fn column_menu_item(self) -> Option<ChooserRow> {
         match self.0 {
-            Some(HitTarget::ColumnMenuItem(col)) => Some(*col),
+            Some(HitTarget::ColumnMenuItem(col)) => Some(ChooserRow::Column(*col)),
+            Some(HitTarget::ColumnMenuAction(row)) => Some(*row),
             _ => None,
         }
     }

@@ -34,7 +34,7 @@ fn render_author_buf(
     let width = 16u16;
     let mut overrides = std::collections::HashMap::new();
     overrides.insert(LogColumn::Author, width);
-    let widths = LogColumnWidths::for_area_width(80, &changes_off(), &overrides);
+    let widths = LogColumnWidths::for_area_width(82, &changes_off(), &overrides);
     let row = commit_row(
         &commit,
         &[],

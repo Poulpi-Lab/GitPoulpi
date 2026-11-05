@@ -163,6 +163,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `log_columns` | `wider` | Allarga la colonna | `]` |
 | `log_columns` | `narrower` | Restringi la colonna | `[` |
 | `log_columns` | `reset_width` | Reimposta le larghezze delle colonne | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Comprimi o espandi tutte le cartelle | `z` |
 | `log_files` | `filter` | Filtra i file modificati | `/` |
 | `log_files` | `expand_all` | Espandi tutte le cartelle | `=` |
@@ -971,6 +973,8 @@ applicano. I tasti sono quelli predefiniti.
 | Vista: Colonna del Log: Allarga la colonna | `]` |
 | Vista: Colonna del Log: Restringi la colonna | `[` |
 | Vista: Colonna del Log: Reimposta le larghezze delle colonne | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | Vista: Log: Scegli le colonne da mostrare |  |
 | Diff: Apri il diff del file selezionato | `Enter` |
 | Diff: Chiudi la vista diff | `Esc` |

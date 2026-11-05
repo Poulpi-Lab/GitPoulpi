@@ -164,6 +164,8 @@ stage_file = "z"
 | `log_columns` | `wider` | Расширить колонку | `]` |
 | `log_columns` | `narrower` | Сузить колонку | `[` |
 | `log_columns` | `reset_width` | Сбросить ширину колонок | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Свернуть или развернуть все папки | `z` |
 | `log_files` | `filter` | Фильтр изменённых файлов | `/` |
 | `log_files` | `expand_all` | Развернуть все папки | `=` |
@@ -973,6 +975,8 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Вид: колонка Log: расширить колонку | `]` |
 | Вид: колонка Log: сузить колонку | `[` |
 | Вид: колонка Log: сбросить ширину колонок | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | Вид: Log: выбрать колонки для показа |  |
 | Diff: открыть diff выбранного файла | `Enter` |
 | Diff: закрыть diff | `Esc` |

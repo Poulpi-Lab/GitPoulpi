@@ -106,6 +106,7 @@ impl WindowState {
             dragging_divider: &mut self.dragging_divider,
             dragging_list_bar: &mut self.dragging_list_bar,
             dragging_log_boundary: &mut self.dragging_log_boundary,
+            log_natural_widths: &self.log_natural_widths,
             dragging_log_header: &mut self.dragging_log_header,
             dragging_scrollbar: &mut self.dragging_scrollbar,
             dragging_sidebar_section: &mut self.dragging_sidebar_section,

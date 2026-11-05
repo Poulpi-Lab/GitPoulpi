@@ -2350,6 +2350,8 @@ split_move_down = "{$commit} 아래로 이동"
 split_reset = "분할 초기화"
 rewrite_host_howto = "호스트의 브랜치 보호를 통과하는 방법 설명"
 rewrite_ai_rules = "AI로 다시 쓰기 규칙 만들기"
+log_columns_fit = "Fit the Column to Its Content"
+log_columns_fit_all = "Fit All Columns to Content"
 
 
 [keymap_ctx]
@@ -3425,6 +3427,8 @@ git_fetch_selected_tag = "Git: 선택한 {$Tag} {$Fetch}"
 # s24:begin
 rewrite_fix_message_encoding = "다시 쓰기: 메시지 인코딩 수정..."
 # s24:end
+view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
+view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
 
 [help_section]
 rewrite = "기록 다시 쓰기"
@@ -4074,6 +4078,16 @@ column_width = "{column} 너비: {cells}칸"
 column_width_reset = "Log 열 너비를 자동으로 되돌렸습니다."
 changes_files = { one = "{n}개", other = "{n}개" }
 changes_files_short = "{n}개"
+# context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
+column_fitted = "{column} fitted to its content: {cells} cells."
+# context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
+column_fit_cut = "{column} needs {need} cells, {have} fit."
+# context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
+column_fit_message = "Message takes the room the other columns leave."
+# context: status line after every Log column was fitted to its content
+columns_fitted_all = "All columns fitted to their content."
+# context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
+columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
 
 [find_bar]
 counter = "{current} / {total}"
@@ -4138,6 +4152,12 @@ changes_tooltip = "{files}, {insertions}, {deletions}"
 changes_files = { one = "파일 {n}개 변경", other = "파일 {n}개 변경" }
 changes_insertions = { one = "{n}줄 추가", other = "{n}줄 추가" }
 changes_deletions = { one = "{n}줄 삭제", other = "{n}줄 삭제" }
+# context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
+column_menu_fit = "Fit {column} to content"
+# context: a row of the Log columns chooser that fits every column to its content
+column_menu_fit_all = "Fit all columns to content"
+# context: a row of the Log columns chooser that puts every column width back to automatic
+column_menu_reset = "Reset column widths"
 
 [overlays]
 select_tab_title = "탭 선택 ({shown}/{total})"

@@ -232,7 +232,7 @@ fn log_column_widths_keep_sha_and_date_intact_at_reasonable_widths() {
     let no_overrides = std::collections::HashMap::new();
     // this project's own Herdr fixture pane width
     let w = LogColumnWidths::for_area_width(84, &no_hidden, &no_overrides);
-    assert_eq!(w.sha_w, 7); // a short SHA is always exactly 7 hex chars
+    assert_eq!(w.sha_w, 8); // 7 hex chars plus the last column's grip cell
     assert!(w.date_w >= 16, "\"YYYY-MM-DD HH:MM\" is 16 chars");
     assert!(
         w.ref_w >= 16,

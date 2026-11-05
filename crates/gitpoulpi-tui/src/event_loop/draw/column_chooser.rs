@@ -12,16 +12,41 @@ pub(super) fn paint(
     frame: &mut Frame,
     log_area: Rect,
     hidden: &std::collections::HashSet<LogColumn>,
-    cursor: Option<usize>,
+    menu: Option<ColumnMenu>,
     hovered_target: Option<&HitTarget>,
     frame_hits: &mut Vec<(Rect, HitTarget)>,
 ) {
-    let title = gitpoulpi_i18n::msg::log_draw::COLUMNS_TITLE.get();
-    // Wide enough for the title and the cross beside it.
+    use gitpoulpi_i18n::msg::log_draw as m;
+    let title = m::COLUMNS_TITLE.get();
+    let rows = chooser_rows(menu.and_then(|m| m.target));
+    let cursor = menu.map(|m| m.cursor);
+    let label = |row: ChooserRow| -> String {
+        match row {
+            ChooserRow::Column(col) => {
+                let mark = crate::dialog_kit::checkbox_mark(!hidden.contains(&col));
+                if col.hideable() {
+                    format!(" {mark} {}", col.title())
+                } else {
+                    format!(" {mark} {} {}", col.title(), m::ALWAYS_SHOWN.get())
+                }
+            }
+            ChooserRow::Separator => String::new(),
+            ChooserRow::FitColumn(col) => format!(" {}", m::column_menu_fit(col.title())),
+            ChooserRow::FitAll => format!(" {}", m::COLUMN_MENU_FIT_ALL.get()),
+            ChooserRow::Reset => format!(" {}", m::COLUMN_MENU_RESET.get()),
+        }
+    };
+    // Wide enough for the title and the cross beside it, and for the longest row.
+    let widest = rows
+        .iter()
+        .map(|r| display_width(&label(*r)) as u16 + 2)
+        .max()
+        .unwrap_or(0);
     let want_w = (display_width(title) as u16 + 8)
         .max(30)
+        .max(widest)
         .min(log_area.width);
-    let want_h = (LogColumn::ALL.len() as u16 + 2).min(log_area.height);
+    let want_h = (rows.len() as u16 + 2).min(log_area.height);
     let popup = Rect::new(
         log_area.x + (log_area.width - want_w) / 2,
         log_area.y + (log_area.height - want_h) / 2,
@@ -29,31 +54,30 @@ pub(super) fn paint(
         want_h,
     );
     frame.render_clipped(Clear, popup);
-    let hovered_item = match hovered_target {
-        Some(HitTarget::ColumnMenuItem(col)) => Some(*col),
+    let hovered_row = match hovered_target {
+        Some(HitTarget::ColumnMenuItem(col)) => Some(ChooserRow::Column(*col)),
+        Some(HitTarget::ColumnMenuAction(row)) => Some(*row),
         _ => None,
     };
-    let items: Vec<ListItem> = LogColumn::ALL
+    let items: Vec<ListItem> = rows
         .iter()
-        .map(|&col| {
-            let mark = crate::dialog_kit::checkbox_mark(!hidden.contains(&col));
-            if col.hideable() {
-                let style = if cursor.and_then(|i| LogColumn::ALL.get(i)) == Some(&col) {
-                    Style::default().bg(th().ui.selection)
-                } else if hovered_item == Some(col) {
-                    hover_style(Style::default())
-                } else {
-                    Style::default()
-                };
-                ListItem::new(format!(" {mark} {}", col.title())).style(style)
-            } else {
-                ListItem::new(format!(
-                    " {mark} {} {}",
-                    col.title(),
-                    gitpoulpi_i18n::msg::log_draw::ALWAYS_SHOWN.get()
-                ))
-                .style(Style::default().fg(th().ui.muted))
+        .enumerate()
+        .map(|(i, &row)| {
+            if row == ChooserRow::Separator {
+                return ListItem::new("\u{2500}".repeat(usize::from(want_w.saturating_sub(2))))
+                    .style(Style::default().fg(th().ui.muted));
             }
+            if !row.actionable() {
+                return ListItem::new(label(row)).style(Style::default().fg(th().ui.muted));
+            }
+            let style = if cursor == Some(i) {
+                Style::default().bg(th().ui.selection)
+            } else if hovered_row == Some(row) {
+                hover_style(Style::default())
+            } else {
+                Style::default()
+            };
+            ListItem::new(label(row)).style(style)
         })
         .collect();
     frame.render_clipped(
@@ -75,19 +99,23 @@ pub(super) fn paint(
     ) {
         frame_hits.insert(0, (cross, HitTarget::ColumnMenuClose));
     }
-    for (i, &col) in LogColumn::ALL.iter().enumerate() {
-        if !col.hideable() {
+    for (i, &row) in rows.iter().enumerate() {
+        if !row.actionable() {
             continue;
         }
         let item_row = popup.y + 1 + i as u16;
         if item_row >= popup.y + popup.height.saturating_sub(1) {
             break;
         }
+        let target = match row {
+            ChooserRow::Column(col) => HitTarget::ColumnMenuItem(col),
+            other => HitTarget::ColumnMenuAction(other),
+        };
         frame_hits.insert(
             0,
             (
                 Rect::new(popup.x + 1, item_row, popup.width.saturating_sub(2), 1),
-                HitTarget::ColumnMenuItem(col),
+                target,
             ),
         );
     }
@@ -107,7 +135,14 @@ mod tests {
         terminal
             .draw(|frame| {
                 let area = frame.area();
-                paint(frame, area, hidden, Some(0), None, &mut hits);
+                paint(
+                    frame,
+                    area,
+                    hidden,
+                    Some(ColumnMenu::new(None)),
+                    None,
+                    &mut hits,
+                );
             })
             .unwrap();
         let buf = terminal.backend().buffer().clone();

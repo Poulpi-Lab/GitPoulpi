@@ -23,10 +23,79 @@ pub(crate) enum LogColumnCmd {
     ResetWidth,
     /// Opens the columns chooser (the header's right-click menu).
     Chooser,
+    /// Fits the picked column to its content (the twin of double-clicking its
+    /// boundary).
+    FitToContent,
+    /// Fits every visible column to its content.
+    FitAllToContent,
+}
+
+/// One row of the Log columns chooser (right-click the header, or the
+/// palette): the column checkboxes, then the actions below a separator.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ChooserRow {
+    /// A column's checkbox (`Message` is listed but never actionable).
+    Column(LogColumn),
+    /// The dim line between the checkboxes and the actions.
+    Separator,
+    /// Fit this column to its content (only with a target column).
+    FitColumn(LogColumn),
+    FitAll,
+    Reset,
+}
+
+impl ChooserRow {
+    /// Whether the cursor can stop on it and a click does something.
+    pub(crate) fn actionable(self) -> bool {
+        match self {
+            ChooserRow::Column(c) => c.hideable(),
+            ChooserRow::Separator => false,
+            // `Message` is the flexible column: it has no width of its own to
+            // fit, so the row is shown dimmed (`fit_column` says why).
+            ChooserRow::FitColumn(c) => c != LogColumn::Message,
+            ChooserRow::FitAll | ChooserRow::Reset => true,
+        }
+    }
+
+    /// Rows that run and close the chooser (the checkboxes keep it open).
+    pub(crate) fn closes(self) -> bool {
+        !matches!(self, ChooserRow::Column(_))
+    }
+}
+
+/// The open chooser: its keyboard cursor (an index into [`chooser_rows`])
+/// and the column the "fit" row acts on (the one right-clicked, or the one
+/// the keyboard picked).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ColumnMenu {
+    pub(crate) cursor: usize,
+    pub(crate) target: Option<LogColumn>,
+}
+
+impl ColumnMenu {
+    /// Opens on the first checkbox that can be toggled.
+    pub(crate) fn new(target: Option<LogColumn>) -> Self {
+        Self {
+            cursor: first_hideable(),
+            target,
+        }
+    }
+}
+
+/// The chooser's rows, top to bottom.
+pub(crate) fn chooser_rows(target: Option<LogColumn>) -> Vec<ChooserRow> {
+    let mut rows: Vec<ChooserRow> = LogColumn::ALL.into_iter().map(ChooserRow::Column).collect();
+    rows.push(ChooserRow::Separator);
+    if let Some(col) = target {
+        rows.push(ChooserRow::FitColumn(col));
+    }
+    rows.push(ChooserRow::FitAll);
+    rows.push(ChooserRow::Reset);
+    rows
 }
 
 /// The first column the chooser can toggle (the cursor's start): an index
-/// into `LogColumn::ALL`.
+/// into [`chooser_rows`].
 pub(crate) fn first_hideable() -> usize {
     LogColumn::ALL
         .iter()
@@ -34,10 +103,10 @@ pub(crate) fn first_hideable() -> usize {
         .unwrap_or(0)
 }
 
-/// The chooser's cursor one step down or up, skipping the always-shown
-/// column and wrapping.
-pub(crate) fn step_chooser(cursor: usize, down: bool) -> usize {
-    let n = LogColumn::ALL.len();
+/// The chooser's cursor one step down or up, skipping rows that cannot be
+/// acted on and wrapping.
+pub(crate) fn step_chooser(rows: &[ChooserRow], cursor: usize, down: bool) -> usize {
+    let n = rows.len();
     (1..=n)
         .map(|k| {
             if down {
@@ -46,7 +115,7 @@ pub(crate) fn step_chooser(cursor: usize, down: bool) -> usize {
                 (cursor + n * k - k) % n
             }
         })
-        .find(|i| LogColumn::ALL[*i].hideable())
+        .find(|i| rows[*i].actionable())
         .unwrap_or(cursor)
 }
 

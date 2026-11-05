@@ -356,6 +356,7 @@ impl WindowState {
                         graph_settings,
                         log_widths,
                         log_visible_order,
+                        log_natural: &mut self.log_natural_widths,
                         log_col_pick: self.log_col_pick,
                         log_offsets,
                         layout,

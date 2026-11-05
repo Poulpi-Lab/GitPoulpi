@@ -300,32 +300,40 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
             *cx.right_pane_collapsed,
         );
     }
-    if let Some(boundary_col) = *cx.dragging_log_boundary {
-        let offsets = cx.log_geo().offsets;
-        // Both sides of the boundary, never just the left one (see
-        // `boundary_drag_widths`). Each width is already clamped there to its
-        // column's floor and to what the pair has between them, so no phantom
-        // override wider than the pane can land in the map.
-        // The pointer holds the gap cell in `line` mode, one cell before
-        // the edge it moves (`column_resize::pointer_to_edge`).
-        let edge = col
-            + crate::column_resize::pointer_to_edge(
-                crate::column_resize::mode(),
-                log_boundary_x(&offsets, boundary_col).is_some(),
+    if let Some(grip) = *cx.dragging_log_boundary {
+        let geo = cx.log_geo();
+        if grip.last {
+            // The grip after the last column: by how far the pointer travelled
+            // since the press, `Message` taking up the difference, never past
+            // what the pane has room for (`LogColumnWidths::fit_max`).
+            let room = geo.widths.fit_max(
+                cx.log_area.width,
+                &geo.order,
+                &*cx.log_column_overrides,
+                grip.col,
             );
-        if let Some(pair) = boundary_drag_widths(&offsets, boundary_col, edge) {
+            cx.log_column_overrides
+                .insert(grip.col, last_grip_width(&grip, col, room));
+        } else if let Some(pair) = {
+            // Both sides of the boundary, never just the left one (see
+            // `boundary_drag_widths`). Each width is already clamped there to
+            // its column's floor and to what the pair has between them, so no
+            // phantom override wider than the pane can land in the map. The
+            // pointer holds the gap cell in `line` mode, one cell before the
+            // edge it moves (`column_resize::pointer_to_edge`).
+            let edge =
+                col + crate::column_resize::pointer_to_edge(crate::column_resize::mode(), true);
+            boundary_drag_widths(&geo.offsets, grip.col, edge)
+        } {
             for (c, w) in pair {
                 cx.log_column_overrides.insert(c, w);
             }
-            // Re-light the strip from the widths we
-            // just wrote. A held button reports as
-            // `Drag`, not `Moved`, so this is the
-            // only place the highlight can follow a
-            // boundary that is being dragged.
-            let offsets = cx.log_geo().offsets;
-            *cx.hovered_resize_strip = log_boundary_x(&offsets, boundary_col)
-                .map(|bx| log_boundary_grab_rect(*cx.log_area, bx));
         }
+        // Re-light the strip from the widths just written. A held button
+        // reports as `Drag`, not `Moved`, so this is the only place the
+        // highlight can follow a boundary that is being dragged.
+        let offsets = cx.log_geo().offsets;
+        *cx.hovered_resize_strip = log_grip_rect(*cx.log_area, &offsets, grip.col);
     }
     if let Some(mut drag) = *cx.dragging_log_header {
         drag.at = (col, row);

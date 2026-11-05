@@ -2350,6 +2350,8 @@ split_move_down = "Przesuń {$commit} w dół"
 split_reset = "Zresetuj podział"
 rewrite_host_howto = "Wyjaśnij ochronę gałęzi po stronie hosta"
 rewrite_ai_rules = "Utwórz reguły przepisania z AI"
+log_columns_fit = "Fit the Column to Its Content"
+log_columns_fit_all = "Fit All Columns to Content"
 
 
 [keymap_ctx]
@@ -3425,6 +3427,8 @@ git_fetch_selected_tag = "Git: {$Fetch} zaznaczony {$tag}"
 # s24:begin
 rewrite_fix_message_encoding = "Przepisanie: Napraw kodowanie opisów..."
 # s24:end
+view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
+view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
 
 [help_section]
 rewrite = "Przepisywanie historii"
@@ -4074,6 +4078,16 @@ column_width = "{column}: szerokość w komórkach: {cells}"
 column_width_reset = "Szerokości kolumn Logu wróciły do automatycznych."
 changes_files = { one = "{n} plik", few = "{n} pliki", many = "{n} plików", other = "{n} pliku" }
 changes_files_short = "{n}p"
+# context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
+column_fitted = "{column} fitted to its content: {cells} cells."
+# context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
+column_fit_cut = "{column} needs {need} cells, {have} fit."
+# context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
+column_fit_message = "Message takes the room the other columns leave."
+# context: status line after every Log column was fitted to its content
+columns_fitted_all = "All columns fitted to their content."
+# context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
+columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
 
 [find_bar]
 counter = "{current} z {total}"
@@ -4138,6 +4152,12 @@ changes_tooltip = "{files}, {insertions}, {deletions}"
 changes_files = { one = "{n} zmieniony plik", few = "{n} zmienione pliki", many = "{n} zmienionych plików", other = "{n} zmienionego pliku" }
 changes_insertions = { one = "{n} wstawienie", few = "{n} wstawienia", many = "{n} wstawień", other = "{n} wstawienia" }
 changes_deletions = { one = "{n} usunięcie", few = "{n} usunięcia", many = "{n} usunięć", other = "{n} usunięcia" }
+# context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
+column_menu_fit = "Fit {column} to content"
+# context: a row of the Log columns chooser that fits every column to its content
+column_menu_fit_all = "Fit all columns to content"
+# context: a row of the Log columns chooser that puts every column width back to automatic
+column_menu_reset = "Reset column widths"
 
 [overlays]
 select_tab_title = "Wybierz kartę ({shown}/{total})"

@@ -57,6 +57,8 @@ pub(in crate::event_loop) struct LogDrawCtx<'a> {
     pub(in crate::event_loop) inline_ref_row: &'a mut Option<u16>,
     pub(in crate::event_loop) inline_ref_drawn: &'a mut bool,
     pub(in crate::event_loop) commit_lane_colors: &'a mut std::collections::HashMap<Oid, Color>,
+    /// Filled by this paint: what each column needs to show its content.
+    pub(in crate::event_loop) log_natural: &'a mut NaturalWidths,
 }
 
 pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_>) {
@@ -111,6 +113,8 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
     let inline_ref_row = &mut *ctx.inline_ref_row;
     let inline_ref_drawn = &mut *ctx.inline_ref_drawn;
     let commit_lane_colors = &mut *ctx.commit_lane_colors;
+    let log_natural = &mut *ctx.log_natural;
+    *log_natural = NaturalWidths::new();
     let solo_nodes: &Option<Vec<CommitNode>> = &layout.nodes;
     let graph_order = &layout.order;
     let wip_graph_line = &layout.wip_line;
@@ -198,7 +202,13 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
             log_state.selected() == Some(0) || log_multi.contains(&RowKey::Wip),
             hovered_wip_row,
         );
-        (row, wip_message_counts(counts, counts_at))
+        let counts_in_message = wip_message_counts(counts, counts_at);
+        log_natural.wip_row(
+            commit_summary,
+            counts_in_message,
+            wip_graph_row.as_ref().map_or(0, |r| r.cells.len()),
+        );
+        (row, counts_in_message)
     });
     if let Some(counts) = wip_built.as_ref().map(|(_, counts)| *counts) {
         // The field's hit target: the Message cell of the WIP row,
@@ -263,31 +273,41 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                         graph::LogEntry::Stash(k) => {
                             let line = layout.stash_lines.get(k).cloned().unwrap_or_default();
                             match stash_row_stashes.get(k) {
-                                Some(Some(stash)) => stash_log_row(
-                                    stash,
-                                    match (compact_graph, stash_graph_rows.get(k)) {
-                                        (true, Some(r)) => {
-                                            graph::compact_line(&r.cells, graph_settings.node_set)
-                                        }
-                                        _ => line,
-                                    },
-                                    stash_graph_rows.get(k).and_then(|r| {
-                                        if compact_graph {
-                                            Some(0)
-                                        } else {
-                                            graph::node_column(&r.cells)
-                                        }
-                                    }),
-                                    log_widths,
-                                    log_visible_order,
-                                    // A revealed row flashes in the hover color even
-                                    // when selected, or revealing HEAD shows nothing.
-                                    (log_state.selected() == Some(display)
-                                        || stash.commit.is_some_and(|c| log_multi.contains_id(&c)))
-                                        && reveal_flash != Some(display),
-                                    hovered_commit.is_some_and(|(id, ..)| Some(id) == stash.commit)
-                                        || reveal_flash == Some(display),
-                                ),
+                                Some(Some(stash)) => {
+                                    log_natural.stash_row(
+                                        stash,
+                                        stash_graph_rows.get(k).map_or(0, |r| r.cells.len()),
+                                    );
+                                    stash_log_row(
+                                        stash,
+                                        match (compact_graph, stash_graph_rows.get(k)) {
+                                            (true, Some(r)) => graph::compact_line(
+                                                &r.cells,
+                                                graph_settings.node_set,
+                                            ),
+                                            _ => line,
+                                        },
+                                        stash_graph_rows.get(k).and_then(|r| {
+                                            if compact_graph {
+                                                Some(0)
+                                            } else {
+                                                graph::node_column(&r.cells)
+                                            }
+                                        }),
+                                        log_widths,
+                                        log_visible_order,
+                                        // A revealed row flashes in the hover color even
+                                        // when selected, or revealing HEAD shows nothing.
+                                        (log_state.selected() == Some(display)
+                                            || stash
+                                                .commit
+                                                .is_some_and(|c| log_multi.contains_id(&c)))
+                                            && reveal_flash != Some(display),
+                                        hovered_commit
+                                            .is_some_and(|(id, ..)| Some(id) == stash.commit)
+                                            || reveal_flash == Some(display),
+                                    )
+                                }
                                 _ => Row::new(vec![Cell::from(line)]),
                             }
                         }
@@ -325,6 +345,14 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                                 }
                             }
                             commit_lane_colors.insert(c.id, lane_color);
+                            log_natural.commit_row(
+                                c,
+                                layout.pills_for(c.id),
+                                graph_grid.get(i).map_or(0, |r| r.cells.len()),
+                                avatar::log_avatar_mode(avatar_placement, avatar_capability),
+                                avatar_live.fallback,
+                                commit_changes.get(&c.id),
+                            );
                             // `ui.graph_ghost_ref`: the hovered row's deduced ref,
                             // faded, where the commit has no pill. Selection does
                             // not show it: only the pointer does.

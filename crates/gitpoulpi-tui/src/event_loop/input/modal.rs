@@ -1196,24 +1196,23 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         && matches!(*cx.input_mode, InputMode::Normal)
         && cx.open_menu.is_column_menu()
     {
-        let cursor = cx.open_menu.column_cursor().unwrap_or(0);
+        let menu = cx.open_menu.column_menu().unwrap_or(ColumnMenu::new(None));
+        let rows = crate::log_table::chooser_rows(menu.target);
         match key.code {
             KeyCode::Esc => cx.open_menu.close_column_menu(),
             KeyCode::Down | KeyCode::Char('j') | KeyCode::Tab => {
-                if let Some(c) = cx.open_menu.column_cursor_mut() {
-                    *c = crate::log_table::step_chooser(cursor, true);
+                if let Some(m) = cx.open_menu.column_menu_mut() {
+                    m.cursor = crate::log_table::step_chooser(&rows, menu.cursor, true);
                 }
             }
             KeyCode::Up | KeyCode::Char('k') | KeyCode::BackTab => {
-                if let Some(c) = cx.open_menu.column_cursor_mut() {
-                    *c = crate::log_table::step_chooser(cursor, false);
+                if let Some(m) = cx.open_menu.column_menu_mut() {
+                    m.cursor = crate::log_table::step_chooser(&rows, menu.cursor, false);
                 }
             }
             KeyCode::Char(' ') | KeyCode::Enter => {
-                if let Some(col) = LogColumn::ALL.get(cursor).copied().filter(|c| c.hideable()) {
-                    if !cx.log_column_hidden.remove(&col) {
-                        cx.log_column_hidden.insert(col);
-                    }
+                if let Some(row) = rows.get(menu.cursor).copied() {
+                    commands::log_columns::run_chooser_row(cx, row);
                 }
             }
             _ => {}

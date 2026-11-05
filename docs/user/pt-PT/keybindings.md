@@ -160,6 +160,8 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `log_columns` | `wider` | Alargar a coluna | `]` |
 | `log_columns` | `narrower` | Estreitar a coluna | `[` |
 | `log_columns` | `reset_width` | Repor as larguras das colunas | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Recolher ou expandir todas as pastas | `z` |
 | `log_files` | `filter` | Filtrar os ficheiros alterados | `/` |
 | `log_files` | `expand_all` | Expandir todas as pastas | `=` |
@@ -965,6 +967,8 @@ As teclas são as predefinidas.
 | Ver: coluna do Log: Alargar a coluna | `]` |
 | Ver: coluna do Log: Estreitar a coluna | `[` |
 | Ver: coluna do Log: Repor as larguras das colunas | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | Ver: Log: escolher as colunas a mostrar |  |
 | Diff: abrir o diff do ficheiro selecionado | `Enter` |
 | Diff: fechar a vista de diff | `Esc` |

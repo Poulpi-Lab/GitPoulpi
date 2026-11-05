@@ -162,6 +162,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `log_columns` | `wider` | Sütunu genişlet | `]` |
 | `log_columns` | `narrower` | Sütunu daralt | `[` |
 | `log_columns` | `reset_width` | Sütun genişliklerini sıfırla | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Tüm Klasörleri Daralt veya Genişlet | `z` |
 | `log_files` | `filter` | Değişen Dosyaları Filtrele | `/` |
 | `log_files` | `expand_all` | Tüm Klasörleri Genişlet | `=` |
@@ -967,6 +969,8 @@ Tuşlar varsayılanlardır.
 | Görünüm: Log sütunu: sütunu genişlet | `]` |
 | Görünüm: Log sütunu: sütunu daralt | `[` |
 | Görünüm: Log sütunu: sütun genişliklerini sıfırla | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | Görünüm: Log: Gösterilecek sütunları seç |  |
 | Diff: Seçili Dosyanın Diff'ini Aç | `Enter` |
 | Diff: Diff Görünümünü Kapat | `Esc` |

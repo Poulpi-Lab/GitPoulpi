@@ -160,6 +160,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `log_columns` | `wider` | Widen the Column | `]` |
 | `log_columns` | `narrower` | Narrow the Column | `[` |
 | `log_columns` | `reset_width` | Reset the Column Widths | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Collapse or Expand All Folders | `z` |
 | `log_files` | `filter` | Filter the Changed Files | `/` |
 | `log_files` | `expand_all` | Expand All Folders | `=` |
@@ -967,6 +969,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | View: Log Column: Widen the Column | `]` |
 | View: Log Column: Narrow the Column | `[` |
 | View: Log Column: Reset the Column Widths | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | View: Log: Choose the Columns to Show |  |
 | Diff: Open Diff for Selected File | `Enter` |
 | Diff: Close Diff View | `Esc` |

@@ -1141,6 +1141,8 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
                 L::Wider => A::LogColumnsWider,
                 L::Narrower => A::LogColumnsNarrower,
                 L::ResetWidth => A::LogColumnsResetWidth,
+                L::FitToContent => A::LogColumnsFit,
+                L::FitAllToContent => A::LogColumnsFitAll,
                 L::Chooser => return None,
             })
         }

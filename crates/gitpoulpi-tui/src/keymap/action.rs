@@ -481,6 +481,8 @@ actions! {
     LogColumnsWider => (LogColumns, "log_columns.wider", LOG_COLUMNS_WIDER, ["]"]),
     LogColumnsNarrower => (LogColumns, "log_columns.narrower", LOG_COLUMNS_NARROWER, ["["]),
     LogColumnsResetWidth => (LogColumns, "log_columns.reset_width", LOG_COLUMNS_RESET_WIDTH, ["0"]),
+    LogColumnsFit => (LogColumns, "log_columns.fit", LOG_COLUMNS_FIT, ["="]),
+    LogColumnsFitAll => (LogColumns, "log_columns.fit_all", LOG_COLUMNS_FIT_ALL, ["+"]),
     // ---- log pane, inside a commit's changed files ----
     LogFilesCollapseAll => (LogFiles, "log_files.collapse_all", LOG_FILES_COLLAPSE_ALL, ["z"]),
     LogFilesFilter => (LogFiles, "log_files.filter", LOG_FILES_FILTER, ["/"]),

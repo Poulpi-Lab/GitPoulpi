@@ -35,7 +35,7 @@ pub(super) enum OpenMenu {
     Overflow(OverflowMenuState),
     /// The Log header's column show/hide checklist (drawn inline, not a
     /// `ContextMenu`).
-    Column(usize),
+    Column(crate::log_table::ColumnMenu),
 }
 
 macro_rules! variant_accessors {
@@ -112,17 +112,18 @@ impl OpenMenu {
         matches!(self, OpenMenu::Column(_))
     }
 
-    /// The chooser's keyboard cursor: an index into `LogColumn::ALL`.
-    pub(super) fn column_cursor(&self) -> Option<usize> {
+    /// The open chooser: its keyboard cursor (an index into
+    /// `log_table::chooser_rows`) and the column its "fit" row acts on.
+    pub(super) fn column_menu(&self) -> Option<crate::log_table::ColumnMenu> {
         match self {
-            OpenMenu::Column(i) => Some(*i),
+            OpenMenu::Column(menu) => Some(*menu),
             _ => None,
         }
     }
 
-    pub(super) fn column_cursor_mut(&mut self) -> Option<&mut usize> {
+    pub(super) fn column_menu_mut(&mut self) -> Option<&mut crate::log_table::ColumnMenu> {
         match self {
-            OpenMenu::Column(i) => Some(i),
+            OpenMenu::Column(menu) => Some(menu),
             _ => None,
         }
     }

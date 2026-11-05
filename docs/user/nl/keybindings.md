@@ -163,6 +163,8 @@ prefix getoond (`Ctrl+G s`).
 | `log_columns` | `wider` | Kolom verbreden | `]` |
 | `log_columns` | `narrower` | Kolom versmallen | `[` |
 | `log_columns` | `reset_width` | Kolombreedtes herstellen | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Alle mappen in-/uitklappen | `z` |
 | `log_files` | `filter` | Gewijzigde bestanden filteren | `/` |
 | `log_files` | `expand_all` | Alle mappen uitklappen | `=` |
@@ -971,6 +973,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Weergave: Logkolom: Kolom verbreden | `]` |
 | Weergave: Logkolom: Kolom versmallen | `[` |
 | Weergave: Logkolom: Kolombreedtes herstellen | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | Weergave: Log: Kolommen kiezen om te tonen |  |
 | Diff: Diff van geselecteerd bestand openen | `Enter` |
 | Diff: Diff-weergave sluiten | `Esc` |

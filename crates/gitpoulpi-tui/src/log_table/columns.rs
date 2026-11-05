@@ -21,6 +21,10 @@ pub(crate) enum LogColumn {
     Sha,
 }
 
+/// The widest a column can be fitted to its content (a pasted novel in a
+/// commit summary must not make a column a thousand cells wide).
+pub(crate) const MAX_COLUMN_CELLS: u16 = 300;
+
 impl LogColumn {
     pub(crate) const ALL: [LogColumn; 7] = [
         LogColumn::Ref,
@@ -184,8 +188,10 @@ impl LogColumnWidths {
         // Every column's ideal width, before any budget is considered.
         let desired = |col: LogColumn| -> u16 {
             match col {
-                // Short SHAs are always exactly 7 hex chars.
-                LogColumn::Sha => 7,
+                // Short SHAs are always exactly 7 hex chars, plus the one cell
+                // the last column's resize grip sits on (`Edge::last`), so it
+                // never covers the 7th digit.
+                LogColumn::Sha => 8,
                 // "YYYY-MM-DD HH:MM" is always 16 chars, plus the one-cell
                 // gutter `commit_row` keeps at the right of every text
                 // column. Asking for only the 16 it prints made the date
@@ -222,12 +228,7 @@ impl LogColumnWidths {
                 .unwrap_or_else(|| desired(col))
                 .max(col.drag_min_width())
         };
-        // A width the user set below the automatic floor is its own floor.
-        let floor = |col: LogColumn| -> u16 {
-            overrides.get(&col).map_or(col.min_width(), |o| {
-                (*o).clamp(col.drag_min_width(), col.min_width())
-            })
-        };
+        let floor = |col: LogColumn| -> u16 { column_floor(col, overrides) };
 
         // Who survives this pane width at all: `message_reservation` is
         // taken out of the budget first, then, when the floors no longer
@@ -263,15 +264,23 @@ impl LogColumnWidths {
             .saturating_sub(floors(&live));
 
         // Growth order: pinned by the width tests at the sizes the app is
-        // used at.
-        for col in [
+        // used at. A column with a width of its own (dragged, or fitted to
+        // its content) is served first, so what it asks for is what it gets
+        // up to `fit_max`: the others fall back to their floors, never the
+        // reverse.
+        let growth = [
             LogColumn::Sha,
             LogColumn::Date,
             LogColumn::Changes,
             LogColumn::Ref,
             LogColumn::Graph,
             LogColumn::Author,
-        ] {
+        ];
+        let pinned_first = growth
+            .into_iter()
+            .filter(|c| overrides.contains_key(c))
+            .chain(growth.into_iter().filter(|c| !overrides.contains_key(c)));
+        for col in pinned_first {
             if spare == 0 {
                 break;
             }
@@ -291,6 +300,30 @@ impl LogColumnWidths {
         *out.width_mut(LogColumn::Message) += spare;
 
         out
+    }
+
+    /// The most `col` can be made in the fit layout: the pane's inner width
+    /// less the room reserved for `Message` and the floor of every other
+    /// column still on screen. Past it the column would take `Message`'s
+    /// reservation or push another column off the pane. `widths` is what the
+    /// pane shows now (a sacrificed column has none and costs nothing).
+    pub(crate) fn fit_max(
+        &self,
+        area_width: u16,
+        order: &[LogColumn],
+        overrides: &std::collections::HashMap<LogColumn, u16>,
+        col: LogColumn,
+    ) -> u16 {
+        let inner = area_width.saturating_sub(2);
+        let others: u16 = order
+            .iter()
+            .filter(|c| **c != col && **c != LogColumn::Message && self.width_of(**c) > 0)
+            .map(|c| column_floor(*c, overrides))
+            .sum();
+        inner
+            .saturating_sub(LogColumn::message_reservation(inner))
+            .saturating_sub(others)
+            .max(col.drag_min_width())
     }
 
     fn width_mut(&mut self, col: LogColumn) -> &mut u16 {
@@ -316,6 +349,14 @@ impl LogColumnWidths {
             LogColumn::Sha => self.sha_w,
         }
     }
+}
+
+/// A column's floor: `min_width`, or the width the user set when that is
+/// smaller (a width below the automatic floor is its own floor).
+fn column_floor(col: LogColumn, overrides: &std::collections::HashMap<LogColumn, u16>) -> u16 {
+    overrides.get(&col).map_or(col.min_width(), |o| {
+        (*o).clamp(col.drag_min_width(), col.min_width())
+    })
 }
 
 /// Left-to-right screen-column offsets for each currently *visible* column
@@ -427,20 +468,16 @@ pub(crate) fn log_header_hit_targets(
     log_area: Rect,
     offsets: &[(LogColumn, u16, u16)],
 ) -> Vec<(Rect, HitTarget)> {
-    let mut hits = Vec::with_capacity(offsets.len() * 2);
-    for (i, &(col, x, w)) in offsets.iter().enumerate() {
-        // Only an *internal* boundary (between this column and the next
-        // visible one) gets a drag target -- the last visible column's
-        // right edge is the pane's own border, which coincides with (and,
-        // being checked first, was stealing clicks from) the Log/Status
-        // pane-divider drag. Grabbing "the pane divider" and getting a
-        // column resize instead, with the whole Log pane appearing to
-        // shift, was exactly that collision.
-        if i + 1 < offsets.len() {
-            let rect = log_boundary_grab_rect(log_area, x + w);
-            // A boundary always resizes the column on its left -- the one whose edge the user is
-            // actually pointing at -- against its right-hand neighbor; see
-            // `boundary_drag_widths`.
+    let mut hits = Vec::with_capacity(offsets.len() * 2 + 1);
+    for &(col, _, _) in offsets {
+        // A boundary always resizes the column on its left -- the one whose edge the user is
+        // actually pointing at -- against its right-hand neighbor; see
+        // `boundary_drag_widths`. The last column's grip is its own last cell
+        // (`log_grip_rect`), never the pane's border, which belongs to the
+        // Log/Status pane-divider drag: grabbing "the pane divider" and
+        // getting a column resize instead, with the whole Log pane appearing
+        // to shift, was exactly that collision.
+        if let Some(rect) = log_grip_rect(log_area, offsets, col) {
             hits.push((rect, HitTarget::LogColumnBoundary(col)));
         }
     }
@@ -453,6 +490,58 @@ pub(crate) fn log_header_hit_targets(
     hits
 }
 
+/// What a press on a column's grip drags: the column, where the pointer
+/// went down and the column's width then. The last column's grip has no
+/// neighbour to trade width with (`Message` absorbs what it frees), so it
+/// moves by how far the pointer travelled from the press, not to wherever
+/// the pointer is: its grip sits on the column's own last cell, and an
+/// absolute position would jump the column by the cell offset on the first
+/// move.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct LogBoundaryDrag {
+    pub(crate) col: LogColumn,
+    pub(crate) press_x: u16,
+    pub(crate) start_w: u16,
+    /// The grip after the last visible column.
+    pub(crate) last: bool,
+}
+
+/// The width the last column's grip gives it with the pointer at `pointer_x`:
+/// its width at the press plus the pointer's travel, between the least a
+/// column can be dragged to and `room` (`LogColumnWidths::fit_max`).
+pub(crate) fn last_grip_width(drag: &LogBoundaryDrag, pointer_x: u16, room: u16) -> u16 {
+    let least = drag.col.drag_min_width();
+    let wanted = i32::from(drag.start_w) + i32::from(pointer_x) - i32::from(drag.press_x);
+    u16::try_from(wanted.max(i32::from(least)))
+        .unwrap_or(u16::MAX)
+        .min(room.max(least))
+}
+
+/// The cells a press can grab to resize `col`: the gap after it for an
+/// internal boundary, its own last cell for the last visible column (not
+/// when that one is `Message`, which is what absorbs the change, or when it
+/// is under two cells wide). `None` when `col` is not visible.
+pub(crate) fn log_grip_rect(
+    log_area: Rect,
+    offsets: &[(LogColumn, u16, u16)],
+    col: LogColumn,
+) -> Option<Rect> {
+    let i = offsets.iter().position(|(c, _, _)| *c == col)?;
+    let (_, x, w) = offsets[i];
+    let bottom = (log_area.y + log_area.height).saturating_sub(1);
+    if i + 1 < offsets.len() {
+        return Some(log_boundary_grab_rect(log_area, x + w));
+    }
+    (w >= 2 && col != LogColumn::Message).then(|| {
+        crate::column_resize::grab_rect(
+            crate::column_resize::mode(),
+            crate::column_resize::Edge::last(x + w),
+            log_area.y + 1,
+            bottom,
+        )
+    })
+}
+
 /// Screen column of the draggable boundary at the right edge of `col`, from
 /// a `column_x_offsets` result - `None` when `col` isn't visible, or is the
 /// last visible column (whose right edge is the pane's own border and so
@@ -461,6 +550,7 @@ pub(crate) fn log_header_hit_targets(
 /// The resize highlight is drawn here rather than at the pointer's own
 /// column: mid-drag the two part company by however far the pointer has
 /// travelled past the edge's clamp.
+#[cfg(test)]
 pub(crate) fn log_boundary_x(offsets: &[(LogColumn, u16, u16)], col: LogColumn) -> Option<u16> {
     let i = offsets.iter().position(|(c, _, _)| *c == col)?;
     (i + 1 < offsets.len()).then(|| offsets[i].1 + offsets[i].2)
@@ -475,11 +565,17 @@ pub(crate) fn paint_log_ticks(
     offsets: &[(LogColumn, u16, u16)],
 ) {
     for &(col, _, _) in offsets {
-        if let Some(bx) = log_boundary_x(offsets, col) {
+        // The grip's resting tick is its gap cell: the column's own last
+        // cell in both layouts (the last column's grip included).
+        if let Some(grip) = log_grip_rect(log_area, offsets, col) {
+            let gap = match crate::column_resize::mode() {
+                gitpoulpi_config::ColumnResize::Line => grip.x,
+                gitpoulpi_config::ColumnResize::Header => grip.x.saturating_sub(1),
+            };
             crate::column_resize::paint_tick(
                 buf,
                 crate::column_resize::mode(),
-                bx.saturating_sub(1),
+                gap,
                 log_area.y + 1,
             );
         }

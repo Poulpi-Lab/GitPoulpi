@@ -159,6 +159,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log_columns` | `wider` | Spalte verbreitern | `]` |
 | `log_columns` | `narrower` | Spalte verschmälern | `[` |
 | `log_columns` | `reset_width` | Spaltenbreiten zurücksetzen | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Alle Ordner ein- oder ausklappen | `z` |
 | `log_files` | `filter` | Geänderte Dateien filtern | `/` |
 | `log_files` | `expand_all` | Alle Ordner aufklappen | `=` |
@@ -962,6 +964,8 @@ die Standardtasten.
 | Ansicht: Log-Spalte: Spalte verbreitern | `]` |
 | Ansicht: Log-Spalte: Spalte verschmälern | `[` |
 | Ansicht: Log-Spalte: Spaltenbreiten zurücksetzen | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | Ansicht: Log: Anzuzeigende Spalten wählen |  |
 | Diff: Diff der ausgewählten Datei öffnen | `Enter` |
 | Diff: Diff-Ansicht schließen | `Esc` |

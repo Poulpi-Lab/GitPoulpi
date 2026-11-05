@@ -158,6 +158,8 @@ stage_file = "z"
 | `log_columns` | `wider` | Розширити стовпець | `]` |
 | `log_columns` | `narrower` | Звузити стовпець | `[` |
 | `log_columns` | `reset_width` | Скинути ширину стовпців | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Згорнути чи розгорнути всі папки | `z` |
 | `log_files` | `filter` | Фільтр змінених файлів | `/` |
 | `log_files` | `expand_all` | Розгорнути всі папки | `=` |
@@ -961,6 +963,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Вигляд: стовпець Log: Розширити стовпець | `]` |
 | Вигляд: стовпець Log: Звузити стовпець | `[` |
 | Вигляд: стовпець Log: Скинути ширину стовпців | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | Вигляд: Log: Вибрати стовпці для показу |  |
 | Diff: відкрити diff вибраного файлу | `Enter` |
 | Diff: закрити diff | `Esc` |

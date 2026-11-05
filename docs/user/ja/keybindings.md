@@ -146,6 +146,8 @@ stage_file = "z"
 | `log_columns` | `wider` | 列を広げる | `]` |
 | `log_columns` | `narrower` | 列を狭める | `[` |
 | `log_columns` | `reset_width` | 列の幅をすべてリセット | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | すべてのフォルダーを折りたたむ／展開 | `z` |
 | `log_files` | `filter` | 変更されたファイルを絞り込み | `/` |
 | `log_files` | `expand_all` | すべてのフォルダーを展開 | `=` |
@@ -933,6 +935,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 表示: Log列: 列を広げる | `]` |
 | 表示: Log列: 列を狭める | `[` |
 | 表示: Log列: 列の幅をすべてリセット | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | 表示: Log: 表示する列を選択 |  |
 | Diff: 選択中のファイルのdiffを開く | `Enter` |
 | Diff: diffビューを閉じる | `Esc` |

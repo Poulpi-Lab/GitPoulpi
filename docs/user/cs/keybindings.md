@@ -161,6 +161,8 @@ předponou (`Ctrl+G s`).
 | `log_columns` | `wider` | Rozšířit sloupec | `]` |
 | `log_columns` | `narrower` | Zúžit sloupec | `[` |
 | `log_columns` | `reset_width` | Obnovit šířky sloupců | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Sbalit nebo rozbalit všechny složky | `z` |
 | `log_files` | `filter` | Filtrovat změněné soubory | `/` |
 | `log_files` | `expand_all` | Rozbalit všechny složky | `=` |
@@ -967,6 +969,8 @@ Klávesy jsou výchozí.
 | Zobrazení: Sloupec Logu: Rozšířit sloupec | `]` |
 | Zobrazení: Sloupec Logu: Zúžit sloupec | `[` |
 | Zobrazení: Sloupec Logu: Obnovit šířky sloupců | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | Zobrazení: Log: Vybrat zobrazené sloupce |  |
 | Diff: Otevřít diff vybraného souboru | `Enter` |
 | Diff: Zavřít zobrazení diffu | `Esc` |

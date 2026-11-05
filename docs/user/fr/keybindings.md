@@ -163,6 +163,8 @@ préfixe (`Ctrl+G s`).
 | `log_columns` | `wider` | Élargir la colonne | `]` |
 | `log_columns` | `narrower` | Rétrécir la colonne | `[` |
 | `log_columns` | `reset_width` | Réinitialiser les largeurs des colonnes | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Replier ou déplier tous les dossiers | `z` |
 | `log_files` | `filter` | Filtrer les fichiers modifiés | `/` |
 | `log_files` | `expand_all` | Déplier tous les dossiers | `=` |
@@ -969,6 +971,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Affichage : Colonne du Log : Élargir la colonne | `]` |
 | Affichage : Colonne du Log : Rétrécir la colonne | `[` |
 | Affichage : Colonne du Log : Réinitialiser les largeurs des colonnes | `0` |
+| Affichage : Colonne du Log : Ajuster la colonne à son contenu | `=` |
+| Affichage : Colonne du Log : Ajuster toutes les colonnes à leur contenu | `+` |
 | Affichage : Log : Choisir les colonnes à afficher |  |
 | Diff : Ouvrir le diff du fichier sélectionné | `Enter` |
 | Diff : Fermer la vue diff | `Esc` |

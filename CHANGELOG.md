@@ -7,6 +7,9 @@ surfaces may still change between minor versions).
 
 ## [Unreleased]
 
+### Added
+- Log columns: double-click a column's boundary to fit the column on its left to its content (keyboard: `=` on the picked column, `+` for all; palette and chooser rows too). The last column has a resize grip on its own last cell, and the SHA column is one cell wider by default so the grip never covers a digit.
+
 ### Changed
 - The Radar opens with `Alt+R` by default (was `Alt+L`). Inside the merge editor and the commit message composer `Alt+R` keeps its own action (reset all, insert issue reference); the Radar stays reachable through the palette there. A custom `global.radar` binding is kept.
 

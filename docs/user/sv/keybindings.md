@@ -162,6 +162,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `log_columns` | `wider` | Bredda kolumnen | `]` |
 | `log_columns` | `narrower` | Smalna av kolumnen | `[` |
 | `log_columns` | `reset_width` | Återställ kolumnernas bredder | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
 | `log_files` | `collapse_all` | Fäll ihop eller ut alla mappar | `z` |
 | `log_files` | `filter` | Filtrera de ändrade filerna | `/` |
 | `log_files` | `expand_all` | Fäll ut alla mappar | `=` |
@@ -969,6 +971,8 @@ Tangenterna är standardvärdena.
 | Vy: Log-kolumn: bredda kolumnen | `]` |
 | Vy: Log-kolumn: smalna av kolumnen | `[` |
 | Vy: Log-kolumn: återställ kolumnernas bredder | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
 | Vy: Log: välj vilka kolumner som visas |  |
 | Diff: Öppna diff för vald fil | `Enter` |
 | Diff: Stäng diff-vyn | `Esc` |

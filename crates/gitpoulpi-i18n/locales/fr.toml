@@ -2355,6 +2355,8 @@ split_move_down = { git = "Descendre le {$commit}", local = "Descendre la {$comm
 split_reset = "Réinitialiser la scission"
 rewrite_host_howto = "Expliquer la protection de l'hébergeur"
 rewrite_ai_rules = "Créer des règles de réécriture avec l'IA"
+log_columns_fit = "Fit the Column to Its Content"
+log_columns_fit_all = "Fit All Columns to Content"
 
 
 [keymap_ctx]
@@ -3430,6 +3432,8 @@ git_fetch_selected_tag = { git = "Git : {$Fetch} le tag sélectionné", local =
 # s24:begin
 rewrite_fix_message_encoding = "Réécriture : corriger l'encodage des messages..."
 # s24:end
+view_log_column_fit = "Affichage : Colonne du Log : Ajuster la colonne à son contenu"
+view_log_column_fit_all = "Affichage : Colonne du Log : Ajuster toutes les colonnes à leur contenu"
 
 [help_section]
 rewrite = "Réécrire l'historique"
@@ -4083,6 +4087,16 @@ column_width = "Largeur de {column} : {cells} cellules"
 column_width_reset = "Largeurs des colonnes du Log revenues à l'automatique."
 changes_files = { one = "{n} fichier", other = "{n} fichiers" }
 changes_files_short = "{n}f"
+# context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
+column_fitted = "{column} fitted to its content: {cells} cells."
+# context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
+column_fit_cut = "{column} needs {need} cells, {have} fit."
+# context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
+column_fit_message = "Message takes the room the other columns leave."
+# context: status line after every Log column was fitted to its content
+columns_fitted_all = "All columns fitted to their content."
+# context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
+columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
 
 [find_bar]
 counter = "{current} sur {total}"
@@ -4147,6 +4161,12 @@ changes_tooltip = "{files}, {insertions}, {deletions}"
 changes_files = { one = "{n} fichier modifié", other = "{n} fichiers modifiés" }
 changes_insertions = { one = "{n} insertion", other = "{n} insertions" }
 changes_deletions = { one = "{n} suppression", other = "{n} suppressions" }
+# context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
+column_menu_fit = "Fit {column} to content"
+# context: a row of the Log columns chooser that fits every column to its content
+column_menu_fit_all = "Fit all columns to content"
+# context: a row of the Log columns chooser that puts every column width back to automatic
+column_menu_reset = "Reset column widths"
 
 [overlays]
 select_tab_title = "Choisir l'onglet ({shown}/{total})"

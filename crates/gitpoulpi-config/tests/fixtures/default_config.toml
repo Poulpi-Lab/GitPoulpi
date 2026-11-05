@@ -224,6 +224,7 @@ side_by_side_min_width = 100
 browse_root = ""
 show_hidden = false
 show_siblings = false
+clone_start_source = "last"
 
 [keybindings]
 

@@ -102,6 +102,12 @@ pub(crate) struct WorkspaceDialog {
     pub(crate) repos: Vec<RepoChoice>,
     cursor: usize,
     scroll: usize,
+    /// The cursor the window last followed: a wheel turn or a bar drag moves
+    /// the window away from it and stays until the cursor moves.
+    followed: usize,
+    /// The list's scrollbar as last painted, and the thumb held.
+    bar: Option<crate::scrollbar::Track>,
+    bar_drag: crate::scrollbar::BarDrag,
     list_rows: usize,
     focus: Focus,
     hover: Option<Hit>,
@@ -235,6 +241,9 @@ impl WorkspaceDialog {
             repos,
             cursor: 0,
             scroll: 0,
+            followed: usize::MAX,
+            bar: None,
+            bar_drag: Default::default(),
             list_rows: 3,
             focus: Focus::Name,
             hover: None,
@@ -601,6 +610,14 @@ impl WorkspaceDialog {
                 _ => self.shield = None,
             }
         }
+        // The list's scrollbar takes its presses and the drag of its thumb.
+        if let Some(top) = self
+            .bar_drag
+            .on_mouse(self.bar, mouse, self.repos.len(), self.scroll)
+        {
+            self.scroll = top;
+            return Outcome::Stay;
+        }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
         if !matches!(mouse.kind, MouseEventKind::Down(_)) && self.field_mouse(mouse) {
             return Outcome::Stay;
@@ -803,7 +820,20 @@ impl WorkspaceDialog {
         self.scroll = self
             .scroll
             .min(self.repos.len().saturating_sub(self.list_rows));
-        self.keep_cursor_visible();
+        if self.followed != self.cursor {
+            self.followed = self.cursor;
+            self.keep_cursor_visible();
+        }
+        // The bar rides the dialog's right border, beside the rows.
+        self.bar = crate::scrollbar::Track::column(
+            Rect::new(rect.right() - 1, list_top, 1, list_rows as u16),
+            self.repos.len(),
+            list_rows,
+            self.scroll,
+        );
+        if let Some(track) = self.bar {
+            crate::scrollbar::render_buf(buf, track, true, false);
+        }
         if self.repos.is_empty() {
             dialog_kit::put(
                 buf,
@@ -1259,5 +1289,89 @@ mod tests {
                 .count(),
             2
         );
+    }
+
+    fn many_repos(n: usize) -> WorkspaceDialog {
+        let mut s = seed();
+        s.known = (0..n)
+            .map(|i| {
+                (
+                    PathBuf::from(format!("/nonexistent-gp/r{i:02}")),
+                    format!("r{i:02}"),
+                )
+            })
+            .collect();
+        WorkspaceDialog::new(s)
+    }
+
+    fn mouse(kind: MouseEventKind, col: u16, row: u16) -> MouseEvent {
+        MouseEvent {
+            kind,
+            column: col,
+            row,
+            modifiers: KeyModifiers::NONE,
+        }
+    }
+
+    #[test]
+    fn the_repository_list_draws_a_bar_only_while_it_overflows() {
+        let area = Rect::new(0, 0, 100, 30);
+        let mut few = many_repos(2);
+        let mut buf = Buffer::empty(area);
+        few.render(rect(area), &mut buf);
+        assert!(few.bar.is_none());
+
+        let mut long = many_repos(60);
+        let mut buf = Buffer::empty(area);
+        long.render(rect(area), &mut buf);
+        let track = long.bar.expect("60 repositories overflow");
+        assert_eq!(buf[(track.rect.x, track.rect.y)].symbol(), "\u{2191}");
+        assert_eq!(
+            buf[(track.rect.x, track.rect.bottom() - 1)].symbol(),
+            "\u{2193}"
+        );
+    }
+
+    #[test]
+    fn the_bar_drags_the_wheel_scrolls_and_the_window_stays_until_the_cursor_moves() {
+        let area = Rect::new(0, 0, 100, 30);
+        let mut d = many_repos(60);
+        let mut buf = Buffer::empty(area);
+        d.render(rect(area), &mut buf);
+        let track = d.bar.unwrap();
+        let x = track.rect.x;
+        let max = 60 - d.list_rows;
+        d.on_mouse(mouse(
+            MouseEventKind::Down(MouseButton::Left),
+            x,
+            track.rect.y + track.thumb_start,
+        ));
+        d.on_mouse(mouse(
+            MouseEventKind::Drag(MouseButton::Left),
+            x,
+            track.rect.bottom() + 3,
+        ));
+        d.on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), x, 0));
+        assert_eq!(d.scroll, max, "dragged to the end");
+        assert_eq!(d.cursor, 0, "the cursor did not move");
+        // The next paints keep the window where it was put.
+        d.render(rect(area), &mut Buffer::empty(area));
+        d.render(rect(area), &mut Buffer::empty(area));
+        assert_eq!(d.scroll, max);
+        // The wheel over the list scrolls it back.
+        let row = d
+            .hits
+            .iter()
+            .find(|(_, h)| matches!(h, Hit::Row(_)))
+            .unwrap()
+            .0;
+        d.on_mouse(mouse(MouseEventKind::ScrollUp, row.x + 2, row.y));
+        d.render(rect(area), &mut Buffer::empty(area));
+        assert_eq!(d.scroll, max - 3);
+        // A key that moves the cursor brings the window back to it.
+        d.focus = Focus::Repos;
+        d.on_key(press(KeyCode::Down));
+        d.render(rect(area), &mut Buffer::empty(area));
+        assert!(d.scroll <= d.cursor && d.cursor < d.scroll + d.list_rows);
     }
 }

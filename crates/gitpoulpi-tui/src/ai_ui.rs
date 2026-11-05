@@ -37,7 +37,7 @@ use gitpoulpi_core::domain::{
 use gitpoulpi_ipc::{Client, Request};
 use gitpoulpi_secrets::CredentialHelperTokens;
 use ratatui::layout::Rect;
-use ratatui::style::{Modifier, Style};
+use ratatui::style::Style;
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, BorderType, Borders, Paragraph, Wrap};
 use ratatui::Frame;
@@ -537,6 +537,9 @@ pub(crate) struct AiPopup {
     frame: Cell<Rect>,
     cross: Cell<Option<Rect>>,
     cross_hover: Cell<bool>,
+    /// The scrollbar in the right border as last painted, and the thumb held.
+    bar: Cell<Option<crate::scrollbar::Track>>,
+    bar_drag: Cell<crate::scrollbar::BarDrag>,
 }
 
 /// What a mouse event did to the popup.
@@ -567,6 +570,8 @@ impl AiPopup {
             frame: Cell::new(Rect::default()),
             cross: Cell::new(None),
             cross_hover: Cell::new(false),
+            bar: Cell::new(None),
+            bar_drag: Cell::new(Default::default()),
         }
     }
 
@@ -576,6 +581,20 @@ impl AiPopup {
         use crossterm::event::{MouseButton, MouseEventKind};
         let at: ratatui::layout::Position = (mouse.column, mouse.row).into();
         let on_cross = self.cross.get().is_some_and(|c| c.contains(at));
+        // The scrollbar takes its presses and the drag of its thumb.
+        let mut drag = self.bar_drag.get();
+        let moved = drag.on_mouse(
+            self.bar.get(),
+            mouse,
+            usize::from(self.line_count()),
+            usize::from(self.scroll),
+        );
+        self.bar_drag.set(drag);
+        if let Some(top) = moved {
+            let max = self.line_count().saturating_sub(self.inner.get().1);
+            self.scroll = top.min(usize::from(max)) as u16;
+            return PopupMouse::Nothing;
+        }
         match mouse.kind {
             MouseEventKind::ScrollUp => self.scroll_by(-3),
             MouseEventKind::ScrollDown => self.scroll_by(3),
@@ -711,18 +730,14 @@ impl AiPopup {
             rect,
             self.cross_hover.get(),
         ));
-        // Dim hint when there is more below.
-        if self.line_count() > inner.height + self.scroll && inner.height > 0 {
-            let more = Rect::new(inner.right().saturating_sub(4), inner.bottom() - 1, 4, 1);
-            frame.render_widget(
-                Paragraph::new(Span::styled(
-                    "\u{25BC}\u{25BC}",
-                    Style::default()
-                        .fg(th().ui.muted)
-                        .add_modifier(Modifier::BOLD),
-                )),
-                more,
-            );
+        // The bar, in the right border, when the text outgrows the box.
+        self.bar.set(crate::scrollbar::Track::vertical(
+            rect,
+            usize::from(self.line_count()),
+            usize::from(self.scroll),
+        ));
+        if let Some(track) = self.bar.get() {
+            crate::scrollbar::render(frame, track, true, false);
         }
     }
 }
@@ -1571,5 +1586,47 @@ mod tests {
         popup.scroll_by(-1000);
         assert_eq!(popup.scroll, 0);
         assert!(matches!(popup.on_key(&copy), PopupKey::Copy(_)));
+    }
+
+    #[test]
+    fn the_popup_draws_a_bar_when_the_text_outgrows_it_and_the_thumb_drags() {
+        use crossterm::event::{KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
+        let mouse = |kind, x: u16, y: u16| MouseEvent {
+            kind,
+            column: x,
+            row: y,
+            modifiers: KeyModifiers::NONE,
+        };
+        let mut popup = AiPopup::working("t".into(), "short".into());
+        rendered(&popup, 100, 30);
+        assert!(popup.bar.get().is_none(), "short text: no bar");
+        popup.set_result(Ok("line\n".repeat(80)));
+        rendered(&popup, 100, 30);
+        let track = popup.bar.get().expect("long text: a bar");
+        let x = track.rect.x;
+        assert_eq!(
+            popup.on_mouse(mouse(
+                MouseEventKind::Down(MouseButton::Left),
+                x,
+                track.rect.y + 1
+            )),
+            PopupMouse::Nothing
+        );
+        popup.on_mouse(mouse(
+            MouseEventKind::Drag(MouseButton::Left),
+            x,
+            track.rect.bottom() + 4,
+        ));
+        popup.on_mouse(mouse(
+            MouseEventKind::Up(MouseButton::Left),
+            x,
+            track.rect.bottom() + 4,
+        ));
+        let max = popup.line_count() - popup.inner.get().1;
+        assert_eq!(popup.scroll, max, "dragged to the end, popup still open");
+        assert!(!popup.is_working());
+        // The wheel brings it back up; a key too.
+        popup.on_mouse(mouse(MouseEventKind::ScrollUp, x - 5, track.rect.y + 2));
+        assert_eq!(popup.scroll, max - 3);
     }
 }

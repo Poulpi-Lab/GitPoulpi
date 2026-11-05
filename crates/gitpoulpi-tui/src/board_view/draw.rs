@@ -311,7 +311,14 @@ impl BoardView {
         let cards_h = body.height.saturating_sub(1 + bar_h);
         self.rows_per_col = ((cards_h / CARD_H) as usize).max(1);
         self.first_col = self.first_col.min(n.saturating_sub(visible));
-        self.ensure_visible();
+        // The selection is scrolled into view when it (or the room) changes,
+        // not on every paint: that would undo the wheel and the bars.
+        let key = (self.sel_col, self.sel_row(), self.rows_per_col, visible);
+        if key != self.followed {
+            self.followed = key;
+            self.ensure_visible();
+        }
+        self.col_bars.clear();
         let first = self.first_col;
 
         for (slot, col) in (first..n).take(visible).enumerate() {
@@ -323,8 +330,16 @@ impl BoardView {
             if drop {
                 dialog_kit::fill(buf, column, Style::default().bg(th().ui.hover));
             }
-            let offset = self.offsets.get(col).copied().unwrap_or(0);
             let list = self.cards.get(col).cloned().unwrap_or_default();
+            let offset = self
+                .offsets
+                .get(col)
+                .copied()
+                .unwrap_or(0)
+                .min(list.len().saturating_sub(self.rows_per_col));
+            if let Some(off) = self.offsets.get_mut(col) {
+                *off = offset;
+            }
             if list.is_empty() {
                 dialog_kit::put(
                     buf,
@@ -353,6 +368,16 @@ impl BoardView {
                     self.hovered(Hit::Card(col, row)),
                 );
                 hits.push((rect, Hit::Card(col, row)));
+            }
+            // The column's bar rides its last cell when its cards overflow.
+            if let Some(track) = crate::scrollbar::Track::column(
+                Rect::new(x + each - 1, top, 1, cards_h),
+                list.len(),
+                self.rows_per_col,
+                offset,
+            ) {
+                crate::scrollbar::render_buf(buf, track, true, false);
+                self.col_bars.push((col, track));
             }
             // A column's empty part is a drop target and a click that
             // selects the column.

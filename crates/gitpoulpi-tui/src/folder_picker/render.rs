@@ -22,6 +22,9 @@ impl FolderPicker {
             rect.height.saturating_sub(2),
         );
         if inner.width < 20 || inner.height < 6 {
+            self.left_bar.hide();
+            self.content_bar.hide();
+            self.drop_bar.hide();
             self.hits = hits;
             return;
         }
@@ -313,20 +316,35 @@ impl FolderPicker {
         // The completion dropdown, over the panes, registered first.
         let found = self.completions();
         let mut dropdown: Vec<(Rect, PickerHit)> = Vec::new();
+        self.drop_area = Rect::default();
         let repo_tag_trailing = format!("{} ", msg::folder_picker::REPO_TAG.get());
         if self.zone == Zone::Path && !found.is_empty() {
             let shown = found.len().min(DROPDOWN_ROWS);
-            let start = self
-                .completion
-                .map(|c| (c + 1).saturating_sub(shown))
-                .unwrap_or(0);
+            // Follows the selection when it (or the list) changed; a wheel
+            // or a bar drag keeps the window where it was put.
+            let key = (self.completion, found.len());
+            if key != self.drop_key {
+                self.drop_key = key;
+                self.drop_top = match self.completion {
+                    Some(c) if c < self.drop_top => c,
+                    Some(c) if c >= self.drop_top + shown => (c + 1).saturating_sub(shown),
+                    Some(_) => self.drop_top,
+                    None => 0,
+                };
+            }
+            let start = self.drop_top.min(found.len() - shown);
+            self.drop_top = start;
+            let rows_h = shown.min(bottom.saturating_sub(inner.y + 1) as usize) as u16;
+            let drop_area = Rect::new(field.x, inner.y + 1, field.width, rows_h);
+            self.drop_area = drop_area;
+            let drop_rows = self.drop_bar.paint(buf, drop_area, found.len(), start);
             for (offset, entry) in found.iter().skip(start).take(shown).enumerate() {
                 let index = start + offset;
                 let y = inner.y + 1 + offset as u16;
                 if y >= bottom {
                     break;
                 }
-                let row = Rect::new(field.x, y, field.width, 1);
+                let row = Rect::new(field.x, y, drop_rows.width, 1);
                 let selected = self.completion == Some(index);
                 let hovered = self.hover == Some(PickerHit::Completion(index));
                 let bg = if selected {
@@ -361,6 +379,8 @@ impl FolderPicker {
                 );
                 dropdown.push((row, PickerHit::Completion(index)));
             }
+        } else {
+            self.drop_bar.hide();
         }
         dropdown.extend(hits);
         crate::pointer_map::from_hits(&dropdown, |h| match h {
@@ -403,6 +423,7 @@ impl FolderPicker {
             }
         }
         self.left_scroll = self.left_scroll.min(rows.len().saturating_sub(height));
+        let area = self.left_bar.paint(buf, area, rows.len(), self.left_scroll);
         for (offset, row) in rows.iter().skip(self.left_scroll).take(height).enumerate() {
             let index = self.left_scroll + offset;
             let y = area.y + offset as u16;
@@ -545,15 +566,15 @@ impl FolderPicker {
             if let Some(sel) = self.content_sel {
                 if sel < self.content_scroll {
                     self.content_scroll = sel;
-                } else if sel >= self.content_scroll + height.saturating_sub(1) {
-                    self.content_scroll = (sel + 1).saturating_sub(height.saturating_sub(1));
+                } else if sel >= self.content_scroll + height {
+                    self.content_scroll = (sel + 1).saturating_sub(height);
                 }
             }
         }
-        // One row is kept for the loading / error / empty note.
-        self.content_scroll = self
-            .content_scroll
-            .min(rows.len().saturating_sub(height.saturating_sub(1)));
+        self.content_scroll = self.content_scroll.min(rows.len().saturating_sub(height));
+        let list = self
+            .content_bar
+            .paint(buf, list, rows.len(), self.content_scroll);
         for (offset, row) in rows
             .iter()
             .skip(self.content_scroll)

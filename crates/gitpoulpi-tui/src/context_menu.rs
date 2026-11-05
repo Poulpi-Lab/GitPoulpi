@@ -44,6 +44,9 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, BorderType, Borders, Paragraph};
 use ratatui::Frame;
 
+mod scroll;
+pub(crate) use scroll::{begin_frame, on_mouse};
+
 use crate::{anchored_popup, display_width, ClippedRender};
 
 /// The `>` at the end of a row that opens a submenu, and the `<` on the
@@ -99,15 +102,25 @@ mod menu_key_tests {
     }
 }
 
-/// The first row drawn when `visible` of `rows` fit and `selected` must
-/// be on screen: 0 until the selection passes the last visible row, then
-/// the smallest scroll that keeps it there.
-pub(crate) fn visible_offset(rows: usize, visible: usize, selected: usize) -> usize {
-    if visible == 0 || rows <= visible {
-        return 0;
+/// Tells two menus apart without making equal menus unequal: ids never
+/// take part in `==`.
+#[derive(Debug, Clone, Copy)]
+struct MenuId(u64);
+
+impl MenuId {
+    fn next() -> Self {
+        static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+        Self(NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
     }
-    (selected + 1).saturating_sub(visible).min(rows - visible)
 }
+
+impl PartialEq for MenuId {
+    fn eq(&self, _: &Self) -> bool {
+        true
+    }
+}
+
+impl Eq for MenuId {}
 
 /// One row of a menu: something to do, a list to drill into, or a rule
 /// between groups.
@@ -249,6 +262,8 @@ pub(crate) struct Menu<A> {
     /// last paint put it.
     closable: bool,
     cross: std::cell::Cell<Option<Rect>>,
+    /// Which menu this is, for the scroll state of a tall one (`scroll`).
+    id: MenuId,
 }
 
 impl<A: Clone> Menu<A> {
@@ -268,6 +283,7 @@ impl<A: Clone> Menu<A> {
             notes: Vec::new(),
             closable: false,
             cross: std::cell::Cell::new(None),
+            id: MenuId::next(),
         };
         menu.selected = menu.edge(false);
         menu
@@ -692,11 +708,12 @@ impl<A: Clone> Menu<A> {
                 Line::from(Span::styled(label, style))
             })
             .collect();
-        // A menu taller than the screen scrolls to keep the selected row
-        // in view (the merged ref+commit menu is ~35 rows). Pure in
-        // `selected`, so drawing needs no scroll state of its own.
+        // A menu taller than the screen (the merged ref+commit menu is ~35
+        // rows) shows a window of its rows with a scrollbar in the right
+        // border: the selection is followed, the wheel and the bar move it.
         let visible = popup.height.saturating_sub(2) as usize;
-        let offset = visible_offset(rows, visible, self.selected);
+        let (offset, bar) =
+            scroll::frame(self.id.0, &self.path, rows, visible, self.selected, popup);
         let lines: Vec<Line> = lines.into_iter().skip(offset).take(visible).collect();
         frame.render_clipped(
             Paragraph::new(lines).block(
@@ -709,6 +726,9 @@ impl<A: Clone> Menu<A> {
             ),
             popup,
         );
+        if let Some(track) = bar {
+            crate::scrollbar::render(frame, track, true, false);
+        }
         self.cross.set(if self.closable {
             crate::chrome::close_cross::paint(frame.buffer_mut(), popup, false)
         } else {
@@ -827,11 +847,12 @@ mod tests {
 
     #[test]
     fn a_tall_menu_scrolls_to_keep_the_selection_visible() {
-        assert_eq!(visible_offset(10, 20, 9), 0, "fits: no scroll");
-        assert_eq!(visible_offset(30, 10, 0), 0);
-        assert_eq!(visible_offset(30, 10, 9), 0);
-        assert_eq!(visible_offset(30, 10, 10), 1);
-        assert_eq!(visible_offset(30, 10, 29), 20);
+        use super::scroll::follow;
+        assert_eq!(follow(0, 9, 10), 0);
+        assert_eq!(follow(0, 10, 10), 1);
+        assert_eq!(follow(0, 29, 10), 20);
+        assert_eq!(follow(20, 25, 10), 20, "inside the window: it stays");
+        assert_eq!(follow(20, 5, 10), 5);
     }
 
     #[test]
@@ -1115,5 +1136,125 @@ mod tests {
             keyed.contains(&crate::keymap::Action::RefsSolo),
             "{keyed:?}"
         );
+    }
+
+    /// 30 rows `r00`..`r29` in a 60x12 screen: 10 fit.
+    fn tall() -> Menu<A> {
+        Menu::new(
+            "tall",
+            (0..30)
+                .map(|i| Entry::action(format!("r{i:02}"), A::One))
+                .collect(),
+            0,
+            0,
+        )
+    }
+
+    fn paint(m: &Menu<A>) -> ratatui::buffer::Buffer {
+        use ratatui::backend::TestBackend;
+        let mut terminal = ratatui::Terminal::new(TestBackend::new(60, 12)).unwrap();
+        crate::scrollbar::begin_frame();
+        begin_frame();
+        terminal.draw(|f| drop(m.render(f, None))).unwrap();
+        terminal.backend().buffer().clone()
+    }
+
+    fn mouse(
+        kind: crossterm::event::MouseEventKind,
+        col: u16,
+        row: u16,
+    ) -> crossterm::event::MouseEvent {
+        crossterm::event::MouseEvent {
+            kind,
+            column: col,
+            row,
+            modifiers: KeyModifiers::NONE,
+        }
+    }
+
+    fn text_of(buf: &ratatui::buffer::Buffer) -> String {
+        (0..buf.area.height)
+            .map(|y| {
+                (0..buf.area.width)
+                    .map(|x| buf[(x, y)].symbol())
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+
+    #[test]
+    fn a_menu_taller_than_the_screen_draws_a_bar_and_one_that_fits_does_not() {
+        let m = tall();
+        let buf = paint(&m);
+        let track = scroll::track().expect("a bar");
+        assert_eq!(buf[(track.rect.x, track.rect.y)].symbol(), "\u{2191}");
+        assert_eq!(
+            buf[(track.rect.x, track.rect.bottom() - 1)].symbol(),
+            "\u{2193}"
+        );
+        paint(&menu());
+        assert!(scroll::track().is_none(), "a menu that fits has no bar");
+    }
+
+    #[test]
+    fn the_bar_drags_the_wheel_scrolls_and_the_selection_is_followed() {
+        use crossterm::event::{MouseButton, MouseEventKind};
+        let mut m = tall();
+        paint(&m);
+        let track = scroll::track().unwrap();
+        let x = track.rect.x;
+        // The thumb dragged past the bottom: the window is at the end and the
+        // selection did not move.
+        let down = track.rect.y + track.thumb_start;
+        assert!(on_mouse(mouse(
+            MouseEventKind::Down(MouseButton::Left),
+            x,
+            down
+        )));
+        assert!(on_mouse(mouse(
+            MouseEventKind::Drag(MouseButton::Left),
+            x,
+            track.rect.bottom() + 2
+        )));
+        assert!(on_mouse(mouse(
+            MouseEventKind::Up(MouseButton::Left),
+            x,
+            track.rect.bottom() + 2
+        )));
+        let buf = paint(&m);
+        assert_eq!(scroll::top(), 20);
+        assert!(text_of(&buf).contains("r29"));
+        assert_eq!(m.selected(), 0);
+        // The wheel over the popup scrolls it back; off the popup it is not ours.
+        assert!(on_mouse(mouse(MouseEventKind::ScrollUp, 5, 5)));
+        assert_eq!(scroll::top(), 17);
+        assert!(!on_mouse(mouse(MouseEventKind::ScrollUp, 59, 11)));
+        // A key moves the selection and the window comes to it.
+        paint(&m);
+        for _ in 0..3 {
+            m.on_key(KeyCode::Up);
+        }
+        assert_eq!(m.selected(), 27);
+        let buf = paint(&m);
+        assert!(text_of(&buf).contains("r27"), "{}", text_of(&buf));
+        m.on_key(KeyCode::Home);
+        paint(&m);
+        assert_eq!(scroll::top(), 0);
+    }
+
+    #[test]
+    fn a_closed_menu_takes_no_click() {
+        use crossterm::event::{MouseButton, MouseEventKind};
+        let m = tall();
+        paint(&m);
+        let track = scroll::track().unwrap();
+        // The next frame paints no menu: the registry is empty.
+        begin_frame();
+        assert!(!on_mouse(mouse(
+            MouseEventKind::Down(MouseButton::Left),
+            track.rect.x,
+            track.rect.y + 2
+        )));
     }
 }

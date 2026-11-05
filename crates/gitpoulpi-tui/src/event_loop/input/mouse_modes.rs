@@ -571,6 +571,14 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                     Some(RewriteHit::PopupRow(_)) => {
                         view.wheel_id(crate::rewrite_view::BarId::Popup, step);
                     }
+                    // A question is open: the wheel scrolls its prompt.
+                    Some(
+                        RewriteHit::QuestionShield
+                        | RewriteHit::QuestionCancel
+                        | RewriteHit::Answer(_),
+                    ) => {
+                        view.wheel_id(crate::rewrite_view::BarId::Question, step);
+                    }
                     Some(RewriteHit::Bar(id)) => {
                         view.wheel_id(id, step);
                     }

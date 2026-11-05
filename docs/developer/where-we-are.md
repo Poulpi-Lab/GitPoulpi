@@ -738,6 +738,23 @@ without the fix; keep it that way.
   `arrow_step` is a dead click: there is no plain variant any more.
 - A popup lights its own bars from its own pointer (`scrollbar::with_pointer`),
   never the global one, so nothing behind it hovers.
+- **No scrollable area without a bar, and a guard says so.**
+  `scrollbar_guard_tests.rs` fails for a source file (its code, not its test
+  modules) that windows a list with `.skip(..).take(..)`, or renders a ratatui
+  `List`/`Table` with a state or a `Paragraph` with `.scroll(..)`, without the
+  shared bar code; its two allow-lists (`PENDING`, `STATEFUL_PENDING`) only
+  shrink. A file that merely imports a `Combo` is not exempt.
+- A window that follows a selection must follow it **when the selection moves**
+  (remember the cursor it last followed), never on every paint: a paint that
+  re-clamps to the cursor undoes the wheel and the bar (the workspace dialog's
+  repository list did).
+- A tall context menu keeps its scroll state in `context_menu/scroll.rs`
+  (one menu is open at a time; `Menu::render` takes `&self`): the registry is
+  cleared as a frame starts, refilled by the paint, and `event_loop::input`
+  offers every mouse event to it before anything else, because the bar sits on
+  the popup's border where no hit target is registered.
+- Header text above a list (`rewrite_view/head.rs`) is clipped by priority so
+  the list keeps `MIN_LIST` rows in a short pane; informing lines go first.
 
 ### Highlighted without acting
 

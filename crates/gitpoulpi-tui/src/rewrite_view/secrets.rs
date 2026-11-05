@@ -25,6 +25,7 @@ use gitpoulpi_i18n::M;
 use gitpoulpi_ipc::rewrite::ScanSecretsArgs;
 
 use super::bars::BarId;
+use super::head;
 use super::render::{bad, bold, dim, plain, row_bg, warn, wrap, RewriteHit, Ui};
 use super::{DetailForm, Focus, Notice, PreviewTab, RewriteView};
 use crate::daemon_link::Reply;
@@ -348,16 +349,32 @@ impl RewriteView {
         let width = body.width.saturating_sub(2) as usize;
         let mut y = body.y;
         let bottom = body.bottom();
-        let lines = |ui: &mut Ui<'_>, y: &mut u16, text: &str, style: Style, max: usize| {
-            for line in wrap(text, width).into_iter().take(max) {
-                if *y >= bottom {
-                    return;
-                }
-                ui.text(x, *y, w, &line, style);
-                *y += 1;
-            }
+        // With a list to show, the header text stops above its last rows:
+        // the informing lines go first, the warning and the error stay.
+        let list_follows = self.secrets.result.is_some() && !self.findings().is_empty();
+        let cap = if list_follows {
+            head::cap(body, 2)
+        } else {
+            bottom
         };
-        lines(ui, &mut y, s::ROTATE_FIRST.get(), warn(), 2);
+        let reserve = u16::from(self.secrets_stale_reason().is_some())
+            + self
+                .secrets
+                .error
+                .as_ref()
+                .map_or(0, |why| wrap(why, width).len().min(2) as u16);
+        let lines =
+            |ui: &mut Ui<'_>, y: &mut u16, text: &str, style: Style, max: usize, optional: bool| {
+                let stop = head::limit(cap, reserve, optional).min(bottom);
+                for line in wrap(text, width).into_iter().take(max) {
+                    if *y >= stop {
+                        return;
+                    }
+                    ui.text(x, *y, w, &line, style);
+                    *y += 1;
+                }
+            };
+        lines(ui, &mut y, s::ROTATE_FIRST.get(), warn(), 2, false);
 
         // The scan button (a Cancel while it runs) and what was read.
         if y < bottom {
@@ -385,14 +402,14 @@ impl RewriteView {
             if r.scan.blobs_skipped_large > 0 {
                 parts.push(s::skipped_large(r.scan.blobs_skipped_large));
             }
-            lines(ui, &mut y, &parts.join("; "), dim(), 2);
+            lines(ui, &mut y, &parts.join("; "), dim(), 2, true);
         }
-        lines(ui, &mut y, s::NOT_EXHAUSTIVE.get(), dim(), 2);
+        lines(ui, &mut y, s::NOT_EXHAUSTIVE.get(), dim(), 2, true);
         if let Some(reason) = self.secrets_stale_reason() {
-            lines(ui, &mut y, reason.get(), warn(), 1);
+            lines(ui, &mut y, reason.get(), warn(), 1, false);
         }
         if let Some(why) = &self.secrets.error {
-            lines(ui, &mut y, why, bad(), 2);
+            lines(ui, &mut y, why, bad(), 2, false);
         }
         if y >= bottom {
             return;
@@ -401,12 +418,12 @@ impl RewriteView {
         let findings = self.findings();
         if self.secrets.result.is_none() {
             if !self.scanning() {
-                lines(ui, &mut y, s::IDLE.get(), plain(), 3);
+                lines(ui, &mut y, s::IDLE.get(), plain(), 3, false);
             }
             return;
         }
         if findings.is_empty() {
-            lines(ui, &mut y, s::NONE_FOUND.get(), plain(), 1);
+            lines(ui, &mut y, s::NONE_FOUND.get(), plain(), 1, false);
             return;
         }
 

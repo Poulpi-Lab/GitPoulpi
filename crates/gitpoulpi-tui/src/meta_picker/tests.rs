@@ -492,3 +492,41 @@ fn a_value_row_is_the_arrow_lit_as_a_whole_and_its_checkbox_the_hand() {
     let other = hit_rect(&p, Hit::Row(0));
     assert_ne!(buf[(other.x + 8, other.y)].bg, crate::th().ui.hover);
 }
+
+#[test]
+fn the_wheel_and_the_bar_move_the_list_and_a_paint_does_not_undo_them() {
+    let mut p = picker(MetaField::Labels, None, false);
+    for i in 0..40 {
+        p.items.push(Item {
+            value: format!("extra{i}"),
+            label: format!("extra{i}"),
+            detail: String::new(),
+            color: None,
+            badge: None,
+        });
+    }
+    p.refilter();
+    let mut buf = Buffer::empty(Rect::new(0, 0, 100, 30));
+    p.render(buf.area, &mut buf, None);
+    let track = p.bar.expect("40 rows overflow");
+    assert_eq!(buf[(track.rect.x, track.rect.y)].symbol(), "\u{2191}");
+    // The wheel over the list: the window moves, the cursor stays.
+    let (row, _) = *p.hits.iter().find(|(_, h)| *h == Hit::Row(0)).unwrap();
+    for _ in 0..3 {
+        p.on_mouse(MouseEvent {
+            kind: MouseEventKind::ScrollDown,
+            column: row.x + 2,
+            row: row.y,
+            modifiers: KeyModifiers::NONE,
+        });
+    }
+    let scrolled = p.offset;
+    assert!(scrolled > 0 && p.cursor == 0, "offset {scrolled}");
+    p.render(buf.area, &mut buf, None);
+    p.render(buf.area, &mut buf, None);
+    assert_eq!(p.offset, scrolled, "a paint does not undo the wheel");
+    // A key moves the cursor and the window comes back to it.
+    p.on_key(key(KeyCode::Down));
+    p.render(buf.area, &mut buf, None);
+    assert!(p.offset <= p.cursor && p.cursor < p.offset + p.rows_visible);
+}

@@ -13,16 +13,9 @@ use std::path::Path;
 const PENDING: &[&str] = &[
     // Not a list the user scrolls: pixel / text-cell windows.
     "commit_column/picture.rs",
-    "image_view/header.rs",
     "text_select.rs",
     "file_selection.rs",
     "log_multiselect.rs",
-    // A menu taller than the screen follows its selection (no scroll state
-    // to drag).
-    "context_menu.rs",
-    // Lists still to get their bar.
-    "folder_picker/render.rs",
-    "repo_switcher.rs",
 ];
 
 const BAR_MARKERS: &[&str] = &[
@@ -33,8 +26,7 @@ const BAR_MARKERS: &[&str] = &[
     "BarDrag",
     "render_buf",
     "popup_list",
-    "Combo",
-    "combo::",
+    "_bar.paint(",
 ];
 
 fn walk(dir: &Path, out: &mut Vec<std::path::PathBuf>) {
@@ -53,6 +45,14 @@ fn walk(dir: &Path, out: &mut Vec<std::path::PathBuf>) {
             out.push(path);
         }
     }
+}
+
+/// The file's own code: an inline `#[cfg(test)]` module windows lists of
+/// test fixtures, not of the screen.
+fn code_of(source: &str) -> &str {
+    source
+        .rfind("#[cfg(test)]\nmod ")
+        .map_or(source, |at| &source[..at])
 }
 
 fn windows_a_list(source: &str) -> bool {
@@ -83,6 +83,52 @@ fn windows_a_list(source: &str) -> bool {
         }
         rest = after;
     }
+    windows_a_range(&squeezed)
+}
+
+/// `(first..len).take(rows)`: a window cut from a range of indexes.
+fn windows_a_range(squeezed: &str) -> bool {
+    let bytes = squeezed.as_bytes();
+    let mut from = 0;
+    while let Some(at) = squeezed[from..].find(").take(") {
+        let close = from + at;
+        from = close + 1;
+        // Walk back to the matching open parenthesis.
+        let mut depth = 0usize;
+        let mut open = None;
+        for i in (0..=close).rev() {
+            match bytes[i] {
+                b')' => depth += 1,
+                b'(' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        open = Some(i);
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        // A bare parenthesised range, not a call's arguments (`zip(a[..n]..)`);
+        // `in(` is the `for .. in (..)` of a loop.
+        let bare = |open: usize| {
+            let word = |b: u8| b.is_ascii_alphanumeric() || b == b'_';
+            open == 0
+                || !word(bytes[open - 1])
+                || (open >= 2
+                    && &bytes[open - 2..open] == b"in"
+                    && (open < 3 || !word(bytes[open - 3])))
+        };
+        if let Some(open) = open.filter(|&o| bare(o)) {
+            let inside = &squeezed[open + 1..close];
+            // A range with a variable start: `offset..list.len()`.
+            if let Some((start, _)) = inside.split_once("..") {
+                if !start.is_empty() && start != "0" && !start.contains('(') {
+                    return true;
+                }
+            }
+        }
+    }
     false
 }
 
@@ -99,7 +145,8 @@ fn every_windowed_list_draws_the_scrollbar() {
             .to_string_lossy()
             .replace('\\', "/");
         let text = std::fs::read_to_string(&path).unwrap();
-        if windows_a_list(&text)
+        let text = code_of(&text);
+        if windows_a_list(text)
             && !BAR_MARKERS.iter().any(|m| text.contains(m))
             && !PENDING.contains(&rel.as_str())
         {
@@ -113,9 +160,57 @@ fn every_windowed_list_draws_the_scrollbar() {
     // The allow-list only shrinks: an entry that now has its bar goes.
     for rel in PENDING {
         let text = std::fs::read_to_string(src.join(rel)).unwrap();
+        let text = code_of(&text);
         assert!(
-            !BAR_MARKERS.iter().any(|m| text.contains(m)) || !windows_a_list(&text),
+            windows_a_list(text),
+            "{rel} windows no list any more: take it off PENDING"
+        );
+        assert!(
+            !BAR_MARKERS.iter().any(|m| text.contains(m)),
             "{rel} has its bar now: take it off PENDING"
         );
     }
+}
+
+/// A list drawn through ratatui's own scrolling (`List` / `Table` with a
+/// state, a `Paragraph` with `.scroll(..)`) scrolls just as much as a
+/// `.skip().take()` window: a file that renders one must go through the
+/// scrollbar code too, or be listed here with why it has none.
+const STATEFUL_PENDING: &[&str] = &[];
+
+fn scrolls_through_ratatui(source: &str) -> bool {
+    [
+        "render_stateful_widget",
+        "render_stateful_clipped",
+        ".scroll((",
+    ]
+    .iter()
+    .any(|m| source.contains(m))
+}
+
+#[test]
+fn every_stateful_list_and_scrolled_paragraph_draws_the_scrollbar() {
+    let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+    let mut files = Vec::new();
+    walk(&src, &mut files);
+    let mut missing = Vec::new();
+    for path in files {
+        let rel = path
+            .strip_prefix(&src)
+            .unwrap()
+            .to_string_lossy()
+            .replace('\\', "/");
+        let text = std::fs::read_to_string(&path).unwrap();
+        let text = code_of(&text);
+        if scrolls_through_ratatui(text)
+            && !BAR_MARKERS.iter().any(|m| text.contains(m))
+            && !STATEFUL_PENDING.contains(&rel.as_str())
+        {
+            missing.push(rel);
+        }
+    }
+    assert!(
+        missing.is_empty(),
+        "these files scroll a List, Table or Paragraph without the shared scrollbar: {missing:?}"
+    );
 }

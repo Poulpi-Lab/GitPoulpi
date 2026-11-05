@@ -236,6 +236,9 @@ pub(crate) struct MetaPicker {
     free: Option<usize>,
     cursor: usize,
     offset: usize,
+    /// What the window was last scrolled to the cursor for (cursor, rows): a
+    /// wheel turn or a bar drag moves it away and it stays until that changes.
+    followed: (usize, usize),
     focus: Focus,
     /// The milestone choice.
     combo: Combo,
@@ -289,6 +292,7 @@ impl MetaPicker {
             shown: Vec::new(),
             cursor: 0,
             offset: 0,
+            followed: (usize::MAX, 0),
             focus: if field.is_single() {
                 Focus::Combo
             } else {

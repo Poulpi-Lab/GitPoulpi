@@ -24,6 +24,7 @@ use gitpoulpi_i18n::M;
 use gitpoulpi_ipc::rewrite::AnalyzeArgs;
 
 use super::bars::BarId;
+use super::head;
 use super::render::{bad, bold, dim, plain, row_bg, warn, wrap, RewriteHit, Ui};
 use super::{DetailForm, Focus, Notice, PreviewTab, RewriteView};
 use crate::daemon_link::Reply;
@@ -505,15 +506,32 @@ impl RewriteView {
         let width = body.width.saturating_sub(2) as usize;
         let mut y = body.y;
         let bottom = body.bottom();
-        let lines = |ui: &mut Ui<'_>, y: &mut u16, text: &str, style: Style, max: usize| {
-            for line in wrap(text, width).into_iter().take(max) {
-                if *y >= bottom {
-                    return;
-                }
-                ui.text(x, *y, w, &line, style);
-                *y += 1;
-            }
+        // With a list to show, the header text stops above its last rows (the
+        // Show / Sort row and the actions row stay): the informing lines go
+        // first, the warning and the error stay.
+        let list_follows = self.size.result.is_some() && !self.rows().is_empty();
+        let cap = if list_follows {
+            head::cap(body, 3)
+        } else {
+            bottom
         };
+        let reserve = u16::from(self.size_stale_reason().is_some())
+            + self
+                .size
+                .error
+                .as_ref()
+                .map_or(0, |why| wrap(why, width).len().min(2) as u16);
+        let lines =
+            |ui: &mut Ui<'_>, y: &mut u16, text: &str, style: Style, max: usize, optional: bool| {
+                let stop = head::limit(cap, reserve, optional).min(bottom);
+                for line in wrap(text, width).into_iter().take(max) {
+                    if *y >= stop {
+                        return;
+                    }
+                    ui.text(x, *y, w, &line, style);
+                    *y += 1;
+                }
+            };
 
         // The run button (a Cancel while it runs) and the figures.
         if y < bottom {
@@ -539,30 +557,30 @@ impl RewriteView {
                 human_size(a.bytes_total),
                 human_size(a.disk_total),
             );
-            lines(ui, &mut y, &summary, dim(), 2);
+            lines(ui, &mut y, &summary, dim(), 2, true);
             let totals = z::totals(
                 human_size(a.bytes_in_head),
                 human_size(a.bytes_history_only),
             );
-            lines(ui, &mut y, &totals, dim(), 1);
+            lines(ui, &mut y, &totals, dim(), 1, true);
             if a.blobs_cut + a.folders_cut + a.deleted_cut > 0 {
                 let cut = a.blobs_cut.max(a.folders_cut).max(a.deleted_cut);
-                lines(ui, &mut y, &z::capped(a.top, cut), dim(), 2);
+                lines(ui, &mut y, &z::capped(a.top, cut), dim(), 2, true);
             }
         }
         if let Some(reason) = self.size_stale_reason() {
-            lines(ui, &mut y, reason.get(), warn(), 1);
+            lines(ui, &mut y, reason.get(), warn(), 1, false);
         }
         if let Some(why) = &self.size.error {
-            lines(ui, &mut y, why, bad(), 2);
+            lines(ui, &mut y, why, bad(), 2, false);
         }
         if y >= bottom {
             return;
         }
         if self.size.result.is_none() {
             if !self.analysing() {
-                lines(ui, &mut y, z::INTRO.get(), plain(), 3);
-                lines(ui, &mut y, z::IDLE.get(), dim(), 3);
+                lines(ui, &mut y, z::INTRO.get(), plain(), 3, false);
+                lines(ui, &mut y, z::IDLE.get(), dim(), 3, false);
             }
             return;
         }
@@ -599,7 +617,7 @@ impl RewriteView {
 
         let rows = self.rows();
         if rows.is_empty() {
-            lines(ui, &mut y, z::NONE_FOUND.get(), plain(), 1);
+            lines(ui, &mut y, z::NONE_FOUND.get(), plain(), 1, false);
             return;
         }
 

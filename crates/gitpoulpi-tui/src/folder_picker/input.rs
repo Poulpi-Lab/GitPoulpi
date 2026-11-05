@@ -350,6 +350,10 @@ impl FolderPicker {
         {
             return PickerOutcome::Stay;
         }
+        // The lists' scrollbars take their presses and thumb drags first.
+        if self.bar_mouse(mouse) {
+            return PickerOutcome::Stay;
+        }
         // A splitter drag in progress claims every move and its release,
         // wherever the pointer strays.
         if self.dragging_splitter {
@@ -386,7 +390,9 @@ impl FolderPicker {
                 } else {
                     -3
                 };
-                if self.content_area.contains((col, row).into()) {
+                if self.drop_area.contains((col, row).into()) {
+                    self.drop_top = (self.drop_top as isize + delta).max(0) as usize;
+                } else if self.content_area.contains((col, row).into()) {
                     self.content_scroll = (self.content_scroll as isize + delta).max(0) as usize;
                 } else if self.left_area.contains((col, row).into()) {
                     self.left_scroll = (self.left_scroll as isize + delta).max(0) as usize;

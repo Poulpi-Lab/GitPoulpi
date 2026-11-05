@@ -223,6 +223,11 @@ fn handle_mouse_inner(
         apply_jobs_goto(cx);
         return Ok(Flow::Handled);
     }
+    // A tall context menu's scrollbar and wheel (the popup floats over all).
+    if crate::context_menu::on_mouse(mouse) {
+        *cx.hovered_target = None;
+        return Ok(Flow::Handled);
+    }
     // The version chip at the right end of the status bar: the Release notes.
     // Settings covers the status bar: its stale chip rect must not take a click.
     if crate::updates::chip::route_mouse(mouse)

@@ -352,6 +352,12 @@ pub(super) fn editing_commit_message(
 
 /// The AI commit-composer review: hover, click (the wheel scrolls the list).
 pub(super) fn composer_review(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<Flow> {
+    // The list's scrollbar takes its own presses and the drag of its thumb.
+    if let InputMode::ComposeCommits(form) = &mut *cx.input_mode {
+        if form.on_bar_mouse(mouse) {
+            return Ok(Flow::Handled);
+        }
+    }
     match mouse.kind {
         MouseEventKind::Moved => {
             *cx.hovered_target = find_hit_target(&*cx.hit_targets, mouse.column, mouse.row);
@@ -422,6 +428,9 @@ pub(super) fn split_commit(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Re
     if form.assign_combo_open() {
         form.on_combo_mouse(mouse);
         *cx.hovered_target = None;
+        return Ok(Flow::Handled);
+    }
+    if form.changes_bar_mouse(mouse) {
         return Ok(Flow::Handled);
     }
     let part = split_hit_at(&*cx.hit_targets, mouse.column, mouse.row);
@@ -510,8 +519,15 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                 }
                 None => {}
             },
-            MouseEventKind::Drag(MouseButton::Left) => view.on_rules_ai_bar_mouse(mouse),
-            MouseEventKind::Up(MouseButton::Left) => view.on_rules_ai_bar_mouse(mouse),
+            // A held scrollbar thumb follows the pointer, even off the bar.
+            MouseEventKind::Drag(MouseButton::Left) => {
+                view.on_rules_ai_bar_mouse(mouse);
+                view.bar_drag(mouse.row);
+            }
+            MouseEventKind::Up(MouseButton::Left) => {
+                view.on_rules_ai_bar_mouse(mouse);
+                view.bar_release();
+            }
             MouseEventKind::ScrollUp | MouseEventKind::ScrollDown => {
                 let step = if mouse.kind == MouseEventKind::ScrollUp {
                     -3
@@ -525,23 +541,37 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                     }
                     Some(RewriteHit::AiSent) => view.on_ai_wheel(step),
                     Some(hit) if hit.is_rules_ai() => view.on_rules_ai_wheel(hit, step),
-                    Some(RewriteHit::DrillDiff | RewriteHit::DrillPath(_)) => {
-                        view.drill_scroll(step)
+                    Some(RewriteHit::DrillDiff) => view.drill_scroll(step),
+                    Some(RewriteHit::DrillPath(_)) => {
+                        view.wheel_id(crate::rewrite_view::BarId::DrillFiles, step);
                     }
-                    Some(RewriteHit::Pane(focus)) => view.on_wheel(focus, step),
+                    Some(RewriteHit::Pane(focus)) => view.on_wheel(focus, mouse.row, step),
                     Some(RewriteHit::Rule(_) | RewriteHit::RuleCheck(_)) => {
-                        view.on_wheel(crate::rewrite_view::Focus::Rules, step)
+                        view.on_wheel(crate::rewrite_view::Focus::Rules, mouse.row, step)
                     }
                     Some(RewriteHit::Field(_)) => {
-                        view.on_wheel(crate::rewrite_view::Focus::Detail, step)
+                        view.on_wheel(crate::rewrite_view::Focus::Detail, mouse.row, step)
                     }
                     Some(
                         RewriteHit::Row(_)
                         | RewriteHit::ProtectedRow(_)
                         | RewriteHit::PushRow(_)
                         | RewriteHit::SecretRow(_)
-                        | RewriteHit::SizeRow(_),
-                    ) => view.on_wheel(crate::rewrite_view::Focus::Preview, step),
+                        | RewriteHit::SizeRow(_)
+                        | RewriteHit::IdentRow(_),
+                    ) => view.on_wheel(crate::rewrite_view::Focus::Preview, mouse.row, step),
+                    Some(RewriteHit::HostLink(_) | RewriteHit::HostPanel) => {
+                        view.wheel_id(crate::rewrite_view::BarId::Howto, step);
+                    }
+                    Some(RewriteHit::IdentPick(_)) => {
+                        view.wheel_id(crate::rewrite_view::BarId::IdentPick, step);
+                    }
+                    Some(RewriteHit::PopupRow(_)) => {
+                        view.wheel_id(crate::rewrite_view::BarId::Popup, step);
+                    }
+                    Some(RewriteHit::Bar(id)) => {
+                        view.wheel_id(id, step);
+                    }
                     _ => {}
                 }
             }
@@ -578,6 +608,18 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
 
 /// The interactive rebase / cherry-pick popup, same rule as the others.
 pub(super) fn interactive_rebase(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<Flow> {
+    // The list's scrollbar takes its own presses and the drag of its thumb;
+    // the wheel scrolls the list under the pointer.
+    if let InputMode::InteractiveRebase(form) = &mut *cx.input_mode {
+        if form.on_bar_mouse(mouse) {
+            return Ok(Flow::Handled);
+        }
+        match mouse.kind {
+            MouseEventKind::ScrollUp => form.on_wheel(-3),
+            MouseEventKind::ScrollDown => form.on_wheel(3),
+            _ => {}
+        }
+    }
     match (mouse.kind, &mut *cx.input_mode) {
         (MouseEventKind::Moved, _) => {
             *cx.hovered_target = find_hit_target(&*cx.hit_targets, mouse.column, mouse.row);

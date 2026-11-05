@@ -135,7 +135,7 @@ pub struct WorkspacesPage {
     expanded: HashSet<String>,
     pub selected: usize,
     pub scroll: usize,
-    follow: bool,
+    pub(super) follow: bool,
     list_height: usize,
     /// What a walk over a workspace is doing right now ("fetching Acme: 2
     /// of 5..."), shown on the footer line until it ends.
@@ -554,7 +554,6 @@ pub(super) fn render(
     hits: &mut Vec<(Rect, ManagerHit)>,
 ) {
     lines.push(Line::default());
-    let width = area.width as usize;
     let hover = manager.hover;
 
     // Buttons.
@@ -625,6 +624,25 @@ pub(super) fn render(
         .ws
         .scroll
         .min(rows.len().saturating_sub(list_height.max(1)));
+    // A list longer than its room keeps the last column for the scrollbar.
+    manager.bar = crate::scrollbar::Track::column(
+        Rect::new(
+            (area.x + area.width).saturating_sub(1),
+            list_top,
+            1,
+            list_height as u16,
+        ),
+        rows.len(),
+        list_height,
+        manager.ws.scroll,
+    );
+    let area = Rect::new(
+        area.x,
+        area.y,
+        area.width - u16::from(manager.bar.is_some()),
+        area.height,
+    );
+    let list_w = area.width as usize;
 
     if manager.ws.entries.is_empty() {
         let mut c = Cursor::new(area, list_top);
@@ -672,9 +690,9 @@ pub(super) fn render(
             ManagerHit::Ws(WsHit::Row(offset)),
         ));
         lines.push(if selected {
-            highlight(line, width, th().ui.selection)
+            highlight(line, list_w, th().ui.selection)
         } else if matches_row(hover, offset) {
-            highlight(line, width, th().ui.hover)
+            highlight(line, list_w, th().ui.hover)
         } else {
             line
         });

@@ -147,6 +147,14 @@ pub(crate) struct RebaseForm {
     pub(crate) head_sha: Option<String>,
     /// What a rebase replays onto, for the header ("Rebasing X onto Y").
     pub(crate) onto_label: Option<String>,
+    /// The first row the wheel or the scrollbar put on top, and the row that
+    /// was selected then: any move of the selection follows it again.
+    scroll: std::cell::Cell<Option<(usize, usize)>>,
+    /// The window the last paint showed: first row, rows visible, rows in all.
+    window: std::cell::Cell<(usize, usize, usize)>,
+    /// The list's scrollbar as the last paint drew it, and the thumb held.
+    bar: std::cell::Cell<Option<crate::scrollbar::Track>>,
+    bar_drag: crate::scrollbar::BarDrag,
 }
 
 impl RebaseForm {
@@ -176,6 +184,32 @@ impl RebaseForm {
             split_armed: None,
             head_sha: None,
             onto_label: None,
+            scroll: std::cell::Cell::new(None),
+            window: std::cell::Cell::new((0, 0, 0)),
+            bar: std::cell::Cell::new(None),
+            bar_drag: Default::default(),
+        }
+    }
+
+    /// The wheel scrolls the list `delta` rows; the selection stays put (it
+    /// may leave the window). The keyboard twin is the selection keys.
+    pub(crate) fn on_wheel(&mut self, delta: isize) {
+        let (offset, rows, count) = self.window.get();
+        let max = count.saturating_sub(rows);
+        let to = (offset as isize + delta).clamp(0, max as isize) as usize;
+        self.scroll.set(Some((to, self.cursor)));
+    }
+
+    /// The list's scrollbar: a press on it, a drag of the thumb. `true` when
+    /// the bar took the event.
+    pub(crate) fn on_bar_mouse(&mut self, mouse: crossterm::event::MouseEvent) -> bool {
+        let (offset, _, count) = self.window.get();
+        match self.bar_drag.on_mouse(self.bar.get(), mouse, count, offset) {
+            Some(top) => {
+                self.scroll.set(Some((top, self.cursor)));
+                true
+            }
+            None => false,
         }
     }
 

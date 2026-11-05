@@ -457,6 +457,23 @@ impl RadarUi {
                 _ => {}
             }
         }
+        // The list's scrollbar: thumb grab and drag (even off the bar), a press
+        // on the track jumping the thumb, the end arrows.
+        if !(self.combo_of(Hit::Scope).is_open()
+            || self.combo_of(Hit::View).is_open()
+            || self.combo_of(Hit::Who).is_open()
+            || self.combo_of(Hit::Snooze).is_open()
+            || self.menu.is_some())
+        {
+            if let Some(top) = self
+                .bar_drag
+                .on_mouse(self.bar, mouse, self.rows.len(), self.scroll)
+            {
+                self.scroll = top;
+                self.follow = false;
+                return Outcome::None;
+            }
+        }
         // Popups own the pointer: first, and nothing behind one hovers.
         for which in [Hit::Scope, Hit::View, Hit::Who, Hit::Snooze] {
             if self.combo_of(which).is_open() {

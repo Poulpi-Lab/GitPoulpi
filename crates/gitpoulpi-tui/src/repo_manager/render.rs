@@ -294,7 +294,22 @@ pub fn render(manager: &mut RepoManager, area: Rect) -> ManagerRender {
     manager.scroll = manager
         .scroll
         .min(rows.len().saturating_sub(list_height.max(1)));
-    let cols = measure(manager, width);
+    // A list longer than its room keeps the last column for the scrollbar.
+    manager.bar = crate::scrollbar::Track::column(
+        Rect::new(
+            (area.x + area.width).saturating_sub(1),
+            list_top,
+            1,
+            list_height as u16,
+        ),
+        rows.len(),
+        list_height,
+        manager.scroll,
+    );
+    let bar = manager.bar.is_some();
+    let list_area = Rect::new(area.x, area.y, area.width - u16::from(bar), area.height);
+    let list_w = list_area.width as usize;
+    let cols = measure(manager, list_w);
 
     for (offset, row) in rows
         .iter()
@@ -307,9 +322,9 @@ pub fn render(manager: &mut RepoManager, area: Rect) -> ManagerRender {
         // band from the first draw.
         let selected = offset == manager.selected && !manager.search_focused;
         let line = match *row {
-            ManagerRow::Header(section) => header_line(manager, section, area, y, &mut hits),
+            ManagerRow::Header(section) => header_line(manager, section, list_area, y, &mut hits),
             ManagerRow::Empty(section) => {
-                let mut c = Cursor::new(area, y);
+                let mut c = Cursor::new(list_area, y);
                 c.push(
                     &format!("      {}", section.empty_text()),
                     Style::default()
@@ -318,14 +333,14 @@ pub fn render(manager: &mut RepoManager, area: Rect) -> ManagerRender {
                 );
                 c.line()
             }
-            ManagerRow::Repo { section, repo } => {
-                repo_line(manager, section, repo, offset, cols, area, y, &mut hits)
-            }
+            ManagerRow::Repo { section, repo } => repo_line(
+                manager, section, repo, offset, cols, list_area, y, &mut hits,
+            ),
         };
         let line = if selected {
-            highlight(line, width, th().ui.selection)
+            highlight(line, list_w, th().ui.selection)
         } else if matches_row(hover, offset, *row) {
-            highlight(line, width, th().ui.hover)
+            highlight(line, list_w, th().ui.hover)
         } else {
             line
         };

@@ -1,3 +1,4 @@
+mod bars;
 mod i18n;
 mod input;
 mod plan;

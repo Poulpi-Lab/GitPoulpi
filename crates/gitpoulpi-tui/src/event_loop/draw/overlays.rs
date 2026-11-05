@@ -133,7 +133,8 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         };
         let render = if manager.radar.is_open() || manager.notes.is_open() {
             // The Radar and the Release notes cover the list; each keeps
-            // its own hit rects.
+            // its own hit rects. The list's bar is not there to press.
+            manager.bar = None;
             if manager.notes.is_open() {
                 manager.notes.render(frame, body);
             } else {
@@ -148,6 +149,9 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         } else {
             let render = listed.expect("laid out above when not covered");
             frame.render_clipped(Paragraph::new(render.lines.clone()), body);
+            if let Some(track) = manager.bar {
+                crate::scrollbar::render(frame, track, true, false);
+            }
             paint_buttons(frame);
             // The jobs indicator ends the key-hint line, where room is left.
             let reserved = if bar.width >= button_w + 40 {

@@ -54,6 +54,9 @@ struct Open {
     list: Rect,
     buttons: Vec<(Rect, Button)>,
     close: dialog_kit::CloseHit,
+    /// The list's scrollbar as last painted, and the thumb held.
+    bar: Option<crate::scrollbar::Track>,
+    bar_drag: crate::scrollbar::BarDrag,
 }
 
 static POPUP: Mutex<Option<Open>> = Mutex::new(None);
@@ -70,6 +73,8 @@ pub(crate) fn open(base_ref: &str, files: &[String]) {
             list: Rect::default(),
             buttons: Vec::new(),
             close: Default::default(),
+            bar: None,
+            bar_drag: Default::default(),
         });
     }
 }
@@ -148,6 +153,14 @@ pub(crate) fn on_mouse(mouse: MouseEvent) -> Option<PopupAction> {
         .iter()
         .find(|(rect, _)| rect.contains(at))
         .map(|(_, b)| *b);
+    // The list's scrollbar takes its own presses and the drag of its thumb.
+    if let Some(top) = open
+        .bar_drag
+        .on_mouse(open.bar, mouse, open.files.len(), open.top)
+    {
+        open.top = top;
+        return None;
+    }
     match mouse.kind {
         MouseEventKind::Moved | MouseEventKind::Drag(_) => {
             open.hovered = over;
@@ -209,6 +222,16 @@ pub(crate) fn render(frame: &mut Frame) {
         outer.width.saturating_sub(4),
         rows,
     );
+    // The bar rides the box's right border, beside the rows.
+    open.bar = crate::scrollbar::Track::column(
+        Rect::new(outer.right() - 1, list.y, 1, rows),
+        open.files.len(),
+        open.rows(),
+        open.top,
+    );
+    if let Some(track) = open.bar {
+        crate::scrollbar::render_buf(buf, track, true, false);
+    }
     let more_below = open.files.len() > open.top + open.rows();
     for (i, file) in open
         .files

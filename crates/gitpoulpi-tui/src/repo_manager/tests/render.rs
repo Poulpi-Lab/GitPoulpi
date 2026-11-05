@@ -165,3 +165,57 @@ fn the_preselected_row_is_highlighted_without_an_arrow_marker() {
         }
     }
 }
+
+/// A list longer than its room keeps its last column for the scrollbar and
+/// shows none when everything fits; a drag on the thumb moves the list.
+#[test]
+fn a_long_list_has_a_scrollbar_the_thumb_drags() {
+    use crossterm::event::{KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
+    let repos: Vec<KnownRepo> = (0..60)
+        .map(|i| {
+            let mut r = repo(&format!("r{i:02}"));
+            r.recent = Some(i);
+            r
+        })
+        .collect();
+    let mut m = RepoManager::new(repos);
+    let area = Rect::new(0, 0, 120, 20);
+    let drawn = render(&mut m, area);
+    let track = m.bar.expect("the list overflows");
+    assert_eq!(track.rect.x, 119);
+    assert!(
+        drawn.hits.iter().all(|(r, _)| r.right() <= track.rect.x),
+        "no row or button runs under the bar"
+    );
+    let (len, top) = m.list_bar_state();
+    assert_eq!(len, m.rows().len());
+    let mouse = |kind, column, row| MouseEvent {
+        kind,
+        column,
+        row,
+        modifiers: KeyModifiers::NONE,
+    };
+    let down = mouse(
+        MouseEventKind::Down(MouseButton::Left),
+        119,
+        track.rect.y + 1,
+    );
+    let top = m
+        .bar_drag
+        .on_mouse(m.bar, down, len, top)
+        .expect("the thumb is held");
+    m.set_list_scroll(top);
+    let drag = mouse(
+        MouseEventKind::Drag(MouseButton::Left),
+        0,
+        track.rect.bottom() + 9,
+    );
+    let top = m.bar_drag.on_mouse(m.bar, drag, len, top).expect("dragged");
+    m.set_list_scroll(top);
+    render(&mut m, area);
+    assert_eq!(m.scroll, len - m.list_height, "dragged to the end");
+    // A page with few rows has no bar.
+    let mut few = manager();
+    render(&mut few, area);
+    assert!(few.bar.is_none());
+}

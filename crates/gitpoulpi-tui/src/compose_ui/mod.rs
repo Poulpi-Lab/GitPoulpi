@@ -96,6 +96,9 @@ pub(crate) struct ComposeForm {
     wheel: std::cell::Cell<Option<(usize, ComposeRow)>>,
     /// The window the last paint showed: first row, rows visible, rows in all.
     window: std::cell::Cell<(usize, usize, usize)>,
+    /// The list's scrollbar as the last paint drew it, and the thumb held.
+    bar: std::cell::Cell<Option<crate::scrollbar::Track>>,
+    bar_drag: crate::scrollbar::BarDrag,
 }
 
 /// A file picked up by a press: `(commit, file)` and, once the pointer has
@@ -155,6 +158,8 @@ impl ComposeForm {
             error: None,
             wheel: std::cell::Cell::new(None),
             window: std::cell::Cell::new((0, 0, 0)),
+            bar: std::cell::Cell::new(None),
+            bar_drag: Default::default(),
         }
     }
 
@@ -165,6 +170,19 @@ impl ComposeForm {
         let max = count.saturating_sub(rows);
         let to = (offset as isize + delta).clamp(0, max as isize) as usize;
         self.wheel.set(Some((to, self.selected)));
+    }
+
+    /// The list's scrollbar: a press on it, a drag of the thumb. `true` when
+    /// the bar took the event. It scrolls the list as the wheel does.
+    pub(crate) fn on_bar_mouse(&mut self, mouse: crossterm::event::MouseEvent) -> bool {
+        let (offset, _, count) = self.window.get();
+        match self.bar_drag.on_mouse(self.bar.get(), mouse, count, offset) {
+            Some(top) => {
+                self.wheel.set(Some((top, self.selected)));
+                true
+            }
+            None => false,
+        }
     }
 
     /// The right pane's file rows are dragged from too.
@@ -679,3 +697,5 @@ pub(crate) fn compose_hit_at(
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod tests_bars;

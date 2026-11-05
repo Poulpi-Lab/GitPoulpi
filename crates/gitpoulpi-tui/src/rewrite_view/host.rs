@@ -21,6 +21,7 @@ use ratatui::style::Style;
 use gitpoulpi_core::domain::rewrite::{HostProtection, HowStep, Loss, PushRefStatus, Way};
 use gitpoulpi_i18n::{msg::rewrite_host as h, M};
 
+use super::bars::BarId;
 use super::render::{bold, dim, plain, row_bg, wrap, RewriteHit};
 use super::{Notice, RewriteView};
 use crate::dialog_kit::{self, ButtonState};
@@ -422,13 +423,27 @@ impl RewriteView {
             .iter()
             .position(|l| matches!(l, Line::Link(i, _) if *i == open.link));
         let mut top = open.scroll.min(lines.len().saturating_sub(room));
-        if let Some(row) = picked_row {
+        if self.bar_free(BarId::Howto, Some(open.link)) {
+            // The bar or the wheel put the text here, and the picked link
+            // has not moved since.
+        } else if let Some(row) = picked_row {
             if row < top {
                 top = row;
             } else if row >= top + room {
                 top = row + 1 - room;
             }
         }
+        self.paint_bar_on(
+            buf,
+            &mut hits,
+            hovered == Some(RewriteHit::Bar(BarId::Howto)),
+            BarId::Howto,
+            (rect.right() - 1, body.y, body.height),
+            lines.len(),
+            room,
+            top,
+            Some(open.link),
+        );
         for (slot, line) in lines.iter().skip(top).take(room).enumerate() {
             let y = body.y + slot as u16;
             match line {

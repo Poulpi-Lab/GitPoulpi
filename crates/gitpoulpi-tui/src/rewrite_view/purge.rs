@@ -28,6 +28,7 @@ use gitpoulpi_i18n::msg::{rewrite_purge as p, rewrite_view as t};
 use gitpoulpi_i18n::M;
 use gitpoulpi_ipc::rewrite::PurgeArgs;
 
+use super::bars::BarId;
 use super::render::{bad, bold, dim, plain, row_bg, warn, wrap, RewriteHit};
 use super::{RewriteKeyOutcome, RewriteView};
 use crate::daemon_link::Reply;
@@ -105,7 +106,7 @@ pub(crate) struct PurgeScreen {
     /// Opened by the palette: closing it closes the workbench too.
     pub standalone: bool,
     /// First row shown, and whether the next paint scrolls to the cursor.
-    scroll: Cell<usize>,
+    pub(super) scroll: Cell<usize>,
     follow: Cell<bool>,
     room: Cell<usize>,
 }
@@ -879,6 +880,17 @@ impl RewriteView {
         s.scroll.set(scroll);
         let mut fine: Vec<(Rect, RewriteHit)> = Vec::new();
         let mut coarse: Vec<(Rect, RewriteHit)> = Vec::new();
+        self.paint_bar_on(
+            buf,
+            &mut fine,
+            hot(RewriteHit::Bar(BarId::Purge)),
+            BarId::Purge,
+            (inner.right(), body.y, body.height),
+            rows.len(),
+            room,
+            scroll,
+            None,
+        );
         let blockers = s.blockers();
         for (slot, row) in rows.iter().enumerate().skip(scroll).take(room) {
             let y = body.y + (slot - scroll) as u16;

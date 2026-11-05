@@ -27,6 +27,7 @@
 // of what the model offers is only reached by the tests.
 #![allow(dead_code, unused_imports)]
 
+mod bars;
 mod drill;
 mod host;
 mod identities;
@@ -69,6 +70,7 @@ use crate::daemon_link::{Reply, Requester};
 use crate::keymap::Action as Bind;
 use crate::text_edit::{Caret, KeyEdit};
 
+pub(crate) use bars::BarId;
 pub(crate) use drill::{Drill, DrillDiff};
 pub(crate) use host::{HostHandle, HostState};
 pub(crate) use identities::{Candidate, IdentitiesState, MergePick};
@@ -1856,6 +1858,15 @@ impl RewriteView {
             KeyCode::Enter if plain && self.tab == PreviewTab::Commits => {
                 self.open_drill(self.rows.cursor)
             }
+            // The Refs tab's list of moving refs has no cursor: its pages are
+            // the keys' twin of its scrollbar (Up and Down move the protected
+            // list's).
+            KeyCode::PageUp | KeyCode::PageDown
+                if self.tab == PreviewTab::Refs
+                    && self.page_bar(
+                        bars::BarId::RefsMoving,
+                        if key.code == KeyCode::PageUp { -1 } else { 1 },
+                    ) => {}
             KeyCode::PageUp => self.move_preview_cursor(-10),
             KeyCode::PageDown => self.move_preview_cursor(10),
             KeyCode::Char(' ') | KeyCode::Enter if plain && self.tab == PreviewTab::Refs => {
@@ -1897,7 +1908,8 @@ impl RewriteView {
             PreviewTab::Secrets => self.move_secret_cursor(delta),
             PreviewTab::Identities => self.move_identity_cursor(delta),
             PreviewTab::Size => self.move_size_cursor(delta),
-            _ => {}
+            // Summary and Impact are text: the keys scroll it.
+            PreviewTab::Summary | PreviewTab::Impact => self.scroll_text(delta),
         }
     }
 

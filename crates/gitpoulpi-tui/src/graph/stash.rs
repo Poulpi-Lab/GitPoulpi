@@ -110,7 +110,7 @@ pub(crate) struct LogRows {
     /// index of every shown commit, ascending. `None` shows them all. The
     /// held list is what every `nodes.get(i)` of the event loop reads, so
     /// `entry` answers in held indices whatever the Log draws.
-    shown: Option<Vec<usize>>,
+    shown: Option<std::sync::Arc<Vec<usize>>>,
 }
 
 impl LogRows {
@@ -124,7 +124,7 @@ impl LogRows {
 
     /// The same rows over a Solo-filtered list: `shown` is the held index of
     /// each commit the Log draws, ascending.
-    pub(crate) fn with_shown(mut self, shown: Option<Vec<usize>>) -> LogRows {
+    pub(crate) fn with_shown(mut self, shown: Option<std::sync::Arc<Vec<usize>>>) -> LogRows {
         self.shown = shown;
         self
     }
@@ -141,7 +141,7 @@ impl LogRows {
 
     /// How many rows the Log has for `commits` commits.
     pub(crate) fn len(&self, commits: usize) -> usize {
-        let commits = self.shown.as_ref().map_or(commits, Vec::len);
+        let commits = self.shown.as_ref().map_or(commits, |shown| shown.len());
         usize::from(self.wip) + self.slots.len() + commits
     }
 
@@ -218,7 +218,7 @@ mod solo_rows_tests {
     /// indices (what `nodes.get(i)` reads), not in positions of the drawn list.
     #[test]
     fn a_solo_filtered_log_answers_in_held_indices() {
-        let rows = LogRows::new(true, Vec::new()).with_shown(Some(vec![1, 3]));
+        let rows = LogRows::new(true, Vec::new()).with_shown(Some(std::sync::Arc::new(vec![1, 3])));
         assert_eq!(rows.len(4), 3, "WIP plus the two shown commits");
         assert_eq!(rows.entry(0), LogEntry::Wip);
         assert_eq!(rows.entry(1), LogEntry::Commit(1));

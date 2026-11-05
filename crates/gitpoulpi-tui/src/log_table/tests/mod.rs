@@ -64,5 +64,6 @@ mod render;
 mod scroll_keys;
 mod search;
 mod select_band;
+mod solo_shown;
 mod stash;
 mod wip;

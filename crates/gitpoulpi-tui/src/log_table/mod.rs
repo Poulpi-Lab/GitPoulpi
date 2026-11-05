@@ -113,10 +113,10 @@ pub(crate) fn log_len_now(
     refs_result: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Ref>>,
     rows: &graph::LogRows,
 ) -> usize {
-    let commits = log_result
-        .as_ref()
-        .map(|g| apply_solo_filter(&g.nodes, solo_refs, refs_result).len())
-        .unwrap_or(0);
+    // `rows` already counts the shown commits under Solo; the held count
+    // serves when it shows them all.
+    let commits = log_result.as_ref().map(|g| g.nodes.len()).unwrap_or(0);
+    let _ = (solo_refs, refs_result);
     rows.len(commits)
 }
 
@@ -200,34 +200,80 @@ pub(crate) fn solo_target_oid(solo_ref: &str, refs: &[gitpoulpi_core::domain::Re
         .map(|r| r.target)
 }
 
+/// What the last [`solo_shown_indices`] answer was computed from.
+#[derive(PartialEq, Eq)]
+struct ShownKey {
+    /// The held list's buffer and shape: a refresh or a page replaces or
+    /// grows it, a new walk changes its ends.
+    nodes_at: usize,
+    len: usize,
+    first: Option<Oid>,
+    last: Option<Oid>,
+    /// Where the soloed refs point now (the refs version, as far as Solo
+    /// can tell).
+    targets: std::collections::HashSet<Oid>,
+}
+
+type Shown = Option<std::sync::Arc<Vec<usize>>>;
+
+thread_local! {
+    static SHOWN_MEMO: std::cell::RefCell<Option<(ShownKey, Shown)>> =
+        const { std::cell::RefCell::new(None) };
+    /// How many times the reachability pass ran on this thread (tests).
+    static SHOWN_COMPUTES: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 /// The held indices of the commits `apply_solo_filter` keeps, or `None`
 /// when it keeps them all (no Solo, or nothing to resolve).
+///
+/// The reachability pass over every held commit runs only when what it
+/// depends on changed (the held list, where the soloed refs point): this is
+/// asked every frame, and a repository of 100k commits must not pay for it
+/// on each one.
 pub(crate) fn solo_shown_indices(
     nodes: &[CommitNode],
     solo_refs: &std::collections::HashSet<String>,
     refs: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Ref>>,
-) -> Option<Vec<usize>> {
+) -> Shown {
     if solo_refs.is_empty() {
         return None;
     }
     let refs = refs.as_ref().ok()?;
-    let targets: Vec<Oid> = solo_refs
+    let targets: std::collections::HashSet<Oid> = solo_refs
         .iter()
         .filter_map(|name| solo_target_oid(name, refs))
         .collect();
-    let kept = solo_filter_nodes(nodes, &targets);
-    if kept.is_empty() {
-        return None;
-    }
-    let ids: std::collections::HashSet<Oid> = kept.iter().map(|c| c.id).collect();
-    Some(
-        nodes
-            .iter()
-            .enumerate()
-            .filter(|(_, c)| ids.contains(&c.id))
-            .map(|(i, _)| i)
-            .collect(),
-    )
+    let key = ShownKey {
+        nodes_at: nodes.as_ptr() as usize,
+        len: nodes.len(),
+        first: nodes.first().map(|c| c.id),
+        last: nodes.last().map(|c| c.id),
+        targets,
+    };
+    SHOWN_MEMO.with(|memo| {
+        let mut memo = memo.borrow_mut();
+        if let Some((held, value)) = memo.as_ref() {
+            if *held == key {
+                return value.clone();
+            }
+        }
+        SHOWN_COMPUTES.with(|n| n.set(n.get() + 1));
+        let targets: Vec<Oid> = key.targets.iter().copied().collect();
+        let kept = solo_filter_nodes(nodes, &targets);
+        let value = (!kept.is_empty()).then(|| {
+            let ids: std::collections::HashSet<Oid> = kept.iter().map(|c| c.id).collect();
+            std::sync::Arc::new(
+                nodes
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, c)| ids.contains(&c.id))
+                    .map(|(i, _)| i)
+                    .collect::<Vec<usize>>(),
+            )
+        });
+        *memo = Some((key, value.clone()));
+        value
+    })
 }
 
 /// Every commit reachable from any oid in `targets` by walking `parents`

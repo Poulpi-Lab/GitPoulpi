@@ -13,15 +13,12 @@ use std::path::Path;
 const PENDING: &[&str] = &[
     // Not a list the user scrolls: pixel / text-cell windows.
     "commit_column/picture.rs",
-    "image_view/header.rs",
     "text_select.rs",
     "file_selection.rs",
     "log_multiselect.rs",
     // A menu taller than the screen follows its selection (no scroll state
     // to drag).
     "context_menu.rs",
-    // Lists still to get their bar.
-    "repo_switcher.rs",
     // Another change owns it.
     "rewrite_view/script_ai.rs",
 ];
@@ -55,6 +52,14 @@ fn walk(dir: &Path, out: &mut Vec<std::path::PathBuf>) {
             out.push(path);
         }
     }
+}
+
+/// The file's own code: an inline `#[cfg(test)]` module windows lists of
+/// test fixtures, not of the screen.
+fn code_of(source: &str) -> &str {
+    source
+        .rfind("#[cfg(test)]\nmod ")
+        .map_or(source, |at| &source[..at])
 }
 
 fn windows_a_list(source: &str) -> bool {
@@ -101,7 +106,8 @@ fn every_windowed_list_draws_the_scrollbar() {
             .to_string_lossy()
             .replace('\\', "/");
         let text = std::fs::read_to_string(&path).unwrap();
-        if windows_a_list(&text)
+        let text = code_of(&text);
+        if windows_a_list(text)
             && !BAR_MARKERS.iter().any(|m| text.contains(m))
             && !PENDING.contains(&rel.as_str())
         {
@@ -115,8 +121,13 @@ fn every_windowed_list_draws_the_scrollbar() {
     // The allow-list only shrinks: an entry that now has its bar goes.
     for rel in PENDING {
         let text = std::fs::read_to_string(src.join(rel)).unwrap();
+        let text = code_of(&text);
         assert!(
-            !BAR_MARKERS.iter().any(|m| text.contains(m)) || !windows_a_list(&text),
+            windows_a_list(text),
+            "{rel} windows no list any more: take it off PENDING"
+        );
+        assert!(
+            !BAR_MARKERS.iter().any(|m| text.contains(m)),
             "{rel} has its bar now: take it off PENDING"
         );
     }

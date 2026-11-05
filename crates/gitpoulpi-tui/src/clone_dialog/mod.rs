@@ -32,12 +32,13 @@
 //! `clone_task` (the daemon, off the input loop), started by the owner
 //! (`repo_dialogs`) from [`CloneOutcome::Submit`].
 
+mod anchor;
 mod dest;
 mod dismiss;
 mod groups;
 mod render;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
@@ -226,6 +227,14 @@ pub(crate) struct CloneDialog {
     edit: crate::text_edit::FieldEditor<CloneFocus>,
     hosted: Vec<HostedSource>,
     projects: HashMap<String, ProjectsState>,
+    /// Profiles whose shown list is a saved copy, a fresh one on its way.
+    refreshing: HashSet<String>,
+    /// Profiles whose refresh failed: the saved list stays, with the reason
+    /// in the Activity Log.
+    refresh_failed: HashMap<String, String>,
+    /// The host's fresh list, held while the scrollbar thumb is dragged (a
+    /// swap under the pointer would move the rows being dragged).
+    pending_fresh: Option<(String, Vec<HostedProject>)>,
     /// What was typed in the repository search.
     search: String,
     /// The highlighted repository of the filtered list (headers are never
@@ -296,6 +305,9 @@ impl CloneDialog {
             hits: Vec::new(),
             hosted: Vec::new(),
             projects: HashMap::new(),
+            refreshing: HashSet::new(),
+            refresh_failed: HashMap::new(),
+            pending_fresh: None,
             search: String::new(),
             repo_cursor: 0,
             repo_offset: 0,
@@ -402,25 +414,140 @@ impl CloneDialog {
         }
     }
 
-    /// Answers a [`CloneOutcome::LoadProjects`].
+    /// Answers a [`CloneOutcome::LoadProjects`] (a plain answer: no saved
+    /// copy, the token not rejected).
     #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
     pub(crate) fn set_projects(
         &mut self,
         profile_id: &str,
         result: Result<Vec<HostedProject>, String>,
     ) {
-        let state = match result {
-            Ok(list) => ProjectsState::Ready(list),
+        self.set_projects_answer(profile_id, result, false);
+    }
+
+    /// The saved copy of a profile's list: shown at once while the host's
+    /// answer is on its way. Ignored once something else is showing.
+    #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+    pub(crate) fn set_cached_projects(&mut self, profile_id: &str, list: Vec<HostedProject>) {
+        if !matches!(
+            self.projects.get(profile_id),
+            None | Some(ProjectsState::Loading)
+        ) {
+            return;
+        }
+        let has_target = self.target.as_ref().is_some_and(|(project, _)| {
+            list.iter()
+                .any(|p| p.full_name.eq_ignore_ascii_case(project))
+        });
+        self.projects
+            .insert(profile_id.to_string(), ProjectsState::Ready(list));
+        self.refreshing.insert(profile_id.to_string());
+        self.refresh_failed.remove(profile_id);
+        // A target missing from the copy waits for the host's list.
+        if has_target {
+            self.settle_target(profile_id);
+        }
+    }
+
+    /// The host's answer for a profile. `unauthorized`: the token was
+    /// rejected, so a saved copy must not stand in for the list.
+    #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+    pub(crate) fn set_projects_answer(
+        &mut self,
+        profile_id: &str,
+        result: Result<Vec<HostedProject>, String>,
+        unauthorized: bool,
+    ) {
+        let showing = matches!(self.projects.get(profile_id), Some(ProjectsState::Ready(_)));
+        match result {
+            Ok(fresh) if showing => {
+                let on_it = self
+                    .hosted_source()
+                    .is_some_and(|s| s.profile_id == profile_id);
+                if on_it && self.bar_drag.held() {
+                    self.pending_fresh = Some((profile_id.to_string(), fresh));
+                } else {
+                    self.apply_fresh(profile_id, fresh);
+                }
+            }
+            Ok(list) => {
+                self.refreshing.remove(profile_id);
+                self.projects
+                    .insert(profile_id.to_string(), ProjectsState::Ready(list));
+                self.settle_target(profile_id);
+            }
             Err(why) => {
                 crate::activity_log::report_problem(
                     crate::activity_log::ProblemSource::Hosting,
                     &why,
                 );
-                self.message = Some(msg::clone::list_failed(&why));
-                ProjectsState::Failed(why)
+                self.refreshing.remove(profile_id);
+                self.pending_fresh = None;
+                if showing && !unauthorized {
+                    self.refresh_failed.insert(profile_id.to_string(), why);
+                } else {
+                    self.refresh_failed.remove(profile_id);
+                    self.message = Some(msg::clone::list_failed(&why));
+                    self.projects
+                        .insert(profile_id.to_string(), ProjectsState::Failed(why));
+                    self.settle_target(profile_id);
+                }
             }
-        };
-        self.projects.insert(profile_id.to_string(), state);
+        }
+    }
+
+    /// Swaps the shown list for the host's, keeping the highlighted project
+    /// highlighted and the viewport on the same projects (see [`anchor`]),
+    /// and the chosen project chosen unless it left the host.
+    fn apply_fresh(&mut self, profile_id: &str, fresh: Vec<HostedProject>) {
+        let on_it = self
+            .hosted_source()
+            .is_some_and(|s| s.profile_id == profile_id);
+        let held = on_it.then(|| {
+            let cursor = self
+                .filtered()
+                .get(self.repo_cursor)
+                .map(|p| p.full_name.to_lowercase());
+            anchor::capture(
+                anchor::row_keys(&self.grouped()),
+                cursor,
+                self.repo_offset,
+                LIST_ROWS,
+            )
+        });
+        self.projects
+            .insert(profile_id.to_string(), ProjectsState::Ready(fresh));
+        self.refreshing.remove(profile_id);
+        self.refresh_failed.remove(profile_id);
+        if let Some(held) = held {
+            let rows = anchor::row_keys(&self.grouped());
+            (self.repo_cursor, self.repo_offset) = anchor::restore(&held, &rows, LIST_ROWS);
+        }
+        // Rows moved: neither the hover nor a hit painted before the swap
+        // may point at another project.
+        self.hover = None;
+        self.hits
+            .retain(|(_, hit)| !matches!(hit, CloneHit::Repo(_)));
+        if on_it {
+            if let Some(name) = self.chosen.clone() {
+                let url = match self.projects.get(profile_id) {
+                    Some(ProjectsState::Ready(list)) => list
+                        .iter()
+                        .find(|p| p.full_name.eq_ignore_ascii_case(&name))
+                        .map(|p| p.clone_url(false).map(str::to_string)),
+                    _ => None,
+                };
+                match url {
+                    Some(url) => self.hosted_url = url.or(self.hosted_url.take()),
+                    None => {
+                        self.chosen = None;
+                        self.hosted_url = None;
+                        self.sync_name();
+                        self.message = Some(msg::clone::chosen_gone(&name));
+                    }
+                }
+            }
+        }
         self.settle_target(profile_id);
     }
 
@@ -614,6 +741,11 @@ impl CloneDialog {
     /// Called every loop turn: carries the probe, a Clone waiting for it,
     /// and the rested source's list request on. Never waits.
     pub(crate) fn poll(&mut self) -> CloneOutcome {
+        if !self.bar_drag.held() {
+            if let Some((id, fresh)) = self.pending_fresh.take() {
+                self.apply_fresh(&id, fresh);
+            }
+        }
         if self.busy() {
             return CloneOutcome::Stay;
         }

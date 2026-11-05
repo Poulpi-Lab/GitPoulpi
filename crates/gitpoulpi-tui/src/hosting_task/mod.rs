@@ -902,12 +902,24 @@ impl HostingWorker {
 
 // -- a provider's project list ------------------------------------------------
 
+/// Which answer of a project-list fetch this is.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ListPhase {
+    /// The saved copy, sent first when there is one.
+    Cached,
+    /// The host's answer (or failure): the last message of a fetch.
+    Final,
+}
+
 /// What a project-list fetch reports: the repositories the profile's token
 /// can see (the Clone dialog's hosted sources, the ISSUES repository
 /// dropdown, the pull-request form's repository dropdowns).
 pub(crate) struct ProjectsAnswer {
     pub(crate) profile_id: String,
     pub(crate) result: Result<Vec<gitpoulpi_hosting::HostedProject>, String>,
+    pub(crate) phase: ListPhase,
+    /// The host rejected the token: a saved list must not stand in for it.
+    pub(crate) unauthorized: bool,
 }
 
 /// A provider's project list, as far as it got.
@@ -918,8 +930,16 @@ pub(crate) enum ProjectsState {
     Failed(String),
 }
 
+/// Where a fetch keeps the saved copy of its list.
+pub(crate) struct ListCacheJob {
+    pub(crate) dir: PathBuf,
+    pub(crate) key: gitpoulpi_hosting::list_cache::ListKey,
+}
+
 pub(crate) struct ProjectsReceiver {
     rx: mpsc::Receiver<ProjectsAnswer>,
+    /// Set when the receiver is dropped: the worker stops and stores nothing.
+    cancelled: Arc<std::sync::atomic::AtomicBool>,
 }
 
 impl ProjectsReceiver {
@@ -928,18 +948,47 @@ impl ProjectsReceiver {
     }
 }
 
+impl Drop for ProjectsReceiver {
+    fn drop(&mut self) {
+        self.cancelled
+            .store(true, std::sync::atomic::Ordering::SeqCst);
+    }
+}
+
+/// How often a running fetch looks at its cancel flag.
+const CANCEL_POLL: Duration = Duration::from_millis(100);
+
 /// Lists `integration`'s projects on their own thread (a token lookup is a
 /// subprocess and the listing is many HTTP pages: never on the input
-/// thread), answering once on the returned channel.
+/// thread). With `cache`, the saved copy is sent first ([`ListPhase::Cached`]),
+/// the fresh list is saved when it lands, and the stale files are pruned; the
+/// host's answer is always one [`ListPhase::Final`] message. A dropped
+/// receiver cancels the fetch.
 pub(crate) fn start_projects(
     factory: Arc<dyn ClientFactory>,
     integration: Integration,
     all: Vec<Integration>,
+    cache: Option<ListCacheJob>,
 ) -> ProjectsReceiver {
+    use gitpoulpi_hosting::list_cache;
+    use std::sync::atomic::Ordering;
     let (tx, rx) = mpsc::channel();
+    let cancelled = Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let flag = Arc::clone(&cancelled);
     std::thread::spawn(move || {
         let profile_id = integration.id.clone();
-        let result = (|| {
+        if let Some(job) = &cache {
+            if let Some(saved) = list_cache::load(&job.dir, &job.key) {
+                let _ = tx.send_notify(ProjectsAnswer {
+                    profile_id: profile_id.clone(),
+                    result: Ok(saved.projects),
+                    phase: ListPhase::Cached,
+                    unauthorized: false,
+                });
+            }
+        }
+        let mut unauthorized = false;
+        let fetched = (|| {
             let runtime = tokio::runtime::Builder::new_current_thread()
                 .enable_all()
                 .build()
@@ -947,13 +996,66 @@ pub(crate) fn start_projects(
             let client = factory
                 .client(&integration, &all)
                 .map_err(|e| error_text(&e))?;
-            runtime
-                .block_on(client.list_projects())
-                .map_err(|e| error_text(&e))
+            if flag.load(Ordering::SeqCst) {
+                return Err(String::new());
+            }
+            let outcome = runtime.block_on(async {
+                let list = client.list_projects();
+                tokio::pin!(list);
+                loop {
+                    tokio::select! {
+                        done = &mut list => break Some(done),
+                        () = tokio::time::sleep(CANCEL_POLL) => {
+                            if flag.load(Ordering::SeqCst) {
+                                break None;
+                            }
+                        }
+                    }
+                }
+            });
+            match outcome {
+                None => Err(String::new()),
+                Some(Ok(list)) => Ok(list),
+                Some(Err(e)) => {
+                    unauthorized = matches!(e, HostingError::Unauthorized { .. });
+                    Err(error_text(&e))
+                }
+            }
         })();
-        let _ = tx.send_notify(ProjectsAnswer { profile_id, result });
+        if flag.load(Ordering::SeqCst) {
+            return;
+        }
+        if let Some(job) = &cache {
+            match &fetched {
+                Ok(list) => {
+                    let saved = list_cache::CachedList::new(
+                        job.key.clone(),
+                        unix_now().max(0) as u64,
+                        list.clone(),
+                    );
+                    if list_cache::store(&job.dir, &saved).is_ok() {
+                        let live: Vec<_> = all
+                            .iter()
+                            .filter_map(|i| {
+                                let login = i.user.as_ref().map(|u| u.login.as_str());
+                                list_cache::ListKey::of(i, login)
+                            })
+                            .collect();
+                        list_cache::prune(&job.dir, &live);
+                    }
+                }
+                Err(_) if unauthorized => list_cache::remove(&job.dir, &job.key),
+                Err(_) => {}
+            }
+        }
+        let _ = tx.send_notify(ProjectsAnswer {
+            profile_id,
+            result: fetched,
+            phase: ListPhase::Final,
+            unauthorized,
+        });
     });
-    ProjectsReceiver { rx }
+    ProjectsReceiver { rx, cancelled }
 }
 
 // -- the choices of the New issue form --------------------------------------

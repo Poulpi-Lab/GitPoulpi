@@ -98,7 +98,7 @@ impl HostingUi {
         self.projects
             .insert(profile_id.to_string(), ProjectsState::Loading);
         self.projects_rx
-            .push(start_projects(factory, integration, all));
+            .push(start_projects(factory, integration, all, None));
     }
 
     fn repo_options(&self, profile_id: &str) -> Vec<ComboOption> {

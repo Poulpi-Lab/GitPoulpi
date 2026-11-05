@@ -531,6 +531,8 @@ impl RepoDialogs {
                     .and_then(|s| s.config().repos.clone_root_or_default())
                     .or_else(|| gitpoulpi_config::default_clone_root(Some(cwd)));
                 let hosted = hosted_sources(&crate::pull_request::load_integrations());
+                #[cfg(feature = "hosting")]
+                self.projects_rx.clear();
                 self.dialog = Some(RepoDialog::Clone {
                     form: Box::new(CloneDialog::new(root.as_deref()).with_hosted(hosted)),
                     picker: None,
@@ -566,6 +568,8 @@ impl RepoDialogs {
         if form.message.is_none() {
             form.message = Some(note);
         }
+        #[cfg(feature = "hosting")]
+        self.projects_rx.clear();
         self.dialog = Some(RepoDialog::Clone {
             form: Box::new(form),
             picker: None,
@@ -1669,10 +1673,12 @@ impl RepoDialogs {
                 let all = crate::pull_request::load_integrations();
                 match all.iter().find(|i| i.id == profile_id).cloned() {
                     Some(integration) => {
+                        let cache = clone_list_job(&integration);
                         self.projects_rx.push(crate::hosting_task::start_projects(
                             std::sync::Arc::new(crate::hosting_task::DefaultFactory),
                             integration,
                             all,
+                            cache,
                         ))
                     }
                     None => {
@@ -1688,6 +1694,8 @@ impl RepoDialogs {
             }
             CloneOutcome::Cancel => {
                 self.dialog = None;
+                #[cfg(feature = "hosting")]
+                self.projects_rx.clear();
                 self.review_clone = None;
                 None
             }
@@ -1881,17 +1889,41 @@ impl RepoDialogs {
                 effects.extend(self.on_board(effect));
             }
             // ...and for the Clone dialog's hosted sources.
+            // No Clone dialog open: nobody waits for these, stop the fetches.
+            if !matches!(self.dialog, Some(RepoDialog::Clone { .. })) {
+                #[cfg(feature = "hosting")]
+                self.projects_rx.clear();
+            }
             let mut landed = Vec::new();
-            self.projects_rx.retain(|rx| match rx.try_recv() {
-                Some(answer) => {
+            self.projects_rx.retain(|rx| {
+                // A fetch sends its saved copy, then one final answer: only
+                // the final one ends it.
+                let mut open = true;
+                while let Some(answer) = rx.try_recv() {
+                    open = answer.phase != crate::hosting_task::ListPhase::Final;
                     landed.push(answer);
-                    false
+                    if !open {
+                        break;
+                    }
                 }
-                None => true,
+                open
             });
             for answer in landed {
                 if let Some(RepoDialog::Clone { form, .. }) = self.dialog.as_mut() {
-                    form.set_projects(&answer.profile_id, answer.result);
+                    match answer.phase {
+                        crate::hosting_task::ListPhase::Cached => {
+                            if let Ok(list) = answer.result {
+                                form.set_cached_projects(&answer.profile_id, list);
+                            }
+                        }
+                        crate::hosting_task::ListPhase::Final => {
+                            form.set_projects_answer(
+                                &answer.profile_id,
+                                answer.result,
+                                answer.unauthorized,
+                            );
+                        }
+                    }
                 }
             }
         }
@@ -2108,6 +2140,21 @@ impl RepoDialogs {
 /// carried action is set only now, so `radar::pending`'s expiry never runs
 /// down while the clone does). `message` says the clone landed; the line
 /// returned adds what follows.
+/// Where the Clone dialog keeps the saved repository list of `integration`
+/// (under the cache directory, so `GITPOULPI_CONFIG_DIR` isolates tests), or
+/// `None` when the profile has no host to key it on.
+#[cfg(feature = "hosting")]
+fn clone_list_job(
+    integration: &gitpoulpi_config::Integration,
+) -> Option<crate::hosting_task::ListCacheJob> {
+    let dir = gitpoulpi_config::ConfigPaths::discover()?
+        .cache_dir()
+        .join("clone-lists");
+    let login = integration.user.as_ref().map(|u| u.login.as_str());
+    let key = gitpoulpi_hosting::list_cache::ListKey::of(integration, login)?;
+    Some(crate::hosting_task::ListCacheJob { dir, key })
+}
+
 fn finish_review_clone(root: &Path, carry: crate::after_clone::Carry, message: String) -> String {
     let all = crate::pull_request::load_integrations();
     let state = crate::remotes_ui::repo_state_path(root);

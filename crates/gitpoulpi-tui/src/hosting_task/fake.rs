@@ -104,6 +104,9 @@ impl HostingClient for FakeClient {
         &self.integration
     }
     async fn list_projects(&self) -> gitpoulpi_hosting::Result<Vec<HostedProject>> {
+        if let Some(fail) = self.fail {
+            return Err(fail());
+        }
         Ok(self.projects.clone())
     }
     async fn list_ssh_keys(&self) -> gitpoulpi_hosting::Result<Vec<HostedSshKey>> {

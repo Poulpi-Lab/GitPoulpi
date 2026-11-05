@@ -541,6 +541,30 @@ impl CloneDialog {
             fw,
             Style::default().fg(th().ui.muted).bg(th().ui.panel),
         );
+        // A saved list still showing: the state of its refresh, right-aligned
+        // on the label row (no hit target).
+        let note = self.hosted_source().and_then(|s| {
+            if self.refreshing.contains(&s.profile_id) {
+                Some(msg::clone::REFRESHING.get())
+            } else if self.refresh_failed.contains_key(&s.profile_id) {
+                Some(msg::clone::REFRESH_FAILED.get())
+            } else {
+                None
+            }
+        });
+        if let Some(note) = note {
+            let w = crate::ui_kit::display_width(note) as u16;
+            if w + 14 < fw {
+                dialog_kit::put(
+                    buf,
+                    fx + fw - w,
+                    y,
+                    note,
+                    w,
+                    Style::default().fg(th().ui.muted).bg(th().ui.panel),
+                );
+            }
+        }
         y += 1;
         let search_rect = Rect::new(fx, y, fw, 1);
         dialog_kit::text_input(

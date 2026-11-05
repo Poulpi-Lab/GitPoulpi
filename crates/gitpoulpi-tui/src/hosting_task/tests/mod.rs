@@ -5,6 +5,7 @@ use gitpoulpi_hosting::PullRequestState;
 mod cache;
 mod fetch;
 mod policy;
+mod projects;
 
 fn runtime() -> tokio::runtime::Runtime {
     tokio::runtime::Builder::new_current_thread()

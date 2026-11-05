@@ -153,6 +153,59 @@ pub struct Options {
 pub struct MockHost {
     pub port: u16,
     pub seen: Arc<Mutex<Vec<http::Request>>>,
+    gate: Arc<Gate>,
+}
+
+/// What [`MockHost::hold_lists`] switches: while `held`, repository list
+/// requests wait (and are counted in `waiting`) until released.
+#[derive(Default)]
+struct Gate {
+    state: Mutex<GateState>,
+    cv: std::sync::Condvar,
+}
+
+#[derive(Default)]
+struct GateState {
+    held: bool,
+    waiting: usize,
+}
+
+impl Gate {
+    fn wait_if_held(&self) {
+        let mut state = self.state.lock().unwrap();
+        if !state.held {
+            return;
+        }
+        state.waiting += 1;
+        let mut state = self.cv.wait_while(state, |s| s.held).unwrap();
+        state.waiting -= 1;
+    }
+}
+
+/// Holds the repository list endpoints (`/api/v3/user/repos`,
+/// `/api/v4/projects`) shut until [`ListGate::release`] or drop (a test that
+/// panics never leaves the server stuck).
+pub struct ListGate {
+    gate: Arc<Gate>,
+}
+
+impl ListGate {
+    /// How many list requests are waiting at the gate.
+    pub fn waiting(&self) -> usize {
+        self.gate.state.lock().unwrap().waiting
+    }
+
+    /// Lets the held requests (and later ones) through.
+    pub fn release(&self) {
+        self.gate.state.lock().unwrap().held = false;
+        self.gate.cv.notify_all();
+    }
+}
+
+impl Drop for ListGate {
+    fn drop(&mut self) {
+        self.release();
+    }
 }
 
 impl MockHost {
@@ -162,6 +215,14 @@ impl MockHost {
 
     /// Whether a request with this method and a target containing `needle`
     /// was seen.
+    /// Makes the repository lists wait until the returned gate is released.
+    pub fn hold_lists(&self) -> ListGate {
+        self.gate.state.lock().unwrap().held = true;
+        ListGate {
+            gate: Arc::clone(&self.gate),
+        }
+    }
+
     pub fn saw(&self, method: &str, needle: &str) -> bool {
         self.requests()
             .iter()
@@ -176,10 +237,18 @@ pub fn start(options: Options) -> std::io::Result<MockHost> {
     // Edits to labels, assignees and milestones live here for the life of
     // the mock (see `meta`).
     let meta = Arc::new(meta::Meta::default());
+    let gate = Arc::new(Gate::default());
+    let handler_gate = Arc::clone(&gate);
     let seen = http::serve(listener, move |request| {
+        if request.method == "GET" {
+            let path = request.target.split('?').next().unwrap_or_default();
+            if path == "/api/v3/user/repos" || path == "/api/v4/projects" {
+                handler_gate.wait_if_held();
+            }
+        }
         route(request, port, &options, &meta)
     });
-    Ok(MockHost { port, seen })
+    Ok(MockHost { port, seen, gate })
 }
 
 /// The tiny HTTP/1.1 loop under every mock of this workspace.

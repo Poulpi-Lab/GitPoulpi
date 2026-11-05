@@ -153,8 +153,8 @@ předponou (`Ctrl+G s`).
 | `log` | `compare_swap` | Prohodit konce porovnání | `x` |
 | `log` | `compare_next` | Přejít na další porovnávaný řádek | `n` |
 | `log` | `pick_column` | Vybrat sloupec k přesunu nebo změně šířky | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | Posunout sloupce doleva | `Shift+Left` |
+| `log` | `scroll_right` | Posunout sloupce doprava | `Shift+Right` |
 | `log` | `copy_mermaid` | Zkopírovat commity jako Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Vybrat další sloupec | `Tab` |
 | `log_columns` | `prev` | Vybrat předchozí sloupec | `Shift+BackTab` |
@@ -163,9 +163,9 @@ předponou (`Ctrl+G s`).
 | `log_columns` | `wider` | Rozšířit sloupec | `]` |
 | `log_columns` | `narrower` | Zúžit sloupec | `[` |
 | `log_columns` | `reset_width` | Obnovit šířky sloupců | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | Přizpůsobit sloupec obsahu | `=` |
+| `log_columns` | `fit_all` | Přizpůsobit všechny sloupce obsahu | `+` |
+| `log_columns` | `layout` | Posouvat do stran nebo přizpůsobit panelu | `s` |
 | `log_files` | `collapse_all` | Sbalit nebo rozbalit všechny složky | `z` |
 | `log_files` | `filter` | Filtrovat změněné soubory | `/` |
 | `log_files` | `expand_all` | Rozbalit všechny složky | `=` |
@@ -659,8 +659,8 @@ Klávesy jsou výchozí.
 | Flow: Pokračovat v zastavené akci nebo ji přerušit... |  |
 | Flow: Přepnout seskupení větví |  |
 | Flow: Nastavení workflow... |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| Remote: Skrýt remote v grafu... |  |
+| Remote: Zobrazit remote v grafu... |  |
 | Git: Nová větev na HEAD... | `Ctrl+G b` |
 | Git: Nový tag na HEAD... | `Ctrl+G t` |
 | Git: Push všech neodeslaných tagů | `Ctrl+G U` |
@@ -972,11 +972,11 @@ Klávesy jsou výchozí.
 | Zobrazení: Sloupec Logu: Rozšířit sloupec | `]` |
 | Zobrazení: Sloupec Logu: Zúžit sloupec | `[` |
 | Zobrazení: Sloupec Logu: Obnovit šířky sloupců | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| Zobrazení: Sloupec Logu: Přizpůsobit sloupec obsahu | `=` |
+| Zobrazení: Sloupec Logu: Přizpůsobit všechny sloupce obsahu | `+` |
+| Zobrazení: Log: Posunout sloupce doleva | `Shift+Left` |
+| Zobrazení: Log: Posunout sloupce doprava | `Shift+Right` |
+| Zobrazení: Log: Přepnout posouvání sloupců do stran | `s` |
 | Zobrazení: Log: Vybrat zobrazené sloupce |  |
 | Diff: Otevřít diff vybraného souboru | `Enter` |
 | Diff: Zavřít zobrazení diffu | `Esc` |

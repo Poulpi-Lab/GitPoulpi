@@ -155,8 +155,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `log` | `compare_swap` | Inverti gli estremi del confronto | `x` |
 | `log` | `compare_next` | Vai alla riga confrontata successiva | `n` |
 | `log` | `pick_column` | Scegli una colonna da spostare o ridimensionare | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | Scorri le colonne a sinistra | `Shift+Left` |
+| `log` | `scroll_right` | Scorri le colonne a destra | `Shift+Right` |
 | `log` | `copy_mermaid` | Copia i commit come Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Scegli la colonna successiva | `Tab` |
 | `log_columns` | `prev` | Scegli la colonna precedente | `Shift+BackTab` |
@@ -165,9 +165,9 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `log_columns` | `wider` | Allarga la colonna | `]` |
 | `log_columns` | `narrower` | Restringi la colonna | `[` |
 | `log_columns` | `reset_width` | Reimposta le larghezze delle colonne | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | Adatta la colonna al contenuto | `=` |
+| `log_columns` | `fit_all` | Adatta tutte le colonne al contenuto | `+` |
+| `log_columns` | `layout` | Scorri lateralmente o adatta al pannello | `s` |
 | `log_files` | `collapse_all` | Comprimi o espandi tutte le cartelle | `z` |
 | `log_files` | `filter` | Filtra i file modificati | `/` |
 | `log_files` | `expand_all` | Espandi tutte le cartelle | `=` |
@@ -663,8 +663,8 @@ applicano. I tasti sono quelli predefiniti.
 | Flow: Continua o interrompi l'azione interrotta... |  |
 | Flow: Attiva o disattiva il raggruppamento dei branch |  |
 | Flow: Impostazioni del workflow... |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| Remoto: Nascondi il remoto nel grafo... |  |
+| Remoto: Mostra il remoto nel grafo... |  |
 | Git: Nuovo branch su HEAD... | `Ctrl+G b` |
 | Git: Crea un tag su HEAD... | `Ctrl+G t` |
 | Git: Push di tutti i tag non inviati | `Ctrl+G U` |
@@ -976,11 +976,11 @@ applicano. I tasti sono quelli predefiniti.
 | Vista: Colonna del Log: Allarga la colonna | `]` |
 | Vista: Colonna del Log: Restringi la colonna | `[` |
 | Vista: Colonna del Log: Reimposta le larghezze delle colonne | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| Vista: Colonna del Log: Adatta la colonna al contenuto | `=` |
+| Vista: Colonna del Log: Adatta tutte le colonne al contenuto | `+` |
+| Vista: Log: Scorri le colonne a sinistra | `Shift+Left` |
+| Vista: Log: Scorri le colonne a destra | `Shift+Right` |
+| Vista: Log: Attiva o disattiva lo scorrimento laterale delle colonne | `s` |
 | Vista: Log: Scegli le colonne da mostrare |  |
 | Diff: Apri il diff del file selezionato | `Enter` |
 | Diff: Chiudi la vista diff | `Esc` |

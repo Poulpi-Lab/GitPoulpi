@@ -155,8 +155,8 @@ préfixe (`Ctrl+G s`).
 | `log` | `compare_swap` | Inverser les extrémités de la comparaison | `x` |
 | `log` | `compare_next` | Aller à la ligne comparée suivante | `n` |
 | `log` | `pick_column` | Choisir une colonne (déplacer, taille) | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | Faire défiler les colonnes vers la gauche | `Shift+Left` |
+| `log` | `scroll_right` | Faire défiler les colonnes vers la droite | `Shift+Right` |
 | `log` | `copy_mermaid` | Copier les commits en gitGraph Mermaid | `Shift+Y` |
 | `log_columns` | `next` | Choisir la colonne suivante | `Tab` |
 | `log_columns` | `prev` | Choisir la colonne précédente | `Shift+BackTab` |
@@ -165,9 +165,9 @@ préfixe (`Ctrl+G s`).
 | `log_columns` | `wider` | Élargir la colonne | `]` |
 | `log_columns` | `narrower` | Rétrécir la colonne | `[` |
 | `log_columns` | `reset_width` | Réinitialiser les largeurs des colonnes | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | Ajuster la colonne à son contenu | `=` |
+| `log_columns` | `fit_all` | Ajuster toutes les colonnes à leur contenu | `+` |
+| `log_columns` | `layout` | Défilement latéral ou ajustement au volet | `s` |
 | `log_files` | `collapse_all` | Replier ou déplier tous les dossiers | `z` |
 | `log_files` | `filter` | Filtrer les fichiers modifiés | `/` |
 | `log_files` | `expand_all` | Déplier tous les dossiers | `=` |

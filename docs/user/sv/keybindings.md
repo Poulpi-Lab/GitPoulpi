@@ -154,8 +154,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `log` | `compare_swap` | Byt plats på jämförelsens ändar | `x` |
 | `log` | `compare_next` | Gå till nästa jämförda rad | `n` |
 | `log` | `pick_column` | Välj en kolumn att flytta eller ändra bredd på | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | Rulla kolumnerna åt vänster | `Shift+Left` |
+| `log` | `scroll_right` | Rulla kolumnerna åt höger | `Shift+Right` |
 | `log` | `copy_mermaid` | Kopiera commits som Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Välj nästa kolumn | `Tab` |
 | `log_columns` | `prev` | Välj föregående kolumn | `Shift+BackTab` |
@@ -164,9 +164,9 @@ Varje tangent du kan binda om, med id:t som används i
 | `log_columns` | `wider` | Bredda kolumnen | `]` |
 | `log_columns` | `narrower` | Smalna av kolumnen | `[` |
 | `log_columns` | `reset_width` | Återställ kolumnernas bredder | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | Anpassa kolumnen efter innehållet | `=` |
+| `log_columns` | `fit_all` | Anpassa alla kolumner efter innehållet | `+` |
+| `log_columns` | `layout` | Rulla i sidled eller anpassa efter rutan | `s` |
 | `log_files` | `collapse_all` | Fäll ihop eller ut alla mappar | `z` |
 | `log_files` | `filter` | Filtrera de ändrade filerna | `/` |
 | `log_files` | `expand_all` | Fäll ut alla mappar | `=` |
@@ -661,8 +661,8 @@ Tangenterna är standardvärdena.
 | Flow: Fortsätt eller avbryt stoppad åtgärd... |  |
 | Flow: Växla grupperade grenar |  |
 | Flow: Arbetsflödesinställningar... |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| Remote: Dölj remote i grafen... |  |
+| Remote: Visa remote i grafen... |  |
 | Git: Ny gren vid HEAD... | `Ctrl+G b` |
 | Git: Ny tag vid HEAD... | `Ctrl+G t` |
 | Git: Pusha alla opushade taggar | `Ctrl+G U` |
@@ -974,11 +974,11 @@ Tangenterna är standardvärdena.
 | Vy: Log-kolumn: bredda kolumnen | `]` |
 | Vy: Log-kolumn: smalna av kolumnen | `[` |
 | Vy: Log-kolumn: återställ kolumnernas bredder | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| Vy: Log-kolumn: anpassa kolumnen efter innehållet | `=` |
+| Vy: Log-kolumn: anpassa alla kolumner efter innehållet | `+` |
+| Vy: Log: rulla kolumnerna åt vänster | `Shift+Left` |
+| Vy: Log: rulla kolumnerna åt höger | `Shift+Right` |
+| Vy: Log: växla rullning i sidled för kolumnerna | `s` |
 | Vy: Log: välj vilka kolumner som visas |  |
 | Diff: Öppna diff för vald fil | `Enter` |
 | Diff: Stäng diff-vyn | `Esc` |

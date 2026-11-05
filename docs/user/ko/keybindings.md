@@ -150,8 +150,8 @@ stage_file = "z"
 | `log` | `compare_swap` | 비교 양쪽 바꾸기 | `x` |
 | `log` | `compare_next` | 다음 비교 행으로 이동 | `n` |
 | `log` | `pick_column` | 이동하거나 크기를 바꿀 열 고르기 | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | 열을 왼쪽으로 스크롤 | `Shift+Left` |
+| `log` | `scroll_right` | 열을 오른쪽으로 스크롤 | `Shift+Right` |
 | `log` | `copy_mermaid` | Mermaid gitGraph로 Commits 복사 | `Shift+Y` |
 | `log_columns` | `next` | 다음 열 고르기 | `Tab` |
 | `log_columns` | `prev` | 이전 열 고르기 | `Shift+BackTab` |
@@ -160,9 +160,9 @@ stage_file = "z"
 | `log_columns` | `wider` | 열 넓히기 | `]` |
 | `log_columns` | `narrower` | 열 좁히기 | `[` |
 | `log_columns` | `reset_width` | 열 너비 초기화 | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | 열을 내용에 맞추기 | `=` |
+| `log_columns` | `fit_all` | 모든 열을 내용에 맞추기 | `+` |
+| `log_columns` | `layout` | 옆으로 스크롤 / 창에 맞춤 | `s` |
 | `log_files` | `collapse_all` | 모든 폴더 접기 또는 펼치기 | `z` |
 | `log_files` | `filter` | 변경된 파일 필터 | `/` |
 | `log_files` | `expand_all` | 모든 폴더 펼치기 | `=` |
@@ -652,8 +652,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Flow: 중단된 동작 계속 또는 중단... |  |
 | Flow: 브랜치 묶기 전환 |  |
 | Flow: 워크플로 설정... |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| 리모트: 그래프에서 리모트 숨기기... |  |
+| 리모트: 그래프에 리모트 표시... |  |
 | Git: HEAD에 새 브랜치... | `Ctrl+G b` |
 | Git: HEAD에 새 Tag... | `Ctrl+G t` |
 | Git: push하지 않은 모든 Tag Push | `Ctrl+G U` |
@@ -965,11 +965,11 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 보기: Log 열: 열 넓히기 | `]` |
 | 보기: Log 열: 열 좁히기 | `[` |
 | 보기: Log 열: 열 너비 초기화 | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| 보기: Log 열: 열을 내용에 맞추기 | `=` |
+| 보기: Log 열: 모든 열을 내용에 맞추기 | `+` |
+| 보기: Log: 열을 왼쪽으로 스크롤 | `Shift+Left` |
+| 보기: Log: 열을 오른쪽으로 스크롤 | `Shift+Right` |
+| 보기: Log: 열 옆으로 스크롤 전환 | `s` |
 | 보기: Log: 표시할 열 선택 |  |
 | Diff: 선택한 파일의 Diff 열기 | `Enter` |
 | Diff: Diff 보기 닫기 | `Esc` |

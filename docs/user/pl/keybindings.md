@@ -153,8 +153,8 @@ prefiksem (`Ctrl+G s`).
 | `log` | `compare_swap` | Zamień końce porównania | `x` |
 | `log` | `compare_next` | Przejdź do następnego porównywanego wiersza | `n` |
 | `log` | `pick_column` | Wybierz kolumnę do przesunięcia lub zmiany szerokości | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | Przewiń kolumny w lewo | `Shift+Left` |
+| `log` | `scroll_right` | Przewiń kolumny w prawo | `Shift+Right` |
 | `log` | `copy_mermaid` | Kopiuj commity jako gitGraph Mermaid | `Shift+Y` |
 | `log_columns` | `next` | Wybierz następną kolumnę | `Tab` |
 | `log_columns` | `prev` | Wybierz poprzednią kolumnę | `Shift+BackTab` |
@@ -163,9 +163,9 @@ prefiksem (`Ctrl+G s`).
 | `log_columns` | `wider` | Poszerz kolumnę | `]` |
 | `log_columns` | `narrower` | Zwęź kolumnę | `[` |
 | `log_columns` | `reset_width` | Zresetuj szerokości kolumn | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | Dopasuj kolumnę do zawartości | `=` |
+| `log_columns` | `fit_all` | Dopasuj wszystkie kolumny do zawartości | `+` |
+| `log_columns` | `layout` | Przewijanie w poziomie lub dopasowanie do panelu | `s` |
 | `log_files` | `collapse_all` | Zwiń lub rozwiń wszystkie foldery | `z` |
 | `log_files` | `filter` | Filtruj zmienione pliki | `/` |
 | `log_files` | `expand_all` | Rozwiń wszystkie foldery | `=` |
@@ -658,8 +658,8 @@ zastosowania. Klawisze są domyślne.
 | Flow: Kontynuuj lub przerwij zatrzymaną akcję... |  |
 | Flow: Przełącz grupowanie gałęzi |  |
 | Flow: Ustawienia przepływu pracy... |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| Zdalne: Ukryj zdalne w grafie... |  |
+| Zdalne: Pokaż zdalne w grafie... |  |
 | Git: Nowa gałąź w HEAD... | `Ctrl+G b` |
 | Git: Nowy tag w HEAD... | `Ctrl+G t` |
 | Git: Push wszystkich niewypchniętych tagów | `Ctrl+G U` |
@@ -971,11 +971,11 @@ zastosowania. Klawisze są domyślne.
 | Widok: Kolumna Logu: Poszerz kolumnę | `]` |
 | Widok: Kolumna Logu: Zwęź kolumnę | `[` |
 | Widok: Kolumna Logu: Zresetuj szerokości kolumn | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| Widok: Kolumna Logu: Dopasuj kolumnę do zawartości | `=` |
+| Widok: Kolumna Logu: Dopasuj wszystkie kolumny do zawartości | `+` |
+| Widok: Log: Przewiń kolumny w lewo | `Shift+Left` |
+| Widok: Log: Przewiń kolumny w prawo | `Shift+Right` |
+| Widok: Log: Przełącz przewijanie kolumn w poziomie | `s` |
 | Widok: Log: Wybierz kolumny do pokazania |  |
 | Diff: Otwórz diff zaznaczonego pliku | `Enter` |
 | Diff: Zamknij widok diff | `Esc` |

@@ -154,8 +154,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `log` | `compare_swap` | Karşılaştırma uçlarını değiştir | `x` |
 | `log` | `compare_next` | Sonraki karşılaştırılan satıra git | `n` |
 | `log` | `pick_column` | Taşımak veya boyutlandırmak için bir sütun seç | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | Sütunları Sola Kaydır | `Shift+Left` |
+| `log` | `scroll_right` | Sütunları Sağa Kaydır | `Shift+Right` |
 | `log` | `copy_mermaid` | Commit'ler Mermaid gitGraph Olarak Kopyala | `Shift+Y` |
 | `log_columns` | `next` | Sonraki sütunu seç | `Tab` |
 | `log_columns` | `prev` | Önceki sütunu seç | `Shift+BackTab` |
@@ -164,9 +164,9 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `log_columns` | `wider` | Sütunu genişlet | `]` |
 | `log_columns` | `narrower` | Sütunu daralt | `[` |
 | `log_columns` | `reset_width` | Sütun genişliklerini sıfırla | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | Sütunu İçeriğine Sığdır | `=` |
+| `log_columns` | `fit_all` | Tüm Sütunları İçeriğe Sığdır | `+` |
+| `log_columns` | `layout` | Yana Kaydır veya Bölmeye Sığdır | `s` |
 | `log_files` | `collapse_all` | Tüm Klasörleri Daralt veya Genişlet | `z` |
 | `log_files` | `filter` | Değişen Dosyaları Filtrele | `/` |
 | `log_files` | `expand_all` | Tüm Klasörleri Genişlet | `=` |
@@ -659,8 +659,8 @@ Tuşlar varsayılanlardır.
 | Flow: Durdurulmuş Eyleme Devam Et veya İptal Et... |  |
 | Flow: Gruplu Dalları Aç/Kapat |  |
 | Flow: İş Akışı Ayarları... |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| Remote: Uzak Depoyu Grafikte Gizle... |  |
+| Remote: Uzak Depoyu Grafikte Göster... |  |
 | Git: HEAD'de Yeni Dal... | `Ctrl+G b` |
 | Git: HEAD'de Yeni Tag... | `Ctrl+G t` |
 | Git: Gönderilmemiş Tüm Tag'leri Push Et | `Ctrl+G U` |
@@ -972,11 +972,11 @@ Tuşlar varsayılanlardır.
 | Görünüm: Log sütunu: sütunu genişlet | `]` |
 | Görünüm: Log sütunu: sütunu daralt | `[` |
 | Görünüm: Log sütunu: sütun genişliklerini sıfırla | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| Görünüm: Log sütunu: Sütunu İçeriğine Sığdır | `=` |
+| Görünüm: Log sütunu: Tüm Sütunları İçeriğe Sığdır | `+` |
+| Görünüm: Log: Sütunları Sola Kaydır | `Shift+Left` |
+| Görünüm: Log: Sütunları Sağa Kaydır | `Shift+Right` |
+| Görünüm: Log: Sütunlar için Yana Kaydırmayı Aç/Kapat | `s` |
 | Görünüm: Log: Gösterilecek sütunları seç |  |
 | Diff: Seçili Dosyanın Diff'ini Aç | `Enter` |
 | Diff: Diff Görünümünü Kapat | `Esc` |

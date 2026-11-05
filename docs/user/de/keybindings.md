@@ -151,8 +151,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log` | `compare_swap` | Vergleichsenden tauschen | `x` |
 | `log` | `compare_next` | Zur nächsten verglichenen Zeile springen | `n` |
 | `log` | `pick_column` | Spalte zum Verschieben oder Anpassen wählen | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | Spalten nach links scrollen | `Shift+Left` |
+| `log` | `scroll_right` | Spalten nach rechts scrollen | `Shift+Right` |
 | `log` | `copy_mermaid` | Commits als Mermaid gitGraph kopieren | `Shift+Y` |
 | `log_columns` | `next` | Nächste Spalte wählen | `Tab` |
 | `log_columns` | `prev` | Vorherige Spalte wählen | `Shift+BackTab` |
@@ -161,9 +161,9 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log_columns` | `wider` | Spalte verbreitern | `]` |
 | `log_columns` | `narrower` | Spalte verschmälern | `[` |
 | `log_columns` | `reset_width` | Spaltenbreiten zurücksetzen | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | Spalte an Inhalt anpassen | `=` |
+| `log_columns` | `fit_all` | Alle Spalten an Inhalt anpassen | `+` |
+| `log_columns` | `layout` | Seitlich scrollen oder an Bereich anpassen | `s` |
 | `log_files` | `collapse_all` | Alle Ordner ein- oder ausklappen | `z` |
 | `log_files` | `filter` | Geänderte Dateien filtern | `/` |
 | `log_files` | `expand_all` | Alle Ordner aufklappen | `=` |
@@ -654,8 +654,8 @@ die Standardtasten.
 | Flow: Angehaltene Aktion fortsetzen oder abbrechen... |  |
 | Flow: Gruppierte Branches umschalten |  |
 | Flow: Workflow-Einstellungen... |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| Remote: Remote im Graph ausblenden... |  |
+| Remote: Remote im Graph einblenden... |  |
 | Git: Neuer Branch an HEAD... | `Ctrl+G b` |
 | Git: Neuer Tag an HEAD... | `Ctrl+G t` |
 | Git: Alle noch nicht gepushten Tags pushen | `Ctrl+G U` |
@@ -967,11 +967,11 @@ die Standardtasten.
 | Ansicht: Log-Spalte: Spalte verbreitern | `]` |
 | Ansicht: Log-Spalte: Spalte verschmälern | `[` |
 | Ansicht: Log-Spalte: Spaltenbreiten zurücksetzen | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| Ansicht: Log-Spalte: Spalte an Inhalt anpassen | `=` |
+| Ansicht: Log-Spalte: Alle Spalten an Inhalt anpassen | `+` |
+| Ansicht: Log: Spalten nach links scrollen | `Shift+Left` |
+| Ansicht: Log: Spalten nach rechts scrollen | `Shift+Right` |
+| Ansicht: Log: Seitliches Scrollen der Spalten umschalten | `s` |
 | Ansicht: Log: Anzuzeigende Spalten wählen |  |
 | Diff: Diff der ausgewählten Datei öffnen | `Enter` |
 | Diff: Diff-Ansicht schließen | `Esc` |

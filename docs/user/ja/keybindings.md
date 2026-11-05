@@ -138,8 +138,8 @@ stage_file = "z"
 | `log` | `compare_swap` | 比較の両端を入れ替え | `x` |
 | `log` | `compare_next` | 次の比較対象の行へ移動 | `n` |
 | `log` | `pick_column` | 移動・幅変更する列を選ぶ | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | 列を左へスクロール | `Shift+Left` |
+| `log` | `scroll_right` | 列を右へスクロール | `Shift+Right` |
 | `log` | `copy_mermaid` | Commitsを Mermaid gitGraph としてコピー | `Shift+Y` |
 | `log_columns` | `next` | 次の列を選ぶ | `Tab` |
 | `log_columns` | `prev` | 前の列を選ぶ | `Shift+BackTab` |
@@ -148,9 +148,9 @@ stage_file = "z"
 | `log_columns` | `wider` | 列を広げる | `]` |
 | `log_columns` | `narrower` | 列を狭める | `[` |
 | `log_columns` | `reset_width` | 列の幅をすべてリセット | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | 列を内容に合わせる | `=` |
+| `log_columns` | `fit_all` | 全列を内容に合わせる | `+` |
+| `log_columns` | `layout` | 横スクロール／ペインに合わせる | `s` |
 | `log_files` | `collapse_all` | すべてのフォルダーを折りたたむ／展開 | `z` |
 | `log_files` | `filter` | 変更されたファイルを絞り込み | `/` |
 | `log_files` | `expand_all` | すべてのフォルダーを展開 | `=` |
@@ -625,8 +625,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Flow: 停止した操作を続行または中止... |  |
 | Flow: ブランチのグループ表示を切り替え |  |
 | Flow: ワークフロー設定... |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| リモート: リモートをグラフで非表示... |  |
+| リモート: リモートをグラフに表示... |  |
 | Git: HEAD に新規ブランチ... | `Ctrl+G b` |
 | Git: HEAD に新規Tag... | `Ctrl+G t` |
 | Git: 未pushのTagをすべてPush | `Ctrl+G U` |
@@ -938,11 +938,11 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 表示: Log列: 列を広げる | `]` |
 | 表示: Log列: 列を狭める | `[` |
 | 表示: Log列: 列の幅をすべてリセット | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| 表示: Log列: 列を内容に合わせる | `=` |
+| 表示: Log列: 全列を内容に合わせる | `+` |
+| 表示: Log: 列を左へスクロール | `Shift+Left` |
+| 表示: Log: 列を右へスクロール | `Shift+Right` |
+| 表示: Log: 列の横スクロールを切り替え | `s` |
 | 表示: Log: 表示する列を選択 |  |
 | Diff: 選択中のファイルのdiffを開く | `Enter` |
 | Diff: diffビューを閉じる | `Esc` |

@@ -155,8 +155,8 @@ prefix getoond (`Ctrl+G s`).
 | `log` | `compare_swap` | Uiteinden van de vergelijking omwisselen | `x` |
 | `log` | `compare_next` | Naar de volgende vergeleken rij | `n` |
 | `log` | `pick_column` | Kolom kiezen om te verplaatsen of de breedte te wijzigen | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | Kolommen naar links scrollen | `Shift+Left` |
+| `log` | `scroll_right` | Kolommen naar rechts scrollen | `Shift+Right` |
 | `log` | `copy_mermaid` | Commits kopiëren als Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Volgende kolom kiezen | `Tab` |
 | `log_columns` | `prev` | Vorige kolom kiezen | `Shift+BackTab` |
@@ -165,9 +165,9 @@ prefix getoond (`Ctrl+G s`).
 | `log_columns` | `wider` | Kolom verbreden | `]` |
 | `log_columns` | `narrower` | Kolom versmallen | `[` |
 | `log_columns` | `reset_width` | Kolombreedtes herstellen | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | Kolom aan inhoud aanpassen | `=` |
+| `log_columns` | `fit_all` | Alle kolommen aan inhoud aanpassen | `+` |
+| `log_columns` | `layout` | Zijwaarts scrollen of aan paneel aanpassen | `s` |
 | `log_files` | `collapse_all` | Alle mappen in-/uitklappen | `z` |
 | `log_files` | `filter` | Gewijzigde bestanden filteren | `/` |
 | `log_files` | `expand_all` | Alle mappen uitklappen | `=` |
@@ -663,8 +663,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Flow: Gestopte actie voortzetten of afbreken... |  |
 | Flow: Gegroepeerde branches omschakelen |  |
 | Flow: Workflowinstellingen... |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| Remote: Remote in grafiek verbergen... |  |
+| Remote: Remote in grafiek tonen... |  |
 | Git: Nieuwe branch op HEAD... | `Ctrl+G b` |
 | Git: Nieuwe tag op HEAD... | `Ctrl+G t` |
 | Git: Alle niet-gepushte tags pushen | `Ctrl+G U` |
@@ -976,11 +976,11 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Weergave: Logkolom: Kolom verbreden | `]` |
 | Weergave: Logkolom: Kolom versmallen | `[` |
 | Weergave: Logkolom: Kolombreedtes herstellen | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| Weergave: Logkolom: Kolom aan inhoud aanpassen | `=` |
+| Weergave: Logkolom: Alle kolommen aan inhoud aanpassen | `+` |
+| Weergave: Log: Kolommen naar links scrollen | `Shift+Left` |
+| Weergave: Log: Kolommen naar rechts scrollen | `Shift+Right` |
+| Weergave: Log: Zijwaarts scrollen van de kolommen aan- of uitzetten | `s` |
 | Weergave: Log: Kolommen kiezen om te tonen |  |
 | Diff: Diff van geselecteerd bestand openen | `Enter` |
 | Diff: Diff-weergave sluiten | `Esc` |

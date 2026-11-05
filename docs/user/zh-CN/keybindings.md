@@ -138,8 +138,8 @@ stage_file = "z"
 | `log` | `compare_swap` | 交换比较的两端 | `x` |
 | `log` | `compare_next` | 转到下一个比较行 | `n` |
 | `log` | `pick_column` | 选择要移动或调整宽度的列 | `Shift+C` |
-| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
-| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
+| `log` | `scroll_left` | 向左滚动各列 | `Shift+Left` |
+| `log` | `scroll_right` | 向右滚动各列 | `Shift+Right` |
 | `log` | `copy_mermaid` | 将 Commits 复制为 Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | 选择下一列 | `Tab` |
 | `log_columns` | `prev` | 选择上一列 | `Shift+BackTab` |
@@ -148,9 +148,9 @@ stage_file = "z"
 | `log_columns` | `wider` | 加宽该列 | `]` |
 | `log_columns` | `narrower` | 收窄该列 | `[` |
 | `log_columns` | `reset_width` | 重置各列宽度 | `0` |
-| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
-| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
-| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
+| `log_columns` | `fit` | 按内容调整该列宽度 | `=` |
+| `log_columns` | `fit_all` | 按内容调整所有列宽度 | `+` |
+| `log_columns` | `layout` | 横向滚动或适应窗格 | `s` |
 | `log_files` | `collapse_all` | 折叠或展开所有文件夹 | `z` |
 | `log_files` | `filter` | 筛选已更改的文件 | `/` |
 | `log_files` | `expand_all` | 展开所有文件夹 | `=` |
@@ -625,8 +625,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Flow：继续或中止已停止的操作… |  |
 | Flow：切换分支分组 |  |
 | Flow：工作流设置… |  |
-| Remote: Hide Remote in Graph... |  |
-| Remote: Show Remote in Graph... |  |
+| 远程：在图中隐藏远程… |  |
+| 远程：在图中显示远程… |  |
 | Git：在 HEAD 处新建分支… | `Ctrl+G b` |
 | Git：在 HEAD 处新建 Tag… | `Ctrl+G t` |
 | Git：Push 所有未 push 的 Tag | `Ctrl+G U` |
@@ -938,11 +938,11 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 视图：Log 列：加宽该列 | `]` |
 | 视图：Log 列：收窄该列 | `[` |
 | 视图：Log 列：重置各列宽度 | `0` |
-| View: Log Column: Fit the Column to Its Content | `=` |
-| View: Log Column: Fit All Columns to Content | `+` |
-| View: Log: Scroll the Columns Left | `Shift+Left` |
-| View: Log: Scroll the Columns Right | `Shift+Right` |
-| View: Log: Toggle Scroll Sideways for the Columns | `s` |
+| 视图：Log 列：按内容调整该列宽度 | `=` |
+| 视图：Log 列：按内容调整所有列宽度 | `+` |
+| 视图：Log：向左滚动各列 | `Shift+Left` |
+| 视图：Log：向右滚动各列 | `Shift+Right` |
+| 视图：Log：切换各列的横向滚动 | `s` |
 | 视图：Log：选择要显示的列 |  |
 | Diff：打开所选文件的 diff | `Enter` |
 | Diff：关闭 diff 视图 | `Esc` |

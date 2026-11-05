@@ -516,8 +516,8 @@ pub enum RefsAction {
     /// `origin/main`, a tag name).
     ///
     /// `--remote <name>...` hides a whole remote (every branch of it, the
-    /// ones fetched later too): the way to look at one history without a
-    /// separate archive remote's.
+    /// ones fetched later too): the way to look at one history without the
+    /// history of a separate archive remote.
     Hide {
         /// Refs to hide.
         #[arg(required_unless_present_any = ["clear", "remote"])]

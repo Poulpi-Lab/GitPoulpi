@@ -182,3 +182,109 @@ fn every_bar_has_a_one_column_rect_in_the_hit_list_as_painted() {
     let rect = rect_of(&hits, RewriteHit::Bar(BarId::Secrets));
     assert_eq!(rect.width, 1);
 }
+
+// ------------------------------------------------------------ short panes
+
+/// How many rows of the screen carry `needle`.
+fn rows_with(s: &str, needle: &str) -> usize {
+    s.lines().filter(|l| l.contains(needle)).count()
+}
+
+#[test]
+fn the_secrets_header_never_takes_the_lists_last_rows_in_a_short_window() {
+    let (mut v, _q, _t) = scanned(30);
+    v.secrets.error = Some("could not read one of the blobs, the scan is partial".into());
+    v.secrets.stale = true;
+    v.secrets.result.as_mut().unwrap().scan.blobs_skipped_binary = 3;
+    v.secrets.result.as_mut().unwrap().scan.blobs_skipped_large = 2;
+    for h in 22..=34 {
+        let (s, _, _) = paint(&v, 60, h, None);
+        assert!(
+            rows_with(&s, "GitHub token") >= 4,
+            "{h} rows: fewer than 4 findings\n{s}"
+        );
+        if h >= 32 {
+            assert!(
+                s.contains("could not read"),
+                "{h} rows: the error stays\n{s}"
+            );
+        }
+    }
+}
+
+#[test]
+fn the_size_header_never_takes_the_lists_last_rows_in_a_short_window() {
+    use gitpoulpi_core::domain::rewrite::{BlobRow, BlobState, SizeAnalysis};
+    let blobs: Vec<BlobRow> = (0..30u8)
+        .map(|i| BlobRow {
+            path: format!("assets/big{i:02}.bin"),
+            more_paths: 0,
+            blob: Oid([i + 1; 20]),
+            size: 1 << 20,
+            disk_size: 1 << 19,
+            first_commit: Oid([0xa1; 20]),
+            last_commit: Oid([0xb2; 20]),
+            state: BlobState::InHead,
+        })
+        .collect();
+    let (mut v, _q, _t) = view();
+    v.tab = PreviewTab::Size;
+    v.start_analysis();
+    v.size.running.as_mut().unwrap().reply = crate::daemon_link::Reply::ready(Ok(SizeAnalysis {
+        blobs,
+        top: 20,
+        commits: 412,
+        blobs_total: 1_980,
+        blobs_cut: 40,
+        bytes_total: 900 << 20,
+        disk_total: 400 << 20,
+        bytes_in_head: 300 << 20,
+        bytes_history_only: 600 << 20,
+        ..SizeAnalysis::default()
+    }));
+    v.poll(None);
+    v.size.error = Some("could not read one of the blobs".into());
+    for h in 22..=34 {
+        let (s, _, _) = paint(&v, 60, h, None);
+        assert!(
+            rows_with(&s, "assets/big") >= 4,
+            "{h} rows: fewer than 4 rows\n{s}"
+        );
+        if h >= 32 {
+            assert!(
+                s.contains("could not read"),
+                "{h} rows: the error stays\n{s}"
+            );
+        }
+    }
+}
+
+#[test]
+fn the_identities_status_line_makes_way_for_the_list_in_a_short_window() {
+    use gitpoulpi_core::domain::rewrite::{IdentityCount, IdentityList};
+    let (mut v, _q, _t) = view();
+    v.tab = PreviewTab::Identities;
+    v.focus = Focus::Preview;
+    v.load_identities();
+    v.identities.load.as_mut().unwrap().0 = crate::daemon_link::Reply::ready(Ok(IdentityList {
+        identities: (0..30)
+            .map(|i| IdentityCount {
+                name: format!("Person{i:02}"),
+                email: format!("p{i:02}@example.org"),
+                as_author: 3,
+                as_committer: 1,
+                mapped_to: None,
+            })
+            .collect(),
+        commits: 90,
+        has_mailmap: false,
+    }));
+    v.poll(None);
+    for h in 20..=34 {
+        let (s, _, _) = paint(&v, 60, h, None);
+        assert!(
+            rows_with(&s, "Person") >= 4,
+            "{h} rows: fewer than 4 identities\n{s}"
+        );
+    }
+}

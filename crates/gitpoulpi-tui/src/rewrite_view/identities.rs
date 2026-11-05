@@ -26,6 +26,7 @@ use gitpoulpi_i18n::msg::{rewrite_identities as m, rewrite_view as t};
 use gitpoulpi_ipc::mailmap::{AddArgs, IdentitiesArgs};
 
 use super::bars::BarId;
+use super::head;
 use super::render::{bad, bold, dim, plain, row_bg, warn, wrap, RewriteHit, Ui};
 use super::{Focus, Notice, PreviewTab, RewriteKeyOutcome, RewriteView};
 use crate::daemon_link::Reply;
@@ -560,8 +561,9 @@ impl RewriteView {
         }
 
         // One status line: working, failed, what the last merge wrote (with
-        // its Undo) or the missing file.
-        if y < bottom {
+        // its Undo) or the missing file. In a short pane it makes way for the
+        // list's rows.
+        if y < bottom && bottom - y > head::MIN_LIST + 1 {
             if let Some(why) = &self.identities.error {
                 ui.text(x, y, w, why, bad());
             } else if self.identities.load.is_some() || self.identities.saving.is_some() {
@@ -617,7 +619,7 @@ impl RewriteView {
             .max()
             .unwrap_or(0);
         let counts_inline = 5 + ident_w + 2 + counts_w < body.width as usize;
-        let detail_h: u16 = u16::from(!counts_inline && bottom - y >= 4);
+        let detail_h: u16 = u16::from(!counts_inline && bottom - y > head::MIN_LIST);
         let room = (bottom - y - detail_h) as usize;
         let cursor = self.identities.cursor.min(rows.len() - 1);
         let top = self.settle(

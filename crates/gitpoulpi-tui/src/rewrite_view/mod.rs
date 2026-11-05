@@ -29,6 +29,7 @@
 
 mod bars;
 mod drill;
+mod head;
 mod host;
 mod identities;
 mod model;

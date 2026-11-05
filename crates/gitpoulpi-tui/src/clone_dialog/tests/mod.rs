@@ -3,6 +3,8 @@ mod form;
 #[cfg(all(feature = "github", feature = "gitlab"))]
 mod hosted;
 mod i18n;
+#[cfg(all(feature = "github", feature = "gitlab"))]
+mod refresh;
 mod render;
 
 use super::*;

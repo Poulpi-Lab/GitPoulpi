@@ -61,6 +61,8 @@ pub mod issue_flow;
 pub mod jira;
 #[cfg(feature = "linear")]
 pub mod linear;
+#[cfg(feature = "hosting")]
+pub mod list_cache;
 #[cfg(feature = "local-issues")]
 pub mod local_markdown;
 #[cfg(feature = "hosting")]

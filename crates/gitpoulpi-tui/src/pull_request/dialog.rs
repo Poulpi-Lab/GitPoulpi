@@ -247,7 +247,7 @@ impl PullRequestDialog {
             .map(|t| t.integration.clone())
             .collect();
         self.projects_rx
-            .push(start_projects(factory, tab.integration, all));
+            .push(start_projects(factory, tab.integration, all, None));
     }
 
     fn refresh_repo_options(&mut self) {

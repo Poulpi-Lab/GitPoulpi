@@ -1471,6 +1471,10 @@ no_match = "no repository matches"
 loading = "loading repositories..."
 # context: {why} is the error text from the server
 list_failed = "could not list repositories: {why}"
+refreshing = "refreshing..."
+refresh_failed = "saved list (refresh failed, see Activity)"
+# context: status line in the Clone dialog when the chosen repository is gone after a refresh; {name} is owner/name
+chosen_gone = "{name} is no longer on the host"
 # context: status line in the Clone dialog opened from a Radar request; {project} is owner/name
 review_project_missing = "{project} is not in this account's list: search for it or use the URL"
 # context: primary button while a clone runs

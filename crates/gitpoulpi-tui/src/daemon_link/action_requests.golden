@@ -305,8 +305,8 @@
   SparseDisable {}
   message: sparse checkout disabled: every file is checked out
   ok: true
-== SetRefVisibility { hidden: ["a"], solo: ["main"] }
-  SetRefVisibility {"hidden":["a"],"mode":"replace","solo":["main"]}
+== SetRefVisibility { hidden: ["a"], solo: ["main"], hidden_remotes: ["archive"] }
+  SetRefVisibility {"hidden":["a"],"hidden_remotes":["archive"],"mode":"replace","solo":["main"]}
   ok: true
 == RemoteSetPushUrl { name: "up", url: Some("https://example.test/p.git") }
   RemoteSetPushUrl {"name":"up","url":"https://example.test/p.git"}

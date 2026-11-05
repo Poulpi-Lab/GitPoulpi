@@ -182,8 +182,8 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
         | PaletteCommand::FetchRemote
         | PaletteCommand::RemoteActions
         | PaletteCommand::PinSshKey
-        | PaletteCommand::HideAllBranchesOfRemote
-        | PaletteCommand::ShowAllBranchesOfRemote => {
+        | PaletteCommand::HideRemoteInGraph
+        | PaletteCommand::ShowRemoteInGraph => {
             let selected_remote = selected_sidebar_remote(
                 &*cx.refs_result,
                 &*cx.refs_filter,

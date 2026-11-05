@@ -88,6 +88,7 @@ async fn start(
             stats_worker: None,
             split_worker: None,
             log_depth: Arc::new(AtomicUsize::new(0)),
+            log_filter: Default::default(),
             lfs_gate: Default::default(),
             activity: Default::default(),
         },

@@ -6,6 +6,10 @@ pub struct RefreshOutcome {
     /// How many commits `log_result` was asked for: the depth when the
     /// refresh was sent, which pages landing meanwhile do not change.
     pub log_limit: usize,
+    /// The generation of the hidden-refs filter `log_result` was read
+    /// under (`DaemonLink::log_filter_generation`): an outcome from an older
+    /// one is a walk of other tips and its Log is not taken.
+    pub log_filter_gen: u64,
     pub status_result: GitResult<WorkingTree>,
     pub refs_result: GitResult<Vec<Ref>>,
     pub stashes_result: GitResult<Vec<Stash>>,
@@ -115,6 +119,18 @@ impl ReadHashes {
             refs: step(&mut self.refs, new.refs),
             stashes: step(&mut self.stashes, new.stashes),
         }
+    }
+
+    /// These hashes as the window may record them: a Log read under another
+    /// hidden-refs filter generation than the one in use (`read_gen` against
+    /// `current_gen`) is a walk of other tips, so its hash is dropped and
+    /// `apply` reports no Log change (the window then keeps the held Log and
+    /// the lazy loader's bookkeeping untouched).
+    pub fn for_filter_generation(mut self, read_gen: u64, current_gen: u64) -> ReadHashes {
+        if read_gen != current_gen {
+            self.log = None;
+        }
+        self
     }
 
     /// The window changed its held result behind the link's back (a lazily
@@ -353,6 +369,9 @@ pub struct FileInsightOutcome {
 pub struct LogPageOutcome {
     pub request: crate::graph::LogPageRequest,
     pub result: GitResult<CommitGraph>,
+    /// The generation of the hidden-refs filter the page was read under; a
+    /// page of an older one belongs to another walk and is dropped.
+    pub log_filter_gen: u64,
 }
 
 /// One batch of commit stats.

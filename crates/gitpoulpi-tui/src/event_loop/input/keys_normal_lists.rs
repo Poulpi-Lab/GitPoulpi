@@ -535,7 +535,11 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                                     &full_name,
                                     &cx.remote_ui.remotes,
                                 ),
-                                cx.hidden_from_graph.contains(&full_name),
+                                refs_tree::hidden_in_graph(
+                                    &*cx.hidden_from_graph,
+                                    &full_name,
+                                    *cx.active_ref_section == SidebarSection::Remote,
+                                ),
                                 cx.solo_refs.contains(full_name.as_str()),
                                 unpushed_tags.contains(full_name.as_str()),
                             ),
@@ -569,8 +573,10 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                         let state = cx.sidebar_states.state(*cx.active_ref_section);
                         let sel = state.selected().unwrap_or(0);
                         let row = area.y + 1 + (sel - state.offset().min(sel)) as u16;
+                        let hidden = crate::refs_tree::remote_hidden(&*cx.hidden_from_graph, &path);
                         cx.remote_ui.open_remote_menu(
                             &path,
+                            hidden,
                             cx.refs_result.as_deref().unwrap_or(&[]),
                             area.x + 2,
                             row,
@@ -597,7 +603,12 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                                 ContextMenu::new(
                                     path.clone(),
                                     folder_menu_entries(
-                                        folder_fully_in(&*cx.hidden_from_graph, &under),
+                                        folder_fully_in(&*cx.hidden_from_graph, &under)
+                                            || (*cx.active_ref_section == SidebarSection::Remote
+                                                && refs_tree::hidden_through_remote(
+                                                    &*cx.hidden_from_graph,
+                                                    &path,
+                                                )),
                                         folder_fully_in(&*cx.solo_refs, &under),
                                     ),
                                     area.x + 2,

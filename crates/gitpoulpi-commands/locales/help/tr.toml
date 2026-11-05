@@ -280,9 +280,19 @@ redo = "`undo`'nun az önce geri aldığı işlemi, kaydedilen tam duruma yinele
 "refs hide" = """Ref'leri commit grafiğinden gizler (TUI'nin "Gizle" komutu): `repo-state.toml` içindeki depo başına görüntü filtresi, açık bir TUI bunu canlı izler. Adlar ref listesinin yazdığı gibi yazılır (`feature/x`, `origin/main`, bir tag adı)"""
 "refs hide --clear" = "Gizli her ref'i göster (adı verilenlere ek olarak)"
 "refs hide --names" = "Gizlenecek ref'ler"
+"refs hide#long" = """
+Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+
+`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
+"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
 "refs show" = "Ref'leri yeniden gösterir: onları gizli ve solo kümelerinden çıkarır"
 "refs show --clear" = "Tüm filtreyi sıfırla: hiçbir şey gizli değil, hiçbir şey solo değil"
 "refs show --names" = "Yeniden gösterilecek ref'ler"
+"refs show#long" = """
+Show refs again: removes them from the hidden and solo sets.
+
+`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
+"refs show --remote" = "Remotes to show again"
 "refs solo" = "Commit grafiğinde yalnızca bu ref'leri (ve eriştiklerini) göster"
 "refs solo --clear" = "Her solo ref'in solo'sunu kaldır (adı verilenlere ek olarak)"
 "refs solo --names" = "Solo yapılacak ref'ler"

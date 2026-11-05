@@ -647,6 +647,10 @@ without the fix; keep it that way.
   bordered sub-pane's first row is `area.y + 1` (`diff_row_at` takes the outer
   rect for that reason).
 
+### Hidden refs change the Log's walk
+
+- A Log answer or page read under an older hidden-refs filter generation is dropped (`RefreshOutcome::log_filter_gen`, `LogPageOutcome::log_filter_gen`), and the window restarts its lazy loader and forgets its Log hash and total when the filter moves, in one place (`WindowState::tick`). A new site that changes `hidden_from_graph` needs nothing: the detector compares the filter each frame. `refs/remotes/<r>/HEAD` is a symbolic mirror and never a tip.
+
 ### Pinned tabs (Radar, Workspaces) are views of the management window
 
 - Both are `RepoManager` states, not windows: `radar.is_open()` and `page == HomePage::Workspaces`. Every `ManagementEntry` that shows something else must reset the other (`tabs::go_to_management`), or two tabs look selected. A new pinned tab needs: a `NewTabSlot` field, one `Fixed::` row in `tab_column`, `HitTarget` pair (tab + `x`, `x` registered first), hover predicates, middle click, `Ctrl+W`, the palette close command, the `+` menu row, a global key, and a session flag read at startup (`init`) and published for the paint walk.

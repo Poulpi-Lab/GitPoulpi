@@ -654,8 +654,8 @@ Klávesy jsou výchozí.
 | Flow: Pokračovat v zastavené akci nebo ji přerušit... |  |
 | Flow: Přepnout seskupení větví |  |
 | Flow: Nastavení workflow... |  |
-| Remote: Skrýt všechny větve remote... |  |
-| Remote: Zobrazit všechny větve remote... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: Nová větev na HEAD... | `Ctrl+G b` |
 | Git: Nový tag na HEAD... | `Ctrl+G t` |
 | Git: Push všech neodeslaných tagů | `Ctrl+G U` |

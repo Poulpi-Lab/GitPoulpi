@@ -1,12 +1,68 @@
 use gitpoulpi_core::domain::{
-    decode_commit_text, CommitGraph, CommitNode, LogOptions, Oid, RepoRef,
+    decode_commit_text, visible_tips, CommitGraph, CommitNode, LogOptions, Oid, RefFilter, RepoRef,
 };
 use gitpoulpi_core::Result;
 
-use crate::process::run_bytes;
+use crate::process::{run, run_bytes, run_bytes_with_stdin};
 
 const FIELD_SEP: char = '\u{1}';
 const RECORD_SEP: char = '\u{2}';
+
+/// The commits a walk with a non-empty filter starts from: every branch,
+/// tag and remote-tracking ref (annotated tags peeled; a tag of a tree or a
+/// blob is no tip) the filter keeps, plus `HEAD` when it resolves. Empty
+/// for an unborn repository with no ref at all.
+pub(crate) fn filtered_tips(repo: &RepoRef, filter: &RefFilter) -> Vec<Oid> {
+    let listing = run(
+        &repo.root,
+        &[
+            "for-each-ref",
+            "--format=%(refname)%09%(objecttype)%09%(objectname)%09%(*objecttype)%09%(*objectname)%09%(symref)",
+            "refs/heads",
+            "refs/tags",
+            "refs/remotes",
+        ],
+    )
+    .unwrap_or_default();
+    let refs: Vec<(String, Oid)> = listing
+        .lines()
+        .filter_map(|line| {
+            let mut f = line.split('\t');
+            let name = f.next()?;
+            let (kind, id, peeled_kind, peeled_id) = (f.next()?, f.next()?, f.next()?, f.next()?);
+            // `refs/remotes/<r>/HEAD` and friends mirror another ref: not a
+            // tip of their own (hiding the branch they name must hide it).
+            if !f.next().unwrap_or_default().is_empty() {
+                return None;
+            }
+            let target = match (kind, peeled_kind) {
+                ("commit", _) => id,
+                ("tag", "commit") => peeled_id,
+                _ => return None,
+            };
+            Some((name.to_string(), Oid::from_hex(target.trim())?))
+        })
+        .collect();
+    let head = run(
+        &repo.root,
+        &["rev-parse", "--verify", "-q", "HEAD^{commit}"],
+    )
+    .ok()
+    .and_then(|out| Oid::from_hex(out.trim()));
+    visible_tips(filter, &refs, head)
+}
+
+/// The tips as `--stdin` input: one id per line. A command line of
+/// thousands of refs would break Windows' limit, and `--exclude` resets
+/// after each `--branches`/`--tags` and takes per-family patterns.
+pub(crate) fn tips_stdin(tips: &[Oid]) -> Vec<u8> {
+    let mut text = String::new();
+    for tip in tips {
+        text.push_str(&tip.to_hex());
+        text.push('\n');
+    }
+    text.into_bytes()
+}
 
 pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
     // `%aN`/`%aE` are `%an`/`%ae` through the `.mailmap` (`log.use_mailmap`).
@@ -37,7 +93,18 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
     if let Some(limit) = opts.limit {
         args.push(format!("-n{limit}"));
     }
-    if opts.all_refs {
+    let mut stdin: Option<Vec<u8>> = None;
+    if opts.all_refs && !opts.hidden.is_empty() {
+        // Hidden refs change the walk: start from the visible tips only.
+        // `--stdin` with no input would fall back to HEAD, so an empty list
+        // is an empty graph without running git.
+        let tips = filtered_tips(repo, &opts.hidden);
+        if tips.is_empty() {
+            return Ok(CommitGraph::default());
+        }
+        args.push("--stdin".to_string());
+        stdin = Some(tips_stdin(&tips));
+    } else if opts.all_refs {
         // `--branches --tags --remotes`, not `--all`: `--all` would include
         // GitPoulpi's remote-tag mirror (`refs/gitpoulpi/remote-tags/...`),
         // which must never put a line in the commit graph. These match
@@ -61,7 +128,11 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
     }
     let args_ref: Vec<&str> = args.iter().map(String::as_str).collect();
 
-    let raw = match run_bytes(&repo.root, &args_ref) {
+    let result = match &stdin {
+        Some(input) => run_bytes_with_stdin(&repo.root, &args_ref, input),
+        None => run_bytes(&repo.root, &args_ref),
+    };
+    let raw = match result {
         Ok(raw) => raw,
         // an empty repo (no commits yet) makes `git log` fail -- that's a
         // valid state, not an error.

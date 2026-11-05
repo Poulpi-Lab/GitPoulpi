@@ -660,8 +660,8 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Flow: продолжить или прервать остановленное действие... |  |
 | Flow: переключить группировку веток |  |
 | Flow: настройки рабочего процесса... |  |
-| Remote: скрыть все ветки remote... |  |
-| Remote: показать все ветки remote... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: новая ветка в HEAD... | `Ctrl+G b` |
 | Git: новый tag в HEAD... | `Ctrl+G t` |
 | Git: push всех неотправленных tag'ов | `Ctrl+G U` |

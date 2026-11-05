@@ -1939,8 +1939,8 @@ copy_name = "リモート名をコピー"
 copy_link = "リモートへのリンクをコピー"
 set_default = "既定のリモートに設定"
 edit_remote = "{name} を編集..."
-hide_all_branches = "すべてのブランチを非表示"
-show_all_branches = "すべてのブランチを表示"
+hide_remote_in_graph = "Hide remote from graph"
+show_remote_in_graph = "Show remote in graph"
 remove_remote = "{name} を削除..."
 default_mark = "（既定）"
 pull_title = "{$Pull}"
@@ -1993,8 +1993,8 @@ default_for_repo = "このリポジトリの既定のリモート"
 copy_name_which = "どのリモートの名前をコピーしますか？"
 copy_link_which = "どのリモートへのリンクをコピーしますか？"
 fetch_which = { git = "どのリモートを{$fetch}しますか？", local = "どのリモートを{$fetch}しますか？" }
-hide_all_which = "どのリモートのブランチをすべて非表示にしますか？"
-show_all_which = "どのリモートのブランチをすべて表示しますか？"
+hide_all_which = "Hide which remote from the graph?"
+show_all_which = "Show which remote in the graph again?"
 select_local_branch = "先にローカルブランチを選択するか、チェックアウトしてください"
 select_remote_first = "先に REMOTE セクションでリモートを選択してください（または Remote: コマンドを使用）"
 what_remote_name = "リモート名"
@@ -2006,8 +2006,9 @@ force_confirm_fetch = { git = "{branch} を {remote} に強制{$push}します�
 force_confirm = { git = "{branch} を {remote} に強制{$push}しますか？\nリース付き：前回の{$fetch}以降に {remote}/{branch} が更新されていると拒否されます。{remote} にしかない{$commit}は破棄されます。", local = "{branch} を {remote} に強制{$push}しますか？\nリース付き：前回のフェッチ以降に {remote}/{branch} が更新されていると拒否されます。{remote} にしかない{$commit}は破棄されます。" }
 setting_upstream = "{branch} のアップストリームを {upstream} に設定中..."
 unsetting_upstream = "{branch} のアップストリームを解除中..."
-branches_hidden = { one = "{remote} の {n} 個のブランチをグラフから非表示にしました", other = "{remote} の {n} 個のブランチをグラフから非表示にしました" }
-branches_shown = { one = "{remote} の {n} 個のブランチを再び表示しました", other = "{remote} の {n} 個のブランチを再び表示しました" }
+remote_hidden = "{remote} hidden from the graph, branches fetched later too"
+remote_shown = "{remote} shown in the graph again"
+branch_hidden_with_remote = "{name} is hidden with remote {remote}: show the remote first"
 pinning = "このリポジトリを {command} に固定中..."
 clearing_pin = "SSH 鍵の固定を解除中..."
 stashing_continuing = { git = "変更を{$stash}してから続行中...", local = "変更を{$stash}してから続行中..." }
@@ -2944,8 +2945,8 @@ remote_copy_link_to_remote = "リモート: リモートへのリンクをコピ
 remote_fetch_remote = { git = "リモート: リモートを{$Fetch}...", local = "リモート: リモートを{$Fetch}..." }
 remote_actions_for_selected_remote = "リモート: 選択中のリモートの操作..."
 repository_ssh_key_for_this_repository = "リポジトリ: このリポジトリの SSH 鍵..."
-remote_hide_all_branches_of_remote = "リモート: リモートのすべてのブランチを非表示..."
-remote_show_all_branches_of_remote = "リモート: リモートのすべてのブランチを表示..."
+remote_hide_remote_in_graph = "Remote: Hide Remote in Graph..."
+remote_show_remote_in_graph = "Remote: Show Remote in Graph..."
 git_new_branch_at_head = "Git: HEAD に新規ブランチ..."
 git_new_tag_at_head = { git = "Git: HEAD に新規{$Tag}...", local = "Git: HEAD に新規{$Tag}..." }
 git_push_all_unpushed_tags = { git = "Git: 未{$push}の{$Tag}をすべて{$Push}", local = "Git: 未プッシュの{$Tag}をすべて{$Push}" }

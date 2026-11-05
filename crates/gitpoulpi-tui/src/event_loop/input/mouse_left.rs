@@ -209,8 +209,13 @@ pub(super) fn handle(
                 Some(FormOutcome::Close) => cx.remote_ui.form = None,
                 Some(FormOutcome::Submit(submit)) => {
                     cx.remote_ui.form = None;
-                    *cx.last_message =
-                        Some(submit_remote_form(submit, &mut *cx.remote_ui, cx.link));
+                    *cx.last_message = Some(submit_remote_form(
+                        submit,
+                        &mut *cx.remote_ui,
+                        cx.link,
+                        &mut *cx.hidden_from_graph,
+                        &*cx.solo_refs,
+                    ));
                 }
                 _ => {}
             }

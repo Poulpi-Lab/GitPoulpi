@@ -408,3 +408,60 @@ fn the_libgit2_count_method_is_its_own_cache_entry_and_works_on_either_backend()
     assert_eq!(count(Some("libgit2")), serde_json::json!(2));
     assert_eq!(cache.misses(), misses + 1, "and is cached on its own");
 }
+
+/// Hiding refs changes the walk, and the filter is part of the request, so
+/// part of the cache key: each visibility is its own entry and toggling
+/// back is a hit with no backend call.
+#[test]
+fn each_hidden_filter_is_its_own_entry_and_toggling_back_hits() {
+    let fixture = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("first")
+        .unwrap()
+        .branch("topic")
+        .unwrap()
+        .commit("topic only")
+        .unwrap()
+        .checkout("main")
+        .unwrap()
+        .build();
+    let repo = fixture.repo_ref();
+    let backend = Git2Backend::new();
+    let cache = ReadCache::with_racy_window(Duration::ZERO);
+    tick();
+    let log = |hidden: &[&str]| {
+        let opts = LogOptions {
+            all_refs: true,
+            hidden: gitpoulpi_core::domain::RefFilter {
+                names: hidden.iter().map(|s| s.to_string()).collect(),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let request = Request {
+            id: 1,
+            session: "cache-test".into(),
+            repo: Some(repo.id.clone()),
+            command: OperationKind::Log,
+            args: serde_json::json!({ "opts": opts }),
+        };
+        dispatch_cached(&cache, &backend, &request)
+            .response
+            .result
+            .expect("log succeeded")
+    };
+
+    let everything = log(&[]);
+    let without_topic = log(&["topic"]);
+    assert_eq!((cache.hits(), cache.misses()), (0, 2));
+    assert!(summaries(&everything).contains(&"topic only".to_string()));
+    assert!(!summaries(&without_topic).contains(&"topic only".to_string()));
+
+    assert_eq!(log(&[]), everything);
+    assert_eq!(log(&["topic"]), without_topic);
+    assert_eq!(
+        (cache.hits(), cache.misses()),
+        (2, 2),
+        "toggling back answers from the cache"
+    );
+}

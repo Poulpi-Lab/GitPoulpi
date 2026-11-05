@@ -170,10 +170,14 @@ impl LinkConn {
 pub(super) async fn collect_refresh(
     conn: &LinkConn,
     log_depth: &Arc<AtomicUsize>,
+    log_filter: &LogFilterCell,
     lfs_gate: &Arc<crate::lfs_ui::LfsGate>,
     scope: ChangeScope,
     defer_lfs: bool,
 ) -> RefreshOutcome {
+    // One snapshot for the whole refresh: the Log below is read under it and
+    // the outcome says which generation that was.
+    let (log_filter_gen, hidden) = log_filter.snapshot();
     let status_fut = conn.call::<WorkingTree>(OperationKind::Status, serde_json::json!({}));
     let log_limit = refresh_limit(log_depth);
     let log_ms = std::sync::atomic::AtomicU64::new(0);
@@ -202,6 +206,7 @@ pub(super) async fn collect_refresh(
                     skip: 0,
                     start_ref: None,
                     all_refs: true,
+                    hidden,
                     ..LogOptions::default()
                 }
             }),
@@ -449,6 +454,7 @@ pub(super) async fn collect_refresh(
         read_hashes,
         log_result,
         log_limit: log_limit as usize,
+        log_filter_gen,
         status_result,
         refs_result,
         stashes_result,

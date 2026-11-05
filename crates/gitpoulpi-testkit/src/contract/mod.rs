@@ -15,6 +15,7 @@ mod file_history;
 mod history;
 mod journal_plumbing;
 mod lfs;
+mod log_hidden;
 mod log_refs;
 mod mailmap;
 mod outside;
@@ -55,6 +56,7 @@ pub use file_history::*;
 pub use history::*;
 pub use journal_plumbing::*;
 pub use lfs::*;
+pub use log_hidden::*;
 pub use log_refs::*;
 pub use mailmap::*;
 pub use outside::*;
@@ -106,6 +108,15 @@ macro_rules! for_each_contract_check {
             check_commit_message_body,
             check_log_all_refs_includes_every_branch_tip,
             check_log_skip_pages_history,
+            check_log_hidden_drops_commits_only_hidden_refs_reach,
+            check_log_hidden_keeps_head_even_if_its_branch_is_hidden,
+            check_log_hidden_remote_prefix_covers_nested_and_later_branches,
+            check_log_hidden_ignores_a_remote_head_symref,
+            check_log_hidden_keep_overrides,
+            check_log_hidden_pages_tile,
+            check_log_hidden_peels_annotated_tags_and_skips_non_commit_tags,
+            check_count_commits_honours_hidden,
+            check_empty_filter_is_the_all_refs_walk,
             check_count_commits_matches_the_walk_the_graph_loads,
             check_head_ref_flag,
             check_tag_target_resolves_to_the_tagged_commit,
@@ -676,6 +687,7 @@ mod meta_tests {
         let source = [
             include_str!("cancel.rs"),
             include_str!("log_refs.rs"),
+            include_str!("log_hidden.rs"),
             include_str!("staging.rs"),
             include_str!("history.rs"),
             include_str!("stash.rs"),

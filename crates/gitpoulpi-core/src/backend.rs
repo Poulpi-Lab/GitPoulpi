@@ -61,10 +61,14 @@ pub trait GitBackend: Send + Sync {
     fn init(&self, path: &Path, opts: &InitOptions) -> Result<RepoRef>;
 
     fn status(&self, repo: &RepoRef) -> Result<WorkingTree>;
+    /// The commit graph. With `all_refs`, `opts.hidden` drops refs from the
+    /// walk (the commits only they reach go with them; `HEAD` always stays
+    /// while a filter is active); both backends take the tips from
+    /// `domain::visible_tips` and page that one walk with `skip`/`limit`.
     fn log(&self, repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph>;
     /// How many commits [`log`](Self::log) would return for `opts` if it
     /// were not paged: the same refs (`all_refs`, `start_ref`, HEAD) and
-    /// path filter, `skip` and `limit` ignored. Counts without loading any
+    /// path filter and `hidden` filter, `skip` and `limit` ignored. Counts without loading any
     /// commit's text, so it stays cheap on a very large history. An unborn
     /// repository is `0`. Read-only; nothing to journal.
     fn count_commits(&self, repo: &RepoRef, opts: &LogOptions) -> Result<u64>;

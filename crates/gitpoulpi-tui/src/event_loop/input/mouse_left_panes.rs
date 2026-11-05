@@ -176,8 +176,14 @@ pub(super) fn handle(
                                     &*cx.log_order,
                                 );
                                 move_table_selection(&mut *cx.log_state, *cx.log_len, 0);
-                            } else if !cx.hidden_from_graph.remove(full_name) {
-                                cx.hidden_from_graph.insert(full_name.clone());
+                            } else if let Some(note) = refs_tree::toggle_hide_ref(
+                                &mut *cx.hidden_from_graph,
+                                Some(kind),
+                                full_name,
+                            ) {
+                                // A branch of a remote hidden as a whole:
+                                // nothing changed, the remote is the thing.
+                                *cx.last_message = Some(note);
                             }
                             refs_tree::submit_ref_visibility(
                                 cx.link,
@@ -185,9 +191,33 @@ pub(super) fn handle(
                                 &*cx.solo_refs,
                             );
                         }
-                        Some(RefTreeRow::Folder { path, .. }) => {
+                        Some(RefTreeRow::Folder {
+                            path,
+                            is_remote_root,
+                            ..
+                        }) => {
                             let under = refs_under_folder(&names_owned, path);
-                            if !under.is_empty() {
+                            // A remote's root row hides the whole remote (a
+                            // pattern: branches fetched later too); folders
+                            // under a hidden remote say so instead.
+                            let remote_row = if cx.solo_refs.is_empty() {
+                                refs_tree::hide_folder(
+                                    &mut *cx.hidden_from_graph,
+                                    Some(kind),
+                                    path,
+                                    *is_remote_root,
+                                )
+                            } else {
+                                refs_tree::FolderHide::Plain
+                            };
+                            if let refs_tree::FolderHide::Done(note) = remote_row {
+                                *cx.last_message = Some(note);
+                                refs_tree::submit_ref_visibility(
+                                    cx.link,
+                                    &*cx.hidden_from_graph,
+                                    &*cx.solo_refs,
+                                );
+                            } else if !under.is_empty() {
                                 if !cx.solo_refs.is_empty() {
                                     let now_soloed = !folder_fully_in(&*cx.solo_refs, &under);
                                     toggle_folder_membership(&mut *cx.solo_refs, &under);

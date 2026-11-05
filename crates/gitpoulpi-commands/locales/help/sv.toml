@@ -280,9 +280,19 @@ redo = "Gör om operationen `undo` just tog tillbaka, till det exakta sparade ti
 "refs hide" = """Dölj refs från commit-grafen (TUI:ts "Dölj"): per-repo-visningsfiltret i `repo-state.toml`, som ett öppet TUI följer direkt. Namn skrivs som refs-listan skriver dem (`feature/x`, `origin/main`, ett tag-namn)"""
 "refs hide --clear" = "Visa varje dold ref igen (utöver eventuella angivna)"
 "refs hide --names" = "Refs att dölja"
+"refs hide#long" = """
+Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+
+`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
+"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
 "refs show" = "Visa refs igen: tar bort dem från dolda- och solo-uppsättningarna"
 "refs show --clear" = "Återställ hela filtret: inget dolt, inget solo"
 "refs show --names" = "Refs att visa igen"
+"refs show#long" = """
+Show refs again: removes them from the hidden and solo sets.
+
+`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
+"refs show --remote" = "Remotes to show again"
 "refs solo" = "Visa bara dessa refs (och vad de når) i commit-grafen"
 "refs solo --clear" = "Ta bort solo från varje solo-ref (utöver eventuella angivna)"
 "refs solo --names" = "Refs att göra solo"

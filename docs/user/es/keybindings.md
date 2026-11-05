@@ -659,8 +659,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Flow: Continuar o abortar la acción detenida... |  |
 | Flow: Alternar ramas agrupadas |  |
 | Flow: Ajustes del flujo de trabajo... |  |
-| Remoto: Ocultar todas las ramas de un remoto... |  |
-| Remoto: Mostrar todas las ramas de un remoto... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: Rama nueva en HEAD... | `Ctrl+G b` |
 | Git: Tag nuevo en HEAD... | `Ctrl+G t` |
 | Git: Push todos los tags sin enviar | `Ctrl+G U` |

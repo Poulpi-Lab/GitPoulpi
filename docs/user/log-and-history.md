@@ -88,9 +88,11 @@ terminal: `gitpoulpi mailmap list|check|add`.
 - **Solo** (the `o` key, or the ref's menu, on a ref, folder or remote):
   shows only the commits of the soloed refs; solo several to see their union.
   `Shift+O` stops soloing.
-- **Hide** a ref (its menu) to take it out of the graph;
-  *Hidden n* in the Refs title counts them, **Show All** (`Shift+H`) brings
-  them back.
+- **Hide** a ref (its menu) to take it out of the graph: its pill goes and so
+  do the commits only it reaches (the checked-out commit always stays, with
+  the working-tree row). *Hidden n* in the Refs title counts them, **Show
+  All** (`Shift+H`) brings them back. The status line's total counts the
+  visible history.
 
 ## Branches, tags and the Refs sidebar
 
@@ -105,7 +107,7 @@ sidebar, or its pill in the Log) for its menu. The most useful entries:
 | Fast-forward `<branch>` to `<current>` / `<current>` to `<branch>` | Moves a branch forward when that is a fast-forward; otherwise grayed with the reason (`diverged, not a fast-forward`) |
 | Create worktree from... | Opens a linked worktree in its own tab |
 | Pull, Push, Fetch, Set upstream... | Network operations on that branch |
-| Hide / Show in graph, Solo | Display only; they hide or solo a ref without touching the repository |
+| Hide / Show in graph, Solo | Display only; they hide or solo a ref (hiding also drops the commits only that ref reaches) without touching the repository |
 | Rename, Delete | Delete asks first; a remote twin can be deleted too |
 | Copy branch name, Copy link to branch on remote | To the clipboard |
 
@@ -171,8 +173,15 @@ at Selected Commit...`). **Settings > Log & graph > Show a ghost branch on the
 hovered commit** turns it off; nothing is drawn where the Ref column is too narrow.
 
 **Remotes.** The `+` in the REMOTE title adds one; right-click a remote's
-name to fetch it, copy its web link, make it the default remote, hide all its
-branches, edit its URLs or remove it.
+name to fetch it, copy its web link, make it the default remote, hide it from
+the graph, edit its URLs or remove it. **Hiding a remote** (its row's eye, the
+menu's *Hide remote from graph*, or `Remote: Hide Remote in Graph...` in the
+palette) hides every branch it has now or gets later, and the commits only it
+reaches leave the Log: the way to browse one history without an unrelated
+archive remote's, and to bring that back with *Show remote in graph*. Showing a
+remote also shows the branches of it that were hidden one by one. A branch of a
+hidden remote says so on the status line if its eye is used: show the remote
+first.
 
 **Stashes.** **Stash** stashes everything (untracked files included);
 `Ctrl+G m` asks for a message first (with AI on, `Ctrl+G` inside that prompt

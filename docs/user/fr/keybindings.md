@@ -656,8 +656,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Flow : Continuer ou abandonner l'action interrompue... |  |
 | Flow : Basculer le groupement des branches |  |
 | Flow : Paramètres du workflow... |  |
-| Distant : Masquer toutes les branches du distant... |  |
-| Distant : Afficher toutes les branches du distant... |  |
+| Distant : Masquer le distant du graphe... |  |
+| Distant : Afficher le distant dans le graphe... |  |
 | Git : Nouvelle branche sur HEAD... | `Ctrl+G b` |
 | Git : Nouveau tag sur HEAD... | `Ctrl+G t` |
 | Git : Push tous les tags non envoyés | `Ctrl+G U` |

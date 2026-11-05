@@ -123,6 +123,16 @@ impl LazyLog {
         self.exhausted = false;
     }
 
+    /// Forgets everything about what was held: the walk changed under the
+    /// loader (the hidden-refs filter moved), so nothing held, in flight or
+    /// latched as "the end" describes it any more. The next refresh that
+    /// lands starts it again.
+    pub(crate) fn restart(&mut self) {
+        self.loaded = 0;
+        self.in_flight = None;
+        self.exhausted = false;
+    }
+
     pub(crate) fn is_loading(&self) -> bool {
         self.in_flight.is_some()
     }
@@ -294,6 +304,32 @@ mod tests {
     fn loaded(lazy: &mut LazyLog, n: usize) -> Vec<CommitNode> {
         lazy.on_refresh(n);
         (0..n).map(|i| node(i as u8)).collect()
+    }
+
+    #[test]
+    fn a_restart_forgets_what_was_held_and_asks_for_nothing_until_a_refresh() {
+        let mut lazy = LazyLog::new(settings(10, 5));
+        loaded(&mut lazy, 10);
+        lazy.mark_requested(LogPageRequest { skip: 10, limit: 5 });
+        let mut nodes: Vec<CommitNode> = (0..3u8).map(node).collect();
+        // The end had been reached once.
+        lazy.on_page(LogPageRequest { skip: 3, limit: 5 }, vec![], &mut nodes);
+        assert!(lazy.is_exhausted());
+
+        lazy.restart();
+        assert_eq!(lazy.loaded(), 0);
+        assert!(
+            !lazy.is_loading(),
+            "the in-flight page belongs to the old walk"
+        );
+        assert!(!lazy.is_exhausted());
+        assert_eq!(lazy.next_page(0, 20), None, "nothing before the refresh");
+
+        lazy.on_refresh(10);
+        assert_eq!(
+            lazy.next_page(0, 20),
+            Some(LogPageRequest { skip: 10, limit: 5 })
+        );
     }
 
     #[test]

@@ -182,8 +182,8 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::RemoteActions
         | PaletteCommand::PinSshKey
         | PaletteCommand::SparseCheckout
-        | PaletteCommand::HideAllBranchesOfRemote
-        | PaletteCommand::ShowAllBranchesOfRemote
+        | PaletteCommand::HideRemoteInGraph
+        | PaletteCommand::ShowRemoteInGraph
         | PaletteCommand::NewBranch
         | PaletteCommand::NewTag
         | PaletteCommand::StashPush

@@ -118,7 +118,7 @@ fn the_remote_menu_and_the_diverged_dialog_fit_in_french() {
         let _t = override_git_terms(local);
         let menu = ContextMenu::new(
             msg::menu_title("origin"),
-            remote_menu_entries("origin", false),
+            remote_menu_entries("origin", false, false),
             2,
             1,
         );
@@ -178,8 +178,4 @@ fn the_tooltips_and_statuses_follow_the_vocabulary() {
         panic!("not direct")
     };
     assert_eq!(said, "poussée de main vers origin...");
-    assert_eq!(
-        msg::branches_hidden(1, "origin"),
-        "1 branche de origin masquée du graphe"
-    );
 }

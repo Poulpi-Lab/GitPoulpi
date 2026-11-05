@@ -287,15 +287,14 @@ pub(crate) enum RemoteUiAction {
         branch: String,
         after_fetch: bool,
     },
-    /// Hide every one of this remote's branches from the graph at once --
-    /// the remote-name row's bulk twin of a branch row's own hide-in-graph
-    /// eye. Expands to the concrete branches this remote has *right now*
-    /// (see `refs_sidebar::refs_under_folder`), not a remembered pattern:
-    /// a branch fetched later from this remote starts visible.
-    HideAllBranches(String),
-    /// The complement: show every one of this remote's branches again,
-    /// whichever of them were individually or bulk-hidden.
-    ShowAllBranches(String),
+    /// Hide the whole remote from the graph -- the remote-name row's eye.
+    /// A pattern, not an expansion: the remote's branches fetched later are
+    /// hidden too, and the commits only they reach leave the Log
+    /// (`refs_tree::set_remote_hidden`).
+    HideRemote(String),
+    /// The complement: show the remote again, with every branch of it that
+    /// was hidden one by one.
+    ShowRemote(String),
     /// Pin this repository to a profile's SSH key (`Some(core.sshCommand)`)
     /// or clear the pin (`None`) - ADR-0008.
     PinSshKey(Option<String>),
@@ -388,7 +387,11 @@ pub(crate) fn ssh_pin_entries(
 
 /// The remote-name row's menu: copy the name or the web
 /// link, fetch, make it the default, edit, remove.
-pub(crate) fn remote_menu_entries(name: &str, is_default: bool) -> Vec<Entry<RemoteUiAction>> {
+pub(crate) fn remote_menu_entries(
+    name: &str,
+    is_default: bool,
+    hidden: bool,
+) -> Vec<Entry<RemoteUiAction>> {
     let mut entries = vec![Entry::action(
         glyph_label("\u{27F2}", msg::fetch_remote(name)),
         RemoteUiAction::FetchRemote(name.to_string()),
@@ -414,20 +417,20 @@ pub(crate) fn remote_menu_entries(name: &str, is_default: bool) -> Vec<Entry<Rem
         RemoteUiAction::EditRemote(name.to_string()),
     ));
     entries.push(Entry::Separator);
-    // The bulk twin of a branch row's own hide-in-graph eye -- two plain rows rather than one label
-    // that flips, since "fully hidden" is not tracked as this row's own
-    // state (see `HideAllBranches`'s doc comment: it's concrete branches,
-    // not a remembered pattern, so there is nothing to reliably report
-    // here without also threading `hidden_from_graph` into every menu
-    // that opens this one).
-    entries.push(Entry::action(
-        glyph_label(hide_in_graph_icon!(), msg::HIDE_ALL_BRANCHES.get()),
-        RemoteUiAction::HideAllBranches(name.to_string()),
-    ));
-    entries.push(Entry::action(
-        glyph_label(hide_in_graph_icon!(), msg::SHOW_ALL_BRANCHES.get()),
-        RemoteUiAction::ShowAllBranches(name.to_string()),
-    ));
+    // The remote row's eye, as a menu row: one row that flips with the
+    // remote's state (a hidden remote is a remembered fact now, not a set
+    // of branches, so there is a state to report).
+    entries.push(if hidden {
+        Entry::action(
+            glyph_label(hide_in_graph_icon!(), msg::SHOW_REMOTE_IN_GRAPH.get()),
+            RemoteUiAction::ShowRemote(name.to_string()),
+        )
+    } else {
+        Entry::action(
+            glyph_label(hide_in_graph_icon!(), msg::HIDE_REMOTE_IN_GRAPH.get()),
+            RemoteUiAction::HideRemote(name.to_string()),
+        )
+    });
     entries.push(Entry::danger(
         glyph_label("\u{2717}", msg::remove_remote(name)),
         RemoteUiAction::RemoveRemote(name.to_string()),

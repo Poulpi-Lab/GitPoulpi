@@ -518,6 +518,7 @@ it never shows as a change. Written by the TUI and the CLI; you rarely edit it.
 | `hosting_integration` | The `[[integrations]]` profile pinned here | `gitpoulpi hosting use --id` |
 | `pulls_source`, `issues_source` | The provider project the PR / issue lists read, as `{ integration, project, filter }`. `filter` is optional: a provider-native extra clause (a Jira JQL fragment, an Azure WIQL condition, Trello list names) ANDed onto the list query; GitHub and GitLab ignore it. | sidebar sections, `gitpoulpi hosting link` |
 | `ref_visibility` | Hidden / soloed refs | Refs sidebar, `gitpoulpi refs hide\|show\|solo` |
+| `hidden_remotes` | Remotes hidden from the graph as a whole (every branch, the ones fetched later too) | the remote's eye and menu, `gitpoulpi refs hide --remote` |
 | `folds`, `collapsed_*_ref_folders` | Collapsed sidebar sections and branch and tag folders. `[folds]` also holds `status_folders` (collapsed folders of the Unstaged / Staged file trees) and `commit_folders` (collapsed folders of a commit's changed-files tree, the same for every commit), each capped at 500 paths, oldest dropped first | the sidebar, the file trees |
 | `pending_auto_stash` | A stash GitPoulpi made and has not put back | written by the daemon; see [Auto-stash](log-and-history.md#auto-stash) |
 

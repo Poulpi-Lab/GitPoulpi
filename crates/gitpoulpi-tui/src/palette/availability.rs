@@ -530,7 +530,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         }
         C::ToggleHideSelectedFolder | C::ToggleSoloSelectedFolder => (!ctx.selected_folder)
             .then_some(msg::palette::WHY_SELECT_A_FOLDER_OR_REMOTE_IN_THE_REFS_PANE_FIRST.get()),
-        C::HideAllBranchesOfRemote | C::ShowAllBranchesOfRemote => {
+        C::HideRemoteInGraph | C::ShowRemoteInGraph => {
             (!ctx.has_remotes).then_some(msg::palette::WHY_THIS_REPOSITORY_HAS_NO_REMOTES.get())
         }
         C::ClearRefsFilter => {

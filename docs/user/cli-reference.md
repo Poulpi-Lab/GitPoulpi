@@ -238,7 +238,8 @@ Plus `commit --ai` and `stash push --ai`. The model is called from the
 | Command | What it does |
 |---|---|
 | `repo discover [path]`, `repo init <path> [--initial-branch B] [--bare]`, `repo open <path>`, `repo close <path>`, `repo list`, `repo recent [--prune] [--forget P]` | Repositories and this session's tabs. |
-| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (each with `--clear`) | The Log's ref filter: hide, show again, show only these (live in an open window). |
+| `refs hide <names>...`, `refs show <names>...`, `refs solo <names>...` (each with `--clear`) | The Log's ref filter: hide, show again, show only these (live in an open window). Hidden refs also leave the walk: commits only they reach disappear from the Log (the checked-out commit always stays). |
+| `refs hide --remote <name>...`, `refs show --remote <name>...` | Hide or show whole remotes: every branch of them, the ones fetched later too. The name must be a remote of the repository (to hide). `show` also drops branches of the remote that were hidden one by one; `--clear` empties the hidden remotes too. |
 | `session list`, `session new <name>`, `session rename <old> <new>`, `session delete <name>` | Named sessions (rename / delete refuse while its daemon runs). |
 | `daemon run`, `daemon start`, `daemon stop [--all]`, `daemon restart`, `daemon status` | The session's background process (alias `server`). Without a running daemon, each command starts an embedded one for its own lifetime. |
 | `config path`, `config get <key>`, `config set <key> <value>` | Settings ([Configuration reference](config-reference.md)). `config set ui.theme` and `ui.graph_color_theme` check the name against the registry. |

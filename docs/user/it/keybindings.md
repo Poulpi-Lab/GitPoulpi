@@ -658,8 +658,8 @@ applicano. I tasti sono quelli predefiniti.
 | Flow: Continua o interrompi l'azione interrotta... |  |
 | Flow: Attiva o disattiva il raggruppamento dei branch |  |
 | Flow: Impostazioni del workflow... |  |
-| Remoto: Nascondi tutti i branch di un remoto... |  |
-| Remoto: Mostra tutti i branch di un remoto... |  |
+| Remote: Hide Remote in Graph... |  |
+| Remote: Show Remote in Graph... |  |
 | Git: Nuovo branch su HEAD... | `Ctrl+G b` |
 | Git: Crea un tag su HEAD... | `Ctrl+G t` |
 | Git: Push di tutti i tag non inviati | `Ctrl+G U` |

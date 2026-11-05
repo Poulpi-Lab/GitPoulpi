@@ -677,12 +677,189 @@ pub fn save_collapsed(repo_root: &Path, collapsed: &CollapsedFolders) {
 
 use gitpoulpi_core::domain::RefVisibility;
 
+// -- hidden remotes -----------------------------------------------------
+//
+// A remote hidden as a whole (`RepoState::hidden_remotes`) lives in the
+// window's hidden set as the key `<remote>/`: a trailing slash no ref name
+// can have, so it never collides with a branch, and every site that already
+// carries the set (clear, count, the daemon submit, the CLI reload) carries
+// the remote with it. Reading "is this ref hidden" goes through
+// `hidden_in_graph`, the one predicate; writing a remote goes through
+// `toggle_remote_hidden`.
+
+/// The hidden-set key of a whole remote.
+pub(crate) fn remote_key(remote: &str) -> String {
+    format!("{remote}/")
+}
+
+/// Whether `path` (a remote branch's `remote/name`, or a folder path under a
+/// remote) lies under a remote hidden as a whole.
+pub(crate) fn hidden_through_remote(hidden: &HashSet<String>, path: &str) -> bool {
+    hidden.iter().any(|k| k.ends_with('/')) && {
+        let with_slash = format!("{path}/");
+        with_slash
+            .match_indices('/')
+            .any(|(i, _)| hidden.contains(&with_slash[..=i]))
+    }
+}
+
+/// Whether `remote` itself is hidden as a whole.
+pub(crate) fn remote_hidden(hidden: &HashSet<String>, remote: &str) -> bool {
+    hidden.contains(&remote_key(remote))
+}
+
+/// The one "is this ref hidden from the graph" predicate: named in the set,
+/// or a remote branch of a remote hidden as a whole (`remote_branch` says it
+/// is one: a local branch `archive/x` is not covered by the remote `archive`).
+pub(crate) fn hidden_in_graph(
+    hidden: &HashSet<String>,
+    full_name: &str,
+    remote_branch: bool,
+) -> bool {
+    hidden.contains(full_name) || (remote_branch && hidden_through_remote(hidden, full_name))
+}
+
+/// The hidden set split for the daemon: individually hidden refs and whole
+/// remotes (without the key's slash), both sorted.
+pub(crate) fn split_hidden(hidden: &HashSet<String>) -> (Vec<String>, Vec<String>) {
+    let mut names: Vec<String> = Vec::new();
+    let mut remotes: Vec<String> = Vec::new();
+    for k in hidden {
+        match k.strip_suffix('/') {
+            Some(remote) => remotes.push(remote.to_string()),
+            None => names.push(k.clone()),
+        }
+    }
+    names.sort();
+    remotes.sort();
+    (names, remotes)
+}
+
+/// Hides `remote` as a whole (`hide`), or shows it again. Hiding absorbs the
+/// individually hidden `<remote>/...` entries (now covered); showing clears
+/// the flag AND every such entry, so a remote whose branches were hidden one
+/// by one comes back whole.
+pub(crate) fn set_remote_hidden(hidden: &mut HashSet<String>, remote: &str, hide: bool) {
+    let key = remote_key(remote);
+    hidden.retain(|n| !n.starts_with(&key));
+    if hide {
+        hidden.insert(key);
+    }
+}
+
+/// A remote was renamed: its hides (the flag and the individual
+/// `<old>/...` branches) move to the new name. Whether anything moved.
+pub(crate) fn rename_remote_in_hidden(hidden: &mut HashSet<String>, old: &str, new: &str) -> bool {
+    let old_prefix = remote_key(old);
+    let moved: Vec<String> = hidden
+        .iter()
+        .filter(|n| n.starts_with(&old_prefix))
+        .cloned()
+        .collect();
+    for name in &moved {
+        hidden.remove(name);
+        hidden.insert(format!("{}{}", remote_key(new), &name[old_prefix.len()..]));
+    }
+    !moved.is_empty()
+}
+
+/// Forgets the hidden remotes that no longer exist (removed from the
+/// repository), with the branches hidden under them. The removed names.
+pub(crate) fn drop_gone_remotes(hidden: &mut HashSet<String>, existing: &[String]) -> Vec<String> {
+    let gone: Vec<String> = split_hidden(hidden)
+        .1
+        .into_iter()
+        .filter(|r| !existing.contains(r))
+        .collect();
+    for remote in &gone {
+        set_remote_hidden(hidden, remote, false);
+    }
+    gone
+}
+
+/// Flips `remote`; returns whether it is hidden afterwards.
+pub(crate) fn toggle_remote_hidden(hidden: &mut HashSet<String>, remote: &str) -> bool {
+    let hide = !remote_hidden(hidden, remote);
+    set_remote_hidden(hidden, remote, hide);
+    hide
+}
+
+/// The remote (without the key's slash) a ref or folder path is hidden
+/// through, the longest one.
+pub(crate) fn hiding_remote_of(hidden: &HashSet<String>, path: &str) -> Option<String> {
+    let with_slash = format!("{path}/");
+    with_slash
+        .match_indices('/')
+        .map(|(i, _)| &with_slash[..=i])
+        .rfind(|k| hidden.contains(*k))
+        .map(|k| k.trim_end_matches('/').to_string())
+}
+
+/// "Hide in graph" on one ref of the Refs sidebar's `kind` section. A remote
+/// branch of a remote hidden as a whole stays hidden with it: the answer is
+/// the note for the status line, and nothing changed. Otherwise flips the
+/// ref's own entry.
+pub(crate) fn toggle_hide_ref(
+    hidden: &mut HashSet<String>,
+    kind: Option<RefRowKind>,
+    full_name: &str,
+) -> Option<String> {
+    let remote_branch = kind == Some(RefRowKind::Remote);
+    if remote_branch && !hidden.contains(full_name) {
+        if let Some(remote) = hiding_remote_of(hidden, full_name) {
+            return Some(gitpoulpi_i18n::msg::remotes::branch_hidden_with_remote(
+                full_name, &remote,
+            ));
+        }
+    }
+    if !hidden.remove(full_name) {
+        hidden.insert(full_name.to_string());
+    }
+    None
+}
+
+/// What "hide this folder" does on the REMOTE section's rows that are about a
+/// whole remote: its root row flips the remote's flag (`Done` carries the
+/// status line), a folder under a hidden remote is refused (`Done` with the
+/// note, nothing changed). `Plain` is every other folder (the caller expands
+/// to the refs under it as before).
+pub(crate) enum FolderHide {
+    Done(String),
+    Plain,
+}
+
+pub(crate) fn hide_folder(
+    hidden: &mut HashSet<String>,
+    kind: Option<RefRowKind>,
+    path: &str,
+    is_remote_root: bool,
+) -> FolderHide {
+    if kind != Some(RefRowKind::Remote) {
+        return FolderHide::Plain;
+    }
+    if is_remote_root {
+        let now_hidden = toggle_remote_hidden(hidden, path);
+        return FolderHide::Done(if now_hidden {
+            gitpoulpi_i18n::msg::remotes::remote_hidden(path)
+        } else {
+            gitpoulpi_i18n::msg::remotes::remote_shown(path)
+        });
+    }
+    match hiding_remote_of(hidden, path) {
+        Some(remote) => FolderHide::Done(gitpoulpi_i18n::msg::remotes::branch_hidden_with_remote(
+            path, &remote,
+        )),
+        None => FolderHide::Plain,
+    }
+}
+
 /// The hidden and soloed ref sets remembered for this repository, in that
-/// order. A missing or unreadable file is two empty sets - everything
-/// shown, nothing soloed, the state a first run is in anyway.
+/// order (hidden remotes ride in the first, see above). A missing or
+/// unreadable file is two empty sets - everything shown, nothing soloed, the
+/// state a first run is in anyway.
 pub fn load_ref_visibility(repo_root: &Path) -> (HashSet<String>, HashSet<String>) {
     let state = RepoState::load(&repo_state_path(repo_root)).unwrap_or_default();
-    let mut hidden = HashSet::new();
+    let mut hidden: HashSet<String> = state.hidden_remotes.iter().map(|r| remote_key(r)).collect();
     let mut solo = HashSet::new();
     for (name, vis) in state.ref_visibility {
         match vis {
@@ -706,14 +883,13 @@ pub fn submit_ref_visibility(
     hidden: &HashSet<String>,
     solo: &HashSet<String>,
 ) {
-    let sorted = |set: &HashSet<String>| {
-        let mut v: Vec<String> = set.iter().cloned().collect();
-        v.sort();
-        v
-    };
+    let (hidden, hidden_remotes) = split_hidden(hidden);
+    let mut solo: Vec<String> = solo.iter().cloned().collect();
+    solo.sort();
     link.submit_action(crate::daemon_link::Action::SetRefVisibility {
-        hidden: sorted(hidden),
-        solo: sorted(solo),
+        hidden,
+        solo,
+        hidden_remotes,
     });
 }
 
@@ -726,8 +902,10 @@ pub fn save_ref_visibility(repo_root: &Path, hidden: &HashSet<String>, solo: &Ha
     let path = repo_state_path(repo_root);
     let mut state = RepoState::load(&path).unwrap_or_default();
     let mut map: BTreeMap<String, RefVisibility> = BTreeMap::new();
-    for name in hidden {
-        map.insert(name.clone(), RefVisibility::Hidden);
+    let (names, remotes) = split_hidden(hidden);
+    state.hidden_remotes = remotes;
+    for name in names {
+        map.insert(name, RefVisibility::Hidden);
     }
     for name in solo {
         // A ref cannot be both hidden and soloed in this UI (Solo owns the
@@ -757,6 +935,140 @@ mod ref_visibility_persistence_tests {
         let (back_hidden, back_solo) = load_ref_visibility(dir.path());
         assert_eq!(back_hidden, hidden);
         assert_eq!(back_solo, solo);
+    }
+
+    #[test]
+    fn a_hidden_remote_round_trips_as_a_key_and_covers_its_branches() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut hidden = HashSet::new();
+        assert!(toggle_remote_hidden(&mut hidden, "archive"));
+        hidden.insert("side".to_string());
+        save_ref_visibility(dir.path(), &hidden, &HashSet::new());
+        let state = RepoState::load(&repo_state_path(dir.path())).unwrap();
+        assert_eq!(state.hidden_remotes, ["archive"]);
+        assert_eq!(
+            state.ref_visibility.len(),
+            1,
+            "the remote is not a ref entry"
+        );
+
+        let (back, _) = load_ref_visibility(dir.path());
+        assert_eq!(back, hidden);
+        assert!(hidden_in_graph(&back, "archive/old-a", true));
+        assert!(hidden_in_graph(&back, "archive/grp/deep", true));
+        assert!(
+            !hidden_in_graph(&back, "archive/old-a", false),
+            "a local branch of that name is not under the remote"
+        );
+        assert!(!hidden_in_graph(&back, "archive2/x", true));
+        assert!(hidden_in_graph(&back, "side", false));
+        assert_eq!(
+            split_hidden(&back),
+            (vec!["side".to_string()], vec!["archive".to_string()])
+        );
+    }
+
+    #[test]
+    fn toggling_a_remote_absorbs_then_restores_its_individual_hides() {
+        let mut hidden: HashSet<String> = ["archive/old-a", "archive/old-b", "origin/main"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        assert!(toggle_remote_hidden(&mut hidden, "archive"));
+        assert!(!hidden.contains("archive/old-a"), "covered by the flag now");
+        assert!(hidden.contains("origin/main"));
+        // Showing clears the flag and every individual entry under it.
+        hidden.insert("archive/old-c".to_string());
+        assert!(!toggle_remote_hidden(&mut hidden, "archive"));
+        assert_eq!(hidden.len(), 1);
+        assert!(hidden.contains("origin/main"));
+    }
+
+    #[test]
+    fn a_renamed_remote_takes_its_hides_along_and_a_removed_one_drops_them() {
+        let mut hidden: HashSet<String> = ["old/", "old/x", "origin/main", "side"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        assert!(rename_remote_in_hidden(&mut hidden, "old", "new"));
+        assert!(hidden.contains("new/") && hidden.contains("new/x"));
+        assert!(!hidden.contains("old/") && !hidden.contains("old/x"));
+        assert!(hidden.contains("origin/main") && hidden.contains("side"));
+        assert!(!rename_remote_in_hidden(&mut hidden, "nothing", "else"));
+
+        let gone = drop_gone_remotes(&mut hidden, &["origin".to_string()]);
+        assert_eq!(gone, vec!["new"]);
+        assert!(!hidden.contains("new/") && !hidden.contains("new/x"));
+        assert!(
+            hidden.contains("origin/main"),
+            "branches hidden one by one stay"
+        );
+    }
+
+    #[test]
+    fn the_eye_on_a_branch_of_a_hidden_remote_says_to_show_the_remote_first() {
+        let mut hidden = HashSet::new();
+        set_remote_hidden(&mut hidden, "archive", true);
+        let before = hidden.clone();
+        let note = toggle_hide_ref(&mut hidden, Some(RefRowKind::Remote), "archive/old-a");
+        assert!(note.is_some_and(|n| n.contains("archive/old-a") && n.contains("archive")));
+        assert_eq!(hidden, before, "nothing changed");
+        // Elsewhere it flips as ever.
+        assert_eq!(
+            toggle_hide_ref(&mut hidden, Some(RefRowKind::Remote), "origin/main"),
+            None
+        );
+        assert!(hidden.contains("origin/main"));
+        assert_eq!(
+            toggle_hide_ref(&mut hidden, Some(RefRowKind::Local), "archive/x"),
+            None
+        );
+        assert!(
+            hidden.contains("archive/x"),
+            "a local branch is not under the remote"
+        );
+    }
+
+    #[test]
+    fn a_remote_root_row_flips_the_remote_and_a_folder_under_it_is_refused() {
+        let mut hidden = HashSet::new();
+        let kind = Some(RefRowKind::Remote);
+        assert!(matches!(
+            hide_folder(&mut hidden, kind, "archive", true),
+            FolderHide::Done(_)
+        ));
+        assert!(remote_hidden(&hidden, "archive"));
+        let before = hidden.clone();
+        assert!(matches!(
+            hide_folder(&mut hidden, kind, "archive/grp", false),
+            FolderHide::Done(_)
+        ));
+        assert_eq!(hidden, before);
+        assert!(matches!(
+            hide_folder(&mut hidden, kind, "archive", true),
+            FolderHide::Done(_)
+        ));
+        assert!(hidden.is_empty());
+        // A plain folder, or one of another section, is the old expansion.
+        assert!(matches!(
+            hide_folder(&mut hidden, kind, "origin/feature", false),
+            FolderHide::Plain
+        ));
+        assert!(matches!(
+            hide_folder(&mut hidden, Some(RefRowKind::Local), "archive", true),
+            FolderHide::Plain
+        ));
+    }
+
+    #[test]
+    fn a_nested_remote_name_is_a_prefix_on_a_path_boundary() {
+        let mut hidden = HashSet::new();
+        toggle_remote_hidden(&mut hidden, "grp/sub");
+        assert!(hidden_through_remote(&hidden, "grp/sub/main"));
+        assert!(hidden_through_remote(&hidden, "grp/sub/feature/x"));
+        assert!(!hidden_through_remote(&hidden, "grp/main"));
+        assert!(!hidden_through_remote(&hidden, "grp/subway/x"));
+        assert!(remote_hidden(&hidden, "grp/sub"));
     }
 
     #[test]

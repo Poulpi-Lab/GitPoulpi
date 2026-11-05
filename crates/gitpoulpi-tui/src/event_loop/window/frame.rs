@@ -12,8 +12,13 @@ impl WindowState {
     /// send and the answer is read on a later frame.
     fn tick_commit_total(&mut self) -> graph::TotalShown {
         let exhausted = self.lazy_log.is_exhausted();
+        // The key also moves with the hidden-refs filter: another walk,
+        // another total.
+        let (filter_gen, filter) = self.link.log_filter();
         let key = match &self.refs_result {
-            Ok(refs) if !exhausted && !self.still_loading => Some(graph::refs_key(refs)),
+            Ok(refs) if !exhausted && !self.still_loading => {
+                Some(graph::refs_key(refs) ^ filter_gen.wrapping_mul(0x9E37_79B9_7F4A_7C15))
+            }
             _ => None,
         };
         // No refs yet (or a failed read): nothing to key a count on, and
@@ -26,10 +31,12 @@ impl WindowState {
                 requester.call(
                     gitpoulpi_core::domain::OperationKind::CountCommits,
                     serde_json::json!({
-                        // The same walk as the graph (`all_refs`), or the total
-                        // would not be what scrolling to the end loads.
+                        // The same walk as the graph (`all_refs`, the same
+                        // hidden refs), or the total would not be what
+                        // scrolling to the end loads.
                         "opts": gitpoulpi_core::domain::LogOptions {
                             all_refs: true,
+                            hidden: filter,
                             ..Default::default()
                         },
                         "method": method.as_str(),

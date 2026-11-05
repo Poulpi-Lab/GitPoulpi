@@ -431,6 +431,8 @@ pub enum Action {
     SetRefVisibility {
         hidden: Vec<String>,
         solo: Vec<String>,
+        /// Remotes hidden as a whole.
+        hidden_remotes: Vec<String>,
     },
     /// `None` removes the separate push URL.
     RemoteSetPushUrl {
@@ -690,9 +692,18 @@ impl Action {
                 json!({ "name": name, "at": at, "annotated_message": message }),
             ),
             Action::TagDelete(name) => (OperationKind::TagDelete, json!({ "name": name })),
-            Action::SetRefVisibility { hidden, solo } => (
+            Action::SetRefVisibility {
+                hidden,
+                solo,
+                hidden_remotes,
+            } => (
                 OperationKind::SetRefVisibility,
-                json!({ "mode": "replace", "hidden": hidden, "solo": solo }),
+                json!({
+                    "mode": "replace",
+                    "hidden": hidden,
+                    "solo": solo,
+                    "hidden_remotes": hidden_remotes,
+                }),
             ),
             _ => return None,
         })

@@ -108,3 +108,23 @@ fn in_flight_labels_follow_the_language_and_the_git_vocabulary() {
         );
     });
 }
+
+/// An outcome read under an older hidden-refs filter must not change what
+/// the window holds: its Log hash is dropped, the other reads still count.
+#[test]
+fn a_log_from_an_older_filter_generation_is_not_a_change() {
+    let mut held = ReadHashes::default();
+    let read = ReadHashes {
+        log: Some(11),
+        refs: Some(22),
+        ..ReadHashes::default()
+    };
+    let changes = held.apply(read.for_filter_generation(3, 4));
+    assert!(!changes.log, "another walk: not taken");
+    assert!(changes.refs, "the refs are not affected by the filter");
+    assert_eq!(held.log, None, "and its hash is not remembered");
+
+    let changes = held.apply(read.for_filter_generation(4, 4));
+    assert!(changes.log);
+    assert_eq!(held.log, Some(11));
+}

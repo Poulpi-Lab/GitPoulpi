@@ -11,10 +11,18 @@ use super::*;
 /// `refs hide|show|solo`: the per-repo display filter, changed through the
 /// daemon so it can tell every other frontend (`Event::RefVisibilityChanged`).
 pub(super) async fn refs(session: &mut Session, action: RefsAction) -> Result<Emitted, String> {
-    let (mode, names, clear) = match action {
-        RefsAction::Hide { names, clear } => ("hide", names, clear),
-        RefsAction::Show { names, clear } => ("show", names, clear),
-        RefsAction::Solo { names, clear } => ("solo", names, clear),
+    let (mode, names, remotes, clear) = match action {
+        RefsAction::Hide {
+            names,
+            remote,
+            clear,
+        } => ("hide", names, remote, clear),
+        RefsAction::Show {
+            names,
+            remote,
+            clear,
+        } => ("show", names, remote, clear),
+        RefsAction::Solo { names, clear } => ("solo", names, Vec::new(), clear),
     };
     // Hiding or soloing something that does not exist would be remembered
     // forever and do nothing; showing it again must stay possible (a branch
@@ -27,16 +35,54 @@ pub(super) async fn refs(session: &mut Session, action: RefsAction) -> Result<Em
             }
         }
     }
-    let state: Value = session
-        .call(
-            OperationKind::SetRefVisibility,
-            json!({ "mode": mode, "names": names, "clear": clear }),
-        )
-        .await?;
+    // Same reasoning for remotes: hiding one that does not exist would be
+    // remembered forever (showing one, e.g. after `remote remove`, stays
+    // possible).
+    if mode == "hide" && !remotes.is_empty() {
+        let known: Vec<gitpoulpi_core::domain::Remote> =
+            session.call(OperationKind::Remotes, json!({})).await?;
+        for name in &remotes {
+            if !known.iter().any(|r| r.name == *name) {
+                return Err(format!("no such remote: {name}"));
+            }
+        }
+    }
+    let mut state: Value = Value::Null;
+    // Names and `--clear` first, so `hide --clear --remote x` ends with only
+    // `x` hidden.
+    if !names.is_empty() || clear || remotes.is_empty() {
+        state = session
+            .call(
+                OperationKind::SetRefVisibility,
+                json!({ "mode": mode, "names": names, "clear": clear }),
+            )
+            .await?;
+    }
+    if !remotes.is_empty() {
+        state = session
+            .call(
+                OperationKind::SetRefVisibility,
+                json!({ "mode": format!("{mode}-remote"), "names": remotes, "clear": false }),
+            )
+            .await?;
+    }
     let count = |key: &str| state[key].as_array().map_or(0, Vec::len);
-    let human = format!("{} hidden, {} soloed", count("hidden"), count("solo"));
+    let human = format!(
+        "{} hidden, {} soloed, {} remotes hidden",
+        count("hidden"),
+        count("solo"),
+        count("hidden_remotes")
+    );
     Ok(emitted(
-        json!({ "mode": mode, "names": names, "clear": clear, "hidden": state["hidden"], "solo": state["solo"] }),
+        json!({
+            "mode": mode,
+            "names": names,
+            "remotes": remotes,
+            "clear": clear,
+            "hidden": state["hidden"],
+            "solo": state["solo"],
+            "hidden_remotes": state["hidden_remotes"],
+        }),
         human,
     ))
 }

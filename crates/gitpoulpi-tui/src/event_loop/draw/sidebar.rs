@@ -127,7 +127,20 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
     // Soloing wins the slot (Show All stays reachable from the palette and
     // `Shift+H`).
     let soloing = !solo_refs.is_empty();
-    let hidden_count = hidden_from_graph.len();
+    // Hidden refs: the set's own entries, plus every remote branch a hidden
+    // remote covers (a hidden remote key is not itself a ref).
+    let hidden_count = hidden_from_graph
+        .iter()
+        .filter(|k| !k.ends_with('/'))
+        .count()
+        + ref_groups
+            .names(RefRowKind::Remote)
+            .iter()
+            .filter(|n| {
+                !hidden_from_graph.contains(*n)
+                    && crate::refs_tree::hidden_through_remote(hidden_from_graph, n)
+            })
+            .count();
     let total_refs: usize = [RefRowKind::Local, RefRowKind::Remote, RefRowKind::Tag]
         .iter()
         .map(|&k| ref_groups.names(k).len())
@@ -493,7 +506,15 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                             // currently drawn has nothing to do with
                             // whether they're hidden.
                             let under = refs_under_folder(names, path);
-                            let all_hidden = folder_fully_in(hidden_from_graph, &under);
+                            // A whole remote hidden (its root row, and every
+                            // folder under it) reads hidden whatever its
+                            // branches say.
+                            let all_hidden = folder_fully_in(hidden_from_graph, &under)
+                                || (kind == RefRowKind::Remote
+                                    && crate::refs_tree::hidden_through_remote(
+                                        hidden_from_graph,
+                                        path,
+                                    ));
                             let is_row_hovered =
                                 hovered_ref_folder.as_deref() == Some(path.as_str());
                             // Same gutter-icon shape as a leaf row's
@@ -552,7 +573,11 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                         } => {
                             let is_checked_out = kind == RefRowKind::Local
                                 && checked_out == Some(full_name.as_str());
-                            let is_hidden = hidden_from_graph.contains(full_name);
+                            let is_hidden = crate::refs_tree::hidden_in_graph(
+                                hidden_from_graph,
+                                full_name,
+                                kind == RefRowKind::Remote,
+                            );
                             // No per-kind icon (the row already sits inside its LOCAL/REMOTE/TAGS
                             // sub-pane). The checked-out mark gets a small fixed gutter on the left,
                             // so names stay aligned whichever rows are checked out.

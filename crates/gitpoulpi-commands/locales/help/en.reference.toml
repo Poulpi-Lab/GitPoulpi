@@ -282,11 +282,21 @@ redo = "Redo the operation `undo` just took back, to the exact state recorded (i
 "redo --expect" = "Only redo if this is still the latest undone entry"
 "redo --yes" = "Go ahead when the redo is risky; without it exit code 3"
 "refs hide" = """Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name)"""
-"refs hide --clear" = "Un-hide every hidden ref (in addition to any named)"
+"refs hide --clear" = "Un-hide every hidden ref and remote (in addition to any named)"
 "refs hide --names" = "Refs to hide"
+"refs hide --remote" = "Remotes to hide as a whole (names as `remote list` spells them)"
+"refs hide#long" = """
+Hide refs from the commit graph (the TUI's "Hide"): the per-repo display filter in `repo-state.toml`, which an open TUI follows live. Names are spelled as the refs listing spells them (`feature/x`, `origin/main`, a tag name).
+
+`--remote <name>...` hides a whole remote (every branch of it, the ones fetched later too): the way to look at one history without a separate archive remote's."""
 "refs show" = "Show refs again: removes them from the hidden and solo sets"
-"refs show --clear" = "Reset the whole filter: nothing hidden, nothing soloed"
+"refs show --clear" = "Reset the whole filter: nothing hidden (remotes included), nothing soloed"
 "refs show --names" = "Refs to show again"
+"refs show --remote" = "Remotes to show again"
+"refs show#long" = """
+Show refs again: removes them from the hidden and solo sets.
+
+`--remote <name>...` shows a whole remote again, with every branch of it that was hidden one by one."""
 "refs solo" = "Show only these refs (and what they reach) in the commit graph"
 "refs solo --clear" = "Un-solo every soloed ref (in addition to any named)"
 "refs solo --names" = "Refs to solo"

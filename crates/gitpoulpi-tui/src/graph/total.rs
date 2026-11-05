@@ -114,6 +114,15 @@ impl CommitTotal {
         }
     }
 
+    /// The walk changed (the hidden-refs filter moved): the held total and
+    /// any count still in flight describe the old walk, so the bar shows the
+    /// placeholder until the new one is counted.
+    pub(crate) fn forget(&mut self) {
+        self.known = None;
+        self.pending = None;
+        self.failed_key = None;
+    }
+
     /// What to print for `loaded` commits held.
     pub(crate) fn shown(&self, loaded: usize, exhausted: bool) -> TotalShown {
         if exhausted || loaded == 0 || self.method == Some(CommitCountMethod::Off) {
@@ -168,6 +177,40 @@ mod tests {
         assert_eq!(total.shown(500, false), TotalShown::Of(2500));
         // ... unless it fell behind what is loaded.
         assert_eq!(total.shown(2600, false), TotalShown::Whole);
+    }
+
+    #[test]
+    fn forgetting_shows_the_placeholder_and_drops_the_old_answer() {
+        let asked = Cell::new(0);
+        let mut total = CommitTotal::default();
+        total.tick(M::SystemGit, 7, false, || {
+            asked.set(asked.get() + 1);
+            counting(2500)
+        });
+        total.tick(M::SystemGit, 7, false, || unreachable!("in flight"));
+        assert_eq!(total.shown(500, false), TotalShown::Of(2500));
+
+        total.forget();
+        assert_eq!(total.shown(500, false), TotalShown::Counting);
+        total.tick(M::SystemGit, 8, false, || {
+            asked.set(asked.get() + 1);
+            counting(40)
+        });
+        total.tick(M::SystemGit, 8, false, || unreachable!("in flight"));
+        assert_eq!(total.shown(10, false), TotalShown::Of(40));
+        assert_eq!(asked.get(), 2);
+
+        // An answer still on its way when the walk changed is not taken.
+        let (reply, fill) = Reply::channel();
+        total.tick(M::SystemGit, 9, false, || reply);
+        total.forget();
+        fill(Ok(9999));
+        total.tick(M::SystemGit, 10, false, || {
+            asked.set(asked.get() + 1);
+            Reply::pending()
+        });
+        assert_eq!(asked.get(), 3);
+        assert_eq!(total.shown(10, false), TotalShown::Counting);
     }
 
     #[test]

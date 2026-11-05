@@ -96,15 +96,8 @@ pub fn count_commits(repo: &RepoRef, opts: &LogOptions) -> Result<u64> {
         return Ok(0);
     };
     let pushed = if opts.all_refs {
-        // Same three families as `log` (never the remote-tag mirror).
-        let heads = revwalk.push_glob("refs/heads/*");
-        let tags = revwalk.push_glob("refs/tags/*");
-        let remotes = revwalk.push_glob("refs/remotes/*");
-        if heads.is_ok() || tags.is_ok() || remotes.is_ok() {
-            Ok(())
-        } else {
-            heads
-        }
+        // Same refs as `log` (never the remote-tag mirror).
+        push_all_refs(&git_repo, &mut revwalk, &opts.hidden)
     } else {
         match &opts.start_ref {
             Some(start) => revwalk.push_ref(start).or_else(|_| {
@@ -166,6 +159,61 @@ pub fn mailmap_resolve(
     Ok(idents.iter().map(|i| map.resolve(i)).collect())
 }
 
+/// Seed `revwalk` for an `all_refs` walk. Without a filter, the three ref
+/// families by glob; with one, a push per visible tip
+/// (`gitpoulpi_core::domain::visible_tips`, the decision both backends
+/// share). `Err` means the walk has no starting point (unborn, or nothing
+/// visible).
+fn push_all_refs(
+    git_repo: &git2::Repository,
+    revwalk: &mut git2::Revwalk<'_>,
+    filter: &gitpoulpi_core::domain::RefFilter,
+) -> std::result::Result<(), git2::Error> {
+    if filter.is_empty() {
+        // A repository can lack any of the three (no remotes, no tags) and
+        // `push_glob` errors on a glob that matches nothing, so only a
+        // failure of *all three* means the walk has no starting point.
+        let heads = revwalk.push_glob("refs/heads/*");
+        let tags = revwalk.push_glob("refs/tags/*");
+        let remotes = revwalk.push_glob("refs/remotes/*");
+        return if heads.is_ok() || tags.is_ok() || remotes.is_ok() {
+            Ok(())
+        } else {
+            heads
+        };
+    }
+    let mut refs: Vec<(String, Oid)> = Vec::new();
+    for pattern in ["refs/heads/*", "refs/tags/*", "refs/remotes/*"] {
+        for reference in git_repo.references_glob(pattern)?.flatten() {
+            // `refs/remotes/<r>/HEAD` and friends mirror another ref: not a
+            // tip of their own (hiding the branch they name must hide it).
+            if reference.kind() == Some(git2::ReferenceType::Symbolic) {
+                continue;
+            }
+            let (Some(name), Ok(commit)) = (reference.name(), reference.peel_to_commit()) else {
+                // A tag of a tree or a blob: no commit, no tip.
+                continue;
+            };
+            if let Ok(id) = to_domain_oid(commit.id()) {
+                refs.push((name.to_string(), id));
+            }
+        }
+    }
+    let head = git_repo
+        .head()
+        .ok()
+        .and_then(|h| h.peel_to_commit().ok())
+        .and_then(|c| to_domain_oid(c.id()).ok());
+    let tips = gitpoulpi_core::domain::visible_tips(filter, &refs, head);
+    if tips.is_empty() {
+        return Err(git2::Error::from_str("no visible tip"));
+    }
+    for tip in tips {
+        revwalk.push(git2::Oid::from_bytes(&tip.0)?)?;
+    }
+    Ok(())
+}
+
 pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
     let git_repo = open(repo)?;
     let mut revwalk = match git_repo.revwalk() {
@@ -179,18 +227,7 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
         // (`refs/gitpoulpi/remote-tags/...`), bookkeeping that must never put
         // a line in the commit graph. The system-git backend says
         // `--branches --tags --remotes` for the same reason.
-        //
-        // A repository can lack any of the three (no remotes, no tags) and
-        // `push_glob` errors on a glob that matches nothing, so only a
-        // failure of *all three* means the walk has no starting point.
-        let heads = revwalk.push_glob("refs/heads/*");
-        let tags = revwalk.push_glob("refs/tags/*");
-        let remotes = revwalk.push_glob("refs/remotes/*");
-        if heads.is_ok() || tags.is_ok() || remotes.is_ok() {
-            Ok(())
-        } else {
-            heads
-        }
+        push_all_refs(&git_repo, &mut revwalk, &opts.hidden)
     } else {
         match &opts.start_ref {
             // A ref name, else any revision git parses (a commit id): the

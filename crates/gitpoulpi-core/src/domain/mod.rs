@@ -12,6 +12,7 @@ mod merge_doc;
 mod mermaid;
 mod operation;
 mod ops;
+mod ref_filter;
 mod reflog;
 mod refs;
 mod repo;
@@ -75,6 +76,7 @@ pub use ops::{
     ResetMode, RevertOutcome, RewordOutcome, RewordRefusal, SparseState, TagSelection,
     WorktreeAddOptions, WorktreeStart, FETCH_REFSPEC_NAMESPACE,
 };
+pub use ref_filter::{visible_tips, RefFilter};
 pub use reflog::{
     reflog_refname, LostCommit, LostCommitOptions, LostCommitsPage, LostSource, ReflogEntry,
     ReflogPage, ReflogPosition, ZERO_OID,

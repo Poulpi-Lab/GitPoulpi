@@ -307,6 +307,7 @@ fn every_action() -> Vec<Action> {
         Action::SetRefVisibility {
             hidden: vec![s("a")],
             solo: vec![s("main")],
+            hidden_remotes: vec![s("archive")],
         },
         Action::RemoteSetPushUrl {
             name: s("up"),

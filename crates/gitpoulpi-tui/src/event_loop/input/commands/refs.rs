@@ -394,7 +394,13 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
         }
         PaletteCommand::ToggleHideInGraph => {
             if let Some(n) = sel_ref {
-                toggle_in(&mut *cx.hidden_from_graph, n);
+                if let Some(note) = refs_tree::toggle_hide_ref(
+                    &mut *cx.hidden_from_graph,
+                    cx.active_ref_section.ref_kind(),
+                    &n,
+                ) {
+                    *cx.last_message = Some(note);
+                }
                 refs_tree::submit_ref_visibility(cx.link, &*cx.hidden_from_graph, &*cx.solo_refs);
             }
         }
@@ -452,7 +458,24 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                 &*cx.remote_names,
             );
             match (selected_folder, cx.active_ref_section.ref_kind()) {
-                (Some((path, _)), Some(kind)) => {
+                (Some((path, is_remote_root)), Some(kind)) => {
+                    // The keyboard twin of the remote row's eye.
+                    if cmd == PaletteCommand::ToggleHideSelectedFolder {
+                        if let refs_tree::FolderHide::Done(note) = refs_tree::hide_folder(
+                            &mut *cx.hidden_from_graph,
+                            Some(kind),
+                            &path,
+                            is_remote_root,
+                        ) {
+                            *cx.last_message = Some(note);
+                            refs_tree::submit_ref_visibility(
+                                cx.link,
+                                &*cx.hidden_from_graph,
+                                &*cx.solo_refs,
+                            );
+                            return true;
+                        }
+                    }
                     let names = cx
                         .refs_result
                         .as_ref()

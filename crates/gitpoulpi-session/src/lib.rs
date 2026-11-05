@@ -1,3 +1,4 @@
+mod clone_source;
 mod commit_template;
 mod favorites;
 mod global;
@@ -10,6 +11,7 @@ mod review_draft;
 mod workflow_file;
 mod workspaces;
 
+pub use clone_source::CloneSource;
 pub use commit_template::{
     join_template, own_template_path, read_template, split_template, template_path, write_template,
     TEMPLATE_FILE,

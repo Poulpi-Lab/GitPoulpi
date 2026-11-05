@@ -37,7 +37,7 @@ pub use repo_data::{
     repo_data_file_with, user_data_folder_name, RepoDataLocation, DEFAULT_REPO_DATA_LOCATION,
     LEGACY_DIR_NAME,
 };
-pub use schema::{default_clone_root, home_dir};
+pub use schema::{default_clone_root, home_dir, CLONE_START_LAST, CLONE_START_URL};
 pub use schema::{
     read_quantity, AutoCrlf, AutoStashMode, AvatarFallback, AvatarPlacement, AvatarSources,
     BlameSide, ColorDepth, ColumnResize, CommitCountMethod, ComposerFiles, CredentialsConfig,

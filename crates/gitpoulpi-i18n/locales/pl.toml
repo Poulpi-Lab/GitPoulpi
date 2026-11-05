@@ -310,6 +310,11 @@ allow_ui_propose = "Pozwól agentom AI proponować zmiany do mojego potwierdzeni
 allow_ui_propose_help = { git = "Włączone: agent AI może otworzyć wstępnie wypełnione okno dialogowe: nowy opis commita, opis commita w kompozytorze, nową gałąź lub tag. Jest oznaczone ✦ Proposed by <agent>, a nic się nie zmienia, dopóki nie potwierdzisz w samym oknie; Esc odrzuca. Wyłączone (domyślnie): `ui propose` i narzędzia MCP ui_propose_* są odrzucane.", local = "Włączone: agent AI może otworzyć wstępnie wypełnione okno dialogowe: nowy opis zatwierdzenia, opis zatwierdzenia w kompozytorze, nową gałąź lub znacznik. Jest oznaczone ✦ Proposed by <agent>, a nic się nie zmienia, dopóki nie potwierdzisz w samym oknie; Esc odrzuca. Wyłączone (domyślnie): `ui propose` i narzędzia MCP ui_propose_* są odrzucane." }
 clone_root = "Domyślny folder klonowania"
 clone_root_help = "Od czego zaczyna się pole „Gdzie sklonować” w oknie Klonuj. Puste: domyślne dla systemu: %USERPROFILE%\\source\\repos w Windows, ~/src gdzie indziej."
+# context: setting: which source the Clone dialog opens on (Last used, Clone with URL, or an integration)
+clone_start_source = "Clone dialog starts on"
+clone_start_source_help = "The source the Clone dialog opens on. Last used reopens the one it showed when it was last closed; Clone with URL always starts on the URL form; or pick one of your connected integrations. A source that is no longer available means Clone with URL."
+# context: option of the "Clone dialog starts on" setting: the source shown when the dialog was last closed
+clone_start_last = "Last used"
 browse_root = "Domyślny folder przeglądania"
 browse_root_help = "Gdzie domyślnie otwiera się Przeglądaj (wybór folderu z karty Home). Puste: Przeglądaj otwiera się w ostatnio wybranym folderze - lub w folderze domowym za pierwszym razem - zamiast w stałym."
 heading_auto_stash = { git = "Auto-stash", local = "Automatyczny schowek" }

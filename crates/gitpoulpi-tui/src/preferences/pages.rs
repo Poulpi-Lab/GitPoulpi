@@ -30,6 +30,7 @@ pub(super) const GENERAL: &[Row] = &[
     Key("general.startup_tab_launcher"),
     Key("general.group_worktree_tabs"),
     Key("repos.clone_root"),
+    Key("repos.clone_start_source"),
     Key("repos.browse_root"),
     Key("session.per_repo_state_dir"),
     Key("general.default_branch_name"),

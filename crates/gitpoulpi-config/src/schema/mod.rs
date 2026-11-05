@@ -164,7 +164,7 @@ impl Default for McpConfig {
 }
 
 /// Where repositories live on this machine.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ReposConfig {
     /// Live: the folder the Clone dialog's "Where to clone to" starts
@@ -182,7 +182,29 @@ pub struct ReposConfig {
     /// Live: the folder picker's "Show sibling folders" checkbox - the
     /// left tree also lists the other folders of every open level.
     pub show_siblings: bool,
+    /// Live: the source the Clone dialog opens on. `last` (the default,
+    /// also an empty value) reopens the source it showed when it was last
+    /// closed, `url` is always "Clone with URL", anything else is an
+    /// integration profile id (a profile that cannot be a source: URL).
+    pub clone_start_source: String,
 }
+
+impl Default for ReposConfig {
+    fn default() -> Self {
+        Self {
+            clone_root: String::new(),
+            browse_root: String::new(),
+            show_hidden: false,
+            show_siblings: false,
+            clone_start_source: CLONE_START_LAST.into(),
+        }
+    }
+}
+
+/// `repos.clone_start_source`: reopen on the last source shown.
+pub const CLONE_START_LAST: &str = "last";
+/// `repos.clone_start_source`: always start on "Clone with URL".
+pub const CLONE_START_URL: &str = "url";
 
 impl ReposConfig {
     /// The folder a clone lands under: the configured one, or the per-OS

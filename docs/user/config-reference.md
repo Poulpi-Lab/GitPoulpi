@@ -421,6 +421,7 @@ Everything else: [AI assistance](ai.md).
 | Key | Default | Values and effect |
 |---|---|---|
 | `repos.clone_root` | `""` | Where the Clone dialog starts; empty = `%USERPROFILE%\source\repos` or `~/src`. |
+| `repos.clone_start_source` | `"last"` | The source the Clone dialog opens on: `last` (default, or empty) = the one it showed when it was last closed, `url` = always Clone with URL, or an integration profile id (`id` in its `[[integrations]]` entry). A profile that is gone, disabled or not connected falls back to Clone with URL. The last source itself is state, kept in `clone-source.toml` in the config folder, not here. |
 | `repos.browse_root` | `""` | Where Browse opens; empty = the last folder chosen, then home. |
 | `repos.show_hidden` | `false` | The folder picker shows hidden folders (`Alt+H` toggles and saves it). |
 | `repos.show_siblings` | `false` | The folder picker's left tree also lists the other folders of every open level, as a real hierarchy (`Alt+S` toggles and saves it). |

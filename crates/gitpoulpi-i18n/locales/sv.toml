@@ -312,6 +312,11 @@ allow_ui_propose = "Låt AI-agenter föreslå ändringar som jag bekräftar"
 allow_ui_propose_help = { git = "På: en AI-agent får öppna en förifylld dialog åt dig: ett nytt meddelande för en commit, ett commit-meddelande i composern, en ny gren eller tag. Den märks ✦ Föreslaget av <agent>, och inget ändras förrän du trycker på dialogens egen bekräftelseknapp; Esc avvisar den. Av (standard): `ui propose` och MCP-verktygen ui_propose_* avvisas.", local = "På: en AI-agent får öppna en förifylld dialog åt dig: ett nytt meddelande för en incheckning, ett incheckningsmeddelande i composern, en ny gren eller tagg. Den märks ✦ Föreslaget av <agent>, och inget ändras förrän du trycker på dialogens egen bekräftelseknapp; Esc avvisar den. Av (standard): `ui propose` och MCP-verktygen ui_propose_* avvisas." }
 clone_root = "Standardmapp för kloning"
 clone_root_help = "Där klondialogens ”Klona till” börjar. Tomt använder standarden per OS: %USERPROFILE%\\source\\repos på Windows, ~/src annars."
+# context: setting: which source the Clone dialog opens on (Last used, Clone with URL, or an integration)
+clone_start_source = "Clone dialog starts on"
+clone_start_source_help = "The source the Clone dialog opens on. Last used reopens the one it showed when it was last closed; Clone with URL always starts on the URL form; or pick one of your connected integrations. A source that is no longer available means Clone with URL."
+# context: option of the "Clone dialog starts on" setting: the source shown when the dialog was last closed
+clone_start_last = "Last used"
 browse_root = "Standardmapp för bläddring"
 browse_root_help = "Där Bläddra (mappväljaren, från fliken Hem) öppnas som standard. Tomt gör att Bläddra öppnas i senast valda mapp - eller hemmappen första gången - i stället för en fast mapp."
 heading_auto_stash = "Auto-stash"

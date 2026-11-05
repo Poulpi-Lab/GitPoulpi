@@ -311,6 +311,11 @@ allow_ui_propose = "KI-Agenten Änderungen zur Bestätigung vorschlagen lassen"
 allow_ui_propose_help = "An: Ein KI-Agent darf einen für Sie vorausgefüllten Dialog öffnen: eine neue Nachricht für einen Commit, eine Commit-Nachricht im Composer, einen neuen Branch oder Tag. Er ist mit ✦ Vorgeschlagen von <Agent> markiert, und nichts ändert sich, bis Sie die eigene Bestätigung des Dialogs drücken; Esc lehnt ihn ab. Aus (Standard): `ui propose` und die MCP-Tools ui_propose_* werden abgelehnt."
 clone_root = "Standard-Klonordner"
 clone_root_help = "Wo „Klonen nach“ im Klon-Dialog beginnt. Leer verwendet den Standard je Betriebssystem: %USERPROFILE%\\source\\repos unter Windows, sonst ~/src."
+# context: setting: which source the Clone dialog opens on (Last used, Clone with URL, or an integration)
+clone_start_source = "Clone dialog starts on"
+clone_start_source_help = "The source the Clone dialog opens on. Last used reopens the one it showed when it was last closed; Clone with URL always starts on the URL form; or pick one of your connected integrations. A source that is no longer available means Clone with URL."
+# context: option of the "Clone dialog starts on" setting: the source shown when the dialog was last closed
+clone_start_last = "Last used"
 browse_root = "Standardordner für Durchsuchen"
 browse_root_help = "Wo Durchsuchen (die Ordnerauswahl im Home-Tab) standardmäßig öffnet. Leer lässt Durchsuchen im zuletzt gewählten Ordner öffnen – beim allerersten Mal im Home-Ordner – statt in einem festen."
 heading_auto_stash = { git = "Auto-Stash", local = "Auto-Zwischenspeicher" }

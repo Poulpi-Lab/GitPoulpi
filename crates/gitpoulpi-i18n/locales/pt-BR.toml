@@ -310,6 +310,11 @@ allow_ui_propose = "Deixar agentes de IA proporem alterações para eu confirmar
 allow_ui_propose_help = { git = "Ativado, um agente de IA pode abrir um diálogo já preenchido para você: uma nova mensagem para um commit, uma mensagem de commit no compositor, uma nova branch ou tag. Ele é marcado ✦ Proposto por <agente>, e nada muda até você confirmar no próprio diálogo; Esc o rejeita. Desativado (padrão), `ui propose` e as ferramentas MCP ui_propose_* são recusadas.", local = "Ativado, um agente de IA pode abrir um diálogo já preenchido para você: uma nova mensagem para um commit, uma mensagem de commit no compositor, uma nova branch ou etiqueta. Ele é marcado ✦ Proposto por <agente>, e nada muda até você confirmar no próprio diálogo; Esc o rejeita. Desativado (padrão), `ui propose` e as ferramentas MCP ui_propose_* são recusadas." }
 clone_root = "Pasta de clone padrão"
 clone_root_help = "Onde começa o campo “Onde clonar” do diálogo Clonar. Vazio usa o padrão de cada SO: %USERPROFILE%\\source\\repos no Windows, ~/src nos demais."
+# context: setting: which source the Clone dialog opens on (Last used, Clone with URL, or an integration)
+clone_start_source = "Clone dialog starts on"
+clone_start_source_help = "The source the Clone dialog opens on. Last used reopens the one it showed when it was last closed; Clone with URL always starts on the URL form; or pick one of your connected integrations. A source that is no longer available means Clone with URL."
+# context: option of the "Clone dialog starts on" setting: the source shown when the dialog was last closed
+clone_start_last = "Last used"
 browse_root = "Pasta de navegação padrão"
 browse_root_help = "Onde Procurar (o seletor de pastas, a partir da aba Início) abre por padrão. Vazio faz Procurar abrir na última pasta escolhida - ou na pasta pessoal, na primeira vez - em vez de uma fixa."
 heading_auto_stash = "Auto-{$stash}"

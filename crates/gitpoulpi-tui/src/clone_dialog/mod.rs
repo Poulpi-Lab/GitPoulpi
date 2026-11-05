@@ -110,6 +110,30 @@ pub(crate) fn hosted_sources(integrations: &[gitpoulpi_config::Integration]) -> 
         .collect()
 }
 
+/// The index of the source a fresh dialog opens on (0 = Clone with URL):
+/// `setting` is `repos.clone_start_source` (`url`, `last`, empty = `last`,
+/// or a profile id) and `last` the profile id the dialog last showed
+/// (`None` = URL). A profile that is not among `hosted` (removed, disabled,
+/// not connected, not a repository source) is URL, silently.
+pub(crate) fn start_source_index(
+    setting: &str,
+    last: Option<&str>,
+    hosted: &[HostedSource],
+) -> usize {
+    let setting = setting.trim();
+    let wanted =
+        if setting.is_empty() || setting.eq_ignore_ascii_case(gitpoulpi_config::CLONE_START_LAST) {
+            last
+        } else if setting.eq_ignore_ascii_case(gitpoulpi_config::CLONE_START_URL) {
+            None
+        } else {
+            Some(setting)
+        };
+    wanted
+        .and_then(|id| hosted.iter().position(|h| h.profile_id == id))
+        .map_or(0, |at| at + 1)
+}
+
 /// `GitHub` / `GitLab` / `Azure DevOps` / `Bitbucket` for a profile kind
 /// (the same names as the sidebar's dropdowns).
 fn provider_name(kind: gitpoulpi_config::IntegrationKind) -> &'static str {
@@ -264,6 +288,9 @@ pub(crate) struct CloneDialog {
     /// The project (and the note to show) a hosted source was opened for
     /// (the Radar's "Clone it, then review"): selected when the list lands.
     target: Option<(String, String)>,
+    /// The user (not the opening code) moved to another source since the
+    /// last [`Self::take_source_change`].
+    source_changed: bool,
 }
 
 impl CloneDialog {
@@ -324,7 +351,36 @@ impl CloneDialog {
             close: Default::default(),
             load_due: None,
             target: None,
+            source_changed: false,
         }
+    }
+
+    /// Opens on the source `repos.clone_start_source` / the remembered
+    /// `last` one resolve to (see [`start_source_index`]); a hosted one
+    /// asks for its list at once, like a picked source. Call after
+    /// [`Self::with_hosted`], and not when the caller picks the source
+    /// itself.
+    pub(crate) fn with_start_source(mut self, setting: &str, last: Option<&str>) -> Self {
+        let at = start_source_index(setting, last, &self.hosted);
+        if at == 0 {
+            return self;
+        }
+        self.select_source(at);
+        self.source_changed = false;
+        if self.hosted_mode() {
+            self.load_due = Some(Instant::now());
+            self.focus = CloneFocus::Search;
+        }
+        self
+    }
+
+    /// The profile id to remember (`None` = URL) when the user changed the
+    /// source since the last call; `None` outside that case.
+    pub(crate) fn take_source_change(&mut self) -> Option<Option<String>> {
+        if !std::mem::take(&mut self.source_changed) {
+            return None;
+        }
+        Some(self.hosted_source().map(|h| h.profile_id.clone()))
     }
 
     /// Starts with `url` typed in (the Radar's "Clone it, then review"): the
@@ -348,6 +404,7 @@ impl CloneDialog {
         if !self.hosted_mode() {
             return self;
         }
+        self.source_changed = false;
         self.message = Some(note.clone());
         self.target = Some((project.to_string(), note));
         self.load_due = Some(Instant::now());
@@ -972,6 +1029,7 @@ impl CloneDialog {
             return;
         }
         self.source = index;
+        self.source_changed = true;
         self.search.clear();
         self.repo_cursor = 0;
         self.repo_offset = 0;

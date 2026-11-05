@@ -310,6 +310,11 @@ allow_ui_propose = "AI 에이전트가 변경 사항을 제안하고 내가 확�
 allow_ui_propose_help = "켜짐이면 AI 에이전트가 미리 채워진 대화상자를 열 수 있습니다: {$commit}의 새 메시지, 작성기의 {$commit} 메시지, 새 브랜치나 {$tag}. ✦ Proposed by <agent>로 표시되며 대화상자 자체의 확인을 누르기 전에는 아무것도 바뀌지 않고, Esc는 거부합니다. 꺼짐(기본값)이면 `ui propose`와 MCP ui_propose_* 도구는 거부됩니다."
 clone_root = "기본 클론 폴더"
 clone_root_help = "클론 대화상자의 \"클론할 위치\"가 시작하는 곳입니다. 비워 두면 OS별 기본값을 씁니다: Windows는 %USERPROFILE%\\source\\repos, 그 외에는 ~/src."
+# context: setting: which source the Clone dialog opens on (Last used, Clone with URL, or an integration)
+clone_start_source = "Clone dialog starts on"
+clone_start_source_help = "The source the Clone dialog opens on. Last used reopens the one it showed when it was last closed; Clone with URL always starts on the URL form; or pick one of your connected integrations. A source that is no longer available means Clone with URL."
+# context: option of the "Clone dialog starts on" setting: the source shown when the dialog was last closed
+clone_start_last = "Last used"
 browse_root = "기본 찾아보기 폴더"
 browse_root_help = "찾아보기(홈 탭의 폴더 선택기)가 기본으로 여는 곳입니다. 비워 두면 고정된 폴더 대신 마지막으로 선택한 폴더에서 열고, 맨 처음에는 홈 폴더에서 엽니다."
 heading_auto_stash = "자동 {$stash}"

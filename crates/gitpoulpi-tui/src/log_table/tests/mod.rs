@@ -61,6 +61,7 @@ mod ghost;
 mod i18n;
 mod prefs;
 mod render;
+mod scroll_keys;
 mod search;
 mod select_band;
 mod stash;

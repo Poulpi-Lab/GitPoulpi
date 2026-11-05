@@ -472,6 +472,8 @@ actions! {
     LogCompareSwap => (Log, "log.compare_swap", KEYMAP_SWAP, ["x"]),
     LogCompareNext => (Log, "log.compare_next", KEYMAP_NEXT_CARD, ["n"]),
     LogPickColumn => (Log, "log.pick_column", LOG_PICK_COLUMN, ["Shift+C"]),
+    LogScrollLeft => (Log, "log.scroll_left", LOG_SCROLL_LEFT, ["Shift+Left"]),
+    LogScrollRight => (Log, "log.scroll_right", LOG_SCROLL_RIGHT, ["Shift+Right"]),
     LogCopyMermaid => (Log, "log.copy_mermaid", KEYMAP_COPY_MERMAID, ["Shift+Y"], @Mermaid),
     // ---- the Log's column header, while a column is picked ----
     LogColumnsNext => (LogColumns, "log_columns.next", LOG_COLUMNS_NEXT, ["Tab"]),
@@ -483,6 +485,7 @@ actions! {
     LogColumnsResetWidth => (LogColumns, "log_columns.reset_width", LOG_COLUMNS_RESET_WIDTH, ["0"]),
     LogColumnsFit => (LogColumns, "log_columns.fit", LOG_COLUMNS_FIT, ["="]),
     LogColumnsFitAll => (LogColumns, "log_columns.fit_all", LOG_COLUMNS_FIT_ALL, ["+"]),
+    LogColumnsLayout => (LogColumns, "log_columns.layout", LOG_COLUMNS_LAYOUT, ["s"]),
     // ---- log pane, inside a commit's changed files ----
     LogFilesCollapseAll => (LogFiles, "log_files.collapse_all", LOG_FILES_COLLAPSE_ALL, ["z"]),
     LogFilesFilter => (LogFiles, "log_files.filter", LOG_FILES_FILTER, ["/"]),

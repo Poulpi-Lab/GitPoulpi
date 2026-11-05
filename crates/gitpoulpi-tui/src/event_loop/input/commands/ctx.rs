@@ -121,6 +121,9 @@ pub(in crate::event_loop) struct CommandCtx<'a> {
     pub(in crate::event_loop) log_col_pick: &'a mut Option<LogColumn>,
     pub(in crate::event_loop) log_column_overrides:
         &'a mut std::collections::HashMap<LogColumn, u16>,
+    pub(in crate::event_loop) log_column_scroll_widths:
+        &'a mut std::collections::HashMap<LogColumn, u16>,
+    pub(in crate::event_loop) log_h_offset: &'a mut u16,
     pub(in crate::event_loop) log_follow: &'a mut bool,
     pub(in crate::event_loop) log_len: &'a mut usize,
     pub(in crate::event_loop) log_menu_refs: &'a mut pill_menu::RefTable,
@@ -221,7 +224,14 @@ impl CommandCtx<'_> {
             *self.log_area,
             &*self.log_column_order,
             &*self.log_column_hidden,
-            &*self.log_column_overrides,
+            &crate::log_table::LogWidthMaps {
+                fit: &*self.log_column_overrides,
+                scroll: &*self.log_column_scroll_widths,
+            },
+            (
+                crate::live_settings::log_columns_layout(),
+                *self.log_h_offset,
+            ),
         )
     }
 }

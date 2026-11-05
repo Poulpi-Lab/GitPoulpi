@@ -23,6 +23,26 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
         }
         return Ok(Flow::Handled);
     }
+    if let Some((ScrollBar::LogHorizontal, grab)) = *cx.dragging_scrollbar {
+        let geo = cx.log_geo();
+        if let Some(track) = scrollbar::Track::horizontal(
+            *cx.log_area,
+            usize::from(geo.content_w),
+            usize::from(geo.h_offset),
+        ) {
+            let pos = col as i32 - track.rect.x as i32;
+            let to = track.drag_offset(
+                usize::from(geo.content_w),
+                track.rect.width as usize,
+                grab,
+                pos,
+            );
+            *cx.log_h_offset = u16::try_from(to)
+                .unwrap_or(u16::MAX)
+                .min(geo.max_h_offset());
+        }
+        return Ok(Flow::Handled);
+    }
     if let Some((kind, grab)) = *cx.dragging_scrollbar {
         match (kind, cx.diff_view_state.as_mut()) {
             (ScrollBar::DiffVertical, Some(s)) => {
@@ -59,6 +79,7 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
             (
                 ScrollBar::FileInsightVertical
                 | ScrollBar::FileInsightHorizontal
+                | ScrollBar::LogHorizontal
                 | ScrollBar::BlameMinimap,
                 _,
             )
@@ -302,7 +323,13 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
     }
     if let Some(grip) = *cx.dragging_log_boundary {
         let geo = cx.log_geo();
-        if grip.last {
+        if geo.layout == gitpoulpi_config::LogColumnsLayout::Scroll {
+            // Only this column changes (the others were pinned at the press)
+            // and the table grows or shrinks: the width is the pointer's place
+            // in the content less where the column starts.
+            cx.log_column_scroll_widths
+                .insert(grip.col, scroll_drag_width(&geo, grip.col, col));
+        } else if grip.last {
             // The grip after the last column: by how far the pointer travelled
             // since the press, `Message` taking up the difference, never past
             // what the pane has room for (`LogColumnWidths::fit_max`).
@@ -332,8 +359,7 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
         // Re-light the strip from the widths just written. A held button
         // reports as `Drag`, not `Moved`, so this is the only place the
         // highlight can follow a boundary that is being dragged.
-        let offsets = cx.log_geo().offsets;
-        *cx.hovered_resize_strip = log_grip_rect(*cx.log_area, &offsets, grip.col);
+        *cx.hovered_resize_strip = cx.log_geo().grip_rect(*cx.log_area, grip.col);
     }
     if let Some(mut drag) = *cx.dragging_log_header {
         drag.at = (col, row);

@@ -63,7 +63,11 @@ fn rendered(select_middle: bool) -> (Buffer, Rect, Vec<(LogColumn, u16, u16)>) {
                 log_area,
                 &mut state,
             );
-            paint_log_ticks(frame.buffer_mut(), log_area, &offsets);
+            paint_log_ticks(
+                frame.buffer_mut(),
+                log_area,
+                &LogColumnsGeo::from_fit_offsets(log_area, &offsets),
+            );
         })
         .unwrap();
     (terminal.backend().buffer().clone(), log_area, offsets)
@@ -73,7 +77,10 @@ fn rendered(select_middle: bool) -> (Buffer, Rect, Vec<(LogColumn, u16, u16)>) {
 fn line_mode_grabs_the_gap_from_the_header_to_the_last_row() {
     set(ColumnResize::Line);
     let (log_area, offsets) = log_geometry();
-    let hits = log_header_hit_targets(log_area, &offsets);
+    let hits = log_header_hit_targets(
+        log_area,
+        &LogColumnsGeo::from_fit_offsets(log_area, &offsets),
+    );
     let header_row = log_area.y + 1;
     let last_row = log_area.y + log_area.height - 2;
     for (col, gap, next) in boundaries(&offsets) {
@@ -107,7 +114,10 @@ fn line_mode_grabs_the_gap_from_the_header_to_the_last_row() {
 fn header_mode_grabs_only_the_first_cell_of_the_next_header() {
     set(ColumnResize::Header);
     let (log_area, offsets) = log_geometry();
-    let hits = log_header_hit_targets(log_area, &offsets);
+    let hits = log_header_hit_targets(
+        log_area,
+        &LogColumnsGeo::from_fit_offsets(log_area, &offsets),
+    );
     let header_row = log_area.y + 1;
     for (col, gap, next) in boundaries(&offsets) {
         assert_eq!(
@@ -147,7 +157,10 @@ fn the_header_rests_with_a_tick_in_each_gap_in_line_mode_and_none_in_header_mode
 fn hovering_the_gap_anywhere_draws_a_thin_line_over_the_whole_table_height() {
     set(ColumnResize::Line);
     let (log_area, offsets) = log_geometry();
-    let hits = log_header_hit_targets(log_area, &offsets);
+    let hits = log_header_hit_targets(
+        log_area,
+        &LogColumnsGeo::from_fit_offsets(log_area, &offsets),
+    );
     let panes = Rect::new(0, 0, log_area.width, log_area.y + log_area.height);
     let header_row = log_area.y + 1;
     let last_row = log_area.y + log_area.height - 2;
@@ -176,7 +189,10 @@ fn hovering_the_gap_anywhere_draws_a_thin_line_over_the_whole_table_height() {
 fn header_mode_hover_lights_one_header_cell_as_a_block() {
     set(ColumnResize::Header);
     let (log_area, offsets) = log_geometry();
-    let hits = log_header_hit_targets(log_area, &offsets);
+    let hits = log_header_hit_targets(
+        log_area,
+        &LogColumnsGeo::from_fit_offsets(log_area, &offsets),
+    );
     let panes = Rect::new(0, 0, log_area.width, log_area.y + log_area.height);
     let (_, _, next) = boundaries(&offsets)[1];
     let header_row = log_area.y + 1;

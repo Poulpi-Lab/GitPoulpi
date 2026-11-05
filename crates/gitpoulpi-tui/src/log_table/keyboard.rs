@@ -28,6 +28,11 @@ pub(crate) enum LogColumnCmd {
     FitToContent,
     /// Fits every visible column to its content.
     FitAllToContent,
+    /// Scrolls the columns sideways by one key step (`scroll` layout).
+    ScrollLeft,
+    ScrollRight,
+    /// Switches between the `fit` and `scroll` layouts.
+    ToggleLayout,
 }
 
 /// One row of the Log columns chooser (right-click the header, or the
@@ -38,6 +43,9 @@ pub(crate) enum ChooserRow {
     Column(LogColumn),
     /// The dim line between the checkboxes and the actions.
     Separator,
+    /// The checkbox that switches to the `scroll` layout (columns keep their
+    /// widths and the Log scrolls sideways).
+    Layout,
     /// Fit this column to its content (only with a target column).
     FitColumn(LogColumn),
     FitAll,
@@ -46,20 +54,23 @@ pub(crate) enum ChooserRow {
 
 impl ChooserRow {
     /// Whether the cursor can stop on it and a click does something.
-    pub(crate) fn actionable(self) -> bool {
+    pub(crate) fn actionable(self, layout: gitpoulpi_config::LogColumnsLayout) -> bool {
         match self {
             ChooserRow::Column(c) => c.hideable(),
             ChooserRow::Separator => false,
-            // `Message` is the flexible column: it has no width of its own to
-            // fit, so the row is shown dimmed (`fit_column` says why).
-            ChooserRow::FitColumn(c) => c != LogColumn::Message,
-            ChooserRow::FitAll | ChooserRow::Reset => true,
+            // In the `fit` layout `Message` is the flexible column: it has no
+            // width of its own to fit, so the row is shown dimmed. In `scroll`
+            // it has one like the others.
+            ChooserRow::FitColumn(c) => {
+                c != LogColumn::Message || layout == gitpoulpi_config::LogColumnsLayout::Scroll
+            }
+            ChooserRow::Layout | ChooserRow::FitAll | ChooserRow::Reset => true,
         }
     }
 
     /// Rows that run and close the chooser (the checkboxes keep it open).
     pub(crate) fn closes(self) -> bool {
-        !matches!(self, ChooserRow::Column(_))
+        !matches!(self, ChooserRow::Column(_) | ChooserRow::Layout)
     }
 }
 
@@ -86,6 +97,7 @@ impl ColumnMenu {
 pub(crate) fn chooser_rows(target: Option<LogColumn>) -> Vec<ChooserRow> {
     let mut rows: Vec<ChooserRow> = LogColumn::ALL.into_iter().map(ChooserRow::Column).collect();
     rows.push(ChooserRow::Separator);
+    rows.push(ChooserRow::Layout);
     if let Some(col) = target {
         rows.push(ChooserRow::FitColumn(col));
     }
@@ -105,7 +117,12 @@ pub(crate) fn first_hideable() -> usize {
 
 /// The chooser's cursor one step down or up, skipping rows that cannot be
 /// acted on and wrapping.
-pub(crate) fn step_chooser(rows: &[ChooserRow], cursor: usize, down: bool) -> usize {
+pub(crate) fn step_chooser(
+    rows: &[ChooserRow],
+    layout: gitpoulpi_config::LogColumnsLayout,
+    cursor: usize,
+    down: bool,
+) -> usize {
     let n = rows.len();
     (1..=n)
         .map(|k| {
@@ -115,12 +132,74 @@ pub(crate) fn step_chooser(rows: &[ChooserRow], cursor: usize, down: bool) -> us
                 (cursor + n * k - k) % n
             }
         })
-        .find(|i| rows[*i].actionable())
+        .find(|i| rows[*i].actionable(layout))
         .unwrap_or(cursor)
 }
 
 /// What one `[` / `]` changes a width by, in cells.
 pub(crate) const KEY_STEP: u16 = 2;
+
+/// What one `Shift+Left` / `Shift+Right` (or sideways wheel notch) scrolls the
+/// columns by, in cells.
+pub(crate) const SCROLL_STEP: u16 = 4;
+
+/// `col` made `delta` cells wider (narrower when negative) in the `scroll`
+/// layout, where only that column changes: its width now, clamped to what a
+/// column can be.
+pub(crate) fn scroll_resized(geo: &LogColumnsGeo, col: LogColumn, delta: i32) -> u16 {
+    let now = i32::from(geo.widths.width_of(col));
+    let wanted = (now + delta).clamp(i32::from(col.drag_min_width()), i32::from(MAX_COLUMN_CELLS));
+    u16::try_from(wanted).unwrap_or(col.drag_min_width())
+}
+
+/// The scroll offset `delta` cells from `now`, kept inside what the content
+/// allows.
+pub(crate) fn scrolled(geo: &LogColumnsGeo, delta: i32) -> u16 {
+    let wanted = (i32::from(geo.h_offset) + delta).clamp(0, i32::from(geo.max_h_offset()));
+    u16::try_from(wanted).unwrap_or(0)
+}
+
+/// The offset that brings `col` fully into view with the least movement (its
+/// start when it is wider than the viewport); unchanged in the `fit` layout.
+pub(crate) fn offset_to_show(geo: &LogColumnsGeo, col: LogColumn) -> u16 {
+    let Some((x, w)) = geo.span_of(col) else {
+        return geo.h_offset;
+    };
+    let right = geo.h_offset + geo.inner.width;
+    let wanted = if x < geo.h_offset || w >= geo.inner.width {
+        x
+    } else if x + w > right {
+        x + w - geo.inner.width
+    } else {
+        geo.h_offset
+    };
+    wanted.min(geo.max_h_offset())
+}
+
+/// Flips `ui.log_columns_layout` (the chooser's checkbox, the palette and `s`
+/// while a column is picked), publishes it for the paint and writes it back to
+/// `config.toml` on a short-lived thread (the input loop never waits on the
+/// disk; the write shares the column lock with the width saves). Returns the
+/// status-line message.
+pub(crate) fn toggle_layout(config_path: &Option<std::path::PathBuf>) -> String {
+    use gitpoulpi_config::LogColumnsLayout;
+    let next = match crate::live_settings::log_columns_layout() {
+        LogColumnsLayout::Fit => LogColumnsLayout::Scroll,
+        LogColumnsLayout::Scroll => LogColumnsLayout::Fit,
+    };
+    crate::live_settings::install_log_columns_layout(next);
+    if let Some(path) = config_path.clone() {
+        std::thread::spawn(move || {
+            let _ = gitpoulpi_config::set_log_columns_layout_in_file(&path, next);
+        });
+    }
+    match next {
+        LogColumnsLayout::Fit => gitpoulpi_i18n::msg::log_table::LAYOUT_NOW_FIT.get().into(),
+        LogColumnsLayout::Scroll => gitpoulpi_i18n::msg::log_table::LAYOUT_NOW_SCROLL
+            .get()
+            .into(),
+    }
+}
 
 /// The visible columns in display order.
 pub(crate) fn visible_in_order(

@@ -2735,6 +2735,21 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::FitAllToContent),
     ),
     entry(
+        msg::palette::VIEW_LOG_SCROLL_LEFT,
+        "",
+        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::ScrollLeft),
+    ),
+    entry(
+        msg::palette::VIEW_LOG_SCROLL_RIGHT,
+        "",
+        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::ScrollRight),
+    ),
+    entry(
+        msg::palette::VIEW_LOG_COLUMNS_LAYOUT,
+        "",
+        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::ToggleLayout),
+    ),
+    entry(
         msg::palette::VIEW_LOG_COLUMN_CHOOSER,
         "",
         PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::Chooser),

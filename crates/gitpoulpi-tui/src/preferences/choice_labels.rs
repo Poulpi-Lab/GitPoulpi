@@ -90,6 +90,8 @@ fn keyed(key: &str, raw: &str) -> Option<M> {
         ("ui.sidebar_sections_scope", "global") => v::SECTIONS_GLOBAL,
         ("ui.column_resize", "line") => v::RESIZE_LINE,
         ("ui.column_resize", "header") => v::RESIZE_HEADER,
+        ("ui.log_columns_layout", "fit") => v::LAYOUT_FIT,
+        ("ui.log_columns_layout", "scroll") => v::LAYOUT_SCROLL,
         ("ui.blame_side", "right") => v::BLAME_RIGHT,
         ("ui.blame_side", "left") => v::BLAME_LEFT,
         ("ui.image_view_text_fallback", "halfblock") => {

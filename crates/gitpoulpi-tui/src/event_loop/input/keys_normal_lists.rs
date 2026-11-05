@@ -120,6 +120,22 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             cx.log_multi.clear();
             *cx.last_message = Some(msg::input::SELECTION_CLEARED.get().into());
         }
+        // The columns scroll sideways (`scroll` layout). Before the bare `Right`
+        // arm below, which ignores modifiers and would open the ref popup on
+        // `Shift+Right`; `LogFiles` keeps its own `Shift+Left/Right`.
+        _ if *cx.focus == Focus::Log
+            && !*cx.commit_file_focus
+            && (km.is(Bind::LogScrollLeft, &key) || km.is(Bind::LogScrollRight, &key)) =>
+        {
+            commands::log_columns::run(
+                cx,
+                if km.is(Bind::LogScrollLeft, &key) {
+                    crate::log_table::LogColumnCmd::ScrollLeft
+                } else {
+                    crate::log_table::LogColumnCmd::ScrollRight
+                },
+            );
+        }
         KeyCode::Right | KeyCode::Char(' ')
             if *cx.focus == Focus::Log && !*cx.commit_file_focus =>
         {

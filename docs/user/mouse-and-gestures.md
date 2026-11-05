@@ -116,6 +116,7 @@ scrollbars. Click a mark to go there.
 - **Drag the bottom border** of the commit message block in the right pane.
 - **Drag the border between two Log headers** (by default the gap, from the header or from anywhere down the table; Settings > Log & graph > Column resizing) to resize a column (the keyboard: `Shift+C` to pick a column, then `]` / `[`).
 - **Double-click the border between two Log headers** to fit the column on its left to its content (the keyboard: `Shift+C` to pick a column, then `=`; `+` fits every column). The last column has a grip on its own last cell: drag it to resize that column, the Message column taking the difference.
+- **Scroll the Log sideways** (the `scroll` column layout; Settings > Log & graph > Column layout, or the chooser's `Scroll sideways` checkbox): the horizontal wheel or `Shift`+wheel over the table, the bar on the bottom border (drag its thumb, press the bare track, click its end arrows), or `Shift+Left` / `Shift+Right`. In the default `fit` layout the columns fill the pane and there is nothing to scroll.
 - **Drag a Log header** to move the column: a ghost of its name follows the pointer, the header it left is dimmed and an accent bar marks the slot where it would land. The columns move when you release; `Esc` cancels, and the pointer shows the open hand while you carry it (the keyboard: `Shift+C` to pick a column, then `<` / `>`).
 
 GitPoulpi remembers every size. See

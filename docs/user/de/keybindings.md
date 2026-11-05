@@ -151,6 +151,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log` | `compare_swap` | Vergleichsenden tauschen | `x` |
 | `log` | `compare_next` | Zur nächsten verglichenen Zeile springen | `n` |
 | `log` | `pick_column` | Spalte zum Verschieben oder Anpassen wählen | `Shift+C` |
+| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
+| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
 | `log` | `copy_mermaid` | Commits als Mermaid gitGraph kopieren | `Shift+Y` |
 | `log_columns` | `next` | Nächste Spalte wählen | `Tab` |
 | `log_columns` | `prev` | Vorherige Spalte wählen | `Shift+BackTab` |
@@ -161,6 +163,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `log_columns` | `reset_width` | Spaltenbreiten zurücksetzen | `0` |
 | `log_columns` | `fit` | Fit the Column to Its Content | `=` |
 | `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
+| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
 | `log_files` | `collapse_all` | Alle Ordner ein- oder ausklappen | `z` |
 | `log_files` | `filter` | Geänderte Dateien filtern | `/` |
 | `log_files` | `expand_all` | Alle Ordner aufklappen | `=` |
@@ -966,6 +969,9 @@ die Standardtasten.
 | Ansicht: Log-Spalte: Spaltenbreiten zurücksetzen | `0` |
 | View: Log Column: Fit the Column to Its Content | `=` |
 | View: Log Column: Fit All Columns to Content | `+` |
+| View: Log: Scroll the Columns Left | `Shift+Left` |
+| View: Log: Scroll the Columns Right | `Shift+Right` |
+| View: Log: Toggle Scroll Sideways for the Columns | `s` |
 | Ansicht: Log: Anzuzeigende Spalten wählen |  |
 | Diff: Diff der ausgewählten Datei öffnen | `Enter` |
 | Diff: Diff-Ansicht schließen | `Esc` |

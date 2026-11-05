@@ -136,6 +136,7 @@ pub(super) fn init(
     crate::build_features::install_workspaces_open(session_store::workspaces_open(session));
     live_settings::install_minimap(settings.config().ui.minimap);
     live_settings::install_column_resize(settings.config().ui.column_resize);
+    live_settings::install_log_columns_layout(settings.config().ui.log_columns_layout);
     live_settings::install_chrome_layout(&settings.config().ui);
     live_settings::install_mermaid(&settings.config().ui);
     live_settings::install_blame(&settings.config().ui);
@@ -387,6 +388,8 @@ pub(super) fn init(
     let log_column_hidden: std::collections::HashSet<LogColumn> = initial_log_columns.hidden;
     let log_column_overrides: std::collections::HashMap<LogColumn, u16> =
         initial_log_columns.widths;
+    let log_column_scroll_widths: std::collections::HashMap<LogColumn, u16> =
+        initial_log_columns.scroll_widths;
     let dragging_log_boundary: Option<LogBoundaryDrag> = None;
     // The Log "Changes" column's numbers, by commit (immutable, so never
     // stale): filled from the daemon for the rows on screen only. The
@@ -826,6 +829,8 @@ pub(super) fn init(
         log_col_pick: None,
         log_column_hidden,
         log_column_overrides,
+        log_column_scroll_widths,
+        log_h_offset: 0,
         dragging_log_boundary,
         log_natural_widths: NaturalWidths::default(),
         commit_changes,

@@ -302,6 +302,33 @@ impl LogColumnWidths {
         out
     }
 
+    /// The widths of the `scroll` layout: every visible column keeps a width
+    /// of its own, so nothing is given up (no `SACRIFICE_ORDER`) and `Message`
+    /// has a fixed one that does not follow the pane. A stored width is
+    /// clamped to what a column can be; a column with none stored yet is as
+    /// wide as the `fit` layout makes it at this pane width (`Message` at
+    /// least its floor), which is what the first drag, key or fit pins
+    /// (`pin_scroll_widths`).
+    pub(crate) fn for_scroll(
+        area_width: u16,
+        hidden: &std::collections::HashSet<LogColumn>,
+        scroll: &std::collections::HashMap<LogColumn, u16>,
+        fit_overrides: &std::collections::HashMap<LogColumn, u16>,
+    ) -> Self {
+        let fit = Self::for_area_width(area_width, hidden, fit_overrides);
+        let mut out = Self::default();
+        for col in LogColumn::ALL {
+            if hidden.contains(&col) {
+                continue;
+            }
+            *out.width_mut(col) = match scroll.get(&col) {
+                Some(w) => (*w).clamp(col.drag_min_width(), MAX_COLUMN_CELLS),
+                None => fit.width_of(col).max(col.min_width()),
+            };
+        }
+        out
+    }
+
     /// The most `col` can be made in the fit layout: the pane's inner width
     /// less the room reserved for `Message` and the floor of every other
     /// column still on screen. Past it the column would take `Message`'s
@@ -404,6 +431,27 @@ pub(crate) fn log_table<'a>(
     widths: &LogColumnWidths,
     border_style: Style,
 ) -> Table<'a> {
+    log_table_body(rows, header_cells, visible_order, widths).block(log_block(border_style))
+}
+
+/// The Log's rounded border, drawn apart from the table when the `scroll`
+/// layout renders the table into a scratch buffer.
+pub(crate) fn log_block<'a>(border_style: Style) -> Block<'a> {
+    Block::default()
+        .border_type(BorderType::Rounded)
+        .borders(Borders::ALL)
+        .border_style(border_style)
+}
+
+/// The table without its block: the columns at their full widths, packed
+/// from the start (`Flex::Start`: a total narrower than the area leaves blank
+/// space at the right instead of spreading the columns).
+pub(crate) fn log_table_body<'a>(
+    rows: Vec<Row<'a>>,
+    header_cells: Vec<Cell<'a>>,
+    visible_order: &[LogColumn],
+    widths: &LogColumnWidths,
+) -> Table<'a> {
     Table::new(
         rows,
         visible_order
@@ -412,18 +460,13 @@ pub(crate) fn log_table<'a>(
             .collect::<Vec<_>>(),
     )
     .column_spacing(0)
+    .flex(ratatui::layout::Flex::Start)
     .header(
         Row::new(header_cells).style(
             Style::default()
                 .fg(th().ui.muted)
                 .add_modifier(Modifier::BOLD),
         ),
-    )
-    .block(
-        Block::default()
-            .border_type(BorderType::Rounded)
-            .borders(Borders::ALL)
-            .border_style(border_style),
     )
     // No `.bg()` here, deliberately -- background for a selected row is
     // applied per-cell in `commit_row`/the WIP row, skipping the Ref column
@@ -466,22 +509,23 @@ pub(crate) fn log_hover_column(offsets: &[(LogColumn, u16, u16)], col: u16) -> O
 /// the resize pointer and the cell that starts a drag are one cell.
 pub(crate) fn log_header_hit_targets(
     log_area: Rect,
-    offsets: &[(LogColumn, u16, u16)],
+    geo: &LogColumnsGeo,
 ) -> Vec<(Rect, HitTarget)> {
-    let mut hits = Vec::with_capacity(offsets.len() * 2 + 1);
-    for &(col, _, _) in offsets {
+    let mut hits = Vec::with_capacity(geo.offsets.len() * 2 + 1);
+    for &(col, _, _) in &geo.spans {
         // A boundary always resizes the column on its left -- the one whose edge the user is
         // actually pointing at -- against its right-hand neighbor; see
         // `boundary_drag_widths`. The last column's grip is its own last cell
-        // (`log_grip_rect`), never the pane's border, which belongs to the
+        // (`LogColumnsGeo::grip_rect`), never the pane's border, which belongs to the
         // Log/Status pane-divider drag: grabbing "the pane divider" and
         // getting a column resize instead, with the whole Log pane appearing
-        // to shift, was exactly that collision.
-        if let Some(rect) = log_grip_rect(log_area, offsets, col) {
+        // to shift, was exactly that collision. A grip scrolled out of the
+        // viewport is not registered: no glyph under it, no target.
+        if let Some(rect) = geo.grip_rect(log_area, col) {
             hits.push((rect, HitTarget::LogColumnBoundary(col)));
         }
     }
-    for &(col, x, w) in offsets {
+    for &(col, x, w) in &geo.offsets {
         hits.push((
             Rect::new(x, log_area.y + 1, w, 1),
             HitTarget::LogColumnHeader(col),
@@ -517,31 +561,6 @@ pub(crate) fn last_grip_width(drag: &LogBoundaryDrag, pointer_x: u16, room: u16)
         .min(room.max(least))
 }
 
-/// The cells a press can grab to resize `col`: the gap after it for an
-/// internal boundary, its own last cell for the last visible column (not
-/// when that one is `Message`, which is what absorbs the change, or when it
-/// is under two cells wide). `None` when `col` is not visible.
-pub(crate) fn log_grip_rect(
-    log_area: Rect,
-    offsets: &[(LogColumn, u16, u16)],
-    col: LogColumn,
-) -> Option<Rect> {
-    let i = offsets.iter().position(|(c, _, _)| *c == col)?;
-    let (_, x, w) = offsets[i];
-    let bottom = (log_area.y + log_area.height).saturating_sub(1);
-    if i + 1 < offsets.len() {
-        return Some(log_boundary_grab_rect(log_area, x + w));
-    }
-    (w >= 2 && col != LogColumn::Message).then(|| {
-        crate::column_resize::grab_rect(
-            crate::column_resize::mode(),
-            crate::column_resize::Edge::last(x + w),
-            log_area.y + 1,
-            bottom,
-        )
-    })
-}
-
 /// Screen column of the draggable boundary at the right edge of `col`, from
 /// a `column_x_offsets` result - `None` when `col` isn't visible, or is the
 /// last visible column (whose right edge is the pane's own border and so
@@ -562,12 +581,12 @@ pub(crate) fn log_boundary_x(offsets: &[(LogColumn, u16, u16)], col: LogColumn) 
 pub(crate) fn paint_log_ticks(
     buf: &mut ratatui::buffer::Buffer,
     log_area: Rect,
-    offsets: &[(LogColumn, u16, u16)],
+    geo: &LogColumnsGeo,
 ) {
-    for &(col, _, _) in offsets {
+    for &(col, _, _) in &geo.spans {
         // The grip's resting tick is its gap cell: the column's own last
         // cell in both layouts (the last column's grip included).
-        if let Some(grip) = log_grip_rect(log_area, offsets, col) {
+        if let Some(grip) = geo.grip_rect(log_area, col) {
             let gap = match crate::column_resize::mode() {
                 gitpoulpi_config::ColumnResize::Line => grip.x,
                 gitpoulpi_config::ColumnResize::Header => grip.x.saturating_sub(1),

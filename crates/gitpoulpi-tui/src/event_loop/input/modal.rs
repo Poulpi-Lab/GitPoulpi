@@ -1198,16 +1198,17 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
     {
         let menu = cx.open_menu.column_menu().unwrap_or(ColumnMenu::new(None));
         let rows = crate::log_table::chooser_rows(menu.target);
+        let layout = crate::live_settings::log_columns_layout();
         match key.code {
             KeyCode::Esc => cx.open_menu.close_column_menu(),
             KeyCode::Down | KeyCode::Char('j') | KeyCode::Tab => {
                 if let Some(m) = cx.open_menu.column_menu_mut() {
-                    m.cursor = crate::log_table::step_chooser(&rows, menu.cursor, true);
+                    m.cursor = crate::log_table::step_chooser(&rows, layout, menu.cursor, true);
                 }
             }
             KeyCode::Up | KeyCode::Char('k') | KeyCode::BackTab => {
                 if let Some(m) = cx.open_menu.column_menu_mut() {
-                    m.cursor = crate::log_table::step_chooser(&rows, menu.cursor, false);
+                    m.cursor = crate::log_table::step_chooser(&rows, layout, menu.cursor, false);
                 }
             }
             KeyCode::Char(' ') | KeyCode::Enter => {

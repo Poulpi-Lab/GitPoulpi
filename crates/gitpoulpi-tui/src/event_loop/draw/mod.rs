@@ -6,6 +6,7 @@ pub(super) mod chrome;
 pub(super) mod column_chooser;
 pub(super) mod footer;
 pub(super) mod log;
+mod log_scroll;
 pub(super) mod overlay_menus;
 pub(super) mod overlays;
 pub(crate) mod palette_overlay;

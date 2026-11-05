@@ -152,6 +152,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `log` | `compare_swap` | Swap the Comparison Ends | `x` |
 | `log` | `compare_next` | Go to the Next Compared Row | `n` |
 | `log` | `pick_column` | Pick a Column to Move or Size | `Shift+C` |
+| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
+| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
 | `log` | `copy_mermaid` | Copy Commits as a Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Pick the Next Column | `Tab` |
 | `log_columns` | `prev` | Pick the Previous Column | `Shift+BackTab` |
@@ -162,6 +164,7 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `log_columns` | `reset_width` | Reset the Column Widths | `0` |
 | `log_columns` | `fit` | Fit the Column to Its Content | `=` |
 | `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
+| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
 | `log_files` | `collapse_all` | Collapse or Expand All Folders | `z` |
 | `log_files` | `filter` | Filter the Changed Files | `/` |
 | `log_files` | `expand_all` | Expand All Folders | `=` |
@@ -971,6 +974,9 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | View: Log Column: Reset the Column Widths | `0` |
 | View: Log Column: Fit the Column to Its Content | `=` |
 | View: Log Column: Fit All Columns to Content | `+` |
+| View: Log: Scroll the Columns Left | `Shift+Left` |
+| View: Log: Scroll the Columns Right | `Shift+Right` |
+| View: Log: Toggle Scroll Sideways for the Columns | `s` |
 | View: Log: Choose the Columns to Show |  |
 | Diff: Open Diff for Selected File | `Enter` |
 | Diff: Close Diff View | `Esc` |

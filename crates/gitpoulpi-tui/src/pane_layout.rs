@@ -54,6 +54,7 @@ pub(crate) fn pane_divider_grab_rect(panes_area: Rect, divider_x: u16) -> Rect {
 /// the column on its left), over the header and every row down to the bottom
 /// border, so the line lit on hover and the drag start are the same cells
 /// (`column_resize`).
+#[cfg(test)]
 pub(crate) fn log_boundary_grab_rect(log_area: Rect, boundary_x: u16) -> Rect {
     crate::column_resize::grab_rect(
         crate::column_resize::mode(),
@@ -565,7 +566,10 @@ mod tests {
         );
         let order = LogColumn::ALL.to_vec();
         let offsets = column_x_offsets(log_area.x, &order, &widths);
-        let hits = log_header_hit_targets(log_area, &offsets);
+        let hits = log_header_hit_targets(
+            log_area,
+            &LogColumnsGeo::from_fit_offsets(log_area, &offsets),
+        );
         ResizeGeometry {
             panes_area,
             log_area,
@@ -590,7 +594,9 @@ mod tests {
                 offsets,
             } = resize_geometry();
             let (last, x, w) = *offsets.last().unwrap();
-            let grip = log_grip_rect(log_area, &offsets, last).expect("a last grip");
+            let grip = LogColumnsGeo::from_fit_offsets(log_area, &offsets)
+                .grip_rect(log_area, last)
+                .expect("a last grip");
             assert_eq!(grip.x, x + w - 1, "{mode:?}: its own last cell");
             assert!(
                 hits.iter()
@@ -615,11 +621,13 @@ mod tests {
             );
             // Under two cells, or `Message`: nothing to grab.
             assert_eq!(
-                log_grip_rect(log_area, &[(LogColumn::Sha, 5, 1)], LogColumn::Sha),
+                LogColumnsGeo::from_fit_offsets(log_area, &[(LogColumn::Sha, 5, 1)])
+                    .grip_rect(log_area, LogColumn::Sha),
                 None
             );
             assert_eq!(
-                log_grip_rect(log_area, &[(LogColumn::Message, 5, 20)], LogColumn::Message),
+                LogColumnsGeo::from_fit_offsets(log_area, &[(LogColumn::Message, 5, 20)])
+                    .grip_rect(log_area, LogColumn::Message),
                 None
             );
         }
@@ -636,8 +644,12 @@ mod tests {
             let ResizeGeometry {
                 log_area, offsets, ..
             } = resize_geometry();
-            let internal = log_grip_rect(log_area, &offsets, offsets[1].0).unwrap();
-            let last = log_grip_rect(log_area, &offsets, offsets.last().unwrap().0).unwrap();
+            let internal = LogColumnsGeo::from_fit_offsets(log_area, &offsets)
+                .grip_rect(log_area, offsets[1].0)
+                .unwrap();
+            let last = LogColumnsGeo::from_fit_offsets(log_area, &offsets)
+                .grip_rect(log_area, offsets.last().unwrap().0)
+                .unwrap();
             let mut buf = Buffer::empty(Rect::new(0, 0, 100, 30));
             crate::column_resize::paint_grab(&mut buf, mode, internal);
             crate::column_resize::paint_grab(&mut buf, mode, last);
@@ -833,7 +845,9 @@ mod tests {
         let (d1, d2) = (18u16, 70u16);
         let boundaries: Vec<u16> = LogColumn::ALL
             .iter()
-            .filter_map(|c| log_grip_rect(log_area, &offsets, *c))
+            .filter_map(|c| {
+                LogColumnsGeo::from_fit_offsets(log_area, &offsets).grip_rect(log_area, *c)
+            })
             .map(|r| r.x)
             .collect();
         let header_row = log_area.y + 1;

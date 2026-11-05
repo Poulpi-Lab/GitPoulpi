@@ -107,6 +107,11 @@ impl PreferencesState {
                 if key == "ui.column_resize" {
                     crate::live_settings::install_column_resize(self.config.ui.column_resize);
                 }
+                if key == "ui.log_columns_layout" {
+                    crate::live_settings::install_log_columns_layout(
+                        self.config.ui.log_columns_layout,
+                    );
+                }
                 if key == "ui.sidebar_sections_scope" {
                     crate::live_settings::install_sidebar_sections_global(
                         self.config.ui.sidebar_sections_scope

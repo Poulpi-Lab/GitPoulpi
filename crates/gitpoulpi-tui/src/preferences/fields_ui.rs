@@ -572,6 +572,23 @@ impl PreferencesState {
         );
         fields.push(
             Field::global(
+                msg::settings_ui::LOG_COLUMNS_LAYOUT.get(),
+                "ui.log_columns_layout",
+                Control::Choice {
+                    options: gitpoulpi_config::LogColumnsLayout::ALL
+                        .iter()
+                        .map(|p| p.as_str().into())
+                        .collect(),
+                    index: gitpoulpi_config::LogColumnsLayout::ALL
+                        .iter()
+                        .position(|p| *p == ui.log_columns_layout)
+                        .unwrap_or(0),
+                },
+            )
+            .with_help(msg::settings_ui::LOG_COLUMNS_LAYOUT_HELP.get()),
+        );
+        fields.push(
+            Field::global(
                 msg::settings_ui::BLAME_SIDE.get(),
                 "ui.blame_side",
                 Control::Choice {

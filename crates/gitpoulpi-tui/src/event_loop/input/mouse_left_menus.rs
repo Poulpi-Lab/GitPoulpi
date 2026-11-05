@@ -346,11 +346,15 @@ pub(super) fn handle(
             *cx.dragging_log_boundary = None;
             *cx.last_click = None;
             *cx.last_message = Some(commands::log_columns::fit_one(cx, c));
-            let geo = cx.log_geo();
-            *cx.hovered_resize_strip = log_grip_rect(*cx.log_area, &geo.offsets, c)
+            *cx.hovered_resize_strip = cx
+                .log_geo()
+                .grip_rect(*cx.log_area, c)
                 .filter(|r| r.contains((col, row).into()));
         } else {
             *cx.last_click = Some((now, col, row));
+            // The `scroll` layout: pin every column where it is, so the drag
+            // changes this one and nothing else moves.
+            commands::log_columns::pin_scroll(cx);
             let geo = cx.log_geo();
             *cx.dragging_log_boundary = Some(LogBoundaryDrag {
                 col: c,

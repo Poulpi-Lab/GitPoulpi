@@ -592,6 +592,10 @@ date_verbose_format_help = "{$commit} 상세 패널의 날짜 줄, 날짜 열의
 preview = "미리보기"
 sidebar_sections_scope = "왼쪽 창 섹션"
 sidebar_sections_scope_help = "왼쪽 창에서 표시하거나 숨긴 섹션을 누구의 선택으로 적용할지 정합니다. 저장소별: 저장소마다 자기 설정을 가집니다(전역 설정이 시작점). 전역: 모든 저장소가 하나의 설정을 씁니다. 전환해도 어느 쪽 설정도 사라지지 않습니다."
+# context: a Settings row; how the Log lays its columns out
+log_columns_layout = "Column layout"
+# context: help text of the Log column layout row; "fit" and "scroll" are the two choices
+log_columns_layout_help = "How the Log lays its columns out. fit: every column fits the pane and only Message flexes. scroll: columns keep their widths, Message too, and the table scrolls sideways when it is wider than the pane."
 
 [settings_git]
 default_backend = "Git 백엔드"
@@ -743,6 +747,8 @@ pos_right = "오른쪽"
 align_start = "시작"
 align_center = "가운데"
 align_end = "끝"
+layout_fit = "Fit the pane"
+layout_scroll = "Scroll sideways"
 
 [reltime]
 just_now = "방금"
@@ -2352,6 +2358,9 @@ rewrite_host_howto = "호스트의 브랜치 보호를 통과하는 방법 설�
 rewrite_ai_rules = "AI로 다시 쓰기 규칙 만들기"
 log_columns_fit = "Fit the Column to Its Content"
 log_columns_fit_all = "Fit All Columns to Content"
+log_scroll_left = "Scroll the Columns Left"
+log_scroll_right = "Scroll the Columns Right"
+log_columns_layout = "Scroll Sideways or Fit the Pane"
 
 
 [keymap_ctx]
@@ -3429,6 +3438,9 @@ rewrite_fix_message_encoding = "다시 쓰기: 메시지 인코딩 수정..."
 # s24:end
 view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
 view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
+view_log_scroll_left = "View: Log: Scroll the Columns Left"
+view_log_scroll_right = "View: Log: Scroll the Columns Right"
+view_log_columns_layout = "View: Log: Toggle Scroll Sideways for the Columns"
 
 [help_section]
 rewrite = "기록 다시 쓰기"
@@ -3836,6 +3848,7 @@ split_7 = "{$commits} 창에서는 해당 {$commit} 선택. 변경 사항에서 
 rewrite_9 = "크기 탭을 열고 기록을 분석합니다: 가장 큰 파일과 폴더, 삭제됐지만 아직 저장된 파일을 보여 주며, 선택한 행은 제거 규칙이 됩니다"
 rewrite_host_howto = "호스트가 보호하는 브랜치에서 다시 쓴 기록을 통과시키는 방법을 설명합니다: 보호 해제, 새 이름으로 {$push}, 저장소 다시 만들기 중 하나이며 대신 실행해 주지는 않습니다"
 rewrite_ai_rules = "설명을 바탕으로 AI가 다시 쓰기 규칙을 만듦 (미리보기도 적용도 하지 않음)"
+log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} 또는 오른쪽 클릭"
@@ -4081,13 +4094,19 @@ changes_files_short = "{n}개"
 # context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
 column_fitted = "{column} fitted to its content: {cells} cells."
 # context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
-column_fit_cut = "{column} needs {need} cells, {have} fit."
+column_fit_cut = "{column} needs {need} cells, {have} fit. Switch the columns to Scroll sideways to show it all."
 # context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
 column_fit_message = "Message takes the room the other columns leave."
 # context: status line after every Log column was fitted to its content
 columns_fitted_all = "All columns fitted to their content."
 # context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
 columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
+# context: status line when a key or command scrolls the Log columns sideways but they fit the pane (the columns layout is "fit"); "Scroll sideways" is the name of the columns layout option
+columns_fit_pane = "The columns fit the pane. Switch the columns to Scroll sideways to scroll."
+# context: status line after the Log columns layout became "scroll sideways": columns keep their widths and the table can be wider than the pane
+layout_now_scroll = "Columns keep their widths and scroll sideways."
+# context: status line after the Log columns layout became "fit": every column fits the pane
+layout_now_fit = "Columns fit the pane."
 
 [find_bar]
 counter = "{current} / {total}"
@@ -4158,6 +4177,8 @@ column_menu_fit = "Fit {column} to content"
 column_menu_fit_all = "Fit all columns to content"
 # context: a row of the Log columns chooser that puts every column width back to automatic
 column_menu_reset = "Reset column widths"
+# context: a checkbox row of the Log columns chooser; when checked, columns keep their widths and the Log scrolls sideways instead of fitting every column into the pane
+column_menu_scroll = "Scroll sideways (columns keep their widths)"
 
 [overlays]
 select_tab_title = "탭 선택 ({shown}/{total})"

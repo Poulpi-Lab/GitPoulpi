@@ -633,6 +633,7 @@ without the fix; keep it that way.
 - The Log table is built in one place, `log_table`, with `column_spacing(0)`:
   ratatui's default spacing of 1 puts rendered column edges up to two cells
   off `column_x_offsets`, and every resize strip lands mid-column.
+- Column x positions come from one `LogColumnsGeo` (`log_table/geo.rs`, `CommandCtx::log_geo()`), never from widths and order rebuilt by hand: in the `scroll` layout the on-screen offsets are clipped by `h_offset`, a grip exists only while its cell is in the viewport, and a hit-test built with offset 0 maps the pointer to the wrong column while scrolled (`pty_log_scroll_layout`).
 - The three panes are split in one place (`pane_areas`, `pane_divider_xs`),
   never `width * pct / 100`: the layout solver rounds where that floors.
 - `Message` must never disappear: `LogColumn::message_reservation` is carved

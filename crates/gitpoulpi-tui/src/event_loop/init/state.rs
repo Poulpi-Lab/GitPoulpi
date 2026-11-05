@@ -242,6 +242,12 @@ pub(in crate::event_loop) struct WindowState {
     pub(in crate::event_loop) log_col_pick: Option<LogColumn>,
     pub(in crate::event_loop) log_column_hidden: std::collections::HashSet<LogColumn>,
     pub(in crate::event_loop) log_column_overrides: std::collections::HashMap<LogColumn, u16>,
+    /// The `scroll` layout's own widths (`ui.log_column_widths_scroll`).
+    pub(in crate::event_loop) log_column_scroll_widths: std::collections::HashMap<LogColumn, u16>,
+    /// How far the Log's columns are scrolled sideways, in cells (the
+    /// `scroll` layout; 0 in the `fit` one). Per window, not saved; clamped
+    /// against the geometry on every frame.
+    pub(in crate::event_loop) log_h_offset: u16,
     pub(in crate::event_loop) dragging_log_boundary: Option<LogBoundaryDrag>,
     /// What each Log column needs to show its content untruncated, measured
     /// by the last paint (`NaturalWidths`): what "fit to content" reads.

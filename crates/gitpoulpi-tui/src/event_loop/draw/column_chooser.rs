@@ -18,6 +18,7 @@ pub(super) fn paint(
 ) {
     use gitpoulpi_i18n::msg::log_draw as m;
     let title = m::COLUMNS_TITLE.get();
+    let layout = crate::live_settings::log_columns_layout();
     let rows = chooser_rows(menu.and_then(|m| m.target));
     let cursor = menu.map(|m| m.cursor);
     let label = |row: ChooserRow| -> String {
@@ -31,6 +32,13 @@ pub(super) fn paint(
                 }
             }
             ChooserRow::Separator => String::new(),
+            ChooserRow::Layout => format!(
+                " {} {}",
+                crate::dialog_kit::checkbox_mark(
+                    layout == gitpoulpi_config::LogColumnsLayout::Scroll
+                ),
+                m::COLUMN_MENU_SCROLL.get()
+            ),
             ChooserRow::FitColumn(col) => format!(" {}", m::column_menu_fit(col.title())),
             ChooserRow::FitAll => format!(" {}", m::COLUMN_MENU_FIT_ALL.get()),
             ChooserRow::Reset => format!(" {}", m::COLUMN_MENU_RESET.get()),
@@ -67,7 +75,7 @@ pub(super) fn paint(
                 return ListItem::new("\u{2500}".repeat(usize::from(want_w.saturating_sub(2))))
                     .style(Style::default().fg(th().ui.muted));
             }
-            if !row.actionable() {
+            if !row.actionable(layout) {
                 return ListItem::new(label(row)).style(Style::default().fg(th().ui.muted));
             }
             let style = if cursor == Some(i) {
@@ -100,7 +108,7 @@ pub(super) fn paint(
         frame_hits.insert(0, (cross, HitTarget::ColumnMenuClose));
     }
     for (i, &row) in rows.iter().enumerate() {
-        if !row.actionable() {
+        if !row.actionable(layout) {
             continue;
         }
         let item_row = popup.y + 1 + i as u16;

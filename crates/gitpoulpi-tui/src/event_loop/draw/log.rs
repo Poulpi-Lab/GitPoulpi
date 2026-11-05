@@ -29,6 +29,8 @@ pub(in crate::event_loop) struct LogDrawCtx<'a> {
     pub(in crate::event_loop) log_visible_order: &'a [LogColumn],
     pub(in crate::event_loop) log_col_pick: Option<LogColumn>,
     pub(in crate::event_loop) log_offsets: &'a [(LogColumn, u16, u16)],
+    /// The whole geometry: the clipped offsets above are its on-screen part.
+    pub(in crate::event_loop) log_geo: &'a LogColumnsGeo,
     pub(in crate::event_loop) layout: &'a graph::LogLayout,
     pub(in crate::event_loop) search_matches: &'a [usize],
     pub(in crate::event_loop) search_match_set: &'a std::collections::HashSet<usize>,
@@ -88,6 +90,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
     let log_widths = ctx.log_widths;
     let log_visible_order = ctx.log_visible_order;
     let log_offsets = ctx.log_offsets;
+    let log_geo = ctx.log_geo;
     let layout = ctx.layout;
     let search_matches = ctx.search_matches;
     let search_match_set = ctx.search_match_set;
@@ -482,7 +485,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
         })
         .collect();
     if central_view == CentralView::Log {
-        frame_hits.extend(log_header_hit_targets(log_area, log_offsets));
+        frame_hits.extend(log_header_hit_targets(log_area, log_geo));
         // render through a throwaway clone so a
         // wheel-scrolled offset can't be dragged back to the
         // selection by ratatui's own `Table::render` -- see
@@ -501,19 +504,34 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
             }
             None => table_render_state(log_state, log_follow, visible_rows),
         };
-        frame.render_stateful_clipped(
-            log_table(
-                log_rows,
-                header_cells,
-                log_visible_order,
-                log_widths,
-                log_border_style,
+        match log_geo.layout {
+            gitpoulpi_config::LogColumnsLayout::Fit => frame.render_stateful_clipped(
+                log_table(
+                    log_rows,
+                    header_cells,
+                    log_visible_order,
+                    log_widths,
+                    log_border_style,
+                ),
+                log_area,
+                &mut log_render_state,
             ),
-            log_area,
-            &mut log_render_state,
-        );
+            gitpoulpi_config::LogColumnsLayout::Scroll => super::log_scroll::render(
+                frame,
+                log_area,
+                log_geo,
+                super::log_scroll::ScrolledTable {
+                    rows: log_rows,
+                    header: header_cells,
+                    order: log_visible_order,
+                    widths: log_widths,
+                    border_style: log_border_style,
+                },
+                &mut log_render_state,
+            ),
+        }
         *log_state.offset_mut() = window.map_or_else(|| log_render_state.offset(), |w| w.start);
-        paint_log_ticks(frame.buffer_mut(), log_area, log_offsets);
+        paint_log_ticks(frame.buffer_mut(), log_area, log_geo);
 
         // a scrollbar wherever a list
         // can genuinely scroll, over the block's own right border --
@@ -525,6 +543,30 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
         if let Some(track) = scrollbar::Track::vertical(log_area, log_len, log_state.offset()) {
             scrollbar::render(frame, track, true, false);
         }
+        // The sideways bar, on the bottom border, only while the columns are
+        // wider than the pane (`scroll` layout). Pressable like the diff
+        // view's: the thumb drags, the bare track brings the thumb under the
+        // pointer, the end arrows step.
+        if log_geo.scrolls() {
+            if let Some(track) = scrollbar::Track::horizontal(
+                log_area,
+                usize::from(log_geo.content_w),
+                usize::from(log_geo.h_offset),
+            ) {
+                scrollbar::render(frame, track, false, false);
+                let thumb = Rect::new(
+                    track.rect.x + track.thumb_start,
+                    track.rect.y,
+                    track.thumb_len.max(1),
+                    track.rect.height,
+                );
+                frame_hits.push((thumb, HitTarget::ScrollbarThumb(ScrollBar::LogHorizontal)));
+                frame_hits.push((
+                    track.rect,
+                    HitTarget::ScrollbarTrack(ScrollBar::LogHorizontal),
+                ));
+            }
+        }
 
         // The inline branch/tag name box, over the Ref cell of the
         // target commit's row (over its pills, if it has any). If the
@@ -533,7 +575,14 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
         if let (Some((kind, _)), Some(row), InputMode::ComposingRefName { value, .. }) =
             (inline_ref, *inline_ref_row, input_mode)
         {
-            if let Some(box_rect) = inline_box_rect(log_offsets, row) {
+            // A Ref column cut by the viewport counts as too narrow: the
+            // status-bar field takes over.
+            let ref_whole: Vec<(LogColumn, u16, u16)> = log_offsets
+                .iter()
+                .copied()
+                .filter(|(c, _, _)| *c != LogColumn::Ref || log_geo.fully_visible(*c))
+                .collect();
+            if let Some(box_rect) = inline_box_rect(&ref_whole, row) {
                 let text_rect = render_inline_box(
                     frame,
                     box_rect,
@@ -624,6 +673,16 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                     let area = clip_to_frame(frame.area(), Rect::new(gx, top, gw, rows));
                     if compact_graph {
                         graph::compact_raster_rows(&mut raster_rows);
+                    } else {
+                        // Cells scrolled off at the left are not drawn.
+                        let cut = log_geo
+                            .span_of(LogColumn::Graph)
+                            .map_or(0, |(x, _)| usize::from(log_geo.h_offset.saturating_sub(x)));
+                        if cut > 0 {
+                            for row in &mut raster_rows {
+                                row.cells.drain(..cut.min(row.cells.len()));
+                            }
+                        }
                     }
                     graph_image.render(frame.buffer_mut(), area, &raster_rows);
                 }
@@ -646,6 +705,13 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                 log_offsets
                     .iter()
                     .find(|(c, _, _)| *c == LogColumn::Author)
+                    .filter(|_| {
+                        // The slot is the column's two leading cells: a column
+                        // cut at the left shows initials only.
+                        log_geo
+                            .span_of(LogColumn::Author)
+                            .is_some_and(|(x, _)| x >= log_geo.h_offset)
+                    })
                     .map(|(_, x, w)| (*x, *w)),
             ) {
                 let top = log_top_y(log_area);

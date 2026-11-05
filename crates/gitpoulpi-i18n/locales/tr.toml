@@ -593,6 +593,10 @@ date_verbose_format_help = "Commit ayrıntı panelinin Tarih satırı, Tarih sü
 preview = "önizleme"
 sidebar_sections_scope = "Sol paneldeki bölümler"
 sidebar_sections_scope_help = "Sol panelde hangi bölümlerin gösterileceği ya da gizleneceği seçimi kime ait. repository: her depo kendi kümesini tutar (genel küme başlangıç noktasıdır). global: tüm depolar için tek küme. Seçeneği değiştirmek iki kümeden hiçbirini kaybettirmez."
+# context: a Settings row; how the Log lays its columns out
+log_columns_layout = "Column layout"
+# context: help text of the Log column layout row; "fit" and "scroll" are the two choices
+log_columns_layout_help = "How the Log lays its columns out. fit: every column fits the pane and only Message flexes. scroll: columns keep their widths, Message too, and the table scrolls sideways when it is wider than the pane."
 
 [settings_git]
 default_backend = "Git arka ucu"
@@ -744,6 +748,8 @@ pos_right = "Sağ"
 align_start = "Baş"
 align_center = "Orta"
 align_end = "Son"
+layout_fit = "Fit the pane"
+layout_scroll = "Scroll sideways"
 
 [reltime]
 just_now = "az önce"
@@ -2354,6 +2360,9 @@ rewrite_host_howto = "Barındırıcının Dal Korumasını Açıkla"
 rewrite_ai_rules = "YZ ile yeniden yazma kuralları oluştur"
 log_columns_fit = "Fit the Column to Its Content"
 log_columns_fit_all = "Fit All Columns to Content"
+log_scroll_left = "Scroll the Columns Left"
+log_scroll_right = "Scroll the Columns Right"
+log_columns_layout = "Scroll Sideways or Fit the Pane"
 
 
 [keymap_ctx]
@@ -3431,6 +3440,9 @@ rewrite_fix_message_encoding = "Yeniden Yaz: Mesaj Kodlamasını Düzelt..."
 # s24:end
 view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
 view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
+view_log_scroll_left = "View: Log: Scroll the Columns Left"
+view_log_scroll_right = "View: Log: Scroll the Columns Right"
+view_log_columns_layout = "View: Log: Toggle Scroll Sideways for the Columns"
 
 [help_section]
 rewrite = "Geçmişi yeniden yaz"
@@ -3838,6 +3850,7 @@ split_7 = "{$commits} panelinde o {$commit}'i seçer; bir değişiklikte m veya 
 rewrite_9 = "Boyut sekmesini açar ve geçmişi analiz eder: en büyük dosyalar ve klasörler, silinmiş ama hâlâ saklanan dosyalar; işaretli satırlar kaldırma kurallarına dönüşür"
 rewrite_host_howto = { git = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla push edin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz", local = "yeniden yazılan geçmişin barındırıcının koruduğu bir daldan nasıl geçirileceğini açıklar: korumayı kaldırın, yeni bir adla gönderin veya depoyu yeniden oluşturun; sizin yerinize hiçbir şey yapılmaz" }
 rewrite_ai_rules = "açıklamanızdan YZ ile yeniden yazma kurallarını oluşturur (hiçbir şey önizlenmez veya uygulanmaz)"
+log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} veya sağ tık"
@@ -4083,13 +4096,19 @@ changes_files_short = "{n}d"
 # context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
 column_fitted = "{column} fitted to its content: {cells} cells."
 # context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
-column_fit_cut = "{column} needs {need} cells, {have} fit."
+column_fit_cut = "{column} needs {need} cells, {have} fit. Switch the columns to Scroll sideways to show it all."
 # context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
 column_fit_message = "Message takes the room the other columns leave."
 # context: status line after every Log column was fitted to its content
 columns_fitted_all = "All columns fitted to their content."
 # context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
 columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
+# context: status line when a key or command scrolls the Log columns sideways but they fit the pane (the columns layout is "fit"); "Scroll sideways" is the name of the columns layout option
+columns_fit_pane = "The columns fit the pane. Switch the columns to Scroll sideways to scroll."
+# context: status line after the Log columns layout became "scroll sideways": columns keep their widths and the table can be wider than the pane
+layout_now_scroll = "Columns keep their widths and scroll sideways."
+# context: status line after the Log columns layout became "fit": every column fits the pane
+layout_now_fit = "Columns fit the pane."
 
 [find_bar]
 counter = "{current} / {total}"
@@ -4160,6 +4179,8 @@ column_menu_fit = "Fit {column} to content"
 column_menu_fit_all = "Fit all columns to content"
 # context: a row of the Log columns chooser that puts every column width back to automatic
 column_menu_reset = "Reset column widths"
+# context: a checkbox row of the Log columns chooser; when checked, columns keep their widths and the Log scrolls sideways instead of fitting every column into the pane
+column_menu_scroll = "Scroll sideways (columns keep their widths)"
 
 [overlays]
 select_tab_title = "Sekme Seç ({shown}/{total})"

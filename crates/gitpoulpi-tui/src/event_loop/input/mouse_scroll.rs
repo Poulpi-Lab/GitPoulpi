@@ -55,6 +55,22 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, g: &Geo, mouse: MouseEvent) -> io:
         }
         _ => {}
     }
+    // The Log's columns scroll sideways in the `scroll` layout: a horizontal
+    // wheel or Shift+wheel over the table. In the `fit` layout there is
+    // nothing to scroll and the event goes on as before.
+    if in_log {
+        let step = i32::from(crate::log_table::SCROLL_STEP);
+        let delta = match mouse.kind {
+            MouseEventKind::ScrollLeft => Some(-step),
+            MouseEventKind::ScrollRight => Some(step),
+            MouseEventKind::ScrollUp if shift => Some(-step),
+            MouseEventKind::ScrollDown if shift => Some(step),
+            _ => None,
+        };
+        if delta.is_some_and(|d| commands::log_columns::scroll_by(cx, d)) {
+            return Ok(Flow::Handled);
+        }
+    }
     match mouse.kind {
         // Shift+wheel scrolls the diff horizontally. Crossterm reports it as
         // `ScrollLeft`/`ScrollRight` or as plain `ScrollDown`/`ScrollUp` with

@@ -127,6 +127,7 @@ pub(super) const LOG_GRAPH: &[Row] = &[
     Key("ui.graph_ghost_ref"),
     Key("ui.ref_connector"),
     Key("ui.column_resize"),
+    Key("ui.log_columns_layout"),
     Key("ui.log_wip_counts_in_message"),
     Key("ui.ref_tree"),
     Key("ui.sidebar_sections_scope"),

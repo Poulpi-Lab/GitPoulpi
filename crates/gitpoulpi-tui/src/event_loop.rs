@@ -337,6 +337,7 @@ pub(crate) fn apply_live_settings(
             crate::build_features::install_radar_enabled(config.general.radar_enabled);
             live_settings::install_minimap(config.ui.minimap);
             live_settings::install_column_resize(config.ui.column_resize);
+            live_settings::install_log_columns_layout(config.ui.log_columns_layout);
             live_settings::install_chrome_layout(&config.ui);
             live_settings::install_mermaid(&config.ui);
             live_settings::install_blame(&config.ui);

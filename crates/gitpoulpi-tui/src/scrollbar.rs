@@ -33,6 +33,8 @@ use crate::theme::{lighten, plain_button_style};
 pub(crate) enum ScrollBar {
     DiffVertical,
     DiffHorizontal,
+    /// The Log's sideways bar on its bottom border (`scroll` column layout).
+    LogHorizontal,
     /// The minimap beside the diff's vertical bar (`minimap.rs`): a track
     /// with no thumb - a click jumps to the line under it.
     DiffMinimap,

@@ -1177,6 +1177,14 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
             if !inside && matches!(mouse.kind, MouseEventKind::Down(MouseButton::Left)) {
                 manager.search_focused = false;
             }
+            // The list's scrollbar: thumb grab and drag (even off the bar), a
+            // press on the track jumping the thumb, the end arrows.
+            let (len, top) = manager.list_bar_state();
+            let bar = manager.bar;
+            if let Some(top) = manager.bar_drag.on_mouse(bar, mouse, len, top) {
+                manager.set_list_scroll(top);
+                return Ok(None);
+            }
             if inside {
                 if hover(&*cx.hovered_target).folder() {
                     *cx.hovered_target = None;

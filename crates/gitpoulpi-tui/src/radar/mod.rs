@@ -352,6 +352,9 @@ pub(crate) struct RadarUi {
     scroll: usize,
     list_height: usize,
     follow: bool,
+    /// The list's scrollbar as last painted, and the thumb held.
+    bar: Option<crate::scrollbar::Track>,
+    bar_drag: crate::scrollbar::BarDrag,
 
     scope_combo: Combo,
     view_combo: Combo,
@@ -459,6 +462,8 @@ impl RadarUi {
             scroll: 0,
             list_height: 10,
             follow: true,
+            bar: None,
+            bar_drag: Default::default(),
             scope_combo: Combo::new(""),
             view_combo: Combo::new(""),
             who_combo: Combo::new(""),

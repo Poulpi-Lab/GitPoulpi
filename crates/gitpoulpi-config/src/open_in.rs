@@ -1447,6 +1447,9 @@ mod tests {
                 c.env_remove(k);
             }
             c.env("PATH", &path);
+            // Panes start `$SHELL`; a login-style rc file (the dev machine's
+            // zsh/fish) would put the real tools ahead of the stubs on PATH.
+            c.env("SHELL", "/bin/sh");
         };
         // The server reports its socket on startup (stdout or stderr
         // depending on the version): read both through a file.

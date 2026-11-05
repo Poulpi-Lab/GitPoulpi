@@ -152,23 +152,23 @@ fn a_badge_switches_the_sub_tab() {
 }
 
 /// A combobox badge opens that combobox (`6` is the Default entry choice on
-/// Open in's General tab); an option only the open list shows proves it.
+/// Open in's General tab); an option only the open list shows proves it. The
+/// config pins the list: the detected one depends on the host's tools.
 #[test]
 fn a_badge_opens_a_combobox() {
     let repo = fixture();
     let config = tempfile::tempdir().unwrap();
+    std::fs::write(
+        config.path().join("config.toml"),
+        "[ui]\nopen_in_default = \"First entry\"\n\
+         [[ui.open_in]]\nlabel = \"First entry\"\ncommand = \"true ${cwd}\"\n\
+         [[ui.open_in]]\nlabel = \"Second entry\"\ncommand = \"true ${cwd}\"\n",
+    )
+    .unwrap();
     let mut term = launch(repo.root(), config.path(), "pty-nav-combo");
     open_settings(&mut term);
     common::settings_page(&mut term, "Open in");
-    // The kitty entry is on every Linux list; Windows and macOS list the detected apps
-    // only, and the open list marks the chosen one with a tick.
-    let option = if cfg!(target_os = "macos") {
-        "\u{2713} Finder"
-    } else if cfg!(windows) {
-        "\u{2713} File explorer"
-    } else {
-        "kitty: new tab (remote control)"
-    };
+    let option = "Second entry";
     assert!(!term.screen().contains(option));
     open_badges(&mut term);
     term.send_text("6").unwrap();

@@ -108,6 +108,7 @@ fn a_running_request_greys_the_button() {
 fn the_dialog_shows_exactly_what_is_sent_and_the_sample_is_off() {
     let (mut v, _q, _t) = open_dialog();
     type_text(&mut v, "move night commits");
+    v.on_key(KeyEvent::new(KeyCode::Char('w'), KeyModifiers::ALT));
     let s = screen(&v);
     assert!(s.contains("What is sent"), "{s}");
     assert!(s.contains("CONTRACT-LINE-TWO"), "the system prompt\n{s}");
@@ -233,4 +234,153 @@ fn the_rule_is_not_replaced_by_closing_the_dialog() {
     assert!(v.script.ai.dialog.is_none());
     assert_eq!(script_text(&v), before);
     assert_eq!(v.take_ai_wish(), None, "nothing was sent");
+}
+
+// ----------------------------------------------- the "What is sent" pane
+
+fn alt(c: char) -> KeyEvent {
+    KeyEvent::new(KeyCode::Char(c), KeyModifiers::ALT)
+}
+
+/// A contract of `n` numbered lines, so the open pane must scroll.
+fn long_contract(v: &mut RewriteView, n: usize) {
+    let prompt = (0..n)
+        .map(|i| format!("CONTRACT-LINE-{i:03}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    v.set_ai_system(Ok(AiSystem {
+        prompt,
+        via: "Fake agent".into(),
+    }));
+}
+
+#[test]
+#[cfg(feature = "ai")]
+fn what_is_sent_is_collapsed_by_default_and_the_dialog_is_shorter_for_it() {
+    let (mut v, _q, _t) = open_dialog();
+    long_contract(&mut v, 60);
+    let (text, hits, _) = paint(&v, W, H, None);
+    assert!(text.contains("\u{25B8} What is sent"), "{text}");
+    assert!(text.contains("Alt+W: show or hide"), "{text}");
+    assert!(!text.contains("CONTRACT-LINE-000"), "{text}");
+    assert!(!hits.iter().any(|(_, h)| *h == RewriteHit::AiSent));
+    assert!(!hits.iter().any(|(_, h)| *h == RewriteHit::AiSentBar));
+    let collapsed = rect_of(&hits, RewriteHit::AiPanel).height;
+    v.on_key(alt('w'));
+    let (text, hits, _) = paint(&v, W, H, None);
+    assert!(text.contains("\u{25BE} What is sent"), "{text}");
+    assert!(text.contains("CONTRACT-LINE-000"), "{text}");
+    let open = rect_of(&hits, RewriteHit::AiPanel).height;
+    assert!(collapsed < open, "collapsed {collapsed} < open {open}");
+    assert!(open <= H - 4, "the dialog stays on the screen");
+    v.on_key(alt('w'));
+    assert!(!screen(&v).contains("CONTRACT-LINE-000"));
+}
+
+#[cfg(feature = "ai")]
+fn check_pane(w: u16, h: u16) {
+    let (mut v, _q, _t) = open_dialog();
+    long_contract(&mut v, 80);
+    v.on_key(alt('w'));
+    let (text, hits, buf) = paint(&v, w, h, None);
+    let pane = rect_of(&hits, RewriteHit::AiSent);
+    let bar = rect_of(&hits, RewriteHit::AiSentBar);
+    let panel = rect_of(&hits, RewriteHit::AiPanel);
+    assert!(pane.height >= 4, "{w}x{h}\n{text}");
+    assert_eq!(bar.x, pane.right() - 1, "{w}x{h}: the pane's right edge");
+    assert_eq!((bar.y, bar.height), (pane.y, pane.height), "{w}x{h}");
+    assert!(bar.x < panel.right() - 1, "{w}x{h}: inside the border");
+    assert_eq!(buf[(bar.x, bar.y)].symbol(), "\u{2191}", "{w}x{h}");
+    assert_eq!(
+        buf[(bar.x, bar.bottom() - 1)].symbol(),
+        "\u{2193}",
+        "{w}x{h}"
+    );
+    let thumb = (bar.y..bar.bottom())
+        .filter(|y| buf[(bar.x, *y)].bg == th().scrollbar.thumb)
+        .count();
+    assert!(thumb >= 1, "{w}x{h}: a thumb is drawn\n{text}");
+    for y in pane.y..pane.bottom() {
+        assert_eq!(buf[(bar.x - 1, y)].symbol(), " ", "{w}x{h}: text under bar");
+    }
+    let tint = buf[(pane.x + 1, pane.y)].bg;
+    assert_ne!(tint, th().ui.panel, "{w}x{h}");
+    assert_ne!(tint, crate::input_bg(false, false), "{w}x{h}");
+    assert_ne!(tint, crate::input_bg(true, false), "{w}x{h}");
+    for y in pane.y..pane.bottom() {
+        assert_eq!(buf[(pane.x, y)].bg, tint, "{w}x{h}: the whole pane");
+    }
+}
+
+#[test]
+#[cfg(feature = "ai")]
+fn the_open_pane_has_its_own_scrollbar_at_a_small_and_a_large_size() {
+    check_pane(60, 22);
+    check_pane(90, 30);
+    check_pane(200, 70);
+}
+
+#[test]
+#[cfg(feature = "ai")]
+fn the_keys_toggle_the_pane_and_scroll_it() {
+    let (mut v, _q, _t) = open_dialog();
+    long_contract(&mut v, 80);
+    // Tab: the sample box, then the pane; Enter opens it.
+    for _ in 0..2 {
+        v.on_key(key(KeyCode::Tab));
+    }
+    assert!(!screen(&v).contains("CONTRACT-LINE-000"));
+    v.on_key(key(KeyCode::Enter));
+    assert!(screen(&v).contains("CONTRACT-LINE-000"));
+    for _ in 0..3 {
+        v.on_key(key(KeyCode::Down));
+    }
+    let s = screen(&v);
+    assert!(
+        !s.contains("CONTRACT-LINE-000") && s.contains("CONTRACT-LINE-002"),
+        "{s}"
+    );
+    v.on_key(key(KeyCode::End));
+    assert!(screen(&v).contains("CONTRACT-LINE-079"));
+    v.on_key(key(KeyCode::Home));
+    assert!(screen(&v).contains("CONTRACT-LINE-000"));
+    v.on_key(key(KeyCode::Enter));
+    assert!(!screen(&v).contains("CONTRACT-LINE-000"));
+}
+
+#[test]
+#[cfg(feature = "ai")]
+fn the_mouse_toggles_wheels_and_drags_the_pane_scrollbar() {
+    use crossterm::event::{MouseButton, MouseEvent, MouseEventKind};
+    let (mut v, _q, _t) = open_dialog();
+    long_contract(&mut v, 80);
+    let (_, hits, _) = paint(&v, W, H, None);
+    let head = rect_of(&hits, RewriteHit::AiSentHead);
+    v.on_press(RewriteHit::AiSentHead, head.x + 3, head.y);
+    assert!(screen(&v).contains("CONTRACT-LINE-000"));
+    v.on_ai_wheel(3);
+    let s = screen(&v);
+    assert!(
+        !s.contains("CONTRACT-LINE-000") && s.contains("CONTRACT-LINE-003"),
+        "{s}"
+    );
+    let (_, hits, buf) = paint(&v, W, H, None);
+    let bar = rect_of(&hits, RewriteHit::AiSentBar);
+    let thumb_y = (bar.y..bar.bottom())
+        .find(|y| buf[(bar.x, *y)].bg == th().scrollbar.thumb)
+        .expect("a thumb");
+    v.on_press(RewriteHit::AiSentBar, bar.x, thumb_y);
+    let mouse = |kind, row| MouseEvent {
+        kind,
+        column: bar.x,
+        row,
+        modifiers: KeyModifiers::NONE,
+    };
+    let below = bar.bottom() + 3;
+    v.on_ai_bar_mouse(mouse(MouseEventKind::Drag(MouseButton::Left), below));
+    v.on_ai_bar_mouse(mouse(MouseEventKind::Up(MouseButton::Left), below));
+    assert!(screen(&v).contains("CONTRACT-LINE-079"));
+    v.on_press(RewriteHit::AiSentBar, bar.x, bar.y + 1);
+    v.on_ai_bar_mouse(mouse(MouseEventKind::Up(MouseButton::Left), bar.y + 1));
+    assert!(!screen(&v).contains("CONTRACT-LINE-079"));
 }

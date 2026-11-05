@@ -522,10 +522,12 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
             // A held scrollbar thumb follows the pointer, even off the bar.
             MouseEventKind::Drag(MouseButton::Left) => {
                 view.on_rules_ai_bar_mouse(mouse);
+                view.on_ai_bar_mouse(mouse);
                 view.bar_drag(mouse.row);
             }
             MouseEventKind::Up(MouseButton::Left) => {
                 view.on_rules_ai_bar_mouse(mouse);
+                view.on_ai_bar_mouse(mouse);
                 view.bar_release();
             }
             MouseEventKind::ScrollUp | MouseEventKind::ScrollDown => {
@@ -539,7 +541,7 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                     Some(RewriteHit::ScriptEditor | RewriteHit::ScriptRow(_)) => {
                         view.on_script_wheel(part, step)
                     }
-                    Some(RewriteHit::AiSent) => view.on_ai_wheel(step),
+                    Some(RewriteHit::AiSent | RewriteHit::AiSentBar) => view.on_ai_wheel(step),
                     Some(hit) if hit.is_rules_ai() => view.on_rules_ai_wheel(hit, step),
                     Some(RewriteHit::DrillDiff) => view.drill_scroll(step),
                     Some(RewriteHit::DrillPath(_)) => {

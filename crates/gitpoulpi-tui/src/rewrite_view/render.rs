@@ -177,6 +177,9 @@ pub(crate) enum RewriteHit {
     AiText,
     AiSample,
     AiSent,
+    /// The "What is sent" header and the pane's scrollbar.
+    AiSentHead,
+    AiSentBar,
     AiSend,
     AiCancel,
     AiClose,
@@ -232,6 +235,7 @@ impl RewriteHit {
                 | RewriteHit::PurgeBody
                 | RewriteHit::AiPanel
                 | RewriteHit::AiShield
+                | RewriteHit::AiSentBar
                 | RewriteHit::RaPanel
                 | RewriteHit::RaShield
                 | RewriteHit::RaSentBar
@@ -1653,11 +1657,13 @@ impl RewriteView {
             RewriteHit::AiText
             | RewriteHit::AiSample
             | RewriteHit::AiSent
+            | RewriteHit::AiSentHead
+            | RewriteHit::AiSentBar
             | RewriteHit::AiSend
             | RewriteHit::AiCancel
             | RewriteHit::AiClose
             | RewriteHit::AiPanel
-            | RewriteHit::AiShield => self.on_ai_press(hit, _col),
+            | RewriteHit::AiShield => self.on_ai_press(hit, _col, row),
             RewriteHit::RulesAi => self.open_rules_ai(),
             RewriteHit::RaText
             | RewriteHit::RaContext

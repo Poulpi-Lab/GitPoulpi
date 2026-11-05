@@ -24,6 +24,7 @@ use gitpoulpi_i18n::msg::{rewrite_secrets as s, rewrite_view as t};
 use gitpoulpi_i18n::M;
 use gitpoulpi_ipc::rewrite::ScanSecretsArgs;
 
+use super::bars::BarId;
 use super::render::{bad, bold, dim, plain, row_bg, warn, wrap, RewriteHit, Ui};
 use super::{DetailForm, Focus, Notice, PreviewTab, RewriteView};
 use crate::daemon_link::Reply;
@@ -416,14 +417,23 @@ impl RewriteView {
         let list_end = actions_y.saturating_sub(detail_h);
         let room = list_end.saturating_sub(y) as usize;
         let cursor = self.secrets.cursor.min(findings.len() - 1);
-        let mut top = self.paint.secrets_top.get();
-        if cursor < top {
-            top = cursor;
-        } else if room > 0 && cursor >= top + room {
-            top = cursor + 1 - room;
-        }
-        top = top.min(findings.len().saturating_sub(room));
+        let top = self.settle(
+            BarId::Secrets,
+            Some(cursor),
+            self.paint.secrets_top.get(),
+            room,
+            findings.len(),
+        );
         self.paint.secrets_top.set(top);
+        self.paint_bar(
+            ui,
+            BarId::Secrets,
+            (body.right(), y, room as u16),
+            findings.len(),
+            room,
+            top,
+            Some(cursor),
+        );
         let focused = self.focus == Focus::Preview;
         let ticked = &self.secrets.result.as_ref().map(|r| &r.ticked);
         let label_w = (width / 4).clamp(12, 26);

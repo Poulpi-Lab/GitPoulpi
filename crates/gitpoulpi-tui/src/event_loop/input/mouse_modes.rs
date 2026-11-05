@@ -510,6 +510,13 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                 }
                 None => {}
             },
+            // A held scrollbar thumb follows the pointer, even off the bar.
+            MouseEventKind::Drag(MouseButton::Left) => {
+                view.bar_drag(mouse.row);
+            }
+            MouseEventKind::Up(MouseButton::Left) => {
+                view.bar_release();
+            }
             MouseEventKind::ScrollUp | MouseEventKind::ScrollDown => {
                 let step = if mouse.kind == MouseEventKind::ScrollUp {
                     -3
@@ -523,23 +530,37 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                     }
                     Some(RewriteHit::AiSent) => view.on_ai_wheel(step),
                     Some(RewriteHit::RaSent | RewriteHit::RaPanel) => view.on_rules_ai_wheel(step),
-                    Some(RewriteHit::DrillDiff | RewriteHit::DrillPath(_)) => {
-                        view.drill_scroll(step)
+                    Some(RewriteHit::DrillDiff) => view.drill_scroll(step),
+                    Some(RewriteHit::DrillPath(_)) => {
+                        view.wheel_id(crate::rewrite_view::BarId::DrillFiles, step);
                     }
-                    Some(RewriteHit::Pane(focus)) => view.on_wheel(focus, step),
+                    Some(RewriteHit::Pane(focus)) => view.on_wheel(focus, mouse.row, step),
                     Some(RewriteHit::Rule(_) | RewriteHit::RuleCheck(_)) => {
-                        view.on_wheel(crate::rewrite_view::Focus::Rules, step)
+                        view.on_wheel(crate::rewrite_view::Focus::Rules, mouse.row, step)
                     }
                     Some(RewriteHit::Field(_)) => {
-                        view.on_wheel(crate::rewrite_view::Focus::Detail, step)
+                        view.on_wheel(crate::rewrite_view::Focus::Detail, mouse.row, step)
                     }
                     Some(
                         RewriteHit::Row(_)
                         | RewriteHit::ProtectedRow(_)
                         | RewriteHit::PushRow(_)
                         | RewriteHit::SecretRow(_)
-                        | RewriteHit::SizeRow(_),
-                    ) => view.on_wheel(crate::rewrite_view::Focus::Preview, step),
+                        | RewriteHit::SizeRow(_)
+                        | RewriteHit::IdentRow(_),
+                    ) => view.on_wheel(crate::rewrite_view::Focus::Preview, mouse.row, step),
+                    Some(RewriteHit::HostLink(_) | RewriteHit::HostPanel) => {
+                        view.wheel_id(crate::rewrite_view::BarId::Howto, step);
+                    }
+                    Some(RewriteHit::IdentPick(_)) => {
+                        view.wheel_id(crate::rewrite_view::BarId::IdentPick, step);
+                    }
+                    Some(RewriteHit::PopupRow(_)) => {
+                        view.wheel_id(crate::rewrite_view::BarId::Popup, step);
+                    }
+                    Some(RewriteHit::Bar(id)) => {
+                        view.wheel_id(id, step);
+                    }
                     _ => {}
                 }
             }

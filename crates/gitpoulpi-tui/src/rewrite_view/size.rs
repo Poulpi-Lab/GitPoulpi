@@ -23,6 +23,7 @@ use gitpoulpi_i18n::msg::{rewrite_size as z, rewrite_view as t};
 use gitpoulpi_i18n::M;
 use gitpoulpi_ipc::rewrite::AnalyzeArgs;
 
+use super::bars::BarId;
 use super::render::{bad, bold, dim, plain, row_bg, warn, wrap, RewriteHit, Ui};
 use super::{DetailForm, Focus, Notice, PreviewTab, RewriteView};
 use crate::daemon_link::Reply;
@@ -613,14 +614,23 @@ impl RewriteView {
         let list_end = actions_y.saturating_sub(detail_h + estimate_h);
         let room = list_end.saturating_sub(y) as usize;
         let cursor = self.size.cursor.min(rows.len() - 1);
-        let mut top = self.paint.size_top.get();
-        if cursor < top {
-            top = cursor;
-        } else if room > 0 && cursor >= top + room {
-            top = cursor + 1 - room;
-        }
-        top = top.min(rows.len().saturating_sub(room));
+        let top = self.settle(
+            BarId::Size,
+            Some(cursor),
+            self.paint.size_top.get(),
+            room,
+            rows.len(),
+        );
         self.paint.size_top.set(top);
+        self.paint_bar(
+            ui,
+            BarId::Size,
+            (body.right(), y, room as u16),
+            rows.len(),
+            room,
+            top,
+            Some(cursor),
+        );
         let focused = self.focus == Focus::Preview;
         let size_w = 10usize;
         let state_w = (width / 6).clamp(8, 14);

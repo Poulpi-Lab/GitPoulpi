@@ -25,6 +25,7 @@ use ratatui::style::Style;
 
 use gitpoulpi_i18n::msg::rewrite_ai as t;
 
+use super::bars::BarId;
 use super::render::{bad, bold, dim, plain, wrap, RewriteHit};
 use super::script::ScriptFocus;
 use super::{Notice, RewriteView};
@@ -725,16 +726,18 @@ impl RewriteView {
             let style = if *heading { bold(false) } else { plain() };
             dialog_kit::put(buf, pane.x + 1, y + i as u16, text, pane.width - 1, style);
         }
-        if lines.len() > pane_h + top && pane_h > 0 {
-            dialog_kit::put(
-                buf,
-                pane.right().saturating_sub(3),
-                y + pane_h as u16 - 1,
-                "\u{25BC}\u{25BC}",
-                2,
-                dim(),
-            );
-        }
+        // The bar sits on the panel's border, beside the pane.
+        self.paint_bar_on(
+            buf,
+            &mut hits,
+            hovered == Some(RewriteHit::Bar(BarId::AiSent)),
+            BarId::AiSent,
+            (inner.right(), y, pane_h as u16),
+            lines.len(),
+            pane_h,
+            top,
+            None,
+        );
         hits.push((pane, RewriteHit::AiSent));
 
         // The note: what went wrong, or the wait.

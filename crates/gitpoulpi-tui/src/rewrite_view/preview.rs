@@ -16,6 +16,7 @@ use gitpoulpi_core::domain::rewrite::{
 use gitpoulpi_core::domain::Oid;
 use gitpoulpi_i18n::{msg::rewrite_view as t, M};
 
+use super::bars::BarId;
 use super::render::{bad_bold, bold, dim, pane, plain, row_name, warn, wrap, RewriteHit, Ui};
 use super::{Focus, PlanState, PreviewTab, RewriteView, Run};
 use crate::dialog_kit;
@@ -486,17 +487,8 @@ impl RewriteView {
                 lines.push((text, warn()));
             }
         }
-        let width = body.width as usize - 2;
-        let mut y = body.y;
-        for (text, style) in lines {
-            for line in wrap(&text, width) {
-                if y >= body.bottom() {
-                    return;
-                }
-                ui.text(body.x + 1, y, body.width - 1, &line, style);
-                y += 1;
-            }
-        }
+        let lines: Vec<(u16, String, Style)> = lines.into_iter().map(|(t, s)| (0, t, s)).collect();
+        let y = self.paint_text(ui, body, &lines);
         // Pushed commits and an author rule: a `.mailmap` would do (S16).
         self.paint_mailmap_offer(ui, body, y);
     }
@@ -534,14 +526,23 @@ impl RewriteView {
         self.paint.rows_visible.set(visible);
         let total = self.rows.total.max(self.rows.loaded.len());
         let cursor = self.rows.cursor.min(total.saturating_sub(1));
-        let mut top = self.paint.rows_top.get();
-        if cursor < top {
-            top = cursor;
-        } else if visible > 0 && cursor >= top + visible {
-            top = cursor + 1 - visible;
-        }
-        top = top.min(total.saturating_sub(visible));
+        let top = self.settle(
+            BarId::Commits,
+            Some(cursor),
+            self.paint.rows_top.get(),
+            visible,
+            total,
+        );
         self.paint.rows_top.set(top);
+        self.paint_bar(
+            ui,
+            BarId::Commits,
+            (list.right(), list.y, list.height),
+            total,
+            visible,
+            top,
+            Some(cursor),
+        );
         if total == 0 {
             ui.text(
                 list.x + 1,
@@ -646,22 +647,16 @@ impl RewriteView {
             ui.text(body.x + 1, y, body.width - 1, what.get(), dim());
             y += 1;
         }
-        // Keep the last two rows for the hint.
-        let list_end = body.bottom().saturating_sub(2);
-        let shown = refusal
+        // Keep the last two rows for the hint; what is in the way scrolls
+        // between them and the reason, with the bar when it is long.
+        let list_end = body.bottom().saturating_sub(2).max(y);
+        let items: Vec<(u16, String, Style)> = refusal
             .lines
             .iter()
-            .take(list_end.saturating_sub(y) as usize)
-            .count();
-        for line in refusal.lines.iter().take(shown) {
-            ui.text(body.x + 3, y, body.width - 3, line, plain());
-            y += 1;
-        }
-        if refusal.lines.len() > shown && y < body.bottom() {
-            let more = t::done_more(refusal.lines.len() - shown);
-            ui.text(body.x + 3, y, body.width - 3, &more, dim());
-            y += 1;
-        }
+            .map(|l| (2, l.clone(), plain()))
+            .collect();
+        let list = Rect::new(body.x, y, body.width, list_end - y);
+        let mut y = self.paint_text(ui, list, &items);
         for line in wrap(hint.get(), width) {
             if y >= body.bottom() {
                 return;
@@ -707,7 +702,29 @@ impl RewriteView {
                 dim(),
             );
         }
-        for (i, change) in moving.iter().take(list_h as usize).enumerate() {
+        let moving_top = self.settle(
+            BarId::RefsMoving,
+            None,
+            self.paint.refs_moving_top.get(),
+            list_h as usize,
+            moving.len(),
+        );
+        self.paint.refs_moving_top.set(moving_top);
+        self.paint_bar(
+            ui,
+            BarId::RefsMoving,
+            (body.right(), body.y, list_h),
+            moving.len(),
+            list_h as usize,
+            moving_top,
+            None,
+        );
+        for (i, change) in moving
+            .iter()
+            .skip(moving_top)
+            .take(list_h as usize)
+            .enumerate()
+        {
             ui.text(
                 body.x + 1,
                 body.y + i as u16,
@@ -739,12 +756,31 @@ impl RewriteView {
             ui.button(nx, top, none, RewriteHit::ProtectedNone, false, true);
         }
         let focused = self.focus == Focus::Preview;
-        for (i, entry) in protected
-            .iter()
-            .enumerate()
-            .take(block.saturating_sub(1) as usize)
-        {
-            let y = top + 1 + i as u16;
+        let room = block.saturating_sub(1) as usize;
+        let first = self.settle(
+            BarId::RefsProtected,
+            Some(self.refs_cursor),
+            self.paint.refs_top.get(),
+            room,
+            protected.len(),
+        );
+        self.paint.refs_top.set(first);
+        self.paint_bar(
+            ui,
+            BarId::RefsProtected,
+            (
+                body.right(),
+                top + 1,
+                (room as u16).min(body.bottom().saturating_sub(top + 1)),
+            ),
+            protected.len(),
+            room,
+            first,
+            Some(self.refs_cursor),
+        );
+        for (slot, entry) in protected.iter().enumerate().skip(first).take(room) {
+            let i = slot;
+            let y = top + 1 + (slot - first) as u16;
             if y >= body.bottom() {
                 break;
             }
@@ -820,17 +856,8 @@ impl RewriteView {
                 }
             }
         }
-        let width = body.width as usize - 2;
-        let mut y = body.y;
-        for (text, style) in lines {
-            for line in wrap(&text, width) {
-                if y >= body.bottom() {
-                    return;
-                }
-                ui.text(body.x + 1, y, body.width - 1, &line, style);
-                y += 1;
-            }
-        }
+        let lines: Vec<(u16, String, Style)> = lines.into_iter().map(|(t, s)| (0, t, s)).collect();
+        self.paint_text(ui, body, &lines);
     }
 
     /// Asks for the rows the Commits tab is about to show. Called by `poll`

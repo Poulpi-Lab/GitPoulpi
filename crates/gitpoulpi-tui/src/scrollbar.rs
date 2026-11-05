@@ -151,7 +151,22 @@ impl Track {
 
     fn vertical_with(body: Rect, content_len: usize, offset: usize) -> Option<Self> {
         let rect = v_track_rect(body)?;
-        let viewport = rect.height as usize;
+        Self::column(rect, content_len, rect.height as usize, offset)
+    }
+
+    /// A vertical bar on an explicit one-column `rect` (a list's rows, not a
+    /// whole bordered block), for a viewport of `viewport` content lines -
+    /// usually `rect.height`, fewer when a row can be taller than a line.
+    /// `None` while everything fits.
+    pub(crate) fn column(
+        rect: Rect,
+        content_len: usize,
+        viewport: usize,
+        offset: usize,
+    ) -> Option<Self> {
+        if rect.width == 0 || rect.height == 0 {
+            return None;
+        }
         let arrow = arrow_cells(rect.height);
         let inner = rect.height - 2 * arrow;
         let (_, thumb_len) = thumb_geometry(inner, content_len, viewport)?;

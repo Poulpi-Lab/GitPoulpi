@@ -22,6 +22,7 @@ use gitpoulpi_i18n::msg::{rewrite_note as n, rewrite_push as p, rewrite_view as 
 use gitpoulpi_i18n::M;
 use gitpoulpi_ipc::rewrite::{MapsArgs, NoteArgs};
 
+use super::bars::BarId;
 use super::preview::{ref_short, short};
 use super::render::{bad, bold, dim, plain, row_bg, warn, wrap, RewriteHit, Ui};
 use super::{Focus, Notice, RewriteKeyOutcome, RewriteView, Run};
@@ -652,14 +653,23 @@ impl RewriteView {
         }
         let rows = self.push.rows();
         let cursor = self.push.cursor.min(rows.saturating_sub(1));
-        let mut top = self.paint.push_top.get();
-        if cursor < top {
-            top = cursor;
-        } else if cursor >= top + room {
-            top = cursor + 1 - room;
-        }
-        top = top.min(rows.saturating_sub(room));
+        let top = self.settle(
+            BarId::Push,
+            Some(cursor),
+            self.paint.push_top.get(),
+            room,
+            rows,
+        );
         self.paint.push_top.set(top);
+        self.paint_bar(
+            ui,
+            BarId::Push,
+            (inner.right(), y, room as u16),
+            rows,
+            room,
+            top,
+            Some(cursor),
+        );
         let focused = self.focus == Focus::Preview;
         match &self.push.sent {
             Some(sent) if sent.results.is_empty() => {

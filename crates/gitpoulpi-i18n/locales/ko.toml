@@ -4954,6 +4954,7 @@ ai_proposed_plan = "AI가 계획을 제안했습니다 - 검토한 뒤 만드세
 ai_wrote_pr = "AI가 제목과 설명을 작성했습니다"
 ai_failed = "AI: {why}"
 ai_canceled = "AI 요청을 취소했습니다"
+refs_refresh_failed = "새로 고치지 못해 마지막 목록을 표시합니다: {why}"
 lfs_program_installed = "설치됨 ({version})"
 lfs_program_too_old = "{version}은(는) 너무 오래되었습니다 (3.0 이상 필요)"
 lfs_program_missing = "설치되지 않음 (https://git-lfs.com)"

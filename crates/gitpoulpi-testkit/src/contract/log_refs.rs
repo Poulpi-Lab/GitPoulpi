@@ -205,6 +205,56 @@ pub fn check_tag_target_resolves_to_the_tagged_commit(backend: &dyn GitBackend) 
     );
 }
 
+/// A ref whose object is gone (a repository being deleted, a half-written
+/// clone) must not take `refs()` down: the system `git` aborts (SIGABRT) when
+/// asked for `%(*objectname)` of such a ref. The valid refs are still listed,
+/// the annotated tag still peeled, and the broken branch keeps its raw id.
+pub fn check_refs_survive_a_ref_to_a_missing_object(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .branch("a")
+        .annotated_tag("v1")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let head = head_oid(backend, &repo_ref);
+
+    // Written straight into the ref store, as a half-deleted repository
+    // would be. Each sorts after a valid ref (`target` after `a`/`main`,
+    // `zz` after `v1`), otherwise git only exits 128.
+    let missing = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
+    // A valid mirror ref sorting before the broken one (`aa` < `zz`): git
+    // lists every ref name before it sorts, and only dies on the missing
+    // object when it formats one; with a broken ref first it just exits 128.
+    let first = repo
+        .root()
+        .join(".git/refs/gitpoulpi/remote-tags/origin/aa");
+    std::fs::create_dir_all(first.parent().unwrap()).unwrap();
+    std::fs::write(first, format!("{head}\n")).unwrap();
+    for broken in [
+        "refs/heads/target",
+        "refs/tags/zz",
+        "refs/gitpoulpi/remote-tags/origin/zz",
+    ] {
+        let path = repo.root().join(".git").join(broken);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(path, format!("{missing}\n")).unwrap();
+    }
+
+    let refs = backend
+        .refs(&repo_ref)
+        .expect("refs() answers despite a ref to a missing object");
+    let tag = refs
+        .iter()
+        .find(|r| matches!(&r.kind, RefKind::Tag { name } if name == "v1"))
+        .expect("the annotated tag is listed");
+    assert_eq!(tag.target, head, "the annotated tag is still peeled");
+    let target = refs
+        .iter()
+        .find(|r| matches!(&r.kind, RefKind::LocalBranch { name } if name == "target"))
+        .expect("the broken branch is listed");
+    assert_eq!(Some(target.target), Oid::from_hex(missing));
+}
+
 pub fn check_branch_create_checkout_delete(backend: &dyn GitBackend) {
     let repo = TestRepoBuilder::new().with_initial().build();
     let repo_ref = repo.repo_ref();

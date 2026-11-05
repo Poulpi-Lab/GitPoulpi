@@ -15,6 +15,8 @@ struct Harness {
     commit_files_tx: tokio::sync::mpsc::UnboundedSender<CommitFilesRequest>,
     commit_files_rx: std_mpsc::Receiver<CommitFilesOutcome>,
     cache: SharedCommitFilesCache,
+    // Stops the link loop before the daemon handle goes (fields drop in order).
+    _link: super::link_guard::LinkGuard,
     _daemon: gitpoulpi_daemon::DaemonHandle,
     // Held so the link loop does not see its other channels close.
     _keep: Vec<Box<dyn std::any::Any + Send>>,
@@ -63,7 +65,7 @@ async fn start(
         commit_files_tx.send(request).unwrap();
     }
     let cache = SharedCommitFilesCache::default();
-    tokio::spawn(link_loop_with_port(
+    let link = super::link_guard::LinkGuard::spawn(link_loop_with_port(
         daemon.port,
         session.to_string(),
         repo.clone(),
@@ -98,6 +100,7 @@ async fn start(
         commit_files_tx,
         commit_files_rx,
         cache,
+        _link: link,
         _daemon: daemon,
         _keep: vec![
             Box::new(manual_refresh_tx),

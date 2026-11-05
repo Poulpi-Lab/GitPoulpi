@@ -27,6 +27,7 @@ mod merge_sync;
 mod notices;
 #[cfg(feature = "hosting")]
 mod radar_pending;
+mod refs_update;
 mod reveal;
 mod sizes;
 mod tick;

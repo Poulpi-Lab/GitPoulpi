@@ -13,7 +13,7 @@ pub fn count_commits(repo: &RepoRef, opts: &LogOptions) -> Result<u64> {
     let mut stdin: Option<Vec<u8>> = None;
     if opts.all_refs && !opts.hidden.is_empty() {
         // The visible tips only (see `log::log`).
-        let tips = filtered_tips(repo, &opts.hidden);
+        let tips = filtered_tips(repo, &opts.hidden)?;
         if tips.is_empty() {
             return Ok(0);
         }

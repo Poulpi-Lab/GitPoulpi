@@ -18,7 +18,68 @@ pub fn panic_on_for_tests(operations: &[OperationKind]) {
     ARMED.store(!list.is_empty(), Ordering::Relaxed);
 }
 
+type Gate = std::sync::Arc<(Mutex<HoldState>, std::sync::Condvar)>;
+
+/// A test-only gate: the armed operation stops inside its blocking dispatch
+/// until `release`, so a test can shut the daemon down while it is in flight.
+#[doc(hidden)]
+pub struct Hold {
+    state: Gate,
+}
+
+#[derive(Default)]
+struct HoldState {
+    reached: bool,
+    released: bool,
+}
+
+static HOLD: Mutex<Option<(OperationKind, Gate)>> = Mutex::new(None);
+
+impl Hold {
+    /// Arms the gate for `operation` (process-global: one test per binary).
+    pub fn arm(operation: OperationKind) -> Self {
+        let state: Gate = std::sync::Arc::default();
+        *HOLD.lock().unwrap_or_else(|e| e.into_inner()) = Some((operation, state.clone()));
+        Self { state }
+    }
+
+    /// Blocks until the operation is inside the gate.
+    pub fn wait_reached(&self) {
+        let (lock, cv) = &*self.state;
+        let mut s = lock.lock().unwrap_or_else(|e| e.into_inner());
+        while !s.reached {
+            s = cv.wait(s).unwrap_or_else(|e| e.into_inner());
+        }
+    }
+
+    /// Lets the held operation go on, and disarms the gate.
+    pub fn release(&self) {
+        *HOLD.lock().unwrap_or_else(|e| e.into_inner()) = None;
+        let (lock, cv) = &*self.state;
+        lock.lock().unwrap_or_else(|e| e.into_inner()).released = true;
+        cv.notify_all();
+    }
+}
+
+fn maybe_hold(command: OperationKind) {
+    let gate = HOLD
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .as_ref()
+        .filter(|(op, _)| *op == command)
+        .map(|(_, state)| state.clone());
+    let Some(gate) = gate else { return };
+    let (lock, cv) = &*gate;
+    let mut s = lock.lock().unwrap_or_else(|e| e.into_inner());
+    s.reached = true;
+    cv.notify_all();
+    while !s.released {
+        s = cv.wait(s).unwrap_or_else(|e| e.into_inner());
+    }
+}
+
 pub(crate) fn maybe_panic(command: OperationKind) {
+    maybe_hold(command);
     if !ARMED.load(Ordering::Relaxed) {
         return;
     }
@@ -70,4 +131,12 @@ pub(crate) async fn integrate_delay() {
 /// step (where it looks for a cancel request).
 pub(crate) async fn step_delay() {
     delay_from("GITPOULPI_TEST_STEP_DELAY_MS").await;
+}
+
+impl Drop for Hold {
+    /// A test that fails while holding must not leave the dispatch thread
+    /// parked (the runtime would wait for it forever).
+    fn drop(&mut self) {
+        self.release();
+    }
 }

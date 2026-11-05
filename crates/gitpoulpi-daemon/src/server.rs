@@ -114,15 +114,20 @@ pub async fn run(
     let jobs = Registry::new(events_tx.clone());
     let info = Arc::new(info);
     let (internal_shutdown_tx, mut internal_shutdown_rx) = mpsc::channel::<()>(1);
+    // Shutdown drains: connections stop reading when `stop` flips, and every
+    // connection / admitted-request task holds a clone of `inflight_tx`, so
+    // `inflight_rx` closes only once the last blocking dispatch has returned.
+    let (stop_tx, stop_rx) = tokio::sync::watch::channel(false);
+    let (inflight_tx, mut inflight_rx) = mpsc::channel::<()>(1);
 
     loop {
         tokio::select! {
             _ = &mut shutdown => {
-                crate::journal::flush_pending();
+                drain(&stop_tx, inflight_tx, &mut inflight_rx).await;
                 return Ok(());
             }
             _ = internal_shutdown_rx.recv() => {
-                crate::journal::flush_pending();
+                drain(&stop_tx, inflight_tx, &mut inflight_rx).await;
                 return Ok(());
             }
             accepted = listener.accept() => {
@@ -138,6 +143,8 @@ pub async fn run(
                     viewers: Arc::clone(&viewers),
                     jobs: Arc::clone(&jobs),
                     internal_shutdown_tx: internal_shutdown_tx.clone(),
+                    stop: stop_rx.clone(),
+                    inflight: inflight_tx.clone(),
                 };
                 tokio::spawn(handle_connection(stream, backend, events_tx, locks, read_cache, control));
             }
@@ -145,9 +152,32 @@ pub async fn run(
     }
 }
 
+/// How long a shutdown waits for in-flight dispatches before giving up (a
+/// long clone must not hold the process hostage).
+const DRAIN_TIMEOUT: Duration = Duration::from_secs(5);
+
+/// Stops every connection's reader, then waits (bounded) for the connection
+/// and request tasks to finish their in-flight blocking dispatch. Without it
+/// the daemon "shut down" while a read was still running, and a test
+/// deleting its fixture raced that read.
+async fn drain(
+    stop_tx: &tokio::sync::watch::Sender<bool>,
+    inflight_tx: mpsc::Sender<()>,
+    inflight_rx: &mut mpsc::Receiver<()>,
+) {
+    let _ = stop_tx.send(true);
+    drop(inflight_tx);
+    let _ = tokio::time::timeout(DRAIN_TIMEOUT, inflight_rx.recv()).await;
+    crate::journal::flush_pending();
+}
+
 /// What a connection needs for the daemon-control requests (`Hello`,
-/// `Shutdown`, `Ui*`).
+/// `Shutdown`, `Ui*`), plus the shutdown drain's handles.
 struct Control {
+    /// Flips to `true` when the daemon shuts down: the reader stops.
+    stop: tokio::sync::watch::Receiver<bool>,
+    /// Held by the connection and each admitted request until it is done.
+    inflight: mpsc::Sender<()>,
     info: Arc<DaemonInfo>,
     viewers: Arc<Viewers>,
     jobs: Arc<Registry>,
@@ -217,9 +247,10 @@ async fn read_requests(
     work_tx: mpsc::UnboundedSender<Work>,
     out_tx: mpsc::Sender<ServerMessage>,
     jobs: Arc<Registry>,
+    stop: tokio::sync::watch::Receiver<bool>,
 ) {
     let mut owned = Vec::new();
-    read_loop(read_half, work_tx, out_tx, &jobs, &mut owned).await;
+    read_loop(read_half, work_tx, out_tx, &jobs, &mut owned, stop).await;
     // The connection is gone: the jobs that asked to die with it (a CLI
     // command interrupted with Ctrl+C) are canceled. One past its point of no
     // return answers `NotCancellable` and simply finishes.
@@ -237,11 +268,15 @@ async fn read_loop(
     out_tx: mpsc::Sender<ServerMessage>,
     jobs: &Arc<Registry>,
     owned: &mut Vec<u64>,
+    mut stop: tokio::sync::watch::Receiver<bool>,
 ) {
     loop {
-        let request: Request = match read_message(&mut read_half).await {
-            Ok(Some(request)) => request,
-            _ => return,
+        let request: Request = tokio::select! {
+            read = read_message(&mut read_half) => match read {
+                Ok(Some(request)) => request,
+                _ => return,
+            },
+            _ = stop.wait_for(|stopped| *stopped) => return,
         };
         if request.command.is_job_control() {
             if !answer_job_control(jobs, &request, &out_tx).await {
@@ -313,6 +348,8 @@ async fn handle_connection(
         viewers,
         jobs,
         internal_shutdown_tx,
+        stop,
+        inflight,
     } = control;
     let mut conn_ui = ConnUi::new(viewers.next_conn());
     let (read_half, mut write_half) = stream.into_split();
@@ -360,6 +397,7 @@ async fn handle_connection(
         work_tx,
         out_tx.clone(),
         Arc::clone(&jobs),
+        stop,
     ));
 
     while let Some(Work { request, job }) = work_rx.recv().await {
@@ -445,6 +483,7 @@ async fn handle_connection(
                 (out_tx.clone(), raw_tx.clone()),
                 events_tx.clone(),
                 Arc::clone(&read_cache),
+                inflight.clone(),
             );
             continue;
         }
@@ -695,6 +734,7 @@ fn run_admitted(
     (out_tx, raw_tx): (mpsc::Sender<ServerMessage>, mpsc::Sender<RawResponse>),
     events_tx: broadcast::Sender<Event>,
     read_cache: Arc<ReadCache>,
+    inflight: mpsc::Sender<()>,
 ) {
     let Admitted {
         request,
@@ -706,6 +746,7 @@ fn run_admitted(
     let (request_id, command) = (request.id, request.command);
     let transfer = matches!(admission, Admission::Transfer(_));
     tokio::spawn(async move {
+        let _inflight = inflight;
         let (label, started, dispatched) = match admission {
             Admission::Read(guard) => {
                 let started = std::time::Instant::now();

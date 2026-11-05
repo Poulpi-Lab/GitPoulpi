@@ -10,23 +10,25 @@ use gitpoulpi_core::domain::{
 };
 use gitpoulpi_core::Result;
 
-use crate::process::{run, run_bytes_with_stdin, run_lenient};
+use crate::process::{read_with_retry, run, run_bytes_with_stdin, run_lenient};
 
 const FIELD_SEP: u8 = 1;
 const RECORD_SEP: u8 = 2;
 
 /// Branches, remote-tracking branches, tags (peeled, commits only) and HEAD.
 fn tips(repo: &RepoRef) -> Result<Vec<Oid>> {
-    let listing = run(
-        &repo.root,
-        &[
-            "for-each-ref",
-            "--format=%(objectname) %(objecttype) %(*objectname) %(*objecttype)",
-            "refs/heads",
-            "refs/remotes",
-            "refs/tags",
-        ],
-    )?;
+    let listing = read_with_retry(|| {
+        run(
+            &repo.root,
+            &[
+                "for-each-ref",
+                "--format=%(objectname) %(objecttype) %(*objectname) %(*objecttype)",
+                "refs/heads",
+                "refs/remotes",
+                "refs/tags",
+            ],
+        )
+    })?;
     let mut out: Vec<Oid> = Vec::new();
     // Tags of tags that `%(*objectname)` peeled only one level (older git
     // stops at the inner tag): resolved to their commit below.

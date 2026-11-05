@@ -775,7 +775,9 @@ impl RewriteView {
             RewriteHit::RaPanel => {}
             RewriteHit::RaSentBar if !working => {
                 self.rules_bar_mouse(crossterm::event::MouseEvent {
-                    kind: crossterm::event::MouseEventKind::Down(crossterm::event::MouseButton::Left),
+                    kind: crossterm::event::MouseEventKind::Down(
+                        crossterm::event::MouseButton::Left,
+                    ),
                     column: col,
                     row,
                     modifiers: KeyModifiers::NONE,
@@ -824,7 +826,9 @@ impl RewriteView {
             }
             RewriteHit::RaSentBar | RewriteHit::RaTextBar => {
                 self.rules_bar_mouse(crossterm::event::MouseEvent {
-                    kind: crossterm::event::MouseEventKind::Down(crossterm::event::MouseButton::Left),
+                    kind: crossterm::event::MouseEventKind::Down(
+                        crossterm::event::MouseButton::Left,
+                    ),
                     column: col,
                     row,
                     modifiers: KeyModifiers::NONE,
@@ -1075,7 +1079,11 @@ impl RewriteView {
             crate::fold_mark::COLLAPSED
         };
         let label_style = Style::default()
-            .fg(if focused { th().ui.accent } else { th().ui.text })
+            .fg(if focused {
+                th().ui.accent
+            } else {
+                th().ui.text
+            })
             .bg(head_bg)
             .add_modifier(Modifier::BOLD);
         let lr = dialog_kit::put(
@@ -1127,7 +1135,12 @@ impl RewriteView {
             }
             // Its own scrollbar: the pane's right column, rows of the body.
             let bar = crate::scrollbar::Track::vertical(
-                Rect::new(pane.x, pane.y.saturating_sub(1), pane.width, pane.height + 2),
+                Rect::new(
+                    pane.x,
+                    pane.y.saturating_sub(1),
+                    pane.width,
+                    pane.height + 2,
+                ),
                 lines.len(),
                 top,
             );

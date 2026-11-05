@@ -21,7 +21,6 @@ const PENDING: &[&str] = &[
     // to drag).
     "context_menu.rs",
     // Lists still to get their bar.
-    "folder_picker/render.rs",
     "repo_switcher.rs",
     // Another change owns it.
     "rewrite_view/script_ai.rs",

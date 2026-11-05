@@ -67,6 +67,7 @@ fn content_index(picker: &FolderPicker, name: &str) -> usize {
         .unwrap()
 }
 
+mod bars;
 mod choose;
 mod filter;
 mod keys;

@@ -30,6 +30,7 @@
 //! thread -- so a slow network drive never blocks a keystroke, and the
 //! tests drive the same state with synchronous reads of a temp tree.
 
+mod bars;
 mod input;
 mod render;
 
@@ -248,6 +249,14 @@ pub(crate) struct FolderPicker {
     pub content_sel: Option<usize>,
     left_scroll: usize,
     content_scroll: usize,
+    /// The completion dropdown's first row, and what it was last scrolled
+    /// for (selection, count): it follows the selection only when that
+    /// changes, so a bar drag stays put.
+    drop_top: usize,
+    drop_key: (Option<usize>, usize),
+    left_bar: bars::PickerBar,
+    content_bar: bars::PickerBar,
+    drop_bar: bars::PickerBar,
     /// A key moved a selection: the next draw scrolls it into view.
     follow: bool,
     pub message: Option<String>,
@@ -257,6 +266,7 @@ pub(crate) struct FolderPicker {
     /// The last draw's pane rects, for the wheel.
     left_area: Rect,
     content_area: Rect,
+    drop_area: Rect,
     /// The path field's caret and selection. A pristine
     /// draft is shown - and behaves - as all selected. Also drives the
     /// "New folder" inline field: the two are never
@@ -355,12 +365,18 @@ impl FolderPicker {
             content_sel: None,
             left_scroll: 0,
             content_scroll: 0,
+            drop_top: 0,
+            drop_key: (None, 0),
+            left_bar: Default::default(),
+            content_bar: Default::default(),
+            drop_bar: Default::default(),
             follow: false,
             message: None,
             hover: None,
             hits: Vec::new(),
             left_area: Rect::default(),
             content_area: Rect::default(),
+            drop_area: Rect::default(),
             show_hidden: false,
             show_siblings: false,
             splitter_w: None,

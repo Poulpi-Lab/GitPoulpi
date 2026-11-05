@@ -131,6 +131,9 @@ pub enum FailureKind {
     MergeConflict,
     /// Local changes would be overwritten: commit, stash or discard.
     WouldOverwrite,
+    /// ssh does not know the remote's host key and could not ask: connect
+    /// once in a terminal to verify and add it.
+    HostKeyUnverified,
     /// The remote could not be reached.
     NetworkUnreachable,
     /// Another git process holds `index.lock` (or another lock file).
@@ -155,6 +158,12 @@ impl FailureKind {
             "another git process seems to be running",
         ]) {
             FailureKind::LockExists
+        } else if has(&[
+            "host key verification failed",
+            "no matching host key type found",
+            "remote host identification has changed",
+        ]) {
+            FailureKind::HostKeyUnverified
         } else if has(&[
             "authentication failed",
             "could not read username",
@@ -512,6 +521,7 @@ mod tests {
             ("error: Your local changes to the following files would be overwritten by merge:\n\ta.txt", K::WouldOverwrite),
             ("fatal: Unable to create '/r/.git/index.lock': File exists.", K::LockExists),
             ("fatal: unable to access 'https://h/r/': Could not resolve host: h", K::NetworkUnreachable),
+            ("Host key verification failed.\nfatal: Could not read from remote repository.", K::HostKeyUnverified),
             ("ssh: connect to host h port 22: Network is unreachable", K::NetworkUnreachable),
             ("something unexpected", K::Other),
         ];

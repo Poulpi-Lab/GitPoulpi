@@ -103,6 +103,7 @@ pub(crate) fn wording(kind: FailureKind) -> Option<(String, String)> {
         FailureKind::AuthFailed => (g::SUMMARY_AUTH, g::HINT_AUTH),
         FailureKind::MergeConflict => (g::SUMMARY_CONFLICT, g::HINT_CONFLICT),
         FailureKind::WouldOverwrite => (g::SUMMARY_OVERWRITE, g::HINT_OVERWRITE),
+        FailureKind::HostKeyUnverified => (g::SUMMARY_HOST_KEY, g::HINT_HOST_KEY),
         FailureKind::NetworkUnreachable => (g::SUMMARY_NETWORK, g::HINT_NETWORK),
         FailureKind::LockExists => (g::SUMMARY_LOCK, g::HINT_LOCK),
         FailureKind::Other => return None,
@@ -155,6 +156,7 @@ mod tests {
             FailureKind::AuthFailed,
             FailureKind::MergeConflict,
             FailureKind::WouldOverwrite,
+            FailureKind::HostKeyUnverified,
             FailureKind::NetworkUnreachable,
             FailureKind::LockExists,
         ] {

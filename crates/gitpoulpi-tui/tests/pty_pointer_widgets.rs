@@ -89,7 +89,7 @@ fn hosting_rig(session: &str) -> Rig {
     let term = common::launch(repo.root())
         .session(session)
         .config_dir(config.path())
-        .size(200, 60)
+        .size(204, 60)
         .no_exit_pause()
         .env("GIT_CONFIG_GLOBAL", "/dev/null")
         .env("GIT_CONFIG_NOSYSTEM", "1")

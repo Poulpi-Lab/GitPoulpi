@@ -161,16 +161,16 @@ fn check(golden: &str, name: &str, cols: u16) {
 }
 
 const GOLDEN_WIDE: &str = "\
-Ref                  │Graph  │Message             │Author     │Date            │SHA
-                      ◌       // WIP           ✎ 1
-                      ┊ □     On main: parked      stash@{0}   DDDDDDDDDDDDDDDD SSSSSSS
- ✓ main 💻  ───────────◎─┴─╮   merge side           GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS
-                      ○   │   main work            GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS
- side 💻  ─────────────│───●   side work            GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS
- v1 🔖  ⬆ ─────────────●───╯   second commit        GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS
-                      ○       first commit         GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS";
+Ref                  │Graph  │Message            │Author     │Date            │SHA
+                      ◌       // WIP          ✎ 1
+                      ┊ □     On main: parked     stash@{0}   DDDDDDDDDDDDDDDD SSSSSSS
+ ✓ main 💻  ───────────◎─┴─╮   merge side          GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS
+                      ○   │   main work           GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS
+ side 💻  ─────────────│───●   side work           GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS
+ v1 🔖  ⬆ ─────────────●───╯   second commit       GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS
+                      ○       first commit        GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS";
 const GOLDEN_NARROW: &str = "\
-Ref      │GrapMessage        │AuthDate     │SHA
+Ref      │GrapMessage        │AuthDate     │SHA   │
           ◌   // WIP      ✎ 1
           ┊ □ On main: parked st… DDDDDDDDD SSSSSSS
  ✓ ma… 💻  ◎─┴─merge side      Gi… DDDDDDDDD SSSSSSS

@@ -163,6 +163,9 @@ pub(crate) enum HitTarget {
     /// the menu open, the usual column-picker convention.
     /// `Message` never gets one (see `LogColumn::adjustable`).
     ColumnMenuItem(LogColumn),
+    /// One action row of the Log's column chooser (fit a column or all of
+    /// them, reset the widths): a click runs it and closes the chooser.
+    ColumnMenuAction(ChooserRow),
     /// The cross in the Log's column chooser's title.
     ColumnMenuClose,
     /// One row of a ref's right-click context menu (`ref_context_menu`),
@@ -472,7 +475,7 @@ pub(crate) fn desired_cursor_shape(
     hit: Option<&HitTarget>,
     hovered_ref_row: Option<&str>,
     dragging_divider: Option<u8>,
-    dragging_log_boundary: Option<LogColumn>,
+    dragging_log_boundary: Option<LogBoundaryDrag>,
     dragging_ref: bool,
     resize_grab: Option<ResizeGrab>,
 ) -> CursorShape {
@@ -560,6 +563,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::TooltipRefPill { .. }
             | HitTarget::LogColumnHeader(_)
             | HitTarget::ColumnMenuItem(_)
+            | HitTarget::ColumnMenuAction(_)
             | HitTarget::ColumnMenuClose
             | HitTarget::ConfirmButton(_)
             | HitTarget::FileListModeButton(_)

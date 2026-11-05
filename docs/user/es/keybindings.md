@@ -156,6 +156,8 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `log` | `compare_swap` | Intercambiar los extremos de la comparación | `x` |
 | `log` | `compare_next` | Ir a la siguiente fila comparada | `n` |
 | `log` | `pick_column` | Elegir una columna para moverla o ajustarla | `Shift+C` |
+| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
+| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
 | `log` | `copy_mermaid` | Copiar Commits como gitGraph de Mermaid | `Shift+Y` |
 | `log_columns` | `next` | Elegir la columna siguiente | `Tab` |
 | `log_columns` | `prev` | Elegir la columna anterior | `Shift+BackTab` |
@@ -164,6 +166,9 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `log_columns` | `wider` | Ensanchar la columna | `]` |
 | `log_columns` | `narrower` | Estrechar la columna | `[` |
 | `log_columns` | `reset_width` | Restablecer los anchos de las columnas | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
+| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
 | `log_files` | `collapse_all` | Contraer o expandir todas las carpetas | `z` |
 | `log_files` | `filter` | Filtrar los archivos cambiados | `/` |
 | `log_files` | `expand_all` | Expandir todas las carpetas | `=` |
@@ -972,6 +977,11 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Ver: Columna del Log: ensanchar la columna | `]` |
 | Ver: Columna del Log: estrechar la columna | `[` |
 | Ver: Columna del Log: restablecer los anchos de las columnas | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
+| View: Log: Scroll the Columns Left | `Shift+Left` |
+| View: Log: Scroll the Columns Right | `Shift+Right` |
+| View: Log: Toggle Scroll Sideways for the Columns | `s` |
 | Ver: Log: elegir las columnas que se muestran |  |
 | Diff: Abrir el diff del archivo seleccionado | `Enter` |
 | Diff: Cerrar la vista de diff | `Esc` |

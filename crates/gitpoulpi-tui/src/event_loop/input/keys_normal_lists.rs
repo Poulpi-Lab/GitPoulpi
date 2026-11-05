@@ -120,6 +120,22 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             cx.log_multi.clear();
             *cx.last_message = Some(msg::input::SELECTION_CLEARED.get().into());
         }
+        // The columns scroll sideways (`scroll` layout). Before the bare `Right`
+        // arm below, which ignores modifiers and would open the ref popup on
+        // `Shift+Right`; `LogFiles` keeps its own `Shift+Left/Right`.
+        _ if *cx.focus == Focus::Log
+            && !*cx.commit_file_focus
+            && (km.is(Bind::LogScrollLeft, &key) || km.is(Bind::LogScrollRight, &key)) =>
+        {
+            commands::log_columns::run(
+                cx,
+                if km.is(Bind::LogScrollLeft, &key) {
+                    crate::log_table::LogColumnCmd::ScrollLeft
+                } else {
+                    crate::log_table::LogColumnCmd::ScrollRight
+                },
+            );
+        }
         KeyCode::Right | KeyCode::Char(' ')
             if *cx.focus == Focus::Log && !*cx.commit_file_focus =>
         {
@@ -145,18 +161,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                     // The Ref column's own left edge, the same anchor the mouse path uses, so
                     // the popup lines up with the pill it expands (a hard-coded
                     // `log_area.x + 2` only coincides when Ref starts there).
-                    let widths = LogColumnWidths::for_area_width(
-                        cx.log_area.width,
-                        &*cx.log_column_hidden,
-                        &*cx.log_column_overrides,
-                    );
-                    let visible_order: Vec<LogColumn> = cx
-                        .log_column_order
-                        .iter()
-                        .copied()
-                        .filter(|c| !cx.log_column_hidden.contains(c))
-                        .collect();
-                    let anchor_col = column_x_offsets(cx.log_area.x, &visible_order, &widths)
+                    let anchor_col = cx
+                        .log_geo()
+                        .offsets
                         .iter()
                         .find(|(c, _, _)| *c == LogColumn::Ref)
                         .map(|(_, x, _)| *x)

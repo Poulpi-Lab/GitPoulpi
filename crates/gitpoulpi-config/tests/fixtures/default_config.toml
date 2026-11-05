@@ -87,6 +87,7 @@ avatar_fallback = "identicon"
 composer_files = "expanded"
 blame_side = "right"
 column_resize = "line"
+log_columns_layout = "fit"
 blame_width = 46
 mouse_scroll_lines = 3
 date_locale = "system"
@@ -115,6 +116,8 @@ sidebar_sections_hidden = []
 sidebar_sections_scope = "repository"
 
 [ui.log_column_widths]
+
+[ui.log_column_widths_scroll]
 
 [ui.commit_column_columns_widths]
 

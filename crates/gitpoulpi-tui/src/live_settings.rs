@@ -335,6 +335,27 @@ pub(crate) fn install_column_resize(mode: gitpoulpi_config::ColumnResize) {
         .store(header, Ordering::Relaxed));
 }
 
+// `ui.log_columns_layout`: whether the Log fits its columns into the pane or
+// lets them keep their widths and scroll sideways. Published like
+// `COLUMN_RESIZE_HEADER`; `true` is `scroll`, the default `fit` is `false`.
+published!(LOG_COLUMNS_SCROLL: AtomicBool = AtomicBool::new(false));
+
+pub(crate) fn install_log_columns_layout(layout: gitpoulpi_config::LogColumnsLayout) {
+    let scroll = layout == gitpoulpi_config::LogColumnsLayout::Scroll;
+    cell!(LOG_COLUMNS_SCROLL, |m: &AtomicBool| m
+        .store(scroll, Ordering::Relaxed));
+}
+
+pub(crate) fn log_columns_layout() -> gitpoulpi_config::LogColumnsLayout {
+    if cell!(LOG_COLUMNS_SCROLL, |m: &AtomicBool| m
+        .load(Ordering::Relaxed))
+    {
+        gitpoulpi_config::LogColumnsLayout::Scroll
+    } else {
+        gitpoulpi_config::LogColumnsLayout::Fit
+    }
+}
+
 pub(crate) fn column_resize() -> gitpoulpi_config::ColumnResize {
     if cell!(COLUMN_RESIZE_HEADER, |m: &AtomicBool| m
         .load(Ordering::Relaxed))

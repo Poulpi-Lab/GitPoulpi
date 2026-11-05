@@ -215,8 +215,12 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
     Item(keys!("{log.compare_next}"), msg::compare::HELP_NEXT_CARD),
     Item(keys!("{log.copy_mermaid}"), msg::mermaid::HELP_COPY),
     Item(
-        keys!("{log.pick_column} / {log_columns.next} / {log_columns.prev} / {log_columns.move_left} / {log_columns.move_right} / {log_columns.wider} / {log_columns.narrower} / {log_columns.reset_width}"),
+        keys!("{log.pick_column} / {log_columns.next} / {log_columns.prev} / {log_columns.move_left} / {log_columns.move_right} / {log_columns.wider} / {log_columns.narrower} / {log_columns.reset_width} / {log_columns.fit} / {log_columns.fit_all}"),
         msg::help_text::LOG_COLUMNS_1,
+    ),
+    Item(
+        keys!("{log.scroll_left} / {log.scroll_right} / {log_columns.layout}"),
+        msg::help_text::LOG_COLUMNS_2,
     ),
     Item(keys!(""), msg::help_text::LOG_PANE_COMMIT_5),
     Item(keys!("{rebase.pick}"), msg::help_text::LOG_PANE_COMMIT_6),

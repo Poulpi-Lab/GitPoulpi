@@ -134,7 +134,9 @@ pub(super) fn handle(
     // `in_log` is false while the Diff view owns the column, so this can't
     // open a column menu over a diff.
     if in_log && row == cx.log_area.y + 1 {
-        *cx.open_menu = OpenMenu::Column(crate::log_table::first_hideable());
+        // The "fit" row acts on the column right-clicked.
+        let target = crate::log_table::log_hover_column(&cx.log_geo().offsets, col);
+        *cx.open_menu = OpenMenu::Column(crate::log_table::ColumnMenu::new(target));
     } else {
         cx.open_menu.close_column_menu();
     }

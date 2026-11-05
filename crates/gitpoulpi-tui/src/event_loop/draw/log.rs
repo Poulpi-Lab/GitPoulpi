@@ -29,6 +29,8 @@ pub(in crate::event_loop) struct LogDrawCtx<'a> {
     pub(in crate::event_loop) log_visible_order: &'a [LogColumn],
     pub(in crate::event_loop) log_col_pick: Option<LogColumn>,
     pub(in crate::event_loop) log_offsets: &'a [(LogColumn, u16, u16)],
+    /// The whole geometry: the clipped offsets above are its on-screen part.
+    pub(in crate::event_loop) log_geo: &'a LogColumnsGeo,
     pub(in crate::event_loop) layout: &'a graph::LogLayout,
     pub(in crate::event_loop) search_matches: &'a [usize],
     pub(in crate::event_loop) search_match_set: &'a std::collections::HashSet<usize>,
@@ -57,6 +59,8 @@ pub(in crate::event_loop) struct LogDrawCtx<'a> {
     pub(in crate::event_loop) inline_ref_row: &'a mut Option<u16>,
     pub(in crate::event_loop) inline_ref_drawn: &'a mut bool,
     pub(in crate::event_loop) commit_lane_colors: &'a mut std::collections::HashMap<Oid, Color>,
+    /// Filled by this paint: what each column needs to show its content.
+    pub(in crate::event_loop) log_natural: &'a mut NaturalWidths,
 }
 
 pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_>) {
@@ -86,6 +90,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
     let log_widths = ctx.log_widths;
     let log_visible_order = ctx.log_visible_order;
     let log_offsets = ctx.log_offsets;
+    let log_geo = ctx.log_geo;
     let layout = ctx.layout;
     let search_matches = ctx.search_matches;
     let search_match_set = ctx.search_match_set;
@@ -111,6 +116,8 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
     let inline_ref_row = &mut *ctx.inline_ref_row;
     let inline_ref_drawn = &mut *ctx.inline_ref_drawn;
     let commit_lane_colors = &mut *ctx.commit_lane_colors;
+    let log_natural = &mut *ctx.log_natural;
+    *log_natural = NaturalWidths::new();
     let solo_nodes: &Option<Vec<CommitNode>> = &layout.nodes;
     let graph_order = &layout.order;
     let wip_graph_line = &layout.wip_line;
@@ -198,7 +205,13 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
             log_state.selected() == Some(0) || log_multi.contains(&RowKey::Wip),
             hovered_wip_row,
         );
-        (row, wip_message_counts(counts, counts_at))
+        let counts_in_message = wip_message_counts(counts, counts_at);
+        log_natural.wip_row(
+            commit_summary,
+            counts_in_message,
+            wip_graph_row.as_ref().map_or(0, |r| r.cells.len()),
+        );
+        (row, counts_in_message)
     });
     if let Some(counts) = wip_built.as_ref().map(|(_, counts)| *counts) {
         // The field's hit target: the Message cell of the WIP row,
@@ -263,31 +276,41 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                         graph::LogEntry::Stash(k) => {
                             let line = layout.stash_lines.get(k).cloned().unwrap_or_default();
                             match stash_row_stashes.get(k) {
-                                Some(Some(stash)) => stash_log_row(
-                                    stash,
-                                    match (compact_graph, stash_graph_rows.get(k)) {
-                                        (true, Some(r)) => {
-                                            graph::compact_line(&r.cells, graph_settings.node_set)
-                                        }
-                                        _ => line,
-                                    },
-                                    stash_graph_rows.get(k).and_then(|r| {
-                                        if compact_graph {
-                                            Some(0)
-                                        } else {
-                                            graph::node_column(&r.cells)
-                                        }
-                                    }),
-                                    log_widths,
-                                    log_visible_order,
-                                    // A revealed row flashes in the hover color even
-                                    // when selected, or revealing HEAD shows nothing.
-                                    (log_state.selected() == Some(display)
-                                        || stash.commit.is_some_and(|c| log_multi.contains_id(&c)))
-                                        && reveal_flash != Some(display),
-                                    hovered_commit.is_some_and(|(id, ..)| Some(id) == stash.commit)
-                                        || reveal_flash == Some(display),
-                                ),
+                                Some(Some(stash)) => {
+                                    log_natural.stash_row(
+                                        stash,
+                                        stash_graph_rows.get(k).map_or(0, |r| r.cells.len()),
+                                    );
+                                    stash_log_row(
+                                        stash,
+                                        match (compact_graph, stash_graph_rows.get(k)) {
+                                            (true, Some(r)) => graph::compact_line(
+                                                &r.cells,
+                                                graph_settings.node_set,
+                                            ),
+                                            _ => line,
+                                        },
+                                        stash_graph_rows.get(k).and_then(|r| {
+                                            if compact_graph {
+                                                Some(0)
+                                            } else {
+                                                graph::node_column(&r.cells)
+                                            }
+                                        }),
+                                        log_widths,
+                                        log_visible_order,
+                                        // A revealed row flashes in the hover color even
+                                        // when selected, or revealing HEAD shows nothing.
+                                        (log_state.selected() == Some(display)
+                                            || stash
+                                                .commit
+                                                .is_some_and(|c| log_multi.contains_id(&c)))
+                                            && reveal_flash != Some(display),
+                                        hovered_commit
+                                            .is_some_and(|(id, ..)| Some(id) == stash.commit)
+                                            || reveal_flash == Some(display),
+                                    )
+                                }
                                 _ => Row::new(vec![Cell::from(line)]),
                             }
                         }
@@ -325,6 +348,14 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                                 }
                             }
                             commit_lane_colors.insert(c.id, lane_color);
+                            log_natural.commit_row(
+                                c,
+                                layout.pills_for(c.id),
+                                graph_grid.get(i).map_or(0, |r| r.cells.len()),
+                                avatar::log_avatar_mode(avatar_placement, avatar_capability),
+                                avatar_live.fallback,
+                                commit_changes.get(&c.id),
+                            );
                             // `ui.graph_ghost_ref`: the hovered row's deduced ref,
                             // faded, where the commit has no pill. Selection does
                             // not show it: only the pointer does.
@@ -454,7 +485,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
         })
         .collect();
     if central_view == CentralView::Log {
-        frame_hits.extend(log_header_hit_targets(log_area, log_offsets));
+        frame_hits.extend(log_header_hit_targets(log_area, log_geo));
         // render through a throwaway clone so a
         // wheel-scrolled offset can't be dragged back to the
         // selection by ratatui's own `Table::render` -- see
@@ -473,19 +504,34 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
             }
             None => table_render_state(log_state, log_follow, visible_rows),
         };
-        frame.render_stateful_clipped(
-            log_table(
-                log_rows,
-                header_cells,
-                log_visible_order,
-                log_widths,
-                log_border_style,
+        match log_geo.layout {
+            gitpoulpi_config::LogColumnsLayout::Fit => frame.render_stateful_clipped(
+                log_table(
+                    log_rows,
+                    header_cells,
+                    log_visible_order,
+                    log_widths,
+                    log_border_style,
+                ),
+                log_area,
+                &mut log_render_state,
             ),
-            log_area,
-            &mut log_render_state,
-        );
+            gitpoulpi_config::LogColumnsLayout::Scroll => super::log_scroll::render(
+                frame,
+                log_area,
+                log_geo,
+                super::log_scroll::ScrolledTable {
+                    rows: log_rows,
+                    header: header_cells,
+                    order: log_visible_order,
+                    widths: log_widths,
+                    border_style: log_border_style,
+                },
+                &mut log_render_state,
+            ),
+        }
         *log_state.offset_mut() = window.map_or_else(|| log_render_state.offset(), |w| w.start);
-        paint_log_ticks(frame.buffer_mut(), log_area, log_offsets);
+        paint_log_ticks(frame.buffer_mut(), log_area, log_geo);
 
         // a scrollbar wherever a list
         // can genuinely scroll, over the block's own right border --
@@ -497,6 +543,30 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
         if let Some(track) = scrollbar::Track::vertical(log_area, log_len, log_state.offset()) {
             scrollbar::render(frame, track, true, false);
         }
+        // The sideways bar, on the bottom border, only while the columns are
+        // wider than the pane (`scroll` layout). Pressable like the diff
+        // view's: the thumb drags, the bare track brings the thumb under the
+        // pointer, the end arrows step.
+        if log_geo.scrolls() {
+            if let Some(track) = scrollbar::Track::horizontal(
+                log_area,
+                usize::from(log_geo.content_w),
+                usize::from(log_geo.h_offset),
+            ) {
+                scrollbar::render(frame, track, false, false);
+                let thumb = Rect::new(
+                    track.rect.x + track.thumb_start,
+                    track.rect.y,
+                    track.thumb_len.max(1),
+                    track.rect.height,
+                );
+                frame_hits.push((thumb, HitTarget::ScrollbarThumb(ScrollBar::LogHorizontal)));
+                frame_hits.push((
+                    track.rect,
+                    HitTarget::ScrollbarTrack(ScrollBar::LogHorizontal),
+                ));
+            }
+        }
 
         // The inline branch/tag name box, over the Ref cell of the
         // target commit's row (over its pills, if it has any). If the
@@ -505,7 +575,14 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
         if let (Some((kind, _)), Some(row), InputMode::ComposingRefName { value, .. }) =
             (inline_ref, *inline_ref_row, input_mode)
         {
-            if let Some(box_rect) = inline_box_rect(log_offsets, row) {
+            // A Ref column cut by the viewport counts as too narrow: the
+            // status-bar field takes over.
+            let ref_whole: Vec<(LogColumn, u16, u16)> = log_offsets
+                .iter()
+                .copied()
+                .filter(|(c, _, _)| *c != LogColumn::Ref || log_geo.fully_visible(*c))
+                .collect();
+            if let Some(box_rect) = inline_box_rect(&ref_whole, row) {
                 let text_rect = render_inline_box(
                     frame,
                     box_rect,
@@ -596,6 +673,16 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                     let area = clip_to_frame(frame.area(), Rect::new(gx, top, gw, rows));
                     if compact_graph {
                         graph::compact_raster_rows(&mut raster_rows);
+                    } else {
+                        // Cells scrolled off at the left are not drawn.
+                        let cut = log_geo
+                            .span_of(LogColumn::Graph)
+                            .map_or(0, |(x, _)| usize::from(log_geo.h_offset.saturating_sub(x)));
+                        if cut > 0 {
+                            for row in &mut raster_rows {
+                                row.cells.drain(..cut.min(row.cells.len()));
+                            }
+                        }
                     }
                     graph_image.render(frame.buffer_mut(), area, &raster_rows);
                 }
@@ -618,6 +705,13 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                 log_offsets
                     .iter()
                     .find(|(c, _, _)| *c == LogColumn::Author)
+                    .filter(|_| {
+                        // The slot is the column's two leading cells: a column
+                        // cut at the left shows initials only.
+                        log_geo
+                            .span_of(LogColumn::Author)
+                            .is_some_and(|(x, _)| x >= log_geo.h_offset)
+                    })
                     .map(|(_, x, w)| (*x, *w)),
             ) {
                 let top = log_top_y(log_area);

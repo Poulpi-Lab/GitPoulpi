@@ -71,7 +71,8 @@ pub(in crate::event_loop) struct CommandCtx<'a> {
     pub(in crate::event_loop) dragging_commit_message: &'a mut bool,
     pub(in crate::event_loop) dragging_divider: &'a mut Option<u8>,
     pub(in crate::event_loop) dragging_list_bar: &'a mut Option<(ListBar, i32)>,
-    pub(in crate::event_loop) dragging_log_boundary: &'a mut Option<LogColumn>,
+    pub(in crate::event_loop) dragging_log_boundary: &'a mut Option<LogBoundaryDrag>,
+    pub(in crate::event_loop) log_natural_widths: &'a NaturalWidths,
     pub(in crate::event_loop) dragging_log_header: &'a mut Option<LogHeaderDrag>,
     pub(in crate::event_loop) dragging_scrollbar: &'a mut Option<(ScrollBar, i32)>,
     pub(in crate::event_loop) dragging_sidebar_section: &'a mut Option<SidebarSection>,
@@ -120,6 +121,9 @@ pub(in crate::event_loop) struct CommandCtx<'a> {
     pub(in crate::event_loop) log_col_pick: &'a mut Option<LogColumn>,
     pub(in crate::event_loop) log_column_overrides:
         &'a mut std::collections::HashMap<LogColumn, u16>,
+    pub(in crate::event_loop) log_column_scroll_widths:
+        &'a mut std::collections::HashMap<LogColumn, u16>,
+    pub(in crate::event_loop) log_h_offset: &'a mut u16,
     pub(in crate::event_loop) log_follow: &'a mut bool,
     pub(in crate::event_loop) log_len: &'a mut usize,
     pub(in crate::event_loop) log_menu_refs: &'a mut pill_menu::RefTable,
@@ -210,4 +214,24 @@ pub(in crate::event_loop) struct CommandCtx<'a> {
     pub(in crate::event_loop) worktree_seed: &'a mut Option<WorktreeSeed>,
     pub(in crate::event_loop) worktrees_result:
         &'a mut gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Worktree>>,
+}
+
+impl CommandCtx<'_> {
+    /// The Log's column geometry right now: the one source for "where is
+    /// column X", shared with the paint (`LogColumnsGeo`).
+    pub(in crate::event_loop) fn log_geo(&self) -> crate::log_table::LogColumnsGeo {
+        crate::log_table::LogColumnsGeo::compute(
+            *self.log_area,
+            &*self.log_column_order,
+            &*self.log_column_hidden,
+            &crate::log_table::LogWidthMaps {
+                fit: &*self.log_column_overrides,
+                scroll: &*self.log_column_scroll_widths,
+            },
+            (
+                crate::live_settings::log_columns_layout(),
+                *self.log_h_offset,
+            ),
+        )
+    }
 }

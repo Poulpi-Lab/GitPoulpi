@@ -54,6 +54,7 @@ pub(crate) fn pane_divider_grab_rect(panes_area: Rect, divider_x: u16) -> Rect {
 /// the column on its left), over the header and every row down to the bottom
 /// border, so the line lit on hover and the drag start are the same cells
 /// (`column_resize`).
+#[cfg(test)]
 pub(crate) fn log_boundary_grab_rect(log_area: Rect, boundary_x: u16) -> Rect {
     crate::column_resize::grab_rect(
         crate::column_resize::mode(),
@@ -565,13 +566,123 @@ mod tests {
         );
         let order = LogColumn::ALL.to_vec();
         let offsets = column_x_offsets(log_area.x, &order, &widths);
-        let hits = log_header_hit_targets(log_area, &offsets);
+        let hits = log_header_hit_targets(
+            log_area,
+            &LogColumnsGeo::from_fit_offsets(log_area, &offsets),
+        );
         ResizeGeometry {
             panes_area,
             log_area,
             hits,
             offsets,
         }
+    }
+
+    /// The grip after the last column is that column's own last cell, in both
+    /// modes: never the pane's border, which the pane divider keeps (a press
+    /// there still grabs the divider). Not registered for a last column under
+    /// two cells wide, or for `Message`, which absorbs the change.
+    #[test]
+    fn the_last_columns_grip_is_its_own_last_cell_and_the_border_stays_the_divider() {
+        use gitpoulpi_config::ColumnResize;
+        for mode in [ColumnResize::Line, ColumnResize::Header] {
+            crate::live_settings::install_column_resize(mode);
+            let ResizeGeometry {
+                panes_area,
+                log_area,
+                hits,
+                offsets,
+            } = resize_geometry();
+            let (last, x, w) = *offsets.last().unwrap();
+            let grip = LogColumnsGeo::from_fit_offsets(log_area, &offsets)
+                .grip_rect(log_area, last)
+                .expect("a last grip");
+            assert_eq!(grip.x, x + w - 1, "{mode:?}: its own last cell");
+            assert!(
+                hits.iter()
+                    .any(|(r, t)| *r == grip && *t == HitTarget::LogColumnBoundary(last)),
+                "{mode:?}: registered like an internal boundary"
+            );
+            let header_row = log_area.y + 1;
+            assert_eq!(
+                resize_grab_at(&hits, grip.x, header_row, panes_area, 18, 70, false, false)
+                    .map(|(g, _)| g),
+                Some(ResizeGrab::LogColumn(last))
+            );
+            // The border cell (the first one past the column) is not the grip.
+            let border = x + w;
+            assert_eq!(border, log_area.x + log_area.width - 1);
+            assert!(
+                !matches!(
+                    resize_grab_at(&hits, border, header_row, panes_area, 18, 70, false, false),
+                    Some((ResizeGrab::LogColumn(_), _))
+                ),
+                "{mode:?}: the border is not a column grip"
+            );
+            // Under two cells, or `Message`: nothing to grab.
+            assert_eq!(
+                LogColumnsGeo::from_fit_offsets(log_area, &[(LogColumn::Sha, 5, 1)])
+                    .grip_rect(log_area, LogColumn::Sha),
+                None
+            );
+            assert_eq!(
+                LogColumnsGeo::from_fit_offsets(log_area, &[(LogColumn::Message, 5, 20)])
+                    .grip_rect(log_area, LogColumn::Message),
+                None
+            );
+        }
+        crate::live_settings::install_column_resize(ColumnResize::Header);
+    }
+
+    /// The last grip lights exactly like an internal one: same glyph, same
+    /// style, in both modes (one helper paints both).
+    #[test]
+    fn the_last_grip_lights_with_the_same_symbol_and_style_as_an_internal_boundary() {
+        use gitpoulpi_config::ColumnResize;
+        for mode in [ColumnResize::Line, ColumnResize::Header] {
+            crate::live_settings::install_column_resize(mode);
+            let ResizeGeometry {
+                log_area, offsets, ..
+            } = resize_geometry();
+            let internal = LogColumnsGeo::from_fit_offsets(log_area, &offsets)
+                .grip_rect(log_area, offsets[1].0)
+                .unwrap();
+            let last = LogColumnsGeo::from_fit_offsets(log_area, &offsets)
+                .grip_rect(log_area, offsets.last().unwrap().0)
+                .unwrap();
+            let mut buf = Buffer::empty(Rect::new(0, 0, 100, 30));
+            crate::column_resize::paint_grab(&mut buf, mode, internal);
+            crate::column_resize::paint_grab(&mut buf, mode, last);
+            let probe = |r: Rect| {
+                let c = &buf[(r.x, r.y)];
+                (c.symbol().to_string(), c.fg, c.bg)
+            };
+            assert_eq!(probe(internal), probe(last), "{mode:?}");
+            assert_ne!(
+                probe(last),
+                probe(Rect::new(0, 29, 1, 1)),
+                "{mode:?}: lit means painted"
+            );
+        }
+        crate::live_settings::install_column_resize(ColumnResize::Header);
+    }
+
+    #[test]
+    fn the_last_grip_width_follows_the_travel_from_the_press() {
+        let drag = LogBoundaryDrag {
+            col: LogColumn::Sha,
+            press_x: 50,
+            start_w: 8,
+            last: true,
+        };
+        assert_eq!(last_grip_width(&drag, 50, 40), 8, "no travel, no change");
+        assert_eq!(last_grip_width(&drag, 47, 40), 5);
+        assert_eq!(last_grip_width(&drag, 55, 40), 13);
+        assert_eq!(
+            last_grip_width(&drag, 0, 40),
+            LogColumn::Sha.drag_min_width()
+        );
+        assert_eq!(last_grip_width(&drag, 200, 20), 20, "capped by the room");
     }
 
     /// The in-buffer half of the resize affordance, which is the half that
@@ -734,7 +845,10 @@ mod tests {
         let (d1, d2) = (18u16, 70u16);
         let boundaries: Vec<u16> = LogColumn::ALL
             .iter()
-            .filter_map(|c| log_boundary_x(&offsets, *c))
+            .filter_map(|c| {
+                LogColumnsGeo::from_fit_offsets(log_area, &offsets).grip_rect(log_area, *c)
+            })
+            .map(|r| r.x)
             .collect();
         let header_row = log_area.y + 1;
 

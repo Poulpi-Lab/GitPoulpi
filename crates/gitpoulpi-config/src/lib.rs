@@ -44,11 +44,11 @@ pub use schema::{
     DefaultBackend, DiffLayout, DisplayUnit, EditorConfig, EditorEol, EolMode, GeneralConfig,
     GitConfig, GraphColorization, GraphLaneBackground, GraphRenderer, GraphRowTintStrength,
     HostingInstance, HttpsMode, ImagePixelatedFrom, ImageProtocol, ImageTextFallback,
-    KittyKeyboard, LauncherBuild, LegacyDiffViewMode, LogConfig, LogLevel, McpConfig, MergeConfig,
-    PrTerminology, Profile, PullButtonMode, PushBehavior, ReposConfig, RetentionUnit,
-    RewriteConfig, SearchConfig, SessionConfig, SidebarSectionsScope, SshConfig, StartupTab,
-    StatusbarPosition, TabDirFollow, TabsPosition, ToolbarAlign, ToolbarPosition, UiConfig,
-    UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig, DEFAULT_BLAME_WIDTH,
+    KittyKeyboard, LauncherBuild, LegacyDiffViewMode, LogColumnsLayout, LogConfig, LogLevel,
+    McpConfig, MergeConfig, PrTerminology, Profile, PullButtonMode, PushBehavior, ReposConfig,
+    RetentionUnit, RewriteConfig, SearchConfig, SessionConfig, SidebarSectionsScope, SshConfig,
+    StartupTab, StatusbarPosition, TabDirFollow, TabsPosition, ToolbarAlign, ToolbarPosition,
+    UiConfig, UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig, DEFAULT_BLAME_WIDTH,
     DEFAULT_COMMITS_PER_LAZY_PAGE, DEFAULT_EDITOR_TAB_SIZE, DEFAULT_HOSTING_REFRESH_MINUTES,
     DEFAULT_INITIAL_COMMITS_IN_GRAPH, DEFAULT_LOG_RETENTION_DAYS, DEFAULT_MAX_COMMITS_IN_GRAPH,
     DEFAULT_MERGE_SIDE_BY_SIDE_MIN_WIDTH, DEFAULT_MOUSE_SCROLL_LINES, DEFAULT_SEARCH_COMMIT_LIMIT,
@@ -348,6 +348,7 @@ pub fn set_log_columns_in_file(
     hidden: &[String],
     order: &[String],
     widths: &std::collections::BTreeMap<String, u16>,
+    scroll_widths: &std::collections::BTreeMap<String, u16>,
 ) -> Result<()> {
     let _guard = COLUMN_WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
     let raw = if path.exists() {
@@ -372,6 +373,42 @@ pub fn set_log_columns_in_file(
         &mut document,
         "ui.log_column_widths",
         toml::Value::Table(table),
+    )?;
+    let mut scroll = toml::map::Map::new();
+    for (name, w) in scroll_widths {
+        scroll.insert(name.clone(), toml::Value::Integer(i64::from(*w)));
+    }
+    insert_dotted(
+        &mut document,
+        "ui.log_column_widths_scroll",
+        toml::Value::Table(scroll),
+    )?;
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    std::fs::write(path, toml::to_string_pretty(&document)?)?;
+    Ok(())
+}
+
+/// Writes `[ui] log_columns_layout` (`fit` or `scroll`) in one load-modify-save
+/// of the document at `path`, under the same lock as the column widths so a
+/// toggle and a width save, run from two threads, never lose each other's key.
+pub fn set_log_columns_layout_in_file(path: &Path, layout: LogColumnsLayout) -> Result<()> {
+    let _guard = COLUMN_WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    let raw = if path.exists() {
+        std::fs::read_to_string(path)?
+    } else {
+        String::new()
+    };
+    let mut document = if raw.trim().is_empty() {
+        toml::Value::Table(toml::map::Map::new())
+    } else {
+        toml::from_str(&raw)?
+    };
+    insert_dotted(
+        &mut document,
+        "ui.log_columns_layout",
+        toml::Value::String(layout.as_str().to_string()),
     )?;
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
@@ -778,6 +815,7 @@ mod tests {
             &["sha".to_string()],
             &["graph".to_string()],
             &Default::default(),
+            &Default::default(),
         )
         .unwrap();
         let widths = [("author".to_string(), 12u16)].into_iter().collect();
@@ -831,13 +869,23 @@ mod tests {
             &["sha".to_string(), "date".to_string()],
             &["graph".to_string(), "ref".to_string()],
             &widths,
+            &[("message".to_string(), 55u16)].into_iter().collect(),
         )
         .unwrap();
         let config = Config::load(&path).unwrap();
         assert_eq!(config.ui.log_columns_hidden, vec!["sha", "date"]);
         assert_eq!(config.ui.log_columns_order, vec!["graph", "ref"]);
         assert_eq!(config.ui.log_column_widths.get("author"), Some(&21));
+        // The scroll layout's widths are their own map, `message` included.
+        assert_eq!(config.ui.log_column_widths_scroll.get("message"), Some(&55));
+        assert_eq!(config.ui.log_columns_layout, LogColumnsLayout::Fit);
         assert_eq!(config.general.default_backend, DefaultBackend::System);
+
+        // The layout key is written apart and keeps the widths.
+        set_log_columns_layout_in_file(&path, LogColumnsLayout::Scroll).unwrap();
+        let config = Config::load(&path).unwrap();
+        assert_eq!(config.ui.log_columns_layout, LogColumnsLayout::Scroll);
+        assert_eq!(config.ui.log_column_widths_scroll.get("message"), Some(&55));
     }
 
     /// The external-tool templates: empty editor/diff tool by default, a

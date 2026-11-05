@@ -104,7 +104,9 @@ fn hover_style_for(target: &HitTarget) -> HoverKind {
             "deliberately no hover fill: the header cell has no click action (drag-to-reorder \
              only); the resize handle's own highlight is LogColumnBoundary's",
         ),
-        HitTarget::ColumnMenuItem(_) => Required("event_loop.rs hover_style (item 15)"),
+        HitTarget::ColumnMenuItem(_) | HitTarget::ColumnMenuAction(_) => {
+            Required("event_loop.rs hover_style (item 15)")
+        }
         HitTarget::ColumnMenuClose => Required("close_cross::paint's plain_button_style"),
         HitTarget::RefContextMenuItem(_)
         | HitTarget::LogContextMenuItem(_)
@@ -422,6 +424,7 @@ fn sample_hit_targets() -> Vec<HitTarget> {
         HitTarget::CommitDetailPart(AmendScope::Summary),
         HitTarget::LogColumnHeader(LogColumn::Author),
         HitTarget::ColumnMenuItem(LogColumn::Author),
+        HitTarget::ColumnMenuAction(ChooserRow::FitAll),
         HitTarget::ColumnMenuClose,
         HitTarget::RefContextMenuItem(0),
         HitTarget::LogContextMenuItem(0),

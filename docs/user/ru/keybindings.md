@@ -156,6 +156,8 @@ stage_file = "z"
 | `log` | `compare_swap` | Поменять стороны сравнения | `x` |
 | `log` | `compare_next` | Перейти к следующей сравниваемой строке | `n` |
 | `log` | `pick_column` | Выбрать колонку для сдвига или изменения ширины | `Shift+C` |
+| `log` | `scroll_left` | Scroll the Columns Left | `Shift+Left` |
+| `log` | `scroll_right` | Scroll the Columns Right | `Shift+Right` |
 | `log` | `copy_mermaid` | Копировать commit'ы как Mermaid gitGraph | `Shift+Y` |
 | `log_columns` | `next` | Выбрать следующую колонку | `Tab` |
 | `log_columns` | `prev` | Выбрать предыдущую колонку | `Shift+BackTab` |
@@ -164,6 +166,9 @@ stage_file = "z"
 | `log_columns` | `wider` | Расширить колонку | `]` |
 | `log_columns` | `narrower` | Сузить колонку | `[` |
 | `log_columns` | `reset_width` | Сбросить ширину колонок | `0` |
+| `log_columns` | `fit` | Fit the Column to Its Content | `=` |
+| `log_columns` | `fit_all` | Fit All Columns to Content | `+` |
+| `log_columns` | `layout` | Scroll Sideways or Fit the Pane | `s` |
 | `log_files` | `collapse_all` | Свернуть или развернуть все папки | `z` |
 | `log_files` | `filter` | Фильтр изменённых файлов | `/` |
 | `log_files` | `expand_all` | Развернуть все папки | `=` |
@@ -973,6 +978,11 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Вид: колонка Log: расширить колонку | `]` |
 | Вид: колонка Log: сузить колонку | `[` |
 | Вид: колонка Log: сбросить ширину колонок | `0` |
+| View: Log Column: Fit the Column to Its Content | `=` |
+| View: Log Column: Fit All Columns to Content | `+` |
+| View: Log: Scroll the Columns Left | `Shift+Left` |
+| View: Log: Scroll the Columns Right | `Shift+Right` |
+| View: Log: Toggle Scroll Sideways for the Columns | `s` |
 | Вид: Log: выбрать колонки для показа |  |
 | Diff: открыть diff выбранного файла | `Enter` |
 | Diff: закрыть diff | `Esc` |

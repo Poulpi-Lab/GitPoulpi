@@ -100,18 +100,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io
         col,
         row,
     );
-    let widths = LogColumnWidths::for_area_width(
-        cx.log_area.width,
-        &*cx.log_column_hidden,
-        &*cx.log_column_overrides,
-    );
-    let visible_order: Vec<LogColumn> = cx
-        .log_column_order
-        .iter()
-        .copied()
-        .filter(|c| !cx.log_column_hidden.contains(c))
-        .collect();
-    let offsets = column_x_offsets(cx.log_area.x, &visible_order, &widths);
+    let offsets = cx.log_geo().offsets;
     let has_wip = has_wip_row(&*cx.status_result);
     let hovered_index = in_log
         .then(|| log_row_to_index(*cx.log_area, cx.log_state.offset(), row, *cx.log_len))

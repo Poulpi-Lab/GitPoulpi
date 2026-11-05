@@ -263,19 +263,42 @@ impl WindowState {
                 // Solo also filters which ref pills render on the remaining rows: only
                 // pills for currently-soloed refs show (branches and tags alike), even on
                 // a visible ancestor of a soloed branch.
-                let log_widths = LogColumnWidths::for_area_width(
-                    self.log_area.width,
+                let log_layout = live_settings::log_columns_layout();
+                let mut log_geo = LogColumnsGeo::compute(
+                    self.log_area,
+                    &self.log_column_order,
                     &self.log_column_hidden,
-                    &self.log_column_overrides,
+                    &LogWidthMaps {
+                        fit: &self.log_column_overrides,
+                        scroll: &self.log_column_scroll_widths,
+                    },
+                    (log_layout, self.log_h_offset),
                 );
-                let log_visible_order: Vec<LogColumn> = self
-                    .log_column_order
-                    .iter()
-                    .copied()
-                    .filter(|c| !self.log_column_hidden.contains(c))
-                    .collect();
-                let log_offsets =
-                    column_x_offsets(self.log_area.x, &log_visible_order, &log_widths);
+                // While the WIP summary is being typed its cell must stay in
+                // view: the scroll never passes the start of Message.
+                if self.composer_focus == Some(ComposerField::WipSummary) {
+                    if let Some((x, _)) = log_geo.span_of(LogColumn::Message) {
+                        if log_geo.h_offset > x {
+                            log_geo = LogColumnsGeo::compute(
+                                self.log_area,
+                                &self.log_column_order,
+                                &self.log_column_hidden,
+                                &LogWidthMaps {
+                                    fit: &self.log_column_overrides,
+                                    scroll: &self.log_column_scroll_widths,
+                                },
+                                (log_layout, x),
+                            );
+                        }
+                    }
+                }
+                // The settled offset is the state: a window that grew, a
+                // column that shrank or a layout that changed pulls it back.
+                self.log_h_offset = log_geo.h_offset;
+                let log_draw_order: Vec<LogColumn> =
+                    log_geo.offsets.iter().map(|(c, _, _)| *c).collect();
+                let (log_widths, log_visible_order, log_offsets) =
+                    (&log_geo.widths, &log_draw_order, &log_geo.offsets);
                 // The solo filter, the lane walk, the stash placement and the
                 // search matches are functions of the inputs below only, so
                 // they are rebuilt when one of those changes -- not on every
@@ -359,10 +382,12 @@ impl WindowState {
                         ui_lane_background: self.ui_lane_background,
                         ui_tint_strength: self.ui_tint_strength,
                         graph_settings,
-                        log_widths: &log_widths,
-                        log_visible_order: &log_visible_order,
+                        log_widths,
+                        log_visible_order,
+                        log_natural: &mut self.log_natural_widths,
                         log_col_pick: self.log_col_pick,
-                        log_offsets: &log_offsets,
+                        log_offsets,
+                        log_geo: &log_geo,
                         layout,
                         search_matches,
                         search_match_set,
@@ -636,7 +661,7 @@ impl WindowState {
                         log_area: self.log_area,
                         log_column_hidden: &self.log_column_hidden,
                         log_result: &self.log_result,
-                        log_widths: &log_widths,
+                        log_widths,
                         open_menu: &self.open_menu,
                         palette_ctx,
                         palette_popup: &mut self.palette_popup,

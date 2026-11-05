@@ -592,6 +592,10 @@ date_verbose_format_help = "A linha Data do painel de detalhes do commit, a dica
 preview = "pré-visualização"
 sidebar_sections_scope = "Secções do painel esquerdo"
 sidebar_sections_scope_help = "A quem pertence a escolha das secções mostradas ou ocultas do painel esquerdo. repository: cada repositório guarda o seu conjunto (o global é o ponto de partida). global: um só conjunto para todos os repositórios. Mudar de uma opção para a outra nunca perde nenhum dos conjuntos."
+# context: a Settings row; how the Log lays its columns out
+log_columns_layout = "Column layout"
+# context: help text of the Log column layout row; "fit" and "scroll" are the two choices
+log_columns_layout_help = "How the Log lays its columns out. fit: every column fits the pane and only Message flexes. scroll: columns keep their widths, Message too, and the table scrolls sideways when it is wider than the pane."
 
 [settings_git]
 default_backend = "Backend do git"
@@ -743,6 +747,8 @@ pos_right = "Direita"
 align_start = "Início"
 align_center = "Centro"
 align_end = "Fim"
+layout_fit = "Fit the pane"
+layout_scroll = "Scroll sideways"
 
 [reltime]
 just_now = "agora mesmo"
@@ -2350,6 +2356,11 @@ split_move_down = "Mover o {$commit} para baixo"
 split_reset = "Repor a divisão"
 rewrite_host_howto = "Explicar a proteção de branches do alojamento"
 rewrite_ai_rules = "Criar regras de reescrita com IA"
+log_columns_fit = "Fit the Column to Its Content"
+log_columns_fit_all = "Fit All Columns to Content"
+log_scroll_left = "Scroll the Columns Left"
+log_scroll_right = "Scroll the Columns Right"
+log_columns_layout = "Scroll Sideways or Fit the Pane"
 
 
 [keymap_ctx]
@@ -3425,6 +3436,11 @@ git_fetch_selected_tag = "Git: {$Fetch} da {$Tag} selecionada"
 # s24:begin
 rewrite_fix_message_encoding = "Reescrever: corrigir a codificação das mensagens..."
 # s24:end
+view_log_column_fit = "View: Log Column: Fit the Column to Its Content"
+view_log_column_fit_all = "View: Log Column: Fit All Columns to Content"
+view_log_scroll_left = "View: Log: Scroll the Columns Left"
+view_log_scroll_right = "View: Log: Scroll the Columns Right"
+view_log_columns_layout = "View: Log: Toggle Scroll Sideways for the Columns"
 
 [help_section]
 rewrite = "Reescrever histórico"
@@ -3832,6 +3848,7 @@ split_7 = "no painel dos {$commits} seleciona esse {$commit}; m ou Enter numa al
 rewrite_9 = "abre o separador Tamanho e analisa o histórico: os maiores ficheiros e pastas, e os ficheiros eliminados mas ainda guardados; as linhas marcadas tornam-se regras de remoção"
 rewrite_host_howto = "explica como fazer passar uma reescrita por uma branch que o alojamento protege: levantar a proteção, fazer um {$push_noun} com um novo nome ou recriar o repositório; nada é feito por si"
 rewrite_ai_rules = "cria as regras de reescrita a partir da sua descrição com IA (nada é pré-visualizado nem aplicado)"
+log_columns_2 = "scroll the Log's columns sideways when they keep their widths (the Scroll sideways layout, chosen in the column chooser, in Settings or with s while a column is picked); in the fit layout every column fits the pane"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} ou botão direito"
@@ -4074,6 +4091,22 @@ column_width = "Largura de {column}: {cells} células"
 column_width_reset = "As larguras das colunas do Log voltaram ao automático."
 changes_files = { one = "{n} ficheiro", other = "{n} ficheiros" }
 changes_files_short = "{n}a"
+# context: status line after one Log column was fitted to its content; {column} is a column header, {cells} a number of terminal cells
+column_fitted = "{column} fitted to its content: {cells} cells."
+# context: status line when a Log column could not be fitted to its content because the pane is too narrow; {column} is a column header, {need} and {have} numbers of terminal cells
+column_fit_cut = "{column} needs {need} cells, {have} fit. Switch the columns to Scroll sideways to show it all."
+# context: status line when asked to fit the Message column; Message is the flexible column that takes the remaining room
+column_fit_message = "Message takes the room the other columns leave."
+# context: status line after every Log column was fitted to its content
+columns_fitted_all = "All columns fitted to their content."
+# context: status line after fitting every Log column when some could not get all they need; {columns} is a comma separated list of column headers
+columns_fit_all_cut = "Fitted to their content, but not enough room for: {columns}."
+# context: status line when a key or command scrolls the Log columns sideways but they fit the pane (the columns layout is "fit"); "Scroll sideways" is the name of the columns layout option
+columns_fit_pane = "The columns fit the pane. Switch the columns to Scroll sideways to scroll."
+# context: status line after the Log columns layout became "scroll sideways": columns keep their widths and the table can be wider than the pane
+layout_now_scroll = "Columns keep their widths and scroll sideways."
+# context: status line after the Log columns layout became "fit": every column fits the pane
+layout_now_fit = "Columns fit the pane."
 
 [find_bar]
 counter = "{current} de {total}"
@@ -4138,6 +4171,14 @@ changes_tooltip = "{files}, {insertions}, {deletions}"
 changes_files = { one = "{n} ficheiro alterado", other = "{n} ficheiros alterados" }
 changes_insertions = { one = "{n} inserção", other = "{n} inserções" }
 changes_deletions = { one = "{n} eliminação", other = "{n} eliminações" }
+# context: a row of the Log columns chooser; {column} is a column header (Ref, Graph, Author, Date, Changes, SHA)
+column_menu_fit = "Fit {column} to content"
+# context: a row of the Log columns chooser that fits every column to its content
+column_menu_fit_all = "Fit all columns to content"
+# context: a row of the Log columns chooser that puts every column width back to automatic
+column_menu_reset = "Reset column widths"
+# context: a checkbox row of the Log columns chooser; when checked, columns keep their widths and the Log scrolls sideways instead of fitting every column into the pane
+column_menu_scroll = "Scroll sideways (columns keep their widths)"
 
 [overlays]
 select_tab_title = "Selecionar separador ({shown}/{total})"

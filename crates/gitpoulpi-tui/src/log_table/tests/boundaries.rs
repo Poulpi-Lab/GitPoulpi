@@ -13,7 +13,10 @@ fn a_column_boundary_is_grabbable_on_the_header_row_only() {
     // The `header` mode (the first letter of the next name is the grab).
     crate::live_settings::install_column_resize(gitpoulpi_config::ColumnResize::Header);
     let (log_area, offsets) = log_geometry();
-    let hits = log_header_hit_targets(log_area, &offsets);
+    let hits = log_header_hit_targets(
+        log_area,
+        &LogColumnsGeo::from_fit_offsets(log_area, &offsets),
+    );
     let header_row = log_area.y + 1;
     let boundary_x = log_boundary_x(&offsets, LogColumn::Graph).unwrap();
 
@@ -46,7 +49,10 @@ fn the_grab_cell_wins_over_the_header_cell_it_sits_on() {
     // The `header` mode (the first letter of the next name is the grab).
     crate::live_settings::install_column_resize(gitpoulpi_config::ColumnResize::Header);
     let (log_area, offsets) = log_geometry();
-    let hits = log_header_hit_targets(log_area, &offsets);
+    let hits = log_header_hit_targets(
+        log_area,
+        &LogColumnsGeo::from_fit_offsets(log_area, &offsets),
+    );
     let header_row = log_area.y + 1;
     let boundary_x = log_boundary_x(&offsets, LogColumn::Graph).unwrap();
 

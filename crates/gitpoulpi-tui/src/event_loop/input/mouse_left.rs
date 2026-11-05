@@ -372,6 +372,15 @@ pub(super) fn diff_targets(
         // never moves on a plain mouse-down, only
         // once the drag actually moves (below).
         let grab = match (kind, cx.diff_view_state.as_ref()) {
+            (ScrollBar::LogHorizontal, _) => {
+                let geo = cx.log_geo();
+                scrollbar::Track::horizontal(
+                    *cx.log_area,
+                    usize::from(geo.content_w),
+                    usize::from(geo.h_offset),
+                )
+                .map(|t| col as i32 - t.rect.x as i32 - t.thumb_start as i32)
+            }
             (ScrollBar::DiffVertical, Some(s)) => {
                 scrollbar::Track::vertical(*cx.diff_body_area, *cx.diff_rendered_len, s.scroll)
                     .map(|t| row as i32 - t.rect.y as i32 - t.thumb_start as i32)
@@ -433,6 +442,35 @@ pub(super) fn diff_targets(
                                 i32::from(pos),
                             );
                             *cx.dragging_scrollbar = Some((ScrollBar::DiffHorizontal, grab));
+                        }
+                    }
+                }
+            }
+            ScrollBar::LogHorizontal => {
+                let geo = cx.log_geo();
+                let track = scrollbar::Track::horizontal(
+                    *cx.log_area,
+                    usize::from(geo.content_w),
+                    usize::from(geo.h_offset),
+                );
+                if let Some(track) = track {
+                    let pos = (col as i32 - track.rect.x as i32).max(0) as u16;
+                    match track.press(pos) {
+                        scrollbar::TrackPress::Arrow(step) => {
+                            *cx.log_h_offset =
+                                crate::log_table::scrolled(&geo, i32::try_from(step).unwrap_or(0));
+                        }
+                        scrollbar::TrackPress::Grab { grab, .. } => {
+                            let to = track.drag_offset(
+                                usize::from(geo.content_w),
+                                track.rect.width as usize,
+                                grab,
+                                i32::from(pos),
+                            );
+                            *cx.log_h_offset = u16::try_from(to)
+                                .unwrap_or(u16::MAX)
+                                .min(geo.max_h_offset());
+                            *cx.dragging_scrollbar = Some((ScrollBar::LogHorizontal, grab));
                         }
                     }
                 }

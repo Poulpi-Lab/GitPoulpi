@@ -321,19 +321,48 @@ pub(super) fn handle(
         // underneath.
         match &hit {
             Some(HitTarget::ColumnMenuItem(col)) => {
-                if !cx.log_column_hidden.remove(col) {
-                    cx.log_column_hidden.insert(*col);
-                }
                 if let Some(i) = LogColumn::ALL.iter().position(|c| c == col) {
-                    if let Some(cursor) = cx.open_menu.column_cursor_mut() {
-                        *cursor = i;
+                    if let Some(menu) = cx.open_menu.column_menu_mut() {
+                        menu.cursor = i;
                     }
                 }
+                commands::log_columns::run_chooser_row(cx, ChooserRow::Column(*col));
+            }
+            Some(HitTarget::ColumnMenuAction(row)) => {
+                commands::log_columns::run_chooser_row(cx, *row);
             }
             _ => cx.open_menu.close_column_menu(),
         }
     } else if let Some(ResizeGrab::LogColumn(c)) = resize_grab {
-        *cx.dragging_log_boundary = Some(c);
+        let now = Instant::now();
+        let double = cx.last_click.is_some_and(|(t, lc, lr)| {
+            now.duration_since(t) < DOUBLE_CLICK_WINDOW && lc == col && lr == row
+        });
+        if double {
+            // A second press on the same grip fits the column to its content
+            // and starts no drag: the first press's release already ended its
+            // own. The light follows the boundary's new place, and only when
+            // the pointer is still on it.
+            *cx.dragging_log_boundary = None;
+            *cx.last_click = None;
+            *cx.last_message = Some(commands::log_columns::fit_one(cx, c));
+            *cx.hovered_resize_strip = cx
+                .log_geo()
+                .grip_rect(*cx.log_area, c)
+                .filter(|r| r.contains((col, row).into()));
+        } else {
+            *cx.last_click = Some((now, col, row));
+            // The `scroll` layout: pin every column where it is, so the drag
+            // changes this one and nothing else moves.
+            commands::log_columns::pin_scroll(cx);
+            let geo = cx.log_geo();
+            *cx.dragging_log_boundary = Some(LogBoundaryDrag {
+                col: c,
+                press_x: col,
+                start_w: geo.widths.width_of(c),
+                last: geo.order.last() == Some(&c),
+            });
+        }
     } else if let Some(HitTarget::LogColumnHeader(header)) = &hit {
         *cx.dragging_log_header = Some(LogHeaderDrag::armed(*header, (col, row)));
     } else if let Some(HitTarget::TooltipRefPill { name, kind }) = &hit {

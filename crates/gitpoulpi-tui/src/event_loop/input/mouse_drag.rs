@@ -23,6 +23,26 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
         }
         return Ok(Flow::Handled);
     }
+    if let Some((ScrollBar::LogHorizontal, grab)) = *cx.dragging_scrollbar {
+        let geo = cx.log_geo();
+        if let Some(track) = scrollbar::Track::horizontal(
+            *cx.log_area,
+            usize::from(geo.content_w),
+            usize::from(geo.h_offset),
+        ) {
+            let pos = col as i32 - track.rect.x as i32;
+            let to = track.drag_offset(
+                usize::from(geo.content_w),
+                track.rect.width as usize,
+                grab,
+                pos,
+            );
+            *cx.log_h_offset = u16::try_from(to)
+                .unwrap_or(u16::MAX)
+                .min(geo.max_h_offset());
+        }
+        return Ok(Flow::Handled);
+    }
     if let Some((kind, grab)) = *cx.dragging_scrollbar {
         match (kind, cx.diff_view_state.as_mut()) {
             (ScrollBar::DiffVertical, Some(s)) => {
@@ -59,6 +79,7 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
             (
                 ScrollBar::FileInsightVertical
                 | ScrollBar::FileInsightHorizontal
+                | ScrollBar::LogHorizontal
                 | ScrollBar::BlameMinimap,
                 _,
             )
@@ -300,48 +321,45 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
             *cx.right_pane_collapsed,
         );
     }
-    if let Some(boundary_col) = *cx.dragging_log_boundary {
-        let widths = LogColumnWidths::for_area_width(
-            cx.log_area.width,
-            &*cx.log_column_hidden,
-            &*cx.log_column_overrides,
-        );
-        let visible_order: Vec<LogColumn> = cx
-            .log_column_order
-            .iter()
-            .copied()
-            .filter(|c| !cx.log_column_hidden.contains(c))
-            .collect();
-        let offsets = column_x_offsets(cx.log_area.x, &visible_order, &widths);
-        // Both sides of the boundary, never just the left one (see
-        // `boundary_drag_widths`). Each width is already clamped there to its
-        // column's floor and to what the pair has between them, so no phantom
-        // override wider than the pane can land in the map.
-        // The pointer holds the gap cell in `line` mode, one cell before
-        // the edge it moves (`column_resize::pointer_to_edge`).
-        let edge = col
-            + crate::column_resize::pointer_to_edge(
-                crate::column_resize::mode(),
-                log_boundary_x(&offsets, boundary_col).is_some(),
+    if let Some(grip) = *cx.dragging_log_boundary {
+        let geo = cx.log_geo();
+        if geo.layout == gitpoulpi_config::LogColumnsLayout::Scroll {
+            // Only this column changes (the others were pinned at the press)
+            // and the table grows or shrinks: the width is the pointer's place
+            // in the content less where the column starts.
+            cx.log_column_scroll_widths
+                .insert(grip.col, scroll_drag_width(&geo, grip.col, col));
+        } else if grip.last {
+            // The grip after the last column: by how far the pointer travelled
+            // since the press, `Message` taking up the difference, never past
+            // what the pane has room for (`LogColumnWidths::fit_max`).
+            let room = geo.widths.fit_max(
+                cx.log_area.width,
+                &geo.order,
+                &*cx.log_column_overrides,
+                grip.col,
             );
-        if let Some(pair) = boundary_drag_widths(&offsets, boundary_col, edge) {
+            cx.log_column_overrides
+                .insert(grip.col, last_grip_width(&grip, col, room));
+        } else if let Some(pair) = {
+            // Both sides of the boundary, never just the left one (see
+            // `boundary_drag_widths`). Each width is already clamped there to
+            // its column's floor and to what the pair has between them, so no
+            // phantom override wider than the pane can land in the map. The
+            // pointer holds the gap cell in `line` mode, one cell before the
+            // edge it moves (`column_resize::pointer_to_edge`).
+            let edge =
+                col + crate::column_resize::pointer_to_edge(crate::column_resize::mode(), true);
+            boundary_drag_widths(&geo.offsets, grip.col, edge)
+        } {
             for (c, w) in pair {
                 cx.log_column_overrides.insert(c, w);
             }
-            // Re-light the strip from the widths we
-            // just wrote. A held button reports as
-            // `Drag`, not `Moved`, so this is the
-            // only place the highlight can follow a
-            // boundary that is being dragged.
-            let widths = LogColumnWidths::for_area_width(
-                cx.log_area.width,
-                &*cx.log_column_hidden,
-                &*cx.log_column_overrides,
-            );
-            let offsets = column_x_offsets(cx.log_area.x, &visible_order, &widths);
-            *cx.hovered_resize_strip = log_boundary_x(&offsets, boundary_col)
-                .map(|bx| log_boundary_grab_rect(*cx.log_area, bx));
         }
+        // Re-light the strip from the widths just written. A held button
+        // reports as `Drag`, not `Moved`, so this is the only place the
+        // highlight can follow a boundary that is being dragged.
+        *cx.hovered_resize_strip = cx.log_geo().grip_rect(*cx.log_area, grip.col);
     }
     if let Some(mut drag) = *cx.dragging_log_header {
         drag.at = (col, row);
@@ -349,18 +367,7 @@ pub(super) fn drag(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::
             drag.started = true;
         }
         if drag.started {
-            let widths = LogColumnWidths::for_area_width(
-                cx.log_area.width,
-                &*cx.log_column_hidden,
-                &*cx.log_column_overrides,
-            );
-            let visible_order: Vec<LogColumn> = cx
-                .log_column_order
-                .iter()
-                .copied()
-                .filter(|c| !cx.log_column_hidden.contains(c))
-                .collect();
-            let offsets = column_x_offsets(cx.log_area.x, &visible_order, &widths);
+            let offsets = cx.log_geo().offsets;
             let slot = drop_slot(&offsets, col);
             drag.slot = Some(slot);
             let header_row = cx.log_area.y + 1;

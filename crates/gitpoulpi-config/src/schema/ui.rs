@@ -728,6 +728,11 @@ pub struct UiConfig {
     /// Live: how the Log, the Radar and the commit column let a column be
     /// resized. See [`ColumnResize`]. `ui.column_resize`.
     pub column_resize: ColumnResize,
+    /// Live: how the Log lays its columns out: `fit` (every column fits the
+    /// pane, only Message flexes) or `scroll` (columns keep their widths, the
+    /// table can be wider than the pane and scrolls sideways). See
+    /// [`LogColumnsLayout`]. `ui.log_columns_layout`.
+    pub log_columns_layout: LogColumnsLayout,
     /// Live: the annotation column's width in cells, set by dragging its
     /// border (or `<` / `>` in the view). Clamped by
     /// [`UiConfig::blame_width_clamped`]. `ui.blame_width`.
@@ -809,6 +814,10 @@ pub struct UiConfig {
     pub log_columns_order: Vec<String>,
     /// Live: manual Log column widths (drag-to-resize), name -> cells.
     pub log_column_widths: std::collections::BTreeMap<String, u16>,
+    /// Live: the Log column widths of the `scroll` layout, name -> cells
+    /// (`message` included: it has a width of its own there). Apart from
+    /// `log_column_widths`, which stays the `fit` layout's.
+    pub log_column_widths_scroll: std::collections::BTreeMap<String, u16>,
     /// Live: the parts of the commit column beside a diff (the column's
     /// `File | All` selector) that are shown, by the Log's stable column
     /// names - `ref`, `graph`, `message`, `author`, `date`, `changes`, `sha`.
@@ -1044,6 +1053,19 @@ pub enum ColumnResize {
 }
 
 config_enum! {
+/// `ui.log_columns_layout`: how the Log lays its columns out.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum LogColumnsLayout {
+    /// Every visible column fits the pane exactly; only Message flexes.
+    #[default]
+    Fit => "fit",
+    /// Columns keep their widths (Message too) and the table scrolls sideways
+    /// when it is wider than the pane.
+    Scroll => "scroll",
+}
+}
+
+config_enum! {
 /// `ui.blame_side`: where the Blame view puts its annotation column.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BlameSide {
@@ -1144,6 +1166,7 @@ impl Default for UiConfig {
             composer_files: ComposerFiles::default(),
             blame_side: BlameSide::default(),
             column_resize: ColumnResize::default(),
+            log_columns_layout: LogColumnsLayout::default(),
             blame_width: DEFAULT_BLAME_WIDTH,
             mouse_scroll_lines: DEFAULT_MOUSE_SCROLL_LINES,
             date_locale: "system".into(),
@@ -1168,6 +1191,7 @@ impl Default for UiConfig {
             log_columns_hidden: Vec::new(),
             log_columns_order: Vec::new(),
             log_column_widths: Default::default(),
+            log_column_widths_scroll: Default::default(),
             commit_column_columns_visible: Vec::new(),
             commit_column_columns_order: Vec::new(),
             commit_column_columns_widths: Default::default(),

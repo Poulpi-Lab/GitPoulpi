@@ -140,6 +140,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ui.sidebar_sections_scope",
     "ui.blame_side",
     "ui.column_resize",
+    "ui.log_columns_layout",
     "ui.blame_width",
     "ui.diff_layout",
     "ui.pr_terminology",

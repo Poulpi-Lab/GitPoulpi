@@ -115,6 +115,8 @@ scrollbars. Click a mark to go there.
 - **Drag the bottom border** of a Refs section to change its height.
 - **Drag the bottom border** of the commit message block in the right pane.
 - **Drag the border between two Log headers** (by default the gap, from the header or from anywhere down the table; Settings > Log & graph > Column resizing) to resize a column (the keyboard: `Shift+C` to pick a column, then `]` / `[`).
+- **Double-click the border between two Log headers** to fit the column on its left to its content (the keyboard: `Shift+C` to pick a column, then `=`; `+` fits every column). The last column has a grip on its own last cell: drag it to resize that column, the Message column taking the difference.
+- **Scroll the Log sideways** (the `scroll` column layout; Settings > Log & graph > Column layout, or the chooser's `Scroll sideways` checkbox): the horizontal wheel or `Shift`+wheel over the table, the bar on the bottom border (drag its thumb, press the bare track, click its end arrows), or `Shift+Left` / `Shift+Right`. In the default `fit` layout the columns fill the pane and there is nothing to scroll.
 - **Drag a Log header** to move the column: a ghost of its name follows the pointer, the header it left is dimmed and an accent bar marks the slot where it would land. The columns move when you release; `Esc` cancels, and the pointer shows the open hand while you carry it (the keyboard: `Shift+C` to pick a column, then `<` / `>`).
 
 GitPoulpi remembers every size. See
@@ -220,7 +222,7 @@ See [Hosting and issue trackers](hosting-integration.md).
   on the commit.
 - **Right-click a ref pill** for one menu with the ref's actions and the
   commit's actions.
-- **Right-click the header** to show or hide columns: a checklist (`[x]` / `[ ]`) with a ✕ in its title; click a row or use the arrows and `Space` / `Enter`, then close it with the ✕, `Esc` or a click away (the palette: `View: Log: Choose the Columns to Show`).
+- **Right-click the header** to show or hide columns: a checklist (`[x]` / `[ ]`) with a ✕ in its title; click a row or use the arrows and `Space` / `Enter`, then close it with the ✕, `Esc` or a click away (the palette: `View: Log: Choose the Columns to Show`). Below the checkboxes: `Fit <column> to content` (the column right-clicked), `Fit all columns to content` and `Reset column widths`.
 - **Click `↑`, `↓` or `✕`** in the search bar to go to the previous or next
   match, or to close the bar.
 - **Click `#12`, `ABC-12` or `AB#12`** in a commit message, in the right pane,

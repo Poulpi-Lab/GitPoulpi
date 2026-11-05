@@ -63,7 +63,19 @@ fn desired_cursor_shape_prioritizes_an_active_drag_over_the_current_hit_target()
     // to Pointer just because the cursor is momentarily over a button.
     let hit = HitTarget::Toolbar(ToolbarButton::Pull);
     assert_eq!(
-        desired_cursor_shape(Some(&hit), None, None, Some(LogColumn::Author), false, None),
+        desired_cursor_shape(
+            Some(&hit),
+            None,
+            None,
+            Some(LogBoundaryDrag {
+                col: LogColumn::Author,
+                press_x: 0,
+                start_w: 10,
+                last: false
+            }),
+            false,
+            None
+        ),
         CursorShape::ColResize
     );
     assert_eq!(

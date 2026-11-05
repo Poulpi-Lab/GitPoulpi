@@ -6,17 +6,23 @@
 use super::*;
 
 mod columns;
+mod fit;
+mod geo;
 mod geometry;
 mod header_drag;
 mod keyboard;
+mod natural;
 mod prefs;
 mod row;
 mod wip;
 
 pub(crate) use columns::*;
+pub(crate) use fit::*;
+pub(crate) use geo::*;
 pub(crate) use geometry::*;
 pub(crate) use header_drag::*;
 pub(crate) use keyboard::*;
+pub(crate) use natural::*;
 pub(crate) use prefs::*;
 pub(crate) use row::*;
 pub(crate) use wip::*;

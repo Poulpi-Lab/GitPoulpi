@@ -52,6 +52,17 @@ impl Edge {
         }
     }
 
+    /// The grip on the last column of a table whose columns end at `end_x`
+    /// (exclusive): the column's own last cell, in both modes. Never the cell
+    /// past it, which is the pane's border.
+    pub(crate) fn last(end_x: u16) -> Self {
+        let cell = end_x.saturating_sub(1);
+        Self {
+            gap_x: cell,
+            next_x: cell,
+        }
+    }
+
     /// The boundary after a last column: no cell follows it, so the gap and
     /// the next cell are the same one (past the column's end).
     pub(crate) fn after(end_x: u16) -> Self {

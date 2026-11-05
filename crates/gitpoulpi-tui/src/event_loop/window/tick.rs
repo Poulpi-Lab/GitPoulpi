@@ -66,6 +66,7 @@ impl WindowState {
                 order: self.log_column_order.clone(),
                 hidden: self.log_column_hidden.clone(),
                 widths: self.log_column_overrides.clone(),
+                scroll_widths: self.log_column_scroll_widths.clone(),
             };
             if now != self.last_saved_log_columns {
                 if let Some(path) = &self.diff_config_path {

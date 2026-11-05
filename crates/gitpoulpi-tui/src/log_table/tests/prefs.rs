@@ -42,3 +42,24 @@ fn a_stored_message_width_is_dropped_at_load() {
     assert_eq!(p.widths.get(&LogColumn::Message), None);
     assert_eq!(p.widths.get(&LogColumn::Graph), Some(&12));
 }
+
+/// The scroll layout's widths are their own map and `Message` has one there
+/// (it is only dropped from the fit layout's); both survive a save and load.
+#[test]
+fn scroll_widths_keep_message_and_round_trip_apart_from_the_fit_widths() {
+    let mut ui = gitpoulpi_config::UiConfig::default();
+    ui.log_column_widths.insert("author".into(), 20);
+    ui.log_column_widths_scroll.insert("message".into(), 90);
+    ui.log_column_widths_scroll.insert("sha".into(), 9);
+    ui.log_column_widths_scroll.insert("bogus".into(), 9);
+    let p = LogColumnPrefs::from_ui(&ui);
+    assert_eq!(p.scroll_widths.get(&LogColumn::Message), Some(&90));
+    assert_eq!(p.scroll_widths.len(), 2);
+    assert_eq!(p.widths.get(&LogColumn::Author), Some(&20));
+    assert_eq!(p.widths.len(), 1, "the fit map is untouched");
+    let (_, _, fit, scroll) = p.to_names();
+    assert_eq!(fit.get("author"), Some(&20));
+    assert_eq!(scroll.get("message"), Some(&90));
+    assert_eq!(scroll.get("sha"), Some(&9));
+    assert!(!fit.contains_key("message"));
+}

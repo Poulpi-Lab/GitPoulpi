@@ -89,6 +89,8 @@ pub(crate) fn log_rows_now(
     status_result: &gitpoulpi_core::Result<WorkingTree>,
     stashes_result: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Stash>>,
     show_stashes: bool,
+    solo_refs: &std::collections::HashSet<String>,
+    refs_result: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Ref>>,
 ) -> graph::LogRows {
     let slots = match (show_stashes, log_result, stashes_result) {
         (true, Ok(g), Ok(stashes)) => {
@@ -96,7 +98,11 @@ pub(crate) fn log_rows_now(
         }
         _ => Vec::new(),
     };
-    graph::LogRows::new(has_wip_row(status_result), slots)
+    let shown = log_result
+        .as_ref()
+        .ok()
+        .and_then(|g| solo_shown_indices(&g.nodes, solo_refs, refs_result));
+    graph::LogRows::new(has_wip_row(status_result), slots).with_shown(shown)
 }
 
 /// How many rows the Log has: the (solo-filtered) commits plus the WIP
@@ -112,6 +118,29 @@ pub(crate) fn log_len_now(
         .map(|g| apply_solo_filter(&g.nodes, solo_refs, refs_result).len())
         .unwrap_or(0);
     rows.len(commits)
+}
+
+/// The commit id behind Log display index `index`: a commit row's own, a
+/// stash row's commit, `None` for the WIP row or past the end. The one
+/// spelling of "what is under this row", used by the pointer on every move
+/// and again every frame (`WindowState::refresh_log_hover`).
+pub(crate) fn log_commit_at(
+    log_result: &gitpoulpi_core::Result<gitpoulpi_core::domain::CommitGraph>,
+    stashes_result: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Stash>>,
+    rows: &graph::LogRows,
+    index: usize,
+) -> Option<gitpoulpi_core::domain::Oid> {
+    match rows.entry(index) {
+        graph::LogEntry::Commit(commit_idx) => log_result
+            .as_ref()
+            .ok()
+            .and_then(|g| g.nodes.get(commit_idx))
+            .map(|c| c.id),
+        graph::LogEntry::Stash(_) => {
+            log_stash_at(stashes_result, rows, index).and_then(|s| s.commit)
+        }
+        graph::LogEntry::Wip => None,
+    }
 }
 
 /// The stash drawn at Log display index `index`, if a stash row is there.
@@ -169,6 +198,36 @@ pub(crate) fn solo_target_oid(solo_ref: &str, refs: &[gitpoulpi_core::domain::Re
     refs.iter()
         .find(|r| ref_full_name(r) == solo_ref)
         .map(|r| r.target)
+}
+
+/// The held indices of the commits `apply_solo_filter` keeps, or `None`
+/// when it keeps them all (no Solo, or nothing to resolve).
+pub(crate) fn solo_shown_indices(
+    nodes: &[CommitNode],
+    solo_refs: &std::collections::HashSet<String>,
+    refs: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Ref>>,
+) -> Option<Vec<usize>> {
+    if solo_refs.is_empty() {
+        return None;
+    }
+    let refs = refs.as_ref().ok()?;
+    let targets: Vec<Oid> = solo_refs
+        .iter()
+        .filter_map(|name| solo_target_oid(name, refs))
+        .collect();
+    let kept = solo_filter_nodes(nodes, &targets);
+    if kept.is_empty() {
+        return None;
+    }
+    let ids: std::collections::HashSet<Oid> = kept.iter().map(|c| c.id).collect();
+    Some(
+        nodes
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| ids.contains(&c.id))
+            .map(|(i, _)| i)
+            .collect(),
+    )
 }
 
 /// Every commit reachable from any oid in `targets` by walking `parents`

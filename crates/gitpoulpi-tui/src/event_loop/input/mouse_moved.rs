@@ -113,18 +113,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io
     // per-commit lookup (tooltip, pills) finds no
     // commit behind it and stays quiet.
     *cx.hovered_commit = hovered_index
-        .and_then(|i| match cx.log_order.entry(i) {
-            graph::LogEntry::Commit(commit_idx) => cx
-                .log_result
-                .as_ref()
-                .ok()
-                .and_then(|g| g.nodes.get(commit_idx))
-                .map(|c| c.id),
-            graph::LogEntry::Stash(_) => {
-                log_stash_at(&*cx.stashes_result, &*cx.log_order, i).and_then(|s| s.commit)
-            }
-            graph::LogEntry::Wip => None,
-        })
+        .and_then(|i| log_commit_at(&*cx.log_result, &*cx.stashes_result, &*cx.log_order, i))
         .and_then(|commit_id| {
             log_hover_column(&offsets, col).map(|hover_col| (commit_id, hover_col, col, row))
         });

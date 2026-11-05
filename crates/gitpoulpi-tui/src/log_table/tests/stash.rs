@@ -48,7 +48,14 @@ fn a_stash_row_shifts_the_commits_below_it_and_is_its_own_selection() {
         }],
     });
     let stashes = Ok(vec![stash_on_2()]);
-    let rows = log_rows_now(&log, &dirty, &stashes, true);
+    let rows = log_rows_now(
+        &log,
+        &dirty,
+        &stashes,
+        true,
+        &Default::default(),
+        &Ok(Vec::new()),
+    );
     assert_eq!(rows.len(3), 5);
 
     let mut state = TableState::default();
@@ -69,7 +76,14 @@ fn a_stash_row_shifts_the_commits_below_it_and_is_its_own_selection() {
     assert_eq!(state.selected(), Some(3));
 
     // The setting off, or soloing: no stash row, nothing shifts.
-    let off = log_rows_now(&log, &dirty, &stashes, false);
+    let off = log_rows_now(
+        &log,
+        &dirty,
+        &stashes,
+        false,
+        &Default::default(),
+        &Ok(Vec::new()),
+    );
     assert_eq!(off.len(3), 4);
     state.select(Some(2));
     assert_eq!(selected_log_commit(&log, &state, &off), Some(oid(2)));

@@ -138,6 +138,8 @@ pub(crate) fn apply_ref_context_action(
                 status_result,
                 stashes_result,
                 stash_rows_shown(graph_show_stashes, solo_refs),
+                solo_refs,
+                refs_result,
             );
             *log_len = log_len_now(log_result, solo_refs, refs_result, log_order);
             move_table_selection(log_state, *log_len, 0);
@@ -175,6 +177,8 @@ pub(crate) fn apply_ref_context_action(
                             status_result,
                             stashes_result,
                             stash_rows_shown(graph_show_stashes, solo_refs),
+                            solo_refs,
+                            refs_result,
                         );
                         *log_len = log_len_now(log_result, solo_refs, refs_result, log_order);
                         move_table_selection(log_state, *log_len, 0);

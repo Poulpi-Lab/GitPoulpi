@@ -638,6 +638,8 @@ pub(super) fn handle(
             &*cx.status_result,
             &*cx.stashes_result,
             stash_rows_shown(*cx.graph_show_stashes, &*cx.solo_refs),
+            &*cx.solo_refs,
+            &*cx.refs_result,
         );
         *cx.log_len = log_len_now(
             &*cx.log_result,

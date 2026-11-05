@@ -472,3 +472,30 @@ fn remember_tabs_shows_checked_when_the_key_is_absent() {
         "explicit off"
     );
 }
+
+#[test]
+fn the_clone_start_source_is_a_combobox_offering_last_url_and_the_sources() {
+    use gitpoulpi_config::{ConnectedUser, Integration, IntegrationKind};
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state(dir.path());
+    let mut hub = Integration::new("hub", IntegrationKind::Github, "https://github.com");
+    hub.user = Some(ConnectedUser {
+        login: "kai".into(),
+        name: String::new(),
+        id: String::new(),
+    });
+    st.config.integrations = vec![hub];
+    let (options, value) = combo_of(&st, "repos.clone_start_source");
+    assert_eq!(value, "last", "the default is the last source");
+    let values: Vec<&str> = options.iter().map(|(_, v)| v.as_str()).collect();
+    assert_eq!(&values[..2], ["last", "url"]);
+    assert_eq!(options[0].0, "Last used");
+    assert_eq!(options[1].0, "Clone with URL");
+    if crate::build_features::HOSTING {
+        assert_eq!(values.get(2), Some(&"hub"), "{values:?}");
+    }
+    st.commit_combo(&Target::Global("repos.clone_start_source"), "url");
+    let stored = std::fs::read_to_string(dir.path().join("config.toml")).unwrap();
+    assert!(stored.contains("clone_start_source = \"url\""), "{stored}");
+    assert_eq!(combo_of(&st, "repos.clone_start_source").1, "url");
+}

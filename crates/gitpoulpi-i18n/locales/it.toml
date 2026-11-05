@@ -310,6 +310,11 @@ allow_ui_propose = "Lascia che gli agenti IA propongano modifiche da confermare"
 allow_ui_propose_help = "Se attivo, un agente IA può aprire un dialogo precompilato per te: un nuovo messaggio per un commit, un messaggio di commit nel compositore, un nuovo branch o tag. È contrassegnato ✦ Proposto da <agente> e nulla cambia finché non premi la conferma del dialogo; Esc lo rifiuta. Se disattivato (predefinito), `ui propose` e gli strumenti MCP ui_propose_* vengono rifiutati."
 clone_root = "Cartella di clonazione predefinita"
 clone_root_help = "Da dove parte «Dove clonare» nel dialogo Clona. Vuoto usa il valore predefinito del sistema: %USERPROFILE%\\source\\repos su Windows, ~/src altrove."
+# context: setting: which source the Clone dialog opens on (Last used, Clone with URL, or an integration)
+clone_start_source = "Clone dialog starts on"
+clone_start_source_help = "The source the Clone dialog opens on. Last used reopens the one it showed when it was last closed; Clone with URL always starts on the URL form; or pick one of your connected integrations. A source that is no longer available means Clone with URL."
+# context: option of the "Clone dialog starts on" setting: the source shown when the dialog was last closed
+clone_start_last = "Last used"
 browse_root = "Cartella di esplorazione predefinita"
 browse_root_help = "Dove si apre Sfoglia (il selettore di cartelle, dalla scheda Home) per impostazione predefinita. Vuoto fa aprire Sfoglia sull'ultima cartella scelta - o sulla cartella home, la prima volta - invece che su una fissa."
 heading_auto_stash = { git = "Auto-stash", local = "Accantonamento automatico" }

@@ -531,10 +531,25 @@ impl RepoDialogs {
                     .and_then(|s| s.config().repos.clone_root_or_default())
                     .or_else(|| gitpoulpi_config::default_clone_root(Some(cwd)));
                 let hosted = hosted_sources(&crate::pull_request::load_integrations());
+                let start = settings
+                    .as_ref()
+                    .map(|s| s.config().repos.clone_start_source.clone())
+                    .unwrap_or_default();
+                let last = crate::session_store::config_dir()
+                    .map(|d| {
+                        gitpoulpi_session::CloneSource::load(
+                            &gitpoulpi_session::CloneSource::file_in(&d),
+                        )
+                    })
+                    .and_then(|c| c.last_profile);
                 #[cfg(feature = "hosting")]
                 self.projects_rx.clear();
                 self.dialog = Some(RepoDialog::Clone {
-                    form: Box::new(CloneDialog::new(root.as_deref()).with_hosted(hosted)),
+                    form: Box::new(
+                        CloneDialog::new(root.as_deref())
+                            .with_hosted(hosted)
+                            .with_start_source(&start, last.as_deref()),
+                    ),
                     picker: None,
                 });
             }
@@ -1655,7 +1670,28 @@ impl RepoDialogs {
         }
     }
 
+    /// Writes the source the user moved the Clone dialog to (once per
+    /// change), so the next opening can start on it.
+    fn remember_clone_source(&mut self) {
+        let Some(RepoDialog::Clone { form, .. }) = self.dialog.as_mut() else {
+            return;
+        };
+        let Some(profile) = form.take_source_change() else {
+            return;
+        };
+        if let Some(dir) = crate::session_store::config_dir() {
+            let path = gitpoulpi_session::CloneSource::file_in(&dir);
+            let state = gitpoulpi_session::CloneSource {
+                last_profile: profile,
+            };
+            if let Err(err) = state.save(&path) {
+                tracing::debug!("clone source not saved: {err}");
+            }
+        }
+    }
+
     fn on_clone(&mut self, outcome: CloneOutcome) -> Option<DialogEffect> {
+        self.remember_clone_source();
         match outcome {
             CloneOutcome::Stay => None,
             CloneOutcome::Open(path) => {

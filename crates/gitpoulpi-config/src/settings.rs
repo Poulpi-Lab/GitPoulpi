@@ -171,6 +171,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ssh.private_key_path",
     "ssh.public_key_path",
     "repos.clone_root",
+    "repos.clone_start_source",
     "repos.browse_root",
     "session.per_repo_state_dir",
     "repos.show_hidden",

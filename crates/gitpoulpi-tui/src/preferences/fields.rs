@@ -287,6 +287,7 @@ impl PreferencesState {
                 Control::Text(self.config.repos.clone_root.clone()),
             )
             .with_help(msg::settings_general::CLONE_ROOT_HELP.get()),
+            self.clone_start_source_field(),
             Field::global(
                 msg::settings_general::BROWSE_ROOT.get(),
                 "repos.browse_root",
@@ -461,6 +462,44 @@ impl PreferencesState {
             )
             .with_help(msg::settings_general::TAB_DIR_FOLLOW_HELP.get()),
         ]
+    }
+
+    /// General > "Clone dialog starts on": Last used, Clone with URL, or a
+    /// profile the dialog could list (its own filter).
+    pub(super) fn clone_start_source_field(&self) -> Field {
+        let mut options: Vec<(String, String)> = vec![
+            (
+                msg::settings_general::CLONE_START_LAST.get().into(),
+                gitpoulpi_config::CLONE_START_LAST.into(),
+            ),
+            (
+                msg::clone::SOURCE_URL.get().into(),
+                gitpoulpi_config::CLONE_START_URL.into(),
+            ),
+        ];
+        options.extend(
+            crate::clone_dialog::hosted_sources(&self.config.integrations)
+                .into_iter()
+                .map(|h| (h.label, h.profile_id)),
+        );
+        let stored = self.config.repos.clone_start_source.trim();
+        let value = if stored.is_empty() || stored.eq_ignore_ascii_case("last") {
+            gitpoulpi_config::CLONE_START_LAST.to_string()
+        } else if stored.eq_ignore_ascii_case("url") {
+            gitpoulpi_config::CLONE_START_URL.to_string()
+        } else {
+            stored.to_string()
+        };
+        Field::global(
+            msg::settings_general::CLONE_START_SOURCE.get(),
+            "repos.clone_start_source",
+            Control::Combo {
+                options,
+                value,
+                custom: false,
+            },
+        )
+        .with_help(msg::settings_general::CLONE_START_SOURCE_HELP.get())
     }
 
     /// Profiles > General: the one setting that is not a profile's own.

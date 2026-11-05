@@ -311,6 +311,11 @@ allow_ui_propose = "YZ ajanlarının onaylayacağım değişiklikler önermesine
 allow_ui_propose_help = { git = "Açıkken bir YZ ajanı sizin için önceden doldurulmuş bir iletişim kutusu açabilir: bir commit için yeni mesaj, düzenleyicide bir commit mesajı, yeni bir dal veya tag. ✦ <ajan> önerdi diye işaretlenir ve iletişim kutusunun kendi onay düğmesine siz basana kadar hiçbir şey değişmez; Esc reddeder. Kapalıyken (varsayılan) `ui propose` ve MCP ui_propose_* araçları reddedilir.", local = "Açıkken bir YZ ajanı sizin için önceden doldurulmuş bir iletişim kutusu açabilir: bir commit için yeni mesaj, düzenleyicide bir commit mesajı, yeni bir dal veya etiket. ✦ <ajan> önerdi diye işaretlenir ve iletişim kutusunun kendi onay düğmesine siz basana kadar hiçbir şey değişmez; Esc reddeder. Kapalıyken (varsayılan) `ui propose` ve MCP ui_propose_* araçları reddedilir." }
 clone_root = "Varsayılan klon klasörü"
 clone_root_help = "Klonla iletişim kutusunun \"Nereye klonlanacak\" alanının başladığı yer. Boşsa işletim sistemine göre varsayılan kullanılır: Windows'ta %USERPROFILE%\\source\\repos, diğerlerinde ~/src."
+# context: setting: which source the Clone dialog opens on (Last used, Clone with URL, or an integration)
+clone_start_source = "Clone dialog starts on"
+clone_start_source_help = "The source the Clone dialog opens on. Last used reopens the one it showed when it was last closed; Clone with URL always starts on the URL form; or pick one of your connected integrations. A source that is no longer available means Clone with URL."
+# context: option of the "Clone dialog starts on" setting: the source shown when the dialog was last closed
+clone_start_last = "Last used"
 browse_root = "Varsayılan gözatma klasörü"
 browse_root_help = "Gözat'ın (Ana sekmeden klasör seçici) varsayılan olarak açıldığı yer. Boşsa Gözat sabit bir klasör yerine en son seçilen klasörde - ya da ilk seferde ana klasörde - açılır."
 heading_auto_stash = { git = "Otomatik Stash", local = "Otomatik Saklama" }

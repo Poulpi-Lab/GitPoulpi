@@ -8208,6 +8208,7 @@ dlg_sample = { one = { git = "Wyślij próbkę z {n} commita (autor, data, temat
 dlg_sample_off = { git = "Wyłączone: nie są wysyłane żadne dane o commitach, tylko twoja prośba.", local = "Wyłączone: nie są wysyłane żadne dane o zatwierdzeniach, tylko twoja prośba." }
 dlg_sample_none = { git = "Log nie pokazuje commitów do próbki.", local = "Log nie pokazuje zatwierdzeń do próbki." }
 dlg_sent_label = "Co zostanie wysłane"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Instrukcje dla modelu:"
 dlg_sent_user = "Twoja prośba:"
 dlg_profile = "Wysyłane do: {name}"

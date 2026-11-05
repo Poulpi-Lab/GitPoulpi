@@ -8209,6 +8209,7 @@ dlg_sample = { one = "{n} 件の{$commit}のサンプル（作成者、日付、
 dlg_sample_off = "オフ：{$commit}のデータは送られず、指示だけが送られます。"
 dlg_sample_none = "サンプルにできる{$commit}が Log にありません。"
 dlg_sent_label = "送信される内容"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "モデルへの指示："
 dlg_sent_user = "あなたの指示："
 dlg_profile = "送信先：{name}"

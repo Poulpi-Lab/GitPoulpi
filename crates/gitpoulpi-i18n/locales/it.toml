@@ -8206,6 +8206,7 @@ dlg_sample = { one = "Invia un campione di {n} {$commit} (autore, data, oggetto)
 dlg_sample_off = "Disattivato: non viene inviato alcun dato dei {$commits}, solo la tua richiesta."
 dlg_sample_none = "Il Log non mostra alcun {$commit} da campionare."
 dlg_sent_label = "Cosa viene inviato"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Istruzioni al modello:"
 dlg_sent_user = "La tua richiesta:"
 dlg_profile = "Inviato a: {name}"

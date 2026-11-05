@@ -10230,6 +10230,7 @@ dlg_sample = { one = "Send a sample of {n} {$commit} (author, date, subject)", o
 dlg_sample_off = "Off: no {$commit} data is sent, only your request."
 dlg_sample_none = "The Log shows no {$commit} to sample."
 dlg_sent_label = "What is sent"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Instructions to the model:"
 dlg_sent_user = "Your request:"
 dlg_profile = "Sent to: {name}"

@@ -8210,6 +8210,7 @@ dlg_sample = { one = "Eine Stichprobe aus {n} {$commit} senden (Autor, Datum, Be
 dlg_sample_off = "Aus: Es werden keine {$commit}-Daten gesendet, nur Ihre Anfrage."
 dlg_sample_none = "Das Log zeigt keinen {$commit} für eine Stichprobe."
 dlg_sent_label = "Was gesendet wird"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Anweisungen an das Modell:"
 dlg_sent_user = "Ihre Anfrage:"
 dlg_profile = "Gesendet an: {name}"

@@ -510,6 +510,8 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                 }
                 None => {}
             },
+            MouseEventKind::Drag(MouseButton::Left) => view.on_rules_ai_bar_mouse(mouse),
+            MouseEventKind::Up(MouseButton::Left) => view.on_rules_ai_bar_mouse(mouse),
             MouseEventKind::ScrollUp | MouseEventKind::ScrollDown => {
                 let step = if mouse.kind == MouseEventKind::ScrollUp {
                     -3
@@ -522,7 +524,7 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                         view.on_script_wheel(part, step)
                     }
                     Some(RewriteHit::AiSent) => view.on_ai_wheel(step),
-                    Some(RewriteHit::RaSent | RewriteHit::RaPanel) => view.on_rules_ai_wheel(step),
+                    Some(hit) if hit.is_rules_ai() => view.on_rules_ai_wheel(hit, step),
                     Some(RewriteHit::DrillDiff | RewriteHit::DrillPath(_)) => {
                         view.drill_scroll(step)
                     }

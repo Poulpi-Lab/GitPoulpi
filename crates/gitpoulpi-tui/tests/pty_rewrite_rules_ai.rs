@@ -233,3 +233,133 @@ fn with_ai_off_nothing_offers_it() {
         term.screen().text()
     );
 }
+
+/// "What is sent" is a pane of its own: collapsed when the dialog opens,
+/// toggled by `Alt+W`, by `Enter` on its focused header and by a click, and
+/// scrolled by keys, by the wheel and by dragging its own scrollbar.
+#[test]
+fn what_is_sent_starts_collapsed_and_its_pane_scrolls_by_key_wheel_and_scrollbar() {
+    let repo = fixture();
+    let before = refs(&repo);
+    let tools = tempfile::tempdir().unwrap();
+    let agent = write_fake_agent(tools.path(), ANSWER);
+    let (mut term, _config) = launch(&repo, "pty-rewrite-rules-ai-pane", ai_config_toml(&agent));
+    term.send_keys("C-p").unwrap();
+    term.send_text("create rules").unwrap();
+    term.wait_for("the palette row", STEP, |s| {
+        s.contains("\u{2726} Rewrite: Create Rules with AI...")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Enter").unwrap();
+    wait_dialog(&term);
+
+    // Collapsed: the header with its mark and its key, not the text.
+    let screen = term.screen();
+    assert!(
+        screen.contains("\u{25B8} What is sent"),
+        "{}",
+        screen.text()
+    );
+    assert!(screen.contains("Alt+W: show or hide"), "{}", screen.text());
+    assert!(
+        !screen.contains("Instructions to the model:"),
+        "{}",
+        screen.text()
+    );
+
+    // Alt+W opens it.
+    term.send_keys("M-w").unwrap();
+    term.wait_for("the pane open", STEP, |s| {
+        s.contains("\u{25BE} What is sent") && s.contains("Instructions to the model:")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert!(
+        !term.screen().contains("Your request:"),
+        "the prompt is longer than the pane\n{}",
+        term.screen().text()
+    );
+
+    // Keys: Tab reaches the pane (description, box, pane), PageDown / End /
+    // Home scroll it.
+    term.send_keys("Tab").unwrap();
+    term.send_keys("Tab").unwrap();
+    term.send_keys("PageDown").unwrap();
+    term.wait_for("the pane scrolled by a page", STEP, |s| {
+        !s.contains("Instructions to the model:")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("End").unwrap();
+    term.wait_for("the end of the pane", STEP, |s| s.contains("Your request:"))
+        .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Home").unwrap();
+    term.wait_for("the top of the pane", STEP, |s| {
+        s.contains("Instructions to the model:")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+
+    // The wheel over the pane.
+    let (col, row) = term
+        .wait_for_text("Instructions to the model:", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    term.scroll(true, col + 2, row + 1).unwrap();
+    term.wait_for("the wheel scrolled the pane", STEP, |s| {
+        !s.contains("Instructions to the model:")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.scroll(false, col + 2, row + 1).unwrap();
+    term.wait_for("the wheel scrolled it back", STEP, |s| {
+        s.contains("Instructions to the model:")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+
+    // Its own scrollbar: on the pane's right edge, under the header's last
+    // column. Dragging the thumb to the bottom shows the end.
+    let (hint_col, head_row) = term
+        .wait_for_text("Alt+W: show or hide", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let bar_col = hint_col + "Alt+W: show or hide".len() as u16;
+    let screen = term.screen();
+    assert!(
+        screen
+            .find_all("\u{2191}")
+            .contains(&(bar_col, head_row + 1)),
+        "no up arrow at the pane's top right\n{}",
+        screen.text()
+    );
+    let down = screen
+        .find_all("\u{2193}")
+        .into_iter()
+        .filter(|(c, _)| *c == bar_col)
+        .map(|(_, r)| r)
+        .max()
+        .unwrap_or_else(|| panic!("no down arrow on the bar\n{}", screen.text()));
+    term.drag((bar_col, head_row + 2), (bar_col, down - 1))
+        .unwrap();
+    term.wait_for("the drag reached the end", STEP, |s| {
+        s.contains("Your request:")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+
+    // A click on the header hides it; Enter on the focused header shows it.
+    let (col, row) = term
+        .wait_for_text("\u{25BE} What is sent", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    term.click(col + 4, row).unwrap();
+    term.wait_for("the pane collapsed", STEP, |s| {
+        s.contains("\u{25B8} What is sent") && !s.contains("Your request:")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the pane open again", STEP, |s| {
+        s.contains("\u{25BE} What is sent") && s.contains("Instructions to the model:")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("M-w").unwrap();
+    term.wait_for("closed by the key", STEP, |s| {
+        s.contains("\u{25B8} What is sent")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+
+    assert_eq!(agent_calls(&agent), 0, "looking sends nothing");
+    assert_eq!(refs(&repo), before);
+}

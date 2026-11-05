@@ -8209,6 +8209,7 @@ dlg_sample = { one = { git = "发送 {n} 个 {$commit} 的样本（作者、日�
 dlg_sample_off = { git = "已关闭：不发送任何 {$commit} 数据，只发送你的请求。", local = "已关闭：不发送任何{$commit}数据，只发送你的请求。" }
 dlg_sample_none = { git = "Log 中没有可作为样本的 {$commit}。", local = "Log 中没有可作为样本的{$commit}。" }
 dlg_sent_label = "发送的内容"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "给模型的指令："
 dlg_sent_user = "你的请求："
 dlg_profile = "发送给：{name}"

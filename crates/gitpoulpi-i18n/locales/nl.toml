@@ -8207,6 +8207,7 @@ dlg_sample = { one = "Een steekproef van {n} {$commit} meesturen (auteur, datum,
 dlg_sample_off = "Uit: er worden geen {$commit}-gegevens verstuurd, alleen jouw verzoek."
 dlg_sample_none = "De Log toont geen {$commit} om te bemonsteren."
 dlg_sent_label = "Wat wordt verstuurd"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Instructies aan het model:"
 dlg_sent_user = "Jouw verzoek:"
 dlg_profile = "Verstuurd naar: {name}"

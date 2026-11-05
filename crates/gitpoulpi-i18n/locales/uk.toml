@@ -8211,6 +8211,7 @@ dlg_sample = { one = { git = "Надіслати зразок із {n} commit'у
 dlg_sample_off = { git = "Вимкнено: дані про commit'и не надсилаються, лише ваш запит.", local = "Вимкнено: дані про коміти не надсилаються, лише ваш запит." }
 dlg_sample_none = { git = "У Log немає commit'ів для зразка.", local = "У Log немає комітів для зразка." }
 dlg_sent_label = "Що надсилається"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Інструкції для моделі:"
 dlg_sent_user = "Ваш запит:"
 dlg_profile = "Куди: {name}"

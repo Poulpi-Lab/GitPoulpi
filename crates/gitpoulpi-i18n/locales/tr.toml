@@ -8212,6 +8212,7 @@ dlg_sample = { one = "{n} {$commit} örneği gönder (yazar, tarih, konu)", othe
 dlg_sample_off = "Kapalı: hiçbir {$commit} verisi gönderilmez, yalnızca isteğiniz."
 dlg_sample_none = "Log'da örneklenecek {$commit} yok."
 dlg_sent_label = "Gönderilenler"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Modele yönergeler:"
 dlg_sent_user = "İsteğiniz:"
 dlg_profile = "Gönderilen profil: {name}"

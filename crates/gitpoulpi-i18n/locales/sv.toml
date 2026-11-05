@@ -8213,6 +8213,7 @@ dlg_sample = { one = "Skicka ett urval på {n} {$commit} (författare, datum, ä
 dlg_sample_off = "Av: inga uppgifter om {$commits} skickas, bara din begäran."
 dlg_sample_none = "Log visar ingen {$commit} att ta ett urval av."
 dlg_sent_label = "Det som skickas"
+dlg_sent_key = "Alt+W: show or hide"
 dlg_sent_system = "Instruktioner till modellen:"
 dlg_sent_user = "Din begäran:"
 dlg_profile = "Skickas till: {name}"

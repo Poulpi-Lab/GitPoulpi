@@ -673,8 +673,13 @@ as you type, the exact text that will go out.
 - **Replace the current rules** (only when the workbench already holds rules; off): by default the
   new rules are added after the ones you have; ticked, they replace them (the scope and settings
   the answer states are applied either way).
-- **What is sent** lists the instructions (the rule vocabulary, then your AI instructions), your
-  request and the profile that receives them. `Tab` moves to it, the arrows scroll it.
+- **What is sent** is a read-only pane on a slightly darker background, apart from the fields above
+  it, and **collapsed** when the dialog opens (the dialog is then short). Click its header, press
+  `Alt+W`, or `Tab` to it and press `Enter` to show it: it lists the instructions (the rule
+  vocabulary, then your AI instructions) and your request, and has its own scrollbar (drag it, use
+  the wheel over the pane, or the arrows, `PageUp`, `PageDown`, `Home` and `End` while it has the
+  focus). The profile that receives them is on the line above. The dialog grows to fit the pane,
+  within the screen. The description field gets a scrollbar of its own when the text outgrows it.
 
 The model may use every rule kind of this page except **Script** (code: *Write a script with AI*
 shows the script for review) and the secret-values form of *Search and replace in files* (secret

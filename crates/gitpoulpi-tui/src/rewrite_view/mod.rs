@@ -43,6 +43,7 @@ mod scope;
 mod script;
 mod script_ai;
 mod secrets;
+mod sent_pane;
 mod signing;
 mod size;
 mod tools;

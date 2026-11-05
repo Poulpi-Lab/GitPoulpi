@@ -27,6 +27,7 @@ use gitpoulpi_i18n::msg::rewrite_ai as t;
 
 use super::render::{bad, bold, dim, plain, wrap, RewriteHit};
 use super::script::ScriptFocus;
+use super::sent_pane::{centered, wrap_width, SentPane, MAX_WIDTH};
 use super::{Notice, RewriteView};
 use crate::dialog_kit::{self, button_width, ButtonState, CheckState};
 use crate::text_edit::{Caret, KeyEdit};
@@ -92,8 +93,6 @@ pub(crate) struct AiDialog {
     /// "Send a sample of N commits": off unless the user ticks it.
     pub sample: bool,
     pub focus: AiFocus,
-    /// First line of the "what is sent" pane shown.
-    pub scroll: usize,
     /// `None` until the window answered; `Err` when AI cannot run.
     pub system: Option<Result<AiSystem, String>>,
     /// The request is out; the dialog waits for it.
@@ -113,9 +112,8 @@ pub(crate) struct AiState {
     /// The key of the script the AI wrote: the banner shows while the
     /// script on screen is still that one.
     mark: Option<u64>,
-    /// The sent-pane rows and the pane's height from the last paint.
-    sent_rows: std::cell::Cell<usize>,
-    sent_height: std::cell::Cell<usize>,
+    /// The shared "What is sent" pane (collapsed until opened).
+    sent: SentPane,
     text_area: std::cell::Cell<Rect>,
 }
 
@@ -126,7 +124,6 @@ impl AiDialog {
             caret: Caret::default(),
             sample: false,
             focus: AiFocus::Text,
-            scroll: 0,
             system: None,
             working: false,
             note: None,
@@ -231,6 +228,7 @@ impl RewriteView {
         if !self.ai_offered() {
             return;
         }
+        self.script.ai.sent = SentPane::default();
         self.script.ai.dialog = Some(AiDialog::new());
         self.script.ai.wish = Some(AiWish::Describe);
     }
@@ -388,6 +386,13 @@ impl RewriteView {
         let plain_key = !key
             .modifiers
             .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT);
+        // Alt+W shows or hides "What is sent" from anywhere in the dialog.
+        if key.modifiers.contains(KeyModifiers::ALT)
+            && !key.modifiers.contains(KeyModifiers::CONTROL)
+            && matches!(key.code, KeyCode::Char('w') | KeyCode::Char('W'))
+        {
+            return self.script.ai.sent.toggle();
+        }
         match key.code {
             KeyCode::Esc => return self.close_ai_dialog(),
             KeyCode::Tab => return self.ai_step_focus(1),
@@ -413,7 +418,7 @@ impl RewriteView {
                                 error: false,
                             });
                         }
-                        d.scroll = 0;
+                        self.script.ai.sent.top = 0;
                     }
                 }
             },
@@ -421,7 +426,7 @@ impl RewriteView {
                 KeyCode::Enter | KeyCode::Char(' ') if plain_key => {
                     if let Some(d) = self.script.ai.dialog.as_mut() {
                         d.sample = !d.sample;
-                        d.scroll = 0;
+                        self.script.ai.sent.top = 0;
                     }
                 }
                 KeyCode::Down | KeyCode::Right if plain_key => self.ai_step_focus(1),
@@ -429,18 +434,25 @@ impl RewriteView {
                 _ => {}
             },
             AiFocus::Sent => {
-                let page = self.script.ai.sent_height.get().max(2) as isize - 1;
-                let step = match key.code {
-                    KeyCode::Up | KeyCode::Char('k') => -1,
-                    KeyCode::Down | KeyCode::Char('j') => 1,
-                    KeyCode::PageUp => -page,
-                    KeyCode::PageDown | KeyCode::Char(' ') => page,
-                    KeyCode::Home => isize::MIN / 2,
-                    KeyCode::End => isize::MAX / 2,
-                    KeyCode::Enter => return self.ai_step_focus(1),
-                    _ => return,
-                };
-                self.ai_scroll(step);
+                if !self.script.ai.sent.open {
+                    match key.code {
+                        KeyCode::Enter | KeyCode::Char(' ') | KeyCode::Right if plain_key => {
+                            self.script.ai.sent.toggle()
+                        }
+                        KeyCode::Down if plain_key => self.ai_step_focus(1),
+                        KeyCode::Up if plain_key => self.ai_step_focus(-1),
+                        _ => {}
+                    }
+                    return;
+                }
+                match key.code {
+                    KeyCode::Enter | KeyCode::Left => self.script.ai.sent.toggle(),
+                    code => {
+                        if let Some(step) = self.script.ai.sent.key_step(code) {
+                            self.script.ai.sent.scroll_by(step);
+                        }
+                    }
+                }
             }
             AiFocus::Send | AiFocus::Cancel => match key.code {
                 KeyCode::Enter | KeyCode::Char(' ') if plain_key => {
@@ -457,15 +469,6 @@ impl RewriteView {
         }
     }
 
-    fn ai_scroll(&mut self, delta: isize) {
-        let rows = self.script.ai.sent_rows.get();
-        let height = self.script.ai.sent_height.get();
-        let max = rows.saturating_sub(height) as isize;
-        if let Some(d) = self.script.ai.dialog.as_mut() {
-            d.scroll = (d.scroll as isize + delta).clamp(0, max) as usize;
-        }
-    }
-
     /// Pasted text goes into the request field.
     pub(super) fn paste_ai(&mut self, pasted: &str) {
         if let Some(d) = self.script.ai.dialog.as_mut() {
@@ -477,13 +480,25 @@ impl RewriteView {
         }
     }
 
+    /// The wheel over the pane (or its bar) scrolls it while it is open.
     pub(crate) fn on_ai_wheel(&mut self, delta: isize) {
-        self.ai_scroll(delta);
+        if self.script.ai.sent.open {
+            self.script.ai.sent.scroll_by(delta);
+        }
+    }
+
+    /// A drag or release with the left button: the pane's thumb.
+    pub(crate) fn on_ai_bar_mouse(&mut self, mouse: crossterm::event::MouseEvent) {
+        if self.script.ai.dialog.is_some() && self.script.ai.sent.bar_mouse(mouse) {
+            if let Some(d) = self.script.ai.dialog.as_mut() {
+                d.focus = AiFocus::Sent;
+            }
+        }
     }
 
     // --------------------------------------------------------------- mouse
 
-    pub(super) fn on_ai_press(&mut self, hit: RewriteHit, col: u16) {
+    pub(super) fn on_ai_press(&mut self, hit: RewriteHit, col: u16, row: u16) {
         let working = self.script.ai.dialog.as_ref().is_some_and(|d| d.working);
         match hit {
             RewriteHit::AiClose | RewriteHit::AiShield | RewriteHit::AiCancel => {
@@ -511,7 +526,7 @@ impl RewriteView {
                 if let Some(d) = self.script.ai.dialog.as_mut() {
                     d.focus = AiFocus::Sample;
                     d.sample = !d.sample;
-                    d.scroll = 0;
+                    self.script.ai.sent.top = 0;
                 }
             }
             RewriteHit::AiSent => {
@@ -519,6 +534,18 @@ impl RewriteView {
                     d.focus = AiFocus::Sent;
                 }
             }
+            RewriteHit::AiSentHead => {
+                if let Some(d) = self.script.ai.dialog.as_mut() {
+                    d.focus = AiFocus::Sent;
+                }
+                self.script.ai.sent.toggle();
+            }
+            RewriteHit::AiSentBar => self.on_ai_bar_mouse(crossterm::event::MouseEvent {
+                kind: crossterm::event::MouseEventKind::Down(crossterm::event::MouseButton::Left),
+                column: col,
+                row,
+                modifiers: KeyModifiers::NONE,
+            }),
             RewriteHit::AiSend => {
                 if let Some(d) = self.script.ai.dialog.as_mut() {
                     d.focus = AiFocus::Send;
@@ -587,13 +614,51 @@ impl RewriteView {
         let Some(d) = &self.script.ai.dialog else {
             return hits;
         };
-        let rect = Rect::new(
+        // The room the dialog may take; it only takes what its content needs.
+        let room = Rect::new(
             bounds.x + 4,
             bounds.y + 2,
             bounds.width.saturating_sub(8),
             bounds.height.saturating_sub(4),
         );
+        let budget = room.height.saturating_sub(2);
+        let wide_inner = room.width.min(MAX_WIDTH).saturating_sub(4);
         let title = format!("{} {}", crate::theme::AI_SPARK, t::DLG_TITLE.get());
+        if wide_inner + 2 < 40 || budget < 10 {
+            let rect = room;
+            dialog_kit::panel(buf, rect, &title);
+            if let Some(cross) =
+                crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::AiClose))
+            {
+                hits.push((cross, RewriteHit::AiClose));
+            }
+            dialog_kit::put(
+                buf,
+                rect.x + 2,
+                rect.y + 1,
+                t::DLG_TOO_SMALL.get(),
+                rect.width.saturating_sub(3),
+                dim(),
+            );
+            hits.push((rect, RewriteHit::AiPanel));
+            hits.push((bounds, RewriteHit::AiShield));
+            return hits;
+        }
+        let lines = self.ai_sent_lines(wrap_width(wide_inner));
+        // Rows around the pane: label, field, sample box and its note, the
+        // facts line, the header, the note and the buttons, plus two gaps.
+        let fixed = |g: u16| 8 + 2 * g;
+        let gap = if fixed(1) + self.script.ai.sent.least_rows() <= budget {
+            1
+        } else {
+            0
+        };
+        let pane_h = self
+            .script
+            .ai
+            .sent
+            .body_rows(lines.len(), budget.saturating_sub(fixed(gap)));
+        let rect = centered(room, fixed(gap) + pane_h);
         dialog_kit::panel(buf, rect, &title);
         if let Some(cross) =
             crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::AiClose))
@@ -606,19 +671,6 @@ impl RewriteView {
             rect.width.saturating_sub(2),
             rect.height.saturating_sub(2),
         );
-        if inner.width < 40 || inner.height < 12 {
-            dialog_kit::put(
-                buf,
-                inner.x + 1,
-                inner.y,
-                t::DLG_TOO_SMALL.get(),
-                inner.width.saturating_sub(1),
-                dim(),
-            );
-            hits.push((rect, RewriteHit::AiPanel));
-            hits.push((bounds, RewriteHit::AiShield));
-            return hits;
-        }
         let wide = inner.width.saturating_sub(2);
         let mut y = inner.y;
 
@@ -659,7 +711,7 @@ impl RewriteView {
             buf.set_line(body.x, y, &line, body.width);
         }
         hits.push((field, hit));
-        y += 2;
+        y += 1 + gap;
 
         // The sample.
         let available = self.ai_sample_available();
@@ -701,41 +753,33 @@ impl RewriteView {
             facts.push(t::DLG_REPLACES.get().to_string());
         }
         dialog_kit::put(buf, inner.x + 1, y, &facts.join("  "), wide, dim());
-        y += 2;
+        y += 1 + gap;
 
-        // What is sent.
-        dialog_kit::put(
+        // What is sent: a pane of its own, tinted apart from the fields above
+        // it. Its header row is always there (it shows or hides the body).
+        let head = Rect::new(inner.x + 1, y, wide, 1);
+        self.script.ai.sent.paint_head(
             buf,
-            inner.x + 1,
-            y,
-            t::DLG_SENT_LABEL.get(),
-            wide,
-            bold(d.focus == AiFocus::Sent),
+            head,
+            d.focus == AiFocus::Sent,
+            hovered == Some(RewriteHit::AiSentHead),
         );
+        hits.push((head, RewriteHit::AiSentHead));
         y += 1;
         let buttons_y = inner.bottom().saturating_sub(1);
         let note_y = buttons_y.saturating_sub(1);
-        let pane_h = note_y.saturating_sub(y) as usize;
-        let lines = self.ai_sent_lines(wide.saturating_sub(2) as usize);
-        self.script.ai.sent_rows.set(lines.len());
-        self.script.ai.sent_height.set(pane_h);
-        let top = d.scroll.min(lines.len().saturating_sub(pane_h));
-        let pane = Rect::new(inner.x + 1, y, wide, pane_h as u16);
-        for (i, (text, heading)) in lines.iter().skip(top).take(pane_h).enumerate() {
-            let style = if *heading { bold(false) } else { plain() };
-            dialog_kit::put(buf, pane.x + 1, y + i as u16, text, pane.width - 1, style);
-        }
-        if lines.len() > pane_h + top && pane_h > 0 {
-            dialog_kit::put(
+        self.script.ai.sent.paint_none();
+        if self.script.ai.sent.open {
+            let pane = Rect::new(inner.x + 1, y, wide, note_y.saturating_sub(y));
+            self.script.ai.sent.paint_body(
                 buf,
-                pane.right().saturating_sub(3),
-                y + pane_h as u16 - 1,
-                "\u{25BC}\u{25BC}",
-                2,
-                dim(),
+                pane,
+                &lines,
+                true,
+                &mut hits,
+                (RewriteHit::AiSentBar, RewriteHit::AiSent),
             );
         }
-        hits.push((pane, RewriteHit::AiSent));
 
         // The note: what went wrong, or the wait.
         if d.working {

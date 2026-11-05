@@ -1554,6 +1554,16 @@ impl RewriteView {
         };
         match key.code {
             KeyCode::Esc => self.question = None,
+            // A long prompt scrolls by pages; the arrows keep moving the answer.
+            KeyCode::PageUp | KeyCode::PageDown => {
+                let page = self.paint.question_room.get().saturating_sub(1).max(1);
+                let top = self.paint.question_top.get();
+                self.paint.question_top.set(if key.code == KeyCode::PageUp {
+                    top.saturating_sub(page)
+                } else {
+                    top + page
+                });
+            }
             KeyCode::Up | KeyCode::Char('k') => {
                 if let Some(c) = cursor {
                     *c = c.saturating_sub(1);

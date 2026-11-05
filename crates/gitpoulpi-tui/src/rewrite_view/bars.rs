@@ -50,6 +50,8 @@ pub(crate) enum BarId {
     Popup,
     /// The "Merge into..." dialog's candidates.
     IdentPick,
+    /// The open question's prompt.
+    Question,
 }
 
 /// One bar as painted this frame.
@@ -216,6 +218,7 @@ impl RewriteView {
             BarId::ScriptRows => self.script.editor.as_ref().map_or(0, |ed| ed.top),
             BarId::Popup => self.paint.popup_top.get(),
             BarId::IdentPick => self.paint.ident_pick_top.get(),
+            BarId::Question => self.paint.question_top.get(),
         }
     }
 
@@ -241,6 +244,7 @@ impl RewriteView {
                 }
             }
             BarId::IdentPick => self.paint.ident_pick_top.set(top),
+            BarId::Question => self.paint.question_top.set(top),
             BarId::Popup => self.paint.popup_top.set(top),
             BarId::ScriptParams => self.paint.script_params_top.set(top),
             BarId::ScriptRows => {

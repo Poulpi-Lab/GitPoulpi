@@ -288,3 +288,53 @@ fn the_identities_status_line_makes_way_for_the_list_in_a_short_window() {
         );
     }
 }
+
+// ----------------------------------------------------------- the question
+
+fn asked(lines: usize) -> (RewriteView, crate::daemon_link::RawQueue, tempfile::TempDir) {
+    let (mut v, q, t) = view();
+    let prompt: String = (0..lines)
+        .map(|i| format!("line{i:02} of what the run is about to do. "))
+        .collect();
+    v.question = Some(Question::ConfirmPushed { prompt });
+    (v, q, t)
+}
+
+#[test]
+fn a_long_question_scrolls_with_a_bar_and_keeps_its_answers_on_screen() {
+    let (mut v, _q, _t) = asked(60);
+    let (s, hits, buf) = paint(&v, 80, 24, None);
+    let (track, id) = bar_of(&hits).unwrap_or_else(|| panic!("no bar\n{s}"));
+    assert_eq!(id, BarId::Question);
+    assert!(arrows(&buf, track), "{s}");
+    assert!(
+        s.contains("Rewrite anyway"),
+        "the options are not cut off\n{s}"
+    );
+    rect_of(&hits, RewriteHit::Answer(1));
+    assert!(s.contains("line00"), "{s}");
+    // The thumb dragged to the end: the end of the prompt, the answers stay.
+    v.on_press(RewriteHit::Bar(id), track.x, track.y + 1);
+    assert!(v.bar_drag(track.bottom() + 5));
+    assert!(v.bar_release());
+    let (s, _, _) = paint(&v, 80, 24, None);
+    assert!(!s.contains("line00") && s.contains("line59"), "{s}");
+    assert!(s.contains("Rewrite anyway"), "{s}");
+    // The wheel and PageUp/PageDown scroll it too.
+    assert!(v.wheel_id(BarId::Question, -3));
+    let _ = paint(&v, 80, 24, None);
+    let wheeled = v.paint.question_top.get();
+    v.on_key(KeyEvent::new(KeyCode::PageUp, KeyModifiers::NONE));
+    let _ = paint(&v, 80, 24, None);
+    assert!(v.paint.question_top.get() < wheeled);
+    // Esc still leaves it unanswered.
+    v.on_key(KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE));
+    assert!(v.question.is_none());
+}
+
+#[test]
+fn a_short_question_has_no_bar() {
+    let (v, _q, _t) = asked(1);
+    let (s, hits, _) = paint(&v, 80, 24, None);
+    assert!(bar_of(&hits).is_none(), "{s}");
+}

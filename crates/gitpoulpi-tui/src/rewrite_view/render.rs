@@ -298,6 +298,9 @@ pub(super) struct Paint {
     pub refs_top: Cell<usize>,
     pub drill_top: Cell<usize>,
     pub popup_top: Cell<usize>,
+    /// First prompt line of the open question, and how many lines it shows.
+    pub question_top: Cell<usize>,
+    pub question_room: Cell<usize>,
     pub ident_pick_top: Cell<usize>,
     pub script_params_top: Cell<usize>,
     /// The scroll of a text tab, with the tab it belongs to.
@@ -506,6 +509,9 @@ impl RewriteView {
         self.paint.bars.borrow_mut().clear();
         if self.popup.is_none() {
             self.paint.popup_top.set(0);
+        }
+        if self.question.is_none() {
+            self.paint.question_top.set(0);
         }
         if self.identities.pick.is_none() {
             self.paint.ident_pick_top.set(0);
@@ -1499,9 +1505,17 @@ impl RewriteView {
         let Some(q) = self.question_view() else {
             return hits;
         };
+        // The prompt keeps the room the window leaves after the options: a
+        // longer one scrolls (bar, wheel, PageUp/PageDown) and the options
+        // stay on screen, where they can be pressed.
         let width = bounds.width.saturating_sub(6).clamp(30, 76);
         let prompt = wrap(&q.prompt, width as usize - 4);
-        let height = (prompt.len() + q.options.len() + 5) as u16;
+        let fixed = q.options.len() + 5;
+        let room = prompt
+            .len()
+            .min((bounds.height as usize).saturating_sub(fixed).max(2));
+        self.paint.question_room.set(room);
+        let height = (room + fixed) as u16;
         let rect = dialog_kit::centered(bounds, width, height);
         dialog_kit::panel(buf, rect, q.title.get());
         if let Some(cross) = crate::chrome::close_cross::paint(
@@ -1512,10 +1526,27 @@ impl RewriteView {
             hits.push((cross, RewriteHit::QuestionCancel));
         }
         let mut y = rect.y + 2;
-        for line in &prompt {
+        let top = self
+            .paint
+            .question_top
+            .get()
+            .min(prompt.len().saturating_sub(room));
+        self.paint.question_top.set(top);
+        for line in prompt.iter().skip(top).take(room) {
             dialog_kit::put(buf, rect.x + 2, y, line, rect.width - 4, plain());
             y += 1;
         }
+        self.paint_bar_on(
+            buf,
+            &mut hits,
+            hovered == Some(RewriteHit::Bar(BarId::Question)),
+            BarId::Question,
+            (rect.right() - 1, rect.y + 2, room as u16),
+            prompt.len(),
+            room,
+            top,
+            None,
+        );
         y += 1;
         for (i, option) in q.options.iter().enumerate() {
             if y >= rect.bottom() - 1 {

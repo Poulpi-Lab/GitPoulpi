@@ -16,9 +16,6 @@ const PENDING: &[&str] = &[
     "text_select.rs",
     "file_selection.rs",
     "log_multiselect.rs",
-    // A menu taller than the screen follows its selection (no scroll state
-    // to drag).
-    "context_menu.rs",
     // Another change owns it.
     "rewrite_view/script_ai.rs",
 ];

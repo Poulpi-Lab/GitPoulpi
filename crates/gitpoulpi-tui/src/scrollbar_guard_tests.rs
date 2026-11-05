@@ -29,8 +29,6 @@ const BAR_MARKERS: &[&str] = &[
     "render_buf",
     "popup_list",
     "_bar.paint(",
-    "Combo",
-    "combo::",
 ];
 
 fn walk(dir: &Path, out: &mut Vec<std::path::PathBuf>) {

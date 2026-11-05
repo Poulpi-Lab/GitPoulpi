@@ -127,3 +127,46 @@ fn every_windowed_list_draws_the_scrollbar() {
         );
     }
 }
+
+/// A list drawn through ratatui's own scrolling (`List` / `Table` with a
+/// state, a `Paragraph` with `.scroll(..)`) scrolls just as much as a
+/// `.skip().take()` window: a file that renders one must go through the
+/// scrollbar code too, or be listed here with why it has none.
+const STATEFUL_PENDING: &[&str] = &[];
+
+fn scrolls_through_ratatui(source: &str) -> bool {
+    [
+        "render_stateful_widget",
+        "render_stateful_clipped",
+        ".scroll((",
+    ]
+    .iter()
+    .any(|m| source.contains(m))
+}
+
+#[test]
+fn every_stateful_list_and_scrolled_paragraph_draws_the_scrollbar() {
+    let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+    let mut files = Vec::new();
+    walk(&src, &mut files);
+    let mut missing = Vec::new();
+    for path in files {
+        let rel = path
+            .strip_prefix(&src)
+            .unwrap()
+            .to_string_lossy()
+            .replace('\\', "/");
+        let text = std::fs::read_to_string(&path).unwrap();
+        let text = code_of(&text);
+        if scrolls_through_ratatui(text)
+            && !BAR_MARKERS.iter().any(|m| text.contains(m))
+            && !STATEFUL_PENDING.contains(&rel.as_str())
+        {
+            missing.push(rel);
+        }
+    }
+    assert!(
+        missing.is_empty(),
+        "these files scroll a List, Table or Paragraph without the shared scrollbar: {missing:?}"
+    );
+}

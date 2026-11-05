@@ -466,6 +466,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
                 all_refs: graph,
                 paths: path.into_iter().map(Into::into).collect(),
                 use_mailmap: false,
+                hidden: Default::default(),
             };
             let log: CommitGraph = session
                 .call(OperationKind::Log, json!({ "opts": opts }))

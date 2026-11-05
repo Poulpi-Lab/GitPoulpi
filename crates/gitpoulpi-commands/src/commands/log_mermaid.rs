@@ -78,6 +78,7 @@ pub(super) async fn log_mermaid(session: &mut Session, args: Args) -> Result<Emi
                     all_refs: args.graph,
                     paths: args.path.iter().map(Into::into).collect(),
                     use_mailmap: false,
+                    hidden: Default::default(),
                 },
             )
             .await?

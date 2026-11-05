@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-use super::Oid;
+use super::{Oid, RefFilter};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct LogOptions {
@@ -37,6 +37,13 @@ pub struct LogOptions {
     /// `log.use_mailmap`; a client's value is not trusted.
     #[serde(default)]
     pub use_mailmap: bool,
+    /// Refs the `all_refs` walk leaves out: commits only they reach vanish
+    /// from the result. Empty (the default, and then absent from the wire)
+    /// is exactly the plain all-refs walk. A non-empty filter always keeps
+    /// `HEAD` in the walk (the working-tree row and the next commit refer
+    /// to it), even when its branch is hidden. Ignored without `all_refs`.
+    #[serde(default, skip_serializing_if = "RefFilter::is_empty")]
+    pub hidden: RefFilter,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

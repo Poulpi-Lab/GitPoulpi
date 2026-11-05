@@ -7179,7 +7179,11 @@ hint_non_ff = "{$Pull} first, then try again."
 # context: one-line reason
 summary_auth = "The remote refused the credentials."
 # context: suggested action
-hint_auth = "Check your credentials in Settings > Integrations, or your SSH key."
+hint_auth = "Check your credentials in Settings > Integrations, or start an ssh-agent with your key, or set an SSH key for this repository."
+# context: one-line reason
+summary_host_key = "The SSH host key of the remote is not known yet."
+# context: suggested action; keep the command verbatim
+hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry."
 # context: one-line reason
 summary_conflict = "It stopped on conflicts."
 # context: suggested action

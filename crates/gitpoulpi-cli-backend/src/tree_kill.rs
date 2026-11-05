@@ -34,7 +34,7 @@ pub(crate) fn spawn_guarded(
 ) -> std::io::Result<(tokio::process::Child, TreeGuard)> {
     cmd.kill_on_drop(true);
     #[cfg(unix)]
-    cmd.process_group(0);
+    detach_from_terminal(cmd);
     #[cfg(windows)]
     {
         // CREATE_NEW_PROCESS_GROUP
@@ -43,6 +43,23 @@ pub(crate) fn spawn_guarded(
     let child = cmd.spawn()?;
     let guard = TreeGuard::attach(&child);
     Ok((child, guard))
+}
+
+/// Starts the child in a new session: it leads its own process group (the
+/// tree kill signals that group) *and* has no controlling terminal. Without
+/// that, an ssh host-key or passphrase prompt opens `/dev/tty`, the child is
+/// in a background group of the daemon's terminal, gets SIGTTIN and stops
+/// forever. With no terminal ssh fails at once ("Host key verification
+/// failed", "Permission denied (publickey)").
+#[cfg(unix)]
+fn detach_from_terminal(cmd: &mut tokio::process::Command) {
+    // SAFETY: `setsid` is async-signal-safe and touches no Rust state.
+    unsafe {
+        cmd.pre_exec(|| {
+            libc::setsid();
+            Ok(())
+        });
+    }
 }
 
 /// The usual `.output()` stdio: nothing on stdin, stdout and stderr piped.

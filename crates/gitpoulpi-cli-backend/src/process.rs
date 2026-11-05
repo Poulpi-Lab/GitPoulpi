@@ -297,6 +297,9 @@ pub(crate) fn git_async(repo_root: &Path, args: &[&str]) -> tokio::process::Comm
     if let Some(ssh) = ssh_key_command(repo_root) {
         cmd.env("GIT_SSH_COMMAND", ssh);
     }
+    // A network command never waits on the terminal (see
+    // `tree_kill::spawn_guarded`, which also drops the controlling one).
+    cmd.stdin(Stdio::null());
     cmd.args(full_args(args).iter().map(OsStr::new));
     cmd.current_dir(repo_root);
     for key in CLEARED_ENV {
@@ -467,6 +470,19 @@ pub fn run_network(repo_root: &Path, args: &[&str]) -> Result<String> {
     }
     if let Some(ssh) = ssh_key_command(repo_root) {
         cmd.env("GIT_SSH_COMMAND", ssh);
+    }
+    cmd.stdin(Stdio::null());
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        // SAFETY: `setsid` is async-signal-safe. No controlling terminal, so
+        // ssh cannot stop on a prompt in a background process group.
+        unsafe {
+            cmd.pre_exec(|| {
+                libc::setsid();
+                Ok(())
+            });
+        }
     }
     let output = cmd.output().map_err(spawn_failed)?;
     utf8_stdout(checked(args, output)?.stdout)

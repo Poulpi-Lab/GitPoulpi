@@ -255,6 +255,78 @@ pub fn check_refs_survive_a_ref_to_a_missing_object(backend: &dyn GitBackend) {
     assert_eq!(Some(target.target), Oid::from_hex(missing));
 }
 
+/// A fixture with a branch `a`, an annotated tag `v1`, and (written straight
+/// into the ref store, as a half-deleted repository would be) a broken
+/// branch `target` and a broken tag `zz` pointing at an object that is gone.
+/// Each sorts after a valid ref of its kind: git only dies on the missing
+/// object when it formats a row after a valid one, otherwise it exits 128.
+fn repo_with_broken_refs() -> crate::FixtureRepo {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .branch("a")
+        .annotated_tag("v1")
+        .build();
+    let missing = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
+    for broken in ["refs/heads/target", "refs/tags/zz"] {
+        let path = repo.root().join(".git").join(broken);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(path, format!("{missing}\n")).unwrap();
+    }
+    repo
+}
+
+/// The filtered walk (`LogOptions::hidden`) lists tips with a `for-each-ref`
+/// and must survive a ref to a missing object: the valid refs still count.
+pub fn check_log_hidden_survives_a_ref_to_a_missing_object(backend: &dyn GitBackend) {
+    let repo = repo_with_broken_refs();
+    let repo_ref = repo.repo_ref();
+    let opts = LogOptions {
+        all_refs: true,
+        hidden: gitpoulpi_core::domain::RefFilter {
+            names: vec!["a".into()],
+            ..Default::default()
+        },
+        ..LogOptions::default()
+    };
+    let graph = backend
+        .log(&repo_ref, &opts)
+        .expect("a filtered log answers despite a ref to a missing object");
+    assert_eq!(graph.nodes.len(), 1, "the initial commit is still reached");
+}
+
+/// `commit_messages` lists its tips with a `for-each-ref` and must survive a
+/// ref to a missing object: the valid commits are still answered.
+pub fn check_commit_messages_survive_a_ref_to_a_missing_object(backend: &dyn GitBackend) {
+    let repo = repo_with_broken_refs();
+    let repo_ref = repo.repo_ref();
+    let answer = backend
+        .commit_messages(
+            &repo_ref,
+            &gitpoulpi_core::domain::CommitMessagesQuery::default(),
+        )
+        .expect("commit_messages answers despite a ref to a missing object");
+    assert_eq!(
+        answer.commits.len(),
+        1,
+        "the initial commit is still listed"
+    );
+}
+
+/// The history rewrite lists refs with a `for-each-ref` and must survive a
+/// ref to a missing object (the size analysis walks every listed ref).
+pub fn check_rewrite_analyze_survives_a_ref_to_a_missing_object(backend: &dyn GitBackend) {
+    let repo = repo_with_broken_refs();
+    let repo_ref = repo.repo_ref();
+    backend
+        .rewrite_analyze(
+            &repo_ref,
+            &gitpoulpi_core::domain::rewrite::Scope::default(),
+            5,
+            &mut |_| std::ops::ControlFlow::Continue(()),
+        )
+        .expect("analyze answers despite a ref to a missing object");
+}
+
 pub fn check_branch_create_checkout_delete(backend: &dyn GitBackend) {
     let repo = TestRepoBuilder::new().with_initial().build();
     let repo_ref = repo.repo_ref();

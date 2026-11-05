@@ -4,6 +4,7 @@ use gitpoulpi_core::domain::{
 use gitpoulpi_core::Result;
 
 use crate::process::{read_with_retry, run, run_bytes, run_bytes_with_stdin};
+use crate::refs::peel_commits;
 
 const FIELD_SEP: char = '\u{1}';
 const RECORD_SEP: char = '\u{2}';
@@ -14,36 +15,42 @@ const RECORD_SEP: char = '\u{2}';
 /// for an unborn repository with no ref at all. A listing that fails is an
 /// error, never an empty list: the Log would silently walk only `HEAD`.
 pub(crate) fn filtered_tips(repo: &RepoRef, filter: &RefFilter) -> Result<Vec<Oid>> {
+    // Only `%(objectname)`: git 2.5x aborts (or exits 128) on a ref whose
+    // object is missing when asked for its type or its peeled object.
+    // `peel_commits` answers both from `cat-file`; a ref that does not reach
+    // a commit (missing object, tag of a tree) is no tip.
     let listing = read_with_retry(|| {
         run(
             &repo.root,
             &[
                 "for-each-ref",
-                "--format=%(refname)%09%(objecttype)%09%(objectname)%09%(*objecttype)%09%(*objectname)%09%(symref)",
+                "--format=%(refname)%09%(objectname)%09%(symref)",
                 "refs/heads",
                 "refs/tags",
                 "refs/remotes",
             ],
         )
     })?;
-    let refs: Vec<(String, Oid)> = listing
+    let rows: Vec<(&str, Oid)> = listing
         .lines()
         .filter_map(|line| {
             let mut f = line.split('\t');
-            let name = f.next()?;
-            let (kind, id, peeled_kind, peeled_id) = (f.next()?, f.next()?, f.next()?, f.next()?);
+            let (name, id) = (f.next()?, f.next()?);
             // `refs/remotes/<r>/HEAD` and friends mirror another ref: not a
             // tip of their own (hiding the branch they name must hide it).
             if !f.next().unwrap_or_default().is_empty() {
                 return None;
             }
-            let target = match (kind, peeled_kind) {
-                ("commit", _) => id,
-                ("tag", "commit") => peeled_id,
-                _ => return None,
-            };
-            Some((name.to_string(), Oid::from_hex(target.trim())?))
+            Some((name, Oid::from_hex(id.trim())?))
         })
+        .collect();
+    let mut ids: Vec<Oid> = rows.iter().map(|(_, id)| *id).collect();
+    ids.sort_by_key(|id| id.0);
+    ids.dedup();
+    let peeled = peel_commits(&repo.root, &ids)?;
+    let refs: Vec<(String, Oid)> = rows
+        .into_iter()
+        .filter_map(|(name, id)| Some((name.to_string(), *peeled.get(&id)?)))
         .collect();
     let head = run(
         &repo.root,

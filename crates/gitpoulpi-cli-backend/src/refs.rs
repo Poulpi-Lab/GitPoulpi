@@ -122,29 +122,72 @@ fn peel_tags(
         .collect();
     ids.sort_by_key(|id| id.0);
     ids.dedup();
-    let mut peeled = std::collections::HashMap::new();
+    peel_commits(&repo.root, &ids)
+}
+
+/// What `cat-file` says about one object: its own type (`missing` for an
+/// object that is gone) and the commit it peels to (through any number of
+/// tags), when it does.
+pub(crate) struct Peel {
+    pub(crate) kind: String,
+    pub(crate) commit: Option<Oid>,
+}
+
+/// `ids` described by one `cat-file --batch-check` (`<id>` and `<id>^{}` per
+/// id; no spawn for an empty list), keyed by the id asked for. Used instead
+/// of `%(*objectname)` / `%(objecttype)` in a `for-each-ref` format: git 2.5x
+/// aborts (or exits 128) on a ref to a missing object.
+pub(crate) fn peel_info(
+    root: &std::path::Path,
+    ids: &[Oid],
+) -> Result<std::collections::HashMap<Oid, Peel>> {
+    let mut info = std::collections::HashMap::new();
     if ids.is_empty() {
-        return Ok(peeled);
+        return Ok(info);
     }
     let mut stdin = String::new();
-    for id in &ids {
-        stdin.push_str(&id.to_string());
-        stdin.push_str("^{}\n");
+    for id in ids {
+        stdin.push_str(&format!("{id}\n{id}^{{}}\n"));
     }
     let answer = read_with_retry(|| {
         run_bytes_with_stdin(
-            &repo.root,
+            root,
             &["cat-file", "--batch-check=%(objectname) %(objecttype)"],
             stdin.as_bytes(),
         )
     })?;
-    // One answer line per input line, in order.
-    for (id, line) in ids.iter().zip(String::from_utf8_lossy(&answer).lines()) {
-        if let Some(commit) = line.strip_suffix(" commit").and_then(Oid::from_hex) {
-            peeled.insert(*id, commit);
-        }
+    // Two answer lines per id, in order. A missing object answers
+    // `<input> missing`, so the type is whatever follows the last space.
+    let text = String::from_utf8_lossy(&answer);
+    let mut lines = text.lines();
+    for id in ids {
+        let (Some(own), Some(peeled)) = (lines.next(), lines.next()) else {
+            break;
+        };
+        let kind = own.rsplit_once(' ').map_or("missing", |(_, kind)| kind);
+        let commit = peeled.strip_suffix(" commit").and_then(Oid::from_hex);
+        info.insert(
+            *id,
+            Peel {
+                kind: kind.to_string(),
+                commit,
+            },
+        );
     }
-    Ok(peeled)
+    Ok(info)
+}
+
+/// The commit each of `ids` peels to, keyed by the id asked for. An id whose
+/// object is missing, or that peels to something other than a commit, is
+/// left out.
+pub(crate) fn peel_commits(
+    root: &std::path::Path,
+    ids: &[Oid],
+) -> Result<std::collections::HashMap<Oid, Oid>> {
+    Ok(peel_info(root, ids)?
+        .into_iter()
+        .filter_map(|(id, p)| Some((id, p.commit?)))
+        .collect())
 }
 
 /// Which remotes hold `name`, split by whether they hold it **at this

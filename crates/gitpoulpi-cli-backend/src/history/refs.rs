@@ -17,6 +17,7 @@ use gitpoulpi_core::Result;
 
 use super::walk::{read_git, refuse, Head};
 use crate::process::{failed_with, read_with_retry, spawn_failed};
+use crate::refs::peel_info;
 
 const HEADS: &str = "refs/heads/";
 const TAGS: &str = "refs/tags/";
@@ -28,7 +29,9 @@ pub(crate) struct RefLine {
     pub(crate) oid: Oid,
     /// `commit`, `tag`, `tree` or `blob`.
     pub(crate) kind: String,
-    /// The type one level down, for an annotated tag.
+    /// `commit` for an annotated tag that peels (through any number of tags)
+    /// to a commit, else empty. Peeled by `cat-file`, never by a `*` field of
+    /// `for-each-ref`: git 2.5x aborts on a ref to a missing object.
     pub(crate) peeled_kind: String,
     /// `refs/remotes/<remote>/<branch>` of a branch's upstream, or empty.
     pub(crate) upstream: String,
@@ -36,10 +39,9 @@ pub(crate) struct RefLine {
 
 impl RefLine {
     /// Whether a tag reaches a commit (a tag of a tag is followed, a tag of
-    /// a tree or blob is not rewritten).
+    /// a tree or blob, or of a missing object, is not rewritten).
     pub(crate) fn reaches_commit(&self) -> bool {
-        self.kind == "commit"
-            || (self.kind == "tag" && ["commit", "tag"].contains(&&*self.peeled_kind))
+        self.kind == "commit" || (self.kind == "tag" && self.peeled_kind == "commit")
     }
 }
 
@@ -59,7 +61,7 @@ pub(crate) struct Refs {
 pub(crate) fn list(root: &Path) -> Result<Refs> {
     let args = [
         "for-each-ref",
-        "--format=%(refname)%00%(objectname)%00%(objecttype)%00%(*objecttype)%00%(upstream)",
+        "--format=%(refname)%00%(objectname)%00%(upstream)",
         "refs/heads",
         "refs/tags",
         "refs/notes",
@@ -78,10 +80,10 @@ pub(crate) fn list(root: &Path) -> Result<Refs> {
             ))
         }
     })?;
-    let mut refs = Refs::default();
+    let mut lines: Vec<RefLine> = Vec::new();
     for line in String::from_utf8_lossy(&out.stdout).lines() {
         let f: Vec<&str> = line.split('\0').collect();
-        if f.len() < 5 {
+        if f.len() < 3 {
             continue;
         }
         let Some(oid) = Oid::from_hex(f[1]) else {
@@ -93,10 +95,28 @@ pub(crate) fn list(root: &Path) -> Result<Refs> {
         let r = RefLine {
             name: f[0].to_string(),
             oid,
-            kind: f[2].to_string(),
-            peeled_kind: f[3].to_string(),
-            upstream: f[4].to_string(),
+            kind: String::new(),
+            peeled_kind: String::new(),
+            upstream: f[2].to_string(),
         };
+        lines.push(r);
+    }
+    // Type and peeled commit from `cat-file`, never from `%(objecttype)` /
+    // `%(*objecttype)`: git 2.5x aborts (or exits 128) on a ref to a missing
+    // object. Such a ref is left out: there is nothing to rewrite.
+    let mut ids: Vec<Oid> = lines.iter().map(|r| r.oid).collect();
+    ids.sort_by_key(|o| o.0);
+    ids.dedup();
+    let info = peel_info(root, &ids)?;
+    let mut refs = Refs::default();
+    for mut r in lines {
+        let Some(peel) = info.get(&r.oid).filter(|p| p.kind != "missing") else {
+            continue;
+        };
+        r.kind = peel.kind.clone();
+        if peel.commit.is_some() {
+            r.peeled_kind = "commit".to_string();
+        }
         let bucket = if r.name.starts_with(HEADS) {
             &mut refs.heads
         } else if r.name.starts_with(TAGS) {

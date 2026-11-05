@@ -50,8 +50,6 @@ pub(crate) enum BarId {
     Popup,
     /// The "Merge into..." dialog's candidates.
     IdentPick,
-    /// The script AI dialog's "what is sent" pane.
-    AiSent,
 }
 
 /// One bar as painted this frame.
@@ -218,7 +216,6 @@ impl RewriteView {
             BarId::ScriptRows => self.script.editor.as_ref().map_or(0, |ed| ed.top),
             BarId::Popup => self.paint.popup_top.get(),
             BarId::IdentPick => self.paint.ident_pick_top.get(),
-            BarId::AiSent => self.script.ai.dialog.as_ref().map_or(0, |d| d.scroll),
         }
     }
 
@@ -241,11 +238,6 @@ impl RewriteView {
                 let text = self.script_text().map(str::to_string);
                 if let (Some(text), Some(ed)) = (text, self.script.editor.as_mut()) {
                     ed.caret.scroll_lines_to(&text, top, reg.viewport);
-                }
-            }
-            BarId::AiSent => {
-                if let Some(d) = self.script.ai.dialog.as_mut() {
-                    d.scroll = top;
                 }
             }
             BarId::IdentPick => self.paint.ident_pick_top.set(top),

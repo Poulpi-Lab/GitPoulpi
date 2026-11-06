@@ -233,6 +233,35 @@ pub(super) async fn ensure_daemon_at(
     port_file: Option<&std::path::Path>,
     session: &str,
 ) -> Result<u16, String> {
+    let paths = gitpoulpi_config::ConfigPaths::discover();
+    ensure_daemon_in(port_file, session, paths.as_ref()).await
+}
+
+/// Refuses while an update is replacing the files this process would run
+/// from: a daemon started now would hold the install folder open, or run
+/// half-swapped binaries. `Err` carries the status-line text.
+pub(super) fn refuse_while_updating(
+    paths: Option<&gitpoulpi_config::ConfigPaths>,
+    install_dir: Option<&std::path::Path>,
+    now: u64,
+) -> Result<(), String> {
+    match paths {
+        Some(paths)
+            if gitpoulpi_config::update_lock::update_in_progress(paths, install_dir, now) =>
+        {
+            Err(gitpoulpi_i18n::msg::link_error::UPDATING.get().to_string())
+        }
+        _ => Ok(()),
+    }
+}
+
+/// [`ensure_daemon_at`] with the config paths given (the update lock lives
+/// there), for the tests.
+pub(super) async fn ensure_daemon_in(
+    port_file: Option<&std::path::Path>,
+    session: &str,
+    paths: Option<&gitpoulpi_config::ConfigPaths>,
+) -> Result<u16, String> {
     if let Some(port_file) = port_file {
         // A file left by a process that is gone is deleted, not connected to:
         // on Windows a refused loopback connect takes ~2 s. The connect
@@ -241,6 +270,17 @@ pub(super) async fn ensure_daemon_at(
             return Ok(port);
         }
     }
+
+    // A daemon that is already up was handled above; starting a new one
+    // waits for the update.
+    let install_dir = std::env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(std::path::Path::to_path_buf));
+    refuse_while_updating(
+        paths,
+        install_dir.as_deref(),
+        gitpoulpi_config::update_lock::now_secs(),
+    )?;
 
     // `general.default_backend` (plus the `GITPOULPI_*` env layer), resolved
     // through the same `gitpoulpi_daemon` factory the CLI uses: otherwise

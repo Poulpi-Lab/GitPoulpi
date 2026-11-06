@@ -5006,6 +5006,7 @@ send_failed = "utracono połączenie z demonem: nie można wysłać żądania: {
 timeout = "demon nie odpowiedział w czasie"
 embedded_failed = "wbudowany demon nie wystartował: {error}"
 link_panicked = "łącze z demonem zatrzymało się nieoczekiwanie (jego wątek spanikował)"
+updating = "GitPoulpi is updating, try again in a moment"
 runtime_failed = "nie można uruchomić środowiska łącza z demonem: {error}"
 connect_failed = "nie można połączyć się z demonem sesji (port {port}): {error}"
 build_mismatch = "demon sesji działa w innym buildzie (demon @{daemon}, to okno @{window}) - uruchom `gitpoulpi daemon restart`, by przejść na pasujący kod"

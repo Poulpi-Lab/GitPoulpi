@@ -5003,6 +5003,7 @@ send_failed = "verbinding met daemon verbroken: kan het verzoek niet versturen: 
 timeout = "de daemon antwoordde niet op tijd"
 embedded_failed = "de ingebedde daemon kon niet starten: {error}"
 link_panicked = "de daemonverbinding stopte onverwacht (zijn thread raakte in paniek)"
+updating = "GitPoulpi is updating, try again in a moment"
 runtime_failed = "kan de runtime van de daemonverbinding niet starten: {error}"
 connect_failed = "kan geen verbinding maken met de sessiedaemon (poort {port}): {error}"
 build_mismatch = "de sessiedaemon draait een andere build (daemon @{daemon}, dit venster @{window}) - voer `gitpoulpi daemon restart` uit om overeenkomende code te krijgen"

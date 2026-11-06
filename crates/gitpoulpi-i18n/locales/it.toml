@@ -5002,6 +5002,7 @@ send_failed = "connessione al daemon persa: impossibile inviare la richiesta: {e
 timeout = "il daemon non ha risposto in tempo"
 embedded_failed = "il daemon incorporato non è riuscito ad avviarsi: {error}"
 link_panicked = "il collegamento al daemon si è interrotto in modo imprevisto (il suo thread è andato in panic)"
+updating = "GitPoulpi is updating, try again in a moment"
 runtime_failed = "impossibile avviare il runtime del collegamento al daemon: {error}"
 connect_failed = "impossibile connettersi al daemon della sessione (porta {port}): {error}"
 build_mismatch = "il daemon della sessione esegue una build diversa (daemon @{daemon}, questa finestra @{window}) - esegui `gitpoulpi daemon restart` per usare codice corrispondente"

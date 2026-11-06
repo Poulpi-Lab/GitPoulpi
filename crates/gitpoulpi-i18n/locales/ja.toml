@@ -5003,6 +5003,7 @@ send_failed = "デーモンとの接続が切れました：リクエストを�
 timeout = "デーモンが時間内に応答しませんでした"
 embedded_failed = "組み込みデーモンを起動できませんでした：{error}"
 link_panicked = "デーモンとの接続が予期せず停止しました（スレッドがパニックしました）"
+updating = "GitPoulpi is updating, try again in a moment"
 runtime_failed = "デーモン接続のランタイムを起動できませんでした：{error}"
 connect_failed = "セッションデーモン（ポート {port}）に接続できませんでした：{error}"
 build_mismatch = "セッションデーモンは別のビルドで動作しています（デーモン @{daemon}、このウィンドウ @{window}）- `gitpoulpi daemon restart` を実行して同じコードに揃えてください"

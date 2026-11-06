@@ -127,6 +127,7 @@ fn a_download_is_staged_beside_the_old_files_and_nothing_running_changes() {
         &updatable,
         &AtomicBool::new(false),
         &|_, _| {},
+        &[],
     )
     .unwrap();
     for name in managed_names(TARGET) {
@@ -160,6 +161,7 @@ fn a_checksum_mismatch_stages_nothing() {
         &updatable,
         &AtomicBool::new(false),
         &|_, _| {},
+        &[],
     )
     .unwrap_err();
     assert!(matches!(
@@ -184,6 +186,7 @@ fn a_missing_checksum_or_a_wrong_asset_name_stages_nothing() {
         &updatable,
         &AtomicBool::new(false),
         &|_, _| {},
+        &[],
     )
     .unwrap_err();
     assert_eq!(err, gitpoulpi_update::UpdateError::NoChecksum);
@@ -196,6 +199,7 @@ fn a_missing_checksum_or_a_wrong_asset_name_stages_nothing() {
         &updatable,
         &AtomicBool::new(false),
         &|_, _| {},
+        &[],
     )
     .unwrap_err();
     assert!(matches!(
@@ -240,6 +244,7 @@ fn restart_swaps_the_files_keeps_the_old_ones_and_revert_brings_them_back() {
         &updatable,
         &AtomicBool::new(false),
         &|_, _| {},
+        &[],
     )
     .unwrap();
     reset(Some(updatable.clone()));
@@ -395,6 +400,7 @@ fn the_tab_of_a_release_build_offers_update_now_then_restart_then_revert() {
         &updatable,
         &AtomicBool::new(false),
         &|_, _| {},
+        &[],
     )
     .unwrap();
     reset(Some(updatable.clone()));
@@ -443,4 +449,33 @@ fn a_running_download_shows_its_percentage_and_no_second_start() {
         Some(msg::WHY_UPDATE_BUSY.get())
     );
     assert_eq!(whys().restart, Some(msg::WHY_UPDATE_BUSY.get()));
+}
+
+/// The policy's `download_base` mirror: staged from only when it is passed.
+#[test]
+fn a_policy_mirror_download_is_staged_only_when_the_mirror_is_allowed() {
+    let _lock = lock();
+    let (_dir, updatable) = install_dir("0.1.0");
+    let mut mirrored = release("99.0.0");
+    let name = format!("gitpoulpi-99.0.0-{TARGET}.tar.gz");
+    let url = format!("https://mirror.example/gp/{name}");
+    mirrored.asset.as_mut().unwrap().url = url.clone();
+    mirrored.checksum.as_mut().unwrap().url = format!("{url}.sha256");
+    let bytes = archive("99.0.0");
+    let stage = |hosts: &[String]| {
+        auto::fetch_and_stage(
+            &served("99.0.0", &bytes),
+            &RealFs,
+            &mirrored,
+            &updatable,
+            &AtomicBool::new(false),
+            &|_, _| {},
+            hosts,
+        )
+    };
+    assert!(matches!(
+        stage(&[]).unwrap_err(),
+        gitpoulpi_update::UpdateError::Download(_)
+    ));
+    stage(&["https://mirror.example/gp/".to_string()]).unwrap();
 }

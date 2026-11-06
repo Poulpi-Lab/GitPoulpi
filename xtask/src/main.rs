@@ -15,6 +15,12 @@ Tasks:
   dist [options]    build the release binaries with the `dist` profile and
                     pack target/dist/gitpoulpi-<version>-<target>.<zip|tar.gz>
                     plus a SHA-256 file (--help for options).
+  package-marker --channel <c> --version <v> --target <t> --out <file>
+                    write the .gitpoulpi-dist marker a package installs, with
+                    its install channel (--help).
+  package-manifests [--dir <dir>]
+                    write latest.json (version, notes, sha256 of every asset)
+                    from the .sha256 files of a release (--help).
   build-custom [options]
                     size-optimised build with only the chosen languages,
                     integrations and features (--help). Interactive front
@@ -50,6 +56,8 @@ fn main() {
         "desktop-lock" => xtask::desktop_lock::run(rest),
         "perf" => xtask::perf::run(rest),
         "dist" => xtask::dist::run(rest),
+        "package-marker" => xtask::dist::package_marker(rest),
+        "package-manifests" => xtask::dist::package_manifests(rest),
         "build-custom" => xtask::custom_build::run(rest),
         "features" => xtask::features::run(rest),
         "licenses" => xtask::licenses::run(rest),

@@ -6,11 +6,7 @@ const LINUX: &str = "x86_64-unknown-linux-gnu";
 const WIN: &str = "x86_64-pc-windows-msvc";
 
 fn marker(version: &str, target: &str) -> String {
-    Marker {
-        version: version.into(),
-        target: target.into(),
-    }
-    .render()
+    Marker::new(version, target).render()
 }
 
 /// An install of `old` in `/app` plus the staged files of `new`.
@@ -286,4 +282,143 @@ fn only_a_marked_build_next_to_its_marker_is_updatable() {
         crate::detect(&fs, Path::new("/elsewhere/gitpoulpi-tui"), LINUX),
         None
     );
+}
+
+/// An install whose marker is `installed`, with the archive's marker staged.
+fn marked_install(installed: &Marker) -> (FakeFs, PathBuf, Vec<String>) {
+    let (fs, dir, names) = install(LINUX, false, "0.1.0", "0.2.0");
+    fs.put(dir.join(MARKER_FILE), &installed.render());
+    (fs, dir, names)
+}
+
+/// The in-memory file system with one path that refuses writes.
+struct FailWrite<'a> {
+    inner: &'a FakeFs,
+    path: PathBuf,
+}
+
+impl crate::fsops::FileOps for FailWrite<'_> {
+    fn exists(&self, p: &Path) -> bool {
+        self.inner.exists(p)
+    }
+    fn read_to_string(&self, p: &Path) -> std::io::Result<String> {
+        self.inner.read_to_string(p)
+    }
+    fn write(&self, p: &Path, data: &[u8], exec: bool) -> std::io::Result<()> {
+        if p == self.path {
+            return Err(std::io::Error::other("injected write failure"));
+        }
+        self.inner.write(p, data, exec)
+    }
+    fn rename(&self, from: &Path, to: &Path) -> std::io::Result<()> {
+        self.inner.rename(from, to)
+    }
+    fn remove_file(&self, p: &Path) -> std::io::Result<()> {
+        self.inner.remove_file(p)
+    }
+    fn link_or_copy(&self, from: &Path, to: &Path) -> std::io::Result<()> {
+        self.inner.link_or_copy(from, to)
+    }
+    fn is_locked(&self, p: &Path) -> bool {
+        self.inner.is_locked(p)
+    }
+}
+
+fn live_marker(fs: &FakeFs, dir: &Path) -> Marker {
+    Marker::parse(&text(fs, dir, MARKER_FILE)).unwrap()
+}
+
+#[test]
+fn apply_keeps_the_installed_channel_and_feed_over_the_archives_marker() {
+    for replace_windows in [false, true] {
+        let (target, own, replace) = if replace_windows {
+            (WIN, "gitpoulpi-tui.exe", Replace::MoveAside)
+        } else {
+            (LINUX, "gitpoulpi-tui", Replace::Atomic)
+        };
+        let (fs, dir, names) = install(target, replace_windows, "0.1.0", "0.2.0");
+        let installed = Marker {
+            channel: Some(InstallChannel::ChocoInternal),
+            feed: Some("https://nexus.example/choco/".into()),
+            ..Marker::new("0.1.0", target)
+        };
+        fs.put(dir.join(MARKER_FILE), &installed.render());
+        // The staged marker is the archive's: it says channel=archive.
+        let staged = Marker::parse(&text(&fs, &dir, ".gitpoulpi-dist.new")).unwrap();
+        assert_eq!(staged.channel, Some(InstallChannel::Archive));
+        apply(&fs, &dir, &names, replace, own).unwrap();
+        let live = live_marker(&fs, &dir);
+        assert_eq!(live.version, "0.2.0");
+        assert_eq!(live.channel, Some(InstallChannel::ChocoInternal));
+        assert_eq!(live.feed.as_deref(), Some("https://nexus.example/choco/"));
+        // The previous marker is untouched, so a revert restores it exactly.
+        assert_eq!(text(&fs, &dir, ".gitpoulpi-dist.old"), installed.render());
+    }
+}
+
+#[test]
+fn a_legacy_install_gets_the_resolved_channel_on_its_first_update() {
+    let (fs, dir, names) = marked_install(&Marker::new("0.1.0", LINUX));
+    apply_with_channel(
+        &fs,
+        &dir,
+        &names,
+        Replace::Atomic,
+        "gitpoulpi-tui",
+        Some(InstallChannel::InnoUser),
+    )
+    .unwrap();
+    assert_eq!(
+        live_marker(&fs, &dir).channel,
+        Some(InstallChannel::InnoUser)
+    );
+}
+
+#[test]
+fn without_any_recorded_channel_the_archives_marker_stands() {
+    let (fs, dir, names) = marked_install(&Marker::new("0.1.0", LINUX));
+    apply(&fs, &dir, &names, Replace::Atomic, "gitpoulpi-tui").unwrap();
+    assert_eq!(
+        live_marker(&fs, &dir).channel,
+        Some(InstallChannel::Archive)
+    );
+}
+
+#[test]
+fn a_failed_marker_rewrite_rolls_the_whole_swap_back() {
+    let (fs, dir, names) = marked_install(&Marker {
+        channel: Some(InstallChannel::Scoop),
+        ..Marker::new("0.1.0", LINUX)
+    });
+    // The rewrite cannot be written: the swap is undone, nothing half-done.
+    let failing = FailWrite {
+        inner: &fs,
+        path: dir.join(MARKER_FILE),
+    };
+    let err = apply(&failing, &dir, &names, Replace::Atomic, "gitpoulpi-tui").unwrap_err();
+    assert!(matches!(err, UpdateError::Io { .. }), "{err:?}");
+    assert_eq!(text(&fs, &dir, "gitpoulpi-tui"), "gitpoulpi-tui 0.1.0");
+    assert_eq!(live_marker(&fs, &dir).channel, Some(InstallChannel::Scoop));
+    assert_eq!(live_marker(&fs, &dir).version, "0.1.0");
+}
+
+#[test]
+fn staging_from_an_archive_into_a_folder_round_trips() {
+    let fs = FakeFs::new(false);
+    let dir = PathBuf::from("/app");
+    for name in managed_names(LINUX) {
+        fs.put(dir.join(&name), &format!("{name} 0.1.0"));
+    }
+    let bytes = testutil::archive_for("0.2.0", LINUX);
+    let staged = stage_from_archive_into(&fs, &dir, &bytes, "0.2.0", LINUX).unwrap();
+    assert_eq!(staged.len(), 5, "{staged:?}");
+    assert_eq!(staged_version(&fs, &dir).as_deref(), Some("0.2.0"));
+    assert_eq!(
+        text(&fs, &dir, "gitpoulpi-tui.new"),
+        "binary gitpoulpi-tui 0.2.0"
+    );
+    assert_eq!(text(&fs, &dir, "gitpoulpi-tui"), "gitpoulpi-tui 0.1.0");
+    // A archive for another version is refused, not staged.
+    let wrong = stage_from_archive_into(&fs, &dir, &bytes, "0.3.0", LINUX);
+    assert!(wrong.is_err());
 }

@@ -8,6 +8,7 @@ pub mod launch;
 pub mod open_in;
 pub mod os_apps;
 mod paths;
+pub mod policy;
 pub mod release;
 mod repo_data;
 mod schema;

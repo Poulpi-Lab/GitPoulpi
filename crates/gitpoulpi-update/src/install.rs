@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 use crate::archive::ArchiveFile;
 use crate::fsops::FileOps;
 use crate::{io_err, Result, UpdateError};
-use gitpoulpi_config::release::{Marker, MARKER_FILE};
+use gitpoulpi_config::release::{InstallChannel, Marker, MARKER_FILE};
 
 pub const NEW: &str = ".new";
 pub const OLD: &str = ".old";
@@ -63,6 +63,21 @@ pub fn stage(fs: &dyn FileOps, dir: &Path, files: &[ArchiveFile]) -> Result<Vec<
         staged.push(file.name.clone());
     }
     Ok(staged)
+}
+
+/// Unpacks `archive` (a release archive for `version` / `target`) and stages
+/// its files into `dir` as [`stage`] does. The elevated worker uses this with
+/// the archive it just re-verified: it never trusts files a user-level process
+/// staged in a folder only administrators may write.
+pub fn stage_from_archive_into(
+    fs: &dyn FileOps,
+    dir: &Path,
+    archive: &[u8],
+    version: &str,
+    target: &str,
+) -> Result<Vec<String>> {
+    let files = crate::archive::extract(archive, version, target)?;
+    stage(fs, dir, &files)
 }
 
 /// Removes the staged `.new` files of `names` (best effort).
@@ -125,12 +140,30 @@ fn check_locks(
 /// Replaces every staged file by its `.new`, keeping the previous one as
 /// `.old`. All or nothing: a failure (a locked file, a full disk) puts
 /// everything back, leaving the `.new` files staged, and says which file.
+///
+/// The marker that lands is the archive's (`channel=archive`, or nothing):
+/// the installed marker's `channel=` and `feed=` are carried over, because a
+/// swap must never turn a Chocolatey install into an archive one.
 pub fn apply(
     fs: &dyn FileOps,
     dir: &Path,
     all: &[String],
     replace: Replace,
     own: &str,
+) -> Result<()> {
+    apply_with_channel(fs, dir, all, replace, own, None)
+}
+
+/// [`apply`], recording `resolved` as the channel when the installed marker
+/// has none (a Legacy install resolved to a channel: its first update
+/// rewrites the marker).
+pub fn apply_with_channel(
+    fs: &dyn FileOps,
+    dir: &Path,
+    all: &[String],
+    replace: Replace,
+    own: &str,
+    resolved: Option<InstallChannel>,
 ) -> Result<()> {
     let names = staged_names(fs, dir, all);
     if names.is_empty() {
@@ -160,12 +193,32 @@ pub fn apply(
                 .map_err(|e| io_err(format!("could not install {name}"), e))?;
             done.push(Done::Install(name.clone()));
         }
-        Ok(())
+        carry_channel(fs, dir, resolved)
     })();
     if result.is_err() {
         walk_back(fs, dir, done);
     }
     result
+}
+
+/// Rewrites the marker that was just moved in so it keeps what the previous
+/// one recorded about the install: `channel=` (else `resolved`, else the new
+/// marker's own) and `feed=`.
+fn carry_channel(fs: &dyn FileOps, dir: &Path, resolved: Option<InstallChannel>) -> Result<()> {
+    let (Some(old), Some(new)) = (marker_of(fs, dir, OLD), marker_of(fs, dir, "")) else {
+        return Ok(());
+    };
+    let merged = Marker {
+        channel: old.channel.or(resolved).or(new.channel),
+        feed: old.feed.or_else(|| new.feed.clone()),
+        ..new.clone()
+    };
+    if merged == new {
+        return Ok(());
+    }
+    let path = dir.join(MARKER_FILE);
+    fs.write(&path, merged.render().as_bytes(), false)
+        .map_err(|e| io_err(format!("could not update {MARKER_FILE}"), e))
 }
 
 fn walk_back(fs: &dyn FileOps, dir: &Path, done: Vec<Done>) {

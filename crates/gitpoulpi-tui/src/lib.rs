@@ -463,7 +463,6 @@ pub fn run_with(session: &str, options: RunOptions) -> io::Result<()> {
         return Ok(());
     }
     tab_dir::set_cwd_file(options.cwd_file);
-    updates::auto::set_session(session);
     // The application log (the Activity Log's second tab); an embedded
     // daemon's `tracing` lines land in it too.
     gitpoulpi_log::init_from_settings("tui");
@@ -494,9 +493,9 @@ pub fn run_with(session: &str, options: RunOptions) -> io::Result<()> {
     image_editor::clean_temp();
     let result = match joined {
         Ok(Ok(())) => {
-            // "Restart to update" / "Revert": the files were swapped, the
-            // terminal is back to normal; run the new binary in our place.
-            updates::auto::relaunch_if_requested();
+            // "Update and restart" / "Revert": the job is written and the
+            // terminal is back to normal; the updater takes over from here.
+            updates::auto::launch_if_requested();
             return Ok(());
         }
         Ok(Err(err)) => {

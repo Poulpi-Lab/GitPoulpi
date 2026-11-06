@@ -121,6 +121,7 @@ préfixe (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Ouvrir le Journal d'activité | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Ouvrir le journal d'activité global | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Afficher les tâches en arrière-plan | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Afficher ou masquer l'aide | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Sélectionner un onglet | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Changer de thème | `Ctrl+N y` |
@@ -837,6 +838,9 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Affichage : Journal d'activité | `Ctrl+N A` |
 | Affichage : Journal d'activité global | `Ctrl+N G` |
 | Aide : Notes de version |  |
+| Mises à jour : Afficher la mise à jour | `Ctrl+N u` |
+| Mises à jour : Copier la commande de mise à jour |  |
+| Mises à jour : Exécuter la commande de mise à jour dans un terminal |  |
 | Mises à jour : Rechercher une mise à jour maintenant |  |
 | Mises à jour : Télécharger |  |
 | Mises à jour : Mettre à jour maintenant |  |

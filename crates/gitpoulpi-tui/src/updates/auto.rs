@@ -1,28 +1,33 @@
-//! Slice B of the updates-and-install design: replacing the
-//! running build by the newer release, driven from the UI. The engine
-//! (download, checksum, unpack, stage, swap, revert) is `gitpoulpi-update`;
-//! this module is the state, the background threads and the restart.
+//! The self-update's side of the UI: download, verify, unpack and stage the
+//! release, then hand the swap to `gitpoulpi-updater` (the install-channels
+//! design). The engine (download, checksum, unpack, stage) is
+//! `gitpoulpi-update`; the swap, the daemon stop and the restart are the
+//! updater's ([`super::handoff`]): this module only prepares the job and
+//! asks the window to end.
 //!
-//! **When it applies.** Only a build installed from a release archive: the
-//! marker `.gitpoulpi-dist` (written by `xtask dist`) sits next to its exe. A
-//! `cargo` build never updates itself; the Release notes tab says so.
+//! **What may happen** is the install channel's [`Procedure`] (`plans`):
+//! `Swap` channels (archive, the Inno installers) download and stage here,
+//! then the updater replaces the files; `Run` channels (Chocolatey, winget,
+//! Scoop, Homebrew) hand the package manager's command to the updater;
+//! everything else (apt, AUR, cargo, Docker, managed installs, a folder this
+//! user cannot write) is shown in the panel and never run by the app.
 //!
-//! **Flow.** `Update now` (or `auto` mode, once a check found a release) runs
-//! a tracked, cancellable job on a thread of its own: download, verify the
-//! `.sha256`, unpack, stage `<name>.new` beside the old files. Nothing
-//! running is touched and nothing restarts. The chip and the tab then offer
-//! `Restart to update`: on that action the session's standalone daemon is
-//! stopped, the files are swapped (all or nothing), and the TUI quits and
-//! re-executes itself with the same arguments once its terminal is restored
-//! ([`relaunch_if_requested`]).
+//! **Flow of a swap.** `Update now` (or `auto` mode, once a check found a
+//! release) runs a tracked, cancellable job on a thread of its own: download,
+//! verify the `.sha256`, unpack, stage `<name>.new` beside the old files (for
+//! an all-users install the verified archive waits in the user's cache and
+//! the elevated worker re-verifies it). Nothing running is touched and
+//! nothing restarts. The panel then offers `Update and restart`, which writes
+//! the job and ends the window; `Update and restart` on a release that is not
+//! downloaded yet downloads it first and then does the same.
 //!
-//! **Revert.** The swap keeps the previous files as `<name>.old`. `Revert to
-//! <previous>` (tab button and palette) swaps them back, until the new
-//! version has been running for [`CLEANUP_AFTER`]: then the `.old` files are
-//! deleted. A Windows exe that was running at the time of the swap cannot be
-//! deleted until its process ends, so that cleanup simply runs again on a
-//! later start. None of this is journaled in git undo: it changes GitPoulpi's
-//! own files, not a repository.
+//! **Revert.** The updater keeps the previous files as `<name>.old`. `Revert
+//! to <previous>` hands a revert job over, until the new version has been
+//! running for [`CLEANUP_AFTER`]: then the `.old` files are deleted. A
+//! Windows exe that was running at the time of the swap cannot be deleted
+//! until its process ends, so that cleanup simply runs again on a later
+//! start. None of this is journaled in git undo: it changes GitPoulpi's own
+//! files, not a repository.
 //!
 //! The threads never touch the render thread: it reads the state under a
 //! short lock and asks for a redraw when it changes.
@@ -36,14 +41,18 @@ use gitpoulpi_config::release;
 use gitpoulpi_hosting::updates::{Release, Version};
 use gitpoulpi_i18n::msg::updates as msg;
 use gitpoulpi_ipc::JobState;
+use gitpoulpi_update::channel::Channel;
 use gitpoulpi_update::fsops::{FileOps, RealFs};
-use gitpoulpi_update::install::{self, Replace};
+use gitpoulpi_update::install;
+use gitpoulpi_update::job::{Action, Staged};
+use gitpoulpi_update::plan::{self, Elevation, Procedure};
 use gitpoulpi_update::{archive, fetch, managed_names, Updatable, UpdateError};
 
-use super::shared;
+use super::{handoff, plans, shared};
 
 /// How long the new version must have been running before the previous
 /// version's `.old` files are deleted (the "successful start").
+#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
 pub(crate) const CLEANUP_AFTER: Duration = Duration::from_secs(60);
 
 /// Where the update stands.
@@ -55,23 +64,16 @@ pub(crate) enum Phase {
     Downloading(String),
     /// Staged beside the old files; waiting for the user's restart.
     Ready(String),
-    /// The swap (or the revert) is running.
+    /// The job is being handed to the updater (or the swap is running).
     Installing(String),
     /// The last attempt failed (the reason).
     Failed(String),
 }
 
-/// What to run again once the window is gone.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct Relaunch {
-    pub(crate) exe: PathBuf,
-    pub(crate) args: Vec<std::ffi::OsString>,
-}
-
 #[derive(Default)]
 pub(super) struct InstallState {
     probed: bool,
-    updatable: Option<Updatable>,
+    pub(super) updatable: Option<Updatable>,
     /// This process's exe, read before any swap (Linux reports a replaced
     /// exe as "... (deleted)" afterwards).
     own_exe: Option<PathBuf>,
@@ -80,10 +82,16 @@ pub(super) struct InstallState {
     progress: Option<(u64, Option<u64>)>,
     cancel: Option<Arc<AtomicBool>>,
     /// The version `Revert` brings back.
-    revert_to: Option<String>,
-    relaunch: Option<Relaunch>,
+    pub(super) revert_to: Option<String>,
+    /// `Update and restart` was asked before the download was there: the
+    /// handoff follows the download.
+    then_restart: bool,
+    /// An all-users install: the verified archive waiting in the user's
+    /// cache and its checksum URL (the elevated worker checks it again).
+    cached: Option<(PathBuf, String)>,
+    /// The job is ready: the window ends, then the updater starts.
+    handoff: Option<handoff::Prepared>,
     quit: bool,
-    session: String,
 }
 
 impl InstallState {
@@ -96,9 +104,10 @@ impl InstallState {
             progress: None,
             cancel: None,
             revert_to: None,
-            relaunch: None,
+            then_restart: false,
+            cached: None,
+            handoff: None,
             quit: false,
-            session: String::new(),
         }
     }
 }
@@ -106,16 +115,33 @@ impl InstallState {
 /// What the screen needs of the install state.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct InstallView {
+    /// This build swaps its own files (a `Swap` procedure, files to replace).
     pub(crate) updatable: bool,
     pub(crate) phase: Phase,
+    /// The version a revert brings back, when this install can go back.
     pub(crate) revert_to: Option<String>,
+    /// What an update does here; `Nothing` until the install is known.
+    pub(crate) procedure: Procedure,
+    /// What going back does.
+    pub(crate) revert: Procedure,
+    /// How GitPoulpi was installed; `None` until read.
+    pub(crate) channel: Option<Channel>,
+    /// The administrator's message, shown in the panel.
+    pub(crate) message: Option<String>,
 }
 
 pub(super) fn view(s: &super::Shared) -> InstallView {
+    let plans = super::plans_of(s);
+    let swap = matches!(plans.procedure, Procedure::Swap { .. });
+    let can_revert = matches!(plans.revert, Procedure::Swap { .. } | Procedure::Run { .. });
     InstallView {
-        updatable: s.install.updatable.is_some(),
+        updatable: s.install.updatable.is_some() && swap,
         phase: s.install.phase.clone(),
-        revert_to: s.install.revert_to.clone(),
+        revert_to: s.install.revert_to.clone().filter(|_| can_revert),
+        procedure: plans.procedure,
+        revert: plans.revert,
+        channel: s.facts.as_ref().map(plans::Facts::channel),
+        message: plans.effective.message,
     }
 }
 
@@ -129,24 +155,37 @@ pub(super) fn set_progress(done: u64, total: Option<u64>) {
     shared().install.progress = Some((done, total));
 }
 
-/// Names the session whose standalone daemon is stopped before a swap.
-pub(crate) fn set_session(session: &str) {
-    shared().install.session = session.to_string();
-}
-
-/// Looks at the install once: is this a release build, is a download staged,
-/// is there a previous version. Reads three tiny files; later calls only
-/// refresh what an action changed.
+/// Remembers this process's exe (before any swap changes it).
 pub(super) fn probe(s: &mut super::Shared) {
     if s.install.probed {
         return;
     }
     s.install.probed = true;
-    let exe = std::env::current_exe().ok();
-    s.install.own_exe = exe.clone();
-    s.install.updatable = exe
-        .as_deref()
-        .and_then(|e| gitpoulpi_update::detect(&RealFs, e, &release::host_target()));
+    s.install.own_exe = std::env::current_exe().ok();
+}
+
+/// The files this install can swap: its folder, exe and marker. Only the
+/// channels the updater replaces itself have them.
+fn updatable_from(facts: &plans::Facts) -> Option<Updatable> {
+    use gitpoulpi_config::release::InstallChannel as C;
+    match facts.channel() {
+        Channel::Install(C::Archive | C::InnoUser | C::InnoMachine) => {
+            facts.resolved.marker.clone().map(|marker| Updatable {
+                dir: facts.resolved.dir.clone(),
+                exe_name: facts.resolved.exe_name.clone(),
+                marker,
+            })
+        }
+        _ => None,
+    }
+}
+
+/// Stores what the background read found and looks at the install folder:
+/// is a download staged, is there a previous version.
+#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+pub(super) fn apply_facts(s: &mut super::Shared, facts: plans::Facts) {
+    s.install.updatable = updatable_from(&facts);
+    s.facts = Some(facts);
     refresh(s, &RealFs);
     if s.install.revert_to.is_some() {
         schedule_cleanup(CLEANUP_AFTER);
@@ -173,15 +212,59 @@ fn refresh(s: &mut super::Shared, fs: &dyn FileOps) {
     }
 }
 
-/// Test seam: pretends the build is (not) an installed release.
+/// Test seam: pretends the build is (not) an installed release, as an
+/// archive install would be.
 #[cfg(test)]
 pub(super) fn set_updatable(s: &mut super::Shared, updatable: Option<Updatable>, fs: &dyn FileOps) {
+    use gitpoulpi_config::release::InstallChannel;
+    use gitpoulpi_update::channel::{How, Resolved};
     s.install = InstallState::new();
     s.install.probed = true;
+    s.facts = updatable.as_ref().map(|u| plans::Facts {
+        resolved: Resolved {
+            channel: Channel::Install(InstallChannel::Archive),
+            how: How::Marker,
+            dir: u.dir.clone(),
+            exe_name: u.exe_name.clone(),
+            marker: Some(u.marker.clone()),
+        },
+        policy: Default::default(),
+        apt_source_present: false,
+        aur_helper: None,
+        binstall: false,
+    });
     s.install.updatable = updatable;
     refresh(s, fs);
 }
 
+/// Test seam: pretends the machine reads as `facts` (a channel, a policy).
+#[cfg(test)]
+pub(super) fn set_facts(s: &mut super::Shared, facts: Option<plans::Facts>) {
+    s.install = InstallState::new();
+    s.install.probed = true;
+    s.install.updatable = facts.as_ref().and_then(updatable_from);
+    s.facts = facts;
+}
+
+/// What the updater does to the files (the tests stand in for it): the swap
+/// or the revert of an install folder.
+#[cfg(test)]
+pub(super) fn swap_files(
+    fs: &dyn FileOps,
+    updatable: &Updatable,
+    revert: bool,
+) -> Result<(), UpdateError> {
+    use gitpoulpi_update::install::Replace;
+    let names = managed_names(&updatable.marker.target);
+    let replace = Replace::for_target(&updatable.marker.target);
+    if revert {
+        install::revert(fs, &updatable.dir, &names, replace, &updatable.exe_name)
+    } else {
+        install::apply(fs, &updatable.dir, &names, replace, &updatable.exe_name)
+    }
+}
+
+#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
 fn schedule_cleanup(after: Duration) {
     let _ = std::thread::Builder::new()
         .name("update-cleanup".into())
@@ -212,42 +295,117 @@ fn busy(phase: &Phase) -> bool {
     matches!(phase, Phase::Downloading(_) | Phase::Installing(_))
 }
 
-/// `Updates: Update now`.
-pub(crate) fn update_now() -> Option<String> {
-    let release = {
-        let s = shared();
-        if s.mode == gitpoulpi_config::UpdateMode::Off {
-            return Some(msg::MSG_OFF.get().to_string());
-        }
-        if s.install.updatable.is_none() {
-            return Some(msg::WHY_NOT_UPDATABLE.get().to_string());
-        }
-        if busy(&s.install.phase) {
-            return Some(msg::WHY_UPDATE_BUSY.get().to_string());
-        }
-        if matches!(s.install.phase, Phase::Ready(_)) {
-            return Some(msg::WHY_UPDATE_READY.get().to_string());
-        }
-        match s.known.clone() {
-            Some(r) => r,
-            None => return Some(msg::WHY_NO_UPDATE.get().to_string()),
-        }
-    };
-    if release.asset.is_none() {
-        // Nothing to download for this platform: the release page is the way.
-        return Some(msg::msg_update_failed(
-            "this release has no archive for this platform", // i18n-english
-        ));
+/// What an action needs of the state, read under one lock.
+struct Now {
+    plans: plans::Plans,
+    release: Option<Release>,
+    phase: Phase,
+    has_files: bool,
+}
+
+fn now() -> Now {
+    let s = shared();
+    Now {
+        plans: super::plans_of(&s),
+        release: s.known.clone(),
+        phase: s.install.phase.clone(),
+        has_files: s.install.updatable.is_some(),
     }
-    start_download(release, Duration::ZERO)
+}
+
+/// Why a swap or run action does not apply: a build with no install record
+/// cannot update itself; every other install updates its own way.
+fn manual_why(procedure: &Procedure) -> String {
+    if matches!(procedure, Procedure::Nothing(_)) {
+        msg::WHY_NOT_UPDATABLE.get().to_string()
+    } else {
+        msg::WHY_MANUAL.get().to_string()
+    }
+}
+
+/// The message for a release that has nothing to download for this platform.
+fn no_archive() -> String {
+    msg::msg_update_failed("this release has no archive for this platform") // i18n-english
+}
+
+/// The checks every swap action starts with. `Err` is the status line.
+fn swap_ready(n: &Now) -> Result<(), String> {
+    if !n.has_files {
+        return Err(msg::WHY_NOT_UPDATABLE.get().to_string());
+    }
+    if busy(&n.phase) {
+        return Err(msg::WHY_UPDATE_BUSY.get().to_string());
+    }
+    Ok(())
+}
+
+/// `Updates: Update now`. A swap channel downloads and stages the release (the
+/// restart is a separate action); a package-manager channel runs its
+/// command; everything else points at the update panel.
+pub(crate) fn update_now() -> Option<String> {
+    let n = now();
+    if n.plans.effective.mode == gitpoulpi_config::UpdateMode::Off {
+        return Some(msg::MSG_OFF.get().to_string());
+    }
+    match n.plans.procedure {
+        Procedure::Swap { .. } => {
+            if let Err(why) = swap_ready(&n) {
+                return Some(why);
+            }
+            if matches!(n.phase, Phase::Ready(_)) {
+                return Some(msg::WHY_UPDATE_READY.get().to_string());
+            }
+            let Some(release) = n.release else {
+                return Some(msg::WHY_NO_UPDATE.get().to_string());
+            };
+            if release.asset.is_none() {
+                // Nothing to download for this platform: the release page is the way.
+                return Some(no_archive());
+            }
+            start_download(release, Duration::ZERO, false)
+        }
+        Procedure::Run { .. } => run_manager(),
+        other => Some(manual_why(&other)),
+    }
+}
+
+/// The panel's main button: a swap channel downloads (when it has not) and
+/// then hands over to the updater; a package-manager channel runs its
+/// command.
+pub(crate) fn update_and_restart() -> Option<String> {
+    let n = now();
+    if n.plans.effective.mode == gitpoulpi_config::UpdateMode::Off {
+        return Some(msg::MSG_OFF.get().to_string());
+    }
+    match n.plans.procedure {
+        Procedure::Swap { .. } => {
+            if let Err(why) = swap_ready(&n) {
+                return Some(why);
+            }
+            if matches!(n.phase, Phase::Ready(_)) {
+                return restart_now();
+            }
+            let Some(release) = n.release else {
+                return Some(msg::WHY_NO_UPDATE.get().to_string());
+            };
+            if release.asset.is_none() {
+                return Some(no_archive());
+            }
+            start_download(release, Duration::ZERO, true)
+        }
+        Procedure::Run { .. } => run_manager(),
+        other => Some(manual_why(&other)),
+    }
 }
 
 /// `auto` mode: a check (or the cache) knows a release this build can take.
-/// Quiet: no status line until it is ready.
+/// Quiet: no status line until it is ready. Only where the updater swaps
+/// files; a package-manager channel behaves like `notify`.
 pub(super) fn auto_start(delay: Duration) {
     let release = {
         let s = shared();
-        if s.mode != gitpoulpi_config::UpdateMode::Auto
+        let plans = super::plans_of(&s);
+        if !plan::stages_in_background(&plans.procedure, &plans.effective)
             || s.install.updatable.is_none()
             || s.skipped
             || !matches!(s.install.phase, Phase::Idle)
@@ -263,22 +421,33 @@ pub(super) fn auto_start(delay: Duration) {
     if release.asset.is_none() {
         return;
     }
-    start_download(release, delay);
+    start_download(release, delay, false);
 }
 
-fn start_download(release: Release, delay: Duration) -> Option<String> {
+fn start_download(release: Release, delay: Duration, then_restart: bool) -> Option<String> {
     let version = release.version.clone();
     let cancel = Arc::new(AtomicBool::new(false));
-    let updatable = {
+    let (updatable, cache) = {
         let mut s = shared();
         let updatable = s.install.updatable.clone()?;
         if busy(&s.install.phase) {
             return Some(msg::WHY_UPDATE_BUSY.get().to_string());
         }
+        // An all-users install stages in the user's cache: the folder is not
+        // ours to write.
+        let cache = matches!(
+            super::plans_of(&s).procedure,
+            Procedure::Swap {
+                elevation: Elevation::Uac,
+                ..
+            }
+        );
         s.install.phase = Phase::Downloading(version.clone());
         s.install.progress = None;
         s.install.cancel = Some(cancel.clone());
-        updatable
+        s.install.cached = None;
+        s.install.then_restart = then_restart;
+        (updatable, cache)
     };
     let stop = cancel.clone();
     let job = crate::jobs_ui::local_start(
@@ -308,7 +477,7 @@ fn start_download(release: Release, delay: Duration) -> Option<String> {
                         crate::redraw::poke();
                     }
                 };
-                let result = download_and_stage(&release, &updatable, &cancel, &on_progress);
+                let result = download_and_stage(&release, &updatable, cache, &cancel, &on_progress);
                 finish_download(job, &version, result);
             }
         });
@@ -326,11 +495,25 @@ fn start_download(release: Release, delay: Duration) -> Option<String> {
 fn download_and_stage(
     release: &Release,
     updatable: &Updatable,
+    cache: bool,
     cancel: &AtomicBool,
     on_progress: fetch::OnProgress<'_>,
 ) -> Result<(), UpdateError> {
     let transport = gitpoulpi_hosting::ReqwestTransport::new()
         .map_err(|e| UpdateError::Download(e.to_string()))?;
+    if cache {
+        let dir = handoff::paths()
+            .map(|p| p.download)
+            .ok_or_else(|| UpdateError::Download("no data folder for the download".into()))?; // i18n-english
+        let path = fetch_to_cache(&transport, release, updatable, &dir, cancel, on_progress)?;
+        let sha_url = release
+            .checksum
+            .as_ref()
+            .map(|c| c.url.clone())
+            .ok_or(UpdateError::NoChecksum)?;
+        shared().install.cached = Some((path, sha_url));
+        return Ok(());
+    }
     fetch_and_stage(&transport, &RealFs, release, updatable, cancel, on_progress)
 }
 
@@ -338,12 +521,20 @@ fn download_and_stage(
 fn download_and_stage(
     _release: &Release,
     _updatable: &Updatable,
+    _cache: bool,
     _cancel: &AtomicBool,
     _on_progress: fetch::OnProgress<'_>,
 ) -> Result<(), UpdateError> {
     Err(UpdateError::Download(
         "this build has no network support".into(), // i18n-english
     ))
+}
+
+fn runtime() -> Result<tokio::runtime::Runtime, UpdateError> {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .map_err(|e| UpdateError::Download(e.to_string()))
 }
 
 /// Download, verify, unpack and stage `release` beside `updatable`'s files.
@@ -359,11 +550,7 @@ pub(super) fn fetch_and_stage(
     on_progress: fetch::OnProgress<'_>,
 ) -> Result<(), UpdateError> {
     let target = &updatable.marker.target;
-    let runtime = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .map_err(|e| UpdateError::Download(e.to_string()))?;
-    let bytes = runtime.block_on(fetch::download_verified(
+    let bytes = runtime()?.block_on(fetch::download_verified(
         transport,
         release,
         target,
@@ -384,221 +571,284 @@ pub(super) fn fetch_and_stage(
     Ok(())
 }
 
+/// Download and verify `release`, check it unpacks, and keep the archive in
+/// `dir` for the elevated worker (an all-users install: the install folder
+/// cannot be written without the administrator's approval). Returns the file.
+#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+pub(super) fn fetch_to_cache(
+    transport: &dyn gitpoulpi_hosting::HttpTransport,
+    release: &Release,
+    updatable: &Updatable,
+    dir: &std::path::Path,
+    cancel: &AtomicBool,
+    on_progress: fetch::OnProgress<'_>,
+) -> Result<PathBuf, UpdateError> {
+    let target = &updatable.marker.target;
+    let bytes = runtime()?.block_on(fetch::download_verified(
+        transport,
+        release,
+        target,
+        cancel,
+        on_progress,
+    ))?;
+    let files = archive::extract(&bytes, &release.version, target)?;
+    if !files.iter().any(|f| f.name == updatable.exe_name) {
+        return Err(UpdateError::Archive(format!(
+            "the archive has no {}", // i18n-english
+            updatable.exe_name
+        )));
+    }
+    let io = |what: &str, e: std::io::Error| UpdateError::Io {
+        what: what.to_string(),
+        error: e.to_string(),
+    };
+    let creating = "creating the download folder"; // i18n-english
+    let saving = "saving the download"; // i18n-english
+    std::fs::create_dir_all(dir).map_err(|e| io(creating, e))?;
+    let path = dir.join(release::archive_name(&release.version, target));
+    std::fs::write(&path, &bytes).map_err(|e| io(saving, e))?;
+    Ok(path)
+}
+
 pub(super) fn finish_download(job: u64, version: &str, result: Result<(), UpdateError>) {
-    let (state, message) = {
+    let (state, message, restart) = {
         let mut s = shared();
         s.install.progress = None;
         s.install.cancel = None;
+        let restart = std::mem::take(&mut s.install.then_restart);
         match result {
             Ok(()) => {
                 s.install.phase = Phase::Ready(version.to_string());
-                (JobState::Done, msg::msg_update_ready(version))
+                (JobState::Done, msg::msg_update_ready(version), restart)
             }
             Err(UpdateError::Canceled) => {
                 s.install.phase = Phase::Idle;
                 (
                     JobState::Canceled,
                     msg::MSG_UPDATE_CANCELED.get().to_string(),
+                    false,
                 )
             }
             Err(e) => {
                 tracing::warn!(target: "updates", "update download failed: {e}");
                 s.install.phase = Phase::Failed(e.to_string());
-                (JobState::Failed, msg::msg_update_failed(e.to_string()))
+                (
+                    JobState::Failed,
+                    msg::msg_update_failed(e.to_string()),
+                    false,
+                )
             }
         }
     };
     shared().message = Some(message);
     crate::jobs_ui::local_finish(job, state);
     crate::redraw::poke();
+    // `Update and restart` was pressed before the download was there.
+    if restart {
+        if let Some(line) = restart_now() {
+            shared().message = Some(line);
+        }
+    }
 }
 
-/// `Updates: Restart to update`: swaps the files, then quits and re-executes.
+/// `Updates: Restart to update`: hands the staged release to the updater.
 pub(crate) fn restart_now() -> Option<String> {
-    swap(false)
+    let n = now();
+    if !matches!(n.plans.procedure, Procedure::Swap { .. }) {
+        return Some(manual_why(&n.plans.procedure));
+    }
+    if let Err(why) = swap_ready(&n) {
+        return Some(why);
+    }
+    match n.phase {
+        Phase::Ready(version) => begin_handoff(Kind::Apply, version),
+        _ => Some(msg::WHY_NOTHING_STAGED.get().to_string()),
+    }
 }
 
 /// `Updates: Revert to the previous version`.
 pub(crate) fn revert_now() -> Option<String> {
-    swap(true)
+    let n = now();
+    let previous = shared().install.revert_to.clone();
+    match n.plans.revert {
+        Procedure::Swap { .. } => {
+            if let Err(why) = swap_ready(&n) {
+                return Some(why);
+            }
+            match previous {
+                Some(version) => begin_handoff(Kind::Revert, version),
+                None => Some(msg::WHY_NO_REVERT.get().to_string()),
+            }
+        }
+        Procedure::Run { argv, elevation } => {
+            if busy(&n.phase) {
+                return Some(msg::WHY_UPDATE_BUSY.get().to_string());
+            }
+            match previous {
+                Some(version) => begin_handoff(Kind::Manager(argv, elevation), version),
+                None => Some(msg::WHY_NO_REVERT.get().to_string()),
+            }
+        }
+        _ => Some(msg::WHY_NO_REVERT.get().to_string()),
+    }
 }
 
-fn swap(revert: bool) -> Option<String> {
-    let (updatable, version) = {
+/// Runs the package manager's update command through the updater.
+pub(crate) fn run_manager() -> Option<String> {
+    let n = now();
+    let Procedure::Run { argv, elevation } = n.plans.procedure else {
+        return Some(manual_why(&n.plans.procedure));
+    };
+    if busy(&n.phase) {
+        return Some(msg::WHY_UPDATE_BUSY.get().to_string());
+    }
+    let Some(release) = n.release else {
+        return Some(msg::WHY_NO_UPDATE.get().to_string());
+    };
+    begin_handoff(Kind::Manager(argv, elevation), release.version)
+}
+
+/// What the updater is asked to do.
+enum Kind {
+    Apply,
+    Revert,
+    Manager(Vec<String>, Elevation),
+}
+
+/// Starts the handoff: the job and the updater copy are made on a worker
+/// thread, then the window is asked to end ([`take_quit_request`]) and
+/// [`launch_if_requested`] starts the updater once the terminal is restored.
+fn begin_handoff(kind: Kind, to_version: String) -> Option<String> {
+    let (install_dir, own_exe, staged, elevation, restore) = {
         let mut s = shared();
-        let Some(updatable) = s.install.updatable.clone() else {
-            return Some(msg::WHY_NOT_UPDATABLE.get().to_string());
-        };
         if busy(&s.install.phase) {
             return Some(msg::WHY_UPDATE_BUSY.get().to_string());
         }
-        let version = if revert {
-            match s.install.revert_to.clone() {
-                Some(v) => v,
-                None => return Some(msg::WHY_NO_REVERT.get().to_string()),
-            }
-        } else {
-            match &s.install.phase {
-                Phase::Ready(v) => v.clone(),
-                _ => return Some(msg::WHY_NOTHING_STAGED.get().to_string()),
-            }
+        let plans = super::plans_of(&s);
+        let install_dir = s
+            .install
+            .updatable
+            .as_ref()
+            .map(|u| u.dir.clone())
+            .or_else(|| s.facts.as_ref().map(|f| f.resolved.dir.clone()))?;
+        let own_exe = s
+            .install
+            .own_exe
+            .clone()
+            .or_else(|| std::env::current_exe().ok())?;
+        let swap_elevation = |p: &Procedure| match p {
+            Procedure::Swap { elevation, .. } => *elevation,
+            _ => Elevation::None,
         };
-        s.install.phase = Phase::Installing(version.clone());
-        (updatable, version)
+        let staged = match (&kind, s.install.cached.clone()) {
+            (Kind::Apply, Some((archive, sha256_url))) => Staged::Archive {
+                archive,
+                sha256_url,
+            },
+            _ => Staged::InPlace,
+        };
+        let elevation = match &kind {
+            Kind::Apply => swap_elevation(&plans.procedure),
+            Kind::Revert => swap_elevation(&plans.revert),
+            Kind::Manager(_, e) => *e,
+        };
+        let restore = match kind {
+            Kind::Apply => Phase::Ready(to_version.clone()),
+            _ => Phase::Idle,
+        };
+        s.install.phase = Phase::Installing(to_version.clone());
+        (install_dir, own_exe, staged, elevation, restore)
     };
-    let job = crate::jobs_ui::local_start_sent(msg::job_install(&version));
     crate::redraw::poke();
-    let session = shared().install.session.clone();
-    let spawned = std::thread::Builder::new()
-        .name("update-swap".into())
-        .spawn({
-            let version = version.clone();
-            move || {
-                stop_standalone_daemon(&session);
-                let result = swap_files(&RealFs, &updatable, revert);
-                finish_swap(job, &version, revert, result);
-            }
-        });
-    if spawned.is_err() {
-        finish_swap(
-            job,
-            &version,
-            revert,
-            Err(UpdateError::Download("could not start a thread".into())), // i18n-english
+    let (action, manager_argv) = match kind {
+        Kind::Apply => (Action::Apply, None),
+        Kind::Revert => (Action::Revert, None),
+        Kind::Manager(argv, _) => (Action::Manager, Some(argv)),
+    };
+    let work = {
+        let (to_version, restore) = (to_version.clone(), restore.clone());
+        move || {
+            let result = (|| {
+                let paths = handoff::paths().ok_or_else(|| "no data folder".to_string())?; // i18n-english
+                let config_dir = gitpoulpi_config::ConfigPaths::discover()
+                    .map(|p| p.config_dir().to_path_buf())
+                    .ok_or_else(|| "no config folder".to_string())?; // i18n-english
+                let job = handoff::build_job(handoff::Inputs {
+                    action,
+                    install_dir,
+                    from_version: super::RUNNING.to_string(),
+                    to_version: to_version.clone(),
+                    staged,
+                    manager_argv,
+                    elevation,
+                    own_exe,
+                    args: std::env::args_os()
+                        .skip(1)
+                        .map(|a| a.to_string_lossy().into_owned())
+                        .collect(),
+                    cwd: std::env::current_dir().unwrap_or_default(),
+                    pid: std::process::id(),
+                    config_dir,
+                    status_path: paths.status.clone(),
+                });
+                handoff::prepare(&job, &paths, &release::host_target())
+            })();
+            finish_handoff(result, &to_version, restore);
+        }
+    };
+    if std::thread::Builder::new()
+        .name("update-handoff".into())
+        .spawn(work)
+        .is_err()
+    {
+        finish_handoff(
+            Err("could not start a thread".into()), // i18n-english
+            &to_version,
+            restore,
         );
     }
     None
 }
 
-/// The file part of a restart or a revert.
-pub(super) fn swap_files(
-    fs: &dyn FileOps,
-    updatable: &Updatable,
-    revert: bool,
-) -> Result<(), UpdateError> {
-    let names = managed_names(&updatable.marker.target);
-    let replace = Replace::for_target(&updatable.marker.target);
-    if revert {
-        install::revert(fs, &updatable.dir, &names, replace, &updatable.exe_name)
-    } else {
-        install::apply(fs, &updatable.dir, &names, replace, &updatable.exe_name)
-    }
-}
-
-pub(super) fn finish_swap(job: u64, version: &str, revert: bool, result: Result<(), UpdateError>) {
-    let ok = result.is_ok();
+pub(super) fn finish_handoff(
+    result: Result<handoff::Prepared, String>,
+    version: &str,
+    restore: Phase,
+) {
     {
         let mut s = shared();
-        match &result {
-            Ok(()) => {
-                // The files are in place; the window now ends and the new
-                // binary starts (`relaunch_if_requested`).
-                s.install.relaunch = s.install.own_exe.clone().map(|exe| Relaunch {
-                    exe,
-                    args: std::env::args_os().skip(1).collect(),
-                });
+        match result {
+            Ok(prepared) => {
+                // The job is written: the window now ends and the updater
+                // starts (`launch_if_requested`).
+                s.install.handoff = Some(prepared);
                 s.install.quit = true;
                 s.message = Some(msg::msg_restarting(version));
             }
-            Err(e) => {
-                tracing::warn!(target: "updates", "update swap failed: {e}");
-                // Rolled back: the download (or the previous version) is
-                // still there to try again.
-                s.install.phase = if revert {
-                    Phase::Idle
-                } else {
-                    Phase::Ready(version.to_string())
-                };
-                s.message = Some(msg::msg_update_failed(e.to_string()));
+            Err(why) => {
+                tracing::warn!(target: "updates", "could not hand the update over: {why}");
+                s.install.phase = restore;
+                s.message = Some(msg::msg_handoff_failed(why));
             }
         }
-        refresh(&mut s, &RealFs);
     }
-    crate::jobs_ui::local_finish(job, if ok { JobState::Done } else { JobState::Failed });
     crate::redraw::poke();
 }
 
-/// Whether the window must quit now (the swap is done and the user asked for
-/// the restart). Read by the loop's tick.
+/// Whether the window must quit now (the job is written and the user asked
+/// for the update). Read by the loop's tick.
 pub(crate) fn take_quit_request() -> bool {
     std::mem::take(&mut shared().install.quit)
 }
 
-/// After the window ended and the terminal is restored: starts the new
-/// binary in place of this process (Unix `exec`; Windows runs it and exits
-/// with its status), with the same arguments. No-op unless a swap asked for it.
-pub(crate) fn relaunch_if_requested() {
-    let Some(plan) = shared().install.relaunch.take() else {
+/// After the window ended and the terminal is restored: starts the updater
+/// in place of this process (Unix `exec`; Windows starts it detached and
+/// exits). No-op unless a handoff asked for it. Returns only when the
+/// updater could not start.
+pub(crate) fn launch_if_requested() {
+    let Some(prepared) = shared().install.handoff.take() else {
         return;
     };
-    let what = "gitpoulpi: could not restart"; // i18n-english
-    let mut cmd = std::process::Command::new(&plan.exe);
-    cmd.args(&plan.args)
-        // Windows: not a double-click, do not relaunch into another terminal.
-        .env("GITPOULPI_RELAUNCHED", "1");
-    #[cfg(unix)]
-    {
-        use std::os::unix::process::CommandExt;
-        let err = cmd.exec();
-        eprintln!("{what} {}: {err}", plan.exe.display());
-    }
-    #[cfg(not(unix))]
-    match cmd.status() {
-        Ok(status) => std::process::exit(status.code().unwrap_or(0)),
-        Err(err) => {
-            eprintln!("{what} {}: {err}", plan.exe.display());
-        }
-    }
-}
-
-/// Asks the session's daemon to shut down when it is a standalone process
-/// (an embedded one lives in this process and goes with it). Best effort: a
-/// binary a daemon still holds makes the swap refuse and say which.
-fn stop_standalone_daemon(session: &str) {
-    use gitpoulpi_core::domain::OperationKind;
-    use gitpoulpi_ipc::{Client, Request};
-    if session.is_empty() {
-        return;
-    }
-    let Some(paths) = gitpoulpi_config::ConfigPaths::discover() else {
-        return;
-    };
-    if !paths.ipc_pid_file(session).exists() {
-        return;
-    }
-    let port_file = paths.ipc_port_file(session);
-    let Ok(runtime) = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-    else {
-        return;
-    };
-    runtime.block_on(async {
-        let ask = async {
-            let mut client = Client::connect(&port_file).await.ok()?;
-            client
-                .call(&Request {
-                    id: 1,
-                    session: session.to_string(),
-                    repo: None,
-                    command: OperationKind::Shutdown,
-                    args: serde_json::Value::Null,
-                })
-                .await
-                .ok()
-        };
-        if tokio::time::timeout(Duration::from_secs(5), ask)
-            .await
-            .is_err()
-        {
-            tracing::warn!(target: "updates", "the session daemon did not stop in time");
-        }
-        // The daemon removes its port file when it is gone.
-        for _ in 0..30 {
-            if !port_file.exists() {
-                break;
-            }
-            tokio::time::sleep(Duration::from_millis(100)).await;
-        }
-    });
+    let why = handoff::launch(&prepared);
+    eprintln!("gitpoulpi: could not start the updater: {why}"); // i18n-english
 }

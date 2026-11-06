@@ -128,6 +128,20 @@ fn apply_jobs_goto(cx: &mut CommandCtx<'_>) {
     *cx.should_quit |= cx.switch_to.is_some() || *cx.close_window;
 }
 
+/// What the update panel asked of the window: a status line, or the Release
+/// notes tab.
+fn apply_update_panel(cx: &mut CommandCtx<'_>, event: crate::updates::panel::Event) {
+    use crate::updates::panel::Event;
+    match event {
+        Event::None => {}
+        Event::Message(line) => *cx.last_message = Some(line),
+        Event::ReleaseNotes => {
+            go_to_management(ManagementEntry::ReleaseNotes, &mut tab_ctx!(cx));
+            *cx.should_quit |= cx.show_management.is_some();
+        }
+    }
+}
+
 fn handle_key_inner(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> io::Result<Flow> {
     // The Activity Log is modal and takes every key.
     // `Ctrl+N` starts the badge prefix over it (`activity_log::nav_targets`);
@@ -144,6 +158,12 @@ fn handle_key_inner(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) ->
         if let Some(command) = crate::activity_log::on_panel_key(key) {
             apply_card_command(cx, command);
         }
+        return Ok(Flow::Handled);
+    }
+    // So is the update panel.
+    if key.kind == KeyEventKind::Press && crate::updates::panel::is_open() {
+        let event = crate::updates::panel::on_key(key);
+        apply_update_panel(cx, event);
         return Ok(Flow::Handled);
     }
     // So is the jobs panel; its Enter may ask for another repository's tab.
@@ -228,15 +248,20 @@ fn handle_mouse_inner(
         *cx.hovered_target = None;
         return Ok(Flow::Handled);
     }
-    // The version chip at the right end of the status bar: the Release notes.
+    // The update panel is modal: it takes every mouse event while open.
+    if let Some(event) = crate::updates::panel::route_mouse(mouse) {
+        *cx.hovered_target = None;
+        apply_update_panel(cx, event);
+        return Ok(Flow::Handled);
+    }
+    // The version chip in the title bar: the update panel.
     // Settings covers the status bar: its stale chip rect must not take a click.
     if crate::updates::chip::route_mouse(mouse)
         && matches!(*cx.input_mode, InputMode::Normal)
         && cx.preferences.is_none()
     {
         *cx.hovered_target = None;
-        go_to_management(ManagementEntry::ReleaseNotes, &mut tab_ctx!(cx));
-        *cx.should_quit |= cx.show_management.is_some();
+        crate::updates::panel::open();
         return Ok(Flow::Handled);
     }
     match &*cx.input_mode {

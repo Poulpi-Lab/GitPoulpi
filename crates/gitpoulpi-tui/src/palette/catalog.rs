@@ -1974,6 +1974,21 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::Updates(crate::updates::UpdatesCommand::ReleaseNotes),
     ),
     entry(
+        gitpoulpi_i18n::msg::updates::PALETTE_SHOW,
+        "",
+        PaletteCommand::Updates(crate::updates::UpdatesCommand::ShowPanel),
+    ),
+    entry(
+        gitpoulpi_i18n::msg::updates::PALETTE_COPY,
+        "",
+        PaletteCommand::Updates(crate::updates::UpdatesCommand::CopyCommand),
+    ),
+    entry(
+        gitpoulpi_i18n::msg::updates::PALETTE_TERMINAL,
+        "",
+        PaletteCommand::Updates(crate::updates::UpdatesCommand::RunInTerminal),
+    ),
+    entry(
         gitpoulpi_i18n::msg::updates::PALETTE_CHECK,
         "",
         PaletteCommand::Updates(crate::updates::UpdatesCommand::CheckNow),

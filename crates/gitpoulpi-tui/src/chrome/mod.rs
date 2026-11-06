@@ -168,6 +168,8 @@ pub(crate) enum NavigationAction {
     OpenGlobalLog,
     /// `Ctrl+N Shift+J` - the background jobs panel, the status bar indicator's label.
     ShowJobs,
+    /// `Ctrl+N u` - the update panel, the version chip in the title bar.
+    ShowUpdates,
     /// `Ctrl+N ?` - toggle the help overlay, the same place bare `?` goes.
     ToggleHelp,
     /// `Ctrl+N t` - open the tab picker: a popup
@@ -238,6 +240,7 @@ pub(crate) fn navigation_key_action_mods(
         Some(Bind::NavOpenActivityLog) => NavigationAction::OpenActivityLog,
         Some(Bind::NavOpenGlobalLog) => NavigationAction::OpenGlobalLog,
         Some(Bind::NavShowJobs) => NavigationAction::ShowJobs,
+        Some(Bind::NavShowUpdates) => NavigationAction::ShowUpdates,
         Some(Bind::NavToggleHelp) => NavigationAction::ToggleHelp,
         Some(Bind::NavSelectTab) => NavigationAction::SelectTab,
         Some(Bind::NavChangeTheme) => NavigationAction::ChangeTheme,

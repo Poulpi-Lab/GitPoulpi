@@ -5,8 +5,10 @@
 //!
 //! Buttons (each with a key and a palette command): Download (the release page
 //! in the browser), Update now / Restart to update / Revert to <previous>
-//! (only for a build installed from a release archive, see `auto`), Skip this
-//! version, Check now. Hit rects come out of the
+//! (a build that replaces its own files, or Run update for a package-manager
+//! install, see `auto`), Update options (the update panel, for every other
+//! install), Skip this version, Check now. The buttons run the same actions
+//! as the update panel's (`updates::run`). Hit rects come out of the
 //! paint walk; the body scrolls with the wheel, the keys and a draggable bar.
 
 use crate::wide_edge::Clear;
@@ -19,6 +21,8 @@ use ratatui::Frame;
 
 use gitpoulpi_config::UpdateMode;
 use gitpoulpi_i18n::msg::updates as msg;
+
+use gitpoulpi_update::plan::Procedure;
 
 use super::auto::Phase;
 use super::{Snapshot, UpdatesCommand};
@@ -43,6 +47,8 @@ enum Hit {
     Revert,
     Skip,
     Check,
+    /// The update panel.
+    Panel,
 }
 
 /// What the event loop must do after the tab handled an event.
@@ -193,13 +199,16 @@ impl NotesUi {
         let mut rows: Vec<Row> = Vec::new();
         let release = snapshot.available.as_ref().or(snapshot.skipped.as_ref());
         if let Some(release) = release {
-            if !snapshot.install.updatable {
-                // A cargo build: say why there is no Update now button.
-                rows.extend(
-                    markdown_lite::render(msg::NOTE_NOT_UPDATABLE.get(), text_w)
-                        .into_iter()
-                        .map(Row::Md),
-                );
+            let note = match &snapshot.install.procedure {
+                // A build with no install record: say why there is no button.
+                Procedure::Nothing(_) => Some(msg::NOTE_NOT_UPDATABLE.get()),
+                Procedure::Swap { .. } | Procedure::Run { .. } => None,
+                Procedure::Show { .. } | Procedure::Announce { .. } => {
+                    Some(msg::NOTE_SEE_PANEL.get())
+                }
+            };
+            if let Some(note) = note {
+                rows.extend(markdown_lite::render(note, text_w).into_iter().map(Row::Md));
                 rows.push(Row::Md(markdown_lite::Line::default()));
             }
             let body = if release.notes.trim().is_empty() {
@@ -346,7 +355,23 @@ impl NotesUi {
                 {
                     buttons.push((Hit::UpdateNow, msg::BTN_UPDATE_NOW.get().to_string()));
                 }
+                Phase::Idle | Phase::Failed(_)
+                    if matches!(install.procedure, Procedure::Run { .. })
+                        && snapshot.available.is_some()
+                        && !off =>
+                {
+                    buttons.push((Hit::UpdateNow, msg::BTN_RUN_UPDATE.get().to_string()));
+                }
                 _ => {}
+            }
+            if known
+                && !off
+                && matches!(
+                    install.procedure,
+                    Procedure::Show { .. } | Procedure::Announce { .. }
+                )
+            {
+                buttons.push((Hit::Panel, msg::BTN_PANEL.get().to_string()));
             }
             if let Some(previous) = &install.revert_to {
                 if !matches!(install.phase, Phase::Downloading(_) | Phase::Installing(_)) {
@@ -412,8 +437,13 @@ impl NotesUi {
             }
         }
         // The bar takes the right edge; the track lives in the border of a
-        // bordered box, so hand it a stand-in one cell taller on each side.
-        self.bar_body = Rect::new(body.right(), body.y.saturating_sub(1), 1, body.height + 2);
+        // bordered box, so hand it a stand-in two cells wide (its right column is the bar) and one cell taller on each side.
+        self.bar_body = Rect::new(
+            body.right().saturating_sub(1),
+            body.y.saturating_sub(1),
+            2,
+            body.height + 2,
+        );
         if let Some(track) = Track::vertical(self.bar_body, self.rows.len(), self.offset) {
             crate::scrollbar::render_buf(buf, track, true, false);
         }
@@ -434,6 +464,7 @@ impl NotesUi {
             Hit::Revert => UpdatesCommand::Revert,
             Hit::Skip => UpdatesCommand::Skip,
             Hit::Check => UpdatesCommand::CheckNow,
+            Hit::Panel => UpdatesCommand::ShowPanel,
         };
         super::run(command).map_or(NotesEvent::None, NotesEvent::Message)
     }
@@ -454,6 +485,7 @@ impl NotesUi {
             KeyCode::Char('v') => return self.command(Hit::Revert),
             KeyCode::Char('s') => return self.command(Hit::Skip),
             KeyCode::Char('r') => return self.command(Hit::Check),
+            KeyCode::Char('p') => return self.command(Hit::Panel),
             KeyCode::Up | KeyCode::Char('k') => self.scroll_by(-1),
             KeyCode::Down | KeyCode::Char('j') => self.scroll_by(1),
             KeyCode::PageUp => self.scroll_by(-page),

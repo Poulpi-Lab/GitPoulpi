@@ -119,6 +119,7 @@ předponou (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Otevřít Protokol aktivity | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Otevřít globální protokol aktivity | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Zobrazit úlohy na pozadí | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Přepnout nápovědu | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Vybrat kartu | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Změnit motiv | `Ctrl+N y` |
@@ -835,6 +836,9 @@ Klávesy jsou výchozí.
 | Zobrazení: Protokol aktivity | `Ctrl+N A` |
 | Zobrazení: Globální protokol aktivity | `Ctrl+N G` |
 | Nápověda: Poznámky k vydání |  |
+| Updates: Show Update | `Ctrl+N u` |
+| Updates: Copy Update Command |  |
+| Updates: Run Update Command in a Terminal |  |
 | Aktualizace: Zkontrolovat aktualizace nyní |  |
 | Aktualizace: Stáhnout |  |
 | Aktualizace: Aktualizovat nyní |  |

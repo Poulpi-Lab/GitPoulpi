@@ -1054,6 +1054,9 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
         PaletteCommand::OpenActivityLog => Some(A::NavOpenActivityLog),
         PaletteCommand::OpenGlobalLog => Some(A::NavOpenGlobalLog),
         PaletteCommand::Jobs(crate::jobs_ui::JobsCmd::Show) => Some(A::NavShowJobs),
+        PaletteCommand::Updates(crate::updates::UpdatesCommand::ShowPanel) => {
+            Some(A::NavShowUpdates)
+        }
         PaletteCommand::Refresh => Some(A::GlobalRefresh),
         PaletteCommand::RefreshAll => Some(A::GlobalRefreshAll),
         PaletteCommand::Quit => Some(A::GlobalQuit),

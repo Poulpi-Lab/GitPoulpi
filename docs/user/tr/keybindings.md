@@ -120,6 +120,7 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Etkinlik Günlüğünü Aç | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Genel etkinlik günlüğünü aç | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Arka plan görevlerini göster | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Yardımı Aç/Kapat | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Sekme Seç | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Temayı Değiştir | `Ctrl+N y` |
@@ -835,6 +836,9 @@ Tuşlar varsayılanlardır.
 | Görünüm: Etkinlik Günlüğü | `Ctrl+N A` |
 | Görünüm: Genel Etkinlik Günlüğü | `Ctrl+N G` |
 | Yardım: Sürüm Notları |  |
+| Updates: Show Update | `Ctrl+N u` |
+| Updates: Copy Update Command |  |
+| Updates: Run Update Command in a Terminal |  |
 | Güncellemeler: Şimdi Denetle |  |
 | Güncellemeler: İndir |  |
 | Güncellemeler: Şimdi Güncelle |  |

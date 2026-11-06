@@ -436,6 +436,7 @@ actions! {
     NavOpenActivityLog => (NavPrefix, "nav_prefix.activity_log", NAV_PREFIX_ACTIVITY_LOG, ["Shift+A"]),
     NavOpenGlobalLog => (NavPrefix, "nav_prefix.global_log", NAV_PREFIX_GLOBAL_LOG, ["Shift+G"]),
     NavShowJobs => (NavPrefix, "nav_prefix.jobs", NAV_PREFIX_JOBS, ["Shift+J"]),
+    NavShowUpdates => (NavPrefix, "nav_prefix.updates", NAV_PREFIX_UPDATES, ["u"]),
     NavToggleHelp => (NavPrefix, "nav_prefix.help", NAV_PREFIX_HELP, ["?"]),
     NavSelectTab => (NavPrefix, "nav_prefix.select_tab", NAV_PREFIX_SELECT_TAB, ["t"]),
     NavChangeTheme => (NavPrefix, "nav_prefix.change_theme", NAV_PREFIX_CHANGE_THEME, ["y"]),

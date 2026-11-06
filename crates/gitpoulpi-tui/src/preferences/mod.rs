@@ -96,6 +96,7 @@ mod repo_pages;
 mod search;
 mod sub_tabs;
 mod theme_page;
+mod updates_rows;
 mod view_memory;
 mod workflow_page;
 use ai_page::AiPage;

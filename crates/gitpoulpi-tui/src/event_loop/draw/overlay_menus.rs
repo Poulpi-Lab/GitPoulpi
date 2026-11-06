@@ -253,6 +253,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
         || crate::about::is_open()
         || crate::activity_log::is_open()
         || crate::jobs_ui::panel_open()
+        || crate::updates::panel::is_open()
         || crate::open_with::popup::is_open()
         || crate::image_view::edit_in::is_open()
         || crate::diff_encoding_menu::is_open();
@@ -836,6 +837,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
         *ctx.nav_badge_targets = badge_pairs(frame, &pairs);
     }
     crate::jobs_ui::render_panel(frame);
+    crate::updates::panel::render(frame);
     *ctx.help_popup_inner_height = help_popup_inner_height;
     *ctx.help_scroll = help_scroll;
     *ctx.ref_popup_rect = ref_popup_rect;

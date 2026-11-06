@@ -1,10 +1,15 @@
-//! Knowing when a newer GitPoulpi exists (the updates-and-install design,
-//! slice A): the status bar's version chip, the Release notes tab and the
-//! check behind them, and [`auto`] (slice B: the self-update).
+//! Knowing when a newer GitPoulpi exists and what to do about it (the
+//! updates-and-install and install-channels designs): the title bar's version
+//! chip, the update panel, the Release notes tab and the check behind them.
 //!
 //! - `mod.rs` (this file): the process-wide state, the check and its cache.
-//! - [`chip`]: the version chip right of the Activity button.
+//! - [`chip`]: the version chip in the title bar; a click opens the panel.
+//! - [`panel`]: the update panel (version, "Installed with", the actions of
+//!   the install channel's procedure).
 //! - [`notes`]: the Release notes tab (a view of the Home window).
+//! - [`plans`]: what this install is and what may be done about an update.
+//! - [`auto`]: download and stage; [`handoff`]: the job for
+//!   `gitpoulpi-updater`; [`terminal`]: "Open in terminal".
 //!
 //! The check runs on a thread of its own, a couple of seconds after startup
 //! has settled, never on the render thread, and only when the cache file says
@@ -20,12 +25,17 @@
 
 pub(crate) mod auto;
 pub(crate) mod chip;
+pub(crate) mod handoff;
 pub(crate) mod notes;
+pub(crate) mod panel;
+pub(crate) mod plans;
+pub(crate) mod terminal;
 
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
 use gitpoulpi_config::{UpdateChannel, UpdateMode};
+use gitpoulpi_hosting::updates::sources::SourceSpec;
 use gitpoulpi_hosting::updates::{CheckParams, Release, UpdateState};
 use gitpoulpi_i18n::msg::updates as msg;
 
@@ -54,14 +64,21 @@ pub(crate) enum UpdatesCommand {
     Download,
     /// `Updates: Skip this version`.
     Skip,
-    /// `Updates: Update now`: download, verify and stage the release.
+    /// `Updates: Update now`: download, verify and stage the release (a
+    /// package-manager channel runs its command).
     UpdateNow,
-    /// `Updates: Restart to update`: swap the files, restart.
+    /// `Updates: Restart to update`: hand the staged release to the updater.
     Restart,
     /// `Updates: Revert to the previous version`.
     Revert,
     /// `Release notes: Close tab`.
     CloseTab,
+    /// `Updates: Show update`: opens the update panel.
+    ShowPanel,
+    /// `Updates: Copy update command`.
+    CopyCommand,
+    /// `Updates: Run update command in a terminal`.
+    RunInTerminal,
 }
 
 #[derive(Default)]
@@ -79,8 +96,12 @@ struct Shared {
     checking: bool,
     /// A status line for the loop to pick up ([`take_message`]).
     message: Option<String>,
-    /// The self-update (slice B).
+    /// The self-update.
     install: auto::InstallState,
+    /// How GitPoulpi was installed and the machine policy; `None` until the
+    /// background read ([`load_facts`]) has finished.
+    facts: Option<plans::Facts>,
+    facts_started: bool,
 }
 
 static SHARED: Mutex<Shared> = Mutex::new(Shared {
@@ -93,6 +114,8 @@ static SHARED: Mutex<Shared> = Mutex::new(Shared {
     checking: false,
     message: None,
     install: auto::InstallState::new(),
+    facts: None,
+    facts_started: false,
 });
 
 fn shared() -> MutexGuard<'static, Shared> {
@@ -117,13 +140,74 @@ pub(crate) struct Snapshot {
     pub(crate) install: auto::InstallView,
 }
 
+/// `config.toml [updates]` as the state holds it.
+fn user_config(s: &Shared) -> gitpoulpi_config::UpdatesConfig {
+    gitpoulpi_config::UpdatesConfig {
+        mode: s.mode,
+        channel: s.channel,
+        repo: s.repo.clone(),
+    }
+}
+
+/// The plans for the release the chip announces (the running version when
+/// none is known).
+fn plans_of(s: &Shared) -> plans::Plans {
+    let to = s.known.as_ref().map_or(RUNNING, |r| r.version.as_str());
+    plans::plans(
+        s.facts.as_ref(),
+        &user_config(s),
+        to,
+        s.install.revert_to.as_deref(),
+    )
+}
+
+/// The user's settings and the machine policy combined.
+fn effective(s: &Shared) -> gitpoulpi_config::policy::EffectiveUpdates {
+    gitpoulpi_config::policy::merge(
+        &s.facts
+            .as_ref()
+            .map(|f| f.policy.clone())
+            .unwrap_or_default(),
+        &user_config(s),
+    )
+}
+
+/// What Settings needs: how this build was installed, and which of the
+/// update rows the administrator's policy sets.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub(crate) struct SettingsView {
+    /// The "Installed with" text; `None` until the install is read.
+    pub(crate) installed_with: Option<String>,
+    pub(crate) mode_locked: bool,
+    pub(crate) channel_locked: bool,
+    pub(crate) repo_locked: bool,
+}
+
+pub(crate) fn settings_view() -> SettingsView {
+    let s = shared();
+    let eff = effective(&s);
+    SettingsView {
+        installed_with: s.facts.as_ref().map(|f| plans::channel_label(f.channel())),
+        mode_locked: eff.mode_locked,
+        channel_locked: eff.release_channel_locked,
+        repo_locked: eff.repo_locked,
+    }
+}
+
 pub(crate) fn snapshot() -> Snapshot {
     let s = shared();
-    let known = (s.mode != UpdateMode::Off)
+    let eff = effective(&s);
+    // A development build never updates: its chip is the plain version, even
+    // when the cache another build wrote knows a release.
+    let dev = s
+        .facts
+        .as_ref()
+        .is_some_and(|f| f.channel() == gitpoulpi_update::channel::Channel::Dev);
+    let known = (eff.mode != UpdateMode::Off && !dev)
         .then(|| s.known.clone())
         .flatten();
     Snapshot {
-        mode: s.mode,
+        mode: eff.mode,
         available: known.clone().filter(|_| !s.skipped),
         skipped: known.filter(|_| s.skipped),
         checking: s.checking,
@@ -137,30 +221,45 @@ pub(crate) struct Whys {
     pub(crate) update_now: Option<&'static str>,
     pub(crate) restart: Option<&'static str>,
     pub(crate) revert: Option<&'static str>,
+    /// `Updates: Copy update command`.
+    pub(crate) copy: Option<&'static str>,
+    /// `Updates: Run update command in a terminal`.
+    pub(crate) terminal: Option<&'static str>,
 }
 
 /// The palette's view of the self-update commands.
 pub(crate) fn whys() -> Whys {
     use auto::Phase;
+    use gitpoulpi_update::plan::Procedure;
     let s = snapshot();
     let busy = matches!(
         s.install.phase,
         Phase::Downloading(_) | Phase::Installing(_)
     );
     let busy_why = busy.then(|| msg::WHY_UPDATE_BUSY.get());
-    let update_now = if !s.install.updatable {
-        Some(msg::WHY_NOT_UPDATABLE.get())
+    let known = s.available.is_some() || s.skipped.is_some();
+    let swap = matches!(s.install.procedure, Procedure::Swap { .. });
+    let run = matches!(s.install.procedure, Procedure::Run { .. });
+    // Why the swap-only commands do not apply: a build with no install
+    // record cannot update itself; every other channel updates its own way.
+    let manual = if matches!(s.install.procedure, Procedure::Nothing(_)) {
+        msg::WHY_NOT_UPDATABLE.get()
+    } else {
+        msg::WHY_MANUAL.get()
+    };
+    let update_now = if !(swap && s.install.updatable) && !run {
+        Some(manual)
     } else if busy {
         busy_why
-    } else if matches!(s.install.phase, Phase::Ready(_)) {
+    } else if swap && matches!(s.install.phase, Phase::Ready(_)) {
         Some(msg::WHY_UPDATE_READY.get())
-    } else if s.available.is_none() && s.skipped.is_none() {
+    } else if !known {
         Some(msg::WHY_NO_UPDATE.get())
     } else {
         None
     };
-    let restart = if !s.install.updatable {
-        Some(msg::WHY_NOT_UPDATABLE.get())
+    let restart = if !(swap && s.install.updatable) {
+        Some(manual)
     } else if busy {
         busy_why
     } else if !matches!(s.install.phase, Phase::Ready(_)) {
@@ -168,19 +267,25 @@ pub(crate) fn whys() -> Whys {
     } else {
         None
     };
-    let revert = if !s.install.updatable {
-        Some(msg::WHY_NOT_UPDATABLE.get())
+    let revert = if s.install.revert_to.is_none() {
+        Some(if swap || run {
+            msg::WHY_NO_REVERT.get()
+        } else {
+            manual
+        })
     } else if busy {
         busy_why
-    } else if s.install.revert_to.is_none() {
-        Some(msg::WHY_NO_REVERT.get())
     } else {
         None
     };
+    let commands = panel::commands(&s.install.procedure);
     Whys {
         update_now,
         restart,
         revert,
+        copy: commands.is_empty().then(|| msg::WHY_NO_COMMAND.get()),
+        terminal: (!matches!(s.install.procedure, Procedure::Show { .. }) || commands.is_empty())
+            .then(|| msg::WHY_NO_TERMINAL.get()),
     }
 }
 
@@ -198,6 +303,51 @@ pub(crate) fn configure(config: &gitpoulpi_config::Config, state_path: Option<Pa
     reload_cache(&mut s);
     auto::probe(&mut s);
     drop(s);
+    load_facts();
+    crate::redraw::poke();
+}
+
+/// Reads how GitPoulpi was installed and the machine policy, once, on a
+/// thread of its own (it reads files, writes a probe file and walks `PATH`).
+/// The result also applies the cache and starts what `auto` mode waits for;
+/// the updater's status from the last update becomes one status line.
+fn load_facts() {
+    {
+        let mut s = shared();
+        if s.facts_started {
+            return;
+        }
+        s.facts_started = true;
+    }
+    // Tests inject their own facts (`auto::set_updatable`).
+    #[cfg(not(test))]
+    {
+        let spawned = std::thread::Builder::new()
+            .name("update-facts".into())
+            .spawn(|| {
+                let facts = plans::Facts::detect();
+                let status = handoff::paths()
+                    .and_then(|p| handoff::startup_status(&p.status, RUNNING, unix_now()));
+                {
+                    let mut s = shared();
+                    auto::apply_facts(&mut s, facts);
+                    reload_cache(&mut s);
+                    if status.is_some() {
+                        s.message = status;
+                    }
+                }
+                crate::redraw::poke();
+                auto::auto_start(STARTUP_DELAY);
+            });
+        if spawned.is_err() {
+            shared().facts_started = false;
+        }
+    }
+}
+
+/// A line for the status bar, from any thread.
+pub(super) fn say(line: String) {
+    shared().message = Some(line);
     crate::redraw::poke();
 }
 
@@ -213,7 +363,10 @@ fn reload_cache(s: &mut Shared) {
         skipped: None,
         ..state.clone()
     };
-    s.known = unskipped.available(RUNNING, s.channel);
+    let eff = effective(s);
+    s.known = unskipped
+        .available(RUNNING, eff.release_channel)
+        .filter(|r| eff.pin.as_ref().map_or(true, |p| p.allows(&r.version)));
     s.skipped = s
         .known
         .as_ref()
@@ -234,7 +387,7 @@ pub(crate) fn start_background_check() {
             .state_path
             .as_deref()
             .map_or(true, |p| UpdateState::load(p).due(unix_now(), false));
-        (s.mode, due)
+        (effective(&s).mode, due)
     };
     if mode == UpdateMode::Off {
         return;
@@ -252,7 +405,7 @@ pub(crate) fn start_background_check() {
 pub(crate) fn check_now() -> Option<String> {
     {
         let mut s = shared();
-        if s.mode == UpdateMode::Off {
+        if effective(&s).mode == UpdateMode::Off {
             return Some(msg::MSG_OFF.get().to_string());
         }
         if s.checking {
@@ -309,6 +462,12 @@ pub(crate) fn run(command: UpdatesCommand) -> Option<String> {
         UpdatesCommand::UpdateNow => auto::update_now(),
         UpdatesCommand::Restart => auto::restart_now(),
         UpdatesCommand::Revert => auto::revert_now(),
+        UpdatesCommand::ShowPanel => {
+            panel::open();
+            None
+        }
+        UpdatesCommand::CopyCommand => panel::copy_command(),
+        UpdatesCommand::RunInTerminal => panel::run_in_terminal(),
         UpdatesCommand::ReleaseNotes | UpdatesCommand::CloseTab => None,
     }
 }
@@ -327,10 +486,29 @@ pub(crate) enum Outcome {
 /// One check against `base` through `transport`: the throttle, the request,
 /// the cache file. Plain inputs, so the tests drive it with a recorded
 /// transport and a temp folder.
-#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+#[cfg(test)]
 pub(crate) fn perform(
     transport: &dyn gitpoulpi_hosting::HttpTransport,
     base: &str,
+    params: &CheckParams,
+    state_path: &Path,
+    force: bool,
+    now: u64,
+) -> Outcome {
+    let spec = SourceSpec::GitHubReleases {
+        api_base: base.to_string(),
+        repo: params.repo.clone(),
+        token: params.token.clone(),
+    };
+    perform_source(transport, &spec, params, state_path, force, now)
+}
+
+/// [`perform`] against any check source (the install channel's and the
+/// policy's choice, `plans::choose_source`).
+#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+pub(crate) fn perform_source(
+    transport: &dyn gitpoulpi_hosting::HttpTransport,
+    spec: &SourceSpec,
     params: &CheckParams,
     state_path: &Path,
     force: bool,
@@ -347,7 +525,7 @@ pub(crate) fn perform(
         Ok(rt) => rt,
         Err(e) => return Outcome::Failed(e.to_string()),
     };
-    let answer = runtime.block_on(gitpoulpi_hosting::updates::check(transport, base, params));
+    let answer = runtime.block_on(spec.check(transport, params));
     let outcome = match &answer {
         Ok(_) => Outcome::Answered,
         Err(e) => Outcome::Failed(e.to_string()),
@@ -383,9 +561,22 @@ fn spawn_check(force: bool, delay: std::time::Duration) {
 
 #[cfg(feature = "hosting")]
 fn run_check(force: bool) -> Outcome {
-    let (state_path, channel, repo) = {
+    // Reads the install and the policy here when the background read has
+    // not finished (this is a background thread, blocking is fine).
+    let facts = {
+        let known = shared().facts.clone();
+        known.or_else(|| {
+            let facts = plans::Facts::detect();
+            let mut s = shared();
+            if s.facts.is_none() {
+                auto::apply_facts(&mut s, facts.clone());
+            }
+            Some(facts)
+        })
+    };
+    let (state_path, eff) = {
         let s = shared();
-        (s.state_path.clone(), s.channel, s.repo.clone())
+        (s.state_path.clone(), effective(&s))
     };
     let Some(state_path) = state_path else {
         return Outcome::NotDue;
@@ -395,21 +586,20 @@ fn run_check(force: bool) -> Outcome {
         Err(e) => return Outcome::Failed(e.to_string()),
     };
     let params = CheckParams {
-        repo,
+        repo: eff.repo.clone(),
         running: RUNNING.to_string(),
-        channel,
+        channel: eff.release_channel,
         target: gitpoulpi_config::release::host_target(),
         token: github_token(),
-        pin: None,
+        pin: eff.pin.as_ref().and_then(plans::pin_text),
     };
-    perform(
-        &transport,
-        &gitpoulpi_hosting::updates::api_base(),
-        &params,
-        &state_path,
-        force,
-        unix_now(),
-    )
+    let spec = plans::choose_source(
+        facts.as_ref(),
+        &eff,
+        gitpoulpi_hosting::updates::api_base(),
+        params.token.clone(),
+    );
+    perform_source(&transport, &spec, &params, &state_path, force, unix_now())
 }
 
 #[cfg(not(feature = "hosting"))]
@@ -473,6 +663,38 @@ pub(crate) fn running_label() -> String {
     } else {
         format!("v{RUNNING} ({GIT_HASH})")
     }
+}
+
+/// What the Settings tests pretend the machine reads as.
+#[cfg(test)]
+pub(crate) struct TestFacts {
+    pub(crate) channel: gitpoulpi_config::release::InstallChannel,
+    pub(crate) mode: Option<UpdateMode>,
+    pub(crate) release_channel: Option<UpdateChannel>,
+}
+
+/// Test seam: the machine reads as `facts` (`None`: not read yet).
+#[cfg(test)]
+pub(crate) fn set_test_facts(facts: Option<TestFacts>) {
+    use gitpoulpi_update::channel::{Channel, How, Resolved};
+    let facts = facts.map(|t| plans::Facts {
+        resolved: Resolved {
+            channel: Channel::Install(t.channel),
+            how: How::Marker,
+            dir: PathBuf::from("/opt/gp"),
+            exe_name: "gitpoulpi-tui".into(),
+            marker: None,
+        },
+        policy: gitpoulpi_config::policy::Policy {
+            mode: t.mode,
+            release_channel: t.release_channel,
+            ..Default::default()
+        },
+        apt_source_present: false,
+        aur_helper: None,
+        binstall: false,
+    });
+    auto::set_facts(&mut shared(), facts);
 }
 
 /// Serialises the tests that touch the process-wide state.

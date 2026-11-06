@@ -8,6 +8,11 @@
 //! stub of the browser), Skip this version puts the chip back and stays
 //! skipped. `updates.mode = "off"` makes no request.
 //!
+//! The security notices (`security.json` next to the release, signed): a
+//! signed notice that names this version turns the chip red and the panel
+//! lists it; an unsigned one changes nothing. The app is a debug build, which
+//! takes the test key through `GITPOULPI_TEST_RELEASE_KEY`.
+//!
 //! The binary is a copy in a temp folder next to a marker (an archive
 //! install): a build with no install record never asks anyone.
 
@@ -42,11 +47,37 @@ const BODY: &str = r###"[
 ]"###;
 
 fn serve() -> FakeReleases {
+    serve_with(None)
+}
+
+/// The security notices a fake release publishes: the file and its `.minisig`.
+struct Notices {
+    body: String,
+    signature: String,
+}
+
+/// A notice for any version below 99.0.0 (this build), signed or not.
+fn notices(signed: bool) -> Notices {
+    let body = serde_json::json!({"schema": 1, "advisories": [{
+        "id": "GPSA-2026-001", "affected": "<99.0.0", "fixed": "99.0.0",
+        "severity": "critical", "url": "https://example.test/advisories/1",
+        "summary": "a fake flaw"}]})
+    .to_string();
+    let signature = if signed {
+        common::release_signer().sign("security.json", "99.0.0", body.as_bytes())
+    } else {
+        String::new()
+    };
+    Notices { body, signature }
+}
+
+fn serve_with(notices: Option<Notices>) -> FakeReleases {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind loopback");
     let port = listener.local_addr().unwrap().port();
     let hits = Arc::new(AtomicUsize::new(0));
     let paths = Arc::new(Mutex::new(Vec::new()));
     let (h, p) = (hits.clone(), paths.clone());
+    let notices = Arc::new(notices);
     std::thread::spawn(move || {
         for stream in listener.incoming() {
             let Ok(mut stream) = stream else { continue };
@@ -60,10 +91,19 @@ fn serve() -> FakeReleases {
                 .unwrap_or("")
                 .to_string();
             h.fetch_add(1, Ordering::SeqCst);
-            p.lock().unwrap().push(path);
+            p.lock().unwrap().push(path.clone());
+            let body = match (notices.as_ref(), path.as_str()) {
+                (Some(n), p) if p.ends_with("/security.json") => n.body.as_str(),
+                (Some(n), p)
+                    if p.ends_with("/security.json.minisig") && !n.signature.is_empty() =>
+                {
+                    n.signature.as_str()
+                }
+                _ => BODY,
+            };
             let response = format!(
-                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{BODY}",
-                BODY.len()
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                body.len()
             );
             let _ = stream.write_all(response.as_bytes());
         }
@@ -100,6 +140,10 @@ fn launch(session: &str, server: &FakeReleases, mode: &str, log: &std::path::Pat
         .binary(installed_exe())
         .env("GITPOULPI_UPDATES_MODE", mode)
         .env(
+            common::RELEASE_KEY_ENV,
+            common::release_signer().public_key_text(),
+        )
+        .env(
             "GITPOULPI_UPDATE_API",
             format!("http://127.0.0.1:{}", server.port),
         )
@@ -125,8 +169,18 @@ fn a_newer_release_turns_the_chip_into_available_and_a_click_opens_its_notes() {
         s.contains("v99.0.0 available")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert_eq!(server.hits.load(Ordering::SeqCst), 1, "one request");
-    let path = server.paths.lock().unwrap()[0].clone();
+    // One request for the releases list; the security notices are asked for
+    // next to it (this fake publishes none).
+    let releases: Vec<String> = server
+        .paths
+        .lock()
+        .unwrap()
+        .iter()
+        .filter(|p| p.starts_with("/repos/"))
+        .cloned()
+        .collect();
+    assert_eq!(releases.len(), 1, "one releases request: {releases:?}");
+    let path = releases[0].clone();
     assert!(
         path.starts_with("/repos/Poulpi-Lab/GitPoulpi/releases"),
         "the releases list of the configured repository: {path}"
@@ -235,6 +289,90 @@ fn mode_off_makes_no_request_and_the_chip_stays_the_version() {
         s.contains(concat!("v", env!("CARGO_PKG_VERSION"))),
         "the running version is on the chip\n{}",
         s.text()
+    );
+    term.stop().unwrap();
+}
+
+#[test]
+fn a_signed_security_notice_turns_the_chip_red_and_the_panel_lists_it() {
+    let server = serve_with(Some(notices(true)));
+    let log = tempfile::NamedTempFile::new().unwrap();
+    let mut term = launch("pty-update-notice", &server, "notify", log.path());
+    term.wait_for("the chip warns about the notice", STEP, |s| {
+        s.contains("Security notice: this version is affected")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The notices are fetched from where a release publishes them.
+    assert!(
+        server
+            .paths
+            .lock()
+            .unwrap()
+            .iter()
+            .any(|p| p == "/Poulpi-Lab/GitPoulpi/releases/latest/download/security.json"),
+        "{:?}",
+        server.paths.lock().unwrap()
+    );
+    // The chip is red: the cell under its first letter has the danger colour.
+    let (col, row) = term
+        .screen()
+        .find("Security notice: this version")
+        .expect("the chip");
+    assert_eq!(row, 0);
+    let fg = term.screen().cell(col + 1, row).expect("a cell").fg;
+    let reddish = match fg {
+        xtask::pty::Color::Rgb(r, g, b) => {
+            r > 150 && r > g.saturating_add(40) && r > b.saturating_add(40)
+        }
+        xtask::pty::Color::Indexed(n) => matches!(n, 1 | 9 | 160..=203),
+        xtask::pty::Color::Default => false,
+    };
+    assert!(reddish, "the chip is red, not {fg:?}");
+    // A click opens the panel, which lists the notice.
+    term.click(col + 1, row).unwrap();
+    term.wait_for("the panel lists the notice", STEP, |s| {
+        s.contains("Installed with:")
+            && s.contains("Critical: a fake flaw")
+            && s.contains("Fixed in version 99.0.0.")
+            && s.contains("https://example.test/advisories/1")
+            && s.contains("Open notice")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The keyboard twin opens the link through the shared URL opener.
+    term.send_text("a").unwrap();
+    term.wait_for("the notice page was opened", STEP, |_| {
+        std::fs::read_to_string(log.path())
+            .map(|t| t.contains("https://example.test/advisories/1"))
+            .unwrap_or(false)
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.stop().unwrap();
+}
+
+#[test]
+fn an_unsigned_security_notice_is_never_shown() {
+    let server = serve_with(Some(notices(false)));
+    let log = tempfile::NamedTempFile::new().unwrap();
+    let term = launch("pty-update-notice-unsigned", &server, "notify", log.path());
+    // The release itself is announced: the check ran, and asked for the notice.
+    term.wait_for("the chip announces the release", STEP, |s| {
+        s.contains("v99.0.0 available")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.wait_for("the notices were asked for", STEP, |_| {
+        server
+            .paths
+            .lock()
+            .unwrap()
+            .iter()
+            .any(|p| p.ends_with("/security.json.minisig"))
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    std::thread::sleep(Duration::from_secs(1));
+    assert!(
+        !term.screen().contains("Security notice"),
+        "{}",
+        term.text()
     );
     term.stop().unwrap();
 }

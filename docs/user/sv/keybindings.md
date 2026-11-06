@@ -839,6 +839,7 @@ Tangenterna är standardvärdena.
 | Visa: Global aktivitetslogg | `Ctrl+N G` |
 | Hjälp: Versionsanteckningar |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Uppdateringar: Sök efter uppdateringar nu |  |

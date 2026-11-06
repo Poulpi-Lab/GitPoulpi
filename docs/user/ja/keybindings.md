@@ -803,6 +803,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 表示: グローバルアクティビティログ | `Ctrl+N G` |
 | ヘルプ: リリースノート |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | 更新: 今すぐ更新を確認 |  |

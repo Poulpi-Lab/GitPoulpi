@@ -35,8 +35,10 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
 use gitpoulpi_config::{UpdateChannel, UpdateMode};
+use gitpoulpi_hosting::updates::notices::{self, Advisory};
 use gitpoulpi_hosting::updates::sources::SourceSpec;
 use gitpoulpi_hosting::updates::{CheckParams, Release, UpdateState};
+use gitpoulpi_i18n::msg::security_notice as security_msg;
 use gitpoulpi_i18n::msg::updates as msg;
 
 /// The running version.
@@ -75,6 +77,9 @@ pub(crate) enum UpdatesCommand {
     CloseTab,
     /// `Updates: Show update`: opens the update panel.
     ShowPanel,
+    /// `Updates: Open security notice`: the link of the notice that names
+    /// this version.
+    SecurityNotice,
     /// `Updates: Copy update command`.
     CopyCommand,
     /// `Updates: Run update command in a terminal`.
@@ -93,6 +98,9 @@ struct Shared {
     known: Option<Release>,
     /// The user chose to skip `known`.
     skipped: bool,
+    /// The verified security notices that name the running version, most
+    /// severe first (from the cache file, like `known`).
+    advisories: Vec<Advisory>,
     checking: bool,
     /// A status line for the loop to pick up ([`take_message`]).
     message: Option<String>,
@@ -111,6 +119,7 @@ static SHARED: Mutex<Shared> = Mutex::new(Shared {
     state_path: None,
     known: None,
     skipped: false,
+    advisories: Vec::new(),
     checking: false,
     message: None,
     install: auto::InstallState::new(),
@@ -135,6 +144,9 @@ pub(crate) struct Snapshot {
     pub(crate) available: Option<Release>,
     /// A newer release the user skipped.
     pub(crate) skipped: Option<Release>,
+    /// Verified security notices that name this build (also on package-managed
+    /// installs; empty with update checks off and for a development build).
+    pub(crate) advisories: Vec<Advisory>,
     pub(crate) checking: bool,
     /// Whether this build may replace itself, and where the update stands.
     pub(crate) install: auto::InstallView,
@@ -217,6 +229,11 @@ pub(crate) fn snapshot() -> Snapshot {
         mode: eff.mode,
         available: known.clone().filter(|_| !s.skipped),
         skipped: known.filter(|_| s.skipped),
+        advisories: if eff.mode != UpdateMode::Off && !dev {
+            s.advisories.clone()
+        } else {
+            Vec::new()
+        },
         checking: s.checking,
         install: auto::view(&s),
     }
@@ -232,6 +249,8 @@ pub(crate) struct Whys {
     pub(crate) copy: Option<&'static str>,
     /// `Updates: Run update command in a terminal`.
     pub(crate) terminal: Option<&'static str>,
+    /// `Updates: Open Security Notice`.
+    pub(crate) notice: Option<&'static str>,
 }
 
 /// The palette's view of the self-update commands.
@@ -293,6 +312,11 @@ pub(crate) fn whys() -> Whys {
         copy: commands.is_empty().then(|| msg::WHY_NO_COMMAND.get()),
         terminal: (!matches!(s.install.procedure, Procedure::Show { .. }) || commands.is_empty())
             .then(|| msg::WHY_NO_TERMINAL.get()),
+        notice: s
+            .advisories
+            .iter()
+            .all(|a| a.safe_url().is_none())
+            .then(|| security_msg::WHY_NO_NOTICE.get()),
     }
 }
 
@@ -378,6 +402,7 @@ fn reload_cache(s: &mut Shared) {
         .known
         .as_ref()
         .is_some_and(|k| state.skipped.as_deref() == Some(k.version.as_str()));
+    s.advisories = notices::affecting(&state.advisories, RUNNING);
 }
 
 /// Starts the once-a-day check when one is due. Returns at once: the thread
@@ -460,12 +485,29 @@ pub(crate) fn download() -> Option<String> {
     })
 }
 
+/// `Updates: Open Security Notice`: the most severe notice's link in the
+/// browser (through the shared URL opener; only an `https` link is opened).
+pub(crate) fn open_security_notice() -> Option<String> {
+    let snapshot = snapshot();
+    let url = snapshot
+        .advisories
+        .iter()
+        .find_map(|a| a.safe_url().map(str::to_string))?;
+    Some(match crate::repo_menu::open_url(&url) {
+        Ok(()) => msg::msg_opened(&url),
+        Err(_) => msg::msg_open_failed(&url),
+    })
+}
+
 /// Runs the palette's update actions that need no view.
 pub(crate) fn run(command: UpdatesCommand) -> Option<String> {
     match command {
         UpdatesCommand::CheckNow => check_now(),
         UpdatesCommand::Download => download(),
         UpdatesCommand::Skip => skip(),
+        UpdatesCommand::SecurityNotice => {
+            open_security_notice().or_else(|| Some(security_msg::WHY_NO_NOTICE.get().to_string()))
+        }
         UpdatesCommand::UpdateNow => auto::update_now(),
         UpdatesCommand::Restart => auto::restart_now(),
         UpdatesCommand::Revert => auto::revert_now(),
@@ -537,7 +579,26 @@ pub(crate) fn perform_source(
         Ok(_) => Outcome::Answered,
         Err(e) => Outcome::Failed(e.to_string()),
     };
+    // The signed security notices: asked with the same throttle, nothing for
+    // a source that asks nobody (the `None` policy). Unsigned or badly signed
+    // ones are never kept: one line in the log.
+    let extra: Vec<String> = params.download_base.iter().cloned().collect();
+    let notice = spec
+        .notices_url(&params.repo, params.download_base.as_deref())
+        .filter(|url| gitpoulpi_hosting::updates::download_host_allowed_with(url, &extra))
+        .map(|url| {
+            runtime.block_on(notices::fetch(
+                transport,
+                &url,
+                &params.running,
+                &params.keys,
+            ))
+        });
+    if let Some(Err(e)) = &notice {
+        tracing::warn!(target: "updates", "security notices ignored: {e}");
+    }
     state.record(now, Some(answer));
+    state.record_notices(notice);
     if let Err(e) = state.save(state_path) {
         tracing::warn!(target: "updates", "could not save the update check: {e}");
     }
@@ -599,6 +660,8 @@ fn run_check(force: bool) -> Outcome {
         target: gitpoulpi_config::release::host_target(),
         token: github_token(),
         pin: eff.pin.as_ref().map(ToString::to_string),
+        keys: gitpoulpi_update::signing::release_keys(),
+        download_base: eff.download_base.clone(),
     };
     let spec = plans::choose_source(
         facts.as_ref(),

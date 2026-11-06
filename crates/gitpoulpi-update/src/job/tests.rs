@@ -37,6 +37,7 @@ fn a_job_round_trips() {
         Staged::Archive {
             archive: abs("/home/u/.cache/gp/gitpoulpi-1.4.2.zip"),
             sha256_url: "https://example.test/a.zip.sha256".into(),
+            minisig_url: "https://example.test/a.zip.minisig".into(),
         },
     ] {
         let j = UpdateJob { staged, ..job() };
@@ -63,12 +64,32 @@ fn the_wire_format_is_the_documented_one() {
         staged: Staged::Archive {
             archive: PathBuf::from("/c/a.zip"),
             sha256_url: "u".into(),
+            minisig_url: "m".into(),
         },
         ..job()
     };
     let v: serde_json::Value = serde_json::from_str(&archive.render()).unwrap();
     assert_eq!(v["staged"]["archive"], "/c/a.zip");
     assert_eq!(v["staged"]["sha256_url"], "u");
+    assert_eq!(v["staged"]["minisig_url"], "m");
+}
+
+#[test]
+fn a_staged_archive_job_without_a_signature_url_is_refused() {
+    let archive = UpdateJob {
+        staged: Staged::Archive {
+            archive: PathBuf::from("/c/a.zip"),
+            sha256_url: "u".into(),
+            minisig_url: "m".into(),
+        },
+        ..job()
+    };
+    let mut v: serde_json::Value = serde_json::from_str(&archive.render()).unwrap();
+    v["staged"].as_object_mut().unwrap().remove("minisig_url");
+    assert!(matches!(
+        UpdateJob::parse(&v.to_string()),
+        Err(JobError::Invalid(_))
+    ));
 }
 
 #[test]

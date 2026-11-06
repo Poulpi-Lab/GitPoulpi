@@ -837,6 +837,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | View: Global Activity Log | `Ctrl+N G` |
 | Help: Release Notes |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Updates: Check for Updates Now |  |

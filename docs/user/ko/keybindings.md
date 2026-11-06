@@ -830,6 +830,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 보기: 전체 활동 로그 | `Ctrl+N G` |
 | 도움말: 릴리스 노트 |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | 업데이트: 지금 업데이트 확인 |  |

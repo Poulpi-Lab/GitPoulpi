@@ -3,8 +3,10 @@
 //!
 //! Traps:
 //! - The archive a user-level process staged is never trusted by the
-//!   elevated worker: it downloads the `.sha256` itself and compares, before
-//!   a single file is touched.
+//!   elevated worker: it downloads the `.minisig` and the `.sha256` itself,
+//!   checks the signature against the compiled-in release keys (the trusted
+//!   comment must name this archive and the job's version) and compares the
+//!   checksum, before a single file is touched.
 //! - A swap is verified by running `<install_dir>/gitpoulpi --version`; a
 //!   build that does not report the target version is rolled back.
 //! - The Inno `DisplayVersion` follows every swap and every rollback, or
@@ -18,6 +20,7 @@ use gitpoulpi_update::channel::{Channel, Hive};
 use gitpoulpi_update::fetch;
 use gitpoulpi_update::install::{self, Replace};
 use gitpoulpi_update::job::{Action, Phase, Staged, UpdateJob};
+use gitpoulpi_update::signing;
 use gitpoulpi_update::{managed_names, UpdateError};
 
 use crate::env::Env;
@@ -51,19 +54,35 @@ fn stage_archive(
     job: &UpdateJob,
     archive: &Path,
     sha256_url: &str,
+    minisig_url: &str,
     extra_hosts: &[String],
 ) -> Result<(), String> {
     let name = archive
         .file_name()
         .and_then(|n| n.to_str())
         .unwrap_or_default();
-    if !download_host_allowed_with(sha256_url, extra_hosts) {
-        return Err(format!("{sha256_url} is not an allowed download host"));
+    for url in [sha256_url, minisig_url] {
+        if !download_host_allowed_with(url, extra_hosts) {
+            return Err(format!("{url} is not an allowed download host"));
+        }
     }
     let bytes = env
         .transfer
         .read_file(archive)
         .map_err(|e| format!("could not read {}: {e}", archive.display()))?;
+    // The signature first: it is what proves the archive is the release's.
+    let sig = env
+        .transfer
+        .get(minisig_url)
+        .map_err(|_| UpdateError::NoSignature.to_string())?;
+    signing::verify(
+        &bytes,
+        &String::from_utf8_lossy(&sig),
+        name,
+        &job.to_version,
+        &env.keys,
+    )
+    .map_err(|e| e.to_string())?;
     let text = env
         .transfer
         .get(sha256_url)
@@ -119,9 +138,10 @@ pub fn swap(
         if let Staged::Archive {
             archive,
             sha256_url,
+            minisig_url,
         } = &job.staged
         {
-            if let Err(e) = stage_archive(env, job, archive, sha256_url, extra_hosts) {
+            if let Err(e) = stage_archive(env, job, archive, sha256_url, minisig_url, extra_hosts) {
                 return Outcome::Failed(format!("{e}; nothing was changed"));
             }
         }

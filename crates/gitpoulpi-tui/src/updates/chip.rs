@@ -4,6 +4,12 @@
 //! then (its Release notes button leads to the tab), else the Release notes tab
 //! (as does the palette's `Help: Release notes`).
 //!
+//! A verified security notice that names the running version turns the chip
+//! red ("Security notice: this version is affected") on every install channel,
+//! package-managed ones included; the click opens the same panel, which lists
+//! the notices. A staged update ("Restart to update") keeps the chip: the
+//! restart is the fix.
+//!
 //! The rect comes out of the paint (`paint`), like the Activity button's: one
 //! walk, so a click never lands beside the glyphs.
 
@@ -14,6 +20,7 @@ use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 
 use crate::{dialog_kit, display_width, th};
+use gitpoulpi_i18n::msg::security_notice as security_msg;
 use gitpoulpi_i18n::msg::updates as msg;
 
 thread_local! {
@@ -22,11 +29,21 @@ thread_local! {
     static POINTER: Cell<Option<(u16, u16)>> = const { Cell::new(None) };
 }
 
+/// Whether the chip warns about a security notice for this build.
+pub(crate) fn is_security() -> bool {
+    let snapshot = super::snapshot();
+    !snapshot.advisories.is_empty()
+        && !matches!(snapshot.install.phase, super::auto::Phase::Ready(_))
+}
+
 /// What the chip says now.
 pub(crate) fn text() -> String {
     let snapshot = super::snapshot();
     if matches!(snapshot.install.phase, super::auto::Phase::Ready(_)) {
         return msg::CHIP_RESTART.get().to_string();
+    }
+    if !snapshot.advisories.is_empty() {
+        return security_msg::CHIP.get().to_string();
     }
     match snapshot.available {
         Some(release) => msg::chip_available(&release.version),
@@ -44,7 +61,9 @@ pub(crate) fn is_available() -> bool {
 /// update is under way or failed); otherwise it opens the Release notes tab.
 pub(crate) fn opens_panel() -> bool {
     let snapshot = super::snapshot();
-    snapshot.available.is_some() || !matches!(snapshot.install.phase, super::auto::Phase::Idle)
+    snapshot.available.is_some()
+        || !snapshot.advisories.is_empty()
+        || !matches!(snapshot.install.phase, super::auto::Phase::Idle)
 }
 
 /// Cells the chip takes (a space either side).
@@ -57,6 +76,9 @@ fn short_text() -> String {
     let snapshot = super::snapshot();
     if matches!(snapshot.install.phase, super::auto::Phase::Ready(_)) {
         return msg::CHIP_RESTART.get().to_string();
+    }
+    if !snapshot.advisories.is_empty() {
+        return security_msg::CHIP_SHORT.get().to_string();
     }
     match snapshot.available {
         Some(release) => msg::chip_available(&release.version),
@@ -93,7 +115,11 @@ pub(crate) fn paint(buf: &mut Buffer, x: u16, y: u16, reserved: u16) {
     let hovered = POINTER
         .get()
         .is_some_and(|(x, y)| rect.contains((x, y).into()));
-    let base = if is_available() {
+    let base = if is_security() {
+        Style::default()
+            .fg(th().status.danger)
+            .add_modifier(Modifier::BOLD)
+    } else if is_available() {
         Style::default()
             .fg(th().ui.accent)
             .add_modifier(Modifier::BOLD)

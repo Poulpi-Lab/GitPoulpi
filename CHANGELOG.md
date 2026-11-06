@@ -11,6 +11,9 @@ surfaces may still change between minor versions).
 - Log columns: a **Scroll sideways** layout (`ui.log_columns_layout = "scroll"`; the column chooser, Settings > Log & graph, the palette, or `s` while a column is picked). Columns keep their widths (Message too), nothing is given up in a narrow window, and the table scrolls sideways with `Shift+Left/Right`, the horizontal wheel or Shift+wheel, and a bar on the bottom border. Each layout keeps its own widths (`ui.log_column_widths_scroll`).
 - Log columns: double-click a column's boundary to fit the column on its left to its content (keyboard: `=` on the picked column, `+` for all; palette and chooser rows too). The last column has a resize grip on its own last cell, and the SHA column is one cell wider by default so the grip never covers a digit.
 
+- Updates: every release file is signed with the project's minisign key and GitPoulpi installs an update only when the signature verifies (the elevated Windows step checks it again); a mirror copies the `.minisig` files and `latest.json` is verified too. Releases published before signing cannot be installed through the updater.
+- Updates: security notices. The daily check also reads the signed `security.json`; a notice that names the running version turns the version chip red ("Security notice: this version is affected") on every install channel, and the update panel lists its severity, summary, fixed version and link.
+
 ### Changed
 - The Radar opens with `Alt+R` by default (was `Alt+L`). Inside the merge editor and the commit message composer `Alt+R` keeps its own action (reset all, insert issue reference); the Radar stays reachable through the palette there. A custom `global.radar` binding is kept.
 

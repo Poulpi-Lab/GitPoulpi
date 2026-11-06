@@ -8847,3 +8847,37 @@ kv_expires = "Expires"
 excess_line = "This token has more rights than GitPoulpi needs:"
 # context: yellow advice on the connected card, under the warning about extra rights
 prefer_fine_grained = "Prefer a fine-grained token with an expiry date"
+
+[security_notice]
+# context: title bar chip, in red, when a security notice published by the project names the running version; the chip opens the update panel
+chip = "Avis de sécurité : cette version est concernée"
+# context: shorter form of the same chip, used when the title bar is too narrow for the long one
+chip_short = "Avis de sécurité"
+# context: heading in the update panel above the security notices that name the running version
+panel_heading = "Avis de sécurité : cette version est concernée"
+# context: severity word of a security notice (lowest level), shown before the summary in the update panel
+sev_low = "Faible"
+# context: severity word of a security notice (second level)
+sev_medium = "Moyenne"
+# context: severity word of a security notice (third level)
+sev_high = "Élevée"
+# context: severity word of a security notice (highest level)
+sev_critical = "Critique"
+# context: one security notice in the update panel; {severity} is Low, Medium, High or Critical, {summary} one sentence from the notice
+advisory_line = "{severity} : {summary}"
+# context: line under a security notice in the update panel; {version} is like 1.4.3
+fixed_in = "Corrigé dans la version {version}."
+# context: line under a security notice in the update panel when no fixed version is published yet
+no_fix = "Aucune version corrigée n'est encore publiée."
+# context: line under a security notice in the update panel; {url} is a web address
+link_line = "Plus d'informations : {url}"
+# context: line in the update panel under a security notice when GitPoulpi was installed by a package manager and cannot update itself
+package_manager = "Mettez à jour avec votre gestionnaire de paquets."
+# context: button in the update panel: opens the web page of the security notice in the browser
+btn_open = "Ouvrir l'avis"
+# context: command palette entry: opens the web page of the security notice that names the running version
+palette_open = "Mises à jour : Ouvrir l'avis de sécurité"
+# context: palette and status line: why Open Security Notice does nothing
+why_no_notice = "aucun avis de sécurité avec un lien ne concerne cette version"
+# context: footer hint of the update panel when a security notice is listed; the letters are the keys of the buttons
+panel_hint = "u mettre à jour  c copier  t terminal  v revenir  n notes  a avis  s ignorer  r vérifier  Échap fermer"

@@ -52,6 +52,9 @@ fn serve(assets: bool) -> u16 {
     entries.push(marker_entry(NEW_VERSION, &target));
     let bytes = write_tar_gz(&release::package_stem(NEW_VERSION, &target), &entries).unwrap();
     let sum = checksum_line(&sha256_hex(&bytes), &name).into_bytes();
+    let sig = common::release_signer()
+        .sign(&name, NEW_VERSION, &bytes)
+        .into_bytes();
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind loopback");
     let port = listener.local_addr().unwrap().port();
     let json = serde_json::json!([{
@@ -69,7 +72,13 @@ fn serve(assets: bool) -> u16 {
     std::thread::spawn(move || {
         for stream in listener.incoming() {
             let Ok(mut stream) = stream else { continue };
-            let (json, bytes, sum, name) = (json.clone(), bytes.clone(), sum.clone(), name.clone());
+            let (json, bytes, sum, sig, name) = (
+                json.clone(),
+                bytes.clone(),
+                sum.clone(),
+                sig.clone(),
+                name.clone(),
+            );
             std::thread::spawn(move || {
                 let mut buf = [0u8; 4096];
                 let n = stream.read(&mut buf).unwrap_or(0);
@@ -84,6 +93,8 @@ fn serve(assets: bool) -> u16 {
                     bytes
                 } else if path == format!("/dl/{name}.sha256") {
                     sum
+                } else if path == format!("/dl/{name}.minisig") {
+                    sig
                 } else {
                     json.into_bytes()
                 };
@@ -138,7 +149,11 @@ fn launch(session: &str, port: u16, exe: &Path, envs: &[(&str, &Path)]) -> Run {
         .binary(exe)
         .env("GITPOULPI_UPDATES_MODE", "notify")
         .env("GITPOULPI_UPDATE_API", format!("http://127.0.0.1:{port}"))
-        .env("GITPOULPI_CLIPBOARD", "memory");
+        .env("GITPOULPI_CLIPBOARD", "memory")
+        .env(
+            common::RELEASE_KEY_ENV,
+            common::release_signer().public_key_text(),
+        );
     for (key, value) in envs {
         launch = launch.env(key, value);
     }

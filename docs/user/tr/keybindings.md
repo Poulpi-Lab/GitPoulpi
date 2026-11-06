@@ -837,6 +837,7 @@ Tuşlar varsayılanlardır.
 | Görünüm: Genel Etkinlik Günlüğü | `Ctrl+N G` |
 | Yardım: Sürüm Notları |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Güncellemeler: Şimdi Denetle |  |

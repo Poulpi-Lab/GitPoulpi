@@ -16,6 +16,8 @@
 //! - A private repository answers 404 without a token; that is a normal
 //!   "no answer", never a user-facing error (the caller logs one line).
 
+pub mod notices;
+pub mod signing;
 pub mod sources;
 
 use std::cmp::Ordering;
@@ -347,6 +349,12 @@ pub struct CheckParams {
     /// The administrator's ceiling: `"1.4"` = any 1.4.x, `"1.4.2"` = at most
     /// 1.4.2 (see [`within_pin`]).
     pub pin: Option<String>,
+    /// The release signing keys a manifest is verified against (production:
+    /// `gitpoulpi_update::signing::release_keys()`). Empty accepts nothing.
+    pub keys: Vec<signing::PublicKey>,
+    /// The policy's `download_base` mirror, where the security notices of a
+    /// source that has no release page of its own are looked for.
+    pub download_base: Option<String>,
 }
 
 /// Asks GitHub (the `base` API root) for the releases and returns the newer
@@ -383,6 +391,12 @@ pub struct UpdateState {
     /// The version the user chose to skip: no chip for it, a newer one shows.
     #[serde(default)]
     pub skipped: Option<String>,
+    /// The security notices of the last check whose signature held (every
+    /// notice, not only the ones that name this build: the running version
+    /// is compared when they are read). Kept like `latest`, so the chip needs
+    /// no request.
+    #[serde(default)]
+    pub advisories: Vec<notices::Advisory>,
 }
 
 impl UpdateState {
@@ -416,6 +430,15 @@ impl UpdateState {
         let latest = self.latest.as_ref()?;
         let newest = newest_after(std::slice::from_ref(latest), running, channel)?;
         (self.skipped.as_deref() != Some(newest.version.as_str())).then_some(newest)
+    }
+
+    /// Records the security notices a check read: they replace the kept ones
+    /// only when the file was fetched and its signature held (a failed or
+    /// untrusted answer keeps what was known).
+    pub fn record_notices(&mut self, answer: Option<Result<Vec<notices::Advisory>>>) {
+        if let Some(Ok(list)) = answer {
+            self.advisories = list;
+        }
     }
 
     /// Records an attempt: the answer replaces the kept release only when the
@@ -463,6 +486,8 @@ mod tests {
             target: TARGET.into(),
             token: None,
             pin: None,
+            keys: Vec::new(),
+            download_base: None,
         }
     }
 
@@ -645,6 +670,14 @@ mod tests {
             checked_at: 42,
             latest: None,
             skipped: Some("0.2.0".into()),
+            advisories: vec![notices::Advisory {
+                id: "GPSA-2026-001".into(),
+                affected: "<0.3.0".into(),
+                fixed: Some("0.3.0".into()),
+                severity: "high".into(),
+                url: "https://example.test/a".into(),
+                summary: "s".into(),
+            }],
         };
         s.save(&path).unwrap();
         assert_eq!(UpdateState::load(&path), s);

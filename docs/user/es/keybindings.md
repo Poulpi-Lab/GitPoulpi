@@ -842,6 +842,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Ver: Registro de actividad global | `Ctrl+N G` |
 | Ayuda: Notas de la versión |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Actualizaciones: Buscar actualizaciones ahora |  |

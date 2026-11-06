@@ -836,6 +836,7 @@ zastosowania. Klawisze są domyślne.
 | Widok: Globalny dziennik aktywności | `Ctrl+N G` |
 | Pomoc: Informacje o wersji |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Aktualizacje: Sprawdź aktualizacje teraz |  |

@@ -841,6 +841,7 @@ applicano. I tasti sono quelli predefiniti.
 | Vista: Registro attività globale | `Ctrl+N G` |
 | Aiuto: Note di rilascio |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Aggiornamenti: Cerca aggiornamenti ora |  |

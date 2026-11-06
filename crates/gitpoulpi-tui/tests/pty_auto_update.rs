@@ -83,11 +83,32 @@ fn archive(version: &str, target: &str) -> Vec<u8> {
     write_tar_gz(&release::package_stem(version, target), &entries).unwrap()
 }
 
-/// `tamper`: serve a checksum that does not match the archive.
-fn serve(tamper: bool) -> FakeHost {
+/// What the fake release carries wrong, if anything.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Fault {
+    None,
+    /// A checksum that does not match the archive.
+    Checksum,
+    /// No `.minisig` for the archive at all.
+    Unsigned,
+    /// A signature made by a key the app does not trust.
+    WrongKey,
+}
+
+fn serve(fault: Fault) -> FakeHost {
+    let tamper = fault == Fault::Checksum;
     let target = release::host_target();
     let name = release::archive_name(NEW_VERSION, &target);
     let bytes = archive(NEW_VERSION, &target);
+    let signature = match fault {
+        Fault::Unsigned => Vec::new(),
+        Fault::WrongKey => gitpoulpi_testkit::signing::TestSigner::new()
+            .sign(&name, NEW_VERSION, &bytes)
+            .into_bytes(),
+        _ => common::release_signer()
+            .sign(&name, NEW_VERSION, &bytes)
+            .into_bytes(),
+    };
     let sum_hash = if tamper {
         sha256_hex(b"not the archive")
     } else {
@@ -100,6 +121,7 @@ fn serve(tamper: bool) -> FakeHost {
     let counter = downloads.clone();
     let files: Arc<Mutex<Files>> = Arc::new(Mutex::new(vec![
         (format!("/dl/{name}.sha256"), sum),
+        (format!("/dl/{name}.minisig"), signature),
         (format!("/dl/{name}"), bytes),
     ]));
     let json = serde_json::json!([{
@@ -107,7 +129,7 @@ fn serve(tamper: bool) -> FakeHost {
         "body": "## What is new\n- the self-update",
         "html_url": "https://example.test/releases/v99.0.0",
         "assets": [
-            {"name": name, "size": files.lock().unwrap()[1].1.len(),
+            {"name": name, "size": files.lock().unwrap()[2].1.len(),
              "browser_download_url": format!("http://127.0.0.1:{port}/dl/{name}")},
             {"name": format!("{name}.sha256"), "size": 90,
              "browser_download_url": format!("http://127.0.0.1:{port}/dl/{name}.sha256")}
@@ -196,6 +218,10 @@ fn launch_with(
         .binary(exe)
         .env("GITPOULPI_UPDATES_MODE", mode)
         .env(
+            common::RELEASE_KEY_ENV,
+            common::release_signer().public_key_text(),
+        )
+        .env(
             "GITPOULPI_UPDATE_API",
             format!("http://127.0.0.1:{}", host.port),
         );
@@ -235,7 +261,7 @@ fn click_body_text(term: &mut Terminal, text: &str) {
 
 #[test]
 fn update_now_downloads_stages_offers_the_restart_and_the_restart_hands_the_job_to_the_updater() {
-    let host = serve(false);
+    let host = serve(Fault::None);
     let (dir, exe) = install_dir(true);
     let record = tempfile::tempdir().unwrap();
     let stub = updater_stub(record.path());
@@ -271,9 +297,9 @@ fn update_now_downloads_stages_offers_the_restart_and_the_restart_hands_the_job_
         "{}",
         term.text()
     );
-    // Both the checksum and the archive were fetched; the files are staged
-    // beside the old ones, and the running binary is untouched.
-    assert_eq!(host.downloads.load(Ordering::SeqCst), 2);
+    // The checksum, the signature and the archive were fetched; the files are
+    // staged beside the old ones, and the running binary is untouched.
+    assert_eq!(host.downloads.load(Ordering::SeqCst), 3);
     assert!(dir.path().join("gitpoulpi-tui.new").exists());
     assert!(dir.path().join(format!("{MARKER_FILE}.new")).exists());
     assert_ne!(
@@ -301,7 +327,7 @@ fn update_now_downloads_stages_offers_the_restart_and_the_restart_hands_the_job_
 
 #[test]
 fn a_checksum_mismatch_is_refused_and_nothing_is_staged() {
-    let host = serve(true);
+    let host = serve(Fault::Checksum);
     let (dir, exe) = install_dir(true);
     let mut term = launch("pty-auto-update-bad", &host, &exe, "notify");
     term.wait_for("the chip", STEP, |s| s.contains("v99.0.0 available"))
@@ -324,8 +350,36 @@ fn a_checksum_mismatch_is_refused_and_nothing_is_staged() {
 }
 
 #[test]
+fn a_release_without_a_valid_signature_is_refused_and_nothing_is_staged() {
+    for (fault, session) in [
+        (Fault::Unsigned, "pty-auto-update-unsigned"),
+        (Fault::WrongKey, "pty-auto-update-wrong-key"),
+    ] {
+        let host = serve(fault);
+        let (dir, exe) = install_dir(true);
+        let mut term = launch(session, &host, &exe, "notify");
+        term.wait_for("the chip", STEP, |s| s.contains("v99.0.0 available"))
+            .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+        term.send_keys("C-p").unwrap();
+        term.send_text("Update now").unwrap();
+        term.wait_for("the palette lists the command", STEP, |s| {
+            s.contains("Updates: Update Now")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+        term.send_keys("Enter").unwrap();
+        term.wait_for("the signature refusal is shown", STEP, |s| {
+            s.contains("signature")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+        assert!(!dir.path().join("gitpoulpi-tui.new").exists());
+        assert!(!term.screen().contains("Restart to update"));
+        term.stop().unwrap();
+    }
+}
+
+#[test]
 fn a_build_without_the_marker_never_asks_never_downloads_and_shows_only_its_version() {
-    let host = serve(false);
+    let host = serve(Fault::None);
     // The plain cargo binary: no `.gitpoulpi-dist` next to it.
     let term = launch(
         "pty-auto-update-dev",
@@ -349,7 +403,7 @@ fn a_build_without_the_marker_never_asks_never_downloads_and_shows_only_its_vers
 
 #[test]
 fn auto_mode_downloads_by_itself_and_waits_for_the_restart() {
-    let host = serve(false);
+    let host = serve(Fault::None);
     let (dir, exe) = install_dir(true);
     let term = launch("pty-auto-update-auto", &host, &exe, "auto");
     term.wait_for("the chip asks for the restart", STEP, |s| {
@@ -365,7 +419,7 @@ fn auto_mode_downloads_by_itself_and_waits_for_the_restart() {
 
 #[test]
 fn revert_hands_a_revert_job_to_the_updater_and_swaps_nothing_itself() {
-    let host = serve(false);
+    let host = serve(Fault::None);
     let (dir, exe) = install_dir(true);
     // As after an update: the previous version's files wait as `.old`.
     let old = dir.path().join("gitpoulpi-tui.old");

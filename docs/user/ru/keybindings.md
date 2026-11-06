@@ -843,6 +843,7 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Вид: Общий журнал активности | `Ctrl+N G` |
 | Справка: заметки о выпуске |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Обновления: проверить наличие сейчас |  |

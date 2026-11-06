@@ -837,6 +837,7 @@ Klávesy jsou výchozí.
 | Zobrazení: Globální protokol aktivity | `Ctrl+N G` |
 | Nápověda: Poznámky k vydání |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Aktualizace: Zkontrolovat aktualizace nyní |  |

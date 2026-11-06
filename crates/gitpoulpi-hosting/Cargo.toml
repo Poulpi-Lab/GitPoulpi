@@ -47,6 +47,9 @@ gitpoulpi-core.workspace = true
 gitpoulpi-secrets.workspace = true
 async-trait.workspace = true
 sha2.workspace = true
+minisign-verify.workspace = true
+# Security notices: the `affected` ranges are semver requirements.
+semver = "1"
 toml.workspace = true
 url.workspace = true
 serde.workspace = true

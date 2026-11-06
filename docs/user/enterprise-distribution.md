@@ -200,7 +200,7 @@ Set-ItemProperty HKLM:\SOFTWARE\Policies\GitPoulpi\Updates -Name pin -Value 1.4
 
 ### latest.json and download_base: a mirror of the release
 
-Copy a release's files (the archives, the setup, the `.sha256` files and `latest.json`) into one folder of an internal web server, keeping the names. `latest.json` is attached to every release:
+Copy a release's files (the archives, the setup, the `.sha256` files, `latest.json`, **every `.minisig` signature file** and `security.json`) into one folder of an internal web server, keeping the names. `latest.json` is attached to every release:
 
 ```json
 {
@@ -219,7 +219,15 @@ check_url = "https://mirror.example/gitpoulpi/latest.json"
 download_base = "https://mirror.example/gitpoulpi/"
 ```
 
-Archive and installer channels check the manifest and download from `download_base`, with the same hash verification as from GitHub. A mirror only has to copy files; it needs no API.
+Archive and installer channels check the manifest and download from `download_base`, with the same verification as from GitHub. A mirror only has to copy files; it needs no API.
+
+The signatures travel with the files, so a mirror cannot weaken them:
+
+- `latest.json` is trusted only when `latest.json.minisig` sits next to it and verifies against the project key built into GitPoulpi. A manifest without its signature, or edited after it was signed, is refused (the hashes inside it are what the downloads are checked against).
+- Each archive is downloaded together with `<archive>.minisig` from the same host and is installed only when that signature verifies and names this file and this version. A mirror that copied the archive but not its `.minisig` makes the update fail with "no signature", and nothing is changed.
+- `security.json` (the security notices, see [Updates](updates.md#security-notices)) and `security.json.minisig` are looked for next to the manifest. A mirror that does not copy them simply shows no notices.
+
+Copy the files unchanged: a signature covers the exact bytes. The security notices are republished for the latest release without a new build, so refresh `latest.json`, `security.json` and their `.minisig` files from the release page whenever you refresh the mirror.
 
 ## Deploying a default config.toml
 

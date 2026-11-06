@@ -95,6 +95,11 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         }
         PaletteCommand::AboutGitPoulpi => crate::about::open(),
         PaletteCommand::AboutLicenses => crate::about::open_licenses(),
+        PaletteCommand::TrustReview => {
+            if !crate::trust_dialog::open_review() {
+                *cx.last_message = Some(gitpoulpi_i18n::msg::trust_dialog::NONE_WAITING.get().into());
+            }
+        }
         PaletteCommand::OpenActivityLog => crate::activity_log::open_panel(),
         PaletteCommand::OpenGlobalLog => crate::activity_log::open_global_panel(),
         PaletteCommand::Jobs(cmd) => crate::jobs_ui::run(cmd),

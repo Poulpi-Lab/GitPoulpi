@@ -46,6 +46,8 @@ pub(crate) struct IntegrationsPage {
 
 impl IntegrationsPage {
     pub(crate) fn detach_pending(&mut self) {}
+    pub(crate) fn begin_retoken(&mut self, _cfg: &Config, _id: &str) {}
+    pub(crate) fn forget_trust_cache(&mut self) {}
     pub(crate) fn combo_open(&self) -> bool {
         false
     }

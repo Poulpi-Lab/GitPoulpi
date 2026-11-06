@@ -464,6 +464,9 @@ pub(crate) enum PaletteCommand {
     AboutGitPoulpi,
     /// `Help: Licenses and Credits`: the About window on its Licenses view.
     AboutLicenses,
+    /// `Integrations: Review security check`: the dialog that asks about an
+    /// integration whose address, account or certificate changed.
+    TrustReview,
     /// `View: Activity Log`: the window the status bar's Activity button opens.
     OpenActivityLog,
     /// `View: Global Activity Log`: the Activity Log's Global tab, reachable
@@ -870,7 +873,9 @@ pub(crate) const fn command_requires(
         PaletteCommand::WorkspaceSearch => Some(crate::build_features::Feature::GlobalSearch),
         PaletteCommand::Workspace(_) => Some(crate::build_features::Feature::Workspaces),
         PaletteCommand::Rewrite(_) => Some(crate::build_features::Feature::HistoryRewrite),
-        PaletteCommand::Hosting(_) | PaletteCommand::StartPullRequestFromSelectedBranch => {
+        PaletteCommand::Hosting(_)
+        | PaletteCommand::TrustReview
+        | PaletteCommand::StartPullRequestFromSelectedBranch => {
             Some(crate::build_features::Feature::Hosting)
         }
         PaletteCommand::CreateWorktreeFromSelectedRef

@@ -461,6 +461,9 @@ async fn create(
     integration: Integration,
     req: NewPullRequest,
 ) -> Result<CreatedPullRequest, String> {
+    gitpoulpi_hosting::TrustGate::ambient()
+        .preflight(&integration)
+        .map_err(|e| crate::hosting_task::error_text(&e))?;
     let token = DefaultTokenSource::for_integrations(&load_integrations())
         .token(&integration)
         .map_err(|e| crate::hosting_task::error_text(&e))?;

@@ -15,6 +15,7 @@ mod providers;
 mod radar;
 mod render;
 mod scroll;
+mod security;
 mod ssh;
 mod wrap;
 

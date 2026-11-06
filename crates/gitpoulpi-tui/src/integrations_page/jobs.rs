@@ -74,16 +74,39 @@ impl IntegrationsPage {
                 Integration::new(id, kind, url.clone())
             }
         };
+        // A changed address is only accepted together with a token typed for
+        // it: the saved one must never travel to the new address (the
+        // security check refuses that, and so does this form).
+        let moved = editing.is_some()
+            && !kind.capabilities().local_folder
+            && gitpoulpi_hosting::trust::integration_origin(&integration).ok()
+                != gitpoulpi_hosting::trust::normalize(&url);
+        if moved && typed.is_empty() {
+            self.error = Some(tmsg::URL_CHANGED_NEEDS_TOKEN.get().into());
+            return;
+        }
         integration.url = url;
         integration.account = self.account_text();
         self.error = None;
+        let trust = TrustOptions {
+            // A profile that was never connected has no token bound to its
+            // old address: the form's address is the one to use.
+            trust_new_origin: moved || integration.user.is_none(),
+            allow_plain_http: self.plain_http && self.plain_http_offered(),
+            strict: self.strict && self.strict_offered(),
+        };
 
         let (tx, rx) = mpsc::channel();
         let tokens = Arc::clone(env.tokens);
         let transport = self.transport.clone();
         let job = integration.clone();
+        let paths = self.trust_paths.clone();
         std::thread::spawn(move || {
-            let _ = tx.send_notify(run_check(&tokens, job, typed, transport));
+            let gate = match paths {
+                Some(p) => gitpoulpi_hosting::TrustGate::load(&p),
+                None => gitpoulpi_hosting::TrustGate::ambient(),
+            };
+            let _ = tx.send_notify(run_check(&tokens, job, typed, transport, trust, &gate));
         });
         self.pending = Some(Pending {
             rx,
@@ -107,6 +130,19 @@ impl IntegrationsPage {
 
     /// Applies the background check's answer, if it has arrived.
     pub(crate) fn poll(&mut self, env: &mut Env) {
+        // The security check's Disconnect rewrote the profile list on a
+        // worker thread: read it again (nothing is being edited that it
+        // could clobber, the page's own state is rebuilt from the file).
+        if crate::trust_dialog::take_changed() {
+            if let Some(path) = env.config_path.as_deref() {
+                if let Ok(fresh) = Config::load(path) {
+                    env.config.integrations = fresh.integrations;
+                    self.pinned.clear();
+                    self.rights.clear();
+                    self.reset_view(env.config);
+                }
+            }
+        }
         self.flush_radar(env);
         self.poll_ssh(env);
         self.pump_picker();
@@ -147,6 +183,13 @@ impl IntegrationsPage {
                     self.warnings
                         .insert(integration.id.clone(), check.missing_scopes.clone());
                 }
+                let rights = Rights::of(&check);
+                if rights.is_empty() {
+                    self.rights.remove(&integration.id);
+                } else {
+                    self.rights.insert(integration.id.clone(), rights);
+                }
+                self.pinned.remove(&integration.id);
                 *env.message = Some(if integration.kind.capabilities().local_folder {
                     gitpoulpi_i18n::msg::local_issues::folder_added(&integration.url)
                 } else {
@@ -174,6 +217,19 @@ impl IntegrationsPage {
         }
     }
 
+    /// Drops the trust record and the caches filled from `integration`.
+    fn forget_trust(&mut self, integration: &Integration) {
+        let paths = self
+            .trust_paths
+            .clone()
+            .or_else(gitpoulpi_config::ConfigPaths::discover);
+        if let Some(paths) = paths {
+            gitpoulpi_hosting::trust::forget(&paths, integration);
+        }
+        self.pinned.remove(&integration.id);
+        self.rights.remove(&integration.id);
+    }
+
     pub(super) fn disconnect(&mut self, env: &mut Env) {
         let Some(i) = self.selected_profile(env.config) else {
             return;
@@ -182,8 +238,12 @@ impl IntegrationsPage {
             let e = &env.config.integrations[i];
             (e.id.clone(), e.token_ref.clone())
         };
+        let before = env.config.integrations[i].clone();
         match env.tokens.delete(&token_ref) {
             Ok(()) => {
+                // Disconnecting forgets what was trusted for the profile too:
+                // a later connection starts from nothing.
+                self.forget_trust(&before);
                 env.config.integrations[i].user = None;
                 env.presence.insert(token_ref, Some(false));
                 self.warnings.remove(&id);
@@ -208,6 +268,7 @@ impl IntegrationsPage {
         // The token outlives the config entry unless it is removed here,
         // and an orphaned secret in a keychain can no longer be seen.
         let _ = env.tokens.delete(&removed.token_ref);
+        self.forget_trust(&removed);
         env.presence.remove(&removed.token_ref);
         self.warnings.remove(&removed.id);
         Self::write_config(env);
@@ -436,11 +497,15 @@ impl IntegrationsPage {
 }
 
 /// The background half of Connect: check the token, and only then keep it.
+/// `gate` is where the check is trusted (the real store in the app; tests pass
+/// one over a temporary private directory, never the user's).
 pub(super) fn run_check(
     tokens: &Tokens,
     integration: Integration,
     typed: String,
     transport: Option<Arc<dyn HttpTransport>>,
+    trust: TrustOptions,
+    gate: &gitpoulpi_hosting::TrustGate,
 ) -> Result<TokenCheck, String> {
     // A folder of notes has no token and no host: nothing to check.
     if integration.kind.capabilities().local_folder {
@@ -455,9 +520,7 @@ pub(super) fn run_check(
         };
         return Ok(TokenCheck {
             user,
-            scopes: None,
-            missing_scopes: Vec::new(),
-            expires_at: None,
+            ..Default::default()
         });
     }
     let secret = if typed.is_empty() {
@@ -476,22 +539,68 @@ pub(super) fn run_check(
         .enable_all()
         .build()
         .map_err(msg::check_start_failed)?;
-    // Slice S5 records the account after a passing check (and shows the
-    // dialog for a refusal); until then a refusal is an ordinary error text.
-    let client = client_for(
-        integration.clone(),
-        secret.clone(),
-        transport,
-        &gitpoulpi_hosting::TrustGate::ambient(),
-    )
-    .map_err(|e| e.to_string())?;
+    // What the person asked of the security check in the form comes first: an
+    // address changed together with a typed token, a plain http address
+    // allowed. A refusal after that is queued for the dialog (the gate does it)
+    // and is an ordinary error text here.
+    if trust.trust_new_origin {
+        let current = gitpoulpi_hosting::trust::integration_origin(&integration).ok();
+        let recorded = gate.record_of(&integration.id).map(|r| r.origin);
+        if recorded.is_some() && recorded != current {
+            gate.trust_origin(&integration).map_err(|e| e.to_string())?;
+        }
+    }
+    let was_allowed = gate
+        .record_of(&integration.id)
+        .is_some_and(|r| r.allow_plain_http);
+    if trust.allow_plain_http != was_allowed {
+        gate.set_allow_plain_http(&integration, trust.allow_plain_http)
+            .map_err(|e| e.to_string())?;
+    }
+    let client = client_for(integration.clone(), secret.clone(), transport, gate)
+        .map_err(|e| e.to_string())?;
     let check = runtime
         .block_on(client.check_token())
         .map_err(|e| e.to_string())?;
+    // The token must belong to the account this integration is trusted for:
+    // a typed token of another account is refused before it is stored.
+    gate.check_account(
+        &integration,
+        &gitpoulpi_hosting::Account {
+            login: check.user.login.clone(),
+            id: check.user.id.clone(),
+        },
+    )
+    .map_err(|e| e.to_string())?;
+    apply_pinning(gate, &integration, trust.strict);
     if !typed.is_empty() {
         tokens
             .store(&integration.token_ref, &secret)
             .map_err(msg::token_not_stored)?;
     }
     Ok(check)
+}
+
+/// Applies the form's "Strict certificate pinning" toggle after a passing
+/// check: switch an existing pin between first-use and strict, or pin what the
+/// verifier saw. Without a certificate to read (a recorded transport, a plain
+/// http address) there is nothing to pin.
+fn apply_pinning(gate: &gitpoulpi_hosting::TrustGate, integration: &Integration, strict: bool) {
+    use gitpoulpi_hosting::trust::{self, TlsMode};
+    let pinned = gate.record_of(&integration.id).and_then(|r| r.tls);
+    match pinned {
+        Some(tls) if (tls.mode == TlsMode::Strict) != strict => {
+            let _ = gate.set_strict(integration, strict);
+        }
+        None if strict => {
+            let observed = trust::integration_origin(integration)
+                .ok()
+                .and_then(|o| trust::origin::host_of(&o))
+                .and_then(|host| trust::tls::observed(&host));
+            if let Some(cert) = observed {
+                let _ = gate.trust_certificate(integration, &cert, TlsMode::Strict);
+            }
+        }
+        _ => {}
+    }
 }

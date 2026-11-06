@@ -40,7 +40,7 @@ use gitpoulpi_config::{
 };
 use gitpoulpi_hosting::{client_for, HttpTransport, TokenCheck};
 use gitpoulpi_i18n::{
-    msg::{integrations as msg, integrations_page as msg2},
+    msg::{integrations as msg, integrations_page as msg2, trust_dialog as tmsg},
     M,
 };
 use gitpoulpi_secrets::TokenStore;
@@ -96,6 +96,10 @@ pub(crate) enum Item {
     Org,
     Account,
     Token,
+    /// The form's "Strict certificate pinning" checkbox.
+    StrictPin,
+    /// The form's "Allow plain http (not encrypted)" checkbox.
+    AllowPlain,
     GetKey,
     Generate,
     /// The local Markdown folder's Browse button.
@@ -257,6 +261,42 @@ impl Default for SshUi {
     }
 }
 
+/// What a token check told about the token's rights and lifetime, kept per
+/// profile for the connected card (the host is asked once, at Connect).
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub(crate) struct Rights {
+    /// Granted scopes beyond what GitPoulpi needs, dangerous ones first.
+    pub(crate) excess: Vec<String>,
+    pub(crate) expires: Option<String>,
+    /// Advise a fine-grained token with an expiry date.
+    pub(crate) prefer_fine_grained: bool,
+}
+
+impl Rights {
+    fn of(check: &TokenCheck) -> Self {
+        Self {
+            excess: check.excess_scopes.clone(),
+            expires: check.expires_at.clone(),
+            // A fine-grained token is what the advice asks for already.
+            prefer_fine_grained: check.token_flavor != Some(gitpoulpi_hosting::TokenFlavor::FineGrained)
+                && (check.recommend_fine_grained || !check.excess_scopes.is_empty()),
+        }
+    }
+
+    fn is_empty(&self) -> bool {
+        self.excess.is_empty() && self.expires.is_none() && !self.prefer_fine_grained
+    }
+}
+
+/// What the form asks of the security check when Connect runs.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub(super) struct TrustOptions {
+    /// The address was changed and a token typed for it: accept it.
+    pub(super) trust_new_origin: bool,
+    pub(super) allow_plain_http: bool,
+    pub(super) strict: bool,
+}
+
 struct Pending {
     rx: mpsc::Receiver<Result<TokenCheck, String>>,
     integration: Integration,
@@ -335,6 +375,17 @@ pub(crate) struct IntegrationsPage {
     error: Option<String>,
     /// Scopes the host said the token lacks, by profile id.
     warnings: HashMap<String, Vec<String>>,
+    /// What the last check said about the token's rights and expiry, by id.
+    rights: HashMap<String, Rights>,
+    /// The pinned certificate (grouped fingerprint, strict) by profile id,
+    /// read once from the trust store.
+    pinned: HashMap<String, Option<(String, bool)>>,
+    /// The form's two security toggles.
+    strict: bool,
+    plain_http: bool,
+    /// "Re-entering the token is recommended" under the token field: set by
+    /// the security check's answer to an address change.
+    retype_hint: bool,
     pending: Option<Pending>,
     editor: FieldEditor<Item>,
     ssh: SshUi,
@@ -347,6 +398,9 @@ pub(crate) struct IntegrationsPage {
     /// `(rect, target, hoverable)`, captured by the last render.
     hits: Vec<(Rect, Hit, bool)>,
     started: std::time::Instant,
+    /// Where the security check keeps its records: `None` is the real
+    /// store, a test points it at a temporary private directory.
+    pub(crate) trust_paths: Option<gitpoulpi_config::ConfigPaths>,
     /// Tests inject a recorded transport; production builds the reqwest one.
     pub(crate) transport: Option<Arc<dyn HttpTransport>>,
     /// Opens a URL in the browser (replaced in tests).
@@ -368,6 +422,11 @@ impl Default for IntegrationsPage {
             token: String::new(),
             error: None,
             warnings: HashMap::new(),
+            rights: HashMap::new(),
+            pinned: HashMap::new(),
+            strict: false,
+            plain_http: false,
+            retype_hint: false,
             pending: None,
             editor: FieldEditor::default(),
             ssh: SshUi::default(),
@@ -377,9 +436,24 @@ impl Default for IntegrationsPage {
             scroll: Scroll::default(),
             hits: Vec::new(),
             started: std::time::Instant::now(),
+            trust_paths: default_trust_paths(),
             transport: None,
             opener: Box::new(crate::repo_menu::open_url),
         }
+    }
+}
+
+/// Where a fresh page keeps its trust records: the real store in the app; in
+/// a test a private directory of its own, so a check never touches the user's.
+fn default_trust_paths() -> Option<gitpoulpi_config::ConfigPaths> {
+    #[cfg(test)]
+    {
+        let dir = tempfile::tempdir().ok()?.keep();
+        Some(gitpoulpi_config::ConfigPaths::for_dir(dir))
+    }
+    #[cfg(not(test))]
+    {
+        None
     }
 }
 
@@ -574,6 +648,12 @@ impl IntegrationsPage {
                     items.push(Item::Account);
                 }
                 items.push(Item::Token);
+                if self.strict_offered() {
+                    items.push(Item::StrictPin);
+                }
+                if self.plain_http_offered() {
+                    items.push(Item::AllowPlain);
+                }
                 if caps.account == Some(AccountField::ApiKey) {
                     items.push(Item::GetKey);
                 }
@@ -683,8 +763,70 @@ impl IntegrationsPage {
         };
         self.token.clear();
         self.error = None;
+        self.retype_hint = false;
+        // The toggles start from what is trusted for the profile.
+        let record = editing.and_then(|i| self.trust_gate().record_of(&cfg.integrations[i].id));
+        self.strict = record
+            .as_ref()
+            .and_then(|r| r.tls.as_ref())
+            .is_some_and(|t| t.mode == gitpoulpi_hosting::trust::TlsMode::Strict);
+        self.plain_http = record.as_ref().is_some_and(|r| r.allow_plain_http);
         self.mode = Mode::Form(editing.map(|i| cfg.integrations[i].id.clone()));
         self.item = 0;
+    }
+
+    /// The security check's answer to an address change: the profile's form,
+    /// with the token field focused and a hint to type the token again (the
+    /// old one was never sent to the new address).
+    pub(crate) fn begin_retoken(&mut self, cfg: &Config, id: &str) {
+        let Some(i) = cfg.integrations.iter().position(|e| e.id == id) else {
+            return;
+        };
+        if let Some(kind) = self.kind_index(cfg.integrations[i].kind) {
+            self.select_kind(kind, cfg);
+            self.sel = self
+                .profile_ids(cfg)
+                .iter()
+                .position(|n| *n == i)
+                .unwrap_or(0);
+        }
+        self.begin_form(cfg, Some(i));
+        self.retype_hint = true;
+        self.pinned.remove(id);
+        self.item = self
+            .items(cfg)
+            .iter()
+            .position(|it| *it == Item::Token)
+            .unwrap_or(0);
+        self.zone = Zone::Body;
+    }
+
+    /// The gate over the store this page reads and writes.
+    fn trust_gate(&self) -> gitpoulpi_hosting::TrustGate {
+        match &self.trust_paths {
+            Some(paths) => gitpoulpi_hosting::TrustGate::load(paths),
+            None => gitpoulpi_hosting::TrustGate::ambient(),
+        }
+    }
+
+    /// Forgets the pinned-certificate readings (the trust store changed).
+    pub(crate) fn forget_trust_cache(&mut self) {
+        self.pinned.clear();
+    }
+
+    /// Whether the form offers the pinning toggle: an https address.
+    fn strict_offered(&self) -> bool {
+        !self.kind().capabilities().local_folder
+            && self
+                .form_url()
+                .is_some_and(|u| u.to_ascii_lowercase().starts_with("https://"))
+    }
+
+    /// Whether the form offers the plain http toggle: only for an `http://`
+    /// address that is not this machine.
+    fn plain_http_offered(&self) -> bool {
+        self.form_url()
+            .is_some_and(|u| gitpoulpi_hosting::trust::origin::is_plain_http_remote(&u))
     }
 
     pub(crate) fn select_kind(&mut self, index: usize, cfg: &Config) {

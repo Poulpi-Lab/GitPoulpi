@@ -251,6 +251,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
         || crate::profile_bar::is_open()
         || crate::workspace_ui::chip::is_open()
         || crate::about::is_open()
+        || crate::trust_dialog::is_open()
         || crate::activity_log::is_open()
         || crate::jobs_ui::panel_open()
         || crate::updates::panel::is_open()
@@ -827,6 +828,8 @@ pub(in crate::event_loop) fn draw_overlay_menus(
 
     ai_ui.render_popup(frame, frame.area());
     crate::about::render(frame);
+    // The integration security check, over everything but the notifications.
+    crate::trust_dialog::render(frame);
     // The notification card and the Activity Log, over everything.
     crate::activity_log::render(frame);
     if matches!(input_mode, InputMode::Navigation) && crate::activity_log::is_open() {

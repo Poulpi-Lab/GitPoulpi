@@ -45,6 +45,19 @@ pub(super) fn settings_closed(cx: &mut CommandCtx<'_>) {
 
 pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> io::Result<Flow> {
     let km = env.km;
+    // The integration security check owns the keyboard above everything: it
+    // answers a change that was refused before anything was sent.
+    if key.kind == KeyEventKind::Press && crate::trust_dialog::is_open() {
+        if let Some(outcome) = crate::trust_dialog::on_key(key) {
+            crate::trust_dialog::apply(
+                outcome,
+                cx.repo_root,
+                &mut *cx.preferences,
+                &mut *cx.last_message,
+            );
+        }
+        return Ok(Flow::Handled);
+    }
     // A ref drag in flight owns `Esc`, ahead of every mode and overlay below: it
     // is a gesture, not a mode, and backing out of one must not also close
     // whatever is behind it. Its own guarded arm rather than a branch in the

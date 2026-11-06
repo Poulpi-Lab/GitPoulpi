@@ -310,6 +310,7 @@ impl PaletteCommand {
                 | C::WorkspaceSearch
                 | C::AboutGitPoulpi
                 | C::AboutLicenses
+                | C::TrustReview
                 | C::ToggleHelp
         )
     }
@@ -1048,6 +1049,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::ToggleHelp
         | C::AboutGitPoulpi
         | C::AboutLicenses
+        | C::TrustReview
         | C::WorkspaceSearch
         | C::OpenActivityLog
         | C::OpenGlobalLog

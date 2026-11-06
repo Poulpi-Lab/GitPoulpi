@@ -268,6 +268,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::ChangeProfile
         | PaletteCommand::AboutGitPoulpi
         | PaletteCommand::AboutLicenses
+        | PaletteCommand::TrustReview
         | PaletteCommand::OpenActivityLog
         | PaletteCommand::OpenGlobalLog
         | PaletteCommand::Jobs(_)

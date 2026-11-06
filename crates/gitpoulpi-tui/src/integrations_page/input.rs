@@ -33,6 +33,8 @@ impl IntegrationsPage {
             | Item::RadarNamespaces
             | Item::RadarMode => self.activate_radar(item, env),
             Item::Host | Item::Org | Item::Account | Item::Token => self.step(1, env.config),
+            Item::StrictPin => self.strict = !self.strict,
+            Item::AllowPlain => self.plain_http = !self.plain_http,
             Item::GetKey => self.open_url(TRELLO_KEY_URL, env),
             Item::Generate => self.open_token_page(env),
             Item::Connect => {

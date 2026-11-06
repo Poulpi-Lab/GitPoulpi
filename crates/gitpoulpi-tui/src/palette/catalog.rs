@@ -3554,6 +3554,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "",
         PaletteCommand::Hosting(HostingCommand::RadarOptions),
     ),
+    entry(
+        msg::trust_dialog::PALETTE_REVIEW,
+        "",
+        PaletteCommand::TrustReview,
+    ),
     entry(msg::palette::APP_QUIT, "q", PaletteCommand::Quit),
     // The keyboard route to the same row: Ctrl+, then Appearance > Theme.
     entry(msg::palette::APP_THEME, "", PaletteCommand::Theme),

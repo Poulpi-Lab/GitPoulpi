@@ -25,6 +25,7 @@ mod resolved_record;
 mod rewrite_runs;
 mod search;
 mod server;
+mod stage_guard;
 mod status;
 mod submodules;
 mod test_hook;

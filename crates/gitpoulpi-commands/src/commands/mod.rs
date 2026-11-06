@@ -279,6 +279,7 @@ pub(crate) fn is_local(command: &Commands) -> bool {
         Commands::Ai {
             action:
                 crate::cli::AiCommand::ReviewContext { .. } | crate::cli::AiCommand::Trust { .. },
+            ..
         } => true,
         _ => false,
     }
@@ -320,6 +321,7 @@ async fn run_local(
                     no_extra_file,
                     reset,
                 },
+            ..
         } => crate::ai_review_ctx::run(
             repo,
             project.as_deref(),
@@ -342,6 +344,7 @@ async fn run_local(
                     accept_certificate,
                     allow_insecure_http,
                 },
+            ..
         } => crate::ai_cmd::trust(
             &profile,
             accept_origin.as_deref(),
@@ -548,13 +551,25 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
             hunk,
             lines,
             all,
+            allow_sensitive,
         } => {
             let target = stage_target(file, folder, hunk, lines, all)?;
             let kind = stage_kind(&target, true);
-            session
-                .call::<()>(kind, json!({ "target": target }))
+            let answer = session
+                .call_typed::<()>(
+                    kind,
+                    json!({ "target": target, "allow_sensitive": allow_sensitive }),
+                )
                 .await?;
-            Ok(emitted(json!({ "staged": target }), "staged"))
+            match answer {
+                Ok(()) => Ok(emitted(json!({ "staged": target }), "staged")),
+                Err(e) => match e.kind {
+                    Some(gitpoulpi_core::TypedError::SensitiveStage { files }) => {
+                        Ok(sensitive_refusal(&files))
+                    }
+                    _ => Err(e.message),
+                },
+            }
         }
 
         Commands::Unstage {
@@ -815,7 +830,9 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         }
 
         #[cfg(feature = "ai")]
-        Commands::Ai { action } => crate::ai_cmd::run(session, action).await,
+        Commands::Ai { action, print_sent } => {
+            crate::ai_cmd::run(session, action, print_sent).await
+        }
 
         Commands::Commit {
             message,
@@ -1528,6 +1545,28 @@ fn discard_target(
         StageTarget::Line(path, selector) => Some(DiscardTarget::Line(path, selector)),
         _ => None,
     })
+}
+
+/// The refusal of a stage that would add sensitive files, as the CLI and MCP
+/// report it: `{error: "sensitive_files", files}` (a rule and a masked
+/// preview each, never a value) and exit code 2, so a caller can tell
+/// "refused" from "failed". `--allow-sensitive` is the retry.
+fn sensitive_refusal(files: &[gitpoulpi_core::privacy::Sensitive]) -> Emitted {
+    let mut human = String::from("refused: these files look sensitive and were not staged:");
+    for f in files {
+        human.push_str(&format!("\n  {} ({})", f.path, f.describe()));
+    }
+    human.push_str("\nStage them anyway with --allow-sensitive (ask the user first).");
+    let mut out = emitted(
+        json!({
+            "error": "sensitive_files",
+            "files": files,
+            "hint": "ask the user, then stage again with --allow-sensitive",
+        }),
+        human,
+    );
+    out.exit_code = 2;
+    out
 }
 
 /// `OperationKind` splits staging by granularity while `GitBackend::stage`

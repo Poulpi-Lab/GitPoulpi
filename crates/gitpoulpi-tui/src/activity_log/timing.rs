@@ -80,7 +80,7 @@ fn take_background_fetch(action: &Action) -> bool {
 /// mutations (stage a file, create a tag) that are not worth a line.
 pub(crate) fn label_for(action: &Action) -> Option<String> {
     let action = match action {
-        Action::AutoStashed(inner) => inner,
+        Action::AutoStashed(inner) | Action::AllowSensitive(inner) => inner,
         other => other,
     };
     Some(

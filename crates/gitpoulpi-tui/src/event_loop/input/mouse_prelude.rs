@@ -391,6 +391,17 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         }
         return Ok(None);
     }
+    // The sensitive-files question of a refused stage is modal the same way.
+    if crate::stage_guard_dialog::is_open() {
+        *cx.hovered_target = None;
+        *cx.hovered_tab_index = None;
+        *cx.hovered_close_tab = None;
+        *cx.hovered_status_row = None;
+        if let Some(staged) = crate::stage_guard_dialog::on_mouse(mouse) {
+            crate::stage_guard_dialog::apply(staged, cx.link, cx.repo_root);
+        }
+        return Ok(None);
+    }
     // An editor status menu (encoding, line breaks, indentation) is modal
     // the same way: it owns the mouse, a click away closes it and is
     // consumed, and nothing behind it hovers.

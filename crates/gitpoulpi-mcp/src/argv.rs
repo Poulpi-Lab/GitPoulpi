@@ -21,6 +21,7 @@ pub fn to_argv(spec: &ToolSpec, args: &Map<String, Value>) -> Result<Vec<String>
         .get_arguments()
         .map(|a| a.get_id().as_str())
         .filter(|id| !["help", "version", "trust", "hash"].contains(id))
+        .filter(|id| !spec.withheld.iter().any(|w| w == id))
         .collect();
     known.insert("repo");
     known.insert("session");

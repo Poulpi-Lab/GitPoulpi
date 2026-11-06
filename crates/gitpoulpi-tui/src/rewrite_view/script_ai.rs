@@ -27,7 +27,7 @@ use gitpoulpi_i18n::msg::rewrite_ai as t;
 
 use super::render::{bad, bold, dim, plain, wrap, RewriteHit};
 use super::script::ScriptFocus;
-use super::sent_pane::{centered, wrap_width, SentPane, MAX_WIDTH};
+use crate::sent_pane::{centered, wrap_width, SentPane, MAX_WIDTH};
 use super::{Notice, RewriteView};
 use crate::dialog_kit::{self, button_width, ButtonState, CheckState};
 use crate::text_edit::{Caret, KeyEdit};

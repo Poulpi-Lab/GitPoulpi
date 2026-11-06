@@ -197,6 +197,8 @@ impl WindowState {
                             || crate::updates::panel::is_open()
                             // The tag delete dialog's rows are picked by their digit.
                             || crate::tag_delete_dialog::is_open()
+                            // The sensitive-files question: 1 and 2 answer it.
+                            || crate::stage_guard_dialog::is_open()
                             || self.remote_ui.is_open()
                             // The encoding dropdown's search line types digits
                             // (`1252`), never a count.

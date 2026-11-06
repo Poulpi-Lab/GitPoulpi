@@ -79,6 +79,11 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
         TypedError::HooksNotTrusted { hooks, .. } => {
             gitpoulpi_i18n::msg::flow_hook_trust::not_trusted(hooks.len() as u64)
         }
+        TypedError::SensitiveStage { files } => {
+            gitpoulpi_i18n::msg::stage_guard::sensitive_stage(gitpoulpi_core::privacy::summary(
+                files,
+            ))
+        }
     }
 }
 
@@ -362,6 +367,21 @@ mod tests {
                     command: "make".into(),
                     personal: false,
                 }],
+            },
+            TypedError::SensitiveStage {
+                files: vec![
+                    gitpoulpi_core::privacy::Sensitive {
+                        path: ".env".into(),
+                        reason: gitpoulpi_core::privacy::Reason::Pattern(".env".into()),
+                    },
+                    gitpoulpi_core::privacy::Sensitive {
+                        path: "a.txt".into(),
+                        reason: gitpoulpi_core::privacy::Reason::Secret {
+                            rule: "github-token".into(),
+                            preview: "ghp_****".into(),
+                        },
+                    },
+                ],
             },
         ];
         for reason in [

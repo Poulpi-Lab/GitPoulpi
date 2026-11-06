@@ -153,9 +153,8 @@ pub enum Error {
     /// `.env`, a recognised token) and the caller did not allow it. Nothing
     /// was staged. `files` lists each file with its reason, never a value.
     #[error(
-        "{} sensitive file(s) were not staged ({}); ask the user, then stage again allowing \
+        "sensitive files were not staged: {}; ask the user, then stage again allowing \
          sensitive files",
-        .files.len(),
         crate::privacy::summary(.files)
     )]
     SensitiveStage {

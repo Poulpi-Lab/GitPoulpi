@@ -308,6 +308,17 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         return Ok(Flow::Handled);
     }
 
+    // The sensitive-files question of a refused stage owns the keyboard.
+    if key.kind == KeyEventKind::Press
+        && matches!(*cx.input_mode, InputMode::Normal)
+        && crate::stage_guard_dialog::is_open()
+    {
+        if let Some(staged) = crate::stage_guard_dialog::on_key(key) {
+            crate::stage_guard_dialog::apply(staged, cx.link, cx.repo_root);
+        }
+        return Ok(Flow::Handled);
+    }
+
     // The repository menu (tab menu, management row menu)
     // owns the keyboard while open, swallowing what it does
     // not use -- the rule every context menu here follows.

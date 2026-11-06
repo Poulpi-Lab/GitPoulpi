@@ -172,6 +172,8 @@ pub(in crate::event_loop) fn draw_overlay_menus(
     crate::revert_mainline::render(frame);
     // The tag delete scope dialog, the same way.
     crate::tag_delete_dialog::render(frame);
+    // The sensitive-files question of a refused stage, the same way.
+    crate::stage_guard_dialog::render(frame);
     // The predicted conflicts popup, the same way.
     crate::conflict_popup::render(frame);
     // Copy as Mermaid gitGraph, the same way.
@@ -246,6 +248,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
         || crate::open_in_bar::is_open()
         || crate::revert_mainline::is_open()
         || crate::tag_delete_dialog::is_open()
+        || crate::stage_guard_dialog::is_open()
         || crate::conflict_popup::is_open()
         || crate::mermaid_popup::is_open()
         || crate::profile_bar::is_open()

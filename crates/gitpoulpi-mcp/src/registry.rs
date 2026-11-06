@@ -34,6 +34,10 @@ pub struct ToolSpec {
     /// instead of a second, possibly-drifting description of the same
     /// arguments.
     pub(crate) command: Command,
+    /// Arguments of the CLI leaf this tool does not offer (not in the schema,
+    /// refused if sent): the operator's gates, such as `allow_sensitive`
+    /// while `[mcp] allow_sensitive_staging` is off.
+    pub(crate) withheld: Vec<&'static str>,
 }
 
 /// CLI leaves deliberately not exposed as MCP tools, each with the reason -
@@ -143,8 +147,36 @@ pub const EXCLUDED: &[(&[&str], &str)] = &[
     ),
 ];
 
-/// Every CLI leaf that isn't excluded, as an MCP tool.
+/// The CLI argument that lets a stage add files the staging guard flags.
+const ALLOW_SENSITIVE: &str = "allow_sensitive";
+
+/// Every CLI leaf that isn't excluded, as an MCP tool, for the default
+/// `[mcp]` settings.
 pub fn tools() -> Vec<ToolSpec> {
+    tools_for(&gitpoulpi_config::McpConfig::default())
+}
+
+/// [`tools`] for the operator's `[mcp]` table: `stage` offers
+/// `allow_sensitive` only when `allow_sensitive_staging` is on. Otherwise
+/// an agent cannot pass it, and a refused stage tells it to ask the user.
+pub fn tools_for(cfg: &gitpoulpi_config::McpConfig) -> Vec<ToolSpec> {
+    let mut specs = all_tools();
+    if !cfg.allow_sensitive_staging {
+        for spec in specs.iter_mut().filter(|s| s.cli_path == ["stage"]) {
+            spec.withheld.push(ALLOW_SENSITIVE);
+            if let Some(props) = spec
+                .input_schema
+                .get_mut("properties")
+                .and_then(Value::as_object_mut)
+            {
+                props.remove(ALLOW_SENSITIVE);
+            }
+        }
+    }
+    specs
+}
+
+fn all_tools() -> Vec<ToolSpec> {
     let mut root = Cli::command();
     root.build();
     let mut specs = Vec::new();
@@ -213,6 +245,7 @@ fn build_spec(cmd: &Command, path: &[String]) -> ToolSpec {
         idempotent: read_only || destructive,
         destructive,
         command: cmd.clone(),
+        withheld: Vec::new(),
     }
 }
 

@@ -36,7 +36,7 @@ impl Remedy {
 /// "Push failed" for the action that failed.
 pub(crate) fn title_for(action: &Action) -> String {
     let action = match action {
-        Action::AutoStashed(inner) => inner,
+        Action::AutoStashed(inner) | Action::AllowSensitive(inner) => inner,
         other => other,
     };
     match action {
@@ -67,7 +67,7 @@ pub(crate) fn title_for(action: &Action) -> String {
 /// timed fetches): the Activity Log's entry title.
 pub(crate) fn done_title(action: &Action) -> Option<String> {
     let action = match action {
-        Action::AutoStashed(inner) => inner,
+        Action::AutoStashed(inner) | Action::AllowSensitive(inner) => inner,
         other => other,
     };
     match action {

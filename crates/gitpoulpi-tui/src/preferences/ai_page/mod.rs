@@ -1064,6 +1064,7 @@ impl PreferencesState {
                                 &profile,
                                 key,
                                 Some(&repo_root),
+                                &gitpoulpi_ai::Privacy::default(),
                             )?;
                             gitpoulpi_ai::test_connection(&*client).await
                         }),

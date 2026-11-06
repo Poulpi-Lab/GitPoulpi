@@ -11,13 +11,17 @@
 //!   honoured through it: the list is fetched and filtered here.
 //! - Semver, not string, order: `0.10.0` is newer than `0.9.0`, and a
 //!   pre-release (`0.2.0-rc.1`) is older than its release (`0.2.0`).
+//! - The sources (GitHub, NuGet, manifest) live in [`sources`]; they all end in
+//!   [`newest_after_pinned`], so semver, channel and pin rules exist once.
 //! - A private repository answers 404 without a token; that is a normal
 //!   "no answer", never a user-facing error (the caller logs one line).
+
+pub mod sources;
 
 use std::cmp::Ordering;
 use std::path::Path;
 
-use crate::http::{HttpRequest, HttpTransport};
+use crate::http::HttpTransport;
 use crate::{Error, Result};
 use gitpoulpi_config::{release, UpdateChannel};
 
@@ -52,24 +56,48 @@ pub const DOWNLOAD_HOSTS: &[&str] = &[
 /// Whether `url` is `https` on one of the [`DOWNLOAD_HOSTS`] (or loopback
 /// while testing).
 pub fn download_host_allowed(url: &str) -> bool {
+    download_host_allowed_with(url, &[])
+}
+
+/// [`download_host_allowed`] plus `extra` hosts: the policy's `download_base`
+/// (a mirror), given as a URL or a bare host. The mirror is allowed only when
+/// the caller passes it; it is never a global. Matching is on the host alone
+/// (no suffix match: `mirror.example.evil` is not `mirror.example`) and the
+/// scheme must still be `https`.
+pub fn download_host_allowed_with(url: &str, extra: &[String]) -> bool {
     let Some((scheme, rest)) = url.split_once("://") else {
         return false;
     };
-    let authority = rest.split(['/', '?', '#']).next().unwrap_or("");
-    if authority.contains('@') {
+    let Some(host) = host_of_authority(rest) else {
         return false;
+    };
+    if std::env::var_os(API_ENV).is_some_and(|v| !v.is_empty())
+        && (host == "127.0.0.1" || host == "localhost" || host == "[::1]")
+    {
+        return scheme == "http" || scheme == "https";
+    }
+    scheme == "https"
+        && (DOWNLOAD_HOSTS.contains(&host.as_str())
+            || extra.iter().any(|e| {
+                let e = e.trim();
+                let e = e.split_once("://").map_or(e, |(_, r)| r);
+                host_of_authority(e).is_some_and(|h| h == host)
+            }))
+}
+
+/// The lowercase host of `rest` (a URL without its scheme); `None` for
+/// userinfo (`https://github.com@evil/`), which hides the real host.
+fn host_of_authority(rest: &str) -> Option<String> {
+    let authority = rest.split(['/', '?', '#']).next().unwrap_or("");
+    if authority.is_empty() || authority.contains('@') {
+        return None;
     }
     let host = authority
         .rsplit_once(':')
         .filter(|(_, port)| port.chars().all(|c| c.is_ascii_digit()))
         .map_or(authority, |(h, _)| h)
         .to_ascii_lowercase();
-    if std::env::var_os(API_ENV).is_some_and(|v| !v.is_empty())
-        && (host == "127.0.0.1" || host == "localhost" || host == "[::1]")
-    {
-        return scheme == "http" || scheme == "https";
-    }
-    scheme == "https" && DOWNLOAD_HOSTS.contains(&host.as_str())
+    Some(host)
 }
 
 /// A semantic version: `major.minor.patch[-pre][+build]`, a leading `v`
@@ -262,18 +290,51 @@ pub fn newest_after(
     running: &str,
     channel: UpdateChannel,
 ) -> Option<Release> {
+    newest_after_pinned(releases, running, channel, None)
+}
+
+/// Whether `version` is at or below `pin`: `"1.4"` (or `"1"`) is any 1.4.x
+/// (any 1.x), `"1.4.2"` is at most 1.4.2. An unreadable pin allows nothing:
+/// an administrator's typo must not lift the ceiling.
+pub fn within_pin(version: &Version, pin: &str) -> bool {
+    let parts: Vec<&str> = pin
+        .trim()
+        .trim_start_matches(['v', 'V'])
+        .split('.')
+        .collect();
+    let nums: Option<Vec<u64>> = parts.iter().map(|p| p.parse().ok()).collect();
+    match nums.as_deref() {
+        Some([major]) => version.major == *major,
+        Some([major, minor]) => version.major == *major && version.minor == *minor,
+        Some([major, minor, patch]) => {
+            (version.major, version.minor, version.patch) <= (*major, *minor, *patch)
+        }
+        _ => false,
+    }
+}
+
+/// The one filter every check source ends in: allowed by `channel`, within
+/// `pin`, newer than `running`, then the highest by semver.
+pub fn newest_after_pinned(
+    releases: &[Release],
+    running: &str,
+    channel: UpdateChannel,
+    pin: Option<&str>,
+) -> Option<Release> {
     let running = Version::parse(running)?;
+    let pin = pin.map(str::trim).filter(|p| !p.is_empty());
     releases
         .iter()
         .filter(|r| channel == UpdateChannel::Prerelease || !r.prerelease)
         .filter_map(|r| Some((Version::parse(&r.version)?, r)))
+        .filter(|(v, _)| pin.map_or(true, |p| within_pin(v, p)))
         .filter(|(v, _)| *v > running)
         .max_by(|a, b| a.0.cmp(&b.0))
         .map(|(_, r)| r.clone())
 }
 
 /// What one check needs.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct CheckParams {
     /// `owner/name`.
     pub repo: String,
@@ -283,27 +344,25 @@ pub struct CheckParams {
     /// A github.com token, when the user has one stored (a private
     /// repository answers 404 without it).
     pub token: Option<String>,
+    /// The administrator's ceiling: `"1.4"` = any 1.4.x, `"1.4.2"` = at most
+    /// 1.4.2 (see [`within_pin`]).
+    pub pin: Option<String>,
 }
 
-/// Asks the host for the releases and returns the newer one, if any.
+/// Asks GitHub (the `base` API root) for the releases and returns the newer
+/// one, if any. Kept for the callers that predate [`sources::SourceSpec`].
 pub async fn check(
     transport: &dyn HttpTransport,
     base: &str,
     params: &CheckParams,
 ) -> Result<Option<Release>> {
-    let url = format!(
-        "{}/repos/{}/releases?per_page=30",
-        base.trim_end_matches('/'),
-        params.repo.trim_matches('/')
-    );
-    let mut request = HttpRequest::get(url).header("Accept", "application/vnd.github+json");
-    if let Some(token) = params.token.as_deref().filter(|t| !t.trim().is_empty()) {
-        request = request.header("Authorization", format!("Bearer {}", token.trim()));
+    sources::SourceSpec::GitHubReleases {
+        api_base: base.to_string(),
+        repo: params.repo.clone(),
+        token: params.token.clone(),
     }
-    let response = transport.send(request).await?;
-    response.error_for_status("the update check")?;
-    let releases = parse_releases(&response.body, &params.target)?;
-    Ok(newest_after(&releases, &params.running, params.channel))
+    .check(transport, params)
+    .await
 }
 
 /// A day, in seconds: the throttle between two checks.
@@ -403,6 +462,7 @@ mod tests {
             channel,
             target: TARGET.into(),
             token: None,
+            pin: None,
         }
     }
 
@@ -604,7 +664,7 @@ mod tests {
 #[cfg(test)]
 mod download_host_tests {
     use super::*;
-    use crate::http::RecordedTransport;
+    use crate::http::{HttpRequest, RecordedTransport};
 
     #[test]
     fn only_https_github_release_hosts_may_be_downloaded_from() {

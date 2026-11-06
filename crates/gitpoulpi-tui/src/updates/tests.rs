@@ -30,6 +30,7 @@ fn params() -> CheckParams {
         channel: UpdateChannel::Stable,
         target: "x86_64-unknown-linux-gnu".into(),
         token: None,
+        pin: None,
     }
 }
 

@@ -1,7 +1,8 @@
 //! The version chip: the running version in the main window's title bar,
 //! between the app name and the repository path. It turns into `v0.2.0 available` in the
-//! accent colour when a newer release is known; a click (or the palette's
-//! `Help: Release notes`) opens the Release notes tab.
+//! accent colour when a newer release is known; a click opens the update panel
+//! then (its Release notes button leads to the tab), else the Release notes tab
+//! (as does the palette's `Help: Release notes`).
 //!
 //! The rect comes out of the paint (`paint`), like the Activity button's: one
 //! walk, so a click never lands beside the glyphs.
@@ -37,6 +38,13 @@ pub(crate) fn text() -> String {
 pub(crate) fn is_available() -> bool {
     let snapshot = super::snapshot();
     snapshot.available.is_some() || matches!(snapshot.install.phase, super::auto::Phase::Ready(_))
+}
+
+/// Whether a click opens the update panel (a release is announced, or an
+/// update is under way or failed); otherwise it opens the Release notes tab.
+pub(crate) fn opens_panel() -> bool {
+    let snapshot = super::snapshot();
+    snapshot.available.is_some() || !matches!(snapshot.install.phase, super::auto::Phase::Idle)
 }
 
 /// Cells the chip takes (a space either side).
@@ -125,8 +133,8 @@ pub(crate) fn hit(col: u16, row: u16) -> bool {
     RECT.get().contains((col, row).into())
 }
 
-/// The mouse, before the panes: `true` when this press opens the Release
-/// notes. The pointer is noted for the hover either way.
+/// The mouse, before the panes: `true` when this press is on the chip (see
+/// [`opens_panel`] for where it leads). The pointer is noted for the hover either way.
 pub(crate) fn route_mouse(mouse: crossterm::event::MouseEvent) -> bool {
     use crossterm::event::{MouseButton, MouseEventKind};
     POINTER.set(Some((mouse.column, mouse.row)));

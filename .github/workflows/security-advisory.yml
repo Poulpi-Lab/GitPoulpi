@@ -1,0 +1,82 @@
+name: Security advisory
+
+# Publishes the security notices of security/advisories.json (the source of truth, reviewed by pull request) to
+# the latest release without a new build: it validates the file, builds security.json, adds the notices to
+# latest.json, signs both with minisign and replaces them on the release (`gh release upload --clobber`).
+# release.yml puts the same two files into every new release.
+#
+# Add a notice with `cargo run -p xtask -- advisory add ...`, merge, and this runs. docs/developer/releasing.md.
+#
+# Secrets: MINISIGN_SECRET_KEY, MINISIGN_PASSWORD (environment `release`), POULPI_BOT_PRIVATE_KEY.
+# Variable: POULPI_BOT_APP_ID. The upload goes out as the Poulpi-Lab GitHub App bot, never a personal account.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'security/advisories.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-advisory
+  cancel-in-progress: false
+
+jobs:
+  publish-notices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: release
+    env:
+      HAS_BOT: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' }}
+    steps:
+      - name: Notice when the bot credentials are missing
+        if: env.HAS_BOT != 'true'
+        run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, nothing is published"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        if: env.HAS_BOT == 'true'
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        if: env.HAS_BOT == 'true'
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        if: env.HAS_BOT == 'true'
+        with:
+          key: security-advisory
+      - name: Validate security/advisories.json
+        if: env.HAS_BOT == 'true'
+        run: cargo run -q -p xtask -- advisory check
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
+        if: env.HAS_BOT == 'true'
+        id: app
+        with:
+          app-id: ${{ vars.POULPI_BOT_APP_ID }}
+          private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
+      - name: Build security.json and latest.json
+        if: env.HAS_BOT == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          tag=$(gh release view --json tagName --jq .tagName)
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          mkdir notices
+          gh release download "$tag" --pattern latest.json --dir notices
+          version=$(jq -r .version notices/latest.json)
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          jq -n --slurpfile advisories security/advisories.json \
+            '{schema: 1, advisories: $advisories[0]}' > notices/security.json
+          jq --slurpfile advisories security/advisories.json \
+            '.advisories = $advisories[0]' notices/latest.json > notices/latest.json.new
+          mv notices/latest.json.new notices/latest.json
+      - name: Sign
+        if: env.HAS_BOT == 'true'
+        env:
+          MINISIGN_SECRET_KEY: ${{ secrets.MINISIGN_SECRET_KEY }}
+          MINISIGN_PASSWORD: ${{ secrets.MINISIGN_PASSWORD }}
+        run: cargo run -q -p xtask -- sign --dir notices --version "$VERSION"
+      - name: Replace the files on the latest release
+        if: env.HAS_BOT == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: gh release upload "$TAG" notices/* --clobber

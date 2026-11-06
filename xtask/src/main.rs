@@ -33,6 +33,14 @@ Tasks:
   licenses [--check]
                     regenerate THIRD-PARTY-LICENSES.txt from Cargo.lock
                     (offline); --check only verifies it is current.
+  lock-age --base <ref> [--min-days N]
+                    fail when Cargo.lock takes a crates.io version younger
+                    than N days (default 2) against <ref> (--help).
+  sign --dir <dist> [--version <v>]
+                    minisign every release asset (MINISIGN_SECRET_KEY and
+                    MINISIGN_PASSWORD from the environment) (--help).
+  advisory check|add
+                    validate or extend security/advisories.json (--help).
   merge-fixture     build a repository stopped on a conflicting merge, to open
                     the merge conflict editor on it (--help for options).
   mock-host [--port N] [--bare-root DIR]
@@ -61,6 +69,9 @@ fn main() {
         "build-custom" => xtask::custom_build::run(rest),
         "features" => xtask::features::run(rest),
         "licenses" => xtask::licenses::run(rest),
+        "lock-age" => xtask::lock_age::run(rest),
+        "sign" => xtask::sign::run(rest),
+        "advisory" => xtask::advisory::run(rest),
         "test" => xtask::test_tiers::run(rest),
         "merge-fixture" => xtask::merge_fixture::run(rest),
         "mock-host" => xtask::mock_host::run(rest),

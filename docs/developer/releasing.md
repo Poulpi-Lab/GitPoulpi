@@ -12,8 +12,9 @@ A tag with a `-` in the version (`releases/v0.2.0-rc.1`) is published as a GitHu
 
 | Job | What it does |
 |---|---|
-| `build` (matrix) | One row per target: Linux x86_64 and arm64 (the arm64 row feeds the multi-arch image and the arm64 `.deb`), Windows x86_64, macOS arm64 and x86_64. `cargo run -p xtask -- dist` builds the archive and its `.sha256`. Windows also builds the Inno Setup installer and the MSI (WiX v5, `packaging/msi/gitpoulpi.wxs`); Linux also builds the `.deb` (`cargo deb --no-build`). Every file has a `.sha256`. |
-| `publish` | One GitHub release with every archive, installer, `.deb`, `install.sh`, `latest.json` (generated from the `.sha256` files) and the `.sha256` files. Notes are the tag's `## [x.y.z]` section of `CHANGELOG.md`, else GitHub's generated notes. Skipped by a dry run. |
+| `preflight` | `cargo-deny` (`advisories bans sources licenses`, policy in `deny.toml`) and `xtask lock-age` against the previous `releases/v*` tag. CI is disabled, so this is where they run before a build. |
+| `build` (matrix, after `preflight`) | One row per target: Linux x86_64 and arm64 (the arm64 row feeds the multi-arch image and the arm64 `.deb`), Windows x86_64, macOS arm64 and x86_64. `cargo run -p xtask -- dist` builds the archive and its `.sha256`. Windows also builds the Inno Setup installer and the MSI (WiX v5, `packaging/msi/gitpoulpi.wxs`); Linux also builds the `.deb` (`cargo deb --no-build`). Every file has a `.sha256`. |
+| `publish` | One GitHub release with every archive, installer, `.deb`, `install.sh`, `latest.json` (generated from the `.sha256` files, with the current advisories), `security.json`, the SBOM, the `.sha256` files and a `.minisig` for every asset except the `.sha256` files (see "Signing and supply chain"). Notes are the tag's `## [x.y.z]` section of `CHANGELOG.md`, else GitHub's generated notes. Skipped by a dry run. |
 | `chocolatey` | Fills the templates in `packaging/chocolatey/`, `choco pack`, `choco push`. |
 | `winget` | `komac update GitPoulpi.GitPoulpi --version <v> --urls <setup> --submit`, from the fork `Poulpi-Lab/winget-pkgs`, as the App's bot. |
 | `scoop`, `homebrew` | Fill the manifest or formula and commit it to `Poulpi-Lab/scoop-gitpoulpi` and `Poulpi-Lab/homebrew-gitpoulpi`, as the App's bot. |
@@ -42,6 +43,9 @@ The owner creates them in the repository settings. Signing keys and accounts bel
 | `PUBLISH_PACKAGES` | variable | `true` enables every channel job. Anything else, and the release still publishes on GitHub. |
 | `PUBLISH_GHCR` | variable | `true` also pushes the image to GHCR with `GITHUB_TOKEN` (the job has `packages: write`). No extra secret. |
 | `PUBLISH_CRATES` | variable | `true` enables the `crates` job. |
+| `MINISIGN_SECRET_KEY`, `MINISIGN_PASSWORD` | secrets of the `release` environment | `publish` and `security-advisory.yml`: the release signing key box and its password. |
+| `ATTESTATIONS` | variable | `true` enables the build provenance attestation step of `publish`. |
+| `DTRACK_URL`, `DTRACK_API_KEY` | secrets (optional) | `publish`: uploads the SBOM to a Dependency-Track server. Skipped with a notice when absent. |
 
 ## The first winget submission is by hand
 
@@ -73,3 +77,47 @@ Check by hand (the installers are not exercised by CI):
 - Windows: a per-user and an all-users install, an update through the panel (the administrator prompt, other users' processes closed), `choco upgrade` and `winget upgrade` re-running the installer and keeping the channel in the marker, and a revert. These steps are listed in [where-we-are.md](where-we-are.md).
 - A `gitpoulpi --version` from the Docker image, `docker run -it` drawing the UI, and the SSH agent forwarding.
 - The apt repository: add the source on a clean Debian, `apt install`, then `apt install --only-upgrade` with a second version.
+
+## Signing and supply chain
+
+### The release signing key
+
+Every release asset is signed with [minisign](https://jedisct1.github.io/minisign/), so an update, a mirror or a manual download can be checked against a key the project controls, independently of GitHub. The signature of each file carries the trusted comment `file:<name> version:<v>`: a valid signature cannot be moved onto another file or onto an older release.
+
+The key is generated once, offline, by the owner, as a project key and never a personal one:
+
+```
+minisign -G -p packaging/minisign.pub -s gitpoulpi-release.key
+```
+
+- Use a strong password. Keep the key file and the password in the organization's password vault.
+- Create a GitHub environment named `release` and store `MINISIGN_SECRET_KEY` (the whole text of `gitpoulpi-release.key`) and `MINISIGN_PASSWORD` there. Only the `publish` job and `security-advisory.yml` use that environment.
+- Commit only `packaging/minisign.pub`. The update client (a later change) compiles it in and does not merge before that file exists.
+
+`cargo run -p xtask -- sign --dir dist --version <v>` is what the workflow runs. It signs every file of the directory except `*.sha256` and `*.minisig` (archives, installers, `.deb`, `install.sh`, `latest.json`, `security.json`, the SBOM) and reads the key from the two environment variables; it never prompts. To check a signature by hand: `minisign -Vm <file> -p packaging/minisign.pub`, then read the trusted comment it prints.
+
+### Rotation
+
+The client accepts a list of compiled-in keys (the current one and the next). To rotate: generate the new key, ship a release that lists both public keys and is still signed with the old one, switch the `release` environment secrets to the new key, and drop the old public key from the list in a later release. Keep a list of keys with their key ids and dates in the password vault.
+
+### Attestations
+
+`actions/attest-build-provenance` signs a build provenance statement for `dist/*`. On a private repository this needs GitHub Enterprise Cloud, so the step runs only when the repository variable `ATTESTATIONS` is `true`. Users verify with `gh attestation verify <file> --repo <owner>/gitpoulpi`.
+
+### SBOM
+
+`publish` runs `cargo cyclonedx --format json` for the binary crates, merges the results into `gitpoulpi-<v>-sbom.cdx.json`, signs it and attaches it. When the secrets `DTRACK_URL` and `DTRACK_API_KEY` exist, the SBOM is also posted to `<DTRACK_URL>/api/v1/bom` (`autoCreate`, project `GitPoulpi`, the release version). Without them the step prints a notice and skips.
+
+### Dependencies
+
+- `.github/dependabot.yml` proposes `cargo` and `github-actions` updates weekly with `cooldown: default-days: 3`. The cooldown does not delay security updates. `xtask/tests/workflow_pins.rs` fails if the cooldown drops below 2 days.
+- Every third-party `uses:` is pinned by its full commit SHA with a `# vX.Y.Z` comment; Dependabot keeps both current. The same test checks every `uses:`.
+- `deny.toml` holds the `cargo-deny` policy: advisories (yanked releases denied, every ignore needs a reason), bans (no `openssl-sys`, no `native-tls`, wildcard versions denied) and sources (crates.io only). It runs in `ci.yml` and in the release `preflight`. Run `cargo deny check advisories bans sources licenses` locally when it is installed.
+- **Dependabot alerts** on a private organization repository are not on by default: an administrator enables "Dependency graph", "Dependabot alerts" and "Dependabot security updates" in Settings, Code security. None of them needs GitHub Advanced Security.
+- **Minimum age.** `cargo run -p xtask -- lock-age --base <ref> --min-days 2` fails when `Cargo.lock` adds or changes a crates.io version published less than two days before. It runs in `ci.yml` (pull requests and pushes that change `Cargo.lock`) and in the release `preflight` against the previous release tag. For an urgent fix, add a trailer to a commit of the range: `Lock-Age-Override: <name>@<version> <reason>` (the reason is mandatory).
+
+### Security notices
+
+`security/advisories.json` is the source of truth: a list of `{id, affected, fixed, severity, url, summary}` with ids `GPSA-YYYY-NNN`, a semver range in `affected`, and an https `url`. Add one with `cargo run -p xtask -- advisory add --affected ">=1.2.0, <1.4.3" --fixed 1.4.3 --severity high --url https://... --summary "..."`, and validate with `cargo run -p xtask -- advisory check`. Merge it by pull request.
+
+The workflow `.github/workflows/security-advisory.yml` (manual dispatch, and every push to `main` that touches the file) validates the file, builds `security.json`, adds the advisories to the latest release's `latest.json`, signs both files and replaces them on the release with `gh release upload --clobber`, as the Poulpi-Lab GitHub App's bot (`POULPI_BOT_APP_ID`, `POULPI_BOT_PRIVATE_KEY`). `release.yml` copies the current file into every new release. Reporting of vulnerabilities is described in `SECURITY.md`.

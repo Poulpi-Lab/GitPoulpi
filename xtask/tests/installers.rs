@@ -456,22 +456,24 @@ fn every_channel_job_is_gated_and_skips_a_missing_secret() {
         }
     }
     // Pushes to other repositories go out as the App bot, never as a personal account.
-    assert!(yml.contains("actions/create-github-app-token@v1"));
+    assert!(yml.contains("actions/create-github-app-token@"));
     assert!(yml.contains("vars.POULPI_BOT_APP_ID"));
     assert!(yml.contains("secrets.POULPI_BOT_PRIVATE_KEY"));
     for forbidden in ["PERSONAL", "GH_PAT", "secrets.PAT"] {
         assert!(!yml.contains(forbidden), "{forbidden}");
     }
-    // Third-party actions are pinned to at least a major version tag.
+    // Third-party actions are pinned by commit SHA (workflow_pins.rs checks every `uses:` of every workflow).
     for line in yml.lines().filter(|l| l.contains("uses: ")) {
-        let reference = line.split("uses: ").nth(1).unwrap().trim();
-        let (name, version) = reference.split_once('@').unwrap_or((reference, ""));
-        let pinned =
-            version.starts_with('v') && version[1..].starts_with(|c: char| c.is_ascii_digit());
-        assert!(
-            pinned || name == "dtolnay/rust-toolchain",
-            "unpinned action: {line}"
-        );
+        let reference = line
+            .split("uses: ")
+            .nth(1)
+            .unwrap()
+            .split('#')
+            .next()
+            .unwrap()
+            .trim();
+        let version = reference.split_once('@').map_or("", |(_, v)| v);
+        assert!(version.len() == 40, "unpinned action: {line}");
     }
 }
 

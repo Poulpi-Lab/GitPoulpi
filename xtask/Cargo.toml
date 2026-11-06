@@ -44,7 +44,13 @@ tar = { version = "0.4", default-features = false }
 zip = { version = "2", default-features = false, features = ["deflate"] }
 sha2 = { workspace = true, features = ["std"] }
 
+# `xtask sign` (release signing), `xtask lock-age` (crates.io publish dates over
+# rustls) and `xtask advisory` (semver ranges): the supply-chain tasks.
+ureq = { version = "2", features = ["json"] }
+minisign = "0.10"
+semver = "1"
+toml.workspace = true
+
 [dev-dependencies]
 # `tests/feature_contract.rs` reads the workspace's Cargo.toml files.
-toml.workspace = true
 tempfile.workspace = true

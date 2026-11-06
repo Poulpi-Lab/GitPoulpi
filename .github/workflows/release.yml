@@ -4,13 +4,21 @@ name: Release
 # repository's tags are prefixed by purpose, version tags live under `releases/`), so it costs nothing
 # day to day. Jobs:
 #
+#   preflight cargo-deny (advisories, bans, sources, licenses) and the minimum age of every crates.io version
+#             added since the previous release tag (xtask lock-age). CI is disabled, so this is where they run.
 #   build     every OS and CPU: `cargo run -p xtask -- dist` (fat LTO), then the installers (Inno Setup and MSI on
 #             Windows, a .deb on Linux), each with a .sha256.
-#   publish   one GitHub release with every archive, installer, .deb, install.sh, latest.json and the .sha256 files.
+#   publish   one GitHub release with every archive, installer, .deb, install.sh, latest.json, security.json, the SBOM,
+#             the .sha256 files and a minisign .minisig for every asset (xtask sign). Runs in the `release`
+#             environment, which holds the signing secrets.
 #   channels  after publish, only for a stable tag and only when the repository variable PUBLISH_PACKAGES is
 #             'true': Chocolatey, winget, Scoop, Homebrew, AUR, apt, Docker (Docker Hub, optionally GHCR) and,
 #             opt-in, crates.io. Every channel step is skipped (the job stays green, with a notice) when its
 #             secret is missing. See docs/developer/releasing.md and the install-channels design.
+#
+# Signing and supply chain: secrets MINISIGN_SECRET_KEY and MINISIGN_PASSWORD (environment `release`), optional
+# DTRACK_URL and DTRACK_API_KEY (SBOM upload), variable ATTESTATIONS ('true' enables build provenance
+# attestations, which need GitHub Enterprise Cloud on a private repository). docs/developer/releasing.md.
 #
 # Secrets: CHOCO_API_KEY, AUR_SSH_PRIVATE_KEY, APT_GPG_PRIVATE_KEY, APT_GPG_PASSPHRASE, POULPI_BOT_PRIVATE_KEY,
 # DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, CARGO_REGISTRY_TOKEN (optional).
@@ -52,7 +60,38 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  preflight:
+    name: supply chain
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Full history and tags: lock-age compares with the previous release tag.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ env.TAG }}
+          fetch-depth: 0
+      - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
+        with:
+          command: check
+          arguments: advisories bans sources licenses
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          key: release-preflight
+      - name: Minimum age of crates.io versions added since the previous release
+        run: |
+          prev=$(git describe --tags --abbrev=0 --match 'releases/v*' "${TAG}^" 2>/dev/null || true)
+          if [ -z "$prev" ]; then
+            echo "::notice::no earlier release tag, the minimum-age check is skipped"
+            exit 0
+          fi
+          echo "comparing with $prev"
+          cargo run -q -p xtask -- lock-age --base "$prev" --min-days 2
+
   build:
+    needs: preflight
     name: ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -67,7 +106,7 @@ jobs:
           - { os: macos-latest, target: aarch64-apple-darwin }
           - { os: macos-latest, target: x86_64-apple-darwin }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ env.TAG }}
       # `xtask dist` names the archives after the workspace version, the installer step and the updater after
@@ -82,10 +121,11 @@ jobs:
             echo "::error::tag $TAG names version $tag_version but Cargo.toml says $cargo_version"
             exit 1
           fi
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
+          toolchain: stable
           targets: ${{ matrix.target }}
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           key: release-${{ matrix.target }}
       - name: Build and pack
@@ -137,7 +177,7 @@ jobs:
           mkdir -p target/deb-stage
           tar -xzf "target/dist/$stem.tar.gz" -C target/deb-stage --strip-components=1
           cargo run -q -p xtask -- package-marker --channel apt --version "$version" --target ${{ matrix.target }} --out target/deb-stage/.gitpoulpi-dist
-      - uses: taiki-e/install-action@v2
+      - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2.90.1
         if: runner.os == 'Linux'
         with:
           tool: cargo-deb
@@ -148,7 +188,7 @@ jobs:
           cargo deb -p gitpoulpi-cli --no-build --no-strip -o target/dist/
           cd target/dist
           for deb in *.deb; do sha256sum "$deb" > "$deb.sha256"; done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: dist-${{ matrix.target }}
           path: target/dist/*
@@ -162,16 +202,20 @@ jobs:
     # `inputs` is empty on a tag push, so only a manual dry run skips this job.
     if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
+    # The signing secrets live in the `release` environment.
+    environment: release
     permissions:
       contents: write
+      id-token: write
+      attestations: write
     outputs:
       version: ${{ steps.meta.outputs.version }}
       prerelease: ${{ steps.meta.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ env.TAG }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           path: dist
           merge-multiple: true
@@ -205,8 +249,62 @@ jobs:
             jq -n --arg name "${sum%.sha256}" --arg hash "$(cut -d ' ' -f 1 "$sum")" '{($name): $hash}'
           done | jq -s 'add')
           jq -n --arg version "${{ steps.meta.outputs.version }}" --rawfile notes ../notes.md --argjson assets "$assets" \
-            '{version: $version, notes: $notes, assets: $assets}' > latest.json
-      - uses: softprops/action-gh-release@v2
+            --slurpfile advisories ../security/advisories.json \
+            '{version: $version, notes: $notes, assets: $assets, advisories: $advisories[0]}' > latest.json
+      # security.json: the security notices of security/advisories.json, signed like every asset. The
+      # security-advisory workflow republishes it (and latest.json) when a notice is added later.
+      - name: security.json
+        run: |
+          cargo run -q -p xtask -- advisory check
+          jq -n --slurpfile advisories security/advisories.json \
+            '{schema: 1, advisories: $advisories[0]}' > dist/security.json
+      # SBOM (CycloneDX, JSON) of the shipped binaries, merged into one file.
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+      - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2.90.1
+        with:
+          tool: cargo-cyclonedx
+      - name: SBOM
+        run: |
+          version="${{ steps.meta.outputs.version }}"
+          for crate in gitpoulpi-cli gitpoulpi-tui gitpoulpi-mcp gitpoulpi-updater; do
+            (cd "crates/$crate" && cargo cyclonedx --format json --override-filename sbom)
+          done
+          jq -s '.[0] * {
+                   components: ([.[].components[]?] | unique_by(."bom-ref")),
+                   dependencies: ([.[].dependencies[]?] | unique_by(.ref))
+                 }' crates/gitpoulpi-cli/sbom.json crates/gitpoulpi-tui/sbom.json \
+                    crates/gitpoulpi-mcp/sbom.json crates/gitpoulpi-updater/sbom.json \
+            > "dist/gitpoulpi-${version}-sbom.cdx.json"
+      # Optional: a Dependency-Track server. Skipped with a notice when its secrets are absent.
+      - name: Upload the SBOM to Dependency-Track
+        env:
+          DTRACK_URL: ${{ secrets.DTRACK_URL }}
+          DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          if [ -z "$DTRACK_URL" ] || [ -z "$DTRACK_API_KEY" ]; then
+            echo "::notice::DTRACK_URL or DTRACK_API_KEY is not set, the SBOM is not uploaded to Dependency-Track"
+            exit 0
+          fi
+          curl -fsS -X POST "${DTRACK_URL%/}/api/v1/bom" \
+            -H "X-Api-Key: $DTRACK_API_KEY" \
+            -F autoCreate=true -F projectName=GitPoulpi -F "projectVersion=$VERSION" \
+            -F "bom=@dist/gitpoulpi-${VERSION}-sbom.cdx.json"
+      # One minisign signature per asset (not .sha256 or .minisig), trusted comment `file:<name> version:<v>`.
+      - name: Sign the assets
+        env:
+          MINISIGN_SECRET_KEY: ${{ secrets.MINISIGN_SECRET_KEY }}
+          MINISIGN_PASSWORD: ${{ secrets.MINISIGN_PASSWORD }}
+        run: cargo run -q -p xtask -- sign --dir dist --version "${{ steps.meta.outputs.version }}"
+      # Build provenance. Private repositories need GitHub Enterprise Cloud for attestations, hence the variable.
+      # Verify with `gh attestation verify <file> --repo <owner>/gitpoulpi`.
+      - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        if: ${{ vars.ATTESTATIONS == 'true' }}
+        with:
+          subject-path: dist/*
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: ${{ env.TAG }}
           name: ${{ steps.notes.outputs.title }}
@@ -233,11 +331,11 @@ jobs:
         if: env.HAS != 'true'
         shell: bash
         run: echo "::notice::CHOCO_API_KEY is not set, the Chocolatey package was not pushed"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
           ref: ${{ env.TAG }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         if: env.HAS == 'true'
         with:
           path: dist
@@ -269,7 +367,7 @@ jobs:
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the winget update was not submitted"
       # The App installation covers the fork Poulpi-Lab/winget-pkgs. komac needs the package to exist in
       # winget-pkgs already (the first version is submitted by hand), then it opens one pull request per release.
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
         if: env.HAS == 'true'
         id: app
         with:
@@ -277,7 +375,7 @@ jobs:
           private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
           owner: Poulpi-Lab
           repositories: winget-pkgs
-      - uses: taiki-e/install-action@v2
+      - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2.90.1
         if: env.HAS == 'true'
         with:
           tool: komac
@@ -300,7 +398,7 @@ jobs:
       - name: Notice when the bot credentials are missing
         if: env.HAS != 'true'
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the Scoop bucket was not updated"
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
         if: env.HAS == 'true'
         id: app
         with:
@@ -308,17 +406,17 @@ jobs:
           private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
           owner: Poulpi-Lab
           repositories: scoop-gitpoulpi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
           ref: ${{ env.TAG }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
           repository: Poulpi-Lab/scoop-gitpoulpi
           token: ${{ steps.app.outputs.token }}
           path: target-repo
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         if: env.HAS == 'true'
         with:
           path: dist
@@ -352,7 +450,7 @@ jobs:
       - name: Notice when the bot credentials are missing
         if: env.HAS != 'true'
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the Homebrew tap was not updated"
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
         if: env.HAS == 'true'
         id: app
         with:
@@ -360,17 +458,17 @@ jobs:
           private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
           owner: Poulpi-Lab
           repositories: homebrew-gitpoulpi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
           ref: ${{ env.TAG }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
           repository: Poulpi-Lab/homebrew-gitpoulpi
           token: ${{ steps.app.outputs.token }}
           path: target-repo
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         if: env.HAS == 'true'
         with:
           path: dist
@@ -408,11 +506,11 @@ jobs:
       - name: Install the tools
         if: env.HAS == 'true'
         run: pacman -Syu --noconfirm base-devel git openssh curl
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
           ref: ${{ env.TAG }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         if: env.HAS == 'true'
         with:
           path: dist
@@ -469,7 +567,7 @@ jobs:
       - name: Notice when a secret is missing
         if: env.HAS != 'true'
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY, POULPI_BOT_APP_ID or APT_GPG_PRIVATE_KEY is not set, the apt repository was not updated"
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
         if: env.HAS == 'true'
         id: app
         with:
@@ -477,18 +575,18 @@ jobs:
           private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
           owner: Poulpi-Lab
           repositories: apt
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
           ref: ${{ env.TAG }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
           repository: Poulpi-Lab/apt
           ref: gh-pages
           token: ${{ steps.app.outputs.token }}
           path: apt-repo
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         if: env.HAS == 'true'
         with:
           path: dist
@@ -541,10 +639,10 @@ jobs:
       - name: Notice when Docker Hub is not configured
         if: env.HAS_DOCKERHUB != 'true'
         run: echo "::notice::DOCKERHUB_USERNAME or DOCKERHUB_TOKEN is not set, nothing is pushed to Docker Hub"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ env.TAG }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: dist-*-linux-gnu
           path: dist
@@ -561,11 +659,11 @@ jobs:
           done
           cp packaging/docker/entrypoint.sh docker-ctx/entrypoint.sh
       # The binaries are copied, but the arm64 image's RUN steps (apt, the marker) execute under emulation.
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
         with:
           platforms: arm64
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/metadata-action@v5
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+      - uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         id: meta
         with:
           images: |
@@ -579,19 +677,19 @@ jobs:
             type=raw,value=latest,enable=${{ !contains(env.VERSION, '-') }}
       - name: Log in to Docker Hub
         if: env.HAS_DOCKERHUB == 'true'
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Log in to GHCR
         if: env.HAS_GHCR == 'true'
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: docker-ctx
           file: packaging/docker/Dockerfile
@@ -604,7 +702,7 @@ jobs:
             SOURCE_URL=https://github.com/${{ github.repository }}
       - name: Docker Hub overview
         if: env.HAS_DOCKERHUB == 'true'
-        uses: peter-evans/dockerhub-description@v4
+        uses: peter-evans/dockerhub-description@432a30c9e07499fd01da9f8a49f0faf9e0ca5b77 # v4.0.2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -624,11 +722,13 @@ jobs:
       - name: Notice when the secret is missing
         if: env.HAS != 'true'
         run: echo "::notice::CARGO_REGISTRY_TOKEN is not set, nothing was published to crates.io"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
           ref: ${{ env.TAG }}
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
         if: env.HAS == 'true'
       - name: Publish the workspace
         if: env.HAS == 'true'

@@ -21,7 +21,6 @@ use gitpoulpi_ipc::{Event, JobInfo, JobState, Request, Response, ServerMessage};
 use gitpoulpi_testkit::{FixtureRepo, FixtureRepoBuilder, SlowRemote};
 use serde_json::{json, Value};
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
-use tokio::net::TcpStream;
 
 const SESSION: &str = "jobs-test";
 const WAIT: Duration = Duration::from_secs(60);
@@ -42,8 +41,11 @@ struct Conn {
 }
 
 impl Conn {
-    async fn connect(port: u16) -> Self {
-        let stream = TcpStream::connect(("127.0.0.1", port)).await.unwrap();
+    async fn connect(endpoint: &gitpoulpi_ipc::Endpoint) -> Self {
+        let stream = gitpoulpi_ipc::Client::connect(endpoint)
+            .await
+            .unwrap()
+            .into_stream();
         let (read, write) = stream.into_split();
         Self {
             read,
@@ -141,7 +143,7 @@ async fn daemon() -> (gitpoulpi_daemon::DaemonHandle, Conn) {
     delay_every_job();
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(Git2Backend::new());
     let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-    let conn = Conn::connect(handle.port).await;
+    let conn = Conn::connect(&handle.endpoint()).await;
     (handle, conn)
 }
 

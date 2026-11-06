@@ -57,7 +57,7 @@ impl Rig {
             .spawn(Arc::clone(&backend))
             .await
             .unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = repo.repo_ref().id;
         Rig {
             handle: Some(handle),
@@ -504,7 +504,7 @@ async fn a_second_client_receives_journal_changed() {
     for (name, backend) in backends() {
         let mut rig = Rig::new(backend).await;
         let handle = rig.handle.as_ref().unwrap();
-        let mut watcher = Client::connect_port(handle.port)
+        let mut watcher = Client::connect(&handle.endpoint())
             .await
             .unwrap()
             .into_stream();
@@ -670,7 +670,7 @@ async fn a_non_journaled_mutation_that_blocks_the_top_entry_broadcasts_it() {
     for (name, backend) in backends() {
         let mut rig = Rig::new(backend).await;
         let handle = rig.handle.as_ref().unwrap();
-        let mut watcher = Client::connect_port(handle.port)
+        let mut watcher = Client::connect(&handle.endpoint())
             .await
             .unwrap()
             .into_stream();

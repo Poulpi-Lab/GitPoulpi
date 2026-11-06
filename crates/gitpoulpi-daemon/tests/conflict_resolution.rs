@@ -55,7 +55,7 @@ impl Rig {
             .spawn(backend)
             .await
             .unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = repo.repo_ref().id;
         let rig = Rig {
             handle: Some(handle),

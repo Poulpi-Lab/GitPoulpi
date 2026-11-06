@@ -24,13 +24,11 @@ fn backend() -> Arc<dyn gitpoulpi_core::GitBackend> {
     Arc::new(SystemGitBackend::new())
 }
 
-async fn wait_for_port_file(paths: &ConfigPaths, session: &str) -> u16 {
+async fn wait_for_port_file(paths: &ConfigPaths, session: &str) -> gitpoulpi_ipc::Endpoint {
     let port_file = paths.ipc_port_file(session);
     for _ in 0..100 {
-        if let Ok(raw) = std::fs::read_to_string(&port_file) {
-            if let Ok(port) = raw.trim().parse::<u16>() {
-                return port;
-            }
+        if let Some(endpoint) = gitpoulpi_ipc::discovery::endpoint(&port_file) {
+            return endpoint;
         }
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
@@ -54,7 +52,7 @@ async fn a_shutdown_request_stops_a_standalone_daemon_and_cleans_up_after_itself
         async move { daemon.run_foreground_in(backend(), &paths).await }
     });
 
-    let port = wait_for_port_file(&paths, session).await;
+    let endpoint = wait_for_port_file(&paths, session).await;
     let port_file = paths.ipc_port_file(session);
     let pid_file = paths.ipc_pid_file(session);
     assert!(port_file.exists(), "port file must exist once listening");
@@ -67,9 +65,9 @@ async fn a_shutdown_request_stops_a_standalone_daemon_and_cleans_up_after_itself
 
     // A second, merely-subscribed client must also hear about the
     // shutdown -- it is a broadcast, not a reply to the asker alone.
-    let mut subscriber = Client::connect_port(port).await.unwrap().into_stream();
+    let mut subscriber = Client::connect(&endpoint).await.unwrap().into_stream();
 
-    let mut actor = Client::connect_port(port).await.unwrap();
+    let mut actor = Client::connect(&endpoint).await.unwrap();
     let response = actor
         .call(&Request {
             id: 1,
@@ -125,11 +123,11 @@ async fn a_shutdown_with_a_reason_broadcasts_shutting_down_before_stopping() {
         let session = "lifecycle-reason-test";
         let daemon = Daemon::new(session);
         let handle = daemon.spawn(backend()).await.unwrap();
-        let mut subscriber = Client::connect_port(handle.port)
+        let mut subscriber = Client::connect(&handle.endpoint())
             .await
             .unwrap()
             .into_stream();
-        let mut actor = Client::connect_port(handle.port).await.unwrap();
+        let mut actor = Client::connect(&handle.endpoint()).await.unwrap();
         actor
             .call(&Request {
                 id: 1,
@@ -179,7 +177,7 @@ async fn a_shutdown_with_a_reason_broadcasts_shutting_down_before_stopping() {
 async fn hello_reports_this_daemons_own_kind_and_pid() {
     let daemon = Daemon::new("lifecycle-hello-test");
     let handle = daemon.spawn(backend()).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
 
     let response = client
         .call(&Request {

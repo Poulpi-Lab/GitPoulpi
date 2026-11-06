@@ -5,8 +5,12 @@
 //! to `<session>.port` under the config dir's `sessions/` directory (see
 //! `gitpoulpi_config::ConfigPaths::ipc_port_file`); clients read the file
 //! to find it. It is localhost-only and needs no platform-specific
-//! dependency, at the cost of no OS-level access control beyond "bound to
-//! loopback" (a named pipe or Unix socket would give that).
+//! dependency. Loopback alone is open to every account on the machine, so
+//! the connection is token-authenticated: the daemon publishes a random
+//! token in a user-only `<session>.token` file (written before the port
+//! file) and refuses a connection whose first request is not a `Hello`
+//! carrying it (see [`crate::auth`]). A named pipe or Unix socket would give
+//! OS-level access control instead.
 //!
 //! Every message in both directions is framed as a 4-byte big-endian
 //! length prefix followed by that many bytes of JSON.
@@ -19,6 +23,10 @@ use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 pub enum TransportError {
     #[error("failed to connect to ipc endpoint {0}: is the daemon running?")]
     ConnectFailed(String),
+    /// The daemon answered the handshake with a refusal (the message is its
+    /// own wording).
+    #[error("{0}")]
+    Refused(String),
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
     #[error("malformed message: {0}")]

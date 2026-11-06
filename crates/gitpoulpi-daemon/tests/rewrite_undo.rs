@@ -105,7 +105,7 @@ impl Rig {
         std::env::set_var("GITPOULPI_GENERAL_UNDO_DEPTH", "0");
         isolated_config();
         let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let mut rig = Rig {
             handle: Some(handle),
             client,
@@ -218,7 +218,7 @@ impl Rig {
         self.handle.take().unwrap().shutdown().await.unwrap();
         gitpoulpi_daemon::forget_rewrite_plans_for_tests();
         let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-        self.client = Client::connect_port(handle.port).await.unwrap();
+        self.client = Client::connect(&handle.endpoint()).await.unwrap();
         self.handle = Some(handle);
     }
 
@@ -603,9 +603,12 @@ struct Raw {
 }
 
 impl Raw {
-    async fn connect(port: u16, repo: &FixtureRepo) -> Raw {
+    async fn connect(endpoint: &gitpoulpi_ipc::Endpoint, repo: &FixtureRepo) -> Raw {
         Raw {
-            stream: TcpStream::connect(("127.0.0.1", port)).await.unwrap(),
+            stream: gitpoulpi_ipc::Client::connect(endpoint)
+                .await
+                .unwrap()
+                .into_stream(),
             repo: repo.root().to_path_buf(),
             next: 100,
             events: Vec::new(),
@@ -663,8 +666,8 @@ impl Raw {
 async fn a_preview_is_a_job_that_reports_progress() {
     let backend: Arc<dyn GitBackend> = Arc::new(gitpoulpi_cli_backend::SystemGitBackend::new());
     let rig = Rig::new(backend).await;
-    let port = rig.handle.as_ref().unwrap().port;
-    let mut raw = Raw::connect(port, &rig.repo).await;
+    let port = rig.handle.as_ref().unwrap().endpoint();
+    let mut raw = Raw::connect(&port, &rig.repo).await;
     let args = serde_json::to_value(PreviewArgs {
         recipe: recipe(),
         vouched: Vec::new(),
@@ -723,8 +726,8 @@ async fn canceling_a_preview_stops_it_and_leaves_nothing() {
     let rig = Rig::new(backend).await;
     std::env::set_var(TICK_DELAY, "250");
     let refs = rig.refs();
-    let port = rig.handle.as_ref().unwrap().port;
-    let mut raw = Raw::connect(port, &rig.repo).await;
+    let port = rig.handle.as_ref().unwrap().endpoint();
+    let mut raw = Raw::connect(&port, &rig.repo).await;
     let args = serde_json::to_value(PreviewArgs {
         recipe: recipe(),
         vouched: Vec::new(),
@@ -970,8 +973,8 @@ async fn a_rewrite_is_pushed_as_a_job_and_the_undo_warns() {
         assert!(note.text.contains("git reset --hard origin/main"), "{name}");
 
         // A job; main is protected, so it is left out.
-        let port = rig.handle.as_ref().unwrap().port;
-        let mut raw = Raw::connect(port, &rig.repo).await;
+        let port = rig.handle.as_ref().unwrap().endpoint();
+        let mut raw = Raw::connect(&port, &rig.repo).await;
         let args = serde_json::to_value(PushRewritten::new(plan.run.clone())).unwrap();
         let id = raw.send(OperationKind::RewritePush, args, true).await;
         let out: PushRewrittenOutcome =
@@ -1074,8 +1077,8 @@ async fn a_secret_scan_is_a_job_and_no_value_reaches_the_wire_or_the_log() {
         let mut wire = String::new();
 
         // The scan, as a job on a raw connection so its events are seen too.
-        let port = rig.handle.as_ref().unwrap().port;
-        let mut raw = Raw::connect(port, &rig.repo).await;
+        let port = rig.handle.as_ref().unwrap().endpoint();
+        let mut raw = Raw::connect(&port, &rig.repo).await;
         let args = serde_json::to_value(ScanSecretsArgs::default()).unwrap();
         let id = raw
             .send(OperationKind::RewriteScanSecrets, args, true)
@@ -1186,8 +1189,8 @@ async fn canceling_a_secret_scan_stops_it() {
     let backend: Arc<dyn GitBackend> = Arc::new(gitpoulpi_cli_backend::SystemGitBackend::new());
     let rig = Rig::new(backend).await;
     std::env::set_var(TICK_DELAY, "250");
-    let port = rig.handle.as_ref().unwrap().port;
-    let mut raw = Raw::connect(port, &rig.repo).await;
+    let port = rig.handle.as_ref().unwrap().endpoint();
+    let mut raw = Raw::connect(&port, &rig.repo).await;
     let args = serde_json::to_value(ScanSecretsArgs::default()).unwrap();
     let id = raw
         .send(OperationKind::RewriteScanSecrets, args, true)
@@ -1234,8 +1237,8 @@ async fn a_size_analysis_is_a_job_with_progress_and_changes_nothing() {
             .build();
         let rig = Rig::on(backend, repo).await;
         let head_before = rig.rev("HEAD");
-        let port = rig.handle.as_ref().unwrap().port;
-        let mut raw = Raw::connect(port, &rig.repo).await;
+        let port = rig.handle.as_ref().unwrap().endpoint();
+        let mut raw = Raw::connect(&port, &rig.repo).await;
         let args = serde_json::to_value(AnalyzeArgs::default()).unwrap();
         let id = raw.send(OperationKind::RewriteAnalyze, args, true).await;
         let answer = raw.wait(id).await.unwrap();
@@ -1271,8 +1274,8 @@ async fn canceling_a_size_analysis_stops_it() {
     let backend: Arc<dyn GitBackend> = Arc::new(gitpoulpi_cli_backend::SystemGitBackend::new());
     let rig = Rig::new(backend).await;
     std::env::set_var(TICK_DELAY, "250");
-    let port = rig.handle.as_ref().unwrap().port;
-    let mut raw = Raw::connect(port, &rig.repo).await;
+    let port = rig.handle.as_ref().unwrap().endpoint();
+    let mut raw = Raw::connect(&port, &rig.repo).await;
     let args = serde_json::to_value(AnalyzeArgs::default()).unwrap();
     let id = raw.send(OperationKind::RewriteAnalyze, args, true).await;
     let deadline = Instant::now() + Duration::from_secs(30);
@@ -1401,8 +1404,8 @@ async fn a_purged_rewrite_is_listed_purged_and_undo_is_refused_with_the_typed_re
         assert_eq!(latest.entries[0].id, ids[1], "{name}");
 
         // The purge is a job that runs to the end.
-        let port = rig.handle.as_ref().unwrap().port;
-        let mut raw = Raw::connect(port, &rig.repo).await;
+        let port = rig.handle.as_ref().unwrap().endpoint();
+        let mut raw = Raw::connect(&port, &rig.repo).await;
         let id = raw
             .send(OperationKind::RewritePurge, json!({ "all": true }), true)
             .await;

@@ -261,7 +261,7 @@ pub fn run(args: &[String]) -> Result<i32, String> {
                 .await
                 .map_err(|e| e.to_string())?;
             let mut b = Bench {
-                client: Client::connect_port(handle.port)
+                client: Client::connect(&handle.endpoint())
                     .await
                     .map_err(|e| e.to_string())?,
                 next_id: 0,

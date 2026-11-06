@@ -50,7 +50,7 @@ async fn the_configured_encoding_decodes_blobs_and_the_repo_preference_wins() {
             .unwrap()
             .build();
         let handle = Daemon::new("encoding-test").spawn(backend).await.unwrap();
-        let mut client = Client::connect_port(handle.port).await.unwrap();
+        let mut client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = repo.repo_ref().id;
         assert_eq!(
             read_latin(&mut client, &id, 2).await,

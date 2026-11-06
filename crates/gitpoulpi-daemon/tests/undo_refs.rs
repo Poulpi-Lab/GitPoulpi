@@ -50,7 +50,7 @@ impl Rig {
         // recorded here (outside_journal.rs covers them recorded).
         std::env::set_var("GITPOULPI_GENERAL_JOURNAL_OUTSIDE", "false");
         let handle = Daemon::new("undo-refs-test").spawn(backend).await.unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = repo.repo_ref().id;
         Rig {
             handle: Some(handle),

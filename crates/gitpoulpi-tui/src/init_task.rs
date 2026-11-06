@@ -73,11 +73,11 @@ async fn run(
         });
     };
 
-    let port = match crate::daemon_link::ensure_daemon(&session).await {
-        Ok(port) => port,
+    let endpoint = match crate::daemon_link::ensure_daemon(&session).await {
+        Ok(endpoint) => endpoint,
         Err(e) => return finish(Err(e)),
     };
-    let stream = match gitpoulpi_ipc::discovery::connect(port).await {
+    let stream = match gitpoulpi_ipc::discovery::connect(&endpoint).await {
         Ok(stream) => stream,
         Err(e) => return finish(Err(gitpoulpi_i18n::msg::task_error::daemon_unreachable(e))),
     };

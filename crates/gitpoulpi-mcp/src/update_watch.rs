@@ -6,12 +6,12 @@
 //! folder open and, on its next tool call, start a fresh daemon from the old
 //! binaries. So it watches the stream and exits for good.
 
-use gitpoulpi_ipc::{transport, Client, Event, ServerMessage, ShutdownArgs};
+use gitpoulpi_ipc::{transport, Client, Endpoint, Event, ServerMessage, ShutdownArgs};
 
-/// Waits on `port`'s event stream until the daemon announces an update
+/// Waits on the daemon's event stream until it announces an update
 /// shutdown (`true`) or the connection ends without one (`false`).
-pub async fn wait_for_update_shutdown(port: u16) -> bool {
-    let Ok(client) = Client::connect_port(port).await else {
+pub async fn wait_for_update_shutdown(endpoint: &Endpoint) -> bool {
+    let Ok(client) = Client::connect(endpoint).await else {
         return false;
     };
     let mut stream = client.into_stream();
@@ -38,10 +38,10 @@ pub fn spawn(session: &str) {
         return;
     };
     tokio::spawn(async move {
-        let Some(port) = gitpoulpi_ipc::discovery::live_port(&port_file).await else {
+        let Some(endpoint) = gitpoulpi_ipc::discovery::live_endpoint(&port_file).await else {
             return;
         };
-        if wait_for_update_shutdown(port).await {
+        if wait_for_update_shutdown(&endpoint).await {
             eprintln!("gitpoulpi-mcp: closing for an update");
             std::process::exit(0);
         }

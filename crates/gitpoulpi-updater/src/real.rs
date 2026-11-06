@@ -57,10 +57,13 @@ impl DaemonOps for RealDaemons {
 
     fn request_shutdown(&self, daemon: &SessionDaemon) -> bool {
         runtime().block_on(async {
-            let Some(port) = discovery::live_port(&daemon.port_file).await else {
+            let Some(endpoint) = discovery::live_endpoint(&daemon.port_file).await else {
                 return false;
             };
-            let Ok(mut client) = Client::connect_port(port).await else {
+            // Without the token file (another account, an old daemon's
+            // leftovers) this fails and the caller falls back to stopping the
+            // processes.
+            let Ok(mut client) = Client::connect(&endpoint).await else {
                 return false;
             };
             let request = Request {

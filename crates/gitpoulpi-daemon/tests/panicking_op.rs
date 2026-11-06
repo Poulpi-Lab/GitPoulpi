@@ -25,7 +25,7 @@ async fn a_panicking_operation_is_answered_with_an_error_and_the_daemon_keeps_se
         .build();
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let request = |id: u64, command: OperationKind| Request {
         id,
         session: SESSION.into(),

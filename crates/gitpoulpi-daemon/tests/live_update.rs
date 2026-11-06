@@ -36,11 +36,11 @@ async fn a_stage_file_broadcast_carries_an_index_only_scope() {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let daemon = Daemon::new("scope-test");
     let handle = daemon.spawn(backend).await.unwrap();
-    let mut watcher = Client::connect_port(handle.port)
+    let mut watcher = Client::connect(&handle.endpoint())
         .await
         .unwrap()
         .into_stream();
-    let mut actor = Client::connect_port(handle.port).await.unwrap();
+    let mut actor = Client::connect(&handle.endpoint()).await.unwrap();
     let resp = actor
         .call(&Request {
             id: 1,
@@ -92,13 +92,13 @@ async fn a_mutation_from_one_client_is_pushed_live_to_another() {
 
     // Client A subscribes to events by connecting and reading raw
     // ServerMessages off the wire (Client::call only surfaces Responses).
-    let mut watcher = Client::connect_port(handle.port)
+    let mut watcher = Client::connect(&handle.endpoint())
         .await
         .unwrap()
         .into_stream();
 
     // Client B stages + commits.
-    let mut actor = Client::connect_port(handle.port).await.unwrap();
+    let mut actor = Client::connect(&handle.endpoint()).await.unwrap();
     let stage_req = Request {
         id: 1,
         session: "live-update-test".into(),
@@ -194,11 +194,11 @@ async fn a_merge_that_stops_on_conflicts_pushes_conflict_detected() {
     let daemon = Daemon::new("conflict-event-test");
     let handle = daemon.spawn(backend).await.unwrap();
 
-    let mut watcher = Client::connect_port(handle.port)
+    let mut watcher = Client::connect(&handle.endpoint())
         .await
         .unwrap()
         .into_stream();
-    let mut actor = Client::connect_port(handle.port).await.unwrap();
+    let mut actor = Client::connect(&handle.endpoint()).await.unwrap();
 
     let merge_req = Request {
         id: 1,
@@ -292,11 +292,11 @@ async fn an_lfs_push_streams_progress_then_repo_changed() {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let daemon = Daemon::new("lfs-progress-event-test");
     let handle = daemon.spawn(backend).await.unwrap();
-    let mut watcher = Client::connect_port(handle.port)
+    let mut watcher = Client::connect(&handle.endpoint())
         .await
         .unwrap()
         .into_stream();
-    let mut actor = Client::connect_port(handle.port).await.unwrap();
+    let mut actor = Client::connect(&handle.endpoint()).await.unwrap();
 
     let push = Request {
         id: 1,
@@ -364,11 +364,11 @@ async fn a_ref_filter_change_from_one_client_is_broadcast_to_another() {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let daemon = Daemon::new("ref-visibility-test");
     let handle = daemon.spawn(backend).await.unwrap();
-    let mut watcher = Client::connect_port(handle.port)
+    let mut watcher = Client::connect(&handle.endpoint())
         .await
         .unwrap()
         .into_stream();
-    let mut actor = Client::connect_port(handle.port).await.unwrap();
+    let mut actor = Client::connect(&handle.endpoint()).await.unwrap();
     let resp = actor
         .call(&Request {
             id: 1,

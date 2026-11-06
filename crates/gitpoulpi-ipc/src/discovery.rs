@@ -1,6 +1,7 @@
 //! Finding a running daemon without ever waiting on a dead one.
 //!
-//! A daemon publishes `sessions/<session>.port` (and `.pid` when it is a
+//! A daemon publishes `sessions/<session>.token` (the secret a client presents
+//! first, written before the port file), `sessions/<session>.port` (and `.pid` when it is a
 //! standalone process, `.host` when it lives inside a TUI or an MCP server).
 //! A crash leaves the files behind, and on Windows connecting to a dead
 //! loopback port takes about two seconds to be refused (instant on Linux), so
@@ -19,18 +20,82 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
+use gitpoulpi_config::secure_fs;
 use tokio::net::TcpStream;
+
+use crate::auth::{Endpoint, Token};
+use crate::transport::TransportError;
 
 /// How long a loopback connect gets. A live daemon accepts in well under a
 /// millisecond; past this the port is as good as dead.
 pub const CONNECT_TIMEOUT: Duration = Duration::from_millis(150);
 
-/// `127.0.0.1:port`, giving up after [`CONNECT_TIMEOUT`].
-pub async fn connect(port: u16) -> io::Result<TcpStream> {
-    connect_with(port, CONNECT_TIMEOUT, |p| {
+/// How long the handshake after a connect may take.
+const HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(10);
+
+/// The endpoint `port_file` names: its port and, when a `.token` file sits
+/// next to it, the token. A missing token file is a daemon from before tokens
+/// (its `Hello` takes none). `None` for a missing or unreadable port file.
+pub fn endpoint(port_file: &Path) -> Option<Endpoint> {
+    let port: u16 = std::fs::read_to_string(port_file)
+        .ok()?
+        .trim()
+        .parse()
+        .ok()?;
+    Some(Endpoint::new(port, read_token(port_file)))
+}
+
+/// The endpoint for `port`, with the token of `port_file` when that file still
+/// names `port` (a newer daemon may have replaced it: then its token is not
+/// this port's).
+pub fn endpoint_for_port(port_file: &Path, port: u16) -> Endpoint {
+    match endpoint(port_file) {
+        Some(found) if found.port == port => found,
+        _ => Endpoint::new(port, None),
+    }
+}
+
+fn read_token(port_file: &Path) -> Option<Token> {
+    Token::from_hex(&std::fs::read_to_string(sibling(port_file, "token")).ok()?)
+}
+
+/// `127.0.0.1:port`, giving up after [`CONNECT_TIMEOUT`], then the token
+/// handshake. A refusal is `PermissionDenied` with the daemon's own message.
+pub async fn connect(endpoint: &Endpoint) -> io::Result<TcpStream> {
+    let mut stream = connect_with(endpoint.port, CONNECT_TIMEOUT, |p| {
         TcpStream::connect(("127.0.0.1", p))
     })
+    .await?;
+    let _ = stream.set_nodelay(true);
+    match tokio::time::timeout(
+        HANDSHAKE_TIMEOUT,
+        crate::auth::handshake(&mut stream, endpoint.token.as_ref()),
+    )
     .await
+    {
+        Ok(Ok(())) => Ok(stream),
+        Ok(Err(TransportError::Refused(message))) => {
+            Err(io::Error::new(io::ErrorKind::PermissionDenied, message))
+        }
+        Ok(Err(TransportError::Io(e))) => Err(e),
+        Ok(Err(e)) => Err(io::Error::other(e.to_string())),
+        Err(_) => Err(io::Error::new(
+            io::ErrorKind::TimedOut,
+            "the daemon did not answer the handshake",
+        )),
+    }
+}
+
+/// Publishes a daemon's endpoint: the token file first (user-only), then the
+/// port file, whose appearance means "ready".
+pub fn publish(port_file: &Path, endpoint: &Endpoint) -> io::Result<()> {
+    if let Some(parent) = port_file.parent() {
+        secure_fs::create_private_dir_all(parent)?;
+    }
+    if let Some(token) = &endpoint.token {
+        secure_fs::write_private(&sibling(port_file, "token"), token.to_hex().as_bytes())?;
+    }
+    secure_fs::write_private(port_file, endpoint.port.to_string().as_bytes())
 }
 
 /// [`connect`] with the connect itself and the patience injectable.
@@ -53,7 +118,11 @@ where
 
 /// Whether something accepts connections on `127.0.0.1:port` (bounded).
 pub async fn is_listening(port: u16) -> bool {
-    connect(port).await.is_ok()
+    connect_with(port, CONNECT_TIMEOUT, |p| {
+        TcpStream::connect(("127.0.0.1", p))
+    })
+    .await
+    .is_ok()
 }
 
 /// The sibling file of `port_file` with another extension.
@@ -78,7 +147,10 @@ pub fn recorded_pid(port_file: &Path) -> Option<u32> {
 /// an embedded daemon writes; never `.pid`, whose existence means "a
 /// standalone daemon that `daemon stop` may kill").
 pub fn write_host_file(port_file: &Path) {
-    let _ = std::fs::write(sibling(port_file, "host"), std::process::id().to_string());
+    let _ = secure_fs::write_private(
+        &sibling(port_file, "host"),
+        std::process::id().to_string().as_bytes(),
+    );
 }
 
 /// Removes `port_file` and its siblings, but only while the port file still
@@ -93,10 +165,13 @@ pub fn remove_if_ours(port_file: &Path, port: u16) {
     }
 }
 
-fn remove_files(port_file: &Path) {
+/// Removes `port_file` and every file published beside it (`.pid`, `.host`,
+/// `.token`).
+pub fn remove_files(port_file: &Path) {
     let _ = std::fs::remove_file(port_file);
     let _ = std::fs::remove_file(sibling(port_file, "pid"));
     let _ = std::fs::remove_file(sibling(port_file, "host"));
+    let _ = std::fs::remove_file(sibling(port_file, "token"));
 }
 
 /// Whether the process that wrote `port_file` is gone. Deletes the files then.
@@ -144,6 +219,12 @@ pub async fn live_port(port_file: &Path) -> Option<u16> {
         TcpStream::connect(("127.0.0.1", p))
     })
     .await
+}
+
+/// [`live_port`] plus the token of the daemon that answered.
+pub async fn live_endpoint(port_file: &Path) -> Option<Endpoint> {
+    let port = live_port(port_file).await?;
+    Some(Endpoint::new(port, read_token(port_file)))
 }
 
 /// Is a process with this id running? A process we may not signal counts as

@@ -135,7 +135,7 @@ async fn a_daemon_that_cannot_be_reached_is_reported() {
     let reason = tokio::time::timeout(
         WAIT,
         link_loop_with_port(
-            port,
+            gitpoulpi_ipc::Endpoint::new(port, None),
             "unreachable".into(),
             fixture().repo_ref(),
             LinkChannels {

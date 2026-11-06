@@ -32,7 +32,7 @@ impl Rig {
             .unwrap()
             .build();
         let handle = Daemon::new("sparse").spawn(backend).await.unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = repo.repo_ref().id;
         Rig {
             handle: Some(handle),

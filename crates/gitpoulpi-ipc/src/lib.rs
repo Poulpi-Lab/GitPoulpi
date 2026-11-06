@@ -1,3 +1,4 @@
+pub mod auth;
 mod client;
 pub mod discovery;
 pub mod etag;
@@ -11,6 +12,7 @@ pub mod timing;
 pub mod transport;
 pub mod ui;
 
+pub use auth::{Endpoint, Token};
 pub use client::{Client, CALL_TIMEOUT};
 pub use events::Event;
 pub use jobs::{JobInfo, JobState, CANCEL_ON_DISCONNECT};

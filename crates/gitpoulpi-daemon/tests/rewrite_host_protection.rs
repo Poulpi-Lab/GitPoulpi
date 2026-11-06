@@ -84,7 +84,7 @@ async fn preview(backend: Arc<dyn GitBackend>, repo: &FixtureRepo, recipe: Recip
     let dir = tempfile::tempdir().unwrap();
     std::env::set_var("GITPOULPI_CONFIG_DIR", dir.path());
     let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let args = serde_json::to_value(PreviewArgs {
         recipe,
         vouched: Vec::new(),

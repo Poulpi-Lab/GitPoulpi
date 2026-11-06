@@ -15,7 +15,6 @@ use gitpoulpi_daemon::Daemon;
 use gitpoulpi_ipc::transport::{read_message, write_message};
 use gitpoulpi_ipc::{Request, Response, ServerMessage};
 use gitpoulpi_testkit::FixtureRepoBuilder;
-use tokio::net::TcpStream;
 
 const SESSION: &str = "concurrent-reads-test";
 
@@ -37,8 +36,14 @@ fn request(id: u64, repo: &gitpoulpi_core::domain::RepoRef, command: OperationKi
 
 /// Sends every request before reading any answer, then collects the
 /// answers by id - in whatever order they come back.
-async fn pipelined(port: u16, requests: &[Request]) -> HashMap<u64, Response> {
-    let stream = TcpStream::connect(("127.0.0.1", port)).await.unwrap();
+async fn pipelined(
+    endpoint: &gitpoulpi_ipc::Endpoint,
+    requests: &[Request],
+) -> HashMap<u64, Response> {
+    let stream = gitpoulpi_ipc::Client::connect(endpoint)
+        .await
+        .unwrap()
+        .into_stream();
     let (mut read_half, mut write_half) = stream.into_split();
     for request in requests {
         write_message(&mut write_half, request).await.unwrap();
@@ -84,7 +89,7 @@ async fn a_mutation_pipelined_between_two_reads_is_seen_by_the_second_only() {
     let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
 
     let answers = pipelined(
-        handle.port,
+        &handle.endpoint(),
         &[
             request(1, &repo, OperationKind::Status),
             request(2, &repo, OperationKind::Log),
@@ -142,7 +147,7 @@ async fn many_pipelined_reads_are_each_answered_under_their_own_id() {
         .enumerate()
         .map(|(i, kind)| request(i as u64 + 1, &repo, *kind))
         .collect();
-    let answers = pipelined(handle.port, &requests).await;
+    let answers = pipelined(&handle.endpoint(), &requests).await;
     for (i, kind) in kinds.iter().enumerate() {
         let answer = &answers[&(i as u64 + 1)];
         assert!(answer.result.is_ok(), "{kind:?}: {:?}", answer.result);

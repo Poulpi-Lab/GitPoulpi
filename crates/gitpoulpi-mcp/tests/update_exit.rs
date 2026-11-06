@@ -11,8 +11,8 @@ use gitpoulpi_daemon::Daemon;
 use gitpoulpi_ipc::{Client, Request, ShutdownArgs};
 use gitpoulpi_mcp::update_watch::wait_for_update_shutdown;
 
-async fn stop(port: u16, session: &str, args: serde_json::Value) {
-    let mut client = Client::connect_port(port).await.unwrap();
+async fn stop(endpoint: &gitpoulpi_ipc::Endpoint, session: &str, args: serde_json::Value) {
+    let mut client = Client::connect(endpoint).await.unwrap();
     client
         .call(&Request {
             id: 1,
@@ -31,11 +31,14 @@ async fn watched(args: serde_json::Value) -> bool {
         .spawn(Arc::new(SystemGitBackend::new()))
         .await
         .unwrap();
-    let port = handle.port;
-    let watcher = tokio::spawn(wait_for_update_shutdown(port));
+    let endpoint = handle.endpoint();
+    let watcher = tokio::spawn({
+        let endpoint = endpoint.clone();
+        async move { wait_for_update_shutdown(&endpoint).await }
+    });
     // The watcher must be subscribed before the daemon stops.
     tokio::time::sleep(Duration::from_millis(200)).await;
-    stop(port, session, args).await;
+    stop(&endpoint, session, args).await;
     let seen = tokio::time::timeout(Duration::from_secs(3), watcher)
         .await
         .expect("the watcher must end once the daemon is gone")

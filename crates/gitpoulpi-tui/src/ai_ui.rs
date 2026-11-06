@@ -863,8 +863,8 @@ async fn call_daemon<T: serde::de::DeserializeOwned>(
 }
 
 async fn connect(session: &str) -> Result<Client, String> {
-    let port = crate::daemon_link::ensure_daemon(session).await?;
-    Client::connect_port(port)
+    let endpoint = crate::daemon_link::ensure_daemon(session).await?;
+    Client::connect(&endpoint)
         .await
         .map_err(msg::daemon_unreachable)
 }
@@ -955,8 +955,8 @@ async fn fetch_diffs(
     repo: &RepoRef,
     targets: Vec<DiffTarget>,
 ) -> Result<Vec<Vec<FileDiff>>, String> {
-    let port = crate::daemon_link::ensure_daemon(session).await?;
-    let mut client = Client::connect_port(port)
+    let endpoint = crate::daemon_link::ensure_daemon(session).await?;
+    let mut client = Client::connect(&endpoint)
         .await
         .map_err(msg::daemon_unreachable)?;
     let mut out = Vec::new();

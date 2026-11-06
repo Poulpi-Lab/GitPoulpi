@@ -88,7 +88,7 @@ async fn submodule_requests_and_keeping_them_up_to_date() {
         repo.git(&["submodule", "update"]);
 
         let handle = Daemon::new("submodules-test").spawn(backend).await.unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let mut rig = Rig {
             client,
             id: repo.repo_ref().id,

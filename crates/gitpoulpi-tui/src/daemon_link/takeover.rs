@@ -30,18 +30,21 @@ pub(super) enum Takeover {
     /// Jobs are running on the other build's daemon; the message says so.
     Busy(String),
     /// The old daemon is gone and this process serves the session on `port`.
-    Restarted { port: u16, notice: String },
+    Restarted {
+        endpoint: gitpoulpi_ipc::Endpoint,
+        notice: String,
+    },
 }
 
 pub(super) async fn takeover_stale_daemon(
-    port: u16,
+    endpoint: &gitpoulpi_ipc::Endpoint,
     session: &str,
     port_file: Option<&std::path::Path>,
 ) -> Takeover {
     let Some(my_sha) = this_build_git_sha() else {
         return Takeover::Unchanged;
     };
-    let Ok(info) = ask::<gitpoulpi_ipc::DaemonInfo>(port, session, OperationKind::Hello).await
+    let Ok(info) = ask::<gitpoulpi_ipc::DaemonInfo>(endpoint, session, OperationKind::Hello).await
     else {
         return Takeover::Unchanged;
     };
@@ -51,7 +54,8 @@ pub(super) async fn takeover_stale_daemon(
     if daemon_sha == my_sha {
         return Takeover::Unchanged;
     }
-    let Ok(jobs) = ask::<Vec<gitpoulpi_ipc::JobInfo>>(port, session, OperationKind::JobList).await
+    let Ok(jobs) =
+        ask::<Vec<gitpoulpi_ipc::JobInfo>>(endpoint, session, OperationKind::JobList).await
     else {
         return Takeover::Unchanged;
     };
@@ -61,14 +65,14 @@ pub(super) async fn takeover_stale_daemon(
             &my_sha,
         ));
     }
-    if ask::<serde_json::Value>(port, session, OperationKind::Shutdown)
+    if ask::<serde_json::Value>(endpoint, session, OperationKind::Shutdown)
         .await
         .is_err()
     {
         return Takeover::Unchanged;
     }
     let deadline = tokio::time::Instant::now() + GONE_WITHIN;
-    while gitpoulpi_ipc::discovery::is_listening(port).await {
+    while gitpoulpi_ipc::discovery::is_listening(endpoint.port).await {
         if tokio::time::Instant::now() >= deadline {
             return Takeover::Unchanged;
         }
@@ -77,11 +81,11 @@ pub(super) async fn takeover_stale_daemon(
     // An embedded daemon cannot remove the files its host process wrote; a
     // standalone one already did. Only ours-by-port, a newer daemon's stay.
     if let Some(port_file) = port_file {
-        gitpoulpi_ipc::discovery::remove_if_ours(port_file, port);
+        gitpoulpi_ipc::discovery::remove_if_ours(port_file, endpoint.port);
     }
     match ensure_daemon_at(port_file, session).await {
-        Ok(new_port) => Takeover::Restarted {
-            port: new_port,
+        Ok(new_endpoint) => Takeover::Restarted {
+            endpoint: new_endpoint,
             notice: gitpoulpi_i18n::msg::link_error::daemon_restarted(&daemon_sha, &my_sha),
         },
         Err(_) => Takeover::Unchanged,
@@ -90,12 +94,12 @@ pub(super) async fn takeover_stale_daemon(
 
 /// One bounded request on a connection of its own (not the link's).
 async fn ask<T: serde::de::DeserializeOwned>(
-    port: u16,
+    endpoint: &gitpoulpi_ipc::Endpoint,
     session: &str,
     command: OperationKind,
 ) -> Result<T, ()> {
     let call = async {
-        let mut client = gitpoulpi_ipc::Client::connect_port(port).await.ok()?;
+        let mut client = gitpoulpi_ipc::Client::connect(endpoint).await.ok()?;
         let response = client
             .call(&Request {
                 id: 1,

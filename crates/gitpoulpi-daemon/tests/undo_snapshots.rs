@@ -45,7 +45,7 @@ impl Rig {
             .spawn(backend.clone())
             .await
             .unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = repo.repo_ref().id;
         Rig {
             handle: Some(handle),
@@ -840,7 +840,7 @@ async fn a_staging_undo_survives_a_daemon_restart_and_the_working_tree_is_untouc
             .spawn(backend.clone())
             .await
             .unwrap();
-        let mut client = Client::connect_port(handle.port).await.unwrap();
+        let mut client = Client::connect(&handle.endpoint()).await.unwrap();
         let resp = client
             .call(&Request {
                 id: 1,

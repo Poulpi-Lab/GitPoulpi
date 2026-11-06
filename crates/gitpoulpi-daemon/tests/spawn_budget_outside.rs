@@ -50,7 +50,7 @@ async fn outside_detection_costs_a_known_number_of_spawns() {
         .spawn(backend)
         .await
         .unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     let none = serde_json::json!({});
 

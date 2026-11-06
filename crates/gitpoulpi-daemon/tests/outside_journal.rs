@@ -53,7 +53,7 @@ impl Rig {
             .spawn(backend.clone())
             .await
             .unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = repo.repo_ref().id;
         let mut rig = Rig {
             handle: Some(handle),
@@ -75,7 +75,7 @@ impl Rig {
             .spawn(self.backend.clone())
             .await
             .unwrap();
-        self.client = Client::connect_port(handle.port).await.unwrap();
+        self.client = Client::connect(&handle.endpoint()).await.unwrap();
         self.handle = Some(handle);
     }
 

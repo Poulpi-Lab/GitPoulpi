@@ -85,8 +85,13 @@ async fn live_port(paths: &ConfigPaths, session: &str) -> Option<u16> {
     is_listening(port).await.then_some(port)
 }
 
-async fn hello(port: u16, session: &str) -> Result<DaemonInfo, String> {
-    let mut client = Client::connect_port(port)
+/// The endpoint of `session`'s daemon on `port`, with its token.
+fn endpoint_of(paths: &ConfigPaths, session: &str, port: u16) -> gitpoulpi_ipc::Endpoint {
+    gitpoulpi_ipc::discovery::endpoint_for_port(&paths.ipc_port_file(session), port)
+}
+
+async fn hello(endpoint: &gitpoulpi_ipc::Endpoint, session: &str) -> Result<DaemonInfo, String> {
+    let mut client = Client::connect(endpoint)
         .await
         .map_err(|e| format!("could not reach the daemon: {e}"))?;
     let response = client
@@ -126,7 +131,7 @@ async fn status_one(paths: &ConfigPaths, session: &str, json_output: bool) {
         return;
     };
 
-    match hello(port, session).await {
+    match hello(&endpoint_of(paths, session, port), session).await {
         Ok(info) => {
             let uptime = (gitpoulpi_core::time::unix_now() - info.started_at).max(0);
             let mut payload = json!({
@@ -248,17 +253,19 @@ async fn stop_one(paths: &ConfigPaths, session: &str) -> Value {
         return json!({ "session": session, "ok": true, "method": "none", "detail": "not running" });
     };
     let Ok(port) = raw.trim().parse::<u16>() else {
-        let _ = std::fs::remove_file(&port_file);
+        gitpoulpi_ipc::discovery::remove_files(&port_file);
         return json!({ "session": session, "ok": true, "method": "none", "detail": "not running (stale port file removed)" });
     };
     if !is_listening(port).await {
-        let _ = std::fs::remove_file(&port_file);
-        let _ = std::fs::remove_file(paths.ipc_pid_file(session));
-        let _ = std::fs::remove_file(port_file.with_extension("host"));
+        gitpoulpi_ipc::discovery::remove_files(&port_file);
         return json!({ "session": session, "ok": true, "method": "none", "detail": "not running (stale files removed)" });
     }
 
-    let graceful = tokio::time::timeout(SHUTDOWN_TIMEOUT, send_shutdown(port, session)).await;
+    let graceful = tokio::time::timeout(
+        SHUTDOWN_TIMEOUT,
+        send_shutdown(&endpoint_of(paths, session, port), session),
+    )
+    .await;
     if matches!(graceful, Ok(Ok(()))) {
         // The daemon removes both discovery files itself; wait briefly for
         // the port to stop answering so `daemon stop && daemon start` does
@@ -274,8 +281,7 @@ async fn stop_one(paths: &ConfigPaths, session: &str) -> Value {
     {
         Some(pid) => {
             kill_pid(pid);
-            let _ = std::fs::remove_file(&port_file);
-            let _ = std::fs::remove_file(&pid_file);
+            gitpoulpi_ipc::discovery::remove_files(&port_file);
             json!({
                 "session": session, "ok": true, "method": "killed", "pid": pid,
                 "detail": format!("did not answer in time, killed pid {pid}"),
@@ -290,8 +296,8 @@ async fn stop_one(paths: &ConfigPaths, session: &str) -> Value {
     }
 }
 
-async fn send_shutdown(port: u16, session: &str) -> Result<(), String> {
-    let mut client = Client::connect_port(port)
+async fn send_shutdown(endpoint: &gitpoulpi_ipc::Endpoint, session: &str) -> Result<(), String> {
+    let mut client = Client::connect(endpoint)
         .await
         .map_err(|e| format!("could not reach the daemon: {e}"))?;
     let response = client

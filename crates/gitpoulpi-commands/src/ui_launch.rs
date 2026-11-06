@@ -153,6 +153,7 @@ mod tests {
 
     fn sv(session: &str, port: u16, viewers: Vec<ViewerInfo>) -> SessionViewers {
         SessionViewers {
+            token: None,
             session: session.into(),
             port,
             viewers,

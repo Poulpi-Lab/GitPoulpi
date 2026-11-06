@@ -54,7 +54,7 @@ impl Rig {
         // Outside changes are not recorded here: only the split's own entry.
         std::env::set_var("GITPOULPI_GENERAL_JOURNAL_OUTSIDE", "false");
         let handle = Daemon::new("split-undo-test").spawn(backend).await.unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         Rig {
             handle: Some(handle),
             client,

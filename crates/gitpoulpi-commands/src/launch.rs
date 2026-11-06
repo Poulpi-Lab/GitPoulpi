@@ -187,7 +187,11 @@ async fn open_windows() -> Vec<Window> {
 }
 
 async fn ask_to_raise(window: &Window) -> Option<RaiseAnswer> {
-    gitpoulpi_daemon::join::raise_window(window.port, &window.viewer.id).await
+    gitpoulpi_daemon::join::raise_window(
+        &gitpoulpi_daemon::join::session_endpoint(&window.session, window.port),
+        &window.viewer.id,
+    )
+    .await
 }
 
 /// Starts `command` detached from this process.

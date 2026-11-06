@@ -48,7 +48,7 @@ async fn commits_then_list(depth: &str, count: usize) -> JournalListing {
         .unwrap()
         .build();
     let handle = Daemon::new("undo-depth").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = repo.repo_ref().id;
     let mut n = 1;
     for i in 0..count {

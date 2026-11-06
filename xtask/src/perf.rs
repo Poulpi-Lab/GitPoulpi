@@ -524,7 +524,7 @@ async fn run_backend(
         .repo
         .id;
     let mut b = Bench {
-        client: Client::connect_port(handle.port)
+        client: Client::connect(&handle.endpoint())
             .await
             .map_err(|e| e.to_string())?,
         repo,

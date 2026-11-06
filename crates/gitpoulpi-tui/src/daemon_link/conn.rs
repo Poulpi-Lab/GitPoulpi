@@ -217,7 +217,7 @@ pub(crate) fn remove_published_port_files() {
 /// [`embedded_daemon_runtime`], **not** the caller's runtime, so it lives as
 /// long as the TUI process, though it still dies with that process rather
 /// than surviving independently (see `session-and-state.md`).
-pub(crate) async fn ensure_daemon(session: &str) -> Result<u16, String> {
+pub(crate) async fn ensure_daemon(session: &str) -> Result<gitpoulpi_ipc::Endpoint, String> {
     ensure_daemon_at(session_port_file(session).as_deref(), session).await
 }
 
@@ -232,7 +232,7 @@ pub(super) fn session_port_file(session: &str) -> Option<PathBuf> {
 pub(super) async fn ensure_daemon_at(
     port_file: Option<&std::path::Path>,
     session: &str,
-) -> Result<u16, String> {
+) -> Result<gitpoulpi_ipc::Endpoint, String> {
     let paths = gitpoulpi_config::ConfigPaths::discover();
     ensure_daemon_in(port_file, session, paths.as_ref()).await
 }
@@ -261,13 +261,13 @@ pub(super) async fn ensure_daemon_in(
     port_file: Option<&std::path::Path>,
     session: &str,
     paths: Option<&gitpoulpi_config::ConfigPaths>,
-) -> Result<u16, String> {
+) -> Result<gitpoulpi_ipc::Endpoint, String> {
     if let Some(port_file) = port_file {
         // A file left by a process that is gone is deleted, not connected to:
         // on Windows a refused loopback connect takes ~2 s. The connect
         // itself is bounded too (`discovery::CONNECT_TIMEOUT`).
-        if let Some(port) = gitpoulpi_ipc::discovery::live_port(port_file).await {
-            return Ok(port);
+        if let Some(endpoint) = gitpoulpi_ipc::discovery::live_endpoint(port_file).await {
+            return Ok(endpoint);
         }
     }
 
@@ -294,30 +294,28 @@ pub(super) async fn ensure_daemon_in(
     // Spawned *on the process-lifetime runtime*: `Daemon::spawn` puts its
     // accept loop on whatever runtime it is polled from, so awaiting it
     // here directly would tie the daemon to this caller's runtime again.
-    let port = embedded_daemon_runtime()
+    let endpoint = embedded_daemon_runtime()
         .spawn(async move {
             let handle = daemon.spawn(backend).await.map_err(|e| e.to_string())?;
-            let port = handle.port;
+            let endpoint = handle.endpoint();
             // Leaked on purpose: dropping the handle would not stop the
             // server, but it is the one thing that could, so nothing
             // holds it.
             std::mem::forget(handle);
-            Ok::<u16, String>(port)
+            Ok::<gitpoulpi_ipc::Endpoint, String>(endpoint)
         })
         .await
         .map_err(gitpoulpi_i18n::msg::link_error::embedded_failed)?
         .map_err(gitpoulpi_i18n::msg::link_error::embedded_failed)?;
 
     if let Some(port_file) = port_file {
-        if let Some(parent) = port_file.parent() {
-            let _ = std::fs::create_dir_all(parent);
-        }
-        let _ = std::fs::write(port_file, port.to_string());
+        // The token file lands user-only before the port file.
+        let _ = gitpoulpi_ipc::discovery::publish(port_file, &endpoint);
         // Who owns the port, so the next start can tell a stale file from a
         // live one without a connect (`remove_port_file` takes both down).
         gitpoulpi_ipc::discovery::write_host_file(port_file);
-        record_published(port_file, port);
+        record_published(port_file, endpoint.port);
     }
 
-    Ok(port)
+    Ok(endpoint)
 }

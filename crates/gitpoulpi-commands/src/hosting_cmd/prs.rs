@@ -373,6 +373,16 @@ pub(super) fn open_url(
                 ApiFamily::Jira | ApiFamily::Trello | ApiFamily::Linear | ApiFamily::YouTrack
             );
             let text = if own_spelling {
+                // Put into the URL as typed, so only a key/short-link alphabet.
+                if reference.is_empty()
+                    || !reference
+                        .chars()
+                        .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+                {
+                    return Err(format!(
+                        "`{reference}` is not an issue reference of {label}"
+                    ));
+                }
                 reference.to_string()
             } else {
                 numeric(reference)
@@ -424,23 +434,7 @@ fn is_jira_key(text: &str) -> bool {
 }
 
 pub(super) fn open_in_browser(url: &str) -> Result<(), String> {
-    let mut command = if cfg!(windows) {
-        let mut c = std::process::Command::new("cmd");
-        c.args(["/C", "start", ""]);
-        c
-    } else if cfg!(target_os = "macos") {
-        std::process::Command::new("open")
-    } else {
-        std::process::Command::new("xdg-open")
-    };
-    command
-        .arg(url)
-        .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
-        .spawn()
-        .map(|_| ())
-        .map_err(|e| format!("could not launch a browser: {e}"))
+    gitpoulpi_config::browser::open_url(url).map_err(|e| e.to_string())
 }
 
 /// `(remote ref, local branch)` a pull request is fetched as. GitHub and

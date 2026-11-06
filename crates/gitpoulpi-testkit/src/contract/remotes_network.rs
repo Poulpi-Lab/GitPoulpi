@@ -1270,6 +1270,56 @@ pub fn check_remote_add_refuses_a_taken_name(backend: &dyn GitBackend) {
     );
 }
 
+/// A URL or remote name that would be read as an option, or that names a
+/// remote helper (`ext::`), is refused by every network entry point, and
+/// nothing is written or run.
+pub fn check_option_lookalike_and_helper_urls_are_refused(backend: &dyn GitBackend) {
+    let source = TestRepoBuilder::new().with_initial().build();
+    let marker = source.root().join("pwned");
+    let upload_pack = format!("--upload-pack=touch {}", marker.display());
+    let ext = format!("ext::sh -c touch% {}", marker.display());
+    let dest_dir = tempfile::tempdir().unwrap();
+
+    for (i, bad) in [upload_pack.as_str(), "-x", ext.as_str()]
+        .into_iter()
+        .enumerate()
+    {
+        let dest = dest_dir.path().join(format!("clone{i}"));
+        assert!(
+            block_on(backend.clone(bad, &dest, &CloneOptions::default())).is_err(),
+            "clone of {bad:?}"
+        );
+        assert!(!dest.exists(), "a refused clone leaves nothing behind");
+
+        let repo = TestRepoBuilder::new().with_initial().build();
+        let repo_ref = repo.repo_ref();
+        assert!(
+            backend.remote_add(&repo_ref, "origin", bad).is_err(),
+            "{bad:?}"
+        );
+        assert!(backend
+            .remote_add(&repo_ref, bad, "https://example.invalid/a.git")
+            .is_err());
+        backend
+            .remote_add(&repo_ref, "origin", "https://example.invalid/a.git")
+            .unwrap();
+        assert!(backend.remote_set_url(&repo_ref, "origin", bad).is_err());
+        assert!(backend
+            .remote_set_push_url(&repo_ref, "origin", Some(bad))
+            .is_err());
+        assert!(block_on(backend.fetch(&repo_ref, bad, &FetchOptions::default())).is_err());
+        assert!(block_on(backend.push(&repo_ref, bad, &PushOptions::default())).is_err());
+        assert_eq!(
+            remote_named(backend, &repo_ref, "origin")
+                .unwrap()
+                .fetch_url,
+            "https://example.invalid/a.git",
+            "a refused change writes nothing"
+        );
+    }
+    assert!(!marker.exists(), "no command was run");
+}
+
 /// Setting an upstream points the branch at an existing remote branch;
 /// `None` removes it; a remote branch nobody fetched is refused.
 pub fn check_branch_set_upstream_sets_and_unsets(backend: &dyn GitBackend) {

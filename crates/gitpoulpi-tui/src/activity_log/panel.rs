@@ -966,7 +966,7 @@ fn open_folder() {
         None => msg::MEMORY_ONLY.get().to_string(),
         Some(dir) => {
             let _ = std::fs::create_dir_all(&dir);
-            match crate::repo_menu::open_url(&dir.to_string_lossy()) {
+            match crate::repo_menu::open_folder(&dir) {
                 Ok(()) => String::new(),
                 Err(why) => msg::folder_failed(why),
             }

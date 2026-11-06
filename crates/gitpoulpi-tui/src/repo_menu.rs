@@ -554,55 +554,23 @@ pub(crate) fn open_in_terminal(path: &Path) -> Result<String, String> {
     crate::tab_dir::open_terminal(path)
 }
 
-/// The program and arguments that open `url` in the OS default browser:
-/// `rundll32 url.dll,FileProtocolHandler <url>` on Windows (`cmd /C
-/// start` breaks on a URL containing `&`, which a compare/merge-request
-/// URL always does - it is a query string), `open` on macOS,
-/// `xdg-open` elsewhere.
-pub(crate) fn url_command(url: &str) -> (String, Vec<String>) {
-    if cfg!(windows) {
-        (
-            "rundll32".into(),
-            vec!["url.dll,FileProtocolHandler".into(), url.to_string()],
-        )
-    } else if cfg!(target_os = "macos") {
-        ("open".into(), vec![url.to_string()])
-    } else {
-        ("xdg-open".into(), vec![url.to_string()])
-    }
+/// Opens `url` in the OS default browser, detached and never waited on.
+/// Only `http`, `https` and `mailto` addresses are launched (the shared
+/// check in `gitpoulpi_config::browser`); anything else is an `Err` for the
+/// status line. Honors `GITPOULPI_OPEN_LOG` and `GITPOULPI_NO_BROWSER`.
+pub(crate) fn open_url(url: &str) -> Result<(), String> {
+    gitpoulpi_config::browser::open_url(url).map_err(msg::no_browser)
 }
 
-/// Opens `url` in the OS default browser, detached and never waited on --
-/// Start a pull request's no-token fallback, and what a token-holding
-/// flow opens on success too.
-pub(crate) fn open_url(url: &str) -> Result<(), String> {
-    // `GITPOULPI_OPEN_LOG=<file>`: a test stub for the browser -- append
-    // the URL to that file instead of launching anything.
-    if let Some(log) = std::env::var_os("GITPOULPI_OPEN_LOG").filter(|v| !v.is_empty()) {
-        use std::io::Write as _;
-        return std::fs::OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(log)
-            .and_then(|mut f| writeln!(f, "{url}"))
-            .map_err(|e| e.to_string());
-    }
-    // `GITPOULPI_NO_BROWSER=1`: never launch one (the pty tests, headless
-    // sessions); the caller still reports the URL on the status line.
-    if std::env::var_os("GITPOULPI_NO_BROWSER").is_some_and(|v| !v.is_empty()) {
-        return Ok(());
-    }
-    let (program, args) = url_command(url);
-    let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-    Command::new(program)
-        .args(args)
-        .current_dir(cwd)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .map(|_| ())
-        .map_err(msg::no_browser)
+/// Opens the `obsidian://` link GitPoulpi built for a note.
+#[cfg_attr(not(feature = "local-issues"), allow(dead_code))]
+pub(crate) fn open_obsidian_link(url: &str) -> Result<(), String> {
+    gitpoulpi_config::browser::open_url_with(url, &["obsidian"]).map_err(msg::no_browser)
+}
+
+/// Opens a local folder in the OS file manager (not a URL).
+pub(crate) fn open_folder(path: &Path) -> Result<(), String> {
+    gitpoulpi_config::browser::open_path(path).map_err(msg::no_browser)
 }
 
 /// A path for the clipboard: as the user would type it.

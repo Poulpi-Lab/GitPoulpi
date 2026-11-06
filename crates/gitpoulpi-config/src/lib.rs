@@ -1,4 +1,5 @@
 mod ai;
+pub mod browser;
 pub mod desktop;
 pub mod dev_mode;
 pub mod image_editors;

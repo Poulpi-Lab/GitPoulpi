@@ -24,10 +24,11 @@ fn require_remote(repo: &RepoRef, name: &str) -> Result<Vec<String>> {
 /// pre-rename remote list, so a sibling remote whose name merely starts
 /// with the old one (`origin` vs `origin/sub`) keeps its own tags.
 pub fn remote_rename(repo: &RepoRef, old_name: &str, new_name: &str) -> Result<()> {
+    gitpoulpi_core::guard::check_remote_arg("remote name", new_name)?;
     let names = require_remote(repo, old_name)?;
     let mirror = mirror_refs_of(repo, old_name, &names)?;
 
-    run(&repo.root, &["remote", "rename", old_name, new_name])?;
+    run(&repo.root, &["remote", "rename", "--", old_name, new_name])?;
 
     let mut script = String::new();
     for (old_ref, tag, oid) in &mirror {
@@ -93,6 +94,7 @@ fn apply_ref_script(repo: &RepoRef, body: &str) -> Result<()> {
 
 /// `git remote set-url`, which already refuses an unknown remote.
 pub fn remote_set_url(repo: &RepoRef, name: &str, url: &str) -> Result<()> {
+    gitpoulpi_core::guard::check_remote_arg("remote address", url)?;
     require_remote(repo, name)?;
     run(&repo.root, &["remote", "set-url", "--", name, url])?;
     Ok(())
@@ -102,6 +104,9 @@ pub fn remote_set_url(repo: &RepoRef, name: &str, url: &str) -> Result<()> {
 /// `git config --unset-all`, which *fails* when there is nothing to
 /// unset, so it only runs when there is.
 pub fn remote_set_push_url(repo: &RepoRef, name: &str, url: Option<&str>) -> Result<()> {
+    if let Some(url) = url {
+        gitpoulpi_core::guard::check_remote_arg("remote address", url)?;
+    }
     require_remote(repo, name)?;
     let key = format!("remote.{name}.pushurl");
     match url {

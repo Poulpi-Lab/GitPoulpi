@@ -316,7 +316,7 @@ const BASE: &[OpenInPreset] = &[
     // The repository's page (needs a GitHub / GitLab origin for ${web_url}).
     p("web-xdg", "Repository page on the web", "web", "xdg-open ${web_url}", LINUX, "", "xdg-open", false),
     p("web-macos", "Repository page on the web", "web", "open ${web_url}", MACOS, "", "", false),
-    p("web-windows", "Repository page on the web", "web", "cmd /C start \"\" ${web_url}", WINDOWS, "", "", false),
+    p("web-windows", "Repository page on the web", "web", "rundll32 url.dll,FileProtocolHandler ${web_url}", WINDOWS, "", "", false),
     p("gh-web", "GitHub: open repository (gh)", "web", "gh repo view --web", ALL, "", "gh", true),
     p("glab-web", "GitLab: open repository (glab)", "web", "glab repo view --web", ALL, "", "glab", false),
 ];

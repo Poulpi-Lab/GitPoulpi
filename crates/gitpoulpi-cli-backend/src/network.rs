@@ -222,6 +222,7 @@ async fn fetch_remotes(
 /// with the remote"; `refs()`, called on every render, never touches the
 /// network.
 pub async fn fetch(repo: &RepoRef, remote: &str, opts: &FetchOptions) -> Result<FetchOutcome> {
+    gitpoulpi_core::guard::check_remote_arg("remote", remote)?;
     fetch_remotes(repo, &[remote.to_string()], &[remote], opts).await
 }
 
@@ -242,9 +243,7 @@ pub async fn fetch_refspec(repo: &RepoRef, remote: &str, refspec: &str) -> Resul
             gitpoulpi_core::domain::FETCH_REFSPEC_NAMESPACE
         ))
     })?;
-    if remote.is_empty() || remote.starts_with('-') {
-        return Err(Error::Backend(format!("`{remote}` is not a remote name")));
-    }
+    gitpoulpi_core::guard::check_remote_arg("remote", remote)?;
     let forced = if refspec.starts_with('+') {
         refspec.to_string()
     } else {
@@ -268,6 +267,7 @@ pub async fn fetch_ref_as_branch(
     remote_ref: &str,
     branch: &str,
 ) -> Result<FetchOutcome> {
+    gitpoulpi_core::guard::check_remote_arg("remote", remote)?;
     if !remote_ref.starts_with("refs/") || remote_ref.contains("..") || remote_ref.contains(' ') {
         return Err(Error::Backend(format!(
             "`{remote_ref}` is not a full ref name (expected refs/...)"
@@ -339,6 +339,9 @@ fn pull_mode_args(mode: PullMode) -> &'static [&'static str] {
 }
 
 pub async fn pull(repo: &RepoRef, opts: &PullOptions) -> Result<PullOutcome> {
+    if let Some(remote) = &opts.remote {
+        gitpoulpi_core::guard::check_remote_arg("remote", remote)?;
+    }
     let before = run_async(&repo.root, &["rev-parse", "HEAD"]).await?;
 
     let mut args: Vec<String> = vec!["pull".into()];
@@ -365,6 +368,9 @@ struct PullSource {
 /// wrong (no upstream, a detached HEAD): the split then runs the whole
 /// `git pull` in the integrate step, so those errors read as they always did.
 async fn pull_source(repo: &RepoRef, opts: &PullOptions) -> Result<Option<PullSource>> {
+    if let Some(remote) = &opts.remote {
+        gitpoulpi_core::guard::check_remote_arg("remote", remote)?;
+    }
     if let Some(remote) = &opts.remote {
         let branch = current_branch(repo).await?;
         return Ok(Some(PullSource {
@@ -558,6 +564,7 @@ async fn finish_pull(
 /// The force flag is `--force-with-lease` and nothing else (see
 /// `PushOptions::force_with_lease`).
 pub async fn push(repo: &RepoRef, remote: &str, opts: &PushOptions) -> Result<PushOutcome> {
+    gitpoulpi_core::guard::check_remote_arg("remote", remote)?;
     let branch = match &opts.branch {
         Some(b) => b.clone(),
         None => current_branch(repo).await?,
@@ -632,6 +639,7 @@ pub async fn push_for_review(
     let branch = branch.strip_prefix("refs/heads/").unwrap_or(branch);
     check("branch", branch)?;
     check("remote", remote)?;
+    gitpoulpi_core::guard::check_remote_arg("remote", remote)?;
     let mut target = format!("refs/for/{branch}");
     if let Some(topic) = topic.map(str::trim).filter(|t| !t.is_empty()) {
         check("topic", topic)?;
@@ -710,6 +718,8 @@ fn clone_args(url: &str, dest: &Path, opts: &CloneOptions, progress: bool) -> Ve
         args.push("--origin".to_string());
         args.push(remote.clone());
     }
+    // `--` ends the options: the address and the folder are operands.
+    args.push("--".to_string());
     args.push(url.to_string());
     args.push(dest.to_string_lossy().to_string());
     args
@@ -840,6 +850,7 @@ pub async fn clone(
     opts: &CloneOptions,
     probe: &LfsProbe,
 ) -> Result<RepoRef> {
+    gitpoulpi_core::guard::check_remote_arg("clone address", url)?;
     let sparse = sparse_dirs_of(opts)?;
     let args = clone_command_args(url, dest, opts, false);
     let args_ref: Vec<&str> = args.iter().map(String::as_str).collect();
@@ -863,6 +874,7 @@ pub async fn clone_with_progress(
     probe: &LfsProbe,
     progress: CloneProgressSink<'_>,
 ) -> Result<RepoRef> {
+    gitpoulpi_core::guard::check_remote_arg("clone address", url)?;
     let sparse = sparse_dirs_of(opts)?;
     let args = clone_command_args(url, dest, opts, true);
     let args_ref: Vec<&str> = args.iter().map(String::as_str).collect();
@@ -965,7 +977,9 @@ fn parse_clone_progress(chunk: &str) -> Vec<CloneProgress> {
 }
 
 pub fn remote_add(repo: &RepoRef, name: &str, url: &str) -> Result<()> {
-    run(&repo.root, &["remote", "add", name, url])?;
+    gitpoulpi_core::guard::check_remote_arg("remote name", name)?;
+    gitpoulpi_core::guard::check_remote_arg("remote address", url)?;
+    run(&repo.root, &["remote", "add", "--", name, url])?;
     Ok(())
 }
 
@@ -1069,7 +1083,7 @@ mod tests {
 
         let plain = clone_args("url", Path::new("dest"), &CloneOptions::default(), false);
         assert!(!plain.iter().any(|a| a == "--progress"));
-        assert_eq!(plain, vec!["clone", "url", "dest"]);
+        assert_eq!(plain, vec!["clone", "--", "url", "dest"]);
     }
 
     /// The command actually run is preceded by the config that keeps the
@@ -1089,7 +1103,7 @@ mod tests {
             assert!(at < clone_at, "{setting} must precede `clone`");
             assert_eq!(args[at - 1], "-c");
         }
-        assert_eq!(&args[clone_at..], ["clone", "url", "dest"]);
+        assert_eq!(&args[clone_at..], ["clone", "--", "url", "dest"]);
     }
 
     /// Custom build without LFS: a plain clone, no `-c filter.lfs.*`.
@@ -1097,7 +1111,7 @@ mod tests {
     #[test]
     fn a_clone_without_lfs_passes_no_lfs_filter_config() {
         let args = clone_command_args("url", Path::new("dest"), &CloneOptions::default(), false);
-        assert_eq!(args, ["clone", "url", "dest"]);
+        assert_eq!(args, ["clone", "--", "url", "dest"]);
         assert!(!args.iter().any(|a| a.contains("filter.lfs")));
     }
 }

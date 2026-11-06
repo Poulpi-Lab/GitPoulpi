@@ -66,6 +66,19 @@ const CLEARED_ENV: &[&str] = &[
     "GIT_LFS_PROGRESS",
 ];
 
+/// Transports a network operation may use: the web, ssh, the git daemon and
+/// local paths (`file` only when the user started the operation, which is
+/// what `user` means). Everything else, remote helpers such as `ext::`
+/// included, is off.
+const TRANSPORT_ALLOWLIST: &[&str] = &[
+    "protocol.allow=never",
+    "protocol.https.allow=always",
+    "protocol.http.allow=always",
+    "protocol.ssh.allow=always",
+    "protocol.git.allow=always",
+    "protocol.file.allow=user",
+];
+
 /// Prepends the global flags and config overrides to a command's own
 /// arguments. `--no-pager` is belt-and-braces - git already skips the
 /// pager when stdout is a pipe - but costs nothing and covers
@@ -73,6 +86,20 @@ const CLEARED_ENV: &[&str] = &[
 fn full_args(args: &[&str]) -> Vec<String> {
     let mut out = Vec::with_capacity(args.len() + CONFIG_OVERRIDES.len() * 2 + 1);
     out.push("--no-pager".to_string());
+    // Submodule clones run with `GIT_PROTOCOL_FROM_USER=0`, which `user`
+    // would refuse for a local-path submodule: allow `file` for those.
+    let submodules = args
+        .iter()
+        .any(|a| *a == "submodule" || *a == "--recurse-submodules");
+    for kv in TRANSPORT_ALLOWLIST {
+        out.push("-c".to_string());
+        let kv = if submodules && *kv == "protocol.file.allow=user" {
+            "protocol.file.allow=always"
+        } else {
+            kv
+        };
+        out.push(kv.to_string());
+    }
     for kv in CONFIG_OVERRIDES {
         out.push("-c".to_string());
         out.push((*kv).to_string());
@@ -920,6 +947,20 @@ mod retry_tests {
 #[cfg(test)]
 mod failure_detail_tests {
     use super::*;
+
+    /// Even if an address got past the argument checks, the transport
+    /// allowlist stops a remote helper: `ext::` would run a command.
+    #[test]
+    fn the_transport_allowlist_blocks_remote_helpers() {
+        let dir = tempfile::tempdir().unwrap();
+        let marker = dir.path().join("ran");
+        let url = format!("ext::sh -c touch% {}", marker.display());
+        assert!(run(dir.path(), &["ls-remote", &url]).is_err());
+        assert!(!marker.exists(), "the helper command must not run");
+        assert!(full_args(&["fetch"])
+            .windows(2)
+            .any(|w| w == ["-c", "protocol.allow=never"]));
+    }
 
     /// The message and the detail of a failed command never hold a password
     /// that the tool (or the caller's arguments) echoed.

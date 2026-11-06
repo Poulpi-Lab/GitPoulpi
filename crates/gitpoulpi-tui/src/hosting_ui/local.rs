@@ -177,7 +177,7 @@ impl HostingUi {
         let Some((path, link)) = io::obsidian_url(url) else {
             return HostingEffect::Message(msg::local_issues::WHY_NO_VAULT.get().into());
         };
-        match crate::repo_menu::open_url(&link) {
+        match crate::repo_menu::open_obsidian_link(&link) {
             Ok(()) => HostingEffect::Message(msg::local_issues::opening_obsidian(path.display())),
             Err(err) => HostingEffect::Message(crate::activity_log::report_problem_clear(
                 crate::activity_log::ProblemSource::Tool,

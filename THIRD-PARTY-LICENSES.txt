@@ -14,7 +14,7 @@ GitKraken is a trademark of its respective owner. GitPoulpi is an independent
 project, not affiliated with, endorsed or sponsored by it; the name is
 mentioned only to describe compatibility and inspiration.
 
-Cargo.lock sha256: 12b742744a7111305a8e382021870439fb00e67b16be6d4da390bab7e341f88b
+Cargo.lock sha256: 51d3ad1f18cf5275890c1ed22366b1a637b7c1fceaf9f9219c81c066e82ee3ea
 
 
 

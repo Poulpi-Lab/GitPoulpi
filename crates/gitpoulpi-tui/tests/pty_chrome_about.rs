@@ -594,7 +594,9 @@ fn a_crate_row_opens_its_page_by_click_and_by_enter() {
         .unwrap_or_else(|| panic!("the link shown on the row: {line:?}"))
         .to_string();
     assert!(shown.contains("ratatui"), "{shown}\n{}", term.text());
-    let expected = format!("https://{shown}");
+    // The link column shrinks as the longest crate name grows and then ends
+    // in an ellipsis: the opened address must still start with what is shown.
+    let expected = format!("https://{}", shown.trim_end_matches('\u{2026}'));
     let opened = |n: usize| {
         for _ in 0..100 {
             let lines: Vec<String> = std::fs::read_to_string(log.path())
@@ -610,18 +612,16 @@ fn a_crate_row_opens_its_page_by_click_and_by_enter() {
         panic!("{n} URLs not opened")
     };
     term.click(rc + 1, rr).unwrap();
-    assert_eq!(opened(1)[0], expected);
+    let first = opened(1)[0].clone();
+    assert!(first.starts_with(&expected), "{first} vs {expected}");
     // The click selected the row: Enter opens the same page again.
     term.send_keys("Enter").unwrap();
-    assert_eq!(opened(2)[1], expected);
+    assert_eq!(opened(2)[1], first);
     // Down moves the selection to the next crate, whose page differs.
     term.send_keys("Down").unwrap();
     term.send_keys("Enter").unwrap();
     let third = opened(3)[2].clone();
-    assert!(
-        third.starts_with("https://") && third != expected,
-        "{third}"
-    );
+    assert!(third.starts_with("https://") && third != first, "{third}");
     assert!(
         term.screen().contains("Enter: open"),
         "the hint names the key:\n{}",

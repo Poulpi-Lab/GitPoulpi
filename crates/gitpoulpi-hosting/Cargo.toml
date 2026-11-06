@@ -14,7 +14,7 @@ description = "Hosting and issue-tracker API clients (GitHub, GitLab, Gitea/Forg
 # what the tests do -- so `--no-default-features` is a genuine
 # no-network build rather than a broken one.
 default = ["network", "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues"]
-network = ["dep:reqwest", "dep:rustls", "dep:rustls-pki-types", "dep:rustls-native-certs", "dep:webpki-roots"]
+network = ["dep:reqwest", "dep:rustls", "dep:rustls-native-certs", "dep:webpki-roots"]
 # Internal: the provider-agnostic port (`client`, `model`, `project`,
 # `resolve`). Never enabled alone: it is what `github` / `gitlab` turn on.
 # With neither built, only the always-compiled helpers remain (`http`,
@@ -61,7 +61,6 @@ reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"
 # `ssh_key`'s module comment.
 ssh-key = { version = "0.6", default-features = false, features = ["ed25519", "p256", "rsa", "alloc", "std", "getrandom"] }
 rustls = { workspace = true, optional = true }
-rustls-pki-types = { workspace = true, optional = true }
 rustls-native-certs = { workspace = true, optional = true }
 webpki-roots = { workspace = true, optional = true }
 rand_core = { version = "0.6", features = ["getrandom"] }

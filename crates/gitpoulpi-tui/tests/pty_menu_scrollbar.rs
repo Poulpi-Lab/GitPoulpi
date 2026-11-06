@@ -47,6 +47,27 @@ fn shown(s: &Screen) -> Vec<String> {
         .collect()
 }
 
+/// The screen once the menu's window has stopped moving: the same rows on
+/// several reads in a row, 100 ms apart (a state check, not a blind wait).
+fn settled(term: &mut xtask::pty::Terminal) -> Screen {
+    let mut last = term.screen();
+    let mut same = 0;
+    for _ in 0..300 {
+        std::thread::sleep(Duration::from_millis(100));
+        let now = term.screen();
+        if menu_bar(&now).is_some() && menu_bar(&last).is_some() && shown(&now) == shown(&last) {
+            same += 1;
+            if same >= 5 {
+                return now;
+            }
+        } else {
+            same = 0;
+        }
+        last = now;
+    }
+    panic!("the menu never settled\n{}", term.text());
+}
+
 #[test]
 fn a_tall_menu_has_a_bar_that_drags_the_wheel_scrolls_and_the_keys_follow() {
     let repo = FixtureRepoBuilder::new()
@@ -84,11 +105,13 @@ fn a_tall_menu_has_a_bar_that_drags_the_wheel_scrolls_and_the_keys_follow() {
     // Drag the thumb (right under the up arrow) past the bottom: the menu
     // scrolls and stays open.
     term.drag((col, first + 1), (col, last + 2)).unwrap();
-    let dragged = term
-        .wait_for("the menu scrolled by its thumb", STEP, |s| {
-            menu_bar(s).is_some() && shown(s) != before
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.wait_for("the menu scrolled by its thumb", STEP, |s| {
+        menu_bar(s).is_some() && shown(s) != before
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The first frame that differs can be mid-drag under load: the drag
+    // ends at the bottom, so take the window once it stops moving.
+    let dragged = settled(&mut term);
 
     // The wheel over the menu scrolls it back to the top.
     for _ in 0..10 {

@@ -22,8 +22,8 @@
 
 use std::sync::{Arc, Mutex};
 
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseButton, MouseEvent};
 use crossterm::event::MouseEventKind;
+use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseButton, MouseEvent};
 use gitpoulpi_ai::{Prepared, SendGate};
 use gitpoulpi_config::AiAction;
 use gitpoulpi_i18n::msg::ai_privacy as msg;
@@ -182,11 +182,8 @@ fn remember_off(action: AiAction) {
 }
 
 fn remember_off_in(path: &std::path::Path, action: AiAction) {
-    let _ = gitpoulpi_config::set_in_file(
-        path,
-        &format!("ai.sent_preview.{}", action.key()),
-        "false",
-    );
+    let _ =
+        gitpoulpi_config::set_in_file(path, &format!("ai.sent_preview.{}", action.key()), "false");
 }
 
 /// A control character is shown as `\x1b`, never sent to the terminal: the
@@ -303,7 +300,10 @@ pub(crate) fn on_key(key: KeyEvent) {
     match open.focus {
         Focus::Pane => {
             if !open.pane.open {
-                if matches!(key.code, KeyCode::Enter | KeyCode::Char(' ') | KeyCode::Right) && plain
+                if matches!(
+                    key.code,
+                    KeyCode::Enter | KeyCode::Char(' ') | KeyCode::Right
+                ) && plain
                 {
                     open.pane.toggle();
                 }
@@ -432,9 +432,10 @@ pub(crate) fn render(frame: &mut Frame) {
     } else {
         summary.len().min(1)
     };
-    let pane_rows = open
-        .pane
-        .body_rows(lines.len(), budget.saturating_sub(fixed(shown_summary)) as u16);
+    let pane_rows = open.pane.body_rows(
+        lines.len(),
+        budget.saturating_sub(fixed(shown_summary)) as u16,
+    );
     let height = (fixed(shown_summary) as u16 + pane_rows).min(room.height);
     let outer = Rect::new(
         room.x + (room.width - width) / 2,
@@ -507,7 +508,8 @@ pub(crate) fn render(frame: &mut Frame) {
             focused: open.focus == Focus::Dont,
         },
     );
-    open.hits.push((Rect::new(r.x, r.y, r.width.max(3), 1), Hit::Dont));
+    open.hits
+        .push((Rect::new(r.x, r.y, r.width.max(3), 1), Hit::Dont));
     // The buttons.
     let send_label = format!("{} {}", crate::theme::AI_SPARK, msg::SEND.get());
     let send = dialog_kit::button(
@@ -548,7 +550,10 @@ fn summary_rows(open: &Open) -> Vec<(String, bool)> {
     if !sent.redactions.is_empty() {
         rows.push((msg::redactions_heading(sent.redactions.len() as u64), true));
         for r in sent.redactions.iter().take(LIST_ROWS) {
-            rows.push((format!("  {}", msg::redaction_row(&r.rule, &r.preview)), false));
+            rows.push((
+                format!("  {}", msg::redaction_row(&r.rule, &r.preview)),
+                false,
+            ));
         }
     }
     if !sent.excluded_files.is_empty() {

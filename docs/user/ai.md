@@ -459,6 +459,50 @@ effective context as `review_context`. The same four settings are `ai.review.*` 
   the window's other clients, or an MCP client.
 - Generated text is never committed, pushed or applied on its own.
 
+### What is cleaned out of a request
+
+Every request, whichever action sends it and whichever provider receives it (a
+hosted API or a local agent), goes through the same cleaning step first:
+
+- **Secrets are redacted** (`[ai.privacy] redact_secrets`, on by default). A token
+  with a known prefix, a private key block, a JWT, a password in a URL and a
+  `password = value` line whose value looks random are replaced by
+  `[REDACTED:<rule>]`. It is not exhaustive: it finds the common shapes (the same
+  scanner as `rewrite scan-secrets`).
+- **Sensitive files are left out** (`[ai.privacy] exclude_sensitive_files`, on by
+  default). The diff of a file matching `[privacy] sensitive_patterns` (`.env`
+  and `.env.*` except the `.example`, `.sample` and `.template` files, `*.pem`,
+  `*.key`, SSH private keys, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`,
+  `*.cer`, `*.der`, `*.kdbx`) is not part of the request. A split piece or a
+  composer file list that names such a file is cut the same way, so a plan for it
+  may be refused as incomplete: stage or split that file yourself.
+
+Turning either off is a choice, and Settings > AI shows a red line under it for as
+long as it is off.
+
+**What is sent, before it is sent.** Before a request leaves, the TUI shows the
+**What is sent** dialog: the instructions and the request after cleaning (the same
+pane as the history rewrite dialogs, scrollable, `Alt+W` shows or hides it), how
+many secrets were replaced and which files were left out (a rule and a masked
+preview such as `ghp_****abcd`, never a value), a **Don't show again for
+<action>** box, and **Send** / **Cancel** (`Esc`, the close cross and a click
+outside cancel; nothing leaves until Send). The box writes
+`[ai.sent_preview] <action> = false`; Settings > AI > *Show what is sent
+before...* has one switch per action and **Show all again**. The two history
+rewrite dialogs already show their request, so they have no switch.
+
+**On the command line**, every `ai ...` answer (and `hosting review suggest`)
+carries `privacy: {redactions: N, excluded_files: [...]}`, and `--print-sent`
+prints the cleaned system and user text, as `{sent: [{system, user}], privacy,
+dry_run: true}`, without calling the model (it needs `ai.enabled = true`, no key
+and no network).
+
+**A limit.** A local agent whose working folder is the repository
+(`workdir = repository`, or *Run the agent in the repository* for a review) can
+read the files itself: the cleaning covers what GitPoulpi sends it, not what it
+opens on its own. Use the `dedicated` working folder to keep it out of the
+repository.
+
 ## Troubleshooting
 
 | Symptom | Fix |

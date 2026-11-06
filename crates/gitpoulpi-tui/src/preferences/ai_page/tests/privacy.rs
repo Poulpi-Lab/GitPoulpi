@@ -32,7 +32,11 @@ fn the_protections_write_config_toml_and_warn_in_red_while_off() {
 
     select_in(&mut state, "Privacy", "Redact secrets before sending");
     state.activate();
-    assert!(file(dir.path()).contains("redact_secrets = false"), "{}", file(dir.path()));
+    assert!(
+        file(dir.path()).contains("redact_secrets = false"),
+        "{}",
+        file(dir.path())
+    );
     assert!(!state.config.ai.privacy.redact_secrets);
     let fields = state.fields();
     assert!(
@@ -77,7 +81,11 @@ fn one_switch_per_action_and_show_all_again() {
 
     select_in(&mut state, "Show what is sent before...", "Commit message");
     state.activate();
-    assert!(file(dir.path()).contains("commit_message = false"), "{}", file(dir.path()));
+    assert!(
+        file(dir.path()).contains("commit_message = false"),
+        "{}",
+        file(dir.path())
+    );
     assert!(!state.config.ai.sent_preview.shows(AiAction::CommitMessage));
     assert!(state.config.ai.sent_preview.shows(AiAction::ExplainChanges));
 

@@ -37,11 +37,12 @@ impl Ctx {
     /// prepared text instead of the provider's answer.
     fn finish(self, result: Result<Emitted, String>) -> Result<Emitted, String> {
         let summary = self.report.as_ref().map(|r| r.summary());
-        let privacy = summary.map(|s| {
-            json!({ "redactions": s.redactions, "excluded_files": s.excluded_files })
-        });
+        let privacy = summary
+            .map(|s| json!({ "redactions": s.redactions, "excluded_files": s.excluded_files }));
         match result {
-            Err(e) if self.print_sent && e.contains(&gitpoulpi_ai::Error::PrintOnly.to_string()) => {
+            Err(e)
+                if self.print_sent && e.contains(&gitpoulpi_ai::Error::PrintOnly.to_string()) =>
+            {
                 let sent = self.report.map(|r| r.sent()).unwrap_or_default();
                 let human = sent
                     .iter()

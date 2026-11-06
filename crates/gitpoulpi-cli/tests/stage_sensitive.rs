@@ -59,8 +59,14 @@ fn a_sensitive_file_is_refused_as_json_then_staged_with_the_flag() {
     assert_eq!(json["error"], "sensitive_files");
     let files = json["files"].as_array().unwrap();
     let paths: Vec<&str> = files.iter().map(|f| f["path"].as_str().unwrap()).collect();
-    assert!(paths.contains(&"server.pem") && paths.contains(&"notes.txt"), "{json}");
-    assert!(!json.to_string().contains(BODY), "no value in the refusal: {json}");
+    assert!(
+        paths.contains(&"server.pem") && paths.contains(&"notes.txt"),
+        "{json}"
+    );
+    assert!(
+        !json.to_string().contains(BODY),
+        "no value in the refusal: {json}"
+    );
     assert_eq!(staged(repo.root()), "", "nothing was staged");
 
     let (code, json, stderr) = run(

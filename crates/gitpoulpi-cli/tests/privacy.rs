@@ -85,7 +85,10 @@ fn the_prompt_has_no_token_and_no_env_and_the_answer_says_what_was_removed() {
     );
     assert_eq!(code, Some(0), "{json} {stderr}");
     assert_eq!(json["summary"], "feat: add things");
-    assert!(json["privacy"]["redactions"].as_u64().unwrap() >= 1, "{json}");
+    assert!(
+        json["privacy"]["redactions"].as_u64().unwrap() >= 1,
+        "{json}"
+    );
     let excluded = json["privacy"]["excluded_files"].as_array().unwrap();
     assert_eq!(excluded, &vec![Value::String(".env".into())], "{json}");
 

@@ -425,17 +425,25 @@ fn budget(backend: &str, op: &str) -> Option<(u64, f64, f64)> {
         // cannot promise. `cache::tests::the_commit_total_is_cached_until_a_ref_moves`
         // guards it deterministically.
         ("stage file", true) | ("unstage file", true) => (0, 1.0, 15.0),
-        ("stage all", true) | ("unstage all", true) => (0, 1.0, 18.0),
+        // Staging everything first asks the sensitive-files guard
+        // (`daemon/src/stage_guard.rs`): one status read (libgit2 takes about
+        // 50 ms for 2000 files, which on git2 is the whole cost) plus the text
+        // of the changed files. `unstage all` has no guard.
+        ("stage all", true) => (0, 1.0, 90.0),
+        ("unstage all", true) => (0, 1.0, 18.0),
         // `general.undo_enabled = false`: the pre-undo cost, exactly. git2
         // stages in process, the system backend runs the one `git add`.
         ("stage file (undo off)", true) | ("unstage file (undo off)", true) => (0, 1.0, 12.0),
-        ("stage all (undo off)", true) | ("unstage all (undo off)", true) => (0, 1.0, 12.0),
+        ("stage all (undo off)", true) => (0, 1.0, 84.0),
+        ("unstage all (undo off)", true) => (0, 1.0, 12.0),
         ("discard 1 file (undo off)", true) => (0, 2.0, 12.0),
         // The first system-git stage of a daemon's life also pays its
         // one-time LFS probe (3 spawns, as before undo existed).
         ("stage file (undo off)", false) => (3, 2.0, 15.0),
         ("unstage file (undo off)", false) => (1, 2.0, 12.0),
-        ("stage all (undo off)", false) | ("unstage all (undo off)", false) => (1, 3.0, 12.0),
+        // The guard's status read is the second spawn of a system-git stage all.
+        ("stage all (undo off)", false) => (2, 3.0, 12.0),
+        ("unstage all (undo off)", false) => (1, 3.0, 12.0),
         ("discard 1 file (undo off)", false) => (3, 4.0, 15.0),
         // Staging is undoable: the journal records the index tree before and
         // after. The trees come from libgit2 in the daemon's process, pins
@@ -443,7 +451,8 @@ fn budget(backend: &str, op: &str) -> Option<(u64, f64, f64)> {
         // the system backend pays the one `git add` and nothing for the
         // journal. git2: no process at all.
         ("stage file", false) | ("unstage file", false) => (1, 2.0, 20.0),
-        ("stage all", false) | ("unstage all", false) => (1, 3.0, 20.0),
+        ("stage all", false) => (2, 3.0, 20.0),
+        ("unstage all", false) => (1, 3.0, 20.0),
         // Discard takes a safety snapshot before and after, built by
         // libgit2 on both backends: only the discard itself spawns (none on
         // git2, the bare 3 on system git).

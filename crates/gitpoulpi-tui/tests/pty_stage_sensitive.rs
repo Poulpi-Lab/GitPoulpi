@@ -68,21 +68,35 @@ fn stage_all_asks_lists_the_file_and_stages_nothing_until_stage_anyway() {
     let text = screen.text();
     assert!(text.contains(".env"), "{text}");
     assert!(text.contains("matches .env"), "{text}");
-    assert!(text.contains("1. Stage anyway") && text.contains("2. Cancel"), "{text}");
-    assert_eq!(staged(&repo), "", "nothing is staged while the question is up");
+    assert!(
+        text.contains("1. Stage anyway") && text.contains("2. Cancel"),
+        "{text}"
+    );
+    assert_eq!(
+        staged(&repo),
+        "",
+        "nothing is staged while the question is up"
+    );
 
     // No default: Enter with nothing highlighted answers nothing.
     term.send_keys("Enter").expect("Enter");
     term.wait_for_stable(Duration::from_millis(300), STEP)
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(term.screen().contains("Sensitive files"), "Enter alone is not an answer");
+    assert!(
+        term.screen().contains("Sensitive files"),
+        "Enter alone is not an answer"
+    );
     assert_eq!(staged(&repo), "");
 
     // Esc cancels: still nothing staged.
     term.send_keys("Escape").expect("Esc");
     term.wait_for_text_to_go("Sensitive files", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
-    assert_eq!(staged(&repo), "", "Cancel stages nothing, not even the plain file");
+    assert_eq!(
+        staged(&repo),
+        "",
+        "Cancel stages nothing, not even the plain file"
+    );
 
     // Again: Down then Enter is "Stage anyway".
     stage_all(&mut term);

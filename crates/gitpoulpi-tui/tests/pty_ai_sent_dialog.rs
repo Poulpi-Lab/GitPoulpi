@@ -80,7 +80,10 @@ fn wait_dialog(term: &Terminal) -> xtask::pty::Screen {
 fn staged_ok(repo: &FixtureRepo) {
     // The fixture staged both files through git, which the guard does not see.
     let staged = repo.git(&["diff", "--cached", "--name-only"]);
-    assert!(staged.contains(".env") && staged.contains("a.txt"), "{staged}");
+    assert!(
+        staged.contains(".env") && staged.contains("a.txt"),
+        "{staged}"
+    );
 }
 
 #[test]
@@ -98,10 +101,20 @@ fn the_dialog_shows_the_cleaned_request_and_nothing_is_sent_until_send() {
     assert!(text.contains("github-token"), "{text}");
     assert!(text.contains("1 sensitive file left out"), "{text}");
     assert!(text.contains("[REDACTED:github-token]"), "{text}");
-    assert!(!text.contains(BODY), "the screen never holds the token: {text}");
+    assert!(
+        !text.contains(BODY),
+        "the screen never holds the token: {text}"
+    );
     assert!(!text.contains("hunter2"), "{text}");
-    assert!(text.contains("Don't show again for Commit message"), "{text}");
-    assert_eq!(agent_calls(&agent), 0, "nothing is sent while the dialog is up");
+    assert!(
+        text.contains("Don't show again for Commit message"),
+        "{text}"
+    );
+    assert_eq!(
+        agent_calls(&agent),
+        0,
+        "nothing is sent while the dialog is up"
+    );
 
     // Send is focused: Enter sends.
     term.send_keys("Enter").expect("Enter");
@@ -113,7 +126,10 @@ fn the_dialog_shows_the_cleaned_request_and_nothing_is_sent_until_send() {
     let prompt = agent_prompt(&agent);
     assert!(prompt.contains("[REDACTED:github-token]"), "{prompt}");
     assert!(!prompt.contains(BODY), "{prompt}");
-    assert!(!prompt.contains("hunter2") && !prompt.contains("DB_PASSWORD"), "{prompt}");
+    assert!(
+        !prompt.contains("hunter2") && !prompt.contains("DB_PASSWORD"),
+        "{prompt}"
+    );
 }
 
 #[test]
@@ -158,7 +174,11 @@ fn escape_cancel_and_the_cross_send_nothing() {
     term.click(cross, title_row).expect("click the cross");
     term.wait_for_text_to_go("Review what is sent", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
-    assert_eq!(agent_calls(&agent), 0, "none of the three answers sent anything");
+    assert_eq!(
+        agent_calls(&agent),
+        0,
+        "none of the three answers sent anything"
+    );
 }
 
 #[test]

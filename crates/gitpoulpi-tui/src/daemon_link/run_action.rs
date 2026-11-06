@@ -55,7 +55,9 @@ pub(super) async fn run_action(
         }
         // Sensitive files in a stage: nothing was staged, the render loop
         // lists them and asks (`stage_guard_dialog`); no error line.
-        Err(CoreError::SensitiveStage { files }) if !matches!(original, Action::AllowSensitive(_)) => {
+        Err(CoreError::SensitiveStage { files })
+            if !matches!(original, Action::AllowSensitive(_)) =>
+        {
             crate::stage_guard_dialog::ask(conn.repo.root.clone(), original, files);
             false
         }

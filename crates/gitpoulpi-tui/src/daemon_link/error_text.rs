@@ -79,11 +79,9 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
         TypedError::HooksNotTrusted { hooks, .. } => {
             gitpoulpi_i18n::msg::flow_hook_trust::not_trusted(hooks.len() as u64)
         }
-        TypedError::SensitiveStage { files } => {
-            gitpoulpi_i18n::msg::stage_guard::sensitive_stage(gitpoulpi_core::privacy::summary(
-                files,
-            ))
-        }
+        TypedError::SensitiveStage { files } => gitpoulpi_i18n::msg::stage_guard::sensitive_stage(
+            gitpoulpi_core::privacy::summary(files),
+        ),
     }
 }
 

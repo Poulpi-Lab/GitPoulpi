@@ -1106,8 +1106,7 @@ explain_changes = "ghost"
 
     #[test]
     fn sent_preview_defaults_on_and_a_partial_table_keeps_the_other_actions_on() {
-        let (c, _) =
-            Config::from_toml_str("[ai.sent_preview]\ncommit_message = false\n").unwrap();
+        let (c, _) = Config::from_toml_str("[ai.sent_preview]\ncommit_message = false\n").unwrap();
         assert!(!c.ai.sent_preview.shows(AiAction::CommitMessage));
         assert!(c.ai.sent_preview.shows(AiAction::CodeReview));
         assert!(!c.ai.sent_preview.all_shown());
@@ -1118,7 +1117,9 @@ explain_changes = "ghost"
         let mut cfg = c;
         cfg.set("ai.sent_preview.code_review", "false").unwrap();
         assert!(!cfg.ai.sent_preview.shows(AiAction::CodeReview));
-        assert!(AiPrivacy::default().redact_secrets && AiPrivacy::default().exclude_sensitive_files);
+        assert!(
+            AiPrivacy::default().redact_secrets && AiPrivacy::default().exclude_sensitive_files
+        );
     }
 
     #[test]

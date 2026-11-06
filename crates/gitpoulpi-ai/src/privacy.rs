@@ -130,7 +130,10 @@ impl std::fmt::Debug for Privacy {
 
 impl Default for Privacy {
     fn default() -> Self {
-        Self::from_config(&AiPrivacy::default(), &privacy::default_sensitive_patterns())
+        Self::from_config(
+            &AiPrivacy::default(),
+            &privacy::default_sensitive_patterns(),
+        )
     }
 }
 

@@ -38,8 +38,8 @@ pub use agent::{expand_env_refs, resolve_command, LocalAgentClient};
 pub use api::{AnthropicClient, OpenAiClient};
 use gitpoulpi_config::{AiProfile, AiProviderKind};
 use gitpoulpi_hosting::{HttpTransport, TrustGate};
-pub use privacy::{Prepared, Privacy, PrivacyClient, PrivacySummary, SendGate};
 pub use parse::{CommitMessage, PlannedCommit, PlannedSplit, PullRequestText};
+pub use privacy::{Prepared, Privacy, PrivacyClient, PrivacySummary, SendGate};
 pub use rules_answer::{RuleProblem, RulesAnswer, RulesSettings};
 
 pub type Result<T> = std::result::Result<T, Error>;

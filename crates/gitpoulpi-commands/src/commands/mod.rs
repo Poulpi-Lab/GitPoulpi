@@ -1561,7 +1561,7 @@ fn sensitive_refusal(files: &[gitpoulpi_core::privacy::Sensitive]) -> Emitted {
         json!({
             "error": "sensitive_files",
             "files": files,
-            "hint": "ask the user, then stage again with --allow-sensitive",
+            "hint": "ask the user whether these files may be staged; the user stages them with --allow-sensitive",
         }),
         human,
     );

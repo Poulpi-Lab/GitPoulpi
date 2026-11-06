@@ -103,11 +103,7 @@ impl Job {
     /// Takes the privacy settings as they are now: `[ai.privacy]` and the
     /// patterns of `[privacy]` (a window's copy of the config can be older
     /// than the file).
-    pub fn with_privacy(
-        mut self,
-        ai: &gitpoulpi_config::AiPrivacy,
-        patterns: &[String],
-    ) -> Self {
+    pub fn with_privacy(mut self, ai: &gitpoulpi_config::AiPrivacy, patterns: &[String]) -> Self {
         self.privacy.redact_secrets = ai.redact_secrets;
         self.privacy.exclude_sensitive_files = ai.exclude_sensitive_files;
         self.privacy.patterns = patterns.to_vec();

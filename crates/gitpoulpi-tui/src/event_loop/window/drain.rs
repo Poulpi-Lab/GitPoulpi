@@ -252,7 +252,8 @@ impl WindowState {
                 Event::Key(key) if key.kind != KeyEventKind::Press => {}
                 // The two question dialogs have no text field: a paste goes nowhere.
                 Event::Paste(_)
-                    if crate::ai_sent_dialog::is_open() || crate::stage_guard_dialog::is_open() => {}
+                    if crate::ai_sent_dialog::is_open() || crate::stage_guard_dialog::is_open() => {
+                }
                 // A pasted token goes into Preferences' Integrations form.
                 Event::Paste(text) if self.preferences.is_some() => {
                     if let Some(prefs) = self.preferences.as_mut() {

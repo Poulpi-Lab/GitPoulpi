@@ -136,7 +136,14 @@ fn the_cross_an_answer_and_a_click_away_work_by_mouse() {
     open(0);
     screen();
     // The cross is read from the border row the paint drew.
-    let cross = POPUP.lock().unwrap().as_ref().unwrap().close.rect().unwrap();
+    let cross = POPUP
+        .lock()
+        .unwrap()
+        .as_ref()
+        .unwrap()
+        .close
+        .rect()
+        .unwrap();
     assert!(on_mouse(click(cross.x, cross.y)).is_none());
     assert!(!is_open(), "the cross cancels");
 
@@ -172,7 +179,10 @@ fn a_long_list_scrolls_by_keys_the_wheel_and_the_bar() {
     open(60);
     let (text, _) = screen_of(100, 24);
     assert!(text.contains(".env"), "{text}");
-    assert!(!text.contains("k59.pem"), "the tail is below the fold: {text}");
+    assert!(
+        !text.contains("k59.pem"),
+        "the tail is below the fold: {text}"
+    );
     {
         let p = POPUP.lock().unwrap();
         let open = p.as_ref().unwrap();
@@ -190,11 +200,7 @@ fn a_long_list_scrolls_by_keys_the_wheel_and_the_bar() {
 
     // The wheel over the pane.
     let pane = POPUP.lock().unwrap().as_ref().unwrap().pane;
-    on_mouse(mouse(
-        MouseEventKind::ScrollDown,
-        pane.x + 3,
-        pane.y + 2,
-    ));
+    on_mouse(mouse(MouseEventKind::ScrollDown, pane.x + 3, pane.y + 2));
     assert_eq!(POPUP.lock().unwrap().as_ref().unwrap().top, WHEEL_LINES);
 
     // The bar: a press and a drag on its thumb move the list.
@@ -202,7 +208,10 @@ fn a_long_list_scrolls_by_keys_the_wheel_and_the_bar() {
     let track = POPUP.lock().unwrap().as_ref().unwrap().track.unwrap();
     on_mouse(click(track.rect.x, track.rect.bottom() - 2));
     let after_press = POPUP.lock().unwrap().as_ref().unwrap().top;
-    assert!(after_press > WHEEL_LINES, "a press on the track jumps there");
+    assert!(
+        after_press > WHEEL_LINES,
+        "a press on the track jumps there"
+    );
     on_mouse(mouse(
         MouseEventKind::Up(MouseButton::Left),
         track.rect.x,
@@ -225,7 +234,10 @@ fn a_file_name_cannot_repaint_the_screen_and_refusals_queue() {
     );
     ask(PathBuf::from("/b"), Action::StageAll, files(0));
     let text = screen();
-    assert!(!text.contains('\u{1b}'), "an escape never reaches the screen");
+    assert!(
+        !text.contains('\u{1b}'),
+        "an escape never reaches the screen"
+    );
     assert!(text.contains("bad\\x1b[2Jname.pem"), "{text}");
     // Answering the first brings up the second.
     on_key(key(KeyCode::Esc));

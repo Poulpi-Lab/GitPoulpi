@@ -144,7 +144,10 @@ fn print_only_needs_no_key_and_no_trust() {
     let t = Arc::new(RecordedTransport::new());
     let client =
         gitpoulpi_ai::client_for_in(&profile, None, t.clone(), None, &gate, &privacy).unwrap();
-    assert_eq!(run(client.complete("s", "u")).unwrap_err(), Error::PrintOnly);
+    assert_eq!(
+        run(client.complete("s", "u")).unwrap_err(),
+        Error::PrintOnly
+    );
     assert!(t.requests().is_empty());
 }
 
@@ -153,7 +156,10 @@ struct Answer(bool, Arc<Mutex<usize>>);
 #[async_trait::async_trait]
 impl SendGate for Answer {
     async fn confirm(&self, sent: &Prepared) -> bool {
-        assert!(!sent.user.contains(TOKEN_BODY), "the gate sees cleaned text");
+        assert!(
+            !sent.user.contains(TOKEN_BODY),
+            "the gate sees cleaned text"
+        );
         *self.1.lock().unwrap() += 1;
         self.0
     }

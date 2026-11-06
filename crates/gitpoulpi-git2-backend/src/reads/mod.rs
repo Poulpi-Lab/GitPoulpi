@@ -282,9 +282,12 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
         let message_bytes = commit.message_bytes();
         let decoded = decode_commit_text(message_bytes, header);
         let summary = match (&decoded, header) {
-            (std::borrow::Cow::Borrowed(_), None) => {
-                commit.summary().ok().flatten().unwrap_or_default().to_string()
-            }
+            (std::borrow::Cow::Borrowed(_), None) => commit
+                .summary()
+                .ok()
+                .flatten()
+                .unwrap_or_default()
+                .to_string(),
             _ => commit_summary(&decoded),
         };
         let message = decoded.trim_end().to_string();

@@ -30,7 +30,13 @@ pub fn worktrees(repo: &RepoRef) -> Result<Vec<Worktree>> {
     // lookup (one `Repository::open` per worktree, the dominant cost) on
     // scoped threads, so N worktrees cost about one open.
     let mut linked: Vec<(PathBuf, bool)> = Vec::new();
-    for name in git_repo.worktrees().map_err(map_err)?.iter().flatten().flatten() {
+    for name in git_repo
+        .worktrees()
+        .map_err(map_err)?
+        .iter()
+        .flatten()
+        .flatten()
+    {
         let wt = match git_repo.find_worktree(name) {
             Ok(wt) => wt,
             // A worktree whose directory was deleted without
@@ -382,7 +388,12 @@ struct CommitMeta {
 /// here).
 fn commit_meta(repo: &git2::Repository, id: git2::Oid, path: &str) -> Result<CommitMeta> {
     let commit = repo.find_commit(id).map_err(map_err)?;
-    let summary = commit.summary().ok().flatten().unwrap_or_default().to_string();
+    let summary = commit
+        .summary()
+        .ok()
+        .flatten()
+        .unwrap_or_default()
+        .to_string();
     let committer_time = commit.committer().when().seconds();
     let Ok(parent) = commit.parent(0) else {
         return Ok(CommitMeta {

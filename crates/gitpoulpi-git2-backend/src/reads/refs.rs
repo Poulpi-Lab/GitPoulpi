@@ -188,7 +188,14 @@ pub fn remotes(repo: &RepoRef) -> Result<Vec<Remote>> {
     for name in names.iter().flatten().flatten() {
         let remote = git_repo.find_remote(name).map_err(map_err)?;
         let fetch_url = remote.url().unwrap_or_default().to_string();
-        let push_url = Some(remote.pushurl().ok().flatten().unwrap_or(&fetch_url).to_string());
+        let push_url = Some(
+            remote
+                .pushurl()
+                .ok()
+                .flatten()
+                .unwrap_or(&fetch_url)
+                .to_string(),
+        );
         out.push(Remote {
             name: name.to_string(),
             fetch_url,

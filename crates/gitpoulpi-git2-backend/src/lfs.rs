@@ -79,7 +79,7 @@ pub fn lfs_files(repo: &RepoRef, at: Option<Oid>) -> Result<Vec<LfsFile>> {
             tree.walk(git2::TreeWalkMode::PreOrder, |dir, entry| {
                 let regular = matches!(entry.filemode(), 0o100644 | 0o100755);
                 if regular && entry.kind() == Some(git2::ObjectType::Blob) {
-                    if let Some(name) = entry.name().ok() {
+                    if let Ok(name) = entry.name() {
                         entries.push((format!("{dir}{name}"), entry.id()));
                     }
                 }

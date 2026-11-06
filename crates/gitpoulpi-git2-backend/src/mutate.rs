@@ -119,7 +119,8 @@ pub fn checkout(repo: &RepoRef, target: &CheckoutTarget) -> Result<()> {
                 Some(r) if r.is_branch() => {
                     git_repo
                         .set_head(
-                            r.name().ok()
+                            r.name()
+                                .ok()
                                 .ok_or_else(|| Error::Backend("branch ref had no name".into()))?,
                         )
                         .map_err(map_err)?;
@@ -187,7 +188,8 @@ pub fn branch_create_tracking(repo: &RepoRef, local_name: &str, upstream: &str) 
         .map_err(map_err)?;
     let head_ref = branch
         .get()
-        .name().ok()
+        .name()
+        .ok()
         .ok_or_else(|| Error::Backend("new branch ref had no name".into()))?
         .to_string();
     git_repo.set_head(&head_ref).map_err(map_err)?;
@@ -324,7 +326,9 @@ pub fn remote_set_push_url(repo: &RepoRef, name: &str, url: Option<&str>) -> Res
             let has_one = git_repo
                 .find_remote(name)
                 .map_err(map_err)?
-                .pushurl().ok()
+                .pushurl()
+                .ok()
+                .flatten()
                 .is_some();
             if has_one {
                 git_repo.remote_set_pushurl(name, None).map_err(map_err)?;

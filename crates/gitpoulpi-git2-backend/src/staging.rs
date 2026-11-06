@@ -107,7 +107,9 @@ fn add_dirty(git: &git2::Repository, index: &mut git2::Index, dir: Option<&str>)
     let mut nested: Vec<String> = Vec::new();
     for entry in statuses.iter() {
         let st = entry.status();
-        let Some(path) = entry.path().ok() else { continue };
+        let Some(path) = entry.path().ok() else {
+            continue;
+        };
         if path.ends_with('/') {
             // An untracked nested repository: let libgit2 add it as one.
             nested.push(path.trim_end_matches('/').to_string());

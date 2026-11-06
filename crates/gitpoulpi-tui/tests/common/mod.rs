@@ -279,6 +279,24 @@ impl Launch {
             // developer's own terminal emulator.
             .env("TERMINAL", "")
             .env("GITPOULPI_DESKTOP_NO_HOOKS", "1");
+        // The "What is sent" dialog stands between an AI action and its
+        // request: every test about an AI answer would stop at it. Only
+        // `pty_ai_sent_dialog` turns it back on, with `.env(..)` of these
+        // keys (`gitpoulpi_config::AiSentPreview`).
+        for action in [
+            "COMMIT_MESSAGE",
+            "EXPLAIN_CHANGES",
+            "STASH_MESSAGE",
+            "PULL_REQUEST_DESCRIPTION",
+            "COMMIT_COMPOSER",
+            "CONFLICT_RESOLVE",
+            "CODE_REVIEW",
+            "SPLIT_COMMIT",
+            "REWRITE_SCRIPT",
+            "REWRITE_RULES",
+        ] {
+            builder = builder.env(format!("GITPOULPI_AI_SENT_PREVIEW_{action}"), "false");
+        }
         // (Alone in its ConPTY the Windows build would relaunch itself in
         // Windows Terminal and count as a launcher start: the PTY driver says
         // a shell shares the console, `GITPOULPI_TEST_SHARED_CONSOLE`.)

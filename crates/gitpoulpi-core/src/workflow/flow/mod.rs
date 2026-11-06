@@ -193,6 +193,11 @@ pub enum FlowStep {
         /// `after_start` or `before_finish`.
         phase: String,
         command: String,
+        /// The command comes from this user's own override, never from the
+        /// committed file: it runs without a trust question. A saved state
+        /// without the field is not personal (the safe side).
+        #[serde(default, skip_serializing_if = "is_false")]
+        personal: bool,
     },
 }
 
@@ -242,7 +247,7 @@ impl FlowStep {
             FlowStep::OpenMergeRequest { source, target, .. } => {
                 format!("Open a merge request from {source} into {target} on the host")
             }
-            FlowStep::Hook { phase, command } => format!("Run the {phase} hook: {command}"),
+            FlowStep::Hook { phase, command, .. } => format!("Run the {phase} hook: {command}"),
         }
     }
 
@@ -339,6 +344,45 @@ pub struct MergeRequestSpec {
 pub struct HookInfo {
     pub phase: String,
     pub command: String,
+    /// From this user's own override: it never needs trust.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub personal: bool,
+}
+
+/// Whether the committed hooks of a workflow may run (filled by the daemon
+/// from the repository's trust records).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HooksTrust {
+    /// The hooks are this user's own: they never ask.
+    Personal,
+    /// The shared hooks (or none) are trusted as they are now.
+    #[default]
+    Trusted,
+    /// The shared hooks must be trusted before they run. `hash` is what
+    /// `FlowTrustHooks` takes; `previous` is the last trusted list when the
+    /// hooks changed since.
+    Untrusted {
+        hash: String,
+        previous: Option<Vec<HookInfo>>,
+    },
+}
+
+/// Args of `FlowTrustHooks`: the hash to trust, or none to only report.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct TrustHooksArgs {
+    pub hash: Option<String>,
+}
+
+/// Answer of `FlowTrustHooks`: the committed hooks as the file has them now
+/// and whether they are trusted.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HooksReport {
+    /// `hooks_hash` of the committed file's hooks (empty when it has none).
+    pub hash: String,
+    pub hooks: Vec<HookInfo>,
+    pub trusted: bool,
 }
 
 /// What an action would do. Answer of `FlowPlan`.
@@ -356,6 +400,10 @@ pub struct FlowPlan {
     pub hooks: Vec<HookInfo>,
     /// Whether the hooks are among the steps.
     pub hooks_run: bool,
+    /// Whether those hooks are trusted to run (the daemon sets it; a plan
+    /// from `plan_flow` alone is `trusted`).
+    #[serde(default)]
+    pub hooks_trust: HooksTrust,
     /// Things worth knowing; the action still runs.
     pub warnings: Vec<String>,
     /// Reasons the action cannot run; a run with blockers is refused.

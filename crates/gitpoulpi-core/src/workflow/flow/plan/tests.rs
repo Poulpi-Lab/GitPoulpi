@@ -555,3 +555,38 @@ fn a_pick_up_needs_no_workflow() {
         ["CreateBranch", "SetUpstream", "Checkout", "RecordParent"]
     );
 }
+
+#[test]
+fn hook_steps_carry_whether_the_hooks_are_the_users_own() {
+    let mut w = git_flow();
+    w.hooks.after_start = vec!["echo hi".into()];
+    let mut f = facts(&["main", "develop"], "main");
+    let mut r = start("feature", &[("slug", "a")]);
+    r.run_hooks = true;
+    let p = plan(&w, &f, &r);
+    assert!(matches!(
+        p.steps.last(),
+        Some(FlowStep::Hook {
+            personal: false,
+            ..
+        })
+    ));
+    assert!(!p.hooks[0].personal);
+    f.hooks_personal = true;
+    let p = plan(&w, &f, &r);
+    assert!(matches!(
+        p.steps.last(),
+        Some(FlowStep::Hook { personal: true, .. })
+    ));
+    assert!(p.hooks[0].personal);
+    // A saved state from before the field existed is not personal.
+    let old: FlowStep =
+        serde_json::from_str(r#"{"op":"hook","phase":"after_start","command":"x"}"#).unwrap();
+    assert!(matches!(
+        old,
+        FlowStep::Hook {
+            personal: false,
+            ..
+        }
+    ));
+}

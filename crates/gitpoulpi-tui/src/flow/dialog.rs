@@ -24,9 +24,10 @@ use ratatui::style::{Modifier, Style};
 
 use super::actions::{
     EventRx, FlowActions, FlowEvent, FlowOp, FlowPreview, FlowRequest, FlowStep, PreviewRx, Resume,
-    StepKind, StoppedFlow,
+    StepKind, StoppedFlow, TrustRx,
 };
 use super::form::{next_version, today_iso, Bump, StartForm, Suggestions};
+use super::hook_trust::{self, HookTrust, Pick};
 use super::view::FlowView;
 use crate::combo::{Combo, ComboOption, ComboOutcome};
 use crate::dialog_kit::{self, ButtonState, CheckState};
@@ -121,6 +122,21 @@ enum Phase {
     Done(Run),
 }
 
+/// The hook trust question over a preview, and the request that remembers
+/// the answer while it is in flight.
+struct TrustUi {
+    pane: HookTrust,
+    pending: Option<(TrustRx, Instant)>,
+}
+
+/// Whether the preview's hooks must be trusted before they may run.
+fn untrusted(preview: &FlowPreview) -> bool {
+    matches!(
+        preview.trust,
+        gitpoulpi_core::workflow::HooksTrust::Untrusted { .. }
+    ) && !preview.hook_lines.is_empty()
+}
+
 /// What the dialog asks its owner for.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum FlowOutcome {
@@ -146,6 +162,9 @@ pub(crate) struct FlowDialog {
     publish: bool,
     with_children: bool,
     run_hooks: bool,
+    /// The question about the committed hooks, while it is open over the
+    /// preview.
+    trust: Option<TrustUi>,
     /// The run now going (or done) is an Abort.
     aborted: bool,
     /// Finish asks how (the type says `ask`): the form has the mode row.
@@ -243,6 +262,7 @@ impl FlowDialog {
             publish: false,
             with_children: false,
             run_hooks: false,
+            trust: None,
             aborted: false,
             finish_asks: false,
             merge_request: None,
@@ -569,16 +589,83 @@ impl FlowDialog {
         self.message = None;
     }
 
+    /// Opens the question about the committed hooks over the preview.
+    fn ask_hook_trust(&mut self, preview: &FlowPreview) {
+        let gitpoulpi_core::workflow::HooksTrust::Untrusted { hash, previous } = &preview.trust
+        else {
+            return;
+        };
+        self.trust = Some(TrustUi {
+            pane: HookTrust::new(hash.clone(), &preview.hook_lines, previous.as_deref()),
+            pending: None,
+        });
+        self.message = None;
+    }
+
+    /// An answer of the hook trust question.
+    fn hook_trust_pick(&mut self, pick: Pick) {
+        let Phase::Preview(preview) = &self.phase else {
+            self.trust = None;
+            return;
+        };
+        let preview = preview.clone();
+        match pick {
+            Pick::Skip => {
+                self.trust = None;
+                self.run_hooks = false;
+                self.begin_run(&preview);
+            }
+            Pick::Trust => {
+                if let Some(ui) = &mut self.trust {
+                    let rx = self.actions.trust_hooks(&ui.pane.hash);
+                    ui.pending = Some((rx, Instant::now()));
+                }
+            }
+        }
+    }
+
+    /// The daemon's answer to "Trust and run": run with the hooks, or show
+    /// why it was refused (the file changed: the preview is read again).
+    fn poll_hook_trust(&mut self) {
+        let Some(ui) = &mut self.trust else {
+            return;
+        };
+        let Some((rx, _)) = &ui.pending else {
+            return;
+        };
+        let answer = match rx.try_recv() {
+            Ok(answer) => answer,
+            Err(std::sync::mpsc::TryRecvError::Empty) => return,
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => Err(msg::LOST.get().into()),
+        };
+        self.trust = None;
+        match answer {
+            Ok(()) => {
+                self.run_hooks = true;
+                if let Phase::Preview(preview) = &self.phase {
+                    let preview = preview.clone();
+                    self.begin_run(&preview);
+                }
+            }
+            Err(why) => {
+                self.begin_preview();
+                self.message = Some(why);
+            }
+        }
+    }
+
     // -- polling -------------------------------------------------------------
 
     /// A request or a run is on its way (the spinner needs frames).
     pub(crate) fn animating(&self) -> bool {
         matches!(self.phase, Phase::Previewing { .. } | Phase::Running(_))
+            || self.trust.as_ref().is_some_and(|t| t.pending.is_some())
     }
 
     /// Drains the channels. Returns a status line when an action ended.
     pub(crate) fn poll(&mut self) -> Option<String> {
         let mut said = None;
+        self.poll_hook_trust();
         let phase = std::mem::replace(&mut self.phase, Phase::Form);
         self.phase = match phase {
             Phase::Previewing { rx, since } => match rx.try_recv() {
@@ -715,8 +802,11 @@ impl FlowDialog {
                 order.push(Focus::Secondary);
             }
             Phase::Previewing { .. } => order.push(Focus::Secondary),
+            // The question owns the body: only its Cancel button is a stop.
+            Phase::Preview(_) if self.trust.is_some() => order.push(Focus::Secondary),
             Phase::Preview(p) => {
-                if !p.hooks.is_empty() {
+                // Untrusted hooks have no checkbox: the question asks.
+                if !p.hooks.is_empty() && !untrusted(p) {
                     order.push(Focus::Hooks);
                 }
                 if p.blockers.is_empty() {
@@ -836,7 +926,11 @@ impl FlowDialog {
                 FlowOutcome::Stay
             }
             Phase::Preview(preview) => {
-                if preview.blockers.is_empty() {
+                if preview.blockers.is_empty() && untrusted(&preview) && self.trust.is_none() {
+                    // Committed hooks nobody trusted: ask before anything runs.
+                    self.ask_hook_trust(&preview);
+                    self.phase = Phase::Preview(preview);
+                } else if preview.blockers.is_empty() {
                     self.begin_run(&preview);
                     if !matches!(self.phase, Phase::Running(_)) {
                         self.phase = Phase::Preview(preview);
@@ -890,6 +984,14 @@ impl FlowDialog {
     }
 
     fn secondary(&mut self) -> FlowOutcome {
+        // Cancel of the hook trust question goes back to the preview.
+        if let Some(ui) = &self.trust {
+            if ui.pending.is_none() {
+                self.trust = None;
+                self.focus = Focus::Primary;
+            }
+            return FlowOutcome::Stay;
+        }
         match &self.phase {
             // Back from a preview to the form (Finish has none).
             Phase::Preview(_) if self.has_form() => {
@@ -973,6 +1075,25 @@ impl FlowDialog {
     }
 
     pub(crate) fn on_key(&mut self, key: KeyEvent) -> FlowOutcome {
+        if let Some(ui) = &mut self.trust {
+            // While the daemon remembers the answer nothing else happens.
+            if ui.pending.is_some() {
+                return FlowOutcome::Stay;
+            }
+            match ui.pane.on_key(key) {
+                hook_trust::Event::Cancel => {
+                    self.trust = None;
+                    self.focus = Focus::Primary;
+                    return FlowOutcome::Stay;
+                }
+                hook_trust::Event::Pick(pick) => {
+                    self.hook_trust_pick(pick);
+                    return FlowOutcome::Stay;
+                }
+                hook_trust::Event::Handled => return FlowOutcome::Stay,
+                hook_trust::Event::Ignored => {}
+            }
+        }
         // An open dropdown is modal: it swallows every key.
         if let Some(open) = self.open_combo() {
             if let Some(combo) = self.combo_of(open) {
@@ -1031,6 +1152,19 @@ impl FlowDialog {
     }
 
     pub(crate) fn on_mouse(&mut self, mouse: MouseEvent) -> FlowOutcome {
+        if let Some(ui) = &mut self.trust {
+            if ui.pending.is_some() {
+                return FlowOutcome::Stay;
+            }
+            match ui.pane.on_mouse(mouse) {
+                hook_trust::Event::Pick(pick) => {
+                    self.hook_trust_pick(pick);
+                    return FlowOutcome::Stay;
+                }
+                hook_trust::Event::Handled => return FlowOutcome::Stay,
+                hook_trust::Event::Cancel | hook_trust::Event::Ignored => {}
+            }
+        }
         // An open dropdown owns the pointer.
         if let Some(open) = self.open_combo() {
             if let Some(combo) = self.combo_of(open) {
@@ -1082,6 +1216,7 @@ impl FlowDialog {
         match &self.phase {
             Phase::Form => Some(msg::BTN_PREVIEW.get()),
             Phase::Previewing { .. } | Phase::Running(_) => None,
+            Phase::Preview(_) if self.trust.is_some() => None,
             Phase::Preview(p) => p.blockers.is_empty().then(|| match self.kind {
                 FlowKind::Start(_) => msg::BTN_START.get(),
                 FlowKind::Finish => msg::BTN_FINISH.get(),
@@ -1099,6 +1234,9 @@ impl FlowDialog {
         match &self.phase {
             Phase::Form => Some(gitpoulpi_i18n::msg::dialog::CANCEL.get()),
             Phase::Previewing { .. } => Some(gitpoulpi_i18n::msg::dialog::CANCEL.get()),
+            Phase::Preview(_) if self.trust.is_some() => {
+                Some(gitpoulpi_i18n::msg::dialog::CANCEL.get())
+            }
             Phase::Preview(_) if self.has_form() => Some(msg::BTN_BACK.get()),
             Phase::Preview(_) => Some(gitpoulpi_i18n::msg::dialog::CANCEL.get()),
             Phase::Running(_) => None,
@@ -1141,6 +1279,33 @@ impl FlowDialog {
                         inner.x,
                         inner.y,
                         &format!("{spin} {}", msg::READING_PLAN.get()),
+                        inner.width,
+                        muted,
+                    );
+                }
+            }
+            Phase::Preview(_) if self.trust.is_some() => {
+                let area = Rect::new(
+                    inner.x,
+                    inner.y,
+                    inner.width,
+                    body_bottom.saturating_sub(inner.y),
+                );
+                let mut waiting = None;
+                if let Some(ui) = &mut self.trust {
+                    ui.pane.render(buf, area);
+                    waiting = ui.pending.as_ref().map(|(_, since)| *since);
+                }
+                if let Some(since) = waiting.filter(|s| s.elapsed() >= SPIN_AFTER) {
+                    let spin = crate::activity::spinner_frame(since.elapsed());
+                    dialog_kit::put(
+                        buf,
+                        inner.x,
+                        message_y,
+                        &format!(
+                            "{spin} {}",
+                            gitpoulpi_i18n::msg::flow_hook_trust::TRUSTING.get()
+                        ),
                         inner.width,
                         muted,
                     );
@@ -1549,6 +1714,18 @@ impl FlowDialog {
                     Style::default().fg(th().ui.text).bg(th().ui.panel),
                 );
                 y += 1;
+            }
+            if untrusted(preview) {
+                // No checkbox: the question comes when the action runs.
+                dialog_kit::put(
+                    buf,
+                    inner.x + 1,
+                    y,
+                    gitpoulpi_i18n::msg::flow_hook_trust::UNTRUSTED_NOTE.get(),
+                    inner.width.saturating_sub(1),
+                    Style::default().fg(th().ui.muted).bg(th().ui.panel),
+                );
+                return;
             }
             let r = dialog_kit::checkbox(
                 buf,

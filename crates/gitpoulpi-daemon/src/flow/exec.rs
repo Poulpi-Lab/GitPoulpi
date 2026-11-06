@@ -14,7 +14,7 @@ use gitpoulpi_core::workflow::{
 use gitpoulpi_core::GitBackend;
 
 use super::facts::{backend_failure, plain_failure};
-use super::{hooks, plan_of, state};
+use super::{hooks, plan_of, state, trust};
 use crate::dispatch::Failure;
 
 /// Why a step did not finish.
@@ -448,7 +448,7 @@ impl<'a> Exec<'a> {
                 output: Some("left to the client (it holds the hosting token)".to_string()),
                 exit_code: None,
             }),
-            FlowStep::Hook { phase, command } => {
+            FlowStep::Hook { phase, command, .. } => {
                 let ran = hooks::run(
                     repo.root.clone(),
                     command.clone(),
@@ -559,6 +559,9 @@ pub(super) async fn start_run(
     if !plan.can_run() {
         return Err(plain_failure(plan.blockers.join("; ")));
     }
+    // Before anything runs: committed hooks that are not trusted refuse the
+    // whole run.
+    trust::check_plan(&plan)?;
     let mut ex = Exec {
         backend,
         repo,
@@ -598,6 +601,9 @@ pub(super) async fn resume_continue(
             req.action.word()
         )));
     }
+    // The saved steps are a file in the repository's own directory: the hooks
+    // still to run are checked like the committed ones, before the first step.
+    trust::check_resume(repo, &saved.steps[saved.next.min(saved.steps.len())..])?;
     let mut ex = exec_for(backend, repo, &saved);
     let mut start = saved.next;
     if saved.conflict {

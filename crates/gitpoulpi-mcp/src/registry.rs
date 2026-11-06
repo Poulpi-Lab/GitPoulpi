@@ -133,6 +133,10 @@ pub const EXCLUDED: &[(&[&str], &str)] = &[
         &["hosting", "login"],
         "takes a secret token on stdin; a token must not pass through an agent's tool-call transcript",
     ),
+    (
+        &["flow", "trust-hooks"],
+        "trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted",
+    ),
 ];
 
 /// Every CLI leaf that isn't excluded, as an MCP tool.

@@ -188,6 +188,19 @@ pub enum FlowAction {
         #[command(flatten)]
         run: FlowRunArgs,
     },
+    /// Review and trust the workflow hooks the repository commits (the
+    /// `[hooks]` of `.gitpoulpi/workflow.toml`): shell commands that would run
+    /// on your machine. Without `--hash` it only prints `{hash, hooks,
+    /// trusted}`; with the hash it remembers the trust, but only when the
+    /// file on disk still has exactly that hash, so what you read is what is
+    /// trusted. A changed file asks again. Hooks of your own override never
+    /// need this. Only a person can do this: there is no MCP tool for it.
+    TrustHooks {
+        /// The hash printed by `flow trust-hooks` (or by a refused
+        /// `--run-hooks`): trust the hooks with that hash.
+        #[arg(long)]
+        hash: Option<String>,
+    },
     /// Turn another tool's branching settings found in the repository
     /// (`git flow init`'s `gitflow.*`, Git Town's `git-town.*`) into a
     /// workflow. Prints the TOML; changes nothing unless `--write`, which

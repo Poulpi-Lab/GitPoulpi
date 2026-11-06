@@ -247,6 +247,7 @@ pub(super) async fn flow(session: &mut Session, action: FlowAction) -> Result<Em
             run_action(session, req, &run, None, None).await
         }
         FlowAction::Issue { action } => issue(session, action).await,
+        FlowAction::TrustHooks { hash } => flow_run::trust_hooks(session, hash).await,
         FlowAction::PickUp {
             target,
             remote,

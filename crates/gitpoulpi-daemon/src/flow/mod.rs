@@ -22,6 +22,7 @@ mod exec;
 mod facts;
 mod hooks;
 mod state;
+mod trust;
 
 use gitpoulpi_core::domain::RepoRef;
 use gitpoulpi_core::workflow::{plan_flow, FlowPlan, FlowRequest, FlowResume, FlowState, FlowStep};
@@ -54,10 +55,14 @@ pub(crate) fn plan_of(
         return Ok(resume_plan(&state, resume));
     }
     let (workflow, facts) = gather(backend, repo)?;
-    Ok(plan_flow(&workflow, &facts, req, &mut |tip, base| {
+    let mut plan = plan_flow(&workflow, &facts, req, &mut |tip, base| {
         backend.ahead_behind(repo, tip, base).ok()
-    }))
+    });
+    plan.hooks_trust = trust::classify(repo, &facts, &plan);
+    Ok(plan)
 }
+
+pub(crate) use trust::trust_hooks;
 
 fn resume_plan(state: &FlowState, resume: FlowResume) -> FlowPlan {
     let mut plan = FlowPlan {

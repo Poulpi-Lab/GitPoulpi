@@ -12,7 +12,7 @@ use std::io::{BufRead, IsTerminal, Write};
 use gitpoulpi_core::domain::OperationKind;
 use gitpoulpi_core::workflow::{
     Fields, FinishMode, FlowAction as Act, FlowOutcome, FlowPlan, FlowRequest, FlowResume,
-    FlowStatus, StepStatus,
+    FlowStatus, HooksReport, HooksTrust, StepStatus, TrustHooksArgs,
 };
 use gitpoulpi_core::TypedError;
 use serde_json::{json, Value};
@@ -141,6 +141,92 @@ fn ask(prompt: &str) -> Result<bool, String> {
     Ok(matches!(line.trim().to_lowercase().as_str(), "y" | "yes"))
 }
 
+/// The commands of an untrusted plan, for a refusal or a question.
+fn untrusted_of(plan: &FlowPlan) -> Option<&str> {
+    match &plan.hooks_trust {
+        HooksTrust::Untrusted { hash, .. } if !plan.hooks.is_empty() => Some(hash),
+        _ => None,
+    }
+}
+
+/// `--run-hooks` on committed hooks nobody trusted: nothing runs, the
+/// commands and the way to trust them come back.
+fn hooks_refusal(plan: &FlowPlan, hash: &str) -> Emitted {
+    let trust_command = format!("gitpoulpi flow trust-hooks --hash {hash}");
+    let hooks: Vec<Value> = plan
+        .hooks
+        .iter()
+        .map(|h| json!({ "phase": h.phase, "command": h.command }))
+        .collect();
+    let mut human =
+        vec!["the repository's workflow hooks are not trusted, nothing was run:".to_string()];
+    for hook in &plan.hooks {
+        human.push(format!("  {}: {}", hook.phase, hook.command));
+    }
+    if let HooksTrust::Untrusted {
+        previous: Some(_), ..
+    } = &plan.hooks_trust
+    {
+        human.push("the hooks changed since you trusted them".to_string());
+    }
+    human.push(format!(
+        "read them, then run `{trust_command}` yourself (or repeat without --run-hooks)"
+    ));
+    Emitted {
+        json: json!({ "refused": {
+            "reason": "hooks_not_trusted",
+            "hash": hash,
+            "hooks": hooks,
+            "trust_command": trust_command,
+        } }),
+        human: human.join("\n"),
+        exit_code: 2,
+    }
+}
+
+/// `flow trust-hooks [--hash H]`: shows the committed hooks and whether they
+/// are trusted; with the hash, trusts them. Only a person (the CLI's own
+/// session) may.
+pub(crate) async fn trust_hooks(
+    session: &mut Session,
+    hash: Option<String>,
+) -> Result<Emitted, String> {
+    if hash.is_some() && !session.may_trust() {
+        return Err(
+            "only a person can trust workflow hooks: run `gitpoulpi flow trust-hooks --hash H` \
+             yourself"
+                .into(),
+        );
+    }
+    let report: HooksReport = session
+        .call(
+            OperationKind::FlowTrustHooks,
+            to_value(&TrustHooksArgs { hash })?,
+        )
+        .await?;
+    let mut human = Vec::new();
+    if report.hooks.is_empty() {
+        human.push("the repository's workflow file commits no hooks".to_string());
+    } else {
+        for hook in &report.hooks {
+            human.push(format!("{}: {}", hook.phase, hook.command));
+        }
+        human.push(if report.trusted {
+            format!("trusted (hash {})", report.hash)
+        } else {
+            format!(
+                "not trusted: `gitpoulpi flow trust-hooks --hash {}` after reading them",
+                report.hash
+            )
+        });
+    }
+    Ok(Emitted {
+        json: to_value(&report)?,
+        human: human.join("\n"),
+        exit_code: 0,
+    })
+}
+
 fn args_json(req: &FlowRequest, run: &FlowRunArgs) -> Result<Value, String> {
     Ok(with_autostash(to_value(req)?, run.autostash))
 }
@@ -178,6 +264,14 @@ pub(crate) async fn run_action(
         return Err(format!("{}: {}", plan.title, plan.blockers.join("; ")));
     }
 
+    // Committed hooks nobody trusted never run on an explicit `--run-hooks`:
+    // the refusal names them and the command a person runs to trust them.
+    if req.run_hooks {
+        if let Some(hash) = untrusted_of(&plan) {
+            return Ok(hooks_refusal(&plan, hash));
+        }
+    }
+
     let terminal = std::io::stdin().is_terminal()
         && std::io::stdout().is_terminal()
         && std::io::stderr().is_terminal();
@@ -187,7 +281,26 @@ pub(crate) async fn run_action(
         for hook in &plan.hooks {
             eprintln!("  {}: {}", hook.phase, hook.command);
         }
-        if ask("Run them too? [y/N] ")? {
+        let untrusted = untrusted_of(&plan).map(str::to_string);
+        let question = if untrusted.is_some() {
+            "These hooks are not trusted yet. Trust them and run them too? [y/N] "
+        } else {
+            "Run them too? [y/N] "
+        };
+        if ask(question)? {
+            if let Some(hash) = untrusted {
+                if !session.may_trust() {
+                    return Err("only a person can trust workflow hooks".into());
+                }
+                // The person just read the commands: remember the trust (the
+                // daemon refuses when the file changed since the plan).
+                let _: HooksReport = session
+                    .call(
+                        OperationKind::FlowTrustHooks,
+                        to_value(&TrustHooksArgs { hash: Some(hash) })?,
+                    )
+                    .await?;
+            }
             req.run_hooks = true;
             plan = session
                 .call(OperationKind::FlowPlan, args_json(&req, run)?)

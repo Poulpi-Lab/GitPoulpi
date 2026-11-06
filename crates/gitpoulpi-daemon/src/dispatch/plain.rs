@@ -761,6 +761,7 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
             let policy = crate::rewrite_runs::script_policy(&repo, &test.vouched);
             to_json!(backend.rewrite_script_test(&repo, &test.script, &policy, &test.commits))
         }
+        OperationKind::FlowTrustHooks => to_json!(crate::flow::trust_hooks(&repo, args)),
         OperationKind::RewriteTrustScript => {
             let trust: gitpoulpi_ipc::rewrite::TrustArgs =
                 match serde_json::from_value(args.clone()) {

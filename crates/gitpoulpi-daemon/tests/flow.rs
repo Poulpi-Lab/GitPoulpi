@@ -8,9 +8,11 @@ use std::sync::{Arc, OnceLock};
 
 use gitpoulpi_core::domain::{OperationKind, RepoId};
 use gitpoulpi_core::workflow::{
-    FlowOutcome, FlowPlan, FlowStatus, Hooks, MergeStrategy, StepStatus, Workflow, WorkflowTemplate,
+    FlowOutcome, FlowPlan, FlowStatus, Hooks, HooksReport, HooksTrust, MergeStrategy, StepStatus,
+    Workflow, WorkflowTemplate,
 };
 use gitpoulpi_core::GitBackend;
+use gitpoulpi_core::TypedError;
 use gitpoulpi_daemon::Daemon;
 use gitpoulpi_ipc::{Client, Request, ResponseError};
 use gitpoulpi_testkit::{FixtureRepo, FixtureRepoBuilder};
@@ -104,6 +106,22 @@ impl Rig {
     async fn try_run(&mut self, args: Value) -> Result<FlowOutcome, ResponseError> {
         let value = self.call(OperationKind::FlowRun, args).await?;
         Ok(serde_json::from_value(value).unwrap())
+    }
+
+    /// What a person does in the dialog: reads the hooks, then trusts that hash.
+    async fn trust_hooks(&mut self) -> HooksReport {
+        let seen: HooksReport = serde_json::from_value(
+            self.call(OperationKind::FlowTrustHooks, json!({}))
+                .await
+                .unwrap(),
+        )
+        .unwrap();
+        serde_json::from_value(
+            self.call(OperationKind::FlowTrustHooks, json!({ "hash": seen.hash }))
+                .await
+                .unwrap(),
+        )
+        .unwrap()
     }
 
     async fn undo(&mut self) -> Value {
@@ -928,6 +946,7 @@ async fn hooks_never_run_unless_asked_and_show_their_output() {
     for (name, backend) in backends() {
         let repo = base_repo().build();
         let mut rig = Rig::new(backend, repo, &hooked(&[hook], &[])).await;
+        rig.trust_hooks().await;
         let request = json!({ "action": "start", "topic": "feature", "fields": { "slug": "h" } });
 
         // Not asked: listed, not run.
@@ -973,6 +992,7 @@ async fn a_failing_hook_stops_the_flow_and_shows_its_output() {
         // `continue` retries it; Undo takes the branch back.
         let repo = base_repo().build();
         let mut rig = Rig::new(backend.clone(), repo, &hooked(&[failing], &[])).await;
+        rig.trust_hooks().await;
         let out = rig
             .run(json!({ "action": "start", "topic": "feature", "fields": { "slug": "h" }, "run_hooks": true }))
             .await;
@@ -1004,6 +1024,7 @@ async fn a_failing_hook_stops_the_flow_and_shows_its_output() {
 
         // Before a finish, nothing has changed yet: a plain error, no state.
         let mut rig = Rig::new(backend, feature_repo(), &hooked(&[], &[failing])).await;
+        rig.trust_hooks().await;
         let error = rig
             .try_run(json!({ "action": "finish", "run_hooks": true }))
             .await
@@ -1016,6 +1037,190 @@ async fn a_failing_hook_stops_the_flow_and_shows_its_output() {
         assert!(error.message.contains("boom"));
         assert_eq!(rig.head(), "feature/x");
         assert!(rig.has_branch("feature/x"));
+        rig.stop().await;
+    }
+}
+
+fn touch(file: &str) -> String {
+    if cfg!(windows) {
+        format!("echo x> {file}")
+    } else {
+        format!("echo x > {file}")
+    }
+}
+
+fn run_start(slug: &str) -> Value {
+    json!({ "action": "start", "topic": "feature", "fields": { "slug": slug }, "run_hooks": true })
+}
+
+#[tokio::test]
+async fn untrusted_committed_hooks_refuse_a_run_before_any_step() {
+    for (name, backend) in backends() {
+        let repo = base_repo().build();
+        let mut rig = Rig::new(backend, repo, &hooked(&[&touch("hook-ran.txt")], &[])).await;
+
+        // The plan says what to ask, and lists the exact commands.
+        let plan = rig.plan(run_start("t")).await;
+        let HooksTrust::Untrusted { hash, previous } = &plan.hooks_trust else {
+            panic!("{name}: {:?}", plan.hooks_trust);
+        };
+        assert_eq!(hash.len(), 64);
+        assert!(previous.is_none());
+        assert_eq!(plan.hooks[0].command, touch("hook-ran.txt"));
+
+        let err = rig.try_run(run_start("t")).await.unwrap_err();
+        match &err.kind {
+            Some(TypedError::HooksNotTrusted { hash: h, hooks }) => {
+                assert_eq!(h, hash);
+                assert_eq!(hooks[0].command, touch("hook-ran.txt"));
+            }
+            other => panic!("{name}: {other:?} {}", err.message),
+        }
+        // Nothing ran: no branch, no checkout, no hook, no saved flow.
+        assert!(!rig.has_branch("feature/t"), "{name}");
+        assert_eq!(rig.head(), "main");
+        assert!(!rig.repo.root().join("hook-ran.txt").exists());
+
+        // Not asking for hooks never needs trust.
+        let out = rig
+            .run(json!({ "action": "start", "topic": "feature", "fields": { "slug": "t" } }))
+            .await;
+        assert_eq!(out.status, FlowStatus::Done, "{name}");
+        rig.stop().await;
+    }
+}
+
+#[tokio::test]
+async fn trusting_the_shown_hooks_lets_them_run_and_a_change_asks_again() {
+    for (name, backend) in backends() {
+        let repo = base_repo().build();
+        let mut rig = Rig::new(backend, repo, &hooked(&[&touch("one.txt")], &[])).await;
+        let report = rig.trust_hooks().await;
+        assert!(report.trusted, "{name}");
+        let plan = rig.plan(run_start("a")).await;
+        assert_eq!(plan.hooks_trust, HooksTrust::Trusted, "{name}");
+        let out = rig.run(run_start("a")).await;
+        assert_eq!(out.status, FlowStatus::Done, "{name}: {out:?}");
+        assert!(rig.repo.root().join("one.txt").exists());
+
+        // The file changes after the trust: the old hash no longer matches.
+        write_workflow(&rig.repo, &hooked(&[&touch("two.txt")], &[]));
+        let plan = rig.plan(run_start("b")).await;
+        match &plan.hooks_trust {
+            HooksTrust::Untrusted { hash, previous } => {
+                assert_ne!(*hash, report.hash);
+                let old = previous.as_ref().expect("the old list is shown");
+                assert_eq!(old[0].command, touch("one.txt"));
+            }
+            other => panic!("{name}: {other:?}"),
+        }
+        let err = rig.try_run(run_start("b")).await.unwrap_err();
+        assert!(
+            matches!(err.kind, Some(TypedError::HooksNotTrusted { .. })),
+            "{name}: {}",
+            err.message
+        );
+        assert!(!rig.repo.root().join("two.txt").exists());
+
+        // Trusting the hash that was shown for the old file is refused: only
+        // what is on disk now can be trusted.
+        let stale = rig
+            .call(
+                OperationKind::FlowTrustHooks,
+                json!({ "hash": report.hash }),
+            )
+            .await
+            .unwrap_err();
+        assert!(
+            stale.message.contains("differs"),
+            "{name}: {}",
+            stale.message
+        );
+        let wrong = rig
+            .call(
+                OperationKind::FlowTrustHooks,
+                json!({ "hash": "0".repeat(64) }),
+            )
+            .await;
+        assert!(wrong.is_err());
+        rig.stop().await;
+    }
+}
+
+#[tokio::test]
+async fn a_resume_checks_every_saved_command_and_refuses_an_injected_one() {
+    let failing = if cfg!(windows) {
+        "echo boom 1>&2 && exit 3"
+    } else {
+        "echo boom >&2; exit 3"
+    };
+    for (name, backend) in backends() {
+        let repo = base_repo().build();
+        let mut rig = Rig::new(backend, repo, &hooked(&[failing], &[])).await;
+        rig.trust_hooks().await;
+        let out = rig.run(run_start("r")).await;
+        assert_eq!(out.status, FlowStatus::Failed, "{name}");
+        assert!(out.resumable);
+
+        // Someone edits the saved state in the repository's own directory.
+        let path = rig.repo.root().join(".git/gitpoulpi/flow-state.json");
+        let text = std::fs::read_to_string(&path).unwrap();
+        let injected = touch("injected.txt");
+        let edited = text.replace(
+            &serde_json::to_string(failing).unwrap(),
+            &serde_json::to_string(&injected).unwrap(),
+        );
+        assert_ne!(text, edited, "{name}: the saved command was found");
+        std::fs::write(&path, edited).unwrap();
+
+        let err = rig
+            .try_run(json!({ "action": "start", "resume": "continue" }))
+            .await
+            .unwrap_err();
+        match &err.kind {
+            Some(TypedError::HooksNotTrusted { hooks, .. }) => {
+                assert_eq!(hooks[0].command, injected, "{name}");
+            }
+            other => panic!("{name}: {other:?} {}", err.message),
+        }
+        assert!(!rig.repo.root().join("injected.txt").exists(), "{name}");
+        // Aborting runs no hook and is still possible.
+        let aborted = rig
+            .run(json!({ "action": "start", "resume": "abort" }))
+            .await;
+        assert_eq!(aborted.status, FlowStatus::Aborted);
+        rig.stop().await;
+    }
+}
+
+#[tokio::test]
+async fn personal_hooks_run_without_asking_and_replace_the_committed_ones() {
+    for (name, backend) in backends() {
+        let repo = base_repo().build();
+        let mut rig = Rig::new(backend, repo, &hooked(&[&touch("shared.txt")], &[])).await;
+        // The user's own override (repo state) carries its own hooks.
+        let path = gitpoulpi_session::RepoState::path_for(
+            rig.repo.root(),
+            gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION,
+        );
+        let state = gitpoulpi_session::RepoState {
+            workflow: Some(gitpoulpi_core::workflow::WorkflowOverride {
+                hooks: Some(Hooks {
+                    after_start: vec![touch("personal.txt")],
+                    before_finish: Vec::new(),
+                }),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        state.save(&path).unwrap();
+
+        let plan = rig.plan(run_start("p")).await;
+        assert_eq!(plan.hooks_trust, HooksTrust::Personal, "{name}");
+        let out = rig.run(run_start("p")).await;
+        assert_eq!(out.status, FlowStatus::Done, "{name}: {out:?}");
+        assert!(rig.repo.root().join("personal.txt").exists(), "{name}");
+        assert!(!rig.repo.root().join("shared.txt").exists(), "{name}");
         rig.stop().await;
     }
 }

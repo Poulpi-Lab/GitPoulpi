@@ -234,6 +234,11 @@ pub enum OperationKind {
     /// repository's state (see `gitpoulpi_ipc::rewrite::TrustArgs`). A human's
     /// act: the MCP server does not expose it.
     RewriteTrustScript,
+    /// Trusts the committed workflow hooks as the file has them now (args
+    /// `{ hash }`, which must equal the hash of the hooks on disk, see
+    /// `gitpoulpi_core::workflow::hooks_hash`), in the repository's state. A
+    /// human's act: the MCP server does not expose it.
+    FlowTrustHooks,
     /// Scans the history for secrets, findings only (see
     /// `GitBackend::rewrite_scan_secrets`). A job.
     RewriteScanSecrets,
@@ -616,6 +621,7 @@ impl OperationKind {
             | K::RewriteScriptCheck
             | K::RewriteScriptTest
             | K::RewriteTrustScript
+            | K::FlowTrustHooks
             | K::RewriteScanSecrets
             | K::RewriteAnalyze
             | K::RewriteCheckSigning
@@ -788,7 +794,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 169] = [
+    pub const ALL: [OperationKind; 170] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -880,6 +886,7 @@ impl OperationKind {
         OperationKind::RewriteScriptCheck,
         OperationKind::RewriteScriptTest,
         OperationKind::RewriteTrustScript,
+        OperationKind::FlowTrustHooks,
         OperationKind::RewriteScanSecrets,
         OperationKind::RewriteAnalyze,
         OperationKind::RewriteCheckSigning,

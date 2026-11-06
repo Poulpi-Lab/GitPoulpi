@@ -451,6 +451,7 @@ Not exposed as tools:
 | `gitpoulpi config set` | an agent must not be able to rewrite its own gating config |
 | `gitpoulpi hosting ssh-key create` | writes a private key and uploads it; too dangerous to let an agent automate |
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
+| `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
 ### Branching workflow actions are plan-then-execute

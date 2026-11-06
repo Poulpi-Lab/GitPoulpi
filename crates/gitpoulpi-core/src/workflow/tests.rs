@@ -118,3 +118,32 @@ fn a_user_override_replaces_adds_and_disables() {
     assert_eq!(w2.bases.len(), 1, "a base is disabled by any of its names");
     assert!(WorkflowOverride::default().is_empty());
 }
+
+#[test]
+fn hooks_hash_is_stable_and_changes_with_every_part() {
+    let hooks = Hooks {
+        after_start: vec!["echo a".into()],
+        before_finish: vec!["make test".into()],
+    };
+    // Pinned: a change here silently drops every recorded trust.
+    assert_eq!(
+        hooks_hash(&hooks),
+        "0a2f47357e536a883253bd9d938cc33eb72dbb16f0fc779273459ac16dad2cd9"
+    );
+    let mut other = hooks.clone();
+    other.after_start[0] = "echo b".into();
+    assert_ne!(hooks_hash(&hooks), hooks_hash(&other));
+    // The same commands under the other phases are a different list.
+    let moved = Hooks {
+        after_start: vec!["make test".into()],
+        before_finish: vec!["echo a".into()],
+    };
+    assert_ne!(hooks_hash(&hooks), hooks_hash(&moved));
+    // One command with a newline is not two commands (a NUL, the only way to
+    // spell out the separator, cannot be in a TOML string or a command line).
+    let joined = Hooks {
+        after_start: vec!["echo a\nmake test".into()],
+        before_finish: Vec::new(),
+    };
+    assert_ne!(hooks_hash(&hooks), hooks_hash(&joined));
+}

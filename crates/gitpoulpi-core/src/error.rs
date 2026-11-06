@@ -136,6 +136,19 @@ pub enum Error {
     #[error("already running as job {existing}")]
     JobConflict { existing: u64 },
 
+    /// The committed workflow hooks were asked to run but this user has not
+    /// trusted them as they are now. Nothing ran. `hash` is what
+    /// `FlowTrustHooks` takes, `hooks` the exact commands.
+    #[error(
+        "the repository's workflow hooks are not trusted ({} command(s), hash {hash}); review \
+         them, then `gitpoulpi flow trust-hooks --hash {hash}`",
+        .hooks.len()
+    )]
+    HooksNotTrusted {
+        hash: String,
+        hooks: Vec<crate::workflow::HookInfo>,
+    },
+
     #[error("backend error: {0}")]
     Backend(String),
 
@@ -370,6 +383,10 @@ pub enum TypedError {
     JobConflict {
         existing: u64,
     },
+    HooksNotTrusted {
+        hash: String,
+        hooks: Vec<crate::workflow::HookInfo>,
+    },
 }
 
 impl Error {
@@ -410,6 +427,10 @@ impl Error {
             }
             Error::JobConflict { existing } => Some(TypedError::JobConflict {
                 existing: *existing,
+            }),
+            Error::HooksNotTrusted { hash, hooks } => Some(TypedError::HooksNotTrusted {
+                hash: hash.clone(),
+                hooks: hooks.clone(),
             }),
             _ => None,
         }
@@ -482,6 +503,7 @@ impl Error {
             TypedError::Canceled { job } => Error::Canceled { job },
             TypedError::NotCancellable { reason } => Error::NotCancellable { reason },
             TypedError::JobConflict { existing } => Error::JobConflict { existing },
+            TypedError::HooksNotTrusted { hash, hooks } => Error::HooksNotTrusted { hash, hooks },
         }
     }
 }
@@ -610,6 +632,27 @@ mod tests {
             Error::from_typed(Error::JobConflict { existing: 3 }.typed().unwrap()),
             Error::JobConflict { existing: 3 }
         ));
+    }
+
+    #[test]
+    fn hooks_not_trusted_round_trips_with_its_commands() {
+        let original = Error::HooksNotTrusted {
+            hash: "ab".repeat(32),
+            hooks: vec![crate::workflow::HookInfo {
+                phase: "after_start".into(),
+                command: "make".into(),
+                personal: false,
+            }],
+        };
+        assert!(original.to_string().contains("not trusted"));
+        let wire = serde_json::to_string(&original.typed().unwrap()).unwrap();
+        match Error::from_typed(serde_json::from_str(&wire).unwrap()) {
+            Error::HooksNotTrusted { hash, hooks } => {
+                assert_eq!(hash.len(), 64);
+                assert_eq!(hooks[0].command, "make");
+            }
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]

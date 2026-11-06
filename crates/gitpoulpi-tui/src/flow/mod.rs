@@ -17,6 +17,7 @@ pub(crate) mod cmd;
 pub(crate) mod daemon;
 pub(crate) mod dialog;
 pub(crate) mod form;
+pub(crate) mod hook_trust;
 #[cfg(feature = "hosting")]
 pub(crate) mod issue_flow;
 #[cfg(feature = "hosting")]

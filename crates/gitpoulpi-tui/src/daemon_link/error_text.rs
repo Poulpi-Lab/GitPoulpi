@@ -76,6 +76,9 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
             msg::jobs::not_cancellable(crate::jobs_ui::reason(*reason))
         }
         TypedError::JobConflict { existing } => msg::jobs::job_conflict(existing),
+        TypedError::HooksNotTrusted { hooks, .. } => {
+            gitpoulpi_i18n::msg::flow_hook_trust::not_trusted(hooks.len() as u64)
+        }
     }
 }
 
@@ -352,6 +355,14 @@ mod tests {
                 stash: StashId(2),
                 hint: "pop it".into(),
             },
+            TypedError::HooksNotTrusted {
+                hash: "0".repeat(64),
+                hooks: vec![gitpoulpi_core::workflow::HookInfo {
+                    phase: "after_start".into(),
+                    command: "make".into(),
+                    personal: false,
+                }],
+            },
         ];
         for reason in [
             PushRejectReason::NonFastForward,
@@ -416,6 +427,15 @@ mod tests {
                     shown,
                     "merge is blocked: auto-stash stash@{2} is still waiting - \
                      use the banner's Pop now, Show stash or Drop first"
+                );
+                continue;
+            }
+            // The TUI points at its own question, not at the CLI command.
+            if matches!(typed, TypedError::HooksNotTrusted { .. }) {
+                assert_eq!(
+                    shown,
+                    "The workflow hooks are not trusted: 1 command was not run. Review it and \
+                     trust it first."
                 );
                 continue;
             }

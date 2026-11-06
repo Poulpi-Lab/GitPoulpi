@@ -25,6 +25,11 @@ pub fn arg_schema(cmd: &Command) -> Value {
         if id == "trust" {
             continue;
         }
+        // `--hash` trusts the committed workflow hooks (`flow trust-hooks`): a
+        // person's decision, never a tool argument.
+        if id == "hash" {
+            continue;
+        }
         let (schema, is_required) = single_arg_schema(arg);
         properties.insert(id.to_string(), schema);
         if is_required {

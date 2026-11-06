@@ -20,7 +20,7 @@ pub fn to_argv(spec: &ToolSpec, args: &Map<String, Value>) -> Result<Vec<String>
         .command
         .get_arguments()
         .map(|a| a.get_id().as_str())
-        .filter(|id| *id != "help" && *id != "version" && *id != "trust")
+        .filter(|id| !["help", "version", "trust", "hash"].contains(id))
         .collect();
     known.insert("repo");
     known.insert("session");
@@ -214,6 +214,31 @@ mod tests {
         let s = spec("rewrite_preview");
         let schema = crate::schema::arg_schema(&s.command);
         assert!(schema["properties"].get("script_language").is_some());
+    }
+
+    /// Agents cannot grant trust to a repository's committed workflow hooks:
+    /// there is no tool for `flow trust-hooks`, and a `hash` argument is
+    /// neither in any schema nor accepted.
+    #[test]
+    fn an_agent_cannot_trust_workflow_hooks() {
+        assert!(
+            registry::tools()
+                .iter()
+                .all(|s| s.cli_path != ["flow", "trust-hooks"]),
+            "`flow trust-hooks` is a tool"
+        );
+        assert!(
+            registry::excluded_reason(&["flow".to_string(), "trust-hooks".to_string()]).is_some()
+        );
+        let s = spec("flow_start");
+        let schema = crate::schema::arg_schema(&s.command);
+        assert!(schema["properties"].get("hash").is_none());
+        assert!(schema["properties"].get("run_hooks").is_some());
+        let args: Map<String, Value> = json!({ "hash": "00", "type": "feature" })
+            .as_object()
+            .unwrap()
+            .clone();
+        assert!(to_argv(&s, &args).is_err(), "flow_start accepted a hash");
     }
 
     #[test]

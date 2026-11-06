@@ -24,6 +24,7 @@ Then as needed: `docs/architecture/overview.md` (architecture), `docs/architectu
 | `gitpoulpi-daemon` | Background per-session server owning all state, so mutations from any frontend show up live in the others. |
 | `gitpoulpi-tui` | ratatui/crossterm UI - an IPC client. |
 | `gitpoulpi-commands` | Shared command layer: the `gitpoulpi` clap `Cli` tree, the IPC `Session` client, and `execute` - one mapping per subcommand, run by both `gitpoulpi-cli` and `gitpoulpi-mcp` so their surfaces can't drift apart. |
+| `gitpoulpi-updater` | `gitpoulpi-updater`: the separate program that stops every GitPoulpi process of an install, updates it by its install channel (file swap, or the package manager), verifies, rolls back on failure and relaunches. Only its Program Files copy runs elevated. |
 | `gitpoulpi-cli` | `gitpoulpi` scriptable CLI - an IPC client, auto-starts its session's daemon. |
 | `gitpoulpi-mcp` | MCP server: one tool per `Cli` leaf (via `rmcp`), gated by `config.toml`'s `[mcp]` table - an IPC client. |
 | `gitpoulpi-testkit` | Fixture-repo builder + backend contract-test suite + spawn budgets. |

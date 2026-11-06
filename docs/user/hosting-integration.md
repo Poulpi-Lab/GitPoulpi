@@ -185,6 +185,24 @@ A stopped command fails with exit code 2 and prints what changed (see the [CLI r
 
 An agent (MCP) cannot accept anything: it is told that the security check needs you.
 
+### In the terminal UI
+
+A stopped request opens the **Integration security check** dialog over whatever you were doing. It says what changed (the old and the new address, the old and the new account with their ids, or the old and the new certificate as a small table with the SHA-256 fingerprint in groups of four, subject, issuer and validity) and that the token was not sent. The answers are numbered:
+
+1. **Disconnect** deletes the saved token, the trust record and what was cached from the integration.
+2. **Trust** the new address, account or certificate (an unencrypted address: **Allow plain http**).
+3. **Cancel** changes nothing.
+
+No answer is highlighted until you press an arrow key or a digit, so a stray Enter accepts nothing. Esc and the close cross cancel; a click outside the dialog does nothing. A long body scrolls with the wheel, Page Up/Page Down or the scrollbar. Several checks queue (one per integration and kind of change) and are asked one after the other. A cancelled check does not pop up again while it is unchanged; **Integrations: Review security check** in the command palette brings it back.
+
+After you trust a new **address**, the integration's form opens with the token field focused and the hint "Re-entering the token is recommended": the saved token was never sent there. In the form, an address changed on purpose is accepted together with a token typed for it; without a token the form asks for one.
+
+The form also has two switches. **Strict certificate pinning** (for an https address) pins the certificate key the server presents when you connect. **Allow plain http (not encrypted)** is offered only for an `http://` address that is not this machine, with a red warning that the token travels in clear text. The connected card shows the pinned fingerprint.
+
+### What the token may do, and until when
+
+Connecting also asks the host what the token can do. GitHub (classic tokens), GitLab and Bitbucket (when it sends the scopes) report their scopes: the card shows a yellow "This token has more rights than GitPoulpi needs" line listing the scopes beyond what GitPoulpi uses, the sensitive ones (such as `delete_repo`, `admin:org`, `sudo`) in red, with the advice to prefer a fine-grained token with an expiry date. A classic GitHub token (`ghp_...`) gets that advice even when its scopes are exact. A fine-grained GitHub token cannot be asked for its permissions, so only its expiry is shown. The card shows the expiry date when the host says it. A token with no expiry shows no reminder, and the other products report no scopes and raise no warning. The same fields are in the JSON of `hosting integrations login` and `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). They are read when you connect, so the card shows them for the session that connected.
+
 ## 4. Link a repository
 
 Linking is explicit and per repository. When a profile is connected, the Refs

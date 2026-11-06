@@ -95,6 +95,13 @@ pub(super) const AGENTS: &[Row] = &[
     Key("mcp.allow_ui_propose"),
     Key("ui.launch"),
     Key("ui.launch_command"),
+    Heading(|| msg::mcp_security::HEADING.get()),
+    Key("mcp.http_auth"),
+    Key("mcp.token"),
+    Key("mcp.tls"),
+    Key("mcp.tls_cert"),
+    Key("mcp.tls_key"),
+    Key("mcp.behind_proxy"),
 ];
 
 pub(super) const APPEARANCE: &[Row] = &[
@@ -217,7 +224,10 @@ impl PreferencesState {
         pool.extend(self.editor_rows());
         pool.extend(self.launcher_rows());
         #[cfg(feature = "mcp")]
-        pool.extend(self.mcp_rows());
+        {
+            pool.extend(self.mcp_rows());
+            pool.extend(self.mcp_security_rows());
+        }
         if !crate::build_features::SUBMODULE {
             pool.retain(|f| {
                 !matches!(
@@ -285,7 +295,25 @@ impl PreferencesState {
     /// build has the server), the view-control and proposal switches and the
     /// "launch" pair.
     pub(super) fn agents_fields(&self) -> Vec<Field> {
-        self.picked(AGENTS)
+        #[cfg_attr(not(feature = "mcp"), allow(unused_mut))]
+        let mut fields = self.picked(AGENTS);
+        // The fingerprint sits under the key path (`mcp_security`).
+        #[cfg(feature = "mcp")]
+        {
+            let after = |fields: &[Field], key: &str| {
+                fields
+                    .iter()
+                    .position(|f| matches!(f.target, Target::Global(k) if k == key))
+                    .map(|i| i + 1)
+            };
+            if let Some(at) = after(&fields, "mcp.tls_key") {
+                fields.splice(at..at, self.mcp_fingerprint_rows());
+            }
+        }
+        // No server in this build: no security heading either.
+        #[cfg(not(feature = "mcp"))]
+        fields.retain(|f| f.label != msg::mcp_security::HEADING.get());
+        fields
     }
 
     pub(super) fn appearance_fields(&self) -> Vec<Field> {

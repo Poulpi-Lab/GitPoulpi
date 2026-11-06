@@ -436,3 +436,63 @@ fn mcp_runs_the_workspace_and_search_tools() {
 
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();
+
+/// Runs `gitpoulpi mcp ...` against its own temporary config folder.
+fn mcp_in(dir: &Path, args: &[&str]) -> std::process::Output {
+    Command::new(env!("CARGO_BIN_EXE_gitpoulpi"))
+        .env("GITPOULPI_CONFIG_DIR", dir)
+        .args(["--session", "cli-mcp-token"])
+        .arg("mcp")
+        .args(args)
+        .output()
+        .unwrap()
+}
+
+fn json_of(output: &std::process::Output) -> Value {
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    serde_json::from_slice(&output.stdout).expect("stdout is JSON")
+}
+
+/// `mcp token`: masked by default, the full token only with `--show`,
+/// replaced by `--rotate`; the file is the one the server reads.
+#[test]
+fn mcp_token_reports_a_hint_and_only_shows_the_token_when_asked() {
+    let dir = tempfile::tempdir().unwrap();
+    let plain = json_of(&mcp_in(dir.path(), &["token"]));
+    assert!(plain.get("token").is_none(), "{plain}");
+    assert_eq!(plain["rotated"], Value::Bool(false));
+    let path = plain["path"].as_str().unwrap();
+    assert!(path.ends_with("mcp-http.token"), "{path}");
+    let on_disk = std::fs::read_to_string(path).unwrap();
+
+    let shown = json_of(&mcp_in(dir.path(), &["token", "--show"]));
+    assert_eq!(shown["token"].as_str().unwrap(), on_disk.trim());
+    assert_eq!(shown["token_hint"], plain["token_hint"]);
+
+    let rotated = json_of(&mcp_in(dir.path(), &["token", "--rotate", "--show"]));
+    assert_eq!(rotated["rotated"], Value::Bool(true));
+    assert_ne!(rotated["token"], shown["token"]);
+    assert_eq!(
+        std::fs::read_to_string(path).unwrap().trim(),
+        rotated["token"].as_str().unwrap()
+    );
+}
+
+/// `--allow-remote` with the defaults (no TLS, no proxy) is refused and the
+/// refusal names what is missing.
+#[test]
+fn mcp_serve_allow_remote_names_what_is_missing() {
+    let dir = tempfile::tempdir().unwrap();
+    let output = mcp_in(
+        dir.path(),
+        &["serve", "--http", "0.0.0.0:0", "--allow-remote"],
+    );
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("unencrypted"), "{stderr}");
+    assert!(stderr.contains("mcp.tls"), "{stderr}");
+}

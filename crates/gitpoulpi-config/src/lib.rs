@@ -6,6 +6,7 @@ pub mod image_editors;
 mod integration;
 mod keybindings;
 pub mod launch;
+pub mod mcp_secrets;
 pub mod open_in;
 pub mod os_apps;
 mod paths;
@@ -49,18 +50,19 @@ pub use schema::{
     GitConfig, GraphColorization, GraphLaneBackground, GraphRenderer, GraphRowTintStrength,
     HostingInstance, HttpsMode, ImagePixelatedFrom, ImageProtocol, ImageTextFallback,
     KittyKeyboard, LauncherBuild, LegacyDiffViewMode, LogColumnsLayout, LogConfig, LogLevel,
-    McpConfig, MergeConfig, PrTerminology, Profile, PullButtonMode, PushBehavior, ReposConfig,
-    RetentionUnit, RewriteConfig, SearchConfig, SessionConfig, SidebarSectionsScope, SshConfig,
-    StartupTab, StatusbarPosition, TabDirFollow, TabsPosition, ToolbarAlign, ToolbarPosition,
-    UiConfig, UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig, DEFAULT_BLAME_WIDTH,
-    DEFAULT_COMMITS_PER_LAZY_PAGE, DEFAULT_EDITOR_TAB_SIZE, DEFAULT_HOSTING_REFRESH_MINUTES,
-    DEFAULT_INITIAL_COMMITS_IN_GRAPH, DEFAULT_LOG_RETENTION_DAYS, DEFAULT_MAX_COMMITS_IN_GRAPH,
-    DEFAULT_MERGE_SIDE_BY_SIDE_MIN_WIDTH, DEFAULT_MOUSE_SCROLL_LINES, DEFAULT_SEARCH_COMMIT_LIMIT,
-    DEFAULT_UPDATES_REPO, GRAPH_COLOR_FOLLOW_THEME, MAX_AUTO_FETCH_INTERVAL_MINUTES,
-    MAX_BLAME_WIDTH, MAX_EDITOR_TAB_SIZE, MAX_HOSTING_REFRESH_MINUTES, MAX_IMAGE_VIEW_MAX_MIB,
-    MAX_LOG_MAX_FILE_MB, MAX_LOG_RETENTION_DAYS, MAX_MERGE_SIDE_BY_SIDE_MIN_WIDTH,
-    MAX_MOUSE_SCROLL_LINES, MAX_SCRIPT_TIMEOUT_MS, MAX_SCRIPT_TOTAL_TIMEOUT_S, MCP_DEFAULT_PORT,
-    MIB_OR_GIB, MINUTES_OR_HOURS, MIN_BLAME_WIDTH, MIN_COMMITS_PER_LAZY_PAGE, MIN_EDITOR_TAB_SIZE,
+    McpConfig, McpTls, MergeConfig, PrTerminology, Profile, PullButtonMode, PushBehavior,
+    ReposConfig, RetentionUnit, RewriteConfig, SearchConfig, SessionConfig, SidebarSectionsScope,
+    SshConfig, StartupTab, StatusbarPosition, TabDirFollow, TabsPosition, ToolbarAlign,
+    ToolbarPosition, UiConfig, UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig,
+    DEFAULT_BLAME_WIDTH, DEFAULT_COMMITS_PER_LAZY_PAGE, DEFAULT_EDITOR_TAB_SIZE,
+    DEFAULT_HOSTING_REFRESH_MINUTES, DEFAULT_INITIAL_COMMITS_IN_GRAPH, DEFAULT_LOG_RETENTION_DAYS,
+    DEFAULT_MAX_COMMITS_IN_GRAPH, DEFAULT_MERGE_SIDE_BY_SIDE_MIN_WIDTH, DEFAULT_MOUSE_SCROLL_LINES,
+    DEFAULT_SEARCH_COMMIT_LIMIT, DEFAULT_UPDATES_REPO, GRAPH_COLOR_FOLLOW_THEME,
+    MAX_AUTO_FETCH_INTERVAL_MINUTES, MAX_BLAME_WIDTH, MAX_EDITOR_TAB_SIZE,
+    MAX_HOSTING_REFRESH_MINUTES, MAX_IMAGE_VIEW_MAX_MIB, MAX_LOG_MAX_FILE_MB,
+    MAX_LOG_RETENTION_DAYS, MAX_MERGE_SIDE_BY_SIDE_MIN_WIDTH, MAX_MOUSE_SCROLL_LINES,
+    MAX_SCRIPT_TIMEOUT_MS, MAX_SCRIPT_TOTAL_TIMEOUT_S, MCP_DEFAULT_PORT, MIB_OR_GIB,
+    MINUTES_OR_HOURS, MIN_BLAME_WIDTH, MIN_COMMITS_PER_LAZY_PAGE, MIN_EDITOR_TAB_SIZE,
     MIN_INITIAL_COMMITS_IN_GRAPH, MIN_MERGE_SIDE_BY_SIDE_MIN_WIDTH, MIN_MOUSE_SCROLL_LINES,
     SCRIPT_TIMEOUT_UNITS, SCRIPT_TOTAL_TIMEOUT_UNITS, THEME_SYSTEM,
 };

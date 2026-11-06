@@ -41,6 +41,8 @@ pub mod config_cmd;
 pub mod hosting_cmd;
 pub mod job_cmd;
 pub mod launch;
+#[cfg(feature = "mcp")]
+pub mod mcp_cmd;
 pub mod repo_cmd;
 #[cfg(feature = "global-search")]
 pub mod search_cmd;

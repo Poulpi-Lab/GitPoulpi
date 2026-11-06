@@ -103,6 +103,7 @@ impl PreferencesState {
             control: Control::Swatches(chips),
             help: None,
             warning: None,
+            danger: false,
             target: Target::None,
             live: true,
             coming: None,

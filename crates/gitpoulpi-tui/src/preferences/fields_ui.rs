@@ -462,6 +462,7 @@ impl PreferencesState {
                 control: Control::Info(format_date(pattern, self.now)),
                 help: None,
                 warning: None,
+                danger: false,
                 target: Target::None,
                 live: true,
                 coming: None,

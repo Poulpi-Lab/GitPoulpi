@@ -425,6 +425,9 @@ pub(super) enum PrefAction {
     Tools(super::launcher_alias::ToolsButton),
     /// A button of the Workflow page.
     Workflow(WfButton),
+    /// A button of the access token row on Agents & MCP.
+    #[cfg(feature = "mcp")]
+    McpSecurity(super::mcp_security::McpButton),
     /// A button of the Sparse checkout page.
     RepoPage(RpButton),
 }
@@ -440,6 +443,9 @@ pub(super) struct Field {
     pub(super) control: Control,
     pub(super) help: Option<String>,
     pub(super) warning: Option<String>,
+    /// The warning is drawn in the danger color (a setting that exposes
+    /// something when it is left on or off the wrong way).
+    pub(super) danger: bool,
     pub(super) target: Target,
     /// `false` renders the `not wired yet` note. Derived from
     /// `LIVE_KEYS` for global keys; stated explicitly otherwise.
@@ -462,6 +468,7 @@ impl Field {
             control,
             help: None,
             warning: None,
+            danger: false,
             target: Target::Global(key),
             live: Settings::key_is_implemented(key),
             coming: None,
@@ -475,6 +482,7 @@ impl Field {
             control,
             help: None,
             warning: None,
+            danger: false,
             target: Target::Repo(field),
             live: false,
             coming: None,
@@ -488,6 +496,7 @@ impl Field {
             control,
             help: None,
             warning: None,
+            danger: false,
             target,
             live: true,
             coming: None,
@@ -525,6 +534,7 @@ impl Field {
             control: Control::Heading,
             help: None,
             warning: None,
+            danger: false,
             target: Target::None,
             live: true,
             coming: None,
@@ -544,6 +554,14 @@ impl Field {
 
     pub(super) fn with_warning(mut self, warning: &str) -> Self {
         self.warning = Some(warning.to_string());
+        self
+    }
+
+    /// A warning drawn in the danger color.
+    #[cfg(feature = "mcp")]
+    pub(super) fn with_danger(mut self, warning: &str) -> Self {
+        self.warning = Some(warning.to_string());
+        self.danger = true;
         self
     }
 

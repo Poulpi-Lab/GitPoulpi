@@ -31,7 +31,8 @@ struct Args {
 
     /// Serve over streamable HTTP instead of stdio. Optionally the
     /// address to listen on (default `[mcp] bind`, else 127.0.0.1:8808); the endpoint is
-    /// `/mcp`. Loopback only unless `--allow-remote`.
+    /// `/mcp`. Requests need the bearer token (`gitpoulpi mcp token`) unless
+    /// `[mcp] http_auth` is off. Loopback only unless `--allow-remote`.
     #[arg(long, value_name = "ADDR", num_args = 0..=1, default_missing_value = "")]
     http: Option<String>,
 
@@ -39,9 +40,11 @@ struct Args {
     #[arg(long, requires = "http")]
     bind: Option<String>,
 
-    /// Let `--http` listen on a non-loopback address. The endpoint has
-    /// NO authentication: anyone who can reach it can run every tool the
-    /// config's [mcp] table allows. Only use on a trusted network.
+    /// Let `--http` listen on a non-loopback address. Refused unless
+    /// `[mcp] http_auth` is on with a token in place, and the traffic is
+    /// encrypted (`[mcp] tls`, or `behind_proxy` for a tunnel or reverse
+    /// proxy you vouch for). Keeping the loopback address and using
+    /// `ssh -L` is the safest setup.
     #[arg(long, requires = "http")]
     allow_remote: bool,
 

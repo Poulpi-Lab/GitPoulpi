@@ -112,6 +112,50 @@ pub struct McpConfig {
     /// agent does not even see the tool unless the operator opts in. The
     /// CLI and the TUI are not gated by it.
     pub allow_history_purge: bool,
+    /// `true` (the default): the HTTP endpoint answers only a request that
+    /// carries the bearer token of `<data>/private/mcp-http.token`
+    /// (`gitpoulpi mcp token`). `false` is for a loopback endpoint you
+    /// trust every local account on; `--allow-remote` is refused without it.
+    pub http_auth: bool,
+    /// TLS of the HTTP endpoint: `off` (the default), `self_signed` (a pair
+    /// generated once under `<data>/private/mcp-tls/`) or `files` (your
+    /// `tls_cert` and `tls_key`). The server terminates TLS itself.
+    pub tls: McpTls,
+    /// Certificate chain (PEM) used with `tls = "files"`.
+    pub tls_cert: String,
+    /// Private key (PEM) used with `tls = "files"`.
+    pub tls_key: String,
+    /// Acknowledges that a tunnel or reverse proxy in front of the endpoint
+    /// carries the encryption. It cannot be verified from inside the server,
+    /// so `--allow-remote` without TLS needs this stated explicitly.
+    pub behind_proxy: bool,
+}
+
+/// `[mcp] tls`: how the HTTP endpoint is encrypted.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum McpTls {
+    #[default]
+    Off,
+    SelfSigned,
+    Files,
+}
+
+impl McpTls {
+    pub const ALL: [McpTls; 3] = [McpTls::Off, McpTls::SelfSigned, McpTls::Files];
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            McpTls::Off => "off",
+            McpTls::SelfSigned => "self_signed",
+            McpTls::Files => "files",
+        }
+    }
+
+    /// Whether the endpoint speaks TLS.
+    pub fn is_on(self) -> bool {
+        self != McpTls::Off
+    }
 }
 
 /// The port of the built-in MCP listen address.
@@ -159,6 +203,11 @@ impl Default for McpConfig {
             ui_control: gitpoulpi_core::domain::UiControl::Ask,
             allow_ui_propose: false,
             allow_history_purge: false,
+            http_auth: true,
+            tls: McpTls::Off,
+            tls_cert: String::new(),
+            tls_key: String::new(),
+            behind_proxy: false,
         }
     }
 }

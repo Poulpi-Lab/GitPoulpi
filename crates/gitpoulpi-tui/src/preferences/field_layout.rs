@@ -416,7 +416,11 @@ impl PreferencesState {
                 let prefix = if n == 0 { "\u{26A0} " } else { "  " };
                 lines.push(Line::from(Span::styled(
                     format!("{indent}{prefix}{line}"),
-                    Style::default().fg(th().status.warning),
+                    Style::default().fg(if field.danger {
+                        th().status.danger
+                    } else {
+                        th().status.warning
+                    }),
                 )));
             }
         }

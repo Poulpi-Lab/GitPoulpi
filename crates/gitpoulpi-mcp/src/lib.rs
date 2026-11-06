@@ -14,6 +14,7 @@ pub mod http;
 pub mod policy;
 pub mod registry;
 pub mod schema;
+pub mod security;
 pub mod server;
 pub mod update_watch;
 
@@ -74,9 +75,10 @@ where
     Ok(())
 }
 
-/// Binds `bind` (empty: `[mcp] bind`, else the default; loopback only unless `allow_remote`), announces the
-/// endpoint on stderr (stdout stays untouched), and serves MCP over
-/// streamable HTTP until Ctrl+C.
+/// Binds `bind` (empty: `[mcp] bind`, else the default), applies the
+/// `--allow-remote` rule (`security::prepare`), announces the endpoint on
+/// stderr (stdout stays untouched), and serves MCP over streamable HTTP
+/// until Ctrl+C.
 pub async fn serve_http(
     bind: &str,
     allow_remote: bool,
@@ -86,14 +88,51 @@ pub async fn serve_http(
 ) -> Result<(), String> {
     ensure_enabled(&cfg)?;
     let bind = http::resolve_bind(bind, &cfg);
+    let wanted = http::parse_bind(&bind)?;
+    let paths = gitpoulpi_config::ConfigPaths::discover();
+    let security = security::prepare(&cfg, paths.as_ref(), wanted, allow_remote)?;
     let listener = http::bind(&bind, allow_remote).await?;
     let addr = listener.local_addr().map_err(|e| e.to_string())?;
-    eprintln!("gitpoulpi-mcp: serving MCP over HTTP on http://{addr}/mcp (Ctrl+C to stop)");
+    let scheme = if security.tls.is_some() {
+        "https"
+    } else {
+        "http"
+    };
+    eprintln!("gitpoulpi-mcp: serving MCP over HTTP on {scheme}://{addr}/mcp (Ctrl+C to stop)");
+    if let Some(fingerprint) = &security.fingerprint {
+        eprintln!("gitpoulpi-mcp: certificate SHA-256 fingerprint: {fingerprint}");
+    }
+    if security.token.is_some() {
+        eprintln!(
+            "gitpoulpi-mcp: clients send `Authorization: Bearer <token>`; `gitpoulpi mcp token \
+             --show` prints it"
+        );
+    } else {
+        eprintln!(
+            "gitpoulpi-mcp: WARNING: mcp.http_auth is off, so any program that can reach \
+             {addr} can run every tool the [mcp] config allows"
+        );
+    }
+    if cfg.behind_proxy && !addr.ip().is_loopback() {
+        eprintln!(
+            "gitpoulpi-mcp: note: mcp.behind_proxy is set; the hop between your proxy and this \
+             server is plain text on that network unless mcp.tls is on"
+        );
+    }
     let shutdown = tokio_util::sync::CancellationToken::new();
     let on_signal = shutdown.clone();
     tokio::spawn(async move {
         let _ = tokio::signal::ctrl_c().await;
         on_signal.cancel();
     });
-    http::serve(listener, session, backend, cfg, allow_remote, shutdown).await
+    http::serve(
+        listener,
+        session,
+        backend,
+        cfg,
+        allow_remote,
+        security,
+        shutdown,
+    )
+    .await
 }

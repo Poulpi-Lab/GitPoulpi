@@ -54,6 +54,10 @@ pub const EXCLUDED: &[(&[&str], &str)] = &[
         "the MCP server cannot spawn/serve a copy of itself",
     ),
     (
+        &["mcp", "token"],
+        "prints, copies and rotates the key that guards this very server: an agent must not read or replace it",
+    ),
+    (
         &["completions"],
         "shell completion generation, not a GitBackend operation",
     ),

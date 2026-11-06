@@ -116,6 +116,7 @@ stage_file = "z"
 | `nav_prefix` | `activity_log` | Відкрити Журнал активності | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Відкрити загальний журнал активності | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Показати фонові завдання | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Перемкнути довідку | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Вибрати вкладку | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Змінити тему | `Ctrl+N y` |
@@ -829,6 +830,9 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Вигляд: журнал активності | `Ctrl+N A` |
 | Вигляд: загальний журнал активності | `Ctrl+N G` |
 | Довідка: нотатки до випуску |  |
+| Updates: Show Update | `Ctrl+N u` |
+| Updates: Copy Update Command |  |
+| Updates: Run Update Command in a Terminal |  |
 | Оновлення: перевірити зараз |  |
 | Оновлення: завантажити |  |
 | Оновлення: оновити зараз |  |

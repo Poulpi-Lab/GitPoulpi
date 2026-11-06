@@ -96,6 +96,7 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
         msg::activity_log::HELP_NAV_GLOBAL,
     ),
     Item(keys!("{nav_prefix.jobs}"), msg::jobs::HELP_NAV),
+    Item(keys!("{nav_prefix.updates}"), msg::updates::HELP_NAV),
     Item(keys!("{nav_prefix.help}"), msg::help_text::NAVIGATION_PREFIX_THEN_7),
     Item(keys!("{global.select_tab} / {nav_prefix.select_tab}"),msg::help_text::NAVIGATION_PREFIX_THEN_8),
     Item(keys!("{global.workspace_search}"), msg::help_text::WORKSPACE_SEARCH),

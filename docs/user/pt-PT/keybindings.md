@@ -118,6 +118,7 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Abrir o Registo de atividade | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Abrir o registo de atividade global | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Mostrar as tarefas em segundo plano | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Alternar ajuda | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Selecionar separador | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Mudar tema | `Ctrl+N y` |
@@ -833,6 +834,9 @@ As teclas são as predefinidas.
 | Ver: registo de atividade | `Ctrl+N A` |
 | Ver: registo de atividade global | `Ctrl+N G` |
 | Ajuda: notas de versão |  |
+| Updates: Show Update | `Ctrl+N u` |
+| Updates: Copy Update Command |  |
+| Updates: Run Update Command in a Terminal |  |
 | Atualizações: procurar atualizações agora |  |
 | Atualizações: transferir |  |
 | Atualizações: atualizar agora |  |

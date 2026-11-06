@@ -118,6 +118,7 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Open the Activity Log | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Open the global Activity Log | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Show the Background Jobs | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Toggle Help | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Select Tab | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Change Theme | `Ctrl+N y` |
@@ -835,6 +836,9 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | View: Activity Log | `Ctrl+N A` |
 | View: Global Activity Log | `Ctrl+N G` |
 | Help: Release Notes |  |
+| Updates: Show Update | `Ctrl+N u` |
+| Updates: Copy Update Command |  |
+| Updates: Run Update Command in a Terminal |  |
 | Updates: Check for Updates Now |  |
 | Updates: Download |  |
 | Updates: Update Now |  |

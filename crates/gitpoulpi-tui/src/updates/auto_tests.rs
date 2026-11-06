@@ -260,24 +260,48 @@ fn restart_swaps_the_files_keeps_the_old_ones_and_revert_brings_them_back() {
 }
 
 #[test]
-fn a_finished_swap_asks_the_loop_to_quit_and_a_failed_one_stays_ready() {
+fn a_written_job_asks_the_loop_to_quit_and_a_failed_handoff_stays_ready() {
     let _lock = lock();
     let (_dir, updatable) = install_dir("0.1.0");
     reset(Some(updatable));
-    finish_swap_test("99.0.0", false, Ok(()));
+    let prepared = handoff::Prepared {
+        updater: "/data/updates/bin/gitpoulpi-updater".into(),
+        job: "/data/updates/job.json".into(),
+    };
+    auto::finish_handoff(Ok(prepared), "99.0.0", Phase::Ready("99.0.0".into()));
     assert!(auto::take_quit_request());
     assert!(!auto::take_quit_request(), "once");
-    finish_swap_test(
+    assert!(take_message().unwrap().contains("99.0.0"));
+    // The updater could not be prepared: nothing ends, the download stays.
+    shared().install.phase = Phase::Installing("99.0.0".into());
+    auto::finish_handoff(
+        Err("this installation has no updater program".into()),
         "99.0.0",
-        false,
-        Err(gitpoulpi_update::UpdateError::Locked(
-            "gitpoulpi-mcp".into(),
-        )),
+        Phase::Ready("99.0.0".into()),
     );
     assert_eq!(snapshot().install.phase, Phase::Ready("99.0.0".into()));
     assert!(!auto::take_quit_request());
     let said = take_message().unwrap();
-    assert!(said.contains("gitpoulpi-mcp"), "{said}");
+    assert!(said.contains("no updater"), "{said}");
+}
+
+#[test]
+fn restart_with_nothing_staged_or_for_a_build_without_files_says_why_and_starts_nothing() {
+    let _lock = lock();
+    reset(None);
+    assert_eq!(
+        auto::restart_now().as_deref(),
+        Some(msg::WHY_NOT_UPDATABLE.get()),
+        "no install record"
+    );
+    let (_dir, updatable) = install_dir("0.1.0");
+    reset(Some(updatable));
+    assert_eq!(
+        auto::restart_now().as_deref(),
+        Some(msg::WHY_NOTHING_STAGED.get())
+    );
+    assert_eq!(snapshot().install.phase, Phase::Idle);
+    assert!(!auto::take_quit_request());
 }
 
 #[test]
@@ -296,15 +320,6 @@ fn a_staged_download_of_an_older_version_is_dropped() {
     reset(Some(updatable));
     assert_eq!(snapshot().install.phase, Phase::Idle);
     assert!(!dir.path().join("gitpoulpi-tui.new").exists());
-}
-
-fn finish_swap_test(
-    version: &str,
-    revert: bool,
-    result: Result<(), gitpoulpi_update::UpdateError>,
-) {
-    let job = crate::jobs_ui::local_start("swap".into(), std::sync::Arc::new(|| {}));
-    auto::finish_swap(job, version, revert, result);
 }
 
 fn tab_text(slot: &mut notes::ReleaseNotesSlot) -> String {

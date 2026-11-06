@@ -122,6 +122,7 @@ stage_file = "z"
 | `nav_prefix` | `activity_log` | Открыть Журнал активности | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Открыть общий журнал активности | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Показать фоновые задачи | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Показать/скрыть справку | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Выбрать вкладку | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Сменить тему | `Ctrl+N y` |
@@ -841,6 +842,9 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Вид: Журнал активности | `Ctrl+N A` |
 | Вид: Общий журнал активности | `Ctrl+N G` |
 | Справка: заметки о выпуске |  |
+| Updates: Show Update | `Ctrl+N u` |
+| Updates: Copy Update Command |  |
+| Updates: Run Update Command in a Terminal |  |
 | Обновления: проверить наличие сейчас |  |
 | Обновления: скачать |  |
 | Обновления: обновить сейчас |  |

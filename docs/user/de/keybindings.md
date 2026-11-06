@@ -117,6 +117,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Aktivitätsprotokoll öffnen | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Globales Aktivitätsprotokoll öffnen | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Hintergrundaufgaben anzeigen | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Hilfe umschalten | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Tab auswählen | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Design wechseln | `Ctrl+N y` |
@@ -830,6 +831,9 @@ die Standardtasten.
 | Ansicht: Aktivitätsprotokoll | `Ctrl+N A` |
 | Ansicht: Globales Aktivitätsprotokoll | `Ctrl+N G` |
 | Hilfe: Versionshinweise |  |
+| Updates: Show Update | `Ctrl+N u` |
+| Updates: Copy Update Command |  |
+| Updates: Run Update Command in a Terminal |  |
 | Updates: Jetzt nach Updates suchen |  |
 | Updates: Herunterladen |  |
 | Updates: Jetzt aktualisieren |  |

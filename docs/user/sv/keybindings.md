@@ -120,6 +120,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `nav_prefix` | `activity_log` | Öppna Aktivitetsloggen | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Öppna den globala aktivitetsloggen | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Visa bakgrundsjobben | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | Växla hjälp | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Välj flik | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Byt tema | `Ctrl+N y` |
@@ -837,6 +838,9 @@ Tangenterna är standardvärdena.
 | Visa: Aktivitetslogg | `Ctrl+N A` |
 | Visa: Global aktivitetslogg | `Ctrl+N G` |
 | Hjälp: Versionsanteckningar |  |
+| Updates: Show Update | `Ctrl+N u` |
+| Updates: Copy Update Command |  |
+| Updates: Run Update Command in a Terminal |  |
 | Uppdateringar: Sök efter uppdateringar nu |  |
 | Uppdateringar: Ladda ned |  |
 | Uppdateringar: Uppdatera nu |  |

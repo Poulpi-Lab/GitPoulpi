@@ -116,6 +116,7 @@ stage_file = "z"
 | `nav_prefix` | `activity_log` | 활동 로그 열기 | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | 전체 활동 로그 열기 | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | 백그라운드 작업 표시 | `Ctrl+N Shift+J` |
+| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
 | `nav_prefix` | `help` | 도움말 전환 | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | 탭 선택 | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | 테마 변경 | `Ctrl+N y` |
@@ -828,6 +829,9 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 보기: 활동 로그 | `Ctrl+N A` |
 | 보기: 전체 활동 로그 | `Ctrl+N G` |
 | 도움말: 릴리스 노트 |  |
+| Updates: Show Update | `Ctrl+N u` |
+| Updates: Copy Update Command |  |
+| Updates: Run Update Command in a Terminal |  |
 | 업데이트: 지금 업데이트 확인 |  |
 | 업데이트: 다운로드 |  |
 | 업데이트: 지금 업데이트 |  |

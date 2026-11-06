@@ -112,6 +112,7 @@ impl WindowState {
                 && !self.ai_ui.popup_open()
                 && !crate::activity_log::is_open()
                 && !crate::jobs_ui::panel_open()
+                && !crate::updates::panel::is_open()
                 && !matches!(
                     self.input_mode,
                     InputMode::Confirm { .. }
@@ -193,6 +194,7 @@ impl WindowState {
                             // and the filter field types digits.
                             || crate::activity_log::is_open()
                             || crate::jobs_ui::panel_open()
+                            || crate::updates::panel::is_open()
                             // The tag delete dialog's rows are picked by their digit.
                             || crate::tag_delete_dialog::is_open()
                             || self.remote_ui.is_open()

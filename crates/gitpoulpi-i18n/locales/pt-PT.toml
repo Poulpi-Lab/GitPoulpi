@@ -1464,6 +1464,126 @@ channel_stable = "Estável"
 channel_prerelease = "Pré-lançamento"
 # context: heading of the group of update settings on the Synchronization page
 heading = "Atualizações"
+# context: title of the update panel, the window the version in the title bar opens
+panel_title = "Updates"
+# context: first line of the update panel; {version} is like v0.1.0 (a development build adds a short commit id)
+panel_version = "GitPoulpi {version}"
+# context: line in the update panel; {channel} says how the app was installed, for example "Chocolatey" or "a release archive"
+panel_installed_with = "Installed with: {channel}"
+# context: line in the update panel while the app looks at how it was installed
+panel_detecting = "Looking at how GitPoulpi was installed..."
+# context: line in the update panel for a build that has no install record (for example built from source)
+panel_no_record = "This build has no install record, so it does not update itself."
+# context: line in the update panel when the app replaces its own files and restarts (macOS and Linux)
+panel_note_swap = "GitPoulpi closes, replaces its files and opens again in this terminal."
+# context: line in the update panel when the app replaces its own files and restarts (Windows)
+panel_note_swap_windows = "GitPoulpi closes, replaces its files and opens again in a new window."
+# context: line in the update panel: the update needs the approval of a Windows administrator, and other users' GitPoulpi windows on this computer are closed
+panel_note_uac = "Windows asks for administrator approval. GitPoulpi processes of other users on this computer are closed."
+# context: line in the update panel when a package manager does the update (macOS and Linux)
+panel_note_run = "GitPoulpi closes while the package manager updates it, then opens again in this terminal."
+# context: line in the update panel when a package manager does the update (Windows)
+panel_note_run_windows = "GitPoulpi closes while the package manager updates it, then opens again in a new window."
+# context: line in the update panel above the command the package manager runs
+panel_run_command = "It runs this command:"
+# context: line in the update panel above the command the user runs in a terminal
+panel_show_intro = "Run this command in a terminal to update:"
+# context: line in the update panel; {message} is a text the administrator of this computer set
+panel_admin_message = "From your administrator: {message}"
+# context: line in the update panel: the administrator turned off self-updates
+announce_policy = "Your administrator turned off updating from inside GitPoulpi. Updates reach this computer another way."
+# context: line in the update panel: the installation is managed by an administrator
+announce_managed = "This installation is managed by your administrator."
+# context: line in the update panel for the Docker image; the commands follow
+announce_container = "This is a container image. Download a newer image to update:"
+# context: line in the update panel: the app cannot write its own folder
+announce_legacy_read_only = "GitPoulpi cannot write its own folder, so it cannot replace itself. Download the new version instead."
+# context: line in the update panel: the apt repository of GitPoulpi is not set up on this computer
+announce_apt = "The GitPoulpi apt repository is not set up on this computer. Download the .deb package of the new version instead."
+# context: line in the update panel: there is no way to go back to the previous version
+announce_no_revert = "There is no way to go back to the previous version from here."
+# context: button in the update panel: downloads the newer version if needed, then closes GitPoulpi, updates it and opens it again
+btn_update_restart = "Update and restart"
+# context: button in the update panel: lets the package manager update GitPoulpi
+btn_run_update = "Run update"
+# context: button in the update panel: copies the update command to the clipboard
+btn_copy = "Copy command"
+# context: button in the update panel: runs the update command in a new terminal window
+btn_terminal = "Open in terminal"
+# context: button in the update panel: opens the Release notes tab
+btn_notes = "Release notes"
+# context: button in the update panel: closes it
+btn_close = "Close"
+# context: button on the Release notes tab: opens the update panel
+btn_panel = "Update options"
+# context: footer hint of the update panel; the letters are the keys of the buttons
+panel_hint = "u update  c copy  t terminal  v revert  n notes  s skip  r check  Esc close"
+# context: note at the top of the Release notes tab: this installation updates through the update panel
+note_see_panel = "To update, open the update panel (click the version in the title bar)."
+# context: palette and status line: why Update now and Restart to update do not apply to this installation; the update panel shows what to do
+why_manual = "this installation is updated another way: see Updates: Show Update"
+# context: palette: why Copy update command is unavailable
+why_no_command = "there is no update command to copy for this installation"
+# context: palette: why Run update command in a terminal is unavailable
+why_no_terminal = "this installation has no update command to run in a terminal"
+# context: what was copied, for the status line (copied {what}: ...)
+copy_what = "the update command"
+# context: status line after the update command was started in a new terminal window
+msg_terminal_opened = "opened a terminal with the update command"
+# context: status line when no terminal window could be started; {reason} is a technical explanation in English
+msg_terminal_failed = "could not open a terminal: {reason}"
+# context: status line when the update could not be handed to the updater program; {reason} is a technical explanation in English
+msg_handoff_failed = "could not start the updater: {reason}"
+# context: status line at start-up after a successful update; {version} is like 0.2.0
+msg_updated = "Updated to v{version}"
+# context: status line at start-up when the administrator approval of an update was declined
+msg_update_declined = "Update canceled: administrator approval was declined. Nothing changed."
+# context: status line at start-up after a failed update; {reason} is a technical explanation in English
+msg_update_failed_previous = "Update failed: {reason}. The previous version is still installed."
+# context: command palette entry: opens the update panel
+palette_show = "Updates: Show Update"
+# context: command palette entry: copies the command that updates GitPoulpi to the clipboard
+palette_copy = "Updates: Copy Update Command"
+# context: command palette entry: runs the command that updates GitPoulpi in a new terminal window
+palette_terminal = "Updates: Run Update Command in a Terminal"
+# context: help line for the key that opens the update panel
+help_nav = "Show the update panel (version, how to update)"
+# context: after "Installed with:": the app was installed from a release archive (a zip or tar.gz)
+via_archive = "a release archive"
+# context: after "Installed with:": the Windows installer, for the current user only
+via_inno_user = "the installer (this user)"
+# context: after "Installed with:": the Windows installer, for all users
+via_inno_machine = "the installer (all users)"
+# context: after "Installed with:": Chocolatey, a Windows package manager; keep the name
+via_choco = "Chocolatey"
+# context: after "Installed with:": a company-internal Chocolatey feed
+via_choco_internal = "Chocolatey (internal feed)"
+# context: after "Installed with:": winget, the Windows package manager; keep the name
+via_winget = "winget"
+# context: after "Installed with:": Scoop, a Windows package manager; keep the name
+via_scoop = "Scoop"
+# context: after "Installed with:": Homebrew, a package manager; keep the name
+via_homebrew = "Homebrew"
+# context: after "Installed with:": apt, the Debian and Ubuntu package manager; keep the name
+via_apt = "apt"
+# context: after "Installed with:": an MSI package deployed by an administrator
+via_msi = "an MSI package"
+# context: after "Installed with:": the Arch User Repository; keep the name
+via_aur = "the AUR"
+# context: after "Installed with:": a Docker image
+via_docker = "a Docker image"
+# context: after "Installed with:": cargo, the Rust package manager; keep the name
+via_cargo = "cargo"
+# context: after "Installed with:": a release archive in a folder this user cannot write
+via_legacy_read_only = "a release archive (read-only folder)"
+# context: after "Installed with:": a development build with no install record
+via_dev = "a development build (no install record)"
+# context: setting row on the Synchronization page, read only: how the app was installed
+installed_with = "Installed with"
+# context: help of the setting above
+installed_with_help = "How GitPoulpi got onto this computer. It decides how updates are applied. This row cannot be changed."
+# context: shown instead of a setting's value when the administrator of this computer set it
+locked = "Set by your administrator"
 
 [radar]
 title = "Radar"
@@ -2177,6 +2297,7 @@ nav_prefix_about = "Abrir Acerca de"
 nav_prefix_activity_log = "Abrir o Registo de atividade"
 nav_prefix_global_log = "Abrir o registo de atividade global"
 nav_prefix_jobs = "Mostrar as tarefas em segundo plano"
+nav_prefix_updates = "Show the Update Panel"
 nav_prefix_help = "Alternar ajuda"
 nav_prefix_select_tab = "Selecionar separador"
 nav_prefix_change_theme = "Mudar tema"

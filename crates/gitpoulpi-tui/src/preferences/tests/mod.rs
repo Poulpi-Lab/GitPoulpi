@@ -36,6 +36,7 @@ mod search;
 mod sub_tabs;
 mod theme;
 mod tokens;
+mod updates_rows;
 mod view_memory;
 mod workflow;
 

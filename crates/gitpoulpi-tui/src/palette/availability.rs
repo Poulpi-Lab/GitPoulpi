@@ -889,7 +889,9 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         C::Updates(command) => {
             use crate::updates::UpdatesCommand as U;
             match command {
-                U::ReleaseNotes | U::CheckNow => None,
+                U::ReleaseNotes | U::CheckNow | U::ShowPanel => None,
+                U::CopyCommand => ctx.update_whys.copy,
+                U::RunInTerminal => ctx.update_whys.terminal,
                 U::Download | U::Skip => {
                     (!ctx.update_known).then_some(msg::updates::WHY_NO_UPDATE.get())
                 }

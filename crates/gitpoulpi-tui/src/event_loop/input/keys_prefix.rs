@@ -605,6 +605,7 @@ pub(super) fn navigation(cx: &mut CommandCtx<'_>, key: KeyEvent) -> io::Result<F
         NavigationAction::OpenActivityLog => crate::activity_log::open_panel(),
         NavigationAction::OpenGlobalLog => crate::activity_log::open_global_panel(),
         NavigationAction::ShowJobs => crate::jobs_ui::run(crate::jobs_ui::JobsCmd::Show),
+        NavigationAction::ShowUpdates => crate::updates::panel::open(),
         NavigationAction::ToggleHelp => {
             *cx.show_help = true;
         }

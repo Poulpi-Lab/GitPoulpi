@@ -85,6 +85,9 @@ fn shape_over_owned_surface(cx: &mut CommandCtx<'_>, col: u16, row: u16) -> Curs
     if crate::jobs_ui::panel_open() {
         return hand(crate::jobs_ui::pointer_hand(col, row) || registered_hand(col, row));
     }
+    if crate::updates::panel::is_open() {
+        return hand(crate::updates::panel::pointer_hand(col, row) || registered_hand(col, row));
+    }
     if let Some(prefs) = cx.preferences.as_ref() {
         if prefs.pointer_text_at(col, row) {
             return CursorShape::Text;

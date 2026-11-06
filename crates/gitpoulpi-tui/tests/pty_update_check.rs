@@ -3,9 +3,13 @@
 //! builds refuse every other host). The real binary, in a pty.
 //!
 //! A newer release makes the chip read `v99.0.0 available`; a click on it opens
-//! the Release notes tab with that release's body on top; Download opens the
-//! release page (through the test stub of the browser), Skip this version puts
-//! the chip back and stays skipped. `updates.mode = "off"` makes no request.
+//! the update panel, whose Release notes button opens the tab with that
+//! release's body on top; Download opens the release page (through the test
+//! stub of the browser), Skip this version puts the chip back and stays
+//! skipped. `updates.mode = "off"` makes no request.
+//!
+//! The binary is a copy in a temp folder next to a marker (an archive
+//! install): a build with no install record never asks anyone.
 
 mod common;
 
@@ -15,6 +19,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use gitpoulpi_config::release::{self, Marker, MARKER_FILE};
 use gitpoulpi_testkit::FixtureRepoBuilder;
 use xtask::pty::{Screen, Terminal};
 
@@ -66,6 +71,21 @@ fn serve() -> FakeReleases {
     FakeReleases { port, hits, paths }
 }
 
+/// A copy of the built TUI next to the marker of an archive install.
+fn installed_exe() -> std::path::PathBuf {
+    let dir = tempfile::tempdir().unwrap();
+    let exe = dir.path().join("gitpoulpi-tui");
+    let built = env!("CARGO_BIN_EXE_gitpoulpi-tui");
+    if std::fs::hard_link(built, &exe).is_err() {
+        std::fs::copy(built, &exe).unwrap();
+    }
+    let marker = Marker::new(env!("CARGO_PKG_VERSION"), release::host_target());
+    std::fs::write(dir.path().join(MARKER_FILE), marker.render()).unwrap();
+    // The install folder must outlive the app.
+    std::mem::forget(dir);
+    exe
+}
+
 fn launch(session: &str, server: &FakeReleases, mode: &str, log: &std::path::Path) -> Terminal {
     let repo = FixtureRepoBuilder::new()
         .unwrap()
@@ -77,6 +97,7 @@ fn launch(session: &str, server: &FakeReleases, mode: &str, log: &std::path::Pat
         .size(200, 50)
         .ready("update check probe")
         .mouse_capture()
+        .binary(installed_exe())
         .env("GITPOULPI_UPDATES_MODE", mode)
         .env(
             "GITPOULPI_UPDATE_API",
@@ -122,8 +143,15 @@ fn a_newer_release_turns_the_chip_into_available_and_a_click_opens_its_notes() {
         s.find("Activity").is_some_and(|a| a.1 != 0),
         "the status line no longer carries it"
     );
-    // A click opens the tab: the release body on top, the buttons, the tab.
+    // A click opens the update panel; its Release notes button the tab: the
+    // release body on top, the buttons, the tab.
     term.click(col + 1, row).unwrap();
+    term.wait_for("the update panel", STEP, |s| {
+        s.contains("Installed with:") && s.contains("Release notes")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (nc, nr) = term.screen().find("Release notes").unwrap();
+    term.click(nc + 1, nr).unwrap();
     term.wait_for("the Release notes tab with the release body", STEP, |s| {
         s.contains("the shiny fake feature")
             && s.contains("Version 99.0.0 is available")

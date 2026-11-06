@@ -340,36 +340,9 @@ impl PreferencesState {
                 Control::Toggle(g.include_untracked_in_autostash),
             )
             .with_help(msg::settings_general::INCLUDE_UNTRACKED_IN_AUTOSTASH_HELP.get()),
-            Field::global(
-                gitpoulpi_i18n::msg::updates::MODE.get(),
-                "updates.mode",
-                Control::Choice {
-                    options: gitpoulpi_config::UpdateMode::ALL
-                        .iter()
-                        .map(|m| m.as_str().into())
-                        .collect(),
-                    index: gitpoulpi_config::UpdateMode::ALL
-                        .iter()
-                        .position(|m| *m == self.config.updates.mode)
-                        .unwrap_or(0),
-                },
-            )
-            .with_help(gitpoulpi_i18n::msg::updates::MODE_HELP.get()),
-            Field::global(
-                gitpoulpi_i18n::msg::updates::CHANNEL.get(),
-                "updates.channel",
-                Control::Choice {
-                    options: gitpoulpi_config::UpdateChannel::ALL
-                        .iter()
-                        .map(|m| m.as_str().into())
-                        .collect(),
-                    index: gitpoulpi_config::UpdateChannel::ALL
-                        .iter()
-                        .position(|m| *m == self.config.updates.channel)
-                        .unwrap_or(0),
-                },
-            )
-            .with_help(gitpoulpi_i18n::msg::updates::CHANNEL_HELP.get()),
+            self.updates_mode_field(),
+            self.updates_channel_field(),
+            self.updates_installed_with_field(),
             self.hosting_refresh_field(),
             self.script_timeout_field(),
             self.script_total_timeout_field(),

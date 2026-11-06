@@ -14,7 +14,7 @@ use gitpoulpi_config::release::{self, InstallChannel};
 use gitpoulpi_config::{UpdateMode, UpdatesConfig};
 use gitpoulpi_hosting::updates::sources::{SourceSpec, CHOCOLATEY_COMMUNITY_FEED};
 use gitpoulpi_i18n::msg::updates as msg;
-use gitpoulpi_update::channel::{self, Channel, NoRegistry, RealEnv, Resolved};
+use gitpoulpi_update::channel::{self, Channel, RealEnv, Resolved};
 use gitpoulpi_update::fsops::RealFs;
 use gitpoulpi_update::plan::{self, PlanContext, Procedure};
 
@@ -43,7 +43,7 @@ impl Facts {
         #[cfg(windows)]
         let registry = gitpoulpi_update::winreg::WindowsRegistry;
         #[cfg(not(windows))]
-        let registry = NoRegistry;
+        let registry = channel::NoRegistry;
         let resolved =
             channel::resolve(&RealFs, &registry, &RealEnv, &exe, &release::host_target());
         let mut policy = Policy::default();

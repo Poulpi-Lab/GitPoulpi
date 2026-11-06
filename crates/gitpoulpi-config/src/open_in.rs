@@ -1188,6 +1188,9 @@ mod tests {
         // Run in the tab's folder without naming it, or naming the web page.
         let implicit = [
             "gitk",
+            "pwsh-window",
+            "powershell-window",
+            "cmd-window",
             "git-gui",
             "gh-web",
             "glab-web",

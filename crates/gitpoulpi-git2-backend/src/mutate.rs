@@ -302,6 +302,7 @@ pub fn fast_forward(
 /// `remote.<name>.url`. libgit2 would happily write config for a remote
 /// that does not exist, so its existence is checked first.
 pub fn remote_set_url(repo: &RepoRef, name: &str, url: &str) -> Result<()> {
+    gitpoulpi_core::guard::check_remote_arg("remote address", url)?;
     let git_repo = open(repo)?;
     git_repo.find_remote(name).map_err(map_err)?;
     git_repo.remote_set_url(name, url).map_err(map_err)?;
@@ -310,6 +311,9 @@ pub fn remote_set_url(repo: &RepoRef, name: &str, url: &str) -> Result<()> {
 
 /// `remote.<name>.pushurl`, set or removed.
 pub fn remote_set_push_url(repo: &RepoRef, name: &str, url: Option<&str>) -> Result<()> {
+    if let Some(url) = url {
+        gitpoulpi_core::guard::check_remote_arg("remote address", url)?;
+    }
     let git_repo = open(repo)?;
     git_repo.find_remote(name).map_err(map_err)?;
     match url {

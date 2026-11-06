@@ -361,6 +361,7 @@ macro_rules! for_each_contract_check {
             check_remote_rename_carries_branches_upstreams_and_tag_mirror,
             check_remote_remove_forgets_its_tag_mirror,
             check_remote_add_refuses_a_taken_name,
+            check_option_lookalike_and_helper_urls_are_refused,
             check_branch_set_upstream_sets_and_unsets,
             check_fetch_all_reaches_every_remote_and_prunes,
             check_a_canceled_fetch_kills_git_and_removes_only_its_own_locks,

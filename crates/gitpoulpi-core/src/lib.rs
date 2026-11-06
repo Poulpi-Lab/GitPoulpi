@@ -4,6 +4,7 @@ pub mod domain;
 pub mod error;
 pub mod failure;
 pub mod fuzzy;
+pub mod guard;
 pub mod journal;
 pub mod licenses;
 pub mod paths;

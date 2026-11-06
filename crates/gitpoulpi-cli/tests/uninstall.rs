@@ -72,11 +72,8 @@ fn a_release_install_loses_its_alias_path_block_and_files() {
     std::fs::write(dir.join("notes.txt"), b"mine").unwrap();
     std::fs::write(
         dir.join(".gitpoulpi-dist"),
-        gitpoulpi_config::release::Marker {
-            version: "0.0.1".into(),
-            target: gitpoulpi_config::release::host_target(),
-        }
-        .render(),
+        gitpoulpi_config::release::Marker::new("0.0.1", gitpoulpi_config::release::host_target())
+            .render(),
     )
     .unwrap();
     let rc = tmp.path().join("home/.bashrc");

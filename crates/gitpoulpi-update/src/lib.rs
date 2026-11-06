@@ -25,9 +25,12 @@
 //! files, not a repository.
 
 pub mod archive;
+pub mod channel;
 pub mod fetch;
 pub mod fsops;
 pub mod install;
+pub mod job;
+pub mod plan;
 #[cfg(test)]
 pub(crate) mod testutil;
 

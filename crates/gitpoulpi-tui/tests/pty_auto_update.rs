@@ -139,10 +139,7 @@ fn install_dir(marker: bool) -> (tempfile::TempDir, PathBuf) {
         std::fs::write(dir.path().join(sibling), script("old sibling")).unwrap();
     }
     if marker {
-        let marker = Marker {
-            version: env!("CARGO_PKG_VERSION").into(),
-            target: release::host_target(),
-        };
+        let marker = Marker::new(env!("CARGO_PKG_VERSION"), release::host_target());
         std::fs::write(dir.path().join(MARKER_FILE), marker.render()).unwrap();
     }
     (dir, exe)
@@ -329,10 +326,7 @@ fn revert_swaps_the_previous_files_back_and_restarts_into_them() {
         use std::os::unix::fs::PermissionsExt;
         std::fs::set_permissions(&old, std::fs::Permissions::from_mode(0o755)).unwrap();
     }
-    let previous = Marker {
-        version: "0.0.9".into(),
-        target: release::host_target(),
-    };
+    let previous = Marker::new("0.0.9", release::host_target());
     std::fs::write(
         dir.path().join(format!("{MARKER_FILE}.old")),
         previous.render(),

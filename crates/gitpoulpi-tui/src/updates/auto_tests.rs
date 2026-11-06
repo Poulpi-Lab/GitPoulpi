@@ -23,11 +23,7 @@ fn install_dir(old: &str) -> (tempfile::TempDir, Updatable) {
     let dir = tempfile::tempdir().unwrap();
     for name in managed_names(TARGET) {
         let text = if name == MARKER_FILE {
-            Marker {
-                version: old.into(),
-                target: TARGET.into(),
-            }
-            .render()
+            Marker::new(old, TARGET).render()
         } else {
             format!("{name} {old}")
         };
@@ -36,10 +32,7 @@ fn install_dir(old: &str) -> (tempfile::TempDir, Updatable) {
     let updatable = Updatable {
         dir: dir.path().to_path_buf(),
         exe_name: "gitpoulpi-tui".into(),
-        marker: Marker {
-            version: old.into(),
-            target: TARGET.into(),
-        },
+        marker: Marker::new(old, TARGET),
     };
     (dir, updatable)
 }

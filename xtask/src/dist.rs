@@ -45,18 +45,172 @@ pub use gitpoulpi_config::release::{
 
 /// The `.gitpoulpi-dist` file: it tells a running build it came from a
 /// release archive and may update itself (version and target are checked
-/// against the archive it downloads).
+/// against the archive it downloads). The archive's marker says
+/// `channel=archive`; a package (Inno, Chocolatey, apt, ...) replaces it with
+/// its own through `xtask package-marker`, one code path for all of them.
 pub fn marker_entry(version: &str, target: &str) -> Entry {
     Entry {
         name: gitpoulpi_config::release::MARKER_FILE.into(),
         data: gitpoulpi_config::release::Marker {
-            version: version.into(),
-            target: target.into(),
+            channel: Some(gitpoulpi_config::release::InstallChannel::Archive),
+            ..gitpoulpi_config::release::Marker::new(version, target)
         }
         .render()
         .into_bytes(),
         executable: false,
     }
+}
+
+const PACKAGE_MARKER_USAGE: &str = "\
+Usage: cargo run -p xtask -- package-marker --channel <c> --version <v> --target <triple>
+                                           [--feed <url>] --out <file>
+
+Writes the .gitpoulpi-dist marker a package installs next to the binaries.
+<c> is one of the install channels (archive, inno-user, inno-machine, choco,
+choco-internal, winget, scoop, homebrew, apt, msi, aur, docker).";
+
+/// The marker text for a package: `channel` must be a real install channel
+/// (`cargo` is never a marker value).
+pub fn package_marker_text(
+    channel: &str,
+    version: &str,
+    target: &str,
+    feed: Option<&str>,
+) -> Result<String, String> {
+    use gitpoulpi_config::release::{InstallChannel, Marker};
+    let channel = InstallChannel::parse(channel).ok_or_else(|| {
+        let all: Vec<&str> = InstallChannel::ALL.iter().map(|c| c.as_str()).collect();
+        format!("unknown channel {channel:?} (one of: {})", all.join(", "))
+    })?;
+    if version.is_empty() || target.is_empty() {
+        return Err("--version and --target must not be empty".into());
+    }
+    Ok(Marker {
+        channel: Some(channel),
+        feed: feed.filter(|f| !f.is_empty()).map(str::to_string),
+        ..Marker::new(version, target)
+    }
+    .render())
+}
+
+/// `xtask package-marker`.
+pub fn package_marker(args: &[String]) -> Result<i32, String> {
+    let (mut channel, mut version, mut target, mut feed, mut out) = (None, None, None, None, None);
+    let mut it = args.iter();
+    while let Some(arg) = it.next() {
+        let mut value = |name: &str| it.next().cloned().ok_or(format!("{name} needs a value"));
+        match arg.as_str() {
+            "--channel" => channel = Some(value("--channel")?),
+            "--version" => version = Some(value("--version")?),
+            "--target" => target = Some(value("--target")?),
+            "--feed" => feed = Some(value("--feed")?),
+            "--out" => out = Some(value("--out")?),
+            "-h" | "--help" => {
+                println!("{PACKAGE_MARKER_USAGE}");
+                return Ok(0);
+            }
+            other => {
+                return Err(format!(
+                    "unknown option {other:?}\n\n{PACKAGE_MARKER_USAGE}"
+                ))
+            }
+        }
+    }
+    let need = |v: Option<String>, name: &str| {
+        v.ok_or(format!("{name} is required\n\n{PACKAGE_MARKER_USAGE}"))
+    };
+    let text = package_marker_text(
+        &need(channel, "--channel")?,
+        &need(version, "--version")?,
+        &need(target, "--target")?,
+        feed.as_deref(),
+    )?;
+    let out = need(out, "--out")?;
+    fs::write(&out, text).map_err(|e| format!("cannot write {out}: {e}"))?;
+    Ok(0)
+}
+
+const PACKAGE_MANIFESTS_USAGE: &str = "\
+Usage: cargo run -p xtask -- package-manifests [--dir <dir>] [--version <v>]
+                                               [--notes <file>] [--out <file>]
+
+Writes latest.json from the .sha256 files in <dir> (default target/dist):
+{\"version\", \"notes\", \"assets\": {file name: sha256}}. The release attaches
+it so a mirror only has to copy files.";
+
+/// One `.sha256` file's line (`<hex>  <name>`, as `sha256sum` writes it).
+pub fn parse_checksum_line(line: &str) -> Option<(String, String)> {
+    let (hex, name) = line.trim().split_once(char::is_whitespace)?;
+    let name = name.trim().trim_start_matches('*');
+    let valid = hex.len() == 64 && hex.chars().all(|c| c.is_ascii_hexdigit());
+    (valid && !name.is_empty()).then(|| (hex.to_ascii_lowercase(), name.to_string()))
+}
+
+/// The `latest.json` text: assets sorted by name so the file is stable.
+pub fn latest_json(version: &str, notes: &str, checksums: &[(String, String)]) -> String {
+    let assets: std::collections::BTreeMap<&str, &str> = checksums
+        .iter()
+        .map(|(hex, name)| (name.as_str(), hex.as_str()))
+        .collect();
+    let value = serde_json::json!({ "version": version, "notes": notes, "assets": assets });
+    let mut text = serde_json::to_string_pretty(&value).expect("json serializes");
+    text.push('\n');
+    text
+}
+
+/// `xtask package-manifests`.
+pub fn package_manifests(args: &[String]) -> Result<i32, String> {
+    let (mut dir, mut version, mut notes, mut out) = (None, None, None, None);
+    let mut it = args.iter();
+    while let Some(arg) = it.next() {
+        let mut value = |name: &str| it.next().cloned().ok_or(format!("{name} needs a value"));
+        match arg.as_str() {
+            "--dir" => dir = Some(value("--dir")?),
+            "--version" => version = Some(value("--version")?),
+            "--notes" => notes = Some(value("--notes")?),
+            "--out" => out = Some(value("--out")?),
+            "-h" | "--help" => {
+                println!("{PACKAGE_MANIFESTS_USAGE}");
+                return Ok(0);
+            }
+            other => {
+                return Err(format!(
+                    "unknown option {other:?}\n\n{PACKAGE_MANIFESTS_USAGE}"
+                ))
+            }
+        }
+    }
+    let dir = PathBuf::from(dir.unwrap_or_else(|| "target/dist".into()));
+    let mut checksums = Vec::new();
+    let entries = fs::read_dir(&dir).map_err(|e| format!("cannot read {}: {e}", dir.display()))?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("sha256") {
+            continue;
+        }
+        let text = fs::read_to_string(&path)
+            .map_err(|e| format!("cannot read {}: {e}", path.display()))?;
+        let (hex, name) = text
+            .lines()
+            .find_map(parse_checksum_line)
+            .ok_or_else(|| format!("{} holds no checksum line", path.display()))?;
+        checksums.push((hex, name));
+    }
+    if checksums.is_empty() {
+        return Err(format!("no .sha256 files in {}", dir.display()));
+    }
+    let notes = match notes {
+        Some(f) => fs::read_to_string(&f).map_err(|e| format!("cannot read {f}: {e}"))?,
+        None => String::new(),
+    };
+    let version = version.unwrap_or_else(|| env!("CARGO_PKG_VERSION").to_string());
+    let out = out
+        .map(PathBuf::from)
+        .unwrap_or_else(|| dir.join("latest.json"));
+    fs::write(&out, latest_json(&version, &notes, &checksums))
+        .map_err(|e| format!("cannot write {}: {e}", out.display()))?;
+    println!("{}", out.display());
+    Ok(0)
 }
 
 pub fn install_text(version: &str, target: &str) -> String {
@@ -345,6 +499,113 @@ mod tests {
                 executable: false,
             },
         ]
+    }
+
+    #[test]
+    fn the_archive_marker_says_channel_archive() {
+        let e = marker_entry("0.2.0", "x86_64-unknown-linux-gnu");
+        let m = gitpoulpi_config::release::Marker::parse(&String::from_utf8(e.data).unwrap());
+        assert_eq!(
+            m.unwrap().channel,
+            Some(gitpoulpi_config::release::InstallChannel::Archive)
+        );
+    }
+
+    #[test]
+    fn package_marker_writes_each_channel_and_refuses_others() {
+        use gitpoulpi_config::release::{InstallChannel, Marker};
+        for c in InstallChannel::ALL {
+            let text = package_marker_text(c.as_str(), "1.2.3", "t", None).unwrap();
+            let m = Marker::parse(&text).unwrap();
+            assert_eq!(
+                (m.version.as_str(), m.target.as_str(), m.channel, m.feed),
+                ("1.2.3", "t", Some(c), None)
+            );
+        }
+        let with_feed = package_marker_text("choco-internal", "1.2.3", "t", Some("https://f/"));
+        assert_eq!(
+            Marker::parse(&with_feed.unwrap()).unwrap().feed.as_deref(),
+            Some("https://f/")
+        );
+        assert!(package_marker_text("cargo", "1", "t", None).is_err());
+        assert!(package_marker_text("snap", "1", "t", None).is_err());
+        assert!(package_marker_text("apt", "", "t", None).is_err());
+    }
+
+    #[test]
+    fn package_marker_writes_the_file() {
+        let tmp = tempfile::tempdir().unwrap();
+        let out = tmp.path().join("marker");
+        let args: Vec<String> = [
+            "--channel",
+            "apt",
+            "--version",
+            "0.3.0",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--out",
+            out.to_str().unwrap(),
+        ]
+        .map(String::from)
+        .to_vec();
+        assert_eq!(package_marker(&args), Ok(0));
+        let m = gitpoulpi_config::release::Marker::parse(&fs::read_to_string(&out).unwrap());
+        assert_eq!(
+            m.unwrap().channel,
+            Some(gitpoulpi_config::release::InstallChannel::Apt)
+        );
+        assert!(package_marker(&args[..6]).is_err(), "--out is required");
+    }
+
+    #[test]
+    fn checksum_lines_parse_and_latest_json_is_sorted_and_complete() {
+        let hex = "ab".repeat(32);
+        let line = checksum_line(&hex, "gitpoulpi-1.0.0-x.tar.gz");
+        assert_eq!(
+            parse_checksum_line(&line),
+            Some((hex.clone(), "gitpoulpi-1.0.0-x.tar.gz".into()))
+        );
+        assert_eq!(parse_checksum_line("short  name"), None);
+        assert_eq!(parse_checksum_line(""), None);
+        let json = latest_json(
+            "1.0.0",
+            "Notes",
+            &[
+                (hex.clone(), "b.zip".into()),
+                ("cd".repeat(32), "a.tar.gz".into()),
+            ],
+        );
+        let v: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(v["version"], "1.0.0");
+        assert_eq!(v["notes"], "Notes");
+        assert_eq!(v["assets"]["b.zip"], hex);
+        let names: Vec<&String> = v["assets"].as_object().unwrap().keys().collect();
+        assert_eq!(names, ["a.tar.gz", "b.zip"]);
+    }
+
+    #[test]
+    fn package_manifests_reads_the_sha256_files_of_a_folder() {
+        let tmp = tempfile::tempdir().unwrap();
+        let hex = "0f".repeat(32);
+        fs::write(
+            tmp.path().join("gitpoulpi-1.0.0-x.zip.sha256"),
+            checksum_line(&hex, "gitpoulpi-1.0.0-x.zip"),
+        )
+        .unwrap();
+        fs::write(tmp.path().join("other.txt"), "ignored").unwrap();
+        let args: Vec<String> = ["--dir", tmp.path().to_str().unwrap(), "--version", "1.0.0"]
+            .map(String::from)
+            .to_vec();
+        assert_eq!(package_manifests(&args), Ok(0));
+        let v: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(tmp.path().join("latest.json")).unwrap())
+                .unwrap();
+        assert_eq!(v["assets"]["gitpoulpi-1.0.0-x.zip"], hex);
+        let empty = tempfile::tempdir().unwrap();
+        let bad: Vec<String> = ["--dir", empty.path().to_str().unwrap()]
+            .map(String::from)
+            .to_vec();
+        assert!(package_manifests(&bad).is_err());
     }
 
     #[test]

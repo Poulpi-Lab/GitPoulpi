@@ -12,6 +12,8 @@ description = "The self-updater's engine: download and verify a release archive,
 gitpoulpi-config.workspace = true
 gitpoulpi-hosting.workspace = true
 thiserror.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 sha2 = { workspace = true, features = ["std"] }
 # The same pure-Rust archive crates `xtask dist` packs with, so what one
 # writes the other reads and no tar/unzip is needed on PATH (Windows).

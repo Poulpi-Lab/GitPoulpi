@@ -110,6 +110,8 @@ impl WindowState {
                 && !self.remote_ui.is_open()
                 && !self.show_help
                 && !self.ai_ui.popup_open()
+                && !crate::ai_sent_dialog::is_open()
+                && !crate::stage_guard_dialog::is_open()
                 && !crate::activity_log::is_open()
                 && !crate::trust_dialog::is_open()
                 && !crate::jobs_ui::panel_open()
@@ -200,6 +202,8 @@ impl WindowState {
                             || crate::tag_delete_dialog::is_open()
                             // The security check's answers are digits too.
                             || crate::trust_dialog::is_open()
+                            // The sensitive-files question: 1 and 2 answer it.
+                            || crate::stage_guard_dialog::is_open()
                             || self.remote_ui.is_open()
                             // The encoding dropdown's search line types digits
                             // (`1252`), never a count.
@@ -249,6 +253,10 @@ impl WindowState {
                 // guard every key handled below fires twice (e.g. one
                 // arrow-key tap moving the selection by two rows).
                 Event::Key(key) if key.kind != KeyEventKind::Press => {}
+                // The two question dialogs have no text field: a paste goes nowhere.
+                Event::Paste(_)
+                    if crate::ai_sent_dialog::is_open() || crate::stage_guard_dialog::is_open() => {
+                }
                 // A pasted token goes into Preferences' Integrations form.
                 Event::Paste(text) if self.preferences.is_some() => {
                     if let Some(prefs) = self.preferences.as_mut() {

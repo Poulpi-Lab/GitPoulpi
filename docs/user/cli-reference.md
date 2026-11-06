@@ -101,7 +101,7 @@ Hunks and lines are numbered as `gitpoulpi --json diff` numbers them.
 
 | Command | What it does |
 |---|---|
-| `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]]` | Stage a file, folder, everything, a hunk or some lines. |
+| `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Stage a file, folder, everything, a hunk or some lines. A file, folder or `--all` stage that would add a sensitive file (a private key, a `.env`, a recognised token: `[privacy]` in the [config reference](config-reference.md#privacy-sensitive-files)) is refused with exit code 2 and `{error: "sensitive_files", files: [{path, reason}]}` (a rule and a masked preview, never a value); nothing is staged. `--allow-sensitive` stages them anyway. |
 | `unstage` (same flags) | The reverse. |
 | `discard --file F [--hunk N [--lines a,b]]` | Throw away unstaged changes (a whole file: every change, untracked file deleted). Undoable. |
 | `rm-file <paths>...` | Delete files from the working tree. Undoable. |
@@ -224,6 +224,7 @@ profile and is optional when there is one)
 
 | Command | What it does |
 |---|---|
+| `ai [--print-sent] <command>` | `--print-sent` on any `ai` command prints what would be sent (the cleaned system and user text, `{sent: [{system, user}], privacy, dry_run: true}`) and calls no model; it needs `ai.enabled = true`, no key and no network. Every `ai` answer carries `privacy: {redactions: N, excluded_files: [...]}`: how many secrets were replaced and which sensitive files were left out ([AI > Privacy](ai.md#privacy)). |
 | `ai commit-message` | Print the message the AI proposes for the staged changes (all changes when nothing is staged); commits nothing. |
 | `ai explain [rev] [--wip]` | Explain a commit (default `HEAD`) or the working changes. |
 | `ai split-plan <rev>` | Print a plan the AI proposes for splitting a commit, as `{commit, parts, applied: false}` where `parts` is what `split-commit --plan` accepts. Applies nothing. Needs `ai.enabled = true`. |

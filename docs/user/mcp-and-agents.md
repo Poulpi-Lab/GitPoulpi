@@ -138,6 +138,7 @@ and how to use GitPoulpi instead of raw `git`.
 | `[mcp] allow_ui` | `true` | `false`: the agent cannot move your window (`ui_state` / `ui_viewers` still answer). |
 | `[mcp] ui_control` | `"ask"` | `ask`: a chip in your window that you confirm; `auto`: applied unless you are busy; `off`: refused. Per agent: `--ui-control`. |
 | `[mcp] allow_ui_propose` | `false` | Lets the agent open pre-filled dialogs you confirm (Settings > Agents & MCP > *Let AI agents propose changes for me to confirm*). |
+| `[mcp] allow_sensitive_staging` | `false` | Only in `config.toml`. Off, the `stage` tool does not offer `allow_sensitive`, and a stage that would add a sensitive file (a private key, a `.env`, a recognised token) is refused with `{error: "sensitive_files", files}`: the agent is to ask you. `true` lets it pass `allow_sensitive`. See [Staging and committing](staging-and-committing.md#sensitive-files). |
 | `[mcp] allow_history_purge` | `false` | Only in `config.toml`. `true` lists the tool `rewrite_purge`, which deletes the old history of a history rewrite (and the undo of it) for good. Off: the agent does not see it. It still needs `allow_mutations`. |
 | `[ui] allow_agent_view_control` | `true` | Your window's master switch (Settings > Agents & MCP > *Allow AI agents to drive the view*). Off: no agent can reach your window. |
 | `[ui] launch` | `"off"` | Whether an agent may open a GitPoulpi window when none is open (see [below](#when-no-window-is-open-or-it-is-in-another-session)). |
@@ -204,6 +205,7 @@ mutation_allowlist = []        # e.g. ["stage", "unstage", "commit", "branch_cre
 allow_ui = true
 ui_control = "ask"             # "auto" lets the agent move your view without asking
 allow_ui_propose = false       # true: the agent may pre-fill Reword / Split / commit / branch / tag dialogs
+allow_sensitive_staging = false  # true: the agent may stage files the staging guard flags
 allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old history for good)
 ```
 

@@ -8864,3 +8864,65 @@ palette_open = "Updates: Open Security Notice"
 why_no_notice = "no security notice with a link names this version"
 # context: footer hint of the update panel when a security notice is listed; the letters are the keys of the buttons
 panel_hint = "u update  c copy  t terminal  v revert  n notes  a notice  s skip  r check  Esc close"
+
+[ai_privacy]
+# context: title of the dialog shown before an AI request is sent; {via} is the name of the AI profile
+title = "Review what is sent to {via}"
+# context: first line of that dialog
+intro = "This is the request after secrets are replaced and sensitive files are left out. Nothing leaves until you choose Send."
+# context: heading of the list of secrets replaced in the request
+redactions_heading = { one = "{n} secret replaced", other = "{n} secrets replaced" }
+# context: heading of the list of sensitive files left out of the request
+excluded_heading = { one = "{n} sensitive file left out", other = "{n} sensitive files left out" }
+# context: line of the dialog when nothing was replaced and nothing was left out
+nothing_removed = "No secret was found and no sensitive file is part of this request."
+# context: one row of the list of replaced secrets; {rule} is the kind of secret (github-token), {preview} a masked sample that never shows the whole value
+redaction_row = "{rule}: {preview}"
+# context: checkbox of the dialog; {action} is the name of the AI action (Commit message, Explain changes...)
+dont_show = "Don't show again for {action}"
+# context: button that sends the AI request
+send = "Send"
+# context: button that cancels the AI request
+cancel = "Cancel"
+# context: key hint at the bottom of the dialog
+hint = "Tab: next control, Space: toggle, Enter: press, Esc: cancel"
+# context: Settings > AI, heading of the privacy rows
+settings_heading = "Privacy"
+# context: Settings > AI, label of a switch
+redact_label = "Redact secrets before sending"
+# context: help under that switch
+redact_help = "Replaces tokens, private keys and passwords found in a request with a [REDACTED] marker before the request leaves this machine."
+# context: red warning shown while that switch is off
+redact_warning = "Off: secrets in your changes are sent to the AI service as they are."
+# context: Settings > AI, label of a switch
+exclude_label = "Leave out sensitive files"
+# context: help under that switch; privacy.sensitive_patterns is a config key and stays as written
+exclude_help = "Never includes the changes of files such as .env, private keys and certificates (see privacy.sensitive_patterns in config.toml)."
+# context: red warning shown while that switch is off
+exclude_warning = "Off: the changes of sensitive files are sent to the AI service when they are part of a request."
+# context: Settings > AI, heading above one switch per AI action
+sent_heading = "Show what is sent before..."
+# context: help under the first of those switches
+sent_help = "Each switch shows the request for review before it is sent. The dialog's Don't show again checkbox turns one off; this button turns them all on."
+# context: Settings > AI, button that turns every "show what is sent" switch back on
+show_all_again = "Show all again"
+# context: status line after that button was pressed
+shown_all = "Every request will be shown before it is sent"
+
+[stage_guard]
+# context: title of the dialog that lists files the staging guard flagged
+title = "Sensitive files"
+# context: question of that dialog
+question = "These files look sensitive. {$Stage} them anyway?"
+# context: one reason in the list; {pattern} is a path pattern such as .env.*
+reason_pattern = "matches {pattern}"
+# context: one reason in the list; {rule} is the kind of secret found (github-token), {preview} a masked sample that never shows the whole value
+reason_secret = "contains {rule} ({preview})"
+# context: first numbered answer of the dialog
+answer_stage = "{$Stage} anyway"
+# context: second numbered answer of the dialog
+answer_cancel = "Cancel, {$stage} nothing"
+# context: key hint at the bottom of the dialog
+hint = "Up/Down: choose, Enter or 1/2: answer, Esc: cancel"
+# context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
+sensitive_stage = "sensitive files were not {$staged}: {files}; ask the user, then {$stage} again allowing sensitive files"

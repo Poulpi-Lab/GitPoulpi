@@ -16,6 +16,59 @@ use crate::cli::AiCommand;
 use crate::client::Session;
 use crate::commands::{emitted, Emitted};
 
+/// What one `ai` run knows about its privacy: whether it only prints what
+/// would be sent (`--print-sent`) and the report of the job it ran, which
+/// becomes the `privacy` object of the answer.
+#[derive(Default)]
+pub(crate) struct Ctx {
+    print_sent: bool,
+    report: Option<std::sync::Arc<gitpoulpi_ai::privacy::Report>>,
+}
+
+impl Ctx {
+    /// [`job_for`], tracked by this run.
+    fn job(&mut self, session: &Session, action: AiAction) -> Result<Job, String> {
+        let job = job_for(session, action)?.with_print_only(self.print_sent);
+        self.report = Some(job.privacy_report());
+        Ok(job)
+    }
+
+    /// The answer with its `privacy` object, or, for `--print-sent`, the
+    /// prepared text instead of the provider's answer.
+    fn finish(self, result: Result<Emitted, String>) -> Result<Emitted, String> {
+        let summary = self.report.as_ref().map(|r| r.summary());
+        let privacy = summary
+            .map(|s| json!({ "redactions": s.redactions, "excluded_files": s.excluded_files }));
+        match result {
+            Err(e)
+                if self.print_sent && e.contains(&gitpoulpi_ai::Error::PrintOnly.to_string()) =>
+            {
+                let sent = self.report.map(|r| r.sent()).unwrap_or_default();
+                let human = sent
+                    .iter()
+                    .map(|(system, user)| format!("--- system ---\n{system}\n--- user ---\n{user}"))
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                let requests: Vec<serde_json::Value> = sent
+                    .iter()
+                    .map(|(system, user)| json!({ "system": system, "user": user }))
+                    .collect();
+                Ok(emitted(
+                    json!({ "sent": requests, "privacy": privacy, "dry_run": true }),
+                    human,
+                ))
+            }
+            Ok(mut out) => {
+                if let (Some(p), Some(map)) = (privacy, out.json.as_object_mut()) {
+                    map.insert("privacy".into(), p);
+                }
+                Ok(out)
+            }
+            other => other,
+        }
+    }
+}
+
 /// Resolves `action` for the session's repository into a runnable [`Job`].
 pub(crate) fn job_for(session: &Session, action: AiAction) -> Result<Job, String> {
     job_for_root(session.repo_root(), action)
@@ -29,6 +82,7 @@ pub(crate) fn job_for_root(
 ) -> Result<Job, String> {
     let settings = gitpoulpi_config::Settings::resolve_ambient().map_err(|e| e.to_string())?;
     let config = &settings.config().ai;
+    let patterns = settings.config().privacy.sensitive_patterns.clone();
     let state = root
         .map(crate::commands::repo_state_path)
         .and_then(|p| gitpoulpi_session::RepoState::load(&p).ok());
@@ -57,6 +111,7 @@ pub(crate) fn job_for_root(
         job.with_repo_instructions(repo_instructions)
             .with_workspace(workspace)
             .with_context(context)
+            .with_sensitive_patterns(&patterns)
     })
 }
 
@@ -168,6 +223,13 @@ pub(crate) async fn generate_commit_message(
     session: &mut Session,
 ) -> Result<parse::CommitMessage, String> {
     let job = job_for(session, AiAction::CommitMessage)?;
+    commit_message_with(session, &job).await
+}
+
+async fn commit_message_with(
+    session: &mut Session,
+    job: &Job,
+) -> Result<parse::CommitMessage, String> {
     let diffs = diff_to_commit(session).await?;
     if diffs.is_empty() {
         return Err("there are no changes to describe".into());
@@ -205,6 +267,7 @@ pub(crate) async fn generate_stash_message(session: &mut Session) -> Result<Stri
 /// The AI's suggestion for conflict `conflict` (1-based) of `path`.
 async fn resolve_conflict(
     session: &mut Session,
+    ctx: &mut Ctx,
     path: &str,
     conflict: Option<usize>,
 ) -> Result<Emitted, String> {
@@ -233,7 +296,7 @@ async fn resolve_conflict(
     };
     let context = prompts::ConflictContext::from_document(&doc, n - 1)
         .ok_or_else(|| format!("there is no conflict {n} in {path}"))?;
-    let job = job_for(session, AiAction::ConflictResolve)?;
+    let job = ctx.job(session, AiAction::ConflictResolve)?;
     let lines = job
         .resolve_conflict(&context)
         .await
@@ -292,11 +355,12 @@ async fn check_script(
 #[cfg(feature = "history-rewrite")]
 async fn rewrite_script(
     session: &mut Session,
+    ctx: &mut Ctx,
     instruction: &str,
     sample: Option<usize>,
 ) -> Result<Emitted, String> {
     use gitpoulpi_ai::assist::RewriteScriptRequest;
-    let job = job_for(session, AiAction::RewriteScript)?;
+    let job = ctx.job(session, AiAction::RewriteScript)?;
     let commits = match sample.filter(|n| *n > 0) {
         Some(n) => {
             let graph: gitpoulpi_core::domain::CommitGraph = session
@@ -357,13 +421,14 @@ async fn rewrite_script(
 #[cfg(feature = "history-rewrite")]
 async fn rewrite_rules(
     session: &mut Session,
+    ctx: &mut Ctx,
     description: &str,
     context: bool,
 ) -> Result<Emitted, String> {
     use gitpoulpi_ai::assist::RewriteRulesRequest;
     use gitpoulpi_core::domain::rewrite::{Recipe, Scope};
     use gitpoulpi_core::domain::{Ref, RefKind};
-    let job = job_for(session, AiAction::RewriteRules)?;
+    let job = ctx.job(session, AiAction::RewriteRules)?;
     let mut request = RewriteRulesRequest {
         description: description.to_string(),
         context: prompts::RulesContext::default(),
@@ -448,10 +513,28 @@ async fn rewrite_rules(
     Ok(out)
 }
 
-pub(crate) async fn run(session: &mut Session, action: AiCommand) -> Result<Emitted, String> {
+pub(crate) async fn run(
+    session: &mut Session,
+    action: AiCommand,
+    print_sent: bool,
+) -> Result<Emitted, String> {
+    let mut ctx = Ctx {
+        print_sent,
+        report: None,
+    };
+    let result = run_action(session, &mut ctx, action).await;
+    ctx.finish(result)
+}
+
+async fn run_action(
+    session: &mut Session,
+    ctx: &mut Ctx,
+    action: AiCommand,
+) -> Result<Emitted, String> {
     match action {
         AiCommand::CommitMessage => {
-            let message = generate_commit_message(session).await?;
+            let job = ctx.job(session, AiAction::CommitMessage)?;
+            let message = commit_message_with(session, &job).await?;
             Ok(emitted(
                 json!({ "summary": message.summary, "description": message.description }),
                 message.full(),
@@ -481,14 +564,14 @@ pub(crate) async fn run(session: &mut Session, action: AiCommand) -> Result<Emit
         AiCommand::RewriteScript {
             instruction,
             sample,
-        } => rewrite_script(session, &instruction, sample).await,
+        } => rewrite_script(session, ctx, &instruction, sample).await,
         #[cfg(feature = "history-rewrite")]
         AiCommand::RewriteRules {
             description,
             context,
-        } => rewrite_rules(session, &description, context).await,
+        } => rewrite_rules(session, ctx, &description, context).await,
         AiCommand::ResolveConflict { path, conflict } => {
-            resolve_conflict(session, &path, conflict).await
+            resolve_conflict(session, ctx, &path, conflict).await
         }
         AiCommand::SplitPlan { rev } => {
             let oid: Oid = session
@@ -497,7 +580,7 @@ pub(crate) async fn run(session: &mut Session, action: AiCommand) -> Result<Emit
             let source: gitpoulpi_core::domain::SplitSource = session
                 .call(OperationKind::SplitSource, json!({ "commit": oid }))
                 .await?;
-            let job = job_for(session, AiAction::SplitCommit)?;
+            let job = ctx.job(session, AiAction::SplitCommit)?;
             let parts = job.plan_split(&source).await.map_err(|e| e.to_string())?;
             let human = parts
                 .iter()
@@ -518,7 +601,7 @@ pub(crate) async fn run(session: &mut Session, action: AiCommand) -> Result<Emit
             ))
         }
         AiCommand::Explain { rev, wip } => {
-            let job = job_for(session, AiAction::ExplainChanges)?;
+            let job = ctx.job(session, AiAction::ExplainChanges)?;
             let (subject, message, diffs) = if wip {
                 let staged = diff_to_commit(session).await?;
                 ("the working tree changes".to_string(), None, staged)

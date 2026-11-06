@@ -396,6 +396,15 @@ impl AiUi {
                 }
                 Err(e) => AiOutcome::Done(job_request, Err(msg::runtime_failed(e))),
             };
+            // The user read the request and chose Cancel: a cancel, not a failure.
+            let outcome = match outcome {
+                AiOutcome::Done(request, Err(why))
+                    if why == gitpoulpi_ai::Error::Declined.to_string() =>
+                {
+                    AiOutcome::Canceled(request)
+                }
+                other => other,
+            };
             let state = match &outcome {
                 AiOutcome::Done(_, Ok(_)) => gitpoulpi_ipc::JobState::Done,
                 AiOutcome::Done(_, Err(_)) => gitpoulpi_ipc::JobState::Failed,
@@ -830,12 +839,42 @@ fn prepare_with(
     Job::prepare(config, action, over.as_ref(), tokens).map(|job| {
         let mut context = gitpoulpi_ai::vars::PromptContext::from_repo(&repo.root);
         context.uilang = ui_language_english().to_string();
-        with_ui_language(
-            job.with_repo_instructions(prefs.ai_instructions)
-                .with_workspace(crate::workspace_ui::store::ai_for(session, &repo.root))
-                .with_context(context),
+        with_privacy(
+            with_ui_language(
+                job.with_repo_instructions(prefs.ai_instructions)
+                    .with_workspace(crate::workspace_ui::store::ai_for(session, &repo.root))
+                    .with_context(context),
+            ),
+            action,
         )
     })
+}
+
+/// Actions whose request the generic "What is sent" dialog shows. The two
+/// history-rewrite dialogs show their own before they ask.
+fn previewed(action: AiAction) -> bool {
+    !matches!(action, AiAction::RewriteScript | AiAction::RewriteRules)
+}
+
+/// The job with the privacy settings as the files say now (a window's copy of
+/// the config can be older), and the "What is sent" dialog as its gate when
+/// the user wants to see this action's request first.
+fn with_privacy(job: Job, action: AiAction) -> Job {
+    let Ok(settings) = gitpoulpi_config::Settings::resolve_ambient() else {
+        return job;
+    };
+    let config = settings.config();
+    let job = job.with_privacy(&config.ai.privacy, &config.privacy.sensitive_patterns);
+    if previewed(action) && config.ai.sent_preview.shows(action) {
+        let gate = crate::ai_sent_dialog::Gate::shared(
+            action,
+            job.profile.display_name().to_string(),
+            action_label(action).to_string(),
+        );
+        job.with_send_gate(gate)
+    } else {
+        job
+    }
 }
 
 /// One request on the worker's own daemon connection.
@@ -1420,7 +1459,10 @@ pub(crate) fn prepare_remote(config: &AiConfig, action: AiAction) -> Result<Job,
         uilang: ui_language_english().to_string(),
         ..Default::default()
     };
-    Ok(with_ui_language(job.with_context(context)))
+    Ok(with_privacy(
+        with_ui_language(job.with_context(context)),
+        action,
+    ))
 }
 
 #[cfg(test)]

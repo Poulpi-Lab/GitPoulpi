@@ -44,6 +44,14 @@ pub(super) fn settings_closed(cx: &mut CommandCtx<'_>) {
 }
 
 pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> io::Result<Flow> {
+    // "What is sent" before an AI request owns the keyboard, ahead of every
+    // mode: the request that asked can come from a form (the commit message
+    // box) or the Explain popup, which are not `Normal`.
+    if key.kind == KeyEventKind::Press && crate::ai_sent_dialog::is_open() {
+        crate::ai_sent_dialog::on_key(key);
+        return Ok(Flow::Handled);
+    }
+
     let km = env.km;
     // The integration security check owns the keyboard above everything: it
     // answers a change that was refused before anything was sent.
@@ -317,6 +325,17 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 &mut *cx.input_mode,
                 &mut *cx.last_message,
             );
+        }
+        return Ok(Flow::Handled);
+    }
+
+    // The sensitive-files question of a refused stage owns the keyboard.
+    if key.kind == KeyEventKind::Press
+        && matches!(*cx.input_mode, InputMode::Normal)
+        && crate::stage_guard_dialog::is_open()
+    {
+        if let Some(staged) = crate::stage_guard_dialog::on_key(key) {
+            crate::stage_guard_dialog::apply(staged, cx.link, cx.repo_root);
         }
         return Ok(Flow::Handled);
     }

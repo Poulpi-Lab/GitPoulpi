@@ -356,6 +356,17 @@ holds the defaults of the [review context](ai.md#review-context): **Run the agen
 link; empty adds none, with a **Browse...** button under it that opens a file picker; `Enter` on the button is
 its keyboard form). This page has its own guide: [AI assistance](ai.md).
 
+Under the per-action blocks, the **Privacy** group:
+
+| Option | What it does |
+|---|---|
+| **Redact secrets before sending** | On (default): tokens, private keys and passwords found in a request are replaced by `[REDACTED:<rule>]` before it leaves. Off: a red line says secrets are sent as they are. |
+| **Leave out sensitive files** | On (default): the changes of `.env` files, private keys and certificates (`[privacy] sensitive_patterns`) are never part of a request. Off: a red line says they are sent when they are part of one. |
+| **Show what is sent before...** | One switch per action (commit message, explain, stash message, pull request description, commit composer, conflict resolution, code review, split commit): show the request in the **What is sent** dialog before it goes out. The dialog's *Don't show again* box turns one off. The history rewrite actions show their own dialog. |
+| **Show all again** | Appears while a switch is off; turns every one back on. |
+
+See [AI > Privacy](ai.md#privacy).
+
 ### Agents & MCP
 
 What AI agents may do in this window, whether the MCP server may run, and how

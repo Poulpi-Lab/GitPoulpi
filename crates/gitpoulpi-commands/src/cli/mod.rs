@@ -329,6 +329,11 @@ pub enum Commands {
         lines: Option<String>,
         #[arg(long)]
         all: bool,
+        /// Stage files that look sensitive (a private key, a `.env`, a
+        /// recognised token) too. Without it such a stage is refused and
+        /// nothing is staged (`[privacy] staging_guard`).
+        #[arg(long)]
+        allow_sensitive: bool,
     },
     Unstage {
         #[arg(long)]
@@ -504,6 +509,12 @@ pub enum Commands {
     /// commit message, or explain a commit or the working changes.
     #[cfg(feature = "ai")]
     Ai {
+        /// Print what would be sent to the model (the system and user text
+        /// after secrets are redacted and sensitive files left out) and
+        /// send nothing. Needs `ai.enabled = true`, but no key and no
+        /// network.
+        #[arg(long, global = true)]
+        print_sent: bool,
         #[command(subcommand)]
         action: AiCommand,
     },

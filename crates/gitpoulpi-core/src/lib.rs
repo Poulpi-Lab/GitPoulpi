@@ -8,6 +8,7 @@ pub mod guard;
 pub mod journal;
 pub mod licenses;
 pub mod paths;
+pub mod privacy;
 pub mod repo_config;
 pub mod textconv;
 pub mod time;

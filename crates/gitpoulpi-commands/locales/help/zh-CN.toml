@@ -1,4 +1,5 @@
 ai = "AI 助手（除非 `ai.enabled = true`，否则关闭）：输出生成的提交消息，或解释某个提交或工作区更改"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "输出 AI 为已暂存更改（未暂存任何内容时则为所有更改）提议的提交消息。不会提交任何内容"
 "ai explain" = "解释一个提交（默认 HEAD），或用 --wip 解释工作区更改"
 "ai resolve-conflict" = "输出 AI 为冲突文件中的某一个合并冲突建议的解决方案（`--conflict N`，从 1 起；文件只有一个冲突时可省略）。只输出：不会写入或暂存任何内容，由调用方决定（`conflicts resolve --content-file` 可应用整个文件的结果）。需要 `ai.enabled = true`"
@@ -384,6 +385,7 @@ ssh-command = "仓库本地的 `core.sshCommand` 固定：此仓库使用哪个 
 "ssh-command set --command" = "字面的 `core.sshCommand` 值"
 "ssh-command set --key" = '私钥文件：固定为 `ssh -i "<key>" -o IdentitiesOnly=yes`'
 "ssh-command show" = "显示仓库已固定的 `core.sshCommand`（未设置时为 null）"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "`--file` 的 diff 中某个 hunk 的索引，编号方式与 `gitpoulpi diff --json` 一致"
 "stage --lines" = "`--hunk` 内以逗号分隔的行索引"
 "stash push --ai" = "让 AI 根据工作区更改为 stash 命名（需要 `ai.enabled = true`，见 `docs/user/ai.md`）"

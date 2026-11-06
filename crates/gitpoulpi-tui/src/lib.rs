@@ -103,6 +103,8 @@ mod about;
 mod activity;
 mod activity_log;
 mod after_clone;
+#[cfg_attr(not(feature = "ai"), path = "ai_sent_dialog_stub.rs")]
+mod ai_sent_dialog;
 #[cfg_attr(not(feature = "ai"), path = "ai_ui_stub.rs")]
 mod ai_ui;
 mod avatar;
@@ -312,7 +314,9 @@ mod review_view;
 mod reword_ui;
 mod rewrite_view;
 mod sections_menu;
+mod sent_pane;
 mod split_ui;
+mod stage_guard_dialog;
 mod status_list;
 mod stuck_banner;
 mod tab_column;

@@ -822,6 +822,11 @@ pub(super) async fn suggest(
         "problems": gathered.problems,
         "agent_in_repository": job.runs_in_repository(),
     });
+    let privacy = job.privacy_report().summary();
+    out["privacy"] = json!({
+        "redactions": privacy.redactions,
+        "excluded_files": privacy.excluded_files,
+    });
     out["diff_source"] = json!(source);
     // Files the host would not show are not in the prompt either.
     out["omitted_files"] = json!(omitted);

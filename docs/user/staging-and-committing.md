@@ -36,6 +36,25 @@ the working changes:
 | Unstage | The same buttons and keys in the Staged section (`Ctrl+G u`) |
 | Discard a file's changes | Right-click the file > **Discard changes...** (asks first; `Ctrl+Z` brings the changes back) |
 
+### Sensitive files
+
+Staging a file, a folder or everything first checks what it would add. A file whose
+name matches `[privacy] sensitive_patterns` (`.env` and `.env.*` except the
+`.example`, `.sample` and `.template` ones, `*.pem`, `*.key`, SSH private keys,
+`*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`), or
+whose text holds a secret the scanner recognises, is not staged. The **Sensitive
+files** question lists each file with its reason (a pattern, or the kind of secret
+with a masked preview, never the value) and offers **1. Stage anyway** or **2. Cancel,
+stage nothing**. No answer is highlighted until you press an arrow key or a digit,
+so a stray Enter answers nothing; `Esc`, the close cross and a click outside cancel.
+It is the same question from the keyboard, a button, a menu, the palette or a
+drag-and-drop, because they all send the same request. Cancelling stages nothing,
+not even the ordinary files of the same stage.
+
+Text files up to 1 MiB each and 32 MiB in all are read; larger files and binary
+files are only judged by name. `[privacy] staging_guard = false` turns the check off.
+Staging one hunk or some lines is not checked: you are already working on that file.
+
 Right-click a file for its menu: stage or unstage, discard, copy the path, file
 history and blame, open in your external editor, diff tool or file manager (set
 in [Settings > Diff & editor](settings.md#diff--editor)), and more.
@@ -279,9 +298,16 @@ Everything on this page is scriptable:
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # after the refusal below
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage` refuses a sensitive file the same way: nothing is staged, the exit
+code is 2 and `--json` prints `{error: "sensitive_files", files: [{path, reason}]}`
+(a rule and a masked preview, never a value). `--allow-sensitive` is the retry. An
+MCP agent is refused with the same answer and cannot pass `allow_sensitive` unless
+`[mcp] allow_sensitive_staging = true`: it is told to ask you.
 
 See the [CLI reference](cli-reference.md).

@@ -34,9 +34,9 @@ use gitpoulpi_i18n::msg::rewrite_rules_ai as r;
 
 use super::render::{bad, bold, dim, plain, wrap, RewriteHit};
 use super::script_ai::{AiSystem, AiWish};
-use super::sent_pane::{centered, sent_bg, wrap_width, SentPane, MAX_WIDTH};
 use super::{Focus, Notice, RewriteView};
 use crate::dialog_kit::{self, button_width, ButtonState, CheckState};
+use crate::sent_pane::{centered, sent_bg, wrap_width, SentPane, MAX_WIDTH};
 use crate::text_edit::{Caret, KeyEdit};
 use crate::text_field::{self, edit_lines, offset_at, EditLook};
 use crate::th;

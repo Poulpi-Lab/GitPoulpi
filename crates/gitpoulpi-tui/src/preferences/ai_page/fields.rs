@@ -150,6 +150,9 @@ impl PreferencesState {
             }
         }
 
+        // -- Privacy ---------------------------------------------------------
+        fields.extend(self.privacy_rows());
+
         // -- The archive of the old presets --------------------------------
         if !ai.legacy_presets.is_empty() {
             fields.push(Field::heading(msg::LEGACY_HEADING.get()));

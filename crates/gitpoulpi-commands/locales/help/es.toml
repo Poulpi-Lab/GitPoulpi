@@ -1,4 +1,5 @@
 ai = "Ayudantes de IA (desactivados salvo `ai.enabled = true`): imprimen un mensaje de commit generado, o explican un commit o los cambios de trabajo"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "Imprime el mensaje de commit que propone la IA para los cambios en stage (o para todos los cambios si no hay nada en stage). No hace commit de nada"
 "ai explain" = "Explica un commit (por defecto HEAD) o, con --wip, los cambios de trabajo"
 "ai resolve-conflict" = "Imprime la resolución que sugiere la IA para UN conflicto de merge de un archivo en conflicto (`--conflict N`, desde 1; opcional si el archivo tiene un único conflicto). Solo imprime: no se escribe ni se pone en stage nada, así que decide quien llama (`conflicts resolve --content-file` aplica un resultado de archivo completo). Requiere `ai.enabled = true`"
@@ -384,6 +385,7 @@ ssh-command = "La fijación local al repositorio de `core.sshCommand`: qué clav
 "ssh-command set --command" = "Un valor literal de `core.sshCommand`"
 "ssh-command set --key" = 'Archivo de clave privada: fija `ssh -i "<key>" -o IdentitiesOnly=yes`'
 "ssh-command show" = "Muestra el `core.sshCommand` fijado del repositorio (null si no está definido)"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "Índice de un hunk dentro del diff de `--file`, tal como los numera `gitpoulpi diff --json`"
 "stage --lines" = "Índices de línea separados por comas dentro de `--hunk`"
 "stash push --ai" = "Deja que la IA ponga nombre al stash a partir de los cambios de trabajo (requiere `ai.enabled = true`, ver `docs/user/ai.md`)"

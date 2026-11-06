@@ -25,6 +25,7 @@ mod api;
 pub mod assist;
 pub mod parse;
 pub mod presets;
+pub mod privacy;
 pub mod prompts;
 pub mod review;
 pub mod review_context;
@@ -38,6 +39,7 @@ pub use api::{AnthropicClient, OpenAiClient};
 use gitpoulpi_config::{AiProfile, AiProviderKind};
 use gitpoulpi_hosting::{HttpTransport, TrustGate};
 pub use parse::{CommitMessage, PlannedCommit, PlannedSplit, PullRequestText};
+pub use privacy::{Prepared, Privacy, PrivacyClient, PrivacySummary, SendGate};
 pub use rules_answer::{RuleProblem, RulesAnswer, RulesSettings};
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -78,6 +80,12 @@ pub enum Error {
     Timeout(u64),
     #[error("{0}")]
     Invalid(String),
+    /// `--print-sent`: the request was prepared and shown, not sent.
+    #[error("nothing was sent (print-only)")]
+    PrintOnly,
+    /// The user looked at what would be sent and canceled.
+    #[error("canceled: nothing was sent")]
+    Declined,
 }
 
 /// How long one completion may take before it is given up on.
@@ -100,7 +108,7 @@ pub fn client_for(
     transport: Arc<dyn HttpTransport>,
     gate: &TrustGate,
 ) -> Result<Box<dyn AiClient>> {
-    client_for_in(profile, api_key, transport, None, gate)
+    client_for_in(profile, api_key, transport, None, gate, &Privacy::default())
 }
 
 /// The transport an API-key profile may use: `transport`, held to the
@@ -132,8 +140,26 @@ fn guarded(
 }
 
 /// [`client_for`] for an action on the repository at `repo_root` (the
-/// working folder of a local agent set to `repository`).
+/// working folder of a local agent set to `repository`). Every client it
+/// returns is wrapped in [`PrivacyClient`]: each request is cleaned by
+/// `privacy` ([`privacy::prepare`]) before it is sent.
 pub fn client_for_in(
+    profile: &AiProfile,
+    api_key: Option<String>,
+    transport: Arc<dyn HttpTransport>,
+    repo_root: Option<&std::path::Path>,
+    gate: &TrustGate,
+    privacy: &Privacy,
+) -> Result<Box<dyn AiClient>> {
+    // Nothing is sent: no key, no trust decision and no agent are needed.
+    if privacy.print_only {
+        return Ok(Box::new(PrivacyClient::print_only(privacy.clone())));
+    }
+    let inner = raw_client_for(profile, api_key, transport, repo_root, gate)?;
+    Ok(Box::new(PrivacyClient::new(inner, privacy.clone())))
+}
+
+fn raw_client_for(
     profile: &AiProfile,
     api_key: Option<String>,
     transport: Arc<dyn HttpTransport>,
@@ -218,7 +244,7 @@ pub fn client_for_network(
     profile: &AiProfile,
     api_key: Option<String>,
 ) -> Result<Box<dyn AiClient>> {
-    client_for_network_in(profile, api_key, None)
+    client_for_network_in(profile, api_key, None, &Privacy::default())
 }
 
 /// [`client_for_network`] for an action on the repository at `repo_root`.
@@ -227,6 +253,7 @@ pub fn client_for_network_in(
     profile: &AiProfile,
     api_key: Option<String>,
     repo_root: Option<&std::path::Path>,
+    privacy: &Privacy,
 ) -> Result<Box<dyn AiClient>> {
     let transport = gitpoulpi_hosting::ReqwestTransport::with_timeout(
         std::time::Duration::from_secs(DEFAULT_TIMEOUT_SECS),
@@ -238,6 +265,7 @@ pub fn client_for_network_in(
         Arc::new(transport),
         repo_root,
         &TrustGate::ambient(),
+        privacy,
     )
 }
 

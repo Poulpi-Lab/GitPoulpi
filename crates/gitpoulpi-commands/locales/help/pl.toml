@@ -1,4 +1,5 @@
 ai = "Pomocnik AI (działa tylko przy `ai.enabled = true`): wypisuje wygenerowany opis commita albo wyjaśnia commit lub zmiany robocze"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "Wypisuje opis commita zaproponowany przez AI dla zmian w poczekalni (lub wszystkich zmian, gdy nic nie ma w poczekalni). Niczego nie zatwierdza"
 "ai explain" = "Wyjaśnia commit (domyślnie HEAD) lub, z --wip, zmiany robocze"
 "ai resolve-conflict" = "Wypisuje rozwiązanie, które AI sugeruje dla JEDNEGO konfliktu scalania w pliku z konfliktem (`--conflict N`, liczone od 1; opcjonalne, gdy plik ma jeden konflikt). Tylko wypisuje: nic nie jest zapisywane ani dodawane do poczekalni, więc decyduje wywołujący (`conflicts resolve --content-file` stosuje wynik dla całego pliku). Wymaga `ai.enabled = true`"
@@ -384,6 +385,7 @@ ssh-command = "Lokalne dla repozytorium przypięcie `core.sshCommand`: którego 
 "ssh-command set --command" = "Dosłowna wartość `core.sshCommand`"
 "ssh-command set --key" = 'Plik klucza prywatnego: przypina `ssh -i "<key>" -o IdentitiesOnly=yes`'
 "ssh-command show" = "Pokazuje przypięte `core.sshCommand` repozytorium (null, gdy nieustawione)"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "Indeks hunka w diffie `--file`, tak jak numeruje je `gitpoulpi diff --json`"
 "stage --lines" = "Indeksy linii w `--hunk`, oddzielone przecinkami"
 "stash push --ai" = "Pozwala AI nazwać stash na podstawie zmian roboczych (wymaga `ai.enabled = true`, zob. `docs/user/ai.md`)"

@@ -24,7 +24,7 @@ pub use rewrite_script::{RewriteScriptOutcome, RewriteScriptRequest, ScriptCheck
 use crate::parse::PlannedSplit;
 
 use crate::vars::{self, PromptContext};
-use crate::{prompts, AiClient, Error, Result};
+use crate::{prompts, AiClient, Error, Prepared, Privacy, Result, SendGate};
 
 /// Everything needed to run one action.
 #[derive(Debug, Clone)]
@@ -56,6 +56,9 @@ pub struct Job {
     /// Values for the `${...}` variables of the instruction texts (see
     /// [`crate::vars`]); the default expands them to nothing.
     pub context: PromptContext,
+    /// What is taken out of a request before it is sent, and what a frontend
+    /// hooks to show or print it (see [`crate::privacy`]).
+    pub privacy: Privacy,
 }
 
 impl Job {
@@ -90,7 +93,63 @@ impl Job {
             api_key,
             answer_language: None,
             context: PromptContext::default(),
+            privacy: Privacy::from_config(
+                &config.privacy,
+                &gitpoulpi_core::privacy::default_sensitive_patterns(),
+            ),
         })
+    }
+
+    /// Takes the privacy settings as they are now: `[ai.privacy]` and the
+    /// patterns of `[privacy]` (a window's copy of the config can be older
+    /// than the file).
+    pub fn with_privacy(mut self, ai: &gitpoulpi_config::AiPrivacy, patterns: &[String]) -> Self {
+        self.privacy.redact_secrets = ai.redact_secrets;
+        self.privacy.exclude_sensitive_files = ai.exclude_sensitive_files;
+        self.privacy.patterns = patterns.to_vec();
+        self
+    }
+
+    /// Uses `[privacy] sensitive_patterns` instead of the built-in list.
+    pub fn with_sensitive_patterns(mut self, patterns: &[String]) -> Self {
+        self.privacy.patterns = patterns.to_vec();
+        self
+    }
+
+    /// Records the prepared request and sends nothing (`--print-sent`): the
+    /// run fails with [`Error::PrintOnly`] and [`Job::privacy_report`] holds
+    /// what would have gone out.
+    pub fn with_print_only(mut self, print_only: bool) -> Self {
+        self.privacy.print_only = print_only;
+        self
+    }
+
+    /// Asks `gate` before the first request of a run is sent.
+    pub fn with_send_gate(mut self, gate: std::sync::Arc<dyn SendGate>) -> Self {
+        self.privacy.gate = Some(gate);
+        self
+    }
+
+    /// What this job's requests were cleaned of (shared with its clones).
+    pub fn privacy_report(&self) -> std::sync::Arc<crate::privacy::Report> {
+        self.privacy.report()
+    }
+
+    /// What [`Job::run`] would send for `user`, after cleaning: the text the
+    /// "What is sent" dialog shows.
+    pub fn prepared(&self, user: &str) -> Prepared {
+        let job = self.with_files_counted(user);
+        crate::privacy::prepare(&job.system_prompt(), user, &self.privacy)
+    }
+
+    fn with_files_counted(&self, user: &str) -> Job {
+        // `${files}`: what the prompt's diff touches, unless the caller said.
+        let mut job = self.clone();
+        if job.context.files.is_empty() {
+            let files = user.lines().filter(|l| l.starts_with("diff -- ")).count();
+            job.context.files = files.to_string();
+        }
+        job
     }
 
     /// Adds the repository's instructions for every action (they come
@@ -227,18 +286,14 @@ impl Job {
             &self.profile,
             self.api_key.clone(),
             self.repo_path().as_deref(),
+            &self.privacy,
         )?;
         self.run_with(&*client, user).await
     }
 
     /// [`Job::run`] over a caller-supplied client (tests).
     pub async fn run_with(&self, client: &dyn AiClient, user: &str) -> Result<String> {
-        // `${files}`: what the prompt's diff touches, unless the caller said.
-        let mut job = self.clone();
-        if job.context.files.is_empty() {
-            let files = user.lines().filter(|l| l.starts_with("diff -- ")).count();
-            job.context.files = files.to_string();
-        }
+        let job = self.with_files_counted(user);
         client.complete(&job.system_prompt(), user).await
     }
 
@@ -255,6 +310,7 @@ impl Job {
             &self.profile,
             self.api_key.clone(),
             self.repo_path().as_deref(),
+            &self.privacy,
         )?;
         self.resolve_conflict_with(&*client, conflict).await
     }
@@ -290,6 +346,7 @@ impl Job {
             &self.profile,
             self.api_key.clone(),
             self.repo_path().as_deref(),
+            &self.privacy,
         )?;
         self.suggest_review_with(&*client, input).await
     }
@@ -330,6 +387,7 @@ impl Job {
             &self.profile,
             self.api_key.clone(),
             self.repo_path().as_deref(),
+            &self.privacy,
         )?;
         self.plan_split_with(&*client, source).await
     }

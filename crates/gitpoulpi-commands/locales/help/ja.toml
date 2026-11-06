@@ -1,4 +1,5 @@
 ai = "AI ヘルパー（`ai.enabled = true` のときのみ有効）：生成したコミットメッセージを出力、またはコミットや作業ツリーの変更を説明します"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "ステージ済みの変更（何もステージされていなければすべての変更）に対して AI が提案するコミットメッセージを出力します。コミットはしません"
 "ai explain" = "コミット（既定は HEAD）、または --wip を付けると作業ツリーの変更を説明します"
 "ai resolve-conflict" = "競合したファイルの 1 つのマージ競合に対して AI が提案する解決案を出力します（`--conflict N`、1 始まり。ファイルに競合が 1 つだけなら省略可）。出力のみで、何も書き込まずステージもしないため、判断は呼び出し側に任されます（`conflicts resolve --content-file` でファイル全体の結果を適用できます）。`ai.enabled = true` が必要です"
@@ -384,6 +385,7 @@ ssh-command = "リポジトリローカルの `core.sshCommand` の固定：こ�
 "ssh-command set --command" = "`core.sshCommand` の値そのもの"
 "ssh-command set --key" = '秘密鍵ファイル：`ssh -i "<key>" -o IdentitiesOnly=yes` に固定します'
 "ssh-command show" = "リポジトリに固定された `core.sshCommand` を表示します（未設定なら null）"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "`--file` の差分内のハンクのインデックス（`gitpoulpi diff --json` が付ける番号）"
 "stage --lines" = "`--hunk` 内の行インデックス（カンマ区切り）"
 "stash push --ai" = "作業中の変更から AI にスタッシュの名前を付けさせます（`ai.enabled = true` が必要。`docs/user/ai.md` を参照）"

@@ -22,9 +22,9 @@ pub mod update_lock;
 
 pub use ai::{
     AgentRunMode, AgentWorkdir, AiAction, AiActionSettings, AiActions, AiConfig, AiPreset,
-    AiProfile, AiProviderKind, AiResolveError, AiResolved, AiReviewContext, RepoAiInstructions,
-    RepoAiReview, RepoInstructionsMode, RunInRepo, WorkspaceAi, DEFAULT_HEADLESS_TIMEOUT_SECS,
-    DEFAULT_PROFILE_ID, DEFAULT_TERMINAL_TIMEOUT_SECS,
+    AiPrivacy, AiProfile, AiProviderKind, AiResolveError, AiResolved, AiReviewContext,
+    AiSentPreview, RepoAiInstructions, RepoAiReview, RepoInstructionsMode, RunInRepo, WorkspaceAi,
+    DEFAULT_HEADLESS_TIMEOUT_SECS, DEFAULT_PROFILE_ID, DEFAULT_TERMINAL_TIMEOUT_SECS,
 };
 pub use integration::{
     normalize_azure_url, AccountField, ApiFamily, AuthMethod, Capabilities, ConnectedUser,
@@ -50,10 +50,10 @@ pub use schema::{
     GitConfig, GraphColorization, GraphLaneBackground, GraphRenderer, GraphRowTintStrength,
     HostingInstance, HttpsMode, ImagePixelatedFrom, ImageProtocol, ImageTextFallback,
     KittyKeyboard, LauncherBuild, LegacyDiffViewMode, LogColumnsLayout, LogConfig, LogLevel,
-    McpConfig, McpTls, MergeConfig, PrTerminology, Profile, PullButtonMode, PushBehavior,
-    ReposConfig, RetentionUnit, RewriteConfig, SearchConfig, SessionConfig, SidebarSectionsScope,
-    SshConfig, StartupTab, StatusbarPosition, TabDirFollow, TabsPosition, ToolbarAlign,
-    ToolbarPosition, UiConfig, UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig,
+    McpConfig, McpTls, MergeConfig, PrTerminology, PrivacyConfig, Profile, PullButtonMode,
+    PushBehavior, ReposConfig, RetentionUnit, RewriteConfig, SearchConfig, SessionConfig,
+    SidebarSectionsScope, SshConfig, StartupTab, StatusbarPosition, TabDirFollow, TabsPosition,
+    ToolbarAlign, ToolbarPosition, UiConfig, UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig,
     DEFAULT_BLAME_WIDTH, DEFAULT_COMMITS_PER_LAZY_PAGE, DEFAULT_EDITOR_TAB_SIZE,
     DEFAULT_HOSTING_REFRESH_MINUTES, DEFAULT_INITIAL_COMMITS_IN_GRAPH, DEFAULT_LOG_RETENTION_DAYS,
     DEFAULT_MAX_COMMITS_IN_GRAPH, DEFAULT_MERGE_SIDE_BY_SIDE_MIN_WIDTH, DEFAULT_MOUSE_SCROLL_LINES,
@@ -152,6 +152,9 @@ pub struct Config {
     /// Looking for a newer release: `updates.mode`, `updates.channel`.
     #[serde(default)]
     pub updates: UpdatesConfig,
+    /// What counts as sensitive, and the staging guard: `privacy.*`.
+    #[serde(default)]
+    pub privacy: PrivacyConfig,
 }
 
 /// What [`Config::profile_for`] needs of a workspace: its default profile id

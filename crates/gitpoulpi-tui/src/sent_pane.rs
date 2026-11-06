@@ -1,5 +1,6 @@
-//! The "What is sent" pane both ✦ AI dialogs of the workbench share (Create
-//! Rules, Write a script): a read-only preview tinted apart from the editable
+//! The "What is sent" pane the ✦ AI dialogs share (the workbench's Create
+//! Rules and Write a script, and the dialog shown before any other AI
+//! request, `ai_sent_dialog`): a read-only preview tinted apart from the editable
 //! fields, **collapsed until the user opens it**, with its own pressable and
 //! draggable scrollbar on its right edge. One implementation, so the two
 //! dialogs cannot drift apart: geometry, tint, keys and the bar's mouse
@@ -13,13 +14,12 @@ use ratatui::style::{Color, Modifier, Style};
 
 use gitpoulpi_i18n::msg::rewrite_ai as t;
 
-use super::render::RewriteHit;
 use crate::dialog_kit;
 use crate::scrollbar::{BarDrag, Track};
 use crate::th;
 
 /// The widest an AI dialog grows; it is as tall as its content needs.
-pub(super) const MAX_WIDTH: u16 = 100;
+pub(crate) const MAX_WIDTH: u16 = 100;
 /// The least rows the open pane gets.
 const MIN_PANE: u16 = 4;
 
@@ -27,7 +27,7 @@ const MIN_PANE: u16 = 4;
 /// read-only preview reads apart from the editable fields (which sit
 /// lighter) in dark and light themes alike. A theme that follows the
 /// terminal's own colors has nothing to sink and uses its hover tone.
-pub(super) fn sent_bg() -> Color {
+pub(crate) fn sent_bg() -> Color {
     let panel = th().ui.panel;
     match panel {
         Color::Rgb(..) => {
@@ -44,7 +44,7 @@ pub(super) fn sent_bg() -> Color {
 
 /// The dialog's rectangle: centred in `room`, at most [`MAX_WIDTH`] wide and
 /// `inner_h` rows of content tall (plus the two border rows).
-pub(super) fn centered(room: Rect, inner_h: u16) -> Rect {
+pub(crate) fn centered(room: Rect, inner_h: u16) -> Rect {
     let width = room.width.min(MAX_WIDTH);
     let height = (inner_h + 2).min(room.height);
     Rect::new(
@@ -57,7 +57,7 @@ pub(super) fn centered(room: Rect, inner_h: u16) -> Rect {
 
 /// The state of the pane, in the dialog's state (`Default` = collapsed).
 #[derive(Default)]
-pub(super) struct SentPane {
+pub(crate) struct SentPane {
     /// The body is shown.
     pub open: bool,
     /// First line shown.
@@ -69,13 +69,13 @@ pub(super) struct SentPane {
 }
 
 impl SentPane {
-    pub(super) fn toggle(&mut self) {
+    pub(crate) fn toggle(&mut self) {
         self.open = !self.open;
         self.top = 0;
     }
 
     /// Rows the open body asks for beyond the fixed ones, at least.
-    pub(super) fn least_rows(&self) -> u16 {
+    pub(crate) fn least_rows(&self) -> u16 {
         if self.open {
             MIN_PANE
         } else {
@@ -85,7 +85,7 @@ impl SentPane {
 
     /// Rows the body takes: its lines, at least [`MIN_PANE`], at most `room`;
     /// none while collapsed.
-    pub(super) fn body_rows(&self, lines: usize, room: u16) -> u16 {
+    pub(crate) fn body_rows(&self, lines: usize, room: u16) -> u16 {
         if self.open {
             (lines.min(u16::MAX as usize) as u16)
                 .max(MIN_PANE)
@@ -96,13 +96,13 @@ impl SentPane {
     }
 
     /// Scrolls by `delta` lines (clamped to the last paint's rows).
-    pub(super) fn scroll_by(&mut self, delta: isize) {
+    pub(crate) fn scroll_by(&mut self, delta: isize) {
         let max = self.rows.get().saturating_sub(self.height.get()) as isize;
         self.top = (self.top as isize + delta).clamp(0, max) as usize;
     }
 
     /// The scroll a key asks for while the pane has the focus.
-    pub(super) fn key_step(&self, code: KeyCode) -> Option<isize> {
+    pub(crate) fn key_step(&self, code: KeyCode) -> Option<isize> {
         let page = self.height.get().max(2) as isize - 1;
         Some(match code {
             KeyCode::Up | KeyCode::Char('k') => -1,
@@ -117,7 +117,7 @@ impl SentPane {
 
     /// A press, drag or release on the bar. Whether the pane scrolled (a
     /// press on the bar is then also a focus).
-    pub(super) fn bar_mouse(&mut self, mouse: MouseEvent) -> bool {
+    pub(crate) fn bar_mouse(&mut self, mouse: MouseEvent) -> bool {
         let new = self
             .drag
             .on_mouse(self.bar.get(), mouse, self.rows.get(), self.top);
@@ -132,7 +132,7 @@ impl SentPane {
     }
 
     /// Paints the header row: the disclosure mark, the label, the key hint.
-    pub(super) fn paint_head(&self, buf: &mut Buffer, head: Rect, focused: bool, hot: bool) {
+    pub(crate) fn paint_head(&self, buf: &mut Buffer, head: Rect, focused: bool, hot: bool) {
         let bg = sent_bg();
         let head_bg = if hot { crate::lighten(bg, 10) } else { bg };
         dialog_kit::fill(buf, head, Style::default().bg(head_bg));
@@ -172,7 +172,7 @@ impl SentPane {
     }
 
     /// Forgets the last paint (collapsed, or not shown).
-    pub(super) fn paint_none(&self) {
+    pub(crate) fn paint_none(&self) {
         self.bar.set(None);
         self.rows.set(0);
         self.height.set(0);
@@ -182,14 +182,14 @@ impl SentPane {
     /// its right column, and adds the bar's and the body's hit targets
     /// (bar first: inner-first). `tinted` is the preview look; the result
     /// list uses the plain dialog background.
-    pub(super) fn paint_body(
+    pub(crate) fn paint_body<H: Copy>(
         &self,
         buf: &mut Buffer,
         pane: Rect,
         lines: &[(String, bool)],
         tinted: bool,
-        hits: &mut Vec<(Rect, RewriteHit)>,
-        (bar_hit, body_hit): (RewriteHit, RewriteHit),
+        hits: &mut Vec<(Rect, H)>,
+        (bar_hit, body_hit): (H, H),
     ) {
         let rows = pane.height as usize;
         self.rows.set(lines.len());
@@ -232,6 +232,6 @@ impl SentPane {
 }
 
 /// The width the lines wrap to in a pane `wide` columns wide.
-pub(super) fn wrap_width(wide: u16) -> usize {
+pub(crate) fn wrap_width(wide: u16) -> usize {
     wide.saturating_sub(3) as usize
 }

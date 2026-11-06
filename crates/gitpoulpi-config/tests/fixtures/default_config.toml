@@ -150,6 +150,7 @@ tls = "off"
 tls_cert = ""
 tls_key = ""
 behind_proxy = false
+allow_sensitive_staging = false
 
 [ai]
 enabled = false
@@ -212,6 +213,22 @@ include_claude_md = true
 include_agents_md = true
 extra_file = ""
 
+[ai.privacy]
+redact_secrets = true
+exclude_sensitive_files = true
+
+[ai.sent_preview]
+code_review = true
+commit_composer = true
+commit_message = true
+conflict_resolve = true
+explain_changes = true
+pull_request_description = true
+rewrite_rules = true
+rewrite_script = true
+split_commit = true
+stash_message = true
+
 [session]
 per_repo_state_dir = "in_git_dir"
 
@@ -259,3 +276,7 @@ script_total_timeout_unit = "auto"
 mode = "notify"
 channel = "stable"
 repo = "Poulpi-Lab/GitPoulpi"
+
+[privacy]
+sensitive_patterns = [".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]
+staging_guard = true

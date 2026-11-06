@@ -1,4 +1,5 @@
 ai = "AI helpers (off unless `ai.enabled = true`): print a generated commit message, or explain a commit or the working changes"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "Print the commit message the AI proposes for the staged changes (or every change when nothing is staged). Commits nothing"
 "ai explain" = "Explain a commit (default HEAD) or, with --wip, the working changes"
 "ai resolve-conflict" = "Print the resolution the AI suggests for ONE merge conflict of a conflicted file (`--conflict N`, 1-based; optional when the file has a single conflict). Prints only: nothing is written or staged, so the caller decides (`conflicts resolve --content-file` applies a whole-file result). Needs `ai.enabled = true`"
@@ -388,6 +389,7 @@ ssh-command = "The repository-local `core.sshCommand` pin: which SSH key this re
 "ssh-command set --command" = "A literal `core.sshCommand` value"
 "ssh-command set --key" = 'Private key file: pins `ssh -i "<key>" -o IdentitiesOnly=yes`'
 "ssh-command show" = "Show the repository's pinned `core.sshCommand` (null when unset)"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "Index of a hunk within `--file`'s diff, as `gitpoulpi diff --json` numbers them"
 "stage --lines" = "Comma-separated line indices within `--hunk`"
 "stash push --ai" = "Let the AI name the stash from the working changes (needs `ai.enabled = true`, see `docs/user/ai.md`)"

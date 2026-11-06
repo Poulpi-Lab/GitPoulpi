@@ -1,4 +1,5 @@
 ai = "YZ yardımcıları (`ai.enabled = true` olmadıkça kapalı): üretilen bir commit mesajını yazdır veya bir commit'i ya da çalışma değişikliklerini açıkla"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "YZ'nin hazırlanmış değişiklikler için önerdiği commit mesajını yazdırır (hiçbir şey hazırlanmamışsa tüm değişiklikler için). Hiçbir şey commit etmez"
 "ai explain" = "Bir commit'i (varsayılan HEAD) veya --wip ile çalışma değişikliklerini açıklar"
 "ai resolve-conflict" = "Çakışmalı bir dosyanın TEK bir merge çakışması için YZ'nin önerdiği çözümü yazdırır (`--conflict N`, 1'den başlar; dosyada tek çakışma varsa isteğe bağlı). Yalnızca yazdırır: hiçbir şey yazılmaz veya hazırlanmaz, kararı çağıran verir (`conflicts resolve --content-file` tüm dosya sonucunu uygular). `ai.enabled = true` gerekir"
@@ -384,6 +385,7 @@ ssh-command = "Depoya yerel `core.sshCommand` sabitlemesi: bu deponun hangi SSH 
 "ssh-command set --command" = "Sözcüksel bir `core.sshCommand` değeri"
 "ssh-command set --key" = 'Özel anahtar dosyası: `ssh -i "<key>" -o IdentitiesOnly=yes` komutunu sabitler'
 "ssh-command show" = "Deponun sabitlenmiş `core.sshCommand` değerini gösterir (ayarlı değilse null)"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "`--file` diff'i içindeki bir hunk'ın dizini, `gitpoulpi diff --json` komutunun numaralandırdığı gibi"
 "stage --lines" = "`--hunk` içindeki virgülle ayrılmış satır dizinleri"
 "stash push --ai" = "Stash'e çalışma değişikliklerine göre YZ'nin ad vermesini sağla (`ai.enabled = true` gerekir, bkz. `docs/user/ai.md`)"

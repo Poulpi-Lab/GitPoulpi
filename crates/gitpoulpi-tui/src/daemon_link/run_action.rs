@@ -53,6 +53,14 @@ pub(super) async fn run_action(
             });
             false
         }
+        // Sensitive files in a stage: nothing was staged, the render loop
+        // lists them and asks (`stage_guard_dialog`); no error line.
+        Err(CoreError::SensitiveStage { files })
+            if !matches!(original, Action::AllowSensitive(_)) =>
+        {
+            crate::stage_guard_dialog::ask(conn.repo.root.clone(), original, files);
+            false
+        }
         // A pending auto-stash: point at the banner, not at CLI commands.
         Err(CoreError::PendingAutoStash {
             operation, stash, ..
@@ -80,6 +88,9 @@ tokio::task_local! {
     /// Set while an [`Action::AutoStashed`] runs: every request it sends
     /// carries `autostash: "always"` (see [`autostash_args`]).
     static AUTOSTASH: bool;
+    /// Set while an [`Action::AllowSensitive`] runs: its stage request
+    /// carries `allow_sensitive: true`.
+    static ALLOW_SENSITIVE: bool;
 }
 
 /// `args` as the daemon should get them: with `autostash: "always"` when
@@ -88,6 +99,10 @@ tokio::task_local! {
 fn autostash_args(mut args: serde_json::Value) -> serde_json::Value {
     if AUTOSTASH.try_with(|on| *on).unwrap_or(false) {
         args["autostash"] = serde_json::json!("always");
+    }
+    // The daemon only reads this key for the three stage operations.
+    if ALLOW_SENSITIVE.try_with(|on| *on).unwrap_or(false) {
+        args["allow_sensitive"] = serde_json::json!(true);
     }
     args
 }
@@ -105,6 +120,21 @@ async fn dispatch(
 ) -> GitResult<()> {
     if let Action::AutoStashed(inner) = action {
         return AUTOSTASH
+            .scope(
+                true,
+                Box::pin(dispatch(
+                    conn,
+                    *inner,
+                    action_error_tx,
+                    action_message_tx,
+                    push_rejected_tx,
+                    activity,
+                )),
+            )
+            .await;
+    }
+    if let Action::AllowSensitive(inner) = action {
+        return ALLOW_SENSITIVE
             .scope(
                 true,
                 Box::pin(dispatch(

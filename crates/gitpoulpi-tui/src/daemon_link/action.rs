@@ -161,6 +161,10 @@ pub enum Action {
     /// carries `autostash: "always"`, so the daemon stashes what blocks it,
     /// runs it and pops the stash.
     AutoStashed(Box<Action>),
+    /// The inner stage again, answering the sensitive-files question with
+    /// "Stage anyway": its request carries `allow_sensitive: true`, so the
+    /// daemon's staging guard lets it through.
+    AllowSensitive(Box<Action>),
     CheckoutBranch(String),
     /// Detach HEAD onto a commit (`CheckoutTarget::Commit`). Separate from
     /// `CheckoutBranch` because two different menus offer them and they
@@ -715,7 +719,9 @@ impl Action {
     pub(super) fn undoable_done_text(&self) -> Option<String> {
         use gitpoulpi_i18n::msg::undo_safety as s;
         let op = match self {
-            Action::AutoStashed(inner) => return inner.undoable_done_text(),
+            Action::AutoStashed(inner) | Action::AllowSensitive(inner) => {
+                return inner.undoable_done_text()
+            }
             Action::DiscardFile { .. }
             | Action::DiscardPaths(_)
             | Action::DiscardHunk { .. }
@@ -750,7 +756,7 @@ impl Action {
         }
         let plain = |m: gitpoulpi_i18n::M| m.get().to_string();
         match self {
-            Action::AutoStashed(inner) => inner.activity_label(),
+            Action::AutoStashed(inner) | Action::AllowSensitive(inner) => inner.activity_label(),
             Action::StageFile(p) => l::act_staging_file(name(p)),
             Action::UnstageFile(p) => l::act_unstaging_file(name(p)),
             Action::StageFolder(p) => l::act_staging_folder(name(p)),
@@ -833,7 +839,7 @@ impl Action {
     /// them): every network action but the submodule update.
     pub(super) fn runs_as_job(&self) -> bool {
         match self {
-            Action::AutoStashed(inner) => inner.runs_as_job(),
+            Action::AutoStashed(inner) | Action::AllowSensitive(inner) => inner.runs_as_job(),
             Action::SubmoduleUpdate { .. } => false,
             other => other.is_network(),
         }
@@ -842,7 +848,7 @@ impl Action {
     /// Actions that reach the network, and so must be spawned rather
     /// than awaited inline - the input loop never waits on one.
     pub(super) fn is_network(&self) -> bool {
-        if let Action::AutoStashed(inner) = self {
+        if let Action::AutoStashed(inner) | Action::AllowSensitive(inner) = self {
             return inner.is_network();
         }
         matches!(

@@ -184,6 +184,16 @@ fn tab_bar_drag(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> bool {
 /// Repository Management tab. `None` when one consumed the event; otherwise
 /// the pointer geometry the click handlers share.
 pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<Option<Geo>> {
+    // "What is sent" before an AI request is modal over everything, the
+    // explanation popup included (an Explain shows it while it works).
+    if crate::ai_sent_dialog::is_open() {
+        *cx.hovered_target = None;
+        *cx.hovered_tab_index = None;
+        *cx.hovered_close_tab = None;
+        *cx.hovered_status_row = None;
+        crate::ai_sent_dialog::on_mouse(mouse);
+        return Ok(None);
+    }
     if tab_bar_drag(cx, mouse) {
         return Ok(None);
     }
@@ -405,6 +415,17 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                 &mut *cx.input_mode,
                 &mut *cx.last_message,
             );
+        }
+        return Ok(None);
+    }
+    // The sensitive-files question of a refused stage is modal the same way.
+    if crate::stage_guard_dialog::is_open() {
+        *cx.hovered_target = None;
+        *cx.hovered_tab_index = None;
+        *cx.hovered_close_tab = None;
+        *cx.hovered_status_row = None;
+        if let Some(staged) = crate::stage_guard_dialog::on_mouse(mouse) {
+            crate::stage_guard_dialog::apply(staged, cx.link, cx.repo_root);
         }
         return Ok(None);
     }

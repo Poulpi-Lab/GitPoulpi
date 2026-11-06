@@ -437,6 +437,76 @@ impl RunInRepo {
     }
 }
 
+/// `[ai.privacy]`: what is taken out of a request before it is sent to a
+/// model. Both default on; turning one off is a choice the Settings page
+/// flags in red.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct AiPrivacy {
+    /// Replace every recognised secret in the prompt with `[REDACTED:<rule>]`.
+    pub redact_secrets: bool,
+    /// Leave out the diff of every file matching `[privacy] sensitive_patterns`.
+    pub exclude_sensitive_files: bool,
+}
+
+impl Default for AiPrivacy {
+    fn default() -> Self {
+        Self {
+            redact_secrets: true,
+            exclude_sensitive_files: true,
+        }
+    }
+}
+
+/// `[ai.sent_preview]`: one switch per action key. `true` (the default)
+/// shows what is sent before each request; the dialog's "Don't show again
+/// for <action>" turns one off. A key the file does not name is `true`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(from = "BTreeMap<String, bool>", into = "BTreeMap<String, bool>")]
+pub struct AiSentPreview(BTreeMap<String, bool>);
+
+impl Default for AiSentPreview {
+    fn default() -> Self {
+        Self::from(BTreeMap::new())
+    }
+}
+
+impl From<BTreeMap<String, bool>> for AiSentPreview {
+    fn from(mut map: BTreeMap<String, bool>) -> Self {
+        for action in AiAction::ALL {
+            map.entry(action.key().to_string()).or_insert(true);
+        }
+        Self(map)
+    }
+}
+
+impl From<AiSentPreview> for BTreeMap<String, bool> {
+    fn from(p: AiSentPreview) -> Self {
+        p.0
+    }
+}
+
+impl AiSentPreview {
+    /// Whether the request of `action` is shown first.
+    pub fn shows(&self, action: AiAction) -> bool {
+        self.0.get(action.key()).copied().unwrap_or(true)
+    }
+
+    pub fn set(&mut self, action: AiAction, show: bool) {
+        self.0.insert(action.key().to_string(), show);
+    }
+
+    /// Back to showing every action's request.
+    pub fn show_all(&mut self) {
+        *self = Self::default();
+    }
+
+    /// Whether every action is shown (the default).
+    pub fn all_shown(&self) -> bool {
+        AiAction::ALL.into_iter().all(|a| self.shows(a))
+    }
+}
+
 /// `[ai.review]`: the project context a code review draft is given next to
 /// the diff, and where the agent runs. A repository overrides any of these
 /// ([`RepoAiReview`]); a single run overrides both.
@@ -662,6 +732,11 @@ pub struct AiConfig {
     pub actions: AiActions,
     /// `[ai.review]`: what a code review draft is given besides the diff.
     pub review: AiReviewContext,
+    /// `[ai.privacy]`: what is stripped from a request before it leaves.
+    pub privacy: AiPrivacy,
+    /// `[ai.sent_preview]`: per action, whether "What is sent" is shown
+    /// before the request goes out.
+    pub sent_preview: AiSentPreview,
     /// Archive of the pre-2026-10-01 `[[ai.presets]]`, written by the
     /// migration and never read by an action. See the module docs.
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -677,6 +752,8 @@ impl Default for AiConfig {
             profiles: Vec::new(),
             actions: AiActions::default(),
             review: AiReviewContext::default(),
+            privacy: AiPrivacy::default(),
+            sent_preview: AiSentPreview::default(),
             legacy_presets: Vec::new(),
         };
         ai.ensure_default_profile();
@@ -1020,7 +1097,29 @@ explain_changes = "ghost"
         };
         plain.save(&path).unwrap();
         let raw = std::fs::read_to_string(&path).unwrap();
-        assert!(!raw.contains("harness") && !raw.contains("env"), "{raw}");
+        // (`.env` also appears in `[privacy] sensitive_patterns`.)
+        assert!(
+            !raw.contains("harness") && !raw.contains("profiles.env"),
+            "{raw}"
+        );
+    }
+
+    #[test]
+    fn sent_preview_defaults_on_and_a_partial_table_keeps_the_other_actions_on() {
+        let (c, _) = Config::from_toml_str("[ai.sent_preview]\ncommit_message = false\n").unwrap();
+        assert!(!c.ai.sent_preview.shows(AiAction::CommitMessage));
+        assert!(c.ai.sent_preview.shows(AiAction::CodeReview));
+        assert!(!c.ai.sent_preview.all_shown());
+        let mut p = c.ai.sent_preview.clone();
+        p.show_all();
+        assert!(p.all_shown());
+        // `config set` reaches a key the file never named.
+        let mut cfg = c;
+        cfg.set("ai.sent_preview.code_review", "false").unwrap();
+        assert!(!cfg.ai.sent_preview.shows(AiAction::CodeReview));
+        assert!(
+            AiPrivacy::default().redact_secrets && AiPrivacy::default().exclude_sensitive_files
+        );
     }
 
     #[test]

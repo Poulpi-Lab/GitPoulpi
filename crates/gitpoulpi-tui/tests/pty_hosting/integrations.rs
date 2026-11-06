@@ -328,6 +328,10 @@ fn a_dotless_docker_host_with_a_port_is_accepted_but_a_bare_name_is_not() {
         term.send_keys("Tab").unwrap();
         term.send_text("tok").unwrap();
         term.send_keys("Tab").unwrap();
+        // An https address also offers the pinning switch (one more stop).
+        if accepted {
+            term.send_keys("Tab").unwrap();
+        }
         term.send_keys("Tab").unwrap();
         term.send_keys("Enter").unwrap();
         if accepted {

@@ -1153,6 +1153,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Integraciones: Gestionar el perfil de este repositorio |  |
 | Integraciones: Conectar integración... |  |
 | Ajustes: Opciones del Radar de un perfil... |  |
+| Integrations: Review security check |  |
 | App: Salir | `q` |
 | App: Tema... |  |
 | App: Cambiar tema... | `Ctrl+N y` |

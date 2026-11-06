@@ -386,6 +386,10 @@ impl ClientFactory for DefaultFactory {
 
 fn read_token(integration: &Integration, all: &[Integration]) -> gitpoulpi_hosting::Result<String> {
     use gitpoulpi_hosting::TokenSource;
+    // The security check comes before the secret is even read: a profile whose
+    // address changed never has its token resolved (and the refusal is queued
+    // for the dialog).
+    gitpoulpi_hosting::TrustGate::ambient().preflight(integration)?;
     gitpoulpi_hosting::DefaultTokenSource::for_integrations(all).token(integration)
 }
 

@@ -1,5 +1,6 @@
 use super::*;
 use crate::th;
+use gitpoulpi_i18n::msg::trust_dialog as tmsg;
 
 impl IntegrationsPage {
     #[allow(clippy::too_many_arguments)]
@@ -109,10 +110,22 @@ impl IntegrationsPage {
             msg::TOKEN_PLACEHOLDER.get(),
         );
         y += 1;
-        if self.stored_token(cfg, presence) {
+        if self.retype_hint {
+            put(
+                frame,
+                body,
+                body.x,
+                y,
+                vec![Span::styled(
+                    tmsg::TOKEN_RETYPE_HINT.get(),
+                    Style::default().fg(th().status.warning),
+                )],
+            );
+        } else if self.stored_token(cfg, presence) {
             put(frame, body, body.x, y, muted(msg::TOKEN_KEPT.get()));
         }
         y += 2;
+        y = self.render_security_toggles(frame, body, y, focused, current);
 
         // The hint box: scopes + the link that pre-fills them.
         let scopes = kind
@@ -217,6 +230,148 @@ impl IntegrationsPage {
                 false,
             );
         }
+    }
+
+    /// The form's security toggles: strict pinning for an https address, the
+    /// plain http opt-in (with its red warning) for an unencrypted one.
+    fn render_security_toggles(
+        &mut self,
+        frame: &mut Canvas,
+        body: Rect,
+        mut y: u16,
+        focused: bool,
+        current: Option<Item>,
+    ) -> u16 {
+        if self.strict_offered() {
+            let mark = crate::dialog_kit::checkbox_mark(self.strict);
+            self.control(
+                frame,
+                body,
+                body.x,
+                y,
+                format!("{mark} {}", tmsg::STRICT_LABEL.get()),
+                Item::StrictPin,
+                current,
+                focused,
+                false,
+            );
+            y += 1;
+            y += put_wrapped(
+                frame,
+                body,
+                body.x + 4,
+                y,
+                tmsg::STRICT_HELP.get(),
+                Style::default().fg(th().ui.muted),
+                3,
+            );
+            y += 1;
+        }
+        if self.plain_http_offered() {
+            let mark = crate::dialog_kit::checkbox_mark(self.plain_http);
+            self.control(
+                frame,
+                body,
+                body.x,
+                y,
+                format!("{mark} {}", tmsg::PLAIN_LABEL.get()),
+                Item::AllowPlain,
+                current,
+                focused,
+                false,
+            );
+            y += 1;
+            y += put_wrapped(
+                frame,
+                body,
+                body.x + 4,
+                y,
+                tmsg::PLAIN_WARNING.get(),
+                Style::default().fg(th().status.danger),
+                3,
+            );
+            y += 1;
+        }
+        y
+    }
+
+    /// The connected card's lines about the token's lifetime and rights, and
+    /// the pinned certificate. Returns the next free row.
+    fn render_trust_lines(
+        &mut self,
+        frame: &mut Canvas,
+        body: Rect,
+        mut y: u16,
+        e: &Integration,
+    ) -> u16 {
+        let rights = self.rights.get(&e.id).cloned().unwrap_or_default();
+        if let Some(expires) = &rights.expires {
+            put(frame, body, body.x, y, kv(tmsg::KV_EXPIRES.get(), expires));
+            y += 1;
+        }
+        if !self.pinned.contains_key(&e.id) {
+            let pin = read_pin(&self.trust_gate(), &e.id);
+            self.pinned.insert(e.id.clone(), pin);
+        }
+        let pinned = self.pinned.get(&e.id).cloned().flatten();
+        if let Some((fingerprint, strict)) = pinned {
+            let mode = if strict {
+                tmsg::MODE_STRICT.get()
+            } else {
+                tmsg::MODE_FIRST_USE.get()
+            };
+            put(
+                frame,
+                body,
+                body.x,
+                y,
+                kv(tmsg::KV_CERTIFICATE.get(), &tmsg::pinned_value(mode)),
+            );
+            y += 1;
+            y += put_wrapped(
+                frame,
+                body,
+                body.x,
+                y,
+                &fingerprint,
+                Style::default().fg(th().ui.muted),
+                3,
+            );
+        }
+        let warn = Style::default().fg(th().status.warning);
+        if !rights.excess.is_empty() {
+            let mut pieces: Vec<(String, Style)> =
+                vec![(format!("\u{26A0} {} ", tmsg::EXCESS_LINE.get()), warn)];
+            let last = rights.excess.len() - 1;
+            for (i, scope) in rights.excess.iter().enumerate() {
+                // The sensitive ones stand out.
+                let style = if gitpoulpi_hosting::is_dangerous_scope(scope) {
+                    Style::default()
+                        .fg(th().status.danger)
+                        .add_modifier(Modifier::BOLD)
+                } else {
+                    warn
+                };
+                let sep = if i == last { "" } else { "," };
+                pieces.push((format!("{scope}{sep} "), style));
+            }
+            for line in wrap_pieces(&pieces, body.width as usize) {
+                put(frame, body, body.x, y, line);
+                y += 1;
+            }
+        }
+        if rights.prefer_fine_grained {
+            y += put_wrapped(
+                frame,
+                body,
+                body.x,
+                y,
+                tmsg::PREFER_FINE_GRAINED.get(),
+                warn,
+                2,
+            );
+        }
+        y
     }
 
     /// The local Markdown profile's form: a folder, a Browse button, no token.
@@ -424,6 +579,7 @@ impl IntegrationsPage {
             );
             y += 1;
         }
+        y = self.render_trust_lines(frame, body, y, e);
         y += 1;
         let mut x = body.x;
         for (label, item) in [
@@ -916,4 +1072,37 @@ pub(super) fn put_wrapped(
         drawn += 1;
     }
     drawn
+}
+
+/// The pinned certificate of profile `id`: its fingerprint in groups of four
+/// and whether the pin is strict. One read of the trust store, remembered by
+/// the page.
+fn read_pin(gate: &gitpoulpi_hosting::TrustGate, id: &str) -> Option<(String, bool)> {
+    let tls = gate.record_of(id)?.tls?;
+    Some((
+        tls.cert.grouped(),
+        tls.mode == gitpoulpi_hosting::trust::TlsMode::Strict,
+    ))
+}
+
+/// Styled words wrapped to `width` columns: each piece keeps its style, a
+/// piece never splits inside a word.
+fn wrap_pieces(pieces: &[(String, Style)], width: usize) -> Vec<Vec<Span<'static>>> {
+    let width = width.max(1);
+    let mut lines: Vec<Vec<Span<'static>>> = vec![Vec::new()];
+    let mut used = 0;
+    for (text, style) in pieces {
+        for word in text.split_inclusive(' ') {
+            let w = display_width(word);
+            if used > 0 && used + display_width(word.trim_end()) > width {
+                lines.push(Vec::new());
+                used = 0;
+            }
+            if let Some(line) = lines.last_mut() {
+                line.push(Span::styled(word.to_string(), *style));
+            }
+            used += w;
+        }
+    }
+    lines
 }

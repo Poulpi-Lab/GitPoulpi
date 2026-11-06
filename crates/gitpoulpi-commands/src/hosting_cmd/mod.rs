@@ -1341,6 +1341,51 @@ mod tests {
         assert!(out.human.contains("MISSING"));
     }
 
+    #[test]
+    fn test_reports_excess_scopes_and_the_token_flavor() {
+        let f = fixture(RecordedTransport::new().on_with_headers(
+            "/user",
+            200,
+            USER,
+            &[(
+                "X-OAuth-Scopes",
+                "repo, read:user, admin:public_key, delete_repo",
+            )],
+        ));
+        add(&f.env, "github", None, None);
+        f.store.store("integration:github", "ghp_tok").unwrap();
+        let out = block_on(run_integrations(
+            &f.env,
+            IntegrationsAction::Test { id: None },
+        ))
+        .unwrap();
+        assert_eq!(out.json["excess_scopes"][0], "delete_repo");
+        assert_eq!(out.json["token_flavor"], "classic");
+        assert_eq!(out.json["recommend_fine_grained"], true);
+        assert!(out.human.contains("more rights than needed"));
+    }
+
+    #[test]
+    fn test_with_exact_scopes_carries_empty_excess_fields() {
+        let f = fixture(RecordedTransport::new().on_with_headers(
+            "/user",
+            200,
+            USER,
+            &[("X-OAuth-Scopes", "repo, read:user, admin:public_key")],
+        ));
+        add(&f.env, "github", None, None);
+        f.store.store("integration:github", "tok").unwrap();
+        let out = block_on(run_integrations(
+            &f.env,
+            IntegrationsAction::Test { id: None },
+        ))
+        .unwrap();
+        assert_eq!(out.json["excess_scopes"], serde_json::json!([]));
+        assert_eq!(out.json["recommend_fine_grained"], false);
+        assert_eq!(out.json["expires_at"], Value::Null);
+        assert!(!out.human.contains("more rights"));
+    }
+
     fn remote(name: &str, url: &str) -> Remote {
         Remote {
             name: name.into(),

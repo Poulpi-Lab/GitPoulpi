@@ -1150,6 +1150,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Intégrations : Gérer le profil de ce dépôt |  |
 | Intégrations : Connecter une intégration... |  |
 | Paramètres : Options du Radar d'un profil... |  |
+| Intégrations : Vérifier la sécurité |  |
 | Application : Quitter | `q` |
 | Application : Thème... |  |
 | Application : Changer de thème... | `Ctrl+N y` |

@@ -1150,6 +1150,7 @@ Tangenterna är standardvärdena.
 | Integrationer: Hantera det här repositoryts profil |  |
 | Integrationer: Anslut integration... |  |
 | Inställningar: Radar-alternativ för en profil... |  |
+| Integrations: Review security check |  |
 | App: Avsluta | `q` |
 | App: Tema... |  |
 | App: Byt tema... | `Ctrl+N y` |

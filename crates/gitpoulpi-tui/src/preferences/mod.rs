@@ -412,6 +412,27 @@ impl PreferencesState {
         }
     }
 
+    /// The security check accepted a new address: the profile's form opens
+    /// with the token field focused (the saved token was never sent there).
+    #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+    pub(crate) fn show_retoken(&mut self, profile_id: &str) {
+        self.reload_integrations();
+        self.show_integration(Some(profile_id));
+        self.integrations.begin_retoken(&self.config, profile_id);
+    }
+
+    /// Reads the profile list from the file again, after the security check
+    /// changed what is trusted (or disconnected a profile).
+    #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+    pub(crate) fn reload_integrations(&mut self) {
+        if let Some(path) = self.config_path.as_deref() {
+            if let Ok(fresh) = Config::load(path) {
+                self.config.integrations = fresh.integrations;
+            }
+        }
+        self.integrations.forget_trust_cache();
+    }
+
     /// Lands on the Integrations page, on the Radar block of the first
     /// connected code host (the palette's *Radar Options of a Profile*).
     /// With no connected code host it is the page itself.

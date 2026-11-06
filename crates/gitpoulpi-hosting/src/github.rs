@@ -10,8 +10,9 @@ use crate::http::{HttpRequest, HttpResponse, HttpTransport};
 use crate::integration::Integration;
 use crate::metadata::{HostedLabel, HostedMilestone, IssueEdit, ItemMeta, MetaKind, PrEdit};
 use crate::model::{
-    best_pull_request, missing_scopes, ChecksState, HostedUser, IssueFilter, IssueState,
-    IssueSummary, PrFilter, PullRequestState, PullRequestSummary, StateFilter, TokenCheck,
+    best_pull_request, excess_scopes, missing_scopes, ChecksState, HostedUser, IssueFilter,
+    IssueState, IssueSummary, PrFilter, PullRequestState, PullRequestSummary, StateFilter,
+    TokenCheck, TokenFlavor,
 };
 use crate::project::{HostedProject, HostedSshKey};
 use crate::Result;
@@ -258,11 +259,28 @@ impl HostingClient for GitHubClient {
             .as_deref()
             .map(|granted| missing_scopes(required, granted))
             .unwrap_or_default();
+        // Optional scopes a feature can use: not an excess.
+        let excess = scopes
+            .as_deref()
+            .map(|granted| excess_scopes(required, &["read:org", "workflow"], granted))
+            .unwrap_or_default();
+        // The prefix says what the header cannot: a fine-grained token has no
+        // scope list to read, a `ghp_` one is classic.
+        let flavor = if self.token.starts_with("github_pat_") {
+            TokenFlavor::FineGrained
+        } else if self.token.starts_with("ghp_") || scopes.is_some() {
+            TokenFlavor::Classic
+        } else {
+            TokenFlavor::Unknown
+        };
         Ok(TokenCheck {
             user,
             scopes,
             missing_scopes: missing,
             expires_at: header_value(&response, "github-authentication-token-expiration"),
+            excess_scopes: excess,
+            token_flavor: Some(flavor),
+            recommend_fine_grained: self.token.starts_with("ghp_"),
         })
     }
 
@@ -1026,6 +1044,78 @@ mod tests {
         assert_eq!(check.user.name, "Octo Cat");
         assert_eq!(check.user.id, "9");
         assert_eq!(check.missing_scopes, vec!["admin:public_key"]);
+        assert_eq!(check.expires_at.as_deref(), Some("2026-12-01 10:00:00 UTC"));
+    }
+
+    fn client_with_token(token: &str, transport: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
+        client_for(
+            Integration::new("gh", IntegrationKind::Github, "https://github.com"),
+            token.into(),
+            transport,
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn a_classic_token_with_extra_rights_lists_them_dangerous_first() {
+        let transport = Arc::new(RecordedTransport::new().on_with_headers(
+            "/user",
+            200,
+            USER,
+            &[
+                (
+                    "X-OAuth-Scopes",
+                    "repo, read:user, admin:public_key, gist, delete_repo, repo:status",
+                ),
+                (
+                    "github-authentication-token-expiration",
+                    "2026-12-01 10:00:00 UTC",
+                ),
+            ],
+        ));
+        let c = client_with_token("ghp_abc", transport);
+        let check = block_on(c.check_token()).unwrap();
+        assert!(check.missing_scopes.is_empty());
+        // `repo:status` is part of `repo`; `delete_repo` leads.
+        assert_eq!(check.excess_scopes, vec!["delete_repo", "gist"]);
+        assert_eq!(check.token_flavor, Some(crate::TokenFlavor::Classic));
+        assert!(check.recommend_fine_grained);
+        assert_eq!(check.expires_at.as_deref(), Some("2026-12-01 10:00:00 UTC"));
+    }
+
+    #[test]
+    fn a_token_with_exactly_the_needed_scopes_and_no_expiry_has_nothing_to_say() {
+        let transport = Arc::new(RecordedTransport::new().on_with_headers(
+            "/user",
+            200,
+            USER,
+            &[("X-OAuth-Scopes", "repo, read:user, admin:public_key")],
+        ));
+        let c = client_with_token("0123456789abcdef", transport);
+        let check = block_on(c.check_token()).unwrap();
+        assert!(check.excess_scopes.is_empty());
+        assert!(!check.recommend_fine_grained);
+        assert_eq!(check.expires_at, None);
+    }
+
+    #[test]
+    fn a_fine_grained_token_shows_only_its_expiry() {
+        let transport = Arc::new(RecordedTransport::new().on_with_headers(
+            "/user",
+            200,
+            USER,
+            &[(
+                "github-authentication-token-expiration",
+                "2026-12-01 10:00:00 UTC",
+            )],
+        ));
+        let c = client_with_token("github_pat_xyz", transport);
+        let check = block_on(c.check_token()).unwrap();
+        assert_eq!(check.scopes, None);
+        assert!(check.excess_scopes.is_empty() && check.missing_scopes.is_empty());
+        assert_eq!(check.token_flavor, Some(crate::TokenFlavor::FineGrained));
+        assert!(!check.recommend_fine_grained);
         assert_eq!(check.expires_at.as_deref(), Some("2026-12-01 10:00:00 UTC"));
     }
 

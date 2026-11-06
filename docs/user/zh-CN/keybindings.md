@@ -1114,6 +1114,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 集成：管理此仓库的配置 |  |
 | 集成：连接集成… |  |
 | 设置：配置的 Radar 选项… |  |
+| Integrations: Review security check |  |
 | 应用：退出 | `q` |
 | 应用：主题… |  |
 | 应用：更改主题… | `Ctrl+N y` |

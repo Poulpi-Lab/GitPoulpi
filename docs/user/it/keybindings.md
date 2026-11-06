@@ -1152,6 +1152,7 @@ applicano. I tasti sono quelli predefiniti.
 | Integrazioni: Gestisci il profilo di questo repository |  |
 | Integrazioni: Connetti un'integrazione... |  |
 | Impostazioni: Opzioni del Radar di un profilo... |  |
+| Integrations: Review security check |  |
 | App: Esci | `q` |
 | App: Tema... |  |
 | App: Cambia tema... | `Ctrl+N y` |

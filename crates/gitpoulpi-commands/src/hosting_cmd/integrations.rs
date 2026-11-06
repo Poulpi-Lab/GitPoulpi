@@ -263,7 +263,7 @@ pub(super) async fn run_integrations(
                 )
                 .map_err(|e| e.to_string())?;
             let human = format!(
-                "`{}`: token belongs to @{}{}{}",
+                "`{}`: token belongs to @{}{}{}{}",
                 integration.id,
                 check.user.login,
                 match &check.scopes {
@@ -274,7 +274,8 @@ pub(super) async fn run_integrations(
                     String::new()
                 } else {
                     format!(" - MISSING: {}", check.missing_scopes.join(", "))
-                }
+                },
+                excess_note(&check)
             );
             Ok(Emitted {
                 exit_code: 0,
@@ -284,6 +285,9 @@ pub(super) async fn run_integrations(
                     "scopes": check.scopes,
                     "missing_scopes": check.missing_scopes,
                     "expires_at": check.expires_at,
+                    "excess_scopes": check.excess_scopes,
+                    "token_flavor": check.token_flavor,
+                    "recommend_fine_grained": check.recommend_fine_grained,
                 }),
                 human,
             })
@@ -479,14 +483,15 @@ pub(super) async fn login(
     env.save_integrations(&integrations)?;
 
     let human = format!(
-        "`{}` connected as @{}{}",
+        "`{}` connected as @{}{}{}",
         integration.id,
         check.user.login,
         if check.missing_scopes.is_empty() {
             String::new()
         } else {
             format!(" - token lacks: {}", check.missing_scopes.join(", "))
-        }
+        },
+        excess_note(&check)
     );
     Ok(Emitted {
         exit_code: 0,
@@ -496,6 +501,9 @@ pub(super) async fn login(
             "scopes": check.scopes,
             "missing_scopes": check.missing_scopes,
             "expires_at": check.expires_at,
+            "excess_scopes": check.excess_scopes,
+            "token_flavor": check.token_flavor,
+            "recommend_fine_grained": check.recommend_fine_grained,
             "token_stored": true,
         }),
         human,
@@ -702,4 +710,21 @@ pub(super) async fn trust_integration(
         }),
         human,
     })
+}
+
+/// The human line about rights beyond what GitPoulpi needs (empty when the
+/// host did not say or there are none).
+fn excess_note(check: &gitpoulpi_hosting::TokenCheck) -> String {
+    if check.excess_scopes.is_empty() {
+        return String::new();
+    }
+    format!(
+        " - more rights than needed: {}{}",
+        check.excess_scopes.join(", "),
+        if check.recommend_fine_grained {
+            " (prefer a fine-grained token with an expiry date)"
+        } else {
+            ""
+        }
+    )
 }

@@ -259,6 +259,7 @@ impl HostingClient for RedmineClient {
             scopes: None,
             missing_scopes: Vec::new(),
             expires_at: None,
+            ..Default::default()
         })
     }
 

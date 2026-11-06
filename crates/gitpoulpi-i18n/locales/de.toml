@@ -8738,3 +8738,97 @@ proxy = "Behind a tunnel or reverse proxy"
 proxy_help = "Switch on when a tunnel or proxy in front of the endpoint encrypts the traffic. The server cannot check that, so it is your statement. It lets a non-loopback address run without TLS. Keeping the loopback address and using ssh -L is safer."
 # context: red warning shown while that switch is on
 proxy_warning = "Without TLS, the hop between the tunnel or proxy and the server is plain text on that network."
+
+[trust_dialog]
+# context: title of the dialog that stops an integration whose address, account or certificate changed
+title = "Integration security check"
+# context: body of the dialog; {name} is the id of an integration, {new} and {old} are web addresses
+origin_changed = "{name} now points to {new}, it was {old}. The token was not sent."
+# context: body of the dialog when the saved token of an integration now belongs to another account; {name} is the id of an integration
+account_changed = "The token of {name} now belongs to another account. The token was not used."
+# context: line of the dialog; {login} is a user name on a code host, {id} is the number the host gave that account
+account_was = "Trusted account: {login} (id {id})"
+# context: line of the dialog; {login} is a user name on a code host, {id} is the number the host gave that account
+account_now = "Account now: {login} (id {id})"
+# context: body of the dialog for a server whose certificate no known authority signed; {name} is the id of an integration
+cert_untrusted = "{name} presents a certificate that no known authority signed. Compare its fingerprint with the one the server's administrator gave you before you trust it. The token was not sent."
+# context: body of the dialog; {name} is the id of an integration
+cert_changed = "The certificate of {name} changed since you trusted it. The token was not sent."
+# context: body of the dialog; {name} is the id of an integration, {origin} is a web address starting with http://
+plain_http = "{name} uses {origin}, which is not encrypted: the token and everything else can be read on the way. The token was not sent."
+# context: heading over the certificate that was trusted before, in the security check dialog
+cert_before = "Trusted before"
+# context: heading over the certificate the server presents now, in the security check dialog
+cert_now = "Presented now"
+# context: label before a certificate fingerprint (a SHA-256 hash)
+cert_fingerprint = "SHA-256"
+# context: label before the subject (owner) of a certificate
+cert_subject = "Subject"
+# context: label before the issuer (the authority that signed) of a certificate
+cert_issuer = "Issuer"
+# context: label before the first day a certificate is valid
+cert_valid_from = "Valid from"
+# context: label before the last day a certificate is valid
+cert_valid_to = "Valid to"
+# context: shown instead of a certificate field that was never recorded
+cert_unknown = "(not recorded)"
+# context: numbered answer of the security check dialog; deletes the integration's saved token
+answer_disconnect = "Disconnect (deletes the saved token)"
+# context: numbered answer of the security check dialog; accepts the web address the integration now has
+answer_trust_origin = "Trust the new address"
+# context: numbered answer of the security check dialog; accepts the account the token now belongs to
+answer_trust_account = "Trust the new account"
+# context: numbered answer of the security check dialog; accepts the certificate the server presents
+answer_trust_cert = "Trust the new certificate"
+# context: numbered answer of the security check dialog; accepts an address that is not encrypted
+answer_allow_http = "Allow plain http (not encrypted)"
+# context: numbered answer of the security check dialog; changes nothing
+answer_cancel = "Cancel"
+# context: hint under the answers of the security check dialog
+hint = "Press a number, or Up and Down then Enter. Esc cancels."
+# context: line of the security check dialog; {n} is how many other checks wait after this one
+more_waiting = "More checks are waiting after this one ({n})."
+# context: command palette entry that opens the security check dialog again
+palette_review = "Integrations: Review security check"
+# context: status line when the palette entry finds nothing to review
+none_waiting = "No integration security check is waiting."
+# context: status line; {name} is the id of an integration
+disconnecting = "Disconnecting {name}..."
+# context: status line; {name} is the id of an integration
+trusted_origin = "{name}: the new address is trusted."
+# context: status line; {name} is the id of an integration
+trusted_account = "{name}: the new account is trusted."
+# context: status line; {name} is the id of an integration
+trusted_cert = "{name}: the new certificate is trusted."
+# context: status line; {name} is the id of an integration
+allowed_http = "{name}: plain http is allowed."
+# context: status line; {name} is the id of an integration whose address changed once more after the dialog was shown
+changed_again = "{name} changed again: nothing was trusted. Review it again."
+# context: status line; {name} is the id of an integration that was removed from the configuration
+no_integration = "{name} is no longer in the configuration."
+# context: hint under the token field of an integration form
+token_retype_hint = "Re-entering the token is recommended."
+# context: checkbox of an integration form; pins the key of the server's certificate
+strict_label = "Strict certificate pinning"
+# context: help under the strict pinning checkbox
+strict_help = "Refuse the server when its certificate key changes, even for a certificate a public authority signed."
+# context: checkbox of an integration form shown for an http:// address
+plain_label = "Allow plain http (not encrypted)"
+# context: red warning under the plain http checkbox
+plain_warning = "Warning: the token and everything else travels in clear text and can be read or changed on the way."
+# context: error of an integration form whose address was changed without typing the token again
+url_changed_needs_token = "The address changed: enter the token again to connect to the new address."
+# context: short label (about six letters) of a line on the connected integration card: the pinned certificate key
+kv_certificate = "Pinned"
+# context: value on the connected card, above the key fingerprint; {mode} is one of the next two messages
+pinned_value = "certificate ({mode})"
+# context: pinning mode shown between parentheses after a certificate fingerprint
+mode_strict = "strict"
+# context: pinning mode shown between parentheses after a certificate fingerprint; the key was accepted at first use
+mode_first_use = "first use"
+# context: label of a line on the connected card: when the token stops working
+kv_expires = "Expires"
+# context: yellow warning on the connected card, followed by a comma separated list of permissions of the token
+excess_line = "This token has more rights than GitPoulpi needs:"
+# context: yellow advice on the connected card, under the warning about extra rights
+prefer_fine_grained = "Prefer a fine-grained token with an expiry date"

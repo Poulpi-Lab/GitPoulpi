@@ -1148,6 +1148,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Integrations: Manage This Repository's Profile |  |
 | Integrations: Connect Integration... |  |
 | Settings: Radar Options of a Profile... |  |
+| Integrations: Review security check |  |
 | App: Quit | `q` |
 | App: Theme... |  |
 | App: Change Theme... | `Ctrl+N y` |

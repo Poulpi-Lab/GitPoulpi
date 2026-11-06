@@ -187,6 +187,23 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
     if tab_bar_drag(cx, mouse) {
         return Ok(None);
     }
+    // The integration security check owns the mouse above everything: a click
+    // never reaches what it covers, and a click away from it is swallowed.
+    if crate::trust_dialog::is_open() {
+        *cx.hovered_target = None;
+        *cx.hovered_tab_index = None;
+        *cx.hovered_close_tab = None;
+        *cx.hovered_status_row = None;
+        if let Some(outcome) = crate::trust_dialog::on_mouse(mouse) {
+            crate::trust_dialog::apply(
+                outcome,
+                cx.repo_root,
+                &mut *cx.preferences,
+                &mut *cx.last_message,
+            );
+        }
+        return Ok(None);
+    }
     // The AI popup is modal: the wheel scrolls it, its cross or a click
     // outside closes it (cancelling a running request), a click inside
     // does nothing.

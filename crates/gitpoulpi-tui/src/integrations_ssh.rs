@@ -58,6 +58,10 @@ fn transport_or_default(
 }
 
 fn token_for(tokens: &Tokens, integration: &Integration) -> Result<String, String> {
+    // The security check first: no token is read for a changed address.
+    gitpoulpi_hosting::TrustGate::ambient()
+        .preflight(integration)
+        .map_err(|e| e.to_string())?;
     tokens
         .load(&integration.token_ref)
         .map_err(|e| e.to_string())?

@@ -327,6 +327,8 @@ mod theme;
 mod theme_picker;
 mod tooltip;
 mod tree_fold;
+#[cfg_attr(not(feature = "hosting"), path = "trust_dialog_stub.rs")]
+mod trust_dialog;
 mod ui_kit;
 #[cfg_attr(not(feature = "global-search"), path = "workspace_search_stub.rs")]
 mod workspace_search;

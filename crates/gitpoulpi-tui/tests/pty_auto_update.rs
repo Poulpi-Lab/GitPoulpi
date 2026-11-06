@@ -1,16 +1,19 @@
-//! The self-update (slice B of the updates-and-install design),
-//! against a fake release server on loopback (`GITPOULPI_UPDATE_API`: test
-//! builds refuse every other host) and a temp install folder.
+//! The self-update's download and staging, and the handoff to the updater
+//! (the install-channels design), against a fake release server on loopback
+//! (`GITPOULPI_UPDATE_API`: test builds refuse every other host) and a temp
+//! install folder.
 //!
 //! The binary under test is a hard link of the built `gitpoulpi-tui` placed
 //! next to the `.gitpoulpi-dist` marker, so it counts as a release build and
-//! may replace itself; the "new version" in the fake archive is a shell
-//! script that prints a sentinel, which proves the restart really executed
-//! the swapped-in file. The maintainer's real install is never touched.
+//! may update itself. The TUI no longer swaps files: "Restart to update" and
+//! "Revert" write a job and start `gitpoulpi-updater`, which here is a
+//! recording shell script (`GITPOULPI_UPDATER_EXE`, debug builds only); the
+//! tests assert on the job it was given and that nothing in the install
+//! folder was replaced. The maintainer's real install is never touched.
 //!
-//! Unix only: the scripts need `/bin/sh`. The Windows swap is covered by the
-//! engine's unit tests (`gitpoulpi-update`) against a simulated Windows file
-//! system.
+//! Unix only: the scripts need `/bin/sh`. The swap itself is the updater's
+//! (its own tests) and the engine's (`gitpoulpi-update`, against a simulated
+//! Windows file system).
 #![cfg(unix)]
 
 mod common;
@@ -29,7 +32,7 @@ use xtask::pty::Terminal;
 
 const STEP: Duration = Duration::from_secs(40);
 const NEW_VERSION: &str = "99.0.0";
-const SENTINEL: &str = "STARTED-THE-SWAPPED-IN-FILE";
+const SENTINEL: &str = "UPDATER-STUB-RAN";
 
 /// A fake `api.github.com` plus release-asset host.
 type Files = Vec<(String, Vec<u8>)>;
@@ -41,6 +44,30 @@ struct FakeHost {
 
 fn script(text: &str) -> Vec<u8> {
     format!("#!/bin/sh\necho {text}\nsleep 120\n").into_bytes()
+}
+
+/// A recording stand-in for `gitpoulpi-updater`: copies the job it is started
+/// with to `<dir>/job.json`, prints the sentinel and waits.
+fn updater_stub(dir: &Path) -> PathBuf {
+    let stub = dir.join("gitpoulpi-updater-stub");
+    std::fs::write(
+        &stub,
+        format!(
+            "#!/bin/sh\ncp \"$3\" '{rec}/job.json'\necho {SENTINEL}\nsleep 120\n",
+            rec = dir.display()
+        ),
+    )
+    .unwrap();
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(&stub, std::fs::Permissions::from_mode(0o755)).unwrap();
+    }
+    stub
+}
+
+fn recorded_job(dir: &Path) -> serde_json::Value {
+    let text = std::fs::read_to_string(dir.join("job.json")).expect("the updater got a job");
+    serde_json::from_str(&text).unwrap()
 }
 
 fn archive(version: &str, target: &str) -> Vec<u8> {
@@ -146,12 +173,22 @@ fn install_dir(marker: bool) -> (tempfile::TempDir, PathBuf) {
 }
 
 fn launch(session: &str, host: &FakeHost, exe: &Path, mode: &str) -> Terminal {
+    launch_with(session, host, exe, mode, None)
+}
+
+fn launch_with(
+    session: &str,
+    host: &FakeHost,
+    exe: &Path,
+    mode: &str,
+    updater: Option<&Path>,
+) -> Terminal {
     let repo = FixtureRepoBuilder::new()
         .unwrap()
         .commit("auto update probe")
         .unwrap()
         .build();
-    let (term, config) = common::launch(repo.root())
+    let mut launch = common::launch(repo.root())
         .session(session)
         .size(200, 50)
         .ready("auto update probe")
@@ -161,8 +198,11 @@ fn launch(session: &str, host: &FakeHost, exe: &Path, mode: &str) -> Terminal {
         .env(
             "GITPOULPI_UPDATE_API",
             format!("http://127.0.0.1:{}", host.port),
-        )
-        .start();
+        );
+    if let Some(updater) = updater {
+        launch = launch.env("GITPOULPI_UPDATER_EXE", updater);
+    }
+    let (term, config) = launch.start();
     std::mem::forget(repo);
     std::mem::forget(config);
     term
@@ -194,15 +234,23 @@ fn click_body_text(term: &mut Terminal, text: &str) {
 }
 
 #[test]
-fn update_now_downloads_stages_offers_the_restart_and_the_restart_runs_the_new_file() {
+fn update_now_downloads_stages_offers_the_restart_and_the_restart_hands_the_job_to_the_updater() {
     let host = serve(false);
     let (dir, exe) = install_dir(true);
-    let mut term = launch("pty-auto-update", &host, &exe, "notify");
+    let record = tempfile::tempdir().unwrap();
+    let stub = updater_stub(record.path());
+    let mut term = launch_with("pty-auto-update", &host, &exe, "notify", Some(&stub));
     term.wait_for("the chip announces the new version", STEP, |s| {
         s.contains("v99.0.0 available")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The chip opens the update panel; its Release notes button the tab.
     click_text(&mut term, "v99.0.0 available");
+    term.wait_for("the panel offers the update", STEP, |s| {
+        s.contains("Update and restart") && s.contains("Release notes")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    click_text(&mut term, "Release notes");
     term.wait_for("the tab offers Update now", STEP, |s| {
         s.contains("Update now") && s.contains("Skip this version")
     })
@@ -233,19 +281,21 @@ fn update_now_downloads_stages_offers_the_restart_and_the_restart_runs_the_new_f
         *b"#!",
         "nothing is replaced before the user restarts"
     );
-    // The user's action: the files are swapped and the new file is started.
+    // The user's action: a job is written and the updater is started.
     click_body_text(&mut term, "Restart to update");
-    term.wait_for("the swapped-in file runs", STEP, |s| s.contains(SENTINEL))
+    term.wait_for("the updater runs", STEP, |s| s.contains(SENTINEL))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let marker = std::fs::read_to_string(dir.path().join(MARKER_FILE)).unwrap();
-    assert_eq!(Marker::parse(&marker).unwrap().version, NEW_VERSION);
-    let old = std::fs::read_to_string(dir.path().join(format!("{MARKER_FILE}.old"))).unwrap();
-    assert_eq!(
-        Marker::parse(&old).unwrap().version,
-        env!("CARGO_PKG_VERSION"),
-        "the previous version is kept for a revert"
+    let job = recorded_job(record.path());
+    assert_eq!(job["action"], "apply");
+    assert_eq!(job["to_version"], NEW_VERSION);
+    assert_eq!(job["from_version"], env!("CARGO_PKG_VERSION"));
+    assert_eq!(job["staged"], "in_place");
+    // The TUI did not swap anything itself.
+    assert_ne!(
+        std::fs::read(dir.path().join("gitpoulpi-tui")).unwrap()[..2],
+        *b"#!"
     );
-    assert!(dir.path().join("gitpoulpi-tui.old").exists());
+    assert!(!dir.path().join("gitpoulpi-tui.old").exists());
     term.stop().unwrap();
 }
 
@@ -274,27 +324,25 @@ fn a_checksum_mismatch_is_refused_and_nothing_is_staged() {
 }
 
 #[test]
-fn a_build_without_the_marker_only_downloads_and_says_why() {
+fn a_build_without_the_marker_never_asks_never_downloads_and_shows_only_its_version() {
     let host = serve(false);
     // The plain cargo binary: no `.gitpoulpi-dist` next to it.
-    let mut term = launch(
+    let term = launch(
         "pty-auto-update-dev",
         &host,
         Path::new(env!("CARGO_BIN_EXE_gitpoulpi-tui")),
         "auto",
     );
-    term.wait_for("the chip", STEP, |s| s.contains("v99.0.0 available"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    click_text(&mut term, "v99.0.0 available");
-    term.wait_for("the tab explains and offers Download only", STEP, |s| {
-        s.contains("cannot update itself") && s.contains("Download")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The background check would have fired two seconds after the start.
+    std::thread::sleep(Duration::from_secs(6));
     let screen = term.screen();
-    let (_, row) = screen.find("Skip this version").expect("the buttons row");
-    let buttons = screen.text().lines().nth(row as usize).unwrap().to_string();
-    assert!(!buttons.contains("Update now"), "{buttons}");
-    // Auto mode did not download for a build that cannot take it.
+    assert!(!screen.contains("available"), "{}", term.text());
+    assert!(
+        screen.contains(concat!("v", env!("CARGO_PKG_VERSION"))),
+        "the running version is on the chip\n{}",
+        term.text()
+    );
+    // Auto mode downloaded nothing for a build that cannot take it.
     assert_eq!(host.downloads.load(Ordering::SeqCst), 0);
     term.stop().unwrap();
 }
@@ -316,12 +364,12 @@ fn auto_mode_downloads_by_itself_and_waits_for_the_restart() {
 }
 
 #[test]
-fn revert_swaps_the_previous_files_back_and_restarts_into_them() {
+fn revert_hands_a_revert_job_to_the_updater_and_swaps_nothing_itself() {
     let host = serve(false);
     let (dir, exe) = install_dir(true);
     // As after an update: the previous version's files wait as `.old`.
     let old = dir.path().join("gitpoulpi-tui.old");
-    std::fs::write(&old, script(SENTINEL)).unwrap();
+    std::fs::write(&old, script("previous")).unwrap();
     {
         use std::os::unix::fs::PermissionsExt;
         std::fs::set_permissions(&old, std::fs::Permissions::from_mode(0o755)).unwrap();
@@ -332,7 +380,9 @@ fn revert_swaps_the_previous_files_back_and_restarts_into_them() {
         previous.render(),
     )
     .unwrap();
-    let mut term = launch("pty-auto-update-revert", &host, &exe, "notify");
+    let record = tempfile::tempdir().unwrap();
+    let stub = updater_stub(record.path());
+    let mut term = launch_with("pty-auto-update-revert", &host, &exe, "notify", Some(&stub));
     term.send_keys("C-p").unwrap();
     term.send_text("Revert to the previous").unwrap();
     term.wait_for("the palette lists Revert", STEP, |s| {
@@ -340,9 +390,17 @@ fn revert_swaps_the_previous_files_back_and_restarts_into_them() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Enter").unwrap();
-    term.wait_for("the previous file runs", STEP, |s| s.contains(SENTINEL))
+    term.wait_for("the updater runs", STEP, |s| s.contains(SENTINEL))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let job = recorded_job(record.path());
+    assert_eq!(job["action"], "revert");
+    assert_eq!(job["to_version"], "0.0.9");
+    // Nothing was swapped by the TUI: the previous files still wait.
+    assert!(old.exists());
     let marker = std::fs::read_to_string(dir.path().join(MARKER_FILE)).unwrap();
-    assert_eq!(Marker::parse(&marker).unwrap().version, "0.0.9");
+    assert_eq!(
+        Marker::parse(&marker).unwrap().version,
+        env!("CARGO_PKG_VERSION")
+    );
     term.stop().unwrap();
 }

@@ -75,26 +75,11 @@ fn the_inno_script_installs_per_user_and_shares_the_cli_with_settings() {
 }
 
 /// The channel the package or installer records, spelled as the marker's `channel=` value.
-/// The literal list mirrors `InstallChannel::ALL` of the install-channels design
-/// (slice A). Once that lands, replace `CHANNELS` with `InstallChannel::ALL` and each
-/// `assert_channel(..)` with `InstallChannel::parse(..).is_some()`.
-const CHANNELS: [&str; 12] = [
-    "archive",
-    "inno-user",
-    "inno-machine",
-    "choco",
-    "choco-internal",
-    "winget",
-    "scoop",
-    "homebrew",
-    "apt",
-    "msi",
-    "aur",
-    "docker",
-];
-
 fn assert_channel(channel: &str) {
-    assert!(CHANNELS.contains(&channel), "unknown channel {channel}");
+    assert!(
+        gitpoulpi_config::release::InstallChannel::parse(channel).is_some(),
+        "unknown channel {channel}"
+    );
 }
 
 /// Every program a package ships. `gitpoulpi-updater` is listed ahead of `BINARIES` gaining it
@@ -108,9 +93,7 @@ fn shipped_binaries() -> Vec<&'static str> {
     all
 }
 
-/// The repository's image name, the literal of `DOCKER_IMAGE` (`gitpoulpi-config`, slice A).
-/// Replace with `gitpoulpi_config::release::DOCKER_IMAGE` once it exists.
-const DOCKER_IMAGE: &str = "poulpilab/gitpoulpi";
+use gitpoulpi_config::release::DOCKER_IMAGE;
 
 #[test]
 fn the_inno_script_writes_the_channel_marker_after_the_copy() {

@@ -1,4 +1,5 @@
 "ai" = "Pomocníci AI (vypnutí, dokud není `ai.enabled = true`): vypíší vygenerovanou zprávu commitu, nebo vysvětlí commit či rozpracované změny"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "Vypíše zprávu commitu, kterou AI navrhuje pro změny v indexu (nebo pro všechny změny, když v indexu nic není). Nic necommituje"
 "ai explain" = "Vysvětlí commit (výchozí HEAD) nebo s --wip rozpracované změny"
 "ai resolve-conflict" = "Vypíše řešení, které AI navrhuje pro JEDEN konflikt merge v souboru v konfliktu (`--conflict N`, číslováno od 1; u souboru s jediným konfliktem nepovinné). Jen vypisuje: nic se nezapíše ani nepřidá do indexu, rozhodnutí tak zůstává na volajícím (výsledek celého souboru použije `conflicts resolve --content-file`). Vyžaduje `ai.enabled = true`"
@@ -378,6 +379,7 @@ amend = "Změní vlastnosti commitu aktuální větve: zprávu, jméno, e-mail a
 "ssh-command set --command" = "Doslovná hodnota `core.sshCommand`"
 "ssh-command set --key" = "Soubor privátního klíče: připne `ssh -i \"<key>\" -o IdentitiesOnly=yes`"
 "ssh-command show" = "Ukáže připnutý `core.sshCommand` repozitáře (null, není-li nastaven)"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "Index hunku v diffu `--file`, tak jak je číslují `gitpoulpi diff --json`"
 "stage --lines" = "Indexy řádků uvnitř `--hunk` oddělené čárkou"
 "stash push --ai" = "Nechá AI pojmenovat stash podle rozpracovaných změn (vyžaduje `ai.enabled = true`, viz `docs/user/ai.md`)"

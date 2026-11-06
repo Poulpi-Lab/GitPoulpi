@@ -1,4 +1,5 @@
 ai = "AI-hjälpmedel (av om inte `ai.enabled = true`): skriver ut ett genererat commit-meddelande, eller förklarar en commit eller ändringarna i arbetskatalogen"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "Skriver ut commit-meddelandet som AI:n föreslår för de stagade ändringarna (eller alla ändringar när inget är stagat). Commitar ingenting"
 "ai explain" = "Förklarar en commit (standard HEAD) eller, med --wip, ändringarna i arbetskatalogen"
 "ai resolve-conflict" = "Skriver ut lösningen AI:n föreslår för EN merge-konflikt i en fil med konflikt (`--conflict N`, från 1; valfritt när filen har en enda konflikt). Skriver bara ut: inget skrivs eller stagas, så anroparen avgör (`conflicts resolve --content-file` tillämpar ett resultat för hela filen). Kräver `ai.enabled = true`"
@@ -384,6 +385,7 @@ ssh-command = "Den repositorylokala `core.sshCommand`-fastsättningen: vilken SS
 "ssh-command set --command" = "Ett bokstavligt `core.sshCommand`-värde"
 "ssh-command set --key" = 'Fil med privat nyckel: fäster `ssh -i "<key>" -o IdentitiesOnly=yes`'
 "ssh-command show" = "Visa repositoryts fastsatta `core.sshCommand` (null när inte satt)"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "Index för en hunk i `--file`s diff, som `gitpoulpi diff --json` numrerar dem"
 "stage --lines" = "Kommaseparerade radindex inom `--hunk`"
 "stash push --ai" = "Låt AI:n namnge stashen utifrån ändringarna i arbetskatalogen (kräver `ai.enabled = true`, se `docs/user/ai.md`)"

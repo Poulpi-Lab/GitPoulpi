@@ -110,6 +110,8 @@ impl WindowState {
                 && !self.remote_ui.is_open()
                 && !self.show_help
                 && !self.ai_ui.popup_open()
+                && !crate::ai_sent_dialog::is_open()
+                && !crate::stage_guard_dialog::is_open()
                 && !crate::activity_log::is_open()
                 && !crate::jobs_ui::panel_open()
                 && !crate::updates::panel::is_open()
@@ -248,6 +250,9 @@ impl WindowState {
                 // guard every key handled below fires twice (e.g. one
                 // arrow-key tap moving the selection by two rows).
                 Event::Key(key) if key.kind != KeyEventKind::Press => {}
+                // The two question dialogs have no text field: a paste goes nowhere.
+                Event::Paste(_)
+                    if crate::ai_sent_dialog::is_open() || crate::stage_guard_dialog::is_open() => {}
                 // A pasted token goes into Preferences' Integrations form.
                 Event::Paste(text) if self.preferences.is_some() => {
                     if let Some(prefs) = self.preferences.as_mut() {

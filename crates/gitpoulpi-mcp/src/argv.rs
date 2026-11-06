@@ -242,6 +242,47 @@ mod tests {
         assert!(to_argv(&s, &args).is_err(), "flow_start accepted a hash");
     }
 
+    /// `stage` offers `allow_sensitive` only when the operator turned
+    /// `[mcp] allow_sensitive_staging` on: otherwise it is neither in the
+    /// schema nor accepted, so an agent cannot pass the staging guard.
+    #[test]
+    fn allow_sensitive_is_offered_only_when_the_operator_allows_it() {
+        let stage = |allow: bool| {
+            let cfg = gitpoulpi_config::McpConfig {
+                allow_sensitive_staging: allow,
+                ..Default::default()
+            };
+            registry::tools_for(&cfg)
+                .into_iter()
+                .find(|s| s.name == "stage")
+                .expect("stage is a tool")
+        };
+        let args: Map<String, Value> = json!({ "all": true, "allow_sensitive": true })
+            .as_object()
+            .unwrap()
+            .clone();
+
+        let closed = stage(false);
+        assert!(closed.input_schema["properties"]
+            .get("allow_sensitive")
+            .is_none());
+        assert!(closed.input_schema["properties"].get("all").is_some());
+        let err = to_argv(&closed, &args).unwrap_err();
+        assert!(err.contains("allow_sensitive"), "{err}");
+        // A plain stage still works.
+        let plain: Map<String, Value> = json!({ "all": true }).as_object().unwrap().clone();
+        assert!(to_argv(&closed, &plain).is_ok());
+
+        let open = stage(true);
+        assert!(open.input_schema["properties"]
+            .get("allow_sensitive")
+            .is_some());
+        let argv = to_argv(&open, &args).unwrap();
+        assert!(argv.contains(&"--allow-sensitive".to_string()), "{argv:?}");
+        // The default table is the closed one.
+        assert!(spec("stage").withheld.contains(&"allow_sensitive"));
+    }
+
     #[test]
     fn unknown_property_is_invalid_params() {
         let s = spec("status");

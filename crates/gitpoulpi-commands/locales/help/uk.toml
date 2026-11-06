@@ -1,4 +1,5 @@
 ai = "Помічники ШІ (вимкнено, доки не `ai.enabled = true`): виводять згенероване повідомлення коміту або пояснюють коміт чи робочі зміни"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "Виводить повідомлення коміту, яке ШІ пропонує для змін в індексі (або для всіх змін, якщо в індексі нічого немає). Нічого не комітить"
 "ai explain" = "Пояснює коміт (типово HEAD) або, з --wip, робочі зміни"
 "ai resolve-conflict" = "Виводить вирішення, яке ШІ пропонує для ОДНОГО конфлікту злиття у файлі з конфліктом (`--conflict N`, нумерація з 1; необов'язково, якщо в файлі один конфлікт). Лише виводить: нічого не записується й не додається в індекс, тож рішення за викликачем (`conflicts resolve --content-file` застосовує результат для всього файлу). Потрібен `ai.enabled = true`"
@@ -384,6 +385,7 @@ ssh-command = "Закріплення `core.sshCommand` у репозиторі�
 "ssh-command set --command" = "Буквальне значення `core.sshCommand`"
 "ssh-command set --key" = 'Файл приватного ключа: закріплює `ssh -i "<key>" -o IdentitiesOnly=yes`'
 "ssh-command show" = "Показує закріплений `core.sshCommand` репозиторію (null, якщо не задано)"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "Індекс hunk у diff `--file`, як їх нумерує `gitpoulpi diff --json`"
 "stage --lines" = "Індекси рядків через кому в межах `--hunk`"
 "stash push --ai" = "Дозволити ШІ назвати stash за робочими змінами (потрібен `ai.enabled = true`, див. `docs/user/ai.md`)"

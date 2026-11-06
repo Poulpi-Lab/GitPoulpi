@@ -249,6 +249,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
         || crate::revert_mainline::is_open()
         || crate::tag_delete_dialog::is_open()
         || crate::stage_guard_dialog::is_open()
+        || crate::ai_sent_dialog::is_open()
         || crate::conflict_popup::is_open()
         || crate::mermaid_popup::is_open()
         || crate::profile_bar::is_open()
@@ -829,6 +830,9 @@ pub(in crate::event_loop) fn draw_overlay_menus(
     }
 
     ai_ui.render_popup(frame, frame.area());
+    // "What is sent" before an AI request: over the explanation popup too
+    // (an Explain shows its popup while it works).
+    crate::ai_sent_dialog::render(frame);
     crate::about::render(frame);
     // The notification card and the Activity Log, over everything.
     crate::activity_log::render(frame);

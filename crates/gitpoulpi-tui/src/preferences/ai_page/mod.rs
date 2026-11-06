@@ -13,9 +13,11 @@
 //! their own threads and report on a channel `poll_ai` drains.
 
 mod open_agent;
+mod privacy_rows;
 mod review_browse;
 mod review_rows;
 
+pub(in crate::preferences) use privacy_rows::PrivacyRow;
 pub(in crate::preferences) use review_rows::ReviewRow;
 
 use crate::th;
@@ -74,6 +76,8 @@ pub(super) enum AiTarget {
     RepoMode,
     /// One of the four code review context rows (`[ai.review]`).
     Review(AiScope, ReviewRow),
+    /// A privacy row (`[ai.privacy]`, `[ai.sent_preview]`).
+    Privacy(PrivacyRow),
 }
 
 /// Where an AI row is saved: `config.toml`, or this repository's
@@ -172,6 +176,8 @@ pub(super) enum AiButton {
     ResetReview,
     /// "Browse..." next to the extra file field of the code review rows.
     BrowseExtra(AiScope),
+    /// "Show all again": every request is shown before it is sent.
+    ShowAllPreviews,
 }
 
 /// What a background thread reports.
@@ -657,8 +663,10 @@ impl PreferencesState {
     }
 
     pub(super) fn ai_commit_bool(&mut self, target: AiTarget, value: bool) {
-        if let AiTarget::Review(scope, row) = target {
-            self.review_commit_bool(scope, row, value);
+        match target {
+            AiTarget::Review(scope, row) => self.review_commit_bool(scope, row, value),
+            AiTarget::Privacy(row) => self.privacy_commit_bool(row, value),
+            _ => {}
         }
     }
 
@@ -1024,6 +1032,7 @@ impl PreferencesState {
                 }
             }
             AiButton::ResetReview => self.review_reset_repo(),
+            AiButton::ShowAllPreviews => self.privacy_show_all(),
             AiButton::BrowseExtra(scope) => self.review_open_browse(scope),
             AiButton::ResetRepo(action) => {
                 self.edit_repo_override(action, |o| *o = Default::default());

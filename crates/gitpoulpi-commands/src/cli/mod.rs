@@ -511,7 +511,8 @@ pub enum Commands {
     Ai {
         /// Print what would be sent to the model (the system and user text
         /// after secrets are redacted and sensitive files left out) and
-        /// send nothing. Needs no key and no network.
+        /// send nothing. Needs `ai.enabled = true`, but no key and no
+        /// network.
         #[arg(long, global = true)]
         print_sent: bool,
         #[command(subcommand)]

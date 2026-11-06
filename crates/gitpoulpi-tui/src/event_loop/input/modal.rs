@@ -44,6 +44,14 @@ pub(super) fn settings_closed(cx: &mut CommandCtx<'_>) {
 }
 
 pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> io::Result<Flow> {
+    // "What is sent" before an AI request owns the keyboard, ahead of every
+    // mode: the request that asked can come from a form (the commit message
+    // box) or the Explain popup, which are not `Normal`.
+    if key.kind == KeyEventKind::Press && crate::ai_sent_dialog::is_open() {
+        crate::ai_sent_dialog::on_key(key);
+        return Ok(Flow::Handled);
+    }
+
     let km = env.km;
     // A ref drag in flight owns `Esc`, ahead of every mode and overlay below: it
     // is a gesture, not a mode, and backing out of one must not also close

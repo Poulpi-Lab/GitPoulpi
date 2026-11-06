@@ -111,6 +111,9 @@ pub struct Privacy {
     /// Asked before the first request of a run goes out.
     pub gate: Option<Arc<dyn SendGate>>,
     report: Arc<Report>,
+    /// The gate said yes once for this run (shared by every clone, so a retry
+    /// of the same request is not asked again).
+    approved: Arc<std::sync::atomic::AtomicBool>,
 }
 
 impl std::fmt::Debug for Privacy {
@@ -140,6 +143,7 @@ impl Privacy {
             print_only: false,
             gate: None,
             report: Arc::default(),
+            approved: Arc::default(),
         }
     }
 
@@ -274,16 +278,11 @@ impl AiClient for Nothing {
 pub struct PrivacyClient {
     inner: Box<dyn AiClient>,
     privacy: Privacy,
-    approved: std::sync::atomic::AtomicBool,
 }
 
 impl PrivacyClient {
     pub fn new(inner: Box<dyn AiClient>, privacy: Privacy) -> Self {
-        Self {
-            inner,
-            privacy,
-            approved: std::sync::atomic::AtomicBool::new(false),
-        }
+        Self { inner, privacy }
     }
 
     /// A client that only records what it would send.
@@ -305,11 +304,11 @@ impl AiClient for PrivacyClient {
         }
         if let Some(gate) = &self.privacy.gate {
             // One decision per run: a retry of the same request is not asked again.
-            if !self.approved.load(Ordering::SeqCst) {
+            if !self.privacy.approved.load(Ordering::SeqCst) {
                 if !gate.confirm(&prepared).await {
                     return Err(Error::Declined);
                 }
-                self.approved.store(true, Ordering::SeqCst);
+                self.privacy.approved.store(true, Ordering::SeqCst);
             }
         }
         self.inner.complete(&prepared.system, &prepared.user).await

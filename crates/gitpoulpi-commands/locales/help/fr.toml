@@ -1,4 +1,5 @@
 ai = "Assistants IA (désactivés sauf si `ai.enabled = true`) : afficher un message de commit généré, ou expliquer un commit ou les modifications en cours"
+"ai --print_sent" = "Print what would be sent to the model (the system and user text after secrets are redacted and sensitive files left out) and send nothing. Needs `ai.enabled = true`, but no key and no network"
 "ai commit-message" = "Affiche le message de commit que l'IA propose pour les modifications indexées (ou pour toutes les modifications si rien n'est indexé). Ne commite rien"
 "ai explain" = "Explique un commit (HEAD par défaut) ou, avec --wip, les modifications en cours"
 "ai resolve-conflict" = "Affiche la résolution que l'IA suggère pour UN conflit de fusion d'un fichier en conflit (`--conflict N`, à partir de 1 ; facultatif quand le fichier n'a qu'un seul conflit). Affiche seulement : rien n'est écrit ni indexé, c'est à l'appelant de décider (`conflicts resolve --content-file` applique un résultat pour tout le fichier). Nécessite `ai.enabled = true`"
@@ -384,6 +385,7 @@ ssh-command = "Le pin `core.sshCommand` local au dépôt : quelle clé SSH ce d
 "ssh-command set --command" = "Une valeur littérale de `core.sshCommand`"
 "ssh-command set --key" = "Fichier de clé privée : épingle `ssh -i \"<key>\" -o IdentitiesOnly=yes`"
 "ssh-command show" = "Affiche le `core.sshCommand` épinglé du dépôt (null si non défini)"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "Indice d'un hunk dans le diff de `--file`, tel que `gitpoulpi diff --json` les numérote"
 "stage --lines" = "Indices de lignes séparés par des virgules dans `--hunk`"
 "stash push --ai" = "Laisse l'IA nommer la mise de côté d'après les modifications en cours (nécessite `ai.enabled = true`, voir `docs/user/ai.md`)"

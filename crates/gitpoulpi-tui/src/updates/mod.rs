@@ -400,6 +400,7 @@ fn run_check(force: bool) -> Outcome {
         channel,
         target: gitpoulpi_config::release::host_target(),
         token: github_token(),
+        pin: None,
     };
     perform(
         &transport,

@@ -72,7 +72,8 @@ pub struct Account {
     pub id: String,
 }
 
-/// Why a client was not built, or a request not sent.
+/// Why a client was not built, or a request not sent. (The larger payloads
+/// are boxed: this travels inside `Error`, which is returned everywhere.)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TrustProblem {
     /// The address now differs from the recorded one.
@@ -84,19 +85,19 @@ pub enum TrustProblem {
     /// The token now belongs to another account.
     AccountChanged {
         subject: TrustSubject,
-        old: Account,
-        new: Account,
+        old: Box<Account>,
+        new: Box<Account>,
     },
     /// First use of a certificate that does not chain to a known root.
     UntrustedCertificate {
         subject: TrustSubject,
-        new: CertInfo,
+        new: Box<CertInfo>,
     },
     /// The certificate key is not the recorded one.
     CertificateChanged {
         subject: TrustSubject,
-        old: CertInfo,
-        new: CertInfo,
+        old: Box<CertInfo>,
+        new: Box<CertInfo>,
     },
     /// A non-loopback `http://` address that was not allowed.
     PlainHttp {

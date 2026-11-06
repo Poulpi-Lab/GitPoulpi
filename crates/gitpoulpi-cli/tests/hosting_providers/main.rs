@@ -11,6 +11,8 @@ mod board;
 mod common;
 mod integrations;
 mod refs;
+#[cfg(feature = "gitlab")]
+mod trust;
 
 #[cfg(feature = "azure-devops")]
 mod azure;

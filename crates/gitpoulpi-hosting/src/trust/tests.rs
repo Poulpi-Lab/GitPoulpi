@@ -364,19 +364,19 @@ fn the_problem_spellings_a_script_reads_are_stable() {
     let kinds = [
         TrustProblem::AccountChanged {
             subject: TrustSubject::Integration("x".into()),
-            old: Account::default(),
-            new: Account::default(),
+            old: Box::default(),
+            new: Box::default(),
         }
         .change(),
         TrustProblem::UntrustedCertificate {
             subject: TrustSubject::Integration("x".into()),
-            new: CertInfo::default(),
+            new: Box::default(),
         }
         .change(),
         TrustProblem::CertificateChanged {
             subject: TrustSubject::Integration("x".into()),
-            old: CertInfo::default(),
-            new: CertInfo::default(),
+            old: Box::default(),
+            new: Box::default(),
         }
         .change(),
         TrustProblem::PlainHttp {

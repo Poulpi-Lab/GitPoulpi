@@ -1004,6 +1004,64 @@ Three content rules in the same stage as the S9/S21 ones: `RuleKind::LineEndings
 - **What the window does**: `apply_propose` refuses unless the input mode is normal and no proposal is pending, then `open_rewrite_proposed` builds the workbench like the palette does (`rewrite_scope_context`) and `RewriteView::with_proposed` swaps the recipe in and sets a notice. **Nothing is previewed, applied, purged or pushed by it**: the only path that tells the proposal it was accepted is `send_apply`, reached from the user's own Apply key or click (`proposal::confirmed(Dialog::Rewrite, recipe json)`); `agent_propose_tick` settles it once the workbench closes (`accepted` when the recipe is as proposed, `accepted_edited` when changed, `rejected` when never applied). The banner (`✦ Proposed by <client>: ...`) is the global one, drawn over the workbench too.
 - **Tests**: PTY `pty_rewrite_propose.rs` (opens filled and marked, waiting and a preview rewrite nothing, Esc rejects, then the user's F5 and Ctrl+S rewrite and the proposal is accepted); CLI `propose_rewrite_*` (script refused before routing, secrets dropped, repository untouched); MCP `a_rewrite_proposal_reaches_the_window_and_rewrites_nothing` and the policy list; core unit tests. Falsified: making the view preview and apply by itself when opened turns the PTY test red at "opening rewrites nothing".
 
+## Integration trust
+
+A saved token is only as safe as the address it is sent to, so the address, the
+account and the certificate an integration was connected with are recorded
+(`gitpoulpi-hosting/src/trust/`) and checked before a client exists.
+
+- **Where.** `<private>/trust.toml` (`TrustStore`), written through
+  `secure_fs::write_private`. Not in `config.toml`: anything that can edit the
+  config (including an agent with file access) must not be able to widen trust.
+  A file that exists but does not parse is an **error** (`Error::TrustStore`),
+  never an empty store: an empty one would let the migration re-trust whatever the
+  config says now. `TrustGate` re-reads the file on every use, so a `trust` run in
+  another process applies at once.
+- **The gate.** `client_for(integration, token, transport, gate)` calls
+  `TrustGate::admit`: plain http, then origin (normalized `scheme://host[:port]` +
+  base path, IDNA, default port dropped), each refusal a `TrustProblem` that is
+  also queued (`trust::report`, deduplicated per subject and kind) for whoever asks
+  a person. The CLI resolves **no token** before `preflight` has passed.
+  Then the transport is wrapped in `GuardedTransport`: a request off
+  `api_origins(kind, recorded)` is refused unsent. Providers that need a second
+  host must be added to `api_origins`; the provider test suites run under the same
+  guard (`TrustGate::for_tests`), which is how a stray host shows up.
+- **Migration.** No record: an integration with a cached `user` (or one the caller
+  `adopt`s because a token resolved) gets a record from the config as it stands,
+  written silently on first use. One that was never connected is held in memory
+  until `record_after_check` runs, so a failed login on a typo does not pin the
+  typo.
+- **Account.** `verify_account` / `check_account` compare the host's account **id**
+  (login only when an id is missing); a record with no account yet learns it.
+  Always after a token is stored, once per process for `GITPOULPI_TOKEN_*` or helper
+  tokens, and after 24 hours otherwise. The CLI wires it into `login`, `test` and
+  `projects`; other commands rely on the origin gate.
+- **TLS traps.** (1) `ReqwestTransport` has **one** shared client with pooling off
+  (a kept-alive connection belongs to the runtime that opened it), built with
+  `use_preconfigured_tls(GuardedVerifier)`: the verifier's policy table is
+  process-wide, keyed by host, filled by the gate whenever it admits a record, so a
+  second integration on the same host with no pin does not clear the first's.
+  (2) `GuardedVerifier` delegates `verify_tls12_signature`, `verify_tls13_signature`
+  and `supported_verify_schemes` to webpki **always**: that signature is what proves
+  the server owns the pinned key; skipping it makes a pin a bearer token anyone
+  who has seen the certificate can replay (a handshake test with a server holding
+  the wrong key guards this). (3) A pin only excuses issuer, self-signature and
+  name failures, never expiry. (4) `rustls` must stay the version reqwest links
+  (0.23, ring). (5) `send` follows redirects only within one origin: only
+  `Authorization` is stripped by the library on a cross-origin redirect, the other
+  token headers are not.
+- **Forgetting.** `trust::forget(paths, integration)` (logout and remove) deletes
+  the record and what was cached from the host: the Clone dialog's lists, the Radar
+  account answer, the remote review drafts keyed by the host. Per-repository Radar
+  snapshots are keyed by repository and cannot be enumerated from an integration;
+  they hold public lists and age out.
+- **AI.** `TrustGate::admit_ai` binds an API-key profile to the origin of its
+  `effective_base_url()` (loopback http allowed, no account check); a local agent
+  has nothing to bind.
+- **Trust is a person's.** `hosting integrations trust` and `ai trust` need
+  `Session::may_trust()` and are in the MCP `EXCLUDED` list; an agent only reads the
+  refusal text (`TRUST_REFUSAL`).
+
 ## Traps: a ref to a missing object, and a daemon that "stopped" mid-read
 
 - **`%(*objectname)` aborts git on a ref whose object is gone.** git 2.5x double-frees (SIGABRT, exit 134) when `for-each-ref` formats `%(*objectname)` or `%(*objecttype)` for a ref to a missing object, after listing a valid ref first; `%(objectname)` and `%(upstream:short)` print the raw id and exit 0. `refs()` on the system backend therefore never asks for the peeled fields: it peels only tag and mirror rows with one `cat-file --batch-check` (`<oid>^{}`; a missing object keeps its raw id, like `Git2Backend`). The other reads that still use them (`filtered_tips`, `messages::tips`, the rewrite `history::refs::list`) go through `read_with_retry` (one retry after 100 ms, then the error with its exit code and stderr), and `filtered_tips` returns that error instead of an empty list (an empty list made the Log walk only `HEAD`). Contract check: `check_refs_survive_a_ref_to_a_missing_object`.

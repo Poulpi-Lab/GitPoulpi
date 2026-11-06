@@ -31,5 +31,30 @@ fn the_board_commands_are_tools() {
     }
 }
 
+/// Accepting a changed address, account or certificate is a person's
+/// decision: neither trust command is a tool, and both are named in
+/// `EXCLUDED`, so an agent only ever reads the refusal.
+#[test]
+fn an_agent_cannot_trust_an_integration() {
+    use gitpoulpi_mcp::registry::excluded_reason;
+    let all = tools();
+    for path in [
+        &["hosting", "integrations", "trust"][..],
+        &["ai", "trust"][..],
+    ] {
+        assert!(
+            all.iter().all(|t| t.cli_path != path),
+            "`{}` is a tool",
+            path.join(" ")
+        );
+        let owned: Vec<String> = path.iter().map(|s| s.to_string()).collect();
+        assert!(
+            excluded_reason(&owned).is_some(),
+            "`{}` is not excluded",
+            path.join(" ")
+        );
+    }
+}
+
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();

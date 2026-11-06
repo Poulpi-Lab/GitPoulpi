@@ -42,6 +42,8 @@ mod review;
 mod review_api;
 #[cfg(feature = "ai")]
 mod review_ctx;
+#[cfg(test)]
+mod trust_tests;
 
 use self::integrations::*;
 use self::keys::*;

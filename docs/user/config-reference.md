@@ -346,6 +346,18 @@ review_mode = "ask"       # ask | clone | api
 The answers are cached per profile in `radar-account.json` next to
 `config.toml` for five minutes; the file is a cache, safe to delete.
 
+### The trust store (not in `config.toml`)
+
+What each integration and API-key AI profile was trusted for (its address, the
+account id, a pinned certificate key, whether plain http was allowed) lives in
+`trust.toml` in the user-only private data folder (`<data>/private/trust.toml`:
+`%APPDATA%\GitPoulpi\private\` on Windows, `~/.local/share/gitpoulpi/private/`
+on Linux). It is deliberately not part of `config.toml`: whoever can edit the
+configuration must not be able to widen trust by editing it. Change it with
+`gitpoulpi hosting integrations trust` and `gitpoulpi ai trust` (see
+[the security check](hosting-integration.md#the-security-check)); the file is
+rewritten by GitPoulpi, not by hand.
+
 ## `[mcp]` (what AI agents may do)
 
 | Key | Default | Values and effect |

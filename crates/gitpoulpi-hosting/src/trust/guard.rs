@@ -44,7 +44,7 @@ impl GuardedTransport {
 
     fn check(&self, url: &str) -> Result<()> {
         match origin::origin_of(url) {
-            Some(o) if self.allowed.iter().any(|a| *a == o) => Ok(()),
+            Some(o) if self.allowed.contains(&o) => Ok(()),
             other => {
                 let problem = TrustProblem::OriginChanged {
                     subject: self.subject.clone(),
@@ -65,7 +65,9 @@ impl GuardedTransport {
                 let problem = match problem {
                     TrustProblem::CertificateChanged { new, old, subject } => {
                         let old = match &self.tls {
-                            Some(t) if t.cert.spki_sha256 == old.spki_sha256 => t.cert.clone(),
+                            Some(t) if t.cert.spki_sha256 == old.spki_sha256 => {
+                                Box::new(t.cert.clone())
+                            }
                             _ => old,
                         };
                         TrustProblem::CertificateChanged { subject, old, new }

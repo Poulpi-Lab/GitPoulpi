@@ -556,7 +556,7 @@ async fn observe_certificate(
     let url = origin::integration_origin(integration).map_err(|e| e.to_string())?;
     let found: Option<CertInfo> = match env.transport()?.send(HttpRequest::get(&url)).await {
         Err(Error::Trust(TrustProblem::UntrustedCertificate { new, .. }))
-        | Err(Error::Trust(TrustProblem::CertificateChanged { new, .. })) => Some(new),
+        | Err(Error::Trust(TrustProblem::CertificateChanged { new, .. })) => Some(*new),
         _ => origin::host_of(&url).and_then(|h| gitpoulpi_hosting::trust::tls::observed(&h)),
     };
     found.ok_or_else(|| {

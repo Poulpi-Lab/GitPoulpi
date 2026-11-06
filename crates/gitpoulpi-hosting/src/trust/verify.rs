@@ -51,9 +51,9 @@ impl TrustGate {
         let due = match reason {
             VerifyReason::TokenStored => true,
             VerifyReason::ExternalToken => first_time_this_process(&integration.id),
-            VerifyReason::Periodic => record
-                .as_ref()
-                .is_none_or(|r| unix_now().saturating_sub(r.account_checked_at) >= RECHECK_SECS),
+            VerifyReason::Periodic => record.as_ref().map_or(true, |r| {
+                unix_now().saturating_sub(r.account_checked_at) >= RECHECK_SECS
+            }),
         };
         if !due {
             return Ok(());
@@ -86,11 +86,11 @@ impl TrustGate {
             if !same {
                 let problem = TrustProblem::AccountChanged {
                     subject: TrustSubject::Integration(integration.id.clone()),
-                    old: Account {
+                    old: Box::new(Account {
                         login: r.account_login.clone(),
                         id: r.account_id.clone(),
-                    },
-                    new: new.clone(),
+                    }),
+                    new: Box::new(new.clone()),
                 };
                 report(&problem);
                 return Err(Error::Trust(problem));

@@ -105,15 +105,15 @@ pub fn problem_for(host: &str) -> Option<TrustProblem> {
     Some(match rejection.pinned {
         Some(spki) => TrustProblem::CertificateChanged {
             subject,
-            old: CertInfo {
+            old: Box::new(CertInfo {
                 spki_sha256: spki,
                 ..CertInfo::default()
-            },
-            new: rejection.new,
+            }),
+            new: Box::new(rejection.new),
         },
         None => TrustProblem::UntrustedCertificate {
             subject,
-            new: rejection.new,
+            new: Box::new(rejection.new),
         },
     })
 }

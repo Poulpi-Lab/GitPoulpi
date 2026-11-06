@@ -1,0 +1,75 @@
+# Releasing
+
+How a release reaches every install channel. The workflow is `.github/workflows/release.yml`; the reasons behind the channels are in the install-channels design. The user side is in [Installation](../user/installation.md), [Updates](../user/updates.md) and [Enterprise distribution](../user/enterprise-distribution.md). Version bumping, the pre-tag checks and the sizes are in [release-process.md](release-process.md).
+
+## Nothing publishes before a tag
+
+The workflow runs only when a tag `releases/v<version>` is pushed (tags are prefixed by purpose, see `CONTRIBUTING.md`), or on a manual dispatch with an existing tag. Day to day it costs nothing. The tag's version must equal the workspace version in `Cargo.toml`: the first step of every build checks it, because the archive names come from `Cargo.toml` and the installers and the update check come from the tag.
+
+A tag with a `-` in the version (`releases/v0.2.0-rc.1`) is published as a GitHub pre-release and reaches **no** channel. Only a stable tag, with the repository variable `PUBLISH_PACKAGES` set to `true`, feeds the channel jobs.
+
+## Jobs
+
+| Job | What it does |
+|---|---|
+| `build` (matrix) | One row per target: Linux x86_64 and arm64 (the arm64 row feeds the multi-arch image and the arm64 `.deb`), Windows x86_64, macOS arm64 and x86_64. `cargo run -p xtask -- dist` builds the archive and its `.sha256`. Windows also builds the Inno Setup installer and the MSI (WiX v5, `packaging/msi/gitpoulpi.wxs`); Linux also builds the `.deb` (`cargo deb --no-build`). Every file has a `.sha256`. |
+| `publish` | One GitHub release with every archive, installer, `.deb`, `install.sh`, `latest.json` (generated from the `.sha256` files) and the `.sha256` files. Notes are the tag's `## [x.y.z]` section of `CHANGELOG.md`, else GitHub's generated notes. Skipped by a dry run. |
+| `chocolatey` | Fills the templates in `packaging/chocolatey/`, `choco pack`, `choco push`. |
+| `winget` | `komac update GitPoulpi.GitPoulpi --version <v> --urls <setup> --submit`, from the fork `Poulpi-Lab/winget-pkgs`, as the App's bot. |
+| `scoop`, `homebrew` | Fill the manifest or formula and commit it to `Poulpi-Lab/scoop-gitpoulpi` and `Poulpi-Lab/homebrew-gitpoulpi`, as the App's bot. |
+| `aur` | In an Arch container fills `gitpoulpi-bin` and `gitpoulpi`, runs `makepkg --printsrcinfo` and pushes over SSH. |
+| `apt` | Checks out `Poulpi-Lab/apt` (the `gh-pages` branch), adds the `.deb` files, runs `packaging/apt/build-repo.sh` (signs `Release` into `InRelease` and `Release.gpg`, keeps the last 5 versions) and commits. |
+| `docker` | One multi-arch buildx build (`linux/amd64`, `linux/arm64`) from `packaging/docker/Dockerfile`, pushed to Docker Hub as `poulpilab/gitpoulpi` and, when enabled, to `ghcr.io/poulpi-lab/gitpoulpi`. Tags `<v>`, `<major.minor>` and `latest`; a pre-release would only get `<v>`. Then the Docker Hub overview. |
+| `crates` | `cargo publish --workspace`, opt-in (see "crates.io"). |
+
+Every channel job starts with an `env` flag that says whether its secrets exist (`HAS`, or `HAS_DOCKERHUB` and `HAS_GHCR`) and each publishing step carries `if: env.HAS... == 'true'`. A missing secret skips the step and the job stays green with a notice, so a half-configured release never fails the whole run.
+
+Every push to another repository and every pull request goes out as the Poulpi-Lab GitHub App's bot (`actions/create-github-app-token`), never as a personal account.
+
+## Secrets and variables
+
+The owner creates them in the repository settings. Signing keys and accounts belong to Poulpi-Lab, never to a person.
+
+| Name | Kind | Used by |
+|---|---|---|
+| `POULPI_BOT_APP_ID` | variable | The App token for `winget`, `scoop`, `homebrew` and `apt`. |
+| `POULPI_BOT_PRIVATE_KEY` | secret | The same App token. The App needs contents and pull-requests write on `scoop-gitpoulpi`, `homebrew-gitpoulpi`, `apt` and the `winget-pkgs` fork. |
+| `CHOCO_API_KEY` | secret | `chocolatey`: the project's Chocolatey account. |
+| `AUR_SSH_PRIVATE_KEY` | secret | `aur`: the project's AUR account. |
+| `APT_GPG_PRIVATE_KEY`, `APT_GPG_PASSPHRASE` | secrets | `apt`: the repository signing key and its passphrase (none when the key has none). |
+| `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` | secrets | `docker`: the Docker Hub organisation or its service account, and a read-write access token limited to `poulpilab/gitpoulpi`. Both are needed to push and to update the overview. |
+| `CARGO_REGISTRY_TOKEN` | secret | `crates` (optional). |
+| `PUBLISH_PACKAGES` | variable | `true` enables every channel job. Anything else, and the release still publishes on GitHub. |
+| `PUBLISH_GHCR` | variable | `true` also pushes the image to GHCR with `GITHUB_TOKEN` (the job has `packages: write`). No extra secret. |
+| `PUBLISH_CRATES` | variable | `true` enables the `crates` job. |
+
+## The first winget submission is by hand
+
+`komac update` needs the package to exist in `microsoft/winget-pkgs`. Submit the first version yourself (the three manifests of `packaging/winget/`, filled in, as a pull request from the fork), wait for it to be merged, and from then on the `winget` job opens one pull request per release. An App installation token may be refused for cross-repository pull requests to `microsoft/winget-pkgs`; the fallback is a token of a dedicated Poulpi-Lab machine account, an owner decision.
+
+## The Docker Hub overview comes from the repository
+
+`packaging/docker/README.md` is the Docker Hub page. The `docker` job pushes it on every release (`peter-evans/dockerhub-description`), replacing whatever is there, so it is never edited on Docker Hub. The test `xtask/tests/installers.rs` keeps it under Docker Hub's 25,000-byte limit, free of relative links (they break there), and pins the short description (at most 100 characters) and the image name `DOCKER_IMAGE` in `crates/gitpoulpi-config/src/release.rs`. A namespace change is that constant, the workflow and the README.
+
+## crates.io
+
+The first channel is `cargo binstall gitpoulpi-cli` (metadata in `crates/gitpoulpi-cli/Cargo.toml`) and `cargo install --git`; both work with the repository alone. Keep the `crates` job off until `publish = false` is set on `xtask` and `gitpoulpi-testkit`, the `xtask` dev-dependency is gone, the changelog `include_str!` lives inside the crate, every `gitpoulpi-*` name is reserved and `cargo publish --workspace --dry-run` is green.
+
+## Dry run
+
+A dry run builds every archive and installer and publishes nothing:
+
+```
+git tag dryrun/v0.1.0 && git push origin dryrun/v0.1.0
+gh workflow run release.yml -f tag=dryrun/v0.1.0 -f dry_run=true
+```
+
+Download the run's artifacts and check them: the archives' `.sha256`, the setup and MSI installing in a clean Windows machine, the `.deb` with `dpkg -c`. The tag's version must still match `Cargo.toml`. A dry run skips `publish`, so the channel jobs (which need it) do not run either.
+
+## Before the first public tag
+
+Check by hand (the installers are not exercised by CI):
+
+- Windows: a per-user and an all-users install, an update through the panel (the administrator prompt, other users' processes closed), `choco upgrade` and `winget upgrade` re-running the installer and keeping the channel in the marker, and a revert. These steps are listed in [where-we-are.md](where-we-are.md).
+- A `gitpoulpi --version` from the Docker image, `docker run -it` drawing the UI, and the SSH agent forwarding.
+- The apt repository: add the source on a clean Debian, `apt install`, then `apt install --only-upgrade` with a second version.

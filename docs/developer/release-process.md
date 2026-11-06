@@ -1,5 +1,7 @@
 # Release process
 
+The jobs, secrets and variables of the release workflow, the dry run and the first winget submission are in [releasing.md](releasing.md).
+
 Not yet defined - no releases exist. This will cover version bumping across the workspace, `xtask`-driven packaging (Windows installer/winget, Linux deb/rpm/AUR or static binary, Homebrew best-effort), and changelog generation. That is Phase 3, "Hardening & performance" - see `../roadmap.md`.
 
 ## What is already fixed

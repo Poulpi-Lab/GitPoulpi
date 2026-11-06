@@ -568,6 +568,7 @@ impl HostingClient for GiteaClient {
             scopes: None,
             missing_scopes: Vec::new(),
             expires_at: None,
+            ..Default::default()
         })
     }
 

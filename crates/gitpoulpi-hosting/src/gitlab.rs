@@ -9,8 +9,9 @@ use crate::http::{HttpRequest, HttpTransport};
 use crate::integration::Integration;
 use crate::metadata::{HostedLabel, HostedMilestone, IssueEdit, ItemMeta, MetaKind, PrEdit};
 use crate::model::{
-    best_pull_request, missing_scopes, ChecksState, HostedUser, IssueFilter, IssueState,
-    IssueSummary, PrFilter, PullRequestState, PullRequestSummary, StateFilter, TokenCheck,
+    best_pull_request, excess_scopes, missing_scopes, ChecksState, HostedUser, IssueFilter,
+    IssueState, IssueSummary, PrFilter, PullRequestState, PullRequestSummary, StateFilter,
+    TokenCheck, TokenFlavor,
 };
 use crate::project::{HostedProject, HostedSshKey};
 use crate::Result;
@@ -326,11 +327,26 @@ impl HostingClient for GitLabClient {
             .as_deref()
             .map(|granted| missing_scopes(required, granted))
             .unwrap_or_default();
+        let excess = scopes
+            .as_deref()
+            .map(|granted| excess_scopes(required, &[], granted))
+            .unwrap_or_default();
+        // The bot accounts GitLab makes for project and group tokens.
+        let bot = (user.login.starts_with("project_") || user.login.starts_with("group_"))
+            && user.login.contains("_bot");
+        let flavor = match (&scopes, bot) {
+            (_, true) => TokenFlavor::ProjectOrGroup,
+            (Some(_), false) => TokenFlavor::Classic,
+            (None, false) => TokenFlavor::Unknown,
+        };
         Ok(TokenCheck {
             user,
             scopes,
             missing_scopes: missing,
             expires_at,
+            excess_scopes: excess,
+            token_flavor: Some(flavor),
+            recommend_fine_grained: false,
         })
     }
 
@@ -909,6 +925,40 @@ mod tests {
         assert!(transport.requests()[0]
             .url
             .starts_with("https://gitlab.example.com/api/v4/user"));
+    }
+
+    #[test]
+    fn a_gitlab_token_with_sudo_and_registry_rights_has_excess_scopes() {
+        let transport = Arc::new(
+            RecordedTransport::new()
+                .on(
+                    "/personal_access_tokens/self",
+                    200,
+                    r#"{"scopes":["api","read_user","read_api","sudo","write_registry"],"expires_at":"2027-01-01"}"#,
+                )
+                .on("/user", 200, USER),
+        );
+        let check = block_on(client(transport).check_token()).unwrap();
+        // `read_api` is part of `api`.
+        assert_eq!(check.excess_scopes, vec!["sudo", "write_registry"]);
+        assert_eq!(check.token_flavor, Some(crate::TokenFlavor::Classic));
+        assert!(!check.recommend_fine_grained);
+    }
+
+    #[test]
+    fn a_gitlab_token_without_expiry_or_extra_rights_says_nothing() {
+        let transport = Arc::new(
+            RecordedTransport::new()
+                .on(
+                    "/personal_access_tokens/self",
+                    200,
+                    r#"{"scopes":["api","read_user"],"expires_at":null}"#,
+                )
+                .on("/user", 200, USER),
+        );
+        let check = block_on(client(transport).check_token()).unwrap();
+        assert!(check.excess_scopes.is_empty());
+        assert_eq!(check.expires_at, None);
     }
 
     #[test]

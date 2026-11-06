@@ -96,6 +96,30 @@ fn check_token_reports_unknown_scopes() {
 }
 
 #[test]
+fn check_token_reads_the_scope_header_when_the_host_sends_it() {
+    let t = Arc::new(RecordedTransport::new().on_with_headers(
+        "/user",
+        200,
+        ME,
+        &[(
+            "x-oauth-scopes",
+            "read:user:bitbucket, read:repository:bitbucket, delete:repository:bitbucket",
+        )],
+    ));
+    let c = client_for(
+        profile(""),
+        "tok".into(),
+        t,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
+    let check = block_on(c.check_token()).unwrap();
+    assert_eq!(check.excess_scopes, vec!["delete:repository:bitbucket"]);
+    assert!(!check.missing_scopes.is_empty());
+    assert_eq!(check.expires_at, None);
+}
+
+#[test]
 fn error_statuses_map_to_typed_errors() {
     for (status, ok) in [(401u16, 0), (403, 1), (429, 2), (500, 3)] {
         let t = Arc::new(RecordedTransport::new().on(

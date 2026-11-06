@@ -128,6 +128,7 @@ impl HostingClient for TrelloClient {
             scopes: None,
             missing_scopes: Vec::new(),
             expires_at: None,
+            ..Default::default()
         })
     }
 

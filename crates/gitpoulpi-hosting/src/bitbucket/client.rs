@@ -12,8 +12,8 @@ use crate::client::{
 use crate::http::{HttpRequest, HttpTransport};
 use crate::integration::Integration;
 use crate::model::{
-    best_pull_request, HostedUser, IssueFilter, IssueSummary, PrFilter, PullRequestSummary,
-    StateFilter, TokenCheck,
+    best_pull_request, excess_scopes, missing_scopes, HostedUser, IssueFilter, IssueSummary,
+    PrFilter, PullRequestSummary, StateFilter, TokenCheck, TokenFlavor,
 };
 use crate::project::{HostedProject, HostedSshKey};
 use crate::{Error, Result};
@@ -265,13 +265,50 @@ impl HostingClient for BitbucketClient {
     }
 
     async fn check_token(&self) -> Result<TokenCheck> {
-        // Bitbucket does not report an API token's scopes: unknown, never
-        // "missing".
+        // Bitbucket sends the token's scopes in `x-oauth-scopes` when it
+        // sends them at all (an API token does not): absent is unknown,
+        // never "missing".
+        let response = self
+            .transport
+            .send(self.get(format!("{}/user", self.api())))
+            .await?;
+        response.error_for_status("checking the Bitbucket token")?;
+        let scopes = response
+            .headers
+            .iter()
+            .find(|(k, _)| k.eq_ignore_ascii_case("x-oauth-scopes"))
+            .map(|(_, v)| {
+                v.split([',', ' '])
+                    .map(str::trim)
+                    .filter(|s| !s.is_empty())
+                    .map(str::to_string)
+                    .collect::<Vec<_>>()
+            })
+            .filter(|s| !s.is_empty());
+        let required = self
+            .integration
+            .kind
+            .token_help()
+            .map(|h| h.scopes)
+            .unwrap_or(&[]);
+        let (missing, excess) = scopes.as_deref().map_or_else(Default::default, |granted| {
+            (
+                missing_scopes(required, granted),
+                excess_scopes(required, &[], granted),
+            )
+        });
+        let account: Account = response.json()?;
         Ok(TokenCheck {
-            user: self.current_user().await?,
-            scopes: None,
-            missing_scopes: Vec::new(),
-            expires_at: None,
+            user: account.into_user(),
+            token_flavor: Some(if scopes.is_some() {
+                TokenFlavor::Classic
+            } else {
+                TokenFlavor::Unknown
+            }),
+            scopes,
+            missing_scopes: missing,
+            excess_scopes: excess,
+            ..Default::default()
         })
     }
 

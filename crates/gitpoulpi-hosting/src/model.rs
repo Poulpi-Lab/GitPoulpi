@@ -17,7 +17,7 @@ pub struct HostedUser {
 }
 
 /// The outcome of checking a token against its host.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TokenCheck {
     pub user: HostedUser,
     /// The scopes the host reports. `None` means *unknown* (a GitHub
@@ -30,6 +30,72 @@ pub struct TokenCheck {
     pub missing_scopes: Vec<String>,
     /// When the token expires, as the host spelled it.
     pub expires_at: Option<String>,
+    /// Granted scopes beyond what GitPoulpi needs, dangerous ones first
+    /// ([`is_dangerous_scope`]). Always empty when `scopes` is `None`: an
+    /// unknown set is never a warning.
+    #[serde(default)]
+    pub excess_scopes: Vec<String>,
+    /// What kind of token it is, when the host or the token's prefix says.
+    #[serde(default)]
+    pub token_flavor: Option<TokenFlavor>,
+    /// A classic token whose host offers fine-grained ones: say so.
+    #[serde(default)]
+    pub recommend_fine_grained: bool,
+}
+
+/// What kind of token a connection uses.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TokenFlavor {
+    /// A personal token whose scopes are a flat list.
+    Classic,
+    /// A token limited to chosen repositories and permissions.
+    FineGrained,
+    /// A token of a project or a group, not of a person.
+    ProjectOrGroup,
+    Unknown,
+}
+
+/// Scopes that can destroy data or reach beyond the repositories: shown
+/// first, and in the warning colour, when a token holds them without need.
+const DANGEROUS_SCOPES: &[&str] = &[
+    "delete_repo",
+    "admin:org",
+    "admin:repo_hook",
+    "admin:enterprise",
+    "admin:gpg_key",
+    "delete:packages",
+    "write:packages",
+    "site_admin",
+    "sudo",
+    "admin_mode",
+    "create_runner",
+    "manage_runner",
+    "k8s_proxy",
+];
+
+/// Whether `scope` is one of the sensitive ones above.
+pub fn is_dangerous_scope(scope: &str) -> bool {
+    DANGEROUS_SCOPES.contains(&scope)
+}
+
+/// The scopes in `granted` that neither `needed` nor `tolerated` (optional
+/// scopes GitPoulpi can use) names, directly or through an umbrella scope,
+/// dangerous ones first. Order inside each group is the host's.
+pub fn excess_scopes(needed: &[&str], tolerated: &[&str], granted: &[String]) -> Vec<String> {
+    let wanted = |g: &str| {
+        needed
+            .iter()
+            .chain(tolerated)
+            .any(|n| *n == g || scope_satisfies(n, g))
+    };
+    let (mut dangerous, other): (Vec<String>, Vec<String>) = granted
+        .iter()
+        .filter(|g| !wanted(g))
+        .cloned()
+        .partition(|g| is_dangerous_scope(g));
+    dangerous.extend(other);
+    dangerous
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -238,6 +304,11 @@ fn scope_satisfies(granted: &str, required: &str) -> bool {
             ) | ("user", "read:user" | "user:email")
                 | ("admin:public_key", "write:public_key" | "read:public_key")
                 | ("write:public_key", "read:public_key")
+                | (
+                    "repo",
+                    "repo:status" | "repo_deployment" | "public_repo" | "repo:invite"
+                        | "security_events"
+                )
         )
 }
 

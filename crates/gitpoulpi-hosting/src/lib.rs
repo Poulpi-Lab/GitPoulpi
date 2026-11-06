@@ -124,9 +124,9 @@ pub use metadata::{
 };
 #[cfg(feature = "hosting")]
 pub use model::{
-    best_pull_request, ChecksState, Choice, HostedUser, IssueCreateOptions, IssueFilter,
-    IssueState, IssueSummary, PrFilter, PullRequestState, PullRequestSummary, StateFilter,
-    TokenCheck,
+    best_pull_request, excess_scopes, is_dangerous_scope, ChecksState, Choice, HostedUser,
+    IssueCreateOptions, IssueFilter, IssueState, IssueSummary, PrFilter, PullRequestState,
+    PullRequestSummary, StateFilter, TokenCheck, TokenFlavor,
 };
 #[cfg(feature = "hosting")]
 pub use project::{HostedProject, HostedSshKey};

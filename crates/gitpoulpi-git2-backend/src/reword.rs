@@ -65,7 +65,7 @@ pub fn amend_commit(
     rewritten.insert(target, new_target);
     for old in &to_replay {
         let old_commit = git_repo.find_commit(*old).map_err(map_err)?;
-        let old_message = old_commit.message_raw().ok_or_else(|| {
+        let old_message = old_commit.message_raw().ok().ok_or_else(|| {
             Error::Backend(format!("commit {old} has a message that is not UTF-8"))
         })?;
         let new = recreate(
@@ -88,6 +88,7 @@ pub fn amend_commit(
     if head_ref.is_branch() {
         let name = head_ref
             .name()
+            .ok()
             .ok_or_else(|| Error::Backend("the checked-out branch has no name".into()))?;
         git_repo
             .reference_matching(name, new_head, true, head, &log_message)
@@ -193,6 +194,7 @@ fn amended_parts(
         Some(m) => m.clone(),
         None => old
             .message_raw()
+            .ok()
             .ok_or_else(|| {
                 Error::Backend(format!(
                     "commit {} has a message that is not UTF-8",

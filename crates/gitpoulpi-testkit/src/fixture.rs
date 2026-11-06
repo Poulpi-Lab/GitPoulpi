@@ -591,7 +591,7 @@ impl FixtureRepoBuilder {
                     uid,
                     gid,
                     file_size: bytes.len() as u32,
-                    id: git2::Oid::zero(),
+                    id: git2::Oid::ZERO_SHA1,
                     flags: 0,
                     flags_extended: 0,
                     path: path.as_bytes().to_vec(),
@@ -625,7 +625,7 @@ impl FixtureRepoBuilder {
         // Not `commit(Some("HEAD"), ..)`: its reflog line joins the whole
         // first paragraph, the CLI's is the subject line.
         let head = repo.find_reference("HEAD").map_err(err)?;
-        let Some(branch) = head.symbolic_target().map(str::to_owned) else {
+        let Some(branch) = head.symbolic_target().ok().flatten().map(str::to_owned) else {
             return Err(Error::GitFailed("detached HEAD: use the CLI".into()));
         };
         let id = repo

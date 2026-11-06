@@ -15,7 +15,7 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
         .head()
         .ok()
         .filter(|h| h.is_branch())
-        .and_then(|h| h.shorthand().map(str::to_string));
+        .and_then(|h| h.shorthand().ok().map(str::to_string));
 
     // Read before the refs so `refs/remotes/<rest>` is split against the
     // remotes that actually exist rather than on the first `/` -- see
@@ -24,6 +24,7 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
         .remotes()
         .map_err(map_err)?
         .iter()
+        .flatten()
         .flatten()
         .map(str::to_string)
         .collect();
@@ -37,7 +38,7 @@ pub fn refs(repo: &RepoRef) -> Result<Vec<Ref>> {
     let mut mirror: std::collections::BTreeMap<String, Vec<(String, Oid)>> = Default::default();
     for reference in git_repo.references().map_err(map_err)? {
         let reference = reference.map_err(map_err)?;
-        let Some(name) = reference.name() else {
+        let Ok(name) = reference.name() else {
             continue;
         };
         ref_names.insert(name.to_string());
@@ -165,7 +166,7 @@ impl<'a> UpstreamResolver<'a> {
                     mapped = spec
                         .transform(&merge)
                         .ok()
-                        .and_then(|b| b.as_str().map(str::to_string));
+                        .and_then(|b| b.as_str().ok().map(str::to_string));
                     break;
                 }
             }
@@ -184,10 +185,17 @@ pub fn remotes(repo: &RepoRef) -> Result<Vec<Remote>> {
     let git_repo = open(repo)?;
     let names = git_repo.remotes().map_err(map_err)?;
     let mut out = Vec::new();
-    for name in names.iter().flatten() {
+    for name in names.iter().flatten().flatten() {
         let remote = git_repo.find_remote(name).map_err(map_err)?;
         let fetch_url = remote.url().unwrap_or_default().to_string();
-        let push_url = Some(remote.pushurl().unwrap_or(&fetch_url).to_string());
+        let push_url = Some(
+            remote
+                .pushurl()
+                .ok()
+                .flatten()
+                .unwrap_or(&fetch_url)
+                .to_string(),
+        );
         out.push(Remote {
             name: name.to_string(),
             fetch_url,

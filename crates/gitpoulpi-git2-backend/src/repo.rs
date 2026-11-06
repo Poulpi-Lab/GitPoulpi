@@ -47,7 +47,7 @@ pub fn discover(path: &std::path::Path) -> Result<gitpoulpi_core::domain::Discov
         .head()
         .ok()
         .filter(|h| h.is_branch())
-        .and_then(|h| h.shorthand().map(str::to_string));
+        .and_then(|h| h.shorthand().ok().map(str::to_string));
 
     Ok(DiscoveredRepo {
         repo: RepoRef::from_root(&root),

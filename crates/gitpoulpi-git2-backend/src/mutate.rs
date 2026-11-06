@@ -120,6 +120,7 @@ pub fn checkout(repo: &RepoRef, target: &CheckoutTarget) -> Result<()> {
                     git_repo
                         .set_head(
                             r.name()
+                                .ok()
                                 .ok_or_else(|| Error::Backend("branch ref had no name".into()))?,
                         )
                         .map_err(map_err)?;
@@ -188,6 +189,7 @@ pub fn branch_create_tracking(repo: &RepoRef, local_name: &str, upstream: &str) 
     let head_ref = branch
         .get()
         .name()
+        .ok()
         .ok_or_else(|| Error::Backend("new branch ref had no name".into()))?
         .to_string();
     git_repo.set_head(&head_ref).map_err(map_err)?;
@@ -274,7 +276,7 @@ pub fn fast_forward(
         && git_repo
             .head()
             .ok()
-            .and_then(|h| h.name().map(|n| n == local))
+            .and_then(|h| h.name().ok().map(|n| n == local))
             .unwrap_or(false);
     if checked_out_here {
         let commit = git_repo.find_commit(to).map_err(map_err)?;
@@ -325,6 +327,8 @@ pub fn remote_set_push_url(repo: &RepoRef, name: &str, url: Option<&str>) -> Res
                 .find_remote(name)
                 .map_err(map_err)?
                 .pushurl()
+                .ok()
+                .flatten()
                 .is_some();
             if has_one {
                 git_repo.remote_set_pushurl(name, None).map_err(map_err)?;
@@ -363,7 +367,7 @@ pub fn config_entries(repo: &RepoRef, prefixes: &[&str]) -> Result<Vec<(String, 
     let mut entries = config.entries(None).map_err(map_err)?;
     while let Some(entry) = entries.next() {
         let entry = entry.map_err(map_err)?;
-        let (Some(name), Some(value)) = (entry.name(), entry.value()) else {
+        let (Some(name), Some(value)) = (entry.name().ok(), entry.value().ok()) else {
             continue;
         };
         let lower = name.to_ascii_lowercase();

@@ -32,7 +32,7 @@ pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
     let files = statuses
         .iter()
         .filter_map(|entry| {
-            let path = entry.path().map(PathBuf::from)?;
+            let path = entry.path().ok().map(PathBuf::from)?;
             let s = entry.status();
 
             let index = if s.contains(git2::Status::CONFLICTED) {
@@ -190,7 +190,7 @@ fn push_all_refs(
             if reference.kind() == Some(git2::ReferenceType::Symbolic) {
                 continue;
             }
-            let (Some(name), Ok(commit)) = (reference.name(), reference.peel_to_commit()) else {
+            let (Ok(name), Ok(commit)) = (reference.name(), reference.peel_to_commit()) else {
                 // A tag of a tree or a blob: no commit, no tip.
                 continue;
             };
@@ -278,13 +278,16 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
         let author = commit.author();
         // Display text follows git: the commit's `encoding` header, else
         // valid UTF-8, else the fallback encoding (`git.default_encoding`).
-        let header = commit.message_encoding();
+        let header = commit.message_encoding().ok().flatten();
         let message_bytes = commit.message_bytes();
         let decoded = decode_commit_text(message_bytes, header);
         let summary = match (&decoded, header) {
-            (std::borrow::Cow::Borrowed(_), None) => {
-                commit.summary().unwrap_or_default().to_string()
-            }
+            (std::borrow::Cow::Borrowed(_), None) => commit
+                .summary()
+                .ok()
+                .flatten()
+                .unwrap_or_default()
+                .to_string(),
             _ => commit_summary(&decoded),
         };
         let message = decoded.trim_end().to_string();

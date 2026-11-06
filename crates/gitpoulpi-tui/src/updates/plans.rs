@@ -9,7 +9,7 @@
 //! it runs on a background thread (`updates::load_facts`), never on the
 //! render thread.
 
-use gitpoulpi_config::policy::{self, CheckKind, EffectiveUpdates, Pin, Policy};
+use gitpoulpi_config::policy::{self, CheckKind, EffectiveUpdates, Policy};
 use gitpoulpi_config::release::{self, InstallChannel};
 use gitpoulpi_config::{UpdateMode, UpdatesConfig};
 use gitpoulpi_hosting::updates::sources::{SourceSpec, CHOCOLATEY_COMMUNITY_FEED};
@@ -38,13 +38,14 @@ impl Facts {
     #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
     pub(crate) fn detect() -> Self {
         let exe = std::env::current_exe().unwrap_or_default();
-        let resolved = channel::resolve(
-            &RealFs,
-            &NoRegistry,
-            &RealEnv,
-            &exe,
-            &release::host_target(),
-        );
+        // The real Inno uninstall key on Windows: an old marker without
+        // `channel=` resolves to inno-user / inno-machine through it.
+        #[cfg(windows)]
+        let registry = gitpoulpi_update::winreg::WindowsRegistry;
+        #[cfg(not(windows))]
+        let registry = NoRegistry;
+        let resolved =
+            channel::resolve(&RealFs, &registry, &RealEnv, &exe, &release::host_target());
         let mut policy = Policy::default();
         for path in policy::policy_paths() {
             let loaded = policy::load(&policy::FilePolicySource(path));
@@ -168,17 +169,6 @@ pub(crate) fn channel_label(channel: Channel) -> String {
         Channel::Dev => msg::VIA_DEV,
     };
     text.get().to_string()
-}
-
-/// `1.4` or `1.4.2` for a pin, the form `CheckParams::pin` takes. `Pin`
-/// keeps its numbers private, so this reads its derived `Debug` text
-/// (`Pin([1, 4])`); a unit test pins that format.
-#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
-pub(crate) fn pin_text(pin: &Pin) -> Option<String> {
-    let debug = format!("{pin:?}");
-    let inner = debug.split_once('[')?.1.split_once(']')?.0;
-    let parts: Vec<&str> = inner.split(',').map(str::trim).collect();
-    (!parts.is_empty() && parts.iter().all(|p| p.parse::<u64>().is_ok())).then(|| parts.join("."))
 }
 
 /// Which source answers "what is the latest release" (the install-channels

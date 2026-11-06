@@ -591,7 +591,7 @@ fn run_check(force: bool) -> Outcome {
         channel: eff.release_channel,
         target: gitpoulpi_config::release::host_target(),
         token: github_token(),
-        pin: eff.pin.as_ref().and_then(plans::pin_text),
+        pin: eff.pin.as_ref().map(ToString::to_string),
     };
     let spec = plans::choose_source(
         facts.as_ref(),

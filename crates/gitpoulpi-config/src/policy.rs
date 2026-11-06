@@ -47,6 +47,19 @@ impl CheckKind {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Pin(Vec<u64>);
 
+impl std::fmt::Display for Pin {
+    /// `1.4` or `1.4.2`: the text [`Pin::parse`] reads back.
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (i, n) in self.0.iter().enumerate() {
+            if i > 0 {
+                f.write_str(".")?;
+            }
+            write!(f, "{n}")?;
+        }
+        Ok(())
+    }
+}
+
 impl Pin {
     /// One to three dot-separated numbers; `None` otherwise.
     pub fn parse(text: &str) -> Option<Self> {

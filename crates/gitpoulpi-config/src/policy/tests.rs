@@ -281,3 +281,10 @@ fn the_file_source_reads_a_real_file_and_a_missing_one_is_no_policy() {
         Some(UpdateMode::Off)
     );
 }
+
+#[test]
+fn a_pin_displays_as_the_text_it_was_parsed_from() {
+    for text in ["2", "1.4", "1.4.2"] {
+        assert_eq!(Pin::parse(text).unwrap().to_string(), text);
+    }
+}

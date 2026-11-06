@@ -40,19 +40,6 @@ fn github(repo: &str) -> SourceSpec {
 }
 
 #[test]
-fn a_pin_is_written_back_as_the_text_the_check_takes() {
-    assert_eq!(
-        pin_text(&Pin::parse("1.4").unwrap()).as_deref(),
-        Some("1.4")
-    );
-    assert_eq!(
-        pin_text(&Pin::parse("1.4.2").unwrap()).as_deref(),
-        Some("1.4.2")
-    );
-    assert_eq!(pin_text(&Pin::parse("2").unwrap()).as_deref(), Some("2"));
-}
-
-#[test]
 fn every_channel_has_its_own_label() {
     let mut seen = std::collections::BTreeSet::new();
     for c in InstallChannel::ALL {

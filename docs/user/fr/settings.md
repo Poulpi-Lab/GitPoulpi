@@ -254,8 +254,11 @@ Aussi sur cette page, sous **Mises à jour** :
 
 | Option | Ce qu'elle fait |
 |---|---|
-| **Rechercher les mises à jour** | Une liste déroulante (`updates.mode`) : **Notifier** (par défaut) vérifie une fois par jour en arrière-plan et affiche `vX.Y.Z disponible` dans la barre de titre ; **Auto** télécharge aussi la mise à jour en arrière-plan quand GitPoulpi a été installé depuis une archive de version (vous choisissez toujours quand redémarrer) ; **Désactivé** ne fait jamais de requête. S'applique immédiatement. Voir [Mises à jour](installation.md#mises-à-jour). |
+| **Rechercher les mises à jour** | Une liste déroulante (`updates.mode`) : **Notifier** (par défaut) vérifie une fois par jour en arrière-plan et affiche `vX.Y.Z disponible` dans la barre de titre ; **Auto** télécharge aussi la mise à jour en arrière-plan quand GitPoulpi a été installé depuis une archive de version (vous choisissez toujours quand redémarrer) ; **Désactivé** ne fait jamais de requête. S'applique immédiatement. Voir [Mises à jour](updates.md). |
 | **Canal de mise à jour** | Une liste déroulante (`updates.channel`) : **Stable** (par défaut) ou **Préversion** (aussi les versions candidates). S'applique immédiatement. |
+| **Installé avec** | Lecture seule. Comment GitPoulpi est arrivé sur cet ordinateur (une archive de version, l'installeur pour cet utilisateur ou tous les utilisateurs, Chocolatey, winget, Scoop, Homebrew, apt, un paquet MSI, l'AUR, une image Docker, cargo, ou une version de développement). Cela décide de la façon dont les mises à jour sont appliquées, voir [Mises à jour](updates.md). |
+
+Une ligne que votre administrateur a définie dans la politique de mise à jour valable pour toute la machine affiche **Défini par votre administrateur** et ne peut pas être modifiée ici.
 
 Aussi sur cette page, sous **Réécriture d'historique**, les limites de temps des scripts externes (voir [Réécriture d'historique](history-rewrite.md)) :
 
@@ -346,11 +349,23 @@ les valeurs par défaut du [contexte de la revue](ai.md#contexte-de-la-revue) :
 (*Réglage du profil*, *Oui*, *Non*), **Inclure CLAUDE.md**, **Inclure AGENTS.md** et **Fichier supplémentaire** (un
 chemin ou un lien ; vide, il n'ajoute rien, avec un bouton **Parcourir...** dessous qui ouvre un sélecteur de fichier ; `Entrée` sur le bouton en est la forme clavier). Cette page a son propre guide : [Assistance IA](ai.md).
 
+Sous les blocs par action, le groupe **Confidentialité** :
+
+| Option | Ce qu'elle fait |
+|---|---|
+| **Masquer les secrets avant l'envoi** | Activé (par défaut) : les jetons, clés privées et mots de passe trouvés dans une requête sont remplacés par `[REDACTED:<rule>]` avant son départ. Désactivé : une ligne rouge indique que les secrets sont envoyés tels quels. |
+| **Exclure les fichiers sensibles** | Activé (par défaut) : les modifications des fichiers `.env`, des clés privées et des certificats (`[privacy] sensitive_patterns`) ne font jamais partie d'une requête. Désactivé : une ligne rouge indique qu'elles sont envoyées quand elles en font partie. |
+| **Afficher ce qui est envoyé avant...** | Une option par action (message de commit, explication, message de stash, description de pull request, compositeur de commits, résolution de conflit, revue de code, scission de commit) : affiche la requête dans la boîte **Ce qui est envoyé** avant son départ. La case *Ne plus afficher* de la boîte en désactive une. Les actions de réécriture d'historique affichent leur propre boîte. |
+| **Tout réafficher** | Apparaît tant qu'une option est désactivée ; les réactive toutes. |
+
+Voir [IA > Confidentialité](ai.md#confidentialité).
+
+
 ### Agents et MCP
 
-Ce que les agents IA peuvent faire dans cette fenêtre, et si le serveur MCP peut
-tourner. Les deux lignes MCP n'apparaissent que dans les builds qui incluent le
-serveur ; voir [MCP et agents](mcp-and-agents.md).
+Ce que les agents IA peuvent faire dans cette fenêtre, si le serveur MCP peut
+tourner, et comment son point d'accès HTTP est protégé. Les lignes MCP n'apparaissent
+que dans les builds qui incluent le serveur ; voir [MCP et agents](mcp-and-agents.md).
 
 | Option | Ce qu'elle fait |
 |---|---|
@@ -359,6 +374,12 @@ serveur ; voir [MCP et agents](mcp-and-agents.md).
 | **Laisser les agents IA piloter la vue** | Permet aux agents de vous montrer un commit, un fichier ou un avis dans cette fenêtre (`ui show`). Désactivé : aucun agent n'atteint la fenêtre. |
 | **Laisser les agents IA proposer des modifications à confirmer** | Permet aux agents d'ouvrir des boîtes Reword, commit, branche ou tag préremplies que vous confirmez. Désactivé par défaut. Voir [MCP et agents](mcp-and-agents.md#permissions). |
 | **Ouvrir une fenêtre pour les agents**, **Commande de lancement (custom)** | Si un agent peut ouvrir une fenêtre GitPoulpi quand aucune n'est ouverte, et avec quel terminal ou multiplexeur. Désactivé par défaut. |
+| **Authentification HTTP** | Activé (par défaut) : le point d'accès HTTP MCP ne répond qu'à une requête portant le jeton d'accès. Désactivé affiche un avertissement rouge : tout programme qui peut joindre le point d'accès peut lancer chaque outil autorisé par les paramètres MCP, et `--allow-remote` est refusé. Enregistré dans `mcp.http_auth`. |
+| **Jeton d'accès** | Le jeton, masqué. La valeur masquée est un bouton : `Enter` (ou un clic) l'affiche en entier sur la ligne du dessous et le masque de nouveau. **Copier** le met dans le presse-papiers sans le répéter dans la ligne d'état, **Renouveler** le remplace après confirmation (les clients qui détiennent l'ancien jeton sont refusés aussitôt, sans redémarrer le serveur), **Créer** fait le premier. `Left` / `Right` passent d'un bouton à l'autre et `Enter` en appuie un. C'est le même jeton que `gitpoulpi mcp token`. |
+| **TLS** | **Désactivé** (par défaut), **Auto-signé** (le serveur crée un certificat une fois et affiche son empreinte) ou **Fichiers** (votre certificat et votre clé). Le serveur termine lui-même le TLS. Enregistré dans `mcp.tls` ; s'applique au prochain démarrage du serveur. |
+| **Chemin du certificat**, **Chemin de la clé** | Les fichiers PEM utilisés avec **Fichiers** (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Empreinte du certificat** | Lecture seule : l'empreinte SHA-256 du certificat présenté par le point d'accès, pour que les clients la vérifient. |
+| **Derrière un tunnel ou un proxy inverse** | Votre déclaration qu'un tunnel ou un proxy placé devant le point d'accès chiffre le trafic, ce qui permet à `--allow-remote` de fonctionner sans TLS. Le serveur ne peut pas le vérifier : un avertissement rouge s'affiche tant que c'est activé. Enregistré dans `mcp.behind_proxy`. Voir [MCP et agents](mcp-and-agents.md#joindre-le-point-daccès-depuis-une-autre-machine). |
 
 ### Apparence
 

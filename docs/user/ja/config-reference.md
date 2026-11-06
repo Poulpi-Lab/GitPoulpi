@@ -297,6 +297,10 @@ review_mode = "ask"       # ask | clone | api
 回答はプロファイルごとに、`config.toml` の隣の `radar-account.json` に 5 分間キャッシュされます。このファイルはキャッシュなので、
 削除しても問題ありません。
 
+### トラストストア（`config.toml` にはありません）
+
+各連携と API キー方式の AI プロファイルが何について信頼されたか（アドレス、アカウント ID、ピン留めした証明書の鍵、平文 http を許可したかどうか）は、ユーザー専用のプライベートデータフォルダーの `trust.toml`（`<data>/private/trust.toml`：Windows では `%APPDATA%\GitPoulpi\private\`、Linux では `~/.local/share/gitpoulpi/private/`）に保存されます。これは意図的に `config.toml` の一部にしていません。設定を編集できる人が、編集によって信頼を広げられてはならないからです。変更は `gitpoulpi hosting integrations trust` と `gitpoulpi ai trust` で行います（[セキュリティチェック](hosting-integration.md#セキュリティチェック)を参照）。ファイルは手作業ではなく、GitPoulpi が書き直します。
+
 ## `[mcp]`（AI エージェントに許可すること）
 
 | キー | 既定値 | 値と効果 |
@@ -309,6 +313,12 @@ review_mode = "ask"       # ask | clone | api
 | `mcp.allow_history_purge` | `false` | `config.toml` のみ（設定に行はありません）。`true` にすると、エージェント向けにツール `rewrite_purge` が一覧に表示されます（`allow_mutations` も必要です）。オフでは、エージェントにはこのツールがまったく見えません。消去は、履歴の書き換えの古い履歴と、その undo、reflog を完全に削除するためです。CLI と TUI は、この設定の制限を受けません。 |
 | `mcp.enabled` | `true` | `false`：`gitpoulpi mcp serve` と `gitpoulpi-mcp` は、このキーを挙げたメッセージを出して起動を拒否します。設定 > エージェントと MCP > *MCP サーバー*。エージェントがサーバーを起動するときに読み込まれます。 |
 | `mcp.bind` | `"127.0.0.1:8808"` | アドレスを指定しないときに `--http` が待ち受けるアドレスです（`--http ADDR` / `--bind` が優先）。`--allow-remote` がない限りループバックのみです。空、または古い `"stdio"` は既定値を意味します。設定 > エージェントと MCP > *MCP サーバーのポート*でポートを編集でき、ホストは維持されます。 |
+| `mcp.http_auth` | `true` | `--http` は、`Authorization: Bearer <token>`（`gitpoulpi mcp token` のトークン）を持つリクエストにだけ応答します。`false` にするとチェックがなくなり、サーバーは stderr に警告を出し、`--allow-remote` は拒否されます。設定 > エージェントと MCP > *HTTP 認証*。 |
+| `mcp.tls` | `"off"` | `off`、`self_signed`（プライベートデータフォルダーの下に一度だけ生成される証明書。起動時に SHA-256 フィンガープリントを出力）、`files`（`tls_cert` と `tls_key`）。TLS をオンにすると、サーバー自身が TLS を終端し、平文のリスナーは存在しません。設定 > エージェントと MCP > *TLS*。 |
+| `mcp.tls_cert` | `""` | `tls = "files"` で使う PEM 形式の証明書チェーン。 |
+| `mcp.tls_key` | `""` | `tls = "files"` で使う PEM 形式の秘密鍵。 |
+| `mcp.behind_proxy` | `false` | エンドポイントの前段にあるトンネルまたはリバースプロキシが暗号化を担っていると、あなたが申告します。サーバーの内部からは確認できないため、TLS なしの `--allow-remote` にはこの設定が必要です。プロキシとサーバーの間は、そのネットワーク上で平文です。設定 > エージェントと MCP > *トンネルまたはリバースプロキシの背後*。 |
+| `mcp.allow_sensitive_staging` | `false` | `config.toml` のみ。オフでは、MCP のステージツールは `allow_sensitive` を提供せず、フラグの付いたファイル（`[privacy]` を参照）を追加するステージは、エージェントにあなたへ尋ねるよう伝えるメッセージとともに拒否されます。オンでは、エージェントが `allow_sensitive` を渡せます。CLI と TUI はこの設定の制限を受けません。あなたに尋ねます。 |
 
 `allow_mutations`、`mutation_allowlist`、`allow_ui` は MCP サーバーだけを制限します。CLI はユーザー自身のシェルなので、これらの対象ではありません。[MCP とエージェント](mcp-and-agents.md)を参照してください。
 
@@ -325,6 +335,9 @@ review_mode = "ask"       # ask | clone | api
 | `ai.review.include_claude_md` | `true` | コードレビューのドラフトにリポジトリの `CLAUDE.md` を渡します（ルート、リクエストの対象ブランチで読み取り。8 KB で切り詰め）。 |
 | `ai.review.include_agents_md` | `true` | `AGENTS.md` についても同様です。 |
 | `ai.review.extra_file` | `""` | コードレビューのドラフトに渡す追加ファイル1つ：リポジトリルートからの相対パス、絶対パス、またはコードホスト上のファイルへのリンク（一致する連携プロファイル経由で、なければ匿名で読み取り）。すべてのファイルの合計は 16 KB で切り詰められます。 |
+| `ai.privacy.redact_secrets` | `true` | リクエスト内のスキャナーが認識するすべてのシークレット（トークン、秘密鍵のブロック、URL 内のパスワード、ランダムに見える `password = ...` の値）を、外に出る前に `[REDACTED:<rule>]` に置き換えます。オフの間、設定 > AI には赤い警告が表示されます。 |
+| `ai.privacy.exclude_sensitive_files` | `true` | `privacy.sensitive_patterns` に一致するすべてのファイルの diff を、送信内容から除外します。リポジトリのフォルダーで動くローカルエージェントは、それでもファイルを自分で読めます：[AI > プライバシー](ai.md#プライバシー)を参照。 |
+| `ai.sent_preview.<action>` | `true` | アクションごとに 1 つのキー（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`）：リクエストを送る前に「送信する内容」を表示します。ダイアログの「今後表示しない」が `false` を書き込み、設定 > AI > *送信前に内容を表示...* でオンに戻せます。 |
 
 リポジトリ固有の `[preferences.ai_review]` テーブル（`repo-state.toml` 内、またはクローンしていないリポジトリでは `remote-reviews.toml` のエントリ）にも同じキーを指定でき（すべて省略可能）、加えて `no_extra_file = true` があります。これは `ai.review.extra_file` の内容にかかわらず、そのリポジトリでは追加ファイルを使いません。未設定のキー、未設定の `extra_file`、存在しない `no_extra_file` は全体の値を継承します。`extra_file` にファイルを設定するとスイッチが解除され、逆の場合も同様です。
 
@@ -407,13 +420,22 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 ## `[updates]`（新しいリリースの確認）
 
-タイトルバーのバージョンチップが、新しいリリースについて行うことです。詳細：[更新](installation.md#更新)。
+タイトルバーのバージョンチップが、新しいリリースについて行うことです。詳細：[更新](updates.md)。
 
 | キー | 既定値 | 値と効果 |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"` は 1 日に 1 回、バックグラウンドで GitHub に新しいリリースがあるかを問い合わせ、あればバージョンチップを `vX.Y.Z が利用可能` にします。`"auto"` は、このビルドがリリースアーカイブから来たものであれば、更新のダウンロードとステージも自動で行います（再起動の前には確認します）。それ以外のビルドでは `"notify"` と同じです。`"off"` はリクエストを一切送りません。すぐに反映されます。 |
 | `updates.channel` | `"stable"` | `"stable"` は正式リリースだけを対象にします。`"prerelease"` はリリース候補（`-rc.1`）も案内します。すぐに反映されます。 |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | リリースを確認する github.com 上の `owner/name` です。そのリポジトリが非公開の間は、github.com のトークン（設定 > 連携）が保存されていない限り GitHub は 404 を返し、確認は静かに失敗してアプリケーションログに 1 行だけ書き込まれます。 |
+
+管理者は、マシン全体のポリシーファイルまたは Windows レジストリで、`mode`、`channel`（`release_channel` として）、`repo` のほか、いくつかの更新オプションを設定できます。ポリシーが設定したキーは `config.toml` より優先され、設定画面には**管理者が設定しています**と表示されます。ポリシーの `mode` は上限で、より低い値は選べますが、より高い値は選べません。[エンタープライズ配布](enterprise-distribution.md#ポリシーファイルとレジストリ)を参照してください。
+
+## `[privacy]`（機密ファイル）
+
+| キー | 既定値 | 値と効果 |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | gitignore 形式のパスパターンです。`/` のないパターンは任意の深さのファイル名に、`/` のあるパターンはパス全体に一致します（先頭の `/` はルートに固定します）。`*` と `?` は 1 つのフォルダー内にとどまり、`**` はフォルダーをまたぎます。`!` は先のパターンが一致したものを再び許可し、最後の一致が優先されます。大文字小文字は区別しません。ステージのガードと `ai.privacy.exclude_sensitive_files` が使います。 |
+| `privacy.staging_guard` | `true` | パターンに一致するファイル、または認識されたシークレットを内容に含むファイルをステージすると、先に確認されます（TUI）。`--allow-sensitive` を付けない限り拒否されます（CLI）。`mcp.allow_sensitive_staging` がエージェントに `allow_sensitive` を渡すことを許している場合を除き、拒否されます（MCP）。テキストファイルは 1 つあたり 1 MiB まで、合計 32 MiB まで読み取ります。バイナリファイルは名前だけで照合されます。[ステージと commit](staging-and-committing.md#機密ファイル)を参照してください。 |
 
 ## `[keybindings]`
 

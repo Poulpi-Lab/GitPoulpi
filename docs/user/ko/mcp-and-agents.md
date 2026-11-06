@@ -64,10 +64,57 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-상태 없는 JSON, 같은 도구, 같은 `[mcp]` 게이트입니다. **인증이 없으므로** 루프백에서만
-수신합니다. `--allow-remote`는 이 제한을 풀며, 그러면 포트에 닿을 수 있는 누구든 설정이
-허용하는 모든 도구를 실행할 수 있습니다. 신뢰할 수 있는 네트워크나 인증 프록시 뒤에서만
-사용하세요.
+상태 없는 JSON, 같은 도구, 같은 `[mcp]` 게이트입니다. 모든 요청에 bearer 토큰이
+필요합니다(`[mcp] http_auth`, 기본값 켜짐). `gitpoulpi mcp token --show`로 출력하고
+(`--copy`, `--rotate`도 있으며, 토큰은 비공개 데이터 폴더 아래 사용자 전용 파일에
+있습니다) 클라이언트에 헤더로 전달하세요.
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+토큰이 없거나 틀리면 `WWW-Authenticate: Bearer`와 함께 `401`을 받습니다. 교체한 토큰은
+서버를 재시작하지 않아도 즉시 적용됩니다. `http_auth`를 끄는 것은 모든 로컬 계정을
+신뢰하는 루프백 엔드포인트를 위한 것이며, 이때 서버는 stderr에 경고합니다.
+
+### 다른 컴퓨터에서 엔드포인트에 접근하기
+
+가장 안전한 구성은 원격 수신기가 아예 필요 없습니다. 루프백 주소를 유지하고 에이전트를
+실행하는 컴퓨터에서 `ssh -L 8808:127.0.0.1:8808 host`로 SSH를 통해 포트를 전달하세요.
+그러면 `--allow-remote`는 관여하지 않습니다.
+
+`--allow-remote`(루프백이 아닌 주소)는 인증이 켜져 있고 토큰이 있으며 **그리고** 트래픽이
+암호화되어 있지 않으면 거부됩니다. 거부 메시지는 무엇이 빠졌는지 알려 줍니다.
+암호화하는 방법은 두 가지입니다.
+
+- **서버의 TLS**(`[mcp] tls = "self_signed"` 또는 `"files"`). 서버가 직접 TLS를
+  종료합니다. 키를 가지고 핸드셰이크를 수행하며, 완료된 핸드셰이크만 HTTP 계층에
+  도달합니다. 평문 HTTP 클라이언트는 핸드셰이크에 실패하며 그 옆에 평문 수신기는
+  존재하지 않습니다. 따라서 암호화는 가정이 아니라 서버가 모든 연결에서 확립하는
+  사실입니다. `self_signed`에서는 처음 시작할 때 비공개 데이터 폴더 아래에 키 쌍을
+  생성하고 SHA-256 지문을 출력합니다(설정에도 표시). 클라이언트는 그 지문이나
+  인증서 파일을 고정하여 서버를 신뢰합니다. `files`에서는 `tls_cert`와 `tls_key`를
+  PEM 파일로 지정하며, 클라이언트는 CA로 인증서를 검증합니다. 클라이언트는 bearer
+  토큰으로 인증하며 클라이언트 인증서는 사용하지 않습니다.
+- **터널 또는 리버스 프록시**(`[mcp] behind_proxy = true`). 터널 에이전트나 프록시는
+  다른 로컬 또는 LAN 클라이언트처럼 연결하며 그 헤더는 위조될 수 있으므로, 서버는
+  안에서 그것이 있는지 알 수 없습니다. 그래서 감지가 아니라 명시적인 확인입니다(설정에서
+  빨간 경고와 함께 표시). 가능하면 같은 컴퓨터에서 터널을 실행하고 루프백 주소를
+  유지하세요. 프록시 뒤에서 루프백이 아닌 주소를 쓰면 프록시와 서버 사이 구간은 해당
+  네트워크에서 평문입니다.
 
 **MCP 없이** 셸이 있는 에이전트는 CLI를 사용합니다. `gitpoulpi --json <command>`
 ([CLI 참조](cli-reference.md) 참고). 에이전트에게 준비된 스킬
@@ -79,12 +126,16 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 | 스위치 | 기본값 | 효과 |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp`가 시작을 거부합니다(설정 > 에이전트 및 MCP > *MCP 서버*). 서버가 시작될 때 읽으므로 실행 중인 서버는 기존 설정을 유지합니다. |
-| `[mcp] bind` | `"127.0.0.1:8808"` | 주소 없이 `--http`를 쓸 때의 주소 (`--allow-remote`가 없으면 루프백만). 설정 > 에이전트 및 MCP > *MCP 서버 포트*가 포트를 편집하고 호스트는 유지합니다. |
+| `[mcp] bind` | `"127.0.0.1:8808"` | 주소 없이 `--http`를 쓸 때의 주소 (`--allow-remote`가 없으면 루프백만. `--allow-remote`에는 인증과 암호화가 필요합니다. 위 참고). 설정 > 에이전트 및 MCP > *MCP 서버 포트*가 포트를 편집하고 호스트는 유지합니다. |
+| `[mcp] http_auth` | `true` | `--http`는 `Authorization: Bearer <token>`(`gitpoulpi mcp token`)이 필요합니다. 설정 > 에이전트 및 MCP > *HTTP 인증*. |
+| `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` 또는 `files`(PEM 경로): 서버가 직접 TLS를 종료합니다. 설정 > 에이전트 및 MCP > *TLS*. |
+| `[mcp] behind_proxy` | `false` | 터널이나 리버스 프록시가 트래픽을 암호화한다고 사용자가 보증하며, 이로써 `--allow-remote`를 TLS 없이 실행할 수 있습니다. |
 | `[mcp] allow_mutations` | `false` | 꺼짐: 무언가를 바꾸는 모든 도구가 거부됩니다. 읽기, `ui_*`, 제안은 계속 동작합니다. `true`이면 에이전트가 commit, push, reset 등을 할 수 있습니다. |
 | `[mcp] mutation_allowlist` | `[]` | 비어 있지 않으면: 이 도구만 변경할 수 있습니다. 예: `["stage", "unstage", "commit"]`. |
 | `[mcp] allow_ui` | `true` | `false`: 에이전트가 내 창을 움직일 수 없습니다(`ui_state` / `ui_viewers`는 계속 응답). |
 | `[mcp] ui_control` | `"ask"` | `ask`: 내가 확인하는 칩이 창에 나타남. `auto`: 내가 바쁘지 않으면 적용. `off`: 거부. 에이전트별: `--ui-control`. |
 | `[mcp] allow_ui_propose` | `false` | 에이전트가 내가 확인하는, 미리 채워진 대화상자를 열 수 있게 합니다 (설정 > 에이전트 및 MCP > *AI 에이전트가 변경 사항을 제안하고 내가 확인하도록 허용*). |
+| `[mcp] allow_sensitive_staging` | `false` | `config.toml`에서만 설정합니다. 꺼져 있으면 `stage` 도구는 `allow_sensitive`를 제공하지 않으며, 민감한 파일(개인 키, `.env`, 인식된 토큰)을 추가하게 될 스테이징은 `{error: "sensitive_files", files}`와 함께 거부됩니다. 에이전트는 사용자에게 물어봐야 합니다. `true`이면 `allow_sensitive`를 전달할 수 있습니다. [스테이징과 commit](staging-and-committing.md#민감한-파일)을 참고하세요. |
 | `[mcp] allow_history_purge` | `false` | `config.toml`에서만 설정합니다. `true`이면 기록 다시 쓰기의 이전 기록(과 그 실행 취소)을 완전히 삭제하는 도구 `rewrite_purge`가 나열됩니다. 꺼져 있으면 에이전트에게 보이지 않습니다. `allow_mutations`도 여전히 필요합니다. |
 | `[ui] allow_agent_view_control` | `true` | 창의 마스터 스위치 (설정 > 에이전트 및 MCP > *AI 에이전트의 화면 제어 허용*). 꺼짐: 어떤 에이전트도 내 창에 닿을 수 없습니다. |
 | `[ui] launch` | `"off"` | 열린 창이 없을 때 에이전트가 GitPoulpi 창을 열 수 있는지 여부 ([아래](#열린-창이-없거나-다른-세션에-있을-때) 참고). |
@@ -141,6 +192,7 @@ mutation_allowlist = []        # e.g. ["stage", "unstage", "commit", "branch_cre
 allow_ui = true
 ui_control = "ask"             # "auto" lets the agent move your view without asking
 allow_ui_propose = false       # true: the agent may pre-fill Reword / Split / commit / branch / tag dialogs
+allow_sensitive_staging = false  # true: the agent may stage files the staging guard flags
 allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old history for good)
 ```
 
@@ -417,7 +469,10 @@ Not exposed as tools:
 
 | CLI | Why |
 |---|---|
+| `gitpoulpi hosting integrations trust` | accepting a changed address, account or certificate is the user's decision; an agent is told the security check needs the user |
+| `gitpoulpi ai trust` | binding an API key to another address is the user's decision |
 | `gitpoulpi mcp serve` | the MCP server cannot spawn/serve a copy of itself |
+| `gitpoulpi mcp token` | prints, copies and rotates the key that guards this very server: an agent must not read or replace it |
 | `gitpoulpi completions` | shell completion generation, not a GitBackend operation |
 | `gitpoulpi shell-init` | prints a wrapper function for the user's own shell, not a GitBackend operation |
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |
@@ -438,6 +493,7 @@ Not exposed as tools:
 | `gitpoulpi config set` | an agent must not be able to rewrite its own gating config |
 | `gitpoulpi hosting ssh-key create` | writes a private key and uploads it; too dangerous to let an agent automate |
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
+| `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
 ### 브랜치 워크플로 동작은 계획 후 실행입니다

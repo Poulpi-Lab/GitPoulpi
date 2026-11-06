@@ -36,6 +36,25 @@ e o painel direito mostra as alterações em curso:
 | Unstage | Os mesmos botões e teclas na secção Staged (`Ctrl+G u`) |
 | Descartar as alterações de um ficheiro | Clique com o botão direito no ficheiro > **Descartar alterações...** (pergunta primeiro; `Ctrl+Z` recupera as alterações) |
 
+### Ficheiros sensíveis
+
+Fazer stage de um ficheiro, de uma pasta ou de tudo verifica primeiro o que isso acrescentaria. Um ficheiro cujo
+nome corresponda a `[privacy] sensitive_patterns` (`.env` e `.env.*` exceto os
+`.example`, `.sample` e `.template`, `*.pem`, `*.key`, chaves privadas SSH,
+`*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`), ou
+cujo texto contenha um segredo que o analisador reconheça, não entra em stage. A pergunta
+**Ficheiros sensíveis** lista cada ficheiro com o seu motivo (um padrão, ou o tipo de segredo
+com uma pré-visualização mascarada, nunca o valor) e oferece **1. Stage mesmo assim** ou **2. Cancelar,
+não stage nada**. Nenhuma resposta fica realçada até premir uma seta ou um dígito,
+pelo que um Enter perdido não responde a nada; `Esc`, a cruz de fechar e um clique fora cancelam.
+É a mesma pergunta a partir do teclado, de um botão, de um menu, da paleta ou de um
+arrastar e largar, porque todos enviam o mesmo pedido. Cancelar não coloca nada em stage,
+nem sequer os ficheiros normais do mesmo stage.
+
+Os ficheiros de texto são lidos até 1 MiB cada e 32 MiB no total; os ficheiros maiores e os
+binários são apenas avaliados pelo nome. `[privacy] staging_guard = false` desativa a verificação.
+Fazer stage de um hunk ou de algumas linhas não é verificado: já está a trabalhar nesse ficheiro.
+
 Clique com o botão direito num ficheiro para ver o seu menu: stage ou unstage,
 descartar, copiar o caminho, histórico e blame do ficheiro, abrir no seu editor
 externo, ferramenta de diff ou gestor de ficheiros (definidos em
@@ -283,9 +302,16 @@ Tudo nesta página pode ser automatizado:
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # depois da recusa abaixo
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage` recusa um ficheiro sensível da mesma forma: nada entra em stage, o código
+de saída é 2 e `--json` mostra `{error: "sensitive_files", files: [{path, reason}]}`
+(uma regra e uma pré-visualização mascarada, nunca um valor). `--allow-sensitive` é a nova tentativa. Um
+agente MCP é recusado com a mesma resposta e não pode passar `allow_sensitive`, a menos que
+`[mcp] allow_sensitive_staging = true`: é-lhe dito que lhe pergunte a si.
 
 Veja a [Referência da CLI](cli-reference.md).

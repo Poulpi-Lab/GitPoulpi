@@ -35,7 +35,7 @@ Fönstrets överkant lyder
   skriver `gitpoulpi licenses` ut samma text.
 - **Versionen** (`v1.0.0`, eller `vX.Y.Z tillgänglig` när en nyare version finns)
   står mellan namnet och sökvägen: ett klick öppnar fliken **Versionsanteckningar**, se
-  [Uppdateringar](installation.md#uppdateringar).
+  [Uppdateringar](updates.md).
 - **Öppna i ▾**, direkt efter sökvägen, öppnar flikens mapp i en terminal, en
   redigerare, en multiplexer eller filhanteraren (`Alt+O`). Se
   [Öppna i](open-in.md).

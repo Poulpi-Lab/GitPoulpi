@@ -36,6 +36,25 @@ de lokale wijzigingen:
 | Unstagen | Dezelfde knoppen en toetsen in de sectie Staged (`Ctrl+G u`) |
 | De wijzigingen van een bestand verwerpen | Rechtsklik op het bestand > **Wijzigingen verwerpen...** (vraagt eerst; `Ctrl+Z` haalt de wijzigingen terug) |
 
+### Gevoelige bestanden
+
+Een bestand, een map of alles stagen controleert eerst wat het zou toevoegen. Een bestand waarvan de
+naam overeenkomt met `[privacy] sensitive_patterns` (`.env` en `.env.*` behalve de
+bestanden `.example`, `.sample` en `.template`, `*.pem`, `*.key`, SSH-privésleutels,
+`*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`), of
+waarvan de tekst een geheim bevat dat de scanner herkent, wordt niet gestaged. De vraag **Gevoelige
+bestanden** somt elk bestand op met zijn reden (een patroon, of de soort geheim
+met een gemaskeerd voorbeeld, nooit de waarde) en biedt **Toch stagen** of **Annuleren, niets stagen**.
+Geen enkel antwoord is gemarkeerd tot je een pijltoets of een cijfer indrukt,
+dus een verdwaalde Enter beantwoordt niets; `Esc`, het sluitkruisje en een klik buiten het venster annuleren.
+Het is dezelfde vraag vanaf het toetsenbord, een knop, een menu, het palet of een
+drag-and-drop, want ze sturen allemaal hetzelfde verzoek. Annuleren staget niets,
+ook niet de gewone bestanden van dezelfde stage.
+
+Tekstbestanden tot 1 MiB elk en 32 MiB in totaal worden gelezen; grotere bestanden en binaire
+bestanden worden alleen op naam beoordeeld. `[privacy] staging_guard = false` zet de controle uit.
+Eén hunk of enkele regels stagen wordt niet gecontroleerd: je werkt al aan dat bestand.
+
 Rechtsklik op een bestand voor zijn menu: stagen of unstagen, verwerpen, het pad kopiëren, bestandsgeschiedenis
 en blame, openen in je externe editor, diff-tool of bestandsbeheer (in te stellen
 in [Instellingen > Diff & editor](settings.md#diff--editor)), en meer.
@@ -274,9 +293,16 @@ Alles op deze pagina is te scripten:
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # na de weigering hieronder
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage` weigert een gevoelig bestand op dezelfde manier: er wordt niets gestaged, de afsluitcode
+is 2 en `--json` drukt `{error: "sensitive_files", files: [{path, reason}]}` af
+(een regel en een gemaskeerd voorbeeld, nooit een waarde). `--allow-sensitive` is de nieuwe poging. Een
+MCP-agent krijgt hetzelfde antwoord en kan `allow_sensitive` niet meegeven tenzij
+`[mcp] allow_sensitive_staging = true`: hem wordt gezegd het jou te vragen.
 
 Zie de [CLI-naslag](cli-reference.md).

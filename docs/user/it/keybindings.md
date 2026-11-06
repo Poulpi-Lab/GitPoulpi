@@ -121,7 +121,7 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `nav_prefix` | `activity_log` | Apri il Registro attività | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Apri il registro attività globale | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Mostra le attività in background | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | Mostra il pannello degli aggiornamenti | `Ctrl+N u` |
 | `nav_prefix` | `help` | Mostra o nascondi l'aiuto | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Seleziona scheda | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Cambia tema | `Ctrl+N y` |
@@ -840,10 +840,10 @@ applicano. I tasti sono quelli predefiniti.
 | Vista: Registro attività | `Ctrl+N A` |
 | Vista: Registro attività globale | `Ctrl+N G` |
 | Aiuto: Note di rilascio |  |
-| Updates: Show Update | `Ctrl+N u` |
-| Updates: Open Security Notice |  |
-| Updates: Copy Update Command |  |
-| Updates: Run Update Command in a Terminal |  |
+| Aggiornamenti: Mostra aggiornamento | `Ctrl+N u` |
+| Aggiornamenti: Apri avviso di sicurezza |  |
+| Aggiornamenti: Copia comando di aggiornamento |  |
+| Aggiornamenti: Esegui comando di aggiornamento in un terminale |  |
 | Aggiornamenti: Cerca aggiornamenti ora |  |
 | Aggiornamenti: Download |  |
 | Aggiornamenti: Aggiorna ora |  |
@@ -1153,7 +1153,7 @@ applicano. I tasti sono quelli predefiniti.
 | Integrazioni: Gestisci il profilo di questo repository |  |
 | Integrazioni: Connetti un'integrazione... |  |
 | Impostazioni: Opzioni del Radar di un profilo... |  |
-| Integrations: Review security check |  |
+| Integrazioni: Rivedi il controllo di sicurezza |  |
 | App: Esci | `q` |
 | App: Tema... |  |
 | App: Cambia tema... | `Ctrl+N y` |

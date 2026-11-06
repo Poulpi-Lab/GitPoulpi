@@ -380,6 +380,15 @@ périmètre, les noms des branches et des tags et les auteurs des derniers commi
 demande (une case, désactivée par défaut, visible dans le volet « ce qui est envoyé »). Le profil
 et les instructions sont ceux de *Règles de réécriture d'historique* dans Paramètres > IA.
 
+## Où va la clé
+
+Une clé d'API (OpenAI, Anthropic, OpenRouter, un serveur compatible OpenAI) est liée à l'adresse pour laquelle elle a été enregistrée : l'origine de l'URL de base du profil, notée dans `trust.toml` dans le dossier de données privé réservé à l'utilisateur. Si l'URL de base pointe plus tard ailleurs, la requête est refusée avant que rien ne soit envoyé et la clé reste où elle est. Lancez `gitpoulpi ai trust <profile> --accept-origin <url>` (ou acceptez-le dans l'application) pour déplacer volontairement la clé vers la nouvelle adresse.
+
+- Le `http://` simple est autorisé sur cette machine (Ollama, LM Studio sur `localhost`) ; partout ailleurs, il faut `gitpoulpi ai trust <profile> --allow-insecure-http on`.
+- Un serveur auto-hébergé dont le certificat ne remonte pas à une autorité connue n'est accepté que pour l'empreinte de clé que vous épinglez avec `--accept-certificate <sha256>` ; la poignée de main TLS prouve toujours que le serveur détient cette clé.
+- Un profil qui avait déjà une clé avant l'existence de ce contrôle est enregistré silencieusement, à partir de son URL de base actuelle, la première fois qu'il est utilisé.
+- Un agent local (`claude -p` et autres) n'a ni clé ni HTTP : il n'y a donc rien à lier.
+
 ## Contexte de la revue
 
 Un brouillon de revue de code (`✦`, ou `hosting review suggest`) lit le diff de la demande, son titre, sa
@@ -468,6 +477,53 @@ affiche le contexte effectif sous `review_context`. Les mêmes quatre réglages 
 - Les clés d'API sont utilisées par le processus `gitpoulpi` lui-même et n'atteignent
   jamais le démon, les autres clients de la fenêtre, ni un client MCP.
 - Le texte généré n'est jamais commité, poussé ni appliqué de lui-même.
+
+### Ce qui est nettoyé dans une requête
+
+Chaque requête, quelle que soit l'action qui l'envoie et quel que soit le
+fournisseur qui la reçoit (une API hébergée ou un agent local), passe d'abord par
+la même étape de nettoyage :
+
+- **Les secrets sont masqués** (`[ai.privacy] redact_secrets`, activé par
+  défaut). Un jeton à préfixe connu, un bloc de clé privée, un JWT, un mot de
+  passe dans une URL et une ligne `password = valeur` dont la valeur paraît
+  aléatoire sont remplacés par `[REDACTED:<rule>]`. Ce n'est pas exhaustif : cela
+  trouve les formes courantes (le même analyseur que `rewrite scan-secrets`).
+- **Les fichiers sensibles sont exclus** (`[ai.privacy] exclude_sensitive_files`,
+  activé par défaut). Le diff d'un fichier correspondant à `[privacy]
+  sensitive_patterns` (`.env` et `.env.*` sauf les fichiers `.example`, `.sample`
+  et `.template`, `*.pem`, `*.key`, les clés privées SSH, `*.p12`, `*.pfx`,
+  `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`) ne fait pas partie de
+  la requête. Un morceau de scission ou une liste de fichiers du compositeur qui
+  nomme un tel fichier est coupé de la même façon : un plan qui le concerne peut
+  donc être refusé comme incomplet, indexez ou scindez ce fichier vous-même.
+
+Désactiver l'un ou l'autre est un choix, et Paramètres > IA affiche une ligne
+rouge dessous tant qu'il est désactivé.
+
+**Ce qui est envoyé, avant l'envoi.** Avant qu'une requête ne parte, le TUI
+affiche la boîte **Ce qui est envoyé** : les instructions et la requête après
+nettoyage (le même volet que les boîtes de réécriture d'historique, défilant,
+`Alt+W` l'affiche ou le masque), combien de secrets ont été remplacés et quels
+fichiers ont été exclus (une règle et un aperçu masqué comme `ghp_****abcd`,
+jamais une valeur), une case **Ne plus afficher pour <action>**, et **Envoyer** /
+**Annuler** (`Esc`, la croix de fermeture et un clic à l'extérieur annulent ; rien
+ne part avant Envoyer). La case écrit `[ai.sent_preview] <action> = false` ;
+Paramètres > IA > *Afficher ce qui est envoyé avant...* a une option par action et
+**Tout réafficher**. Les deux boîtes de réécriture d'historique montrent déjà leur
+requête, elles n'ont donc pas d'option.
+
+**En ligne de commande**, chaque réponse `ai ...` (et `hosting review suggest`)
+porte `privacy: {redactions: N, excluded_files: [...]}`, et `--print-sent` affiche
+le texte système et utilisateur nettoyé, sous la forme `{sent: [{system, user}],
+privacy, dry_run: true}`, sans appeler le modèle (il exige `ai.enabled = true`,
+aucune clé et aucun réseau).
+
+**Une limite.** Un agent local dont le dossier de travail est le dépôt
+(`workdir = repository`, ou *Lancer l'agent dans le dépôt* pour une revue) peut
+lire les fichiers lui-même : le nettoyage couvre ce que GitPoulpi lui envoie, pas
+ce qu'il ouvre de lui-même. Utilisez le dossier de travail `dedicated` pour le
+tenir hors du dépôt.
 
 ## Dépannage
 

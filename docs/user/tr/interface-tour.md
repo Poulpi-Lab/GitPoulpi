@@ -32,7 +32,7 @@ Pencerenin üst kenarında
   basın. `t` (veya `Yardım: Lisanslar ve Emeği Geçenler` palet komutu) programa gömülü her şeyin lisans bildirimlerini ve emeği geçenleri kaydırılabilir bir metin olarak gösterir (`Up` / `Down`, `PgUp` / `PgDn`, `Home` / `End`; geri dönmek için `Esc` veya `t`). Bir betikte aynı metni `gitpoulpi licenses` yazdırır.
 - **Sürüm** (`v1.0.0`; daha yeni bir sürüm varsa `vX.Y.Z kullanılabilir`) ad ile
   yol arasında durur: tıklamak **Sürüm notları** sekmesini açar, bkz.
-  [Güncellemeler](installation.md#güncellemeler).
+  [Güncellemeler](updates.md).
 - Yolun hemen ardından gelen **Şurada aç ▾**, sekmenin klasörünü bir terminalde,
   bir düzenleyicide, bir multiplexer'da veya dosya yöneticisinde açar
   (`Alt+O`). Bkz. [Şurada aç](open-in.md).

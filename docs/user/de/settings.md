@@ -261,8 +261,11 @@ Ebenfalls auf dieser Seite, unter **Updates**:
 
 | Option | Was sie tut |
 |---|---|
-| **Nach Updates suchen** | Ein Dropdown (`updates.mode`): **Hinweisen** (Standard) prüft einmal täglich im Hintergrund und zeigt `vX.Y.Z verfügbar` in der Titelleiste; **Automatisch** lädt das Update zusätzlich im Hintergrund herunter, wenn GitPoulpi aus einem Release-Archiv installiert wurde (wann neu gestartet wird, entscheiden Sie weiterhin); **Aus** stellt nie eine Anfrage. Wirkt sofort. Siehe [Updates](installation.md#updates). |
+| **Nach Updates suchen** | Ein Dropdown (`updates.mode`): **Hinweisen** (Standard) prüft einmal täglich im Hintergrund und zeigt `vX.Y.Z verfügbar` in der Titelleiste; **Automatisch** lädt das Update zusätzlich im Hintergrund herunter, wenn GitPoulpi aus einem Release-Archiv installiert wurde (wann neu gestartet wird, entscheiden Sie weiterhin); **Aus** stellt nie eine Anfrage. Wirkt sofort. Siehe [Updates](updates.md). |
 | **Update-Kanal** | Ein Dropdown (`updates.channel`): **Stabil** (Standard) oder **Vorabversion** (auch Release Candidates). Wirkt sofort. |
+| **Installiert über** | Schreibgeschützt. Wie GitPoulpi auf diesen Computer gekommen ist (ein Release-Archiv, das Installationsprogramm für diesen Benutzer oder alle Benutzer, Chocolatey, winget, Scoop, Homebrew, apt, ein MSI-Paket, das AUR, ein Docker-Image, cargo oder ein Entwicklungs-Build). Das bestimmt, wie Updates angewendet werden, siehe [Updates](updates.md). |
+
+Eine Zeile, die Ihr Administrator in der computerweiten Update-Richtlinie gesetzt hat, zeigt **Vom Administrator festgelegt** und lässt sich hier nicht ändern.
 
 
 Ebenfalls auf dieser Seite, unter **Verlauf umschreiben**, die Zeitlimits externer Skripte (siehe [Verlauf umschreiben](history-rewrite.md)):
@@ -354,11 +357,22 @@ enthält außerdem die Standardwerte des [Review-Kontexts](ai.md#review-kontext)
 (*Profileinstellung*, *Ja*, *Nein*), **CLAUDE.md einbeziehen**, **AGENTS.md einbeziehen** und **Zusätzliche Datei** (ein Pfad oder ein
 Link; leer fügt keine hinzu, mit einer Schaltfläche **Durchsuchen...** darunter, die eine Dateiauswahl öffnet; `Enter` auf der Schaltfläche ist ihre Tastaturform). Diese Seite hat eine eigene Anleitung: [KI-Unterstützung](ai.md).
 
+Unter den Blöcken je Aktion die Gruppe **Datenschutz**:
+
+| Option | Was sie tut |
+|---|---|
+| **Geheimnisse vor dem Senden schwärzen** | An (Standard): In einer Anfrage gefundene Tokens, private Schlüssel und Passwörter werden durch `[REDACTED:<rule>]` ersetzt, bevor sie hinausgeht. Aus: Eine rote Zeile sagt, dass Geheimnisse unverändert gesendet werden. |
+| **Sensible Dateien auslassen** | An (Standard): Die Änderungen von `.env`-Dateien, privaten Schlüsseln und Zertifikaten (`[privacy] sensitive_patterns`) gehören nie zu einer Anfrage. Aus: Eine rote Zeile sagt, dass sie gesendet werden, wenn sie zu einer gehören. |
+| **Gesendetes anzeigen vor...** | Ein Schalter je Aktion (Commit-Nachricht, Erklären, Stash-Nachricht, Pull-Request-Beschreibung, Commit-Composer, Konfliktlösung, Code-Review, Commit aufteilen): Die Anfrage im Dialog **Prüfen, was gesendet wird** zeigen, bevor sie hinausgeht. Das Kästchen *Nicht mehr anzeigen* des Dialogs schaltet einen aus. Die Aktionen zum Umschreiben des Verlaufs zeigen ihren eigenen Dialog. |
+| **Alle wieder anzeigen** | Erscheint, solange ein Schalter aus ist; schaltet jeden wieder ein. |
+
+Siehe [KI > Datenschutz](ai.md#datenschutz).
+
 ### Agenten & MCP
 
-Was KI-Agenten in diesem Fenster dürfen und ob der MCP-Server laufen darf. Die
-beiden MCP-Zeilen erscheinen nur in Builds, die den Server enthalten; siehe
-[MCP und Agenten](mcp-and-agents.md).
+Was KI-Agenten in diesem Fenster dürfen, ob der MCP-Server laufen darf und wie
+sein HTTP-Endpunkt geschützt ist. Die MCP-Zeilen erscheinen nur in Builds, die
+den Server enthalten; siehe [MCP und Agenten](mcp-and-agents.md).
 
 | Option | Was sie tut |
 |---|---|
@@ -367,6 +381,12 @@ beiden MCP-Zeilen erscheinen nur in Builds, die den Server enthalten; siehe
 | **KI-Agenten die Ansicht steuern lassen** | Lässt Agenten Ihnen in diesem Fenster einen Commit, eine Datei oder einen Hinweis zeigen (`ui show`). Aus: Kein Agent erreicht das Fenster. |
 | **KI-Agenten Änderungen zur Bestätigung vorschlagen lassen** | Lässt Agenten vorausgefüllte Dialoge für Reword, Commit, Branch oder Tag öffnen, die Sie bestätigen. Standardmäßig aus. Siehe [MCP und Agenten](mcp-and-agents.md#berechtigungen). |
 | **Fenster für Agenten öffnen**, **Startbefehl (custom)** | Ob ein Agent ein GitPoulpi-Fenster öffnen darf, wenn keines offen ist, und mit welchem Terminal oder Multiplexer. Standardmäßig aus. |
+| **HTTP-Authentifizierung** | An (Standard): Der MCP-HTTP-Endpunkt beantwortet nur eine Anfrage mit dem Zugriffstoken. Aus zeigt eine rote Warnung: Jedes Programm, das den Endpunkt erreicht, kann jedes Tool ausführen, das die MCP-Einstellungen erlauben, und `--allow-remote` wird abgelehnt. Gespeichert als `mcp.http_auth`. |
+| **Zugriffstoken** | Das Token, maskiert. Der maskierte Wert ist eine Schaltfläche: `Enter` (oder ein Klick) zeigt ihn vollständig in der Zeile darunter und verbirgt ihn wieder. **Kopieren** legt es in die Zwischenablage, ohne es in der Statuszeile auszugeben, **Erneuern** ersetzt es nach einer Bestätigung (Clients mit dem alten Token werden sofort abgewiesen, kein Neustart des Servers nötig), **Erzeugen** legt das erste an. `Links` / `Rechts` wechseln zwischen den Schaltflächen, und `Enter` drückt eine. Dasselbe Token liefert `gitpoulpi mcp token`. |
+| **TLS** | **Aus** (Standard), **Selbstsigniert** (der Server erzeugt einmal ein Zertifikat und zeigt seinen Fingerabdruck) oder **Dateien** (Ihr Zertifikat und Schlüssel). Der Server beendet TLS selbst. Gespeichert als `mcp.tls`; gilt beim nächsten Start des Servers. |
+| **Zertifikatspfad**, **Schlüsselpfad** | Die PEM-Dateien, die mit **Dateien** verwendet werden (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Zertifikat-Fingerabdruck** | Schreibgeschützt: der SHA-256-Fingerabdruck des Zertifikats, das der Endpunkt ausliefert, zur Prüfung durch Clients. |
+| **Hinter Tunnel oder Reverse-Proxy** | Ihre Erklärung, dass ein Tunnel oder Proxy vor dem Endpunkt den Datenverkehr verschlüsselt, was `--allow-remote` ohne TLS ermöglicht. Der Server kann es nicht prüfen und zeigt daher bei eingeschaltetem Zustand eine rote Warnung. Gespeichert als `mcp.behind_proxy`. Siehe [MCP und Agenten](mcp-and-agents.md#den-endpunkt-von-einem-anderen-rechner-erreichen). |
 
 ### Darstellung
 

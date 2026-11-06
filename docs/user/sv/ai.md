@@ -372,6 +372,15 @@ nyaste commits med (en ruta, av som standard, som syns i rutan ”det som
 skickas”). Profilen och instruktionerna är de för *Regler för historikomskrivning*
 under Inställningar > AI.
 
+## Vart nyckeln tar vägen
+
+En API-nyckel (OpenAI, Anthropic, OpenRouter, en OpenAI-kompatibel server) är bunden till adressen den lagrades för: ursprunget för profilens bas-URL, registrerat i `trust.toml` i den privata datamappen som bara användaren kan läsa. Om bas-URL:en senare pekar någon annanstans nekas begäran innan något skickas och nyckeln stannar där den är. Kör `gitpoulpi ai trust <profile> --accept-origin <url>` (eller godta det i appen) för att flytta nyckeln till den nya adressen med flit.
+
+- Vanlig `http://` tillåts på den här datorn (Ollama, LM Studio på `localhost`); överallt annars krävs `gitpoulpi ai trust <profile> --allow-insecure-http on`.
+- En självhostad server vars certifikat inte leder till en känd utfärdare godtas bara för det nyckelfingeravtryck du fäster med `--accept-certificate <sha256>`; TLS-handskakningen bevisar fortfarande att servern har den nyckeln.
+- En profil som redan hade en nyckel innan den här kontrollen fanns registreras tyst, från sin nuvarande bas-URL, första gången den används.
+- En lokal agent (`claude -p` och liknande) har ingen nyckel och inget HTTP, så det finns inget att binda.
+
 ## Granskningskontext
 
 Ett kodgranskningsutkast (`✦`, eller `hosting review suggest`) läser begärans diff, titel, beskrivning och
@@ -455,6 +464,50 @@ det gällande sammanhanget som `review_context`. Samma fyra inställningar är `
   commits följer med **bara** om du markerar *Skicka ett urval* i dialogen (av som
   standard; CLI:t kräver `--sample N`). Filinnehåll och hemliga värden skickas aldrig.
 - Genererad text commitas, pushas eller tillämpas aldrig av sig själv.
+
+### Vad som rensas bort ur en begäran
+
+Varje begäran, oavsett vilken åtgärd som skickar den och vilken leverantör som tar emot den (ett
+hostat API eller en lokal agent), går först genom samma rensningssteg:
+
+- **Hemligheter maskeras** (`[ai.privacy] redact_secrets`, på som standard). En token
+  med ett känt prefix, ett block med en privat nyckel, en JWT, ett lösenord i en URL och en
+  rad `password = value` vars värde ser slumpmässigt ut ersätts med
+  `[REDACTED:<rule>]`. Det är inte uttömmande: det hittar de vanliga formerna (samma
+  skanner som `rewrite scan-secrets`).
+- **Känsliga filer utelämnas** (`[ai.privacy] exclude_sensitive_files`, på som
+  standard). Diffen för en fil som matchar `[privacy] sensitive_patterns` (`.env`
+  och `.env.*` utom filerna `.example`, `.sample` och `.template`, `*.pem`,
+  `*.key`, privata SSH-nycklar, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`,
+  `*.cer`, `*.der`, `*.kdbx`) ingår inte i begäran. En delad del eller en
+  composer-fillista som namnger en sådan fil kapas på samma sätt, så en plan för den
+  kan nekas som ofullständig: stagea eller dela den filen själv.
+
+Att stänga av någon av dem är ett val, och Inställningar > AI visar en röd rad under den så
+länge den är av.
+
+**Det som skickas, innan det skickas.** Innan en begäran lämnar datorn visar TUI:t
+dialogen **Det som skickas**: instruktionerna och begäran efter rensning (samma
+ruta som i dialogerna för historikomskrivning, rullningsbar, `Alt+W` visar eller döljer den), hur
+många hemligheter som ersattes och vilka filer som utelämnades (en regel och en maskerad
+förhandsvisning som `ghp_****abcd`, aldrig ett värde), en ruta **Visa inte igen för
+<åtgärd>**, och **Skicka** / **Avbryt** (`Esc`, stängningskorset och ett klick
+utanför avbryter; ingenting lämnar datorn förrän Skicka). Rutan skriver
+`[ai.sent_preview] <action> = false`; Inställningar > AI > *Visa vad som skickas
+före...* har ett reglage per åtgärd och **Visa alla igen**. De två dialogerna för
+historikomskrivning visar redan sin begäran, så de har inget reglage.
+
+**På kommandoraden** bär varje `ai ...`-svar (och `hosting review suggest`)
+`privacy: {redactions: N, excluded_files: [...]}`, och `--print-sent`
+skriver ut den rensade system- och användartexten, som `{sent: [{system, user}], privacy,
+dry_run: true}`, utan att anropa modellen (det kräver `ai.enabled = true`, ingen nyckel
+och inget nätverk).
+
+**En gräns.** En lokal agent vars arbetsmapp är repositoryt
+(`workdir = repository`, eller *Kör agenten i repositoryt* för en granskning) kan
+läsa filerna själv: rensningen gäller det GitPoulpi skickar till den, inte det den
+öppnar på egen hand. Använd den `dedicated` arbetsmappen för att hålla den utanför
+repositoryt.
 
 ## Felsökning
 

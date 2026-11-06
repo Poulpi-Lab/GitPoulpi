@@ -104,7 +104,7 @@ stage_file = "z"
 | `nav_prefix` | `activity_log` | 打开活动日志 | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | 打开全局活动日志 | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | 显示后台任务 | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | 显示更新面板 | `Ctrl+N u` |
 | `nav_prefix` | `help` | 切换帮助 | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | 选择标签页 | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | 更改主题 | `Ctrl+N y` |
@@ -802,10 +802,10 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 视图：活动日志 | `Ctrl+N A` |
 | 视图：全局活动日志 | `Ctrl+N G` |
 | 帮助：发行说明 |  |
-| Updates: Show Update | `Ctrl+N u` |
-| Updates: Open Security Notice |  |
-| Updates: Copy Update Command |  |
-| Updates: Run Update Command in a Terminal |  |
+| 更新：显示更新 | `Ctrl+N u` |
+| 更新：打开安全公告 |  |
+| 更新：复制更新命令 |  |
+| 更新：在终端中运行更新命令 |  |
 | 更新：立即检查更新 |  |
 | 更新：下载 |  |
 | 更新：立即更新 |  |
@@ -1115,7 +1115,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 集成：管理此仓库的配置 |  |
 | 集成：连接集成… |  |
 | 设置：配置的 Radar 选项… |  |
-| Integrations: Review security check |  |
+| 集成：查看安全检查 |  |
 | 应用：退出 | `q` |
 | 应用：主题… |  |
 | 应用：更改主题… | `Ctrl+N y` |

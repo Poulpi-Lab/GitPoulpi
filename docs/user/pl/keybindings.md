@@ -119,7 +119,7 @@ prefiksem (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Otwórz Dziennik aktywności | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Otwórz globalny dziennik aktywności | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Pokaż zadania w tle | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | Pokaż panel aktualizacji | `Ctrl+N u` |
 | `nav_prefix` | `help` | Przełącz pomoc | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Wybierz kartę | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Zmień motyw | `Ctrl+N y` |
@@ -835,10 +835,10 @@ zastosowania. Klawisze są domyślne.
 | Widok: Dziennik aktywności | `Ctrl+N A` |
 | Widok: Globalny dziennik aktywności | `Ctrl+N G` |
 | Pomoc: Informacje o wersji |  |
-| Updates: Show Update | `Ctrl+N u` |
-| Updates: Open Security Notice |  |
-| Updates: Copy Update Command |  |
-| Updates: Run Update Command in a Terminal |  |
+| Aktualizacje: Pokaż aktualizację | `Ctrl+N u` |
+| Aktualizacje: Otwórz komunikat o bezpieczeństwie |  |
+| Aktualizacje: Kopiuj polecenie aktualizacji |  |
+| Aktualizacje: Uruchom polecenie aktualizacji w terminalu |  |
 | Aktualizacje: Sprawdź aktualizacje teraz |  |
 | Aktualizacje: Pobierz |  |
 | Aktualizacje: Zaktualizuj teraz |  |
@@ -1148,7 +1148,7 @@ zastosowania. Klawisze są domyślne.
 | Integracje: Zarządzaj profilem tego repozytorium |  |
 | Integracje: Połącz integrację... |  |
 | Ustawienia: Opcje Radaru profilu... |  |
-| Integrations: Review security check |  |
+| Integracje: Przejrzyj kontrolę bezpieczeństwa |  |
 | Aplikacja: Zakończ | `q` |
 | Aplikacja: Motyw... |  |
 | Aplikacja: Zmień motyw... | `Ctrl+N y` |

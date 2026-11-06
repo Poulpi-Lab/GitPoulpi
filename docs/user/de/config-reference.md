@@ -349,6 +349,18 @@ review_mode = "ask"       # ask | clone | api
 Die Antworten werden pro Profil fünf Minuten in `radar-account.json` neben
 `config.toml` zwischengespeichert; die Datei ist ein Cache und kann gefahrlos gelöscht werden.
 
+### Der Vertrauensspeicher (nicht in `config.toml`)
+
+Wofür jede Integration und jedes KI-Profil mit API-Schlüssel als vertrauenswürdig galt (seine Adresse,
+die Konto-ID, ein angehefteter Zertifikatschlüssel, ob einfaches http erlaubt wurde), liegt in
+`trust.toml` im privaten Datenordner, der nur dem Benutzer gehört (`<data>/private/trust.toml`:
+`%APPDATA%\GitPoulpi\private\` unter Windows, `~/.local/share/gitpoulpi/private/`
+unter Linux). Er ist bewusst nicht Teil der `config.toml`: Wer die
+Konfiguration bearbeiten kann, darf das Vertrauen nicht durch Bearbeiten erweitern können. Ändern Sie ihn mit
+`gitpoulpi hosting integrations trust` und `gitpoulpi ai trust` (siehe
+[die Sicherheitsprüfung](hosting-integration.md#die-sicherheitsprüfung)); die Datei wird
+von GitPoulpi neu geschrieben, nicht von Hand.
+
 ## `[mcp]` (was KI-Agenten dürfen)
 
 | Schlüssel | Standard | Werte und Wirkung |
@@ -361,6 +373,12 @@ Die Antworten werden pro Profil fünf Minuten in `radar-account.json` neben
 | `mcp.allow_history_purge` | `false` | Nur in der `config.toml` (keine Zeile in den Einstellungen). `true` führt das Werkzeug `rewrite_purge` für Agenten auf (es braucht weiterhin `allow_mutations`). Aus sieht ein Agent das Werkzeug gar nicht: Ein Bereinigen löscht den alten Verlauf eines Umschreibens, dessen Rückgängig und seine Reflogs endgültig. CLI und TUI unterliegen dieser Sperre nicht. |
 | `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve` und `gitpoulpi-mcp` verweigern den Start, mit einer Meldung, die diesen Schlüssel nennt. Einstellungen > Agenten & MCP > *MCP-Server*. Wird gelesen, wenn ein Agent den Server startet. |
 | `mcp.bind` | `"127.0.0.1:8808"` | Die Adresse, auf der `--http` lauscht, wenn Sie keine angeben (`--http ADDR` / `--bind` gewinnen). Nur Loopback, außer `--allow-remote`. Leer oder das alte `"stdio"` bedeuten den Standard. Einstellungen > Agenten & MCP > *Port des MCP-Servers* ändert den Port und behält den Host. |
+| `mcp.http_auth` | `true` | `--http` beantwortet nur eine Anfrage mit `Authorization: Bearer <token>` (dem Token von `gitpoulpi mcp token`). `false` entfernt die Prüfung; der Server warnt dann auf stderr, und `--allow-remote` wird abgelehnt. Einstellungen > Agenten & MCP > *HTTP-Authentifizierung*. |
+| `mcp.tls` | `"off"` | `off`, `self_signed` (ein einmal erzeugtes Zertifikat im privaten Datenordner, sein SHA-256-Fingerabdruck wird beim Start ausgegeben) oder `files` (`tls_cert` und `tls_key`). Bei eingeschaltetem TLS beendet der Server TLS selbst, und es gibt keinen unverschlüsselten Listener. Einstellungen > Agenten & MCP > *TLS*. |
+| `mcp.tls_cert` | `""` | PEM-Zertifikatskette, die mit `tls = "files"` verwendet wird. |
+| `mcp.tls_key` | `""` | PEM-Privatschlüssel, der mit `tls = "files"` verwendet wird. |
+| `mcp.behind_proxy` | `false` | Sie erklären, dass ein Tunnel oder Reverse-Proxy vor dem Endpunkt die Verschlüsselung übernimmt. Das lässt sich innerhalb des Servers nicht prüfen, daher muss es für `--allow-remote` ohne TLS gesetzt sein. Der Abschnitt zwischen Proxy und Server ist in diesem Netzwerk Klartext. Einstellungen > Agenten & MCP > *Hinter Tunnel oder Reverse-Proxy*. |
+| `mcp.allow_sensitive_staging` | `false` | Nur in `config.toml`. Aus: Die MCP-Stage-Tools bieten `allow_sensitive` nicht an, und ein Staging, das eine markierte Datei hinzufügen würde (siehe `[privacy]`), wird mit einer Meldung abgelehnt, die den Agenten anweist, Sie zu fragen. An: Ein Agent darf `allow_sensitive` übergeben. Die CLI und die TUI unterliegen dem nicht: Sie fragen Sie. |
 
 `allow_mutations`, `mutation_allowlist` und `allow_ui` sperren nur den MCP-Server; die CLI
 ist Ihre eigene Shell und wird von ihnen nicht gesperrt. Siehe
@@ -379,6 +397,9 @@ ist Ihre eigene Shell und wird von ihnen nicht gesperrt. Siehe
 | `ai.review.include_claude_md` | `true` | Einem Code-Review-Entwurf die `CLAUDE.md` des Repositorys geben (Wurzel, gelesen auf dem Branch, auf den die Anfrage zielt; bei 8 KB gekürzt). |
 | `ai.review.include_agents_md` | `true` | Dasselbe für `AGENTS.md`. |
 | `ai.review.extra_file` | `""` | Eine weitere Datei für einen Code-Review-Entwurf: ein Pfad relativ zur Repository-Wurzel, ein absoluter Pfad oder ein Link auf eine Datei eines Code-Hosts (gelesen über das passende Integrationsprofil, sonst anonym). Alle Dateien zusammen werden bei 16 KB gekürzt. |
+| `ai.privacy.redact_secrets` | `true` | Ersetzt jedes Geheimnis, das der Scanner in einer Anfrage erkennt (ein Token, einen privaten Schlüsselblock, ein Passwort in einer URL, einen `password = ...`-Wert, der zufällig aussieht), durch `[REDACTED:<rule>]`, bevor sie hinausgeht. Einstellungen > KI zeigt eine rote Warnung, solange es aus ist. |
+| `ai.privacy.exclude_sensitive_files` | `true` | Lässt den Diff jeder Datei, die zu `privacy.sensitive_patterns` passt, aus dem Gesendeten heraus. Ein lokaler Agent, der im Repository-Ordner arbeitet, kann Dateien weiterhin selbst lesen: siehe [KI > Datenschutz](ai.md#datenschutz). |
+| `ai.sent_preview.<action>` | `true` | Ein Schlüssel je Aktion (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`): „Was gesendet wird“ anzeigen, bevor die Anfrage hinausgeht. „Für ... nicht mehr anzeigen“ im Dialog schreibt `false`; Einstellungen > KI > *Gesendetes anzeigen vor...* schaltet sie wieder ein. |
 
 Die eigene Tabelle `[preferences.ai_review]` eines Repositorys (in seiner `repo-state.toml` oder, bei einem nicht
 geklonten Repository, der Eintrag in `remote-reviews.toml`) nimmt dieselben Schlüssel, alle optional, plus
@@ -474,13 +495,22 @@ Was `gitpoulpi rewrite` und die Werkbank zum Umschreiben des Verlaufs schützen.
 
 ## `[updates]` (die Suche nach einem neueren Release)
 
-Was der Versions-Chip der Titelleiste bei neueren Releases tut. Details: [Updates](installation.md#updates).
+Was der Versions-Chip der Titelleiste bei neueren Releases tut. Details: [Updates](updates.md).
 
 | Schlüssel | Standard | Werte und Wirkung |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"` fragt einmal täglich im Hintergrund bei GitHub nach, ob es ein neueres Release gibt, und macht aus dem Versions-Chip `vX.Y.Z verfügbar`. `"auto"` lädt das Update zusätzlich von selbst herunter und legt es bereit, wenn dieser Build aus einem Release-Archiv stammt (vor dem Neustart wird weiterhin gefragt); bei jedem anderen Build verhält es sich wie `"notify"`. `"off"` stellt nie eine Anfrage. Wirkt sofort. |
 | `updates.channel` | `"stable"` | `"stable"` berücksichtigt nur vollständige Releases; `"prerelease"` bietet auch Release Candidates an (`-rc.1`). Wirkt sofort. |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | Das `owner/name` auf github.com, dessen Releases geprüft werden. Solange dieses Repository privat ist, antwortet GitHub mit 404, sofern kein Token für github.com gespeichert ist (Einstellungen > Integrationen); ohne eines scheitert die Prüfung leise und schreibt eine Zeile ins Anwendungsprotokoll. |
+
+Ein Administrator kann `mode`, `channel` (als `release_channel`) und `repo` sowie einige weitere Update-Optionen in einer computerweiten Richtliniendatei oder der Windows-Registry festlegen. Ein Schlüssel, den die Richtlinie setzt, gewinnt gegenüber der `config.toml` und erscheint in den Einstellungen als **Vom Administrator festgelegt**. `mode` in der Richtlinie ist eine Obergrenze: Sie können einen niedrigeren Wert wählen, nie einen höheren. Siehe [Unternehmensverteilung](enterprise-distribution.md#die-richtliniendatei-und-die-registry).
+
+## `[privacy]` (sensible Dateien)
+
+| Schlüssel | Standard | Werte und Wirkung |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Pfadmuster im gitignore-Stil. Ein Muster ohne `/` passt auf den Dateinamen in beliebiger Tiefe, eines mit `/` auf den ganzen Pfad (ein führendes `/` verankert es an der Wurzel); `*` und `?` bleiben innerhalb eines Ordners, `**` überschreitet Ordner; ein `!` erlaubt wieder, was ein früheres Muster erfasst hat, und die letzte Übereinstimmung gewinnt; Groß-/Kleinschreibung wird ignoriert. Wird vom Staging-Schutz und von `ai.privacy.exclude_sensitive_files` verwendet. |
+| `privacy.staging_guard` | `true` | Beim Stagen einer Datei, die zu einem Muster passt oder deren Inhalt ein erkanntes Geheimnis enthält, wird zuerst gefragt (TUI), es wird abgelehnt, außer `--allow-sensitive` ist angegeben (CLI) oder `mcp.allow_sensitive_staging` erlaubt dem Agenten, `allow_sensitive` zu übergeben (MCP). Textdateien bis zu 1 MiB je Datei und 32 MiB insgesamt werden gelesen; Binärdateien werden nur nach Namen geprüft. Siehe [Staging und Committen](staging-and-committing.md#sensible-dateien). |
 
 ## `[keybindings]`
 

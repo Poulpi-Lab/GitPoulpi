@@ -121,7 +121,7 @@ préfixe (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Ouvrir le Journal d'activité | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Ouvrir le journal d'activité global | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Afficher les tâches en arrière-plan | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | Afficher le panneau de mise à jour | `Ctrl+N u` |
 | `nav_prefix` | `help` | Afficher ou masquer l'aide | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Sélectionner un onglet | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Changer de thème | `Ctrl+N y` |
@@ -1151,7 +1151,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Intégrations : Gérer le profil de ce dépôt |  |
 | Intégrations : Connecter une intégration... |  |
 | Paramètres : Options du Radar d'un profil... |  |
-| Intégrations : Vérifier la sécurité |  |
+| Intégrations : Revoir le contrôle de sécurité |  |
 | Application : Quitter | `q` |
 | Application : Thème... |  |
 | Application : Changer de thème... | `Ctrl+N y` |

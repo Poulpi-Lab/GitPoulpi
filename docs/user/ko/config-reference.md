@@ -333,6 +333,10 @@ review_mode = "ask"       # ask | clone | api
 
 응답은 프로필별로 `config.toml` 옆의 `radar-account.json`에 5분간 캐시됩니다. 이 파일은 캐시이므로 삭제해도 안전합니다.
 
+### 신뢰 저장소(`config.toml`에 없음)
+
+각 연동과 API 키 AI 프로필이 무엇에 대해 신뢰받았는지(주소, 계정 id, 고정된 인증서 키, 일반 http 허용 여부)는 사용자만 접근할 수 있는 비공개 데이터 폴더의 `trust.toml`(`<data>/private/trust.toml`: Windows는 `%APPDATA%\GitPoulpi\private\`, Linux는 `~/.local/share/gitpoulpi/private/`)에 있습니다. 설정을 편집할 수 있는 사람이 편집만으로 신뢰를 넓힐 수 없어야 하므로 의도적으로 `config.toml`에 포함하지 않습니다. `gitpoulpi hosting integrations trust`와 `gitpoulpi ai trust`로 변경하세요([보안 확인](hosting-integration.md#보안-확인) 참고). 이 파일은 직접 편집하는 것이 아니라 GitPoulpi가 다시 씁니다.
+
 ## `[mcp]` (AI 에이전트가 할 수 있는 일)
 
 | 키 | 기본값 | 값과 효과 |
@@ -345,6 +349,12 @@ review_mode = "ask"       # ask | clone | api
 | `mcp.allow_history_purge` | `false` | `config.toml`에서만 설정합니다(설정 화면에는 행이 없음). `true`이면 에이전트에게 도구 `rewrite_purge`가 나열됩니다(`allow_mutations`도 여전히 필요). 꺼져 있으면 에이전트에게 도구가 아예 보이지 않습니다. 영구 삭제는 기록 다시 쓰기의 이전 기록과 그 실행 취소, reflog를 완전히 지우기 때문입니다. CLI와 TUI는 이 설정의 제한을 받지 않습니다. |
 | `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve`와 `gitpoulpi-mcp`가 이 키를 알려 주는 메시지와 함께 시작을 거부합니다. 설정 > 에이전트 및 MCP > *MCP 서버*. 에이전트가 서버를 시작할 때 읽습니다. |
 | `mcp.bind` | `"127.0.0.1:8808"` | 주소를 지정하지 않았을 때 `--http`가 수신하는 주소(`--http ADDR` / `--bind`가 우선). `--allow-remote`가 없으면 루프백만 허용됩니다. 비어 있거나 예전 `"stdio"`는 기본값을 뜻합니다. 설정 > 에이전트 및 MCP > *MCP 서버 포트*가 포트를 편집하고 호스트는 유지합니다. |
+| `mcp.http_auth` | `true` | `--http`는 `Authorization: Bearer <token>`(`gitpoulpi mcp token`의 토큰)이 있는 요청에만 응답합니다. `false`는 이 검사를 없애며, 이때 서버는 stderr에 경고하고 `--allow-remote`는 거부됩니다. 설정 > 에이전트 및 MCP > *HTTP 인증*. |
+| `mcp.tls` | `"off"` | `off`, `self_signed`(비공개 데이터 폴더에 한 번 생성되는 인증서이며 시작할 때 SHA-256 지문을 출력), 또는 `files`(`tls_cert`와 `tls_key`). TLS를 켜면 서버가 직접 TLS를 종료하며 평문 수신기는 존재하지 않습니다. 설정 > 에이전트 및 MCP > *TLS*. |
+| `mcp.tls_cert` | `""` | `tls = "files"`일 때 사용하는 PEM 인증서 체인. |
+| `mcp.tls_key` | `""` | `tls = "files"`일 때 사용하는 PEM 개인 키. |
+| `mcp.behind_proxy` | `false` | 엔드포인트 앞의 터널이나 리버스 프록시가 암호화를 맡는다고 사용자가 밝힙니다. 서버 안에서는 확인할 수 없으므로 TLS 없는 `--allow-remote`에는 이 값이 필요합니다. 프록시와 서버 사이 구간은 해당 네트워크에서 평문입니다. 설정 > 에이전트 및 MCP > *터널 또는 리버스 프록시 뒤*. |
+| `mcp.allow_sensitive_staging` | `false` | `config.toml`에만 있습니다. 꺼져 있으면 MCP 스테이징 도구는 `allow_sensitive`를 제공하지 않으며, 표시된 파일(`[privacy]` 참고)을 추가하게 될 스테이징은 에이전트에게 사용자에게 물어보라는 메시지와 함께 거부됩니다. 켜져 있으면 에이전트가 `allow_sensitive`를 전달할 수 있습니다. CLI와 TUI는 이 값의 제약을 받지 않으며 사용자에게 묻습니다. |
 
 `allow_mutations`, `mutation_allowlist`, `allow_ui`는 MCP 서버에만 적용됩니다. CLI는 사용자
 자신의 셸이므로 이 설정의 제한을 받지 않습니다. [MCP와 에이전트](mcp-and-agents.md#권한)를
@@ -363,6 +373,9 @@ review_mode = "ask"       # ask | clone | api
 | `ai.review.include_claude_md` | `true` | 코드 리뷰 초안에 저장소의 `CLAUDE.md`를 전달합니다(루트, 요청이 대상으로 하는 브랜치에서 읽음, 8 KB에서 잘림). |
 | `ai.review.include_agents_md` | `true` | `AGENTS.md`도 같습니다. |
 | `ai.review.extra_file` | `""` | 코드 리뷰 초안에 쓸 추가 파일 하나: 저장소 루트 기준 경로, 절대 경로 또는 코드 호스트 파일의 링크(일치하는 연동 프로필로 읽고, 없으면 익명). 모든 파일을 합쳐 16 KB에서 잘립니다. |
+| `ai.privacy.redact_secrets` | `true` | 스캐너가 인식하는 모든 비밀 정보(토큰, 개인 키 블록, URL 안의 비밀번호, 값이 무작위로 보이는 `password = ...`)를 요청이 나가기 전에 `[REDACTED:<rule>]`로 대체합니다. 꺼져 있는 동안 설정 > AI에 빨간 경고가 표시됩니다. |
+| `ai.privacy.exclude_sensitive_files` | `true` | `privacy.sensitive_patterns`에 일치하는 모든 파일의 diff를 전송 내용에서 제외합니다. 저장소 폴더에서 작업하는 로컬 에이전트는 여전히 파일을 직접 읽을 수 있습니다: [AI > 개인정보](ai.md#개인정보)를 참고하세요. |
+| `ai.sent_preview.<action>` | `true` | 동작마다 키 하나(`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`): 요청이 나가기 전에 "보내는 내용"을 표시합니다. 대화상자의 "다시 표시하지 않기"는 `false`를 기록하고, 설정 > AI > *보내기 전에 전송 내용 표시...*가 다시 켭니다. |
 
 저장소 고유의 `[preferences.ai_review]` 테이블(`repo-state.toml`에 있으며, 클론되지 않은 저장소의 항목은 `remote-reviews.toml`에 있음)은 같은 키를 모두 선택 사항으로 받고, 추가로 `no_extra_file = true`를 받습니다. 이는 `ai.review.extra_file`이 무엇이든 그 저장소에는 추가 파일이 없다는 뜻입니다. 설정하지 않은 키, 설정하지 않은 `extra_file`, 없는 `no_extra_file`은 전역 값을 상속하며, `extra_file`을 파일로 설정하면 스위치가 지워지고 그 반대도 마찬가지입니다.
 
@@ -451,13 +464,22 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 ## `[updates]` (새 릴리스 확인)
 
-제목 표시줄의 버전 칩이 새 릴리스에 대해 하는 일입니다. 자세한 내용: [업데이트](installation.md#업데이트).
+제목 표시줄의 버전 칩이 새 릴리스에 대해 하는 일입니다. 자세한 내용: [업데이트](updates.md).
 
 | 키 | 기본값 | 값과 효과 |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"`는 하루에 한 번 백그라운드에서 GitHub에 새 릴리스가 있는지 물어 버전 칩을 `vX.Y.Z available`로 바꿉니다. `"auto"`는 이 빌드가 릴리스 아카이브에서 왔다면 업데이트를 스스로 내려받아 준비해 두기도 하며(재시작하기 전에는 계속 묻습니다), 다른 빌드에서는 `"notify"`처럼 동작합니다. `"off"`는 요청을 전혀 보내지 않습니다. 즉시 적용됩니다. |
 | `updates.channel` | `"stable"` | `"stable"`은 정식 릴리스만 대상으로 하고, `"prerelease"`는 릴리스 후보(`-rc.1`)도 알립니다. 즉시 적용됩니다. |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | 릴리스를 확인할 github.com의 `owner/name`. 그 저장소가 비공개인 동안에는 github.com용 토큰이 저장되어 있지 않으면(설정 > 연동) GitHub가 404로 답하며, 토큰이 없으면 확인이 조용히 실패하고 애플리케이션 로그에 한 줄만 기록됩니다. |
+
+관리자는 컴퓨터 전체 정책 파일이나 Windows 레지스트리에서 `mode`, `channel`(`release_channel`로), `repo`와 몇 가지 다른 업데이트 옵션을 설정할 수 있습니다. 정책이 설정한 키는 `config.toml`보다 우선하며 설정에서 **관리자가 설정함**으로 표시됩니다. 정책의 `mode`는 상한입니다: 더 낮은 값은 고를 수 있지만 더 높은 값은 고를 수 없습니다. [엔터프라이즈 배포](enterprise-distribution.md#정책-파일과-레지스트리)를 참고하세요.
+
+## `[privacy]` (민감한 파일)
+
+| 키 | 기본값 | 값과 효과 |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | gitignore 방식의 경로 패턴. `/`가 없는 패턴은 모든 깊이의 파일 이름에 일치하고, `/`가 있는 패턴은 전체 경로에 일치합니다(앞의 `/`는 루트에 고정). `*`와 `?`는 한 폴더 안에 머물고 `**`는 폴더를 넘나듭니다. `!`는 앞선 패턴이 일치시킨 것을 다시 허용하며 마지막으로 일치한 것이 적용됩니다. 대소문자는 무시합니다. 스테이징 가드와 `ai.privacy.exclude_sensitive_files`가 사용합니다. |
+| `privacy.staging_guard` | `true` | 패턴에 일치하거나 내용에 인식된 비밀 정보가 있는 파일을 스테이징하면 먼저 묻고(TUI), `--allow-sensitive`가 없으면 거부되며(CLI), `mcp.allow_sensitive_staging`이 에이전트의 `allow_sensitive` 전달을 허용하지 않으면 거부됩니다(MCP). 텍스트 파일은 각각 최대 1 MiB, 전체 32 MiB까지 읽으며, 바이너리 파일은 이름으로만 일치시킵니다. [스테이징과 commit](staging-and-committing.md#민감한-파일)을 참고하세요. |
 
 ## `[keybindings]`
 

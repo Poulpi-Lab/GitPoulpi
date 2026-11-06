@@ -10,7 +10,7 @@ GitPoulpi 是一个终端 Git 客户端，拥有可点击的 commit 图、命令
 
 ## 从这里开始
 
-1. **[安装](installation.md)**：你需要什么、发布压缩包、从源码构建。若想要更小的二进制文件，请参见 **[自定义构建](custom-builds.md)**。
+1. **[安装](installation.md)**：你需要什么、发布压缩包、包管理器、从源码构建。若想要更小的二进制文件，请参见 **[自定义构建](custom-builds.md)**。GitPoulpi 如何保持最新（版本标记、更新面板、回退）：**[更新](updates.md)**。要在容器中运行：**[在 Docker 中运行](docker.md)**。面向管理员的内部源、镜像和更新策略：**[企业分发](enterprise-distribution.md)**。
 2. **[快速上手](getting-started.md)**：你的头五分钟，从启动到第一次 commit。
 3. **[界面导览](interface-tour.md)**：窗口中每个区域的名称，附图。
 

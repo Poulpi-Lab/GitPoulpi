@@ -1989,7 +1989,7 @@ panel_version = "GitPoulpi {version}"
 # context: line in the update panel; {channel} says how the app was installed, for example "Chocolatey" or "a release archive"
 panel_installed_with = "Installed with: {channel}"
 # context: line in the update panel while the app looks at how it was installed
-panel_detecting = "Looking at how GitPoulpi was installed..."
+panel_detecting = "Checking how GitPoulpi was installed..."
 # context: line in the update panel for a build that has no install record (for example built from source)
 panel_no_record = "This build has no install record, so it does not update itself."
 # context: line in the update panel when the app replaces its own files and restarts (macOS and Linux)
@@ -1997,7 +1997,7 @@ panel_note_swap = "GitPoulpi closes, replaces its files and opens again in this 
 # context: line in the update panel when the app replaces its own files and restarts (Windows)
 panel_note_swap_windows = "GitPoulpi closes, replaces its files and opens again in a new window."
 # context: line in the update panel: the update needs the approval of a Windows administrator, and other users' GitPoulpi windows on this computer are closed
-panel_note_uac = "Windows asks for administrator approval. GitPoulpi processes of other users on this computer are closed."
+panel_note_uac = "Windows asks for administrator approval. Other users' GitPoulpi sessions on this computer are closed."
 # context: line in the update panel when a package manager does the update (macOS and Linux)
 panel_note_run = "GitPoulpi closes while the package manager updates it, then opens again in this terminal."
 # context: line in the update panel when a package manager does the update (Windows)
@@ -6070,7 +6070,7 @@ send_failed = "daemon connection lost: could not send the request: {error}"
 timeout = "the daemon did not answer in time"
 embedded_failed = "the embedded daemon failed to start: {error}"
 link_panicked = "the daemon link stopped unexpectedly (its thread panicked)"
-updating = "GitPoulpi is updating, try again in a moment"
+updating = "GitPoulpi is updating. Try again in a moment"
 runtime_failed = "could not start the daemon link's runtime: {error}"
 connect_failed = "could not connect to the session daemon (port {port}): {error}"
 build_mismatch = "the session daemon is running a different build (daemon @{daemon}, this window @{window}) - run `gitpoulpi daemon restart` to pick up matching code"
@@ -10742,7 +10742,7 @@ token_missing = "There is no access token yet."
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice
-tls_help = "Encrypts the HTTP endpoint; the server ends TLS itself, so a plain connection is refused. Self-signed makes a certificate once and shows its fingerprint for clients to check. Files uses the certificate and key below. Applies the next time the server starts."
+tls_help = "Encrypts the HTTP endpoint; the server ends TLS itself, so a plain connection is refused. Self-signed creates a certificate once and shows its fingerprint for clients to check. Files uses the certificate and key below. Applies the next time the server starts."
 # context: TLS choice: no encryption
 tls_off = "Off"
 # context: TLS choice: the server makes its own certificate
@@ -10770,7 +10770,7 @@ fingerprint_off = "(TLS is off)"
 # context: label of a switch in Settings > Agents & MCP: the user states that a tunnel or reverse proxy encrypts the traffic
 proxy = "Behind a tunnel or reverse proxy"
 # context: help under that switch
-proxy_help = "Switch on when a tunnel or proxy in front of the endpoint encrypts the traffic. The server cannot check that, so it is your statement. It lets a non-loopback address run without TLS. Keeping the loopback address and using ssh -L is safer."
+proxy_help = "Switch on when a tunnel or proxy in front of the endpoint encrypts the traffic. The server cannot check that, so you are vouching for it. It lets a non-loopback address run without TLS. Keeping the loopback address and using ssh -L is safer."
 # context: red warning shown while that switch is on
 proxy_warning = "Without TLS, the hop between the tunnel or proxy and the server is plain text on that network."
 
@@ -10778,7 +10778,7 @@ proxy_warning = "Without TLS, the hop between the tunnel or proxy and the server
 # context: title of the dialog that stops an integration whose address, account or certificate changed
 title = "Integration security check"
 # context: body of the dialog; {name} is the id of an integration, {new} and {old} are web addresses
-origin_changed = "{name} now points to {new}, it was {old}. The token was not sent."
+origin_changed = "{name} now points to {new} instead of {old}. The token was not sent."
 # context: body of the dialog when the saved token of an integration now belongs to another account; {name} is the id of an integration
 account_changed = "The token of {name} now belongs to another account. The token was not used."
 # context: line of the dialog; {login} is a user name on a code host, {id} is the number the host gave that account
@@ -10850,7 +10850,7 @@ strict_help = "Refuse the server when its certificate key changes, even for a ce
 # context: checkbox of an integration form shown for an http:// address
 plain_label = "Allow plain http (not encrypted)"
 # context: red warning under the plain http checkbox
-plain_warning = "Warning: the token and everything else travels in clear text and can be read or changed on the way."
+plain_warning = "Warning: the token and everything else travel in clear text and can be read or changed on the way."
 # context: error of an integration form whose address was changed without typing the token again
 url_changed_needs_token = "The address changed: enter the token again to connect to the new address."
 # context: short label (about six letters) of a line on the connected integration card: the pinned certificate key

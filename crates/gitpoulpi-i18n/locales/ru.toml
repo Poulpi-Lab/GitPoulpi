@@ -1457,99 +1457,99 @@ channel_prerelease = "Предварительный"
 # context: heading of the group of update settings on the Synchronization page
 heading = "Обновления"
 # context: title of the update panel, the window the version in the title bar opens
-panel_title = "Updates"
+panel_title = "Обновления"
 # context: first line of the update panel; {version} is like v0.1.0 (a development build adds a short commit id)
 panel_version = "GitPoulpi {version}"
 # context: line in the update panel; {channel} says how the app was installed, for example "Chocolatey" or "a release archive"
-panel_installed_with = "Installed with: {channel}"
+panel_installed_with = "Установлено через: {channel}"
 # context: line in the update panel while the app looks at how it was installed
-panel_detecting = "Looking at how GitPoulpi was installed..."
+panel_detecting = "Проверяем, как установлен GitPoulpi..."
 # context: line in the update panel for a build that has no install record (for example built from source)
-panel_no_record = "This build has no install record, so it does not update itself."
+panel_no_record = "У этой сборки нет записи об установке, поэтому она не обновляется сама."
 # context: line in the update panel when the app replaces its own files and restarts (macOS and Linux)
-panel_note_swap = "GitPoulpi closes, replaces its files and opens again in this terminal."
+panel_note_swap = "GitPoulpi закроется, заменит свои файлы и снова откроется в этом терминале."
 # context: line in the update panel when the app replaces its own files and restarts (Windows)
-panel_note_swap_windows = "GitPoulpi closes, replaces its files and opens again in a new window."
+panel_note_swap_windows = "GitPoulpi закроется, заменит свои файлы и снова откроется в новом окне."
 # context: line in the update panel: the update needs the approval of a Windows administrator, and other users' GitPoulpi windows on this computer are closed
-panel_note_uac = "Windows asks for administrator approval. GitPoulpi processes of other users on this computer are closed."
+panel_note_uac = "Windows запросит подтверждение администратора. Сеансы GitPoulpi других пользователей на этом компьютере будут закрыты."
 # context: line in the update panel when a package manager does the update (macOS and Linux)
-panel_note_run = "GitPoulpi closes while the package manager updates it, then opens again in this terminal."
+panel_note_run = "GitPoulpi закроется на время обновления менеджером пакетов, затем снова откроется в этом терминале."
 # context: line in the update panel when a package manager does the update (Windows)
-panel_note_run_windows = "GitPoulpi closes while the package manager updates it, then opens again in a new window."
+panel_note_run_windows = "GitPoulpi закроется на время обновления менеджером пакетов, затем снова откроется в новом окне."
 # context: line in the update panel above the command the package manager runs
-panel_run_command = "It runs this command:"
+panel_run_command = "Выполняется эта команда:"
 # context: line in the update panel above the command the user runs in a terminal
-panel_show_intro = "Run this command in a terminal to update:"
+panel_show_intro = "Для обновления выполните в терминале команду:"
 # context: line in the update panel; {message} is a text the administrator of this computer set
-panel_admin_message = "From your administrator: {message}"
+panel_admin_message = "От вашего администратора: {message}"
 # context: line in the update panel: the administrator turned off self-updates
-announce_policy = "Your administrator turned off updating from inside GitPoulpi. Updates reach this computer another way."
+announce_policy = "Администратор отключил обновление из GitPoulpi. Обновления попадают на этот компьютер другим способом."
 # context: line in the update panel: the installation is managed by an administrator
-announce_managed = "This installation is managed by your administrator."
+announce_managed = "Эта установка управляется вашим администратором."
 # context: line in the update panel for the Docker image; the commands follow
-announce_container = "This is a container image. Download a newer image to update:"
+announce_container = "Это образ контейнера. Для обновления скачайте более новый образ:"
 # context: line in the update panel: the app cannot write its own folder
-announce_legacy_read_only = "GitPoulpi cannot write its own folder, so it cannot replace itself. Download the new version instead."
+announce_legacy_read_only = "GitPoulpi не может записывать в собственную папку, поэтому не может заменить себя. Скачайте новую версию."
 # context: line in the update panel: the apt repository of GitPoulpi is not set up on this computer
-announce_apt = "The GitPoulpi apt repository is not set up on this computer. Download the .deb package of the new version instead."
+announce_apt = "Репозиторий apt GitPoulpi не настроен на этом компьютере. Скачайте пакет .deb новой версии."
 # context: line in the update panel: there is no way to go back to the previous version
-announce_no_revert = "There is no way to go back to the previous version from here."
+announce_no_revert = "Вернуться к предыдущей версии отсюда нельзя."
 # context: button in the update panel: downloads the newer version if needed, then closes GitPoulpi, updates it and opens it again
-btn_update_restart = "Update and restart"
+btn_update_restart = "Обновить и перезапустить"
 # context: button in the update panel: lets the package manager update GitPoulpi
-btn_run_update = "Run update"
+btn_run_update = "Запустить обновление"
 # context: button in the update panel: copies the update command to the clipboard
-btn_copy = "Copy command"
+btn_copy = "Копировать команду"
 # context: button in the update panel: runs the update command in a new terminal window
-btn_terminal = "Open in terminal"
+btn_terminal = "Открыть в терминале"
 # context: button in the update panel: opens the Release notes tab
-btn_notes = "Release notes"
+btn_notes = "Заметки о выпуске"
 # context: button in the update panel: closes it
-btn_close = "Close"
+btn_close = "Закрыть"
 # context: button on the Release notes tab: opens the update panel
-btn_panel = "Update options"
+btn_panel = "Параметры обновления"
 # context: footer hint of the update panel; the letters are the keys of the buttons
-panel_hint = "u update  c copy  t terminal  v revert  n notes  s skip  r check  Esc close"
+panel_hint = "u обновить  c копировать  t терминал  v вернуть  n заметки  s пропустить  r проверить  Esc закрыть"
 # context: note at the top of the Release notes tab: this installation updates through the update panel
-note_see_panel = "To update, open the update panel (click the version in the title bar)."
+note_see_panel = "Чтобы обновить, откройте панель обновлений (щёлкните по версии в строке заголовка)."
 # context: palette and status line: why Update now and Restart to update do not apply to this installation; the update panel shows what to do
-why_manual = "this installation is updated another way: see Updates: Show Update"
+why_manual = "эта установка обновляется другим способом: см. «Обновления: показать обновление»"
 # context: palette: why Copy update command is unavailable
-why_no_command = "there is no update command to copy for this installation"
+why_no_command = "для этой установки нет команды обновления, которую можно скопировать"
 # context: palette: why Run update command in a terminal is unavailable
-why_no_terminal = "this installation has no update command to run in a terminal"
+why_no_terminal = "для этой установки нет команды обновления, которую можно выполнить в терминале"
 # context: what was copied, for the status line (copied {what}: ...)
-copy_what = "the update command"
+copy_what = "команду обновления"
 # context: status line after the update command was started in a new terminal window
-msg_terminal_opened = "opened a terminal with the update command"
+msg_terminal_opened = "открыт терминал с командой обновления"
 # context: status line when no terminal window could be started; {reason} is a technical explanation in English
-msg_terminal_failed = "could not open a terminal: {reason}"
+msg_terminal_failed = "не удалось открыть терминал: {reason}"
 # context: status line when the update could not be handed to the updater program; {reason} is a technical explanation in English
-msg_handoff_failed = "could not start the updater: {reason}"
+msg_handoff_failed = "не удалось запустить программу обновления: {reason}"
 # context: status line at start-up after a successful update; {version} is like 0.2.0
-msg_updated = "Updated to v{version}"
+msg_updated = "Обновлено до v{version}"
 # context: status line at start-up when the administrator approval of an update was declined
-msg_update_declined = "Update canceled: administrator approval was declined. Nothing changed."
+msg_update_declined = "Обновление отменено: подтверждение администратора отклонено. Ничего не изменилось."
 # context: status line at start-up after a failed update; {reason} is a technical explanation in English
-msg_update_failed_previous = "Update failed: {reason}. The previous version is still installed."
+msg_update_failed_previous = "Не удалось обновить: {reason}. Предыдущая версия по-прежнему установлена."
 # context: command palette entry: opens the update panel
-palette_show = "Updates: Show Update"
+palette_show = "Обновления: показать обновление"
 # context: command palette entry: copies the command that updates GitPoulpi to the clipboard
-palette_copy = "Updates: Copy Update Command"
+palette_copy = "Обновления: копировать команду обновления"
 # context: command palette entry: runs the command that updates GitPoulpi in a new terminal window
-palette_terminal = "Updates: Run Update Command in a Terminal"
+palette_terminal = "Обновления: выполнить команду обновления в терминале"
 # context: help line for the key that opens the update panel
-help_nav = "Show the update panel (version, how to update)"
+help_nav = "Показать панель обновлений (версия, как обновить)"
 # context: after "Installed with:": the app was installed from a release archive (a zip or tar.gz)
-via_archive = "a release archive"
+via_archive = "архив релиза"
 # context: after "Installed with:": the Windows installer, for the current user only
-via_inno_user = "the installer (this user)"
+via_inno_user = "установщик (для этого пользователя)"
 # context: after "Installed with:": the Windows installer, for all users
-via_inno_machine = "the installer (all users)"
+via_inno_machine = "установщик (для всех пользователей)"
 # context: after "Installed with:": Chocolatey, a Windows package manager; keep the name
 via_choco = "Chocolatey"
 # context: after "Installed with:": a company-internal Chocolatey feed
-via_choco_internal = "Chocolatey (internal feed)"
+via_choco_internal = "Chocolatey (внутренний репозиторий)"
 # context: after "Installed with:": winget, the Windows package manager; keep the name
 via_winget = "winget"
 # context: after "Installed with:": Scoop, a Windows package manager; keep the name
@@ -1559,23 +1559,23 @@ via_homebrew = "Homebrew"
 # context: after "Installed with:": apt, the Debian and Ubuntu package manager; keep the name
 via_apt = "apt"
 # context: after "Installed with:": an MSI package deployed by an administrator
-via_msi = "an MSI package"
+via_msi = "пакет MSI"
 # context: after "Installed with:": the Arch User Repository; keep the name
-via_aur = "the AUR"
+via_aur = "AUR"
 # context: after "Installed with:": a Docker image
-via_docker = "a Docker image"
+via_docker = "образ Docker"
 # context: after "Installed with:": cargo, the Rust package manager; keep the name
 via_cargo = "cargo"
 # context: after "Installed with:": a release archive in a folder this user cannot write
-via_legacy_read_only = "a release archive (read-only folder)"
+via_legacy_read_only = "архив релиза (папка только для чтения)"
 # context: after "Installed with:": a development build with no install record
-via_dev = "a development build (no install record)"
+via_dev = "сборка для разработки (без записи об установке)"
 # context: setting row on the Synchronization page, read only: how the app was installed
-installed_with = "Installed with"
+installed_with = "Установлено через"
 # context: help of the setting above
-installed_with_help = "How GitPoulpi got onto this computer. It decides how updates are applied. This row cannot be changed."
+installed_with_help = "Как GitPoulpi попал на этот компьютер. От этого зависит, как применяются обновления. Эту строку изменить нельзя."
 # context: shown instead of a setting's value when the administrator of this computer set it
-locked = "Set by your administrator"
+locked = "Задано администратором"
 
 [radar]
 title = "Radar"
@@ -2290,7 +2290,7 @@ nav_prefix_about = "Открыть «О программе»"
 nav_prefix_activity_log = "Открыть Журнал активности"
 nav_prefix_global_log = "Открыть общий журнал активности"
 nav_prefix_jobs = "Показать фоновые задачи"
-nav_prefix_updates = "Show the Update Panel"
+nav_prefix_updates = "Показать панель обновлений"
 nav_prefix_help = "Показать/скрыть справку"
 nav_prefix_select_tab = "Выбрать вкладку"
 nav_prefix_change_theme = "Сменить тему"
@@ -4998,7 +4998,7 @@ send_failed = "соединение с демоном потеряно: не у�
 timeout = "демон не ответил вовремя"
 embedded_failed = "встроенный демон не запустился: {error}"
 link_panicked = "связь с демоном неожиданно остановилась (её поток завершился аварийно)"
-updating = "GitPoulpi is updating, try again in a moment"
+updating = "GitPoulpi обновляется. Повторите через мгновение"
 runtime_failed = "не удалось запустить среду выполнения связи с демоном: {error}"
 connect_failed = "не удалось подключиться к демону сеанса (порт {port}): {error}"
 build_mismatch = "демон сеанса работает на другой сборке (демон @{daemon}, это окно @{window}) - выполните `gitpoulpi daemon restart`, чтобы подтянуть соответствующий код"
@@ -8655,280 +8655,280 @@ no_new_folder = "Выберите существующий файл: папку 
 
 [flow_hook_trust]
 # context: heading of the question in the Flow dialog when the repository's committed workflow hooks differ from the list the user trusted earlier
-heading_changed = "The hooks changed since you trusted them"
+heading_changed = "Хуки изменились с тех пор, как вы им доверились"
 # context: question in the Flow dialog above the exact shell commands the repository's workflow wants to run
-question = "This repository's workflow runs these commands on your machine. Trust them?"
+question = "Рабочий процесс этого репозитория запускает эти команды на вашем компьютере. Доверять им?"
 # context: heading of the commands that would run now, inside the scrollable command list of the hook trust question
-commands_heading = "Commands to run now"
+commands_heading = "Команды для запуска сейчас"
 # context: heading of the list of commands the user trusted earlier, shown below the new ones when the hooks changed
-previous_heading = "Commands you trusted before"
+previous_heading = "Команды, которым вы доверяли раньше"
 # context: first numbered answer of the hook trust question: remember the trust and run the action with its hooks
-answer_trust = "Trust and run"
+answer_trust = "Доверять и запустить"
 # context: second numbered answer of the hook trust question: run the action and skip every hook
-answer_skip = "Run without hooks"
+answer_skip = "Запустить без хуков"
 # context: key hint under the numbered answers of the hook trust question
-hint = "Up/Down or 1/2 to choose, Enter to confirm, PgUp/PgDn to scroll, Esc to go back"
+hint = "Вверх/Вниз или 1/2: выбор, Enter: подтвердить, PgUp/PgDn: прокрутка, Esc: назад"
 # context: shown while the daemon remembers the user's trust for the hooks
-trusting = "Remembering your answer..."
+trusting = "Запоминаем ваш ответ..."
 # context: one-line note in the Flow preview when the hooks are not trusted yet; the question comes when the action runs
-untrusted_note = "These hooks are not trusted yet: you are asked before they run."
+untrusted_note = "Этим хукам ещё не доверяют: перед запуском вас спросят."
 # context: error text when the daemon refused a run because the committed workflow hooks are not trusted; {n} is how many commands there are
-not_trusted = { one = "The workflow hooks are not trusted: {n} command was not run. Review it and trust it first.", other = "The workflow hooks are not trusted: {n} commands were not run. Review them and trust them first." }
+not_trusted = { one = "Хукам рабочего процесса не доверяют: {n} команда не выполнена. Сначала проверьте её и доверьтесь ей.", few = "Хукам рабочего процесса не доверяют: {n} команды не выполнены. Сначала проверьте их и доверьтесь им.", many = "Хукам рабочего процесса не доверяют: {n} команд не выполнено. Сначала проверьте их и доверьтесь им.", other = "Хукам рабочего процесса не доверяют: {n} команд не выполнено. Сначала проверьте их и доверьтесь им." }
 
 [mcp_security]
 # context: heading in Settings > Agents & MCP above the rows that protect the MCP HTTP endpoint
-heading = "MCP HTTP endpoint security"
+heading = "Безопасность HTTP-эндпоинта MCP"
 # context: label of a switch in Settings > Agents & MCP; the MCP server's HTTP endpoint asks clients for an access token
-auth = "HTTP authentication"
+auth = "Аутентификация HTTP"
 # context: help under the HTTP authentication switch
-auth_help = "Requests to the MCP HTTP endpoint (gitpoulpi mcp serve --http) must carry the access token. Applies the next time the server starts."
+auth_help = "Запросы к HTTP-эндпоинту MCP (gitpoulpi mcp serve --http) должны содержать токен доступа. Применяется при следующем запуске сервера."
 # context: red warning shown while HTTP authentication is off
-auth_warning = "Authentication is off: any program that can reach the endpoint can run every tool the MCP settings allow."
+auth_warning = "Аутентификация выключена: любая программа, имеющая доступ к эндпоинту, может запускать все инструменты, разрешённые настройками MCP."
 # context: label of the row that shows the access token of the MCP HTTP endpoint
-token = "Access token"
+token = "Токен доступа"
 # context: value of the access token row when no token has been made yet
-token_none = "(none yet)"
+token_none = "(пока нет)"
 # context: help under the access token row
-token_help = "Clients send it as Authorization: Bearer followed by the token. It is kept in a file only you can read. A new token applies at once: clients holding the old one are refused."
+token_help = "Клиенты отправляют его как Authorization: Bearer и далее токен. Он хранится в файле, доступном только вам. Новый токен действует сразу: клиентам со старым токеном будет отказано."
 # context: button that reveals the access token on screen
-show = "Show"
+show = "Показать"
 # context: button that hides the access token again
-hide = "Hide"
+hide = "Скрыть"
 # context: button that copies the access token to the clipboard
-copy = "Copy"
+copy = "Копировать"
 # context: button that replaces the access token with a new one
-rotate = "Rotate"
+rotate = "Заменить"
 # context: button that makes the first access token when there is none
-create = "Create"
+create = "Создать"
 # context: status line after the access token was copied; the token itself is never shown there
-token_copied = "Access token copied to the clipboard."
+token_copied = "Токен доступа скопирован в буфер обмена."
 # context: status line after the access token was replaced
-token_rotated = "Access token replaced."
+token_rotated = "Токен доступа заменён."
 # context: status line when the access token file could not be written; {reason} is the system error
-token_failed = "Could not keep the access token: {reason}"
+token_failed = "Не удалось сохранить токен доступа: {reason}"
 # context: status line when there is no access token to show or copy
-token_missing = "There is no access token yet."
+token_missing = "Токена доступа пока нет."
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice
-tls_help = "Encrypts the HTTP endpoint; the server ends TLS itself, so a plain connection is refused. Self-signed makes a certificate once and shows its fingerprint for clients to check. Files uses the certificate and key below. Applies the next time the server starts."
+tls_help = "Шифрует HTTP-эндпоинт; сервер сам завершает TLS, поэтому обычное соединение отклоняется. «Самоподписанный» один раз создаёт сертификат и показывает его отпечаток для проверки клиентами. «Файлы» использует сертификат и ключ ниже. Применяется при следующем запуске сервера."
 # context: TLS choice: no encryption
-tls_off = "Off"
+tls_off = "Выкл."
 # context: TLS choice: the server makes its own certificate
-tls_self_signed = "Self-signed"
+tls_self_signed = "Самоподписанный"
 # context: TLS choice: the user supplies a certificate and a key file
-tls_files = "Files"
+tls_files = "Файлы"
 # context: label of a path field in Settings > Agents & MCP: the TLS certificate file
-tls_cert = "Certificate path"
+tls_cert = "Путь к сертификату"
 # context: help under the certificate path
-tls_cert_help = "PEM file with the certificate chain. Used when TLS is set to Files."
+tls_cert_help = "Файл PEM с цепочкой сертификатов. Используется, когда TLS задан как «Файлы»."
 # context: label of a path field in Settings > Agents & MCP: the TLS private key file
-tls_key = "Key path"
+tls_key = "Путь к ключу"
 # context: help under the key path
-tls_key_help = "PEM file with the private key. Used when TLS is set to Files."
+tls_key_help = "Файл PEM с закрытым ключом. Используется, когда TLS задан как «Файлы»."
 # context: label of a read-only row: the SHA-256 fingerprint of the certificate the endpoint serves
-fingerprint = "Certificate fingerprint"
+fingerprint = "Отпечаток сертификата"
 # context: help under the fingerprint row
-fingerprint_help = "SHA-256 of the certificate the endpoint serves. A client that checks this value is talking to this server."
+fingerprint_help = "SHA-256 сертификата, который предъявляет эндпоинт. Клиент, проверяющий это значение, говорит именно с этим сервером."
 # context: value of the fingerprint row when TLS is Self-signed and the certificate does not exist yet
-fingerprint_pending = "(made when the server first starts with TLS)"
+fingerprint_pending = "(создаётся при первом запуске сервера с TLS)"
 # context: value of the fingerprint row when the certificate file cannot be read
-fingerprint_unreadable = "(certificate not readable)"
+fingerprint_unreadable = "(сертификат не читается)"
 # context: value of the fingerprint row when TLS is off
-fingerprint_off = "(TLS is off)"
+fingerprint_off = "(TLS выключен)"
 # context: label of a switch in Settings > Agents & MCP: the user states that a tunnel or reverse proxy encrypts the traffic
-proxy = "Behind a tunnel or reverse proxy"
+proxy = "За туннелем или обратным прокси"
 # context: help under that switch
-proxy_help = "Switch on when a tunnel or proxy in front of the endpoint encrypts the traffic. The server cannot check that, so it is your statement. It lets a non-loopback address run without TLS. Keeping the loopback address and using ssh -L is safer."
+proxy_help = "Включите, если туннель или прокси перед эндпоинтом шифрует трафик. Сервер не может это проверить, так что вы ручаетесь за это сами. Позволяет адресу, отличному от loopback, работать без TLS. Безопаснее оставить адрес loopback и использовать ssh -L."
 # context: red warning shown while that switch is on
-proxy_warning = "Without TLS, the hop between the tunnel or proxy and the server is plain text on that network."
+proxy_warning = "Без TLS участок между туннелем или прокси и сервером передаётся в открытом виде по этой сети."
 
 [trust_dialog]
 # context: title of the dialog that stops an integration whose address, account or certificate changed
-title = "Integration security check"
+title = "Проверка безопасности интеграции"
 # context: body of the dialog; {name} is the id of an integration, {new} and {old} are web addresses
-origin_changed = "{name} now points to {new}, it was {old}. The token was not sent."
+origin_changed = "{name} теперь указывает на {new} вместо {old}. Токен не отправлен."
 # context: body of the dialog when the saved token of an integration now belongs to another account; {name} is the id of an integration
-account_changed = "The token of {name} now belongs to another account. The token was not used."
+account_changed = "Токен {name} теперь принадлежит другой учётной записи. Токен не использован."
 # context: line of the dialog; {login} is a user name on a code host, {id} is the number the host gave that account
-account_was = "Trusted account: {login} (id {id})"
+account_was = "Доверенная учётная запись: {login} (id {id})"
 # context: line of the dialog; {login} is a user name on a code host, {id} is the number the host gave that account
-account_now = "Account now: {login} (id {id})"
+account_now = "Учётная запись сейчас: {login} (id {id})"
 # context: body of the dialog for a server whose certificate no known authority signed; {name} is the id of an integration
-cert_untrusted = "{name} presents a certificate that no known authority signed. Compare its fingerprint with the one the server's administrator gave you before you trust it. The token was not sent."
+cert_untrusted = "{name} предъявляет сертификат, который не подписан ни одним известным удостоверяющим центром. Прежде чем доверять ему, сверьте отпечаток с тем, что дал вам администратор сервера. Токен не отправлен."
 # context: body of the dialog; {name} is the id of an integration
-cert_changed = "The certificate of {name} changed since you trusted it. The token was not sent."
+cert_changed = "Сертификат {name} изменился с тех пор, как вы ему доверились. Токен не отправлен."
 # context: body of the dialog; {name} is the id of an integration, {origin} is a web address starting with http://
-plain_http = "{name} uses {origin}, which is not encrypted: the token and everything else can be read on the way. The token was not sent."
+plain_http = "{name} использует {origin}: соединение не зашифровано, токен и всё остальное можно прочитать по пути. Токен не отправлен."
 # context: heading over the certificate that was trusted before, in the security check dialog
-cert_before = "Trusted before"
+cert_before = "Доверенный ранее"
 # context: heading over the certificate the server presents now, in the security check dialog
-cert_now = "Presented now"
+cert_now = "Предъявлен сейчас"
 # context: label before a certificate fingerprint (a SHA-256 hash)
 cert_fingerprint = "SHA-256"
 # context: label before the subject (owner) of a certificate
-cert_subject = "Subject"
+cert_subject = "Субъект"
 # context: label before the issuer (the authority that signed) of a certificate
-cert_issuer = "Issuer"
+cert_issuer = "Издатель"
 # context: label before the first day a certificate is valid
-cert_valid_from = "Valid from"
+cert_valid_from = "Действителен с"
 # context: label before the last day a certificate is valid
-cert_valid_to = "Valid to"
+cert_valid_to = "Действителен до"
 # context: shown instead of a certificate field that was never recorded
-cert_unknown = "(not recorded)"
+cert_unknown = "(не записано)"
 # context: numbered answer of the security check dialog; deletes the integration's saved token
-answer_disconnect = "Disconnect (deletes the saved token)"
+answer_disconnect = "Отключить (удаляет сохранённый токен)"
 # context: numbered answer of the security check dialog; accepts the web address the integration now has
-answer_trust_origin = "Trust the new address"
+answer_trust_origin = "Доверять новому адресу"
 # context: numbered answer of the security check dialog; accepts the account the token now belongs to
-answer_trust_account = "Trust the new account"
+answer_trust_account = "Доверять новой учётной записи"
 # context: numbered answer of the security check dialog; accepts the certificate the server presents
-answer_trust_cert = "Trust the new certificate"
+answer_trust_cert = "Доверять новому сертификату"
 # context: numbered answer of the security check dialog; accepts an address that is not encrypted
-answer_allow_http = "Allow plain http (not encrypted)"
+answer_allow_http = "Разрешить обычный http (без шифрования)"
 # context: numbered answer of the security check dialog; changes nothing
-answer_cancel = "Cancel"
+answer_cancel = "Отмена"
 # context: hint under the answers of the security check dialog
-hint = "Press a number, or Up and Down then Enter. Esc cancels."
+hint = "Нажмите цифру или Вверх/Вниз и Enter. Esc отменяет."
 # context: line of the security check dialog; {n} is how many other checks wait after this one
-more_waiting = "More checks are waiting after this one ({n})."
+more_waiting = "После этой проверки ждут ещё проверки ({n})."
 # context: command palette entry that opens the security check dialog again
-palette_review = "Integrations: Review security check"
+palette_review = "Интеграции: проверка безопасности"
 # context: status line when the palette entry finds nothing to review
-none_waiting = "No integration security check is waiting."
+none_waiting = "Нет ожидающих проверок безопасности интеграций."
 # context: status line; {name} is the id of an integration
-disconnecting = "Disconnecting {name}..."
+disconnecting = "Отключаем {name}..."
 # context: status line; {name} is the id of an integration
-trusted_origin = "{name}: the new address is trusted."
+trusted_origin = "{name}: новый адрес принят как доверенный."
 # context: status line; {name} is the id of an integration
-trusted_account = "{name}: the new account is trusted."
+trusted_account = "{name}: новая учётная запись принята как доверенная."
 # context: status line; {name} is the id of an integration
-trusted_cert = "{name}: the new certificate is trusted."
+trusted_cert = "{name}: новый сертификат принят как доверенный."
 # context: status line; {name} is the id of an integration
-allowed_http = "{name}: plain http is allowed."
+allowed_http = "{name}: обычный http разрешён."
 # context: status line; {name} is the id of an integration whose address changed once more after the dialog was shown
-changed_again = "{name} changed again: nothing was trusted. Review it again."
+changed_again = "{name} снова изменился: ничему не доверено. Проверьте ещё раз."
 # context: status line; {name} is the id of an integration that was removed from the configuration
-no_integration = "{name} is no longer in the configuration."
+no_integration = "{name} больше нет в конфигурации."
 # context: hint under the token field of an integration form
-token_retype_hint = "Re-entering the token is recommended."
+token_retype_hint = "Рекомендуется ввести токен заново."
 # context: checkbox of an integration form; pins the key of the server's certificate
-strict_label = "Strict certificate pinning"
+strict_label = "Строгая привязка сертификата"
 # context: help under the strict pinning checkbox
-strict_help = "Refuse the server when its certificate key changes, even for a certificate a public authority signed."
+strict_help = "Отклонять сервер, если ключ его сертификата изменился, даже для сертификата, подписанного публичным центром."
 # context: checkbox of an integration form shown for an http:// address
-plain_label = "Allow plain http (not encrypted)"
+plain_label = "Разрешить обычный http (без шифрования)"
 # context: red warning under the plain http checkbox
-plain_warning = "Warning: the token and everything else travels in clear text and can be read or changed on the way."
+plain_warning = "Внимание: токен и всё остальное передаются открытым текстом и могут быть прочитаны или изменены по пути."
 # context: error of an integration form whose address was changed without typing the token again
-url_changed_needs_token = "The address changed: enter the token again to connect to the new address."
+url_changed_needs_token = "Адрес изменился: введите токен заново, чтобы подключиться к новому адресу."
 # context: short label (about six letters) of a line on the connected integration card: the pinned certificate key
-kv_certificate = "Pinned"
+kv_certificate = "Привяз."
 # context: value on the connected card, above the key fingerprint; {mode} is one of the next two messages
-pinned_value = "certificate ({mode})"
+pinned_value = "сертификат ({mode})"
 # context: pinning mode shown between parentheses after a certificate fingerprint
-mode_strict = "strict"
+mode_strict = "строго"
 # context: pinning mode shown between parentheses after a certificate fingerprint; the key was accepted at first use
-mode_first_use = "first use"
+mode_first_use = "при первом использовании"
 # context: label of a line on the connected card: when the token stops working
-kv_expires = "Expires"
+kv_expires = "Истекает"
 # context: yellow warning on the connected card, followed by a comma separated list of permissions of the token
-excess_line = "This token has more rights than GitPoulpi needs:"
+excess_line = "У этого токена больше прав, чем нужно GitPoulpi:"
 # context: yellow advice on the connected card, under the warning about extra rights
-prefer_fine_grained = "Prefer a fine-grained token with an expiry date"
+prefer_fine_grained = "Лучше использовать токен с точными правами и сроком действия"
 
 [security_notice]
 # context: title bar chip, in red, when a security notice published by the project names the running version; the chip opens the update panel
-chip = "Security notice: this version is affected"
+chip = "Уведомление о безопасности: эта версия затронута"
 # context: shorter form of the same chip, used when the title bar is too narrow for the long one
-chip_short = "Security notice"
+chip_short = "Уведомление о безопасности"
 # context: heading in the update panel above the security notices that name the running version
-panel_heading = "Security notice: this version is affected"
+panel_heading = "Уведомление о безопасности: эта версия затронута"
 # context: severity word of a security notice (lowest level), shown before the summary in the update panel
-sev_low = "Low"
+sev_low = "Низкая"
 # context: severity word of a security notice (second level)
-sev_medium = "Medium"
+sev_medium = "Средняя"
 # context: severity word of a security notice (third level)
-sev_high = "High"
+sev_high = "Высокая"
 # context: severity word of a security notice (highest level)
-sev_critical = "Critical"
+sev_critical = "Критическая"
 # context: one security notice in the update panel; {severity} is Low, Medium, High or Critical, {summary} one sentence from the notice
 advisory_line = "{severity}: {summary}"
 # context: line under a security notice in the update panel; {version} is like 1.4.3
-fixed_in = "Fixed in version {version}."
+fixed_in = "Исправлено в версии {version}."
 # context: line under a security notice in the update panel when no fixed version is published yet
-no_fix = "No fixed version is published yet."
+no_fix = "Исправленная версия пока не опубликована."
 # context: line under a security notice in the update panel; {url} is a web address
-link_line = "More information: {url}"
+link_line = "Подробнее: {url}"
 # context: line in the update panel under a security notice when GitPoulpi was installed by a package manager and cannot update itself
-package_manager = "Update with your package manager."
+package_manager = "Обновите через менеджер пакетов."
 # context: button in the update panel: opens the web page of the security notice in the browser
-btn_open = "Open notice"
+btn_open = "Открыть уведомление"
 # context: command palette entry: opens the web page of the security notice that names the running version
-palette_open = "Updates: Open Security Notice"
+palette_open = "Обновления: открыть уведомление о безопасности"
 # context: palette and status line: why Open Security Notice does nothing
-why_no_notice = "no security notice with a link names this version"
+why_no_notice = "ни одно уведомление о безопасности со ссылкой не относится к этой версии"
 # context: footer hint of the update panel when a security notice is listed; the letters are the keys of the buttons
-panel_hint = "u update  c copy  t terminal  v revert  n notes  a notice  s skip  r check  Esc close"
+panel_hint = "u обновить  c копировать  t терминал  v вернуть  n заметки  a уведомление  s пропустить  r проверить  Esc закрыть"
 
 [ai_privacy]
 # context: title of the dialog shown before an AI request is sent; {via} is the name of the AI profile
-title = "Review what is sent to {via}"
+title = "Проверьте, что отправляется в {via}"
 # context: first line of that dialog
-intro = "This is the request after secrets are replaced and sensitive files are left out. Nothing leaves until you choose Send."
+intro = "Это запрос после замены секретов и исключения конфиденциальных файлов. Ничего не уйдёт, пока вы не выберете «Отправить»."
 # context: heading of the list of secrets replaced in the request
-redactions_heading = { one = "{n} secret replaced", other = "{n} secrets replaced" }
+redactions_heading = { one = "Заменён {n} секрет", few = "Заменено {n} секрета", many = "Заменено {n} секретов", other = "Заменено {n} секретов" }
 # context: heading of the list of sensitive files left out of the request
-excluded_heading = { one = "{n} sensitive file left out", other = "{n} sensitive files left out" }
+excluded_heading = { one = "Исключён {n} конфиденциальный файл", few = "Исключено {n} конфиденциальных файла", many = "Исключено {n} конфиденциальных файлов", other = "Исключено {n} конфиденциальных файлов" }
 # context: line of the dialog when nothing was replaced and nothing was left out
-nothing_removed = "No secret was found and no sensitive file is part of this request."
+nothing_removed = "Секретов не найдено, и конфиденциальных файлов в этом запросе нет."
 # context: one row of the list of replaced secrets; {rule} is the kind of secret (github-token), {preview} a masked sample that never shows the whole value
 redaction_row = "{rule}: {preview}"
 # context: checkbox of the dialog; {action} is the name of the AI action (Commit message, Explain changes...)
-dont_show = "Don't show again for {action}"
+dont_show = "Больше не показывать для «{action}»"
 # context: button that sends the AI request
-send = "Send"
+send = "Отправить"
 # context: button that cancels the AI request
-cancel = "Cancel"
+cancel = "Отмена"
 # context: key hint at the bottom of the dialog
-hint = "Tab: next control, Space: toggle, Enter: press, Esc: cancel"
+hint = "Tab: следующий элемент, Пробел: переключить, Enter: нажать, Esc: отмена"
 # context: Settings > AI, heading of the privacy rows
-settings_heading = "Privacy"
+settings_heading = "Конфиденциальность"
 # context: Settings > AI, label of a switch
-redact_label = "Redact secrets before sending"
+redact_label = "Скрывать секреты перед отправкой"
 # context: help under that switch
-redact_help = "Replaces tokens, private keys and passwords found in a request with a [REDACTED] marker before the request leaves this machine."
+redact_help = "Заменяет токены, закрытые ключи и пароли, найденные в запросе, маркером [REDACTED] до того, как запрос покинет этот компьютер."
 # context: red warning shown while that switch is off
-redact_warning = "Off: secrets in your changes are sent to the AI service as they are."
+redact_warning = "Выкл.: секреты в ваших изменениях отправляются сервису ИИ как есть."
 # context: Settings > AI, label of a switch
-exclude_label = "Leave out sensitive files"
+exclude_label = "Исключать конфиденциальные файлы"
 # context: help under that switch; privacy.sensitive_patterns is a config key and stays as written
-exclude_help = "Never includes the changes of files such as .env, private keys and certificates (see privacy.sensitive_patterns in config.toml)."
+exclude_help = "Никогда не включает изменения файлов вроде .env, закрытых ключей и сертификатов (см. privacy.sensitive_patterns в config.toml)."
 # context: red warning shown while that switch is off
-exclude_warning = "Off: the changes of sensitive files are sent to the AI service when they are part of a request."
+exclude_warning = "Выкл.: изменения конфиденциальных файлов отправляются сервису ИИ, если входят в запрос."
 # context: Settings > AI, heading above one switch per AI action
-sent_heading = "Show what is sent before..."
+sent_heading = "Показывать, что отправляется, перед..."
 # context: help under the first of those switches
-sent_help = "Each switch shows the request for review before it is sent. The dialog's Don't show again checkbox turns one off; this button turns them all on."
+sent_help = "Каждый переключатель показывает запрос на проверку перед отправкой. Флажок «Больше не показывать» в диалоге выключает один из них; эта кнопка включает все."
 # context: Settings > AI, button that turns every "show what is sent" switch back on
-show_all_again = "Show all again"
+show_all_again = "Показывать всё снова"
 # context: status line after that button was pressed
-shown_all = "Every request will be shown before it is sent"
+shown_all = "Каждый запрос будет показан перед отправкой"
 
 [stage_guard]
 # context: title of the dialog that lists files the staging guard flagged
-title = "Sensitive files"
+title = "Конфиденциальные файлы"
 # context: question of that dialog
-question = "These files look sensitive. {$Stage} them anyway?"
+question = "Эти файлы выглядят конфиденциальными. Всё равно {$stage}?"
 # context: one reason in the list; {pattern} is a path pattern such as .env.*
-reason_pattern = "matches {pattern}"
+reason_pattern = "совпадает с {pattern}"
 # context: one reason in the list; {rule} is the kind of secret found (github-token), {preview} a masked sample that never shows the whole value
-reason_secret = "contains {rule} ({preview})"
+reason_secret = "содержит {rule} ({preview})"
 # context: first numbered answer of the dialog
-answer_stage = "{$Stage} anyway"
+answer_stage = "Всё равно {$stage}"
 # context: second numbered answer of the dialog
-answer_cancel = "Cancel, {$stage} nothing"
+answer_cancel = "Отмена, ничего не {$stage}"
 # context: key hint at the bottom of the dialog
-hint = "Up/Down: choose, Enter or 1/2: answer, Esc: cancel"
+hint = "Вверх/Вниз: выбор, Enter или 1/2: ответ, Esc: отмена"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
-sensitive_stage = "sensitive files were not {$staged}: {files}; ask the user, then {$stage} again allowing sensitive files"
+sensitive_stage = "конфиденциальные файлы не {$staged}: {files}; спросите пользователя, затем повторите {$stage}, разрешив конфиденциальные файлы"

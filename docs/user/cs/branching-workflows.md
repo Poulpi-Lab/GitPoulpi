@@ -252,6 +252,31 @@ chyba; po hooku `after_start` větev existuje a tok lze
 pokračovat nebo přerušit). `--no-hooks` je přeskočí bez ptaní. Hook může dělat
 cokoli, takže `undo` vrací jen změny v gitu.
 
+**Důvěra.** Příkazy ze commitnuté sekce `[hooks]` pocházejí od toho, kdo může
+pushovat do repozitáře, takže potřebují i *vaši* důvěru, jednou pro každou verzi
+seznamu. Důvěra se drží pro každý repozitář podle hashe hooků (změna kteréhokoli
+příkazu, fáze nebo pořadí se zeptá znovu) a daemon ji kontroluje před prvním
+krokem běhu a před pokračováním navázaného toku, takže odmítnutý běh nic
+nezměnil. Hooky ve vašem vlastním přepsání (`[workflow]` ve stavu vašeho repozitáře,
+stránka Nastavení) jsou vaše a nikdy se neptají.
+
+- **CLI:** `gitpoulpi flow trust-hooks` vypíše příkazy, jejich `hash` a zda jsou
+  `trusted`; `gitpoulpi flow trust-hooks --hash <hash>` jim důvěřuje, a to jen
+  když má soubor na disku stále tento hash. `--run-hooks` u hooků bez důvěry vypíše
+  odmítnutí (`{"refused": {"reason": "hooks_not_trusted",
+  ...}}`, kód ukončení 2) s příkazy a tímto příkazovým řádkem. Terminál, který
+  se ptá "Run them too?", se ptá i na to, zda jim také důvěřovat.
+- **TUI:** náhled vypíše hooky a řekne, že se jim zatím nedůvěřuje. Stisknutí
+  tlačítka akce se pak zeptá "Workflow tohoto repozitáře spouští na vašem počítači tyto příkazy. Důvěřujete jim?"
+  s přesnými příkazy v posouvatelném podokně
+  (kolečko myši, tažitelný posuvník, PgUp/PgDn/Home/End) a dvěma odpověďmi:
+  **1 Důvěřovat a spustit** a **2 Spustit bez hooků**. Nic není zvýrazněno, dokud
+  nestisknete šipku nebo číslici; Esc, Zrušit nebo zavírací křížek se vrátí
+  bez odpovědi. Když se soubor od vašeho schválení změnil, titulek říká "Hooky se od vašeho schválení změnily"
+  a starý seznam je ukázán pod novým.
+- **Agenti:** neexistuje nástroj, který by hookům důvěřoval. `run_hooks: true` u hooků
+  bez důvěry se odmítne s příkazy a člověk spustí `flow trust-hooks`.
+
 ### Pro agenty (MCP)
 
 Nástroje jsou `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` a
@@ -261,7 +286,9 @@ hlídá `allow_mutations`). Jsou to plán, a teprve pak provedení: zavolejte s
 abyste ho provedli. Bez obojího se volání odmítne a nese plán, takže nic
 neběží omylem. Hooky běží jen s výslovným `run_hooks: true`; plán
 je uvádí (`hooks`, `hooks_run`), aby agent mohl uživateli nejdřív ukázat příkazy.
-Po konfliktu `continue_: true` (přepínač je `--continue`) nebo
+Commitnutým hookům musí důvěřovat člověk (`flow trust-hooks`, k němuž neexistuje
+nástroj): `run_hooks: true` u hooků bez důvěry vrátí `refused` s příkazy a nic
+nespustí. Po konfliktu `continue_: true` (přepínač je `--continue`) nebo
 `abort: true`.
 
 ### Undo

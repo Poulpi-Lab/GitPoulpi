@@ -36,7 +36,32 @@ Bunların yanında arşiv, kısayolların zaten açık bir GitPoulpi penceresini
 Bir sürüm arşivi `gitpoulpi-<sürüm>-<hedef>.zip` (Windows) veya `.tar.gz`
 (Linux, macOS) dosyasıdır ve yanında bir `.sha256` dosyası bulunur. Arşivi
 `.sha256` dosyasına göre doğrulayın, açın ve üç çalıştırılabilir dosyayı
-`PATH` üzerindeki bir klasöre koyun. Arşivdeki `INSTALL.txt` aynı adımları verir.
+`PATH` üzerindeki bir klasöre koyun (`gitpoulpi-updater` ve `.gitpoulpi-dist` işaretini
+onların yanında tutun: işaret `channel=archive` der, böylece derleme kendini güncelleyebilir,
+bkz. [Güncellemeler](updates.md)). Arşivdeki `INSTALL.txt` aynı adımları verir.
+
+### Bir indirmeyi doğrulayın
+
+Her sürüm dosyası projenin [minisign](https://jedisct1.github.io/minisign/) anahtarıyla imzalanır ve GitPoulpi bir güncellemeyi kurmadan önce bu imzayı kendisi denetler. Elle indirdiğiniz bir dosya için yanındaki `.minisig` imzadır. Açık anahtar (anahtar kimliği `B461FFCBF6F6A4F2`) depoda `packaging/minisign.pub` olarak commit'lidir:
+
+```
+untrusted comment: minisign public key B461FFCBF6F6A4F2
+RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+```
+minisign -Vm gitpoulpi-<version>-<target>.tar.gz -P RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+Komutun yazdırdığı güvenilen yorumu okuyun: `file:<dosyanın adı> version:<beklediğiniz sürüm>` olmalıdır. Geçerli ama başka bir dosyayı ya da başka bir sürümü adlandıran bir imza, sizin dosyanız için bir imza değildir.
+
+Sürüm, yapı kaynağı kanıtlarıyla (build provenance attestation) derlenmişse (deponun `ATTESTATIONS` değişkeni), GitHub CLI bir dosyanın nerede derlendiğini denetler:
+
+```
+gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoulpi
+```
+
+`.sha256` dosyası yalnızca bozuk bir indirmeyi yakalar. Dosyanın projeye ait olduğunu gösteren şey imzadır.
 
 ## Bir yükleyiciyle
 
@@ -47,20 +72,20 @@ kurduğu ile Ayarlar'ın gösterdiği her zaman aynıdır.
 
 ### Windows: `gitpoulpi-<sürüm>-x86_64-pc-windows-msvc-setup.exe`
 
-Geçerli kullanıcı için, yönetici istemi olmadan, `%LOCALAPPDATA%\Programs\GitPoulpi`
-klasörüne kurar (ilk iletişim kutusu tüm kullanıcılar için kurulumu ve kurulum klasörünü
-önerir). Onay kutuları: Başlat menüsü kısayolu, Masaüstü kısayolu, PATH'e ekle. Bir sayfa
-**komut takma adını** sorar: varsayılan `gp`, istediğiniz herhangi bir ad, boş bırakırsanız
-takma ad yok. PowerShell `gp` adını zaten `Get-ItemProperty` için kullanır; orada başka bir
-ad seçin ya da `gitpoulpi` komutunu kullanın.
+İlk iletişim kutusu kurulumun kimin için olduğunu sorar:
 
-Yükleyici üç çalıştırılabilir dosyayı ve `.gitpoulpi-dist` işaretini kopyalar; böylece
-[Şimdi güncelle](#yerinde-güncelleme) zip'te olduğu gibi çalışır. Kullanıcı başına bir kurulum
-yazılabilir olduğundan kendini güncelleyebilir; Program Files içindeki tüm kullanıcılar için bir
-kurulumun değiştirilmesi yükseltilmiş yetki ister, bu yüzden onu yeni kurulum programıyla yeniden
-kurun. Windows Ayarlar > Uygulamalar'dan kaldırın: bu, `gitpoulpi uninstall` komutunu (takma ad,
-PATH girdileri, kısayollar) çalıştırır ve dosyaları, güncelleyicinin bıraktığı `.old`
-dosyaları dahil, siler. Ayarlarınız ve depolarınız kalır.
+| Seçim | Nereye | Yönetici hakları | Güncellemeler için anlamı |
+|---|---|---|---|
+| **Yalnızca benim için** (varsayılan) | `%LOCALAPPDATA%\Programs\GitPoulpi` | yok | GitPoulpi kendi dosyalarını değiştirir: [güncelleme panelinde](updates.md) **Güncelle ve yeniden başlat**, onay istemi yok. |
+| **Tüm kullanıcılar için** | `Program Files\GitPoulpi` | kurulumda bir onay istemi | Her güncelleme yönetici onayı ister (bir Windows istemi) ve bilgisayardaki diğer kullanıcıların GitPoulpi oturumları önce kapatılır. |
+
+Aynı seçim sessizce de çalışır: `gitpoulpi-<sürüm>-...-setup.exe /CURRENTUSER` veya `/ALLUSERS`.
+
+Onay kutuları: Başlat menüsü kısayolu, Masaüstü kısayolu, PATH'e ekle. Bir sayfa **komut takma adını** sorar: varsayılan `gp`, istediğiniz herhangi bir ad, boş bırakırsanız takma ad yok (komut satırında `/ALIAS=ad` veya `/ALIAS=`). PowerShell `gp` adını zaten `Get-ItemProperty` için kullanır; orada başka bir ad seçin ya da `gitpoulpi` komutunu kullanın.
+
+Yükleyici çalıştırılabilir dosyaları (güncelleme sırasında dosyaları değiştiren küçük program olan `gitpoulpi-updater` dahil) ve `.gitpoulpi-dist` işaretini kopyalar. İşaret GitPoulpi'nin nasıl kurulduğunu kaydeder (`inno-user` veya `inno-machine`); güncelleme paneli bunu **Kurulum yöntemi** olarak gösterir. Kurulum programını yeniden çalıştırmak seçimlerinizi (kapsam, kısayollar, takma ad) korur.
+
+Windows Ayarlar > Uygulamalar'dan kaldırın: bu, `gitpoulpi uninstall` komutunu (takma ad, PATH girdileri, kısayollar) çalıştırır ve dosyaları, güncelleyicinin bıraktığı `.old` dosyaları dahil, siler. Ayarlarınız ve depolarınız kalır.
 
 ### Linux ve macOS: `install.sh`
 
@@ -69,7 +94,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 İşletim sisteminiz ve işlemcinize uygun arşivi seçer, `.sha256` dosyasını denetler,
-`~/.local/opt/gitpoulpi` içine kurar ve `gitpoulpi` ile `gitpoulpi-mcp` programlarını
+`~/.local/opt/gitpoulpi` içine kurar (kanal `archive`: GitPoulpi kendini yerinde günceller) ve `gitpoulpi` ile `gitpoulpi-mcp` programlarını
 `~/.local/bin` içine bağlar. Root gerekmez ve ana klasörünüzün dışındaki hiçbir şeye
 dokunulmaz. `--yes` olmadan takma adı (varsayılan `gp`), PATH'i ve kısayolları sorar.
 
@@ -86,6 +111,38 @@ dokunulmaz. `--yes` olmadan takma adı (varsayılan `gp`), PATH'i ve kısayollar
 
 En son sürüm sorgusu için deponun herkese açık olması gerekir; özel bir depo için arşivi
 tarayıcıda indirin ve `--archive` kullanın.
+
+## Bir paket yöneticisiyle
+
+Aşağıdaki her kanal, programların yanına kendi kanal adıyla aynı `.gitpoulpi-dist` işaretini yazar. GitPoulpi güncellemelerin kimde olduğunu bilmek için onu okur: paket yöneticisinde; bu yüzden GitPoulpi onun arkasından dosyaları asla değiştirmez. Güncelleme paneli (başlık çubuğundaki sürüme tıklayın) bu durumda paket yöneticisinin kendi komutunu çalıştırır ya da kopyalayabilmeniz için gösterir. Bkz. [Güncellemeler](updates.md).
+
+| Kanal | Kurulum | Notlar |
+|---|---|---|
+| **Chocolatey** (Windows) | `choco install gitpoulpi` | Tüm kullanıcılar için kurar, bu yüzden güncellemeler yönetici onayı ister. |
+| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | Seçmek için `--scope user` veya `--scope machine` ekleyin; makine kapsamı kurulumda ve her güncellemede yönetici onayı ister. |
+| **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` ardından `scoop install gitpoulpi` | Kullanıcı başına, yönetici hakkı yok. |
+| **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | Tap `Poulpi-Lab/homebrew-gitpoulpi` adresindedir. |
+| **apt** (Debian, Ubuntu) | bkz. [apt deposu](#apt-debian-ve-ubuntu) | İmzalı depo; her sürüme bir `.deb` de eklenir. |
+| **MSI** (Windows, yönetilen) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Yöneticiler için: tüm kullanıcılar, uygulama içi güncelleme yok. Bkz. [Kurumsal dağıtım](enterprise-distribution.md#msi-intune-veya-grup-politikası-ile). |
+| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (veya `paru -S gitpoulpi-bin`) | Yardımcı olmadan: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, sonra `cd gitpoulpi-bin && makepkg -si`. |
+| **cargo** | `cargo binstall gitpoulpi-cli` | Derlemek yerine sürüm arşivini indirir. |
+| **cargo, kaynaktan** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Derler; bir Rust araç zinciri gerekir. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | Bkz. [Docker'da çalıştırma](docker.md). Aynı imaj `ghcr.io/poulpi-lab/gitpoulpi` adresinde de vardır. |
+
+Yukarıdaki adlar, sürüm sürecinin yayımladığı adlardır (bkz. [Sürüm yayımlama](../../developer/releasing.md)): henüz canlı olmayan bir kanal "bulunamadı" yanıtı verir ve sürüm arşivi veya yükleyici her zaman çalışır.
+
+Paket yöneticisinin kendi PATH işleyişi geçerlidir: Chocolatey, winget, Scoop ve Homebrew programları PATH'e kendileri koyar ve hiçbiri `gp` takma adını oluşturmaz (`gitpoulpi alias create gp` çalıştırın ya da Ayarlar > Genel > Başlatıcı).
+
+### apt (Debian ve Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+Depo `amd64` ve `arm64` mimarilerini destekler ve projeye ait bir anahtarla imzalıdır. Programlar `/usr/lib/gitpoulpi` içine gider ve `/usr/bin` içinde bağlantılar bulunur. Paket `git` paketine bağlıdır ve `git-lfs` paketini önerir. Depo olmadan, bir sürümün `.deb` dosyasını `sudo apt install ./gitpoulpi_<version>_<arch>.deb` ile kurun: GitPoulpi bu durumda bir sonraki `.deb` dosyasını kendiniz indirmenizi söyler; çünkü `apt` komutlarını yalnızca depoyu `/etc/apt/sources.list.d/gitpoulpi.*` içinde bulduğunda sunar.
 
 ## Kaynaktan
 
@@ -130,65 +187,11 @@ dosyası yazılır.
 
 ## Güncellemeler
 
-Başlık çubuğu, çalışan sürümü (`v1.0.0`) uygulama adı ile depo yolu arasında gösterir. Ona tıklayın
-ya da komut paletinden (`Ctrl+P`) **Yardım: Sürüm Notları** komutunu çalıştırın: değişiklik
-günlüğüyle bir Sürüm notları sekmesi açılır; çalışan sürüme kaydırılmış olarak.
+Başlık çubuğu, çalışan sürümü (`v1.0.0`) uygulama adı ile depo yolu arasında gösterir. Ona tıklayın, ya da `Ctrl+N` ardından `u` tuşlarına basın, ya da komut paletinden (`Ctrl+P`) **Güncellemeler: Güncellemeyi Göster** komutunu çalıştırın: güncelleme paneli sürümle, GitPoulpi'nin nasıl kurulduğuyla ve daha yeni bir sürüm için ne yapılacağıyla açılır. **Yardım: Sürüm Notları** değişiklik günlüğünü açar.
 
-GitPoulpi günde bir kez, arka planda, GitHub'a daha yeni bir sürüm olup olmadığını sorar
-(`updates.mode`, [Ayarlar > Eşitleme](settings.md#eşitleme)). Varsa çip vurgu renginde
-`v0.2.0 kullanılabilir` der ve tıklamak, o sürümün notları en üstte olacak şekilde Sürüm notları
-sekmesini açar. Sekmede her birinin bir tuşu ve bir palet komutu olan üç düğme vardır:
+GitPoulpi günde bir kez, arka planda, sürümlerinin yayımlandığı yerde (varsayılan olarak GitHub) daha yenisi olup olmadığını denetler (`updates.mode`, [Ayarlar > Eşitleme](settings.md#eşitleme)). Varsa çip vurgu renginde `v0.2.0 kullanılabilir` der.
 
-- **İndir** (`d`, *Güncellemeler: İndir*) sürüm sayfasını tarayıcınızda açar.
-- **Bu sürümü atla** (`s`, *Güncellemeler: Bu Sürümü Atla*) daha yeni bir sürüm çıkana kadar
-  bildirimi gizler.
-- **Şimdi denetle** (`r`, *Güncellemeler: Şimdi Denetle*) hemen yeniden sorar.
-
-`updates.mode = "off"` hiçbir istek yapmaz. Ağ bağlantısı yokken ya da depo özelken ve saklı bir
-github.com token'ı yokken denetim sessizce başarısız olur (uygulama günlüğünde bir satır, arayüzde
-hiçbir şey). `GITPOULPI_UPDATE_API` denetimi başka bir API köküne yöneltir (testlerde kullanılır).
-
-### Yerinde güncelleme
-
-Bir sürüm arşivinden kurulan bir derleme kendini değiştirebilir. Arşiv, çalıştırılabilir
-dosyaların yanında küçük bir `.gitpoulpi-dist` dosyası taşır; çalışan bir derleme yalnızca bu
-dosya çalıştırılabilir dosyasının yanında durduğunda (ve platformunu adlandırdığında)
-"güncellenebilir" sayılır. `cargo` ile yapılmış bir derleme, başka yere kopyalanmış özel bir derleme
-ya da dosyayı atlamış bir paket kendini asla güncellemez: Sürüm notları sekmesi bunu söyler ve
-yalnızca **İndir** sunar.
-
-Güncellenebilir bir derleme için sekme şunları ekler:
-
-- **Şimdi güncelle** (`u`, *Güncellemeler: Şimdi Güncelle*) arşivi ve `.sha256` dosyasını arka planda
-  indirir (durum çubuğunun göstergesinde bir iş; yüzdesiyle, her iş gibi iptal edilebilir),
-  özeti denetler, arşivi açar ve her yeni dosyayı eskisinin yanına `<ad>.new` olarak koyar.
-  Çalışan hiçbir şeye dokunulmaz. `auto` kipinde bir denetim daha yeni bir sürüm bulur bulmaz
-  aynısı kendiliğinden olur.
-- **Güncellemek için yeniden başlat** (`R`, *Güncellemeler: Güncellemek İçin Yeniden Başlat*;
-  indirme hazırlandığında çip de aynısını der) her zaman sizin eyleminizdir, asla otomatik
-  değildir. Oturumun bağımsız daemon'ını durdurur (gömülü olan pencereyle birlikte gider),
-  dosyaları değiştirir ve yeni sürümü aynı argümanlar ve oturumla başlatır.
-- **Önceki sürüme dön** (`v`, *Güncellemeler: Önceki Sürüme Dön*) önceki dosyaları geri koyar
-  ve yeniden başlatır. Önceki sürümün dosyaları, yeni sürüm bir dakika çalışana kadar `<ad>.old`
-  olarak kalır, sonra silinir; yani düğme o ilk çalıştırma için vardır. git geri alma
-  geçmişinin parçası değildir: bir depoyu değil, GitPoulpi'nin kendi dosyalarını değiştirir.
-
-Dosyaların nasıl değiştirildiği: Linux ve macOS'ta her yeni dosya eskisinin üzerine yeniden
-adlandırılır (atomik; çalışan bir program çıkana kadar eski kopyasını korur). Windows'ta çalışan
-bir `.exe` üzerine yazılamaz, bu yüzden eskisi `<ad>.old` olarak yeniden adlandırılır ve yenisi
-yerine taşınır; hâlâ çalışan bir `.old` sonraki bir başlatmada silinir. Değiştirme ya hep ya
-hiçtir: başka bir program çalıştırılabilir dosyalardan birini tutuyorsa (örneğin
-`gitpoulpi-mcp` çalıştıran bir MCP istemcisi), GitPoulpi dosyayı adlandırır, hiçbir şeyi
-değiştirmez ve indirmeyi yeni bir deneme için hazır bırakır.
-
-Reddedilenler, her biri bir iletiyle: `.sha256` dosyası olmayan bir sürüm, eşleşmeyen bir özet,
-adı bu platforma ait olmayan bir arşiv dosyası (`gitpoulpi-<sürüm>-<hedef>.<zip|tar.gz>`),
-işareti başka bir sürümü ya da platformu adlandıran bir arşiv ve şu sunucuların dışındaki her
-indirme bağlantısı: GitHub'ın `github.com`, `api.github.com`, `objects.githubusercontent.com`,
-`release-assets.githubusercontent.com` ve `github-releases.githubusercontent.com` adresleri
-(ilk istek ve her yönlendirme adımı; başka bir yere yönlendirme indirmeyi durdurur). Özel bir
-deponun arşivleri bir tarayıcı oturumu ister, bu yüzden indirme, depo herkese açık olana kadar
-orada başarısız olur.
+Panelin ne yaptığı GitPoulpi'nin nasıl kurulduğuna bağlıdır: bir sürüm arşivi veya Windows yükleyicisi kendi dosyalarını değiştirir, bir paket yöneticisi kendi komutunu çalıştırır, yönetilen veya kapsayıcı bir kurulum güncellemelerin ona nasıl ulaştığını söyler. `cargo build` ile yapılmış bir derleme asla güncellenmez. Önceki sürüme dönme, `auto` ile `notify` farkı ve bir yöneticinin neleri kilitleyebileceğiyle tam anlatım [Güncellemeler](updates.md) sayfasındadır.
 
 ## Çalıştığını denetleyin
 

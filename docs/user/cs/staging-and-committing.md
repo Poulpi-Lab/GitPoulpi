@@ -36,6 +36,25 @@ pracovní změny:
 | Unstage | Stejná tlačítka a klávesy v sekci Staged (`Ctrl+G u`) |
 | Zahození změn souboru | Klikněte pravým tlačítkem na soubor > **Zahodit změny...** (nejdřív se zeptá; `Ctrl+Z` změny vrátí) |
 
+### Citlivé soubory
+
+Stage souboru, složky nebo všeho nejprve zkontroluje, co by přidal. Soubor, jehož
+název odpovídá `[privacy] sensitive_patterns` (`.env` a `.env.*` kromě souborů
+`.example`, `.sample` a `.template`, `*.pem`, `*.key`, soukromé klíče SSH,
+`*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`), nebo
+jehož text obsahuje tajnou hodnotu, kterou skener pozná, se nepřidá. Otázka **Citlivé
+soubory** vypíše každý soubor s důvodem (vzor, nebo druh tajné hodnoty
+s maskovaným náhledem, nikdy hodnota) a nabídne **1. Stage přesto** nebo **2. Zrušit a nic nepřidávat**.
+Žádná odpověď není zvýrazněna, dokud nestisknete šipku nebo číslici,
+takže náhodné Enter neodpoví nic; `Esc`, zavírací křížek a klik mimo ruší.
+Je to stejná otázka z klávesnice, tlačítka, nabídky, palety nebo
+přetažení, protože všechny posílají stejný požadavek. Zrušení nepřidá nic,
+ani běžné soubory téhož stage.
+
+Textové soubory do 1 MiB každý a 32 MiB celkem se čtou; větší soubory a binární
+soubory se posuzují jen podle názvu. `[privacy] staging_guard = false` kontrolu vypne.
+Stage jednoho hunku nebo některých řádků se nekontroluje: na tom souboru už pracujete.
+
 Kliknutím pravým tlačítkem na soubor otevřete jeho nabídku: stage nebo
 unstage, zahodit, kopírovat cestu, historie souboru a blame, otevřít ve
 vašem externím editoru, diff nástroji nebo správci souborů (nastavuje se v
@@ -271,9 +290,16 @@ Vše na této stránce lze skriptovat:
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # after the refusal below
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage` odmítne citlivý soubor stejným způsobem: nic se nepřidá, kód
+ukončení je 2 a `--json` vypíše `{error: "sensitive_files", files: [{path, reason}]}`
+(pravidlo a maskovaný náhled, nikdy hodnota). `--allow-sensitive` je opakování. Agent
+MCP je odmítnut stejnou odpovědí a nemůže předat `allow_sensitive`, pokud není
+`[mcp] allow_sensitive_staging = true`: má se zeptat vás.
 
 Viz [Referenční příručka CLI](cli-reference.md).

@@ -350,6 +350,15 @@ Namen der Branches und Tags und die Autoren der neuesten Commits mit (ein Kästc
 aus, im Bereich „Was gesendet wird“ sichtbar). Profil und Anweisungen sind die von *Regeln zum
 Umschreiben des Verlaufs* unter Einstellungen > KI.
 
+## Wohin der Schlüssel gehört
+
+Ein API-Schlüssel (OpenAI, Anthropic, OpenRouter, ein OpenAI-kompatibler Server) ist an die Adresse gebunden, für die er gespeichert wurde: den Origin der Basis-URL des Profils, festgehalten in `trust.toml` im privaten Datenordner, der nur dem Benutzer gehört. Zeigt die Basis-URL später woandershin, wird die Anfrage abgelehnt, bevor etwas gesendet wird, und der Schlüssel bleibt, wo er ist. Führen Sie `gitpoulpi ai trust <profile> --accept-origin <url>` aus (oder akzeptieren Sie es in der App), um den Schlüssel bewusst an die neue Adresse zu verschieben.
+
+- Einfaches `http://` ist auf diesem Rechner erlaubt (Ollama, LM Studio auf `localhost`); anderswo braucht es `gitpoulpi ai trust <profile> --allow-insecure-http on`.
+- Ein selbst gehosteter Server, dessen Zertifikat nicht zu einer bekannten Zertifizierungsstelle führt, wird nur für den Schlüssel-Fingerabdruck akzeptiert, den Sie mit `--accept-certificate <sha256>` festlegen; der TLS-Handshake beweist weiterhin, dass der Server diesen Schlüssel besitzt.
+- Ein Profil, das schon vor dieser Prüfung einen Schlüssel hatte, wird bei der ersten Verwendung stillschweigend aus seiner aktuellen Basis-URL erfasst.
+- Ein lokaler Agent (`claude -p` und Ähnliche) hat keinen Schlüssel und kein HTTP, es gibt also nichts zu binden.
+
 ## Review-Kontext
 
 Ein Code-Review-Entwurf (`✦` oder `hosting review suggest`) liest Diff, Titel, Beschreibung und die
@@ -433,6 +442,21 @@ wirksamen Kontext als `review_context` aus. Dieselben vier Einstellungen sind `a
 - API-Schlüssel werden vom Prozess `gitpoulpi` selbst verwendet und erreichen nie den
   Daemon, die anderen Clients des Fensters oder einen MCP-Client.
 - Erzeugter Text wird nie von selbst committet, gepusht oder angewendet.
+
+### Was aus einer Anfrage entfernt wird
+
+Jede Anfrage, gleich welche Aktion sie sendet und welcher Anbieter sie erhält (eine gehostete API oder ein lokaler Agent), durchläuft zuerst denselben Bereinigungsschritt:
+
+- **Geheimnisse werden geschwärzt** (`[ai.privacy] redact_secrets`, standardmäßig an). Ein Token mit bekanntem Präfix, ein privater Schlüsselblock, ein JWT, ein Passwort in einer URL und eine Zeile `password = value`, deren Wert zufällig aussieht, werden durch `[REDACTED:<rule>]` ersetzt. Das ist nicht erschöpfend: Es findet die gängigen Formen (derselbe Scanner wie bei `rewrite scan-secrets`).
+- **Sensible Dateien werden ausgelassen** (`[ai.privacy] exclude_sensitive_files`, standardmäßig an). Der Diff einer Datei, die zu `[privacy] sensitive_patterns` passt (`.env` und `.env.*` außer den Dateien `.example`, `.sample` und `.template`, `*.pem`, `*.key`, private SSH-Schlüssel, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`), gehört nicht zur Anfrage. Ein aufgeteiltes Stück oder eine Dateiliste des Composers, die eine solche Datei nennt, wird genauso gekürzt, sodass ein Plan dafür als unvollständig abgelehnt werden kann: Stagen oder teilen Sie diese Datei selbst.
+
+Eines von beiden auszuschalten ist eine bewusste Entscheidung, und Einstellungen > KI zeigt darunter eine rote Zeile, solange es aus ist.
+
+**Was gesendet wird, bevor es gesendet wird.** Bevor eine Anfrage hinausgeht, zeigt die TUI den Dialog **Prüfen, was gesendet wird**: die Anweisungen und die Anfrage nach der Bereinigung (derselbe Bereich wie in den Dialogen zum Umschreiben des Verlaufs, scrollbar, `Alt+W` zeigt oder verbirgt ihn), wie viele Geheimnisse ersetzt und welche Dateien ausgelassen wurden (eine Regel und eine maskierte Vorschau wie `ghp_****abcd`, nie ein Wert), ein Kontrollkästchen **Für <Aktion> nicht mehr anzeigen** und **Senden** / **Abbrechen** (`Esc`, das Schließen-Kreuz und ein Klick außerhalb brechen ab; nichts verlässt den Rechner vor Senden). Das Kontrollkästchen schreibt `[ai.sent_preview] <action> = false`; Einstellungen > KI > *Gesendetes anzeigen vor...* hat einen Schalter je Aktion und **Alle wieder anzeigen**. Die beiden Dialoge zum Umschreiben des Verlaufs zeigen ihre Anfrage ohnehin, daher haben sie keinen Schalter.
+
+**Auf der Kommandozeile** trägt jede Antwort von `ai ...` (und `hosting review suggest`) `privacy: {redactions: N, excluded_files: [...]}`, und `--print-sent` gibt den bereinigten System- und Benutzertext aus, als `{sent: [{system, user}], privacy, dry_run: true}`, ohne das Modell aufzurufen (es braucht `ai.enabled = true`, aber keinen Schlüssel und kein Netzwerk).
+
+**Eine Grenze.** Ein lokaler Agent, dessen Arbeitsordner das Repository ist (`workdir = repository`, oder *Den Agenten im Repository ausführen* bei einem Review), kann die Dateien selbst lesen: Die Bereinigung deckt ab, was GitPoulpi ihm sendet, nicht, was er von sich aus öffnet. Verwenden Sie den Arbeitsordner `dedicated`, um ihn aus dem Repository herauszuhalten.
 
 ## Fehlerbehebung
 

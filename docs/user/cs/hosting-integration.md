@@ -158,6 +158,43 @@ GitPoulpi hledá token profilu v tomto pořadí:
 Každý profil je položka `[[integrations]]` v `config.toml`. Viz
 [referenční příručka konfigurace](config-reference.md#integrations-hosting-a-issue-trackery).
 
+## Kontrola zabezpečení
+
+Uložený token je stejně bezpečný jako adresa, na kterou se posílá. GitPoulpi si proto pro každou integraci pamatuje, k čemu byla připojena, a zastaví se, když se to změní:
+
+- **Adresa.** Při prvním použití integrace (nebo připojení) se její adresa zaznamená do `trust.toml` v soukromé datové složce jen pro uživatele (`<data>/private/`), ne do `config.toml`: úprava konfigurace nikdy nemůže rozšířit to, čemu se důvěřuje. Pokud adresa v konfiguraci už není ta zaznamenaná, nic se na ni neodešle a token se ani nečte. Různé zápisy jedné adresy (`HTTPS://Git.Example.com:443/`) jsou stejná adresa; hostitel s podobným názvem ne.
+- **Účet.** Po připojení tokenu a pak zhruba jednou denně (a jednou za běh u tokenu, který pochází z `GITPOULPI_TOKEN_*` nebo z credential helperu) se GitPoulpi hostitele zeptá, komu token patří, a porovná **id** účtu, ne přihlašovací jméno. Token, který nyní patří někomu jinému, se zastaví.
+- **Certifikát.** Servery, jejichž certifikát nevede k žádné známé autoritě (soukromá CA, server s vlastním podpisem), se přijímají jen pro přesný klíč, který jste přijali, a TLS handshake stále dokazuje, že server tento klíč drží. Se zapnutým přísným připnutím se klíč musí shodovat, i když certifikát vede k veřejnému kořeni; cenou je, že každá výměna klíče se zeptá znovu, proto je to dobrovolné. Veřejní hostitelé (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) žádný záznam certifikátu nevedou.
+- **Prosté http.** Adresa `http://` mimo loopback se odmítne, pokud jste ji pro danou integraci nepovolili.
+
+Každý požadavek je také vázán na vlastní adresu integrace (a u veřejného hostitele na jeho hostitele API, například `api.github.com`): požadavek kamkoli jinam se odmítne dřív, než se odešle, a přesměrování na jinou adresu se nenásleduje.
+
+**Integrace připojené před existencí této kontroly** dostanou svůj záznam tiše, z konfigurace, jaká byla, při prvním použití po upgradu: ponechají si dnešní úroveň důvěry a nic se neptá.
+
+### Z příkazové řádky
+
+Zastavený příkaz skončí s kódem ukončení 2 a vypíše, co se změnilo (viz [Reference CLI](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` ukáže, čemu se důvěřuje; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` a `--allow-insecure-http on|off` přijmou vždy jednu věc, s uvedením přesné hodnoty. Po přijetí nové adresy zadejte token znovu. Odpojení (`hosting logout`) nebo odebrání integrace smaže její token, její záznam důvěry a to, co se z ní uložilo do mezipaměti (uložené seznamy repozitářů dialogu Klonovat, seznamy účtu v Radaru a návrhy vzdálených kontrol jejího hostitele).
+
+Agent (MCP) nemůže přijmout nic: dozví se, že kontrola zabezpečení potřebuje vás.
+
+### V terminálovém rozhraní
+
+Zastavený požadavek otevře dialog **Kontrola zabezpečení integrace** nad tím, co jste dělali. Říká, co se změnilo (stará a nová adresa, starý a nový účet s jejich id, nebo starý a nový certifikát jako malá tabulka s otiskem SHA-256 ve skupinách po čtyřech, subjektem, vydavatelem a platností) a že token nebyl odeslán. Odpovědi jsou číslované:
+
+1. **Odpojit** smaže uložený token, záznam důvěry a to, co se z integrace uložilo do mezipaměti.
+2. **Důvěřovat** nové adrese, účtu nebo certifikátu (nešifrovaná adresa: **Povolit prosté http**).
+3. **Zrušit** nic nemění.
+
+Žádná odpověď není zvýrazněna, dokud nestisknete šipku nebo číslici, takže náhodné Enter nic nepřijme. Esc a zavírací křížek zruší; klik mimo dialog nedělá nic. Dlouhý text se posouvá kolečkem, Page Up/Page Down nebo posuvníkem. Několik kontrol se řadí do fronty (jedna na integraci a druh změny) a ptá se jedna po druhé. Zrušená kontrola se znovu neobjeví, dokud se nezmění; **Integrace: Zkontrolovat zabezpečení** v paletě příkazů ji přinese zpět.
+
+Po důvěře k nové **adrese** se formulář integrace otevře s aktivním polem tokenu a nápovědou "Doporučujeme token zadat znovu.": uložený token se tam nikdy neposlal. Ve formuláři se záměrně změněná adresa přijme spolu s tokenem zadaným pro ni; bez tokenu formulář o něj požádá.
+
+Formulář má také dva přepínače. **Přísné připnutí certifikátu** (pro adresu https) připne klíč certifikátu, který server předloží při připojení. **Povolit prosté http (nešifrované)** se nabízí jen pro adresu `http://`, která není tento počítač, s červeným varováním, že token putuje jako prostý text. Připojená karta ukazuje připnutý otisk.
+
+### Co smí token a do kdy
+
+Připojení se hostitele také zeptá, co token umí. GitHub (klasické tokeny), GitLab a Bitbucket (když pošle scopes) hlásí své scopes: karta ukáže žlutý řádek "Tento token má víc práv, než GitPoulpi potřebuje" se seznamem scopes nad rámec toho, co GitPoulpi používá, citlivé (například `delete_repo`, `admin:org`, `sudo`) červeně, s radou použít raději jemně nastavený token s datem vypršení. Klasický token GitHubu (`ghp_...`) dostane tuto radu i tehdy, když jsou jeho scopes přesné. Jemně nastavený token GitHubu se na oprávnění zeptat nelze, takže se ukáže jen jeho vypršení. Karta ukazuje datum vypršení, když ho hostitel uvede. Token bez vypršení neukáže žádnou připomínku a ostatní produkty žádné scopes nehlásí a nevyvolají varování. Stejná pole jsou v JSON příkazů `hosting integrations login` a `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). Čtou se při připojení, takže je karta ukazuje pro relaci, která se připojila.
+
 ## 4. Propojení repozitáře
 
 Propojení je výslovné a platí pro každý repozitář zvlášť. Je-li profil

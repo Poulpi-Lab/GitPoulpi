@@ -16,8 +16,13 @@ vous en avez besoin.
 ## Pour commencer
 
 1. **[Installation](installation.md)** : ce qu'il vous faut, archives de
-   release, compilation depuis les sources. Pour un binaire plus petit, voir
-   **[Builds personnalisés](custom-builds.md)**.
+   release, gestionnaires de paquets, compilation depuis les sources. Pour un
+   binaire plus petit, voir **[Builds personnalisés](custom-builds.md)**.
+   Comment GitPoulpi se tient à jour (la pastille de version, le panneau de
+   mise à jour, le retour en arrière) : **[Mises à jour](updates.md)**. Pour
+   l'exécuter dans un conteneur : **[Exécuter dans Docker](docker.md)**. Pour
+   les administrateurs, flux internes, miroirs et politique de mise à jour :
+   **[Distribution en entreprise](enterprise-distribution.md)**.
 2. **[Premiers pas](getting-started.md)** : vos cinq premières minutes, du
    lancement à votre premier commit.
 3. **[Visite de l'interface](interface-tour.md)** : le nom de chaque zone de la

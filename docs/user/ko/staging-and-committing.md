@@ -25,6 +25,12 @@
 | 스테이징 해제 | 스테이징된 섹션에서 같은 버튼과 키(`Ctrl+G u`) |
 | 파일의 변경 사항 버리기 | 파일을 마우스 오른쪽 버튼으로 클릭 > **변경 사항 버리기...**(먼저 확인하며, `Ctrl+Z`로 변경 사항을 되돌릴 수 있음) |
 
+### 민감한 파일
+
+파일, 폴더 또는 전체를 스테이징하면 먼저 무엇이 추가되는지 확인합니다. 이름이 `[privacy] sensitive_patterns`(`.example`, `.sample`, `.template` 파일을 제외한 `.env`와 `.env.*`, `*.pem`, `*.key`, SSH 개인 키, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`)에 일치하거나, 텍스트에 스캐너가 인식하는 비밀 정보가 들어 있는 파일은 스테이징되지 않습니다. **민감한 파일** 질문은 각 파일을 이유(패턴, 또는 비밀 정보의 종류와 가려진 미리 보기이며 값은 절대 표시하지 않음)와 함께 나열하고 **1. 그래도 스테이징** 또는 **2. 취소, 스테이징하지 않음**을 제공합니다. 화살표 키나 숫자를 누르기 전에는 어떤 답도 강조되지 않으므로 실수로 누른 Enter는 아무것도 답하지 않습니다. `Esc`, 닫기 표시, 바깥 클릭은 취소합니다. 키보드, 버튼, 메뉴, 팔레트, 드래그 앤 드롭 모두 같은 요청을 보내므로 같은 질문이 나옵니다. 취소하면 같은 스테이징의 일반 파일도 포함해 아무것도 스테이징하지 않습니다.
+
+텍스트 파일은 각각 최대 1 MiB, 전체 32 MiB까지 읽으며, 더 큰 파일과 바이너리 파일은 이름으로만 판단합니다. `[privacy] staging_guard = false`는 검사를 끕니다. hunk 하나나 일부 줄을 스테이징하는 것은 검사하지 않습니다. 이미 그 파일을 작업 중이기 때문입니다.
+
 파일을 마우스 오른쪽 버튼으로 클릭하면 메뉴가 나옵니다. 스테이징 또는 스테이징 해제, 버리기, 경로 복사, 파일 기록과 blame, 외부 편집기·diff 도구·파일 관리자에서 열기([설정 > Diff 및 편집기](settings.md#diff-및-편집기)에서 지정), 그 밖의 기능이 있습니다.
 
 ## 파일 무시하기, 바이너리 또는 텍스트로 처리하기
@@ -198,9 +204,12 @@ commit을 만들 때는 먼저 모든 것을 스테이징 해제하고, 각 comm
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # after the refusal below
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage`도 민감한 파일을 같은 방식으로 거부합니다. 아무것도 스테이징되지 않고 종료 코드는 2이며 `--json`은 `{error: "sensitive_files", files: [{path, reason}]}`(규칙과 가려진 미리 보기이며 값은 절대 표시하지 않음)를 출력합니다. 다시 시도하려면 `--allow-sensitive`를 쓰세요. MCP 에이전트도 같은 응답으로 거부되며 `[mcp] allow_sensitive_staging = true`가 아니면 `allow_sensitive`를 전달할 수 없습니다. 에이전트는 사용자에게 물어보라는 안내를 받습니다.
 
 [CLI 참조](cli-reference.md)를 참고하세요.

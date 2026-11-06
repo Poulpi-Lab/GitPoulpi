@@ -356,6 +356,15 @@ namen van branches en tags en de auteurs van de nieuwste commits mee (een vakje,
 paneel "wat wordt verstuurd"). Het profiel en de instructies zijn die van *Regels voor geschiedenis
 herschrijven* in Instellingen > AI.
 
+## Waar de sleutel naartoe gaat
+
+Een API-sleutel (OpenAI, Anthropic, OpenRouter, een OpenAI-compatibele server) is gebonden aan het adres waarvoor hij is opgeslagen: de oorsprong van de basis-URL van het profiel, vastgelegd in `trust.toml` in de privégegevensmap die alleen jij kunt lezen. Als de basis-URL later ergens anders naartoe wijst, wordt het verzoek geweigerd voordat er iets wordt verstuurd en blijft de sleutel waar hij is. Voer `gitpoulpi ai trust <profiel> --accept-origin <url>` uit (of accepteer het in de app) om de sleutel bewust naar het nieuwe adres te verplaatsen.
+
+- Gewone `http://` is toegestaan op deze computer (Ollama, LM Studio op `localhost`); overal elders is `gitpoulpi ai trust <profiel> --allow-insecure-http on` nodig.
+- Een zelf gehoste server waarvan het certificaat niet naar een bekende autoriteit leidt, wordt alleen geaccepteerd voor de sleutelvingerafdruk die je vastpint met `--accept-certificate <sha256>`; de TLS-handshake bewijst nog steeds dat de server die sleutel heeft.
+- Een profiel dat al een sleutel had voordat deze controle bestond, wordt stilletjes vastgelegd, vanaf zijn huidige basis-URL, de eerste keer dat het wordt gebruikt.
+- Een lokale agent (`claude -p` en dergelijke) heeft geen sleutel en geen HTTP, dus er valt niets te binden.
+
 ## Reviewcontext
 
 Een codereviewconcept (`✦`, of `hosting review suggest`) leest het verschil, de titel, de beschrijving en de
@@ -434,6 +443,50 @@ effectieve context af als `review_context`. Dezelfde vier instellingen zijn `ai.
 - API-sleutels worden door het `gitpoulpi`-proces zelf gebruikt en bereiken nooit de daemon,
   de andere clients van het venster of een MCP-client.
 - Gegenereerde tekst wordt nooit uit zichzelf gecommit, gepusht of toegepast.
+
+### Wat uit een verzoek wordt gehaald
+
+Elk verzoek, welke actie het ook verstuurt en welke aanbieder het ook ontvangt (een
+gehoste API of een lokale agent), gaat eerst door dezelfde opschoonstap:
+
+- **Geheimen worden gemaskeerd** (`[ai.privacy] redact_secrets`, standaard aan). Een token
+  met een bekend voorvoegsel, een privésleutelblok, een JWT, een wachtwoord in een URL en een
+  regel `password = waarde` waarvan de waarde willekeurig lijkt, worden vervangen door
+  `[REDACTED:<regel>]`. Het is niet uitputtend: het vindt de gangbare vormen (dezelfde
+  scanner als `rewrite scan-secrets`).
+- **Gevoelige bestanden worden weggelaten** (`[ai.privacy] exclude_sensitive_files`, standaard
+  aan). De diff van een bestand dat overeenkomt met `[privacy] sensitive_patterns` (`.env`
+  en `.env.*` behalve de bestanden `.example`, `.sample` en `.template`, `*.pem`,
+  `*.key`, SSH-privésleutels, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`,
+  `*.cer`, `*.der`, `*.kdbx`) maakt geen deel uit van het verzoek. Een gesplitst deel of een
+  bestandslijst van de composer die zo'n bestand noemt, wordt op dezelfde manier ingekort, dus een plan
+  ervoor kan als onvolledig worden geweigerd: stage of splits dat bestand zelf.
+
+Een van beide uitzetten is een keuze, en Instellingen > AI toont er een rode regel onder zolang
+het uit staat.
+
+**Wat wordt verstuurd, voordat het wordt verstuurd.** Voordat een verzoek weggaat, toont de TUI het
+dialoogvenster **Wat wordt verstuurd**: de instructies en het verzoek na het opschonen (hetzelfde
+paneel als in de dialogen voor het herschrijven van de geschiedenis, scrollbaar, `Alt+W` toont of verbergt het), hoeveel
+geheimen zijn vervangen en welke bestanden zijn weggelaten (een regel en een gemaskeerd
+voorbeeld zoals `ghp_****abcd`, nooit een waarde), een vakje **Niet meer tonen voor
+<actie>**, en **Verzenden** / **Annuleren** (`Esc`, het sluitkruisje en een klik
+buiten het venster annuleren; er verlaat niets je computer voordat je Verzenden kiest). Het vakje schrijft
+`[ai.sent_preview] <actie> = false`; Instellingen > AI > *Toon wat wordt verstuurd
+vóór...* heeft één schakelaar per actie en **Alles opnieuw tonen**. De twee dialogen voor het
+herschrijven van de geschiedenis tonen hun verzoek al, dus die hebben geen schakelaar.
+
+**Op de opdrachtregel** bevat elk `ai ...`-antwoord (en `hosting review suggest`)
+`privacy: {redactions: N, excluded_files: [...]}`, en `--print-sent`
+drukt de opgeschoonde systeem- en gebruikerstekst af, als `{sent: [{system, user}], privacy,
+dry_run: true}`, zonder het model aan te roepen (het vereist `ai.enabled = true`, geen sleutel
+en geen netwerk).
+
+**Een grens.** Een lokale agent waarvan de werkmap de repository is
+(`workdir = repository`, of *De agent in de repository laten draaien* voor een review) kan
+de bestanden zelf lezen: het opschonen dekt wat GitPoulpi hem stuurt, niet wat hij
+zelf opent. Gebruik de werkmap `dedicated` (*Speciale map*) om hem buiten de
+repository te houden.
 
 ## Probleemoplossing
 

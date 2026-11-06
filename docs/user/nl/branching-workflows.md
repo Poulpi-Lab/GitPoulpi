@@ -240,6 +240,31 @@ voordat er iets veranderd is, dus dat is een gewone fout; na een `after_start`-h
 de flow worden voortgezet of afgebroken). `--no-hooks` slaat ze over zonder te vragen. Een hook kan van
 alles doen, dus `undo` draait alleen de git-wijzigingen terug.
 
+**Vertrouwen.** De opdrachten van een gecommitte sectie `[hooks]` komen van wie er ook naar de
+repository kan pushen, dus ze hebben ook *jouw* vertrouwen nodig, eenmaal per versie van de
+lijst. Het vertrouwen wordt per repository bewaard aan de hand van de hash van de hooks (een wijziging van
+een opdracht, fase of volgorde vraagt opnieuw) en wordt door de daemon gecontroleerd vóór de eerste
+stap van een run en voordat een voortgezette flow doorgaat, dus een geweigerde run heeft niets
+gewijzigd. Hooks in je eigen override (`[workflow]` in je repositorystatus, de
+Instellingen-pagina) zijn van jou en vragen nooit.
+
+- **CLI:** `gitpoulpi flow trust-hooks` drukt de opdrachten, hun `hash` en
+  of ze `trusted` zijn af; `gitpoulpi flow trust-hooks --hash <hash>` vertrouwt
+  ze, en alleen als het bestand op schijf nog die hash heeft. `--run-hooks` bij
+  niet-vertrouwde hooks drukt een weigering af (`{"refused": {"reason": "hooks_not_trusted",
+  ...}}`, afsluitcode 2) met de opdrachten en die opdrachtregel. Een terminal die
+  wordt gevraagd "Ze ook uitvoeren?" wordt ook gevraagd of ze moeten worden vertrouwd.
+- **TUI:** het voorbeeld toont de hooks en zegt dat ze nog niet zijn vertrouwd. Op de actieknop
+  drukken vraagt dan "De workflow van deze repository voert deze opdrachten uit op
+  je computer. Vertrouwen?" met de exacte opdrachten in een scrollbaar paneel
+  (muiswiel, versleepbare schuifbalk, PgUp/PgDn/Home/End) en twee antwoorden:
+  **1 Vertrouwen en uitvoeren** en **2 Zonder hooks uitvoeren**. Niets is gemarkeerd tot je een
+  pijltoets of een cijfer indrukt; Esc, Annuleren of het sluitkruisje gaan terug zonder
+  te antwoorden. Als het bestand is gewijzigd sinds je het vertrouwde, zegt de titel "De hooks
+  zijn gewijzigd sinds je ze vertrouwde" en wordt de oude lijst onder de nieuwe getoond.
+- **Agents:** er is geen tool om hooks te vertrouwen. `run_hooks: true` bij niet-vertrouwde
+  hooks wordt geweigerd met de opdrachten, en een persoon voert `flow trust-hooks` uit.
+
 ### Voor agents (MCP)
 
 De tools zijn `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` en `flow_set_parent` (finish, sync en
@@ -247,7 +272,9 @@ promote zijn als destructief aangemerkt, dus `allow_mutations` begrendelt ze). Z
 roep aan met `dry_run: true` om het plan te krijgen (een normaal resultaat), en dan opnieuw met `yes: true`
 om het uit te voeren. Zonder een van beide wordt de aanroep geweigerd en draagt hij het plan, zodat er niets
 per ongeluk draait. Hooks draaien alleen met een expliciete `run_hooks: true`; het plan somt ze op (`hooks`,
-`hooks_run`) zodat de agent de gebruiker eerst de opdrachten kan tonen. Na een conflict: `continue_: true`
+`hooks_run`) zodat de agent de gebruiker eerst de opdrachten kan tonen. Gecommitte hooks moeten door een
+persoon worden vertrouwd (`flow trust-hooks`, waarvoor geen tool bestaat): `run_hooks: true` bij niet-vertrouwde
+hooks geeft `refused` terug met de opdrachten en voert niets uit. Na een conflict: `continue_: true`
 (de vlag is `--continue`) of `abort: true`.
 
 ### Ongedaan maken

@@ -66,11 +66,60 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-Bezstanowy JSON, te same narzędzia, te same bramki `[mcp]`. **Nie ma
-uwierzytelniania**, więc nasłuchuje wyłącznie na loopbacku; `--allow-remote` to
-znosi, a wtedy każdy, kto dosięgnie portu, może uruchomić każde narzędzie, na
-które pozwala twoja konfiguracja. Używaj tego tylko za zaufaną siecią albo
-uwierzytelniającym proxy.
+Bezstanowy JSON, te same narzędzia, te same bramki `[mcp]`. Każde żądanie wymaga
+tokenu bearer (`[mcp] http_auth`, domyślnie włączone): wypisz go przez `gitpoulpi mcp token
+--show` (albo `--copy`, `--rotate`; token leży w pliku dostępnym tylko dla użytkownika w
+prywatnym folderze danych) i przekaż klientowi jako nagłówek:
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+Brakujący lub błędny token dostaje `401` z `WWW-Authenticate: Bearer`. Wymieniony
+token obowiązuje od razu, bez restartu serwera. Wyłączenie `http_auth` jest dla
+punktu końcowego na pętli zwrotnej, gdy ufasz każdemu lokalnemu kontu; serwer ostrzega wtedy na
+stderr.
+
+### Dostęp do punktu końcowego z innego komputera
+
+Najbezpieczniejsza konfiguracja w ogóle nie potrzebuje zdalnego nasłuchu: zostań przy adresie pętli zwrotnej i
+przekieruj port przez SSH z komputera, na którym działa agent, `ssh -L
+8808:127.0.0.1:8808 host`. Wtedy `--allow-remote` nie jest potrzebne.
+
+`--allow-remote` (adres inny niż pętla zwrotna) jest odrzucane, chyba że uwierzytelnianie jest włączone
+i istnieje token **oraz** ruch jest szyfrowany. Odmowa mówi, czego brakuje. Są dwa sposoby
+na szyfrowanie:
+
+- **TLS w serwerze** (`[mcp] tls = "self_signed"` lub `"files"`). Serwer
+  sam kończy TLS: trzyma klucz, przeprowadza uzgadnianie i tylko zakończone
+  uzgadnianie dociera do warstwy HTTP; klient ze zwykłym HTTP nie przechodzi uzgadniania, a obok
+  nie istnieje żaden zwykły nasłuch. Szyfrowanie jest więc faktem, który serwer
+  ustala przy każdym połączeniu, a nie założeniem. Przy `self_signed` pierwszy
+  start generuje parę w prywatnym folderze danych i wypisuje jej
+  odcisk SHA-256 (jest też w Ustawieniach); klient ufa serwerowi, przypinając
+  ten odcisk lub plik certyfikatu. Przy `files` ustaw `tls_cert` i
+  `tls_key` na swoje pliki PEM, a klienci weryfikują certyfikat przez jego urząd.
+  Klienci uwierzytelniają się tokenem bearer; certyfikaty klientów nie są używane.
+- **Tunel lub zwrotne proxy** (`[mcp] behind_proxy = true`). Agent tunelu lub
+  proxy łączy się jak każdy lokalny klient lub klient z sieci LAN, a jego nagłówki można sfałszować, więc
+  serwer nie może poznać od środka, czy jakiś jest. Dlatego jest to
+  jawne oświadczenie (pokazywane z czerwonym ostrzeżeniem w Ustawieniach), a nie
+  wykrywanie. Uruchom tunel na tym samym komputerze i zostań przy adresie pętli zwrotnej, gdy
+  możesz. Przy adresie innym niż pętla zwrotna za proxy odcinek między proxy
+  a serwerem jest w tej sieci zwykłym tekstem.
 
 **Bez MCP** agent z powłoką używa CLI: `gitpoulpi --json <command>` (zob.
 [Opis CLI](cli-reference.md)). Daj mu gotowy skill
@@ -82,12 +131,16 @@ kiedy i jak używać GitPoulpi zamiast surowego `git`.
 | Przełącznik | Domyślnie | Skutek |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` odmawiają uruchomienia (Ustawienia > Agenci i MCP > *Serwer MCP*). Czytane przy starcie serwera: działający serwer zachowuje swoje ustawienia. |
-| `[mcp] bind` | `"127.0.0.1:8808"` | Adres, którego używa `--http`, gdy nie podano żadnego (tylko loopback, chyba że `--allow-remote`). Ustawienia > Agenci i MCP > *Port serwera MCP* edytuje jego port i zachowuje host. |
+| `[mcp] bind` | `"127.0.0.1:8808"` | Adres, którego używa `--http`, gdy nie podano żadnego (tylko pętla zwrotna, chyba że `--allow-remote`, które wymaga uwierzytelniania i szyfrowania, zob. wyżej). Ustawienia > Agenci i MCP > *Port serwera MCP* edytuje jego port i zachowuje host. |
+| `[mcp] http_auth` | `true` | `--http` wymaga `Authorization: Bearer <token>` (`gitpoulpi mcp token`). Ustawienia > Agenci i MCP > *Uwierzytelnianie HTTP*. |
+| `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` lub `files` (twoje ścieżki PEM): serwer sam kończy TLS. Ustawienia > Agenci i MCP > *TLS*. |
+| `[mcp] behind_proxy` | `false` | Ręczysz, że tunel lub zwrotne proxy szyfruje ruch, co pozwala `--allow-remote` działać bez TLS. |
 | `[mcp] allow_mutations` | `false` | Wyłączone: każde narzędzie, które coś zmienia, jest odrzucane; odczyty, `ui_*` i propozycje nadal działają. `true` pozwala agentowi robić commit, push, reset... |
 | `[mcp] mutation_allowlist` | `[]` | Niepusta: tylko te narzędzia mogą coś zmieniać, np. `["stage", "unstage", "commit"]`. |
 | `[mcp] allow_ui` | `true` | `false`: agent nie może poruszać twoim oknem (`ui_state` / `ui_viewers` nadal odpowiadają). |
 | `[mcp] ui_control` | `"ask"` | `ask`: znacznik w twoim oknie, który potwierdzasz; `auto`: stosowane, chyba że jesteś zajęty; `off`: odrzucane. Dla jednego agenta: `--ui-control`. |
 | `[mcp] allow_ui_propose` | `false` | Pozwala agentowi otwierać wstępnie wypełnione okna dialogowe, które potwierdzasz (Ustawienia > Agenci i MCP > *Pozwól agentom AI proponować zmiany do mojego potwierdzenia*). |
+| `[mcp] allow_sensitive_staging` | `false` | Tylko w `config.toml`. Wyłączone: narzędzie `stage` nie oferuje `allow_sensitive`, a dodanie, które objęłoby wrażliwy plik (klucz prywatny, `.env`, rozpoznany token), jest odrzucane z `{error: "sensitive_files", files}`: agent ma zapytać ciebie. `true` pozwala mu przekazać `allow_sensitive`. Zob. [Stage i commity](staging-and-committing.md#wrażliwe-pliki). |
 | `[mcp] allow_history_purge` | `false` | Tylko w `config.toml`. `true` udostępnia narzędzie `rewrite_purge`, które usuwa na stałe starą historię przepisania (i jego cofnięcie). Wyłączone: agent go nie widzi. Nadal wymaga `allow_mutations`. |
 | `[ui] allow_agent_view_control` | `true` | Główny wyłącznik twojego okna (Ustawienia > Agenci i MCP > *Pozwól agentom AI sterować widokiem*). Wyłączony: żaden agent nie dosięgnie twojego okna. |
 | `[ui] launch` | `"off"` | Czy agent może otworzyć okno GitPoulpi, gdy żadne nie jest otwarte (zob. [niżej](#gdy-nie-ma-otwartego-okna-albo-jest-w-innej-sesji)). |
@@ -157,6 +210,7 @@ mutation_allowlist = []        # np. ["stage", "unstage", "commit", "branch_crea
 allow_ui = true
 ui_control = "ask"             # "auto" pozwala agentowi zmieniać widok bez pytania
 allow_ui_propose = false       # true: agent może wstępnie wypełniać okna Reword / Split / commit / gałąź / tag
+allow_sensitive_staging = false  # true: agent może dodawać do stage pliki oznaczone przez strażnika
 allow_history_purge = false    # true: agent widzi rewrite_purge (usuwa starą historię na stałe)
 ```
 

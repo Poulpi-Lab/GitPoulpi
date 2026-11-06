@@ -253,6 +253,34 @@ errore; dopo un hook `after_start` il branch esiste e il flusso si può
 continuare o interrompere). `--no-hooks` li salta senza chiedere. Un hook può fare
 qualsiasi cosa, quindi `undo` riprende solo le modifiche git.
 
+**Attendibilità.** I comandi di una sezione `[hooks]` di cui è stato fatto il commit
+provengono da chiunque possa fare push nel repository, quindi richiedono anche *la tua*
+fiducia, una volta per versione dell'elenco. La fiducia è conservata per repository
+tramite l'hash degli hook (la modifica di qualsiasi comando, fase o ordine chiede di
+nuovo) e viene verificata dal daemon prima del primo passo di un'esecuzione e prima che un
+flusso ripreso prosegua, quindi un'esecuzione rifiutata non ha cambiato nulla. Gli hook
+del tuo override (`[workflow]` nello stato del tuo repository, la pagina Impostazioni)
+sono tuoi e non chiedono mai.
+
+- **CLI:** `gitpoulpi flow trust-hooks` stampa i comandi, il loro `hash` e se sono
+  `trusted`; `gitpoulpi flow trust-hooks --hash <hash>` li considera attendibili, e solo
+  quando il file su disco ha ancora quell'hash. `--run-hooks` su hook non attendibili
+  stampa un rifiuto (`{"refused": {"reason": "hooks_not_trusted", ...}}`, codice di uscita
+  2) con i comandi e quella riga di comando. A un terminale a cui viene chiesto «Eseguirli
+  anche?» viene chiesto anche se considerarli attendibili.
+- **TUI:** l'anteprima elenca gli hook e dice che non sono ancora attendibili. Premere
+  allora il pulsante dell'azione chiede «Il workflow di questo repository esegue questi
+  comandi sul tuo computer. Considerarli attendibili?» con i comandi esatti in un riquadro
+  scorrevole (rotellina del mouse, barra di scorrimento trascinabile,
+  PgSu/PgGiù/Home/Fine) e due risposte: **1 Considera attendibili ed esegui** e **2 Esegui
+  senza hook**. Nulla è evidenziato finché non premi una freccia o una cifra; Esc, Annulla
+  o la croce di chiusura tornano indietro senza rispondere. Quando il file è cambiato da
+  quando lo hai considerato attendibile, il titolo dice «Gli hook sono cambiati da quando
+  li hai considerati attendibili» e il vecchio elenco è mostrato sotto il nuovo.
+- **Agenti:** non esiste uno strumento per considerare attendibili gli hook.
+  `run_hooks: true` su hook non attendibili viene rifiutato con i comandi, e una persona
+  esegue `flow trust-hooks`.
+
 ### Per gli agenti (MCP)
 
 Gli strumenti sono `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` e
@@ -262,8 +290,10 @@ li governa `allow_mutations`). Sono piano-poi-esecuzione: chiama con
 per eseguirlo. Senza nessuno dei due la chiamata viene rifiutata e porta il piano, così nulla
 parte per errore. Gli hook vengono eseguiti solo con un esplicito `run_hooks: true`; il piano
 li elenca (`hooks`, `hooks_run`) così l'agente può mostrare prima i comandi
-all'utente. Dopo un conflitto, `continue_: true` (il flag è `--continue`) oppure
-`abort: true`.
+all'utente. Gli hook di cui è stato fatto il commit devono essere considerati attendibili
+da una persona (`flow trust-hooks`, che non ha uno strumento): `run_hooks: true` su hook
+non attendibili restituisce `refused` con i comandi e non esegue nulla. Dopo un conflitto,
+`continue_: true` (il flag è `--continue`) oppure `abort: true`.
 
 ### Annullamento
 

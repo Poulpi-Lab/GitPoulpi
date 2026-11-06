@@ -35,7 +35,32 @@ Vedle nich archiv obsahuje `gitpoulpi-launch`, drobný program, který zástupci
 Archiv vydání je `gitpoulpi-<version>-<target>.zip` (Windows) nebo
 `.tar.gz` (Linux, macOS) se souborem `.sha256` vedle něj. Ověřte archiv podle
 souboru `.sha256`, rozbalte jej a dejte tři spustitelné soubory do složky v
-`PATH`. Stejné kroky uvádí `INSTALL.txt` v archivu.
+`PATH` (ponechte vedle nich `gitpoulpi-updater` a značku `.gitpoulpi-dist`:
+značka říká `channel=archive`, takže se sestavení umí samo aktualizovat, viz
+[Aktualizace](updates.md)). Stejné kroky uvádí `INSTALL.txt` v archivu.
+
+### Ověření stažení
+
+Každý soubor vydání je podepsán klíčem [minisign](https://jedisct1.github.io/minisign/) projektu a GitPoulpi tento podpis před instalací aktualizace ověřuje sám. U souboru, který jste stáhli ručně, je podpisem `.minisig` vedle něj. Veřejný klíč (id klíče `B461FFCBF6F6A4F2`) je v repozitáři commitnut jako `packaging/minisign.pub`:
+
+```
+untrusted comment: minisign public key B461FFCBF6F6A4F2
+RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+```
+minisign -Vm gitpoulpi-<version>-<target>.tar.gz -P RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+Přečtěte si důvěryhodný komentář, který příkaz vypíše: musí být `file:<název souboru> version:<očekávaná verze>`. Podpis, který je platný, ale jmenuje jiný soubor nebo jinou verzi, není podpisem vašeho souboru.
+
+Tam, kde bylo vydání sestaveno s atestacemi původu sestavení (proměnná repozitáře `ATTESTATIONS`), GitHub CLI ověří, kde byl soubor sestaven:
+
+```
+gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoulpi
+```
+
+Soubor `.sha256` zachytí jen poškozené stažení. Podpis je to, co ukazuje, že soubor pochází od projektu.
 
 ## Instalátorem
 
@@ -46,21 +71,20 @@ nastaví, a to, co ukazuje Nastavení, se vždy shoduje.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
 
-Instaluje se pro aktuálního uživatele, bez výzvy správce, do
-`%LOCALAPPDATA%\Programs\GitPoulpi` (první dialog nabídne instalaci pro všechny
-uživatele a volbu složky). Zaškrtávací pole: zástupce v nabídce Start, zástupce na
-ploše, přidání do PATH. Jedna stránka se ptá na **alias příkazu**: výchozí je `gp`,
-můžete zvolit libovolný název, prázdné znamená žádný. PowerShell už `gp` používá pro
-`Get-ItemProperty`, proto tam zvolte jiný název nebo použijte `gitpoulpi`.
+První dialog se ptá, pro koho je instalace:
 
-Instalátor zkopíruje tři spustitelné soubory a značku `.gitpoulpi-dist`, takže
-[Aktualizovat nyní](#aktualizace-na-místě) funguje stejně jako u archivu zip.
-Instalace pro jednoho uživatele je zapisovatelná, takže se umí aktualizovat sama;
-instalace pro všechny uživatele v Program Files vyžaduje ke svému nahrazení
-zvýšená oprávnění, proto ji přeinstalujte novým instalátorem.
-Odinstalace probíhá v Nastavení Windows > Aplikace: spustí `gitpoulpi uninstall`
-(alias, záznamy v PATH, zástupci) a smaže soubory včetně zbytků `.old` po aktualizaci.
-Vaše nastavení a repozitáře zůstanou.
+| Volba | Kam | Práva správce | Co to znamená pro aktualizace |
+|---|---|---|---|
+| **Jen pro mě** (výchozí) | `%LOCALAPPDATA%\Programs\GitPoulpi` | žádná | GitPoulpi nahrazuje vlastní soubory: **Aktualizovat a restartovat** v [panelu aktualizací](updates.md), bez dotazu. |
+| **Pro všechny uživatele** | `Program Files\GitPoulpi` | jeden dotaz při instalaci | Každá aktualizace žádá o schválení správcem (dotaz Windows) a relace GitPoulpi ostatních uživatelů na počítači se nejprve zavřou. |
+
+Stejná volba funguje tiše: `gitpoulpi-<version>-...-setup.exe /CURRENTUSER` nebo `/ALLUSERS`.
+
+Zaškrtávací pole: zástupce v nabídce Start, zástupce na ploše, přidání do PATH. Jedna stránka se ptá na **alias příkazu**: výchozí je `gp`, můžete zvolit libovolný název, prázdné znamená žádný (`/ALIAS=name` nebo `/ALIAS=` na příkazovém řádku). PowerShell už `gp` používá pro `Get-ItemProperty`, proto tam zvolte jiný název nebo použijte `gitpoulpi`.
+
+Instalátor zkopíruje spustitelné soubory (včetně `gitpoulpi-updater`, malého programu, který při aktualizaci vyměňuje soubory) a značku `.gitpoulpi-dist`. Značka zaznamenává, jak byl GitPoulpi nainstalován (`inno-user` nebo `inno-machine`), což panel aktualizací ukazuje jako **Nainstalováno přes**. Opětovné spuštění instalátoru zachová vaše volby (rozsah, zástupce, alias).
+
+Odinstalace probíhá v Nastavení Windows > Aplikace: spustí `gitpoulpi uninstall` (alias, záznamy v PATH, zástupci) a smaže soubory včetně zbytků `.old` po aktualizaci. Vaše nastavení a repozitáře zůstanou.
 
 ### Linux a macOS: `install.sh`
 
@@ -68,7 +92,7 @@ Vaše nastavení a repozitáře zůstanou.
 curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
 ```
 
-Vybere archiv pro váš systém a procesor, ověří jeho `.sha256`, nainstaluje do
+Vybere archiv pro váš systém a procesor, ověří jeho `.sha256`, nainstaluje (kanál `archive`: GitPoulpi se aktualizuje na místě) do
 `~/.local/opt/gitpoulpi` a odkazy `gitpoulpi` a `gitpoulpi-mcp` zapíše do
 `~/.local/bin`. Nepotřebuje root a nic mimo váš domovský adresář se nemění.
 Bez `--yes` se zeptá na alias (výchozí `gp`), PATH a zástupce.
@@ -86,6 +110,38 @@ Bez `--yes` se zeptá na alias (výchozí `gp`), PATH a zástupce.
 
 Vyhledání nejnovějšího vydání vyžaduje veřejný repozitář; u soukromého stáhněte
 archiv v prohlížeči a použijte `--archive`.
+
+## Správcem balíčků
+
+Každý kanál níže zapisuje vedle programů stejnou značku `.gitpoulpi-dist` s vlastním názvem kanálu. GitPoulpi ji čte, aby věděl, kdo vlastní aktualizace: vlastní je správce balíčků, takže GitPoulpi nikdy nevyměňuje soubory za jeho zády. Panel aktualizací (klikněte na verzi v záhlaví okna) pak spustí vlastní příkaz správce balíčků, nebo ho ukáže, abyste ho mohli zkopírovat. Viz [Aktualizace](updates.md).
+
+| Kanál | Instalace | Poznámky |
+|---|---|---|
+| **Chocolatey** (Windows) | `choco install gitpoulpi` | Instaluje pro všechny uživatele, takže aktualizace žádají o schválení správcem. |
+| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | Přidejte `--scope user` nebo `--scope machine` pro volbu; rozsah machine žádá o schválení správcem při instalaci i při každé aktualizaci. |
+| **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` pak `scoop install gitpoulpi` | Pro uživatele, bez práv správce. |
+| **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | Tap je `Poulpi-Lab/homebrew-gitpoulpi`. |
+| **apt** (Debian, Ubuntu) | viz [repozitář apt](#apt-debian-a-ubuntu) | Podepsaný repozitář; `.deb` je také přiložen ke každému vydání. |
+| **MSI** (Windows, spravované) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Pro správce: všichni uživatelé, žádné aktualizace v aplikaci. Viz [Podniková distribuce](enterprise-distribution.md#msi-s-intune-nebo-group-policy). |
+| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (nebo `paru -S gitpoulpi-bin`) | Bez pomocníka: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, pak `cd gitpoulpi-bin && makepkg -si`. |
+| **cargo** | `cargo binstall gitpoulpi-cli` | Stáhne archiv vydání místo kompilace. |
+| **cargo, ze zdrojových kódů** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Kompiluje; potřebuje toolchain Rustu. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | Viz [Běh v Dockeru](docker.md). Stejný obraz je na `ghcr.io/poulpi-lab/gitpoulpi`. |
+
+Názvy výše jsou ty, do kterých proces vydání publikuje (viz [Vydávání](../../developer/releasing.md)): kanál, který ještě není aktivní, odpoví "not found" a archiv vydání nebo instalační program funguje vždy.
+
+Platí vlastní zacházení správce balíčků s PATH: Chocolatey, winget, Scoop a Homebrew dávají programy do PATH samy a žádný z nich nevytváří alias `gp` (spusťte `gitpoulpi alias create gp`, nebo Nastavení > Obecné > Spouštěč).
+
+### apt (Debian a Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+Repozitář podporuje `amd64` a `arm64` a je podepsán klíčem, který patří projektu. Programy jdou do `/usr/lib/gitpoulpi` s odkazy v `/usr/bin`. Balíček závisí na `git` a doporučuje `git-lfs`. Bez repozitáře nainstalujte `.deb` vydání pomocí `sudo apt install ./gitpoulpi_<version>_<arch>.deb`: GitPoulpi vám pak řekne, abyste si další `.deb` stáhli sami, protože nabízí příkazy `apt` jen tehdy, když najde repozitář v `/etc/apt/sources.list.d/gitpoulpi.*`.
 
 ## Ze zdrojových kódů
 
@@ -129,68 +185,11 @@ systémy). Archiv obsahuje tři spustitelné soubory, `INSTALL.txt`,
 
 ## Aktualizace
 
-Záhlaví okna ukazuje běžící verzi (`v1.0.0`) mezi názvem aplikace a cestou k repozitáři. Kliknutím na ni,
-nebo příkazem **Nápověda: Poznámky k vydání** z palety (`Ctrl+P`), se otevře karta Poznámky k vydání
-se seznamem změn, posunutým na běžící verzi.
+Záhlaví okna ukazuje běžící verzi (`v1.0.0`) mezi názvem aplikace a cestou k repozitáři. Když je známo novější vydání (nebo probíhá aktualizace), kliknutí na ni otevře panel aktualizací s verzí, způsobem instalace GitPoulpi a tím, co s novým vydáním dělat; jinak kliknutí otevře kartu Poznámky k vydání. `Ctrl+N` a pak `u`, nebo **Aktualizace: Zobrazit aktualizaci** v paletě příkazů (`Ctrl+P`), panel aktualizací otevře vždy, a **Nápověda: Poznámky k vydání** vždy otevře seznam změn.
 
-Jednou denně GitPoulpi na pozadí zjistí na GitHubu, zda existuje novější vydání
-(`updates.mode`, [Nastavení > Synchronizace](settings.md#synchronizace)).
-Pokud ano, čip ukáže `v0.2.0 k dispozici` ve zvýrazňovací barvě a kliknutí na něj otevře
-kartu Poznámky k vydání s poznámkami k tomuto vydání nahoře. Karta má tři tlačítka,
-každé s klávesou a příkazem palety:
+Jednou denně na pozadí GitPoulpi zkontroluje místo, kde se zveřejňují jeho vydání (ve výchozím stavu GitHub), zda existuje novější (`updates.mode`, [Nastavení > Synchronizace](settings.md#synchronizace)). Když ano, čip hlásí `v0.2.0 k dispozici` v barvě zvýraznění.
 
-- **Stáhnout** (`d`, *Aktualizace: Stáhnout*) otevře stránku vydání v prohlížeči.
-- **Přeskočit tuto verzi** (`s`, *Aktualizace: Přeskočit tuto verzi*) skryje oznámení,
-  dokud se neobjeví novější vydání.
-- **Zkontrolovat nyní** (`r`, *Aktualizace: Zkontrolovat aktualizace nyní*) se zeptá ihned znovu.
-
-`updates.mode = "off"` neodešle žádný požadavek. Bez připojení k síti, nebo dokud je
-repozitář soukromý a není uložen token pro github.com, kontrola tiše selže (jeden řádek
-v protokolu aplikace, nic v rozhraní).
-`GITPOULPI_UPDATE_API` nasměruje kontrolu na jiný kořen API (používají ho testy).
-
-### Aktualizace na místě
-
-Sestavení nainstalované z archivu vydání se umí nahradit samo. Archiv obsahuje
-malý soubor `.gitpoulpi-dist` vedle spustitelných souborů; běžící sestavení je
-„aktualizovatelné“ jen tehdy, když tento soubor leží vedle jeho spustitelného souboru (a uvádí
-jeho platformu). Sestavení vytvořené přes `cargo`, vlastní sestavení zkopírované jinam
-nebo balíček, který soubor vynechal, se nikdy samo neaktualizuje: jeho karta Poznámky k vydání
-to řekne a nabídne jen **Stáhnout**.
-
-U aktualizovatelného sestavení karta přidává:
-
-- **Aktualizovat nyní** (`u`, *Aktualizace: Aktualizovat nyní*) stáhne archiv a jeho
-  `.sha256` na pozadí (úloha v indikátoru stavového řádku, s procenty, jde zrušit
-  jako každá úloha), ověří hash, rozbalí archiv
-  a každý nový soubor položí vedle starého jako `<name>.new`. Nic běžícího se nedotkne.
-  V režimu `auto` se totéž stane samo, jakmile kontrola najde novější vydání.
-- **Restartovat pro aktualizaci** (`R`, *Aktualizace: Restartovat pro aktualizaci*; totéž říká čip,
-  jakmile je stažení připraveno) je vždy vaše akce, nikdy automatická. Zastaví samostatného
-  démona relace (vestavěný zaniká s oknem), vymění soubory a spustí novou verzi se stejnými
-  argumenty a relací.
-- **Vrátit se k předchozí verzi** (`v`, *Aktualizace: Vrátit se k předchozí verzi*) vrátí předchozí
-  soubory a restartuje. Soubory předchozí verze zůstanou jako
-  `<name>.old`, dokud nová verze neběží minutu, pak se smažou, takže tlačítko je tu
-  pro první spuštění. Není součástí historie vrácení (Zpět): mění vlastní soubory GitPoulpi,
-  ne repozitář.
-
-Jak se soubory nahrazují: v Linuxu a macOS se každý nový soubor přejmenuje přes
-starý (atomicky; běžící program si drží starou kopii, dokud neskončí). Ve
-Windows se běžící `.exe` přepsat nedá, proto se starý přejmenuje na
-`<name>.old` a nový se přesune na jeho místo; `.old`, který ještě běží, smaže
-některé pozdější spuštění. Výměna je buď celá, nebo žádná: pokud některý ze
-spustitelných souborů drží jiný program (třeba klient MCP spouštějící `gitpoulpi-mcp`), GitPoulpi pojmenuje
-soubor, nic nezmění a stažení nechá připravené k dalšímu pokusu.
-
-Co se odmítne, vždy se zprávou: vydání bez souboru `.sha256`, hash,
-který nesouhlasí, soubor archivu, jehož název není ten pro tuto platformu
-(`gitpoulpi-<version>-<target>.<zip|tar.gz>`), archiv, jehož značka uvádí
-jinou verzi nebo platformu, a každý odkaz ke stažení mimo tyto servery: `github.com` GitHubu, `api.github.com`,
-`objects.githubusercontent.com`, `release-assets.githubusercontent.com` a `github-releases.githubusercontent.com`
-(první požadavek i každé přesměrování; přesměrování kamkoli jinam stažení zastaví).
-Archivy soukromého repozitáře vyžadují relaci v prohlížeči, takže stažení
-tam selže, dokud se repozitář nezveřejní.
+Co panel dělá, závisí na způsobu instalace GitPoulpi: archiv vydání nebo instalační program pro Windows nahradí vlastní soubory, správce balíčků spustí vlastní příkaz, spravovaná instalace nebo instalace v kontejneru říká, jak se k ní aktualizace dostávají. Sestavení vytvořené pomocí `cargo build` se nikdy neaktualizuje. Úplný popis, s návratem, `auto` oproti `notify` a tím, co může správce zamknout, je v [Aktualizacích](updates.md).
 
 ## Ověření, že vše funguje
 

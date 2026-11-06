@@ -259,6 +259,31 @@ zwykły błąd; po hooku `after_start` gałąź istnieje, a przepływ można
 kontynuować albo przerwać). `--no-hooks` pomija je bez pytania. Hook może zrobić
 wszystko, więc `undo` cofa tylko zmiany w git.
 
+**Zaufanie.** Polecenia zapisanej w repozytorium sekcji `[hooks]` pochodzą od każdego, kto
+może pisać do repozytorium, więc wymagają też *twojego* zaufania, raz dla każdej wersji
+listy. Zaufanie jest trzymane dla repozytorium według hasha hooków (zmiana
+któregokolwiek polecenia, fazy lub kolejności pyta ponownie) i sprawdzane przez demona
+przed pierwszym krokiem uruchomienia oraz zanim kontynuowany przepływ pójdzie dalej, więc
+odrzucone uruchomienie niczego nie zmieniło. Hooki z twojego własnego nadpisania (`[workflow]`
+w stanie repozytorium, strona Ustawień) są twoje i nigdy nie pytają.
+
+- **CLI:** `gitpoulpi flow trust-hooks` wypisuje polecenia, ich `hash` i to, czy są
+  `trusted`; `gitpoulpi flow trust-hooks --hash <hash>` im ufa, i to tylko wtedy, gdy plik
+  na dysku nadal ma ten hash. `--run-hooks` dla niezaufanych hooków wypisuje odmowę
+  (`{"refused": {"reason": "hooks_not_trusted", ...}}`, kod wyjścia 2) z poleceniami
+  i tym wierszem poleceń. Terminal pytany „Uruchomić je też?” jest pytany,
+  czy im także zaufać.
+- **TUI:** podgląd wymienia hooki i mówi, że nie są jeszcze zaufane. Naciśnięcie
+  przycisku akcji pyta wtedy „Przepływ pracy tego repozytorium uruchamia na twoim komputerze
+  te polecenia. Zaufać im?” z dokładnymi poleceniami w przewijanym panelu
+  (kółko myszy, przeciągany pasek przewijania, PgUp/PgDn/Home/End) i dwiema odpowiedziami:
+  **1 Zaufaj i uruchom** oraz **2 Uruchom bez hooków**. Nic nie jest podświetlone, dopóki
+  nie naciśniesz strzałki lub cyfry; Esc, Anuluj lub krzyżyk zamknięcia wracają bez
+  odpowiedzi. Gdy plik zmienił się od czasu, gdy mu zaufano, tytuł mówi „Hooki zmieniły się od czasu,
+  gdy im zaufano”, a stara lista jest pokazana pod nową.
+- **Agenci:** nie ma narzędzia do zaufania hookom. `run_hooks: true` dla niezaufanych
+  hooków jest odrzucane z poleceniami, a człowiek uruchamia `flow trust-hooks`.
+
 ### Dla agentów (MCP)
 
 Narzędzia to `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` i
@@ -268,7 +293,9 @@ wykonanie: wywołaj z `dry_run: true`, aby dostać plan (zwykły wynik), a potem
 ponownie z `yes: true`, aby go wykonać. Bez żadnego z nich wywołanie jest
 odrzucane i niesie plan, więc nic nie rusza przez przypadek. Hooki działają
 tylko z jawnym `run_hooks: true`; plan je wymienia (`hooks`, `hooks_run`), aby
-agent mógł najpierw pokazać użytkownikowi polecenia. Po konflikcie
+agent mógł najpierw pokazać użytkownikowi polecenia. Zapisane hooki musi zaufać
+człowiek (`flow trust-hooks`, które nie ma narzędzia): `run_hooks: true` dla niezaufanych
+hooków zwraca `refused` z poleceniami i niczego nie uruchamia. Po konflikcie
 `continue_: true` (flaga to `--continue`) lub `abort: true`.
 
 ### Cofanie

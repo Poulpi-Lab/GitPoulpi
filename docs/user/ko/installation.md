@@ -34,7 +34,32 @@ GitPoulpi에는 실행 파일이 세 개 있습니다:
 릴리스 아카이브는 `gitpoulpi-<version>-<target>.zip`(Windows) 또는
 `.tar.gz`(Linux, macOS)이며 옆에 `.sha256` 파일이 있습니다. 아카이브를
 `.sha256` 파일과 대조해 확인하고, 압축을 풀고, 실행 파일 세 개를 `PATH`에 있는
-폴더에 넣으세요. 아카이브 안의 `INSTALL.txt`에도 같은 단계가 있습니다.
+폴더에 넣으세요(`gitpoulpi-updater`와 `.gitpoulpi-dist` 표시 파일은 그 옆에 두세요.
+표시 파일에 `channel=archive`가 적혀 있어 이 빌드가 스스로 업데이트할 수 있습니다.
+[업데이트](updates.md) 참고). 아카이브 안의 `INSTALL.txt`에도 같은 단계가 있습니다.
+
+### 다운로드 검증하기
+
+모든 릴리스 파일은 프로젝트의 [minisign](https://jedisct1.github.io/minisign/) 키로 서명되어 있으며, GitPoulpi는 업데이트를 설치하기 전에 이 서명을 직접 검사합니다. 직접 내려받은 파일은 옆에 있는 `.minisig`가 서명입니다. 공개 키(키 id `B461FFCBF6F6A4F2`)는 저장소에 `packaging/minisign.pub`로 커밋되어 있습니다.
+
+```
+untrusted comment: minisign public key B461FFCBF6F6A4F2
+RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+```
+minisign -Vm gitpoulpi-<version>-<target>.tar.gz -P RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+명령이 출력하는 신뢰된 주석(trusted comment)을 읽으세요. `file:<파일 이름> version:<예상하는 버전>`이어야 합니다. 유효하지만 다른 파일이나 다른 버전을 명시한 서명은 해당 파일의 서명이 아닙니다.
+
+릴리스가 빌드 출처 증명(저장소의 `ATTESTATIONS` 변수)과 함께 빌드된 경우, GitHub CLI로 파일이 어디서 빌드되었는지 확인할 수 있습니다.
+
+```
+gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoulpi
+```
+
+`.sha256` 파일은 손상된 다운로드만 잡아냅니다. 파일이 프로젝트의 것임을 보여 주는 것은 서명입니다.
 
 ## 설치 프로그램으로
 
@@ -45,19 +70,20 @@ GitPoulpi에는 실행 파일이 세 개 있습니다:
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
 
-현재 사용자용으로 관리자 권한 요청 없이 `%LOCALAPPDATA%\Programs\GitPoulpi`에
-설치합니다(첫 대화상자에서 모든 사용자용 설치와 설치 폴더를 고를 수 있습니다).
-체크박스: 시작 메뉴 바로 가기, 바탕 화면 바로 가기, PATH에 추가. 한 페이지에서
-**명령 별칭**을 묻습니다. 기본값은 `gp`이고 원하는 이름을 쓸 수 있으며, 비워 두면
-별칭을 만들지 않습니다. PowerShell은 이미 `gp`를 `Get-ItemProperty`에 쓰므로
-PowerShell에서는 다른 이름을 고르거나 `gitpoulpi`를 쓰세요.
+첫 대화상자가 누구를 위한 설치인지 묻습니다.
 
-설치 프로그램은 실행 파일 세 개와 `.gitpoulpi-dist` 표시 파일을 복사하므로
-[지금 업데이트](#제자리-업데이트)가 zip과 똑같이 동작합니다. 사용자별 설치는 쓰기가
-가능해 스스로 업데이트할 수 있지만, Program Files의 모든 사용자용 설치는 교체하려면
-권한 상승이 필요하므로 새 설치 프로그램으로 다시 설치하세요. 제거는 Windows 설정 >
-앱에서 합니다. `gitpoulpi uninstall`(별칭, PATH 항목, 바로 가기)을 실행한 뒤 업데이트
-프로그램이 남긴 `.old` 파일을 포함해 파일을 삭제합니다. 설정과 저장소는 그대로 남습니다.
+| 선택 | 위치 | 관리자 권한 | 업데이트에 대한 의미 |
+|---|---|---|---|
+| **나만 사용**(기본값) | `%LOCALAPPDATA%\Programs\GitPoulpi` | 없음 | GitPoulpi가 자신의 파일을 교체합니다: [업데이트 패널](updates.md)의 **업데이트 후 재시작**, 확인 창 없음. |
+| **모든 사용자** | `Program Files\GitPoulpi` | 설치할 때 한 번 확인 | 업데이트마다 관리자 승인(Windows 확인 창)을 요청하며, 이 컴퓨터에서 다른 사용자가 실행 중인 GitPoulpi 세션이 먼저 종료됩니다. |
+
+같은 선택을 자동으로도 할 수 있습니다: `gitpoulpi-<version>-...-setup.exe /CURRENTUSER` 또는 `/ALLUSERS`.
+
+체크박스: 시작 메뉴 바로 가기, 바탕 화면 바로 가기, PATH에 추가. 한 페이지에서 **명령 별칭**을 묻습니다. 기본값은 `gp`이고 원하는 이름을 쓸 수 있으며, 비워 두면 별칭을 만들지 않습니다(명령줄에서는 `/ALIAS=name` 또는 `/ALIAS=`). PowerShell은 이미 `gp`를 `Get-ItemProperty`에 쓰므로 PowerShell에서는 다른 이름을 고르거나 `gitpoulpi`를 쓰세요.
+
+설치 프로그램은 실행 파일(파일을 교체하는 작은 프로그램인 `gitpoulpi-updater` 포함)과 `.gitpoulpi-dist` 표시 파일을 복사합니다. 표시 파일에는 GitPoulpi가 설치된 방법(`inno-user` 또는 `inno-machine`)이 기록되며, 업데이트 패널이 이를 **설치 방법**으로 표시합니다. 설치 프로그램을 다시 실행해도 선택(범위, 바로 가기, 별칭)은 유지됩니다.
+
+제거는 Windows 설정 > 앱에서 합니다. `gitpoulpi uninstall`(별칭, PATH 항목, 바로 가기)을 실행한 뒤 업데이트 프로그램이 남긴 `.old` 파일을 포함해 파일을 삭제합니다. 설정과 저장소는 그대로 남습니다.
 
 ### Linux와 macOS: `install.sh`
 
@@ -66,7 +92,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 OS와 CPU에 맞는 아카이브를 고르고 `.sha256`을 확인한 뒤 `~/.local/opt/gitpoulpi`에
-설치하고, `gitpoulpi`와 `gitpoulpi-mcp`를 `~/.local/bin`에 링크합니다. root 권한이
+설치하고(채널 `archive`: GitPoulpi가 제자리에서 스스로 업데이트), `gitpoulpi`와 `gitpoulpi-mcp`를 `~/.local/bin`에 링크합니다. root 권한이
 필요 없으며 홈 폴더 밖은 건드리지 않습니다. `--yes`가 없으면 별칭(기본값 `gp`),
 PATH, 바로 가기에 대해 묻습니다.
 
@@ -83,6 +109,38 @@ PATH, 바로 가기에 대해 묻습니다.
 
 최신 릴리스를 조회하려면 저장소가 공개여야 합니다. 비공개 저장소라면 브라우저에서
 아카이브를 내려받아 `--archive`를 쓰세요.
+## 패키지 관리자로
+
+아래의 모든 채널은 프로그램 옆에 같은 `.gitpoulpi-dist` 표시 파일을 쓰며 채널 이름만 다릅니다. GitPoulpi는 이를 읽어 누가 업데이트를 맡는지 알아냅니다. 패키지 관리자가 맡으므로 GitPoulpi는 그 몰래 파일을 교체하지 않습니다. 그러면 업데이트 패널(제목 표시줄의 버전을 클릭)이 패키지 관리자 자체의 명령을 실행하거나, 복사할 수 있도록 표시합니다. [업데이트](updates.md)를 참고하세요.
+
+| 채널 | 설치 | 비고 |
+|---|---|---|
+| **Chocolatey** (Windows) | `choco install gitpoulpi` | 모든 사용자용으로 설치되므로 업데이트에 관리자 승인이 필요합니다. |
+| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | `--scope user` 또는 `--scope machine`을 붙여 선택합니다. machine 범위는 설치할 때와 업데이트마다 관리자 승인을 요청합니다. |
+| **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` 다음 `scoop install gitpoulpi` | 사용자별, 관리자 권한 없음. |
+| **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | tap은 `Poulpi-Lab/homebrew-gitpoulpi`입니다. |
+| **apt** (Debian, Ubuntu) | [apt 저장소](#apt-debian-ubuntu) 참고 | 서명된 저장소. 모든 릴리스에 `.deb`도 첨부됩니다. |
+| **MSI** (Windows, 관리형) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 관리자용: 모든 사용자, 앱 내 업데이트 없음. [엔터프라이즈 배포](enterprise-distribution.md#msi-intune-또는-그룹-정책)를 참고하세요. |
+| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (또는 `paru -S gitpoulpi-bin`) | 도우미가 없으면: `git clone https://aur.archlinux.org/gitpoulpi-bin.git` 다음 `cd gitpoulpi-bin && makepkg -si`. |
+| **cargo** | `cargo binstall gitpoulpi-cli` | 컴파일하지 않고 릴리스 아카이브를 내려받습니다. |
+| **cargo, 소스에서** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | 컴파일합니다. Rust 툴체인이 필요합니다. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker에서 실행하기](docker.md)를 참고하세요. 같은 이미지가 `ghcr.io/poulpi-lab/gitpoulpi`에도 있습니다. |
+
+위의 이름은 릴리스 절차가 게시하는 대상입니다([릴리스](../../developer/releasing.md) 참고). 아직 게시되지 않은 채널은 "찾을 수 없음"으로 응답하며, 릴리스 아카이브나 설치 프로그램은 항상 동작합니다.
+
+패키지 관리자 자체의 PATH 처리가 적용됩니다. Chocolatey, winget, Scoop, Homebrew는 프로그램을 PATH에 직접 올려 주며, 어느 것도 `gp` 별칭을 만들지 않습니다(`gitpoulpi alias create gp`를 실행하거나 설정 > 일반 > 런처를 사용하세요).
+
+### apt (Debian, Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+저장소는 `amd64`와 `arm64`를 지원하며 프로젝트 소유의 키로 서명됩니다. 프로그램은 `/usr/lib/gitpoulpi`에 설치되고 `/usr/bin`에 링크가 만들어집니다. 패키지는 `git`에 의존하고 `git-lfs`를 권장합니다. 저장소 없이 릴리스의 `.deb`를 설치하려면 `sudo apt install ./gitpoulpi_<version>_<arch>.deb`를 사용하세요. 이 경우 GitPoulpi는 다음 `.deb`를 직접 내려받으라고 안내합니다. `/etc/apt/sources.list.d/gitpoulpi.*`에서 저장소를 찾았을 때만 `apt` 명령을 제안하기 때문입니다.
+
 ## 소스에서
 
 최신 안정 Rust 툴체인이 필요합니다(<https://rustup.rs>).
@@ -125,64 +183,12 @@ cargo run -p xtask -- dist
 
 ## 업데이트
 
-제목 표시줄의 앱 이름과 저장소 경로 사이에 실행 중인 버전(`v1.0.0`)이 표시됩니다. 이를 클릭하거나
-명령 팔레트(`Ctrl+P`)에서 **도움말: 릴리스 노트**를 실행하면 변경 내역이 실행 중인
-버전 위치로 스크롤된 릴리스 노트 탭이 열립니다.
+제목 표시줄의 앱 이름과 저장소 경로 사이에 실행 중인 버전(`v1.0.0`)이 표시됩니다. 이를 클릭하거나, `Ctrl+N` 다음 `u`를 누르거나, 명령 팔레트(`Ctrl+P`)에서 **업데이트: 업데이트 패널 보기**를 실행하면 버전, GitPoulpi가 설치된 방법, 새 릴리스에 대해 할 일이 담긴 업데이트 패널이 열립니다. **도움말: 릴리스 노트**는 변경 로그를 엽니다.
 
-GitPoulpi는 하루에 한 번 백그라운드에서 GitHub에 새 릴리스가 있는지 묻습니다
-(`updates.mode`, [설정 > 동기화](settings.md#동기화)). 새 릴리스가 있으면 칩이 강조색으로
-`v0.2.0 사용 가능`이라고 표시되고, 클릭하면 그 릴리스의 노트가 맨 위에 있는 릴리스 노트
-탭이 열립니다. 탭에는 버튼 세 개가 있으며 각각 키와 팔레트 명령이 있습니다:
+하루에 한 번 백그라운드에서 GitPoulpi가 릴리스가 게시되는 곳(기본값은 GitHub)에 새 릴리스가 있는지 확인합니다(`updates.mode`, [설정 > 동기화](settings.md#동기화)). 있으면 칩이 강조색의 `v0.2.0 사용 가능`으로 바뀝니다.
 
-- **다운로드**(`d`, *업데이트: 다운로드*)는 브라우저에서 릴리스 페이지를 엽니다.
-- **이 버전 건너뛰기**(`s`, *업데이트: 이 버전 건너뛰기*)는 더 새로운 릴리스가 나올
-  때까지 알림을 숨깁니다.
-- **지금 확인**(`r`, *업데이트: 지금 업데이트 확인*)은 즉시 다시 확인합니다.
+패널의 동작은 GitPoulpi가 설치된 방법에 따라 다릅니다. 릴리스 아카이브나 Windows 설치 프로그램은 자신의 파일을 교체하고, 패키지 관리자는 자체 명령을 실행하며, 관리형 또는 컨테이너 설치는 업데이트가 전달되는 방법을 알려 줍니다. `cargo build`로 만든 빌드는 업데이트하지 않습니다. 되돌리기, `auto`와 `notify`의 차이, 관리자가 잠글 수 있는 것을 포함한 전체 설명은 [업데이트](updates.md)에 있습니다.
 
-`updates.mode = "off"`이면 요청을 전혀 보내지 않습니다. 네트워크에 연결되어 있지 않거나
-저장소가 비공개이고 github.com 토큰이 저장되어 있지 않으면 확인은 조용히 실패합니다
-(애플리케이션 로그에 한 줄, 인터페이스에는 아무것도 표시되지 않음).
-`GITPOULPI_UPDATE_API`는 확인 요청을 다른 API 루트로 보냅니다(테스트에서 사용).
-
-### 제자리 업데이트
-
-릴리스 아카이브로 설치한 빌드는 스스로를 교체할 수 있습니다. 아카이브에는 실행 파일 옆에
-작은 `.gitpoulpi-dist` 파일이 들어 있으며, 실행 중인 빌드는 그 파일이 실행 파일 옆에
-있고 자신의 플랫폼을 가리킬 때만 "업데이트 가능"입니다. `cargo`로 만든 빌드, 다른 곳에
-복사한 사용자 지정 빌드, 그 파일을 빼 버린 패키지는 스스로 업데이트하지 않습니다. 이런
-빌드의 릴리스 노트 탭은 그 사실을 알려 주고 **다운로드**만 제공합니다.
-
-업데이트 가능한 빌드에는 탭에 다음이 더해집니다:
-
-- **지금 업데이트**(`u`, *업데이트: 지금 업데이트*)는 백그라운드에서 아카이브와 그
-  `.sha256`을 내려받고(상태 표시줄 표시기의 작업으로 퍼센트가 표시되며 다른 작업처럼
-  취소할 수 있음), 해시를 확인하고, 아카이브를 풀어 각 새 파일을 이전 파일 옆에
-  `<name>.new`로 둡니다. 실행 중인 것은 건드리지 않습니다. `auto` 모드에서는 확인에서
-  새 릴리스가 발견되는 즉시 같은 일이 저절로 일어납니다.
-- **재시작하여 업데이트**(`R`, *업데이트: 재시작하여 업데이트*. 다운로드가 준비되면 칩에도
-  같은 문구가 표시됨)는 언제나 사용자가 직접 누르며 자동으로 실행되지 않습니다. 세션의
-  독립 데몬을 중지하고(내장 데몬은 창과 함께 종료됨) 파일을 교체한 뒤 같은 인수와 세션으로
-  새 버전을 시작합니다.
-- **이전 버전으로 되돌리기**(`v`, *업데이트: 이전 버전으로 되돌리기*)는 이전 파일로 되돌리고
-  재시작합니다. 이전 버전의 파일은 새 버전이 1분 동안 실행될 때까지 `<name>.old`로
-  남았다가 삭제되므로, 이 버튼은 그 첫 실행 동안만 있습니다. git 실행 취소 기록에는
-  포함되지 않습니다. 저장소가 아니라 GitPoulpi 자체의 파일을 바꾸기 때문입니다.
-
-파일을 교체하는 방식: Linux와 macOS에서는 각 새 파일을 이전 파일 위로 이름 변경합니다
-(원자적이며, 실행 중인 프로그램은 종료할 때까지 이전 사본을 유지함). Windows에서는 실행 중인
-`.exe`를 덮어쓸 수 없으므로 이전 파일을 `<name>.old`로 이름 바꾸고 새 파일을 옮겨 넣으며,
-아직 실행 중인 `.old`는 이후 시작 때 삭제됩니다. 교체는 전부 아니면 전무입니다. 다른
-프로그램이 실행 파일 중 하나를 붙잡고 있으면(예: `gitpoulpi-mcp`를 실행 중인 MCP 클라이언트)
-GitPoulpi는 그 파일 이름을 알려 주고, 아무것도 바꾸지 않으며, 다시 시도할 수 있게 다운로드를
-준비된 채로 둡니다.
-
-다음은 각각 메시지와 함께 거부됩니다: `.sha256` 파일이 없는 릴리스, 일치하지 않는 해시, 이
-플랫폼용이 아닌 이름의 아카이브 파일(`gitpoulpi-<version>-<target>.<zip|tar.gz>`), 표시 파일이
-다른 버전이나 플랫폼을 가리키는 아카이브, 그리고 다음 호스트 밖의 모든 다운로드 링크:
-GitHub의 `github.com`, `api.github.com`, `objects.githubusercontent.com`,
-`release-assets.githubusercontent.com`, `github-releases.githubusercontent.com`(첫 요청과 모든
-리디렉션 단계이며, 다른 곳으로 리디렉션되면 다운로드가 중단됨). 비공개 저장소의 아카이브는
-브라우저 세션이 필요하므로, 저장소가 공개될 때까지 그곳에서는 다운로드가 실패합니다.
 ## 잘 동작하는지 확인하기
 
 ```

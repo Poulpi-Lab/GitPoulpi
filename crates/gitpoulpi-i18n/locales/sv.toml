@@ -1467,99 +1467,99 @@ channel_prerelease = "Förhandsversion"
 # context: heading of the group of update settings on the Synchronization page
 heading = "Uppdateringar"
 # context: title of the update panel, the window the version in the title bar opens
-panel_title = "Updates"
+panel_title = "Uppdateringar"
 # context: first line of the update panel; {version} is like v0.1.0 (a development build adds a short commit id)
 panel_version = "GitPoulpi {version}"
 # context: line in the update panel; {channel} says how the app was installed, for example "Chocolatey" or "a release archive"
-panel_installed_with = "Installed with: {channel}"
+panel_installed_with = "Installerat med: {channel}"
 # context: line in the update panel while the app looks at how it was installed
-panel_detecting = "Looking at how GitPoulpi was installed..."
+panel_detecting = "Tar reda på hur GitPoulpi installerades..."
 # context: line in the update panel for a build that has no install record (for example built from source)
-panel_no_record = "This build has no install record, so it does not update itself."
+panel_no_record = "Det här bygget saknar installationspost och uppdaterar därför inte sig självt."
 # context: line in the update panel when the app replaces its own files and restarts (macOS and Linux)
-panel_note_swap = "GitPoulpi closes, replaces its files and opens again in this terminal."
+panel_note_swap = "GitPoulpi stängs, byter ut sina filer och öppnas igen i den här terminalen."
 # context: line in the update panel when the app replaces its own files and restarts (Windows)
-panel_note_swap_windows = "GitPoulpi closes, replaces its files and opens again in a new window."
+panel_note_swap_windows = "GitPoulpi stängs, byter ut sina filer och öppnas igen i ett nytt fönster."
 # context: line in the update panel: the update needs the approval of a Windows administrator, and other users' GitPoulpi windows on this computer are closed
-panel_note_uac = "Windows asks for administrator approval. GitPoulpi processes of other users on this computer are closed."
+panel_note_uac = "Windows ber om administratörsgodkännande. GitPoulpi-processer som tillhör andra användare på den här datorn stängs."
 # context: line in the update panel when a package manager does the update (macOS and Linux)
-panel_note_run = "GitPoulpi closes while the package manager updates it, then opens again in this terminal."
+panel_note_run = "GitPoulpi stängs medan pakethanteraren uppdaterar det och öppnas sedan igen i den här terminalen."
 # context: line in the update panel when a package manager does the update (Windows)
-panel_note_run_windows = "GitPoulpi closes while the package manager updates it, then opens again in a new window."
+panel_note_run_windows = "GitPoulpi stängs medan pakethanteraren uppdaterar det och öppnas sedan igen i ett nytt fönster."
 # context: line in the update panel above the command the package manager runs
-panel_run_command = "It runs this command:"
+panel_run_command = "Den kör det här kommandot:"
 # context: line in the update panel above the command the user runs in a terminal
-panel_show_intro = "Run this command in a terminal to update:"
+panel_show_intro = "Kör det här kommandot i en terminal för att uppdatera:"
 # context: line in the update panel; {message} is a text the administrator of this computer set
-panel_admin_message = "From your administrator: {message}"
+panel_admin_message = "Från din administratör: {message}"
 # context: line in the update panel: the administrator turned off self-updates
-announce_policy = "Your administrator turned off updating from inside GitPoulpi. Updates reach this computer another way."
+announce_policy = "Din administratör har stängt av uppdatering inifrån GitPoulpi. Uppdateringar når den här datorn på annat sätt."
 # context: line in the update panel: the installation is managed by an administrator
-announce_managed = "This installation is managed by your administrator."
+announce_managed = "Den här installationen hanteras av din administratör."
 # context: line in the update panel for the Docker image; the commands follow
-announce_container = "This is a container image. Download a newer image to update:"
+announce_container = "Det här är en containeravbild. Ladda ned en nyare avbild för att uppdatera:"
 # context: line in the update panel: the app cannot write its own folder
-announce_legacy_read_only = "GitPoulpi cannot write its own folder, so it cannot replace itself. Download the new version instead."
+announce_legacy_read_only = "GitPoulpi kan inte skriva i sin egen mapp och kan därför inte ersätta sig självt. Ladda ned den nya versionen i stället."
 # context: line in the update panel: the apt repository of GitPoulpi is not set up on this computer
-announce_apt = "The GitPoulpi apt repository is not set up on this computer. Download the .deb package of the new version instead."
+announce_apt = "GitPoulpis apt-repository är inte konfigurerat på den här datorn. Ladda ned .deb-paketet för den nya versionen i stället."
 # context: line in the update panel: there is no way to go back to the previous version
-announce_no_revert = "There is no way to go back to the previous version from here."
+announce_no_revert = "Det går inte att gå tillbaka till föregående version härifrån."
 # context: button in the update panel: downloads the newer version if needed, then closes GitPoulpi, updates it and opens it again
-btn_update_restart = "Update and restart"
+btn_update_restart = "Uppdatera och starta om"
 # context: button in the update panel: lets the package manager update GitPoulpi
-btn_run_update = "Run update"
+btn_run_update = "Kör uppdatering"
 # context: button in the update panel: copies the update command to the clipboard
-btn_copy = "Copy command"
+btn_copy = "Kopiera kommando"
 # context: button in the update panel: runs the update command in a new terminal window
-btn_terminal = "Open in terminal"
+btn_terminal = "Öppna i terminal"
 # context: button in the update panel: opens the Release notes tab
-btn_notes = "Release notes"
+btn_notes = "Versionsanteckningar"
 # context: button in the update panel: closes it
-btn_close = "Close"
+btn_close = "Stäng"
 # context: button on the Release notes tab: opens the update panel
-btn_panel = "Update options"
+btn_panel = "Uppdateringsalternativ"
 # context: footer hint of the update panel; the letters are the keys of the buttons
-panel_hint = "u update  c copy  t terminal  v revert  n notes  s skip  r check  Esc close"
+panel_hint = "u uppdatera  c kopiera  t terminal  v återgå  n anteckningar  s hoppa över  r sök  Esc stäng"
 # context: note at the top of the Release notes tab: this installation updates through the update panel
-note_see_panel = "To update, open the update panel (click the version in the title bar)."
+note_see_panel = "Öppna uppdateringspanelen (klicka på versionen i titelraden) för att uppdatera."
 # context: palette and status line: why Update now and Restart to update do not apply to this installation; the update panel shows what to do
-why_manual = "this installation is updated another way: see Updates: Show Update"
+why_manual = "den här installationen uppdateras på annat sätt: se Uppdateringar: Visa uppdatering"
 # context: palette: why Copy update command is unavailable
-why_no_command = "there is no update command to copy for this installation"
+why_no_command = "det finns inget uppdateringskommando att kopiera för den här installationen"
 # context: palette: why Run update command in a terminal is unavailable
-why_no_terminal = "this installation has no update command to run in a terminal"
+why_no_terminal = "den här installationen har inget uppdateringskommando att köra i en terminal"
 # context: what was copied, for the status line (copied {what}: ...)
-copy_what = "the update command"
+copy_what = "uppdateringskommandot"
 # context: status line after the update command was started in a new terminal window
-msg_terminal_opened = "opened a terminal with the update command"
+msg_terminal_opened = "öppnade en terminal med uppdateringskommandot"
 # context: status line when no terminal window could be started; {reason} is a technical explanation in English
-msg_terminal_failed = "could not open a terminal: {reason}"
+msg_terminal_failed = "kunde inte öppna en terminal: {reason}"
 # context: status line when the update could not be handed to the updater program; {reason} is a technical explanation in English
-msg_handoff_failed = "could not start the updater: {reason}"
+msg_handoff_failed = "kunde inte starta uppdateraren: {reason}"
 # context: status line at start-up after a successful update; {version} is like 0.2.0
-msg_updated = "Updated to v{version}"
+msg_updated = "Uppdaterad till v{version}"
 # context: status line at start-up when the administrator approval of an update was declined
-msg_update_declined = "Update canceled: administrator approval was declined. Nothing changed."
+msg_update_declined = "Uppdateringen avbröts: administratörsgodkännandet nekades. Inget ändrades."
 # context: status line at start-up after a failed update; {reason} is a technical explanation in English
-msg_update_failed_previous = "Update failed: {reason}. The previous version is still installed."
+msg_update_failed_previous = "Uppdateringen misslyckades: {reason}. Föregående version är fortfarande installerad."
 # context: command palette entry: opens the update panel
-palette_show = "Updates: Show Update"
+palette_show = "Uppdateringar: Visa uppdatering"
 # context: command palette entry: copies the command that updates GitPoulpi to the clipboard
-palette_copy = "Updates: Copy Update Command"
+palette_copy = "Uppdateringar: Kopiera uppdateringskommando"
 # context: command palette entry: runs the command that updates GitPoulpi in a new terminal window
-palette_terminal = "Updates: Run Update Command in a Terminal"
+palette_terminal = "Uppdateringar: Kör uppdateringskommando i en terminal"
 # context: help line for the key that opens the update panel
-help_nav = "Show the update panel (version, how to update)"
+help_nav = "Visa uppdateringspanelen (version, hur man uppdaterar)"
 # context: after "Installed with:": the app was installed from a release archive (a zip or tar.gz)
-via_archive = "a release archive"
+via_archive = "ett releasearkiv"
 # context: after "Installed with:": the Windows installer, for the current user only
-via_inno_user = "the installer (this user)"
+via_inno_user = "installationsprogrammet (den här användaren)"
 # context: after "Installed with:": the Windows installer, for all users
-via_inno_machine = "the installer (all users)"
+via_inno_machine = "installationsprogrammet (alla användare)"
 # context: after "Installed with:": Chocolatey, a Windows package manager; keep the name
 via_choco = "Chocolatey"
 # context: after "Installed with:": a company-internal Chocolatey feed
-via_choco_internal = "Chocolatey (internal feed)"
+via_choco_internal = "Chocolatey (intern feed)"
 # context: after "Installed with:": winget, the Windows package manager; keep the name
 via_winget = "winget"
 # context: after "Installed with:": Scoop, a Windows package manager; keep the name
@@ -1569,23 +1569,23 @@ via_homebrew = "Homebrew"
 # context: after "Installed with:": apt, the Debian and Ubuntu package manager; keep the name
 via_apt = "apt"
 # context: after "Installed with:": an MSI package deployed by an administrator
-via_msi = "an MSI package"
+via_msi = "ett MSI-paket"
 # context: after "Installed with:": the Arch User Repository; keep the name
-via_aur = "the AUR"
+via_aur = "AUR"
 # context: after "Installed with:": a Docker image
-via_docker = "a Docker image"
+via_docker = "en Docker-avbild"
 # context: after "Installed with:": cargo, the Rust package manager; keep the name
 via_cargo = "cargo"
 # context: after "Installed with:": a release archive in a folder this user cannot write
-via_legacy_read_only = "a release archive (read-only folder)"
+via_legacy_read_only = "ett releasearkiv (skrivskyddad mapp)"
 # context: after "Installed with:": a development build with no install record
-via_dev = "a development build (no install record)"
+via_dev = "ett utvecklingsbygge (ingen installationspost)"
 # context: setting row on the Synchronization page, read only: how the app was installed
-installed_with = "Installed with"
+installed_with = "Installerat med"
 # context: help of the setting above
-installed_with_help = "How GitPoulpi got onto this computer. It decides how updates are applied. This row cannot be changed."
+installed_with_help = "Hur GitPoulpi kom till den här datorn. Det avgör hur uppdateringar tillämpas. Den här raden kan inte ändras."
 # context: shown instead of a setting's value when the administrator of this computer set it
-locked = "Set by your administrator"
+locked = "Inställt av din administratör"
 
 [radar]
 title = "Radar"
@@ -2300,7 +2300,7 @@ nav_prefix_about = "Öppna Om GitPoulpi"
 nav_prefix_activity_log = "Öppna Aktivitetsloggen"
 nav_prefix_global_log = "Öppna den globala aktivitetsloggen"
 nav_prefix_jobs = "Visa bakgrundsjobben"
-nav_prefix_updates = "Show the Update Panel"
+nav_prefix_updates = "Visa uppdateringspanelen"
 nav_prefix_help = "Växla hjälp"
 nav_prefix_select_tab = "Välj flik"
 nav_prefix_change_theme = "Byt tema"
@@ -5009,7 +5009,7 @@ send_failed = "anslutningen till daemon förlorades: kunde inte skicka förfråg
 timeout = "daemon svarade inte i tid"
 embedded_failed = "den inbäddade daemon kunde inte starta: {error}"
 link_panicked = "daemon-länken stoppades oväntat (dess tråd panikade)"
-updating = "GitPoulpi is updating, try again in a moment"
+updating = "GitPoulpi uppdateras, försök igen om en stund"
 runtime_failed = "kunde inte starta daemon-länkens runtime: {error}"
 connect_failed = "kunde inte ansluta till sessionens daemon (port {port}): {error}"
 build_mismatch = "sessionens daemon kör en annan build (daemon @{daemon}, det här fönstret @{window}) - kör `gitpoulpi daemon restart` för att få matchande kod"
@@ -8654,280 +8654,280 @@ no_new_folder = "Välj en befintlig fil: en mapp kan inte skapas här."
 
 [flow_hook_trust]
 # context: heading of the question in the Flow dialog when the repository's committed workflow hooks differ from the list the user trusted earlier
-heading_changed = "The hooks changed since you trusted them"
+heading_changed = "Hooks har ändrats sedan du litade på dem"
 # context: question in the Flow dialog above the exact shell commands the repository's workflow wants to run
-question = "This repository's workflow runs these commands on your machine. Trust them?"
+question = "Det här repositoryts arbetsflöde kör de här kommandona på din dator. Lita på dem?"
 # context: heading of the commands that would run now, inside the scrollable command list of the hook trust question
-commands_heading = "Commands to run now"
+commands_heading = "Kommandon som körs nu"
 # context: heading of the list of commands the user trusted earlier, shown below the new ones when the hooks changed
-previous_heading = "Commands you trusted before"
+previous_heading = "Kommandon du litat på tidigare"
 # context: first numbered answer of the hook trust question: remember the trust and run the action with its hooks
-answer_trust = "Trust and run"
+answer_trust = "Lita på och kör"
 # context: second numbered answer of the hook trust question: run the action and skip every hook
-answer_skip = "Run without hooks"
+answer_skip = "Kör utan hooks"
 # context: key hint under the numbered answers of the hook trust question
-hint = "Up/Down or 1/2 to choose, Enter to confirm, PgUp/PgDn to scroll, Esc to go back"
+hint = "Upp/Ned eller 1/2 för att välja, Enter för att bekräfta, PgUp/PgDn för att scrolla, Esc för att gå tillbaka"
 # context: shown while the daemon remembers the user's trust for the hooks
-trusting = "Remembering your answer..."
+trusting = "Kommer ihåg ditt svar..."
 # context: one-line note in the Flow preview when the hooks are not trusted yet; the question comes when the action runs
-untrusted_note = "These hooks are not trusted yet: you are asked before they run."
+untrusted_note = "Dessa hooks är inte betrodda ännu: du tillfrågas innan de körs."
 # context: error text when the daemon refused a run because the committed workflow hooks are not trusted; {n} is how many commands there are
-not_trusted = { one = "The workflow hooks are not trusted: {n} command was not run. Review it and trust it first.", other = "The workflow hooks are not trusted: {n} commands were not run. Review them and trust them first." }
+not_trusted = { one = "Arbetsflödets hooks är inte betrodda: {n} kommando kördes inte. Granska det och lita på det först.", other = "Arbetsflödets hooks är inte betrodda: {n} kommandon kördes inte. Granska dem och lita på dem först." }
 
 [mcp_security]
 # context: heading in Settings > Agents & MCP above the rows that protect the MCP HTTP endpoint
-heading = "MCP HTTP endpoint security"
+heading = "Säkerhet för MCP:s HTTP-endpoint"
 # context: label of a switch in Settings > Agents & MCP; the MCP server's HTTP endpoint asks clients for an access token
-auth = "HTTP authentication"
+auth = "HTTP-autentisering"
 # context: help under the HTTP authentication switch
-auth_help = "Requests to the MCP HTTP endpoint (gitpoulpi mcp serve --http) must carry the access token. Applies the next time the server starts."
+auth_help = "Anrop till MCP:s HTTP-endpoint (gitpoulpi mcp serve --http) måste ha åtkomsttoken. Gäller nästa gång servern startar."
 # context: red warning shown while HTTP authentication is off
-auth_warning = "Authentication is off: any program that can reach the endpoint can run every tool the MCP settings allow."
+auth_warning = "Autentisering är av: vilket program som helst som når endpointen kan köra varje verktyg som MCP-inställningarna tillåter."
 # context: label of the row that shows the access token of the MCP HTTP endpoint
-token = "Access token"
+token = "Åtkomsttoken"
 # context: value of the access token row when no token has been made yet
-token_none = "(none yet)"
+token_none = "(ingen ännu)"
 # context: help under the access token row
-token_help = "Clients send it as Authorization: Bearer followed by the token. It is kept in a file only you can read. A new token applies at once: clients holding the old one are refused."
+token_help = "Klienter skickar den som Authorization: Bearer följt av token. Den sparas i en fil som bara du kan läsa. En ny token gäller direkt: klienter som har den gamla nekas."
 # context: button that reveals the access token on screen
-show = "Show"
+show = "Visa"
 # context: button that hides the access token again
-hide = "Hide"
+hide = "Dölj"
 # context: button that copies the access token to the clipboard
-copy = "Copy"
+copy = "Kopiera"
 # context: button that replaces the access token with a new one
-rotate = "Rotate"
+rotate = "Rotera"
 # context: button that makes the first access token when there is none
-create = "Create"
+create = "Skapa"
 # context: status line after the access token was copied; the token itself is never shown there
-token_copied = "Access token copied to the clipboard."
+token_copied = "Åtkomsttoken kopierad till urklipp."
 # context: status line after the access token was replaced
-token_rotated = "Access token replaced."
+token_rotated = "Åtkomsttoken utbytt."
 # context: status line when the access token file could not be written; {reason} is the system error
-token_failed = "Could not keep the access token: {reason}"
+token_failed = "Kunde inte spara åtkomsttoken: {reason}"
 # context: status line when there is no access token to show or copy
-token_missing = "There is no access token yet."
+token_missing = "Det finns ingen åtkomsttoken ännu."
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice
-tls_help = "Encrypts the HTTP endpoint; the server ends TLS itself, so a plain connection is refused. Self-signed makes a certificate once and shows its fingerprint for clients to check. Files uses the certificate and key below. Applies the next time the server starts."
+tls_help = "Krypterar HTTP-endpointen; servern avslutar TLS själv, så en vanlig anslutning nekas. Självsignerat skapar ett certifikat en gång och visar dess fingeravtryck så att klienter kan kontrollera det. Filer använder certifikatet och nyckeln nedan. Gäller nästa gång servern startar."
 # context: TLS choice: no encryption
-tls_off = "Off"
+tls_off = "Av"
 # context: TLS choice: the server makes its own certificate
-tls_self_signed = "Self-signed"
+tls_self_signed = "Självsignerat"
 # context: TLS choice: the user supplies a certificate and a key file
-tls_files = "Files"
+tls_files = "Filer"
 # context: label of a path field in Settings > Agents & MCP: the TLS certificate file
-tls_cert = "Certificate path"
+tls_cert = "Certifikatsökväg"
 # context: help under the certificate path
-tls_cert_help = "PEM file with the certificate chain. Used when TLS is set to Files."
+tls_cert_help = "PEM-fil med certifikatkedjan. Används när TLS är satt till Filer."
 # context: label of a path field in Settings > Agents & MCP: the TLS private key file
-tls_key = "Key path"
+tls_key = "Nyckelsökväg"
 # context: help under the key path
-tls_key_help = "PEM file with the private key. Used when TLS is set to Files."
+tls_key_help = "PEM-fil med den privata nyckeln. Används när TLS är satt till Filer."
 # context: label of a read-only row: the SHA-256 fingerprint of the certificate the endpoint serves
-fingerprint = "Certificate fingerprint"
+fingerprint = "Certifikatets fingeravtryck"
 # context: help under the fingerprint row
-fingerprint_help = "SHA-256 of the certificate the endpoint serves. A client that checks this value is talking to this server."
+fingerprint_help = "SHA-256 för certifikatet som endpointen presenterar. En klient som kontrollerar det här värdet talar med den här servern."
 # context: value of the fingerprint row when TLS is Self-signed and the certificate does not exist yet
-fingerprint_pending = "(made when the server first starts with TLS)"
+fingerprint_pending = "(skapas när servern först startar med TLS)"
 # context: value of the fingerprint row when the certificate file cannot be read
-fingerprint_unreadable = "(certificate not readable)"
+fingerprint_unreadable = "(certifikatet kan inte läsas)"
 # context: value of the fingerprint row when TLS is off
-fingerprint_off = "(TLS is off)"
+fingerprint_off = "(TLS är av)"
 # context: label of a switch in Settings > Agents & MCP: the user states that a tunnel or reverse proxy encrypts the traffic
-proxy = "Behind a tunnel or reverse proxy"
+proxy = "Bakom en tunnel eller omvänd proxy"
 # context: help under that switch
-proxy_help = "Switch on when a tunnel or proxy in front of the endpoint encrypts the traffic. The server cannot check that, so it is your statement. It lets a non-loopback address run without TLS. Keeping the loopback address and using ssh -L is safer."
+proxy_help = "Slå på när en tunnel eller proxy framför endpointen krypterar trafiken. Servern kan inte kontrollera det, så det är ditt eget påstående. Det låter en adress som inte är loopback köra utan TLS. Det är säkrare att behålla loopback-adressen och använda ssh -L."
 # context: red warning shown while that switch is on
-proxy_warning = "Without TLS, the hop between the tunnel or proxy and the server is plain text on that network."
+proxy_warning = "Utan TLS går sträckan mellan tunneln eller proxyn och servern i klartext i det nätverket."
 
 [trust_dialog]
 # context: title of the dialog that stops an integration whose address, account or certificate changed
-title = "Integration security check"
+title = "Säkerhetskontroll av integration"
 # context: body of the dialog; {name} is the id of an integration, {new} and {old} are web addresses
-origin_changed = "{name} now points to {new}, it was {old}. The token was not sent."
+origin_changed = "{name} pekar nu på {new}, tidigare {old}. Token skickades inte."
 # context: body of the dialog when the saved token of an integration now belongs to another account; {name} is the id of an integration
-account_changed = "The token of {name} now belongs to another account. The token was not used."
+account_changed = "Token för {name} tillhör nu ett annat konto. Token användes inte."
 # context: line of the dialog; {login} is a user name on a code host, {id} is the number the host gave that account
-account_was = "Trusted account: {login} (id {id})"
+account_was = "Betrott konto: {login} (id {id})"
 # context: line of the dialog; {login} is a user name on a code host, {id} is the number the host gave that account
-account_now = "Account now: {login} (id {id})"
+account_now = "Konto nu: {login} (id {id})"
 # context: body of the dialog for a server whose certificate no known authority signed; {name} is the id of an integration
-cert_untrusted = "{name} presents a certificate that no known authority signed. Compare its fingerprint with the one the server's administrator gave you before you trust it. The token was not sent."
+cert_untrusted = "{name} presenterar ett certifikat som ingen känd utfärdare har signerat. Jämför dess fingeravtryck med det som serverns administratör gav dig innan du litar på det. Token skickades inte."
 # context: body of the dialog; {name} is the id of an integration
-cert_changed = "The certificate of {name} changed since you trusted it. The token was not sent."
+cert_changed = "Certifikatet för {name} har ändrats sedan du litade på det. Token skickades inte."
 # context: body of the dialog; {name} is the id of an integration, {origin} is a web address starting with http://
-plain_http = "{name} uses {origin}, which is not encrypted: the token and everything else can be read on the way. The token was not sent."
+plain_http = "{name} använder {origin}, som inte är krypterad: token och allt annat kan läsas på vägen. Token skickades inte."
 # context: heading over the certificate that was trusted before, in the security check dialog
-cert_before = "Trusted before"
+cert_before = "Betrott tidigare"
 # context: heading over the certificate the server presents now, in the security check dialog
-cert_now = "Presented now"
+cert_now = "Presenteras nu"
 # context: label before a certificate fingerprint (a SHA-256 hash)
 cert_fingerprint = "SHA-256"
 # context: label before the subject (owner) of a certificate
-cert_subject = "Subject"
+cert_subject = "Ämne"
 # context: label before the issuer (the authority that signed) of a certificate
-cert_issuer = "Issuer"
+cert_issuer = "Utfärdare"
 # context: label before the first day a certificate is valid
-cert_valid_from = "Valid from"
+cert_valid_from = "Giltigt från"
 # context: label before the last day a certificate is valid
-cert_valid_to = "Valid to"
+cert_valid_to = "Giltigt till"
 # context: shown instead of a certificate field that was never recorded
-cert_unknown = "(not recorded)"
+cert_unknown = "(inte registrerat)"
 # context: numbered answer of the security check dialog; deletes the integration's saved token
-answer_disconnect = "Disconnect (deletes the saved token)"
+answer_disconnect = "Koppla från (raderar den sparade token)"
 # context: numbered answer of the security check dialog; accepts the web address the integration now has
-answer_trust_origin = "Trust the new address"
+answer_trust_origin = "Lita på den nya adressen"
 # context: numbered answer of the security check dialog; accepts the account the token now belongs to
-answer_trust_account = "Trust the new account"
+answer_trust_account = "Lita på det nya kontot"
 # context: numbered answer of the security check dialog; accepts the certificate the server presents
-answer_trust_cert = "Trust the new certificate"
+answer_trust_cert = "Lita på det nya certifikatet"
 # context: numbered answer of the security check dialog; accepts an address that is not encrypted
-answer_allow_http = "Allow plain http (not encrypted)"
+answer_allow_http = "Tillåt vanlig http (okrypterat)"
 # context: numbered answer of the security check dialog; changes nothing
-answer_cancel = "Cancel"
+answer_cancel = "Avbryt"
 # context: hint under the answers of the security check dialog
-hint = "Press a number, or Up and Down then Enter. Esc cancels."
+hint = "Tryck på en siffra, eller Upp och Ned och sedan Enter. Esc avbryter."
 # context: line of the security check dialog; {n} is how many other checks wait after this one
-more_waiting = "More checks are waiting after this one ({n})."
+more_waiting = "Fler kontroller väntar efter den här ({n})."
 # context: command palette entry that opens the security check dialog again
-palette_review = "Integrations: Review security check"
+palette_review = "Integrationer: Granska säkerhetskontroll"
 # context: status line when the palette entry finds nothing to review
-none_waiting = "No integration security check is waiting."
+none_waiting = "Ingen säkerhetskontroll av integrationer väntar."
 # context: status line; {name} is the id of an integration
-disconnecting = "Disconnecting {name}..."
+disconnecting = "Kopplar från {name}..."
 # context: status line; {name} is the id of an integration
-trusted_origin = "{name}: the new address is trusted."
+trusted_origin = "{name}: den nya adressen är betrodd."
 # context: status line; {name} is the id of an integration
-trusted_account = "{name}: the new account is trusted."
+trusted_account = "{name}: det nya kontot är betrott."
 # context: status line; {name} is the id of an integration
-trusted_cert = "{name}: the new certificate is trusted."
+trusted_cert = "{name}: det nya certifikatet är betrott."
 # context: status line; {name} is the id of an integration
-allowed_http = "{name}: plain http is allowed."
+allowed_http = "{name}: vanlig http är tillåten."
 # context: status line; {name} is the id of an integration whose address changed once more after the dialog was shown
-changed_again = "{name} changed again: nothing was trusted. Review it again."
+changed_again = "{name} ändrades igen: ingenting blev betrott. Granska det igen."
 # context: status line; {name} is the id of an integration that was removed from the configuration
-no_integration = "{name} is no longer in the configuration."
+no_integration = "{name} finns inte längre i konfigurationen."
 # context: hint under the token field of an integration form
-token_retype_hint = "Re-entering the token is recommended."
+token_retype_hint = "Du bör ange token igen."
 # context: checkbox of an integration form; pins the key of the server's certificate
-strict_label = "Strict certificate pinning"
+strict_label = "Strikt certifikatfästning"
 # context: help under the strict pinning checkbox
-strict_help = "Refuse the server when its certificate key changes, even for a certificate a public authority signed."
+strict_help = "Neka servern när certifikatets nyckel ändras, även för ett certifikat som en offentlig utfärdare har signerat."
 # context: checkbox of an integration form shown for an http:// address
-plain_label = "Allow plain http (not encrypted)"
+plain_label = "Tillåt vanlig http (okrypterat)"
 # context: red warning under the plain http checkbox
-plain_warning = "Warning: the token and everything else travels in clear text and can be read or changed on the way."
+plain_warning = "Varning: token och allt annat skickas i klartext och kan läsas eller ändras på vägen."
 # context: error of an integration form whose address was changed without typing the token again
-url_changed_needs_token = "The address changed: enter the token again to connect to the new address."
+url_changed_needs_token = "Adressen ändrades: ange token igen för att ansluta till den nya adressen."
 # context: short label (about six letters) of a line on the connected integration card: the pinned certificate key
-kv_certificate = "Pinned"
+kv_certificate = "Fäst"
 # context: value on the connected card, above the key fingerprint; {mode} is one of the next two messages
-pinned_value = "certificate ({mode})"
+pinned_value = "certifikat ({mode})"
 # context: pinning mode shown between parentheses after a certificate fingerprint
-mode_strict = "strict"
+mode_strict = "strikt"
 # context: pinning mode shown between parentheses after a certificate fingerprint; the key was accepted at first use
-mode_first_use = "first use"
+mode_first_use = "första användning"
 # context: label of a line on the connected card: when the token stops working
-kv_expires = "Expires"
+kv_expires = "Utgår"
 # context: yellow warning on the connected card, followed by a comma separated list of permissions of the token
-excess_line = "This token has more rights than GitPoulpi needs:"
+excess_line = "Den här token har fler rättigheter än GitPoulpi behöver:"
 # context: yellow advice on the connected card, under the warning about extra rights
-prefer_fine_grained = "Prefer a fine-grained token with an expiry date"
+prefer_fine_grained = "Föredra en finkornig token med utgångsdatum"
 
 [security_notice]
 # context: title bar chip, in red, when a security notice published by the project names the running version; the chip opens the update panel
-chip = "Security notice: this version is affected"
+chip = "Säkerhetsmeddelande: den här versionen påverkas"
 # context: shorter form of the same chip, used when the title bar is too narrow for the long one
-chip_short = "Security notice"
+chip_short = "Säkerhetsmeddelande"
 # context: heading in the update panel above the security notices that name the running version
-panel_heading = "Security notice: this version is affected"
+panel_heading = "Säkerhetsmeddelande: den här versionen påverkas"
 # context: severity word of a security notice (lowest level), shown before the summary in the update panel
-sev_low = "Low"
+sev_low = "Låg"
 # context: severity word of a security notice (second level)
-sev_medium = "Medium"
+sev_medium = "Medel"
 # context: severity word of a security notice (third level)
-sev_high = "High"
+sev_high = "Hög"
 # context: severity word of a security notice (highest level)
-sev_critical = "Critical"
+sev_critical = "Kritisk"
 # context: one security notice in the update panel; {severity} is Low, Medium, High or Critical, {summary} one sentence from the notice
 advisory_line = "{severity}: {summary}"
 # context: line under a security notice in the update panel; {version} is like 1.4.3
-fixed_in = "Fixed in version {version}."
+fixed_in = "Åtgärdad i version {version}."
 # context: line under a security notice in the update panel when no fixed version is published yet
-no_fix = "No fixed version is published yet."
+no_fix = "Ingen åtgärdad version har publicerats ännu."
 # context: line under a security notice in the update panel; {url} is a web address
-link_line = "More information: {url}"
+link_line = "Mer information: {url}"
 # context: line in the update panel under a security notice when GitPoulpi was installed by a package manager and cannot update itself
-package_manager = "Update with your package manager."
+package_manager = "Uppdatera med din pakethanterare."
 # context: button in the update panel: opens the web page of the security notice in the browser
-btn_open = "Open notice"
+btn_open = "Öppna meddelande"
 # context: command palette entry: opens the web page of the security notice that names the running version
-palette_open = "Updates: Open Security Notice"
+palette_open = "Uppdateringar: Öppna säkerhetsmeddelande"
 # context: palette and status line: why Open Security Notice does nothing
-why_no_notice = "no security notice with a link names this version"
+why_no_notice = "inget säkerhetsmeddelande med länk nämner den här versionen"
 # context: footer hint of the update panel when a security notice is listed; the letters are the keys of the buttons
-panel_hint = "u update  c copy  t terminal  v revert  n notes  a notice  s skip  r check  Esc close"
+panel_hint = "u uppdatera  c kopiera  t terminal  v återgå  n anteckningar  a meddelande  s hoppa över  r sök  Esc stäng"
 
 [ai_privacy]
 # context: title of the dialog shown before an AI request is sent; {via} is the name of the AI profile
-title = "Review what is sent to {via}"
+title = "Granska vad som skickas till {via}"
 # context: first line of that dialog
-intro = "This is the request after secrets are replaced and sensitive files are left out. Nothing leaves until you choose Send."
+intro = "Det här är anropet efter att hemligheter har ersatts och känsliga filer har utelämnats. Inget lämnar datorn förrän du väljer Skicka."
 # context: heading of the list of secrets replaced in the request
-redactions_heading = { one = "{n} secret replaced", other = "{n} secrets replaced" }
+redactions_heading = { one = "{n} hemlighet ersatt", other = "{n} hemligheter ersatta" }
 # context: heading of the list of sensitive files left out of the request
-excluded_heading = { one = "{n} sensitive file left out", other = "{n} sensitive files left out" }
+excluded_heading = { one = "{n} känslig fil utelämnad", other = "{n} känsliga filer utelämnade" }
 # context: line of the dialog when nothing was replaced and nothing was left out
-nothing_removed = "No secret was found and no sensitive file is part of this request."
+nothing_removed = "Ingen hemlighet hittades och ingen känslig fil ingår i det här anropet."
 # context: one row of the list of replaced secrets; {rule} is the kind of secret (github-token), {preview} a masked sample that never shows the whole value
 redaction_row = "{rule}: {preview}"
 # context: checkbox of the dialog; {action} is the name of the AI action (Commit message, Explain changes...)
-dont_show = "Don't show again for {action}"
+dont_show = "Visa inte igen för {action}"
 # context: button that sends the AI request
-send = "Send"
+send = "Skicka"
 # context: button that cancels the AI request
-cancel = "Cancel"
+cancel = "Avbryt"
 # context: key hint at the bottom of the dialog
-hint = "Tab: next control, Space: toggle, Enter: press, Esc: cancel"
+hint = "Tab: nästa kontroll, Blanksteg: växla, Enter: tryck, Esc: avbryt"
 # context: Settings > AI, heading of the privacy rows
-settings_heading = "Privacy"
+settings_heading = "Integritet"
 # context: Settings > AI, label of a switch
-redact_label = "Redact secrets before sending"
+redact_label = "Maskera hemligheter före sändning"
 # context: help under that switch
-redact_help = "Replaces tokens, private keys and passwords found in a request with a [REDACTED] marker before the request leaves this machine."
+redact_help = "Ersätter tokens, privata nycklar och lösenord som hittas i ett anrop med en [REDACTED]-markör innan anropet lämnar den här datorn."
 # context: red warning shown while that switch is off
-redact_warning = "Off: secrets in your changes are sent to the AI service as they are."
+redact_warning = "Av: hemligheter i dina ändringar skickas som de är till AI-tjänsten."
 # context: Settings > AI, label of a switch
-exclude_label = "Leave out sensitive files"
+exclude_label = "Utelämna känsliga filer"
 # context: help under that switch; privacy.sensitive_patterns is a config key and stays as written
-exclude_help = "Never includes the changes of files such as .env, private keys and certificates (see privacy.sensitive_patterns in config.toml)."
+exclude_help = "Tar aldrig med ändringar i filer som .env, privata nycklar och certifikat (se privacy.sensitive_patterns i config.toml)."
 # context: red warning shown while that switch is off
-exclude_warning = "Off: the changes of sensitive files are sent to the AI service when they are part of a request."
+exclude_warning = "Av: ändringar i känsliga filer skickas till AI-tjänsten när de ingår i ett anrop."
 # context: Settings > AI, heading above one switch per AI action
-sent_heading = "Show what is sent before..."
+sent_heading = "Visa vad som skickas före..."
 # context: help under the first of those switches
-sent_help = "Each switch shows the request for review before it is sent. The dialog's Don't show again checkbox turns one off; this button turns them all on."
+sent_help = "Varje reglage visar anropet för granskning innan det skickas. Kryssrutan Visa inte igen i dialogen stänger av ett reglage; den här knappen slår på alla."
 # context: Settings > AI, button that turns every "show what is sent" switch back on
-show_all_again = "Show all again"
+show_all_again = "Visa alla igen"
 # context: status line after that button was pressed
-shown_all = "Every request will be shown before it is sent"
+shown_all = "Varje anrop visas innan det skickas"
 
 [stage_guard]
 # context: title of the dialog that lists files the staging guard flagged
-title = "Sensitive files"
+title = "Känsliga filer"
 # context: question of that dialog
-question = "These files look sensitive. {$Stage} them anyway?"
+question = "De här filerna ser känsliga ut. {$Stage} dem ändå?"
 # context: one reason in the list; {pattern} is a path pattern such as .env.*
-reason_pattern = "matches {pattern}"
+reason_pattern = "matchar {pattern}"
 # context: one reason in the list; {rule} is the kind of secret found (github-token), {preview} a masked sample that never shows the whole value
-reason_secret = "contains {rule} ({preview})"
+reason_secret = "innehåller {rule} ({preview})"
 # context: first numbered answer of the dialog
-answer_stage = "{$Stage} anyway"
+answer_stage = "{$Stage} ändå"
 # context: second numbered answer of the dialog
-answer_cancel = "Cancel, {$stage} nothing"
+answer_cancel = "Avbryt, {$stage} ingenting"
 # context: key hint at the bottom of the dialog
-hint = "Up/Down: choose, Enter or 1/2: answer, Esc: cancel"
+hint = "Upp/Ned: välj, Enter eller 1/2: svara, Esc: avbryt"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
-sensitive_stage = "sensitive files were not {$staged}: {files}; ask the user, then {$stage} again allowing sensitive files"
+sensitive_stage = "känsliga filer blev inte {$staged}: {files}; fråga användaren och {$stage} sedan igen med känsliga filer tillåtna"

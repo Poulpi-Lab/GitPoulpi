@@ -30,7 +30,7 @@ Il bordo superiore della finestra riporta
   Ogni crate dell'elenco ha un link alla sua pagina (il suo repository o, in mancanza, la sua pagina su crates.io): fai clic sulla riga, oppure sceglila con `Up` / `Down` e premi `Enter`, per aprirla nel browser. `t` (o il comando della palette `Aiuto: Licenze e crediti`) mostra le note di licenza e i crediti di tutto ciò che è incluso nel programma, in un testo scorrevole (`Up` / `Down`, `PgUp` / `PgDn`, `Home` / `End`; `Esc` o `t` per tornare). Da uno script, `gitpoulpi licenses` stampa lo stesso testo.
 - La **versione** (`v1.0.0`, oppure `vX.Y.Z disponibile` quando esiste una versione più recente)
   sta tra il nome e il percorso: un clic apre la scheda **Note di rilascio**, vedi
-  [Aggiornamenti](installation.md#aggiornamenti).
+  [Aggiornamenti](updates.md).
 - **Apri in ▾**, subito dopo il percorso, apre la cartella della scheda in un
   terminale, un editor, un multiplexer o il gestore file (`Alt+O`). Vedi
   [Apri in](open-in.md).

@@ -250,8 +250,11 @@ På samma sida, under **Uppdateringar**:
 
 | Alternativ | Vad det gör |
 |---|---|
-| **Sök efter uppdateringar** | En rullgardinslista (`updates.mode`): **Meddela** (standard) söker en gång per dygn i bakgrunden och visar `vX.Y.Z tillgänglig` i titelraden; **Auto** laddar dessutom ned uppdateringen i bakgrunden när GitPoulpi installerades från ett releasearkiv (du väljer själv när det startas om); **Av** gör aldrig någon förfrågan. Gäller direkt. Se [Uppdateringar](installation.md#uppdateringar). |
+| **Sök efter uppdateringar** | En rullgardinslista (`updates.mode`): **Meddela** (standard) söker en gång per dygn i bakgrunden och visar `vX.Y.Z tillgänglig` i titelraden; **Auto** laddar dessutom ned uppdateringen i bakgrunden när GitPoulpi installerades från ett releasearkiv (du väljer själv när det startas om); **Av** gör aldrig någon förfrågan. Gäller direkt. Se [Uppdateringar](updates.md). |
 | **Uppdateringskanal** | En rullgardinslista (`updates.channel`): **Stabil** (standard) eller **Förhandsversion** (även release candidates). Gäller direkt. |
+| **Installerat med** | Skrivskyddad. Hur GitPoulpi kom till den här datorn (ett releasearkiv, installationsprogrammet för den här användaren eller alla användare, Chocolatey, winget, Scoop, Homebrew, apt, ett MSI-paket, AUR, en Docker-avbild, cargo eller ett utvecklingsbygge). Det avgör hur uppdateringar tillämpas, se [Uppdateringar](updates.md). |
+
+En rad som din administratör har satt i uppdateringspolicyn för hela datorn visar **Inställt av din administratör** och kan inte ändras här.
 
 På samma sida, under **Omskrivning av historiken**, tidsgränserna för externa skript (se [Skriva om historiken](history-rewrite.md)):
 
@@ -341,11 +344,22 @@ innehåller också standardvärdena för [granskningskontexten](ai.md#granskning
 länk; tomt lägger inte till någon, med en knapp **Bläddra...** under som öppnar en filväljare; `Enter` på knappen är
 dess tangentbordsform). Den här sidan har en egen guide: [AI-hjälp](ai.md).
 
+Under blocken per åtgärd gruppen **Integritet**:
+
+| Alternativ | Vad det gör |
+|---|---|
+| **Maskera hemligheter före sändning** | På (standard): tokens, privata nycklar och lösenord som hittas i en begäran ersätts med `[REDACTED:<rule>]` innan den lämnar datorn. Av: en röd rad säger att hemligheter skickas som de är. |
+| **Utelämna känsliga filer** | På (standard): ändringarna i `.env`-filer, privata nycklar och certifikat (`[privacy] sensitive_patterns`) ingår aldrig i en begäran. Av: en röd rad säger att de skickas när de ingår i en. |
+| **Visa vad som skickas före...** | Ett reglage per åtgärd (commit-meddelande, förklara, stash-meddelande, pull request-beskrivning, commit-composer, konfliktlösning, kodgranskning, dela commit): visa begäran i dialogen **Det som skickas** innan den går iväg. Dialogens ruta *Visa inte igen* stänger av ett. Åtgärderna för historikomskrivning visar sin egen dialog. |
+| **Visa alla igen** | Visas medan ett reglage är av; slår på alla igen. |
+
+Se [AI > Integritet](ai.md#integritet).
+
 ### Agenter & MCP
 
-Vad AI-agenter får göra i det här fönstret, och om MCP-servern får köras. De
-två MCP-raderna visas bara i byggen som innehåller servern; se
-[MCP och agenter](mcp-and-agents.md).
+Vad AI-agenter får göra i det här fönstret, om MCP-servern får köras och hur
+dess HTTP-endpoint skyddas. MCP-raderna visas bara i byggen som innehåller
+servern; se [MCP och agenter](mcp-and-agents.md).
 
 | Alternativ | Vad det gör |
 |---|---|
@@ -354,6 +368,12 @@ två MCP-raderna visas bara i byggen som innehåller servern; se
 | **Låt AI-agenter styra vyn** | Låter agenter visa dig en commit, en fil eller ett meddelande i det här fönstret (`ui show`). Av: ingen agent når fönstret. |
 | **Låt AI-agenter föreslå ändringar som jag bekräftar** | Låter agenter öppna förifyllda dialoger för reword, commit, gren eller tag som du bekräftar. Av som standard. Se [MCP och agenter](mcp-and-agents.md#behörigheter). |
 | **Öppna ett fönster för agenter**, **Startkommando (custom)** | Om en agent får öppna ett GitPoulpi-fönster när inget är öppet, och med vilken terminal eller multiplexer. Av som standard. |
+| **HTTP-autentisering** | På (standard): MCP:s HTTP-endpoint svarar bara på en begäran som bär åtkomsttoken. Av visar en röd varning: vilket program som helst som når endpointen kan köra varje verktyg som MCP-inställningarna tillåter, och `--allow-remote` nekas. Sparas som `mcp.http_auth`. |
+| **Åtkomsttoken** | Token, maskerad. Det maskerade värdet är en knapp: `Enter` (eller ett klick) visar den i sin helhet på raden under och döljer den igen. **Kopiera** lägger den i urklipp utan att skriva ut den i statusraden, **Rotera** ersätter den efter en bekräftelse (klienter som har den gamla token nekas direkt, ingen omstart av servern behövs), **Skapa** gör den första. `Left` / `Right` flyttar mellan knapparna och `Enter` trycker på en. Samma token är `gitpoulpi mcp token`. |
+| **TLS** | **Av** (standard), **Självsignerat** (servern skapar ett certifikat en gång och visar dess fingeravtryck) eller **Filer** (ditt certifikat och din nyckel). Servern avslutar TLS själv. Sparas som `mcp.tls`; gäller nästa gång servern startar. |
+| **Certifikatsökväg**, **Nyckelsökväg** | PEM-filerna som används med **Filer** (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Certifikatets fingeravtryck** | Skrivskyddad: SHA-256-fingeravtrycket för certifikatet som endpointen presenterar, för klienter att kontrollera. |
+| **Bakom en tunnel eller omvänd proxy** | Ditt påstående att en tunnel eller proxy framför endpointen krypterar trafiken, vilket låter `--allow-remote` köra utan TLS. Servern kan inte kontrollera det, så den visar en röd varning medan det är på. Sparas som `mcp.behind_proxy`. Se [MCP och agenter](mcp-and-agents.md#att-nå-endpointen-från-en-annan-dator). |
 
 ### Utseende
 

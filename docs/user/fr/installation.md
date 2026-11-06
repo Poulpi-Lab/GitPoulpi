@@ -36,8 +36,33 @@ GitPoulpi fournit trois exécutables :
 Une archive de release s'appelle `gitpoulpi-<version>-<target>.zip` (Windows)
 ou `.tar.gz` (Linux, macOS), avec un fichier `.sha256` à côté. Vérifiez
 l'archive avec le fichier `.sha256`, décompressez-la et placez les trois
-exécutables dans un dossier de votre `PATH`. Le fichier `INSTALL.txt` de
-l'archive donne les mêmes étapes.
+exécutables dans un dossier de votre `PATH` (gardez `gitpoulpi-updater` et le marqueur
+`.gitpoulpi-dist` à côté d'eux : le marqueur dit `channel=archive`, pour que cette version puisse se
+mettre à jour elle-même, voir [Mises à jour](updates.md)). Le fichier `INSTALL.txt` de l'archive
+donne les mêmes étapes.
+
+### Vérifier un téléchargement
+
+Chaque fichier de version est signé avec la clé [minisign](https://jedisct1.github.io/minisign/) du projet, et GitPoulpi vérifie lui-même cette signature avant d'installer une mise à jour. Pour un fichier que vous avez téléchargé à la main, le `.minisig` à côté de lui est la signature. La clé publique (identifiant de clé `B461FFCBF6F6A4F2`) est commitée sous `packaging/minisign.pub` dans le dépôt :
+
+```
+untrusted comment: minisign public key B461FFCBF6F6A4F2
+RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+```
+minisign -Vm gitpoulpi-<version>-<target>.tar.gz -P RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+Lisez le commentaire signé qu'affiche la commande : il doit être `file:<le nom du fichier> version:<la version attendue>`. Une signature valide mais qui désigne un autre fichier ou une autre version n'est pas une signature pour le vôtre.
+
+Quand la version a été construite avec des attestations de provenance de build (la variable `ATTESTATIONS` du dépôt), la CLI GitHub vérifie où un fichier a été construit :
+
+```
+gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoulpi
+```
+
+Le fichier `.sha256` ne détecte qu'un téléchargement abîmé. La signature est ce qui montre que le fichier est bien celui du projet.
 
 ## Avec un installateur
 
@@ -49,23 +74,20 @@ donc toujours.
 
 ### Windows : `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
 
-Il s'installe pour l'utilisateur courant, sans demande d'élévation, dans
-`%LOCALAPPDATA%\Programs\GitPoulpi` (la première boîte propose une installation
-pour tous les utilisateurs et le choix du dossier). Cases à cocher : raccourci du
-menu Démarrer, raccourci du Bureau, ajout au PATH. Une page demande l'**alias de
-commande** : `gp` par défaut, le nom que vous voulez, ou vide pour aucun.
-PowerShell utilise déjà `gp` pour `Get-ItemProperty` : choisissez un autre nom
-pour lui, ou utilisez `gitpoulpi`.
+La première boîte demande pour qui est l'installation :
 
-L'installateur copie les trois exécutables et le marqueur `.gitpoulpi-dist` ;
-[Mettre à jour maintenant](#mettre-à-jour-sur-place) fonctionne donc exactement
-comme avec le zip. Une installation par utilisateur est accessible en écriture,
-elle peut donc se mettre à jour elle-même ; une installation pour tous les
-utilisateurs dans Program Files demande une élévation pour être remplacée :
-réinstallez-la plutôt avec le nouvel installateur. Pour désinstaller, passez par
-Paramètres Windows > Applications : cela lance `gitpoulpi uninstall` (alias,
-entrées du PATH, raccourcis) et supprime les fichiers, y compris les restes
-`.old` du programme de mise à jour. Vos paramètres et vos dépôts restent.
+| Choix | Où | Droits d'administrateur | Ce que cela change pour les mises à jour |
+|---|---|---|---|
+| **Seulement pour moi** (par défaut) | `%LOCALAPPDATA%\Programs\GitPoulpi` | aucun | GitPoulpi remplace ses propres fichiers : **Mettre à jour et redémarrer** dans le [panneau de mise à jour](updates.md), sans demande d'autorisation. |
+| **Pour tous les utilisateurs** | `Program Files\GitPoulpi` | une demande à l'installation | Chaque mise à jour demande l'accord d'un administrateur (une invite Windows), et les sessions GitPoulpi des autres utilisateurs de l'ordinateur sont d'abord fermées. |
+
+Le même choix fonctionne en silence : `gitpoulpi-<version>-...-setup.exe /CURRENTUSER` ou `/ALLUSERS`.
+
+Cases à cocher : raccourci du menu Démarrer, raccourci du Bureau, ajout au PATH. Une page demande l'**alias de commande** : `gp` par défaut, le nom que vous voulez, ou vide pour aucun (`/ALIAS=nom` ou `/ALIAS=` en ligne de commande). PowerShell utilise déjà `gp` pour `Get-ItemProperty` : choisissez un autre nom pour lui, ou utilisez `gitpoulpi`.
+
+L'installateur copie les exécutables (dont `gitpoulpi-updater`, le petit programme qui remplace les fichiers pendant une mise à jour) et le marqueur `.gitpoulpi-dist`. Le marqueur enregistre comment GitPoulpi a été installé (`inno-user` ou `inno-machine`), ce que le panneau de mise à jour affiche comme **Installé avec**. Relancer l'installateur conserve vos choix (portée, raccourcis, alias).
+
+Pour désinstaller, passez par Paramètres Windows > Applications : cela lance `gitpoulpi uninstall` (alias, entrées du PATH, raccourcis) et supprime les fichiers, y compris les restes `.old` du programme de mise à jour. Vos paramètres et vos dépôts restent.
 
 ### Linux et macOS : `install.sh`
 
@@ -74,7 +96,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 Il choisit l'archive adaptée à votre système et à votre processeur, vérifie son
-`.sha256`, s'installe dans `~/.local/opt/gitpoulpi` et crée des liens
+`.sha256`, s'installe (canal `archive` : GitPoulpi se met à jour sur place) dans `~/.local/opt/gitpoulpi` et crée des liens
 `gitpoulpi` et `gitpoulpi-mcp` dans `~/.local/bin`. Aucun accès root n'est
 nécessaire et rien en dehors de votre dossier personnel n'est touché. Sans
 `--yes`, il pose la question de l'alias (`gp` par défaut), du PATH et des
@@ -93,6 +115,38 @@ raccourcis.
 
 La recherche de la dernière version suppose que le dépôt est public ; pour un
 dépôt privé, téléchargez l'archive dans un navigateur et utilisez `--archive`.
+
+## Avec un gestionnaire de paquets
+
+Chaque canal ci-dessous écrit le même marqueur `.gitpoulpi-dist` à côté des programmes, avec son propre nom de canal. GitPoulpi le lit pour savoir qui s'occupe des mises à jour : c'est le gestionnaire de paquets, donc GitPoulpi ne remplace jamais des fichiers dans son dos. Le panneau de mise à jour (cliquez sur la version dans la barre de titre) lance alors la commande propre du gestionnaire de paquets, ou l'affiche pour que vous la copiiez. Voir [Mises à jour](updates.md).
+
+| Canal | Installation | Remarques |
+|---|---|---|
+| **Chocolatey** (Windows) | `choco install gitpoulpi` | Installe pour tous les utilisateurs : les mises à jour demandent donc l'accord d'un administrateur. |
+| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | Ajoutez `--scope user` ou `--scope machine` pour choisir ; la portée machine demande l'accord d'un administrateur à l'installation et à chaque mise à jour. |
+| **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` puis `scoop install gitpoulpi` | Par utilisateur, sans droits d'administrateur. |
+| **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | Le tap est `Poulpi-Lab/homebrew-gitpoulpi`. |
+| **apt** (Debian, Ubuntu) | voir [le dépôt apt](#apt-debian-et-ubuntu) | Dépôt signé ; un `.deb` est aussi joint à chaque version. |
+| **MSI** (Windows, géré) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Pour les administrateurs : tous les utilisateurs, pas de mise à jour dans l'application. Voir [Distribution en entreprise](enterprise-distribution.md#msi-avec-intune-ou-une-stratégie-de-groupe). |
+| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (ou `paru -S gitpoulpi-bin`) | Sans assistant : `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, puis `cd gitpoulpi-bin && makepkg -si`. |
+| **cargo** | `cargo binstall gitpoulpi-cli` | Télécharge l'archive de version au lieu de compiler. |
+| **cargo, depuis les sources** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Compile ; nécessite une chaîne d'outils Rust. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | Voir [Exécuter dans Docker](docker.md). La même image est sur `ghcr.io/poulpi-lab/gitpoulpi`. |
+
+Les noms ci-dessus sont ceux vers lesquels le processus de publication publie (voir [Releasing](../../developer/releasing.md)) : un canal qui n'est pas encore en ligne répond « not found », et l'archive de version ou l'installeur fonctionne toujours.
+
+La gestion du PATH propre à chaque gestionnaire de paquets s'applique : Chocolatey, winget, Scoop et Homebrew placent eux-mêmes les programmes dans le PATH, et aucun ne crée l'alias `gp` (lancez `gitpoulpi alias create gp`, ou Paramètres > Général > Lanceur).
+
+### apt (Debian et Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+Le dépôt prend en charge `amd64` et `arm64` et est signé avec une clé qui appartient au projet. Les programmes vont dans `/usr/lib/gitpoulpi`, avec des liens dans `/usr/bin`. Le paquet dépend de `git` et recommande `git-lfs`. Sans le dépôt, installez le `.deb` d'une version avec `sudo apt install ./gitpoulpi_<version>_<arch>.deb` : GitPoulpi vous dit alors de télécharger vous-même le `.deb` suivant, car il ne propose des commandes `apt` que s'il trouve le dépôt dans `/etc/apt/sources.list.d/gitpoulpi.*`.
 
 ## Depuis les sources
 
@@ -137,83 +191,11 @@ côté.
 
 ## Mises à jour
 
-La barre de titre affiche la version en cours (`v1.0.0`) entre le nom de
-l'application et le chemin du dépôt. Cliquez dessus, ou lancez **Aide : Notes de version** depuis la palette
-de commandes (`Ctrl+P`) : un onglet Notes de version s'ouvre avec le journal des
-changements, positionné sur la version en cours.
+La barre de titre affiche la version en cours (`v1.0.0`) entre le nom de l'application et le chemin du dépôt. Cliquez dessus, ou tapez `Ctrl+N` puis `u`, ou lancez **Mises à jour : Afficher la mise à jour** depuis la palette de commandes (`Ctrl+P`) : le panneau de mise à jour s'ouvre avec la version, la façon dont GitPoulpi a été installé et ce qu'il faut faire pour une version plus récente. **Aide : Notes de version** ouvre le journal des modifications.
 
-Une fois par jour, en arrière-plan, GitPoulpi demande à GitHub s'il existe une
-version plus récente (`updates.mode`,
-[Paramètres > Synchronisation](settings.md#synchronisation)). Quand c'est le cas,
-la pastille affiche `v0.2.0 disponible` dans la couleur d'accent et un clic dessus
-ouvre l'onglet Notes de version, avec les notes de cette version en haut. L'onglet
-a trois boutons, chacun avec une touche et une commande de palette :
+Une fois par jour, en arrière-plan, GitPoulpi cherche une version plus récente à l'endroit où ses versions sont publiées (GitHub par défaut) (`updates.mode`, [Paramètres > Synchronisation](settings.md#synchronisation)). Quand il en trouve une, la pastille affiche `v0.2.0 disponible` dans la couleur d'accent.
 
-- **Télécharger** (`d`, *Mises à jour : Télécharger*) ouvre la page de la version
-  dans votre navigateur.
-- **Ignorer cette version** (`s`, *Mises à jour : Ignorer cette version*) masque
-  l'avis jusqu'à l'arrivée d'une version plus récente.
-- **Rechercher** (`r`, *Mises à jour : Rechercher une mise à jour maintenant*)
-  interroge de nouveau tout de suite.
-
-`updates.mode = "off"` ne fait aucune requête. Sans connexion réseau, ou tant que
-le dépôt est privé et qu'aucun jeton github.com n'est enregistré, la vérification
-échoue discrètement (une ligne dans le journal de l'application, rien dans
-l'interface). `GITPOULPI_UPDATE_API` dirige la vérification vers une autre racine
-d'API (utilisé par les tests).
-
-### Mettre à jour sur place
-
-Un build installé depuis une archive de version peut se remplacer lui-même.
-L'archive contient un petit fichier `.gitpoulpi-dist` à côté des exécutables ; un
-build en cours n'est « mettable à jour » que si ce fichier se trouve à côté de son
-exécutable (et nomme sa plateforme). Un build fait avec `cargo`, un build
-personnalisé copié ailleurs, ou un paquet qui a laissé tomber le fichier ne se met
-jamais à jour tout seul : son onglet Notes de version le dit et ne propose que
-**Télécharger**.
-
-Pour un build qui peut se mettre à jour, l'onglet ajoute :
-
-- **Mettre à jour maintenant** (`u`, *Mises à jour : Mettre à jour maintenant*)
-  télécharge l'archive et son `.sha256` en arrière-plan (une tâche dans
-  l'indicateur de la ligne d'état, avec son pourcentage, annulable comme toute
-  tâche), vérifie l'empreinte, décompresse l'archive et place chaque nouveau
-  fichier à côté de l'ancien sous le nom `<nom>.new`. Rien de ce qui tourne n'est
-  touché. En mode `auto`, la même chose se produit toute seule dès qu'une
-  vérification trouve une version plus récente.
-- **Redémarrer pour mettre à jour** (`R`, *Mises à jour : Redémarrer pour mettre
-  à jour* ; la pastille affiche la même chose une fois le téléchargement préparé)
-  est toujours une action de votre part, jamais automatique. Elle arrête le démon
-  autonome de la session (un démon intégré part avec la fenêtre), remplace les
-  fichiers et démarre la nouvelle version avec les mêmes arguments et la même
-  session.
-- **Revenir à la version précédente** (`v`, *Mises à jour : Revenir à la version
-  précédente*) remet les fichiers précédents en place et redémarre. Les fichiers
-  de la version précédente restent sous le nom `<nom>.old` jusqu'à ce que la
-  nouvelle version tourne depuis une minute, puis ils sont supprimés : le bouton
-  est donc là pour ce premier lancement. Il ne fait pas partie du journal
-  d'annulation git : il modifie les fichiers de GitPoulpi, pas un dépôt.
-
-Comment les fichiers sont remplacés : sous Linux et macOS, chaque nouveau fichier
-est renommé par-dessus l'ancien (opération atomique ; un programme en cours garde
-son ancienne copie jusqu'à sa fin). Sous Windows, un `.exe` en cours ne peut pas
-être écrasé : l'ancien est donc renommé en `<nom>.old` et le nouveau mis à sa
-place ; un `.old` encore en cours d'exécution est supprimé à un démarrage
-ultérieur. Le remplacement est tout ou rien : si un autre programme tient l'un
-des exécutables (un client MCP qui lance `gitpoulpi-mcp`, par exemple), GitPoulpi
-nomme le fichier, ne change rien et laisse le téléchargement préparé pour un
-nouvel essai.
-
-Ce qui est refusé, chaque fois avec un message : une version sans fichier
-`.sha256`, une empreinte qui ne correspond pas, un fichier d'archive dont le nom
-n'est pas celui de cette plateforme (`gitpoulpi-<version>-<target>.<zip|tar.gz>`),
-une archive dont le marqueur nomme une autre version ou une autre plateforme, et
-tout lien de téléchargement hors de ces hôtes : `github.com`, `api.github.com`,
-`objects.githubusercontent.com`, `release-assets.githubusercontent.com` et
-`github-releases.githubusercontent.com` de GitHub (la première requête et chaque
-redirection ; une redirection vers ailleurs arrête le téléchargement). Les
-archives d'un dépôt privé demandent une session de navigateur : le téléchargement
-y échoue donc tant que le dépôt n'est pas public.
+Ce que fait le panneau dépend de la façon dont GitPoulpi a été installé : une archive de version ou l'installeur Windows remplace ses propres fichiers, un gestionnaire de paquets lance sa propre commande, une installation gérée ou en conteneur dit comment les mises à jour lui parviennent. Une version compilée avec `cargo build` ne se met jamais à jour. La description complète, avec le retour en arrière, `auto` face à `notify` et ce qu'un administrateur peut verrouiller, est dans [Mises à jour](updates.md).
 
 ## Vérifier que ça marche
 

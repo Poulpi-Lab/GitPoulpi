@@ -1,0 +1,102 @@
+[English](../updates.md) · [Čeština](../cs/updates.md) · [Deutsch](../de/updates.md) · [Español](../es/updates.md) · [Français](../fr/updates.md) · [Italiano](../it/updates.md) · [日本語](../ja/updates.md) · [한국어](../ko/updates.md) · [Nederlands](../nl/updates.md) · [Polski](../pl/updates.md) · [Português (Brasil)](../pt-BR/updates.md) · [Português (Portugal)](../pt-PT/updates.md) · [Русский](../ru/updates.md) · [Svenska](../sv/updates.md) · [Türkçe](../tr/updates.md) · [Українська](../uk/updates.md) · **简体中文**
+
+# 更新
+
+GitPoulpi 会检查是否有更新的发布版本，并根据安装方式，要么替换自身的文件，要么把更新交给安装它的程序。没有你的操作，任何东西都不会被替换或重启。
+
+## 标记和面板
+
+标题栏在应用名称和仓库路径之间显示正在运行的版本（`v1.0.0`）。已知有更新的发布版本时，标记会变成以强调色显示的 `v0.2.0 可用`。
+
+点击该标记，或按 `Ctrl+N` 再按 `u`，或在命令面板（`Ctrl+P`）中运行 **更新：显示更新**，即可打开更新面板。它是盖在应用上的窗口：`Esc`、`q`、关闭叉号或点击窗口外部都会关闭它。它显示：
+
+- 正在运行的版本和**安装方式**：GitPoulpi 是怎样装到这台电脑上的（下面的一切都由它决定）；
+- 更新进行到哪一步（检查中、下载中并带百分比、已就绪、失败）；
+- 此安装方式对应流程的按钮，有命令时还会显示完整命令；
+- 管理员设置的一行说明（如果有）。
+
+每个按钮都有对应的按键（印在面板的提示行里）和命令面板命令，所以面板不用鼠标也能操作：
+
+| 按钮 | 按键 | 命令面板命令 |
+|---|---|---|
+| **更新并重启**（或**运行更新**） | `u` | 更新：立即更新 |
+| **复制命令** | `c` | 更新：复制更新命令 |
+| **在终端中打开** | `t` | 更新：在终端中运行更新命令 |
+| **回退** | `v` | 更新：回退到上一个版本 |
+| **发行说明** | `n` | 帮助：发行说明 |
+| **跳过此版本** | `s` | 更新：跳过此版本 |
+| **打开公告**（仅在有安全公告时） | `a` | 更新：打开安全公告 |
+| **立即检查** | `r` | 更新：立即检查更新 |
+| **关闭** | `Esc` | |
+
+不适用于此安装方式的命令，在命令面板中会显示为灰色并说明原因（例如“此安装通过其他方式更新：见‘更新：显示更新’”）。
+
+## 各种安装方式分别会怎样
+
+| 安装方式 | 检查来源 | 面板的做法 | 回退 |
+|---|---|---|---|
+| 发布压缩包，或 `install.sh` | GitHub 发布版本 | **更新并重启**：GitPoulpi 下载并校验压缩包，关闭、替换自身文件，并在同一个终端中重新打开。 | **回退**会把上一个版本的文件换回来。 |
+| Windows 安装程序，仅为我安装 | GitHub 发布版本 | 同上，且没有提示。在 Windows 上会在新窗口中重新打开。 | **回退**会换回。 |
+| Windows 安装程序，所有用户 | GitHub 发布版本 | 同上，但 Windows 会请求管理员批准。这台电脑上其他用户的 GitPoulpi 会话会被关闭，其未保存的输入会丢失。如果你拒绝，则不会有任何更改。 | **回退**会换回，提示相同。 |
+| Chocolatey | Chocolatey 社区源 | **运行更新**会运行 `choco upgrade gitpoulpi -y`（Windows 会请求管理员批准）。 | 面板显示 `choco install gitpoulpi --version <previous> --allow-downgrade -y`。 |
+| Chocolatey，内部源 | 你所在组织的源 | **运行更新**会运行 `choco upgrade gitpoulpi -y --source=<feed>`。不会再次发送软件包参数，因此已部署的配置保持不变。 | 同样的 `choco install` 行，带上该源。 |
+| winget | GitHub 发布版本 | **运行更新**会运行 `winget upgrade --id GitPoulpi.GitPoulpi --exact --silent`，并已接受协议。当安装是整台机器范围时，winget 自己会请求管理员批准。 | 面板显示 `winget install --id GitPoulpi.GitPoulpi --version <previous>`。 |
+| Scoop | GitHub 发布版本 | GitPoulpi 完全关闭后，**运行更新**会运行 `scoop update gitpoulpi`。 | **回退**会运行 `scoop reset gitpoulpi@<previous>`。 |
+| Homebrew | GitHub 发布版本 | **运行更新**会在此终端中运行 `brew upgrade gitpoulpi`。 | 面板显示 `brew install gitpoulpi@<previous>`。 |
+| apt | GitHub 发布版本 | 面板显示 `sudo apt update && sudo apt install --only-upgrade gitpoulpi`，并提供**复制命令**和**在终端中打开**。GitPoulpi 绝不会替你运行 `sudo`。如果这台电脑上没有 GitPoulpi 的 apt 软件源，面板会提示改为下载新的 `.deb`。 | 面板显示 `sudo apt install gitpoulpi=<previous>`。 |
+| MSI 软件包 | GitHub 发布版本，或你的管理员提供的来源 | 无需运行任何内容：此安装由你的管理员管理，面板会显示管理员的留言。 | 不提供。 |
+| AUR | GitHub 发布版本 | 面板显示 `yay -S gitpoulpi-bin`（或 `paru`，先找到哪个用哪个；没有助手时，显示 `git clone` 和 `makepkg -si` 步骤）。 | 不提供。 |
+| cargo | GitHub 发布版本 | 已安装 `cargo-binstall` 时，面板显示 `cargo binstall gitpoulpi-cli`，否则显示 `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli`。 | 同样的命令，带上上一个标签。 |
+| Docker 镜像 | GitHub 发布版本 | 无需运行任何内容：镜像是整体替换的。面板显示 `docker pull poulpilab/gitpoulpi:<version>` 和 `:latest`。参见[在 Docker 中运行](docker.md)。 | 面板显示 `docker pull poulpilab/gitpoulpi:<previous>`。 |
+| 放在你无法写入的文件夹中的发布压缩包 | GitHub 发布版本 | 面板会说明 GitPoulpi 无法在那里替换自身，并指向**下载**。 | 不提供。 |
+| 开发构建（`cargo build`） | 无 | 从不更新。标记只显示版本，没有别的；面板会说明没有安装记录。 | 不提供。 |
+
+“显示”类的行本身从不运行任何内容。**在终端中打开**会打开你的终端并把命令输入好，由你按 Enter。
+
+除非管理员把检查指向别处（内部源、镜像或 `latest.json`，见[企业分发](enterprise-distribution.md)），发布版本始终来自项目的 GitHub 仓库。发行说明取自发布页面或 GitPoulpi 内置的更新日志，哪个能访问就用哪个。
+
+## 通知与自动
+
+`updates.mode`（[设置 > 同步](settings.md#同步)）：
+
+- **通知**（默认）：GitPoulpi 每天在后台检查一次并显示标记。在你按下按钮之前不会下载任何东西。
+- **自动**：在 GitPoulpi 替换自身文件的安装方式下（发布压缩包、Windows 安装程序），一旦发现更新，它还会在后台下载并校验。此时标记显示**重启以更新**，重启仍由你决定。在由包管理器负责更新的安装方式下，**自动**的表现与**通知**相同。
+- **关闭**：从不发出任何请求，标记只显示版本。
+
+**更新通道**设置（`updates.channel`）可在**稳定版**和**预发布版**（也包括候选版本）之间选择。你用**立即检查**发起的检查会忽略每天一次的限制。没有网络连接时，或仓库为私有且没有存储 github.com 令牌时，后台检查会悄悄失败，应用日志里只记一行。
+
+## 重启，以及之后你会看到什么
+
+按下**更新并重启**或**运行更新**会保存你的会话并关闭窗口。由一个单独的小程序 `gitpoulpi-updater` 完成工作，这样 GitPoulpi 自己的文件在被替换时不会被占用，包管理器也不会被一个在等待的父进程堵住。它先停止 GitPoulpi 的后台守护进程（你的其他窗口和 MCP 服务器也会关闭），执行更新，检查新的 `gitpoulpi --version` 打印出预期的版本，然后重新启动 GitPoulpi：在 Linux 和 macOS 上是在同一个终端中，在 Windows 上是在新窗口中。如果检查失败，它会把旧文件放回去。
+
+下一次启动时，状态栏会显示一行：
+
+- `已更新到 v1.4.2`
+- `更新失败：<原因>。仍保留上一个版本。`
+- `更新已取消：管理员批准被拒绝。未做任何更改。`
+
+同一时间只运行一个更新；GitPoulpi 数据文件夹中的一个锁文件（以及可写时安装文件夹中的一个）会挡住第二个更新，超过十分钟的锁会被忽略，因此崩溃的更新绝不会让 GitPoulpi 永久被锁。存在新鲜的锁时，CLI 和守护进程不会启动。
+
+## 回退
+
+在 GitPoulpi 替换自身文件的安装方式下，**回退**会把上一个版本的文件换回来并重启。新版本启动后，这些文件会以 `<name>.old` 保留一分钟，然后被删除，所以回退是留给更新后的第一次运行的。在由包管理器负责安装的情况下，回退就是表格中的命令：面板会显示或运行它。回退改动的是 GitPoulpi 自己的文件，而不是某个仓库，因此不属于 git 的撤销日志。
+
+## 检查什么、拒绝什么
+
+在替换任何东西之前，GitPoulpi 会下载压缩包、它的 `.minisig` 签名和它的 `.sha256`。它先校验签名，使用的是内置在 GitPoulpi 中的项目发布密钥，且签名的受信任注释必须写明这个压缩包和这个版本。然后再校验哈希。它会拒绝：没有 `.minisig` 的发布版本（在发布开始签名之前发布的旧版本无法通过更新程序安装，包括固定到或回到某个旧版本）、由另一个密钥签的签名、针对另一个文件或另一个版本的签名、没有 `.sha256` 的发布版本、不匹配的哈希、文件名不是适用于当前平台的名称（`gitpoulpi-<version>-<target>.<zip|tar.gz>`）的压缩包、标记指向另一个版本或平台的压缩包，以及指向 GitHub 发布主机（每一次重定向都会检查）或管理员配置的镜像之外的下载链接。替换要么全部完成，要么全都不做：如果另一个程序占用着其中一个可执行文件，GitPoulpi 会指出是哪个文件，不改动任何内容，并保留已下载的文件以便再试。在 Windows 上，所有用户的更新会由提权的步骤重新校验，它自己下载 `.minisig` 和 `.sha256` 并再次检查两者，因此其间在用户下载文件夹中被调包的文件会被拒绝。包管理器（Chocolatey、winget、Scoop、Homebrew、apt、AUR）会校验它们自己的软件包：GitPoulpi 在那里不下载任何东西。
+
+## 安全公告
+
+项目会在每个发布版本旁发布 `security.json`：安全公告的列表（标识符、严重程度、以范围表示的受影响版本，例如 `>=1.2.0, <1.4.3`、修复版本、链接和一句话摘要）。查找新版本的那个每日检查也会获取它，来源与发布版本相同：GitHub 用仓库的发布页面，镜像用 `latest.json` 所在的文件夹，公共 Chocolatey 源用 GitHub。只有当 `security.json.minisig` 能用项目密钥校验通过时，公告才会被采用；未签名或签名有误的文件绝不会显示（活动日志里会有一行说明它被忽略了）。
+
+当某条公告提到正在运行的版本时，标记会变红并显示**安全公告：此版本受影响**，所有安装方式都一样，包括由包管理器管理的。此时更新面板会列出每条公告的严重程度、摘要、修复版本和链接；**打开公告**（`a`，或命令面板中的**更新：打开安全公告**）会在浏览器中打开最严重那条的链接。在由包管理器负责安装的情况下，面板还会加上“请用你的包管理器更新。”
+
+更新检查关闭（`updates.mode = "off"`）时、管理员策略的 `check` 为 `none` 时，以及用 `cargo build` 构建的版本，都不会获取任何内容，也不会显示公告。组织自己的 NuGet 源不会让 GitPoulpi 去连接 GitHub：它的公告只来自策略中的 `download_base` 镜像。
+
+## 管理员锁定的设置
+
+管理员可以在整台机器范围的策略中设置更新模式、通道、固定的版本、检查的位置，以及 GitPoulpi 是否可以自行更新。在设置中，这些行会显示**由管理员设定**，面板会显示他们的留言；关闭自行更新后，面板会提供命令或一条说明，而不是替换文件的按钮。无法读取的策略文件会按失败即关闭处理：只通知，不自行更新。管理员这一侧见[企业分发](enterprise-distribution.md#策略文件和注册表)。
+
+## 环境变量
+
+`GITPOULPI_UPDATE_API` 可让检查指向另一个 API 根地址（测试用）。

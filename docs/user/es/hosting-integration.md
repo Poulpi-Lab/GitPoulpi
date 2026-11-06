@@ -163,6 +163,43 @@ GitPoulpi busca el token de un perfil en este orden:
 Cada perfil es una entrada `[[integrations]]` en `config.toml`. Consulta la
 [referencia de configuración](config-reference.md#integrations-alojamiento-y-gestores-de-issues).
 
+## La comprobación de seguridad
+
+Un token guardado solo es tan seguro como la dirección a la que se envía. Por eso GitPoulpi recuerda, para cada integración, a qué estaba conectada, y se detiene cuando eso cambia:
+
+- **La dirección.** La primera vez que se usa una integración (o se conecta), su dirección se registra en `trust.toml`, en la carpeta de datos privada que solo lee el usuario (`<data>/private/`), no en `config.toml`: editar la configuración nunca puede ampliar aquello en lo que se confía. Si la dirección de la configuración ya no es la registrada, no se le envía nada y ni siquiera se lee el token. Las grafías de una misma dirección (`HTTPS://Git.Example.com:443/`) son la misma dirección; un host parecido no lo es.
+- **La cuenta.** Tras conectar un token, y luego aproximadamente una vez al día (y una vez por ejecución para un token que viene de `GITPOULPI_TOKEN_*` o del credential helper), GitPoulpi pregunta al host a quién pertenece el token y compara el **id** de la cuenta, no el login. Un token que ahora pertenece a otra persona se detiene.
+- **El certificado.** Los servidores cuyo certificado no encadena con una autoridad conocida (una CA privada, un servidor autofirmado) solo se aceptan para la clave exacta que aceptaste, y el handshake TLS sigue demostrando que el servidor tiene esa clave. Con la fijación estricta activada, la clave debe coincidir aunque el certificado encadene con una raíz pública; el precio es que cada rotación de clave vuelve a preguntar, por eso es opcional. Los hosts públicos (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) no guardan registro de certificado.
+- **http sin cifrar.** Una dirección `http://` que no sea de loopback se rechaza salvo que la hayas permitido para esa integración.
+
+Además, cada petición queda limitada a la propia dirección de la integración (y, para un host público, a su host de API como `api.github.com`): una petición a cualquier otro sitio se rechaza antes de enviarla, y una redirección a otra dirección no se sigue.
+
+**Las integraciones conectadas antes de que existiera esta comprobación** reciben su registro en silencio, a partir de la configuración tal como estaba, la primera vez que se usan tras la actualización: conservan el nivel de confianza de hoy y no se pregunta nada.
+
+### Desde la línea de comandos
+
+Un comando detenido falla con código de salida 2 e imprime qué cambió (consulta la [referencia de la CLI](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` muestra en qué se confía; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` y `--allow-insecure-http on|off` aceptan cada uno una cosa, nombrando el valor exacto. Tras aceptar una dirección nueva, introduce el token de nuevo. Desconectar (`hosting logout`) o quitar una integración borra su token, su registro de confianza y lo que se guardó en caché de ella (las listas de repositorios guardadas del diálogo Clonar, las listas de cuenta del Radar y los borradores de revisión remota de su host).
+
+Un agente (MCP) no puede aceptar nada: se le dice que la comprobación de seguridad te necesita a ti.
+
+### En la interfaz de terminal
+
+Una petición detenida abre el diálogo **Comprobación de seguridad de la integración** sobre lo que estuvieras haciendo. Dice qué cambió (la dirección antigua y la nueva, la cuenta antigua y la nueva con sus ids, o el certificado antiguo y el nuevo como una pequeña tabla con la huella SHA-256 en grupos de cuatro, el sujeto, el emisor y la validez) y que no se envió el token. Las respuestas están numeradas:
+
+1. **Desconectar (borra el token guardado)** borra el token guardado, el registro de confianza y lo que se guardó en caché de la integración.
+2. **Confiar** en la nueva dirección, cuenta o certificado (una dirección sin cifrar: **Permitir http sin cifrar**).
+3. **Cancelar** no cambia nada.
+
+Ninguna respuesta aparece resaltada hasta que pulsas una flecha o un dígito, así que un Enter accidental no acepta nada. Esc y la cruz de cierre cancelan; un clic fuera del diálogo no hace nada. Un cuerpo largo se desplaza con la rueda, Página arriba/Página abajo o la barra de desplazamiento. Varias comprobaciones se ponen en cola (una por integración y tipo de cambio) y se preguntan una tras otra. Una comprobación cancelada no vuelve a aparecer mientras no cambie; **Integraciones: Revisar comprobación de seguridad** en la paleta de comandos la trae de vuelta.
+
+Tras confiar en una **dirección** nueva, el formulario de la integración se abre con el campo del token enfocado y la pista «Se recomienda volver a introducir el token»: el token guardado nunca se envió allí. En el formulario, una dirección cambiada a propósito se acepta junto con un token escrito para ella; sin token, el formulario pide uno.
+
+El formulario tiene además dos interruptores. **Fijación estricta del certificado** (para una dirección https) fija la clave del certificado que presenta el servidor cuando te conectas. **Permitir http sin cifrar** se ofrece solo para una dirección `http://` que no es esta máquina, con un aviso rojo de que el token viaja en texto plano. La tarjeta de conexión muestra la huella fijada.
+
+### Qué puede hacer el token y hasta cuándo
+
+Al conectar también se pregunta al host qué puede hacer el token. GitHub (tokens clásicos), GitLab y Bitbucket (cuando envía los ámbitos) informan de sus ámbitos: la tarjeta muestra una línea amarilla «Este token tiene más permisos de los que GitPoulpi necesita» con los ámbitos que exceden lo que usa GitPoulpi, los sensibles (como `delete_repo`, `admin:org`, `sudo`) en rojo, con el consejo de preferir un token de permisos detallados con fecha de caducidad. Un token clásico de GitHub (`ghp_...`) recibe ese consejo incluso cuando sus ámbitos son exactos. A un token de permisos detallados de GitHub no se le pueden pedir sus permisos, así que solo se muestra su caducidad. La tarjeta muestra la fecha de caducidad cuando el host la indica. Un token sin caducidad no muestra ningún recordatorio, y los demás productos no informan de ámbitos y no generan ningún aviso. Los mismos campos están en el JSON de `hosting integrations login` y `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). Se leen al conectar, así que la tarjeta los muestra para la sesión que conectó.
+
 ## 4. Vincular un repositorio
 
 La vinculación es explícita y por repositorio. Cuando hay un perfil conectado, la barra

@@ -36,6 +36,26 @@ panel çalışma değişikliklerini gösterir:
 | Unstage'lemek | Staged bölümündeki aynı düğmeler ve tuşlar (`Ctrl+G u`) |
 | Bir dosyanın değişikliklerini atmak | Dosyaya sağ tık > **Değişiklikleri at...** (önce sorar; `Ctrl+Z` değişiklikleri geri getirir) |
 
+### Hassas dosyalar
+
+Bir dosyayı, bir klasörü veya her şeyi stage'lemek önce neyi ekleyeceğini denetler. Adı
+`[privacy] sensitive_patterns` ile eşleşen (`.example`, `.sample` ve `.template` olanlar
+dışında `.env` ve `.env.*`, `*.pem`, `*.key`, SSH özel anahtarları, `*.p12`, `*.pfx`,
+`*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`) ya da metni tarayıcının
+tanıdığı bir gizli bilgi içeren bir dosya stage'lenmez. **Hassas dosyalar** sorusu her
+dosyayı nedeniyle birlikte listeler (bir kalıp ya da maskeli bir önizlemeyle gizli bilginin
+türü, asla değer) ve **1. Yine de stage'le** veya **2. İptal et, hiçbir şeye dokunma**
+seçeneklerini sunar. Bir ok tuşuna veya bir rakama basana kadar hiçbir yanıt vurgulanmaz;
+böylece yanlışlıkla basılan bir Enter hiçbir şeyi yanıtlamaz; `Esc`, kapatma çarpısı ve
+dışına bir tıklama iptal eder. Klavyeden, bir düğmeden, bir menüden, paletten ya da bir
+sürükle ve bırakmadan gelse de aynı sorudur, çünkü hepsi aynı isteği gönderir. İptal etmek
+hiçbir şeyi stage'lemez; aynı stage işleminin sıradan dosyalarını bile.
+
+Her biri 1 MiB'a ve toplam 32 MiB'a kadar metin dosyaları okunur; daha büyük dosyalar ve
+ikili dosyalar yalnızca adıyla değerlendirilir. `[privacy] staging_guard = false` denetimi
+kapatır. Bir hunk'ı ya da bazı satırları stage'lemek denetlenmez: zaten o dosya üzerinde
+çalışıyorsunuz.
+
 Menüsü için bir dosyaya sağ tıklayın: stage'le veya unstage'le, at, yolu kopyala,
 dosya geçmişi ve blame, harici düzenleyicinizde, diff aracında veya dosya
 yöneticisinde aç ([Ayarlar > Diff ve düzenleyici](settings.md#diff-ve-düzenleyici)
@@ -280,9 +300,16 @@ Bu sayfadaki her şey betiklenebilir:
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # aşağıdaki retten sonra
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage` hassas bir dosyayı aynı şekilde reddeder: hiçbir şey stage'lenmez, çıkış
+kodu 2'dir ve `--json` `{error: "sensitive_files", files: [{path, reason}]}` yazdırır (bir
+kural ve maskeli bir önizleme, asla bir değer). `--allow-sensitive` yeniden denemedir. Bir
+MCP ajanı aynı yanıtla reddedilir ve `[mcp] allow_sensitive_staging = true` olmadıkça
+`allow_sensitive` geçemez: ona size sorması söylenir.
 
 Bkz. [CLI başvurusu](cli-reference.md).

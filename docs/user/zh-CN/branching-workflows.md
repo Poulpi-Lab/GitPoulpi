@@ -169,9 +169,15 @@ mode = "local"                 # local | host-creates-branch | bot
 
 工作流文件中的 `[hooks]` 列出 shell 命令（`after_start`、`before_finish`）。它们来自你的团队共享的文件，所以它们**除非你要求，否则绝不运行**：用 `--run-hooks`，或对终端在列出它们之后询问的问题回答是。计划总会列出它们，不会运行时为 `hooks_run: false`。钩子在 shell 中运行，以仓库为工作目录，并设置了 `GITPOULPI_FLOW_ACTION` / `GITPOULPI_FLOW_BRANCH`；它的确切命令、退出码和完整输出都在结果里。退出码非零的钩子会让流程停在那里（`before_finish` 钩子在任何更改发生前运行，所以是一个普通错误；`after_start` 钩子之后分支已经存在，流程可以继续或中止）。`--no-hooks` 不经询问直接跳过它们。钩子可以做任何事，所以 `undo` 只会撤回 git 的更改。
 
+**信任。** 已提交的 `[hooks]` 部分里的命令来自任何能 push 到该仓库的人，所以它们还需要*你*的信任，每个版本的列表信任一次。信任按仓库保存，依据是钩子的哈希（任何命令、阶段或顺序的变化都会再次询问），并由守护进程在一次运行的第一步之前、以及在继续某个中断的流程之前检查，所以被拒绝的运行不会改动任何内容。你自己的覆盖设置里的钩子（你的仓库状态中的 `[workflow]`、设置页面）归你所有，从不询问。
+
+- **CLI：** `gitpoulpi flow trust-hooks` 会打印这些命令、它们的 `hash` 以及是否 `trusted`；`gitpoulpi flow trust-hooks --hash <hash>` 会信任它们，并且仅当磁盘上的文件仍是该哈希时才生效。对未受信任的钩子使用 `--run-hooks` 会打印拒绝信息（`{"refused": {"reason": "hooks_not_trusted", ...}}`，退出码 2），其中带有这些命令和那条命令行。被问到“Run them too?”的终端，也会被问是否同时信任它们。
+- **TUI：** 预览会列出这些钩子，并说明它们尚未受信任。随后按下操作按钮会询问“此仓库的工作流会在你的电脑上运行这些命令。要信任它们吗？”，并在一个可滚动的窗格中显示确切的命令（鼠标滚轮、可拖动的滚动条、PgUp/PgDn/Home/End），有两个答案：**1 信任并运行**和 **2 不带钩子运行**。在你按下方向键或数字键之前，没有任何选项被高亮；Esc、取消或关闭叉号会不作答直接返回。如果该文件在你信任之后发生了变化，标题会显示“钩子自你信任后已发生变化”，旧的列表显示在新的列表下方。
+- **代理：** 没有信任钩子的工具。对未受信任的钩子使用 `run_hooks: true` 会被拒绝并附上这些命令，需要由人来运行 `flow trust-hooks`。
+
 ### 面向代理（MCP）
 
-工具为 `flow_start`、`flow_finish`、`flow_sync`、`flow_promote` 和 `flow_set_parent`（finish、sync 和 promote 被标注为破坏性，所以由 `allow_mutations` 把关）。它们是先出计划再执行：带 `dry_run: true` 调用以获得计划（普通结果），然后带 `yes: true` 再次调用以运行它。两者都不带时调用会被拒绝并附带计划，所以不会意外运行。钩子只有在明确给出 `run_hooks: true` 时才会运行；计划会列出它们（`hooks`、`hooks_run`），以便代理先把命令展示给用户。发生冲突后，用 `continue_: true`（对应的选项是 `--continue`）或 `abort: true`。
+工具为 `flow_start`、`flow_finish`、`flow_sync`、`flow_promote` 和 `flow_set_parent`（finish、sync 和 promote 被标注为破坏性，所以由 `allow_mutations` 把关）。它们是先出计划再执行：带 `dry_run: true` 调用以获得计划（普通结果），然后带 `yes: true` 再次调用以运行它。两者都不带时调用会被拒绝并附带计划，所以不会意外运行。钩子只有在明确给出 `run_hooks: true` 时才会运行；计划会列出它们（`hooks`、`hooks_run`），以便代理先把命令展示给用户。已提交的钩子必须由人来信任（`flow trust-hooks`，它没有对应的工具）：对未受信任的钩子使用 `run_hooks: true` 会返回 `refused` 并附上这些命令，不会运行任何内容。发生冲突后，用 `continue_: true`（对应的选项是 `--continue`）或 `abort: true`。
 
 ### 撤销
 

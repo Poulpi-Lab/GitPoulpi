@@ -52,7 +52,35 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-ステートレスな JSON で、ツールも `[mcp]` の制限も同じです。**認証はない**ため、ループバックでしか待ち受けません。`--allow-remote` でこれを解除できますが、その場合はポートに到達できる人なら誰でも、設定が許可するすべてのツールを実行できます。信頼できるネットワークの内側、または認証付きプロキシの背後でのみ使ってください。
+ステートレスな JSON で、ツールも `[mcp]` の制限も同じです。すべてのリクエストにベアラートークンが必要です（`[mcp] http_auth`、既定でオン）。`gitpoulpi mcp token --show`（または `--copy`、`--rotate`。トークンはプライベートデータフォルダー内のユーザー専用ファイルにあります）で表示し、クライアントにヘッダーとして渡します。
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+トークンがない、または間違っているリクエストには、`WWW-Authenticate: Bearer` 付きの `401` が返ります。再発行したトークンはすぐに有効になり、サーバーの再起動は不要です。`http_auth` をオフにするのは、ローカルのすべてのアカウントを信頼できるループバックのエンドポイント向けで、その場合サーバーは stderr に警告を出します。
+
+### 別のマシンからエンドポイントに接続する
+
+最も安全な構成は、リモートのリスナーをまったく必要としません。ループバックアドレスのままにして、エージェントを動かすマシンから SSH でポートを転送します：`ssh -L 8808:127.0.0.1:8808 host`。この場合、`--allow-remote` は関係しません。
+
+`--allow-remote`（ループバック以外のアドレス）は、認証がオンでトークンがあり、**かつ**通信が暗号化されている場合を除き、拒否されます。拒否のメッセージには、足りないものが示されます。暗号化には 2 つの方法があります。
+
+- **サーバー内の TLS**（`[mcp] tls = "self_signed"` または `"files"`）。サーバー自身が TLS を終端します。鍵を持ち、ハンドシェイクを実行し、完了したハンドシェイクだけが HTTP 層に届きます。平文 HTTP のクライアントはハンドシェイクに失敗し、その隣に平文のリスナーは存在しません。つまり暗号化は、想定ではなく、接続のたびにサーバーが成立させる事実です。`self_signed` では、最初の起動でプライベートデータフォルダーの下に鍵ペアを生成し、その SHA-256 フィンガープリントを出力します（設定にも表示されます）。クライアントは、そのフィンガープリントまたは証明書ファイルをピン留めしてサーバーを信頼します。`files` では、`tls_cert` と `tls_key` に PEM ファイルを設定し、クライアントは認証局によって証明書を検証します。クライアントはベアラートークンで認証し、クライアント証明書は使いません。
+- **トンネルまたはリバースプロキシ**（`[mcp] behind_proxy = true`）。トンネルのエージェントやプロキシは、ローカルや LAN のクライアントと同じように接続し、そのヘッダーは偽造できるため、サーバーの内側からは、それがあるかどうかを判別できません。だから検出ではなく、明示的な承認にしています（設定には赤い警告が表示されます）。可能なら、同じマシンでトンネルを動かし、ループバックアドレスのままにしてください。プロキシの背後でループバック以外のアドレスを使う場合、プロキシとサーバーの間は、そのネットワーク上で平文です。
 
 **MCP を使わない場合**、シェルを使えるエージェントは CLI を使います：`gitpoulpi --json <command>`（[CLI リファレンス](cli-reference.md)を参照）。素の `git` の代わりに、いつ・どのように GitPoulpi を使うかを記した既製のスキル [`skills/gitpoulpi/SKILL.md`](../../../skills/gitpoulpi/SKILL.md) を渡してください。
 
@@ -61,12 +89,16 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 | スイッチ | 既定値 | 効果 |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`：`gitpoulpi mcp serve` / `gitpoulpi-mcp` は起動を拒否します（設定 > エージェントと MCP > *MCP サーバー*）。サーバーの起動時に読み込まれ、起動中のサーバーは設定をそのまま保ちます。 |
-| `[mcp] bind` | `"127.0.0.1:8808"` | アドレスが指定されないときに `--http` が使うアドレス（`--allow-remote` がなければループバックのみ）。設定 > エージェントと MCP > *MCP サーバーのポート*でポートを編集でき、ホストは維持されます。 |
+| `[mcp] bind` | `"127.0.0.1:8808"` | アドレスが指定されないときに `--http` が使うアドレス（`--allow-remote` がなければループバックのみ。`--allow-remote` には認証と暗号化が必要です。上記を参照）。設定 > エージェントと MCP > *MCP サーバーのポート*でポートを編集でき、ホストは維持されます。 |
+| `[mcp] http_auth` | `true` | `--http` には `Authorization: Bearer <token>`（`gitpoulpi mcp token`）が必要です。設定 > エージェントと MCP > *HTTP 認証*。 |
+| `[mcp] tls`、`tls_cert`、`tls_key` | `"off"` | `off`、`self_signed`、`files`（PEM のパス）：サーバー自身が TLS を終端します。設定 > エージェントと MCP > *TLS*。 |
+| `[mcp] behind_proxy` | `false` | トンネルまたはリバースプロキシが通信を暗号化していると申告します。これにより `--allow-remote` を TLS なしで動かせます。 |
 | `[mcp] allow_mutations` | `false` | オフ：何かを変更するツールはすべて拒否されます。読み取り、`ui_*`、提案は引き続き動作します。`true` にすると、エージェントは commit、push、リセットなどができます。 |
 | `[mcp] mutation_allowlist` | `[]` | 空でない場合：ここに挙げたツールだけが変更を行えます。例：`["stage", "unstage", "commit"]`。 |
 | `[mcp] allow_ui` | `true` | `false`：エージェントはユーザーのウィンドウを動かせません（`ui_state` / `ui_viewers` は引き続き応答します）。 |
 | `[mcp] ui_control` | `"ask"` | `ask`：ウィンドウにユーザーが確認するチップが出ます。`auto`：ユーザーが操作中でなければ適用されます。`off`：拒否されます。エージェントごと：`--ui-control`。 |
 | `[mcp] allow_ui_propose` | `false` | エージェントが、ユーザーが確認する入力済みのダイアログを開けるようにします（設定 > エージェントと MCP > *AI エージェントの変更提案を確認できるようにする*）。 |
+| `[mcp] allow_sensitive_staging` | `false` | `config.toml` のみ。オフでは、`stage` ツールは `allow_sensitive` を提供せず、機密ファイル（秘密鍵、`.env`、認識されたトークン）を追加するステージは `{error: "sensitive_files", files}` で拒否されます：エージェントはあなたに尋ねることになります。`true` にすると `allow_sensitive` を渡せます。[ステージと commit](staging-and-committing.md#機密ファイル)を参照してください。 |
 | `[mcp] allow_history_purge` | `false` | `config.toml` のみ。`true` にすると、履歴の書き換えの古い履歴（とその undo）を完全に削除するツール `rewrite_purge` が一覧に表示されます。オフ：エージェントにはこのツールが見えません。使うには `allow_mutations` も必要です。 |
 | `[ui] allow_agent_view_control` | `true` | ウィンドウ側のマスタースイッチです（設定 > エージェントと MCP > *AI エージェントによる表示の操作を許可*）。オフ：どのエージェントもユーザーのウィンドウに到達できません。 |
 | `[ui] launch` | `"off"` | ウィンドウが開いていないときに、エージェントが GitPoulpi のウィンドウを開いてよいか（[後述](#ウィンドウが開いていない場合または別のセッションにある場合)）。 |
@@ -96,6 +128,7 @@ mutation_allowlist = []        # e.g. ["stage", "unstage", "commit", "branch_cre
 allow_ui = true
 ui_control = "ask"             # "auto" lets the agent move your view without asking
 allow_ui_propose = false       # true: the agent may pre-fill Reword / Split / commit / branch / tag dialogs
+allow_sensitive_staging = false  # true: the agent may stage files the staging guard flags
 allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old history for good)
 ```
 
@@ -367,7 +400,10 @@ Not exposed as tools:
 
 | CLI | Why |
 |---|---|
+| `gitpoulpi hosting integrations trust` | accepting a changed address, account or certificate is the user's decision; an agent is told the security check needs the user |
+| `gitpoulpi ai trust` | binding an API key to another address is the user's decision |
 | `gitpoulpi mcp serve` | the MCP server cannot spawn/serve a copy of itself |
+| `gitpoulpi mcp token` | prints, copies and rotates the key that guards this very server: an agent must not read or replace it |
 | `gitpoulpi completions` | shell completion generation, not a GitBackend operation |
 | `gitpoulpi shell-init` | prints a wrapper function for the user's own shell, not a GitBackend operation |
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |
@@ -388,6 +424,7 @@ Not exposed as tools:
 | `gitpoulpi config set` | an agent must not be able to rewrite its own gating config |
 | `gitpoulpi hosting ssh-key create` | writes a private key and uploads it; too dangerous to let an agent automate |
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
+| `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
 ### ブランチワークフローのアクションは「プランしてから実行」

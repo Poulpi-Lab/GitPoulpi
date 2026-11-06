@@ -14,9 +14,13 @@ budete potřebovat.
 
 ## Začněte zde
 
-1. **[Instalace](installation.md)**: co potřebujete, archivy vydání, sestavení
-   ze zdrojových kódů. Pro menší binární soubor viz
-   **[Vlastní sestavení](custom-builds.md)**.
+1. **[Instalace](installation.md)**: co potřebujete, archivy vydání, správci
+   balíčků, sestavení ze zdrojových kódů. Pro menší binární soubor viz
+   **[Vlastní sestavení](custom-builds.md)**. Jak se GitPoulpi udržuje aktuální
+   (čip verze, panel aktualizací, návrat): **[Aktualizace](updates.md)**.
+   Spuštění v kontejneru: **[Běh v Dockeru](docker.md)**. Pro správce, interní
+   zdroje, zrcadla a politiku aktualizací:
+   **[Podniková distribuce](enterprise-distribution.md)**.
 2. **[První kroky](getting-started.md)**: vašich prvních pět minut, od spuštění
    po první commit.
 3. **[Prohlídka rozhraní](interface-tour.md)**: název každé oblasti okna, s

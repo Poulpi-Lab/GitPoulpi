@@ -163,6 +163,43 @@ GitPoulpi szuka tokenu profilu w tej kolejności:
 Każdy profil to wpis `[[integrations]]` w `config.toml`. Zob.
 [Opis konfiguracji](config-reference.md#integrations-hosting-i-trackery-zgłoszeń).
 
+## Kontrola bezpieczeństwa
+
+Zapisany token jest tak bezpieczny, jak adres, na który jest wysyłany. Dlatego GitPoulpi zapamiętuje dla każdej integracji, z czym była połączona, i zatrzymuje się, gdy to się zmieni:
+
+- **Adres.** Przy pierwszym użyciu integracji (lub połączeniu) jej adres jest zapisywany w `trust.toml`, w prywatnym folderze danych dostępnym tylko dla użytkownika (`<data>/private/`), a nie w `config.toml`: edycja konfiguracji nigdy nie poszerzy tego, czemu zaufano. Jeśli adres w konfiguracji nie jest już zapisanym, nic nie jest do niego wysyłane, a token nie jest nawet odczytywany. Różne zapisy jednego adresu (`HTTPS://Git.Example.com:443/`) to ten sam adres; host z podobną nazwą nie.
+- **Konto.** Po połączeniu tokenu, a potem mniej więcej raz dziennie (i raz na uruchomienie dla tokenu pochodzącego z `GITPOULPI_TOKEN_*` lub z helpera poświadczeń), GitPoulpi pyta hosta, do kogo należy token, i porównuje **id** konta, a nie login. Token, który teraz należy do kogoś innego, jest zatrzymywany.
+- **Certyfikat.** Serwery, których certyfikat nie łączy się ze znanym urzędem (prywatny urząd certyfikacji, serwer z certyfikatem samopodpisanym), są akceptowane tylko dla dokładnie tego klucza, który zaakceptowałeś, a uzgadnianie TLS nadal dowodzi, że serwer ma ten klucz. Przy włączonym ścisłym przypinaniu klucz musi pasować nawet wtedy, gdy certyfikat łączy się z publicznym korzeniem; ceną jest to, że każda rotacja klucza pyta ponownie, dlatego jest to opcja do włączenia. Hosty publiczne (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) nie mają zapisu certyfikatu.
+- **Zwykłe http.** Adres `http://` inny niż pętla zwrotna jest odrzucany, chyba że zezwolono na niego dla tej integracji.
+
+Każde żądanie jest też ograniczone do własnego adresu integracji (a dla hosta publicznego do jego hosta API, takiego jak `api.github.com`): żądanie gdziekolwiek indziej jest odrzucane przed wysłaniem, a przekierowanie na inny adres nie jest śledzone.
+
+**Integracje połączone, zanim ta kontrola istniała**, dostają swój zapis po cichu, z konfiguracji w jej dawnym kształcie, przy pierwszym użyciu po aktualizacji: zachowują dzisiejszy poziom zaufania i nic o nic nie pyta.
+
+### Z wiersza poleceń
+
+Zatrzymane polecenie kończy się kodem wyjścia 2 i wypisuje, co się zmieniło (zob. [Opis CLI](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` pokazuje, czemu zaufano; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` i `--allow-insecure-http on|off` akceptują po jednej rzeczy, wskazując dokładną wartość. Po zaakceptowaniu nowego adresu wpisz token ponownie. Rozłączenie (`hosting logout`) lub usunięcie integracji kasuje jej token, zapis zaufania i to, co z niej zapisano w pamięci podręcznej (zapisane listy repozytoriów okna Klonuj, listy kont Radaru i robocze wersje zdalnych przeglądów jej hosta).
+
+Agent (MCP) niczego nie może zaakceptować: dostaje informację, że kontrola bezpieczeństwa wymaga ciebie.
+
+### W interfejsie terminala
+
+Zatrzymane żądanie otwiera okno **Kontrola bezpieczeństwa integracji** nad tym, co akurat robiłeś. Mówi, co się zmieniło (stary i nowy adres, stare i nowe konto z ich id albo stary i nowy certyfikat jako mała tabela z odciskiem SHA-256 w grupach po cztery, podmiotem, wystawcą i ważnością) oraz że token nie został wysłany. Odpowiedzi są ponumerowane:
+
+1. **Rozłącz** kasuje zapisany token, zapis zaufania i to, co z integracji zapisano w pamięci podręcznej.
+2. **Zaufaj** nowemu adresowi, kontu lub certyfikatowi (adres bez szyfrowania: **Zezwól na zwykłe http**).
+3. **Anuluj** niczego nie zmienia.
+
+Żadna odpowiedź nie jest podświetlona, dopóki nie naciśniesz strzałki lub cyfry, więc przypadkowy Enter niczego nie akceptuje. Esc i krzyżyk zamknięcia anulują; kliknięcie poza oknem nic nie robi. Długa treść przewija się kółkiem, Page Up/Page Down lub paskiem przewijania. Kilka kontroli ustawia się w kolejce (jedna na integrację i rodzaj zmiany) i są zadawane jedna po drugiej. Anulowana kontrola nie wyskakuje ponownie, dopóki się nie zmieni; **Integracje: Przejrzyj kontrolę bezpieczeństwa** w palecie poleceń ją przywraca.
+
+Po zaufaniu nowemu **adresowi** formularz integracji otwiera się z aktywnym polem tokenu i podpowiedzią „Zalecane jest ponowne wpisanie tokenu”: zapisany token nigdy tam nie został wysłany. W formularzu adres zmieniony celowo jest akceptowany razem z wpisanym dla niego tokenem; bez tokenu formularz o niego prosi.
+
+Formularz ma też dwa przełączniki. **Ścisłe przypinanie certyfikatu** (dla adresu https) przypina klucz certyfikatu, który serwer przedstawia przy łączeniu. **Zezwól na zwykłe http (bez szyfrowania)** jest oferowane tylko dla adresu `http://` innego niż ten komputer, z czerwonym ostrzeżeniem, że token jest przesyłany otwartym tekstem. Karta połączonej integracji pokazuje przypięty odcisk.
+
+### Co może token i do kiedy
+
+Połączenie pyta też hosta, co token może robić. GitHub (tokeny klasyczne), GitLab i Bitbucket (gdy przesyła zakresy) raportują swoje zakresy: karta pokazuje żółty wiersz „Ten token ma więcej uprawnień, niż potrzebuje GitPoulpi” z listą zakresów ponad to, czego GitPoulpi używa, a te wrażliwe (takie jak `delete_repo`, `admin:org`, `sudo`) na czerwono, z radą, by wybrać token o precyzyjnych uprawnieniach z datą wygaśnięcia. Klasyczny token GitHub (`ghp_...`) dostaje tę radę nawet wtedy, gdy jego zakresy są dokładne. O uprawnienia tokenu GitHub o precyzyjnych uprawnieniach nie da się zapytać, więc pokazywana jest tylko jego data wygaśnięcia. Karta pokazuje datę wygaśnięcia, gdy host ją podaje. Token bez daty wygaśnięcia nie pokazuje przypomnienia, a inne produkty nie raportują zakresów i nie wywołują ostrzeżenia. Te same pola są w JSON polecenia `hosting integrations login` i `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). Są odczytywane przy połączeniu, więc karta pokazuje je dla sesji, która się połączyła.
+
 ## 4. Powiąż repozytorium
 
 Powiązanie jest jawne i dla każdego repozytorium osobne. Gdy profil jest

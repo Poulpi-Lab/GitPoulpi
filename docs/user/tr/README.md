@@ -15,8 +15,12 @@ başvuru sayfalarına atlayın.
 ## Buradan başlayın
 
 1. **[Kurulum](installation.md)**: nelere ihtiyacınız olduğu, sürüm arşivleri,
-   kaynaktan derleme. Daha küçük bir ikili için
-   **[Özel derlemeler](custom-builds.md)** sayfasına bakın.
+   paket yöneticileri, kaynaktan derleme. Daha küçük bir ikili için
+   **[Özel derlemeler](custom-builds.md)** sayfasına bakın. GitPoulpi'nin kendini
+   nasıl güncel tuttuğu (sürüm çipi, güncelleme paneli, önceki sürüme dönme):
+   **[Güncellemeler](updates.md)**. Bir kapsayıcıda çalıştırmak için:
+   **[Docker'da çalıştırma](docker.md)**. Yöneticiler için, iç kaynaklar, yansılar
+   ve güncelleme politikası: **[Kurumsal dağıtım](enterprise-distribution.md)**.
 2. **[Başlarken](getting-started.md)**: ilk beş dakikanız, başlatmaktan ilk
    commit'inize kadar.
 3. **[Arayüz turu](interface-tour.md)**: pencerenin her bölgesinin adı,

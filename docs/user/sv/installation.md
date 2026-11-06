@@ -35,7 +35,32 @@ Bredvid dem innehåller arkivet `gitpoulpi-launch`, ett litet program som genvä
 Ett releasearkiv heter `gitpoulpi-<version>-<target>.zip` (Windows) eller
 `.tar.gz` (Linux, macOS), med en `.sha256`-fil bredvid. Kontrollera arkivet mot
 `.sha256`-filen, packa upp det och lägg de tre körbara filerna i en mapp i din
-`PATH`. `INSTALL.txt` i arkivet ger samma steg.
+`PATH` (behåll `gitpoulpi-updater` och markeringen `.gitpoulpi-dist` bredvid dem:
+markeringen säger `channel=archive`, så bygget kan uppdatera sig självt, se
+[Uppdateringar](updates.md)). `INSTALL.txt` i arkivet ger samma steg.
+
+### Verifiera en nedladdning
+
+Varje releasefil är signerad med projektets [minisign](https://jedisct1.github.io/minisign/)-nyckel, och GitPoulpi kontrollerar den signaturen själv innan det installerar en uppdatering. För en fil som du har laddat ned för hand är `.minisig` bredvid den signaturen. Den publika nyckeln (nyckel-id `B461FFCBF6F6A4F2`) är incheckad som `packaging/minisign.pub` i repositoryt:
+
+```
+untrusted comment: minisign public key B461FFCBF6F6A4F2
+RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+```
+minisign -Vm gitpoulpi-<version>-<target>.tar.gz -P RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+Läs den betrodda kommentaren som kommandot skriver ut: den måste vara `file:<filens namn> version:<den version du förväntar dig>`. En signatur som är giltig men namnger en annan fil eller en annan version är inte en signatur för din.
+
+Där releasen byggdes med attesteringar av byggursprung (repositoryts variabel `ATTESTATIONS`) kontrollerar GitHub CLI var en fil byggdes:
+
+```
+gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoulpi
+```
+
+Filen `.sha256` fångar bara en skadad nedladdning. Det är signaturen som visar att filen är projektets.
 
 ## Med ett installationsprogram
 
@@ -46,20 +71,20 @@ installationsprogrammet ställer in och det som Inställningar visar stämmer al
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
 
-Det installerar för den aktuella användaren, utan administratörsfråga, i
-`%LOCALAPPDATA%\Programs\GitPoulpi` (den första dialogen erbjuder en
-installation för alla användare och val av installationsmapp). Kryssrutor: genväg i Startmenyn, genväg på
-skrivbordet, lägg till i PATH. En sida frågar efter **kommandoaliaset**: `gp` som standard,
-valfritt namn, tomt för inget. PowerShell använder redan `gp` för
-`Get-ItemProperty`, så välj ett annat namn där eller använd `gitpoulpi`.
+Den första dialogen frågar vem installationen är till för:
 
-Installationsprogrammet kopierar de tre körbara filerna och markeringen `.gitpoulpi-dist`, så att
-[Uppdatera nu](#uppdatera-på-plats) fungerar precis som för zip-arkivet. En installation
-för en användare är skrivbar och kan därför uppdatera sig själv; en installation för alla användare i
-Program Files kräver förhöjda rättigheter för att ersättas, så installera om den med den nya setup-filen i stället.
-Avinstallera från Windows Inställningar > Appar: det kör `gitpoulpi uninstall` (alias,
-PATH-poster, genvägar) och raderar filerna, även uppdateringens kvarlämnade `.old`.
-Dina inställningar och repositories finns kvar.
+| Val | Var | Administratörsrättigheter | Vad det betyder för uppdateringar |
+|---|---|---|---|
+| **Bara för mig** (standard) | `%LOCALAPPDATA%\Programs\GitPoulpi` | inga | GitPoulpi ersätter sina egna filer: **Uppdatera och starta om** i [uppdateringspanelen](updates.md), utan fråga. |
+| **För alla användare** | `Program Files\GitPoulpi` | en fråga vid installationen | Varje uppdatering ber om administratörsgodkännande (en Windows-fråga), och GitPoulpi-sessionerna för andra användare på datorn stängs först. |
+
+Samma val fungerar tyst: `gitpoulpi-<version>-...-setup.exe /CURRENTUSER` eller `/ALLUSERS`.
+
+Kryssrutor: genväg i Startmenyn, genväg på skrivbordet, lägg till i PATH. En sida frågar efter **kommandoaliaset**: `gp` som standard, valfritt namn, tomt för inget (`/ALIAS=name` eller `/ALIAS=` på kommandoraden). PowerShell använder redan `gp` för `Get-ItemProperty`, så välj ett annat namn där eller använd `gitpoulpi`.
+
+Installationsprogrammet kopierar de körbara filerna (inklusive `gitpoulpi-updater`, det lilla programmet som byter filer under en uppdatering) och markeringen `.gitpoulpi-dist`. Markeringen registrerar hur GitPoulpi installerades (`inno-user` eller `inno-machine`), vilket uppdateringspanelen visar som **Installerat med**. Att köra setup igen behåller dina val (omfattning, genvägar, alias).
+
+Avinstallera från Windows Inställningar > Appar: det kör `gitpoulpi uninstall` (alias, PATH-poster, genvägar) och raderar filerna, även uppdateringens kvarlämnade `.old`. Dina inställningar och repositories finns kvar.
 
 ### Linux och macOS: `install.sh`
 
@@ -67,7 +92,7 @@ Dina inställningar och repositories finns kvar.
 curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
 ```
 
-Skriptet väljer arkivet för ditt operativsystem och din processor, kontrollerar dess `.sha256`, installerar i
+Skriptet väljer arkivet för ditt operativsystem och din processor, kontrollerar dess `.sha256`, installerar (kanalen `archive`: GitPoulpi uppdaterar sig självt på plats) i
 `~/.local/opt/gitpoulpi` och länkar `gitpoulpi` och `gitpoulpi-mcp` till
 `~/.local/bin`. Ingen root behövs och inget utanför din hemkatalog rörs.
 Utan `--yes` frågar det efter alias (standard `gp`), PATH och genvägar.
@@ -85,6 +110,38 @@ Utan `--yes` frågar det efter alias (standard `gp`), PATH och genvägar.
 
 Att slå upp den senaste releasen kräver att repositoryt är publikt; för ett privat
 repository, ladda ned arkivet i en webbläsare och använd `--archive`.
+
+## Med en pakethanterare
+
+Varje kanal nedan skriver samma markering `.gitpoulpi-dist` bredvid programmen, med sitt eget kanalnamn. GitPoulpi läser den för att veta vem som äger uppdateringarna: det gör pakethanteraren, så GitPoulpi byter aldrig filer bakom ryggen på den. Uppdateringspanelen (klicka på versionen i titelraden) kör då pakethanterarens eget kommando, eller visar det så att du kan kopiera det. Se [Uppdateringar](updates.md).
+
+| Kanal | Installera | Anmärkningar |
+|---|---|---|
+| **Chocolatey** (Windows) | `choco install gitpoulpi` | Installerar för alla användare, så uppdateringar ber om administratörsgodkännande. |
+| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | Lägg till `--scope user` eller `--scope machine` för att välja; machine-omfattning ber om administratörsgodkännande vid installationen och vid varje uppdatering. |
+| **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` och sedan `scoop install gitpoulpi` | Per användare, inga administratörsrättigheter. |
+| **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | Tapen är `Poulpi-Lab/homebrew-gitpoulpi`. |
+| **apt** (Debian, Ubuntu) | se [apt-repositoryt](#apt-debian-och-ubuntu) | Signerat repository; en `.deb` bifogas också varje release. |
+| **MSI** (Windows, hanterad) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | För administratörer: alla användare, inga uppdateringar i appen. Se [Företagsdistribution](enterprise-distribution.md#msi-med-intune-eller-grupprincip). |
+| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (eller `paru -S gitpoulpi-bin`) | Utan en hjälpare: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, sedan `cd gitpoulpi-bin && makepkg -si`. |
+| **cargo** | `cargo binstall gitpoulpi-cli` | Laddar ned releasearkivet i stället för att kompilera. |
+| **cargo, från källkod** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Kompilerar; kräver en Rust-toolchain. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | Se [Köra i Docker](docker.md). Samma avbild finns på `ghcr.io/poulpi-lab/gitpoulpi`. |
+
+Namnen ovan är de som releaseprocessen publicerar till (se [Släppa en release](../../developer/releasing.md)): en kanal som inte är live än svarar "not found", och releasearkivet eller installationsprogrammet fungerar alltid.
+
+En pakethanterares egen PATH-hantering gäller: Chocolatey, winget, Scoop och Homebrew lägger själva programmen i PATH, och ingen av dem skapar aliaset `gp` (kör `gitpoulpi alias create gp`, eller Inställningar > Allmänt > Startare).
+
+### apt (Debian och Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+Repositoryt stöder `amd64` och `arm64` och är signerat med en nyckel som tillhör projektet. Programmen hamnar i `/usr/lib/gitpoulpi` med länkar i `/usr/bin`. Paketet beror på `git` och rekommenderar `git-lfs`. Utan repositoryt installerar du `.deb` från en release med `sudo apt install ./gitpoulpi_<version>_<arch>.deb`: GitPoulpi säger då att du ska ladda ned nästa `.deb` själv, eftersom det bara erbjuder `apt`-kommandon när det hittar repositoryt i `/etc/apt/sources.list.d/gitpoulpi.*`.
 
 ## Från källkod
 
@@ -128,71 +185,11 @@ system). Arkivet innehåller de tre körbara filerna, `INSTALL.txt`,
 
 ## Uppdateringar
 
-Titelraden visar den version som körs (`v1.0.0`) mellan programnamnet
-och repositoryts sökväg. Klicka på den, eller kör **Hjälp: Versionsanteckningar** i kommandopaletten (`Ctrl+P`): en flik Versionsanteckningar öppnas med ändringsloggen, rullad
-till den version som körs.
+Titelraden visar den version som körs (`v1.0.0`) mellan programnamnet och repositoryts sökväg. Klicka på den, eller tryck `Ctrl+N` och sedan `u`, eller kör **Uppdateringar: Visa uppdatering** i kommandopaletten (`Ctrl+P`): uppdateringspanelen öppnas med versionen, hur GitPoulpi installerades och vad du kan göra åt en nyare release. **Hjälp: Versionsanteckningar** öppnar ändringsloggen.
 
-En gång per dygn frågar GitPoulpi GitHub i bakgrunden om det finns en nyare release
-(`updates.mode`, [Inställningar > Synkronisering](settings.md#synkronisering)).
-När det finns en står det `v0.2.0 tillgänglig` på chipet i accentfärgen och ett klick på det
-öppnar fliken Versionsanteckningar med den releasens anteckningar överst. Fliken har
-tre knappar, var och en med en tangent och ett palettkommando:
+En gång per dygn, i bakgrunden, kontrollerar GitPoulpi platsen där dess releaser publiceras (GitHub som standard) efter en nyare (`updates.mode`, [Inställningar > Synkronisering](settings.md#synkronisering)). När det finns en står det `v0.2.0 tillgänglig` på chipet i accentfärgen.
 
-- **Ladda ned** (`d`, *Uppdateringar: Ladda ned*) öppnar releasesidan i din webbläsare.
-- **Hoppa över den här versionen** (`s`, *Uppdateringar: Hoppa över den här versionen*) döljer meddelandet
-  tills en nyare release dyker upp.
-- **Sök nu** (`r`, *Uppdateringar: Sök efter uppdateringar nu*) frågar igen direkt.
-
-`updates.mode = "off"` gör ingen förfrågan alls. Utan nätverksanslutning,
-eller medan repositoryt är privat och ingen github.com-token är lagrad, misslyckas kontrollen
-tyst (en rad i programloggen, ingenting i gränssnittet).
-`GITPOULPI_UPDATE_API` pekar kontrollen mot en annan API-rot (används av testerna).
-
-### Uppdatera på plats
-
-Ett bygge som installerats från ett releasearkiv kan ersätta sig självt. Arkivet innehåller
-en liten fil `.gitpoulpi-dist` bredvid de körbara filerna; ett bygge som körs är
-”uppdateringsbart” bara när den filen ligger bredvid dess körbara fil (och namnger dess
-plattform). Ett bygge gjort med `cargo`, ett anpassat bygge som kopierats någon annanstans eller ett
-paket som tappat filen uppdaterar sig aldrig själv: dess flik Versionsanteckningar säger
-det och erbjuder bara **Ladda ned**.
-
-För ett uppdateringsbart bygge lägger fliken till:
-
-- **Uppdatera nu** (`u`, *Uppdateringar: Uppdatera nu*) laddar ned arkivet och dess
-  `.sha256` i bakgrunden (ett jobb i statusradens indikator, med sin
-  procentsats, avbrytbart som vilket jobb som helst), kontrollerar hashen, packar upp arkivet
-  och lägger varje ny fil bredvid den gamla som `<namn>.new`. Inget som körs
-  rörs. I läget `auto` sker samma sak av sig självt så snart en kontroll hittar en
-  nyare release.
-- **Starta om för att uppdatera** (`R`, *Uppdateringar: Starta om för att uppdatera*; chipet säger
-  detsamma när nedladdningen väl är förberedd) är alltid din åtgärd, aldrig automatisk. Den
-  stoppar sessionens fristående daemon (en inbäddad försvinner med fönstret), byter
-  filerna och startar den nya versionen med samma argument och
-  session.
-- **Gå tillbaka till föregående version** (`v`, *Uppdateringar: Gå tillbaka till föregående version*) byter
-  tillbaka de tidigare filerna och startar om. Den tidigare versionens filer finns kvar som
-  `<namn>.old` tills den nya versionen har körts i en minut, sedan raderas
-  de, så knappen finns kvar under den första körningen. Den ingår inte i
-  gits ångrajournal: den ändrar GitPoulpis egna filer, inte ett repository.
-
-Hur filerna ersätts: i Linux och macOS döps varje ny fil om över den
-gamla (atomiskt; ett program som körs behåller sin gamla kopia tills det avslutas). I
-Windows kan en `.exe` som körs inte skrivas över, så den gamla döps om till
-`<namn>.old` och den nya flyttas in; en `.old` som fortfarande körs raderas
-vid en senare start. Bytet är allt eller inget: om ett annat program håller en av
-de körbara filerna (en MCP-klient som kör `gitpoulpi-mcp`, till exempel) namnger GitPoulpi
-filen, ändrar ingenting och lämnar nedladdningen förberedd för ett nytt försök.
-
-Vad som vägras, var och en med ett meddelande: en release utan `.sha256`-fil, en hash
-som inte stämmer, en arkivfil vars namn inte är det för den här plattformen
-(`gitpoulpi-<version>-<target>.<zip|tar.gz>`), ett arkiv vars markering namnger
-en annan version eller plattform, och varje nedladdningslänk utanför dessa värdar: GitHubs
-`github.com`, `api.github.com`, `objects.githubusercontent.com`,
-`release-assets.githubusercontent.com` och `github-releases.githubusercontent.com`
-(den första förfrågan och varje omdirigering; en omdirigering någon annanstans stoppar
-nedladdningen). Ett privat repositorys arkiv kräver en webbläsarsession, så
-nedladdningen misslyckas där tills repositoryt är publikt.
+Vad panelen gör beror på hur GitPoulpi installerades: ett releasearkiv eller Windows-installationsprogrammet ersätter sina egna filer, en pakethanterare kör sitt eget kommando, en hanterad installation eller en containerinstallation säger hur uppdateringar når den. Ett bygge gjort med `cargo build` uppdateras aldrig. Den fullständiga beskrivningen, med att gå tillbaka, `auto` mot `notify` och vad en administratör kan låsa, finns i [Uppdateringar](updates.md).
 
 ## Kontrollera att det fungerar
 

@@ -117,7 +117,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Aktivitätsprotokoll öffnen | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Globales Aktivitätsprotokoll öffnen | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Hintergrundaufgaben anzeigen | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | Update-Fenster anzeigen | `Ctrl+N u` |
 | `nav_prefix` | `help` | Hilfe umschalten | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Tab auswählen | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Design wechseln | `Ctrl+N y` |
@@ -831,10 +831,10 @@ die Standardtasten.
 | Ansicht: Aktivitätsprotokoll | `Ctrl+N A` |
 | Ansicht: Globales Aktivitätsprotokoll | `Ctrl+N G` |
 | Hilfe: Versionshinweise |  |
-| Updates: Show Update | `Ctrl+N u` |
-| Updates: Open Security Notice |  |
-| Updates: Copy Update Command |  |
-| Updates: Run Update Command in a Terminal |  |
+| Updates: Update-Fenster anzeigen | `Ctrl+N u` |
+| Updates: Sicherheitshinweis öffnen |  |
+| Updates: Update-Befehl kopieren |  |
+| Updates: Update-Befehl in einem Terminal ausführen |  |
 | Updates: Jetzt nach Updates suchen |  |
 | Updates: Herunterladen |  |
 | Updates: Jetzt aktualisieren |  |
@@ -1144,7 +1144,7 @@ die Standardtasten.
 | Integrationen: Profil dieses Repositorys verwalten |  |
 | Integrationen: Integration verbinden... |  |
 | Einstellungen: Radar-Optionen eines Profils... |  |
-| Integrations: Review security check |  |
+| Integrationen: Sicherheitsprüfung ansehen |  |
 | App: Beenden | `q` |
 | App: Design... |  |
 | App: Design wechseln... | `Ctrl+N y` |

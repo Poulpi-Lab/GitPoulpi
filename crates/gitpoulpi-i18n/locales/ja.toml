@@ -1467,99 +1467,99 @@ channel_prerelease = "プレリリース版"
 # context: heading of the group of update settings on the Synchronization page
 heading = "更新"
 # context: title of the update panel, the window the version in the title bar opens
-panel_title = "Updates"
+panel_title = "更新"
 # context: first line of the update panel; {version} is like v0.1.0 (a development build adds a short commit id)
 panel_version = "GitPoulpi {version}"
 # context: line in the update panel; {channel} says how the app was installed, for example "Chocolatey" or "a release archive"
-panel_installed_with = "Installed with: {channel}"
+panel_installed_with = "インストール方法：{channel}"
 # context: line in the update panel while the app looks at how it was installed
-panel_detecting = "Looking at how GitPoulpi was installed..."
+panel_detecting = "インストール方法を確認しています..."
 # context: line in the update panel for a build that has no install record (for example built from source)
-panel_no_record = "This build has no install record, so it does not update itself."
+panel_no_record = "このビルドにはインストール記録がないため、自己更新しません。"
 # context: line in the update panel when the app replaces its own files and restarts (macOS and Linux)
-panel_note_swap = "GitPoulpi closes, replaces its files and opens again in this terminal."
+panel_note_swap = "GitPoulpi は終了し、ファイルを置き換えて、このターミナルで再び開きます。"
 # context: line in the update panel when the app replaces its own files and restarts (Windows)
-panel_note_swap_windows = "GitPoulpi closes, replaces its files and opens again in a new window."
+panel_note_swap_windows = "GitPoulpi は終了し、ファイルを置き換えて、新しいウィンドウで再び開きます。"
 # context: line in the update panel: the update needs the approval of a Windows administrator, and other users' GitPoulpi windows on this computer are closed
-panel_note_uac = "Windows asks for administrator approval. GitPoulpi processes of other users on this computer are closed."
+panel_note_uac = "Windows が管理者の承認を求めます。このコンピューター上の他のユーザーの GitPoulpi セッションは終了します。"
 # context: line in the update panel when a package manager does the update (macOS and Linux)
-panel_note_run = "GitPoulpi closes while the package manager updates it, then opens again in this terminal."
+panel_note_run = "パッケージマネージャーが更新する間、GitPoulpi は終了し、その後このターミナルで再び開きます。"
 # context: line in the update panel when a package manager does the update (Windows)
-panel_note_run_windows = "GitPoulpi closes while the package manager updates it, then opens again in a new window."
+panel_note_run_windows = "パッケージマネージャーが更新する間、GitPoulpi は終了し、その後新しいウィンドウで再び開きます。"
 # context: line in the update panel above the command the package manager runs
-panel_run_command = "It runs this command:"
+panel_run_command = "次のコマンドを実行します："
 # context: line in the update panel above the command the user runs in a terminal
-panel_show_intro = "Run this command in a terminal to update:"
+panel_show_intro = "更新するには、ターミナルで次のコマンドを実行してください："
 # context: line in the update panel; {message} is a text the administrator of this computer set
-panel_admin_message = "From your administrator: {message}"
+panel_admin_message = "管理者からのメッセージ：{message}"
 # context: line in the update panel: the administrator turned off self-updates
-announce_policy = "Your administrator turned off updating from inside GitPoulpi. Updates reach this computer another way."
+announce_policy = "管理者が GitPoulpi 内からの更新をオフにしています。更新は別の方法でこのコンピューターに届きます。"
 # context: line in the update panel: the installation is managed by an administrator
-announce_managed = "This installation is managed by your administrator."
+announce_managed = "このインストールは管理者が管理しています。"
 # context: line in the update panel for the Docker image; the commands follow
-announce_container = "This is a container image. Download a newer image to update:"
+announce_container = "これはコンテナーイメージです。更新するには新しいイメージをダウンロードしてください："
 # context: line in the update panel: the app cannot write its own folder
-announce_legacy_read_only = "GitPoulpi cannot write its own folder, so it cannot replace itself. Download the new version instead."
+announce_legacy_read_only = "GitPoulpi は自身のフォルダーに書き込めないため、自分を置き換えられません。代わりに新しいバージョンをダウンロードしてください。"
 # context: line in the update panel: the apt repository of GitPoulpi is not set up on this computer
-announce_apt = "The GitPoulpi apt repository is not set up on this computer. Download the .deb package of the new version instead."
+announce_apt = "GitPoulpi の apt リポジトリがこのコンピューターに設定されていません。代わりに新しいバージョンの .deb パッケージをダウンロードしてください。"
 # context: line in the update panel: there is no way to go back to the previous version
-announce_no_revert = "There is no way to go back to the previous version from here."
+announce_no_revert = "ここから前のバージョンに戻す方法はありません。"
 # context: button in the update panel: downloads the newer version if needed, then closes GitPoulpi, updates it and opens it again
-btn_update_restart = "Update and restart"
+btn_update_restart = "更新して再起動"
 # context: button in the update panel: lets the package manager update GitPoulpi
-btn_run_update = "Run update"
+btn_run_update = "更新を実行"
 # context: button in the update panel: copies the update command to the clipboard
-btn_copy = "Copy command"
+btn_copy = "コマンドをコピー"
 # context: button in the update panel: runs the update command in a new terminal window
-btn_terminal = "Open in terminal"
+btn_terminal = "ターミナルで開く"
 # context: button in the update panel: opens the Release notes tab
-btn_notes = "Release notes"
+btn_notes = "リリースノート"
 # context: button in the update panel: closes it
-btn_close = "Close"
+btn_close = "閉じる"
 # context: button on the Release notes tab: opens the update panel
-btn_panel = "Update options"
+btn_panel = "更新オプション"
 # context: footer hint of the update panel; the letters are the keys of the buttons
-panel_hint = "u update  c copy  t terminal  v revert  n notes  s skip  r check  Esc close"
+panel_hint = "u 更新  c コピー  t ターミナル  v 戻す  n ノート  s スキップ  r 確認  Esc 閉じる"
 # context: note at the top of the Release notes tab: this installation updates through the update panel
-note_see_panel = "To update, open the update panel (click the version in the title bar)."
+note_see_panel = "更新するには、更新パネルを開いてください（タイトルバーのバージョンをクリック）。"
 # context: palette and status line: why Update now and Restart to update do not apply to this installation; the update panel shows what to do
-why_manual = "this installation is updated another way: see Updates: Show Update"
+why_manual = "このインストールは別の方法で更新します：「更新: 更新パネルを表示」を参照"
 # context: palette: why Copy update command is unavailable
-why_no_command = "there is no update command to copy for this installation"
+why_no_command = "このインストールにはコピーできる更新コマンドがありません"
 # context: palette: why Run update command in a terminal is unavailable
-why_no_terminal = "this installation has no update command to run in a terminal"
+why_no_terminal = "このインストールにはターミナルで実行できる更新コマンドがありません"
 # context: what was copied, for the status line (copied {what}: ...)
-copy_what = "the update command"
+copy_what = "更新コマンド"
 # context: status line after the update command was started in a new terminal window
-msg_terminal_opened = "opened a terminal with the update command"
+msg_terminal_opened = "更新コマンドを入力したターミナルを開きました"
 # context: status line when no terminal window could be started; {reason} is a technical explanation in English
-msg_terminal_failed = "could not open a terminal: {reason}"
+msg_terminal_failed = "ターミナルを開けませんでした：{reason}"
 # context: status line when the update could not be handed to the updater program; {reason} is a technical explanation in English
-msg_handoff_failed = "could not start the updater: {reason}"
+msg_handoff_failed = "アップデーターを起動できませんでした：{reason}"
 # context: status line at start-up after a successful update; {version} is like 0.2.0
-msg_updated = "Updated to v{version}"
+msg_updated = "v{version} に更新しました"
 # context: status line at start-up when the administrator approval of an update was declined
-msg_update_declined = "Update canceled: administrator approval was declined. Nothing changed."
+msg_update_declined = "更新を中止しました：管理者の承認が拒否されました。何も変更されていません。"
 # context: status line at start-up after a failed update; {reason} is a technical explanation in English
-msg_update_failed_previous = "Update failed: {reason}. The previous version is still installed."
+msg_update_failed_previous = "更新に失敗しました：{reason}。前のバージョンがそのまま残っています。"
 # context: command palette entry: opens the update panel
-palette_show = "Updates: Show Update"
+palette_show = "更新: 更新パネルを表示"
 # context: command palette entry: copies the command that updates GitPoulpi to the clipboard
-palette_copy = "Updates: Copy Update Command"
+palette_copy = "更新: 更新コマンドをコピー"
 # context: command palette entry: runs the command that updates GitPoulpi in a new terminal window
-palette_terminal = "Updates: Run Update Command in a Terminal"
+palette_terminal = "更新: 更新コマンドをターミナルで実行"
 # context: help line for the key that opens the update panel
-help_nav = "Show the update panel (version, how to update)"
+help_nav = "更新パネルを表示（バージョン、更新方法）"
 # context: after "Installed with:": the app was installed from a release archive (a zip or tar.gz)
-via_archive = "a release archive"
+via_archive = "リリースアーカイブ"
 # context: after "Installed with:": the Windows installer, for the current user only
-via_inno_user = "the installer (this user)"
+via_inno_user = "インストーラー（このユーザー）"
 # context: after "Installed with:": the Windows installer, for all users
-via_inno_machine = "the installer (all users)"
+via_inno_machine = "インストーラー（全ユーザー）"
 # context: after "Installed with:": Chocolatey, a Windows package manager; keep the name
 via_choco = "Chocolatey"
 # context: after "Installed with:": a company-internal Chocolatey feed
-via_choco_internal = "Chocolatey (internal feed)"
+via_choco_internal = "Chocolatey（社内フィード）"
 # context: after "Installed with:": winget, the Windows package manager; keep the name
 via_winget = "winget"
 # context: after "Installed with:": Scoop, a Windows package manager; keep the name
@@ -1569,23 +1569,23 @@ via_homebrew = "Homebrew"
 # context: after "Installed with:": apt, the Debian and Ubuntu package manager; keep the name
 via_apt = "apt"
 # context: after "Installed with:": an MSI package deployed by an administrator
-via_msi = "an MSI package"
+via_msi = "MSI パッケージ"
 # context: after "Installed with:": the Arch User Repository; keep the name
-via_aur = "the AUR"
+via_aur = "AUR"
 # context: after "Installed with:": a Docker image
-via_docker = "a Docker image"
+via_docker = "Docker イメージ"
 # context: after "Installed with:": cargo, the Rust package manager; keep the name
 via_cargo = "cargo"
 # context: after "Installed with:": a release archive in a folder this user cannot write
-via_legacy_read_only = "a release archive (read-only folder)"
+via_legacy_read_only = "リリースアーカイブ（読み取り専用フォルダー）"
 # context: after "Installed with:": a development build with no install record
-via_dev = "a development build (no install record)"
+via_dev = "開発ビルド（インストール記録なし）"
 # context: setting row on the Synchronization page, read only: how the app was installed
-installed_with = "Installed with"
+installed_with = "インストール方法"
 # context: help of the setting above
-installed_with_help = "How GitPoulpi got onto this computer. It decides how updates are applied. This row cannot be changed."
+installed_with_help = "GitPoulpi がこのコンピューターに入った方法です。更新の適用方法はこれで決まります。この行は変更できません。"
 # context: shown instead of a setting's value when the administrator of this computer set it
-locked = "Set by your administrator"
+locked = "管理者が設定しています"
 
 [radar]
 title = "Radar"
@@ -2297,7 +2297,7 @@ nav_prefix_about = "バージョン情報を開く"
 nav_prefix_activity_log = "アクティビティログを開く"
 nav_prefix_global_log = "グローバルアクティビティログを開く"
 nav_prefix_jobs = "バックグラウンドタスクを表示"
-nav_prefix_updates = "Show the Update Panel"
+nav_prefix_updates = "更新パネルを表示"
 nav_prefix_help = "ヘルプの表示切り替え"
 nav_prefix_select_tab = "タブを選択"
 nav_prefix_change_theme = "テーマを変更"
@@ -5003,7 +5003,7 @@ send_failed = "デーモンとの接続が切れました：リクエストを�
 timeout = "デーモンが時間内に応答しませんでした"
 embedded_failed = "組み込みデーモンを起動できませんでした：{error}"
 link_panicked = "デーモンとの接続が予期せず停止しました（スレッドがパニックしました）"
-updating = "GitPoulpi is updating, try again in a moment"
+updating = "GitPoulpi を更新中です。しばらくしてからもう一度お試しください"
 runtime_failed = "デーモン接続のランタイムを起動できませんでした：{error}"
 connect_failed = "セッションデーモン（ポート {port}）に接続できませんでした：{error}"
 build_mismatch = "セッションデーモンは別のビルドで動作しています（デーモン @{daemon}、このウィンドウ @{window}）- `gitpoulpi daemon restart` を実行して同じコードに揃えてください"
@@ -8650,280 +8650,280 @@ no_new_folder = "既存のファイルを選んでください。ここではフ
 
 [flow_hook_trust]
 # context: heading of the question in the Flow dialog when the repository's committed workflow hooks differ from the list the user trusted earlier
-heading_changed = "The hooks changed since you trusted them"
+heading_changed = "信頼した後でフックが変更されました"
 # context: question in the Flow dialog above the exact shell commands the repository's workflow wants to run
-question = "This repository's workflow runs these commands on your machine. Trust them?"
+question = "このリポジトリのワークフローは、あなたのマシン上で次のコマンドを実行します。信頼しますか？"
 # context: heading of the commands that would run now, inside the scrollable command list of the hook trust question
-commands_heading = "Commands to run now"
+commands_heading = "今回実行するコマンド"
 # context: heading of the list of commands the user trusted earlier, shown below the new ones when the hooks changed
-previous_heading = "Commands you trusted before"
+previous_heading = "以前に信頼したコマンド"
 # context: first numbered answer of the hook trust question: remember the trust and run the action with its hooks
-answer_trust = "Trust and run"
+answer_trust = "信頼して実行"
 # context: second numbered answer of the hook trust question: run the action and skip every hook
-answer_skip = "Run without hooks"
+answer_skip = "フックなしで実行"
 # context: key hint under the numbered answers of the hook trust question
-hint = "Up/Down or 1/2 to choose, Enter to confirm, PgUp/PgDn to scroll, Esc to go back"
+hint = "↑/↓ または 1/2 で選択、Enter で確定、PgUp/PgDn でスクロール、Esc で戻る"
 # context: shown while the daemon remembers the user's trust for the hooks
-trusting = "Remembering your answer..."
+trusting = "回答を記憶しています..."
 # context: one-line note in the Flow preview when the hooks are not trusted yet; the question comes when the action runs
-untrusted_note = "These hooks are not trusted yet: you are asked before they run."
+untrusted_note = "これらのフックはまだ信頼されていません：実行前に確認します。"
 # context: error text when the daemon refused a run because the committed workflow hooks are not trusted; {n} is how many commands there are
-not_trusted = { one = "The workflow hooks are not trusted: {n} command was not run. Review it and trust it first.", other = "The workflow hooks are not trusted: {n} commands were not run. Review them and trust them first." }
+not_trusted = { one = "ワークフローのフックが信頼されていません：{n} 件のコマンドを実行しませんでした。内容を確認して先に信頼してください。", other = "ワークフローのフックが信頼されていません：{n} 件のコマンドを実行しませんでした。内容を確認して先に信頼してください。" }
 
 [mcp_security]
 # context: heading in Settings > Agents & MCP above the rows that protect the MCP HTTP endpoint
-heading = "MCP HTTP endpoint security"
+heading = "MCP HTTP エンドポイントのセキュリティ"
 # context: label of a switch in Settings > Agents & MCP; the MCP server's HTTP endpoint asks clients for an access token
-auth = "HTTP authentication"
+auth = "HTTP 認証"
 # context: help under the HTTP authentication switch
-auth_help = "Requests to the MCP HTTP endpoint (gitpoulpi mcp serve --http) must carry the access token. Applies the next time the server starts."
+auth_help = "MCP HTTP エンドポイント（gitpoulpi mcp serve --http）へのリクエストにはアクセストークンが必要です。次回のサーバー起動時に反映されます。"
 # context: red warning shown while HTTP authentication is off
-auth_warning = "Authentication is off: any program that can reach the endpoint can run every tool the MCP settings allow."
+auth_warning = "認証がオフです：エンドポイントに到達できるプログラムは、MCP 設定で許可されたすべてのツールを実行できます。"
 # context: label of the row that shows the access token of the MCP HTTP endpoint
-token = "Access token"
+token = "アクセストークン"
 # context: value of the access token row when no token has been made yet
-token_none = "(none yet)"
+token_none = "（未作成）"
 # context: help under the access token row
-token_help = "Clients send it as Authorization: Bearer followed by the token. It is kept in a file only you can read. A new token applies at once: clients holding the old one are refused."
+token_help = "クライアントは Authorization: Bearer に続けてトークンを送ります。トークンはあなただけが読めるファイルに保存されます。新しいトークンはすぐに有効になり、古いトークンを持つクライアントは拒否されます。"
 # context: button that reveals the access token on screen
-show = "Show"
+show = "表示"
 # context: button that hides the access token again
-hide = "Hide"
+hide = "非表示"
 # context: button that copies the access token to the clipboard
-copy = "Copy"
+copy = "コピー"
 # context: button that replaces the access token with a new one
-rotate = "Rotate"
+rotate = "再発行"
 # context: button that makes the first access token when there is none
-create = "Create"
+create = "作成"
 # context: status line after the access token was copied; the token itself is never shown there
-token_copied = "Access token copied to the clipboard."
+token_copied = "アクセストークンをクリップボードにコピーしました。"
 # context: status line after the access token was replaced
-token_rotated = "Access token replaced."
+token_rotated = "アクセストークンを再発行しました。"
 # context: status line when the access token file could not be written; {reason} is the system error
-token_failed = "Could not keep the access token: {reason}"
+token_failed = "アクセストークンを保存できませんでした：{reason}"
 # context: status line when there is no access token to show or copy
-token_missing = "There is no access token yet."
+token_missing = "アクセストークンはまだありません。"
 # context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
 tls = "TLS"
 # context: help under the TLS choice
-tls_help = "Encrypts the HTTP endpoint; the server ends TLS itself, so a plain connection is refused. Self-signed makes a certificate once and shows its fingerprint for clients to check. Files uses the certificate and key below. Applies the next time the server starts."
+tls_help = "HTTP エンドポイントを暗号化します。サーバー自身が TLS を終端するため、平文の接続は拒否されます。「自己署名」は証明書を一度作成し、クライアントが確認できるようフィンガープリントを表示します。「ファイル」は下の証明書と鍵を使います。次回のサーバー起動時に反映されます。"
 # context: TLS choice: no encryption
-tls_off = "Off"
+tls_off = "オフ"
 # context: TLS choice: the server makes its own certificate
-tls_self_signed = "Self-signed"
+tls_self_signed = "自己署名"
 # context: TLS choice: the user supplies a certificate and a key file
-tls_files = "Files"
+tls_files = "ファイル"
 # context: label of a path field in Settings > Agents & MCP: the TLS certificate file
-tls_cert = "Certificate path"
+tls_cert = "証明書のパス"
 # context: help under the certificate path
-tls_cert_help = "PEM file with the certificate chain. Used when TLS is set to Files."
+tls_cert_help = "証明書チェーンの PEM ファイルです。TLS が「ファイル」のときに使います。"
 # context: label of a path field in Settings > Agents & MCP: the TLS private key file
-tls_key = "Key path"
+tls_key = "鍵のパス"
 # context: help under the key path
-tls_key_help = "PEM file with the private key. Used when TLS is set to Files."
+tls_key_help = "秘密鍵の PEM ファイルです。TLS が「ファイル」のときに使います。"
 # context: label of a read-only row: the SHA-256 fingerprint of the certificate the endpoint serves
-fingerprint = "Certificate fingerprint"
+fingerprint = "証明書のフィンガープリント"
 # context: help under the fingerprint row
-fingerprint_help = "SHA-256 of the certificate the endpoint serves. A client that checks this value is talking to this server."
+fingerprint_help = "エンドポイントが提示する証明書の SHA-256 です。この値を確認するクライアントは、このサーバーと通信していることを確かめられます。"
 # context: value of the fingerprint row when TLS is Self-signed and the certificate does not exist yet
-fingerprint_pending = "(made when the server first starts with TLS)"
+fingerprint_pending = "（TLS で最初にサーバーを起動したときに作成）"
 # context: value of the fingerprint row when the certificate file cannot be read
-fingerprint_unreadable = "(certificate not readable)"
+fingerprint_unreadable = "（証明書を読み取れません）"
 # context: value of the fingerprint row when TLS is off
-fingerprint_off = "(TLS is off)"
+fingerprint_off = "（TLS はオフ）"
 # context: label of a switch in Settings > Agents & MCP: the user states that a tunnel or reverse proxy encrypts the traffic
-proxy = "Behind a tunnel or reverse proxy"
+proxy = "トンネルまたはリバースプロキシの背後"
 # context: help under that switch
-proxy_help = "Switch on when a tunnel or proxy in front of the endpoint encrypts the traffic. The server cannot check that, so it is your statement. It lets a non-loopback address run without TLS. Keeping the loopback address and using ssh -L is safer."
+proxy_help = "エンドポイントの前段にあるトンネルやプロキシが通信を暗号化している場合にオンにします。サーバーはそれを確認できないため、あなたの申告になります。ループバック以外のアドレスを TLS なしで動かせるようになります。ループバックアドレスのままにして ssh -L を使う方が安全です。"
 # context: red warning shown while that switch is on
-proxy_warning = "Without TLS, the hop between the tunnel or proxy and the server is plain text on that network."
+proxy_warning = "TLS がないと、トンネルまたはプロキシとサーバーの間は、そのネットワーク上で平文になります。"
 
 [trust_dialog]
 # context: title of the dialog that stops an integration whose address, account or certificate changed
-title = "Integration security check"
+title = "連携のセキュリティチェック"
 # context: body of the dialog; {name} is the id of an integration, {new} and {old} are web addresses
-origin_changed = "{name} now points to {new}, it was {old}. The token was not sent."
+origin_changed = "{name} の接続先が {old} から {new} に変わりました。トークンは送信していません。"
 # context: body of the dialog when the saved token of an integration now belongs to another account; {name} is the id of an integration
-account_changed = "The token of {name} now belongs to another account. The token was not used."
+account_changed = "{name} のトークンが別のアカウントのものになりました。トークンは使用していません。"
 # context: line of the dialog; {login} is a user name on a code host, {id} is the number the host gave that account
-account_was = "Trusted account: {login} (id {id})"
+account_was = "信頼済みのアカウント：{login}（id {id}）"
 # context: line of the dialog; {login} is a user name on a code host, {id} is the number the host gave that account
-account_now = "Account now: {login} (id {id})"
+account_now = "現在のアカウント：{login}（id {id}）"
 # context: body of the dialog for a server whose certificate no known authority signed; {name} is the id of an integration
-cert_untrusted = "{name} presents a certificate that no known authority signed. Compare its fingerprint with the one the server's administrator gave you before you trust it. The token was not sent."
+cert_untrusted = "{name} は、既知の認証局が署名していない証明書を提示しています。信頼する前に、フィンガープリントをサーバー管理者から受け取ったものと照合してください。トークンは送信していません。"
 # context: body of the dialog; {name} is the id of an integration
-cert_changed = "The certificate of {name} changed since you trusted it. The token was not sent."
+cert_changed = "{name} の証明書は、信頼した後で変更されました。トークンは送信していません。"
 # context: body of the dialog; {name} is the id of an integration, {origin} is a web address starting with http://
-plain_http = "{name} uses {origin}, which is not encrypted: the token and everything else can be read on the way. The token was not sent."
+plain_http = "{name} は暗号化されていない {origin} を使っています：トークンを含むすべての通信が途中で読み取られる可能性があります。トークンは送信していません。"
 # context: heading over the certificate that was trusted before, in the security check dialog
-cert_before = "Trusted before"
+cert_before = "以前に信頼"
 # context: heading over the certificate the server presents now, in the security check dialog
-cert_now = "Presented now"
+cert_now = "現在の提示"
 # context: label before a certificate fingerprint (a SHA-256 hash)
 cert_fingerprint = "SHA-256"
 # context: label before the subject (owner) of a certificate
-cert_subject = "Subject"
+cert_subject = "サブジェクト"
 # context: label before the issuer (the authority that signed) of a certificate
-cert_issuer = "Issuer"
+cert_issuer = "発行者"
 # context: label before the first day a certificate is valid
-cert_valid_from = "Valid from"
+cert_valid_from = "有効期間の開始"
 # context: label before the last day a certificate is valid
-cert_valid_to = "Valid to"
+cert_valid_to = "有効期間の終了"
 # context: shown instead of a certificate field that was never recorded
-cert_unknown = "(not recorded)"
+cert_unknown = "（記録なし）"
 # context: numbered answer of the security check dialog; deletes the integration's saved token
-answer_disconnect = "Disconnect (deletes the saved token)"
+answer_disconnect = "切断（保存済みトークンを削除）"
 # context: numbered answer of the security check dialog; accepts the web address the integration now has
-answer_trust_origin = "Trust the new address"
+answer_trust_origin = "新しいアドレスを信頼"
 # context: numbered answer of the security check dialog; accepts the account the token now belongs to
-answer_trust_account = "Trust the new account"
+answer_trust_account = "新しいアカウントを信頼"
 # context: numbered answer of the security check dialog; accepts the certificate the server presents
-answer_trust_cert = "Trust the new certificate"
+answer_trust_cert = "新しい証明書を信頼"
 # context: numbered answer of the security check dialog; accepts an address that is not encrypted
-answer_allow_http = "Allow plain http (not encrypted)"
+answer_allow_http = "平文 http を許可（暗号化なし）"
 # context: numbered answer of the security check dialog; changes nothing
-answer_cancel = "Cancel"
+answer_cancel = "キャンセル"
 # context: hint under the answers of the security check dialog
-hint = "Press a number, or Up and Down then Enter. Esc cancels."
+hint = "番号を押すか、↑/↓ を押して Enter。Esc でキャンセル。"
 # context: line of the security check dialog; {n} is how many other checks wait after this one
-more_waiting = "More checks are waiting after this one ({n})."
+more_waiting = "このあとにチェックがあと {n} 件あります。"
 # context: command palette entry that opens the security check dialog again
-palette_review = "Integrations: Review security check"
+palette_review = "連携: セキュリティチェックを確認"
 # context: status line when the palette entry finds nothing to review
-none_waiting = "No integration security check is waiting."
+none_waiting = "待機中の連携セキュリティチェックはありません。"
 # context: status line; {name} is the id of an integration
-disconnecting = "Disconnecting {name}..."
+disconnecting = "{name} を切断しています..."
 # context: status line; {name} is the id of an integration
-trusted_origin = "{name}: the new address is trusted."
+trusted_origin = "{name}：新しいアドレスを信頼しました。"
 # context: status line; {name} is the id of an integration
-trusted_account = "{name}: the new account is trusted."
+trusted_account = "{name}：新しいアカウントを信頼しました。"
 # context: status line; {name} is the id of an integration
-trusted_cert = "{name}: the new certificate is trusted."
+trusted_cert = "{name}：新しい証明書を信頼しました。"
 # context: status line; {name} is the id of an integration
-allowed_http = "{name}: plain http is allowed."
+allowed_http = "{name}：平文 http を許可しました。"
 # context: status line; {name} is the id of an integration whose address changed once more after the dialog was shown
-changed_again = "{name} changed again: nothing was trusted. Review it again."
+changed_again = "{name} が再び変更されました：何も信頼していません。もう一度確認してください。"
 # context: status line; {name} is the id of an integration that was removed from the configuration
-no_integration = "{name} is no longer in the configuration."
+no_integration = "{name} はもう設定にありません。"
 # context: hint under the token field of an integration form
-token_retype_hint = "Re-entering the token is recommended."
+token_retype_hint = "トークンの再入力をおすすめします。"
 # context: checkbox of an integration form; pins the key of the server's certificate
-strict_label = "Strict certificate pinning"
+strict_label = "証明書を厳密にピン留め"
 # context: help under the strict pinning checkbox
-strict_help = "Refuse the server when its certificate key changes, even for a certificate a public authority signed."
+strict_help = "公的な認証局が署名した証明書であっても、証明書の鍵が変わったらサーバーを拒否します。"
 # context: checkbox of an integration form shown for an http:// address
-plain_label = "Allow plain http (not encrypted)"
+plain_label = "平文 http を許可（暗号化なし）"
 # context: red warning under the plain http checkbox
-plain_warning = "Warning: the token and everything else travels in clear text and can be read or changed on the way."
+plain_warning = "警告：トークンを含むすべての通信が平文で送られ、途中で読み取りや改ざんをされる可能性があります。"
 # context: error of an integration form whose address was changed without typing the token again
-url_changed_needs_token = "The address changed: enter the token again to connect to the new address."
+url_changed_needs_token = "アドレスが変更されました：新しいアドレスに接続するには、トークンをもう一度入力してください。"
 # context: short label (about six letters) of a line on the connected integration card: the pinned certificate key
-kv_certificate = "Pinned"
+kv_certificate = "ピン留め"
 # context: value on the connected card, above the key fingerprint; {mode} is one of the next two messages
-pinned_value = "certificate ({mode})"
+pinned_value = "証明書（{mode}）"
 # context: pinning mode shown between parentheses after a certificate fingerprint
-mode_strict = "strict"
+mode_strict = "厳密"
 # context: pinning mode shown between parentheses after a certificate fingerprint; the key was accepted at first use
-mode_first_use = "first use"
+mode_first_use = "初回使用"
 # context: label of a line on the connected card: when the token stops working
-kv_expires = "Expires"
+kv_expires = "期限"
 # context: yellow warning on the connected card, followed by a comma separated list of permissions of the token
-excess_line = "This token has more rights than GitPoulpi needs:"
+excess_line = "このトークンは GitPoulpi に必要な範囲を超える権限を持っています："
 # context: yellow advice on the connected card, under the warning about extra rights
-prefer_fine_grained = "Prefer a fine-grained token with an expiry date"
+prefer_fine_grained = "有効期限のあるきめ細かいトークンの使用をおすすめします"
 
 [security_notice]
 # context: title bar chip, in red, when a security notice published by the project names the running version; the chip opens the update panel
-chip = "Security notice: this version is affected"
+chip = "セキュリティ通知：このバージョンが対象"
 # context: shorter form of the same chip, used when the title bar is too narrow for the long one
-chip_short = "Security notice"
+chip_short = "セキュリティ通知"
 # context: heading in the update panel above the security notices that name the running version
-panel_heading = "Security notice: this version is affected"
+panel_heading = "セキュリティ通知：このバージョンが対象"
 # context: severity word of a security notice (lowest level), shown before the summary in the update panel
-sev_low = "Low"
+sev_low = "低"
 # context: severity word of a security notice (second level)
-sev_medium = "Medium"
+sev_medium = "中"
 # context: severity word of a security notice (third level)
-sev_high = "High"
+sev_high = "高"
 # context: severity word of a security notice (highest level)
-sev_critical = "Critical"
+sev_critical = "緊急"
 # context: one security notice in the update panel; {severity} is Low, Medium, High or Critical, {summary} one sentence from the notice
-advisory_line = "{severity}: {summary}"
+advisory_line = "{severity}：{summary}"
 # context: line under a security notice in the update panel; {version} is like 1.4.3
-fixed_in = "Fixed in version {version}."
+fixed_in = "バージョン {version} で修正されました。"
 # context: line under a security notice in the update panel when no fixed version is published yet
-no_fix = "No fixed version is published yet."
+no_fix = "修正バージョンはまだ公開されていません。"
 # context: line under a security notice in the update panel; {url} is a web address
-link_line = "More information: {url}"
+link_line = "詳細：{url}"
 # context: line in the update panel under a security notice when GitPoulpi was installed by a package manager and cannot update itself
-package_manager = "Update with your package manager."
+package_manager = "パッケージマネージャーで更新してください。"
 # context: button in the update panel: opens the web page of the security notice in the browser
-btn_open = "Open notice"
+btn_open = "通知を開く"
 # context: command palette entry: opens the web page of the security notice that names the running version
-palette_open = "Updates: Open Security Notice"
+palette_open = "更新: セキュリティ通知を開く"
 # context: palette and status line: why Open Security Notice does nothing
-why_no_notice = "no security notice with a link names this version"
+why_no_notice = "このバージョンを対象とするリンク付きのセキュリティ通知はありません"
 # context: footer hint of the update panel when a security notice is listed; the letters are the keys of the buttons
-panel_hint = "u update  c copy  t terminal  v revert  n notes  a notice  s skip  r check  Esc close"
+panel_hint = "u 更新  c コピー  t ターミナル  v 戻す  n ノート  a 通知  s スキップ  r 確認  Esc 閉じる"
 
 [ai_privacy]
 # context: title of the dialog shown before an AI request is sent; {via} is the name of the AI profile
-title = "Review what is sent to {via}"
+title = "{via} に送信する内容を確認"
 # context: first line of that dialog
-intro = "This is the request after secrets are replaced and sensitive files are left out. Nothing leaves until you choose Send."
+intro = "シークレットを置き換え、機密ファイルを除外した後のリクエストです。「送信」を選ぶまで何も外部に出ません。"
 # context: heading of the list of secrets replaced in the request
-redactions_heading = { one = "{n} secret replaced", other = "{n} secrets replaced" }
+redactions_heading = { one = "シークレット {n} 件を置き換え", other = "シークレット {n} 件を置き換え" }
 # context: heading of the list of sensitive files left out of the request
-excluded_heading = { one = "{n} sensitive file left out", other = "{n} sensitive files left out" }
+excluded_heading = { one = "機密ファイル {n} 件を除外", other = "機密ファイル {n} 件を除外" }
 # context: line of the dialog when nothing was replaced and nothing was left out
-nothing_removed = "No secret was found and no sensitive file is part of this request."
+nothing_removed = "シークレットは見つからず、このリクエストに機密ファイルは含まれていません。"
 # context: one row of the list of replaced secrets; {rule} is the kind of secret (github-token), {preview} a masked sample that never shows the whole value
-redaction_row = "{rule}: {preview}"
+redaction_row = "{rule}：{preview}"
 # context: checkbox of the dialog; {action} is the name of the AI action (Commit message, Explain changes...)
-dont_show = "Don't show again for {action}"
+dont_show = "{action} では今後表示しない"
 # context: button that sends the AI request
-send = "Send"
+send = "送信"
 # context: button that cancels the AI request
-cancel = "Cancel"
+cancel = "キャンセル"
 # context: key hint at the bottom of the dialog
-hint = "Tab: next control, Space: toggle, Enter: press, Esc: cancel"
+hint = "Tab: 次のコントロール、Space: 切り替え、Enter: 押す、Esc: キャンセル"
 # context: Settings > AI, heading of the privacy rows
-settings_heading = "Privacy"
+settings_heading = "プライバシー"
 # context: Settings > AI, label of a switch
-redact_label = "Redact secrets before sending"
+redact_label = "送信前にシークレットを伏せる"
 # context: help under that switch
-redact_help = "Replaces tokens, private keys and passwords found in a request with a [REDACTED] marker before the request leaves this machine."
+redact_help = "リクエスト内のトークン、秘密鍵、パスワードを、このマシンの外に出る前に [REDACTED] マーカーに置き換えます。"
 # context: red warning shown while that switch is off
-redact_warning = "Off: secrets in your changes are sent to the AI service as they are."
+redact_warning = "オフ：変更内のシークレットがそのまま AI サービスに送信されます。"
 # context: Settings > AI, label of a switch
-exclude_label = "Leave out sensitive files"
+exclude_label = "機密ファイルを除外"
 # context: help under that switch; privacy.sensitive_patterns is a config key and stays as written
-exclude_help = "Never includes the changes of files such as .env, private keys and certificates (see privacy.sensitive_patterns in config.toml)."
+exclude_help = ".env、秘密鍵、証明書などのファイルの変更は一切含めません（config.toml の privacy.sensitive_patterns を参照）。"
 # context: red warning shown while that switch is off
-exclude_warning = "Off: the changes of sensitive files are sent to the AI service when they are part of a request."
+exclude_warning = "オフ：機密ファイルの変更がリクエストに含まれる場合、AI サービスに送信されます。"
 # context: Settings > AI, heading above one switch per AI action
-sent_heading = "Show what is sent before..."
+sent_heading = "送信前に内容を表示..."
 # context: help under the first of those switches
-sent_help = "Each switch shows the request for review before it is sent. The dialog's Don't show again checkbox turns one off; this button turns them all on."
+sent_help = "各スイッチは、送信前にリクエストの確認画面を表示します。ダイアログの「今後表示しない」チェックボックスで 1 つずつオフになり、このボタンですべてオンに戻ります。"
 # context: Settings > AI, button that turns every "show what is sent" switch back on
-show_all_again = "Show all again"
+show_all_again = "すべて再表示"
 # context: status line after that button was pressed
-shown_all = "Every request will be shown before it is sent"
+shown_all = "すべてのリクエストを送信前に表示します"
 
 [stage_guard]
 # context: title of the dialog that lists files the staging guard flagged
-title = "Sensitive files"
+title = "機密ファイル"
 # context: question of that dialog
-question = "These files look sensitive. {$Stage} them anyway?"
+question = "これらのファイルは機密のようです。それでも{$Stage}しますか？"
 # context: one reason in the list; {pattern} is a path pattern such as .env.*
-reason_pattern = "matches {pattern}"
+reason_pattern = "{pattern} に一致"
 # context: one reason in the list; {rule} is the kind of secret found (github-token), {preview} a masked sample that never shows the whole value
-reason_secret = "contains {rule} ({preview})"
+reason_secret = "{rule} を含む（{preview}）"
 # context: first numbered answer of the dialog
-answer_stage = "{$Stage} anyway"
+answer_stage = "それでも{$Stage}"
 # context: second numbered answer of the dialog
-answer_cancel = "Cancel, {$stage} nothing"
+answer_cancel = "キャンセル（何も{$stage}しない）"
 # context: key hint at the bottom of the dialog
-hint = "Up/Down: choose, Enter or 1/2: answer, Esc: cancel"
+hint = "↑/↓: 選択、Enter または 1/2: 回答、Esc: キャンセル"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
-sensitive_stage = "sensitive files were not {$staged}: {files}; ask the user, then {$stage} again allowing sensitive files"
+sensitive_stage = "機密ファイルは{$staged}されませんでした：{files}。ユーザーに確認し、機密ファイルを許可して再度{$stage}してください"

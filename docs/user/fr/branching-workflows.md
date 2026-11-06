@@ -235,6 +235,30 @@ sortie sont dans le résultat. Un hook qui sort avec un code non nul arrête le 
 `after_start`, la branche existe et le flux peut être continué ou abandonné). `--no-hooks` les ignore sans
 demander. Un hook peut tout faire : `undo` ne reprend donc que les changements git.
 
+**Confiance.** Les commandes d'une section `[hooks]` commitée viennent de quiconque peut
+pousser dans le dépôt : elles ont donc aussi besoin de *votre* confiance, une fois par version de la
+liste. La confiance est conservée par dépôt grâce au hash des hooks (le changement d'une commande, d'une
+phase ou de l'ordre redemande) et est vérifiée par le démon avant la première étape d'une exécution et
+avant qu'un flux continué ne reprenne : une exécution refusée n'a donc rien changé. Les hooks de votre
+propre surcharge (`[workflow]` dans l'état de votre dépôt, la page des Paramètres) sont les vôtres et ne
+demandent jamais.
+
+- **CLI :** `gitpoulpi flow trust-hooks` affiche les commandes, leur `hash` et si elles sont
+  `trusted` ; `gitpoulpi flow trust-hooks --hash <hash>` les approuve, et seulement si le fichier sur le
+  disque a encore ce hash. `--run-hooks` sur des hooks non approuvés affiche un refus (`{"refused":
+  {"reason": "hooks_not_trusted", ...}}`, code de sortie 2) avec les commandes et cette ligne de commande.
+  Un terminal à qui l'on demande « Les exécuter aussi ? » se voit demander s'il faut aussi les approuver.
+- **TUI :** l'aperçu liste les hooks et dit qu'ils ne sont pas encore approuvés. Appuyer ensuite sur le
+  bouton de l'action demande « Le workflow de ce dépôt lance ces commandes sur votre machine. Les
+  approuver ? » avec les commandes exactes dans un volet défilant (molette, barre de défilement
+  déplaçable, PgUp/PgDn/Home/End) et deux réponses : **1 Approuver et lancer** et **2 Lancer sans les
+  hooks**. Rien n'est mis en évidence tant que vous n'appuyez pas sur une flèche ou un chiffre ; `Esc`,
+  Annuler ou la croix de fermeture reviennent en arrière sans répondre. Quand le fichier a changé depuis
+  votre approbation, le titre dit « Les hooks ont changé depuis votre approbation » et l'ancienne liste
+  s'affiche sous la nouvelle.
+- **Agents :** il n'existe pas d'outil pour approuver des hooks. `run_hooks: true` sur des hooks non
+  approuvés est refusé avec les commandes, et une personne lance `flow trust-hooks`.
+
 ### Pour les agents (MCP)
 
 Les outils sont `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` et `flow_set_parent` (finish, sync et
@@ -242,7 +266,9 @@ promote sont annotés destructifs, donc `allow_mutations` les contrôle). Ils fo
 exécuter : appelez avec `dry_run: true` pour obtenir le plan (un résultat normal), puis de nouveau avec
 `yes: true` pour l'exécuter. Sans l'un ni l'autre, l'appel est refusé et porte le plan, donc rien ne s'exécute
 par accident. Les hooks ne s'exécutent qu'avec un `run_hooks: true` explicite ; le plan les liste (`hooks`,
-`hooks_run`) pour que l'agent puisse montrer d'abord les commandes à l'utilisateur. Après un conflit,
+`hooks_run`) pour que l'agent puisse montrer d'abord les commandes à l'utilisateur. Les hooks commités
+doivent être approuvés par une personne (`flow trust-hooks`, qui n'a pas d'outil) : `run_hooks: true` sur des
+hooks non approuvés renvoie `refused` avec les commandes et n'exécute rien. Après un conflit,
 `continue_: true` (l'option est `--continue`) ou `abort: true`.
 
 ### Annulation

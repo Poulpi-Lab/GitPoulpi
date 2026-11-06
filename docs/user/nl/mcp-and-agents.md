@@ -64,10 +64,60 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-Stateless JSON, dezelfde tools, dezelfde `[mcp]`-afschermingen. Er is **geen authenticatie**, dus
-hij luistert alleen op loopback; `--allow-remote` heft dat op, en dan kan iedereen die de
-poort bereikt elke tool uitvoeren die je configuratie toestaat. Gebruik het alleen achter een
-vertrouwd netwerk of een authenticerende proxy.
+Stateless JSON, dezelfde tools, dezelfde `[mcp]`-afschermingen. Elk verzoek heeft het bearer-token
+nodig (`[mcp] http_auth`, standaard aan): druk het af met `gitpoulpi mcp token
+--show` (of `--copy`, `--rotate`; het token staat in een bestand dat alleen jij kunt lezen in de
+privégegevensmap) en geef het als header aan de client:
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+Een ontbrekend of onjuist token krijgt `401` met `WWW-Authenticate: Bearer`. Een vernieuwd
+token geldt meteen, zonder herstart van de server. `http_auth` uitzetten is bedoeld voor een
+loopback-eindpunt waar je elk lokaal account vertrouwt; de server waarschuwt dan op
+stderr.
+
+### Het eindpunt vanaf een andere machine bereiken
+
+De veiligste opzet heeft helemaal geen remote listener nodig: houd het loopbackadres en
+stuur de poort via SSH door vanaf de machine waarop de agent draait, `ssh -L
+8808:127.0.0.1:8808 host`. Dan komt `--allow-remote` er niet aan te pas.
+
+`--allow-remote` (een adres dat geen loopback is) wordt geweigerd tenzij authenticatie aan staat
+met een token op zijn plaats **en** het verkeer is versleuteld. De weigering noemt wat
+ontbreekt. Er zijn twee manieren om versleuteld te zijn:
+
+- **TLS in de server** (`[mcp] tls = "self_signed"` of `"files"`). De server
+  beëindigt TLS zelf: hij heeft de sleutel, doet de handshake, en alleen een voltooide
+  handshake bereikt de HTTP-laag; een client met gewone HTTP mislukt in de handshake en er bestaat
+  geen gewone listener ernaast. De versleuteling is dus een feit dat de server bij elke
+  verbinding vaststelt, geen aanname. Met `self_signed` maakt de
+  eerste start een paar onder de privégegevensmap en drukt de SHA-256-vingerafdruk af
+  (ook in de Instellingen); een client vertrouwt de server door die vingerafdruk of het
+  certificaatbestand te pinnen. Met `files` stel je `tls_cert` en
+  `tls_key` in op je PEM-bestanden en clients verifiëren het certificaat via zijn CA.
+  Clients authenticeren met het bearer-token; clientcertificaten worden niet gebruikt.
+- **Een tunnel of reverse proxy** (`[mcp] behind_proxy = true`). Een tunnelagent of
+  proxy verbindt zoals elke lokale of LAN-client en zijn headers kunnen worden vervalst, dus
+  de server kan van binnenuit niet zien of er een is. Daarom is het een
+  expliciete bevestiging (met een rode waarschuwing in de Instellingen) in plaats van een
+  detectie. Laat de tunnel op dezelfde machine draaien en houd het loopbackadres als je
+  kunt. Bij een adres dat geen loopback is achter een proxy, is de schakel tussen de proxy
+  en de server platte tekst op dat netwerk.
 
 **Zonder MCP** gebruikt een agent met een shell de CLI: `gitpoulpi --json <opdracht>` (zie de
 [CLI-naslag](cli-reference.md)). Geef hem de kant-en-klare skill
@@ -79,12 +129,16 @@ GitPoulpi in plaats van kale `git` gebruikt.
 | Schakelaar | Standaard | Effect |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` weigeren te starten (Instellingen > Agents & MCP > *MCP-server*). Gelezen bij het starten van de server: een draaiende server houdt zijn instellingen. |
-| `[mcp] bind` | `"127.0.0.1:8808"` | Adres dat `--http` gebruikt als er geen is opgegeven (alleen loopback tenzij `--allow-remote`). Instellingen > Agents & MCP > *Poort van MCP-server* wijzigt de poort en behoudt de host. |
+| `[mcp] bind` | `"127.0.0.1:8808"` | Adres dat `--http` gebruikt als er geen is opgegeven (alleen loopback tenzij `--allow-remote`, dat authenticatie en versleuteling vereist, zie hierboven). Instellingen > Agents & MCP > *Poort van MCP-server* wijzigt de poort en behoudt de host. |
+| `[mcp] http_auth` | `true` | `--http` heeft `Authorization: Bearer <token>` nodig (`gitpoulpi mcp token`). Instellingen > Agents & MCP > *HTTP-authenticatie*. |
+| `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` of `files` (je PEM-paden): de server beëindigt TLS zelf. Instellingen > Agents & MCP > *TLS*. |
+| `[mcp] behind_proxy` | `false` | Je staat ervoor in dat een tunnel of reverse proxy het verkeer versleutelt, waardoor `--allow-remote` zonder TLS kan draaien. |
 | `[mcp] allow_mutations` | `false` | Uit: elke tool die iets wijzigt wordt geweigerd; lezen, `ui_*` en voorstellen werken nog. `true` laat de agent committen, pushen, resetten... |
 | `[mcp] mutation_allowlist` | `[]` | Niet leeg: alleen deze tools mogen iets wijzigen, bijv. `["stage", "unstage", "commit"]`. |
 | `[mcp] allow_ui` | `true` | `false`: de agent kan je venster niet verplaatsen (`ui_state` / `ui_viewers` antwoorden nog). |
 | `[mcp] ui_control` | `"ask"` | `ask`: een chip in je venster die je bevestigt; `auto`: toegepast tenzij je bezig bent; `off`: geweigerd. Per agent: `--ui-control`. |
 | `[mcp] allow_ui_propose` | `false` | Laat de agent vooraf ingevulde dialoogvensters openen die jij bevestigt (Instellingen > Agents & MCP > *AI-agents wijzigingen laten voorstellen die ik bevestig*). |
+| `[mcp] allow_sensitive_staging` | `false` | Alleen in `config.toml`. Uit biedt de tool `stage` `allow_sensitive` niet aan, en een stage die een gevoelig bestand zou toevoegen (een privésleutel, een `.env`, een herkend token) wordt geweigerd met `{error: "sensitive_files", files}`: de agent moet het jou vragen. `true` laat hem `allow_sensitive` meegeven. Zie [Stagen en committen](staging-and-committing.md#gevoelige-bestanden). |
 | `[mcp] allow_history_purge` | `false` | Alleen in `config.toml`. `true` maakt de tool `rewrite_purge` zichtbaar, die de oude geschiedenis van een herschrijving (en het ongedaan maken ervan) voorgoed verwijdert. Uit: de agent ziet hem niet. Hij heeft nog steeds `allow_mutations` nodig. |
 | `[ui] allow_agent_view_control` | `true` | De hoofdschakelaar van je venster (Instellingen > Agents & MCP > *AI-agents de weergave laten besturen*). Uit: geen enkele agent bereikt je venster. |
 | `[ui] launch` | `"off"` | Of een agent een GitPoulpi-venster mag openen als er geen open is (zie [hieronder](#wanneer-er-geen-venster-open-is-of-het-in-een-andere-sessie-staat)). |
@@ -149,6 +203,7 @@ mutation_allowlist = []        # bijv. ["stage", "unstage", "commit", "branch_cr
 allow_ui = true
 ui_control = "ask"             # "auto" laat de agent je weergave verplaatsen zonder te vragen
 allow_ui_propose = false       # true: de agent mag dialogen voor Reword / Split / commit / branch / tag vooraf invullen
+allow_sensitive_staging = false  # true: de agent mag bestanden stagen die de stagebewaker markeert
 allow_history_purge = false    # true: de agent ziet rewrite_purge (verwijdert oude geschiedenis voorgoed)
 ```
 

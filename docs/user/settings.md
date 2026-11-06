@@ -382,7 +382,7 @@ the server; see [MCP and agents](mcp-and-agents.md).
 | **Open a window for agents**, **Launch command (custom)** | Whether an agent may open a GitPoulpi window when none is open, and with which terminal or multiplexer. Off by default. |
 | **HTTP authentication** | On (default): the MCP HTTP endpoint answers only a request carrying the access token. Off shows a red warning: any program that can reach the endpoint can run every tool the MCP settings allow, and `--allow-remote` is refused. Saved as `mcp.http_auth`. |
 | **Access token** | The token, masked. The masked value is a button: `Enter` (or a click) shows it in full on the row below and hides it again. **Copy** puts it on the clipboard without echoing it in the status line, **Rotate** replaces it after a confirmation (clients holding the old token are refused at once, no server restart needed), **Create** makes the first one. `Left` / `Right` move between the buttons and `Enter` presses one. The same token is `gitpoulpi mcp token`. |
-| **TLS** | **Off** (default), **Self-signed** (the server makes a certificate once and shows its fingerprint) or **Files** (your certificate and key). The server ends TLS itself. Saved as `mcp.tls`; applies the next time the server starts. |
+| **TLS** | **Off** (default), **Self-signed** (the server creates a certificate once and shows its fingerprint) or **Files** (your certificate and key). The server ends TLS itself. Saved as `mcp.tls`; applies the next time the server starts. |
 | **Certificate path**, **Key path** | The PEM files used with **Files** (`mcp.tls_cert`, `mcp.tls_key`). |
 | **Certificate fingerprint** | Read-only: the SHA-256 fingerprint of the certificate the endpoint serves, for clients to check. |
 | **Behind a tunnel or reverse proxy** | Your statement that a tunnel or proxy in front of the endpoint encrypts the traffic, which lets `--allow-remote` run without TLS. The server cannot check it, so it shows a red warning while on. Saved as `mcp.behind_proxy`. See [MCP and agents](mcp-and-agents.md#reaching-the-endpoint-from-another-machine). |
@@ -559,8 +559,8 @@ settings (`gitpoulpi ui show settings sparse-checkout`).
 | **State** | Whether this working tree is a sparse checkout. |
 | **Directories to keep** | One directory per line, relative to the repository root. `Enter` (or a click) opens a multi-line editor: `Ctrl+S` keeps the text, `Esc` drops it. While sparse checkout is on, the field shows the current directories. Git's cone mode only knows directories (no patterns, no single files), the files at the root are always checked out, and an empty list is refused. |
 | **Start sparse checkout** | Checks out only the listed directories. Once sparse checkout is on, the same button reads **Apply directory list** and applies the edited list: a directory that left the list is removed from your working directory. Greyed out while the list is empty. |
-| **Stop sparse checkout** | Back to a full checkout: every file comes back (after a confirmation). Greyed out while sparse checkout is off. |
-| **Refresh sparse checkout** | Applies the current list again (for example after a script or another tool checked out files outside it). It sends the current directories, not the unsent text of the field. Greyed out while sparse checkout is off. |
+| **Stop sparse checkout** | Back to a full checkout: every file comes back (after a confirmation). Grayed out while sparse checkout is off. |
+| **Refresh sparse checkout** | Applies the current list again (for example after a script or another tool checked out files outside it). It sends the current directories, not the unsent text of the field. Grayed out while sparse checkout is off. |
 
 The buttons run as ordinary background actions (the page shows "applying the sparse checkout..." while one runs). Like
 the dialog, they are not on the Undo stack: nothing is lost, and **Disable** brings every file back.

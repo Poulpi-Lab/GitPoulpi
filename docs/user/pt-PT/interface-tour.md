@@ -28,7 +28,7 @@ A margem superior da janela lê-se
   Cada crate da lista tem uma ligação para a sua página (o repositório ou, na falta dele, a página no crates.io): clique na linha, ou escolha-a com `↑` `↓` e prima `Enter`, para a abrir no navegador. `t` (ou o comando da paleta `Ajuda: licenças e créditos`) mostra os avisos de licença e os créditos de tudo o que o programa traz incorporado, num texto deslizante (`Up` / `Down`, `PgUp` / `PgDn`, `Home` / `End`; `Esc` ou `t` para voltar). Num script, `gitpoulpi licenses` imprime o mesmo texto.
 - A **versão** (`v1.0.0`, ou `vX.Y.Z disponível` quando existe uma versão mais recente)
   fica entre o nome e o caminho: um clique abre o separador **Notas de versão**, ver
-  [Atualizações](installation.md#atualizações).
+  [Atualizações](updates.md).
 - **Abrir em ▾**, logo a seguir ao caminho, abre a pasta do separador num terminal,
   num editor, num multiplexador ou no gestor de ficheiros (`Alt+O`). Consulte
   [Abrir em](open-in.md).

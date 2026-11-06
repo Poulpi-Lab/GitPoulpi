@@ -369,6 +369,15 @@ nazwy gałęzi i tagów oraz autorzy najnowszych commitów (pole wyboru, domyśl
 widoczne w panelu „co zostanie wysłane”). Profil i instrukcje to te z pozycji *Reguły
 przepisania historii* w Ustawieniach > AI.
 
+## Dokąd trafia klucz
+
+Klucz API (OpenAI, Anthropic, OpenRouter, serwer zgodny z OpenAI) jest związany z adresem, dla którego go zapisano: z originem base URL profilu, zapisanym w `trust.toml` w prywatnym folderze danych dostępnym tylko dla użytkownika. Jeśli base URL później wskazuje gdzie indziej, żądanie jest odrzucane, zanim cokolwiek zostanie wysłane, a klucz zostaje tam, gdzie jest. Uruchom `gitpoulpi ai trust <profile> --accept-origin <url>` (albo zaakceptuj to w aplikacji), by celowo przenieść klucz na nowy adres.
+
+- Zwykłe `http://` jest dozwolone na tym komputerze (Ollama, LM Studio na `localhost`); gdziekolwiek indziej wymaga `gitpoulpi ai trust <profile> --allow-insecure-http on`.
+- Serwer na własnym hostingu, którego certyfikat nie łączy się ze znanym urzędem, jest akceptowany tylko dla odcisku klucza, który przypniesz przez `--accept-certificate <sha256>`; uzgadnianie TLS nadal dowodzi, że serwer ma ten klucz.
+- Profil, który miał klucz, zanim ta kontrola istniała, jest zapisywany po cichu, z jego bieżącego base URL, przy pierwszym użyciu.
+- Lokalny agent (`claude -p` i podobne) nie ma klucza ani HTTP, więc nie ma czego wiązać.
+
 ## Kontekst przeglądu
 
 Szkic przeglądu kodu (`✦` lub `hosting review suggest`) czyta diff żądania, tytuł, opis i istniejące
@@ -454,6 +463,50 @@ efektywny kontekst jako `review_context`. Te same cztery ustawienia to `ai.revie
 - Klucze API są używane przez sam proces `gitpoulpi` i nigdy nie docierają do
   demona, innych klientów okna ani klienta MCP.
 - Wygenerowany tekst nigdy nie jest sam zatwierdzany, wypychany ani stosowany.
+
+### Co jest usuwane z żądania
+
+Każde żądanie, niezależnie od tego, która akcja je wysyła i który dostawca je odbiera
+(hostowane API lub lokalny agent), przechodzi najpierw przez ten sam krok czyszczenia:
+
+- **Sekrety są zastępowane** (`[ai.privacy] redact_secrets`, domyślnie włączone). Token
+  ze znanym prefiksem, blok klucza prywatnego, JWT, hasło w URL i wiersz
+  `password = value`, którego wartość wygląda na losową, są zastępowane przez
+  `[REDACTED:<rule>]`. To nie jest wyczerpujące: znajduje typowe kształty (ten sam
+  skaner co `rewrite scan-secrets`).
+- **Wrażliwe pliki są pomijane** (`[ai.privacy] exclude_sensitive_files`, domyślnie
+  włączone). Diff pliku pasującego do `[privacy] sensitive_patterns` (`.env`
+  i `.env.*` z wyjątkiem plików z końcówką `.example`, `.sample` i `.template`, `*.pem`,
+  `*.key`, prywatne klucze SSH, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`,
+  `*.cer`, `*.der`, `*.kdbx`) nie jest częścią żądania. Kawałek podziału lub lista plików
+  kompozytora, która wymienia taki plik, jest ucinana tak samo, więc plan dla niej
+  może zostać odrzucony jako niepełny: dodaj do stage lub podziel ten plik sam.
+
+Wyłączenie któregokolwiek jest twoim wyborem, a Ustawienia > AI pokazują pod nim czerwony wiersz,
+dopóki jest wyłączone.
+
+**Co jest wysyłane, zanim zostanie wysłane.** Zanim żądanie wyjdzie, TUI pokazuje
+okno **Co zostanie wysłane**: instrukcje i żądanie po oczyszczeniu (ten sam
+panel co w oknach przepisywania historii, przewijany, `Alt+W` go pokazuje lub ukrywa), ile
+sekretów zastąpiono i które pliki pominięto (reguła i zamaskowany
+podgląd, taki jak `ghp_****abcd`, nigdy wartość), pole **Nie pokazuj ponownie dla
+<action>** oraz **Wyślij** / **Anuluj** (`Esc`, krzyżyk zamknięcia i kliknięcie
+poza oknem anulują; nic nie wychodzi, dopóki nie wybierzesz Wyślij). Pole zapisuje
+`[ai.sent_preview] <action> = false`; Ustawienia > AI > *Pokazuj, co zostanie wysłane,
+przed...* mają jeden przełącznik na akcję i **Pokaż wszystko ponownie**. Dwa okna
+przepisywania historii już pokazują swoje żądanie, więc nie mają przełącznika.
+
+**W wierszu poleceń** każda odpowiedź `ai ...` (i `hosting review suggest`)
+niesie `privacy: {redactions: N, excluded_files: [...]}`, a `--print-sent`
+wypisuje oczyszczony tekst systemowy i użytkownika jako `{sent: [{system, user}], privacy,
+dry_run: true}`, bez wywoływania modelu (wymaga `ai.enabled = true`, ale nie klucza
+ani sieci).
+
+**Ograniczenie.** Lokalny agent, którego folderem roboczym jest repozytorium
+(`workdir = repository` albo *Uruchamiaj agenta w repozytorium* dla przeglądu), może
+sam czytać pliki: czyszczenie obejmuje to, co GitPoulpi mu wysyła, a nie to,
+co otwiera sam. Użyj folderu roboczego `dedicated`, by trzymać go poza
+repozytorium.
 
 ## Rozwiązywanie problemów
 

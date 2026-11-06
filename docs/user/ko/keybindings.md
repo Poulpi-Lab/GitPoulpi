@@ -116,7 +116,7 @@ stage_file = "z"
 | `nav_prefix` | `activity_log` | 활동 로그 열기 | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | 전체 활동 로그 열기 | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | 백그라운드 작업 표시 | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | 업데이트 패널 보기 | `Ctrl+N u` |
 | `nav_prefix` | `help` | 도움말 전환 | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | 탭 선택 | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | 테마 변경 | `Ctrl+N y` |
@@ -829,10 +829,10 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 보기: 활동 로그 | `Ctrl+N A` |
 | 보기: 전체 활동 로그 | `Ctrl+N G` |
 | 도움말: 릴리스 노트 |  |
-| Updates: Show Update | `Ctrl+N u` |
-| Updates: Open Security Notice |  |
-| Updates: Copy Update Command |  |
-| Updates: Run Update Command in a Terminal |  |
+| 업데이트: 업데이트 패널 보기 | `Ctrl+N u` |
+| 업데이트: 보안 공지 열기 |  |
+| 업데이트: 업데이트 명령 복사 |  |
+| 업데이트: 터미널에서 업데이트 명령 실행 |  |
 | 업데이트: 지금 업데이트 확인 |  |
 | 업데이트: 다운로드 |  |
 | 업데이트: 지금 업데이트 |  |
@@ -1142,7 +1142,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 연동: 이 저장소의 프로필 관리 |  |
 | 연동: 연동 연결... |  |
 | 설정: 프로필의 Radar 옵션... |  |
-| Integrations: Review security check |  |
+| 연동: 보안 확인 검토 |  |
 | 앱: 종료 | `q` |
 | 앱: 테마... |  |
 | 앱: 테마 변경... | `Ctrl+N y` |

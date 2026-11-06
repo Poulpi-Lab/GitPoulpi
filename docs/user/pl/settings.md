@@ -252,8 +252,11 @@ Na tej stronie, w grupie **Aktualizacje**:
 
 | Opcja | Działanie |
 |---|---|
-| **Sprawdzanie aktualizacji** | Lista rozwijana (`updates.mode`): **Powiadamiaj** (domyślnie) raz dziennie sprawdza w tle i pokazuje `vX.Y.Z dostępna` na pasku tytułu; **Automatycznie** dodatkowo pobiera aktualizację w tle, gdy GitPoulpi zainstalowano z archiwum wydania (moment ponownego uruchomienia nadal wybierasz ty); **Wył.** nigdy nie wysyła zapytań. Działa od razu. Zob. [Aktualizacje](installation.md#aktualizacje). |
+| **Sprawdzanie aktualizacji** | Lista rozwijana (`updates.mode`): **Powiadamiaj** (domyślnie) raz dziennie sprawdza w tle i pokazuje `vX.Y.Z dostępna` na pasku tytułu; **Automatycznie** dodatkowo pobiera aktualizację w tle, gdy GitPoulpi zainstalowano z archiwum wydania (moment ponownego uruchomienia nadal wybierasz ty); **Wył.** nigdy nie wysyła zapytań. Działa od razu. Zob. [Aktualizacje](updates.md). |
 | **Kanał aktualizacji** | Lista rozwijana (`updates.channel`): **Stabilny** (domyślnie) albo **Wstępny** (także wersje kandydujące). Działa od razu. |
+| **Sposób instalacji** | Tylko do odczytu. Jak GitPoulpi trafił na ten komputer (archiwum wydania, instalator dla tego użytkownika lub wszystkich, Chocolatey, winget, Scoop, Homebrew, apt, pakiet MSI, AUR, obraz Docker, cargo albo kompilacja deweloperska). Od tego zależy, jak stosowane są aktualizacje, zob. [Aktualizacje](updates.md). |
+
+Wiersz ustawiony przez administratora w polityce aktualizacji obowiązującej na całym komputerze pokazuje **Ustawione przez administratora** i nie można go tu zmienić.
 
 Na tej stronie, w grupie **Przepisywanie historii**, limity czasu skryptów zewnętrznych (zob. [Przepisywanie historii](history-rewrite.md)):
 
@@ -345,10 +348,21 @@ zawiera też wartości domyślne [kontekstu przeglądu](ai.md#kontekst-przegląd
 link; puste nie dodaje nic, z przyciskiem **Przeglądaj...** pod spodem, który otwiera wybór pliku; `Enter` na przycisku to jego forma klawiaturowa). Ta strona ma własny
 przewodnik: [Wsparcie AI](ai.md).
 
+Pod blokami poszczególnych akcji jest grupa **Prywatność**:
+
+| Opcja | Działanie |
+|---|---|
+| **Zastępuj sekrety przed wysłaniem** | Włączone (domyślnie): tokeny, klucze prywatne i hasła znalezione w żądaniu są zastępowane przez `[REDACTED:<rule>]`, zanim żądanie wyjdzie. Wyłączone: czerwony wiersz mówi, że sekrety są wysyłane bez zmian. |
+| **Pomijaj wrażliwe pliki** | Włączone (domyślnie): zmiany plików `.env`, kluczy prywatnych i certyfikatów (`[privacy] sensitive_patterns`) nigdy nie są częścią żądania. Wyłączone: czerwony wiersz mówi, że są wysyłane, gdy są częścią żądania. |
+| **Pokazuj, co zostanie wysłane, przed...** | Jeden przełącznik na akcję (opis commita, wyjaśnienie, opis stasha, opis pull requesta, kompozytor commitów, rozwiązanie konfliktu, przegląd kodu, podział commita): pokazuje żądanie w oknie **Co zostanie wysłane**, zanim wyjdzie. Pole *Nie pokazuj ponownie* w oknie wyłącza jeden z nich. Akcje przepisywania historii pokazują własne okno. |
+| **Pokaż wszystko ponownie** | Pojawia się, gdy któryś przełącznik jest wyłączony; włącza każdy z powrotem. |
+
+Zob. [AI > Prywatność](ai.md#prywatność).
+
 ### Agenci i MCP
 
-Co agenci AI mogą robić w tym oknie i czy serwer MCP może działać. Dwa wiersze
-MCP są widoczne tylko w kompilacjach zawierających serwer; zob.
+Co agenci AI mogą robić w tym oknie, czy serwer MCP może działać i jak chroniony jest jego
+punkt końcowy HTTP. Wiersze MCP są widoczne tylko w kompilacjach zawierających serwer; zob.
 [MCP i agenci](mcp-and-agents.md).
 
 | Opcja | Działanie |
@@ -358,6 +372,12 @@ MCP są widoczne tylko w kompilacjach zawierających serwer; zob.
 | **Pozwól agentom AI sterować widokiem** | Pozwala agentom pokazać w tym oknie commit, plik lub powiadomienie (`ui show`). Wyłączone: żaden agent nie sięga do okna. |
 | **Pozwól agentom AI proponować zmiany do mojego potwierdzenia** | Pozwala agentom otwierać wstępnie wypełnione okna Reword, commit, gałęzi lub tagu, które potwierdzasz. Domyślnie wyłączone. Zob. [MCP i agenci](mcp-and-agents.md#uprawnienia). |
 | **Otwórz okno dla agentów**, **Polecenie uruchomienia (custom)** | Czy agent może otworzyć okno GitPoulpi, gdy żadne nie jest otwarte, i w jakim terminalu lub multiplekserze. Domyślnie wyłączone. |
+| **Uwierzytelnianie HTTP** | Włączone (domyślnie): punkt końcowy MCP HTTP odpowiada tylko na żądanie z tokenem dostępu. Wyłączone pokazuje czerwone ostrzeżenie: każdy program, który ma dostęp do punktu końcowego, może uruchomić każde narzędzie dozwolone w ustawieniach MCP, a `--allow-remote` jest odrzucane. Zapisywane jako `mcp.http_auth`. |
+| **Token dostępu** | Token, zamaskowany. Zamaskowana wartość jest przyciskiem: `Enter` (lub kliknięcie) pokazuje ją w całości w wierszu poniżej i ukrywa ponownie. **Kopiuj** kładzie ją w schowku bez echa w wierszu stanu, **Wymień** zastępuje ją po potwierdzeniu (klienci z poprzednim tokenem są odrzucani od razu, bez restartu serwera), **Utwórz** tworzy pierwszy. `Left` / `Right` przechodzą między przyciskami, a `Enter` naciska jeden. Ten sam token pokazuje `gitpoulpi mcp token`. |
+| **TLS** | **Wył.** (domyślnie), **Samopodpisany** (serwer raz tworzy certyfikat i pokazuje jego odcisk) lub **Pliki** (twój certyfikat i klucz). Serwer sam kończy TLS. Zapisywane jako `mcp.tls`; działa od następnego uruchomienia serwera. |
+| **Ścieżka certyfikatu**, **Ścieżka klucza** | Pliki PEM używane z **Pliki** (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Odcisk certyfikatu** | Tylko do odczytu: odcisk SHA-256 certyfikatu, który udostępnia punkt końcowy, do sprawdzenia przez klientów. |
+| **Za tunelem lub zwrotnym proxy** | Twoje oświadczenie, że tunel lub proxy przed punktem końcowym szyfruje ruch, co pozwala `--allow-remote` działać bez TLS. Serwer nie może tego sprawdzić, więc pokazuje czerwone ostrzeżenie, gdy jest włączone. Zapisywane jako `mcp.behind_proxy`. Zob. [MCP i agenci](mcp-and-agents.md#dostęp-do-punktu-końcowego-z-innego-komputera). |
 
 ### Wygląd
 

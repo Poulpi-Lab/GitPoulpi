@@ -348,6 +348,18 @@ review_mode = "ask"       # ask | clone | api
 Svaren cachas per profil i `radar-account.json` bredvid
 `config.toml` i fem minuter; filen är en cache och kan tas bort utan risk.
 
+### Förtroendearkivet (finns inte i `config.toml`)
+
+Vad varje integration och AI-profil med API-nyckel betroddes för (dess adress,
+konto-id, en fäst certifikatsnyckel, om vanlig http tilläts) ligger i
+`trust.toml` i den privata datamappen som bara användaren kan läsa (`<data>/private/trust.toml`:
+`%APPDATA%\GitPoulpi\private\` i Windows, `~/.local/share/gitpoulpi/private/`
+i Linux). Den är med flit inte en del av `config.toml`: den som kan redigera
+konfigurationen får inte kunna vidga förtroendet genom att redigera den. Ändra den med
+`gitpoulpi hosting integrations trust` och `gitpoulpi ai trust` (se
+[säkerhetskontrollen](hosting-integration.md#säkerhetskontrollen)); filen skrivs
+om av GitPoulpi, inte för hand.
+
 ## `[mcp]` (vad AI-agenter får göra)
 
 | Nyckel | Standard | Värden och effekt |
@@ -360,6 +372,12 @@ Svaren cachas per profil i `radar-account.json` bredvid
 | `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve` och `gitpoulpi-mcp` vägrar starta, med ett meddelande som namnger den här nyckeln. Inställningar > Agenter & MCP > *MCP-server*. Läses när en agent startar servern. |
 | `mcp.bind` | `"127.0.0.1:8808"` | Adressen `--http` lyssnar på när du inte anger någon (`--http ADDR` / `--bind` vinner). Bara loopback om inte `--allow-remote`. Tomt eller det gamla `"stdio"` betyder standardadressen. Inställningar > Agenter & MCP > *MCP-serverns port* ändrar porten och behåller värden. |
 | `mcp.allow_history_purge` | `false` | Bara i `config.toml` (ingen rad i Inställningar). `true` listar verktyget `rewrite_purge` för agenter (det kräver fortfarande `allow_mutations`). Av ser en agent inte verktyget alls: en rensning raderar den gamla historiken från en historikomskrivning, ångra-posten för den och dess reflogs för gott. CLI:t och TUI:t styrs inte av den. |
+| `mcp.http_auth` | `true` | `--http` svarar bara på en begäran med `Authorization: Bearer <token>` (token från `gitpoulpi mcp token`). `false` tar bort kontrollen; servern varnar då på stderr, och `--allow-remote` nekas. Inställningar > Agenter & MCP > *HTTP-autentisering*. |
+| `mcp.tls` | `"off"` | `off`, `self_signed` (ett certifikat som skapas en gång under den privata datamappen, med sitt SHA-256-fingeravtryck utskrivet vid start) eller `files` (`tls_cert` och `tls_key`). Med TLS på avslutar servern TLS själv och ingen vanlig lyssnare finns. Inställningar > Agenter & MCP > *TLS*. |
+| `mcp.tls_cert` | `""` | PEM-certifikatkedja som används med `tls = "files"`. |
+| `mcp.tls_key` | `""` | Privat PEM-nyckel som används med `tls = "files"`. |
+| `mcp.behind_proxy` | `false` | Du uppger att en tunnel eller omvänd proxy framför endpointen står för krypteringen. Det kan inte kontrolleras inifrån servern, så `--allow-remote` utan TLS kräver att det är satt. Sträckan mellan proxyn och servern är klartext i det nätverket. Inställningar > Agenter & MCP > *Bakom en tunnel eller omvänd proxy*. |
+| `mcp.allow_sensitive_staging` | `false` | Bara i `config.toml`. Av: MCP:s stage-verktyg erbjuder inte `allow_sensitive`, och en stage som skulle lägga till en flaggad fil (se `[privacy]`) nekas med ett meddelande som säger åt agenten att fråga dig. På: en agent får skicka `allow_sensitive`. CLI:t och TUI:t styrs inte av den: de frågar dig. |
 
 `allow_mutations`, `mutation_allowlist` och `allow_ui` styr bara MCP-servern; CLI:t är
 ditt eget skal och styrs inte av dem. Se [MCP och
@@ -378,6 +396,9 @@ agenter](mcp-and-agents.md#behörigheter).
 | `ai.review.include_claude_md` | `true` | Ge ett kodgranskningsutkast repositoryts `CLAUDE.md` (roten, läst på den gren begäran riktar sig mot; kapas vid 8 KB). |
 | `ai.review.include_agents_md` | `true` | Detsamma för `AGENTS.md`. |
 | `ai.review.extra_file` | `""` | En fil till för ett kodgranskningsutkast: en sökväg relativt repositoryts rot, en absolut sökväg eller en länk till en fil hos en kodvärd (läst via den matchande integrationsprofilen, annars anonymt). Alla filerna tillsammans kapas vid 16 KB. |
+| `ai.privacy.redact_secrets` | `true` | Ersätt varje hemlighet som skannern känner igen i en begäran (en token, ett block med en privat nyckel, ett lösenord i en URL, ett `password = ...`-värde som ser slumpmässigt ut) med `[REDACTED:<rule>]` innan den lämnar datorn. Inställningar > AI visar en röd varning medan den är av. |
+| `ai.privacy.exclude_sensitive_files` | `true` | Utelämna diffen för varje fil som matchar `privacy.sensitive_patterns` från det som skickas. En lokal agent som arbetar i repositoryts mapp kan fortfarande läsa filer själv: se [AI > Integritet](ai.md#integritet). |
+| `ai.sent_preview.<action>` | `true` | En nyckel per åtgärd (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`): visa ”Det som skickas” innan begäran går iväg. Dialogens ”Visa inte igen för ...” skriver `false`; Inställningar > AI > *Visa vad som skickas före...* slår på dem igen. |
 
 Ett repositorys egen tabell `[preferences.ai_review]` (i dess `repo-state.toml`, eller posten för ett repository som inte är
 klonat i `remote-reviews.toml`) tar samma nycklar, alla valfria, plus `no_extra_file = true`: ingen extra fil för
@@ -471,13 +492,22 @@ Det som `gitpoulpi rewrite` och omskrivningsvyn skyddar. Detaljer: [Skriva om hi
 
 ## `[updates]` (söka efter en nyare release)
 
-Vad versionschipet i titelraden gör med nyare releaser. Detaljer: [Uppdateringar](installation.md#uppdateringar).
+Vad versionschipet i titelraden gör med nyare releaser. Detaljer: [Uppdateringar](updates.md).
 
 | Nyckel | Standard | Värden och effekt |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"` frågar GitHub en gång per dygn, i bakgrunden, om det finns en nyare release och gör versionschipet till `vX.Y.Z tillgänglig`. `"auto"` laddar också ned och förbereder uppdateringen själv när det här bygget kom från ett releasearkiv (det frågar fortfarande innan det startar om); för alla andra bygge beter det sig som `"notify"`. `"off"` gör aldrig någon förfrågan. Gäller direkt. |
 | `updates.channel` | `"stable"` | `"stable"` beaktar bara fullständiga releaser; `"prerelease"` erbjuder också release candidates (`-rc.1`). Gäller direkt. |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | `ägare/namn` på github.com vars releaser kontrolleras. Så länge det repositoryt är privat svarar GitHub 404 om inte en token är lagrad för github.com (Inställningar > Integrationer); utan en misslyckas kontrollen tyst och skriver en rad i programloggen. |
+
+En administratör kan ange `mode`, `channel` (som `release_channel`) och `repo`, plus några fler uppdateringsalternativ, i en policyfil för hela datorn eller i Windows-registret. En nyckel som policyn sätter vinner över `config.toml` och visas i Inställningar som **Inställt av din administratör**. `mode` i policyn är ett tak: du kan välja ett lägre värde, aldrig ett högre. Se [Företagsdistribution](enterprise-distribution.md#policyfilen-och-registret).
+
+## `[privacy]` (känsliga filer)
+
+| Nyckel | Standard | Värden och effekt |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Sökvägsmönster i gitignore-stil. Ett mönster utan `/` matchar filnamnet på vilket djup som helst, ett med `/` hela sökvägen (ett inledande `/` förankrar det i roten); `*` och `?` stannar inom en mapp, `**` korsar mappar; ett `!` tillåter på nytt det ett tidigare mönster matchade och sista träffen gäller; skiftläge ignoreras. Används av stagingskyddet och av `ai.privacy.exclude_sensitive_files`. |
+| `privacy.staging_guard` | `true` | Att stagea en fil som matchar ett mönster, eller vars innehåll har en igenkänd hemlighet, frågar först (TUI), nekas om inte `--allow-sensitive` anges (CLI) eller om inte `mcp.allow_sensitive_staging` låter agenten skicka `allow_sensitive` (MCP). Textfiler upp till 1 MiB var och 32 MiB totalt läses; binärfiler matchas bara på namn. Se [Stage och commit](staging-and-committing.md#känsliga-filer). |
 
 ## `[keybindings]`
 

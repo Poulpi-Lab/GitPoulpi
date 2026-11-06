@@ -256,8 +256,11 @@ También en esta página, bajo **Actualizaciones**:
 
 | Opción | Qué hace |
 |---|---|
-| **Buscar actualizaciones** | Un desplegable (`updates.mode`): **Notificar** (por defecto) comprueba una vez al día en segundo plano y muestra `vX.Y.Z disponible` en la barra de título; **Auto** además descarga la actualización en segundo plano cuando GitPoulpi se instaló desde un paquete de versión (tú eliges cuándo reiniciar); **Desactivado** nunca hace ninguna petición. Se aplica al instante. Consulta [Actualizaciones](installation.md#actualizaciones). |
+| **Buscar actualizaciones** | Un desplegable (`updates.mode`): **Notificar** (por defecto) comprueba una vez al día en segundo plano y muestra `vX.Y.Z disponible` en la barra de título; **Auto** además descarga la actualización en segundo plano cuando GitPoulpi se instaló desde un paquete de versión (tú eliges cuándo reiniciar); **Desactivado** nunca hace ninguna petición. Se aplica al instante. Consulta [Actualizaciones](updates.md). |
 | **Canal de actualización** | Un desplegable (`updates.channel`): **Estable** (por defecto) o **Preliminar** (también versiones candidatas). Se aplica al instante. |
+| **Instalado con** | Solo lectura. Cómo llegó GitPoulpi a este equipo (un archivo de versión, el instalador para este usuario o para todos, Chocolatey, winget, Scoop, Homebrew, apt, un paquete MSI, el AUR, una imagen de Docker, cargo o una compilación de desarrollo). Decide cómo se aplican las actualizaciones, consulta [Actualizaciones](updates.md). |
+
+Una fila que tu administrador ha fijado en la política de actualización para todo el equipo muestra **Fijado por tu administrador** y no se puede cambiar aquí.
 
 También en esta página, bajo **Reescritura del historial**, los límites de tiempo de los scripts externos (véase [Reescritura del historial](history-rewrite.md)):
 
@@ -351,11 +354,22 @@ contiene los valores por defecto del [contexto de la revisión](ai.md#contexto-d
 (*Ajuste del perfil*, *Sí*, *No*), **Incluir CLAUDE.md**, **Incluir AGENTS.md** y **Archivo adicional** (una ruta o un
 enlace; vacío no añade ninguno, con un botón **Examinar...** debajo que abre un selector de archivos; `Enter` sobre el botón es su forma de teclado). Esta página tiene su propia guía: [Asistencia de IA](ai.md).
 
+Bajo los bloques por acción, el grupo **Privacidad**:
+
+| Opción | Qué hace |
+|---|---|
+| **Ocultar secretos antes de enviar** | Activado (por defecto): los tokens, claves privadas y contraseñas que se encuentren en una petición se sustituyen por `[REDACTED:<rule>]` antes de que salga. Desactivado: una línea roja avisa de que los secretos se envían tal cual. |
+| **Dejar fuera archivos sensibles** | Activado (por defecto): los cambios de archivos `.env`, claves privadas y certificados (`[privacy] sensitive_patterns`) nunca forman parte de una petición. Desactivado: una línea roja avisa de que se envían cuando forman parte de una. |
+| **Mostrar lo que se envía antes de...** | Un interruptor por acción (mensaje de commit, explicar, mensaje de stash, descripción de pull request, compositor de commits, resolución de conflictos, revisión de código, dividir commit): muestra la petición en el diálogo **Revisa lo que se envía** antes de que salga. La casilla *No mostrar más* del diálogo desactiva uno. Las acciones de reescritura del historial muestran su propio diálogo. |
+| **Mostrar todo otra vez** | Aparece mientras un interruptor está desactivado; vuelve a activarlos todos. |
+
+Consulta [IA > Privacidad](ai.md#privacidad).
+
 ### Agentes y MCP
 
-Qué pueden hacer los agentes de IA en esta ventana, y si el servidor MCP puede
-funcionar. Las dos filas de MCP solo aparecen en las compilaciones que incluyen
-el servidor; consulta [MCP y agentes](mcp-and-agents.md).
+Qué pueden hacer los agentes de IA en esta ventana, si el servidor MCP puede
+funcionar y cómo se protege su endpoint HTTP. Las filas de MCP solo aparecen en
+las compilaciones que incluyen el servidor; consulta [MCP y agentes](mcp-and-agents.md).
 
 | Opción | Qué hace |
 |---|---|
@@ -364,6 +378,12 @@ el servidor; consulta [MCP y agentes](mcp-and-agents.md).
 | **Permitir que los agentes de IA controlen la vista** | Deja que los agentes te muestren un commit, un archivo o un aviso en esta ventana (`ui show`). Desactivado: ningún agente llega a la ventana. |
 | **Dejar que los agentes de IA propongan cambios para que yo los confirme** | Deja que los agentes abran diálogos de Reword, commit, rama o tag rellenados de antemano que tú confirmas. Desactivado por defecto. Consulta [MCP y agentes](mcp-and-agents.md#permisos). |
 | **Abrir una ventana para agentes**, **Comando de lanzamiento (custom)** | Si un agente puede abrir una ventana de GitPoulpi cuando no hay ninguna abierta, y con qué terminal o multiplexor. Desactivado por defecto. |
+| **Autenticación HTTP** | Activado (por defecto): el endpoint HTTP de MCP solo responde a una solicitud que lleve el token de acceso. Desactivado muestra un aviso rojo: cualquier programa que llegue al endpoint puede ejecutar todas las herramientas que permiten los ajustes de MCP, y `--allow-remote` se rechaza. Se guarda como `mcp.http_auth`. |
+| **Token de acceso** | El token, enmascarado. El valor enmascarado es un botón: `Enter` (o un clic) lo muestra completo en la fila de abajo y lo vuelve a ocultar. **Copiar** lo pone en el portapapeles sin mostrarlo en la línea de estado, **Renovar** lo reemplaza tras una confirmación (los clientes que tengan el token anterior se rechazan al instante, sin reiniciar el servidor), **Crear** hace el primero. `Left` / `Right` se mueven entre los botones y `Enter` pulsa uno. El mismo token es `gitpoulpi mcp token`. |
+| **TLS** | **Desactivado** (por defecto), **Autofirmado** (el servidor crea un certificado una vez y muestra su huella) o **Archivos** (tu certificado y tu clave). El servidor termina TLS él mismo. Se guarda como `mcp.tls`; se aplica la próxima vez que arranque el servidor. |
+| **Ruta del certificado**, **Ruta de la clave** | Los archivos PEM que se usan con **Archivos** (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Huella del certificado** | Solo lectura: la huella SHA-256 del certificado que sirve el endpoint, para que los clientes la comprueben. |
+| **Detrás de un túnel o proxy inverso** | Tu declaración de que un túnel o proxy delante del endpoint cifra el tráfico, lo que permite que `--allow-remote` funcione sin TLS. El servidor no puede comprobarlo, así que muestra un aviso rojo mientras está activado. Se guarda como `mcp.behind_proxy`. Consulta [MCP y agentes](mcp-and-agents.md#acceder-al-endpoint-desde-otra-máquina). |
 
 ### Apariencia
 

@@ -263,8 +263,11 @@ Sempre in questa pagina, sotto **Aggiornamenti**:
 
 | Opzione | Cosa fa |
 |---|---|
-| **Ricerca di aggiornamenti** | Un menu a discesa (`updates.mode`): **Notifica** (predefinito) cerca una volta al giorno in background e mostra `vX.Y.Z disponibile` nella barra del titolo; **Auto** scarica anche l'aggiornamento in background quando GitPoulpi è stato installato da un archivio di rilascio (decidi tu quando riavviare); **Disattivato** non fa mai nessuna richiesta. Si applica subito. Vedi [Aggiornamenti](installation.md#aggiornamenti). |
+| **Ricerca di aggiornamenti** | Un menu a discesa (`updates.mode`): **Notifica** (predefinito) cerca una volta al giorno in background e mostra `vX.Y.Z disponibile` nella barra del titolo; **Auto** scarica anche l'aggiornamento in background quando GitPoulpi è stato installato da un archivio di rilascio (decidi tu quando riavviare); **Disattivato** non fa mai nessuna richiesta. Si applica subito. Vedi [Aggiornamenti](updates.md). |
 | **Canale di aggiornamento** | Un menu a discesa (`updates.channel`): **Stabile** (predefinito) o **Pre-release** (anche le release candidate). Si applica subito. |
+| **Installato con** | Sola lettura. Come GitPoulpi è arrivato su questo computer (un archivio di rilascio, il programma di installazione per questo utente o per tutti gli utenti, Chocolatey, winget, Scoop, Homebrew, apt, un pacchetto MSI, l'AUR, un'immagine Docker, cargo, o una build di sviluppo). Determina come vengono applicati gli aggiornamenti, vedi [Aggiornamenti](updates.md). |
+
+Una riga che il tuo amministratore ha impostato nella policy di aggiornamento valida per tutta la macchina mostra **Impostato dal tuo amministratore** e non può essere modificata qui.
 
 Sempre in questa pagina, sotto **Riscrittura della cronologia**, i limiti di tempo degli script esterni (vedi [Riscrittura della cronologia](history-rewrite.md)):
 
@@ -356,11 +359,22 @@ contiene anche i valori predefiniti del [contesto della revisione](ai.md#contest
 link; vuoto non ne aggiunge nessuno, con un pulsante **Sfoglia...** sotto che apre un selettore di file; `Invio` sul pulsante è la sua forma da tastiera). Questa pagina ha
 una guida propria: [Assistenza IA](ai.md).
 
+Sotto i blocchi per azione, il gruppo **Privacy**:
+
+| Opzione | Cosa fa |
+|---|---|
+| **Oscura i segreti prima dell'invio** | Attivo (predefinito): token, chiavi private e password trovati in una richiesta vengono sostituiti da `[REDACTED:<rule>]` prima che parta. Disattivato: una riga rossa dice che i segreti vengono inviati così come sono. |
+| **Escludi i file sensibili** | Attivo (predefinito): le modifiche dei file `.env`, delle chiavi private e dei certificati (`[privacy] sensitive_patterns`) non fanno mai parte di una richiesta. Disattivato: una riga rossa dice che vengono inviate quando fanno parte di una richiesta. |
+| **Mostra cosa viene inviato prima di...** | Un interruttore per azione (messaggio di commit, spiegazione, messaggio dello stash, descrizione della pull request, compositore di commit, risoluzione dei conflitti, revisione del codice, divisione di un commit): mostra la richiesta nel dialogo **Controlla cosa viene inviato** prima che parta. La casella *Non mostrare più* del dialogo ne disattiva uno. Le azioni di riscrittura della cronologia mostrano il proprio dialogo. |
+| **Mostra di nuovo tutto** | Compare finché un interruttore è disattivato; li riattiva tutti. |
+
+Vedi [IA > Privacy](ai.md#privacy).
+
 ### Agenti e MCP
 
-Cosa possono fare gli agenti IA in questa finestra, e se il server MCP può essere
-eseguito. Le due righe MCP compaiono solo nelle build che includono il server;
-vedi [MCP e agenti](mcp-and-agents.md).
+Cosa possono fare gli agenti IA in questa finestra, se il server MCP può essere
+eseguito, e come è protetto il suo endpoint HTTP. Le righe MCP compaiono solo nelle
+build che includono il server; vedi [MCP e agenti](mcp-and-agents.md).
 
 | Opzione | Cosa fa |
 |---|---|
@@ -369,6 +383,12 @@ vedi [MCP e agenti](mcp-and-agents.md).
 | **Consenti agli agenti IA di pilotare la vista** | Permette agli agenti di mostrarti un commit, un file o un avviso in questa finestra (`ui show`). Disattivata: nessun agente raggiunge la finestra. |
 | **Lascia che gli agenti IA propongano modifiche da confermare** | Permette agli agenti di aprire dialoghi precompilati di Reword, commit, branch o tag che confermi tu. Disattivata di base. Vedi [MCP e agenti](mcp-and-agents.md#permessi). |
 | **Apri una finestra per gli agenti**, **Comando di avvio (custom)** | Se un agente può aprire una finestra di GitPoulpi quando non ce n'è nessuna aperta, e con quale terminale o multiplexer. Disattivato di base. |
+| **Autenticazione HTTP** | Attiva (predefinito): l'endpoint HTTP di MCP risponde solo a una richiesta che porta il token di accesso. Disattivata mostra un avviso rosso: qualsiasi programma che raggiunge l'endpoint può eseguire ogni strumento consentito dalle impostazioni MCP, e `--allow-remote` viene rifiutato. Salvata come `mcp.http_auth`. |
+| **Token di accesso** | Il token, mascherato. Il valore mascherato è un pulsante: `Invio` (o un clic) lo mostra per intero nella riga sotto e lo nasconde di nuovo. **Copia** lo mette negli appunti senza ripeterlo nella riga di stato, **Ruota** lo sostituisce dopo una conferma (i client che hanno il vecchio token vengono rifiutati subito, senza riavviare il server), **Crea** crea il primo. `Sinistra` / `Destra` si spostano tra i pulsanti e `Invio` ne preme uno. Lo stesso token è `gitpoulpi mcp token`. |
+| **TLS** | **Disattivato** (predefinito), **Autofirmato** (il server crea una volta un certificato e ne mostra l'impronta) o **File** (il tuo certificato e la tua chiave). Il server termina TLS da sé. Salvato come `mcp.tls`; vale dal prossimo avvio del server. |
+| **Percorso del certificato**, **Percorso della chiave** | I file PEM usati con **File** (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Impronta del certificato** | Sola lettura: l'impronta SHA-256 del certificato servito dall'endpoint, da far verificare ai client. |
+| **Dietro un tunnel o un reverse proxy** | La tua dichiarazione che un tunnel o un proxy davanti all'endpoint cifra il traffico, il che permette a `--allow-remote` di funzionare senza TLS. Il server non può verificarla, quindi mostra un avviso rosso finché è attiva. Salvata come `mcp.behind_proxy`. Vedi [MCP e agenti](mcp-and-agents.md#raggiungere-lendpoint-da-unaltra-macchina). |
 
 ### Aspetto
 

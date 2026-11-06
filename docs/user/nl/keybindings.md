@@ -121,7 +121,7 @@ prefix getoond (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Activiteitenlogboek openen | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Globaal activiteitenlogboek openen | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Achtergrondtaken tonen | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | Het updatepaneel tonen | `Ctrl+N u` |
 | `nav_prefix` | `help` | Help omschakelen | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Tabblad kiezen | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Thema wijzigen | `Ctrl+N y` |
@@ -840,10 +840,10 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Weergave: Activiteitenlogboek | `Ctrl+N A` |
 | Weergave: Globaal activiteitenlogboek | `Ctrl+N G` |
 | Help: Releasenotes |  |
-| Updates: Show Update | `Ctrl+N u` |
-| Updates: Open Security Notice |  |
-| Updates: Copy Update Command |  |
-| Updates: Run Update Command in a Terminal |  |
+| Updates: Updatepaneel tonen | `Ctrl+N u` |
+| Updates: Beveiligingsmelding openen |  |
+| Updates: Updateopdracht kopiëren |  |
+| Updates: Updateopdracht in een terminal uitvoeren |  |
 | Updates: Nu op updates controleren |  |
 | Updates: Downloaden |  |
 | Updates: Nu bijwerken |  |
@@ -1153,7 +1153,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Integraties: Profiel van deze repository beheren |  |
 | Integraties: Integratie verbinden... |  |
 | Instellingen: Radar-opties van een profiel... |  |
-| Integrations: Review security check |  |
+| Integraties: Beveiligingscontrole bekijken |  |
 | App: Afsluiten | `q` |
 | App: Thema... |  |
 | App: Thema wijzigen... | `Ctrl+N y` |

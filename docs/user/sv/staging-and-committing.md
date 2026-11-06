@@ -36,6 +36,25 @@ de lokala ändringarna:
 | Unstagea | Samma knappar och tangenter i avsnittet Staged (`Ctrl+G u`) |
 | Förkasta en fils ändringar | Högerklicka på filen > **Förkasta ändringar...** (frågar först; `Ctrl+Z` tar tillbaka ändringarna) |
 
+### Känsliga filer
+
+Att stagea en fil, en mapp eller allt kontrollerar först vad det skulle lägga till. En fil vars
+namn matchar `[privacy] sensitive_patterns` (`.env` och `.env.*` utom filerna
+`.example`, `.sample` och `.template`, `*.pem`, `*.key`, privata SSH-nycklar,
+`*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`), eller
+vars text innehåller en hemlighet som skannern känner igen, stageas inte. Frågan **Känsliga
+filer** listar varje fil med sin orsak (ett mönster, eller slaget av hemlighet
+med en maskerad förhandsvisning, aldrig värdet) och erbjuder **1. Stage ändå** eller **2. Avbryt,
+stage ingenting**. Inget svar är markerat förrän du trycker på en piltangent eller en siffra,
+så ett förlupet Enter svarar ingenting; `Esc`, stängningskorset och ett klick utanför avbryter.
+Det är samma fråga från tangentbordet, en knapp, en meny, paletten eller en
+drag och släpp, eftersom de alla skickar samma begäran. Att avbryta stagear ingenting,
+inte ens de vanliga filerna i samma stage.
+
+Textfiler upp till 1 MiB var och 32 MiB totalt läses; större filer och binärfiler
+bedöms bara efter namn. `[privacy] staging_guard = false` stänger av kontrollen.
+Att stagea en hunk eller några rader kontrolleras inte: du arbetar redan med den filen.
+
 Högerklicka på en fil för dess meny: stage eller unstage, förkasta, kopiera
 sökvägen, filhistorik och blame, öppna i din externa redigerare, ditt
 diff-verktyg eller din filhanterare (ställs in i
@@ -274,9 +293,16 @@ Allt på den här sidan går att skripta:
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # efter nekandet nedan
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage` nekar en känslig fil på samma sätt: ingenting stageas, slutkoden
+är 2 och `--json` skriver ut `{error: "sensitive_files", files: [{path, reason}]}`
+(en regel och en maskerad förhandsvisning, aldrig ett värde). `--allow-sensitive` är
+nytt försök. En MCP-agent nekas med samma svar och kan inte skicka `allow_sensitive` om inte
+`[mcp] allow_sensitive_staging = true`: den får veta att den ska fråga dig.
 
 Se [CLI-referensen](cli-reference.md).

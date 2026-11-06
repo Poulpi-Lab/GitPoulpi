@@ -35,8 +35,32 @@ Naast die bestanden bevat het archief `gitpoulpi-launch`, een klein programma da
 Een releasearchief heet `gitpoulpi-<version>-<target>.zip` (Windows) of
 `.tar.gz` (Linux, macOS), met ernaast een `.sha256`-bestand. Controleer het
 archief aan de hand van het `.sha256`-bestand, pak het uit en zet de drie
-uitvoerbare bestanden in een map op je `PATH`. `INSTALL.txt` in het archief
-geeft dezelfde stappen.
+uitvoerbare bestanden in een map op je `PATH` (houd `gitpoulpi-updater` en de
+markering `.gitpoulpi-dist` ernaast: de markering zegt `channel=archive`, zodat de build
+zichzelf kan bijwerken, zie [Updates](updates.md)). `INSTALL.txt` in het archief geeft dezelfde stappen.
+
+### Een download verifiëren
+
+Elk releasebestand is ondertekend met de [minisign](https://jedisct1.github.io/minisign/)-sleutel van het project, en GitPoulpi controleert die handtekening zelf voordat het een update installeert. Voor een bestand dat je met de hand hebt gedownload, is de `.minisig` ernaast de handtekening. De publieke sleutel (sleutel-id `B461FFCBF6F6A4F2`) staat als `packaging/minisign.pub` in de repository:
+
+```
+untrusted comment: minisign public key B461FFCBF6F6A4F2
+RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+```
+minisign -Vm gitpoulpi-<version>-<target>.tar.gz -P RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+Lees de vertrouwde opmerking die de opdracht afdrukt: die moet `file:<de naam van het bestand> version:<de versie die je verwacht>` zijn. Een handtekening die geldig is maar een ander bestand of een andere versie noemt, is geen handtekening voor het jouwe.
+
+Als de release is gebouwd met build-provenance-attestaties (de variabele `ATTESTATIONS` van de repository), controleert de GitHub CLI waar een bestand is gebouwd:
+
+```
+gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoulpi
+```
+
+Het `.sha256`-bestand vangt alleen een beschadigde download op. De handtekening laat zien dat het bestand van het project is.
 
 ## Met een installatieprogramma
 
@@ -48,22 +72,20 @@ komen dus altijd overeen.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
 
-Het installeert voor de huidige gebruiker, zonder beheerdersprompt, in
-`%LOCALAPPDATA%\Programs\GitPoulpi` (het eerste dialoogvenster biedt een
-installatie voor alle gebruikers en de keuze van de installatiemap). Selectievakjes:
-snelkoppeling in het Startmenu, snelkoppeling op het Bureaublad, toevoegen aan PATH.
-Een pagina vraagt om het **opdrachtalias**: standaard `gp`, elke naam die je wilt,
-leeg voor geen. PowerShell gebruikt `gp` al voor `Get-ItemProperty`, kies daar dus
-een andere naam of gebruik `gitpoulpi`.
+Het eerste dialoogvenster vraagt voor wie de installatie is:
 
-Het installatieprogramma kopieert de drie uitvoerbare bestanden en het bestand
-`.gitpoulpi-dist`, zodat [Nu bijwerken](#ter-plekke-bijwerken) precies zo werkt als bij
-de zip. Een installatie per gebruiker is beschrijfbaar en kan zichzelf dus bijwerken;
-een installatie voor alle gebruikers in Program Files heeft verhoogde rechten nodig
-om vervangen te worden, installeer die dus opnieuw met de nieuwe setup. Verwijderen
-doe je via Windows-instellingen > Apps: dat voert `gitpoulpi uninstall` uit (alias,
-PATH-items, snelkoppelingen) en verwijdert de bestanden, inclusief de `.old`-restanten
-van de updater. Je instellingen en repositories blijven staan.
+| Keuze | Waar | Beheerdersrechten | Wat het voor updates betekent |
+|---|---|---|---|
+| **Alleen voor mij** (standaard) | `%LOCALAPPDATA%\Programs\GitPoulpi` | geen | GitPoulpi vervangt zijn eigen bestanden: **Bijwerken en herstarten** in het [updatepaneel](updates.md), zonder vraag. |
+| **Voor alle gebruikers** | `Program Files\GitPoulpi` | één vraag bij de installatie | Elke update vraagt om goedkeuring van een beheerder (een Windows-vraag), en de GitPoulpi-sessies van andere gebruikers op de computer worden eerst gesloten. |
+
+Dezelfde keuze werkt stil: `gitpoulpi-<version>-...-setup.exe /CURRENTUSER` of `/ALLUSERS`.
+
+Selectievakjes: snelkoppeling in het Startmenu, snelkoppeling op het Bureaublad, toevoegen aan PATH. Een pagina vraagt om het **opdrachtalias**: standaard `gp`, elke naam die je wilt, leeg voor geen (`/ALIAS=naam` of `/ALIAS=` op de opdrachtregel). PowerShell gebruikt `gp` al voor `Get-ItemProperty`, kies daar dus een andere naam of gebruik `gitpoulpi`.
+
+Het installatieprogramma kopieert de uitvoerbare bestanden (inclusief `gitpoulpi-updater`, het kleine programma dat tijdens een update bestanden verwisselt) en de markering `.gitpoulpi-dist`. De markering legt vast hoe GitPoulpi is geïnstalleerd (`inno-user` of `inno-machine`), wat het updatepaneel toont als **Geïnstalleerd via**. De setup opnieuw uitvoeren behoudt je keuzes (bereik, snelkoppelingen, alias).
+
+Verwijderen doe je via Windows-instellingen > Apps: dat voert `gitpoulpi uninstall` uit (alias, PATH-items, snelkoppelingen) en verwijdert de bestanden, inclusief de `.old`-restanten van de updater. Je instellingen en repositories blijven staan.
 
 ### Linux en macOS: `install.sh`
 
@@ -72,7 +94,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 ```
 
 Het script kiest het archief voor je besturingssysteem en processor, controleert het
-`.sha256`-bestand, installeert in `~/.local/opt/gitpoulpi` en koppelt `gitpoulpi` en
+`.sha256`-bestand, installeert (kanaal `archive`: GitPoulpi werkt zichzelf ter plekke bij) in `~/.local/opt/gitpoulpi` en koppelt `gitpoulpi` en
 `gitpoulpi-mcp` in `~/.local/bin`. Er is geen root nodig en er wordt niets buiten je
 thuismap aangeraakt. Zonder `--yes` vraagt het naar het alias (standaard `gp`), de PATH
 en de snelkoppelingen.
@@ -90,6 +112,38 @@ en de snelkoppelingen.
 
 Het opzoeken van de nieuwste release werkt alleen als de repository openbaar is; voor
 een privérepository download je het archief in een browser en gebruik je `--archive`.
+
+## Met een pakketbeheerder
+
+Elk kanaal hieronder schrijft dezelfde markering `.gitpoulpi-dist` naast de programma's, met een eigen kanaalnaam. GitPoulpi leest die om te weten wie de updates beheert: de pakketbeheerder, dus GitPoulpi verwisselt nooit bestanden achter zijn rug om. Het updatepaneel (klik op de versie in de titelbalk) voert dan de eigen opdracht van de pakketbeheerder uit, of toont hem zodat je hem kunt kopiëren. Zie [Updates](updates.md).
+
+| Kanaal | Installeren | Opmerkingen |
+|---|---|---|
+| **Chocolatey** (Windows) | `choco install gitpoulpi` | Installeert voor alle gebruikers, dus updates vragen om goedkeuring van een beheerder. |
+| **winget** (Windows) | `winget install --id GitPoulpi.GitPoulpi` | Voeg `--scope user` of `--scope machine` toe om te kiezen; machinebereik vraagt om goedkeuring van een beheerder bij de installatie en bij elke update. |
+| **Scoop** (Windows) | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` en dan `scoop install gitpoulpi` | Per gebruiker, geen beheerdersrechten. |
+| **Homebrew** (macOS, Linux) | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | De tap is `Poulpi-Lab/homebrew-gitpoulpi`. |
+| **apt** (Debian, Ubuntu) | zie [de apt-repository](#apt-debian-en-ubuntu) | Ondertekende repository; een `.deb` is ook bij elke release bijgevoegd. |
+| **MSI** (Windows, beheerd) | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | Voor beheerders: alle gebruikers, geen updates vanuit de app. Zie [Distributie voor organisaties](enterprise-distribution.md#msi-met-intune-of-groepsbeleid). |
+| **AUR** (Arch Linux) | `yay -S gitpoulpi-bin` (of `paru -S gitpoulpi-bin`) | Zonder helper: `git clone https://aur.archlinux.org/gitpoulpi-bin.git`, dan `cd gitpoulpi-bin && makepkg -si`. |
+| **cargo** | `cargo binstall gitpoulpi-cli` | Downloadt het releasearchief in plaats van te compileren. |
+| **cargo, vanuit de broncode** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | Compileert; heeft een Rust-toolchain nodig. |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | Zie [GitPoulpi in Docker draaien](docker.md). Dezelfde image staat op `ghcr.io/poulpi-lab/gitpoulpi`. |
+
+De namen hierboven zijn die waarnaar het releaseproces publiceert (zie [Releasen](../../developer/releasing.md)): een kanaal dat nog niet live is, antwoordt "not found", en het releasearchief of installatieprogramma werkt altijd.
+
+De eigen PATH-afhandeling van een pakketbeheerder geldt: Chocolatey, winget, Scoop en Homebrew zetten de programma's zelf op de PATH, en geen ervan maakt het alias `gp` (voer `gitpoulpi alias create gp` uit, of Instellingen > Algemeen > Starter).
+
+### apt (Debian en Ubuntu)
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+De repository ondersteunt `amd64` en `arm64` en is ondertekend met een sleutel die van het project is. De programma's gaan naar `/usr/lib/gitpoulpi` met koppelingen in `/usr/bin`. Het pakket hangt af van `git` en beveelt `git-lfs` aan. Zonder de repository installeer je de `.deb` van een release met `sudo apt install ./gitpoulpi_<version>_<arch>.deb`: GitPoulpi zegt dan dat je de volgende `.deb` zelf moet downloaden, omdat het alleen `apt`-opdrachten aanbiedt als het de repository vindt in `/etc/apt/sources.list.d/gitpoulpi.*`.
 
 ## Vanuit de broncode
 
@@ -134,72 +188,11 @@ geschreven.
 
 ## Updates
 
-De titelbalk toont de draaiende versie (`v1.0.0`) tussen de naam van de applicatie en het repositorypad. Klik
-erop, of voer **Help: Releasenotes** uit vanuit het opdrachtenpalet (`Ctrl+P`): er opent
-een tabblad Releasenotes met het changelog, gescrold naar de draaiende versie.
+De titelbalk toont de draaiende versie (`v1.0.0`) tussen de naam van de applicatie en het repositorypad. Klik erop, of druk op `Ctrl+N` en dan `u`, of voer **Updates: Updatepaneel tonen** uit vanuit het opdrachtenpalet (`Ctrl+P`): het updatepaneel opent met de versie, hoe GitPoulpi is geïnstalleerd en wat je met een nieuwere release moet doen. **Help: Releasenotes** opent het changelog.
 
-Eenmaal per dag vraagt GitPoulpi op de achtergrond aan GitHub of er een nieuwere
-release bestaat (`updates.mode`, [Instellingen > Synchronisatie](settings.md#synchronisatie)).
-Als dat zo is, staat er in de chip `v0.2.0 beschikbaar` in de accentkleur en opent een
-klik het tabblad Releasenotes met de notes van die release bovenaan. Het tabblad heeft
-drie knoppen, elk met een toets en een opdracht in het palet:
+Eenmaal per dag controleert GitPoulpi op de achtergrond op de plek waar zijn releases worden gepubliceerd (standaard GitHub) of er een nieuwere is (`updates.mode`, [Instellingen > Synchronisatie](settings.md#synchronisatie)). Als dat zo is, staat er in de chip `v0.2.0 beschikbaar` in de accentkleur.
 
-- **Downloaden** (`d`, *Updates: Downloaden*) opent de releasepagina in je browser.
-- **Deze versie overslaan** (`s`, *Updates: Deze versie overslaan*) verbergt de melding
-  tot er een nieuwere release verschijnt.
-- **Nu controleren** (`r`, *Updates: Nu op updates controleren*) vraagt het meteen opnieuw.
-
-`updates.mode = "off"` doet helemaal geen verzoek. Zonder netwerkverbinding, of zolang de
-repository privé is en er geen github.com-token is opgeslagen, mislukt de controle
-stilletjes (één regel in het applicatielogboek, niets in de interface).
-`GITPOULPI_UPDATE_API` richt de controle op een andere API-root (gebruikt door de tests).
-
-### Ter plekke bijwerken
-
-Een build die uit een releasearchief is geïnstalleerd, kan zichzelf vervangen. Het
-archief bevat naast de uitvoerbare bestanden een klein bestand `.gitpoulpi-dist`; een
-draaiende build is alleen "bijwerkbaar" als dat bestand naast zijn uitvoerbare bestand
-staat (en zijn platform noemt). Een build die met `cargo` is gemaakt, een aangepaste
-build die ergens anders naartoe is gekopieerd of een pakket dat het bestand wegliet,
-werkt zichzelf nooit bij: het tabblad Releasenotes zegt dat en biedt alleen
-**Downloaden** aan.
-
-Voor een bijwerkbare build voegt het tabblad toe:
-
-- **Nu bijwerken** (`u`, *Updates: Nu bijwerken*) downloadt het archief en het
-  `.sha256`-bestand op de achtergrond (een taak in de indicator van de statusbalk, met
-  percentage, te annuleren zoals elke taak), controleert de hash, pakt het archief uit en
-  zet elk nieuw bestand naast het oude als `<naam>.new`. Niets wat draait wordt
-  aangeraakt. In de modus `auto` gebeurt hetzelfde vanzelf zodra een controle een nieuwere
-  release vindt.
-- **Herstarten om bij te werken** (`R`, *Updates: Herstarten om bij te werken*; de chip
-  zegt hetzelfde zodra de download klaarstaat) is altijd jouw actie, nooit automatisch. Het
-  stopt de losse daemon van de sessie (een ingebedde verdwijnt met het venster), verwisselt
-  de bestanden en start de nieuwe versie met dezelfde argumenten en sessie.
-- **Terug naar de vorige versie** (`v`, *Updates: Terug naar de vorige versie*) zet de vorige
-  bestanden terug en herstart. De bestanden van de vorige versie blijven als `<naam>.old`
-  staan tot de nieuwe versie een minuut heeft gedraaid, daarna worden ze verwijderd; de
-  knop is er dus voor die eerste run. Dit hoort niet bij het ongedaanmaakjournaal van git:
-  het wijzigt de eigen bestanden van GitPoulpi, geen repository.
-
-Hoe de bestanden worden vervangen: op Linux en macOS wordt elk nieuw bestand over het oude
-heen hernoemd (atomair; een draaiend programma houdt zijn oude kopie tot het stopt). Op
-Windows kan een draaiende `.exe` niet worden overschreven, dus het oude bestand wordt
-hernoemd naar `<naam>.old` en het nieuwe ervoor in de plaats gezet; een `.old` die nog
-draait, wordt door een latere start verwijderd. De wissel is alles of niets: als een
-ander programma een van de uitvoerbare bestanden vasthoudt (bijvoorbeeld een MCP-client
-die `gitpoulpi-mcp` draait), noemt GitPoulpi dat bestand, wijzigt niets en laat de
-download klaarstaan voor een nieuwe poging.
-
-Wat wordt geweigerd, steeds met een melding: een release zonder `.sha256`-bestand, een
-hash die niet klopt, een archiefbestand waarvan de naam niet die voor dit platform is
-(`gitpoulpi-<version>-<target>.<zip|tar.gz>`), een archief waarvan de markering een
-andere versie of een ander platform noemt, en elke downloadlink buiten deze hosts:
-`github.com`, `api.github.com`, `objects.githubusercontent.com`,
-`release-assets.githubusercontent.com` en `github-releases.githubusercontent.com` (het
-eerste verzoek en elke redirect; een redirect naar ergens anders stopt de download). De
-archieven van een privérepository hebben een browsersessie nodig, dus daar mislukt de
-download tot de repository openbaar is.
+Wat het paneel doet hangt af van hoe GitPoulpi is geïnstalleerd: een releasearchief of het Windows-installatieprogramma vervangt zijn eigen bestanden, een pakketbeheerder voert zijn eigen opdracht uit, een beheerde of containerinstallatie zegt hoe updates hem bereiken. Een build die met `cargo build` is gemaakt, werkt zichzelf nooit bij. De volledige beschrijving, met teruggaan, `auto` tegenover `notify` en wat een beheerder kan vergrendelen, staat in [Updates](updates.md).
 
 ## Controleren of het werkt
 

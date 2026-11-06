@@ -206,6 +206,15 @@ timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
 
 你用自己的话描述历史应如何重写（“把我的旧邮箱 a@b.org 换成 c@d.org”，“从全部历史中移除 secrets.txt”），模型就会用工作台自己的词汇提出一个范围、一些设置和一组[重写规则](history-rewrite.md#用-ai-创建规则)。**它只做准备**：答案会填入工作台，不会预览也不会应用任何内容；无法使用的条目会连同原因一起列出，有效的条目则保留。这种方式绝不会创建脚本规则。可选地，还可以一并发送范围、分支和 tag 名称以及最近 commit 的作者（一个复选框，默认关闭，显示在“发送的内容”窗格中）。所用的配置和指令是设置 > AI 中 *历史重写规则* 的那一组。
 
+## 密钥去向
+
+API 密钥（OpenAI、Anthropic、OpenRouter、与 OpenAI 兼容的服务器）会绑定到它被存入时的地址：配置的基础 URL 的源（origin），记录在仅限该用户访问的私有数据文件夹里的 `trust.toml` 中。如果基础 URL 之后指向了别处，请求会在发送任何内容之前被拒绝，密钥也留在原处。运行 `gitpoulpi ai trust <profile> --accept-origin <url>`（或在应用中接受）即可有意把密钥移到新地址。
+
+- 纯 `http://` 在本机上是允许的（`localhost` 上的 Ollama、LM Studio）；在其他任何地方都需要 `gitpoulpi ai trust <profile> --allow-insecure-http on`。
+- 证书不能链到已知机构的自托管服务器，只有在你用 `--accept-certificate <sha256>` 固定了密钥指纹时才会被接受；TLS 握手仍会证明服务器持有该密钥。
+- 在此检查出现之前就已有密钥的配置，会在第一次使用时按其当前基础 URL 静默记录。
+- 本地代理（`claude -p` 之类）没有密钥也没有 HTTP，所以无需绑定任何东西。
+
 ## 评审上下文
 
 代码评审草稿（`✦`，或 `hosting review suggest`）会读取请求的 diff、标题、描述和已有评论。还可以给它项目自己的约定，放在 diff 之前的 **Project conventions** 块中，
@@ -262,6 +271,21 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 - 它只会发送到为该操作选定的配置：该 API 主机，或你的本地代理命令的 stdin（之后由该代理自行决定做什么）。
 - API 密钥由 `gitpoulpi` 进程自身使用，绝不会到达守护进程、窗口的其他客户端或 MCP 客户端。
 - 生成的文本绝不会被自动 commit、push 或应用。
+
+### 请求中会清除什么
+
+每个请求，无论由哪个操作发出、由哪个提供方接收（托管的 API 或本地代理），都会先经过同一个清理步骤：
+
+- **密钥会被遮蔽**（`[ai.privacy] redact_secrets`，默认开启）。带有已知前缀的令牌、私钥块、JWT、URL 中的密码，以及值看起来随机的 `password = value` 行，都会被替换为 `[REDACTED:<rule>]`。它并不穷尽：它能找出常见的形态（与 `rewrite scan-secrets` 用的是同一个扫描器）。
+- **敏感文件会被排除**（`[ai.privacy] exclude_sensitive_files`，默认开启）。匹配 `[privacy] sensitive_patterns` 的文件（`.env` 和 `.env.*`，但 `.example`、`.sample` 和 `.template` 文件除外，以及 `*.pem`、`*.key`、SSH 私钥、`*.p12`、`*.pfx`、`*.jks`、`*.keystore`、`*.crt`、`*.cer`、`*.der`、`*.kdbx`）的 diff 不属于请求的一部分。点名这类文件的拆分片段或撰写器文件列表也会同样被裁掉，所以针对它的方案可能会因不完整而被拒绝：请自己 stage 或拆分该文件。
+
+关闭其中任何一项都是你自己的选择，只要它处于关闭状态，设置 > AI 就会在它下面显示一行红字。
+
+**发送之前，先看发送的内容。** 请求离开之前，TUI 会显示**发送的内容**对话框：清理之后的指令和请求（与历史重写对话框是同一个窗格，可滚动，`Alt+W` 显示或隐藏它）、有多少个密钥被替换以及哪些文件被排除（规则和遮蔽后的预览，例如 `ghp_****abcd`，绝不显示值）、一个**不再为<操作>显示**复选框，以及**发送** / **取消**（`Esc`、关闭叉号和点击窗口外部都会取消；在“发送”之前不会有任何内容离开）。该复选框会写入 `[ai.sent_preview] <action> = false`；设置 > AI > *发送前显示所发内容…* 为每个操作提供一个开关，并有**全部重新显示**。两个历史重写对话框本来就会显示它们的请求，所以没有开关。
+
+**在命令行中**，每个 `ai ...` 的结果（以及 `hosting review suggest`）都带有 `privacy: {redactions: N, excluded_files: [...]}`，而 `--print-sent` 会打印清理后的 system 和 user 文本，形式为 `{sent: [{system, user}], privacy, dry_run: true}`，且不调用模型（它需要 `ai.enabled = true`，不需要密钥和网络）。
+
+**一个限制。** 工作文件夹就是仓库的本地代理（`workdir = repository`，或评审时的*在仓库中运行代理*）可以自己读取文件：清理覆盖的是 GitPoulpi 发给它的内容，而不是它自己打开的内容。使用 `dedicated` 工作文件夹可以让它远离仓库。
 
 ## 故障排除
 

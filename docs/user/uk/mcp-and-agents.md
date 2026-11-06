@@ -66,11 +66,60 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-Безстановий JSON, ті самі інструменти, ті самі обмеження `[mcp]`. Він **не має
-автентифікації**, тому слухає лише loopback; `--allow-remote` знімає це обмеження,
-і тоді будь-хто, хто дістанеться порту, зможе виконувати всі інструменти, які
-дозволяє ваша конфігурація. Використовуйте лише за довіреною мережею або проксі,
-що автентифікує.
+Безстановий JSON, ті самі інструменти, ті самі обмеження `[mcp]`. Кожен запит
+потребує bearer-токена (`[mcp] http_auth`, типово ввімкнено): виведіть його через
+`gitpoulpi mcp token --show` (або `--copy`, `--rotate`; токен лежить у файлі лише
+для користувача в приватній теці даних) і передайте клієнту як заголовок:
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+Відсутній чи хибний токен отримує `401` із `WWW-Authenticate: Bearer`. Замінений
+токен діє одразу, без перезапуску сервера. Вимикати `http_auth` варто для точки на
+loopback, де ви довіряєте кожному локальному обліковому запису; сервер тоді
+попереджає в stderr.
+
+### Доступ до точки з іншої машини
+
+Найбезпечніше налаштування взагалі не потребує віддаленого слухача: лишіть адресу
+loopback і прокиньте порт через SSH з машини, на якій працює агент,
+`ssh -L 8808:127.0.0.1:8808 host`. Тоді `--allow-remote` не залучається.
+
+`--allow-remote` (адреса не з loopback) відхиляється, якщо автентифікацію не
+ввімкнено з токеном на місці **і** трафік не зашифровано. Відмова називає, чого
+бракує. Є два способи бути зашифрованим:
+
+- **TLS у сервері** (`[mcp] tls = "self_signed"` або `"files"`). Сервер сам
+  завершує TLS: він тримає ключ, виконує рукостискання, і до шару HTTP доходить
+  лише завершене рукостискання; клієнт зі звичайним HTTP зазнає невдачі на
+  рукостисканні, а звичайного слухача поряд немає. Тож шифрування - це факт, який
+  сервер встановлює на кожному з'єднанні, а не припущення. З `self_signed` перший
+  запуск створює пару в приватній теці даних і виводить її відбиток SHA-256 (він
+  є й у Налаштуваннях); клієнт довіряє серверу, закріплюючи цей відбиток чи
+  файл сертифіката. З `files` задайте `tls_cert` і `tls_key` як ваші файли PEM, і
+  клієнти перевіряють сертифікат за його ЦС. Клієнти автентифікуються bearer-токеном;
+  клієнтські сертифікати не використовуються.
+- **Тунель або зворотний проксі** (`[mcp] behind_proxy = true`). Агент тунелю чи
+  проксі підключається як будь-який локальний чи LAN-клієнт, а його заголовки
+  можна підробити, тож сервер зсередини не може сказати, чи він там є. Тому це
+  явне підтвердження (показане з червоним попередженням у Налаштуваннях), а не
+  виявлення. Запускайте тунель на тій самій машині й, коли можете, лишайте адресу
+  loopback. З адресою не з loopback за проксі ділянка між проксі та сервером
+  передається відкритим текстом у тій мережі.
 
 **Без MCP** агент із доступом до shell користується CLI: `gitpoulpi --json <команда>`
 (див. [довідник CLI](cli-reference.md)). Дайте йому готовий навик (skill)
@@ -82,12 +131,16 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 | Перемикач | Типово | Дія |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` відмовляються запускатися (Налаштування > Агенти й MCP > *Сервер MCP*). Зчитується під час запуску сервера: запущений сервер зберігає свої налаштування. |
-| `[mcp] bind` | `"127.0.0.1:8808"` | Адреса, яку `--http` використовує, коли жодної не вказано (лише loopback, окрім `--allow-remote`). Налаштування > Агенти й MCP > *Порт сервера MCP* змінює його порт і зберігає хост. |
+| `[mcp] bind` | `"127.0.0.1:8808"` | Адреса, яку `--http` використовує, коли жодної не вказано (лише loopback, окрім `--allow-remote`, що потребує автентифікації й шифрування, див. вище). Налаштування > Агенти й MCP > *Порт сервера MCP* змінює його порт і зберігає хост. |
+| `[mcp] http_auth` | `true` | `--http` потребує `Authorization: Bearer <token>` (`gitpoulpi mcp token`). Налаштування > Агенти й MCP > *HTTP-автентифікація*. |
+| `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` або `files` (ваші шляхи PEM): сервер сам завершує TLS. Налаштування > Агенти й MCP > *TLS*. |
+| `[mcp] behind_proxy` | `false` | Ви ручаєтеся, що тунель або зворотний проксі шифрує трафік, що дозволяє `--allow-remote` працювати без TLS. |
 | `[mcp] allow_mutations` | `false` | Вимкнено: кожен інструмент, що щось змінює, відхиляється; читання, `ui_*` і пропозиції все ще працюють. `true` дозволяє агентові робити commit, push, reset... |
 | `[mcp] mutation_allowlist` | `[]` | Не порожній: лише ці інструменти можуть щось змінювати, напр. `["stage", "unstage", "commit"]`. |
 | `[mcp] allow_ui` | `true` | `false`: агент не може рухати ваше вікно (`ui_state` / `ui_viewers` все ще відповідають). |
 | `[mcp] ui_control` | `"ask"` | `ask`: у вашому вікні з'являється чип, який ви підтверджуєте; `auto`: застосовується, якщо ви не зайняті; `off`: відхиляється. Для окремого агента: `--ui-control`. |
 | `[mcp] allow_ui_propose` | `false` | Дозволяє агентові відкривати наперед заповнені діалоги, які ви підтверджуєте (Налаштування > Агенти й MCP > *Дозволити ШІ-агентам пропонувати зміни на моє підтвердження*). |
+| `[mcp] allow_sensitive_staging` | `false` | Лише в `config.toml`. Вимкнено: інструмент `stage` не пропонує `allow_sensitive`, а додавання, що внесло б чутливий файл (приватний ключ, `.env`, розпізнаний токен), відхиляється з `{error: "sensitive_files", files}`: агент має спитати вас. `true` дозволяє йому передати `allow_sensitive`. Див. [Staging і commit'и](staging-and-committing.md#чутливі-файли). |
 | `[mcp] allow_history_purge` | `false` | Лише в `config.toml`. `true` показує інструмент `rewrite_purge`, що остаточно видаляє стару історію переписування (і її скасування). Вимкнено: агент його не бачить. Йому все одно потрібен `allow_mutations`. |
 | `[ui] allow_agent_view_control` | `true` | Загальний перемикач вашого вікна (Налаштування > Агенти й MCP > *Дозволити ШІ-агентам керувати виглядом*). Вимкнено: жоден агент не може дістатися вашого вікна. |
 | `[ui] launch` | `"off"` | Чи може агент відкрити вікно GitPoulpi, коли жодного не відкрито (див. [нижче](#коли-жодного-вікна-не-відкрито-або-воно-в-іншій-сесії)). |
@@ -154,6 +207,7 @@ mutation_allowlist = []        # e.g. ["stage", "unstage", "commit", "branch_cre
 allow_ui = true
 ui_control = "ask"             # "auto" lets the agent move your view without asking
 allow_ui_propose = false       # true: the agent may pre-fill Reword / Split / commit / branch / tag dialogs
+allow_sensitive_staging = false  # true: the agent may stage files the staging guard flags
 allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old history for good)
 ```
 
@@ -432,7 +486,10 @@ Not exposed as tools:
 
 | CLI | Why |
 |---|---|
+| `gitpoulpi hosting integrations trust` | accepting a changed address, account or certificate is the user's decision; an agent is told the security check needs the user |
+| `gitpoulpi ai trust` | binding an API key to another address is the user's decision |
 | `gitpoulpi mcp serve` | the MCP server cannot spawn/serve a copy of itself |
+| `gitpoulpi mcp token` | prints, copies and rotates the key that guards this very server: an agent must not read or replace it |
 | `gitpoulpi completions` | shell completion generation, not a GitBackend operation |
 | `gitpoulpi shell-init` | prints a wrapper function for the user's own shell, not a GitBackend operation |
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |
@@ -453,6 +510,7 @@ Not exposed as tools:
 | `gitpoulpi config set` | an agent must not be able to rewrite its own gating config |
 | `gitpoulpi hosting ssh-key create` | writes a private key and uploads it; too dangerous to let an agent automate |
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
+| `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
 ### Дії робочого процесу гілок: план, потім виконання

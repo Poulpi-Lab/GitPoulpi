@@ -353,6 +353,15 @@ takto nikdy nevytvoří. Volitelně se přidá rozsah, názvy větví a tagů a 
 commitů (zaškrtávací políčko, ve výchozím stavu vypnuté, viditelné v podokně „co se odešle“). Profil
 a instrukce jsou ty pro *Pravidla pro přepis historie* v Nastavení > AI.
 
+## Kam jde klíč
+
+Klíč API (OpenAI, Anthropic, OpenRouter, server kompatibilní s OpenAI) je navázán na adresu, pro kterou byl uložen: původ základní URL profilu, zaznamenaný v `trust.toml` v soukromé datové složce jen pro uživatele. Pokud základní URL později ukazuje jinam, požadavek se odmítne dřív, než se cokoli odešle, a klíč zůstane, kde je. Spusťte `gitpoulpi ai trust <profile> --accept-origin <url>` (nebo to přijměte v aplikaci), abyste klíč záměrně přesunuli na novou adresu.
+
+- Prosté `http://` je povoleno na tomto počítači (Ollama, LM Studio na `localhost`); kdekoli jinde vyžaduje `gitpoulpi ai trust <profile> --allow-insecure-http on`.
+- Vlastní server, jehož certifikát nevede k žádné známé autoritě, se přijme jen pro otisk klíče, který připnete pomocí `--accept-certificate <sha256>`; TLS handshake stále dokazuje, že server tento klíč drží.
+- Profil, který měl klíč už před existencí této kontroly, se při prvním použití tiše zaznamená z aktuální základní URL.
+- Lokální agent (`claude -p` a podobní) nemá klíč ani HTTP, takže není co navázat.
+
 ## Kontext kontroly
 
 Koncept kontroly kódu (`✦` nebo `hosting review suggest`) čte diff, název, popis a existující komentáře
@@ -436,6 +445,49 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 - Klíče API používá samotný proces `gitpoulpi` a nikdy se nedostanou k daemonu,
   k ostatním klientům okna ani ke klientovi MCP.
 - Vygenerovaný text se nikdy sám necommituje, nepushuje ani neaplikuje.
+
+### Co se z požadavku odstraní
+
+Každý požadavek, ať ho odesílá kterákoli akce a ať ho přijímá kterýkoli poskytovatel
+(hostované API nebo lokální agent), nejprve projde stejným krokem čištění:
+
+- **Tajné hodnoty se skryjí** (`[ai.privacy] redact_secrets`, ve výchozím stavu zapnuto). Token
+  se známou předponou, blok soukromého klíče, JWT, heslo v URL a řádek
+  `password = value`, jehož hodnota vypadá náhodně, se nahradí
+  `[REDACTED:<rule>]`. Není to vyčerpávající: najde běžné tvary (stejný
+  skener jako `rewrite scan-secrets`).
+- **Citlivé soubory se vynechají** (`[ai.privacy] exclude_sensitive_files`, ve výchozím stavu
+  zapnuto). Diff souboru odpovídajícího `[privacy] sensitive_patterns` (`.env`
+  a `.env.*` kromě souborů `.example`, `.sample` a `.template`, `*.pem`,
+  `*.key`, soukromé klíče SSH, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`,
+  `*.cer`, `*.der`, `*.kdbx`) není součástí požadavku. Rozdělený kus nebo seznam
+  souborů composeru, který takový soubor jmenuje, se ořízne stejně, takže plán pro něj
+  může být odmítnut jako neúplný: tento soubor přidejte do indexu nebo rozdělte sami.
+
+Vypnutí kteréhokoli z nich je vaše volba a Nastavení > AI pod ním ukazuje červený řádek,
+dokud je vypnuté.
+
+**Co se odesílá, než se to odešle.** Dříve než požadavek odejde, TUI ukáže dialog
+**Co se odešle**: instrukce a požadavek po vyčištění (stejné podokno jako v dialozích přepisu
+historie, posouvatelné, `Alt+W` ho ukáže nebo skryje), kolik tajných hodnot bylo nahrazeno a které
+soubory byly vynechány (pravidlo a maskovaný náhled jako `ghp_****abcd`, nikdy hodnota), zaškrtávací
+pole **Příště nezobrazovat pro <akce>** a **Odeslat** / **Zrušit** (`Esc`, zavírací křížek a klik
+mimo ruší; nic neodejde, dokud nestisknete Odeslat). Pole zapíše
+`[ai.sent_preview] <action> = false`; Nastavení > AI > *Zobrazit, co se odesílá, před...*
+má jeden přepínač na akci a **Zobrazit vše znovu**. Oba dialogy přepisu historie
+už svůj požadavek ukazují, takže přepínač nemají.
+
+**Na příkazové řádce** každá odpověď `ai ...` (a `hosting review suggest`)
+nese `privacy: {redactions: N, excluded_files: [...]}` a `--print-sent`
+vypíše vyčištěný systémový a uživatelský text jako `{sent: [{system, user}], privacy,
+dry_run: true}`, aniž by volal model (vyžaduje `ai.enabled = true`, žádný klíč
+a žádnou síť).
+
+**Omezení.** Lokální agent, jehož pracovní složkou je repozitář
+(`workdir = repository`, nebo *Spustit agenta v repozitáři* u kontroly), si může
+soubory přečíst sám: čištění pokrývá to, co mu GitPoulpi pošle, ne to, co
+otevře sám. Použijte pracovní složku `dedicated`, aby zůstal mimo
+repozitář.
 
 ## Řešení potíží
 

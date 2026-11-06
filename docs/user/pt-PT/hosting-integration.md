@@ -162,6 +162,43 @@ O GitPoulpi procura o token de um perfil por esta ordem:
 Cada perfil é uma entrada `[[integrations]]` em `config.toml`. Consulte a
 [referência de configuração](config-reference.md#integrations-alojamento-e-gestores-de-issues).
 
+## A verificação de segurança
+
+Um token guardado só é tão seguro quanto o endereço para onde é enviado. O GitPoulpi lembra-se, por isso, de cada integração, daquilo a que estava ligada, e pára quando isso muda:
+
+- **O endereço.** Na primeira vez que uma integração é usada (ou ligada), o seu endereço é registado em `trust.toml`, na pasta de dados privada só do utilizador (`<dados>/private/`), não em `config.toml`: editar a configuração nunca pode alargar o que é de confiança. Se o endereço na configuração deixar de ser o registado, nada lhe é enviado e o token nem sequer é lido. As grafias de um mesmo endereço (`HTTPS://Git.Example.com:443/`) são o mesmo endereço; um anfitrião parecido não é.
+- **A conta.** Depois de ligar um token, e depois cerca de uma vez por dia (e uma vez por execução para um token que vem de `GITPOULPI_TOKEN_*` ou do auxiliar de credenciais), o GitPoulpi pergunta ao anfitrião a quem pertence o token e compara o **id** da conta, não o nome de utilizador. Um token que passou a pertencer a outra pessoa é parado.
+- **O certificado.** Os servidores cujo certificado não se encadeia a uma autoridade conhecida (uma CA privada, um servidor autoassinado) só são aceites para a chave exata que aceitou, e o handshake TLS continua a provar que o servidor possui essa chave. Com a fixação estrita ativa, a chave tem de coincidir mesmo quando o certificado se encadeia a uma raiz pública; o preço é que cada rotação de chave volta a perguntar, razão pela qual é opcional. Os anfitriões públicos (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) não guardam nenhum registo de certificado.
+- **http simples.** Um endereço `http://` que não seja de loopback é recusado, a menos que o tenha permitido para essa integração.
+
+Cada pedido é também limitado ao endereço da própria integração (e, para um anfitrião público, ao seu anfitrião de API, como `api.github.com`): um pedido para qualquer outro lado é recusado antes de ser enviado, e um redirecionamento para outro endereço não é seguido.
+
+**As integrações ligadas antes de esta verificação existir** recebem o seu registo em silêncio, a partir da configuração tal como estava, na primeira vez que são usadas depois da atualização: mantêm o nível de confiança de hoje e nada pergunta.
+
+### A partir da linha de comandos
+
+Um comando parado falha com o código de saída 2 e mostra o que mudou (veja a [referência da CLI](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` mostra o que é de confiança; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` e `--allow-insecure-http on|off` aceitam uma coisa cada, indicando o valor exato. Depois de aceitar um novo endereço, escreva o token de novo. Desligar (`hosting logout`) ou remover uma integração elimina o seu token, o seu registo de confiança e o que dela ficou em cache (as listas de repositórios guardadas do diálogo Clonar, as listas de conta do Radar e os rascunhos de revisão remota do seu anfitrião).
+
+Um agente (MCP) não pode aceitar nada: é-lhe dito que a verificação de segurança precisa de si.
+
+### Na interface de terminal
+
+Um pedido parado abre o diálogo **Verificação de segurança da integração** sobre o que estava a fazer. Diz o que mudou (o endereço antigo e o novo, a conta antiga e a nova com os seus ids, ou o certificado antigo e o novo numa pequena tabela com a impressão digital SHA-256 em grupos de quatro, o titular, o emissor e a validade) e que o token não foi enviado. As respostas são numeradas:
+
+1. **Desligar** elimina o token guardado, o registo de confiança e o que ficou em cache da integração.
+2. **Confiar** no novo endereço, conta ou certificado (num endereço sem cifra: **Permitir http simples**).
+3. **Cancelar** não altera nada.
+
+Nenhuma resposta fica realçada até premir uma seta ou um dígito, pelo que um Enter perdido não aceita nada. Esc e a cruz de fechar cancelam; um clique fora do diálogo não faz nada. Um corpo longo desloca-se com a roda, Page Up/Page Down ou a barra de deslocação. Várias verificações ficam em fila (uma por integração e tipo de alteração) e são feitas uma após a outra. Uma verificação cancelada não volta a surgir enquanto não mudar; **Integrações: rever verificação de segurança** na paleta de comandos volta a trazê-la.
+
+Depois de confiar num novo **endereço**, o formulário da integração abre com o campo do token em foco e a sugestão "Recomenda-se escrever o token de novo": o token guardado nunca foi enviado para lá. No formulário, um endereço alterado de propósito é aceite juntamente com um token escrito para ele; sem token, o formulário pede um.
+
+O formulário tem também dois interruptores. **Fixação estrita do certificado** (para um endereço https) fixa a chave do certificado que o servidor apresenta quando liga. **Permitir http simples (sem cifra)** só é oferecido para um endereço `http://` que não seja este computador, com um aviso vermelho de que o token viaja em texto simples. O cartão da integração ligada mostra a impressão digital fixada.
+
+### O que o token pode fazer, e até quando
+
+Ligar pergunta também ao anfitrião o que o token pode fazer. O GitHub (tokens clássicos), o GitLab e o Bitbucket (quando envia os âmbitos) comunicam os seus âmbitos: o cartão mostra uma linha amarela "Este token tem mais permissões do que o GitPoulpi precisa" com os âmbitos para além do que o GitPoulpi usa, os sensíveis (como `delete_repo`, `admin:org`, `sudo`) a vermelho, com o conselho de preferir um token de permissões granulares com data de expiração. Um token clássico do GitHub (`ghp_...`) recebe esse conselho mesmo quando os seus âmbitos são exatos. Não se podem pedir as permissões a um token granular do GitHub, por isso só se mostra a sua expiração. O cartão mostra a data de expiração quando o anfitrião a indica. Um token sem expiração não mostra nenhum lembrete, e os outros produtos não comunicam âmbitos e não geram nenhum aviso. Os mesmos campos estão no JSON de `hosting integrations login` e `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). São lidos quando liga, por isso o cartão mostra-os na sessão que ligou.
+
 ## 4. Ligar um repositório
 
 A ligação é explícita e por repositório. Quando um perfil está ligado, a barra lateral

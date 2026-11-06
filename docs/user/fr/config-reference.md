@@ -347,6 +347,19 @@ review_mode = "ask"       # ask | clone | api
 Les réponses sont mises en cache par profil dans `radar-account.json`, à côté de
 `config.toml`, pendant cinq minutes ; le fichier est un cache, sans risque à supprimer.
 
+### Le magasin de confiance (pas dans `config.toml`)
+
+Ce à quoi chaque intégration et chaque profil d'IA à clé d'API a été approuvé (son
+adresse, l'identifiant du compte, une clé de certificat épinglée, si le http
+simple a été autorisé) vit dans `trust.toml`, dans le dossier de données privé
+réservé à l'utilisateur (`<data>/private/trust.toml` : `%APPDATA%\GitPoulpi\private\`
+sous Windows, `~/.local/share/gitpoulpi/private/` sous Linux). Il ne fait
+volontairement pas partie de `config.toml` : qui peut modifier la configuration
+ne doit pas pouvoir élargir la confiance en la modifiant. Changez-le avec
+`gitpoulpi hosting integrations trust` et `gitpoulpi ai trust` (voir
+[le contrôle de sécurité](hosting-integration.md#le-contrôle-de-sécurité)) ; le
+fichier est réécrit par GitPoulpi, pas à la main.
+
 ## `[mcp]` (ce que les agents IA peuvent faire)
 
 | Clé | Défaut | Valeurs et effet |
@@ -359,6 +372,12 @@ Les réponses sont mises en cache par profil dans `radar-account.json`, à côt�
 | `mcp.allow_history_purge` | `false` | Seulement dans `config.toml` (pas de ligne dans les Paramètres). `true` expose aux agents l'outil `rewrite_purge` (qui exige quand même `allow_mutations`). Désactivé, un agent ne voit pas l'outil du tout : une purge supprime définitivement l'ancien historique d'une réécriture d'historique, son annulation et ses reflogs. La CLI et la TUI ne sont pas concernées par ce réglage. |
 | `mcp.enabled` | `true` | `false` : `gitpoulpi mcp serve` et `gitpoulpi-mcp` refusent de démarrer, avec un message qui nomme cette clé. Paramètres > Agents et MCP > *Serveur MCP*. Lu au démarrage du serveur par un agent. |
 | `mcp.bind` | `"127.0.0.1:8808"` | L'adresse sur laquelle `--http` écoute quand vous n'en donnez pas (`--http ADDR` / `--bind` l'emportent). Loopback seulement sauf `--allow-remote`. Vide ou l'ancien `"stdio"` signifient le défaut. Paramètres > Agents et MCP > *Port du serveur MCP* modifie le port et conserve l'hôte. |
+| `mcp.http_auth` | `true` | `--http` ne répond qu'à une requête portant `Authorization: Bearer <token>` (le jeton de `gitpoulpi mcp token`). `false` supprime la vérification ; le serveur avertit alors sur stderr, et `--allow-remote` est refusé. Paramètres > Agents et MCP > *Authentification HTTP*. |
+| `mcp.tls` | `"off"` | `off`, `self_signed` (un certificat généré une fois dans le dossier de données privé, son empreinte SHA-256 affichée au démarrage) ou `files` (`tls_cert` et `tls_key`). Avec TLS, le serveur termine lui-même le TLS et aucun écouteur en clair n'existe. Paramètres > Agents et MCP > *TLS*. |
+| `mcp.tls_cert` | `""` | Chaîne de certificats PEM utilisée avec `tls = "files"`. |
+| `mcp.tls_key` | `""` | Clé privée PEM utilisée avec `tls = "files"`. |
+| `mcp.behind_proxy` | `false` | Vous déclarez qu'un tunnel ou un proxy inverse placé devant le point d'accès assure le chiffrement. Cela ne peut pas être vérifié depuis le serveur : `--allow-remote` sans TLS exige donc cette clé. Le tronçon entre le proxy et le serveur circule en clair sur ce réseau. Paramètres > Agents et MCP > *Derrière un tunnel ou un proxy inverse*. |
+| `mcp.allow_sensitive_staging` | `false` | Seulement dans `config.toml`. Désactivé, les outils MCP de stage n'offrent pas `allow_sensitive`, et un stage qui ajouterait un fichier signalé (voir `[privacy]`) est refusé avec un message qui dit à l'agent de vous demander. Activé, un agent peut passer `allow_sensitive`. La CLI et le TUI n'en dépendent pas : ils vous demandent. |
 
 `allow_mutations`, `mutation_allowlist` et `allow_ui` ne contrôlent que le serveur MCP ;
 la CLI est votre propre shell et n'est pas contrôlée par eux. Voir
@@ -377,6 +396,9 @@ la CLI est votre propre shell et n'est pas contrôlée par eux. Voir
 | `ai.review.include_claude_md` | `true` | Donne à un brouillon de revue de code le `CLAUDE.md` du dépôt (à la racine, lu sur la branche visée par la demande ; coupé à 8 Ko). |
 | `ai.review.include_agents_md` | `true` | Pareil pour `AGENTS.md`. |
 | `ai.review.extra_file` | `""` | Un fichier de plus pour un brouillon de revue de code : un chemin relatif à la racine du dépôt, un chemin absolu ou un lien vers un fichier d'un hébergeur (lu via le profil d'intégration correspondant, sinon anonymement). L'ensemble des fichiers est coupé à 16 Ko. |
+| `ai.privacy.redact_secrets` | `true` | Remplace tout secret que l'analyseur reconnaît dans une requête (un jeton, un bloc de clé privée, un mot de passe dans une URL, une valeur `password = ...` qui paraît aléatoire) par `[REDACTED:<rule>]` avant son départ. Paramètres > IA affiche un avertissement rouge tant qu'il est désactivé. |
+| `ai.privacy.exclude_sensitive_files` | `true` | Exclut de ce qui est envoyé le diff de chaque fichier correspondant à `privacy.sensitive_patterns`. Un agent local qui travaille dans le dossier du dépôt peut quand même lire les fichiers lui-même : voir [IA > Confidentialité](ai.md#confidentialité). |
+| `ai.sent_preview.<action>` | `true` | Une clé par action (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`) : affiche « Ce qui est envoyé » avant le départ de la requête. « Ne plus afficher pour ... » de la boîte écrit `false` ; Paramètres > IA > *Afficher ce qui est envoyé avant...* les réactive. |
 
 La table `[preferences.ai_review]` propre à un dépôt (dans son `repo-state.toml`, ou l'entrée d'un dépôt non cloné dans
 `remote-reviews.toml`) accepte les mêmes clés, toutes facultatives, plus `no_extra_file = true` : aucun fichier
@@ -471,13 +493,22 @@ Ce que `gitpoulpi rewrite` et l'atelier de réécriture d'historique protègent.
 
 ## `[updates]` (la recherche d'une version plus récente)
 
-Ce que fait la pastille de version de la barre de titre au sujet des nouvelles versions. Détails : [Mises à jour](installation.md#mises-à-jour).
+Ce que fait la pastille de version de la barre de titre au sujet des nouvelles versions. Détails : [Mises à jour](updates.md).
 
 | Clé | Défaut | Valeurs et effet |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"` demande à GitHub une fois par jour, en arrière-plan, s'il existe une version plus récente, et transforme la pastille de version en `vX.Y.Z disponible`. `"auto"` télécharge et prépare aussi la mise à jour tout seul quand ce build vient d'une archive de version (il demande quand même avant de redémarrer) ; pour tout autre build, il se comporte comme `"notify"`. `"off"` ne fait jamais de requête. S'applique immédiatement. |
 | `updates.channel` | `"stable"` | `"stable"` ne considère que les versions complètes ; `"prerelease"` propose aussi les versions candidates (`-rc.1`). S'applique immédiatement. |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | Le `propriétaire/nom` sur github.com dont les versions sont vérifiées. Tant que ce dépôt est privé, GitHub répond 404 sauf si un jeton est enregistré pour github.com (Paramètres > Intégrations) ; sans jeton, la vérification échoue discrètement et écrit une ligne dans le journal de l'application. |
+
+Un administrateur peut définir `mode`, `channel` (sous le nom `release_channel`) et `repo`, plus quelques autres options de mise à jour, dans un fichier de politique valable pour toute la machine ou dans le registre Windows. Une clé définie par la politique l'emporte sur `config.toml` et s'affiche dans les Paramètres comme **Défini par votre administrateur**. `mode` dans la politique est un plafond : vous pouvez choisir une valeur plus basse, jamais plus haute. Voir [Distribution en entreprise](enterprise-distribution.md#le-fichier-de-politique-et-le-registre).
+
+## `[privacy]` (fichiers sensibles)
+
+| Clé | Défaut | Valeurs et effet |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Motifs de chemin au style gitignore. Un motif sans `/` correspond au nom de fichier à toute profondeur, un motif avec `/` au chemin entier (un `/` initial l'ancre à la racine) ; `*` et `?` restent dans un seul dossier, `**` traverse les dossiers ; un `!` autorise de nouveau ce qu'un motif précédent avait retenu et la dernière correspondance l'emporte ; la casse est ignorée. Utilisé par la garde de stage et par `ai.privacy.exclude_sensitive_files`. |
+| `privacy.staging_guard` | `true` | Stager un fichier qui correspond à un motif, ou dont le contenu renferme un secret reconnu, demande d'abord confirmation (TUI), est refusé sauf avec `--allow-sensitive` (CLI) ou sauf si `mcp.allow_sensitive_staging` laisse l'agent passer `allow_sensitive` (MCP). Les fichiers texte jusqu'à 1 Mio chacun et 32 Mio au total sont lus ; les fichiers binaires ne sont repérés que par leur nom. Voir [Stage et commit](staging-and-committing.md#fichiers-sensibles). |
 
 ## `[keybindings]`
 

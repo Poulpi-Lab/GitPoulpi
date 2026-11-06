@@ -295,6 +295,10 @@ review_mode = "ask"       # ask | clone | api
 
 答复按配置缓存在 `config.toml` 旁边的 `radar-account.json` 中，保留五分钟；该文件只是缓存，可以放心删除。
 
+### 信任存储（不在 `config.toml` 中）
+
+每个集成和使用 API 密钥的 AI 配置被信任的内容（它的地址、账户 id、固定的证书密钥、是否允许了明文 http）保存在仅限该用户访问的私有数据文件夹里的 `trust.toml` 中（`<data>/private/trust.toml`：Windows 上是 `%APPDATA%\GitPoulpi\private\`，Linux 上是 `~/.local/share/gitpoulpi/private/`）。它刻意不属于 `config.toml`：能编辑配置的人不应当能通过编辑它来扩大信任。请用 `gitpoulpi hosting integrations trust` 和 `gitpoulpi ai trust` 来更改（见[安全检查](hosting-integration.md#安全检查)）；该文件由 GitPoulpi 重写，而不是手工编辑。
+
 ## `[mcp]`（AI 代理可以做什么）
 
 | 键 | 默认值 | 取值与作用 |
@@ -307,6 +311,12 @@ review_mode = "ask"       # ask | clone | api
 | `mcp.allow_history_purge` | `false` | 仅存在于 `config.toml`（设置中没有对应行）。`true` 会向代理列出工具 `rewrite_purge`（仍需要 `allow_mutations`）。关闭时，代理根本看不到这个工具：清除会永久删除历史重写留下的旧历史、它的撤销记录及其 reflog。CLI 和 TUI 不受它限制。 |
 | `mcp.enabled` | `true` | `false`：`gitpoulpi mcp serve` 和 `gitpoulpi-mcp` 拒绝启动，并给出点名此键的提示。设置 > 代理与 MCP > *MCP 服务器*。在代理启动服务器时读取。 |
 | `mcp.bind` | `"127.0.0.1:8808"` | 未指定时 `--http` 监听的地址（`--http ADDR` / `--bind` 优先）。除非使用 `--allow-remote`，否则仅限回环地址。留空或旧的 `"stdio"` 表示默认值。设置 > 代理与 MCP > *MCP 服务器端口* 编辑端口并保留主机。 |
+| `mcp.http_auth` | `true` | `--http` 只响应带有 `Authorization: Bearer <token>`（`gitpoulpi mcp token` 的令牌）的请求。`false` 会取消该检查；服务器随后会在 stderr 上警告，并且 `--allow-remote` 会被拒绝。设置 > 代理与 MCP > *HTTP 身份验证*。 |
+| `mcp.tls` | `"off"` | `off`、`self_signed`（在私有数据文件夹下一次性生成的证书，启动时会打印其 SHA-256 指纹）或 `files`（`tls_cert` 和 `tls_key`）。开启 TLS 后，服务器自己终结 TLS，不存在纯文本监听器。设置 > 代理与 MCP > *TLS*。 |
+| `mcp.tls_cert` | `""` | 与 `tls = "files"` 一起使用的 PEM 证书链。 |
+| `mcp.tls_key` | `""` | 与 `tls = "files"` 一起使用的 PEM 私钥。 |
+| `mcp.behind_proxy` | `false` | 你声明端点前面的隧道或反向代理负责加密。服务器内部无法检查这一点，所以不带 TLS 的 `--allow-remote` 需要设置它。代理与服务器之间的这一跳在该网络上是明文。设置 > 代理与 MCP > *位于隧道或反向代理之后*。 |
+| `mcp.allow_sensitive_staging` | `false` | 仅存在于 `config.toml`。关闭时，MCP 的 stage 工具不提供 `allow_sensitive`，会加入被标记文件（见 `[privacy]`）的 stage 会被拒绝，并附一条让代理来问你的消息。开启时，代理可以传入 `allow_sensitive`。CLI 和 TUI 不受它限制：它们会询问你。 |
 
 `allow_mutations`、`mutation_allowlist` 和 `allow_ui` 只限制 MCP 服务器；CLI 是你自己的 shell，不受它们限制。参见 [MCP 与代理](mcp-and-agents.md#权限)。
 
@@ -323,6 +333,9 @@ review_mode = "ask"       # ask | clone | api
 | `ai.review.include_claude_md` | `true` | 将仓库的 `CLAUDE.md` 提供给代码评审草稿（根目录，在请求所针对的分支上读取；在 8 KB 处截断）。 |
 | `ai.review.include_agents_md` | `true` | `AGENTS.md` 同理。 |
 | `ai.review.extra_file` | `""` | 代码评审草稿的另一个文件：相对于仓库根目录的路径、绝对路径，或指向代码托管平台上某文件的链接（通过匹配的集成配置读取，否则匿名读取）。所有文件合计在 16 KB 处截断。 |
+| `ai.privacy.redact_secrets` | `true` | 在请求离开之前，把扫描器识别出的请求中的每个密钥（令牌、私钥块、URL 中的密码、看起来随机的 `password = ...` 值）替换为 `[REDACTED:<rule>]`。关闭期间，设置 > AI 会显示红色警告。 |
+| `ai.privacy.exclude_sensitive_files` | `true` | 把每个匹配 `privacy.sensitive_patterns` 的文件的 diff 从所发送的内容中排除。在仓库文件夹中工作的本地代理仍然可以自己读取文件：见 [AI > 隐私](ai.md#隐私)。 |
+| `ai.sent_preview.<action>` | `true` | 每个操作一个键（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`）：在请求发出之前显示“发送的内容”。对话框中的“不再为……显示”会写入 `false`；设置 > AI > *发送前显示所发内容…* 会把它们重新打开。 |
 
 仓库自己的 `[preferences.ai_review]` 表（在其 `repo-state.toml` 中；未克隆仓库的条目在 `remote-reviews.toml` 中）接受相同的键，全部可选，另加 `no_extra_file = true`：此仓库不使用额外文件，不论 `ai.review.extra_file` 是什么。未设置的键、未设置的 `extra_file` 和缺失的 `no_extra_file` 都继承全局值；把 `extra_file` 设为某个文件会清除该开关，反之亦然。
 
@@ -405,13 +418,22 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 ## `[updates]`（查找更新的发布版本）
 
-标题栏的版本标记如何处理更新的发布版本。详情：[更新](installation.md#更新)。
+标题栏的版本标记如何处理更新的发布版本。详情：[更新](updates.md)。
 
 | 键 | 默认值 | 取值与作用 |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"` 每天在后台向 GitHub 询问一次是否有更新的发布版本，并把版本标记变成 `vX.Y.Z 可用`。`"auto"` 在此构建来自发布压缩包时，还会自行下载并暂存更新（重启前仍会询问）；对其他任何构建，其行为与 `"notify"` 相同。`"off"` 从不发出请求。立即生效。 |
 | `updates.channel` | `"stable"` | `"stable"` 只考虑正式发布的版本；`"prerelease"` 还会提供候选版本（`-rc.1`）。立即生效。 |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | 检查其发布版本的 github.com 上的 `owner/name`。在该仓库为私有期间，除非为 github.com 存储了令牌（设置 > 集成），否则 GitHub 会返回 404；没有令牌时检查会悄悄失败，并向应用程序日志写入一行。 |
+
+管理员可以在整台机器范围的策略文件或 Windows 注册表中设置 `mode`、`channel`（写作 `release_channel`）和 `repo`，以及其他一些更新选项。策略设定的键优先于 `config.toml`，并在设置中显示为**由管理员设定**。策略中的 `mode` 是一个上限：你可以选更低的值，不能更高。见[企业分发](enterprise-distribution.md#策略文件和注册表)。
+
+## `[privacy]`（敏感文件）
+
+| 键 | 默认值 | 取值和效果 |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | gitignore 风格的路径模式。不含 `/` 的模式匹配任意深度的文件名，含 `/` 的匹配整个路径（开头的 `/` 把它锚定在根目录）；`*` 和 `?` 只在一个文件夹内，`**` 可以跨文件夹；`!` 重新允许前面某个模式匹配到的内容，最后一次匹配生效；忽略大小写。由 stage 防护和 `ai.privacy.exclude_sensitive_files` 使用。 |
+| `privacy.staging_guard` | `true` | stage 匹配某个模式、或内容含有可识别密钥的文件时，会先询问（TUI），除非给出 `--allow-sensitive`（CLI）或 `mcp.allow_sensitive_staging` 允许代理传入 `allow_sensitive`（MCP），否则会被拒绝。每个文本文件最多读取 1 MiB、总共 32 MiB；二进制文件只按名称匹配。见 [stage 与 commit](staging-and-committing.md#敏感文件)。 |
 
 ## `[keybindings]`
 

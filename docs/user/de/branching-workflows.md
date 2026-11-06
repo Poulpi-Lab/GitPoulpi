@@ -268,6 +268,31 @@ Flow lässt sich fortsetzen oder abbrechen). `--no-hooks` überspringt sie ohne
 Nachfrage. Ein Hook kann alles tun, daher nimmt `undo` nur die Git-Änderungen
 zurück.
 
+**Vertrauen.** Die Befehle eines committeten Abschnitts `[hooks]` stammen von jedem, der in das
+Repository pushen kann, daher brauchen sie auch *Ihr* Vertrauen, einmal je Version der
+Liste. Das Vertrauen wird je Repository über den Hash der Hooks gehalten (die Änderung eines
+beliebigen Befehls, einer Phase oder der Reihenfolge fragt erneut) und vom Daemon vor dem ersten
+Schritt eines Laufs und bevor ein fortgesetzter Flow weitergeht geprüft, ein abgelehnter Lauf hat also
+nichts geändert. Hooks in Ihrer eigenen Abweichung (`[workflow]` in Ihrem Repository-Zustand, die
+Einstellungsseite) gehören Ihnen und fragen nie.
+
+- **CLI:** `gitpoulpi flow trust-hooks` gibt die Befehle, ihren `hash` und aus, ob sie
+  `trusted` sind; `gitpoulpi flow trust-hooks --hash <hash>` vertraut ihnen,
+  und nur dann, wenn die Datei auf der Platte noch diesen Hash hat. `--run-hooks` bei
+  nicht vertrauten Hooks gibt eine Ablehnung aus (`{"refused": {"reason": "hooks_not_trusted",
+  ...}}`, Exit-Code 2) mit den Befehlen und dieser Befehlszeile. Ein Terminal, das
+  „Run them too?“ gefragt wird, wird auch gefragt, ob ihnen vertraut werden soll.
+- **TUI:** Die Vorschau listet die Hooks auf und sagt, dass ihnen noch nicht vertraut wird. Der Druck auf
+  die Aktionsschaltfläche fragt dann „Der Workflow dieses Repositorys führt diese Befehle auf
+  Ihrem Rechner aus. Vertrauen?“ mit den genauen Befehlen in einem scrollbaren Bereich
+  (Mausrad, ziehbare Bildlaufleiste, Bild auf/Bild ab/Pos1/Ende) und zwei Antworten:
+  **1 Vertrauen und ausführen** und **2 Ohne Hooks ausführen**. Nichts ist hervorgehoben, bis Sie
+  eine Pfeiltaste oder eine Ziffer drücken; Esc, Abbrechen oder das Schließen-Kreuz gehen zurück,
+  ohne zu antworten. Hat sich die Datei seit Ihrem Vertrauen geändert, lautet der Titel „Die Hooks
+  haben sich geändert, seit Sie ihnen vertraut haben“, und die alte Liste steht unter der neuen.
+- **Agenten:** Es gibt kein Tool, um Hooks zu vertrauen. `run_hooks: true` bei nicht vertrauten
+  Hooks wird mit den Befehlen abgelehnt, und eine Person führt `flow trust-hooks` aus.
+
 ### Für Agenten (MCP)
 
 Die Tools sind `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` und
@@ -277,8 +302,10 @@ mit `dry_run: true` aufrufen, um den Plan zu erhalten (ein normales Ergebnis),
 dann erneut mit `yes: true`, um ihn auszuführen. Ohne beides wird der Aufruf
 abgelehnt und trägt den Plan, damit nichts versehentlich läuft. Hooks laufen nur
 mit einem ausdrücklichen `run_hooks: true`; der Plan listet sie auf (`hooks`,
-`hooks_run`), damit der Agent dem Benutzer zuerst die Befehle zeigen kann. Nach
-einem Konflikt `continue_: true` (die Option heißt `--continue`) oder `abort: true`.
+`hooks_run`), damit der Agent dem Benutzer zuerst die Befehle zeigen kann. Committete
+Hooks muss eine Person vertrauen (`flow trust-hooks`, wofür es kein Tool gibt): `run_hooks: true`
+bei nicht vertrauten Hooks liefert `refused` mit den Befehlen und führt nichts aus. Nach einem
+Konflikt `continue_: true` (die Option heißt `--continue`) oder `abort: true`.
 
 ### Rückgängig
 

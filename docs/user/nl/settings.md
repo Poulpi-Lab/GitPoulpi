@@ -247,8 +247,11 @@ Ook op deze pagina, onder **Updates**:
 
 | Optie | Wat ze doet |
 |---|---|
-| **Op updates controleren** | Een keuzelijst (`updates.mode`): **Melden** (standaard) controleert eenmaal per dag op de achtergrond en toont `vX.Y.Z beschikbaar` in de titelbalk; **Auto** downloadt de update ook op de achtergrond als GitPoulpi uit een releasearchief is geïnstalleerd (jij kiest nog steeds wanneer je herstart); **Uit** doet nooit een verzoek. Geldt direct. Zie [Updates](installation.md#updates). |
+| **Op updates controleren** | Een keuzelijst (`updates.mode`): **Melden** (standaard) controleert eenmaal per dag op de achtergrond en toont `vX.Y.Z beschikbaar` in de titelbalk; **Auto** downloadt de update ook op de achtergrond als GitPoulpi uit een releasearchief is geïnstalleerd (jij kiest nog steeds wanneer je herstart); **Uit** doet nooit een verzoek. Geldt direct. Zie [Updates](updates.md). |
 | **Updatekanaal** | Een keuzelijst (`updates.channel`): **Stabiel** (standaard) of **Pre-release** (ook release candidates). Geldt direct. |
+| **Geïnstalleerd via** | Alleen-lezen. Hoe GitPoulpi op deze computer is gekomen (een releasearchief, het installatieprogramma voor deze gebruiker of alle gebruikers, Chocolatey, winget, Scoop, Homebrew, apt, een MSI-pakket, de AUR, een Docker-image, cargo of een ontwikkelbuild). Het bepaalt hoe updates worden toegepast, zie [Updates](updates.md). |
+
+Een rij die je beheerder in het updatebeleid voor de hele machine heeft ingesteld, toont **Ingesteld door je beheerder** en kan hier niet worden gewijzigd.
 
 Ook op deze pagina, onder **Geschiedenis herschrijven**, de tijdslimieten van externe scripts (zie [Geschiedenis herschrijven](history-rewrite.md)):
 
@@ -338,11 +341,22 @@ standaardwaarden van de [reviewcontext](ai.md#reviewcontext): **De agent in de r
 link; leeg voegt er geen toe, met een knop **Bladeren...** eronder die een bestandskiezer opent; `Enter` op de knop is
 het toetsenbordequivalent). Deze pagina heeft een eigen gids: [AI-ondersteuning](ai.md).
 
+Onder de blokken per actie staat de groep **Privacy**:
+
+| Optie | Wat ze doet |
+|---|---|
+| **Geheimen maskeren vóór verzending** | Aan (standaard): tokens, privésleutels en wachtwoorden in een verzoek worden vervangen door `[REDACTED:<regel>]` voordat het weggaat. Uit: een rode regel zegt dat geheimen worden verstuurd zoals ze zijn. |
+| **Gevoelige bestanden weglaten** | Aan (standaard): de wijzigingen van `.env`-bestanden, privésleutels en certificaten (`[privacy] sensitive_patterns`) maken nooit deel uit van een verzoek. Uit: een rode regel zegt dat ze worden verstuurd als ze deel uitmaken van een verzoek. |
+| **Toon wat wordt verstuurd vóór...** | Eén schakelaar per actie (commitbericht, uitleggen, stashbericht, pull request-beschrijving, commit-composer, conflictoplossing, codereview, commit splitsen): toon het verzoek in het dialoogvenster **Wat wordt verstuurd** voordat het weggaat. Het vakje *Niet meer tonen* van het dialoogvenster zet er een uit. De acties voor het herschrijven van de geschiedenis tonen hun eigen dialoogvenster. |
+| **Alles opnieuw tonen** | Verschijnt zolang een schakelaar uit staat; zet ze allemaal weer aan. |
+
+Zie [AI > Privacy](ai.md#privacy).
+
 ### Agents & MCP
 
-Wat AI-agents in dit venster mogen doen, en of de MCP-server mag draaien. De twee
-MCP-rijen verschijnen alleen in builds die de server bevatten; zie
-[MCP en agents](mcp-and-agents.md).
+Wat AI-agents in dit venster mogen doen, of de MCP-server mag draaien, en hoe
+zijn HTTP-eindpunt wordt beveiligd. De MCP-rijen verschijnen alleen in builds die
+de server bevatten; zie [MCP en agents](mcp-and-agents.md).
 
 | Optie | Wat ze doet |
 |---|---|
@@ -351,6 +365,12 @@ MCP-rijen verschijnen alleen in builds die de server bevatten; zie
 | **AI-agents de weergave laten besturen** | Laat agents je een commit, een bestand of een melding in dit venster tonen (`ui show`). Uit: geen enkele agent bereikt het venster. |
 | **AI-agents wijzigingen laten voorstellen die ik bevestig** | Laat agents vooraf ingevulde dialoogvensters voor Reword, commit, branch of tag openen die jij bevestigt. Standaard uit. Zie [MCP en agents](mcp-and-agents.md#rechten). |
 | **Een venster voor agents openen**, **Startopdracht (custom)** | Of een agent een GitPoulpi-venster mag openen als er geen open is, en met welke terminal of multiplexer. Standaard uit. |
+| **HTTP-authenticatie** | Aan (standaard): het MCP-HTTP-eindpunt beantwoordt alleen een verzoek met het toegangstoken. Uit toont een rode waarschuwing: elk programma dat het eindpunt kan bereiken, kan alle tools uitvoeren die de MCP-instellingen toestaan, en `--allow-remote` wordt geweigerd. Opgeslagen als `mcp.http_auth`. |
+| **Toegangstoken** | Het token, gemaskeerd. De gemaskeerde waarde is een knop: `Enter` (of een klik) toont hem volledig op de rij eronder en verbergt hem weer. **Kopiëren** zet hem op het klembord zonder hem in de statusregel te tonen, **Vernieuwen** vervangt hem na een bevestiging (clients met het oude token worden meteen geweigerd, geen herstart van de server nodig), **Maken** maakt het eerste. `Left` / `Right` bewegen tussen de knoppen en `Enter` drukt er een in. Hetzelfde token is `gitpoulpi mcp token`. |
+| **TLS** | **Uit** (standaard), **Zelfondertekend** (de server maakt eenmalig een certificaat en toont de vingerafdruk) of **Bestanden** (je certificaat en sleutel). De server beëindigt TLS zelf. Opgeslagen als `mcp.tls`; geldt de volgende keer dat de server start. |
+| **Pad van het certificaat**, **Pad van de sleutel** | De PEM-bestanden die met **Bestanden** worden gebruikt (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Vingerafdruk van het certificaat** | Alleen-lezen: de SHA-256-vingerafdruk van het certificaat dat het eindpunt aanbiedt, zodat clients die kunnen controleren. |
+| **Achter een tunnel of reverse proxy** | Jouw verklaring dat een tunnel of proxy voor het eindpunt het verkeer versleutelt, waardoor `--allow-remote` zonder TLS kan draaien. De server kan het niet controleren, dus hij toont een rode waarschuwing zolang het aan staat. Opgeslagen als `mcp.behind_proxy`. Zie [MCP en agents](mcp-and-agents.md#het-eindpunt-vanaf-een-andere-machine-bereiken). |
 
 ### Weergave
 

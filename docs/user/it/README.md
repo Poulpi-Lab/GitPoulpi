@@ -15,8 +15,13 @@ di riferimento quando ti servono.
 ## Da dove cominciare
 
 1. **[Installazione](installation.md)**: cosa serve, archivi di release,
-   compilazione dai sorgenti. Per un binario più piccolo, vedi
-   **[Build personalizzate](custom-builds.md)**.
+   gestori di pacchetti, compilazione dai sorgenti. Per un binario più piccolo,
+   vedi **[Build personalizzate](custom-builds.md)**. Come GitPoulpi si tiene
+   aggiornato (il chip della versione, il pannello degli aggiornamenti, il
+   ritorno alla versione precedente): **[Aggiornamenti](updates.md)**. Per
+   eseguirlo in un container: **[Eseguire in Docker](docker.md)**. Per gli
+   amministratori, feed interni, mirror e la policy di aggiornamento:
+   **[Distribuzione aziendale](enterprise-distribution.md)**.
 2. **[Per iniziare](getting-started.md)**: i tuoi primi cinque minuti, dall'avvio
    al primo commit.
 3. **[Tour dell'interfaccia](interface-tour.md)**: il nome di ogni area della

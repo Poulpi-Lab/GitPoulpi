@@ -1,3 +1,5 @@
+**English** · [Čeština](cs/docker.md) · [Deutsch](de/docker.md) · [Español](es/docker.md) · [Français](fr/docker.md) · [Italiano](it/docker.md) · [日本語](ja/docker.md) · [한국어](ko/docker.md) · [Nederlands](nl/docker.md) · [Polski](pl/docker.md) · [Português (Brasil)](pt-BR/docker.md) · [Português (Portugal)](pt-PT/docker.md) · [Русский](ru/docker.md) · [Svenska](sv/docker.md) · [Türkçe](tr/docker.md) · [Українська](uk/docker.md) · [简体中文](zh-CN/docker.md)
+
 # Running in Docker
 
 The `poulpilab/gitpoulpi` image holds the official release binaries (`gitpoulpi-tui`, `gitpoulpi`, `gitpoulpi-mcp`) on `debian:bookworm-slim`, with `git`, `git-lfs`, `openssh-client`, `less` and `tini`. It runs on `linux/amd64` and `linux/arm64`. It is on Docker Hub; the same tags are also on `ghcr.io/poulpi-lab/gitpoulpi`, and everything below works with either name.
@@ -100,4 +102,4 @@ An image is replaced, never updated in place. GitPoulpi inside a container knows
 docker pull poulpilab/gitpoulpi
 ```
 
-Then start a new container. Your settings stay in the `/config` volume. To go back, run an older tag: `docker pull poulpilab/gitpoulpi:<previous>`. To pin a version in scripts, use the exact tag instead of `latest`. An organisation can mirror the image on its own registry, see [Enterprise distribution](enterprise-distribution.md#docker-registry-mirror).
+Then start a new container. Your settings stay in the `/config` volume. To go back, run an older tag: `docker pull poulpilab/gitpoulpi:<previous>`. To pin a version in scripts, use the exact tag instead of `latest`. An organization can mirror the image on its own registry, see [Enterprise distribution](enterprise-distribution.md#docker-registry-mirror).

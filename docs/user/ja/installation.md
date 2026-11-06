@@ -34,7 +34,33 @@ GitPoulpi には 3 つの実行ファイルがあります。
 リリースアーカイブは `gitpoulpi-<version>-<target>.zip`（Windows）または
 `.tar.gz`（Linux、macOS）で、隣に `.sha256` ファイルがあります。
 アーカイブを `.sha256` ファイルで確認し、展開して、3 つの実行ファイルを
-`PATH` 上のフォルダーに置いてください。アーカイブ内の `INSTALL.txt` にも同じ手順があります。
+`PATH` 上のフォルダーに置いてください（`gitpoulpi-updater` と `.gitpoulpi-dist`
+マーカーはその隣に残してください。マーカーには `channel=archive` と書かれていて、
+これによりビルドが自己更新できます。[更新](updates.md)を参照）。
+アーカイブ内の `INSTALL.txt` にも同じ手順があります。
+
+### ダウンロードを検証する
+
+すべてのリリースファイルには、プロジェクトの [minisign](https://jedisct1.github.io/minisign/) 鍵で署名が付いており、GitPoulpi は更新をインストールする前にその署名を自分で検証します。手動でダウンロードしたファイルの場合、その隣にある `.minisig` が署名です。公開鍵（鍵 ID `B461FFCBF6F6A4F2`）は、リポジトリの `packaging/minisign.pub` にコミットされています。
+
+```
+untrusted comment: minisign public key B461FFCBF6F6A4F2
+RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+```
+minisign -Vm gitpoulpi-<version>-<target>.tar.gz -P RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+コマンドが出力する信頼済みコメントを確認してください。`file:<ファイル名> version:<期待するバージョン>` になっている必要があります。署名自体は有効でも、別のファイルや別のバージョンを指している場合、それはあなたのファイルの署名ではありません。
+
+リリースがビルド来歴の証明（リポジトリの `ATTESTATIONS` 変数）付きでビルドされている場合は、GitHub CLI でファイルがどこでビルドされたかを確認できます。
+
+```
+gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoulpi
+```
+
+`.sha256` ファイルで分かるのは、ダウンロードの破損だけです。そのファイルがプロジェクトのものであることを示すのは署名です。
 
 ## インストーラーで
 
@@ -42,9 +68,20 @@ GitPoulpi には 3 つの実行ファイルがあります。
 
 ### Windows：`gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
 
-管理者権限の確認なしで、現在のユーザー向けに `%LOCALAPPDATA%\Programs\GitPoulpi` へインストールします（最初のダイアログで、全ユーザー向けのインストールとインストール先を選べます）。チェックボックスは、スタートメニューのショートカット、デスクトップのショートカット、PATH への追加です。**コマンドのエイリアス**を尋ねるページがあり、既定は `gp`、好きな名前にでき、空にすればエイリアスなしになります。PowerShell では `gp` がすでに `Get-ItemProperty` に使われているため、別の名前にするか `gitpoulpi` を使ってください。
+最初のダイアログで、インストールの対象を尋ねます。
 
-インストーラーは 3 つの実行ファイルと `.gitpoulpi-dist` マーカーをコピーするので、[今すぐ更新](#その場で更新する)は zip の場合とまったく同じように動作します。ユーザー単位のインストールは書き込み可能なので自己更新できます。Program Files への全ユーザー向けインストールは、置き換えに管理者権限が必要なため、新しいセットアップで入れ直してください。アンインストールは Windows の設定 > アプリから行います。`gitpoulpi uninstall`（エイリアス、PATH のエントリ、ショートカット）を実行してから、更新機能が残した `.old` ファイルを含めてファイルを削除します。設定とリポジトリは残ります。
+| 選択 | 場所 | 管理者権限 | 更新への影響 |
+|---|---|---|---|
+| **自分のみ**（既定） | `%LOCALAPPDATA%\Programs\GitPoulpi` | 不要 | GitPoulpi が自分のファイルを置き換えます：[更新パネル](updates.md)の**更新して再起動**で、確認はありません。 |
+| **全ユーザー** | `Program Files\GitPoulpi` | インストール時に 1 回確認 | 更新のたびに管理者の承認（Windows の確認）を求め、このコンピューター上の他のユーザーの GitPoulpi セッションを先に終了します。 |
+
+同じ選択はサイレントでも指定できます：`gitpoulpi-<version>-...-setup.exe /CURRENTUSER` または `/ALLUSERS`。
+
+チェックボックスは、スタートメニューのショートカット、デスクトップのショートカット、PATH への追加です。**コマンドのエイリアス**を尋ねるページがあり、既定は `gp`、好きな名前にでき、空にすればエイリアスなしになります（コマンドラインでは `/ALIAS=name` または `/ALIAS=`）。PowerShell では `gp` がすでに `Get-ItemProperty` に使われているため、別の名前にするか `gitpoulpi` を使ってください。
+
+インストーラーは実行ファイル（更新中にファイルを入れ替える小さなプログラム `gitpoulpi-updater` を含む）と `.gitpoulpi-dist` マーカーをコピーします。マーカーには GitPoulpi のインストール方法（`inno-user` または `inno-machine`）が記録され、更新パネルが**インストール方法**として表示するのはこれです。セットアップをもう一度実行しても、選択内容（対象、ショートカット、エイリアス）は保持されます。
+
+アンインストールは Windows の設定 > アプリから行います。`gitpoulpi uninstall`（エイリアス、PATH のエントリ、ショートカット）を実行してから、更新機能が残した `.old` ファイルを含めてファイルを削除します。設定とリポジトリは残ります。
 
 ### Linux と macOS：`install.sh`
 
@@ -52,7 +89,7 @@ GitPoulpi には 3 つの実行ファイルがあります。
 curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
 ```
 
-OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~/.local/opt/gitpoulpi` にインストールし、`gitpoulpi` と `gitpoulpi-mcp` を `~/.local/bin` にリンクします。root 権限は不要で、ホームの外には何も触れません。`--yes` を付けない場合は、エイリアス（既定は `gp`）、PATH、ショートカットについて尋ねます。
+OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~/.local/opt/gitpoulpi` にインストールし（チャンネルは `archive`：GitPoulpi はその場で自己更新します）、`gitpoulpi` と `gitpoulpi-mcp` を `~/.local/bin` にリンクします。root 権限は不要で、ホームの外には何も触れません。`--yes` を付けない場合は、エイリアス（既定は `gp`）、PATH、ショートカットについて尋ねます。
 
 | フラグ | 効果 |
 |---|---|
@@ -66,6 +103,38 @@ OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~
 | `--uninstall` | `gitpoulpi uninstall` を実行してから、リンクとフォルダーを削除します。 |
 
 最新リリースの検索にはリポジトリが公開されている必要があります。非公開の場合は、ブラウザーでアーカイブをダウンロードして `--archive` を使ってください。
+
+## パッケージマネージャーで
+
+以下のどのチャンネルも、プログラムの隣に同じ `.gitpoulpi-dist` マーカーを、そのチャンネル固有の名前で書き込みます。GitPoulpi はこれを読んで、更新の担い手を知ります。担うのはパッケージマネージャーであり、GitPoulpi がその裏でファイルを入れ替えることはありません。更新パネル（タイトルバーのバージョンをクリック）は、パッケージマネージャー自身のコマンドを実行するか、コピーできるように表示します。[更新](updates.md)を参照してください。
+
+| チャンネル | インストール | 備考 |
+|---|---|---|
+| **Chocolatey**（Windows） | `choco install gitpoulpi` | 全ユーザー向けにインストールされるため、更新には管理者の承認が必要です。 |
+| **winget**（Windows） | `winget install --id GitPoulpi.GitPoulpi` | `--scope user` または `--scope machine` で選べます。machine スコープは、インストール時と更新のたびに管理者の承認を求めます。 |
+| **Scoop**（Windows） | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` の後に `scoop install gitpoulpi` | ユーザーごと。管理者権限は不要です。 |
+| **Homebrew**（macOS、Linux） | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | tap は `Poulpi-Lab/homebrew-gitpoulpi` です。 |
+| **apt**（Debian、Ubuntu） | [apt リポジトリ](#aptdebian-と-ubuntu)を参照 | 署名付きのリポジトリ。すべてのリリースに `.deb` も添付されています。 |
+| **MSI**（Windows、管理対象） | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 管理者向け：全ユーザー、アプリ内更新なし。[エンタープライズ配布](enterprise-distribution.md#intune-またはグループポリシーでの-msi)を参照。 |
+| **AUR**（Arch Linux） | `yay -S gitpoulpi-bin`（または `paru -S gitpoulpi-bin`） | ヘルパーがない場合：`git clone https://aur.archlinux.org/gitpoulpi-bin.git` の後に `cd gitpoulpi-bin && makepkg -si`。 |
+| **cargo** | `cargo binstall gitpoulpi-cli` | コンパイルせず、リリースアーカイブをダウンロードします。 |
+| **cargo（ソースから）** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | コンパイルします。Rust ツールチェーンが必要です。 |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | [Docker で実行する](docker.md)を参照。同じイメージは `ghcr.io/poulpi-lab/gitpoulpi` にもあります。 |
+
+上の名前は、リリースの手順が公開先としているものです（[リリース](../../developer/releasing.md)を参照）。まだ公開されていないチャンネルは「見つかりません」と応答しますが、リリースアーカイブやインストーラーはつねに使えます。
+
+パッケージマネージャー自身の PATH の扱いが適用されます。Chocolatey、winget、Scoop、Homebrew はプログラムを自分で PATH に追加しますが、どれも `gp` エイリアスは作りません（`gitpoulpi alias create gp` を実行するか、設定 > 一般 > ランチャーを使ってください）。
+
+### apt（Debian と Ubuntu）
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+リポジトリは `amd64` と `arm64` に対応し、プロジェクト固有の鍵で署名されています。プログラムは `/usr/lib/gitpoulpi` に入り、`/usr/bin` にリンクが作られます。パッケージは `git` に依存し、`git-lfs` を推奨します。リポジトリを使わない場合は、リリースの `.deb` を `sudo apt install ./gitpoulpi_<version>_<arch>.deb` でインストールしてください。その場合、GitPoulpi は次の `.deb` を自分でダウンロードするよう案内します。`apt` コマンドを提示するのは、`/etc/apt/sources.list.d/gitpoulpi.*` にリポジトリがあるときだけだからです。
 
 ## ソースから
 
@@ -110,29 +179,11 @@ cargo run -p xtask -- dist
 
 ## 更新
 
-タイトルバーのアプリ名とリポジトリのパスの間に、実行中のバージョン（`v1.0.0`）が表示されます。これをクリックするか、コマンドパレット（`Ctrl+P`）で**ヘルプ: リリースノート**を実行すると、変更履歴を載せたリリースノートのタブが、実行中のバージョンの位置までスクロールした状態で開きます。
+タイトルバーのアプリ名とリポジトリのパスの間に、実行中のバージョン（`v1.0.0`）が表示されます。これをクリックするか、`Ctrl+N` の後に `u` を押すか、コマンドパレット（`Ctrl+P`）で**更新: 更新パネルを表示**を実行すると、更新パネルが開き、バージョン、GitPoulpi のインストール方法、新しいリリースへの対処が表示されます。**ヘルプ: リリースノート**は変更履歴を開きます。
 
-GitPoulpi は 1 日に 1 回、バックグラウンドで GitHub に新しいリリースがあるかを問い合わせます（`updates.mode`、[設定 > 同期](settings.md#同期)）。新しいリリースがあると、チップにアクセントカラーで `v0.2.0 が利用可能` と表示され、クリックするとそのリリースのノートを先頭にしてリリースノートのタブが開きます。タブには 3 つのボタンがあり、それぞれにキーとパレットのコマンドがあります。
+GitPoulpi は 1 日に 1 回、バックグラウンドで、リリースの公開先（既定では GitHub）に新しいリリースがあるかを確認します（`updates.mode`、[設定 > 同期](settings.md#同期)）。新しいリリースがあると、チップにアクセントカラーで `v0.2.0 が利用可能` と表示されます。
 
-- **ダウンロード**（`d`、*更新: ダウンロード*）は、リリースのページをブラウザーで開きます。
-- **このバージョンをスキップ**（`s`、*更新: このバージョンをスキップ*）は、さらに新しいリリースが出るまで通知を隠します。
-- **今すぐ確認**（`r`、*更新: 今すぐ更新を確認*）は、すぐにもう一度問い合わせます。
-
-`updates.mode = "off"` にすると、リクエストはまったく送られません。ネットワークに接続できない場合や、リポジトリが非公開で github.com のトークンが保存されていない場合、確認は静かに失敗します（アプリケーションログに 1 行だけ記録され、画面には何も出ません）。`GITPOULPI_UPDATE_API` で、確認先を別の API ルートに向けられます（テストで使います）。
-
-### その場で更新する
-
-リリースアーカイブからインストールしたビルドは、自分自身を置き換えられます。アーカイブには実行ファイルの隣に小さな `.gitpoulpi-dist` ファイルが入っていて、実行中のビルドが「更新可能」になるのは、このファイルが実行ファイルの隣にある（かつ自分のプラットフォームを指している）場合だけです。`cargo` で作ったビルド、別の場所にコピーしたカスタムビルド、このファイルを外したパッケージは自己更新しません。その場合、リリースノートのタブにその旨が表示され、**ダウンロード**だけが使えます。
-
-更新可能なビルドでは、タブに次のボタンが加わります。
-
-- **今すぐ更新**（`u`、*更新: 今すぐ更新*）は、アーカイブとその `.sha256` をバックグラウンドでダウンロードし（ステータスバーのインジケーターに進捗率付きのタスクとして表示され、ほかのタスクと同様にキャンセルできます）、ハッシュを確認してアーカイブを展開し、新しい各ファイルを古いものの隣に `<name>.new` として置きます。実行中のものには何も触れません。`auto` モードでは、確認で新しいリリースが見つかるとすぐ、同じ処理が自動で行われます。
-- **再起動して更新**（`R`、*更新: 再起動して更新*。ダウンロードが準備できるとチップにも同じ文言が出ます）は、つねに自分で行う操作で、自動では行われません。セッションの単体デーモンを停止し（組み込みのデーモンはウィンドウと一緒に終了します）、ファイルを入れ替えて、同じ引数とセッションで新しいバージョンを起動します。
-- **前のバージョンに戻す**（`v`、*更新: 前のバージョンに戻す*）は、前のファイルに入れ替えて再起動します。前のバージョンのファイルは、新しいバージョンが 1 分間動作し続けるまで `<name>.old` として残り、その後に削除されるので、このボタンは最初の起動の間だけ使えます。これは git の元に戻す履歴の対象ではありません。変更されるのはリポジトリではなく GitPoulpi 自身のファイルだからです。
-
-ファイルの置き換え方：Linux と macOS では、新しい各ファイルを古いものの上にリネームします（アトミックです。実行中のプログラムは終了するまで古いコピーを使い続けます）。Windows では実行中の `.exe` を上書きできないため、古いものを `<name>.old` にリネームし、新しいものを移動します。まだ実行中の `.old` は、あとの起動で削除されます。入れ替えは全部成功するか何も行われないかのどちらかです。別のプログラムが実行ファイルのどれかを使用中の場合（たとえば `gitpoulpi-mcp` を動かしている MCP クライアント）、GitPoulpi はそのファイル名を示し、何も変更せず、ダウンロードしたものを残して再試行できるようにします。
-
-拒否されるもの（それぞれメッセージが出ます）：`.sha256` ファイルのないリリース、ハッシュの不一致、このプラットフォーム用の名前（`gitpoulpi-<version>-<target>.<zip|tar.gz>`）ではないアーカイブ、マーカーが別のバージョンやプラットフォームを指しているアーカイブ、そして次のホスト以外へのダウンロードリンクです：GitHub の `github.com`、`api.github.com`、`objects.githubusercontent.com`、`release-assets.githubusercontent.com`、`github-releases.githubusercontent.com`（最初のリクエストとすべてのリダイレクト先が対象で、それ以外へのリダイレクトはダウンロードを止めます）。非公開リポジトリのアーカイブにはブラウザーのセッションが必要なため、リポジトリが公開されるまでそこではダウンロードに失敗します。
+パネルの動作は GitPoulpi のインストール方法によって決まります。リリースアーカイブや Windows インストーラーは自分のファイルを置き換え、パッケージマネージャーは自分のコマンドを実行し、管理対象やコンテナーのインストールは、更新がどう届くかを案内します。`cargo build` で作ったビルドは更新されません。元に戻す操作、`auto` と `notify` の違い、管理者がロックできる内容を含む詳しい説明は、[更新](updates.md)にあります。
 
 ## 動作を確認する
 

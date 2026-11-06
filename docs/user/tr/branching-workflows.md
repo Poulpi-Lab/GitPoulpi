@@ -240,6 +240,31 @@ bir hatadır; bir `after_start` hook'undan sonra dal vardır ve akışa devam ed
 edilebilir). `--no-hooks` onları sormadan atlar. Bir hook her şeyi yapabilir, bu yüzden `undo`
 yalnızca git değişikliklerini geri alır.
 
+**Güven.** Commit'lenmiş bir `[hooks]` bölümünün komutları depoya push edebilen kişiden gelir,
+bu yüzden liste sürümü başına bir kez *sizin* güveninizi de ister. Güven, depo başına hook'ların
+hash'iyle tutulur (herhangi bir komutun, aşamanın veya sıranın değişmesi yeniden sorar) ve
+daemon tarafından bir çalıştırmanın ilk adımından önce ve devam ettirilen bir akış sürmeden
+önce denetlenir; bu yüzden reddedilen bir çalıştırma hiçbir şeyi değiştirmemiştir. Kendi
+geçersiz kılmanızdaki hook'lar (depo durumunuzdaki `[workflow]`, Ayarlar sayfası) sizindir ve
+asla sormaz.
+
+- **CLI:** `gitpoulpi flow trust-hooks` komutları, `hash` değerlerini ve `trusted` olup
+  olmadıklarını yazdırır; `gitpoulpi flow trust-hooks --hash <hash>` onlara güvenir, ama
+  yalnızca diskteki dosya hâlâ o hash'e sahipse. Güvenilmeyen hook'larda `--run-hooks`,
+  komutlarla ve o komut satırıyla birlikte bir ret yazdırır (`{"refused": {"reason":
+  "hooks_not_trusted", ...}}`, çıkış kodu 2). "Run them too?" diye sorulan bir terminala
+  onlara güvenip güvenmeyeceği de sorulur.
+- **TUI:** önizleme hook'ları listeler ve henüz güvenilmediklerini söyler. Eylem düğmesine
+  basmak bu durumda kaydırılabilir bir bölmede tam komutlarla birlikte (fare tekerleği,
+  sürüklenebilir kaydırma çubuğu, PgUp/PgDn/Home/End) "Bu deponun iş akışı makinenizde şu
+  komutları çalıştırır. Güvenilsin mi?" diye sorar ve iki yanıt sunar: **1 Güven ve çalıştır**
+  ve **2 Hook'lar olmadan çalıştır**. Bir ok tuşuna veya bir rakama basana kadar hiçbir şey
+  vurgulanmaz; Esc, İptal veya kapatma çarpısı yanıt vermeden geri döner. Dosya, güvendiğinizden
+  beri değiştiyse başlık "Hook'lar, onlara güvendiğinizden beri değişti" der ve eski liste
+  yenisinin altında gösterilir.
+- **Ajanlar:** hook'lara güvenecek bir araç yoktur. Güvenilmeyen hook'larda `run_hooks: true`
+  komutlarla birlikte reddedilir ve bir insan `flow trust-hooks` komutunu çalıştırır.
+
 ### Ajanlar için (MCP)
 
 Araçlar `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` ve `flow_set_parent`'tır
@@ -248,7 +273,9 @@ denetler). Planla-sonra-çalıştır biçimindedirler: planı almak için `dry_r
 (normal bir sonuç), sonra çalıştırmak için `yes: true` ile yeniden. İkisi de yoksa çağrı
 reddedilir ve planı taşır, böylece hiçbir şey kazara çalışmaz. Hook'lar yalnızca açık bir
 `run_hooks: true` ile çalışır; plan onları listeler (`hooks`, `hooks_run`) ki ajan komutları
-önce kullanıcıya gösterebilsin. Bir çakışmadan sonra `continue_: true` (bayrak `--continue`)
+önce kullanıcıya gösterebilsin. Commit'lenmiş hook'lara bir insan güvenmelidir (aracı olmayan
+`flow trust-hooks`): güvenilmeyen hook'larda `run_hooks: true`, komutlarla birlikte `refused`
+döndürür ve hiçbir şey çalıştırmaz. Bir çakışmadan sonra `continue_: true` (bayrak `--continue`)
 veya `abort: true`.
 
 ### Geri alma

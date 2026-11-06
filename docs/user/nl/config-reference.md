@@ -347,6 +347,18 @@ review_mode = "ask"       # ask | clone | api
 De antwoorden worden per profiel vijf minuten bewaard in `radar-account.json` naast
 `config.toml`; het bestand is een cache en veilig te verwijderen.
 
+### Het vertrouwensarchief (niet in `config.toml`)
+
+Waarvoor elke integratie en elk AI-profiel met API-sleutel is vertrouwd (zijn adres,
+de account-id, een vastgepinde certificaatsleutel, of gewone http was toegestaan) staat
+in `trust.toml` in de privégegevensmap die alleen jij kunt lezen (`<data>/private/trust.toml`:
+`%APPDATA%\GitPoulpi\private\` op Windows, `~/.local/share/gitpoulpi/private/`
+op Linux). Het maakt bewust geen deel uit van `config.toml`: wie de
+configuratie kan bewerken, mag het vertrouwen niet kunnen verbreden door dat te bewerken. Wijzig het met
+`gitpoulpi hosting integrations trust` en `gitpoulpi ai trust` (zie
+[de beveiligingscontrole](hosting-integration.md#de-beveiligingscontrole)); het bestand wordt
+door GitPoulpi herschreven, niet met de hand.
+
 ## `[mcp]` (wat AI-agents mogen doen)
 
 | Sleutel | Standaard | Waarden en effect |
@@ -359,6 +371,12 @@ De antwoorden worden per profiel vijf minuten bewaard in `radar-account.json` na
 | `mcp.allow_history_purge` | `false` | Alleen in `config.toml` (geen rij in de Instellingen). `true` maakt de tool `rewrite_purge` zichtbaar voor agents (hij heeft nog steeds `allow_mutations` nodig). Uit ziet een agent de tool helemaal niet: een purge verwijdert de oude geschiedenis van een herschrijving, het ongedaan maken ervan en de reflogs voorgoed. De CLI en de TUI worden er niet door beperkt. |
 | `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve` en `gitpoulpi-mcp` weigeren te starten, met een melding die deze sleutel noemt. Instellingen > Agents & MCP > *MCP-server*. Gelezen wanneer een agent de server start. |
 | `mcp.bind` | `"127.0.0.1:8808"` | Het adres waarop `--http` luistert als je er geen opgeeft (`--http ADDR` / `--bind` winnen). Alleen loopback tenzij `--allow-remote`. Leeg of de oude `"stdio"` betekent de standaard. Instellingen > Agents & MCP > *Poort van MCP-server* wijzigt de poort en behoudt de host. |
+| `mcp.http_auth` | `true` | `--http` beantwoordt alleen een verzoek met `Authorization: Bearer <token>` (het token van `gitpoulpi mcp token`). `false` haalt de controle weg; de server waarschuwt dan op stderr, en `--allow-remote` wordt geweigerd. Instellingen > Agents & MCP > *HTTP-authenticatie*. |
+| `mcp.tls` | `"off"` | `off`, `self_signed` (een certificaat dat eenmalig onder de privégegevensmap wordt gemaakt, met zijn SHA-256-vingerafdruk afgedrukt bij de start) of `files` (`tls_cert` en `tls_key`). Met TLS aan beëindigt de server TLS zelf en bestaat er geen gewone listener. Instellingen > Agents & MCP > *TLS*. |
+| `mcp.tls_cert` | `""` | PEM-certificaatketen die wordt gebruikt met `tls = "files"`. |
+| `mcp.tls_key` | `""` | PEM-privésleutel die wordt gebruikt met `tls = "files"`. |
+| `mcp.behind_proxy` | `false` | Je verklaart dat een tunnel of reverse proxy voor het eindpunt de versleuteling verzorgt. Dat kan vanuit de server niet worden gecontroleerd, dus `--allow-remote` zonder TLS vereist dat dit is ingesteld. De schakel tussen de proxy en de server is platte tekst op dat netwerk. Instellingen > Agents & MCP > *Achter een tunnel of reverse proxy*. |
+| `mcp.allow_sensitive_staging` | `false` | Alleen in `config.toml`. Uit bieden de MCP-stagetools `allow_sensitive` niet aan, en een stage die een gemarkeerd bestand zou toevoegen (zie `[privacy]`) wordt geweigerd met een bericht dat de agent zegt het jou te vragen. Aan mag een agent `allow_sensitive` meegeven. De CLI en de TUI worden er niet door beperkt: die vragen het jou. |
 
 `allow_mutations`, `mutation_allowlist` en `allow_ui` beperken alleen de MCP-server;
 de CLI is je eigen shell en wordt er niet door beperkt. Zie [MCP en
@@ -377,6 +395,9 @@ agents](mcp-and-agents.md#rechten).
 | `ai.review.include_claude_md` | `true` | Geef een codereviewconcept de `CLAUDE.md` van de repository (wortel, gelezen op de branch waarop het verzoek mikt; ingekort op 8 KB). |
 | `ai.review.include_agents_md` | `true` | Hetzelfde voor `AGENTS.md`. |
 | `ai.review.extra_file` | `""` | Nog een bestand voor een codereviewconcept: een pad relatief aan de repositorywortel, een absoluut pad of een link naar een bestand van een codehost (gelezen via het passende integratieprofiel, anders anoniem). Alle bestanden samen worden op 16 KB ingekort. |
+| `ai.privacy.redact_secrets` | `true` | Vervang elk geheim dat de scanner in een verzoek herkent (een token, een privésleutelblok, een wachtwoord in een URL, een `password = ...`-waarde die willekeurig lijkt) door `[REDACTED:<regel>]` voordat het weggaat. Instellingen > AI toont een rode waarschuwing zolang het uit staat. |
+| `ai.privacy.exclude_sensitive_files` | `true` | Laat de diff van elk bestand dat overeenkomt met `privacy.sensitive_patterns` weg uit wat wordt verstuurd. Een lokale agent die in de repositorymap werkt, kan bestanden nog steeds zelf lezen: zie [AI > Privacy](ai.md#privacy). |
+| `ai.sent_preview.<actie>` | `true` | Eén sleutel per actie (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`): toon "Wat wordt verstuurd" voordat het verzoek weggaat. "Niet meer tonen voor ..." in het dialoogvenster schrijft `false`; Instellingen > AI > *Toon wat wordt verstuurd vóór...* zet ze weer aan. |
 
 De eigen tabel `[preferences.ai_review]` van een repository (in haar `repo-state.toml`, of de vermelding van een niet-gekloonde repository in `remote-reviews.toml`) neemt dezelfde sleutels aan, allemaal optioneel, plus `no_extra_file = true`: geen extra bestand voor die repository, wat `ai.review.extra_file` ook zegt. Een niet ingestelde sleutel, een niet ingestelde `extra_file` en een ontbrekende `no_extra_file` erven de globale waarde; `extra_file` op een bestand zetten wist de schakelaar en andersom.
 
@@ -466,13 +487,22 @@ Wat `gitpoulpi rewrite` en de werkbank voor het herschrijven van de geschiedenis
 
 ## `[updates]` (zoeken naar een nieuwere release)
 
-Wat de versiechip in de titelbalk met nieuwere releases doet. Details: [Updates](installation.md#updates).
+Wat de versiechip in de titelbalk met nieuwere releases doet. Details: [Updates](updates.md).
 
 | Sleutel | Standaard | Waarden en effect |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"` vraagt eenmaal per dag op de achtergrond aan GitHub of er een nieuwere release bestaat en verandert de versiechip in `vX.Y.Z beschikbaar`. `"auto"` downloadt en klaarzet de update ook zelf als deze build uit een releasearchief komt (het vraagt nog steeds voor het herstarten); voor elke andere build gedraagt het zich als `"notify"`. `"off"` doet nooit een verzoek. Geldt direct. |
 | `updates.channel` | `"stable"` | `"stable"` kijkt alleen naar volledige releases; `"prerelease"` biedt ook release candidates aan (`-rc.1`). Geldt direct. |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | De `owner/name` op github.com waarvan de releases worden gecontroleerd. Zolang die repository privé is, antwoordt GitHub met 404, tenzij er een token voor github.com is opgeslagen (Instellingen > Integraties); zonder token mislukt de controle stilletjes en wordt er één regel naar het applicatielogboek geschreven. |
+
+Een beheerder kan `mode`, `channel` (als `release_channel`) en `repo`, plus enkele andere update-opties, instellen in een beleidsbestand voor de hele machine of in het Windows-register. Een sleutel die het beleid instelt, wint van `config.toml` en staat in de Instellingen als **Ingesteld door je beheerder**. `mode` in het beleid is een plafond: je kunt een lagere waarde kiezen, nooit een hogere. Zie [Distributie voor organisaties](enterprise-distribution.md#het-beleidsbestand-en-het-register).
+
+## `[privacy]` (gevoelige bestanden)
+
+| Sleutel | Standaard | Waarden en effect |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Padpatronen in gitignore-stijl. Een patroon zonder `/` komt overeen met de bestandsnaam op elke diepte, een met `/` met het hele pad (een voorafgaande `/` verankert het in de root); `*` en `?` blijven binnen één map, `**` gaat over mappen heen; een `!` staat weer toe wat een eerder patroon trof en de laatste treffer wint; hoofdletters worden genegeerd. Gebruikt door de stagebewaker en door `ai.privacy.exclude_sensitive_files`. |
+| `privacy.staging_guard` | `true` | Een bestand stagen dat overeenkomt met een patroon, of waarvan de inhoud een herkend geheim bevat, vraagt eerst (TUI), wordt geweigerd tenzij `--allow-sensitive` is opgegeven (CLI) of tenzij `mcp.allow_sensitive_staging` de agent `allow_sensitive` laat meegeven (MCP). Tekstbestanden tot 1 MiB elk en 32 MiB in totaal worden gelezen; binaire bestanden worden alleen op naam vergeleken. Zie [Stagen en committen](staging-and-committing.md#gevoelige-bestanden). |
 
 ## `[keybindings]`
 

@@ -368,6 +368,15 @@ oluşturulmaz. İsterseniz kapsam, dal ve tag adları ve en yeni commit'lerin ya
 (varsayılan olarak kapalı bir kutu, "ne gönderilir" bölmesinde görünür). Profil ve talimatlar,
 Ayarlar > YZ içindeki *Geçmiş yeniden yazma kuralları* olanlardır.
 
+## Anahtarın gittiği yer
+
+Bir API anahtarı (OpenAI, Anthropic, OpenRouter, OpenAI uyumlu bir sunucu) saklandığı adrese bağlıdır: profilin temel URL'sinin kökeni, yalnızca kullanıcıya ait özel veri klasöründeki `trust.toml` dosyasına kaydedilir. Temel URL sonradan başka bir yeri gösterirse, istek hiçbir şey gönderilmeden reddedilir ve anahtar olduğu yerde kalır. Anahtarı bilerek yeni adrese taşımak için `gitpoulpi ai trust <profile> --accept-origin <url>` komutunu çalıştırın (ya da uygulamada kabul edin).
+
+- Düz `http://` bu makinede serbesttir (`localhost` üzerinde Ollama, LM Studio); başka her yerde `gitpoulpi ai trust <profile> --allow-insecure-http on` gerekir.
+- Sertifikası bilinen bir otoriteye zincirlenmeyen, kendi barındırılan bir sunucu yalnızca `--accept-certificate <sha256>` ile sabitlediğiniz anahtar parmak izi için kabul edilir; TLS el sıkışması yine de sunucunun o anahtarı taşıdığını kanıtlar.
+- Bu denetim var olmadan önce zaten anahtarı olan bir profil, ilk kullanıldığında mevcut temel URL'sinden sessizce kaydedilir.
+- Yerel bir ajanın (`claude -p` ve benzerleri) anahtarı ve HTTP'si yoktur, bu yüzden bağlanacak bir şey yoktur.
+
 ## İnceleme bağlamı
 
 Bir kod inceleme taslağı (`✦` veya `hosting review suggest`) isteğin diff'ini, başlığını, açıklamasını ve
@@ -452,6 +461,49 @@ bağlamı `review_context` olarak yazdırır. Aynı dört ayar `config.toml` iç
   diğer istemcilerine veya bir MCP istemcisine asla ulaşmaz.
 - Üretilen metin kendiliğinden asla commit edilmez, push edilmez veya
   uygulanmaz.
+
+### Bir istekten neler temizlenir
+
+Her istek, hangi eylem gönderirse göndersin ve hangi sağlayıcı (barındırılan bir
+API veya yerel bir ajan) alırsa alsın, önce aynı temizleme adımından geçer:
+
+- **Gizli bilgiler sansürlenir** (`[ai.privacy] redact_secrets`, varsayılan olarak
+  açık). Bilinen önekli bir token, bir özel anahtar bloğu, bir JWT, bir URL içindeki
+  parola ve değeri rastgele görünen bir `password = value` satırı `[REDACTED:<rule>]`
+  ile değiştirilir. Kapsamlı değildir: yaygın biçimleri bulur (`rewrite scan-secrets`
+  ile aynı tarayıcı).
+- **Hassas dosyalar dışarıda bırakılır** (`[ai.privacy] exclude_sensitive_files`,
+  varsayılan olarak açık). `[privacy] sensitive_patterns` ile eşleşen bir dosyanın
+  diff'i (`.example`, `.sample` ve `.template` dosyaları dışında `.env` ve `.env.*`,
+  `*.pem`, `*.key`, SSH özel anahtarları, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`,
+  `*.crt`, `*.cer`, `*.der`, `*.kdbx`) isteğin parçası olmaz. Böyle bir dosyayı
+  adlandıran bölünmüş bir parça veya besteci dosya listesi aynı şekilde kesilir; bu
+  yüzden onun için bir plan eksik diye reddedilebilir: o dosyayı kendiniz stage'leyin
+  veya bölün.
+
+İkisinden birini kapatmak bir seçimdir ve Ayarlar > YZ, kapalı kaldığı sürece altında
+kırmızı bir satır gösterir.
+
+**Ne gönderildiği, gönderilmeden önce.** Bir istek çıkmadan önce TUI **Gönderilenler**
+iletişim kutusunu gösterir: talimatlar ve temizlemeden sonraki istek (geçmiş yeniden yazma
+iletişim kutularıyla aynı bölme, kaydırılabilir, `Alt+W` gösterir veya gizler), kaç gizli
+bilginin değiştirildiği ve hangi dosyaların dışarıda bırakıldığı (bir kural ve `ghp_****abcd`
+gibi maskeli bir önizleme, asla bir değer), bir **<eylem> için bir daha gösterme** kutusu ve
+**Gönder** / **İptal** (`Esc`, kapatma çarpısı ve dışına bir tıklama iptal eder; Gönder'e
+kadar hiçbir şey çıkmaz). Kutu `[ai.sent_preview] <action> = false` yazar; Ayarlar > YZ >
+*Göndermeden önce gönderileni göster...* her eylem için bir anahtar ve **Hepsini yeniden
+göster** düğmesi sunar. İki geçmiş yeniden yazma iletişim kutusu isteklerini zaten gösterir,
+bu yüzden anahtarları yoktur.
+
+**Komut satırında**, her `ai ...` yanıtı (ve `hosting review suggest`)
+`privacy: {redactions: N, excluded_files: [...]}` taşır ve `--print-sent`, temizlenmiş
+sistem ve kullanıcı metnini `{sent: [{system, user}], privacy, dry_run: true}` olarak,
+modeli çağırmadan yazdırır (`ai.enabled = true` gerekir, anahtar ve ağ gerekmez).
+
+**Bir sınır.** Çalışma klasörü depo olan bir yerel ajan (`workdir = repository` ya da bir
+inceleme için *Ajanı depoda çalıştır*) dosyaları kendisi okuyabilir: temizleme,
+GitPoulpi'nin ona gönderdiğini kapsar, kendi başına açtıklarını değil. Onu depodan uzak
+tutmak için `dedicated` çalışma klasörünü kullanın.
 
 ## Sorun giderme
 

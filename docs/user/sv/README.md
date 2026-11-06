@@ -13,8 +13,13 @@ läsordning: börja överst och hoppa till referenssidorna när du behöver dem.
 
 ## Börja här
 
-1. **[Installation](installation.md)**: vad du behöver, releasearkiv, bygga från
-   källkod. För en mindre binär, se **[Anpassade byggen](custom-builds.md)**.
+1. **[Installation](installation.md)**: vad du behöver, releasearkiv,
+   pakethanterare, bygga från källkod. För en mindre binär, se
+   **[Anpassade byggen](custom-builds.md)**. Hur GitPoulpi håller sig aktuellt
+   (versionschipet, uppdateringspanelen, gå tillbaka): **[Uppdateringar](updates.md)**.
+   För att köra det i en container: **[Köra i Docker](docker.md)**. För
+   administratörer, interna feeds, speglar och uppdateringspolicyn:
+   **[Företagsdistribution](enterprise-distribution.md)**.
 2. **[Komma igång](getting-started.md)**: dina första fem minuter, från start
    till din första commit.
 3. **[Rundtur i gränssnittet](interface-tour.md)**: namnet på varje område i

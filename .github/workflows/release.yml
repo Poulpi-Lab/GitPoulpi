@@ -320,6 +320,8 @@ jobs:
   # `if: env.HAS... == 'true'`, so a missing secret skips the step and the job stays green with a notice.
 
   chocolatey:
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
+    environment: release
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
     runs-on: windows-latest
@@ -355,6 +357,8 @@ jobs:
           choco push "gitpoulpi.$VERSION.nupkg" --source https://push.chocolatey.org/ --api-key "$CHOCO_API_KEY"
 
   winget:
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
+    environment: release
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
     runs-on: ubuntu-latest
@@ -388,6 +392,8 @@ jobs:
           komac update GitPoulpi.GitPoulpi --version "$VERSION" --urls "$url" --submit
 
   scoop:
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
+    environment: release
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
     runs-on: ubuntu-latest
@@ -440,6 +446,8 @@ jobs:
           git push
 
   homebrew:
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
+    environment: release
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
     runs-on: ubuntu-latest
@@ -492,6 +500,8 @@ jobs:
           git push
 
   aur:
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
+    environment: release
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
     runs-on: ubuntu-latest
@@ -557,6 +567,8 @@ jobs:
           done
 
   apt:
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
+    environment: release
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
     runs-on: ubuntu-latest
@@ -625,6 +637,8 @@ jobs:
   # from the build job's Linux archives (amd64 and arm64). Without any login the build still runs and checks the
   # Dockerfile, but pushes nothing. The Docker Hub overview is packaging/docker/README.md, replaced on every release.
   docker:
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
+    environment: release
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
     runs-on: ubuntu-latest
@@ -713,6 +727,8 @@ jobs:
   # Opt-in until the workspace is ready for crates.io (publish = false on xtask and the testkit, the CHANGELOG
   # include inside the crate, every name reserved): needs the secret and PUBLISH_CRATES == 'true'.
   crates:
+    # Publish secrets live in the `release` environment, which only `releases/v*` tags may use.
+    environment: release
     needs: publish
     if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' && vars.PUBLISH_CRATES == 'true' }}
     runs-on: ubuntu-latest

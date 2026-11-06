@@ -64,10 +64,60 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-Bezstavový JSON, stejné nástroje, stejné brány `[mcp]`. Nemá **žádné
-ověřování**, takže naslouchá jen na loopbacku; `--allow-remote` to zruší a pak
-každý, kdo se k portu dostane, může spustit každý nástroj, který vaše konfigurace
-povoluje. Používejte jen za důvěryhodnou sítí nebo ověřujícím proxy.
+Bezstavový JSON, stejné nástroje, stejné brány `[mcp]`. Každý požadavek potřebuje
+bearer token (`[mcp] http_auth`, ve výchozím stavu zapnuto): vypište ho pomocí `gitpoulpi mcp token
+--show` (nebo `--copy`, `--rotate`; token žije v souboru jen pro uživatele v
+soukromé datové složce) a předejte ho klientovi jako hlavičku:
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+Chybějící nebo špatný token dostane `401` s `WWW-Authenticate: Bearer`. Obnovený
+token platí okamžitě, bez restartu serveru. Vypnutí `http_auth` je určeno pro
+endpoint na loopbacku, kde důvěřujete každému místnímu účtu; server pak varuje na
+stderr.
+
+### Přístup k endpointu z jiného počítače
+
+Nejbezpečnější uspořádání nepotřebuje žádný vzdálený posluchač: ponechte adresu loopback a
+přesměrujte port přes SSH z počítače, na kterém běží agent, `ssh -L
+8808:127.0.0.1:8808 host`. Pak se `--allow-remote` vůbec nepoužije.
+
+`--allow-remote` (adresa mimo loopback) se odmítne, pokud není zapnuto ověřování
+s existujícím tokenem **a** provoz není šifrovaný. Odmítnutí pojmenuje, co
+chybí. Šifrovat lze dvěma způsoby:
+
+- **TLS v serveru** (`[mcp] tls = "self_signed"` nebo `"files"`). Server
+  ukončuje TLS sám: drží klíč, provádí handshake a k vrstvě HTTP se dostane jen dokončený
+  handshake; klient s prostým HTTP handshake nedokončí a vedle něj neexistuje
+  žádný prostý posluchač. Šifrování je tedy skutečnost, kterou server
+  zajistí při každém spojení, ne předpoklad. U `self_signed` první
+  spuštění vygeneruje pár v soukromé datové složce a vypíše jeho otisk
+  SHA-256 (také v Nastavení); klient serveru důvěřuje připnutím
+  tohoto otisku nebo souboru certifikátu. U `files` nastavte `tls_cert` a
+  `tls_key` na své soubory PEM a klienti ověřují certifikát podle jeho CA.
+  Klienti se ověřují bearer tokenem; klientské certifikáty se nepoužívají.
+- **Tunel nebo reverzní proxy** (`[mcp] behind_proxy = true`). Agent tunelu nebo
+  proxy se připojuje jako jakýkoli místní klient nebo klient z LAN a jeho hlavičky lze zfalšovat, takže
+  server zevnitř nepozná, zda tam jeden je. Proto jde o
+  výslovné potvrzení (v Nastavení s červeným varováním) místo
+  detekce. Tunel provozujte na stejném počítači a pokud můžete, ponechte adresu loopback.
+  U adresy mimo loopback za proxy je úsek mezi proxy
+  a serverem v té síti prostý text.
 
 **Bez MCP** agent s shellem používá CLI: `gitpoulpi --json <command>`
 (viz [Referenční příručka CLI](cli-reference.md)). Dejte mu hotový skill
@@ -79,12 +129,16 @@ a jak používat GitPoulpi místo holého `git`.
 | Přepínač | Výchozí | Účinek |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` odmítnou startovat (Nastavení > Agenti a MCP > *Server MCP*). Čte se při startu serveru: běžící server si ponechá svá nastavení. |
-| `[mcp] bind` | `"127.0.0.1:8808"` | Adresa, kterou `--http` použije, když žádná není zadána (jen loopback, pokud není `--allow-remote`). Nastavení > Agenti a MCP > *Port serveru MCP* upraví jeho port a ponechá hostitele. |
+| `[mcp] bind` | `"127.0.0.1:8808"` | Adresa, kterou `--http` použije, když žádná není zadána (jen loopback, pokud není `--allow-remote`, které vyžaduje ověřování a šifrování, viz výše). Nastavení > Agenti a MCP > *Port serveru MCP* upraví jeho port a ponechá hostitele. |
+| `[mcp] http_auth` | `true` | `--http` potřebuje `Authorization: Bearer <token>` (`gitpoulpi mcp token`). Nastavení > Agenti a MCP > *Ověřování HTTP*. |
+| `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` nebo `files` (vaše cesty PEM): server ukončuje TLS sám. Nastavení > Agenti a MCP > *TLS*. |
+| `[mcp] behind_proxy` | `false` | Ručíte za to, že provoz šifruje tunel nebo reverzní proxy, což umožní běh `--allow-remote` bez TLS. |
 | `[mcp] allow_mutations` | `false` | Vypnuto: každý nástroj, který něco mění, se odmítne; čtení, `ui_*` a návrhy dál fungují. `true` agentovi dovolí commitovat, pushovat, resetovat... |
 | `[mcp] mutation_allowlist` | `[]` | Neprázdné: jen tyto nástroje smějí něco měnit, např. `["stage", "unstage", "commit"]`. |
 | `[mcp] allow_ui` | `true` | `false`: agent nemůže hýbat vaším oknem (`ui_state` / `ui_viewers` dál odpovídají). |
 | `[mcp] ui_control` | `"ask"` | `ask`: čip ve vašem okně, který potvrdíte; `auto`: použije se, pokud nejste zaneprázdněni; `off`: odmítnuto. Pro jednoho agenta: `--ui-control`. |
 | `[mcp] allow_ui_propose` | `false` | Dovolí agentovi otevřít předvyplněné dialogy, které potvrdíte (Nastavení > Agenti a MCP > *Nechat AI agenty navrhovat změny k mému potvrzení*). |
+| `[mcp] allow_sensitive_staging` | `false` | Jen v `config.toml`. Vypnuto, nástroj `stage` nenabízí `allow_sensitive` a přidání do indexu, které by zahrnulo citlivý soubor (soukromý klíč, `.env`, rozpoznaný token), se odmítne s `{error: "sensitive_files", files}`: agent se má zeptat vás. `true` mu dovolí předat `allow_sensitive`. Viz [Stagování a commitování](staging-and-committing.md#citlivé-soubory). |
 | `[mcp] allow_history_purge` | `false` | Jen v `config.toml`. `true` zpřístupní nástroj `rewrite_purge`, který smaže nadobro starou historii přepisu (i její vrácení zpět). Vypnuto: agent ho nevidí. Stále vyžaduje `allow_mutations`. |
 | `[ui] allow_agent_view_control` | `true` | Hlavní vypínač vašeho okna (Nastavení > Agenti a MCP > *Povolit AI agentům ovládat zobrazení*). Vypnuto: žádný agent se k vašemu oknu nedostane. |
 | `[ui] launch` | `"off"` | Zda smí agent otevřít okno GitPoulpi, když žádné není otevřené (viz [níže](#když-není-otevřeno-žádné-okno-nebo-je-v-jiné-relaci)). |
@@ -153,6 +207,7 @@ mutation_allowlist = []        # e.g. ["stage", "unstage", "commit", "branch_cre
 allow_ui = true
 ui_control = "ask"             # "auto" lets the agent move your view without asking
 allow_ui_propose = false       # true: agent smí předvyplnit dialogy Reword / Split / commit / větev / tag
+allow_sensitive_staging = false  # true: agent smí přidat do indexu soubory, které ochrana označí
 allow_history_purge = false    # true: agent vidí rewrite_purge (smaže nadobro starou historii)
 ```
 
@@ -430,7 +485,10 @@ Not exposed as tools:
 
 | CLI | Why |
 |---|---|
+| `gitpoulpi hosting integrations trust` | accepting a changed address, account or certificate is the user's decision; an agent is told the security check needs the user |
+| `gitpoulpi ai trust` | binding an API key to another address is the user's decision |
 | `gitpoulpi mcp serve` | the MCP server cannot spawn/serve a copy of itself |
+| `gitpoulpi mcp token` | prints, copies and rotates the key that guards this very server: an agent must not read or replace it |
 | `gitpoulpi completions` | shell completion generation, not a GitBackend operation |
 | `gitpoulpi shell-init` | prints a wrapper function for the user's own shell, not a GitBackend operation |
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |
@@ -451,6 +509,7 @@ Not exposed as tools:
 | `gitpoulpi config set` | an agent must not be able to rewrite its own gating config |
 | `gitpoulpi hosting ssh-key create` | writes a private key and uploads it; too dangerous to let an agent automate |
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
+| `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
 ### Akce workflow větvení jsou plán, a teprve pak provedení

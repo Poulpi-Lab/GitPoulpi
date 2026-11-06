@@ -347,6 +347,17 @@ review_mode = "ask"       # ask | clone | api
 Yanıtlar profil başına, `config.toml`'un yanındaki `radar-account.json` içinde beş dakika önbelleğe alınır;
 dosya bir önbellektir, silinmesi güvenlidir.
 
+### Güven deposu (`config.toml` içinde değil)
+
+Her entegrasyonun ve API anahtarlı YZ profilinin ne için güvenildiği (adresi, hesap kimliği,
+sabitlenmiş bir sertifika anahtarı, düz http'ye izin verilip verilmediği) yalnızca kullanıcıya ait
+özel veri klasöründeki `trust.toml` dosyasında durur (`<data>/private/trust.toml`: Windows'ta
+`%APPDATA%\GitPoulpi\private\`, Linux'ta `~/.local/share/gitpoulpi/private/`). Bilerek
+`config.toml` dosyasının parçası değildir: yapılandırmayı düzenleyebilen kişi, onu düzenleyerek
+güveni genişletememelidir. Onu `gitpoulpi hosting integrations trust` ve `gitpoulpi ai trust` ile
+değiştirin (bkz. [güvenlik denetimi](hosting-integration.md#güvenlik-denetimi)); dosyayı elle değil,
+GitPoulpi yeniden yazar.
+
 ## `[mcp]` (YZ ajanlarının yapabilecekleri)
 
 | Anahtar | Varsayılan | Değerler ve etki |
@@ -359,6 +370,12 @@ dosya bir önbellektir, silinmesi güvenlidir.
 | `mcp.allow_history_purge` | `false` | Yalnızca `config.toml` içinde (Ayarlar'da satırı yok). `true`, `rewrite_purge` aracını ajanlara listeler (yine de `allow_mutations` gerekir). Kapalıyken bir ajan aracı hiç görmez: temizlik, bir geçmiş yeniden yazmanın eski geçmişini, onun geri almasını ve reflog'larını kalıcı olarak siler. CLI ve TUI bundan etkilenmez. |
 | `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve` ve `gitpoulpi-mcp` bu anahtarı adlandıran bir mesajla başlamayı reddeder. Ayarlar > Ajanlar ve MCP > *MCP sunucusu*. Bir ajan sunucuyu başlattığında okunur. |
 | `mcp.bind` | `"127.0.0.1:8808"` | Hiçbiri verilmediğinde `--http` ile dinlenen adres (`--http ADDR` / `--bind` kazanır). `--allow-remote` olmadıkça yalnızca loopback. Boş ya da eski `"stdio"` varsayılan anlamına gelir. Ayarlar > Ajanlar ve MCP > *MCP sunucu portu* portu düzenler ve ana makine kısmını korur. |
+| `mcp.http_auth` | `true` | `--http` yalnızca `Authorization: Bearer <token>` taşıyan bir isteğe yanıt verir (`gitpoulpi mcp token` token'ı). `false` denetimi kaldırır; sunucu bu durumda stderr'e uyarı yazar ve `--allow-remote` reddedilir. Ayarlar > Ajanlar ve MCP > *HTTP kimlik doğrulaması*. |
+| `mcp.tls` | `"off"` | `off`, `self_signed` (özel veri klasörünün altında bir kez üretilen bir sertifika, başlangıçta SHA-256 parmak izi yazdırılır) veya `files` (`tls_cert` ve `tls_key`). TLS açıkken sunucu TLS'yi kendisi sonlandırır ve düz bir dinleyici yoktur. Ayarlar > Ajanlar ve MCP > *TLS*. |
+| `mcp.tls_cert` | `""` | `tls = "files"` ile kullanılan PEM sertifika zinciri. |
+| `mcp.tls_key` | `""` | `tls = "files"` ile kullanılan PEM özel anahtar. |
+| `mcp.behind_proxy` | `false` | Uç noktanın önündeki bir tünelin veya ters vekil sunucunun şifrelemeyi taşıdığını beyan edersiniz. Bu, sunucunun içinden denetlenemez; bu yüzden TLS olmadan `--allow-remote` için ayarlı olması gerekir. Vekil ile sunucu arasındaki bağlantı o ağda düz metindir. Ayarlar > Ajanlar ve MCP > *Tünel veya ters vekil sunucunun arkasında*. |
+| `mcp.allow_sensitive_staging` | `false` | Yalnızca `config.toml` içinde. Kapalıyken MCP stage araçları `allow_sensitive` sunmaz ve işaretli bir dosya ekleyecek bir stage (bkz. `[privacy]`) ajana size sormasını söyleyen bir iletiyle reddedilir. Açıkken bir ajan `allow_sensitive` geçebilir. CLI ve TUI buna bağlı değildir: onlar size sorar. |
 
 `allow_mutations`, `mutation_allowlist` ve `allow_ui` yalnızca MCP sunucusunu kapılar;
 CLI sizin kendi kabuğunuzdur ve bunlarla kapılanmaz. Bkz. [MCP ve
@@ -377,6 +394,9 @@ ajanlar](mcp-and-agents.md#i̇zinler).
 | `ai.review.include_claude_md` | `true` | Bir kod inceleme taslağına deponun `CLAUDE.md` dosyasını ver (kök, isteğin hedeflediği dalda okunur; 8 KB'ta kesilir). |
 | `ai.review.include_agents_md` | `true` | `AGENTS.md` için aynısı. |
 | `ai.review.extra_file` | `""` | Bir kod inceleme taslağı için bir dosya daha: depo köküne göre bir yol, mutlak bir yol veya bir kod barındırıcısındaki dosyaya bağlantı (eşleşen entegrasyon profili üzerinden, yoksa anonim okunur). Tüm dosyalar birlikte 16 KB'ta kesilir. |
+| `ai.privacy.redact_secrets` | `true` | Tarayıcının tanıdığı her gizli bilgiyi (bir token, bir özel anahtar bloğu, bir URL içindeki parola, rastgele görünen bir `password = ...` değeri) bir istek çıkmadan önce `[REDACTED:<rule>]` ile değiştirir. Kapalıyken Ayarlar > YZ kırmızı bir uyarı gösterir. |
+| `ai.privacy.exclude_sensitive_files` | `true` | `privacy.sensitive_patterns` ile eşleşen her dosyanın diff'ini gönderilenin dışında bırakır. Depo klasöründe çalışan bir yerel ajan yine de dosyaları kendisi okuyabilir: bkz. [YZ > Gizlilik](ai.md#gizlilik). |
+| `ai.sent_preview.<action>` | `true` | Eylem başına bir anahtar (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`): istek çıkmadan önce "Gönderilenler"i gösterir. İletişim kutusundaki "<eylem> için bir daha gösterme" `false` yazar; Ayarlar > YZ > *Göndermeden önce gönderileni göster...* onları yeniden açar. |
 
 Bir deponun kendi `[preferences.ai_review]` tablosu (`repo-state.toml` içinde, ya da klonlanmamış bir deponun girdisi
 `remote-reviews.toml` içinde) aynı anahtarları alır, hepsi isteğe bağlıdır, ayrıca `no_extra_file = true`: o depo için
@@ -470,13 +490,22 @@ Dosyalar, işletim sisteminin durum klasöründe `gitpoulpi-YYYY-MM-DD.log` adı
 
 ## `[updates]` (daha yeni bir sürümü arama)
 
-Başlık çubuğundaki sürüm çipinin daha yeni sürümlerle ilgili yaptığı. Ayrıntılar: [Güncellemeler](installation.md#güncellemeler).
+Başlık çubuğundaki sürüm çipinin daha yeni sürümlerle ilgili yaptığı. Ayrıntılar: [Güncellemeler](updates.md).
 
 | Anahtar | Varsayılan | Değerler ve etki |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"`, günde bir kez arka planda GitHub'a daha yeni bir sürüm olup olmadığını sorar ve sürüm çipini `vX.Y.Z kullanılabilir` yapar. `"auto"`, bu derleme bir sürüm arşivinden geldiyse güncellemeyi kendiliğinden indirip hazırlar de (yeniden başlatmadan önce yine sorar); başka derlemelerde `"notify"` gibi davranır. `"off"` hiç istek yapmaz. Hemen uygulanır. |
 | `updates.channel` | `"stable"` | `"stable"` yalnızca tam sürümleri dikkate alır; `"prerelease"` sürüm adaylarını (`-rc.1`) da sunar. Hemen uygulanır. |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | Sürümleri denetlenen github.com `sahip/ad` değeri. Bu depo özelken, github.com için saklı bir token yoksa GitHub 404 yanıtı verir (Ayarlar > Entegrasyonlar); token yoksa denetim sessizce başarısız olur ve uygulama günlüğüne bir satır yazar. |
+
+Bir yönetici `mode`, `channel` (`release_channel` olarak) ve `repo` değerlerini, ayrıca birkaç güncelleme seçeneğini makine genelinde bir politika dosyasında veya Windows kayıt defterinde ayarlayabilir. Politikanın ayarladığı bir anahtar `config.toml` dosyasına üstün gelir ve Ayarlarda **Yöneticiniz tarafından ayarlandı** olarak görünür. Politikadaki `mode` bir üst sınırdır: daha düşük bir değer seçebilirsiniz, asla daha yüksek bir değer değil. Bkz. [Kurumsal dağıtım](enterprise-distribution.md#politika-dosyası-ve-kayıt-defteri).
+
+## `[privacy]` (hassas dosyalar)
+
+| Anahtar | Varsayılan | Değerler ve etki |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Gitignore tarzı yol kalıpları. `/` içermeyen bir kalıp dosya adıyla her derinlikte eşleşir, `/` içeren tüm yolla eşleşir (baştaki `/` onu köke sabitler); `*` ve `?` tek bir klasörün içinde kalır, `**` klasörleri aşar; bir `!` önceki bir kalıbın eşleştirdiğini yeniden serbest bırakır ve son eşleşme kazanır; büyük/küçük harf yok sayılır. stage koruması ve `ai.privacy.exclude_sensitive_files` tarafından kullanılır. |
+| `privacy.staging_guard` | `true` | Bir kalıpla eşleşen ya da içeriğinde tanınan bir gizli bilgi bulunan bir dosyayı stage'lemek önce sorar (TUI), `--allow-sensitive` verilmedikçe reddedilir (CLI) ya da `mcp.allow_sensitive_staging` ajanın `allow_sensitive` geçmesine izin vermedikçe reddedilir (MCP). Her biri 1 MiB'a ve toplam 32 MiB'a kadar metin dosyaları okunur; ikili dosyalar yalnızca adıyla eşleştirilir. Bkz. [Stage'leme ve commit](staging-and-committing.md#hassas-dosyalar).
 
 ## `[keybindings]`
 

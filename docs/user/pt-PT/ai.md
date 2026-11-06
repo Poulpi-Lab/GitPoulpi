@@ -374,6 +374,15 @@ das branches e das tags e os autores dos commits mais recentes vão junto (uma c
 por predefinição, mostrada no painel "o que é enviado"). O perfil e as instruções são os de
 *Regras de reescrita do histórico* em Definições > IA.
 
+## Para onde vai a chave
+
+Uma chave de API (OpenAI, Anthropic, OpenRouter, um servidor compatível com OpenAI) fica associada ao endereço para o qual foi guardada: a origem do URL base do perfil, registada em `trust.toml` na pasta de dados privada, só do utilizador. Se o URL base passar mais tarde a apontar para outro sítio, o pedido é recusado antes de ser enviado seja o que for e a chave fica onde está. Execute `gitpoulpi ai trust <perfil> --accept-origin <url>` (ou aceite-o na aplicação) para mover a chave para o novo endereço de propósito.
+
+- O `http://` simples é permitido neste computador (Ollama, LM Studio em `localhost`); em qualquer outro lado precisa de `gitpoulpi ai trust <perfil> --allow-insecure-http on`.
+- Um servidor auto-alojado cujo certificado não se encadeia a uma autoridade conhecida só é aceite para a impressão digital da chave que fixar com `--accept-certificate <sha256>`; o handshake TLS continua a provar que o servidor possui essa chave.
+- Um perfil que já tinha uma chave antes de esta verificação existir é registado em silêncio, a partir do seu URL base atual, na primeira vez que é usado.
+- Um agente local (`claude -p` e semelhantes) não tem chave nem HTTP, pelo que não há nada a associar.
+
 ## Contexto da revisão
 
 Um rascunho de revisão de código (`✦`, ou `hosting review suggest`) lê o diff, o título, a descrição e os
@@ -457,6 +466,50 @@ contexto efetivo como `review_context`. As mesmas quatro definições são `ai.r
 - As chaves de API são usadas pelo próprio processo `gitpoulpi` e nunca chegam ao
   daemon, aos outros clientes da janela, nem a um cliente MCP.
 - O texto gerado nunca é commitado, enviado nem aplicado por si só.
+
+### O que é retirado de um pedido
+
+Todos os pedidos, qualquer que seja a ação que os envia e o fornecedor que os recebe (uma
+API alojada ou um agente local), passam primeiro pelo mesmo passo de limpeza:
+
+- **Os segredos são ocultados** (`[ai.privacy] redact_secrets`, ativo por predefinição). Um token
+  com um prefixo conhecido, um bloco de chave privada, um JWT, uma palavra-passe num URL e uma
+  linha `password = valor` cujo valor pareça aleatório são substituídos por
+  `[REDACTED:<regra>]`. Não é exaustivo: encontra as formas comuns (o mesmo
+  analisador de `rewrite scan-secrets`).
+- **Os ficheiros sensíveis são excluídos** (`[ai.privacy] exclude_sensitive_files`, ativo por
+  predefinição). O diff de um ficheiro que corresponda a `[privacy] sensitive_patterns` (`.env`
+  e `.env.*` exceto os ficheiros `.example`, `.sample` e `.template`, `*.pem`,
+  `*.key`, chaves privadas SSH, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`,
+  `*.cer`, `*.der`, `*.kdbx`) não faz parte do pedido. Uma peça de divisão ou uma lista de
+  ficheiros do compositor que nomeie um ficheiro assim é cortada da mesma forma, pelo que um plano
+  para ele pode ser recusado por incompleto: coloque ou divida esse ficheiro você mesmo.
+
+Desativar qualquer um deles é uma escolha, e as Definições > IA mostram uma linha vermelha por baixo
+enquanto estiver desativado.
+
+**O que é enviado, antes de ser enviado.** Antes de um pedido sair, a TUI mostra o diálogo
+**O que é enviado**: as instruções e o pedido depois da limpeza (o mesmo painel dos diálogos de
+reescrita do histórico, com deslocação, `Alt+W` mostra-o ou oculta-o), quantos segredos foram
+substituídos e que ficheiros foram excluídos (uma regra e uma pré-visualização mascarada
+como `ghp_****abcd`, nunca um valor), uma caixa **Não mostrar de novo para
+<ação>**, e **Enviar** / **Cancelar** (`Esc`, a cruz de fechar e um clique
+fora cancelam; nada sai antes de Enviar). A caixa escreve
+`[ai.sent_preview] <ação> = false`; Definições > IA > *Mostrar o que é enviado
+antes de...* tem um interruptor por ação e **Mostrar tudo de novo**. Os dois diálogos de
+reescrita do histórico já mostram o seu pedido, por isso não têm interruptor.
+
+**Na linha de comandos**, cada resposta `ai ...` (e `hosting review suggest`)
+traz `privacy: {redactions: N, excluded_files: [...]}`, e `--print-sent`
+mostra o texto do sistema e do utilizador já limpo, como `{sent: [{system, user}], privacy,
+dry_run: true}`, sem chamar o modelo (precisa de `ai.enabled = true`, sem chave
+e sem rede).
+
+**Um limite.** Um agente local cuja pasta de trabalho é o repositório
+(`workdir = repository`, ou *Executar o agente no repositório* numa revisão) pode
+ler ele próprio os ficheiros: a limpeza cobre o que o GitPoulpi lhe envia, não o que
+ele abre por si. Use a pasta de trabalho `dedicated` para o manter fora do
+repositório.
 
 ## Resolução de problemas
 

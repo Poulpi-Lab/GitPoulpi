@@ -161,6 +161,43 @@ GitPoulpi letar efter en profils token i den här ordningen:
 Varje profil är en `[[integrations]]`-post i `config.toml`. Se
 [konfigurationsreferensen](config-reference.md#integrations-hosting-och-ärendehantering).
 
+## Säkerhetskontrollen
+
+En sparad token är bara så säker som adressen den skickas till. GitPoulpi kommer därför ihåg, för varje integration, vad den anslöts till, och stannar när det ändras:
+
+- **Adressen.** Första gången en integration används (eller ansluts) registreras dess adress i `trust.toml`, i den privata datamappen som bara användaren kan läsa (`<data>/private/`), inte i `config.toml`: att redigera konfigurationen kan aldrig vidga vad som betros. Om adressen i konfigurationen inte längre är den registrerade skickas ingenting dit och token läses inte ens. Olika stavningar av en adress (`HTTPS://Git.Example.com:443/`) är samma adress; en värd som liknar den är det inte.
+- **Kontot.** Efter att du har anslutit en token, och sedan ungefär en gång per dygn (och en gång per körning för en token som kommer från `GITPOULPI_TOKEN_*` eller credential helpern), frågar GitPoulpi värden vem token tillhör och jämför kontots **id**, inte inloggningsnamnet. En token som nu tillhör någon annan stoppas.
+- **Certifikatet.** Servrar vars certifikat inte leder till en känd utfärdare (en privat CA, en självsignerad server) godtas bara för den exakta nyckel du godtog, och TLS-handskakningen bevisar fortfarande att servern har den nyckeln. Med strikt fästning på måste nyckeln matcha även när certifikatet leder till en offentlig rot; priset är att varje nyckelrotation frågar igen, vilket är anledningen till att det är frivilligt. De offentliga värdarna (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) har ingen certifikatpost.
+- **Vanlig http.** En `http://`-adress som inte är loopback nekas om du inte har tillåtit den för den integrationen.
+
+Varje begäran hålls också till integrationens egen adress (och, för en offentlig värd, dess API-värd som `api.github.com`): en begäran någon annanstans nekas innan den skickas, och en omdirigering till en annan adress följs inte.
+
+**Integrationer som anslöts innan den här kontrollen fanns** får sin post tyst, från konfigurationen som den var, första gången de används efter uppgraderingen: de behåller dagens förtroendenivå och ingenting frågar.
+
+### Från kommandoraden
+
+Ett stoppat kommando misslyckas med slutkod 2 och skriver ut vad som ändrades (se [CLI-referensen](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` visar vad som är betrott; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` och `--allow-insecure-http on|off` godtar en sak var och namnger det exakta värdet. Efter att ha godtagit en ny adress anger du token igen. Att koppla från (`hosting logout`) eller ta bort en integration raderar dess token, dess förtroendepost och det som cachats från den (de sparade repositorylistorna i dialogen Klona, kontolistorna i Radar och utkasten till fjärrgranskningar från dess värd).
+
+En agent (MCP) kan inte godta något: den får veta att säkerhetskontrollen behöver dig.
+
+### I terminalgränssnittet
+
+En stoppad begäran öppnar dialogen **Säkerhetskontroll av integration** över det du höll på med. Den säger vad som ändrades (den gamla och den nya adressen, det gamla och det nya kontot med sina id, eller det gamla och det nya certifikatet som en liten tabell med SHA-256-fingeravtrycket i grupper om fyra, ämne, utfärdare och giltighet) och att token inte skickades. Svaren är numrerade:
+
+1. **Koppla från** raderar den sparade token, förtroendeposten och det som cachats från integrationen.
+2. **Lita på** den nya adressen, det nya kontot eller det nya certifikatet (en okrypterad adress: **Tillåt vanlig http**).
+3. **Avbryt** ändrar ingenting.
+
+Inget svar är markerat förrän du trycker på en piltangent eller en siffra, så ett förlupet Enter godtar ingenting. Esc och stängningskorset avbryter; ett klick utanför dialogen gör ingenting. En lång text rullar med hjulet, Page Up/Page Down eller rullningslisten. Flera kontroller köas (en per integration och slag av ändring) och ställs en efter en. En avbruten kontroll dyker inte upp igen så länge den är oförändrad; **Integrationer: Granska säkerhetskontroll** i kommandopaletten tar tillbaka den.
+
+Efter att du har litat på en ny **adress** öppnas integrationens formulär med tokenfältet fokuserat och tipset ”Du bör ange token igen.”: den sparade token skickades aldrig dit. I formuläret godtas en adress som ändrats med flit tillsammans med en token som skrivits för den; utan token ber formuläret om en.
+
+Formuläret har också två reglage. **Strikt certifikatfästning** (för en https-adress) fäster certifikatnyckeln som servern presenterar när du ansluter. **Tillåt vanlig http (okrypterat)** erbjuds bara för en `http://`-adress som inte är den här datorn, med en röd varning om att token färdas i klartext. Det anslutna kortet visar det fästa fingeravtrycket.
+
+### Vad token får göra, och till när
+
+Att ansluta frågar också värden vad token kan göra. GitHub (klassiska tokens), GitLab och Bitbucket (när den skickar scopes) rapporterar sina scopes: kortet visar en gul rad ”Den här token har fler rättigheter än GitPoulpi behöver” som listar de scopes som går utöver det GitPoulpi använder, de känsliga (som `delete_repo`, `admin:org`, `sudo`) i rött, med rådet att föredra en finkornig token med utgångsdatum. En klassisk GitHub-token (`ghp_...`) får det rådet även när dess scopes är exakta. En finkornig GitHub-token kan inte tillfrågas om sina behörigheter, så bara dess utgångsdatum visas. Kortet visar utgångsdatumet när värden anger det. En token utan utgångsdatum visar ingen påminnelse, och de andra produkterna rapporterar inga scopes och ger ingen varning. Samma fält finns i JSON från `hosting integrations login` och `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). De läses när du ansluter, så kortet visar dem för sessionen som anslöt.
+
 ## 4. Länka ett repository
 
 Länkning är explicit och per repository. När en profil är ansluten visar

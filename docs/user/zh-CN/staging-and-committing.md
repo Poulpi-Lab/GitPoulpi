@@ -25,6 +25,12 @@
 | unstage | 在 staged 分区中使用相同的按钮和按键（`Ctrl+G u`） |
 | 丢弃一个文件的更改 | 右键点击文件 > **丢弃更改**（会先询问；`Ctrl+Z` 可带回这些更改） |
 
+### 敏感文件
+
+stage 一个文件、一个文件夹或全部内容之前，会先检查它将加入什么。文件名匹配 `[privacy] sensitive_patterns`（`.env` 和 `.env.*`，但 `.example`、`.sample` 和 `.template` 的除外，以及 `*.pem`、`*.key`、SSH 私钥、`*.p12`、`*.pfx`、`*.jks`、`*.keystore`、`*.crt`、`*.cer`、`*.der`、`*.kdbx`），或者文本中含有扫描器可识别的密钥的文件，不会被 stage。**敏感文件**问题会列出每个文件及其原因（一个模式，或带遮蔽预览的密钥种类，绝不显示值），并提供 **1. 仍然 stage** 或 **2. 取消，不 stage 任何文件**。在你按下方向键或数字键之前，没有任何答案被高亮，所以误按 Enter 不会作答；`Esc`、关闭叉号和点击窗口外部都会取消。无论来自键盘、按钮、菜单、命令面板还是拖放，都是同一个问题，因为它们发出的是同一个请求。取消不会 stage 任何内容，同一次 stage 中的普通文件也不会。
+
+每个文本文件最多读取 1 MiB、总共 32 MiB；更大的文件和二进制文件只按名称判断。`[privacy] staging_guard = false` 会关闭该检查。stage 单个 hunk 或若干行不做检查：你已经在处理那个文件了。
+
 右键点击文件可打开它的菜单：stage 或 unstage、丢弃、复制路径、文件历史和 blame、在外部编辑器、diff 工具或文件管理器中打开（在[设置 > Diff 与编辑器](settings.md#diff-与编辑器)中设置），等等。
 
 ## 忽略文件，以及将文件视为二进制或文本
@@ -193,9 +199,12 @@ commit 表单位于右侧窗格底部，它的 **摘要** 同时也是 Log 中�
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # 在下面的拒绝之后
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage` 以同样的方式拒绝敏感文件：不 stage 任何内容，退出码为 2，`--json` 输出 `{error: "sensitive_files", files: [{path, reason}]}`（一条规则和遮蔽后的预览，绝不输出值）。`--allow-sensitive` 就是重试。MCP 代理会得到同样的拒绝，并且除非 `[mcp] allow_sensitive_staging = true`，否则无法传入 `allow_sensitive`：它会被告知来问你。
 
 参见 [CLI 参考](cli-reference.md)。

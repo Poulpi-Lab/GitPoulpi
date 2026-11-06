@@ -15,8 +15,12 @@ je ze nodig hebt.
 ## Begin hier
 
 1. **[Installatie](installation.md)**: wat je nodig hebt, releasearchieven,
-   bouwen vanuit de broncode. Voor een kleinere binary, zie
-   **[Aangepaste builds](custom-builds.md)**.
+   pakketbeheerders, bouwen vanuit de broncode. Voor een kleinere binary, zie
+   **[Aangepaste builds](custom-builds.md)**. Hoe GitPoulpi zichzelf actueel
+   houdt (de versiechip, het updatepaneel, teruggaan): **[Updates](updates.md)**.
+   Om het in een container te draaien: **[GitPoulpi in Docker draaien](docker.md)**.
+   Voor beheerders, interne feeds, mirrors en het updatebeleid:
+   **[Distributie voor organisaties](enterprise-distribution.md)**.
 2. **[Aan de slag](getting-started.md)**: je eerste vijf minuten, van opstarten
    tot je eerste commit.
 3. **[Rondleiding door de interface](interface-tour.md)**: de naam van elk deel

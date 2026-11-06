@@ -252,8 +252,11 @@ Bu sayfada ayrıca **Güncellemeler** altında şunlar vardır:
 
 | Seçenek | Ne yapar |
 |---|---|
-| **Güncellemeleri denetle** | Bir açılır liste (`updates.mode`): **Bildir** (varsayılan) günde bir kez arka planda denetler ve başlık çubuğunda `vX.Y.Z kullanılabilir` gösterir; **Otomatik**, GitPoulpi bir sürüm arşivinden kurulduysa güncellemeyi arka planda da indirir (ne zaman yeniden başlatacağınıza yine siz karar verirsiniz); **Kapalı** hiç istek yapmaz. Hemen uygulanır. Bkz. [Güncellemeler](installation.md#güncellemeler). |
+| **Güncellemeleri denetle** | Bir açılır liste (`updates.mode`): **Bildir** (varsayılan) günde bir kez arka planda denetler ve başlık çubuğunda `vX.Y.Z kullanılabilir` gösterir; **Otomatik**, GitPoulpi bir sürüm arşivinden kurulduysa güncellemeyi arka planda da indirir (ne zaman yeniden başlatacağınıza yine siz karar verirsiniz); **Kapalı** hiç istek yapmaz. Hemen uygulanır. Bkz. [Güncellemeler](updates.md). |
 | **Güncelleme kanalı** | Bir açılır liste (`updates.channel`): **Kararlı** (varsayılan) veya **Ön sürüm** (sürüm adaylarını da kapsar). Hemen uygulanır. |
+| **Kurulum yöntemi** | Salt okunur. GitPoulpi'nin bu bilgisayara nasıl geldiği (bir sürüm arşivi, bu kullanıcı veya tüm kullanıcılar için kurulum programı, Chocolatey, winget, Scoop, Homebrew, apt, bir MSI paketi, AUR, bir Docker imajı, cargo veya bir geliştirme derlemesi). Güncellemelerin nasıl uygulanacağını belirler, bkz. [Güncellemeler](updates.md). |
+
+Yöneticinizin makine genelindeki güncelleme politikasında ayarladığı bir satır **Yöneticiniz tarafından ayarlandı** der ve burada değiştirilemez.
 
 Bu sayfada ayrıca **Geçmişi yeniden yazma** altında harici betiklerin süre sınırları vardır (bkz. [Geçmişi yeniden yazma](history-rewrite.md)):
 
@@ -341,11 +344,22 @@ ayrıca [inceleme bağlamının](ai.md#i̇nceleme-bağlamı) varsayılanlarını
 (*Profil ayarı*, *Evet*, *Hayır*), **CLAUDE.md'yi ekle**, **AGENTS.md'yi ekle** ve **Ek dosya** (bir yol ya da
 bağlantı; boşsa hiçbiri eklenmez, altında bir dosya seçici açan bir **Gözat...** düğmesi vardır; düğmede `Enter` onun klavye karşılığıdır). Bu sayfanın kendi kılavuzu var: [YZ desteği](ai.md).
 
+Eylem başına bloklarının altında **Gizlilik** grubu:
+
+| Seçenek | Ne yapar |
+|---|---|
+| **Göndermeden önce gizli bilgileri sansürle** | Açık (varsayılan): bir istekte bulunan token'lar, özel anahtarlar ve parolalar, istek çıkmadan önce `[REDACTED:<rule>]` ile değiştirilir. Kapalı: kırmızı bir satır gizli bilgilerin olduğu gibi gönderildiğini söyler. |
+| **Hassas dosyaları dışarıda bırak** | Açık (varsayılan): `.env` dosyalarının, özel anahtarların ve sertifikaların değişiklikleri (`[privacy] sensitive_patterns`) asla bir isteğin parçası olmaz. Kapalı: kırmızı bir satır, bir isteğin parçasıysa gönderildiklerini söyler. |
+| **Göndermeden önce gönderileni göster...** | Eylem başına bir anahtar (commit mesajı, açıklama, stash mesajı, pull request açıklaması, commit besteci, çakışma çözümü, kod incelemesi, commit bölme): isteği, çıkmadan önce **Gönderilenler** iletişim kutusunda gösterir. İletişim kutusundaki *Bir daha gösterme* kutusu birini kapatır. Geçmişi yeniden yazma eylemleri kendi iletişim kutusunu gösterir. |
+| **Hepsini yeniden göster** | Bir anahtar kapalıyken görünür; hepsini yeniden açar. |
+
+Bkz. [YZ > Gizlilik](ai.md#gizlilik).
+
 ### Ajanlar ve MCP
 
-YZ ajanlarının bu pencerede neler yapabileceği ve MCP sunucusunun çalışıp çalışamayacağı.
-İki MCP satırı yalnızca sunucuyu içeren derlemelerde görünür; bkz.
-[MCP ve ajanlar](mcp-and-agents.md).
+YZ ajanlarının bu pencerede neler yapabileceği, MCP sunucusunun çalışıp çalışamayacağı ve
+HTTP uç noktasının nasıl korunduğu. MCP satırları yalnızca sunucuyu içeren derlemelerde
+görünür; bkz. [MCP ve ajanlar](mcp-and-agents.md).
 
 | Seçenek | Ne yapar |
 |---|---|
@@ -354,6 +368,12 @@ YZ ajanlarının bu pencerede neler yapabileceği ve MCP sunucusunun çalışıp
 | **YZ ajanlarının görünümü yönetmesine izin ver** | Ajanların size bu pencerede bir commit, bir dosya ya da bir bildirim göstermesine izin verir (`ui show`). Kapalı: hiçbir ajan pencereye ulaşamaz. |
 | **YZ ajanlarının onaylayacağım değişiklikler önermesine izin ver** | Ajanların, sizin onaylayacağınız önceden doldurulmuş Reword, commit, dal ya da tag iletişim kutuları açmasına izin verir. Varsayılan olarak kapalıdır. Bkz. [MCP ve ajanlar](mcp-and-agents.md#i̇zinler). |
 | **Ajanlar için pencere aç**, **Başlatma komutu (custom)** | Hiçbir pencere açık değilken bir ajanın bir GitPoulpi penceresi açıp açamayacağı ve hangi terminal ya da çoklayıcıyla açacağı. Varsayılan olarak kapalıdır. |
+| **HTTP kimlik doğrulaması** | Açık (varsayılan): MCP HTTP uç noktası yalnızca erişim token'ı taşıyan bir isteğe yanıt verir. Kapalıyken kırmızı bir uyarı gösterir: uç noktaya erişebilen her program MCP ayarlarının izin verdiği her aracı çalıştırabilir ve `--allow-remote` reddedilir. `mcp.http_auth` olarak kaydedilir. |
+| **Erişim token'ı** | Token, maskeli. Maskeli değer bir düğmedir: `Enter` (veya bir tıklama) onu alttaki satırda tam olarak gösterir ve yeniden gizler. **Kopyala** onu durum satırında yankılamadan panoya koyar, **Döndür** onu bir onaydan sonra değiştirir (eski token'ı tutan istemciler hemen reddedilir, sunucunun yeniden başlatılması gerekmez), **Oluştur** ilkini yapar. `Left` / `Right` düğmeler arasında gezinir ve `Enter` birine basar. Aynı token `gitpoulpi mcp token` komutudur. |
+| **TLS** | **Kapalı** (varsayılan), **Kendinden imzalı** (sunucu bir kez sertifika oluşturur ve parmak izini gösterir) veya **Dosyalar** (sizin sertifikanız ve anahtarınız). TLS'yi sunucu kendisi sonlandırır. `mcp.tls` olarak kaydedilir; sunucunun bir sonraki başlayışında uygulanır. |
+| **Sertifika yolu**, **Anahtar yolu** | **Dosyalar** ile kullanılan PEM dosyaları (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Sertifika parmak izi** | Salt okunur: uç noktanın sunduğu sertifikanın SHA-256 parmak izi, istemcilerin denetlemesi için. |
+| **Tünel veya ters vekil sunucunun arkasında** | Uç noktanın önündeki bir tünelin veya vekil sunucunun trafiği şifrelediğine dair beyanınız; bu, `--allow-remote` komutunun TLS olmadan çalışmasına izin verir. Sunucu bunu denetleyemez, bu yüzden açıkken kırmızı bir uyarı gösterir. `mcp.behind_proxy` olarak kaydedilir. Bkz. [MCP ve ajanlar](mcp-and-agents.md#uç-noktaya-başka-bir-makineden-erişmek). |
 
 ### Görünüm
 

@@ -1,3 +1,5 @@
+**English** · [Čeština](cs/enterprise-distribution.md) · [Deutsch](de/enterprise-distribution.md) · [Español](es/enterprise-distribution.md) · [Français](fr/enterprise-distribution.md) · [Italiano](it/enterprise-distribution.md) · [日本語](ja/enterprise-distribution.md) · [한국어](ko/enterprise-distribution.md) · [Nederlands](nl/enterprise-distribution.md) · [Polski](pl/enterprise-distribution.md) · [Português (Brasil)](pt-BR/enterprise-distribution.md) · [Português (Portugal)](pt-PT/enterprise-distribution.md) · [Русский](ru/enterprise-distribution.md) · [Svenska](sv/enterprise-distribution.md) · [Türkçe](tr/enterprise-distribution.md) · [Українська](uk/enterprise-distribution.md) · [简体中文](zh-CN/enterprise-distribution.md)
+
 # Enterprise distribution
 
 For administrators who deploy GitPoulpi to many computers from their own servers: internal package feeds, mirrors, a machine-wide update policy, and a default configuration. Read [Installation](installation.md) and [Updates](updates.md) first.
@@ -9,7 +11,7 @@ Two facts drive everything here:
 
 ## Chocolatey, with a private feed
 
-The public package downloads the installer from GitHub. For a closed network, internalise it:
+The public package downloads the installer from GitHub. For a closed network, internalize it:
 
 1. Get the package (`choco download gitpoulpi --internalize` with the licensed Chocolatey tooling, or download the `.nupkg` and unpack it).
 2. In `tools\chocolateyinstall.ps1` point `url64bit` at your own copy of `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe` and keep `checksum64` equal to the first field of the release's `.sha256` file (or the checksum of your copy).

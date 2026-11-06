@@ -118,7 +118,7 @@ As teclas depois de um prefixo aparecem com o prefixo (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Abrir o Registro de atividade | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Abrir o registro de atividade global | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Mostrar as tarefas em segundo plano | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | Mostrar o painel de atualização | `Ctrl+N u` |
 | `nav_prefix` | `help` | Alternar ajuda | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Selecionar aba | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Mudar tema | `Ctrl+N y` |
@@ -834,10 +834,10 @@ As teclas são as padrão.
 | Exibir: registro de atividade | `Ctrl+N A` |
 | Exibir: registro de atividade global | `Ctrl+N G` |
 | Ajuda: Notas da versão |  |
-| Updates: Show Update | `Ctrl+N u` |
-| Updates: Open Security Notice |  |
-| Updates: Copy Update Command |  |
-| Updates: Run Update Command in a Terminal |  |
+| Atualizações: mostrar painel de atualização | `Ctrl+N u` |
+| Atualizações: abrir aviso de segurança |  |
+| Atualizações: copiar comando de atualização |  |
+| Atualizações: executar comando de atualização em um terminal |  |
 | Atualizações: verificar agora |  |
 | Atualizações: baixar |  |
 | Atualizações: atualizar agora |  |
@@ -1147,7 +1147,7 @@ As teclas são as padrão.
 | Integrações: gerenciar o perfil deste repositório |  |
 | Integrações: conectar integração... |  |
 | Configurações: Opções do Radar de um perfil... |  |
-| Integrations: Review security check |  |
+| Integrações: revisar verificação de segurança |  |
 | App: sair | `q` |
 | App: tema... |  |
 | App: mudar tema... | `Ctrl+N y` |

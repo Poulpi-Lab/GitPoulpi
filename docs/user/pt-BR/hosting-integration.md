@@ -164,6 +164,43 @@ O GitPoulpi procura o token de um perfil nesta ordem:
 Cada perfil é uma entrada `[[integrations]]` no `config.toml`. Veja a
 [referência de configuração](config-reference.md#integrations-hospedagem-e-issue-trackers).
 
+## A verificação de segurança
+
+Um token salvo só é tão seguro quanto o endereço para o qual é enviado. Por isso o GitPoulpi lembra, para cada integração, ao que ela estava conectada, e para quando isso muda:
+
+- **O endereço.** Na primeira vez que uma integração é usada (ou conectada), o endereço dela é registrado em `trust.toml`, na pasta de dados privada só do usuário (`<data>/private/`), não no `config.toml`: editar a configuração nunca consegue ampliar o que é confiável. Se o endereço na configuração não é mais o registrado, nada é enviado a ele e o token nem é lido. Grafias de um mesmo endereço (`HTTPS://Git.Example.com:443/`) são o mesmo endereço; um host parecido não é.
+- **A conta.** Depois que você conecta um token, e depois cerca de uma vez por dia (e uma vez por execução para um token que vem de `GITPOULPI_TOKEN_*` ou do auxiliar de credenciais), o GitPoulpi pergunta ao host a quem o token pertence e compara o **id** da conta, não o login. Um token que agora pertence a outra pessoa é barrado.
+- **O certificado.** Servidores cujo certificado não se encadeia a uma autoridade conhecida (uma CA privada, um servidor autoassinado) são aceitos só para a chave exata que você aceitou, e o handshake TLS ainda prova que o servidor tem essa chave. Com a fixação estrita ativada, a chave precisa coincidir mesmo quando o certificado se encadeia a uma raiz pública; o preço é que toda rotação de chave pergunta de novo, e por isso ela é opcional. Os hosts públicos (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) não guardam registro de certificado.
+- **http simples.** Um endereço `http://` que não seja loopback é recusado, a menos que você o tenha permitido para aquela integração.
+
+Toda requisição também fica restrita ao endereço da própria integração (e, para um host público, ao host de API dele, como `api.github.com`): uma requisição para qualquer outro lugar é recusada antes de ser enviada, e um redirecionamento para outro endereço não é seguido.
+
+**As integrações conectadas antes de existir esta verificação** recebem o registro em silêncio, a partir da configuração como estava, na primeira vez que são usadas depois da atualização: elas mantêm o nível de confiança de hoje e nada pergunta.
+
+### Pela linha de comando
+
+Um comando barrado falha com código de saída 2 e imprime o que mudou (veja a [referência da CLI](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` mostra o que é confiável; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` e `--allow-insecure-http on|off` aceitam uma coisa cada, nomeando o valor exato. Depois de aceitar um novo endereço, digite o token de novo. Desconectar (`hosting logout`) ou remover uma integração exclui o token dela, o registro de confiança e o que foi guardado em cache a partir dela (as listas de repositórios salvas do diálogo Clonar, as listas de conta do Radar e os rascunhos de revisão remota do host dela).
+
+Um agente (MCP) não consegue aceitar nada: ele é avisado de que a verificação de segurança precisa de você.
+
+### Na interface do terminal
+
+Uma requisição barrada abre o diálogo **Verificação de segurança da integração** sobre o que você estava fazendo. Ele diz o que mudou (o endereço antigo e o novo, a conta antiga e a nova com seus ids, ou o certificado antigo e o novo como uma pequena tabela com a impressão digital SHA-256 em grupos de quatro, o assunto, o emissor e a validade) e que o token não foi enviado. As respostas são numeradas:
+
+1. **Desconectar** exclui o token salvo, o registro de confiança e o que foi guardado em cache a partir da integração.
+2. **Confiar** no novo endereço, conta ou certificado (para um endereço sem criptografia: **Permitir http simples**).
+3. **Cancelar** não muda nada.
+
+Nenhuma resposta fica destacada até você pressionar uma seta ou um dígito, então um Enter perdido não aceita nada. Esc e o `✕` de fechar cancelam; um clique fora do diálogo não faz nada. Um corpo longo rola com a roda do mouse, Page Up/Page Down ou a barra de rolagem. Várias verificações entram na fila (uma por integração e tipo de mudança) e são perguntadas uma depois da outra. Uma verificação cancelada não reaparece enquanto não mudar; **Integrações: revisar verificação de segurança** na paleta de comandos a traz de volta.
+
+Depois que você confia em um novo **endereço**, o formulário da integração abre com o campo do token em foco e a dica "Recomenda-se digitar o token de novo": o token salvo nunca foi enviado para lá. No formulário, um endereço alterado de propósito é aceito junto com um token digitado para ele; sem um token, o formulário pede um.
+
+O formulário também tem duas chaves. **Fixação estrita de certificado** (para um endereço https) fixa a chave do certificado que o servidor apresenta quando você conecta. **Permitir http simples (sem criptografia)** só é oferecido para um endereço `http://` que não seja esta máquina, com um aviso vermelho de que o token trafega em texto claro. O cartão conectado mostra a impressão digital fixada.
+
+### O que o token pode fazer, e até quando
+
+Conectar também pergunta ao host o que o token pode fazer. O GitHub (tokens clássicos), o GitLab e o Bitbucket (quando envia os escopos) informam seus escopos: o cartão mostra uma linha amarela "Este token tem mais permissões do que o GitPoulpi precisa" listando os escopos além do que o GitPoulpi usa, os sensíveis (como `delete_repo`, `admin:org`, `sudo`) em vermelho, com o conselho de preferir um token granular com data de validade. Um token clássico do GitHub (`ghp_...`) recebe esse conselho mesmo quando os escopos são exatos. Um token granular do GitHub não pode ser consultado sobre suas permissões, então só a validade dele é mostrada. O cartão mostra a data de validade quando o host a informa. Um token sem validade não mostra lembrete, e os outros produtos não informam escopos e não geram aviso. Os mesmos campos estão no JSON de `hosting integrations login` e `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). Eles são lidos quando você conecta, então o cartão os mostra para a sessão que conectou.
+
 ## 4. Vincular um repositório
 
 A vinculação é explícita e por repositório. Quando um perfil está conectado, a barra

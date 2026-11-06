@@ -14,9 +14,13 @@ przechodź wtedy, gdy będą potrzebne.
 
 ## Zacznij tutaj
 
-1. **[Instalacja](installation.md)**: czego potrzeba, archiwa wydań, budowanie
-   ze źródeł. Mniejszy plik binarny opisują
-   **[Własne kompilacje](custom-builds.md)**.
+1. **[Instalacja](installation.md)**: czego potrzeba, archiwa wydań,
+   menedżery pakietów, budowanie ze źródeł. Mniejszy plik binarny opisują
+   **[Własne kompilacje](custom-builds.md)**. Jak GitPoulpi sam dba o aktualność
+   (znaczek wersji, panel aktualizacji, powrót do poprzedniej wersji):
+   **[Aktualizacje](updates.md)**. Uruchamianie w kontenerze:
+   **[Uruchamianie w Dockerze](docker.md)**. Dla administratorów: wewnętrzne feedy,
+   lustra i polityka aktualizacji: **[Dystrybucja w przedsiębiorstwie](enterprise-distribution.md)**.
 2. **[Pierwsze kroki](getting-started.md)**: pierwsze pięć minut, od
    uruchomienia do pierwszego commita.
 3. **[Przewodnik po interfejsie](interface-tour.md)**: nazwa każdego obszaru

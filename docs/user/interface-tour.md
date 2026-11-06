@@ -34,8 +34,8 @@ The top edge of the window reads
   `PgUp` / `PgDn`, `Home` / `End`; `Esc` or `t` goes back). From a script,
   `gitpoulpi licenses` prints the same text.
 - The **version** (`v1.0.0`; `vX.Y.Z available` when a newer release exists)
-  sits between the name and the path: a click opens the Release notes tab, see
-  [Updates](updates.md).
+  sits between the name and the path: a click opens the update panel when a
+  newer release exists, the Release notes tab otherwise. See [Updates](updates.md).
 - **Open in ▾**, right after the path, opens the tab's folder in a terminal,
   an editor, a multiplexer or the file manager (`Alt+O`). See
   [Open in](open-in.md).

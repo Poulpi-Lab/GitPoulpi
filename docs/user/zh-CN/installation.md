@@ -23,7 +23,30 @@ GitPoulpi 有三个可执行文件：
 
 ## 从发布压缩包安装
 
-发布压缩包为 `gitpoulpi-<version>-<target>.zip`（Windows）或 `.tar.gz`（Linux、macOS），旁边附有一个 `.sha256` 文件。请对照 `.sha256` 文件检查压缩包，解压后，把三个可执行文件放进 `PATH` 中的某个文件夹。压缩包内的 `INSTALL.txt` 给出相同的步骤。
+发布压缩包为 `gitpoulpi-<version>-<target>.zip`（Windows）或 `.tar.gz`（Linux、macOS），旁边附有一个 `.sha256` 文件。请对照 `.sha256` 文件检查压缩包，解压后，把三个可执行文件放进 `PATH` 中的某个文件夹（请把 `gitpoulpi-updater` 和 `.gitpoulpi-dist` 标记文件放在它们旁边：标记写的是 `channel=archive`，这样该构建才能自行更新，见[更新](updates.md)）。压缩包内的 `INSTALL.txt` 给出相同的步骤。
+
+### 验证下载
+
+每个发布文件都用项目的 [minisign](https://jedisct1.github.io/minisign/) 密钥签名，GitPoulpi 在安装更新之前会自己检查该签名。对于你手动下载的文件，旁边的 `.minisig` 就是签名。公钥（密钥 id 为 `B461FFCBF6F6A4F2`）作为 `packaging/minisign.pub` 提交在仓库中：
+
+```
+untrusted comment: minisign public key B461FFCBF6F6A4F2
+RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+```
+minisign -Vm gitpoulpi-<version>-<target>.tar.gz -P RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+请阅读该命令打印出的受信任注释：它必须是 `file:<该文件的名称> version:<你期望的版本>`。有效但写明了另一个文件或另一个版本的签名，不是你这个文件的签名。
+
+如果发布版本是带构建来源证明（仓库的 `ATTESTATIONS` 变量）构建的，GitHub CLI 可以检查文件是在哪里构建的：
+
+```
+gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoulpi
+```
+
+`.sha256` 文件只能发现损坏的下载。签名才能证明该文件出自本项目。
 
 ## 使用安装程序
 
@@ -31,9 +54,20 @@ GitPoulpi 有三个可执行文件：
 
 ### Windows：`gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
 
-它为当前用户安装，不弹出管理员提示，安装到 `%LOCALAPPDATA%\Programs\GitPoulpi`（第一个对话框可以改为为所有用户安装，并可更改安装文件夹）。复选框：开始菜单快捷方式、桌面快捷方式、添加到 PATH。有一页会询问**命令别名**：默认为 `gp`，可填任意名称，留空则不创建。PowerShell 已经把 `gp` 用作 `Get-ItemProperty`，所以在那里请换一个名称，或直接使用 `gitpoulpi`。
+第一个对话框会询问为谁安装：
 
-安装程序会复制三个可执行文件和 `.gitpoulpi-dist` 标记文件，因此[立即更新](#原地更新)的行为与 zip 完全相同。按用户安装的目录可写，所以能自行更新；装在 Program Files 的所有用户安装需要提升权限才能被替换，请改为用新的安装程序重新安装。卸载请在 Windows 设置 > 应用中进行：它会运行 `gitpoulpi uninstall`（别名、PATH 条目、快捷方式），并删除这些文件，包括更新程序留下的 `.old` 文件。你的设置和仓库会保留。
+| 选择 | 位置 | 管理员权限 | 对更新意味着什么 |
+|---|---|---|---|
+| **仅为我**（默认） | `%LOCALAPPDATA%\Programs\GitPoulpi` | 不需要 | GitPoulpi 替换自身的文件：在[更新面板](updates.md)中使用**更新并重启**，没有提示。 |
+| **为所有用户** | `Program Files\GitPoulpi` | 安装时一次提示 | 每次更新都会请求管理员批准（Windows 提示），并且这台电脑上其他用户的 GitPoulpi 会话会先被关闭。 |
+
+同样的选择也可以静默进行：`gitpoulpi-<version>-...-setup.exe /CURRENTUSER` 或 `/ALLUSERS`。
+
+复选框：开始菜单快捷方式、桌面快捷方式、添加到 PATH。有一页会询问**命令别名**：默认为 `gp`，可填任意名称，留空则不创建（命令行中用 `/ALIAS=name` 或 `/ALIAS=`）。PowerShell 已经把 `gp` 用作 `Get-ItemProperty`，所以在那里请换一个名称，或直接使用 `gitpoulpi`。
+
+安装程序会复制这些可执行文件（包括 `gitpoulpi-updater`，更新期间负责替换文件的小程序）和 `.gitpoulpi-dist` 标记文件。标记记录了 GitPoulpi 是怎样安装的（`inno-user` 或 `inno-machine`），更新面板把它显示为**安装方式**。再次运行安装程序会保留你的选择（范围、快捷方式、别名）。
+
+卸载请在 Windows 设置 > 应用中进行：它会运行 `gitpoulpi uninstall`（别名、PATH 条目、快捷方式），并删除这些文件，包括更新程序留下的 `.old` 文件。你的设置和仓库会保留。
 
 ### Linux 和 macOS：`install.sh`
 
@@ -41,7 +75,7 @@ GitPoulpi 有三个可执行文件：
 curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/install.sh | sh
 ```
 
-它会选择适合你的系统和 CPU 的压缩包，检查其 `.sha256`，安装到 `~/.local/opt/gitpoulpi`，并把 `gitpoulpi` 和 `gitpoulpi-mcp` 链接到 `~/.local/bin`。不需要 root 权限，也不会改动主目录之外的任何内容。不加 `--yes` 时，它会询问别名（默认 `gp`）、PATH 和快捷方式。
+它会选择适合你的系统和 CPU 的压缩包，检查其 `.sha256`，安装（通道为 `archive`：GitPoulpi 会原地自行更新）到 `~/.local/opt/gitpoulpi`，并把 `gitpoulpi` 和 `gitpoulpi-mcp` 链接到 `~/.local/bin`。不需要 root 权限，也不会改动主目录之外的任何内容。不加 `--yes` 时，它会询问别名（默认 `gp`）、PATH 和快捷方式。
 
 | 参数 | 作用 |
 |---|---|
@@ -55,6 +89,38 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 | `--uninstall` | 运行 `gitpoulpi uninstall`，然后删除链接和文件夹。 |
 
 查询最新发布版本要求仓库是公开的；私有仓库请在浏览器中下载压缩包，再使用 `--archive`。
+
+## 使用包管理器
+
+下面每个通道都会在程序旁写入同样的 `.gitpoulpi-dist` 标记，只是通道名称各不相同。GitPoulpi 读取它来了解由谁负责更新：由包管理器负责，所以 GitPoulpi 绝不会在它背后替换文件。更新面板（点击标题栏中的版本号）随后会运行包管理器自己的命令，或者把它显示出来供你复制。见[更新](updates.md)。
+
+| 通道 | 安装 | 说明 |
+|---|---|---|
+| **Chocolatey**（Windows） | `choco install gitpoulpi` | 为所有用户安装，所以更新会请求管理员批准。 |
+| **winget**（Windows） | `winget install --id GitPoulpi.GitPoulpi` | 加上 `--scope user` 或 `--scope machine` 来选择；machine 范围在安装和每次更新时都会请求管理员批准。 |
+| **Scoop**（Windows） | `scoop bucket add gitpoulpi https://github.com/Poulpi-Lab/scoop-gitpoulpi` 然后 `scoop install gitpoulpi` | 按用户安装，不需要管理员权限。 |
+| **Homebrew**（macOS、Linux） | `brew install Poulpi-Lab/gitpoulpi/gitpoulpi` | tap 是 `Poulpi-Lab/homebrew-gitpoulpi`。 |
+| **apt**（Debian、Ubuntu） | 见 [apt 软件源](#aptdebian-和-ubuntu) | 已签名的软件源；每个发布版本还附带一个 `.deb`。 |
+| **MSI**（Windows，受管理） | `msiexec /i gitpoulpi-<version>-x86_64-pc-windows-msvc.msi /qn` | 面向管理员：所有用户，没有应用内更新。见[企业分发](enterprise-distribution.md#msi使用-intune-或组策略)。 |
+| **AUR**（Arch Linux） | `yay -S gitpoulpi-bin`（或 `paru -S gitpoulpi-bin`） | 没有助手时：`git clone https://aur.archlinux.org/gitpoulpi-bin.git`，然后 `cd gitpoulpi-bin && makepkg -si`。 |
+| **cargo** | `cargo binstall gitpoulpi-cli` | 下载发布压缩包而不是编译。 |
+| **cargo，从源码** | `cargo install --locked --git https://github.com/Poulpi-Lab/GitPoulpi --tag releases/v<version> gitpoulpi-cli` | 需要编译；需要 Rust 工具链。 |
+| **Docker** | `docker pull poulpilab/gitpoulpi` | 见[在 Docker 中运行](docker.md)。同一个镜像也在 `ghcr.io/poulpi-lab/gitpoulpi` 上。 |
+
+上面的名称是发布流程所发布到的名称（见[发布](../../developer/releasing.md)）：尚未上线的通道会回答“not found”，而发布压缩包或安装程序始终可用。
+
+包管理器自己的 PATH 处理会生效：Chocolatey、winget、Scoop 和 Homebrew 会自己把程序放进 PATH，而且它们都不会创建 `gp` 别名（请运行 `gitpoulpi alias create gp`，或使用设置 > 常规 > 启动器）。
+
+### apt（Debian 和 Ubuntu）
+
+```
+sudo install -d /etc/apt/keyrings
+curl -fsSL https://poulpi-lab.github.io/apt/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt/gitpoulpi.sources
+sudo apt update && sudo apt install gitpoulpi
+```
+
+该软件源支持 `amd64` 和 `arm64`，由属于本项目的密钥签名。程序安装到 `/usr/lib/gitpoulpi`，并在 `/usr/bin` 中建立链接。该软件包依赖 `git`，并推荐 `git-lfs`。没有该软件源时，可以用 `sudo apt install ./gitpoulpi_<version>_<arch>.deb` 安装某个发布版本的 `.deb`：此后 GitPoulpi 会告诉你自己去下载下一个 `.deb`，因为只有在 `/etc/apt/sources.list.d/gitpoulpi.*` 中找到该软件源时，它才会提供 `apt` 命令。
 
 ## 从源码安装
 
@@ -91,29 +157,11 @@ cargo run -p xtask -- dist
 
 ## 更新
 
-标题栏在应用名称和仓库路径之间显示正在运行的版本（`v1.0.0`）。点击它，或在命令面板（`Ctrl+P`）中运行 **帮助：发行说明**，会打开“发行说明”标签页，显示更新日志，并滚动到当前运行的版本。
+标题栏在应用名称和仓库路径之间显示正在运行的版本（`v1.0.0`）。已知有更新的发布版本（或更新正在进行）时，点击它会打开更新面板，里面有版本、GitPoulpi 的安装方式，以及面对新版本该怎么做；否则点击会打开“发行说明”标签页。`Ctrl+N` 再按 `u`，或命令面板（`Ctrl+P`）中的 **更新：显示更新**，总是打开更新面板，而 **帮助：发行说明** 总是打开更新日志。
 
-GitPoulpi 每天在后台向 GitHub 询问一次是否有更新的发布版本（`updates.mode`，[设置 > 同步](settings.md#同步)）。有的话，标题栏里的标记会以强调色显示 `v0.2.0 可用`，点击它会打开“发行说明”标签页，并把该版本的说明放在最上面。标签页有三个按钮，每个都有对应的按键和命令面板命令：
+GitPoulpi 每天在后台到发布其版本的地方（默认是 GitHub）检查是否有更新的版本（`updates.mode`，[设置 > 同步](settings.md#同步)）。有的话，标记会以强调色显示 `v0.2.0 可用`。
 
-- **下载**（`d`，*更新：下载*）在浏览器中打开发布页面。
-- **跳过此版本**（`s`，*更新：跳过此版本*）隐藏提示，直到出现更新的版本。
-- **立即检查**（`r`，*更新：立即检查更新*）立刻重新询问一次。
-
-`updates.mode = "off"` 完全不发出请求。没有网络连接时，或者仓库为私有且没有存储 github.com 令牌时，检查会悄悄失败（应用日志里记一行，界面上没有任何提示）。`GITPOULPI_UPDATE_API` 可让检查指向另一个 API 根地址（测试用）。
-
-### 原地更新
-
-通过发布压缩包安装的版本可以替换自身。压缩包里可执行文件旁带有一个很小的 `.gitpoulpi-dist` 文件；只有当该文件位于可执行文件旁边（且写明了它所属的平台）时，正在运行的版本才算“可更新”。用 `cargo` 构建的版本、复制到别处的自定义构建，或丢掉了该文件的软件包，都不会自行更新：它的“发行说明”标签页会说明这一点，且只提供**下载**。
-
-对于可更新的版本，标签页还会增加：
-
-- **立即更新**（`u`，*更新：立即更新*）在后台下载压缩包及其 `.sha256`（状态栏指示器里的一个任务，带百分比，和其他任务一样可以取消），校验哈希，解压，并把每个新文件作为 `<name>.new` 放在旧文件旁边。正在运行的内容不会被动到。在 `auto` 模式下，一旦检查发现更新的版本，这一步会自动完成。
-- **重启以更新**（`R`，*更新：重启以更新*；下载就绪后，状态栏标记也会显示同样的文字）始终由你来操作，绝不会自动进行。它会停止该会话的独立守护进程（内嵌的守护进程随窗口一起结束），替换文件，并以相同的参数和会话启动新版本。
-- **回退到上一个版本**（`v`，*更新：回退到上一个版本*）把之前的文件换回来并重启。上一个版本的文件会以 `<name>.old` 保留，直到新版本运行满一分钟后才被删除，所以这个按钮是留给第一次运行的。它不属于 git 的撤销日志：它改动的是 GitPoulpi 自己的文件，而不是某个仓库。
-
-文件如何被替换：在 Linux 和 macOS 上，每个新文件都以重命名的方式覆盖旧文件（原子操作；正在运行的程序在退出前一直使用旧副本）。在 Windows 上，正在运行的 `.exe` 无法被覆盖，所以旧文件被重命名为 `<name>.old`，再把新文件移入；仍在运行的 `.old` 会在之后的某次启动时被删除。替换要么全部完成，要么全都不做：如果另一个程序占用着其中一个可执行文件（例如运行着 `gitpoulpi-mcp` 的 MCP 客户端），GitPoulpi 会指出是哪个文件，不改动任何内容，并保留已下载的文件以便再试。
-
-以下情况会被拒绝，并各有提示：发布版本没有 `.sha256` 文件、哈希不匹配、压缩包文件名不是适用于当前平台的名称（`gitpoulpi-<version>-<target>.<zip|tar.gz>`）、压缩包中的标记指向另一个版本或平台，以及指向这些主机之外的任何下载链接：GitHub 的 `github.com`、`api.github.com`、`objects.githubusercontent.com`、`release-assets.githubusercontent.com` 和 `github-releases.githubusercontent.com`（首次请求和每一次重定向；重定向到其他任何地方都会中止下载）。私有仓库的压缩包需要浏览器会话，因此在仓库公开之前，那里的下载会失败。
+面板的做法取决于 GitPoulpi 的安装方式：发布压缩包或 Windows 安装程序会替换自身的文件，包管理器会运行它自己的命令，受管理的安装或容器安装会说明更新如何送达。用 `cargo build` 构建的版本从不更新。完整的说明，包括回退、`auto` 与 `notify` 的区别以及管理员可以锁定什么，见[更新](updates.md)。
 
 ## 检查是否正常工作
 

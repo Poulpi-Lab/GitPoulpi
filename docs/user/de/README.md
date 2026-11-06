@@ -15,8 +15,12 @@ springen Sie zu den Referenzseiten, wenn Sie sie brauchen.
 ## Hier anfangen
 
 1. **[Installation](installation.md)**: was Sie brauchen, Release-Archive,
-   Bauen aus dem Quellcode. Für eine kleinere Binärdatei siehe
-   **[Eigene Builds](custom-builds.md)**.
+   Paketmanager, Bauen aus dem Quellcode. Für eine kleinere Binärdatei siehe
+   **[Eigene Builds](custom-builds.md)**. Wie GitPoulpi sich selbst aktuell hält
+   (der Versions-Chip, das Update-Fenster, Zurückgehen): **[Updates](updates.md)**.
+   Zum Betrieb in einem Container: **[In Docker ausführen](docker.md)**. Für
+   Administratoren, interne Feeds, Spiegel und die Update-Richtlinie:
+   **[Unternehmensverteilung](enterprise-distribution.md)**.
 2. **[Erste Schritte](getting-started.md)**: Ihre ersten fünf Minuten, vom
    Start bis zum ersten Commit.
 3. **[Rundgang durch die Oberfläche](interface-tour.md)**: der Name jedes

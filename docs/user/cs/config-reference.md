@@ -347,6 +347,18 @@ review_mode = "ask"       # ask | clone | api
 Odpovědi se pro každý profil na pět minut ukládají do mezipaměti `radar-account.json` vedle
 `config.toml`; soubor je mezipaměť, lze ho bezpečně smazat.
 
+### Úložiště důvěry (není v `config.toml`)
+
+Čemu byla každá integrace a profil AI s klíčem API důvěřována (její adresa,
+id účtu, připnutý klíč certifikátu, zda bylo povoleno prosté http) žije v
+`trust.toml` v soukromé datové složce jen pro uživatele (`<data>/private/trust.toml`:
+`%APPDATA%\GitPoulpi\private\` ve Windows, `~/.local/share/gitpoulpi/private/`
+v Linuxu). Záměrně není součástí `config.toml`: kdo může upravovat
+konfiguraci, nesmí moci rozšířit důvěru jejím úpravou. Mění se příkazy
+`gitpoulpi hosting integrations trust` a `gitpoulpi ai trust` (viz
+[kontrola zabezpečení](hosting-integration.md#kontrola-zabezpečení)); soubor
+přepisuje GitPoulpi, ne ruční úprava.
+
 ## `[mcp]` (co smějí dělat AI agenti)
 
 | Klíč | Výchozí | Hodnoty a účinek |
@@ -359,6 +371,12 @@ Odpovědi se pro každý profil na pět minut ukládají do mezipaměti `radar-a
 | `mcp.allow_history_purge` | `false` | Jen v `config.toml` (žádný řádek v Nastavení). `true` zpřístupní agentům nástroj `rewrite_purge` (stále vyžaduje `allow_mutations`). Vypnuto, agent ten nástroj vůbec nevidí: purge smaže nadobro starou historii přepisu, její vrácení zpět i její reflogy. CLI a TUI touto volbou omezeny nejsou. |
 | `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve` a `gitpoulpi-mcp` odmítnou start se zprávou pojmenovávající tento klíč. Nastavení > Agenti a MCP > *Server MCP*. Čte se, když agent spouští server. |
 | `mcp.bind` | `"127.0.0.1:8808"` | Adresa, na které `--http` naslouchá, když žádnou nezadáte (`--http ADDR` / `--bind` mají přednost). Jen loopback, pokud není `--allow-remote`. Prázdné nebo starý `"stdio"` znamenají výchozí. Nastavení > Agenti a MCP > *Port serveru MCP* upraví port a ponechá hostitele. |
+| `mcp.http_auth` | `true` | `--http` odpovídá jen na požadavek s `Authorization: Bearer <token>` (token z `gitpoulpi mcp token`). `false` kontrolu odstraní; server pak varuje na stderr a `--allow-remote` se odmítne. Nastavení > Agenti a MCP > *Ověřování HTTP*. |
+| `mcp.tls` | `"off"` | `off`, `self_signed` (certifikát vygenerovaný jednou v soukromé datové složce, jeho otisk SHA-256 se vypíše při startu) nebo `files` (`tls_cert` a `tls_key`). Se zapnutým TLS server TLS ukončuje sám a žádný prostý posluchač neexistuje. Nastavení > Agenti a MCP > *TLS*. |
+| `mcp.tls_cert` | `""` | Řetěz certifikátů PEM používaný s `tls = "files"`. |
+| `mcp.tls_key` | `""` | Soukromý klíč PEM používaný s `tls = "files"`. |
+| `mcp.behind_proxy` | `false` | Prohlašujete, že šifrování zajišťuje tunel nebo reverzní proxy před endpointem. Zevnitř serveru to nelze ověřit, takže `--allow-remote` bez TLS vyžaduje, aby to bylo nastaveno. Úsek mezi proxy a serverem je v té síti prostý text. Nastavení > Agenti a MCP > *Za tunelem nebo reverzní proxy*. |
+| `mcp.allow_sensitive_staging` | `false` | Jen v `config.toml`. Vypnuto, nástroje MCP pro stage nenabízejí `allow_sensitive` a přidání do indexu, které by zahrnulo označený soubor (viz `[privacy]`), se odmítne se zprávou, že se agent má zeptat vás. Zapnuto, agent smí předat `allow_sensitive`. CLI a TUI touto volbou omezeny nejsou: ptají se vás. |
 
 `allow_mutations`, `mutation_allowlist` a `allow_ui` hlídají jen server MCP;
 CLI je váš vlastní shell a těmito klíči se neřídí. Viz [MCP a
@@ -377,6 +395,9 @@ agenti](mcp-and-agents.md#oprávnění).
 | `ai.review.include_claude_md` | `true` | Předat konceptu kontroly kódu soubor `CLAUDE.md` repozitáře (kořen, čtený ve větvi, na kterou žádost míří; oříznutý na 8 KB). |
 | `ai.review.include_agents_md` | `true` | Totéž pro `AGENTS.md`. |
 | `ai.review.extra_file` | `""` | Ještě jeden soubor pro koncept kontroly kódu: cesta relativní ke kořeni repozitáře, absolutní cesta nebo odkaz na soubor na hostiteli kódu (čte se přes odpovídající profil integrace, jinak anonymně). Všechny soubory dohromady se ořezávají na 16 KB. |
+| `ai.privacy.redact_secrets` | `true` | Nahradí každou tajnou hodnotu, kterou skener v požadavku pozná (token, blok soukromého klíče, heslo v URL, hodnotu `password = ...`, která vypadá náhodně), za `[REDACTED:<rule>]`, než požadavek odejde. Nastavení > AI ukazuje červené varování, dokud je vypnuto. |
+| `ai.privacy.exclude_sensitive_files` | `true` | Vynechá z odesílaného diff každého souboru odpovídajícího `privacy.sensitive_patterns`. Lokální agent, který pracuje ve složce repozitáře, si soubory stále může přečíst sám: viz [AI > Soukromí](ai.md#soukromí). |
+| `ai.sent_preview.<action>` | `true` | Jeden klíč na akci (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`): před odesláním požadavku ukáže "Co se odešle". "Příště nezobrazovat pro ..." v dialogu zapíše `false`; Nastavení > AI > *Zobrazit, co se odesílá, před...* je znovu zapne. `rewrite_script` a `rewrite_rules` se přijímají, ale nemají účinek: dialogy přepisu historie vždy ukazují vlastní podokno. |
 
 Vlastní tabulka repozitáře `[preferences.ai_review]` (v jeho `repo-state.toml`, nebo záznam repozitáře, který není
 naklonovaný, v `remote-reviews.toml`) má stejné klíče, všechny nepovinné, a navíc `no_extra_file = true`: pro tento
@@ -469,13 +490,22 @@ Co `gitpoulpi rewrite` a nástroj pro přepis historie chrání. Podrobnosti: [P
 
 ## `[updates]` (hledání novějšího vydání)
 
-Co dělá verzový čip v záhlaví okna s novějšími vydáními. Podrobnosti: [Aktualizace](installation.md#aktualizace).
+Co dělá verzový čip v záhlaví okna s novějšími vydáními. Podrobnosti: [Aktualizace](updates.md).
 
 | Klíč | Výchozí | Hodnoty a účinek |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"` se jednou denně na pozadí zeptá GitHubu, zda existuje novější vydání, a změní verzový čip na `vX.Y.Z k dispozici`. `"auto"` navíc samo stáhne a připraví aktualizaci, pokud sestavení pochází z archivu vydání (před restartem se stále zeptá); u jiného sestavení se chová jako `"notify"`. `"off"` neodešle nikdy žádný požadavek. Platí živě. |
 | `updates.channel` | `"stable"` | `"stable"` bere v úvahu jen plná vydání; `"prerelease"` nabízí i kandidáty na vydání (`-rc.1`). Platí živě. |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | `owner/name` na github.com, jehož vydání se kontrolují. Dokud je repozitář soukromý, GitHub odpovídá 404, pokud pro github.com není uložen token (Nastavení > Integrace); bez něj kontrola tiše selže a zapíše jeden řádek do protokolu aplikace. |
+
+Správce může v souboru politiky platné pro celý počítač nebo v registru Windows nastavit `mode`, `channel` (jako `release_channel`) a `repo`, plus několik dalších voleb aktualizací. Klíč, který politika nastaví, má přednost před `config.toml` a v Nastavení se zobrazí jako **Nastaveno vaším správcem**. `mode` v politice je strop: můžete zvolit nižší hodnotu, nikdy vyšší. Viz [Podniková distribuce](enterprise-distribution.md#soubor-politiky-a-registr).
+
+## `[privacy]` (citlivé soubory)
+
+| Klíč | Výchozí | Hodnoty a účinek |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Vzory cest ve stylu gitignore. Vzor bez `/` odpovídá názvu souboru v jakékoli hloubce, vzor s `/` celé cestě (úvodní `/` ho ukotví v kořeni); `*` a `?` zůstávají uvnitř jedné složky, `**` složky překračuje; `!` znovu povolí to, čemu odpovídal dřívější vzor, a vyhrává poslední shoda; velikost písmen se ignoruje. Používá je ochrana přidávání do indexu a `ai.privacy.exclude_sensitive_files`. |
+| `privacy.staging_guard` | `true` | Přidání souboru do indexu, který odpovídá vzoru nebo jehož obsah obsahuje rozpoznanou tajnou hodnotu, se nejprve zeptá (TUI), je odmítnuto, pokud není zadáno `--allow-sensitive` (CLI), nebo pokud `mcp.allow_sensitive_staging` nedovolí agentovi předat `allow_sensitive` (MCP). Čtou se textové soubory do 1 MiB každý a 32 MiB celkem; binární soubory se porovnávají jen podle názvu. Viz [Přidávání do indexu a commitování](staging-and-committing.md#citlivé-soubory). |
 
 ## `[keybindings]`
 

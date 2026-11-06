@@ -36,6 +36,24 @@ der rechte Bereich zeigt die Änderungen:
 | Zu unstagen | Dieselben Schaltflächen und Tasten im Abschnitt Staged (`Ctrl+G u`) |
 | Die Änderungen einer Datei zu verwerfen | Rechtsklick auf die Datei > **Änderungen verwerfen** (fragt vorher; `Ctrl+Z` bringt die Änderungen zurück) |
 
+### Sensible Dateien
+
+Beim Stagen einer Datei, eines Ordners oder von allem wird zuerst geprüft, was es hinzufügen würde. Eine Datei, deren
+Name zu `[privacy] sensitive_patterns` passt (`.env` und `.env.*` außer den Dateien `.example`, `.sample` und
+`.template`, `*.pem`, `*.key`, private SSH-Schlüssel, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`,
+`*.der`, `*.kdbx`) oder deren Text ein vom Scanner erkanntes Geheimnis enthält, wird nicht gestagt. Die Frage **Sensible
+Dateien** listet jede Datei mit ihrem Grund auf (ein Muster oder die Art des Geheimnisses
+mit maskierter Vorschau, nie der Wert) und bietet **1. Trotzdem stagen** oder **2. Abbrechen,
+nichts stagen**. Keine Antwort ist hervorgehoben, bis Sie eine Pfeiltaste oder eine Ziffer drücken,
+ein versehentliches Enter beantwortet also nichts; `Esc`, das Schließen-Kreuz und ein Klick außerhalb brechen ab.
+Es ist dieselbe Frage von der Tastatur, per Schaltfläche, Menü, Palette oder
+Drag-and-drop, weil alle dieselbe Anfrage senden. Abbrechen stagt nichts,
+nicht einmal die gewöhnlichen Dateien desselben Stagings.
+
+Textdateien bis zu 1 MiB je Datei und 32 MiB insgesamt werden gelesen; größere Dateien und Binärdateien
+werden nur nach dem Namen beurteilt. `[privacy] staging_guard = false` schaltet die Prüfung aus.
+Das Stagen eines Hunks oder einzelner Zeilen wird nicht geprüft: Sie arbeiten ohnehin schon an dieser Datei.
+
 Rechtsklick auf eine Datei öffnet ihr Menü: stagen oder unstagen, verwerfen, den
 Pfad kopieren, Dateiverlauf und Blame, in Ihrem externen Editor, Diff-Tool oder
 Dateimanager öffnen (eingestellt unter
@@ -285,9 +303,16 @@ Alles auf dieser Seite lässt sich skripten:
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # after the refusal below
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage` lehnt eine sensible Datei genauso ab: Nichts wird gestagt, der Exit-Code
+ist 2, und `--json` gibt `{error: "sensitive_files", files: [{path, reason}]}` aus
+(eine Regel und eine maskierte Vorschau, nie ein Wert). `--allow-sensitive` ist der erneute Versuch. Ein
+MCP-Agent wird mit derselben Antwort abgewiesen und kann `allow_sensitive` nur übergeben, wenn
+`[mcp] allow_sensitive_staging = true` gilt: Ihm wird gesagt, er solle Sie fragen.
 
 Siehe die [CLI-Referenz](cli-reference.md).

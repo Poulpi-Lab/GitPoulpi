@@ -36,6 +36,25 @@ zmiany robocze:
 | Cofnąć stage | Te same przyciski i klawisze w sekcji Staged (`Ctrl+G u`) |
 | Odrzucić zmiany pliku | Kliknij plik prawym przyciskiem > **Odrzuć zmiany...** (najpierw pyta; `Ctrl+Z` przywraca zmiany) |
 
+### Wrażliwe pliki
+
+Dodanie do stage pliku, folderu lub wszystkiego najpierw sprawdza, co zostałoby dodane.
+Plik, którego nazwa pasuje do `[privacy] sensitive_patterns` (`.env` i `.env.*` z wyjątkiem
+tych z końcówką `.example`, `.sample` i `.template`, `*.pem`, `*.key`, prywatne klucze SSH,
+`*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`), albo
+którego tekst zawiera sekret rozpoznany przez skaner, nie trafia do stage. Pytanie **Wrażliwe
+pliki** wymienia każdy plik z przyczyną (wzorzec albo rodzaj sekretu
+z zamaskowanym podglądem, nigdy wartość) i oferuje **1. Stage mimo to** albo **2. Anuluj,
+bez stage**. Żadna odpowiedź nie jest podświetlona, dopóki nie naciśniesz strzałki lub cyfry,
+więc przypadkowy Enter nie odpowiada na nic; `Esc`, krzyżyk zamknięcia i kliknięcie poza oknem anulują.
+To samo pytanie pojawia się z klawiatury, przycisku, menu, palety lub
+przeciągnięcia, bo wszystkie wysyłają to samo żądanie. Anulowanie nie dodaje nic do stage,
+nawet zwykłych plików z tego samego stage.
+
+Pliki tekstowe do 1 MiB każdy i 32 MiB łącznie są czytane; większe pliki i pliki
+binarne są oceniane tylko po nazwie. `[privacy] staging_guard = false` wyłącza sprawdzanie.
+Stage jednego hunka lub kilku linii nie jest sprawdzany: już pracujesz nad tym plikiem.
+
 Kliknij plik prawym przyciskiem, by zobaczyć jego menu: stage lub unstage, odrzucenie, kopiowanie ścieżki, historia
 pliku i blame, otwarcie w zewnętrznym edytorze, narzędziu diff lub menedżerze plików (ustawia się je
 w [Ustawienia > Diff i edytor](settings.md#diff-i-edytor)) i więcej.
@@ -272,9 +291,16 @@ Wszystko na tej stronie można zautomatyzować skryptem:
 ```
 gitpoulpi --json status
 gitpoulpi stage --file src/lib.rs
+gitpoulpi stage --all --allow-sensitive   # po odmowie opisanej niżej
 gitpoulpi --json diff
 gitpoulpi commit -m "feat: add the helper"
 gitpoulpi discard --file src/lib.rs --hunk 1
 ```
+
+`gitpoulpi stage` odrzuca wrażliwy plik tak samo: nic nie trafia do stage, kod wyjścia to 2,
+a `--json` wypisuje `{error: "sensitive_files", files: [{path, reason}]}`
+(reguła i zamaskowany podgląd, nigdy wartość). `--allow-sensitive` to ponowna próba. Agent
+MCP dostaje tę samą odpowiedź i nie może przekazać `allow_sensitive`, chyba że
+`[mcp] allow_sensitive_staging = true`: ma zapytać ciebie.
 
 Zob. [Opis CLI](cli-reference.md).

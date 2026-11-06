@@ -164,6 +164,43 @@ GitPoulpi cherche le jeton d'un profil dans cet ordre :
 Chaque profil est une entrée `[[integrations]]` de `config.toml`. Voir la
 [référence de configuration](config-reference.md#integrations-hébergeurs-et-suivi-de-tickets).
 
+## Le contrôle de sécurité
+
+Un jeton enregistré n'est sûr que dans la mesure où l'adresse à laquelle il est envoyé l'est. GitPoulpi retient donc, pour chaque intégration, à quoi elle était connectée, et s'arrête quand cela change :
+
+- **L'adresse.** La première fois qu'une intégration est utilisée (ou connectée), son adresse est notée dans `trust.toml`, dans le dossier de données privé réservé à l'utilisateur (`<data>/private/`), et non dans `config.toml` : modifier la configuration ne peut jamais élargir ce qui est approuvé. Si l'adresse de la configuration n'est plus celle qui est notée, rien ne lui est envoyé et le jeton n'est même pas lu. Les écritures d'une même adresse (`HTTPS://Git.Example.com:443/`) sont la même adresse ; un hôte qui lui ressemble n'en est pas une.
+- **Le compte.** Après la connexion d'un jeton, puis environ une fois par jour (et une fois par exécution pour un jeton qui vient de `GITPOULPI_TOKEN_*` ou de l'assistant d'identifiants), GitPoulpi demande à l'hébergeur à qui appartient le jeton et compare l'**id** du compte, pas l'identifiant de connexion. Un jeton qui appartient désormais à quelqu'un d'autre est arrêté.
+- **Le certificat.** Les serveurs dont le certificat ne remonte pas à une autorité connue (une autorité privée, un serveur auto-signé) ne sont acceptés que pour la clé exacte que vous avez acceptée, et la poignée de main TLS prouve toujours que le serveur détient cette clé. Avec l'épinglage strict, la clé doit correspondre même quand le certificat remonte à une racine publique ; le prix est que chaque renouvellement de clé redemande, c'est pourquoi il est optionnel. Les hôtes publics (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) ne gardent aucune trace de certificat.
+- **Le http simple.** Une adresse `http://` non loopback est refusée sauf si vous l'avez autorisée pour cette intégration.
+
+Chaque requête est aussi tenue à l'adresse propre de l'intégration (et, pour un hôte public, à son hôte d'API comme `api.github.com`) : une requête ailleurs est refusée avant d'être envoyée, et une redirection vers une autre adresse n'est pas suivie.
+
+**Les intégrations connectées avant l'existence de ce contrôle** reçoivent leur trace silencieusement, à partir de la configuration telle qu'elle était, la première fois qu'elles sont utilisées après la mise à niveau : elles gardent le niveau de confiance d'aujourd'hui et rien ne demande.
+
+### En ligne de commande
+
+Une commande arrêtée échoue avec le code de sortie 2 et affiche ce qui a changé (voir la [référence CLI](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` montre ce qui est approuvé ; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` et `--allow-insecure-http on|off` acceptent chacun une chose, en nommant la valeur exacte. Après avoir accepté une nouvelle adresse, saisissez à nouveau le jeton. Se déconnecter (`hosting logout`) ou retirer une intégration supprime son jeton, sa trace de confiance et ce qui en avait été mis en cache (les listes de dépôts enregistrées de la boîte Cloner, les listes de compte du Radar et les brouillons de revue distante de son hôte).
+
+Un agent (MCP) ne peut rien accepter : on lui dit que le contrôle de sécurité a besoin de vous.
+
+### Dans l'interface du terminal
+
+Une requête arrêtée ouvre la boîte **Contrôle de sécurité de l'intégration** par-dessus ce que vous faisiez. Elle dit ce qui a changé (l'ancienne et la nouvelle adresse, l'ancien et le nouveau compte avec leurs id, ou l'ancien et le nouveau certificat sous forme d'un petit tableau avec l'empreinte SHA-256 en groupes de quatre, le sujet, l'émetteur et la validité) et que le jeton n'a pas été envoyé. Les réponses sont numérotées :
+
+1. **Déconnecter** supprime le jeton enregistré, la trace de confiance et ce qui avait été mis en cache pour l'intégration.
+2. **Approuver** la nouvelle adresse, le nouveau compte ou le nouveau certificat (pour une adresse non chiffrée : **Autoriser http simple**).
+3. **Annuler** ne change rien.
+
+Aucune réponse n'est mise en évidence tant que vous n'appuyez pas sur une flèche ou un chiffre, donc un Enter par mégarde n'accepte rien. `Esc` et la croix de fermeture annulent ; un clic à l'extérieur de la boîte ne fait rien. Un long texte défile avec la molette, PgUp/PgDn ou la barre de défilement. Plusieurs contrôles se mettent en file (un par intégration et par type de changement) et sont posés l'un après l'autre. Un contrôle annulé ne réapparaît pas tant qu'il n'a pas changé ; **Intégrations : Revoir le contrôle de sécurité** dans la palette de commandes le ramène.
+
+Après avoir approuvé une nouvelle **adresse**, le formulaire de l'intégration s'ouvre avec le champ du jeton actif et l'indication « Il est recommandé de saisir à nouveau le jeton. » : le jeton enregistré n'y a jamais été envoyé. Dans le formulaire, une adresse changée volontairement est acceptée avec un jeton saisi pour elle ; sans jeton, le formulaire en demande un.
+
+Le formulaire a aussi deux cases. **Épinglage strict du certificat** (pour une adresse https) épingle la clé du certificat que le serveur présente quand vous vous connectez. **Autoriser http simple (non chiffré)** n'est proposée que pour une adresse `http://` qui n'est pas cette machine, avec un avertissement rouge disant que le jeton circule en clair. La carte connectée affiche l'empreinte épinglée.
+
+### Ce que le jeton peut faire, et jusqu'à quand
+
+La connexion demande aussi à l'hébergeur ce que le jeton peut faire. GitHub (jetons classiques), GitLab et Bitbucket (quand il envoie les portées) indiquent leurs portées : la carte affiche une ligne jaune « Ce jeton a plus de droits que GitPoulpi n'en a besoin » listant les portées au-delà de ce que GitPoulpi utilise, les sensibles (comme `delete_repo`, `admin:org`, `sudo`) en rouge, avec le conseil de préférer un jeton à permissions détaillées avec une date d'expiration. Un jeton GitHub classique (`ghp_...`) reçoit ce conseil même quand ses portées sont exactes. On ne peut pas demander ses permissions à un jeton GitHub à permissions détaillées : seule son expiration est affichée. La carte affiche la date d'expiration quand l'hébergeur la donne. Un jeton sans expiration n'affiche aucun rappel, et les autres produits n'indiquent aucune portée et ne lèvent aucun avertissement. Les mêmes champs sont dans le JSON de `hosting integrations login` et `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). Ils sont lus à la connexion : la carte les affiche donc pour la session qui s'est connectée.
+
 ## 4. Lier un dépôt
 
 La liaison est explicite et par dépôt. Quand un profil est connecté, le panneau

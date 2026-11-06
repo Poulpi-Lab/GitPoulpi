@@ -120,7 +120,7 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `nav_prefix` | `activity_log` | Etkinlik Günlüğünü Aç | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | Genel etkinlik günlüğünü aç | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | Arka plan görevlerini göster | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | Güncelleme Panelini Göster | `Ctrl+N u` |
 | `nav_prefix` | `help` | Yardımı Aç/Kapat | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | Sekme Seç | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | Temayı Değiştir | `Ctrl+N y` |
@@ -836,10 +836,10 @@ Tuşlar varsayılanlardır.
 | Görünüm: Etkinlik Günlüğü | `Ctrl+N A` |
 | Görünüm: Genel Etkinlik Günlüğü | `Ctrl+N G` |
 | Yardım: Sürüm Notları |  |
-| Updates: Show Update | `Ctrl+N u` |
-| Updates: Open Security Notice |  |
-| Updates: Copy Update Command |  |
-| Updates: Run Update Command in a Terminal |  |
+| Güncellemeler: Güncellemeyi Göster | `Ctrl+N u` |
+| Güncellemeler: Güvenlik Bildirimini Aç |  |
+| Güncellemeler: Güncelleme Komutunu Kopyala |  |
+| Güncellemeler: Güncelleme Komutunu Terminalde Çalıştır |  |
 | Güncellemeler: Şimdi Denetle |  |
 | Güncellemeler: İndir |  |
 | Güncellemeler: Şimdi Güncelle |  |
@@ -1149,7 +1149,7 @@ Tuşlar varsayılanlardır.
 | Entegrasyonlar: Bu Deponun Profilini Yönet |  |
 | Entegrasyonlar: Entegrasyon Bağla... |  |
 | Ayarlar: Bir profilin Radar seçenekleri... |  |
-| Integrations: Review security check |  |
+| Entegrasyonlar: Güvenlik Denetimini İncele |  |
 | Uygulama: Çık | `q` |
 | Uygulama: Tema... |  |
 | Uygulama: Temayı Değiştir... | `Ctrl+N y` |

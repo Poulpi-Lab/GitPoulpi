@@ -253,6 +253,31 @@ fel; efter en `after_start`-hook finns grenen och flödet kan
 fortsättas eller avbrytas). `--no-hooks` hoppar över dem utan att fråga. En hook kan göra
 vad som helst, så `undo` tar bara tillbaka git-ändringarna.
 
+**Förtroende.** Kommandona i en incheckad `[hooks]`-sektion kommer från den som kan
+pusha till repositoryt, så de behöver också *ditt* förtroende, en gång per version av
+listan. Förtroendet hålls per repository genom hooksens hash (en ändring av något
+kommando, någon fas eller ordningen frågar igen) och kontrolleras av daemonen före det första
+steget i en körning och innan ett fortsatt flöde går vidare, så en nekad körning har inte ändrat
+något. Hooks i din egen åsidosättning (`[workflow]` i ditt repositorytillstånd, sidan
+Inställningar) är dina och frågar aldrig.
+
+- **CLI:** `gitpoulpi flow trust-hooks` skriver ut kommandona, deras `hash` och
+  om de är `trusted`; `gitpoulpi flow trust-hooks --hash <hash>` litar på
+  dem, och bara när filen på disk fortfarande har den hashen. `--run-hooks` på
+  ej betrodda hooks skriver ut ett nekande (`{"refused": {"reason": "hooks_not_trusted",
+  ...}}`, slutkod 2) med kommandona och den kommandoraden. En terminal som
+  får frågan "Run them too?" får också frågan om den ska lita på dem.
+- **TUI:** förhandsvisningen listar hooksen och säger att de inte är betrodda ännu. När du
+  trycker på åtgärdsknappen frågar den sedan "Det här repositoryts arbetsflöde kör de här kommandona på
+  din dator. Lita på dem?" med de exakta kommandona i en rullningsbar ruta
+  (mushjul, dragbar rullningslist, PgUp/PgDn/Home/End) och två svar:
+  **1 Lita på och kör** och **2 Kör utan hooks**. Ingenting är markerat förrän du
+  trycker på en piltangent eller en siffra; Esc, Avbryt eller stängningskorset går tillbaka utan att
+  svara. När filen har ändrats sedan du litade på den står det i titeln "Hooks har ändrats
+  sedan du litade på dem" och den gamla listan visas under den nya.
+- **Agenter:** det finns inget verktyg för att lita på hooks. `run_hooks: true` på ej betrodda
+  hooks nekas med kommandona, och en människa kör `flow trust-hooks`.
+
 ### För agenter (MCP)
 
 Verktygen är `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` och
@@ -262,8 +287,10 @@ Verktygen är `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` och
 för att köra den. Utan någon av dem vägras anropet och bär planen, så inget
 körs av misstag. Hooks körs bara med ett uttryckligt `run_hooks: true`; planen
 listar dem (`hooks`, `hooks_run`) så att agenten kan visa användaren kommandona
-först. Efter en konflikt, `continue_: true` (flaggan är `--continue`) eller
-`abort: true`.
+först. Incheckade hooks måste betros av en människa (`flow trust-hooks`, som saknar
+verktyg): `run_hooks: true` på ej betrodda hooks returnerar `refused` med
+kommandona och kör ingenting. Efter en konflikt, `continue_: true` (flaggan är
+`--continue`) eller `abort: true`.
 
 ### Ångra
 

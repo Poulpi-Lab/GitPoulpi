@@ -42,13 +42,13 @@ Staging a file, a folder or everything first checks what it would add. A file wh
 name matches `[privacy] sensitive_patterns` (`.env` and `.env.*` except the
 `.example`, `.sample` and `.template` ones, `*.pem`, `*.key`, SSH private keys,
 `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.crt`, `*.cer`, `*.der`, `*.kdbx`), or
-whose text holds a secret the scanner recognises, is not staged. The **Sensitive
+whose text holds a secret the scanner recognizes, is not staged. The **Sensitive
 files** question lists each file with its reason (a pattern, or the kind of secret
 with a masked preview, never the value) and offers **1. Stage anyway** or **2. Cancel,
 stage nothing**. No answer is highlighted until you press an arrow key or a digit,
 so a stray Enter answers nothing; `Esc`, the close cross and a click outside cancel.
 It is the same question from the keyboard, a button, a menu, the palette or a
-drag-and-drop, because they all send the same request. Cancelling stages nothing,
+drag-and-drop, because they all send the same request. Canceling stages nothing,
 not even the ordinary files of the same stage.
 
 Text files up to 1 MiB each and 32 MiB in all are read; larger files and binary

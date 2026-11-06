@@ -104,7 +104,7 @@ stage_file = "z"
 | `nav_prefix` | `activity_log` | アクティビティログを開く | `Ctrl+N Shift+A` |
 | `nav_prefix` | `global_log` | グローバルアクティビティログを開く | `Ctrl+N Shift+G` |
 | `nav_prefix` | `jobs` | バックグラウンドタスクを表示 | `Ctrl+N Shift+J` |
-| `nav_prefix` | `updates` | Show the Update Panel | `Ctrl+N u` |
+| `nav_prefix` | `updates` | 更新パネルを表示 | `Ctrl+N u` |
 | `nav_prefix` | `help` | ヘルプの表示切り替え | `Ctrl+N ?` |
 | `nav_prefix` | `select_tab` | タブを選択 | `Ctrl+N t` |
 | `nav_prefix` | `change_theme` | テーマを変更 | `Ctrl+N y` |
@@ -802,10 +802,10 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 表示: アクティビティログ | `Ctrl+N A` |
 | 表示: グローバルアクティビティログ | `Ctrl+N G` |
 | ヘルプ: リリースノート |  |
-| Updates: Show Update | `Ctrl+N u` |
-| Updates: Open Security Notice |  |
-| Updates: Copy Update Command |  |
-| Updates: Run Update Command in a Terminal |  |
+| 更新: 更新パネルを表示 | `Ctrl+N u` |
+| 更新: セキュリティ通知を開く |  |
+| 更新: 更新コマンドをコピー |  |
+| 更新: 更新コマンドをターミナルで実行 |  |
 | 更新: 今すぐ更新を確認 |  |
 | 更新: ダウンロード |  |
 | 更新: 今すぐ更新 |  |
@@ -1115,7 +1115,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 連携: このリポジトリのプロファイルを管理 |  |
 | 連携: 連携を接続... |  |
 | 設定: プロファイルのレーダーオプション... |  |
-| Integrations: Review security check |  |
+| 連携: セキュリティチェックを確認 |  |
 | アプリ: 終了 | `q` |
 | アプリ: テーマ... |  |
 | アプリ: テーマを変更... | `Ctrl+N y` |

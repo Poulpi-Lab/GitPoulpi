@@ -17,8 +17,8 @@ Horní okraj okna zobrazuje
 
 - **🐙** otevře okno **O aplikaci GitPoulpi**: verze, funkce sestavení, licence, odkazy a crates třetích stran. Na terminálu, který kreslí obrázky, je chobotnice pixelové logo v barvě vašeho loga (jinde zůstává emoji). Paleta: `Nápověda: O aplikaci GitPoulpi`; klávesy: `Ctrl+N`, pak `A`. V okně O aplikaci sledují zorničky chobotnice ukazatel myši. Kliknutím na logo (nebo stiskem `Space`) ho roztočíte do další barvy. Pravým tlačítkem na logo (nebo stiskem `c`) otevřete seznam barev. GitPoulpi uloží vaši volbu do `ui.logo_color`. Odkazy se otevřou kliknutím nebo svou přístupovou klávesou (`s` zdrojový kód, `d` dokumentace, `i` licence) a `l` vypíše crates třetích stran s jejich verzemi a licencemi (posouvatelný seznam; `Esc` nebo `l` vrátí zpět, stejně jako klik na jeho nadpis). Každý crate v seznamu má odkaz na svou stránku (repozitář, jinak stránku na crates.io): klikněte na řádek, nebo ho vyberte pomocí `↑` `↓` a stiskněte `Enter`, a otevře se v prohlížeči. `t` (nebo příkaz palety `Help: Licenses and Credits`) otevře licenční oznámení a poděkování ke všemu, co je v programu zabudováno, jako posouvatelný text (`Up` / `Down`, `PgUp` / `PgDn`, `Home` / `End`; zpět `Esc` nebo `t`). Ve skriptu vypíše stejný text `gitpoulpi licenses`.
 - **Verze** (`v1.0.0`, nebo `vX.Y.Z k dispozici`, existuje-li novější vydání)
-  je mezi názvem a cestou: kliknutím se otevře karta **Poznámky k vydání**, viz
-  [Aktualizace](installation.md#aktualizace).
+  je mezi názvem a cestou: kliknutí otevře panel aktualizací, když existuje
+  novější vydání, jinak kartu **Poznámky k vydání**. Viz [Aktualizace](updates.md).
 - **Otevřít v ▾** hned za cestou otevře složku karty v terminálu, editoru,
   multiplexeru nebo správci souborů (`Alt+O`). Viz [Otevřít v](open-in.md).
 - **⌕ Globální hledání** (lupa se svým popiskem), těsně vlevo od ozubeného kola, otevře [globální hledání](search.md) (`Ctrl+Alt+F`). Když je záhlaví příliš úzké, ustoupí jako první: nejdřív zmizí popisek (lupa zůstane), potom celé tlačítko.

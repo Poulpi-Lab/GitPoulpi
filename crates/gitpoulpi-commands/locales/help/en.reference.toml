@@ -389,7 +389,7 @@ ssh-command = "The repository-local `core.sshCommand` pin: which SSH key this re
 "ssh-command set --command" = "A literal `core.sshCommand` value"
 "ssh-command set --key" = 'Private key file: pins `ssh -i "<key>" -o IdentitiesOnly=yes`'
 "ssh-command show" = "Show the repository's pinned `core.sshCommand` (null when unset)"
-"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognised token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
+"stage --allow_sensitive" = "Stage files that look sensitive (a private key, a `.env`, a recognized token) too. Without it such a stage is refused and nothing is staged (`[privacy] staging_guard`)"
 "stage --hunk" = "Index of a hunk within `--file`'s diff, as `gitpoulpi diff --json` numbers them"
 "stage --lines" = "Comma-separated line indices within `--hunk`"
 "stash push --ai" = "Let the AI name the stash from the working changes (needs `ai.enabled = true`, see `docs/user/ai.md`)"

@@ -1,3 +1,5 @@
+**English** · [Čeština](cs/updates.md) · [Deutsch](de/updates.md) · [Español](es/updates.md) · [Français](fr/updates.md) · [Italiano](it/updates.md) · [日本語](ja/updates.md) · [한국어](ko/updates.md) · [Nederlands](nl/updates.md) · [Polski](pl/updates.md) · [Português (Brasil)](pt-BR/updates.md) · [Português (Portugal)](pt-PT/updates.md) · [Русский](ru/updates.md) · [Svenska](sv/updates.md) · [Türkçe](tr/updates.md) · [Українська](uk/updates.md) · [简体中文](zh-CN/updates.md)
+
 # Updates
 
 GitPoulpi checks for newer releases and, depending on how it was installed, either replaces its own files or hands the update to the program that installed it. Nothing is ever replaced or restarted without your action.
@@ -6,7 +8,7 @@ GitPoulpi checks for newer releases and, depending on how it was installed, eith
 
 The title bar shows the running version (`v1.0.0`) between the app name and the repository path. When a newer release is known the chip turns into `v0.2.0 available` in the accent color.
 
-Click the chip, press `Ctrl+N` then `u`, or run **Updates: Show Update** from the command palette (`Ctrl+P`): the update panel opens. It is a window over the app: `Esc`, `q`, the close cross or a click outside closes it. It shows:
+Press `Ctrl+N` then `u`, run **Updates: Show Update** from the command palette (`Ctrl+P`), or click the chip while it says `available` (or while an update is under way): the update panel opens. With no newer release, a click on the chip opens the Release notes tab instead. It is a window over the app: `Esc`, `q`, the close cross or a click outside closes it. It shows:
 
 - the running version and **Installed with**: how GitPoulpi got onto this computer (it decides everything below);
 - where the update stands (checking, downloading with a percentage, ready, failed);
@@ -27,7 +29,7 @@ Every button has a key (printed in the panel's hint line) and a palette command,
 | **Check now** | `r` | Updates: Check for Updates Now |
 | **Close** | `Esc` | |
 
-A command that does not apply to this installation is greyed out in the palette with the reason (for example "this installation is updated another way: see Updates: Show Update").
+A command that does not apply to this installation is grayed out in the palette with the reason (for example "this installation is updated another way: see Updates: Show Update").
 
 ## What happens, per installation
 
@@ -35,9 +37,9 @@ A command that does not apply to this installation is greyed out in the palette 
 |---|---|---|---|
 | A release archive, or `install.sh` | GitHub releases | **Update and restart**: GitPoulpi downloads and verifies the archive, closes, replaces its files and opens again in the same terminal. | **Revert** swaps the previous files back. |
 | The Windows installer, only for me | GitHub releases | The same, with no prompt. On Windows it reopens in a new window. | **Revert** swaps back. |
-| The Windows installer, all users | GitHub releases | The same, but Windows asks for administrator approval. GitPoulpi processes of other users on the computer are closed, which loses their unsaved input. If you decline, nothing changes. | **Revert** swaps back, with the same prompt. |
+| The Windows installer, all users | GitHub releases | The same, but Windows asks for administrator approval. Other users' GitPoulpi sessions on the computer are closed, which loses their unsaved input. If you decline, nothing changes. | **Revert** swaps back, with the same prompt. |
 | Chocolatey | The Chocolatey community feed | **Run update** runs `choco upgrade gitpoulpi -y` (Windows asks for administrator approval). | The panel shows `choco install gitpoulpi --version <previous> --allow-downgrade -y`. |
-| Chocolatey, internal feed | Your organisation's feed | **Run update** runs `choco upgrade gitpoulpi -y --source=<feed>`. Package parameters are not sent again, so a deployed configuration stays untouched. | The same `choco install` line with the feed. |
+| Chocolatey, internal feed | Your organization's feed | **Run update** runs `choco upgrade gitpoulpi -y --source=<feed>`. Package parameters are not sent again, so a deployed configuration stays untouched. | The same `choco install` line with the feed. |
 | winget | GitHub releases | **Run update** runs `winget upgrade --id GitPoulpi.GitPoulpi --exact --silent` with the agreements accepted. winget asks for administrator approval itself when the install is machine-wide. | The panel shows `winget install --id GitPoulpi.GitPoulpi --version <previous>`. |
 | Scoop | GitHub releases | **Run update** runs `scoop update gitpoulpi` after GitPoulpi has closed completely. | **Revert** runs `scoop reset gitpoulpi@<previous>`. |
 | Homebrew | GitHub releases | **Run update** runs `brew upgrade gitpoulpi` in this terminal. | The panel shows `brew install gitpoulpi@<previous>`. |

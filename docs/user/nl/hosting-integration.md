@@ -162,6 +162,43 @@ GitPoulpi zoekt het token van een profiel in deze volgorde:
 Elk profiel is een `[[integrations]]`-item in `config.toml`. Zie de
 [configuratienaslag](config-reference.md#integrations-hosting-en-issuetrackers).
 
+## De beveiligingscontrole
+
+Een opgeslagen token is maar zo veilig als het adres waarheen het wordt gestuurd. GitPoulpi onthoudt daarom per integratie waarmee het was verbonden en stopt als dat verandert:
+
+- **Het adres.** De eerste keer dat een integratie wordt gebruikt (of verbonden), wordt haar adres vastgelegd in `trust.toml`, in de privégegevensmap die alleen jij kunt lezen (`<data>/private/`), niet in `config.toml`: het bewerken van de configuratie kan nooit verbreden wat wordt vertrouwd. Als het adres in de configuratie niet meer het vastgelegde is, wordt er niets naartoe gestuurd en wordt het token niet eens gelezen. Spellingen van één adres (`HTTPS://Git.Example.com:443/`) zijn hetzelfde adres; een host die erop lijkt, niet.
+- **Het account.** Nadat je een token hebt verbonden, en daarna ongeveer eenmaal per dag (en eenmaal per run voor een token dat uit `GITPOULPI_TOKEN_*` of de credential helper komt), vraagt GitPoulpi aan de host van wie het token is en vergelijkt de account-**id**, niet de login. Een token dat nu van iemand anders is, wordt gestopt.
+- **Het certificaat.** Servers waarvan het certificaat niet naar een bekende autoriteit leidt (een privé-CA, een zelfondertekende server) worden alleen geaccepteerd voor de exacte sleutel die je hebt geaccepteerd, en de TLS-handshake bewijst nog steeds dat de server die sleutel heeft. Met strikt pinnen aan moet de sleutel overeenkomen, ook als het certificaat naar een openbare root leidt; de prijs is dat elke sleutelrotatie opnieuw vraagt, daarom is het opt-in. De openbare hosts (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) houden geen certificaatregistratie bij.
+- **Gewone http.** Een `http://`-adres dat geen loopback is, wordt geweigerd tenzij je het voor die integratie hebt toegestaan.
+
+Elk verzoek wordt ook gebonden aan het eigen adres van de integratie (en, voor een openbare host, aan zijn API-host zoals `api.github.com`): een verzoek ergens anders heen wordt geweigerd voordat het wordt verstuurd, en een redirect naar een ander adres wordt niet gevolgd.
+
+**Integraties die zijn verbonden voordat deze controle bestond** krijgen hun registratie stilletjes, uit de configuratie zoals die was, de eerste keer dat ze na de upgrade worden gebruikt: ze behouden het huidige vertrouwensniveau en er wordt niets gevraagd.
+
+### Vanaf de opdrachtregel
+
+Een gestopte opdracht mislukt met afsluitcode 2 en drukt af wat er is veranderd (zie de [CLI-naslag](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` toont wat wordt vertrouwd; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` en `--allow-insecure-http on|off` accepteren elk één ding, met de exacte waarde. Voer na het accepteren van een nieuw adres het token opnieuw in. Verbinding verbreken (`hosting logout`) of een integratie verwijderen verwijdert haar token, haar vertrouwensregistratie en wat ervan in de cache stond (de opgeslagen repositorylijsten van het dialoogvenster Klonen, de accountlijsten van de Radar en de externe reviewconcepten van die host).
+
+Een agent (MCP) kan niets accepteren: hem wordt gezegd dat de beveiligingscontrole jou nodig heeft.
+
+### In de terminal-UI
+
+Een gestopt verzoek opent het dialoogvenster **Beveiligingscontrole van integratie** boven waar je mee bezig was. Het zegt wat er is veranderd (het oude en het nieuwe adres, het oude en het nieuwe account met hun id's, of het oude en het nieuwe certificaat als een kleine tabel met de SHA-256-vingerafdruk in groepen van vier, onderwerp, uitgever en geldigheid) en dat het token niet is verstuurd. De antwoorden zijn genummerd:
+
+1. **Verbinding verbreken** verwijdert het opgeslagen token, de vertrouwensregistratie en wat van de integratie in de cache stond.
+2. **Het nieuwe adres vertrouwen**, **Het nieuwe account vertrouwen** of **Het nieuwe certificaat vertrouwen** (een niet-versleuteld adres: **Gewone http toestaan (niet versleuteld)**).
+3. **Annuleren** wijzigt niets.
+
+Geen enkel antwoord is gemarkeerd tot je een pijltoets of een cijfer indrukt, dus een verdwaalde Enter accepteert niets. Esc en het sluitkruisje annuleren; een klik buiten het dialoogvenster doet niets. Een lange tekst scrolt met het wiel, Page Up/Page Down of de schuifbalk. Meerdere controles komen in een wachtrij (één per integratie en soort wijziging) en worden na elkaar gevraagd. Een geannuleerde controle verschijnt niet opnieuw zolang hij onveranderd is; **Integraties: Beveiligingscontrole bekijken** in het opdrachtpalet brengt hem terug.
+
+Nadat je een nieuw **adres** hebt vertrouwd, opent het formulier van de integratie met het tokenveld gefocust en de hint "Het token opnieuw invoeren wordt aanbevolen": het opgeslagen token is daar nooit naartoe gestuurd. In het formulier wordt een bewust gewijzigd adres geaccepteerd samen met een token dat ervoor is getypt; zonder token vraagt het formulier erom.
+
+Het formulier heeft ook twee schakelaars. **Strikte certificaatpinning** (voor een https-adres) pint de certificaatsleutel die de server aanbiedt wanneer je verbindt. **Gewone http toestaan (niet versleuteld)** wordt alleen aangeboden voor een `http://`-adres dat niet deze computer is, met een rode waarschuwing dat het token als leesbare tekst reist. De verbonden kaart toont de vastgepinde vingerafdruk.
+
+### Wat het token mag doen, en tot wanneer
+
+Verbinden vraagt de host ook wat het token kan doen. GitHub (klassieke tokens), GitLab en Bitbucket (wanneer die de scopes meestuurt) melden hun scopes: de kaart toont een gele regel "Dit token heeft meer rechten dan GitPoulpi nodig heeft" met de scopes die verder gaan dan wat GitPoulpi gebruikt, de gevoelige (zoals `delete_repo`, `admin:org`, `sudo`) in rood, met het advies liever een fijnmazig token met een vervaldatum te gebruiken. Een klassiek GitHub-token (`ghp_...`) krijgt dat advies ook als zijn scopes precies kloppen. Een fijnmazig GitHub-token kan niet naar zijn rechten worden gevraagd, dus alleen zijn vervaldatum wordt getoond. De kaart toont de vervaldatum als de host die meldt. Een token zonder vervaldatum toont geen herinnering, en de andere producten melden geen scopes en geven geen waarschuwing. Dezelfde velden staan in de JSON van `hosting integrations login` en `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). Ze worden gelezen wanneer je verbindt, dus de kaart toont ze voor de sessie die verbond.
+
 ## 4. Koppel een repository
 
 Koppelen is expliciet en per repository. Als een profiel is verbonden, toont de Refs-

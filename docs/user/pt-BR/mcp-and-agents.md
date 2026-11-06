@@ -64,10 +64,60 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-JSON sem estado, as mesmas ferramentas, as mesmas travas de `[mcp]`. Ele **não tem autenticação**, então
-escuta somente em loopback; `--allow-remote` remove essa limitação, e então qualquer pessoa que consiga
-alcançar a porta pode executar todas as ferramentas que a sua configuração permite. Use-o somente atrás de uma
-rede confiável ou de um proxy com autenticação.
+JSON sem estado, as mesmas ferramentas, as mesmas travas de `[mcp]`. Toda requisição precisa do token
+bearer (`[mcp] http_auth`, ativado por padrão): imprima-o com `gitpoulpi mcp token
+--show` (ou `--copy`, `--rotate`; o token fica em um arquivo só do usuário na pasta
+de dados privada) e entregue-o ao cliente como um cabeçalho:
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+Um token ausente ou errado recebe `401` com `WWW-Authenticate: Bearer`. Um token
+substituído vale na hora, sem reiniciar o servidor. Desativar `http_auth` serve para um
+endpoint loopback em que você confia em todas as contas locais; o servidor então avisa no
+stderr.
+
+### Acessando o endpoint de outra máquina
+
+A configuração mais segura não precisa de nenhum listener remoto: mantenha o endereço loopback e
+encaminhe a porta por SSH a partir da máquina que executa o agente, `ssh -L
+8808:127.0.0.1:8808 host`. Assim o `--allow-remote` nem entra em cena.
+
+`--allow-remote` (um endereço que não seja loopback) é recusado, a menos que a autenticação esteja ativada
+com um token definido **e** o tráfego seja criptografado. A recusa nomeia o que
+falta. Há duas formas de ter criptografia:
+
+- **TLS no servidor** (`[mcp] tls = "self_signed"` ou `"files"`). O servidor
+  encerra o TLS por conta própria: ele guarda a chave, executa o handshake, e só um
+  handshake concluído chega à camada HTTP; um cliente HTTP simples falha no handshake e não existe
+  listener simples ao lado. Então a criptografia é um fato que o servidor
+  estabelece em cada conexão, não uma suposição. Com `self_signed`, a
+  primeira inicialização gera um par na pasta de dados privada e imprime a impressão digital
+  SHA-256 dele (também nas Configurações); um cliente confia no servidor fixando
+  essa impressão digital ou o arquivo do certificado. Com `files`, defina `tls_cert` e
+  `tls_key` para os seus arquivos PEM e os clientes verificam o certificado pela CA dele.
+  Os clientes se autenticam com o token bearer; certificados de cliente não são usados.
+- **Um túnel ou proxy reverso** (`[mcp] behind_proxy = true`). Um agente de túnel ou
+  proxy se conecta como qualquer cliente local ou da LAN e seus cabeçalhos podem ser forjados, então
+  o servidor não consegue saber de dentro se há um. Por isso isto é um
+  reconhecimento explícito (mostrado com um aviso vermelho nas Configurações) em vez de uma
+  detecção. Execute o túnel na mesma máquina e mantenha o endereço loopback quando
+  puder. Com um endereço que não seja loopback atrás de um proxy, o trecho entre o proxy
+  e o servidor é texto simples nessa rede.
 
 **Sem MCP**, um agente com um shell usa a CLI: `gitpoulpi --json <command>`
 (veja a [referência da CLI](cli-reference.md)). Dê a ele a skill pronta
@@ -79,12 +129,16 @@ e como usar o GitPoulpi em vez do `git` puro.
 | Chave | Padrão | Efeito |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` se recusam a iniciar (Configurações > Agentes e MCP > *Servidor MCP*). Lido quando o servidor inicia: um servidor em execução mantém suas configurações. |
-| `[mcp] bind` | `"127.0.0.1:8808"` | Endereço que `--http` usa quando nenhum é informado (somente loopback, a menos que `--allow-remote`). Configurações > Agentes e MCP > *Porta do servidor MCP* edita a porta e mantém o host. |
+| `[mcp] bind` | `"127.0.0.1:8808"` | Endereço que `--http` usa quando nenhum é informado (somente loopback, a menos que `--allow-remote`, que exige autenticação e criptografia, veja acima). Configurações > Agentes e MCP > *Porta do servidor MCP* edita a porta e mantém o host. |
+| `[mcp] http_auth` | `true` | `--http` exige `Authorization: Bearer <token>` (`gitpoulpi mcp token`). Configurações > Agentes e MCP > *Autenticação HTTP*. |
+| `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` ou `files` (os seus caminhos PEM): o servidor encerra o TLS por conta própria. Configurações > Agentes e MCP > *TLS*. |
+| `[mcp] behind_proxy` | `false` | Você declara que um túnel ou proxy reverso criptografa o tráfego, o que deixa `--allow-remote` funcionar sem TLS. |
 | `[mcp] allow_mutations` | `false` | Desligado: toda ferramenta que altera algo é recusada; leituras, `ui_*` e propostas continuam funcionando. `true` deixa o agente fazer commit, push, reset... |
 | `[mcp] mutation_allowlist` | `[]` | Não vazia: somente estas ferramentas podem alterar coisas, por exemplo `["stage", "unstage", "commit"]`. |
 | `[mcp] allow_ui` | `true` | `false`: o agente não pode mexer na sua janela (`ui_state` / `ui_viewers` ainda respondem). |
 | `[mcp] ui_control` | `"ask"` | `ask`: um chip na sua janela que você confirma; `auto`: aplicado, a menos que você esteja ocupado; `off`: recusado. Por agente: `--ui-control`. |
 | `[mcp] allow_ui_propose` | `false` | Deixa o agente abrir diálogos pré-preenchidos que você confirma (Configurações > Agentes e MCP > *Deixar agentes de IA proporem alterações para eu confirmar*). |
+| `[mcp] allow_sensitive_staging` | `false` | Somente no `config.toml`. Desativado, a ferramenta `stage` não oferece `allow_sensitive`, e um stage que adicionaria um arquivo sensível (uma chave privada, um `.env`, um token reconhecido) é recusado com `{error: "sensitive_files", files}`: o agente deve perguntar a você. `true` deixa-o passar `allow_sensitive`. Veja [Stage e commit](staging-and-committing.md#arquivos-sensíveis). |
 | `[mcp] allow_history_purge` | `false` | Somente no `config.toml`. `true` lista a ferramenta `rewrite_purge`, que apaga de vez o histórico antigo de uma reescrita de histórico (e o desfazer dela). Desativado: o agente não a vê. Ela ainda exige `allow_mutations`. |
 | `[ui] allow_agent_view_control` | `true` | A chave geral da sua janela (Configurações > Agentes e MCP > *Permitir que agentes de IA controlem a visualização*). Desligada: nenhum agente alcança a sua janela. |
 | `[ui] launch` | `"off"` | Se um agente pode abrir uma janela do GitPoulpi quando nenhuma está aberta (veja [abaixo](#quando-nenhuma-janela-está-aberta-ou-ela-está-em-outra-sessão)). |
@@ -153,6 +207,7 @@ mutation_allowlist = []        # e.g. ["stage", "unstage", "commit", "branch_cre
 allow_ui = true
 ui_control = "ask"             # "auto" deixa o agente mudar a sua visualização sem perguntar
 allow_ui_propose = false       # true: o agente pode preencher antes os diálogos de Reword / Split / commit / branch / tag
+allow_sensitive_staging = false  # true: o agente pode fazer stage de arquivos que a proteção de stage sinaliza
 allow_history_purge = false    # true: o agente vê rewrite_purge (apaga o histórico antigo de vez)
 ```
 
@@ -430,7 +485,10 @@ Not exposed as tools:
 
 | CLI | Why |
 |---|---|
+| `gitpoulpi hosting integrations trust` | accepting a changed address, account or certificate is the user's decision; an agent is told the security check needs the user |
+| `gitpoulpi ai trust` | binding an API key to another address is the user's decision |
 | `gitpoulpi mcp serve` | the MCP server cannot spawn/serve a copy of itself |
+| `gitpoulpi mcp token` | prints, copies and rotates the key that guards this very server: an agent must not read or replace it |
 | `gitpoulpi completions` | shell completion generation, not a GitBackend operation |
 | `gitpoulpi shell-init` | prints a wrapper function for the user's own shell, not a GitBackend operation |
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |
@@ -451,6 +509,7 @@ Not exposed as tools:
 | `gitpoulpi config set` | an agent must not be able to rewrite its own gating config |
 | `gitpoulpi hosting ssh-key create` | writes a private key and uploads it; too dangerous to let an agent automate |
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
+| `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
 ### As ações de fluxo de trabalho de branches são planejar-e-depois-executar

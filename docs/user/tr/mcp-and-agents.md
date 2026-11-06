@@ -66,11 +66,61 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-Durumsuz JSON, aynı araçlar, aynı `[mcp]` kapıları. **Kimlik doğrulaması yoktur**,
-bu yüzden yalnızca loopback üzerinde dinler; `--allow-remote` bunu kaldırır ve
-o zaman porta ulaşabilen herkes yapılandırmanızın izin verdiği her aracı
-çalıştırabilir. Yalnızca güvenilir bir ağın ya da kimlik doğrulayan bir
-vekilin arkasında kullanın.
+Durumsuz JSON, aynı araçlar, aynı `[mcp]` kapıları. Her istek bearer token'ı
+gerektirir (`[mcp] http_auth`, varsayılan olarak açık): onu `gitpoulpi mcp token
+--show` ile yazdırın (veya `--copy`, `--rotate`; token, özel veri klasörünün
+altındaki yalnızca kullanıcıya ait bir dosyada durur) ve istemciye bir başlık
+olarak verin:
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+Eksik veya yanlış bir token `WWW-Authenticate: Bearer` ile `401` alır. Değiştirilen
+bir token sunucuyu yeniden başlatmadan hemen geçerli olur. `http_auth` değerini
+kapatmak, her yerel hesaba güvendiğiniz bir loopback uç noktası içindir; sunucu bu
+durumda stderr'e uyarı yazar.
+
+### Uç noktaya başka bir makineden erişmek
+
+En güvenli kurulum hiç uzak dinleyici gerektirmez: loopback adresini koruyun ve
+portu ajanı çalıştıran makineden SSH ile iletin, `ssh -L
+8808:127.0.0.1:8808 host`. Bu durumda `--allow-remote` devreye girmez.
+
+`--allow-remote` (loopback olmayan bir adres), kimlik doğrulama bir token ile açık
+**ve** trafik şifreli olmadıkça reddedilir. Ret, nelerin eksik olduğunu adlandırır.
+Şifrelenmenin iki yolu vardır:
+
+- **Sunucuda TLS** (`[mcp] tls = "self_signed"` veya `"files"`). Sunucu TLS'yi
+  kendisi sonlandırır: anahtarı tutar, el sıkışmayı yürütür ve HTTP katmanına yalnızca
+  tamamlanmış bir el sıkışma ulaşır; düz HTTP kullanan bir istemci el sıkışmada
+  başarısız olur ve yanında düz bir dinleyici yoktur. Yani şifreleme, bir varsayım
+  değil, sunucunun her bağlantıda kurduğu bir olgudur. `self_signed` ile ilk başlatma
+  özel veri klasörünün altında bir çift üretir ve SHA-256 parmak izini yazdırır
+  (Ayarlarda da vardır); bir istemci sunucuya o parmak izini ya da sertifika dosyasını
+  sabitleyerek güvenir. `files` ile `tls_cert` ve `tls_key` değerlerini PEM
+  dosyalarınıza ayarlayın; istemciler sertifikayı CA'sıyla doğrular. İstemciler bearer
+  token ile kimlik doğrular; istemci sertifikaları kullanılmaz.
+- **Bir tünel veya ters vekil sunucu** (`[mcp] behind_proxy = true`). Bir tünel ajanı
+  veya vekil sunucu, herhangi bir yerel veya LAN istemcisi gibi bağlanır ve başlıkları
+  taklit edilebilir; bu yüzden sunucu içeriden onun orada olup olmadığını söyleyemez.
+  Bu yüzden bir algılama yerine açık bir onaydır (Ayarlarda kırmızı bir uyarıyla
+  gösterilir). Mümkün olduğunda tüneli aynı makinede çalıştırın ve loopback adresini
+  koruyun. Bir vekilin arkasındaki loopback olmayan bir adreste, vekil ile sunucu
+  arasındaki bağlantı o ağda düz metindir.
 
 **MCP olmadan**, kabuğu olan bir ajan CLI'ı kullanır: `gitpoulpi --json <command>`
 ([CLI başvurusuna](cli-reference.md) bakın). Ona, ham `git` yerine GitPoulpi'nin ne
@@ -82,12 +132,16 @@ zaman ve nasıl kullanılacağını söyleyen hazır
 | Anahtar | Varsayılan | Etki |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` başlamayı reddeder (Ayarlar > Ajanlar ve MCP > *MCP sunucusu*). Sunucu başlarken okunur: çalışan bir sunucu ayarlarını korur. |
-| `[mcp] bind` | `"127.0.0.1:8808"` | Hiçbiri verilmediğinde `--http`'nin kullandığı adres (`--allow-remote` olmadıkça yalnızca loopback). Ayarlar > Ajanlar ve MCP > *MCP sunucu portu* portu düzenler ve ana makine kısmını korur. |
+| `[mcp] bind` | `"127.0.0.1:8808"` | Hiçbiri verilmediğinde `--http`'nin kullandığı adres (`--allow-remote` olmadıkça yalnızca loopback; bu kimlik doğrulama ve şifreleme ister, bkz. yukarısı). Ayarlar > Ajanlar ve MCP > *MCP sunucu portu* portu düzenler ve ana makine kısmını korur. |
+| `[mcp] http_auth` | `true` | `--http`, `Authorization: Bearer <token>` ister (`gitpoulpi mcp token`). Ayarlar > Ajanlar ve MCP > *HTTP kimlik doğrulaması*. |
+| `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` veya `files` (PEM yollarınız): sunucu TLS'yi kendisi sonlandırır. Ayarlar > Ajanlar ve MCP > *TLS*. |
+| `[mcp] behind_proxy` | `false` | Bir tünelin veya ters vekil sunucunun trafiği şifrelediğinin sorumluluğunu üstlenirsiniz; bu, `--allow-remote` komutunun TLS olmadan çalışmasına izin verir. |
 | `[mcp] allow_mutations` | `false` | Kapalı: bir şeyi değiştiren her araç reddedilir; okumalar, `ui_*` ve öneriler yine çalışır. `true`, ajanın commit, push, reset... yapmasına izin verir. |
 | `[mcp] mutation_allowlist` | `[]` | Boş değil: yalnızca bu araçlar bir şey değiştirebilir, örn. `["stage", "unstage", "commit"]`. |
 | `[mcp] allow_ui` | `true` | `false`: ajan pencerenizi hareket ettiremez (`ui_state` / `ui_viewers` yine yanıt verir). |
 | `[mcp] ui_control` | `"ask"` | `ask`: pencerenizde onayladığınız bir çip; `auto`: meşgul olmadığınız sürece uygulanır; `off`: reddedilir. Ajan başına: `--ui-control`. |
 | `[mcp] allow_ui_propose` | `false` | Ajanın, sizin onaylayacağınız önceden doldurulmuş iletişim kutuları açmasına izin verir (Ayarlar > Ajanlar ve MCP > *YZ ajanlarının onaylayacağım değişiklikler önermesine izin ver*). |
+| `[mcp] allow_sensitive_staging` | `false` | Yalnızca `config.toml` içinde. Kapalıyken `stage` aracı `allow_sensitive` sunmaz ve hassas bir dosya (bir özel anahtar, bir `.env`, tanınan bir token) ekleyecek bir stage `{error: "sensitive_files", files}` ile reddedilir: ajan size soracaktır. `true`, onun `allow_sensitive` geçmesine izin verir. Bkz. [Stage'leme ve commit'leme](staging-and-committing.md#hassas-dosyalar). |
 | `[mcp] allow_history_purge` | `false` | Yalnızca `config.toml` içinde. `true`, bir geçmiş yeniden yazmanın eski geçmişini (ve onun geri almasını) kalıcı olarak silen `rewrite_purge` aracını listeler. Kapalıyken ajan onu görmez. Yine de `allow_mutations` gerekir. |
 | `[ui] allow_agent_view_control` | `true` | Pencerenizin ana anahtarı (Ayarlar > Ajanlar ve MCP > *YZ ajanlarının görünümü yönetmesine izin ver*). Kapalı: hiçbir ajan pencerenize ulaşamaz. |
 | `[ui] launch` | `"off"` | Hiçbir pencere açık değilken bir ajanın GitPoulpi penceresi açıp açamayacağı ([aşağıya](#hiçbir-pencere-açık-olmadığında-veya-başka-bir-oturumda-olduğunda) bakın). |
@@ -152,6 +206,7 @@ mutation_allowlist = []        # örn. ["stage", "unstage", "commit", "branch_cr
 allow_ui = true
 ui_control = "ask"             # "auto" ajanın görünümünüzü sormadan hareket ettirmesine izin verir
 allow_ui_propose = false       # true: ajan Reword / Split / commit / dal / tag iletişim kutularını önceden doldurabilir
+allow_sensitive_staging = false  # true: ajan stage koruması işaretleyen dosyaları stage'leyebilir
 allow_history_purge = false    # true: ajan rewrite_purge aracını görür (eski geçmişi kalıcı olarak siler)
 ```
 

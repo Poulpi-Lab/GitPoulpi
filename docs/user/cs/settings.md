@@ -247,8 +247,11 @@ Též na této stránce, ve skupině **Aktualizace**:
 
 | Volba | Co dělá |
 |---|---|
-| **Kontrola aktualizací** | Rozbalovací seznam (`updates.mode`): **Oznamovat** (výchozí) jednou denně na pozadí zkontroluje a v záhlaví okna ukáže `vX.Y.Z k dispozici`; **Auto** navíc stáhne aktualizaci na pozadí, byl-li GitPoulpi nainstalován z archivu vydání (kdy restartovat, volíte vy); **Vypnuto** neodešle nikdy žádný požadavek. Platí okamžitě. Viz [Aktualizace](installation.md#aktualizace). |
+| **Kontrola aktualizací** | Rozbalovací seznam (`updates.mode`): **Oznamovat** (výchozí) jednou denně na pozadí zkontroluje a v záhlaví okna ukáže `vX.Y.Z k dispozici`; **Auto** navíc stáhne aktualizaci na pozadí, byl-li GitPoulpi nainstalován z archivu vydání (kdy restartovat, volíte vy); **Vypnuto** neodešle nikdy žádný požadavek. Platí okamžitě. Viz [Aktualizace](updates.md). |
 | **Kanál aktualizací** | Rozbalovací seznam (`updates.channel`): **Stabilní** (výchozí) nebo **Předběžný** (i kandidáti na vydání). Platí okamžitě. |
+| **Nainstalováno přes** | Jen pro čtení. Jak se GitPoulpi dostal do tohoto počítače (archiv vydání, instalační program pro tohoto uživatele nebo všechny uživatele, Chocolatey, winget, Scoop, Homebrew, apt, balíček MSI, AUR, obraz Dockeru, cargo nebo vývojové sestavení). Určuje, jak se aktualizace použijí, viz [Aktualizace](updates.md). |
+
+Řádek, který nastavil váš správce v politice aktualizací platné pro celý počítač, ukazuje **Nastaveno vaším správcem** a nelze ho tady změnit.
 
 Též na této stránce, ve skupině **Přepis historie**, časové limity externích skriptů (viz [Přepis historie](history-rewrite.md)):
 
@@ -339,11 +342,22 @@ na kartě Obecné obsahuje také výchozí hodnoty [kontextu kontroly](ai.md#kon
 v repozitáři** (*Podle profilu*, *Ano*, *Ne*), **Zahrnout CLAUDE.md**, **Zahrnout AGENTS.md** a **Další soubor**
 (cesta nebo odkaz; prázdné nepřidá žádný, s tlačítkem **Procházet...** pod ním, které otevře výběr souboru; `Enter` na tlačítku je jeho klávesová podoba). Tato stránka má vlastního průvodce: [Asistence AI](ai.md).
 
+Pod bloky jednotlivých akcí je skupina **Soukromí**:
+
+| Volba | Co dělá |
+|---|---|
+| **Před odesláním skrýt tajné hodnoty** | Zapnuto (výchozí): tokeny, soukromé klíče a hesla nalezené v požadavku se před odesláním nahradí `[REDACTED:<rule>]`. Vypnuto: červený řádek říká, že se tajné hodnoty odesílají beze změny. |
+| **Vynechat citlivé soubory** | Zapnuto (výchozí): změny souborů `.env`, soukromých klíčů a certifikátů (`[privacy] sensitive_patterns`) nejsou nikdy součástí požadavku. Vypnuto: červený řádek říká, že se odesílají, když jsou součástí požadavku. |
+| **Zobrazit, co se odesílá, před...** | Jeden přepínač na akci (zpráva commitu, vysvětlení, zpráva stashe, popis pull requestu, composer commitů, řešení konfliktů, kontrola kódu, rozdělení commitu): ukáže požadavek v dialogu **Co se odešle**, než odejde. Pole *Příště nezobrazovat* v dialogu jeden vypne. Akce přepisu historie ukazují vlastní dialog. |
+| **Zobrazit vše znovu** | Objeví se, dokud je některý přepínač vypnutý; zapne všechny zpět. |
+
+Viz [AI > Soukromí](ai.md#soukromí).
+
 ### Agenti a MCP
 
-Co smějí AI agenti dělat v tomto okně a zda smí běžet server MCP. Oba řádky
-MCP se zobrazují jen v sestaveních, která server obsahují; viz
-[MCP a agenti](mcp-and-agents.md).
+Co smějí AI agenti dělat v tomto okně, zda smí běžet server MCP a jak je chráněn
+jeho endpoint HTTP. Řádky MCP se zobrazují jen v sestaveních, která server
+obsahují; viz [MCP a agenti](mcp-and-agents.md).
 
 | Volba | Co dělá |
 |---|---|
@@ -352,6 +366,12 @@ MCP se zobrazují jen v sestaveních, která server obsahují; viz
 | **Povolit AI agentům ovládat zobrazení** | Umožní agentům ukázat vám v tomto okně commit, soubor nebo oznámení (`ui show`). Vypnuto: žádný agent okno neovlivní. |
 | **Nechat AI agenty navrhovat změny k mému potvrzení** | Umožní agentům otevírat předvyplněné dialogy Reword, commit, větev nebo tag, které potvrdíte vy. Ve výchozím stavu vypnuto. Viz [MCP a agenti](mcp-and-agents.md#oprávnění). |
 | **Otevřít okno pro agenty**, **Příkaz ke spuštění (custom)** | Zda smí agent otevřít okno GitPoulpi, když žádné není otevřené, a pomocí kterého terminálu nebo multiplexeru. Ve výchozím stavu vypnuto. |
+| **Ověřování HTTP** | Zapnuto (výchozí): endpoint HTTP serveru MCP odpovídá jen na požadavek s přístupovým tokenem. Vypnuto ukáže červené varování: jakýkoli program, který se k endpointu dostane, může spustit každý nástroj povolený v nastavení MCP, a `--allow-remote` se odmítne. Ukládá se jako `mcp.http_auth`. |
+| **Přístupový token** | Token, maskovaný. Maskovaná hodnota je tlačítko: `Enter` (nebo klik) ji ukáže celou na řádku pod ní a znovu ji skryje. **Kopírovat** ji vloží do schránky bez zobrazení ve stavovém řádku, **Obnovit** ji po potvrzení nahradí (klienti se starým tokenem jsou okamžitě odmítnuti, restart serveru není potřeba), **Vytvořit** udělá první. `Left` / `Right` se pohybují mezi tlačítky a `Enter` jedno stiskne. Stejný token je `gitpoulpi mcp token`. |
+| **TLS** | **Vypnuto** (výchozí), **Self-signed** (server jednou vytvoří certifikát a ukáže jeho otisk) nebo **Soubory** (váš certifikát a klíč). Server ukončuje TLS sám. Ukládá se jako `mcp.tls`; platí od dalšího spuštění serveru. |
+| **Cesta k certifikátu**, **Cesta ke klíči** | Soubory PEM používané se **Soubory** (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Otisk certifikátu** | Jen pro čtení: otisk SHA-256 certifikátu, který endpoint předkládá, aby ho klienti mohli ověřit. |
+| **Za tunelem nebo reverzní proxy** | Vaše prohlášení, že provoz šifruje tunel nebo proxy před endpointem, což umožní běh `--allow-remote` bez TLS. Server to nemůže ověřit, takže při zapnutí ukazuje červené varování. Ukládá se jako `mcp.behind_proxy`. Viz [MCP a agenti](mcp-and-agents.md#přístup-k-endpointu-z-jiného-počítače). |
 
 ### Vzhled
 

@@ -253,6 +253,31 @@ simples; depois de um hook `after_start` a branch existe e o fluxo pode ser
 continuado ou abortado). `--no-hooks` ignora-os sem perguntar. Um hook pode fazer
 qualquer coisa, por isso o `undo` só reverte as alterações de git.
 
+**Confiança.** Os comandos de uma secção `[hooks]` incluída nos commits vêm de quem pode
+fazer push para o repositório, por isso precisam também da *sua* confiança, uma vez por versão da
+lista. A confiança é guardada por repositório através do hash dos hooks (a alteração de qualquer
+comando, fase ou ordem volta a perguntar) e é verificada pelo daemon antes do primeiro
+passo de uma execução e antes de um fluxo continuado prosseguir, pelo que uma execução recusada não
+alterou nada. Os hooks da sua própria substituição (`[workflow]` no estado do seu repositório, a
+página das Definições) são seus e nunca perguntam.
+
+- **CLI:** `gitpoulpi flow trust-hooks` mostra os comandos, o seu `hash` e
+  se são `trusted`; `gitpoulpi flow trust-hooks --hash <hash>` confia
+  neles, e só quando o ficheiro em disco ainda tem esse hash. `--run-hooks` em hooks
+  sem confiança mostra uma recusa (`{"refused": {"reason": "hooks_not_trusted",
+  ...}}`, código de saída 2) com os comandos e essa linha de comandos. Um terminal a quem
+  se pergunta "Run them too?" é também questionado sobre se confia neles.
+- **TUI:** a pré-visualização lista os hooks e diz que ainda não são de confiança. Premir
+  depois o botão da ação pergunta "O fluxo de trabalho deste repositório executa estes comandos no
+  seu computador. Confiar neles?" com os comandos exatos num painel com deslocação
+  (roda do rato, barra de deslocação arrastável, PgUp/PgDn/Home/End) e duas respostas:
+  **1 Confiar e executar** e **2 Executar sem hooks**. Nada fica realçado até
+  premir uma seta ou um dígito; Esc, Cancelar ou a cruz de fechar voltam atrás sem
+  responder. Quando o ficheiro mudou desde que confiou nele, o título diz "Os hooks
+  mudaram desde que confiou neles" e a lista antiga é mostrada abaixo da nova.
+- **Agentes:** não existe nenhuma ferramenta para confiar em hooks. `run_hooks: true` em hooks
+  sem confiança é recusado com os comandos, e é uma pessoa que executa `flow trust-hooks`.
+
 ### Para agentes (MCP)
 
 As ferramentas são `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` e
@@ -262,8 +287,10 @@ As ferramentas são `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` e
 para o executar. Sem nenhuma das duas a chamada é recusada e traz o plano, por isso nada
 executa por acidente. Os hooks só executam com um `run_hooks: true` explícito; o plano
 lista-os (`hooks`, `hooks_run`) para que o agente possa mostrar primeiro os comandos ao
-utilizador. Depois de um conflito, `continue_: true` (a opção é `--continue`) ou
-`abort: true`.
+utilizador. Os hooks incluídos nos commits têm de ter a confiança de uma pessoa (`flow trust-hooks`, que não
+tem ferramenta): `run_hooks: true` em hooks sem confiança devolve `refused` com os
+comandos e não executa nada. Depois de um conflito, `continue_: true` (a opção é
+`--continue`) ou `abort: true`.
 
 ### Desfazer
 

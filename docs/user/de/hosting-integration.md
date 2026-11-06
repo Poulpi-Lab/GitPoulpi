@@ -160,6 +160,43 @@ GitPoulpi sucht das Token eines Profils in dieser Reihenfolge:
 Jedes Profil ist ein Eintrag `[[integrations]]` in der `config.toml`. Siehe die
 [Konfigurationsreferenz](config-reference.md#integrations-hosting-und-issue-tracker).
 
+## Die Sicherheitsprüfung
+
+Ein gespeichertes Token ist nur so sicher wie die Adresse, an die es gesendet wird. GitPoulpi merkt sich daher für jede Integration, womit sie verbunden war, und hält an, wenn sich das ändert:
+
+- **Die Adresse.** Bei der ersten Verwendung (oder beim Verbinden) einer Integration wird ihre Adresse in `trust.toml` festgehalten, im privaten Datenordner, der nur dem Benutzer gehört (`<data>/private/`), nicht in `config.toml`: Das Bearbeiten der Konfiguration kann das Vertrauen nie erweitern. Ist die Adresse in der Konfiguration nicht mehr die festgehaltene, wird nichts an sie gesendet und das Token nicht einmal gelesen. Schreibweisen derselben Adresse (`HTTPS://Git.Example.com:443/`) sind dieselbe Adresse; ein ähnlich aussehender Host nicht.
+- **Das Konto.** Nachdem Sie ein Token verbunden haben, und dann etwa einmal täglich (und einmal je Lauf bei einem Token aus `GITPOULPI_TOKEN_*` oder dem Credential-Helper), fragt GitPoulpi den Host, wem das Token gehört, und vergleicht die Konto-**ID**, nicht den Login. Ein Token, das jetzt jemand anderem gehört, wird angehalten.
+- **Das Zertifikat.** Server, deren Zertifikat nicht zu einer bekannten Zertifizierungsstelle führt (eine private CA, ein selbstsignierter Server), werden nur für genau den Schlüssel akzeptiert, den Sie akzeptiert haben, und der TLS-Handshake beweist weiterhin, dass der Server diesen Schlüssel besitzt. Bei strengem Pinning muss der Schlüssel auch dann passen, wenn das Zertifikat zu einer öffentlichen Wurzel führt; der Preis ist, dass jede Schlüsselrotation erneut fragt, weshalb es optional ist. Die öffentlichen Hosts (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) führen keinen Zertifikateintrag.
+- **Einfaches http.** Eine `http://`-Adresse außerhalb des Loopbacks wird abgelehnt, außer Sie haben sie für diese Integration erlaubt.
+
+Jede Anfrage wird außerdem an die eigene Adresse der Integration gebunden (und bei einem öffentlichen Host an dessen API-Host wie `api.github.com`): Eine Anfrage anderswohin wird abgelehnt, bevor sie gesendet wird, und eine Weiterleitung an eine andere Adresse wird nicht verfolgt.
+
+**Vor dieser Prüfung verbundene Integrationen** erhalten ihren Eintrag stillschweigend aus der Konfiguration, wie sie war, bei der ersten Verwendung nach dem Upgrade: Sie behalten das heutige Vertrauensniveau, und nichts fragt.
+
+### Von der Kommandozeile
+
+Ein angehaltener Befehl endet mit Exit-Code 2 und gibt aus, was sich geändert hat (siehe die [CLI-Referenz](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` zeigt, was vertraut wird; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` und `--allow-insecure-http on|off` akzeptieren je eine Sache und nennen den genauen Wert. Geben Sie nach dem Akzeptieren einer neuen Adresse das Token erneut ein. Das Trennen (`hosting logout`) oder Entfernen einer Integration löscht ihr Token, ihren Vertrauenseintrag und alles, was von ihr zwischengespeichert wurde (die gespeicherten Repository-Listen des Klon-Dialogs, die Radar-Kontolisten und die Remote-Review-Entwürfe ihres Hosts).
+
+Ein Agent (MCP) kann nichts akzeptieren: Ihm wird gesagt, dass die Sicherheitsprüfung Sie braucht.
+
+### In der Terminal-Oberfläche
+
+Eine angehaltene Anfrage öffnet den Dialog **Sicherheitsprüfung der Integration** über dem, was Sie gerade tun. Er sagt, was sich geändert hat (die alte und die neue Adresse, das alte und das neue Konto mit ihren IDs, oder das alte und das neue Zertifikat als kleine Tabelle mit dem SHA-256-Fingerabdruck in Vierergruppen, Inhaber, Aussteller und Gültigkeit) und dass das Token nicht gesendet wurde. Die Antworten sind nummeriert:
+
+1. **Trennen** löscht das gespeicherte Token, den Vertrauenseintrag und alles, was von der Integration zwischengespeichert wurde.
+2. Der neuen Adresse, dem neuen Konto oder dem neuen Zertifikat **vertrauen** (bei einer unverschlüsselten Adresse: **Einfaches http erlauben**).
+3. **Abbrechen** ändert nichts.
+
+Keine Antwort ist hervorgehoben, bis Sie eine Pfeiltaste oder eine Ziffer drücken, ein versehentliches Enter akzeptiert also nichts. Esc und das Schließen-Kreuz brechen ab; ein Klick außerhalb des Dialogs bewirkt nichts. Ein langer Text scrollt mit dem Mausrad, Bild auf/Bild ab oder der Bildlaufleiste. Mehrere Prüfungen werden eingereiht (eine je Integration und Art der Änderung) und nacheinander gestellt. Eine abgebrochene Prüfung erscheint nicht erneut, solange sie unverändert ist; **Integrationen: Sicherheitsprüfung ansehen** in der Befehlspalette holt sie zurück.
+
+Nachdem Sie einer neuen **Adresse** vertraut haben, öffnet sich das Formular der Integration mit fokussiertem Token-Feld und dem Hinweis „Das Token erneut einzugeben wird empfohlen“: Das gespeicherte Token wurde nie dorthin gesendet. Im Formular wird eine absichtlich geänderte Adresse zusammen mit einem dafür eingegebenen Token akzeptiert; ohne Token verlangt das Formular eines.
+
+Das Formular hat außerdem zwei Schalter. **Striktes Zertifikat-Pinning** (für eine https-Adresse) heftet den Zertifikatschlüssel an, den der Server beim Verbinden vorlegt. **Einfaches http erlauben (nicht verschlüsselt)** wird nur für eine `http://`-Adresse angeboten, die nicht dieser Rechner ist, mit einer roten Warnung, dass das Token im Klartext übertragen wird. Die verbundene Karte zeigt den angehefteten Fingerabdruck.
+
+### Was das Token darf und bis wann
+
+Das Verbinden fragt den Host auch, was das Token kann. GitHub (klassische Tokens), GitLab und Bitbucket (wenn es die Scopes sendet) melden ihre Scopes: Die Karte zeigt eine gelbe Zeile „Dieses Token hat mehr Rechte, als GitPoulpi braucht“ mit den Scopes über das hinaus, was GitPoulpi nutzt, die sensiblen (wie `delete_repo`, `admin:org`, `sudo`) in Rot, mit dem Rat, ein fein abgestuftes Token mit Ablaufdatum zu bevorzugen. Ein klassisches GitHub-Token (`ghp_...`) bekommt diesen Rat auch dann, wenn seine Scopes genau passen. Bei einem fein abgestuften GitHub-Token lassen sich die Berechtigungen nicht abfragen, daher wird nur sein Ablauf angezeigt. Die Karte zeigt das Ablaufdatum, wenn der Host es nennt. Ein Token ohne Ablauf zeigt keine Erinnerung, und die anderen Produkte melden keine Scopes und lösen keine Warnung aus. Dieselben Felder stehen im JSON von `hosting integrations login` und `test` (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). Sie werden beim Verbinden gelesen, die Karte zeigt sie also für die Sitzung, die verbunden hat.
+
 ## 4. Ein Repository verknüpfen
 
 Das Verknüpfen ist ausdrücklich und pro Repository. Ist ein Profil verbunden, zeigt die

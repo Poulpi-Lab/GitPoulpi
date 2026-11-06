@@ -161,6 +161,43 @@ GitPoulpi bir profilin token'ını şu sırayla arar:
 Her profil, `config.toml` içinde bir `[[integrations]]` girdisidir. Bkz.
 [yapılandırma başvurusu](config-reference.md#integrations-barındırma-ve-issue-takipçileri).
 
+## Güvenlik denetimi
+
+Kayıtlı bir token, gönderildiği adres kadar güvenlidir. Bu yüzden GitPoulpi her entegrasyon için neye bağlandığını hatırlar ve bu değiştiğinde durur:
+
+- **Adres.** Bir entegrasyon ilk kullanıldığında (veya bağlandığında) adresi, `config.toml` dosyasına değil, yalnızca kullanıcıya ait özel veri klasöründeki (`<data>/private/`) `trust.toml` dosyasına kaydedilir: yapılandırmayı düzenlemek güvenilenleri asla genişletemez. Yapılandırmadaki adres artık kayıtlı olan değilse ona hiçbir şey gönderilmez ve token okunmaz bile. Bir adresin yazılış biçimleri (`HTTPS://Git.Example.com:443/`) aynı adrestir; benzer görünen bir sunucu aynı değildir.
+- **Hesap.** Bir token bağladıktan sonra, sonra yaklaşık günde bir kez (ve `GITPOULPI_TOKEN_*` veya kimlik bilgisi yardımcısından gelen bir token için çalıştırma başına bir kez) GitPoulpi barındırıcıya token'ın kime ait olduğunu sorar ve girişi değil, hesap **kimliğini** karşılaştırır. Artık başka birine ait olan bir token durdurulur.
+- **Sertifika.** Sertifikası bilinen bir otoriteye zincirlenmeyen sunucular (özel bir CA, kendinden imzalı bir sunucu) yalnızca kabul ettiğiniz tam anahtar için kabul edilir ve TLS el sıkışması yine de sunucunun o anahtarı taşıdığını kanıtlar. Sıkı sabitleme açıkken, sertifika herkese açık bir köke zincirlense bile anahtar eşleşmelidir; bedeli her anahtar değişiminin yeniden sormasıdır, bu yüzden isteğe bağlıdır. Herkese açık barındırıcılar (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) sertifika kaydı tutmaz.
+- **Düz http.** Loopback olmayan bir `http://` adresi, o entegrasyon için ona izin vermediyseniz reddedilir.
+
+Her istek ayrıca entegrasyonun kendi adresine (ve herkese açık bir barındırıcı için `api.github.com` gibi API sunucusuna) bağlı tutulur: başka bir yere giden bir istek gönderilmeden reddedilir ve başka bir adrese yönlendirme izlenmez.
+
+**Bu denetim var olmadan önce bağlanan entegrasyonlar** kayıtlarını, yükseltmeden sonra ilk kullanıldıklarında, yapılandırmanın o zamanki halinden sessizce alır: bugünkü güven düzeylerini korurlar ve hiçbir şey sormaz.
+
+### Komut satırından
+
+Durdurulan bir komut çıkış kodu 2 ile başarısız olur ve neyin değiştiğini yazdırır (bkz. [CLI başvurusu](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` nelere güvenildiğini gösterir; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` ve `--allow-insecure-http on|off` her biri tam değeri adlandırarak bir şeyi kabul eder. Yeni bir adresi kabul ettikten sonra token'ı yeniden girin. Bağlantıyı kesmek (`hosting logout`) veya bir entegrasyonu kaldırmak token'ını, güven kaydını ve ondan önbelleğe alınanları (Klonla iletişim kutusunun kayıtlı depo listeleri, Radar hesap listeleri ve barındırıcısının uzak inceleme taslakları) siler.
+
+Bir ajan (MCP) hiçbir şeyi kabul edemez: güvenlik denetiminin sizi gerektirdiği söylenir.
+
+### Terminal arayüzünde
+
+Durdurulan bir istek, o sırada ne yapıyorsanız onun üzerinde **Entegrasyon güvenlik denetimi** iletişim kutusunu açar. Neyin değiştiğini (eski ve yeni adres, kimlikleriyle eski ve yeni hesap, ya da SHA-256 parmak izi dörderli gruplar halinde, konu, veren ve geçerlilikle küçük bir tablo olarak eski ve yeni sertifika) ve token'ın gönderilmediğini söyler. Yanıtlar numaralıdır:
+
+1. **Bağlantıyı kes** kayıtlı token'ı, güven kaydını ve entegrasyondan önbelleğe alınanları siler.
+2. Yeni adrese, hesaba veya sertifikaya **güven** (şifrelenmemiş bir adres için: **Düz http'ye izin ver**).
+3. **İptal** hiçbir şeyi değiştirmez.
+
+Bir ok tuşuna veya bir rakama basana kadar hiçbir yanıt vurgulanmaz; böylece yanlışlıkla basılan bir Enter hiçbir şeyi kabul etmez. Esc ve kapatma çarpısı iptal eder; iletişim kutusunun dışına tıklamak hiçbir şey yapmaz. Uzun bir gövde tekerlek, Page Up/Page Down veya kaydırma çubuğuyla kayar. Birkaç denetim sıraya girer (entegrasyon ve değişiklik türü başına bir tane) ve birbiri ardına sorulur. İptal edilen bir denetim, değişmediği sürece yeniden çıkmaz; komut paletindeki **Entegrasyonlar: Güvenlik Denetimini İncele** onu geri getirir.
+
+Yeni bir **adrese** güvendikten sonra entegrasyonun formu, token alanı odaklanmış ve "Token'ı yeniden girmeniz önerilir." ipucuyla açılır: kayıtlı token oraya asla gönderilmedi. Formda, bilerek değiştirilen bir adres, onun için yazılan bir token'la birlikte kabul edilir; token olmadan form bir tane ister.
+
+Formda ayrıca iki anahtar vardır. **Sıkı sertifika sabitleme** (bir https adresi için) bağlandığınızda sunucunun sunduğu sertifika anahtarını sabitler. **Düz http'ye izin ver (şifrelenmemiş)** yalnızca bu makine olmayan bir `http://` adresi için sunulur ve token'ın açık metin olarak iletildiğini söyleyen kırmızı bir uyarı taşır. Bağlı kart sabitlenen parmak izini gösterir.
+
+### Token ne yapabilir ve ne zamana kadar
+
+Bağlanmak ayrıca barındırıcıya token'ın neler yapabildiğini sorar. GitHub (klasik token'lar), GitLab ve Bitbucket (kapsamları gönderdiğinde) kapsamlarını bildirir: kart, GitPoulpi'nin kullandığının ötesindeki kapsamları listeleyen sarı bir "Bu token, GitPoulpi'nin ihtiyaç duyduğundan fazla yetkiye sahip" satırı gösterir; hassas olanlar (`delete_repo`, `admin:org`, `sudo` gibi) kırmızıyla, son kullanma tarihli ince ayrıntılı bir token tercih etme öğüdüyle birlikte. Klasik bir GitHub token'ı (`ghp_...`) kapsamları tam olsa bile bu öğüdü alır. İnce ayrıntılı bir GitHub token'ının izinleri sorulamaz, bu yüzden yalnızca son kullanma tarihi gösterilir. Barındırıcı söylediğinde kart son kullanma tarihini gösterir. Son kullanma tarihi olmayan bir token hiçbir hatırlatma göstermez ve diğer ürünler kapsam bildirmez ve uyarı çıkarmaz. Aynı alanlar `hosting integrations login` ve `test` JSON çıktısındadır (`excess_scopes`, `token_flavor`, `recommend_fine_grained`, `expires_at`). Bağlandığınızda okunurlar, bu yüzden kart onları bağlanan oturum için gösterir.
+
 ## 4. Bir depoyu bağlayın
 
 Bağlama açıktır ve depo başınadır. Bir profil bağlı olduğunda Refs kenar çubuğu,

@@ -78,7 +78,7 @@ The first dialog asks who the install is for:
 | Choice | Where | Administrator rights | What it means for updates |
 |---|---|---|---|
 | **Only for me** (default) | `%LOCALAPPDATA%\Programs\GitPoulpi` | none | GitPoulpi replaces its own files: **Update and restart** in the [update panel](updates.md), no prompt. |
-| **For all users** | `Program Files\GitPoulpi` | one prompt at install | Each update asks for administrator approval (a Windows prompt), and the GitPoulpi processes of other users on the computer are closed first. |
+| **For all users** | `Program Files\GitPoulpi` | one prompt at install | Each update asks for administrator approval (a Windows prompt), and the GitPoulpi sessions of other users on the computer are closed first. |
 
 The same choice works silently: `gitpoulpi-<version>-...-setup.exe /CURRENTUSER` or `/ALLUSERS`.
 
@@ -188,9 +188,9 @@ to it.
 
 ## Updates
 
-The title bar shows the running version (`v1.0.0`) between the app name and the repository path. Click it, or press `Ctrl+N` then `u`, or run **Updates: Show Update** from the command palette (`Ctrl+P`): the update panel opens with the version, how GitPoulpi was installed and what to do about a newer release. **Help: Release Notes** opens the changelog.
+The title bar shows the running version (`v1.0.0`) between the app name and the repository path. When a newer release is known (or an update is under way), a click on it opens the update panel with the version, how GitPoulpi was installed and what to do about the new release; otherwise a click opens the Release notes tab. `Ctrl+N` then `u`, or **Updates: Show Update** in the command palette (`Ctrl+P`), always opens the update panel, and **Help: Release Notes** always opens the changelog.
 
-Once a day, in the background, GitPoulpi asks where its releases are published (GitHub by default) whether a newer one exists (`updates.mode`, [Settings > Synchronization](settings.md#synchronization)). When one does, the chip reads `v0.2.0 available` in the accent color.
+Once a day, in the background, GitPoulpi checks the place where its releases are published (GitHub by default) for a newer one (`updates.mode`, [Settings > Synchronization](settings.md#synchronization)). When one does, the chip reads `v0.2.0 available` in the accent color.
 
 What the panel does depends on how GitPoulpi was installed: a release archive or the Windows installer replaces its own files, a package manager runs its own command, a managed or container install says how updates reach it. A build made with `cargo build` never updates. The full description, with revert, `auto` against `notify` and what an administrator can lock, is in [Updates](updates.md).
 

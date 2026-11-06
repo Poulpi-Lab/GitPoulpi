@@ -193,7 +193,7 @@ A stopped request opens the **Integration security check** dialog over whatever 
 2. **Trust** the new address, account or certificate (an unencrypted address: **Allow plain http**).
 3. **Cancel** changes nothing.
 
-No answer is highlighted until you press an arrow key or a digit, so a stray Enter accepts nothing. Esc and the close cross cancel; a click outside the dialog does nothing. A long body scrolls with the wheel, Page Up/Page Down or the scrollbar. Several checks queue (one per integration and kind of change) and are asked one after the other. A cancelled check does not pop up again while it is unchanged; **Integrations: Review security check** in the command palette brings it back.
+No answer is highlighted until you press an arrow key or a digit, so a stray Enter accepts nothing. Esc and the close cross cancel; a click outside the dialog does nothing. A long body scrolls with the wheel, Page Up/Page Down or the scrollbar. Several checks queue (one per integration and kind of change) and are asked one after the other. A canceled check does not pop up again while it is unchanged; **Integrations: Review security check** in the command palette brings it back.
 
 After you trust a new **address**, the integration's form opens with the token field focused and the hint "Re-entering the token is recommended": the saved token was never sent there. In the form, an address changed on purpose is accepted together with a token typed for it; without a token the form asks for one.
 

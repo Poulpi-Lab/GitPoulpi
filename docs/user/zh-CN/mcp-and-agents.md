@@ -52,7 +52,35 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-无状态 JSON，相同的工具，相同的 `[mcp]` 门控。它**没有认证**，所以只监听回环地址；`--allow-remote` 会解除这一限制，此后任何能访问该端口的人都可以运行你的配置允许的每一个工具。请仅在受信任的网络或带认证的代理之后使用它。
+无状态 JSON，相同的工具，相同的 `[mcp]` 门控。每个请求都需要 bearer 令牌（`[mcp] http_auth`，默认开启）：用 `gitpoulpi mcp token --show`（或 `--copy`、`--rotate`；令牌保存在私有数据文件夹下仅限该用户访问的文件里）打印它，并作为请求头交给客户端：
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+缺少令牌或令牌错误会得到 `401` 和 `WWW-Authenticate: Bearer`。更换后的令牌立即生效，无需重启服务器。关闭 `http_auth` 只适用于你信任本机每个账户的回环端点；此时服务器会在 stderr 上发出警告。
+
+### 从另一台机器访问端点
+
+最安全的做法根本不需要远程监听：保留回环地址，在运行代理的机器上通过 SSH 转发端口，`ssh -L 8808:127.0.0.1:8808 host`。这样就不涉及 `--allow-remote`。
+
+`--allow-remote`（非回环地址）会被拒绝，除非已开启身份验证并且已有令牌，**并且**流量已加密。拒绝信息会指出缺少什么。有两种方式可以做到加密：
+
+- **服务器中的 TLS**（`[mcp] tls = "self_signed"` 或 `"files"`）。服务器自己终结 TLS：它持有密钥、执行握手，只有完成的握手才会到达 HTTP 层；纯 HTTP 客户端会握手失败，旁边也不存在纯文本监听器。所以加密是服务器在每个连接上确立的事实，而不是一个假设。使用 `self_signed` 时，首次启动会在私有数据文件夹下生成一对密钥，并打印其 SHA-256 指纹（设置中也有）；客户端通过固定该指纹或证书文件来信任服务器。使用 `files` 时，把 `tls_cert` 和 `tls_key` 设为你的 PEM 文件，客户端则通过 CA 验证证书。客户端使用 bearer 令牌进行身份验证；不使用客户端证书。
+- **隧道或反向代理**（`[mcp] behind_proxy = true`）。隧道代理或反向代理与任何本机或局域网客户端一样发起连接，其请求头可以被伪造，所以服务器从内部无法判断它是否存在。因此这是一个明确的确认（在设置中带红色警告显示），而不是自动检测。可能的话，请在同一台机器上运行隧道并保留回环地址。在代理之后使用非回环地址时，代理与服务器之间的这一跳在该网络上是明文。
 
 **不使用 MCP** 时，有 shell 的代理使用 CLI：`gitpoulpi --json <command>`（参见 [CLI 参考](cli-reference.md)）。请给它现成的技能 [`skills/gitpoulpi/SKILL.md`](../../../skills/gitpoulpi/SKILL.md)，它说明了何时以及如何用 GitPoulpi 取代原始的 `git`。
 
@@ -61,12 +89,16 @@ claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 | 开关 | 默认值 | 效果 |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`：`gitpoulpi mcp serve` / `gitpoulpi-mcp` 拒绝启动（设置 > 代理与 MCP > *MCP 服务器*）。在服务器启动时读取：已在运行的服务器沿用其设置。 |
-| `[mcp] bind` | `"127.0.0.1:8808"` | 未给出地址时 `--http` 使用的地址（除非 `--allow-remote`，否则仅限回环）。设置 > 代理与 MCP > *MCP 服务器端口* 编辑其端口并保留主机。 |
+| `[mcp] bind` | `"127.0.0.1:8808"` | 未给出地址时 `--http` 使用的地址（除非 `--allow-remote`，否则仅限回环；`--allow-remote` 需要身份验证和加密，见上文）。设置 > 代理与 MCP > *MCP 服务器端口* 编辑其端口并保留主机。 |
+| `[mcp] http_auth` | `true` | `--http` 需要 `Authorization: Bearer <token>`（`gitpoulpi mcp token`）。设置 > 代理与 MCP > *HTTP 身份验证*。 |
+| `[mcp] tls`、`tls_cert`、`tls_key` | `"off"` | `off`、`self_signed` 或 `files`（你的 PEM 路径）：服务器自己终结 TLS。设置 > 代理与 MCP > *TLS*。 |
+| `[mcp] behind_proxy` | `false` | 你担保隧道或反向代理会加密流量，这样 `--allow-remote` 就可以在没有 TLS 的情况下运行。 |
 | `[mcp] allow_mutations` | `false` | 关闭：每个会更改内容的工具都被拒绝；读取、`ui_*` 和提案仍可使用。`true` 允许代理 commit、push、reset…… |
 | `[mcp] mutation_allowlist` | `[]` | 非空：只有这些工具可以更改内容，例如 `["stage", "unstage", "commit"]`。 |
 | `[mcp] allow_ui` | `true` | `false`：代理不能移动你的窗口（`ui_state` / `ui_viewers` 仍会响应）。 |
 | `[mcp] ui_control` | `"ask"` | `ask`：你的窗口中出现一个需要你确认的提示块；`auto`：除非你正忙，否则直接应用；`off`：拒绝。按代理设置：`--ui-control`。 |
 | `[mcp] allow_ui_propose` | `false` | 允许代理打开由你确认的预填对话框（设置 > 代理与 MCP > *允许 AI 代理提出更改供我确认*）。 |
+| `[mcp] allow_sensitive_staging` | `false` | 仅存在于 `config.toml`。关闭时，`stage` 工具不提供 `allow_sensitive`，会加入敏感文件（私钥、`.env`、可识别的令牌）的 stage 会被拒绝并返回 `{error: "sensitive_files", files}`：代理应当来问你。`true` 允许它传入 `allow_sensitive`。见 [stage 与 commit](staging-and-committing.md#敏感文件)。 |
 | `[mcp] allow_history_purge` | `false` | 仅存在于 `config.toml`。`true` 会列出工具 `rewrite_purge`，它会永久删除历史重写留下的旧历史（以及它的撤销记录）。关闭：代理看不到它。仍需要 `allow_mutations`。 |
 | `[ui] allow_agent_view_control` | `true` | 你窗口的总开关（设置 > 代理与 MCP > *允许 AI 代理控制视图*）。关闭：没有任何代理能触及你的窗口。 |
 | `[ui] launch` | `"off"` | 在没有打开窗口时，代理是否可以打开 GitPoulpi 窗口（参见[下文](#没有打开窗口或窗口在另一个会话中)）。 |
@@ -93,6 +125,7 @@ mutation_allowlist = []        # e.g. ["stage", "unstage", "commit", "branch_cre
 allow_ui = true
 ui_control = "ask"             # "auto" lets the agent move your view without asking
 allow_ui_propose = false       # true: the agent may pre-fill Reword / Split / commit / branch / tag dialogs
+allow_sensitive_staging = false  # true: the agent may stage files the staging guard flags
 allow_history_purge = false    # true: the agent sees rewrite_purge (deletes old history for good)
 ```
 
@@ -364,7 +397,10 @@ Not exposed as tools:
 
 | CLI | Why |
 |---|---|
+| `gitpoulpi hosting integrations trust` | accepting a changed address, account or certificate is the user's decision; an agent is told the security check needs the user |
+| `gitpoulpi ai trust` | binding an API key to another address is the user's decision |
 | `gitpoulpi mcp serve` | the MCP server cannot spawn/serve a copy of itself |
+| `gitpoulpi mcp token` | prints, copies and rotates the key that guards this very server: an agent must not read or replace it |
 | `gitpoulpi completions` | shell completion generation, not a GitBackend operation |
 | `gitpoulpi shell-init` | prints a wrapper function for the user's own shell, not a GitBackend operation |
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |
@@ -385,6 +421,7 @@ Not exposed as tools:
 | `gitpoulpi config set` | an agent must not be able to rewrite its own gating config |
 | `gitpoulpi hosting ssh-key create` | writes a private key and uploads it; too dangerous to let an agent automate |
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
+| `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
 ### 分支工作流操作先出计划再执行

@@ -79,8 +79,8 @@ impl Session {
         backend: DefaultBackend,
         publish: bool,
     ) -> Result<Self, String> {
-        let port = ensure_daemon(session, backend, publish).await?;
-        let client = Client::connect_port(port)
+        let endpoint = ensure_daemon(session, backend, publish).await?;
+        let client = Client::connect(&endpoint)
             .await
             .map_err(|e| format!("could not reach this session's daemon: {e}"))?;
         Ok(Self {
@@ -103,7 +103,8 @@ impl Session {
         port: u16,
         repo: Option<RepoRef>,
     ) -> Result<Self, String> {
-        let client = Client::connect_port(port)
+        let endpoint = gitpoulpi_daemon::join::session_endpoint(session, port);
+        let client = Client::connect(&endpoint)
             .await
             .map_err(|e| format!("could not reach session `{session}`'s daemon: {e}"))?;
         Ok(Self {
@@ -288,11 +289,11 @@ async fn ensure_daemon(
     session: &str,
     backend: DefaultBackend,
     publish: bool,
-) -> Result<u16, String> {
+) -> Result<gitpoulpi_ipc::Endpoint, String> {
     let port_file = gitpoulpi_config::ConfigPaths::discover().map(|p| p.ipc_port_file(session));
     if let Some(port_file) = &port_file {
-        if let Some(port) = gitpoulpi_ipc::discovery::live_port(port_file).await {
-            return Ok(port);
+        if let Some(endpoint) = gitpoulpi_ipc::discovery::live_endpoint(port_file).await {
+            return Ok(endpoint);
         }
     }
 
@@ -316,21 +317,19 @@ async fn ensure_daemon(
         .spawn(gitpoulpi_daemon::backend_for(backend))
         .await
         .map_err(|e| format!("failed to start this session's daemon: {e}"))?;
-    let port = handle.port;
+    let endpoint = handle.endpoint();
     // The accept loop has to outlive this function; the process exiting is
     // what stops it.
     std::mem::forget(handle);
 
     if publish {
         if let Some(port_file) = &port_file {
-            if let Some(parent) = port_file.parent() {
-                let _ = std::fs::create_dir_all(parent);
-            }
-            let _ = std::fs::write(port_file, port.to_string());
+            // Token file first, then the port file (see `discovery::publish`).
+            let _ = gitpoulpi_ipc::discovery::publish(port_file, &endpoint);
             gitpoulpi_ipc::discovery::write_host_file(port_file);
         }
     }
-    Ok(port)
+    Ok(endpoint)
 }
 
 /// The repo a command targets: `--repo` if given, otherwise the enclosing

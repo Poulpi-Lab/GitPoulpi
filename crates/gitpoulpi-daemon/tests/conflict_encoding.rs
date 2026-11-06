@@ -41,7 +41,7 @@ async fn the_configured_encoding_decodes_the_conflict_document() {
             .spawn(backend)
             .await
             .unwrap();
-        let mut client = Client::connect_port(handle.port).await.unwrap();
+        let mut client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = fx.repo_ref().id;
         let plain = show(&mut client, &id, 2).await;
         assert_eq!(plain.conflict_count(), 0, "{name}: no text to merge");

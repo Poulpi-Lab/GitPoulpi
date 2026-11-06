@@ -68,7 +68,7 @@ async fn unstaging_a_resolved_path_keeps_the_others_conflicted_and_is_undoable()
             .await
             .unwrap();
         let mut c = Ctx {
-            client: Client::connect_port(handle.port).await.unwrap(),
+            client: Client::connect(&handle.endpoint()).await.unwrap(),
             id: fx.repo_ref().id,
             n: 0,
         };
@@ -128,7 +128,7 @@ async fn undoing_an_abort_brings_back_the_whole_merge() {
             .await
             .unwrap();
         let mut c = Ctx {
-            client: Client::connect_port(handle.port).await.unwrap(),
+            client: Client::connect(&handle.endpoint()).await.unwrap(),
             id: fx.repo_ref().id,
             n: 0,
         };

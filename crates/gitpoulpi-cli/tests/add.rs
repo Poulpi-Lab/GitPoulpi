@@ -56,14 +56,14 @@ impl World {
             .rt
             .block_on(gitpoulpi_daemon::Daemon::new(name).spawn(backend))
             .unwrap();
-        let port = handle.port;
-        std::fs::write(&port_file, port.to_string()).unwrap();
+        let endpoint = handle.endpoint();
+        gitpoulpi_ipc::discovery::publish(&port_file, &endpoint).unwrap();
         std::mem::forget(handle);
         let seen: Seen = Arc::default();
         let (ready_tx, ready_rx) = std::sync::mpsc::channel();
         let tabs: Vec<RepoId> = tabs.iter().map(|r| r.repo_ref().id).collect();
         self.rt.spawn(fake_window(
-            port,
+            endpoint,
             name.to_string(),
             tabs,
             answer,
@@ -100,14 +100,14 @@ impl World {
 }
 
 async fn fake_window(
-    port: u16,
+    endpoint: gitpoulpi_ipc::Endpoint,
     session: String,
     tabs: Vec<RepoId>,
     answer: UiOutcome,
     seen: Seen,
     ready: std::sync::mpsc::Sender<()>,
 ) {
-    let mut stream = Client::connect_port(port).await.unwrap().into_stream();
+    let mut stream = Client::connect(&endpoint).await.unwrap().into_stream();
     let info = ViewerInfo {
         id: ViewerId(format!("window-of-{session}")),
         pid: 4242,

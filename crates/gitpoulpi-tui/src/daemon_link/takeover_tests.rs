@@ -10,6 +10,7 @@ const OLD_SHA: &str = "0ldb1ld";
 struct OldDaemon {
     rt: tokio::runtime::Runtime,
     port: u16,
+    endpoint: gitpoulpi_ipc::Endpoint,
 }
 
 fn old_daemon(port_file: &std::path::Path) -> OldDaemon {
@@ -18,19 +19,22 @@ fn old_daemon(port_file: &std::path::Path) -> OldDaemon {
         .enable_all()
         .build()
         .unwrap();
-    let port = rt.block_on(async {
+    let endpoint = rt.block_on(async {
         let daemon = gitpoulpi_daemon::Daemon::new("takeover").with_git_sha(OLD_SHA);
         let handle = daemon
             .spawn(gitpoulpi_daemon::backend_for(Default::default()))
             .await
             .unwrap();
-        let port = handle.port;
+        let endpoint = handle.endpoint();
         std::mem::forget(handle);
-        port
+        endpoint
     });
-    std::fs::create_dir_all(port_file.parent().unwrap()).unwrap();
-    std::fs::write(port_file, port.to_string()).unwrap();
-    OldDaemon { rt, port }
+    gitpoulpi_ipc::discovery::publish(port_file, &endpoint).unwrap();
+    OldDaemon {
+        rt,
+        port: endpoint.port,
+        endpoint,
+    }
 }
 
 fn listening(old: &OldDaemon) -> bool {
@@ -107,13 +111,13 @@ fn a_daemon_of_another_build_with_a_running_job_is_left_alone() {
 
     let slow = gitpoulpi_testkit::SlowRemote::start();
     let dest = config.path().join("cloned");
-    let old_port = old.port;
     // The clone request keeps its connection (and so its job) until the end.
     let _clone_conn = old.rt.block_on(async {
         use gitpoulpi_ipc::transport::write_message;
-        let stream = tokio::net::TcpStream::connect(("127.0.0.1", old_port))
+        let stream = gitpoulpi_ipc::Client::connect(&old.endpoint)
             .await
-            .unwrap();
+            .unwrap()
+            .into_stream();
         let (read, mut write) = stream.into_split();
         write_message(
             &mut write,

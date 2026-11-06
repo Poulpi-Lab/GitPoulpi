@@ -38,6 +38,11 @@ pub struct ResponseError {
     /// `gitpoulpi_core::Error::from_wire`. Optional on the wire like `kind`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub detail: Option<Box<gitpoulpi_core::ErrorDetail>>,
+    /// The daemon refused the connection because it did not start with a
+    /// `Hello` carrying the session's token (see [`crate::auth`]). Optional
+    /// on the wire: an older client ignores it and prints `message`.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub auth_required: bool,
 }
 
 /// Which kind of process a daemon is running in, reported by `Hello` and

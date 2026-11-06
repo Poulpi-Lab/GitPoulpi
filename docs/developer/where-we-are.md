@@ -631,6 +631,12 @@ without the fix; keep it that way.
 - Never `TcpStream::connect` to a port taken from a discovery file without a bound: use `gitpoulpi_ipc::discovery` (`connect`, `live_port`, `remove_if_stale`), and probe many files concurrently. Linux refuses instantly, so only the Windows VM shows it; `xtask perf --tui` has startup rows for it (`session-and-state.md`, "Discovery files have an owner").
 - `tui-stall input` entries of about one frame while something animates were the drain's first `poll` waiting for input (spinner pacing), not a stalled UI thread; the trace now logs `input` only when an event was handled.
 
+### Every IPC connect goes through the token handshake
+
+- Never `TcpStream::connect` or build a port by hand to talk to a daemon: read the endpoint with `gitpoulpi_ipc::discovery::endpoint` (or `live_endpoint`, which also probes) and connect with `Client::connect(&Endpoint)` or `discovery::connect(&Endpoint)`. Both send the `Hello` with the token from `sessions/<name>.token`; a raw socket is refused. A test that spawns a daemon uses `DaemonHandle::endpoint()`; a test double of a daemon only has to answer the first `Hello` (any non-`auth_required` answer counts as accepted).
+- Discovery files are written user-only through `discovery::publish` (token first, then the port) and removed through `discovery::remove_files`; a hand-written `std::fs::write` of a port file leaves a daemon nobody can authenticate to.
+- Local state goes through `gitpoulpi_config::secure_fs` (`create_private_dir_all`, `write_private`: atomic, created `0600`, never a `chmod` after the write). Never set a process-wide `umask` for this: it would also change the modes of checked-out files.
+
 ### Log row arithmetic (the repeat offender)
 
 - Rows go through `log_table/geometry.rs`: `log_top_y`, `log_index_to_row`,

@@ -430,12 +430,9 @@ mod ui {
     async fn attach_fake_viewer(session: &str, repo: &gitpoulpi_testkit::FixtureRepo) -> Seen {
         let port_file =
             gitpoulpi_config::ConfigPaths::for_dir(isolated_config_dir()).ipc_port_file(session);
-        let port: u16 = std::fs::read_to_string(port_file)
-            .expect("the MCP server publishes its daemon's port")
-            .trim()
-            .parse()
-            .unwrap();
-        let mut stream = Client::connect_port(port).await.unwrap().into_stream();
+        let endpoint = gitpoulpi_ipc::discovery::endpoint(&port_file)
+            .expect("the MCP server publishes its daemon's port");
+        let mut stream = Client::connect(&endpoint).await.unwrap().into_stream();
         let id = repo.repo_ref().id;
         let info = ViewerInfo {
             id: ViewerId("fake".into()),

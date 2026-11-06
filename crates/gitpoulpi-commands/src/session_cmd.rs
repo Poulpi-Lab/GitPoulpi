@@ -176,9 +176,7 @@ fn refuse_live(paths: &ConfigPaths, name: &str, verb: &str) -> Result<(), String
 
 /// Leftover discovery files of a daemon that is no longer there.
 fn remove_stale_discovery(paths: &ConfigPaths, name: &str) {
-    let _ = std::fs::remove_file(paths.ipc_port_file(name));
-    let _ = std::fs::remove_file(paths.ipc_pid_file(name));
-    let _ = std::fs::remove_file(paths.ipc_port_file(name).with_extension("host"));
+    gitpoulpi_ipc::discovery::remove_files(&paths.ipc_port_file(name));
 }
 
 fn delete(paths: &ConfigPaths, raw: &str) -> Result<Emitted, String> {

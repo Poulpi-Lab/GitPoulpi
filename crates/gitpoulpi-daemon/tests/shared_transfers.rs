@@ -11,7 +11,6 @@ use gitpoulpi_git2_backend::Git2Backend;
 use gitpoulpi_ipc::transport::{read_message, write_message};
 use gitpoulpi_ipc::{Request, ServerMessage};
 use gitpoulpi_testkit::FixtureRepoBuilder;
-use tokio::net::TcpStream;
 
 const SESSION: &str = "shared-transfers-test";
 
@@ -86,9 +85,10 @@ async fn a_status_during_a_slow_fetch_is_answered_at_once() {
 
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(Git2Backend::new());
     let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-    let stream = TcpStream::connect(("127.0.0.1", handle.port))
+    let stream = gitpoulpi_ipc::Client::connect(&handle.endpoint())
         .await
-        .unwrap();
+        .unwrap()
+        .into_stream();
     let (mut read, mut write) = stream.into_split();
 
     // Warm the daemon (first-use costs are not what is measured).
@@ -165,9 +165,10 @@ async fn a_stage_during_a_slow_fetch_runs_at_once_and_so_do_the_reads_after_it()
 
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(Git2Backend::new());
     let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-    let stream = TcpStream::connect(("127.0.0.1", handle.port))
+    let stream = gitpoulpi_ipc::Client::connect(&handle.endpoint())
         .await
-        .unwrap();
+        .unwrap()
+        .into_stream();
     let (mut read, mut write) = stream.into_split();
 
     write_message(
@@ -245,9 +246,10 @@ async fn two_different_fetches_run_one_after_the_other() {
 
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(Git2Backend::new());
     let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-    let stream = TcpStream::connect(("127.0.0.1", handle.port))
+    let stream = gitpoulpi_ipc::Client::connect(&handle.endpoint())
         .await
-        .unwrap();
+        .unwrap()
+        .into_stream();
     let (mut read, mut write) = stream.into_split();
 
     let sent = Instant::now();
@@ -299,9 +301,10 @@ async fn two_identical_fetches_join_one_job_and_both_get_the_answer() {
 
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(Git2Backend::new());
     let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-    let stream = TcpStream::connect(("127.0.0.1", handle.port))
+    let stream = gitpoulpi_ipc::Client::connect(&handle.endpoint())
         .await
-        .unwrap();
+        .unwrap()
+        .into_stream();
     let (mut read, mut write) = stream.into_split();
 
     let contacts_of = || {

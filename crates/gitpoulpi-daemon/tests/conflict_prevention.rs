@@ -248,7 +248,7 @@ async fn the_request_goes_through_the_daemon_with_and_without_a_debounce() {
         .spawn(backend)
         .await
         .unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = repo.repo_ref().id;
     let ask = |n: u64, args: serde_json::Value| Request {
         id: n,

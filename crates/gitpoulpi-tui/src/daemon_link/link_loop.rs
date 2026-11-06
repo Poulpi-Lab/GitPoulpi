@@ -37,21 +37,21 @@ pub(super) async fn link_loop(
     repo: RepoRef,
     channels: LinkChannels,
 ) -> Option<String> {
-    let port = match ensure_daemon_at(port_file.as_deref(), &session).await {
-        Ok(port) => port,
+    let endpoint = match ensure_daemon_at(port_file.as_deref(), &session).await {
+        Ok(endpoint) => endpoint,
         Err(e) => return Some(e),
     };
     // A daemon from another build is replaced when it is idle (once per link
     // start; see `takeover`).
-    let port = match takeover_stale_daemon(port, &session, port_file.as_deref()).await {
-        Takeover::Unchanged => port,
+    let endpoint = match takeover_stale_daemon(&endpoint, &session, port_file.as_deref()).await {
+        Takeover::Unchanged => endpoint,
         Takeover::Busy(message) => return Some(message),
-        Takeover::Restarted { port, notice } => {
+        Takeover::Restarted { endpoint, notice } => {
             let _ = channels.action_message_tx.send(notice);
-            port
+            endpoint
         }
     };
-    link_loop_with_port(port, session, repo, channels, Default::default()).await
+    link_loop_with_port(endpoint, session, repo, channels, Default::default()).await
 }
 
 /// The part of `link_loop` that's independent of how the port was found -
@@ -63,7 +63,7 @@ pub(super) async fn link_loop(
 /// connect or lost its connection. `start` forwards that on
 /// `DaemonLink::failure_rx`.
 pub(super) async fn link_loop_with_port(
-    port: u16,
+    endpoint: gitpoulpi_ipc::Endpoint,
     session: String,
     repo: RepoRef,
     channels: LinkChannels,
@@ -97,9 +97,14 @@ pub(super) async fn link_loop_with_port(
     // Never a silent `return`: the render loop only learns the link is alive
     // from a `RefreshOutcome`, so a dropped connect error leaves it on
     // "Loading repository..." forever.
-    let stream = match gitpoulpi_ipc::discovery::connect(port).await {
+    let stream = match gitpoulpi_ipc::discovery::connect(&endpoint).await {
         Ok(s) => s,
-        Err(e) => return Some(gitpoulpi_i18n::msg::link_error::connect_failed(port, e)),
+        Err(e) => {
+            return Some(gitpoulpi_i18n::msg::link_error::connect_failed(
+                endpoint.port,
+                e,
+            ))
+        }
     };
     let (read_half, write_half) = stream.into_split();
     let conn = LinkConn {

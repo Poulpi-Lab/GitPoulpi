@@ -5,7 +5,7 @@ use std::time::Duration;
 use gitpoulpi_core::domain::{Operation, OperationKind, RepoId};
 use gitpoulpi_core::GitBackend;
 use gitpoulpi_ipc::transport::{read_message, write_message, write_raw_frame};
-use gitpoulpi_ipc::{ChangeScope, DaemonInfo, Event, Request, Response, ServerMessage};
+use gitpoulpi_ipc::{ChangeScope, DaemonInfo, Event, Request, Response, ServerMessage, Token};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::{broadcast, mpsc, RwLock};
 
@@ -101,6 +101,7 @@ pub async fn run(
     port_tx: tokio::sync::oneshot::Sender<u16>,
     mut shutdown: tokio::sync::oneshot::Receiver<()>,
     info: DaemonInfo,
+    token: Token,
 ) -> Result<()> {
     let listener = TcpListener::bind(("127.0.0.1", 0)).await?;
     let port = listener.local_addr()?.port();
@@ -113,6 +114,7 @@ pub async fn run(
     let viewers = Arc::new(Viewers::default());
     let jobs = Registry::new(events_tx.clone());
     let info = Arc::new(info);
+    let token = Arc::new(token);
     let (internal_shutdown_tx, mut internal_shutdown_rx) = mpsc::channel::<()>(1);
     // Shutdown drains: connections stop reading when `stop` flips, and every
     // connection / admitted-request task holds a clone of `inflight_tx`, so
@@ -140,6 +142,7 @@ pub async fn run(
                 let read_cache = Arc::clone(&read_cache);
                 let control = Control {
                     info: Arc::clone(&info),
+                    token: Arc::clone(&token),
                     viewers: Arc::clone(&viewers),
                     jobs: Arc::clone(&jobs),
                     internal_shutdown_tx: internal_shutdown_tx.clone(),
@@ -179,6 +182,8 @@ struct Control {
     /// Held by the connection and each admitted request until it is done.
     inflight: mpsc::Sender<()>,
     info: Arc<DaemonInfo>,
+    /// What a connection's first `Hello` must carry (see `gitpoulpi_ipc::auth`).
+    token: Arc<Token>,
     viewers: Arc<Viewers>,
     jobs: Arc<Registry>,
     internal_shutdown_tx: mpsc::Sender<()>,
@@ -197,6 +202,7 @@ fn job_error(error: &gitpoulpi_core::Error) -> gitpoulpi_ipc::ResponseError {
         unsupported: false,
         kind: error.typed(),
         detail: None,
+        auth_required: false,
     }
 }
 
@@ -226,6 +232,7 @@ async fn answer_job_control(
                     unsupported: false,
                     kind: None,
                     detail: None,
+                    auth_required: false,
                 }),
             },
         };
@@ -336,7 +343,7 @@ async fn read_loop(
 }
 
 async fn handle_connection(
-    stream: TcpStream,
+    mut stream: TcpStream,
     backend: Arc<dyn GitBackend>,
     events_tx: broadcast::Sender<Event>,
     (repo_locks, transfer_locks): (RepoLocks, TransferLocks),
@@ -345,12 +352,18 @@ async fn handle_connection(
 ) {
     let Control {
         info,
+        token,
         viewers,
         jobs,
         internal_shutdown_tx,
         stop,
         inflight,
     } = control;
+    // Nothing is read or dispatched before the client proved it read the
+    // user-only token file: its first request is `Hello` carrying the token.
+    if !gitpoulpi_ipc::auth::authenticate(&mut stream, &token, &info).await {
+        return;
+    }
     let mut conn_ui = ConnUi::new(viewers.next_conn());
     let (read_half, mut write_half) = stream.into_split();
     let mut events_rx = events_tx.subscribe();

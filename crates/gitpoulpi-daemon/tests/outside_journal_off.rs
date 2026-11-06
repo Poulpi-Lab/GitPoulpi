@@ -21,7 +21,7 @@ async fn with_the_setting_off_an_outside_commit_is_not_recorded_and_still_blocks
         .unwrap()
         .build();
     let handle = Daemon::new("outside-off").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = repo.repo_ref().id;
     let mut n = 0;
     let mut call = |command: OperationKind, args: Value| {

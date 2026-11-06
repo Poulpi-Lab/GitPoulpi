@@ -30,9 +30,9 @@ struct Conn {
 }
 
 impl Conn {
-    async fn open(port: u16) -> Self {
+    async fn open(endpoint: &gitpoulpi_ipc::Endpoint) -> Self {
         Self {
-            stream: Client::connect_port(port).await.unwrap().into_stream(),
+            stream: Client::connect(endpoint).await.unwrap().into_stream(),
             next: 1,
             events: Vec::new(),
         }
@@ -133,17 +133,21 @@ fn applied() -> UiOutcome {
     }
 }
 
-async fn start() -> (u16, gitpoulpi_daemon::DaemonHandle) {
+async fn start() -> (gitpoulpi_ipc::Endpoint, gitpoulpi_daemon::DaemonHandle) {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("ui-test").spawn(backend).await.unwrap();
-    (handle.port, handle)
+    (handle.endpoint(), handle)
 }
 
 /// Sends `UiShow` from a fresh agent connection in a task, so the test can
 /// play the viewer meanwhile.
-fn agent_shows(port: u16, args: UiShowArgs) -> tokio::task::JoinHandle<UiOutcome> {
+fn agent_shows(
+    endpoint: &gitpoulpi_ipc::Endpoint,
+    args: UiShowArgs,
+) -> tokio::task::JoinHandle<UiOutcome> {
+    let port = endpoint.clone();
     tokio::spawn(async move {
-        let mut agent = Conn::open(port).await;
+        let mut agent = Conn::open(&port).await;
         outcome(agent.call(OperationKind::UiShow, args).await)
     })
 }
@@ -151,10 +155,10 @@ fn agent_shows(port: u16, args: UiShowArgs) -> tokio::task::JoinHandle<UiOutcome
 #[tokio::test]
 async fn an_intent_reaches_the_attached_viewer_and_its_report_answers_the_agent() {
     let (port, _daemon) = start().await;
-    let mut viewer = Conn::open(port).await;
+    let mut viewer = Conn::open(&port).await;
     viewer.attach(info("v1", "/a", &["/a"], Some(true))).await;
 
-    let agent = agent_shows(port, show(tab("/a")));
+    let agent = agent_shows(&port, show(tab("/a")));
     let Some(Event::UiIntent {
         viewer: to,
         intent_id,
@@ -175,11 +179,11 @@ async fn an_intent_reaches_the_attached_viewer_and_its_report_answers_the_agent(
 #[tokio::test]
 async fn the_ui_control_mode_is_carried_to_the_viewer() {
     let (port, _daemon) = start().await;
-    let mut viewer = Conn::open(port).await;
+    let mut viewer = Conn::open(&port).await;
     viewer.attach(info("v1", "/a", &["/a"], None)).await;
     let mut args = show(tab("/a"));
     args.origin.control = UiControl::Ask;
-    let agent = agent_shows(port, args);
+    let agent = agent_shows(&port, args);
     let Some(Event::UiIntent {
         intent_id, origin, ..
     }) = viewer.event(Duration::from_secs(3)).await
@@ -206,7 +210,7 @@ async fn the_ui_control_mode_is_carried_to_the_viewer() {
 #[tokio::test]
 async fn no_viewer_is_a_clear_error_and_nothing_hangs() {
     let (port, _daemon) = start().await;
-    let mut agent = Conn::open(port).await;
+    let mut agent = Conn::open(&port).await;
     let started = std::time::Instant::now();
     let out = outcome(agent.call(OperationKind::UiShow, show(tab("/a"))).await);
     let UiOutcome::NoViewer { message } = out else {
@@ -242,13 +246,13 @@ async fn no_viewer_is_a_clear_error_and_nothing_hangs() {
 #[tokio::test]
 async fn the_window_showing_the_repo_wins_then_the_focused_one() {
     let (port, _daemon) = start().await;
-    let mut a = Conn::open(port).await;
-    let mut b = Conn::open(port).await;
+    let mut a = Conn::open(&port).await;
+    let mut b = Conn::open(&port).await;
     a.attach(info("a", "/x", &["/x", "/y"], Some(true))).await;
     b.attach(info("b", "/y", &["/y"], None)).await;
 
     // /y is b's active tab, a only has it open.
-    let first = agent_shows(port, show(tab("/y")));
+    let first = agent_shows(&port, show(tab("/y")));
     let Some(Event::UiIntent { intent_id, .. }) = b.event(Duration::from_secs(3)).await else {
         panic!("b shows /y")
     };
@@ -257,7 +261,7 @@ async fn the_window_showing_the_repo_wins_then_the_focused_one() {
     assert!(a.event(Duration::from_millis(200)).await.is_none());
 
     // Neither shows /q: the focused window (a) takes it.
-    let second = agent_shows(port, show(tab("/q")));
+    let second = agent_shows(&port, show(tab("/q")));
     let Some(Event::UiIntent { intent_id, .. }) = a.event(Duration::from_secs(3)).await else {
         panic!("a is focused")
     };
@@ -272,7 +276,7 @@ async fn the_window_showing_the_repo_wins_then_the_focused_one() {
         )
         .await;
     assert!(r.result.is_ok());
-    let third = agent_shows(port, show(UiIntent::ShowHelp { topic: None }));
+    let third = agent_shows(&port, show(UiIntent::ShowHelp { topic: None }));
     let Some(Event::UiIntent { intent_id, .. }) = b.event(Duration::from_secs(3)).await else {
         panic!("b was focused last")
     };
@@ -283,14 +287,14 @@ async fn the_window_showing_the_repo_wins_then_the_focused_one() {
 #[tokio::test]
 async fn an_explicit_viewer_overrides_the_selection() {
     let (port, _daemon) = start().await;
-    let mut a = Conn::open(port).await;
-    let mut b = Conn::open(port).await;
+    let mut a = Conn::open(&port).await;
+    let mut b = Conn::open(&port).await;
     a.attach(info("a", "/x", &["/x"], Some(true))).await;
     b.attach(info("b", "/y", &["/y"], None)).await;
 
     let mut args = show(tab("/x"));
     args.viewer = Some(ViewerId("b".into()));
-    let agent = agent_shows(port, args);
+    let agent = agent_shows(&port, args);
     let Some(Event::UiIntent { intent_id, .. }) = b.event(Duration::from_secs(3)).await else {
         panic!("b was named")
     };
@@ -300,7 +304,7 @@ async fn an_explicit_viewer_overrides_the_selection() {
 
     let mut args = show(tab("/x"));
     args.viewer = Some(ViewerId("ghost".into()));
-    let mut agent = Conn::open(port).await;
+    let mut agent = Conn::open(&port).await;
     let out = outcome(agent.call(OperationKind::UiShow, args).await);
     assert!(
         matches!(out, UiOutcome::Refused { ref reason } if reason.contains("ghost")),
@@ -323,10 +327,10 @@ async fn an_explicit_viewer_overrides_the_selection() {
 #[tokio::test]
 async fn a_viewer_that_drops_mid_intent_and_reattaches_still_answers_it() {
     let (port, _daemon) = start().await;
-    let mut old = Conn::open(port).await;
+    let mut old = Conn::open(&port).await;
     old.attach(info("v1", "/a", &["/a"], Some(true))).await;
 
-    let agent = agent_shows(port, show(tab("/b")));
+    let agent = agent_shows(&port, show(tab("/b")));
     let Some(Event::UiIntent { intent_id, .. }) = old.event(Duration::from_secs(3)).await else {
         panic!()
     };
@@ -334,7 +338,7 @@ async fn a_viewer_that_drops_mid_intent_and_reattaches_still_answers_it() {
     drop(old);
     tokio::time::sleep(Duration::from_millis(100)).await;
 
-    let mut fresh = Conn::open(port).await;
+    let mut fresh = Conn::open(&port).await;
     fresh
         .attach(info("v1", "/b", &["/a", "/b"], Some(true)))
         .await;
@@ -355,11 +359,11 @@ async fn a_viewer_that_drops_mid_intent_and_reattaches_still_answers_it() {
 #[tokio::test]
 async fn an_unanswered_intent_times_out_with_a_refusal() {
     let (port, _daemon) = start().await;
-    let mut viewer = Conn::open(port).await;
+    let mut viewer = Conn::open(&port).await;
     viewer.attach(info("v1", "/a", &["/a"], None)).await;
     let mut args = show(tab("/a"));
     args.timeout_ms = Some(150);
-    let mut agent = Conn::open(port).await;
+    let mut agent = Conn::open(&port).await;
     let out = outcome(agent.call(OperationKind::UiShow, args).await);
     assert_eq!(out, UiOutcome::refused("the window did not answer"));
     // A late report for the dropped intent is rejected.
@@ -373,7 +377,7 @@ async fn an_unanswered_intent_times_out_with_a_refusal() {
 async fn a_burst_of_six_intents_hits_the_rate_limit() {
     let (port, _daemon) = start().await;
     // No viewer: each call is answered at once, but still takes a token.
-    let mut agent = Conn::open(port).await;
+    let mut agent = Conn::open(&port).await;
     for _ in 0..5 {
         let out = outcome(agent.call(OperationKind::UiShow, show(tab("/a"))).await);
         assert!(matches!(out, UiOutcome::NoViewer { .. }), "{out:?}");
@@ -381,7 +385,7 @@ async fn a_burst_of_six_intents_hits_the_rate_limit() {
     let out = outcome(agent.call(OperationKind::UiShow, show(tab("/a"))).await);
     assert_eq!(out, UiOutcome::refused("rate limited"));
     // The limit is per connection: another client is not affected.
-    let mut other = Conn::open(port).await;
+    let mut other = Conn::open(&port).await;
     let out = outcome(other.call(OperationKind::UiShow, show(tab("/a"))).await);
     assert!(matches!(out, UiOutcome::NoViewer { .. }));
 }
@@ -389,12 +393,12 @@ async fn a_burst_of_six_intents_hits_the_rate_limit() {
 #[tokio::test]
 async fn control_off_and_a_user_switch_refuse_without_bothering_the_window() {
     let (port, _daemon) = start().await;
-    let mut viewer = Conn::open(port).await;
+    let mut viewer = Conn::open(&port).await;
     let mut closed = info("v1", "/a", &["/a"], Some(true));
     closed.agent_control = false;
     viewer.attach(closed).await;
 
-    let mut agent = Conn::open(port).await;
+    let mut agent = Conn::open(&port).await;
     let out = outcome(agent.call(OperationKind::UiShow, show(tab("/a"))).await);
     assert!(
         matches!(out, UiOutcome::Refused { ref reason } if reason.contains("turned agent view control off")),
@@ -414,11 +418,11 @@ async fn control_off_and_a_user_switch_refuse_without_bothering_the_window() {
 #[tokio::test]
 async fn intents_are_never_broadcast_journaled_or_a_mutation() {
     let (port, _daemon) = start().await;
-    let mut viewer = Conn::open(port).await;
+    let mut viewer = Conn::open(&port).await;
     viewer.attach(info("v1", "/a", &["/a"], Some(true))).await;
     // A plain subscriber: it must hear nothing at all.
-    let mut bystander = Conn::open(port).await;
-    let mut other_viewer = Conn::open(port).await;
+    let mut bystander = Conn::open(&port).await;
+    let mut other_viewer = Conn::open(&port).await;
     other_viewer.attach(info("v2", "/z", &["/z"], None)).await;
 
     for intent in [
@@ -427,7 +431,7 @@ async fn intents_are_never_broadcast_journaled_or_a_mutation() {
             message: "hello".into(),
         },
     ] {
-        let agent = agent_shows(port, show(intent));
+        let agent = agent_shows(&port, show(intent));
         let Some(Event::UiIntent { intent_id, .. }) = viewer.event(Duration::from_secs(3)).await
         else {
             panic!()
@@ -448,7 +452,7 @@ async fn intents_are_never_broadcast_journaled_or_a_mutation() {
     );
 
     // A connection that is not the viewer cannot answer for it.
-    let agent = agent_shows(port, show(tab("/a")));
+    let agent = agent_shows(&port, show(tab("/a")));
     let Some(Event::UiIntent { intent_id, .. }) = viewer.event(Duration::from_secs(3)).await else {
         panic!()
     };
@@ -472,10 +476,10 @@ async fn intents_are_never_broadcast_journaled_or_a_mutation() {
 #[tokio::test]
 async fn escape_sequences_in_a_toast_are_stripped_before_the_window_sees_them() {
     let (port, _daemon) = start().await;
-    let mut viewer = Conn::open(port).await;
+    let mut viewer = Conn::open(&port).await;
     viewer.attach(info("v1", "/a", &["/a"], None)).await;
     let agent = agent_shows(
-        port,
+        &port,
         show(UiIntent::Notify {
             message: "pwn\u{1b}]0;title\u{7}ed".into(),
         }),
@@ -499,10 +503,10 @@ async fn escape_sequences_in_a_toast_are_stripped_before_the_window_sees_them() 
 #[tokio::test]
 async fn ui_state_asks_the_window_and_returns_its_answer() {
     let (port, _daemon) = start().await;
-    let mut viewer = Conn::open(port).await;
+    let mut viewer = Conn::open(&port).await;
     viewer.attach(info("v1", "/a", &["/a"], Some(true))).await;
     let task = tokio::spawn(async move {
-        let mut agent = Conn::open(port).await;
+        let mut agent = Conn::open(&port).await;
         agent
             .call(
                 OperationKind::UiQuery,
@@ -551,14 +555,14 @@ fn raise_answer(resp: Response) -> RaiseAnswer {
 #[tokio::test]
 async fn a_launcher_raise_reaches_the_most_recent_window_and_reports_what_it_did() {
     let (port, _daemon) = start().await;
-    let mut old = Conn::open(port).await;
+    let mut old = Conn::open(&port).await;
     old.attach(info("old", "/a", &["/a"], None)).await;
-    let mut recent = Conn::open(port).await;
+    let mut recent = Conn::open(&port).await;
     recent
         .attach(info("recent", "/b", &["/b"], Some(true)))
         .await;
     let task = tokio::spawn(async move {
-        let mut launcher = Conn::open(port).await;
+        let mut launcher = Conn::open(&port).await;
         launcher
             .call(OperationKind::UiQuery, UiQueryArgs::Raise { viewer: None })
             .await
@@ -578,13 +582,13 @@ async fn a_launcher_raise_reaches_the_most_recent_window_and_reports_what_it_did
 #[tokio::test]
 async fn a_raise_the_window_could_not_do_says_why_so_the_launcher_starts_a_new_one() {
     let (port, _daemon) = start().await;
-    let mut viewer = Conn::open(port).await;
+    let mut viewer = Conn::open(&port).await;
     // The user switched agent control off: a launcher click still raises.
     let mut quiet = info("v1", "/a", &["/a"], Some(true));
     quiet.agent_control = false;
     viewer.attach(quiet).await;
     let task = tokio::spawn(async move {
-        let mut launcher = Conn::open(port).await;
+        let mut launcher = Conn::open(&port).await;
         launcher
             .call(OperationKind::UiQuery, UiQueryArgs::Raise { viewer: None })
             .await
@@ -610,7 +614,7 @@ async fn a_raise_the_window_could_not_do_says_why_so_the_launcher_starts_a_new_o
 #[tokio::test]
 async fn a_raise_with_no_window_attached_is_a_plain_no() {
     let (port, _daemon) = start().await;
-    let mut launcher = Conn::open(port).await;
+    let mut launcher = Conn::open(&port).await;
     let answer = raise_answer(
         launcher
             .call(OperationKind::UiQuery, UiQueryArgs::Raise { viewer: None })

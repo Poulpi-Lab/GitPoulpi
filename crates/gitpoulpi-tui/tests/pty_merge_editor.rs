@@ -95,9 +95,12 @@ fn daemon_resolve(
         .join("sessions")
         .join(format!("{session}.port"));
     tokio::runtime::Runtime::new().unwrap().block_on(async {
-        let mut client = gitpoulpi_ipc::Client::connect(&port_file)
-            .await
-            .expect("connect to the session's daemon");
+        let mut client = gitpoulpi_ipc::Client::connect(
+            &gitpoulpi_ipc::discovery::endpoint(&port_file)
+                .expect("the session published its discovery files"),
+        )
+        .await
+        .expect("connect to the session's daemon");
         let response = client
             .call(&gitpoulpi_ipc::Request {
                 id: 1,

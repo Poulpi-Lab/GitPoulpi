@@ -155,8 +155,8 @@ struct Conn {
 
 impl Conn {
     async fn open(session: &str) -> Result<Self, String> {
-        let port = crate::daemon_link::ensure_daemon(session).await?;
-        let client = Client::connect_port(port)
+        let endpoint = crate::daemon_link::ensure_daemon(session).await?;
+        let client = Client::connect(&endpoint)
             .await
             .map_err(gitpoulpi_i18n::msg::task_error::daemon_unreachable)?;
         Ok(Self {

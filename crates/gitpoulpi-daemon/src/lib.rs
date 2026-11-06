@@ -81,11 +81,23 @@ pub enum Error {
 /// without touching the filesystem).
 pub struct DaemonHandle {
     pub port: u16,
+    token: gitpoulpi_ipc::Token,
     shutdown_tx: Option<tokio::sync::oneshot::Sender<()>>,
     join: tokio::task::JoinHandle<Result<()>>,
 }
 
 impl DaemonHandle {
+    /// The token a client must present first (see `gitpoulpi_ipc::auth`). An
+    /// in-process daemon hands it to its own clients through memory.
+    pub fn token(&self) -> &gitpoulpi_ipc::Token {
+        &self.token
+    }
+
+    /// Port and token, what `Client::connect` takes.
+    pub fn endpoint(&self) -> gitpoulpi_ipc::Endpoint {
+        gitpoulpi_ipc::Endpoint::new(self.port, Some(self.token.clone()))
+    }
+
     pub async fn shutdown(mut self) -> Result<()> {
         if let Some(tx) = self.shutdown_tx.take() {
             let _ = tx.send(());
@@ -141,14 +153,22 @@ impl Daemon {
     /// target it (see `gitpoulpi_ipc::DaemonKind`).
     pub async fn spawn(&self, backend: Arc<dyn GitBackend>) -> Result<DaemonHandle> {
         let info = self.info(backend.as_ref(), DaemonKind::Embedded);
+        let token = new_token()?;
         let (port_tx, port_rx) = tokio::sync::oneshot::channel();
         let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
-        let join = tokio::spawn(server::run(backend, port_tx, shutdown_rx, info));
+        let join = tokio::spawn(server::run(
+            backend,
+            port_tx,
+            shutdown_rx,
+            info,
+            token.clone(),
+        ));
         let port = port_rx
             .await
             .map_err(|_| Error::StartFailed("daemon task exited before binding".into()))?;
         Ok(DaemonHandle {
             port,
+            token,
             shutdown_tx: Some(shutdown_tx),
             join,
         })
@@ -162,6 +182,7 @@ impl Daemon {
     /// foreground case and via a detached child for `daemon start`.
     pub async fn run_foreground(&self, backend: Arc<dyn GitBackend>) -> Result<()> {
         let paths = gitpoulpi_config::ConfigPaths::discover().ok_or(Error::NoConfigDir)?;
+        gitpoulpi_config::secure_fs::harden_app_dirs(&paths);
         self.run_foreground_in(backend, &paths).await
     }
 
@@ -180,20 +201,32 @@ impl Daemon {
         if port_file.exists() {
             return Err(Error::AlreadyRunning(self.session_name.clone()));
         }
-        if let Some(parent) = port_file.parent() {
-            std::fs::create_dir_all(parent)?;
-        }
 
+        let token = new_token()?;
         let info = self.info(backend.as_ref(), DaemonKind::Standalone);
         let (port_tx, port_rx) = tokio::sync::oneshot::channel();
         let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
-        let mut join = tokio::spawn(server::run(backend, port_tx, shutdown_rx, info));
+        let mut join = tokio::spawn(server::run(
+            backend,
+            port_tx,
+            shutdown_rx,
+            info,
+            token.clone(),
+        ));
         let port = port_rx
             .await
             .map_err(|_| Error::StartFailed("daemon task exited before binding".into()))?;
 
-        std::fs::write(&port_file, port.to_string())?;
-        std::fs::write(&pid_file, std::process::id().to_string())?;
+        // The token file lands user-only before the port file: the port file
+        // appearing means "ready".
+        gitpoulpi_ipc::discovery::publish(
+            &port_file,
+            &gitpoulpi_ipc::Endpoint::new(port, Some(token)),
+        )?;
+        gitpoulpi_config::secure_fs::write_private(
+            &pid_file,
+            std::process::id().to_string().as_bytes(),
+        )?;
         tracing::info!(
             session = %self.session_name,
             port,
@@ -211,13 +244,11 @@ impl Daemon {
                 let _ = (&mut join).await;
             }
             result = &mut join => {
-                let _ = std::fs::remove_file(&port_file);
-                let _ = std::fs::remove_file(&pid_file);
+                gitpoulpi_ipc::discovery::remove_files(&port_file);
                 return result.map_err(|e| Error::StartFailed(e.to_string()))?;
             }
         }
-        let _ = std::fs::remove_file(&port_file);
-        let _ = std::fs::remove_file(&pid_file);
+        gitpoulpi_ipc::discovery::remove_files(&port_file);
         Ok(())
     }
 
@@ -233,6 +264,11 @@ impl Daemon {
             git_sha: self.git_sha_override.clone().or_else(git_sha_best_effort),
         }
     }
+}
+
+fn new_token() -> Result<gitpoulpi_ipc::Token> {
+    gitpoulpi_ipc::Token::generate()
+        .map_err(|e| Error::StartFailed(format!("no random token: {e}")))
 }
 
 /// The short commit sha this daemon was built from (baked in at build

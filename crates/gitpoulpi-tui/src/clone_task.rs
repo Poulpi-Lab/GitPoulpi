@@ -95,8 +95,8 @@ async fn run(
 ) -> Result<RepoRef, CloneFailure> {
     let started = std::time::Instant::now();
     let failed = |e: String| CloneFailure::Failed(e);
-    let port = daemon_port(&session).await.map_err(failed)?;
-    let stream = gitpoulpi_ipc::discovery::connect(port)
+    let endpoint = daemon_endpoint(&session).await.map_err(failed)?;
+    let stream = gitpoulpi_ipc::discovery::connect(&endpoint)
         .await
         .map_err(|e| failed(gitpoulpi_i18n::msg::task_error::daemon_unreachable(e)))?;
     let (mut read_half, mut write_half) = stream.into_split();
@@ -156,6 +156,6 @@ async fn run(
     }
 }
 
-async fn daemon_port(session: &str) -> Result<u16, String> {
+async fn daemon_endpoint(session: &str) -> Result<gitpoulpi_ipc::Endpoint, String> {
     crate::daemon_link::ensure_daemon(session).await
 }

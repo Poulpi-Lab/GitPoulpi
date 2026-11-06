@@ -101,7 +101,7 @@ async fn merging_identities_writes_the_mailmap_undo_restores_it_and_the_views_fo
         let repo = fixture();
         let handle = Daemon::new("mailmap-test").spawn(backend).await.unwrap();
         let mut rig = Rig {
-            client: Client::connect_port(handle.port).await.unwrap(),
+            client: Client::connect(&handle.endpoint()).await.unwrap(),
             id: repo.repo_ref().id,
             next: 1,
         };

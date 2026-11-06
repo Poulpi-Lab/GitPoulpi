@@ -53,7 +53,7 @@ impl Rig {
             .spawn(backend)
             .await
             .unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = repo.repo_ref().id;
         Rig {
             handle: Some(handle),
@@ -576,13 +576,14 @@ async fn two_clients_undoing_the_same_entry_never_both_win() {
                     .unwrap();
             state.undo.unwrap().id
         };
-        let port = rig.handle.as_ref().unwrap().port;
+        let endpoint = rig.handle.as_ref().unwrap().endpoint();
         let id = rig.id.clone();
         let racers: Vec<_> = (0..4u64)
             .map(|n| {
                 let id = id.clone();
+                let endpoint = endpoint.clone();
                 tokio::spawn(async move {
-                    let mut client = Client::connect_port(port).await.unwrap();
+                    let mut client = Client::connect(&endpoint).await.unwrap();
                     client
                         .call(&Request {
                             id: 100 + n,

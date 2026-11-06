@@ -33,7 +33,7 @@ async fn a_diverged_push_arrives_as_a_typed_rejection() {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let daemon = Daemon::new("typed-errors-test");
     let handle = daemon.spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
 
     let resp = client
         .call(&Request {
@@ -79,7 +79,7 @@ async fn a_reword_runs_through_the_daemon_and_a_refusal_arrives_typed() {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let daemon = Daemon::new("typed-errors-reword-test");
     let handle = daemon.spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let request = |id: u64, commit: &str, message: &str| Request {
         id,
         session: "typed-errors-reword-test".into(),
@@ -132,7 +132,7 @@ async fn a_split_refusal_arrives_typed() {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let daemon = Daemon::new("typed-errors-split-test");
     let handle = daemon.spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let resp = client
         .call(&Request {
             id: 1,
@@ -170,7 +170,7 @@ async fn a_rewrite_refusal_arrives_typed() {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let daemon = Daemon::new("typed-errors-rewrite-test");
     let handle = daemon.spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let repo_id = repo.repo_ref().id.clone();
     async fn call(
         client: &mut Client,
@@ -251,7 +251,7 @@ async fn fast_forward_and_worktree_add_run_through_the_daemon() {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let daemon = Daemon::new("typed-errors-ff-test");
     let handle = daemon.spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let request = |id: u64, command: OperationKind, args: serde_json::Value| Request {
         id,
         session: "typed-errors-ff-test".into(),
@@ -336,7 +336,7 @@ async fn rebase_refusal_round_trips_typed() {
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let daemon = Daemon::new("typed-errors-rebase-test");
     let handle = daemon.spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
 
     let refused = client
         .call(&Request {

@@ -66,7 +66,7 @@ async fn start(
     }
     let cache = SharedCommitFilesCache::default();
     let link = super::link_guard::LinkGuard::spawn(link_loop_with_port(
-        daemon.port,
+        daemon.endpoint(),
         session.to_string(),
         repo.clone(),
         LinkChannels {

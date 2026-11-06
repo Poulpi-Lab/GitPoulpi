@@ -28,7 +28,7 @@ use gitpoulpi_ipc::ui::{
     RaiseAnswer, UiIntent, UiOrigin, UiOutcome, UiQueryArgs, UiShowArgs, ViewerId, ViewerInfo,
     RAISE_ANSWER_TIMEOUT_MS,
 };
-use gitpoulpi_ipc::{Client, Request};
+use gitpoulpi_ipc::{Client, Endpoint, Request, Token};
 
 /// How long a daemon gets to list its windows. Short on purpose: the daemons
 /// are on loopback, and `gp -a` must feel as fast as `gp`.
@@ -39,6 +39,9 @@ pub const PROBE_TIMEOUT: Duration = Duration::from_millis(400);
 pub struct SessionViewers {
     pub session: String,
     pub port: u16,
+    /// The token of the daemon's `.token` file, `None` for a daemon from
+    /// before tokens existed.
+    pub token: Option<Token>,
     pub viewers: Vec<ViewerInfo>,
 }
 
@@ -74,7 +77,7 @@ async fn scan_dir<F, Fut>(
     probe: F,
 ) -> Vec<SessionViewers>
 where
-    F: Fn(u16, Duration) -> Fut,
+    F: Fn(Endpoint, Duration) -> Fut,
     Fut: std::future::Future<Output = Option<Vec<ViewerInfo>>> + Send + 'static,
 {
     let mut probes = tokio::task::JoinSet::new();
@@ -89,29 +92,32 @@ where
         if gitpoulpi_ipc::discovery::remove_if_stale(&port_file, pid_alive) {
             continue;
         }
-        let answer = probe(port, patience);
-        probes.spawn(async move { (index, session, port, answer.await) });
+        let endpoint = gitpoulpi_ipc::discovery::endpoint_for_port(&port_file, port);
+        let token = endpoint.token.clone();
+        let answer = probe(endpoint, patience);
+        probes.spawn(async move { (index, session, port, token, answer.await) });
     }
     let mut found = Vec::new();
     while let Some(done) = probes.join_next().await {
-        if let Ok((index, session, port, Some(viewers))) = done {
-            found.push((index, session, port, viewers));
+        if let Ok((index, session, port, token, Some(viewers))) = done {
+            found.push((index, session, port, token, viewers));
         }
     }
     found.sort_by_key(|f| f.0);
     found
         .into_iter()
-        .map(|(_, session, port, viewers)| SessionViewers {
+        .map(|(_, session, port, token, viewers)| SessionViewers {
             session,
             port,
+            token,
             viewers,
         })
         .collect()
 }
 
-async fn probe_viewers(port: u16, patience: Duration) -> Option<Vec<ViewerInfo>> {
+async fn probe_viewers(endpoint: Endpoint, patience: Duration) -> Option<Vec<ViewerInfo>> {
     let work = async {
-        let mut client = Client::connect_port(port).await.ok()?;
+        let mut client = Client::connect(&endpoint).await.ok()?;
         let request = Request {
             id: 1,
             session: String::new(),
@@ -125,11 +131,23 @@ async fn probe_viewers(port: u16, patience: Duration) -> Option<Vec<ViewerInfo>>
     tokio::time::timeout(patience, work).await.ok().flatten()
 }
 
+/// The endpoint of `session`'s daemon on `port`, with the token its port file
+/// sits beside (see [`gitpoulpi_ipc::discovery::endpoint_for_port`]).
+pub fn session_endpoint(session: &str, port: u16) -> Endpoint {
+    match ConfigPaths::discover() {
+        Some(paths) => {
+            gitpoulpi_ipc::discovery::endpoint_for_port(&paths.ipc_port_file(session), port)
+        }
+        None => Endpoint::new(port, None),
+    }
+}
+
 /// A running session with at least one TUI window: somewhere to add a tab.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Candidate {
     pub session: String,
     pub port: u16,
+    pub token: Option<Token>,
     /// Most recently focused first (the order the daemon lists them in).
     pub viewers: Vec<ViewerInfo>,
 }
@@ -167,6 +185,7 @@ pub fn candidates(found: Vec<SessionViewers>) -> Vec<Candidate> {
         .map(|s| Candidate {
             session: s.session,
             port: s.port,
+            token: s.token,
             viewers: s.viewers,
         })
         .collect();
@@ -314,9 +333,9 @@ pub fn allow_foreground(_pid: u32) {}
 
 /// Asks a window to bring its terminal window forward (best effort: not every
 /// desktop lets a terminal raise itself). `None`: the daemon did not answer.
-pub async fn raise_window(port: u16, viewer: &ViewerId) -> Option<RaiseAnswer> {
+pub async fn raise_window(endpoint: &Endpoint, viewer: &ViewerId) -> Option<RaiseAnswer> {
     let work = async {
-        let mut client = Client::connect_port(port).await.ok()?;
+        let mut client = Client::connect(endpoint).await.ok()?;
         let request = Request {
             id: 1,
             session: String::new(),
@@ -384,10 +403,11 @@ pub async fn join_session(
         .best_window(repo)
         .ok_or_else(|| format!("session `{}` has no open window", candidate.session))?;
     let already_open = window.tabs.contains(repo);
+    let endpoint = Endpoint::new(candidate.port, candidate.token.clone());
     let mut raised = false;
     if raise {
         allow_foreground(window.pid);
-        raised = raise_window(candidate.port, &window.id)
+        raised = raise_window(&endpoint, &window.id)
             .await
             .is_some_and(|answer| answer.raised);
     }
@@ -397,7 +417,7 @@ pub async fn join_session(
         origin: UiOrigin::add_command(),
         timeout_ms: None,
     };
-    let mut client = Client::connect_port(candidate.port)
+    let mut client = Client::connect(&endpoint)
         .await
         .map_err(|e| format!("session `{}`: {e}", candidate.session))?;
     let request = Request {
@@ -605,6 +625,7 @@ mod tests {
         SessionViewers {
             session: name.into(),
             port,
+            token: None,
             viewers,
         }
     }
@@ -654,7 +675,8 @@ mod tests {
             Some("d"),
             Duration::from_millis(100),
             &|pid| pid != 111,
-            move |port, _| {
+            move |endpoint, _| {
+                let port = endpoint.port;
                 log.lock().unwrap().push(port);
                 // The first sessions answer last: the order must not follow it.
                 let delay = 40 - u64::from(port) * 10;

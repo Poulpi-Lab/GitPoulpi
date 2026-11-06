@@ -1,7 +1,6 @@
-use std::path::Path;
-
 use tokio::net::TcpStream;
 
+use crate::auth::Endpoint;
 use crate::protocol::{Request, ServerMessage};
 use crate::transport::{read_message, write_message, Result, TransportError};
 
@@ -17,25 +16,18 @@ pub struct Client {
 }
 
 impl Client {
-    /// Reads the port the session's daemon published (see
-    /// `gitpoulpi_config::ConfigPaths::ipc_port_file`) and connects to it.
-    pub async fn connect(port_file: &Path) -> Result<Self> {
-        let raw = std::fs::read_to_string(port_file)
-            .map_err(|_| TransportError::ConnectFailed(port_file.display().to_string()))?;
-        let port: u16 = raw
-            .trim()
-            .parse()
-            .map_err(|_| TransportError::ConnectFailed(port_file.display().to_string()))?;
-        Self::connect_port(port).await
-    }
-
-    pub async fn connect_port(port: u16) -> Result<Self> {
-        let stream = TcpStream::connect(("127.0.0.1", port))
+    /// Connects to a daemon and authenticates (see [`crate::auth`]). Get the
+    /// endpoint from [`crate::discovery::endpoint`], or from a daemon this
+    /// process embeds.
+    pub async fn connect(endpoint: &Endpoint) -> Result<Self> {
+        let port = endpoint.port;
+        let mut stream = TcpStream::connect(("127.0.0.1", port))
             .await
             .map_err(|_| TransportError::ConnectFailed(format!("127.0.0.1:{port}")))?;
         // Request/response ping-pong of small frames: Nagle plus delayed
         // ACK would hold each one back ~40 ms.
         let _ = stream.set_nodelay(true);
+        crate::auth::handshake(&mut stream, endpoint.token.as_ref()).await?;
         Ok(Self { stream })
     }
 

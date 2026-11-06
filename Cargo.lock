@@ -1186,11 +1186,13 @@ version = "1.0.0-rc.1"
 dependencies = [
  "directories",
  "gitpoulpi-core",
+ "libc",
  "serde",
  "serde_json",
  "tempfile",
  "thiserror 1.0.69",
  "toml",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -1272,10 +1274,13 @@ dependencies = [
 name = "gitpoulpi-ipc"
 version = "1.0.0-rc.1"
 dependencies = [
+ "getrandom 0.4.3",
+ "gitpoulpi-config",
  "gitpoulpi-core",
  "libc",
  "serde",
  "serde_json",
+ "subtle",
  "tempfile",
  "thiserror 1.0.69",
  "tokio",

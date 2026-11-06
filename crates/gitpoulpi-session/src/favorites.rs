@@ -58,9 +58,9 @@ impl FavoriteRepos {
 
     pub fn save(&self, path: &Path) -> Result<()> {
         if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)?;
+            gitpoulpi_config::secure_fs::create_private_dir_all(parent)?;
         }
-        std::fs::write(path, toml::to_string_pretty(self)?)?;
+        gitpoulpi_config::secure_fs::write_private(path, toml::to_string_pretty(self)?.as_bytes())?;
         Ok(())
     }
 

@@ -26,7 +26,7 @@ struct Harness {
     seen: Seen,
     texts: Arc<Mutex<Vec<bool>>>,
     #[cfg_attr(not(unix), allow(dead_code))]
-    port: u16,
+    endpoint: gitpoulpi_ipc::Endpoint,
     /// Keeps the daemon and the fake viewer alive.
     _rt: tokio::runtime::Runtime,
 }
@@ -64,15 +64,15 @@ fn harness_on(
     let handle = rt
         .block_on(gitpoulpi_daemon::Daemon::new(session).spawn(backend))
         .unwrap();
-    let port = handle.port;
-    std::fs::write(&port_file, port.to_string()).unwrap();
+    let endpoint = handle.endpoint();
+    gitpoulpi_ipc::discovery::publish(&port_file, &endpoint).unwrap();
     std::mem::forget(handle); // lives as long as the runtime
     let seen: Seen = Arc::default();
     let texts: Arc<Mutex<Vec<bool>>> = Arc::default();
     if viewer {
         let (ready_tx, ready_rx) = std::sync::mpsc::channel();
         rt.spawn(fake_viewer(
-            port,
+            endpoint.clone(),
             repo.repo_ref().id,
             answer,
             Arc::clone(&seen),
@@ -87,20 +87,20 @@ fn harness_on(
         repo,
         seen,
         texts,
-        port,
+        endpoint,
         _rt: rt,
     }
 }
 
 async fn fake_viewer(
-    port: u16,
+    endpoint: gitpoulpi_ipc::Endpoint,
     repo: RepoId,
     answer: UiOutcome,
     seen: Seen,
     texts: Arc<Mutex<Vec<bool>>>,
     ready: std::sync::mpsc::Sender<()>,
 ) {
-    let mut stream = Client::connect_port(port).await.unwrap().into_stream();
+    let mut stream = Client::connect(&endpoint).await.unwrap().into_stream();
     let info = ViewerInfo {
         id: ViewerId("fake-viewer".into()),
         pid: 4242,
@@ -508,14 +508,14 @@ impl Harness {
             ._rt
             .block_on(gitpoulpi_daemon::Daemon::new(session).spawn(backend))
             .unwrap();
-        std::fs::write(&port_file, handle.port.to_string()).unwrap();
-        let port = handle.port;
+        let endpoint = handle.endpoint();
+        gitpoulpi_ipc::discovery::publish(&port_file, &endpoint).unwrap();
         std::mem::forget(handle);
         let seen: Seen = Arc::default();
         if with_viewer {
             let (tx, rx) = std::sync::mpsc::channel();
             self._rt.spawn(fake_viewer(
-                port,
+                endpoint,
                 self.repo.repo_ref().id,
                 applied(),
                 Arc::clone(&seen),
@@ -576,8 +576,8 @@ impl Harness {
             std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o755)).unwrap();
         }
         if attach {
-            let (port, repo, handle) = (
-                self.port,
+            let (endpoint, repo, handle) = (
+                self.endpoint.clone(),
                 self.repo.repo_ref().id,
                 self._rt.handle().clone(),
             );
@@ -588,7 +588,7 @@ impl Harness {
                 }
                 let (tx, rx) = std::sync::mpsc::channel();
                 handle.spawn(fake_viewer(
-                    port,
+                    endpoint,
                     repo,
                     applied(),
                     Arc::default(),

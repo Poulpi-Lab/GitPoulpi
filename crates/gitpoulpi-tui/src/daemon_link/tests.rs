@@ -39,7 +39,7 @@ async fn survives_a_repo_changed_event_without_deadlocking() {
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
     let link = LinkGuard::spawn(link_loop_with_port(
-        daemon_handle.port,
+        daemon_handle.endpoint(),
         "daemon-link-test".to_string(),
         repo.clone(),
         LinkChannels {
@@ -76,7 +76,7 @@ async fn survives_a_repo_changed_event_without_deadlocking() {
     // A second client mutates the repo through the daemon, which
     // broadcasts RepoChanged -- the path that would deadlock a reader
     // that refreshed inline.
-    let mut mutator = gitpoulpi_ipc::Client::connect_port(daemon_handle.port)
+    let mut mutator = gitpoulpi_ipc::Client::connect(&daemon_handle.endpoint())
         .await
         .unwrap();
     std::fs::write(repo.root.join("new.txt"), "hello").unwrap();
@@ -170,7 +170,7 @@ async fn staging_one_hunk_through_the_link_leaves_the_other_unstaged() {
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
     let link = LinkGuard::spawn(link_loop_with_port(
-        daemon_handle.port,
+        daemon_handle.endpoint(),
         "daemon-link-hunk-test".to_string(),
         repo.clone(),
         LinkChannels {
@@ -345,7 +345,7 @@ async fn file_insight_answers_content_blame_and_history_for_a_path() {
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
     let link = LinkGuard::spawn(link_loop_with_port(
-        daemon_handle.port,
+        daemon_handle.endpoint(),
         "daemon-link-insight-test".to_string(),
         repo.clone(),
         LinkChannels {
@@ -546,6 +546,7 @@ async fn a_stage_file_event_refreshes_status_without_log_or_lfs() {
                         unsupported: true,
                         kind: None,
                         detail: None,
+                        auth_required: false,
                     })
                 }
                 OperationKind::Status => Ok(serde_json::to_value(WorkingTree::default()).unwrap()),
@@ -587,7 +588,7 @@ async fn a_stage_file_event_refreshes_status_without_log_or_lfs() {
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
     let _link = LinkGuard::spawn(link_loop_with_port(
-        port,
+        gitpoulpi_ipc::Endpoint::new(port, None),
         "scoped-refresh-test".to_string(),
         repo,
         LinkChannels {
@@ -699,6 +700,7 @@ async fn a_stage_all_is_sent_at_once_while_a_slow_refresh_is_in_flight() {
                                 unsupported: true,
                                 kind: None,
                                 detail: None,
+                                auth_required: false,
                             })
                         }
                         OperationKind::Status => {
@@ -748,7 +750,7 @@ async fn a_stage_all_is_sent_at_once_while_a_slow_refresh_is_in_flight() {
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
     let activity = Arc::new(crate::activity::Activity::default());
     let _link = LinkGuard::spawn(link_loop_with_port(
-        port,
+        gitpoulpi_ipc::Endpoint::new(port, None),
         "non-queueing-test".to_string(),
         repo,
         LinkChannels {
@@ -874,7 +876,7 @@ async fn a_paged_log_tiles_onto_the_initial_load_over_the_real_link() {
     let (log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, log_page_rx) = std_mpsc::channel();
     let link = LinkGuard::spawn(link_loop_with_port(
-        daemon_handle.port,
+        daemon_handle.endpoint(),
         "daemon-link-paging".to_string(),
         repo.clone(),
         LinkChannels {
@@ -943,7 +945,7 @@ async fn a_paged_log_tiles_onto_the_initial_load_over_the_real_link() {
     // The whole point: what paging produced is what one unpaged walk
     // would have produced, in the same order, with nothing repeated
     // and nothing missing.
-    let mut whole = gitpoulpi_ipc::Client::connect_port(daemon_handle.port)
+    let mut whole = gitpoulpi_ipc::Client::connect(&daemon_handle.endpoint())
         .await
         .unwrap();
     let unpaged = whole
@@ -1014,7 +1016,7 @@ async fn stashing_through_the_link_leaves_a_clean_working_tree() {
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
     let link = LinkGuard::spawn(link_loop_with_port(
-        daemon_handle.port,
+        daemon_handle.endpoint(),
         "daemon-link-stash-test".to_string(),
         repo.clone(),
         LinkChannels {
@@ -1194,7 +1196,7 @@ async fn a_merge_blocked_after_a_dropped_checkout_asks_instead_of_vanishing() {
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
     let link = LinkGuard::spawn(link_loop_with_port(
-        daemon_handle.port,
+        daemon_handle.endpoint(),
         "daemon-link-nested-autostash".to_string(),
         repo.clone(),
         LinkChannels {
@@ -1303,7 +1305,7 @@ async fn two_polls_with_no_change_cause_no_layout_rebuild() {
     let (_log_page_tx, log_page_task_rx) = tokio::sync::mpsc::unbounded_channel();
     let (log_page_out_tx, _log_page_rx) = std_mpsc::channel();
     let link = LinkGuard::spawn(link_loop_with_port(
-        daemon_handle.port,
+        daemon_handle.endpoint(),
         "daemon-link-idle-polls".to_string(),
         repo.clone(),
         LinkChannels {
@@ -1416,8 +1418,8 @@ async fn a_live_update_lock_refuses_the_embedded_daemon_start() {
     .unwrap();
     let refused = conn::ensure_daemon_in(Some(&port_file), "update-lock-test", Some(&paths)).await;
     assert_eq!(
-        refused,
-        Err(gitpoulpi_i18n::msg::link_error::UPDATING.get().to_string())
+        refused.unwrap_err(),
+        gitpoulpi_i18n::msg::link_error::UPDATING.get().to_string()
     );
     assert!(!port_file.exists(), "no daemon was started");
 

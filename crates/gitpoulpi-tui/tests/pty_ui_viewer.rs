@@ -59,7 +59,12 @@ impl Rig {
     /// One request on a fresh connection, as `gitpoulpi ui ...` would send it.
     fn call(&self, command: OperationKind, args: impl serde::Serialize) -> serde_json::Value {
         self.rt.block_on(async {
-            let mut client = Client::connect(&self.port_file).await.expect("connect");
+            let mut client = Client::connect(
+                &gitpoulpi_ipc::discovery::endpoint(&self.port_file)
+                    .expect("the session published its discovery files"),
+            )
+            .await
+            .expect("connect");
             let response = client
                 .call(&Request {
                     id: 1,

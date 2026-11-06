@@ -206,6 +206,7 @@ pub(crate) fn err_full(
                 unsupported,
                 kind,
                 detail: detail.map(Box::new),
+                auth_required: false,
             }),
         },
         mutated: false,

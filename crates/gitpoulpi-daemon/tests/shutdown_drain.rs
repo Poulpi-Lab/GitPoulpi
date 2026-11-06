@@ -12,7 +12,6 @@ use gitpoulpi_daemon::{Daemon, Hold};
 use gitpoulpi_ipc::transport::write_message;
 use gitpoulpi_ipc::Request;
 use gitpoulpi_testkit::FixtureRepoBuilder;
-use tokio::net::TcpStream;
 
 const SESSION: &str = "shutdown-drain-test";
 
@@ -27,9 +26,10 @@ async fn shutdown_waits_for_a_read_that_is_in_flight() {
     let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
 
     let hold = Hold::arm(OperationKind::Refs);
-    let stream = TcpStream::connect(("127.0.0.1", handle.port))
+    let stream = gitpoulpi_ipc::Client::connect(&handle.endpoint())
         .await
-        .unwrap();
+        .unwrap()
+        .into_stream();
     let (_read_half, mut write_half) = stream.into_split();
     write_message(
         &mut write_half,

@@ -218,10 +218,10 @@ impl GlobalSession {
 
     pub fn save(&self, path: &Path) -> Result<()> {
         if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)?;
+            gitpoulpi_config::secure_fs::create_private_dir_all(parent)?;
         }
         let raw = toml::to_string_pretty(self)?;
-        std::fs::write(path, raw)?;
+        gitpoulpi_config::secure_fs::write_private(path, raw.as_bytes())?;
         Ok(())
     }
 

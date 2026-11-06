@@ -69,9 +69,9 @@ impl RecentRepos {
 
     pub fn save(&self, path: &Path) -> Result<()> {
         if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)?;
+            gitpoulpi_config::secure_fs::create_private_dir_all(parent)?;
         }
-        std::fs::write(path, toml::to_string_pretty(self)?)?;
+        gitpoulpi_config::secure_fs::write_private(path, toml::to_string_pretty(self)?.as_bytes())?;
         Ok(())
     }
 
@@ -141,6 +141,18 @@ pub use gitpoulpi_core::time::unix_now as now_seconds;
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(unix)]
+    #[test]
+    fn a_saved_session_file_is_user_only() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("sessions").join("recent.toml");
+        RecentRepos::default().save(&file).unwrap();
+        let mode = |p: &Path| std::fs::metadata(p).unwrap().permissions().mode() & 0o777;
+        assert_eq!(mode(&file), 0o600);
+        assert_eq!(mode(file.parent().unwrap()), 0o700);
+    }
 
     fn at(n: usize) -> PathBuf {
         PathBuf::from(format!("/repos/r{n}"))

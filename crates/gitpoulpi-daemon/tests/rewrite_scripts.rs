@@ -58,7 +58,7 @@ impl Rig {
             .build();
         let backend: Arc<dyn GitBackend> = Arc::new(gitpoulpi_cli_backend::SystemGitBackend::new());
         let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         Rig {
             handle: Some(handle),
             client,

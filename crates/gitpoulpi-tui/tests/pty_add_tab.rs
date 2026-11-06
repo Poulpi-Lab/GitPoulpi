@@ -55,15 +55,13 @@ impl Rig {
     /// What the scan of `sessions/*.port` would find, read from this rig's
     /// own config directory (the scan itself reads the real one).
     fn found(&self) -> Vec<SessionViewers> {
-        let port: u16 = std::fs::read_to_string(
-            self.config
+        let endpoint = gitpoulpi_ipc::discovery::endpoint(
+            &self
+                .config
                 .path()
                 .join("sessions")
                 .join(format!("{}.port", self.session)),
         )
-        .unwrap()
-        .trim()
-        .parse()
         .unwrap();
         let viewers: Vec<ViewerInfo> = serde_json::from_value(common::daemon_call(
             self.config.path(),
@@ -74,7 +72,8 @@ impl Rig {
         .unwrap();
         vec![SessionViewers {
             session: self.session.clone(),
-            port,
+            port: endpoint.port,
+            token: endpoint.token,
             viewers,
         }]
     }

@@ -49,7 +49,7 @@ async fn staging_through_the_daemon_adds_no_spawns() {
 
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     let stage = serde_json::json!({ "target": StageTarget::File("new.txt".into()) });
 
@@ -112,7 +112,7 @@ async fn staging_and_discarding_with_undo_off_cost_what_they_cost_before_undo() 
     let repo_ref = repo.repo_ref();
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     call(
         &mut client,
@@ -182,7 +182,7 @@ async fn diff_files_then_one_files_hunks_is_two_spawns() {
 
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     ask(
         &mut client,
@@ -263,7 +263,7 @@ async fn commit_stats_for_a_viewport_is_one_spawn_then_zero() {
 
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     let log = ask(
         &mut client,
@@ -331,7 +331,7 @@ async fn journaling_a_mutation_costs_a_known_number_of_spawns() {
     let system = SystemGitBackend::new();
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     let tip = gitpoulpi_core::domain::Oid::from_hex(&repo.git(&["rev-parse", "HEAD"])).unwrap();
     // First request warms the daemon.
@@ -578,7 +578,7 @@ async fn journaling_the_ref_only_operations_costs_a_known_number_of_spawns() {
 
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     call(
         &mut client,
@@ -756,7 +756,7 @@ async fn snapshot_operations_cost_a_known_number_of_spawns() {
     let repo_ref = repo.repo_ref();
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     call(
         &mut client,
@@ -882,7 +882,7 @@ async fn journaling_the_history_operations_costs_a_known_number_of_spawns() {
 
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     call(
         &mut client,
@@ -1057,7 +1057,7 @@ async fn stash_and_remote_operations_stay_within_their_journal_budget() {
     let repo_ref = repo.repo_ref();
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     ask(
         &mut client,
@@ -1194,7 +1194,7 @@ async fn an_auto_stashed_checkout_stays_within_its_spawn_budget() {
     let repo_ref = repo.repo_ref();
     let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
     let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
-    let mut client = Client::connect_port(handle.port).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = &repo_ref.id;
     call(
         &mut client,

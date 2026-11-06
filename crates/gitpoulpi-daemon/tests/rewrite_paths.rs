@@ -90,7 +90,7 @@ impl Rig {
         isolated_config();
         let repo = lib_repo();
         let handle = Daemon::new(SESSION).spawn(backend).await.unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let mut rig = Rig {
             handle: Some(handle),
             client,

@@ -87,6 +87,10 @@ impl From<BackendArg> for gitpoulpi_config::DefaultBackend {
 
 fn main() {
     let args = Args::parse();
+    // User-only app directories (best effort, once per start).
+    if let Some(paths) = gitpoulpi_config::ConfigPaths::discover() {
+        gitpoulpi_config::secure_fs::harden_app_dirs(&paths);
+    }
     let overrides = Overrides {
         default_backend: args.backend.map(Into::into),
     };

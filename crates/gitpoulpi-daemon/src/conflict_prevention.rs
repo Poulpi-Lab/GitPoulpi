@@ -505,6 +505,7 @@ pub fn spawn_debounced(
             unsupported: false,
             kind: None,
             detail: None,
+            auth_required: false,
         });
         let _ = out_tx
             .send(ServerMessage::Response(Response {

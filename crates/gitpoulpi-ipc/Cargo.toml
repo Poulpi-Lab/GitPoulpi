@@ -10,6 +10,9 @@ description = "Client<->daemon IPC protocol shared by the TUI, CLI, and MCP fron
 
 [dependencies]
 gitpoulpi-core.workspace = true
+gitpoulpi-config.workspace = true
+getrandom = "0.4"
+subtle = "2"
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

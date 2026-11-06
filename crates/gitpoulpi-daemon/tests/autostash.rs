@@ -45,7 +45,7 @@ impl Rig {
 
     async fn with_repo(backend: Arc<dyn GitBackend>, repo: FixtureRepo) -> Rig {
         let handle = Daemon::new("autostash").spawn(backend).await.unwrap();
-        let client = Client::connect_port(handle.port).await.unwrap();
+        let client = Client::connect(&handle.endpoint()).await.unwrap();
         let id = repo.repo_ref().id;
         Rig {
             handle: Some(handle),
@@ -317,7 +317,7 @@ async fn pull_rig(backend: Arc<dyn GitBackend>, remote_edit: &str) -> Rig {
     );
     repo.git_at(&scratch, &["push", "-q", "origin", "main"]);
     let handle = Daemon::new("autostash").spawn(backend).await.unwrap();
-    let client = Client::connect_port(handle.port).await.unwrap();
+    let client = Client::connect(&handle.endpoint()).await.unwrap();
     let id = repo.repo_ref().id;
     let rig = Rig {
         handle: Some(handle),
@@ -373,7 +373,7 @@ async fn auto_stash_for_a_blocked_pull_and_its_live_event() {
         assert_eq!(rig.file(), "1\n2\n3\n4\n5 local\n", "{name}");
 
         // ask + the request's own answer (what `--autostash` sends).
-        let mut watcher = Client::connect_port(rig.handle.as_ref().unwrap().port)
+        let mut watcher = Client::connect(&rig.handle.as_ref().unwrap().endpoint())
             .await
             .unwrap()
             .into_stream();
@@ -417,7 +417,7 @@ async fn auto_stash_for_a_blocked_pull_and_its_live_event() {
         // A pop that conflicts: the pull stands, the stash stays, the
         // pending record says Conflicted, and the event fires.
         let mut rig = pull_rig(backend.clone(), "1\n2\n3\n4\n5 remote\n").await;
-        let mut watcher = Client::connect_port(rig.handle.as_ref().unwrap().port)
+        let mut watcher = Client::connect(&rig.handle.as_ref().unwrap().endpoint())
             .await
             .unwrap()
             .into_stream();
@@ -458,7 +458,7 @@ async fn a_manual_pop_or_drop_of_the_pending_stash_clears_the_record_and_fires_t
             // Back to a state where the stash applies cleanly.
             rig.repo.git(&["reset", "-q", "--hard"]);
             rig.repo.git(&["checkout", "-q", "main"]);
-            let mut watcher = Client::connect_port(rig.handle.as_ref().unwrap().port)
+            let mut watcher = Client::connect(&rig.handle.as_ref().unwrap().endpoint())
                 .await
                 .unwrap()
                 .into_stream();
@@ -631,7 +631,7 @@ async fn a_stash_dropped_outside_clears_the_record_and_unblocks() {
             "{name}: {}",
             record(&rig)
         );
-        let mut watcher = Client::connect_port(rig.handle.as_ref().unwrap().port)
+        let mut watcher = Client::connect(&rig.handle.as_ref().unwrap().endpoint())
             .await
             .unwrap()
             .into_stream();
@@ -658,7 +658,7 @@ async fn a_refresh_read_clears_a_record_whose_stash_is_gone() {
     std::env::set_var(ENV, "always");
     for (name, backend) in backends() {
         let mut rig = pending_rig(backend).await;
-        let mut watcher = Client::connect_port(rig.handle.as_ref().unwrap().port)
+        let mut watcher = Client::connect(&rig.handle.as_ref().unwrap().endpoint())
             .await
             .unwrap()
             .into_stream();
@@ -681,7 +681,7 @@ async fn a_refs_read_that_clears_the_record_still_tells_the_clients() {
     std::env::set_var(ENV, "always");
     for (name, backend) in backends() {
         let mut rig = pending_rig(backend).await;
-        let mut watcher = Client::connect_port(rig.handle.as_ref().unwrap().port)
+        let mut watcher = Client::connect(&rig.handle.as_ref().unwrap().endpoint())
             .await
             .unwrap()
             .into_stream();

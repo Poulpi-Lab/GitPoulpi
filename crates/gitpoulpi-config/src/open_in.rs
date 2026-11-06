@@ -152,6 +152,41 @@ pub fn validate(command: &str) -> Result<(), String> {
 
 // ------------------------------------------------------------------- presets
 
+/// The command text of the Windows presets before they stopped going through
+/// `cmd /C start` (a folder named `a&calc` ran `calc`: cmd re-parses its
+/// command line), mapped to what they say now. Saved configs keep the old
+/// text; the launcher runs this replacement for them. Only these exact
+/// strings: a command the user edited is theirs.
+const LEGACY_WINDOWS_COMMANDS: &[(&str, &str)] = &[
+    ("cmd /C start \"\" /D ${cwd} pwsh.exe", "pwsh.exe"),
+    (
+        "cmd /C start \"\" /D ${cwd} powershell.exe",
+        "powershell.exe",
+    ),
+    ("cmd /C start \"\" /D ${cwd} cmd.exe", "cmd.exe"),
+    (
+        "cmd /C start \"\" wsl.exe --cd ${cwd}",
+        "wsl.exe --cd ${cwd}",
+    ),
+    (
+        "cmd /C start \"\" warp://action/new_tab?path=${cwd}",
+        "rundll32 url.dll,FileProtocolHandler warp://action/new_tab?path=${cwd}",
+    ),
+    (
+        "cmd /C start \"\" ${web_url}",
+        "rundll32 url.dll,FileProtocolHandler ${web_url}",
+    ),
+];
+
+/// The safe replacement of a saved command that is exactly one of the old
+/// `cmd /C start` preset texts, else `None`.
+pub fn modernized_command(command: &str) -> Option<&'static str> {
+    LEGACY_WINDOWS_COMMANDS
+        .iter()
+        .find(|(old, _)| *old == command.trim())
+        .map(|(_, new)| *new)
+}
+
 /// One built-in entry.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OpenInPreset {
@@ -279,12 +314,12 @@ const BASE: &[OpenInPreset] = &[
     p("wt-winps", "Windows Terminal: Windows PowerShell (tab)", "terminal", "wt.exe -w 0 new-tab -d ${cwd} powershell.exe", WINDOWS, "windows-terminal", "wt", false),
     p("wt-cmd", "Windows Terminal: Command Prompt (tab)", "terminal", "wt.exe -w 0 new-tab -d ${cwd} cmd.exe", WINDOWS, "windows-terminal", "wt", false),
     p("wt-wsl", "Windows Terminal: WSL (tab)", "terminal", "wt.exe -w 0 new-tab -d ${cwd} wsl.exe", WINDOWS, "windows-terminal", "wt", false),
-    p("pwsh-window", "PowerShell 7 window", "terminal", "cmd /C start \"\" /D ${cwd} pwsh.exe", WINDOWS, "", "pwsh", false),
-    p("powershell-window", "Windows PowerShell window", "terminal", "cmd /C start \"\" /D ${cwd} powershell.exe", WINDOWS, "", "powershell", false),
-    p("cmd-window", "Command Prompt window", "terminal", "cmd /C start \"\" /D ${cwd} cmd.exe", WINDOWS, "", "", false),
-    p("wsl-window", "WSL window", "terminal", "cmd /C start \"\" wsl.exe --cd ${cwd}", WINDOWS, "", "wsl", false),
+    p("pwsh-window", "PowerShell 7 window", "terminal", "pwsh.exe", WINDOWS, "", "pwsh", false),
+    p("powershell-window", "Windows PowerShell window", "terminal", "powershell.exe", WINDOWS, "", "powershell", false),
+    p("cmd-window", "Command Prompt window", "terminal", "cmd.exe", WINDOWS, "", "", false),
+    p("wsl-window", "WSL window", "terminal", "wsl.exe --cd ${cwd}", WINDOWS, "", "wsl", false),
     p("git-bash", "Git Bash", "terminal", "git-bash.exe --cd=${cwd}", WINDOWS, "", "git-bash", false),
-    p("warp-windows", "Warp: new tab", "terminal", "cmd /C start \"\" warp://action/new_tab?path=${cwd}", WINDOWS, "warp", "", false),
+    p("warp-windows", "Warp: new tab", "terminal", "rundll32 url.dll,FileProtocolHandler warp://action/new_tab?path=${cwd}", WINDOWS, "warp", "", false),
     p("warp-macos", "Warp: new tab", "terminal", "open warp://action/new_tab?path=${cwd}", MACOS, "warp", "", false),
     p("warp-linux", "Warp: new tab", "terminal", "xdg-open warp://action/new_tab?path=${cwd}", LINUX, "warp", "", false),
     // Editors and IDEs. `zeditor` is Zed's name on Arch.
@@ -316,7 +351,7 @@ const BASE: &[OpenInPreset] = &[
     // The repository's page (needs a GitHub / GitLab origin for ${web_url}).
     p("web-xdg", "Repository page on the web", "web", "xdg-open ${web_url}", LINUX, "", "xdg-open", false),
     p("web-macos", "Repository page on the web", "web", "open ${web_url}", MACOS, "", "", false),
-    p("web-windows", "Repository page on the web", "web", "cmd /C start \"\" ${web_url}", WINDOWS, "", "", false),
+    p("web-windows", "Repository page on the web", "web", "rundll32 url.dll,FileProtocolHandler ${web_url}", WINDOWS, "", "", false),
     p("gh-web", "GitHub: open repository (gh)", "web", "gh repo view --web", ALL, "", "gh", true),
     p("glab-web", "GitLab: open repository (glab)", "web", "glab repo view --web", ALL, "", "glab", false),
 ];
@@ -1080,6 +1115,35 @@ mod tests {
             .filter(|l| std::fs::canonicalize(l).ok().as_deref() == Some(folder.as_path()))
             .count();
         assert_eq!(hits, 2, "{paths}");
+    }
+
+    #[test]
+    fn no_windows_preset_passes_a_folder_through_cmd() {
+        for p in presets()
+            .iter()
+            .filter(|p| p.platforms.contains(&"windows"))
+        {
+            let argv = expand(p.command, &OpenInVars::default(), &|_| None).unwrap();
+            let program = argv[0].to_ascii_lowercase();
+            assert!(
+                !(program == "cmd" || program == "cmd.exe") || argv.len() == 1,
+                "{}: {argv:?}",
+                p.id
+            );
+        }
+        assert_eq!(preset("cmd-window").unwrap().command, "cmd.exe");
+    }
+
+    #[test]
+    fn the_old_cmd_start_texts_map_to_the_new_presets() {
+        assert_eq!(
+            modernized_command("cmd /C start \"\" /D ${cwd} cmd.exe"),
+            Some("cmd.exe")
+        );
+        assert_eq!(modernized_command("cmd /C start \"\" /D ${cwd} code"), None);
+        for (_, new) in LEGACY_WINDOWS_COMMANDS {
+            assert_eq!(modernized_command(new), None);
+        }
     }
 
     #[test]

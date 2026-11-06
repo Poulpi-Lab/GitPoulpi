@@ -632,6 +632,20 @@ fn is_cmd_start(program: &str, args: &[String]) -> bool {
             .is_some_and(|a| a.eq_ignore_ascii_case("start"))
 }
 
+/// Whether `program args` is a bare console shell (`cmd`, `pwsh`,
+/// `powershell`, `wsl [--cd <dir>]`, `cmd /K <command>`): on Windows it is
+/// started with `CREATE_NEW_CONSOLE` so it opens a window of its own in the
+/// launch directory. Anything with other arguments (`cmd /C dir`) is a
+/// command to run, not a terminal to show.
+pub(crate) fn wants_new_console(program: &str, args: &[String]) -> bool {
+    match program_stem(program).as_str() {
+        "cmd" => args.is_empty() || args[0].eq_ignore_ascii_case("/K"),
+        "pwsh" | "powershell" => args.is_empty(),
+        "wsl" => args.is_empty() || (args.len() == 2 && args[0].eq_ignore_ascii_case("--cd")),
+        _ => false,
+    }
+}
+
 /// The late-error message for a launcher that ended with `code`, or `None`
 /// when that is a success. `explorer.exe` always exits 1 even when it worked.
 pub(crate) fn exit_failure(
@@ -678,14 +692,32 @@ pub(crate) fn start(launch: &Launch, report: fn(String)) -> Result<(), String> {
         .current_dir(launch.cwd)
         .env("GITPOULPI_CWD", launch.cwd)
         .env("GITPOULPI_REPO", &launch.info.repo)
-        .env("GITPOULPI_BRANCH", &launch.info.branch)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::piped());
+        .env("GITPOULPI_BRANCH", &launch.info.branch);
+    // A console shell opened "here" gets its own console window, with the
+    // folder as its working directory: no `cmd /C start` in between, which
+    // would parse the folder name as a command line.
+    let own_console = cfg!(windows) && wants_new_console(launch.program, launch.args);
+    if own_console {
+        // Null handles would be kept by the new console and end the shell at
+        // once; inherited console handles are replaced by the new console's.
+        command
+            .stdin(Stdio::inherit())
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit());
+    } else {
+        command
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::piped());
+    }
     #[cfg(windows)]
-    if !is_cmd_start(launch.program, launch.args) {
+    {
         use std::os::windows::process::CommandExt;
-        command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
+        if own_console {
+            command.creation_flags(0x0000_0010); // CREATE_NEW_CONSOLE
+        } else if !is_cmd_start(launch.program, launch.args) {
+            command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
+        }
     }
     let mut child = command
         .spawn()
@@ -769,8 +801,10 @@ fn prepare(index: usize, path: &Path) -> Result<Prepared, String> {
         .file_name()
         .map(|n| n.to_string_lossy().to_string())
         .unwrap_or_default();
+    // A saved config may still hold an old `cmd /C start` preset text.
+    let command = open_in::modernized_command(&entry.command).unwrap_or(&entry.command);
     let argv = open_in::expand(
-        &entry.command,
+        command,
         &open_in::OpenInVars {
             cwd: &cwd,
             repo: &info.repo,
@@ -1078,6 +1112,46 @@ mod tests {
         assert!(exit_failure("Z", "z", None, b"")
             .unwrap()
             .contains("stopped"));
+    }
+
+    #[test]
+    fn console_shells_get_their_own_window_and_commands_do_not() {
+        let a = |v: &[&str]| v.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        assert!(wants_new_console("cmd", &[]));
+        assert!(wants_new_console(r"C:\Windows\System32\cmd.exe", &[]));
+        assert!(wants_new_console("cmd", &a(&["/K", "claude"])));
+        assert!(wants_new_console("pwsh.exe", &[]));
+        assert!(wants_new_console("wsl", &a(&["--cd", r"C:\a&b"])));
+        assert!(!wants_new_console("cmd", &a(&["/C", "dir"])));
+        assert!(!wants_new_console("pwsh", &a(&["-c", "ls"])));
+        assert!(!wants_new_console("code", &[]));
+    }
+
+    #[test]
+    fn the_cmd_window_preset_never_puts_the_folder_in_a_command_line() {
+        let _g = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+        reset_for_tests();
+        let hostile = r"C:\x&calc|^%PATH%!";
+        for old in [
+            "cmd /C start \"\" /D ${cwd} cmd.exe",
+            open_in::preset("cmd-window").unwrap().command,
+        ] {
+            install(&open_in_config(&[("Cmd", old)], TabDirFollow::Buttons));
+            let state = open_in_state();
+            let command = open_in::modernized_command(&state.entries[0].command)
+                .unwrap_or(&state.entries[0].command);
+            let argv = open_in::expand(
+                command,
+                &open_in::OpenInVars {
+                    cwd: hostile,
+                    ..Default::default()
+                },
+                &|_| None,
+            )
+            .unwrap();
+            assert_eq!(argv, ["cmd.exe"], "{old}");
+            assert!(wants_new_console(&argv[0], &argv[1..]));
+        }
     }
 
     #[test]

@@ -15,6 +15,7 @@ mod schema;
 mod session_name;
 mod settings;
 pub mod theme;
+pub mod update_lock;
 
 pub use ai::{
     AgentRunMode, AgentWorkdir, AiAction, AiActionSettings, AiActions, AiConfig, AiPreset,

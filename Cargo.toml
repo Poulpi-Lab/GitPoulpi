@@ -19,6 +19,7 @@ members = [
     "crates/gitpoulpi-commands",
     "crates/gitpoulpi-cli",
     "crates/gitpoulpi-mcp",
+    "crates/gitpoulpi-updater",
     "crates/gitpoulpi-testkit",
     "xtask",
 ]
@@ -57,6 +58,7 @@ gitpoulpi-testkit = { path = "crates/gitpoulpi-testkit" }
 gitpoulpi-tui = { path = "crates/gitpoulpi-tui", default-features = false }
 gitpoulpi-commands = { path = "crates/gitpoulpi-commands", default-features = false }
 gitpoulpi-mcp = { path = "crates/gitpoulpi-mcp", default-features = false }
+gitpoulpi-updater = { path = "crates/gitpoulpi-updater" }
 xtask = { path = "xtask" }
 
 async-trait = "0.1"

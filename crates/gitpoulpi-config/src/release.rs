@@ -7,11 +7,12 @@
 /// `gitpoulpi-launch` is the console-less program the Windows shortcuts run
 /// (`gitpoulpi launch` without a console flash); it ships everywhere so an
 /// install is the same set of files on every OS.
-pub const BINARIES: [&str; 4] = [
+pub const BINARIES: [&str; 5] = [
     "gitpoulpi-tui",
     "gitpoulpi",
     "gitpoulpi-mcp",
     "gitpoulpi-launch",
+    "gitpoulpi-updater",
 ];
 
 /// The file `xtask dist` writes next to the binaries inside a release

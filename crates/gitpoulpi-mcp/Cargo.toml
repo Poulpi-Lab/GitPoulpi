@@ -106,4 +106,6 @@ winresource = { version = "0.1", default-features = false }
 
 [dev-dependencies]
 gitpoulpi-testkit.workspace = true
+gitpoulpi-daemon.workspace = true
+gitpoulpi-cli-backend.workspace = true
 tempfile.workspace = true

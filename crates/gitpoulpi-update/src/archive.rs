@@ -147,7 +147,8 @@ mod tests {
                 "gitpoulpi",
                 "gitpoulpi-launch",
                 "gitpoulpi-mcp",
-                "gitpoulpi-tui"
+                "gitpoulpi-tui",
+                "gitpoulpi-updater"
             ]
         );
         assert!(

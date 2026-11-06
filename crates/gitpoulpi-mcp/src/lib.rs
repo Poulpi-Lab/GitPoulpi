@@ -15,6 +15,7 @@ pub mod policy;
 pub mod registry;
 pub mod schema;
 pub mod server;
+pub mod update_watch;
 
 use gitpoulpi_config::DefaultBackend;
 pub use gitpoulpi_config::McpConfig;

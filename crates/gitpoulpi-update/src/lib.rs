@@ -31,8 +31,11 @@ pub mod fsops;
 pub mod install;
 pub mod job;
 pub mod plan;
+pub mod policy_source;
 #[cfg(test)]
 pub(crate) mod testutil;
+#[cfg(windows)]
+pub mod winreg;
 
 use std::path::{Path, PathBuf};
 

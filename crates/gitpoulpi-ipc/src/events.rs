@@ -94,6 +94,15 @@ pub enum Event {
     DaemonStopping {
         session: String,
     },
+    /// The daemon was asked to shut down for a reason (`Shutdown` with
+    /// `{"reason": "update"}`): the updater stops every session this way. Sent
+    /// to every subscriber **before** [`Event::DaemonStopping`], and only when a
+    /// reason was given. A TUI or an MCP server that sees `reason == "update"`
+    /// exits for good instead of restarting a daemon the updater is replacing.
+    ShuttingDown {
+        session: String,
+        reason: String,
+    },
     /// A history rewrite preview is running: the phase it is in and how far
     /// it got (`done` of `total`, `total` 0 while unknown). Throttled to
     /// about 10 per second. The preview's job (`JobChanged`) carries the same

@@ -14,7 +14,9 @@ pub mod ui;
 pub use client::{Client, CALL_TIMEOUT};
 pub use events::Event;
 pub use jobs::{JobInfo, JobState, CANCEL_ON_DISCONNECT};
-pub use protocol::{DaemonInfo, DaemonKind, Request, Response, ResponseError, ServerMessage};
+pub use protocol::{
+    DaemonInfo, DaemonKind, Request, Response, ResponseError, ServerMessage, ShutdownArgs,
+};
 pub use scope::ChangeScope;
 pub use transport::TransportError;
 

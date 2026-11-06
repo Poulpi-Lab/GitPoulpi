@@ -149,6 +149,34 @@ impl ConfigPaths {
     pub fn ipc_pid_file(&self, session_name: &str) -> PathBuf {
         self.sessions_dir().join(format!("{session_name}.pid"))
     }
+
+    /// Where the updater and the TUI hand an update over (the install-channels
+    /// design): `<data>/updates`.
+    pub fn updates_dir(&self) -> PathBuf {
+        self.data_dir().join("updates")
+    }
+
+    /// The job the TUI writes and `gitpoulpi-updater run --job` reads.
+    pub fn update_job_file(&self) -> PathBuf {
+        self.updates_dir().join("job.json")
+    }
+
+    /// What the updater last did; the TUI reads it on its next start.
+    pub fn update_status_file(&self) -> PathBuf {
+        self.updates_dir().join("status.json")
+    }
+
+    /// Present while an update runs; the CLI and every daemon auto-start
+    /// refuse to start a daemon then (see [`crate::update_lock`]).
+    pub fn update_lock_file(&self) -> PathBuf {
+        self.updates_dir().join("updating.lock")
+    }
+
+    /// The copy of the updater the TUI runs from, so the install folder's
+    /// own copy is never locked and a package manager can overwrite it.
+    pub fn update_bin_dir(&self) -> PathBuf {
+        self.updates_dir().join("bin")
+    }
 }
 
 #[cfg(test)]
@@ -188,6 +216,19 @@ mod tests {
             paths.ipc_pid_file("work"),
             dir.path().join("sessions").join("work.pid")
         );
+        assert_eq!(
+            paths.update_lock_file(),
+            dir.path()
+                .join("data")
+                .join("updates")
+                .join("updating.lock")
+        );
+        assert_eq!(paths.update_job_file().file_name().unwrap(), "job.json");
+        assert_eq!(
+            paths.update_status_file().file_name().unwrap(),
+            "status.json"
+        );
+        assert_eq!(paths.update_bin_dir(), dir.path().join("data/updates/bin"));
         assert_eq!(paths.cache_dir(), dir.path().join("cache"));
         assert_eq!(paths.log_dir(), dir.path().join("cache").join("logs"));
         assert!(ConfigPaths::for_dir(dir.path())

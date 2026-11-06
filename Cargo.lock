@@ -1298,9 +1298,11 @@ name = "gitpoulpi-mcp"
 version = "1.0.0-rc.1"
 dependencies = [
  "clap",
+ "gitpoulpi-cli-backend",
  "gitpoulpi-commands",
  "gitpoulpi-config",
  "gitpoulpi-core",
+ "gitpoulpi-daemon",
  "gitpoulpi-i18n",
  "gitpoulpi-ipc",
  "gitpoulpi-testkit",
@@ -1411,8 +1413,30 @@ dependencies = [
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
+ "windows-sys 0.61.2",
  "xtask",
  "zip",
+]
+
+[[package]]
+name = "gitpoulpi-updater"
+version = "1.0.0-rc.1"
+dependencies = [
+ "assert_cmd",
+ "gitpoulpi-cli-backend",
+ "gitpoulpi-config",
+ "gitpoulpi-core",
+ "gitpoulpi-daemon",
+ "gitpoulpi-hosting",
+ "gitpoulpi-ipc",
+ "gitpoulpi-testkit",
+ "gitpoulpi-update",
+ "libc",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "windows-sys 0.61.2",
+ "xtask",
 ]
 
 [[package]]

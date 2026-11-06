@@ -16,7 +16,7 @@
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)
 
-$bins = 'gitpoulpi', 'gitpoulpi-tui', 'gitpoulpi-mcp', 'gitpoulpi-launch'
+$bins = 'gitpoulpi', 'gitpoulpi-tui', 'gitpoulpi-mcp', 'gitpoulpi-launch', 'gitpoulpi-updater'
 
 # Same as build-opti: Windows refuses to delete a running .exe but lets it be
 # renamed, so move the previous binaries aside and an open TUI or a session
@@ -30,7 +30,7 @@ foreach ($bin in $bins) {
     }
 }
 
-cargo build --release --locked -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp @args
+cargo build --release --locked -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp -p gitpoulpi-updater @args
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host ''

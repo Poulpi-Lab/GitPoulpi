@@ -21,6 +21,10 @@ flate2.workspace = true
 tar = { version = "0.4", default-features = false }
 zip = { version = "2", default-features = false, features = ["deflate"] }
 
+# `winreg`: the Inno uninstall key and the administrators' policy key.
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Registry"] }
+
 [dev-dependencies]
 tempfile.workspace = true
 tokio.workspace = true

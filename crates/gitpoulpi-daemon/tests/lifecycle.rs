@@ -18,7 +18,7 @@ use gitpoulpi_cli_backend::SystemGitBackend;
 use gitpoulpi_config::ConfigPaths;
 use gitpoulpi_core::domain::OperationKind;
 use gitpoulpi_daemon::{Daemon, DaemonInfo, DaemonKind};
-use gitpoulpi_ipc::{Client, Event, Request, ServerMessage};
+use gitpoulpi_ipc::{Client, Event, Request, ServerMessage, ShutdownArgs};
 
 fn backend() -> Arc<dyn gitpoulpi_core::GitBackend> {
     Arc::new(SystemGitBackend::new())
@@ -111,6 +111,64 @@ async fn a_shutdown_request_stops_a_standalone_daemon_and_cleans_up_after_itself
 
     assert!(!port_file.exists(), "shutdown must remove the port file");
     assert!(!pid_file.exists(), "shutdown must remove the pid file");
+}
+
+/// The updater's shutdown (`{"reason":"update"}`): every subscriber hears
+/// `ShuttingDown` with the reason, and it arrives before `DaemonStopping`. A
+/// plain `Shutdown` sends no `ShuttingDown` at all.
+#[tokio::test]
+async fn a_shutdown_with_a_reason_broadcasts_shutting_down_before_stopping() {
+    for (args, expect_reason) in [
+        (serde_json::to_value(ShutdownArgs::update()).unwrap(), true),
+        (serde_json::Value::Null, false),
+    ] {
+        let session = "lifecycle-reason-test";
+        let daemon = Daemon::new(session);
+        let handle = daemon.spawn(backend()).await.unwrap();
+        let mut subscriber = Client::connect_port(handle.port)
+            .await
+            .unwrap()
+            .into_stream();
+        let mut actor = Client::connect_port(handle.port).await.unwrap();
+        actor
+            .call(&Request {
+                id: 1,
+                session: session.to_string(),
+                repo: None,
+                command: OperationKind::Shutdown,
+                args,
+            })
+            .await
+            .unwrap();
+
+        let mut seen: Vec<String> = Vec::new();
+        let _ = tokio::time::timeout(Duration::from_secs(2), async {
+            loop {
+                let msg: Option<ServerMessage> =
+                    gitpoulpi_ipc::transport::read_message(&mut subscriber)
+                        .await
+                        .unwrap_or(None);
+                match msg {
+                    Some(ServerMessage::Event(Event::ShuttingDown { reason, .. })) => {
+                        seen.push(format!("shutting:{reason}"))
+                    }
+                    Some(ServerMessage::Event(Event::DaemonStopping { .. })) => {
+                        seen.push("stopping".into());
+                        return;
+                    }
+                    Some(_) => continue,
+                    None => return,
+                }
+            }
+        })
+        .await;
+        if expect_reason {
+            assert_eq!(seen, ["shutting:update", "stopping"]);
+        } else {
+            assert_eq!(seen, ["stopping"]);
+        }
+        let _ = handle.shutdown().await;
+    }
 }
 
 /// `Hello` answers with this daemon's own info, distinguishing an embedded

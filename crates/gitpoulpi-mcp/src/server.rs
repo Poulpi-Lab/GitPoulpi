@@ -126,6 +126,7 @@ impl GitPoulpiServer {
     ) -> Result<Self, String> {
         crate::ensure_enabled(&cfg)?;
         let ipc = gitpoulpi_commands::Session::connect(&session, None, backend, true).await?;
+        crate::update_watch::spawn(&session);
         let tools = registry::tools()
             .into_iter()
             .map(|spec| (spec.name.clone(), Arc::new(spec)))

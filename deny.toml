@@ -1,6 +1,9 @@
-# cargo-deny policy: `cargo deny check licenses` (scripts/check.ps1 runs it
-# when cargo-deny is installed). A new dependency under a license that is not
-# listed here fails the check, so a copyleft crate never slips in unseen.
+# cargo-deny policy: `cargo deny check advisories bans sources licenses`
+# (scripts/check.ps1 runs it when cargo-deny is installed; CI and the release
+# preflight run it through EmbarkStudios/cargo-deny-action). A new dependency
+# under a license that is not listed here, from a registry other than
+# crates.io, or with a known advisory fails the check, so nothing slips in
+# unseen.
 # The notices that ship with the binaries are THIRD-PARTY-LICENSES.txt
 # (`cargo run -p xtask -- licenses`).
 
@@ -30,3 +33,43 @@ confidence-threshold = 0.9
 # libgit2 (GPLv2 with a linking exception) is C code bundled by libgit2-sys,
 # not a crate license cargo-deny sees; it is documented in
 # THIRD-PARTY-LICENSES.txt.
+
+[advisories]
+version = 2
+# A yanked release is a withdrawn one: do not ship it.
+yanked = "deny"
+# Every ignore needs an id and a reason. These are findings of the first run of
+# this policy on the existing lock file: each one needs a dependency upgrade
+# that is a separate change (a major version or an upstream release). Remove the
+# entry when the upgrade lands; do not add one without a reason.
+ignore = [
+    { id = "RUSTSEC-2025-0141", reason = "bincode 1.3.3 comes in through syntect (syntax highlighting); declared complete by its authors, no vulnerability, no safe upgrade exists" },
+    { id = "RUSTSEC-2024-0436", reason = "paste is a proc-macro of ratatui, build time only; no vulnerability, no replacement upstream yet" },
+    { id = "RUSTSEC-2023-0071", reason = "rsa (Marvin timing attack) comes in through ssh-key, which only generates a local SSH key pair (RSA is an optional key type); the attack needs an observer timing private-key operations, and none is performed. No fixed release exists" },
+    { id = "RUSTSEC-2026-0387", reason = "crypto-bigint 0.5.5 comes in through ssh-key's p256 and rsa, used for local one-shot key generation with no observer of timing; fixed only in 0.7.x, which ssh-key 0.6 does not accept. Tracked: upgrade ssh-key" },
+    { id = "RUSTSEC-2026-0008", reason = "libgit2 binding git2 0.19: fixed in 0.20/0.21, a breaking upgrade of the backend crates. Tracked: upgrade git2" },
+    { id = "RUSTSEC-2026-0183", reason = "libgit2 binding git2 0.19: fixed in 0.21. Tracked: upgrade git2" },
+    { id = "RUSTSEC-2026-0184", reason = "libgit2 binding git2 0.19: fixed in 0.21. Tracked: upgrade git2" },
+    { id = "RUSTSEC-2026-0367", reason = "zip 2.x extraction flaws; fixed in zip 9. Update archives come from the project's own release and are checked by SHA-256 before extraction. Tracked: upgrade zip" },
+    { id = "RUSTSEC-2026-0368", reason = "zip 2.x extraction flaws; fixed in zip 9. Tracked: upgrade zip (see RUSTSEC-2026-0367)" },
+    { id = "RUSTSEC-2026-0369", reason = "zip 2.x extraction flaws; fixed in zip 9. Tracked: upgrade zip (see RUSTSEC-2026-0367)" },
+    { id = "RUSTSEC-2026-0429", reason = "zip 2.x extraction flaws; fixed in zip 9. Tracked: upgrade zip (see RUSTSEC-2026-0367)" },
+]
+
+[bans]
+multiple-versions = "warn"
+# "warn", not "deny": the workspace crates depend on each other by path without a
+# version, which cargo-deny counts as wildcards for crates that could be published.
+# Give them versions (workspace.dependencies) to turn this into "deny".
+wildcards = "warn"
+# rustls-only policy: no system TLS stack.
+deny = [
+    { crate = "openssl-sys", reason = "TLS is rustls only" },
+    { crate = "native-tls", reason = "TLS is rustls only" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

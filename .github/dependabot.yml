@@ -1,0 +1,24 @@
+# Version updates for the Rust dependencies and for the pinned workflow actions.
+# `cooldown` waits a few days after a release is published before proposing it,
+# so a hijacked or yanked release is usually gone by then. Cooldown does not
+# apply to security updates, which is intended. xtask/tests/workflow_pins.rs
+# keeps the cooldown at 2 days or more.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    open-pull-requests-limit: 5
+    groups:
+      cargo-minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    open-pull-requests-limit: 5

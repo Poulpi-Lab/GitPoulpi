@@ -3,10 +3,12 @@
 # Formula for a tap repository (Formula/gitpoulpi.rb of a `homebrew-gitpoulpi` repo, installed with
 # `brew install <owner>/gitpoulpi/gitpoulpi`). It installs the official release archives, no compilation.
 # Replace @VERSION@ and the @SHA256_...@ values (first field of each archive's .sha256), then
-# `brew install --build-from-source ./gitpoulpi.rb` and `brew test gitpoulpi` (macOS is untested so far).
+# `brew install --build-from-source ./gitpoulpi.rb` and `brew test gitpoulpi`.
 #
-# A formula download is not quarantined, so Gatekeeper does not block the unsigned binaries. The
-# `.gitpoulpi-dist` marker is not installed: GitPoulpi never replaces its own files, brew upgrades it.
+# A formula download is not quarantined, so Gatekeeper does not block the unsigned binaries. The programs go
+# to libexec next to a `.gitpoulpi-dist` marker with channel=homebrew (the exe directory is found by
+# following the bin symlink), and bin gets symlinks: GitPoulpi then runs `brew upgrade gitpoulpi` itself and
+# never swaps files behind Homebrew. gitpoulpi-updater is installed with the other binaries.
 class Gitpoulpi < Formula
   desc "Git client for the terminal with a clickable commit graph, a CLI and an MCP server"
   homepage "https://github.com/Poulpi-Lab/GitPoulpi"
@@ -29,10 +31,21 @@ class Gitpoulpi < Formula
       url "https://github.com/Poulpi-Lab/GitPoulpi/releases/download/releases/v#{version}/gitpoulpi-#{version}-x86_64-unknown-linux-gnu.tar.gz"
       sha256 "@SHA256_LINUX_X86_64@"
     end
+    on_arm do
+      url "https://github.com/Poulpi-Lab/GitPoulpi/releases/download/releases/v#{version}/gitpoulpi-#{version}-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "@SHA256_LINUX_AARCH64@"
+    end
   end
 
   def install
-    bin.install "gitpoulpi", "gitpoulpi-tui", "gitpoulpi-mcp", "gitpoulpi-launch"
+    libexec.install "gitpoulpi", "gitpoulpi-tui", "gitpoulpi-mcp", "gitpoulpi-launch", "gitpoulpi-updater"
+    target = if OS.mac?
+      Hardware::CPU.arm? ? "aarch64-apple-darwin" : "x86_64-apple-darwin"
+    else
+      Hardware::CPU.arm? ? "aarch64-unknown-linux-gnu" : "x86_64-unknown-linux-gnu"
+    end
+    (libexec/".gitpoulpi-dist").write "version=#{version}\ntarget=#{target}\nchannel=homebrew\n"
+    %w[gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch].each { |name| bin.install_symlink libexec/name }
     doc.install "README.md", "CHANGELOG.md", "INSTALL.txt"
     prefix.install "LICENSE", "THIRD-PARTY-LICENSES.txt"
   end

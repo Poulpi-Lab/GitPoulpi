@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  GitPoulpi MSI for managed Windows fleets (Intune, GPO, SCCM). WiX v5 (`dotnet tool install, global, wix`),
+  hand written; cargo-wix targets WiX 3 and is not used. Per-machine, MajorUpgrade, fixed UpgradeCode.
+
+  Built by .github/workflows/release.yml from the release zip extracted into SourceDir, and a marker file made
+  by `xtask package-marker` with channel msi:
+
+    wix build packaging/msi/gitpoulpi.wxs -arch x64 -d Version=0.2.0 -d SourceDir=C:\src\gitpoulpi-0.2.0-x86_64-pc-windows-msvc -d MarkerFile=C:\src\marker-msi -o gitpoulpi-0.2.0-x86_64-pc-windows-msvc.msi
+
+  The marker records channel=msi: a managed install announces updates and never swaps its own files.
+
+  Public properties (msiexec ... PROPERTY=value):
+    INSTALLFOLDER       install folder (default Program Files\GitPoulpi)
+    ADDTOPATH=1         add the folder to the machine PATH (default 1; ADDTOPATH=0 skips it)
+    UPDATES_MODE, UPDATES_PIN, UPDATES_CHECK, UPDATES_CHECK_URL, UPDATES_MESSAGE
+                        written to HKLM\SOFTWARE\Policies\GitPoulpi\Updates (names mode, pin, check, check_url,
+                        message) only when set; the policy file and registry reference is in
+                        docs/user/enterprise-distribution.md
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?ifndef Version?>
+  <?define Version = "0.0.0"?>
+  <?endif?>
+  <?ifndef SourceDir?>
+  <?define SourceDir = "dist-files"?>
+  <?endif?>
+  <?ifndef MarkerFile?>
+  <?define MarkerFile = "marker-msi"?>
+  <?endif?>
+
+  <Package Name="GitPoulpi" Manufacturer="GitPoulpi" Version="$(Version)"
+           UpgradeCode="B2F4A7C1-3D5E-4F68-9A0B-6C7D8E9F1A2B" Scope="perMachine" Compressed="yes">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of GitPoulpi is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Property Id="ADDTOPATH" Value="1" Secure="yes" />
+    <Property Id="UPDATES_MODE" Secure="yes" />
+    <Property Id="UPDATES_PIN" Secure="yes" />
+    <Property Id="UPDATES_CHECK" Secure="yes" />
+    <Property Id="UPDATES_CHECK_URL" Secure="yes" />
+    <Property Id="UPDATES_MESSAGE" Secure="yes" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="GitPoulpi" />
+    </StandardDirectory>
+
+    <ComponentGroup Id="Programs" Directory="INSTALLFOLDER">
+      <Component>
+        <File Source="$(SourceDir)\gitpoulpi.exe" />
+      </Component>
+      <Component>
+        <File Source="$(SourceDir)\gitpoulpi-tui.exe" />
+      </Component>
+      <Component>
+        <File Source="$(SourceDir)\gitpoulpi-mcp.exe" />
+      </Component>
+      <Component>
+        <File Source="$(SourceDir)\gitpoulpi-launch.exe" />
+      </Component>
+      <Component>
+        <File Source="$(SourceDir)\gitpoulpi-updater.exe" />
+      </Component>
+      <Component>
+        <File Name=".gitpoulpi-dist" Source="$(MarkerFile)" />
+      </Component>
+      <Component>
+        <File Source="$(SourceDir)\LICENSE" />
+      </Component>
+      <Component>
+        <File Source="$(SourceDir)\THIRD-PARTY-LICENSES.txt" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="PathEntry" Directory="INSTALLFOLDER">
+      <Component Condition="ADDTOPATH = 1">
+        <Environment Id="GitPoulpiPath" Name="PATH" Value="[INSTALLFOLDER]" Part="last" Action="set"
+                     System="yes" Permanent="no" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Update policy, written only for the properties that are set. -->
+    <ComponentGroup Id="UpdatePolicy" Directory="INSTALLFOLDER">
+      <Component Condition="UPDATES_MODE">
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Policies\GitPoulpi\Updates" Name="mode" Type="string"
+                       Value="[UPDATES_MODE]" KeyPath="yes" />
+      </Component>
+      <Component Condition="UPDATES_PIN">
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Policies\GitPoulpi\Updates" Name="pin" Type="string"
+                       Value="[UPDATES_PIN]" KeyPath="yes" />
+      </Component>
+      <Component Condition="UPDATES_CHECK">
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Policies\GitPoulpi\Updates" Name="check" Type="string"
+                       Value="[UPDATES_CHECK]" KeyPath="yes" />
+      </Component>
+      <Component Condition="UPDATES_CHECK_URL">
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Policies\GitPoulpi\Updates" Name="check_url" Type="string"
+                       Value="[UPDATES_CHECK_URL]" KeyPath="yes" />
+      </Component>
+      <Component Condition="UPDATES_MESSAGE">
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Policies\GitPoulpi\Updates" Name="message" Type="string"
+                       Value="[UPDATES_MESSAGE]" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="Main" Title="GitPoulpi" Level="1">
+      <ComponentGroupRef Id="Programs" />
+      <ComponentGroupRef Id="PathEntry" />
+      <ComponentGroupRef Id="UpdatePolicy" />
+    </Feature>
+  </Package>
+</Wix>

@@ -1,14 +1,13 @@
-# TEMPLATE, NOT PUBLISHED. see the release-and-packaging design ("winget").
+# TEMPLATE, NOT PUBLISHED. see the release-and-packaging and install-channels designs ("winget").
 # @SHA256_WINDOWS_SETUP@ is the first field of gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe.sha256.
 #
 # winget runs the Inno Setup installer of the release (packaging/windows/gitpoulpi.iss). For the inno type winget
 # already passes /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART; Custom adds the rest:
-#   /CURRENTUSER or /ALLUSERS  picks the scope (needs `commandline` in PrivilegesRequiredOverridesAllowed, see
-#                              the plan; today the script allows `dialog`);
+#   /CURRENTUSER or /ALLUSERS  picks the scope (the script allows `commandline dialog`);
 #   /TASKS=...                 Start menu shortcut and PATH, no Desktop shortcut;
-#   /ALIAS= /NOSELFUPDATE      no `gp` command alias and no self-update marker. Both need the small .iss change
-#                              of the plan; until then Inno ignores them, a silent install creates the `gp`
-#                              alias and the program can update itself behind winget's back.
+#   /ALIAS=                    no `gp` command alias;
+#   /CHANNEL=winget            the installer writes channel=winget into the marker, so GitPoulpi runs
+#                              `winget upgrade` for updates and a re-run keeps the channel.
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
 
 PackageIdentifier: GitPoulpi.GitPoulpi
@@ -33,13 +32,13 @@ Installers:
     InstallerUrl: https://github.com/Poulpi-Lab/GitPoulpi/releases/download/releases/v@VERSION@/gitpoulpi-@VERSION@-x86_64-pc-windows-msvc-setup.exe
     InstallerSha256: "@SHA256_WINDOWS_SETUP@"
     InstallerSwitches:
-      Custom: /CURRENTUSER /TASKS="startmenu,addtopath" /ALIAS= /NOSELFUPDATE
+      Custom: /CURRENTUSER /TASKS="startmenu,addtopath" /ALIAS= /CHANNEL=winget
   - Architecture: x64
     Scope: machine
     InstallerUrl: https://github.com/Poulpi-Lab/GitPoulpi/releases/download/releases/v@VERSION@/gitpoulpi-@VERSION@-x86_64-pc-windows-msvc-setup.exe
     InstallerSha256: "@SHA256_WINDOWS_SETUP@"
     ElevationRequirement: elevatesSelf
     InstallerSwitches:
-      Custom: /ALLUSERS /TASKS="startmenu,addtopath" /ALIAS= /NOSELFUPDATE
+      Custom: /ALLUSERS /TASKS="startmenu,addtopath" /ALIAS= /CHANNEL=winget
 ManifestType: installer
 ManifestVersion: 1.6.0

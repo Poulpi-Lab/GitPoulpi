@@ -115,3 +115,38 @@ tempfile.workspace = true
 # The pty driver, for `tests/pty_ui_show.rs`: it runs the `gitpoulpi`
 # binary (the TUI when it gets no subcommand) in a terminal.
 xtask.workspace = true
+
+# `cargo deb --no-build` (release.yml, packaging/apt/): the release job fills `target/deb-stage` with the
+# archive's binaries plus a marker made by `xtask package-marker --channel apt`. The programs live in
+# /usr/lib/gitpoulpi next to the marker; the maintainer scripts link them into /usr/bin.
+[package.metadata.deb]
+name = "gitpoulpi"
+maintainer = "GitPoulpi contributors <noreply@users.noreply.github.com>"
+section = "vcs"
+priority = "optional"
+extended-description = "A Git client for the terminal with a clickable commit graph, a command palette, hosting integrations, a scriptable CLI and an MCP server."
+depends = "$auto, git"
+recommends = "git-lfs"
+maintainer-scripts = "../../packaging/apt/scripts"
+assets = [
+    ["../../target/deb-stage/gitpoulpi", "usr/lib/gitpoulpi/gitpoulpi", "755"],
+    ["../../target/deb-stage/gitpoulpi-tui", "usr/lib/gitpoulpi/gitpoulpi-tui", "755"],
+    ["../../target/deb-stage/gitpoulpi-mcp", "usr/lib/gitpoulpi/gitpoulpi-mcp", "755"],
+    ["../../target/deb-stage/gitpoulpi-launch", "usr/lib/gitpoulpi/gitpoulpi-launch", "755"],
+    ["../../target/deb-stage/gitpoulpi-updater", "usr/lib/gitpoulpi/gitpoulpi-updater", "755"],
+    ["../../target/deb-stage/.gitpoulpi-dist", "usr/lib/gitpoulpi/.gitpoulpi-dist", "644"],
+    ["../../LICENSE", "usr/share/doc/gitpoulpi/LICENSE", "644"],
+    ["../../target/deb-stage/THIRD-PARTY-LICENSES.txt", "usr/share/doc/gitpoulpi/THIRD-PARTY-LICENSES.txt", "644"],
+    ["../../README.md", "usr/share/doc/gitpoulpi/README.md", "644"],
+]
+
+# cargo-binstall downloads the release archive instead of compiling: the archive holds a folder
+# `gitpoulpi-<version>-<target>/` with the programs inside.
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/releases/v{ version }/gitpoulpi-{ version }-{ target }.tar.gz"
+pkg-fmt = "tgz"
+bin-dir = "gitpoulpi-{ version }-{ target }/{ bin }{ binary-ext }"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-url = "{ repo }/releases/download/releases/v{ version }/gitpoulpi-{ version }-{ target }.zip"
+pkg-fmt = "zip"

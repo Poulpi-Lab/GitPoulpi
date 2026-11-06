@@ -1,0 +1,9 @@
+#!/bin/sh
+# Links the programs into /usr/bin. They live in /usr/lib/gitpoulpi next to the .gitpoulpi-dist marker.
+set -e
+if [ "$1" = configure ]; then
+    for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch; do
+        ln -sf "/usr/lib/gitpoulpi/$bin" "/usr/bin/$bin"
+    done
+fi
+exit 0

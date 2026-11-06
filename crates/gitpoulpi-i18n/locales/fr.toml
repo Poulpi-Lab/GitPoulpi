@@ -5017,6 +5017,7 @@ send_failed = "connexion au démon perdue : envoi de la requête impossible : 
 timeout = "le démon n'a pas répondu à temps"
 embedded_failed = "le démon intégré n'a pas pu démarrer : {error}"
 link_panicked = "la liaison avec le démon s'est arrêtée de façon inattendue (son thread a paniqué)"
+updating = "GitPoulpi is updating, try again in a moment"
 runtime_failed = "impossible de démarrer le runtime de la liaison avec le démon : {error}"
 connect_failed = "connexion impossible au démon de la session (port {port}) : {error}"
 build_mismatch = "le démon de la session tourne avec une autre version (démon @{daemon}, cette fenêtre @{window}) - lancez `gitpoulpi daemon restart` pour utiliser le même code"

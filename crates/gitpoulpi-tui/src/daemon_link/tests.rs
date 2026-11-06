@@ -1398,3 +1398,37 @@ async fn two_polls_with_no_change_cause_no_layout_rebuild() {
     link.stop().await;
     daemon_handle.shutdown().await.unwrap();
 }
+
+/// A live update lock keeps the TUI from auto-starting its own daemon: the
+/// refusal is the localized status text, no daemon is started and no
+/// discovery file written. A stale lock, or none, does not refuse.
+#[tokio::test]
+async fn a_live_update_lock_refuses_the_embedded_daemon_start() {
+    use gitpoulpi_config::{update_lock, ConfigPaths};
+    let dir = tempfile::tempdir().unwrap();
+    let paths = ConfigPaths::for_dir(dir.path().join("cfg"));
+    let port_file = dir.path().join("session.port");
+    std::fs::create_dir_all(paths.update_lock_file().parent().unwrap()).unwrap();
+    std::fs::write(
+        paths.update_lock_file(),
+        update_lock::render(1, update_lock::now_secs()),
+    )
+    .unwrap();
+    let refused = conn::ensure_daemon_in(Some(&port_file), "update-lock-test", Some(&paths)).await;
+    assert_eq!(
+        refused,
+        Err(gitpoulpi_i18n::msg::link_error::UPDATING.get().to_string())
+    );
+    assert!(!port_file.exists(), "no daemon was started");
+
+    let now = update_lock::now_secs();
+    assert!(conn::refuse_while_updating(Some(&paths), None, now).is_err());
+    let stale = now + update_lock::STALE_AFTER_SECS + 5;
+    assert_eq!(
+        conn::refuse_while_updating(Some(&paths), None, stale),
+        Ok(())
+    );
+    std::fs::remove_file(paths.update_lock_file()).unwrap();
+    assert_eq!(conn::refuse_while_updating(Some(&paths), None, now), Ok(()));
+    assert_eq!(conn::refuse_while_updating(None, None, now), Ok(()));
+}

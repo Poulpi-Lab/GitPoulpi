@@ -153,10 +153,12 @@ fn serve() -> u16 {
     port
 }
 
-/// The version chip, the Release notes buttons: the hand; the release text:
-/// the arrow.
+/// The version chip and the update panel's Release notes button: the hand;
+/// the release text: the arrow. The build under test is a marker'd copy (a
+/// development build does not check for updates).
 #[test]
 fn the_version_chip_and_the_release_notes_buttons_show_the_pointing_hand() {
+    use gitpoulpi_config::release::{self, InstallChannel, Marker, MARKER_FILE};
     let port = serve();
     let repo = FixtureRepoBuilder::new()
         .unwrap()
@@ -164,12 +166,25 @@ fn the_version_chip_and_the_release_notes_buttons_show_the_pointing_hand() {
         .unwrap()
         .build();
     let config = tempfile::tempdir().unwrap();
+    let install = tempfile::tempdir().unwrap();
+    let exe = install.path().join("gitpoulpi-tui");
+    let built = env!("CARGO_BIN_EXE_gitpoulpi-tui");
+    if std::fs::hard_link(built, &exe).is_err() {
+        std::fs::copy(built, &exe).unwrap();
+    }
+    for sibling in ["gitpoulpi", "gitpoulpi-mcp"] {
+        std::fs::write(install.path().join(sibling), "#!/bin/sh\n").unwrap();
+    }
+    let mut marker = Marker::new(env!("CARGO_PKG_VERSION"), release::host_target());
+    marker.channel = Some(InstallChannel::Archive);
+    std::fs::write(install.path().join(MARKER_FILE), marker.render()).unwrap();
     let mut term = common::launch(repo.root())
         .session("pty-pointer-notes")
         .config_dir(config.path())
         .size(200, 50)
         .no_exit_pause()
         .mouse_capture()
+        .binary(&exe)
         .env("GITPOULPI_UPDATES_MODE", "notify")
         .env("GITPOULPI_UPDATE_API", format!("http://127.0.0.1:{port}"))
         .spawn();
@@ -180,6 +195,17 @@ fn the_version_chip_and_the_release_notes_buttons_show_the_pointing_hand() {
     let (col, row) = term.screen().find("v99.0.0 available").unwrap();
     hover(&mut term, "the version chip", (col + 1, row), "pointer");
     term.click(col + 1, row).unwrap();
+    // The chip opens the update panel; its Release notes button leads on.
+    term.wait_for("the update panel", STEP, |s| s.contains("Installed with:"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let notes_button = term.screen().find("Release notes").unwrap();
+    hover(
+        &mut term,
+        "the panel's Release notes",
+        (notes_button.0 + 1, notes_button.1),
+        "pointer",
+    );
+    term.click(notes_button.0 + 1, notes_button.1).unwrap();
     term.wait_for("the Release notes tab", STEP, |s| {
         s.contains("the shiny fake feature") && s.contains("Skip this version")
     })

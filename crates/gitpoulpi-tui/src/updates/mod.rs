@@ -161,6 +161,13 @@ fn plans_of(s: &Shared) -> plans::Plans {
     )
 }
 
+/// The hosts a download may use besides GitHub's: the policy's
+/// `download_base` mirror.
+#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+pub(crate) fn extra_download_hosts() -> Vec<String> {
+    effective(&shared()).download_base.into_iter().collect()
+}
+
 /// The user's settings and the machine policy combined.
 fn effective(s: &Shared) -> gitpoulpi_config::policy::EffectiveUpdates {
     gitpoulpi_config::policy::merge(
@@ -591,7 +598,7 @@ fn run_check(force: bool) -> Outcome {
         channel: eff.release_channel,
         target: gitpoulpi_config::release::host_target(),
         token: github_token(),
-        pin: eff.pin.as_ref().and_then(plans::pin_text),
+        pin: eff.pin.as_ref().map(ToString::to_string),
     };
     let spec = plans::choose_source(
         facts.as_ref(),

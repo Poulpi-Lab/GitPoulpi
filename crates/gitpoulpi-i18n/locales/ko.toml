@@ -5001,6 +5001,7 @@ send_failed = "데몬 연결이 끊어졌습니다: 요청을 보내지 못했�
 timeout = "데몬이 제때 응답하지 않았습니다"
 embedded_failed = "내장 데몬을 시작하지 못했습니다: {error}"
 link_panicked = "데몬 연결이 예기치 않게 중지되었습니다 (스레드가 panic됨)"
+updating = "GitPoulpi is updating, try again in a moment"
 runtime_failed = "데몬 연결의 런타임을 시작하지 못했습니다: {error}"
 connect_failed = "세션 데몬(포트 {port})에 연결하지 못했습니다: {error}"
 build_mismatch = "세션 데몬이 다른 빌드로 실행 중입니다 (데몬 @{daemon}, 이 창 @{window}) - 일치하는 코드를 사용하려면 `gitpoulpi daemon restart`를 실행하세요"

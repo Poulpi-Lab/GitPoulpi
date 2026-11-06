@@ -5009,6 +5009,7 @@ send_failed = "anslutningen till daemon förlorades: kunde inte skicka förfråg
 timeout = "daemon svarade inte i tid"
 embedded_failed = "den inbäddade daemon kunde inte starta: {error}"
 link_panicked = "daemon-länken stoppades oväntat (dess tråd panikade)"
+updating = "GitPoulpi is updating, try again in a moment"
 runtime_failed = "kunde inte starta daemon-länkens runtime: {error}"
 connect_failed = "kunde inte ansluta till sessionens daemon (port {port}): {error}"
 build_mismatch = "sessionens daemon kör en annan build (daemon @{daemon}, det här fönstret @{window}) - kör `gitpoulpi daemon restart` för att få matchande kod"

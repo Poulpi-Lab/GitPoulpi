@@ -499,13 +499,24 @@ fn download_and_stage(
     cancel: &AtomicBool,
     on_progress: fetch::OnProgress<'_>,
 ) -> Result<(), UpdateError> {
+    // The policy's `download_base` mirror is the one extra host allowed.
+    let mirror = super::extra_download_hosts();
     let transport = gitpoulpi_hosting::ReqwestTransport::new()
-        .map_err(|e| UpdateError::Download(e.to_string()))?;
+        .map_err(|e| UpdateError::Download(e.to_string()))?
+        .with_download_hosts(mirror.clone());
     if cache {
         let dir = handoff::paths()
             .map(|p| p.download)
             .ok_or_else(|| UpdateError::Download("no data folder for the download".into()))?; // i18n-english
-        let path = fetch_to_cache(&transport, release, updatable, &dir, cancel, on_progress)?;
+        let path = fetch_to_cache(
+            &transport,
+            release,
+            updatable,
+            &dir,
+            cancel,
+            on_progress,
+            &mirror,
+        )?;
         let sha_url = release
             .checksum
             .as_ref()
@@ -514,7 +525,15 @@ fn download_and_stage(
         shared().install.cached = Some((path, sha_url));
         return Ok(());
     }
-    fetch_and_stage(&transport, &RealFs, release, updatable, cancel, on_progress)
+    fetch_and_stage(
+        &transport,
+        &RealFs,
+        release,
+        updatable,
+        cancel,
+        on_progress,
+        &mirror,
+    )
 }
 
 #[cfg(not(feature = "hosting"))]
@@ -548,14 +567,16 @@ pub(super) fn fetch_and_stage(
     updatable: &Updatable,
     cancel: &AtomicBool,
     on_progress: fetch::OnProgress<'_>,
+    extra_hosts: &[String],
 ) -> Result<(), UpdateError> {
     let target = &updatable.marker.target;
-    let bytes = runtime()?.block_on(fetch::download_verified(
+    let bytes = runtime()?.block_on(fetch::download_verified_with(
         transport,
         release,
         target,
         cancel,
         on_progress,
+        extra_hosts,
     ))?;
     let files = archive::extract(&bytes, &release.version, target)?;
     if !files.iter().any(|f| f.name == updatable.exe_name) {
@@ -582,14 +603,16 @@ pub(super) fn fetch_to_cache(
     dir: &std::path::Path,
     cancel: &AtomicBool,
     on_progress: fetch::OnProgress<'_>,
+    extra_hosts: &[String],
 ) -> Result<PathBuf, UpdateError> {
     let target = &updatable.marker.target;
-    let bytes = runtime()?.block_on(fetch::download_verified(
+    let bytes = runtime()?.block_on(fetch::download_verified_with(
         transport,
         release,
         target,
         cancel,
         on_progress,
+        extra_hosts,
     ))?;
     let files = archive::extract(&bytes, &release.version, target)?;
     if !files.iter().any(|f| f.name == updatable.exe_name) {

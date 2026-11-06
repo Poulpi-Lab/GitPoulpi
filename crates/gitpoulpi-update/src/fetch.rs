@@ -14,7 +14,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use gitpoulpi_config::release;
 use gitpoulpi_hosting::http::{HttpRequest, HttpTransport};
-use gitpoulpi_hosting::updates::{download_host_allowed, Asset, Release};
+use gitpoulpi_hosting::updates::{download_host_allowed_with, Asset, Release};
 use sha2::{Digest, Sha256};
 
 use crate::{Result, UpdateError};
@@ -56,14 +56,16 @@ pub fn parse_checksum(text: &str, archive: &str) -> Result<String> {
     Ok(hash)
 }
 
-fn check_asset(asset: &Asset, expected: &str) -> Result<()> {
+/// `asset` is the expected file on an allowed host: GitHub's, or one of
+/// `extra_hosts` (the policy's `download_base` mirror).
+fn check_asset(asset: &Asset, expected: &str, extra_hosts: &[String]) -> Result<()> {
     if asset.name != expected {
         return Err(UpdateError::WrongAsset {
             expected: expected.to_string(),
             found: asset.name.clone(),
         });
     }
-    if !download_host_allowed(&asset.url) {
+    if !download_host_allowed_with(&asset.url, extra_hosts) {
         return Err(UpdateError::Download(format!(
             "{} is not a GitHub release host",
             asset.url
@@ -82,13 +84,26 @@ pub async fn download_verified(
     cancel: &AtomicBool,
     on_progress: OnProgress<'_>,
 ) -> Result<Vec<u8>> {
+    download_verified_with(transport, release, target, cancel, on_progress, &[]).await
+}
+
+/// [`download_verified`] that also accepts assets on `extra_hosts`: the
+/// update policy's `download_base` mirror. Nothing else widens the hosts.
+pub async fn download_verified_with(
+    transport: &dyn HttpTransport,
+    release: &Release,
+    target: &str,
+    cancel: &AtomicBool,
+    on_progress: OnProgress<'_>,
+    extra_hosts: &[String],
+) -> Result<Vec<u8>> {
     let archive_name = release::archive_name(&release.version, target);
     let asset = release.asset.as_ref().ok_or_else(|| {
         UpdateError::Download(format!("this release has no {archive_name} to download"))
     })?;
     let checksum = release.checksum.as_ref().ok_or(UpdateError::NoChecksum)?;
-    check_asset(asset, &archive_name)?;
-    check_asset(checksum, &format!("{archive_name}.sha256"))?;
+    check_asset(asset, &archive_name, extra_hosts)?;
+    check_asset(checksum, &format!("{archive_name}.sha256"), extra_hosts)?;
 
     let flag = |_: u64, _: Option<u64>| !cancel.load(Ordering::SeqCst);
     // The checksum first: a missing or odd one stops before the big download.
@@ -257,6 +272,32 @@ mod tests {
         let err = run(&transport, &release, &AtomicBool::new(false)).unwrap_err();
         assert!(matches!(err, UpdateError::Download(_)), "{err:?}");
         assert!(transport.requests().is_empty());
+    }
+
+    #[test]
+    fn a_policy_mirror_is_allowed_only_when_it_is_given() {
+        let bytes = archive_for("0.2.0", LINUX);
+        let name = release::archive_name("0.2.0", LINUX);
+        let sum = format!("{}  {name}\n", sha256_hex(&bytes));
+        let release = release_for("0.2.0", LINUX, "https://mirror.example/gp/a.tar.gz");
+        let mirror = vec!["https://mirror.example/gp/".to_string()];
+        let go = |hosts: &[String]| {
+            tokio::runtime::Builder::new_current_thread()
+                .build()
+                .unwrap()
+                .block_on(download_verified_with(
+                    &served(&bytes, &sum),
+                    &release,
+                    LINUX,
+                    &AtomicBool::new(false),
+                    &|_, _| {},
+                    hosts,
+                ))
+        };
+        assert!(matches!(go(&[]).unwrap_err(), UpdateError::Download(_)));
+        assert_eq!(go(&mirror).unwrap(), bytes);
+        let other = vec!["https://other.example/".to_string()];
+        assert!(matches!(go(&other).unwrap_err(), UpdateError::Download(_)));
     }
 
     #[test]

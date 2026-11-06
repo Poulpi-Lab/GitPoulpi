@@ -4998,6 +4998,7 @@ send_failed = "соединение с демоном потеряно: не у�
 timeout = "демон не ответил вовремя"
 embedded_failed = "встроенный демон не запустился: {error}"
 link_panicked = "связь с демоном неожиданно остановилась (её поток завершился аварийно)"
+updating = "GitPoulpi is updating, try again in a moment"
 runtime_failed = "не удалось запустить среду выполнения связи с демоном: {error}"
 connect_failed = "не удалось подключиться к демону сеанса (порт {port}): {error}"
 build_mismatch = "демон сеанса работает на другой сборке (демон @{daemon}, это окно @{window}) - выполните `gitpoulpi daemon restart`, чтобы подтянуть соответствующий код"

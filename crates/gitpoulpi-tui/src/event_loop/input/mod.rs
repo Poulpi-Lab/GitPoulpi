@@ -254,14 +254,19 @@ fn handle_mouse_inner(
         apply_update_panel(cx, event);
         return Ok(Flow::Handled);
     }
-    // The version chip in the title bar: the update panel.
+    // The version chip in the title bar: the update panel when a release is
+    // announced, else the Release notes tab.
     // Settings covers the status bar: its stale chip rect must not take a click.
     if crate::updates::chip::route_mouse(mouse)
         && matches!(*cx.input_mode, InputMode::Normal)
         && cx.preferences.is_none()
     {
         *cx.hovered_target = None;
-        crate::updates::panel::open();
+        if crate::updates::chip::opens_panel() {
+            crate::updates::panel::open();
+        } else {
+            apply_update_panel(cx, crate::updates::panel::Event::ReleaseNotes);
+        }
         return Ok(Flow::Handled);
     }
     match &*cx.input_mode {

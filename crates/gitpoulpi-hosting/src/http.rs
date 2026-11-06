@@ -401,6 +401,9 @@ fn is_loopback_host(host: &str) -> bool {
 #[cfg(feature = "network")]
 pub struct ReqwestTransport {
     client: reqwest::Client,
+    /// Extra hosts `download` may fetch from (the update policy's
+    /// `download_base` mirror); empty unless the caller names one.
+    download_hosts: std::sync::Arc<Vec<String>>,
 }
 
 #[cfg(feature = "network")]
@@ -425,7 +428,19 @@ impl ReqwestTransport {
             .pool_max_idle_per_host(0)
             .build()
             .map_err(|e| Error::Http(e.to_string()))?;
-        Ok(Self { client })
+        Ok(Self {
+            client,
+            download_hosts: std::sync::Arc::default(),
+        })
+    }
+
+    /// Lets [`HttpTransport::download`] fetch from `hosts` as well as the
+    /// GitHub release hosts (URLs or bare hosts; see
+    /// [`crate::updates::download_host_allowed_with`]).
+    #[must_use]
+    pub fn with_download_hosts(mut self, hosts: Vec<String>) -> Self {
+        self.download_hosts = std::sync::Arc::new(hosts);
+        self
     }
 }
 
@@ -475,7 +490,7 @@ impl HttpTransport for ReqwestTransport {
     /// hosts [`crate::updates::download_host_allowed`] names (a release asset
     /// redirects to GitHub's CDN), and the first URL must be one of them too.
     async fn download(&self, request: HttpRequest, progress: &Progress<'_>) -> Result<Vec<u8>> {
-        if !crate::updates::download_host_allowed(&request.url) {
+        if !crate::updates::download_host_allowed_with(&request.url, &self.download_hosts) {
             return Err(Error::Http(format!(
                 "refusing to download from {}: not a GitHub release host",
                 request.url
@@ -484,10 +499,11 @@ impl HttpTransport for ReqwestTransport {
         if let Some(why) = external_host_refusal(&request.url) {
             return Err(Error::Http(why));
         }
-        let policy = reqwest::redirect::Policy::custom(|attempt| {
+        let hosts = self.download_hosts.clone();
+        let policy = reqwest::redirect::Policy::custom(move |attempt| {
             if attempt.previous().len() >= 5 {
                 attempt.error("too many redirects")
-            } else if crate::updates::download_host_allowed(attempt.url().as_str()) {
+            } else if crate::updates::download_host_allowed_with(attempt.url().as_str(), &hosts) {
                 attempt.follow()
             } else {
                 let host = attempt.url().host_str().unwrap_or("?").to_string();

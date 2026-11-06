@@ -95,7 +95,27 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host 'WARNING: git-lfs is not installed; the LFS checks will be SKIPPED.' -ForegroundColor Yellow
 }
 
-Invoke-Gate 'fmt'    @('cargo', 'fmt', '--all', '--check')
+# `cargo fmt --all` hands rustfmt every source file on one command line, which
+# Windows refuses past ~32k characters (os error 206): check one package at a
+# time instead (same files, same verdict).
+function Invoke-FmtCheck {
+    $meta = cargo metadata --no-deps --format-version 1 | ConvertFrom-Json
+    if ($LASTEXITCODE -ne 0) { return $LASTEXITCODE }
+    foreach ($name in ($meta.packages | ForEach-Object { $_.name } | Sort-Object)) {
+        & cargo fmt -p $name --check
+        if ($LASTEXITCODE -ne 0) { return $LASTEXITCODE }
+    }
+    return 0
+}
+Write-Host '==> fmt' -ForegroundColor Cyan
+$fmtStarted = Get-Date
+$fmtCode = Invoke-FmtCheck
+if ($fmtCode -ne 0) {
+    Write-Host 'FAILED: fmt' -ForegroundColor Red
+    exit $fmtCode
+}
+Write-Host ("    ok in {0:n0}s" -f ((Get-Date) - $fmtStarted).TotalSeconds) -ForegroundColor Green
+$ran.Add('fmt')
 if ($Failed -and -not $Clippy) {
     $skipped.Add('clippy (fix loop: -Failed without -Clippy)')
 } else {

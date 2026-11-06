@@ -1295,7 +1295,7 @@ La paleta tiene las mismas acciones, por ejemplo
 
 | Tecla | Acción |
 |---|---|
-| `Ctrl+O`, o un clic en `⌂` | Ir a la pestaña Inicio (en la pestaña Inicio: dar el foco al campo de búsqueda) |
+| `Ctrl+O`, o un clic en `⌂` | Ir a la pestaña Inicio (en la pestaña Inicio: dar el foco al campo de búsqueda; con el Radar o las notas de la versión abiertos: ciérralos primero) |
 | `Ctrl+Shift+N` | Abrir la pestaña Inicio con el diálogo Clonar |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Pestaña siguiente / anterior |
 | `t` | Elegir una pestaña en una lista filtrable |

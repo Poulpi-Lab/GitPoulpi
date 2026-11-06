@@ -245,7 +245,7 @@ The list of a profile you have opened before shows at once from a saved copy
 while the host is asked again (*refreshing...* next to the label); when the
 answer lands, new repositories appear and gone ones disappear, and the
 highlighted and chosen repository stay where they are. If the refresh fails, the
-saved list stays with a note, the reason is in the Activity Log.
+saved list stays with a note, and the reason is in the Activity Log.
 
 If the host refuses the token, the dialog shows *could not list repositories*
 with the reason in place of the list (and the saved copy is deleted); the other

@@ -427,6 +427,7 @@ conservati in `[[ai.legacy_presets]]`. Per tutto il resto: [Assistenza IA](ai.md
 | Chiave | Predefinito | Valori ed effetto |
 |---|---|---|
 | `repos.clone_root` | `""` | Da dove parte la finestra Clona; vuoto = `%USERPROFILE%\source\repos` o `~/src`. |
+| `repos.clone_start_source` | `"last"` | L'origine su cui si apre la finestra Clona: `last` (predefinito, o vuoto) = quella mostrata alla precedente chiusura, `url` = sempre Clona con URL, oppure l'id di un profilo di integrazione (`id` nella sua voce `[[integrations]]`). Un profilo scomparso, disattivato o non collegato ripiega su Clona con URL. L'ultima origine in sé è uno stato, conservato in `clone-source.toml` nella cartella di configurazione, non qui. |
 | `repos.browse_root` | `""` | Dove si apre Sfoglia; vuoto = l'ultima cartella scelta, poi la home. |
 | `repos.show_hidden` | `false` | Il selettore di cartelle mostra le cartelle nascoste (`Alt+H` lo commuta e lo salva). |
 | `repos.show_siblings` | `false` | L'albero a sinistra del selettore di cartelle elenca anche le altre cartelle di ogni livello aperto, come una vera gerarchia (`Alt+S` lo commuta e lo salva). |

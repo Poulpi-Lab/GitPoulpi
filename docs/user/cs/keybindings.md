@@ -1286,7 +1286,7 @@ Paleta má stejné akce, například `Navigace: Přejít na Refs > Lokální` ne
 
 | Klávesa | Akce |
 |---|---|
-| `Ctrl+O`, nebo klik na `⌂` | Přejít na kartu Domů (na kartě Domů: zaostřit vyhledávací pole) |
+| `Ctrl+O`, nebo klik na `⌂` | Přejít na kartu Domů (na kartě Domů: zaostřit vyhledávací pole; s otevřeným Radarem nebo poznámkami k vydání: nejprve je zavřít) |
 | `Ctrl+Shift+N` | Otevřít kartu Domů s dialogem Klonovat |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Další / předchozí karta |
 | `t` | Zvolit kartu z filtrovatelného seznamu |

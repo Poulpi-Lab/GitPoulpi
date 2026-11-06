@@ -358,6 +358,7 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | 键 | 默认值 | 取值与作用 |
 |---|---|---|
 | `repos.clone_root` | `""` | 克隆对话框的起始位置；留空 = `%USERPROFILE%\source\repos` 或 `~/src`。 |
+| `repos.clone_start_source` | `"last"` | 克隆对话框打开时所在的来源：`last`（默认，或留空）= 它上次关闭时显示的来源，`url` = 始终为“通过 URL 克隆”，或某个集成配置的 id（其 `[[integrations]]` 条目中的 `id`）。已不存在、已禁用或未连接的配置会回退到“通过 URL 克隆”。上次的来源本身属于状态，保存在配置文件夹的 `clone-source.toml` 中，而不是这里。 |
 | `repos.browse_root` | `""` | “浏览”打开的位置；留空 = 上次选择的文件夹，然后是主目录。 |
 | `repos.show_hidden` | `false` | 文件夹选择器显示隐藏文件夹（`Alt+H` 切换并保存）。 |
 | `repos.show_siblings` | `false` | 文件夹选择器的左侧树还会以真实层级列出每一级已展开目录中的其他文件夹（`Alt+S` 切换并保存）。 |

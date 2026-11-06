@@ -227,7 +227,9 @@ Das Suchfeld filtert über alle Abschnitte hinweg (Name, vollständiger Pfad und
 
 ![Der Dialog Klonen, die Suche grenzt die Liste auf eine Organisation ein](../images/clone-hosted-search.png)
 
-Lehnt der Host das Token ab, zeigt der Dialog anstelle der Liste *Repositories konnten nicht aufgelistet werden* mit dem Grund; die anderen Quellen funktionieren weiter.
+Die Liste eines Profils, das Sie schon einmal geöffnet haben, erscheint sofort aus einer gespeicherten Kopie, während der Host erneut gefragt wird (*wird aktualisiert...* neben der Beschriftung); sobald die Antwort eintrifft, erscheinen neue Repositories und verschwundene fallen weg, und das markierte und das gewählte Repository bleiben, wo sie sind. Schlägt die Aktualisierung fehl, bleibt die gespeicherte Liste mit einem Hinweis stehen, und der Grund steht im Aktivitätsprotokoll.
+
+Lehnt der Host das Token ab, zeigt der Dialog anstelle der Liste *Repositories konnten nicht aufgelistet werden* mit dem Grund (und die gespeicherte Kopie wird gelöscht); die anderen Quellen funktionieren weiter.
 
 ## 5. Pull Requests und Issues in der Seitenleiste
 

@@ -229,7 +229,9 @@ Het zoekveld filtert over alle secties heen (naam, volledig pad en beschrijving)
 
 ![Het dialoogvenster Klonen, waarbij de zoekopdracht de lijst tot een organisatie beperkt](../images/clone-hosted-search.png)
 
-Weigert de host het token, dan toont het dialoogvenster in plaats van de lijst *kon repositories niet weergeven* met de reden; de andere bronnen blijven werken.
+De lijst van een profiel dat je eerder hebt geopend, verschijnt meteen uit een opgeslagen kopie terwijl de host opnieuw wordt gevraagd (*vernieuwen...* naast het label); zodra het antwoord binnen is, verschijnen nieuwe repositories en verdwijnen verdwenen, en blijven de gemarkeerde en gekozen repository waar ze zijn. Mislukt het vernieuwen, dan blijft de opgeslagen lijst staan met een opmerking, en de reden staat in het activiteitenlogboek.
+
+Weigert de host het token, dan toont het dialoogvenster in plaats van de lijst *kon repositories niet weergeven* met de reden (en de opgeslagen kopie wordt verwijderd); de andere bronnen blijven werken.
 
 ## 5. Pull requests en issues in de zijbalk
 

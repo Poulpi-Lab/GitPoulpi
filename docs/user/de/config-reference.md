@@ -427,6 +427,7 @@ aufbewahrt. Alles andere: [KI-Unterstützung](ai.md).
 | Schlüssel | Standard | Werte und Wirkung |
 |---|---|---|
 | `repos.clone_root` | `""` | Wo der Klon-Dialog beginnt; leer = `%USERPROFILE%\source\repos` oder `~/src`. |
+| `repos.clone_start_source` | `"last"` | Die Quelle, bei der der Klon-Dialog beginnt: `last` (Standard, oder leer) = die Quelle, die beim letzten Schließen angezeigt wurde, `url` = immer Per URL klonen, oder die ID eines Integrationsprofils (`id` in seinem `[[integrations]]`-Eintrag). Ein Profil, das fehlt, deaktiviert oder nicht verbunden ist, fällt auf Per URL klonen zurück. Die letzte Quelle selbst ist Zustand und steht in `clone-source.toml` im Konfigurationsordner, nicht hier. |
 | `repos.browse_root` | `""` | Wo Durchsuchen sich öffnet; leer = der zuletzt gewählte Ordner, dann Home. |
 | `repos.show_hidden` | `false` | Die Ordnerauswahl zeigt versteckte Ordner (`Alt+H` schaltet um und speichert es). |
 | `repos.show_siblings` | `false` | Der linke Baum der Ordnerauswahl listet auch die anderen Ordner jeder geöffneten Ebene, als echte Hierarchie (`Alt+S` schaltet um und speichert es). |

@@ -1285,7 +1285,7 @@ A paleta tem as mesmas ações, por exemplo
 
 | Tecla | Ação |
 |---|---|
-| `Ctrl+O`, ou um clique em `⌂` | Ir para o separador Início (no separador Início: focar o campo de pesquisa) |
+| `Ctrl+O`, ou um clique em `⌂` | Ir para o separador Início (no separador Início: focar o campo de pesquisa; com o Radar ou as notas de versão abertos: fechá-lo primeiro) |
 | `Ctrl+Shift+N` | Abrir o separador Início com o diálogo Clonar |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Separador seguinte / anterior |
 | `t` | Escolher um separador a partir de uma lista filtrável |

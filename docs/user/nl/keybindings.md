@@ -1292,7 +1292,7 @@ Het palet heeft dezelfde acties, bijvoorbeeld
 
 | Toets | Actie |
 |---|---|
-| `Ctrl+O`, of een klik op `⌂` | Naar het tabblad Start gaan (op het tabblad Start: focus op het zoekveld) |
+| `Ctrl+O`, of een klik op `⌂` | Naar het tabblad Start gaan (op het tabblad Start: focus op het zoekveld; met de Radar of de Releasenotes open: sluit die eerst) |
 | `Ctrl+Shift+N` | Het tabblad Start openen met het kloondialoogvenster |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Volgend / vorig tabblad |
 | `t` | Een tabblad kiezen uit een filterbare lijst |

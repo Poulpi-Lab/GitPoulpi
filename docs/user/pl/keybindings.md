@@ -1288,7 +1288,7 @@ Paleta ma te same akcje, na przykład
 
 | Klawisz | Działanie |
 |---|---|
-| `Ctrl+O` albo kliknięcie `⌂` | Przechodzi na kartę Home (na karcie Home: fokus na polu wyszukiwania) |
+| `Ctrl+O` albo kliknięcie `⌂` | Przechodzi na kartę Home (na karcie Home: fokus na polu wyszukiwania; przy otwartym Radarze lub otwartych informacjach o wersji: najpierw je zamyka) |
 | `Ctrl+Shift+N` | Otwiera kartę Home z oknem Klonuj |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Następna / poprzednia karta |
 | `t` | Wybiera kartę z filtrowalnej listy |

@@ -624,9 +624,14 @@ Werkbank mit einer neuen Skriptregel und geöffnetem Dialog öffnet. Vor dem Dr�
   neuesten 20), damit das Modell sieht, wie Ihre Daten aussehen. Nie Dateiinhalte oder
   Commit-Nachrichten außer dem Betreff. Bei ausgeschaltetem Kästchen verlassen keine Commit-Daten
   den Rechner.
-- **Was gesendet wird** listet die Anweisungen (den festen Skriptvertrag, dann Ihre KI-Anweisungen)
-  und Ihre Anfrage und nennt das Profil, das sie erhält. `Tab` wechselt dorthin, die Pfeile
-  scrollen.
+- **Was gesendet wird** ist ein schreibgeschütztes Feld auf etwas dunklerem Hintergrund, beim
+  Öffnen des Dialogs eingeklappt (der Dialog ist dann kurz). Klicken Sie auf seine Kopfzeile,
+  drücken Sie `Alt+W` oder wechseln Sie mit `Tab` dorthin und drücken Sie `Enter`, um es
+  anzuzeigen: Es listet die Anweisungen (den festen Skriptvertrag, dann Ihre KI-Anweisungen) und
+  Ihre Anfrage und hat eine eigene Bildlaufleiste (ziehen Sie sie, nutzen Sie das Mausrad über dem
+  Feld oder, solange es den Fokus hat, die Pfeile, `PageUp`, `PageDown`, `Home` und `End`). Das
+  Profil, das sie erhält, steht in der Zeile darüber. Der Dialog wächst mit dem Feld, im Rahmen des
+  Bildschirms.
 - **Senden** (`Tab` dorthin, `Enter`). Während das Modell arbeitet, wartet der Dialog, und `Esc`
   bricht die Anfrage ab. Schlägt sie fehl, bleibt der Dialog mit dem Grund offen, damit Sie es
   erneut versuchen können.
@@ -669,8 +674,15 @@ genauen Text, der hinausgeht.
 - **Aktuelle Regeln ersetzen** (nur, wenn die Werkbank schon Regeln enthält; aus): Standardmäßig
   werden die neuen Regeln nach Ihren vorhandenen angefügt; angekreuzt ersetzen sie diese (den
   Umfang und die Einstellungen aus der Antwort übernimmt die Werkbank in beiden Fällen).
-- **Was gesendet wird** listet die Anweisungen (das Regelvokabular, dann Ihre KI-Anweisungen), Ihre
-  Anfrage und das Profil, das sie erhält. `Tab` wechselt dorthin, die Pfeile scrollen.
+- **Was gesendet wird** ist ein schreibgeschütztes Feld auf etwas dunklerem Hintergrund, abgesetzt
+  von den Feldern darüber, und beim Öffnen des Dialogs **eingeklappt** (der Dialog ist dann kurz).
+  Klicken Sie auf seine Kopfzeile, drücken Sie `Alt+W` oder wechseln Sie mit `Tab` dorthin und
+  drücken Sie `Enter`, um es anzuzeigen: Es listet die Anweisungen (das Regelvokabular, dann Ihre
+  KI-Anweisungen) und Ihre Anfrage und hat eine eigene Bildlaufleiste (ziehen Sie sie, nutzen Sie
+  das Mausrad über dem Feld oder, solange es den Fokus hat, die Pfeile, `PageUp`, `PageDown`,
+  `Home` und `End`). Das Profil, das sie erhält, steht in der Zeile darüber. Der Dialog wächst mit
+  dem Feld, im Rahmen des Bildschirms. Das Beschreibungsfeld bekommt eine eigene Bildlaufleiste,
+  wenn der Text es überragt.
 
 Das Modell darf jede Regelart dieser Seite verwenden außer **Skript** (Code: *Ein Skript mit KI
 schreiben* zeigt das Skript zur Prüfung) und der Form für geheime Werte von *In Dateien suchen und

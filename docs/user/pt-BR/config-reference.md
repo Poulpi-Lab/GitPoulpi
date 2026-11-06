@@ -448,6 +448,7 @@ Um perfil chamado *Default* é criado quando não há nenhum. Arquivos antigos c
 | Chave | Padrão | Valores e efeito |
 |---|---|---|
 | `repos.clone_root` | `""` | Onde o diálogo Clonar começa; vazio = `%USERPROFILE%\source\repos` ou `~/src`. |
+| `repos.clone_start_source` | `"last"` | A fonte em que o diálogo Clonar abre: `last` (padrão, ou vazio) = a que ele mostrava quando foi fechado pela última vez, `url` = sempre Clonar por URL, ou o id de um perfil de integração (`id` na sua entrada `[[integrations]]`). Um perfil que não existe mais, está desativado ou não está conectado volta para Clonar por URL. A última fonte em si é estado, guardado em `clone-source.toml` na pasta de configuração, não aqui. |
 | `repos.browse_root` | `""` | Onde Procurar abre; vazio = a última pasta escolhida, depois a pasta pessoal. |
 | `repos.show_hidden` | `false` | O seletor de pastas mostra pastas ocultas (`Alt+H` alterna e salva). |
 | `repos.show_siblings` | `false` | A árvore da esquerda do seletor de pastas também lista as outras pastas de cada nível aberto, como uma hierarquia real (`Alt+S` alterna e salva). |

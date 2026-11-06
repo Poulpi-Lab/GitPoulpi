@@ -223,7 +223,14 @@ Vyhledávací pole filtruje napříč sekcemi (název, úplná cesta a popis); s
 
 ![Dialog Klonovat s vyhledáváním zúženým na jednu organizaci](../images/clone-hosted-search.png)
 
-Pokud hostitel token odmítne, dialog místo seznamu zobrazí *nelze vypsat repozitáře* s důvodem; ostatní zdroje fungují dál.
+Seznam profilu, který jste už otevřeli, se zobrazí okamžitě z uložené kopie,
+zatímco se hostitel znovu dotazuje (*obnovování...* vedle popisku); když odpověď
+dorazí, nové repozitáře se objeví a zmizelé zmizí, a zvýrazněný i zvolený
+repozitář zůstanou na svém místě. Pokud obnovení selže, uložený seznam zůstane
+s poznámkou a důvod je v Protokolu aktivity.
+
+Pokud hostitel token odmítne, dialog místo seznamu zobrazí *nelze vypsat repozitáře*
+s důvodem (a uložená kopie se smaže); ostatní zdroje fungují dál.
 
 ## 5. Pull requesty a issues v postranním panelu
 

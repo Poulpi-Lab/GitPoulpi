@@ -1294,7 +1294,7 @@ La palette ha le stesse azioni, per esempio
 
 | Tasto | Azione |
 |---|---|
-| `Ctrl+O`, o un clic su `⌂` | Va alla scheda Home (nella scheda Home: dà il focus al campo di ricerca) |
+| `Ctrl+O`, o un clic su `⌂` | Va alla scheda Home (nella scheda Home: dà il focus al campo di ricerca; con il Radar o le note di rilascio aperti: chiudili prima) |
 | `Ctrl+Shift+N` | Apre la scheda Home con la finestra Clona |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Scheda successiva / precedente |
 | `t` | Sceglie una scheda da un elenco filtrabile |

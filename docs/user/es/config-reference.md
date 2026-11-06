@@ -424,6 +424,7 @@ Se crea un perfil llamado *Default* cuando no hay ninguno. Los antiguos archivos
 | Clave | Por defecto | Valores y efecto |
 |---|---|---|
 | `repos.clone_root` | `""` | Dónde empieza el diálogo Clonar; vacío = `%USERPROFILE%\source\repos` o `~/src`. |
+| `repos.clone_start_source` | `"last"` | La fuente con la que se abre el diálogo Clonar: `last` (por defecto, o vacío) = la que mostraba al cerrarse por última vez, `url` = siempre Clonar con URL, o el id de un perfil de integración (`id` en su entrada `[[integrations]]`). Un perfil que ya no existe, está desactivado o no está conectado vuelve a Clonar con URL. La última fuente en sí es estado, se guarda en `clone-source.toml` en la carpeta de configuración, no aquí. |
 | `repos.browse_root` | `""` | Dónde se abre Examinar; vacío = la última carpeta elegida, luego la carpeta personal. |
 | `repos.show_hidden` | `false` | El selector de carpetas muestra las carpetas ocultas (`Alt+H` lo alterna y lo guarda). |
 | `repos.show_siblings` | `false` | El árbol izquierdo del selector de carpetas también lista las demás carpetas de cada nivel abierto, como una jerarquía real (`Alt+S` lo alterna y lo guarda). |

@@ -312,10 +312,10 @@ allow_ui_propose_help = { git = "Увімк.: ШІ-агент може відк�
 clone_root = "Типова папка клонування"
 clone_root_help = "Звідки починається «Куди клонувати» в діалозі клонування. Порожньо - типове для ОС: %USERPROFILE%\\source\\repos у Windows, ~/src в інших."
 # context: setting: which source the Clone dialog opens on (Last used, Clone with URL, or an integration)
-clone_start_source = "Clone dialog starts on"
-clone_start_source_help = "The source the Clone dialog opens on. Last used reopens the one it showed when it was last closed; Clone with URL always starts on the URL form; or pick one of your connected integrations. A source that is no longer available means Clone with URL."
+clone_start_source = "Діалог клонування починається з"
+clone_start_source_help = "Джерело, з якого відкривається діалог клонування. «Останнє використане» відкриває те, яке він показував під час останнього закриття; «Клонувати за URL» завжди починає з форми URL; або виберіть одну з підключених інтеграцій. Якщо джерело вже недоступне, діалог переходить на «Клонувати за URL»."
 # context: option of the "Clone dialog starts on" setting: the source shown when the dialog was last closed
-clone_start_last = "Last used"
+clone_start_last = "Останнє використане"
 browse_root = "Типова папка огляду"
 browse_root_help = "Де відкривається огляд (вибір папки на вкладці «Головна»). Порожньо: остання вибрана папка, а за першого разу - домашня."
 heading_auto_stash = { git = "Auto-stash", local = "Автосхованка" }
@@ -1070,9 +1070,9 @@ no_repos = "в цього облікового запису немає репо�
 no_match = "жоден репозиторій не підходить"
 loading = "завантаження репозиторіїв..."
 list_failed = "не вдалося отримати список репозиторіїв: {why}"
-refreshing = "refreshing..."
-refresh_failed = "saved list (refresh failed, see Activity)"
-chosen_gone = "{name} is no longer on the host"
+refreshing = "оновлення..."
+refresh_failed = "збережений список (оновлення не вдалося, див. Журнал активності)"
+chosen_gone = "{name} більше немає на хості"
 cloning = "Клонування..."
 go = "Клонувати"
 hint_clone = "клонувати"
@@ -8211,7 +8211,7 @@ dlg_sample = { one = { git = "Надіслати зразок із {n} commit'у
 dlg_sample_off = { git = "Вимкнено: дані про commit'и не надсилаються, лише ваш запит.", local = "Вимкнено: дані про коміти не надсилаються, лише ваш запит." }
 dlg_sample_none = { git = "У Log немає commit'ів для зразка.", local = "У Log немає комітів для зразка." }
 dlg_sent_label = "Що надсилається"
-dlg_sent_key = "Alt+W: show or hide"
+dlg_sent_key = "Alt+W: показати або сховати"
 dlg_sent_system = "Інструкції для моделі:"
 dlg_sent_user = "Ваш запит:"
 dlg_profile = "Куди: {name}"

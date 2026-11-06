@@ -404,6 +404,7 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | 키 | 기본값 | 값과 효과 |
 |---|---|---|
 | `repos.clone_root` | `""` | 클론 대화상자가 시작하는 위치. 비어 있으면 `%USERPROFILE%\source\repos` 또는 `~/src`. |
+| `repos.clone_start_source` | `"last"` | 클론 대화상자가 처음 여는 소스: `last`(기본값, 비어 있어도 같음) = 대화상자를 마지막으로 닫았을 때 보이던 소스, `url` = 항상 URL로 클론, 또는 연동 프로필 id(`[[integrations]]` 항목의 `id`). 사라졌거나 비활성이거나 연결되지 않은 프로필은 URL로 클론으로 돌아갑니다. 마지막 소스 자체는 상태이며 여기가 아니라 설정 폴더의 `clone-source.toml`에 저장됩니다. |
 | `repos.browse_root` | `""` | 찾아보기가 여는 위치. 비어 있으면 마지막으로 선택한 폴더, 그다음 홈. |
 | `repos.show_hidden` | `false` | 폴더 선택기가 숨김 폴더를 표시합니다(`Alt+H`로 전환하고 저장). |
 | `repos.show_siblings` | `false` | 폴더 선택기의 왼쪽 트리에 열린 모든 단계의 다른 폴더도 실제 계층으로 표시합니다(`Alt+S`로 전환하고 저장). |

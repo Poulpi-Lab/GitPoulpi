@@ -418,6 +418,7 @@ Een profiel met de naam *Default* wordt gemaakt als er geen is. Oude bestanden m
 
 | Sleutel | Standaard | Waarden en effect |
 |---|---|---|
+| `repos.clone_start_source` | `"last"` | De bron waarop het dialoogvenster Klonen opent: `last` (standaard, of leeg) = de bron die het toonde toen het voor het laatst werd gesloten, `url` = altijd Klonen met URL, of een profiel-id van een integratie (`id` in de `[[integrations]]`-invoer). Een profiel dat weg, uitgeschakeld of niet verbonden is, valt terug op Klonen met URL. De laatste bron zelf is status, bewaard in `clone-source.toml` in de configuratiemap, niet hier. |
 | `repos.clone_root` | `""` | Waar het dialoogvenster Clone begint; leeg = `%USERPROFILE%\source\repos` of `~/src`. |
 | `repos.browse_root` | `""` | Waar Bladeren opent; leeg = de laatst gekozen map, daarna home. |
 | `repos.show_hidden` | `false` | De mapkiezer toont verborgen mappen (`Alt+H` schakelt om en slaat op). |

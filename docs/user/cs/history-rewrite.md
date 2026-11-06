@@ -625,8 +625,12 @@ dialog při psaní ukazuje přesný text, který odejde.
   a předmět commitů, které by použilo „Vyzkoušet na výběru“ (váš výběr v Logu, jinak
   20 nejnovějších), aby model viděl, jak vaše data vypadají. Nikdy obsah souborů ani těla
   commitů. S vypnutým políčkem žádná data o commitech počítač neopustí.
-- **Co se odesílá** vypíše pokyny (pevný kontrakt skriptu, pak vaše pokyny pro AI)
-  a váš požadavek a také profil, který je dostane. `Tab` tam přejde, šipky posouvají.
+- **Co se odesílá** je panel jen pro čtení na o něco tmavším pozadí, při otevření dialogu
+  sbalený (dialog je pak nízký). Zobrazíte ho kliknutím na jeho záhlaví, klávesou `Alt+W`,
+  nebo přejdete `Tab` a stisknete `Enter`: vypíše pokyny (pevný kontrakt skriptu, pak vaše
+  pokyny pro AI) a váš požadavek a má vlastní posuvník (přetáhněte ho, použijte kolečko myši
+  nad panelem, nebo šipky, `PageUp`, `PageDown`, `Home` a `End`, dokud má fokus). Profil,
+  který je dostane, je na řádku nad ním. Dialog se zvětší, aby panel pojal, v mezích obrazovky.
 - **Odeslat** (`Tab` na něj, `Enter`). Zatímco model pracuje, dialog čeká a `Esc`
   požadavek zruší. Když selže, dialog zůstane s důvodem, abyste to mohli zkusit znovu.
 
@@ -664,8 +668,14 @@ psaní ukazuje přesný text, který odejde.
 - **Nahradit stávající pravidla** (jen když nástroj už pravidla obsahuje; vypnuto): ve
   výchozím stavu se nová pravidla přidají za ta, která máte; po zaškrtnutí je nahradí
   (rozsah a nastavení, která odpověď uvádí, se použijí v obou případech).
-- **Co se odesílá** vypíše pokyny (slovník pravidel, pak vaše pokyny pro AI), váš
-  požadavek a profil, který je dostane. `Tab` tam přejde, šipky posouvají.
+- **Co se odesílá** je panel jen pro čtení na o něco tmavším pozadí, oddělený od polí nad
+  ním, a při otevření dialogu **sbalený** (dialog je pak nízký). Zobrazíte ho kliknutím na
+  jeho záhlaví, klávesou `Alt+W`, nebo přejdete `Tab` a stisknete `Enter`: vypíše pokyny
+  (slovník pravidel, pak vaše pokyny pro AI) a váš požadavek a má vlastní posuvník
+  (přetáhněte ho, použijte kolečko myši nad panelem, nebo šipky, `PageUp`, `PageDown`,
+  `Home` a `End`, dokud má fokus). Profil, který je dostane, je na řádku nad ním. Dialog se
+  zvětší, aby panel pojal, v mezích obrazovky. Pole popisu dostane vlastní posuvník, když
+  text přeroste jeho výšku.
 
 Model smí použít každý druh pravidla z této stránky kromě **Skript** (kód: *Napsat skript
 pomocí AI* ukáže skript ke kontrole) a podoby *Hledat a nahradit v souborech* pro tajné

@@ -630,9 +630,13 @@ gönderilmez: iletişim kutusu, siz yazarken, gidecek metnin tam olarak ne oldu�
   commit'lerin (Log seçiminiz, yoksa en yeni 20) yazarı, tarihi ve konusu eklenir; böylece
   model verinizin neye benzediğini görür. Dosya içerikleri ve commit gövdeleri asla
   gönderilmez. Kutu kapalıyken makineden hiçbir commit verisi çıkmaz.
-- **Gönderilenler,** yönergeleri (sabit betik sözleşmesi, sonra YZ yönergeleriniz) ve
-  isteğinizi, ayrıca bunları hangi profilin aldığını listeler. `Tab` oraya geçer, oklar
-  kaydırır.
+- **Gönderilenler**, biraz daha koyu bir arka planda salt okunur bir bölmedir ve iletişim kutusu
+  açıldığında daraltılmıştır (iletişim kutusu o zaman kısadır). Göstermek için başlığına tıklayın,
+  `Alt+W`'ye basın ya da `Tab` ile ona gidip `Enter`'a basın: yönergeleri (sabit betik
+  sözleşmesi, sonra YZ yönergeleriniz) ve isteğinizi listeler, kendi kaydırma çubuğu vardır
+  (sürükleyin, bölmenin üzerinde fare tekerleğini kullanın ya da odaktayken oklar, `PageUp`,
+  `PageDown`, `Home` ve `End`). Bunları alan profil bir üstteki satırdadır. İletişim kutusu,
+  ekran sınırları içinde bölmeye sığacak kadar büyür.
 - **Gönder** (`Tab` ile ona gidin, `Enter`). Model çalışırken iletişim kutusu bekler ve
   `Esc` isteği iptal eder. Başarısız olursa iletişim kutusu nedeniyle birlikte açık kalır,
   böylece yeniden deneyebilirsiniz.
@@ -672,8 +676,14 @@ iletişim kutusu, siz yazarken, gidecek metnin tam olarak ne olduğunu gösterir
 - **Mevcut kuralları değiştir** (yalnızca ekranda zaten kurallar varken; kapalı): varsayılan
   olarak yeni kurallar sizinkilerin ardına eklenir; işaretlenirse onların yerini alır (yanıtın
   belirttiği kapsam ve ayarlar her iki durumda da uygulanır).
-- **Gönderilenler,** yönergeleri (kural dili, sonra YZ yönergeleriniz), isteğinizi ve bunları
-  hangi profilin aldığını listeler. `Tab` oraya geçer, oklar kaydırır.
+- **Gönderilenler**, yukarıdaki alanlardan ayrı, biraz daha koyu bir arka planda salt okunur bir
+  bölmedir ve iletişim kutusu açıldığında **daraltılmıştır** (iletişim kutusu o zaman kısadır).
+  Göstermek için başlığına tıklayın, `Alt+W`'ye basın ya da `Tab` ile ona gidip `Enter`'a basın:
+  yönergeleri (kural dili, sonra YZ yönergeleriniz) ve isteğinizi listeler, kendi kaydırma
+  çubuğu vardır (sürükleyin, bölmenin üzerinde fare tekerleğini kullanın ya da odaktayken oklar,
+  `PageUp`, `PageDown`, `Home` ve `End`). Bunları alan profil bir üstteki satırdadır. İletişim
+  kutusu, ekran sınırları içinde bölmeye sığacak kadar büyür. Açıklama alanı, metin sığmadığında
+  kendi kaydırma çubuğunu alır.
 
 Model bu sayfadaki her kural türünü kullanabilir; **Betik** (kod: *YZ ile betik yazma* betiği
 incelemeniz için gösterir) ve *Dosyalarda bul ve değiştir*'in gizli değerler biçimi (gizli

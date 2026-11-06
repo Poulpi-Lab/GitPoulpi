@@ -675,9 +675,14 @@ mientras escribes, el texto exacto que saldrá.
   modelo vea cómo son tus datos. Nunca el contenido de los archivos ni los
   cuerpos de los commits. Con la casilla desactivada, ningún dato de commits sale
   de la máquina.
-- **Qué se envía** lista las instrucciones (el contrato fijo del script y luego
-  tus instrucciones de IA) y tu petición, y qué perfil las recibe. `Tab` pasa a
-  esa zona, las flechas la desplazan.
+- **Qué se envía** es un panel de solo lectura sobre un fondo algo más oscuro,
+  plegado al abrir el diálogo (que queda entonces corto). Haz clic en su
+  cabecera, pulsa `Alt+W`, o ve con `Tab` hasta él y pulsa `Enter` para
+  mostrarlo: lista las instrucciones (el contrato fijo del script y luego tus
+  instrucciones de IA) y tu petición, con una barra de desplazamiento propia
+  (arrástrala, usa la rueda sobre el panel, o las flechas, `PageUp`, `PageDown`,
+  `Home` y `End` mientras tiene el foco). El perfil que las recibe está en la
+  línea de arriba. El diálogo crece para ajustarse al panel, dentro de la pantalla.
 - **Enviar** (`Tab` hasta él, `Enter`). Mientras el modelo trabaja el diálogo
   espera, y `Esc` cancela la petición. Si falla, el diálogo se queda con el
   motivo para que puedas intentarlo de nuevo.
@@ -719,8 +724,14 @@ diálogo muestra, mientras escribes, el texto exacto que saldrá.
 - **Reemplazar las reglas actuales** (solo cuando el editor ya tiene reglas; desactivado): por
   defecto las reglas nuevas se añaden después de las que tienes; si lo marcas, las reemplazan (el
   alcance y los ajustes que indica la respuesta se aplican en ambos casos).
-- **Qué se envía** lista las instrucciones (el vocabulario de las reglas y luego tus instrucciones
-  de IA), tu petición y el perfil que las recibe. `Tab` pasa a esa zona, las flechas la desplazan.
+- **Qué se envía** es un panel de solo lectura sobre un fondo algo más oscuro, aparte de los campos
+  de encima, y **plegado** al abrir el diálogo (que queda entonces corto). Haz clic en su cabecera,
+  pulsa `Alt+W`, o ve con `Tab` hasta él y pulsa `Enter` para mostrarlo: lista las instrucciones (el
+  vocabulario de las reglas y luego tus instrucciones de IA) y tu petición, y tiene su propia barra
+  de desplazamiento (arrástrala, usa la rueda sobre el panel, o las flechas, `PageUp`, `PageDown`,
+  `Home` y `End` mientras tiene el foco). El perfil que las recibe está en la línea de arriba. El
+  diálogo crece para ajustarse al panel, dentro de la pantalla. El campo de descripción tiene su
+  propia barra de desplazamiento cuando el texto lo desborda.
 
 El modelo puede usar todos los tipos de regla de esta página salvo **Script** (es código: *Escribir
 un script con IA* muestra el script para que lo revises) y la forma de valores secretos de *Buscar

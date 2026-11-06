@@ -230,7 +230,9 @@ El cuadro de búsqueda filtra en todas las secciones (nombre, ruta completa y de
 
 ![El diálogo Clonar con la búsqueda reducida a una organización](../images/clone-hosted-search.png)
 
-Si el host rechaza el token, el diálogo muestra *no se pudieron listar los repositorios* con el motivo en lugar de la lista; las demás fuentes siguen funcionando.
+La lista de un perfil que ya has abierto antes aparece al instante a partir de una copia guardada mientras se vuelve a consultar al host (*actualizando...* junto a la etiqueta); cuando llega la respuesta, aparecen los repositorios nuevos y desaparecen los que ya no existen, y el repositorio resaltado y el elegido se quedan donde están. Si la actualización falla, la lista guardada se mantiene con una nota, y el motivo está en el Registro de actividad.
+
+Si el host rechaza el token, el diálogo muestra *no se pudieron listar los repositorios* con el motivo en lugar de la lista (y la copia guardada se elimina); las demás fuentes siguen funcionando.
 
 ## 5. Pull requests e issues en la barra lateral
 

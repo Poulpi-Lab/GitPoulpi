@@ -663,9 +663,13 @@ esatto che partirà.
   altrimenti i 20 più recenti), così il modello vede com'è fatto il tuo dato. Mai il
   contenuto dei file né i corpi dei messaggi. Con la casella disattivata, nessun dato
   dei commit lascia la macchina.
-- **Cosa viene inviato** elenca le istruzioni (il contratto fisso dello script, poi le
-  tue istruzioni per l'IA) e la tua richiesta, e quale profilo le riceve. `Tab` ci si
-  sposta, le frecce lo scorrono.
+- **Cosa viene inviato** è un riquadro di sola lettura su uno sfondo leggermente più scuro,
+  compresso all'apertura della finestra (che allora è bassa). Clicca la sua intestazione,
+  premi `Alt+W`, oppure vai lì con `Tab` e premi `Invio` per mostrarlo: elenca le istruzioni
+  (il contratto fisso dello script, poi le tue istruzioni per l'IA) e la tua richiesta, con
+  una barra di scorrimento propria (trascinala, usa la rotellina sul riquadro, oppure le
+  frecce, `PageUp`, `PageDown`, `Home` e `End` mentre ha il focus). Il profilo che le riceve
+  è sulla riga sopra. La finestra si allarga per contenere il riquadro, entro lo schermo.
 - **Invia** (`Tab` fino a lì, `Invio`). Mentre il modello lavora la finestra attende, e
   `Esc` annulla la richiesta. Se fallisce, la finestra resta con il motivo, così puoi
   riprovare.
@@ -709,9 +713,15 @@ mostra, mentre scrivi, il testo esatto che partirà.
   disattivato): per impostazione predefinita le nuove regole vengono aggiunte dopo quelle che hai;
   se spuntato, le sostituiscono (l'ambito e le impostazioni indicati dalla risposta vengono
   applicati in entrambi i casi).
-- **Cosa viene inviato** elenca le istruzioni (il vocabolario delle regole, poi le tue istruzioni
-  per l'IA), la tua richiesta e il profilo che le riceve. `Tab` ci si sposta, le frecce lo
-  scorrono.
+- **Cosa viene inviato** è un riquadro di sola lettura su uno sfondo leggermente più scuro,
+  separato dai campi sopra, e **compresso** all'apertura della finestra (che allora è bassa).
+  Clicca la sua intestazione, premi `Alt+W`, oppure vai lì con `Tab` e premi `Invio` per
+  mostrarlo: elenca le istruzioni (il vocabolario delle regole, poi le tue istruzioni per l'IA)
+  e la tua richiesta, e ha una barra di scorrimento propria (trascinala, usa la rotellina sul
+  riquadro, oppure le frecce, `PageUp`, `PageDown`, `Home` e `End` mentre ha il focus). Il
+  profilo che le riceve è sulla riga sopra. La finestra si allarga per contenere il riquadro,
+  entro lo schermo. Il campo della descrizione ha una barra di scorrimento propria quando il
+  testo lo supera.
 
 Il modello può usare ogni tipo di regola di questa pagina tranne **Script** (è codice: *Scrivere
 uno script con l'IA* mostra lo script da rivedere) e la forma a valori segreti di *Cerca e

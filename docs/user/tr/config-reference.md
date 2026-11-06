@@ -423,6 +423,7 @@ Geri kalan her şey: [YZ desteği](ai.md).
 | Anahtar | Varsayılan | Değerler ve etki |
 |---|---|---|
 | `repos.clone_root` | `""` | Klonla iletişim kutusunun başladığı yer; boşsa `%USERPROFILE%\source\repos` ya da `~/src`. |
+| `repos.clone_start_source` | `"last"` | Klonla iletişim kutusunun hangi kaynakta açıldığı: `last` (varsayılan ya da boş) = en son kapatıldığında gösterdiği kaynak, `url` = her zaman URL ile klonla, ya da bir entegrasyon profilinin kimliği (`[[integrations]]` girdisindeki `id`). Silinmiş, devre dışı bırakılmış ya da bağlı olmayan bir profil URL ile klonla'ya döner. Son kaynağın kendisi durumdur; yapılandırma klasöründeki `clone-source.toml` içinde tutulur, burada değil. |
 | `repos.browse_root` | `""` | Gözat'ın açıldığı yer; boşsa son seçilen klasör, sonra ana klasör. |
 | `repos.show_hidden` | `false` | Klasör seçici gizli klasörleri gösterir (`Alt+H` bunu açıp kapatır ve kaydeder). |
 | `repos.show_siblings` | `false` | Klasör seçicinin sol ağacı, açık her düzeyin diğer klasörlerini de gerçek bir hiyerarşi olarak listeler (`Alt+S` bunu açıp kapatır ve kaydeder). |

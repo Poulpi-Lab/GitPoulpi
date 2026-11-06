@@ -429,6 +429,7 @@ Profil o nazwie *Default* jest tworzony, gdy żadnego nie ma. Stare pliki
 | Klucz | Domyślnie | Wartości i działanie |
 |---|---|---|
 | `repos.clone_root` | `""` | Folder, od którego zaczyna się okno Clone; puste = `%USERPROFILE%\source\repos` lub `~/src`. |
+| `repos.clone_start_source` | `"last"` | Źródło, od którego otwiera się okno Clone: `last` (domyślnie, albo puste) = to, które pokazywało przy ostatnim zamknięciu, `url` = zawsze Klonuj z URL, albo id profilu integracji (`id` we wpisie `[[integrations]]`). Profil, którego nie ma, jest wyłączony lub niepołączony, wraca do Klonuj z URL. Samo ostatnie źródło to stan, trzymany w `clone-source.toml` w folderze konfiguracji, nie tutaj. |
 | `repos.browse_root` | `""` | Folder, w którym otwiera się Przeglądaj; puste = ostatnio wybrany folder, potem katalog domowy. |
 | `repos.show_hidden` | `false` | Selektor folderów pokazuje foldery ukryte (`Alt+H` przełącza i zapisuje). |
 | `repos.show_siblings` | `false` | Lewe drzewo selektora folderów wypisuje też pozostałe foldery każdego otwartego poziomu, jako prawdziwą hierarchię (`Alt+S` przełącza i zapisuje). |

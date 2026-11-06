@@ -1284,7 +1284,7 @@ A paleta tem as mesmas ações, por exemplo
 
 | Tecla | Ação |
 |---|---|
-| `Ctrl+O`, ou um clique em `⌂` | Vai para a aba Início (na aba Início: foca o campo de busca) |
+| `Ctrl+O`, ou um clique em `⌂` | Vai para a aba Início (na aba Início: foca o campo de busca; com o Radar ou as notas da versão abertos: fecha-os primeiro) |
 | `Ctrl+Shift+N` | Abre a aba Início com o diálogo Clonar |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Aba seguinte / anterior |
 | `t` | Escolhe uma aba em uma lista filtrável |

@@ -229,7 +229,9 @@ Pole wyszukiwania filtruje we wszystkich sekcjach (nazwa, pełna ścieżka i opi
 
 ![Okno Klonuj z wyszukiwaniem zawężającym listę do jednej organizacji](../images/clone-hosted-search.png)
 
-Jeśli host odrzuci token, okno zamiast listy pokazuje *nie można wylistować repozytoriów* z przyczyną; pozostałe źródła nadal działają.
+Lista profilu, który już otwierano, pokazuje się od razu z zapisanej kopii, podczas gdy host jest pytany ponownie (*odświeżanie...* obok etykiety); gdy odpowiedź dotrze, nowe repozytoria się pojawiają, a nieistniejące znikają, przy czym podświetlone i wybrane repozytorium zostają na miejscu. Jeśli odświeżenie się nie powiedzie, zapisana lista zostaje z adnotacją, a przyczyna jest w Dzienniku aktywności.
+
+Jeśli host odrzuci token, okno zamiast listy pokazuje *nie można wylistować repozytoriów* z przyczyną (a zapisana kopia jest usuwana); pozostałe źródła nadal działają.
 
 ## 5. Pull requesty i zgłoszenia w panelu bocznym
 

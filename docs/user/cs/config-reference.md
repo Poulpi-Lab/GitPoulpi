@@ -422,6 +422,7 @@ Profil s názvem *Default* se vytvoří, pokud žádný není. Staré soubory s
 | Klíč | Výchozí | Hodnoty a účinek |
 |---|---|---|
 | `repos.clone_root` | `""` | Odkud začíná dialog Klonovat; prázdné = `%USERPROFILE%\source\repos` nebo `~/src`. |
+| `repos.clone_start_source` | `"last"` | Zdroj, na kterém se dialog Klonovat otevře: `last` (výchozí, nebo prázdné) = ten, který zobrazoval při posledním zavření, `url` = vždy Klonovat z URL, nebo id profilu integrace (`id` v jejím záznamu `[[integrations]]`). Profil, který zmizel, je vypnutý nebo není připojený, se vrátí na Klonovat z URL. Poslední zdroj samotný je stav, uložený v `clone-source.toml` ve složce konfigurace, ne zde. |
 | `repos.browse_root` | `""` | Kde se otevře Procházet; prázdné = naposledy zvolená složka, pak domovská. |
 | `repos.show_hidden` | `false` | Výběr složky zobrazuje skryté složky (`Alt+H` to přepíná a ukládá). |
 | `repos.show_siblings` | `false` | Levý strom výběru složky uvádí i ostatní složky každé otevřené úrovně, jako skutečnou hierarchii (`Alt+S` to přepíná a ukládá). |

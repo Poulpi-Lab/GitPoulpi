@@ -1288,7 +1288,7 @@ Paletten har samma åtgärder, till exempel
 
 | Tangent | Åtgärd |
 |---|---|
-| `Ctrl+O`, eller ett klick på `⌂` | Gå till fliken Hem (på fliken Hem: fokusera sökfältet) |
+| `Ctrl+O`, eller ett klick på `⌂` | Gå till fliken Hem (på fliken Hem: fokusera sökfältet; med Radarn eller versionsanteckningarna öppna: stäng dem först) |
 | `Ctrl+Shift+N` | Öppna fliken Hem med dialogen Klona |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Nästa / föregående flik |
 | `t` | Välj en flik i en filtrerbar lista |

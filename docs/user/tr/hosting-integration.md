@@ -226,7 +226,9 @@ Arama kutusu tüm bölümlerde filtreler (ad, tam yol ve açıklama); eşleşmes
 
 ![Aramanın listeyi tek bir kuruluşa daralttığı Klonla iletişim kutusu](../images/clone-hosted-search.png)
 
-Barındırıcı token'ı reddederse iletişim kutusu, listenin yerine nedeniyle birlikte *depolar listelenemedi* mesajını gösterir; diğer kaynaklar çalışmaya devam eder.
+Daha önce açtığınız bir profilin listesi, barındırıcıya yeniden sorulurken kayıtlı bir kopyadan hemen görünür (etiketin yanında *yenileniyor...*); yanıt geldiğinde yeni depolar belirir, kaybolanlar listeden çıkar ve vurgulanan ile seçilen depo yerinde kalır. Yenileme başarısız olursa kayıtlı liste bir notla birlikte kalır, nedeni Etkinlik Günlüğü'ndedir.
+
+Barındırıcı token'ı reddederse iletişim kutusu, listenin yerine nedeniyle birlikte *depolar listelenemedi* mesajını gösterir (ve kayıtlı kopya silinir); diğer kaynaklar çalışmaya devam eder.
 
 ## 5. Kenar çubuğundaki pull request'ler ve issue'lar
 

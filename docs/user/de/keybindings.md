@@ -1282,7 +1282,7 @@ Die Palette hat dieselben Aktionen, zum Beispiel
 
 | Taste | Aktion |
 |---|---|
-| `Ctrl+O` oder ein Klick auf `⌂` | Zum Home-Tab gehen (im Home-Tab: das Suchfeld fokussieren) |
+| `Ctrl+O` oder ein Klick auf `⌂` | Zum Home-Tab gehen (im Home-Tab: das Suchfeld fokussieren; bei geöffnetem Radar oder geöffneten Versionshinweisen: zuerst schließen) |
 | `Ctrl+Shift+N` | Den Home-Tab mit dem Klon-Dialog öffnen |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Nächster / vorheriger Tab |
 | `t` | Einen Tab aus einer filterbaren Liste wählen |

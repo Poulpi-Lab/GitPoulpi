@@ -701,9 +701,14 @@ boîte affiche, pendant que vous tapez, le texte exact qui partira.
   modèle voie à quoi ressemblent vos données. Jamais le contenu des fichiers ni
   le corps des commits. Case décochée, aucune donnée de commit ne quitte la
   machine.
-- **Ce qui est envoyé** liste les consignes (le contrat fixe du script, puis vos
-  instructions IA) et votre demande, ainsi que le profil qui les reçoit. `Tab`
-  y accède, les flèches le font défiler.
+- **Ce qui est envoyé** est un volet en lecture seule sur un fond un peu plus sombre,
+  replié à l'ouverture de la boîte (qui est alors courte). Cliquez sur son en-tête,
+  appuyez sur `Alt+W`, ou allez-y avec `Tab` et appuyez sur `Enter` pour l'afficher :
+  il liste les consignes (le contrat fixe du script, puis vos instructions IA) et votre
+  demande, avec sa propre barre de défilement (faites-la glisser, utilisez la molette sur
+  le volet, ou les flèches, `PageUp`, `PageDown`, `Home` et `End` quand il a le focus).
+  Le profil qui les reçoit est sur la ligne au-dessus. La boîte s'agrandit pour contenir
+  le volet, dans la limite de l'écran.
 - **Envoyer** (`Tab` jusqu'au bouton, puis `Enter`). Pendant que le modèle
   travaille, la boîte attend, et `Esc` annule la requête. En cas d'échec, la boîte
   reste ouverte avec la raison pour que vous puissiez réessayer.
@@ -748,8 +753,14 @@ montre, pendant que vous tapez, le texte exact qui partira.
   désactivé) : par défaut, les nouvelles règles sont ajoutées après les vôtres ; cochée, elles les
   remplacent (le périmètre et les réglages que la réponse indique sont appliqués dans les deux
   cas).
-- **Ce qui est envoyé** liste les instructions (le vocabulaire des règles, puis vos instructions
-  IA), votre demande et le profil qui les reçoit. `Tab` y va, les flèches font défiler.
+- **Ce qui est envoyé** est un volet en lecture seule sur un fond un peu plus sombre, séparé des
+  champs au-dessus, et **replié** à l'ouverture de la boîte (qui est alors courte). Cliquez sur son
+  en-tête, appuyez sur `Alt+W`, ou allez-y avec `Tab` et appuyez sur `Enter` pour l'afficher : il
+  liste les instructions (le vocabulaire des règles, puis vos instructions IA) et votre demande, et
+  a sa propre barre de défilement (faites-la glisser, utilisez la molette sur le volet, ou les
+  flèches, `PageUp`, `PageDown`, `Home` et `End` quand il a le focus). Le profil qui les reçoit est
+  sur la ligne au-dessus. La boîte s'agrandit pour contenir le volet, dans la limite de l'écran. Le
+  champ de description a sa propre barre de défilement quand le texte le dépasse.
 
 Le modèle peut employer tous les types de règle de cette page sauf **Script** (du code : *Écrire un
 script avec l'IA* montre le script pour relecture) et la forme « valeurs secrètes » de *Rechercher

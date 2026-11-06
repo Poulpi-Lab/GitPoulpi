@@ -655,9 +655,12 @@ tekst, który wyjdzie.
   go nie ma, 20 najnowszych), są dodawane, żeby model zobaczył, jak wyglądają
   twoje dane. Nigdy zawartość plików ani treść commitów. Przy wyłączonym polu
   żadne dane o commitach nie opuszczają komputera.
-- **Co zostanie wysłane** wymienia instrukcje (stały kontrakt skryptu, potem twoje
-  instrukcje AI) i twoją prośbę oraz profil, który je dostanie. `Tab` przechodzi
-  do tego pola, strzałki je przewijają.
+- **Co zostanie wysłane** to panel tylko do odczytu na nieco ciemniejszym tle, zwinięty po
+  otwarciu okna (okno jest wtedy niskie). Kliknij jego nagłówek, naciśnij `Alt+W` albo przejdź
+  do niego `Tab` i naciśnij `Enter`, by go pokazać: wymienia instrukcje (stały kontrakt skryptu,
+  potem twoje instrukcje AI) i twoją prośbę, z własnym paskiem przewijania (przeciągnij go, użyj
+  kółka nad panelem albo strzałek, `PageUp`, `PageDown`, `Home` i `End`, gdy ma fokus). Profil,
+  który je dostanie, jest w wierszu powyżej. Okno rośnie, by objąć panel, w granicach ekranu.
 - **Wyślij** (`Tab` do niego, `Enter`). Gdy model pracuje, okno czeka, a `Esc`
   anuluje zapytanie. Jeśli się nie powiedzie, okno zostaje z powodem, abyś mógł
   spróbować ponownie.
@@ -698,9 +701,14 @@ naciśniesz **Wyślij**: okno pokazuje, w trakcie pisania, dokładny tekst, któ
 - **Zastąp obecne reguły** (tylko gdy warsztat ma już reguły; wyłączone): domyślnie nowe
   reguły są dodawane po tych, które masz; po zaznaczeniu je zastępują (zakres i ustawienia
   podane w odpowiedzi są stosowane w obu przypadkach).
-- **Co zostanie wysłane** wymienia instrukcje (słownictwo reguł, potem twoje instrukcje
-  AI), twoją prośbę oraz profil, który je dostanie. `Tab` przechodzi do tego pola,
-  strzałki je przewijają.
+- **Co zostanie wysłane** to panel tylko do odczytu na nieco ciemniejszym tle, oddzielony od pól
+  nad nim i **zwinięty** po otwarciu okna (okno jest wtedy niskie). Kliknij jego nagłówek,
+  naciśnij `Alt+W` albo przejdź do niego `Tab` i naciśnij `Enter`, by go pokazać: wymienia
+  instrukcje (słownictwo reguł, potem twoje instrukcje AI) i twoją prośbę oraz ma własny pasek
+  przewijania (przeciągnij go, użyj kółka nad panelem albo strzałek, `PageUp`, `PageDown`,
+  `Home` i `End`, gdy ma fokus). Profil, który je dostanie, jest w wierszu powyżej. Okno rośnie,
+  by objąć panel, w granicach ekranu. Pole opisu dostaje własny pasek przewijania, gdy tekst
+  przerośnie pole.
 
 Model może użyć każdego rodzaju reguły z tej strony z wyjątkiem **Skryptu** (to kod:
 *Napisz skrypt z AI* pokazuje skrypt do przejrzenia) i formy *Znajdź i zamień w plikach*

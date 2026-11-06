@@ -230,7 +230,9 @@ Il campo di ricerca filtra in tutte le sezioni (nome, percorso completo e descri
 
 ![La finestra Clona con la ricerca che restringe l'elenco a un'organizzazione](../images/clone-hosted-search.png)
 
-Se l'host rifiuta il token, la finestra mostra *impossibile elencare i repository* con il motivo al posto dell'elenco; le altre sorgenti continuano a funzionare.
+L'elenco di un profilo già aperto in precedenza compare subito da una copia salvata mentre l'host viene interrogato di nuovo (*aggiornamento...* accanto all'etichetta); quando arriva la risposta, i repository nuovi compaiono e quelli scomparsi spariscono, mentre il repository evidenziato e quello scelto restano dove sono. Se l'aggiornamento fallisce, l'elenco salvato resta con una nota, e il motivo è nel Registro attività.
+
+Se l'host rifiuta il token, la finestra mostra *impossibile elencare i repository* con il motivo al posto dell'elenco (e la copia salvata viene eliminata); le altre sorgenti continuano a funzionare.
 
 ## 5. Pull request e issue nella barra laterale
 

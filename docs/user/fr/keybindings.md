@@ -1289,7 +1289,7 @@ La palette a les mêmes actions, par exemple
 
 | Touche | Action |
 |---|---|
-| `Ctrl+O`, ou un clic sur `⌂` | Aller à l'onglet Accueil (sur l'onglet Accueil : cibler la zone de recherche) |
+| `Ctrl+O`, ou un clic sur `⌂` | Aller à l'onglet Accueil (sur l'onglet Accueil : cibler la zone de recherche ; avec le Radar ou les notes de version ouverts : le fermer d'abord) |
 | `Ctrl+Shift+N` | Ouvrir l'onglet Accueil avec la boîte Cloner |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Onglet suivant / précédent |
 | `t` | Choisir un onglet dans une liste filtrable |

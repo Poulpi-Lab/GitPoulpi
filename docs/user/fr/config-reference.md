@@ -424,6 +424,7 @@ Un profil nommé *Default* est créé quand il n'y en a aucun. Les anciens fichi
 | Clé | Défaut | Valeurs et effet |
 |---|---|---|
 | `repos.clone_root` | `""` | Où la boîte Cloner démarre ; vide = `%USERPROFILE%\source\repos` ou `~/src`. |
+| `repos.clone_start_source` | `"last"` | La source sur laquelle s'ouvre la boîte Cloner : `last` (par défaut, ou vide) = celle qu'elle affichait à sa dernière fermeture, `url` = toujours Cloner par URL, ou l'identifiant d'un profil d'intégration (`id` dans son entrée `[[integrations]]`). Un profil supprimé, désactivé ou non connecté revient à Cloner par URL. La dernière source elle-même est un état, conservé dans `clone-source.toml` dans le dossier de configuration, pas ici. |
 | `repos.browse_root` | `""` | Où Parcourir s'ouvre ; vide = le dernier dossier choisi, puis le dossier personnel. |
 | `repos.show_hidden` | `false` | Le sélecteur de dossiers montre les dossiers cachés (`Alt+H` le bascule et l'enregistre). |
 | `repos.show_siblings` | `false` | L'arbre de gauche du sélecteur de dossiers liste aussi les autres dossiers de chaque niveau ouvert, comme une vraie hiérarchie (`Alt+S` le bascule et l'enregistre). |

@@ -651,8 +651,13 @@ drukt: het dialoogvenster toont, terwijl je typt, de exacte tekst die zal worden
   anders de 20 nieuwste) toegevoegd, zodat het model ziet hoe je gegevens eruitzien. Nooit
   bestandsinhoud of de berichttekst van commits. Met het vakje uit verlaat geen enkel commitgegeven
   de machine.
-- **Wat wordt verstuurd** toont de instructies (het vaste scriptcontract, dan je AI-instructies) en
-  je verzoek, en welk profiel ze ontvangt. `Tab` gaat ernaartoe, de pijltjes scrollen.
+- **Wat wordt verstuurd** is een alleen-lezen paneel op een iets donkerdere achtergrond, ingeklapt
+  zodra het dialoogvenster opent (het dialoogvenster is dan kort). Klik op de kop, druk op `Alt+W`,
+  of ga met `Tab` ernaartoe en druk op `Enter` om het te tonen: het toont de instructies (het vaste
+  scriptcontract, dan je AI-instructies) en je verzoek, met een eigen schuifbalk (sleep hem,
+  gebruik het wiel boven het paneel, of de pijltjes, `PageUp`, `PageDown`, `Home` en `End` zolang
+  het de focus heeft). Het profiel dat ze ontvangt staat op de regel erboven. Het dialoogvenster
+  groeit mee met het paneel, binnen het scherm.
 - **Versturen** (`Tab` ernaartoe, `Enter`). Terwijl het model werkt, wacht het dialoogvenster, en
   `Esc` annuleert het verzoek. Als het mislukt, blijft het dialoogvenster staan met de reden, zodat
   je het opnieuw kunt proberen.
@@ -694,9 +699,14 @@ de exacte tekst die zal worden verstuurd.
 - **De huidige regels vervangen** (alleen als de werkbank al regels bevat; uit): standaard worden de
   nieuwe regels achter de bestaande toegevoegd; aangevinkt vervangen ze die (het bereik en de
   instellingen die het antwoord noemt, worden hoe dan ook toegepast).
-- **Wat wordt verstuurd** toont de instructies (de woordenschat van de regels, dan je
-  AI-instructies), je verzoek en het profiel dat ze ontvangt. `Tab` gaat ernaartoe, de pijltjes
-  scrollen.
+- **Wat wordt verstuurd** is een alleen-lezen paneel op een iets donkerdere achtergrond, los van
+  de velden erboven, en **ingeklapt** zodra het dialoogvenster opent (het dialoogvenster is dan
+  kort). Klik op de kop, druk op `Alt+W`, of ga met `Tab` ernaartoe en druk op `Enter` om het te
+  tonen: het toont de instructies (de woordenschat van de regels, dan je AI-instructies) en je
+  verzoek, en heeft een eigen schuifbalk (sleep hem, gebruik het wiel boven het paneel, of de
+  pijltjes, `PageUp`, `PageDown`, `Home` en `End` zolang het de focus heeft). Het profiel dat ze
+  ontvangt staat op de regel erboven. Het dialoogvenster groeit mee met het paneel, binnen het
+  scherm. Het beschrijvingsveld krijgt een eigen schuifbalk als de tekst er niet meer in past.
 
 Het model mag elk soort regel van deze pagina gebruiken behalve **Script** (code: *Een script
 schrijven met AI* toont het script ter controle) en de vorm met geheime waarden van *Zoeken en

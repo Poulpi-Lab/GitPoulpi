@@ -664,9 +664,13 @@ den text som går iväg.
   Log, annars de 20 nyaste) till, så att modellen ser hur dina data ser ut.
   Aldrig filinnehåll eller commitmeddelandenas brödtext. Med rutan av lämnar inga
   commitdata datorn.
-- **Det som skickas** listar instruktionerna (det fasta skriptkontraktet och sedan
-  dina AI-instruktioner) och din begäran, och vilken profil som tar emot dem.
-  `Tab` flyttar dit, pilarna rullar.
+- **Det som skickas** är en skrivskyddad ruta på en något mörkare bakgrund, hopfälld
+  när dialogen öppnas (dialogen är då kort). Klicka på dess rubrik, tryck `Alt+W` eller
+  gå dit med `Tab` och tryck `Enter` för att visa den: den listar instruktionerna (det
+  fasta skriptkontraktet och sedan dina AI-instruktioner) och din begäran, med ett eget
+  rullningsfält (dra i det, använd hjulet över rutan, eller pilarna, `PageUp`,
+  `PageDown`, `Home` och `End` medan den har fokus). Profilen som tar emot dem står på
+  raden ovanför. Dialogen växer så att rutan ryms, inom skärmen.
 - **Skicka** (`Tab` dit, `Enter`). Medan modellen arbetar väntar dialogen, och
   `Esc` avbryter begäran. Om den misslyckas står dialogen kvar med orsaken så att
   du kan försöka igen.
@@ -711,9 +715,14 @@ som **fyller omskrivningsvyn**. Ingenting skickas förrän du trycker på
   regler; av): som standard läggs de nya reglerna till efter dem du har; med
   rutan markerad ersätter de dem (omfånget och inställningarna som svaret anger
   tillämpas i båda fallen).
-- **Det som skickas** listar instruktionerna (regelvokabulären och sedan dina
-  AI-instruktioner), din begäran och vilken profil som tar emot dem. `Tab`
-  flyttar dit, pilarna rullar.
+- **Det som skickas** är en skrivskyddad ruta på en något mörkare bakgrund, skild från
+  fälten ovanför, och **hopfälld** när dialogen öppnas (dialogen är då kort). Klicka på
+  dess rubrik, tryck `Alt+W` eller gå dit med `Tab` och tryck `Enter` för att visa den:
+  den listar instruktionerna (regelvokabulären och sedan dina AI-instruktioner) och din
+  begäran, och har ett eget rullningsfält (dra i det, använd hjulet över rutan, eller
+  pilarna, `PageUp`, `PageDown`, `Home` och `End` medan den har fokus). Profilen som tar
+  emot dem står på raden ovanför. Dialogen växer så att rutan ryms, inom skärmen.
+  Beskrivningsfältet får ett eget rullningsfält när texten blir längre än fältet.
 
 Modellen får använda alla regelsorter på den här sidan utom **Skript** (kod:
 *Skriv ett skript med AI* visar skriptet för granskning) och formen med hemliga

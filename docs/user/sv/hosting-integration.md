@@ -228,7 +228,9 @@ Sökfältet filtrerar över alla sektioner (namn, fullständig sökväg och besk
 
 ![Dialogen Klona där sökningen begränsar listan till en organisation](../images/clone-hosted-search.png)
 
-Om värden vägrar token visar dialogen *kunde inte lista repositories* med orsaken i stället för listan; de andra källorna fungerar som vanligt.
+Listan för en profil som du har öppnat tidigare visas direkt från en sparad kopia medan värden tillfrågas på nytt (*uppdaterar...* bredvid etiketten); när svaret kommer visas nya repositories och borttagna försvinner, och det markerade och det valda repositoryt stannar där de är. Om uppdateringen misslyckas står den sparade listan kvar med en notis, och orsaken finns i Aktivitetsloggen.
+
+Om värden vägrar token visar dialogen *kunde inte lista repositories* med orsaken i stället för listan (och den sparade kopian raderas); de andra källorna fungerar som vanligt.
 
 ## 5. Pull requests och ärenden i sidopanelen
 

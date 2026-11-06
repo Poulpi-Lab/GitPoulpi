@@ -313,10 +313,10 @@ allow_ui_propose_help = { git = "Если включено, ИИ-агент мо
 clone_root = "Папка клонирования по умолчанию"
 clone_root_help = "С чего начинается поле «Куда клонировать» в диалоге клонирования. Пусто - значение по ОС: %USERPROFILE%\\source\\repos в Windows, ~/src в остальных."
 # context: setting: which source the Clone dialog opens on (Last used, Clone with URL, or an integration)
-clone_start_source = "Clone dialog starts on"
-clone_start_source_help = "The source the Clone dialog opens on. Last used reopens the one it showed when it was last closed; Clone with URL always starts on the URL form; or pick one of your connected integrations. A source that is no longer available means Clone with URL."
+clone_start_source = "Диалог клонирования открывается на"
+clone_start_source_help = "Источник, на котором открывается диалог клонирования. «Последний использованный» открывает тот, что был показан при последнем закрытии; «Клонировать по URL» всегда начинает с формы URL; либо выберите одну из подключённых интеграций. Если источник больше недоступен, открывается «Клонировать по URL»."
 # context: option of the "Clone dialog starts on" setting: the source shown when the dialog was last closed
-clone_start_last = "Last used"
+clone_start_last = "Последний использованный"
 browse_root = "Папка обзора по умолчанию"
 browse_root_help = "Где по умолчанию открывается «Обзор» (выбор папки на вкладке «Главная»). Пусто - «Обзор» открывается в последней выбранной папке (или в домашней при первом запуске), а не в фиксированной."
 heading_auto_stash = { git = "Auto-stash", local = "Автостэш" }
@@ -1072,9 +1072,9 @@ no_repos = "в этом аккаунте нет репозиториев"
 no_match = "нет подходящих репозиториев"
 loading = "загрузка репозиториев..."
 list_failed = "не удалось получить список репозиториев: {why}"
-refreshing = "refreshing..."
-refresh_failed = "saved list (refresh failed, see Activity)"
-chosen_gone = "{name} is no longer on the host"
+refreshing = "обновление..."
+refresh_failed = "сохранённый список (обновить не удалось, см. «Журнал активности»)"
+chosen_gone = "{name} больше нет на хосте"
 cloning = "Клонирование..."
 go = "Клонировать"
 hint_clone = "клонировать"
@@ -8214,7 +8214,7 @@ dlg_sample = { one = { git = "Отправить выборку commit'ов: {n}
 dlg_sample_off = { git = "Выключено: данные о commit'ах не отправляются, только ваш запрос.", local = "Выключено: данные о коммитах не отправляются, только ваш запрос." }
 dlg_sample_none = { git = "В Log нет commit'ов для выборки.", local = "В Log нет коммитов для выборки." }
 dlg_sent_label = "Что отправляется"
-dlg_sent_key = "Alt+W: show or hide"
+dlg_sent_key = "Alt+W: показать или скрыть"
 dlg_sent_system = "Инструкции для модели:"
 dlg_sent_user = "Ваш запрос:"
 dlg_profile = "Отправляется в: {name}"

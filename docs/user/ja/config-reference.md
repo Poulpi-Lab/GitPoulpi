@@ -360,6 +360,7 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | キー | 既定値 | 値と効果 |
 |---|---|---|
 | `repos.clone_root` | `""` | Clone ダイアログが開始する場所です。空の場合は `%USERPROFILE%\source\repos` または `~/src`。 |
+| `repos.clone_start_source` | `"last"` | Clone ダイアログが最初に開くソースです。`last`（既定。空でも同じ）= 最後に閉じたときに表示していたソース、`url` = 常に「URL でクローン」、または連携プロファイルの id（`[[integrations]]` エントリの `id`）。なくなった、無効にした、または未接続のプロファイルは「URL でクローン」になります。最後のソース自体は状態であり、ここではなく設定フォルダーの `clone-source.toml` に保存されます。 |
 | `repos.browse_root` | `""` | Browse が開く場所です。空の場合は最後に選んだフォルダー、なければホーム。 |
 | `repos.show_hidden` | `false` | フォルダー選択で隠しフォルダーを表示します（`Alt+H` で切り替わり、保存されます）。 |
 | `repos.show_siblings` | `false` | フォルダー選択の左のツリーに、開いている各階層のほかのフォルダーも、本来の階層のまま並べます（`Alt+S` で切り替わり、保存されます）。 |

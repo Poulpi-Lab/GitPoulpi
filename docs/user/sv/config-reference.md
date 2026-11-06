@@ -424,6 +424,7 @@ En profil med namnet *Default* skapas när det inte finns någon. Gamla
 | Nyckel | Standard | Värden och effekt |
 |---|---|---|
 | `repos.clone_root` | `""` | Var Clone-dialogen börjar; tomt = `%USERPROFILE%\source\repos` eller `~/src`. |
+| `repos.clone_start_source` | `"last"` | Källan som Klona-dialogen öppnas på: `last` (standard, eller tomt) = den som visades när dialogen stängdes sist, `url` = alltid Klona med URL, eller ett integrationsprofil-id (`id` i dess `[[integrations]]`-post). En profil som är borta, inaktiverad eller inte ansluten ersätts av Klona med URL. Den senaste källan i sig är tillstånd som sparas i `clone-source.toml` i konfigurationsmappen, inte här. |
 | `repos.browse_root` | `""` | Var Bläddra öppnas; tomt = senast valda mapp, sedan hemmappen. |
 | `repos.show_hidden` | `false` | Mappväljaren visar dolda mappar (`Alt+H` växlar och sparar det). |
 | `repos.show_siblings` | `false` | Mappväljarens vänstra träd listar också de andra mapparna på varje öppen nivå, som en riktig hierarki (`Alt+S` växlar och sparar det). |

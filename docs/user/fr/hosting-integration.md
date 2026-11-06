@@ -230,7 +230,9 @@ Le champ de recherche filtre dans toutes les sections (nom, chemin complet et de
 
 ![La boîte de dialogue Cloner, la recherche réduisant la liste à une organisation](../images/clone-hosted-search.png)
 
-Si l'hébergeur refuse le jeton, la boîte de dialogue affiche *impossible de lister les dépôts* avec la raison à la place de la liste ; les autres sources continuent de fonctionner.
+La liste d'un profil déjà ouvert s'affiche aussitôt à partir d'une copie enregistrée pendant que l'hébergeur est interrogé de nouveau (*actualisation...* à côté du libellé) ; quand la réponse arrive, les nouveaux dépôts apparaissent et ceux qui ont disparu s'effacent, et le dépôt en surbrillance et le dépôt choisi restent à leur place. Si l'actualisation échoue, la liste enregistrée reste affichée avec une note, la raison est dans le Journal d'activité.
+
+Si l'hébergeur refuse le jeton, la boîte de dialogue affiche *impossible de lister les dépôts* avec la raison à la place de la liste (et la copie enregistrée est supprimée) ; les autres sources continuent de fonctionner.
 
 ## 5. Pull requests et tickets dans le panneau latéral
 

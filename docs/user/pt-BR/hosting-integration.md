@@ -231,7 +231,13 @@ A caixa de busca filtra em todas as seções (nome, caminho completo e descriç�
 
 ![O diálogo Clonar com a busca reduzindo a lista a uma organização](../images/clone-hosted-search.png)
 
-Se o host recusar o token, o diálogo mostra *não foi possível listar os repositórios* com o motivo no lugar da lista; as outras fontes continuam funcionando.
+A lista de um perfil que você já abriu antes aparece na hora, a partir de uma cópia salva,
+enquanto o host é consultado de novo (*atualizando...* ao lado do rótulo); quando a
+resposta chega, os repositórios novos aparecem e os que sumiram desaparecem, e o
+repositório destacado e o escolhido continuam onde estão. Se a atualização falhar, a
+lista salva continua com uma nota, e o motivo está no Registro de atividade.
+
+Se o host recusar o token, o diálogo mostra *não foi possível listar os repositórios* com o motivo no lugar da lista (e a cópia salva é apagada); as outras fontes continuam funcionando.
 
 ## 5. Pull requests e issues na barra lateral
 

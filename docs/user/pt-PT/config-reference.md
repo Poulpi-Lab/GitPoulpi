@@ -430,6 +430,7 @@ com `[[ai.presets]]` / `[ai.defaults]` são migrados ao carregar e mantidos em
 | Chave | Predefinição | Valores e efeito |
 |---|---|---|
 | `repos.clone_root` | `""` | Onde a caixa de diálogo Clonar começa; vazio = `%USERPROFILE%\source\repos` ou `~/src`. |
+| `repos.clone_start_source` | `"last"` | A fonte em que a caixa de diálogo Clonar abre: `last` (predefinição, ou vazio) = a que mostrava quando foi fechada da última vez, `url` = sempre Clonar por URL, ou o id de um perfil de integração (`id` na sua entrada `[[integrations]]`). Um perfil que já não exista, esteja desativado ou não esteja ligado recorre a Clonar por URL. A última fonte em si é estado, guardado em `clone-source.toml` na pasta de configuração, não aqui. |
 | `repos.browse_root` | `""` | Onde Procurar abre; vazio = a última pasta escolhida, depois a pasta pessoal. |
 | `repos.show_hidden` | `false` | O seletor de pastas mostra pastas ocultas (`Alt+H` alterna e guarda). |
 | `repos.show_siblings` | `false` | A árvore da esquerda do seletor de pastas lista também as outras pastas de cada nível aberto, como uma hierarquia real (`Alt+S` alterna e guarda). |

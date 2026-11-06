@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   TEMPLATE, NOT PUBLISHED. see the release-and-packaging design ("Chocolatey").
-  Replace @VERSION@ here and @VERSION@ / @SHA256_WINDOWS_SETUP@ in tools/chocolateyinstall.ps1, then
+  packaging/fill-templates.sh fills the version and checksum placeholders here and in tools/chocolateyinstall.ps1; then
   `choco pack` in this folder and `choco install gitpoulpi -s . -y` in a VM before `choco push`.
   The package downloads the release's Inno Setup installer; it embeds no binary, so no VERIFICATION.txt
   is needed. Uninstall goes through Chocolatey's automatic uninstaller (the installer's registry entry).

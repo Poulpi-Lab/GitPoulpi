@@ -3,7 +3,7 @@
         "TEMPLATE, NOT PUBLISHED. see the release-and-packaging design (Scoop).",
         "Replace @VERSION@ and @SHA256_WINDOWS_ZIP@ (first field of gitpoulpi-<version>-x86_64-pc-windows-msvc.zip.sha256),",
         "then commit this file as bucket/gitpoulpi.json of a bucket repository. checkver and autoupdate keep it current.",
-        "post_install deletes the .gitpoulpi-dist marker: without it GitPoulpi never replaces its own files, so Scoop stays the only updater."
+        "post_install rewrites the .gitpoulpi-dist marker with channel=scoop: GitPoulpi then runs `scoop update gitpoulpi` itself and never swaps files behind Scoop. gitpoulpi-updater.exe ships in the zip and needs no shim."
     ],
     "version": "@VERSION@",
     "description": "Git client for the terminal with a clickable commit graph, a command palette, hosting integrations, a CLI and an MCP server",
@@ -31,7 +31,7 @@
             "GitPoulpi"
         ]
     ],
-    "post_install": "Remove-Item \"$dir\\.gitpoulpi-dist\" -Force -ErrorAction SilentlyContinue",
+    "post_install": "Set-Content -Path \"$dir\\.gitpoulpi-dist\" -Value \"version=$version\",\"target=x86_64-pc-windows-msvc\",\"channel=scoop\" -Encoding ascii",
     "checkver": {
         "url": "https://api.github.com/repos/Poulpi-Lab/GitPoulpi/releases/latest",
         "jsonpath": "$.tag_name",

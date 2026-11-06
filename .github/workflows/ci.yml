@@ -153,3 +153,36 @@ jobs:
       # `cargo run -p xtask -- test --help`).
       - name: test
         run: cargo run -p xtask -- test --tier fast
+
+  # Packaging checks, on demand only (CI is disabled by default and these cost minutes): the crates.io dry run,
+  # the Dockerfile lint, and a WiX build of the MSI from stub files, so a broken .wxs shows before a release tag.
+  packaging-linux:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo publish dry run
+        run: cargo publish --workspace --dry-run
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: packaging/docker/Dockerfile
+
+  packaging-windows:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: wix build with stub files
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          New-Item -ItemType Directory -Path stub | Out-Null
+          foreach ($f in 'gitpoulpi.exe','gitpoulpi-tui.exe','gitpoulpi-mcp.exe','gitpoulpi-launch.exe','gitpoulpi-updater.exe','LICENSE','THIRD-PARTY-LICENSES.txt','marker-msi') {
+            Set-Content -Path "stub/$f" -Value 'stub'
+          }
+          wix build packaging/msi/gitpoulpi.wxs -arch x64 -d Version=0.0.1 -d "SourceDir=$PWD\stub" -d "MarkerFile=$PWD\stub\marker-msi" -o stub.msi
+          if ($LASTEXITCODE -ne 0) { throw "wix build failed" }

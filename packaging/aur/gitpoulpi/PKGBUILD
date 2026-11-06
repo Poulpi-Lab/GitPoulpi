@@ -10,7 +10,8 @@
 #
 # The build uses the `dist` profile of the official archives (fat LTO, one codegen unit): several minutes
 # and a few GB of RAM. `--release` builds faster with slightly larger binaries if that matters more.
-# No `.gitpoulpi-dist` marker is installed, so GitPoulpi never replaces its own files.
+# A `.gitpoulpi-dist` marker with channel=aur is installed next to the programs in /usr/lib/gitpoulpi, so
+# GitPoulpi never replaces its own files; /usr/bin holds symlinks.
 
 # Maintainer: @MAINTAINER@
 pkgname=gitpoulpi
@@ -43,7 +44,7 @@ build() {
     export RUSTUP_TOOLCHAIN=stable
     export CARGO_TARGET_DIR=target
     # GITPOULPI_DIST: the version string carries no commit hash, as in the release archives.
-    GITPOULPI_DIST=1 cargo build --frozen --profile dist -p gitpoulpi-tui -p gitpoulpi-cli -p gitpoulpi-mcp
+    GITPOULPI_DIST=1 cargo build --frozen --profile dist -p gitpoulpi-tui -p gitpoulpi-cli -p gitpoulpi-mcp -p gitpoulpi-updater
 }
 
 check() {
@@ -56,10 +57,19 @@ check() {
 
 package() {
     cd "${_srcdir}"
+    local _target="${CARCH}-unknown-linux-gnu"
+    # Programs and marker live together in /usr/lib/gitpoulpi, /usr/bin holds symlinks. The marker says
+    # channel=aur, so GitPoulpi shows the helper command for an update and never swaps files behind pacman.
     local bin
-    for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch; do
-        install -Dm755 "target/dist/${bin}" "${pkgdir}/usr/bin/${bin}"
+    for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch gitpoulpi-updater; do
+        install -Dm755 "target/dist/${bin}" "${pkgdir}/usr/lib/gitpoulpi/${bin}"
     done
+    for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch; do
+        install -d "${pkgdir}/usr/bin"
+        ln -s "/usr/lib/gitpoulpi/${bin}" "${pkgdir}/usr/bin/${bin}"
+    done
+    printf 'version=%s\ntarget=%s\nchannel=aur\n' "${pkgver}" "${_target}" > "${srcdir}/gitpoulpi-dist-marker"
+    install -Dm644 "${srcdir}/gitpoulpi-dist-marker" "${pkgdir}/usr/lib/gitpoulpi/.gitpoulpi-dist"
     install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
     install -Dm644 THIRD-PARTY-LICENSES.txt "${pkgdir}/usr/share/licenses/${pkgname}/THIRD-PARTY-LICENSES.txt"
     install -Dm644 README.md CHANGELOG.md -t "${pkgdir}/usr/share/doc/${pkgname}/"

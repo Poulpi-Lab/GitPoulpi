@@ -7,8 +7,9 @@
 #
 # It downloads the archive for this OS and CPU from the release (or takes a
 # local one with --archive), checks the .sha256 next to it, copies the program
-# files into --prefix (with the .gitpoulpi-dist marker, which keeps the
-# self-updater working) and links `gitpoulpi` and `gitpoulpi-mcp` into
+# files into --prefix (gitpoulpi, gitpoulpi-tui, gitpoulpi-mcp, gitpoulpi-launch
+# and gitpoulpi-updater, with the .gitpoulpi-dist marker that records
+# channel=archive, so GitPoulpi updates itself in place) and links `gitpoulpi` and `gitpoulpi-mcp` into
 # ~/.local/bin. The command alias, the PATH entry and the shortcuts are made by
 # the installed `gitpoulpi` itself (`alias create`, `path add`, `desktop
 # shortcut install`), the same code as Settings > General > Launcher, so the
@@ -211,6 +212,7 @@ host_target() {
     cpu=$(uname -m)
     case "$os/$cpu" in
     Linux/x86_64 | Linux/amd64) echo "x86_64-unknown-linux-gnu" ;;
+    Linux/aarch64 | Linux/arm64) echo "aarch64-unknown-linux-gnu" ;;
     Darwin/arm64 | Darwin/aarch64) echo "aarch64-apple-darwin" ;;
     Darwin/x86_64) echo "x86_64-apple-darwin" ;;
     *) die "no GitPoulpi release for $os on $cpu; build it from source" ;;
@@ -258,6 +260,9 @@ done
 for f in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch "$MARKER"; do
     [ -f "$src/$f" ] || die "the archive is missing $f"
 done
+# The archive's marker names the channel already; an older archive without it
+# gets the line here, so the install is never a "legacy" one.
+grep -q '^channel=' "$src/$MARKER" || printf 'channel=archive\n' >>"$src/$MARKER"
 
 # Questions (only when the flags did not answer them).
 if [ "$ALIAS_SET" -eq 0 ]; then

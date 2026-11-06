@@ -2,10 +2,25 @@ name: Release
 
 # Runs only when a version tag is pushed (`git tag releases/v0.2.0 && git push origin releases/v0.2.0`; this
 # repository's tags are prefixed by purpose, version tags live under `releases/`), so it costs nothing
-# day to day. It builds the three binaries with `cargo run -p xtask -- dist` (fat LTO) on each OS, then
-# publishes one GitHub release carrying every archive and its .sha256. The release notes are the tag's
-# `## [x.y.z]` section of CHANGELOG.md when there is one, else GitHub's generated notes. A tag with a `-`
-# (releases/v0.2.0-rc.1) is published as a pre-release. The CI workflow stays disabled; this one is independent.
+# day to day. Jobs:
+#
+#   build     every OS and CPU: `cargo run -p xtask -- dist` (fat LTO), then the installers (Inno Setup and MSI on
+#             Windows, a .deb on Linux), each with a .sha256.
+#   publish   one GitHub release with every archive, installer, .deb, install.sh, latest.json and the .sha256 files.
+#   channels  after publish, only for a stable tag and only when the repository variable PUBLISH_PACKAGES is
+#             'true': Chocolatey, winget, Scoop, Homebrew, AUR, apt, Docker (Docker Hub, optionally GHCR) and,
+#             opt-in, crates.io. Every channel step is skipped (the job stays green, with a notice) when its
+#             secret is missing. See docs/developer/releasing.md and the install-channels design.
+#
+# Secrets: CHOCO_API_KEY, AUR_SSH_PRIVATE_KEY, APT_GPG_PRIVATE_KEY, APT_GPG_PASSPHRASE, POULPI_BOT_PRIVATE_KEY,
+# DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, CARGO_REGISTRY_TOKEN (optional).
+# Variables: POULPI_BOT_APP_ID, PUBLISH_PACKAGES, PUBLISH_GHCR (optional), PUBLISH_CRATES (optional).
+# Pushes to the other repositories go out as the Poulpi-Lab GitHub App bot (actions/create-github-app-token),
+# never as a personal account.
+#
+# The release notes are the tag's `## [x.y.z]` section of CHANGELOG.md when there is one, else GitHub's generated
+# notes. A tag with a `-` (releases/v0.2.0-rc.1) is published as a pre-release and reaches no channel.
+# The CI workflow stays disabled; this one is independent.
 #
 # Dry run (builds every archive and installer, publishes nothing): push a tag under another prefix, for example
 # `git tag dryrun/v0.1.0 && git push origin dryrun/v0.1.0`, then
@@ -26,7 +41,7 @@ on:
         default: false
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.event.inputs.tag || github.ref_name }}
@@ -44,8 +59,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 22.04 for an older glibc: the Linux binary then runs on more distributions.
+          # 22.04 for an older glibc: the Linux binary then runs on more distributions. The arm64 row feeds the
+          # multi-arch Docker image and the arm64 .deb; hosted arm runners are free only for public repositories.
           - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-22.04-arm, target: aarch64-unknown-linux-gnu }
           - { os: windows-latest, target: x86_64-pc-windows-msvc }
           - { os: macos-latest, target: aarch64-apple-darwin }
           - { os: macos-latest, target: x86_64-apple-darwin }
@@ -90,13 +107,54 @@ jobs:
           $setup = "$stem-setup.exe"
           $hash = (Get-FileHash "target/dist/$setup" -Algorithm SHA256).Hash.ToLower()
           [System.IO.File]::WriteAllText("$PWD/target/dist/$setup.sha256", "$hash  $setup`n")
+      # The MSI (packaging/msi/gitpoulpi.wxs, WiX v5) for Intune, GPO and SCCM: the same files, a marker with
+      # channel=msi. An MSI version has no pre-release part, so a -rc tag builds it from the numeric core.
+      - name: Windows installer (MSI, WiX)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          $version = ($env:TAG -replace '^.*/', '').TrimStart('v')
+          $msiVersion = ($version -split '-')[0]
+          $stem = "gitpoulpi-$version-${{ matrix.target }}"
+          cargo run -q -p xtask -- package-marker --channel msi --version $version --target ${{ matrix.target }} --out "$PWD/marker-msi"
+          if ($LASTEXITCODE -ne 0) { throw "package-marker failed" }
+          wix build packaging/msi/gitpoulpi.wxs -arch x64 -d "Version=$msiVersion" -d "SourceDir=$PWD\installer-src\$stem" -d "MarkerFile=$PWD\marker-msi" -o "target/dist/$stem.msi"
+          if ($LASTEXITCODE -ne 0) { throw "wix build failed" }
+          $msi = "$stem.msi"
+          $hash = (Get-FileHash "target/dist/$msi" -Algorithm SHA256).Hash.ToLower()
+          [System.IO.File]::WriteAllText("$PWD/target/dist/$msi.sha256", "$hash  $msi`n")
+      # Linux only: the .deb. cargo-deb packs the archive's binaries (staged in target/deb-stage, see
+      # [package.metadata.deb] of gitpoulpi-cli) with a marker that says channel=apt.
+      - name: Debian package
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          version="${TAG##*/}"
+          version="${version#v}"
+          stem="gitpoulpi-$version-${{ matrix.target }}"
+          rm -rf target/deb-stage
+          mkdir -p target/deb-stage
+          tar -xzf "target/dist/$stem.tar.gz" -C target/deb-stage --strip-components=1
+          cargo run -q -p xtask -- package-marker --channel apt --version "$version" --target ${{ matrix.target }} --out target/deb-stage/.gitpoulpi-dist
+      - uses: taiki-e/install-action@v2
+        if: runner.os == 'Linux'
+        with:
+          tool: cargo-deb
+      - name: Debian package (pack)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          cargo deb -p gitpoulpi-cli --no-build --no-strip -o target/dist/
+          cd target/dist
+          for deb in *.deb; do sha256sum "$deb" > "$deb.sha256"; done
       - uses: actions/upload-artifact@v4
         with:
           name: dist-${{ matrix.target }}
           path: target/dist/*
           if-no-files-found: error
-          # The release keeps the files; the artifacts are only the hand-over to the publish job (and what a
-          # dry run inspects). Short retention keeps a private repository's Actions storage quota free.
+          # The release keeps the files; the artifacts are only the hand-over to the publish and channel jobs (and
+          # what a dry run inspects). Short retention keeps a private repository's Actions storage quota free.
           retention-days: 7
 
   publish:
@@ -104,6 +162,11 @@ jobs:
     # `inputs` is empty on a tag push, so only a manual dry run skips this job.
     if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -112,6 +175,13 @@ jobs:
         with:
           path: dist
           merge-multiple: true
+      - name: Version and pre-release flag
+        id: meta
+        run: |
+          version="${TAG##*/}"
+          version="${version#v}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          case "$version" in *-*) echo "prerelease=true" >> "$GITHUB_OUTPUT" ;; *) echo "prerelease=false" >> "$GITHUB_OUTPUT" ;; esac
       # The Linux and macOS installer: `curl -fsSL .../releases/latest/download/install.sh | sh`.
       - name: Attach install.sh
         run: cp packaging/install.sh dist/install.sh
@@ -126,6 +196,16 @@ jobs:
             on { print }
           ' CHANGELOG.md > notes.md
           if [ -s notes.md ]; then echo "generate=false" >> "$GITHUB_OUTPUT"; else echo "generate=true" >> "$GITHUB_OUTPUT"; fi
+      # latest.json: the version, the notes and every asset's sha256, for mirrors and the manifest update source
+      # (policy `check = "manifest"`). A mirror only copies the release's files next to it.
+      - name: latest.json
+        run: |
+          cd dist
+          assets=$(for sum in *.sha256; do
+            jq -n --arg name "${sum%.sha256}" --arg hash "$(cut -d ' ' -f 1 "$sum")" '{($name): $hash}'
+          done | jq -s 'add')
+          jq -n --arg version "${{ steps.meta.outputs.version }}" --rawfile notes ../notes.md --argjson assets "$assets" \
+            '{version: $version, notes: $notes, assets: $assets}' > latest.json
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
@@ -135,3 +215,423 @@ jobs:
           prerelease: ${{ contains(env.TAG, '-') }}
           files: dist/*
           fail_on_unmatched_files: true
+
+  # ---------------------------------------------------------------- channels
+  # Every job below runs after `publish`, only for a stable tag and only when PUBLISH_PACKAGES is 'true'. A job
+  # starts with an `env` flag that says whether its secrets exist; each publishing step carries
+  # `if: env.HAS... == 'true'`, so a missing secret skips the step and the job stays green with a notice.
+
+  chocolatey:
+    needs: publish
+    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    runs-on: windows-latest
+    env:
+      HAS: ${{ secrets.CHOCO_API_KEY != '' }}
+      VERSION: ${{ needs.publish.outputs.version }}
+    steps:
+      - name: Notice when the secret is missing
+        if: env.HAS != 'true'
+        shell: bash
+        run: echo "::notice::CHOCO_API_KEY is not set, the Chocolatey package was not pushed"
+      - uses: actions/checkout@v4
+        if: env.HAS == 'true'
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/download-artifact@v4
+        if: env.HAS == 'true'
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Fill the templates
+        if: env.HAS == 'true'
+        shell: bash
+        run: sh packaging/fill-templates.sh "$VERSION" dist filled
+      - name: Pack and push
+        if: env.HAS == 'true'
+        shell: bash
+        working-directory: filled/chocolatey
+        env:
+          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+        run: |
+          choco pack
+          choco push "gitpoulpi.$VERSION.nupkg" --source https://push.chocolatey.org/ --api-key "$CHOCO_API_KEY"
+
+  winget:
+    needs: publish
+    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      HAS: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' }}
+      VERSION: ${{ needs.publish.outputs.version }}
+    steps:
+      - name: Notice when the bot credentials are missing
+        if: env.HAS != 'true'
+        run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the winget update was not submitted"
+      # The App installation covers the fork Poulpi-Lab/winget-pkgs. komac needs the package to exist in
+      # winget-pkgs already (the first version is submitted by hand), then it opens one pull request per release.
+      - uses: actions/create-github-app-token@v1
+        if: env.HAS == 'true'
+        id: app
+        with:
+          app-id: ${{ vars.POULPI_BOT_APP_ID }}
+          private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
+          owner: Poulpi-Lab
+          repositories: winget-pkgs
+      - uses: taiki-e/install-action@v2
+        if: env.HAS == 'true'
+        with:
+          tool: komac
+      - name: Submit the update
+        if: env.HAS == 'true'
+        env:
+          GITHUB_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          url="https://github.com/${{ github.repository }}/releases/download/${TAG}/gitpoulpi-${VERSION}-x86_64-pc-windows-msvc-setup.exe"
+          komac update GitPoulpi.GitPoulpi --version "$VERSION" --urls "$url" --submit
+
+  scoop:
+    needs: publish
+    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      HAS: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' }}
+      VERSION: ${{ needs.publish.outputs.version }}
+    steps:
+      - name: Notice when the bot credentials are missing
+        if: env.HAS != 'true'
+        run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the Scoop bucket was not updated"
+      - uses: actions/create-github-app-token@v1
+        if: env.HAS == 'true'
+        id: app
+        with:
+          app-id: ${{ vars.POULPI_BOT_APP_ID }}
+          private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
+          owner: Poulpi-Lab
+          repositories: scoop-gitpoulpi
+      - uses: actions/checkout@v4
+        if: env.HAS == 'true'
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/checkout@v4
+        if: env.HAS == 'true'
+        with:
+          repository: Poulpi-Lab/scoop-gitpoulpi
+          token: ${{ steps.app.outputs.token }}
+          path: target-repo
+      - uses: actions/download-artifact@v4
+        if: env.HAS == 'true'
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Fill the manifest and push as the bot
+        if: env.HAS == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          BOT_SLUG: ${{ steps.app.outputs.app-slug }}
+        run: |
+          sh packaging/fill-templates.sh "$VERSION" dist filled
+          mkdir -p target-repo/bucket
+          cp filled/scoop/gitpoulpi.json target-repo/bucket/gitpoulpi.json
+          cd target-repo
+          bot_id=$(gh api "/users/${BOT_SLUG}[bot]" --jq .id)
+          git config user.name "${BOT_SLUG}[bot]"
+          git config user.email "${bot_id}+${BOT_SLUG}[bot]@users.noreply.github.com"
+          git add bucket/gitpoulpi.json
+          git diff --cached --quiet && { echo "nothing to commit"; exit 0; }
+          git commit -m "gitpoulpi ${VERSION}"
+          git push
+
+  homebrew:
+    needs: publish
+    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      HAS: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' }}
+      VERSION: ${{ needs.publish.outputs.version }}
+    steps:
+      - name: Notice when the bot credentials are missing
+        if: env.HAS != 'true'
+        run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the Homebrew tap was not updated"
+      - uses: actions/create-github-app-token@v1
+        if: env.HAS == 'true'
+        id: app
+        with:
+          app-id: ${{ vars.POULPI_BOT_APP_ID }}
+          private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
+          owner: Poulpi-Lab
+          repositories: homebrew-gitpoulpi
+      - uses: actions/checkout@v4
+        if: env.HAS == 'true'
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/checkout@v4
+        if: env.HAS == 'true'
+        with:
+          repository: Poulpi-Lab/homebrew-gitpoulpi
+          token: ${{ steps.app.outputs.token }}
+          path: target-repo
+      - uses: actions/download-artifact@v4
+        if: env.HAS == 'true'
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Fill the formula and push as the bot
+        if: env.HAS == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          BOT_SLUG: ${{ steps.app.outputs.app-slug }}
+        run: |
+          sh packaging/fill-templates.sh "$VERSION" dist filled
+          mkdir -p target-repo/Formula
+          cp filled/homebrew/gitpoulpi.rb target-repo/Formula/gitpoulpi.rb
+          cd target-repo
+          bot_id=$(gh api "/users/${BOT_SLUG}[bot]" --jq .id)
+          git config user.name "${BOT_SLUG}[bot]"
+          git config user.email "${bot_id}+${BOT_SLUG}[bot]@users.noreply.github.com"
+          git add Formula/gitpoulpi.rb
+          git diff --cached --quiet && { echo "nothing to commit"; exit 0; }
+          git commit -m "gitpoulpi ${VERSION}"
+          git push
+
+  aur:
+    needs: publish
+    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    env:
+      HAS: ${{ secrets.AUR_SSH_PRIVATE_KEY != '' }}
+      VERSION: ${{ needs.publish.outputs.version }}
+    steps:
+      - name: Notice when the secret is missing
+        if: env.HAS != 'true'
+        run: echo "::notice::AUR_SSH_PRIVATE_KEY is not set, the AUR packages were not pushed"
+      - name: Install the tools
+        if: env.HAS == 'true'
+        run: pacman -Syu --noconfirm base-devel git openssh curl
+      - uses: actions/checkout@v4
+        if: env.HAS == 'true'
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/download-artifact@v4
+        if: env.HAS == 'true'
+        with:
+          path: dist
+          merge-multiple: true
+      # The source package needs the tag's source tarball checksum, which only exists for a public repository:
+      # without it the folder is skipped with a notice and gitpoulpi-bin is still pushed.
+      - name: Fill the templates
+        if: env.HAS == 'true'
+        run: |
+          src_url="https://github.com/${{ github.repository }}/archive/refs/tags/${TAG}.tar.gz"
+          if curl -fsSL -o source.tar.gz "$src_url"; then
+            SOURCE_SHA256=$(sha256sum source.tar.gz | cut -d ' ' -f 1)
+            export SOURCE_SHA256
+          else
+            echo "::notice::the source tarball is not downloadable, the gitpoulpi source package is skipped"
+          fi
+          sh packaging/fill-templates.sh "$VERSION" dist filled
+      - name: Generate .SRCINFO and push to the AUR
+        if: env.HAS == 'true'
+        env:
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+        run: |
+          useradd -m builder
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/aur -o IdentitiesOnly=yes"
+          git config --global user.name "Poulpi-Lab"
+          git config --global user.email "noreply@users.noreply.github.com"
+          for pkg in gitpoulpi-bin gitpoulpi; do
+            [ -d "filled/aur/$pkg" ] || continue
+            chown -R builder "filled/aur/$pkg"
+            su builder -c "cd filled/aur/$pkg && makepkg --printsrcinfo > .SRCINFO"
+            git clone "ssh://aur@aur.archlinux.org/$pkg.git" "aur-$pkg"
+            cp "filled/aur/$pkg/PKGBUILD" "filled/aur/$pkg/.SRCINFO" "aur-$pkg/"
+            cd "aur-$pkg"
+            git add PKGBUILD .SRCINFO
+            if git diff --cached --quiet; then echo "$pkg: nothing to commit"; else
+              git commit -m "Update to ${VERSION}"
+              git push
+            fi
+            cd ..
+          done
+
+  apt:
+    needs: publish
+    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      HAS: ${{ secrets.POULPI_BOT_PRIVATE_KEY != '' && vars.POULPI_BOT_APP_ID != '' && secrets.APT_GPG_PRIVATE_KEY != '' }}
+      VERSION: ${{ needs.publish.outputs.version }}
+    steps:
+      - name: Notice when a secret is missing
+        if: env.HAS != 'true'
+        run: echo "::notice::POULPI_BOT_PRIVATE_KEY, POULPI_BOT_APP_ID or APT_GPG_PRIVATE_KEY is not set, the apt repository was not updated"
+      - uses: actions/create-github-app-token@v1
+        if: env.HAS == 'true'
+        id: app
+        with:
+          app-id: ${{ vars.POULPI_BOT_APP_ID }}
+          private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
+          owner: Poulpi-Lab
+          repositories: apt
+      - uses: actions/checkout@v4
+        if: env.HAS == 'true'
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/checkout@v4
+        if: env.HAS == 'true'
+        with:
+          repository: Poulpi-Lab/apt
+          ref: gh-pages
+          token: ${{ steps.app.outputs.token }}
+          path: apt-repo
+      - uses: actions/download-artifact@v4
+        if: env.HAS == 'true'
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Add the packages and build the signed repository
+        if: env.HAS == 'true'
+        env:
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+          APT_GPG_PASSPHRASE: ${{ secrets.APT_GPG_PASSPHRASE }}
+        run: |
+          sudo apt-get install -y --no-install-recommends apt-utils
+          printf '%s\n' "$APT_GPG_PRIVATE_KEY" | gpg --batch --import
+          APT_GPG_KEY_ID=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr/ { print $10; exit }')
+          export APT_GPG_KEY_ID
+          mkdir -p apt-repo/pool
+          cp dist/*.deb apt-repo/pool/
+          sh packaging/apt/build-repo.sh apt-repo
+          cp packaging/apt/gitpoulpi.sources apt-repo/gitpoulpi.sources
+      - name: Push as the bot
+        if: env.HAS == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          BOT_SLUG: ${{ steps.app.outputs.app-slug }}
+        run: |
+          cd apt-repo
+          bot_id=$(gh api "/users/${BOT_SLUG}[bot]" --jq .id)
+          git config user.name "${BOT_SLUG}[bot]"
+          git config user.email "${bot_id}+${BOT_SLUG}[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "nothing to commit"; exit 0; }
+          git commit -m "gitpoulpi ${VERSION}"
+          git push
+
+  # One multi-arch build, pushed to Docker Hub (poulpilab/gitpoulpi, the primary registry) and, when the
+  # variable PUBLISH_GHCR is 'true', to ghcr.io/poulpi-lab/gitpoulpi with the same tags. The binaries come
+  # from the build job's Linux archives (amd64 and arm64). Without any login the build still runs and checks the
+  # Dockerfile, but pushes nothing. The Docker Hub overview is packaging/docker/README.md, replaced on every release.
+  docker:
+    needs: publish
+    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      HAS_DOCKERHUB: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
+      HAS_GHCR: ${{ vars.PUBLISH_GHCR == 'true' }}
+      VERSION: ${{ needs.publish.outputs.version }}
+    steps:
+      - name: Notice when Docker Hub is not configured
+        if: env.HAS_DOCKERHUB != 'true'
+        run: echo "::notice::DOCKERHUB_USERNAME or DOCKERHUB_TOKEN is not set, nothing is pushed to Docker Hub"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dist-*-linux-gnu
+          path: dist
+          merge-multiple: true
+      - name: Prepare the build context
+        run: |
+          for pair in "amd64 x86_64-unknown-linux-gnu" "arm64 aarch64-unknown-linux-gnu"; do
+            set -- $pair
+            mkdir -p "docker-ctx/dist/$1" "unpacked/$1"
+            tar -xzf "dist/gitpoulpi-${VERSION}-$2.tar.gz" -C "unpacked/$1" --strip-components=1
+            for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch gitpoulpi-updater; do
+              cp "unpacked/$1/$bin" "docker-ctx/dist/$1/$bin"
+            done
+          done
+          cp packaging/docker/entrypoint.sh docker-ctx/entrypoint.sh
+      # The binaries are copied, but the arm64 image's RUN steps (apt, the marker) execute under emulation.
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: |
+            poulpilab/gitpoulpi
+            ${{ env.HAS_GHCR == 'true' && 'ghcr.io/poulpi-lab/gitpoulpi' || '' }}
+          flavor: latest=false
+          # `latest` and major.minor only on a stable tag; a pre-release gets its exact version.
+          tags: |
+            type=raw,value=${{ env.VERSION }}
+            type=semver,pattern={{major}}.{{minor}},value=v${{ env.VERSION }},enable=${{ !contains(env.VERSION, '-') }}
+            type=raw,value=latest,enable=${{ !contains(env.VERSION, '-') }}
+      - name: Log in to Docker Hub
+        if: env.HAS_DOCKERHUB == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to GHCR
+        if: env.HAS_GHCR == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: docker-ctx
+          file: packaging/docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ env.HAS_DOCKERHUB == 'true' || env.HAS_GHCR == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ env.VERSION }}
+            SOURCE_URL=https://github.com/${{ github.repository }}
+      - name: Docker Hub overview
+        if: env.HAS_DOCKERHUB == 'true'
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: poulpilab/gitpoulpi
+          readme-filepath: packaging/docker/README.md
+          short-description: Git client for the terminal with a clickable commit graph, a CLI and an MCP server
+
+  # Opt-in until the workspace is ready for crates.io (publish = false on xtask and the testkit, the CHANGELOG
+  # include inside the crate, every name reserved): needs the secret and PUBLISH_CRATES == 'true'.
+  crates:
+    needs: publish
+    if: ${{ needs.publish.outputs.prerelease == 'false' && vars.PUBLISH_PACKAGES == 'true' && vars.PUBLISH_CRATES == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      HAS: ${{ secrets.CARGO_REGISTRY_TOKEN != '' }}
+    steps:
+      - name: Notice when the secret is missing
+        if: env.HAS != 'true'
+        run: echo "::notice::CARGO_REGISTRY_TOKEN is not set, nothing was published to crates.io"
+      - uses: actions/checkout@v4
+        if: env.HAS == 'true'
+        with:
+          ref: ${{ env.TAG }}
+      - uses: dtolnay/rust-toolchain@stable
+        if: env.HAS == 'true'
+      - name: Publish the workspace
+        if: env.HAS == 'true'
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish --workspace

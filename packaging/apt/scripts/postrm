@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+case "$1" in
+    remove | purge)
+        for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch; do
+            [ -L "/usr/bin/$bin" ] && rm -f "/usr/bin/$bin"
+        done
+        ;;
+esac
+exit 0

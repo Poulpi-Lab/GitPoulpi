@@ -468,13 +468,15 @@ What `gitpoulpi rewrite` and the history rewrite workbench protect. Details: [Hi
 
 ## `[updates]` (looking for a newer release)
 
-What the title bar's version chip does about newer releases. Details: [Updates](installation.md#updates).
+What the title bar's version chip does about newer releases. Details: [Updates](updates.md).
 
 | Key | Default | Values and effect |
 |---|---|---|
 | `updates.mode` | `"notify"` | `"notify"` asks GitHub once a day, in the background, whether a newer release exists, and turns the version chip into `vX.Y.Z available`. `"auto"` also downloads and stages the update by itself when this build came from a release archive (it still asks before restarting); for any other build it behaves like `"notify"`. `"off"` never makes a request. Applies live. |
 | `updates.channel` | `"stable"` | `"stable"` considers only full releases; `"prerelease"` also offers release candidates (`-rc.1`). Applies live. |
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | The `owner/name` on github.com whose releases are checked. While that repository is private GitHub answers 404 unless a token is stored for github.com (Settings > Integrations); without one the check fails quietly and writes one line to the application log. |
+
+An administrator can set `mode`, `channel` (as `release_channel`) and `repo`, plus a few more update options, in a machine-wide policy file or the Windows registry. A key the policy sets wins over `config.toml` and shows in Settings as **Set by your administrator**. `mode` in the policy is a ceiling: you can pick a lower value, never a higher one. See [Enterprise distribution](enterprise-distribution.md#the-policy-file-and-the-registry).
 
 ## `[keybindings]`
 

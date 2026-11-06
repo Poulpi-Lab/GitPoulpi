@@ -14,8 +14,12 @@ start at the top, and jump to the reference pages when you need them.
 ## Start here
 
 1. **[Installation](installation.md)**: what you need, release archives,
-   building from source. For a smaller binary, see
-   **[Custom builds](custom-builds.md)**.
+   package managers, building from source. For a smaller binary, see
+   **[Custom builds](custom-builds.md)**. How GitPoulpi keeps itself current
+   (the version chip, the update panel, revert): **[Updates](updates.md)**.
+   To run it in a container: **[Running in Docker](docker.md)**. For
+   administrators, internal feeds, mirrors and the update policy:
+   **[Enterprise distribution](enterprise-distribution.md)**.
 2. **[Getting started](getting-started.md)**: your first five minutes, from
    launching to your first commit.
 3. **[Tour of the interface](interface-tour.md)**: the name of every area of the

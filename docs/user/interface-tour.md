@@ -35,7 +35,7 @@ The top edge of the window reads
   `gitpoulpi licenses` prints the same text.
 - The **version** (`v1.0.0`; `vX.Y.Z available` when a newer release exists)
   sits between the name and the path: a click opens the Release notes tab, see
-  [Updates](installation.md#updates).
+  [Updates](updates.md).
 - **Open in ▾**, right after the path, opens the tab's folder in a terminal,
   an editor, a multiplexer or the file manager (`Alt+O`). See
   [Open in](open-in.md).

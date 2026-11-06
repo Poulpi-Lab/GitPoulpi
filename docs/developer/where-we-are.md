@@ -30,6 +30,16 @@ when this file and the code disagree, fix this file.
   explain, merge suggestions, through an API or a local agent CLI.
 - **Git LFS** (ADR 0009) through the system `git-lfs`; a missing program is a
   typed error (`Error::LfsUnavailable`) with the install link.
+- **Updates and install channels**: the marker's `channel=` says how GitPoulpi
+  was installed (`gitpoulpi_config::release::InstallChannel`); `gitpoulpi-update`
+  resolves it and plans the update per channel, the title-bar chip opens the
+  update panel (`tui/updates/`), and the new crate `crates/gitpoulpi-updater`
+  (`gitpoulpi-updater`) does the swap or runs the package manager after the TUI
+  exits. A machine-wide policy (`gitpoulpi_config::policy`) can lock it. User
+  pages: `docs/user/updates.md`, `enterprise-distribution.md`, `docker.md`;
+  release side: `docs/developer/releasing.md`. Open: the Windows hand checks
+  (UAC swap, Restart Manager, `choco upgrade`, revert) under "Things to verify
+  by hand".
 - **Custom builds**: cargo features per language/integration/feature
   (`docs/user/custom-builds.md`); a feature that is off is a `*_stub.rs` module.
 
@@ -287,6 +297,7 @@ not closed since:
 
 ## Things to verify by hand
 
+- **Updater and install channels** (`crates/gitpoulpi-updater`, the update panel; pending on Windows; the logic runs against fakes in the Linux tiers): on Windows (1) an all-users install: **Update and restart** shows the UAC prompt, other users' GitPoulpi processes close, the new version opens in a new window and the status line says `Updated to v...`; decline the prompt and see `Update canceled ... Nothing changed.` (2) The Restart Manager really lists and closes a process of another user that holds an install file. (3) `choco upgrade gitpoulpi` and `winget upgrade` re-run the setup and the marker keeps its channel (and `feed=` for `choco-internal`, which needs Chocolatey to remember package parameters). (4) **Revert** after an Inno user update and after an all-users one. (5) The Inno uninstall key's `DisplayVersion` follows an update. On Linux and macOS: Homebrew and the `.deb` marker land next to the binaries (`channel=homebrew`, `channel=apt`).
 - **Terminal run mode of local agents** (`docs/user/ai.md#run-mode-headless-or-virtual-terminal`; the client, the profile rows and the
   Generate button are tested against a fake interactive agent, no real agent was ever started): for each of Claude Code, Codex and
   Gemini, in a scratch repository with a staged change: (1) Settings > AI > profile > Run mode = Interactive; press **Open the
@@ -598,6 +609,14 @@ and a scratch repository.
 
 Each of these caused a real bug. Most have a test that was confirmed to fail
 without the fix; keep it that way.
+
+### Install channels
+
+- **The marker's channel survives a swap.** The release archive's marker says
+  `channel=archive`; `install::apply` keeps the installed marker's `channel=` and
+  `feed=` instead, so updating a Chocolatey or Scoop install in place can never
+  turn it into an archive install. See "The updater owns the swap" in
+  `docs/architecture/session-and-state.md`.
 
 ### Slow first launch (macOS)
 

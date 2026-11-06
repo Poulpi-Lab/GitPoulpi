@@ -4,16 +4,14 @@
 //! same everywhere.
 
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::{Command, Stdio};
 use std::time::Duration;
 
 use gitpoulpi_core::domain::OperationKind;
 use gitpoulpi_ipc::{discovery, Client, Request, ShutdownArgs};
 
-use crate::ops::{
-    Clock, DaemonOps, LaunchPlan, Proc, ProcessOps, RunError, SessionDaemon, Transfer,
-};
+use crate::ops::{Clock, DaemonOps, LaunchPlan, RunError, SessionDaemon, Transfer};
 
 pub struct RealClock;
 
@@ -166,6 +164,8 @@ pub(crate) fn relaunch_now(plan: &LaunchPlan) -> Result<(), String> {
 #[cfg(unix)]
 mod unix {
     use super::*;
+    use crate::ops::{Proc, ProcessOps};
+    use std::path::PathBuf;
 
     pub struct RealProc;
 

@@ -6,10 +6,10 @@
 //! a test machine does not have; no config or data folder of the user is
 //! touched: every path comes from the job.
 
-use std::path::Path;
-
 use assert_cmd::Command;
+#[cfg(unix)]
 use gitpoulpi_config::release::{self, InstallChannel, Marker, MARKER_FILE};
+#[cfg(unix)]
 use gitpoulpi_update::job::{
     Action, JobElevation, Relaunch, Staged, UpdateJob, UpdateStatus, SCHEMA,
 };
@@ -55,11 +55,13 @@ fn a_missing_or_foreign_job_is_exit_6() {
     assert!(String::from_utf8_lossy(&out.stderr).contains("schema"));
 }
 
+#[cfg(unix)]
 fn script(version: &str) -> String {
     format!("#!/bin/sh\necho \"gitpoulpi {version} (test)\"\n")
 }
 
-fn write_exec(path: &Path, text: &str) {
+#[cfg(unix)]
+fn write_exec(path: &std::path::Path, text: &str) {
     std::fs::write(path, text).unwrap();
     #[cfg(unix)]
     {

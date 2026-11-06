@@ -22,8 +22,8 @@
 
 use std::sync::Mutex;
 
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseButton, MouseEvent};
 use crossterm::event::MouseEventKind;
+use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseButton, MouseEvent};
 use gitpoulpi_hosting::TrustProblem;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
@@ -231,12 +231,10 @@ impl Dialog {
         }
         let at = (mouse.column, mouse.row);
         self.pointer = Some(at);
-        if let Some(top) = self.bar.on_mouse(
-            self.painted.track,
-            mouse,
-            self.total_lines(),
-            self.scroll,
-        ) {
+        if let Some(top) =
+            self.bar
+                .on_mouse(self.painted.track, mouse, self.total_lines(), self.scroll)
+        {
             let max = self.total_lines().saturating_sub(self.rows());
             self.scroll = top.min(max);
             return None;

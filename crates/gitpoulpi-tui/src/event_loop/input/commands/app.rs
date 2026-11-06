@@ -97,7 +97,8 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::AboutLicenses => crate::about::open_licenses(),
         PaletteCommand::TrustReview => {
             if !crate::trust_dialog::open_review() {
-                *cx.last_message = Some(gitpoulpi_i18n::msg::trust_dialog::NONE_WAITING.get().into());
+                *cx.last_message =
+                    Some(gitpoulpi_i18n::msg::trust_dialog::NONE_WAITING.get().into());
             }
         }
         PaletteCommand::OpenActivityLog => crate::activity_log::open_panel(),

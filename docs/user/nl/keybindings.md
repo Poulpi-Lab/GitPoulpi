@@ -1152,6 +1152,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Integraties: Profiel van deze repository beheren |  |
 | Integraties: Integratie verbinden... |  |
 | Instellingen: Radar-opties van een profiel... |  |
+| Integrations: Review security check |  |
 | App: Afsluiten | `q` |
 | App: Thema... |  |
 | App: Thema wijzigen... | `Ctrl+N y` |

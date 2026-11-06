@@ -60,7 +60,14 @@ pub(super) fn paint(d: &mut Dialog, buf: &mut Buffer, area: Rect) {
             Tone::Heading => heading,
             Tone::Muted => muted,
         };
-        dialog_kit::put(buf, body_rect.x, body_rect.y + i as u16, &l.text, body_rect.width, style);
+        dialog_kit::put(
+            buf,
+            body_rect.x,
+            body_rect.y + i as u16,
+            &l.text,
+            body_rect.width,
+            style,
+        );
     }
     let bar_rect = Rect::new(outer.right().saturating_sub(2), body_rect.y, 1, body_rows);
     let track = Track::column(bar_rect, lines.len(), usize::from(body_rows), d.scroll);

@@ -1347,7 +1347,10 @@ mod tests {
             "/user",
             200,
             USER,
-            &[("X-OAuth-Scopes", "repo, read:user, admin:public_key, delete_repo")],
+            &[(
+                "X-OAuth-Scopes",
+                "repo, read:user, admin:public_key, delete_repo",
+            )],
         ));
         add(&f.env, "github", None, None);
         f.store.store("integration:github", "ghp_tok").unwrap();

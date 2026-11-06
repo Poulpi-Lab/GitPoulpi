@@ -1148,6 +1148,7 @@ Tuşlar varsayılanlardır.
 | Entegrasyonlar: Bu Deponun Profilini Yönet |  |
 | Entegrasyonlar: Entegrasyon Bağla... |  |
 | Ayarlar: Bir profilin Radar seçenekleri... |  |
+| Integrations: Review security check |  |
 | Uygulama: Çık | `q` |
 | Uygulama: Tema... |  |
 | Uygulama: Temayı Değiştir... | `Ctrl+N y` |

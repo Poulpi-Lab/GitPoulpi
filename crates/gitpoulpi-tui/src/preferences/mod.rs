@@ -409,6 +409,7 @@ impl PreferencesState {
 
     /// The security check accepted a new address: the profile's form opens
     /// with the token field focused (the saved token was never sent there).
+    #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
     pub(crate) fn show_retoken(&mut self, profile_id: &str) {
         self.reload_integrations();
         self.show_integration(Some(profile_id));
@@ -417,6 +418,7 @@ impl PreferencesState {
 
     /// Reads the profile list from the file again, after the security check
     /// changed what is trusted (or disconnected a profile).
+    #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
     pub(crate) fn reload_integrations(&mut self) {
         if let Some(path) = self.config_path.as_deref() {
             if let Ok(fresh) = Config::load(path) {

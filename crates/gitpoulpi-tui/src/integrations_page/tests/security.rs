@@ -44,7 +44,10 @@ fn a_token_with_extra_rights_shows_them_with_the_expiry_and_the_advice() {
             "X-OAuth-Scopes",
             "repo, read:user, admin:public_key, gist, delete_repo",
         ),
-        ("github-authentication-token-expiration", "2026-12-01 10:00:00 UTC"),
+        (
+            "github-authentication-token-expiration",
+            "2026-12-01 10:00:00 UTC",
+        ),
     ]);
     connect_github(&mut page, &mut h, "ghp_secret");
     let screen = text(&draw(&mut page, &h, 90, 30, None));
@@ -102,14 +105,21 @@ fn the_toggles_follow_the_address_in_the_form() {
     assert!(items.contains(&Item::AllowPlain), "{items:?}");
     assert!(!items.contains(&Item::StrictPin), "{items:?}");
     let screen = text(&draw(&mut page, &h, 90, 40, None));
-    assert!(screen.contains("Allow plain http (not encrypted)"), "{screen}");
-    assert!(screen.contains("Warning: the token and everything else"), "{screen}");
+    assert!(
+        screen.contains("Allow plain http (not encrypted)"),
+        "{screen}"
+    );
+    assert!(
+        screen.contains("Warning: the token and everything else"),
+        "{screen}"
+    );
 
     // The warning is red.
     let buf = draw(&mut page, &h, 90, 40, None);
     let warn_fg = (0..buf.area.height).find_map(|y| {
         let line: String = (0..buf.area.width).map(|x| buf[(x, y)].symbol()).collect();
-        line.find("Warning: the token").map(|x| buf[(x as u16, y)].fg)
+        line.find("Warning: the token")
+            .map(|x| buf[(x as u16, y)].fg)
     });
     assert_eq!(warn_fg, Some(crate::th().status.danger));
 
@@ -129,10 +139,16 @@ fn the_toggles_follow_the_address_in_the_form() {
     let items = page.items(&h.config);
     assert!(items.contains(&Item::StrictPin) && !items.contains(&Item::AllowPlain));
     let screen = text(&draw(&mut page, &h, 90, 40, None));
-    assert!(screen.contains("[ ] Strict certificate pinning"), "{screen}");
+    assert!(
+        screen.contains("[ ] Strict certificate pinning"),
+        "{screen}"
+    );
     page.activate(Item::StrictPin, &mut h.env());
     let screen = text(&draw(&mut page, &h, 90, 40, None));
-    assert!(screen.contains("[x] Strict certificate pinning"), "{screen}");
+    assert!(
+        screen.contains("[x] Strict certificate pinning"),
+        "{screen}"
+    );
 }
 
 #[test]
@@ -147,7 +163,10 @@ fn a_remote_http_address_is_refused_without_the_toggle_and_sends_nothing() {
     assert!(error.contains("not encrypted"), "{error}");
     assert!(transport.requests().is_empty(), "nothing was sent");
     assert!(h.config.integrations.is_empty());
-    assert_eq!(h.tokens.load("integration:gitlab-self-managed").unwrap(), None);
+    assert_eq!(
+        h.tokens.load("integration:gitlab-self-managed").unwrap(),
+        None
+    );
 }
 
 #[test]
@@ -242,10 +261,16 @@ fn a_changed_address_needs_a_token_typed_for_it() {
     page.activate(Item::Connect, &mut h.env());
     wait_connected(&mut page, &mut h);
     assert_eq!(page.view(&h.config), View::Connected(0));
-    assert_eq!(h.config.integrations[0].url, "https://elsewhere.example.com");
+    assert_eq!(
+        h.config.integrations[0].url,
+        "https://elsewhere.example.com"
+    );
     let record = gate_of(&page).record_of(&id).unwrap();
     assert_eq!(record.origin, "https://elsewhere.example.com");
-    assert!(transport.requests().iter().all(|r| r.url.starts_with("https://elsewhere.example.com")));
+    assert!(transport
+        .requests()
+        .iter()
+        .all(|r| r.url.starts_with("https://elsewhere.example.com")));
 }
 
 #[test]
@@ -311,5 +336,8 @@ fn disconnect_and_remove_forget_what_was_trusted() {
     let kind = page.kind_index(IntegrationKind::Forgejo).unwrap();
     page.select_kind(kind, &h.config);
     page.activate(Item::Disconnect, &mut h.env());
-    assert!(gate_of(&page).record_of(&id).is_none(), "disconnect forgets");
+    assert!(
+        gate_of(&page).record_of(&id).is_none(),
+        "disconnect forgets"
+    );
 }

@@ -1143,6 +1143,7 @@ die Standardtasten.
 | Integrationen: Profil dieses Repositorys verwalten |  |
 | Integrationen: Integration verbinden... |  |
 | Einstellungen: Radar-Optionen eines Profils... |  |
+| Integrations: Review security check |  |
 | App: Beenden | `q` |
 | App: Design... |  |
 | App: Design wechseln... | `Ctrl+N y` |

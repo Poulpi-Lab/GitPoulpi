@@ -306,7 +306,10 @@ fn scope_satisfies(granted: &str, required: &str) -> bool {
                 | ("write:public_key", "read:public_key")
                 | (
                     "repo",
-                    "repo:status" | "repo_deployment" | "public_repo" | "repo:invite"
+                    "repo:status"
+                        | "repo_deployment"
+                        | "public_repo"
+                        | "repo:invite"
                         | "security_events"
                 )
         )

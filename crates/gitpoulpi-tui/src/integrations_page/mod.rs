@@ -278,7 +278,8 @@ impl Rights {
             excess: check.excess_scopes.clone(),
             expires: check.expires_at.clone(),
             // A fine-grained token is what the advice asks for already.
-            prefer_fine_grained: check.token_flavor != Some(gitpoulpi_hosting::TokenFlavor::FineGrained)
+            prefer_fine_grained: check.token_flavor
+                != Some(gitpoulpi_hosting::TokenFlavor::FineGrained)
                 && (check.recommend_fine_grained || !check.excess_scopes.is_empty()),
         }
     }

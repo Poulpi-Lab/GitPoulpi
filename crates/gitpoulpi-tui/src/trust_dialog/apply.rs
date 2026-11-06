@@ -54,8 +54,7 @@ pub(super) fn apply_in(
     match outcome.problem.subject().clone() {
         TrustSubject::Integration(id) => {
             let config = Config::load(&paths.config_file()).unwrap_or_default();
-            let Some(integration) = config.integrations.iter().find(|i| i.id == id).cloned()
-            else {
+            let Some(integration) = config.integrations.iter().find(|i| i.id == id).cloned() else {
                 *message = Some(msg::no_integration(&id));
                 return;
             };
@@ -67,10 +66,11 @@ pub(super) fn apply_in(
                 Choice::Trust => {
                     let (said, accepted) = trust_integration(&gate, &outcome.problem, &integration);
                     *message = Some(said);
-                    let origin_change = matches!(outcome.problem, TrustProblem::OriginChanged { .. });
+                    let origin_change =
+                        matches!(outcome.problem, TrustProblem::OriginChanged { .. });
                     if origin_change && accepted {
-                        let state = preferences
-                            .get_or_insert_with(|| PreferencesState::open(repo_root));
+                        let state =
+                            preferences.get_or_insert_with(|| PreferencesState::open(repo_root));
                         state.show_retoken(&id);
                     } else if let Some(state) = preferences.as_mut() {
                         state.reload_integrations();

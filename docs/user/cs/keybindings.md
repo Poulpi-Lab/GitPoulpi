@@ -1148,6 +1148,7 @@ Klávesy jsou výchozí.
 | Integrace: Spravovat profil tohoto repozitáře |  |
 | Integrace: Připojit integraci... |  |
 | Nastavení: Možnosti Radaru profilu... |  |
+| Integrations: Review security check |  |
 | Aplikace: Ukončit | `q` |
 | Aplikace: Motiv... |  |
 | Aplikace: Změnit motiv... | `Ctrl+N y` |

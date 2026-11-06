@@ -8714,7 +8714,7 @@ hint = "Press a number, or Up and Down then Enter. Esc cancels."
 # context: line of the security check dialog; {n} is how many other checks wait after this one
 more_waiting = "More checks are waiting after this one ({n})."
 # context: command palette entry that opens the security check dialog again
-palette_review = "Integrations: Review security check"
+palette_review = "Intégrations : Vérifier la sécurité"
 # context: status line when the palette entry finds nothing to review
 none_waiting = "No integration security check is waiting."
 # context: status line; {name} is the id of an integration

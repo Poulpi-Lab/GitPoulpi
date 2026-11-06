@@ -1147,6 +1147,7 @@ zastosowania. Klawisze są domyślne.
 | Integracje: Zarządzaj profilem tego repozytorium |  |
 | Integracje: Połącz integrację... |  |
 | Ustawienia: Opcje Radaru profilu... |  |
+| Integrations: Review security check |  |
 | Aplikacja: Zakończ | `q` |
 | Aplikacja: Motyw... |  |
 | Aplikacja: Zmień motyw... | `Ctrl+N y` |

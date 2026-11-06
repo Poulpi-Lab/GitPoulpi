@@ -72,7 +72,10 @@ fn one_question_per_subject_and_kind_the_newest_wins() {
         Some("https://two.example.com")
     );
     let (_, text) = screen(&mut d, AREA);
-    assert!(text.contains("More checks are waiting after this one (2)."), "{text}");
+    assert!(
+        text.contains("More checks are waiting after this one (2)."),
+        "{text}"
+    );
 }
 
 #[test]
@@ -157,8 +160,14 @@ fn a_plain_http_refusal_offers_to_allow_it() {
         origin: "http://git.example.com".into(),
     }]);
     let (_, text) = screen(&mut d, AREA);
-    assert!(text.contains("http://git.example.com, which is not encrypted"), "{text}");
-    assert!(text.contains("2  Allow plain http (not encrypted)"), "{text}");
+    assert!(
+        text.contains("http://git.example.com, which is not encrypted"),
+        "{text}"
+    );
+    assert!(
+        text.contains("2  Allow plain http (not encrypted)"),
+        "{text}"
+    );
 }
 
 #[test]
@@ -299,8 +308,14 @@ fn a_long_body_scrolls_with_keys_the_wheel_and_a_draggable_bar() {
     let mut d = open_with(vec![changed_cert("work")]);
     let (_, text) = screen(&mut d, small);
     assert!(text.contains("Trusted before"), "{text}");
-    assert!(!text.contains("Valid to  2027"), "the end is below the fold:\n{text}");
-    let track = d.painted.track.expect("a bar is drawn when the body is cut");
+    assert!(
+        !text.contains("Valid to  2027"),
+        "the end is below the fold:\n{text}"
+    );
+    let track = d
+        .painted
+        .track
+        .expect("a bar is drawn when the body is cut");
     // Keys.
     press(&mut d, KeyCode::PageDown);
     assert!(d.scroll > 0);
@@ -310,7 +325,10 @@ fn a_long_body_scrolls_with_keys_the_wheel_and_a_draggable_bar() {
     let end = d.scroll;
     assert!(end > 0);
     let (_, text) = screen(&mut d, small);
-    assert!(text.contains("2027-01-01"), "the end is shown at the end:\n{text}");
+    assert!(
+        text.contains("2027-01-01"),
+        "the end is shown at the end:\n{text}"
+    );
     // Wheel.
     press(&mut d, KeyCode::Home);
     let inside = (d.painted.window.x + 5, d.painted.window.y + 3);
@@ -333,7 +351,10 @@ fn a_long_body_scrolls_with_keys_the_wheel_and_a_draggable_bar() {
         row: track.rect.bottom() - 1,
         modifiers: KeyModifiers::NONE,
     });
-    assert_eq!(d.scroll, end, "dragging the thumb to the end scrolls to the end");
+    assert_eq!(
+        d.scroll, end,
+        "dragging the thumb to the end scrolls to the end"
+    );
     d.on_mouse(MouseEvent {
         kind: MouseEventKind::Up(MouseButton::Left),
         column: track.rect.x,
@@ -361,7 +382,12 @@ mod effects {
         let dir = tempfile::tempdir().unwrap();
         let paths = ConfigPaths::for_dir(dir.path());
         let integration = Integration::new("work", IntegrationKind::GitlabSelfManaged, url);
-        set_list_in_file(&paths.config_file(), "integrations", &[integration.clone()]).unwrap();
+        set_list_in_file(
+            &paths.config_file(),
+            "integrations",
+            std::slice::from_ref(&integration),
+        )
+        .unwrap();
         (dir, paths, integration)
     }
 
@@ -394,9 +420,15 @@ mod effects {
             },
             Choice::Trust,
         );
-        assert_eq!(message.as_deref(), Some("work: the new account is trusted."));
+        assert_eq!(
+            message.as_deref(),
+            Some("work: the new account is trusted.")
+        );
         let record = TrustGate::load(&paths).record_of("work").unwrap();
-        assert_eq!((record.account_id.as_str(), record.account_login.as_str()), ("42", "new"));
+        assert_eq!(
+            (record.account_id.as_str(), record.account_login.as_str()),
+            ("42", "new")
+        );
         let _ = integration;
     }
 
@@ -412,8 +444,14 @@ mod effects {
             Choice::Trust,
         );
         let record = TrustGate::load(&paths).record_of("work").unwrap();
-        assert_eq!(record.tls.as_ref().unwrap().cert.spki_sha256, cert("ef56").spki_sha256);
-        assert_eq!(record.tls.unwrap().mode, gitpoulpi_hosting::trust::TlsMode::Tofu);
+        assert_eq!(
+            record.tls.as_ref().unwrap().cert.spki_sha256,
+            cert("ef56").spki_sha256
+        );
+        assert_eq!(
+            record.tls.unwrap().mode,
+            gitpoulpi_hosting::trust::TlsMode::Tofu
+        );
         let message = answer(
             &paths,
             TrustProblem::PlainHttp {
@@ -423,7 +461,12 @@ mod effects {
             Choice::Trust,
         );
         assert_eq!(message.as_deref(), Some("work: plain http is allowed."));
-        assert!(TrustGate::load(&paths).record_of("work").unwrap().allow_plain_http);
+        assert!(
+            TrustGate::load(&paths)
+                .record_of("work")
+                .unwrap()
+                .allow_plain_http
+        );
     }
 
     #[test]
@@ -444,7 +487,11 @@ mod effects {
     #[test]
     fn an_integration_that_is_gone_says_so() {
         let (_dir, paths, _) = setup("https://git.example.com");
-        let message = answer(&paths, origin("missing", "https://x.example.com"), Choice::Trust);
+        let message = answer(
+            &paths,
+            origin("missing", "https://x.example.com"),
+            Choice::Trust,
+        );
         assert_eq!(
             message.as_deref(),
             Some("missing is no longer in the configuration.")
@@ -463,7 +510,10 @@ mod effects {
             },
             Choice::Trust,
         );
-        assert_eq!(message.as_deref(), Some("openai: the new address is trusted."));
+        assert_eq!(
+            message.as_deref(),
+            Some("openai: the new address is trusted.")
+        );
         let record = TrustGate::load(&paths).ai_record_of("openai").unwrap();
         assert_eq!(record.origin, "https://proxy.example.com");
     }

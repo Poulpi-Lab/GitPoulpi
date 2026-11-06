@@ -1146,6 +1146,7 @@ As teclas são as predefinidas.
 | Integrações: gerir o perfil deste repositório |  |
 | Integrações: ligar integração... |  |
 | Definições: Opções do Radar de um perfil... |  |
+| Integrations: Review security check |  |
 | Aplicação: sair | `q` |
 | Aplicação: tema... |  |
 | Aplicação: mudar tema... | `Ctrl+N y` |

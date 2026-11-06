@@ -128,7 +128,11 @@ fn a_changed_address_opens_the_dialog_and_nothing_is_sent_to_either_host() {
         })
         .unwrap_or_else(|e| panic!("{e}"));
     // The sentence may wrap: compare without line breaks.
-    let flat = screen.text().split_whitespace().collect::<Vec<_>>().join(" ");
+    let flat = screen
+        .text()
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ");
     let wanted = want.split_whitespace().collect::<Vec<_>>().join(" ");
     assert!(
         flat.contains(&wanted) || flat.contains("The token was not sent."),
@@ -151,8 +155,8 @@ fn a_changed_address_opens_the_dialog_and_nothing_is_sent_to_either_host() {
             !x.contains("Integration security check")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let store = TrustStore::load(&TrustStore::file_in(&ConfigPaths::for_dir(s.config.path())))
-        .unwrap();
+    let store =
+        TrustStore::load(&TrustStore::file_in(&ConfigPaths::for_dir(s.config.path()))).unwrap();
     assert_eq!(
         store.integration[0].origin,
         format!("http://127.0.0.1:{}", s.old.port)
@@ -203,9 +207,13 @@ fn trusting_the_new_address_opens_the_form_on_the_token() {
             x.contains("Re-entering the token is recommended.")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(!screen.contains("Integration security check"), "{}", screen.text());
-    let store = TrustStore::load(&TrustStore::file_in(&ConfigPaths::for_dir(s.config.path())))
-        .unwrap();
+    assert!(
+        !screen.contains("Integration security check"),
+        "{}",
+        screen.text()
+    );
+    let store =
+        TrustStore::load(&TrustStore::file_in(&ConfigPaths::for_dir(s.config.path()))).unwrap();
     assert_eq!(
         store.integration[0].origin,
         format!("http://127.0.0.1:{}", s.new.port)

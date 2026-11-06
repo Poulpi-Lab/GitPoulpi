@@ -46,7 +46,13 @@ fn pr_row(id: u64, state: &str, draft: bool, fork: &str) -> String {
 #[test]
 fn basic_header_with_an_account_and_bearer_without() {
     let t = Arc::new(RecordedTransport::new().on("/user", 200, ME));
-    let c = client_for(profile("me@x"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("me@x"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let user = block_on(c.current_user()).unwrap();
     assert_eq!(
         (user.login.as_str(), user.name.as_str()),
@@ -61,7 +67,13 @@ fn basic_header_with_an_account_and_bearer_without() {
     );
 
     let t = Arc::new(RecordedTransport::new().on("/user", 200, ME));
-    let c = client_for(profile(""), "tok".into(), t.clone());
+    let c = client_for(
+        profile(""),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     block_on(c.check_token()).unwrap();
     assert_eq!(
         header(&t.requests()[0], "Authorization"),
@@ -72,7 +84,13 @@ fn basic_header_with_an_account_and_bearer_without() {
 #[test]
 fn check_token_reports_unknown_scopes() {
     let t = Arc::new(RecordedTransport::new().on("/user", 200, ME));
-    let c = client_for(profile("me@x"), "tok".into(), t);
+    let c = client_for(
+        profile("me@x"),
+        "tok".into(),
+        t,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let check = block_on(c.check_token()).unwrap();
     assert!(check.scopes.is_none() && check.missing_scopes.is_empty());
 }
@@ -85,7 +103,13 @@ fn error_statuses_map_to_typed_errors() {
             status,
             r#"{"type":"error","error":{"message":"nope"}}"#,
         ));
-        let c = client_for(profile("a@b"), "tok".into(), t);
+        let c = client_for(
+            profile("a@b"),
+            "tok".into(),
+            t,
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
         let err = block_on(c.current_user()).unwrap_err();
         match (ok, &err) {
             (0, Error::Unauthorized { .. })
@@ -121,7 +145,13 @@ fn projects_come_from_discovered_workspaces_and_follow_next() {
             .on("/repositories/ws1?", 200, &page1)
             .on("/repositories/ws2", 403, r#"{"error":{"message":"scope"}}"#),
     );
-    let c = client_for(profile("a@b"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("a@b"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let projects = block_on(c.list_projects()).unwrap();
     let names: Vec<_> = projects.iter().map(|p| p.full_name.as_str()).collect();
     assert_eq!(names, ["ws1/a", "ws1/b"], "ws2 forbidden is skipped");
@@ -145,7 +175,13 @@ fn projects_come_from_discovered_workspaces_and_follow_next() {
 fn a_next_link_to_another_host_is_not_followed() {
     let page = r#"{"values":[],"next":"https://evil.example/2.0/steal"}"#;
     let t = Arc::new(RecordedTransport::new().on("/user/workspaces", 200, page));
-    let c = client_for(profile("a@b"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("a@b"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     assert!(matches!(block_on(c.list_projects()), Err(Error::Decode(_))));
     assert_eq!(t.requests().len(), 1);
 }
@@ -155,7 +191,13 @@ fn paging_is_capped() {
     // A host that always answers with a next link must stop at MAX_PAGES.
     let page = r#"{"values":[],"next":"https://api.bitbucket.org/2.0/user/workspaces?again"}"#;
     let t = Arc::new(RecordedTransport::new().on("/user/workspaces", 200, page));
-    let c = client_for(profile("a@b"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("a@b"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     block_on(c.list_projects()).unwrap();
     assert_eq!(t.requests().len(), crate::client::MAX_PAGES as usize);
 }
@@ -175,7 +217,13 @@ fn pull_requests_map_states_forks_and_review_requests() {
             .on("/pullrequests", 200, &body)
             .on("/user", 200, ME),
     );
-    let c = client_for(profile("a@b"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("a@b"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let filter = PrFilter {
         state: StateFilter::All,
         mine: true,
@@ -223,7 +271,13 @@ fn the_branch_lookup_queries_the_source_branch_and_picks_the_best() {
         pr_row(2, "OPEN", false, "ws/repo")
     );
     let t = Arc::new(RecordedTransport::new().on("/pullrequests", 200, &body));
-    let c = client_for(profile("a@b"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("a@b"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let best = block_on(c.pull_request_for_branch("ws/repo", "feat\"x"))
         .unwrap()
         .unwrap();
@@ -239,7 +293,13 @@ fn the_branch_lookup_queries_the_source_branch_and_picks_the_best() {
 fn create_pull_request_sends_draft_and_the_fork_repository() {
     let created = pr_row(9, "OPEN", true, "fork/repo");
     let t = Arc::new(RecordedTransport::new().on("/pullrequests", 201, &created));
-    let c = client_for(profile("a@b"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("a@b"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let got = block_on(c.create_pull_request(&NewPullRequest {
         project: "ws/repo".into(),
         source_branch: "feat".into(),
@@ -276,7 +336,13 @@ fn ssh_keys_list_upload_and_delete_use_the_user_uuid() {
             // Last: `/2.0/user` is a prefix of `/2.0/users/...`.
             .on("/2.0/user", 200, ME),
     );
-    let c = client_for(profile("a@b"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("a@b"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let keys = block_on(c.list_ssh_keys()).unwrap();
     assert_eq!(
         (keys[0].id.as_str(), keys[0].title.as_str()),
@@ -303,7 +369,13 @@ fn upload_ssh_key_posts_label_and_key() {
             )
             .on("/2.0/user", 200, ME),
     );
-    let c = client_for(profile("a@b"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("a@b"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let key = block_on(c.upload_ssh_key("new", " ssh-ed25519 BBBB\n")).unwrap();
     assert_eq!(key.id, "{k-2}");
     let post = t
@@ -319,7 +391,13 @@ fn upload_ssh_key_posts_label_and_key() {
 #[test]
 fn issues_are_retired() {
     let t = Arc::new(RecordedTransport::new());
-    let c = client_for(profile("a@b"), "tok".into(), t.clone());
+    let c = client_for(
+        profile("a@b"),
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let want = "Bitbucket issues were retired on 2026-08-20; link a Jira project instead";
     for err in [
         block_on(c.list_issues("ws/repo", &IssueFilter::default())).unwrap_err(),
@@ -361,7 +439,13 @@ fn the_spec_has_urls_checkout_and_the_well_known_host() {
     let mut pr = block_on(async {
         let body = format!("{{\"values\":[{}]}}", pr_row(7, "OPEN", false, "fork/repo"));
         let t = Arc::new(RecordedTransport::new().on("/pullrequests", 200, &body));
-        let c = client_for(profile("a@b"), "tok".into(), t);
+        let c = client_for(
+            profile("a@b"),
+            "tok".into(),
+            t,
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
         c.list_pull_requests("ws/repo", &PrFilter::default())
             .await
             .unwrap()

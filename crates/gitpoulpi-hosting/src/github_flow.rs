@@ -215,7 +215,13 @@ mod tests {
         } else {
             IntegrationKind::GithubEnterprise
         };
-        client_for(Integration::new("gh", kind, url), "tok".into(), t)
+        client_for(
+            Integration::new("gh", kind, url),
+            "tok".into(),
+            t,
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap()
     }
 
     fn block_on<F: std::future::Future>(f: F) -> F::Output {

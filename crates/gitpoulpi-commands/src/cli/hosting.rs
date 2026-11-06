@@ -798,6 +798,32 @@ pub enum IntegrationsAction {
         #[arg(long)]
         id: Option<String>,
     },
+    /// Reviews the security check of a profile and accepts what it stopped:
+    /// a new address, another account, a new certificate, plain http. Only a
+    /// person runs this (it is not an agent tool). With no option it prints
+    /// what is trusted and what is stopped.
+    Trust {
+        /// The profile.
+        id: String,
+        /// Accept the profile's current address (it must be spelled exactly
+        /// as the refusal printed it).
+        #[arg(long, value_name = "URL")]
+        accept_origin: Option<String>,
+        /// Accept this account id as the owner of the token.
+        #[arg(long, value_name = "ID")]
+        accept_account: Option<String>,
+        /// Accept the certificate with this key fingerprint (SHA-256, hex),
+        /// exactly as the refusal printed it.
+        #[arg(long, value_name = "SHA256")]
+        accept_certificate: Option<String>,
+        /// Hold the pinned certificate strictly: the key must match even
+        /// when the certificate chains to a public root.
+        #[arg(long, value_enum)]
+        strict_tls: Option<OnOff>,
+        /// Allow a plain `http://` address that is not on this machine.
+        #[arg(long, value_enum)]
+        allow_insecure_http: Option<OnOff>,
+    },
     /// Shows or changes a profile's Radar settings (`[integrations.radar]`):
     /// which account-wide lists `hosting radar` and the Radar fetch, the
     /// namespaces to search and what a review of a request that is not

@@ -476,10 +476,21 @@ pub(super) fn run_check(
         .enable_all()
         .build()
         .map_err(msg::check_start_failed)?;
-    let client = client_for(integration.clone(), secret.clone(), transport);
+    let gate = gitpoulpi_hosting::TrustGate::ambient();
+    let client = client_for(integration.clone(), secret.clone(), transport, &gate)
+        .map_err(|e| e.to_string())?;
     let check = runtime
         .block_on(client.check_token())
         .map_err(|e| e.to_string())?;
+    // A check that passed is what the trust record is made of.
+    gate.check_account(
+        &integration,
+        &gitpoulpi_hosting::Account {
+            login: check.user.login.clone(),
+            id: check.user.id.clone(),
+        },
+    )
+    .map_err(|e| e.to_string())?;
     if !typed.is_empty() {
         tokens
             .store(&integration.token_ref, &secret)

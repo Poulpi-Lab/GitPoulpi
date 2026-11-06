@@ -136,6 +136,30 @@ pub fn remove(dir: &Path, key: &ListKey) {
     let _ = std::fs::remove_file(path_of(dir, key));
 }
 
+/// Deletes every saved list of the integration `id`, whatever its host and
+/// login; returns how many files went. Files that do not parse are left to
+/// [`prune`].
+pub fn remove_integration(dir: &Path, id: &str) -> usize {
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return 0;
+    };
+    let mut removed = 0;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("json") {
+            continue;
+        }
+        let owned = std::fs::read_to_string(&path)
+            .ok()
+            .and_then(|raw| serde_json::from_str::<CachedList>(&raw).ok())
+            .is_some_and(|l| l.key.integration_id == id);
+        if owned && std::fs::remove_file(&path).is_ok() {
+            removed += 1;
+        }
+    }
+    removed
+}
+
 /// Deletes every file whose key is not in `live` (a removed profile, a
 /// disconnected or other account), then keeps only the [`MAX_FILES`] newest.
 /// Files that do not parse are deleted too.

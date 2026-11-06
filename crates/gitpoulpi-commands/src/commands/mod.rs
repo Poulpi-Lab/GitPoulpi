@@ -277,7 +277,8 @@ pub(crate) fn is_local(command: &Commands) -> bool {
         // The review-context defaults live in config files.
         #[cfg(feature = "ai")]
         Commands::Ai {
-            action: crate::cli::AiCommand::ReviewContext { .. },
+            action:
+                crate::cli::AiCommand::ReviewContext { .. } | crate::cli::AiCommand::Trust { .. },
         } => true,
         _ => false,
     }
@@ -331,6 +332,21 @@ async fn run_local(
                 no_extra_file,
             },
             reset,
+        ),
+        #[cfg(feature = "ai")]
+        Commands::Ai {
+            action:
+                crate::cli::AiCommand::Trust {
+                    profile,
+                    accept_origin,
+                    accept_certificate,
+                    allow_insecure_http,
+                },
+        } => crate::ai_cmd::trust(
+            &profile,
+            accept_origin.as_deref(),
+            accept_certificate.as_deref(),
+            allow_insecure_http.map(|o| o == crate::cli::OnOff::On),
         ),
         _ => unreachable!("run_local is only called for `is_local` commands"),
     }

@@ -24,7 +24,13 @@ fn block_on<F: std::future::Future>(f: F) -> F::Output {
 }
 
 fn github(url: &str, kind: IntegrationKind, t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
-    client_for(Integration::new("gh", kind, url), "tok".into(), t)
+    client_for(
+        Integration::new("gh", kind, url),
+        "tok".into(),
+        t,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 fn gitlab(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
@@ -36,7 +42,9 @@ fn gitlab(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         ),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 fn dotcom(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
@@ -133,7 +141,9 @@ fn a_client_without_review_support_says_so() {
         Integration::new("bb", IntegrationKind::Bitbucket, "https://bitbucket.org"),
         "tok".into(),
         Arc::new(RecordedTransport::new()),
-    );
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     assert_eq!(
         bitbucket.review_capabilities(),
         ReviewCapabilities::default()
@@ -697,7 +707,9 @@ fn gitlab_submit_deletes_the_drafts_it_made_when_one_fails() {
         ),
         "tok".into(),
         Arc::new(Seq(Default::default(), inner.clone())),
-    );
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     let review = submission(
         ReviewEvent::Comment,
         "",

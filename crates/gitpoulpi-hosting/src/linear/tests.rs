@@ -69,7 +69,13 @@ impl HttpTransport for Fake {
 
 fn client(t: Arc<Fake>) -> Box<dyn HostingClient> {
     let i = Integration::new("ln", IntegrationKind::Linear, "https://linear.app");
-    client_for(i, "lin_api_key".into(), t)
+    client_for(
+        i,
+        "lin_api_key".into(),
+        t,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 fn data(v: Value) -> (u16, String) {
@@ -531,7 +537,7 @@ fn live_linear_reads() {
     let token = std::env::var("GITPOULPI_LIVE_LINEAR_TOKEN").expect("GITPOULPI_LIVE_LINEAR_TOKEN");
     let transport = Arc::new(crate::http::ReqwestTransport::new().unwrap());
     let i = Integration::new("live", IntegrationKind::Linear, "https://linear.app");
-    let c = client_for(i, token, transport);
+    let c = client_for(i, token, transport, &crate::trust::TrustGate::for_tests()).unwrap();
     let check = block_on(c.check_token()).expect("viewer");
     eprintln!("viewer: {:?}", check.user);
     let teams = block_on(c.list_projects()).expect("teams");

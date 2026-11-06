@@ -109,10 +109,11 @@ impl AiClient for AnthropicClient {
 }
 
 async fn send(transport: &dyn HttpTransport, request: HttpRequest) -> Result<HttpResponse> {
-    let response = transport
-        .send(request)
-        .await
-        .map_err(|e| Error::Http(e.to_string()))?;
+    let response = transport.send(request).await.map_err(|e| match e {
+        // The security check refused: keep it typed for the dialog.
+        gitpoulpi_hosting::Error::Trust(problem) => Error::Trust(problem),
+        other => Error::Http(other.to_string()),
+    })?;
     if response.is_success() {
         return Ok(response);
     }

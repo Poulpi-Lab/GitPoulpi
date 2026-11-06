@@ -396,6 +396,48 @@ fn is_loopback_host(host: &str) -> bool {
     host == "localhost" || host.ends_with(".localhost") || host == "::1" || host.starts_with("127.")
 }
 
+/// Follows a redirect only within the origin that answered it.
+#[cfg(feature = "network")]
+fn same_origin_redirects() -> reqwest::redirect::Policy {
+    reqwest::redirect::Policy::custom(|attempt| {
+        let same = attempt.previous().last().is_some_and(|prev| {
+            prev.scheme() == attempt.url().scheme()
+                && prev.host_str() == attempt.url().host_str()
+                && prev.port_or_known_default() == attempt.url().port_or_known_default()
+        });
+        if attempt.previous().len() >= 5 {
+            attempt.error("too many redirects")
+        } else if same {
+            attempt.follow()
+        } else {
+            attempt.stop()
+        }
+    })
+}
+
+/// A failed send as an [`Error`]: a certificate the trust verifier refused
+/// becomes the [`TrustProblem`](crate::trust::TrustProblem) it is (subject
+/// still the host; the guarding transport binds the integration).
+#[cfg(feature = "network")]
+fn send_error(error: &reqwest::Error, url: &str) -> Error {
+    use std::error::Error as _;
+    let mut text = error.to_string();
+    let mut source = error.source();
+    while let Some(s) = source {
+        text.push(' ');
+        text.push_str(&s.to_string());
+        source = s.source();
+    }
+    if text.to_ascii_lowercase().contains("certificate") {
+        if let Some(problem) =
+            crate::trust::origin::host_of(url).and_then(|h| crate::trust::tls::problem_for(&h))
+        {
+            return Error::Trust(problem);
+        }
+    }
+    Error::Http(error.to_string())
+}
+
 /// The real transport. Built once per client, not per request:
 /// `reqwest::Client` owns the connection pool.
 #[cfg(feature = "network")]
@@ -418,6 +460,13 @@ impl ReqwestTransport {
     pub fn with_timeout(timeout: std::time::Duration) -> Result<Self> {
         let client = reqwest::Client::builder()
             .user_agent(concat!("gitpoulpi/", env!("CARGO_PKG_VERSION")))
+            // Certificates go through `trust::tls::GuardedVerifier`: webpki
+            // as before, plus the recorded key pins.
+            .use_preconfigured_tls(crate::trust::tls::client_config().map_err(Error::Http)?)
+            // A redirect to another origin would carry the token headers
+            // along (only `Authorization` is dropped by the library), so the
+            // call fails with the redirect response instead.
+            .redirect(same_origin_redirects())
             // A hung host must not hang the daemon's connection with it.
             .timeout(timeout)
             // Callers run each task on a runtime of its own and share this
@@ -458,6 +507,7 @@ impl HttpTransport for ReqwestTransport {
         if let Some(why) = external_host_refusal(&request.url) {
             return Err(Error::Http(why));
         }
+        let request_url = request.url.clone();
         let mut builder = self.client.request(method, &request.url);
         for (name, value) in &request.headers {
             builder = builder.header(name, value);
@@ -468,7 +518,7 @@ impl HttpTransport for ReqwestTransport {
         let response = builder
             .send()
             .await
-            .map_err(|e| Error::Http(e.to_string()))?;
+            .map_err(|e| send_error(&e, &request_url))?;
         let status = response.status().as_u16();
         let headers = response
             .headers()
@@ -514,6 +564,7 @@ impl HttpTransport for ReqwestTransport {
         });
         let client = reqwest::Client::builder()
             .user_agent(concat!("gitpoulpi/", env!("CARGO_PKG_VERSION")))
+            .use_preconfigured_tls(crate::trust::tls::client_config().map_err(Error::Http)?)
             .redirect(policy)
             // A stalled connection ends; a slow but moving one may take long.
             .read_timeout(std::time::Duration::from_secs(30))
@@ -525,10 +576,8 @@ impl HttpTransport for ReqwestTransport {
         for (name, value) in &request.headers {
             builder = builder.header(name, value);
         }
-        let mut response = builder
-            .send()
-            .await
-            .map_err(|e| Error::Http(e.to_string()))?;
+        let url = request.url.clone();
+        let mut response = builder.send().await.map_err(|e| send_error(&e, &url))?;
         let status = response.status();
         if !status.is_success() {
             return Err(Error::Http(format!(

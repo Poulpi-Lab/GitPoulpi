@@ -955,7 +955,13 @@ fn legacy_visualstudio_urls_are_normalized_to_the_org_root() {
 #[test]
 fn client_for_builds_this_client_and_ssh_keys_stay_unsupported() {
     let t = Arc::new(RecordedTransport::new());
-    let boxed = crate::client_for(services(), TOKEN.to_string(), t);
+    let boxed = crate::client_for(
+        services(),
+        TOKEN.to_string(),
+        t,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     assert!(matches!(
         block_on(boxed.list_ssh_keys()),
         Err(Error::Unsupported(_))

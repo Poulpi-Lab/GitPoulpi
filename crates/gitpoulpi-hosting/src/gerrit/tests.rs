@@ -23,7 +23,13 @@ fn block_on<F: std::future::Future>(f: F) -> F::Output {
 fn client(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
     let mut i = Integration::new("gr", IntegrationKind::Gerrit, "http://127.0.0.1:8081/");
     i.account = "admin".into();
-    client_for(i, "http-pass".into(), t)
+    client_for(
+        i,
+        "http-pass".into(),
+        t,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 /// A Gerrit JSON answer: the guard line, then the JSON.
@@ -689,7 +695,13 @@ fn live_gerrit_reads() {
     let transport = Arc::new(crate::ReqwestTransport::new().expect("transport"));
     let mut integration = Integration::new("live", IntegrationKind::Gerrit, url);
     integration.account = user;
-    let client = client_for(integration, token, transport);
+    let client = client_for(
+        integration,
+        token,
+        transport,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     block_on(async {
         let check = client.check_token().await.expect("credentials");
         println!("user: {}", check.user.login);

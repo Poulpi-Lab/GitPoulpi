@@ -148,6 +148,7 @@ toml.workspace = true
 winresource = { version = "0.1", default-features = false }
 
 [dev-dependencies]
+gitpoulpi-hosting = { workspace = true, features = ["test-support"] }
 async-trait.workspace = true
 gitpoulpi-testkit.workspace = true
 tempfile.workspace = true

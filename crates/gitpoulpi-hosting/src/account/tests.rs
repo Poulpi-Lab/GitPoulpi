@@ -29,7 +29,13 @@ fn client(
         login: login.to_string(),
         ..Default::default()
     });
-    client_for(integration, "tok".into(), transport)
+    client_for(
+        integration,
+        "tok".into(),
+        transport,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 /// `%XX` decoded, to read the query a request carried.

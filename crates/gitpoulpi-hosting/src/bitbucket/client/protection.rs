@@ -67,7 +67,9 @@ mod tests {
             Integration::new("bb", IntegrationKind::Bitbucket, "https://bitbucket.org"),
             "tok".into(),
             transport,
+            &crate::trust::TrustGate::for_tests(),
         )
+        .unwrap()
     }
 
     #[test]

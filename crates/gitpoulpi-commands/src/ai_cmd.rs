@@ -460,6 +460,23 @@ pub(crate) async fn run(session: &mut Session, action: AiCommand) -> Result<Emit
         AiCommand::Prompt { action } => prompt(session, &action),
         // Answered from files, before a daemon is involved (`is_local`).
         AiCommand::ReviewContext { .. } => Err("`ai review-context` runs without a daemon".into()),
+        AiCommand::Trust {
+            profile,
+            accept_origin,
+            accept_certificate,
+            allow_insecure_http,
+        } => {
+            // Trusting is a person's decision (the MCP server cannot).
+            if !session.may_trust() {
+                return Err(TRUST_REFUSAL.to_string());
+            }
+            trust(
+                &profile,
+                accept_origin.as_deref(),
+                accept_certificate.as_deref(),
+                allow_insecure_http.map(|o| o == crate::cli::OnOff::On),
+            )
+        }
         #[cfg(feature = "history-rewrite")]
         AiCommand::RewriteScript {
             instruction,
@@ -535,4 +552,98 @@ pub(crate) async fn run(session: &mut Session, action: AiCommand) -> Result<Emit
             ))
         }
     }
+}
+
+/// What an agent reads when a security check needs the person.
+const TRUST_REFUSAL: &str =
+    "This AI profile's security check needs the user: open GitPoulpi or run `gitpoulpi ai trust`";
+
+/// `ai trust`: show or accept what binds a profile's API key to its address.
+/// Each `--accept-*` names the exact value to accept.
+pub(crate) fn trust(
+    profile: &str,
+    accept_origin: Option<&str>,
+    accept_certificate: Option<&str>,
+    allow_insecure_http: Option<bool>,
+) -> Result<Emitted, String> {
+    use gitpoulpi_hosting::trust::{origin, CertInfo, TlsMode, TlsRecord};
+    let settings = gitpoulpi_config::Settings::resolve_ambient().map_err(|e| e.to_string())?;
+    let found = settings
+        .config()
+        .ai
+        .profile(profile)
+        .cloned()
+        .ok_or_else(|| format!("no AI profile `{profile}`"))?;
+    if found.kind == gitpoulpi_config::AiProviderKind::LocalAgent {
+        return Err(format!(
+            "`{profile}` is a local agent: it has no address to trust"
+        ));
+    }
+    let base = found.effective_base_url().to_string();
+    let current = gitpoulpi_hosting::trust::normalize(&base)
+        .ok_or_else(|| format!("`{base}` is not an address"))?;
+    let gate = gitpoulpi_hosting::TrustGate::ambient();
+    let err = |e: gitpoulpi_hosting::Error| e.to_string();
+    let mut accepted: Vec<String> = Vec::new();
+    if let Some(url) = accept_origin {
+        let given = gitpoulpi_hosting::trust::normalize(url)
+            .ok_or_else(|| format!("`{url}` is not an address"))?;
+        if given != current {
+            return Err(format!(
+                "`{profile}` points to {current} now, not to {given}: nothing was accepted"
+            ));
+        }
+        gate.trust_ai_origin(profile, &base).map_err(err)?;
+        accepted.push(format!("address {current}"));
+    }
+    if let Some(on) = allow_insecure_http {
+        gate.update_ai_record(profile, &base, |r| r.allow_plain_http = on)
+            .map_err(err)?;
+        accepted.push(format!(
+            "plain http {}",
+            if on { "allowed" } else { "refused" }
+        ));
+    }
+    if let Some(fingerprint) = accept_certificate {
+        let fp = fingerprint.trim().to_ascii_lowercase().replace(' ', "");
+        if fp.len() != 64 || !fp.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(
+                "--accept-certificate takes the SHA-256 fingerprint (64 hex digits)".into(),
+            );
+        }
+        gate.update_ai_record(profile, &base, |r| {
+            r.tls = Some(TlsRecord {
+                mode: TlsMode::Tofu,
+                cert: CertInfo {
+                    spki_sha256: fp.clone(),
+                    ..CertInfo::default()
+                },
+            });
+        })
+        .map_err(err)?;
+        accepted.push(format!("certificate {fp}"));
+    }
+    let record = gate.ai_record_of(profile);
+    let human = if accepted.is_empty() {
+        match &record {
+            Some(r) => format!("`{profile}` is trusted for {}", r.origin),
+            None => format!("`{profile}` has no trust record yet; its key is bound on first use"),
+        }
+    } else {
+        format!("`{profile}`: accepted {}", accepted.join(", "))
+    };
+    Ok(emitted(
+        json!({
+            "profile": profile,
+            "accepted": accepted,
+            "current_origin": current,
+            "trusted": record.as_ref().map(|r| json!({
+                "origin": r.origin,
+                "allow_plain_http": r.allow_plain_http,
+                "certificate": r.tls.as_ref().map(|t| t.cert.spki_sha256.clone()),
+            })),
+            "plain_http_remote": origin::is_plain_http_remote(&current),
+        }),
+        human,
+    ))
 }

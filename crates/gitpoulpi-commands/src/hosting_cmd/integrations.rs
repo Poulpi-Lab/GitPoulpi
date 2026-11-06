@@ -179,6 +179,8 @@ pub(super) async fn run_integrations(
             // not leave the profile half-removed, so it is reported instead.
             let token_error = env.store.delete(&removed.token_ref).err();
             env.save_integrations(&integrations)?;
+            // Its trust record and everything cached from its host go too.
+            gitpoulpi_hosting::trust::forget(&env.paths, &removed);
             let human = match &token_error {
                 None => format!("removed `{id}` and its stored token"),
                 Some(e) => format!(
@@ -221,6 +223,28 @@ pub(super) async fn run_integrations(
             },
         ),
 
+        IntegrationsAction::Trust {
+            id,
+            accept_origin,
+            accept_account,
+            accept_certificate,
+            strict_tls,
+            allow_insecure_http,
+        } => {
+            trust_integration(
+                env,
+                &id,
+                TrustOptions {
+                    accept_origin,
+                    accept_account,
+                    accept_certificate,
+                    strict_tls: strict_tls.map(|o| o == crate::cli::OnOff::On),
+                    allow_insecure_http: allow_insecure_http.map(|o| o == crate::cli::OnOff::On),
+                },
+            )
+            .await
+        }
+
         IntegrationsAction::Test { id } => {
             let integrations = env.integrations()?;
             let integration = pick(&integrations, id.as_deref())?;
@@ -228,6 +252,15 @@ pub(super) async fn run_integrations(
                 .client(integration, &integrations)?
                 .check_token()
                 .await
+                .map_err(|e| e.to_string())?;
+            env.gate
+                .check_account(
+                    integration,
+                    &gitpoulpi_hosting::Account {
+                        login: check.user.login.clone(),
+                        id: check.user.id.clone(),
+                    },
+                )
                 .map_err(|e| e.to_string())?;
             let human = format!(
                 "`{}`: token belongs to @{}{}{}",
@@ -413,9 +446,25 @@ pub(super) async fn login(
 ) -> Result<Emitted, String> {
     let mut integrations = env.integrations()?;
     let integration = pick(&integrations, id)?.clone();
-    let client =
-        gitpoulpi_hosting::client_for(integration.clone(), token.to_string(), env.transport()?);
+    let client = gitpoulpi_hosting::client_for(
+        integration.clone(),
+        token.to_string(),
+        env.transport()?,
+        &env.gate,
+    )
+    .map_err(|e| e.to_string())?;
     let check = client.check_token().await.map_err(|e| e.to_string())?;
+    // The account of a token that was just typed must be the one trusted
+    // (or the first one this integration is trusted for).
+    env.gate
+        .check_account(
+            &integration,
+            &gitpoulpi_hosting::Account {
+                login: check.user.login.clone(),
+                id: check.user.id.clone(),
+            },
+        )
+        .map_err(|e| e.to_string())?;
 
     env.store
         .store(&integration.token_ref, token)
@@ -463,9 +512,194 @@ pub(super) fn logout(env: &HostingEnv, id: Option<&str>) -> Result<Emitted, Stri
         entry.user = None;
     }
     env.save_integrations(&integrations)?;
+    // Disconnecting forgets what was trusted for it, and what was cached.
+    gitpoulpi_hosting::trust::forget(&env.paths, &integration);
     Ok(Emitted {
         exit_code: 0,
         json: json!({ "id": integration.id, "token_deleted": true }),
         human: format!("`{}` disconnected; the profile is kept", integration.id),
+    })
+}
+
+/// What `integrations trust` was asked to accept.
+pub(super) struct TrustOptions {
+    pub accept_origin: Option<String>,
+    pub accept_account: Option<String>,
+    pub accept_certificate: Option<String>,
+    pub strict_tls: Option<bool>,
+    pub allow_insecure_http: Option<bool>,
+}
+
+fn tls_json(tls: &Option<gitpoulpi_hosting::trust::TlsRecord>) -> Value {
+    match tls {
+        None => Value::Null,
+        Some(t) => json!({
+            "mode": t.mode.as_str(),
+            "spki_sha256": t.cert.spki_sha256,
+            "subject": t.cert.subject,
+            "issuer": t.cert.issuer,
+            "not_before": t.cert.not_before,
+            "not_after": t.cert.not_after,
+        }),
+    }
+}
+
+/// The key fingerprint of the certificate `integration`'s host presents
+/// right now: one unauthenticated request, over the plain transport (so the
+/// verifier records what it saw and no token is involved).
+async fn observe_certificate(
+    env: &HostingEnv,
+    integration: &Integration,
+) -> Result<gitpoulpi_hosting::trust::CertInfo, String> {
+    use gitpoulpi_hosting::trust::{origin, CertInfo};
+    use gitpoulpi_hosting::{Error, HttpRequest, TrustProblem};
+    let url = origin::integration_origin(integration).map_err(|e| e.to_string())?;
+    let found: Option<CertInfo> = match env.transport()?.send(HttpRequest::get(&url)).await {
+        Err(Error::Trust(TrustProblem::UntrustedCertificate { new, .. }))
+        | Err(Error::Trust(TrustProblem::CertificateChanged { new, .. })) => Some(new),
+        _ => origin::host_of(&url).and_then(|h| gitpoulpi_hosting::trust::tls::observed(&h)),
+    };
+    found.ok_or_else(|| {
+        format!("no certificate could be read from {url} (is the server reachable over https?)")
+    })
+}
+
+/// `integrations trust`: accept, one explicit value at a time, what the
+/// security check stopped. Each `--accept-*` names the exact value to accept,
+/// so a change that happened since the refusal was read is not accepted by
+/// accident.
+pub(super) async fn trust_integration(
+    env: &HostingEnv,
+    id: &str,
+    opts: TrustOptions,
+) -> Result<Emitted, String> {
+    use gitpoulpi_hosting::trust::{self, origin, TlsMode};
+    let integrations = env.integrations()?;
+    let integration = pick(&integrations, Some(id))?.clone();
+    if integration.kind.capabilities().local_folder {
+        return Err(format!(
+            "`{id}` is a folder of notes: there is no address to trust"
+        ));
+    }
+    let gate = &env.gate;
+    let err = |e: gitpoulpi_hosting::Error| e.to_string();
+    let current = trust::integration_origin(&integration).map_err(err)?;
+    let mut accepted: Vec<String> = Vec::new();
+
+    if let Some(url) = &opts.accept_origin {
+        let given = trust::normalize(url).ok_or_else(|| format!("`{url}` is not an address"))?;
+        if given != current {
+            return Err(format!(
+                "`{id}` points to {current} now, not to {given}: nothing was accepted"
+            ));
+        }
+        gate.trust_origin(&integration).map_err(err)?;
+        accepted.push(format!("address {current}"));
+    }
+    if let Some(on) = opts.allow_insecure_http {
+        gate.set_allow_plain_http(&integration, on).map_err(err)?;
+        accepted.push(format!(
+            "plain http {}",
+            if on { "allowed" } else { "refused" }
+        ));
+    }
+    if let Some(account) = &opts.accept_account {
+        gate.trust_account(
+            &integration,
+            &gitpoulpi_hosting::Account {
+                login: String::new(),
+                id: account.trim().to_string(),
+            },
+        )
+        .map_err(err)?;
+        accepted.push(format!("account {}", account.trim()));
+    }
+    let mode = match opts.strict_tls {
+        Some(true) => TlsMode::Strict,
+        _ => gate
+            .record_of(id)
+            .and_then(|r| r.tls.map(|t| t.mode))
+            .unwrap_or(TlsMode::Tofu),
+    };
+    if let Some(fingerprint) = &opts.accept_certificate {
+        let fp = fingerprint.trim().to_ascii_lowercase().replace(' ', "");
+        if fp.len() != 64 || !fp.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(
+                "--accept-certificate takes the SHA-256 fingerprint (64 hex digits)".into(),
+            );
+        }
+        let cert = gitpoulpi_hosting::trust::CertInfo {
+            spki_sha256: fp.clone(),
+            ..Default::default()
+        };
+        gate.trust_certificate(&integration, &cert, mode)
+            .map_err(err)?;
+        accepted.push(format!("certificate {fp} ({})", mode.as_str()));
+    } else if let Some(strict) = opts.strict_tls {
+        let has_pin = gate.record_of(id).is_some_and(|r| r.tls.is_some());
+        if has_pin {
+            gate.set_strict(&integration, strict).map_err(err)?;
+        } else if strict {
+            // Nothing pinned yet: pin what the server presents now.
+            let cert = observe_certificate(env, &integration).await?;
+            gate.trust_certificate(&integration, &cert, TlsMode::Strict)
+                .map_err(err)?;
+        }
+        accepted.push(format!(
+            "strict pinning {}",
+            if strict { "on" } else { "off" }
+        ));
+    }
+
+    let record = gate.record_of(id);
+    let pending: Vec<Value> = trust::peek_pending()
+        .iter()
+        .filter(|p| p.subject().name() == id)
+        .map(|p| {
+            json!({ "change": p.change(), "old": p.old_text(), "new": p.new_text(), "fix": p.fix() })
+        })
+        .collect();
+    let human = if accepted.is_empty() {
+        match &record {
+            Some(r) => format!(
+                "`{id}` is trusted for {} (account {}{}){}",
+                r.origin,
+                if r.account_login.is_empty() {
+                    r.account_id.clone()
+                } else {
+                    format!("{} #{}", r.account_login, r.account_id)
+                },
+                if r.allow_plain_http {
+                    ", plain http allowed"
+                } else {
+                    ""
+                },
+                match &r.tls {
+                    Some(t) => format!("; certificate {} ({})", t.cert.grouped(), t.mode.as_str()),
+                    None => String::new(),
+                }
+            ),
+            None => format!("`{id}` has no trust record yet; it gets one on its first connection"),
+        }
+    } else {
+        format!("`{id}`: accepted {}", accepted.join(", "))
+    };
+    Ok(Emitted {
+        exit_code: 0,
+        json: json!({
+            "id": id,
+            "accepted": accepted,
+            "current_origin": current,
+            "trusted": record.as_ref().map(|r| json!({
+                "origin": r.origin,
+                "account_id": r.account_id,
+                "account_login": r.account_login,
+                "allow_plain_http": r.allow_plain_http,
+                "tls": tls_json(&r.tls),
+            })),
+            "pending": pending,
+            "plain_http_remote": origin::is_plain_http_remote(&current),
+        }),
+        human,
     })
 }

@@ -61,18 +61,45 @@ pub struct HostingEnv {
     pub config_file: PathBuf,
     store: Arc<dyn TokenStore + Send + Sync>,
     transport: TransportFactory,
+    /// Where the trust store and the caches live.
+    pub paths: gitpoulpi_config::ConfigPaths,
+    /// The integration trust check every client goes through.
+    pub gate: gitpoulpi_hosting::TrustGate,
 }
 
 impl HostingEnv {
+    /// An environment whose trust store and caches sit next to
+    /// `config_file`, as a test lays them out.
     pub fn new(
         config_file: PathBuf,
         store: Arc<dyn TokenStore + Send + Sync>,
         transport: TransportFactory,
     ) -> Self {
+        let dir = config_file
+            .parent()
+            .map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from("."));
+        Self::with_paths(
+            config_file,
+            store,
+            transport,
+            gitpoulpi_config::ConfigPaths::for_dir(dir),
+        )
+    }
+
+    pub fn with_paths(
+        config_file: PathBuf,
+        store: Arc<dyn TokenStore + Send + Sync>,
+        transport: TransportFactory,
+        paths: gitpoulpi_config::ConfigPaths,
+    ) -> Self {
+        let gate = gitpoulpi_hosting::TrustGate::load(&paths);
         Self {
             config_file,
             store,
             transport,
+            paths,
+            gate,
         }
     }
 
@@ -80,7 +107,7 @@ impl HostingEnv {
     pub fn ambient() -> Result<Self, String> {
         let paths = gitpoulpi_config::ConfigPaths::discover()
             .ok_or_else(|| "could not determine this OS's config directory".to_string())?;
-        Ok(Self::new(
+        Ok(Self::with_paths(
             paths.config_file(),
             Arc::new(gitpoulpi_secrets::CredentialHelperTokens::new()),
             Box::new(|| {
@@ -88,6 +115,7 @@ impl HostingEnv {
                     gitpoulpi_hosting::ReqwestTransport::new().map_err(|e| e.to_string())?;
                 Ok(Arc::new(transport) as Arc<dyn HttpTransport>)
             }),
+            paths,
         ))
     }
 
@@ -111,19 +139,57 @@ impl HostingEnv {
 
     /// The hosting client for `integration`, with its token resolved by the
     /// default order (env var, stored token, unambiguous helper).
+    ///
+    /// The trust check comes first: an address that is not the recorded one
+    /// stops here, before the token is even looked up.
     fn client(
         &self,
         integration: &Integration,
         integrations: &[Integration],
     ) -> Result<Box<dyn gitpoulpi_hosting::HostingClient>, String> {
+        self.gate
+            .preflight(integration)
+            .map_err(|e| e.to_string())?;
         let source =
             DefaultTokenSource::new(Box::new(SharedStore(self.store.clone())), integrations);
         let token = source.token(integration).map_err(|e| e.to_string())?;
-        Ok(gitpoulpi_hosting::client_for(
-            integration.clone(),
-            token,
-            self.transport()?,
-        ))
+        if !integration.kind.capabilities().local_folder {
+            // A token exists for it: an integration from before the trust
+            // store gets its record now, from the config as it stands.
+            self.gate.adopt(integration).map_err(|e| e.to_string())?;
+        }
+        gitpoulpi_hosting::client_for(integration.clone(), token, self.transport()?, &self.gate)
+            .map_err(|e| e.to_string())
+    }
+
+    /// [`Self::client`], then the account check of
+    /// [`gitpoulpi_hosting::TrustGate::verify_account`] when it is due: the
+    /// token must still belong to the account that was trusted.
+    async fn client_checked(
+        &self,
+        integration: &Integration,
+        integrations: &[Integration],
+    ) -> Result<Box<dyn gitpoulpi_hosting::HostingClient>, String> {
+        let client = self.client(integration, integrations)?;
+        if !integration.kind.capabilities().local_folder {
+            let own_token = self
+                .store
+                .load(&integration.token_ref)
+                .ok()
+                .flatten()
+                .is_some_and(|t| !t.trim().is_empty())
+                && std::env::var_os(gitpoulpi_hosting::token_env_var(&integration.id)).is_none();
+            let reason = if own_token {
+                gitpoulpi_hosting::trust::VerifyReason::Periodic
+            } else {
+                gitpoulpi_hosting::trust::VerifyReason::ExternalToken
+            };
+            self.gate
+                .verify_account(integration, client.as_ref(), reason)
+                .await
+                .map_err(|e| e.to_string())?;
+        }
+        Ok(client)
     }
 }
 
@@ -383,6 +449,54 @@ fn pick<'a>(integrations: &'a [Integration], id: Option<&str>) -> Result<&'a Int
     }
 }
 
+/// The refusal text an agent (MCP) or a script reads when the security check
+/// of an integration needs a person.
+pub const TRUST_REFUSAL: &str = "This integration's security check needs the user: open \
+    GitPoulpi or run `gitpoulpi hosting integrations trust`";
+
+/// A trust refusal as the CLI answers it: exit code 2 and the change in JSON,
+/// instead of a bare failure. Only the problem the error text carries is
+/// taken, so a refusal queued by another task is not mistaken for this one.
+pub(crate) fn trust_answer(result: Result<Emitted, String>) -> Result<Emitted, String> {
+    let Err(message) = result else {
+        return result;
+    };
+    let queue = gitpoulpi_hosting::trust::take_pending();
+    let (mine, rest): (Vec<_>, Vec<_>) = queue
+        .into_iter()
+        .partition(|p| message.contains(&p.to_string()));
+    for other in &rest {
+        gitpoulpi_hosting::trust::report(other);
+    }
+    match mine.into_iter().next() {
+        Some(problem) => Ok(trust_refusal(&problem)),
+        None => Err(message),
+    }
+}
+
+pub(crate) fn trust_refusal(problem: &gitpoulpi_hosting::TrustProblem) -> Emitted {
+    use gitpoulpi_hosting::TrustSubject;
+    let (kind, name) = match problem.subject() {
+        TrustSubject::Ai(p) => ("ai", p.as_str()),
+        TrustSubject::Integration(i) => ("integration", i.as_str()),
+        TrustSubject::Host(h) => ("host", h.as_str()),
+    };
+    Emitted {
+        exit_code: 2,
+        json: json!({
+            "error": "trust_check",
+            "subject": name,
+            "subject_kind": kind,
+            "change": problem.change(),
+            "old": problem.old_text(),
+            "new": problem.new_text(),
+            "fix": problem.fix(),
+            "message": problem.to_string(),
+        }),
+        human: format!("{TRUST_REFUSAL}: {problem}"),
+    }
+}
+
 /// Everything that needs no repository (and so no daemon), against the
 /// real config, credential store and network.
 pub async fn run_local(action: HostingAction) -> Result<Emitted, String> {
@@ -391,6 +505,10 @@ pub async fn run_local(action: HostingAction) -> Result<Emitted, String> {
 
 /// [`run_local`] over an explicit environment, for tests.
 pub async fn run_local_with(env: &HostingEnv, action: HostingAction) -> Result<Emitted, String> {
+    trust_answer(run_local_inner(env, action).await)
+}
+
+async fn run_local_inner(env: &HostingEnv, action: HostingAction) -> Result<Emitted, String> {
     match action {
         HostingAction::List => integrations_list(env),
         HostingAction::Integrations { action } => run_integrations(env, action).await,
@@ -411,7 +529,8 @@ pub async fn run_local_with(env: &HostingEnv, action: HostingAction) -> Result<E
             let integrations = env.integrations()?;
             let integration = pick(&integrations, id.as_deref())?;
             let projects = env
-                .client(integration, &integrations)?
+                .client_checked(integration, &integrations)
+                .await?
                 .list_projects()
                 .await
                 .map_err(|e| e.to_string())?;
@@ -485,6 +604,14 @@ pub async fn run_via_daemon(ipc: &mut Session, action: HostingAction) -> Result<
 
 /// [`run_via_daemon`] over an explicit environment.
 pub async fn run_via_daemon_with(
+    env: &HostingEnv,
+    ipc: &mut Session,
+    action: HostingAction,
+) -> Result<Emitted, String> {
+    trust_answer(run_via_daemon_inner(env, ipc, action).await)
+}
+
+async fn run_via_daemon_inner(
     env: &HostingEnv,
     ipc: &mut Session,
     action: HostingAction,
@@ -794,6 +921,11 @@ pub async fn run_via_daemon_with(
             clear,
         } => return run_link(env, ipc, kind, id, project, filter, clear).await,
         HostingAction::Clone { .. } => {}
+        // Trusting is a person's decision: a session that is not the CLI's
+        // (the MCP server) cannot.
+        HostingAction::Integrations {
+            action: crate::cli::IntegrationsAction::Trust { .. },
+        } if !ipc.may_trust() => return Err(TRUST_REFUSAL.to_string()),
         other => return run_local_with(env, other).await,
     }
 

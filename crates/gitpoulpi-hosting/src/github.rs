@@ -985,7 +985,13 @@ mod tests {
         url: &str,
         transport: Arc<RecordedTransport>,
     ) -> Box<dyn HostingClient> {
-        client_for(Integration::new("gh", kind, url), "tok".into(), transport)
+        client_for(
+            Integration::new("gh", kind, url),
+            "tok".into(),
+            transport,
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap()
     }
 
     const USER: &str =

@@ -302,7 +302,9 @@ mod tests {
             ),
             "t".into(),
             t,
+            &crate::trust::TrustGate::for_tests(),
         )
+        .unwrap()
     }
 
     fn mr(iid: u64, state: &str, source: &str) -> String {

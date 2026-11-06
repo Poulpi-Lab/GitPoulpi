@@ -17,7 +17,9 @@ fn client(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         Integration::new("gh", IntegrationKind::Github, "https://github.com"),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 fn enterprise(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
@@ -25,7 +27,9 @@ fn enterprise(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         Integration::new("ghe", IntegrationKind::GithubEnterprise, "https://ghe.corp"),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 fn body_of(r: &HttpRequest) -> serde_json::Value {

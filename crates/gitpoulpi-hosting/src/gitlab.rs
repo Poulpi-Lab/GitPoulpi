@@ -873,7 +873,9 @@ mod tests {
             ),
             "tok".into(),
             transport,
+            &crate::trust::TrustGate::for_tests(),
         )
+        .unwrap()
     }
 
     const USER: &str =

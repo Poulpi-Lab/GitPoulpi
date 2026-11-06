@@ -92,7 +92,9 @@ pub(crate) fn generate(
                 req.integration.clone(),
                 secret,
                 transport_or_default(transport)?,
-            );
+                &gitpoulpi_hosting::TrustGate::ambient(),
+            )
+            .map_err(|e| e.to_string())?;
             block_on(async {
                 let existing = client.list_ssh_keys().await.map_err(|e| e.to_string())?;
                 if let Some(k) = existing
@@ -145,7 +147,9 @@ pub(crate) fn remove(
             integration.clone(),
             secret,
             transport_or_default(transport)?,
-        );
+            &gitpoulpi_hosting::TrustGate::ambient(),
+        )
+        .map_err(|e| e.to_string())?;
         block_on(client.delete_ssh_key(id))?.map_err(msg::delete_remote_failed)?;
         deleted_remote = true;
     }

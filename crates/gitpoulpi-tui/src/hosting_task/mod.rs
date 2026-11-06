@@ -397,11 +397,12 @@ fn build_client(
     // One shared caching transport: ETags and the rate-limit state
     // must outlive the per-refresh client.
     let transport = gitpoulpi_hosting::shared_network_transport()?;
-    Ok(gitpoulpi_hosting::client_for(
+    gitpoulpi_hosting::client_for(
         integration.clone(),
         token,
         transport,
-    ))
+        &gitpoulpi_hosting::TrustGate::ambient(),
+    )
 }
 
 /// Tokens read once per round. Reading one is a credential-helper

@@ -19,7 +19,13 @@ fn block_on<F: std::future::Future>(f: F) -> F::Output {
 
 fn client(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
     let i = Integration::new("rm", IntegrationKind::Redmine, "http://127.0.0.1:3002/");
-    client_for(i, "key-123".into(), t)
+    client_for(
+        i,
+        "key-123".into(),
+        t,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 fn body(r: &HttpRequest) -> Value {
@@ -444,7 +450,9 @@ fn live_redmine_reads() {
         Integration::new("live", IntegrationKind::Redmine, url),
         key,
         transport,
-    );
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     block_on(async {
         let check = client.check_token().await.expect("key");
         println!("user: {}", check.user.login);

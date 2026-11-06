@@ -19,7 +19,13 @@ fn block_on<F: std::future::Future>(f: F) -> F::Output {
 fn client(kind: IntegrationKind, url: &str, t: &Arc<RecordedTransport>) -> Box<dyn HostingClient> {
     let mut integration = Integration::new("acct", kind, url);
     integration.account = "mara".into();
-    client_for(integration, "tok".into(), t.clone())
+    client_for(
+        integration,
+        "tok".into(),
+        t.clone(),
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 fn decoded(text: &str) -> String {

@@ -26,7 +26,9 @@ fn github(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         Integration::new("gh", IntegrationKind::Github, "https://github.com"),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 fn gitlab(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
@@ -38,7 +40,9 @@ fn gitlab(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         ),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 fn lines(file: &ApiFileDiff) -> Vec<(LineOrigin, String)> {
@@ -346,7 +350,9 @@ fn a_host_without_the_api_code_says_so() {
         Integration::new("t", IntegrationKind::Trello, "https://api.trello.com"),
         "tok".into(),
         t.clone(),
-    );
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     assert!(block_on(client.pull_request_diff("p", 1, None, None)).is_err());
     assert!(block_on(client.pull_request_commits("p", 1)).is_err());
     assert!(block_on(client.commit_diff("p", "abc")).is_err());

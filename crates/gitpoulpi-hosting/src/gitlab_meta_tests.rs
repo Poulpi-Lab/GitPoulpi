@@ -21,7 +21,9 @@ fn client(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         ),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 fn body_of(r: &HttpRequest) -> serde_json::Value {

@@ -468,7 +468,13 @@ async fn create(
         gitpoulpi_hosting::ReqwestTransport::new()
             .map_err(|e| crate::hosting_task::error_text(&e))?,
     );
-    let client = client_for(integration, token, transport);
+    let client = client_for(
+        integration,
+        token,
+        transport,
+        &gitpoulpi_hosting::TrustGate::ambient(),
+    )
+    .map_err(|e| crate::hosting_task::error_text(&e))?;
     client
         .create_pull_request(&req)
         .await

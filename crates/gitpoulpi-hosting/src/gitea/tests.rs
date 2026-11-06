@@ -29,7 +29,9 @@ fn gitea(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         Integration::new("g", IntegrationKind::Gitea, "https://git.example.com/"),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 fn forgejo(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
@@ -37,7 +39,9 @@ fn forgejo(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         Integration::new("c", IntegrationKind::Forgejo, "https://codeberg.org"),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 fn body_of(r: &HttpRequest) -> Value {
@@ -95,7 +99,9 @@ fn a_plain_http_server_is_called_over_http() {
         Integration::new("g", IntegrationKind::Gitea, "http://localhost:3000/"),
         "tok".into(),
         t.clone(),
-    );
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     block_on(client.check_token()).unwrap();
     assert_eq!(t.requests()[0].url, "http://localhost:3000/api/v1/user");
 }
@@ -1164,7 +1170,9 @@ fn live_gitea_reads() {
         Integration::new("live", IntegrationKind::Gitea, url),
         token,
         transport,
-    );
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     block_on(async {
         let check = client.check_token().await.expect("token");
         assert!(!check.user.login.is_empty());

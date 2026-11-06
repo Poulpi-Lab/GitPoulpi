@@ -103,7 +103,9 @@ mod tests {
             ),
             "tok".into(),
             transport.clone(),
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
         let found = block_on(lookup(&*c, "KEY/slug"));
         let ProtectionLookup::Known(found) = found else {
             panic!("{found:?}")

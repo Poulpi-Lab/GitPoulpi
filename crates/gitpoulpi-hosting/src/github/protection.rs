@@ -166,7 +166,9 @@ mod tests {
             Integration::new("gh", IntegrationKind::Github, "https://github.com"),
             "tok".into(),
             transport,
+            &crate::trust::TrustGate::for_tests(),
         )
+        .unwrap()
     }
 
     const BRANCHES: &str =

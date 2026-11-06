@@ -303,6 +303,24 @@ pub enum AiCommand {
         #[arg(long)]
         action: String,
     },
+    /// Binds a profile's API key to the address it was stored for: shows
+    /// what is trusted, or accepts the profile's current address (after
+    /// its base URL changed), a self-hosted server's certificate, or plain
+    /// http. Only a person runs this (it is not an agent tool).
+    Trust {
+        /// The AI profile id.
+        profile: String,
+        /// Accept the profile's current base URL (spelled exactly as the
+        /// refusal printed it).
+        #[arg(long, value_name = "URL")]
+        accept_origin: Option<String>,
+        /// Accept the certificate with this key fingerprint (SHA-256, hex).
+        #[arg(long, value_name = "SHA256")]
+        accept_certificate: Option<String>,
+        /// Allow a plain `http://` base URL that is not on this machine.
+        #[arg(long, value_enum)]
+        allow_insecure_http: Option<OnOff>,
+    },
 }
 
 #[derive(Debug, Subcommand)]

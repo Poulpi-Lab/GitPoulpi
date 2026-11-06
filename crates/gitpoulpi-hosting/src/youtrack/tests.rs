@@ -24,7 +24,13 @@ fn client(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         IntegrationKind::Youtrack,
         "https://acme.youtrack.cloud/",
     );
-    client_for(i, "perm:token".into(), t)
+    client_for(
+        i,
+        "perm:token".into(),
+        t,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 fn body(r: &HttpRequest) -> Value {
@@ -424,7 +430,9 @@ fn live_youtrack_reads() {
         Integration::new("live", IntegrationKind::Youtrack, &url),
         token,
         transport,
-    );
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap();
     eprintln!(
         "user: {:?}",
         block_on(c.check_token()).expect("users/me").user

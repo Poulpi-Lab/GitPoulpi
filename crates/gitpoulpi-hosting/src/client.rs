@@ -588,12 +588,39 @@ pub trait HostingClient: Send + Sync {
     }
 }
 
-/// Builds the client for `integration`, over `transport`.
+/// Builds the client for `integration`, over `transport`, once `gate` has
+/// admitted it.
+///
+/// The gate checks the address against the trust record **before** anything
+/// exists (see [`crate::trust`]), and the transport the client gets is
+/// wrapped so that no request leaves the integration's origins. A folder of
+/// local notes has no network and skips the gate.
 ///
 /// Families without a client return an [`UnsupportedClient`] rather than
-/// failing here, so the signature stays infallible; callers that want to
-/// hide the feature altogether gate on `kind.capabilities().implemented`.
+/// failing here; callers that want to hide the feature altogether gate on
+/// `kind.capabilities().implemented`.
 pub fn client_for(
+    integration: Integration,
+    token: String,
+    transport: Arc<dyn HttpTransport>,
+    gate: &crate::trust::TrustGate,
+) -> Result<Box<dyn HostingClient>> {
+    let transport = if integration.kind.capabilities().local_folder {
+        transport
+    } else {
+        let admitted = gate.admit(&integration)?;
+        Arc::new(crate::trust::GuardedTransport::new(
+            transport,
+            admitted.subject,
+            admitted.record.origin.clone(),
+            admitted.origins,
+            admitted.record.tls.clone(),
+        )) as Arc<dyn HttpTransport>
+    };
+    Ok(build_client(integration, token, transport))
+}
+
+fn build_client(
     integration: Integration,
     token: String,
     transport: Arc<dyn HttpTransport>,
@@ -896,7 +923,13 @@ mod tests {
     fn the_default_issue_create_options_are_empty_and_new_issue_has_no_type() {
         let transport = std::sync::Arc::new(RecordedTransport::new());
         let gh = Integration::new("gh", IntegrationKind::Github, "https://github.com");
-        let client = client_for(gh, "tok".into(), transport);
+        let client = client_for(
+            gh,
+            "tok".into(),
+            transport,
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
         let options = block_on(client.issue_create_options("me/thing")).unwrap();
         assert_eq!(options, IssueCreateOptions::default());
         let new = NewIssue::default();
@@ -910,7 +943,9 @@ mod tests {
             integration(IntegrationKind::Github, "https://github.com"),
             "tok".into(),
             transport.clone(),
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
 
         let projects = block_on(client.list_projects()).unwrap();
         assert_eq!(projects.len(), 1);
@@ -940,7 +975,9 @@ mod tests {
             integration(IntegrationKind::Gitlab, "https://gitlab.example.com"),
             "tok".into(),
             transport.clone(),
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
 
         let projects = block_on(client.list_projects()).unwrap();
         assert_eq!(projects[0].full_name, "group/sub/one");
@@ -970,7 +1007,9 @@ mod tests {
             integration(IntegrationKind::Github, "https://github.com"),
             "tok".into(),
             transport.clone(),
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
         let projects = block_on(client.list_projects()).unwrap();
         let seen: Vec<(&str, bool)> = projects.iter().map(|p| (p.owner(), p.private)).collect();
         assert_eq!(seen, vec![("me", true), ("acme", false), ("acme", true)]);
@@ -990,7 +1029,9 @@ mod tests {
             integration(IntegrationKind::Gitlab, "https://gitlab.example.com"),
             "tok".into(),
             transport,
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
         let projects = block_on(client.list_projects()).unwrap();
         let seen: Vec<(&str, bool)> = projects.iter().map(|p| (p.owner(), p.private)).collect();
         assert_eq!(
@@ -1021,7 +1062,9 @@ mod tests {
             integration(IntegrationKind::Gitlab, "https://gitlab.example.com"),
             "tok".into(),
             transport.clone(),
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
 
         let projects = block_on(client.list_projects()).unwrap();
         assert_eq!(projects.len(), PAGE_SIZE as usize + 1);
@@ -1042,7 +1085,9 @@ mod tests {
             integration(IntegrationKind::Github, "https://github.com"),
             "stale".into(),
             transport,
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
 
         let err = block_on(client.list_projects()).unwrap_err();
         assert!(matches!(err, crate::Error::Unauthorized { .. }));
@@ -1068,7 +1113,13 @@ mod tests {
                 201,
                 r#"{"id":7,"title":"laptop","key":"ssh-ed25519 AAAA laptop"}"#,
             ));
-            let client = client_for(integration(kind, url), "tok".into(), transport.clone());
+            let client = client_for(
+                integration(kind, url),
+                "tok".into(),
+                transport.clone(),
+                &crate::trust::TrustGate::for_tests(),
+            )
+            .unwrap();
 
             let key =
                 block_on(client.upload_ssh_key("laptop", "ssh-ed25519 AAAA laptop\n")).unwrap();
@@ -1111,7 +1162,9 @@ mod tests {
             integration(IntegrationKind::Github, "https://github.com"),
             "tok".into(),
             transport.clone(),
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
 
         let created = block_on(client.create_pull_request(&new_pr("me/thing"))).unwrap();
         assert_eq!(created.number, 42);
@@ -1142,7 +1195,9 @@ mod tests {
             integration(IntegrationKind::Gitlab, "https://gitlab.example.com"),
             "tok".into(),
             transport.clone(),
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
 
         let mut req = new_pr("group/sub/proj");
         req.draft = true;
@@ -1182,7 +1237,9 @@ mod tests {
             integration(IntegrationKind::Github, "https://github.com"),
             "tok".into(),
             transport.clone(),
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
         let mut req = new_pr("up/thing");
         req.source_project = Some("me/thing".into());
         block_on(client.create_pull_request(&req)).unwrap();
@@ -1216,7 +1273,9 @@ mod tests {
             integration(IntegrationKind::Gitlab, "https://g.example.com"),
             "tok".into(),
             transport.clone(),
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
         let mut req = new_pr("up/thing");
         req.source_project = Some("me/thing".into());
         let created = block_on(client.create_pull_request(&req)).unwrap();
@@ -1246,7 +1305,9 @@ mod tests {
             integration(IntegrationKind::Github, "https://github.com"),
             "tok".into(),
             transport,
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
 
         let err = block_on(client.create_pull_request(&new_pr("me/thing"))).unwrap_err();
         assert!(matches!(err, crate::Error::Api { status: 422, .. }));
@@ -1265,7 +1326,9 @@ mod tests {
                 integration(IntegrationKind::Github, "https://github.com"),
                 "tok".into(),
                 transport,
-            );
+                &crate::trust::TrustGate::for_tests(),
+            )
+            .unwrap();
             let err = block_on(client.create_pull_request(&new_pr("me/thing"))).unwrap_err();
             if want_unauthorized {
                 assert!(matches!(err, crate::Error::Unauthorized { .. }));
@@ -1286,7 +1349,9 @@ mod tests {
             integration(IntegrationKind::Github, "https://github.com"),
             "tok".into(),
             transport,
-        );
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap();
         let keys = block_on(client.list_ssh_keys()).unwrap();
         assert_eq!(keys[0].title, "laptop");
     }

@@ -1435,11 +1435,12 @@ mod tests {
             integration: &Integration,
             _all: &[Integration],
         ) -> gitpoulpi_hosting::Result<Box<dyn gitpoulpi_hosting::HostingClient>> {
-            Ok(gitpoulpi_hosting::client_for(
+            gitpoulpi_hosting::client_for(
                 integration.clone(),
                 "tok".into(),
                 self.transport.clone(),
-            ))
+                &gitpoulpi_hosting::TrustGate::for_tests(),
+            )
         }
     }
 

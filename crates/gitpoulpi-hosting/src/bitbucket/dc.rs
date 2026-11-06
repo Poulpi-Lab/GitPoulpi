@@ -713,7 +713,13 @@ mod tests {
     }
 
     fn client(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
-        client_for(profile(), "tok".into(), t)
+        client_for(
+            profile(),
+            "tok".into(),
+            t,
+            &crate::trust::TrustGate::for_tests(),
+        )
+        .unwrap()
     }
 
     #[test]

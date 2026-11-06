@@ -166,6 +166,25 @@ GitPoulpi looks for the token of a profile in this order:
 Each profile is an `[[integrations]]` entry in `config.toml`. See the
 [configuration reference](config-reference.md#integrations-hosting-and-issue-trackers).
 
+## The security check
+
+A saved token is only as safe as the address it is sent to. GitPoulpi therefore remembers, for each integration, what it was connected to, and stops when that changes:
+
+- **The address.** The first time an integration is used (or connected), its address is recorded in `trust.toml`, in the user-only private data folder (`<data>/private/`), not in `config.toml`: editing the configuration can never widen what is trusted. If the address in the configuration is no longer the recorded one, nothing is sent to it and the token is not even read. Spellings of one address (`HTTPS://Git.Example.com:443/`) are the same address; a lookalike host is not.
+- **The account.** After you connect a token, and then about once a day (and once per run for a token that comes from `GITPOULPI_TOKEN_*` or the credential helper), GitPoulpi asks the host who the token belongs to and compares the account **id**, not the login. A token that now belongs to someone else is stopped.
+- **The certificate.** Servers whose certificate does not chain to a known authority (a private CA, a self-signed server) are accepted only for the exact key you accepted, and the TLS handshake still proves the server holds that key. With strict pinning on, the key must match even when the certificate chains to a public root; the price is that every key rotation asks again, which is why it is opt-in. The public hosts (github.com, gitlab.com, codeberg.org, bitbucket.org, dev.azure.com, `*.atlassian.net`, ...) keep no certificate record.
+- **Plain http.** A non-loopback `http://` address is refused unless you allowed it for that integration.
+
+Every request is also held to the integration's own address (and, for a public host, its API host such as `api.github.com`): a request anywhere else is refused before it is sent, and a redirect to another address is not followed.
+
+**Integrations connected before this check existed** get their record silently, from the configuration as it was, the first time they are used after the upgrade: they keep today's level of trust and nothing asks.
+
+### From the command line
+
+A stopped command fails with exit code 2 and prints what changed (see the [CLI reference](cli-reference.md)). `gitpoulpi hosting integrations trust <id>` shows what is trusted; `--accept-origin <url>`, `--accept-account <id>`, `--accept-certificate <sha256>`, `--strict-tls on|off` and `--allow-insecure-http on|off` accept one thing each, naming the exact value. After accepting a new address, enter the token again. Disconnecting (`hosting logout`) or removing an integration deletes its token, its trust record and what was cached from it (the saved repository lists of the Clone dialog, the Radar account lists and the remote review drafts of its host).
+
+An agent (MCP) cannot accept anything: it is told that the security check needs you.
+
 ## 4. Link a repository
 
 Linking is explicit and per repository. When a profile is connected, the Refs

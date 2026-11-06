@@ -476,7 +476,15 @@ pub(super) fn run_check(
         .enable_all()
         .build()
         .map_err(msg::check_start_failed)?;
-    let client = client_for(integration.clone(), secret.clone(), transport);
+    // Slice S5 records the account after a passing check (and shows the
+    // dialog for a refusal); until then a refusal is an ordinary error text.
+    let client = client_for(
+        integration.clone(),
+        secret.clone(),
+        transport,
+        &gitpoulpi_hosting::TrustGate::ambient(),
+    )
+    .map_err(|e| e.to_string())?;
     let check = runtime
         .block_on(client.check_token())
         .map_err(|e| e.to_string())?;

@@ -84,6 +84,7 @@ pub mod spec;
 pub mod ssh_key;
 #[cfg(feature = "trello")]
 pub mod trello;
+pub mod trust;
 pub mod updates;
 mod web_url;
 #[cfg(feature = "youtrack")]
@@ -142,6 +143,7 @@ pub use review::{
 #[cfg(feature = "hosting")]
 pub use spec::CheckoutSource;
 pub use spec::{spec_for, FamilySpec, RemoteRef};
+pub use trust::{Account, TrustGate, TrustProblem, TrustSubject};
 pub use web_url::{
     new_issue_form_url, new_pull_request_form_url, percent_encode_component, PullRequestForm,
     MAX_URL_LEN, TRUNCATION_NOTE,
@@ -211,6 +213,16 @@ pub enum Error {
     /// The local Markdown issue source: a folder or note problem.
     #[error("{0}")]
     Local(String),
+
+    /// The integration trust check refused: nothing was sent.
+    #[error("{0}")]
+    Trust(trust::TrustProblem),
+
+    /// `trust.toml` could not be read or written. Refused rather than
+    /// treated as empty: an empty store would re-trust whatever the config
+    /// says now.
+    #[error("the integration trust store is unusable: {0}")]
+    TrustStore(String),
 }
 
 /// Which configured instance a remote URL belongs to, so a repository's

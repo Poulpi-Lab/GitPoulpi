@@ -36,7 +36,7 @@ use std::sync::Arc;
 pub use agent::{expand_env_refs, resolve_command, LocalAgentClient};
 pub use api::{AnthropicClient, OpenAiClient};
 use gitpoulpi_config::{AiProfile, AiProviderKind};
-use gitpoulpi_hosting::HttpTransport;
+use gitpoulpi_hosting::{HttpTransport, TrustGate};
 pub use parse::{CommitMessage, PlannedCommit, PlannedSplit, PullRequestText};
 pub use rules_answer::{RuleProblem, RulesAnswer, RulesSettings};
 
@@ -56,6 +56,9 @@ pub enum Error {
     Http(String),
     #[error("the AI answer could not be understood: {0}")]
     Decode(String),
+    /// The security check of the profile's address refused: nothing was sent.
+    #[error("{0}")]
+    Trust(gitpoulpi_hosting::TrustProblem),
     #[error("the AI answered nothing")]
     Empty,
     #[error("the local agent failed: {0}")]
@@ -88,13 +91,44 @@ pub trait AiClient: Send + Sync {
 
 /// Builds the client a profile describes over `transport`.
 ///
-/// `api_key` is required for every kind but `local_agent`.
+/// `api_key` is required for every kind but `local_agent`. For the kinds that
+/// send the key over HTTP, `gate` binds it to the origin it was stored for:
+/// another `base_url` is refused before anything is sent.
 pub fn client_for(
     profile: &AiProfile,
     api_key: Option<String>,
     transport: Arc<dyn HttpTransport>,
+    gate: &TrustGate,
 ) -> Result<Box<dyn AiClient>> {
-    client_for_in(profile, api_key, transport, None)
+    client_for_in(profile, api_key, transport, None, gate)
+}
+
+/// The transport an API-key profile may use: `transport`, held to the
+/// origin of the profile's base URL once the gate admits it.
+fn guarded(
+    profile: &AiProfile,
+    has_key: bool,
+    transport: Arc<dyn HttpTransport>,
+    gate: &TrustGate,
+) -> Result<Arc<dyn HttpTransport>> {
+    let base = profile.effective_base_url();
+    let origins = gate
+        .admit_ai(&profile.id, base, has_key)
+        .map_err(|e| match e {
+            gitpoulpi_hosting::Error::Trust(p) => Error::Trust(p),
+            other => Error::BadProfile(other.to_string()),
+        })?;
+    let record = gate.ai_record_of(&profile.id);
+    Ok(Arc::new(gitpoulpi_hosting::trust::GuardedTransport::new(
+        transport,
+        gitpoulpi_hosting::TrustSubject::Ai(profile.id.clone()),
+        record
+            .as_ref()
+            .map(|r| r.origin.clone())
+            .unwrap_or_default(),
+        origins,
+        record.and_then(|r| r.tls),
+    )))
 }
 
 /// [`client_for`] for an action on the repository at `repo_root` (the
@@ -104,12 +138,18 @@ pub fn client_for_in(
     api_key: Option<String>,
     transport: Arc<dyn HttpTransport>,
     repo_root: Option<&std::path::Path>,
+    gate: &TrustGate,
 ) -> Result<Box<dyn AiClient>> {
     let key = || {
         api_key
             .clone()
             .filter(|k| !k.trim().is_empty())
             .ok_or(Error::MissingKey)
+    };
+    let has_key = api_key.as_deref().is_some_and(|k| !k.trim().is_empty());
+    let transport = match profile.kind {
+        AiProviderKind::LocalAgent => transport,
+        _ => guarded(profile, has_key, transport, gate)?,
     };
     Ok(match profile.kind {
         AiProviderKind::OpenAi | AiProviderKind::OpenRouter | AiProviderKind::OpenAiCompatible => {
@@ -192,7 +232,13 @@ pub fn client_for_network_in(
         std::time::Duration::from_secs(DEFAULT_TIMEOUT_SECS),
     )
     .map_err(|e| Error::Http(e.to_string()))?;
-    client_for_in(profile, api_key, Arc::new(transport), repo_root)
+    client_for_in(
+        profile,
+        api_key,
+        Arc::new(transport),
+        repo_root,
+        &TrustGate::ambient(),
+    )
 }
 
 /// Checks that a profile can answer: a one-word round trip.

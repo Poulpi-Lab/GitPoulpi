@@ -42,6 +42,14 @@ pub struct ToolSpec {
 /// than silently going stale.
 pub const EXCLUDED: &[(&[&str], &str)] = &[
     (
+        &["hosting", "integrations", "trust"],
+        "accepting a changed address, account or certificate is the user's decision; an agent is told the security check needs the user",
+    ),
+    (
+        &["ai", "trust"],
+        "binding an API key to another address is the user's decision",
+    ),
+    (
         &["mcp", "serve"],
         "the MCP server cannot spawn/serve a copy of itself",
     ),

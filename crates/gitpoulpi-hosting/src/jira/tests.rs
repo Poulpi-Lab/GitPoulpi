@@ -31,12 +31,24 @@ fn cloud(transport: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         "https://acme.atlassian.net/",
     );
     i.account = "me@acme.com".into();
-    client_for(i, "tok".into(), transport)
+    client_for(
+        i,
+        "tok".into(),
+        transport,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 fn dc(transport: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
     let i = Integration::new("jd", IntegrationKind::JiraDataCenter, "https://jira.corp");
-    client_for(i, "pat".into(), transport)
+    client_for(
+        i,
+        "pat".into(),
+        transport,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 fn issue(n: u32, done: bool) -> String {

@@ -14,7 +14,7 @@ description = "Hosting and issue-tracker API clients (GitHub, GitLab, Gitea/Forg
 # what the tests do -- so `--no-default-features` is a genuine
 # no-network build rather than a broken one.
 default = ["network", "github", "gitlab", "azure-devops", "bitbucket", "jira", "trello", "gitea", "linear", "youtrack", "redmine", "gerrit", "local-issues"]
-network = ["dep:reqwest"]
+network = ["dep:reqwest", "dep:rustls", "dep:rustls-native-certs", "dep:webpki-roots"]
 # Internal: the provider-agnostic port (`client`, `model`, `project`,
 # `resolve`). Never enabled alone: it is what `github` / `gitlab` turn on.
 # With neither built, only the always-compiled helpers remain (`http`,
@@ -37,11 +37,18 @@ gerrit = ["network", "hosting"]
 # "network" is on because the shared callers build the transport).
 local-issues = ["network", "hosting"]
 
+# Test doubles for the trust gate (`TrustGate::for_tests`), for the crates
+# whose tests build clients.
+test-support = []
+
 [dependencies]
 gitpoulpi-config.workspace = true
 gitpoulpi-core.workspace = true
 gitpoulpi-secrets.workspace = true
 async-trait.workspace = true
+sha2.workspace = true
+toml.workspace = true
+url.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
@@ -53,10 +60,12 @@ reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"
 # `ssh-keygen` binary that Windows ships as an optional feature -- see
 # `ssh_key`'s module comment.
 ssh-key = { version = "0.6", default-features = false, features = ["ed25519", "p256", "rsa", "alloc", "std", "getrandom"] }
+rustls = { workspace = true, optional = true }
+rustls-native-certs = { workspace = true, optional = true }
+webpki-roots = { workspace = true, optional = true }
 rand_core = { version = "0.6", features = ["getrandom"] }
 
 [dev-dependencies]
 tempfile.workspace = true
-toml.workspace = true
 tokio.workspace = true
 gitpoulpi-testkit.workspace = true

@@ -24,7 +24,13 @@ fn header<'a>(request: &'a HttpRequest, name: &str) -> Option<&'a str> {
 fn trello(transport: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
     let mut i = Integration::new("tr", IntegrationKind::Trello, "https://trello.com");
     i.account = "KEY123".into();
-    client_for(i, "SECRETTOKEN".into(), transport)
+    client_for(
+        i,
+        "SECRETTOKEN".into(),
+        transport,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 const LISTS: &str =

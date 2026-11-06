@@ -20,7 +20,13 @@ fn block_on<F: std::future::Future>(f: F) -> F::Output {
 fn client(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
     let mut i = Integration::new("gr", IntegrationKind::Gerrit, "http://127.0.0.1:8081/");
     i.account = "admin".into();
-    client_for(i, "http-pass".into(), t)
+    client_for(
+        i,
+        "http-pass".into(),
+        t,
+        &crate::trust::TrustGate::for_tests(),
+    )
+    .unwrap()
 }
 
 fn gerrit(json: impl std::fmt::Display) -> String {

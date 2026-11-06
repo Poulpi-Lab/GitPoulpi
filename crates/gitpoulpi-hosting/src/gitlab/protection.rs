@@ -62,7 +62,9 @@ mod tests {
             Integration::new("gl", IntegrationKind::GitlabSelfManaged, url),
             "tok".into(),
             transport,
+            &crate::trust::TrustGate::for_tests(),
         )
+        .unwrap()
     }
 
     #[test]

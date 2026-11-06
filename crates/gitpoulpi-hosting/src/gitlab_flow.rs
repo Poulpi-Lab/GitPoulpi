@@ -116,7 +116,9 @@ mod tests {
             ),
             "tok".into(),
             t,
+            &crate::trust::TrustGate::for_tests(),
         )
+        .unwrap()
     }
 
     fn block_on<F: std::future::Future>(f: F) -> F::Output {

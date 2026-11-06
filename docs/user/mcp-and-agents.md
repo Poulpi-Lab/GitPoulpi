@@ -428,6 +428,8 @@ Not exposed as tools:
 
 | CLI | Why |
 |---|---|
+| `gitpoulpi hosting integrations trust` | accepting a changed address, account or certificate is the user's decision; an agent is told the security check needs the user |
+| `gitpoulpi ai trust` | binding an API key to another address is the user's decision |
 | `gitpoulpi mcp serve` | the MCP server cannot spawn/serve a copy of itself |
 | `gitpoulpi completions` | shell completion generation, not a GitBackend operation |
 | `gitpoulpi shell-init` | prints a wrapper function for the user's own shell, not a GitBackend operation |

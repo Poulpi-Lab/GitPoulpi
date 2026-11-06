@@ -22,7 +22,9 @@ fn gitea(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         Integration::new("g", IntegrationKind::Gitea, "https://git.example.com/"),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 fn forgejo(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
@@ -30,7 +32,9 @@ fn forgejo(t: Arc<RecordedTransport>) -> Box<dyn HostingClient> {
         Integration::new("c", IntegrationKind::Forgejo, "https://codeberg.org"),
         "tok".into(),
         t,
+        &crate::trust::TrustGate::for_tests(),
     )
+    .unwrap()
 }
 
 const PULL_DIFF: &str = "diff --git a/src/a.rs b/src/a.rs\nindex 111..222 100644\n--- a/src/a.rs\n+++ b/src/a.rs\n@@ -1,3 +1,3 @@\n keep\n-old\n+new\n tail\ndiff --git a/docs/new.md b/docs/new.md\nnew file mode 100644\nindex 000..333\n--- /dev/null\n+++ b/docs/new.md\n@@ -0,0 +1,2 @@\n+# New\n+text\ndiff --git a/gone.txt b/gone.txt\ndeleted file mode 100644\nindex 444..000\n--- a/gone.txt\n+++ /dev/null\n@@ -1 +0,0 @@\n-bye\ndiff --git a/old name.rs b/new name.rs\nsimilarity index 100%\nrename from old name.rs\nrename to new name.rs\ndiff --git a/logo.png b/logo.png\nindex 555..666 100644\nBinary files a/logo.png and b/logo.png differ\n";

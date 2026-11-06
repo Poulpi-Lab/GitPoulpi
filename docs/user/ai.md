@@ -365,6 +365,16 @@ rule is never created this way. Optionally the scope, the branch and tag names a
 the newest commits go along (a box, off by default, shown in the "what is sent" pane). The profile
 and instructions are the *History rewrite rules* ones in Settings > AI.
 
+## Where the key goes
+
+An API key (OpenAI, Anthropic, OpenRouter, an OpenAI-compatible server) is bound to the address it was stored for: the origin of the profile's base URL, recorded in `trust.toml` in the user-only private data folder. If the base URL later points somewhere else, the request is refused before anything is sent and the key stays where it is. Run `gitpoulpi ai trust <profile> --accept-origin <url>` (or accept it in the app) to move the key to the new address on purpose.
+
+- Plain `http://` is allowed on this machine (Ollama, LM Studio on `localhost`); anywhere else it needs `gitpoulpi ai trust <profile> --allow-insecure-http on`.
+- A self-hosted server whose certificate does not chain to a known authority is accepted only for the key fingerprint you pin with `--accept-certificate <sha256>`; the TLS handshake still proves the server holds that key.
+- A profile that already had a key before this check existed is recorded silently, from its current base URL, the first time it is used.
+- A local agent (`claude -p` and the like) has no key and no HTTP, so there is nothing to bind.
+
+
 ## Review context
 
 A code review draft (`✦`, or `hosting review suggest`) reads the request's diff, title, description and

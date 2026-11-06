@@ -80,6 +80,7 @@ fn repository_commands_are_grayed_on_the_home_tab() {
         "App: Settings...",
         "Repository: Clone...",
         "Repositories: Search",
+        "Integrations: Review security check",
     ] {
         assert_eq!(reason_of(home, label), None, "{label}");
     }

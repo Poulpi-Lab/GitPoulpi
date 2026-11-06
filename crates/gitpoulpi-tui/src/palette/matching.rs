@@ -179,7 +179,9 @@ pub(crate) fn needs_repository(label: &str) -> bool {
         "Navigation" | "Refs" | "Git" | "Edit" | "Commit" | "Commit Details" | "Diff"
         | "Working Changes" | "Files" | "File" | "Copy" | "Composer" | "LFS" | "Remote"
         | "Pull Requests" | "Merge Requests" | "Issues" | "Flow" => true,
-        "Integrations" => !rest.contains("Connect Integration"),
+        "Integrations" => {
+            !(rest.contains("Connect Integration") || rest.contains("Review security check"))
+        }
         "Repository" => {
             rest.contains("SSH Key for This Repository") || rest.contains("Sparse Checkout")
         }

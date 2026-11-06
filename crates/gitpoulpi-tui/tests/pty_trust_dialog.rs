@@ -192,6 +192,51 @@ fn a_changed_address_opens_the_dialog_and_nothing_is_sent_to_either_host() {
     assert!(s.new.requests().is_empty());
 }
 
+/// The palette reaches the review from the Repository Management tab too:
+/// cancel the check (it is snoozed), then ask for it back from the palette.
+#[test]
+fn the_palette_brings_the_check_back_on_the_management_tab() {
+    let mut s = open("pty-trust-dialog-palette-home");
+    s.term
+        .wait_for("the security check dialog", STEP, |x| {
+            x.contains("2  Trust the new address")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    s.term.send_keys("Escape").unwrap();
+    let screen = s
+        .term
+        .wait_for("the dialog gone, Home still shown", STEP, |x| {
+            !x.contains("2  Trust the new address") && x.contains("Repository Management")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(
+        screen.contains("Repository Management"),
+        "{}",
+        screen.text()
+    );
+    // The Clone dialog the setup opened is still up: close it, so the
+    // palette is asked from the plain Home tab.
+    s.term.send_keys("Escape").unwrap();
+    s.term
+        .wait_for("the Clone dialog closed", STEP, |x| {
+            !x.contains("Shallow clone") && x.contains("Repository Management")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    s.term.send_keys("C-p").unwrap();
+    s.term.send_text("security check").unwrap();
+    s.term
+        .wait_for("the palette row", STEP, |x| {
+            x.contains("Review security check")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    s.term.send_keys("Enter").unwrap();
+    s.term
+        .wait_for("the dialog back from the palette", STEP, |x| {
+            x.contains("2  Trust the new address")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+}
+
 #[test]
 fn trusting_the_new_address_opens_the_form_on_the_token() {
     let mut s = open("pty-trust-dialog-trust");

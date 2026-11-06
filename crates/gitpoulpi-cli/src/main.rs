@@ -38,6 +38,10 @@ fn main() {
 }
 
 fn real_main() {
+    // User-only app directories (best effort, once per start).
+    if let Some(paths) = gitpoulpi_config::ConfigPaths::discover() {
+        gitpoulpi_config::secure_fs::harden_app_dirs(&paths);
+    }
     let cli = cli::parse_localized();
     if cli.add.is_some() && cli.command.is_some() {
         eprintln!("gitpoulpi: --add opens a folder as a tab and takes no subcommand");

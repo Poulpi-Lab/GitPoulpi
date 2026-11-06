@@ -150,6 +150,19 @@ impl ConfigPaths {
         self.sessions_dir().join(format!("{session_name}.pid"))
     }
 
+    /// Where secrets that must stay user-only live (the integration trust
+    /// store, MCP secrets, update keys): `<data>/private`, created `0700` by
+    /// [`crate::secure_fs::harden_app_dirs`].
+    pub fn private_dir(&self) -> PathBuf {
+        self.data_dir().join("private")
+    }
+
+    /// Where the daemon for `session_name` publishes the token a client must
+    /// present first (`Hello`). Written user-only before the `.port` file.
+    pub fn ipc_token_file(&self, session_name: &str) -> PathBuf {
+        self.sessions_dir().join(format!("{session_name}.token"))
+    }
+
     /// Where the updater and the TUI hand an update over (the install-channels
     /// design): `<data>/updates`.
     pub fn updates_dir(&self) -> PathBuf {

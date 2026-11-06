@@ -12,6 +12,7 @@ pub mod policy;
 pub mod release;
 mod repo_data;
 mod schema;
+pub mod secure_fs;
 mod session_name;
 mod settings;
 pub mod theme;
@@ -203,10 +204,10 @@ impl Config {
 
     pub fn save(&self, path: &Path) -> Result<()> {
         if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)?;
+            secure_fs::create_private_dir_all(parent)?;
         }
         let raw = toml::to_string_pretty(self)?;
-        std::fs::write(path, raw)?;
+        secure_fs::write_private(path, raw.as_bytes())?;
         Ok(())
     }
 
@@ -336,9 +337,9 @@ pub fn set_commit_column_in_file(
         toml::Value::Table(table),
     )?;
     if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
+        secure_fs::create_private_dir_all(parent)?;
     }
-    std::fs::write(path, toml::to_string_pretty(&document)?)?;
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
     Ok(())
 }
 
@@ -386,9 +387,9 @@ pub fn set_log_columns_in_file(
         toml::Value::Table(scroll),
     )?;
     if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
+        secure_fs::create_private_dir_all(parent)?;
     }
-    std::fs::write(path, toml::to_string_pretty(&document)?)?;
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
     Ok(())
 }
 
@@ -413,9 +414,9 @@ pub fn set_log_columns_layout_in_file(path: &Path, layout: LogColumnsLayout) -> 
         toml::Value::String(layout.as_str().to_string()),
     )?;
     if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
+        secure_fs::create_private_dir_all(parent)?;
     }
-    std::fs::write(path, toml::to_string_pretty(&document)?)?;
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
     Ok(())
 }
 
@@ -436,9 +437,9 @@ pub fn set_sidebar_sections_hidden_in_file(path: &Path, hidden: &[String]) -> Re
     let names = toml::Value::Array(hidden.iter().cloned().map(toml::Value::String).collect());
     insert_dotted(&mut document, "ui.sidebar_sections_hidden", names)?;
     if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
+        secure_fs::create_private_dir_all(parent)?;
     }
-    std::fs::write(path, toml::to_string_pretty(&document)?)?;
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
     Ok(())
 }
 
@@ -501,9 +502,9 @@ pub fn set_in_file(path: &Path, key: &str, value: &str) -> Result<serde_json::Va
     let stored = config.get(key)?;
 
     if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
+        secure_fs::create_private_dir_all(parent)?;
     }
-    std::fs::write(path, toml::to_string_pretty(&document)?)?;
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
     Ok(stored)
 }
 
@@ -551,9 +552,9 @@ pub fn set_list_in_file<T: serde::Serialize>(path: &Path, key: &str, items: &[T]
         })?;
 
     if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
+        secure_fs::create_private_dir_all(parent)?;
     }
-    std::fs::write(path, toml::to_string_pretty(&document)?)?;
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
     Ok(())
 }
 
@@ -593,9 +594,9 @@ fn set_entries_in_file(path: &Path, key: &str, entries: Option<&[OpenInEntry]>) 
             expected: err.to_string(),
         })?;
     if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
+        secure_fs::create_private_dir_all(parent)?;
     }
-    std::fs::write(path, toml::to_string_pretty(&document)?)?;
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
     Ok(())
 }
 

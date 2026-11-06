@@ -115,7 +115,7 @@ fn strip_userinfo(url: &str) -> String {
 
 /// Saves `list` (temp file, then rename), capped and stripped of user info.
 pub fn store(dir: &Path, list: &CachedList) -> std::io::Result<()> {
-    std::fs::create_dir_all(dir)?;
+    gitpoulpi_config::secure_fs::create_private_dir_all(dir)?;
     let mut list = list.clone();
     list.projects.truncate(MAX_PROJECTS);
     for p in &mut list.projects {
@@ -128,11 +128,7 @@ pub fn store(dir: &Path, list: &CachedList) -> std::io::Result<()> {
     }
     let path = path_of(dir, &list.key);
     let text = serde_json::to_string(&list).map_err(std::io::Error::other)?;
-    let tmp = path.with_extension(format!("json.{}.tmp", std::process::id()));
-    std::fs::write(&tmp, text)?;
-    std::fs::rename(&tmp, &path).inspect_err(|_| {
-        let _ = std::fs::remove_file(&tmp);
-    })
+    gitpoulpi_config::secure_fs::write_private(&path, text.as_bytes())
 }
 
 /// Deletes the saved list of `key`.

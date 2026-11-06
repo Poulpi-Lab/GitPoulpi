@@ -446,6 +446,10 @@ pub struct RunOptions {
 
 /// [`run`] with the command-line options.
 pub fn run_with(session: &str, options: RunOptions) -> io::Result<()> {
+    // User-only app directories (best effort, once per start).
+    if let Some(paths) = gitpoulpi_config::ConfigPaths::discover() {
+        gitpoulpi_config::secure_fs::harden_app_dirs(&paths);
+    }
     // Windows: a start nobody typed (double-click, a pinned exe, a pinned
     // shortcut from before `--launcher`) is a launcher start.
     #[cfg(windows)]

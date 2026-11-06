@@ -408,7 +408,7 @@ impl Logger {
 /// Appends lines to today's file, rotating at the size cap. Runs until every
 /// sender is gone.
 fn writer(dir: &Path, rx: &mpsc::Receiver<Msg>, max: &AtomicU64) {
-    let _ = std::fs::create_dir_all(dir);
+    let _ = gitpoulpi_config::secure_fs::create_private_dir_all(dir);
     let mut open: Option<(PathBuf, std::fs::File, u64)> = None;
     while let Ok(first) = rx.recv() {
         let mut batch = vec![first];
@@ -436,6 +436,18 @@ fn writer(dir: &Path, rx: &mpsc::Receiver<Msg>, max: &AtomicU64) {
     }
 }
 
+/// Opens a day's log for appending, created user-only (`0600` on Unix).
+fn open_log(path: &Path) -> std::io::Result<std::fs::File> {
+    let mut options = std::fs::OpenOptions::new();
+    options.create(true).append(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.mode(0o600);
+    }
+    options.open(path)
+}
+
 fn append(dir: &Path, open: &mut Option<(PathBuf, std::fs::File, u64)>, line: &str, max: u64) {
     let path = dir.join(file_name(Local::now().date_naive()));
     if open.as_ref().is_some_and(|(p, _, _)| *p != path) {
@@ -447,21 +459,13 @@ fn append(dir: &Path, open: &mut Option<(PathBuf, std::fs::File, u64)>, line: &s
         let _ = std::fs::rename(&path, rotated_name(&path));
     }
     if open.is_none() {
-        let _ = std::fs::create_dir_all(dir);
-        if let Ok(file) = std::fs::OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&path)
-        {
+        let _ = gitpoulpi_config::secure_fs::create_private_dir_all(dir);
+        if let Ok(file) = open_log(&path) {
             let size = file.metadata().map(|m| m.len()).unwrap_or(0);
             if size >= max {
                 drop(file);
                 let _ = std::fs::rename(&path, rotated_name(&path));
-                if let Ok(file) = std::fs::OpenOptions::new()
-                    .create(true)
-                    .append(true)
-                    .open(&path)
-                {
+                if let Ok(file) = open_log(&path) {
                     *open = Some((path.clone(), file, 0));
                 }
             } else {
@@ -964,6 +968,29 @@ mod tests {
         assert_eq!(file_date("gitpoulpi-x.log"), None);
         assert_eq!(file_date("other-2026-10-08.log"), None);
     }
+    #[cfg(unix)]
+    #[test]
+    fn a_log_file_is_created_user_only() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let log = Logger::new(Options {
+            dir: Some(dir.path().join("logs")),
+            level: Level::Info,
+            retention_days: 30,
+            max_file_bytes: 1024 * 1024,
+            process: "test",
+        });
+        log.emit(Level::Info, "t", "a line");
+        log.flush();
+        let live = dir
+            .path()
+            .join("logs")
+            .join(file_name(Local::now().date_naive()));
+        let mode = |p: &Path| std::fs::metadata(p).unwrap().permissions().mode() & 0o777;
+        assert_eq!(mode(&live), 0o600);
+        assert_eq!(mode(live.parent().unwrap()), 0o700);
+    }
+
     #[test]
     fn clear_empties_every_day_keeps_the_live_file_and_the_writer_keeps_writing() {
         let dir = tempfile::tempdir().unwrap();

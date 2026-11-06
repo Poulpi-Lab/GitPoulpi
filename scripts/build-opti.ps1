@@ -15,7 +15,7 @@
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)
 
-$bins = 'gitpoulpi', 'gitpoulpi-tui', 'gitpoulpi-mcp', 'gitpoulpi-launch'
+$bins = 'gitpoulpi', 'gitpoulpi-tui', 'gitpoulpi-mcp', 'gitpoulpi-launch', 'gitpoulpi-updater'
 
 # Windows refuses to delete a running .exe (an open TUI, a session daemon) but
 # lets it be renamed: move the previous binaries aside before building so the
@@ -32,7 +32,7 @@ foreach ($bin in $bins) {
 
 # sccache cannot cache LTO'd final links and gains little here: build without it.
 $env:RUSTC_WRAPPER = ''
-cargo build --profile dist --locked -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp @args
+cargo build --profile dist --locked -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp -p gitpoulpi-updater @args
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host ''

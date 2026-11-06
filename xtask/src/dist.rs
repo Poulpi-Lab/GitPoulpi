@@ -16,14 +16,19 @@ use std::process::Command;
 use sha2::{Digest, Sha256};
 
 /// The packages (and therefore the binaries) a release ships.
-const PACKAGES: [&str; 3] = ["gitpoulpi-tui", "gitpoulpi-cli", "gitpoulpi-mcp"];
+const PACKAGES: [&str; 4] = [
+    "gitpoulpi-tui",
+    "gitpoulpi-cli",
+    "gitpoulpi-mcp",
+    "gitpoulpi-updater",
+];
 /// The binary names those packages produce.
-const BINARIES: [&str; 4] = gitpoulpi_config::release::BINARIES;
+const BINARIES: [&str; 5] = gitpoulpi_config::release::BINARIES;
 
 const USAGE: &str = "\
 Usage: cargo run -p xtask -- dist [--target <triple>] [--no-build]
 
-Builds gitpoulpi, gitpoulpi-tui, gitpoulpi-mcp and gitpoulpi-launch with `--profile dist` and
+Builds gitpoulpi, gitpoulpi-tui, gitpoulpi-mcp, gitpoulpi-launch and gitpoulpi-updater with `--profile dist` and
 writes target/dist/gitpoulpi-<version>-<target>.<zip|tar.gz> plus a .sha256
 file. Windows targets get a .zip, everything else a .tar.gz.
 
@@ -225,7 +230,7 @@ pub fn install_text(version: &str, target: &str) -> String {
     } else {
         (
             "Copy the binaries to a folder on your PATH, for example\n\
-             ~/.local/bin (`install -m 755 gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch ~/.local/bin`)\n\
+             ~/.local/bin (`install -m 755 gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch gitpoulpi-updater ~/.local/bin`)\n\
              or /usr/local/bin.",
             "gitpoulpi --version",
         )
@@ -238,6 +243,7 @@ pub fn install_text(version: &str, target: &str) -> String {
          \x20 {tui}  the terminal UI on its own\n\
          \x20 {mcp}  the MCP server for AI agents\n\
          \x20 {launch}  what the shortcuts run: shows the open window, else starts one\n\
+         \x20 {updater}  replaces GitPoulpi during an update; GitPoulpi runs it, not you\n\
          \n\
          Install\n\
          {place}\n\
@@ -258,6 +264,7 @@ pub fn install_text(version: &str, target: &str) -> String {
         tui = exe("gitpoulpi-tui"),
         mcp = exe("gitpoulpi-mcp"),
         launch = exe("gitpoulpi-launch"),
+        updater = exe("gitpoulpi-updater"),
     )
 }
 

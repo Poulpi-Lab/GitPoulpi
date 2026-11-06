@@ -9,11 +9,11 @@ cd "$(dirname "$0")/.."
 
 # sccache cannot cache LTO'd final links and gains little here: build without it.
 RUSTC_WRAPPER= cargo build --profile dist --locked \
-    -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp "$@"
+    -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp -p gitpoulpi-updater "$@"
 
 echo
 echo "Optimized binaries (target/dist):"
-for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch; do
+for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch gitpoulpi-updater; do
     f="target/dist/$bin"
     if [ -f "$f" ]; then
         awk -v b="$bin" -v s="$(wc -c < "$f")" 'BEGIN { printf "  %-15s %6.1f MB\n", b, s / 1048576 }'

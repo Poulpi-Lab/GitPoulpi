@@ -49,7 +49,8 @@ fn script_dry_run_prints_the_cargo_command() {
         .find(|l| l.starts_with("RUSTC_WRAPPER= cargo build"))
         .unwrap_or_else(|| panic!("no cargo line in:\n{out}"));
     assert!(cmd.contains("--profile custom --locked"));
-    assert!(cmd.contains("-p gitpoulpi-cli -p gitpoulpi-tui --no-default-features"));
+    assert!(cmd
+        .contains("-p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-updater --no-default-features"));
     assert!(!cmd.contains("gitpoulpi-mcp"));
     assert!(cmd.contains("gitpoulpi-cli/lang-fr,gitpoulpi-cli/lfs"));
     assert!(!cmd.contains("/ai") && !cmd.contains("github") && !cmd.contains("gitlab"));

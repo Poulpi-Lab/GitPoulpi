@@ -268,7 +268,7 @@ impl Choices {
     }
 
     pub fn packages(&self) -> Vec<&'static str> {
-        let mut p = vec!["gitpoulpi-cli", "gitpoulpi-tui"];
+        let mut p = vec!["gitpoulpi-cli", "gitpoulpi-tui", "gitpoulpi-updater"];
         if self.mcp {
             p.push("gitpoulpi-mcp");
         }
@@ -1115,6 +1115,7 @@ pub fn run(args: &[String]) -> Result<i32, String> {
         "gitpoulpi-tui",
         "gitpoulpi-mcp",
         "gitpoulpi-launch",
+        "gitpoulpi-updater",
     ] {
         let file = out.join(format!("{bin}{exe}"));
         let Ok(meta) = std::fs::metadata(&file) else {
@@ -1158,7 +1159,7 @@ mod tests {
         let a = c.cargo_args("custom", false, &[]);
         assert_eq!(
             a.join(" "),
-            "build --profile custom --locked -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp \
+            "build --profile custom --locked -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-updater -p gitpoulpi-mcp \
              --no-default-features --features \
              gitpoulpi-cli/lang-fr,gitpoulpi-cli/github,gitpoulpi-cli/mcp,\
              gitpoulpi-tui/lang-fr,gitpoulpi-tui/github,gitpoulpi-tui/mcp,\

@@ -35,7 +35,10 @@ fn text(fs: &FakeFs, dir: &Path, name: &str) -> String {
 #[test]
 fn staging_puts_new_files_beside_the_old_ones_and_touches_nothing_else() {
     let (fs, dir, names) = install(LINUX, false, "0.1.0", "0.2.0");
-    assert_eq!(staged_names(&fs, &dir, &names).len(), 5);
+    assert_eq!(
+        staged_names(&fs, &dir, &names).len(),
+        gitpoulpi_config::release::BINARIES.len() + 1
+    );
     assert_eq!(staged_version(&fs, &dir).as_deref(), Some("0.2.0"));
     assert_eq!(text(&fs, &dir, "gitpoulpi-tui"), "gitpoulpi-tui 0.1.0");
     assert!(!fs.exists(&dir.join("README.md.new")), "only managed files");
@@ -111,7 +114,7 @@ fn windows_refuses_when_another_binary_is_running_and_changes_nothing() {
     assert!(!fs.exists(&dir.join("gitpoulpi-tui.exe.old")));
     assert_eq!(
         staged_names(&fs, &dir, &names).len(),
-        5,
+        gitpoulpi_config::release::BINARIES.len() + 1,
         "the download stays staged for a retry"
     );
 }
@@ -210,7 +213,10 @@ fn cleanup_after_a_successful_start_removes_the_old_files() {
     let (fs, dir, names) = install(LINUX, false, "0.1.0", "0.2.0");
     apply(&fs, &dir, &names, Replace::Atomic, "gitpoulpi-tui").unwrap();
     let done = cleanup(&fs, &dir, &names);
-    assert_eq!(done.removed.len(), 5);
+    assert_eq!(
+        done.removed.len(),
+        gitpoulpi_config::release::BINARIES.len() + 1
+    );
     assert!(done.kept.is_empty());
     assert_eq!(previous_version(&fs, &dir), None);
     // Nothing left to clean on the next start.
@@ -411,7 +417,11 @@ fn staging_from_an_archive_into_a_folder_round_trips() {
     }
     let bytes = testutil::archive_for("0.2.0", LINUX);
     let staged = stage_from_archive_into(&fs, &dir, &bytes, "0.2.0", LINUX).unwrap();
-    assert_eq!(staged.len(), 5, "{staged:?}");
+    assert_eq!(
+        staged.len(),
+        gitpoulpi_config::release::BINARIES.len() + 1,
+        "{staged:?}"
+    );
     assert_eq!(staged_version(&fs, &dir).as_deref(), Some("0.2.0"));
     assert_eq!(
         text(&fs, &dir, "gitpoulpi-tui.new"),

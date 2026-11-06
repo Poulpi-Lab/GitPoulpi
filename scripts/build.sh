@@ -9,11 +9,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 cargo build --release --locked \
-    -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp "$@"
+    -p gitpoulpi-cli -p gitpoulpi-tui -p gitpoulpi-mcp -p gitpoulpi-updater "$@"
 
 echo
 echo "Binaries (target/release):"
-for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch; do
+for bin in gitpoulpi gitpoulpi-tui gitpoulpi-mcp gitpoulpi-launch gitpoulpi-updater; do
     f="target/release/$bin"
     if [ -f "$f" ]; then
         awk -v b="$bin" -v s="$(wc -c < "$f")" 'BEGIN { printf "  %-15s %6.1f MB\n", b, s / 1048576 }'

@@ -92,15 +92,16 @@ pub fn settings() -> GuardSettings {
     s
 }
 
-/// `Ok` when the request may go on; a refusal as the dispatcher carries it.
-/// Only `StageFile`, `StageFolder` and `StageAll` are checked.
-pub(crate) fn check(
+/// `None` when the request may go on; the refusal, as the dispatcher carries
+/// it, when it may not. Only `StageFile`, `StageFolder` and `StageAll` are
+/// checked.
+pub(crate) fn refusal(
     backend: &dyn GitBackend,
     repo: &RepoRef,
     command: OperationKind,
     target: &StageTarget,
     args: &Value,
-) -> Result<(), Failure> {
+) -> Option<Failure> {
     if !matches!(
         command,
         OperationKind::StageFile | OperationKind::StageFolder | OperationKind::StageAll
@@ -109,17 +110,17 @@ pub(crate) fn check(
         .and_then(Value::as_bool)
         .unwrap_or(false)
     {
-        return Ok(());
+        return None;
     }
     let s = settings();
     match scan(backend, repo, target, &s) {
-        Ok(files) if files.is_empty() => Ok(()),
+        Ok(files) if files.is_empty() => None,
         Ok(files) => {
             let e = Error::SensitiveStage { files };
-            Err((e.to_string(), e.typed(), None))
+            Some((e.to_string(), e.typed(), None))
         }
         // A status that cannot be read is the stage's own failure to report.
-        Err(_) => Ok(()),
+        Err(_) => None,
     }
 }
 

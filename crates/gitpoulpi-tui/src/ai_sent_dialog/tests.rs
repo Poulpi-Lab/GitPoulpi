@@ -51,7 +51,7 @@ async fn gate_confirm(gate: &Arc<dyn SendGate>, sent: &Prepared) -> bool {
 fn ask_from_worker(sent: Prepared) -> std::thread::JoinHandle<bool> {
     reset();
     let handle = std::thread::spawn(move || {
-        let gate = Gate::new(
+        let gate = Gate::shared(
             AiAction::CommitMessage,
             "Claude".into(),
             "Commit message".into(),

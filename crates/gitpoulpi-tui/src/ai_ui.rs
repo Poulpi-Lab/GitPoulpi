@@ -866,7 +866,7 @@ fn with_privacy(job: Job, action: AiAction) -> Job {
     let config = settings.config();
     let job = job.with_privacy(&config.ai.privacy, &config.privacy.sensitive_patterns);
     if previewed(action) && config.ai.sent_preview.shows(action) {
-        let gate = crate::ai_sent_dialog::Gate::new(
+        let gate = crate::ai_sent_dialog::Gate::shared(
             action,
             job.profile.display_name().to_string(),
             action_label(action).to_string(),

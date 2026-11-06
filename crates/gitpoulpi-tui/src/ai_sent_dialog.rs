@@ -87,7 +87,7 @@ pub(crate) struct Gate {
 }
 
 impl Gate {
-    pub(crate) fn new(action: AiAction, via: String, action_label: String) -> Arc<dyn SendGate> {
+    pub(crate) fn shared(action: AiAction, via: String, action_label: String) -> Arc<dyn SendGate> {
         Arc::new(Self {
             action,
             via,

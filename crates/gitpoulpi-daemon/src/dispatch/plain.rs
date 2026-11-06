@@ -330,9 +330,9 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
         | OperationKind::StageHunk
         | OperationKind::StageLine => {
             let target: StageTarget = arg_or_err!(args, "target", request.id);
-            match crate::stage_guard::check(backend, &repo, request.command, &target, args) {
-                Err(refused) => Err(refused),
-                Ok(()) => to_json!(backend.stage(&repo, &target)),
+            match crate::stage_guard::refusal(backend, &repo, request.command, &target, args) {
+                Some(refused) => Err(refused),
+                None => to_json!(backend.stage(&repo, &target)),
             }
         }
         OperationKind::UnstageFile

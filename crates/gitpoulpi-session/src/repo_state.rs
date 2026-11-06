@@ -274,6 +274,34 @@ pub struct RepoState {
     /// question, `rewrite script trust`); the MCP server cannot.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub trusted_scripts: Vec<TrustedScript>,
+    /// The committed workflow hooks (`.gitpoulpi/workflow.toml`'s `[hooks]`)
+    /// the user trusted, by `gitpoulpi_core::workflow::hooks_hash`: hooks run
+    /// only while the file's hash is here, so a changed file asks again. The
+    /// commands are kept to show "what changed". Only a human adds to it
+    /// (`FlowTrustHooks`; the MCP server cannot). Capped at 50.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub trusted_hooks: Vec<TrustedHooks>,
+}
+
+/// One hook command of a trust record.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct HookLine {
+    /// `after_start` or `before_finish`.
+    pub phase: String,
+    pub command: String,
+}
+
+/// A list of committed workflow hooks the user trusted (see
+/// `RepoState::trusted_hooks`).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct TrustedHooks {
+    /// `hooks_hash` of the list.
+    pub hash: String,
+    pub hooks: Vec<HookLine>,
+    /// Unix seconds.
+    pub trusted_at: i64,
 }
 
 /// A script the user trusted (see `RepoState::trusted_scripts`).
@@ -313,6 +341,33 @@ impl RepoState {
         });
         let extra = self.trusted_scripts.len().saturating_sub(200);
         self.trusted_scripts.drain(..extra);
+    }
+
+    /// Trusts the committed hooks `hooks` whose hash is `hash` (trusting the
+    /// same hash again only refreshes it); the list is capped at 50 entries,
+    /// forgetting the oldest.
+    pub fn trust_hooks(&mut self, hash: &str, hooks: Vec<HookLine>, now: i64) {
+        self.trusted_hooks.retain(|t| t.hash != hash);
+        self.trusted_hooks.push(TrustedHooks {
+            hash: hash.to_string(),
+            hooks,
+            trusted_at: now,
+        });
+        let extra = self.trusted_hooks.len().saturating_sub(50);
+        self.trusted_hooks.drain(..extra);
+    }
+
+    /// Whether the committed hooks with this hash were trusted.
+    pub fn trusts_hooks(&self, hash: &str) -> bool {
+        self.trusted_hooks.iter().any(|t| t.hash == hash)
+    }
+
+    /// Whether `command` of `phase` is in any trusted list (what a resumed
+    /// flow checks per step).
+    pub fn trusts_hook_command(&self, phase: &str, command: &str) -> bool {
+        self.trusted_hooks
+            .iter()
+            .any(|t| t.hooks.iter().any(|h| h.phase == phase && h.command == command))
     }
 
     /// Whether the user trusted the script with this hash.
@@ -483,6 +538,34 @@ mod tests {
         let back = RepoState::load(&path).unwrap();
         assert_eq!(back.trusted_scripts, state.trusted_scripts);
         assert_eq!(back.trusted_scripts[1].label, "renamed.py");
+    }
+
+    #[test]
+    fn trusted_hooks_are_keyed_by_hash_and_capped_at_fifty() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = RepoState::path_for(dir.path(), ".gitpoulpi");
+        let line = |c: &str| HookLine {
+            phase: "after_start".into(),
+            command: c.into(),
+        };
+        let mut state = RepoState::default();
+        state.trust_hooks("aa", vec![line("make")], 1);
+        state.trust_hooks("aa", vec![line("make")], 2);
+        assert_eq!(state.trusted_hooks.len(), 1);
+        assert!(state.trusts_hooks("aa") && !state.trusts_hooks("bb"));
+        assert!(state.trusts_hook_command("after_start", "make"));
+        assert!(!state.trusts_hook_command("before_finish", "make"));
+        assert!(!state.trusts_hook_command("after_start", "make; rm"));
+        for i in 0..60 {
+            state.trust_hooks(&format!("h{i}"), vec![line("x")], 3);
+        }
+        assert_eq!(state.trusted_hooks.len(), 50);
+        assert!(!state.trusts_hooks("aa"), "the oldest is forgotten");
+        state.save(&path).unwrap();
+        assert_eq!(
+            RepoState::load(&path).unwrap().trusted_hooks,
+            state.trusted_hooks
+        );
     }
 
     #[test]

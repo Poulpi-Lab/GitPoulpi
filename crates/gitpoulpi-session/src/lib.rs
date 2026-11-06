@@ -30,7 +30,7 @@ pub use recipe_file::{
 pub use remote_reviews::RemoteReviews;
 pub use repo_state::{
     resolve_default_remote, FoldState, IssuesSource, PendingAutoStash, PendingAutoStashState,
-    RepoPreferences, RepoState, TrustedScript, WatchedIssue,
+    HookLine, RepoPreferences, RepoState, TrustedHooks, TrustedScript, WatchedIssue,
 };
 pub use review_draft::{AiDraft, AiItem, AiPlace, DraftComment, ReviewDraft};
 

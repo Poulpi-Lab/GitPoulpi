@@ -253,6 +253,31 @@ error; after an `after_start` hook the branch exists and the flow can be
 continued or aborted). `--no-hooks` skips them without asking. A hook can do
 anything, so `undo` only takes back the git changes.
 
+**Trust.** The commands of a committed `[hooks]` section come from whoever can
+push to the repository, so they also need *your* trust, once per version of the
+list. Trust is kept per repository by the hash of the hooks (a change of any
+command, phase or order asks again) and is checked by the daemon before the first
+step of a run and before a continued flow goes on, so a refused run has changed
+nothing. Hooks in your own override (`[workflow]` in your repository state, the
+Settings page) are yours and never ask.
+
+- **CLI:** `gitpoulpi flow trust-hooks` prints the commands, their `hash` and
+  whether they are `trusted`; `gitpoulpi flow trust-hooks --hash <hash>` trusts
+  them, and only when the file on disk still has that hash. `--run-hooks` on
+  untrusted hooks prints a refusal (`{"refused": {"reason": "hooks_not_trusted",
+  ...}}`, exit code 2) with the commands and that command line. A terminal that
+  is asked "Run them too?" is asked whether to trust them as well.
+- **TUI:** the preview lists the hooks and says they are not trusted yet. Pressing
+  the action button then asks "This repository's workflow runs these commands on
+  your machine. Trust them?" with the exact commands in a scrollable pane
+  (mouse wheel, draggable scrollbar, PgUp/PgDn/Home/End) and two answers:
+  **1 Trust and run** and **2 Run without hooks**. Nothing is highlighted until you
+  press an arrow key or a digit; Esc, Cancel or the close cross go back without
+  answering. When the file changed since you trusted it, the title says "The hooks
+  changed since you trusted them" and the old list is shown below the new one.
+- **Agents:** there is no tool to trust hooks. `run_hooks: true` on untrusted
+  hooks is refused with the commands, and a person runs `flow trust-hooks`.
+
 ### For agents (MCP)
 
 The tools are `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` and
@@ -262,8 +287,10 @@ The tools are `flow_start`, `flow_finish`, `flow_sync`, `flow_promote` and
 to run it. Without either the call is refused and carries the plan, so nothing
 runs by accident. Hooks run only with an explicit `run_hooks: true`; the plan
 lists them (`hooks`, `hooks_run`) so the agent can show the user the commands
-first. After a conflict, `continue_: true` (the flag is `--continue`) or
-`abort: true`.
+first. Committed hooks must be trusted by a person (`flow trust-hooks`, which has
+no tool): `run_hooks: true` on untrusted hooks returns `refused` with the
+commands and runs nothing. After a conflict, `continue_: true` (the flag is
+`--continue`) or `abort: true`.
 
 ### Undo
 

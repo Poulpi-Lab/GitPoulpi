@@ -104,6 +104,11 @@ pub(crate) struct FlowPreview {
     pub(crate) warnings: Vec<String>,
     /// What Undo will not take back, in words (highlighted).
     pub(crate) irreversible: Vec<String>,
+    /// Whether the hooks may run (the daemon decides from the repository's
+    /// trust records); `Untrusted` makes the dialog ask before running.
+    pub(crate) trust: gitpoulpi_core::workflow::HooksTrust,
+    /// The exact hook commands as `(phase, command)`, verbatim.
+    pub(crate) hook_lines: Vec<(String, String)>,
 }
 
 /// Progress of a running action.
@@ -136,6 +141,8 @@ pub(crate) enum Resume {
 pub(crate) type PreviewRx = Receiver<Result<FlowPreview, String>>;
 /// The event stream of a running action.
 pub(crate) type EventRx = Receiver<FlowEvent>;
+/// The answer of `trust_hooks`: nothing, or why the daemon refused.
+pub(crate) type TrustRx = Receiver<Result<(), String>>;
 
 /// What the Flow dialogs call. Implemented over W2's daemon requests; the
 /// fake below stands in for tests.
@@ -146,6 +153,15 @@ pub(crate) trait FlowActions: Send + Sync {
     fn execute(&self, request: &FlowRequest) -> EventRx;
     /// Continues or aborts an action stopped on a conflict.
     fn resume(&self, how: Resume) -> EventRx;
+    /// Trusts the repository's committed hooks whose hash is `hash` (the one
+    /// the preview carried; the daemon re-reads the file and refuses when it
+    /// changed since).
+    fn trust_hooks(&self, hash: &str) -> TrustRx {
+        let _ = hash;
+        let (tx, rx) = channel();
+        let _ = tx.send(Err(String::new()));
+        rx
+    }
     /// The action a conflict stopped, if any (the Flow dialog can be
     /// reopened on it after the conflicts were resolved elsewhere).
     fn stopped(&self) -> Option<StoppedFlow> {
@@ -168,6 +184,7 @@ pub(crate) enum Call {
     Preview(FlowRequest),
     Execute(FlowRequest),
     Resume(Resume),
+    TrustHooks(String),
 }
 
 /// A scripted [`FlowActions`]: records every call, answers previews with
@@ -210,6 +227,10 @@ impl FakeFlowActions {
                 Call::Resume(how) => serde_json::json!({
                     "call": "resume",
                     "how": if *how == Resume::Continue { "continue" } else { "abort" },
+                }),
+                Call::TrustHooks(hash) => serde_json::json!({
+                    "call": "trust_hooks",
+                    "hash": hash,
                 }),
             };
             if let Ok(mut f) = std::fs::OpenOptions::new()
@@ -336,6 +357,13 @@ impl FlowActions for FakeFlowActions {
         self.record(Call::Resume(how));
         let (tx, rx) = channel();
         let _ = tx.send(FlowEvent::Finished);
+        rx
+    }
+
+    fn trust_hooks(&self, hash: &str) -> TrustRx {
+        self.record(Call::TrustHooks(hash.to_string()));
+        let (tx, rx) = channel();
+        let _ = tx.send(Ok(()));
         rx
     }
 }

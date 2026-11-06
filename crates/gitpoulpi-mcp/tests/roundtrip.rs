@@ -324,6 +324,30 @@ async fn flow_actions_are_plan_then_execute_and_hooks_need_an_explicit_opt_in() 
     assert!(refused["result"]["structuredContent"]["needs_confirmation"]["plan"].is_object());
     assert!(repo.git(&["branch"]).contains("feature/x"));
 
+    // run_hooks on committed hooks nobody trusted: refused with the commands
+    // and nothing ran; an agent has no tool to trust them.
+    let refused = client
+        .call_tool(
+            "flow_finish",
+            json!({ "repo": repo_arg, "yes": true, "run_hooks": true }),
+        )
+        .await;
+    assert_eq!(refused["result"]["isError"], json!(true), "{refused:?}");
+    let refusal = &refused["result"]["structuredContent"]["refused"];
+    assert_eq!(refusal["reason"], "hooks_not_trusted", "{refused:?}");
+    assert_eq!(refusal["hooks"][0]["command"], hook);
+    assert!(refusal["trust_command"]
+        .as_str()
+        .unwrap()
+        .starts_with("gitpoulpi flow trust-hooks --hash "));
+    assert!(!repo.root().join("hook.txt").exists());
+    assert!(repo.git(&["branch"]).contains("feature/x"));
+    let tools = client.request("tools/list", json!({})).await;
+    assert!(
+        !tools.to_string().contains("trust_hooks"),
+        "no tool trusts hooks: {tools}"
+    );
+
     // yes without run_hooks: the merge happens, the hook does not run.
     let done = client
         .call_tool("flow_finish", json!({ "repo": repo_arg, "yes": true }))

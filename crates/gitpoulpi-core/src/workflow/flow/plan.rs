@@ -35,6 +35,11 @@ pub struct FlowFacts {
     pub user: Option<String>,
     /// `YYYY-MM-DD`, offered for a `{date}` token.
     pub today: String,
+    /// The effective hooks are this user's own override, not the committed
+    /// file's.
+    pub hooks_personal: bool,
+    /// The hash of the committed file's hooks (`hooks_hash`), when it has any.
+    pub shared_hooks_hash: Option<String>,
 }
 
 /// A readable title for a topic branch: its slug as words, with the issue.
@@ -186,11 +191,13 @@ impl Planner<'_> {
             self.plan.hooks.push(HookInfo {
                 phase: phase.to_string(),
                 command: command.clone(),
+                personal: self.f.hooks_personal,
             });
             if self.r.run_hooks {
                 out.push(FlowStep::Hook {
                     phase: phase.to_string(),
                     command: command.clone(),
+                    personal: self.f.hooks_personal,
                 });
             }
         }

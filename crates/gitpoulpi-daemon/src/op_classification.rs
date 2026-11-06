@@ -99,6 +99,7 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::RewriteScriptCheck, "R", "ALL"),
     (K::RewriteScriptTest, "R", "ALL"),
     (K::RewriteTrustScript, "R", "ALL"),
+    (K::FlowTrustHooks, "R", "ALL"),
     (K::RewriteScanSecrets, "R", "ALL"),
     (K::RewriteAnalyze, "R", "ALL"),
     (K::RewriteCheckSigning, "R", "ALL"),

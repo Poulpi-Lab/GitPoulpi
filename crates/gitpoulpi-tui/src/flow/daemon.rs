@@ -25,7 +25,7 @@ use gitpoulpi_core::workflow::{
 
 use super::actions::{
     EventRx, FlowActions, FlowEvent, FlowOp, FlowPreview, FlowRequest, FlowStep, PreviewRx, Resume,
-    StepKind, StoppedFlow,
+    StepKind, StoppedFlow, TrustRx,
 };
 use crate::daemon_link::error_text::error_text;
 use crate::daemon_link::{Reply, Requester};
@@ -134,6 +134,12 @@ pub(crate) fn preview_of(plan: &FlowPlan) -> FlowPreview {
         blockers: plan.blockers.clone(),
         warnings: plan.warnings.clone(),
         irreversible: plan.irreversible.clone(),
+        trust: plan.hooks_trust.clone(),
+        hook_lines: plan
+            .hooks
+            .iter()
+            .map(|h| (h.phase.clone(), h.command.clone()))
+            .collect(),
     }
 }
 
@@ -360,6 +366,24 @@ impl FlowActions for DaemonFlowActions {
         } else {
             run_events(&requester, wire, offset, tx);
         }
+        rx
+    }
+
+    fn trust_hooks(&self, hash: &str) -> TrustRx {
+        let (tx, rx) = channel();
+        let args = serde_json::to_value(wf::TrustHooksArgs {
+            hash: Some(hash.to_string()),
+        })
+        .unwrap_or_default();
+        let reply = self
+            .requester
+            .call::<wf::HooksReport>(OperationKind::FlowTrustHooks, args);
+        bridge(reply, tx, |answer| {
+            vec![match answer {
+                Ok(_) => Ok(()),
+                Err(e) => Err(error_text(&e)),
+            }]
+        });
         rx
     }
 

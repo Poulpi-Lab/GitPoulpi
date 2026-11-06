@@ -219,6 +219,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::RewriteScriptCheck
         | K::RewriteScriptTest
         | K::RewriteTrustScript
+        | K::FlowTrustHooks
         | K::RewriteScanSecrets
         | K::RewriteAnalyze
         | K::RewriteCheckSigning
@@ -581,6 +582,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::RewriteScriptCheck
         | K::RewriteScriptTest
         | K::RewriteTrustScript
+        | K::FlowTrustHooks
         | K::RewriteScanSecrets
         | K::RewriteAnalyze
         | K::RewriteCheckSigning

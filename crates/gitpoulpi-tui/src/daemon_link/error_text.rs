@@ -76,6 +76,9 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
             msg::jobs::not_cancellable(crate::jobs_ui::reason(*reason))
         }
         TypedError::JobConflict { existing } => msg::jobs::job_conflict(existing),
+        TypedError::HooksNotTrusted { hooks, .. } => {
+            gitpoulpi_i18n::msg::flow_hook_trust::not_trusted(hooks.len() as u64)
+        }
     }
 }
 
@@ -351,6 +354,14 @@ mod tests {
                 operation: "merge".into(),
                 stash: StashId(2),
                 hint: "pop it".into(),
+            },
+            TypedError::HooksNotTrusted {
+                hash: "0".repeat(64),
+                hooks: vec![gitpoulpi_core::workflow::HookInfo {
+                    phase: "after_start".into(),
+                    command: "make".into(),
+                    personal: false,
+                }],
             },
         ];
         for reason in [

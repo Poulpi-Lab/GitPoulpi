@@ -73,6 +73,13 @@ pub(super) fn gather(
         .ok()
         .filter(|u| !u.trim().is_empty());
     facts.today = civil_date(gitpoulpi_core::time::unix_now());
+    facts.hooks_personal = loaded.user.as_ref().is_some_and(|u| u.hooks.is_some());
+    facts.shared_hooks_hash = loaded
+        .shared
+        .as_ref()
+        .map(|s| &s.workflow.hooks)
+        .filter(|h| !h.is_empty())
+        .map(gitpoulpi_core::workflow::hooks_hash);
     Ok((loaded.effective(), facts))
 }
 

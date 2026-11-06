@@ -77,6 +77,7 @@ fn a_plan_marks_irreversible_steps_and_hooks() {
             wf::FlowStep::Hook {
                 phase: "before_finish".into(),
                 command: "cargo fmt".into(),
+                personal: false,
             },
         ],
         blockers: vec!["dirty".into()],
@@ -154,6 +155,7 @@ fn a_failed_hook_says_its_last_output_line() {
         wf::FlowStep::Hook {
             phase: "before_finish".into(),
             command: "make".into(),
+            personal: false,
         },
         StepStatus::Failed,
     );

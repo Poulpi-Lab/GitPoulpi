@@ -292,6 +292,19 @@ fn preview() -> FlowPreview {
         blockers: Vec::new(),
         warnings: vec!["feature/x is 2 commits behind origin/feature/x".into()],
         irreversible: vec!["Pushing feature/x to origin is not taken back by Undo".into()],
+        ..Default::default()
+    }
+}
+
+/// [`preview`] whose hooks the repository committed and nobody trusted yet.
+fn untrusted_preview(previous: Option<Vec<gitpoulpi_core::workflow::HookInfo>>) -> FlowPreview {
+    FlowPreview {
+        trust: gitpoulpi_core::workflow::HooksTrust::Untrusted {
+            hash: "ab".repeat(32),
+            previous,
+        },
+        hook_lines: vec![("before_finish".into(), "cargo fmt".into())],
+        ..preview()
     }
 }
 
@@ -756,4 +769,145 @@ fn the_flow_dialog_has_a_cross_and_a_typed_slug_is_dirty() {
     assert!(!d.is_dirty());
     type_text(&mut d, "login");
     assert!(d.is_dirty(), "a typed slug is work worth keeping");
+}
+
+#[test]
+fn untrusted_hooks_ask_before_anything_runs_and_trust_and_run_sends_the_hash() {
+    let fake = FakeFlowActions::new(untrusted_preview(None));
+    let mut d = FlowDialog::new(seed(FlowKind::Finish, "feature/login"), fake.clone());
+    let screen = wait_poll(&mut d, |s| s.contains("This will:"));
+    // No checkbox: the question comes when the action runs.
+    assert!(!screen.contains("Run the hooks"), "{screen}");
+    assert!(screen.contains("not trusted yet"), "{screen}");
+    d.on_key(key(KeyCode::Enter));
+    let screen = paint(&mut d);
+    for want in [
+        "runs these commands on your machine. Trust them?",
+        "$ cargo fmt",
+        "1. Trust and run",
+        "2. Run without hooks",
+    ] {
+        assert!(screen.contains(want), "{want}:\n{screen}");
+    }
+    assert!(
+        !fake.calls().iter().any(|c| matches!(c, Call::Execute(_))),
+        "nothing ran while the question is open"
+    );
+    // No default: Enter alone answers nothing.
+    d.on_key(key(KeyCode::Enter));
+    assert!(!fake
+        .calls()
+        .iter()
+        .any(|c| matches!(c, Call::Execute(_) | Call::TrustHooks(_))));
+    // An arrow starts the highlight, Enter on it trusts and runs.
+    d.on_key(key(KeyCode::Down));
+    d.on_key(key(KeyCode::Enter));
+    wait_poll(&mut d, |s| s.contains("Done."));
+    let calls = fake.calls();
+    assert!(calls.contains(&Call::TrustHooks("ab".repeat(32))), "{calls:?}");
+    let Some(Call::Execute(request)) = calls.iter().find(|c| matches!(c, Call::Execute(_)))
+    else {
+        panic!("{calls:?}");
+    };
+    assert!(request.run_hooks, "trusted: the hooks run");
+}
+
+#[test]
+fn run_without_hooks_never_asks_the_daemon_to_trust() {
+    let fake = FakeFlowActions::new(untrusted_preview(None));
+    let mut d = FlowDialog::new(seed(FlowKind::Finish, "feature/login"), fake.clone());
+    wait_poll(&mut d, |s| s.contains("This will:"));
+    d.on_key(key(KeyCode::Enter));
+    d.on_key(key(KeyCode::Char('2')));
+    let screen = wait_poll(&mut d, |s| s.contains("Done."));
+    assert!(!screen.contains("cargo fmt"), "the hook step is not run:\n{screen}");
+    let calls = fake.calls();
+    assert!(!calls.iter().any(|c| matches!(c, Call::TrustHooks(_))), "{calls:?}");
+    let Some(Call::Execute(request)) = calls.iter().find(|c| matches!(c, Call::Execute(_)))
+    else {
+        panic!("{calls:?}");
+    };
+    assert!(!request.run_hooks);
+}
+
+#[test]
+fn escape_cancels_the_question_and_a_second_escape_leaves_the_dialog() {
+    let fake = FakeFlowActions::new(untrusted_preview(None));
+    let mut d = FlowDialog::new(seed(FlowKind::Finish, "feature/login"), fake.clone());
+    wait_poll(&mut d, |s| s.contains("This will:"));
+    d.on_key(key(KeyCode::Enter));
+    assert!(paint(&mut d).contains("Trust them?"));
+    assert_eq!(d.on_key(key(KeyCode::Esc)), FlowOutcome::Stay);
+    let screen = paint(&mut d);
+    assert!(!screen.contains("Trust them?"), "{screen}");
+    assert!(screen.contains("This will:"), "back on the preview:\n{screen}");
+    assert!(!fake
+        .calls()
+        .iter()
+        .any(|c| matches!(c, Call::Execute(_) | Call::TrustHooks(_))));
+    assert_eq!(d.on_key(key(KeyCode::Esc)), FlowOutcome::Close);
+}
+
+#[test]
+fn changed_hooks_say_so_and_show_the_old_list_and_the_buttons_answer_like_the_keys() {
+    let old = vec![gitpoulpi_core::workflow::HookInfo {
+        phase: "before_finish".into(),
+        command: "make old".into(),
+        personal: false,
+    }];
+    let fake = FakeFlowActions::new(untrusted_preview(Some(old)));
+    let mut d = FlowDialog::new(seed(FlowKind::Finish, "feature/login"), fake.clone());
+    wait_poll(&mut d, |s| s.contains("This will:"));
+    d.on_key(key(KeyCode::Enter));
+    let screen = paint(&mut d);
+    assert!(screen.contains("The hooks changed since you trusted them"), "{screen}");
+    assert!(screen.contains("$ make old"), "{screen}");
+    // The Cancel button is the mouse twin of Esc.
+    let area = Rect::new(0, 0, 110, 26);
+    let mut buf = Buffer::empty(area);
+    d.render(super::flow_rect(area), &mut buf);
+    let (x, y) = find(&buf, "Cancel");
+    d.on_mouse(MouseEvent {
+        kind: MouseEventKind::Down(MouseButton::Left),
+        column: x + 2,
+        row: y,
+        modifiers: KeyModifiers::NONE,
+    });
+    assert!(!paint(&mut d).contains("Trust them?"));
+    // And a click on answer 2 runs without hooks.
+    d.on_key(key(KeyCode::Enter));
+    let mut buf = Buffer::empty(area);
+    d.render(super::flow_rect(area), &mut buf);
+    let (x, y) = find(&buf, "2. Run without hooks");
+    d.on_mouse(MouseEvent {
+        kind: MouseEventKind::Down(MouseButton::Left),
+        column: x + 3,
+        row: y,
+        modifiers: KeyModifiers::NONE,
+    });
+    wait_poll(&mut d, |s| s.contains("Done."));
+    assert!(fake
+        .calls()
+        .iter()
+        .any(|c| matches!(c, Call::Execute(r) if !r.run_hooks)));
+}
+
+#[test]
+fn trusted_and_personal_hooks_keep_the_checkbox_and_never_ask() {
+    for trust in [
+        gitpoulpi_core::workflow::HooksTrust::Trusted,
+        gitpoulpi_core::workflow::HooksTrust::Personal,
+    ] {
+        let fake = FakeFlowActions::new(FlowPreview {
+            trust,
+            hook_lines: vec![("before_finish".into(), "cargo fmt".into())],
+            ..preview()
+        });
+        let mut d = FlowDialog::new(seed(FlowKind::Finish, "feature/login"), fake.clone());
+        let screen = wait_poll(&mut d, |s| s.contains("This will:"));
+        assert!(screen.contains("[ ] Run the hooks"), "{screen}");
+        d.on_key(key(KeyCode::Enter));
+        wait_poll(&mut d, |s| s.contains("Done."));
+        assert!(!fake.calls().iter().any(|c| matches!(c, Call::TrustHooks(_))));
+    }
 }

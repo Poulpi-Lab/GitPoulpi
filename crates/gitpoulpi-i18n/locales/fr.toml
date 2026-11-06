@@ -8663,3 +8663,25 @@ no_extra_label = "Aucun fichier supplémentaire"
 no_extra_help = "Ne donner aucun fichier supplémentaire au modèle pour ce dépôt, même si le réglage global en désigne un. Un champ vide suit le réglage global."
 # context: message in the file picker when the user tries to create a folder there
 no_new_folder = "Choisissez un fichier existant : on ne peut pas créer de dossier ici."
+
+[flow_hook_trust]
+# context: heading of the question in the Flow dialog when the repository's committed workflow hooks differ from the list the user trusted earlier
+heading_changed = "The hooks changed since you trusted them"
+# context: question in the Flow dialog above the exact shell commands the repository's workflow wants to run
+question = "This repository's workflow runs these commands on your machine. Trust them?"
+# context: heading of the commands that would run now, inside the scrollable command list of the hook trust question
+commands_heading = "Commands to run now"
+# context: heading of the list of commands the user trusted earlier, shown below the new ones when the hooks changed
+previous_heading = "Commands you trusted before"
+# context: first numbered answer of the hook trust question: remember the trust and run the action with its hooks
+answer_trust = "Trust and run"
+# context: second numbered answer of the hook trust question: run the action and skip every hook
+answer_skip = "Run without hooks"
+# context: key hint under the numbered answers of the hook trust question
+hint = "Up/Down or 1/2 to choose, Enter to confirm, PgUp/PgDn to scroll, Esc to go back"
+# context: shown while the daemon remembers the user's trust for the hooks
+trusting = "Remembering your answer..."
+# context: one-line note in the Flow preview when the hooks are not trusted yet; the question comes when the action runs
+untrusted_note = "These hooks are not trusted yet: you are asked before they run."
+# context: error text when the daemon refused a run because the committed workflow hooks are not trusted; {n} is how many commands there are
+not_trusted = { one = "The workflow hooks are not trusted: {n} command was not run. Review it and trust it first.", other = "The workflow hooks are not trusted: {n} commands were not run. Review them and trust them first." }

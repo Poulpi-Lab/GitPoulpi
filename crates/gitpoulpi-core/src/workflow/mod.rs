@@ -24,7 +24,7 @@ pub use classify::{Classification, CompiledWorkflow, ParentInfo, ParentSource};
 pub use detect::{detect, Detection, FoundBase, FoundTopic};
 pub use flow::{
     branch_title, plan_flow, FlowAction, FlowFacts, FlowOutcome, FlowPlan, FlowRequest, FlowResume,
-    FlowState, FlowStatus, FlowStep, HookInfo, MergeRequestSpec, StepReport, StepStatus,
+    FlowState, FlowStatus, FlowStep, HookInfo, HooksReport, HooksTrust, TrustHooksArgs, MergeRequestSpec, StepReport, StepStatus,
     SyncMethod,
 };
 pub use import::{
@@ -170,6 +170,39 @@ impl Hooks {
     pub fn is_empty(&self) -> bool {
         self.after_start.is_empty() && self.before_finish.is_empty()
     }
+
+    /// The hooks as `(phase, command)` in the fixed phase order the hash and
+    /// the trust records use.
+    pub fn lines(&self) -> Vec<(&'static str, &str)> {
+        let mut out = Vec::new();
+        out.extend(self.after_start.iter().map(|c| ("after_start", c.as_str())));
+        out.extend(
+            self.before_finish
+                .iter()
+                .map(|c| ("before_finish", c.as_str())),
+        );
+        out
+    }
+}
+
+/// The SHA-256 (lowercase hex) of a workflow's hooks: `phase \0 command \n`
+/// per hook in fixed phase order, so any change of a command, its phase or
+/// the list asks for trust again. What `FlowTrustHooks` is keyed by.
+pub fn hooks_hash(hooks: &Hooks) -> String {
+    use sha2::{Digest, Sha256};
+    use std::fmt::Write;
+    let mut hasher = Sha256::new();
+    for (phase, command) in hooks.lines() {
+        hasher.update(phase.as_bytes());
+        hasher.update([0u8]);
+        hasher.update(command.as_bytes());
+        hasher.update(b"\n");
+    }
+    let mut out = String::with_capacity(64);
+    for byte in hasher.finalize() {
+        let _ = write!(out, "{byte:02x}");
+    }
+    out
 }
 
 /// Who creates the branch of an issue.

@@ -92,7 +92,7 @@ minisign -G -p packaging/minisign.pub -s gitpoulpi-release.key
 
 - Use a strong password. Keep the key file and the password in the organization's password vault.
 - Create a GitHub environment named `release` and store `MINISIGN_SECRET_KEY` (the whole text of `gitpoulpi-release.key`) and `MINISIGN_PASSWORD` there. Only the `publish` job and `security-advisory.yml` use that environment.
-- Commit only `packaging/minisign.pub`. The update client (a later change) compiles it in and does not merge before that file exists.
+- Commit only `packaging/minisign.pub`. The update client compiles it in (`gitpoulpi_update::signing::release_keys()`, a list, so a rotation ships the next key in a release before the old one retires: add the new public key file to `KEY_FILES` there). A release is only installable by a client that has its key, and only releases signed by this workflow can be installed through the updater.
 
 `cargo run -p xtask -- sign --dir dist --version <v>` is what the workflow runs. It signs every file of the directory except `*.sha256` and `*.minisig` (archives, installers, `.deb`, `install.sh`, `latest.json`, `security.json`, the SBOM) and reads the key from the two environment variables; it never prompts. To check a signature by hand: `minisign -Vm <file> -p packaging/minisign.pub`, then read the trusted comment it prints.
 

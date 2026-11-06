@@ -832,6 +832,7 @@ die Standardtasten.
 | Ansicht: Globales Aktivitätsprotokoll | `Ctrl+N G` |
 | Hilfe: Versionshinweise |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Updates: Jetzt nach Updates suchen |  |

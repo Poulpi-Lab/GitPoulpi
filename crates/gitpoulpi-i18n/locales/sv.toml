@@ -8741,3 +8741,37 @@ proxy = "Behind a tunnel or reverse proxy"
 proxy_help = "Switch on when a tunnel or proxy in front of the endpoint encrypts the traffic. The server cannot check that, so it is your statement. It lets a non-loopback address run without TLS. Keeping the loopback address and using ssh -L is safer."
 # context: red warning shown while that switch is on
 proxy_warning = "Without TLS, the hop between the tunnel or proxy and the server is plain text on that network."
+
+[security_notice]
+# context: title bar chip, in red, when a security notice published by the project names the running version; the chip opens the update panel
+chip = "Security notice: this version is affected"
+# context: shorter form of the same chip, used when the title bar is too narrow for the long one
+chip_short = "Security notice"
+# context: heading in the update panel above the security notices that name the running version
+panel_heading = "Security notice: this version is affected"
+# context: severity word of a security notice (lowest level), shown before the summary in the update panel
+sev_low = "Low"
+# context: severity word of a security notice (second level)
+sev_medium = "Medium"
+# context: severity word of a security notice (third level)
+sev_high = "High"
+# context: severity word of a security notice (highest level)
+sev_critical = "Critical"
+# context: one security notice in the update panel; {severity} is Low, Medium, High or Critical, {summary} one sentence from the notice
+advisory_line = "{severity}: {summary}"
+# context: line under a security notice in the update panel; {version} is like 1.4.3
+fixed_in = "Fixed in version {version}."
+# context: line under a security notice in the update panel when no fixed version is published yet
+no_fix = "No fixed version is published yet."
+# context: line under a security notice in the update panel; {url} is a web address
+link_line = "More information: {url}"
+# context: line in the update panel under a security notice when GitPoulpi was installed by a package manager and cannot update itself
+package_manager = "Update with your package manager."
+# context: button in the update panel: opens the web page of the security notice in the browser
+btn_open = "Open notice"
+# context: command palette entry: opens the web page of the security notice that names the running version
+palette_open = "Updates: Open Security Notice"
+# context: palette and status line: why Open Security Notice does nothing
+why_no_notice = "no security notice with a link names this version"
+# context: footer hint of the update panel when a security notice is listed; the letters are the keys of the buttons
+panel_hint = "u update  c copy  t terminal  v revert  n notes  a notice  s skip  r check  Esc close"

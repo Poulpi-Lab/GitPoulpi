@@ -5,6 +5,7 @@ use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use gitpoulpi_config::release::{self, InstallChannel, Marker, MARKER_FILE};
+use gitpoulpi_testkit::signing::TestSigner;
 use gitpoulpi_update::fsops::RealFs;
 use gitpoulpi_update::job::{
     Action, JobElevation, Phase, Relaunch, Staged, UpdateJob, UpdateStatus, SCHEMA,
@@ -120,6 +121,7 @@ struct World {
     chan: FakeChannelEnv,
     policy: FakePolicy,
     own_exe: PathBuf,
+    signer: TestSigner,
 }
 
 impl World {
@@ -149,6 +151,7 @@ impl World {
                 registry: None,
             },
             own_exe: fx.updates.join("bin").join(fx.exe("gitpoulpi-updater")),
+            signer: TestSigner::new(),
             log,
         }
     }
@@ -164,6 +167,10 @@ impl World {
             channel_env: &self.chan,
             policy: &self.policy,
             host_target: release::host_target(),
+            keys: vec![gitpoulpi_update::signing::PublicKey::decode(
+                &self.signer.public_key_text(),
+            )
+            .expect("the test key parses")],
             own_exe: self.own_exe.clone(),
             own_pid: 77,
             echo: false,
@@ -467,6 +474,7 @@ fn archive_bytes(fx: &Fx) -> Vec<u8> {
 }
 
 const SUM_URL: &str = "https://github.com/Poulpi-Lab/GitPoulpi/releases/download/v2.0.0/x.sha256";
+const SIG_URL: &str = "https://github.com/Poulpi-Lab/GitPoulpi/releases/download/v2.0.0/x.minisig";
 
 /// A machine install whose archive sits in the user's cache.
 fn archive_job(fx: &Fx, bytes: &[u8]) -> UpdateJob {
@@ -479,8 +487,15 @@ fn archive_job(fx: &Fx, bytes: &[u8]) -> UpdateJob {
     j.staged = Staged::Archive {
         archive: cache,
         sha256_url: SUM_URL.into(),
+        minisig_url: SIG_URL.into(),
     };
     j
+}
+
+/// What the release published as the archive's `.minisig`.
+fn signature_for(w: &World, fx: &Fx, bytes: &[u8]) -> Vec<u8> {
+    let name = release::archive_name(TO, &fx.target);
+    w.signer.sign(&name, TO, bytes).into_bytes()
 }
 
 fn checksum_for(fx: &Fx, bytes: &[u8]) -> Vec<u8> {
@@ -498,6 +513,8 @@ fn the_elevated_worker_verifies_stages_swaps_and_writes_the_machine_hive() {
     w.transfer
         .urls
         .insert(SUM_URL.into(), checksum_for(&fx, &bytes));
+    let sig = signature_for(&w, &fx, &bytes);
+    w.transfer.urls.insert(SIG_URL.into(), sig);
     // Another user's process the elevated look can see.
     w.proc.other_users.borrow_mut().push(Proc {
         pid: 900,
@@ -535,6 +552,9 @@ fn the_elevated_worker_refuses_an_archive_that_does_not_match_the_published_chec
     w.transfer
         .urls
         .insert(SUM_URL.into(), checksum_for(&fx, b"the real archive"));
+    // The signature is the real one: the checksum is what fails here.
+    let sig = signature_for(&w, &fx, &bytes);
+    w.transfer.urls.insert(SIG_URL.into(), sig);
     let out = flow::elevated(&w.env(), &fx.job_path, 55);
     assert_eq!(out.code(), 1, "{out:?}");
     assert!(out.message().contains("checksum"), "{out:?}");
@@ -545,6 +565,110 @@ fn the_elevated_worker_refuses_an_archive_that_does_not_match_the_published_chec
             "{name} was staged"
         );
     }
+}
+
+/// The elevated worker's refusal of a staged archive: nothing staged, nothing
+/// swapped, the reason names the signature.
+fn assert_refused_untouched(fx: &Fx, out: &Outcome, reason: &str) {
+    assert_eq!(out.code(), 1, "{out:?}");
+    assert!(out.message().contains(reason), "{out:?}");
+    assert_eq!(fx.read(&fx.exe("gitpoulpi")), format!("v:{FROM}\n"));
+    for name in managed_names(&fx.target) {
+        assert!(
+            !fx.install.join(format!("{name}.new")).exists(),
+            "{name} was staged"
+        );
+    }
+}
+
+#[test]
+fn the_elevated_worker_refuses_a_tampered_staged_archive_even_with_a_matching_checksum() {
+    let fx = fx(Some(InstallChannel::InnoMachine));
+    let mut w = worker_world(&fx);
+    let real = archive_bytes(&fx);
+    // A user-level process swapped the staged file for its own build, and
+    // cannot sign: the release's checksum and signature are for `real`.
+    let mut tampered = real.clone();
+    tampered.extend_from_slice(b"extra");
+    let j = archive_job(&fx, &tampered);
+    put(&fx, &j);
+    w.transfer
+        .urls
+        .insert(SUM_URL.into(), checksum_for(&fx, &tampered));
+    let sig = signature_for(&w, &fx, &real);
+    w.transfer.urls.insert(SIG_URL.into(), sig);
+    let out = flow::elevated(&w.env(), &fx.job_path, 55);
+    assert_refused_untouched(&fx, &out, "signature");
+}
+
+#[test]
+fn the_elevated_worker_refuses_an_archive_without_a_signature() {
+    let fx = fx(Some(InstallChannel::InnoMachine));
+    let mut w = worker_world(&fx);
+    let bytes = archive_bytes(&fx);
+    let j = archive_job(&fx, &bytes);
+    put(&fx, &j);
+    w.transfer
+        .urls
+        .insert(SUM_URL.into(), checksum_for(&fx, &bytes));
+    // Nothing at the .minisig URL (404).
+    let out = flow::elevated(&w.env(), &fx.job_path, 55);
+    assert_refused_untouched(&fx, &out, "no signature");
+}
+
+#[test]
+fn the_elevated_worker_refuses_a_signature_for_another_file_or_version_or_key() {
+    let fx = fx(Some(InstallChannel::InnoMachine));
+    let bytes = archive_bytes(&fx);
+    let name = release::archive_name(TO, &fx.target);
+    let stranger = TestSigner::new();
+    // (the signature text: which signer, which file, which version, the
+    // reason the refusal gives)
+    for (case, reason) in [
+        ("other file", "signature is for"),
+        ("other version", "signature is for"),
+        ("other key", "signature does not match"),
+    ] {
+        let mut w = worker_world(&fx);
+        let j = archive_job(&fx, &bytes);
+        put(&fx, &j);
+        w.transfer
+            .urls
+            .insert(SUM_URL.into(), checksum_for(&fx, &bytes));
+        let sig = match case {
+            "other file" => w.signer.sign("other.zip", TO, &bytes),
+            "other version" => w.signer.sign(&name, "1.0.0", &bytes),
+            _ => stranger.sign(&name, TO, &bytes),
+        };
+        w.transfer.urls.insert(SIG_URL.into(), sig.into_bytes());
+        let out = flow::elevated(&w.env(), &fx.job_path, 55);
+        assert_refused_untouched(&fx, &out, reason);
+    }
+}
+
+#[test]
+fn the_elevated_worker_refuses_a_signature_from_a_host_the_policy_does_not_allow() {
+    let fx = fx(Some(InstallChannel::InnoMachine));
+    let mut w = worker_world(&fx);
+    let bytes = archive_bytes(&fx);
+    let mut j = archive_job(&fx, &bytes);
+    if let Staged::Archive { minisig_url, .. } = &mut j.staged {
+        *minisig_url = "https://evil.example/x.minisig".into();
+    }
+    put(&fx, &j);
+    w.transfer
+        .urls
+        .insert(SUM_URL.into(), checksum_for(&fx, &bytes));
+    let sig = signature_for(&w, &fx, &bytes);
+    w.transfer
+        .urls
+        .insert("https://evil.example/x.minisig".into(), sig);
+    let out = flow::elevated(&w.env(), &fx.job_path, 55);
+    assert_eq!(out.code(), 1, "{out:?}");
+    assert!(
+        w.position("get:https://evil.example").is_none(),
+        "no request to a host that is not allowed"
+    );
 }
 
 #[test]

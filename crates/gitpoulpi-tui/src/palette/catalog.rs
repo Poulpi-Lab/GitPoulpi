@@ -1979,6 +1979,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::Updates(crate::updates::UpdatesCommand::ShowPanel),
     ),
     entry(
+        gitpoulpi_i18n::msg::security_notice::PALETTE_OPEN,
+        "",
+        PaletteCommand::Updates(crate::updates::UpdatesCommand::SecurityNotice),
+    ),
+    entry(
         gitpoulpi_i18n::msg::updates::PALETTE_COPY,
         "",
         PaletteCommand::Updates(crate::updates::UpdatesCommand::CopyCommand),

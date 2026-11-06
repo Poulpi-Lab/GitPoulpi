@@ -8,11 +8,23 @@ use super::*;
 use gitpoulpi_config::release::{Marker, MARKER_FILE};
 use gitpoulpi_hosting::updates::Asset;
 use gitpoulpi_hosting::RecordedTransport;
+use gitpoulpi_testkit::signing::TestSigner;
 use gitpoulpi_update::fsops::RealFs;
 use gitpoulpi_update::{managed_names, Updatable};
 use xtask::dist::{marker_entry, write_tar_gz, Entry};
 
 const TARGET: &str = "x86_64-unknown-linux-gnu";
+
+fn signer() -> &'static TestSigner {
+    static SIGNER: std::sync::OnceLock<TestSigner> = std::sync::OnceLock::new();
+    SIGNER.get_or_init(TestSigner::new)
+}
+
+/// The test release key, handed to the code the way production hands it
+/// `release_keys()`.
+fn keys() -> Vec<gitpoulpi_update::signing::PublicKey> {
+    vec![gitpoulpi_update::signing::PublicKey::decode(&signer().public_key_text()).unwrap()]
+}
 
 fn lock() -> std::sync::MutexGuard<'static, ()> {
     TEST_LOCK.lock().unwrap_or_else(|e| e.into_inner())
@@ -79,8 +91,11 @@ fn served(version: &str, hash_of: &[u8]) -> RecordedTransport {
         "{}  gitpoulpi-{version}-{TARGET}.tar.gz\n",
         gitpoulpi_update::fetch::sha256_hex(hash_of)
     );
+    let name = format!("gitpoulpi-{version}-{TARGET}.tar.gz");
+    let sig = signer().sign(&name, version, &bytes);
     RecordedTransport::new()
         .on_file(".tar.gz.sha256", sum.into_bytes())
+        .on_file(".tar.gz.minisig", sig.into_bytes())
         .on_file(".tar.gz", bytes)
 }
 
@@ -128,6 +143,7 @@ fn a_download_is_staged_beside_the_old_files_and_nothing_running_changes() {
         &AtomicBool::new(false),
         &|_, _| {},
         &[],
+        &keys(),
     )
     .unwrap();
     for name in managed_names(TARGET) {
@@ -162,6 +178,7 @@ fn a_checksum_mismatch_stages_nothing() {
         &AtomicBool::new(false),
         &|_, _| {},
         &[],
+        &keys(),
     )
     .unwrap_err();
     assert!(matches!(
@@ -187,6 +204,7 @@ fn a_missing_checksum_or_a_wrong_asset_name_stages_nothing() {
         &AtomicBool::new(false),
         &|_, _| {},
         &[],
+        &keys(),
     )
     .unwrap_err();
     assert_eq!(err, gitpoulpi_update::UpdateError::NoChecksum);
@@ -200,6 +218,7 @@ fn a_missing_checksum_or_a_wrong_asset_name_stages_nothing() {
         &AtomicBool::new(false),
         &|_, _| {},
         &[],
+        &keys(),
     )
     .unwrap_err();
     assert!(matches!(
@@ -245,6 +264,7 @@ fn restart_swaps_the_files_keeps_the_old_ones_and_revert_brings_them_back() {
         &AtomicBool::new(false),
         &|_, _| {},
         &[],
+        &keys(),
     )
     .unwrap();
     reset(Some(updatable.clone()));
@@ -401,6 +421,7 @@ fn the_tab_of_a_release_build_offers_update_now_then_restart_then_revert() {
         &AtomicBool::new(false),
         &|_, _| {},
         &[],
+        &keys(),
     )
     .unwrap();
     reset(Some(updatable.clone()));
@@ -471,6 +492,7 @@ fn a_policy_mirror_download_is_staged_only_when_the_mirror_is_allowed() {
             &AtomicBool::new(false),
             &|_, _| {},
             hosts,
+            &keys(),
         )
     };
     assert!(matches!(

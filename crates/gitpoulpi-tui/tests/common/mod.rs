@@ -20,6 +20,21 @@ use std::time::Duration;
 
 use xtask::pty::{Screen, Terminal};
 
+/// The release key pair of the update tests. The app under test is a debug
+/// build, which accepts one extra public key through `GITPOULPI_TEST_RELEASE_KEY`
+/// (compiled out of release builds), so a fake release server can sign what
+/// it serves. The project's real key is never involved.
+#[allow(dead_code)]
+pub fn release_signer() -> &'static gitpoulpi_testkit::signing::TestSigner {
+    static SIGNER: std::sync::OnceLock<gitpoulpi_testkit::signing::TestSigner> =
+        std::sync::OnceLock::new();
+    SIGNER.get_or_init(gitpoulpi_testkit::signing::TestSigner::new)
+}
+
+/// The environment variable that hands [`release_signer`]'s public key to the app.
+#[allow(dead_code)]
+pub const RELEASE_KEY_ENV: &str = "GITPOULPI_TEST_RELEASE_KEY";
+
 /// How long the first byte of output may take.
 const FIRST_OUTPUT: Duration = Duration::from_secs(20);
 /// How long the ready condition may take.

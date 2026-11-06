@@ -3,8 +3,9 @@
 //!
 //! The flow, each step its own module so each is tested alone:
 //!
-//! 1. [`fetch`]: download the release archive and its `.sha256` through an
-//!    `HttpTransport`, refuse a wrong asset name or a missing / mismatching
+//! 1. [`fetch`]: download the release archive, its `.minisig` and its
+//!    `.sha256` through an `HttpTransport`, refuse a wrong asset name, a
+//!    missing or wrong signature ([`signing`]) and a missing / mismatching
 //!    checksum, and report progress (cancellable).
 //! 2. [`archive`]: unpack the archive in memory (zip on Windows targets,
 //!    tar.gz elsewhere), keeping only the release's own files.
@@ -32,6 +33,7 @@ pub mod install;
 pub mod job;
 pub mod plan;
 pub mod policy_source;
+pub mod signing;
 #[cfg(test)]
 pub(crate) mod testutil;
 #[cfg(windows)]
@@ -53,6 +55,12 @@ pub enum UpdateError {
     Download(String),
     #[error("the release has no checksum file for this archive, so it is not installed")]
     NoChecksum,
+    #[error("the release has no signature file for this archive, so it is not installed")]
+    NoSignature,
+    #[error("the signature does not match (not signed by a GitPoulpi release key): the download is not installed")]
+    BadSignature,
+    #[error("the signature is for {found}, expected {expected}: the download is not installed")]
+    SignatureForOtherFile { expected: String, found: String },
     #[error("the checksum does not match (expected {expected}, got {actual}): the download is not installed")]
     ChecksumMismatch { expected: String, actual: String },
     #[error("the release asset is named {found}, expected {expected}: not installed")]

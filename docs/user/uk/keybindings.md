@@ -831,6 +831,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Вигляд: загальний журнал активності | `Ctrl+N G` |
 | Довідка: нотатки до випуску |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Оновлення: перевірити зараз |  |

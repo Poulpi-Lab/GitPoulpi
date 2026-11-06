@@ -835,6 +835,7 @@ As teclas são as predefinidas.
 | Ver: registo de atividade global | `Ctrl+N G` |
 | Ajuda: notas de versão |  |
 | Updates: Show Update | `Ctrl+N u` |
+| Updates: Open Security Notice |  |
 | Updates: Copy Update Command |  |
 | Updates: Run Update Command in a Terminal |  |
 | Atualizações: procurar atualizações agora |  |

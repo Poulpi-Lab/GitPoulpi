@@ -96,6 +96,10 @@ image-webp = { version = "0.2", default-features = false }
 # way to get the *security* property wrong, a hash function is not that,
 # and a bug here would silently address every avatar at the wrong URL.
 sha2 = { version = "0.10", default-features = false }
+# Release signatures (the client side of `xtask sign`); the pure-Rust verifier, no dependencies.
+minisign-verify = "=0.2.5"
+# Test-only: generates key pairs and signs, the same crate `xtask sign` uses.
+minisign = "0.10"
 # The history rewrite engine hashes the objects it re-creates (SHA-1 ids)
 # and writes them into a temporary pack (zlib). Same RustCrypto family as
 # `sha2`; `flate2` was already used by `gitpoulpi-update`.

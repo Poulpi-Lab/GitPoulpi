@@ -25,7 +25,7 @@ use std::collections::BTreeMap;
 use async_trait::async_trait;
 
 use super::{
-    newest_after_pinned, parse_releases, pick_assets, Asset, CheckParams, Release, Version,
+    newest_after_pinned, parse_releases, pick_assets, signing, Asset, CheckParams, Release, Version,
 };
 use crate::http::{HttpRequest, HttpTransport};
 use crate::{Error, Result};
@@ -33,6 +33,9 @@ use gitpoulpi_config::release;
 
 /// The package id on NuGet and Chocolatey feeds.
 pub const NUGET_ID: &str = "gitpoulpi";
+
+/// The manifest's file name (its signature is `latest.json.minisig`).
+pub const MANIFEST_FILE: &str = "latest.json";
 
 /// Chocolatey's community feed (a v2 root).
 pub const CHOCOLATEY_COMMUNITY_FEED: &str = "https://community.chocolatey.org/api/v2/";
@@ -57,6 +60,69 @@ pub enum SourceSpec {
     Manifest { url: String },
     /// Never asks anyone (a managed deployment).
     None,
+}
+
+impl SourceSpec {
+    /// Where the signed security notices are for this source, or `None` when
+    /// nothing may be asked (the `None` source; a NuGet feed of the
+    /// organization's own, which is not a reason to contact GitHub; a GitHub
+    /// Enterprise Server, whose host is not a release host).
+    ///
+    /// - GitHub: `<web>/<repo>/releases/latest/download/security.json`.
+    /// - A manifest mirror: `security.json` next to the manifest.
+    /// - NuGet: from GitHub when the feed is the public one; otherwise from
+    ///   the policy's `download_base` mirror when there is one.
+    pub fn notices_url(&self, repo: &str, download_base: Option<&str>) -> Option<String> {
+        let github = |web: &str| {
+            format!(
+                "{}/{}/releases/latest/download/{}",
+                web.trim_end_matches('/'),
+                repo.trim_matches('/'),
+                super::notices::FILE
+            )
+        };
+        let mirror = || {
+            download_base
+                .map(str::trim)
+                .filter(|b| !b.is_empty())
+                .map(|b| format!("{}/{}", b.trim_end_matches('/'), super::notices::FILE))
+        };
+        match self {
+            SourceSpec::None => None,
+            SourceSpec::GitHubReleases { api_base, .. } => {
+                let api = api_base.trim_end_matches('/');
+                if api == "https://api.github.com" {
+                    Some(github("https://github.com"))
+                } else if api.ends_with("/api/v3") {
+                    // Enterprise Server: not a release host, so only a
+                    // mirror the policy names can serve the notices.
+                    mirror()
+                } else {
+                    // The test override (`GITPOULPI_UPDATE_API`): a fake
+                    // server serves the web side of the release too.
+                    Some(github(api))
+                }
+            }
+            SourceSpec::Manifest { url } => {
+                let dir = url
+                    .split(['?', '#'])
+                    .next()
+                    .unwrap_or(url)
+                    .rsplit_once('/')
+                    .map_or("", |(d, _)| d);
+                Some(format!("{dir}/{}", super::notices::FILE))
+            }
+            SourceSpec::NuGet { feed } => {
+                if feed.trim().starts_with(CHOCOLATEY_COMMUNITY_FEED)
+                    || feed.contains("api.nuget.org")
+                {
+                    Some(github("https://github.com"))
+                } else {
+                    mirror()
+                }
+            }
+        }
+    }
 }
 
 /// One way of finding the newest release.
@@ -99,11 +165,26 @@ impl CheckSource for SourceSpec {
             SourceSpec::NuGet { feed } => nuget_releases(transport, feed).await?,
             SourceSpec::Manifest { url } => {
                 let body = get(transport, url, "the update manifest", &[]).await?;
-                vec![manifest_release(
-                    url,
-                    &parse_manifest(&body)?,
-                    &params.target,
-                )?]
+                let manifest = parse_manifest(&body)?;
+                // The hashes inside are only as good as the file: a mirror
+                // must copy `latest.json.minisig` next to it.
+                let sig = get(
+                    transport,
+                    &format!("{url}.minisig"),
+                    "the update manifest's signature",
+                    &[],
+                )
+                .await
+                .map_err(|e| Error::Decode(format!("the manifest has no signature: {e}")))?;
+                signing::verify(
+                    body.as_bytes(),
+                    &sig,
+                    MANIFEST_FILE,
+                    manifest.version.trim().trim_start_matches(['v', 'V']),
+                    &params.keys,
+                )
+                .map_err(|e| Error::Decode(format!("the manifest is not trusted: {e}")))?;
+                vec![manifest_release(url, &manifest, &params.target)?]
             }
         };
         Ok(newest_after_pinned(
@@ -365,8 +446,25 @@ mod tests {
     use crate::http::RecordedTransport;
     use crate::updates::{download_host_allowed, download_host_allowed_with};
     use gitpoulpi_config::UpdateChannel;
+    use gitpoulpi_testkit::signing::TestSigner;
 
     const TARGET: &str = "x86_64-unknown-linux-gnu";
+
+    fn signer() -> &'static TestSigner {
+        static SIGNER: std::sync::OnceLock<TestSigner> = std::sync::OnceLock::new();
+        SIGNER.get_or_init(TestSigner::new)
+    }
+
+    /// `body` served as `latest.json` with a signature for `version`.
+    fn signed_manifest(body: &str, version: &str) -> RecordedTransport {
+        RecordedTransport::new()
+            .on(
+                "latest.json.minisig",
+                200,
+                &signer().sign(MANIFEST_FILE, version, body.as_bytes()),
+            )
+            .on("latest.json", 200, body)
+    }
 
     fn block<F: std::future::Future>(f: F) -> F::Output {
         tokio::runtime::Builder::new_current_thread()
@@ -381,6 +479,7 @@ mod tests {
             running: running.into(),
             channel: UpdateChannel::Stable,
             target: TARGET.into(),
+            keys: vec![signing::parse_key(&signer().public_key_text()).unwrap()],
             ..Default::default()
         }
     }
@@ -567,7 +666,7 @@ mod tests {
     #[test]
     fn the_manifest_names_the_archive_beside_itself() {
         let url = "https://mirror.example/gitpoulpi/latest.json";
-        let t = RecordedTransport::new().on("latest.json", 200, &manifest_body());
+        let t = signed_manifest(&manifest_body(), "1.4.2");
         let found = run(
             &t,
             &SourceSpec::Manifest { url: url.into() },
@@ -599,8 +698,100 @@ mod tests {
     }
 
     #[test]
+    fn a_manifest_without_a_valid_signature_is_never_trusted() {
+        let url = "https://mirror.example/gitpoulpi/latest.json";
+        let spec = SourceSpec::Manifest { url: url.into() };
+        let body = manifest_body();
+        let refused = |t: &RecordedTransport| {
+            let err = block(spec.check(t, &params("1.0.0"))).unwrap_err();
+            assert!(matches!(err, Error::Decode(_)), "{err:?}");
+            err.to_string()
+        };
+        // No signature file (the mirror copied only the manifest).
+        let unsigned = RecordedTransport::new().on("latest.json", 200, &body);
+        assert!(refused(&unsigned).contains("signature"));
+        // A signature for another version, another file and another key.
+        assert!(refused(&signed_manifest(&body, "1.4.1")).contains("not trusted"));
+        let other_file = RecordedTransport::new()
+            .on(
+                "latest.json.minisig",
+                200,
+                &signer().sign("security.json", "1.4.2", body.as_bytes()),
+            )
+            .on("latest.json", 200, &body);
+        assert!(refused(&other_file).contains("not trusted"));
+        let stranger = TestSigner::new();
+        let foreign = RecordedTransport::new()
+            .on(
+                "latest.json.minisig",
+                200,
+                &stranger.sign(MANIFEST_FILE, "1.4.2", body.as_bytes()),
+            )
+            .on("latest.json", 200, &body);
+        assert!(refused(&foreign).contains("not trusted"));
+        // A signed manifest edited afterwards (a different hash inside).
+        let edited = body.replace("ab12", "ffff");
+        let tampered = RecordedTransport::new()
+            .on(
+                "latest.json.minisig",
+                200,
+                &signer().sign(MANIFEST_FILE, "1.4.2", body.as_bytes()),
+            )
+            .on("latest.json", 200, &edited);
+        assert!(refused(&tampered).contains("not trusted"));
+        // No key compiled in accepts nothing.
+        let t = signed_manifest(&body, "1.4.2");
+        let no_keys = CheckParams {
+            keys: Vec::new(),
+            ..params("1.0.0")
+        };
+        assert!(block(spec.check(&t, &no_keys)).is_err());
+    }
+
+    #[test]
+    fn notices_are_asked_where_the_source_publishes_them() {
+        let notices = |spec: &SourceSpec, base: Option<&str>| spec.notices_url("o/r", base);
+        assert_eq!(
+            notices(&github("https://api.github.com"), None).as_deref(),
+            Some("https://github.com/o/r/releases/latest/download/security.json")
+        );
+        assert_eq!(
+            notices(&github("https://ghe.corp.example/api/v3"), None),
+            None,
+            "an Enterprise Server is not a release host"
+        );
+        assert_eq!(
+            notices(
+                &github("https://ghe.corp.example/api/v3"),
+                Some("https://mirror.example/gp/")
+            )
+            .as_deref(),
+            Some("https://mirror.example/gp/security.json")
+        );
+        let manifest = SourceSpec::Manifest {
+            url: "https://mirror.example/gp/latest.json".into(),
+        };
+        assert_eq!(
+            notices(&manifest, None).as_deref(),
+            Some("https://mirror.example/gp/security.json")
+        );
+        let public = SourceSpec::NuGet {
+            feed: CHOCOLATEY_COMMUNITY_FEED.into(),
+        };
+        assert_eq!(
+            notices(&public, None).as_deref(),
+            Some("https://github.com/o/r/releases/latest/download/security.json")
+        );
+        let internal = SourceSpec::NuGet {
+            feed: "https://nuget.corp.example/v3/index.json".into(),
+        };
+        assert_eq!(notices(&internal, None), None);
+        assert_eq!(notices(&SourceSpec::None, Some("https://m.example")), None);
+    }
+
+    #[test]
     fn a_manifest_without_a_semver_version_is_an_error() {
-        let t = RecordedTransport::new().on("latest.json", 200, r#"{"version":"nightly"}"#);
+        let t = signed_manifest(r#"{"version":"nightly"}"#, "nightly");
         let spec = SourceSpec::Manifest {
             url: "https://m.example/latest.json".into(),
         };
@@ -632,7 +823,7 @@ mod tests {
         assert!(run(&t, &gh, &pinned("0.9")).is_none());
         let (t3, nuget) = nuget_v3();
         assert_eq!(run(&t3, &nuget, &pinned("1.4")).unwrap().version, "1.4.9");
-        let tm = RecordedTransport::new().on("latest.json", 200, &manifest_body());
+        let tm = signed_manifest(&manifest_body(), "1.4.2");
         let man = SourceSpec::Manifest {
             url: "https://m.example/latest.json".into(),
         };

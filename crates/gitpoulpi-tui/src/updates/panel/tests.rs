@@ -320,3 +320,82 @@ fn the_buttons_match_the_procedure_and_the_pure_list_has_no_empty_label() {
     }
     close();
 }
+
+fn advisory(
+    severity: &str,
+    fixed: Option<&str>,
+    url: &str,
+) -> gitpoulpi_hosting::updates::notices::Advisory {
+    gitpoulpi_hosting::updates::notices::Advisory {
+        id: "GPSA-2026-001".into(),
+        affected: "<99.0.0".into(),
+        fixed: fixed.map(str::to_string),
+        severity: severity.into(),
+        url: url.into(),
+        summary: "a fake flaw".into(),
+    }
+}
+
+#[test]
+fn a_security_notice_lists_severity_fix_and_link_and_offers_to_open_it() {
+    let _lock = lock();
+    setup(Some(facts(
+        Channel::Install(InstallChannel::Choco),
+        Policy::default(),
+    )));
+    shared().advisories = vec![advisory(
+        "critical",
+        Some("99.0.0"),
+        "https://example.test/advisories/1",
+    )];
+    open();
+    let text = draw(100, 34);
+    assert!(
+        text.contains("Security notice: this version is affected"),
+        "{text}"
+    );
+    assert!(text.contains("Critical: a fake flaw"), "{text}");
+    assert!(text.contains("Fixed in version 99.0.0."), "{text}");
+    assert!(
+        text.contains("More information: https://example.test/advisories/1"),
+        "{text}"
+    );
+    assert!(
+        text.contains("Update with your package manager."),
+        "package-managed installs are pointed at their package manager\n{text}"
+    );
+    assert!(text.contains("Open notice"), "{text}");
+    assert!(text.contains("a notice"), "the key is in the hint\n{text}");
+    let list = actions(&crate::updates::snapshot());
+    assert!(list.iter().any(|(a, _)| *a == Act::Notice));
+    assert_eq!(key_action(&key(KeyCode::Char('a'))), Some(Act::Notice));
+    shared().advisories = Vec::new();
+    close();
+}
+
+#[test]
+fn a_swap_install_is_not_told_to_use_a_package_manager_and_a_notice_without_a_link_has_no_button() {
+    let _lock = lock();
+    setup(Some(facts(
+        Channel::Install(InstallChannel::Archive),
+        Policy::default(),
+    )));
+    shared().advisories = vec![advisory("low", None, "ftp://example.test/x")];
+    open();
+    let text = draw(100, 34);
+    assert!(text.contains("Low: a fake flaw"), "{text}");
+    assert!(
+        text.contains("No fixed version is published yet."),
+        "{text}"
+    );
+    assert!(!text.contains("package manager"), "{text}");
+    assert!(
+        !text.contains("ftp://"),
+        "only an https link is ever shown\n{text}"
+    );
+    assert!(!actions(&crate::updates::snapshot())
+        .iter()
+        .any(|(a, _)| *a == Act::Notice));
+    shared().advisories = Vec::new();
+    close();
+}

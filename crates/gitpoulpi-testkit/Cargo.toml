@@ -33,6 +33,8 @@ tokio.workspace = true
 # index and the commit; everything a backend is tested on still goes through
 # the real `git`. See `fast_commit` in fixture.rs.
 git2.workspace = true
+# `signing`: a throwaway release key pair for the update tests.
+minisign.workspace = true
 
 [target.'cfg(unix)'.dependencies]
 # `isolate_process_env` removes its throwaway dir at process exit (`atexit`).

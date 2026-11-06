@@ -31,6 +31,8 @@ fn params() -> CheckParams {
         target: "x86_64-unknown-linux-gnu".into(),
         token: None,
         pin: None,
+        keys: Vec::new(),
+        download_base: None,
     }
 }
 
@@ -370,4 +372,158 @@ fn the_release_notes_buttons_show_the_pointing_hand_and_the_text_the_arrow() {
         .position(|l| l.contains("shiny new thing"))
         .expect("the body") as u16;
     assert!(!slot.pointer_hand_at(3, body_row), "release text");
+}
+
+// ---- security notices ----
+
+fn signer() -> &'static gitpoulpi_testkit::signing::TestSigner {
+    static SIGNER: std::sync::OnceLock<gitpoulpi_testkit::signing::TestSigner> =
+        std::sync::OnceLock::new();
+    SIGNER.get_or_init(gitpoulpi_testkit::signing::TestSigner::new)
+}
+
+fn notice_params() -> CheckParams {
+    CheckParams {
+        keys: vec![
+            gitpoulpi_update::signing::PublicKey::decode(&signer().public_key_text()).unwrap(),
+        ],
+        ..params()
+    }
+}
+
+fn notices_json(affected: &str) -> String {
+    serde_json::json!({"schema": 1, "advisories": [{
+        "id": "GPSA-2026-001", "affected": affected, "fixed": "99.0.0",
+        "severity": "high", "url": "https://example.test/advisories/1",
+        "summary": "a fake flaw"}]})
+    .to_string()
+}
+
+/// A GitHub source whose release list and security notices are served;
+/// `signed_by` signs `security.json` (`None`: no signature file).
+fn notice_transport(
+    body: &str,
+    signed_by: Option<&gitpoulpi_testkit::signing::TestSigner>,
+) -> RecordedTransport {
+    let mut t = RecordedTransport::new().on("/releases?per_page", 200, &releases_body());
+    if let Some(signer) = signed_by {
+        t = t.on_file(
+            "security.json.minisig",
+            signer
+                .sign("security.json", "99.0.0", body.as_bytes())
+                .into_bytes(),
+        );
+    }
+    t.on_file("security.json", body.as_bytes().to_vec())
+}
+
+fn github() -> SourceSpec {
+    SourceSpec::GitHubReleases {
+        api_base: "https://api.github.com".into(),
+        repo: "o/r".into(),
+        token: None,
+    }
+}
+
+fn check_with_notices(path: &Path, transport: &RecordedTransport, spec: &SourceSpec) {
+    let outcome = perform_source(transport, spec, &notice_params(), path, false, 10);
+    finish(outcome, false);
+}
+
+#[test]
+fn a_signed_notice_that_names_this_version_turns_the_chip_red_on_every_channel() {
+    let _lock = lock();
+    let dir = tempfile::tempdir().unwrap();
+    let path = configured(dir.path(), UpdateMode::Notify);
+    let t = notice_transport(&notices_json("<99.0.0"), Some(signer()));
+    check_with_notices(&path, &t, &github());
+    let snap = snapshot();
+    assert_eq!(snap.advisories.len(), 1);
+    assert!(chip::is_security());
+    assert_eq!(chip::text(), "Security notice: this version is affected");
+    assert!(chip::opens_panel());
+    // A package-managed install gets it as well.
+    set_test_facts(Some(TestFacts {
+        channel: gitpoulpi_config::release::InstallChannel::Choco,
+        mode: None,
+        release_channel: None,
+    }));
+    assert!(chip::is_security(), "package managers get the red chip too");
+    // The notice is asked where a release publishes it, and nothing else.
+    let urls: Vec<String> = t.requests().into_iter().map(|r| r.url).collect();
+    assert!(
+        urls.contains(&"https://github.com/o/r/releases/latest/download/security.json".into()),
+        "{urls:?}"
+    );
+    assert!(
+        urls.contains(
+            &"https://github.com/o/r/releases/latest/download/security.json.minisig".into()
+        ),
+        "{urls:?}"
+    );
+    set_test_facts(None);
+}
+
+#[test]
+fn an_unsigned_or_wrongly_signed_notice_is_never_shown() {
+    let _lock = lock();
+    for signed_by in [None, Some(gitpoulpi_testkit::signing::TestSigner::new())] {
+        let dir = tempfile::tempdir().unwrap();
+        let path = configured(dir.path(), UpdateMode::Notify);
+        let t = notice_transport(&notices_json("<99.0.0"), signed_by.as_ref());
+        check_with_notices(&path, &t, &github());
+        assert!(snapshot().advisories.is_empty());
+        assert!(!chip::is_security());
+        assert_eq!(chip::text(), "v99.0.0 available", "the release still shows");
+        assert!(UpdateState::load(&path).advisories.is_empty(), "never kept");
+    }
+}
+
+#[test]
+fn a_notice_for_other_versions_is_kept_but_not_shown() {
+    let _lock = lock();
+    let dir = tempfile::tempdir().unwrap();
+    let path = configured(dir.path(), UpdateMode::Notify);
+    let t = notice_transport(&notices_json(">=100.0.0"), Some(signer()));
+    check_with_notices(&path, &t, &github());
+    assert!(snapshot().advisories.is_empty());
+    assert_eq!(UpdateState::load(&path).advisories.len(), 1);
+}
+
+#[test]
+fn a_failed_notice_fetch_keeps_the_notices_known_before() {
+    let _lock = lock();
+    let dir = tempfile::tempdir().unwrap();
+    let path = configured(dir.path(), UpdateMode::Notify);
+    let t = notice_transport(&notices_json("<99.0.0"), Some(signer()));
+    check_with_notices(&path, &t, &github());
+    assert!(chip::is_security());
+    // The next day the file is gone from the host.
+    let gone = RecordedTransport::new().on("/releases?per_page", 200, &releases_body());
+    let outcome = perform_source(&gone, &github(), &notice_params(), &path, true, 100_000);
+    finish(outcome, false);
+    assert!(chip::is_security(), "what was verified stays");
+}
+
+#[test]
+fn update_checks_off_or_the_none_source_fetch_no_notice() {
+    let _lock = lock();
+    let dir = tempfile::tempdir().unwrap();
+    let path = configured(dir.path(), UpdateMode::Notify);
+    let t = notice_transport(&notices_json("<99.0.0"), Some(signer()));
+    check_with_notices(&path, &t, &SourceSpec::None);
+    assert!(t.requests().is_empty(), "the None source asks nobody");
+    // Off: nothing is asked, and a cached notice is not shown either.
+    let dir = tempfile::tempdir().unwrap();
+    let path = configured(dir.path(), UpdateMode::Notify);
+    let t = notice_transport(&notices_json("<99.0.0"), Some(signer()));
+    check_with_notices(&path, &t, &github());
+    assert!(chip::is_security());
+    let mut config = Config::default();
+    config.updates.mode = UpdateMode::Off;
+    configure(&config, None);
+    assert!(snapshot().advisories.is_empty());
+    assert!(!chip::is_security());
+    assert!(check_now().is_some());
+    assert!(!shared().checking);
 }

@@ -16,6 +16,7 @@ use gitpoulpi_update::channel::{self, ChannelEnv, Hive, RegistryOps, Resolved};
 use gitpoulpi_update::fsops::FileOps;
 use gitpoulpi_update::job::{Action, UpdateJob};
 use gitpoulpi_update::plan::{self, PlanContext, Procedure};
+use gitpoulpi_update::signing::PublicKey;
 
 use crate::ops::{Clock, DaemonOps, ProcessOps, Registry, Transfer};
 use crate::outcome::Outcome;
@@ -30,6 +31,9 @@ pub struct Env<'a> {
     pub channel_env: &'a dyn ChannelEnv,
     pub policy: &'a dyn PolicySource,
     pub host_target: String,
+    /// The release signing keys (production: `signing::release_keys()`); the
+    /// elevated worker checks the staged archive's signature against them.
+    pub keys: Vec<PublicKey>,
     /// This executable, to tell the installed copy from the TUI's copy.
     pub own_exe: PathBuf,
     pub own_pid: u32,

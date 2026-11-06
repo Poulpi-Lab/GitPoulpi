@@ -41,6 +41,29 @@ in a folder on your `PATH` (keep `gitpoulpi-updater` and the `.gitpoulpi-dist`
 marker next to them: the marker says `channel=archive`, so the build can update
 itself, see [Updates](updates.md)). `INSTALL.txt` in the archive gives the same steps.
 
+### Verify a download
+
+Every release file is signed with the project's [minisign](https://jedisct1.github.io/minisign/) key, and GitPoulpi checks that signature itself before it installs an update. For a file you downloaded by hand, the `.minisig` next to it is the signature. The public key (key id `B461FFCBF6F6A4F2`) is committed as `packaging/minisign.pub` in the repository:
+
+```
+untrusted comment: minisign public key B461FFCBF6F6A4F2
+RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+```
+minisign -Vm gitpoulpi-<version>-<target>.tar.gz -P RWTypPb2y/9htNMSQTZUXq/V/RpK04Y9Ca5ub3SgALrpMbywtSM1UAoL
+```
+
+Read the trusted comment the command prints: it must be `file:<the file's name> version:<the version you expect>`. A signature that is valid but names another file or another version is not a signature for yours.
+
+Where the release was built with build provenance attestations (the repository's `ATTESTATIONS` variable), the GitHub CLI checks where a file was built:
+
+```
+gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoulpi
+```
+
+The `.sha256` file only catches a damaged download. The signature is what shows the file is the project's.
+
 ## With an installer
 
 Each release also ships an installer per OS. Both make the same choices

@@ -892,6 +892,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
                 U::ReleaseNotes | U::CheckNow | U::ShowPanel => None,
                 U::CopyCommand => ctx.update_whys.copy,
                 U::RunInTerminal => ctx.update_whys.terminal,
+                U::SecurityNotice => ctx.update_whys.notice,
                 U::Download | U::Skip => {
                     (!ctx.update_known).then_some(msg::updates::WHY_NO_UPDATE.get())
                 }

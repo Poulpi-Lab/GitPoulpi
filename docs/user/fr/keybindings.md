@@ -839,6 +839,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Affichage : Journal d'activité global | `Ctrl+N G` |
 | Aide : Notes de version |  |
 | Mises à jour : Afficher la mise à jour | `Ctrl+N u` |
+| Mises à jour : Ouvrir l'avis de sécurité |  |
 | Mises à jour : Copier la commande de mise à jour |  |
 | Mises à jour : Exécuter la commande de mise à jour dans un terminal |  |
 | Mises à jour : Rechercher une mise à jour maintenant |  |

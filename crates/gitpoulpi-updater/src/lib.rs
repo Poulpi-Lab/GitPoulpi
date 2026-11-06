@@ -102,6 +102,7 @@ pub fn main_with(args: &[String]) -> i32 {
         channel_env: &chan_env,
         policy: &policy,
         host_target: gitpoulpi_config::release::host_target(),
+        keys: gitpoulpi_update::signing::release_keys(),
         own_exe: std::env::current_exe().unwrap_or_default(),
         own_pid: std::process::id(),
         echo: true,

@@ -46,14 +46,17 @@ pub enum Staged {
     /// Already staged as `.new` files in the install folder.
     InPlace,
     /// Downloaded in the user's cache: the elevated worker verifies it again
-    /// against the `.sha256` it fetches itself, then stages it.
+    /// against the `.minisig` and the `.sha256` it fetches itself, then
+    /// stages it. A job without `minisig_url` is refused (it does not parse).
     Archive {
         archive: PathBuf,
         sha256_url: String,
+        minisig_url: String,
     },
 }
 
-/// `"in_place"` or `{"archive": ..., "sha256_url": ...}` on the wire.
+/// `"in_place"` or `{"archive": ..., "sha256_url": ..., "minisig_url": ...}`
+/// on the wire.
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 enum StagedRepr {
@@ -61,6 +64,7 @@ enum StagedRepr {
     Archive {
         archive: PathBuf,
         sha256_url: String,
+        minisig_url: String,
     },
 }
 
@@ -74,9 +78,11 @@ impl TryFrom<StagedRepr> for Staged {
             StagedRepr::Archive {
                 archive,
                 sha256_url,
+                minisig_url,
             } => Ok(Staged::Archive {
                 archive,
                 sha256_url,
+                minisig_url,
             }),
         }
     }
@@ -89,9 +95,11 @@ impl From<Staged> for StagedRepr {
             Staged::Archive {
                 archive,
                 sha256_url,
+                minisig_url,
             } => StagedRepr::Archive {
                 archive,
                 sha256_url,
+                minisig_url,
             },
         }
     }

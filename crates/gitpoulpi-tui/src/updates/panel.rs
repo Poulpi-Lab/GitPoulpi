@@ -31,6 +31,7 @@ use ratatui::style::{Modifier, Style};
 use ratatui::Frame;
 
 use gitpoulpi_config::UpdateMode;
+use gitpoulpi_i18n::msg::security_notice as security_msg;
 use gitpoulpi_i18n::msg::updates as msg;
 use gitpoulpi_update::plan::{
     display_command, AnnounceReason, Elevation, NothingReason, Procedure,
@@ -55,6 +56,8 @@ pub(crate) enum Act {
     Notes,
     Skip,
     Check,
+    /// The security notice's page in the browser.
+    Notice,
     Close,
 }
 
@@ -169,6 +172,9 @@ pub(crate) fn actions(snap: &Snapshot) -> Vec<(Act, String)> {
     {
         out.push((Act::Download, msg::BTN_DOWNLOAD.get().to_string()));
     }
+    if snap.advisories.iter().any(|a| a.safe_url().is_some()) {
+        out.push((Act::Notice, security_msg::BTN_OPEN.get().to_string()));
+    }
     out.push((Act::Notes, msg::BTN_NOTES.get().to_string()));
     if snap.available.is_some() && !off {
         out.push((Act::Skip, msg::BTN_SKIP.get().to_string()));
@@ -257,6 +263,71 @@ fn announce_text(reason: AnnounceReason) -> &'static str {
     }
 }
 
+/// The severity word of a notice.
+fn severity_word(severity: &str) -> String {
+    match severity.trim().to_ascii_lowercase().as_str() {
+        "critical" => security_msg::SEV_CRITICAL.get().to_string(),
+        "high" => security_msg::SEV_HIGH.get().to_string(),
+        "medium" => security_msg::SEV_MEDIUM.get().to_string(),
+        "low" => security_msg::SEV_LOW.get().to_string(),
+        other => other.to_string(),
+    }
+}
+
+/// The security notices that name this build: a red heading, then per notice
+/// the severity and summary, the fixed version and the link. A package-managed
+/// install is told to update with its package manager.
+fn push_advisories(rows: &mut Vec<Row>, snap: &Snapshot, width: usize) {
+    if snap.advisories.is_empty() {
+        return;
+    }
+    blank(rows);
+    push_wrapped(
+        rows,
+        security_msg::PANEL_HEADING.get(),
+        Look::Danger,
+        width,
+        "",
+    );
+    for advisory in &snap.advisories {
+        push_wrapped(
+            rows,
+            &security_msg::advisory_line(severity_word(&advisory.severity), &advisory.summary),
+            Look::Plain,
+            width,
+            "  ",
+        );
+        let fixed = match advisory
+            .fixed
+            .as_deref()
+            .map(str::trim)
+            .filter(|f| !f.is_empty())
+        {
+            Some(version) => security_msg::fixed_in(version),
+            None => security_msg::NO_FIX.get().to_string(),
+        };
+        push_wrapped(rows, &fixed, Look::Muted, width, "    ");
+        if let Some(url) = advisory.safe_url() {
+            push_wrapped(
+                rows,
+                &security_msg::link_line(url),
+                Look::Command,
+                width,
+                "    ",
+            );
+        }
+    }
+    if !matches!(snap.install.procedure, Procedure::Swap { .. }) {
+        push_wrapped(
+            rows,
+            security_msg::PACKAGE_MANAGER.get(),
+            Look::Plain,
+            width,
+            "  ",
+        );
+    }
+}
+
 /// The body for `snap`, wrapped to `width` cells.
 pub(crate) fn content(
     snap: &Snapshot,
@@ -288,6 +359,7 @@ pub(crate) fn content(
             "",
         );
     }
+    push_advisories(&mut rows, snap, width);
     let off = snap.mode == UpdateMode::Off;
     let commands_now = |rows: &mut Vec<Row>, list: &[String]| {
         for command in list {
@@ -405,6 +477,7 @@ fn perform(act: Act) -> Event {
         Act::Revert => said(super::auto::revert_now()),
         Act::Download => said(super::run(UpdatesCommand::Download)),
         Act::Skip => said(super::skip()),
+        Act::Notice => said(super::run(UpdatesCommand::SecurityNotice)),
         Act::Check => said(super::check_now()),
         Act::Notes => {
             close();
@@ -444,6 +517,7 @@ fn key_action(key: &KeyEvent) -> Option<Act> {
         KeyCode::Char('d') => Act::Download,
         KeyCode::Char('n') => Act::Notes,
         KeyCode::Char('s') => Act::Skip,
+        KeyCode::Char('a') => Act::Notice,
         KeyCode::Char('r') => Act::Check,
         KeyCode::Esc | KeyCode::Char('q') => Act::Close,
         _ => return None,
@@ -683,7 +757,11 @@ pub(crate) fn render(frame: &mut Frame) {
         buf,
         x0,
         rect.bottom().saturating_sub(2),
-        msg::PANEL_HINT.get(),
+        if snap.advisories.is_empty() {
+            msg::PANEL_HINT.get()
+        } else {
+            security_msg::PANEL_HINT.get()
+        },
         inner_w,
         Style::default().fg(th().ui.muted).bg(th().ui.panel),
     );

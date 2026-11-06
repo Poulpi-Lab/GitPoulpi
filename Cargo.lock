@@ -1239,10 +1239,12 @@ dependencies = [
  "gitpoulpi-core",
  "gitpoulpi-secrets",
  "gitpoulpi-testkit",
+ "minisign-verify",
  "rand_core 0.6.4",
  "reqwest",
  "rustls",
  "rustls-native-certs",
+ "semver",
  "serde",
  "serde_json",
  "sha2",
@@ -1357,6 +1359,7 @@ dependencies = [
  "git2",
  "gitpoulpi-core",
  "libc",
+ "minisign",
  "png",
  "serde_json",
  "tempfile",
@@ -1413,6 +1416,8 @@ dependencies = [
  "flate2",
  "gitpoulpi-config",
  "gitpoulpi-hosting",
+ "gitpoulpi-testkit",
+ "minisign-verify",
  "serde",
  "serde_json",
  "sha2",
@@ -2020,6 +2025,12 @@ dependencies = [
  "rpassword",
  "scrypt",
 ]
+
+[[package]]
+name = "minisign-verify"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22f9645cb765ea72b8111f36c522475d2daa0d22c957a9826437e97534bc4e9e"
 
 [[package]]
 name = "miniz_oxide"

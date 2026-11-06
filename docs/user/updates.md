@@ -23,6 +23,7 @@ Every button has a key (printed in the panel's hint line) and a palette command,
 | **Revert** | `v` | Updates: Revert to the Previous Version |
 | **Release notes** | `n` | Help: Release Notes |
 | **Skip this version** | `s` | Updates: Skip This Version |
+| **Open notice** (only with a security notice) | `a` | Updates: Open Security Notice |
 | **Check now** | `r` | Updates: Check for Updates Now |
 | **Close** | `Esc` | |
 
@@ -80,7 +81,15 @@ Where GitPoulpi replaces its own files, **Revert** swaps the previous files back
 
 ## What is checked and refused
 
-Before anything is replaced GitPoulpi downloads the archive and its `.sha256`, checks the hash, and refuses: a release without a `.sha256`, a hash that does not match, an archive whose name is not the one for this platform (`gitpoulpi-<version>-<target>.<zip|tar.gz>`), an archive whose marker names another version or platform, and a download link outside GitHub's release hosts (every redirect hop is checked) or the mirror an administrator configured. The swap is all or nothing: if another program holds one of the executables, GitPoulpi names the file, changes nothing and leaves the download for another try. On Windows, an all-users update is re-verified by the elevated step, which downloads the `.sha256` itself.
+Before anything is replaced GitPoulpi downloads the archive, its `.minisig` signature and its `.sha256`. It checks the signature first, against the project's release key built into GitPoulpi, and the trusted comment of the signature must name this archive and this version. Then it checks the hash. It refuses: a release without a `.minisig` (an older release published before releases were signed cannot be installed through the updater, which includes pinning or going back to one), a signature by another key, a signature for another file or another version, a release without a `.sha256`, a hash that does not match, an archive whose name is not the one for this platform (`gitpoulpi-<version>-<target>.<zip|tar.gz>`), an archive whose marker names another version or platform, and a download link outside GitHub's release hosts (every redirect hop is checked) or the mirror an administrator configured. The swap is all or nothing: if another program holds one of the executables, GitPoulpi names the file, changes nothing and leaves the download for another try. On Windows, an all-users update is re-verified by the elevated step, which downloads the `.minisig` and the `.sha256` itself and checks both again, so a file swapped in the user's download folder in between is refused. Package managers (Chocolatey, winget, Scoop, Homebrew, apt, AUR) verify their own packages: GitPoulpi downloads nothing there.
+
+## Security notices
+
+Next to each release the project publishes `security.json`: the list of security notices (an identifier, a severity, the affected versions as a range such as `>=1.2.0, <1.4.3`, the fixed version, a link and a one-sentence summary). The same daily check that looks for a new version also fetches it, from the same place as the release: the release page of the repository for GitHub, the folder of `latest.json` for a mirror, GitHub for the public Chocolatey feed. A notice is used only when `security.json.minisig` verifies against the project key; an unsigned or badly signed file is never shown (one line in the Activity Log says it was ignored).
+
+When a notice names the running version, the chip turns red and reads **Security notice: this version is affected**, on every installation, package-managed ones included. The update panel then lists each notice with its severity, summary, fixed version and link; **Open notice** (`a`, or **Updates: Open Security Notice** in the palette) opens the most severe one's link in the browser. Where a package manager owns the install the panel adds "Update with your package manager."
+
+With update checks off (`updates.mode = "off"`), with an administrator policy whose `check` is `none`, and for a build made with `cargo build`, nothing is fetched and no notice is shown. An organization's own NuGet feed does not make GitPoulpi contact GitHub: its notices come only from the policy's `download_base` mirror.
 
 ## Settings an administrator locked
 

@@ -88,7 +88,8 @@ pub(super) struct InstallState {
     then_restart: bool,
     /// An all-users install: the verified archive waiting in the user's
     /// cache and its checksum URL (the elevated worker checks it again).
-    cached: Option<(PathBuf, String)>,
+    /// The archive in the cache, its `.sha256` URL and its `.minisig` URL.
+    cached: Option<(PathBuf, String, String)>,
     /// The job is ready: the window ends, then the updater starts.
     handoff: Option<handoff::Prepared>,
     quit: bool,
@@ -501,6 +502,8 @@ fn download_and_stage(
 ) -> Result<(), UpdateError> {
     // The policy's `download_base` mirror is the one extra host allowed.
     let mirror = super::extra_download_hosts();
+    // Production: the compiled-in release keys, nothing else.
+    let keys = gitpoulpi_update::signing::release_keys();
     let transport = gitpoulpi_hosting::ReqwestTransport::new()
         .map_err(|e| UpdateError::Download(e.to_string()))?
         .with_download_hosts(mirror.clone());
@@ -516,13 +519,19 @@ fn download_and_stage(
             cancel,
             on_progress,
             &mirror,
+            &keys,
         )?;
         let sha_url = release
             .checksum
             .as_ref()
             .map(|c| c.url.clone())
             .ok_or(UpdateError::NoChecksum)?;
-        shared().install.cached = Some((path, sha_url));
+        let sig_url = release
+            .asset
+            .as_ref()
+            .map(|a| fetch::minisig_url(&a.url))
+            .ok_or(UpdateError::NoSignature)?;
+        shared().install.cached = Some((path, sha_url, sig_url));
         return Ok(());
     }
     fetch_and_stage(
@@ -533,6 +542,7 @@ fn download_and_stage(
         cancel,
         on_progress,
         &mirror,
+        &keys,
     )
 }
 
@@ -560,6 +570,7 @@ fn runtime() -> Result<tokio::runtime::Runtime, UpdateError> {
 /// Plain inputs, so the tests drive it with a recorded transport and a temp
 /// folder.
 #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+#[allow(clippy::too_many_arguments)]
 pub(super) fn fetch_and_stage(
     transport: &dyn gitpoulpi_hosting::HttpTransport,
     fs: &dyn FileOps,
@@ -568,6 +579,7 @@ pub(super) fn fetch_and_stage(
     cancel: &AtomicBool,
     on_progress: fetch::OnProgress<'_>,
     extra_hosts: &[String],
+    keys: &[gitpoulpi_update::signing::PublicKey],
 ) -> Result<(), UpdateError> {
     let target = &updatable.marker.target;
     let bytes = runtime()?.block_on(fetch::download_verified_with(
@@ -577,6 +589,7 @@ pub(super) fn fetch_and_stage(
         cancel,
         on_progress,
         extra_hosts,
+        keys,
     ))?;
     let files = archive::extract(&bytes, &release.version, target)?;
     if !files.iter().any(|f| f.name == updatable.exe_name) {
@@ -596,6 +609,7 @@ pub(super) fn fetch_and_stage(
 /// `dir` for the elevated worker (an all-users install: the install folder
 /// cannot be written without the administrator's approval). Returns the file.
 #[cfg_attr(not(feature = "hosting"), allow(dead_code))]
+#[allow(clippy::too_many_arguments)]
 pub(super) fn fetch_to_cache(
     transport: &dyn gitpoulpi_hosting::HttpTransport,
     release: &Release,
@@ -604,6 +618,7 @@ pub(super) fn fetch_to_cache(
     cancel: &AtomicBool,
     on_progress: fetch::OnProgress<'_>,
     extra_hosts: &[String],
+    keys: &[gitpoulpi_update::signing::PublicKey],
 ) -> Result<PathBuf, UpdateError> {
     let target = &updatable.marker.target;
     let bytes = runtime()?.block_on(fetch::download_verified_with(
@@ -613,6 +628,7 @@ pub(super) fn fetch_to_cache(
         cancel,
         on_progress,
         extra_hosts,
+        keys,
     ))?;
     let files = archive::extract(&bytes, &release.version, target)?;
     if !files.iter().any(|f| f.name == updatable.exe_name) {
@@ -764,9 +780,10 @@ fn begin_handoff(kind: Kind, to_version: String) -> Option<String> {
             _ => Elevation::None,
         };
         let staged = match (&kind, s.install.cached.clone()) {
-            (Kind::Apply, Some((archive, sha256_url))) => Staged::Archive {
+            (Kind::Apply, Some((archive, sha256_url, minisig_url))) => Staged::Archive {
                 archive,
                 sha256_url,
+                minisig_url,
             },
             _ => Staged::InPlace,
         };

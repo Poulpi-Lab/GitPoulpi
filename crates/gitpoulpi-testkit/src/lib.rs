@@ -7,6 +7,7 @@ pub mod lfs;
 pub mod live;
 pub mod prediction_fixture;
 pub mod script_fixture;
+pub mod signing;
 mod slow_remote;
 pub mod spawn_budget;
 pub mod terminal_agent;

@@ -368,7 +368,13 @@ fn an_inno_user_swap_updates_the_files_hkcu_and_relaunches_unelevated() {
         .into_iter()
         .find(|l| l.starts_with("relaunch"))
         .unwrap();
-    assert!(relaunch.ends_with("--session work:true"), "{relaunch}");
+    // Unix replaces the process (`true`); Windows starts a detached
+    // launcher instead (`false`).
+    let replace = if cfg!(windows) { "false" } else { "true" };
+    assert!(
+        relaunch.ends_with(&format!("--session work:{replace}")),
+        "{relaunch}"
+    );
 }
 
 #[test]

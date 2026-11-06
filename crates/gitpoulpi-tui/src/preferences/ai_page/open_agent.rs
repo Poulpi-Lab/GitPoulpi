@@ -29,7 +29,7 @@ pub(super) fn launcher_with_agent(
     let mut out = args.to_vec();
     match stem.as_str() {
         "wt" | "xdg-terminal-exec" => {}
-        // `cmd /C start "" /D <dir> cmd`: keep the shell open on the agent.
+        // Bare `cmd` in a new console: `/K` keeps the shell open on the agent.
         "cmd" => out.push("/K".into()),
         "open" => return None,
         _ => out.push("-e".into()),
@@ -172,12 +172,8 @@ mod tests {
         assert_eq!(a, ["claude", "--effort", "low"]);
         let (_, a) = launcher_with_agent("/usr/bin/alacritty", &[], &agent()).unwrap();
         assert_eq!(a, ["-e", "claude", "--effort", "low"]);
-        let cmd: Vec<String> = ["/C", "start", "", "/D", "C:\\x", "cmd"]
-            .iter()
-            .map(|s| s.to_string())
-            .collect();
-        let (_, a) = launcher_with_agent("cmd", &cmd, &agent()).unwrap();
-        assert_eq!(&a[5..], ["cmd", "/K", "claude", "--effort", "low"]);
+        let (_, a) = launcher_with_agent("cmd", &[], &agent()).unwrap();
+        assert_eq!(a, ["/K", "claude", "--effort", "low"]);
         assert!(launcher_with_agent("open", &[], &agent()).is_none());
     }
 

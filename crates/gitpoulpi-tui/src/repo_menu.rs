@@ -359,8 +359,9 @@ pub(crate) fn file_manager_command(path: &Path) -> (String, Vec<String>) {
 /// effort per platform:
 ///
 /// - **Windows**: Windows Terminal (`wt -d <path>`) when `wt` is on
-///   `PATH`, else a new console window running `cmd` started in `path`
-///   (`cmd /C start "" /D <path> cmd`).
+///   `PATH`, else a new console window running `cmd`, started with `path`
+///   as its working directory (no arguments, see
+///   `tab_dir::wants_new_console`).
 /// - **macOS**: `open -a Terminal <path>`.
 /// - **Linux and the rest**: `$TERMINAL` when set, else
 ///   `xdg-terminal-exec` when installed, else `x-terminal-emulator`
@@ -379,17 +380,9 @@ pub(crate) fn terminal_command(
         if on_path("wt") {
             ("wt".into(), vec!["-d".into(), dir])
         } else {
-            (
-                "cmd".into(),
-                vec![
-                    "/C".into(),
-                    "start".into(),
-                    String::new(),
-                    "/D".into(),
-                    dir,
-                    "cmd".into(),
-                ],
-            )
+            // No arguments: the launcher starts it in `path` with its own
+            // console window, so the folder name never reaches a cmd line.
+            ("cmd".into(), Vec::new())
         }
     } else if cfg!(target_os = "macos") {
         ("open".into(), vec!["-a".into(), "Terminal".into(), dir])
@@ -756,11 +749,15 @@ mod tests {
     fn the_terminal_ladder_prefers_windows_terminal_then_falls_back() {
         let dir = Path::new("/work/repo");
         let (with_wt, args) = terminal_command(dir, |p| p == "wt", Some("kitty".into()));
-        let (without, _) = terminal_command(dir, |_| false, None);
+        let (without, without_args) = terminal_command(dir, |_| false, None);
         if cfg!(windows) {
             assert_eq!(with_wt, "wt");
             assert_eq!(args[0], "-d");
             assert_eq!(without, "cmd");
+            assert!(
+                without_args.is_empty(),
+                "the folder is the cwd, never an argument"
+            );
         } else if cfg!(target_os = "macos") {
             assert_eq!(with_wt, "open");
         } else {

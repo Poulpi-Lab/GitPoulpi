@@ -1,23 +1,32 @@
 use super::*;
 
+/// A path that is absolute on the host: `/x` as is, `C:\x` on Windows.
+fn abs(unix: &str) -> PathBuf {
+    if cfg!(windows) {
+        PathBuf::from(format!("C:{}", unix.replace('/', "\\")))
+    } else {
+        PathBuf::from(unix)
+    }
+}
+
 fn job() -> UpdateJob {
     UpdateJob {
         schema: SCHEMA,
         action: Action::Apply,
-        install_dir: PathBuf::from("/opt/gp"),
+        install_dir: abs("/opt/gp"),
         from_version: "1.4.1".into(),
         to_version: "1.4.2".into(),
         staged: Staged::InPlace,
         manager_argv: None,
         elevation: JobElevation::None,
         relaunch: Relaunch {
-            exe: PathBuf::from("/opt/gp/gitpoulpi-tui"),
+            exe: abs("/opt/gp/gitpoulpi-tui"),
             args: vec!["--session".into(), "work".into()],
-            cwd: PathBuf::from("/home/u/repo"),
+            cwd: abs("/home/u/repo"),
         },
         requester_pid: 4242,
-        config_dir: PathBuf::from("/home/u/.config/gitpoulpi"),
-        status_path: PathBuf::from("/home/u/.local/share/gitpoulpi/updates/status.json"),
+        config_dir: abs("/home/u/.config/gitpoulpi"),
+        status_path: abs("/home/u/.local/share/gitpoulpi/updates/status.json"),
     }
 }
 
@@ -26,7 +35,7 @@ fn a_job_round_trips() {
     for staged in [
         Staged::InPlace,
         Staged::Archive {
-            archive: PathBuf::from("/home/u/.cache/gp/gitpoulpi-1.4.2.zip"),
+            archive: abs("/home/u/.cache/gp/gitpoulpi-1.4.2.zip"),
             sha256_url: "https://example.test/a.zip.sha256".into(),
         },
     ] {

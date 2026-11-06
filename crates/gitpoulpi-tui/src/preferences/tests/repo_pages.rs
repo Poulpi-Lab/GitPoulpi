@@ -55,6 +55,7 @@ fn field(fields: &[Field], label: &str) -> Field {
         control: found.control.clone(),
         help: found.help.clone(),
         warning: found.warning.clone(),
+        danger: found.danger,
         target: found.target.clone(),
         live: found.live,
         coming: found.coming.clone(),

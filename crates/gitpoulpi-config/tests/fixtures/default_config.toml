@@ -145,6 +145,11 @@ allow_ui = true
 ui_control = "ask"
 allow_ui_propose = false
 allow_history_purge = false
+http_auth = true
+tls = "off"
+tls_cert = ""
+tls_key = ""
+behind_proxy = false
 
 [ai]
 enabled = false

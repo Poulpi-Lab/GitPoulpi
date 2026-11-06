@@ -5,6 +5,7 @@
 use std::sync::OnceLock;
 
 use gitpoulpi_config::{DefaultBackend, McpConfig};
+use gitpoulpi_mcp::security::{Security, TokenSource};
 use gitpoulpi_testkit::FixtureRepoBuilder;
 use serde_json::{json, Value};
 use tempfile::TempDir;
@@ -20,11 +21,23 @@ fn isolated_config_dir() -> &'static std::path::Path {
 
 /// POSTs one JSON-RPC message to `/mcp` and returns (status line, JSON body).
 async fn post(addr: std::net::SocketAddr, message: Value) -> (String, Option<Value>) {
+    post_with(addr, message, None).await
+}
+
+/// `post`, with an `Authorization` header when `authorization` is given.
+async fn post_with(
+    addr: std::net::SocketAddr,
+    message: Value,
+    authorization: Option<&str>,
+) -> (String, Option<Value>) {
     let body = message.to_string();
+    let auth = authorization
+        .map(|v| format!("Authorization: {v}\r\n"))
+        .unwrap_or_default();
     let mut stream = TcpStream::connect(addr).await.unwrap();
     let request = format!(
         "POST /mcp HTTP/1.1\r\nHost: {addr}\r\nContent-Type: application/json\r\n\
-         Accept: application/json, text/event-stream\r\nContent-Length: {}\r\n\
+         Accept: application/json, text/event-stream\r\n{auth}Content-Length: {}\r\n\
          Connection: close\r\n\r\n{body}",
         body.len()
     );
@@ -44,6 +57,13 @@ async fn post(addr: std::net::SocketAddr, message: Value) -> (String, Option<Val
 }
 
 async fn start(session: &str) -> (std::net::SocketAddr, CancellationToken) {
+    start_with(session, Security::open()).await
+}
+
+async fn start_with(
+    session: &str,
+    security: Security,
+) -> (std::net::SocketAddr, CancellationToken) {
     std::env::set_var("GITPOULPI_CONFIG_DIR", isolated_config_dir());
     let listener = gitpoulpi_mcp::http::bind("127.0.0.1:0", false)
         .await
@@ -59,6 +79,7 @@ async fn start(session: &str) -> (std::net::SocketAddr, CancellationToken) {
             DefaultBackend::default(),
             McpConfig::default(),
             false,
+            security,
             token,
         )
         .await;
@@ -106,6 +127,27 @@ async fn tools_list_and_a_read_tool_work_over_http() {
     assert_ne!(result.get("isError"), Some(&json!(true)), "{result}");
     assert!(result["structuredContent"]["files"].is_array(), "{result}");
 
+    shutdown.cancel();
+}
+
+#[tokio::test]
+async fn the_endpoint_answers_only_a_request_with_the_bearer_token() {
+    let (addr, shutdown) = start_with(
+        "mcp-http-auth",
+        Security {
+            token: Some(TokenSource::Fixed("tok-123".into())),
+            ..Security::open()
+        },
+    )
+    .await;
+    let list = json!({ "jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {} });
+    let (status, _) = post(addr, list.clone()).await;
+    assert!(status.contains("401"), "{status}");
+    let (status, _) = post_with(addr, list.clone(), Some("Bearer nope")).await;
+    assert!(status.contains("401"), "{status}");
+    let (status, body) = post_with(addr, list, Some("Bearer tok-123")).await;
+    assert!(status.contains("200"), "{status}");
+    assert!(body.unwrap()["result"]["tools"].is_array());
     shutdown.cancel();
 }
 

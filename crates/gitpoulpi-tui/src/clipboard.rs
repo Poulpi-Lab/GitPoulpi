@@ -109,6 +109,27 @@ impl Clipboard {
         }
     }
 
+    /// Puts `value` on the clipboard and says nothing about it: for a secret
+    /// that must not be echoed into the status line. `Err` is the sentence
+    /// to show.
+    #[cfg(feature = "mcp")]
+    pub(crate) fn copy_secret(&mut self, value: &str) -> Result<(), String> {
+        let handle = self.inner.get_or_insert_with(open_backend);
+        match handle {
+            Ok(Backend::System(clipboard)) => clipboard
+                .set_text(value.to_string())
+                .map_err(|e| msg::input::copy_failed("token", e.to_string())),
+            Ok(Backend::Memory(buffer)) => {
+                *buffer = value.to_string();
+                if let Ok(path) = std::env::var(DUMP_ENV) {
+                    let _ = std::fs::write(path, value);
+                }
+                Ok(())
+            }
+            Err(why) => Err(msg::input::no_clipboard(why)),
+        }
+    }
+
     /// The clipboard's text, for the editor's `Ctrl+V` - most terminals turn a paste into a
     /// bracketed-paste event
     /// on their own, but a `Ctrl+V` that reaches the app as a key is
@@ -137,6 +158,12 @@ thread_local! {
 /// [`Clipboard::copy`] through the thread's long-lived shared handle.
 pub(crate) fn copy_shared(what: &str, value: &str) -> String {
     SHARED.with(|clipboard| clipboard.borrow_mut().copy(what, value))
+}
+
+/// [`Clipboard::copy_secret`] through the thread's long-lived shared handle.
+#[cfg(feature = "mcp")]
+pub(crate) fn copy_secret_shared(value: &str) -> Result<(), String> {
+    SHARED.with(|clipboard| clipboard.borrow_mut().copy_secret(value))
 }
 
 /// A one-line echo of what was copied, so the confirmation is verifiable

@@ -732,11 +732,15 @@ pub enum McpAction {
         stdio: bool,
         /// Listen address for streamable HTTP, e.g. 127.0.0.1:8808
         /// (endpoint `/mcp`); without an address, `[mcp] bind` (default
-        /// 127.0.0.1:8808). Loopback only unless `--allow-remote`.
+        /// 127.0.0.1:8808). Requests need the bearer token (`mcp token`)
+        /// unless `[mcp] http_auth` is off. Loopback only unless
+        /// `--allow-remote`.
         #[arg(long, value_name = "ADDR", num_args = 0..=1, default_missing_value = "")]
         http: Option<String>,
-        /// Allow `--http` on a non-loopback address. No authentication:
-        /// anyone who can reach it can run every tool `[mcp]` allows.
+        /// Allow `--http` on a non-loopback address. Refused unless
+        /// `[mcp] http_auth` is on with a token in place and the traffic is
+        /// encrypted (`[mcp] tls`, or `behind_proxy` for a tunnel or reverse
+        /// proxy you vouch for); `ssh -L` to a loopback endpoint is safer.
         #[arg(long, requires = "http")]
         allow_remote: bool,
         /// How far the agent may move the user's window with the `ui_*`
@@ -744,6 +748,24 @@ pub enum McpAction {
         /// confirms), `auto` or `off`. Overrides `[mcp] ui_control`.
         #[arg(long, value_parser = ["auto", "ask", "off"])]
         ui_control: Option<String>,
+    },
+    /// The bearer token of the HTTP endpoint (`mcp serve --http`): shows it
+    /// masked as JSON `{token_hint, path, rotated}`, creating it on first
+    /// use. A client sends it as `Authorization: Bearer <token>`. Not an MCP
+    /// tool: an agent never reads or rotates its own key
+    Token {
+        /// Print the full token too, for you to paste into a client's
+        /// configuration
+        #[arg(long)]
+        show: bool,
+        /// Copy the full token to the clipboard through the terminal
+        /// (OSC 52), without printing it
+        #[arg(long)]
+        copy: bool,
+        /// Replace the token with a new one; clients holding the old one are
+        /// refused at once
+        #[arg(long)]
+        rotate: bool,
     },
 }
 

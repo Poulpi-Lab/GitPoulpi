@@ -24,6 +24,8 @@ pub(super) fn is_destructive(action: PrefAction) -> bool {
         PrefAction::Launcher(L::Remove(_)) => true,
         PrefAction::Tools(T::AliasRemove | T::PathRemove) => true,
         PrefAction::RepoPage(RpButton::Disable) => true,
+        #[cfg(feature = "mcp")]
+        PrefAction::McpSecurity(super::mcp_security::McpButton::Rotate) => true,
         #[cfg(feature = "ai")]
         PrefAction::Ai(ai_page::AiButton::DeleteLegacy) => true,
         _ => false,

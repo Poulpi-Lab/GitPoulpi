@@ -358,6 +358,11 @@ The answers are cached per profile in `radar-account.json` next to
 | `mcp.allow_history_purge` | `false` | Only in `config.toml` (no Settings row). `true` lists the tool `rewrite_purge` for agents (it still needs `allow_mutations`). Off, an agent does not see the tool at all: a purge deletes the old history of a history rewrite, the undo of it and its reflogs for good. The CLI and the TUI are not gated by it. |
 | `mcp.enabled` | `true` | `false`: `gitpoulpi mcp serve` and `gitpoulpi-mcp` refuse to start, with a message naming this key. Settings > Agents & MCP > *MCP server*. Read when an agent starts the server. |
 | `mcp.bind` | `"127.0.0.1:8808"` | The address `--http` listens on when you give none (`--http ADDR` / `--bind` win). Loopback only unless `--allow-remote`. Empty or the old `"stdio"` mean the default. Settings > Agents & MCP > *MCP server port* edits the port and keeps the host. |
+| `mcp.http_auth` | `true` | `--http` answers only a request with `Authorization: Bearer <token>` (the token of `gitpoulpi mcp token`). `false` removes the check; the server then warns on stderr, and `--allow-remote` is refused. Settings > Agents & MCP > *HTTP authentication*. |
+| `mcp.tls` | `"off"` | `off`, `self_signed` (a certificate generated once under the private data folder, its SHA-256 fingerprint printed at start) or `files` (`tls_cert` and `tls_key`). With TLS on, the server terminates TLS itself and no plain listener exists. Settings > Agents & MCP > *TLS*. |
+| `mcp.tls_cert` | `""` | PEM certificate chain used with `tls = "files"`. |
+| `mcp.tls_key` | `""` | PEM private key used with `tls = "files"`. |
+| `mcp.behind_proxy` | `false` | You state that a tunnel or reverse proxy in front of the endpoint carries the encryption. It cannot be checked from inside the server, so `--allow-remote` without TLS needs it set. The hop between the proxy and the server is plain text on that network. Settings > Agents & MCP > *Behind a tunnel or reverse proxy*. |
 
 `allow_mutations`, `mutation_allowlist` and `allow_ui` gate the MCP server only;
 the CLI is your own shell and is not gated by them. See [MCP and

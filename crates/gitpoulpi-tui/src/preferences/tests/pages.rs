@@ -79,6 +79,18 @@ fn each_setting_is_on_the_page_the_owner_chose() {
                 "mcp.enabled",
                 #[cfg(feature = "mcp")]
                 "mcp.port",
+                #[cfg(feature = "mcp")]
+                "mcp.http_auth",
+                #[cfg(feature = "mcp")]
+                "mcp.token",
+                #[cfg(feature = "mcp")]
+                "mcp.tls",
+                #[cfg(feature = "mcp")]
+                "mcp.tls_cert",
+                #[cfg(feature = "mcp")]
+                "mcp.tls_key",
+                #[cfg(feature = "mcp")]
+                "mcp.behind_proxy",
                 "ui.allow_agent_view_control",
                 "mcp.allow_ui_propose",
                 "ui.launch",

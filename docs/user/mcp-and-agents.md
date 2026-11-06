@@ -64,10 +64,60 @@ gitpoulpi mcp serve --http 127.0.0.1:9000
 claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp
 ```
 
-Stateless JSON, same tools, same `[mcp]` gates. It has **no authentication**, so
-it listens on loopback only; `--allow-remote` lifts that, and then anyone who can
-reach the port can run every tool your config allows. Use it only behind a
-trusted network or an authenticating proxy.
+Stateless JSON, same tools, same `[mcp]` gates. Every request needs the bearer
+token (`[mcp] http_auth`, on by default): print it with `gitpoulpi mcp token
+--show` (or `--copy`, `--rotate`; the token lives in a user-only file under the
+private data folder) and give it to the client as a header:
+
+```
+claude mcp add --transport http gitpoulpi http://127.0.0.1:8808/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "mcpServers": {
+    "gitpoulpi": {
+      "type": "http",
+      "url": "http://127.0.0.1:8808/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+A missing or wrong token gets `401` with `WWW-Authenticate: Bearer`. A rotated
+token applies at once, with no server restart. Turning `http_auth` off is for a
+loopback endpoint where you trust every local account; the server then warns on
+stderr.
+
+### Reaching the endpoint from another machine
+
+The safest setup needs no remote listener at all: keep the loopback address and
+forward the port over SSH from the machine that runs the agent, `ssh -L
+8808:127.0.0.1:8808 host`. Then `--allow-remote` is not involved.
+
+`--allow-remote` (a non-loopback address) is refused unless authentication is on
+with a token in place **and** the traffic is encrypted. The refusal names what is
+missing. There are two ways to be encrypted:
+
+- **TLS in the server** (`[mcp] tls = "self_signed"` or `"files"`). The server
+  terminates TLS itself: it holds the key, runs the handshake, and only a finished
+  handshake reaches the HTTP layer; a plain-HTTP client fails the handshake and no
+  plain listener exists beside it. So the encryption is a fact the server
+  establishes on every connection, not an assumption. With `self_signed`, the
+  first start generates a pair under the private data folder and prints its
+  SHA-256 fingerprint (also in Settings); a client trusts the server by pinning
+  that fingerprint or the certificate file. With `files`, set `tls_cert` and
+  `tls_key` to your PEM files and clients verify the certificate by its CA.
+  Clients authenticate with the bearer token; client certificates are not used.
+- **A tunnel or reverse proxy** (`[mcp] behind_proxy = true`). A tunnel agent or
+  proxy connects like any local or LAN client and its headers can be forged, so
+  the server cannot tell from inside whether one is there. That is why it is an
+  explicit acknowledgement (shown with a red warning in Settings) instead of a
+  detection. Run the tunnel on the same machine and keep the loopback address when
+  you can. With a non-loopback address behind a proxy, the hop between the proxy
+  and the server is plain text on that network.
 
 **Without MCP**, an agent with a shell uses the CLI: `gitpoulpi --json <command>`
 (see the [CLI reference](cli-reference.md)). Give it the ready-made skill
@@ -79,7 +129,10 @@ and how to use GitPoulpi instead of raw `git`.
 | Switch | Default | Effect |
 |---|---|---|
 | `[mcp] enabled` | `true` | `false`: `gitpoulpi mcp serve` / `gitpoulpi-mcp` refuse to start (Settings > Agents & MCP > *MCP server*). Read when the server starts: a running server keeps its settings. |
-| `[mcp] bind` | `"127.0.0.1:8808"` | Address `--http` uses when none is given (loopback only unless `--allow-remote`). Settings > Agents & MCP > *MCP server port* edits its port and keeps the host. |
+| `[mcp] bind` | `"127.0.0.1:8808"` | Address `--http` uses when none is given (loopback only unless `--allow-remote`, which needs authentication and encryption, see above). Settings > Agents & MCP > *MCP server port* edits its port and keeps the host. |
+| `[mcp] http_auth` | `true` | `--http` needs `Authorization: Bearer <token>` (`gitpoulpi mcp token`). Settings > Agents & MCP > *HTTP authentication*. |
+| `[mcp] tls`, `tls_cert`, `tls_key` | `"off"` | `off`, `self_signed` or `files` (your PEM paths): the server terminates TLS itself. Settings > Agents & MCP > *TLS*. |
+| `[mcp] behind_proxy` | `false` | You vouch that a tunnel or reverse proxy encrypts the traffic, which lets `--allow-remote` run without TLS. |
 | `[mcp] allow_mutations` | `false` | Off: every tool that changes something is refused; reads, `ui_*` and proposals still work. `true` lets the agent commit, push, reset... |
 | `[mcp] mutation_allowlist` | `[]` | Non-empty: only these tools may change things, e.g. `["stage", "unstage", "commit"]`. |
 | `[mcp] allow_ui` | `true` | `false`: the agent cannot move your window (`ui_state` / `ui_viewers` still answer). |
@@ -429,6 +482,7 @@ Not exposed as tools:
 | CLI | Why |
 |---|---|
 | `gitpoulpi mcp serve` | the MCP server cannot spawn/serve a copy of itself |
+| `gitpoulpi mcp token` | prints, copies and rotates the key that guards this very server: an agent must not read or replace it |
 | `gitpoulpi completions` | shell completion generation, not a GitBackend operation |
 | `gitpoulpi shell-init` | prints a wrapper function for the user's own shell, not a GitBackend operation |
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |

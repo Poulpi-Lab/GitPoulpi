@@ -358,9 +358,9 @@ its keyboard form). This page has its own guide: [AI assistance](ai.md).
 
 ### Agents & MCP
 
-What AI agents may do in this window, and whether the MCP server may run. The
-two MCP rows show only in builds that include the server; see
-[MCP and agents](mcp-and-agents.md).
+What AI agents may do in this window, whether the MCP server may run, and how
+its HTTP endpoint is protected. The MCP rows show only in builds that include
+the server; see [MCP and agents](mcp-and-agents.md).
 
 | Option | What it does |
 |---|---|
@@ -369,6 +369,12 @@ two MCP rows show only in builds that include the server; see
 | **Allow AI agents to drive the view** | Lets agents show you a commit, a file or a notice in this window (`ui show`). Off: no agent reaches the window. |
 | **Let AI agents propose changes for me to confirm** | Lets agents open pre-filled Reword, commit, branch or tag dialogs that you confirm. Off by default. See [MCP and agents](mcp-and-agents.md#permissions). |
 | **Open a window for agents**, **Launch command (custom)** | Whether an agent may open a GitPoulpi window when none is open, and with which terminal or multiplexer. Off by default. |
+| **HTTP authentication** | On (default): the MCP HTTP endpoint answers only a request carrying the access token. Off shows a red warning: any program that can reach the endpoint can run every tool the MCP settings allow, and `--allow-remote` is refused. Saved as `mcp.http_auth`. |
+| **Access token** | The token, masked. The masked value is a button: `Enter` (or a click) shows it in full on the row below and hides it again. **Copy** puts it on the clipboard without echoing it in the status line, **Rotate** replaces it after a confirmation (clients holding the old token are refused at once, no server restart needed), **Create** makes the first one. `Left` / `Right` move between the buttons and `Enter` presses one. The same token is `gitpoulpi mcp token`. |
+| **TLS** | **Off** (default), **Self-signed** (the server makes a certificate once and shows its fingerprint) or **Files** (your certificate and key). The server ends TLS itself. Saved as `mcp.tls`; applies the next time the server starts. |
+| **Certificate path**, **Key path** | The PEM files used with **Files** (`mcp.tls_cert`, `mcp.tls_key`). |
+| **Certificate fingerprint** | Read-only: the SHA-256 fingerprint of the certificate the endpoint serves, for clients to check. |
+| **Behind a tunnel or reverse proxy** | Your statement that a tunnel or proxy in front of the endpoint encrypts the traffic, which lets `--allow-remote` run without TLS. The server cannot check it, so it shows a red warning while on. Saved as `mcp.behind_proxy`. See [MCP and agents](mcp-and-agents.md#reaching-the-endpoint-from-another-machine). |
 
 ### Appearance
 

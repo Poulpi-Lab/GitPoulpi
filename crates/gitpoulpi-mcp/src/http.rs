@@ -1,12 +1,14 @@
 //! The streamable-HTTP transport: the same tools as stdio, served by
 //! rmcp's `StreamableHttpService` over a hyper HTTP/1 listener.
 //!
-//! Security model: there is no authentication, so the listener is bound
-//! to loopback only. A non-loopback address is refused unless the caller
-//! passes `allow_remote` (the binary's `--allow-remote`), which also
-//! lifts rmcp's `Host`-header allow-list. Anyone who can reach the port
-//! can then run every tool `config.toml`'s `[mcp]` table permits.
-//! Local web pages are kept out by that same allow-list (DNS rebinding).
+//! Security model (`security.rs`): the endpoint answers only a request with
+//! the bearer token (`[mcp] http_auth`, on by default), optionally behind
+//! TLS the server terminates itself (`[mcp] tls`). A non-loopback address
+//! is refused unless `--allow-remote` is given AND authentication is on
+//! with a token in place AND the traffic is encrypted (TLS, or
+//! `behind_proxy` for a tunnel the user vouches for). `--allow-remote` also
+//! lifts rmcp's `Host`-header allow-list; local web pages are otherwise kept
+//! out by that allow-list (DNS rebinding).
 //!
 //! The service is stateless with plain JSON responses (no SSE, no
 //! `Mcp-Session-Id`): every tool is request/response and all state lives
@@ -24,6 +26,7 @@ use rmcp::transport::streamable_http_server::{StreamableHttpServerConfig, Stream
 use tokio::net::TcpListener;
 use tokio_util::sync::CancellationToken;
 
+use crate::security::{BearerGate, Security};
 use crate::server::{GitPoulpiServer, SharedServer};
 
 /// The default listen address of `gitpoulpi-mcp --http`.
@@ -44,17 +47,21 @@ pub fn resolve_bind(explicit: &str, cfg: &McpConfig) -> String {
     }
 }
 
+/// Parses a listen address.
+pub fn parse_bind(bind: &str) -> Result<SocketAddr, String> {
+    bind.parse()
+        .map_err(|e| format!("invalid bind address `{bind}`: {e}"))
+}
+
 /// Parses `bind` and listens on it, refusing a non-loopback address
-/// unless `allow_remote`.
+/// unless `allow_remote`. (`security::prepare` applies the rest of the
+/// `--allow-remote` rule before this runs.)
 pub async fn bind(bind: &str, allow_remote: bool) -> Result<TcpListener, String> {
-    let addr: SocketAddr = bind
-        .parse()
-        .map_err(|e| format!("invalid bind address `{bind}`: {e}"))?;
+    let addr = parse_bind(bind)?;
     if !addr.ip().is_loopback() && !allow_remote {
         return Err(format!(
-            "refusing to listen on non-loopback address {addr}: the MCP HTTP endpoint has no \
-             authentication, so anyone who can reach it can run every tool the [mcp] config \
-             allows. Pass --allow-remote if you really want that."
+            "refusing to listen on non-loopback address {addr}: pass --allow-remote, which \
+             needs authentication (mcp.http_auth) and TLS (mcp.tls) or mcp.behind_proxy"
         ));
     }
     TcpListener::bind(addr)
@@ -70,6 +77,7 @@ pub async fn serve(
     backend: DefaultBackend,
     cfg: McpConfig,
     allow_remote: bool,
+    security: Security,
     shutdown: CancellationToken,
 ) -> Result<(), String> {
     let handler = SharedServer(Arc::new(
@@ -87,6 +95,8 @@ pub async fn serve(
         Arc::new(NeverSessionManager::default()),
         config,
     );
+    let service = BearerGate::new(service, security.token.clone());
+    let acceptor = security.tls.clone().map(tokio_rustls::TlsAcceptor::from);
 
     loop {
         let (stream, _) = tokio::select! {
@@ -94,12 +104,24 @@ pub async fn serve(
             accepted = listener.accept() => accepted.map_err(|e| format!("accept failed: {e}"))?,
         };
         let hyper_service = TowerToHyperService::new(service.clone());
+        let acceptor = acceptor.clone();
         tokio::spawn(async move {
-            // Per-connection errors (client hung up mid-request) are not
-            // the server's problem.
-            let _ = Builder::new(TokioExecutor::new())
-                .serve_connection(TokioIo::new(stream), hyper_service)
-                .await;
+            // Per-connection errors (client hung up mid-request, a failed
+            // TLS handshake) are not the server's problem.
+            match acceptor {
+                Some(acceptor) => {
+                    if let Ok(tls) = acceptor.accept(stream).await {
+                        let _ = Builder::new(TokioExecutor::new())
+                            .serve_connection(TokioIo::new(tls), hyper_service)
+                            .await;
+                    }
+                }
+                None => {
+                    let _ = Builder::new(TokioExecutor::new())
+                        .serve_connection(TokioIo::new(stream), hyper_service)
+                        .await;
+                }
+            }
         });
     }
 }

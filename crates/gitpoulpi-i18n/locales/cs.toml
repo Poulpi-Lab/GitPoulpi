@@ -8641,3 +8641,71 @@ no_extra_label = "Žádný další soubor"
 no_extra_help = "Nedávat modelu pro tento repozitář žádný další soubor, i když ho globální nastavení určuje. Prázdné pole místo toho globální nastavení následuje."
 # context: message in the file picker when the user tries to create a folder there
 no_new_folder = "Vyberte existující soubor: složku zde vytvořit nelze."
+
+[mcp_security]
+# context: heading in Settings > Agents & MCP above the rows that protect the MCP HTTP endpoint
+heading = "MCP HTTP endpoint security"
+# context: label of a switch in Settings > Agents & MCP; the MCP server's HTTP endpoint asks clients for an access token
+auth = "HTTP authentication"
+# context: help under the HTTP authentication switch
+auth_help = "Requests to the MCP HTTP endpoint (gitpoulpi mcp serve --http) must carry the access token. Applies the next time the server starts."
+# context: red warning shown while HTTP authentication is off
+auth_warning = "Authentication is off: any program that can reach the endpoint can run every tool the MCP settings allow."
+# context: label of the row that shows the access token of the MCP HTTP endpoint
+token = "Access token"
+# context: value of the access token row when no token has been made yet
+token_none = "(none yet)"
+# context: help under the access token row
+token_help = "Clients send it as Authorization: Bearer followed by the token. It is kept in a file only you can read. A new token applies at once: clients holding the old one are refused."
+# context: button that reveals the access token on screen
+show = "Show"
+# context: button that hides the access token again
+hide = "Hide"
+# context: button that copies the access token to the clipboard
+copy = "Copy"
+# context: button that replaces the access token with a new one
+rotate = "Rotate"
+# context: button that makes the first access token when there is none
+create = "Create"
+# context: status line after the access token was copied; the token itself is never shown there
+token_copied = "Access token copied to the clipboard."
+# context: status line after the access token was replaced
+token_rotated = "Access token replaced."
+# context: status line when the access token file could not be written; {reason} is the system error
+token_failed = "Could not keep the access token: {reason}"
+# context: status line when there is no access token to show or copy
+token_missing = "There is no access token yet."
+# context: label of a choice in Settings > Agents & MCP: how the MCP HTTP endpoint is encrypted (TLS)
+tls = "TLS"
+# context: help under the TLS choice
+tls_help = "Encrypts the HTTP endpoint; the server ends TLS itself, so a plain connection is refused. Self-signed makes a certificate once and shows its fingerprint for clients to check. Files uses the certificate and key below. Applies the next time the server starts."
+# context: TLS choice: no encryption
+tls_off = "Off"
+# context: TLS choice: the server makes its own certificate
+tls_self_signed = "Self-signed"
+# context: TLS choice: the user supplies a certificate and a key file
+tls_files = "Files"
+# context: label of a path field in Settings > Agents & MCP: the TLS certificate file
+tls_cert = "Certificate path"
+# context: help under the certificate path
+tls_cert_help = "PEM file with the certificate chain. Used when TLS is set to Files."
+# context: label of a path field in Settings > Agents & MCP: the TLS private key file
+tls_key = "Key path"
+# context: help under the key path
+tls_key_help = "PEM file with the private key. Used when TLS is set to Files."
+# context: label of a read-only row: the SHA-256 fingerprint of the certificate the endpoint serves
+fingerprint = "Certificate fingerprint"
+# context: help under the fingerprint row
+fingerprint_help = "SHA-256 of the certificate the endpoint serves. A client that checks this value is talking to this server."
+# context: value of the fingerprint row when TLS is Self-signed and the certificate does not exist yet
+fingerprint_pending = "(made when the server first starts with TLS)"
+# context: value of the fingerprint row when the certificate file cannot be read
+fingerprint_unreadable = "(certificate not readable)"
+# context: value of the fingerprint row when TLS is off
+fingerprint_off = "(TLS is off)"
+# context: label of a switch in Settings > Agents & MCP: the user states that a tunnel or reverse proxy encrypts the traffic
+proxy = "Behind a tunnel or reverse proxy"
+# context: help under that switch
+proxy_help = "Switch on when a tunnel or proxy in front of the endpoint encrypts the traffic. The server cannot check that, so it is your statement. It lets a non-loopback address run without TLS. Keeping the loopback address and using ssh -L is safer."
+# context: red warning shown while that switch is on
+proxy_warning = "Without TLS, the hop between the tunnel or proxy and the server is plain text on that network."

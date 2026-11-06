@@ -277,6 +277,19 @@ fn run_mcp_command(session: &str, action: McpAction, backend: DefaultBackend) {
                 std::process::exit(1);
             }
         }
+        McpAction::Token { show, copy, rotate } => {
+            let Some(paths) = gitpoulpi_config::ConfigPaths::discover() else {
+                eprintln!("gitpoulpi: mcp token failed: no config folder is available");
+                std::process::exit(1);
+            };
+            match gitpoulpi_commands::mcp_cmd::token(&paths, show, copy, rotate) {
+                Ok(report) => println!("{report}"),
+                Err(err) => {
+                    eprintln!("gitpoulpi: mcp token failed: {err}");
+                    std::process::exit(1);
+                }
+            }
+        }
     }
 }
 

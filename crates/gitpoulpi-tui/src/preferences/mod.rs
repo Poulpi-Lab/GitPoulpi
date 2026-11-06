@@ -83,6 +83,8 @@ mod launcher_alias;
 mod launcher_page;
 pub(crate) mod list_editor;
 mod list_page;
+#[cfg(feature = "mcp")]
+mod mcp_security;
 mod model;
 mod nav;
 mod open_in_page;
@@ -218,6 +220,9 @@ pub(crate) struct PreferencesState {
     launcher: launcher_page::LauncherState,
     /// The command alias and PATH rows under it, read on a thread.
     tools: launcher_alias::ToolsState,
+    /// The MCP endpoint's access token rows (`mcp_security`).
+    #[cfg(feature = "mcp")]
+    mcp_sec: mcp_security::McpSecurityState,
     /// The detected image editors, set by tests; the page otherwise asks the
     /// shared background lookup (`image_editor::detected_ready`).
     image_detected: std::cell::OnceCell<gitpoulpi_config::image_editors::Detected>,
@@ -521,6 +526,8 @@ impl PreferencesState {
             image_index: 0,
             launcher: Default::default(),
             tools: Default::default(),
+            #[cfg(feature = "mcp")]
+            mcp_sec: mcp_security::McpSecurityState::read(),
             image_detected: std::cell::OnceCell::new(),
             open_in_detected: std::cell::OnceCell::new(),
             repo_root: repo_root.to_path_buf(),

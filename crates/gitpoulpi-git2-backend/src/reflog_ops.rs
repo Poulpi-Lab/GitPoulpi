@@ -37,6 +37,8 @@ pub fn reflog(repo: &RepoRef, refname: &str, skip: usize, limit: usize) -> Resul
             time: who.when().seconds(),
             message: entry
                 .message()
+                .ok()
+                .flatten()
                 .unwrap_or_default()
                 .trim_end_matches(['\r', '\n'])
                 .to_string(),

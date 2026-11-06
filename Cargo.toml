@@ -120,7 +120,7 @@ directories = "5"
 tracing = "0.1"
 tempfile = "3"
 insta = "1"
-git2 = { version = "0.19", default-features = false }
+git2 = { version = "0.21", default-features = false }
 # `git.default_encoding`: decoding non-UTF-8 file content for display.
 encoding_rs = "0.8"
 # The merge conflict editor aligns each side's real file against the merged

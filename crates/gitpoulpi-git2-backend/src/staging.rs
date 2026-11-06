@@ -107,7 +107,7 @@ fn add_dirty(git: &git2::Repository, index: &mut git2::Index, dir: Option<&str>)
     let mut nested: Vec<String> = Vec::new();
     for entry in statuses.iter() {
         let st = entry.status();
-        let Some(path) = entry.path() else { continue };
+        let Some(path) = entry.path().ok() else { continue };
         if path.ends_with('/') {
             // An untracked nested repository: let libgit2 add it as one.
             nested.push(path.trim_end_matches('/').to_string());
@@ -264,6 +264,6 @@ fn unmerged_free_specs(git: &git2::Repository, spec: &str) -> Result<Vec<String>
     Ok(statuses
         .iter()
         .filter(|e| e.status().intersects(staged) && !e.status().contains(git2::Status::CONFLICTED))
-        .filter_map(|e| e.path().map(str::to_string))
+        .filter_map(|e| e.path().ok().map(str::to_string))
         .collect())
 }

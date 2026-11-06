@@ -22,7 +22,7 @@ fn tips(repo: &git2::Repository) -> Result<Vec<git2::Oid>> {
     let mut out: Vec<git2::Oid> = Vec::new();
     let refs = repo.references().map_err(map_err)?;
     for reference in refs.flatten() {
-        let Some(name) = reference.name() else {
+        let Ok(name) = reference.name() else {
             continue;
         };
         if !(name.starts_with("refs/heads/")
@@ -99,7 +99,7 @@ pub fn commit_messages(repo: &RepoRef, query: &CommitMessagesQuery) -> Result<Co
         let commit = git_repo
             .find_commit(oid.map_err(map_err)?)
             .map_err(map_err)?;
-        let header = commit.message_encoding();
+        let header = commit.message_encoding().ok().flatten();
         let message = decode_commit_text(commit.message_bytes(), header);
         let (subject, body) = split_message(&message);
         out.commits.push(CommitMessage {

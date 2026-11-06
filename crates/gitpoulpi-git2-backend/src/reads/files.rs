@@ -30,7 +30,7 @@ pub fn worktrees(repo: &RepoRef) -> Result<Vec<Worktree>> {
     // lookup (one `Repository::open` per worktree, the dominant cost) on
     // scoped threads, so N worktrees cost about one open.
     let mut linked: Vec<(PathBuf, bool)> = Vec::new();
-    for name in git_repo.worktrees().map_err(map_err)?.iter().flatten() {
+    for name in git_repo.worktrees().map_err(map_err)?.iter().flatten().flatten() {
         let wt = match git_repo.find_worktree(name) {
             Ok(wt) => wt,
             // A worktree whose directory was deleted without
@@ -118,7 +118,7 @@ fn branch_at(path: &std::path::Path) -> Option<String> {
     if !head.is_branch() {
         return None;
     }
-    head.shorthand().map(str::to_string)
+    head.shorthand().ok().map(str::to_string)
 }
 
 /// See `GitBackend::read_blob`.
@@ -339,7 +339,9 @@ pub fn blame(repo: &RepoRef, path: &Path, at: Oid) -> Result<Blame> {
             metas.insert(key.clone(), meta);
         }
         let meta = &metas[&key];
-        let signature = hunk.final_signature();
+        let signature = hunk
+            .final_signature()
+            .ok_or_else(|| Error::Backend("a blame hunk without a signature".into()))?;
         // A hunk covers a run of consecutive lines; this line's position
         // inside that run is the same in the original file.
         let offset = final_line.saturating_sub(hunk.final_start_line() as u32);
@@ -380,7 +382,7 @@ struct CommitMeta {
 /// here).
 fn commit_meta(repo: &git2::Repository, id: git2::Oid, path: &str) -> Result<CommitMeta> {
     let commit = repo.find_commit(id).map_err(map_err)?;
-    let summary = commit.summary().unwrap_or_default().to_string();
+    let summary = commit.summary().ok().flatten().unwrap_or_default().to_string();
     let committer_time = commit.committer().when().seconds();
     let Ok(parent) = commit.parent(0) else {
         return Ok(CommitMeta {
@@ -455,7 +457,7 @@ pub fn list_tree(repo: &RepoRef, at: Oid) -> Result<Vec<PathBuf>> {
         if entry.kind() == Some(git2::ObjectType::Tree) {
             return git2::TreeWalkResult::Ok;
         }
-        if let Some(name) = entry.name() {
+        if let Ok(name) = entry.name() {
             // `dir` is already `/`-separated and either empty or
             // `/`-terminated, so this concatenation is the whole conversion.
             paths.push(PathBuf::from(format!("{dir}{name}")));
@@ -514,9 +516,9 @@ pub fn submodules(repo: &RepoRef) -> Result<Vec<Submodule>> {
             SubmoduleState::UpToDate
         };
         out.push(Submodule {
-            name: sm.name().unwrap_or(&path).to_string(),
-            url: sm.url().unwrap_or_default().to_string(),
-            branch: sm.branch().map(str::to_string),
+            name: sm.name().ok().unwrap_or(&path).to_string(),
+            url: sm.url().ok().flatten().unwrap_or_default().to_string(),
+            branch: sm.branch().ok().flatten().map(str::to_string),
             state,
             expected,
             head,

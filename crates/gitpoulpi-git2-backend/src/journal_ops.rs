@@ -10,7 +10,7 @@ use crate::repo::{map_err, open, to_domain_oid, to_git2_oid};
 
 fn head_state(repo: &git2::Repository) -> Result<HeadState> {
     let head = repo.find_reference("HEAD").map_err(map_err)?;
-    if let Some(target) = head.symbolic_target() {
+    if let Some(target) = head.symbolic_target().ok().flatten() {
         return Ok(HeadState::Branch(
             target
                 .strip_prefix("refs/heads/")
@@ -30,12 +30,12 @@ pub fn ref_snapshot(repo: &RepoRef, scope: &RefScope) -> Result<RefSnapshot> {
     let mut symrefs = BTreeMap::new();
     for reference in git_repo.references().map_err(map_err)? {
         let reference = reference.map_err(map_err)?;
-        if let (Some(name), Some(target)) = (reference.name(), reference.symbolic_target()) {
+        if let (Some(name), Some(target)) = (reference.name().ok(), reference.symbolic_target().ok().flatten()) {
             if scope.prefixes.iter().any(|p| name.starts_with(p.as_str())) {
                 symrefs.insert(name.to_string(), target.to_string());
             }
         }
-        let (Some(name), Some(target)) = (reference.name(), reference.target()) else {
+        let (Some(name), Some(target)) = (reference.name().ok(), reference.target()) else {
             continue;
         };
         if scope.prefixes.iter().any(|p| name.starts_with(p.as_str())) {
@@ -183,7 +183,7 @@ fn read_section(config: &git2::Config, section: &str) -> Result<Vec<(String, Str
     let mut entries = config.entries(None).map_err(map_err)?;
     while let Some(entry) = entries.next() {
         let entry = entry.map_err(map_err)?;
-        let Some(key) = entry.name() else { continue };
+        let Some(key) = entry.name().ok() else { continue };
         if gitpoulpi_cli_backend::config_key_in_section(section, key) {
             out.push((key.to_string(), entry.value().unwrap_or("").to_string()));
         }
@@ -198,7 +198,7 @@ pub fn remote_dependents(repo: &RepoRef, remote: &str) -> Result<Vec<String>> {
     let mut entries = config.entries(None).map_err(map_err)?;
     while let Some(entry) = entries.next() {
         let entry = entry.map_err(map_err)?;
-        if let Some(key) = entry.name() {
+        if let Some(key) = entry.name().ok() {
             all.push((key.to_string(), entry.value().unwrap_or("").to_string()));
         }
     }

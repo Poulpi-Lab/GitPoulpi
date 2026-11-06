@@ -3,7 +3,8 @@
 //! Only the release's own files are taken, by exact name, from the archive's
 //! top-level directory (`gitpoulpi-<version>-<target>/`): the binaries and the
 //! marker. Nothing else is written, whatever the archive contains, so a
-//! crafted entry name (`../x`, an absolute path) has nothing to land on.
+//! crafted entry name (`../x`, an absolute path) has nothing to land on. A zip
+//! entry whose name is not enclosed in the archive root is refused outright.
 
 use std::io::Read;
 
@@ -95,10 +96,19 @@ fn read_zip(bytes: &[u8], stem: &str, wanted: &[String]) -> Result<Vec<ArchiveFi
     let mut out = Vec::new();
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).map_err(bad)?;
+        // `enclosed_name` is the crate's own check: no NUL byte, no absolute
+        // path, nothing that climbs out of the archive root. An entry that
+        // fails it is a crafted archive, refused as a whole. A symlink is
+        // never taken (its target is not a file of the release).
+        let Some(enclosed) = file.enclosed_name() else {
+            return Err(UpdateError::Archive(
+                "an archive entry has an unsafe path".to_string(),
+            ));
+        };
         if !file.is_file() {
             continue;
         }
-        let path = file.name().replace('\\', "/");
+        let path = enclosed.to_string_lossy().replace('\\', "/");
         let Some(name) = path
             .strip_prefix(stem)
             .and_then(|p| p.strip_prefix('/'))
@@ -174,6 +184,33 @@ mod tests {
         let files = extract(&bytes, "0.2.0", WIN).unwrap();
         assert!(files.iter().any(|f| f.name == "gitpoulpi-tui.exe"));
         assert!(files.iter().any(|f| f.name == MARKER_FILE));
+    }
+
+    #[test]
+    fn a_zip_with_an_unsafe_entry_path_is_refused() {
+        let stem = release::package_stem("0.2.0", WIN);
+        for bad_name in ["../../evil", "../../../etc/passwd", "sub/../../../evil"] {
+            let mut e = entries("0.2.0", WIN);
+            e.push(Entry {
+                name: bad_name.into(),
+                data: b"x".to_vec(),
+                executable: false,
+            });
+            let bytes = write_zip(&stem, &e).unwrap();
+            assert!(
+                matches!(extract(&bytes, "0.2.0", WIN), Err(UpdateError::Archive(_))),
+                "{bad_name} must be refused"
+            );
+        }
+        // An absolute entry name (an empty stem puts a leading slash).
+        let bytes = write_zip("", &entries("0.2.0", WIN)).unwrap();
+        assert!(matches!(
+            extract(&bytes, "0.2.0", WIN),
+            Err(UpdateError::Archive(_))
+        ));
+        // A plain archive still extracts.
+        let bytes = write_zip(&stem, &entries("0.2.0", WIN)).unwrap();
+        assert!(extract(&bytes, "0.2.0", WIN).is_ok());
     }
 
     #[test]

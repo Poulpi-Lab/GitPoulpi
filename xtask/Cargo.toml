@@ -41,7 +41,7 @@ vt100.workspace = true
 # runs the same on Windows and Linux with no tar/zip/sha256sum on PATH.
 flate2 = "1"
 tar = { version = "0.4", default-features = false }
-zip = { version = "2", default-features = false, features = ["deflate"] }
+zip = { version = "9.2.3", default-features = false, features = ["deflate"] }
 sha2 = { workspace = true, features = ["std"] }
 
 # `xtask sign` (release signing), `xtask lock-age` (crates.io publish dates over

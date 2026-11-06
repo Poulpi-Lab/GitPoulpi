@@ -71,8 +71,14 @@ fn generate(term: &mut Terminal) {
 }
 
 fn wait_dialog(term: &Terminal) -> xtask::pty::Screen {
-    term.wait_for("the What is sent dialog", STEP, |s| {
+    // The whole dialog, buttons included: the title can be on screen a frame
+    // before the rows under it.
+    term.wait_for("the What is sent dialog with its buttons", STEP, |s| {
         s.contains("Review what is sent to Fake agent")
+            && (0..s.rows()).any(|r| {
+                let line = s.line(r);
+                line.contains("Send") && line.contains("Cancel")
+            })
     })
     .unwrap_or_else(|e| panic!("{e}"))
 }

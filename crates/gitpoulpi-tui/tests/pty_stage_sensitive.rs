@@ -43,7 +43,9 @@ fn stage_all(term: &mut Terminal) -> Screen {
     term.send_keys("C-g").expect("Ctrl+G");
     term.send_keys("a").expect("a");
     term.wait_for("the sensitive files question", STEP, |s| {
-        s.contains("Sensitive files") && s.contains("Stage anyway")
+        s.contains("Sensitive files")
+            && s.contains("1. Stage anyway")
+            && s.contains("2. Cancel, stage nothing")
     })
     .unwrap_or_else(|e| panic!("{e}"))
 }

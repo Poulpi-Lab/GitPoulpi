@@ -430,6 +430,15 @@ mod tests {
                 );
                 continue;
             }
+            // The TUI points at its own question, not at the CLI command.
+            if matches!(typed, TypedError::HooksNotTrusted { .. }) {
+                assert_eq!(
+                    shown,
+                    "The workflow hooks are not trusted: 1 command was not run. Review it and \
+                     trust it first."
+                );
+                continue;
+            }
             assert_eq!(
                 shown,
                 CoreError::from_typed(typed.clone()).to_string(),

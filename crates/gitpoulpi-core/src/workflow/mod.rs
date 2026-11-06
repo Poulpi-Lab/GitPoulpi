@@ -24,8 +24,8 @@ pub use classify::{Classification, CompiledWorkflow, ParentInfo, ParentSource};
 pub use detect::{detect, Detection, FoundBase, FoundTopic};
 pub use flow::{
     branch_title, plan_flow, FlowAction, FlowFacts, FlowOutcome, FlowPlan, FlowRequest, FlowResume,
-    FlowState, FlowStatus, FlowStep, HookInfo, HooksReport, HooksTrust, TrustHooksArgs, MergeRequestSpec, StepReport, StepStatus,
-    SyncMethod,
+    FlowState, FlowStatus, FlowStep, HookInfo, HooksReport, HooksTrust, MergeRequestSpec,
+    StepReport, StepStatus, SyncMethod, TrustHooksArgs,
 };
 pub use import::{
     import_git_flow, import_git_town, parse_recorded_parents, Imported, RECORDED_PARENT_VARIABLE,

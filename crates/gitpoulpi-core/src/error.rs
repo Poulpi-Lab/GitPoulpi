@@ -635,6 +635,27 @@ mod tests {
     }
 
     #[test]
+    fn hooks_not_trusted_round_trips_with_its_commands() {
+        let original = Error::HooksNotTrusted {
+            hash: "ab".repeat(32),
+            hooks: vec![crate::workflow::HookInfo {
+                phase: "after_start".into(),
+                command: "make".into(),
+                personal: false,
+            }],
+        };
+        assert!(original.to_string().contains("not trusted"));
+        let wire = serde_json::to_string(&original.typed().unwrap()).unwrap();
+        match Error::from_typed(serde_json::from_str(&wire).unwrap()) {
+            Error::HooksNotTrusted { hash, hooks } => {
+                assert_eq!(hash.len(), 64);
+                assert_eq!(hooks[0].command, "make");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
     fn not_built_round_trips_and_serialises_with_a_stable_kind() {
         let original = Error::NotBuilt { feature: "lfs" };
         assert_eq!(original.to_string(), "lfs is not built into this binary");

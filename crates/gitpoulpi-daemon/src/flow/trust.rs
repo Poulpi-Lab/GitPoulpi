@@ -75,10 +75,15 @@ fn not_trusted(hash: String, hooks: Vec<HookInfo>) -> Failure {
 /// The refusal of a fresh run: the plan runs hooks and the committed ones
 /// are not trusted. Nothing has run.
 pub(super) fn check_plan(plan: &FlowPlan) -> Result<(), Failure> {
-    let runs_shared_hooks = plan
-        .steps
-        .iter()
-        .any(|s| matches!(s, FlowStep::Hook { personal: false, .. }));
+    let runs_shared_hooks = plan.steps.iter().any(|s| {
+        matches!(
+            s,
+            FlowStep::Hook {
+                personal: false,
+                ..
+            }
+        )
+    });
     match &plan.hooks_trust {
         HooksTrust::Untrusted { hash, .. } if runs_shared_hooks => {
             Err(not_trusted(hash.clone(), plan.hooks.clone()))
@@ -142,12 +147,9 @@ pub(super) fn check_resume(repo: &RepoRef, steps: &[FlowStep]) -> Result<(), Fai
 pub(crate) fn trust_hooks(repo: &RepoRef, args: &serde_json::Value) -> Result<HooksReport, Error> {
     let parsed: TrustHooksArgs = serde_json::from_value(args.clone())
         .map_err(|e| Error::Backend(format!("invalid arguments: {e}")))?;
-    let loaded = LoadedWorkflow::load(&repo.root, &crate::workflow::state_dir())
-        .map_err(Error::Backend)?;
-    let hooks = loaded
-        .shared
-        .map(|s| s.workflow.hooks)
-        .unwrap_or_default();
+    let loaded =
+        LoadedWorkflow::load(&repo.root, &crate::workflow::state_dir()).map_err(Error::Backend)?;
+    let hooks = loaded.shared.map(|s| s.workflow.hooks).unwrap_or_default();
     let hash = if hooks.is_empty() {
         String::new()
     } else {

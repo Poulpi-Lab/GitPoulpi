@@ -1302,7 +1302,10 @@ impl FlowDialog {
                         buf,
                         inner.x,
                         message_y,
-                        &format!("{spin} {}", gitpoulpi_i18n::msg::flow_hook_trust::TRUSTING.get()),
+                        &format!(
+                            "{spin} {}",
+                            gitpoulpi_i18n::msg::flow_hook_trust::TRUSTING.get()
+                        ),
                         inner.width,
                         muted,
                     );

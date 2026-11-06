@@ -804,9 +804,11 @@ fn untrusted_hooks_ask_before_anything_runs_and_trust_and_run_sends_the_hash() {
     d.on_key(key(KeyCode::Enter));
     wait_poll(&mut d, |s| s.contains("Done."));
     let calls = fake.calls();
-    assert!(calls.contains(&Call::TrustHooks("ab".repeat(32))), "{calls:?}");
-    let Some(Call::Execute(request)) = calls.iter().find(|c| matches!(c, Call::Execute(_)))
-    else {
+    assert!(
+        calls.contains(&Call::TrustHooks("ab".repeat(32))),
+        "{calls:?}"
+    );
+    let Some(Call::Execute(request)) = calls.iter().find(|c| matches!(c, Call::Execute(_))) else {
         panic!("{calls:?}");
     };
     assert!(request.run_hooks, "trusted: the hooks run");
@@ -820,11 +822,16 @@ fn run_without_hooks_never_asks_the_daemon_to_trust() {
     d.on_key(key(KeyCode::Enter));
     d.on_key(key(KeyCode::Char('2')));
     let screen = wait_poll(&mut d, |s| s.contains("Done."));
-    assert!(!screen.contains("cargo fmt"), "the hook step is not run:\n{screen}");
+    assert!(
+        !screen.contains("cargo fmt"),
+        "the hook step is not run:\n{screen}"
+    );
     let calls = fake.calls();
-    assert!(!calls.iter().any(|c| matches!(c, Call::TrustHooks(_))), "{calls:?}");
-    let Some(Call::Execute(request)) = calls.iter().find(|c| matches!(c, Call::Execute(_)))
-    else {
+    assert!(
+        !calls.iter().any(|c| matches!(c, Call::TrustHooks(_))),
+        "{calls:?}"
+    );
+    let Some(Call::Execute(request)) = calls.iter().find(|c| matches!(c, Call::Execute(_))) else {
         panic!("{calls:?}");
     };
     assert!(!request.run_hooks);
@@ -840,7 +847,10 @@ fn escape_cancels_the_question_and_a_second_escape_leaves_the_dialog() {
     assert_eq!(d.on_key(key(KeyCode::Esc)), FlowOutcome::Stay);
     let screen = paint(&mut d);
     assert!(!screen.contains("Trust them?"), "{screen}");
-    assert!(screen.contains("This will:"), "back on the preview:\n{screen}");
+    assert!(
+        screen.contains("This will:"),
+        "back on the preview:\n{screen}"
+    );
     assert!(!fake
         .calls()
         .iter()
@@ -860,7 +870,10 @@ fn changed_hooks_say_so_and_show_the_old_list_and_the_buttons_answer_like_the_ke
     wait_poll(&mut d, |s| s.contains("This will:"));
     d.on_key(key(KeyCode::Enter));
     let screen = paint(&mut d);
-    assert!(screen.contains("The hooks changed since you trusted them"), "{screen}");
+    assert!(
+        screen.contains("The hooks changed since you trusted them"),
+        "{screen}"
+    );
     assert!(screen.contains("$ make old"), "{screen}");
     // The Cancel button is the mouse twin of Esc.
     let area = Rect::new(0, 0, 110, 26);
@@ -908,6 +921,9 @@ fn trusted_and_personal_hooks_keep_the_checkbox_and_never_ask() {
         assert!(screen.contains("[ ] Run the hooks"), "{screen}");
         d.on_key(key(KeyCode::Enter));
         wait_poll(&mut d, |s| s.contains("Done."));
-        assert!(!fake.calls().iter().any(|c| matches!(c, Call::TrustHooks(_))));
+        assert!(!fake
+            .calls()
+            .iter()
+            .any(|c| matches!(c, Call::TrustHooks(_))));
     }
 }

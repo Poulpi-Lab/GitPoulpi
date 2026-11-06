@@ -140,7 +140,11 @@ fn wrap_words(text: &str, width: usize) -> Vec<String> {
 impl HookTrust {
     /// `now`: the commands the repository wants to run; `previous`: the list
     /// trusted before when the file changed since.
-    pub(crate) fn new(hash: String, now: &[(String, String)], previous: Option<&[HookInfo]>) -> Self {
+    pub(crate) fn new(
+        hash: String,
+        now: &[(String, String)],
+        previous: Option<&[HookInfo]>,
+    ) -> Self {
         let mut lines = Vec::new();
         push_hooks(&mut lines, msg::COMMANDS_HEADING.get(), now);
         if let Some(old) = previous {
@@ -389,7 +393,14 @@ impl HookTrust {
                 Kind::Phase => Style::default().fg(th().ui.muted).bg(panel),
                 Kind::Command | Kind::Blank => Style::default().fg(th().ui.text).bg(panel),
             };
-            dialog_kit::put(buf, text_x, pane.y + 1 + i as u16, text, text_w as u16, style);
+            dialog_kit::put(
+                buf,
+                text_x,
+                pane.y + 1 + i as u16,
+                text,
+                text_w as u16,
+                style,
+            );
         }
         self.track = Track::vertical(pane, self.content, self.top);
         if let Some(track) = self.track {
@@ -437,12 +448,22 @@ mod tests {
         assert_eq!(pane.on_key(key(KeyCode::Enter)), Event::Handled);
         assert_eq!(pane.cursor(), None);
         assert_eq!(pane.on_key(key(KeyCode::Down)), Event::Handled);
-        assert_eq!(pane.cursor(), Some(0), "the first arrow only starts the highlight");
+        assert_eq!(
+            pane.cursor(),
+            Some(0),
+            "the first arrow only starts the highlight"
+        );
         assert_eq!(pane.on_key(key(KeyCode::Enter)), Event::Pick(Pick::Trust));
         assert_eq!(pane.on_key(key(KeyCode::Down)), Event::Handled);
         assert_eq!(pane.on_key(key(KeyCode::Enter)), Event::Pick(Pick::Skip));
-        assert_eq!(pane.on_key(key(KeyCode::Char('1'))), Event::Pick(Pick::Trust));
-        assert_eq!(pane.on_key(key(KeyCode::Char('2'))), Event::Pick(Pick::Skip));
+        assert_eq!(
+            pane.on_key(key(KeyCode::Char('1'))),
+            Event::Pick(Pick::Trust)
+        );
+        assert_eq!(
+            pane.on_key(key(KeyCode::Char('2'))),
+            Event::Pick(Pick::Skip)
+        );
         assert_eq!(pane.on_key(key(KeyCode::Esc)), Event::Cancel);
     }
 
@@ -451,12 +472,18 @@ mod tests {
         let long = "Q".repeat(150);
         let hooks = vec![
             ("after_start".to_string(), long.clone()),
-            ("before_finish".to_string(), "echo \u{1b}[2J\tdone".to_string()),
+            (
+                "before_finish".to_string(),
+                "echo \u{1b}[2J\tdone".to_string(),
+            ),
         ];
         let mut pane = HookTrust::new("h".into(), &hooks, None);
         let (buf, area) = painted(&mut pane);
         let text = dialog_kit::buffer_text(&buf);
-        assert!(!text.contains('\u{1b}'), "an escape never reaches the screen");
+        assert!(
+            !text.contains('\u{1b}'),
+            "an escape never reaches the screen"
+        );
         assert!(text.contains("\\x1b[2J    done"), "{text}");
         // The 150-char command wraps over several rows, none lost.
         let xs: usize = (0..area.height)
@@ -503,7 +530,11 @@ mod tests {
         let thumb_row = track.rect.y + track.thumb_start;
         let col = track.rect.x;
         assert_eq!(
-            pane.on_mouse(mouse(MouseEventKind::Down(MouseButton::Left), col, thumb_row)),
+            pane.on_mouse(mouse(
+                MouseEventKind::Down(MouseButton::Left),
+                col,
+                thumb_row
+            )),
             Event::Handled
         );
         pane.on_mouse(mouse(
@@ -512,7 +543,11 @@ mod tests {
             track.rect.y + track.track_len,
         ));
         assert_eq!(pane.top(), pane.max_top(), "dragged to the end");
-        pane.on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), col, track.rect.y));
+        pane.on_mouse(mouse(
+            MouseEventKind::Up(MouseButton::Left),
+            col,
+            track.rect.y,
+        ));
         pane.on_key(key(KeyCode::End));
         assert_eq!(pane.top(), pane.max_top());
     }

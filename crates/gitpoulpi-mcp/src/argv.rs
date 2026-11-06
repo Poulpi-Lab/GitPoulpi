@@ -227,8 +227,9 @@ mod tests {
                 .all(|s| s.cli_path != ["flow", "trust-hooks"]),
             "`flow trust-hooks` is a tool"
         );
-        assert!(registry::excluded_reason(&["flow".to_string(), "trust-hooks".to_string()])
-            .is_some());
+        assert!(
+            registry::excluded_reason(&["flow".to_string(), "trust-hooks".to_string()]).is_some()
+        );
         let s = spec("flow_start");
         let schema = crate::schema::arg_schema(&s.command);
         assert!(schema["properties"].get("hash").is_none());

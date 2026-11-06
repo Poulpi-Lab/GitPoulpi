@@ -158,9 +158,8 @@ fn hooks_refusal(plan: &FlowPlan, hash: &str) -> Emitted {
         .iter()
         .map(|h| json!({ "phase": h.phase, "command": h.command }))
         .collect();
-    let mut human = vec![
-        "the repository's workflow hooks are not trusted, nothing was run:".to_string(),
-    ];
+    let mut human =
+        vec!["the repository's workflow hooks are not trusted, nothing was run:".to_string()];
     for hook in &plan.hooks {
         human.push(format!("  {}: {}", hook.phase, hook.command));
     }

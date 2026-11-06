@@ -8684,4 +8684,4 @@ trusting = "Remembering your answer..."
 # context: one-line note in the Flow preview when the hooks are not trusted yet; the question comes when the action runs
 untrusted_note = "These hooks are not trusted yet: you are asked before they run."
 # context: error text when the daemon refused a run because the committed workflow hooks are not trusted; {n} is how many commands there are
-not_trusted = { one = "The workflow hooks are not trusted: {n} command was not run. Review it and trust it first.", other = "The workflow hooks are not trusted: {n} commands were not run. Review them and trust them first." }
+not_trusted = { one = "Les hooks du workflow ne sont pas approuvés : {n} commande n'a pas été exécutée. Relisez-la et approuvez-la d'abord.", other = "Les hooks du workflow ne sont pas approuvés : {n} commandes n'ont pas été exécutées. Relisez-les et approuvez-les d'abord." }

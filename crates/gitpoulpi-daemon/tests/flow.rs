@@ -11,8 +11,8 @@ use gitpoulpi_core::workflow::{
     FlowOutcome, FlowPlan, FlowStatus, Hooks, HooksReport, HooksTrust, MergeStrategy, StepStatus,
     Workflow, WorkflowTemplate,
 };
-use gitpoulpi_core::TypedError;
 use gitpoulpi_core::GitBackend;
+use gitpoulpi_core::TypedError;
 use gitpoulpi_daemon::Daemon;
 use gitpoulpi_ipc::{Client, Request, ResponseError};
 use gitpoulpi_testkit::{FixtureRepo, FixtureRepoBuilder};
@@ -1125,12 +1125,22 @@ async fn trusting_the_shown_hooks_lets_them_run_and_a_change_asks_again() {
         // Trusting the hash that was shown for the old file is refused: only
         // what is on disk now can be trusted.
         let stale = rig
-            .call(OperationKind::FlowTrustHooks, json!({ "hash": report.hash }))
+            .call(
+                OperationKind::FlowTrustHooks,
+                json!({ "hash": report.hash }),
+            )
             .await
             .unwrap_err();
-        assert!(stale.message.contains("differs"), "{name}: {}", stale.message);
+        assert!(
+            stale.message.contains("differs"),
+            "{name}: {}",
+            stale.message
+        );
         let wrong = rig
-            .call(OperationKind::FlowTrustHooks, json!({ "hash": "0".repeat(64) }))
+            .call(
+                OperationKind::FlowTrustHooks,
+                json!({ "hash": "0".repeat(64) }),
+            )
             .await;
         assert!(wrong.is_err());
         rig.stop().await;
@@ -1193,14 +1203,16 @@ async fn personal_hooks_run_without_asking_and_replace_the_committed_ones() {
             rig.repo.root(),
             gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION,
         );
-        let mut state = gitpoulpi_session::RepoState::default();
-        state.workflow = Some(gitpoulpi_core::workflow::WorkflowOverride {
-            hooks: Some(Hooks {
-                after_start: vec![touch("personal.txt")],
-                before_finish: Vec::new(),
+        let state = gitpoulpi_session::RepoState {
+            workflow: Some(gitpoulpi_core::workflow::WorkflowOverride {
+                hooks: Some(Hooks {
+                    after_start: vec![touch("personal.txt")],
+                    before_finish: Vec::new(),
+                }),
+                ..Default::default()
             }),
             ..Default::default()
-        });
+        };
         state.save(&path).unwrap();
 
         let plan = rig.plan(run_start("p")).await;

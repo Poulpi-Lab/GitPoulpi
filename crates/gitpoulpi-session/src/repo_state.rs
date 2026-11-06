@@ -365,9 +365,11 @@ impl RepoState {
     /// Whether `command` of `phase` is in any trusted list (what a resumed
     /// flow checks per step).
     pub fn trusts_hook_command(&self, phase: &str, command: &str) -> bool {
-        self.trusted_hooks
-            .iter()
-            .any(|t| t.hooks.iter().any(|h| h.phase == phase && h.command == command))
+        self.trusted_hooks.iter().any(|t| {
+            t.hooks
+                .iter()
+                .any(|h| h.phase == phase && h.command == command)
+        })
     }
 
     /// Whether the user trusted the script with this hash.

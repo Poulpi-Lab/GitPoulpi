@@ -333,6 +333,52 @@ fn hooks_run_only_when_asked_and_their_output_is_in_the_result() {
     assert!(outcome.steps.iter().all(|s| s.exit_code.is_none()));
     ok(repo.root(), session, &["undo"]);
 
+    // Committed hooks nobody trusted: `--run-hooks` is refused with the
+    // commands and the trust command, and nothing ran or changed.
+    let output = run(
+        repo.root(),
+        session,
+        &["flow", "start", "feature", "h", "--run-hooks", "--yes"],
+    );
+    assert_eq!(output.status.code(), Some(2));
+    let refused = json_of(&output)["refused"].clone();
+    assert_eq!(refused["reason"], "hooks_not_trusted");
+    assert_eq!(refused["hooks"][0]["command"], hook);
+    assert_eq!(refused["hooks"][0]["phase"], "after_start");
+    let hash = refused["hash"].as_str().unwrap().to_string();
+    assert_eq!(hash.len(), 64);
+    assert_eq!(
+        refused["trust_command"],
+        format!("gitpoulpi flow trust-hooks --hash {hash}")
+    );
+    assert!(!repo.root().join("hook.txt").exists());
+    assert!(!repo.git(&["branch"]).contains("feature/h"));
+
+    // `flow trust-hooks` shows them and changes nothing.
+    let shown = ok(repo.root(), session, &["flow", "trust-hooks"]);
+    assert_eq!(shown["trusted"], false);
+    assert_eq!(shown["hash"], hash);
+    assert_eq!(shown["hooks"][0]["command"], hook);
+    // A hash that is not the file's is refused.
+    let error = error_of(
+        repo.root(),
+        session,
+        &["flow", "trust-hooks", "--hash", &"0".repeat(64)],
+    );
+    assert!(error.contains("differs"), "{error}");
+    assert_eq!(
+        ok(repo.root(), session, &["flow", "trust-hooks"])["trusted"],
+        false
+    );
+    // The hash of what was shown trusts it.
+    let trusted = ok(
+        repo.root(),
+        session,
+        &["flow", "trust-hooks", "--hash", &hash],
+    );
+    assert_eq!(trusted["trusted"], true);
+    assert_eq!(trusted["hash"], hash);
+
     let out = ok(
         repo.root(),
         session,
@@ -368,6 +414,22 @@ fn hooks_run_only_when_asked_and_their_output_is_in_the_result() {
         ],
     );
     assert!(!output.status.success(), "the two flags exclude each other");
+
+    // The file changes after the trust: the old trust does not carry over.
+    let mut text = std::fs::read_to_string(&path).unwrap();
+    text = text.replace("from-hook", "from-another-hook");
+    std::fs::write(&path, text).unwrap();
+    let output = run(
+        repo.root(),
+        session,
+        &["flow", "start", "feature", "h4", "--run-hooks", "--yes"],
+    );
+    assert_eq!(output.status.code(), Some(2));
+    assert_ne!(json_of(&output)["refused"]["hash"], hash);
+    assert_eq!(
+        ok(repo.root(), session, &["flow", "trust-hooks"])["trusted"],
+        false
+    );
 }
 
 #[test]

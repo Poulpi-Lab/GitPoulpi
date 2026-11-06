@@ -107,6 +107,13 @@ pub(super) async fn read_loop(
             {
                 lfs_gate.set_filters_posed();
             }
+            // The updater is replacing GitPoulpi: leave for good rather than
+            // restart the daemon it is stopping (the install-channels design).
+            Some(ServerMessage::Event(Event::ShuttingDown { reason, .. }))
+                if reason == gitpoulpi_ipc::ShutdownArgs::UPDATE =>
+            {
+                quit_for_update()
+            }
             // The daemon is about to exit (a `gitpoulpi daemon stop`/`restart` run
             // from elsewhere). Takes the same stopped-link path as a dropped
             // connection (`r`/Refresh starts a fresh daemon), and reacting to the
@@ -179,4 +186,14 @@ pub(super) async fn read_loop(
     // tells the loop below the connection is gone.
     pending.lock().unwrap().close(reason);
     drop(event_refresh_tx);
+}
+
+/// Ends this process for an update. The session (tabs, layout, filters) is
+/// written as it changes, so there is nothing left to save; what remains is
+/// handing the terminal back and saying why, since the updater takes this
+/// terminal over next on Unix.
+fn quit_for_update() -> ! {
+    crate::exit_log::restore_terminal();
+    eprintln!("gitpoulpi: closing for an update"); // i18n-english
+    std::process::exit(0)
 }

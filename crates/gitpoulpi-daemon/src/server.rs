@@ -922,6 +922,15 @@ async fn handle_control(
                 }))
                 .await
                 .is_ok();
+            // A reason (the updater's `update`) is announced first so a frontend
+            // can tell "replaced by an update, do not restart a daemon" from a
+            // plain stop; `DaemonStopping` always follows.
+            if let Some(reason) = gitpoulpi_ipc::ShutdownArgs::from_value(&request.args).reason {
+                let _ = events_tx.send(Event::ShuttingDown {
+                    session: info.session.clone(),
+                    reason,
+                });
+            }
             let _ = events_tx.send(Event::DaemonStopping {
                 session: info.session.clone(),
             });

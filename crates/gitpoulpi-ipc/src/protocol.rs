@@ -81,3 +81,29 @@ pub enum ServerMessage {
     Response(Response),
     Event(crate::events::Event),
 }
+
+/// The optional args of `OperationKind::Shutdown`. Without a reason the daemon
+/// only broadcasts [`crate::Event::DaemonStopping`]; with one it first
+/// broadcasts [`crate::Event::ShuttingDown`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ShutdownArgs {
+    #[serde(default)]
+    pub reason: Option<String>,
+}
+
+impl ShutdownArgs {
+    /// The reason the updater gives: every frontend of the session exits.
+    pub const UPDATE: &'static str = "update";
+
+    pub fn update() -> Self {
+        Self {
+            reason: Some(Self::UPDATE.to_string()),
+        }
+    }
+
+    /// The args as the request carries them; `null` or anything unreadable
+    /// is "no reason" (an old client's plain `Shutdown`).
+    pub fn from_value(args: &serde_json::Value) -> Self {
+        serde_json::from_value(args.clone()).unwrap_or_default()
+    }
+}

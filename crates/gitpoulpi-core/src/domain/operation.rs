@@ -419,7 +419,8 @@ pub enum OperationKind {
     /// `LostCommitOptions`. A read, scanned off the render thread.
     LostCommits,
     /// Daemon-control pseudo-operation: tells the daemon to answer OK,
-    /// broadcast `Event::DaemonStopping`, flush its discovery files and
+    /// broadcast `Event::ShuttingDown` (only when args carry a `reason`, as
+    /// the updater's `{"reason":"update"}` does) and `Event::DaemonStopping`, flush its discovery files and
     /// exit the process. Never reaches any `GitBackend`, for the same
     /// reason as `Hello`.
     Shutdown,

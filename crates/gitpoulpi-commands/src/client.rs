@@ -296,6 +296,22 @@ async fn ensure_daemon(
         }
     }
 
+    // An update is replacing the files this daemon would run from: starting
+    // one now would hold the install folder open (or run half-swapped
+    // binaries). A daemon that is already up was handled above.
+    if let Some(paths) = gitpoulpi_config::ConfigPaths::discover() {
+        let install_dir = std::env::current_exe()
+            .ok()
+            .and_then(|exe| exe.parent().map(std::path::Path::to_path_buf));
+        if gitpoulpi_config::update_lock::update_in_progress(
+            &paths,
+            install_dir.as_deref(),
+            gitpoulpi_config::update_lock::now_secs(),
+        ) {
+            return Err(gitpoulpi_config::update_lock::UPDATING_MESSAGE.to_string());
+        }
+    }
+
     let handle = gitpoulpi_daemon::Daemon::new(session)
         .spawn(gitpoulpi_daemon::backend_for(backend))
         .await

@@ -330,7 +330,7 @@ pub enum Commands {
         #[arg(long)]
         all: bool,
         /// Stage files that look sensitive (a private key, a `.env`, a
-        /// recognised token) too. Without it such a stage is refused and
+        /// recognized token) too. Without it such a stage is refused and
         /// nothing is staged (`[privacy] staging_guard`).
         #[arg(long)]
         allow_sensitive: bool,

@@ -8917,7 +8917,7 @@ shown_all = "Her istek gönderilmeden önce gösterilecek"
 # context: title of the dialog that lists files the staging guard flagged
 title = "Hassas dosyalar"
 # context: question of that dialog
-question = "Bu dosyalar hassas görünüyor. Ne yapılsın?"
+question = "Bu dosyalar hassas görünüyor. Yine de {$stage}?"
 # context: one reason in the list; {pattern} is a path pattern such as .env.*
 reason_pattern = "{pattern} ile eşleşiyor"
 # context: one reason in the list; {rule} is the kind of secret found (github-token), {preview} a masked sample that never shows the whole value
@@ -8925,7 +8925,7 @@ reason_secret = "{rule} içeriyor ({preview})"
 # context: first numbered answer of the dialog
 answer_stage = "Yine de {$stage}"
 # context: second numbered answer of the dialog
-answer_cancel = "İptal et, hiçbir şeye dokunma"
+answer_cancel = "İptal et, hiçbir şeyi {$stage}"
 # context: key hint at the bottom of the dialog
 hint = "Yukarı/Aşağı: seç, Enter veya 1/2: yanıtla, Esc: iptal"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints

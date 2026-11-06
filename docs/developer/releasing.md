@@ -19,7 +19,7 @@ A tag with a `-` in the version (`releases/v0.2.0-rc.1`) is published as a GitHu
 | `winget` | `komac update GitPoulpi.GitPoulpi --version <v> --urls <setup> --submit`, from the fork `Poulpi-Lab/winget-pkgs`, as the App's bot. |
 | `scoop`, `homebrew` | Fill the manifest or formula and commit it to `Poulpi-Lab/scoop-gitpoulpi` and `Poulpi-Lab/homebrew-gitpoulpi`, as the App's bot. |
 | `aur` | In an Arch container fills `gitpoulpi-bin` and `gitpoulpi`, runs `makepkg --printsrcinfo` and pushes over SSH. |
-| `apt` | Checks out `Poulpi-Lab/apt` (the `gh-pages` branch), adds the `.deb` files, runs `packaging/apt/build-repo.sh` (signs `Release` into `InRelease` and `Release.gpg`, keeps the last 5 versions) and commits. |
+| `apt` | Checks out `Poulpi-Lab/apt-gitpoulpi` (the `gh-pages` branch), adds the `.deb` files, runs `packaging/apt/build-repo.sh` (signs `Release` into `InRelease` and `Release.gpg`, keeps the last 5 versions) and commits. |
 | `docker` | One multi-arch buildx build (`linux/amd64`, `linux/arm64`) from `packaging/docker/Dockerfile`, pushed to Docker Hub as `poulpilab/gitpoulpi` and, when enabled, to `ghcr.io/poulpi-lab/gitpoulpi`. Tags `<v>`, `<major.minor>` and `latest`; a pre-release would only get `<v>`. Then the Docker Hub overview. |
 | `crates` | `cargo publish --workspace`, opt-in (see "crates.io"). |
 

@@ -84,7 +84,7 @@ fn the_origin_body_names_the_integration_and_both_addresses() {
     let (_, text) = screen(&mut d, AREA);
     for want in [
         "Integration security check",
-        "work now points to https://new.example.com, it was https://old.example.com.",
+        "work now points to https://new.example.com instead of https://old.example.com.",
         "token was not sent.",
         "1  Disconnect (deletes the saved token)",
         "2  Trust the new address",

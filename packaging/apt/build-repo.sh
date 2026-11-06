@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds the signed apt repository served from the `Poulpi-Lab/apt` gh-pages branch.
+# Builds the signed apt repository served from the `Poulpi-Lab/apt-gitpoulpi` gh-pages branch.
 #
 #   sh build-repo.sh REPO_DIR
 #

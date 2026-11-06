@@ -8916,7 +8916,7 @@ reason_secret = "obsahuje {rule} ({preview})"
 # context: first numbered answer of the dialog
 answer_stage = "{$Stage} přesto"
 # context: second numbered answer of the dialog
-answer_cancel = "Zrušit a nic nepřidávat"
+answer_cancel = "Zrušit, nic nebude {$staged}"
 # context: key hint at the bottom of the dialog
 hint = "Nahoru/Dolů: výběr, Enter nebo 1/2: odpověď, Esc: zrušit"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints

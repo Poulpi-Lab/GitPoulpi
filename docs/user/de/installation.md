@@ -138,8 +138,8 @@ Es gilt die eigene PATH-Behandlung des Paketmanagers: Chocolatey, winget, Scoop 
 
 ```
 sudo install -d /etc/apt/keyrings
-curl -fsSL https://poulpi-lab.github.io/apt/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
-sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt/gitpoulpi.sources
+curl -fsSL https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi-archive-keyring.gpg | sudo tee /etc/apt/keyrings/gitpoulpi.gpg >/dev/null
+sudo curl -fsSL -o /etc/apt/sources.list.d/gitpoulpi.sources https://poulpi-lab.github.io/apt-gitpoulpi/gitpoulpi.sources
 sudo apt update && sudo apt install gitpoulpi
 ```
 

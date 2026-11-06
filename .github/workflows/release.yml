@@ -586,7 +586,7 @@ jobs:
           app-id: ${{ vars.POULPI_BOT_APP_ID }}
           private-key: ${{ secrets.POULPI_BOT_PRIVATE_KEY }}
           owner: Poulpi-Lab
-          repositories: apt
+          repositories: apt-gitpoulpi
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
@@ -594,7 +594,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         if: env.HAS == 'true'
         with:
-          repository: Poulpi-Lab/apt
+          repository: Poulpi-Lab/apt-gitpoulpi
           ref: gh-pages
           token: ${{ steps.app.outputs.token }}
           path: apt-repo

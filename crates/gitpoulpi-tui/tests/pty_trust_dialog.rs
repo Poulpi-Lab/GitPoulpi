@@ -112,7 +112,7 @@ fn open(session: &str) -> Setup {
 
 fn address_text(s: &Setup) -> String {
     format!(
-        "hub now points to http://127.0.0.1:{}, it was http://127.0.0.1:{}.",
+        "hub now points to http://127.0.0.1:{} instead of http://127.0.0.1:{}.",
         s.new.port, s.old.port
     )
 }

@@ -149,6 +149,19 @@ pub enum Error {
         hooks: Vec<crate::workflow::HookInfo>,
     },
 
+    /// A stage request would add files that look sensitive (a private key, a
+    /// `.env`, a recognised token) and the caller did not allow it. Nothing
+    /// was staged. `files` lists each file with its reason, never a value.
+    #[error(
+        "{} sensitive file(s) were not staged ({}); ask the user, then stage again allowing \
+         sensitive files",
+        .files.len(),
+        crate::privacy::summary(.files)
+    )]
+    SensitiveStage {
+        files: Vec<crate::privacy::Sensitive>,
+    },
+
     #[error("backend error: {0}")]
     Backend(String),
 
@@ -387,6 +400,9 @@ pub enum TypedError {
         hash: String,
         hooks: Vec<crate::workflow::HookInfo>,
     },
+    SensitiveStage {
+        files: Vec<crate::privacy::Sensitive>,
+    },
 }
 
 impl Error {
@@ -431,6 +447,9 @@ impl Error {
             Error::HooksNotTrusted { hash, hooks } => Some(TypedError::HooksNotTrusted {
                 hash: hash.clone(),
                 hooks: hooks.clone(),
+            }),
+            Error::SensitiveStage { files } => Some(TypedError::SensitiveStage {
+                files: files.clone(),
             }),
             _ => None,
         }
@@ -504,6 +523,7 @@ impl Error {
             TypedError::NotCancellable { reason } => Error::NotCancellable { reason },
             TypedError::JobConflict { existing } => Error::JobConflict { existing },
             TypedError::HooksNotTrusted { hash, hooks } => Error::HooksNotTrusted { hash, hooks },
+            TypedError::SensitiveStage { files } => Error::SensitiveStage { files },
         }
     }
 }
@@ -650,6 +670,35 @@ mod tests {
             Error::HooksNotTrusted { hash, hooks } => {
                 assert_eq!(hash.len(), 64);
                 assert_eq!(hooks[0].command, "make");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn sensitive_stage_round_trips_with_reasons_and_no_value() {
+        use crate::privacy::{Reason, Sensitive};
+        let original = Error::SensitiveStage {
+            files: vec![
+                Sensitive {
+                    path: ".env".into(),
+                    reason: Reason::Pattern(".env".into()),
+                },
+                Sensitive {
+                    path: "a.txt".into(),
+                    reason: Reason::Secret {
+                        rule: "github-token".into(),
+                        preview: "ghp_****".into(),
+                    },
+                },
+            ],
+        };
+        assert!(original.to_string().contains(".env, a.txt"));
+        let wire = serde_json::to_string(&original.typed().unwrap()).unwrap();
+        match Error::from_typed(serde_json::from_str(&wire).unwrap()) {
+            Error::SensitiveStage { files } => {
+                assert_eq!(files.len(), 2);
+                assert_eq!(files[1].path, "a.txt");
             }
             other => panic!("{other:?}"),
         }

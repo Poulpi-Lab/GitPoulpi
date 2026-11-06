@@ -45,6 +45,7 @@ mod editor;
 mod general;
 mod git;
 mod log;
+mod privacy;
 mod quantity;
 mod rewrite;
 mod search;
@@ -56,6 +57,7 @@ pub use editor::*;
 pub use general::*;
 pub use git::*;
 pub use log::*;
+pub use privacy::*;
 pub use quantity::*;
 pub use rewrite::*;
 pub use search::*;
@@ -129,6 +131,11 @@ pub struct McpConfig {
     /// carries the encryption. It cannot be verified from inside the server,
     /// so `--allow-remote` without TLS needs this stated explicitly.
     pub behind_proxy: bool,
+    /// `false` (the default): an MCP agent cannot stage a file the staging
+    /// guard flags (a private key, a `.env`, a recognised token): the stage
+    /// tools do not even offer `allow_sensitive`, and the refusal tells the
+    /// agent to ask the user. `true` lets an agent pass it.
+    pub allow_sensitive_staging: bool,
 }
 
 /// `[mcp] tls`: how the HTTP endpoint is encrypted.
@@ -208,6 +215,7 @@ impl Default for McpConfig {
             tls_cert: String::new(),
             tls_key: String::new(),
             behind_proxy: false,
+            allow_sensitive_staging: false,
         }
     }
 }

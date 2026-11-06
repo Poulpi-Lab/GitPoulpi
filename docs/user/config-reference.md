@@ -375,6 +375,7 @@ rewritten by GitPoulpi, not by hand.
 | `mcp.tls_cert` | `""` | PEM certificate chain used with `tls = "files"`. |
 | `mcp.tls_key` | `""` | PEM private key used with `tls = "files"`. |
 | `mcp.behind_proxy` | `false` | You state that a tunnel or reverse proxy in front of the endpoint carries the encryption. It cannot be checked from inside the server, so `--allow-remote` without TLS needs it set. The hop between the proxy and the server is plain text on that network. Settings > Agents & MCP > *Behind a tunnel or reverse proxy*. |
+| `mcp.allow_sensitive_staging` | `false` | Only in `config.toml`. Off, the MCP stage tools do not offer `allow_sensitive`, and a stage that would add a flagged file (see `[privacy]`) is refused with a message telling the agent to ask you. On, an agent may pass `allow_sensitive`. The CLI and the TUI are not gated by it: they ask you. |
 
 `allow_mutations`, `mutation_allowlist` and `allow_ui` gate the MCP server only;
 the CLI is your own shell and is not gated by them. See [MCP and
@@ -393,6 +394,9 @@ agents](mcp-and-agents.md#permissions).
 | `ai.review.include_claude_md` | `true` | Give a code review draft the repository's `CLAUDE.md` (root, read at the branch the request targets; cut at 8 KB). |
 | `ai.review.include_agents_md` | `true` | Same for `AGENTS.md`. |
 | `ai.review.extra_file` | `""` | One more file for a code review draft: a path relative to the repository root, an absolute path, or a link to a file of a code host (read through the matching integration profile, else anonymously). All the files together are cut at 16 KB. |
+| `ai.privacy.redact_secrets` | `true` | Replace every secret the scanner recognises in a request (a token, a private key block, a password in a URL, a `password = ...` value that looks random) with `[REDACTED:<rule>]` before it leaves. Settings > AI shows a red warning while it is off. |
+| `ai.privacy.exclude_sensitive_files` | `true` | Leave out the diff of every file matching `privacy.sensitive_patterns` from what is sent. A local agent that works in the repository folder can still read files itself: see [AI > Privacy](ai.md#privacy). |
+| `ai.sent_preview.<action>` | `true` | One key per action (`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`): show "What is sent" before the request goes out. The dialog's "Don't show again for ..." writes `false`; Settings > AI > *Show what is sent before...* turns them back on. |
 
 A repository's own `[preferences.ai_review]` table (in its `repo-state.toml`, or the entry of a repository that is
 not cloned in `remote-reviews.toml`) takes the same keys, all optional, plus `no_extra_file = true`: no extra file for
@@ -494,6 +498,13 @@ What the title bar's version chip does about newer releases. Details: [Updates](
 | `updates.repo` | `"Poulpi-Lab/GitPoulpi"` | The `owner/name` on github.com whose releases are checked. While that repository is private GitHub answers 404 unless a token is stored for github.com (Settings > Integrations); without one the check fails quietly and writes one line to the application log. |
 
 An administrator can set `mode`, `channel` (as `release_channel`) and `repo`, plus a few more update options, in a machine-wide policy file or the Windows registry. A key the policy sets wins over `config.toml` and shows in Settings as **Set by your administrator**. `mode` in the policy is a ceiling: you can pick a lower value, never a higher one. See [Enterprise distribution](enterprise-distribution.md#the-policy-file-and-the-registry).
+
+## `[privacy]` (sensitive files)
+
+| Key | Default | Values and effect |
+|---|---|---|
+| `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Gitignore-style path patterns. A pattern without a `/` matches the file name at any depth, one with a `/` the whole path (a leading `/` anchors it at the root); `*` and `?` stay inside one folder, `**` crosses folders; a `!` re-allows what an earlier pattern matched and the last match wins; case is ignored. Used by the staging guard and by `ai.privacy.exclude_sensitive_files`. |
+| `privacy.staging_guard` | `true` | Staging a file that matches a pattern, or whose content holds a recognised secret, asks first (TUI), is refused unless `--allow-sensitive` is given (CLI) or unless `mcp.allow_sensitive_staging` lets the agent pass `allow_sensitive` (MCP). Text files up to 1 MiB each and 32 MiB in all are read; binary files are only matched by name. See [Staging and committing](staging-and-committing.md#sensitive-files). |
 
 ## `[keybindings]`
 

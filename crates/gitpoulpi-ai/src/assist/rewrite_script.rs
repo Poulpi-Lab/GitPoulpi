@@ -82,6 +82,7 @@ impl Job {
             &self.profile,
             self.api_key.clone(),
             self.repo_path().as_deref(),
+            &self.privacy,
         )?;
         self.write_rewrite_script_with(&*client, request, checker)
             .await

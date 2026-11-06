@@ -19,6 +19,10 @@ fn doc_spelling(key: &str) -> String {
     if parts.len() == 4 && parts[0] == "ai" && parts[1] == "actions" {
         return format!("ai.actions.<action>.{}", parts[3]);
     }
+    // The ten `ai.sent_preview.<action>` switches are documented once too.
+    if parts.len() == 3 && parts[0] == "ai" && parts[1] == "sent_preview" {
+        return "ai.sent_preview.<action>".to_string();
+    }
     key.to_string()
 }
 

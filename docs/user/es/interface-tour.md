@@ -31,8 +31,9 @@ El borde superior de la ventana dice
   repositorio o, si no tiene, su página en crates.io): haz clic en la fila, o
   elígela con `Up` / `Down` y pulsa `Enter`, para abrirla en el navegador. `t` (o el comando de la paleta `Ayuda: Licencias y créditos`) muestra los avisos de licencia y los créditos de todo lo que lleva el programa, en un texto desplazable (`Up` / `Down`, `PgUp` / `PgDn`, `Home` / `End`; `Esc` o `t` para volver). Desde un script, `gitpoulpi licenses` imprime el mismo texto.
 - La **versión** (`v1.0.0`; `vX.Y.Z disponible` si hay una versión más reciente)
-  está entre el nombre y la ruta: un clic abre la pestaña **Notas de la versión**, consulta
-  [Actualizaciones](updates.md).
+  está entre el nombre y la ruta: un clic abre el panel de actualización cuando
+  existe una versión más reciente, y la pestaña Notas de la versión en caso contrario.
+  Consulta [Actualizaciones](updates.md).
 - **Abrir en ▾**, justo después de la ruta, abre la carpeta de la pestaña en un
   terminal, un editor, un multiplexor o el gestor de archivos (`Alt+O`). Consulta
   [Abrir en](open-in.md).

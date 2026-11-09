@@ -8,7 +8,7 @@ GitPoulpi busca versiones más recientes y, según cómo se instaló, reemplaza 
 
 La barra de título muestra la versión en uso (`v1.0.0`) entre el nombre de la aplicación y la ruta del repositorio. Cuando se conoce una versión más reciente, el chip pasa a `v0.2.0 disponible` con el color de acento.
 
-Haz clic en el chip, pulsa `Ctrl+N` y luego `u`, o ejecuta **Actualizaciones: Mostrar actualización** desde la paleta de comandos (`Ctrl+P`): se abre el panel de actualización. Es una ventana sobre la aplicación: `Esc`, `q`, la cruz de cierre o un clic fuera la cierra. Muestra:
+Pulsa `Ctrl+N` y luego `u`, ejecuta **Actualizaciones: Mostrar actualización** desde la paleta de comandos (`Ctrl+P`), o haz clic en el chip mientras dice `disponible` (o mientras hay una actualización en curso): se abre el panel de actualización. Sin una versión más reciente, un clic en el chip abre en su lugar la pestaña Notas de la versión. Es una ventana sobre la aplicación: `Esc`, `q`, la cruz de cierre o un clic fuera la cierra. Muestra:
 
 - la versión en uso e **Instalado con**: cómo llegó GitPoulpi a este equipo (de ello depende todo lo que sigue);
 - en qué punto está la actualización (comprobando, descargando con un porcentaje, lista, fallida);

@@ -25,13 +25,13 @@ pub enum HttpsAuth {
         #[serde(default, skip_serializing_if = "is_false")]
         ignore_repo_helpers: bool,
     },
-    /// A GitPoulpi integration account's token. Not available yet.
+    /// A GitPoulpi integration account's token.
     Integration {
         integration: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         username: Option<String>,
     },
-    /// One credential helper command. Not available yet.
+    /// One credential helper command, run by git. Stored only when confirmed.
     Helper {
         helper: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -45,7 +45,8 @@ pub enum HttpsAuth {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         confirmed_at: Option<i64>,
     },
-    /// A command that prints a token. Not available yet.
+    /// A command that prints a token, run by the daemon. Stored only when
+    /// confirmed.
     TokenCommand {
         argv: Vec<String>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -171,8 +172,9 @@ fn file_name_of(path: &str) -> &str {
 pub struct RepoAuthSetArgs {
     pub profile: RepoAuthProfile,
     /// The requester confirms a command-running source (helper, token
-    /// command). Only a person may; those sources are not available yet, so
-    /// today it changes nothing.
+    /// command). Only a person may: the CLI sends it only from a session that
+    /// may trust, the TUI after its dialog, MCP never. Without it a command
+    /// is stored only when it is the one already confirmed.
     #[serde(default)]
     pub confirm: bool,
 }

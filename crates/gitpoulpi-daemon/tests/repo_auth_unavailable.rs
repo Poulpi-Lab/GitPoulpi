@@ -99,8 +99,8 @@ async fn a_profile_that_cannot_be_used_refuses_the_transfer() {
         .unwrap()
     };
 
-    // Helper and token command sources are not accepted yet, whatever
-    // `confirm` says, and nothing is stored.
+    // Helper and token command sources are stored only when confirmed, and
+    // nothing is stored for an unconfirmed request.
     for https in [
         HttpsAuth::Helper {
             helper: "!/x/helper".into(),
@@ -123,15 +123,19 @@ async fn a_profile_that_cannot_be_used_refuses_the_transfer() {
         let error = rig
             .call(
                 OperationKind::RepoAuthSet,
-                set(RepoAuthProfile {
-                    https: Some(https),
-                    ssh: None,
-                }),
+                serde_json::to_value(RepoAuthSetArgs {
+                    profile: RepoAuthProfile {
+                        https: Some(https),
+                        ssh: None,
+                    },
+                    confirm: false,
+                })
+                .unwrap(),
             )
             .await
-            .expect_err("a command source is not available yet");
+            .expect_err("an unconfirmed command source is refused");
         assert!(
-            unavailable_reason(&error).contains("not available yet"),
+            matches!(&error.kind, Some(TypedError::NeedsConfirmation(p)) if p.contains("confirms it")),
             "{error:?}"
         );
     }
@@ -186,7 +190,7 @@ async fn a_profile_that_cannot_be_used_refuses_the_transfer() {
     assert_eq!(view.summary.as_deref(), Some("HTTPS: work"));
 
     // Hand-written helper and token command entries (the file is the source
-    // of truth) are parsed and kept, and refuse the same way.
+    // of truth) are parsed and kept, and refuse: nobody confirmed them.
     let key = repo_auth_key(&repo.repo_ref().root);
     for body in [
         "source = \"helper\"\nhelper = \"!/x/helper\"\n",
@@ -198,7 +202,7 @@ async fn a_profile_that_cannot_be_used_refuses_the_transfer() {
         )
         .unwrap();
         let error = rig.fetch().await.expect_err("a command source refuses");
-        assert!(unavailable_reason(&error).contains("not available yet"));
+        assert!(unavailable_reason(&error).contains("never confirmed"));
         // The view never carries the command.
         let view = rig.view().await;
         let text = serde_json::to_string(&view).unwrap();

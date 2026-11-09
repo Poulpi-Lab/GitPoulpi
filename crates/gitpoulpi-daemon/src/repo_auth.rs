@@ -515,9 +515,10 @@ fn settle_command(
     if carried {
         return Ok(());
     }
-    Err(unavailable(
+    Err(Error::NeedsConfirmation(
         "a credential helper or token command is stored only when a person confirms it: \
-         ask the person to set it in GitPoulpi",
+         ask the person to set it in GitPoulpi"
+            .into(),
     ))
 }
 

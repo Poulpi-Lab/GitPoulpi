@@ -478,17 +478,14 @@ async fn an_unconfirmed_request_cannot_store_a_command() {
         .await
         .expect_err("an agent cannot confirm");
     assert!(
-        matches!(error.kind, Some(TypedError::RepoAuthUnavailable { .. })),
+        matches!(error.kind, Some(TypedError::NeedsConfirmation(_))),
         "{error:?}"
     );
     let error = rig
         .set(helper_source("!tool"), false)
         .await
         .expect_err("nor a helper");
-    assert!(matches!(
-        error.kind,
-        Some(TypedError::RepoAuthUnavailable { .. })
-    ));
+    assert!(matches!(error.kind, Some(TypedError::NeedsConfirmation(_))));
     assert!(!rig.view().await.configured, "nothing was stored");
 
     // Hashes a client writes are not believed: the daemon computes its own.

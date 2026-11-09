@@ -88,5 +88,8 @@ pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
         i += 1;
     }
 
-    Ok(WorkingTree { files })
+    Ok(WorkingTree {
+        files,
+        ..WorkingTree::default()
+    })
 }

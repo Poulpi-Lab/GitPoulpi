@@ -163,6 +163,10 @@ pub struct Remote {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct WorkingTree {
     pub files: Vec<super::StatusEntry>,
+    /// Who the repository's remotes sign in as, when its profile is not all
+    /// default. Added by the daemon from the private file (no spawn).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub repo_auth: Option<super::ActiveIdentity>,
 }
 
 #[cfg(test)]

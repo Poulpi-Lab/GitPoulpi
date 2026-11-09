@@ -592,17 +592,18 @@ pub(crate) async fn test(
     Ok(reports)
 }
 
-/// The short label for the status payload, computed from the file (no spawn).
-/// `None` when everything is default or the file is not readable (the
-/// transfer itself says so then).
-pub(crate) fn summary_for(root: &Path) -> Option<String> {
-    stored_profile(root).ok().flatten()?.summary()
-}
-
-/// Adds the summary to a serialized status payload.
+/// Adds the identity (what the push line says) to a serialized status
+/// payload, from the file (no spawn). Nothing when everything is default or
+/// the file is not readable (the transfer itself says so then).
 pub(crate) fn add_summary(root: &Path, status: &mut Value) {
-    if let (Some(label), Some(map)) = (summary_for(root), status.as_object_mut()) {
-        map.insert(STATUS_KEY.to_string(), Value::String(label));
+    let identity = stored_profile(root)
+        .ok()
+        .flatten()
+        .and_then(|p| p.identity());
+    if let (Some(identity), Some(map)) = (identity, status.as_object_mut()) {
+        if let Ok(value) = serde_json::to_value(identity) {
+            map.insert(STATUS_KEY.to_string(), value);
+        }
     }
 }
 

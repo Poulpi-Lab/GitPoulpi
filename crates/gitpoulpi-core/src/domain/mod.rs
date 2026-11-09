@@ -96,8 +96,9 @@ pub use repo::{
     CommitGraph, CommitNode, DiscoveredRepo, Oid, Remote, RepoId, RepoRef, WorkingTree,
 };
 pub use repo_auth::{
-    command_sha256, AuthOverride, HttpsAuth, RemoteIdentity, RepoAuthProfile, RepoAuthSetArgs,
-    RepoAuthTestArgs, RepoAuthView, SshAuth,
+    command_sha256, ActiveIdentity, AuthOverride, HttpsAuth, HttpsIdentity, IdentityVia,
+    RemoteIdentity, RepoAuthProfile, RepoAuthSetArgs,
+    RepoAuthTestArgs, RepoAuthView, SshAuth, SshIdentity,
 };
 pub use restore::{RestoreItem, RestoreItemKind, RestoreOffer, RestoreOutcome};
 pub use rewrite::RewriteRefusal;

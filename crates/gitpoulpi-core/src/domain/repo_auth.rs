@@ -160,6 +160,115 @@ impl RepoAuthProfile {
     }
 }
 
+/// How the HTTPS identity of a profile is reached.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum IdentityVia {
+    /// The token of a GitPoulpi account; the name is the account id.
+    Token,
+    /// Only a git username on the system helpers; the name is the user.
+    Username,
+    /// This repository's own credential helper command.
+    CredentialHelper,
+    /// This repository's token command.
+    TokenCommand,
+    /// The system helpers, with the repository's own ones ignored.
+    HelpersIgnored,
+}
+
+/// Who a repository's HTTPS remotes sign in as.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HttpsIdentity {
+    pub via: IdentityVia,
+    /// An account id or a user name; empty when `via` has none.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub name: String,
+}
+
+/// Who a repository's SSH remotes sign in as.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SshIdentity {
+    /// A key file's name, or the account id for an account's key.
+    pub name: String,
+    /// `name` is an account id (the key of that integration).
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub of_account: bool,
+}
+
+/// What the status payload says about a repository whose profile is not all
+/// default (the push line and the Activity Log entries of fetch, pull and
+/// push). Never a secret. The wording is the UI's.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ActiveIdentity {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub https: Option<HttpsIdentity>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ssh: Option<SshIdentity>,
+    /// An integration account is the source of the HTTPS or SSH identity.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub integration: bool,
+}
+
+impl RepoAuthProfile {
+    /// The identity this profile gives, `None` when everything is default.
+    pub fn identity(&self) -> Option<ActiveIdentity> {
+        if self.is_default() {
+            return None;
+        }
+        let mut id = ActiveIdentity::default();
+        id.https = match &self.https {
+            None => None,
+            Some(HttpsAuth::System {
+                username,
+                ignore_repo_helpers,
+            }) => match (
+                username.as_deref().filter(|u| !u.is_empty()),
+                ignore_repo_helpers,
+            ) {
+                (Some(u), _) => Some(HttpsIdentity {
+                    via: IdentityVia::Username,
+                    name: u.to_string(),
+                }),
+                (None, true) => Some(HttpsIdentity {
+                    via: IdentityVia::HelpersIgnored,
+                    name: String::new(),
+                }),
+                (None, false) => None,
+            },
+            Some(HttpsAuth::Integration { integration, .. }) => {
+                id.integration = true;
+                Some(HttpsIdentity {
+                    via: IdentityVia::Token,
+                    name: integration.clone(),
+                })
+            }
+            Some(HttpsAuth::Helper { .. }) => Some(HttpsIdentity {
+                via: IdentityVia::CredentialHelper,
+                name: String::new(),
+            }),
+            Some(HttpsAuth::TokenCommand { .. }) => Some(HttpsIdentity {
+                via: IdentityVia::TokenCommand,
+                name: String::new(),
+            }),
+        };
+        id.ssh = match &self.ssh {
+            None | Some(SshAuth::System) => None,
+            Some(SshAuth::KeyFile { key, .. }) => Some(SshIdentity {
+                name: file_name_of(key).to_string(),
+                of_account: false,
+            }),
+            Some(SshAuth::IntegrationKey { integration, .. }) => {
+                id.integration = true;
+                Some(SshIdentity {
+                    name: integration.clone(),
+                    of_account: true,
+                })
+            }
+        };
+        Some(id)
+    }
+}
+
 /// The SHA-256 (lower-case hex) of a command-running source's command: the
 /// helper string, or the arguments of a token command joined by NUL. What a
 /// person confirms is shown with this hash.
@@ -262,6 +371,26 @@ pub struct RepoAuthView {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_identity_names_the_account_or_the_key_and_is_absent_by_default() {
+        assert_eq!(RepoAuthProfile::default().identity(), None);
+        let p = RepoAuthProfile {
+            https: Some(HttpsAuth::Integration {
+                integration: "github-corp".into(),
+                username: None,
+            }),
+            ssh: Some(SshAuth::KeyFile {
+                key: "C:\\Users\\me\\.ssh\\work_ed25519".into(),
+                known_hosts: None,
+                strict_host_key: false,
+            }),
+        };
+        let id = p.identity().expect("not default");
+        assert_eq!(id.https.unwrap().name, "github-corp");
+        assert_eq!(id.ssh.unwrap().name, "work_ed25519");
+        assert!(id.integration);
+    }
 
     #[test]
     fn a_profile_with_only_defaults_has_no_summary() {

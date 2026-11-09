@@ -74,7 +74,10 @@ pub fn status(repo: &RepoRef) -> Result<WorkingTree> {
         })
         .collect();
 
-    Ok(WorkingTree { files })
+    Ok(WorkingTree {
+        files,
+        ..WorkingTree::default()
+    })
 }
 
 /// The commit total counted in-process (`log.commit_count = "libgit2"`):

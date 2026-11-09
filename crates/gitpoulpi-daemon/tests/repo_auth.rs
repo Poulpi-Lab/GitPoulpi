@@ -240,7 +240,7 @@ async fn ignoring_the_repositorys_helpers_lets_the_machines_helper_answer() {
     let status = rig.ok(OperationKind::Status, json!({})).await;
     assert_eq!(
         status["repo_auth"],
-        "HTTPS: globaluser, repo helpers ignored"
+        json!({"https": {"via": "username", "name": "globaluser"}})
     );
 
     // Clear: back to the machine's defaults, and today's failure.

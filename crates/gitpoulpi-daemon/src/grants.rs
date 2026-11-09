@@ -123,6 +123,22 @@ impl GrantGuard {
     }
 }
 
+impl GrantGuard {
+    /// `error` as the person should read it: when the transfer failed after
+    /// the grant refused a host, or after the token command gave no token,
+    /// that is the reason (not git's "terminal prompts disabled"). Every path
+    /// that runs a transfer under a grant words its failure through this.
+    pub(crate) fn explain(&self, error: gitpoulpi_core::Error) -> gitpoulpi_core::Error {
+        if let Some((host, expected)) = self.refused() {
+            gitpoulpi_core::Error::GrantRefused { host, expected }
+        } else if let Some(command_error) = self.command_failure() {
+            command_error
+        } else {
+            error
+        }
+    }
+}
+
 impl Drop for GrantGuard {
     fn drop(&mut self) {
         let mut registry = lock();

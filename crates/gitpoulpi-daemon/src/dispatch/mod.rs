@@ -368,15 +368,12 @@ async fn dispatch_network_inner(
     // A transfer that failed after the grant refused a host (a remote URL
     // rewritten to another server by the repository's own configuration):
     // say that, instead of git's "terminal prompts disabled".
-    if let (Some(grant), Err(error)) = (&grant, &dispatched.response.result) {
-        if let Some((host, expected)) = grant.refused() {
-            let refused = Error::GrantRefused { host, expected };
-            let _ = error;
-            dispatched = failed(request, refused.to_string(), refused.typed(), None);
-        } else if let Some(error) = grant.command_failure() {
-            // The token command gave no token: its own words (redacted),
-            // instead of git's "terminal prompts disabled".
-            dispatched = failed(request, error.to_string(), error.typed(), None);
+    if let (Some(grant), Err(_)) = (&grant, &dispatched.response.result) {
+        if grant.refused().is_some() || grant.command_failure().is_some() {
+            // The grant's reason (a refused host, a token command that gave
+            // no token), instead of git's "terminal prompts disabled".
+            let reason = grant.explain(Error::Backend(String::new()));
+            dispatched = failed(request, reason.to_string(), reason.typed(), None);
         }
     }
     dispatched

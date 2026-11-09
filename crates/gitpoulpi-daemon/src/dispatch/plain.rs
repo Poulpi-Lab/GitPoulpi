@@ -215,7 +215,15 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
             // authentication profile, read live.
             match crate::credentials::apply_for(backend, &repo, &request.session) {
                 // The grant (an account source) lives until the update is over.
-                Ok(_grant) => to_json!(backend.submodule_update(&repo, &opts)),
+                // A refused host or a failed token command reads as that.
+                Ok(grant) => {
+                    let result = backend.submodule_update(&repo, &opts);
+                    let result = match (&grant, result) {
+                        (Some(grant), Err(e)) => Err(grant.explain(e)),
+                        (_, other) => other,
+                    };
+                    to_json!(result)
+                }
                 Err(error) => Err((error.to_string(), error.typed(), None)),
             }
         }

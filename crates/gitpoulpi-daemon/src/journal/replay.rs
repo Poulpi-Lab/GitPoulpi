@@ -225,7 +225,7 @@ fn run_remote_step(
     use gitpoulpi_core::domain::UndoRefusal;
     use gitpoulpi_core::Error;
     // The grant (an account source) lives until the step is over.
-    let _grant = crate::credentials::apply_for(backend, repo, session)?;
+    let grant = crate::credentials::apply_for(backend, repo, session)?;
     let moved = |actual| {
         Error::UndoRefused(UndoRefusal::RemoteRefMoved(Box::new(
             gitpoulpi_core::domain::RemoteRefMoved {
@@ -236,7 +236,7 @@ fn run_remote_step(
             },
         )))
     };
-    block_on(async {
+    let outcome = block_on(async {
         let actual = backend.remote_ref_value(repo, remote, name).await?;
         if actual != from {
             return Err(moved(actual));
@@ -252,7 +252,12 @@ fn run_remote_step(
             }
             other => other,
         }
-    })
+    });
+    // A refused host or a failed token command reads as that.
+    match (&grant, outcome) {
+        (Some(grant), Err(e @ (Error::Backend(_) | Error::Git { .. }))) => Err(grant.explain(e)),
+        (_, other) => other,
+    }
 }
 
 /// `Undo`/`Redo` with `forget`: drops the top entry of `direction` from the

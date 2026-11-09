@@ -53,7 +53,7 @@ pub fn keep_up_to_date(backend: &dyn GitBackend, request: &Request, dispatched: 
     if !out_of_step {
         return;
     }
-    let Ok(_grant) = crate::credentials::apply_for(backend, &repo, &request.session) else {
+    let Ok(grant) = crate::credentials::apply_for(backend, &repo, &request.session) else {
         // A profile that cannot be used refuses the transfer; the explicit
         // submodule update says why, this background one just does not run.
         return;
@@ -68,6 +68,10 @@ pub fn keep_up_to_date(backend: &dyn GitBackend, request: &Request, dispatched: 
     );
     dispatched.mutated = true;
     if let Err(e) = updated {
+        let e = match &grant {
+            Some(grant) => grant.explain(e),
+            None => e,
+        };
         let journal = dispatched.journal.take();
         *dispatched = err_kind(
             request.id,

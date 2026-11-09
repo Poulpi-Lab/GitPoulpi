@@ -406,6 +406,55 @@ async fn a_failing_command_reads_with_a_redacted_stderr() {
     rig.handle.shutdown().await.unwrap();
 }
 
+/// The submodule update runs under the same grant: a token command that fails
+/// reads as that there too, not as git's "terminal prompts disabled".
+#[tokio::test]
+async fn a_failing_command_reads_the_same_in_a_submodule_update() {
+    let _turn = exclusive().await;
+    let server = AuthHttpRemote::start_accepting();
+    let repo = repo_on(&server);
+    let head = repo.git(&["rev-parse", "HEAD"]);
+    std::fs::write(
+        repo.root().join(".gitmodules"),
+        format!(
+            "[submodule \"sub\"]\n\tpath = sub\n\turl = {}\n",
+            server.url()
+        ),
+    )
+    .unwrap();
+    repo.git(&[
+        "update-index",
+        "--add",
+        "--cacheinfo",
+        &format!("160000,{},sub", head.trim()),
+    ]);
+    let scripts = tempfile::tempdir().unwrap();
+    let tool = script(
+        scripts.path(),
+        "token.sh",
+        "echo 'vault is sealed' >&2\nexit 3\n",
+    );
+    let mut rig = Rig::new("token-command-submodule", &repo).await;
+    rig.set(token_command(&[&tool.to_string_lossy()], &[]), true)
+        .await
+        .unwrap();
+    let error = rig
+        .call(
+            OperationKind::SubmoduleUpdate,
+            json!({ "opts": { "paths": [], "init": true, "recursive": false } }),
+        )
+        .await
+        .expect_err("the command failed");
+    match &error.kind {
+        Some(TypedError::TokenCommandFailed { exit, stderr_tail }) => {
+            assert_eq!(*exit, Some(3));
+            assert!(stderr_tail.contains("vault is sealed"), "{stderr_tail}");
+        }
+        other => panic!("{other:?}: {}", error.message),
+    }
+    rig.handle.shutdown().await.unwrap();
+}
+
 /// A helper source: git runs the confirmed helper as is. A stored hash that no
 /// longer matches the helper refuses the transfer, as does a changed in-tree
 /// helper script.

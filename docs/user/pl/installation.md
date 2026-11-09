@@ -185,7 +185,7 @@ systemy). Archiwum zawiera trzy pliki wykonywalne, `INSTALL.txt`, `README.md`,
 
 ## Aktualizacje
 
-Pasek tytułu pokazuje działającą wersję (`v1.0.0`) między nazwą aplikacji a ścieżką repozytorium. Kliknij ją, naciśnij `Ctrl+N`, a potem `u`, albo uruchom **Aktualizacje: Pokaż aktualizację** z palety poleceń (`Ctrl+P`): otwiera się panel aktualizacji z wersją, sposobem instalacji GitPoulpi i tym, co zrobić z nowszym wydaniem. **Pomoc: Informacje o wersji** otwiera dziennik zmian.
+Pasek tytułu pokazuje działającą wersję (`v1.0.0`) między nazwą aplikacji a ścieżką repozytorium. Kliknięcie jej otwiera panel aktualizacji tylko wtedy, gdy istnieje nowsze wydanie albo trwa aktualizacja; w przeciwnym razie otwiera kartę **Informacje o wersji**. Panel otwierają też `Ctrl+N`, a potem `u`, oraz **Aktualizacje: Pokaż aktualizację** z palety poleceń (`Ctrl+P`). Panel pokazuje wersję, sposobem instalacji GitPoulpi i tym, co zrobić z nowszym wydaniem. **Pomoc: Informacje o wersji** otwiera dziennik zmian.
 
 Raz dziennie, w tle, GitPoulpi sprawdza miejsce, w którym publikowane są jego wydania (domyślnie GitHub), czy jest nowsze (`updates.mode`, [Ustawienia > Synchronizacja](settings.md#synchronizacja)). Gdy tak, znaczek czyta `v0.2.0 dostępna` w kolorze akcentu.
 

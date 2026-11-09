@@ -8,7 +8,7 @@ GitPoulpi sprawdza, czy są nowsze wydania, i zależnie od sposobu instalacji al
 
 Pasek tytułu pokazuje działającą wersję (`v1.0.0`) między nazwą aplikacji a ścieżką repozytorium. Gdy znane jest nowsze wydanie, znaczek zmienia się w `v0.2.0 dostępna` w kolorze akcentu.
 
-Kliknij znaczek, naciśnij `Ctrl+N`, a potem `u`, albo uruchom **Aktualizacje: Pokaż aktualizację** z palety poleceń (`Ctrl+P`): otwiera się panel aktualizacji. To okno nad aplikacją: zamyka je `Esc`, `q`, krzyżyk zamknięcia lub kliknięcie poza nim. Pokazuje:
+Kliknięcie znaczka otwiera panel aktualizacji tylko wtedy, gdy istnieje nowsze wydanie albo trwa aktualizacja; w przeciwnym razie otwiera kartę **Informacje o wersji**. Panel otwierają też `Ctrl+N`, a potem `u`, oraz **Aktualizacje: Pokaż aktualizację** z palety poleceń (`Ctrl+P`). Panel to okno nad aplikacją: zamyka je `Esc`, `q`, krzyżyk zamknięcia lub kliknięcie poza nim. Pokazuje:
 
 - działającą wersję i **Sposób instalacji**: jak GitPoulpi trafił na ten komputer (od tego zależy wszystko poniżej);
 - stan aktualizacji (sprawdzanie, pobieranie z procentami, gotowa, nieudana);

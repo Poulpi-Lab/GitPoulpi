@@ -149,6 +149,7 @@ pedido de nome que o botão.
 | Alterações em andamento | stage e unstage (arquivo, pasta, hunk, linhas, tudo), descartar (arquivo, pasta, hunk, linhas, um checkout de arquivo), aplicar um patch, **excluir um arquivo do disco**, **ignorar** (arquivo, extensão ou pasta: a linha do `.gitignore` escolhido), **tratar como binário ou texto** (a linha do `.gitattributes`) |
 | Stashes | push, apply, pop, drop |
 | Remotos e configuração | adicionar, remover, renomear, alterar a URL ou a URL de push de um remoto, track e untrack do Git LFS |
+| Em um servidor | **excluir uma branch ou tag em um remoto** (pelo menu da ref, pela paleta, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, ou um fim de workflow que exclui a branch remota): veja abaixo |
 
 Enquanto um merge, cherry-pick ou revert está parado por conflitos, **Salvar e
 marcar resolvido**, o stage e o unstage também podem ser desfeitos (cada um é
@@ -169,11 +170,40 @@ antiga). Desfazer a remoção de um remoto devolve suas branches de rastreamento
 remoto, seu alias `origin/HEAD` e as configurações de upstream das branches que o
 rastreavam.
 
+### Excluir uma branch ou tag em um remoto
+
+Antes da exclusão, o GitPoulpi pergunta ao servidor o que a branch ou tag guarda
+agora e registra: o remoto, o nome e o commit exato (para uma tag anotada, o
+próprio objeto da tag, de modo que a anotação é mantida). A exclusão só é feita
+se o servidor ainda guardar esse valor.
+
+**Desfazer a envia de volta** com o mesmo nome, no mesmo commit, sem nunca forçar.
+Como é uma alteração em um servidor que outras pessoas veem, Desfazer **sempre
+pergunta antes** e diz isso (“Desfazer recria a branch topic em origin em
+3f2a1c0...”); os passos da entrada também dizem (`gitpoulpi undo --dry-run`). Ele
+usa as mesmas credenciais de um push. A branch de rastreamento remoto volta junto.
+**Refazer** a exclui de novo, com a mesma segurança.
+
+Desfazer se recusa, sem alterar nada, quando:
+
+- a branch ou tag foi **criada de novo no remoto** desde então, ou movida: ela está
+  em outro commit que não o registrado, e enviar sobrescreveria o trabalho de outra
+  pessoa (a recusa nomeia os dois commits);
+- o commit (ou objeto de tag) **não está mais no seu repositório** (foi removido
+  pela coleta de lixo): o desfazer não pode ser feito.
+
+“Excluir localmente e no remoto” é **uma entrada só**: Desfazer restaura a branch ou
+tag local e a remota juntas, Refazer exclui as duas de novo. Excluir só a branch
+remota deixa a local em paz; desfazer faz o mesmo. Um fim de workflow que também
+exclui a branch remota pode ser desfeito como um todo.
+
 ## O que não pode ser desfeito, e por quê
 
-- **Qualquer coisa em um servidor**: push, excluir uma branch ou tag remota, enviar
-  uma tag, push do LFS, lock e unlock. Esse estado é compartilhado com outras
-  pessoas; desfazê-lo seria outro push, e o GitPoulpi não fará isso por você.
+- **A maior parte do que acontece em um servidor**: push, enviar uma tag, push do
+  LFS, lock e unlock, abrir um pull request. Esse estado é compartilhado com outras
+  pessoas; desfazer um push seria um force-push ou uma exclusão do lado delas, e o
+  GitPoulpi não fará isso por você. (Excluir uma branch ou tag remota é a exceção:
+  o desfazer só recoloca o que o servidor guardava e se recusa se algo mudou lá.)
   Desfazer também nunca fica bloqueado por uma operação dessas.
 - **Fetch**: ele só move refs de rastreamento remoto, que espelham o servidor. O
   próximo fetch faria tudo de novo.
@@ -285,6 +315,9 @@ Dois casos se resolvem sozinhos:
 
 Desfazer só pergunta quando é arriscado:
 
+- a entrada excluiu uma branch ou tag em um remoto: desfazê-la **envia de volta ao
+  servidor** (veja acima), então sempre pergunta, e o mesmo vale para o refazer que
+  a exclui lá de novo;
 - o commit (ou merge, rebase, cherry-pick, revert) que você está desfazendo já está
   no upstream da branch: desfazê-lo reescreve um histórico que você publicou, e
   você teria de fazer force-push do resultado;
@@ -347,8 +380,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   entrada de refazer mais recente). Ele se recusa quando essa entrada não está
   bloqueada, e termina com **3** sem `--yes`. É uma mutação para o MCP, mas não
   destrutiva: o repositório não é tocado.
-- Código de saída **0** feito, **2** recusado (o JSON nomeia o motivo), **3**
-  arriscado e exige `--yes`.
+- Código de saída **0** feito, **2** recusado (o JSON nomeia o motivo, por exemplo
+  `RemoteRefMoved` quando uma branch remota excluída foi criada de novo), **3**
+  arriscado e exige `--yes` (desfazer a exclusão de uma branch ou tag remota, que
+  faz push ao servidor).
 
 Voltar atrás sem desfazer tudo o que veio depois:
 

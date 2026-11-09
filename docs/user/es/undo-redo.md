@@ -143,6 +143,7 @@ de nombre que el botón.
 | Cambios de trabajo | stage y unstage (archivo, carpeta, hunk, líneas, todo), descartar (archivo, carpeta, hunk, líneas, un checkout de archivo), aplicar un parche, **eliminar un archivo del disco**, **ignorar** (archivo, extensión o carpeta: la línea del `.gitignore` que elijas), **tratar como binario o texto** (la línea de `.gitattributes`) |
 | Stashes | push, apply, pop, drop |
 | Remotos y configuración | añadir, quitar, renombrar, cambiar la URL o la URL de push de un remoto, track y untrack de Git LFS |
+| En un servidor | **eliminar una rama o un tag en un remoto** (desde el menú de la ref, la paleta, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, o el cierre de un flujo que elimina la rama remota): véase abajo |
 
 Mientras un merge, cherry-pick o revert está detenido por conflictos, **Guardar y marcar
 resuelto**, el stage y el unstage también se pueden deshacer (cada uno se revierte antes que el
@@ -161,11 +162,40 @@ simbólicos. Deshacer un stash eliminado devuelve el mismo stash, con el mismo i
 Deshacer la eliminación de un remoto devuelve sus ramas de seguimiento remoto, su alias
 `origin/HEAD` y los ajustes de upstream de las ramas que lo seguían.
 
+### Eliminar una rama o un tag en un remoto
+
+Antes de la eliminación, GitPoulpi pregunta al servidor qué contiene ahora la rama o el
+tag y lo registra: el remoto, el nombre y el commit exacto (en un tag anotado, el propio
+objeto del tag, para conservar su anotación). La eliminación solo se hace si el servidor
+sigue teniendo ese valor.
+
+**Deshacer la vuelve a enviar** con el mismo nombre, en el mismo commit, sin forzar nunca.
+Como es un cambio en un servidor que otras personas ven, Deshacer **siempre pregunta
+primero** y lo dice («Deshacer esto vuelve a crear la rama topic en origin en
+3f2a1c0...»); los pasos de la entrada también lo dicen (`gitpoulpi undo --dry-run`). Usa
+las mismas credenciales que un push. La rama de seguimiento remoto vuelve con ella.
+**Rehacer** la elimina otra vez, con la misma seguridad.
+
+Deshacer se niega, sin cambiar nada, cuando:
+
+- la rama o el tag se **creó de nuevo en el remoto** desde entonces, o se movió: está en
+  otro commit distinto del registrado, y enviarlo sobrescribiría el trabajo de otra persona
+  (la negativa nombra ambos commits);
+- el commit (o el objeto del tag) **ya no está en tu repositorio** (lo eliminó la
+  recolección de basura): el deshacer no se puede hacer.
+
+«Eliminar en local y en el remoto» es **una sola entrada**: Deshacer restaura juntas la rama
+o el tag local y el remoto, Rehacer vuelve a eliminar ambos. Eliminar solo la rama remota
+deja intacta la local; deshacerlo hace lo mismo. El cierre de un flujo que también elimina
+la rama remota se puede deshacer en conjunto.
+
 ## Qué no se puede deshacer, y por qué
 
-- **Cualquier cosa en un servidor**: push, eliminar una rama o un tag remotos, enviar un tag,
-  push de LFS, bloquear y desbloquear. Ese estado se comparte con otras personas; deshacerlo
-  sería otro push, y GitPoulpi no lo hará por ti. Además, deshacer nunca se bloquea por una
+- **La mayoría de las cosas en un servidor**: push, enviar un tag, push de LFS, bloquear y
+  desbloquear, abrir una pull request. Ese estado se comparte con otras personas; deshacer
+  un push sería un force-push o una eliminación en su lado, y GitPoulpi no lo hará por ti.
+  (Eliminar una rama o un tag remotos es la excepción: el deshacer solo devuelve lo que el
+  servidor tenía, y se niega si algo cambió allí.) Además, deshacer nunca se bloquea por una
   operación así.
 - **Fetch**: solo mueve refs de seguimiento remoto, que reflejan el servidor. El siguiente
   fetch volvería a hacerlo.
@@ -273,7 +303,10 @@ Deshacer solo pregunta cuando es arriesgado:
   del resultado;
 - tienes cambios sin commit y el deshacer mueve el árbol de trabajo: tus cambios se
   conservan, pero el deshacer se detiene, sin cambiar nada, si uno de ellos está en un
-  archivo que tiene que reescribir.
+  archivo que tiene que reescribir;
+- la entrada eliminó una rama o un tag en un remoto: deshacerla **la vuelve a enviar al
+  servidor** (véase arriba), así que siempre pregunta, y lo mismo el rehacer que la
+  elimina allí otra vez.
 
 Rehacer, y todo deshacer de un simple movimiento de refs, nunca pregunta: la otra dirección
 está a una tecla de distancia.
@@ -327,8 +360,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
 - `undo-forget` quita del diario la entrada bloqueada más reciente (`--redo`: la entrada de
   rehacer más reciente). Se niega cuando esa entrada no está bloqueada, y termina con **3** sin
   `--yes`. Para el MCP es una mutación, pero no destructiva: el repositorio no se toca.
-- Código de salida **0** hecho, **2** rechazado (el JSON nombra el motivo), **3** arriesgado y
-  necesita `--yes`.
+- Código de salida **0** hecho, **2** rechazado (el JSON nombra el motivo, por ejemplo
+  `RemoteRefMoved` cuando una rama remota eliminada se creó de nuevo), **3** arriesgado y
+  necesita `--yes` (deshacer la eliminación de una rama o un tag remotos, que hace un push al
+  servidor).
 
 Volver atrás sin deshacer todo lo posterior:
 

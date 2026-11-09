@@ -152,6 +152,7 @@ potwierdzenie lub pole nazwy co przycisk.
 | Zmiany robocze | stage i unstage (plik, folder, hunk, linie, wszystko), odrzucenie (plik, folder, hunk, linie, checkout pliku), zastosowanie patcha, **usunięcie pliku z dysku**, **ignorowanie** (plik, rozszerzenie lub folder: wiersz w wybranym `.gitignore`), **traktowanie jako binarny lub tekstowy** (wiersz w `.gitattributes`) |
 | Stashe | push, apply, pop, drop |
 | Zdalne repozytoria i konfiguracja | dodanie, usunięcie, zmiana nazwy, zmiana adresu URL lub push URL zdalnego repozytorium, Git LFS track i untrack |
+| Na serwerze | **usunięcie gałęzi lub tagu na zdalnym repozytorium** (z menu refa, palety, `branch delete-remote`, `tag delete-remote`, `tag delete --both` albo zakończenia workflow, które usuwa gałąź zdalną): zob. niżej |
 
 Gdy merge, cherry-pick lub revert jest zatrzymany na konfliktach, **Zapisz i oznacz jako rozwiązany**,
 stage i unstage również można cofnąć (każdy z nich jest cofany
@@ -171,11 +172,41 @@ pozycji). Cofnięcie usunięcia zdalnego repozytorium przywraca jego gałęzie
 zdalne, alias `origin/HEAD` i ustawienia upstreamu gałęzi, które
 je śledziły.
 
+### Usunięcie gałęzi lub tagu na zdalnym repozytorium
+
+Przed usunięciem GitPoulpi pyta serwer, co gałąź lub tag trzyma w tej chwili,
+i to zapisuje: zdalne repozytorium, nazwę i dokładny commit (dla tagu
+z adnotacją sam obiekt tagu, więc adnotacja zostaje). Usunięcie jest potem
+wykonywane tylko wtedy, gdy serwer nadal trzyma tę wartość.
+
+**Cofnięcie wypycha ją z powrotem** pod tą samą nazwą, na ten sam commit,
+nigdy bez wymuszania. Ponieważ to zmiana na serwerze, który widzą inne osoby,
+Cofnij **zawsze pyta najpierw** i mówi o tym („Cofnięcie odtworzy gałąź topic
+w origin na 3f2a1c0...”); kroki wpisu też to mówią (`gitpoulpi undo --dry-run`).
+Używa tych samych poświadczeń co push. Razem z nią wraca gałąź zdalna
+śledząca. **Ponów** usuwa ją znowu, z tym samym zabezpieczeniem.
+
+Cofnięcie odmawia, niczego nie zmieniając, gdy:
+
+- gałąź lub tag został od tego czasu **utworzony ponownie na zdalnym
+  repozytorium** albo przesunięty: wskazuje inny commit niż zapisany, a wypchnięcie
+  nadpisałoby czyjąś pracę (odmowa podaje oba commity);
+- commita (lub obiektu tagu) **nie ma już w twoim repozytorium** (został usunięty
+  przez garbage collection): cofnięcie nie jest możliwe.
+
+„Usuń lokalnie i na zdalnym” to **jeden wpis**: Cofnij przywraca razem gałąź lub
+tag lokalny i zdalny, Ponów usuwa oba znowu. Usunięcie tylko gałęzi zdalnej
+zostawia lokalną w spokoju; jej cofnięcie robi to samo. Zakończenie workflow, które
+usuwa też gałąź zdalną, można cofnąć w całości.
+
 ## Czego nie można cofnąć i dlaczego
 
-- **Niczego, co dotyczy serwera**: push, usunięcia zdalnej gałęzi lub tagu, wypchnięcia
-  tagu, LFS push, lock i unlock. Ten stan jest wspólny z innymi osobami;
-  jego cofnięcie byłoby kolejnym pushem, a GitPoulpi nie zrobi tego za ciebie.
+- **Większości rzeczy, które dotyczą serwera**: push, wypchnięcia tagu, LFS push,
+  lock i unlock, otwarcia pull requesta. Ten stan jest wspólny z innymi osobami;
+  cofnięcie pusha byłoby force-pushem lub usunięciem po ich stronie, a GitPoulpi
+  nie zrobi tego za ciebie. (Wyjątkiem jest usunięcie gałęzi lub tagu na zdalnym
+  repozytorium: cofnięcie tylko przywraca to, co trzymał serwer, i odmawia, gdy
+  cokolwiek się tam zmieniło.)
   Cofanie nigdy też nie jest blokowane przez taką operację.
 - **Fetch**: przesuwa tylko refy zdalne, które odzwierciedlają serwer. Następny
   fetch zrobiłby to znowu.
@@ -290,7 +321,10 @@ Cofanie pyta tylko wtedy, gdy jest ryzykowne:
   a wynik trzeba by wypchnąć siłą (force-push);
 - masz niezatwierdzone zmiany, a cofnięcie rusza drzewo robocze: twoje
   zmiany są zachowane, ale cofanie zatrzymuje się bez żadnych zmian, jeśli jedna z nich jest w
-  pliku, który musi przepisać.
+  pliku, który musi przepisać;
+- wpis usunął gałąź lub tag na zdalnym repozytorium: jego cofnięcie **wypycha je
+  z powrotem na serwer** (zob. wyżej), więc zawsze pyta, tak samo jak ponowienie,
+  które usuwa je tam znowu.
 
 Ponów i każde cofnięcie samego przesunięcia refa nigdy nie pytają: druga strona jest
 o jeden klawisz dalej.
@@ -346,8 +380,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   wpis ponawiania). Odmawia, gdy wpis nie jest zablokowany, i kończy się kodem **3**
   bez `--yes`. Dla MCP to mutacja, ale nie destrukcyjna: repozytorium
   pozostaje nietknięte.
-- Kod wyjścia **0** wykonano, **2** odmowa (JSON podaje powód), **3** ryzykowne
-  i wymaga `--yes`.
+- Kod wyjścia **0** wykonano, **2** odmowa (JSON podaje powód, na przykład
+  `RemoteRefMoved`, gdy usunięta gałąź zdalna została utworzona ponownie), **3**
+  ryzykowne i wymaga `--yes` (cofnięcie usunięcia gałęzi lub tagu na zdalnym
+  repozytorium, które wypycha na serwer).
 
 Wracanie bez cofania wszystkiego, co było potem:
 

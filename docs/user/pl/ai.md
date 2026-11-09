@@ -301,7 +301,11 @@ tekstu przed nim i po nim oraz twoje instrukcje (globalne, repozytorium
 i te z *Rozwiązywanie konfliktów* w Ustawieniach > AI). Odpowiada rozwiązanym
 tekstem tego jednego konfliktu w bloku kodu; odpowiedź ze znacznikami konfliktu
 albo dodatkowym tekstem zamiast kodu jest odsyłana raz, potem odrzucana. Konflikt powyżej
-około 40 KB nie jest wysyłany. Elementy sterujące są ukryte, gdy AI jest
+40 KB (`ai.limits.conflict_bytes`, *Ustawienia > AI > Limity*) jest wstrzymywany za
+ostrzeżeniem, które podaje jego rozmiar i limit, z przyciskami *Wyślij mimo to*
+(tylko to żądanie, nadal oczyszczone kontrolami prywatności), *Otwórz ustawienie*
+i *Anuluj*; limit to własne zabezpieczenie GitPoulpi, więc podnieś go, gdy twój
+model ma zapas. Elementy sterujące są ukryte, gdy AI jest
 wyłączone, a sugestia nigdy niczego nie zapisuje, nie dodaje do poczekalni ani
 nie rozwiązuje: przejrzyj Wynik, edytuj go i zapisz jak zwykle.
 
@@ -312,7 +316,9 @@ nie rozwiązuje: przejrzyj Wynik, edytuj go i zapisz jak zwykle.
 ### Kompozytor commitów
 
 Model dzieli zmiany robocze na kilka commitów (każdy zmieniony plik w dokładnie
-jednym; nieprawidłowy plan jest odsyłany raz, potem odrzucany). Plan
+jednym; nieprawidłowy plan jest odsyłany raz, potem odrzucany). Dopóki pliki
+mają konflikty, o nic się nie pyta: okno wypisuje je i otwiera widok rozwiązywania
+konfliktów, bo kompozytor potrzebuje drzewa bez konfliktów. Plan
 przeglądasz, zanim cokolwiek zostanie zatwierdzone:
 
 ![Przegląd kompozytora: cztery proponowane commity z plikami oraz przyciski Resetuj, Anuluj i Utwórz 4 commity](../images/composer.png)
@@ -446,13 +452,63 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 efektywny kontekst jako `review_context`. Te same cztery ustawienia to `ai.review.*` w
 `config.toml` ([opis](config-reference.md#ai-wbudowane-ai-domyślnie-wyłączone)).
 
+## Limity wejścia
+
+Każde wejście, które GitPoulpi umieszcza w żądaniu, ma limit rozmiaru: ustawienie
+w `[ai.limits]` (*Ustawienia > AI > Limity*). Limity to własne zabezpieczenie
+GitPoulpi (okno kontekstu modelu różni się zależnie od modelu): podnieś je, gdy
+twój model ma zapas, obniż, by żądania były małe.
+
+| Ustawienie (`ai.limits.`) | Domyślnie | Co ogranicza |
+|---|---|---|
+| `conflict_bytes` | 40000 | Bloki bazowy, bieżący i przychodzący jednego konfliktu merge |
+| `diff_bytes` | 60000 | Diff opisu commita, wyjaśnienia, nazwy stasha, opisu pull requesta, planu commitów lub podziału; cały diff przeglądu kodu |
+| `review_file_bytes` | 12000 | Diff jednego pliku w przeglądzie kodu |
+| `review_text_bytes` | 4000 | Opis przeglądanego pull requesta |
+| `review_threads_bytes` | 6000 | Istniejące komentarze przeglądu |
+| `review_context_file_bytes` | 8192 | Jeden plik kontekstu projektu w przeglądzie (`CLAUDE.md`, `AGENTS.md`, dodatkowy plik) |
+| `review_context_bytes` | 16384 | Wszystkie pliki kontekstu przeglądu razem |
+
+**Nic nie jest obcinane po cichu.** Gdy wejście przekracza limit, żądanie czeka,
+a okno *Przekroczono limit AI* wypisuje, co go przekracza: która część (diff,
+plik, opis, plik kontekstu), jej rozmiar, limit i ustawienie. Przegląd wypisuje
+każdą przekraczającą część w jednym oknie. Przyciski, każdy z klawiszem:
+
+- *Wyślij wszystko* (`W`): tylko to żądanie, nic nie jest obcinane. Nadal przechodzi
+  przez kontrole prywatności (sekrety zastąpione, pliki wrażliwe pominięte) i, gdy
+  jest włączony, panel *Co jest wysyłane*, który pojawia się potem.
+- *Wyślij obcięte* (`O`): to, co przekracza limit, jest obcinane, jak zawsze;
+  każda linia okna mówi, co zostaje pominięte (koniec diffa, ostatnie hunki,
+  pliki, które się nie mieszczą).
+- *Otwórz ustawienie* (`U`): anuluje żądanie i otwiera *Ustawienia > AI > Limity*
+  na pierwszym wymienionym limicie. Fokus zaczyna się tutaj: Enter nigdy nie wysyła.
+- *Anuluj* (`A`, `Esc`, krzyżyk lub kliknięcie poza oknem): niczego nie wysyła.
+
+Wyjątkiem jest konflikt: nigdy nie jest obcinany. *Wyślij mimo to* (`M`) wysyła go
+w całości jeden raz.
+
+Nic nie uruchamia żądania AI samo, więc nie ma przebiegu w tle, który mógłby
+pytać: każde żądanie to takie, które sam uruchomiłeś. Przebieg, który nie może
+zapytać (CLI i MCP), obcina jak dawniej i mówi o tym; zob. niżej.
+
+**W wierszu poleceń** nic nie może odpowiedzieć na okno, więc wejście przekraczające
+limit jest obcinane jak dawniej, a odpowiedź mówi, co obcięto:
+`truncated: [{part, detail?, bytes, limit, setting}]` (obecne tylko, gdy coś
+obcięto; `part` to jedno z `diff`, `split_hunks`, `review_diff`, `review_file`,
+`review_text`, `review_threads`, `context_file`, `context_total`). `--send-all`
+(alias `--no-truncate`) wysyła natomiast wszystko w całości: przy `ai` (wszystkie
+jego polecenia, także `ai resolve-conflict`, gdzie konflikt powyżej limitu jest
+inaczej odrzucany), przy `commit --ai`, `stash push --ai` i `hosting review suggest`.
+Narzędzia MCP mają ten sam argument `send_all` i to samo pole `truncated`.
+
 ## Prywatność
 
 - Nic nie jest wysyłane, dopóki nie naciśniesz przycisku lub nie uruchomisz
   polecenia. Żadnego AI w tle, żadnej telemetrii, żadnego konta GitPoulpi.
 - Co jest wysyłane: prompt (wbudowany, potem twoje instrukcje) i diff, o który
-  zapytano, obcięty do około 60 KB (z informacją o tym); dla pull requesta także
-  tematy commitów gałęzi.
+  zapytano; dla pull requesta także tematy commitów gałęzi. Diff powyżej 60 KB
+  (`ai.limits.diff_bytes`) nigdy nie jest obcinany po cichu: zob.
+  [Limity wejścia](#limity-wejścia).
 - Zapytanie o skrypt przepisania historii wysyła twoje polecenie i stały kontrakt
   skryptu (API piaskownicy skryptów). Autor, data i temat do 20 commitów idą razem
   z nim **tylko** po zaznaczeniu *Wyślij próbkę* w oknie (domyślnie wyłączone; CLI
@@ -522,6 +578,8 @@ repozytorium.
 | `niepowodzenie:` 404 | **Model** tam nie istnieje: wyczyść go, aby użyć domyślnego. |
 | `niepowodzenie:` błąd połączenia (Ollama, LM Studio) | Serwer nie działa albo **Bazowy URL** ma zły port lub brakuje w nim `/v1`. |
 | Klucz pokazuje `(nie ustawiono)` po wpisaniu | Brak menedżera poświadczeń: skonfiguruj go (`git config --global credential.helper ...`) i wpisz klucz ponownie. |
+| *Przekroczono limit AI* | Wejście żądania przekracza limit z `[ai.limits]`: wybierz *Wyślij wszystko*, *Wyślij obcięte*, *Otwórz ustawienie* lub *Anuluj* (zob. [Limity wejścia](#limity-wejścia)). |
+| „Ten konflikt jest większy niż limit” | Konflikt przekracza `ai.limits.conflict_bytes` (domyślnie 40000). *Wyślij mimo to* wysyła go raz; *Otwórz ustawienie* prowadzi do limitu w Ustawienia > AI > Limity. |
 | Zły język lub styl | Dodaj instrukcje; znaczniki Szybkie wstawianie w edytorze robią to szybko. |
 | Kompozytor mówi, że plan jest nieprawidłowy | Model pominął lub powtórzył plik: spróbuj ponownie albo użyj mocniejszego modelu. |
 

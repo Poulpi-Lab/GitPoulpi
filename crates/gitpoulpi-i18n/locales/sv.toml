@@ -2461,8 +2461,8 @@ preferences_list_remove = "Ta bort det valda listobjektet"
 preferences_list_move_up = "Flytta det valda listobjektet upp"
 preferences_list_move_down = "Flytta det valda listobjektet ned"
 ai_popup_copy = "Kopiera resultatet"
-activity_log_scroll_left = "Scroll the Activity Log Left"
-activity_log_scroll_right = "Scroll the Activity Log Right"
+activity_log_scroll_left = "Rulla Aktivitetsloggen åt vänster"
+activity_log_scroll_right = "Rulla Aktivitetsloggen åt höger"
 integrations_add = "Lägg till en profil"
 integrations_edit = "Redigera vald profil"
 integrations_open_token = "Öppna tokensidan"
@@ -2528,7 +2528,7 @@ folder_picker = "Mappväljare"
 preferences = "Inställningar"
 ai_popup = "Popup för AI-resultat"
 integrations = "Inställningar: sidan Integrationer"
-activity_log = "Activity Log window"
+activity_log = "Fönstret Aktivitetslogg"
 palette = "Palettkommandon"
 split = "Redigerare för att dela upp {$commit}"
 
@@ -4592,8 +4592,8 @@ not_blocked = "den senaste ångraposten är inte blockerad"
 forget_button = "Glöm"
 
 [undo_ui]
-nothing_to_undo = { git = "inget att ångra (en push, en fetch eller något annat som gjorts på en remote-server ångras aldrig)", local = "inget att ångra (en push, en hämtning eller något annat som gjorts på en remote-server ångras aldrig)" }
-tip_nothing_to_undo = { git = "Inget att ångra (en push, en fetch eller något annat som gjorts på en remote-server ångras aldrig)", local = "Inget att ångra (en push, en hämtning eller något annat som gjorts på en remote-server ångras aldrig)" }
+nothing_to_undo = "inget att ångra (en {$push_noun}, en {$fetch_noun} eller något annat som gjorts på en remote-server ångras aldrig, utom borttagning av en remote-gren eller en {$tag})"
+tip_nothing_to_undo = "Inget att ångra (en {$push_noun}, en {$fetch_noun} eller något annat som gjorts på en remote-server ångras aldrig, utom borttagning av en remote-gren eller en {$tag})"
 tip_nothing_to_redo = "Inget att göra om"
 nothing_to_redo = "inget att göra om"
 disabled = "Ångra är avstängt (Inställningar > Allmänt)"
@@ -5052,7 +5052,7 @@ conflict_not_conflicted = "filen är inte i konflikt"
 conflict_already = "filen är fortfarande i konflikt"
 conflict_no_operation = "ingen {$merge}, {$rebase}, {$cherry_pick} eller revert pågår"
 conflict_unencodable = "rad {line} har ett tecken som filens teckenkodning inte kan representera"
-conflict_local_changes = "local changes the abort would overwrite: {paths}"
+conflict_local_changes = "lokala ändringar som avbrytandet skulle skriva över: {paths}"
 undo_refused = "kan inte ångra/göra om: {reason}"
 undo_in_progress = "slutför eller avbryt {op} först"
 undo_ref_moved = "{name} är vid {actual}, inte vid {expected} där operationen lämnade den; den ändrades utanför GitPoulpi"
@@ -5081,8 +5081,8 @@ undo_already_restored = "allt som den här åtgärden tog bort är redan tillbak
 undo_no_such_entry = "det finns ingen åtgärd nr {id} i ångrahistoriken"
 split_refused = { git = "kan inte dela upp den commiten: {reason}", local = "kan inte dela upp den incheckningen: {reason}" }
 undo_purged = "den gamla historiken för åtgärd #{entry} har rensats, så den kan inte ångras eller göras om"
-undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
-undo_remote_object_missing = "{object} is no longer in this repository (it was garbage collected), so the branch or {$tag} cannot be restored on the remote with a {$push_noun}"
+undo_remote_ref_moved = "{name} på {remote} är på {actual}, inte på {expected} där åtgärden lämnade den: den ändrades på remoten efteråt, så ingenting skickades eller togs bort där"
+undo_remote_object_missing = "{object} finns inte längre i det här repositoryt (det städades bort av skräpsamlingen), så grenen eller {$tag} kan inte återställas på remoten med en {$push_noun}"
 
 [window]
 connecting = "ansluter till sessionens daemon..."
@@ -5932,17 +5932,17 @@ scope_all = "Alla repositories"
 scope_workspace = "Arbetsyta: {name}"
 app_wide = "hela appen"
 git_empty = "Inga åtgärder än. Åtgärderna i det valda omfånget visas här, med hur lång tid de tog."
-hint_git = "Upp/Ned: välj  Enter: detaljer  c: kopiera  r: föreslagen åtgärd  d: diagnostik  s: omfång  Tab: program  Esc: stäng"
+hint_git = "Upp/Ned: välj  Vänster/Höger: rulla  Enter: detaljer  c: kopiera  r: föreslagen åtgärd  d: diagnostik  s: omfång  Tab: program  Esc: stäng"
 hint_application = "Pilar: rulla  l: nivå  /: filtrera  c: kopiera allt  o: mapp  x: rensa  d: diagnostik  s: omfång  g: git  Esc: stäng"
 palette_scope = "Aktivitetslogg: Välj omfång"
 palette_git_tab = "Aktivitetslogg: Git-åtgärder"
 palette_app_tab = "Aktivitetslogg: Programlogg"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the left
-palette_scroll_left = "Activity Log: Scroll Left"
+palette_scroll_left = "Aktivitetslogg: Rulla åt vänster"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the right
-palette_scroll_right = "Activity Log: Scroll Right"
+palette_scroll_right = "Aktivitetslogg: Rulla åt höger"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
-help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
+help_scroll = "Aktivitetslogg: rulla långa rader i sidled (även Shift+hjul eller den vågräta rullningslisten)"
 
 [git_error]
 summary_host_key = "SSH-värdnyckeln för remoten är ännu inte känd."
@@ -5971,9 +5971,9 @@ summary_network = "Remoten kunde inte nås."
 hint_network = "Kontrollera din anslutning och remotens adress och försök igen."
 summary_lock = "En annan git-process använder det här repositoryt."
 hint_lock = "Stäng andra git-verktyg, eller ta bort låsfilen om inget körs."
-summary_credential_helper = "The configured credential helper failed: {line}"
-hint_credential_helper = "Run `git config --show-origin --get-all credential.helper` to see where it is set, fix or remove that helper, then retry."
-hint_abort_blocked = "Save a copy of the changes to those files or discard them in the Status pane, then retry the abort."
+summary_credential_helper = "Den konfigurerade credential helpern misslyckades: {line}"
+hint_credential_helper = "Kör `git config --show-origin --get-all credential.helper` för att se var den är satt, rätta eller ta bort den och försök igen."
+hint_abort_blocked = "Spara en kopia av ändringarna i de filerna eller släng dem i rutan Status och försök sedan avbryta igen."
 action_pull_first = "{$Pull} först"
 action_integrations = "Öppna Integrationer"
 action_stash_retry = "{$Stash} och försök igen"
@@ -8949,100 +8949,100 @@ sensitive_stage = "känsliga filer blev inte {$staged}: {files}; fråga använda
 
 [ai_limits]
 # context: Settings > AI, heading of the rows that limit how much input an AI request carries
-settings_heading = "Limits"
+settings_heading = "Gränser"
 # context: Settings > AI, label of a number: the most bytes one merge conflict may add up to when the AI is asked to resolve it
-conflict_label = "Largest conflict to send (bytes)"
+conflict_label = "Största konflikt att skicka (byte)"
 # context: help under that number
-conflict_help = "Over this size, Suggest a resolution does not fail: it warns, and you can send it anyway once, open this setting or cancel. The limit is GitPoulpi's own guard, not the model's: raise it when your model has the room. 40000 by default."
+conflict_help = "Över den här storleken misslyckas inte ”Föreslå en lösning”: den varnar, och du kan skicka ändå en gång, öppna den här inställningen eller avbryta. Gränsen är GitPoulpis eget skydd, inte modellens: höj den när din modell har utrymme. 40000 som standard."
 # context: red warning under that number while it is very large
-conflict_warning = "A very large limit can send more than the model accepts: the request then fails at the provider."
+conflict_warning = "En mycket stor gräns kan skicka mer än modellen accepterar: förfrågan misslyckas då hos leverantören."
 # context: title of the dialog shown when a conflict is over the limit
-too_large_title = "Conflict too large to send"
+too_large_title = "Konflikten är för stor för att skickas"
 # context: body of that dialog; {path} is the file, {size} the conflict's size (for example "48.1 KB (49206 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-too_large_body = "The conflict in {path} is {size}, and the limit is {limit} (setting {key}). The limit is GitPoulpi's own guard, not the model's. If you send it anyway, secrets are still replaced and sensitive files are still left out."
+too_large_body = "Konflikten i {path} är {size} och gränsen är {limit} (inställningen {key}). Gränsen är GitPoulpis eget skydd, inte modellens. Om du skickar den ändå ersätts hemligheter fortfarande och känsliga filer utelämnas fortfarande."
 # context: button that sends the oversized conflict this one time
-send_anyway = "Send anyway"
+send_anyway = "Skicka ändå"
 # context: button that opens Settings on the limit
-open_setting = "Open setting"
+open_setting = "Öppna inställningen"
 # context: key of the Send anyway button, one letter (shown as "Send anyway (S)")
 key_send = "s"
 # context: key of the Open setting button, one letter
 key_open = "o"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "b"
 # context: Settings > AI, label of a number: the most bytes of the {$diff} an AI request for a message, an explanation, a stash name, a request description, a commit plan or a split may carry; also the whole {$diff} of a code review
-diff_label = "Largest {$diff} to send (bytes)"
+diff_label = "Största {$diff} att skicka (byte)"
 # context: help under that number
-diff_help = "Over this size, nothing is cut silently: you are asked whether to send all of the {$diff}, send it truncated, open this setting or cancel. Applies to a message for a {$commit}, an explanation, a name for a {$stash}, a description of a request, a plan of {$commits} and a split, and to the whole {$diff} of a code review. 60000 by default."
+diff_help = "Över den här storleken klipps inget av i det tysta: du får frågan om hela {$diff} ska skickas, om den ska skickas avkortad, om inställningen ska öppnas eller om du vill avbryta. Gäller meddelanden för en {$commit}, förklaringar, namn på en {$stash}, beskrivningar av en request, planer för {$commits} och uppdelningar, samt hela {$diff} i en kodgranskning. 60000 som standard."
 # context: Settings > AI, label of a number: the most bytes of one file's {$diff} in a code review
-review_file_label = "Largest file {$diff} in a review (bytes)"
+review_file_label = "Största {$diff} per fil i en granskning (byte)"
 # context: help under that number
-review_file_help = "Over this size, one file's {$diff} in a code review is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 12000 by default."
+review_file_help = "Över den här storleken klipps {$diff} för en enskild fil i en kodgranskning av, efter att du fått frågan: skicka allt, skicka avkortat, öppna inställningen eller avbryt. 12000 som standard."
 # context: Settings > AI, label of a number: the most bytes of the description of the reviewed request
-review_text_label = "Largest review description (bytes)"
+review_text_label = "Största beskrivning i en granskning (byte)"
 # context: help under that number
-review_text_help = "Over this size, the description of the reviewed request is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 4000 by default."
+review_text_help = "Över den här storleken klipps beskrivningen av den granskade requesten av, efter att du fått frågan: skicka allt, skicka avkortat, öppna inställningen eller avbryt. 4000 som standard."
 # context: Settings > AI, label of a number: the most bytes of the comments that already exist on the reviewed request
-review_threads_label = "Largest list of existing comments in a review (bytes)"
+review_threads_label = "Största lista med befintliga kommentarer i en granskning (byte)"
 # context: help under that number
-review_threads_help = "The comments that already exist are listed so the model does not repeat them. Over this size, the list is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 6000 by default."
+review_threads_help = "De kommentarer som redan finns listas så att modellen inte upprepar dem. Över den här storleken klipps listan av, efter att du fått frågan: skicka allt, skicka avkortat, öppna inställningen eller avbryt. 6000 som standard."
 # context: Settings > AI, label of a number: the most bytes of one project context file (CLAUDE.md, AGENTS.md, the extra file) given to a code review
-review_context_file_label = "Largest context file in a review (bytes)"
+review_context_file_label = "Största kontextfil i en granskning (byte)"
 # context: help under that number
-review_context_file_help = "Over this size, a context file (CLAUDE.md, AGENTS.md or the extra file) is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 8192 by default."
+review_context_file_help = "Över den här storleken klipps en kontextfil (CLAUDE.md, AGENTS.md eller den extra filen) av, efter att du fått frågan: skicka allt, skicka avkortat, öppna inställningen eller avbryt. 8192 som standard."
 # context: Settings > AI, label of a number: the most bytes of all the project context files together
-review_context_label = "Largest context in a review, all files (bytes)"
+review_context_label = "Största kontext i en granskning, alla filer (byte)"
 # context: help under that number
-review_context_help = "Over this size, the context files together are cut (the last one is shortened or left out), after you were asked: send all of them, send them truncated, open this setting or cancel. 16384 by default."
+review_context_help = "Över den här storleken klipps kontextfilerna tillsammans av (den sista kortas eller utelämnas), efter att du fått frågan: skicka allt, skicka avkortat, öppna inställningen eller avbryt. 16384 som standard."
 # context: title of the dialog shown when what would be sent to the AI is over a limit and would be cut
-truncate_title = "Over the AI limit"
+truncate_title = "Över AI-gränsen"
 # context: first paragraph of that dialog, before the list of what is over its limit
-truncate_intro = "Some of what would be sent to the AI is over a limit GitPoulpi sets (the limits are GitPoulpi's own guard, not the model's):"
+truncate_intro = "En del av det som skulle skickas till AI:n överskrider en gräns som GitPoulpi sätter (gränserna är GitPoulpis eget skydd, inte modellens):"
 # context: last paragraph of that dialog, explaining the buttons
-truncate_outro = "Send all sends everything this one time. Send truncated cuts what is over its limit, as described above. Either way, secrets are still replaced and sensitive files are still left out."
+truncate_outro = "Skicka allt skickar allt den här gången. Skicka avkortat klipper av det som överskrider sin gräns, som beskrivs ovan. Hur du än väljer ersätts hemligheter fortfarande och känsliga filer utelämnas fortfarande."
 # context: list line of that dialog; {size} is the {$diff}'s size (for example "91.2 KB (91234 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-part_diff = "The {$diff} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_diff = "Storleken på {$diff} är {size}, gräns {limit} (inställningen {key}). Avkortad utelämnas slutet."
 # context: list line of that dialog, for the {$commit} being split; sizes like the line above
-part_hunks = "The changes of the {$commit} are {size}, limit {limit} (setting {key}). Truncated, the last ones lose their {$diff}."
+part_hunks = "Ändringarna i {$commit} är {size}, gräns {limit} (inställningen {key}). Avkortade förlorar de sista sin {$diff}."
 # context: list line of that dialog, for a code review; {name} is the list of files that do not fit
-part_review_diff = "Files that do not fit the review: {name}. The review is {size}, limit {limit} (setting {key}). Truncated, they are left out."
+part_review_diff = "Filer som inte ryms i granskningen: {name}. Granskningen är {size}, gräns {limit} (inställningen {key}). Avkortad utelämnas de."
 # context: list line of that dialog, for one file of a code review; {name} is its path
-part_review_file = "The {$diff} of {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_file = "Storleken på {$diff} för {name} är {size}, gräns {limit} (inställningen {key}). Avkortad utelämnas slutet."
 # context: list line of that dialog, for the description of the reviewed request
-part_review_text = "The description is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_text = "Beskrivningen är {size}, gräns {limit} (inställningen {key}). Avkortad utelämnas slutet."
 # context: list line of that dialog, for the comments that already exist on the reviewed request
-part_review_threads = "The existing comments are {size}, limit {limit} (setting {key}). Truncated, the last ones are left out."
+part_review_threads = "De befintliga kommentarerna är {size}, gräns {limit} (inställningen {key}). Avkortade utelämnas de sista."
 # context: list line of that dialog, for one project context file of a code review; {name} is the file
-part_context_file = "The context file {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_context_file = "Kontextfilen {name} är {size}, gräns {limit} (inställningen {key}). Avkortad utelämnas slutet."
 # context: list line of that dialog, for the project context files together; {name} is the file that crossed the limit
-part_context_total = "The context files together reach {size} at {name}, limit {limit} (setting {key}). Truncated, the rest is left out."
+part_context_total = "Kontextfilerna tillsammans når {size} vid {name}, gräns {limit} (inställningen {key}). Avkortade utelämnas resten."
 # context: button that sends everything of the oversized request this one time, nothing cut
-send_all = "Send all"
+send_all = "Skicka allt"
 # context: button that sends the request with what is over its limit cut
-send_truncated = "Send truncated"
+send_truncated = "Skicka avkortat"
 # context: key of the Send all button, one letter (shown as "Send all (A)")
 key_send_all = "a"
 # context: key of the Send truncated button, one letter (shown as "Send truncated (T)")
-key_send_truncated = "t"
+key_send_truncated = "k"
 
 [conflict_guard]
 # context: title of the dialog that says conflicts must be resolved before an action
-title = "Resolve the conflicts first"
+title = "Lös konflikterna först"
 # context: first line of that dialog; {n} files have unresolved conflicts
-count = { one = "{n} file still has conflicts", other = "{n} files still have conflicts" }
+count = { one = "{n} fil har fortfarande konflikter", other = "{n} filer har fortfarande konflikter" }
 # context: last line of the list of files in that dialog; {n} more files are not listed
-more = "and {n} more"
+more = "och {n} till"
 # context: second paragraph of the dialog when the AI commit composer was asked
-compose_hint = "The AI cannot split the changes into {$commits} while files have conflicts. Resolve them, then ask again."
+compose_hint = "AI:n kan inte dela upp ändringarna i {$commits} medan filer har konflikter. Lös dem och fråga sedan igen."
 # context: second paragraph of the dialog when a commit was asked
-commit_hint = "A {$commit} needs every conflict resolved first. Resolve them, {$stage} the results, then {$commit} again."
+commit_hint = "En {$commit} kräver att alla konflikter är lösta först. Lös dem, {$stage} resultaten och gör sedan {$commit} igen."
 # context: button that opens the conflict resolution view
-resolve = "Resolve conflicts"
+resolve = "Lös konflikter"
 # context: key of the Resolve conflicts button, one letter (shown as "Resolve conflicts (R)")
-key_resolve = "r"
+key_resolve = "l"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "b"
 # context: label of the disabled Commit button while files have conflicts
-need_resolve = "Resolve conflicts to {$commit}"
+need_resolve = "Lös konflikter för att göra {$commit}"
 # context: palette: why a command does nothing while files have conflicts
-why_commit = "files still have conflicts: resolve them first"
+why_commit = "filer har fortfarande konflikter: lös dem först"

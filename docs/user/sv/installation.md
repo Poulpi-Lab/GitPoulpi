@@ -185,7 +185,7 @@ system). Arkivet innehåller de tre körbara filerna, `INSTALL.txt`,
 
 ## Uppdateringar
 
-Titelraden visar den version som körs (`v1.0.0`) mellan programnamnet och repositoryts sökväg. Klicka på den, eller tryck `Ctrl+N` och sedan `u`, eller kör **Uppdateringar: Visa uppdatering** i kommandopaletten (`Ctrl+P`): uppdateringspanelen öppnas med versionen, hur GitPoulpi installerades och vad du kan göra åt en nyare release. **Hjälp: Versionsanteckningar** öppnar ändringsloggen.
+Titelraden visar den version som körs (`v1.0.0`) mellan programnamnet och repositoryts sökväg. När en nyare release är känd (eller en uppdatering pågår) öppnar ett klick på den uppdateringspanelen med versionen, hur GitPoulpi installerades och vad du kan göra åt den nya releasen; annars öppnar ett klick fliken Versionsanteckningar. `Ctrl+N` och sedan `u`, eller **Uppdateringar: Visa uppdatering** i kommandopaletten (`Ctrl+P`), öppnar alltid uppdateringspanelen, och **Hjälp: Versionsanteckningar** öppnar alltid ändringsloggen.
 
 En gång per dygn, i bakgrunden, kontrollerar GitPoulpi platsen där dess releaser publiceras (GitHub som standard) efter en nyare (`updates.mode`, [Inställningar > Synkronisering](settings.md#synkronisering)). När det finns en står det `v0.2.0 tillgänglig` på chipet i accentfärgen.
 

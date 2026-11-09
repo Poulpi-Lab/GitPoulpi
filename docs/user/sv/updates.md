@@ -8,7 +8,7 @@ GitPoulpi söker efter nyare releaser och, beroende på hur det installerades, e
 
 Titelraden visar den körande versionen (`v1.0.0`) mellan appnamnet och repositoryts sökväg. När en nyare release är känd blir chipet `v0.2.0 tillgänglig` i accentfärgen.
 
-Klicka på chipet, tryck `Ctrl+N` och sedan `u`, eller kör **Uppdateringar: Visa uppdatering** från kommandopaletten (`Ctrl+P`): uppdateringspanelen öppnas. Den är ett fönster över appen: `Esc`, `q`, stängningskorset eller ett klick utanför stänger den. Den visar:
+Tryck `Ctrl+N` och sedan `u`, kör **Uppdateringar: Visa uppdatering** från kommandopaletten (`Ctrl+P`), eller klicka på chipet medan det står `tillgänglig` (eller medan en uppdatering pågår): uppdateringspanelen öppnas. Utan någon nyare release öppnar ett klick på chipet fliken Versionsanteckningar i stället. Den är ett fönster över appen: `Esc`, `q`, stängningskorset eller ett klick utanför stänger den. Den visar:
 
 - den körande versionen och **Installerat med**: hur GitPoulpi kom till den här datorn (det avgör allt nedan);
 - hur uppdateringen står sig (söker, laddar ned med en procentsats, redo, misslyckad);

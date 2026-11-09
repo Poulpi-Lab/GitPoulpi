@@ -304,7 +304,11 @@ sammanslagen text före och efter den, och dina instruktioner (globala,
 repository, och *Konfliktlösning*-instruktionerna i Inställningar > AI). Den
 svarar med den lösta texten för just den konflikten i ett kodblock; ett svar med
 konfliktmarkörer eller strunttext i stället för kod skickas tillbaka en gång och
-vägras sedan. En konflikt över cirka 40 KB skickas inte. Kontrollerna är dolda
+vägras sedan. En konflikt över 40 KB (`ai.limits.conflict_bytes`, *Inställningar >
+AI > Gränser*) hålls tillbaka bakom en varning som anger dess storlek och gränsen,
+med *Skicka ändå* (bara den här begäran, fortfarande rensad av integritetskontrollerna),
+*Öppna inställningen* och *Avbryt*; gränsen är GitPoulpis eget skydd, så höj den när
+din modell har utrymme. Kontrollerna är dolda
 medan AI är avstängt, och ett förslag sparar, stagear eller löser aldrig något:
 granska Resultat, redigera det och spara som vanligt.
 
@@ -315,8 +319,10 @@ granska Resultat, redigera det och spara som vanligt.
 ### Commit-composern
 
 Modellen delar upp de lokala ändringarna i flera commits (varje ändrad fil i exakt en;
-en ogiltig plan skickas tillbaka en gång och vägras sedan). Du granskar planen
-innan något commitas:
+en ogiltig plan skickas tillbaka en gång och vägras sedan). Så länge filer
+fortfarande har konflikter frågas ingenting: en dialog listar dem och öppnar
+konfliktlösningsvyn, eftersom composern behöver ett träd utan konflikter. Du
+granskar planen innan något commitas:
 
 ![Composerns granskning: fyra föreslagna commits med sina filer, och knapparna Återställ, Avbryt och Skapa 4 commits](../images/composer.png)
 
@@ -448,13 +454,64 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 det gällande sammanhanget som `review_context`. Samma fyra inställningar är `ai.review.*` i
 `config.toml` ([referens](config-reference.md#ai-inbyggd-ai-av-som-standard)).
 
+## Gränser för indata
+
+Varje indata som GitPoulpi lägger i en begäran har en storleksgräns, en inställning
+under `[ai.limits]` (*Inställningar > AI > Gränser*). Gränserna är GitPoulpis eget
+skydd (en modells kontextfönster skiljer sig mellan modeller): höj dem när din
+modell har utrymme, sänk dem för att hålla begäranden små.
+
+| Inställning (`ai.limits.`) | Standard | Vad den begränsar |
+|---|---|---|
+| `conflict_bytes` | 40000 | Base-, current- och incoming-blocken i en merge-konflikt |
+| `diff_bytes` | 60000 | Diffen för ett meddelande till en commit, en förklaring, ett stash-namn, en beskrivning av en pull request, en commit-plan eller en uppdelning; hela diffen i en kodgranskning |
+| `review_file_bytes` | 12000 | En fils diff i en kodgranskning |
+| `review_text_bytes` | 4000 | Beskrivningen av den granskade pull requesten |
+| `review_threads_bytes` | 6000 | De granskningskommentarer som redan finns |
+| `review_context_file_bytes` | 8192 | En kontextfil för projektet i en granskning (`CLAUDE.md`, `AGENTS.md`, den extra filen) |
+| `review_context_bytes` | 16384 | Alla kontextfiler i en granskning tillsammans |
+
+**Ingenting klipps av i det tysta.** När en indata överskrider sin gräns väntar
+begäran och *Över AI-gränsen* listar vad som överskrider: vilken del (diffen, en
+fil, beskrivningen, en kontextfil), dess storlek, gränsen och inställningen. En
+granskning listar alla delar som överskrider i en enda dialog. Knapparna, var och en
+med sin tangent:
+
+- *Skicka allt* (`A`): bara den här begäran, ingenting klipps av. Den går fortfarande
+  genom integritetskontrollerna (hemligheter ersätts, känsliga filer utelämnas) och,
+  när den är på, rutan *Granska vad som skickas*, som kommer härnäst.
+- *Skicka avkortat* (`K`): det som överskrider sin gräns klipps av, som det alltid
+  gjorts; varje rad i dialogen säger vad som utelämnas (slutet av diffen, de sista
+  hunkarna, filerna som inte ryms).
+- *Öppna inställningen* (`O`): avbryter begäran och öppnar *Inställningar > AI >
+  Gränser* vid den första gränsen i listan. Fokus börjar här: Enter skickar aldrig.
+- *Avbryt* (`B`, `Esc`, korset eller ett klick utanför): skickar ingenting.
+
+En konflikt är undantaget: den klipps aldrig. *Skicka ändå* (`S`) skickar den hel en gång.
+
+Inget startar en AI-begäran av sig självt, så det finns ingen körning i bakgrunden
+som kunde fråga: varje begäran är en du startade. En körning som inte kan fråga
+(CLI och MCP) trunkerar som förut och säger det; se nedan.
+
+**På kommandoraden** kan inget svara på en dialog, så en indata över sin gräns
+trunkeras som förut och svaret anger vad som klipptes av:
+`truncated: [{part, detail?, bytes, limit, setting}]` (finns bara när något
+klipptes av; `part` är en av `diff`, `split_hunks`, `review_diff`, `review_file`,
+`review_text`, `review_threads`, `context_file`, `context_total`). `--send-all`
+(alias `--no-truncate`) skickar i stället allt hel: på `ai` (alla dess
+kommandon, inklusive `ai resolve-conflict`, där en konflikt över sin gräns
+annars vägras), på `commit --ai`, på `stash push --ai` och på
+`hosting review suggest`. MCP-verktygen har samma argument `send_all` och samma
+fält `truncated`.
+
 ## Integritet
 
 - Ingenting skickas förrän du trycker på en knapp eller kör ett kommando. Ingen
   AI i bakgrunden, ingen telemetri, inget GitPoulpi-konto.
 - Det som skickas: prompten (den inbyggda, sedan dina instruktioner) och den diff
-  du frågade om, avkortad vid cirka 60 KB (med en notering om det); för en pull
-  request också grenens commit-ämnesrader.
+  du frågade om; för en pull request också grenens commit-ämnesrader. En diff
+  över 60 KB (`ai.limits.diff_bytes`) klipps aldrig av i det tysta: se
+  [Gränser för indata](#gränser-för-indata).
 - Det går bara till den profil som valts för den åtgärden: den API-värden, eller
   stdin för ditt lokala agentkommando (som sedan gör vad den agenten nu gör).
 - API-nycklar används av själva `gitpoulpi`-processen och når aldrig daemonen,
@@ -523,6 +580,8 @@ repositoryt.
 | `misslyckades:` 404 | **Modellen** finns inte där: töm den för att använda standardmodellen. |
 | `misslyckades:` anslutningsfel (Ollama, LM Studio) | Servern körs inte, eller **Bas-URL** har fel port eller saknar `/v1`. |
 | Nyckeln visar `(inte satt)` efter att du skrivit den | Ingen credential helper: konfigurera en (`git config --global credential.helper ...`) och skriv in den igen. |
+| *Över AI-gränsen* | En indata i begäran överskrider en gräns i `[ai.limits]`: välj *Skicka allt*, *Skicka avkortat*, *Öppna inställningen* eller *Avbryt* (se [Gränser för indata](#gränser-för-indata)). |
+| "Konflikten är större än gränsen" | Konflikten överskrider `ai.limits.conflict_bytes` (40000 som standard). *Skicka ändå* skickar den en gång; *Öppna inställningen* går till gränsen i Inställningar > AI > Gränser. |
 | Fel språk eller stil | Lägg till instruktioner; redigerarens chips under Snabbinfogning gör det snabbt. |
 | Composern säger att planen är ogiltig | Modellen hoppade över eller upprepade en fil: försök igen eller använd en starkare modell. |
 

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use super::*;
 use gitpoulpi_core::domain::{
     CloneOptions, CloneProgress, FetchOptions, LfsFetchOptions, LfsProgress, LfsPushOptions,
-    OperationKind, PullOptions, PushOptions, TagSelection,
+    OperationKind, PullOptions, PushOptions, RemoteAccessOptions, TagSelection,
 };
 use gitpoulpi_core::GitBackend;
 use gitpoulpi_ipc::{Event, Request};
@@ -93,6 +93,14 @@ pub(super) async fn dispatch_network_plain(
                 .and_then(|v| serde_json::from_value(v.clone()).ok())
                 .unwrap_or_default();
             to_json!(backend.fetch_all(&repo, &opts).await)
+        }
+        OperationKind::RemoteAccessCheck => {
+            let remote: String = arg_or_err!(args, "remote", request.id);
+            let opts: RemoteAccessOptions = args
+                .get("opts")
+                .and_then(|v| serde_json::from_value(v.clone()).ok())
+                .unwrap_or_default();
+            to_json!(backend.remote_access_check(&repo, &remote, &opts).await)
         }
         OperationKind::FetchRefspec => {
             let remote: String = arg_or_err!(args, "remote", request.id);
@@ -324,7 +332,10 @@ pub(super) async fn dispatch_network_plain(
     // Listing locks reads the server and changes nothing here, so it must
     // not broadcast `RepoChanged` (a client refreshing on that event would
     // answer its own poll with another refresh).
-    let mutated = request.command != OperationKind::LfsLocks;
+    let mutated = !matches!(
+        request.command,
+        OperationKind::LfsLocks | OperationKind::RemoteAccessCheck
+    );
     match outcome {
         Ok(value) => {
             if mutated {

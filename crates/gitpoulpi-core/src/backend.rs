@@ -12,9 +12,9 @@ use crate::domain::{
     MergeOutcome, NetworkAuth, Oid, OperationState, PatchApplied, PatchCreated, PatchSource,
     PathHash, PullOptions, PullOutcome, PushOptions, PushOutcome, RebaseOptions, RebaseOutcome,
     RebasePlanDraft, RebaseState, Ref, RefScope, RefSnapshot, RefUpdate, ReflogPage, Remote,
-    RepoRef, ResetMode, ResolveOptions, RevertOutcome, RewordOutcome, Snapshot, SparseState,
-    SplitCommit, SplitOutcome, SplitSource, StageTarget, Stash, StashId, Submodule,
-    SubmoduleUpdateOptions, WorkingTree, Worktree, WorktreeAddOptions,
+    RemoteAccessOptions, RemoteAccessReport, RepoRef, ResetMode, ResolveOptions, RevertOutcome,
+    RewordOutcome, Snapshot, SparseState, SplitCommit, SplitOutcome, SplitSource, StageTarget,
+    Stash, StashId, Submodule, SubmoduleUpdateOptions, WorkingTree, Worktree, WorktreeAddOptions,
 };
 use crate::Result;
 
@@ -1053,6 +1053,19 @@ pub trait GitBackend: Send + Sync {
     /// Not a repository mutation: not journaled, not undoable. `Git2Backend`
     /// forwards it to its system-git fallback, which does all networking.
     fn set_network_auth(&self, repo: &RepoRef, auth: Option<NetworkAuth>);
+    /// Connection test: `git ls-remote --heads` against `remote`'s fetch URL
+    /// (its push URL with [`RemoteAccessOptions::push`]), with the
+    /// repository's [`NetworkAuth`] applied like for any transfer. A failed
+    /// connection is **not** an `Err`: it is a report with `ok: false` and a
+    /// classified [`crate::ErrorDetail`]. `Err` is for a remote that does not
+    /// exist or a git that cannot start. A read: nothing in the repository
+    /// changes.
+    async fn remote_access_check(
+        &self,
+        repo: &RepoRef,
+        remote: &str,
+        opts: &RemoteAccessOptions,
+    ) -> Result<RemoteAccessReport>;
     async fn fetch(
         &self,
         repo: &RepoRef,

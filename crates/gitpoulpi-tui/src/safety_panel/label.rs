@@ -194,6 +194,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::LfsStatus
         | K::LfsFiles
         | K::LfsLocks
+        | K::RemoteAccessCheck
         | K::Hello
         | K::JournalState
         | K::JournalList
@@ -557,6 +558,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::LfsStatus
         | K::LfsFiles
         | K::LfsLocks
+        | K::RemoteAccessCheck
         | K::Hello
         | K::JournalState
         | K::JournalList

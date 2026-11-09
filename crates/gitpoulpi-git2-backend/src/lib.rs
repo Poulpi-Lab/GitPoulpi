@@ -667,6 +667,14 @@ impl GitBackend for Git2Backend {
     fn set_network_auth(&self, repo: &RepoRef, auth: Option<NetworkAuth>) {
         self.fallback.set_network_auth(repo, auth);
     }
+    async fn remote_access_check(
+        &self,
+        repo: &RepoRef,
+        remote: &str,
+        opts: &RemoteAccessOptions,
+    ) -> Result<RemoteAccessReport> {
+        self.fallback.remote_access_check(repo, remote, opts).await
+    }
     async fn fetch(
         &self,
         repo: &RepoRef,

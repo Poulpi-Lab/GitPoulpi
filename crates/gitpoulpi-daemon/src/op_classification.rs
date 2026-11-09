@@ -113,6 +113,7 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::FetchAll, "NS", "ALL"),
     (K::FetchRefAsBranch, "NJ", "ALL"),
     (K::FetchRefspec, "NS", "ALL"),
+    (K::RemoteAccessCheck, "N", "NONE"),
     (K::Pull, "NCJH", "ALL"),
     (K::Push, "NS", "ALL"),
     (K::PushForReview, "NS", "ALL"),

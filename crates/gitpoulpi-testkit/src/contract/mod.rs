@@ -23,6 +23,7 @@ mod outside;
 mod predict;
 mod pull_split;
 mod reflog;
+mod remote_access;
 mod remotes_network;
 mod rewrite;
 mod rewrite_analyze;
@@ -65,6 +66,7 @@ pub use outside::*;
 pub use predict::*;
 pub use pull_split::*;
 pub use reflog::*;
+pub use remote_access::*;
 pub use remotes_network::*;
 pub use rewrite::*;
 pub use rewrite_analyze::*;
@@ -375,6 +377,9 @@ macro_rules! for_each_contract_check {
             check_two_repositories_with_different_auth_do_not_cross,
             check_no_network_auth_entry_means_unchanged_behaviour,
             check_an_entrys_ssh_command_beats_core_ssh_command,
+            check_a_remote_access_check_over_ssh_names_the_accepted_key,
+            check_a_remote_access_check_with_push_uses_the_push_url,
+            check_a_failed_remote_access_check_is_a_classified_report,
             check_a_canceled_fetch_kills_git_and_removes_only_its_own_locks,
             check_a_canceled_push_kills_git,
             check_a_canceled_fetch_kills_the_helpers_git_started,
@@ -742,6 +747,7 @@ mod meta_tests {
             include_str!("rewrite_encoding.rs"),
             include_str!("workflow.rs"),
             include_str!("network_auth.rs"),
+            include_str!("remote_access.rs"),
             include_str!("mod.rs"),
         ]
         .concat();

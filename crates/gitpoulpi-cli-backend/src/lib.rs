@@ -47,6 +47,7 @@ mod process;
 mod rebase_interactive;
 mod reflog_ops;
 mod refs;
+mod remote_access;
 mod remote_ref;
 mod remotes;
 mod reset;
@@ -702,6 +703,14 @@ impl GitBackend for SystemGitBackend {
     }
     fn set_network_auth(&self, repo: &RepoRef, auth: Option<NetworkAuth>) {
         process::set_network_auth(&repo.root, auth);
+    }
+    async fn remote_access_check(
+        &self,
+        repo: &RepoRef,
+        remote: &str,
+        opts: &RemoteAccessOptions,
+    ) -> Result<RemoteAccessReport> {
+        remote_access::check(repo, remote, opts).await
     }
     async fn fetch(
         &self,

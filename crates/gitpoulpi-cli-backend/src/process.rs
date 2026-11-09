@@ -784,8 +784,59 @@ pub async fn run_full_async(repo_root: &Path, args: &[&str]) -> Result<FullOutpu
 /// recognise a refusal by its words (`push --atomic` on a server that lacks
 /// it). Same credential and cancel behaviour.
 pub(crate) async fn run_full_async_english(repo_root: &Path, args: &[&str]) -> Result<FullOutput> {
+    run_full_async_with(repo_root, args, false).await
+}
+
+/// The ssh command a network command of `repo_root` would run, with `-v`
+/// appended, so ssh reports which key the server accepted. `cmd` is the
+/// command built by [`git_async`]: what [`apply_network_auth`] chose for it
+/// (an entry's command, or the global key's) is read back from its
+/// environment; otherwise git's own order applies: an exported
+/// `GIT_SSH_COMMAND`, `core.sshCommand`, an exported `GIT_SSH`, plain `ssh`.
+/// Only a connection test asks for this; no ordinary operation is verbose.
+fn verbose_ssh_command(cmd: &tokio::process::Command, repo_root: &Path) -> String {
+    let chosen = cmd
+        .as_std()
+        .get_envs()
+        .find(|(k, _)| *k == "GIT_SSH_COMMAND")
+        .and_then(|(_, v)| v.map(|v| v.to_string_lossy().into_owned()));
+    let base = chosen
+        .or_else(|| {
+            std::env::var("GIT_SSH_COMMAND")
+                .ok()
+                .filter(|v| !v.is_empty())
+        })
+        .or_else(|| {
+            git(repo_root, &["config", "--get", "core.sshCommand"])
+                .output()
+                .ok()
+                .filter(|o| o.status.success())
+                .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+                .filter(|v| !v.is_empty())
+        })
+        .or_else(|| {
+            std::env::var("GIT_SSH")
+                .ok()
+                .filter(|v| !v.is_empty())
+                .map(|v| gitpoulpi_core::repo_config::sh_quote_path(&v))
+        })
+        .unwrap_or_else(|| "ssh".to_string());
+    format!("{base} -v")
+}
+
+/// [`run_full_async_english`], optionally with ssh run verbose (see
+/// [`verbose_ssh_command`]).
+pub(crate) async fn run_full_async_with(
+    repo_root: &Path,
+    args: &[&str],
+    ssh_verbose: bool,
+) -> Result<FullOutput> {
     let mut cmd = git_async(repo_root, args);
     cmd.env("LC_ALL", "C").env("LANGUAGE", "C");
+    if ssh_verbose {
+        let ssh = verbose_ssh_command(&cmd, repo_root);
+        cmd.env("GIT_SSH_COMMAND", ssh);
+    }
     crate::tree_kill::captured(&mut cmd);
     let (child, mut guard) = crate::tree_kill::spawn_guarded(&mut cmd).map_err(spawn_failed)?;
     let output = child.wait_with_output().await.map_err(spawn_failed)?;

@@ -127,6 +127,7 @@ fn label_for(request: &Request) -> String {
         K::Fetch => format!("Fetching {remote}"),
         K::FetchAll => "Fetching all remotes".into(),
         K::FetchRefspec | K::FetchRefAsBranch => format!("Fetching from {remote}"),
+        K::RemoteAccessCheck => format!("Testing the connection to {remote}"),
         K::Pull => "Pulling".into(),
         K::Push => {
             let branch = request

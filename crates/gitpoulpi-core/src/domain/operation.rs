@@ -274,6 +274,10 @@ pub enum OperationKind {
     /// Fetch one `refs/gitpoulpi/...` spec (a pull/merge request head for
     /// review; see `GitBackend::fetch_refspec`). Network, not journaled.
     FetchRefspec,
+    /// Connection test of one remote: `ls-remote --heads` with the repository's
+    /// network authentication applied (see `GitBackend::remote_access_check`).
+    /// A network read: nothing changes, so nothing is broadcast.
+    RemoteAccessCheck,
     Pull,
     Push,
     /// Push `HEAD` to `refs/for/<branch>` to open a Gerrit change (see
@@ -755,6 +759,8 @@ impl OperationKind {
                 .journaled()
                 .history(),
             K::Clone | K::LfsPull | K::LfsLocks => OpTraits::NONE.network(),
+            // Reads a remote with the repository's credentials; changes nothing.
+            K::RemoteAccessCheck => OpTraits::NONE.network().scope(ChangeScope::NONE),
             K::RemoteAdd
             | K::RemoteRemove
             | K::RemoteRename
@@ -799,7 +805,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 170] = [
+    pub const ALL: [OperationKind; 171] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -905,6 +911,7 @@ impl OperationKind {
         OperationKind::FetchAll,
         OperationKind::FetchRefAsBranch,
         OperationKind::FetchRefspec,
+        OperationKind::RemoteAccessCheck,
         OperationKind::Pull,
         OperationKind::Push,
         OperationKind::PushForReview,

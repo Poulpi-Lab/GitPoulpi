@@ -2459,8 +2459,8 @@ preferences_list_remove = "Odebrat vybranou položku seznamu"
 preferences_list_move_up = "Posunout vybranou položku seznamu nahoru"
 preferences_list_move_down = "Posunout vybranou položku seznamu dolů"
 ai_popup_copy = "Kopírovat výsledek"
-activity_log_scroll_left = "Scroll the Activity Log Left"
-activity_log_scroll_right = "Scroll the Activity Log Right"
+activity_log_scroll_left = "Posunout Protokol aktivity doleva"
+activity_log_scroll_right = "Posunout Protokol aktivity doprava"
 integrations_add = "Přidat profil"
 integrations_edit = "Upravit vybraný profil"
 integrations_open_token = "Otevřít stránku tokenu"
@@ -2526,7 +2526,7 @@ folder_picker = "Výběr složky"
 preferences = "Nastavení"
 ai_popup = "Vyskakovací okno výsledku AI"
 integrations = "Nastavení: Stránka Integrace"
-activity_log = "Activity Log window"
+activity_log = "Okno Protokolu aktivity"
 palette = "Příkazy palety"
 split = "Editor rozdělení {$commit}u"
 
@@ -4586,8 +4586,8 @@ not_blocked = "poslední položka vrácení není blokovaná"
 forget_button = "Zapomenout"
 
 [undo_ui]
-nothing_to_undo = { git = "není co vrátit (push, fetch ani nic jiného provedené na vzdáleném serveru se nikdy nevrací)", local = "není co vrátit (odeslání, načtení ani nic jiného provedené na vzdáleném serveru se nikdy nevrací)" }
-tip_nothing_to_undo = { git = "Není co vrátit (push, fetch ani nic jiného provedené na vzdáleném serveru se nikdy nevrací)", local = "Není co vrátit (odeslání, načtení ani nic jiného provedené na vzdáleném serveru se nikdy nevrací)" }
+nothing_to_undo = { git = "není co vrátit (push, fetch ani nic jiného provedené na vzdáleném serveru se nikdy nevrací, kromě smazání vzdálené větve nebo tagu)", local = "není co vrátit (odeslání, načtení ani nic jiného provedené na vzdáleném serveru se nikdy nevrací, kromě smazání vzdálené větve nebo značky)" }
+tip_nothing_to_undo = { git = "Není co vrátit (push, fetch ani nic jiného provedené na vzdáleném serveru se nikdy nevrací, kromě smazání vzdálené větve nebo tagu)", local = "Není co vrátit (odeslání, načtení ani nic jiného provedené na vzdáleném serveru se nikdy nevrací, kromě smazání vzdálené větve nebo značky)" }
 tip_nothing_to_redo = "Není co zopakovat"
 nothing_to_redo = "není co zopakovat"
 disabled = "Zpět je vypnuto (Nastavení > Obecné)"
@@ -5045,7 +5045,7 @@ conflict_not_conflicted = "soubor není v konfliktu"
 conflict_already = "soubor je stále v konfliktu"
 conflict_no_operation = { git = "neprobíhá žádný merge, rebase, cherry-pick ani revert", local = "neprobíhá žádné sloučení, rebase, cherry-pick ani revert" }
 conflict_unencodable = "řádek {line} obsahuje znak, který kódování souboru nedokáže vyjádřit"
-conflict_local_changes = "local changes the abort would overwrite: {paths}"
+conflict_local_changes = "místní změny, které by přerušení přepsalo: {paths}"
 undo_refused = "nelze vrátit/zopakovat: {reason}"
 undo_in_progress = "nejdřív dokončete nebo přerušte {op}"
 undo_ref_moved = "{name} je na {actual}, ne na {expected}, kde ho operace nechala; byl změněn mimo GitPoulpi"
@@ -5074,8 +5074,8 @@ undo_already_restored = "vše, co tato operace odstranila, je už zpět"
 undo_no_such_entry = "v historii vrácení není operace č. {id}"
 split_refused = "tento {$commit} nelze rozdělit: {reason}"
 undo_purged = "stará historie operace #{entry} byla vymazána, takže ji nelze vrátit zpět ani zopakovat"
-undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
-undo_remote_object_missing = "{object} is no longer in this repository (it was garbage collected), so the branch or {$tag} cannot be restored on the remote with a {$push_noun}"
+undo_remote_ref_moved = { git = "{name} na {remote} je na {actual}, ne na {expected}, kde ho operace nechala: od té doby se na remote změnil, takže se tam nic nepushlo ani nesmazalo", local = "{name} na {remote} je na {actual}, ne na {expected}, kde ho operace nechala: od té doby se na remote změnil, takže se tam nic neodeslalo ani nesmazalo" }
+undo_remote_object_missing = { git = "{object} už v tomto repozitáři není (byl odstraněn garbage collectionem), takže větev nebo {$tag} nelze na remote obnovit pomocí pushe", local = "{object} už v tomto repozitáři není (byl odstraněn garbage collectionem), takže větev nebo značku nelze na remote obnovit pomocí odeslání" }
 
 [window]
 connecting = "připojování k daemonu relace..."
@@ -5925,17 +5925,17 @@ scope_all = "Všechny repozitáře"
 scope_workspace = "Pracovní prostor: {name}"
 app_wide = "celá aplikace"
 git_empty = "Zatím žádné operace. Tady jsou operace zvoleného rozsahu i s dobou, jak dlouho trvaly."
-hint_git = "Nahoru/Dolů: výběr  Enter: podrobnosti  c: kopírovat  r: navržená akce  d: diagnostika  s: rozsah  Tab: aplikace  Esc: zavřít"
+hint_git = "Nahoru/Dolů: výběr  Doleva/Doprava: posun  Enter: podrobnosti  c: kopírovat  r: navržená akce  d: diagnostika  s: rozsah  Tab: aplikace  Esc: zavřít"
 hint_application = "Šipky: posun  l: úroveň  /: filtr  c: kopírovat vše  o: složka  x: vymazat  d: diagnostika  s: rozsah  g: git  Esc: zavřít"
 palette_scope = "Protokol aktivity: Zvolit rozsah"
 palette_git_tab = "Protokol aktivity: Operace gitu"
 palette_app_tab = "Protokol aktivity: Protokol aplikace"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the left
-palette_scroll_left = "Activity Log: Scroll Left"
+palette_scroll_left = "Protokol aktivity: Posunout doleva"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the right
-palette_scroll_right = "Activity Log: Scroll Right"
+palette_scroll_right = "Protokol aktivity: Posunout doprava"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
-help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
+help_scroll = "Protokol aktivity: posun dlouhých řádků do stran (také Shift + kolečko nebo vodorovný posuvník)"
 
 [git_error]
 summary_host_key = "Hostitelský klíč SSH tohoto remote zatím není znám."
@@ -5964,9 +5964,9 @@ summary_network = "Remote je nedostupný."
 hint_network = "Zkontrolujte připojení a adresu remote a zkuste to znovu."
 summary_lock = "Tento repozitář používá jiný proces git."
 hint_lock = "Zavřete jiné nástroje git, nebo smažte soubor zámku, pokud žádný neběží."
-summary_credential_helper = "The configured credential helper failed: {line}"
-hint_credential_helper = "Run `git config --show-origin --get-all credential.helper` to see where it is set, fix or remove that helper, then retry."
-hint_abort_blocked = "Save a copy of the changes to those files or discard them in the Status pane, then retry the abort."
+summary_credential_helper = "Nastavený pomocník přihlašovacích údajů selhal: {line}"
+hint_credential_helper = "Spusťte `git config --show-origin --get-all credential.helper`, zjistíte, kde je nastaven; pomocníka opravte nebo odeberte a zkuste to znovu."
+hint_abort_blocked = "Zálohujte změny v těchto souborech nebo je zahoďte v panelu Stav a pak zkuste přerušení znovu."
 action_pull_first = "Nejdřív {$Pull}"
 action_integrations = "Otevřít Integrace"
 action_stash_retry = "{$Stash} a zkusit znovu"
@@ -8939,100 +8939,100 @@ sensitive_stage = "citlivé soubory nebyly {$staged}: {files}; zeptejte se uživ
 
 [ai_limits]
 # context: Settings > AI, heading of the rows that limit how much input an AI request carries
-settings_heading = "Limits"
+settings_heading = "Limity"
 # context: Settings > AI, label of a number: the most bytes one merge conflict may add up to when the AI is asked to resolve it
-conflict_label = "Largest conflict to send (bytes)"
+conflict_label = "Největší konflikt k odeslání (bajty)"
 # context: help under that number
-conflict_help = "Over this size, Suggest a resolution does not fail: it warns, and you can send it anyway once, open this setting or cancel. The limit is GitPoulpi's own guard, not the model's: raise it when your model has the room. 40000 by default."
+conflict_help = "Nad touto velikostí „Navrhnout řešení“ neselže: upozorní a můžete konflikt jednorázově přesto odeslat, otevřít toto nastavení, nebo zrušit. Limit je vlastní pojistka GitPoulpi, ne limit modelu: zvyšte ho, pokud na to váš model má kapacitu. Výchozí je 40000."
 # context: red warning under that number while it is very large
-conflict_warning = "A very large limit can send more than the model accepts: the request then fails at the provider."
+conflict_warning = "Velmi vysoký limit může odeslat víc, než model přijme: požadavek pak selže u poskytovatele."
 # context: title of the dialog shown when a conflict is over the limit
-too_large_title = "Conflict too large to send"
+too_large_title = "Konflikt je příliš velký k odeslání"
 # context: body of that dialog; {path} is the file, {size} the conflict's size (for example "48.1 KB (49206 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-too_large_body = "The conflict in {path} is {size}, and the limit is {limit} (setting {key}). The limit is GitPoulpi's own guard, not the model's. If you send it anyway, secrets are still replaced and sensitive files are still left out."
+too_large_body = "Konflikt v {path} má {size} a limit je {limit} (nastavení {key}). Limit je vlastní pojistka GitPoulpi, ne limit modelu. Pokud ho přesto odešlete, tajné hodnoty se stále nahrazují a citlivé soubory se stále vynechávají."
 # context: button that sends the oversized conflict this one time
-send_anyway = "Send anyway"
+send_anyway = "Odeslat přesto"
 # context: button that opens Settings on the limit
-open_setting = "Open setting"
+open_setting = "Otevřít nastavení"
 # context: key of the Send anyway button, one letter (shown as "Send anyway (S)")
-key_send = "s"
+key_send = "o"
 # context: key of the Open setting button, one letter
-key_open = "o"
+key_open = "n"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "z"
 # context: Settings > AI, label of a number: the most bytes of the {$diff} an AI request for a message, an explanation, a stash name, a request description, a commit plan or a split may carry; also the whole {$diff} of a code review
-diff_label = "Largest {$diff} to send (bytes)"
+diff_label = "Největší {$diff} k odeslání (bajty)"
 # context: help under that number
-diff_help = "Over this size, nothing is cut silently: you are asked whether to send all of the {$diff}, send it truncated, open this setting or cancel. Applies to a message for a {$commit}, an explanation, a name for a {$stash}, a description of a request, a plan of {$commits} and a split, and to the whole {$diff} of a code review. 60000 by default."
+diff_help = { git = "Nad touto velikostí se nic neořezává potichu: dostanete otázku, zda odeslat celý {$diff}, odeslat ho zkráceně, otevřít toto nastavení, nebo zrušit. Platí pro zprávu {$commit}u, vysvětlení, název stashe, popis žádosti, plán {$commits} a rozdělení, a pro celý {$diff} revize kódu. Výchozí je 60000.", local = "Nad touto velikostí se nic neořezává potichu: dostanete otázku, zda odeslat celý {$diff}, odeslat ho zkráceně, otevřít toto nastavení, nebo zrušit. Platí pro zprávu {$commit}u, vysvětlení, název odložených změn, popis žádosti, plán {$commits} a rozdělení, a pro celý {$diff} revize kódu. Výchozí je 60000." }
 # context: Settings > AI, label of a number: the most bytes of one file's {$diff} in a code review
-review_file_label = "Largest file {$diff} in a review (bytes)"
+review_file_label = "Největší {$diff} souboru v revizi (bajty)"
 # context: help under that number
-review_file_help = "Over this size, one file's {$diff} in a code review is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 12000 by default."
+review_file_help = "Nad touto velikostí se {$diff} jednoho souboru v revizi kódu ořízne, až po otázce: odeslat celý, odeslat zkráceně, otevřít toto nastavení, nebo zrušit. Výchozí je 12000."
 # context: Settings > AI, label of a number: the most bytes of the description of the reviewed request
-review_text_label = "Largest review description (bytes)"
+review_text_label = "Největší popis v revizi (bajty)"
 # context: help under that number
-review_text_help = "Over this size, the description of the reviewed request is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 4000 by default."
+review_text_help = "Nad touto velikostí se popis revidované žádosti ořízne, až po otázce: odeslat celý, odeslat zkráceně, otevřít toto nastavení, nebo zrušit. Výchozí je 4000."
 # context: Settings > AI, label of a number: the most bytes of the comments that already exist on the reviewed request
-review_threads_label = "Largest list of existing comments in a review (bytes)"
+review_threads_label = "Největší seznam stávajících komentářů v revizi (bajty)"
 # context: help under that number
-review_threads_help = "The comments that already exist are listed so the model does not repeat them. Over this size, the list is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 6000 by default."
+review_threads_help = "Stávající komentáře se uvádějí, aby je model neopakoval. Nad touto velikostí se seznam ořízne, až po otázce: odeslat celý, odeslat zkráceně, otevřít toto nastavení, nebo zrušit. Výchozí je 6000."
 # context: Settings > AI, label of a number: the most bytes of one project context file (CLAUDE.md, AGENTS.md, the extra file) given to a code review
-review_context_file_label = "Largest context file in a review (bytes)"
+review_context_file_label = "Největší kontextový soubor v revizi (bajty)"
 # context: help under that number
-review_context_file_help = "Over this size, a context file (CLAUDE.md, AGENTS.md or the extra file) is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 8192 by default."
+review_context_file_help = "Nad touto velikostí se kontextový soubor (CLAUDE.md, AGENTS.md nebo další soubor) ořízne, až po otázce: odeslat celý, odeslat zkráceně, otevřít toto nastavení, nebo zrušit. Výchozí je 8192."
 # context: Settings > AI, label of a number: the most bytes of all the project context files together
-review_context_label = "Largest context in a review, all files (bytes)"
+review_context_label = "Největší kontext v revizi, všechny soubory (bajty)"
 # context: help under that number
-review_context_help = "Over this size, the context files together are cut (the last one is shortened or left out), after you were asked: send all of them, send them truncated, open this setting or cancel. 16384 by default."
+review_context_help = "Nad touto velikostí se kontextové soubory dohromady oříznou (poslední se zkrátí nebo vynechá), až po otázce: odeslat všechny, odeslat zkráceně, otevřít toto nastavení, nebo zrušit. Výchozí je 16384."
 # context: title of the dialog shown when what would be sent to the AI is over a limit and would be cut
-truncate_title = "Over the AI limit"
+truncate_title = "Nad limitem AI"
 # context: first paragraph of that dialog, before the list of what is over its limit
-truncate_intro = "Some of what would be sent to the AI is over a limit GitPoulpi sets (the limits are GitPoulpi's own guard, not the model's):"
+truncate_intro = "Něco z toho, co by se odeslalo AI, přesahuje limit nastavený v GitPoulpi (limity jsou vlastní pojistka GitPoulpi, ne limit modelu):"
 # context: last paragraph of that dialog, explaining the buttons
-truncate_outro = "Send all sends everything this one time. Send truncated cuts what is over its limit, as described above. Either way, secrets are still replaced and sensitive files are still left out."
+truncate_outro = "Odeslat vše odešle všechno, jen tentokrát. Odeslat zkráceně ořízne to, co je nad limitem, jak je popsáno výše. V obou případech se tajné hodnoty stále nahrazují a citlivé soubory stále vynechávají."
 # context: list line of that dialog; {size} is the {$diff}'s size (for example "91.2 KB (91234 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-part_diff = "The {$diff} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_diff = "{$diff} má {size}, limit je {limit} (nastavení {key}). Při zkrácení se jeho konec vynechá."
 # context: list line of that dialog, for the {$commit} being split; sizes like the line above
-part_hunks = "The changes of the {$commit} are {size}, limit {limit} (setting {key}). Truncated, the last ones lose their {$diff}."
+part_hunks = "Změny {$commit}u mají {size}, limit je {limit} (nastavení {key}). Při zkrácení poslední z nich přijdou o svůj {$diff}."
 # context: list line of that dialog, for a code review; {name} is the list of files that do not fit
-part_review_diff = "Files that do not fit the review: {name}. The review is {size}, limit {limit} (setting {key}). Truncated, they are left out."
+part_review_diff = "Soubory, které se do revize nevejdou: {name}. Revize má {size}, limit je {limit} (nastavení {key}). Při zkrácení se vynechají."
 # context: list line of that dialog, for one file of a code review; {name} is its path
-part_review_file = "The {$diff} of {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_file = "{$diff} souboru {name} má {size}, limit je {limit} (nastavení {key}). Při zkrácení se jeho konec vynechá."
 # context: list line of that dialog, for the description of the reviewed request
-part_review_text = "The description is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_text = "Popis má {size}, limit je {limit} (nastavení {key}). Při zkrácení se jeho konec vynechá."
 # context: list line of that dialog, for the comments that already exist on the reviewed request
-part_review_threads = "The existing comments are {size}, limit {limit} (setting {key}). Truncated, the last ones are left out."
+part_review_threads = "Stávající komentáře mají {size}, limit je {limit} (nastavení {key}). Při zkrácení se poslední vynechají."
 # context: list line of that dialog, for one project context file of a code review; {name} is the file
-part_context_file = "The context file {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_context_file = "Kontextový soubor {name} má {size}, limit je {limit} (nastavení {key}). Při zkrácení se jeho konec vynechá."
 # context: list line of that dialog, for the project context files together; {name} is the file that crossed the limit
-part_context_total = "The context files together reach {size} at {name}, limit {limit} (setting {key}). Truncated, the rest is left out."
+part_context_total = "Kontextové soubory dohromady dosahují {size} u souboru {name}, limit je {limit} (nastavení {key}). Při zkrácení se zbytek vynechá."
 # context: button that sends everything of the oversized request this one time, nothing cut
-send_all = "Send all"
+send_all = "Odeslat vše"
 # context: button that sends the request with what is over its limit cut
-send_truncated = "Send truncated"
+send_truncated = "Odeslat zkráceně"
 # context: key of the Send all button, one letter (shown as "Send all (A)")
-key_send_all = "a"
+key_send_all = "v"
 # context: key of the Send truncated button, one letter (shown as "Send truncated (T)")
-key_send_truncated = "t"
+key_send_truncated = "k"
 
 [conflict_guard]
 # context: title of the dialog that says conflicts must be resolved before an action
-title = "Resolve the conflicts first"
+title = "Nejdřív vyřešte konflikty"
 # context: first line of that dialog; {n} files have unresolved conflicts
-count = { one = "{n} file still has conflicts", other = "{n} files still have conflicts" }
+count = { one = "{n} soubor má stále konflikty", few = "{n} soubory mají stále konflikty", other = "{n} souborů má stále konflikty" }
 # context: last line of the list of files in that dialog; {n} more files are not listed
-more = "and {n} more"
+more = "a dalších {n}"
 # context: second paragraph of the dialog when the AI commit composer was asked
-compose_hint = "The AI cannot split the changes into {$commits} while files have conflicts. Resolve them, then ask again."
+compose_hint = "AI nemůže rozdělit změny na {$commits}, dokud mají soubory konflikty. Vyřešte je a pak se zeptejte znovu."
 # context: second paragraph of the dialog when a commit was asked
-commit_hint = "A {$commit} needs every conflict resolved first. Resolve them, {$stage} the results, then {$commit} again."
+commit_hint = "Pro {$commit} musí být nejdřív vyřešeny všechny konflikty. Vyřešte je, výsledky {$stage} a pak {$commit} znovu."
 # context: button that opens the conflict resolution view
-resolve = "Resolve conflicts"
+resolve = "Vyřešit konflikty"
 # context: key of the Resolve conflicts button, one letter (shown as "Resolve conflicts (R)")
-key_resolve = "r"
+key_resolve = "v"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "z"
 # context: label of the disabled Commit button while files have conflicts
-need_resolve = "Resolve conflicts to {$commit}"
+need_resolve = "Vyřešte konflikty, abyste mohli {$commit}"
 # context: palette: why a command does nothing while files have conflicts
-why_commit = "files still have conflicts: resolve them first"
+why_commit = "soubory mají stále konflikty: nejdřív je vyřešte"

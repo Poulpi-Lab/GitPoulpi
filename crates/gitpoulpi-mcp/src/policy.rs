@@ -44,6 +44,9 @@ const READ_ONLY: &[&[&str]] = &[
     &["mailmap", "list"],
     &["mailmap", "check"],
     &["ssh-command", "show"],
+    // Which identity each remote uses: no secret, no command for an agent.
+    // (`repo-auth test` reaches the network, so it is gated like `fetch`.)
+    &["repo-auth", "show"],
     &["repo-config", "show"],
     // Branching workflows: classification, templates, detection, the file.
     &["flow", "status"],

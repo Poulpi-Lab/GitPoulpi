@@ -40,6 +40,7 @@ mod mailmap;
 mod rebase;
 mod refs;
 mod remote;
+mod repo_auth;
 #[cfg(feature = "history-rewrite")]
 pub(crate) mod rewrite;
 #[cfg(feature = "history-rewrite")]
@@ -909,6 +910,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         },
         Commands::Remote { action } => remote(session, action).await,
         Commands::SshCommand { action } => ssh_command(session, action).await,
+        Commands::RepoAuth { action } => repo_auth::repo_auth(session, action).await,
         Commands::RepoConfig { action } => repo_config(session, action).await,
         Commands::SparseCheckout { action } => sparse_checkout(session, action).await,
         Commands::Conflicts { action } => conflicts(session, action).await,

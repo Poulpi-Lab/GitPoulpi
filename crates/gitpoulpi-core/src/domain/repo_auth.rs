@@ -159,6 +159,30 @@ impl RepoAuthProfile {
     }
 }
 
+/// The SHA-256 (lower-case hex) of a command-running source's command: the
+/// helper string, or the arguments of a token command joined by NUL. What a
+/// person confirms is shown with this hash.
+pub fn command_sha256(parts: &[&str]) -> String {
+    use sha2::{Digest, Sha256};
+    let digest = Sha256::digest(parts.join("\0").as_bytes());
+    digest.iter().map(|b| format!("{b:02x}")).collect()
+}
+
+impl HttpsAuth {
+    /// The hash of the command of a helper or token-command source, `None`
+    /// for the others.
+    pub fn command_sha256(&self) -> Option<String> {
+        match self {
+            HttpsAuth::Helper { helper, .. } => Some(command_sha256(&[helper])),
+            HttpsAuth::TokenCommand { argv, .. } => {
+                let parts: Vec<&str> = argv.iter().map(String::as_str).collect();
+                Some(command_sha256(&parts))
+            }
+            _ => None,
+        }
+    }
+}
+
 /// The last component of a path written with either separator.
 fn file_name_of(path: &str) -> &str {
     path.rsplit(['/', '\\'])

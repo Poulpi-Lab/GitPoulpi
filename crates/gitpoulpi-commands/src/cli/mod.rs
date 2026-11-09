@@ -10,6 +10,7 @@ mod job;
 mod lfs;
 mod mailmap;
 mod refs_misc;
+mod repo_auth;
 #[cfg(feature = "history-rewrite")]
 mod rewrite;
 mod ui;
@@ -45,6 +46,7 @@ pub use refs_misc::{
     RepoConfigAction, ResetModeArg, ReviewFlags, RunInRepoArg, SessionAction, ShortcutAction,
     SparseAction, SshCommandAction, StashAction, TagAction, ThemeAction,
 };
+pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "history-rewrite")]
 pub use rewrite::{RewriteAction, RewriteRecipeArgs, RewriteScriptAction};
 pub use ui::{UiAction, UiProposeAction, UiShowAction};
@@ -965,10 +967,17 @@ pub enum Commands {
         action: FlowAction,
     },
     /// The repository-local `core.sshCommand` pin: which SSH key this
-    /// repository uses.
+    /// repository uses. See `repo-auth` for the whole identity.
     SshCommand {
         #[command(subcommand)]
         action: SshCommandAction,
+    },
+    /// Which identity this repository authenticates with (HTTPS and SSH): the
+    /// machine's own, a GitPoulpi account, or a key file. `show` and `test`
+    /// read; `set` and `clear` are a person's decision.
+    RepoAuth {
+        #[command(subcommand)]
+        action: RepoAuthAction,
     },
     /// The repository-local `core.autocrlf` and `core.eol` (what Settings >
     /// Git & Encoding edits). Undoable like any other operation.

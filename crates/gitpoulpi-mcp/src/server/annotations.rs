@@ -51,6 +51,8 @@ const TOOLS: &[(&str, &str, bool)] = &[
     ("diff", "read", false),
     ("discard", "destructive", false),
     ("fetch", "write", true),
+    ("repo_auth_show", "read", false),
+    ("repo_auth_test", "write", true),
     ("hosting_board_move", "write", true),
     ("hosting_board_show", "read", true),
     ("hosting_checkout_pr", "write", true),

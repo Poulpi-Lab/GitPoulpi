@@ -9,6 +9,9 @@
 //! like a UI regression, so the tests below pin the spelling.
 
 fn main() -> std::io::Result<()> {
+    // Started by git as the credential helper of an account-authenticated
+    // transfer (ADR-0010)? Then this is all the process does.
+    gitpoulpi_ipc::git_credential::run_if_requested();
     let mut args: Vec<String> = std::env::args().skip(1).collect();
     let cwd_file = match take_cwd_file(&mut args) {
         Ok(file) => file,

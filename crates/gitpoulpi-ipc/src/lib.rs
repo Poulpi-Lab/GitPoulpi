@@ -2,6 +2,7 @@ pub mod auth;
 mod client;
 pub mod discovery;
 pub mod etag;
+pub mod git_credential;
 mod events;
 pub mod jobs;
 pub mod mailmap;

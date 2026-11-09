@@ -27,6 +27,9 @@ fn runtime() -> tokio::runtime::Runtime {
 }
 
 fn main() {
+    // Started by git as the credential helper of an account-authenticated
+    // transfer (ADR-0010)? Then this is all the process does.
+    gitpoulpi_ipc::git_credential::run_if_requested();
     let worker = std::thread::Builder::new()
         .name("gitpoulpi-main".into())
         .stack_size(STACK_BYTES)

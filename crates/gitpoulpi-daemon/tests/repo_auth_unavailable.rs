@@ -172,7 +172,10 @@ async fn a_profile_that_cannot_be_used_refuses_the_transfer() {
     .await
     .unwrap();
     let error = rig.fetch().await.expect_err("the account source refuses");
-    assert!(unavailable_reason(&error).contains("no longer exists"), "{error:?}");
+    assert!(
+        unavailable_reason(&error).contains("no longer exists"),
+        "{error:?}"
+    );
     let view = rig.view().await;
     assert!(view.configured);
     assert!(view

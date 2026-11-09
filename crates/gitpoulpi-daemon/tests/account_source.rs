@@ -19,7 +19,9 @@ use gitpoulpi_core::domain::{
 };
 use gitpoulpi_core::TypedError;
 use gitpoulpi_daemon::Daemon;
-use gitpoulpi_ipc::git_credential::{CredentialAction, CredentialGrantAnswer, CredentialGrantRequest};
+use gitpoulpi_ipc::git_credential::{
+    CredentialAction, CredentialGrantAnswer, CredentialGrantRequest,
+};
 use gitpoulpi_ipc::{Client, Request, ResponseError};
 use gitpoulpi_secrets::{InMemoryTokens, TokenStore};
 use gitpoulpi_testkit::{AuthHttpRemote, FixtureRepo, FixtureRepoBuilder};
@@ -208,7 +210,12 @@ impl Rig {
     }
 
     /// What the helper would send for `grant`.
-    async fn grant(&mut self, grant: &str, action: CredentialAction, host: &str) -> CredentialGrantAnswer {
+    async fn grant(
+        &mut self,
+        grant: &str,
+        action: CredentialAction,
+        host: &str,
+    ) -> CredentialGrantAnswer {
         self.next += 1;
         let response = self
             .client
@@ -273,7 +280,10 @@ async fn the_accounts_token_reaches_its_own_server_and_nothing_else_sees_it() {
     {
         let log = std::fs::read_to_string(&helper().log).unwrap();
         assert!(log.contains("ARGV [--gitpoulpi-git-credential] [get]"));
-        assert!(log.contains("ARGV [--gitpoulpi-git-credential] [store]"), "git reports acceptance");
+        assert!(
+            log.contains("ARGV [--gitpoulpi-git-credential] [store]"),
+            "git reports acceptance"
+        );
         // Neither the helper's arguments nor its environment (git's own)
         // hold the token.
         assert!(!log.contains(TOKEN), "the token leaked into argv or env");
@@ -284,7 +294,9 @@ async fn the_accounts_token_reaches_its_own_server_and_nothing_else_sees_it() {
             .to_string();
         assert!(log.contains("GITPOULPI_CREDENTIAL_SESSION=account-source-main"));
         // The operation is over: the grant answers nothing, for its own host too.
-        let dead = rig.grant(&grant, CredentialAction::Get, &server.host()).await;
+        let dead = rig
+            .grant(&grant, CredentialAction::Get, &server.host())
+            .await;
         assert_eq!(dead, CredentialGrantAnswer::default());
     }
     rig.handle.shutdown().await.unwrap();

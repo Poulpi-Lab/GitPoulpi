@@ -349,8 +349,7 @@ pub fn redact(text: &str) -> String {
 /// masked wherever they appear whatever they look like: a token with no
 /// known prefix is invisible to the shape rules above.
 fn registered_secrets() -> &'static std::sync::Mutex<Vec<String>> {
-    static SECRETS: std::sync::OnceLock<std::sync::Mutex<Vec<String>>> =
-        std::sync::OnceLock::new();
+    static SECRETS: std::sync::OnceLock<std::sync::Mutex<Vec<String>>> = std::sync::OnceLock::new();
     SECRETS.get_or_init(Default::default)
 }
 

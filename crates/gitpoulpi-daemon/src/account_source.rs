@@ -178,9 +178,8 @@ mod hosting {
         let admitted = TrustGate::ambient()
             .admit(&integration)
             .map_err(|e| unavailable(format!("the account \"{id}\" is not trusted: {e}")))?;
-        let (scheme, host) = split_origin(&admitted.record.origin).ok_or_else(|| {
-            unavailable(format!("the account \"{id}\" has no usable address"))
-        })?;
+        let (scheme, host) = split_origin(&admitted.record.origin)
+            .ok_or_else(|| unavailable(format!("the account \"{id}\" has no usable address")))?;
         let login = integration
             .user
             .as_ref()
@@ -204,11 +203,14 @@ mod hosting {
     }
 
     pub(super) fn token_of(account: &Account) -> Result<String, Error> {
-        let store: Box<dyn TokenStore + Send + Sync> =
-            match TOKEN_STORE.lock().unwrap_or_else(|e| e.into_inner()).clone() {
-                Some(store) => Box::new(Shared(store)),
-                None => Box::new(gitpoulpi_secrets::CredentialHelperTokens::new()),
-            };
+        let store: Box<dyn TokenStore + Send + Sync> = match TOKEN_STORE
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .clone()
+        {
+            Some(store) => Box::new(Shared(store)),
+            None => Box::new(gitpoulpi_secrets::CredentialHelperTokens::new()),
+        };
         DefaultTokenSource::new(store, &account.integrations)
             .token(&account.integration)
             .ok()
@@ -282,7 +284,11 @@ mod hosting {
         fn no_secret_is_in_the_auth_the_child_is_built_from() {
             let token = "zz-plain-0123456789-secret";
             let account = Account {
-                integration: Integration::new("work", IntegrationKind::Github, "https://github.com"),
+                integration: Integration::new(
+                    "work",
+                    IntegrationKind::Github,
+                    "https://github.com",
+                ),
                 integrations: Vec::new(),
                 username: "x-access-token".into(),
                 scheme: "https".into(),

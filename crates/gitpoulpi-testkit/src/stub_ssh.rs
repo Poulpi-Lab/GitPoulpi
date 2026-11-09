@@ -152,9 +152,9 @@ mod tests {
                 std::thread::spawn(move || {
                     for n in 0..8 {
                         let args = [
-                            format!("-i"),
+                            "-i".to_string(),
                             format!("/keys/{t}-{n}"),
-                            format!("-o"),
+                            "-o".to_string(),
                             format!("Opt={t}-{n}"),
                             format!("host-{t}-{n}"),
                         ];

@@ -167,13 +167,28 @@ mod tests {
     fn git_usernames_per_host() {
         use IntegrationKind as K;
         let name = git_username;
-        assert_eq!(name(K::Github, "me", "me").as_deref(), Some("x-access-token"));
-        assert_eq!(name(K::GithubEnterprise, "", "").as_deref(), Some("x-access-token"));
+        assert_eq!(
+            name(K::Github, "me", "me").as_deref(),
+            Some("x-access-token")
+        );
+        assert_eq!(
+            name(K::GithubEnterprise, "", "").as_deref(),
+            Some("x-access-token")
+        );
         assert_eq!(name(K::Gitlab, "me", "").as_deref(), Some("oauth2"));
-        assert_eq!(name(K::GitlabSelfManaged, "", "").as_deref(), Some("oauth2"));
+        assert_eq!(
+            name(K::GitlabSelfManaged, "", "").as_deref(),
+            Some("oauth2")
+        );
         assert_eq!(name(K::Bitbucket, "ada", "").as_deref(), Some("ada"));
-        assert_eq!(name(K::Bitbucket, " ", "ada").as_deref(), Some("x-token-auth"));
-        assert_eq!(name(K::BitbucketDataCenter, "", "ada").as_deref(), Some("ada"));
+        assert_eq!(
+            name(K::Bitbucket, " ", "ada").as_deref(),
+            Some("x-token-auth")
+        );
+        assert_eq!(
+            name(K::BitbucketDataCenter, "", "ada").as_deref(),
+            Some("ada")
+        );
         assert_eq!(name(K::AzureDevops, "", "").as_deref(), Some("gitpoulpi"));
         assert_eq!(name(K::AzureDevops, "", "ada").as_deref(), Some("ada"));
         assert_eq!(name(K::Gitea, "acct", "ada").as_deref(), Some("ada"));

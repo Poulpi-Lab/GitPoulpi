@@ -278,6 +278,19 @@ pub enum OperationKind {
     /// network authentication applied (see `GitBackend::remote_access_check`).
     /// A network read: nothing changes, so nothing is broadcast.
     RemoteAccessCheck,
+    /// The repository's authentication profile and what it resolves to, with
+    /// no secret (read; see `gitpoulpi_core::domain::RepoAuthView`). Served by
+    /// the daemon from its private `repo-auth.toml`; not a backend call.
+    RepoAuthGet,
+    /// Replace the repository's authentication profile (daemon-owned, private
+    /// file). Not journaled and not undoable, like settings.
+    RepoAuthSet,
+    /// Remove the repository's authentication profile (back to the machine's
+    /// defaults). Not journaled and not undoable, like settings.
+    RepoAuthClear,
+    /// Connection test of every remote (or one) with the profile applied: a
+    /// network read, like `RemoteAccessCheck`.
+    RepoAuthTest,
     Pull,
     Push,
     /// Push `HEAD` to `refs/for/<branch>` to open a Gerrit change (see
@@ -631,6 +644,7 @@ impl OperationKind {
             | K::RewriteScriptTest
             | K::RewriteTrustScript
             | K::FlowTrustHooks
+            | K::RepoAuthGet
             | K::RewriteScanSecrets
             | K::RewriteAnalyze
             | K::RewriteCheckSigning
@@ -760,7 +774,10 @@ impl OperationKind {
                 .history(),
             K::Clone | K::LfsPull | K::LfsLocks => OpTraits::NONE.network(),
             // Reads a remote with the repository's credentials; changes nothing.
-            K::RemoteAccessCheck => OpTraits::NONE.network().scope(ChangeScope::NONE),
+            K::RemoteAccessCheck | K::RepoAuthTest => {
+                OpTraits::NONE.network().scope(ChangeScope::NONE)
+            }
+            K::RepoAuthSet | K::RepoAuthClear => OpTraits::NONE.scope(ChangeScope::NONE),
             K::RemoteAdd
             | K::RemoteRemove
             | K::RemoteRename
@@ -805,7 +822,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 171] = [
+    pub const ALL: [OperationKind; 175] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -912,6 +929,10 @@ impl OperationKind {
         OperationKind::FetchRefAsBranch,
         OperationKind::FetchRefspec,
         OperationKind::RemoteAccessCheck,
+        OperationKind::RepoAuthGet,
+        OperationKind::RepoAuthSet,
+        OperationKind::RepoAuthClear,
+        OperationKind::RepoAuthTest,
         OperationKind::Pull,
         OperationKind::Push,
         OperationKind::PushForReview,

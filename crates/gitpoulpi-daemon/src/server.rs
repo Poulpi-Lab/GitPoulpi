@@ -1148,6 +1148,12 @@ fn after_mutation(
     if command == OperationKind::SetRefVisibility {
         let _ = events_tx.send(Event::RefVisibilityChanged { repo: repo.clone() });
     }
+    if matches!(
+        command,
+        OperationKind::RepoAuthSet | OperationKind::RepoAuthClear
+    ) {
+        let _ = events_tx.send(Event::RepoAuthChanged { repo: repo.clone() });
+    }
     let _ = events_tx.send(Event::RepoChanged {
         repo: repo.clone(),
         scope,

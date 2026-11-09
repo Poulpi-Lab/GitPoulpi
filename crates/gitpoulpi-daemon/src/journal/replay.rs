@@ -216,7 +216,7 @@ fn run_remote_step(
 ) -> Result<()> {
     use gitpoulpi_core::domain::UndoRefusal;
     use gitpoulpi_core::Error;
-    crate::credentials::apply_from_config();
+    crate::credentials::apply_for(backend, repo)?;
     let moved = |actual| {
         Error::UndoRefused(UndoRefusal::RemoteRefMoved(Box::new(
             gitpoulpi_core::domain::RemoteRefMoved {

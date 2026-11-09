@@ -32,6 +32,11 @@ pub enum Event {
     RefVisibilityChanged {
         repo: RepoId,
     },
+    /// The repository's authentication profile (`repo-auth.toml`) was set or
+    /// cleared through the daemon. Re-read it (`RepoAuthGet`) to follow.
+    RepoAuthChanged {
+        repo: RepoId,
+    },
     /// The repository's pending auto-stash record (`repo-state.toml`'s
     /// `pending_auto_stash`) was written, changed or cleared by an
     /// auto-stash. Re-read it to follow.

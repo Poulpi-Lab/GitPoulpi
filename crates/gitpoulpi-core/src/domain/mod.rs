@@ -17,6 +17,7 @@ mod ref_filter;
 mod reflog;
 mod refs;
 mod repo;
+mod repo_auth;
 mod restore;
 pub mod rewrite;
 mod rules;
@@ -93,6 +94,10 @@ pub use refs::{
 };
 pub use repo::{
     CommitGraph, CommitNode, DiscoveredRepo, Oid, Remote, RepoId, RepoRef, WorkingTree,
+};
+pub use repo_auth::{
+    AuthOverride, HttpsAuth, RemoteIdentity, RepoAuthProfile, RepoAuthSetArgs, RepoAuthTestArgs,
+    RepoAuthView, SshAuth,
 };
 pub use restore::{RestoreItem, RestoreItemKind, RestoreOffer, RestoreOutcome};
 pub use rewrite::RewriteRefusal;

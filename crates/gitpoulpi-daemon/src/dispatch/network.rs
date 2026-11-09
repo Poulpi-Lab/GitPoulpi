@@ -102,6 +102,11 @@ pub(super) async fn dispatch_network_plain(
                 .unwrap_or_default();
             to_json!(backend.remote_access_check(&repo, &remote, &opts).await)
         }
+        OperationKind::RepoAuthTest => {
+            let opts: gitpoulpi_core::domain::RepoAuthTestArgs =
+                serde_json::from_value(args.clone()).unwrap_or_default();
+            to_json!(crate::repo_auth::test(backend, &repo, &opts).await)
+        }
         OperationKind::FetchRefspec => {
             let remote: String = arg_or_err!(args, "remote", request.id);
             let refspec: String = arg_or_err!(args, "refspec", request.id);
@@ -334,7 +339,7 @@ pub(super) async fn dispatch_network_plain(
     // answer its own poll with another refresh).
     let mutated = !matches!(
         request.command,
-        OperationKind::LfsLocks | OperationKind::RemoteAccessCheck
+        OperationKind::LfsLocks | OperationKind::RemoteAccessCheck | OperationKind::RepoAuthTest
     );
     match outcome {
         Ok(value) => {

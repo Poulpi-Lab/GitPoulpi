@@ -134,7 +134,7 @@ sha breve). Hunk e righe sono numerati come li numera `gitpoulpi --json diff`.
 |---|---|
 | `branch list`, `branch create <name> [at]`, `branch delete <name>`, `branch rename <old> <new>` | Branch locali. |
 | `branch track <remote/branch> [--name N]` | Crea un branch locale che traccia uno remoto, e ne fa il checkout. |
-| `branch delete-remote <name> [--remote R]` | Elimina un branch su un remoto, mantiene quello locale. |
+| `branch delete-remote <name> [--remote R]` | Elimina un branch su un remoto, mantiene quello locale. `undo --yes` lo rimanda com'era ([annulla](undo-redo.md#eliminare-un-branch-o-un-tag-su-un-remoto)). |
 | `branch set-upstream <branch> <remote/branch>`, `branch unset-upstream <branch>` | Upstream. |
 | `branch fast-forward <branch> [target]` | Sposta in avanti un branch solo se è un fast-forward. |
 | `checkout <target> [--autostash]` | Cambia branch o si stacca su un commit. |
@@ -147,7 +147,7 @@ sha breve). Hunk e righe sono numerati come li numera `gitpoulpi --json diff`.
 | `tag list [--unpushed]`, `tag create <name> [at] [-m M]`, `tag annotate <name> -m M` | Tag. `tag list` stampa ogni tag con la sua posizione, appresa dall'ultimo fetch o push dei tag (mai dalla rete): `local` (esiste qui), `remote` (i remote che lo hanno), `differs_on` (i remote che lo tengono su un altro commit) e `where`: `local`, `remote` (un remote lo ha, questo repository no), `both` o `differs`. |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | Elimina un tag: in locale (predefinito), solo su un remote (`git push R --delete`; azione verso l'esterno e non annullabile), oppure qui e sul remote che lo ha. La risposta contiene `scope` (`local`, `remote`, `both`) e, per l'eliminazione solo locale di un tag che un remote ha ancora, `still_on` (il prossimo `fetch` lo riporta). Un'eliminazione combinata rimuove prima il remote; `undo` ripristina poi solo il tag locale e `tag push` lo rimette. |
 | `tag fetch <name> [--remote R]` | Scarica un tag da un remote (per impostazione predefinita quello che lo ha), ad es. un tag con `where: remote`. Non sovrascrive mai un tag locale che punta a un altro commit. |
-| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tag su un remoto (senza nomi: ogni tag che nessun remoto ha). |
+| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tag su un remoto (senza nomi: ogni tag che nessun remoto ha). Eliminarne uno su un remoto è annullabile (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Worktree collegati. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Sottomoduli ([Sottomoduli](submodules.md)). |
 
@@ -226,7 +226,7 @@ profilo ed è facoltativo quando ce n'è uno solo)
 
 | Comando | Cosa fa |
 |---|---|
-| `ai [--print-sent] <command>` | `--print-sent` su qualsiasi comando `ai` stampa ciò che verrebbe inviato (il testo di sistema e dell'utente ripulito, `{sent: [{system, user}], privacy, dry_run: true}`) e non chiama alcun modello; richiede `ai.enabled = true`, nessuna chiave e nessuna rete. Ogni risposta di `ai` porta `privacy: {redactions: N, excluded_files: [...]}`: quanti segreti sono stati sostituiti e quali file sensibili sono stati esclusi ([IA > Privacy](ai.md#privacy)). |
+| `ai [--print-sent] [--send-all] <command>` | `--send-all` (alias `--no-truncate`) su qualsiasi comando `ai` invia ogni input per intero, anche oltre il suo limite `ai.limits.*`; senza, un input oltre un limite viene troncato (un conflitto viene rifiutato) e la risposta porta `truncated: [{part, detail?, bytes, limit, setting}]` quando qualcosa è stato tagliato ([IA > Limiti di input](ai.md#limiti-di-input)). `--print-sent` su qualsiasi comando `ai` stampa ciò che verrebbe inviato (il testo di sistema e dell'utente ripulito, `{sent: [{system, user}], privacy, dry_run: true}`) e non chiama alcun modello; richiede `ai.enabled = true`, nessuna chiave e nessuna rete. Ogni risposta di `ai` porta `privacy: {redactions: N, excluded_files: [...]}`: quanti segreti sono stati sostituiti e quali file sensibili sono stati esclusi ([IA > Privacy](ai.md#privacy)). |
 | `ai commit-message` | Stampa il messaggio che l'IA propone per le modifiche in stage (tutte le modifiche se nulla è in stage); non fa nessun commit. |
 | `ai explain [rev] [--wip]` | Spiega un commit (predefinito `HEAD`) o le modifiche in corso. |
 | `ai split-plan <rev>` | Stampa un piano che l'IA propone per dividere un commit, come `{commit, parts, applied: false}` dove `parts` è ciò che `split-commit --plan` accetta. Non applica nulla. Richiede `ai.enabled = true`. |
@@ -237,7 +237,7 @@ profilo ed è facoltativo quando ce n'è uno solo)
 | `ai review-context [--repo PATH \| --project HOST/PROJECT] [--run-in-repo profile\|yes\|no] [--claude-md on\|off] [--agents-md on\|off] [--context-file PATH\|URL] [--no-context-file] [--no-extra-file [on\|off]] [--reset]` | Mostra o imposta ciò che una bozza di revisione del codice riceve oltre al diff (`[ai.review]`, vedi [IA > Contesto della revisione](ai.md#contesto-della-revisione)). Senza `--repo` né `--project` è il valore predefinito globale; `--repo` (il flag globale) sono i valori propri di un clone, `--project github.com/owner/name` quelli di un repository non clonato (`remote-reviews.toml`). Senza un flag di impostazione mostra soltanto; con uno salva e stampa. JSON: `scope` (`global`, `repository`, `project`), `target`, `global`, `own` (solo i campi impostati dal repository o dal progetto), `effective` (ciò che riceve una revisione), `changed`. `--reset` dimentica i valori propri del repository o del progetto. `--run-in-repo` non vale per `--project`. Non richiede alcun modello; funziona con l'IA disattivata. |
 | `ai trust <profile> [--accept-origin URL] [--accept-certificate SHA256] [--allow-insecure-http on\|off]` | Lega la chiave API di un profilo all'indirizzo per cui è stata memorizzata (vedi [IA > Dove va la chiave](ai.md#dove-va-la-chiave)). Senza opzioni stampa `{profile, current_origin, trusted}`; `--accept-origin` accetta l'URL di base attuale del profilo dopo che è cambiato (scritto come lo ha stampato il rifiuto), `--accept-certificate` fissa il certificato di un server self-hosted tramite la sua impronta di chiave SHA-256, `--allow-insecure-http` consente un URL di base `http://` in chiaro che non è su questa macchina. Solo una persona lo esegue: non è uno strumento MCP. Funziona con l'IA disattivata. |
 
-Più `commit --ai` e `stash push --ai`. Il modello viene chiamato dal processo
+Più `commit --ai [--send-all]` e `stash push --ai [--send-all]` (stessi `--send-all` e `truncated` di `ai`; anche `hosting review suggest` accetta `--send-all`). Il modello viene chiamato dal processo
 `gitpoulpi`, quindi le chiavi API non passano mai al daemon o a un client MCP.
 
 **Repository, sessioni, daemon, impostazioni**

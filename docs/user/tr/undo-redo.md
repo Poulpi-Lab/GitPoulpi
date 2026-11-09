@@ -148,6 +148,7 @@ satırları düğmeyle aynı onayı ya da ad istemini açar.
 | Çalışma değişiklikleri | stage ve unstage (dosya, klasör, hunk, satırlar, tümü), atma (dosya, klasör, hunk, satırlar, bir dosya checkout'u), yama uygulama, **bir dosyayı diskten silme**, **yok sayma** (dosya, uzantı veya klasör: seçtiğiniz `.gitignore` dosyasındaki satır), **ikili ya da metin olarak ele alma** (`.gitattributes` satırı) |
 | Stash'ler | push, apply, pop, drop |
 | Uzak depolar ve yapılandırma | bir uzak depoyu ekleme, kaldırma, yeniden adlandırma, URL'sini veya push URL'sini değiştirme, Git LFS izleme ve izlemeyi bırakma |
+| Bir sunucuda | **bir uzak depodaki dalı veya tag'i silme** (ref'in menüsünden, paletten, `branch delete-remote`, `tag delete-remote`, `tag delete --both` ile ya da uzak dalı da silen bir iş akışı bitirmesiyle): aşağıya bakın |
 
 Bir merge, cherry-pick veya revert çakışmalarda durmuşken **Kaydet ve Çözüldü
 İşaretle**, stage ve unstage de geri alınabilir (her biri altındakinden önce geri
@@ -168,11 +169,41 @@ commit kimliğiyle geri verir (eski konumunda değil, stash listesinin başında
 dallarını, `origin/HEAD` takma adını ve onu izleyen dalların upstream ayarlarını
 geri verir.
 
+### Bir uzak sunucudaki dalı veya tag'i silme
+
+Silmeden önce GitPoulpi, dalın veya tag'in şu an ne tuttuğunu sunucuya sorar ve
+kaydeder: uzak depo, ad ve tam commit (açıklamalı bir tag için tag nesnesinin
+kendisi, böylece açıklaması korunur). Silme ancak sunucu hâlâ bu değeri tutuyorsa
+yapılır.
+
+**Geri al onu geri gönderir**: aynı adla, aynı commit'te, asla zorlamadan. Bu,
+başkalarının gördüğü bir sunucuda yapılan bir değişiklik olduğundan Geri al
+**her zaman önce sorar** ve bunu söyler ("Bunu geri almak origin üzerinde topic
+dalını 3f2a1c0... konumunda yeniden oluşturur"); girdinin adımları da bunu söyler
+(`gitpoulpi undo --dry-run`). Bir push ile aynı kimlik bilgilerini kullanır. Uzak
+izleme dalı da onunla birlikte geri gelir. **Yinele** onu aynı güvenlikle yeniden
+siler.
+
+Geri al, hiçbir şeyi değiştirmeden şu durumlarda reddeder:
+
+- dal veya tag o zamandan beri uzak depoda **yeniden oluşturulmuş** ya da
+  taşınmış: kaydedilenden başka bir commit'te ve push, bir başkasının çalışmasının
+  üzerine yazardı (ret iki commit'i de adlandırır);
+- commit (veya tag nesnesi) **artık deponuzda yok** (çöp toplamayla silindi):
+  geri alma yapılamaz.
+
+"Yerelde ve uzak depoda sil" **tek bir girdidir**: Geri al yerel ve uzak dalı ya da
+tag'i birlikte geri yükler, Yinele ikisini de yeniden siler. Yalnızca uzak dalı
+silmek yerel olana dokunmaz; geri almak da aynısını yapar. Uzak dalı da silen bir
+iş akışı bitirmesi bütün olarak geri alınabilir.
+
 ## Nelerin geri alınamadığı ve nedeni
 
-- **Bir sunucudaki her şey**: push, bir uzak dalı veya tag'i silme, bir tag
-  push'lama, LFS push, kilitleme ve kilidi açma. Bu durum başkalarıyla paylaşılır;
-  onu geri almak başka bir push olurdu ve GitPoulpi bunu sizin yerinize yapmaz.
+- **Bir sunucudaki çoğu şey**: push, bir tag push'lama, LFS push, kilitleme ve
+  kilidi açma, pull request açma. Bu durum başkalarıyla paylaşılır; bir push'u
+  geri almak onların tarafında bir force-push veya silme olurdu ve GitPoulpi bunu
+  sizin yerinize yapmaz. (Bir uzak dalı veya tag'i silmek istisnadır: geri alma
+  yalnızca sunucunun tuttuğunu geri koyar ve orada bir şey değiştiyse reddeder.)
   Geri al da böyle bir işlem yüzünden asla engellenmez.
 - **Fetch**: yalnızca sunucuyu yansıtan uzak izleme ref'lerini hareket ettirir.
   Sonraki fetch bunu yine yapardı.
@@ -289,6 +320,10 @@ Geri al yalnızca riskli olduğunda sorar:
   ettiriyor: değişiklikleriniz korunur, ancak biri yeniden yazılması gereken bir
   dosyadaysa geri alma hiçbir şeyi değiştirmeden durur.
 
+- girdi bir uzak depodaki dalı veya tag'i sildi: onu geri almak **sunucuya geri
+  push'lar** (yukarıya bakın), bu yüzden her zaman sorar; onu orada yeniden silen
+  yinele de öyle.
+
 Yinele ve yalnızca ref taşıyan her geri alma asla sormaz: diğer yön bir
 tuş uzağınızdadır.
 
@@ -344,8 +379,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   yineleme girdisi). O girdi engelli değilse reddeder ve `--yes` olmadan **3** ile
   çıkar. MCP için bir değişiklik işlemidir, ama yıkıcı değildir: depoya
   dokunulmaz.
-- Çıkış kodu **0** yapıldı, **2** reddedildi (JSON nedenini adlandırır), **3**
-  riskli ve `--yes` gerekir.
+- Çıkış kodu **0** yapıldı, **2** reddedildi (JSON nedenini adlandırır, örneğin
+  silinmiş bir uzak dal yeniden oluşturulduğunda `RemoteRefMoved`), **3** riskli ve
+  `--yes` gerekir (bir uzak depodaki dalın veya tag'in silinmesini geri almak
+  sunucuya push'lar).
 
 Sonrasındaki her şeyi geri almadan geri dönmek:
 

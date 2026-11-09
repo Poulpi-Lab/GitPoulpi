@@ -8,7 +8,7 @@ GitPoulpi daha yeni sürümleri denetler ve nasıl kurulduğuna göre ya kendi d
 
 Başlık çubuğu, çalışan sürümü (`v1.0.0`) uygulama adı ile depo yolu arasında gösterir. Daha yeni bir sürüm bilindiğinde çip vurgu renginde `v0.2.0 kullanılabilir` olur.
 
-Çipe tıklayın, `Ctrl+N` ardından `u` tuşlarına basın ya da komut paletinden (`Ctrl+P`) **Güncellemeler: Güncellemeyi Göster** komutunu çalıştırın: güncelleme paneli açılır. Uygulamanın üstünde bir penceredir: `Esc`, `q`, kapatma çarpısı ya da dışına bir tıklama kapatır. Şunları gösterir:
+`Ctrl+N` ardından `u` tuşlarına basın, komut paletinden (`Ctrl+P`) **Güncellemeler: Güncellemeyi Göster** komutunu çalıştırın ya da çip `kullanılabilir` derken (veya bir güncelleme sürerken) ona tıklayın: güncelleme paneli açılır. Daha yeni bir sürüm yokken çipe tıklamak bunun yerine Sürüm notları sekmesini açar. Uygulamanın üstünde bir penceredir: `Esc`, `q`, kapatma çarpısı ya da dışına bir tıklama kapatır. Şunları gösterir:
 
 - çalışan sürümü ve **Kurulum yöntemi**: GitPoulpi'nin bu bilgisayara nasıl geldiği (aşağıdaki her şeyi bu belirler);
 - güncellemenin durumunu (denetleniyor, yüzdesiyle indiriliyor, hazır, başarısız);

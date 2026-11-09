@@ -298,7 +298,8 @@ impl UndoRefusal {
     pub fn message(&self) -> String {
         match self {
             UndoRefusal::NothingToUndo => "nothing to undo (a push, a fetch or anything else \
-                 done on a remote server is never undone)"
+                 done on a remote server is never undone, except deleting a remote branch \
+                 or tag)"
                 .into(),
             UndoRefusal::NothingToRedo => "nothing to redo".into(),
             UndoRefusal::Disabled => UNDO_DISABLED_MESSAGE.into(),

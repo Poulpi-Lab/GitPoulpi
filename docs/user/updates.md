@@ -8,7 +8,7 @@ GitPoulpi checks for newer releases and, depending on how it was installed, eith
 
 The title bar shows the running version (`v1.0.0`) between the app name and the repository path. When a newer release is known the chip turns into `v0.2.0 available` in the accent color.
 
-Press `Ctrl+N` then `u`, run **Updates: Show Update** from the command palette (`Ctrl+P`), or click the chip while it says `available` (or while an update is under way): the update panel opens. With no newer release, a click on the chip opens the Release notes tab instead. It is a window over the app: `Esc`, `q`, the close cross or a click outside closes it. It shows:
+Press `Ctrl+N` then `u`, run **Updates: Show Update** from the command palette (`Ctrl+P`), or click the chip: the update panel opens only when a newer release exists or an update is under way; otherwise a click opens the Release notes tab. It is a window over the app: `Esc`, `q`, the close cross or a click outside closes it. It shows:
 
 - the running version and **Installed with**: how GitPoulpi got onto this computer (it decides everything below);
 - where the update stands (checking, downloading with a percentage, ready, failed);

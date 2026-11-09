@@ -5582,8 +5582,8 @@ forget_button = "Forget"
 
 [undo_ui]
 # context: why Undo is idle; a remote server means a push, fetch etc. cannot be undone
-nothing_to_undo = "nothing to undo (a push, a fetch or anything else done on a remote server is never undone)"
-tip_nothing_to_undo = "Nothing to undo (a push, a fetch or anything else done on a remote server is never undone)"
+nothing_to_undo = "nothing to undo (a {$push_noun}, a {$fetch_noun} or anything else done on a remote server is never undone, except deleting a remote branch or {$tag})"
+tip_nothing_to_undo = "Nothing to undo (a {$push_noun}, a {$fetch_noun} or anything else done on a remote server is never undone, except deleting a remote branch or {$tag})"
 tip_nothing_to_redo = "Nothing to redo"
 nothing_to_redo = "nothing to redo"
 disabled = "Undo is turned off (Settings > General)"
@@ -10988,7 +10988,7 @@ settings_heading = "Limits"
 # context: Settings > AI, label of a number: the most bytes one merge conflict may add up to when the AI is asked to resolve it
 conflict_label = "Largest conflict to send (bytes)"
 # context: help under that number
-conflict_help = "Over this size, Suggest a resolution does not fail: it warns, and you can send it anyway once, open this setting or cancel. The limit is GitPoulpi's own guard, not the model's: raise it when your model has the room. 40000 by default."
+conflict_help = "Over this size, \"Suggest a resolution\" does not fail: it warns, and you can send it anyway once, open this setting or cancel. The limit is GitPoulpi's own guard, not the model's: raise it when your model has the room. 40000 by default."
 # context: red warning under that number while it is very large
 conflict_warning = "A very large limit can send more than the model accepts: the request then fails at the provider."
 # context: title of the dialog shown when a conflict is over the limit

@@ -188,7 +188,7 @@ to it.
 
 ## Updates
 
-The title bar shows the running version (`v1.0.0`) between the app name and the repository path. When a newer release is known (or an update is under way), a click on it opens the update panel with the version, how GitPoulpi was installed and what to do about the new release; otherwise a click opens the Release notes tab. `Ctrl+N` then `u`, or **Updates: Show Update** in the command palette (`Ctrl+P`), always opens the update panel, and **Help: Release Notes** always opens the changelog.
+The title bar shows the running version (`v1.0.0`) between the app name and the repository path. When a newer release is known (or an update is under way), a click on it opens the update panel with the version, how GitPoulpi was installed and what to do about the new release; with no newer release and no update under way, a click opens the Release notes tab instead. `Ctrl+N` then `u`, or **Updates: Show Update** in the command palette (`Ctrl+P`), always opens the update panel, and **Help: Release Notes** always opens the changelog.
 
 Once a day, in the background, GitPoulpi checks the place where its releases are published (GitHub by default) for a newer one (`updates.mode`, [Settings > Synchronization](settings.md#synchronization)). When one does, the chip reads `v0.2.0 available` in the accent color.
 

@@ -375,8 +375,8 @@ stage_file = "z"
 | `preferences` | `prev_tab` | 設定ページの前のタブ | `Alt+Left` |
 | `preferences` | `next_tab` | 設定ページの次のタブ | `Alt+Right` |
 | `ai_popup` | `copy` | 結果をコピー | `c` |
-| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
-| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
+| `activity_log` | `scroll_left` | アクティビティログを左へスクロール | `Left` |
+| `activity_log` | `scroll_right` | アクティビティログを右へスクロール | `Right` |
 | `integrations` | `add` | プロファイルを追加 | `a` |
 | `integrations` | `edit` | 選択中のプロファイルを編集 | `e` |
 | `integrations` | `open_token` | トークンのページを開く | `o` |
@@ -829,8 +829,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | アクティビティログ: 対象範囲を選択 |  |
 | アクティビティログ: Git 操作 |  |
 | アクティビティログ: アプリケーションログ |  |
-| Activity Log: Scroll Left | `Left` |
-| Activity Log: Scroll Right | `Right` |
+| アクティビティログ: 左へスクロール | `Left` |
+| アクティビティログ: 右へスクロール | `Right` |
 | アクティビティログ: 直前のエラーをコピー |  |
 | アクティビティログ: 提案された操作を実行 |  |
 | アクティビティログ: 直前のエラーを開く |  |

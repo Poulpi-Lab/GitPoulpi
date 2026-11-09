@@ -649,7 +649,6 @@ Tuşlar varsayılanlardır.
 | Remote: Uzak Depo Bağlantısını Kopyala |  |
 | Remote: Uzak Depoyu Fetch Et... |  |
 | Remote: Seçili Uzak Depo Eylemleri... | `.` |
-| Depo: Bu Depo İçin SSH Anahtarı... |  |
 | Depo: Kısmi Checkout... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

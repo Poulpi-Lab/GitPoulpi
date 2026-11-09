@@ -649,7 +649,6 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Remote: Copy Link to Remote |  |
 | Remote: Fetch Remote... |  |
 | Remote: Actions for Selected Remote... | `.` |
-| Repository: SSH Key for This Repository... |  |
 | Repository: Sparse Checkout... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

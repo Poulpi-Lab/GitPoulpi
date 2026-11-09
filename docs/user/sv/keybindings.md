@@ -651,7 +651,6 @@ Tangenterna är standardvärdena.
 | Remote: Kopiera länk till remote |  |
 | Remote: Fetch remote... |  |
 | Remote: Åtgärder för vald remote... | `.` |
-| Repository: SSH-nyckel för det här repositoryt... |  |
 | Repository: Delvis utcheckning... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

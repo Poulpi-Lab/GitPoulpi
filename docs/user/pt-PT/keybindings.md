@@ -647,7 +647,6 @@ As teclas são as predefinidas.
 | Remoto: copiar a ligação do remoto |  |
 | Remoto: fetch do remoto... |  |
 | Remoto: ações do remoto selecionado... | `.` |
-| Repositório: chave SSH deste repositório... |  |
 | Repositório: checkout parcial... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

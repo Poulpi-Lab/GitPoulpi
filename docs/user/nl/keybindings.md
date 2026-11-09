@@ -653,7 +653,6 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Remote: Link naar remote kopiëren |  |
 | Remote: Remote fetchen... |  |
 | Remote: Acties voor geselecteerde remote... | `.` |
-| Repository: SSH-sleutel voor deze repository... |  |
 | Repository: Gedeeltelijke checkout... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

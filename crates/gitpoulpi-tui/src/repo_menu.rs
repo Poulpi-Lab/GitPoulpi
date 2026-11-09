@@ -691,7 +691,7 @@ mod tests {
                 "Close tabs to the right...",
                 "Add to favorites",
                 "Copy path",
-                "SSH key...",
+                "SSH & credentials...",
                 "Sparse checkout...",
             ]
         );

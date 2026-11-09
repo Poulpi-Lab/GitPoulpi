@@ -655,7 +655,6 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Remote: копировать ссылку на remote |  |
 | Remote: fetch remote... |  |
 | Remote: действия для выбранного remote... | `.` |
-| Репозиторий: ключ SSH для этого репозитория... |  |
 | Репозиторий: Частичный checkout... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

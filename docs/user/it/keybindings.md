@@ -653,7 +653,6 @@ applicano. I tasti sono quelli predefiniti.
 | Remoto: Copia il link del remoto |  |
 | Remoto: Fetch di un remoto... |  |
 | Remoto: Azioni per il remoto selezionato... | `.` |
-| Repository: Chiave SSH per questo repository... |  |
 | Repository: Checkout parziale... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

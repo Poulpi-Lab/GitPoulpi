@@ -649,7 +649,6 @@ Klávesy jsou výchozí.
 | Remote: Kopírovat odkaz na remote |  |
 | Remote: Fetch remote... |  |
 | Remote: Akce vybraného remote... | `.` |
-| Repozitář: Klíč SSH pro tento repozitář... |  |
 | Repozitář: Částečný checkout... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

@@ -615,7 +615,6 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 远程：复制远程链接 |  |
 | 远程：Fetch 远程… |  |
 | 远程：所选远程的操作… | `.` |
-| 仓库：此仓库的 SSH 密钥… |  |
 | 仓库：稀疏检出… |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

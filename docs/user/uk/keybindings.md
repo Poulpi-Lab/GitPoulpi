@@ -643,7 +643,6 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Remote: копіювати посилання на remote |  |
 | Remote: fetch remote... |  |
 | Remote: дії для вибраного remote... | `.` |
-| Репозиторій: ключ SSH для цього репозиторію... |  |
 | Репозиторій: розріджений checkout... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

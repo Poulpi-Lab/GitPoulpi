@@ -642,7 +642,6 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 리모트: 리모트 링크 복사 |  |
 | 리모트: 리모트 Fetch... |  |
 | 리모트: 선택한 리모트의 동작... | `.` |
-| 저장소: 이 저장소의 SSH 키... |  |
 | 저장소: 스파스 체크아웃... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

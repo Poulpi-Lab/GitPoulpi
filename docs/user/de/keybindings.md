@@ -644,7 +644,6 @@ die Standardtasten.
 | Remote: Link zum Remote kopieren |  |
 | Remote: Remote abrufen (Fetch)... |  |
 | Remote: Aktionen für ausgewähltes Remote... | `.` |
-| Repository: SSH-Schlüssel für dieses Repository... |  |
 | Repository: Sparse Checkout... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

@@ -651,7 +651,6 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Distant : Copier le lien du distant |  |
 | Distant : Fetch un distant... |  |
 | Distant : Actions du distant sélectionné... | `.` |
-| Dépôt : Clé SSH de ce dépôt... |  |
 | Dépôt : Extraction partielle... |  |
 | Dépôt : Authentification SSH et identifiants... |  |
 | Dépôt : Tester la connexion |  |

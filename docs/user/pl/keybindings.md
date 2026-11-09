@@ -648,7 +648,6 @@ zastosowania. Klawisze są domyślne.
 | Zdalne: Kopiuj link do zdalnego |  |
 | Zdalne: Fetch zdalnego... |  |
 | Zdalne: Akcje dla zaznaczonego zdalnego... | `.` |
-| Repozytorium: Klucz SSH dla tego repozytorium... |  |
 | Repozytorium: Częściowy checkout... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

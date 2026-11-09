@@ -654,7 +654,6 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Remoto: Copiar enlace del remoto |  |
 | Remoto: Fetch remoto... |  |
 | Remoto: Acciones del remoto seleccionado... | `.` |
-| Repositorio: Clave SSH de este repositorio... |  |
 | Repositorio: Checkout parcial... |  |
 | Repository: SSH & Credentials... |  |
 | Repository: Test Connection |  |

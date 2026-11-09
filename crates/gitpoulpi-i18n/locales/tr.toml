@@ -2460,6 +2460,8 @@ preferences_list_remove = "Seçili Liste Öğesini Kaldır"
 preferences_list_move_up = "Seçili Liste Öğesini Yukarı Taşı"
 preferences_list_move_down = "Seçili Liste Öğesini Aşağı Taşı"
 ai_popup_copy = "Sonucu Kopyala"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Profil Ekle"
 integrations_edit = "Seçili Profili Düzenle"
 integrations_open_token = "Token Sayfasını Aç"
@@ -2525,6 +2527,7 @@ folder_picker = "Klasör seçici"
 preferences = "Ayarlar"
 ai_popup = "YZ sonuç açılır penceresi"
 integrations = "Ayarlar: Entegrasyonlar sayfası"
+activity_log = "Activity Log window"
 palette = "Palet komutları"
 split = "{$commit} bölme düzenleyicisi"
 
@@ -5930,6 +5933,12 @@ hint_application = "Oklar: kaydır  l: düzey  /: filtre  c: tümünü kopyala  
 palette_scope = "Etkinlik Günlüğü: Kapsamı Seç"
 palette_git_tab = "Etkinlik Günlüğü: Git İşlemleri"
 palette_app_tab = "Etkinlik Günlüğü: Uygulama Günlüğü"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "Uzak deponun SSH ana makine anahtarı henüz bilinmiyor."

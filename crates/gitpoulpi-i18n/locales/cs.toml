@@ -2459,6 +2459,8 @@ preferences_list_remove = "Odebrat vybranou položku seznamu"
 preferences_list_move_up = "Posunout vybranou položku seznamu nahoru"
 preferences_list_move_down = "Posunout vybranou položku seznamu dolů"
 ai_popup_copy = "Kopírovat výsledek"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Přidat profil"
 integrations_edit = "Upravit vybraný profil"
 integrations_open_token = "Otevřít stránku tokenu"
@@ -2524,6 +2526,7 @@ folder_picker = "Výběr složky"
 preferences = "Nastavení"
 ai_popup = "Vyskakovací okno výsledku AI"
 integrations = "Nastavení: Stránka Integrace"
+activity_log = "Activity Log window"
 palette = "Příkazy palety"
 split = "Editor rozdělení {$commit}u"
 
@@ -5924,6 +5927,12 @@ hint_application = "Šipky: posun  l: úroveň  /: filtr  c: kopírovat vše  o:
 palette_scope = "Protokol aktivity: Zvolit rozsah"
 palette_git_tab = "Protokol aktivity: Operace gitu"
 palette_app_tab = "Protokol aktivity: Protokol aplikace"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "Hostitelský klíč SSH tohoto remote zatím není znám."

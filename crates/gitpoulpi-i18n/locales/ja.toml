@@ -2450,6 +2450,8 @@ preferences_list_remove = "選択したリスト項目を削除"
 preferences_list_move_up = "選択したリスト項目を上へ移動"
 preferences_list_move_down = "選択したリスト項目を下へ移動"
 ai_popup_copy = "結果をコピー"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "プロファイルを追加"
 integrations_edit = "選択中のプロファイルを編集"
 integrations_open_token = "トークンのページを開く"
@@ -2525,6 +2527,7 @@ folder_picker = "フォルダー選択"
 preferences = "設定"
 ai_popup = "AI 結果ポップアップ"
 integrations = "設定：連携ページ"
+activity_log = "Activity Log window"
 palette = "パレットのコマンド"
 split = "{$commit}の分割エディター"
 
@@ -5925,6 +5928,12 @@ hint_application = "矢印：スクロール  l：レベル  /：絞り込み  c
 palette_scope = "アクティビティログ: 対象範囲を選択"
 palette_git_tab = "アクティビティログ: Git 操作"
 palette_app_tab = "アクティビティログ: アプリケーションログ"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "リモートの SSH ホスト鍵がまだ登録されていません。"

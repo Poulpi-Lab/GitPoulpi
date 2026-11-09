@@ -388,6 +388,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Vorheriger Tab der Einstellungsseite | `Alt+Left` |
 | `preferences` | `next_tab` | Nächster Tab der Einstellungsseite | `Alt+Right` |
 | `ai_popup` | `copy` | Ergebnis kopieren | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Ein Profil hinzufügen | `a` |
 | `integrations` | `edit` | Ausgewähltes Profil bearbeiten | `e` |
 | `integrations` | `open_token` | Token-Seite öffnen | `o` |
@@ -856,6 +858,8 @@ die Standardtasten.
 | Aktivitätsprotokoll: Bereich wählen |  |
 | Aktivitätsprotokoll: Git-Vorgänge |  |
 | Aktivitätsprotokoll: Anwendungsprotokoll |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Aktivitätsprotokoll: Letzten Fehler kopieren |  |
 | Aktivitätsprotokoll: Vorgeschlagene Aktion ausführen |  |
 | Aktivitätsprotokoll: Letzten Fehler öffnen |  |

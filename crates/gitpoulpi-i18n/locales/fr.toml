@@ -2463,6 +2463,8 @@ preferences_list_remove = "Supprimer l'élément sélectionné"
 preferences_list_move_up = "Monter l'élément sélectionné"
 preferences_list_move_down = "Descendre l'élément sélectionné"
 ai_popup_copy = "Copier le résultat"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Ajouter un profil"
 integrations_edit = "Modifier le profil sélectionné"
 integrations_open_token = "Ouvrir la page du jeton"
@@ -2528,6 +2530,7 @@ folder_picker = "Sélecteur de dossier"
 preferences = "Paramètres"
 ai_popup = "Fenêtre de résultat de l'IA"
 integrations = "Paramètres : page Intégrations"
+activity_log = "Activity Log window"
 palette = "Commandes de la palette"
 split = { git = "Éditeur de scission de commit", local = "Éditeur de scission de validation" }
 
@@ -5942,6 +5945,12 @@ hint_application = "Flèches : défiler  l : niveau  / : filtrer  c : tout c
 palette_scope = "Journal d'activité : Choisir le périmètre"
 palette_git_tab = "Journal d'activité : Opérations Git"
 palette_app_tab = "Journal d'activité : Journal de l'application"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Journal d'activité : Défiler à gauche"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Journal d'activité : Défiler à droite"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "La clé d'hôte SSH du distant n'est pas encore connue."

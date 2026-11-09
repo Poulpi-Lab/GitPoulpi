@@ -3291,6 +3291,8 @@ preferences_list_remove = "Remove the Selected List Item"
 preferences_list_move_up = "Move the Selected List Item Up"
 preferences_list_move_down = "Move the Selected List Item Down"
 ai_popup_copy = "Copy the Result"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Add a Profile"
 integrations_edit = "Edit the Selected Profile"
 integrations_open_token = "Open the Token Page"
@@ -3357,6 +3359,7 @@ folder_picker = "Folder picker"
 preferences = "Settings"
 ai_popup = "AI result popup"
 integrations = "Settings: Integrations page"
+activity_log = "Activity Log window"
 palette = "Palette commands"
 split = "Split {$commit} editor"
 
@@ -7310,7 +7313,7 @@ app_wide = "app-wide"
 # context: empty Git operations tab
 git_empty = "No operations yet. The operations of the chosen scope are listed here, with how long they took."
 # context: key hints under the Git operations tab; keep the key names
-hint_git = "Up/Down: select  Enter: details  c: copy  r: suggested action  d: diagnostics  s: scope  Tab: application  Esc: close"
+hint_git = "Up/Down: select  Left/Right: scroll  Enter: details  c: copy  r: suggested action  d: diagnostics  s: scope  Tab: application  Esc: close"
 # context: key hints under the Application tab; keep the key names
 hint_application = "Arrows: scroll  l: level  /: filter  c: copy all  o: folder  x: clear  d: diagnostics  s: scope  g: git  Esc: close"
 # context: command palette entry: opens the Activity Log's Scope box
@@ -7319,6 +7322,12 @@ palette_scope = "Activity Log: Choose the Scope"
 palette_git_tab = "Activity Log: Git Operations"
 # context: command palette entry: shows the Activity Log's Application tab
 palette_app_tab = "Activity Log: Application Log"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 # context: title of the notification

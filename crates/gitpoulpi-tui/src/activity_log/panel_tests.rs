@@ -413,6 +413,117 @@ fn a_long_application_line_scrolls_sideways_by_keys_wheel_and_bar() {
     close();
 }
 
+fn long_detail_entry(title: &str) -> feed::Entry {
+    let mut e = feed::Entry::new(Severity::Error, title.into(), "boom".into());
+    e.detail = Some(gitpoulpi_core::ErrorDetail::from_git(
+        &["push", "origin"],
+        Some(1),
+        &format!("{}\n", long_line_marker()),
+    ));
+    e
+}
+
+fn bar_arrows(screen: &str) -> bool {
+    screen.contains('\u{2190}') && screen.contains('\u{2192}')
+}
+
+#[test]
+fn a_long_git_detail_line_scrolls_sideways_by_keys_wheel_palette_and_bar() {
+    let _lock = lock();
+    feed::push(long_detail_entry("Sideways push"));
+    let mut terminal = terminal();
+    let collapsed = draw(&mut terminal);
+    assert!(
+        !bar_arrows(&collapsed),
+        "no bar while nothing is wider than the view\n{collapsed}"
+    );
+    assert!(with(|s| hbar(s).is_none()));
+
+    key(KeyCode::Enter);
+    let screen = draw(&mut terminal);
+    assert!(screen.contains("start-marker"), "{screen}");
+    assert!(!screen.contains("end-marker"), "cut at the edge\n{screen}");
+    assert!(bar_arrows(&screen), "a bar appears\n{screen}");
+    assert_eq!(with(|s| s.hoffset), 0);
+
+    // Keys: Right / Left, Home.
+    key(KeyCode::Right);
+    assert_eq!(with(|s| s.hoffset), 8);
+    let screen = draw(&mut terminal);
+    assert!(!screen.contains("start-marker"), "scrolled\n{screen}");
+    assert!(screen.contains("-marker"), "{screen}");
+    key(KeyCode::Left);
+    assert_eq!(with(|s| s.hoffset), 0);
+    key(KeyCode::Right);
+    key(KeyCode::Home);
+    assert_eq!(with(|s| s.hoffset), 0, "Home resets");
+    assert_eq!(with(|s| s.tab), Tab::Git, "the arrows no longer change tab");
+
+    // Shift+wheel and the horizontal wheel.
+    let list = with(|s| s.list);
+    on_mouse(MouseEvent {
+        kind: MouseEventKind::ScrollDown,
+        column: list.x + 3,
+        row: list.y,
+        modifiers: KeyModifiers::SHIFT,
+    });
+    assert_eq!(with(|s| s.hoffset), 9);
+    mouse(MouseEventKind::ScrollLeft, list.x + 3, list.y);
+    assert_eq!(with(|s| s.hoffset), 1);
+    mouse(MouseEventKind::ScrollRight, list.x + 3, list.y);
+    assert_eq!(with(|s| s.hoffset), 9);
+
+    // The palette commands scroll the tab in front.
+    level_cmd_open(LevelCmd::ScrollLeft);
+    assert_eq!(with(|s| s.hoffset), 1);
+    level_cmd_open(LevelCmd::ScrollRight);
+    assert_eq!(with(|s| s.hoffset), 9);
+    assert_eq!(with(|s| s.tab), Tab::Git);
+    key(KeyCode::Home);
+
+    // The bar: a press on the bare track jumps, the far end shows the end of
+    // the line, and dragging the thumb back returns.
+    draw(&mut terminal);
+    let hbody = with(|s| s.hbody);
+    let bar_y = hbody.bottom() - 1;
+    mouse(
+        MouseEventKind::Down(MouseButton::Left),
+        hbody.right() - 3,
+        bar_y,
+    );
+    let jumped = with(|s| s.hoffset);
+    assert!(jumped > 100, "the track press jumped to {jumped}");
+    let screen = draw(&mut terminal);
+    assert!(screen.contains("end-marker"), "{screen}");
+    mouse(MouseEventKind::Drag(MouseButton::Left), hbody.x + 1, bar_y);
+    assert!(with(|s| s.hoffset) < jumped, "dragging left moves back");
+    mouse(MouseEventKind::Up(MouseButton::Left), hbody.x + 1, bar_y);
+    assert!(with(|s| s.hgrab.is_none()));
+
+    // Switching tab starts the other one at the left edge.
+    switch_tab(Tab::Application);
+    assert_eq!(with(|s| s.hoffset), 0);
+    close();
+}
+
+#[test]
+fn a_long_git_header_scrolls_sideways_to_its_end() {
+    let _lock = lock();
+    feed::push(error(&format!("Head-start {} head-end", "y".repeat(200))));
+    let mut terminal = terminal();
+    let screen = draw(&mut terminal);
+    assert!(screen.contains("Head-start"), "{screen}");
+    assert!(!screen.contains("head-end"), "{screen}");
+    assert!(bar_arrows(&screen), "{screen}");
+    for _ in 0..30 {
+        key(KeyCode::Right);
+    }
+    let screen = draw(&mut terminal);
+    assert!(screen.contains("head-end"), "{screen}");
+    assert!(!screen.contains("Head-start"), "{screen}");
+    close();
+}
+
 #[test]
 fn the_git_operations_tab_lists_the_active_repositorys_operations_with_their_duration() {
     let _lock = lock();

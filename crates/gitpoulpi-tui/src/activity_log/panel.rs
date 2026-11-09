@@ -117,6 +117,10 @@ pub(crate) enum LevelCmd {
     GitTab,
     /// Shows the Application tab.
     AppTab,
+    /// Scrolls the lines of the tab in front one step to the left.
+    ScrollLeft,
+    /// Scrolls the lines of the tab in front one step to the right.
+    ScrollRight,
 }
 
 struct State {
@@ -131,7 +135,7 @@ struct State {
     expanded: Vec<u64>,
     /// First visual line shown, per tab (`tab_index`).
     offset: [usize; 2],
-    /// First column shown in the Application tab.
+    /// First column shown (both tabs; a tab switch goes back to 0).
     hoffset: usize,
     /// Where the horizontal thumb is held while it is dragged.
     hgrab: Option<i32>,
@@ -320,6 +324,7 @@ fn switch_tab(tab: Tab) {
         s.scope_combo = None;
         s.notice = None;
         s.selected = 0;
+        s.hoffset = 0;
     });
     if tab == Tab::Application {
         start_refresher();
@@ -778,12 +783,18 @@ pub(super) fn level_cmd(cmd: LevelCmd) {
         LevelCmd::All => s.shown = [true; 5],
         LevelCmd::Clear => s.shown = [false; 5],
         LevelCmd::ClearLog => ask_clear_log_in(s),
-        LevelCmd::Scope | LevelCmd::GitTab | LevelCmd::AppTab => {}
+        LevelCmd::Scope
+        | LevelCmd::GitTab
+        | LevelCmd::AppTab
+        | LevelCmd::ScrollLeft
+        | LevelCmd::ScrollRight => {}
     });
     match cmd {
         LevelCmd::Scope => open_scope_box(),
         LevelCmd::GitTab => switch_tab(Tab::Git),
         LevelCmd::AppTab => switch_tab(Tab::Application),
+        LevelCmd::ScrollLeft => hscroll(-H_STEP),
+        LevelCmd::ScrollRight => hscroll(H_STEP),
         _ => {}
     }
 }
@@ -792,8 +803,15 @@ pub(super) fn level_cmd(cmd: LevelCmd) {
 /// level commands (the Git operations tab or the Scope box for theirs), and
 /// applies.
 pub(crate) fn level_cmd_open(cmd: LevelCmd) {
-    open();
-    if !matches!(cmd, LevelCmd::Scope | LevelCmd::GitTab) {
+    // Scrolling keeps the window as it is (reopening goes back to the left
+    // edge and the first entry).
+    if !(matches!(cmd, LevelCmd::ScrollLeft | LevelCmd::ScrollRight) && is_open()) {
+        open();
+    }
+    if !matches!(
+        cmd,
+        LevelCmd::Scope | LevelCmd::GitTab | LevelCmd::ScrollLeft | LevelCmd::ScrollRight
+    ) {
         with(|s| s.tab = Tab::Application);
         start_refresher();
     }
@@ -1146,14 +1164,15 @@ pub(crate) fn on_key(key: KeyEvent) {
     }
     let tab = with(|s| s.tab);
     let page = with(|s| s.list.height.max(1)) as isize;
+    // Sideways scrolling of long lines, on both tabs (rebindable).
+    match crate::keymap::current().action_in(crate::keymap::Ctx::ActivityLog, &key) {
+        Some(crate::keymap::Action::ActivityLogScrollLeft) => return hscroll(-H_STEP),
+        Some(crate::keymap::Action::ActivityLogScrollRight) => return hscroll(H_STEP),
+        _ => {}
+    }
     match key.code {
         KeyCode::Esc | KeyCode::Char('q') => close(),
         KeyCode::Tab | KeyCode::BackTab => switch_tab(other_tab(tab)),
-        // Sideways scrolling belongs to the Application tab's long lines;
-        // on the Git operations tab the arrows still change tab.
-        KeyCode::Right | KeyCode::Left if tab == Tab::Git => {
-            switch_tab(other_tab(tab));
-        }
         KeyCode::Char('d') => copy_diagnostics(),
         // The tabs by letter, and the Scope box.
         KeyCode::Char('g') if tab != Tab::Git => switch_tab(Tab::Git),
@@ -1192,7 +1211,11 @@ fn activity_key(key: KeyEvent, page: isize) {
         KeyCode::Down | KeyCode::Char('j') => step(1),
         KeyCode::PageUp => step(-5),
         KeyCode::PageDown => step(5),
-        KeyCode::Home => step(isize::MIN / 2),
+        // Home goes back to the first entry and the left edge.
+        KeyCode::Home => {
+            with(|s| s.hoffset = 0);
+            step(isize::MIN / 2);
+        }
         KeyCode::End => step(isize::MAX / 2),
         KeyCode::Enter | KeyCode::Char(' ') => {
             let selected = with(|s| s.selected);
@@ -1214,8 +1237,6 @@ fn app_key(key: KeyEvent, page: isize) {
         KeyCode::Down | KeyCode::Char('j') => scroll(1),
         KeyCode::PageUp => scroll(-page),
         KeyCode::PageDown => scroll(page),
-        KeyCode::Left => hscroll(-H_STEP),
-        KeyCode::Right => hscroll(H_STEP),
         // Home goes back to the start of the lines: the top and the left edge.
         KeyCode::Home => {
             with(|s| s.hoffset = 0);
@@ -1271,11 +1292,8 @@ fn tab_index(tab: Tab) -> usize {
     }
 }
 
-/// The Application tab's horizontal bar as last painted.
+/// The horizontal bar as last painted (either tab).
 fn hbar(s: &State) -> Option<crate::scrollbar::Track> {
-    if s.tab != Tab::Application {
-        return None;
-    }
     crate::scrollbar::Track::horizontal(s.hbody, s.longest.saturating_sub(1), s.hoffset)
 }
 
@@ -1383,21 +1401,19 @@ pub(crate) fn on_mouse(mouse: MouseEvent) {
             } else {
                 3
             };
-            // Shift+wheel scrolls the Application lines sideways.
-            if mouse.modifiers.contains(KeyModifiers::SHIFT) && tab == Tab::Application {
+            // Shift+wheel scrolls the lines sideways.
+            if mouse.modifiers.contains(KeyModifiers::SHIFT) {
                 hscroll(delta * 3);
             } else {
                 scroll(delta);
             }
         }
         MouseEventKind::ScrollLeft | MouseEventKind::ScrollRight => {
-            if tab == Tab::Application {
-                hscroll(if mouse.kind == MouseEventKind::ScrollLeft {
-                    -H_STEP
-                } else {
-                    H_STEP
-                });
-            }
+            hscroll(if mouse.kind == MouseEventKind::ScrollLeft {
+                -H_STEP
+            } else {
+                H_STEP
+            });
         }
         MouseEventKind::Down(MouseButton::Left) => press(at, mouse),
         MouseEventKind::Drag(MouseButton::Left) => {
@@ -1420,7 +1436,7 @@ pub(crate) fn on_mouse(mouse: MouseEvent) {
 }
 
 fn press(at: ratatui::layout::Position, mouse: MouseEvent) {
-    // The horizontal bar sits under the Application list's last line.
+    // The horizontal bar sits under the list's last line.
     if hbar_press(mouse.column, mouse.row) {
         return;
     }

@@ -111,10 +111,7 @@ fn activity_lines(entries: &[Entry], expanded: &[u64], width: usize) -> Vec<Line
             None => entry.message.lines().map(str::to_string).collect(),
         };
         for l in raw.iter().take(ENTRY_LINES) {
-            out.push(Line::Text(
-                crate::fit(&format!("{indent}{l}"), width.saturating_sub(1)),
-                muted,
-            ));
+            out.push(Line::Text(format!("{indent}{l}"), muted));
         }
         if raw.len() > ENTRY_LINES {
             out.push(Line::Text(
@@ -290,8 +287,8 @@ pub(crate) fn render(frame: &mut Frame) {
     }
 
     // The list sits between the toolbar and the notice and hint rows. The
-    // Application tab keeps the row above the notice for its horizontal bar.
-    let bar_row = u16::from(tab == Tab::Application);
+    // Both tabs keep the row above the notice for the horizontal bar.
+    let bar_row = 1;
     let list = Rect::new(
         x0,
         y + 1,
@@ -325,7 +322,7 @@ pub(crate) fn render(frame: &mut Frame) {
             crate::scrollbar::render_buf(buf, track, true, false)
         });
     }
-    // The Application lines are never cut: a bar along the bottom scrolls them.
+    // Lines are never cut: a bar along the bottom scrolls them sideways.
     if let Some(track) = with(|s| hbar(s)) {
         crate::scrollbar::with_pointer(if level_open { None } else { pointer }, || {
             crate::scrollbar::render_buf(buf, track, false, false)
@@ -594,6 +591,10 @@ fn paint_activity(
     feed::mark_all_read();
     let panel = th().ui.panel;
     if entries.is_empty() {
+        with(|s| {
+            s.longest = 0;
+            s.hoffset = 0;
+        });
         let lines = crate::ui_kit::wrap_words(msg::GIT_EMPTY.get(), row_w);
         for (i, l) in lines.iter().take(page).enumerate() {
             dialog_kit::put(
@@ -630,6 +631,22 @@ fn paint_activity(
         s.offset[slot] = o;
         o
     });
+    // The widest line decides the horizontal bar (a wrapped line fits, a
+    // header or a detail line may not).
+    let longest = lines
+        .iter()
+        .map(|l| match l {
+            Line::Header(i) => header_width(&entries[*i], expanded.contains(&entries[*i].id), &sc),
+            Line::Text(text, _) => display_width(text),
+            Line::Buttons(_) => 0,
+        })
+        .max()
+        .unwrap_or(0);
+    let hoffset = with(|s| {
+        s.longest = longest;
+        s.hoffset = s.hoffset.min(longest.saturating_sub(row_w));
+        s.hoffset
+    });
     for (row, line) in lines.iter().skip(offset).take(page).enumerate() {
         let y = list.y + row as u16;
         let width = row_w as u16;
@@ -646,80 +663,30 @@ fn paint_activity(
                     panel
                 };
                 dialog_kit::fill(buf, r, Style::default().bg(bg));
-                let marker = crate::fold_mark::glyph_open(is_open);
-                let clock = gitpoulpi_log::clock(entry.ts_ms);
-                let tail = entry
-                    .summary
-                    .clone()
-                    .unwrap_or_else(|| entry.message.lines().next().unwrap_or("").to_string());
-                // "Push - 123 ms - The remote could not be reached."
-                let mut rest = String::new();
-                if let Some(ms) = entry
-                    .duration_ms
-                    .filter(|_| crate::activity_log::timing::timings_on())
-                {
-                    rest.push_str(&format!(" - {}", msg::duration(ms)));
-                }
-                if !tail.is_empty() && tail != entry.title && entry.list_title.is_none() {
-                    rest.push_str(&format!(" - {tail}"));
-                }
-                // Rows of several repositories say whose each one is; a row of
-                // none, under a narrow scope, says it is app-wide.
-                if sc.judge(entry.repo.as_deref(), entry.workspace.as_deref()) == Belongs::AppWide {
-                    rest.push_str(&format!(" [{}]", msg::APP_WIDE.get()));
-                } else if sc.many() {
-                    if let Some(name) = entry
-                        .repo
-                        .as_deref()
-                        .and_then(std::path::Path::file_name)
-                        .map(|n| n.to_string_lossy().into_owned())
-                        .or_else(|| entry.workspace.clone())
-                    {
-                        rest.push_str(&format!(" [{name}]"));
+                let mut x = list.x;
+                let mut col = 0usize;
+                for (text, style) in header_segments(entry, is_open, &sc) {
+                    let shown = window_cells(&text, hoffset.saturating_sub(col), {
+                        usize::from(width).saturating_sub(usize::from(x - list.x))
+                    });
+                    col += display_width(&text);
+                    if shown.is_empty() {
+                        continue;
                     }
+                    let put = dialog_kit::put(buf, x, y, &shown, width, style.bg(bg));
+                    x = put.right();
                 }
-                let head = format!("{marker} {clock}  ");
-                let x = dialog_kit::put(
-                    buf,
-                    list.x,
-                    y,
-                    &head,
-                    width,
-                    Style::default().fg(th().ui.muted).bg(bg),
-                );
-                let glyph = dialog_kit::put(
-                    buf,
-                    x.right(),
-                    y,
-                    "\u{25CF} ",
-                    width.saturating_sub(x.width),
-                    Style::default().fg(severity_color(entry.severity)).bg(bg),
-                );
-                let used = x.width + glyph.width;
-                let title = dialog_kit::put(
-                    buf,
-                    glyph.right(),
-                    y,
-                    entry.list_title.as_deref().unwrap_or(&entry.title),
-                    width.saturating_sub(used),
-                    Style::default()
-                        .fg(th().ui.text)
-                        .bg(bg)
-                        .add_modifier(Modifier::BOLD),
-                );
-                let used = used + title.width;
-                dialog_kit::put(
-                    buf,
-                    title.right(),
-                    y,
-                    &rest,
-                    width.saturating_sub(used),
-                    Style::default().fg(th().ui.muted).bg(bg),
-                );
                 hits.push((r, Hit::Header(*i)));
             }
             Line::Text(text, style) => {
-                dialog_kit::put(buf, list.x, y, text, width, *style);
+                dialog_kit::put(
+                    buf,
+                    list.x,
+                    y,
+                    &window_cells(text, hoffset, row_w),
+                    width,
+                    *style,
+                );
             }
             Line::Buttons(i) => {
                 let label = msg::COPY.get();
@@ -755,6 +722,69 @@ fn paint_activity(
         }
     }
     (lines.len(), offset)
+}
+
+/// The pieces of an entry's header row, in order, with their foreground and
+/// modifiers (the row's background is added where it is painted).
+fn header_segments(entry: &Entry, is_open: bool, sc: &Scoping) -> Vec<(String, Style)> {
+    let marker = crate::fold_mark::glyph_open(is_open);
+    let clock = gitpoulpi_log::clock(entry.ts_ms);
+    let tail = entry
+        .summary
+        .clone()
+        .unwrap_or_else(|| entry.message.lines().next().unwrap_or("").to_string());
+    // "Push - 123 ms - The remote could not be reached."
+    let mut rest = String::new();
+    if let Some(ms) = entry
+        .duration_ms
+        .filter(|_| crate::activity_log::timing::timings_on())
+    {
+        rest.push_str(&format!(" - {}", msg::duration(ms)));
+    }
+    if !tail.is_empty() && tail != entry.title && entry.list_title.is_none() {
+        rest.push_str(&format!(" - {tail}"));
+    }
+    // Rows of several repositories say whose each one is; a row of none,
+    // under a narrow scope, says it is app-wide.
+    if sc.judge(entry.repo.as_deref(), entry.workspace.as_deref()) == Belongs::AppWide {
+        rest.push_str(&format!(" [{}]", msg::APP_WIDE.get()));
+    } else if sc.many() {
+        if let Some(name) = entry
+            .repo
+            .as_deref()
+            .and_then(std::path::Path::file_name)
+            .map(|n| n.to_string_lossy().into_owned())
+            .or_else(|| entry.workspace.clone())
+        {
+            rest.push_str(&format!(" [{name}]"));
+        }
+    }
+    let muted = Style::default().fg(th().ui.muted);
+    vec![
+        (format!("{marker} {clock}  "), muted),
+        (
+            "\u{25CF} ".to_string(),
+            Style::default().fg(severity_color(entry.severity)),
+        ),
+        (
+            entry
+                .list_title
+                .as_deref()
+                .unwrap_or(&entry.title)
+                .to_string(),
+            Style::default()
+                .fg(th().ui.text)
+                .add_modifier(Modifier::BOLD),
+        ),
+        (rest, muted),
+    ]
+}
+
+fn header_width(entry: &Entry, is_open: bool, sc: &Scoping) -> usize {
+    header_segments(entry, is_open, sc)
+        .iter()
+        .map(|(t, _)| display_width(t))
+        .sum()
 }
 
 /// `text` from display column `skip` on, at most `width` columns wide

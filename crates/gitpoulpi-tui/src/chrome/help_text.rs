@@ -95,6 +95,10 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
         keys!("{nav_prefix.global_log}"),
         msg::activity_log::HELP_NAV_GLOBAL,
     ),
+    Item(
+        keys!("{activity_log.scroll_left} / {activity_log.scroll_right}"),
+        msg::activity_log::HELP_SCROLL,
+    ),
     Item(keys!("{nav_prefix.jobs}"), msg::jobs::HELP_NAV),
     Item(keys!("{nav_prefix.updates}"), msg::updates::HELP_NAV),
     Item(keys!("{nav_prefix.help}"), msg::help_text::NAVIGATION_PREFIX_THEN_7),

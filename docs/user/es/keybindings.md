@@ -393,6 +393,8 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Pestaña anterior de la página de ajustes | `Alt+Left` |
 | `preferences` | `next_tab` | Pestaña siguiente de la página de ajustes | `Alt+Right` |
 | `ai_popup` | `copy` | Copiar el resultado | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Añadir un perfil | `a` |
 | `integrations` | `edit` | Editar el perfil seleccionado | `e` |
 | `integrations` | `open_token` | Abrir la página del token | `o` |
@@ -866,6 +868,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Registro de actividad: Elegir el alcance |  |
 | Registro de actividad: Operaciones de git |  |
 | Registro de actividad: Registro de la aplicación |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Registro de actividad: Copiar el último error |  |
 | Registro de actividad: Ejecutar la acción sugerida |  |
 | Registro de actividad: Abrir el último error |  |

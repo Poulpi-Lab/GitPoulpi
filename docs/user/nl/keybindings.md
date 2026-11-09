@@ -392,6 +392,8 @@ prefix getoond (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Vorig tabblad van de instellingenpagina | `Alt+Left` |
 | `preferences` | `next_tab` | Volgend tabblad van de instellingenpagina | `Alt+Right` |
 | `ai_popup` | `copy` | Het resultaat kopiëren | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Een profiel toevoegen | `a` |
 | `integrations` | `edit` | Het geselecteerde profiel bewerken | `e` |
 | `integrations` | `open_token` | De tokenpagina openen | `o` |
@@ -865,6 +867,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Activiteitenlogboek: Het bereik kiezen |  |
 | Activiteitenlogboek: Git-bewerkingen |  |
 | Activiteitenlogboek: Applicatielogboek |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Activiteitenlogboek: Laatste fout kopiëren |  |
 | Activiteitenlogboek: Voorgestelde actie uitvoeren |  |
 | Activiteitenlogboek: Laatste fout openen |  |

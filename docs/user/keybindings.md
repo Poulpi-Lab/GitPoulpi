@@ -389,6 +389,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Previous Tab of the Settings Page | `Alt+Left` |
 | `preferences` | `next_tab` | Next Tab of the Settings Page | `Alt+Right` |
 | `ai_popup` | `copy` | Copy the Result | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Add a Profile | `a` |
 | `integrations` | `edit` | Edit the Selected Profile | `e` |
 | `integrations` | `open_token` | Open the Token Page | `o` |
@@ -861,6 +863,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Activity Log: Choose the Scope |  |
 | Activity Log: Git Operations |  |
 | Activity Log: Application Log |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Activity Log: Copy the Last Error |  |
 | Activity Log: Run the Suggested Action |  |
 | Activity Log: Open the Last Error |  |

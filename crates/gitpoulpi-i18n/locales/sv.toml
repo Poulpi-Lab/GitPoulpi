@@ -2461,6 +2461,8 @@ preferences_list_remove = "Ta bort det valda listobjektet"
 preferences_list_move_up = "Flytta det valda listobjektet upp"
 preferences_list_move_down = "Flytta det valda listobjektet ned"
 ai_popup_copy = "Kopiera resultatet"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Lägg till en profil"
 integrations_edit = "Redigera vald profil"
 integrations_open_token = "Öppna tokensidan"
@@ -2526,6 +2528,7 @@ folder_picker = "Mappväljare"
 preferences = "Inställningar"
 ai_popup = "Popup för AI-resultat"
 integrations = "Inställningar: sidan Integrationer"
+activity_log = "Activity Log window"
 palette = "Palettkommandon"
 split = "Redigerare för att dela upp {$commit}"
 
@@ -5931,6 +5934,12 @@ hint_application = "Pilar: rulla  l: nivå  /: filtrera  c: kopiera allt  o: map
 palette_scope = "Aktivitetslogg: Välj omfång"
 palette_git_tab = "Aktivitetslogg: Git-åtgärder"
 palette_app_tab = "Aktivitetslogg: Programlogg"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "SSH-värdnyckeln för remoten är ännu inte känd."

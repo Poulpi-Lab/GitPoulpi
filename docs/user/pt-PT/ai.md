@@ -308,9 +308,14 @@ texto já integrado antes e depois dele, e as suas instruções (globais, do
 repositório e as de *Resolução de conflitos* em Definições > IA). Responde com o
 texto resolvido desse único conflito num bloco de código; uma resposta com
 marcadores de conflito ou conversa em vez de código é devolvida uma vez e depois
-recusada. Um conflito com mais de cerca de 40 KB não é enviado. Os controlos
-ficam ocultos enquanto a IA está desativada, e uma sugestão nunca guarda, faz
-stage nem resolve nada: reveja o Output, edite-o e guarde como habitualmente.
+recusada. Um conflito com mais de 40 KB (`ai.limits.conflict_bytes`,
+*Definições > IA > Limites*) fica retido por trás de um aviso que indica o seu
+tamanho e o limite, com *Enviar mesmo assim* (só este pedido, sempre limpo pelas
+verificações de privacidade), *Abrir definição* e *Cancelar*; o limite é uma
+proteção do próprio GitPoulpi, por isso aumente-o quando o seu modelo tiver margem.
+Os controlos ficam ocultos enquanto a IA está desativada, e uma sugestão nunca
+guarda, faz stage nem resolve nada: reveja o Output, edite-o e guarde como
+habitualmente.
 
 ![O formulário de commit depois do botão de faísca: um resumo e uma descrição escritos pelo modelo, prontos a editar](../images/ai-commit-message.png)
 
@@ -319,7 +324,9 @@ stage nem resolve nada: reveja o Output, edite-o e guarde como habitualmente.
 ### O compositor de commits
 
 O modelo divide as alterações em curso em vários commits (cada ficheiro alterado
-em exatamente um; um plano inválido é devolvido uma vez e depois recusado). Revê
+em exatamente um; um plano inválido é devolvido uma vez e depois recusado). Enquanto
+houver ficheiros com conflitos nada é pedido: um diálogo lista-os e abre a vista de
+resolução de conflitos, porque o compositor precisa de uma árvore sem conflitos. Revê
 o plano antes de qualquer commit ser feito:
 
 ![A revisão do compositor: quatro commits propostos com os seus ficheiros, e os botões Repor, Cancelar e Criar 4 commits](../images/composer.png)
@@ -450,13 +457,63 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 contexto efetivo como `review_context`. As mesmas quatro definições são `ai.review.*` em
 `config.toml` ([referência](config-reference.md#ai-ia-integrada-desativada-por-predefinição)).
 
+## Limites de entrada
+
+Cada entrada que o GitPoulpi põe num pedido tem um limite de tamanho, uma definição
+em `[ai.limits]` (*Definições > IA > Limites*). Os limites são uma proteção do próprio
+GitPoulpi (a janela de contexto difere de modelo para modelo): aumente-os quando o seu
+modelo tiver margem, reduza-os para manter os pedidos pequenos.
+
+| Definição (`ai.limits.`) | Predefinição | O que limita |
+|---|---|---|
+| `conflict_bytes` | 40000 | Os blocos base, atual e recebido de um conflito de merge |
+| `diff_bytes` | 60000 | O diff de uma mensagem de commit, de uma explicação, de um nome de stash, de uma descrição de pull request, de um plano de commits ou de uma divisão; o diff completo de uma revisão de código |
+| `review_file_bytes` | 12000 | O diff de um ficheiro numa revisão de código |
+| `review_text_bytes` | 4000 | A descrição do pull request revisto |
+| `review_threads_bytes` | 6000 | Os comentários de revisão que já existem |
+| `review_context_file_bytes` | 8192 | Um ficheiro de contexto do projeto numa revisão (`CLAUDE.md`, `AGENTS.md`, o ficheiro adicional) |
+| `review_context_bytes` | 16384 | Todos os ficheiros de contexto de uma revisão em conjunto |
+
+**Nada é cortado em silêncio.** Quando uma entrada excede o seu limite, o pedido
+fica à espera e *Acima do limite da IA* lista o que excede: que parte (o diff, um
+ficheiro, a descrição, um ficheiro de contexto), o seu tamanho, o limite e a definição.
+Uma revisão lista todas as partes excedidas num só diálogo. Os botões, cada um com a
+sua tecla:
+
+- *Enviar tudo* (`T`): só este pedido, nada é cortado. Passa na mesma pelas
+  verificações de privacidade (segredos substituídos, ficheiros sensíveis de fora) e,
+  quando está ativado, pelo painel *O que é enviado*, que vem a seguir.
+- *Enviar truncado* (`R`): o que excede o limite é cortado, como sempre foi; cada
+  linha do diálogo diz o que fica de fora (o fim do diff, os últimos hunks, os
+  ficheiros que não cabem).
+- *Abrir definição* (`A`): cancela o pedido e abre *Definições > IA > Limites* no
+  primeiro limite listado. O foco começa aqui: Enter nunca envia.
+- *Cancelar* (`C`, `Esc`, a cruz ou um clique fora): não envia nada.
+
+Um conflito é a exceção: nunca é cortado. *Enviar mesmo assim* envia-o inteiro uma vez.
+
+Nada inicia um pedido de IA por si só, por isso não há execuções em segundo plano que
+possam perguntar: cada pedido é um que iniciou. Uma execução que não pode perguntar (a
+CLI e o MCP) trunca como antes e di-lo; veja abaixo.
+
+**Na linha de comandos**, nada pode responder a um diálogo, por isso uma entrada acima
+do limite é truncada como antes e a resposta diz o que foi cortado:
+`truncated: [{part, detail?, bytes, limit, setting}]` (presente só quando algo foi
+cortado; `part` é um de `diff`, `split_hunks`, `review_diff`, `review_file`,
+`review_text`, `review_threads`, `context_file`, `context_total`). `--send-all`
+(alias `--no-truncate`) envia tudo inteiro: em `ai` (todos os seus comandos, incluindo
+`ai resolve-conflict`, onde um conflito acima do limite é de outro modo recusado), em
+`commit --ai`, em `stash push --ai` e em `hosting review suggest`. As ferramentas MCP
+têm o mesmo argumento `send_all` e o mesmo campo `truncated`.
+
 ## Privacidade
 
 - Nada é enviado até premir um botão ou executar um comando. Sem IA em segundo
   plano, sem telemetria, sem conta GitPoulpi.
 - O que é enviado: o prompt (o integrado, depois as suas instruções) e o diff
-  sobre o qual perguntou, cortado em cerca de 60 KB (com uma nota a dizê-lo); para
-  um pull request, também os assuntos dos commits da branch.
+  sobre o qual perguntou; para um pull request, também os assuntos dos commits da
+  branch. Um diff com mais de 60 KB (`ai.limits.diff_bytes`) nunca é cortado em
+  silêncio: veja [Limites de entrada](#limites-de-entrada).
 - Um pedido de script de reescrita do histórico envia a sua instrução e o contrato fixo
   do script (a API da sandbox de scripts). O autor, a data e o assunto de até 20 commits só
   seguem junto **se** marcar *Enviar uma amostra* no diálogo (desativado por predefinição; a
@@ -525,6 +582,8 @@ repositório.
 | `falhou:` 404 | O **Modelo** não existe lá: limpe-o para usar o predefinido. |
 | `falhou:` erro de ligação (Ollama, LM Studio) | O servidor não está a correr, ou o **URL base** tem a porta errada ou falta-lhe `/v1`. |
 | A chave mostra `(não definida)` depois de a escrever | Sem credential helper: configure um (`git config --global credential.helper ...`) e introduza-a outra vez. |
+| *Acima do limite da IA* | Uma entrada do pedido excede um limite de `[ai.limits]`: escolha *Enviar tudo*, *Enviar truncado*, *Abrir definição* ou *Cancelar* (veja [Limites de entrada](#limites-de-entrada)). |
+| «Conflito demasiado grande para enviar» | O conflito excede `ai.limits.conflict_bytes` (40000 por predefinição). *Enviar mesmo assim* envia-o uma vez; *Abrir definição* vai ao limite em Definições > IA > Limites. |
 | Idioma ou estilo errado | Adicione instruções; os chips de Inserção rápida do editor tornam isso rápido. |
 | O compositor diz que o plano é inválido | O modelo saltou ou repetiu um ficheiro: tente de novo ou use um modelo mais forte. |
 

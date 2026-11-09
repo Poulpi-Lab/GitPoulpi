@@ -37,6 +37,7 @@ mod lfs;
 #[cfg(feature = "mermaid")]
 mod log_mermaid;
 mod mailmap;
+mod repo_auth;
 mod rebase;
 mod refs;
 mod remote;
@@ -909,6 +910,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         },
         Commands::Remote { action } => remote(session, action).await,
         Commands::SshCommand { action } => ssh_command(session, action).await,
+        Commands::RepoAuth { action } => repo_auth::repo_auth(session, action).await,
         Commands::RepoConfig { action } => repo_config(session, action).await,
         Commands::SparseCheckout { action } => sparse_checkout(session, action).await,
         Commands::Conflicts { action } => conflicts(session, action).await,

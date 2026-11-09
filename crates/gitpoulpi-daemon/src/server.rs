@@ -413,7 +413,11 @@ async fn handle_connection(
         stop,
     ));
 
-    while let Some(Work { request, job }) = work_rx.recv().await {
+    while let Some(Work { mut request, job }) = work_rx.recv().await {
+        // The session name a transfer's credential grant is served under is
+        // this daemon's own, never one the client wrote: a client could name
+        // another session's daemon, and the helper's lookup trusts it.
+        request.session.clone_from(&info.session);
         // Canceled while it waited behind an earlier request of this
         // connection: already answered, run nothing.
         if job.as_ref().is_some_and(|job| !job.claim()) {
@@ -923,6 +927,27 @@ async fn handle_control(
                     request_id,
                     result: Ok(value),
                 }))
+                .await
+                .is_ok();
+            Some(if sent { Flow::Continue } else { Flow::Stop })
+        }
+        OperationKind::CredentialGrant => {
+            let result = match serde_json::from_value::<
+                gitpoulpi_ipc::git_credential::CredentialGrantRequest,
+            >(request.args.clone())
+            {
+                Ok(grant) => Ok(serde_json::to_value(crate::grants::answer(&grant))
+                    .unwrap_or(serde_json::Value::Null)),
+                Err(e) => Err(gitpoulpi_ipc::ResponseError {
+                    message: format!("invalid arguments: {e}"),
+                    unsupported: false,
+                    kind: None,
+                    detail: None,
+                    auth_required: false,
+                }),
+            };
+            let sent = out_tx
+                .send(ServerMessage::Response(Response { request_id, result }))
                 .await
                 .is_ok();
             Some(if sent { Flow::Continue } else { Flow::Stop })

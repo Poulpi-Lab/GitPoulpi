@@ -9,11 +9,15 @@ repository.workspace = true
 description = "Background per-session daemon: owns GitBackend/session state and the IPC endpoint every frontend (TUI/CLI/MCP) connects to."
 
 [features]
-default = ["lfs", "worktree", "submodule", "rewrite-scripts"]
+default = ["lfs", "worktree", "submodule", "rewrite-scripts", "hosting"]
 lfs = ["gitpoulpi-cli-backend/lfs", "gitpoulpi-git2-backend/lfs"]
 worktree = ["gitpoulpi-cli-backend/worktree", "gitpoulpi-git2-backend/worktree"]
 submodule = ["gitpoulpi-cli-backend/submodule", "gitpoulpi-git2-backend/submodule"]
 rewrite-scripts = ["gitpoulpi-cli-backend/rewrite-scripts", "gitpoulpi-git2-backend/rewrite-scripts"]
+# GitPoulpi accounts as a repository's HTTPS source (ADR-0010): the trust store,
+# the token source and the git user-name table. The hosting crate comes without
+# its clients and without a socket. Off, the System and key sources remain.
+hosting = ["dep:gitpoulpi-hosting", "dep:gitpoulpi-secrets"]
 
 [dependencies]
 gitpoulpi-core.workspace = true
@@ -22,6 +26,8 @@ gitpoulpi-git2-backend.workspace = true
 gitpoulpi-ipc.workspace = true
 gitpoulpi-config.workspace = true
 gitpoulpi-session.workspace = true
+gitpoulpi-hosting = { workspace = true, optional = true }
+gitpoulpi-secrets = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

@@ -1,3 +1,4 @@
+mod account_source;
 mod auto_resolve;
 mod autostash;
 mod autostash_start_over;
@@ -8,6 +9,7 @@ mod credentials;
 mod dispatch;
 mod encoding;
 mod flow;
+mod grants;
 mod jobs;
 pub mod join;
 mod journal;
@@ -34,6 +36,9 @@ mod undo_settings;
 mod viewers;
 mod workflow;
 
+pub use account_source::set_credential_helper_exe;
+#[cfg(feature = "hosting")]
+pub use account_source::set_token_store;
 pub use backend::{backend_for, backend_from_ambient_config};
 pub use gitpoulpi_ipc::{DaemonInfo, DaemonKind};
 pub use status::{DaemonStatus, SessionDaemonInfo};

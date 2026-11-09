@@ -830,7 +830,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 175] = [
+    pub const ALL: [OperationKind; 176] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,

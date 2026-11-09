@@ -213,8 +213,9 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
                 .unwrap_or_default();
             // May clone: `credentials.https_mode` and the repository's
             // authentication profile, read live.
-            match crate::credentials::apply_for(backend, &repo) {
-                Ok(()) => to_json!(backend.submodule_update(&repo, &opts)),
+            match crate::credentials::apply_for(backend, &repo, &request.session) {
+                // The grant (an account source) lives until the update is over.
+                Ok(_grant) => to_json!(backend.submodule_update(&repo, &opts)),
                 Err(error) => Err((error.to_string(), error.typed(), None)),
             }
         }

@@ -8,10 +8,10 @@
 //! machine's own credentials, because pushing to work with a personal account
 //! is the failure this feature exists to prevent.
 //!
-//! In this slice the System HTTPS source and the key-file and
-//! integration-key SSH sources work. The integration, helper and
-//! token-command HTTPS sources are parsed and stored but refuse (they need
-//! the credential broker); `RepoAuthSet` does not accept the last two.
+//! The System and account (integration) HTTPS sources and the key-file and
+//! integration-key SSH sources work. The helper and token-command HTTPS
+//! sources are parsed and stored but refuse (they need the trust and hash
+//! pinning of a later slice); `RepoAuthSet` does not accept them.
 
 use std::path::Path;
 
@@ -48,21 +48,56 @@ pub(crate) fn stored_profile(root: &Path) -> Result<Option<RepoAuthProfile>, Err
         .map_err(unavailable)
 }
 
-/// What `profile` gives the repository's git processes, or why it cannot be
-/// used. Reads git config (read-only) for the cases that need it; spawns
-/// nothing when the profile is all default.
-pub(crate) fn resolve(root: &Path, profile: &RepoAuthProfile) -> Result<NetworkAuth, Error> {
+/// What resolving a profile gives a transfer: the `NetworkAuth` for the
+/// repository's processes, and the grant (if the source has one) that must
+/// stay alive until the transfer is over.
+pub(crate) struct Resolved {
+    pub auth: NetworkAuth,
+    pub grant: Option<crate::grants::GrantGuard>,
+}
+
+/// What `profile` gives the repository's processes for a transfer of the
+/// daemon's session `session`, or why it cannot be used. Reads the
+/// configuration (read-only) for the cases that need it and, for an account
+/// source, the account's token (which the grant then serves to the helper).
+pub(crate) fn resolve(
+    root: &Path,
+    profile: &RepoAuthProfile,
+    session: &str,
+) -> Result<Resolved, Error> {
+    resolve_inner(root, profile, Some(session))
+}
+
+/// Whether `profile` can be used, without reading a token or issuing a grant
+/// (what a read of the profile reports).
+pub(crate) fn check(root: &Path, profile: &RepoAuthProfile) -> Result<(), Error> {
+    resolve_inner(root, profile, None).map(|_| ())
+}
+
+fn resolve_inner(
+    root: &Path,
+    profile: &RepoAuthProfile,
+    session: Option<&str>,
+) -> Result<Resolved, Error> {
     let mut auth = NetworkAuth::default();
+    let mut grant = None;
     match &profile.https {
         None => https_system(root, &mut auth, None, false)?,
         Some(HttpsAuth::System {
             username,
             ignore_repo_helpers,
         }) => https_system(root, &mut auth, username.as_deref(), *ignore_repo_helpers)?,
-        Some(HttpsAuth::Integration { integration, .. }) => {
-            return Err(unavailable(format!(
-                "the account source (\"{integration}\") is not available yet"
-            )))
+        Some(HttpsAuth::Integration {
+            integration,
+            username,
+        }) => {
+            grant = crate::account_source::apply(
+                root,
+                &mut auth,
+                integration,
+                username.as_deref(),
+                session,
+            )?;
         }
         Some(HttpsAuth::Helper { .. }) => {
             return Err(unavailable(
@@ -101,7 +136,7 @@ pub(crate) fn resolve(root: &Path, profile: &RepoAuthProfile) -> Result<NetworkA
             )?)
         }
     };
-    Ok(auth)
+    Ok(Resolved { auth, grant })
 }
 
 /// The System HTTPS source. The process-wide `credentials.https_mode`
@@ -320,7 +355,7 @@ pub(crate) fn build_view(backend: &dyn GitBackend, repo: &RepoRef) -> RepoAuthVi
         }
     }
     if view.unavailable.is_none() && record.is_some() {
-        if let Err(Error::RepoAuthUnavailable { reason }) = resolve(&repo.root, &profile) {
+        if let Err(Error::RepoAuthUnavailable { reason }) = check(&repo.root, &profile) {
             view.unavailable = Some(reason);
         }
     }
@@ -366,7 +401,9 @@ fn identity_of(profile: &RepoAuthProfile, transport: RemoteTransport) -> String 
                 }
                 s
             }
-            Some(HttpsAuth::Integration { integration, .. }) => format!("account {integration}"),
+            Some(HttpsAuth::Integration { integration, .. }) => {
+                format!("account {integration} (token)")
+            }
             Some(HttpsAuth::Helper { .. }) => "credential helper".to_string(),
             Some(HttpsAuth::TokenCommand { .. }) => "token command".to_string(),
         },
@@ -494,8 +531,14 @@ pub(crate) async fn test(
         ssh_verbose: true,
     };
     let mut reports = Vec::with_capacity(names.len());
+    // Whatever an earlier operation of this repository left is not this test's.
+    let _ = crate::grants::take_outcome(&repo.root);
     for name in names {
-        reports.push(backend.remote_access_check(repo, &name, &opts).await?);
+        let mut report = backend.remote_access_check(repo, &name, &opts).await?;
+        // The transport reports `store` for a credential that worked: that
+        // names the identity (the account), which no backend can see.
+        report.accepted_identity = crate::grants::take_outcome(&repo.root).accepted;
+        reports.push(report);
     }
     Ok(reports)
 }
@@ -543,7 +586,10 @@ mod tests {
                 strict_host_key: false,
             }),
         };
-        let error = resolve(dir.path(), &profile).unwrap_err();
+        let error = match resolve(dir.path(), &profile, "s") {
+            Err(e) => e,
+            Ok(_) => panic!("a missing key file must not resolve"),
+        };
         assert!(
             matches!(error, Error::RepoAuthUnavailable { ref reason } if reason.contains("does not exist")),
             "{error:?}"

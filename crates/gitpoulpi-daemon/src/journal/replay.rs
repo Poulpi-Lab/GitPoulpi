@@ -98,11 +98,17 @@ pub fn undo_redo(backend: &dyn GitBackend, request: &Request, direction: Directi
     let message = format!("gitpoulpi: {} {}", direction.verb(), plan.entry.label);
     let mut done: Vec<&Step> = Vec::new();
     for step in &plan.steps {
-        if let Err(e) = run_step(backend, &repo, step, &message) {
+        if let Err(e) = run_step(backend, &repo, step, &message, &request.session) {
             // Put back what already moved, from the states the plan
             // recorded; the entry stays where it was.
             for earlier in done.iter().rev() {
-                if let Err(rollback) = run_step(backend, &repo, &earlier.inverse(), &message) {
+                if let Err(rollback) = run_step(
+                    backend,
+                    &repo,
+                    &earlier.inverse(),
+                    &message,
+                    &request.session,
+                ) {
                     tracing::warn!("undo rollback step failed: {rollback}");
                 }
             }
@@ -150,6 +156,7 @@ pub(super) fn run_step(
     repo: &RepoRef,
     step: &Step,
     message: &str,
+    session: &str,
 ) -> Result<()> {
     match step {
         Step::UpdateRefs(updates) => backend.update_refs(repo, updates, message),
@@ -186,7 +193,7 @@ pub(super) fn run_step(
             name,
             to,
             from,
-        } => run_remote_step(backend, repo, (remote, name), *to, *from),
+        } => run_remote_step(backend, repo, (remote, name), *to, *from, session),
     }
 }
 
@@ -213,10 +220,12 @@ fn run_remote_step(
     (remote, name): (&str, &str),
     to: Option<gitpoulpi_core::domain::Oid>,
     from: Option<gitpoulpi_core::domain::Oid>,
+    session: &str,
 ) -> Result<()> {
     use gitpoulpi_core::domain::UndoRefusal;
     use gitpoulpi_core::Error;
-    crate::credentials::apply_for(backend, repo)?;
+    // The grant (an account source) lives until the step is over.
+    let _grant = crate::credentials::apply_for(backend, repo, session)?;
     let moved = |actual| {
         Error::UndoRefused(UndoRefusal::RemoteRefMoved(Box::new(
             gitpoulpi_core::domain::RemoteRefMoved {

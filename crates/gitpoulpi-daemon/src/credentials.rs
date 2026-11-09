@@ -37,20 +37,25 @@ pub(crate) fn apply_from_config() {
 /// `Err` when the profile cannot be used (unreadable file, a missing account
 /// or key, a source this version does not have): the caller **refuses the
 /// transfer**. It never falls back to the machine's own credentials.
+///
+/// `Ok(Some(grant))` for an account source: the caller keeps the guard alive
+/// for exactly as long as the transfer runs (dropping it revokes the grant).
+/// `session` is the daemon's own session name, never one a client wrote.
 pub(crate) fn apply_for(
     backend: &dyn gitpoulpi_core::GitBackend,
     repo: &gitpoulpi_core::domain::RepoRef,
-) -> gitpoulpi_core::Result<()> {
+    session: &str,
+) -> gitpoulpi_core::Result<Option<crate::grants::GrantGuard>> {
     apply_from_config();
     // Whatever was set for the previous transfer is gone, also when this one
     // is refused below.
     backend.set_network_auth(repo, None);
     let Some(profile) = crate::repo_auth::stored_profile(&repo.root)? else {
-        return Ok(());
+        return Ok(None);
     };
-    let auth = crate::repo_auth::resolve(&repo.root, &profile)?;
-    backend.set_network_auth(repo, Some(auth));
-    Ok(())
+    let resolved = crate::repo_auth::resolve(&repo.root, &profile, session)?;
+    backend.set_network_auth(repo, Some(resolved.auth));
+    Ok(resolved.grant)
 }
 
 /// The key file `ssh.private_key_path` (else `ssh.public_key_path`, which ssh

@@ -33,7 +33,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use gitpoulpi_core::domain::{ChangeScope, OperationKind, RepoId, RepoRef};
-use gitpoulpi_core::GitBackend;
+use gitpoulpi_core::{Error, GitBackend};
 use gitpoulpi_ipc::{Event, Request, Response, ResponseError};
 use serde_json::Value;
 use tokio::sync::broadcast;
@@ -348,17 +348,41 @@ async fn dispatch_network_inner(
     if let Some(refused) = refuse_unbuilt(request) {
         return refused;
     }
-    match repo_ref(request) {
+    // The grant of an account source (if any) is held until the whole
+    // operation, journaling and the second pass of a pull included, is over:
+    // success, failure and cancel (the future is dropped) all revoke it.
+    let grant = match repo_ref(request) {
         // The repository's own authentication profile comes with the global
         // setting; a profile that cannot be used refuses the transfer.
-        Ok(repo) => {
-            if let Err(error) = crate::credentials::apply_for(backend, &repo) {
-                return failed(request, error.to_string(), error.typed(), None);
-            }
-        }
+        Ok(repo) => match crate::credentials::apply_for(backend, &repo, &request.session) {
+            Ok(grant) => grant,
+            Err(error) => return failed(request, error.to_string(), error.typed(), None),
+        },
         // A clone has no repository yet.
-        Err(_) => crate::credentials::apply_from_config(),
+        Err(_) => {
+            crate::credentials::apply_from_config();
+            None
+        }
+    };
+    let mut dispatched = dispatch_network_authed(backend, request, events).await;
+    // A transfer that failed after the grant refused a host (a remote URL
+    // rewritten to another server by the repository's own configuration):
+    // say that, instead of git's "terminal prompts disabled".
+    if let (Some(grant), Err(error)) = (&grant, &dispatched.response.result) {
+        if let Some((host, expected)) = grant.refused() {
+            let refused = Error::GrantRefused { host, expected };
+            let _ = error;
+            dispatched = failed(request, refused.to_string(), refused.typed(), None);
+        }
     }
+    dispatched
+}
+
+async fn dispatch_network_authed(
+    backend: &dyn GitBackend,
+    request: &Request,
+    events: &broadcast::Sender<Event>,
+) -> Dispatched {
     if let Some(refused) = crate::autostash::refuse_while_pending(request) {
         return refused;
     }

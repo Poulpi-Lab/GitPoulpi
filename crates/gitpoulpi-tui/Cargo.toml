@@ -53,7 +53,7 @@ lang-tr = ["gitpoulpi-i18n/lang-tr"]
 lang-qps = ["gitpoulpi-i18n/lang-qps"]
 ai = ["dep:gitpoulpi-ai", "dep:async-trait"]
 # Internal: "at least one hosting provider". Never enabled alone.
-hosting = []
+hosting = ["gitpoulpi-daemon/hosting"]
 github = ["hosting", "gitpoulpi-hosting/github"]
 gitlab = ["hosting", "gitpoulpi-hosting/gitlab"]
 azure-devops = ["hosting", "gitpoulpi-hosting/azure-devops"]

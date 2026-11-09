@@ -1,9 +1,11 @@
+use std::collections::HashMap;
 use std::ffi::{OsStr, OsString};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
 use std::sync::OnceLock;
 
+use gitpoulpi_core::domain::NetworkAuth;
 use gitpoulpi_core::Result;
 
 /// `-c key=value` overrides prepended to *every* git invocation.
@@ -84,7 +86,14 @@ const TRANSPORT_ALLOWLIST: &[&str] = &[
 /// pager when stdout is a pipe - but costs nothing and covers
 /// `GIT_PAGER`-style surprises.
 fn full_args(args: &[&str]) -> Vec<String> {
-    let mut out = Vec::with_capacity(args.len() + CONFIG_OVERRIDES.len() * 2 + 1);
+    full_args_with(&[], args)
+}
+
+/// [`full_args`] with `extra` (already `-c key=value` pairs, see
+/// [`apply_network_auth`]) among the global options, after the transport
+/// allowlist and the shape overrides and before the command's own arguments.
+fn full_args_with(extra: &[String], args: &[&str]) -> Vec<String> {
+    let mut out = Vec::with_capacity(args.len() + CONFIG_OVERRIDES.len() * 2 + extra.len() + 1);
     out.push("--no-pager".to_string());
     // Submodule clones run with `GIT_PROTOCOL_FROM_USER=0`, which `user`
     // would refuse for a local-path submodule: allow `file` for those.
@@ -104,6 +113,7 @@ fn full_args(args: &[&str]) -> Vec<String> {
         out.push("-c".to_string());
         out.push((*kv).to_string());
     }
+    out.extend(extra.iter().cloned());
     out.extend(args.iter().map(|a| (*a).to_string()));
     out
 }
@@ -283,6 +293,103 @@ fn ssh_key_command(repo_root: &Path) -> Option<String> {
     ))
 }
 
+/// How each repository's network git processes authenticate, keyed by the
+/// canonical repository root (ADR-0010). Process-wide like the credential mode
+/// and key it overrides, because the network operations are free functions
+/// that only receive a repository root; keyed by repository, because one
+/// daemon serves many of them at once and a per-repository setting kept in
+/// a single slot would race between two concurrent fetches.
+static NETWORK_AUTH: std::sync::RwLock<Option<HashMap<PathBuf, NetworkAuth>>> =
+    std::sync::RwLock::new(None);
+
+/// The registry key of a repository root: canonical when it can be, so a
+/// symlinked or relative spelling finds the same entry.
+fn auth_key(repo_root: &Path) -> PathBuf {
+    std::fs::canonicalize(repo_root).unwrap_or_else(|_| repo_root.to_path_buf())
+}
+
+/// Sets (`Some`) or removes (`None`) the entry of the repository at
+/// `repo_root`. Memory only.
+pub(crate) fn set_network_auth(repo_root: &Path, auth: Option<NetworkAuth>) {
+    let key = auth_key(repo_root);
+    if let Ok(mut slot) = NETWORK_AUTH.write() {
+        let map = slot.get_or_insert_with(HashMap::new);
+        match auth {
+            Some(auth) => {
+                map.insert(key, auth);
+            }
+            None => {
+                map.remove(&key);
+            }
+        }
+    }
+}
+
+fn network_auth_for(repo_root: &Path) -> Option<NetworkAuth> {
+    let slot = NETWORK_AUTH.read().ok()?;
+    let map = slot.as_ref().filter(|m| !m.is_empty())?;
+    map.get(&auth_key(repo_root)).cloned()
+}
+
+/// The one place a network command gets its credentials and ssh command, for
+/// the async commands (`git_async`) and the synchronous one (`run_network`)
+/// alike, so submodules and LFS cannot drift from fetch and push.
+///
+/// With an entry for the repository, [`NetworkAuth`] applies **instead of**
+/// the process-wide credential mode and ssh key. Without one, the mode and
+/// key apply as they always did.
+///
+/// The environment is set on `cmd` now. The `-c` arguments cannot be added to
+/// a command that already holds its arguments (they must come before the
+/// subcommand), so they are returned for the caller to put among the global
+/// options, see [`full_args_with`].
+fn apply_network_auth(cmd: &mut Command, repo_root: &Path) -> Vec<String> {
+    let mut args = Vec::new();
+    let set = |args: &mut Vec<String>, kv: String| {
+        args.push("-c".to_string());
+        args.push(kv);
+    };
+    let Some(auth) = network_auth_for(repo_root) else {
+        let (credential_args, prompt) = credential_settings(credential_mode());
+        args.extend(credential_args.iter().map(|a| (*a).to_string()));
+        if let Some(prompt) = prompt {
+            cmd.env("GIT_TERMINAL_PROMPT", prompt);
+        }
+        if let Some(ssh) = ssh_key_command(repo_root) {
+            cmd.env("GIT_SSH_COMMAND", ssh);
+        }
+        return args;
+    };
+    if let Some(helpers) = &auth.credential_helpers {
+        // The empty value resets the list built so far: every config file's
+        // (the repository's and what it includes), URL-scoped entries too.
+        set(&mut args, "credential.helper=".to_string());
+        for helper in helpers {
+            set(&mut args, format!("credential.helper={helper}"));
+        }
+    }
+    if let Some(user) = &auth.credential_username {
+        set(&mut args, format!("credential.username={user}"));
+    }
+    if auth.no_prompt {
+        set(&mut args, "core.askPass=".to_string());
+        cmd.env("GIT_TERMINAL_PROMPT", "0");
+        cmd.env_remove("GIT_ASKPASS");
+        cmd.env_remove("SSH_ASKPASS");
+    }
+    if auth.reset_extra_header {
+        set(&mut args, "http.extraHeader=".to_string());
+    }
+    if let Some(ssh) = &auth.ssh_command {
+        // Ranks above `core.sshCommand`, and replaces one the user exported.
+        cmd.env("GIT_SSH_COMMAND", ssh);
+    }
+    for (name, value) in &auth.env {
+        cmd.env(name, value);
+    }
+    args
+}
+
 /// `~/x` as the user's home plus `x` (ssh would, but the shell git runs the
 /// command in does not expand a quoted tilde).
 fn expand_home(path: &str) -> String {
@@ -316,18 +423,11 @@ pub(crate) fn git_async(repo_root: &Path, args: &[&str]) -> tokio::process::Comm
     if let Some(p) = child_path() {
         cmd.env("PATH", p);
     }
-    let (credential_args, prompt) = credential_settings(credential_mode());
-    cmd.args(credential_args);
-    if let Some(prompt) = prompt {
-        cmd.env("GIT_TERMINAL_PROMPT", prompt);
-    }
-    if let Some(ssh) = ssh_key_command(repo_root) {
-        cmd.env("GIT_SSH_COMMAND", ssh);
-    }
+    let network_args = apply_network_auth(cmd.as_std_mut(), repo_root);
     // A network command never waits on the terminal (see
     // `tree_kill::spawn_guarded`, which also drops the controlling one).
     cmd.stdin(Stdio::null());
-    cmd.args(full_args(args).iter().map(OsStr::new));
+    cmd.args(full_args_with(&network_args, args).iter().map(OsStr::new));
     cmd.current_dir(repo_root);
     for key in CLEARED_ENV {
         cmd.env_remove(key);
@@ -538,15 +638,14 @@ pub fn run_in_english(repo_root: &Path, args: &[&str]) -> Result<String> {
 /// network commands.
 #[cfg(feature = "submodule")]
 pub fn run_network(repo_root: &Path, args: &[&str]) -> Result<String> {
-    let (credential_args, prompt) = credential_settings(credential_mode());
-    let mut all: Vec<&str> = credential_args.to_vec();
-    all.extend_from_slice(args);
-    let mut cmd = git(repo_root, &all);
-    if let Some(prompt) = prompt {
-        cmd.env("GIT_TERMINAL_PROMPT", prompt);
-    }
-    if let Some(ssh) = ssh_key_command(repo_root) {
-        cmd.env("GIT_SSH_COMMAND", ssh);
+    count_spawn();
+    let mut cmd = Command::new(git_program());
+    apply_git_env(&mut cmd);
+    let network_args = apply_network_auth(&mut cmd, repo_root);
+    cmd.args(full_args_with(&network_args, args).iter().map(OsStr::new));
+    cmd.current_dir(repo_root);
+    for key in CLEARED_ENV {
+        cmd.env_remove(key);
     }
     cmd.stdin(Stdio::null());
     #[cfg(unix)]
@@ -1121,5 +1220,96 @@ mod stdin_writer_tests {
         let input = vec![b'x'; 4 << 20];
         assert!(run_bytes_with_stdin(dir.path(), &["--version"], &input).is_err());
         assert!(run_with_stdin(dir.path(), &["--version"], &"x".repeat(4 << 20)).is_err());
+    }
+}
+
+#[cfg(test)]
+mod network_auth_tests {
+    use super::*;
+
+    fn envs(cmd: &Command) -> Vec<(String, Option<String>)> {
+        cmd.get_envs()
+            .map(|(k, v)| {
+                (
+                    k.to_string_lossy().into_owned(),
+                    v.map(|v| v.to_string_lossy().into_owned()),
+                )
+            })
+            .collect()
+    }
+
+    /// An entry puts its settings among the global options, before the
+    /// subcommand, and the global credential mode does not apply next to it.
+    #[test]
+    fn an_entry_replaces_the_global_mode_and_sits_before_the_subcommand() {
+        let dir = tempfile::tempdir().unwrap();
+        set_network_auth(
+            dir.path(),
+            Some(NetworkAuth {
+                credential_helpers: Some(vec!["!h".into()]),
+                credential_username: Some("u".into()),
+                no_prompt: true,
+                reset_extra_header: true,
+                ssh_command: Some("ssh -i k".into()),
+                env: vec![("GRANT".into(), "g1".into())],
+            }),
+        );
+        let mut cmd = Command::new("git");
+        let extra = apply_network_auth(&mut cmd, dir.path());
+        let all = full_args_with(&extra, &["fetch", "origin"]);
+        let flat = all.join(" ");
+        assert!(
+            flat.contains(
+                "-c credential.helper= -c credential.helper=!h -c credential.username=u \
+                 -c core.askPass= -c http.extraHeader= fetch origin"
+            ),
+            "{flat}"
+        );
+        // The transport allowlist is still in front of everything.
+        assert!(
+            flat.starts_with("--no-pager -c protocol.allow=never"),
+            "{flat}"
+        );
+        let env = envs(&cmd);
+        let get = |name: &str| env.iter().find(|(k, _)| k == name).cloned();
+        assert_eq!(
+            get("GIT_SSH_COMMAND"),
+            Some(("GIT_SSH_COMMAND".into(), Some("ssh -i k".into())))
+        );
+        assert_eq!(get("GRANT").and_then(|e| e.1), Some("g1".into()));
+        assert_eq!(
+            get("GIT_TERMINAL_PROMPT").and_then(|e| e.1),
+            Some("0".into())
+        );
+        assert_eq!(get("GIT_ASKPASS"), Some(("GIT_ASKPASS".into(), None)));
+        assert_eq!(get("SSH_ASKPASS"), Some(("SSH_ASKPASS".into(), None)));
+
+        set_network_auth(dir.path(), None);
+        let mut cmd = Command::new("git");
+        let extra = apply_network_auth(&mut cmd, dir.path());
+        assert!(
+            !extra.iter().any(|a| a.starts_with("core.askPass")),
+            "an entry survived its removal: {extra:?}"
+        );
+    }
+
+    /// A repository has its own entry: another repository's root finds
+    /// nothing, and another spelling of the same root finds it.
+    #[test]
+    fn entries_are_keyed_by_repository_root() {
+        let (a, b) = (tempfile::tempdir().unwrap(), tempfile::tempdir().unwrap());
+        set_network_auth(
+            a.path(),
+            Some(NetworkAuth {
+                no_prompt: true,
+                ..NetworkAuth::default()
+            }),
+        );
+        assert!(network_auth_for(a.path()).is_some());
+        assert!(network_auth_for(b.path()).is_none());
+        let dotted = a.path().join(".");
+        assert!(network_auth_for(&dotted).is_some());
+        set_network_auth(a.path(), None);
+        assert!(network_auth_for(a.path()).is_none());
     }
 }

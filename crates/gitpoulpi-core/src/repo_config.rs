@@ -109,8 +109,17 @@ pub fn check_repo_config_value(key: &str, value: &str) -> Result<()> {
 /// double quotes with `"`, `$` and the backtick escaped. Backslashes become
 /// forward slashes, which git's `sh` accepts on Windows too.
 pub fn ssh_command_for_key(key_path: &str) -> String {
-    let mut quoted = String::with_capacity(key_path.len() + 2);
-    for c in key_path.chars() {
+    format!("ssh -i {} -o IdentitiesOnly=yes", sh_quote_path(key_path))
+}
+
+/// `path` as one word for the `sh` git runs a command through (a credential
+/// helper, `GIT_SSH_COMMAND`): in double quotes with `"`, `$` and the
+/// backtick escaped, backslashes turned into forward slashes (Git for
+/// Windows' `sh` accepts them, and a quoted backslash would be an escape).
+pub fn sh_quote_path(path: &str) -> String {
+    let mut quoted = String::with_capacity(path.len() + 2);
+    quoted.push('"');
+    for c in path.chars() {
         match c {
             '\\' => quoted.push('/'),
             '"' | '$' | '`' => {
@@ -120,7 +129,8 @@ pub fn ssh_command_for_key(key_path: &str) -> String {
             c => quoted.push(c),
         }
     }
-    format!("ssh -i \"{quoted}\" -o IdentitiesOnly=yes")
+    quoted.push('"');
+    quoted
 }
 
 #[cfg(test)]
@@ -137,6 +147,14 @@ mod tests {
             c(r#"/k/$HOME/`x`/"q""#),
             r#"ssh -i "/k/\$HOME/\`x\`/\"q\"" -o IdentitiesOnly=yes"#
         );
+    }
+
+    #[test]
+    fn a_path_is_one_double_quoted_word() {
+        use super::sh_quote_path as q;
+        assert_eq!(q("/a b/c"), r#""/a b/c""#);
+        assert_eq!(q(r"C:\Program Files\x.exe"), r#""C:/Program Files/x.exe""#);
+        assert_eq!(q(r#"a"$`"#), r#""a\"\$\`""#);
     }
 
     use super::*;

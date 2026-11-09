@@ -1,3 +1,4 @@
+mod auth_remote;
 pub mod conflict_fixture;
 pub mod contract;
 pub mod fake_agent;
@@ -10,14 +11,19 @@ pub mod script_fixture;
 pub mod signing;
 mod slow_remote;
 pub mod spawn_budget;
+#[cfg(unix)]
+mod stub_ssh;
 pub mod terminal_agent;
 mod test_builder;
 
+pub use auth_remote::AuthHttpRemote;
 pub use conflict_fixture::{ConflictFixture, FixtureOperation};
 pub use fixture::{allow_file_submodules, png_bytes, FixtureRepo, FixtureRepoBuilder};
 pub use isolate::isolate_process_env;
 pub use slow_remote::SlowRemote;
 pub use spawn_budget::SpawnBudget;
+#[cfg(unix)]
+pub use stub_ssh::StubSsh;
 pub use test_builder::TestRepoBuilder;
 
 pub type Result<T> = std::result::Result<T, Error>;

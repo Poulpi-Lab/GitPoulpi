@@ -662,6 +662,11 @@ impl GitBackend for Git2Backend {
     fn rewrite_discard(&self, repo: &RepoRef, run: &RunId) -> Result<()> {
         self.fallback.rewrite_discard(repo, run)
     }
+    /// Networking is CliFallback, like `fetch`: the system-git layer is where
+    /// the entry is applied.
+    fn set_network_auth(&self, repo: &RepoRef, auth: Option<NetworkAuth>) {
+        self.fallback.set_network_auth(repo, auth);
+    }
     async fn fetch(
         &self,
         repo: &RepoRef,

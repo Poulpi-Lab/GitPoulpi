@@ -1083,6 +1083,18 @@ account and the certificate an integration was connected with are recorded
 - **The TUI has one handler.** Every staging entry point ends in `Action::StageFile|StageFolder|StageAll`; `run_action` hands a refused one to `stage_guard_dialog::ask` (process-wide, keyed by the repository root so another window never receives the answer) and answers it with `Action::AllowSensitive(inner)`. No answer is highlighted until an arrow or a digit.
 - **MCP withholds the argument.** `registry::tools_for(cfg)` drops `allow_sensitive` from the `stage` schema and `to_argv` refuses it unless `[mcp] allow_sensitive_staging`.
 
+## Per-repository authentication
+
+Decision record: [ADR-0010](decisions/0010-per-repository-authentication.md). The design is staged; this section says what has landed.
+
+**Landed: the git boundary (no stored profile yet).**
+
+- **`NetworkAuth` and `set_network_auth`.** The daemon is not wired to it yet: nothing sets an entry in a running session, so behaviour in the app is unchanged. The backends and their contract tests are the whole slice. An entry is held in memory, keyed by canonical repository root, and replaces the global `credentials.https_mode` and `ssh.private_key_path` for that repository's network processes.
+- **One function builds the credential and ssh part of a network command** (`apply_network_auth` in `gitpoulpi-cli-backend/src/process.rs`): `git_async` and `run_network` both call it, so submodule update and LFS cannot drift from fetch and push. Its `-c` arguments are returned to be spliced among the global options (they must precede the subcommand); its environment is set on the command.
+- **Traps.** `credential.helper=` (empty) is what removes the repository's helpers, URL-scoped and included ones too; without it a repository's own helper runs even though another is listed (the contract check proves both sides, falsified by removing the reset). `GIT_SSH_COMMAND` set on the child replaces an exported one and outranks `core.sshCommand`. An empty `core.askPass` plus removing `GIT_ASKPASS` / `SSH_ASKPASS` is what keeps a prompt from appearing. `Git2Backend` only forwards: it has no networking of its own.
+- **Test helpers** (`gitpoulpi-testkit`): `AuthHttpRemote` answers `401` + `WWW-Authenticate: Basic`, records every `Authorization` header and then answers `404`; `StubSsh` (Unix only) records its arguments and runs the trailing `git-upload-pack` / `git-receive-pack` command with `sh`, which makes a working `ssh://` remote out of a directory. The checks that need `GIT_SSH_COMMAND` in the environment live in `gitpoulpi-cli-backend/tests/network_auth_env.rs`, not in the contract suite, which must not touch the process environment.
+- **Not undoable, not journaled:** an entry is not a repository mutation, like settings.
+
 ## Traps: a ref to a missing object, and a daemon that "stopped" mid-read
 
 - **`%(*objectname)` aborts git on a ref whose object is gone.** git 2.5x double-frees (SIGABRT, exit 134) when `for-each-ref` formats `%(*objectname)` or `%(*objecttype)` for a ref to a missing object, after listing a valid ref first; `%(objectname)` and `%(upstream:short)` print the raw id and exit 0. `refs()` on the system backend therefore never asks for the peeled fields: it peels only tag and mirror rows with one `cat-file --batch-check` (`<oid>^{}`; a missing object keeps its raw id, like `Git2Backend`). The other reads that still use them (`filtered_tips`, `messages::tips`, the rewrite `history::refs::list`) go through `read_with_retry` (one retry after 100 ms, then the error with its exit code and stderr), and `filtered_tips` returns that error instead of an empty list (an empty list made the Log walk only `HEAD`). Contract check: `check_refs_survive_a_ref_to_a_missing_object`.

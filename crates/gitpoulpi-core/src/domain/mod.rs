@@ -10,6 +10,7 @@ mod image_info;
 mod lfs;
 mod merge_doc;
 mod mermaid;
+mod network_auth;
 mod operation;
 mod ops;
 mod ref_filter;
@@ -63,6 +64,10 @@ pub use merge_doc::{
 pub use mermaid::{
     attach_refs, commits_to_tip, mermaid_git_graph, MermaidDetail, MermaidOptions,
     MermaidOrientation,
+};
+pub use network_auth::{
+    strip_userinfo, transport_of, NetworkAuth, RemoteAccessOptions, RemoteAccessReport,
+    RemoteTransport,
 };
 pub use operation::{OpTraits, Operation, OperationKind};
 pub use ops::{

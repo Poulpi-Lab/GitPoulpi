@@ -700,6 +700,9 @@ impl GitBackend for SystemGitBackend {
     fn stash_paths(&self, repo: &RepoRef, commit: Oid) -> Result<Vec<String>> {
         stash_ops::stash_paths(repo, commit)
     }
+    fn set_network_auth(&self, repo: &RepoRef, auth: Option<NetworkAuth>) {
+        process::set_network_auth(&repo.root, auth);
+    }
     async fn fetch(
         &self,
         repo: &RepoRef,

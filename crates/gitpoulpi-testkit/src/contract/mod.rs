@@ -18,6 +18,7 @@ mod lfs;
 mod log_hidden;
 mod log_refs;
 mod mailmap;
+mod network_auth;
 mod outside;
 mod predict;
 mod pull_split;
@@ -59,6 +60,7 @@ pub use lfs::*;
 pub use log_hidden::*;
 pub use log_refs::*;
 pub use mailmap::*;
+pub use network_auth::*;
 pub use outside::*;
 pub use predict::*;
 pub use pull_split::*;
@@ -369,6 +371,10 @@ macro_rules! for_each_contract_check {
             check_option_lookalike_and_helper_urls_are_refused,
             check_branch_set_upstream_sets_and_unsets,
             check_fetch_all_reaches_every_remote_and_prunes,
+            check_a_helpers_credential_reaches_the_remote_and_the_repositorys_own_helpers_do_not_run,
+            check_two_repositories_with_different_auth_do_not_cross,
+            check_no_network_auth_entry_means_unchanged_behaviour,
+            check_an_entrys_ssh_command_beats_core_ssh_command,
             check_a_canceled_fetch_kills_git_and_removes_only_its_own_locks,
             check_a_canceled_push_kills_git,
             check_a_canceled_fetch_kills_the_helpers_git_started,
@@ -735,6 +741,7 @@ mod meta_tests {
             include_str!("rewrite_textconv.rs"),
             include_str!("rewrite_encoding.rs"),
             include_str!("workflow.rs"),
+            include_str!("network_auth.rs"),
             include_str!("mod.rs"),
         ]
         .concat();

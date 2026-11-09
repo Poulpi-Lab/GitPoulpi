@@ -9,8 +9,8 @@ use crate::domain::{
     FileDiff, FileHistoryPage, IndexLock, InitOptions, InteractiveRebase, LfsFetchOptions, LfsFile,
     LfsInstallScope, LfsLock, LfsPattern, LfsProgressSink, LfsPushOptions, LfsRepoStatus,
     LfsTrackOptions, LogOptions, LostCommitOptions, LostCommitsPage, MergeDocument, MergeOptions,
-    MergeOutcome, Oid, OperationState, PatchApplied, PatchCreated, PatchSource, PathHash,
-    PullOptions, PullOutcome, PushOptions, PushOutcome, RebaseOptions, RebaseOutcome,
+    MergeOutcome, NetworkAuth, Oid, OperationState, PatchApplied, PatchCreated, PatchSource,
+    PathHash, PullOptions, PullOutcome, PushOptions, PushOutcome, RebaseOptions, RebaseOutcome,
     RebasePlanDraft, RebaseState, Ref, RefScope, RefSnapshot, RefUpdate, ReflogPage, Remote,
     RepoRef, ResetMode, ResolveOptions, RevertOutcome, RewordOutcome, Snapshot, SparseState,
     SplitCommit, SplitOutcome, SplitSource, StageTarget, Stash, StashId, Submodule,
@@ -1046,6 +1046,13 @@ pub trait GitBackend: Send + Sync {
     fn stash_paths(&self, repo: &RepoRef, commit: Oid) -> Result<Vec<String>>;
 
     // -- network (async: fetch/pull/push/clone hit the network) --
+    /// Sets (or, with `None`, removes) how the network git processes of
+    /// `repo` authenticate: they get `auth` instead of the process-wide
+    /// credential mode and SSH key (ADR-0010). Held in memory, per
+    /// repository, never persisted; no entry means the unchanged behaviour.
+    /// Not a repository mutation: not journaled, not undoable. `Git2Backend`
+    /// forwards it to its system-git fallback, which does all networking.
+    fn set_network_auth(&self, repo: &RepoRef, auth: Option<NetworkAuth>);
     async fn fetch(
         &self,
         repo: &RepoRef,

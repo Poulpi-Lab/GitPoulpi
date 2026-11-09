@@ -124,6 +124,23 @@ pub enum Error {
     #[error("this repository's authentication cannot be used: {reason}")]
     RepoAuthUnavailable { reason: String },
 
+    /// The repository's token command did not give a token: it exited
+    /// non-zero (`exit`), timed out or could not start (`exit` is `None`), or
+    /// printed nothing usable. `stderr_tail` is the end of its standard error,
+    /// already redacted (it never carries the token). The transfer is refused.
+    #[error("the token command failed{}: {stderr_tail}", exit.map(|c| format!(" (exit {c})")).unwrap_or_default())]
+    TokenCommandFailed {
+        exit: Option<i32>,
+        stderr_tail: String,
+    },
+
+    /// A file the confirmed credential helper or token command runs, inside
+    /// the repository's work tree, is not the one the person confirmed (a pull
+    /// can change a tracked script). `path` names it. The transfer is
+    /// refused until the command is confirmed again.
+    #[error("{path} changed since it was confirmed as this repository's credential command: confirm the command again")]
+    RepoAuthCommandChanged { path: String },
+
     /// The transfer was refused credentials because git asked for a host that
     /// is not the account's own address: `host` is where git went (a remote
     /// URL rewritten by the repository's own `url.<x>.insteadOf`, say),
@@ -405,6 +422,13 @@ pub enum TypedError {
     RepoAuthUnavailable {
         reason: String,
     },
+    TokenCommandFailed {
+        exit: Option<i32>,
+        stderr_tail: String,
+    },
+    RepoAuthCommandChanged {
+        path: String,
+    },
     GrantRefused {
         host: String,
         expected: String,
@@ -462,6 +486,15 @@ impl Error {
             Error::RepoAuthUnavailable { reason } => Some(TypedError::RepoAuthUnavailable {
                 reason: reason.clone(),
             }),
+            Error::TokenCommandFailed { exit, stderr_tail } => {
+                Some(TypedError::TokenCommandFailed {
+                    exit: *exit,
+                    stderr_tail: stderr_tail.clone(),
+                })
+            }
+            Error::RepoAuthCommandChanged { path } => {
+                Some(TypedError::RepoAuthCommandChanged { path: path.clone() })
+            }
             Error::GrantRefused { host, expected } => Some(TypedError::GrantRefused {
                 host: host.clone(),
                 expected: expected.clone(),
@@ -549,6 +582,10 @@ impl Error {
                 feature: known_feature(&feature),
             },
             TypedError::RepoAuthUnavailable { reason } => Error::RepoAuthUnavailable { reason },
+            TypedError::TokenCommandFailed { exit, stderr_tail } => {
+                Error::TokenCommandFailed { exit, stderr_tail }
+            }
+            TypedError::RepoAuthCommandChanged { path } => Error::RepoAuthCommandChanged { path },
             TypedError::GrantRefused { host, expected } => Error::GrantRefused { host, expected },
             TypedError::Canceled { job } => Error::Canceled { job },
             TypedError::NotCancellable { reason } => Error::NotCancellable { reason },

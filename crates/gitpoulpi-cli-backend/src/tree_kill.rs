@@ -127,7 +127,6 @@ impl TreeGuard {
 
     /// Kills the whole tree now and for good: SIGKILL to the group (no grace
     /// period, unlike dropping the guard) or the Job Object terminated.
-    #[cfg(feature = "rewrite-scripts")]
     pub(crate) fn kill_now(&mut self) {
         #[cfg(unix)]
         if let Some(pgid) = self.pgid.take() {

@@ -37,8 +37,11 @@ pub(crate) struct GrantCredential {
     pub password: String,
     /// `http` or `https`: the only protocol the grant answers.
     pub scheme: String,
-    /// `host` or `host:port`, lowercase: the only host the grant answers.
-    pub host: String,
+    /// `host` or `host:port`, lowercase: the only hosts the grant answers.
+    pub hosts: Vec<String>,
+    /// A token command that makes the credential when git asks (the
+    /// `username` and `password` above are then empty).
+    pub command: Option<crate::token_command::TokenCommand>,
     /// What a connection test says worked: `account work (token, user x)`.
     pub identity: String,
 }
@@ -50,7 +53,8 @@ impl std::fmt::Debug for GrantCredential {
             .field("username", &self.username)
             .field("password", &"***")
             .field("scheme", &self.scheme)
-            .field("host", &self.host)
+            .field("hosts", &self.hosts)
+            .field("command", &self.command)
             .finish()
     }
 }
@@ -68,6 +72,8 @@ struct Entry {
     /// `(host git asked for, host the grant is bound to)` of the last `get`
     /// that was refused.
     refused: Option<(String, String)>,
+    /// `(exit, stderr tail)` of the last token command that failed.
+    command_failure: Option<(Option<i32>, String)>,
 }
 
 #[derive(Default)]
@@ -102,6 +108,15 @@ impl GrantGuard {
     /// `(host asked for, host expected)` of the last refused `get`.
     pub(crate) fn refused(&self) -> Option<(String, String)> {
         lock().grants.get(&self.id)?.refused.clone()
+    }
+}
+
+impl GrantGuard {
+    /// Why the grant's token command failed, if it did (the transfer then
+    /// failed for want of a credential).
+    pub(crate) fn command_failure(&self) -> Option<gitpoulpi_core::Error> {
+        let (exit, stderr_tail) = lock().grants.get(&self.id)?.command_failure.clone()?;
+        Some(gitpoulpi_core::Error::TokenCommandFailed { exit, stderr_tail })
     }
 }
 
@@ -185,53 +200,93 @@ pub(crate) fn issue(root: &Path, credential: GrantCredential) -> Result<GrantGua
             accepted: false,
             token_refused: false,
             refused: None,
+            command_failure: None,
         },
     );
     Ok(GrantGuard { id })
 }
 
 fn host_matches(entry: &Entry, request: &CredentialGrantRequest) -> bool {
+    let host = request.host.trim();
     request
         .protocol
         .eq_ignore_ascii_case(&entry.credential.scheme)
-        && request
-            .host
-            .trim()
-            .eq_ignore_ascii_case(&entry.credential.host)
+        && entry
+            .credential
+            .hosts
+            .iter()
+            .any(|h| host.eq_ignore_ascii_case(h))
+}
+
+/// What to do after the registry lock is released.
+enum Next {
+    Done(CredentialGrantAnswer),
+    /// Run the token command (it takes a while: never under the lock).
+    Command(crate::token_command::TokenCommand),
 }
 
 /// The daemon's answer to one helper request. An unknown or revoked grant
 /// answers nothing, exactly like a refused host.
-pub(crate) fn answer(request: &CredentialGrantRequest) -> CredentialGrantAnswer {
-    let mut registry = lock();
-    let Some(entry) = registry.grants.get_mut(&request.grant) else {
-        return CredentialGrantAnswer::default();
+pub(crate) async fn answer(request: &CredentialGrantRequest) -> CredentialGrantAnswer {
+    let next = {
+        let mut registry = lock();
+        let Some(entry) = registry.grants.get_mut(&request.grant) else {
+            return CredentialGrantAnswer::default();
+        };
+        let matches = host_matches(entry, request);
+        match request.action {
+            CredentialAction::Get if matches => match &entry.credential.command {
+                Some(command) => Next::Command(command.clone()),
+                None => Next::Done(CredentialGrantAnswer {
+                    username: Some(entry.credential.username.clone()),
+                    password: Some(entry.credential.password.clone()),
+                }),
+            },
+            CredentialAction::Get => {
+                entry.refused = Some((
+                    request.host.trim().to_string(),
+                    entry.credential.hosts.join(", "),
+                ));
+                Next::Done(CredentialGrantAnswer::default())
+            }
+            CredentialAction::Store => {
+                if matches {
+                    entry.accepted = true;
+                }
+                Next::Done(CredentialGrantAnswer::default())
+            }
+            CredentialAction::Erase => {
+                if matches {
+                    entry.token_refused = true;
+                    // The server refused the token: the next get must make a
+                    // new one.
+                    if let Some(command) = &entry.credential.command {
+                        crate::token_command::invalidate(command);
+                    }
+                }
+                Next::Done(CredentialGrantAnswer::default())
+            }
+        }
     };
-    let matches = host_matches(entry, request);
-    match request.action {
-        CredentialAction::Get if matches => CredentialGrantAnswer {
-            username: Some(entry.credential.username.clone()),
-            password: Some(entry.credential.password.clone()),
-        },
-        CredentialAction::Get => {
-            entry.refused = Some((
-                request.host.trim().to_string(),
-                entry.credential.host.clone(),
-            ));
-            CredentialGrantAnswer::default()
+    let command = match next {
+        Next::Done(answer) => return answer,
+        Next::Command(command) => command,
+    };
+    match crate::token_command::credential(&command).await {
+        Ok(given) => {
+            let (username, password) = crate::token_command::answer_of(&command, given);
+            CredentialGrantAnswer {
+                username: Some(username),
+                password: Some(password),
+            }
         }
-        CredentialAction::Store => {
-            if matches {
-                entry.accepted = true;
+        Err(gitpoulpi_core::Error::TokenCommandFailed { exit, stderr_tail }) => {
+            if let Some(entry) = lock().grants.get_mut(&request.grant) {
+                entry.command_failure = Some((exit, stderr_tail));
             }
             CredentialGrantAnswer::default()
         }
-        CredentialAction::Erase => {
-            if matches {
-                entry.token_refused = true;
-            }
-            CredentialGrantAnswer::default()
-        }
+        Err(_) => CredentialGrantAnswer::default(),
     }
 }
 
@@ -244,7 +299,8 @@ mod tests {
             username: "x-access-token".into(),
             password: "tok-0123456789".into(),
             scheme: "https".into(),
-            host: host.into(),
+            hosts: vec![host.into()],
+            command: None,
             identity: "account work".into(),
         }
     }
@@ -259,13 +315,13 @@ mod tests {
         }
     }
 
-    #[test]
-    fn a_grant_answers_only_its_protocol_and_host_and_only_while_alive() {
+    #[tokio::test]
+    async fn a_grant_answers_only_its_protocol_and_host_and_only_while_alive() {
         let guard = issue(Path::new("/r"), credential("git.corp.example")).unwrap();
         let id = guard.id().to_string();
         assert_eq!(id.len(), 32);
 
-        let ok = answer(&get(&id, "https", "GIT.corp.example"));
+        let ok = answer(&get(&id, "https", "GIT.corp.example")).await;
         assert_eq!(ok.username.as_deref(), Some("x-access-token"));
         assert_eq!(ok.password.as_deref(), Some("tok-0123456789"));
         assert_eq!(guard.refused(), None);
@@ -278,7 +334,7 @@ mod tests {
             ("http", "git.corp.example"),
         ] {
             assert_eq!(
-                answer(&get(&id, protocol, host)),
+                answer(&get(&id, protocol, host)).await,
                 CredentialGrantAnswer::default(),
                 "{protocol}://{host}"
             );
@@ -290,7 +346,7 @@ mod tests {
 
         drop(guard);
         assert_eq!(
-            answer(&get(&id, "https", "git.corp.example")),
+            answer(&get(&id, "https", "git.corp.example")).await,
             CredentialGrantAnswer::default(),
             "a revoked grant answers nothing"
         );
@@ -299,21 +355,21 @@ mod tests {
                 "0123456789abcdef0123456789abcdef",
                 "https",
                 "git.corp.example"
-            )),
+            )).await,
             CredentialGrantAnswer::default()
         );
     }
 
-    #[test]
-    fn store_and_erase_are_read_back_once_per_remote() {
+    #[tokio::test]
+    async fn store_and_erase_are_read_back_once_per_remote() {
         let root = Path::new("/outcome-root");
         let guard = issue(root, credential("h.example")).unwrap();
         let send = |action, host: &str| {
             let mut r = get(guard.id(), "https", host);
             r.action = action;
-            answer(&r)
+            async move { answer(&r).await }
         };
-        send(CredentialAction::Store, "h.example");
+        send(CredentialAction::Store, "h.example").await;
         assert_eq!(
             take_outcome(root),
             Outcome {
@@ -322,9 +378,9 @@ mod tests {
             }
         );
         assert_eq!(take_outcome(root), Outcome::default());
-        send(CredentialAction::Erase, "h.example");
+        send(CredentialAction::Erase, "h.example").await;
         // Another host's store or erase says nothing about this account.
-        send(CredentialAction::Store, "other.example");
+        send(CredentialAction::Store, "other.example").await;
         assert_eq!(
             take_outcome(root),
             Outcome {

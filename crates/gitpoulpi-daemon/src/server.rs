@@ -936,7 +936,7 @@ async fn handle_control(
                 gitpoulpi_ipc::git_credential::CredentialGrantRequest,
             >(request.args.clone())
             {
-                Ok(grant) => Ok(serde_json::to_value(crate::grants::answer(&grant))
+                Ok(grant) => Ok(serde_json::to_value(crate::grants::answer(&grant).await)
                     .unwrap_or(serde_json::Value::Null)),
                 Err(e) => Err(gitpoulpi_ipc::ResponseError {
                     message: format!("invalid arguments: {e}"),

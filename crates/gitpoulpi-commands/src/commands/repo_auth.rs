@@ -90,7 +90,7 @@ fn stored_profile(session: &Session) -> Option<RepoAuthProfile> {
 
 /// `{set, sha256}` for a command, plus the command itself for a person.
 fn command_json(https: &HttpsAuth, reveal: bool, stored: Option<&HttpsAuth>) -> Value {
-    let source = stored.unwrap_or(https);
+    // The view's own command is blanked: only the stored one can be hashed.
     let sha = match https {
         HttpsAuth::Helper {
             confirmed_sha256, ..
@@ -100,9 +100,9 @@ fn command_json(https: &HttpsAuth, reveal: bool, stored: Option<&HttpsAuth>) -> 
         } => confirmed_sha256.clone(),
         _ => None,
     }
-    .or_else(|| source.command_sha256());
+    .or_else(|| stored.and_then(HttpsAuth::command_sha256));
     let mut out = json!({ "set": true, "sha256": sha });
-    if reveal {
+    if let (true, Some(source)) = (reveal, stored) {
         match source {
             HttpsAuth::Helper { helper, .. } => out["helper"] = json!(helper),
             HttpsAuth::TokenCommand { argv, .. } => out["argv"] = json!(argv),
@@ -115,19 +115,26 @@ fn command_json(https: &HttpsAuth, reveal: bool, stored: Option<&HttpsAuth>) -> 
 /// The view as JSON with the command of a command-running source replaced by
 /// `command` (never `helper` / `argv` unless the session may trust).
 fn view_json(session: &Session, view: &RepoAuthView) -> Result<Value, String> {
-    let mut value = to_value(view)?;
-    let stored = if session.may_trust() {
+    let reveal = session.may_trust();
+    let stored = if reveal {
         stored_profile(session)
     } else {
         None
     };
+    view_json_with(view, reveal, stored.as_ref())
+}
+
+/// [`view_json`] for a given trust: `stored` is the profile with its commands,
+/// read only when `reveal`.
+fn view_json_with(
+    view: &RepoAuthView,
+    reveal: bool,
+    stored: Option<&RepoAuthProfile>,
+) -> Result<Value, String> {
+    let mut value = to_value(view)?;
     if let Some(https) = &view.profile.https {
         if https.command_sha256().is_some() {
-            let command = command_json(
-                https,
-                session.may_trust(),
-                stored.as_ref().and_then(|p| p.https.as_ref()),
-            );
+            let command = command_json(https, reveal, stored.and_then(|p| p.https.as_ref()));
             if let Some(map) = value
                 .pointer_mut("/profile/https")
                 .and_then(Value::as_object_mut)
@@ -497,4 +504,92 @@ async fn test(
         json!({ "ok": ok, "reports": reports, "identity": identities }),
         human.join("\n"),
     ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn token_command() -> HttpsAuth {
+        HttpsAuth::TokenCommand {
+            argv: vec!["pass".into(), "show".into(), "work-token".into()],
+            username: None,
+            hosts: vec!["github.com".into()],
+            cache_minutes: None,
+            confirmed_sha256: None,
+            script_sha256: None,
+            confirmed_at: None,
+        }
+    }
+
+    /// What the daemon sends: the command blanked, the confirmed hash kept.
+    fn view_of(https: HttpsAuth) -> RepoAuthView {
+        let sha = https.command_sha256();
+        let mut blanked = https;
+        if let HttpsAuth::TokenCommand {
+            argv,
+            confirmed_sha256,
+            ..
+        } = &mut blanked
+        {
+            argv.clear();
+            *confirmed_sha256 = sha;
+        }
+        RepoAuthView {
+            configured: true,
+            profile: RepoAuthProfile {
+                https: Some(blanked),
+                ssh: None,
+            },
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn a_command_is_shown_only_to_a_session_that_may_trust() {
+        let full = token_command();
+        let view = view_of(full.clone());
+        let stored = RepoAuthProfile {
+            https: Some(full.clone()),
+            ssh: None,
+        };
+
+        let agent = view_json_with(&view, false, None).unwrap();
+        let command = &agent["profile"]["https"]["command"];
+        assert_eq!(command["set"], true);
+        assert_eq!(command["sha256"], json!(full.command_sha256()));
+        assert!(command.get("argv").is_none() && command.get("helper").is_none());
+        assert!(!agent.to_string().contains("work-token"));
+
+        // Even with the stored profile at hand, an agent's view stays blind.
+        let still_agent = view_json_with(&view, false, Some(&stored)).unwrap();
+        assert!(!still_agent.to_string().contains("work-token"));
+
+        let person = view_json_with(&view, true, Some(&stored)).unwrap();
+        assert_eq!(
+            person["profile"]["https"]["command"]["argv"],
+            json!(["pass", "show", "work-token"])
+        );
+        assert!(person["profile"]["https"].get("argv").is_none());
+    }
+
+    #[test]
+    fn a_refusal_is_exit_code_2_with_a_stable_reason() {
+        let out = refused("needs_user", "ask the user", Some("hint"));
+        assert_eq!(out.exit_code, 2);
+        assert_eq!(out.json["refused"]["reason"], "needs_user");
+        assert_eq!(out.json["refused"]["message"], "ask the user");
+        assert_eq!(out.json["refused"]["hint"], "hint");
+    }
+
+    #[test]
+    fn the_hash_follows_the_command() {
+        let a = token_command();
+        let mut b = token_command();
+        if let HttpsAuth::TokenCommand { argv, .. } = &mut b {
+            argv[2] = "other".into();
+        }
+        assert_ne!(a.command_sha256(), b.command_sha256());
+        assert_eq!(a.command_sha256().unwrap().len(), 64);
+    }
 }

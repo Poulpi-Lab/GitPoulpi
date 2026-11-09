@@ -85,7 +85,7 @@ png = "0.18"
 jpeg-decoder = { version = "0.3", default-features = false }
 # Image view (`image-view` feature): GIF first frame and WebP, decoded off
 # the repository's own blobs. BMP and ICO are hand-rolled.
-gif = { version = "0.13", default-features = false, features = ["std"] }
+gif = { version = "0.14", default-features = false, features = ["std"] }
 image-webp = { version = "0.2", default-features = false }
 # Gravatar's *current* API (docs.gravatar.com, verified 2026-09-23) is
 # emphatic that MD5 identifiers are legacy ("Don't use MD5!") and requires
@@ -97,7 +97,7 @@ image-webp = { version = "0.2", default-features = false }
 # and a bug here would silently address every avatar at the wrong URL.
 sha2 = { version = "0.10", default-features = false }
 # Release signatures (the client side of `xtask sign`); the pure-Rust verifier, no dependencies.
-minisign-verify = "=0.2.5"
+minisign-verify = "=0.3.0"
 # Test-only: generates key pairs and signs, the same crate `xtask sign` uses.
 minisign = "0.10"
 # The history rewrite engine hashes the objects it re-creates (SHA-1 ids)
@@ -120,7 +120,7 @@ webpki-roots = "1"
 # Branch-workflow topic types may match branch names by a user regex (gitpoulpi_core::workflow).
 regex = "1"
 thiserror = "1"
-directories = "5"
+directories = "6"
 tracing = "0.1"
 tempfile = "3"
 insta = "1"

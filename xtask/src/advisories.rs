@@ -274,18 +274,20 @@ fn dependency_path(entry: &Entry) -> String {
 }
 
 fn agent() -> ureq::Agent {
-    ureq::AgentBuilder::new()
-        .timeout(Duration::from_secs(60))
+    ureq::Agent::config_builder()
+        .timeout_global(Some(Duration::from_secs(60)))
         .user_agent("gitpoulpi-xtask advisories (+https://github.com/Poulpi-Lab/gitpoulpi)")
         .build()
+        .into()
 }
 
 fn osv_post(body: &Value) -> Result<Value, String> {
     agent()
         .post("https://api.osv.dev/v1/querybatch")
-        .send_json(body.clone())
+        .send_json(body)
         .map_err(|e| format!("OSV querybatch failed: {e}"))?
-        .into_json()
+        .body_mut()
+        .read_json()
         .map_err(|e| format!("unreadable OSV answer: {e}"))
 }
 
@@ -294,7 +296,8 @@ fn osv_get(id: &str) -> Result<Value, String> {
         .get(&format!("https://api.osv.dev/v1/vulns/{id}"))
         .call()
         .map_err(|e| format!("OSV lookup of {id} failed: {e}"))?
-        .into_json()
+        .body_mut()
+        .read_json()
         .map_err(|e| format!("unreadable OSV answer for {id}: {e}"))
 }
 

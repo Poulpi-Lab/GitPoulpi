@@ -206,15 +206,17 @@ pub fn crates_io_created_at(entry: &Entry) -> Result<i64, String> {
         "https://crates.io/api/v1/crates/{}/{}",
         entry.name, entry.version
     );
-    let agent = ureq::AgentBuilder::new()
-        .timeout(Duration::from_secs(30))
+    let agent: ureq::Agent = ureq::Agent::config_builder()
+        .timeout_global(Some(Duration::from_secs(30)))
         .user_agent("gitpoulpi-xtask lock-age (+https://github.com/Poulpi-Lab/gitpoulpi)")
-        .build();
+        .build()
+        .into();
     let body: serde_json::Value = agent
         .get(&url)
         .call()
         .map_err(|e| format!("{entry}: crates.io lookup failed: {e}"))?
-        .into_json()
+        .body_mut()
+        .read_json()
         .map_err(|e| format!("{entry}: unreadable crates.io answer: {e}"))?;
     let created = body["version"]["created_at"]
         .as_str()

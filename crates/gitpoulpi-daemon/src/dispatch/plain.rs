@@ -67,7 +67,11 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
     }
 
     let outcome: Result<Value, Failure> = match request.command {
-        OperationKind::Status => to_json!(backend.status(&repo)),
+        OperationKind::Status => to_json!(backend.status(&repo)).map(|mut status| {
+            // The push indicator's label, from the private file (no spawn).
+            crate::repo_auth::add_summary(&repo.root, &mut status);
+            status
+        }),
         OperationKind::ConflictEntries => to_json!(backend.conflict_entries(&repo)),
         OperationKind::ConflictShow => {
             let path: PathBuf = arg_or_err!(args, "path", request.id);
@@ -207,9 +211,12 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
                 .get("opts")
                 .and_then(|v| serde_json::from_value(v.clone()).ok())
                 .unwrap_or_default();
-            // May clone: `credentials.https_mode`, read live.
-            crate::credentials::apply_from_config();
-            to_json!(backend.submodule_update(&repo, &opts))
+            // May clone: `credentials.https_mode` and the repository's
+            // authentication profile, read live.
+            match crate::credentials::apply_for(backend, &repo) {
+                Ok(()) => to_json!(backend.submodule_update(&repo, &opts)),
+                Err(error) => Err((error.to_string(), error.typed(), None)),
+            }
         }
         OperationKind::Resolve => {
             let rev: String = arg_or_err!(args, "rev", request.id);
@@ -774,6 +781,9 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
             to_json!(backend.rewrite_script_test(&repo, &test.script, &policy, &test.commits))
         }
         OperationKind::FlowTrustHooks => to_json!(crate::flow::trust_hooks(&repo, args)),
+        OperationKind::RepoAuthGet => return crate::repo_auth::get(backend, &repo, request),
+        OperationKind::RepoAuthSet => return crate::repo_auth::set(&repo, request),
+        OperationKind::RepoAuthClear => return crate::repo_auth::clear(&repo, request),
         OperationKind::RewriteTrustScript => {
             let trust: gitpoulpi_ipc::rewrite::TrustArgs =
                 match serde_json::from_value(args.clone()) {

@@ -348,7 +348,17 @@ async fn dispatch_network_inner(
     if let Some(refused) = refuse_unbuilt(request) {
         return refused;
     }
-    crate::credentials::apply_from_config();
+    match repo_ref(request) {
+        // The repository's own authentication profile comes with the global
+        // setting; a profile that cannot be used refuses the transfer.
+        Ok(repo) => {
+            if let Err(error) = crate::credentials::apply_for(backend, &repo) {
+                return failed(request, error.to_string(), error.typed(), None);
+            }
+        }
+        // A clone has no repository yet.
+        Err(_) => crate::credentials::apply_from_config(),
+    }
     if let Some(refused) = crate::autostash::refuse_while_pending(request) {
         return refused;
     }

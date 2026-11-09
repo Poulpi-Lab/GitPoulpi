@@ -53,7 +53,11 @@ pub fn keep_up_to_date(backend: &dyn GitBackend, request: &Request, dispatched: 
     if !out_of_step {
         return;
     }
-    crate::credentials::apply_from_config();
+    if crate::credentials::apply_for(backend, &repo).is_err() {
+        // A profile that cannot be used refuses the transfer; the explicit
+        // submodule update says why, this background one just does not run.
+        return;
+    }
     let updated = backend.submodule_update(
         &repo,
         &SubmoduleUpdateOptions {

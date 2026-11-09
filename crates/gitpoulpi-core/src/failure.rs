@@ -275,6 +275,8 @@ fn credential_helper_line(stderr: &str) -> Option<(&str, bool)> {
         .iter()
         .any(|n| l.contains(n));
         let names_helper = l.contains("credential");
+        // bash as `sh` names the script and the line instead:
+        // `/x/helper get: line 1: /x/helper: No such file or directory`.
         let shell_prefix = [
             "sh: ",
             "/bin/sh: ",
@@ -284,7 +286,8 @@ fn credential_helper_line(stderr: &str) -> Option<(&str, bool)> {
             "/bin/dash: ",
         ]
         .iter()
-        .any(|p| l.starts_with(p));
+        .any(|p| l.starts_with(p))
+            || l.contains(": line ");
         if (l.contains("is not a git command") && l.contains("credential-"))
             || (l.contains("credential helper") && l.contains("told us to quit"))
             || (names_helper && shell_failure && (shell_prefix || l.contains("cannot run")))
@@ -640,6 +643,7 @@ mod tests {
             "fatal: credential helper '/x/y' told us to quit",
             "'git-credential-foo' is not recognized as an internal or external command,\nfatal: Authentication failed for 'https://h/r'",
             "error: cannot run git-credential-foo: No such file or directory\nfatal: Authentication failed for 'https://h/r'",
+            "/x/credential-script get: line 1: /x/credential-script: No such file or directory\nfatal: could not read Username for 'http://h': No such device or address",
         ] {
             assert_eq!(K::classify(stderr), K::CredentialHelperFailed, "{stderr}");
             assert!(K::credential_helper_line(stderr).is_some(), "{stderr}");

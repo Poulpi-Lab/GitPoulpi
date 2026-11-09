@@ -21,6 +21,12 @@ pub struct NetworkAuth {
     /// file, repository and included ones too, and clears URL-scoped helpers
     /// as well) and then each entry is added.
     pub credential_helpers: Option<Vec<String>>,
+    /// Helpers kept for one URL only, `(url, helper)`: each becomes
+    /// `-c credential.<url>.helper=<helper>`, after the reset and the list
+    /// above. A URL-scoped helper of the user's own configuration is cleared
+    /// by the reset like any other, and it must not be re-added without its
+    /// scope (it would then answer for every host).
+    pub credential_url_helpers: Vec<(String, String)>,
     /// `-c credential.username=`.
     pub credential_username: Option<String>,
     /// No prompt of any kind: `GIT_TERMINAL_PROMPT=0`, `-c core.askPass=`,

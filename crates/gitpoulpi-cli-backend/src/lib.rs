@@ -54,6 +54,7 @@ mod reset;
 mod reword;
 mod rewrite;
 mod rule_files;
+mod scoped_config;
 mod snapshot_ops;
 mod sparse;
 mod split;
@@ -97,6 +98,10 @@ pub use cancel_cleanup::remove_stale_transfer_files;
 pub use content::{body_of, lfs_local_object};
 pub use reflog_ops::reflog_via_git;
 pub use refs::{apply_tag_sync, tag_sync_for};
+pub use scoped_config::{
+    config_entries, credential_helper_entries, global_ssh_program, machine_wide_helpers,
+    ssh_command_entries, ConfigEntry,
+};
 
 /// The config-section rules of the undo journal, shared with
 /// `Git2Backend` so the two accept exactly the same sections.
@@ -107,7 +112,10 @@ pub use journal_ops::{
 
 /// How network commands get HTTPS credentials; the daemon sets it from
 /// `credentials.https_mode` before each network operation.
-pub use process::{credential_mode, git_program, set_credential_mode, set_ssh_key, CredentialMode};
+pub use process::{
+    credential_mode, expand_home, git_program, set_credential_mode, set_ssh_key,
+    ssh_key_command as global_ssh_key_command, CredentialMode,
+};
 
 /// The part of `merge_document` after the stages are read, and the label
 /// reader, shared with `Git2Backend` (which reads the stages natively).

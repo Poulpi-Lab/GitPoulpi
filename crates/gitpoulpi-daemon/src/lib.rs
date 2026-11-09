@@ -21,6 +21,7 @@ mod mailmap;
 mod op_classification;
 mod opstate;
 mod ref_visibility;
+mod repo_auth;
 mod resolved_record;
 mod rewrite_runs;
 mod search;

@@ -195,6 +195,10 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::LfsFiles
         | K::LfsLocks
         | K::RemoteAccessCheck
+        | K::RepoAuthGet
+        | K::RepoAuthSet
+        | K::RepoAuthClear
+        | K::RepoAuthTest
         | K::Hello
         | K::JournalState
         | K::JournalList
@@ -559,6 +563,10 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::LfsFiles
         | K::LfsLocks
         | K::RemoteAccessCheck
+        | K::RepoAuthGet
+        | K::RepoAuthSet
+        | K::RepoAuthClear
+        | K::RepoAuthTest
         | K::Hello
         | K::JournalState
         | K::JournalList

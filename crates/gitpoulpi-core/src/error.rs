@@ -116,6 +116,14 @@ pub enum Error {
     #[error("{feature} is not built into this binary")]
     NotBuilt { feature: &'static str },
 
+    /// The repository's authentication profile cannot be used (its file is
+    /// unreadable, the integration it names is gone, a key file is missing,
+    /// or the source is not available in this version). The transfer is
+    /// refused: it never falls back to the machine's own credentials, because
+    /// pushing to work with a personal account is the failure to avoid.
+    #[error("this repository's authentication cannot be used: {reason}")]
+    RepoAuthUnavailable { reason: String },
+
     /// A background job was canceled (`JobCancel`, or a client that asked for
     /// cancel-on-disconnect went away). The repository is as it was before the
     /// operation, or at its last safe point (see the cancel policy in
@@ -386,6 +394,9 @@ pub enum TypedError {
     NotBuilt {
         feature: String,
     },
+    RepoAuthUnavailable {
+        reason: String,
+    },
     Canceled {
         job: u64,
     },
@@ -435,6 +446,9 @@ impl Error {
             }),
             Error::NotBuilt { feature } => Some(TypedError::NotBuilt {
                 feature: (*feature).to_string(),
+            }),
+            Error::RepoAuthUnavailable { reason } => Some(TypedError::RepoAuthUnavailable {
+                reason: reason.clone(),
             }),
             Error::Canceled { job } => Some(TypedError::Canceled { job: *job }),
             Error::NotCancellable { reason } => {
@@ -518,6 +532,7 @@ impl Error {
             TypedError::NotBuilt { feature } => Error::NotBuilt {
                 feature: known_feature(&feature),
             },
+            TypedError::RepoAuthUnavailable { reason } => Error::RepoAuthUnavailable { reason },
             TypedError::Canceled { job } => Error::Canceled { job },
             TypedError::NotCancellable { reason } => Error::NotCancellable { reason },
             TypedError::JobConflict { existing } => Error::JobConflict { existing },

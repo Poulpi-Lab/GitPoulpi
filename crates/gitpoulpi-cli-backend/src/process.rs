@@ -273,7 +273,7 @@ pub fn set_ssh_key(path: Option<String>) {
 ///    pin from "SSH key for this repository", or a global one),
 /// 3. the configured key (`ssh -i "<key>" -o IdentitiesOnly=yes`),
 /// 4. nothing: ssh's own configuration and the ssh-agent.
-fn ssh_key_command(repo_root: &Path) -> Option<String> {
+pub fn ssh_key_command(repo_root: &Path) -> Option<String> {
     let key = SSH_KEY.read().ok()?.clone()?;
     let user_env = |name: &str| std::env::var_os(name).is_some_and(|v| !v.is_empty());
     if user_env("GIT_SSH_COMMAND") || user_env("GIT_SSH") {
@@ -367,6 +367,9 @@ fn apply_network_auth(cmd: &mut Command, repo_root: &Path) -> Vec<String> {
         for helper in helpers {
             set(&mut args, format!("credential.helper={helper}"));
         }
+        for (url, helper) in &auth.credential_url_helpers {
+            set(&mut args, format!("credential.{url}.helper={helper}"));
+        }
     }
     if let Some(user) = &auth.credential_username {
         set(&mut args, format!("credential.username={user}"));
@@ -392,7 +395,7 @@ fn apply_network_auth(cmd: &mut Command, repo_root: &Path) -> Vec<String> {
 
 /// `~/x` as the user's home plus `x` (ssh would, but the shell git runs the
 /// command in does not expand a quoted tilde).
-fn expand_home(path: &str) -> String {
+pub fn expand_home(path: &str) -> String {
     let rest = path.strip_prefix("~/").or_else(|| path.strip_prefix("~\\"));
     match (
         rest,
@@ -1298,6 +1301,7 @@ mod network_auth_tests {
             dir.path(),
             Some(NetworkAuth {
                 credential_helpers: Some(vec!["!h".into()]),
+                credential_url_helpers: vec![("https://h".into(), "!u".into())],
                 credential_username: Some("u".into()),
                 no_prompt: true,
                 reset_extra_header: true,
@@ -1311,7 +1315,8 @@ mod network_auth_tests {
         let flat = all.join(" ");
         assert!(
             flat.contains(
-                "-c credential.helper= -c credential.helper=!h -c credential.username=u \
+                "-c credential.helper= -c credential.helper=!h \
+                 -c credential.https://h.helper=!u -c credential.username=u \
                  -c core.askPass= -c http.extraHeader= fetch origin"
             ),
             "{flat}"

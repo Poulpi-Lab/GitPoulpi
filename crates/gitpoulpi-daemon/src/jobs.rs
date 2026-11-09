@@ -128,6 +128,7 @@ fn label_for(request: &Request) -> String {
         K::FetchAll => "Fetching all remotes".into(),
         K::FetchRefspec | K::FetchRefAsBranch => format!("Fetching from {remote}"),
         K::RemoteAccessCheck => format!("Testing the connection to {remote}"),
+        K::RepoAuthTest => "Testing the connection of every remote".into(),
         K::Pull => "Pulling".into(),
         K::Push => {
             let branch = request

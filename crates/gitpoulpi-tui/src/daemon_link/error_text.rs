@@ -69,6 +69,9 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
             operation, stash, ..
         } => pending_autostash(operation, stash.0),
         TypedError::NotBuilt { feature } => msg::typed_error::not_built(feature),
+        // No catalog sentence until the TUI surface of the per-repository
+        // authentication lands: the English text of the error itself.
+        TypedError::RepoAuthUnavailable { .. } => CoreError::from_typed(typed.clone()).to_string(),
         // The action that was running when its job was canceled (the label
         // comes from the jobs cell; a job the window never heard of is `#id`).
         TypedError::Canceled { job } => msg::jobs::canceled(crate::jobs_ui::label_of_id(*job)),

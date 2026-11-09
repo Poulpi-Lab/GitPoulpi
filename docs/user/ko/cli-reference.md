@@ -107,7 +107,7 @@
 |---|---|
 | `branch list`, `branch create <name> [at]`, `branch delete <name>`, `branch rename <old> <new>` | 로컬 브랜치. |
 | `branch track <remote/branch> [--name N]` | 리모트 브랜치를 추적하는 로컬 브랜치를 만들고 체크아웃합니다. |
-| `branch delete-remote <name> [--remote R]` | 리모트의 브랜치를 삭제하고 로컬 브랜치는 유지합니다. |
+| `branch delete-remote <name> [--remote R]` | 리모트의 브랜치를 삭제하고 로컬 브랜치는 유지합니다. `undo --yes`가 원래대로 다시 push합니다([실행 취소](undo-redo.md#리모트의-브랜치나-tag-삭제)). |
 | `branch set-upstream <branch> <remote/branch>`, `branch unset-upstream <branch>` | 업스트림. |
 | `branch fast-forward <branch> [target]` | fast-forward일 때만 브랜치를 앞으로 옮깁니다. |
 | `checkout <target> [--autostash]` | 브랜치를 전환하거나 commit에서 분리(detach)합니다. |
@@ -120,7 +120,7 @@
 | `tag list [--unpushed]`, `tag create <name> [at] [-m M]`, `tag annotate <name> -m M` | Tag. `tag list`는 각 tag를 그 위치와 함께 출력합니다. 마지막 fetch나 tag push에서 알게 된 정보이며 네트워크를 쓰지 않습니다. `local`(여기에 있음), `remote`(그 tag를 가진 리모트), `differs_on`(다른 commit에 그 tag를 가진 리모트), 그리고 `where`: `local`, `remote`(리모트에는 있지만 이 저장소에는 없음), `both`, `differs`. |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | tag를 삭제합니다. 로컬(기본값), 리모트에서만(`git push R --delete`. 외부에 영향을 주며 실행 취소할 수 없음), 또는 여기와 그 tag를 가진 리모트 양쪽에서 삭제합니다. 응답에는 `scope`(`local`, `remote`, `both`)가 들어 있고, 리모트에 아직 있는 tag를 로컬에서만 삭제했을 때는 `still_on`(다음 `fetch`가 되살림)도 들어 있습니다. 양쪽 삭제는 리모트를 먼저 지우며, 이후 `undo`는 로컬 tag만 복원하고 `tag push`가 다시 올립니다. |
 | `tag fetch <name> [--remote R]` | 리모트(기본값은 그 tag를 가진 리모트)에서 tag 하나를 fetch합니다. 예: `where: remote`인 tag. 다른 commit을 가리키는 로컬 tag는 절대 덮어쓰지 않습니다. |
-| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | 리모트의 tag(이름이 없으면 어느 리모트에도 없는 모든 tag). |
+| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | 리모트의 tag(이름이 없으면 어느 리모트에도 없는 모든 tag). 리모트에서의 삭제는 실행 취소할 수 있습니다(`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | 연결된 worktree. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | 서브모듈([서브모듈](submodules.md)). |
 
@@ -196,7 +196,7 @@ GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, L
 
 | 명령 | 동작 |
 |---|---|
-| `ai [--print-sent] <command>` | 모든 `ai` 명령의 `--print-sent`는 전송될 내용(정리된 시스템 텍스트와 사용자 텍스트, `{sent: [{system, user}], privacy, dry_run: true}`)을 출력하고 모델을 호출하지 않습니다. `ai.enabled = true`가 필요하며 키와 네트워크는 필요 없습니다. 모든 `ai` 응답에는 `privacy: {redactions: N, excluded_files: [...]}`가 들어 있습니다: 비밀 정보가 몇 개 대체되었고 어떤 민감한 파일이 제외되었는지([AI > 개인정보](ai.md#개인정보)). |
+| `ai [--print-sent] [--send-all] <command>` | 모든 `ai` 명령의 `--send-all`(별칭 `--no-truncate`)은 모든 입력을 `ai.limits.*` 한도를 넘더라도 통째로 보냅니다. 이 옵션이 없으면 한도를 넘은 입력은 잘리고(충돌은 거부됨) 무언가 잘렸을 때 응답에 `truncated: [{part, detail?, bytes, limit, setting}]`가 들어 있습니다([AI > 입력 한도](ai.md#입력-한도)). 모든 `ai` 명령의 `--print-sent`는 전송될 내용(정리된 시스템 텍스트와 사용자 텍스트, `{sent: [{system, user}], privacy, dry_run: true}`)을 출력하고 모델을 호출하지 않습니다. `ai.enabled = true`가 필요하며 키와 네트워크는 필요 없습니다. 모든 `ai` 응답에는 `privacy: {redactions: N, excluded_files: [...]}`가 들어 있습니다: 비밀 정보가 몇 개 대체되었고 어떤 민감한 파일이 제외되었는지([AI > 개인정보](ai.md#개인정보)). |
 | `ai commit-message` | 스테이징된 변경 사항(스테이징된 것이 없으면 모든 변경 사항)에 대해 AI가 제안하는 메시지를 출력합니다. 아무것도 commit하지 않습니다. |
 | `ai explain [rev] [--wip]` | commit(기본값 `HEAD`) 또는 작업 변경 사항을 설명합니다. |
 | `ai split-plan <rev>` | commit을 나누기 위해 AI가 제안하는 계획을 `{commit, parts, applied: false}` 형식으로 출력합니다. `parts`는 `split-commit --plan`이 받는 형식입니다. 아무것도 적용하지 않습니다. `ai.enabled = true`가 필요합니다. |
@@ -207,7 +207,7 @@ GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, L
 | `ai review-context [--repo PATH \| --project HOST/PROJECT] [--run-in-repo profile\|yes\|no] [--claude-md on\|off] [--agents-md on\|off] [--context-file PATH\|URL] [--no-context-file] [--no-extra-file [on\|off]] [--reset]` | 코드 리뷰 초안에 diff 외에 무엇을 줄지 표시하거나 설정합니다(`[ai.review]`, [AI > 리뷰 컨텍스트](ai.md#리뷰-컨텍스트) 참고). `--repo`도 `--project`도 없으면 전역 기본값이고, `--repo`(전역 플래그)는 클론 하나의 고유 값, `--project github.com/owner/name`은 클론되지 않은 저장소의 값(`remote-reviews.toml`)입니다. 설정 플래그가 없으면 표시만, 있으면 저장하고 출력합니다. JSON: `scope`(`global`, `repository`, `project`), `target`, `global`, `own`(저장소 또는 프로젝트가 설정한 필드만), `effective`(리뷰에 적용되는 값), `changed`. `--reset`은 저장소 또는 프로젝트의 고유 값을 지웁니다. `--run-in-repo`는 `--project`에 적용되지 않습니다. `--no-extra-file`(단독 또는 `on`)은 전역 값과 관계없이 저장소 또는 프로젝트에 추가 파일을 주지 않으며, `off`는 다시 전역 파일을 따르게 합니다. `--repo` 또는 `--project`가 필요하고 `--context-file`과 함께 쓸 수 없으며, 이때 `own`에 `"no_extra_file": true`가 나타납니다. 모델이 필요 없으며 AI를 꺼도 동작합니다. |
 | `ai trust <profile> [--accept-origin URL] [--accept-certificate SHA256] [--allow-insecure-http on\|off]` | 프로필의 API 키를 저장된 주소에 묶습니다([AI > 키가 가는 곳](ai.md#키가-가는-곳) 참고). 옵션이 없으면 `{profile, current_origin, trusted}`를 출력합니다. `--accept-origin`은 바뀐 뒤의 프로필 현재 기본 URL을 수락하고(거부 메시지가 출력한 철자 그대로), `--accept-certificate`는 자체 호스팅 서버의 인증서를 SHA-256 키 지문으로 고정하며, `--allow-insecure-http`는 이 컴퓨터가 아닌 곳의 일반 `http://` 기본 URL을 허용합니다. 사람만 실행합니다: MCP 도구가 아닙니다. AI가 꺼져 있어도 동작합니다. |
 
-여기에 `commit --ai`와 `stash push --ai`가 더해집니다. 모델은 `gitpoulpi` 프로세스에서 호출되므로 API 키는 데몬이나 MCP 클라이언트로 넘어가지 않습니다.
+여기에 `commit --ai [--send-all]`와 `stash push --ai [--send-all]`가 더해집니다(`ai`와 같은 `--send-all`과 `truncated`이며, `hosting review suggest`도 `--send-all`을 받습니다). 모델은 `gitpoulpi` 프로세스에서 호출되므로 API 키는 데몬이나 MCP 클라이언트로 넘어가지 않습니다.
 
 **저장소, 세션, 데몬, 설정**
 

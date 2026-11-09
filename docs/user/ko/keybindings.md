@@ -387,8 +387,8 @@ stage_file = "z"
 | `preferences` | `prev_tab` | 설정 페이지의 이전 탭 | `Alt+Left` |
 | `preferences` | `next_tab` | 설정 페이지의 다음 탭 | `Alt+Right` |
 | `ai_popup` | `copy` | 결과 복사 | `c` |
-| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
-| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
+| `activity_log` | `scroll_left` | 활동 로그 왼쪽으로 스크롤 | `Left` |
+| `activity_log` | `scroll_right` | 활동 로그 오른쪽으로 스크롤 | `Right` |
 | `integrations` | `add` | 프로필 추가 | `a` |
 | `integrations` | `edit` | 선택한 프로필 편집 | `e` |
 | `integrations` | `open_token` | 토큰 페이지 열기 | `o` |
@@ -856,8 +856,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 활동 로그: 범위 선택 |  |
 | 활동 로그: Git 작업 |  |
 | 활동 로그: 애플리케이션 로그 |  |
-| Activity Log: Scroll Left | `Left` |
-| Activity Log: Scroll Right | `Right` |
+| 활동 로그: 왼쪽으로 스크롤 | `Left` |
+| 활동 로그: 오른쪽으로 스크롤 | `Right` |
 | 활동 로그: 마지막 오류 복사 |  |
 | 활동 로그: 제안된 작업 실행 |  |
 | 활동 로그: 마지막 오류 열기 |  |

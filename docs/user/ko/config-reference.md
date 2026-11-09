@@ -373,6 +373,13 @@ review_mode = "ask"       # ask | clone | api
 | `ai.review.include_claude_md` | `true` | 코드 리뷰 초안에 저장소의 `CLAUDE.md`를 전달합니다(루트, 요청이 대상으로 하는 브랜치에서 읽음, 8 KB에서 잘림). |
 | `ai.review.include_agents_md` | `true` | `AGENTS.md`도 같습니다. |
 | `ai.review.extra_file` | `""` | 코드 리뷰 초안에 쓸 추가 파일 하나: 저장소 루트 기준 경로, 절대 경로 또는 코드 호스트 파일의 링크(일치하는 연동 프로필로 읽고, 없으면 익명). 모든 파일을 합쳐 16 KB에서 잘립니다. |
+| `ai.limits.conflict_bytes` | `40000` | "해결 방법 제안"이 보낼 때 merge 충돌 하나(base, 현재, 들어오는 블록 합계)가 가질 수 있는 최대 바이트 수. 이를 넘으면 GitPoulpi는 실패하지 않고 경고하며 *그래도 보내기*(이번 요청에만), *설정 열기*, *취소*를 제공합니다. 충돌은 절대 잘리지 않습니다. 이 한도는 모델이 아닌 GitPoulpi 자체의 안전장치이므로 모델에 여유가 있으면 늘리세요. 1000~50000000 사이로 유지되며 설정 > AI > 한도에서 바꿀 수 있습니다. 아래의 다른 한도도 같은 방식으로 동작하며 모두 그 그룹에 있습니다. |
+| `ai.limits.diff_bytes` | `60000` | commit 메시지, 설명, stash 이름, pull request 설명, commit 계획, commit 분할 요청이 담을 수 있는 diff의 최대 바이트 수이자 코드 리뷰 전체 diff의 최대 바이트 수. 이를 넘어도 조용히 잘리지 않습니다. TUI에서는 *AI 한도 초과*가 *모두 보내기*(이번 요청에만, 자르지 않음), *잘라서 보내기*(이전처럼 끝부분 제외), *설정 열기*, *취소*를 제공하고, CLI와 MCP는 잘라서 `truncated`에 알립니다(`--send-all`은 전부 보냄). 1000~50000000 사이로 유지됩니다. |
+| `ai.limits.review_file_bytes` | `12000` | 코드 리뷰에서 파일 하나의 diff의 최대 바이트 수. 이를 넘으면 같은 질문과 같은 두 가지 답이 나오며, *잘라서 보내기*는 그 파일을 눈에 보이는 메모와 함께 줄입니다. 범위는 같습니다. |
+| `ai.limits.review_text_bytes` | `4000` | 리뷰 대상 pull request 설명의 최대 바이트 수. 이를 넘으면 *잘라서 보내기*가 설명을 `[text cut]` 메모와 함께 자릅니다. 범위는 같습니다. |
+| `ai.limits.review_threads_bytes` | `6000` | 이미 있는 리뷰 댓글 목록(모델이 반복하지 않도록 전달됨)의 최대 바이트 수. 이를 넘으면 *잘라서 보내기*가 목록을 자릅니다. 범위는 같습니다. |
+| `ai.limits.review_context_file_bytes` | `8192` | 코드 리뷰에 전달되는 프로젝트 컨텍스트 파일 하나(`CLAUDE.md`, `AGENTS.md`, 추가 파일)의 최대 바이트 수. 이를 넘으면 *잘라서 보내기*가 파일을 메모와 함께 줄입니다. 범위는 같습니다. |
+| `ai.limits.review_context_bytes` | `16384` | 모든 컨텍스트 파일 합계의 최대 바이트 수. 이를 넘으면 *잘라서 보내기*가 한도를 넘는 파일을 줄이고 그 뒤의 파일은 제외합니다. 범위는 같습니다. |
 | `ai.privacy.redact_secrets` | `true` | 스캐너가 인식하는 모든 비밀 정보(토큰, 개인 키 블록, URL 안의 비밀번호, 값이 무작위로 보이는 `password = ...`)를 요청이 나가기 전에 `[REDACTED:<rule>]`로 대체합니다. 꺼져 있는 동안 설정 > AI에 빨간 경고가 표시됩니다. |
 | `ai.privacy.exclude_sensitive_files` | `true` | `privacy.sensitive_patterns`에 일치하는 모든 파일의 diff를 전송 내용에서 제외합니다. 저장소 폴더에서 작업하는 로컬 에이전트는 여전히 파일을 직접 읽을 수 있습니다: [AI > 개인정보](ai.md#개인정보)를 참고하세요. |
 | `ai.sent_preview.<action>` | `true` | 동작마다 키 하나(`commit_message`, `explain_changes`, `stash_message`, `pull_request_description`, `commit_composer`, `conflict_resolve`, `code_review`, `split_commit`, `rewrite_script`, `rewrite_rules`): 요청이 나가기 전에 "보내는 내용"을 표시합니다. 대화상자의 "다시 표시하지 않기"는 `false`를 기록하고, 설정 > AI > *보내기 전에 전송 내용 표시...*가 다시 켭니다. |

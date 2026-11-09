@@ -2448,8 +2448,8 @@ preferences_list_remove = "선택한 목록 항목 제거"
 preferences_list_move_up = "선택한 목록 항목 위로 이동"
 preferences_list_move_down = "선택한 목록 항목 아래로 이동"
 ai_popup_copy = "결과 복사"
-activity_log_scroll_left = "Scroll the Activity Log Left"
-activity_log_scroll_right = "Scroll the Activity Log Right"
+activity_log_scroll_left = "활동 로그 왼쪽으로 스크롤"
+activity_log_scroll_right = "활동 로그 오른쪽으로 스크롤"
 integrations_add = "프로필 추가"
 integrations_edit = "선택한 프로필 편집"
 integrations_open_token = "토큰 페이지 열기"
@@ -2525,7 +2525,7 @@ folder_picker = "폴더 선택기"
 preferences = "설정"
 ai_popup = "AI 결과 팝업"
 integrations = "설정: 연동 페이지"
-activity_log = "Activity Log window"
+activity_log = "활동 로그 창"
 palette = "팔레트 명령"
 split = "{$Commit} 분할 편집기"
 
@@ -4585,8 +4585,8 @@ not_blocked = "최근 실행 취소 항목은 막혀 있지 않습니다"
 forget_button = "잊기"
 
 [undo_ui]
-nothing_to_undo = "실행 취소할 항목이 없습니다 ({$push}, {$fetch} 등 원격 서버에서 한 작업은 되돌리지 않습니다)"
-tip_nothing_to_undo = "실행 취소할 항목이 없습니다 ({$push}, {$fetch} 등 원격 서버에서 한 작업은 되돌리지 않습니다)"
+nothing_to_undo = "실행 취소할 항목이 없습니다 ({$push_noun}, {$fetch_noun} 등 원격 서버에서 한 작업은 되돌리지 않습니다. 단, 원격 브랜치나 {$tag} 삭제는 예외입니다)"
+tip_nothing_to_undo = "실행 취소할 항목이 없습니다 ({$push_noun}, {$fetch_noun} 등 원격 서버에서 한 작업은 되돌리지 않습니다. 단, 원격 브랜치나 {$tag} 삭제는 예외입니다)"
 tip_nothing_to_redo = "다시 실행할 항목이 없습니다"
 nothing_to_redo = "다시 실행할 항목이 없습니다"
 disabled = "실행 취소가 꺼져 있습니다 (설정 > 일반)"
@@ -5044,7 +5044,7 @@ conflict_not_conflicted = "파일이 충돌 상태가 아닙니다"
 conflict_already = "파일이 여전히 충돌 상태입니다"
 conflict_no_operation = "진행 중인 {$merge}, {$rebase}, {$cherry_pick} 또는 되돌리기가 없습니다"
 conflict_unencodable = "{line}번째 줄에 파일의 인코딩으로 표현할 수 없는 문자가 있습니다"
-conflict_local_changes = "local changes the abort would overwrite: {paths}"
+conflict_local_changes = "중단하면 덮어쓰게 될 로컬 변경 사항이 있습니다: {paths}"
 undo_refused = "실행 취소/다시 실행할 수 없습니다: {reason}"
 undo_in_progress = "먼저 {op}을(를) 끝내거나 중단하세요"
 undo_ref_moved = "{name}은(는) 작업이 남긴 {expected}가 아니라 {actual}에 있습니다. GitPoulpi 밖에서 변경되었습니다"
@@ -5073,8 +5073,8 @@ undo_already_restored = "이 작업이 제거한 것은 모두 이미 돌아왔�
 undo_no_such_entry = "실행 취소 기록에 {id}번 작업이 없습니다"
 split_refused = "{$commit}을 분할할 수 없습니다: {reason}"
 undo_purged = "작업 #{entry}의 이전 기록이 영구 삭제되어 실행 취소나 다시 실행을 할 수 없습니다"
-undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
-undo_remote_object_missing = "{object} is no longer in this repository (it was garbage collected), so the branch or {$tag} cannot be restored on the remote with a {$push_noun}"
+undo_remote_ref_moved = "{remote}의 {name}은(는) 작업이 남긴 {expected}가 아니라 {actual}에 있습니다. 그 후 리모트에서 변경되었으므로 그곳에는 아무것도 {$push}하거나 삭제하지 않았습니다"
+undo_remote_object_missing = "{object}이(가) 이 저장소에 더 이상 없어서(가비지 컬렉션됨) 브랜치 또는 {$tag}을(를) {$push_noun}(으)로 리모트에 복원할 수 없습니다"
 
 [window]
 connecting = "세션 데몬에 연결하는 중..."
@@ -5924,17 +5924,17 @@ scope_all = "모든 저장소"
 scope_workspace = "워크스페이스: {name}"
 app_wide = "앱 전체"
 git_empty = "아직 작업이 없습니다. 선택한 범위의 작업이 걸린 시간과 함께 여기에 표시됩니다."
-hint_git = "Up/Down: 선택  Enter: 세부 정보  c: 복사  r: 제안된 작업  d: 진단  s: 범위  Tab: 애플리케이션  Esc: 닫기"
+hint_git = "Up/Down: 선택  Left/Right: 스크롤  Enter: 세부 정보  c: 복사  r: 제안된 작업  d: 진단  s: 범위  Tab: 애플리케이션  Esc: 닫기"
 hint_application = "화살표: 스크롤  l: 수준  /: 필터  c: 모두 복사  o: 폴더  x: 지우기  d: 진단  s: 범위  g: git  Esc: 닫기"
 palette_scope = "활동 로그: 범위 선택"
 palette_git_tab = "활동 로그: Git 작업"
 palette_app_tab = "활동 로그: 애플리케이션 로그"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the left
-palette_scroll_left = "Activity Log: Scroll Left"
+palette_scroll_left = "활동 로그: 왼쪽으로 스크롤"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the right
-palette_scroll_right = "Activity Log: Scroll Right"
+palette_scroll_right = "활동 로그: 오른쪽으로 스크롤"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
-help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
+help_scroll = "활동 로그: 긴 줄을 옆으로 스크롤 (Shift + 휠 또는 가로 스크롤바도 가능)"
 
 [git_error]
 summary_host_key = "리모트의 SSH 호스트 키를 아직 알 수 없습니다."
@@ -5963,9 +5963,9 @@ summary_network = "리모트에 연결할 수 없습니다."
 hint_network = "연결과 리모트 주소를 확인한 다음 다시 시도하세요."
 summary_lock = "다른 git 프로세스가 이 저장소를 사용 중입니다."
 hint_lock = "다른 git 도구를 닫거나, 실행 중인 것이 없으면 잠금 파일을 삭제하세요."
-summary_credential_helper = "The configured credential helper failed: {line}"
-hint_credential_helper = "Run `git config --show-origin --get-all credential.helper` to see where it is set, fix or remove that helper, then retry."
-hint_abort_blocked = "Save a copy of the changes to those files or discard them in the Status pane, then retry the abort."
+summary_credential_helper = "설정된 자격 증명 도우미가 실패했습니다: {line}"
+hint_credential_helper = "`git config --show-origin --get-all credential.helper`를 실행해 설정된 위치를 확인하고, 그 도우미를 고치거나 제거한 다음 다시 시도하세요."
+hint_abort_blocked = "해당 파일의 변경 사항을 따로 복사해 두거나 Status 창에서 버린 다음, 중단을 다시 시도하세요."
 action_pull_first = "먼저 {$Pull}"
 action_integrations = "연동 열기"
 action_stash_retry = "{$Stash} 후 다시 시도"
@@ -8939,21 +8939,21 @@ sensitive_stage = "민감한 파일은 {$staged} 상태가 아닙니다: {files}
 
 [ai_limits]
 # context: Settings > AI, heading of the rows that limit how much input an AI request carries
-settings_heading = "Limits"
+settings_heading = "한도"
 # context: Settings > AI, label of a number: the most bytes one merge conflict may add up to when the AI is asked to resolve it
-conflict_label = "Largest conflict to send (bytes)"
+conflict_label = "전송할 최대 충돌 크기 (바이트)"
 # context: help under that number
-conflict_help = "Over this size, Suggest a resolution does not fail: it warns, and you can send it anyway once, open this setting or cancel. The limit is GitPoulpi's own guard, not the model's: raise it when your model has the room. 40000 by default."
+conflict_help = "이 크기를 넘으면 \"해결 방법 제안\"은 실패하지 않고 경고합니다. 한 번만 그대로 보내거나, 이 설정을 열거나, 취소할 수 있습니다. 이 한도는 모델이 아닌 GitPoulpi 자체의 안전장치이므로, 모델에 여유가 있으면 늘리세요. 기본값은 40000입니다."
 # context: red warning under that number while it is very large
-conflict_warning = "A very large limit can send more than the model accepts: the request then fails at the provider."
+conflict_warning = "한도가 매우 크면 모델이 받아들이는 양보다 많이 보낼 수 있습니다. 그러면 제공자 쪽에서 요청이 실패합니다."
 # context: title of the dialog shown when a conflict is over the limit
-too_large_title = "Conflict too large to send"
+too_large_title = "충돌이 너무 커서 보낼 수 없음"
 # context: body of that dialog; {path} is the file, {size} the conflict's size (for example "48.1 KB (49206 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-too_large_body = "The conflict in {path} is {size}, and the limit is {limit} (setting {key}). The limit is GitPoulpi's own guard, not the model's. If you send it anyway, secrets are still replaced and sensitive files are still left out."
+too_large_body = "{path}의 충돌은 {size}이고 한도는 {limit}입니다 (설정 {key}). 이 한도는 모델이 아닌 GitPoulpi 자체의 안전장치입니다. 그래도 보내면 비밀 정보는 계속 대체되고 민감한 파일은 계속 제외됩니다."
 # context: button that sends the oversized conflict this one time
-send_anyway = "Send anyway"
+send_anyway = "그래도 보내기"
 # context: button that opens Settings on the limit
-open_setting = "Open setting"
+open_setting = "설정 열기"
 # context: key of the Send anyway button, one letter (shown as "Send anyway (S)")
 key_send = "s"
 # context: key of the Open setting button, one letter
@@ -8961,55 +8961,55 @@ key_open = "o"
 # context: key of the Cancel button of that dialog, one letter
 key_cancel = "c"
 # context: Settings > AI, label of a number: the most bytes of the {$diff} an AI request for a message, an explanation, a stash name, a request description, a commit plan or a split may carry; also the whole {$diff} of a code review
-diff_label = "Largest {$diff} to send (bytes)"
+diff_label = "전송할 최대 {$diff} 크기 (바이트)"
 # context: help under that number
-diff_help = "Over this size, nothing is cut silently: you are asked whether to send all of the {$diff}, send it truncated, open this setting or cancel. Applies to a message for a {$commit}, an explanation, a name for a {$stash}, a description of a request, a plan of {$commits} and a split, and to the whole {$diff} of a code review. 60000 by default."
+diff_help = "이 크기를 넘어도 조용히 잘리지 않습니다. {$diff} 전체를 보낼지, 잘라서 보낼지, 이 설정을 열지, 취소할지 묻습니다. {$commit} 메시지, 설명, {$stash} 이름, 요청 설명, {$commits} 계획과 분할 요청에 적용되며, 코드 리뷰의 전체 {$diff}에도 적용됩니다. 기본값은 60000입니다."
 # context: Settings > AI, label of a number: the most bytes of one file's {$diff} in a code review
-review_file_label = "Largest file {$diff} in a review (bytes)"
+review_file_label = "리뷰에서 파일 하나의 최대 {$diff} 크기 (바이트)"
 # context: help under that number
-review_file_help = "Over this size, one file's {$diff} in a code review is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 12000 by default."
+review_file_help = "이 크기를 넘으면 코드 리뷰에서 파일 하나의 {$diff}가 잘립니다. 그 전에 전부 보낼지, 잘라서 보낼지, 이 설정을 열지, 취소할지 묻습니다. 기본값은 12000입니다."
 # context: Settings > AI, label of a number: the most bytes of the description of the reviewed request
-review_text_label = "Largest review description (bytes)"
+review_text_label = "리뷰 설명의 최대 크기 (바이트)"
 # context: help under that number
-review_text_help = "Over this size, the description of the reviewed request is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 4000 by default."
+review_text_help = "이 크기를 넘으면 리뷰 대상 요청의 설명이 잘립니다. 그 전에 전부 보낼지, 잘라서 보낼지, 이 설정을 열지, 취소할지 묻습니다. 기본값은 4000입니다."
 # context: Settings > AI, label of a number: the most bytes of the comments that already exist on the reviewed request
-review_threads_label = "Largest list of existing comments in a review (bytes)"
+review_threads_label = "리뷰에서 기존 댓글 목록의 최대 크기 (바이트)"
 # context: help under that number
-review_threads_help = "The comments that already exist are listed so the model does not repeat them. Over this size, the list is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 6000 by default."
+review_threads_help = "이미 있는 댓글은 모델이 반복하지 않도록 목록으로 전달됩니다. 이 크기를 넘으면 목록이 잘립니다. 그 전에 전부 보낼지, 잘라서 보낼지, 이 설정을 열지, 취소할지 묻습니다. 기본값은 6000입니다."
 # context: Settings > AI, label of a number: the most bytes of one project context file (CLAUDE.md, AGENTS.md, the extra file) given to a code review
-review_context_file_label = "Largest context file in a review (bytes)"
+review_context_file_label = "리뷰에서 컨텍스트 파일 하나의 최대 크기 (바이트)"
 # context: help under that number
-review_context_file_help = "Over this size, a context file (CLAUDE.md, AGENTS.md or the extra file) is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 8192 by default."
+review_context_file_help = "이 크기를 넘으면 컨텍스트 파일(CLAUDE.md, AGENTS.md 또는 추가 파일)이 잘립니다. 그 전에 전부 보낼지, 잘라서 보낼지, 이 설정을 열지, 취소할지 묻습니다. 기본값은 8192입니다."
 # context: Settings > AI, label of a number: the most bytes of all the project context files together
-review_context_label = "Largest context in a review, all files (bytes)"
+review_context_label = "리뷰에서 모든 파일의 컨텍스트 최대 크기 (바이트)"
 # context: help under that number
-review_context_help = "Over this size, the context files together are cut (the last one is shortened or left out), after you were asked: send all of them, send them truncated, open this setting or cancel. 16384 by default."
+review_context_help = "이 크기를 넘으면 컨텍스트 파일 전체가 잘립니다 (마지막 파일은 줄어들거나 제외됩니다). 그 전에 전부 보낼지, 잘라서 보낼지, 이 설정을 열지, 취소할지 묻습니다. 기본값은 16384입니다."
 # context: title of the dialog shown when what would be sent to the AI is over a limit and would be cut
-truncate_title = "Over the AI limit"
+truncate_title = "AI 한도 초과"
 # context: first paragraph of that dialog, before the list of what is over its limit
-truncate_intro = "Some of what would be sent to the AI is over a limit GitPoulpi sets (the limits are GitPoulpi's own guard, not the model's):"
+truncate_intro = "AI로 보낼 내용 중 일부가 GitPoulpi가 정한 한도를 넘었습니다 (이 한도는 모델이 아닌 GitPoulpi 자체의 안전장치입니다):"
 # context: last paragraph of that dialog, explaining the buttons
-truncate_outro = "Send all sends everything this one time. Send truncated cuts what is over its limit, as described above. Either way, secrets are still replaced and sensitive files are still left out."
+truncate_outro = "\"모두 보내기\"는 이번 한 번 전부 보냅니다. \"잘라서 보내기\"는 위에 설명한 대로 한도를 넘은 부분을 자릅니다. 어느 쪽이든 비밀 정보는 계속 대체되고 민감한 파일은 계속 제외됩니다."
 # context: list line of that dialog; {size} is the {$diff}'s size (for example "91.2 KB (91234 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-part_diff = "The {$diff} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_diff = "{$diff}는 {size}이고 한도는 {limit}입니다 (설정 {key}). 자르면 끝부분이 빠집니다."
 # context: list line of that dialog, for the {$commit} being split; sizes like the line above
-part_hunks = "The changes of the {$commit} are {size}, limit {limit} (setting {key}). Truncated, the last ones lose their {$diff}."
+part_hunks = "{$commit}의 변경 사항은 {size}이고 한도는 {limit}입니다 (설정 {key}). 자르면 마지막 변경 사항들의 {$diff}가 빠집니다."
 # context: list line of that dialog, for a code review; {name} is the list of files that do not fit
-part_review_diff = "Files that do not fit the review: {name}. The review is {size}, limit {limit} (setting {key}). Truncated, they are left out."
+part_review_diff = "리뷰에 들어가지 않는 파일: {name}. 리뷰는 {size}이고 한도는 {limit}입니다 (설정 {key}). 자르면 이 파일들이 빠집니다."
 # context: list line of that dialog, for one file of a code review; {name} is its path
-part_review_file = "The {$diff} of {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_file = "{name}의 {$diff}는 {size}이고 한도는 {limit}입니다 (설정 {key}). 자르면 끝부분이 빠집니다."
 # context: list line of that dialog, for the description of the reviewed request
-part_review_text = "The description is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_text = "설명은 {size}이고 한도는 {limit}입니다 (설정 {key}). 자르면 끝부분이 빠집니다."
 # context: list line of that dialog, for the comments that already exist on the reviewed request
-part_review_threads = "The existing comments are {size}, limit {limit} (setting {key}). Truncated, the last ones are left out."
+part_review_threads = "기존 댓글은 {size}이고 한도는 {limit}입니다 (설정 {key}). 자르면 마지막 댓글들이 빠집니다."
 # context: list line of that dialog, for one project context file of a code review; {name} is the file
-part_context_file = "The context file {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_context_file = "컨텍스트 파일 {name}은(는) {size}이고 한도는 {limit}입니다 (설정 {key}). 자르면 끝부분이 빠집니다."
 # context: list line of that dialog, for the project context files together; {name} is the file that crossed the limit
-part_context_total = "The context files together reach {size} at {name}, limit {limit} (setting {key}). Truncated, the rest is left out."
+part_context_total = "컨텍스트 파일 전체가 {name}에서 {size}에 이르렀고 한도는 {limit}입니다 (설정 {key}). 자르면 나머지가 빠집니다."
 # context: button that sends everything of the oversized request this one time, nothing cut
-send_all = "Send all"
+send_all = "모두 보내기"
 # context: button that sends the request with what is over its limit cut
-send_truncated = "Send truncated"
+send_truncated = "잘라서 보내기"
 # context: key of the Send all button, one letter (shown as "Send all (A)")
 key_send_all = "a"
 # context: key of the Send truncated button, one letter (shown as "Send truncated (T)")
@@ -9017,22 +9017,22 @@ key_send_truncated = "t"
 
 [conflict_guard]
 # context: title of the dialog that says conflicts must be resolved before an action
-title = "Resolve the conflicts first"
+title = "먼저 충돌을 해결하세요"
 # context: first line of that dialog; {n} files have unresolved conflicts
-count = { one = "{n} file still has conflicts", other = "{n} files still have conflicts" }
+count = { one = "파일 {n}개에 아직 충돌이 있습니다", other = "파일 {n}개에 아직 충돌이 있습니다" }
 # context: last line of the list of files in that dialog; {n} more files are not listed
-more = "and {n} more"
+more = "외 {n}개"
 # context: second paragraph of the dialog when the AI commit composer was asked
-compose_hint = "The AI cannot split the changes into {$commits} while files have conflicts. Resolve them, then ask again."
+compose_hint = "파일에 충돌이 있는 동안에는 AI가 변경 사항을 여러 {$commits}(으)로 나눌 수 없습니다. 충돌을 해결한 다음 다시 요청하세요."
 # context: second paragraph of the dialog when a commit was asked
-commit_hint = "A {$commit} needs every conflict resolved first. Resolve them, {$stage} the results, then {$commit} again."
+commit_hint = "{$Commit}하려면 먼저 모든 충돌을 해결해야 합니다. 충돌을 해결하고 결과를 {$stage}한 다음 다시 {$commit}하세요."
 # context: button that opens the conflict resolution view
-resolve = "Resolve conflicts"
+resolve = "충돌 해결"
 # context: key of the Resolve conflicts button, one letter (shown as "Resolve conflicts (R)")
 key_resolve = "r"
 # context: key of the Cancel button of that dialog, one letter
 key_cancel = "c"
 # context: label of the disabled Commit button while files have conflicts
-need_resolve = "Resolve conflicts to {$commit}"
+need_resolve = "{$Commit}하려면 충돌을 해결하세요"
 # context: palette: why a command does nothing while files have conflicts
-why_commit = "files still have conflicts: resolve them first"
+why_commit = "아직 충돌이 있는 파일이 있습니다: 먼저 해결하세요"

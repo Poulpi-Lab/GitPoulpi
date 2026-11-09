@@ -117,6 +117,47 @@ pub fn tighten_owned(path: &Path) -> io::Result<()> {
     }
 }
 
+/// Whether `path` (a private key, say) can be read by other accounts: any
+/// group or other permission bit on Unix, an allow entry for Everyone, Users
+/// or Authenticated Users on Windows. `false` when it cannot be read. OpenSSH
+/// refuses such a key ("bad permissions"). A file, never a symlink's target
+/// owner: the target's own bits count.
+pub fn readable_by_others(path: &Path) -> bool {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::metadata(path).is_ok_and(|m| m.permissions().mode() & 0o077 != 0)
+    }
+    #[cfg(windows)]
+    {
+        has_foreign_access(path)
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = path;
+        false
+    }
+}
+
+/// Restricts `path` to the current account: `chmod 600` on Unix, a protected
+/// user-and-SYSTEM-only DACL on Windows. The fix for [`readable_by_others`].
+pub fn restrict_to_user(path: &Path) -> io::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600))
+    }
+    #[cfg(windows)]
+    {
+        protect_user_only(path)
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = path;
+        Ok(())
+    }
+}
+
 /// How deep and how wide [`harden_app_dirs`] walks below a root: the roots
 /// hold a handful of files, the cap only stops a runaway cache.
 #[cfg(unix)]
@@ -394,6 +435,19 @@ mod tests {
             unsafe { libc::umask(old) };
             result.unwrap();
             assert_eq!(mode(&file), 0o600);
+        }
+
+        #[test]
+        fn a_key_readable_by_others_is_found_and_restricted() {
+            let dir = tempfile::tempdir().unwrap();
+            let key = dir.path().join("id_work");
+            std::fs::write(&key, "key").unwrap();
+            std::fs::set_permissions(&key, std::fs::Permissions::from_mode(0o644)).unwrap();
+            assert!(readable_by_others(&key));
+            restrict_to_user(&key).unwrap();
+            assert_eq!(mode(&key), 0o600);
+            assert!(!readable_by_others(&key));
+            assert!(!readable_by_others(&dir.path().join("missing")));
         }
 
         #[test]

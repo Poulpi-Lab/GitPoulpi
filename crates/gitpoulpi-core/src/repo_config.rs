@@ -112,6 +112,63 @@ pub fn ssh_command_for_key(key_path: &str) -> String {
     format!("ssh -i {} -o IdentitiesOnly=yes", sh_quote_path(key_path))
 }
 
+/// The key of a pin made by [`ssh_command_for_key`] (or typed the same way):
+/// `ssh -i <key> [-o IdentitiesOnly=yes]`, the key one `sh` word. `None` for
+/// any other command (another program, more options), which GitPoulpi cannot
+/// restate as a key profile without losing something.
+pub fn key_of_ssh_command(command: &str) -> Option<String> {
+    let words = sh_words(command)?;
+    let mut it = words.iter().map(String::as_str);
+    if it.next()? != "ssh" || it.next()? != "-i" {
+        return None;
+    }
+    let key = it.next()?.to_string();
+    match (it.next(), it.next(), it.next()) {
+        (None, ..) => {}
+        (Some("-o"), Some(opt), None) if opt.eq_ignore_ascii_case("IdentitiesOnly=yes") => {}
+        _ => return None,
+    }
+    (!key.is_empty()).then_some(key)
+}
+
+/// Splits `text` into the words an `sh` would: spaces separate, single quotes
+/// are literal, double quotes let a backslash escape `"`, `$`, a backtick or
+/// a backslash. `None` for an unclosed quote. No expansion is done.
+fn sh_words(text: &str) -> Option<Vec<String>> {
+    let mut out = Vec::new();
+    let mut cur = String::new();
+    let mut has = false;
+    let mut quote: Option<char> = None;
+    let mut chars = text.chars().peekable();
+    while let Some(c) = chars.next() {
+        match (quote, c) {
+            (Some(q), c) if c == q => quote = None,
+            (Some('"'), '\\') if matches!(chars.peek(), Some('"' | '$' | '`' | '\\')) => {
+                cur.push(chars.next()?);
+            }
+            (Some(_), c) => cur.push(c),
+            (None, '"' | '\'') => {
+                quote = Some(c);
+                has = true;
+            }
+            (None, c) if c.is_whitespace() => {
+                if has || !cur.is_empty() {
+                    out.push(std::mem::take(&mut cur));
+                    has = false;
+                }
+            }
+            (None, c) => cur.push(c),
+        }
+    }
+    if quote.is_some() {
+        return None;
+    }
+    if has || !cur.is_empty() {
+        out.push(cur);
+    }
+    Some(out)
+}
+
 /// `path` as one word for the `sh` git runs a command through (a credential
 /// helper, `GIT_SSH_COMMAND`): in double quotes with `"`, `$` and the
 /// backtick escaped, backslashes turned into forward slashes (Git for
@@ -147,6 +204,20 @@ mod tests {
             c(r#"/k/$HOME/`x`/"q""#),
             r#"ssh -i "/k/\$HOME/\`x\`/\"q\"" -o IdentitiesOnly=yes"#
         );
+    }
+
+    #[test]
+    fn the_key_of_a_pin_is_read_back_and_other_commands_are_not_keys() {
+        use super::{key_of_ssh_command as k, ssh_command_for_key as c};
+        for key in ["/k/a b", "/k/$HOME/`x`/\"q\"", "C:/Users/me/.ssh/id"] {
+            assert_eq!(k(&c(key)).as_deref(), Some(key), "{key}");
+        }
+        assert_eq!(k("ssh -i /k/id").as_deref(), Some("/k/id"));
+        assert_eq!(k("ssh -i /k/id -F /x/config"), None);
+        assert_eq!(k("ssh -i /k/id -o StrictHostKeyChecking=no"), None);
+        assert_eq!(k("plink -i /k/id"), None);
+        assert_eq!(k("ssh"), None);
+        assert_eq!(k("ssh -i \"/open"), None);
     }
 
     #[test]

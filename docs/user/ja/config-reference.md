@@ -337,6 +337,13 @@ review_mode = "ask"       # ask | clone | api
 | `ai.review.extra_file` | `""` | コードレビューのドラフトに渡す追加ファイル1つ：リポジトリルートからの相対パス、絶対パス、またはコードホスト上のファイルへのリンク（一致する連携プロファイル経由で、なければ匿名で読み取り）。すべてのファイルの合計は 16 KB で切り詰められます。 |
 | `ai.privacy.redact_secrets` | `true` | リクエスト内のスキャナーが認識するすべてのシークレット（トークン、秘密鍵のブロック、URL 内のパスワード、ランダムに見える `password = ...` の値）を、外に出る前に `[REDACTED:<rule>]` に置き換えます。オフの間、設定 > AI には赤い警告が表示されます。 |
 | `ai.privacy.exclude_sensitive_files` | `true` | `privacy.sensitive_patterns` に一致するすべてのファイルの diff を、送信内容から除外します。リポジトリのフォルダーで動くローカルエージェントは、それでもファイルを自分で読めます：[AI > プライバシー](ai.md#プライバシー)を参照。 |
+| `ai.limits.conflict_bytes` | `40000` | 「解決案を提案」が送信する 1 つの merge 競合（ベース、現在、受け入れ側のブロックの合計）の最大バイト数。超えると GitPoulpi は失敗せず、警告を出して、*そのまま送信*（このリクエストのみ）、*設定を開く*、*キャンセル*を提示します。競合が切り詰められることはありません。この上限は GitPoulpi 独自の安全策で、モデルの上限ではありません。モデルに余裕があるときは引き上げてください。1000 から 50000000 の範囲に収められ、設定 > AI > 上限で変更できます。以下の他の上限も同じ方式で、すべてそのグループにあります。 |
+| `ai.limits.diff_bytes` | `60000` | commit メッセージ、説明、stash の名前、pull request の説明、commit プラン、commit の分割が持てる diff の最大バイト数、およびコードレビュー全体の diff の最大バイト数。超えても黙って切り詰めることはありません。TUI では*AI の上限を超えています*が*すべて送信*（このリクエストのみ、何も切り詰めない）、*切り詰めて送信*（末尾を除外、従来どおり）、*設定を開く*、*キャンセル*を提示します。CLI と MCP は切り詰めて `truncated` で報告します（`--send-all` ですべてを送信）。1000 から 50000000 の範囲です。 |
+| `ai.limits.review_file_bytes` | `12000` | コードレビューでの 1 ファイルの diff の最大バイト数。超えると、同じ確認と同じ 2 つの回答になります。*切り詰めて送信*はそのファイルを、目に見える注記つきで短くします。範囲は同じです。 |
+| `ai.limits.review_text_bytes` | `4000` | レビュー対象の pull request の説明の最大バイト数。超えると、*切り詰めて送信*は説明を `[text cut]` の注記つきで切り詰めます。範囲は同じです。 |
+| `ai.limits.review_threads_bytes` | `6000` | すでにあるレビューコメントの一覧（モデルが繰り返さないように渡されます）の最大バイト数。超えると、*切り詰めて送信*は一覧を切り詰めます。範囲は同じです。 |
+| `ai.limits.review_context_file_bytes` | `8192` | コードレビューに渡す 1 つのプロジェクトコンテキストファイル（`CLAUDE.md`、`AGENTS.md`、追加ファイル）の最大バイト数。超えると、*切り詰めて送信*はそのファイルを注記つきで短くします。範囲は同じです。 |
+| `ai.limits.review_context_bytes` | `16384` | すべてのコンテキストファイルを合わせた最大バイト数。超えると、*切り詰めて送信*は上限をまたぐファイルを短くし、それ以降のファイルを除外します。範囲は同じです。 |
 | `ai.sent_preview.<action>` | `true` | アクションごとに 1 つのキー（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`）：リクエストを送る前に「送信する内容」を表示します。ダイアログの「今後表示しない」が `false` を書き込み、設定 > AI > *送信前に内容を表示...* でオンに戻せます。 |
 
 リポジトリ固有の `[preferences.ai_review]` テーブル（`repo-state.toml` 内、またはクローンしていないリポジトリでは `remote-reviews.toml` のエントリ）にも同じキーを指定でき（すべて省略可能）、加えて `no_extra_file = true` があります。これは `ai.review.extra_file` の内容にかかわらず、そのリポジトリでは追加ファイルを使いません。未設定のキー、未設定の `extra_file`、存在しない `no_extra_file` は全体の値を継承します。`extra_file` にファイルを設定するとスイッチが解除され、逆の場合も同様です。

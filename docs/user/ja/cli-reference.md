@@ -107,7 +107,7 @@
 |---|---|
 | `branch list`、`branch create <name> [at]`、`branch delete <name>`、`branch rename <old> <new>` | ローカルブランチ。 |
 | `branch track <remote/branch> [--name N]` | リモートブランチを追跡するローカルブランチを作成し、チェックアウトします。 |
-| `branch delete-remote <name> [--remote R]` | リモート上のブランチを削除し、ローカルのものは残します。 |
+| `branch delete-remote <name> [--remote R]` | リモート上のブランチを削除し、ローカルのものは残します。`undo --yes` で元の状態のまま push し直します（[元に戻す](undo-redo.md#リモートのブランチや-tag-の削除)）。 |
 | `branch set-upstream <branch> <remote/branch>`、`branch unset-upstream <branch>` | アップストリーム。 |
 | `branch fast-forward <branch> [target]` | 早送りできる場合にのみ、ブランチを進めます。 |
 | `checkout <target> [--autostash]` | ブランチを切り替える、または commit で HEAD を切り離します。 |
@@ -120,7 +120,7 @@
 | `tag list [--unpushed]`、`tag create <name> [at] [-m M]`、`tag annotate <name> -m M` | tag。`tag list` は、各 tag をその所在とともに表示します。所在は直近の fetch または tag の push で得た情報で、ネットワークには問い合わせません。`local`（ここにある）、`remote`（持っているリモート）、`differs_on`（別の commit を指しているリモート）、`where`：`local`、`remote`（リモートにあり、このリポジトリにはない）、`both`、`differs`。 |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | tag を削除します。ローカル（既定）、リモートだけ（`git push R --delete`。外部に影響し、元に戻せません）、またはここと、その tag を持つリモートの両方。答えには `scope`（`local`、`remote`、`both`）が入り、リモートにまだある tag をローカルだけで削除した場合は `still_on` も入ります（次の `fetch` で戻ってきます）。両方の削除は、リモートを先に削除します。`undo` で復元されるのはローカルの tag だけで、`tag push` で戻せます。 |
 | `tag fetch <name> [--remote R]` | リモートから tag を 1 つ取得します（既定は、その tag を持つリモート）。たとえば `where: remote` の tag に使います。別の commit を指すローカルの tag は上書きしません。 |
-| `tag push [names...] [--remote R]`、`tag delete-remote <name> [--remote R]` | リモートの tag（名前なし：どのリモートにもない tag をすべて）。 |
+| `tag push [names...] [--remote R]`、`tag delete-remote <name> [--remote R]` | リモートの tag（名前なし：どのリモートにもない tag をすべて）。リモートでの削除は元に戻せます（`undo --yes`）。 |
 | `worktree list`、`worktree add <path> <start> [-b BRANCH]` | リンクされた worktree。 |
 | `submodule list`、`submodule init [paths]`、`submodule update [paths] [--init] [--recursive]` | サブモジュール（[サブモジュール](submodules.md)）。 |
 
@@ -195,7 +195,7 @@
 
 | コマンド | 内容 |
 |---|---|
-| `ai [--print-sent] <command>` | どの `ai` コマンドでも `--print-sent` を付けると、送信される内容（クリーニング後の system テキストと user テキスト、`{sent: [{system, user}], privacy, dry_run: true}`）を出力し、モデルは呼びません。`ai.enabled = true` が必要で、キーもネットワークも不要です。すべての `ai` の応答には `privacy: {redactions: N, excluded_files: [...]}` が含まれます：置き換えられたシークレットの数と、除外された機密ファイルです（[AI > プライバシー](ai.md#プライバシー)）。 |
+| `ai [--print-sent] [--send-all] <command>` | どの `ai` コマンドでも `--send-all`（別名 `--no-truncate`）を付けると、`ai.limits.*` の上限を超えていても、すべての入力を全体のまま送信します。付けない場合、上限を超えた入力は切り詰められ（競合は拒否され）、何かを切り詰めたときは応答に `truncated: [{part, detail?, bytes, limit, setting}]` が含まれます（[AI > 入力の上限](ai.md#入力の上限)）。どの `ai` コマンドでも `--print-sent` を付けると、送信される内容（クリーニング後の system テキストと user テキスト、`{sent: [{system, user}], privacy, dry_run: true}`）を出力し、モデルは呼びません。`ai.enabled = true` が必要で、キーもネットワークも不要です。すべての `ai` の応答には `privacy: {redactions: N, excluded_files: [...]}` が含まれます：置き換えられたシークレットの数と、除外された機密ファイルです（[AI > プライバシー](ai.md#プライバシー)）。 |
 | `ai commit-message` | ステージ済みの変更（何もステージされていなければすべての変更）に対して AI が提案するメッセージを出力します。commit はしません。 |
 | `ai explain [rev] [--wip]` | commit（既定は `HEAD`）または作業中の変更を説明します。 |
 | `ai split-plan <rev>` | AI が commit の分割のために提案する計画を、`{commit, parts, applied: false}` の形で出力します。`parts` は `split-commit --plan` が受け付ける形式です。何も適用しません。`ai.enabled = true` が必要です。 |
@@ -206,7 +206,7 @@
 | `ai review-context [--repo PATH \| --project HOST/PROJECT] [--run-in-repo profile\|yes\|no] [--claude-md on\|off] [--agents-md on\|off] [--context-file PATH\|URL] [--no-context-file] [--no-extra-file [on\|off]] [--reset]` | コードレビューのドラフトに差分以外に何を渡すかを表示または設定します（`[ai.review]`。[AI > レビューのコンテキスト](ai.md#レビューのコンテキスト)を参照）。`--repo` も `--project` も指定しなければ全体の既定値です。`--repo`（グローバルフラグ）は1つのクローン固有の値、`--project github.com/owner/name` はクローンしていないリポジトリの値です（`remote-reviews.toml`）。設定フラグがなければ表示するだけで、あれば保存して表示します。JSON：`scope`（`global`、`repository`、`project`）、`target`、`global`、`own`（リポジトリまたはプロジェクトが設定したフィールドのみ）、`effective`（レビューで実際に使われる値）、`changed`。`--reset` はリポジトリまたはプロジェクト固有の値を破棄します。`--run-in-repo` は `--project` には適用されません。`--no-extra-file`（単独、または `on`）は、全体の設定にかかわらずリポジトリまたはプロジェクトに追加ファイルを渡さず、`off` は再び全体のファイルに従わせます。`--repo` または `--project` が必要で、`--context-file` とは同時に使えず、`own` には `"no_extra_file": true` が表示されます。モデルは不要で、AI がオフでも動作します。 |
 | `ai trust <profile> [--accept-origin URL] [--accept-certificate SHA256] [--allow-insecure-http on\|off]` | プロファイルの API キーを、保存時のアドレスに結び付けます（[AI > キーの送り先](ai.md#キーの送り先)を参照）。オプションなしでは `{profile, current_origin, trusted}` を出力します。`--accept-origin` は、変更後のプロファイルの現在のベース URL を受け入れ（拒否時に出力された表記のとおりに指定）、`--accept-certificate` はセルフホストサーバーの証明書を SHA-256 の鍵フィンガープリントでピン留めし、`--allow-insecure-http` はこのマシン上にない平文の `http://` ベース URL を許可します。実行できるのは人だけです：MCP ツールではありません。AI がオフでも動作します。 |
 
-加えて `commit --ai` と `stash push --ai` があります。モデルは `gitpoulpi` プロセスから呼び出されるため、API キーがデーモンや MCP クライアントに渡ることはありません。
+加えて `commit --ai [--send-all]` と `stash push --ai [--send-all]` があります（`ai` と同じ `--send-all` と `truncated` で、`hosting review suggest` も `--send-all` を受け付けます）。モデルは `gitpoulpi` プロセスから呼び出されるため、API キーがデーモンや MCP クライアントに渡ることはありません。
 
 **リポジトリ、セッション、デーモン、設定**
 

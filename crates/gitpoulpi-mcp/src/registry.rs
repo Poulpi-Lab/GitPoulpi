@@ -142,10 +142,22 @@ pub const EXCLUDED: &[(&[&str], &str)] = &[
         "takes a secret token on stdin; a token must not pass through an agent's tool-call transcript",
     ),
     (
+        &["repo-auth", "set"],
+        "which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token",
+    ),
+    (
+        &["repo-auth", "clear"],
+        "which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token",
+    ),
+    (
         &["flow", "trust-hooks"],
         "trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted",
     ),
 ];
+
+/// The `repo-auth` arguments that carry a command to run (a credential helper,
+/// a token command): never an MCP argument.
+const REPO_AUTH_COMMAND_ARGS: [&str; 2] = ["command", "helper"];
 
 /// The CLI argument that lets a stage add files the staging guard flags.
 const ALLOW_SENSITIVE: &str = "allow_sensitive";
@@ -228,7 +240,21 @@ fn build_spec(cmd: &Command, path: &[String]) -> ToolSpec {
         .filter(|s| !s.is_empty())
         .unwrap_or_else(|| format!("gitpoulpi {}", path.join(" ")));
     let cli_path: Vec<String> = path.to_vec();
-    let input_schema = schema::arg_schema(cmd);
+    let mut input_schema = schema::arg_schema(cmd);
+    // A command that signs a repository in is a person's to write: whatever
+    // `repo-auth` leaf is ever offered never takes one from an agent.
+    let mut withheld = Vec::new();
+    if cli_path.first().map(String::as_str) == Some("repo-auth") {
+        for id in REPO_AUTH_COMMAND_ARGS {
+            withheld.push(id);
+            if let Some(props) = input_schema
+                .get_mut("properties")
+                .and_then(Value::as_object_mut)
+            {
+                props.remove(id);
+            }
+        }
+    }
     let read_only = policy::is_read_only(&cli_path);
     let destructive = policy::is_destructive(&cli_path);
     ToolSpec {
@@ -245,7 +271,7 @@ fn build_spec(cmd: &Command, path: &[String]) -> ToolSpec {
         idempotent: read_only || destructive,
         destructive,
         command: cmd.clone(),
-        withheld: Vec::new(),
+        withheld,
     }
 }
 
@@ -304,6 +330,41 @@ mod tests {
                 leaves.contains(&path),
                 "EXCLUDED entry {path:?} ({reason}) does not name a real CLI leaf"
             );
+        }
+    }
+
+    /// Which identity a repository signs in with is a person's decision: no
+    /// tool sets or clears it, the exclusions say why, and the read-only
+    /// `show` is a tool, `test` a network one gated like `fetch`.
+    #[test]
+    fn an_agent_cannot_set_repo_auth() {
+        let all = tools();
+        for leaf in ["set", "clear"] {
+            let path = vec!["repo-auth".to_string(), leaf.to_string()];
+            assert!(
+                all.iter().all(|t| t.cli_path != path),
+                "`repo-auth {leaf}` is a tool"
+            );
+            assert!(
+                excluded_reason(&path).is_some(),
+                "`repo-auth {leaf}` is not excluded"
+            );
+        }
+        let by_name = |n: &str| {
+            all.iter()
+                .find(|t| t.name == n)
+                .unwrap_or_else(|| panic!("no tool {n}"))
+        };
+        assert!(by_name("repo_auth_show").read_only);
+        let test = by_name("repo_auth_test");
+        assert!(
+            !test.read_only && !test.destructive,
+            "test is gated like fetch"
+        );
+        // The set command never reaches an agent, even through the others.
+        for t in all.iter().filter(|t| t.cli_path[0] == "repo-auth") {
+            let props = t.input_schema["properties"].as_object().unwrap();
+            assert!(!props.contains_key("command") && !props.contains_key("helper"));
         }
     }
 

@@ -39,6 +39,7 @@ fn is_open_world(name: &str) -> bool {
             | "tag_fetch"
             | "branch_delete_remote"
             | "lfs_fetch"
+            | "repo_auth_test"
             | "lfs_pull"
             | "lfs_push"
             | "lfs_lock"

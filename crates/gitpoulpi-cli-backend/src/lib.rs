@@ -8,6 +8,7 @@
 mod branch;
 mod cancel_cleanup;
 mod checkout;
+mod command_run;
 mod commit;
 mod conflicts;
 mod content;
@@ -71,7 +72,6 @@ mod submodules;
 mod submodules;
 mod tags;
 mod tools;
-mod command_run;
 mod tree_kill;
 mod worktree_list;
 #[cfg(feature = "worktree")]

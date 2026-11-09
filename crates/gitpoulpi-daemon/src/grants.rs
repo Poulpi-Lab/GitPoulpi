@@ -361,7 +361,8 @@ mod tests {
                 "0123456789abcdef0123456789abcdef",
                 "https",
                 "git.corp.example"
-            )).await,
+            ))
+            .await,
             CredentialGrantAnswer::default()
         );
     }

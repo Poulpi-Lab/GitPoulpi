@@ -205,12 +205,9 @@ async fn a_token_command_serves_its_server_and_is_cached() {
         ),
     );
     let mut rig = Rig::new("token-command-main", &repo).await;
-    rig.set(
-        token_command(&[&tool.to_string_lossy()], &[]),
-        true,
-    )
-    .await
-    .expect("a confirmed command is stored");
+    rig.set(token_command(&[&tool.to_string_lossy()], &[]), true)
+        .await
+        .expect("a confirmed command is stored");
 
     rig.fetch().await.expect("the token is accepted");
     rig.fetch().await.expect("the second fetch too");
@@ -397,7 +394,10 @@ async fn a_failing_command_reads_with_a_redacted_stderr() {
             assert_eq!(*exit, Some(3));
             assert!(stderr_tail.contains("vault is sealed"), "{stderr_tail}");
             assert!(!stderr_tail.contains(TOKEN), "{stderr_tail}");
-            assert!(!stderr_tail.contains("abcdef1234567890xyz"), "{stderr_tail}");
+            assert!(
+                !stderr_tail.contains("abcdef1234567890xyz"),
+                "{stderr_tail}"
+            );
         }
         other => panic!("{other:?}: {}", error.message),
     }
@@ -415,12 +415,19 @@ async fn a_helper_source_needs_its_confirmed_hash() {
     let server = AuthHttpRemote::start_accepting();
     let repo = repo_on(&server);
     let tracked = repo.root().join("cred.sh");
-    std::fs::write(&tracked, "cat >/dev/null; echo username=hh; echo password=pp-123456\n").unwrap();
+    std::fs::write(
+        &tracked,
+        "cat >/dev/null; echo username=hh; echo password=pp-123456\n",
+    )
+    .unwrap();
     let helper_text = "!sh cred.sh";
     let mut rig = Rig::new("token-command-helper", &repo).await;
     rig.set(helper_source(helper_text), true).await.unwrap();
     rig.fetch().await.expect("the helper answers");
-    assert!(server.basic_credentials().iter().any(|c| c == "hh:pp-123456"));
+    assert!(server
+        .basic_credentials()
+        .iter()
+        .any(|c| c == "hh:pp-123456"));
 
     // The stored hash is not the helper's any more (a hand-edited store).
     let file = gitpoulpi_config::ConfigPaths::discover()

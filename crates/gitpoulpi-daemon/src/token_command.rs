@@ -182,7 +182,10 @@ async fn run(command: &TokenCommand) -> Result<Credential, Error> {
             ));
         }
         Err(gitpoulpi_cli_backend::CommandRunError::Spawn(why)) => {
-            tracing::warn!("the token command could not start: {}", gitpoulpi_core::redact(&why));
+            tracing::warn!(
+                "the token command could not start: {}",
+                gitpoulpi_core::redact(&why)
+            );
             return Err(failed(None, &why));
         }
     };
@@ -462,7 +465,10 @@ mod tests {
 
     #[test]
     fn hosts_are_normalized() {
-        assert_eq!(normalize_host(" HTTPS://User@Git.Example:8443/x ").unwrap(), "git.example:8443");
+        assert_eq!(
+            normalize_host(" HTTPS://User@Git.Example:8443/x ").unwrap(),
+            "git.example:8443"
+        );
         assert_eq!(normalize_host("github.com").unwrap(), "github.com");
         assert!(normalize_host("  ").is_none());
     }
@@ -544,7 +550,11 @@ mod tests {
             matches!(&error, Error::TokenCommandFailed { exit: None, stderr_tail } if stderr_tail.contains("longer than")),
             "{error:?}"
         );
-        let pid: i32 = std::fs::read_to_string(&pidfile).unwrap().trim().parse().unwrap();
+        let pid: i32 = std::fs::read_to_string(&pidfile)
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap();
         for _ in 0..50 {
             // SAFETY: signal 0 only probes for existence.
             if unsafe { libc::kill(pid, 0) } != 0 {

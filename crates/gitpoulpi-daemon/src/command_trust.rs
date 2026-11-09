@@ -240,11 +240,9 @@ pub(crate) fn verify(root: &Path, https: &HttpsAuth) -> Result<(), Error> {
     };
     let (confirmed, script, _) = confirmation(https).unwrap_or((None, None, None));
     match confirmed {
-        None => {
-            return Err(unavailable(
-                "the command was never confirmed: confirm it in GitPoulpi's authentication settings",
-            ))
-        }
+        None => return Err(unavailable(
+            "the command was never confirmed: confirm it in GitPoulpi's authentication settings",
+        )),
         Some(c) if c != hash => {
             return Err(unavailable(
                 "the command is not the one that was confirmed: confirm it again",

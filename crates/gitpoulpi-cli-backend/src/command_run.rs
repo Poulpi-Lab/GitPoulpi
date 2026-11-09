@@ -70,9 +70,13 @@ mod tests {
     #[tokio::test]
     async fn output_exit_code_and_cwd() {
         let dir = tempfile::tempdir().unwrap();
-        let out = run_command(&sh("pwd; echo bad >&2; exit 3"), dir.path(), Duration::from_secs(10))
-            .await
-            .unwrap();
+        let out = run_command(
+            &sh("pwd; echo bad >&2; exit 3"),
+            dir.path(),
+            Duration::from_secs(10),
+        )
+        .await
+        .unwrap();
         assert_eq!(out.exit_code, Some(3));
         assert!(out.stderr.contains("bad"));
         let canonical = std::fs::canonicalize(dir.path()).unwrap();
@@ -82,9 +86,13 @@ mod tests {
     #[tokio::test]
     async fn a_missing_program_is_a_spawn_error() {
         let dir = tempfile::tempdir().unwrap();
-        let err = run_command(&["/no/such/program".into()], dir.path(), Duration::from_secs(5))
-            .await
-            .unwrap_err();
+        let err = run_command(
+            &["/no/such/program".into()],
+            dir.path(),
+            Duration::from_secs(5),
+        )
+        .await
+        .unwrap_err();
         assert!(matches!(err, CommandRunError::Spawn(_)), "{err:?}");
     }
 
@@ -102,7 +110,11 @@ mod tests {
             .await
             .unwrap_err();
         assert_eq!(err, CommandRunError::TimedOut);
-        let pid: i32 = std::fs::read_to_string(&pidfile).unwrap().trim().parse().unwrap();
+        let pid: i32 = std::fs::read_to_string(&pidfile)
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap();
         // The kill is a signal; give the kernel a moment to reap.
         for _ in 0..50 {
             // SAFETY: signal 0 only probes for existence.

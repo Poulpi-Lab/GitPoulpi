@@ -116,12 +116,7 @@ impl Drop for AuthHttpRemote {
     }
 }
 
-fn serve(
-    mut stream: TcpStream,
-    seen: &Mutex<Vec<String>>,
-    requests: &Mutex<usize>,
-    mode: Mode,
-) {
+fn serve(mut stream: TcpStream, seen: &Mutex<Vec<String>>, requests: &Mutex<usize>, mode: Mode) {
     let mut head = Vec::new();
     let mut buf = [0u8; 2048];
     while !head.windows(4).any(|w| w == b"\r\n\r\n") {

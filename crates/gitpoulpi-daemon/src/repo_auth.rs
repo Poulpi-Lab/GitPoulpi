@@ -493,7 +493,11 @@ fn settle_command(
     confirm: bool,
     now: i64,
 ) -> Result<(), Error> {
-    let Some(https) = profile.https.as_mut().filter(|h| command_trust::is_command(h)) else {
+    let Some(https) = profile
+        .https
+        .as_mut()
+        .filter(|h| command_trust::is_command(h))
+    else {
         return Ok(());
     };
     if confirm {

@@ -377,25 +377,3 @@ async fn an_edited_account_address_refuses_the_transfer() {
     );
     rig.handle.shutdown().await.unwrap();
 }
-
-/// The helper and token command sources still refuse until their slice.
-#[tokio::test]
-async fn the_command_sources_stay_refused() {
-    setup();
-    let server = AuthHttpRemote::start_accepting();
-    let repo = repo_on(&server);
-    let mut rig = Rig::new("account-source-commands", &repo).await;
-    let args = json!({
-        "profile": { "https": { "source": "helper", "helper": "!echo" } },
-        "confirm": true,
-    });
-    let error = rig
-        .call(OperationKind::RepoAuthSet, args)
-        .await
-        .expect_err("not yet");
-    assert!(matches!(
-        error.kind,
-        Some(TypedError::RepoAuthUnavailable { .. })
-    ));
-    rig.handle.shutdown().await.unwrap();
-}

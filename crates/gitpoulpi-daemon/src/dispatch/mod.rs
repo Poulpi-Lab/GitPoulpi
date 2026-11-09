@@ -373,6 +373,10 @@ async fn dispatch_network_inner(
             let refused = Error::GrantRefused { host, expected };
             let _ = error;
             dispatched = failed(request, refused.to_string(), refused.typed(), None);
+        } else if let Some(error) = grant.command_failure() {
+            // The token command gave no token: its own words (redacted),
+            // instead of git's "terminal prompts disabled".
+            dispatched = failed(request, error.to_string(), error.typed(), None);
         }
     }
     dispatched

@@ -8,10 +8,10 @@
 //! machine's own credentials, because pushing to work with a personal account
 //! is the failure this feature exists to prevent.
 //!
-//! The System and account (integration) HTTPS sources and the key-file and
-//! integration-key SSH sources work. The helper and token-command HTTPS
-//! sources are parsed and stored but refuse (they need the trust and hash
-//! pinning of a later slice); `RepoAuthSet` does not accept them.
+//! The System, account (integration), helper and token-command HTTPS sources
+//! and the key-file and integration-key SSH sources work. A helper or token
+//! command is stored only when the requester confirms it (`confirm: true`)
+//! and is hash-pinned, with the in-tree files it runs (`command_trust`).
 
 use std::path::Path;
 
@@ -26,6 +26,7 @@ use gitpoulpi_core::{Error, GitBackend};
 use gitpoulpi_ipc::Request;
 use serde_json::Value;
 
+use crate::command_trust;
 use crate::dispatch::{err, failed, ok, Dispatched};
 
 /// The key a status payload carries the summary under.
@@ -99,13 +100,8 @@ fn resolve_inner(
                 session,
             )?;
         }
-        Some(HttpsAuth::Helper { .. }) => {
-            return Err(unavailable(
-                "the credential helper source is not available yet",
-            ))
-        }
-        Some(HttpsAuth::TokenCommand { .. }) => {
-            return Err(unavailable("the token command source is not available yet"))
+        Some(https @ (HttpsAuth::Helper { .. } | HttpsAuth::TokenCommand { .. })) => {
+            grant = crate::token_command::apply(root, &mut auth, https, session)?;
         }
     }
     auth.ssh_command = match &profile.ssh {
@@ -282,8 +278,19 @@ fn validate(profile: &RepoAuthProfile) -> Result<(), String> {
                 text("the user name", u)?;
             }
         }
-        // Refused by the caller with its own typed error.
-        Some(HttpsAuth::Helper { .. }) | Some(HttpsAuth::TokenCommand { .. }) | None => {}
+        Some(https @ (HttpsAuth::Helper { .. } | HttpsAuth::TokenCommand { .. })) => {
+            crate::token_command::validate(https)?;
+            let username = match https {
+                HttpsAuth::Helper { username, .. } | HttpsAuth::TokenCommand { username, .. } => {
+                    username
+                }
+                _ => &None,
+            };
+            if let Some(u) = username.as_deref().filter(|u| !u.is_empty()) {
+                text("the user name", u)?;
+            }
+        }
+        None => {}
     }
     match &profile.ssh {
         Some(SshAuth::KeyFile {
@@ -355,8 +362,12 @@ pub(crate) fn build_view(backend: &dyn GitBackend, repo: &RepoRef) -> RepoAuthVi
         }
     }
     if view.unavailable.is_none() && record.is_some() {
-        if let Err(Error::RepoAuthUnavailable { reason }) = check(&repo.root, &profile) {
-            view.unavailable = Some(reason);
+        match check(&repo.root, &profile) {
+            Err(Error::RepoAuthUnavailable { reason }) => view.unavailable = Some(reason),
+            Err(other @ Error::RepoAuthCommandChanged { .. }) => {
+                view.unavailable = Some(other.to_string())
+            }
+            _ => {}
         }
     }
     if let Some(reason) = &view.unavailable {
@@ -468,6 +479,49 @@ fn overrides(root: &Path, profile: &RepoAuthProfile) -> Vec<AuthOverride> {
     out
 }
 
+/// Pins the command of a helper or token-command source being stored. Only a
+/// request with `confirm: true` (a person: the TUI after its dialog, the CLI
+/// when it may trust, never an agent's MCP) pins a new or changed command; the
+/// hashes a client sends are never believed, the daemon computes them from the
+/// command and the files it names. Without `confirm`, only a profile whose
+/// command is the one already confirmed (and whose files are unchanged) is
+/// stored, keeping its confirmation (editing the hosts or the cache time).
+fn settle_command(
+    root: &Path,
+    paths: &ConfigPaths,
+    profile: &mut RepoAuthProfile,
+    confirm: bool,
+    now: i64,
+) -> Result<(), Error> {
+    let Some(https) = profile
+        .https
+        .as_mut()
+        .filter(|h| command_trust::is_command(h))
+    else {
+        return Ok(());
+    };
+    if confirm {
+        if let Some(pin) = command_trust::pin(root, https) {
+            command_trust::apply_pin(https, pin, now);
+        }
+        return Ok(());
+    }
+    let stored = gitpoulpi_session::load_repo_auth(paths, root)
+        .map_err(unavailable)?
+        .and_then(|r| r.https);
+    let carried = stored
+        .as_ref()
+        .is_some_and(|stored| command_trust::carry_confirmation(root, https, stored));
+    if carried {
+        return Ok(());
+    }
+    Err(Error::NeedsConfirmation(
+        "a credential helper or token command is stored only when a person confirms it: \
+         ask the person to set it in GitPoulpi"
+            .into(),
+    ))
+}
+
 /// `RepoAuthSet`. Not journaled, not undoable: a choice of identity is a
 /// setting, not a change to the repository.
 pub(crate) fn set(repo: &RepoRef, request: &Request) -> Dispatched {
@@ -475,29 +529,23 @@ pub(crate) fn set(repo: &RepoRef, request: &Request) -> Dispatched {
         Ok(a) => a,
         Err(e) => return err(request.id, format!("invalid arguments: {e}"), false),
     };
-    if matches!(
-        args.profile.https,
-        Some(HttpsAuth::Helper { .. }) | Some(HttpsAuth::TokenCommand { .. })
-    ) {
-        // Whatever `confirm` says: running a command needs the trust and
-        // hash pinning of a later slice.
-        let error =
-            unavailable("the credential helper and token command sources are not available yet");
-        return failed(request, error.to_string(), error.typed(), None);
-    }
     if let Err(message) = validate(&args.profile) {
         return err(request.id, format!("invalid profile: {message}"), false);
     }
     let Some(paths) = ConfigPaths::discover() else {
         return err(request.id, "no configuration directory".into(), false);
     };
-    match gitpoulpi_session::save_repo_auth(
-        &paths,
-        &repo.root,
-        &args.profile,
-        gitpoulpi_core::time::unix_now(),
-    ) {
-        Ok(()) => ok(request.id, Value::Null, true),
+    let now = gitpoulpi_core::time::unix_now();
+    let mut profile = args.profile;
+    if let Err(error) = settle_command(&repo.root, &paths, &mut profile, args.confirm, now) {
+        return failed(request, error.to_string(), error.typed(), None);
+    }
+    match gitpoulpi_session::save_repo_auth(&paths, &repo.root, &profile, now) {
+        Ok(()) => {
+            // Whatever token the previous profile made is not this one's.
+            crate::token_command::forget_root(&repo.root);
+            ok(request.id, Value::Null, true)
+        }
         Err(message) => err(request.id, message, false),
     }
 }
@@ -507,6 +555,7 @@ pub(crate) fn clear(repo: &RepoRef, request: &Request) -> Dispatched {
     let Some(paths) = ConfigPaths::discover() else {
         return ok(request.id, Value::Bool(false), false);
     };
+    crate::token_command::forget_root(&repo.root);
     match gitpoulpi_session::clear_repo_auth(&paths, &repo.root) {
         // Nothing to clear is not a change: nothing is broadcast.
         Ok(had) => ok(request.id, Value::Bool(had), had),

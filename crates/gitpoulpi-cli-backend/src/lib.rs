@@ -8,6 +8,7 @@
 mod branch;
 mod cancel_cleanup;
 mod checkout;
+mod command_run;
 mod commit;
 mod conflicts;
 mod content;
@@ -95,6 +96,7 @@ use gitpoulpi_core::{GitBackend, Result};
 /// differing oid does *not* count as pushed lives in exactly one place,
 /// not once per backend.
 pub use cancel_cleanup::remove_stale_transfer_files;
+pub use command_run::{run_command, CommandOutput, CommandRunError};
 pub use content::{body_of, lfs_local_object};
 pub use reflog_ops::reflog_via_git;
 pub use refs::{apply_tag_sync, tag_sync_for};

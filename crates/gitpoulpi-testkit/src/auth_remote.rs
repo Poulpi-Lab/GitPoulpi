@@ -17,6 +17,13 @@ use std::net::{TcpListener, TcpStream};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Mode {
+    AskThenNotFound,
+    Accepting,
+    AlwaysUnauthorized,
+}
+
 /// See the module docs.
 pub struct AuthHttpRemote {
     port: u16,
@@ -27,16 +34,23 @@ pub struct AuthHttpRemote {
 
 impl AuthHttpRemote {
     pub fn start() -> Self {
-        Self::start_with(false)
+        Self::start_with(Mode::AskThenNotFound)
+    }
+
+    /// Answers `401` to every request, credentials or not: the server
+    /// refuses whatever token it is given (git then reports it rejected,
+    /// `credential reject`, which helpers see as `erase`).
+    pub fn start_rejecting() -> Self {
+        Self::start_with(Mode::AlwaysUnauthorized)
     }
 
     /// Like [`Self::start`], but a request with a `Basic` header gets the
     /// advertisement of an empty repository: `ls-remote` and `fetch` succeed.
     pub fn start_accepting() -> Self {
-        Self::start_with(true)
+        Self::start_with(Mode::Accepting)
     }
 
-    fn start_with(accepting: bool) -> Self {
+    fn start_with(mode: Mode) -> Self {
         let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind the auth remote");
         let port = listener.local_addr().unwrap().port();
         let seen = Arc::new(Mutex::new(Vec::new()));
@@ -51,7 +65,7 @@ impl AuthHttpRemote {
                     }
                     let Ok(stream) = stream else { continue };
                     let (seen, requests) = (seen.clone(), requests.clone());
-                    std::thread::spawn(move || serve(stream, &seen, &requests, accepting));
+                    std::thread::spawn(move || serve(stream, &seen, &requests, mode));
                 }
             });
         }
@@ -102,12 +116,7 @@ impl Drop for AuthHttpRemote {
     }
 }
 
-fn serve(
-    mut stream: TcpStream,
-    seen: &Mutex<Vec<String>>,
-    requests: &Mutex<usize>,
-    accepting: bool,
-) {
+fn serve(mut stream: TcpStream, seen: &Mutex<Vec<String>>, requests: &Mutex<usize>, mode: Mode) {
     let mut head = Vec::new();
     let mut buf = [0u8; 2048];
     while !head.windows(4).any(|w| w == b"\r\n\r\n") {
@@ -132,9 +141,9 @@ fn serve(
     if let Some(value) = authorization {
         seen.lock().unwrap().push(value);
     }
-    let answer: Vec<u8> = if basic && accepting {
+    let answer: Vec<u8> = if basic && mode == Mode::Accepting {
         empty_repository_advertisement()
-    } else if basic {
+    } else if basic && mode == Mode::AskThenNotFound {
         b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n".to_vec()
     } else {
         b"HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"gitpoulpi-test\"\r\n\

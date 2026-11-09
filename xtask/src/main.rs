@@ -39,6 +39,9 @@ Tasks:
   sign --dir <dist> [--version <v>]
                     minisign every release asset (MINISIGN_SECRET_KEY and
                     MINISIGN_PASSWORD from the environment) (--help).
+  advisories [--json|--markdown] [--no-paths]
+                    query OSV for every Cargo.lock crate, drop deny.toml's
+                    ignored ids, exit 1 on any left (--help).
   advisory check|add
                     validate or extend security/advisories.json (--help).
   merge-fixture     build a repository stopped on a conflicting merge, to open
@@ -71,6 +74,7 @@ fn main() {
         "licenses" => xtask::licenses::run(rest),
         "lock-age" => xtask::lock_age::run(rest),
         "sign" => xtask::sign::run(rest),
+        "advisories" => xtask::advisories::run(rest),
         "advisory" => xtask::advisory::run(rest),
         "test" => xtask::test_tiers::run(rest),
         "merge-fixture" => xtask::merge_fixture::run(rest),

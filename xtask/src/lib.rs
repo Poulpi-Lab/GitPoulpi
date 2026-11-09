@@ -5,6 +5,7 @@
 //! The library half exists for `pty`: it is how the TUI is verified, both
 //! from `crates/gitpoulpi-tui/tests/` and interactively.
 
+pub mod advisories;
 pub mod advisory;
 pub mod custom_build;
 pub mod desktop_lock;

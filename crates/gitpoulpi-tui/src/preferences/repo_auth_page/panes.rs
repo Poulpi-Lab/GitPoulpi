@@ -115,7 +115,10 @@ impl TextPane {
         }
     }
 
-    pub(super) fn render(&mut self, buf: &mut Buffer, pane: Rect) {
+    /// Paints the pane in `pane`; `bordered`: it draws its own frame (else
+    /// it sits on the frame of a panel that has painted one already, and
+    /// only its scrollbar goes on that frame's right edge).
+    pub(super) fn render(&mut self, buf: &mut Buffer, pane: Rect, bordered: bool) {
         use ratatui::widgets::{Block, BorderType, Borders, Widget};
         self.rect = pane;
         self.track = None;
@@ -123,12 +126,14 @@ impl TextPane {
             return;
         }
         let panel = th().ui.panel;
-        Block::default()
-            .borders(Borders::ALL)
-            .border_type(BorderType::Rounded)
-            .border_style(Style::default().fg(th().ui.muted).bg(panel))
-            .style(Style::default().bg(panel))
-            .render(pane, buf);
+        if bordered {
+            Block::default()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded)
+                .border_style(Style::default().fg(th().ui.muted).bg(panel))
+                .style(Style::default().bg(panel))
+                .render(pane, buf);
+        }
         let text_x = pane.x + 2;
         let text_w = pane.width.saturating_sub(4) as usize;
         let rows = pane.height.saturating_sub(2) as usize;
@@ -262,22 +267,10 @@ impl ResultsPane {
         self.frame = rect;
         dialog_kit::fill(buf, rect, Style::default().bg(th().ui.panel));
         self.close.panel(buf, rect, t::RESULTS_TITLE.get());
-        let inner = Rect::new(
-            rect.x + 1,
-            rect.y + 1,
-            rect.width.saturating_sub(2),
-            rect.height.saturating_sub(3),
-        );
-        self.pane.render(buf, inner);
-        let muted = Style::default().fg(th().ui.muted).bg(th().ui.panel);
-        dialog_kit::put(
-            buf,
-            rect.x + 2,
-            rect.bottom().saturating_sub(2),
-            t::RESULTS_HINT.get(),
-            rect.width.saturating_sub(4),
-            muted,
-        );
+        // The pane sits on the panel's own frame: one box, the bar on its
+        // right edge, the key hint on the bottom border.
+        self.pane.render(buf, rect, false);
+        crate::preferences::editor_close::footer(buf, rect, t::RESULTS_HINT.get());
     }
 }
 
@@ -437,7 +430,7 @@ impl CommandConfirm {
             body.width + 2,
             a1_y.saturating_sub(y),
         );
-        self.pane.render(buf, pane);
+        self.pane.render(buf, pane, true);
         self.answers = [Rect::default(); 2];
         for (i, (label, row)) in [
             (t::ANSWER_SAVE.get(), a1_y),

@@ -624,3 +624,50 @@ fn the_page_draws_at_narrow_and_wide_widths() {
         insta::assert_snapshot!(format!("ssh_credentials_{w}"), text);
     }
 }
+
+#[test]
+fn a_view_that_lands_while_a_dropdown_is_open_waits_for_it() {
+    let dir = tempfile::tempdir().unwrap();
+    let (mut st, _q) = page(dir.path());
+    // Not loaded yet: the status row says so, at the end of the page, so
+    // no row above it moves when the view arrives.
+    let before: Vec<String> = labels(&st);
+    assert_eq!(before.last().unwrap(), "Reading the sign-in settings...");
+    select(&mut st, "Sign in with");
+    st.activate();
+    assert!(st.choice.is_some());
+    st.repo_auth.get = Some(Reply::ready(Ok(RepoAuthView {
+        remotes: vec![RemoteIdentity {
+            remote: "origin".into(),
+            url: "https://h/x.git".into(),
+            transport: RemoteTransport::Https,
+            identity: "system git".into(),
+        }],
+        ..RepoAuthView::default()
+    })));
+    st.poll_repo_auth();
+    assert!(!st.repo_auth.loaded, "the view waits while the dropdown is open");
+    st.on_key(key(KeyCode::Esc));
+    assert!(st.choice.is_none());
+    st.poll_repo_auth();
+    assert!(st.repo_auth.loaded);
+}
+
+#[test]
+fn a_mouse_pick_in_a_choice_dropdown_changes_the_draft() {
+    let dir = tempfile::tempdir().unwrap();
+    let (mut st, _q) = page(dir.path());
+    loaded(&mut st);
+    select(&mut st, "Sign in with");
+    st.activate();
+    let screen = draw_screen(&mut st);
+    let (row, text) = screen
+        .lines()
+        .enumerate()
+        .find(|(_, l)| l.contains("Token command"))
+        .unwrap();
+    let col = text[..text.find("Token command").unwrap()].chars().count() as u16;
+    st.on_mouse(MouseEventKind::Down(MouseButton::Left), col + 1, row as u16);
+    st.on_mouse(MouseEventKind::Up(MouseButton::Left), col + 1, row as u16);
+    assert_eq!(st.repo_auth.draft.https, HttpsKind::TokenCommand, "{screen}");
+}

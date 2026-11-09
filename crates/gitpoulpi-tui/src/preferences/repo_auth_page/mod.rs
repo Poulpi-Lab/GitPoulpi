@@ -201,7 +201,11 @@ impl PreferencesState {
                 ra.keys_rx = None;
             }
         }
-        if let Some(answer) = ra.get.as_ref().and_then(Reply::take) {
+        // A view that lands while a row is being edited or a dropdown is
+        // open would shift the rows under the person's hands: it waits.
+        let holding = self.choice.is_some() || self.edit.is_some();
+        let ra = &mut self.repo_auth;
+        if let Some(answer) = ra.get.as_ref().filter(|_| !holding).and_then(Reply::take) {
             ra.get = None;
             match answer {
                 Ok(view) => self.ra_view_arrived(view),
@@ -656,13 +660,6 @@ impl PreferencesState {
         let d = &ra.draft;
         let target = Target::RepoAuth;
         let mut f = vec![Field::plain(t::INTRO.get(), Control::Info(String::new()), Target::None)];
-        if !ra.loaded {
-            f.push(Field::plain(
-                ra.status.as_deref().unwrap_or(t::LOADING.get()),
-                Control::Info(String::new()),
-                Target::None,
-            ));
-        }
 
         // -- HTTPS ----------------------------------------------------------------
         f.push(Field::heading(t::HEADING_HTTPS.get()));
@@ -930,6 +927,7 @@ impl PreferencesState {
                 crate::activity::spinner_frame(run.started.elapsed()),
             )),
             Some(_) => None,
+            None if !ra.loaded => Some(t::LOADING.get().to_string()),
             None => ra
                 .status
                 .clone()

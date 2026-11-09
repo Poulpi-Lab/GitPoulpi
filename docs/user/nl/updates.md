@@ -8,7 +8,7 @@ GitPoulpi controleert of er nieuwere releases zijn en vervangt, afhankelijk van 
 
 De titelbalk toont de draaiende versie (`v1.0.0`) tussen de appnaam en het pad van de repository. Zodra een nieuwere release bekend is, verandert de chip in `v0.2.0 beschikbaar` in de accentkleur.
 
-Klik op de chip, druk op `Ctrl+N` en dan `u`, of voer **Updates: Updatepaneel tonen** uit in het opdrachtpalet (`Ctrl+P`): het updatepaneel opent. Het is een venster boven de app: `Esc`, `q`, het sluitkruisje of een klik buiten het venster sluit het. Het toont:
+Druk op `Ctrl+N` en dan `u`, voer **Updates: Updatepaneel tonen** uit in het opdrachtpalet (`Ctrl+P`), of klik op de chip terwijl die `beschikbaar` meldt (of terwijl een update bezig is): het updatepaneel opent. Zonder nieuwere release opent een klik op de chip in plaats daarvan het tabblad Releasenotes. Het is een venster boven de app: `Esc`, `q`, het sluitkruisje of een klik buiten het venster sluit het. Het toont:
 
 - de draaiende versie en **Geïnstalleerd via**: hoe GitPoulpi op deze computer is gekomen (dat bepaalt alles hieronder);
 - hoe de update ervoor staat (controleren, downloaden met een percentage, klaar, mislukt);

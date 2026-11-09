@@ -2460,8 +2460,8 @@ preferences_list_remove = "Het geselecteerde lijstitem verwijderen"
 preferences_list_move_up = "Het geselecteerde lijstitem omhoog verplaatsen"
 preferences_list_move_down = "Het geselecteerde lijstitem omlaag verplaatsen"
 ai_popup_copy = "Het resultaat kopiëren"
-activity_log_scroll_left = "Scroll the Activity Log Left"
-activity_log_scroll_right = "Scroll the Activity Log Right"
+activity_log_scroll_left = "Het activiteitenlogboek naar links scrollen"
+activity_log_scroll_right = "Het activiteitenlogboek naar rechts scrollen"
 integrations_add = "Een profiel toevoegen"
 integrations_edit = "Het geselecteerde profiel bewerken"
 integrations_open_token = "De tokenpagina openen"
@@ -2527,7 +2527,7 @@ folder_picker = "Mapkiezer"
 preferences = "Instellingen"
 ai_popup = "AI-resultaatpopup"
 integrations = "Instellingen: pagina Integraties"
-activity_log = "Activity Log window"
+activity_log = "Venster Activiteitenlogboek"
 palette = "Palet-opdrachten"
 split = "Editor voor het splitsen van een {$commit}"
 
@@ -4587,8 +4587,8 @@ not_blocked = "het laatste ongedaan-maken-item is niet geblokkeerd"
 forget_button = "Vergeten"
 
 [undo_ui]
-nothing_to_undo = { git = "niets om ongedaan te maken (een push, een fetch of iets anders op een remote server wordt nooit teruggedraaid)", local = "niets om ongedaan te maken (een push, een ophaalactie of iets anders op een remote server wordt nooit teruggedraaid)" }
-tip_nothing_to_undo = { git = "Niets om ongedaan te maken (een push, een fetch of iets anders op een remote server wordt nooit teruggedraaid)", local = "Niets om ongedaan te maken (een push, een ophaalactie of iets anders op een remote server wordt nooit teruggedraaid)" }
+nothing_to_undo = { git = "niets om ongedaan te maken (een {$push_noun}, een {$fetch_noun} of iets anders op een remote server wordt nooit teruggedraaid, behalve het verwijderen van een remote branch of {$tag})", local = "niets om ongedaan te maken (een {$push_noun}, een {$fetch_noun} of iets anders op een remote server wordt nooit teruggedraaid, behalve het verwijderen van een remote branch of {$tag})" }
+tip_nothing_to_undo = { git = "Niets om ongedaan te maken (een {$push_noun}, een {$fetch_noun} of iets anders op een remote server wordt nooit teruggedraaid, behalve het verwijderen van een remote branch of {$tag})", local = "Niets om ongedaan te maken (een {$push_noun}, een {$fetch_noun} of iets anders op een remote server wordt nooit teruggedraaid, behalve het verwijderen van een remote branch of {$tag})" }
 tip_nothing_to_redo = "Niets om opnieuw te doen"
 nothing_to_redo = "niets om opnieuw te doen"
 disabled = "Ongedaan maken staat uit (Instellingen > Algemeen)"
@@ -5046,7 +5046,7 @@ conflict_not_conflicted = "het bestand heeft geen conflict"
 conflict_already = "het bestand is nog in conflict"
 conflict_no_operation = "er is geen {$merge}, {$rebase}, {$cherry_pick} of revert bezig"
 conflict_unencodable = "regel {line} heeft een teken dat de codering van het bestand niet kan weergeven"
-conflict_local_changes = "local changes the abort would overwrite: {paths}"
+conflict_local_changes = "lokale wijzigingen die het afbreken zou overschrijven: {paths}"
 undo_refused = "kan niet ongedaan maken/opnieuw doen: {reason}"
 undo_in_progress = "rond eerst de {op} af of breek hem af"
 undo_ref_moved = "{name} staat op {actual}, niet op {expected} waar de bewerking hem achterliet; hij is buiten GitPoulpi gewijzigd"
@@ -5075,8 +5075,8 @@ undo_already_restored = "alles wat deze bewerking verwijderde, is al terug"
 undo_no_such_entry = "er is geen bewerking nr. {id} in de geschiedenis van ongedaan maken"
 split_refused = "die {$commit} kan niet worden gesplitst: {reason}"
 undo_purged = "de oude geschiedenis van bewerking #{entry} is opgeruimd, dus die kan niet ongedaan of opnieuw worden gemaakt"
-undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
-undo_remote_object_missing = "{object} is no longer in this repository (it was garbage collected), so the branch or {$tag} cannot be restored on the remote with a {$push_noun}"
+undo_remote_ref_moved = "{name} op {remote} staat op {actual}, niet op {expected} waar de bewerking hem achterliet; hij is sindsdien op de remote gewijzigd, dus er is daar niets gepusht of verwijderd"
+undo_remote_object_missing = "{object} staat niet meer in deze repository (het is door garbage collection opgeruimd), dus de branch of {$tag} kan niet met een {$push_noun} op de remote worden hersteld"
 
 [window]
 connecting = "verbinden met de sessiedaemon..."
@@ -5926,17 +5926,17 @@ scope_all = "Alle repositories"
 scope_workspace = "Werkruimte: {name}"
 app_wide = "app-breed"
 git_empty = "Nog geen bewerkingen. De bewerkingen van het gekozen bereik staan hier, met hoe lang ze duurden."
-hint_git = "Omhoog/omlaag: kiezen  Enter: details  c: kopiëren  r: voorgestelde actie  d: diagnose  s: bereik  Tab: applicatie  Esc: sluiten"
+hint_git = "Omhoog/omlaag: kiezen  Links/rechts: scrollen  Enter: details  c: kopiëren  r: voorgestelde actie  d: diagnose  s: bereik  Tab: applicatie  Esc: sluiten"
 hint_application = "Pijlen: scrollen  l: niveau  /: filter  c: alles kopiëren  o: map  x: wissen  d: diagnose  s: bereik  g: git  Esc: sluiten"
 palette_scope = "Activiteitenlogboek: Het bereik kiezen"
 palette_git_tab = "Activiteitenlogboek: Git-bewerkingen"
 palette_app_tab = "Activiteitenlogboek: Applicatielogboek"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the left
-palette_scroll_left = "Activity Log: Scroll Left"
+palette_scroll_left = "Activiteitenlogboek: Naar links scrollen"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the right
-palette_scroll_right = "Activity Log: Scroll Right"
+palette_scroll_right = "Activiteitenlogboek: Naar rechts scrollen"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
-help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
+help_scroll = "Activiteitenlogboek: lange regels zijwaarts scrollen (ook Shift + wiel, of de horizontale schuifbalk)"
 
 [git_error]
 summary_host_key = "De SSH-hostsleutel van de remote is nog niet bekend."
@@ -5965,9 +5965,9 @@ summary_network = "De remote is niet bereikbaar."
 hint_network = "Controleer je verbinding en het adres van de remote en probeer opnieuw."
 summary_lock = "Een ander git-proces gebruikt deze repository."
 hint_lock = "Sluit andere git-programma's, of verwijder het vergrendelbestand als er geen draait."
-summary_credential_helper = "The configured credential helper failed: {line}"
-hint_credential_helper = "Run `git config --show-origin --get-all credential.helper` to see where it is set, fix or remove that helper, then retry."
-hint_abort_blocked = "Save a copy of the changes to those files or discard them in the Status pane, then retry the abort."
+summary_credential_helper = "De ingestelde helper voor inloggegevens is mislukt: {line}"
+hint_credential_helper = "Voer `git config --show-origin --get-all credential.helper` uit om te zien waar hij is ingesteld, repareer of verwijder die helper en probeer het opnieuw."
+hint_abort_blocked = "Sla een kopie van de wijzigingen in die bestanden op of verwerp ze in het paneel Status en probeer het afbreken opnieuw."
 action_pull_first = "Eerst {$pull}"
 action_integrations = "Integraties openen"
 action_stash_retry = "{$Stash} en opnieuw"
@@ -8943,100 +8943,100 @@ sensitive_stage = "gevoelige bestanden zijn niet gestaged: {files}; vraag het de
 
 [ai_limits]
 # context: Settings > AI, heading of the rows that limit how much input an AI request carries
-settings_heading = "Limits"
+settings_heading = "Limieten"
 # context: Settings > AI, label of a number: the most bytes one merge conflict may add up to when the AI is asked to resolve it
-conflict_label = "Largest conflict to send (bytes)"
+conflict_label = "Grootste conflict om te verzenden (bytes)"
 # context: help under that number
-conflict_help = "Over this size, Suggest a resolution does not fail: it warns, and you can send it anyway once, open this setting or cancel. The limit is GitPoulpi's own guard, not the model's: raise it when your model has the room. 40000 by default."
+conflict_help = "Boven deze grootte mislukt \"Oplossing voorstellen\" niet: er volgt een waarschuwing en je kunt het toch één keer verzenden, deze instelling openen of annuleren. De limiet is de eigen beveiliging van GitPoulpi, niet die van het model: verhoog hem als je model genoeg ruimte heeft. Standaard 40000."
 # context: red warning under that number while it is very large
-conflict_warning = "A very large limit can send more than the model accepts: the request then fails at the provider."
+conflict_warning = "Een zeer hoge limiet kan meer verzenden dan het model accepteert: het verzoek mislukt dan bij de provider."
 # context: title of the dialog shown when a conflict is over the limit
-too_large_title = "Conflict too large to send"
+too_large_title = "Conflict te groot om te verzenden"
 # context: body of that dialog; {path} is the file, {size} the conflict's size (for example "48.1 KB (49206 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-too_large_body = "The conflict in {path} is {size}, and the limit is {limit} (setting {key}). The limit is GitPoulpi's own guard, not the model's. If you send it anyway, secrets are still replaced and sensitive files are still left out."
+too_large_body = "Het conflict in {path} is {size} en de limiet is {limit} (instelling {key}). De limiet is de eigen beveiliging van GitPoulpi, niet die van het model. Als je het toch verzendt, worden geheimen nog steeds vervangen en gevoelige bestanden nog steeds weggelaten."
 # context: button that sends the oversized conflict this one time
-send_anyway = "Send anyway"
+send_anyway = "Toch verzenden"
 # context: button that opens Settings on the limit
-open_setting = "Open setting"
+open_setting = "Instelling openen"
 # context: key of the Send anyway button, one letter (shown as "Send anyway (S)")
-key_send = "s"
+key_send = "t"
 # context: key of the Open setting button, one letter
-key_open = "o"
+key_open = "i"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "a"
 # context: Settings > AI, label of a number: the most bytes of the {$diff} an AI request for a message, an explanation, a stash name, a request description, a commit plan or a split may carry; also the whole {$diff} of a code review
-diff_label = "Largest {$diff} to send (bytes)"
+diff_label = "Grootste {$diff} om te verzenden (bytes)"
 # context: help under that number
-diff_help = "Over this size, nothing is cut silently: you are asked whether to send all of the {$diff}, send it truncated, open this setting or cancel. Applies to a message for a {$commit}, an explanation, a name for a {$stash}, a description of a request, a plan of {$commits} and a split, and to the whole {$diff} of a code review. 60000 by default."
+diff_help = "Boven deze grootte wordt niets stilzwijgend afgekapt: er wordt gevraagd of je alles wilt verzenden, ingekort wilt verzenden, deze instelling wilt openen of wilt annuleren. Geldt voor een bericht voor een {$commit}, een uitleg, de naam van een {$stash}, de beschrijving van een verzoek, een plan van {$commits} en een splitsing, en voor de totale omvang van {$diff} in een review. Standaard 60000."
 # context: Settings > AI, label of a number: the most bytes of one file's {$diff} in a code review
-review_file_label = "Largest file {$diff} in a review (bytes)"
+review_file_label = "Grootste {$diff} per bestand in een review (bytes)"
 # context: help under that number
-review_file_help = "Over this size, one file's {$diff} in a code review is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 12000 by default."
+review_file_help = "Boven deze grootte wordt de inhoud van {$diff} van één bestand in een review ingekort, nadat er is gevraagd: alles verzenden, ingekort verzenden, deze instelling openen of annuleren. Standaard 12000."
 # context: Settings > AI, label of a number: the most bytes of the description of the reviewed request
-review_text_label = "Largest review description (bytes)"
+review_text_label = "Grootste reviewbeschrijving (bytes)"
 # context: help under that number
-review_text_help = "Over this size, the description of the reviewed request is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 4000 by default."
+review_text_help = "Boven deze grootte wordt de beschrijving van het beoordeelde verzoek ingekort, nadat er is gevraagd: alles verzenden, ingekort verzenden, deze instelling openen of annuleren. Standaard 4000."
 # context: Settings > AI, label of a number: the most bytes of the comments that already exist on the reviewed request
-review_threads_label = "Largest list of existing comments in a review (bytes)"
+review_threads_label = "Grootste lijst bestaande opmerkingen in een review (bytes)"
 # context: help under that number
-review_threads_help = "The comments that already exist are listed so the model does not repeat them. Over this size, the list is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 6000 by default."
+review_threads_help = "De bestaande opmerkingen worden vermeld zodat het model ze niet herhaalt. Boven deze grootte wordt de lijst ingekort, nadat er is gevraagd: alles verzenden, ingekort verzenden, deze instelling openen of annuleren. Standaard 6000."
 # context: Settings > AI, label of a number: the most bytes of one project context file (CLAUDE.md, AGENTS.md, the extra file) given to a code review
-review_context_file_label = "Largest context file in a review (bytes)"
+review_context_file_label = "Grootste contextbestand in een review (bytes)"
 # context: help under that number
-review_context_file_help = "Over this size, a context file (CLAUDE.md, AGENTS.md or the extra file) is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 8192 by default."
+review_context_file_help = "Boven deze grootte wordt een contextbestand (CLAUDE.md, AGENTS.md of het extra bestand) ingekort, nadat er is gevraagd: alles verzenden, ingekort verzenden, deze instelling openen of annuleren. Standaard 8192."
 # context: Settings > AI, label of a number: the most bytes of all the project context files together
-review_context_label = "Largest context in a review, all files (bytes)"
+review_context_label = "Grootste context in een review, alle bestanden (bytes)"
 # context: help under that number
-review_context_help = "Over this size, the context files together are cut (the last one is shortened or left out), after you were asked: send all of them, send them truncated, open this setting or cancel. 16384 by default."
+review_context_help = "Boven deze grootte worden de contextbestanden samen ingekort (het laatste wordt verkort of weggelaten), nadat er is gevraagd: alles verzenden, ingekort verzenden, deze instelling openen of annuleren. Standaard 16384."
 # context: title of the dialog shown when what would be sent to the AI is over a limit and would be cut
-truncate_title = "Over the AI limit"
+truncate_title = "Boven de AI-limiet"
 # context: first paragraph of that dialog, before the list of what is over its limit
-truncate_intro = "Some of what would be sent to the AI is over a limit GitPoulpi sets (the limits are GitPoulpi's own guard, not the model's):"
+truncate_intro = "Een deel van wat naar de AI zou worden verzonden, is groter dan een limiet van GitPoulpi (de limieten zijn de eigen beveiliging van GitPoulpi, niet die van het model):"
 # context: last paragraph of that dialog, explaining the buttons
-truncate_outro = "Send all sends everything this one time. Send truncated cuts what is over its limit, as described above. Either way, secrets are still replaced and sensitive files are still left out."
+truncate_outro = "Alles verzenden verzendt alles, één keer. Ingekort verzenden kort in wat boven zijn limiet zit, zoals hierboven beschreven. In beide gevallen worden geheimen nog steeds vervangen en gevoelige bestanden nog steeds weggelaten."
 # context: list line of that dialog; {size} is the {$diff}'s size (for example "91.2 KB (91234 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-part_diff = "The {$diff} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_diff = "{$Diff}: {size}, limiet {limit} (instelling {key}). Ingekort wordt het einde weggelaten."
 # context: list line of that dialog, for the {$commit} being split; sizes like the line above
-part_hunks = "The changes of the {$commit} are {size}, limit {limit} (setting {key}). Truncated, the last ones lose their {$diff}."
+part_hunks = "De wijzigingen van de {$commit} zijn {size}, limiet {limit} (instelling {key}). Ingekort verliezen de laatste hun {$diff}."
 # context: list line of that dialog, for a code review; {name} is the list of files that do not fit
-part_review_diff = "Files that do not fit the review: {name}. The review is {size}, limit {limit} (setting {key}). Truncated, they are left out."
+part_review_diff = "Bestanden die niet in de review passen: {name}. De review is {size}, limiet {limit} (instelling {key}). Ingekort worden ze weggelaten."
 # context: list line of that dialog, for one file of a code review; {name} is its path
-part_review_file = "The {$diff} of {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_file = "{$Diff} van {name}: {size}, limiet {limit} (instelling {key}). Ingekort wordt het einde weggelaten."
 # context: list line of that dialog, for the description of the reviewed request
-part_review_text = "The description is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_text = "De beschrijving is {size}, limiet {limit} (instelling {key}). Ingekort wordt het einde weggelaten."
 # context: list line of that dialog, for the comments that already exist on the reviewed request
-part_review_threads = "The existing comments are {size}, limit {limit} (setting {key}). Truncated, the last ones are left out."
+part_review_threads = "De bestaande opmerkingen zijn {size}, limiet {limit} (instelling {key}). Ingekort worden de laatste weggelaten."
 # context: list line of that dialog, for one project context file of a code review; {name} is the file
-part_context_file = "The context file {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_context_file = "Het contextbestand {name} is {size}, limiet {limit} (instelling {key}). Ingekort wordt het einde weggelaten."
 # context: list line of that dialog, for the project context files together; {name} is the file that crossed the limit
-part_context_total = "The context files together reach {size} at {name}, limit {limit} (setting {key}). Truncated, the rest is left out."
+part_context_total = "De contextbestanden samen bereiken {size} bij {name}, limiet {limit} (instelling {key}). Ingekort wordt de rest weggelaten."
 # context: button that sends everything of the oversized request this one time, nothing cut
-send_all = "Send all"
+send_all = "Alles verzenden"
 # context: button that sends the request with what is over its limit cut
-send_truncated = "Send truncated"
+send_truncated = "Ingekort verzenden"
 # context: key of the Send all button, one letter (shown as "Send all (A)")
-key_send_all = "a"
+key_send_all = "v"
 # context: key of the Send truncated button, one letter (shown as "Send truncated (T)")
-key_send_truncated = "t"
+key_send_truncated = "k"
 
 [conflict_guard]
 # context: title of the dialog that says conflicts must be resolved before an action
-title = "Resolve the conflicts first"
+title = "Los eerst de conflicten op"
 # context: first line of that dialog; {n} files have unresolved conflicts
-count = { one = "{n} file still has conflicts", other = "{n} files still have conflicts" }
+count = { one = "{n} bestand heeft nog conflicten", other = "{n} bestanden hebben nog conflicten" }
 # context: last line of the list of files in that dialog; {n} more files are not listed
-more = "and {n} more"
+more = "en nog {n}"
 # context: second paragraph of the dialog when the AI commit composer was asked
-compose_hint = "The AI cannot split the changes into {$commits} while files have conflicts. Resolve them, then ask again."
+compose_hint = "De AI kan de wijzigingen niet in {$commits} splitsen zolang bestanden conflicten hebben. Los ze op en vraag het dan opnieuw."
 # context: second paragraph of the dialog when a commit was asked
-commit_hint = "A {$commit} needs every conflict resolved first. Resolve them, {$stage} the results, then {$commit} again."
+commit_hint = "Voor een {$commit} moet eerst elk conflict zijn opgelost. Los ze op, {$stage} de resultaten en {$commit} dan opnieuw."
 # context: button that opens the conflict resolution view
-resolve = "Resolve conflicts"
+resolve = "Conflicten oplossen"
 # context: key of the Resolve conflicts button, one letter (shown as "Resolve conflicts (R)")
-key_resolve = "r"
+key_resolve = "o"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "a"
 # context: label of the disabled Commit button while files have conflicts
-need_resolve = "Resolve conflicts to {$commit}"
+need_resolve = "Los conflicten op voor een {$commit}"
 # context: palette: why a command does nothing while files have conflicts
-why_commit = "files still have conflicts: resolve them first"
+why_commit = "bestanden hebben nog conflicten: los ze eerst op"

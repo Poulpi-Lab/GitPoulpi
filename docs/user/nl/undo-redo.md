@@ -145,6 +145,7 @@ De rijen zijn grijs (met de reden) zolang hun weergave niet open is; de drie ope
 | Lokale wijzigingen | stage en unstage (bestand, map, hunk, regels, alles), verwerpen (bestand, map, hunk, regels, een bestandscheckout), een patch toepassen, **een bestand van schijf verwijderen**, **negeren** (bestand, extensie of map: de regel in het `.gitignore` dat je koos), **als binair of tekst behandelen** (de regel in `.gitattributes`) |
 | Stashes | push, apply, pop, drop |
 | Remotes en configuratie | een remote toevoegen, verwijderen, hernoemen, de URL of push-URL wijzigen, Git LFS track en untrack |
+| Op een server | **een branch of tag op een remote verwijderen** (via het menu van de ref, het palet, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, of een workflow-afronding die de remote branch verwijdert): zie hieronder |
 
 Terwijl een merge, cherry-pick of revert op conflicten is gestopt, zijn
 **Opslaan & als opgelost markeren**, stagen en unstagen ook ongedaan te maken
@@ -166,11 +167,40 @@ remote ongedaan maken geeft zijn remote-trackingbranches, zijn
 `origin/HEAD`-alias en de upstream-instellingen van de branches die hem volgden
 terug.
 
+### Een branch of tag op een remote verwijderen
+
+Vóór het verwijderen vraagt GitPoulpi de server wat de branch of tag op dat moment
+bevat en legt dat vast: de remote, de naam en de exacte commit (bij een
+geannoteerde tag het tag-object zelf, zodat zijn annotatie behouden blijft). Het
+verwijderen gebeurt dan alleen als de server nog die waarde bevat.
+
+**Ongedaan maken pusht hem terug** onder dezelfde naam, op dezelfde commit, zonder ooit
+te forceren. Omdat dat een wijziging is op een server die anderen zien, vraagt Ongedaan maken
+**altijd eerst** en zegt dat ("Dit ongedaan maken maakt branch topic opnieuw aan op origin op
+3f2a1c0..."); de stappen van het item zeggen het ook (`gitpoulpi undo --dry-run`). Het gebruikt
+dezelfde inloggegevens als een push. De remote-trackingbranch komt mee terug.
+**Opnieuw** verwijdert hem weer, met dezelfde veiligheid.
+
+Ongedaan maken weigert, zonder iets te wijzigen, wanneer:
+
+- de branch of tag sindsdien **opnieuw op de remote is aangemaakt**, of is verplaatst: hij
+  staat op een andere commit dan de vastgelegde, en pushen zou het werk van
+  iemand anders overschrijven (de weigering noemt beide commits);
+- de commit (of het tag-object) **niet meer in je repository staat** (hij is door
+  garbage collection opgeruimd): het ongedaan maken kan niet.
+
+"Lokaal en op de remote verwijderen" is **één item**: Ongedaan maken herstelt de lokale en
+de remote branch of tag samen, Opnieuw verwijdert beide weer. Alleen de remote branch
+verwijderen laat de lokale ongemoeid; het ongedaan maken doet hetzelfde. Een
+workflow-afronding die ook de remote branch verwijdert, is als geheel ongedaan te maken.
+
 ## Wat niet ongedaan kan worden gemaakt, en waarom
 
-- **Alles op een server**: push, een remote branch of tag verwijderen, een tag
-  pushen, LFS push, lock en unlock. Die toestand wordt met anderen gedeeld; het
-  ongedaan maken zou weer een push zijn, en dat doet GitPoulpi niet voor je.
+- **Het meeste op een server**: push, een tag pushen, LFS push, lock en unlock,
+  een pull request openen. Die toestand wordt met anderen gedeeld; een push
+  ongedaan maken zou een force-push of een verwijdering aan hun kant zijn, en dat doet
+  GitPoulpi niet voor je. (Een remote branch of tag verwijderen is de uitzondering: het
+  ongedaan maken zet alleen terug wat de server bevatte, en weigert als daar iets is veranderd.)
   Ongedaan maken blokkeert ook nooit vanwege zo'n handeling.
 - **Fetch**: het verplaatst alleen remote-trackingrefs, die de server
   weerspiegelen. De volgende fetch zou het opnieuw doen.
@@ -294,7 +324,10 @@ Ongedaan maken vraagt alleen als het riskant is:
   je hebt gepubliceerd, en je zou het resultaat moeten force-pushen;
 - je hebt niet-gecommitte wijzigingen en het ongedaan maken verplaatst de
   werkmap: je wijzigingen blijven behouden, maar het ongedaan maken stopt zonder
-  iets te wijzigen als een ervan in een bestand zit dat het moet herschrijven.
+  iets te wijzigen als een ervan in een bestand zit dat het moet herschrijven;
+- het item verwijderde een branch of tag op een remote: het ongedaan maken **pusht hem
+  terug naar de server** (zie hierboven), dus het vraagt altijd, en de Opnieuw die hem daar
+  weer verwijdert ook.
 
 Opnieuw, en elke ongedaanmaking van een alleen-ref-verplaatsing, vraagt nooit:
 de andere richting is één toets verderop.
@@ -353,8 +386,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   (`--redo`: het nieuwste opnieuw-item). Het weigert als dat item niet geblokkeerd
   is, en eindigt met **3** zonder `--yes`. Voor MCP is het een mutatie, maar geen
   destructieve: de repository blijft onaangeroerd.
-- Afsluitcode **0** gedaan, **2** geweigerd (de JSON noemt de reden), **3**
-  riskant en vereist `--yes`.
+- Afsluitcode **0** gedaan, **2** geweigerd (de JSON noemt de reden, bijvoorbeeld
+  `RemoteRefMoved` wanneer een verwijderde remote branch opnieuw is aangemaakt), **3**
+  riskant en vereist `--yes` (het ongedaan maken van het verwijderen van een remote branch of tag,
+  wat naar de server pusht).
 
 Teruggaan zonder alles erna ongedaan te maken:
 

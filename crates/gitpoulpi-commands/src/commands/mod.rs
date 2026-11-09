@@ -37,10 +37,10 @@ mod lfs;
 #[cfg(feature = "mermaid")]
 mod log_mermaid;
 mod mailmap;
-mod repo_auth;
 mod rebase;
 mod refs;
 mod remote;
+mod repo_auth;
 #[cfg(feature = "history-rewrite")]
 pub(crate) mod rewrite;
 #[cfg(feature = "history-rewrite")]

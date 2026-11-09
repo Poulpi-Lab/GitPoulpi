@@ -195,13 +195,8 @@ fn goes_with(used: bool, flag: &str, with: &str) -> Result<(), String> {
 fn parse_https(source: &str, f: &SetFlags) -> Result<HttpsAuth, String> {
     let username = f.username.clone().filter(|u| !u.is_empty());
     let not_helper = |f: &SetFlags| goes_with(f.helper.is_some(), "--helper", "--https helper");
-    let not_command = |f: &SetFlags| {
-        goes_with(
-            !f.command.is_empty(),
-            "--command",
-            "--https token-command",
-        )
-    };
+    let not_command =
+        |f: &SetFlags| goes_with(!f.command.is_empty(), "--command", "--https token-command");
     let not_hosts = |f: &SetFlags| {
         goes_with(
             !f.hosts.is_empty(),
@@ -468,18 +463,20 @@ async fn test(
 ) -> Result<Emitted, String> {
     let identities: Vec<RemoteIdentity> = view(session).await?.remotes;
     let args = to_value(&RepoAuthTestArgs { remote, push })?;
-    let reports: Vec<RemoteAccessReport> =
-        match session.call_typed(OperationKind::RepoAuthTest, args).await? {
-            Ok(reports) => reports,
-            Err(e) => {
-                return match e.kind {
-                    Some(TypedError::RepoAuthUnavailable { reason }) => {
-                        Ok(refused("unavailable", reason, None))
-                    }
-                    _ => Err(e.message),
+    let reports: Vec<RemoteAccessReport> = match session
+        .call_typed(OperationKind::RepoAuthTest, args)
+        .await?
+    {
+        Ok(reports) => reports,
+        Err(e) => {
+            return match e.kind {
+                Some(TypedError::RepoAuthUnavailable { reason }) => {
+                    Ok(refused("unavailable", reason, None))
                 }
+                _ => Err(e.message),
             }
-        };
+        }
+    };
     let mut human = Vec::new();
     for r in &reports {
         let who = identities

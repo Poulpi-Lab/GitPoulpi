@@ -97,8 +97,7 @@ pub use repo::{
 };
 pub use repo_auth::{
     command_sha256, AuthOverride, HttpsAuth, RemoteIdentity, RepoAuthProfile, RepoAuthSetArgs,
-    RepoAuthTestArgs,
-    RepoAuthView, SshAuth,
+    RepoAuthTestArgs, RepoAuthView, SshAuth,
 };
 pub use restore::{RestoreItem, RestoreItemKind, RestoreOffer, RestoreOutcome};
 pub use rewrite::RewriteRefusal;

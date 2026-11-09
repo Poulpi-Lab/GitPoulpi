@@ -149,7 +149,13 @@ fn a_command_source_is_refused_cleanly_with_exit_code_2() {
 
     for args in [
         &[
-            "repo-auth", "set", "--https", "helper", "--helper", "store", "--yes",
+            "repo-auth",
+            "set",
+            "--https",
+            "helper",
+            "--helper",
+            "store",
+            "--yes",
         ][..],
         &[
             "repo-auth",
@@ -283,7 +289,14 @@ fn test_reports_each_remote_with_its_identity() {
     ok(
         root,
         session,
-        &["repo-auth", "set", "--https", "system", "--username", "alice"],
+        &[
+            "repo-auth",
+            "set",
+            "--https",
+            "system",
+            "--username",
+            "alice",
+        ],
     );
     let shown = ok(root, session, &["repo-auth", "show"]);
     let web = shown["remotes"]

@@ -32,7 +32,6 @@ pub use job::JobAction;
 #[cfg(feature = "lfs")]
 pub use lfs::LfsAction;
 pub use mailmap::MailmapAction;
-pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "ai")]
 pub use refs_misc::AiCommand;
 #[cfg(feature = "mcp")]
@@ -47,6 +46,7 @@ pub use refs_misc::{
     RepoConfigAction, ResetModeArg, ReviewFlags, RunInRepoArg, SessionAction, ShortcutAction,
     SparseAction, SshCommandAction, StashAction, TagAction, ThemeAction,
 };
+pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "history-rewrite")]
 pub use rewrite::{RewriteAction, RewriteRecipeArgs, RewriteScriptAction};
 pub use ui::{UiAction, UiProposeAction, UiShowAction};

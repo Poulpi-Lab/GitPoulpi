@@ -413,14 +413,14 @@ impl Highlight {
         let mut buf = String::new();
         while self.window_from + self.window.len() < to {
             let i = self.window_from + self.window.len();
-            if i % 8 == 0 && started.elapsed() >= budget {
+            if i.is_multiple_of(8) && started.elapsed() >= budget {
                 return false;
             }
             let Some((parse, hl)) = self.window_state.as_mut() else {
                 return true;
             };
             let at = i - self.window_from;
-            if at % WINDOW_STRIDE == 0 && self.window_marks.len() == at / WINDOW_STRIDE {
+            if at.is_multiple_of(WINDOW_STRIDE) && self.window_marks.len() == at / WINDOW_STRIDE {
                 self.window_marks.push((parse.clone(), hl.clone()));
             }
             let runs = parse_line(parse, hl, &self.highlighter, set, line_text(i), &mut buf);
@@ -450,13 +450,13 @@ impl Highlight {
         while self.lines.len() < upto {
             let i = self.lines.len();
             // Checked every few lines: `Instant::now` is not free.
-            if i % 8 == 0 && started.elapsed() >= budget {
+            if i.is_multiple_of(8) && started.elapsed() >= budget {
                 return false;
             }
             let Some((parse, hl)) = self.state.as_mut() else {
                 return true;
             };
-            if i % STRIDE == 0 && self.checkpoints.len() == i / STRIDE {
+            if i.is_multiple_of(STRIDE) && self.checkpoints.len() == i / STRIDE {
                 self.checkpoints.push((parse.clone(), hl.clone()));
             }
             let runs = parse_line(parse, hl, &self.highlighter, set, line_text(i), &mut buf);

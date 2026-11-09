@@ -281,7 +281,7 @@ fn route(
             let triggers = options
                 .bot_label
                 .as_ref()
-                .map_or(true, |l| issue.labels.iter().any(|x| x == l));
+                .is_none_or(|l| issue.labels.iter().any(|x| x == l));
             if let (Some(delay), true) = (options.bot_delay, triggers) {
                 let (bare, st, opts, issue) = (
                     options.bare.clone(),

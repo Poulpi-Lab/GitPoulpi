@@ -434,7 +434,7 @@ pub fn classify_sides(
 
     let is_text = |b: &Option<SideBlob>| {
         b.as_ref()
-            .map_or(true, |b| matches!(b.content, BlobContent::Text { .. }))
+            .is_none_or(|b| matches!(b.content, BlobContent::Text { .. }))
     };
     let mergeable = matches!(
         entry.kind,

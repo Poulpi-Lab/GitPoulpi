@@ -498,9 +498,7 @@ impl BoardView {
             drag.over = Self::column_of_hit(hit).or(drag.over);
             // At the left / right edge the columns scroll under the pointer.
             let (left, right) = (self.body_rect.x, self.body_rect.right());
-            let due = self
-                .edge_scroll
-                .map_or(true, |t| t.elapsed() >= EDGE_SCROLL);
+            let due = self.edge_scroll.is_none_or(|t| t.elapsed() >= EDGE_SCROLL);
             if due && right > left {
                 if mouse.column <= left && self.first_col > 0 {
                     self.first_col -= 1;

@@ -142,7 +142,7 @@ fn num(v: Option<&String>, name: &str) -> Result<usize, String> {
 /// side makes (so the Full file mode has something to color).
 pub fn big_versions(lines: usize, conflicts: usize) -> [String; 3] {
     let base_line = |i: usize| {
-        if i % 25 == 0 {
+        if i.is_multiple_of(25) {
             format!("pub fn step_{i}(input: &[u32], offset: u32) -> Option<u32> {{")
         } else if i % 25 == 24 {
             "}".to_string()

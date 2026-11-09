@@ -88,7 +88,7 @@ pub fn decide(reuse_window: bool, new_window: bool, windows: &[Window]) -> Decis
 pub fn most_recent_window(windows: &[Window]) -> Option<&Window> {
     let mut best: Option<&Window> = None;
     for w in windows {
-        let newer = best.map_or(true, |b| {
+        let newer = best.is_none_or(|b| {
             w.viewer.last_focus_at.unwrap_or(0) > b.viewer.last_focus_at.unwrap_or(0)
         });
         if newer {
@@ -143,7 +143,7 @@ pub fn split_new_window(args: &[String]) -> (bool, &[String]) {
 
 /// `ui.reuse_window` from the resolved config; on, when it cannot be read.
 fn reuse_window_setting(config: Option<&gitpoulpi_config::Config>) -> bool {
-    config.map_or(true, |c| c.ui.reuse_window)
+    config.is_none_or(|c| c.ui.reuse_window)
 }
 
 fn resolved_config() -> Option<gitpoulpi_config::Config> {

@@ -516,7 +516,7 @@ pub(crate) fn run_stage(
         if !active[k] {
             continue;
         }
-        if index % 64 == 0 {
+        if index.is_multiple_of(64) {
             tick(index)?;
         }
         let mut before = Vec::new();

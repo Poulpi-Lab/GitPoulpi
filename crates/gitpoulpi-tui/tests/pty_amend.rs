@@ -64,7 +64,7 @@ fn in_detail_pane(term: &Terminal, needle: &str) -> Option<(u16, u16)> {
                 continue;
             }
             let col = line[..byte].chars().count() as u16;
-            if best.map_or(true, |(c, _)| col > c) {
+            if best.is_none_or(|(c, _)| col > c) {
                 best = Some((col, row));
             }
         }

@@ -194,7 +194,7 @@ impl LogRows {
     pub(crate) fn is_shown(&self, i: usize) -> bool {
         self.shown
             .as_ref()
-            .map_or(true, |shown| shown.binary_search(&i).is_ok())
+            .is_none_or(|shown| shown.binary_search(&i).is_ok())
     }
 
     /// The display index of the `i`-th commit the Log draws (what a search

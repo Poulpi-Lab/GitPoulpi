@@ -96,7 +96,7 @@ pub(crate) fn decode_rgba(bytes: &[u8]) -> Result<Decoded, DecodeError> {
         ImageFormat::Bmp => bmp::decode_file(bytes)?,
         ImageFormat::Ico => decode_ico(bytes)?,
     };
-    let has_alpha = data.chunks_exact(4).any(|p| p[3] != 255);
+    let has_alpha = data.as_chunks::<4>().0.iter().any(|p| p[3] != 255);
     Ok(Decoded {
         format,
         bitmap: Bitmap {
@@ -130,7 +130,7 @@ fn decode_png(bytes: &[u8]) -> Result<(u32, u32, Vec<u8>), DecodeError> {
     match info.color_type {
         png::ColorType::Rgba if src.len() >= n * 4 => out.extend_from_slice(&src[..n * 4]),
         png::ColorType::Rgb if src.len() >= n * 3 => {
-            for p in src.chunks_exact(3).take(n) {
+            for p in src.as_chunks::<3>().0.iter().take(n) {
                 out.extend_from_slice(&[p[0], p[1], p[2], 255]);
             }
         }
@@ -140,7 +140,7 @@ fn decode_png(bytes: &[u8]) -> Result<(u32, u32, Vec<u8>), DecodeError> {
             }
         }
         png::ColorType::GrayscaleAlpha if src.len() >= n * 2 => {
-            for p in src.chunks_exact(2).take(n) {
+            for p in src.as_chunks::<2>().0.iter().take(n) {
                 out.extend_from_slice(&[p[0], p[0], p[0], p[1]]);
             }
         }
@@ -159,7 +159,7 @@ fn decode_jpeg(bytes: &[u8]) -> Result<(u32, u32, Vec<u8>), DecodeError> {
     let mut out = Vec::with_capacity(w as usize * h as usize * 4);
     match info.pixel_format {
         jpeg_decoder::PixelFormat::RGB24 => {
-            for p in px.chunks_exact(3) {
+            for p in px.as_chunks::<3>().0 {
                 out.extend_from_slice(&[p[0], p[1], p[2], 255]);
             }
         }
@@ -170,7 +170,7 @@ fn decode_jpeg(bytes: &[u8]) -> Result<(u32, u32, Vec<u8>), DecodeError> {
         }
         jpeg_decoder::PixelFormat::CMYK32 => {
             // Adobe CMYK JPEGs store inverted values: r = c * k / 255.
-            for p in px.chunks_exact(4) {
+            for p in px.as_chunks::<4>().0 {
                 let k = u32::from(p[3]);
                 let f = |c: u8| (u32::from(c) * k / 255) as u8;
                 out.extend_from_slice(&[f(p[0]), f(p[1]), f(p[2]), 255]);
@@ -245,7 +245,7 @@ fn decode_webp(bytes: &[u8]) -> Result<(u32, u32, Vec<u8>), DecodeError> {
         return Err(DecodeError::Corrupt);
     }
     let mut out = Vec::with_capacity(n * 4);
-    for p in buf.chunks_exact(3).take(n) {
+    for p in buf.as_chunks::<3>().0.iter().take(n) {
         out.extend_from_slice(&[p[0], p[1], p[2], 255]);
     }
     Ok((w, h, out))
@@ -265,7 +265,7 @@ fn decode_ico(bytes: &[u8]) -> Result<(u32, u32, Vec<u8>), DecodeError> {
         let size = u32::from_le_bytes([e[8], e[9], e[10], e[11]]) as usize;
         let off = u32::from_le_bytes([e[12], e[13], e[14], e[15]]) as usize;
         let area = w * h;
-        if best.map_or(true, |(a, b, _, _)| (area, bpp) > (a, b)) {
+        if best.is_none_or(|(a, b, _, _)| (area, bpp) > (a, b)) {
             best = Some((area, bpp, off, size));
         }
     }

@@ -49,9 +49,8 @@ pub(crate) fn pick(found: &[SessionViewers], repo: Option<&RepoId>) -> Pick {
     let mut hits: Vec<(&str, u16)> = Vec::new();
     for s in found {
         for v in &s.viewers {
-            let has_repo = repo.map_or(true, |r| {
-                v.tabs.contains(r) || v.active_repo.as_ref() == Some(r)
-            });
+            let has_repo =
+                repo.is_none_or(|r| v.tabs.contains(r) || v.active_repo.as_ref() == Some(r));
             if v.agent_control && has_repo {
                 hits.push((s.session.as_str(), s.port));
             }

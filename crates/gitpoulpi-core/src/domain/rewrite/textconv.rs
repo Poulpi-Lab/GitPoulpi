@@ -187,10 +187,10 @@ fn decode(bytes: &[u8], from: TextEncoding) -> Option<String> {
             let le = from == TextEncoding::Utf16Le;
             let bom: [u8; 2] = if le { [0xFF, 0xFE] } else { [0xFE, 0xFF] };
             let body = bytes.strip_prefix(&bom).unwrap_or(bytes);
-            if body.len() % 2 != 0 {
+            if !body.len().is_multiple_of(2) {
                 return None;
             }
-            let units = body.chunks_exact(2).map(|c| {
+            let units = body.as_chunks::<2>().0.iter().map(|c| {
                 if le {
                     u16::from_le_bytes([c[0], c[1]])
                 } else {
@@ -282,7 +282,7 @@ impl PathFilter {
     }
 
     pub fn matches(&self, path: &str) -> bool {
-        self.include.as_ref().map_or(true, |g| g.is_match(path))
+        self.include.as_ref().is_none_or(|g| g.is_match(path))
             && !self.exclude.as_ref().is_some_and(|g| g.is_match(path))
     }
 

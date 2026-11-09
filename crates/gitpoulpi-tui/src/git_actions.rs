@@ -124,7 +124,7 @@ pub(crate) fn remote_pill_candidates(
     refs: &[gitpoulpi_core::domain::Ref],
 ) -> Vec<String> {
     refs.iter()
-        .filter(|r| at.map_or(true, |c| r.target == c))
+        .filter(|r| at.is_none_or(|c| r.target == c))
         .filter_map(|r| match &r.kind {
             RefKind::RemoteBranch { remote, name } if name == branch => {
                 Some(format!("{remote}/{name}"))

@@ -223,7 +223,7 @@ pub(crate) fn display(raw: &str, tabs: Tabs) -> Cow<'_, str> {
                 Tabs::Expand(n) => n - (col % n),
                 Tabs::OneSpace => 1,
             };
-            out.extend(std::iter::repeat(' ').take(pad));
+            out.extend(std::iter::repeat_n(' ', pad));
             col += pad;
         } else {
             out.push(ch);

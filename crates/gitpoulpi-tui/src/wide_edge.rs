@@ -46,7 +46,9 @@ pub(crate) fn blank_cut_glyphs(buf: &mut Buffer, area: Rect) {
                 break;
             }
             let cell = &buf[(x, y)];
-            if !cell.skip && crate::display_width(cell.symbol()) as u16 > k {
+            if cell.diff_option != ratatui::buffer::CellDiffOption::Skip
+                && crate::display_width(cell.symbol()) as u16 > k
+            {
                 buf[(x, y)].set_symbol(" ");
             }
         }

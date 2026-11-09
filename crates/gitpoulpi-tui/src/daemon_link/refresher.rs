@@ -96,7 +96,7 @@ impl Refresher {
             let lfs_same = outcome
                 .read_hashes
                 .lfs
-                .map_or(true, |h| self.last_lfs == Some(h));
+                .is_none_or(|h| self.last_lfs == Some(h));
             if let Some(h) = outcome.read_hashes.lfs {
                 self.last_lfs = Some(h);
             }

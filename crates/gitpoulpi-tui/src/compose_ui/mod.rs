@@ -211,7 +211,7 @@ impl ComposeForm {
         let from = match self.selected {
             ComposeRow::File(i, j) => (i, j),
             ComposeRow::Commit(i) => {
-                if self.commits.get(i).map_or(true, |c| c.files.is_empty()) {
+                if self.commits.get(i).is_none_or(|c| c.files.is_empty()) {
                     return;
                 }
                 (i, 0)

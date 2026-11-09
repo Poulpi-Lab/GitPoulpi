@@ -77,7 +77,7 @@ fn log_side_images(stream: &[u8], marker: &[u8]) -> usize {
                     c.parse::<u32>().ok()
                 })
         });
-        if col.map_or(true, |c| c <= 100) {
+        if col.is_none_or(|c| c <= 100) {
             found += 1;
         }
     }

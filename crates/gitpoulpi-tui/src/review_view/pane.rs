@@ -87,7 +87,7 @@ impl DiffPane {
         let new_file = self
             .built_for
             .as_ref()
-            .map_or(true, |(name, _, _)| *name != key.0);
+            .is_none_or(|(name, _, _)| *name != key.0);
         self.built_for = Some(key);
         self.render = render;
         if new_file {

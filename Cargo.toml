@@ -27,7 +27,7 @@ members = [
 [workspace.package]
 version = "1.0.0-rc.1"
 edition = "2021"
-rust-version = "1.80"
+rust-version = "1.88"
 authors = ["Poulpi-Lab <poulpilab@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/Poulpi-Lab/GitPoulpi"
@@ -64,8 +64,8 @@ xtask = { path = "xtask" }
 async-trait = "0.1"
 clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
-crossterm = "0.28"
-ratatui = "0.29"
+crossterm = "0.29"
+ratatui = "0.30.2"
 # The commit graph's Graph column is drawn as a real image and handed to
 # the terminal over the iTerm2 inline-image protocol, which carries a PNG.
 # Encoding only -- the bitmap is generated at exactly the pixel size it

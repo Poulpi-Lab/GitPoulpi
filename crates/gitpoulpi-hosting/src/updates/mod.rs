@@ -329,7 +329,7 @@ pub fn newest_after_pinned(
         .iter()
         .filter(|r| channel == UpdateChannel::Prerelease || !r.prerelease)
         .filter_map(|r| Some((Version::parse(&r.version)?, r)))
-        .filter(|(v, _)| pin.map_or(true, |p| within_pin(v, p)))
+        .filter(|(v, _)| pin.is_none_or(|p| within_pin(v, p)))
         .filter(|(v, _)| *v > running)
         .max_by(|a, b| a.0.cmp(&b.0))
         .map(|(_, r)| r.clone())

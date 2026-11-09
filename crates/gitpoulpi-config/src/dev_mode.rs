@@ -77,7 +77,7 @@ pub fn newest_build(exe: &Path) -> PathBuf {
     for profile in NEWEST_PROFILES {
         let path = root.join("target").join(profile).join(name);
         if let Some(time) = modified(&path) {
-            if best.as_ref().map_or(true, |(t, _)| time > *t) {
+            if best.as_ref().is_none_or(|(t, _)| time > *t) {
                 best = Some((time, path));
             }
         }

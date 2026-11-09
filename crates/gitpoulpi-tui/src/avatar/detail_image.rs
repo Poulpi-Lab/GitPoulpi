@@ -178,7 +178,7 @@ impl DetailAvatarImage {
                         covered.push((x, y));
                         over.push((x, y, cell.clone()));
                     }
-                } else if !cell.skip {
+                } else if cell.diff_option != ratatui::buffer::CellDiffOption::Skip {
                     covered.push((x, y));
                     over.push((x, y, cell.clone()));
                 }
@@ -347,7 +347,7 @@ mod tests {
         // Untouched -- not reserved (`skip`) -- so the caller's initials
         // badge renders into these cells through the ordinary ratatui
         // path instead.
-        assert!(!buf[(2, 1)].skip);
+        assert!(buf[(2, 1)].diff_option != ratatui::buffer::CellDiffOption::Skip);
     }
 
     #[test]

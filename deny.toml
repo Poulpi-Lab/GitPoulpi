@@ -44,11 +44,8 @@ yanked = "deny"
 # entry when the upgrade lands; do not add one without a reason.
 ignore = [
     { id = "RUSTSEC-2025-0141", reason = "bincode 1.3.3 comes in through syntect (syntax highlighting); declared complete by its authors, no vulnerability, no safe upgrade exists" },
-    { id = "RUSTSEC-2024-0436", reason = "paste is a proc-macro of ratatui, build time only; no vulnerability, no replacement upstream yet" },
     { id = "RUSTSEC-2023-0071", reason = "rsa (Marvin timing attack) comes in through ssh-key, which only generates a local SSH key pair (RSA is an optional key type); the attack needs an observer timing private-key operations, and none is performed. No fixed release exists" },
     { id = "RUSTSEC-2026-0387", reason = "crypto-bigint 0.5.5 comes in through ssh-key's p256 and rsa, used for local one-shot key generation with no observer of timing; fixed only in 0.7.x, which ssh-key 0.6 does not accept. Tracked: upgrade ssh-key" },
-    { id = "RUSTSEC-2026-0253", reason = "lru 0.12.5 comes in through ratatui 0.29's layout cache (a thread-local LruCache of 500 splits); ratatui only calls get_or_insert, resize and cap on it, never pop(), and the flagged UB needs a key whose Drop panics under catch_unwind (the key is a Rect plus a Layout). Fixed only in lru 0.18.2, which ratatui 0.29 does not accept. Tracked: upgrade ratatui" },
-    { id = "RUSTSEC-2026-0002", reason = "lru 0.12.5 comes in through ratatui 0.29's layout cache; the unsound IterMut (Stacked Borrows) is never reached because ratatui does not call iter_mut() on its cache. Fixed only in lru 0.16.3, which ratatui 0.29 does not accept. Tracked: upgrade ratatui" },
 ]
 
 [bans]

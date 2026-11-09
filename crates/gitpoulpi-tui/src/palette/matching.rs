@@ -62,7 +62,7 @@ fn with_haystacks<R>(f: impl FnOnce(&[Haystack]) -> R) -> R {
     );
     HAYSTACKS.with(|cell| {
         let mut slot = cell.borrow_mut();
-        if slot.as_ref().map_or(true, |c| c.key != key) {
+        if slot.as_ref().is_none_or(|c| c.key != key) {
             let rows = PALETTE_COMMANDS
                 .iter()
                 .chain(settings::entries())

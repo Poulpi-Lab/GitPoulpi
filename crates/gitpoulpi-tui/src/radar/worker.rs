@@ -698,9 +698,8 @@ fn remember(prepared: &Prepared, snap: &HostingSnapshot) {
     let Some(path) = prepared.cache.as_deref() else {
         return;
     };
-    let compatible = load_cache(path).map_or(true, |old| {
-        old.pr_view == PrView::Open && old.issue_view == IssueView::Open
-    });
+    let compatible = load_cache(path)
+        .is_none_or(|old| old.pr_view == PrView::Open && old.issue_view == IssueView::Open);
     if compatible {
         save_cache(path, snap);
     }

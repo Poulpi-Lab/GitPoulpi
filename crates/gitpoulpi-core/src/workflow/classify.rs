@@ -217,7 +217,7 @@ impl CompiledWorkflow {
                 };
                 let spec = m.specificity();
                 // Strictly greater: an earlier declaration wins a tie.
-                if best.as_ref().map_or(true, |(s, _, _)| spec > *s) {
+                if best.as_ref().is_none_or(|(s, _, _)| spec > *s) {
                     best = Some((spec, idx, fields));
                 }
             }

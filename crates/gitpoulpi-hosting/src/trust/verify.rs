@@ -51,9 +51,9 @@ impl TrustGate {
         let due = match reason {
             VerifyReason::TokenStored => true,
             VerifyReason::ExternalToken => first_time_this_process(&integration.id),
-            VerifyReason::Periodic => record.as_ref().map_or(true, |r| {
-                unix_now().saturating_sub(r.account_checked_at) >= RECHECK_SECS
-            }),
+            VerifyReason::Periodic => record
+                .as_ref()
+                .is_none_or(|r| unix_now().saturating_sub(r.account_checked_at) >= RECHECK_SECS),
         };
         if !due {
             return Ok(());

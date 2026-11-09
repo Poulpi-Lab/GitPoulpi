@@ -129,11 +129,8 @@ impl CompiledMatch {
     }
 
     pub fn matches(&self, ident: &Ident) -> bool {
-        self.name.as_ref().map_or(true, |f| f.is_match(&ident.name))
-            && self
-                .email
-                .as_ref()
-                .map_or(true, |f| f.is_match(&ident.email))
+        self.name.as_ref().is_none_or(|f| f.is_match(&ident.name))
+            && self.email.as_ref().is_none_or(|f| f.is_match(&ident.email))
     }
 }
 

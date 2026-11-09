@@ -1307,7 +1307,7 @@ impl ReviewView {
         let can_resolve = self
             .host
             .as_ref()
-            .map_or(true, |h| h.detail.capabilities.resolve);
+            .is_none_or(|h| h.detail.capabilities.resolve);
         if !can_resolve {
             pairs.retain(|(key, _)| *key != "x");
         }

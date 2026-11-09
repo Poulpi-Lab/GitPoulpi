@@ -397,7 +397,7 @@ fn reload_cache(s: &mut Shared) {
     let eff = effective(s);
     s.known = unskipped
         .available(RUNNING, eff.release_channel)
-        .filter(|r| eff.pin.as_ref().map_or(true, |p| p.allows(&r.version)));
+        .filter(|r| eff.pin.as_ref().is_none_or(|p| p.allows(&r.version)));
     s.skipped = s
         .known
         .as_ref()
@@ -418,7 +418,7 @@ pub(crate) fn start_background_check() {
         let due = s
             .state_path
             .as_deref()
-            .map_or(true, |p| UpdateState::load(p).due(unix_now(), false));
+            .is_none_or(|p| UpdateState::load(p).due(unix_now(), false));
         (effective(&s).mode, due)
     };
     if mode == UpdateMode::Off {

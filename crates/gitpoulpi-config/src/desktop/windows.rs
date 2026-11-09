@@ -341,7 +341,7 @@ fn names_exe(bytes: &[u8], req: &Request) -> bool {
 
 /// The launch helper counterpart of [`names_exe`]; true when there is none.
 fn names_launch(bytes: &[u8], req: &Request) -> bool {
-    req.launch_exe.map_or(true, |l| {
+    req.launch_exe.is_none_or(|l| {
         exe_spellings(l, req.newest)
             .iter()
             .any(|e| contains_text(bytes, e))

@@ -74,7 +74,7 @@ impl RetentionUnit {
             RetentionUnit::Weeks,
         ]
         .into_iter()
-        .find(|u| days >= u.days() && days % u.days() == 0)
+        .find(|u| days >= u.days() && days.is_multiple_of(u.days()))
         .unwrap_or(RetentionUnit::Days)
     }
 }
@@ -220,7 +220,7 @@ impl LogConfig {
         let days = self.retention_days_clamped();
         let unit = match self.retention_unit {
             RetentionUnit::Auto => RetentionUnit::auto_for(days),
-            u if days % u.days() == 0 => u,
+            u if days.is_multiple_of(u.days()) => u,
             _ => RetentionUnit::auto_for(days),
         };
         (days / unit.days(), unit)

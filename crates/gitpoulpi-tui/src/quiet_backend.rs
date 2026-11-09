@@ -94,6 +94,8 @@ impl<W: Write> Write for QuietBackend<W> {
 }
 
 impl<W: Write> Backend for QuietBackend<W> {
+    type Error = io::Error;
+
     fn draw<'a, I>(&mut self, content: I) -> io::Result<()>
     where
         I: Iterator<Item = (u16, u16, &'a Cell)>,

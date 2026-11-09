@@ -1003,7 +1003,7 @@ fn base64_round_trips_through_a_reference_decoder() {
     .unwrap();
     let payload = seq.rsplit_once(':').unwrap().1.trim_end_matches('\u{7}');
     assert!(
-        payload.len() % 4 == 0,
+        payload.len().is_multiple_of(4),
         "base64 output must be padded to a multiple of four"
     );
     assert!(

@@ -621,7 +621,7 @@ impl HostingClient for GiteaClient {
                         .as_deref()
                         .is_some_and(|me| p.author.eq_ignore_ascii_case(me))
             })
-            .filter(|(p, _, _)| mentioning.as_ref().map_or(true, |s| s.contains(&p.number)))
+            .filter(|(p, _, _)| mentioning.as_ref().is_none_or(|s| s.contains(&p.number)))
             .collect();
         if filter.checks {
             self.fill_status(project, &mut rows).await;

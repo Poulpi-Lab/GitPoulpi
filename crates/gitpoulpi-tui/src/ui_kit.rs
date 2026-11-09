@@ -295,7 +295,7 @@ fn in_view(index: usize, offset: usize, visible: usize) -> bool {
 /// The caller copies `.offset()` off the returned state into the persisted
 /// one afterwards (needed for `follow == true`; a no-op copy otherwise).
 pub(crate) fn list_render_state(state: &ListState, follow: bool, visible: usize) -> ListState {
-    let mut render = state.clone();
+    let mut render = *state;
     if !follow {
         if let Some(sel) = state.selected() {
             if !in_view(sel, state.offset(), visible) {
@@ -312,7 +312,7 @@ pub(crate) fn list_render_state(state: &ListState, follow: bool, visible: usize)
 
 /// The `TableState` counterpart of `list_render_state`, for the Log.
 pub(crate) fn table_render_state(state: &TableState, follow: bool, visible: usize) -> TableState {
-    let mut render = state.clone();
+    let mut render = *state;
     if !follow {
         if let Some(sel) = state.selected() {
             if !in_view(sel, state.offset(), visible) {

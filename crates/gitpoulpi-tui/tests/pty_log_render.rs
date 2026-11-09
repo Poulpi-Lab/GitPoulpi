@@ -80,7 +80,7 @@ fn mask(line: &str) -> String {
             } else if at(end, '\u{2026}') {
                 end += 1;
             }
-            out.extend(std::iter::repeat('D').take(end - i));
+            out.extend(std::iter::repeat_n('D', end - i));
             i = end;
         } else if i + 7 <= chars.len()
             && chars[i..i + 7]

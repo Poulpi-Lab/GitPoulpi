@@ -394,7 +394,7 @@ impl Bitmap {
     /// produce). `rgb` must hold `width * height * 3` bytes.
     pub(crate) fn from_rgb(width: u32, height: u32, rgb: &[u8]) -> Bitmap {
         let mut data = Vec::with_capacity(rgb.len() / 3 * 4);
-        for p in rgb.chunks_exact(3) {
+        for p in rgb.as_chunks::<3>().0 {
             data.extend_from_slice(&[p[0], p[1], p[2], 255]);
         }
         Bitmap {
@@ -634,7 +634,7 @@ impl Encoded {
                     let held = if blends {
                         cell.modifier.contains(BLANK_RESERVED)
                     } else {
-                        cell.skip
+                        cell.diff_option == ratatui::buffer::CellDiffOption::Skip
                     };
                     if !held {
                         n += 1;
@@ -752,7 +752,7 @@ impl Widget for ImageReservation {
             for x in area.left()..area.right() {
                 let cell = &mut buf[(x, y)];
                 cell.reset();
-                cell.set_skip(true);
+                cell.set_diff_option(ratatui::buffer::CellDiffOption::Skip);
             }
         }
     }
@@ -813,7 +813,7 @@ impl Hide {
         for y in area.top()..area.bottom() {
             for x in area.left()..area.right() {
                 let cell = &buf[(x, y)];
-                if !cell.skip {
+                if cell.diff_option != ratatui::buffer::CellDiffOption::Skip {
                     self.cells.push((x, y, cell.clone()));
                 }
             }

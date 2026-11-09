@@ -612,5 +612,5 @@ fn diff_owns_keys(cx: &CommandCtx<'_>) -> bool {
         && cx
             .diff_view_state
             .as_ref()
-            .map_or(true, |s| !s.lists_have_keys)
+            .is_none_or(|s| !s.lists_have_keys)
 }

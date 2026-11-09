@@ -346,8 +346,8 @@ fn handle(mut stream: TcpStream, state: &Mutex<ServerState>) -> std::io::Result<
             let locks: Vec<Value> = state
                 .locks
                 .iter()
-                .filter(|l| by_path.as_ref().map_or(true, |p| &l.path == p))
-                .filter(|l| by_id.as_ref().map_or(true, |i| &l.id == i))
+                .filter(|l| by_path.as_ref().is_none_or(|p| &l.path == p))
+                .filter(|l| by_id.as_ref().is_none_or(|i| &l.id == i))
                 .map(lock_json)
                 .collect();
             respond(&mut stream, "200 OK", &json!({ "locks": locks }))

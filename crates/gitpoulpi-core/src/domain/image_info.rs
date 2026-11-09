@@ -231,7 +231,7 @@ fn ico(b: &[u8]) -> Option<ImageInfo> {
                 u32::from(h)
             }
         });
-        if best.map_or(true, |(bw, bh)| w * h > bw * bh) {
+        if best.is_none_or(|(bw, bh)| w * h > bw * bh) {
             best = Some((w, h));
         }
     }

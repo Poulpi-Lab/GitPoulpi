@@ -364,7 +364,7 @@ impl HostingClient for JiraClient {
             let page_rows = page.rows();
             let got = page_rows.len();
             rows.extend(page_rows);
-            if got == 0 || total.map_or(true, |t| rows.len() as u64 >= t) {
+            if got == 0 || total.is_none_or(|t| rows.len() as u64 >= t) {
                 break;
             }
         }

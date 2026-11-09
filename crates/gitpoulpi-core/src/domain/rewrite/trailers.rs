@@ -378,7 +378,7 @@ pub fn remove(message: &str, key: &str, only: Option<&CompiledPattern>) -> Strin
     let doomed = |l: &BlockLine| {
         l.trailer
             .as_ref()
-            .is_some_and(|t| same_key(&t.key, key) && only.map_or(true, |p| p.is_match(&t.value)))
+            .is_some_and(|t| same_key(&t.key, key) && only.is_none_or(|p| p.is_match(&t.value)))
     };
     if !block.lines.iter().any(doomed) {
         return message.to_string();

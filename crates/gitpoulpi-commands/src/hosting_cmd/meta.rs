@@ -251,7 +251,7 @@ fn matches(text: &str, query: &Option<String>) -> bool {
         .as_deref()
         .map(str::trim)
         .filter(|q| !q.is_empty())
-        .map_or(true, |q| text.to_lowercase().contains(&q.to_lowercase()))
+        .is_none_or(|q| text.to_lowercase().contains(&q.to_lowercase()))
 }
 
 /// `hosting members`.

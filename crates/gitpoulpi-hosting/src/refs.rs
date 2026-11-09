@@ -174,7 +174,7 @@ impl Matcher<'_> {
     fn at(&self, chars: &[char], i: usize) -> Option<(usize, FoundRef)> {
         let c = chars[i];
         let prev = i.checked_sub(1).map(|p| chars[p]);
-        let boundary = prev.map_or(true, |p| !is_word(p) && p != '&');
+        let boundary = prev.is_none_or(|p| !is_word(p) && p != '&');
         let issues = self.ctx.issues.as_ref();
         let make = |end: usize, kind, reference: String, url: Option<String>| FoundRef {
             start: i,
@@ -219,7 +219,7 @@ impl Matcher<'_> {
         }
 
         // Jira, Linear and YouTrack `KEY-N`.
-        if c.is_ascii_uppercase() && prev.map_or(true, |p| !is_word(p) && p != '-') {
+        if c.is_ascii_uppercase() && prev.is_none_or(|p| !is_word(p) && p != '-') {
             if let Some(j) = issues.filter(|j| j.family.is_key_tracker()) {
                 let mut k = i;
                 while k < chars.len()
@@ -232,7 +232,7 @@ impl Matcher<'_> {
                 if chars.get(k) == Some(&'-') {
                     let key = slice(chars, i, k);
                     if let Some((end, _)) = digits_at(chars, k + 1) {
-                        if j.jira_key_known(&key) && chars.get(end).map_or(true, |n| !is_word(*n)) {
+                        if j.jira_key_known(&key) && chars.get(end).is_none_or(|n| !is_word(*n)) {
                             let reference = slice(chars, i, end);
                             let url = (spec_for(j.family).issue_web_url)(
                                 &j.web_base,
@@ -251,7 +251,7 @@ impl Matcher<'_> {
         {
             if let Some(az) = self.azure_issues() {
                 if let Some((end, n)) = digits_at(chars, i + 3) {
-                    if chars.get(end).map_or(true, |n| !is_word(*n)) {
+                    if chars.get(end).is_none_or(|n| !is_word(*n)) {
                         let (reference, url) = self.issue_number_ref(az, n);
                         return Some((end, make(end, RefKind::Issue, reference, url)));
                     }

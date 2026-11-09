@@ -126,7 +126,7 @@ fn ticks(s: &Screen, b: Block, glyph: &str, fg: Option<Color>) -> Vec<u16> {
     (b.top + 1..b.bottom)
         .filter(|&r| {
             s.cell(b.right, r)
-                .is_some_and(|c| c.text == glyph && fg.map_or(true, |f| c.fg == f))
+                .is_some_and(|c| c.text == glyph && fg.is_none_or(|f| c.fg == f))
         })
         .collect()
 }

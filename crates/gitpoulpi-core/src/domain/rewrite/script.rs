@@ -225,7 +225,7 @@ impl ScriptHeader {
         self.params
             .iter()
             .filter(|p| p.kind == ParamKind::Text && p.default.is_none())
-            .filter(|p| given.get(&p.name).map_or(true, |v| v.is_empty()))
+            .filter(|p| given.get(&p.name).is_none_or(|v| v.is_empty()))
             .map(|p| p.name.clone())
             .collect()
     }

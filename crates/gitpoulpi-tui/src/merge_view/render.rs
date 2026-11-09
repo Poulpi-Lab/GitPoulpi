@@ -1434,7 +1434,7 @@ impl MergeView {
                 Mark::ConflictDone
             };
             let cell = &mut cells[(row * inner / len).min(inner - 1)];
-            if cell.map_or(true, |(old, _)| mark > old) {
+            if cell.is_none_or(|(old, _)| mark > old) {
                 *cell = Some((mark, c));
             }
         }

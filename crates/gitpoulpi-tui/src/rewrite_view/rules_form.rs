@@ -1332,7 +1332,7 @@ pub(crate) fn parse_size(text: &str) -> Option<u64> {
 /// The size with its unit, the form [`parse_size`] reads back (`5 MiB`).
 pub(crate) fn format_size(bytes: u64) -> String {
     for (unit, size) in [("GiB", 1u64 << 30), ("MiB", 1 << 20), ("KiB", 1 << 10)] {
-        if bytes >= size && bytes % size == 0 {
+        if bytes >= size && bytes.is_multiple_of(size) {
             return format!("{} {unit}", bytes / size);
         }
     }

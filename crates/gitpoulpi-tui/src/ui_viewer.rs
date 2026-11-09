@@ -908,7 +908,7 @@ fn visible_text(buffer: &Buffer, area: Rect) -> Vec<String> {
             let mut row = String::new();
             for x in area.left()..area.right() {
                 let cell = &buffer[(x, y)];
-                if !cell.skip {
+                if cell.diff_option != ratatui::buffer::CellDiffOption::Skip {
                     row.push_str(cell.symbol());
                 }
             }

@@ -916,9 +916,7 @@ impl Planner<'_> {
 /// `user` and `date` have natural values; the others the caller must give.
 fn fill_defaults(pattern: &BranchPattern, fields: &mut Fields, facts: &FlowFacts) {
     for token in pattern.tokens() {
-        let missing = fields
-            .get(token.name())
-            .map_or(true, |v| v.trim().is_empty());
+        let missing = fields.get(token.name()).is_none_or(|v| v.trim().is_empty());
         if !missing {
             continue;
         }

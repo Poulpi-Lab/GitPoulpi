@@ -248,6 +248,29 @@ pub enum UndoRefusal {
     Purged {
         entry: u64,
     },
+    /// Undoing or redoing a deletion on a remote: the branch or tag there is
+    /// no longer as the operation left it (recreated, moved or deleted by
+    /// someone else), so pushing or deleting would overwrite that. Nothing was
+    /// changed; `name` is the full ref (`refs/heads/x`).
+    RemoteRefMoved(Box<RemoteRefMoved>),
+    /// Undoing the deletion of a remote branch or tag needs its commit or tag
+    /// object, and it is no longer in this repository (it was garbage
+    /// collected), so it cannot be pushed back.
+    RemoteObjectMissing {
+        oid: Oid,
+    },
+}
+
+/// What [`UndoRefusal::RemoteRefMoved`] says (boxed there: the refusal travels
+/// in every error, and strings would make all of them bigger).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RemoteRefMoved {
+    pub remote: String,
+    /// The full ref name (`refs/heads/x`, `refs/tags/v1`).
+    pub name: String,
+    /// What the entry expected the remote to hold (`None`: nothing).
+    pub expected: Option<Oid>,
+    pub actual: Option<Oid>,
 }
 
 impl UndoRefusal {
@@ -266,6 +289,8 @@ impl UndoRefusal {
                 | UndoRefusal::StashChanged { .. }
                 | UndoRefusal::OperationEnded
                 | UndoRefusal::Purged { .. }
+                | UndoRefusal::RemoteRefMoved { .. }
+                | UndoRefusal::RemoteObjectMissing { .. }
         )
     }
 
@@ -273,7 +298,8 @@ impl UndoRefusal {
     pub fn message(&self) -> String {
         match self {
             UndoRefusal::NothingToUndo => "nothing to undo (a push, a fetch or anything else \
-                 done on a remote server is never undone)"
+                 done on a remote server is never undone, except deleting a remote \
+                 branch or tag)"
                 .into(),
             UndoRefusal::NothingToRedo => "nothing to redo".into(),
             UndoRefusal::Disabled => UNDO_DISABLED_MESSAGE.into(),
@@ -337,6 +363,26 @@ impl UndoRefusal {
             UndoRefusal::Purged { entry } => format!(
                 "the old history of operation #{entry} was purged, so it cannot be undone or redone; \
                  `gitpoulpi undo-forget` drops it from the undo history"
+            ),
+            UndoRefusal::RemoteRefMoved(moved) => {
+                let RemoteRefMoved {
+                    remote,
+                    name,
+                    expected,
+                    actual,
+                } = &**moved;
+                format!(
+                "{} on {remote} is {}, not {} as the operation left it: it was changed on the \
+                 remote since, so nothing was pushed or deleted there",
+                display_ref_name(name),
+                actual.map_or_else(|| "gone".to_string(), |o| format!("at {}", short(o))),
+                expected.map_or_else(|| "gone".to_string(), |o| format!("at {}", short(o))),
+                )
+            }
+            UndoRefusal::RemoteObjectMissing { oid } => format!(
+                "{} is no longer in this repository (it was garbage collected), so the remote \
+                 branch or tag cannot be pushed back",
+                short(*oid)
             ),
             UndoRefusal::StaleEntry {
                 expected_id,
@@ -473,4 +519,12 @@ pub struct PathHash {
 pub struct Snapshot {
     pub tree: Oid,
     pub hashes: Vec<PathHash>,
+}
+
+/// `refs/heads/x` as `x`, `refs/tags/v1` as `tag v1`.
+fn display_ref_name(name: &str) -> String {
+    name.strip_prefix("refs/heads/")
+        .map(str::to_string)
+        .or_else(|| name.strip_prefix("refs/tags/").map(|t| format!("tag {t}")))
+        .unwrap_or_else(|| name.to_string())
 }

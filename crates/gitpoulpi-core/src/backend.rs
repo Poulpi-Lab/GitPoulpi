@@ -658,6 +658,35 @@ pub trait GitBackend: Send + Sync {
     /// with it. The remote twin of [`GitBackend::branch_delete`], which
     /// must not touch the remote.
     async fn branch_delete_remote(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()>;
+
+    /// What `remote` holds at the fully qualified `full_ref` (`refs/heads/x`
+    /// or `refs/tags/v1`) right now, asked of the server (`ls-remote`);
+    /// `None` when it has no such ref. For an annotated tag, the tag object.
+    /// A network read, never answered from local tracking refs. It is the
+    /// value an undo of a remote deletion records and later checks.
+    async fn remote_ref_value(
+        &self,
+        repo: &RepoRef,
+        remote: &str,
+        full_ref: &str,
+    ) -> Result<Option<Oid>>;
+
+    /// Moves the branch or tag `full_ref` on `remote` from `expect` to `new`,
+    /// never forced: `Some(oid)` pushes that object there (it re-creates a
+    /// deleted ref when `expect` is `None`), `None` deletes the ref. The
+    /// remote must hold `expect` at that moment (a lease); if it moved on,
+    /// [`crate::Error::PushRejected`] with `StaleLease` comes back and
+    /// nothing changed. An object this repository no longer has is
+    /// [`crate::Error::UndoRefused`] with `RemoteObjectMissing`. Network.
+    /// The remote-tracking ref (branch) or remote-tag mirror (tag) follows.
+    async fn remote_ref_update(
+        &self,
+        repo: &RepoRef,
+        remote: &str,
+        full_ref: &str,
+        new: Option<Oid>,
+        expect: Option<Oid>,
+    ) -> Result<()>;
     fn merge(&self, repo: &RepoRef, from: &Ref, opts: &MergeOptions) -> Result<MergeOutcome>;
     fn rebase(&self, repo: &RepoRef, onto: &Ref, opts: &RebaseOptions) -> Result<RebaseOutcome>;
 

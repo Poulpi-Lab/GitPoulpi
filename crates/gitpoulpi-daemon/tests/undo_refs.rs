@@ -557,11 +557,11 @@ async fn deleting_an_annotated_tag_is_undone_with_the_very_same_tag_object() {
     }
 }
 
-/// The combined delete of a tag that is on a remote ("Delete locally and
-/// on origin"): the remote half is explicitly NOT journaled (nothing can
-/// undo what other people already saw), the local half is. So Undo
-/// restores the very same local tag object, which is then *local only*
-/// again, and a tag push puts it back on the remote.
+/// Two separate requests, a remote delete then a local one (the combined
+/// gesture sends one request with `and_local`: undo_remote_delete.rs). Each
+/// half is its own entry: undoing the local one restores the very same local
+/// tag object, which is then *local only* again (the remote entry underneath
+/// is what re-creates it there), and a tag push puts it back on the remote.
 #[tokio::test]
 async fn undoing_a_combined_tag_delete_restores_it_locally_and_a_push_puts_it_back() {
     for (name, backend) in backends() {
@@ -597,7 +597,7 @@ async fn undoing_a_combined_tag_delete_restores_it_locally_and_a_push_puts_it_ba
         assert_eq!(
             undone.entry.kind,
             OperationKind::TagDelete,
-            "{name}: the remote delete has no journal entry of its own"
+            "{name}: the local delete is the top entry"
         );
         assert_eq!(rig.rev("refs/tags/v1"), object, "{name}: same tag object");
         assert_eq!(

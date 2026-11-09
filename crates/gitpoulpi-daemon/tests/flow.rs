@@ -1386,9 +1386,11 @@ async fn delete_remote_removes_the_branch_on_the_remote_too() {
             .plan(json!({ "action": "finish", "delete_remote": true }))
             .await;
         assert!(
-            plan.irreversible.iter().any(|i| i.contains("Deleting")),
-            "{name}"
+            plan.undoable && plan.irreversible.is_empty(),
+            "{name}: deleting a remote branch is taken back by Undo: {:?}",
+            plan.irreversible
         );
+        let tip = rig.tip("feature/gone");
         let out = rig
             .run(json!({ "action": "finish", "delete_remote": true }))
             .await;
@@ -1398,6 +1400,29 @@ async fn delete_remote_removes_the_branch_on_the_remote_too() {
             "{name}"
         );
         assert!(!rig.has_branch("feature/gone"));
+
+        // One entry: undo (confirmed, it pushes) brings the branch back
+        // here and on the remote at the same commit, redo deletes both.
+        let undone = rig
+            .call(OperationKind::Undo, json!({ "confirmed": true }))
+            .await
+            .unwrap();
+        assert_eq!(undone["applied"], true, "{name}: {undone}");
+        assert!(rig.has_branch("feature/gone"), "{name}");
+        assert_eq!(
+            rig.repo
+                .git_in_remote(&["rev-parse", "refs/heads/feature/gone"])
+                .trim(),
+            tip.trim(),
+            "{name}"
+        );
+        rig.call(OperationKind::Redo, json!({ "confirmed": true }))
+            .await
+            .unwrap();
+        assert!(
+            !rig.repo.git_in_remote(&["branch"]).contains("feature/gone"),
+            "{name}"
+        );
         rig.stop().await;
     }
 }

@@ -505,6 +505,26 @@ impl GitBackend for Git2Backend {
     async fn branch_delete_remote(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
         self.fallback.branch_delete_remote(repo, remote, name).await
     }
+    async fn remote_ref_value(
+        &self,
+        repo: &RepoRef,
+        remote: &str,
+        full_ref: &str,
+    ) -> Result<Option<Oid>> {
+        self.fallback.remote_ref_value(repo, remote, full_ref).await
+    }
+    async fn remote_ref_update(
+        &self,
+        repo: &RepoRef,
+        remote: &str,
+        full_ref: &str,
+        new: Option<Oid>,
+        expect: Option<Oid>,
+    ) -> Result<()> {
+        self.fallback
+            .remote_ref_update(repo, remote, full_ref, new, expect)
+            .await
+    }
     fn rebase_state(&self, repo: &RepoRef) -> Result<Option<RebaseState>> {
         // Part of every refresh: answered natively in the (overwhelmingly
         // common) no-rebase case; the system backend reads the state

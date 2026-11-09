@@ -5089,6 +5089,8 @@ undo_already_restored = "tout ce que cette opération a supprimé est déjà rev
 undo_no_such_entry = "il n'y a pas d'opération n°{id} dans l'historique d'annulation"
 split_refused = { git = "impossible de scinder ce commit : {reason}", local = "impossible de scinder cette validation : {reason}" }
 undo_purged = "l'ancien historique de l'opération #{entry} a été purgé : elle ne peut plus être annulée ni rétablie"
+undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
+undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
 
 [window]
 connecting = "connexion au démon de la session..."

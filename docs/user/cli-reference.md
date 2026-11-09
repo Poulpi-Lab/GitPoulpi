@@ -133,7 +133,7 @@ Hunks and lines are numbered as `gitpoulpi --json diff` numbers them.
 |---|---|
 | `branch list`, `branch create <name> [at]`, `branch delete <name>`, `branch rename <old> <new>` | Local branches. |
 | `branch track <remote/branch> [--name N]` | Create a local branch tracking a remote one, and check it out. |
-| `branch delete-remote <name> [--remote R]` | Delete a branch on a remote, keep the local one. |
+| `branch delete-remote <name> [--remote R]` | Delete a branch on a remote, keep the local one. `undo --yes` pushes it back as it was ([undo](undo-redo.md#deleting-a-branch-or-tag-on-a-remote)). |
 | `branch set-upstream <branch> <remote/branch>`, `branch unset-upstream <branch>` | Upstream. |
 | `branch fast-forward <branch> [target]` | Move a branch forward only if it is a fast-forward. |
 | `checkout <target> [--autostash]` | Switch branch or detach at a commit. |
@@ -146,7 +146,7 @@ Hunks and lines are numbered as `gitpoulpi --json diff` numbers them.
 | `tag list [--unpushed]`, `tag create <name> [at] [-m M]`, `tag annotate <name> -m M` | Tags. `tag list` prints each tag with where it lives, learned from the last fetch or tag push (never the network): `local` (it exists here), `remote` (the remotes that have it), `differs_on` (remotes holding it at another commit) and `where`: `local`, `remote` (a remote has it, this repository does not), `both` or `differs`. |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | Delete a tag: locally (the default), on a remote only (`git push R --delete`; outward-facing and not undoable), or here and on the remote that has it. The answer carries `scope` (`local`, `remote`, `both`) and, for a local-only delete of a tag a remote still has, `still_on` (the next `fetch` brings it back). A combined delete removes the remote first; `undo` then restores the local tag only and `tag push` puts it back. |
 | `tag fetch <name> [--remote R]` | Fetch one tag from a remote (the one that has it by default), e.g. a `where: remote` tag. Never overwrites a local tag at another commit. |
-| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags on a remote (no names: every tag no remote has). |
+| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags on a remote (no names: every tag no remote has). Deleting one on a remote is undoable (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Linked worktrees. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submodules ([Submodules](submodules.md)). |
 

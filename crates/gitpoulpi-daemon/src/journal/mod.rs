@@ -30,7 +30,9 @@ pub use outside::{
     adopt as outside_adopt, sync as outside_sync, transfer_finished, transfer_started, Busy, Caller,
 };
 pub use purge::{purge_check, purge_run};
-pub use record::{begin_record, finish_record, record, Recording};
+pub use record::{
+    begin_record, begin_record_remote, finish_record, record, Recording, RemoteDelete,
+};
 pub use replay::undo_redo;
 pub use restore::{reflog_restore, restore_entry};
 pub use start_over::{forget_staging_above, start_over_target};

@@ -62,6 +62,14 @@ pub(super) struct Before {
     pub(super) snap: Option<crate::journal_snap::Captured>,
     /// What stash, remote and LFS operations read before (`journal_stashes_remotes`).
     pub(super) stash_remote: Option<crate::journal_stashes_remotes::Capture>,
+    /// A branch or tag being deleted on a remote: what it held right before
+    /// (asked of the server), recorded with the entry once the deletion
+    /// succeeded.
+    pub(super) remote_ref: Option<gitpoulpi_core::journal::RemoteRefChange>,
+    /// The local deletion of the same name done in the same request (the
+    /// "delete here and on the remote" gesture), as the request that alone
+    /// would have made it: captured and recorded like it, in the same entry.
+    pub(super) local_request: Option<Request>,
 }
 
 pub(super) fn arg_str(request: &Request, key: &str) -> Option<String> {
@@ -86,6 +94,8 @@ pub(super) fn capture_before(
         unrecordable: false,
         snap: None,
         stash_remote: None,
+        remote_ref: None,
+        local_request: None,
     };
     if crate::journal_stashes_remotes::handles(request) {
         let captured = crate::journal_stashes_remotes::capture(backend, repo, request)?;

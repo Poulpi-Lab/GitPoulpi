@@ -180,7 +180,27 @@ pub(super) async fn dispatch_network_plain(
         OperationKind::TagDeleteRemote => {
             let remote: String = arg_or_err!(args, "remote", request.id);
             let name: String = arg_or_err!(args, "name", request.id);
-            to_json!(backend.tag_delete_remote(&repo, &remote, &name).await)
+            let deleted = match leased(args) {
+                Some(expect) => {
+                    backend
+                        .remote_ref_update(
+                            &repo,
+                            &remote,
+                            &format!("refs/tags/{name}"),
+                            None,
+                            Some(expect),
+                        )
+                        .await
+                }
+                None => backend.tag_delete_remote(&repo, &remote, &name).await,
+            };
+            // "Delete here and on the remote": the local half only once the
+            // remote one happened.
+            let deleted = match (deleted, local_twin(args, &name)) {
+                (Ok(()), Some(local)) => backend.tag_delete(&repo, &local),
+                (other, _) => other,
+            };
+            to_json!(deleted)
         }
         OperationKind::TagFetch => {
             let remote: String = arg_or_err!(args, "remote", request.id);
@@ -270,7 +290,25 @@ pub(super) async fn dispatch_network_plain(
         OperationKind::BranchDeleteRemote => {
             let remote: String = arg_or_err!(args, "remote", request.id);
             let name: String = arg_or_err!(args, "name", request.id);
-            to_json!(backend.branch_delete_remote(&repo, &remote, &name).await)
+            let deleted = match leased(args) {
+                Some(expect) => {
+                    backend
+                        .remote_ref_update(
+                            &repo,
+                            &remote,
+                            &format!("refs/heads/{name}"),
+                            None,
+                            Some(expect),
+                        )
+                        .await
+                }
+                None => backend.branch_delete_remote(&repo, &remote, &name).await,
+            };
+            let deleted = match (deleted, local_twin(args, &name)) {
+                (Ok(()), Some(local)) => backend.branch_delete(&repo, &local),
+                (other, _) => other,
+            };
+            to_json!(deleted)
         }
         // The workflow actions: git steps, hooks and pushes in one run.
         OperationKind::FlowRun => crate::flow::run(backend, &repo, args).await,
@@ -307,5 +345,22 @@ pub(super) async fn dispatch_network_plain(
             ok(request.id, value, mutated)
         }
         Err((message, kind, detail)) => failed(request, message, kind, detail),
+    }
+}
+
+/// The value a remote deletion is leased on (`expect`, set by the journaled
+/// path after asking the server).
+fn leased(args: &Value) -> Option<gitpoulpi_core::domain::Oid> {
+    serde_json::from_value(args.get("expect")?.clone()).ok()
+}
+
+/// The local branch or tag the request deletes together with the remote
+/// one: `and_local: true` is the one of the same name, a string names it
+/// (a local branch may track a remote branch of another name).
+pub(crate) fn local_twin(args: &Value, name: &str) -> Option<String> {
+    match args.get("and_local")? {
+        Value::Bool(true) => Some(name.to_string()),
+        Value::String(local) => Some(local.clone()),
+        _ => None,
     }
 }

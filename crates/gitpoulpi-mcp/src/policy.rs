@@ -113,7 +113,8 @@ const READ_ONLY: &[&[&str]] = &[
 ];
 
 const DESTRUCTIVE: &[&[&str]] = &[
-    // Every undo is redoable, but it moves refs and HEAD back: gated like
+    // Every undo is redoable, but it moves refs and HEAD back (and undoing a
+    // remote branch or tag deletion pushes it back to the server): gated like
     // `reset`.
     &["undo"],
     &["redo"],
@@ -127,7 +128,7 @@ const DESTRUCTIVE: &[&[&str]] = &[
     &["discard"],
     &["rm-file"],
     &["branch", "delete"],
-    // Deletes a branch on the remote: server-side, not undoable locally.
+    // Deletes a branch on the remote: server-side (`undo` pushes it back).
     &["branch", "delete-remote"],
     &["tag", "delete"],
     &["tag", "delete-remote"],

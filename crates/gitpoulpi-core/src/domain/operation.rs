@@ -99,7 +99,10 @@ pub enum OperationKind {
     BranchCreateTracking,
     BranchDelete,
     /// Delete a branch from a remote, leaving the local one (see
-    /// `GitBackend::branch_delete_remote`). Network.
+    /// `GitBackend::branch_delete_remote`). Network. Journaled by the daemon
+    /// (the commit the server held is recorded; undo pushes it back, see
+    /// `RemoteRefChange`); with `and_local` the local branch goes in the same
+    /// entry.
     BranchDeleteRemote,
     BranchRename,
     /// Set or clear a local branch's upstream (see
@@ -158,7 +161,9 @@ pub enum OperationKind {
     /// as well as of the local mirror refs.
     TagPush,
     /// Delete a tag from a remote, keeping the local one (see
-    /// `GitBackend::tag_delete_remote`). Network.
+    /// `GitBackend::tag_delete_remote`). Network. Journaled like
+    /// [`OperationKind::BranchDeleteRemote`] (an annotated tag's own object is
+    /// what undo pushes back).
     TagDeleteRemote,
     /// Fetch one tag from a remote (see `GitBackend::tag_fetch`). Network.
     TagFetch,

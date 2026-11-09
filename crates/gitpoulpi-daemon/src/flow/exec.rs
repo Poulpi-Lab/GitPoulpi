@@ -80,6 +80,8 @@ struct Exec<'a> {
     /// Something was changed: a failure from here on is reported with the
     /// flow saved, not as a plain error.
     changed: bool,
+    /// Branches deleted on a remote by this run (see `FlowOutcome`).
+    remote_deleted: Vec<gitpoulpi_core::journal::RemoteRefChange>,
 }
 
 pub(super) fn in_progress(repo: &RepoRef) -> Option<String> {
@@ -141,6 +143,7 @@ impl<'a> Exec<'a> {
             message,
             merge_request: self.mr.clone().filter(|_| status == FlowStatus::Done),
             resumable,
+            remote_deleted: self.remote_deleted.clone(),
         }
     }
 
@@ -437,10 +440,31 @@ impl<'a> Exec<'a> {
                 Ok(Ran::done(None))
             }
             FlowStep::DeleteRemoteBranch { remote, name } => {
-                backend
-                    .branch_delete_remote(repo, remote, name)
-                    .await
-                    .map_err(stop)?;
+                // The server's own value, recorded and leased on, so that
+                // undoing the run pushes back exactly what was deleted.
+                let full = format!("refs/heads/{name}");
+                let held = backend.remote_ref_value(repo, remote, &full).await;
+                match held {
+                    Ok(Some(old)) => {
+                        backend
+                            .remote_ref_update(repo, remote, &full, None, Some(old))
+                            .await
+                            .map_err(stop)?;
+                        self.remote_deleted
+                            .push(gitpoulpi_core::journal::RemoteRefChange {
+                                remote: remote.clone(),
+                                name: full,
+                                old: Some(old),
+                                new: None,
+                            });
+                    }
+                    _ => {
+                        backend
+                            .branch_delete_remote(repo, remote, name)
+                            .await
+                            .map_err(stop)?;
+                    }
+                }
                 Ok(Ran::done(None))
             }
             FlowStep::OpenMergeRequest { .. } => Ok(Ran {
@@ -531,6 +555,7 @@ fn exec_for<'a>(backend: &'a dyn GitBackend, repo: &'a RepoRef, state: &FlowStat
         }),
         mr: state.merge_request.clone(),
         changed: false,
+        remote_deleted: Vec::new(),
     }
 }
 
@@ -572,6 +597,7 @@ pub(super) async fn start_run(
         branch: plan.branch.clone(),
         mr: plan.merge_request.clone(),
         changed: false,
+        remote_deleted: Vec::new(),
     };
     ex.original_head = ex.head_branch();
     if plan.steps.is_empty() {

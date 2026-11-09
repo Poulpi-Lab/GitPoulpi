@@ -5081,6 +5081,8 @@ undo_already_restored = "allt som den här åtgärden tog bort är redan tillbak
 undo_no_such_entry = "det finns ingen åtgärd nr {id} i ångrahistoriken"
 split_refused = { git = "kan inte dela upp den commiten: {reason}", local = "kan inte dela upp den incheckningen: {reason}" }
 undo_purged = "den gamla historiken för åtgärd #{entry} har rensats, så den kan inte ångras eller göras om"
+undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
+undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
 
 [window]
 connecting = "ansluter till sessionens daemon..."

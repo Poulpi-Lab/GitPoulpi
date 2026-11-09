@@ -42,6 +42,21 @@ pub struct RefChange {
     pub new: Option<Oid>,
 }
 
+/// A branch or tag deleted on a remote: `old` is what the remote held right
+/// before the deletion (the commit of a branch, the object of a tag; for an
+/// annotated tag the tag object itself, not the commit), `new` is `None` once
+/// it is gone. Undo pushes `old` back under the same name, without force
+/// (and refuses when the remote has something else there); redo deletes it
+/// again, with a lease on that value.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RemoteRefChange {
+    pub remote: String,
+    /// The full ref name on the remote (`refs/heads/x`, `refs/tags/v1`).
+    pub name: String,
+    pub old: Option<Oid>,
+    pub new: Option<Oid>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HeadChange {
     pub old: HeadState,
@@ -203,6 +218,10 @@ pub struct JournalEntry {
     /// Set on an `Outside` entry: the reflog's reason and committer.
     #[serde(default)]
     pub outside: Option<OutsideInfo>,
+    /// Refs deleted on a remote by this operation (a remote branch or tag
+    /// delete, alone or together with its local twin).
+    #[serde(default)]
+    pub remote_refs: Vec<RemoteRefChange>,
 }
 
 impl JournalEntry {
@@ -241,6 +260,15 @@ impl JournalEntry {
                         }
                     )
                 })
+                .chain(self.remote_refs.iter().map(|r| {
+                    format!(
+                        "{}/{}: {} -> {}",
+                        r.remote,
+                        r.name,
+                        short_opt(r.old),
+                        short_opt(r.new)
+                    )
+                }))
                 .chain(
                     self.index
                         .iter()
@@ -382,6 +410,15 @@ pub enum Step {
     /// The index file and the operation's state files become the saved
     /// state `to`; they are the saved state `from` now.
     RestoreOpState { to: String, from: String },
+    /// A ref on a remote goes from `from` to `to` (`None` = it does not
+    /// exist): a network operation. Never forced: the remote must still hold
+    /// `from` (a lease), or nothing happens.
+    RemoteRef {
+        remote: String,
+        name: String,
+        to: Option<Oid>,
+        from: Option<Oid>,
+    },
 }
 
 impl Step {
@@ -425,6 +462,17 @@ impl Step {
                 to: from.clone(),
                 from: to.clone(),
             },
+            Step::RemoteRef {
+                remote,
+                name,
+                to,
+                from,
+            } => Step::RemoteRef {
+                remote: remote.clone(),
+                name: name.clone(),
+                to: *from,
+                from: *to,
+            },
             // Back to the resolved file and its staged entry.
             Step::Unresolve { path, resolved, .. } => Step::RestorePaths {
                 paths: vec![path.clone()],
@@ -457,6 +505,16 @@ impl Step {
             Step::Unresolve { path, .. } => vec![format!(
                 "put {path} back in conflict (its three versions return to the index)"
             )],
+            Step::RemoteRef {
+                remote, name, to, ..
+            } => vec![match to {
+                Some(oid) => format!(
+                    "re-create {} on {remote} at {} (pushed to the remote, without force)",
+                    display_ref(name),
+                    short(*oid)
+                ),
+                None => format!("delete {} on {remote} again", display_ref(name)),
+            }],
             Step::RestoreOpState { .. } => vec![
                 "restore the index with its conflicts and the operation's state (merge, \
                  cherry-pick or revert in progress)"
@@ -604,6 +662,7 @@ impl Journal {
             conflict: None,
             opstate: None,
             outside: None,
+            remote_refs: Vec::new(),
         });
         id
     }
@@ -651,6 +710,7 @@ impl Journal {
                 message: change.message.clone(),
                 committer: change.committer.clone(),
             }),
+            remote_refs: Vec::new(),
         });
         self.retired.append(&mut self.redo);
         let mut dropped = Vec::new();
@@ -899,6 +959,18 @@ impl Journal {
         }
 
         let mut steps: Vec<Step> = Vec::new();
+        // The remote first: it is the step that can be refused (the remote
+        // moved on, the object is gone) and it changes nothing here, so a
+        // refusal leaves the repository as it was.
+        for change in &entry.remote_refs {
+            let (from, to) = oriented(undo, change.old, change.new);
+            steps.push(Step::RemoteRef {
+                remote: change.remote.clone(),
+                name: change.name.clone(),
+                to,
+                from,
+            });
+        }
         let pin_creates: Vec<RefUpdate> = new_pins
             .iter()
             .map(|p| RefUpdate::Create {

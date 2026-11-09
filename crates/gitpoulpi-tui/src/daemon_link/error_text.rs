@@ -225,6 +225,19 @@ pub(crate) fn undo_refusal(refusal: &UndoRefusal) -> String {
         UndoRefusal::ConfigChanged { section } => msg::typed_error::undo_config_changed(section),
         UndoRefusal::Interrupted { entry } => msg::typed_error::undo_interrupted(entry),
         UndoRefusal::Purged { entry } => msg::typed_error::undo_purged(entry),
+        UndoRefusal::RemoteRefMoved(moved) => msg::typed_error::undo_remote_ref_moved(
+            moved
+                .name
+                .strip_prefix("refs/heads/")
+                .or_else(|| moved.name.strip_prefix("refs/tags/"))
+                .unwrap_or(&moved.name),
+            &moved.remote,
+            nothing(moved.actual),
+            nothing(moved.expected),
+        ),
+        UndoRefusal::RemoteObjectMissing { oid } => {
+            msg::typed_error::undo_remote_object_missing(short(*oid))
+        }
         UndoRefusal::WouldOverwrite { detail } => {
             msg::typed_error::undo_would_overwrite(detail.trim())
         }
@@ -300,6 +313,13 @@ mod tests {
             },
             UndoRefusal::IndexChanged,
             UndoRefusal::StashChanged { commit: oid('c') },
+            UndoRefusal::RemoteRefMoved(Box::new(gitpoulpi_core::domain::RemoteRefMoved {
+                remote: "origin".into(),
+                name: "refs/heads/topic".into(),
+                expected: None,
+                actual: Some(oid('d')),
+            })),
+            UndoRefusal::RemoteObjectMissing { oid: oid('e') },
             UndoRefusal::StaleEntry {
                 expected_id: 3,
                 top_id: 5,

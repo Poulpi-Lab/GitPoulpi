@@ -316,15 +316,13 @@ impl FlowStep {
         }
     }
 
-    /// Whether Undo cannot take the step back. A push, a remote deletion
-    /// and a merge request live on the host.
+    /// Whether Undo cannot take the step back. A push and a merge request
+    /// live on the host; a remote branch deletion is taken back (the branch
+    /// is pushed back as it was, without force).
     pub fn irreversible(&self) -> bool {
         matches!(
             self,
-            FlowStep::Push { .. }
-                | FlowStep::DeleteRemoteBranch { .. }
-                | FlowStep::OpenMergeRequest { .. }
-                | FlowStep::Hook { .. }
+            FlowStep::Push { .. } | FlowStep::OpenMergeRequest { .. } | FlowStep::Hook { .. }
         )
     }
 }
@@ -500,6 +498,10 @@ pub struct FlowOutcome {
     /// A conflict or a failure left a flow that `resume` can go on with.
     #[serde(default, skip_serializing_if = "is_false")]
     pub resumable: bool,
+    /// The branches this run deleted on a remote, with the commit each held
+    /// right before (undoing the run pushes them back).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub remote_deleted: Vec<crate::journal::RemoteRefChange>,
 }
 
 /// What the daemon persists to resume a stopped flow

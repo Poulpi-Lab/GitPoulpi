@@ -59,6 +59,12 @@ pub(super) fn label_for(request: &Request) -> String {
         OperationKind::SparseDisable => "Disable sparse checkout".to_string(),
         OperationKind::TagCreate => format!("Create tag {}", arg("name")),
         OperationKind::TagDelete => format!("Delete tag {}", arg("name")),
+        OperationKind::BranchDeleteRemote => {
+            format!("Delete branch {} on {}", arg("name"), arg("remote"))
+        }
+        OperationKind::TagDeleteRemote => {
+            format!("Delete tag {} on {}", arg("name"), arg("remote"))
+        }
         OperationKind::TagAnnotate => format!("Annotate tag {}", arg("name")),
         OperationKind::FastForward => format!(
             "Fast-forward {} to {}",

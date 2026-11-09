@@ -169,6 +169,57 @@ fn deleting_locally_and_on_the_remote_sticks_through_a_refetch() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
+/// The combined delete is one Undo entry: Ctrl+Z asks (it re-creates the tag
+/// on the server), and after the confirm the tag is back here and on origin.
+#[test]
+fn undoing_a_delete_here_and_on_the_remote_brings_the_tag_back_in_both_places() {
+    let repo = fixture();
+    let object = repo.git(&["rev-parse", "refs/tags/v1"]);
+    let (mut term, _config) = launch_fetched(repo.root(), "pty-tag-where-undo");
+    open_delete_dialog(&mut term, "v1", BOTH);
+    term.send_keys("3").unwrap();
+    term.wait_for("the confirm naming origin", STEP, |s| {
+        s.contains("here AND on origin")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("y").unwrap();
+    term.wait_for("the result line", STEP, |s| {
+        s.contains("Deleted v1 here and on origin")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(!local_has(&repo, "v1") && !remote_tags(&repo).contains("v1"));
+
+    let mut asked = false;
+    for _ in 0..60 {
+        term.send_keys("C-z").unwrap();
+        if term
+            .wait_for("the undo question", Duration::from_secs(1), |s| {
+                s.contains("re-creates tag v1 on origin")
+            })
+            .is_ok()
+        {
+            asked = true;
+            break;
+        }
+    }
+    assert!(asked, "the undo never asked:\n{}", term.text());
+    assert!(
+        !remote_tags(&repo).contains("v1"),
+        "asking changes nothing on the server"
+    );
+    term.send_keys("y").unwrap();
+    term.wait_for("the tag back on origin", STEP, |_| {
+        remote_tags(&repo).contains("v1")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert_eq!(
+        repo.git_in_remote(&["rev-parse", "refs/tags/v1"]),
+        object,
+        "the same tag object"
+    );
+    assert!(local_has(&repo, "v1"), "and the local tag is back too");
+}
+
 /// The local-only delete of a tag a remote has: it works, it says the remote
 /// still has it, and the next fetch does bring it back (git's behaviour,
 /// now announced instead of surprising).

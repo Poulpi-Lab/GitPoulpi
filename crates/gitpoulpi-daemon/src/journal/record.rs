@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use gitpoulpi_core::domain::{Oid, OperationKind, RefScope, RepoRef};
-use gitpoulpi_core::journal::{pin_name, JournalEntry, Pin};
+use gitpoulpi_core::journal::{pin_name, JournalEntry, Pin, RemoteRefChange};
 use gitpoulpi_core::GitBackend;
 use gitpoulpi_ipc::Request;
 use serde_json::Value;
@@ -75,6 +75,30 @@ pub fn record(
 /// await its network call between the two halves. `None`: the journal
 /// cannot be used, run the operation unrecorded.
 pub fn begin_record(backend: &dyn GitBackend, request: &Request) -> Option<Recording> {
+    begin_record_with(backend, request, None)
+}
+
+/// What a remote deletion adds to its recording: the ref as the server held
+/// it, and the local twin deleted by the same request, if any.
+pub struct RemoteDelete {
+    pub change: RemoteRefChange,
+    pub local_request: Option<Request>,
+}
+
+/// [`begin_record`] for the deletion of a branch or tag on a remote.
+pub fn begin_record_remote(
+    backend: &dyn GitBackend,
+    request: &Request,
+    delete: RemoteDelete,
+) -> Option<Recording> {
+    begin_record_with(backend, request, Some(delete))
+}
+
+fn begin_record_with(
+    backend: &dyn GitBackend,
+    request: &Request,
+    remote: Option<RemoteDelete>,
+) -> Option<Recording> {
     if !crate::undo_settings::enabled() {
         return None;
     }
@@ -95,7 +119,11 @@ pub fn begin_record(backend: &dyn GitBackend, request: &Request) -> Option<Recor
     {
         return None;
     }
-    let mut before = match capture_before(backend, &repo, request) {
+    let capture_request = remote
+        .as_ref()
+        .and_then(|r| r.local_request.as_ref())
+        .unwrap_or(request);
+    let mut before = match capture_before(backend, &repo, capture_request) {
         Ok(b) => b,
         Err(e) => {
             tracing::warn!(
@@ -107,6 +135,13 @@ pub fn begin_record(backend: &dyn GitBackend, request: &Request) -> Option<Recor
     };
     if before.unrecordable {
         return None;
+    }
+    if let Some(remote) = remote {
+        // The object the remote held must outlive the deletion: undo pushes
+        // it back from here.
+        before.pins.extend(remote.change.old);
+        before.remote_ref = Some(remote.change);
+        before.local_request = remote.local_request;
     }
     if crate::journal_snap::is_snapshot_op(request) {
         match crate::journal_snap::capture(backend, &repo, request, &journal) {
@@ -145,7 +180,7 @@ pub fn begin_record(backend: &dyn GitBackend, request: &Request) -> Option<Recor
     // Write-ahead: the entry and its pins exist before anything changes.
     let id = journal.begin(
         request.command,
-        label_for(request),
+        label_for(before.local_request.as_ref().unwrap_or(request)),
         now(),
         before.head.clone(),
         before.require_head,
@@ -280,7 +315,34 @@ pub fn finish_record(
         }
         _ => None,
     };
+    // A remote deletion with a local twin is recorded as the local operation
+    // would be, with the remote ref added to the same entry.
+    let effective = before.local_request.as_ref().unwrap_or(request);
+    // A workflow action that deleted branches on a remote reports them.
+    let flow_remote: Vec<RemoteRefChange> = match (&dispatched.response.result, request.command) {
+        (Ok(value), OperationKind::FlowRun) => value
+            .get("remote_deleted")
+            .and_then(|v| serde_json::from_value(v.clone()).ok())
+            .unwrap_or_default(),
+        _ => Vec::new(),
+    };
+    let own_remote = before.remote_ref.is_some() && succeeded;
+    let remote_done = (before.remote_ref.is_some() || !flow_remote.is_empty()) && succeeded;
     let recorded = match &dispatched.response.result {
+        Ok(_) if own_remote && before.local_request.is_none() => Some(After {
+            head: None,
+            refs: vec![],
+            config: vec![],
+            label: None,
+        }),
+        Ok(value) if own_remote => {
+            after_state(backend, &repo, effective, &before, value).map(|mut after| {
+                let remote = before.remote_ref.as_ref().map_or("", |r| r.remote.as_str());
+                let base = after.label.take().unwrap_or_else(|| label_for(effective));
+                after.label = Some(format!("{base} and on {remote}"));
+                after
+            })
+        }
         Ok(_) if before.stash_remote.is_some() => stash_remote_done.as_ref().map(|d| After {
             head: None,
             refs: d.refs.clone(),
@@ -303,12 +365,28 @@ pub fn finish_record(
                 || !after.config.is_empty()
                 || after.head_moved(&before)
                 || snap_done.is_some()
+                || remote_done
                 || stash_remote_done
                     .as_ref()
                     .is_some_and(|d| d.stash.is_some() || d.index.is_some()) =>
         {
             if let Some(entry) = journal.entry_mut(id) {
                 entry.label = after.label.clone().unwrap_or_else(|| entry.label.clone());
+                if let (true, Some(change)) = (remote_done, &before.remote_ref) {
+                    entry.remote_refs = vec![RemoteRefChange {
+                        new: None,
+                        ..change.clone()
+                    }];
+                }
+                if !flow_remote.is_empty() {
+                    // Pinned now (the delete already dropped the tracking
+                    // ref that kept them alive): undo pushes them back.
+                    let olds: Vec<Oid> = flow_remote.iter().filter_map(|c| c.old).collect();
+                    crate::journal_stashes_remotes::pin_extra(
+                        backend, &repo, &pin_ns, entry, &olds,
+                    );
+                    entry.remote_refs = flow_remote.clone();
+                }
                 if request.command == OperationKind::FlowRun {
                     entry.effect =
                         flow_effect(before.head.as_ref(), after.head.as_ref(), &after.refs);

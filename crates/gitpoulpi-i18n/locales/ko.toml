@@ -5073,6 +5073,8 @@ undo_already_restored = "이 작업이 제거한 것은 모두 이미 돌아왔�
 undo_no_such_entry = "실행 취소 기록에 {id}번 작업이 없습니다"
 split_refused = "{$commit}을 분할할 수 없습니다: {reason}"
 undo_purged = "작업 #{entry}의 이전 기록이 영구 삭제되어 실행 취소나 다시 실행을 할 수 없습니다"
+undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
+undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
 
 [window]
 connecting = "세션 데몬에 연결하는 중..."

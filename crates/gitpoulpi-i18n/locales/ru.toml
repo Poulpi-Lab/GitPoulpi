@@ -5070,6 +5070,8 @@ undo_already_restored = "всё, что удалила эта операция, 
 undo_no_such_entry = "в истории отмен нет операции №{id}"
 split_refused = "нельзя разделить этот {$commit}: {reason}"
 undo_purged = "старая история операции #{entry} очищена, поэтому её нельзя ни отменить, ни повторить"
+undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
+undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
 
 [window]
 connecting = "подключение к демону сеанса..."

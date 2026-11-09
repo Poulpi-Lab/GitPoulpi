@@ -823,6 +823,31 @@ mod tests {
         }
     }
 
+    /// A token no prefix rule recognises is masked once the daemon registered
+    /// it (what resolving an account's token does), in the ring and the file.
+    #[test]
+    fn a_registered_token_without_a_known_prefix_never_reaches_the_ring_or_the_file() {
+        let secret = "qx-registered-9f8e7d6c5b4a";
+        gitpoulpi_core::redact_register_secret(secret);
+        let dir = tempfile::tempdir().unwrap();
+        let log = logger(dir.path(), Level::Info);
+        log.emit(
+            Level::Warn,
+            "daemon",
+            &format!("remote: denied: bad credentials {secret}"),
+        );
+        log.flush();
+        let on_disk = read_records(dir.path(), 10);
+        for text in [
+            log.recent()[0].message.clone(),
+            on_disk[0].message.clone(),
+            std::fs::read_to_string(dir.path().join(file_name(Local::now().date_naive()))).unwrap(),
+        ] {
+            assert!(!text.contains(secret), "leaked: {text}");
+            assert!(text.contains("***"), "{text}");
+        }
+    }
+
     #[test]
     fn tracing_events_land_in_the_log_with_their_fields() {
         let dir = tempfile::tempdir().unwrap();

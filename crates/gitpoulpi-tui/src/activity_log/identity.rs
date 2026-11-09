@@ -135,4 +135,42 @@ mod tests {
         note(repo, None);
         assert_eq!(line_for(repo), None, "back to default: no line");
     }
+
+    /// The Activity Log entry of a pull or push appends who it signed in as,
+    /// only for a repository whose profile is not default and only for the
+    /// operations that sign in.
+    #[test]
+    fn the_entry_of_a_pull_says_who_it_signed_in_as() {
+        use crate::activity_log::{feed, report_success};
+        use gitpoulpi_core::domain::PullOptions;
+        let repo = Path::new("/repos/work");
+        let pull = Action::Pull(PullOptions::default());
+        let took = std::time::Duration::from_millis(5);
+
+        report_success(&pull, repo, took);
+        let plain = feed::snapshot().remove(0);
+        assert!(!plain.message.contains("Signs in"), "{}", plain.message);
+
+        let account = ActiveIdentity {
+            https: Some(HttpsIdentity {
+                via: IdentityVia::Token,
+                name: "github-corp".into(),
+            }),
+            ..ActiveIdentity::default()
+        };
+        note(repo, Some(&account));
+        report_success(&pull, repo, took);
+        let entry = feed::snapshot().remove(0);
+        assert!(
+            entry.message.contains("Signs in as: github-corp (token)"),
+            "{}",
+            entry.message
+        );
+        // Another repository, and an operation that never signs in: nothing.
+        report_success(&pull, Path::new("/repos/other"), took);
+        assert!(!feed::snapshot()[0].message.contains("Signs in"));
+        assert!(!uses_network(&Action::StageAll));
+        assert!(uses_network(&Action::FetchAll));
+        assert!(uses_network(&pull));
+    }
 }

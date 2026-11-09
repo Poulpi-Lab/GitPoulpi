@@ -113,6 +113,31 @@ network. Make sure `git fetch` works in a plain terminal first. GitHub/GitLab
 tokens for pull requests are separate and optional: see [Hosting and issue
 trackers](hosting-integration.md).
 
+**A fetch, pull or push fails with "The configured credential helper failed", "The SSH host key of the remote is not known yet", or a refused sign-in, and its Activity Log entry has an "SSH & credentials..." button.**
+The failure comes from how this repository signs in. The button opens
+Settings > SSH & credentials, where you pick another source for this
+repository: git's own helpers with the repository's helpers ignored, an
+integration account, a key file (with a known hosts file), or a helper or token
+command of your own; **Test connection** then checks every remote. For a
+helper that could not run, `git config --show-origin --get-all
+credential.helper` shows where it is set.
+
+**"GitPoulpi did not send the account token to ...".** The repository's remote
+points at a server that is not the address the chosen account is bound to
+(often a `url.<x>.insteadOf` rewrite in the repository's own config), so the
+token was held back. Fix the remote or choose another source on the page.
+
+**"This repository's token command failed", "... changed since you confirmed it", "This repository's sign-in cannot be used".**
+The page's choices cannot be carried out: the token command printed no token
+(its last error lines are quoted, with secrets removed), a script it runs
+changed since you confirmed it (confirm the command again on the page), or the
+choice names a key file or account that is gone. Each reading has the
+**SSH & credentials...** button.
+
+**OpenSSH says "bad permissions" for a key file.** Other accounts can read the
+key. On Settings > SSH & credentials the **Private key file** row shows a
+warning with **Restrict to my account**.
+
 **"staging..." stays on the status line.** A background refresh is still running; it
 disappears when the file list updates. `r` forces a refresh.
 

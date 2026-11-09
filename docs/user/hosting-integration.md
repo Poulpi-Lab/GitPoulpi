@@ -654,18 +654,24 @@ When a key is attached, the section shows `title (SHA256:...)` with:
 
 ### SSH key for one repository
 
-To make one repository use the key of a profile, GitPoulpi sets
-`core.sshCommand` to `ssh -i "<key>" -o IdentitiesOnly=yes` in that repository.
-This is never done automatically. Open the tab menu (`Ctrl+T`, or right-click
-the tab) and choose **SSH key...**, or run the palette command
-*Repository: SSH Key for This Repository...*. The menu shows the current pin,
-every profile that has a private key, and **Clear the pin**.
+To make one repository use a particular key, open the tab menu (`Ctrl+T`, or
+right-click the tab) and choose **SSH & credentials...**, or run the palette
+command *Repository: SSH & Credentials...*, and pick **Key file** (or **Account
+key** for the key of an integration profile) under SSH. The choice is kept in
+GitPoulpi's private folder: nothing is written to the repository or to git's
+config. See [Settings](settings.md#repo-specific-ssh--credentials).
 
-CLI and MCP: `gitpoulpi ssh-command show | set --key <file> | clear`.
+A repository that still has a `core.sshCommand` of its own, from the former
+"SSH key for this repository" pin, shows it on that page, read-only, with
+**Move into GitPoulpi**.
+
+CLI and MCP: `gitpoulpi repo-auth` (the per-repository choice) and, for the
+`core.sshCommand` pin itself, `gitpoulpi ssh-command show | set --key <file> |
+clear`.
 
 The global key on Settings > SSH & credentials (*Private key path*, or
-*Generate key pair*) applies to every repository without a pin. A repository
-pin wins over it.
+*Generate key pair*) applies to every repository without a choice of its own.
+A repository's key file or pin wins over it.
 
 ## 13b. Branch protection, for a history rewrite
 

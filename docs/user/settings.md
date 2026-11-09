@@ -567,9 +567,10 @@ blocks.
 | **Ignore credential helpers set by this repository** | **System** only. The helpers the repository sets for itself (its `.git/config`, files it includes) are listed under it with the file each comes from; the system and global helpers keep working. |
 | **Helper**, **Command**, **Hosts**, **Cache (minutes)** | A command the repository runs to sign in. A *helper* is a git credential helper; a *token command* prints a token (the argument list is split by spaces, with quotes around an argument that holds spaces, and shown under **Runs as**; no shell runs it, it runs in the repository folder). **Hosts** limits it to those hosts (empty: the host of the main remote); **Cache** is how long a token is reused (50 minutes by default). **Use this repository's current helper** copies the helper the repository sets into the field. |
 | **SSH: Sign in with** | **System** (ssh's own setup, the agent and the default keys), **Key file** or **Account key** (the key of an integration). |
-| **Private key file** | Pick one of the keys found in `~/.ssh` or type a path. Only this key is offered, to every SSH remote of the repository, submodules included. |
+| **Private key file** | Pick one of the keys found in `~/.ssh` or type a path. Only this key is offered, to every SSH remote of the repository, submodules included. When other accounts can read the key file (a permission bit for group or others on Linux and macOS, an entry for Everyone, Users or Authenticated Users on Windows), a warning says that OpenSSH refuses such a key ("bad permissions") and **Restrict to my account** fixes it (`chmod 600`, or a DACL for your account and SYSTEM only on Windows). |
 | **Known hosts file**, **Strict host key checking** | An optional file of trusted host keys, and refusing a host that is not in it. |
 | **ssh program** | The program that will run (read-only). |
+| **Pinned in git's config** | Only when this repository sets its own `core.sshCommand` (the old "SSH key for this repository" pin, which GitPoulpi used to write). The command is shown read-only. **Move into GitPoulpi** saves the equivalent **Key file** choice and then removes the pin from git's config; it is offered when the command is a plain `ssh -i <key>` pin, and only while the page has no unsaved edits and its SSH choice is still **System**. Any other command is shown with a note instead: edit it with `git config`. The move is not undoable, like every setting here, and the pin removal is not on the Undo stack either (nothing is lost: the key is in the profile). |
 | **Remotes** | Read-only: each remote with its protocol and the identity it will use. Settings the profile overrides (`core.sshCommand`, `credential.helper`) are listed with their file, and a profile that cannot be used says why. |
 
 Buttons (a key for each: `Tab`/`Left`/`Right` between them, `Enter` presses):
@@ -591,6 +592,14 @@ command. If the command is stored already and unchanged, saving the other half o
 
 A profile that cannot be used (a missing key file, a source this version does not run yet) makes the transfer fail
 with its reason instead of falling back to the machine's own identity.
+
+When the profile is not all default, the **Push** menu ends with a line saying who the push signs in as (**Signs in
+as: github-corp (token)** or **SSH key: work_ed25519**); it opens this page. The same line is added to the Activity
+Log entries of fetch, pull and push. A failure caused by this page's choices (a credential helper that could not run,
+an SSH host key that is not known yet, a refused sign-in, a token command that failed, a token that was not sent
+because the server is not the account's address) shows an **SSH & credentials...** button on its Activity Log entry
+(`r` on the entry), next to **Open Integrations** when an integration account may be the source. The tab menu's
+**SSH & credentials...** row opens the page too; it replaces the old **SSH key...** pin menu and its palette entry.
 
 ### Repo-specific: Sparse checkout
 

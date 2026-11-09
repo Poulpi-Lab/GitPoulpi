@@ -188,7 +188,7 @@ Das baut das Profil `dist` und schreibt
 
 ## Updates
 
-Die Titelleiste zeigt die laufende Version (`v1.0.0`) zwischen dem Programmnamen und dem Repository-Pfad. Klicken Sie darauf, oder drücken Sie `Ctrl+N` und dann `u`, oder führen Sie **Updates: Update-Fenster anzeigen** in der Befehlspalette (`Ctrl+P`) aus: Das Update-Fenster öffnet sich mit der Version, dem Installationsweg von GitPoulpi und dem, was bei einem neueren Release zu tun ist. **Hilfe: Versionshinweise** öffnet das Änderungsprotokoll.
+Die Titelleiste zeigt die laufende Version (`v1.0.0`) zwischen dem Programmnamen und dem Repository-Pfad. Ist ein neueres Release bekannt (oder läuft ein Update), öffnet ein Klick darauf das Update-Fenster mit der Version, dem Installationsweg von GitPoulpi und dem, was bei dem neuen Release zu tun ist; sonst öffnet ein Klick den Tab Versionshinweise. `Ctrl+N` und dann `u`, oder **Updates: Update-Fenster anzeigen** in der Befehlspalette (`Ctrl+P`), öffnet immer das Update-Fenster, und **Hilfe: Versionshinweise** öffnet immer das Änderungsprotokoll.
 
 Einmal täglich prüft GitPoulpi im Hintergrund an dem Ort, an dem seine Releases veröffentlicht werden (standardmäßig GitHub), ob es ein neueres gibt (`updates.mode`, [Einstellungen > Synchronisierung](settings.md#synchronisierung)). Gibt es eines, steht auf dem Chip `v0.2.0 verfügbar` in der Akzentfarbe.
 

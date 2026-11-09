@@ -2461,8 +2461,8 @@ preferences_list_remove = "Ausgewählten Listeneintrag entfernen"
 preferences_list_move_up = "Ausgewählten Listeneintrag nach oben"
 preferences_list_move_down = "Ausgewählten Listeneintrag nach unten"
 ai_popup_copy = "Ergebnis kopieren"
-activity_log_scroll_left = "Scroll the Activity Log Left"
-activity_log_scroll_right = "Scroll the Activity Log Right"
+activity_log_scroll_left = "Aktivitätsprotokoll nach links scrollen"
+activity_log_scroll_right = "Aktivitätsprotokoll nach rechts scrollen"
 integrations_add = "Ein Profil hinzufügen"
 integrations_edit = "Ausgewähltes Profil bearbeiten"
 integrations_open_token = "Token-Seite öffnen"
@@ -2528,7 +2528,7 @@ folder_picker = "Ordnerauswahl"
 preferences = "Einstellungen"
 ai_popup = "KI-Ergebnis-Popup"
 integrations = "Einstellungen: Integrationen"
-activity_log = "Activity Log window"
+activity_log = "Aktivitätsprotokoll-Fenster"
 palette = "Palette-Befehle"
 split = "Aufteilungseditor für {$commit}"
 
@@ -4592,8 +4592,8 @@ not_blocked = "der letzte Rückgängig-Eintrag ist nicht blockiert"
 forget_button = "Vergessen"
 
 [undo_ui]
-nothing_to_undo = { git = "nichts rückgängig zu machen (ein Push, ein Fetch oder alles andere auf einem entfernten Server wird nie rückgängig gemacht)", local = "nichts rückgängig zu machen (Hochladen, Abrufen und alles andere auf einem entfernten Server wird nie rückgängig gemacht)" }
-tip_nothing_to_undo = { git = "Nichts rückgängig zu machen (ein Push, ein Fetch oder alles andere auf einem entfernten Server wird nie rückgängig gemacht)", local = "Nichts rückgängig zu machen (Hochladen, Abrufen und alles andere auf einem entfernten Server wird nie rückgängig gemacht)" }
+nothing_to_undo = { git = "nichts rückgängig zu machen (ein {$push_noun}, ein {$fetch_noun} oder alles andere auf einem entfernten Server wird nie rückgängig gemacht, außer dem Löschen eines Branches oder {$tag} auf dem Remote)", local = "nichts rückgängig zu machen ({$push_noun}, {$fetch_noun} und alles andere auf einem entfernten Server wird nie rückgängig gemacht, außer dem Löschen eines Branches oder {$tag} auf dem Remote)" }
+tip_nothing_to_undo = { git = "Nichts rückgängig zu machen (ein {$push_noun}, ein {$fetch_noun} oder alles andere auf einem entfernten Server wird nie rückgängig gemacht, außer dem Löschen eines Branches oder {$tag} auf dem Remote)", local = "Nichts rückgängig zu machen ({$push_noun}, {$fetch_noun} und alles andere auf einem entfernten Server wird nie rückgängig gemacht, außer dem Löschen eines Branches oder {$tag} auf dem Remote)" }
 tip_nothing_to_redo = "Nichts zu wiederholen"
 nothing_to_redo = "nichts zu wiederholen"
 disabled = "Rückgängig ist ausgeschaltet (Einstellungen > Allgemein)"
@@ -5052,7 +5052,7 @@ conflict_not_conflicted = "die Datei ist nicht im Konflikt"
 conflict_already = "die Datei ist weiterhin im Konflikt"
 conflict_no_operation = "es läuft kein {$Merge}, {$Rebase}, {$Cherry_pick} oder Revert"
 conflict_unencodable = "Zeile {line} hat ein Zeichen, das die Kodierung der Datei nicht darstellen kann"
-conflict_local_changes = "local changes the abort would overwrite: {paths}"
+conflict_local_changes = "lokale Änderungen, die der Abbruch überschreiben würde: {paths}"
 undo_refused = "Rückgängig/Wiederholen nicht möglich: {reason}"
 undo_in_progress = "zuerst {op} abschließen oder abbrechen"
 undo_ref_moved = "{name} steht bei {actual}, nicht bei {expected}, wo der Vorgang es hinterlassen hat; es wurde außerhalb von GitPoulpi geändert"
@@ -5081,8 +5081,8 @@ undo_already_restored = "alles, was dieser Vorgang entfernt hat, ist schon wiede
 undo_no_such_entry = "im Rückgängig-Verlauf gibt es keinen Vorgang Nr. {id}"
 split_refused = "dieser {$commit} lässt sich nicht aufteilen: {reason}"
 undo_purged = "der alte Verlauf von Vorgang #{entry} wurde bereinigt, daher lässt er sich nicht rückgängig machen oder wiederholen"
-undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
-undo_remote_object_missing = "{object} is no longer in this repository (it was garbage collected), so the branch or {$tag} cannot be restored on the remote with a {$push_noun}"
+undo_remote_ref_moved = "{name} auf {remote} steht bei {actual}, nicht bei {expected}, wo der Vorgang es hinterlassen hat: es wurde seitdem auf dem Remote geändert, daher wurde dort nichts übertragen oder gelöscht"
+undo_remote_object_missing = "{object} ist nicht mehr in diesem Repository (es wurde von der Garbage Collection entfernt), daher lässt sich der Branch oder {$tag} nicht per {$push_noun} auf dem Remote wiederherstellen"
 
 [window]
 connecting = "Verbindung zum Sitzungs-Daemon wird hergestellt..."
@@ -5932,17 +5932,17 @@ scope_all = "Alle Repositories"
 scope_workspace = "Workspace: {name}"
 app_wide = "anwendungsweit"
 git_empty = "Noch keine Vorgänge. Hier stehen die Vorgänge des gewählten Bereichs, mit ihrer Dauer."
-hint_git = "Auf/Ab: wählen  Enter: Details  c: kopieren  r: Vorschlag ausführen  d: Diagnose  s: Bereich  Tab: Anwendung  Esc: schließen"
+hint_git = "Auf/Ab: wählen  Links/Rechts: scrollen  Enter: Details  c: kopieren  r: Vorschlag ausführen  d: Diagnose  s: Bereich  Tab: Anwendung  Esc: schließen"
 hint_application = "Pfeile: scrollen  l: Stufe  /: filtern  c: alles kopieren  o: Ordner  x: leeren  d: Diagnose  s: Bereich  g: Git  Esc: schließen"
 palette_scope = "Aktivitätsprotokoll: Bereich wählen"
 palette_git_tab = "Aktivitätsprotokoll: Git-Vorgänge"
 palette_app_tab = "Aktivitätsprotokoll: Anwendungsprotokoll"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the left
-palette_scroll_left = "Activity Log: Scroll Left"
+palette_scroll_left = "Aktivitätsprotokoll: nach links scrollen"
 # context: command palette entry: scrolls the Activity Log's lines sideways, to the right
-palette_scroll_right = "Activity Log: Scroll Right"
+palette_scroll_right = "Aktivitätsprotokoll: nach rechts scrollen"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
-help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
+help_scroll = "Aktivitätsprotokoll: lange Zeilen seitlich scrollen (auch Shift + Mausrad oder die horizontale Bildlaufleiste)"
 
 [git_error]
 summary_host_key = "Der SSH-Hostschlüssel des Remotes ist noch nicht bekannt."
@@ -5971,9 +5971,9 @@ summary_network = "Das Remote ist nicht erreichbar."
 hint_network = "Prüfen Sie Ihre Verbindung und die Adresse des Remotes und versuchen Sie es erneut."
 summary_lock = "Ein anderer Git-Prozess verwendet dieses Repository."
 hint_lock = "Schließen Sie andere Git-Werkzeuge oder löschen Sie die Sperrdatei, falls keines läuft."
-summary_credential_helper = "The configured credential helper failed: {line}"
-hint_credential_helper = "Run `git config --show-origin --get-all credential.helper` to see where it is set, fix or remove that helper, then retry."
-hint_abort_blocked = "Save a copy of the changes to those files or discard them in the Status pane, then retry the abort."
+summary_credential_helper = "Der konfigurierte Credential-Helper ist fehlgeschlagen: {line}"
+hint_credential_helper = "Führen Sie `git config --show-origin --get-all credential.helper` aus, um zu sehen, wo er gesetzt ist, korrigieren oder entfernen Sie diesen Helper und versuchen Sie es dann erneut."
+hint_abort_blocked = "Sichern Sie die Änderungen an diesen Dateien oder verwerfen Sie sie im Status-Bereich und versuchen Sie dann erneut abzubrechen."
 action_pull_first = "Erst {$Pull}"
 action_integrations = "Integrationen öffnen"
 action_stash_retry = "{$Stash} und wiederholen"
@@ -8948,98 +8948,98 @@ sensitive_stage = "sensible Dateien wurden nicht {$staged}: {files}; den Benutze
 # context: Settings > AI, heading of the rows that limit how much input an AI request carries
 settings_heading = "Limits"
 # context: Settings > AI, label of a number: the most bytes one merge conflict may add up to when the AI is asked to resolve it
-conflict_label = "Largest conflict to send (bytes)"
+conflict_label = "Größter zu sendender Konflikt (Bytes)"
 # context: help under that number
-conflict_help = "Over this size, Suggest a resolution does not fail: it warns, and you can send it anyway once, open this setting or cancel. The limit is GitPoulpi's own guard, not the model's: raise it when your model has the room. 40000 by default."
+conflict_help = "Darüber schlägt „Lösung vorschlagen“ nicht fehl: Es warnt, und Sie können den Konflikt einmalig trotzdem senden, diese Einstellung öffnen oder abbrechen. Das Limit ist GitPoulpis eigene Schranke, nicht die des Modells: Erhöhen Sie es, wenn Ihr Modell genug Platz hat. Standard: 40000."
 # context: red warning under that number while it is very large
-conflict_warning = "A very large limit can send more than the model accepts: the request then fails at the provider."
+conflict_warning = "Ein sehr großes Limit kann mehr senden, als das Modell annimmt: Die Anfrage schlägt dann beim Anbieter fehl."
 # context: title of the dialog shown when a conflict is over the limit
-too_large_title = "Conflict too large to send"
+too_large_title = "Konflikt zu groß zum Senden"
 # context: body of that dialog; {path} is the file, {size} the conflict's size (for example "48.1 KB (49206 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-too_large_body = "The conflict in {path} is {size}, and the limit is {limit} (setting {key}). The limit is GitPoulpi's own guard, not the model's. If you send it anyway, secrets are still replaced and sensitive files are still left out."
+too_large_body = "Der Konflikt in {path} ist {size} groß, das Limit beträgt {limit} (Einstellung {key}). Das Limit ist GitPoulpis eigene Schranke, nicht die des Modells. Wenn Sie ihn trotzdem senden, werden Geheimnisse weiterhin ersetzt und sensible Dateien weiterhin ausgelassen."
 # context: button that sends the oversized conflict this one time
-send_anyway = "Send anyway"
+send_anyway = "Trotzdem senden"
 # context: button that opens Settings on the limit
-open_setting = "Open setting"
+open_setting = "Einstellung öffnen"
 # context: key of the Send anyway button, one letter (shown as "Send anyway (S)")
-key_send = "s"
+key_send = "t"
 # context: key of the Open setting button, one letter
-key_open = "o"
+key_open = "e"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "b"
 # context: Settings > AI, label of a number: the most bytes of the {$diff} an AI request for a message, an explanation, a stash name, a request description, a commit plan or a split may carry; also the whole {$diff} of a code review
-diff_label = "Largest {$diff} to send (bytes)"
+diff_label = "Größenlimit für {$diff} beim Senden (Bytes)"
 # context: help under that number
-diff_help = "Over this size, nothing is cut silently: you are asked whether to send all of the {$diff}, send it truncated, open this setting or cancel. Applies to a message for a {$commit}, an explanation, a name for a {$stash}, a description of a request, a plan of {$commits} and a split, and to the whole {$diff} of a code review. 60000 by default."
+diff_help = "Darüber wird nichts stillschweigend gekürzt: Sie werden gefragt, ob Sie alles ({$diff}) senden, gekürzt senden, diese Einstellung öffnen oder abbrechen möchten. Gilt für eine Nachricht zu einem {$commit}, eine Erklärung, einen Namen für einen {$stash}, eine Beschreibung einer Anfrage, einen Plan für {$commits} und eine Aufteilung sowie für das gesamte {$diff} eines Code-Reviews. Standard: 60000."
 # context: Settings > AI, label of a number: the most bytes of one file's {$diff} in a code review
-review_file_label = "Largest file {$diff} in a review (bytes)"
+review_file_label = "Größenlimit für {$diff} einer Datei im Review (Bytes)"
 # context: help under that number
-review_file_help = "Over this size, one file's {$diff} in a code review is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 12000 by default."
+review_file_help = "Darüber wird {$diff} einer Datei in einem Code-Review gekürzt, nachdem Sie gefragt wurden: alles senden, gekürzt senden, diese Einstellung öffnen oder abbrechen. Standard: 12000."
 # context: Settings > AI, label of a number: the most bytes of the description of the reviewed request
-review_text_label = "Largest review description (bytes)"
+review_text_label = "Größte Review-Beschreibung (Bytes)"
 # context: help under that number
-review_text_help = "Over this size, the description of the reviewed request is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 4000 by default."
+review_text_help = "Darüber wird die Beschreibung der begutachteten Anfrage gekürzt, nachdem Sie gefragt wurden: alles senden, gekürzt senden, diese Einstellung öffnen oder abbrechen. Standard: 4000."
 # context: Settings > AI, label of a number: the most bytes of the comments that already exist on the reviewed request
-review_threads_label = "Largest list of existing comments in a review (bytes)"
+review_threads_label = "Größte Liste vorhandener Kommentare im Review (Bytes)"
 # context: help under that number
-review_threads_help = "The comments that already exist are listed so the model does not repeat them. Over this size, the list is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 6000 by default."
+review_threads_help = "Die bereits vorhandenen Kommentare werden aufgelistet, damit das Modell sie nicht wiederholt. Darüber wird die Liste gekürzt, nachdem Sie gefragt wurden: alles senden, gekürzt senden, diese Einstellung öffnen oder abbrechen. Standard: 6000."
 # context: Settings > AI, label of a number: the most bytes of one project context file (CLAUDE.md, AGENTS.md, the extra file) given to a code review
-review_context_file_label = "Largest context file in a review (bytes)"
+review_context_file_label = "Größte Kontextdatei im Review (Bytes)"
 # context: help under that number
-review_context_file_help = "Over this size, a context file (CLAUDE.md, AGENTS.md or the extra file) is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 8192 by default."
+review_context_file_help = "Darüber wird eine Kontextdatei (CLAUDE.md, AGENTS.md oder die zusätzliche Datei) gekürzt, nachdem Sie gefragt wurden: alles senden, gekürzt senden, diese Einstellung öffnen oder abbrechen. Standard: 8192."
 # context: Settings > AI, label of a number: the most bytes of all the project context files together
-review_context_label = "Largest context in a review, all files (bytes)"
+review_context_label = "Größter Kontext im Review, alle Dateien (Bytes)"
 # context: help under that number
-review_context_help = "Over this size, the context files together are cut (the last one is shortened or left out), after you were asked: send all of them, send them truncated, open this setting or cancel. 16384 by default."
+review_context_help = "Darüber werden die Kontextdateien zusammen gekürzt (die letzte wird verkürzt oder ausgelassen), nachdem Sie gefragt wurden: alles senden, gekürzt senden, diese Einstellung öffnen oder abbrechen. Standard: 16384."
 # context: title of the dialog shown when what would be sent to the AI is over a limit and would be cut
-truncate_title = "Over the AI limit"
+truncate_title = "Über dem KI-Limit"
 # context: first paragraph of that dialog, before the list of what is over its limit
-truncate_intro = "Some of what would be sent to the AI is over a limit GitPoulpi sets (the limits are GitPoulpi's own guard, not the model's):"
+truncate_intro = "Einiges von dem, was an die KI gesendet würde, liegt über einem Limit, das GitPoulpi setzt (die Limits sind GitPoulpis eigene Schranke, nicht die des Modells):"
 # context: last paragraph of that dialog, explaining the buttons
-truncate_outro = "Send all sends everything this one time. Send truncated cuts what is over its limit, as described above. Either way, secrets are still replaced and sensitive files are still left out."
+truncate_outro = "„Alles senden“ sendet einmalig alles. „Gekürzt senden“ kürzt, was über seinem Limit liegt, wie oben beschrieben. In beiden Fällen werden Geheimnisse weiterhin ersetzt und sensible Dateien weiterhin ausgelassen."
 # context: list line of that dialog; {size} is the {$diff}'s size (for example "91.2 KB (91234 bytes)"), {limit} the limit in the same form, {key} the name of the setting
-part_diff = "The {$diff} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_diff = "{$diff} ist {size} groß, Limit {limit} (Einstellung {key}). Gekürzt wird das Ende ausgelassen."
 # context: list line of that dialog, for the {$commit} being split; sizes like the line above
-part_hunks = "The changes of the {$commit} are {size}, limit {limit} (setting {key}). Truncated, the last ones lose their {$diff}."
+part_hunks = "Die Änderungen des {$commit} sind {size} groß, Limit {limit} (Einstellung {key}). Gekürzt verlieren die letzten ihr {$diff}."
 # context: list line of that dialog, for a code review; {name} is the list of files that do not fit
-part_review_diff = "Files that do not fit the review: {name}. The review is {size}, limit {limit} (setting {key}). Truncated, they are left out."
+part_review_diff = "Dateien, die nicht ins Review passen: {name}. Das Review ist {size} groß, Limit {limit} (Einstellung {key}). Gekürzt werden sie ausgelassen."
 # context: list line of that dialog, for one file of a code review; {name} is its path
-part_review_file = "The {$diff} of {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_file = "{$diff} von {name} ist {size} groß, Limit {limit} (Einstellung {key}). Gekürzt wird das Ende ausgelassen."
 # context: list line of that dialog, for the description of the reviewed request
-part_review_text = "The description is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_review_text = "Die Beschreibung ist {size} groß, Limit {limit} (Einstellung {key}). Gekürzt wird das Ende ausgelassen."
 # context: list line of that dialog, for the comments that already exist on the reviewed request
-part_review_threads = "The existing comments are {size}, limit {limit} (setting {key}). Truncated, the last ones are left out."
+part_review_threads = "Die vorhandenen Kommentare sind {size} groß, Limit {limit} (Einstellung {key}). Gekürzt werden die letzten ausgelassen."
 # context: list line of that dialog, for one project context file of a code review; {name} is the file
-part_context_file = "The context file {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+part_context_file = "Die Kontextdatei {name} ist {size} groß, Limit {limit} (Einstellung {key}). Gekürzt wird ihr Ende ausgelassen."
 # context: list line of that dialog, for the project context files together; {name} is the file that crossed the limit
-part_context_total = "The context files together reach {size} at {name}, limit {limit} (setting {key}). Truncated, the rest is left out."
+part_context_total = "Die Kontextdateien zusammen erreichen {size} bei {name}, Limit {limit} (Einstellung {key}). Gekürzt wird der Rest ausgelassen."
 # context: button that sends everything of the oversized request this one time, nothing cut
-send_all = "Send all"
+send_all = "Alles senden"
 # context: button that sends the request with what is over its limit cut
-send_truncated = "Send truncated"
+send_truncated = "Gekürzt senden"
 # context: key of the Send all button, one letter (shown as "Send all (A)")
 key_send_all = "a"
 # context: key of the Send truncated button, one letter (shown as "Send truncated (T)")
-key_send_truncated = "t"
+key_send_truncated = "g"
 
 [conflict_guard]
 # context: title of the dialog that says conflicts must be resolved before an action
-title = "Resolve the conflicts first"
+title = "Zuerst die Konflikte lösen"
 # context: first line of that dialog; {n} files have unresolved conflicts
-count = { one = "{n} file still has conflicts", other = "{n} files still have conflicts" }
+count = { one = "{n} Datei hat noch Konflikte", other = "{n} Dateien haben noch Konflikte" }
 # context: last line of the list of files in that dialog; {n} more files are not listed
-more = "and {n} more"
+more = "und {n} weitere"
 # context: second paragraph of the dialog when the AI commit composer was asked
-compose_hint = "The AI cannot split the changes into {$commits} while files have conflicts. Resolve them, then ask again."
+compose_hint = "Die KI kann die Änderungen nicht in {$commits} aufteilen, solange Dateien Konflikte haben. Lösen Sie sie und fragen Sie dann erneut."
 # context: second paragraph of the dialog when a commit was asked
-commit_hint = "A {$commit} needs every conflict resolved first. Resolve them, {$stage} the results, then {$commit} again."
+commit_hint = "Für einen {$commit} muss zuerst jeder Konflikt gelöst sein. Konflikte lösen, die Ergebnisse {$stage} und dann erneut einen {$commit} erstellen."
 # context: button that opens the conflict resolution view
-resolve = "Resolve conflicts"
+resolve = "Konflikte lösen"
 # context: key of the Resolve conflicts button, one letter (shown as "Resolve conflicts (R)")
-key_resolve = "r"
+key_resolve = "k"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "b"
 # context: label of the disabled Commit button while files have conflicts
-need_resolve = "Resolve conflicts to {$commit}"
+need_resolve = "Konflikte lösen vor dem {$commit}"
 # context: palette: why a command does nothing while files have conflicts
-why_commit = "files still have conflicts: resolve them first"
+why_commit = "Dateien haben noch Konflikte: zuerst lösen"

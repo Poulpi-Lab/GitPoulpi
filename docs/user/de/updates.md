@@ -8,7 +8,7 @@ GitPoulpi sucht nach neueren Releases und ersetzt je nach Installationsweg entwe
 
 Die Titelleiste zeigt die laufende Version (`v1.0.0`) zwischen dem App-Namen und dem Repository-Pfad. Ist ein neueres Release bekannt, wird der Chip in der Akzentfarbe zu `v0.2.0 verfügbar`.
 
-Klicken Sie auf den Chip, drücken Sie `Ctrl+N` und dann `u`, oder führen Sie **Updates: Update-Fenster anzeigen** in der Befehlspalette (`Ctrl+P`) aus: Das Update-Fenster öffnet sich. Es liegt als Fenster über der App: `Esc`, `q`, das Schließen-Kreuz oder ein Klick außerhalb schließt es. Es zeigt:
+Drücken Sie `Ctrl+N` und dann `u`, führen Sie **Updates: Update-Fenster anzeigen** in der Befehlspalette (`Ctrl+P`) aus, oder klicken Sie auf den Chip, solange er `verfügbar` anzeigt (oder solange ein Update läuft): Das Update-Fenster öffnet sich. Gibt es kein neueres Release, öffnet ein Klick auf den Chip stattdessen den Tab Versionshinweise. Es liegt als Fenster über der App: `Esc`, `q`, das Schließen-Kreuz oder ein Klick außerhalb schließt es. Es zeigt:
 
 - die laufende Version und **Installiert über**: wie GitPoulpi auf diesen Computer gekommen ist (das bestimmt alles Weitere);
 - den Stand des Updates (Suche, Download mit Prozentangabe, bereit, fehlgeschlagen);

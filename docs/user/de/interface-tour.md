@@ -17,8 +17,8 @@ Der obere Rand des Fensters lautet
 
 - **🐙** öffnet das Fenster **Über GitPoulpi**: Version, Build-Funktionen, Lizenz, Links, ein kurzer Hinweis, dass GitPoulpi ein unabhängiges Projekt ist, die Fremd-Crates sowie die Lizenzen und Danksagungen. Auf einem Terminal, das Bilder zeichnet, ist der Oktopus das Pixel-Logo in Ihrer Logo-Farbe (sonst bleibt es das Emoji). Palette: `Hilfe: Über GitPoulpi`; Tasten: `Ctrl+N`, dann `A`. Im Fenster „Über GitPoulpi“ folgen die Pupillen des Oktopus dem Mauszeiger. Klicken Sie auf das Logo (oder drücken Sie `Space`), um es zur nächsten Farbe zu drehen. Rechtsklick auf das Logo (oder `c`) zeigt die Farbliste. GitPoulpi speichert Ihre Wahl in `ui.logo_color`. Die Links öffnen sich per Klick oder mit ihrer Zugriffstaste (`s` Quellcode, `d` Dokumentation, `i` Lizenz), und `l` listet die Fremd-Crates mit Versionen und Lizenzen (eine scrollbare Liste; `Esc` oder `l` geht zurück, ebenso ein Klick auf seine Überschrift). Jede Crate der Liste trägt einen Link auf ihre Seite (ihr Repository, sonst ihre Seite auf crates.io): Klicken Sie auf die Zeile, oder wählen Sie sie mit `Up` / `Down` und drücken Sie `Enter`, um sie im Browser zu öffnen. `t` (oder der Palettenbefehl `Hilfe: Lizenzen und Danksagungen`) zeigt die Lizenzhinweise und Danksagungen für alles, was im Programm steckt, als scrollbaren Text (`Up` / `Down`, `PgUp` / `PgDn`, `Home` / `End`; zurück mit `Esc` oder `t`). In einem Skript gibt `gitpoulpi licenses` denselben Text aus.
 - Die **Version** (`v1.0.0`; `vX.Y.Z verfügbar`, wenn es ein neueres Release gibt)
-  steht zwischen Name und Pfad: Ein Klick öffnet den Tab **Versionshinweise**, siehe
-  [Updates](updates.md).
+  steht zwischen Name und Pfad: Ein Klick öffnet das Update-Fenster, wenn es ein
+  neueres Release gibt, sonst den Tab **Versionshinweise**. Siehe [Updates](updates.md).
 - **Öffnen in ▾**, direkt hinter dem Pfad, öffnet den Ordner des Tabs in einem
   Terminal, einem Editor, einem Multiplexer oder im Dateimanager (`Alt+O`).
   Siehe [Öffnen in](open-in.md).

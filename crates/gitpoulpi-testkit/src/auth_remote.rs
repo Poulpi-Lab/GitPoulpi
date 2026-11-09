@@ -6,7 +6,9 @@
 //! carries no `Authorization: Basic` header (git then asks its credential
 //! helpers and retries), and `404` to one that does. The transfer therefore
 //! always fails at the end, which is fine: the *recorded header* is the
-//! assertion. Every `Authorization` value received is kept, in order, whatever
+//! assertion. [`AuthHttpRemote::start_accepting`] instead answers `200` with the
+//! advertisement of an empty repository, so a transfer succeeds and git
+//! reports the credential as accepted (`credential approve`). Every `Authorization` value received is kept, in order, whatever
 //! its scheme, so a test can also prove that a header it did not want sent
 //! (a repository's `http.extraHeader`) never arrived.
 
@@ -25,6 +27,16 @@ pub struct AuthHttpRemote {
 
 impl AuthHttpRemote {
     pub fn start() -> Self {
+        Self::start_with(false)
+    }
+
+    /// Like [`Self::start`], but a request with a `Basic` header gets the
+    /// advertisement of an empty repository: `ls-remote` and `fetch` succeed.
+    pub fn start_accepting() -> Self {
+        Self::start_with(true)
+    }
+
+    fn start_with(accepting: bool) -> Self {
         let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind the auth remote");
         let port = listener.local_addr().unwrap().port();
         let seen = Arc::new(Mutex::new(Vec::new()));
@@ -39,7 +51,7 @@ impl AuthHttpRemote {
                     }
                     let Ok(stream) = stream else { continue };
                     let (seen, requests) = (seen.clone(), requests.clone());
-                    std::thread::spawn(move || serve(stream, &seen, &requests));
+                    std::thread::spawn(move || serve(stream, &seen, &requests, accepting));
                 }
             });
         }
@@ -90,7 +102,12 @@ impl Drop for AuthHttpRemote {
     }
 }
 
-fn serve(mut stream: TcpStream, seen: &Mutex<Vec<String>>, requests: &Mutex<usize>) {
+fn serve(
+    mut stream: TcpStream,
+    seen: &Mutex<Vec<String>>,
+    requests: &Mutex<usize>,
+    accepting: bool,
+) {
     let mut head = Vec::new();
     let mut buf = [0u8; 2048];
     while !head.windows(4).any(|w| w == b"\r\n\r\n") {
@@ -115,11 +132,33 @@ fn serve(mut stream: TcpStream, seen: &Mutex<Vec<String>>, requests: &Mutex<usiz
     if let Some(value) = authorization {
         seen.lock().unwrap().push(value);
     }
-    let answer: &[u8] = if basic {
-        b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+    let answer: Vec<u8> = if basic && accepting {
+        empty_repository_advertisement()
+    } else if basic {
+        b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n".to_vec()
     } else {
         b"HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"gitpoulpi-test\"\r\n\
           Content-Length: 0\r\nConnection: close\r\n\r\n"
+            .to_vec()
     };
-    let _ = stream.write_all(answer);
+    let _ = stream.write_all(&answer);
+}
+
+/// A `200` carrying the smart-HTTP advertisement of a repository with no refs.
+fn empty_repository_advertisement() -> Vec<u8> {
+    let pkt = |text: &str| format!("{:04x}{text}", text.len() + 4);
+    let body = format!(
+        "{}0000{}0000",
+        pkt("# service=git-upload-pack\n"),
+        pkt(&format!(
+            "{} capabilities^{{}}\0side-band-64k\n",
+            "0".repeat(40)
+        ))
+    );
+    format!(
+        "HTTP/1.1 200 OK\r\nContent-Type: application/x-git-upload-pack-advertisement\r\n\
+         Cache-Control: no-cache\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+        body.len()
+    )
+    .into_bytes()
 }

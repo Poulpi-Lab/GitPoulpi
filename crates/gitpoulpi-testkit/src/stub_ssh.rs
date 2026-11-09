@@ -62,9 +62,17 @@ exec sh -c "$last"
 "#
             .to_string()
         };
+        // One record per invocation, appended under a lock: the system
+        // backend's fetch runs two ssh processes at once (the remote and its
+        // mirrors), and `sh` flushes a `printf` line by line, so a record
+        // written without the lock interleaved with the other's. `mkdir` is
+        // the portable atomic lock (no `flock` on macOS).
+        let log_q = sh_quote_path(&log.to_string_lossy());
+        let lock_q = sh_quote_path(&format!("{}.lock", log.to_string_lossy()));
         let script = format!(
-            "#!/bin/sh\n{{ for a in \"$@\"; do printf '%s\\n' \"$a\"; done; echo '--'; }} >> {}\n{body}",
-            sh_quote_path(&log.to_string_lossy())
+            "#!/bin/sh\nuntil mkdir {lock_q} 2>/dev/null; do :; done\n\
+             {{ for a in \"$@\"; do printf '%s\\n' \"$a\"; done; echo '--'; }} >> {log_q}\n\
+             rmdir {lock_q}\n{body}"
         );
         std::fs::write(&program, script).expect("write the stub ssh");
         std::fs::set_permissions(&program, std::fs::Permissions::from_mode(0o755)).unwrap();
@@ -125,5 +133,53 @@ exec sh -c "$last"
 impl Default for StubSsh {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Many invocations at once, each with its own arguments: every logged
+    /// call is exactly one invocation's argument list, none torn or mixed.
+    #[test]
+    fn concurrent_invocations_are_logged_intact() {
+        let stub = StubSsh::new();
+        let program = stub.program.clone();
+        let threads: Vec<_> = (0..16)
+            .map(|t| {
+                let program = program.clone();
+                std::thread::spawn(move || {
+                    for n in 0..8 {
+                        let args = [
+                            format!("-i"),
+                            format!("/keys/{t}-{n}"),
+                            format!("-o"),
+                            format!("Opt={t}-{n}"),
+                            format!("host-{t}-{n}"),
+                        ];
+                        // The stub ends by running its last argument: `true`.
+                        let status = std::process::Command::new(&program)
+                            .args(&args)
+                            .arg("true")
+                            .status()
+                            .unwrap();
+                        assert!(status.success());
+                    }
+                })
+            })
+            .collect();
+        for thread in threads {
+            thread.join().unwrap();
+        }
+        let calls = stub.calls();
+        assert_eq!(calls.len(), 16 * 8);
+        for call in &calls {
+            assert_eq!(call.len(), 6, "{call:?}");
+            let id = call[4].strip_prefix("host-").expect("a whole call");
+            assert_eq!(call[1], format!("/keys/{id}"), "{call:?}");
+            assert_eq!(call[3], format!("Opt={id}"), "{call:?}");
+            assert_eq!(call[5], "true", "{call:?}");
+        }
     }
 }

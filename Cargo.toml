@@ -85,7 +85,7 @@ png = "0.18"
 jpeg-decoder = { version = "0.3", default-features = false }
 # Image view (`image-view` feature): GIF first frame and WebP, decoded off
 # the repository's own blobs. BMP and ICO are hand-rolled.
-gif = { version = "0.13", default-features = false, features = ["std"] }
+gif = { version = "0.14", default-features = false, features = ["std"] }
 image-webp = { version = "0.2", default-features = false }
 # Gravatar's *current* API (docs.gravatar.com, verified 2026-09-23) is
 # emphatic that MD5 identifiers are legacy ("Don't use MD5!") and requires

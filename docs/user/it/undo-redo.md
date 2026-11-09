@@ -150,6 +150,7 @@ righe con `...` aprono la stessa conferma o lo stesso prompt del nome del pulsan
 | Modifiche in corso | stage e unstage (file, cartella, hunk, righe, tutto), scarto (file, cartella, hunk, righe, un checkout di file), applicare una patch, **eliminare un file dal disco**, **ignorare** (file, estensione o cartella: la riga del `.gitignore` che hai scelto), **trattare come binario o testo** (la riga di `.gitattributes`) |
 | Stash | push, apply, pop, drop |
 | Remoti e configurazione | aggiungere, rimuovere, rinominare, cambiare l'URL o l'URL di push di un remoto, track e untrack di Git LFS |
+| Su un server | **eliminare un branch o un tag su un remoto** (dal menu del riferimento, dalla palette, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, o un finish del workflow che elimina il branch remoto): vedi sotto |
 
 Mentre un merge, un cherry-pick o un revert è fermo sui conflitti, anche **Salva e segna come
 risolto**, lo stage e l'unstage sono annullabili (ognuno viene annullato prima di
@@ -169,11 +170,40 @@ posizione). Annullare la rimozione di un remoto restituisce i suoi branch
 di tracking remoto, il suo alias `origin/HEAD` e le impostazioni di upstream dei branch che
 lo tracciavano.
 
+### Eliminare un branch o un tag su un remoto
+
+Prima dell'eliminazione GitPoulpi chiede al server cosa contiene in questo momento il branch o
+il tag e lo registra: il remoto, il nome e il commit esatto (per un tag annotato, l'oggetto
+tag stesso, così la sua annotazione viene conservata). L'eliminazione viene poi eseguita solo
+se il server contiene ancora quel valore.
+
+**Annulla lo rimanda** con lo stesso nome, sullo stesso commit, senza mai forzare. Poiché è
+una modifica su un server che altre persone vedono, Annulla **chiede sempre prima** e lo
+dice («Annullare questa operazione ricrea il branch topic su origin a 3f2a1c0...»); lo dicono
+anche i passaggi della voce (`gitpoulpi undo --dry-run`). Usa le stesse credenziali di un push.
+Il branch di tracking remoto torna insieme. **Ripeti** lo elimina di nuovo, con la stessa
+sicurezza.
+
+Annulla rifiuta, senza cambiare nulla, quando:
+
+- il branch o il tag è stato **creato di nuovo sul remoto** da allora, o spostato: è su un
+  altro commit rispetto a quello registrato, e un push sovrascriverebbe il lavoro di qualcun
+  altro (il rifiuto nomina entrambi i commit);
+- il commit (o l'oggetto tag) **non è più nel tuo repository** (è stato rimosso dal garbage
+  collector): l'annullamento non si può fare.
+
+«Elimina in locale e sul remoto» è **una sola voce**: Annulla ripristina insieme il branch o il
+tag locale e quello remoto, Ripeti li elimina di nuovo entrambi. Eliminare solo il branch
+remoto lascia stare quello locale; annullarlo fa lo stesso. Un finish del workflow che elimina
+anche il branch remoto è annullabile nel suo insieme.
+
 ## Cosa non si può annullare, e perché
 
-- **Qualsiasi cosa su un server**: push, eliminazione di un branch o tag remoto, invio di un
-  tag, push LFS, blocco e sblocco. Quello stato è condiviso con altre persone;
-  annullarlo sarebbe un altro push, e GitPoulpi non lo farà al posto tuo.
+- **Quasi tutto ciò che è su un server**: push, invio di un tag, push LFS, blocco e sblocco,
+  apertura di una pull request. Quello stato è condiviso con altre persone; annullare un push
+  sarebbe un force-push o un'eliminazione sul loro lato, e GitPoulpi non lo farà al posto tuo.
+  (Eliminare un branch o un tag remoto è l'eccezione: l'annullamento rimette soltanto ciò che
+  il server conteneva, e rifiuta se lì qualcosa è cambiato.)
   Annulla non si blocca mai nemmeno a causa di una simile operazione.
 - **Fetch**: sposta solo i riferimenti di tracking remoto, che rispecchiano il server. Il
   fetch successivo lo rifarebbe.
@@ -292,6 +322,9 @@ Annulla chiede conferma solo quando è rischioso:
 - hai modifiche non committate e l'annullamento sposta la directory di lavoro: le tue
   modifiche vengono conservate, ma l'annullamento si ferma, senza cambiare nulla, se una di esse è
   in un file che deve riscrivere.
+- la voce ha eliminato un branch o un tag su un remoto: annullarla **lo rimanda al server**
+  (vedi sopra), quindi chiede sempre, e lo stesso vale per la ripetizione che lo elimina di nuovo
+  lì.
 
 Ripeti, e ogni annullamento di un semplice spostamento di riferimenti, non chiede mai: la direzione opposta
 è a un tasto di distanza.
@@ -347,8 +380,9 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   di ripetizione più recente). Rifiuta quando quella voce non è bloccata, e termina con codice **3**
   senza `--yes`. Per MCP è una mutazione, ma non distruttiva: il
   repository non viene toccato.
-- Codice di uscita **0** fatto, **2** rifiutato (il JSON ne indica il motivo), **3** rischioso
-  e richiede `--yes`.
+- Codice di uscita **0** fatto, **2** rifiutato (il JSON ne indica il motivo, per esempio
+  `RemoteRefMoved` quando un branch remoto eliminato è stato creato di nuovo), **3** rischioso
+  e richiede `--yes` (annullare l'eliminazione di un branch o tag remoto, che fa un push verso il server).
 
 Tornare indietro senza annullare tutto ciò che è venuto dopo:
 

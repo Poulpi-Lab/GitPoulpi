@@ -186,7 +186,7 @@ sistemi). L'archivio contiene i tre eseguibili, `INSTALL.txt`,
 
 ## Aggiornamenti
 
-La barra del titolo mostra la versione in uso (`v1.0.0`) tra il nome dell'applicazione e il percorso del repository. Cliccala, oppure premi `Ctrl+N` e poi `u`, oppure esegui **Aggiornamenti: Mostra aggiornamento** dalla palette dei comandi (`Ctrl+P`): si apre il pannello degli aggiornamenti con la versione, come è stato installato GitPoulpi e cosa fare per una release più recente. **Aiuto: Note di rilascio** apre il changelog.
+La barra del titolo mostra la versione in uso (`v1.0.0`) tra il nome dell'applicazione e il percorso del repository. Quando è nota una release più recente (o un aggiornamento è in corso), un clic sulla versione apre il pannello degli aggiornamenti con la versione, come è stato installato GitPoulpi e cosa fare per la nuova release; altrimenti un clic apre la scheda Note di rilascio. `Ctrl+N` e poi `u`, oppure **Aggiornamenti: Mostra aggiornamento** nella palette dei comandi (`Ctrl+P`), aprono sempre il pannello degli aggiornamenti, e **Aiuto: Note di rilascio** apre sempre il changelog.
 
 Una volta al giorno, in background, GitPoulpi controlla nel luogo in cui sono pubblicate le sue release (di base GitHub) se ce n'è una più recente (`updates.mode`, [Impostazioni > Sincronizzazione](settings.md#sincronizzazione)). Quando c'è, il chip riporta `v0.2.0 disponibile` nel colore d'accento.
 

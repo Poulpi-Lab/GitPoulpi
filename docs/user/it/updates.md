@@ -8,7 +8,7 @@ GitPoulpi cerca le release più recenti e, a seconda di come è stato installato
 
 La barra del titolo mostra la versione in esecuzione (`v1.0.0`) tra il nome dell'app e il percorso del repository. Quando è nota una release più recente il chip diventa `v0.2.0 disponibile` nel colore di accento.
 
-Clicca il chip, premi `Ctrl+N` e poi `u`, oppure esegui **Aggiornamenti: Mostra aggiornamento** dalla palette dei comandi (`Ctrl+P`): si apre il pannello degli aggiornamenti. È una finestra sopra l'app: `Esc`, `q`, la croce di chiusura o un clic all'esterno la chiude. Mostra:
+Premi `Ctrl+N` e poi `u`, esegui **Aggiornamenti: Mostra aggiornamento** dalla palette dei comandi (`Ctrl+P`), oppure clicca il chip mentre riporta `disponibile` (o mentre un aggiornamento è in corso): si apre il pannello degli aggiornamenti. Senza una release più recente, un clic sul chip apre invece la scheda Note di rilascio. È una finestra sopra l'app: `Esc`, `q`, la croce di chiusura o un clic all'esterno la chiude. Mostra:
 
 - la versione in esecuzione e **Installato con**: come GitPoulpi è arrivato su questo computer (da questo dipende tutto ciò che segue);
 - a che punto è l'aggiornamento (ricerca, download con una percentuale, pronto, non riuscito);

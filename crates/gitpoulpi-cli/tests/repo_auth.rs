@@ -13,8 +13,15 @@ gitpoulpi_testkit::isolate_binary!();
 
 /// Runs `gitpoulpi --json ...` and returns the exit code and the payload.
 fn run(root: &Path, session: &str, args: &[&str]) -> (i32, Value) {
+    // Each fixture gets its own config (and so its own private repo-auth
+    // store): tests never share or touch the real one.
+    let config = root
+        .parent()
+        .expect("fixture root has a parent")
+        .join("config");
     let output = Command::cargo_bin("gitpoulpi")
         .unwrap()
+        .env("GITPOULPI_CONFIG_DIR", &config)
         .arg("--json")
         .args(["--session", session])
         .args(["--repo", &root.to_string_lossy()])
@@ -232,7 +239,7 @@ fn show_hides_a_stored_command_from_its_secret_but_a_person_may_read_it() {
         ssh: None,
     };
     let sha = profile.https.as_ref().unwrap().command_sha256().unwrap();
-    let paths = gitpoulpi_config::ConfigPaths::discover().unwrap();
+    let paths = gitpoulpi_config::ConfigPaths::for_dir(root.parent().unwrap().join("config"));
     gitpoulpi_session::save_repo_auth(&paths, root, &profile, 1).unwrap();
 
     let shown = ok(root, "ra-command", &["repo-auth", "show"]);

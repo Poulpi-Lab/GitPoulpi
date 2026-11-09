@@ -34,6 +34,15 @@ thiserror.workspace = true
 tracing.workspace = true
 tokio.workspace = true
 
+# Test support: a stand-in for a GitPoulpi binary playing git's credential
+# helper (see `tests/account_source.rs`). Not shipped: packaging builds the
+# named binaries only.
+[[bin]]
+name = "gitpoulpi-credential-stub"
+path = "tests/support/credential_stub.rs"
+test = false
+doc = false
+
 [dev-dependencies]
 gitpoulpi-testkit.workspace = true
 gitpoulpi-log.workspace = true

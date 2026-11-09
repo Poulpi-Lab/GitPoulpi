@@ -1027,7 +1027,6 @@ close_right = "关闭右侧标签页…"
 remove_recent = "从最近中移除"
 remove_list = "从列表中移除"
 copy_path = "复制路径"
-ssh_key = "SSH 密钥…"
 close_prompt = { one = "关闭 {n} 个标签页：{listed}？\n\n磁盘上的仓库不会受到影响。", other = "关闭 {n} 个标签页：{listed}？\n\n磁盘上的仓库不会受到影响。" }
 name_one = "“{name}”"
 names_two = "“{a}”和“{b}”"
@@ -2085,12 +2084,6 @@ push_to_title = { git = "将 {branch} {$push} 到", local = "将 {branch} 推送
 upstream_title = { git = "{branch} 的 upstream", local = "{branch} 的上游" }
 type_remote_branch = "输入远程分支…"
 unset_upstream = { git = "取消设置 upstream", local = "取消设置上游" }
-ssh_pin_title = "此仓库的 SSH 密钥"
-pinned = "已固定：{command}"
-not_pinned = "未固定（使用你的 ssh 设置）"
-no_profile_key = "没有配置带有 SSH 密钥（设置 > 集成）"
-clear_pin = "清除固定"
-clear_pin_none = "清除固定（未设置）"
 diverged_title = "{remote}/{branch} 已分叉"
 pull_then_push = { git = "先 {$Pull}（{$merge}），再 {$push}", local = "先拉取（合并），再推送" }
 force_push_lease = { git = "强制 {$push}（带 lease）…", local = "强制推送（带 lease）…" }
@@ -2142,8 +2135,6 @@ unsetting_upstream = { git = "正在取消设置 {branch} 的 upstream…", loca
 remote_hidden = "{remote} 已从图中隐藏，之后获取的分支同样隐藏"
 remote_shown = "{remote} 已重新显示在图中"
 branch_hidden_with_remote = "{name} 已随远程 {remote} 一并隐藏：请先显示该远程"
-pinning = "正在将此仓库固定到 {command}…"
-clearing_pin = "正在清除 SSH 密钥固定…"
 stashing_continuing = { git = "正在 {$stash} 你的更改，然后继续…", local = "正在贮藏你的更改，然后继续…" }
 autostash_always_saved = { git = "自动 {$stash}：总是（已保存到设置）- 正在 {$stash} 你的更改并继续…", local = "自动{$stash}：总是（已保存到设置）- 正在{$stash}你的更改并继续…" }
 autostash_always_not_saved = { git = "自动 {$stash} 设置未保存（{err}）- 本次会 {$stash} 你的更改并继续…", local = "自动{$stash}设置未保存（{err}）- 本次会{$stash}你的更改并继续…" }
@@ -3086,7 +3077,6 @@ remote_copy_remote_name = "远程：复制远程名称"
 remote_copy_link_to_remote = "远程：复制远程链接"
 remote_fetch_remote = { git = "远程：{$Fetch} 远程…", local = "远程：{$Fetch}远程…" }
 remote_actions_for_selected_remote = "远程：所选远程的操作…"
-repository_ssh_key_for_this_repository = "仓库：此仓库的 SSH 密钥…"
 remote_hide_remote_in_graph = "远程：在图中隐藏远程…"
 remote_show_remote_in_graph = "远程：在图中显示远程…"
 git_new_branch_at_head = "Git：在 HEAD 处新建分支…"
@@ -5078,6 +5068,14 @@ split_refused = { git = "无法拆分该 {$commit}：{reason}", local = "无法�
 undo_purged = "操作 #{entry} 的旧历史已被清除，因此无法撤销或重做"
 undo_remote_ref_moved = { git = "远程 {remote} 上的 {name} 位于 {actual}，而不是操作结束时的 {expected}：此后它已在远程被更改，因此没有在那里进行 {$push_noun} 或删除任何内容", local = "远程 {remote} 上的 {name} 位于 {actual}，而不是操作结束时的 {expected}：此后它已在远程被更改，因此没有在那里进行{$push_noun}或删除任何内容" }
 undo_remote_object_missing = { git = "{object} 已不在此仓库中（已被垃圾回收），因此无法通过 {$push_noun} 在远程恢复该分支或 {$tag}", local = "{object} 已不在此仓库中（已被垃圾回收），因此无法通过{$push_noun}在远程恢复该分支或{$tag}" }
+repo_auth_unavailable = "This repository's sign-in cannot be used: {reason}"
+repo_auth_command_changed = "{path} changed since you confirmed it as this repository's credential command. Confirm the command again."
+token_command_failed = "This repository's token command failed."
+token_command_failed_tail = "This repository's token command failed: {tail}"
+token_command_failed_code = "This repository's token command failed (exit {code})."
+token_command_failed_code_tail = "This repository's token command failed (exit {code}): {tail}"
+grant_refused = "GitPoulpi did not send the account token to {host}: it is not {expected}, that account's address."
+repo_auth_needs_confirmation = "A credential helper or token command is stored only when you confirm it in SSH & credentials."
 
 [window]
 connecting = "正在连接到会话守护进程…"
@@ -5974,6 +5972,8 @@ action_pull_first = { git = "先 {$Pull}", local = "先{$Pull}" }
 action_integrations = "打开集成"
 action_stash_retry = { git = "{$Stash} 后重试", local = "{$Stash}后重试" }
 action_retry = "重试"
+action_repo_auth = "SSH & credentials..."
+hint_repo_auth = "Choose another way to sign in for this repository in SSH & credentials, then retry."
 
 [failure_card]
 title_clone = "克隆失败"
@@ -9152,3 +9152,24 @@ scope_ok = "nothing missing, nothing extra"
 scope_missing = "missing: {list}"
 scope_excess = "more than needed: {list}"
 loading = "Reading the sign-in settings..."
+identity_token = "Signs in as: {account} (token)"
+identity_user = "Signs in as: {user}"
+identity_helper = "Signs in with this repository's credential helper"
+identity_command = "Signs in with this repository's token command"
+identity_ignored = "Ignores the credential helpers of this repository"
+identity_ssh = "SSH key: {key}"
+identity_ssh_account = "SSH key of {account}"
+identity_both = "{https}; {ssh}"
+menu_row = "SSH & credentials..."
+pin_label = "Pinned in git's config"
+pin_help = "This repository sets its own SSH command. GitPoulpi can keep that key in its private store instead of the repository's config."
+pin_move = "Move into GitPoulpi"
+pin_other = "This command is not a plain key pin, so GitPoulpi cannot move it. Edit it with git config."
+pin_save_first = "Save or revert your edits first."
+pin_ssh_taken = "SSH already has a source here. Use the defaults first, then move the pin."
+pin_moved = "Moved: this repository now signs in over SSH with {key}, and its pin is removed."
+pin_unset_failed = "The key is saved, but the pin could not be removed: {why}"
+acl_warning = "Other accounts can read this key file. OpenSSH refuses such a key (bad permissions)."
+acl_button = "Restrict to my account"
+acl_done = "The key file can now be read by your account only."
+acl_failed = "Could not restrict the key file: {why}"

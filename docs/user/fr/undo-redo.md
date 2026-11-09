@@ -160,6 +160,7 @@ saisie de nom que le bouton.
 | Modifications locales | stage et unstage (fichier, dossier, hunk, lignes, tout), abandon (fichier, dossier, hunk, lignes, un checkout de fichier), appliquer un patch, **supprimer un fichier du disque**, **ignorer** (fichier, extension ou dossier : la ligne du `.gitignore` choisi), **traiter comme binaire ou texte** (la ligne de `.gitattributes`) |
 | Stashes | push, apply, pop, drop |
 | Remotes et configuration | ajouter, retirer, renommer, changer l'URL ou l'URL de push d'un remote, suivre et ne plus suivre avec Git LFS |
+| Sur un serveur | **supprimer une branche ou un tag sur un remote** (depuis le menu de la ref, la palette, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, ou une fin de workflow qui supprime la branche distante) : voir ci-dessous |
 
 Tant qu'un merge, un cherry-pick ou un revert est arrêté sur des conflits,
 **Enregistrer et marquer résolu**, le stage et l'unstage sont aussi annulables
@@ -180,13 +181,43 @@ le même id de commit (il se place au sommet de la liste des stashes, comme
 redonne ses branches de suivi, son alias `origin/HEAD` et les paramètres d'amont
 des branches qui le suivaient.
 
+### Supprimer une branche ou un tag sur un remote
+
+Avant la suppression, GitPoulpi demande au serveur ce que contient la branche ou le tag
+à cet instant et l'enregistre : le remote, le nom et le commit exact (pour un tag
+annoté, l'objet tag lui-même, donc son annotation est conservée). La suppression n'est
+faite que si le serveur contient encore cette valeur.
+
+**Annuler la repousse** sous le même nom, au même commit, sans jamais forcer. Comme
+c'est un changement sur un serveur que d'autres voient, Annuler **demande toujours
+d'abord** et le dit (« Annuler recrée la branche topic sur origin à 3f2a1c0... ») ; les
+étapes de l'entrée le disent aussi (`gitpoulpi undo --dry-run`). Il utilise les mêmes
+identifiants qu'un push. La branche de suivi distant revient avec elle.
+**Rétablir** la supprime de nouveau, avec la même sécurité.
+
+Annuler refuse, sans rien changer, quand :
+
+- la branche ou le tag a été **recréé sur le remote** depuis, ou déplacé : il est à un
+  autre commit que celui enregistré, et pousser écraserait le travail de quelqu'un
+  d'autre (le refus nomme les deux commits) ;
+- le commit (ou l'objet tag) **n'est plus dans votre dépôt** (il a été supprimé par le
+  ramasse-miettes) : l'annulation est impossible.
+
+« Supprimer en local et sur le remote » est **une seule entrée** : Annuler restaure
+ensemble la branche ou le tag local et distant, Rétablir les supprime de nouveau tous
+les deux. Supprimer seulement la branche distante laisse la locale tranquille ;
+l'annuler fait de même. Une fin de workflow qui supprime aussi la branche distante est
+annulable en bloc.
+
 ## Ce qui ne peut pas être annulé, et pourquoi
 
-- **Tout ce qui est sur un serveur** : push, suppression d'une branche ou d'un
-  tag distant, push d'un tag, push LFS, verrouiller et déverrouiller. Cet état
-  est partagé avec d'autres personnes ; l'annuler serait un autre push, et
-  GitPoulpi ne le fera pas à votre place. Annuler n'est d'ailleurs jamais bloqué
-  par une telle opération.
+- **La plupart de ce qui est sur un serveur** : push, push d'un tag, push LFS,
+  verrouiller et déverrouiller, ouvrir une pull request. Cet état est partagé avec
+  d'autres personnes ; annuler un push serait un force-push ou une suppression chez
+  elles, et GitPoulpi ne le fera pas à votre place. (Supprimer une branche ou un tag
+  distant est l'exception : l'annulation ne remet que ce que le serveur contenait, et
+  refuse si quelque chose y a changé.) Annuler n'est d'ailleurs jamais bloqué par une
+  telle opération.
 - **Fetch** : il ne déplace que des refs de suivi distant, qui reflètent le
   serveur. Le prochain fetch le referait.
 - **Abandonner un rebase** : l'annulation n'est pas proposée (un rebase déplace
@@ -314,6 +345,10 @@ Annuler ne demande confirmation que lorsque c'est risqué :
   travail : vos modifications sont conservées, mais l'annulation s'arrête sans
   rien changer si l'un d'eux est dans un fichier qu'elle doit réécrire.
 
+- l'entrée a supprimé une branche ou un tag sur un remote : l'annuler **la repousse
+  sur le serveur** (voir plus haut), donc il demande toujours, tout comme le
+  rétablissement qui la supprime de nouveau là-bas.
+
 Rétablir, et toute annulation d'un simple déplacement de ref, ne demande
 jamais : l'autre sens est à une touche.
 
@@ -371,8 +406,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   l'entrée de rétablissement la plus récente). Il refuse quand cette entrée
   n'est pas bloquée, et sort avec le code **3** sans `--yes`. C'est une mutation
   pour MCP, mais non destructive : le dépôt n'est pas touché.
-- Code de sortie **0** fait, **2** refusé (le JSON nomme la raison), **3**
-  risqué et demande `--yes`.
+- Code de sortie **0** fait, **2** refusé (le JSON nomme la raison, par exemple
+  `RemoteRefMoved` quand une branche distante supprimée a été recréée), **3** risqué
+  et demande `--yes` (annuler la suppression d'une branche ou d'un tag distant, ce qui
+  pousse vers le serveur).
 
 Revenir en arrière sans tout annuler après coup :
 

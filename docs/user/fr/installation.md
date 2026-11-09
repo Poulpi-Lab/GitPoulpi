@@ -191,7 +191,7 @@ côté.
 
 ## Mises à jour
 
-La barre de titre affiche la version en cours (`v1.0.0`) entre le nom de l'application et le chemin du dépôt. Cliquez dessus, ou tapez `Ctrl+N` puis `u`, ou lancez **Mises à jour : Afficher la mise à jour** depuis la palette de commandes (`Ctrl+P`) : le panneau de mise à jour s'ouvre avec la version, la façon dont GitPoulpi a été installé et ce qu'il faut faire pour une version plus récente. **Aide : Notes de version** ouvre le journal des modifications.
+La barre de titre affiche la version en cours (`v1.0.0`) entre le nom de l'application et le chemin du dépôt. Un clic dessus ouvre le panneau de mise à jour seulement quand une version plus récente existe ou qu'une mise à jour est en cours ; sinon il ouvre l'onglet **Notes de version**. Vous pouvez aussi taper `Ctrl+N` puis `u`, ou lancer **Mises à jour : Afficher la mise à jour** depuis la palette de commandes (`Ctrl+P`) : le panneau de mise à jour s'ouvre avec la version, la façon dont GitPoulpi a été installé et ce qu'il faut faire pour une version plus récente. **Aide : Notes de version** ouvre le journal des modifications.
 
 Une fois par jour, en arrière-plan, GitPoulpi cherche une version plus récente à l'endroit où ses versions sont publiées (GitHub par défaut) (`updates.mode`, [Paramètres > Synchronisation](settings.md#synchronisation)). Quand il en trouve une, la pastille affiche `v0.2.0 disponible` dans la couleur d'accent.
 

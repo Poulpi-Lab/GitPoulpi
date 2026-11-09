@@ -8,7 +8,7 @@ GitPoulpi recherche les versions plus récentes et, selon la façon dont il a é
 
 La barre de titre affiche la version en cours (`v1.0.0`) entre le nom de l'application et le chemin du dépôt. Quand une version plus récente est connue, la pastille devient `v0.2.0 disponible` dans la couleur d'accent.
 
-Cliquez sur la pastille, tapez `Ctrl+N` puis `u`, ou lancez **Mises à jour : Afficher la mise à jour** depuis la palette de commandes (`Ctrl+P`) : le panneau de mise à jour s'ouvre. C'est une fenêtre par-dessus l'application : `Esc`, `q`, la croix de fermeture ou un clic à l'extérieur la ferme. Il affiche :
+Un clic sur la pastille ouvre le panneau de mise à jour seulement quand une version plus récente existe ou qu'une mise à jour est en cours ; sinon il ouvre l'onglet **Notes de version**. Tapez `Ctrl+N` puis `u`, ou lancez **Mises à jour : Afficher la mise à jour** depuis la palette de commandes (`Ctrl+P`) : le panneau de mise à jour s'ouvre. C'est une fenêtre par-dessus l'application : `Esc`, `q`, la croix de fermeture ou un clic à l'extérieur la ferme. Il affiche :
 
 - la version en cours et **Installé avec** : comment GitPoulpi est arrivé sur cet ordinateur (cela décide de tout ce qui suit) ;
 - où en est la mise à jour (recherche, téléchargement avec un pourcentage, prête, échec) ;

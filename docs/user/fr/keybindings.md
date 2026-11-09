@@ -392,8 +392,8 @@ préfixe (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Onglet précédent de la page de paramètres | `Alt+Left` |
 | `preferences` | `next_tab` | Onglet suivant de la page de paramètres | `Alt+Right` |
 | `ai_popup` | `copy` | Copier le résultat | `c` |
-| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
-| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
+| `activity_log` | `scroll_left` | Faire défiler le journal d'activité vers la gauche | `Left` |
+| `activity_log` | `scroll_right` | Faire défiler le journal d'activité vers la droite | `Right` |
 | `integrations` | `add` | Ajouter un profil | `a` |
 | `integrations` | `edit` | Modifier le profil sélectionné | `e` |
 | `integrations` | `open_token` | Ouvrir la page du jeton | `o` |

@@ -293,7 +293,10 @@ al samengevoegde tekst ervoor en erna, en je instructies (globaal,
 repository, en die van *Conflictoplossing* in Instellingen > AI). Het antwoordt met de
 opgeloste tekst van dat ene conflict in een codeblok; een antwoord met conflictmarkeringen
 of begeleidende tekst in plaats van code wordt één keer teruggestuurd en daarna geweigerd. Een conflict van meer dan
-ongeveer 40 KB wordt niet verstuurd. De bediening is verborgen zolang AI uit staat, en een voorstel
+40 KB (`ai.limits.conflict_bytes`, *Instellingen > AI > Limieten*) wordt tegengehouden achter
+een waarschuwing met zijn grootte en de limiet, met *Toch verzenden* (alleen dit verzoek,
+nog steeds opgeschoond door de privacycontroles), *Instelling openen* en *Annuleren*; de limiet is
+de eigen beveiliging van GitPoulpi, dus verhoog hem als je model genoeg ruimte heeft. De bediening is verborgen zolang AI uit staat, en een voorstel
 slaat niets op, stagt niets en lost niets op: bekijk de uitvoer, bewerk hem en sla op zoals gewoonlijk.
 
 ![Het commit-formulier na de knop met de glinstering: een samenvatting en beschrijving geschreven door het model, klaar om te bewerken](../images/ai-commit-message.png)
@@ -303,7 +306,9 @@ slaat niets op, stagt niets en lost niets op: bekijk de uitvoer, bewerk hem en s
 ### De commit-composer
 
 Het model verdeelt de lokale wijzigingen over meerdere commits (elk gewijzigd bestand in
-precies één; een ongeldig plan wordt één keer teruggestuurd en daarna geweigerd). Je bekijkt het plan
+precies één; een ongeldig plan wordt één keer teruggestuurd en daarna geweigerd). Zolang bestanden nog
+conflicten hebben, wordt er niets gevraagd: een dialoogvenster somt ze op en opent de
+conflictoplossingsweergave, omdat de composer een boom zonder conflicten nodig heeft. Je bekijkt het plan
 voordat er iets wordt gecommit:
 
 ![De review van de composer: vier voorgestelde commits met hun bestanden, en de knoppen Reset, Annuleren en 4 commits maken](../images/composer.png)
@@ -427,13 +432,64 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 effectieve context af als `review_context`. Dezelfde vier instellingen zijn `ai.review.*` in
 `config.toml` ([naslag](config-reference.md#ai-ingebouwde-ai-standaard-uit)).
 
+## Invoerlimieten
+
+Elke invoer die GitPoulpi in een verzoek stopt, heeft een groottelimiet: een instelling onder
+`[ai.limits]` (*Instellingen > AI > Limieten*). De limieten zijn de eigen beveiliging van GitPoulpi
+(het contextvenster verschilt per model): verhoog ze als je model genoeg ruimte heeft, verlaag ze
+om verzoeken klein te houden.
+
+| Instelling (`ai.limits.`) | Standaard | Wat het begrenst |
+|---|---|---|
+| `conflict_bytes` | 40000 | De basis-, huidige en inkomende blokken van één merge-conflict |
+| `diff_bytes` | 60000 | De diff van een bericht voor een commit, een uitleg, een stash-naam, een pull request-beschrijving, een commitplan of een splitsing; de hele diff van een codereview |
+| `review_file_bytes` | 12000 | De diff van één bestand in een codereview |
+| `review_text_bytes` | 4000 | De beschrijving van het beoordeelde pull request |
+| `review_threads_bytes` | 6000 | De reviewopmerkingen die al bestaan |
+| `review_context_file_bytes` | 8192 | Eén projectcontextbestand van een review (`CLAUDE.md`, `AGENTS.md`, het extra bestand) |
+| `review_context_bytes` | 16384 | Alle contextbestanden van een review samen |
+
+**Er wordt niets stilzwijgend afgekapt.** Als een invoer boven zijn limiet zit, wacht het verzoek
+en toont *Boven de AI-limiet* wat er boven zit: welk deel (de diff, een bestand, de
+beschrijving, een contextbestand), de grootte, de limiet en de instelling. Een review somt
+elk deel dat erboven zit op in één dialoogvenster. De knoppen, elk met zijn toets:
+
+- *Alles verzenden* (`V`): alleen dit verzoek, er wordt niets afgekapt. Het gaat nog steeds door de
+  privacycontroles (geheimen vervangen, gevoelige bestanden weggelaten) en, als dat aan staat,
+  het paneel *Wat wordt verstuurd*, dat daarna komt.
+- *Ingekort verzenden* (`K`): wat boven zijn limiet zit, wordt afgekapt, zoals het altijd was; elke
+  regel van het dialoogvenster zegt wat er wordt weggelaten (het einde van de diff, de laatste
+  hunks, de bestanden die niet passen).
+- *Instelling openen* (`I`): annuleert het verzoek en opent *Instellingen > AI > Limieten*
+  bij de eerste vermelde limiet. De focus begint hier: Enter verzendt nooit.
+- *Annuleren* (`A`, `Esc`, het kruisje of een klik erbuiten): verzendt niets.
+
+Een conflict is de uitzondering: het wordt nooit afgekapt. *Toch verzenden* (`T`) verzendt het één keer
+volledig.
+
+Niets start zelf een AI-verzoek, dus er is geen achtergrondrun die zou kunnen vragen:
+elk verzoek is er een dat je zelf hebt gestart. Een run die niet kan vragen (de CLI en
+MCP) kapt af zoals voorheen en meldt dat; zie hieronder.
+
+**Op de opdrachtregel** kan niets een dialoogvenster beantwoorden, dus een invoer boven zijn limiet
+wordt afgekapt zoals voorheen en het antwoord zegt wat er is weggelaten:
+`truncated: [{part, detail?, bytes, limit, setting}]` (alleen aanwezig als er iets is
+weggelaten; `part` is een van `diff`, `split_hunks`, `review_diff`, `review_file`,
+`review_text`, `review_threads`, `context_file`, `context_total`). `--send-all`
+(alias `--no-truncate`) verstuurt in plaats daarvan alles volledig: bij `ai` (al zijn
+opdrachten, inclusief `ai resolve-conflict`, waar een conflict boven zijn limiet anders
+wordt geweigerd), bij `commit --ai`, bij `stash push --ai` en bij
+`hosting review suggest`. De MCP-tools hebben hetzelfde argument `send_all` en hetzelfde
+veld `truncated`.
+
 ## Privacy
 
 - Er wordt niets verstuurd tot je op een knop drukt of een opdracht uitvoert. Geen AI
   op de achtergrond, geen telemetrie, geen GitPoulpi-account.
 - Wat wordt verstuurd: de prompt (ingebouwd, daarna je instructies) en de diff waar je
-  om vroeg, afgekapt op ongeveer 60 KB (met een opmerking daarover); voor een pull request
-  ook de commit-onderwerpen van de branch.
+  om vroeg; voor een pull request ook de commit-onderwerpen van de branch. Een diff boven
+  60 KB (`ai.limits.diff_bytes`) wordt nooit stilzwijgend afgekapt: zie
+  [Invoerlimieten](#invoerlimieten).
 - Een verzoek om een herschrijfscript verstuurt je instructie en het vaste scriptcontract (de API van de
   scriptsandbox). Auteur, datum en onderwerp van maximaal 20 commits gaan **alleen** mee als je *Een steekproef
   meesturen* in het dialoogvenster aanvinkt (standaard uit; de CLI heeft daarvoor `--sample N` nodig).
@@ -502,6 +558,8 @@ repository te houden.
 | `failed:` 404 | Het **Model** bestaat daar niet: wis het om de standaard te gebruiken. |
 | `failed:` connection error (Ollama, LM Studio) | De server draait niet, of de **Basis-URL** heeft de verkeerde poort of mist `/v1`. |
 | De sleutel toont `(niet ingesteld)` nadat je hem hebt getypt | Geen credential helper: configureer er een (`git config --global credential.helper ...`) en voer hem opnieuw in. |
+| *Boven de AI-limiet* | Een invoer van het verzoek zit boven een limiet van `[ai.limits]`: kies *Alles verzenden*, *Ingekort verzenden*, *Instelling openen* of *Annuleren* (zie [Invoerlimieten](#invoerlimieten)). |
+| "Conflict te groot om te verzenden" | Het conflict zit boven `ai.limits.conflict_bytes` (standaard 40000). *Toch verzenden* verzendt het één keer; *Instelling openen* gaat naar de limiet in Instellingen > AI > Limieten. |
 | Verkeerde taal of stijl | Voeg instructies toe; met de chips Snel invoegen van de editor gaat dat snel. |
 | De composer zegt dat het plan ongeldig is | Het model heeft een bestand overgeslagen of herhaald: probeer opnieuw of gebruik een sterker model. |
 

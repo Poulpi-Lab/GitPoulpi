@@ -188,7 +188,7 @@ geschreven.
 
 ## Updates
 
-De titelbalk toont de draaiende versie (`v1.0.0`) tussen de naam van de applicatie en het repositorypad. Klik erop, of druk op `Ctrl+N` en dan `u`, of voer **Updates: Updatepaneel tonen** uit vanuit het opdrachtenpalet (`Ctrl+P`): het updatepaneel opent met de versie, hoe GitPoulpi is geïnstalleerd en wat je met een nieuwere release moet doen. **Help: Releasenotes** opent het changelog.
+De titelbalk toont de draaiende versie (`v1.0.0`) tussen de naam van de applicatie en het repositorypad. Als er een nieuwere release bekend is (of een update bezig is), opent een klik erop het updatepaneel met de versie, hoe GitPoulpi is geïnstalleerd en wat je met de nieuwe release moet doen; anders opent een klik het tabblad Releasenotes. `Ctrl+N` en dan `u`, of **Updates: Updatepaneel tonen** in het opdrachtenpalet (`Ctrl+P`), opent altijd het updatepaneel, en **Help: Releasenotes** opent altijd het changelog.
 
 Eenmaal per dag controleert GitPoulpi op de achtergrond op de plek waar zijn releases worden gepubliceerd (standaard GitHub) of er een nieuwere is (`updates.mode`, [Instellingen > Synchronisatie](settings.md#synchronisatie)). Als dat zo is, staat er in de chip `v0.2.0 beschikbaar` in de accentkleur.
 

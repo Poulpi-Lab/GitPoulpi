@@ -187,7 +187,7 @@ dosyası yazılır.
 
 ## Güncellemeler
 
-Başlık çubuğu, çalışan sürümü (`v1.0.0`) uygulama adı ile depo yolu arasında gösterir. Ona tıklayın, ya da `Ctrl+N` ardından `u` tuşlarına basın, ya da komut paletinden (`Ctrl+P`) **Güncellemeler: Güncellemeyi Göster** komutunu çalıştırın: güncelleme paneli sürümle, GitPoulpi'nin nasıl kurulduğuyla ve daha yeni bir sürüm için ne yapılacağıyla açılır. **Yardım: Sürüm Notları** değişiklik günlüğünü açar.
+Başlık çubuğu, çalışan sürümü (`v1.0.0`) uygulama adı ile depo yolu arasında gösterir. Daha yeni bir sürüm bilindiğinde (ya da bir güncelleme sürerken) ona tıklamak güncelleme panelini açar: sürümle, GitPoulpi'nin nasıl kurulduğuyla ve yeni sürüm için ne yapılacağıyla; aksi halde tıklamak Sürüm notları sekmesini açar. `Ctrl+N` ardından `u` tuşları ya da komut paletindeki (`Ctrl+P`) **Güncellemeler: Güncellemeyi Göster** komutu güncelleme panelini her zaman açar, **Yardım: Sürüm Notları** ise değişiklik günlüğünü her zaman açar.
 
 GitPoulpi günde bir kez, arka planda, sürümlerinin yayımlandığı yerde (varsayılan olarak GitHub) daha yenisi olup olmadığını denetler (`updates.mode`, [Ayarlar > Eşitleme](settings.md#eşitleme)). Varsa çip vurgu renginde `v0.2.0 kullanılabilir` der.
 

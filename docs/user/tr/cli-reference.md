@@ -133,7 +133,7 @@ numaralandırdığı gibi numaralandırılır.
 |---|---|
 | `branch list`, `branch create <name> [at]`, `branch delete <name>`, `branch rename <old> <new>` | Yerel dallar. |
 | `branch track <remote/branch> [--name N]` | Bir uzak dalı izleyen yerel bir dal oluştur ve checkout et. |
-| `branch delete-remote <name> [--remote R]` | Bir uzak depodaki dalı sil, yerel olanı koru. |
+| `branch delete-remote <name> [--remote R]` | Bir uzak depodaki dalı sil, yerel olanı koru. `undo --yes` onu olduğu gibi geri gönderir ([geri alma](undo-redo.md#bir-uzak-sunucudaki-dalı-veya-tagi-silme)). |
 | `branch set-upstream <branch> <remote/branch>`, `branch unset-upstream <branch>` | Upstream. |
 | `branch fast-forward <branch> [target]` | Bir dalı yalnızca fast-forward ise ileri taşı. |
 | `checkout <target> [--autostash]` | Dal değiştir ya da bir commit'te ayrık HEAD'e geç. |
@@ -146,7 +146,7 @@ numaralandırdığı gibi numaralandırılır.
 | `tag list [--unpushed]`, `tag create <name> [at] [-m M]`, `tag annotate <name> -m M` | Tag'ler. `tag list` her tag'i nerede durduğuyla birlikte yazdırır; bu bilgi son fetch veya tag push işleminden öğrenilir (asla ağdan değil): `local` (burada var), `remote` (onu tutan uzak depolar), `differs_on` (onu başka bir commit'te tutan uzak depolar) ve `where`: `local`, `remote` (bir uzak depoda var, bu depoda yok), `both` veya `differs`. |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | Bir tag'i siler: yerelde (varsayılan), yalnızca bir uzak depoda (`git push R --delete`; başkalarını etkiler ve geri alınamaz) veya burada ve onu tutan uzak depoda. Yanıt `scope` (`local`, `remote`, `both`) taşır ve bir uzak depoda hâlâ olan bir tag'in yalnızca yerelde silinmesi için `still_on` taşır (sonraki `fetch` onu geri getirir). Birleşik silme önce uzak depoyu siler; `undo` sonra yalnızca yerel tag'i geri yükler ve `tag push` onu yeniden koyar. |
 | `tag fetch <name> [--remote R]` | Bir uzak depodan (varsayılan olarak onu tutan) tek bir tag'i fetch eder, örneğin `where: remote` olan bir tag. Başka bir commit'teki yerel tag'in üzerine asla yazmaz. |
-| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Bir uzak depodaki tag'ler (ad yoksa: hiçbir uzak deponun sahip olmadığı her tag). |
+| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Bir uzak depodaki tag'ler (ad yoksa: hiçbir uzak deponun sahip olmadığı her tag). Birini bir uzak depoda silmek geri alınabilir (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Bağlı worktree'ler. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Alt modüller ([Alt modüller](submodules.md)). |
 
@@ -224,7 +224,7 @@ tek profil varsa isteğe bağlıdır)
 
 | Komut | Ne yapar |
 |---|---|
-| `ai [--print-sent] <command>` | Herhangi bir `ai` komutundaki `--print-sent`, gönderilecek olanı (temizlenmiş sistem ve kullanıcı metni, `{sent: [{system, user}], privacy, dry_run: true}`) yazdırır ve hiçbir model çağırmaz; `ai.enabled = true` gerekir, anahtar ve ağ gerekmez. Her `ai` yanıtı `privacy: {redactions: N, excluded_files: [...]}` taşır: kaç gizli bilginin değiştirildiği ve hangi hassas dosyaların dışarıda bırakıldığı ([YZ > Gizlilik](ai.md#gizlilik)). |
+| `ai [--print-sent] [--send-all] <command>` | Herhangi bir `ai` komutundaki `--send-all` (takma ad `--no-truncate`) her girdiyi, `ai.limits.*` sınırını aşsa bile bütün olarak gönderir; bu olmadan sınırı aşan girdi kısaltılır (çakışma ise reddedilir) ve bir şey kesildiğinde yanıt `truncated: [{part, detail?, bytes, limit, setting}]` taşır ([YZ > Girdi sınırları](ai.md#girdi-sınırları)). `--print-sent` herhangi bir `ai` komutunda, gönderilecek olanı (temizlenmiş sistem ve kullanıcı metni, `{sent: [{system, user}], privacy, dry_run: true}`) yazdırır ve hiçbir model çağırmaz; `ai.enabled = true` gerekir, anahtar ve ağ gerekmez. Her `ai` yanıtı `privacy: {redactions: N, excluded_files: [...]}` taşır: kaç gizli bilginin değiştirildiği ve hangi hassas dosyaların dışarıda bırakıldığı ([YZ > Gizlilik](ai.md#gizlilik)). |
 | `ai commit-message` | YZ'nin stage'lenmiş değişiklikler için önerdiği mesajı yazdır (hiçbir şey stage'lenmemişse tüm değişiklikler); hiçbir şeyi commit etmez. |
 | `ai explain [rev] [--wip]` | Bir commit'i (varsayılan `HEAD`) ya da çalışma değişikliklerini açıkla. |
 | `ai split-plan <rev>` | YZ'nin bir commit'i bölmek için önerdiği planı `{commit, parts, applied: false}` biçiminde yazdırır; `parts`, `split-commit --plan` komutunun kabul ettiği şeydir. Hiçbir şey uygulamaz. `ai.enabled = true` gerektirir. |
@@ -235,7 +235,7 @@ tek profil varsa isteğe bağlıdır)
 | `ai review-context [--repo PATH \| --project HOST/PROJECT] [--run-in-repo profile\|yes\|no] [--claude-md on\|off] [--agents-md on\|off] [--context-file PATH\|URL] [--no-context-file] [--no-extra-file [on\|off]] [--reset]` | Bir kod inceleme taslağına diff dışında nelerin verildiğini göster veya ayarla (`[ai.review]`, bkz. [YZ > İnceleme bağlamı](ai.md#i̇nceleme-bağlamı)). `--repo` da `--project` de verilmezse genel varsayılandır; `--repo` (genel bayrak) bir klonun kendi değerleri, `--project github.com/owner/name` klonlanmamış bir deponun değerleridir (`remote-reviews.toml`). Ayar bayrağı olmadan yalnızca gösterir; biriyle kaydeder ve yazdırır. JSON: `scope` (`global`, `repository`, `project`), `target`, `global`, `own` (yalnızca deponun ya da projenin ayarladığı alanlar), `effective` (bir incelemenin aldığı), `changed`. `--reset` deponun veya projenin kendi değerlerini unutur. `--run-in-repo`, `--project` için geçerli değildir. `--no-extra-file` (tek başına ya da `on`) genel dosya ne derse desin depoya veya projeye ek dosya vermez, `off` genel dosyayı yeniden izletir; `--repo` veya `--project` gerektirir, `--context-file` ile birlikte kullanılamaz ve `own` o zaman `"no_extra_file": true` gösterir. Model gerektirmez; YZ kapalıyken de çalışır. |
 | `ai trust <profile> [--accept-origin URL] [--accept-certificate SHA256] [--allow-insecure-http on\|off]` | Bir profilin API anahtarını saklandığı adrese bağlar (bkz. [YZ > Anahtarın gittiği yer](ai.md#anahtarın-gittiği-yer)). Seçenek olmadan `{profile, current_origin, trusted}` yazdırır; `--accept-origin`, değiştikten sonra profilin şimdiki temel URL'sini kabul eder (ret mesajında yazdırıldığı gibi yazılmalı), `--accept-certificate` kendi barındırılan bir sunucunun sertifikasını SHA-256 anahtar parmak iziyle sabitler, `--allow-insecure-http` bu makinede olmayan düz bir `http://` temel URL'sine izin verir. Yalnızca bir insan çalıştırır: bir MCP aracı değildir. YZ kapalıyken de çalışır. |
 
-Ayrıca `commit --ai` ve `stash push --ai`. Model `gitpoulpi` sürecinden çağrılır,
+Ayrıca `commit --ai [--send-all]` ve `stash push --ai [--send-all]` (`ai` ile aynı `--send-all` ve `truncated`; `hosting review suggest` de `--send-all` alır). Model `gitpoulpi` sürecinden çağrılır,
 bu yüzden API anahtarları asla daemon'a veya bir MCP istemcisine geçmez.
 
 **Depolar, oturumlar, daemon, ayarlar**

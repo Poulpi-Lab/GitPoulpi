@@ -304,8 +304,11 @@ birleştirilmiş en çok 20 satır metni ve talimatlarınızı (genel, depo ve A
 YZ içindeki *Çakışma Çözümü* talimatları) alır. Yanıtını, yalnızca o tek
 çakışmanın çözülmüş metni olarak bir kod bloğunda verir; kod yerine çakışma
 işaretleri veya sohbet içeren bir yanıt bir kez geri gönderilir, sonra
-reddedilir. Yaklaşık 40 KB'ı aşan bir çakışma gönderilmez. YZ kapalıyken
-denetimler gizlidir ve bir öneri hiçbir şeyi kaydetmez, stage'lemez veya
+reddedilir. 40 KB'ı aşan bir çakışma (`ai.limits.conflict_bytes`, *Ayarlar > YZ >
+Sınırlar*) bir uyarının arkasında tutulur; uyarı boyutunu ve sınırı söyler ve *Yine
+de gönder* (yalnızca bu istek, gizlilik denetimleri yine uygulanır), *Ayarı aç* ve
+*İptal* düğmeleri sunar; sınır GitPoulpi'nin kendi korumasıdır, bu yüzden modeliniz
+yer açıyorsa artırın. YZ kapalıyken denetimler gizlidir ve bir öneri hiçbir şeyi kaydetmez, stage'lemez veya
 çözmez: Çıktı'yı gözden geçirin, düzenleyin ve her zamanki gibi kaydedin.
 
 ![Parıltı düğmesinden sonra commit formu: modelin yazdığı, düzenlemeye hazır bir özet ve açıklama](../images/ai-commit-message.png)
@@ -316,7 +319,9 @@ denetimler gizlidir ve bir öneri hiçbir şeyi kaydetmez, stage'lemez veya
 
 Model, çalışma değişikliklerini birkaç commit'e böler (her değişen dosya tam
 olarak birinde; geçersiz bir plan bir kez geri gönderilir, sonra reddedilir).
-Hiçbir şey commit edilmeden önce planı gözden geçirirsiniz:
+Dosyalarda hâlâ çakışma varken hiçbir şey sorulmaz: bir iletişim kutusu onları
+listeler ve çakışma çözme görünümünü açar, çünkü composer çakışmasız bir ağaç
+ister. Hiçbir şey commit edilmeden önce planı gözden geçirirsiniz:
 
 ![Composer incelemesi: dosyalarıyla birlikte dört önerilen commit ve Sıfırla, İptal ve 4 commit oluştur düğmeleri](../images/composer.png)
 
@@ -444,13 +449,63 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 bağlamı `review_context` olarak yazdırır. Aynı dört ayar `config.toml` içinde `ai.review.*` olarak bulunur
 ([başvuru](config-reference.md#ai-yerleşik-yz-varsayılan-olarak-kapalı)).
 
+## Girdi sınırları
+
+GitPoulpi'nin bir isteğe koyduğu her girdinin bir boyut sınırı vardır: `[ai.limits]`
+altında bir ayar (*Ayarlar > YZ > Sınırlar*). Sınırlar GitPoulpi'nin kendi korumasıdır
+(bir modelin bağlam penceresi modele göre değişir): modeliniz yer açıyorsa artırın,
+istekleri küçük tutmak için azaltın.
+
+| Ayar (`ai.limits.`) | Varsayılan | Neyi sınırlar |
+|---|---|---|
+| `conflict_bytes` | 40000 | Bir merge çakışmasının temel, geçerli ve gelen blokları |
+| `diff_bytes` | 60000 | Bir commit mesajı, bir açıklama, bir stash adı, bir pull request açıklaması, bir commit planı veya bir bölme isteğinin diff'i; bir kod incelemesinin tüm diff'i |
+| `review_file_bytes` | 12000 | Bir kod incelemesinde tek bir dosyanın diff'i |
+| `review_text_bytes` | 4000 | İncelenen pull request'in açıklaması |
+| `review_threads_bytes` | 6000 | Zaten var olan inceleme yorumları |
+| `review_context_file_bytes` | 8192 | Bir incelemenin tek bir proje bağlam dosyası (`CLAUDE.md`, `AGENTS.md`, ek dosya) |
+| `review_context_bytes` | 16384 | Bir incelemenin tüm bağlam dosyaları birlikte |
+
+**Hiçbir şey sessizce kesilmez.** Bir girdi sınırını aştığında istek bekler ve
+*YZ sınırı aşıldı* neyin aştığını listeler: hangi parça (diff, bir dosya, açıklama,
+bir bağlam dosyası), boyutu, sınır ve ayar. Bir inceleme sınırı aşan her parçayı tek
+bir iletişim kutusunda listeler. Düğmeler, her biri tuşuyla:
+
+- *Tümünü gönder* (`T`): yalnızca bu istek, hiçbir şey kesilmez. Yine gizlilik
+  denetimlerinden (gizli bilgiler değiştirilir, hassas dosyalar dışarıda bırakılır) ve
+  açıksa sıradaki *Neler gönderiliyor* panelinden geçer.
+- *Kısaltarak gönder* (`K`): sınırı aşan kesilir, eskiden olduğu gibi; iletişim
+  kutusunun her satırı neyin dışarıda kaldığını söyler (diff'in sonu, son hunk'lar,
+  sığmayan dosyalar).
+- *Ayarı aç* (`A`): isteği iptal eder ve *Ayarlar > YZ > Sınırlar* sayfasını listelenen
+  ilk sınırda açar. Odak buradan başlar: Enter hiçbir zaman göndermez.
+- *İptal* (`P`, `Esc`, çarpı ya da dışına tıklama): hiçbir şey göndermez.
+
+Çakışma istisnadır: asla kesilmez. *Yine de gönder* onu bir kez bütün olarak gönderir
+(`G`).
+
+Hiçbir şey bir YZ isteğini kendiliğinden başlatmaz, bu yüzden soracak bir arka plan
+çalıştırması yoktur: her istek sizin başlattığınız bir istektir. Soramayan bir çalıştırma
+(CLI ve MCP) eskisi gibi kısaltır ve bunu söyler; aşağıya bakın.
+
+**Komut satırında** hiçbir şey bir iletişim kutusunu yanıtlayamaz, bu yüzden sınırı aşan
+bir girdi eskisi gibi kısaltılır ve yanıt neyin kesildiğini söyler:
+`truncated: [{part, detail?, bytes, limit, setting}]` (yalnızca bir şey kesildiğinde
+bulunur; `part` şunlardan biridir: `diff`, `split_hunks`, `review_diff`, `review_file`,
+`review_text`, `review_threads`, `context_file`, `context_total`). `--send-all`
+(takma ad `--no-truncate`) bunun yerine her şeyi bütün olarak gönderir: `ai` üzerinde
+(tüm komutları, sınırını aşan bir çakışmanın aksi halde reddedildiği `ai resolve-conflict`
+dahil), `commit --ai`, `stash push --ai` ve `hosting review suggest` üzerinde. MCP
+araçlarında aynı `send_all` argümanı ve aynı `truncated` alanı vardır.
+
 ## Gizlilik
 
 - Bir düğmeye basana veya bir komut çalıştırana kadar hiçbir şey gönderilmez.
   Arka planda YZ yok, telemetri yok, GitPoulpi hesabı yok.
 - Gönderilen: istem (önce yerleşik olan, sonra sizin talimatlarınız) ve
-  sorduğunuz diff, yaklaşık 60 KB'ta kesilmiş olarak (bunu belirten bir notla);
-  bir pull request için ayrıca dalın commit konuları.
+  sorduğunuz diff; bir pull request için ayrıca dalın commit konuları. 60 KB'ı
+  (`ai.limits.diff_bytes`) aşan bir diff asla sessizce kesilmez: bkz.
+  [Girdi sınırları](#girdi-sınırları).
 - Bir geçmiş yeniden yazma betiği isteği, yönergenizi ve sabit betik sözleşmesini (betik
   korumalı alanının API'si) gönderir. En fazla 20 commit'in yazarı, tarihi ve konusu
   **yalnızca** iletişim kutusunda *Örnek gönder* kutusunu işaretlerseniz gider (varsayılan
@@ -519,6 +574,8 @@ tutmak için `dedicated` çalışma klasörünü kullanın.
 | `başarısız:` 404 | **Model** orada yok: varsayılanı kullanmak için temizleyin. |
 | `başarısız:` bağlantı hatası (Ollama, LM Studio) | Sunucu çalışmıyor ya da **Temel URL**'de port yanlış veya `/v1` eksik. |
 | Anahtar, yazıldıktan sonra `(ayarlanmadı)` gösteriyor | Kimlik bilgisi yardımcısı yok: birini yapılandırın (`git config --global credential.helper ...`) ve yeniden girin. |
+| *YZ sınırı aşıldı* | İsteğin bir girdisi `[ai.limits]` sınırlarından birini aşıyor: *Tümünü gönder*, *Kısaltarak gönder*, *Ayarı aç* veya *İptal* seçin (bkz. [Girdi sınırları](#girdi-sınırları)). |
+| "Çakışma sınırdan büyük" | Çakışma `ai.limits.conflict_bytes` değerini aşıyor (varsayılan 40000). *Yine de gönder* onu bir kez gönderir; *Ayarı aç* Ayarlar > YZ > Sınırlar'daki sınıra götürür. |
 | Yanlış dil veya üslup | Talimat ekleyin; düzenleyicinin Hızlı ekle çipleri bunu hızlandırır. |
 | Composer planın geçersiz olduğunu söylüyor | Model bir dosyayı atladı veya yineledi: yeniden deneyin ya da daha güçlü bir model kullanın. |
 

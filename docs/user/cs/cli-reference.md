@@ -132,7 +132,7 @@ Hunky a řádky se číslují tak, jak je číslují `gitpoulpi --json diff`.
 |---|---|
 | `branch list`, `branch create <name> [at]`, `branch delete <name>`, `branch rename <old> <new>` | Lokální větve. |
 | `branch track <remote/branch> [--name N]` | Vytvoří lokální větev sledující vzdálenou a přepne na ni. |
-| `branch delete-remote <name> [--remote R]` | Smaže větev na remote, lokální ponechá. |
+| `branch delete-remote <name> [--remote R]` | Smaže větev na remote, lokální ponechá. `undo --yes` ji pushne zpět tak, jak byla ([undo](undo-redo.md#smazání-větve-nebo-tagu-na-remote)). |
 | `branch set-upstream <branch> <remote/branch>`, `branch unset-upstream <branch>` | Upstream. |
 | `branch fast-forward <branch> [target]` | Posune větev dopředu, jen pokud jde o fast-forward. |
 | `checkout <target> [--autostash]` | Přepne větev nebo odpojí HEAD na commitu. |
@@ -145,7 +145,7 @@ Hunky a řádky se číslují tak, jak je číslují `gitpoulpi --json diff`.
 | `tag list [--unpushed]`, `tag create <name> [at] [-m M]`, `tag annotate <name> -m M` | Tagy. `tag list` vypíše každý tag s tím, kde existuje, zjištěno z posledního fetch nebo push tagu (nikdy ze sítě): `local` (existuje tady), `remote` (remoty, které ho mají), `differs_on` (remoty, kde je na jiném commitu) a `where`: `local`, `remote` (remote ho má, tento repozitář ne), `both` nebo `differs`. |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | Smaže tag: lokálně (výchozí), jen na remote (`git push R --delete`; dopad navenek a nelze vrátit zpět), nebo tady i na remote, který ho má. Odpověď nese `scope` (`local`, `remote`, `both`) a u čistě lokálního smazání tagu, který remote stále má, `still_on` (příští `fetch` ho vrátí). Kombinované smazání odstraní nejdřív remote; `undo` pak obnoví jen lokální tag a `tag push` ho vrátí. |
 | `tag fetch <name> [--remote R]` | Stáhne jeden tag z remote (ve výchozím stavu z toho, který ho má), např. tag s `where: remote`. Nikdy nepřepíše lokální tag na jiném commitu. |
-| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tagy na remote (bez názvů: každý tag, který žádný remote nemá). |
+| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tagy na remote (bez názvů: každý tag, který žádný remote nemá). Smazání tagu na remote lze vrátit (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Propojené worktrees. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submoduly ([Submoduly](submodules.md)). |
 
@@ -221,7 +221,7 @@ stash vrátí, bez ohledu na `general.auto_stash` ([Auto-stash](log-and-history.
 
 | Příkaz | Co dělá |
 |---|---|
-| `ai [--print-sent] <command>` | `--print-sent` u kteréhokoli příkazu `ai` vypíše, co by se odeslalo (vyčištěný systémový a uživatelský text, `{sent: [{system, user}], privacy, dry_run: true}`), a nevolá žádný model; vyžaduje `ai.enabled = true`, žádný klíč ani síť. Každá odpověď `ai` nese `privacy: {redactions: N, excluded_files: [...]}`: kolik tajných hodnot bylo nahrazeno a které citlivé soubory byly vynechány ([AI > Soukromí](ai.md#soukromí)). |
+| `ai [--print-sent] [--send-all] <command>` | `--send-all` (alias `--no-truncate`) u kteréhokoli příkazu `ai` odešle každý vstup celý, i nad jeho limitem `ai.limits.*`; bez něj se vstup nad limitem zkrátí (konflikt se odmítne) a odpověď nese `truncated: [{part, detail?, bytes, limit, setting}]`, když se něco ořízlo ([AI > Limity vstupu](ai.md#limity-vstupu)). `--print-sent` u kteréhokoli příkazu `ai` vypíše, co by se odeslalo (vyčištěný systémový a uživatelský text, `{sent: [{system, user}], privacy, dry_run: true}`), a nevolá žádný model; vyžaduje `ai.enabled = true`, žádný klíč ani síť. Každá odpověď `ai` nese `privacy: {redactions: N, excluded_files: [...]}`: kolik tajných hodnot bylo nahrazeno a které citlivé soubory byly vynechány ([AI > Soukromí](ai.md#soukromí)). |
 | `ai commit-message` | Vypíše zprávu, kterou AI navrhuje pro změny v indexu (všechny změny, když v indexu nic není); nic necommituje. |
 | `ai explain [rev] [--wip]` | Vysvětlí commit (výchozí `HEAD`) nebo pracovní změny. |
 | `ai split-plan <rev>` | Vypíše plán, který AI navrhuje pro rozdělení commitu, jako `{commit, parts, applied: false}`, kde `parts` je to, co přijímá `split-commit --plan`. Nic neaplikuje. Vyžaduje `ai.enabled = true`. |
@@ -232,7 +232,7 @@ stash vrátí, bez ohledu na `general.auto_stash` ([Auto-stash](log-and-history.
 | `ai review-context [--repo PATH \| --project HOST/PROJECT] [--run-in-repo profile\|yes\|no] [--claude-md on\|off] [--agents-md on\|off] [--context-file PATH\|URL] [--no-context-file] [--no-extra-file [on\|off]] [--reset]` | Zobrazí nebo nastaví, co koncept kontroly kódu dostane kromě diffu (`[ai.review]`, viz [AI > Kontext kontroly](ai.md#kontext-kontroly)). Bez `--repo` i `--project` jde o globální výchozí hodnotu; `--repo` (globální přepínač) jsou vlastní hodnoty jednoho klonu, `--project github.com/owner/name` hodnoty repozitáře, který není naklonovaný (`remote-reviews.toml`). Bez přepínače nastavení jen zobrazí; s ním uloží a vypíše. JSON: `scope` (`global`, `repository`, `project`), `target`, `global`, `own` (jen pole, která repozitář nebo projekt nastavil), `effective` (co kontrola dostane), `changed`. `--reset` zapomene vlastní hodnoty repozitáře nebo projektu. `--run-in-repo` se na `--project` nevztahuje. `--no-extra-file` (samotný nebo `on`) dá repozitáři či projektu žádný další soubor, ať říká globální cokoli, `off` ho přinutí znovu následovat globální soubor; vyžaduje `--repo` nebo `--project`, vylučuje `--context-file` a `own` pak ukazuje `"no_extra_file": true`. Nepotřebuje model; funguje i s vypnutou AI. |
 | `ai trust <profile> [--accept-origin URL] [--accept-certificate SHA256] [--allow-insecure-http on\|off]` | Naváže API klíč profilu na adresu, pro kterou byl uložen (viz [AI > Kam jde klíč](ai.md#kam-jde-klíč)). Bez volby vypíše `{profile, current_origin, trusted}`; `--accept-origin` přijme aktuální základní URL profilu po její změně (zapsanou tak, jak ji vypsalo odmítnutí), `--accept-certificate` připne certifikát vlastního serveru podle otisku jeho klíče SHA-256, `--allow-insecure-http` povolí prostou základní URL `http://`, která není na tomto počítači. Spouští to jen člověk: není to nástroj MCP. Funguje i s vypnutou AI. |
 
-K tomu `commit --ai` a `stash push --ai`. Model se volá z procesu `gitpoulpi`,
+K tomu `commit --ai [--send-all]` a `stash push --ai [--send-all]` (stejné `--send-all` a `truncated` jako u `ai`; `--send-all` bere i `hosting review suggest`). Model se volá z procesu `gitpoulpi`,
 takže klíče API nikdy nepřecházejí k daemonu ani klientovi MCP.
 
 **Repozitáře, relace, daemon, nastavení**

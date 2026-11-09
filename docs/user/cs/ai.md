@@ -295,7 +295,11 @@ konfliktu s popisky, které editor ukazuje, až 20 řádků již sloučeného te
 ním a za ním a vaše instrukce (globální, repozitáře a instrukce *Řešení
 konfliktů* v Nastavení > AI). Odpoví vyřešeným textem tohoto jediného konfliktu
 v bloku kódu; odpověď se značkami konfliktu nebo povídáním místo kódu se jednou
-pošle zpět, pak se odmítne. Konflikt nad zhruba 40 KB se neodesílá. Ovládací
+pošle zpět, pak se odmítne. Konflikt nad 40 KB (`ai.limits.conflict_bytes`,
+*Nastavení > AI > Limity*) se zadrží za upozorněním, které uvádí jeho velikost a
+limit, s tlačítky *Odeslat přesto* (jen tento požadavek, stále čištěný kontrolami
+soukromí), *Otevřít nastavení* a *Zrušit*; limit je vlastní pojistka GitPoulpi,
+takže ho zvyšte, pokud na to váš model má kapacitu. Ovládací
 prvky jsou skryté, dokud je AI vypnutá, a návrh nikdy nic neuloží, nepřidá do
 indexu ani nevyřeší: zkontrolujte Výstup, upravte ho a uložte jako obvykle.
 
@@ -306,7 +310,9 @@ indexu ani nevyřeší: zkontrolujte Výstup, upravte ho a uložte jako obvykle.
 ### Composer commitů
 
 Model rozdělí pracovní změny do několika commitů (každý změněný soubor přesně do
-jednoho; neplatný plán se jednou pošle zpět, pak se odmítne). Plán zkontrolujete,
+jednoho; neplatný plán se jednou pošle zpět, pak se odmítne). Dokud mají soubory
+konflikty, nic se nezeptá: dialog je vypíše a otevře pohled na řešení konfliktů,
+protože composer potřebuje strom bez konfliktů. Plán zkontrolujete,
 než se cokoli commituje:
 
 ![Kontrola v composeru: čtyři navržené commity s jejich soubory a tlačítka Obnovit, Zrušit a Vytvořit 4 commity](../images/composer.png)
@@ -429,13 +435,62 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 účinný kontext jako `review_context`. Stejná čtyři nastavení jsou `ai.review.*` v
 `config.toml` ([reference](config-reference.md#ai-vestavěná-ai-ve-výchozím-stavu-vypnuta)).
 
+## Limity vstupu
+
+Každý vstup, který GitPoulpi vkládá do požadavku, má limit velikosti, nastavení
+v `[ai.limits]` (*Nastavení > AI > Limity*). Limity jsou vlastní pojistka GitPoulpi
+(kontextové okno se u každého modelu liší): zvyšte je, pokud na to váš model má
+kapacitu, nebo je snižte, aby byly požadavky malé.
+
+| Nastavení (`ai.limits.`) | Výchozí | Co omezuje |
+|---|---|---|
+| `conflict_bytes` | 40000 | Bloky base, current a incoming jednoho konfliktu merge |
+| `diff_bytes` | 60000 | Diff zprávy commitu, vysvětlení, názvu stashe, popisu pull requestu, plánu commitů nebo rozdělení; celý diff revize kódu |
+| `review_file_bytes` | 12000 | Diff jednoho souboru v revizi kódu |
+| `review_text_bytes` | 4000 | Popis revidovaného pull requestu |
+| `review_threads_bytes` | 6000 | Již existující komentáře revize |
+| `review_context_file_bytes` | 8192 | Jeden kontextový soubor projektu v revizi (`CLAUDE.md`, `AGENTS.md`, další soubor) |
+| `review_context_bytes` | 16384 | Všechny kontextové soubory revize dohromady |
+
+**Nic se neořezává potichu.** Když je vstup nad svým limitem, požadavek počká a
+*Nad limitem AI* vypíše, co je nad limitem: která část (diff, soubor, popis,
+kontextový soubor), její velikost, limit a nastavení. Revize vypíše všechny části
+nad limitem v jednom dialogu. Tlačítka, každé s klávesou:
+
+- *Odeslat vše* (`V`): jen tento požadavek, nic se neořízne. Stále projde
+  kontrolami soukromí (tajné hodnoty nahrazeny, citlivé soubory vynechány) a, je-li
+  zapnutý, panelem *Co se odesílá*, který následuje.
+- *Odeslat zkráceně* (`K`): to, co je nad limitem, se ořízne, jako dřív; každý
+  řádek dialogu říká, co se vynechá (konec diffu, poslední hunky, soubory, které se
+  nevejdou).
+- *Otevřít nastavení* (`N`): zruší požadavek a otevře *Nastavení > AI > Limity*
+  na prvním vypsaném limitu. Fokus začíná tady: Enter nikdy neodešle.
+- *Zrušit* (`Z`, `Esc`, křížek nebo klik mimo): nic se neodešle.
+
+Konflikt je výjimka: nikdy se neřeže. *Odeslat přesto* (`O`) ho odešle celý jednou.
+
+Nic nespouští požadavek AI samo, takže neexistuje běh na pozadí, který by se mohl
+ptát: každý požadavek jste spustili vy. Běh, který se zeptat nemůže (CLI a MCP),
+zkracuje jako dřív a řekne to; viz níže.
+
+**Na příkazové řádce** nemá kdo odpovědět na dialog, takže se vstup nad limitem
+zkrátí jako dřív a odpověď říká, co bylo oříznuto:
+`truncated: [{part, detail?, bytes, limit, setting}]` (jen když se něco ořízlo;
+`part` je jedno z `diff`, `split_hunks`, `review_diff`, `review_file`,
+`review_text`, `review_threads`, `context_file`, `context_total`). `--send-all`
+(alias `--no-truncate`) místo toho odešle všechno celé: u `ai` (všechny jeho
+příkazy, včetně `ai resolve-conflict`, kde je konflikt nad limitem jinak
+odmítnut), u `commit --ai`, u `stash push --ai` a u `hosting review suggest`.
+Nástroje MCP mají stejný argument `send_all` a stejné pole `truncated`.
+
 ## Soukromí
 
 - Nic se neodesílá, dokud nestisknete tlačítko nebo nespustíte příkaz. Žádná AI
   na pozadí, žádná telemetrie, žádný účet GitPoulpi.
 - Co se odesílá: prompt (vestavěný, pak vaše instrukce) a diff, na který jste se
-  ptali, oříznutý na zhruba 60 KB (s poznámkou o tom); u pull requestu také
-  předměty commitů větve.
+  ptali; u pull requestu také předměty commitů větve. Diff nad 60 KB
+  (`ai.limits.diff_bytes`) se nikdy neořízne potichu: viz
+  [Limity vstupu](#limity-vstupu).
 - Požadavek na skript pro přepis historie odešle vaši instrukci a pevný kontrakt skriptu
   (API izolovaného prostředí pro skripty). Autor, datum a předmět až 20 commitů odejdou
   **jen** tehdy, když v dialogu zaškrtnete *Odeslat vzorek* (ve výchozím stavu vypnuto;
@@ -503,6 +558,8 @@ repozitář.
 | `selhalo:` 404 | **Model** tam neexistuje: vymažte ho a použije se výchozí. |
 | `selhalo:` chyba připojení (Ollama, LM Studio) | Server neběží, nebo **Základní URL** má špatný port či chybí `/v1`. |
 | Klíč po zadání ukazuje `(nenastaven)` | Není credential helper: nakonfigurujte jeden (`git config --global credential.helper ...`) a zadejte klíč znovu. |
+| *Nad limitem AI* | Vstup požadavku je nad limitem z `[ai.limits]`: zvolte *Odeslat vše*, *Odeslat zkráceně*, *Otevřít nastavení* nebo *Zrušit* (viz [Limity vstupu](#limity-vstupu)). |
+| „Tento konflikt je větší než limit“ | Konflikt je nad `ai.limits.conflict_bytes` (výchozí 40000). *Odeslat přesto* ho odešle jednou; *Otevřít nastavení* přejde na limit v Nastavení > AI > Limity. |
 | Špatný jazyk nebo styl | Přidejte instrukce; čipy Rychlého vložení v editoru to urychlí. |
 | Composer hlásí, že plán je neplatný | Model přeskočil nebo zopakoval soubor: zkuste to znovu nebo použijte silnější model. |
 

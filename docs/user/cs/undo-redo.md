@@ -145,6 +145,7 @@ obnovit samostatně, „zpět lze přesunout jen větev nebo HEAD“ a podobně.
 | Pracovní změny | stage a unstage (soubor, složka, hunk, řádky, vše), zahození (soubor, složka, hunk, řádky, checkout souboru), aplikace patche, **smazání souboru z disku**, **ignorování** (soubor, přípona nebo složka: řádek v `.gitignore`, který jste zvolili), **považování za binární nebo textový** (řádek v `.gitattributes`) |
 | Stashe | push, apply, pop, drop |
 | Remoty a konfigurace | přidání, odebrání, přejmenování, změna URL nebo push URL remotu, Git LFS track a untrack |
+| Na serveru | **smazání větve nebo tagu na remote** (z nabídky refu, z palety, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, nebo dokončení workflow, které maže vzdálenou větev): viz níže |
 
 Dokud merge, cherry-pick nebo revert stojí na konfliktech, lze vrátit i
 **Uložit a označit jako vyřešené**, stage a unstage (každé se vezme zpět před
@@ -163,12 +164,40 @@ odkazů. Vrácení zahozeného stashe vrátí tentýž stash se stejným id comm
 Vrácení odebrání remotu vrátí jeho remote-tracking větve, jeho alias
 `origin/HEAD` a nastavení upstreamu větví, které jej sledovaly.
 
+### Smazání větve nebo tagu na remote
+
+Před smazáním se GitPoulpi zeptá serveru, co větev nebo tag právě drží, a zaznamená
+to: remote, název a přesný commit (u anotovaného tagu samotný objekt tagu, takže
+jeho anotace zůstane). Smazání se pak provede jen tehdy, když server stále drží
+tuto hodnotu.
+
+**Zpět ji pushne zpět** pod stejným názvem, na stejný commit, bez jakéhokoli
+vynucení. Protože je to změna na serveru, který vidí další lidé, Zpět **se vždy
+zeptá** a řekne to („Vrácení znovu vytvoří větev topic na origin na
+3f2a1c0..."); říkají to i kroky položky (`gitpoulpi undo --dry-run`). Používá
+stejné přihlašovací údaje jako push. Remote-tracking větev se vrátí s ní.
+**Znovu** ji smaže znovu, se stejnou jistotou.
+
+Zpět odmítne a nic nezmění, když:
+
+- větev nebo tag byly na remote od té doby **vytvořeny znovu** nebo posunuty:
+  jsou na jiném commitu, než který byl zaznamenán, a push by přepsal cizí práci
+  (odmítnutí uvádí oba commity);
+- commit (nebo objekt tagu) **už není ve vašem repozitáři** (byl odstraněn
+  garbage collectionem): vrácení nelze provést.
+
+„Smazat lokálně i na remote“ je **jedna položka**: Zpět obnoví lokální i vzdálenou
+větev nebo tag společně, Znovu obojí smaže znovu. Smazání jen vzdálené větve
+lokální ponechá; vrácení to dělá také. Dokončení workflow, které maže i vzdálenou
+větev, lze vrátit jako celek.
+
 ## Co vrátit nelze a proč
 
-- **Cokoli na serveru**: push, smazání vzdálené větve nebo tagu, push tagu, LFS
-  push, lock a unlock. Tento stav sdílejí další lidé; vrácení by byl další
-  push a GitPoulpi ho za vás neudělá. Zpět se kvůli takové operaci také nikdy
-  neblokuje.
+- **Většinu věcí na serveru**: push, push tagu, LFS push, lock a unlock, otevření
+  pull requestu. Tento stav sdílejí další lidé; vrácení pushe by byl force-push
+  nebo smazání na jejich straně a GitPoulpi ho za vás neudělá. (Smazání vzdálené
+  větve nebo tagu je výjimka: vrácení jen vrátí, co server držel, a odmítne, když
+  se tam cokoli změnilo.) Zpět se kvůli takové operaci také nikdy neblokuje.
 - **Fetch**: pouze posouvá remote-tracking refy, které zrcadlí server. Další
   fetch by je posunul znovu.
 - **Přerušení rebase**: zpět se pro něj nenabízí (rebase posouvá větve a drží
@@ -282,6 +311,9 @@ Zpět se ptá jen tehdy, když je to riskantní:
   zachovány, ale zpět se zastaví beze změny, pokud je některá z nich v souboru,
   který musí přepsat.
 
+- položka smazala větev nebo tag na remote: vrácení ji **pushne zpět na server**
+  (viz výše), takže se vždy zeptá, stejně jako Znovu, které ji tam smaže znovu.
+
 Znovu a každé vrácení pouhého posunu refu se nikdy neptá: opačný směr je na
 jedinou klávesu.
 
@@ -336,8 +368,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   nejnovější položku pro znovu). Odmítne, když ta položka není blokovaná, a bez
   `--yes` skončí s kódem **3**. Pro MCP je to mutace, ale ne destruktivní:
   repozitáře se nedotkne.
-- Kód ukončení **0** hotovo, **2** odmítnuto (JSON uvádí důvod), **3** riskantní
-  a vyžaduje `--yes`.
+- Kód ukončení **0** hotovo, **2** odmítnuto (JSON uvádí důvod, například
+  `RemoteRefMoved`, když byla smazaná vzdálená větev vytvořena znovu), **3**
+  riskantní a vyžaduje `--yes` (vrácení smazání vzdálené větve nebo tagu, které
+  pushuje na server).
 
 Návrat bez vracení všeho, co přišlo potom:
 

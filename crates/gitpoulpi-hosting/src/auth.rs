@@ -74,6 +74,52 @@ fn basic(user: &str, token: &str) -> String {
     format!("Basic {}", base64(format!("{user}:{token}").as_bytes()))
 }
 
+/// The user name git's HTTPS transport sends together with `token` for
+/// `kind`, or `None` for a kind that is not a code host (issue trackers, a
+/// folder of notes). Pure, so every host is a table-test row.
+///
+/// | Kind | User name |
+/// |---|---|
+/// | github, github enterprise | `x-access-token` |
+/// | gitlab* | `oauth2` |
+/// | bitbucket cloud | the account, or `x-token-auth` for an access token (no account) |
+/// | bitbucket data center | the account, else the login |
+/// | azure devops* | any non-empty name: the account, else the login, else `gitpoulpi` |
+/// | gitea, forgejo | the login, else the account |
+/// | gerrit | the account (HTTP password auth), else the login |
+///
+/// `account` is the profile's configured account, `login` the one the host
+/// reported on the last check. A profile's own `username` overrides this.
+pub fn git_username(kind: IntegrationKind, account: &str, login: &str) -> Option<String> {
+    let (account, login) = (account.trim(), login.trim());
+    let first = |names: &[&str], fallback: &str| {
+        names
+            .iter()
+            .find(|n| !n.is_empty())
+            .copied()
+            .unwrap_or(fallback)
+            .to_string()
+    };
+    Some(match kind {
+        IntegrationKind::Github | IntegrationKind::GithubEnterprise => "x-access-token".into(),
+        IntegrationKind::Gitlab | IntegrationKind::GitlabSelfManaged => "oauth2".into(),
+        IntegrationKind::Bitbucket => first(&[account], "x-token-auth"),
+        IntegrationKind::BitbucketDataCenter => first(&[account, login], "x-token-auth"),
+        IntegrationKind::AzureDevops | IntegrationKind::AzureDevopsServer => {
+            first(&[account, login], "gitpoulpi")
+        }
+        IntegrationKind::Gitea | IntegrationKind::Forgejo => first(&[login, account], "git"),
+        IntegrationKind::Gerrit => first(&[account, login], "git"),
+        IntegrationKind::JiraCloud
+        | IntegrationKind::JiraDataCenter
+        | IntegrationKind::Trello
+        | IntegrationKind::Linear
+        | IntegrationKind::Youtrack
+        | IntegrationKind::Redmine
+        | IntegrationKind::LocalMarkdown => return None,
+    })
+}
+
 /// RFC 4648 base64 with padding. Twenty lines beat a dependency.
 pub fn base64(input: &[u8]) -> String {
     const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -114,6 +160,35 @@ mod tests {
             ("foobar", "Zm9vYmFy"),
         ] {
             assert_eq!(base64(input.as_bytes()), want, "{input:?}");
+        }
+    }
+
+    #[test]
+    fn git_usernames_per_host() {
+        use IntegrationKind as K;
+        let name = git_username;
+        assert_eq!(name(K::Github, "me", "me").as_deref(), Some("x-access-token"));
+        assert_eq!(name(K::GithubEnterprise, "", "").as_deref(), Some("x-access-token"));
+        assert_eq!(name(K::Gitlab, "me", "").as_deref(), Some("oauth2"));
+        assert_eq!(name(K::GitlabSelfManaged, "", "").as_deref(), Some("oauth2"));
+        assert_eq!(name(K::Bitbucket, "ada", "").as_deref(), Some("ada"));
+        assert_eq!(name(K::Bitbucket, " ", "ada").as_deref(), Some("x-token-auth"));
+        assert_eq!(name(K::BitbucketDataCenter, "", "ada").as_deref(), Some("ada"));
+        assert_eq!(name(K::AzureDevops, "", "").as_deref(), Some("gitpoulpi"));
+        assert_eq!(name(K::AzureDevops, "", "ada").as_deref(), Some("ada"));
+        assert_eq!(name(K::Gitea, "acct", "ada").as_deref(), Some("ada"));
+        assert_eq!(name(K::Forgejo, "acct", "").as_deref(), Some("acct"));
+        assert_eq!(name(K::Gerrit, "ada", "other").as_deref(), Some("ada"));
+        for k in [
+            K::JiraCloud,
+            K::JiraDataCenter,
+            K::Trello,
+            K::Linear,
+            K::Youtrack,
+            K::Redmine,
+            K::LocalMarkdown,
+        ] {
+            assert_eq!(name(k, "a", "b"), None, "{k:?}");
         }
     }
 

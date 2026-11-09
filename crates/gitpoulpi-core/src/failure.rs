@@ -338,9 +338,52 @@ const SECRET_KEYS: &[&str] = &[
 /// style headers, `Bearer`/`Basic` values, token-shaped words and
 /// `password=...` pairs. Idempotent, line structure preserved.
 pub fn redact(text: &str) -> String {
-    text.split_inclusive('\n')
+    let masked = text
+        .split_inclusive('\n')
         .map(redact_line)
-        .collect::<String>()
+        .collect::<String>();
+    mask_registered(masked)
+}
+
+/// Secrets this process knows exactly (a token it resolved for a grant),
+/// masked wherever they appear whatever they look like: a token with no
+/// known prefix is invisible to the shape rules above.
+fn registered_secrets() -> &'static std::sync::Mutex<Vec<String>> {
+    static SECRETS: std::sync::OnceLock<std::sync::Mutex<Vec<String>>> =
+        std::sync::OnceLock::new();
+    SECRETS.get_or_init(Default::default)
+}
+
+/// Shorter values would mask ordinary words.
+const MIN_REGISTERED_SECRET: usize = 6;
+
+/// Remembers `secret` for the life of the process: [`redact`] masks every
+/// occurrence of it from now on. A value shorter than six characters is
+/// ignored (it would mask ordinary text); registering twice is harmless.
+pub fn redact_register_secret(secret: &str) {
+    let secret = secret.trim();
+    if secret.len() < MIN_REGISTERED_SECRET {
+        return;
+    }
+    let mut all = registered_secrets()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner());
+    if !all.iter().any(|s| s == secret) {
+        all.push(secret.to_string());
+    }
+}
+
+fn mask_registered(text: String) -> String {
+    let all = registered_secrets()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner());
+    all.iter().fold(text, |text, secret| {
+        if text.contains(secret.as_str()) {
+            text.replace(secret.as_str(), "***")
+        } else {
+            text
+        }
+    })
 }
 
 fn redact_line(line: &str) -> String {
@@ -564,6 +607,19 @@ mod tests {
         // Ordinary text survives, including words that merely contain keys.
         let plain = "error: failed to push some refs to 'origin' (tokenizer, basic setup)";
         assert_eq!(redact(plain), plain);
+    }
+
+    #[test]
+    fn a_registered_secret_is_masked_even_without_a_known_prefix() {
+        let secret = "zq81-plain-secret-value-4417";
+        let line = format!("remote: denied for {secret} at host\n");
+        assert!(redact(&line).contains(secret), "not registered yet");
+        redact_register_secret(secret);
+        redact_register_secret(secret);
+        redact_register_secret("abc");
+        assert_eq!(redact(&line), "remote: denied for *** at host\n");
+        // Too short to be a secret: ordinary text stays readable.
+        assert_eq!(redact("abc def"), "abc def");
     }
 
     #[test]

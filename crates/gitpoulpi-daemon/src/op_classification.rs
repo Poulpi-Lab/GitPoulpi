@@ -164,6 +164,7 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::LfsLock, "N", "INDEX|WORKTREE|LFS"),
     (K::LfsUnlock, "N", "INDEX|WORKTREE|LFS"),
     (K::Hello, "", "ALL"),
+    (K::CredentialGrant, "", "ALL"),
     (K::ComposeCommits, "JP", "ALL"),
     (K::Undo, "", "ALL"),
     (K::Redo, "", "ALL"),

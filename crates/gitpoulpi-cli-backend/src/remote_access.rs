@@ -75,6 +75,7 @@ pub async fn check(
         duration_ms,
         ssh_accepted_key: accepted,
         ssh_authenticated_to: authenticated,
+        accepted_identity: None,
         error,
     })
 }

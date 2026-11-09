@@ -16,4 +16,4 @@ pub mod workflow;
 
 pub use backend::GitBackend;
 pub use error::{Error, NotCancellableReason, Result, TypedError, BUILD_FEATURES};
-pub use failure::{redact, ErrorDetail, FailureKind, Git2Detail};
+pub use failure::{redact, redact_register_secret, ErrorDetail, FailureKind, Git2Detail};

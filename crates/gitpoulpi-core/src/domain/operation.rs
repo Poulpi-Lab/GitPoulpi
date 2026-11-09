@@ -412,6 +412,13 @@ pub enum OperationKind {
     /// `dispatch`. An `OperationKind` variant only so it rides the existing
     /// `Request`/`Response` envelope.
     Hello,
+    /// Daemon-control pseudo-operation sent by the credential helper a
+    /// GitPoulpi binary plays when git asks for a credential (see
+    /// `gitpoulpi_ipc::git_credential`): args are a `CredentialGrantRequest`,
+    /// the answer a `CredentialGrantAnswer`. Intercepted by the daemon like
+    /// `Hello`: no repository lock, never journaled, never broadcast. Answers
+    /// only for a live, host-bound grant of a running network operation.
+    CredentialGrant,
     /// The AI commit composer's plan as one operation: unstage everything,
     /// then per commit stage its files and commit, under one lock and
     /// journaled as one entry. Args `{ commits: [{ message, paths }] }`.
@@ -590,6 +597,7 @@ impl OperationKind {
             | K::PatchApply
             | K::RebaseAbort
             | K::Hello
+            | K::CredentialGrant
             | K::Undo
             | K::JournalRestore
             | K::Outside
@@ -979,6 +987,7 @@ impl OperationKind {
         OperationKind::LfsLock,
         OperationKind::LfsUnlock,
         OperationKind::Hello,
+        OperationKind::CredentialGrant,
         OperationKind::ComposeCommits,
         OperationKind::Undo,
         OperationKind::Redo,

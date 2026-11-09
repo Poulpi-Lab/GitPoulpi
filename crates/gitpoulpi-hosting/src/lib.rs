@@ -95,7 +95,7 @@ pub use account::{
     AccountCache, AccountIssue, AccountItems, AccountPr, AccountQuery, CachedAccount, ACCOUNT_TTL,
     ACCOUNT_TTL_SECS,
 };
-pub use auth::auth_headers;
+pub use auth::{auth_headers, git_username};
 #[cfg(feature = "hosting")]
 pub use client::{
     client_for, issue_web_url, pull_request_edit_url, pull_request_head_ref, pull_request_web_url,

@@ -87,6 +87,11 @@ pub struct RemoteAccessReport {
     /// With `ssh_verbose`: the host ssh reported `Authenticated to`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ssh_authenticated_to: Option<String>,
+    /// For an HTTPS remote that authenticated with a GitPoulpi account: the
+    /// identity the transport reported as accepted (`account work (token, user
+    /// x)`). Set by the daemon, which brokers the credential; no backend knows it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub accepted_identity: Option<String>,
     /// Why it failed; [`ErrorDetail::kind`] classifies it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<ErrorDetail>,

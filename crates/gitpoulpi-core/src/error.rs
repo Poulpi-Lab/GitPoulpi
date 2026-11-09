@@ -124,6 +124,14 @@ pub enum Error {
     #[error("this repository's authentication cannot be used: {reason}")]
     RepoAuthUnavailable { reason: String },
 
+    /// The transfer was refused credentials because git asked for a host that
+    /// is not the account's own address: `host` is where git went (a remote
+    /// URL rewritten by the repository's own `url.<x>.insteadOf`, say),
+    /// `expected` the address the account's token is bound to. The token was
+    /// **not** sent.
+    #[error("GitPoulpi did not send the account's token to {host}: it is not {expected}, the address that account is bound to")]
+    GrantRefused { host: String, expected: String },
+
     /// A background job was canceled (`JobCancel`, or a client that asked for
     /// cancel-on-disconnect went away). The repository is as it was before the
     /// operation, or at its last safe point (see the cancel policy in
@@ -397,6 +405,10 @@ pub enum TypedError {
     RepoAuthUnavailable {
         reason: String,
     },
+    GrantRefused {
+        host: String,
+        expected: String,
+    },
     Canceled {
         job: u64,
     },
@@ -449,6 +461,10 @@ impl Error {
             }),
             Error::RepoAuthUnavailable { reason } => Some(TypedError::RepoAuthUnavailable {
                 reason: reason.clone(),
+            }),
+            Error::GrantRefused { host, expected } => Some(TypedError::GrantRefused {
+                host: host.clone(),
+                expected: expected.clone(),
             }),
             Error::Canceled { job } => Some(TypedError::Canceled { job: *job }),
             Error::NotCancellable { reason } => {
@@ -533,6 +549,7 @@ impl Error {
                 feature: known_feature(&feature),
             },
             TypedError::RepoAuthUnavailable { reason } => Error::RepoAuthUnavailable { reason },
+            TypedError::GrantRefused { host, expected } => Error::GrantRefused { host, expected },
             TypedError::Canceled { job } => Error::Canceled { job },
             TypedError::NotCancellable { reason } => Error::NotCancellable { reason },
             TypedError::JobConflict { existing } => Error::JobConflict { existing },

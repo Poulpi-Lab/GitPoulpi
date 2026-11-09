@@ -968,6 +968,61 @@ fn reclicking_the_selected_segment_hides_the_column_and_keeps_the_list() {
     term.stop().unwrap();
 }
 
+/// The list picked on the selector is remembered: the next file opened, after
+/// the view was closed, shows that list at once, and so does a restart. Red
+/// when the saved mode is only applied by Alt+C (a fresh file opens on the
+/// graph again), or `All` is not what a later pick of `All` leaves behind.
+#[test]
+fn the_picked_list_applies_to_the_next_file_and_survives_a_restart() {
+    let repo = fixture();
+    let config = tempfile::tempdir().unwrap();
+    let mut term = launch_in(repo.root(), config.path(), "pty-cc-remember", 180);
+    open_head_file(&mut term);
+    term.wait_for("the graph column", STEP, |s| s.contains(TITLE))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    click_file_segment(&mut term);
+    term.wait_for("the file history", STEP, history_shown)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    wait_for_saved(config.path(), "commit_column_mode = 1");
+
+    // Close the view, open another file: its history, not the graph.
+    term.send_keys("Escape").unwrap();
+    term.wait_for("the Log back", STEP, |s| {
+        !s.contains(" History - c.txt ") && !s.contains(TITLE)
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    open_file_at(&mut term, "edit a", "a.txt");
+    term.wait_for("a.txt's history", STEP, |s| {
+        s.contains(" History - a.txt ") && !s.contains(TITLE)
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.stop().unwrap();
+
+    // A restart: the same list on the first file opened.
+    let mut term = launch_in(repo.root(), config.path(), "pty-cc-remember", 180);
+    open_from_the_list(&mut term, "c.txt");
+    term.wait_for("the file history after a restart", STEP, history_shown)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Picking `All` is remembered the same way.
+    click_all_segment(&mut term);
+    term.wait_for("the graph column", STEP, |s| {
+        s.contains(TITLE) && !s.contains(" History - c.txt ")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    wait_for_saved(config.path(), "commit_column_mode = 0");
+    term.send_keys("Escape").unwrap();
+    term.wait_for("the Log back", STEP, |s| {
+        !s.contains(TITLE) && s.contains("Refs")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    open_file_at(&mut term, "edit a", "a.txt");
+    term.wait_for("the graph for the next file", STEP, |s| {
+        s.contains(TITLE) && !s.contains(" History - ")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.stop().unwrap();
+}
+
 /// The selector's tooltip names the click, the re-click and the key.
 #[test]
 fn the_selectors_tooltip_names_the_click_the_reclick_and_the_key() {

@@ -923,6 +923,7 @@ pub(super) fn init(
         help_popup_inner_height: 10,
         file_insight: None,
         history: None,
+        list_applied_to: None,
         commit_col: crate::commit_column::CommitColumn::new(
             restored_layout.commit_column,
             restored_layout.commit_column_cols,

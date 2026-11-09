@@ -8,6 +8,7 @@ use init::WindowState;
 impl WindowState {
     /// Runs before the frame is settled and drawn.
     pub(in crate::event_loop) fn tick_history(&mut self) {
+        self.apply_remembered_list();
         self.promote_history_intent();
         // The view lives as long as its diff does: closing the diff, or
         // opening another file's, ends it.
@@ -46,6 +47,47 @@ impl WindowState {
                 }
             }
         }
+    }
+
+    /// The bar's `File | All` pick is remembered (`commit_column_mode`): a
+    /// commit's file opened while the column is wanted and `File` is the
+    /// remembered list opens as that file's History, the way a click on `File`
+    /// would, instead of the graph. Once per opened file: leaving the History
+    /// for the graph (or a click on `All`) sets the mode to `All`, so this
+    /// does not fight the user.
+    fn apply_remembered_list(&mut self) {
+        let viewed = crate::commit_column::viewed_commit(
+            self.central_view,
+            self.diff_view_state.as_ref(),
+            self.file_insight.as_ref(),
+        );
+        let Some(commit) = viewed else {
+            self.list_applied_to = None;
+            return;
+        };
+        let width = crossterm::terminal::size().map_or(0, |(w, _)| w);
+        if self.commit_col.mode != crate::commit_column::ColumnMode::File
+            || !self.commit_col.wanted(width)
+        {
+            return;
+        }
+        let refs = self.refs_result.as_deref().unwrap_or(&[]);
+        let request = match (self.central_view, &self.file_insight, &self.diff_view_state) {
+            (CentralView::File, Some(f), _) => FileInsightRequest {
+                kind: FileInsightKind::History,
+                ..f.request.clone()
+            },
+            (CentralView::Diff, _, Some(s)) => {
+                crate::diff_actions::diff_insight_request(s, FileInsightKind::History, refs)
+            }
+            _ => return,
+        };
+        let key = (request.path.clone(), commit);
+        if self.list_applied_to.as_ref() == Some(&key) {
+            return;
+        }
+        self.list_applied_to = Some(key);
+        crate::diff_actions::open_insight_request(request, &self.link, &mut self.file_insight);
     }
 
     /// Every place that opens a History creates a `FileInsightKind::History`

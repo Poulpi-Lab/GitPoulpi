@@ -324,6 +324,10 @@ pub(in crate::event_loop) struct WindowState {
     pub(in crate::event_loop) file_insight: Option<FileInsight>,
     /// The File History split view; its diff is `diff_view_state`.
     pub(in crate::event_loop) history: Option<crate::history_view::HistoryView>,
+    /// The file view the remembered `File` list was last applied to (so a
+    /// History that cannot open does not retry every tick); cleared while no
+    /// commit's file is open. See `WindowState::apply_remembered_list`.
+    pub(in crate::event_loop) list_applied_to: Option<(std::path::PathBuf, Oid)>,
     /// The commit list left of the Diff / File View / Blame / Edit views.
     pub(in crate::event_loop) commit_col: crate::commit_column::CommitColumn,
     pub(in crate::event_loop) editor: Option<crate::editor::Editor>,

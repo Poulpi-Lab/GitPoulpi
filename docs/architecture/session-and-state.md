@@ -371,7 +371,7 @@ Plan: [mcp-show-ui](../developer/the mcp-show-ui design); user page: [mcp-and-ag
   shown / hidden; `CommitColumn::mode` (`commit_column_mode`: 0 all, 1 file) is the list it comes back with. A
   session written before the mode existed has no `commit_column_mode` and reads as `All` (what the column always
   showed first). `draw_central` sets `mode` from what is painted (a History list shown = File, the graph = All), so
-  the mode follows a History opened from a menu; only `set_state` saves it. Off is one choice for both lists: it
+  the mode follows a History opened from a menu; only `set_state` saves it. The saved mode also decides what a freshly opened commit file shows: with `File` remembered and the column wanted, `WindowState::apply_remembered_list` (tick, before the draw, once per file) turns the view into that file's History, so the pick survives the view closing, another file and a restart (it was only used by `Alt+C` before; `pty_commit_column`). Off is one choice for both lists: it
   writes `Pref::Off` and hides the open History's list (`HistoryView::hidden`, `strip`) and leaves the mode alone.
   `Alt+C`, the strip and a Ctrl+click on the selector are `toggle`: off -> `mode.state()` (File inside an open
   History, whatever the mode says), on -> Off.

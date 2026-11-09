@@ -1,3 +1,4 @@
+#![cfg_attr(not(feature = "hosting"), allow(dead_code))]
 //! Credential grants (ADR-0010): how an account's token reaches git without
 //! sitting in a process argument or an environment variable.
 //!

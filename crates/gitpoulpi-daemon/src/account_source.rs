@@ -12,6 +12,7 @@ use std::path::Path;
 use std::sync::Mutex;
 
 use gitpoulpi_core::domain::NetworkAuth;
+#[cfg(feature = "hosting")]
 use gitpoulpi_core::repo_config::sh_quote_path;
 use gitpoulpi_core::Error;
 
@@ -37,6 +38,7 @@ pub fn set_credential_helper_exe(exe: Option<std::path::PathBuf>) {
 /// The path goes through the same quoting as the SSH key command (a path with
 /// spaces, `"`, `$` or backslashes survives Git for Windows' `sh`); the flag
 /// is plain ASCII so MSYS path conversion leaves it alone.
+#[cfg(feature = "hosting")]
 pub(crate) fn helper_command() -> Result<String, Error> {
     let configured = HELPER_EXE.lock().unwrap_or_else(|e| e.into_inner()).clone();
     let exe = match configured {
@@ -53,6 +55,7 @@ pub(crate) fn helper_command() -> Result<String, Error> {
 
 /// What git's child gets in its environment: the grant id and the session
 /// whose daemon serves it. Neither is a secret.
+#[cfg(feature = "hosting")]
 pub(crate) fn grant_env(grant: &GrantGuard, session: &str) -> Vec<(String, String)> {
     vec![
         (

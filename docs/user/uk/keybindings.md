@@ -645,6 +645,9 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Remote: дії для вибраного remote... | `.` |
 | Репозиторій: ключ SSH для цього репозиторію... |  |
 | Репозиторій: розріджений checkout... |  |
+| Repository: SSH & Credentials... |  |
+| Repository: Test Connection |  |
+| Repository: Use Default Credentials |  |
 | Flow: відкрити меню | `Ctrl+G W` |
 | Flow: почати гілку... |  |
 | Flow: нове issue... |  |

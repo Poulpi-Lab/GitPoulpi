@@ -650,6 +650,9 @@ zastosowania. Klawisze są domyślne.
 | Zdalne: Akcje dla zaznaczonego zdalnego... | `.` |
 | Repozytorium: Klucz SSH dla tego repozytorium... |  |
 | Repozytorium: Częściowy checkout... |  |
+| Repository: SSH & Credentials... |  |
+| Repository: Test Connection |  |
+| Repository: Use Default Credentials |  |
 | Flow: Otwórz menu | `Ctrl+G W` |
 | Flow: Rozpocznij gałąź... |  |
 | Flow: Nowe zgłoszenie... |  |

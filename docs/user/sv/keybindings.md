@@ -653,6 +653,9 @@ Tangenterna är standardvärdena.
 | Remote: Åtgärder för vald remote... | `.` |
 | Repository: SSH-nyckel för det här repositoryt... |  |
 | Repository: Delvis utcheckning... |  |
+| Repository: SSH & Credentials... |  |
+| Repository: Test Connection |  |
+| Repository: Use Default Credentials |  |
 | Flow: Öppna menyn | `Ctrl+G W` |
 | Flow: Starta gren... |  |
 | Flow: Nytt ärende... |  |

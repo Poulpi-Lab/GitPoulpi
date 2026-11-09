@@ -657,6 +657,9 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Remote: действия для выбранного remote... | `.` |
 | Репозиторий: ключ SSH для этого репозитория... |  |
 | Репозиторий: Частичный checkout... |  |
+| Repository: SSH & Credentials... |  |
+| Repository: Test Connection |  |
+| Repository: Use Default Credentials |  |
 | Flow: открыть меню | `Ctrl+G W` |
 | Flow: начать ветку... |  |
 | Flow: новая задача... |  |

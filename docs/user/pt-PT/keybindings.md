@@ -389,6 +389,8 @@ As teclas depois de um prefixo são mostradas com o prefixo (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Separador anterior da página de definições | `Alt+Left` |
 | `preferences` | `next_tab` | Separador seguinte da página de definições | `Alt+Right` |
 | `ai_popup` | `copy` | Copiar o resultado | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Adicionar um perfil | `a` |
 | `integrations` | `edit` | Editar o perfil selecionado | `e` |
 | `integrations` | `open_token` | Abrir a página do token | `o` |
@@ -859,6 +861,8 @@ As teclas são as predefinidas.
 | Registo de atividade: escolher o âmbito |  |
 | Registo de atividade: operações Git |  |
 | Registo de atividade: registo da aplicação |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Registo de atividade: copiar o último erro |  |
 | Registo de atividade: executar a ação sugerida |  |
 | Registo de atividade: abrir o último erro |  |

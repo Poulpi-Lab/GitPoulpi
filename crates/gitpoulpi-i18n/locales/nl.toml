@@ -2460,6 +2460,8 @@ preferences_list_remove = "Het geselecteerde lijstitem verwijderen"
 preferences_list_move_up = "Het geselecteerde lijstitem omhoog verplaatsen"
 preferences_list_move_down = "Het geselecteerde lijstitem omlaag verplaatsen"
 ai_popup_copy = "Het resultaat kopiëren"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Een profiel toevoegen"
 integrations_edit = "Het geselecteerde profiel bewerken"
 integrations_open_token = "De tokenpagina openen"
@@ -2525,6 +2527,7 @@ folder_picker = "Mapkiezer"
 preferences = "Instellingen"
 ai_popup = "AI-resultaatpopup"
 integrations = "Instellingen: pagina Integraties"
+activity_log = "Activity Log window"
 palette = "Palet-opdrachten"
 split = "Editor voor het splitsen van een {$commit}"
 
@@ -5926,6 +5929,12 @@ hint_application = "Pijlen: scrollen  l: niveau  /: filter  c: alles kopiëren  
 palette_scope = "Activiteitenlogboek: Het bereik kiezen"
 palette_git_tab = "Activiteitenlogboek: Git-bewerkingen"
 palette_app_tab = "Activiteitenlogboek: Applicatielogboek"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "De SSH-hostsleutel van de remote is nog niet bekend."

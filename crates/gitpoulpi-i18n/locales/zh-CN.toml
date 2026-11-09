@@ -2449,6 +2449,8 @@ preferences_list_remove = "删除所选列表项"
 preferences_list_move_up = "将所选列表项上移"
 preferences_list_move_down = "将所选列表项下移"
 ai_popup_copy = "复制结果"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "添加配置"
 integrations_edit = "编辑所选配置"
 integrations_open_token = "打开令牌页面"
@@ -2524,6 +2526,7 @@ folder_picker = "文件夹选择器"
 preferences = "设置"
 ai_popup = "AI 结果弹窗"
 integrations = "设置：集成页面"
+activity_log = "Activity Log window"
 palette = "命令面板命令"
 split = { git = "拆分 {$commit} 编辑器", local = "拆分{$commit}编辑器" }
 
@@ -5928,6 +5931,12 @@ hint_application = "方向键：滚动  l：级别  /：筛选  c：全部复制
 palette_scope = "活动日志：选择范围"
 palette_git_tab = "活动日志：Git 操作"
 palette_app_tab = "活动日志：应用日志"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "尚不认识该远程的 SSH 主机密钥。"

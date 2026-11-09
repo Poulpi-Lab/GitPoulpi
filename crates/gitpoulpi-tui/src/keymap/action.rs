@@ -40,6 +40,8 @@ pub(crate) enum Ctx {
     Preferences,
     AiPopup,
     Integrations,
+    /// The Activity Log window, while it is open.
+    ActivityLog,
     /// The palette commands that have no key of their own: one bindable
     /// action each (`palette.<command id>`), dispatched like `Global`.
     Palette,
@@ -78,6 +80,7 @@ impl Ctx {
         Ctx::Preferences,
         Ctx::AiPopup,
         Ctx::Integrations,
+        Ctx::ActivityLog,
         Ctx::Palette,
     ];
 
@@ -172,6 +175,7 @@ impl Ctx {
             Ctx::Preferences => t::PREFERENCES,
             Ctx::AiPopup => t::AI_POPUP,
             Ctx::Integrations => t::INTEGRATIONS,
+            Ctx::ActivityLog => t::ACTIVITY_LOG,
             Ctx::Palette => t::PALETTE,
         }
     }
@@ -209,6 +213,7 @@ impl Ctx {
             Ctx::Preferences => "preferences",
             Ctx::AiPopup => "ai_popup",
             Ctx::Integrations => "integrations",
+            Ctx::ActivityLog => "activity_log",
             Ctx::Palette => "palette",
         }
     }
@@ -722,6 +727,8 @@ actions! {
     PreferencesPrevTab => (Preferences, "preferences.prev_tab", PREFERENCES_PREV_TAB, ["Alt+Left"]),
     PreferencesNextTab => (Preferences, "preferences.next_tab", PREFERENCES_NEXT_TAB, ["Alt+Right"]),
     AiPopupCopy => (AiPopup, "ai_popup.copy", AI_POPUP_COPY, ["c"], @Ai),
+    ActivityLogScrollLeft => (ActivityLog, "activity_log.scroll_left", ACTIVITY_LOG_SCROLL_LEFT, ["Left"]),
+    ActivityLogScrollRight => (ActivityLog, "activity_log.scroll_right", ACTIVITY_LOG_SCROLL_RIGHT, ["Right"]),
     IntegrationsAdd => (Integrations, "integrations.add", INTEGRATIONS_ADD, ["a"]),
     IntegrationsEdit => (Integrations, "integrations.edit", INTEGRATIONS_EDIT, ["e"]),
     IntegrationsOpenToken => (Integrations, "integrations.open_token", INTEGRATIONS_OPEN_TOKEN, ["o"]),

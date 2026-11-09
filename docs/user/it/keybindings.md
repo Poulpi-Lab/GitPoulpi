@@ -392,6 +392,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `preferences` | `prev_tab` | Scheda precedente della pagina delle impostazioni | `Alt+Left` |
 | `preferences` | `next_tab` | Scheda successiva della pagina delle impostazioni | `Alt+Right` |
 | `ai_popup` | `copy` | Copia il risultato | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Aggiungi un profilo | `a` |
 | `integrations` | `edit` | Modifica il profilo selezionato | `e` |
 | `integrations` | `open_token` | Apri la pagina del token | `o` |
@@ -865,6 +867,8 @@ applicano. I tasti sono quelli predefiniti.
 | Registro attività: Scegli l'ambito |  |
 | Registro attività: Operazioni git |  |
 | Registro attività: Registro dell'applicazione |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Registro attività: Copia l'ultimo errore |  |
 | Registro attività: Esegui l'azione suggerita |  |
 | Registro attività: Apri l'ultimo errore |  |

@@ -2109,6 +2109,16 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::AppTab),
     ),
     entry(
+        gitpoulpi_i18n::msg::activity_log::PALETTE_SCROLL_LEFT,
+        "",
+        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::ScrollLeft),
+    ),
+    entry(
+        gitpoulpi_i18n::msg::activity_log::PALETTE_SCROLL_RIGHT,
+        "",
+        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::ScrollRight),
+    ),
+    entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_COPY_LAST_ERROR,
         "",
         PaletteCommand::CopyLastError,

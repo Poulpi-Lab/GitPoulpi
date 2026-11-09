@@ -2459,6 +2459,8 @@ preferences_list_remove = "Видалити вибраний елемент сп
 preferences_list_move_up = "Перемістити вибраний елемент списку вгору"
 preferences_list_move_down = "Перемістити вибраний елемент списку вниз"
 ai_popup_copy = "Копіювати результат"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Додати профіль"
 integrations_edit = "Змінити вибраний профіль"
 integrations_open_token = "Відкрити сторінку токена"
@@ -2524,6 +2526,7 @@ folder_picker = "Вибір папки"
 preferences = "Налаштування"
 ai_popup = "Вікно результату ШІ"
 integrations = "Налаштування: сторінка Інтеграції"
+activity_log = "Activity Log window"
 palette = "Команди палітри"
 split = { git = "Редактор розділення commit'у", local = "Редактор розділення коміту" }
 
@@ -5930,6 +5933,12 @@ hint_application = "Стрілки: прокрутка  l: рівень  /: фі
 palette_scope = "Журнал активності: вибрати область"
 palette_git_tab = "Журнал активності: операції git"
 palette_app_tab = "Журнал активності: журнал застосунку"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "Ключ SSH-хоста віддаленого репозиторію ще невідомий."

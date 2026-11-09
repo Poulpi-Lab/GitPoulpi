@@ -392,6 +392,8 @@ préfixe (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Onglet précédent de la page de paramètres | `Alt+Left` |
 | `preferences` | `next_tab` | Onglet suivant de la page de paramètres | `Alt+Right` |
 | `ai_popup` | `copy` | Copier le résultat | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Ajouter un profil | `a` |
 | `integrations` | `edit` | Modifier le profil sélectionné | `e` |
 | `integrations` | `open_token` | Ouvrir la page du jeton | `o` |
@@ -863,6 +865,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Journal d'activité : Choisir le périmètre |  |
 | Journal d'activité : Opérations Git |  |
 | Journal d'activité : Journal de l'application |  |
+| Journal d'activité : Défiler à gauche | `Left` |
+| Journal d'activité : Défiler à droite | `Right` |
 | Journal d'activité : Copier la dernière erreur |  |
 | Journal d'activité : Lancer l'action suggérée |  |
 | Journal d'activité : Ouvrir la dernière erreur |  |

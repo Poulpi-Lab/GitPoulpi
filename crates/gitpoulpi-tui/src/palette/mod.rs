@@ -1104,6 +1104,12 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
         PaletteCommand::LfsPull => Some(A::GitLfsPull),
         PaletteCommand::LfsPushAll => Some(A::GitLfsPushAll),
         PaletteCommand::LfsPrune => Some(A::GitLfsPrune),
+        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::ScrollLeft) => {
+            Some(A::ActivityLogScrollLeft)
+        }
+        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::ScrollRight) => {
+            Some(A::ActivityLogScrollRight)
+        }
         PaletteCommand::Undo => Some(A::GlobalUndo),
         PaletteCommand::Redo => Some(A::GlobalRedo),
         PaletteCommand::UndoHistory => Some(A::GlobalUndoHistory),

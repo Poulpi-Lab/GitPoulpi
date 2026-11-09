@@ -390,6 +390,8 @@ předponou (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Předchozí karta stránky nastavení | `Alt+Left` |
 | `preferences` | `next_tab` | Další karta stránky nastavení | `Alt+Right` |
 | `ai_popup` | `copy` | Kopírovat výsledek | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Přidat profil | `a` |
 | `integrations` | `edit` | Upravit vybraný profil | `e` |
 | `integrations` | `open_token` | Otevřít stránku tokenu | `o` |
@@ -861,6 +863,8 @@ Klávesy jsou výchozí.
 | Protokol aktivity: Zvolit rozsah |  |
 | Protokol aktivity: Operace gitu |  |
 | Protokol aktivity: Protokol aplikace |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Protokol aktivity: Kopírovat poslední chybu |  |
 | Protokol aktivity: Provést navrženou akci |  |
 | Protokol aktivity: Otevřít poslední chybu |  |

@@ -2459,6 +2459,8 @@ preferences_list_remove = "Remover o item selecionado da lista"
 preferences_list_move_up = "Mover o item selecionado da lista para cima"
 preferences_list_move_down = "Mover o item selecionado da lista para baixo"
 ai_popup_copy = "Copiar o resultado"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Adicionar um perfil"
 integrations_edit = "Editar o perfil selecionado"
 integrations_open_token = "Abrir a página do token"
@@ -2524,6 +2526,7 @@ folder_picker = "Seletor de pastas"
 preferences = "Configurações"
 ai_popup = "Popup de resultado da IA"
 integrations = "Configurações: página Integrações"
+activity_log = "Activity Log window"
 palette = "Comandos da paleta"
 split = "Editor de divisão de {$commit}"
 
@@ -5925,6 +5928,12 @@ hint_application = "↑↓: rolar  l: nível  /: filtro  c: copiar tudo  o: past
 palette_scope = "Registro de atividade: escolher o escopo"
 palette_git_tab = "Registro de atividade: operações do Git"
 palette_app_tab = "Registro de atividade: registro do aplicativo"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "A chave de host SSH do remoto ainda não é conhecida."

@@ -387,6 +387,8 @@ stage_file = "z"
 | `preferences` | `prev_tab` | Попередня вкладка сторінки налаштувань | `Alt+Left` |
 | `preferences` | `next_tab` | Наступна вкладка сторінки налаштувань | `Alt+Right` |
 | `ai_popup` | `copy` | Копіювати результат | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Додати профіль | `a` |
 | `integrations` | `edit` | Змінити вибраний профіль | `e` |
 | `integrations` | `open_token` | Відкрити сторінку токена | `o` |
@@ -855,6 +857,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Журнал активності: вибрати область |  |
 | Журнал активності: операції git |  |
 | Журнал активності: журнал застосунку |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Журнал активності: копіювати останню помилку |  |
 | Журнал активності: виконати запропоновану дію |  |
 | Журнал активності: відкрити останню помилку |  |

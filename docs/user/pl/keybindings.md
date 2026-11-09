@@ -390,6 +390,8 @@ prefiksem (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Poprzednia karta strony ustawień | `Alt+Left` |
 | `preferences` | `next_tab` | Następna karta strony ustawień | `Alt+Right` |
 | `ai_popup` | `copy` | Kopiuj wynik | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Dodaj profil | `a` |
 | `integrations` | `edit` | Edytuj zaznaczony profil | `e` |
 | `integrations` | `open_token` | Otwórz stronę tokenu | `o` |
@@ -860,6 +862,8 @@ zastosowania. Klawisze są domyślne.
 | Dziennik aktywności: Wybierz zakres |  |
 | Dziennik aktywności: Operacje git |  |
 | Dziennik aktywności: Dziennik aplikacji |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Dziennik aktywności: Kopiuj ostatni błąd |  |
 | Dziennik aktywności: Wykonaj sugerowaną akcję |  |
 | Dziennik aktywności: Otwórz ostatni błąd |  |

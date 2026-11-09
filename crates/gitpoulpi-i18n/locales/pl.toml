@@ -2458,6 +2458,8 @@ preferences_list_remove = "Usuń zaznaczony element listy"
 preferences_list_move_up = "Przesuń zaznaczony element listy w górę"
 preferences_list_move_down = "Przesuń zaznaczony element listy w dół"
 ai_popup_copy = "Kopiuj wynik"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Dodaj profil"
 integrations_edit = "Edytuj zaznaczony profil"
 integrations_open_token = "Otwórz stronę tokenu"
@@ -2523,6 +2525,7 @@ folder_picker = "Wybór folderu"
 preferences = "Ustawienia"
 ai_popup = "Okno wyniku AI"
 integrations = "Ustawienia: Strona Integracji"
+activity_log = "Activity Log window"
 palette = "Polecenia palety"
 split = { git = "Edytor podziału commita", local = "Edytor podziału zatwierdzenia" }
 
@@ -5929,6 +5932,12 @@ hint_application = "Strzałki: przewijanie  l: poziom  /: filtr  c: kopiuj wszys
 palette_scope = "Dziennik aktywności: Wybierz zakres"
 palette_git_tab = "Dziennik aktywności: Operacje git"
 palette_app_tab = "Dziennik aktywności: Dziennik aplikacji"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "Klucz hosta SSH zdalnego repozytorium nie jest jeszcze znany."

@@ -342,3 +342,86 @@ fn a_long_application_line_scrolls_by_key_track_press_and_drag() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
+
+/// A failed push whose error line (the `unable to access '<url>'` message)
+/// is longer than the window: the remote's URL carries a marker at its end.
+fn long_url_origin() -> gitpoulpi_testkit::FixtureRepo {
+    let repo = with_local_origin();
+    repo.git(&[
+        "remote",
+        "set-url",
+        "origin",
+        &format!("http://127.0.0.1:1/{}/tail-marker.git", "x".repeat(150)),
+    ]);
+    repo
+}
+
+#[test]
+fn a_long_operations_line_scrolls_by_key_track_press_and_drag() {
+    let repo = long_url_origin();
+    let config = tempfile::tempdir().unwrap();
+    let mut term = launch(repo.root(), "pty-timings-ops-hscroll", config.path(), 100);
+    click_push(&mut term);
+    term.wait_for("the failure in the status line", STEP, |s| {
+        s.contains("error: Push failed")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The Activity Log opens on the first tab: open the entry.
+    open_log_by_key(&mut term);
+    term.send_keys("Enter").unwrap();
+    let screen = term
+        .wait_for("the long error line, cut at the edge", STEP, |s| {
+            s.contains("unable to access") && s.contains("\u{2192}")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !screen.contains("tail-marker"),
+        "the end of the line is cut off before scrolling\n{}",
+        screen.text()
+    );
+
+    // The keyboard: Right scrolls a step (the tab stays), Home comes back.
+    let before = screen.text();
+    term.send_keys("Right").unwrap();
+    term.wait_for("the view moved sideways", STEP, |s| s.text() != before)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        term.screen().contains(" Git operations "),
+        "{}",
+        term.text()
+    );
+    for _ in 0..30 {
+        term.send_keys("Right").unwrap();
+    }
+    term.wait_for("the end of the line", STEP, |s| s.contains("tail-marker"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Home").unwrap();
+    term.wait_for("back at the start", STEP, |s| !s.contains("tail-marker"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+
+    // The bar: arrows at the ends of its row. A press on the bare track near
+    // the right end jumps the thumb there and shows the end of the line.
+    let screen = term.screen();
+    let (left, bar_row) = screen.find("\u{2190}").expect("the horizontal bar");
+    let right = screen
+        .find_all("\u{2192}")
+        .into_iter()
+        .find(|(_, r)| *r == bar_row)
+        .expect("its right arrow")
+        .0;
+    term.press(right - 2, bar_row).unwrap();
+    term.release(right - 2, bar_row).unwrap();
+    term.wait_for("the end of the line by the bar", STEP, |s| {
+        s.contains("tail-marker")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+
+    // Dragging the thumb back to the left end returns to the start.
+    term.press(right - 2, bar_row).unwrap();
+    term.drag_to(left + 1, bar_row).unwrap();
+    term.release(left + 1, bar_row).unwrap();
+    term.wait_for("the start of the line again", STEP, |s| {
+        !s.contains("tail-marker")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+}

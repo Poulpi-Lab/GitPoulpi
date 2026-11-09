@@ -391,6 +391,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Ayarlar Sayfasının Önceki Sekmesi | `Alt+Left` |
 | `preferences` | `next_tab` | Ayarlar Sayfasının Sonraki Sekmesi | `Alt+Right` |
 | `ai_popup` | `copy` | Sonucu Kopyala | `c` |
+| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
+| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
 | `integrations` | `add` | Profil Ekle | `a` |
 | `integrations` | `edit` | Seçili Profili Düzenle | `e` |
 | `integrations` | `open_token` | Token Sayfasını Aç | `o` |
@@ -861,6 +863,8 @@ Tuşlar varsayılanlardır.
 | Etkinlik Günlüğü: Kapsamı Seç |  |
 | Etkinlik Günlüğü: Git İşlemleri |  |
 | Etkinlik Günlüğü: Uygulama Günlüğü |  |
+| Activity Log: Scroll Left | `Left` |
+| Activity Log: Scroll Right | `Right` |
 | Etkinlik Günlüğü: Son Hatayı Kopyala |  |
 | Etkinlik Günlüğü: Önerilen Eylemi Çalıştır |  |
 | Etkinlik Günlüğü: Son Hatayı Aç |  |

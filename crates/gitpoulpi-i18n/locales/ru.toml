@@ -2451,6 +2451,8 @@ preferences_list_remove = "Удалить выбранный элемент сп
 preferences_list_move_up = "Переместить выбранный элемент списка вверх"
 preferences_list_move_down = "Переместить выбранный элемент списка вниз"
 ai_popup_copy = "Копировать результат"
+activity_log_scroll_left = "Scroll the Activity Log Left"
+activity_log_scroll_right = "Scroll the Activity Log Right"
 integrations_add = "Добавить профиль"
 integrations_edit = "Изменить выбранный профиль"
 integrations_open_token = "Открыть страницу токена"
@@ -2516,6 +2518,7 @@ folder_picker = "Выбор папки"
 preferences = "Настройки"
 ai_popup = "Окно результата ИИ"
 integrations = "Настройки: страница Интеграции"
+activity_log = "Activity Log window"
 palette = "Команды палитры"
 split = { git = "Редактор разделения commit'а", local = "Редактор разделения коммита" }
 
@@ -5922,6 +5925,12 @@ hint_application = "Стрелки: прокрутка  l: уровень  /: ф
 palette_scope = "Журнал активности: выбрать область"
 palette_git_tab = "Журнал активности: операции git"
 palette_app_tab = "Журнал активности: журнал приложения"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the left
+palette_scroll_left = "Activity Log: Scroll Left"
+# context: command palette entry: scrolls the Activity Log's lines sideways, to the right
+palette_scroll_right = "Activity Log: Scroll Right"
+# context: help line: sideways scrolling of the Activity Log, keys are shown before it
+help_scroll = "Activity Log: scroll long lines sideways (also Shift + wheel, or the horizontal scrollbar)"
 
 [git_error]
 summary_host_key = "Ключ SSH-хоста этого remote пока неизвестен."

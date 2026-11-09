@@ -84,12 +84,17 @@ pub(crate) enum Outcome {
 }
 
 pub(crate) fn key_of(m: gitpoulpi_i18n::M) -> char {
-    m.get().chars().next().unwrap_or(' ').to_ascii_lowercase()
+    lower(m.get().chars().next().unwrap_or(' '))
+}
+
+/// One character, lowercased: catalog key letters may be non-ASCII (Cyrillic, Greek...).
+fn lower(c: char) -> char {
+    c.to_lowercase().next().unwrap_or(c)
 }
 
 /// "Send anyway (S)": the label with its key.
 pub(crate) fn labelled(label: &str, key: char) -> String {
-    format!("{label} ({})", key.to_ascii_uppercase())
+    format!("{label} ({})", key.to_uppercase())
 }
 
 // i18n-scan: off
@@ -193,7 +198,7 @@ impl GuideDialog {
                 .modifiers
                 .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT)
             {
-                let c = c.to_ascii_lowercase();
+                let c = lower(c);
                 if let Some((_, choice)) = self.keys.iter().find(|(k, _)| *k == c) {
                     return Outcome::Chose(*choice);
                 }

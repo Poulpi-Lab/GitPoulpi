@@ -279,7 +279,11 @@ Zeilen bereits gemergten Text davor und danach sowie Ihre Anweisungen (global,
 Repository und die für *Konfliktlösung* unter Einstellungen > KI). Es antwortet mit dem
 gelösten Text dieses einen Konflikts in einem Codeblock; eine Antwort mit
 Konfliktmarkierungen oder Geplauder statt Code wird einmal zurückgeschickt, dann
-abgelehnt. Ein Konflikt über etwa 40 KB wird nicht gesendet. Die Bedienelemente sind
+abgelehnt. Ein Konflikt über 40 KB (`ai.limits.conflict_bytes`, *Einstellungen > KI >
+Limits*) wird hinter einer Warnung zurückgehalten, die seine Größe und das Limit nennt,
+mit *Trotzdem senden* (nur diese Anfrage, weiterhin von den Datenschutzprüfungen
+bereinigt), *Einstellung öffnen* und *Abbrechen*; das Limit ist GitPoulpis eigene
+Schranke, erhöhen Sie es also, wenn Ihr Modell genug Platz hat. Die Bedienelemente sind
 ausgeblendet, solange die KI aus ist, und ein Vorschlag speichert, stagt oder löst nie
 etwas: Prüfen Sie das Ergebnis, bearbeiten Sie es und speichern Sie wie gewohnt.
 
@@ -290,7 +294,9 @@ etwas: Prüfen Sie das Ergebnis, bearbeiten Sie es und speichern Sie wie gewohnt
 ### Der Commit-Composer
 
 Das Modell verteilt die Änderungen auf mehrere Commits (jede geänderte Datei in genau
-einem; ein ungültiger Plan wird einmal zurückgeschickt, dann abgelehnt). Sie prüfen den
+einem; ein ungültiger Plan wird einmal zurückgeschickt, dann abgelehnt). Solange Dateien
+noch Konflikte haben, wird nichts angefragt: Ein Dialog listet sie auf und öffnet die
+Konfliktlösungsansicht, denn der Composer braucht einen Baum ohne Konflikte. Sie prüfen den
 Plan, bevor etwas committet wird:
 
 ![Die Composer-Prüfung: vier vorgeschlagene Commits mit ihren Dateien und die Schaltflächen Zurücksetzen, Abbrechen und 4 Commits erstellen](../images/composer.png)
@@ -426,13 +432,64 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 wirksamen Kontext als `review_context` aus. Dieselben vier Einstellungen sind `ai.review.*` in
 `config.toml` ([Referenz](config-reference.md#ai-eingebaute-ki-standardmäßig-aus)).
 
+## Eingabelimits
+
+Jede Eingabe, die GitPoulpi in eine Anfrage legt, hat ein Größenlimit, eine Einstellung
+unter `[ai.limits]` (*Einstellungen > KI > Limits*). Die Limits sind GitPoulpis eigene
+Schranke (das Kontextfenster eines Modells ist von Modell zu Modell verschieden): Erhöhen
+Sie sie, wenn Ihr Modell genug Platz hat, senken Sie sie, um Anfragen klein zu halten.
+
+| Einstellung (`ai.limits.`) | Standard | Was sie begrenzt |
+|---|---|---|
+| `conflict_bytes` | 40000 | Die Blöcke Basis, aktuell und eingehend eines Merge-Konflikts |
+| `diff_bytes` | 60000 | Der Diff einer Nachricht zu einem Commit, einer Erklärung, eines Stash-Namens, einer Pull-Request-Beschreibung, eines Commit-Plans oder einer Aufteilung; der gesamte Diff eines Code-Reviews |
+| `review_file_bytes` | 12000 | Der Diff einer Datei in einem Code-Review |
+| `review_text_bytes` | 4000 | Die Beschreibung des begutachteten Pull Requests |
+| `review_threads_bytes` | 6000 | Die bereits vorhandenen Review-Kommentare |
+| `review_context_file_bytes` | 8192 | Eine Projekt-Kontextdatei eines Reviews (`CLAUDE.md`, `AGENTS.md`, die zusätzliche Datei) |
+| `review_context_bytes` | 16384 | Alle Kontextdateien eines Reviews zusammen |
+
+**Nichts wird stillschweigend gekürzt.** Liegt eine Eingabe über ihrem Limit, wartet die
+Anfrage, und *Über dem KI-Limit* listet auf, was darüber liegt: welcher Teil (der Diff,
+eine Datei, die Beschreibung, eine Kontextdatei), seine Größe, das Limit und die
+Einstellung. Ein Review listet jeden Teil über dem Limit in einem Dialog auf. Die
+Schaltflächen, jeweils mit ihrer Taste:
+
+- *Alles senden* (`A`): nur diese Anfrage, nichts wird gekürzt. Sie durchläuft weiterhin die
+  Datenschutzprüfungen (Geheimnisse ersetzt, sensible Dateien ausgelassen) und, wenn er an
+  ist, den Dialog *Prüfen, was gesendet wird*, der als Nächstes kommt.
+- *Gekürzt senden* (`G`): Was über seinem Limit liegt, wird gekürzt, wie es immer war; jede
+  Zeile des Dialogs sagt, was ausgelassen wird (das Ende des Diffs, die letzten Hunks, die
+  Dateien, die nicht passen).
+- *Einstellung öffnen* (`E`): bricht die Anfrage ab und öffnet *Einstellungen > KI > Limits*
+  beim ersten aufgelisteten Limit. Hier startet der Fokus: Enter sendet nie.
+- *Abbrechen* (`B`, `Esc`, das Kreuz oder ein Klick außerhalb): sendet nichts.
+
+Ein Konflikt ist die Ausnahme: Er wird nie gekürzt. *Trotzdem senden* (`T`) sendet ihn
+einmal vollständig.
+
+Nichts startet von selbst eine KI-Anfrage, also gibt es keinen Hintergrundlauf, der
+fragen könnte: Jede Anfrage haben Sie selbst gestartet. Ein Lauf, der nicht fragen kann
+(CLI und MCP), kürzt wie bisher und sagt es; siehe unten.
+
+**Auf der Kommandozeile** kann nichts einen Dialog beantworten, daher wird eine Eingabe
+über ihrem Limit wie bisher gekürzt, und die Antwort nennt, was gekürzt wurde:
+`truncated: [{part, detail?, bytes, limit, setting}]` (nur vorhanden, wenn etwas gekürzt
+wurde; `part` ist eines von `diff`, `split_hunks`, `review_diff`, `review_file`,
+`review_text`, `review_threads`, `context_file`, `context_total`). `--send-all` (Alias
+`--no-truncate`) sendet stattdessen alles vollständig: bei `ai` (allen Unterbefehlen,
+auch `ai resolve-conflict`, wo ein Konflikt über seinem Limit sonst abgelehnt wird), bei
+`commit --ai`, bei `stash push --ai` und bei `hosting review suggest`. Die MCP-Tools haben
+dasselbe Argument `send_all` und dasselbe Feld `truncated`.
+
 ## Datenschutz
 
 - Nichts wird gesendet, bis Sie eine Schaltfläche drücken oder einen Befehl ausführen.
   Keine KI im Hintergrund, keine Telemetrie, kein GitPoulpi-Konto.
 - Was gesendet wird: der Prompt (eingebaut, dann Ihre Anweisungen) und der Diff, nach dem
-  Sie gefragt haben, bei etwa 60 KB abgeschnitten (mit einem Hinweis darauf); bei einem
-  Pull Request außerdem die Commit-Betreffs des Branches.
+  Sie gefragt haben; bei einem Pull Request außerdem die Commit-Betreffs des Branches. Ein
+  Diff über 60 KB (`ai.limits.diff_bytes`) wird nie stillschweigend gekürzt: siehe
+  [Eingabelimits](#eingabelimits).
 - Eine Anfrage für ein Skript zum Umschreiben des Verlaufs sendet Ihre Anweisung und den festen
   Skriptvertrag (die API der Skript-Sandbox). Autor, Datum und Betreff von bis zu 20 Commits
   gehen **nur** mit, wenn Sie im Dialog *Eine Stichprobe senden* ankreuzen (standardmäßig aus;
@@ -472,6 +529,8 @@ Eines von beiden auszuschalten ist eine bewusste Entscheidung, und Einstellungen
 | `fehlgeschlagen:` 404 | Das **Modell** existiert dort nicht: leeren Sie es, um den Standard zu nutzen. |
 | `fehlgeschlagen:` Verbindungsfehler (Ollama, LM Studio) | Der Server läuft nicht, oder die **Basis-URL** hat den falschen Port oder es fehlt `/v1`. |
 | Der Schlüssel zeigt nach dem Tippen `(nicht gesetzt)` | Kein Credential-Helper: Richten Sie einen ein (`git config --global credential.helper ...`) und geben Sie ihn erneut ein. |
+| *Über dem KI-Limit* | Eine Eingabe der Anfrage liegt über einem Limit aus `[ai.limits]`: wählen Sie *Alles senden*, *Gekürzt senden*, *Einstellung öffnen* oder *Abbrechen* (siehe [Eingabelimits](#eingabelimits)). |
+| „Konflikt zu groß zum Senden“ | Der Konflikt liegt über `ai.limits.conflict_bytes` (standardmäßig 40000). *Trotzdem senden* sendet ihn einmal; *Einstellung öffnen* führt zum Limit unter Einstellungen > KI > Limits. |
 | Falsche Sprache oder falscher Stil | Fügen Sie Anweisungen hinzu; mit den Chips *Schnell einfügen* des Editors geht es schnell. |
 | Der Composer sagt, der Plan sei ungültig | Das Modell hat eine Datei übersprungen oder wiederholt: erneut versuchen oder ein stärkeres Modell nutzen. |
 

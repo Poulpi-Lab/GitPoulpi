@@ -163,6 +163,7 @@ Schaltfläche.
 | Änderungen | stagen und unstagen (Datei, Ordner, Hunk, Zeilen, alles), verwerfen (Datei, Ordner, Hunk, Zeilen, ein Datei-Checkout), einen Patch anwenden, **eine Datei vom Datenträger löschen**, **ignorieren** (Datei, Endung oder Ordner: die Zeile in der von Ihnen gewählten `.gitignore`), **als Binär- oder Textdatei behandeln** (die `.gitattributes`-Zeile) |
 | Stashes | push, apply, pop, drop |
 | Remotes und Konfiguration | ein Remote hinzufügen, entfernen, umbenennen, die URL oder Push-URL ändern, Git-LFS-Tracking an- und abschalten |
+| Auf einem Server | **einen Branch oder Tag auf einem Remote löschen** (im Menü des Refs, in der Palette, per `branch delete-remote`, `tag delete-remote`, `tag delete --both` oder durch einen Workflow-Abschluss, der den Remote-Branch löscht): siehe unten |
 
 Solange ein Merge, Cherry-Pick oder Revert bei Konflikten angehalten ist, sind
 **Speichern & als gelöst markieren**, Stagen und Unstagen ebenfalls rückgängig
@@ -185,13 +186,44 @@ an seiner alten Position). Das Rückgängigmachen des Entfernens eines Remotes
 bringt seine Remote-Tracking-Branches, seinen Alias `origin/HEAD` und die
 Upstream-Einstellungen der Branches zurück, die ihm folgten.
 
+### Einen Branch oder Tag auf einem Remote löschen
+
+Vor dem Löschen fragt GitPoulpi den Server, was der Branch oder Tag gerade enthält,
+und zeichnet es auf: das Remote, den Namen und den genauen Commit (bei einem
+annotierten Tag das Tag-Objekt selbst, damit seine Annotation erhalten bleibt). Das
+Löschen wird dann nur ausgeführt, wenn der Server noch genau diesen Wert hält.
+
+**Rückgängig schiebt ihn zurück**, unter demselben Namen, auf denselben Commit, ohne
+je zu erzwingen. Weil das eine Änderung auf einem Server ist, den andere sehen,
+**fragt Rückgängig immer zuerst** und sagt es ausdrücklich („Das Rückgängigmachen
+legt den Branch topic auf origin bei 3f2a1c0 neu an ...“); auch die Schritte des
+Eintrags sagen es (`gitpoulpi undo --dry-run`). Es nutzt dieselben Zugangsdaten wie
+ein Push. Der Remote-Tracking-Branch kommt mit zurück. **Wiederholen** löscht ihn mit
+derselben Sicherheit erneut.
+
+Rückgängig lehnt ab und ändert nichts, wenn:
+
+- der Branch oder Tag seitdem auf dem Remote **neu angelegt** oder verschoben wurde: Er
+  steht dann auf einem anderen Commit als dem aufgezeichneten, und das Hochladen würde
+  die Arbeit eines anderen überschreiben (die Ablehnung nennt beide Commits);
+- der Commit (oder das Tag-Objekt) **nicht mehr in Ihrem Repository** ist (er wurde von
+  der Garbage Collection entfernt): Das Rückgängigmachen ist dann nicht möglich.
+
+„Lokal und auf dem Remote löschen“ ist **ein Eintrag**: Rückgängig stellt den lokalen
+und den entfernten Branch oder Tag zusammen wieder her, Wiederholen löscht beide
+erneut. Wird nur der Remote-Branch gelöscht, bleibt der lokale unberührt; das
+Rückgängigmachen verhält sich ebenso. Ein Workflow-Abschluss, der auch den Remote-Branch
+löscht, ist als Ganzes rückgängig zu machen.
+
 ## Was sich nicht rückgängig machen lässt, und warum
 
-- **Alles auf einem Server**: Push, Löschen eines Remote-Branches oder -Tags,
-  Pushen eines Tags, LFS-Push, Sperren und Entsperren. Dieser Zustand wird mit
-  anderen geteilt; ihn rückgängig zu machen wäre ein weiterer Push, und das
-  tut GitPoulpi nicht für Sie. Rückgängig wird auch nie von einem solchen
-  Vorgang blockiert.
+- **Das meiste auf einem Server**: Push, Pushen eines Tags, LFS-Push, Sperren und
+  Entsperren, das Öffnen eines Pull Requests. Dieser Zustand wird mit anderen
+  geteilt; einen Push rückgängig zu machen wäre ein Force-Push oder ein Löschen bei
+  den anderen, und das tut GitPoulpi nicht für Sie. (Das Löschen eines
+  Remote-Branches oder -Tags ist die Ausnahme: Das Rückgängigmachen legt nur
+  zurück, was der Server hielt, und lehnt ab, wenn sich dort etwas geändert hat.)
+  Rückgängig wird auch nie von einem solchen Vorgang blockiert.
 - **Fetch**: Er bewegt nur Remote-Tracking-Refs, die den Server spiegeln. Der
   nächste Fetch würde es wiederholen.
 - **Einen Rebase abbrechen**: Rückgängig wird dafür nicht angeboten (ein Rebase
@@ -322,6 +354,10 @@ Rückgängig fragt nur, wenn es riskant ist:
   bricht ab, ohne etwas zu ändern, wenn eine davon in einer Datei liegt, die es
   umschreiben muss.
 
+- der Eintrag hat einen Branch oder Tag auf einem Remote gelöscht: Das
+  Rückgängigmachen **schiebt ihn zurück auf den Server** (siehe oben), also fragt es
+  immer, und ebenso das Wiederholen, das ihn dort erneut löscht.
+
 Wiederholen und jedes Rückgängig einer reinen Ref-Bewegung fragt nie: Die
 Gegenrichtung ist eine Taste entfernt.
 
@@ -382,8 +418,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   (`--redo`: den neuesten Wiederholen-Eintrag). Es lehnt ab, wenn dieser Eintrag
   nicht blockiert ist, und endet ohne `--yes` mit **3**. Für MCP ist es eine
   Mutation, aber keine destruktive: Das Repository bleibt unberührt.
-- Exit-Code **0** erledigt, **2** abgelehnt (das JSON nennt den Grund), **3**
-  riskant und braucht `--yes`.
+- Exit-Code **0** erledigt, **2** abgelehnt (das JSON nennt den Grund, zum Beispiel
+  `RemoteRefMoved`, wenn ein gelöschter Remote-Branch neu angelegt wurde), **3**
+  riskant und braucht `--yes` (das Rückgängigmachen des Löschens eines Remote-Branches
+  oder -Tags, das auf den Server pusht).
 
 Zurückgehen, ohne alles Spätere rückgängig zu machen:
 

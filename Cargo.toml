@@ -120,7 +120,7 @@ webpki-roots = "1"
 # Branch-workflow topic types may match branch names by a user regex (gitpoulpi_core::workflow).
 regex = "1"
 thiserror = "1"
-directories = "5"
+directories = "6"
 tracing = "0.1"
 tempfile = "3"
 insta = "1"

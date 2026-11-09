@@ -335,6 +335,13 @@ review_mode = "ask"       # ask | clone | api
 | `ai.review.extra_file` | `""` | 代码评审草稿的另一个文件：相对于仓库根目录的路径、绝对路径，或指向代码托管平台上某文件的链接（通过匹配的集成配置读取，否则匿名读取）。所有文件合计在 16 KB 处截断。 |
 | `ai.privacy.redact_secrets` | `true` | 在请求离开之前，把扫描器识别出的请求中的每个密钥（令牌、私钥块、URL 中的密码、看起来随机的 `password = ...` 值）替换为 `[REDACTED:<rule>]`。关闭期间，设置 > AI 会显示红色警告。 |
 | `ai.privacy.exclude_sensitive_files` | `true` | 把每个匹配 `privacy.sensitive_patterns` 的文件的 diff 从所发送的内容中排除。在仓库文件夹中工作的本地代理仍然可以自己读取文件：见 [AI > 隐私](ai.md#隐私)。 |
+| `ai.limits.conflict_bytes` | `40000` | “建议解决方案”发送一个 merge 冲突（它的 base、当前和传入代码块合计）时，该冲突最多可有的字节数。超过时 GitPoulpi 不会失败：它会给出警告，并提供 *仍然发送*（仅限这一次请求）、*打开设置* 和 *取消*；冲突绝不会被截断。该限制是 GitPoulpi 自己的保护措施，不是模型的限制：模型容量足够时请调高。取值限制在 1000 到 50000000 之间；可在 设置 > AI > 限制 中设置。下面其他上限的工作方式相同，且都在该分组中。 |
+| `ai.limits.diff_bytes` | `60000` | commit 消息、解释、stash 名称、pull request 描述、commit 计划或 commit 拆分所用的 diff 最多可有的字节数，以及代码评审整个 diff 的字节数。超过时不会悄悄截断：在 TUI 中，*超出 AI 限制* 会提供 *全部发送*（仅限这一次请求，不截断）、*发送截断版本*（末尾被省略，和以前一样）、*打开设置* 和 *取消*；CLI 和 MCP 会截断并在 `truncated` 中报告（`--send-all` 发送全部内容）。取值限制在 1000 到 50000000 之间。 |
+| `ai.limits.review_file_bytes` | `12000` | 代码评审中单个文件的 diff 最多可有的字节数。超过时，同样的询问和同样的两种回答；*发送截断版本* 会缩短该文件，并附上可见的说明。范围相同。 |
+| `ai.limits.review_text_bytes` | `4000` | 被评审的 pull request 的描述最多可有的字节数。超过时，*发送截断版本* 会截断描述，并附上 `[text cut]` 说明。范围相同。 |
+| `ai.limits.review_threads_bytes` | `6000` | 已存在的评审评论列表（提供给模型，免得它重复）最多可有的字节数。超过时，*发送截断版本* 会截断该列表。范围相同。 |
+| `ai.limits.review_context_file_bytes` | `8192` | 提供给代码评审的单个项目上下文文件（`CLAUDE.md`、`AGENTS.md`、额外文件）最多可有的字节数。超过时，*发送截断版本* 会缩短该文件并附上说明。范围相同。 |
+| `ai.limits.review_context_bytes` | `16384` | 所有上下文文件合计最多可有的字节数。超过时，*发送截断版本* 会缩短越过限制的那个文件，并省略其后的文件。范围相同。 |
 | `ai.sent_preview.<action>` | `true` | 每个操作一个键（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`）：在请求发出之前显示“发送的内容”。对话框中的“不再为……显示”会写入 `false`；设置 > AI > *发送前显示所发内容…* 会把它们重新打开。 |
 
 仓库自己的 `[preferences.ai_review]` 表（在其 `repo-state.toml` 中；未克隆仓库的条目在 `remote-reviews.toml` 中）接受相同的键，全部可选，另加 `no_extra_file = true`：此仓库不使用额外文件，不论 `ai.review.extra_file` 是什么。未设置的键、未设置的 `extra_file` 和缺失的 `no_extra_file` 都继承全局值；把 `extra_file` 设为某个文件会清除该开关，反之亦然。

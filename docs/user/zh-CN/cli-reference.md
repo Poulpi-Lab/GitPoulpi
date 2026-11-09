@@ -107,7 +107,7 @@
 |---|---|
 | `branch list`、`branch create <name> [at]`、`branch delete <name>`、`branch rename <old> <new>` | 本地分支。 |
 | `branch track <remote/branch> [--name N]` | 创建一个跟踪远程分支的本地分支，并检出它。 |
-| `branch delete-remote <name> [--remote R]` | 删除远程上的分支，保留本地分支。 |
+| `branch delete-remote <name> [--remote R]` | 删除远程上的分支，保留本地分支。`undo --yes` 会把它原样 push 回去（[撤销](undo-redo.md#删除远程上的分支或标签)）。 |
 | `branch set-upstream <branch> <remote/branch>`、`branch unset-upstream <branch>` | 上游。 |
 | `branch fast-forward <branch> [target]` | 仅当可以快进时才向前移动分支。 |
 | `checkout <target> [--autostash]` | 切换分支，或在某个 commit 处分离。 |
@@ -120,7 +120,7 @@
 | `tag list [--unpushed]`、`tag create <name> [at] [-m M]`、`tag annotate <name> -m M` | Tag。`tag list` 会输出每个 tag 及其所在位置，信息来自上一次 fetch 或 tag push（从不访问网络）：`local`（本地有）、`remote`（拥有它的远程）、`differs_on`（持有它但指向其他 commit 的远程）以及 `where`：`local`、`remote`（某个远程有它而本仓库没有）、`both` 或 `differs`。 |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | 删除一个 tag：在本地（默认）、只在某个远程上（`git push R --delete`；会影响他人，且无法撤销），或同时在本地和拥有它的远程上。输出带有 `scope`（`local`、`remote`、`both`）；对于某个远程仍有的 tag 只在本地删除的情况，还有 `still_on`（下一次 `fetch` 会把它带回来）。同时删除时先删远程；之后 `undo` 只恢复本地 tag，`tag push` 可以把它放回去。 |
 | `tag fetch <name> [--remote R]` | 从某个远程（默认是拥有它的那个）fetch 一个 tag，例如 `where: remote` 的 tag。绝不会覆盖指向其他 commit 的本地 tag。 |
-| `tag push [names...] [--remote R]`、`tag delete-remote <name> [--remote R]` | 远程上的 tag（不给名称：push 所有尚无远程拥有的 tag）。 |
+| `tag push [names...] [--remote R]`、`tag delete-remote <name> [--remote R]` | 远程上的 tag（不给名称：push 所有尚无远程拥有的 tag）。在远程上删除 tag 是可以撤销的（`undo --yes`）。 |
 | `worktree list`、`worktree add <path> <start> [-b BRANCH]` | 关联的 worktree。 |
 | `submodule list`、`submodule init [paths]`、`submodule update [paths] [--init] [--recursive]` | 子模块（[子模块](submodules.md)）。 |
 
@@ -195,7 +195,7 @@
 
 | 命令 | 作用 |
 |---|---|
-| `ai [--print-sent] <command>` | 在任何 `ai` 命令上使用 `--print-sent` 会打印将发送的内容（清理后的 system 和 user 文本，`{sent: [{system, user}], privacy, dry_run: true}`），并且不调用模型；它需要 `ai.enabled = true`，不需要密钥和网络。每个 `ai` 结果都带有 `privacy: {redactions: N, excluded_files: [...]}`：有多少个密钥被替换、哪些敏感文件被排除（[AI > 隐私](ai.md#隐私)）。 |
+| `ai [--print-sent] [--send-all] <command>` | 在任何 `ai` 命令上使用 `--send-all`（别名 `--no-truncate`）会完整发送每一项输入，即使超过其 `ai.limits.*` 限制；不带它时，超过限制的输入会被截断（冲突则被拒绝），并且在有内容被截掉时，结果带有 `truncated: [{part, detail?, bytes, limit, setting}]`（[AI > 输入限制](ai.md#输入限制)）。在任何 `ai` 命令上使用 `--print-sent` 会打印将发送的内容（清理后的 system 和 user 文本，`{sent: [{system, user}], privacy, dry_run: true}`），并且不调用模型；它需要 `ai.enabled = true`，不需要密钥和网络。每个 `ai` 结果都带有 `privacy: {redactions: N, excluded_files: [...]}`：有多少个密钥被替换、哪些敏感文件被排除（[AI > 隐私](ai.md#隐私)）。 |
 | `ai commit-message` | 打印 AI 为 staged 更改（没有 stage 内容时为全部更改）提议的消息；不 commit 任何内容。 |
 | `ai explain [rev] [--wip]` | 解释一个 commit（默认为 `HEAD`）或工作区更改。 |
 | `ai split-plan <rev>` | 输出 AI 为拆分某个 commit 建议的计划，形如 `{commit, parts, applied: false}`，其中 `parts` 就是 `split-commit --plan` 接受的内容。不会应用任何内容。需要 `ai.enabled = true`。 |
@@ -206,7 +206,7 @@
 | `ai review-context [--repo PATH \| --project HOST/PROJECT] [--run-in-repo profile\|yes\|no] [--claude-md on\|off] [--agents-md on\|off] [--context-file PATH\|URL] [--no-context-file] [--no-extra-file [on\|off]] [--reset]` | 显示或设置代码评审草稿除 diff 外还会得到什么（`[ai.review]`，见 [AI > 评审上下文](ai.md#评审上下文)）。`--repo` 和 `--project` 都不给时是全局默认值；`--repo`（全局标志）是某个克隆自己的值，`--project github.com/owner/name` 是未克隆仓库的值（`remote-reviews.toml`）。不带设置标志时只显示；带设置标志时保存并输出。JSON：`scope`（`global`、`repository`、`project`）、`target`、`global`、`own`（仅仓库或项目设置过的字段）、`effective`（评审实际得到的）、`changed`。`--reset` 会忘掉仓库或项目自己的值。`--run-in-repo` 不适用于 `--project`。`--no-extra-file`（单独给出或 `on`）让仓库或项目不使用额外文件，不论全局文件是什么；`off` 让它重新沿用全局文件；它需要 `--repo` 或 `--project`，与 `--context-file` 互斥，此时 `own` 会显示 `"no_extra_file": true`。不需要模型；AI 关闭时也能用。 |
 | `ai trust <profile> [--accept-origin URL] [--accept-certificate SHA256] [--allow-insecure-http on\|off]` | 把配置文件的 API 密钥绑定到它被存入时的地址（见 [AI > 密钥去向](ai.md#密钥去向)）。不带选项时输出 `{profile, current_origin, trusted}`；`--accept-origin` 在基础 URL 更改之后接受该配置文件当前的基础 URL（拼写与拒绝信息打印的一致），`--accept-certificate` 按 SHA-256 密钥指纹固定自托管服务器的证书，`--allow-insecure-http` 允许不在本机上的纯 `http://` 基础 URL。只有人才会运行它：不是 MCP 工具。AI 关闭时也能使用。 |
 
-另外还有 `commit --ai` 和 `stash push --ai`。模型由 `gitpoulpi` 进程调用，因此 API 密钥绝不会传给守护进程或 MCP 客户端。
+另外还有 `commit --ai [--send-all]` 和 `stash push --ai [--send-all]`（`--send-all` 和 `truncated` 与 `ai` 相同；`hosting review suggest` 也接受 `--send-all`）。模型由 `gitpoulpi` 进程调用，因此 API 密钥绝不会传给守护进程或 MCP 客户端。
 
 **仓库、会话、守护进程、设置**
 

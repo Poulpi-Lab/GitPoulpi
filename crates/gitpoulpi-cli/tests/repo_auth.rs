@@ -138,15 +138,7 @@ fn set_system_key_and_integration_round_trip_then_clear() {
 }
 
 #[test]
-fn a_command_source_is_refused_cleanly_with_exit_code_2() {
-    let repo = FixtureRepoBuilder::new()
-        .unwrap()
-        .commit("initial")
-        .unwrap()
-        .build();
-    let root = repo.root();
-    let session = "ra-refused";
-
+fn a_confirmed_command_source_is_stored_with_its_hash() {
     for args in [
         &[
             "repo-auth",
@@ -171,13 +163,21 @@ fn a_command_source_is_refused_cleanly_with_exit_code_2() {
             "token",
         ][..],
     ] {
+        let repo = FixtureRepoBuilder::new()
+            .unwrap()
+            .commit("initial")
+            .unwrap()
+            .build();
+        let root = repo.root();
+        let session = "ra-command";
         let (code, json) = run(root, session, args);
-        assert_eq!(code, 2, "{args:?}: {json}");
-        assert_eq!(json["refused"]["reason"], "unavailable", "{json}");
-        assert!(json["refused"]["message"].as_str().is_some());
-        // Nothing was written.
+        assert_eq!(code, 0, "{args:?}: {json}");
+        assert_eq!(json["set"], true, "{json}");
+        let https = &json["view"]["profile"]["https"];
+        let sha = https["confirmed_sha256"].as_str().expect("confirmed hash");
+        assert_eq!(https["command"]["sha256"].as_str(), Some(sha), "{json}");
         let shown = ok(root, session, &["repo-auth", "show"]);
-        assert_eq!(shown["configured"], false);
+        assert_eq!(shown["configured"], true);
     }
 }
 

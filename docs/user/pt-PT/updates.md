@@ -8,7 +8,7 @@ O GitPoulpi procura versões mais recentes e, consoante a forma como foi instala
 
 A barra de título mostra a versão em execução (`v1.0.0`) entre o nome da aplicação e o caminho do repositório. Quando se conhece uma versão mais recente, o indicador passa a `v0.2.0 disponível` na cor de destaque.
 
-Clique no indicador, prima `Ctrl+N` e depois `u`, ou execute **Atualizações: mostrar atualização** na paleta de comandos (`Ctrl+P`): abre-se o painel de atualizações. É uma janela sobre a aplicação: `Esc`, `q`, a cruz de fechar ou um clique fora fecham-na. Mostra:
+Prima `Ctrl+N` e depois `u`, execute **Atualizações: mostrar atualização** na paleta de comandos (`Ctrl+P`), ou clique no indicador enquanto diz `disponível` (ou enquanto uma atualização está em curso): abre-se o painel de atualizações. Sem versão mais recente, um clique no indicador abre antes o separador Notas de versão. É uma janela sobre a aplicação: `Esc`, `q`, a cruz de fechar ou um clique fora fecham-na. Mostra:
 
 - a versão em execução e **Instalado com**: como o GitPoulpi chegou a este computador (é isso que decide tudo o que se segue);
 - em que ponto está a atualização (a procurar, a transferir com uma percentagem, pronta, falhada);

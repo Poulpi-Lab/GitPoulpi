@@ -134,7 +134,7 @@ numera.
 |---|---|
 | `branch list`, `branch create <name> [at]`, `branch delete <name>`, `branch rename <old> <new>` | Branches locais. |
 | `branch track <remote/branch> [--name N]` | Cria uma branch local que acompanha uma remota, e faz checkout dela. |
-| `branch delete-remote <name> [--remote R]` | Elimina uma branch num remoto, mantém a local. |
+| `branch delete-remote <name> [--remote R]` | Elimina uma branch num remoto, mantém a local. `undo --yes` volta a enviá-la tal como estava ([desfazer](undo-redo.md#eliminar-uma-branch-ou-tag-num-remoto)). |
 | `branch set-upstream <branch> <remote/branch>`, `branch unset-upstream <branch>` | Upstream. |
 | `branch fast-forward <branch> [target]` | Avança uma branch só se for um fast-forward. |
 | `checkout <target> [--autostash]` | Muda de branch ou faz detach num commit. |
@@ -147,7 +147,7 @@ numera.
 | `tag list [--unpushed]`, `tag create <name> [at] [-m M]`, `tag annotate <name> -m M` | Tags. `tag list` mostra cada tag com o sítio onde está, conhecido do último fetch ou push de tags (nunca da rede): `local` (existe aqui), `remote` (os remotos que a têm), `differs_on` (remotos que a têm noutro commit) e `where`: `local`, `remote` (um remoto tem-na, este repositório não), `both` ou `differs`. |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | Elimina uma tag: localmente (por omissão), só num remoto (`git push R --delete`; visível para fora e sem desfazer), ou aqui e no remoto que a tem. A resposta traz `scope` (`local`, `remote`, `both`) e, para uma eliminação só local de uma tag que um remoto ainda tem, `still_on` (o próximo `fetch` traz-a de volta). Uma eliminação combinada remove primeiro a do remoto; `undo` repõe depois só a tag local e `tag push` volta a enviá-la. |
 | `tag fetch <name> [--remote R]` | Obtém uma tag de um remoto (por omissão o que a tem), por exemplo uma tag `where: remote`. Nunca substitui uma tag local noutro commit. |
-| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags num remoto (sem nomes: todas as tags que nenhum remoto tem). |
+| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags num remoto (sem nomes: todas as tags que nenhum remoto tem). Eliminar uma num remoto é desfazível (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Worktrees ligados. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submódulos ([Submódulos](submodules.md)). |
 
@@ -225,7 +225,7 @@ perfil e é opcional quando há um só)
 
 | Comando | O que faz |
 |---|---|
-| `ai [--print-sent] <command>` | `--print-sent` em qualquer comando `ai` mostra o que seria enviado (o texto do sistema e do utilizador já limpo, `{sent: [{system, user}], privacy, dry_run: true}`) e não chama nenhum modelo; precisa de `ai.enabled = true`, sem chave e sem rede. Cada resposta `ai` traz `privacy: {redactions: N, excluded_files: [...]}`: quantos segredos foram substituídos e que ficheiros sensíveis foram excluídos ([IA > Privacidade](ai.md#privacidade)). |
+| `ai [--print-sent] [--send-all] <command>` | `--send-all` (alias `--no-truncate`) em qualquer comando `ai` envia cada entrada por inteiro, mesmo acima do seu limite `ai.limits.*`; sem isto, uma entrada acima de um limite é truncada (um conflito é recusado) e a resposta traz `truncated: [{part, detail?, bytes, limit, setting}]` quando algo foi cortado ([IA > Limites de entrada](ai.md#limites-de-entrada)). `--print-sent` em qualquer comando `ai` mostra o que seria enviado (o texto do sistema e do utilizador já limpo, `{sent: [{system, user}], privacy, dry_run: true}`) e não chama nenhum modelo; precisa de `ai.enabled = true`, sem chave e sem rede. Cada resposta `ai` traz `privacy: {redactions: N, excluded_files: [...]}`: quantos segredos foram substituídos e que ficheiros sensíveis foram excluídos ([IA > Privacidade](ai.md#privacidade)). |
 | `ai commit-message` | Imprime a mensagem que a IA propõe para as alterações em stage (todas as alterações quando nada está em stage); não faz commit de nada. |
 | `ai explain [rev] [--wip]` | Explica um commit (predefinição `HEAD`) ou as alterações em curso. |
 | `ai split-plan <rev>` | Imprime um plano que a IA propõe para dividir um commit, como `{commit, parts, applied: false}`, em que `parts` é o que `split-commit --plan` aceita. Não aplica nada. Requer `ai.enabled = true`. |
@@ -236,7 +236,7 @@ perfil e é opcional quando há um só)
 | `ai review-context [--repo PATH \| --project HOST/PROJECT] [--run-in-repo profile\|yes\|no] [--claude-md on\|off] [--agents-md on\|off] [--context-file PATH\|URL] [--no-context-file] [--no-extra-file [on\|off]] [--reset]` | Mostra ou define o que um rascunho de revisão de código recebe além do diff (`[ai.review]`, ver [IA > Contexto da revisão](ai.md#contexto-da-revisão)). Sem `--repo` nem `--project` é a predefinição global; `--repo` (a opção global) são os valores próprios de um clone, `--project github.com/owner/name` os de um repositório não clonado (`remote-reviews.toml`). Sem uma opção de definição apenas mostra; com uma, guarda e imprime. JSON: `scope` (`global`, `repository`, `project`), `target`, `global`, `own` (só os campos que o repositório ou projeto definiu), `effective` (o que uma revisão recebe), `changed`. `--reset` esquece os valores próprios do repositório ou projeto. `--run-in-repo` não se aplica a `--project`. Não precisa de modelo; funciona com a IA desligada. |
 | `ai trust <profile> [--accept-origin URL] [--accept-certificate SHA256] [--allow-insecure-http on\|off]` | Associa a chave de API de um perfil ao endereço para o qual foi guardada (veja [IA > Para onde vai a chave](ai.md#para-onde-vai-a-chave)). Sem opções mostra `{profile, current_origin, trusted}`; `--accept-origin` aceita o URL base atual do perfil depois de este ter mudado (escrito como a recusa o mostrou), `--accept-certificate` fixa o certificado de um servidor auto-alojado pela sua impressão digital de chave SHA-256, `--allow-insecure-http` permite um URL base `http://` simples que não esteja neste computador. Só uma pessoa o executa: não é uma ferramenta MCP. Funciona com a IA desativada. |
 
-Mais `commit --ai` e `stash push --ai`. O modelo é chamado a partir do processo
+Mais `commit --ai [--send-all]` e `stash push --ai [--send-all]` (o mesmo `--send-all` e `truncated` que em `ai`; `hosting review suggest` também aceita `--send-all`). O modelo é chamado a partir do processo
 `gitpoulpi`, por isso as chaves de API nunca passam para o daemon nem para um
 cliente MCP.
 

@@ -185,7 +185,7 @@ sistemas). O arquivo contém os três executáveis, `INSTALL.txt`, `README.md`,
 
 ## Atualizações
 
-A barra de título mostra a versão em execução (`v1.0.0`) entre o nome da aplicação e o caminho do repositório. Clique nela, ou prima `Ctrl+N` e depois `u`, ou execute **Atualizações: mostrar atualização** a partir da paleta de comandos (`Ctrl+P`): abre-se o painel de atualizações com a versão, como o GitPoulpi foi instalado e o que fazer perante uma versão mais recente. **Ajuda: notas de versão** abre o registo de alterações.
+A barra de título mostra a versão em execução (`v1.0.0`) entre o nome da aplicação e o caminho do repositório. Quando se conhece uma versão mais recente (ou há uma atualização em curso), um clique nela abre o painel de atualizações com a versão, como o GitPoulpi foi instalado e o que fazer perante a nova versão; caso contrário, um clique abre o separador Notas de versão. `Ctrl+N` e depois `u`, ou **Atualizações: mostrar atualização** na paleta de comandos (`Ctrl+P`), abrem sempre o painel de atualizações, e **Ajuda: notas de versão** abre sempre o registo de alterações.
 
 Uma vez por dia, em segundo plano, o GitPoulpi verifica no sítio onde as suas versões são publicadas (por predefinição o GitHub) se existe uma mais recente (`updates.mode`, [Definições > Sincronização](settings.md#sincronização)). Quando existe, o indicador passa a dizer `v0.2.0 disponível` na cor de destaque.
 

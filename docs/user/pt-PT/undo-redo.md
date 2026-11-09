@@ -154,6 +154,7 @@ pedido de nome que o botão.
 | Alterações em curso | stage e unstage (ficheiro, pasta, hunk, linhas, tudo), descartar (ficheiro, pasta, hunk, linhas, um checkout de ficheiro), aplicar um patch, **eliminar um ficheiro do disco**, **ignorar** (ficheiro, extensão ou pasta: a linha do `.gitignore`) |
 | Stashes | push, apply, pop, drop |
 | Remotos e configuração | adicionar, remover, renomear, alterar o URL ou o URL de push de um remoto, track e untrack do Git LFS |
+| Num servidor | **eliminar uma branch ou uma tag num remoto** (a partir do menu da ref, da paleta, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, ou de um fim de fluxo que elimina a branch remota): veja abaixo |
 
 Enquanto um merge, cherry-pick ou revert está parado em conflitos, **Guardar e
 marcar resolvido**, o stage e o unstage também são desfazíveis (cada um é
@@ -174,12 +175,41 @@ mesmo stash, com o mesmo id de commit (fica no topo da lista de stashes, como
 as suas branches de acompanhamento remoto, o seu alias `origin/HEAD` e as
 definições de upstream das branches que o acompanhavam.
 
+### Eliminar uma branch ou tag num remoto
+
+Antes da eliminação, o GitPoulpi pergunta ao servidor o que a branch ou a tag contém
+nesse momento e regista-o: o remoto, o nome e o commit exato (numa tag anotada, o
+próprio objeto da tag, para que a anotação se mantenha). A eliminação só é feita se o
+servidor ainda tiver esse valor.
+
+**Desfazer volta a enviá-la** com o mesmo nome, no mesmo commit, sem nunca forçar.
+Como é uma alteração num servidor que outras pessoas veem, o Desfazer **pergunta
+sempre primeiro** e di-lo («Desfazer isto volta a criar a branch topic em origin em
+3f2a1c0...»); os passos da entrada di-lo também (`gitpoulpi undo --dry-run`). Usa as
+mesmas credenciais que um push. A branch de acompanhamento remoto volta com ela.
+**Refazer** elimina-a de novo, com a mesma segurança.
+
+O Desfazer recusa, sem alterar nada, quando:
+
+- a branch ou a tag foi **criada de novo no remoto** entretanto, ou movida: está num
+  commit diferente do registado, e enviar sobrescreveria o trabalho de outra pessoa
+  (a recusa nomeia os dois commits);
+- o commit (ou o objeto da tag) **já não está no seu repositório** (foi removido pela
+  limpeza de lixo): o desfazer não pode ser feito.
+
+«Eliminar localmente e no remoto» é **uma só entrada**: o Desfazer restaura em
+conjunto a branch ou tag local e a remota, o Refazer elimina ambas de novo. Eliminar
+só a branch remota deixa a local em paz; desfazê-lo faz o mesmo. Um fim de fluxo que
+também elimina a branch remota é desfazível como um todo.
+
 ## O que não pode ser desfeito, e porquê
 
-- **Qualquer coisa num servidor**: push, eliminar uma branch ou tag remota, fazer
-  push de uma tag, push de LFS, bloquear e desbloquear. Esse estado é partilhado
-  com outras pessoas; desfazê-lo seria outro push, e o GitPoulpi não o fará por
-  si. O Desfazer também nunca fica bloqueado por uma operação dessas.
+- **A maior parte do que acontece num servidor**: push, fazer push de uma tag, push
+  de LFS, bloquear e desbloquear, abrir um pull request. Esse estado é partilhado
+  com outras pessoas; desfazer um push seria um force push ou uma eliminação do
+  lado delas, e o GitPoulpi não o fará por si. (Eliminar uma branch ou tag remota é
+  a exceção: o desfazer só repõe o que o servidor tinha, e recusa se algo mudou
+  lá.) O Desfazer também nunca fica bloqueado por uma operação dessas.
 - **Fetch**: só move refs de acompanhamento remoto, que espelham o servidor. O
   fetch seguinte voltaria a fazê-lo.
 - **Abortar um rebase**: o desfazer não é oferecido para ele (um rebase move
@@ -301,7 +331,10 @@ O Desfazer só pergunta quando é arriscado:
   fazer force push do resultado;
 - tem alterações por commitar e o desfazer move a árvore de trabalho: as suas
   alterações são mantidas, mas o desfazer pára, sem alterar nada, se uma delas
-  estiver num ficheiro que ele tem de reescrever.
+  estiver num ficheiro que ele tem de reescrever;
+- a entrada eliminou uma branch ou tag num remoto: desfazê-lo **volta a enviá-la
+  para o servidor** (veja acima), por isso pergunta sempre, tal como o refazer que
+  a elimina lá de novo.
 
 Refazer, e todo o desfazer de um movimento só de refs, nunca pergunta: a outra
 direção está à distância de uma tecla.
@@ -358,8 +391,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   entrada de refazer mais recente). Recusa quando essa entrada não está
   bloqueada, e sai com **3** sem `--yes`. É uma mutação para o MCP, mas não
   destrutiva: o repositório não é tocado.
-- Código de saída **0** feito, **2** recusado (o JSON nomeia o motivo), **3**
-  arriscado e precisa de `--yes`.
+- Código de saída **0** feito, **2** recusado (o JSON nomeia o motivo, por exemplo
+  `RemoteRefMoved` quando uma branch remota eliminada foi criada de novo), **3**
+  arriscado e precisa de `--yes` (desfazer a eliminação de uma branch ou tag
+  remota, que envia para o servidor).
 
 Voltar atrás sem desfazer tudo o que veio depois:
 

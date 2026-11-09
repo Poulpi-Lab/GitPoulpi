@@ -362,8 +362,12 @@ pub(crate) fn build_view(backend: &dyn GitBackend, repo: &RepoRef) -> RepoAuthVi
         }
     }
     if view.unavailable.is_none() && record.is_some() {
-        if let Err(Error::RepoAuthUnavailable { reason }) = check(&repo.root, &profile) {
-            view.unavailable = Some(reason);
+        match check(&repo.root, &profile) {
+            Err(Error::RepoAuthUnavailable { reason }) => view.unavailable = Some(reason),
+            Err(other @ Error::RepoAuthCommandChanged { .. }) => {
+                view.unavailable = Some(other.to_string())
+            }
+            _ => {}
         }
     }
     if let Some(reason) = &view.unavailable {

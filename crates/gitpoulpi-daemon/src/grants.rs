@@ -39,6 +39,9 @@ pub(crate) struct GrantCredential {
     pub scheme: String,
     /// `host` or `host:port`, lowercase: the only hosts the grant answers.
     pub hosts: Vec<String>,
+    /// Whether `http` is answered too (only a token command whose hosts are
+    /// all loopback: nothing crosses a network).
+    pub allow_plain_http: bool,
     /// A token command that makes the credential when git asks (the
     /// `username` and `password` above are then empty).
     pub command: Option<crate::token_command::TokenCommand>,
@@ -208,9 +211,11 @@ pub(crate) fn issue(root: &Path, credential: GrantCredential) -> Result<GrantGua
 
 fn host_matches(entry: &Entry, request: &CredentialGrantRequest) -> bool {
     let host = request.host.trim();
-    request
+    let protocol_ok = request
         .protocol
         .eq_ignore_ascii_case(&entry.credential.scheme)
+        || (entry.credential.allow_plain_http && request.protocol.eq_ignore_ascii_case("http"));
+    protocol_ok
         && entry
             .credential
             .hosts
@@ -300,6 +305,7 @@ mod tests {
             password: "tok-0123456789".into(),
             scheme: "https".into(),
             hosts: vec![host.into()],
+            allow_plain_http: false,
             command: None,
             identity: "account work".into(),
         }

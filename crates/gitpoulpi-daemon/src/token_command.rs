@@ -109,6 +109,11 @@ pub(crate) fn forget_root(root: &Path) {
 /// The credential of `command`: the cached one while it is fresh, else the
 /// command's output (and then cached).
 pub(crate) async fn credential(command: &TokenCommand) -> Result<Credential, Error> {
+    // One at a time: git can ask twice at once (a fetch and the submodule or
+    // prune step it starts), and a command that prompts a person or spends a
+    // one-time code must not run twice for one transfer.
+    static RUNNING: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+    let _one_at_a_time = RUNNING.lock().await;
     if !command.cache.is_zero() {
         let hit = cache_lock()
             .get(&key_of(command))
@@ -254,6 +259,16 @@ fn normalize_host(entry: &str) -> Option<String> {
     (!host.is_empty()).then(|| host.to_ascii_lowercase())
 }
 
+/// Whether `host[:port]` is this machine: the one place plain `http` is
+/// answered (nothing crosses a network).
+fn is_loopback(host: &str) -> bool {
+    let name = match host.strip_prefix('[') {
+        Some(v6) => v6.split(']').next().unwrap_or(""),
+        None => host.rsplit_once(':').map_or(host, |(h, _)| h),
+    };
+    name == "localhost" || name == "::1" || name == "127.0.0.1"
+}
+
 /// The host of `origin` when it is an http(s) remote.
 fn origin_host(root: &Path) -> Option<String> {
     let output = std::process::Command::new(gitpoulpi_cli_backend::git_program())
@@ -351,6 +366,7 @@ pub(crate) fn apply(
                     username: String::new(),
                     password: String::new(),
                     scheme: "https".into(),
+                    allow_plain_http: hosts.iter().all(|h| is_loopback(h)),
                     hosts,
                     identity: "token command".into(),
                     command: Some(command),

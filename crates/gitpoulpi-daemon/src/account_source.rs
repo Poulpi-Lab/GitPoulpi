@@ -255,6 +255,7 @@ mod hosting {
                 password: token,
                 scheme: account.scheme.clone(),
                 hosts: vec![account.host.clone()],
+                allow_plain_http: false,
                 command: None,
                 identity: format!(
                     "account {} (token, user {})",

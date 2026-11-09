@@ -91,13 +91,17 @@ fn a_command_is_confirmed_with_no_default_answer_and_escape_saves_nothing() {
         s.contains("Runs as")
     });
     type_field(&mut term, "Command", COMMAND);
-    wait(&term, "the argv preview", |s| s.contains("[pass] [show] [work-token]"));
+    wait(&term, "the argv preview", |s| {
+        s.contains("[pass] [show] [work-token]")
+    });
     type_field(&mut term, "Hosts", "github.com");
 
     // Save opens the question, with nothing chosen.
     click_button(&mut term, "Save");
     let screen = term
-        .wait_for("the confirmation", STEP, |s| s.contains("Allow this command?"))
+        .wait_for("the confirmation", STEP, |s| {
+            s.contains("Allow this command?")
+        })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(screen.contains(&format!("$ {COMMAND}")), "{}", term.text());
     let sha = gitpoulpi_core::domain::command_sha256(&["pass", "show", "work-token"]);
@@ -107,7 +111,10 @@ fn a_command_is_confirmed_with_no_default_answer_and_escape_saves_nothing() {
         "{}",
         term.text()
     );
-    assert!(!screen.contains("> 1.") && !screen.contains("> 2."), "no default answer");
+    assert!(
+        !screen.contains("> 1.") && !screen.contains("> 2."),
+        "no default answer"
+    );
 
     // Enter answers nothing.
     term.send_keys("Enter").unwrap();
@@ -119,26 +126,37 @@ fn a_command_is_confirmed_with_no_default_answer_and_escape_saves_nothing() {
     );
     // An arrow only starts the highlight.
     term.send_keys("Down").unwrap();
-    wait(&term, "the first answer highlighted", |s| s.contains("> 1. Save and allow"));
+    wait(&term, "the first answer highlighted", |s| {
+        s.contains("> 1. Save and allow")
+    });
 
     // Esc cancels: nothing saved, the edit stays.
     term.send_keys("Escape").unwrap();
-    wait(&term, "the question closed", |s| !s.contains("Allow this command?"));
+    wait(&term, "the question closed", |s| {
+        !s.contains("Allow this command?")
+    });
     std::thread::sleep(Duration::from_millis(500));
     assert!(
         !profile_file(config.path()).contains("pass"),
         "Esc saved nothing: {}",
         profile_file(config.path())
     );
-    assert!(term.screen().contains("Unsaved changes."), "{}", term.text());
+    assert!(
+        term.screen().contains("Unsaved changes."),
+        "{}",
+        term.text()
+    );
 
     // Again, then `1`: the daemon saves it, or refuses it with its own words.
     click_button(&mut term, "Save");
-    wait(&term, "the confirmation again", |s| s.contains("Allow this command?"));
+    wait(&term, "the confirmation again", |s| {
+        s.contains("Allow this command?")
+    });
     term.send_keys("1").unwrap();
     let screen = term
         .wait_for("the daemon's answer", STEP, |s| {
-            s.contains("Saved. This repository now signs in as chosen.") || s.contains("Not saved: ")
+            s.contains("Saved. This repository now signs in as chosen.")
+                || s.contains("Not saved: ")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     if screen.contains("Not saved: ") {

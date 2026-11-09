@@ -41,12 +41,7 @@ fn rig(remotes: usize) -> Rig {
     }
     let repo = builder.build();
     let bare = repo.remote_path().unwrap().to_path_buf();
-    repo.git(&[
-        "remote",
-        "set-url",
-        "origin",
-        &StubSsh::url_for(&bare),
-    ]);
+    repo.git(&["remote", "set-url", "origin", &StubSsh::url_for(&bare)]);
     for i in 1..remotes {
         repo.git(&[
             "remote",
@@ -149,7 +144,9 @@ fn a_picked_key_is_saved_and_the_connection_test_names_the_accepted_key() {
     // The page has read the repository's remotes (the rows below do not
     // shift while the dropdowns are used).
     wait(&term, "the page loaded", |s| {
-        s.contains("origin") && s.contains("system ssh (agent") && !s.contains("Reading the sign-in")
+        s.contains("origin")
+            && s.contains("system ssh (agent")
+            && !s.contains("Reading the sign-in")
     });
 
     // SSH: System -> Key file, through the dropdown.
@@ -207,16 +204,26 @@ fn a_picked_key_is_saved_and_the_connection_test_names_the_accepted_key() {
         .wait_for("the results panel", STEP, |s| s.contains("Connection test"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(screen.contains("accepted key"), "{}", term.text());
-    assert!(screen.contains(&key_text) || screen.contains("id_work"), "{}", term.text());
-    assert!(screen.contains("Fetch: ok") && screen.contains("Push: ok"), "{}", term.text());
     assert!(
-        rig.stub.identity_files().iter().any(|f| *f == key_text),
+        screen.contains(&key_text) || screen.contains("id_work"),
+        "{}",
+        term.text()
+    );
+    assert!(
+        screen.contains("Fetch: ok") && screen.contains("Push: ok"),
+        "{}",
+        term.text()
+    );
+    assert!(
+        rig.stub.identity_files().contains(&key_text),
         "ssh was run with the chosen key: {:?}",
         rig.stub.identity_files()
     );
     // Esc closes the panel.
     term.send_keys("Escape").unwrap();
-    wait(&term, "the panel closed", |s| !s.contains("Connection test"));
+    wait(&term, "the panel closed", |s| {
+        !s.contains("Connection test")
+    });
 }
 
 #[test]
@@ -258,7 +265,10 @@ fn the_results_scrollbar_drags_and_the_cross_closes_the_panel() {
         s.contains("Tested with the saved choices.")
     });
     // The wheel scrolls it too.
-    let (c, r) = term.screen().find("Tested with the saved choices.").unwrap();
+    let (c, r) = term
+        .screen()
+        .find("Tested with the saved choices.")
+        .unwrap();
     term.scroll(true, c + 2, r).unwrap();
     wait(&term, "the pane scrolled by the wheel", |s| {
         !s.contains("Tested with the saved choices.")
@@ -290,5 +300,7 @@ fn the_results_scrollbar_drags_and_the_cross_closes_the_panel() {
         .find(|(_, r)| *r == title_row)
         .expect("the panel's cross");
     term.click(cross.0, cross.1).unwrap();
-    wait(&term, "the panel closed", |s| !s.contains("Connection test"));
+    wait(&term, "the panel closed", |s| {
+        !s.contains("Connection test")
+    });
 }

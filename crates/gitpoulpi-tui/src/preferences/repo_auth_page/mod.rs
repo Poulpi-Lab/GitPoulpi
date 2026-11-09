@@ -219,7 +219,8 @@ impl PreferencesState {
                 Ok(_) => {
                     ra.status = Some(t::SAVED.get().to_string());
                     ra.reset_on_get = true;
-                    ra.get = Some(requester.call(OperationKind::RepoAuthGet, serde_json::json!({})));
+                    ra.get =
+                        Some(requester.call(OperationKind::RepoAuthGet, serde_json::json!({})));
                 }
                 Err(e) => ra.status = Some(t::refused(error_text(&e))),
             }
@@ -237,7 +238,8 @@ impl PreferencesState {
                         .to_string(),
                     );
                     ra.reset_on_get = true;
-                    ra.get = Some(requester.call(OperationKind::RepoAuthGet, serde_json::json!({})));
+                    ra.get =
+                        Some(requester.call(OperationKind::RepoAuthGet, serde_json::json!({})));
                 }
                 Err(e) => ra.status = Some(t::refused(error_text(&e))),
             }
@@ -304,7 +306,9 @@ impl PreferencesState {
             t::DEFAULTS_BODY.get(),
             vec![
                 (
-                    gitpoulpi_i18n::msg::settings_screen::CANCEL.get().to_string(),
+                    gitpoulpi_i18n::msg::settings_screen::CANCEL
+                        .get()
+                        .to_string(),
                     false,
                 ),
                 (t::DEFAULTS_CONFIRM.get().to_string(), true),
@@ -322,7 +326,9 @@ impl PreferencesState {
             .view
             .overrides
             .iter()
-            .filter(|o| o.key == "credential.helper" && matches!(o.scope.as_str(), "local" | "worktree"))
+            .filter(|o| {
+                o.key == "credential.helper" && matches!(o.scope.as_str(), "local" | "worktree")
+            })
             .map(|o| (o.value.clone(), o.origin.clone()))
             .collect()
     }
@@ -390,14 +396,16 @@ impl PreferencesState {
         ra.status = None;
         ra.test = Some(TestRun {
             started: Instant::now(),
-            stage: Stage::Fetch(requester.call(
-                OperationKind::RepoAuthTest,
-                serde_json::to_value(RepoAuthTestArgs {
-                    remote: None,
-                    push: false,
-                })
-                .unwrap_or_default(),
-            )),
+            stage: Stage::Fetch(
+                requester.call(
+                    OperationKind::RepoAuthTest,
+                    serde_json::to_value(RepoAuthTestArgs {
+                        remote: None,
+                        push: false,
+                    })
+                    .unwrap_or_default(),
+                ),
+            ),
             fetch: Vec::new(),
         });
     }
@@ -425,14 +433,16 @@ impl PreferencesState {
         match &run.stage {
             Stage::Fetch(_) => {
                 run.fetch = reports;
-                run.stage = Stage::Push(requester.call(
-                    OperationKind::RepoAuthTest,
-                    serde_json::to_value(RepoAuthTestArgs {
-                        remote: None,
-                        push: true,
-                    })
-                    .unwrap_or_default(),
-                ));
+                run.stage = Stage::Push(
+                    requester.call(
+                        OperationKind::RepoAuthTest,
+                        serde_json::to_value(RepoAuthTestArgs {
+                            remote: None,
+                            push: true,
+                        })
+                        .unwrap_or_default(),
+                    ),
+                );
             }
             Stage::Push(_) => {
                 let fetch = std::mem::take(&mut run.fetch);
@@ -606,7 +616,10 @@ impl PreferencesState {
             })
             .collect();
         accounts.sort_by_key(|(matches, ..)| !*matches);
-        accounts.into_iter().map(|(_, id, label)| (id, label)).collect()
+        accounts
+            .into_iter()
+            .map(|(_, id, label)| (id, label))
+            .collect()
     }
 
     fn ra_account_choice(&self, selected: &str, target: RaTarget, label: &str) -> Field {
@@ -652,14 +665,21 @@ impl PreferencesState {
             .iter()
             .filter(|o| o.key == "core.sshCommand")
             .find(|o| !want_global || matches!(o.scope.as_str(), "global" | "system"))
-            .map_or_else(|| t::SSH_PROGRAM_DEFAULT.get().to_string(), |o| o.value.clone())
+            .map_or_else(
+                || t::SSH_PROGRAM_DEFAULT.get().to_string(),
+                |o| o.value.clone(),
+            )
     }
 
     pub(super) fn repo_auth_fields(&self) -> Vec<Field> {
         let ra = &self.repo_auth;
         let d = &ra.draft;
         let target = Target::RepoAuth;
-        let mut f = vec![Field::plain(t::INTRO.get(), Control::Info(String::new()), Target::None)];
+        let mut f = vec![Field::plain(
+            t::INTRO.get(),
+            Control::Info(String::new()),
+            Target::None,
+        )];
 
         // -- HTTPS ----------------------------------------------------------------
         f.push(Field::heading(t::HEADING_HTTPS.get()));
@@ -686,8 +706,12 @@ impl PreferencesState {
             target(RaTarget::HttpsSource),
         ));
         let username = |label: &str| {
-            Field::plain(label, Control::Text(d.username.clone()), target(RaTarget::Username))
-                .with_help(t::USERNAME_HELP.get())
+            Field::plain(
+                label,
+                Control::Text(d.username.clone()),
+                target(RaTarget::Username),
+            )
+            .with_help(t::USERNAME_HELP.get())
         };
         match d.https {
             HttpsKind::System => {
@@ -895,7 +919,11 @@ impl PreferencesState {
             } else {
                 t::override_competes(&o.key, &o.value, &o.origin)
             };
-            f.push(Field::plain(&line, Control::Info(String::new()), Target::None));
+            f.push(Field::plain(
+                &line,
+                Control::Info(String::new()),
+                Target::None,
+            ));
         }
         for w in &ra.view.warnings {
             f.push(Field::plain(w, Control::Info(String::new()), Target::None));
@@ -915,7 +943,10 @@ impl PreferencesState {
         test.enabled = !busy;
         let mut save = Btn::new(t::BUTTON_SAVE.get(), PrefAction::RepoAuth(RaButton::Save));
         save.enabled = dirty && !busy;
-        let mut revert = Btn::new(t::BUTTON_REVERT.get(), PrefAction::RepoAuth(RaButton::Revert));
+        let mut revert = Btn::new(
+            t::BUTTON_REVERT.get(),
+            PrefAction::RepoAuth(RaButton::Revert),
+        );
         revert.enabled = dirty;
         let defaults = Btn::new(
             t::BUTTON_DEFAULTS.get(),
@@ -934,7 +965,11 @@ impl PreferencesState {
                 .or_else(|| dirty.then(|| t::DIRTY_NOTE.get().to_string())),
         };
         if let Some(text) = status {
-            f.push(Field::plain(&text, Control::Info(String::new()), Target::None));
+            f.push(Field::plain(
+                &text,
+                Control::Info(String::new()),
+                Target::None,
+            ));
         }
         f
     }
@@ -985,7 +1020,8 @@ fn spawn_key_scan(
                             name.as_str(),
                             "known_hosts" | "known_hosts.old" | "config" | "authorized_keys"
                         )
-                        && (name.starts_with("id_") || path.with_file_name(format!("{name}.pub")).is_file());
+                        && (name.starts_with("id_")
+                            || path.with_file_name(format!("{name}.pub")).is_file());
                     if is_private {
                         found.push(path.to_string_lossy().into_owned());
                     }

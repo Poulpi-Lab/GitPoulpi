@@ -303,17 +303,15 @@ impl CommandConfirm {
     /// `shown`: the command, one entry per line; `hash`: its SHA-256.
     pub(super) fn new(helper: bool, shown: &str, hash: &str) -> Self {
         use gitpoulpi_i18n::msg::repo_auth as t;
-        let mut lines = vec![
-            (
-                Kind::Heading,
-                if helper {
-                    t::CONFIRM_HELPER_HEADING.get()
-                } else {
-                    t::CONFIRM_COMMAND_HEADING.get()
-                }
-                .to_string(),
-            ),
-        ];
+        let mut lines = vec![(
+            Kind::Heading,
+            if helper {
+                t::CONFIRM_HELPER_HEADING.get()
+            } else {
+                t::CONFIRM_COMMAND_HEADING.get()
+            }
+            .to_string(),
+        )];
         for (i, line) in shown.split('\n').enumerate() {
             let prefix = if i == 0 { "$ " } else { "  " };
             lines.push((Kind::Command, format!("{prefix}{}", visible(line))));
@@ -424,20 +422,12 @@ impl CommandConfirm {
         let hint_y = body.bottom().saturating_sub(1);
         let a2_y = hint_y.saturating_sub(1);
         let a1_y = a2_y.saturating_sub(1);
-        let pane = Rect::new(
-            body.x - 1,
-            y,
-            body.width + 2,
-            a1_y.saturating_sub(y),
-        );
+        let pane = Rect::new(body.x - 1, y, body.width + 2, a1_y.saturating_sub(y));
         self.pane.render(buf, pane, true);
         self.answers = [Rect::default(); 2];
-        for (i, (label, row)) in [
-            (t::ANSWER_SAVE.get(), a1_y),
-            (t::ANSWER_CANCEL.get(), a2_y),
-        ]
-        .into_iter()
-        .enumerate()
+        for (i, (label, row)) in [(t::ANSWER_SAVE.get(), a1_y), (t::ANSWER_CANCEL.get(), a2_y)]
+            .into_iter()
+            .enumerate()
         {
             if row < y || row >= body.bottom() {
                 continue;
@@ -466,7 +456,14 @@ impl CommandConfirm {
             self.answers[i] = band;
         }
         if hint_y >= y {
-            dialog_kit::put(buf, body.x, hint_y, t::CONFIRM_HINT.get(), body.width, muted);
+            dialog_kit::put(
+                buf,
+                body.x,
+                hint_y,
+                t::CONFIRM_HINT.get(),
+                body.width,
+                muted,
+            );
         }
     }
 }

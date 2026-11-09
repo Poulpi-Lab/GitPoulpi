@@ -86,7 +86,10 @@ pub(crate) fn split_command(text: &str) -> Result<Vec<String>, ()> {
 pub(crate) fn join_command(argv: &[String]) -> String {
     argv.iter()
         .map(|a| {
-            if a.is_empty() || a.chars().any(|c| c.is_whitespace() || c == '"' || c == '\'') {
+            if a.is_empty()
+                || a.chars()
+                    .any(|c| c.is_whitespace() || c == '"' || c == '\'')
+            {
                 format!("\"{}\"", a.replace('\\', "\\\\").replace('"', "\\\""))
             } else {
                 a.clone()
@@ -213,9 +216,11 @@ impl Draft {
                         script_sha256,
                         confirmed_at,
                         ..
-                    }) if *old == helper => {
-                        (confirmed_sha256.clone(), script_sha256.clone(), *confirmed_at)
-                    }
+                    }) if *old == helper => (
+                        confirmed_sha256.clone(),
+                        script_sha256.clone(),
+                        *confirmed_at,
+                    ),
                     _ => (None, None, None),
                 };
                 Some(HttpsAuth::Helper {
@@ -246,9 +251,11 @@ impl Draft {
                         script_sha256,
                         confirmed_at,
                         ..
-                    }) if *old == argv => {
-                        (confirmed_sha256.clone(), script_sha256.clone(), *confirmed_at)
-                    }
+                    }) if *old == argv => (
+                        confirmed_sha256.clone(),
+                        script_sha256.clone(),
+                        *confirmed_at,
+                    ),
                     _ => (None, None, None),
                 };
                 Some(HttpsAuth::TokenCommand {
@@ -323,7 +330,9 @@ mod tests {
 
     #[test]
     fn the_default_draft_is_no_profile() {
-        let p = Draft::default().to_profile(&RepoAuthProfile::default()).unwrap();
+        let p = Draft::default()
+            .to_profile(&RepoAuthProfile::default())
+            .unwrap();
         assert!(p.is_default() && p.https.is_none() && p.ssh.is_none());
     }
 

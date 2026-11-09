@@ -124,11 +124,18 @@ fn the_default_page_has_the_intro_both_choices_the_remotes_and_four_buttons() {
     for want in ["HTTPS", "SSH", "Remotes", "origin", "Git username"] {
         assert!(l.iter().any(|x| x == want), "{want} in {l:?}");
     }
-    let origin = st.fields().into_iter().find(|f| f.label == "origin").unwrap();
+    let origin = st
+        .fields()
+        .into_iter()
+        .find(|f| f.label == "origin")
+        .unwrap();
     assert_eq!(origin.value_text(), "https  system git");
     for b in ["Test connection", "Save", "Revert", "Use defaults"] {
-        assert!(st.fields().iter().any(|f| matches!(&f.control,
-            Control::Buttons(bs) if bs.iter().any(|x| x.label == b))), "{b}");
+        assert!(
+            st.fields().iter().any(|f| matches!(&f.control,
+            Control::Buttons(bs) if bs.iter().any(|x| x.label == b))),
+            "{b}"
+        );
     }
     assert!(!button_enabled(&st, "Save") && !button_enabled(&st, "Revert"));
     assert!(button_enabled(&st, "Test connection"));
@@ -234,7 +241,10 @@ fn save_sends_the_whole_profile_and_a_plain_source_needs_no_confirmation() {
     st.repo_auth.draft.key = "/home/u/.ssh/work".into();
     st.repo_auth.draft.strict = true;
     press(&mut st, "Save");
-    assert!(st.repo_auth.confirm.is_none(), "a key needs no confirmation");
+    assert!(
+        st.repo_auth.confirm.is_none(),
+        "a key needs no confirmation"
+    );
     let sent = queue.queued();
     assert_eq!(sent.len(), 1, "{sent:?}");
     assert_eq!(sent[0].0, OperationKind::RepoAuthSet);
@@ -257,9 +267,11 @@ fn the_answer_of_a_save_refreshes_the_view_and_a_refusal_is_shown_cleanly() {
     let (mut st, queue) = page(dir.path());
     loaded(&mut st);
     st.repo_auth.draft.username = "alice".into();
-    st.repo_auth.set = Some(Reply::ready(Err(gitpoulpi_core::Error::RepoAuthUnavailable {
-        reason: "the credential helper and token command sources are not available yet".into(),
-    })));
+    st.repo_auth.set = Some(Reply::ready(Err(
+        gitpoulpi_core::Error::RepoAuthUnavailable {
+            reason: "the credential helper and token command sources are not available yet".into(),
+        },
+    )));
     st.poll_repo_auth();
     let status = st.repo_auth.status.clone().unwrap();
     assert!(status.starts_with("Not saved: "), "{status}");
@@ -295,7 +307,10 @@ fn saving_a_command_opens_the_confirmation_with_no_default_answer() {
     let (mut st, queue) = command_page(dir.path());
     press(&mut st, "Save");
     assert!(st.ra_overlay_open());
-    assert!(queue.queued().is_empty(), "nothing is sent before the answer");
+    assert!(
+        queue.queued().is_empty(),
+        "nothing is sent before the answer"
+    );
     let screen = draw_screen(&mut st);
     for want in [
         "Allow this command?",
@@ -389,7 +404,11 @@ fn importing_the_repositorys_helper_fills_the_field_and_still_asks() {
     );
     pick(&mut st, "Sign in with", "Credential helper");
     press(&mut st, "Use this repository's current helper");
-    let helper = st.fields().into_iter().find(|f| f.label == "Helper").unwrap();
+    let helper = st
+        .fields()
+        .into_iter()
+        .find(|f| f.label == "Helper")
+        .unwrap();
     assert_eq!(helper.value_text(), "!sh repo.sh");
     queue.queued();
     press(&mut st, "Save");
@@ -418,7 +437,10 @@ fn a_long_command_is_wrapped_never_cut_and_a_control_character_is_spelled_out() 
     st.on_key(key(KeyCode::Home));
     draw_screen(&mut st);
     let confirm = st.repo_auth.confirm.as_ref().unwrap();
-    assert!(confirm.pane().track().is_some(), "a long command has a scrollbar");
+    assert!(
+        confirm.pane().track().is_some(),
+        "a long command has a scrollbar"
+    );
     assert_eq!(st.repo_auth.confirm.as_ref().unwrap().pane().top(), 0);
 }
 
@@ -480,7 +502,10 @@ fn the_results_name_the_identity_the_timing_and_read_a_failure_kindly() {
     );
     let text: Vec<&str> = lines.iter().map(|(_, l)| l.as_str()).collect();
     let joined = text.join("\n");
-    assert!(joined.contains("origin  (ssh, ssh key work_ed25519)"), "{joined}");
+    assert!(
+        joined.contains("origin  (ssh, ssh key work_ed25519)"),
+        "{joined}"
+    );
     assert!(
         joined.contains("Fetch: ok  2 branches, 42 ms, accepted key /keys/work_ed25519"),
         "{joined}"
@@ -522,7 +547,10 @@ fn a_test_runs_fetch_then_push_off_the_render_thread_and_opens_the_results() {
     assert!(st.ra_overlay_open());
     let screen = draw_screen(&mut st);
     assert!(screen.contains("Connection test"), "{screen}");
-    assert!(screen.contains("accepted key /keys/work_ed25519"), "{screen}");
+    assert!(
+        screen.contains("accepted key /keys/work_ed25519"),
+        "{screen}"
+    );
     // Esc closes it.
     st.on_key(key(KeyCode::Esc));
     assert!(!st.ra_overlay_open());
@@ -535,7 +563,11 @@ fn the_spinner_shows_only_after_150_ms() {
     loaded(&mut st);
     press(&mut st, "Test connection");
     st.poll_repo_auth();
-    let running = |st: &PreferencesState| labels(st).into_iter().any(|l| l.contains("Testing the connection"));
+    let running = |st: &PreferencesState| {
+        labels(st)
+            .into_iter()
+            .any(|l| l.contains("Testing the connection"))
+    };
     assert!(!running(&st), "not at once");
     if let Some(run) = st.repo_auth.test.as_mut() {
         run.started = Instant::now() - Duration::from_millis(400);
@@ -556,7 +588,14 @@ fn the_results_pane_scrolls_by_keys_wheel_and_a_draggable_scrollbar() {
     let pane = |st: &PreferencesState| st.repo_auth.results.as_ref().unwrap().pane() as *const _;
     let _ = pane;
     let top = |st: &PreferencesState| st.repo_auth.results.as_ref().unwrap().pane().top();
-    let track = st.repo_auth.results.as_ref().unwrap().pane().track().expect("a bar");
+    let track = st
+        .repo_auth
+        .results
+        .as_ref()
+        .unwrap()
+        .pane()
+        .track()
+        .expect("a bar");
     assert_eq!(top(&st), 0);
     st.on_key(key(KeyCode::PageDown));
     assert!(top(&st) > 0);
@@ -646,7 +685,10 @@ fn a_view_that_lands_while_a_dropdown_is_open_waits_for_it() {
         ..RepoAuthView::default()
     })));
     st.poll_repo_auth();
-    assert!(!st.repo_auth.loaded, "the view waits while the dropdown is open");
+    assert!(
+        !st.repo_auth.loaded,
+        "the view waits while the dropdown is open"
+    );
     st.on_key(key(KeyCode::Esc));
     assert!(st.choice.is_none());
     st.poll_repo_auth();
@@ -669,5 +711,9 @@ fn a_mouse_pick_in_a_choice_dropdown_changes_the_draft() {
     let col = text[..text.find("Token command").unwrap()].chars().count() as u16;
     st.on_mouse(MouseEventKind::Down(MouseButton::Left), col + 1, row as u16);
     st.on_mouse(MouseEventKind::Up(MouseButton::Left), col + 1, row as u16);
-    assert_eq!(st.repo_auth.draft.https, HttpsKind::TokenCommand, "{screen}");
+    assert_eq!(
+        st.repo_auth.draft.https,
+        HttpsKind::TokenCommand,
+        "{screen}"
+    );
 }

@@ -45,6 +45,9 @@ pub(crate) struct IntegrationsPage {
 }
 
 impl IntegrationsPage {
+    pub(crate) fn scope_notes(&self, _id: &str) -> Option<(Vec<String>, Vec<String>)> {
+        None
+    }
     pub(crate) fn detach_pending(&mut self) {}
     pub(crate) fn begin_retoken(&mut self, _cfg: &Config, _id: &str) {}
     pub(crate) fn forget_trust_cache(&mut self) {}

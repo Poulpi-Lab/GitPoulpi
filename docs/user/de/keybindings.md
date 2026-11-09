@@ -646,6 +646,9 @@ die Standardtasten.
 | Remote: Aktionen für ausgewähltes Remote... | `.` |
 | Repository: SSH-Schlüssel für dieses Repository... |  |
 | Repository: Sparse Checkout... |  |
+| Repository: SSH & Credentials... |  |
+| Repository: Test Connection |  |
+| Repository: Use Default Credentials |  |
 | Flow: Menü öffnen | `Ctrl+G W` |
 | Flow: Branch starten... |  |
 | Flow: Neues Issue... |  |

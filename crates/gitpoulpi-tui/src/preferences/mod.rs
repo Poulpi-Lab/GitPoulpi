@@ -94,6 +94,7 @@ mod persist;
 mod quantity;
 mod quantity_rows;
 mod render;
+mod repo_auth_page;
 mod repo_pages;
 mod search;
 mod sub_tabs;
@@ -311,6 +312,8 @@ pub(crate) struct PreferencesState {
     workflow: workflow_page::WorkflowPage,
     /// The Sparse checkout and LFS pages' state (`repo_pages`).
     repo_pages: repo_pages::RepoPages,
+    /// The SSH & credentials page's state (`repo_auth_page`).
+    repo_auth: repo_auth_page::RepoAuthPage,
     /// The Keyboard Shortcuts page's own state (`keybindings_page`).
     keys: keybindings_page::KeybindingsPage,
     /// Where the edited value sits in its row, as (column offset, width),
@@ -584,6 +587,7 @@ impl PreferencesState {
             ai: Default::default(),
             workflow: Default::default(),
             repo_pages: Default::default(),
+            repo_auth: Default::default(),
             keys: keybindings_page::KeybindingsPage::new(crate::keymap::Keymap::from_config(
                 &keybindings,
             )),
@@ -677,7 +681,10 @@ impl PreferencesState {
 
     /// A spinner is on screen: the render loop keeps drawing.
     pub(crate) fn animating(&self) -> bool {
-        self.integrations.animating() || self.open_in_detecting() || self.images_detecting()
+        self.integrations.animating()
+            || self.open_in_detecting()
+            || self.images_detecting()
+            || self.ra_animating()
     }
 
     /// Applies whatever the background token-presence probe
@@ -801,6 +808,9 @@ impl PreferencesState {
             self.rp_editor_paste(text);
             return;
         }
+        if self.ra_overlay_open() {
+            return;
+        }
         if self.keys_active() {
             self.keys_paste(text);
             return;
@@ -873,6 +883,7 @@ impl PreferencesState {
             PrefSection::MergeBehavior => self.merge_fields(),
             PrefSection::CommitTemplate => self.template_fields(),
             PrefSection::ConflictPrevention => self.conflict_fields(),
+            PrefSection::RepoAuth => self.repo_auth_fields(),
         }
     }
 }

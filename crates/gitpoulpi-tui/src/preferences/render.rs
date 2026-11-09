@@ -74,6 +74,7 @@ impl PreferencesState {
         self.render_review_browse(frame, area);
         self.render_workflow_editor(frame, inner);
         self.render_repo_pages_editor(frame, inner);
+        self.render_repo_auth_overlays(frame, inner);
         if let Some((_, combo)) = self.choice.as_mut() {
             combo.render_popup(frame.buffer_mut(), area);
         }

@@ -75,7 +75,7 @@ pub(crate) struct HookTrust {
 
 /// A control character is shown as `\x1b`, never sent to the terminal:
 /// a command must not be able to repaint the screen it is judged on.
-fn visible(text: &str) -> String {
+pub(crate) fn visible(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     for c in text.chars() {
         match c {
@@ -100,7 +100,7 @@ fn push_hooks(lines: &mut Vec<(Kind, String)>, heading: &str, hooks: &[(String, 
 
 /// Cuts `text` into pieces of at most `width` columns, anywhere (a command
 /// is shown whole, never truncated).
-fn wrap_hard(text: &str, width: usize) -> Vec<String> {
+pub(crate) fn wrap_hard(text: &str, width: usize) -> Vec<String> {
     let width = width.max(1);
     let mut out = vec![String::new()];
     let mut used = 0usize;
@@ -119,7 +119,7 @@ fn wrap_hard(text: &str, width: usize) -> Vec<String> {
 }
 
 /// Greedy word wrap on spaces, by display width.
-fn wrap_words(text: &str, width: usize) -> Vec<String> {
+pub(crate) fn wrap_words(text: &str, width: usize) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     let mut line = String::new();
     for word in text.split(' ') {

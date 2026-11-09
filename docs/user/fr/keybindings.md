@@ -653,6 +653,9 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Distant : Actions du distant sélectionné... | `.` |
 | Dépôt : Clé SSH de ce dépôt... |  |
 | Dépôt : Extraction partielle... |  |
+| Dépôt : Authentification SSH et identifiants... |  |
+| Dépôt : Tester la connexion |  |
+| Dépôt : Utiliser les identifiants par défaut |  |
 | Flow : Ouvrir le menu | `Ctrl+G W` |
 | Flow : Démarrer une branche... |  |
 | Flow : Nouveau ticket... |  |

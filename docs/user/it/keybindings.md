@@ -655,6 +655,9 @@ applicano. I tasti sono quelli predefiniti.
 | Remoto: Azioni per il remoto selezionato... | `.` |
 | Repository: Chiave SSH per questo repository... |  |
 | Repository: Checkout parziale... |  |
+| Repository: SSH & Credentials... |  |
+| Repository: Test Connection |  |
+| Repository: Use Default Credentials |  |
 | Flow: Apri il menu | `Ctrl+G W` |
 | Flow: Avvia un branch... |  |
 | Flow: Nuova issue... |  |

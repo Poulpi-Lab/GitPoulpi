@@ -651,6 +651,9 @@ Tuşlar varsayılanlardır.
 | Remote: Seçili Uzak Depo Eylemleri... | `.` |
 | Depo: Bu Depo İçin SSH Anahtarı... |  |
 | Depo: Kısmi Checkout... |  |
+| Repository: SSH & Credentials... |  |
+| Repository: Test Connection |  |
+| Repository: Use Default Credentials |  |
 | Flow: Menüyü Aç | `Ctrl+G W` |
 | Flow: Dal Başlat... |  |
 | Flow: Yeni Issue... |  |

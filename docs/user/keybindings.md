@@ -651,6 +651,9 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Remote: Actions for Selected Remote... | `.` |
 | Repository: SSH Key for This Repository... |  |
 | Repository: Sparse Checkout... |  |
+| Repository: SSH & Credentials... |  |
+| Repository: Test Connection |  |
+| Repository: Use Default Credentials |  |
 | Flow: Open Menu | `Ctrl+G W` |
 | Flow: Start Branch... |  |
 | Flow: New Issue... |  |

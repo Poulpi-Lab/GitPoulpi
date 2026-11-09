@@ -656,6 +656,9 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Remoto: Acciones del remoto seleccionado... | `.` |
 | Repositorio: Clave SSH de este repositorio... |  |
 | Repositorio: Checkout parcial... |  |
+| Repository: SSH & Credentials... |  |
+| Repository: Test Connection |  |
+| Repository: Use Default Credentials |  |
 | Flow: Abrir menú | `Ctrl+G W` |
 | Flow: Empezar rama... |  |
 | Flow: Nuevo issue... |  |

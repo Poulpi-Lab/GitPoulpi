@@ -33,6 +33,10 @@ impl WindowState {
             prefs.set_sparse(&self.sparse);
             prefs.set_lfs_status(self.lfs.status.as_ref());
             prefs.set_in_flight(self.link.in_flight_text());
+            // The SSH & credentials page talks to the daemon through the
+            // link's request queue, never on this thread.
+            prefs.set_repo_auth_requester(self.link.activity_handle().raw.requester());
+            prefs.poll_repo_auth();
             match prefs.take_sparse_request() {
                 Some(crate::preferences::SparseRequest::Set(dirs)) => {
                     self.link.submit_action(Action::SparseSet { dirs });

@@ -42,6 +42,23 @@ impl RawQueue {
         }
     }
 
+    /// The requests queued so far, as (operation, arguments), for tests that
+    /// check what a view asked of the daemon. Nothing answers them.
+    #[cfg(test)]
+    pub(crate) fn queued(&self) -> Vec<(OperationKind, serde_json::Value)> {
+        let Ok(mut held) = self.rx.lock() else {
+            return Vec::new();
+        };
+        let Some(rx) = held.as_mut() else {
+            return Vec::new();
+        };
+        let mut out = Vec::new();
+        while let Ok(request) = rx.try_recv() {
+            out.push((request.command, request.args));
+        }
+        out
+    }
+
     pub(super) fn take_receiver(&self) -> Option<tokio::sync::mpsc::UnboundedReceiver<RawRequest>> {
         self.rx.lock().ok().and_then(|mut rx| rx.take())
     }

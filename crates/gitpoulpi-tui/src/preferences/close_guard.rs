@@ -26,6 +26,8 @@ pub(super) enum CloseIssue {
     Workflow,
     /// The commit template was edited and not saved.
     Template,
+    /// The SSH & credentials page was edited and not saved.
+    RepoAuth,
     /// The profile at this index has no author email.
     Profile(usize),
 }
@@ -61,6 +63,9 @@ impl PreferencesState {
         if self.repo_pages.template.dirty {
             return Some(CloseIssue::Template);
         }
+        if self.ra_dirty() {
+            return Some(CloseIssue::RepoAuth);
+        }
         self.config
             .profiles
             .iter()
@@ -77,6 +82,10 @@ impl PreferencesState {
         let (title, body) = match issue {
             CloseIssue::Workflow => (screen::CLOSE_TITLE.get(), screen::CLOSE_WORKFLOW.get()),
             CloseIssue::Template => (screen::CLOSE_TITLE.get(), screen::CLOSE_TEMPLATE.get()),
+            CloseIssue::RepoAuth => (
+                screen::CLOSE_TITLE.get(),
+                gitpoulpi_i18n::msg::repo_auth::CLOSE_BODY.get(),
+            ),
             CloseIssue::Profile(_) => (screen::CLOSE_TITLE.get(), screen::CLOSE_PROFILE.get()),
         };
         let leave = if issue.loses_work() {
@@ -139,6 +148,7 @@ impl PreferencesState {
         let (section, focus) = match issue {
             CloseIssue::Workflow => (PrefSection::Workflow, PrefFocus::Fields),
             CloseIssue::Template => (PrefSection::CommitTemplate, PrefFocus::Fields),
+            CloseIssue::RepoAuth => (PrefSection::RepoAuth, PrefFocus::Fields),
             CloseIssue::Profile(_) => (PrefSection::Profiles, PrefFocus::List),
         };
         self.section = PrefSection::ALL

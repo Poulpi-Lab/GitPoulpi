@@ -168,7 +168,7 @@ timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
 
 ### Merge 冲突解决
 
-模型会收到文件的路径和语言、冲突的 base、当前（A）和传入（B）代码块（带有编辑器所显示的标签）、其前后各最多 20 行已 merge 的文本，以及你的指令（全局、仓库，以及设置 > AI 中的 *冲突解决* 指令）。它以代码块的形式回答该冲突的解决文本；如果答案带有冲突标记或闲聊而非代码，会被退回一次，之后拒绝。超过约 40 KB 的冲突不会被发送。AI 关闭时这些控件会隐藏，建议绝不会保存、stage 或解决任何内容：请检查输出、进行编辑，然后照常保存。
+模型会收到文件的路径和语言、冲突的 base、当前（A）和传入（B）代码块（带有编辑器所显示的标签）、其前后各最多 20 行已 merge 的文本，以及你的指令（全局、仓库，以及设置 > AI 中的 *冲突解决* 指令）。它以代码块的形式回答该冲突的解决文本；如果答案带有冲突标记或闲聊而非代码，会被退回一次，之后拒绝。超过 40 KB（`ai.limits.conflict_bytes`，*设置 > AI > 限制*）的冲突会被拦下并给出警告，警告中写明它的大小和限制，并提供 *仍然发送*（仅限这一次请求，仍会经过隐私检查）、*打开设置* 和 *取消*；该限制是 GitPoulpi 自己的保护措施，所以当你的模型容量足够时可以调高。AI 关闭时这些控件会隐藏，建议绝不会保存、stage 或解决任何内容：请检查输出、进行编辑，然后照常保存。
 
 ![点击闪光按钮之后的 commit 表单：由模型写好的摘要和描述，可供编辑](../images/ai-commit-message.png)
 
@@ -176,7 +176,7 @@ timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
 
 ### Commit 撰写器
 
-模型把工作区更改拆分为多个 commit（每个有改动的文件恰好属于一个 commit；无效的计划会被退回一次，之后拒绝）。在 commit 任何内容之前，你可以先审阅该计划：
+模型把工作区更改拆分为多个 commit（每个有改动的文件恰好属于一个 commit；无效的计划会被退回一次，之后拒绝）。只要仍有文件存在冲突，就不会发出任何请求：一个对话框会列出这些文件并打开冲突解决视图，因为撰写器需要一个没有冲突的工作树。在 commit 任何内容之前，你可以先审阅该计划：
 
 ![撰写器评审：四个拟议的 commit 及其文件，以及重置、取消和创建 4 个 commit 按钮](../images/composer.png)
 
@@ -263,10 +263,37 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 `ai review-context` 不需要模型，AI 关闭时也能用。`ai prompt --action code_review` 会把实际生效的上下文输出为 `review_context`。
 同样的四项设置在 `config.toml` 中是 `ai.review.*`（[参考](config-reference.md#ai内置-ai默认关闭)）。
 
+## 输入限制
+
+GitPoulpi 放进请求的每一项输入都有大小限制，它们是 `[ai.limits]` 下的设置（*设置 > AI > 限制*）。这些限制是 GitPoulpi 自己的保护措施（不同模型的上下文窗口各不相同）：模型容量足够时可以调高，想让请求保持精简时可以调低。
+
+| 设置（`ai.limits.`） | 默认值 | 限制的内容 |
+|---|---|---|
+| `conflict_bytes` | 40000 | 一个 merge 冲突的 base、当前和传入代码块 |
+| `diff_bytes` | 60000 | commit 消息、解释、stash 名称、pull request 描述、commit 计划或拆分所用的 diff；代码评审的整个 diff |
+| `review_file_bytes` | 12000 | 代码评审中单个文件的 diff |
+| `review_text_bytes` | 4000 | 被评审的 pull request 的描述 |
+| `review_threads_bytes` | 6000 | 已存在的评审评论 |
+| `review_context_file_bytes` | 8192 | 评审的单个项目上下文文件（`CLAUDE.md`、`AGENTS.md`、额外文件） |
+| `review_context_bytes` | 16384 | 评审的所有上下文文件合计 |
+
+**不会悄悄截断任何内容。** 当某项输入超过其限制时，请求会暂停，*超出 AI 限制* 对话框会列出超出的部分：哪一部分（diff、某个文件、描述、某个上下文文件）、它的大小、限制和对应的设置。评审会在同一个对话框中列出所有超出的部分。各按钮及其按键：
+
+- *全部发送*（`A`）：仅限这一次请求，不截断任何内容。它仍会经过隐私检查（密钥被替换、敏感文件被排除），并且在开启时还会经过随后出现的 *发送内容* 窗格。
+- *发送截断版本*（`T`）：超出限制的部分会被截去，和以前一样；对话框的每一行都会说明省略了什么（diff 的末尾、最后的 hunk、放不下的文件）。
+- *打开设置*（`O`）：取消请求，并在列出的第一个限制处打开 *设置 > AI > 限制*。焦点从这里开始：Enter 绝不会发送。
+- *取消*（`C`、`Esc`、关闭叉号或点击窗口外部）：不发送任何内容。
+
+冲突是例外：它绝不会被截断。*仍然发送* 会把它完整发送一次。
+
+没有任何东西会自行发起 AI 请求，所以不存在能够询问的后台运行：每个请求都是你发起的。无法询问的运行（CLI 和 MCP）会像以前一样截断，并给出说明；见下文。
+
+**在命令行中**，没有人能回答对话框，所以超过限制的输入会像以前一样被截断，结果会说明截掉了什么：`truncated: [{part, detail?, bytes, limit, setting}]`（仅在有内容被截掉时出现；`part` 是 `diff`、`split_hunks`、`review_diff`、`review_file`、`review_text`、`review_threads`、`context_file`、`context_total` 之一）。`--send-all`（别名 `--no-truncate`）则改为完整发送所有内容：可用于 `ai`（它的所有命令，包括 `ai resolve-conflict`，其中超过限制的冲突在其他情况下会被拒绝）、`commit --ai`、`stash push --ai` 和 `hosting review suggest`。MCP 工具有同样的 `send_all` 参数和同样的 `truncated` 字段。
+
 ## 隐私
 
 - 在你按下按钮或运行命令之前，不会发送任何内容。没有后台 AI，没有遥测，没有 GitPoulpi 账号。
-- 发送的内容：提示词（先是内置的，然后是你的指令）和你所询问的 diff，在约 60 KB 处截断（并附有说明）；对于 pull request，还包括分支的 commit 标题。
+- 发送的内容：提示词（先是内置的，然后是你的指令）和你所询问的 diff；对于 pull request，还包括分支的 commit 标题。超过 60 KB（`ai.limits.diff_bytes`）的 diff 绝不会被悄悄截断：见[输入限制](#输入限制)。
 - 历史重写脚本请求会发送你的指令和固定的脚本约定（脚本沙箱的 API）。最多 20 个 commit 的作者、日期和标题**仅在**你于对话框中勾选 *发送样本* 时才会一并发送（默认关闭；CLI 需要 `--sample N`）。文件内容和机密值绝不会发送。
 - 它只会发送到为该操作选定的配置：该 API 主机，或你的本地代理命令的 stdin（之后由该代理自行决定做什么）。
 - API 密钥由 `gitpoulpi` 进程自身使用，绝不会到达守护进程、窗口的其他客户端或 MCP 客户端。
@@ -301,6 +328,8 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 | `failed:` 404 | 那里不存在该 **模型**：清空它以使用默认值。 |
 | `failed:` 连接错误（Ollama、LM Studio） | 服务器未运行，或 **基础 URL** 的端口有误或缺少 `/v1`。 |
 | 输入密钥后显示 `(not set)` | 没有凭据助手：请配置一个（`git config --global credential.helper ...`）并重新输入。 |
+| *超出 AI 限制* | 请求中的某项输入超过了 `[ai.limits]` 的某个限制：选择 *全部发送*、*发送截断版本*、*打开设置* 或 *取消*（见[输入限制](#输入限制)）。 |
+| “冲突大于限制” | 冲突超过了 `ai.limits.conflict_bytes`（默认 40000）。*仍然发送* 会发送一次；*打开设置* 会前往 设置 > AI > 限制 中的该限制。 |
 | 语言或风格不对 | 添加指令；编辑器中的“快速插入”快捷项能让这件事很快完成。 |
 | 撰写器提示计划无效 | 模型漏掉或重复了某个文件：请重试，或使用更强的模型。 |
 

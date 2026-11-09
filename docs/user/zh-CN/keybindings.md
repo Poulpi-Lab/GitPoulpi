@@ -375,8 +375,8 @@ stage_file = "z"
 | `preferences` | `prev_tab` | 设置页的上一个标签页 | `Alt+Left` |
 | `preferences` | `next_tab` | 设置页的下一个标签页 | `Alt+Right` |
 | `ai_popup` | `copy` | 复制结果 | `c` |
-| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
-| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
+| `activity_log` | `scroll_left` | 向左滚动活动日志 | `Left` |
+| `activity_log` | `scroll_right` | 向右滚动活动日志 | `Right` |
 | `integrations` | `add` | 添加配置 | `a` |
 | `integrations` | `edit` | 编辑所选配置 | `e` |
 | `integrations` | `open_token` | 打开令牌页面 | `o` |
@@ -829,8 +829,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 活动日志：选择范围 |  |
 | 活动日志：Git 操作 |  |
 | 活动日志：应用日志 |  |
-| Activity Log: Scroll Left | `Left` |
-| Activity Log: Scroll Right | `Right` |
+| 活动日志：向左滚动 | `Left` |
+| 活动日志：向右滚动 | `Right` |
 | 活动日志：复制最近的错误 |  |
 | 活动日志：执行建议的操作 |  |
 | 活动日志：打开最近的错误 |  |

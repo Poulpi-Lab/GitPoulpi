@@ -568,7 +568,6 @@ impl Field {
     }
 
     /// A warning drawn in the danger color.
-    #[cfg(any(feature = "mcp", feature = "ai"))]
     pub(super) fn with_danger(mut self, warning: &str) -> Self {
         self.warning = Some(warning.to_string());
         self.danger = true;

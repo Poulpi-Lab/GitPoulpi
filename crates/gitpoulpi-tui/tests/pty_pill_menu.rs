@@ -141,6 +141,82 @@ fn a_remote_branch_is_deleted_from_the_menu_and_the_local_one_stays() {
     panic!("the remote branch was never deleted");
 }
 
+/// Deleting a branch on the remote is undone with Ctrl+Z: it asks first (the
+/// undo re-creates the branch on the server), and after the confirm the
+/// remote has the very same commit again. Falsified by breaking the undo of a
+/// remote deletion (the branch stays gone).
+#[test]
+fn a_deleted_remote_branch_is_undone_with_ctrl_z_after_a_confirm() {
+    let repo = fixture(true);
+    repo.git(&["push", "origin", "to-delete"]);
+    let tip = repo.git(&["rev-parse", "to-delete"]);
+    let (mut term, _c) = launch(&repo, "pty-pill-remote-undo");
+    right_click_pill(&mut term, "older target commit", "to-delete");
+    let menu = term
+        .wait_for("the delete rows", STEP, |s| {
+            s.contains("Delete origin/to-delete")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (c, r) = menu.find("Delete origin/to-delete").unwrap();
+    term.click(c + 1, r).unwrap();
+    term.wait_for("the confirm prompt", STEP, |s| s.contains("from origin?"))
+        .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("y").unwrap();
+    for _ in 0..300 {
+        if repo
+            .git_in_remote(&["branch", "--list", "to-delete"])
+            .is_empty()
+        {
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(200));
+    }
+    assert!(
+        repo.git_in_remote(&["branch", "--list", "to-delete"])
+            .is_empty(),
+        "the remote branch must be deleted first"
+    );
+
+    // Ctrl+Z: a network undo asks, and says what it does on the server.
+    // The Undo button only enables once the daemon told the window about the
+    // new entry, so the key is repeated until the question is up.
+    let mut asked = false;
+    for _ in 0..60 {
+        term.send_keys("C-z").unwrap();
+        if term
+            .wait_for("the undo question", Duration::from_secs(1), |s| {
+                s.contains("re-creates branch to-delete on origin")
+            })
+            .is_ok()
+        {
+            asked = true;
+            break;
+        }
+    }
+    assert!(asked, "the undo never asked:\n{}", term.text());
+    assert!(
+        repo.git_in_remote(&["branch", "--list", "to-delete"])
+            .is_empty(),
+        "asking changes nothing on the server"
+    );
+    term.send_keys("y").unwrap();
+    for _ in 0..300 {
+        if !repo
+            .git_in_remote(&["branch", "--list", "to-delete"])
+            .is_empty()
+        {
+            assert_eq!(
+                repo.git_in_remote(&["rev-parse", "refs/heads/to-delete"]),
+                tip,
+                "the same commit is back on the remote"
+            );
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(200));
+    }
+    panic!("the remote branch was never re-created:\n{}", term.text());
+}
+
 /// The ref's rows and the commit's rows are in one menu.
 #[test]
 fn the_pill_menu_carries_the_refs_rows_and_the_commits_rows() {

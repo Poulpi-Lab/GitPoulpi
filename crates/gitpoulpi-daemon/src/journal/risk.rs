@@ -33,6 +33,32 @@ pub(super) fn risk(
         }
         _ => {}
     }
+    for change in &entry.remote_refs {
+        let what = match change.name.strip_prefix("refs/tags/") {
+            Some(tag) => format!("tag {tag}"),
+            None => format!(
+                "branch {}",
+                change
+                    .name
+                    .strip_prefix("refs/heads/")
+                    .unwrap_or(&change.name)
+            ),
+        };
+        reasons.push(match (d, change.old) {
+            (Direction::Undo, Some(old)) => format!(
+                "Undoing this re-creates {what} on {} at {}: it is pushed to the remote \
+                 server, where everyone sees it again (it is never forced, and refused \
+                 if {} has something else under that name now).",
+                change.remote,
+                gitpoulpi_core::domain::short(old),
+                change.remote
+            ),
+            _ => format!(
+                "Redoing this deletes {what} on {} again (the remote server).",
+                change.remote
+            ),
+        });
+    }
     if d == Direction::Undo {
         reasons.extend(pushed_risk(backend, repo, entry));
     }

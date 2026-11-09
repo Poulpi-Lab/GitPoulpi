@@ -145,6 +145,7 @@ open the same confirmation or name prompt as the button.
 | Working changes | stage and unstage (file, folder, hunk, lines, all), discard (file, folder, hunk, lines, a file checkout), apply a patch, **delete a file from disk**, **ignore** (file, extension or folder: the line in the `.gitignore` you chose), **treat as binary or text** (the `.gitattributes` line) |
 | Stashes | push, apply, pop, drop |
 | Remotes and config | add, remove, rename, change the URL or push URL of a remote, Git LFS track and untrack |
+| On a server | **deleting a branch or a tag on a remote** (from the ref's menu, the palette, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, or a workflow finish that deletes the remote branch): see below |
 
 While a merge, cherry-pick or revert is stopped on conflicts, **Save & Mark
 Resolved**, staging and unstaging are undoable too (each one is taken back
@@ -164,11 +165,40 @@ position). Undoing the removal of a remote gives back its remote-tracking
 branches, its `origin/HEAD` alias and the upstream settings of the branches that
 tracked it.
 
+### Deleting a branch or tag on a remote
+
+Before the deletion GitPoulpi asks the server what the branch or tag holds
+right now and records it: the remote, the name and the exact commit (for an
+annotated tag, the tag object itself, so its annotation is kept). The deletion
+is then made only if the server still holds that value.
+
+**Undo pushes it back** under the same name, at the same commit, without ever
+forcing. Because that is a change on a server other people see, Undo **always
+asks first** and says so ("Undoing this re-creates branch topic on origin at
+3f2a1c0..."); the entry's steps say it too (`gitpoulpi undo --dry-run`). It uses
+the same credentials as a push. The remote-tracking branch comes back with it.
+**Redo** deletes it again, with the same safety.
+
+Undo refuses, changing nothing, when:
+
+- the branch or tag was **created again on the remote** since, or moved: it is
+  at another commit than the one recorded, and pushing would overwrite someone
+  else's work (the refusal names both commits);
+- the commit (or tag object) is **no longer in your repository** (it was
+  garbage collected): the undo cannot be done.
+
+"Delete locally and on the remote" is **one entry**: Undo restores the local and
+the remote branch or tag together, Redo deletes both again. Deleting only the
+remote branch leaves the local one alone; undoing it does the same. A workflow
+finish that also deletes the remote branch is undoable as a whole.
+
 ## What cannot be undone, and why
 
-- **Anything on a server**: push, deleting a remote branch or tag, pushing a
-  tag, LFS push, lock and unlock. That state is shared with other people;
-  undoing it would be another push, and GitPoulpi will not do that for you.
+- **Most things on a server**: push, pushing a tag, LFS push, lock and unlock,
+  opening a pull request. That state is shared with other people; undoing a
+  push would be a force-push or a delete on their side, and GitPoulpi will not
+  do that for you. (Deleting a remote branch or tag is the exception: the undo
+  only puts back what the server held, and refuses if anything changed there.)
   Undo never blocks because of such an operation either.
 - **Fetch**: it only moves remote-tracking refs, which mirror the server. The
   next fetch would do it again.
@@ -282,6 +312,10 @@ Undo asks only when it is risky:
   changes are kept, but the undo stops, changing nothing, if one of them is in a
   file it has to rewrite.
 
+- the entry deleted a branch or tag on a remote: undoing it **pushes it back to
+  the server** (see above), so it always asks, and so does the redo that deletes
+  it there again.
+
 Redo, and every undo of a ref-only move, never asks: the other direction is one
 key away.
 
@@ -336,8 +370,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   newest redo entry). It refuses when that entry is not blocked, and exits **3**
   without `--yes`. It is a mutation for MCP, but not a destructive one: the
   repository is untouched.
-- Exit code **0** done, **2** refused (the JSON names the reason), **3** risky
-  and needs `--yes`.
+- Exit code **0** done, **2** refused (the JSON names the reason, for example
+  `RemoteRefMoved` when a deleted remote branch was created again), **3** risky
+  and needs `--yes` (undoing the deletion of a remote branch or tag, which
+  pushes to the server).
 
 Going back without undoing everything after it:
 

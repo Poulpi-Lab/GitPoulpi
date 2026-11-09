@@ -167,9 +167,9 @@ fn remotes_with(refs: &[Ref], name: &str) -> Vec<String> {
 /// The remote goes **first** in a combined delete: if the push is refused
 /// (no rights, offline) nothing local was lost; the reverse would leave a
 /// tag that is still on the remote and gone here, which a fetch brings
-/// straight back. Only the local half is journaled (undo restores the
-/// local tag); the remote delete is not undoable, and the answer says how
-/// to put the tag back.
+/// straight back. It is one request, so one undo entry: undo puts the tag
+/// back on the remote (the very same object, never forced) and here, redo
+/// deletes both again.
 async fn delete(
     session: &mut Session,
     name: String,
@@ -210,14 +210,15 @@ async fn delete(
         ));
     }
     if let Some(r) = target_remote.as_deref() {
+        // `both`: the daemon deletes the local tag in the same request, once
+        // the remote one is gone.
         session
             .call::<()>(
                 OperationKind::TagDeleteRemote,
-                json!({ "remote": r, "name": name }),
+                json!({ "remote": r, "name": name, "and_local": !remote_only_request }),
             )
             .await?;
-    }
-    if !remote_only_request {
+    } else if !remote_only_request {
         session
             .call::<()>(OperationKind::TagDelete, json!({ "name": name }))
             .await?;
@@ -225,11 +226,13 @@ async fn delete(
     Ok(match (remote_only_request, target_remote) {
         (true, Some(r)) => emitted(
             json!({ "deleted": name, "remote": r, "scope": "remote" }),
-            format!("deleted tag {name} on {r} (the local tag stays; undo cannot bring it back on {r}, `tag push` can)"),
+            format!(
+                "deleted tag {name} on {r} (the local tag stays; `undo` pushes it back on {r})"
+            ),
         ),
         (false, Some(r)) => emitted(
             json!({ "deleted": name, "remote": r, "scope": "both" }),
-            format!("deleted tag {name} here and on {r} (undo restores the local tag only; `tag push` puts it back on {r})"),
+            format!("deleted tag {name} here and on {r} (`undo` restores it in both places)"),
         ),
         _ => {
             let still: Vec<String> = on;

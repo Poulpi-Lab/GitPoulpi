@@ -5579,8 +5579,8 @@ forget_button = "Forget"
 
 [undo_ui]
 # context: why Undo is idle; a remote server means a push, fetch etc. cannot be undone
-nothing_to_undo = "nothing to undo (a push, a fetch or anything else done on a remote server is never undone)"
-tip_nothing_to_undo = "Nothing to undo (a push, a fetch or anything else done on a remote server is never undone)"
+nothing_to_undo = "nothing to undo (a push, a fetch or anything else done on a remote server is never undone, except deleting a remote branch or tag)"
+tip_nothing_to_undo = "Nothing to undo (a push, a fetch or anything else done on a remote server is never undone, except deleting a remote branch or tag)"
 tip_nothing_to_redo = "Nothing to redo"
 nothing_to_redo = "nothing to redo"
 disabled = "Undo is turned off (Settings > General)"
@@ -6150,6 +6150,8 @@ undo_no_such_entry = "there is no operation #{id} in the undo history"
 # Status messages, window side: `event_loop/window/*` and `event_loop/init/*`.
 split_refused = "cannot split that {$commit}: {reason}"
 undo_purged = "the old history of operation #{entry} was purged, so it cannot be undone or redone"
+undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
+undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
 [window]
 connecting = "connecting to the session daemon..."
 reconnecting = "reconnecting to the session daemon..."

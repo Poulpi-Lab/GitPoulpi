@@ -356,6 +356,12 @@ async fn dispatch_network_inner(
     if let Ok(repo) = repo_ref(request) {
         crate::lfs_preflight::run(backend, &repo, request.command, events);
     }
+    if matches!(
+        request.command,
+        OperationKind::BranchDeleteRemote | OperationKind::TagDeleteRemote
+    ) {
+        return dispatch_remote_delete(backend, request, events).await;
+    }
     if !matches!(
         request.command,
         OperationKind::FetchRefAsBranch | OperationKind::Pull | OperationKind::FlowRun
@@ -386,6 +392,72 @@ async fn dispatch_network_inner(
     // `general.keep_submodules_up_to_date`.
     crate::submodules::keep_up_to_date(backend, request, &mut dispatched);
     settle_pending(backend, request, &mut dispatched);
+    dispatched
+}
+
+/// Deleting a branch or tag on a remote, journaled: the server is asked what
+/// the ref holds right now, that exact value is recorded (and pinned: undo
+/// pushes it back), and the deletion is leased on it, so what is recorded is
+/// what is deleted. `and_local` also deletes the local branch or tag of the
+/// same name, in the same entry.
+///
+/// A ref the server does not have, or a server that does not answer, is not
+/// journaled: the plain deletion runs and fails with its own message.
+async fn dispatch_remote_delete(
+    backend: &dyn GitBackend,
+    request: &Request,
+    events: &broadcast::Sender<Event>,
+) -> Dispatched {
+    let is_tag = request.command == OperationKind::TagDeleteRemote;
+    let text = |key: &str| request.args.get(key).and_then(|v| v.as_str());
+    let (Ok(repo), Some(remote), Some(name)) = (repo_ref(request), text("remote"), text("name"))
+    else {
+        return dispatch_network_plain(backend, request, events).await;
+    };
+    let full_ref = if is_tag {
+        format!("refs/tags/{name}")
+    } else {
+        format!("refs/heads/{name}")
+    };
+    let Ok(Some(old)) = backend.remote_ref_value(&repo, remote, &full_ref).await else {
+        return dispatch_network_plain(backend, request, events).await;
+    };
+    let local_request = network::local_twin(&request.args, name).map(|local| Request {
+        command: if is_tag {
+            OperationKind::TagDelete
+        } else {
+            OperationKind::BranchDelete
+        },
+        args: serde_json::json!({ "name": local }),
+        ..request.clone()
+    });
+    let mut leased = request.clone();
+    if let Some(args) = leased.args.as_object_mut() {
+        args.insert("expect".into(), serde_json::json!(old));
+    }
+    let change = gitpoulpi_core::journal::RemoteRefChange {
+        remote: remote.to_string(),
+        name: full_ref,
+        old: Some(old),
+        new: None,
+    };
+    let mut recording = crate::journal::begin_record_remote(
+        backend,
+        request,
+        crate::journal::RemoteDelete {
+            change,
+            local_request,
+        },
+    )
+    .map(|recording| AbandonedRecording {
+        backend,
+        request,
+        recording: Some(recording),
+    });
+    let mut dispatched = dispatch_network_plain(backend, &leased, events).await;
+    if let Some(recording) = recording.as_mut().and_then(AbandonedRecording::finished) {
+        crate::journal::finish_record(backend, request, recording, &mut dispatched);
+    }
     dispatched
 }
 

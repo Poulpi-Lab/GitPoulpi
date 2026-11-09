@@ -566,24 +566,15 @@ async fn dispatch(
             .await
         }
         Action::TagDeleteBoth { remote, name } => {
-            // Remote first: refused (no rights, offline), nothing local
-            // was lost. The local half is the journaled one.
+            // One request, so one undo entry: the daemon deletes on the
+            // remote first (refused: no rights, offline, nothing local was
+            // lost), then the local tag.
             let outcome = conn
                 .call::<()>(
                     OperationKind::TagDeleteRemote,
-                    serde_json::json!({ "remote": remote, "name": name }),
+                    serde_json::json!({ "remote": remote, "name": name, "and_local": true }),
                 )
                 .await;
-            let outcome = match outcome {
-                Ok(()) => {
-                    conn.call::<()>(
-                        OperationKind::TagDelete,
-                        serde_json::json!({ "name": name }),
-                    )
-                    .await
-                }
-                other => other,
-            };
             report(action_message_tx, outcome, move |_| {
                 gitpoulpi_i18n::msg::tag_where::msg_deleted_both(&name, &remote)
             })
@@ -614,23 +605,15 @@ async fn dispatch(
             name,
             and_local,
         } => {
+            // One request (one undo entry): the local branch goes only once
+            // the remote accepted the deletion.
+            let both = and_local.is_some();
             let outcome = conn
                 .call::<()>(
                     OperationKind::BranchDeleteRemote,
-                    serde_json::json!({ "remote": remote, "name": name }),
+                    serde_json::json!({ "remote": remote, "name": name, "and_local": and_local }),
                 )
                 .await;
-            let both = and_local.is_some();
-            let outcome = match (outcome, and_local) {
-                (Ok(()), Some(local)) => {
-                    conn.call::<()>(
-                        OperationKind::BranchDelete,
-                        serde_json::json!({ "name": local }),
-                    )
-                    .await
-                }
-                (other, _) => other,
-            };
             report(action_message_tx, outcome, move |_| {
                 if both {
                     l::branch_deleted_both(&name, &remote)

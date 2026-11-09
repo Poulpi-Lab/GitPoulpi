@@ -47,6 +47,7 @@ mod process;
 mod rebase_interactive;
 mod reflog_ops;
 mod refs;
+mod remote_ref;
 mod remotes;
 mod reset;
 mod reword;
@@ -494,6 +495,24 @@ impl GitBackend for SystemGitBackend {
     }
     async fn branch_delete_remote(&self, repo: &RepoRef, remote: &str, name: &str) -> Result<()> {
         branch::branch_delete_remote(repo, remote, name).await
+    }
+    async fn remote_ref_value(
+        &self,
+        repo: &RepoRef,
+        remote: &str,
+        full_ref: &str,
+    ) -> Result<Option<Oid>> {
+        remote_ref::remote_ref_value(repo, remote, full_ref).await
+    }
+    async fn remote_ref_update(
+        &self,
+        repo: &RepoRef,
+        remote: &str,
+        full_ref: &str,
+        new: Option<Oid>,
+        expect: Option<Oid>,
+    ) -> Result<()> {
+        remote_ref::remote_ref_update(repo, remote, full_ref, new, expect).await
     }
     fn merge(&self, repo: &RepoRef, from: &Ref, opts: &MergeOptions) -> Result<MergeOutcome> {
         history_ops::merge(repo, from, opts)

@@ -5076,6 +5076,8 @@ undo_already_restored = "bu işlemin kaldırdığı her şey zaten geri geldi"
 undo_no_such_entry = "geri alma geçmişinde {id} numaralı işlem yok"
 split_refused = "bu {$commit} bölünemez: {reason}"
 undo_purged = "#{entry} işleminin eski geçmişi temizlendi, bu yüzden geri alınamaz veya yinelenemez"
+undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
+undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
 
 [window]
 connecting = "oturum daemon'ına bağlanılıyor..."

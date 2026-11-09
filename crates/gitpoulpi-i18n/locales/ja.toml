@@ -5071,6 +5071,8 @@ undo_already_restored = "この操作が削除したものはすべてすでに�
 undo_no_such_entry = "元に戻す履歴に操作 #{id} はありません"
 split_refused = "その{$commit}は分割できません：{reason}"
 undo_purged = "操作 #{entry} の古い履歴は消去されたため、元に戻すことも、やり直すこともできません"
+undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
+undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
 
 [window]
 connecting = "セッションデーモンに接続中..."

@@ -5074,6 +5074,8 @@ undo_already_restored = "wszystko, co usunęła ta operacja, już wróciło"
 undo_no_such_entry = "w historii cofania nie ma operacji nr {id}"
 split_refused = { git = "nie można podzielić tego commita: {reason}", local = "nie można podzielić tego zatwierdzenia: {reason}" }
 undo_purged = "stara historia operacji #{entry} została usunięta na stałe, więc nie można jej cofnąć ani ponowić"
+undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
+undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
 
 [window]
 connecting = "łączenie z demonem sesji..."

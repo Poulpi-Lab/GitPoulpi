@@ -212,9 +212,6 @@ impl Planner<'_> {
                 FlowStep::Push { remote, branch, .. } => irreversible.push(format!(
                     "Pushing {branch} to {remote} is not taken back by Undo"
                 )),
-                FlowStep::DeleteRemoteBranch { remote, name } => irreversible.push(format!(
-                    "Deleting {name} on {remote} is not taken back by Undo"
-                )),
                 FlowStep::OpenMergeRequest { .. } => irreversible.push(
                     "The merge request is opened on the host and Undo cannot close it".to_string(),
                 ),

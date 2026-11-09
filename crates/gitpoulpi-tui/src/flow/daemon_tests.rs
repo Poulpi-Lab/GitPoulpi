@@ -31,6 +31,7 @@ fn outcome(status: FlowStatus, steps: Vec<StepReport>) -> FlowOutcome {
         message: "stopped".into(),
         merge_request: None,
         resumable: true,
+        remote_deleted: Vec::new(),
     }
 }
 

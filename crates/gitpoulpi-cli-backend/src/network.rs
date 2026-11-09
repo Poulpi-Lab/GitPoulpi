@@ -667,7 +667,7 @@ pub async fn push_for_review(
 /// `non-fast-forward` when we do) or a lease protected it
 /// (`stale info`). A hook refusing the push (`[remote rejected]`) stays
 /// an ordinary error carrying git's message.
-fn rejection_reason(porcelain: &str) -> Option<PushRejectReason> {
+pub(crate) fn rejection_reason(porcelain: &str) -> Option<PushRejectReason> {
     porcelain
         .lines()
         .filter(|line| line.starts_with('!'))

@@ -1,7 +1,7 @@
 use super::{block_on, head_oid};
 use crate::TestRepoBuilder;
 use gitpoulpi_core::domain::{
-    CloneOptions, ClonePhase, CloneProgress, FetchOptions, LogOptions, PullMode, PullOptions,
+    CloneOptions, ClonePhase, CloneProgress, FetchOptions, LogOptions, Oid, PullMode, PullOptions,
     PullOutcome, PushOptions, PushRejectReason, RefKind, ResetMode, TagSelection, TagSync,
     REMOTE_TAG_MIRROR_PREFIX,
 };
@@ -1926,5 +1926,126 @@ pub fn check_repo_config_reads_and_writes_the_commit_template(backend: &dyn GitB
             .as_deref(),
         Some(";"),
         "the other key is untouched"
+    );
+}
+
+/// `remote_ref_value` asks the server: the exact value of a branch (a
+/// commit) and of an annotated tag (the tag object, not the commit), `None`
+/// for a ref the remote does not have, and a same-tail name does not match.
+pub fn check_remote_ref_value_reads_the_server(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new().with_initial().with_origin().build();
+    let repo_ref = repo.repo_ref();
+    let head = head_oid(backend, &repo_ref);
+    backend.branch_create(&repo_ref, "topic", head).unwrap();
+    repo.git(&["tag", "-a", "v1", "-m", "release"]);
+    repo.git(&["push", "origin", "topic", "refs/tags/v1"]);
+    let tag_object = repo.git(&["rev-parse", "refs/tags/v1"]).trim().to_string();
+    assert_ne!(tag_object, head.to_hex(), "fixture: the tag is annotated");
+
+    let value = |name: &str| block_on(backend.remote_ref_value(&repo_ref, "origin", name)).unwrap();
+    assert_eq!(value("refs/heads/topic"), Some(head));
+    assert_eq!(
+        value("refs/tags/v1").map(|o| o.to_hex()),
+        Some(tag_object),
+        "an annotated tag reads as its tag object"
+    );
+    assert_eq!(value("refs/heads/missing"), None);
+    assert_eq!(
+        value("refs/heads/opic"),
+        None,
+        "only the exact name counts, not a tail match"
+    );
+}
+
+/// The pair undo of a remote deletion stands on: `remote_ref_update` with
+/// `None` deletes with a lease, with `Some(oid)` pushes it back (a new branch,
+/// the exact annotated tag object), and each refuses, changing nothing, when
+/// the remote does not hold what the caller expected.
+pub fn check_remote_ref_update_recreates_and_deletes_with_a_lease(backend: &dyn GitBackend) {
+    use gitpoulpi_core::Error;
+    let repo = TestRepoBuilder::new().with_initial().with_origin().build();
+    let repo_ref = repo.repo_ref();
+    let head = head_oid(backend, &repo_ref);
+    backend.branch_create(&repo_ref, "topic", head).unwrap();
+    repo.git(&["tag", "-a", "v1", "-m", "release"]);
+    repo.git(&["push", "origin", "topic", "refs/tags/v1"]);
+    let tag_object = Oid::from_hex(repo.git(&["rev-parse", "refs/tags/v1"]).trim()).unwrap();
+    let update = |name: &str, new: Option<Oid>, expect: Option<Oid>| {
+        block_on(backend.remote_ref_update(&repo_ref, "origin", name, new, expect))
+    };
+
+    // A lease on the wrong value: refused, the remote untouched.
+    let wrong = update("refs/heads/topic", None, Some(tag_object));
+    assert!(
+        matches!(&wrong, Err(Error::PushRejected(r)) if r.reason == PushRejectReason::StaleLease),
+        "{wrong:?}"
+    );
+    assert!(repo
+        .git_in_remote(&["branch", "--list", "topic"])
+        .contains("topic"));
+
+    // Delete with the right lease, then put the very same objects back.
+    update("refs/heads/topic", None, Some(head)).expect("delete branch");
+    update("refs/tags/v1", None, Some(tag_object)).expect("delete tag");
+    assert_eq!(
+        repo.git_in_remote(&["branch", "--list", "topic"]).trim(),
+        ""
+    );
+    assert_eq!(repo.git_in_remote(&["tag", "--list"]).trim(), "");
+
+    update("refs/heads/topic", Some(head), None).expect("re-create branch");
+    update("refs/tags/v1", Some(tag_object), None).expect("re-create tag");
+    assert_eq!(
+        repo.git_in_remote(&["rev-parse", "refs/heads/topic"])
+            .trim(),
+        head.to_hex()
+    );
+    assert_eq!(
+        repo.git_in_remote(&["rev-parse", "refs/tags/v1"]).trim(),
+        tag_object.to_hex(),
+        "the annotation survives: the tag object itself went back"
+    );
+    let tag = find_tag(backend, &repo_ref, "v1");
+    assert!(
+        !tag.is_unpushed_tag(),
+        "the tag mirror knows it is on origin again"
+    );
+
+    // Re-creating over a branch that exists (recreated elsewhere): refused.
+    let clash = update("refs/heads/topic", Some(tag_object), None);
+    assert!(
+        matches!(&clash, Err(Error::PushRejected(r)) if r.reason == PushRejectReason::StaleLease),
+        "{clash:?}"
+    );
+    assert_eq!(
+        repo.git_in_remote(&["rev-parse", "refs/heads/topic"])
+            .trim(),
+        head.to_hex(),
+        "the remote branch is untouched"
+    );
+}
+
+/// An object that is not in this repository cannot be pushed back: a typed
+/// refusal, before anything reaches the remote.
+pub fn check_remote_ref_update_refuses_an_object_that_is_gone(backend: &dyn GitBackend) {
+    use gitpoulpi_core::domain::UndoRefusal;
+    use gitpoulpi_core::Error;
+    let repo = TestRepoBuilder::new().with_initial().with_origin().build();
+    let repo_ref = repo.repo_ref();
+    let missing = Oid::from_hex(&"ab".repeat(20)).unwrap();
+    let result = block_on(backend.remote_ref_update(
+        &repo_ref,
+        "origin",
+        "refs/heads/ghost",
+        Some(missing),
+        None,
+    ));
+    assert!(
+        matches!(&result, Err(Error::UndoRefused(UndoRefusal::RemoteObjectMissing { oid })) if *oid == missing),
+        "{result:?}"
+    );
+    assert_eq!(
+        repo.git_in_remote(&["branch", "--list", "ghost"]).trim(),
+        ""
     );
 }

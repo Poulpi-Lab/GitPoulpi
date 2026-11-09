@@ -181,7 +181,69 @@ pub(super) fn run_step(
         Step::StashDrop { commit, message } => {
             crate::journal_stashes_remotes::run_stash_step(backend, repo, *commit, message, false)
         }
+        Step::RemoteRef {
+            remote,
+            name,
+            to,
+            from,
+        } => run_remote_step(backend, repo, (remote, name), *to, *from),
     }
+}
+
+/// Runs a future to its end from the blocking thread a request runs on.
+fn block_on<F: std::future::Future>(future: F) -> F::Output {
+    match tokio::runtime::Handle::try_current() {
+        Ok(handle) => handle.block_on(future),
+        Err(_) => tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .expect("a tokio runtime")
+            .block_on(future),
+    }
+}
+
+/// Moves a ref on a remote (the undo of a remote deletion pushes the branch
+/// or tag back, the redo deletes it again). The same credentials as every
+/// other transfer. The server is asked first, and the move is leased on what
+/// it said, so a ref changed on the remote since is refused (typed, nothing
+/// changed), never overwritten.
+fn run_remote_step(
+    backend: &dyn GitBackend,
+    repo: &RepoRef,
+    (remote, name): (&str, &str),
+    to: Option<gitpoulpi_core::domain::Oid>,
+    from: Option<gitpoulpi_core::domain::Oid>,
+) -> Result<()> {
+    use gitpoulpi_core::domain::UndoRefusal;
+    use gitpoulpi_core::Error;
+    crate::credentials::apply_from_config();
+    let moved = |actual| {
+        Error::UndoRefused(UndoRefusal::RemoteRefMoved(Box::new(
+            gitpoulpi_core::domain::RemoteRefMoved {
+                remote: remote.to_string(),
+                name: name.to_string(),
+                expected: from,
+                actual,
+            },
+        )))
+    };
+    block_on(async {
+        let actual = backend.remote_ref_value(repo, remote, name).await?;
+        if actual != from {
+            return Err(moved(actual));
+        }
+        match backend
+            .remote_ref_update(repo, remote, name, to, from)
+            .await
+        {
+            Err(Error::PushRejected(rejected))
+                if rejected.reason == gitpoulpi_core::domain::PushRejectReason::StaleLease =>
+            {
+                Err(moved(backend.remote_ref_value(repo, remote, name).await?))
+            }
+            other => other,
+        }
+    })
 }
 
 /// `Undo`/`Redo` with `forget`: drops the top entry of `direction` from the

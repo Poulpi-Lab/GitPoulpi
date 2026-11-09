@@ -136,6 +136,7 @@ fn shape_over_owned_surface(cx: &mut CommandCtx<'_>, col: u16, row: u16) -> Curs
             | InputMode::ThemePicker(_)
             | InputMode::LanguagePicker(_)
             | InputMode::WorkspaceSearch(_)
+            | InputMode::Guide(_)
     ) {
         return crate::pointer_map::shape_at(col, row);
     }

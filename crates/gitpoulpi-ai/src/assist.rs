@@ -59,6 +59,10 @@ pub struct Job {
     /// What is taken out of a request before it is sent, and what a frontend
     /// hooks to show or print it (see [`crate::privacy`]).
     pub privacy: Privacy,
+    /// Most bytes of one merge conflict a "Suggest a resolution" may carry
+    /// (`ai.limits.conflict_bytes`); `usize::MAX` once the user chose to send
+    /// a large one anyway.
+    pub conflict_limit: usize,
 }
 
 impl Job {
@@ -97,7 +101,16 @@ impl Job {
                 &config.privacy,
                 &gitpoulpi_core::privacy::default_sensitive_patterns(),
             ),
+            conflict_limit: config.limits.conflict_bytes_clamped(),
         })
+    }
+
+    /// Sends a conflict over `ai.limits.conflict_bytes` as well: the user
+    /// was warned and chose to. Everything else (redaction, excluded files)
+    /// applies unchanged.
+    pub fn without_conflict_limit(mut self) -> Self {
+        self.conflict_limit = usize::MAX;
+        self
     }
 
     /// Takes the privacy settings as they are now: `[ai.privacy]` and the
@@ -321,7 +334,7 @@ impl Job {
         client: &dyn AiClient,
         conflict: &prompts::ConflictContext,
     ) -> Result<Vec<String>> {
-        let prompt = prompts::conflict_resolve(conflict)?;
+        let prompt = prompts::conflict_resolve(conflict, self.conflict_limit)?;
         let answer = self.run_with(client, &prompt).await?;
         match prompts::conflict_resolution(&answer) {
             Ok(lines) => Ok(lines),
@@ -1070,6 +1083,40 @@ mod tests {
         );
         let client = Script(vec!["sorry, no", "sorry, no"].into(), Default::default());
         assert!(block_on(job().resolve_conflict_with(&client, &conflict())).is_err());
+    }
+
+    /// `ai.limits.conflict_bytes` reaches the job; over it nothing is sent
+    /// and the error is the typed one the frontends turn into a warning;
+    /// "send anyway" lifts it for that job only.
+    #[test]
+    fn a_conflict_over_the_configured_limit_is_held_back_until_sent_anyway() {
+        let mut config = AiConfig {
+            enabled: true,
+            ..AiConfig::default()
+        };
+        config.limits.conflict_bytes = 1_000;
+        let job = Job::prepare(&config, AiAction::ConflictResolve, None, &Fixed(None)).unwrap();
+        assert_eq!(job.conflict_limit, 1_000);
+        let mut big = conflict();
+        big.ours = vec!["x".repeat(1_500)];
+        let client = Script(vec!["```\nab\n```"].into(), Default::default());
+        let err = block_on(job.resolve_conflict_with(&client, &big)).unwrap_err();
+        assert!(
+            matches!(err, Error::TooLarge { limit: 1_000, .. }),
+            "{err:?}"
+        );
+        assert!(client.1.lock().unwrap().is_empty(), "nothing was sent");
+        // The same job, past the warning: it goes out.
+        let lines = block_on(
+            job.clone()
+                .without_conflict_limit()
+                .resolve_conflict_with(&client, &big),
+        )
+        .unwrap();
+        assert_eq!(lines, ["ab"]);
+        assert_eq!(client.1.lock().unwrap().len(), 1);
+        // The default is today's 40000.
+        assert_eq!(self::job().conflict_limit, 40_000);
     }
 
     #[test]

@@ -955,6 +955,11 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
                 None
             }
         }
+        // Git refuses to commit unmerged files: grayed with the reason (the
+        // action itself opens the guiding dialog if something still runs it).
+        C::Commit | C::CommitNow if ctx.has_conflicts => {
+            Some(gitpoulpi_i18n::msg::conflict_guard::WHY_COMMIT.get())
+        }
         C::AiComposeCommits => {
             if !ctx.ai_enabled {
                 Some(msg::palette::WHY_AI_IS_TURNED_OFF_SETTINGS_AI.get())

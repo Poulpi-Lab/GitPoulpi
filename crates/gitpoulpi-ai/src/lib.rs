@@ -61,6 +61,17 @@ pub enum Error {
     /// The security check of the profile's address refused: nothing was sent.
     #[error("{0}")]
     Trust(gitpoulpi_hosting::TrustProblem),
+    /// An input over a limit the user can change (`ai.limits.*`): callers
+    /// warn and offer "send anyway" instead of reporting a failure.
+    #[error(
+        "this {what} is too large to send to the AI ({bytes} bytes; the limit is {limit}). \
+         Raise ai.limits.conflict_bytes in config.toml or Settings > AI > Limits"
+    )]
+    TooLarge {
+        what: &'static str,
+        bytes: usize,
+        limit: usize,
+    },
     #[error("the AI answered nothing")]
     Empty,
     #[error("the local agent failed: {0}")]

@@ -352,6 +352,7 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
         staged_count,
         ctx.merging,
         ComposerHover {
+            conflicts: conflicts.len(),
             amend_checkbox: hover(hovered_target).amend_checkbox(),
             skip_hooks: commit_skip_hooks,
             skip_hooks_checkbox: hover(hovered_target).skip_hooks_checkbox(),

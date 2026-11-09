@@ -198,6 +198,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ai.review.extra_file",
     "ai.privacy.redact_secrets",
     "ai.privacy.exclude_sensitive_files",
+    "ai.limits.conflict_bytes",
     "ai.sent_preview.commit_message",
     "ai.sent_preview.explain_changes",
     "ai.sent_preview.stash_message",

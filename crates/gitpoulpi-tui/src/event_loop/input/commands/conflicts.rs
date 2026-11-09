@@ -125,9 +125,9 @@ fn start_ai_suggest(cx: &mut CommandCtx<'_>, conflict: usize) {
         path: context.path.clone(),
         conflict,
         context: Box::new(context),
+        oversize_ok: false,
     };
-    cx.ai_ui
-        .start_into(cx.session, cx.repo, request, &mut *cx.last_message);
+    super::start_ai(cx, request);
 }
 
 /// The merge / cherry-pick / revert Abort: asks first (it throws the

@@ -15,6 +15,8 @@ surfaces may still change between minor versions).
 - Updates: security notices. The daily check also reads the signed `security.json`; a notice that names the running version turns the version chip red ("Security notice: this version is affected") on every install channel, and the update panel lists its severity, summary, fixed version and link.
 
 ### Changed
+- AI: a merge conflict over the input limit no longer fails with an error. GitPoulpi warns with the size, the limit and the setting, and offers Send anyway (this request only, still redacted), Open setting and Cancel. The limit is the new `ai.limits.conflict_bytes` (40000 by default, Settings > AI > Limits).
+- Committing, and the AI commit composer, with files still in conflict no longer produce an error report: a dialog lists the files and opens the merge editor; the Commit button and the palette say why they are unavailable. The CLI and MCP name the files in the refusal.
 - The Radar opens with `Alt+R` by default (was `Alt+L`). Inside the merge editor and the commit message composer `Alt+R` keeps its own action (reset all, insert issue reference); the Radar stays reachable through the palette there. A custom `global.radar` binding is kept.
 
 ## [1.0.0] - 2026-10-29

@@ -793,6 +793,10 @@ pub(super) fn third_pane_controls(
                 *cx.commit_filter_focus = true;
             }
             HitTarget::CommitButton => {
+                // Unresolved conflicts: guide to them instead of an error.
+                if commands::block_on_conflicts(cx, crate::guide_dialog::Blocked::Commit) {
+                    return Ok(Flow::Handled);
+                }
                 let staged_count = cx
                     .status_result
                     .as_ref()
@@ -806,6 +810,7 @@ pub(super) fn third_pane_controls(
                         cx.operation_state,
                         Some(gitpoulpi_core::domain::OperationState::Merge { .. })
                     ),
+                    0,
                 ) {
                     // Disabled, but never silent --
                     // the same convention as

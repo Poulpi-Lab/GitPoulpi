@@ -12,6 +12,7 @@
 //! subprocess) and testing a connection (a network round trip) run on
 //! their own threads and report on a channel `poll_ai` drains.
 
+mod limits_rows;
 mod open_agent;
 mod privacy_rows;
 mod review_browse;

@@ -12,7 +12,16 @@ use gitpoulpi_i18n::msg;
 pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> io::Result<Flow> {
     let km = env.km;
     let palette_ctx = env.palette_ctx;
+    // The commit prompt's Enter with files still in conflict: git would
+    // refuse, so the guiding dialog opens instead.
+    if key.code == KeyCode::Enter
+        && matches!(&*cx.input_mode, InputMode::ComposingCommitMessage(_))
+        && commands::block_on_conflicts(cx, crate::guide_dialog::Blocked::Commit)
+    {
+        return Ok(Flow::Handled);
+    }
     match &mut *cx.input_mode {
+        InputMode::Guide(_) => commands::guide_key(cx, key),
         InputMode::ComposingCommitMessage(msg) => match key.code {
             _ if MainField::CommitPrompt.claims(&*cx.field_editor, msg, &key) => {
                 edit_main_field(

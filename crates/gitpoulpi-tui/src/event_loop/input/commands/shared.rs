@@ -4,7 +4,7 @@
 use crate::event_loop::*;
 use gitpoulpi_i18n::msg;
 
-use super::CommandCtx;
+use super::{block_on_conflicts, CommandCtx};
 
 /// How a keyboard or palette resize moves a block.
 #[derive(Clone, Copy)]
@@ -234,6 +234,10 @@ pub(in crate::event_loop) fn explain_wip(cx: &mut CommandCtx<'_>) {
 /// `Ctrl+Enter` and `Ctrl+G Enter` all land here) and, when a message was
 /// sent, clears the composer for the next commit.
 pub(in crate::event_loop) fn submit_composer(cx: &mut CommandCtx<'_>) {
+    // Git refuses to commit unmerged files: say which, and offer the editor.
+    if block_on_conflicts(cx, crate::guide_dialog::Blocked::Commit) {
+        return;
+    }
     submit_commit(
         cx.link,
         &*cx.commit_summary,
@@ -274,7 +278,16 @@ pub(in crate::event_loop) fn commit_now(cx: &mut CommandCtx<'_>) {
         cx.operation_state,
         Some(gitpoulpi_core::domain::OperationState::Merge { .. })
     );
-    match commit_readiness(&*cx.commit_summary, *cx.commit_amend, staged_count, merging) {
+    if block_on_conflicts(cx, crate::guide_dialog::Blocked::Commit) {
+        return;
+    }
+    match commit_readiness(
+        &*cx.commit_summary,
+        *cx.commit_amend,
+        staged_count,
+        merging,
+        0,
+    ) {
         Ok(()) => submit_composer(cx),
         Err(reason) => {
             *cx.last_message = Some(reason.get().to_string());

@@ -21,10 +21,11 @@ pub mod theme;
 pub mod update_lock;
 
 pub use ai::{
-    AgentRunMode, AgentWorkdir, AiAction, AiActionSettings, AiActions, AiConfig, AiPreset,
-    AiPrivacy, AiProfile, AiProviderKind, AiResolveError, AiResolved, AiReviewContext,
+    AgentRunMode, AgentWorkdir, AiAction, AiActionSettings, AiActions, AiConfig, AiLimits,
+    AiPreset, AiPrivacy, AiProfile, AiProviderKind, AiResolveError, AiResolved, AiReviewContext,
     AiSentPreview, RepoAiInstructions, RepoAiReview, RepoInstructionsMode, RunInRepo, WorkspaceAi,
-    DEFAULT_HEADLESS_TIMEOUT_SECS, DEFAULT_PROFILE_ID, DEFAULT_TERMINAL_TIMEOUT_SECS,
+    DEFAULT_CONFLICT_BYTES, DEFAULT_HEADLESS_TIMEOUT_SECS, DEFAULT_PROFILE_ID,
+    DEFAULT_TERMINAL_TIMEOUT_SECS, MAX_CONFLICT_BYTES, MIN_CONFLICT_BYTES,
 };
 pub use integration::{
     normalize_azure_url, AccountField, ApiFamily, AuthMethod, Capabilities, ConnectedUser,

@@ -14,6 +14,7 @@ mod ctx;
 mod diff;
 mod folds;
 mod git;
+mod guides;
 pub(in crate::event_loop) mod history;
 pub(in crate::event_loop) mod log_columns;
 mod nav;
@@ -30,6 +31,7 @@ pub(in crate::event_loop) use folds::{
     apply_ref_fold_action, fold_files, fold_key, is_ref_fold_action,
 };
 use gitpoulpi_i18n::msg;
+pub(in crate::event_loop) use guides::{block_on_conflicts, guide_key, guide_mouse, start_ai};
 pub(in crate::event_loop) use pane::*;
 pub(in crate::event_loop) use shared::*;
 pub(in crate::event_loop) use sidebar_sections::{

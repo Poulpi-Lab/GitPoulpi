@@ -300,8 +300,11 @@ incoming (B) blocks with the labels the editor shows, up to 20 lines of
 already-merged text before and after it, and your instructions (global,
 repository, and the *Conflict Resolution* ones in Settings > AI). It answers with the
 resolved text of that one conflict in a code block; an answer with conflict markers
-or chatter instead of code is sent back once, then refused. A conflict over about
-40 KB is not sent. The controls are hidden while AI is off, and a suggestion never
+or chatter instead of code is sent back once, then refused. A conflict over
+40 KB (`ai.limits.conflict_bytes`, *Settings > AI > Limits*) is held back behind a
+warning that gives its size and the limit, with *Send anyway* (this request only,
+still cleaned by the privacy checks), *Open setting* and *Cancel*; the limit is
+GitPoulpi's own guard, so raise it when your model has the room. The controls are hidden while AI is off, and a suggestion never
 saves, stages or resolves anything: review the Output, edit it, and save as usual.
 
 ![The commit form after the sparkle button: a summary and description written by the model, ready to edit](images/ai-commit-message.png)
@@ -311,8 +314,10 @@ saves, stages or resolves anything: review the Output, edit it, and save as usua
 ### The commit composer
 
 The model splits the working changes into several commits (every changed file in
-exactly one; an invalid plan is sent back once, then refused). You review the plan
-before anything is committed:
+exactly one; an invalid plan is sent back once, then refused). While files still
+have conflicts nothing is asked: a dialog lists them and opens the conflict
+resolution view, since the composer needs a tree without conflicts. You review the
+plan before anything is committed:
 
 ![The composer review: four proposed commits with their files, and the Reset, Cancel and Create 4 commits buttons](images/composer.png)
 
@@ -517,6 +522,7 @@ repository.
 | `failed:` 404 | The **Model** does not exist there: clear it to use the default. |
 | `failed:` connection error (Ollama, LM Studio) | The server is not running, or the **Base URL** has the wrong port or lacks `/v1`. |
 | The key shows `(not set)` after typing it | No credential helper: configure one (`git config --global credential.helper ...`) and enter it again. |
+| "This conflict is larger than the limit" | The conflict is over `ai.limits.conflict_bytes` (40000 by default). *Send anyway* sends it once; *Open setting* goes to the limit in Settings > AI > Limits. |
 | Wrong language or style | Add instructions; the editor's Quick insert chips make it quick. |
 | The composer says the plan is invalid | The model skipped or repeated a file: try again or use a stronger model. |
 

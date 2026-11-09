@@ -55,7 +55,12 @@ pub(crate) fn commit_readiness(
     amend: bool,
     staged_count: usize,
     merging: bool,
+    conflicts: usize,
 ) -> Result<(), gitpoulpi_i18n::M> {
+    // Git refuses to commit unmerged files, whatever else is staged.
+    if conflicts > 0 {
+        return Err(gitpoulpi_i18n::msg::conflict_guard::NEED_RESOLVE);
+    }
     // `merging`: a merge is stopped, and its commit needs nothing staged
     // (the resolved result may equal HEAD, "take ours" everywhere).
     if !amend && !merging && staged_count == 0 {
@@ -208,6 +213,9 @@ pub(crate) struct ComposerHover {
     pub(crate) ai: ComposerAi,
     /// The `#` (insert issue reference) button.
     pub(crate) issue_ref: ComposerIssueRef,
+    /// Files that still have conflicts: the Commit button is disabled (and
+    /// says why) until it is 0.
+    pub(crate) conflicts: usize,
 }
 
 /// State of the `#` button at the right of the Summary row.
@@ -395,7 +403,7 @@ pub(crate) fn render_commit_composer(
     }
 
     // -- Commit button, full pane width -----------------------------------
-    let ready = commit_readiness(summary, amend, staged_count, merging);
+    let ready = commit_readiness(summary, amend, staged_count, merging, hover.conflicts);
     let label = commit_button_label(amend, staged_count, merging, ready);
     hits.push((button_row, HitTarget::CommitButton));
     let style = match (ready.is_ok(), hover.commit_button) {
@@ -1038,7 +1046,7 @@ mod tests {
     /// "Amend previous commit" rather than a file count.
     #[test]
     fn amend_mode_is_committable_with_nothing_staged_and_says_so() {
-        assert_eq!(commit_readiness("fix: x", true, 0, false), Ok(()));
+        assert_eq!(commit_readiness("fix: x", true, 0, false, 0), Ok(()));
         let buf = paint(60, COMPOSER_MIN_HEIGHT, "fix: x", "", true, None, 0);
         assert!(
             buffer_contains(&buf, "Amend previous commit"),
@@ -1046,16 +1054,66 @@ mod tests {
         );
     }
 
+    /// The painted Commit button itself says why it is disabled while files
+    /// still have conflicts (and is not the "Commit changes to N files" one).
+    #[test]
+    fn the_painted_commit_button_asks_to_resolve_conflicts_first() {
+        use ratatui::backend::TestBackend;
+        use ratatui::Terminal;
+        let mut terminal = Terminal::new(TestBackend::new(60, COMPOSER_MIN_HEIGHT)).unwrap();
+        terminal
+            .draw(|frame| {
+                let mut hits: Vec<(Rect, HitTarget)> = Vec::new();
+                render_commit_composer(
+                    frame,
+                    Rect::new(0, 0, 60, COMPOSER_MIN_HEIGHT),
+                    &mut hits,
+                    "fix: x",
+                    "",
+                    false,
+                    None,
+                    3,
+                    false,
+                    ComposerHover {
+                        conflicts: 2,
+                        ..ComposerHover::default()
+                    },
+                    &text_edit::FieldEditor::default(),
+                );
+            })
+            .unwrap();
+        let buf = terminal.backend().buffer().clone();
+        assert!(
+            buffer_contains(&buf, "Resolve conflicts to commit"),
+            "the disabled button names the reason"
+        );
+        assert!(!buffer_contains(&buf, "Commit changes to"));
+    }
+
     /// While a merge is stopped its commit needs nothing staged (the
     /// resolved result may equal HEAD); a plain commit still does.
     #[test]
     fn a_merge_commit_is_ready_with_nothing_staged() {
-        assert_eq!(commit_readiness("Merge x", false, 0, true), Ok(()));
+        assert_eq!(commit_readiness("Merge x", false, 0, true, 0), Ok(()));
         assert_eq!(
-            commit_readiness("Merge x", false, 0, false),
+            commit_readiness("Merge x", false, 0, false, 0),
             Err(msg::NEED_STAGED)
         );
-        assert_eq!(commit_readiness("", false, 0, true), Err(msg::NEED_SUMMARY));
+        assert_eq!(
+            commit_readiness("", false, 0, true, 0),
+            Err(msg::NEED_SUMMARY)
+        );
+    }
+
+    /// Unmerged files stop every commit, amend and merge commit included,
+    /// whatever is staged: the button says to resolve them.
+    #[test]
+    fn conflicts_disable_the_commit_button_with_a_reason() {
+        let need = gitpoulpi_i18n::msg::conflict_guard::NEED_RESOLVE;
+        assert_eq!(commit_readiness("fix: x", false, 3, false, 2), Err(need));
+        assert_eq!(commit_readiness("fix: x", true, 0, false, 1), Err(need));
+        assert_eq!(commit_readiness("Merge x", false, 0, true, 1), Err(need));
+        assert_eq!(commit_readiness("fix: x", false, 3, false, 0), Ok(()));
     }
 
     /// Small panes degrade rather than panic: below `COMPOSER_MIN_HEIGHT`

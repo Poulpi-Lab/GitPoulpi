@@ -350,6 +350,13 @@ pub(super) fn editing_commit_message(
     Ok(Flow::Handled)
 }
 
+/// The guiding dialog is modal: every mouse event is its own or swallowed.
+pub(super) fn guide(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<Flow> {
+    *cx.hovered_target = None;
+    commands::guide_mouse(cx, mouse);
+    Ok(Flow::Handled)
+}
+
 /// The AI commit-composer review: hover, click (the wheel scrolls the list).
 pub(super) fn composer_review(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<Flow> {
     // The list's scrollbar takes its own presses and the drag of its thumb.

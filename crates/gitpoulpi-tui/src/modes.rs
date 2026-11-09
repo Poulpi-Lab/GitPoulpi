@@ -229,6 +229,10 @@ pub(crate) enum InputMode {
     /// tabs), its popup owns the keyboard and the mouse like the pickers.
     #[cfg_attr(not(feature = "global-search"), allow(dead_code))]
     WorkspaceSearch(Box<crate::workspace_search::WorkspaceSearch>),
+    /// A guiding dialog (`guide_dialog.rs`): conflicts must be resolved
+    /// first, or an AI input is over its limit. Owns keys and mouse while
+    /// open; Esc, the cross and an outside click cancel.
+    Guide(Box<crate::guide_dialog::GuideDialog>),
 }
 
 /// What the confirm modal carries out if the user says yes.

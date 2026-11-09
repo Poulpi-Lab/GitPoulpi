@@ -147,6 +147,7 @@ mod fold_state;
 mod folder_listing;
 mod folder_picker;
 mod graph;
+mod guide_dialog;
 mod help_guide;
 mod help_view;
 mod history_view;

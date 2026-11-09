@@ -156,6 +156,9 @@ pub(crate) struct Confirm<C: Copy + PartialEq> {
     panel: Rect,
     close: CloseHit,
     hits: Vec<(Rect, usize)>,
+    /// A line break in the body ends the line (a list, paragraphs) instead
+    /// of flowing into the text.
+    keep_breaks: bool,
 }
 
 impl<C: Copy + PartialEq> Confirm<C> {
@@ -178,7 +181,14 @@ impl<C: Copy + PartialEq> Confirm<C> {
             panel: Rect::default(),
             close: CloseHit::default(),
             hits: Vec::new(),
+            keep_breaks: false,
         }
+    }
+
+    /// Keeps the body's line breaks (each line is still wrapped to the box).
+    pub(crate) fn keep_breaks(mut self) -> Self {
+        self.keep_breaks = true;
+        self
     }
 
     /// Focuses (and highlights as primary) the button for `choice`.
@@ -250,7 +260,21 @@ impl<C: Copy + PartialEq> Confirm<C> {
             .max(44)
             .min(bounds.width);
         let inner_w = want_w.saturating_sub(4).max(1) as usize;
-        let lines = crate::ui_kit::wrap_words(&self.body, inner_w);
+        let lines: Vec<String> = if self.keep_breaks {
+            self.body
+                .split('\n')
+                .flat_map(|line| {
+                    let wrapped = crate::ui_kit::wrap_words(line, inner_w);
+                    if wrapped.is_empty() {
+                        vec![String::new()]
+                    } else {
+                        wrapped
+                    }
+                })
+                .collect()
+        } else {
+            crate::ui_kit::wrap_words(&self.body, inner_w)
+        };
         let want_h = lines.len() as u16 + 4;
         let panel_rect = centered(bounds, want_w, want_h);
         self.panel = panel_rect;

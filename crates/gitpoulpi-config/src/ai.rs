@@ -458,6 +458,45 @@ impl Default for AiPrivacy {
     }
 }
 
+/// Default for `ai.limits.conflict_bytes`: the most the three blocks (base,
+/// ours, theirs) of one merge conflict may add up to before a request is
+/// held back behind a warning.
+pub const DEFAULT_CONFLICT_BYTES: usize = 40_000;
+/// Smallest `ai.limits.conflict_bytes` takes (a hand-edited `0` or a tiny
+/// number would hold back every conflict).
+pub const MIN_CONFLICT_BYTES: usize = 1_000;
+/// Largest `ai.limits.conflict_bytes` takes.
+pub const MAX_CONFLICT_BYTES: usize = 50_000_000;
+
+/// `[ai.limits]`: how much input a request may carry before GitPoulpi warns
+/// instead of sending. The limit is GitPoulpi's own guard (a model's context
+/// window differs per model), so it is a setting: over it, the user is asked
+/// whether to send anyway.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct AiLimits {
+    /// Bytes of one merge conflict (base + ours + theirs) a "Suggest a
+    /// resolution" request may carry.
+    pub conflict_bytes: usize,
+}
+
+impl Default for AiLimits {
+    fn default() -> Self {
+        Self {
+            conflict_bytes: DEFAULT_CONFLICT_BYTES,
+        }
+    }
+}
+
+impl AiLimits {
+    /// `conflict_bytes` with a hand-edited out-of-range value brought back
+    /// into `MIN_CONFLICT_BYTES..=MAX_CONFLICT_BYTES`.
+    pub fn conflict_bytes_clamped(&self) -> usize {
+        self.conflict_bytes
+            .clamp(MIN_CONFLICT_BYTES, MAX_CONFLICT_BYTES)
+    }
+}
+
 /// `[ai.sent_preview]`: one switch per action key. `true` (the default)
 /// shows what is sent before each request; the dialog's "Don't show again
 /// for <action>" turns one off. A key the file does not name is `true`.
@@ -734,6 +773,8 @@ pub struct AiConfig {
     pub review: AiReviewContext,
     /// `[ai.privacy]`: what is stripped from a request before it leaves.
     pub privacy: AiPrivacy,
+    /// `[ai.limits]`: how much input a request may carry before a warning.
+    pub limits: AiLimits,
     /// `[ai.sent_preview]`: per action, whether "What is sent" is shown
     /// before the request goes out.
     pub sent_preview: AiSentPreview,
@@ -753,6 +794,7 @@ impl Default for AiConfig {
             actions: AiActions::default(),
             review: AiReviewContext::default(),
             privacy: AiPrivacy::default(),
+            limits: AiLimits::default(),
             sent_preview: AiSentPreview::default(),
             legacy_presets: Vec::new(),
         };
@@ -1344,6 +1386,25 @@ explain_changes = "ghost"
         assert_eq!(toml::from_str::<RepoAiReview>(&raw).unwrap(), on);
         assert_eq!(on.extra_choice().as_deref(), Some(""));
         assert!(!on.is_empty());
+    }
+
+    #[test]
+    fn the_limits_table_defaults_to_todays_cap_and_reads_back() {
+        let ai: AiConfig = toml::from_str("enabled = true").unwrap();
+        assert_eq!(ai.limits.conflict_bytes, 40_000);
+        assert_eq!(ai.limits, AiLimits::default());
+        let ai: AiConfig = toml::from_str("[limits]\nconflict_bytes = 90000\n").unwrap();
+        assert_eq!(ai.limits.conflict_bytes, 90_000);
+        assert_eq!(ai.limits.conflict_bytes_clamped(), 90_000);
+        let raw = toml::to_string(&ai).unwrap();
+        assert!(raw.contains("conflict_bytes = 90000"), "{raw}");
+        // A hand-edited extreme is brought back into range.
+        let tiny = AiLimits { conflict_bytes: 0 };
+        assert_eq!(tiny.conflict_bytes_clamped(), MIN_CONFLICT_BYTES);
+        let huge = AiLimits {
+            conflict_bytes: usize::MAX,
+        };
+        assert_eq!(huge.conflict_bytes_clamped(), MAX_CONFLICT_BYTES);
     }
 
     #[test]

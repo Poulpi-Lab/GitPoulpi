@@ -32,6 +32,11 @@ pub(crate) struct ConflictContext {
 }
 
 impl ConflictContext {
+    /// Never asked: there is no AI to send to.
+    pub(crate) fn size(&self) -> usize {
+        0
+    }
+
     /// Never: there is no AI to ask.
     pub(crate) fn from_document(
         _: &gitpoulpi_core::domain::MergeDocument,
@@ -59,6 +64,7 @@ pub(crate) enum AiRequest {
         path: String,
         conflict: usize,
         context: Box<ConflictContext>,
+        oversize_ok: bool,
     },
     RewriteScript {
         instruction: String,
@@ -150,6 +156,11 @@ impl AiUi {
     /// Never: this binary has no AI.
     pub(crate) fn enabled(&self) -> bool {
         false
+    }
+
+    /// Never asked: nothing is sent.
+    pub(crate) fn conflict_limit(&self) -> usize {
+        usize::MAX
     }
 
     pub(crate) fn running(&self) -> bool {

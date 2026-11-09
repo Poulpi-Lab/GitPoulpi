@@ -622,6 +622,13 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         frame_hits.insert(0, (cancel_rect, HitTarget::ConfirmButton(false)));
     }
 
+    // A guiding dialog (conflicts first / input too large): it paints its
+    // own buttons and cross and keeps their rects for its mouse handler.
+    if let InputMode::Guide(dialog) = &input_mode {
+        let area = frame.area();
+        dialog.render(frame.buffer_mut(), area);
+    }
+
     // The Edit commit message popup, registered from the walk
     // that drew it.
     if let InputMode::EditingCommitMessage(form) = &input_mode {

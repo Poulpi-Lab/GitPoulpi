@@ -467,7 +467,7 @@ room, lower them to keep requests small.
 **Nothing is cut silently.** When an input is over its limit the request waits
 and *Over the AI limit* lists what is over: which part (the diff, a file, the
 description, a context file), its size, the limit and the setting. A review lists
-every part that is over in one dialog. The buttons, each with its key:
+every part that is over in one dialog. The buttons, each with its key (the keys shown here are the English ones; other languages pick their own letters, printed on each button):
 
 - *Send all* (`A`): this request only, nothing is cut. It still goes through the
   privacy checks (secrets replaced, sensitive files left out) and, when it is on,
@@ -573,7 +573,7 @@ repository.
 | `failed:` connection error (Ollama, LM Studio) | The server is not running, or the **Base URL** has the wrong port or lacks `/v1`. |
 | The key shows `(not set)` after typing it | No credential helper: configure one (`git config --global credential.helper ...`) and enter it again. |
 | *Over the AI limit* | An input of the request is over a limit of `[ai.limits]`: choose *Send all*, *Send truncated*, *Open setting* or *Cancel* (see [Input limits](#input-limits)). |
-| "This conflict is larger than the limit" | The conflict is over `ai.limits.conflict_bytes` (40000 by default). *Send anyway* sends it once; *Open setting* goes to the limit in Settings > AI > Limits. |
+| "Conflict too large to send" | The conflict is over `ai.limits.conflict_bytes` (40000 by default). *Send anyway* sends it once; *Open setting* goes to the limit in Settings > AI > Limits. |
 | Wrong language or style | Add instructions; the editor's Quick insert chips make it quick. |
 | The composer says the plan is invalid | The model skipped or repeated a file: try again or use a stronger model. |
 

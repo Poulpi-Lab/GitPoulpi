@@ -132,7 +132,7 @@ Hunk'и и строки нумеруются так, как их нумеруе�
 |---|---|
 | `branch list`, `branch create <name> [at]`, `branch delete <name>`, `branch rename <old> <new>` | Локальные ветки. |
 | `branch track <remote/branch> [--name N]` | Создать локальную ветку, отслеживающую удалённую, и перейти на неё. |
-| `branch delete-remote <name> [--remote R]` | Удалить ветку на remote, сохранив локальную. |
+| `branch delete-remote <name> [--remote R]` | Удалить ветку на remote, сохранив локальную. `undo --yes` отправляет её обратно как была ([отмена](undo-redo.md#удаление-ветки-или-tag-на-remote)). |
 | `branch set-upstream <branch> <remote/branch>`, `branch unset-upstream <branch>` | Upstream. |
 | `branch fast-forward <branch> [target]` | Сдвинуть ветку вперёд, только если это fast-forward. |
 | `checkout <target> [--autostash]` | Переключить ветку или перейти на commit с отсоединённым HEAD. |
@@ -145,7 +145,7 @@ Hunk'и и строки нумеруются так, как их нумеруе�
 | `tag list [--unpushed]`, `tag create <name> [at] [-m M]`, `tag annotate <name> -m M` | Tag'и. `tag list` печатает каждый tag с указанием, где он находится, по данным последнего fetch или отправки tag'ов (но не из сети): `local` (он есть здесь), `remote` (remote, где он есть), `differs_on` (remote, где он указывает на другой commit) и `where`: `local`, `remote` (есть на remote, а в этом репозитории нет), `both` или `differs`. |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | Удалить tag: локально (по умолчанию), только на remote (`git push R --delete`; действие наружу, не отменяется) или здесь и на remote, где он есть. Ответ содержит `scope` (`local`, `remote`, `both`) и, при локальном удалении tag'а, который всё ещё есть на remote, `still_on` (следующий `fetch` вернёт его). Совместное удаление сначала убирает tag на remote; `undo` затем восстанавливает только локальный tag, а `tag push` возвращает его на remote. |
 | `tag fetch <name> [--remote R]` | Загрузить один tag с remote (по умолчанию с того, где он есть), например tag с `where: remote`. Никогда не перезаписывает локальный tag, указывающий на другой commit. |
-| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tag'и на remote (без имён: каждый tag, которого нет ни на одном remote). |
+| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tag'и на remote (без имён: каждый tag, которого нет ни на одном remote). Удаление на remote можно отменить (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Связанные рабочие деревья. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Подмодули ([Подмодули](submodules.md)). |
 
@@ -223,7 +223,7 @@ GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, L
 
 | Команда | Что делает |
 |---|---|
-| `ai [--print-sent] <command>` | `--print-sent` у любой команды `ai` выводит, что было бы отправлено (очищенные системный и пользовательский текст, `{sent: [{system, user}], privacy, dry_run: true}`), и не обращается к модели; нужен `ai.enabled = true`, ключ и сеть не нужны. Каждый ответ `ai` несёт `privacy: {redactions: N, excluded_files: [...]}`: сколько секретов заменено и какие конфиденциальные файлы исключены ([ИИ > Конфиденциальность](ai.md#конфиденциальность)). |
+| `ai [--print-sent] [--send-all] <command>` | `--send-all` (псевдоним `--no-truncate`) у любой команды `ai` отправляет каждый ввод целиком, даже сверх его предела `ai.limits.*`; без него ввод сверх предела обрезается (конфликт отклоняется), а ответ несёт `truncated: [{part, detail?, bytes, limit, setting}]`, если что-то было обрезано ([ИИ > Лимиты ввода](ai.md#лимиты-ввода)). `--print-sent` у любой команды `ai` выводит, что было бы отправлено (очищенные системный и пользовательский текст, `{sent: [{system, user}], privacy, dry_run: true}`), и не обращается к модели; нужен `ai.enabled = true`, ключ и сеть не нужны. Каждый ответ `ai` несёт `privacy: {redactions: N, excluded_files: [...]}`: сколько секретов заменено и какие конфиденциальные файлы исключены ([ИИ > Конфиденциальность](ai.md#конфиденциальность)). |
 | `ai commit-message` | Вывести сообщение, которое ИИ предлагает для изменений в индексе (для всех изменений, если индекс пуст); commit не создаётся. |
 | `ai explain [rev] [--wip]` | Объяснить commit (по умолчанию `HEAD`) или рабочие изменения. |
 | `ai split-plan <rev>` | Вывести план, который ИИ предлагает для разделения commit'а, в виде `{commit, parts, applied: false}`, где `parts` - то, что принимает `split-commit --plan`. Ничего не применяет. Требуется `ai.enabled = true`. |
@@ -234,7 +234,7 @@ GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, Jira, Trello, L
 | `ai review-context [--repo PATH \| --project HOST/PROJECT] [--run-in-repo profile\|yes\|no] [--claude-md on\|off] [--agents-md on\|off] [--context-file PATH\|URL] [--no-context-file] [--no-extra-file [on\|off]] [--reset]` | Показать или задать, что черновик код-ревью получает помимо diff (`[ai.review]`, см. [ИИ > Контекст ревью](ai.md#контекст-ревью)). Без `--repo` и `--project` это глобальное значение по умолчанию; `--repo` (глобальный флаг) - собственные значения одного клона, `--project github.com/owner/name` - значения репозитория, который не клонирован (`remote-reviews.toml`). Без флага настройки только показывает; с ним сохраняет и выводит. JSON: `scope` (`global`, `repository`, `project`), `target`, `global`, `own` (только поля, заданные репозиторием или проектом), `effective` (то, что получит ревью), `changed`. `--reset` забывает собственные значения репозитория или проекта. `--run-in-repo` не применяется к `--project`. `--no-extra-file` (один или с `on`) даёт репозиторию или проекту отсутствие дополнительного файла, что бы ни говорил глобальный, `off` снова возвращает глобальный файл; ему нужен `--repo` или `--project`, он исключает `--context-file`, а `own` тогда показывает `"no_extra_file": true`. Не требует модели; работает при выключенном ИИ. |
 | `ai trust <profile> [--accept-origin URL] [--accept-certificate SHA256] [--allow-insecure-http on\|off]` | Привязывает ключ API профиля к адресу, для которого он сохранён (см. [ИИ > Куда уходит ключ](ai.md#куда-уходит-ключ)). Без параметров выводит `{profile, current_origin, trusted}`; `--accept-origin` принимает текущий базовый URL профиля после его смены (написанный так, как его вывел отказ), `--accept-certificate` закрепляет сертификат самостоятельно размещённого сервера по отпечатку ключа SHA-256, `--allow-insecure-http` разрешает обычный базовый URL `http://`, не находящийся на этой машине. Запускает только человек: это не инструмент MCP. Работает при выключенном ИИ. |
 
-Плюс `commit --ai` и `stash push --ai`. Модель вызывается из процесса `gitpoulpi`,
+Плюс `commit --ai [--send-all]` и `stash push --ai [--send-all]` (те же `--send-all` и `truncated`, что у `ai`; `hosting review suggest` тоже принимает `--send-all`). Модель вызывается из процесса `gitpoulpi`,
 поэтому API-ключи никогда не попадают ни к демону, ни к MCP-клиенту.
 
 **Репозитории, сессии, демон, настройки**

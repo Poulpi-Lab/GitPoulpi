@@ -393,8 +393,8 @@ stage_file = "z"
 | `preferences` | `prev_tab` | Предыдущая вкладка страницы настроек | `Alt+Left` |
 | `preferences` | `next_tab` | Следующая вкладка страницы настроек | `Alt+Right` |
 | `ai_popup` | `copy` | Копировать результат | `c` |
-| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
-| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
+| `activity_log` | `scroll_left` | Прокрутить журнал активности влево | `Left` |
+| `activity_log` | `scroll_right` | Прокрутить журнал активности вправо | `Right` |
 | `integrations` | `add` | Добавить профиль | `a` |
 | `integrations` | `edit` | Изменить выбранный профиль | `e` |
 | `integrations` | `open_token` | Открыть страницу токена | `o` |
@@ -869,8 +869,8 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Журнал активности: выбрать область |  |
 | Журнал активности: операции git |  |
 | Журнал активности: журнал приложения |  |
-| Activity Log: Scroll Left | `Left` |
-| Activity Log: Scroll Right | `Right` |
+| Журнал активности: прокрутить влево | `Left` |
+| Журнал активности: прокрутить вправо | `Right` |
 | Журнал активности: копировать последнюю ошибку |  |
 | Журнал активности: выполнить предложенное действие |  |
 | Журнал активности: открыть последнюю ошибку |  |

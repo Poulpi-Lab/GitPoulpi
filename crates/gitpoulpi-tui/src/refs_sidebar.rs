@@ -534,7 +534,7 @@ fn collect_groups(
     let filter_lower = filter.to_lowercase();
     let matches =
         |name: &str| filter_lower.is_empty() || name.to_lowercase().contains(&filter_lower);
-    let want = |k: RefRowKind| only.map_or(true, |o| o == k);
+    let want = |k: RefRowKind| only.is_none_or(|o| o == k);
 
     for r in refs {
         match &r.kind {

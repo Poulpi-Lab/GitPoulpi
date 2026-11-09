@@ -55,7 +55,7 @@ impl Checker {
     }
 
     fn at(&self, x: u32, y: u32) -> (u8, u8, u8) {
-        if ((x / self.cell) + (y / self.cell)) % 2 == 0 {
+        if ((x / self.cell) + (y / self.cell)).is_multiple_of(2) {
             self.light
         } else {
             self.dark
@@ -213,7 +213,7 @@ pub(crate) fn render_to_from(
         for (r, line) in band.chunks_exact_mut(row_bytes).enumerate() {
             let y = first_row + r;
             let ty = &yt[y];
-            for (x, px) in line.chunks_exact_mut(4).enumerate() {
+            for (x, px) in line.as_chunks_mut::<4>().0.iter_mut().enumerate() {
                 let tx = &xt[x];
                 let (mut ar, mut ag, mut ab, mut aa) = (0f32, 0f32, 0f32, 0f32);
                 for j in 0..ty.n {

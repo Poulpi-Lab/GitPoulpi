@@ -60,7 +60,7 @@ impl AzureDevopsClient {
             .into_iter()
             .filter(|p| p.is_enabled && p.is_blocking)
             .flat_map(|p| p.settings.scope)
-            .filter(|s| s.repository_id.as_deref().map_or(true, |id| id == repo_id))
+            .filter(|s| s.repository_id.as_deref().is_none_or(|id| id == repo_id))
         {
             match (scope.match_kind.as_str(), scope.ref_name.as_deref()) {
                 ("DefaultBranch", _) => {

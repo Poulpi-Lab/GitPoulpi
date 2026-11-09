@@ -23,7 +23,7 @@ pub(crate) fn cells(s: &str) -> usize {
 /// is already as wide or wider.
 pub(crate) fn pad_to(s: &str, width: usize) -> String {
     let mut out = String::from(s);
-    out.extend(std::iter::repeat(' ').take(width.saturating_sub(cells(s))));
+    out.extend(std::iter::repeat_n(' ', width.saturating_sub(cells(s))));
     out
 }
 
@@ -77,7 +77,7 @@ pub(crate) fn slice_cells(s: &str, skip: usize, width: usize) -> String {
             kept_prev = true;
         } else {
             let inside = b.min(end) - a.max(skip);
-            out.extend(std::iter::repeat(' ').take(inside));
+            out.extend(std::iter::repeat_n(' ', inside));
             kept_prev = false;
         }
     }

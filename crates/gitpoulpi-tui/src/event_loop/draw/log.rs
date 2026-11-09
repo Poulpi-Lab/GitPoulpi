@@ -167,7 +167,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
     // index 0 is inside the window.
     let wip_built = (has_wip
         && central_view == CentralView::Log
-        && window.map_or(true, |w| w.start == 0 && w.end > 0))
+        && window.is_none_or(|w| w.start == 0 && w.end > 0))
     .then(|| {
         // The WIP row: one line like a commit. Its Graph
         // cell is the dotted marker on HEAD's lane (the dashed

@@ -94,7 +94,7 @@ fn to_rgb(
             if bytes.len() < pixels * 4 {
                 return None;
             }
-            for px in bytes.chunks_exact(4).take(pixels) {
+            for px in bytes.as_chunks::<4>().0.iter().take(pixels) {
                 let a = f32::from(px[3]) / 255.0;
                 for c in &px[..3] {
                     let v = f32::from(*c) * a + 255.0 * (1.0 - a);
@@ -114,7 +114,7 @@ fn to_rgb(
             if bytes.len() < pixels * 2 {
                 return None;
             }
-            for px in bytes.chunks_exact(2).take(pixels) {
+            for px in bytes.as_chunks::<2>().0.iter().take(pixels) {
                 let a = f32::from(px[1]) / 255.0;
                 let v = (f32::from(px[0]) * a + 255.0 * (1.0 - a)).round() as u8;
                 out.extend_from_slice(&[v, v, v]);

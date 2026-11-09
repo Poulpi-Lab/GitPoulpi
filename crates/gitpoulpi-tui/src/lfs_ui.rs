@@ -119,7 +119,7 @@ impl LfsGate {
         }
         dirty
             || !state.fetched_once
-            || (state.uses_lfs && state.last.map_or(true, |t| t.elapsed() >= LFS_POLL))
+            || (state.uses_lfs && state.last.is_none_or(|t| t.elapsed() >= LFS_POLL))
     }
 
     /// Records that a snapshot was taken.
@@ -144,7 +144,7 @@ impl LfsGate {
         let mut state = self.state.lock().unwrap_or_else(|e| e.into_inner());
         let remote = state.locks_remote.clone()?;
         let due = std::mem::take(&mut state.locks_wanted)
-            || state.locks_last.map_or(true, |t| t.elapsed() >= LOCKS_POLL);
+            || state.locks_last.is_none_or(|t| t.elapsed() >= LOCKS_POLL);
         due.then_some(remote)
     }
 

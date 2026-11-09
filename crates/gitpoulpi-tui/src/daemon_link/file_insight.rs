@@ -24,7 +24,7 @@ pub(super) async fn append_untracked_diffs(
         .files
         .iter()
         .filter(|e| e.index.is_none() && e.worktree == Some(FileStatus::Untracked))
-        .filter(|e| only.map_or(true, |p| e.path == p))
+        .filter(|e| only.is_none_or(|p| e.path == p))
         .filter(|e| !files.iter().any(|f| f.path == e.path))
         .take(MAX_UNTRACKED_DIFFS)
         .collect();

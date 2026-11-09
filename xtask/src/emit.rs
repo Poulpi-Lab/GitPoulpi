@@ -64,7 +64,7 @@ pub fn run(args: &[String]) -> Result<i32, String> {
 
 fn decode_hex(text: &str) -> Result<Vec<u8>, String> {
     let digits: Vec<char> = text.chars().filter(|c| !c.is_whitespace()).collect();
-    if digits.len() % 2 != 0 {
+    if !digits.len().is_multiple_of(2) {
         return Err("hex payload must have an even number of digits".to_string());
     }
     digits

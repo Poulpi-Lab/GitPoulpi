@@ -784,7 +784,7 @@ pub(in crate::event_loop) fn compare_goto_next(cx: &mut CommandCtx<'_>) {
     let next = c
         .cards
         .iter()
-        .position(|card| cursor.map_or(true, |cur| card.row > cur))
+        .position(|card| cursor.is_none_or(|cur| card.row > cur))
         .unwrap_or(0);
     compare_goto_card(cx, next);
 }

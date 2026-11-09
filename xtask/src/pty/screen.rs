@@ -101,7 +101,7 @@ impl Screen {
             line.push_str(text);
             // `repeat_n` would read better but only stabilised in 1.82,
             // and this workspace's MSRV is 1.80.
-            columns.extend(std::iter::repeat(offset as u16).take(text.len()));
+            columns.extend(std::iter::repeat_n(offset as u16, text.len()));
         }
         let trimmed = line.trim_end();
         columns.truncate(trimmed.len());

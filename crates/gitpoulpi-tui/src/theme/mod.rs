@@ -334,7 +334,7 @@ pub(crate) fn paint_statusbar(buf: &mut ratatui::buffer::Buffer, area: ratatui::
     let readable = |c: Color| match (rgb_of(c), rgb_of(fill)) {
         (Some((r, g, b)), Some((fr, fg_, fb))) => {
             contrast_ratio(ThemeColor::Rgb(r, g, b), ThemeColor::Rgb(fr, fg_, fb))
-                .map_or(true, |x| x >= 3.0)
+                .is_none_or(|x| x >= 3.0)
         }
         _ => true,
     };

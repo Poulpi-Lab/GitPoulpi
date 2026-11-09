@@ -84,7 +84,27 @@ fn click_push(term: &mut Terminal) {
 }
 
 fn open_activity(term: &mut Terminal) {
-    term.send_keys("C-n").unwrap();
+    // Under load a lone Ctrl+N can be lost (read together with the Esc
+    // before it, the pair is one Alt chord), and an "A" sent before the
+    // chord prompt is up is lost too: retry until the prompt shows.
+    let mut up = false;
+    for _ in 0..4 {
+        term.send_keys("C-n").unwrap();
+        if term
+            .wait_for("the Ctrl+N chord prompt", Duration::from_secs(5), |s| {
+                s.contains("t=select tab")
+            })
+            .is_ok()
+        {
+            up = true;
+            break;
+        }
+    }
+    assert!(
+        up,
+        "the Ctrl+N chord prompt never came up:\n{}",
+        term.text()
+    );
     term.send_text("A").unwrap();
 }
 

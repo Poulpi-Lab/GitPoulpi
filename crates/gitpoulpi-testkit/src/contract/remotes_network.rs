@@ -88,7 +88,7 @@ pub fn check_clone_reports_progress_that_ends_at_done(backend: &dyn GitBackend) 
     );
     assert!(
         seen.iter()
-            .all(|p| p.current.zip(p.total).map_or(true, |(c, t)| c <= t)),
+            .all(|p| p.current.zip(p.total).is_none_or(|(c, t)| c <= t)),
         "a count may never exceed its total: {seen:?}"
     );
 }

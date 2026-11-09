@@ -78,14 +78,14 @@ fn a_reserved_image_area_is_never_emitted_by_ratatui() {
     for y in area.top()..area.bottom() {
         for x in area.left()..area.right() {
             assert!(
-                buf[(x, y)].skip,
+                buf[(x, y)].diff_option == ratatui::buffer::CellDiffOption::Skip,
                 "cell {x},{y} is under the image and must never be emitted"
             );
             assert_eq!(buf[(x, y)].symbol(), " ");
         }
     }
     // Outside the area the buffer is untouched.
-    assert!(!buf[(5, 1)].skip);
+    assert!(buf[(5, 1)].diff_option != ratatui::buffer::CellDiffOption::Skip);
 }
 
 #[test]
@@ -206,7 +206,7 @@ fn a_blank_reservation_keeps_the_row_background_and_is_not_skipped() {
     );
     BlankReservation.render(area, &mut buf);
     let c = &buf[(1, 0)];
-    assert!(!c.skip);
+    assert!(c.diff_option != ratatui::buffer::CellDiffOption::Skip);
     assert_eq!(c.symbol(), " ");
     assert_eq!(c.bg, Color::Rgb(52, 58, 90));
     assert_eq!(c.fg, Color::Reset);
@@ -229,5 +229,5 @@ fn a_sixel_picture_is_exactly_its_cells_in_pixels_and_blends() {
     let mut buf = Buffer::empty(Rect::new(0, 0, 4, 4));
     encoded.reserve(Rect::new(0, 0, 2, 3), &mut buf);
     assert!(buf[(0, 0)].modifier.contains(BLANK_RESERVED));
-    assert!(!buf[(0, 0)].skip);
+    assert!(buf[(0, 0)].diff_option != ratatui::buffer::CellDiffOption::Skip);
 }

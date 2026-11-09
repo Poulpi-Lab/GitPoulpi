@@ -430,7 +430,7 @@ impl MergeFlow {
     /// An agent's request could not be carried out: its proposal (if it was
     /// one) fails, with `message` on the status line.
     fn agent_failed(&mut self, env: &mut Env<'_>, path: &Path, message: Option<String>) {
-        if !self.agent.as_ref().map_or(true, |a| a.path == path) {
+        if !self.agent.as_ref().is_none_or(|a| a.path == path) {
             return;
         }
         self.agent = None;

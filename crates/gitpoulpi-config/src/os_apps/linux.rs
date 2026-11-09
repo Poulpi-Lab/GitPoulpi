@@ -145,7 +145,7 @@ pub fn mime_of(file_name: &str, roots: &XdgRoots, files: &dyn Files) -> Option<S
         if hit
             && best
                 .as_ref()
-                .map_or(true, |(l, w, _)| (glob.len(), weight) > (*l, *w))
+                .is_none_or(|(l, w, _)| (glob.len(), weight) > (*l, *w))
         {
             best = Some((glob.len(), weight, mime.to_string()));
         }

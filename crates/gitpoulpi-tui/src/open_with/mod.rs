@@ -433,7 +433,7 @@ pub(crate) fn offer(outcome: FileInsightOutcome) -> Option<FileInsightOutcome> {
     };
     if waiting
         .as_ref()
-        .map_or(true, |w| w.request != outcome.request)
+        .is_none_or(|w| w.request != outcome.request)
     {
         return Some(outcome);
     }

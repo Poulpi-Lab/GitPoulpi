@@ -205,7 +205,7 @@ pub(super) fn decode_dib(
         _ => false,
     };
     if !alpha_is_real {
-        for px in out.chunks_exact_mut(4) {
+        for px in out.as_chunks_mut::<4>().0 {
             px[3] = 255;
         }
     }

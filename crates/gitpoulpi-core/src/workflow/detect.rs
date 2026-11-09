@@ -259,7 +259,7 @@ mod tests {
         let gh = r
             .iter()
             .find(|x| x.template == WorkflowTemplate::GithubFlow);
-        assert!(gh.map_or(true, |g| g.score < r[0].score));
+        assert!(gh.is_none_or(|g| g.score < r[0].score));
         assert_eq!(r[0].template, WorkflowTemplate::GitFlow);
     }
 

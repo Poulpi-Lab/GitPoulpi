@@ -499,7 +499,10 @@ impl LogAvatarImages {
                 continue;
             }
             let under = terminal_image::cells_of(buf, area);
-            let overdrawn: Vec<bool> = under.iter().map(|(_, _, c)| !c.skip).collect();
+            let overdrawn: Vec<bool> = under
+                .iter()
+                .map(|(_, _, c)| c.diff_option != ratatui::buffer::CellDiffOption::Skip)
+                .collect();
             let covered: Vec<(u16, u16)> = (under.iter().zip(&overdrawn))
                 .filter(|(_, over)| **over)
                 .map(|((x, y, _), _)| (*x, *y))

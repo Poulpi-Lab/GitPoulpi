@@ -79,7 +79,7 @@ fn flow_word(request: &Request) -> Option<&'static str> {
     request
         .args
         .get("resume")
-        .map_or(true, Value::is_null)
+        .is_none_or(Value::is_null)
         .then_some("workflow action")
 }
 

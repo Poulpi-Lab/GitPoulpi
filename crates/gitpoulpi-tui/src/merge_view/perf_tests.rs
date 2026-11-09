@@ -42,7 +42,7 @@ fn blob(n: u8, content: Vec<String>) -> Option<SideBlob> {
 /// conflicts spread evenly.
 pub(super) fn big_document(lines: usize, conflicts: usize) -> MergeDocument {
     let line = |i: usize| {
-        if i % 25 == 0 {
+        if i.is_multiple_of(25) {
             format!("pub fn step_{i}(input: &[u32], offset: u32) -> Option<u32> {{")
         } else if i % 25 == 24 {
             "}".to_string()

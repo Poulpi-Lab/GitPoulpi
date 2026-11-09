@@ -236,7 +236,7 @@ pub fn split_remote_ref<'a>(rest: &'a str, remote_names: &[String]) -> Option<(S
         if let Some(branch) = rest.strip_prefix(candidate.as_str()) {
             if branch.starts_with('/')
                 && branch.len() > 1
-                && best.map_or(true, |b| candidate.len() > b.len())
+                && best.is_none_or(|b| candidate.len() > b.len())
             {
                 best = Some(candidate.as_str());
             }

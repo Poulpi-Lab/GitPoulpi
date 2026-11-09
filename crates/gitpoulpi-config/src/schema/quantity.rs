@@ -67,7 +67,8 @@ pub fn read_quantity(
     choices: &[DisplayUnit],
 ) -> (u64, DisplayUnit) {
     let weight = |u: DisplayUnit| u.weight_in(base).filter(|w| *w > 0);
-    let fits = |u: DisplayUnit| choices.contains(&u) && weight(u).is_some_and(|w| total % w == 0);
+    let fits =
+        |u: DisplayUnit| choices.contains(&u) && weight(u).is_some_and(|w| total.is_multiple_of(w));
     let unit = if fits(chosen) {
         chosen
     } else {

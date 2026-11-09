@@ -834,7 +834,7 @@ impl RadarUi {
                     let unset = self
                         .config_dir
                         .as_deref()
-                        .map_or(true, |d| scope::folder_of(d, value).is_none());
+                        .is_none_or(|d| scope::folder_of(d, value).is_none());
                     if unset {
                         self.scope_combo.select(Some(self.scope.clone()));
                         return Outcome::Setting(if value == CLONE_FOLDER {

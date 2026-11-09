@@ -366,7 +366,10 @@ fn a_kitty_picture_reserves_placeholder_cells_not_skipped_ones() {
     for (row, y) in (area.top()..area.bottom()).enumerate() {
         for (col, x) in (area.left()..area.right()).enumerate() {
             let cell = &buf[(x, y)];
-            assert!(!cell.skip, "ratatui must emit placeholder {x},{y}");
+            assert!(
+                cell.diff_option != ratatui::buffer::CellDiffOption::Skip,
+                "ratatui must emit placeholder {x},{y}"
+            );
             assert_eq!(cell.fg, color, "the id rides in the foreground");
             assert_eq!(
                 cell.symbol(),

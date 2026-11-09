@@ -76,7 +76,7 @@ pub fn whitespace_resolution(doc: &MergeDocument) -> Option<Vec<ConflictPicks>> 
     }
     let text = |b: &Option<super::SideBlob>| {
         b.as_ref()
-            .map_or(true, |b| matches!(b.content, BlobContent::Text { .. }))
+            .is_none_or(|b| matches!(b.content, BlobContent::Text { .. }))
     };
     if !(text(&doc.base) && text(&doc.ours) && text(&doc.theirs)) {
         return None;

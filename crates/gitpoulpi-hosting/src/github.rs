@@ -330,10 +330,10 @@ impl HostingClient for GitHubClient {
             .filter(|p| {
                 mentioning
                     .as_ref()
-                    .map_or(true, |set| set.contains(&p.number))
+                    .is_none_or(|set| set.contains(&p.number))
             })
             .filter(|p| {
-                me.as_deref().map_or(true, |me| {
+                me.as_deref().is_none_or(|me| {
                     p.user
                         .as_ref()
                         .is_some_and(|u| u.login.eq_ignore_ascii_case(me))
@@ -410,7 +410,7 @@ impl HostingClient for GitHubClient {
             .filter(|r| {
                 mentioning
                     .as_ref()
-                    .map_or(true, |set| set.contains(&r.number))
+                    .is_none_or(|set| set.contains(&r.number))
             })
             .map(|r| IssueSummary {
                 number: r.number,

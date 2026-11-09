@@ -835,7 +835,7 @@ impl WindowState {
             for y in rect.top()..rect.bottom() {
                 for x in rect.left()..rect.right() {
                     let cell = &completed.buffer[(x, y)];
-                    if !cell.skip {
+                    if cell.diff_option != ratatui::buffer::CellDiffOption::Skip {
                         cells.push((x, y, cell.clone()));
                     }
                 }

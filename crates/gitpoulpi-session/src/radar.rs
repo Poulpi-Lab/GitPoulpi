@@ -259,7 +259,7 @@ impl RadarState {
     pub fn prune(&mut self, now: i64) -> usize {
         let before = self.snoozes.len();
         self.snoozes
-            .retain(|s| s.until.map_or(true, |until| now < until));
+            .retain(|s| s.until.is_none_or(|until| now < until));
         before - self.snoozes.len()
     }
 

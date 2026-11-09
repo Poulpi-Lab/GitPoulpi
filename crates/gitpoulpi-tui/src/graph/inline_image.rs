@@ -331,7 +331,7 @@ impl GraphImage {
         for y in area.top()..area.bottom() {
             for x in area.left()..area.right() {
                 let cell = &buf[(x, y)];
-                if !cell.skip {
+                if cell.diff_option != ratatui::buffer::CellDiffOption::Skip {
                     covered.push((x, y));
                     over.push((x, y, cell.clone()));
                 }
@@ -834,7 +834,7 @@ mod tests {
     fn a_transparent_picture_sits_on_real_cells_and_idles_for_free() {
         let mut img = alpha_image();
         let (buf, written) = frame(&mut img, &rows(0), None);
-        assert!(!buf[(GRAPH.x, GRAPH.y)].skip);
+        assert!(buf[(GRAPH.x, GRAPH.y)].diff_option != ratatui::buffer::CellDiffOption::Skip);
         assert!(sends_the_image(&written));
         // The cells under the picture are rewritten before it.
         let image_at = written.find("]1337;File=").unwrap();
@@ -884,7 +884,10 @@ mod tests {
     fn a_sixel_graph_is_one_picture_of_exactly_its_cells_and_idles_for_free() {
         let mut img = sixel_image();
         let (buf, written) = frame(&mut img, &rows(0), None);
-        assert!(!buf[(GRAPH.x, GRAPH.y)].skip, "cells stay real blanks");
+        assert!(
+            buf[(GRAPH.x, GRAPH.y)].diff_option != ratatui::buffer::CellDiffOption::Skip,
+            "cells stay real blanks"
+        );
         let cell = terminal_image::cell_size();
         let raster = format!(
             "\"1;1;{};{}",

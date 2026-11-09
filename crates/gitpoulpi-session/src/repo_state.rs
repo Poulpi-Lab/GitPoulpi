@@ -450,7 +450,7 @@ pub(crate) fn ensure_state_gitignore(dir: &Path) -> Result<()> {
     // user data folder are outside what git looks at.
     if dir
         .file_name()
-        .map_or(true, |n| n != gitpoulpi_config::LEGACY_DIR_NAME)
+        .is_none_or(|n| n != gitpoulpi_config::LEGACY_DIR_NAME)
     {
         return Ok(());
     }

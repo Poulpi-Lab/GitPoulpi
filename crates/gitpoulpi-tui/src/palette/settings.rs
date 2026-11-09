@@ -196,7 +196,7 @@ fn current_of(op: SettingOp) -> Option<Current> {
     let key = model().rows.get(op.row() as usize)?.key;
     let stamp = config_stamp();
     let mut slot = VALUES.lock().unwrap_or_else(|e| e.into_inner());
-    if slot.as_ref().map_or(true, |(s, _)| *s != stamp) {
+    if slot.as_ref().is_none_or(|(s, _)| *s != stamp) {
         *slot = Some((stamp, HashMap::new()));
     }
     let map = &mut slot.as_mut()?.1;

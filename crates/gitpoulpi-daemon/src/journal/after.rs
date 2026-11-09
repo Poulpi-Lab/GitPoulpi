@@ -157,7 +157,7 @@ pub(super) fn after_state(
                     if request
                         .args
                         .get("annotated_message")
-                        .map_or(true, Value::is_null) =>
+                        .is_none_or(Value::is_null) =>
                 {
                     Some(serde_json::from_value(request.args.get("at")?.clone()).ok()?)
                 }

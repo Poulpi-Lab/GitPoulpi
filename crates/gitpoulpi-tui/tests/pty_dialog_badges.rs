@@ -189,7 +189,7 @@ fn list_badge(screen: &Screen, rest: &str, row: Option<u16>) -> Option<char> {
     let (col, r) = screen
         .find_all(rest)
         .into_iter()
-        .find(|(_, r)| row.map_or(true, |row| *r == row))?;
+        .find(|(_, r)| row.is_none_or(|row| *r == row))?;
     let c = screen
         .cell(col.checked_sub(2)?, r)?
         .display()

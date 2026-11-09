@@ -408,7 +408,7 @@ impl GitLabClient {
     ) -> Result<Vec<ReviewComment>> {
         let mut out = Vec::new();
         for d in self.discussions(project, number).await? {
-            if d.notes.first().map_or(true, |n| n.position.is_some()) {
+            if d.notes.first().is_none_or(|n| n.position.is_some()) {
                 continue;
             }
             let first_id = d.notes[0].id.to_string();

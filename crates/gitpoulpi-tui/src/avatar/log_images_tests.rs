@@ -206,7 +206,7 @@ fn a_terminal_that_cannot_draw_images_keeps_the_initials() {
     let (buf, written) = frame(&mut img, &rows, &faces(), SCREEN, None);
     assert_eq!(written, "");
     assert_eq!(buf[(AUTHOR_X, TOP)].symbol(), "a");
-    assert!(!buf[(AUTHOR_X, TOP)].skip);
+    assert!(buf[(AUTHOR_X, TOP)].diff_option != ratatui::buffer::CellDiffOption::Skip);
 }
 
 /// Only the rows handed a picture are reserved; the others keep what the
@@ -227,8 +227,11 @@ fn a_row_whose_picture_is_not_cached_keeps_its_initials_and_gets_no_picture() {
     ];
     let (buf, written) = frame(&mut img, &rows, &faces(), SCREEN, None);
     assert_eq!(rows_sent(&written), vec![TOP]);
-    assert!(buf[(AUTHOR_X, TOP)].skip, "ada's picture was not reserved");
-    assert!(!buf[(AUTHOR_X, TOP + 1)].skip);
+    assert!(
+        buf[(AUTHOR_X, TOP)].diff_option == ratatui::buffer::CellDiffOption::Skip,
+        "ada's picture was not reserved"
+    );
+    assert!(buf[(AUTHOR_X, TOP + 1)].diff_option != ratatui::buffer::CellDiffOption::Skip);
     assert_eq!(buf[(AUTHOR_X, TOP + 1)].symbol(), "b");
 }
 
@@ -243,7 +246,7 @@ fn the_picture_replaces_the_initials_once_it_arrives() {
     assert_eq!(written, "");
     let (buf, written) = frame(&mut img, &[row("ada")], &faces(), SCREEN, None);
     assert_eq!(rows_sent(&written), vec![TOP]);
-    assert!(buf[(AUTHOR_X, TOP)].skip);
+    assert!(buf[(AUTHOR_X, TOP)].diff_option == ratatui::buffer::CellDiffOption::Skip);
 }
 
 // ---- the re-emit decision ----

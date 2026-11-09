@@ -273,7 +273,7 @@ mod tests {
 
     fn solid(w: u32, h: u32, rgba: [u8; 4]) -> Bitmap {
         let mut b = Bitmap::transparent(w, h);
-        for px in b.data.chunks_exact_mut(4) {
+        for px in b.data.as_chunks_mut::<4>().0 {
             px.copy_from_slice(&rgba);
         }
         b

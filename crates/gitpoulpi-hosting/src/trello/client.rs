@@ -166,7 +166,7 @@ impl HostingClient for TrelloClient {
                         .get(&c.id_list)
                         .is_some_and(|n| wanted.contains(&n.to_lowercase()))
             })
-            .filter(|c| me.as_ref().map_or(true, |me| c.id_members.contains(me)))
+            .filter(|c| me.as_ref().is_none_or(|me| c.id_members.contains(me)))
             .map(|c| map::map_card(&names, c))
             .collect())
     }

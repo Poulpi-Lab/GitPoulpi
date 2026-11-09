@@ -215,7 +215,7 @@ pub fn lfs_available(cfg: &gitpoulpi_config::Config) -> bool {
 /// `built` reports. Untagged is always offered. Registries call
 /// [`offered`]; tests call this with a fake table.
 pub fn offered_with(requires: Option<Feature>, built: impl Fn(Feature) -> bool) -> bool {
-    requires.map_or(true, built)
+    requires.is_none_or(built)
 }
 
 /// [`offered_with`] for this build.

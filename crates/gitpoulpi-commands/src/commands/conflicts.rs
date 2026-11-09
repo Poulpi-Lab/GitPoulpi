@@ -541,7 +541,7 @@ async fn show(session: &mut Session, path: &str, only: Option<usize>) -> Result<
         .conflicts()
         .enumerate()
         .map(|(i, r)| (i + 1, r))
-        .filter(|(i, _)| only.map_or(true, |n| n == *i))
+        .filter(|(i, _)| only.is_none_or(|n| n == *i))
         .collect();
     let conflicts: Vec<Value> = regions
         .iter()

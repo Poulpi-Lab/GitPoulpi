@@ -276,7 +276,7 @@ fn changes(
                 if found.commits.last() != Some(&oid) {
                     found.commits.push(oid);
                     let n = found.commits.len() as u64;
-                    if n % 256 == 0 {
+                    if n.is_multiple_of(256) {
                         tick(RewritePhase::Walking, n, total)?;
                     }
                 }

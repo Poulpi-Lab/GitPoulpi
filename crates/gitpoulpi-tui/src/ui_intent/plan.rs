@@ -104,7 +104,7 @@ pub(crate) fn find_ref(refs: &[Ref], wanted: &str) -> Option<RefTarget> {
     };
     [RefRowKind::Local, RefRowKind::Remote, RefRowKind::Tag]
         .into_iter()
-        .filter(|k| only.map_or(true, |o| o == *k))
+        .filter(|k| only.is_none_or(|o| o == *k))
         .find_map(|kind| {
             refs.iter()
                 .find(|r| kind_of(r) == kind && ref_full_name(r) == short)

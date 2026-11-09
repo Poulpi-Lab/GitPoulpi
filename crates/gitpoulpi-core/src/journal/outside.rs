@@ -167,7 +167,7 @@ impl OutsideChange {
     /// moved and HEAD stayed on it, or a detached HEAD moved; every other
     /// ref moves alone.
     pub fn effect(&self, head_now: &HeadState) -> Effect {
-        let head_stayed = self.head.as_ref().map_or(true, |h| h.old == h.new);
+        let head_stayed = self.head.as_ref().is_none_or(|h| h.old == h.new);
         let moves_checked_out = match head_now {
             HeadState::Branch(b) => {
                 let full = format!("refs/heads/{b}");

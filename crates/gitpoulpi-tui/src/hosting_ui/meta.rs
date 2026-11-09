@@ -35,7 +35,7 @@ pub(super) fn menu_entries(
     FIELDS
         .into_iter()
         .filter(|f| pr || *f != MetaField::Reviewers)
-        .filter(|f| kind.map_or(true, |k| meta_picker::supports_field(k, *f)))
+        .filter(|f| kind.is_none_or(|k| meta_picker::supports_field(k, *f)))
         .map(|field| {
             Entry::action(
                 label_of(field),
@@ -121,7 +121,7 @@ impl HostingUi {
             .map(|t| t.profile.kind);
         if field != MetaField::Reviewers
             && self.meta_issues()
-            && issue_kind.map_or(true, |k| meta_picker::supports_field(k, field))
+            && issue_kind.is_none_or(|k| meta_picker::supports_field(k, field))
         {
             if let Some(snap) = self.snapshot.as_ref() {
                 if !entries.is_empty() && !snap.issues.is_empty() {

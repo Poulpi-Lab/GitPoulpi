@@ -6,8 +6,11 @@
 //! "ours" / "theirs": during a rebase git swaps their meaning), and up to
 //! [`CONTEXT_LINES`] lines of the text git merged by itself on each side.
 //! It answers with the resolved text of that region only. Everything is
-//! capped ([`SIDE_BUDGET`], [`CONTEXT_BUDGET`], [`MAX_ANSWER_BYTES`]) so a
-//! huge conflict fails with a sentence instead of a provider error.
+//! capped. The size of the three blocks has a limit the user can change
+//! (`ai.limits.conflict_bytes`, default [`SIDE_BUDGET`]): over it,
+//! [`conflict_resolve`] returns [`Error::TooLarge`] and the frontends warn and
+//! offer to send anyway; the context ([`CONTEXT_BUDGET`]) and the answer
+//! ([`MAX_ANSWER_BYTES`]) caps stay internal.
 
 use gitpoulpi_core::domain::{ConflictSide, MergeDocument, MergeRegion};
 
@@ -15,8 +18,9 @@ use crate::{Error, Result};
 
 /// Lines of surrounding merged text sent on each side of the conflict.
 pub const CONTEXT_LINES: usize = 20;
-/// Most bytes the three blocks of the conflict may add up to.
-pub const SIDE_BUDGET: usize = 40_000;
+/// Most bytes the three blocks of the conflict may add up to by default
+/// (`ai.limits.conflict_bytes`).
+pub const SIDE_BUDGET: usize = gitpoulpi_config::DEFAULT_CONFLICT_BYTES;
 /// Most bytes of surrounding context, each side.
 pub const CONTEXT_BUDGET: usize = 6_000;
 /// An answer longer than this is rejected as junk.
@@ -47,6 +51,12 @@ pub struct ConflictContext {
 }
 
 impl ConflictContext {
+    /// Bytes the three blocks add up to: what `ai.limits.conflict_bytes`
+    /// is compared with.
+    pub fn size(&self) -> usize {
+        bytes_of(&self.base) + bytes_of(&self.ours) + bytes_of(&self.theirs)
+    }
+
     /// The context of conflict `n` (0-based) of `doc`, or `None` when the
     /// document has no such conflict.
     pub fn from_document(doc: &MergeDocument, n: usize) -> Option<Self> {
@@ -157,14 +167,17 @@ fn block(title: &str, lines: &[String], fence_lang: &str) -> String {
     out
 }
 
-/// The user message of "suggest a resolution". `Err` when the conflict is
-/// too large to send.
-pub fn conflict_resolve(c: &ConflictContext) -> Result<String> {
-    let total = bytes_of(&c.base) + bytes_of(&c.ours) + bytes_of(&c.theirs);
-    if total > SIDE_BUDGET {
-        return Err(Error::Invalid(format!(
-            "this conflict is too large to send to the AI ({total} bytes; the limit is {SIDE_BUDGET})"
-        )));
+/// The user message of "suggest a resolution". `Err(TooLarge)` when the
+/// conflict is over `limit` bytes (`usize::MAX`: no limit, the user chose to
+/// send it anyway).
+pub fn conflict_resolve(c: &ConflictContext, limit: usize) -> Result<String> {
+    let total = c.size();
+    if total > limit {
+        return Err(Error::TooLarge {
+            what: "conflict",
+            bytes: total,
+            limit,
+        });
     }
     let language = language_of(&c.path);
     let fence = match language {
@@ -353,7 +366,7 @@ mod tests {
 
     #[test]
     fn the_prompt_names_the_file_language_labels_and_all_three_blocks() {
-        let p = conflict_resolve(&ctx()).unwrap();
+        let p = conflict_resolve(&ctx(), SIDE_BUDGET).unwrap();
         assert!(p.contains("conflict 2 of 3 in `src/lib.rs` (Rust)"), "{p}");
         assert!(p.contains("Side A: Current · main"), "{p}");
         assert!(p.contains("Side B: Incoming · feature"), "{p}");
@@ -363,7 +376,7 @@ mod tests {
 
     #[test]
     fn the_context_is_capped_to_twenty_lines_nearest_the_conflict() {
-        let p = conflict_resolve(&ctx()).unwrap();
+        let p = conflict_resolve(&ctx(), SIDE_BUDGET).unwrap();
         assert!(p.contains("before 30") && p.contains("before 11"), "{p}");
         assert!(!p.contains("before 10\n"), "{p}");
         assert!(p.contains("after 1\n") && p.contains("after 20\n"), "{p}");
@@ -375,7 +388,7 @@ mod tests {
         let mut c = ctx();
         c.has_base = false;
         c.base.clear();
-        let p = conflict_resolve(&c).unwrap();
+        let p = conflict_resolve(&c, SIDE_BUDGET).unwrap();
         assert!(p.contains("none: both sides added this"), "{p}");
     }
 
@@ -383,8 +396,32 @@ mod tests {
     fn a_huge_conflict_is_refused_with_a_sentence() {
         let mut c = ctx();
         c.ours = vec!["x".repeat(SIDE_BUDGET + 1)];
-        let err = conflict_resolve(&c).unwrap_err().to_string();
-        assert!(err.contains("too large"), "{err}");
+        let err = conflict_resolve(&c, SIDE_BUDGET).unwrap_err();
+        assert!(matches!(err, Error::TooLarge { .. }), "{err:?}");
+        let said = err.to_string();
+        assert!(
+            said.contains("too large") && said.contains("ai.limits.conflict_bytes"),
+            "{said}"
+        );
+    }
+
+    #[test]
+    fn the_limit_is_the_callers_and_send_anyway_lifts_it() {
+        let mut c = ctx();
+        c.ours = vec!["x".repeat(SIDE_BUDGET + 1)];
+        let size = c.size();
+        assert!(size > SIDE_BUDGET);
+        // Exactly at the limit is fine; one byte under is not.
+        assert!(conflict_resolve(&c, size).is_ok());
+        assert_eq!(
+            conflict_resolve(&c, size - 1),
+            Err(Error::TooLarge {
+                what: "conflict",
+                bytes: size,
+                limit: size - 1
+            })
+        );
+        assert!(conflict_resolve(&c, usize::MAX).is_ok());
     }
 
     #[test]

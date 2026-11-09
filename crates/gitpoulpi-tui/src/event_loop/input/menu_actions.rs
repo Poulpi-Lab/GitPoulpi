@@ -58,12 +58,7 @@ pub(in crate::event_loop) fn apply_wip_action(cx: &mut CommandCtx<'_>, action: W
     if action == WipContextAction::AiExplain {
         commands::explain_wip(cx);
     } else if action == WipContextAction::AiCompose {
-        cx.ai_ui.start_into(
-            cx.session,
-            cx.repo,
-            AiRequest::Compose,
-            &mut *cx.last_message,
-        );
+        commands::start_ai(cx, AiRequest::Compose);
     } else {
         apply_wip_context_action(
             action,
@@ -210,11 +205,6 @@ pub(in crate::event_loop) fn compose_commits(cx: &mut CommandCtx<'_>) {
     } else if !has_wip_row(&*cx.status_result) {
         *cx.last_message = Some(msg::input::NO_CHANGES_TO_SPLIT.get().into());
     } else {
-        cx.ai_ui.start_into(
-            cx.session,
-            cx.repo,
-            AiRequest::Compose,
-            &mut *cx.last_message,
-        );
+        commands::start_ai(cx, AiRequest::Compose);
     }
 }

@@ -18,12 +18,7 @@ pub(super) fn leader(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         // changes into commits (an interactive review).
         Some(Bind::GitAiCompose) if cx.ai_ui.enabled() => {
             if has_wip_row(&*cx.status_result) {
-                cx.ai_ui.start_into(
-                    cx.session,
-                    cx.repo,
-                    AiRequest::Compose,
-                    &mut *cx.last_message,
-                );
+                commands::start_ai(cx, AiRequest::Compose);
             } else {
                 *cx.last_message = Some(msg::input::NO_CHANGES_TO_SPLIT.get().into());
             }

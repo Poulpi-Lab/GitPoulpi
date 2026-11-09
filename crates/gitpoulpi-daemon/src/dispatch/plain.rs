@@ -352,7 +352,16 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
                 },
                 None => CommitOptions::default(),
             };
-            to_json!(backend.commit(&repo, &message, &opts))
+            let committed = backend.commit(&repo, &message, &opts);
+            // Git's own refusal ("Committing is not possible because you have
+            // unmerged files") says nothing about what to do: name the files.
+            let committed = committed.map_err(|e| match backend.conflict_entries(&repo) {
+                Ok(entries) if !entries.is_empty() => {
+                    gitpoulpi_core::Error::Backend(unresolved_conflicts_message(&entries))
+                }
+                _ => e,
+            });
+            to_json!(committed)
         }
         OperationKind::Checkout => {
             let target: CheckoutTarget = arg_or_err!(args, "target", request.id);
@@ -902,5 +911,29 @@ fn failed_typed(request: &Request, error: gitpoulpi_core::Error) -> Dispatched {
         error.to_string(),
         error.typed(),
         error.detail().cloned(),
+    )
+}
+
+/// "cannot commit: 2 files still have conflicts (a.rs, b.rs): resolve them and
+/// stage the results first" - the sentence a commit refused over unmerged
+/// files carries for the CLI and MCP (the TUI asks before it gets here).
+fn unresolved_conflicts_message(entries: &[gitpoulpi_core::domain::ConflictEntry]) -> String {
+    const SHOWN: usize = 5;
+    let mut names: Vec<String> = entries
+        .iter()
+        .take(SHOWN)
+        .map(|e| e.path.to_string_lossy().replace('\\', "/"))
+        .collect();
+    if entries.len() > SHOWN {
+        names.push(format!("and {} more", entries.len() - SHOWN));
+    }
+    let files = if entries.len() == 1 {
+        "1 file still has conflicts".to_string()
+    } else {
+        format!("{} files still have conflicts", entries.len())
+    };
+    format!(
+        "cannot commit: {files} ({}): resolve them and stage the results first",
+        names.join(", ")
     )
 }

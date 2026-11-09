@@ -8925,3 +8925,49 @@ answer_cancel = "Annuleren, niets stagen"
 hint = "Omhoog/Omlaag: kiezen, Enter of 1/2: antwoorden, Esc: annuleren"
 # context: the error line when a stage was refused for sensitive files; {files} is a list of paths. In English it is word for word the text the CLI prints
 sensitive_stage = "gevoelige bestanden zijn niet gestaged: {files}; vraag het de gebruiker en stage dan opnieuw met gevoelige bestanden toegestaan"
+
+[ai_limits]
+# context: Settings > AI, heading of the rows that limit how much input an AI request carries
+settings_heading = "Limits"
+# context: Settings > AI, label of a number: the most bytes one merge conflict may add up to when the AI is asked to resolve it
+conflict_label = "Largest conflict to send (bytes)"
+# context: help under that number
+conflict_help = "Over this size, Suggest a resolution does not fail: it warns, and you can send it anyway once, open this setting or cancel. The limit is GitPoulpi's own guard, not the model's: raise it when your model has the room. 40000 by default."
+# context: red warning under that number while it is very large
+conflict_warning = "A very large limit can send more than the model accepts: the request then fails at the provider."
+# context: title of the dialog shown when a conflict is over the limit
+too_large_title = "Conflict too large to send"
+# context: body of that dialog; {path} is the file, {size} the conflict's size (for example "48.1 KB (49206 bytes)"), {limit} the limit in the same form, {key} the name of the setting
+too_large_body = "The conflict in {path} is {size}, and the limit is {limit} (setting {key}). The limit is GitPoulpi's own guard, not the model's. If you send it anyway, secrets are still replaced and sensitive files are still left out."
+# context: button that sends the oversized conflict this one time
+send_anyway = "Send anyway"
+# context: button that opens Settings on the limit
+open_setting = "Open setting"
+# context: key of the Send anyway button, one letter (shown as "Send anyway (S)")
+key_send = "s"
+# context: key of the Open setting button, one letter
+key_open = "o"
+# context: key of the Cancel button of that dialog, one letter
+key_cancel = "c"
+
+[conflict_guard]
+# context: title of the dialog that says conflicts must be resolved before an action
+title = "Resolve the conflicts first"
+# context: first line of that dialog; {n} files have unresolved conflicts
+count = { one = "{n} file still has conflicts", other = "{n} files still have conflicts" }
+# context: last line of the list of files in that dialog; {n} more files are not listed
+more = "and {n} more"
+# context: second paragraph of the dialog when the AI commit composer was asked
+compose_hint = "The AI cannot split the changes into {$commits} while files have conflicts. Resolve them, then ask again."
+# context: second paragraph of the dialog when a commit was asked
+commit_hint = "A {$commit} needs every conflict resolved first. Resolve them, {$stage} the results, then {$commit} again."
+# context: button that opens the conflict resolution view
+resolve = "Resolve conflicts"
+# context: key of the Resolve conflicts button, one letter (shown as "Resolve conflicts (R)")
+key_resolve = "r"
+# context: key of the Cancel button of that dialog, one letter
+key_cancel = "c"
+# context: label of the disabled Commit button while files have conflicts
+need_resolve = "Resolve conflicts to {$commit}"
+# context: palette: why a command does nothing while files have conflicts
+why_commit = "files still have conflicts: resolve them first"

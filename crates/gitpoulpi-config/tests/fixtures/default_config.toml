@@ -217,6 +217,9 @@ extra_file = ""
 redact_secrets = true
 exclude_sensitive_files = true
 
+[ai.limits]
+conflict_bytes = 40000
+
 [ai.sent_preview]
 code_review = true
 commit_composer = true

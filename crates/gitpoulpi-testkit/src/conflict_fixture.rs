@@ -300,6 +300,32 @@ impl ConflictFixture {
         )
     }
 
+    /// [`ConflictFixture::text`] with a big conflict at line 3: each side is
+    /// about `side_bytes` of 60-column lines (`first_ours_line` leads ours),
+    /// for the AI input size limit.
+    pub fn large_text(side_bytes: usize, first_ours_line: &str) -> Self {
+        let block = |who: &str, lead: &str| -> String {
+            let mut text = String::from(lead);
+            let mut n = 0;
+            while text.len() < side_bytes {
+                n += 1;
+                text.push_str(&format!("{who} filler line {n:05} {}\n", "x".repeat(38)));
+            }
+            text.pop();
+            text
+        };
+        let ours = block("ours", &format!("{first_ours_line}\n"));
+        let theirs = block("theirs", "");
+        scenario(
+            FixtureOperation::Merge,
+            true,
+            &["notes.txt"],
+            &|r| write(r, "notes.txt", lines_with(10, &[]).as_bytes()),
+            &|r| write(r, "notes.txt", lines_with(10, &[(3, &ours)]).as_bytes()),
+            &|r| write(r, "notes.txt", lines_with(10, &[(3, &theirs)]).as_bytes()),
+        )
+    }
+
     /// Three files (one in a folder), several conflicts in the first.
     /// Paths come back sorted.
     pub fn multi_conflict() -> Self {

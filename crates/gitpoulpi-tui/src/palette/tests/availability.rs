@@ -259,6 +259,24 @@ fn conflict_resolution_distinguishes_no_conflicts_from_no_selection() {
     }
 }
 
+/// Git refuses to commit unmerged files: both commit commands are grayed with
+/// the reason while files still have conflicts, and run as before without.
+#[test]
+fn commit_commands_are_unavailable_while_files_have_conflicts() {
+    let clean = PaletteContext::default();
+    let conflicted = PaletteContext {
+        has_conflicts: true,
+        ..PaletteContext::default()
+    };
+    for cmd in [PaletteCommand::Commit, PaletteCommand::CommitNow] {
+        assert_eq!(unavailable_reason(cmd, clean), None, "{cmd:?}");
+        assert!(
+            unavailable_reason(cmd, conflicted).is_some_and(|r| r.contains("conflicts")),
+            "{cmd:?}"
+        );
+    }
+}
+
 /// Rebase asks for the same thing Merge does - a local branch in the
 /// sidebar - and must not become available a frame earlier or later
 /// than it does.

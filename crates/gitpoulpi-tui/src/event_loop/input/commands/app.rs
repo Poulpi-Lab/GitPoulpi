@@ -481,12 +481,7 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             *cx.compose_move_requested = true;
         }
         PaletteCommand::AiComposeCommits => {
-            cx.ai_ui.start_into(
-                cx.session,
-                cx.repo,
-                AiRequest::Compose,
-                &mut *cx.last_message,
-            );
+            super::start_ai(cx, AiRequest::Compose);
         }
         PaletteCommand::StashPushWithMessage => {
             *cx.input_mode = InputMode::ComposingRefName {

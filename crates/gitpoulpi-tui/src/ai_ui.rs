@@ -144,6 +144,9 @@ pub(crate) enum AiRequest {
         path: String,
         conflict: usize,
         context: Box<prompts::ConflictContext>,
+        /// The user saw the "too large" warning and chose "Send anyway":
+        /// this one request ignores `ai.limits.conflict_bytes`.
+        oversize_ok: bool,
     },
     /// A history rewrite script for `instruction`; `sample` is what the user
     /// agreed to send along (empty unless the box was ticked).
@@ -290,6 +293,12 @@ impl AiUi {
         self.config = gitpoulpi_config::Settings::resolve_ambient()
             .map(|s| s.config().ai.clone())
             .unwrap_or_default();
+    }
+
+    /// `ai.limits.conflict_bytes`: the size over which a conflict is not sent
+    /// without asking.
+    pub(crate) fn conflict_limit(&self) -> usize {
+        self.config.limits.conflict_bytes_clamped()
     }
 
     /// Whether AI entry points are shown at all.
@@ -774,11 +783,13 @@ async fn execute(
             .map(AiAnswer::StashMessage),
         AiRequest::Compose => compose(&config, &session, &repo).await.map(AiAnswer::Plan),
         AiRequest::SplitCommit { oid, .. } => split_commit(&config, &session, &repo, oid).await,
-        AiRequest::ResolveConflict { context, .. } => {
-            resolve_conflict(&config, &session, &repo, &context)
-                .await
-                .map(AiAnswer::Resolution)
-        }
+        AiRequest::ResolveConflict {
+            context,
+            oversize_ok,
+            ..
+        } => resolve_conflict(&config, &session, &repo, &context, oversize_ok)
+            .await
+            .map(AiAnswer::Resolution),
         AiRequest::RewriteScript {
             instruction,
             sample,
@@ -1374,8 +1385,16 @@ async fn resolve_conflict(
     session: &str,
     repo: &RepoRef,
     context: &prompts::ConflictContext,
+    oversize_ok: bool,
 ) -> Result<Vec<String>, String> {
     let job = prepare(config, session, repo, AiAction::ConflictResolve)?;
+    // Past the warning: the privacy pipeline (`prepare` hooked it in) still
+    // cleans the request exactly like any other.
+    let job = if oversize_ok {
+        job.without_conflict_limit()
+    } else {
+        job
+    };
     job.resolve_conflict(context)
         .await
         .map_err(|e| e.to_string())

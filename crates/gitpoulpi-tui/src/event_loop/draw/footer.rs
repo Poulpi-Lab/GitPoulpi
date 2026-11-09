@@ -130,6 +130,8 @@ pub(in crate::event_loop) fn draw_footer(
         // not a status-bar line -- a destructive action deserves a
         // real modal, not text a user could miss.
         InputMode::Confirm { .. } => String::new(),
+        // The dialog names its own keys on its buttons.
+        InputMode::Guide(_) => String::new(),
         // The popup names its own keys.
         InputMode::EditingCommitMessage(_) => String::new(),
         InputMode::InteractiveRebase(_) => String::new(),

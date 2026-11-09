@@ -364,3 +364,23 @@ fn delete_accepts_a_deletion_and_exactly_one_way_is_required() {
 
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();
+
+/// Git's own "Committing is not possible because you have unmerged files"
+/// says nothing about what to do: the CLI (and MCP) get a sentence naming the
+/// files, from the daemon, whichever backend refused.
+#[test]
+fn a_commit_with_unresolved_conflicts_says_which_files_and_what_to_do() {
+    let f = ConflictFixture::text();
+    let s = "cli-conflicts-commit";
+    let head = f.git(&["rev-parse", "HEAD"]);
+    let (code, json) = run(f.root(), s, &["commit", "-m", "too early"]);
+    assert_ne!(code, 0, "{json}");
+    let said = json.to_string();
+    assert!(
+        said.contains("cannot commit: 1 file still has conflicts (notes.txt)")
+            && said.contains("resolve them and stage the results first"),
+        "{said}"
+    );
+    assert!(!said.contains("exit 128"), "{said}");
+    assert_eq!(f.git(&["rev-parse", "HEAD"]), head, "nothing committed");
+}

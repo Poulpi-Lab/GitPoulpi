@@ -273,6 +273,7 @@ fn handle_mouse_inner(
         InputMode::EditingCommitMessage(_) => {
             return mouse_modes::editing_commit_message(cx, mouse)
         }
+        InputMode::Guide(_) => return mouse_modes::guide(cx, mouse),
         InputMode::ComposeCommits(_) => return mouse_modes::composer_review(cx, mouse),
         InputMode::SplitCommit(_) => return mouse_modes::split_commit(cx, mouse),
         InputMode::Rewrite(_) => return mouse_modes::rewrite(cx, mouse),

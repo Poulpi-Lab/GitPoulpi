@@ -313,6 +313,8 @@ The key paths apply to the next transfer. A `~/` prefix means your home folder.
 
 A setting made elsewhere always wins over these paths. The order, highest first:
 
+0. A key chosen for one repository on its own
+   [SSH & credentials](#repo-specific-ssh--credentials) page (the repo-specific group).
 1. `GIT_SSH_COMMAND` or `GIT_SSH` in the environment GitPoulpi runs in.
 2. `core.sshCommand` in the repository's git config or your global git config.
    The tab menu's *SSH key...* item writes this for one repository.
@@ -548,6 +550,47 @@ Three options are on the **General** tab.
 | **Install LFS filters before pull and push** | Before a pull or a push, runs `git lfs install --local` when the repository uses LFS and its filters are missing. |
 | **git-lfs program** | The detected `git-lfs` program (read-only). |
 | **Initialize LFS for this repository** | Runs `git lfs install --local` now. |
+
+### Repo-specific: SSH & credentials
+
+`gitpoulpi ui show settings ssh-credentials`. How *this repository* signs in, kept in GitPoulpi's private folder: nothing
+is written to the repository or to git's config, and it is not undoable (like any setting). It is used by fetch, pull,
+push, submodules and LFS of this repository only. The CLI twin is `gitpoulpi repo-auth`
+(see the [CLI reference](cli-reference.md)). The page is also reached from the command palette:
+**Repository: SSH & Credentials...**. Nothing is sent until you press **Save**; the page asks the daemon, so it never
+blocks.
+
+| Row | What it does |
+|---|---|
+| **HTTPS: Sign in with** | **System** (git's own helpers, the default), **GitPoulpi account** (the token of an integration; accounts whose host is one of this repository's remotes come first, and the line under it says what the last token check found: missing and extra scopes), **Credential helper** or **Token command**. |
+| **Git username** | Sent as the user name of HTTPS remotes. With **System** it lets a credential manager pick one of several stored accounts. |
+| **Ignore credential helpers set by this repository** | **System** only. The helpers the repository sets for itself (its `.git/config`, files it includes) are listed under it with the file each comes from; the system and global helpers keep working. |
+| **Helper**, **Command**, **Hosts**, **Cache (minutes)** | A command the repository runs to sign in. A *helper* is a git credential helper; a *token command* prints a token (the argument list is split by spaces, with quotes around an argument that holds spaces, and shown under **Runs as**; no shell runs it, it runs in the repository folder). **Hosts** limits it to those hosts (empty: the host of the main remote); **Cache** is how long a token is reused (50 minutes by default). **Use this repository's current helper** copies the helper the repository sets into the field. |
+| **SSH: Sign in with** | **System** (ssh's own setup, the agent and the default keys), **Key file** or **Account key** (the key of an integration). |
+| **Private key file** | Pick one of the keys found in `~/.ssh` or type a path. Only this key is offered, to every SSH remote of the repository, submodules included. |
+| **Known hosts file**, **Strict host key checking** | An optional file of trusted host keys, and refusing a host that is not in it. |
+| **ssh program** | The program that will run (read-only). |
+| **Remotes** | Read-only: each remote with its protocol and the identity it will use. Settings the profile overrides (`core.sshCommand`, `credential.helper`) are listed with their file, and a profile that cannot be used says why. |
+
+Buttons (a key for each: `Tab`/`Left`/`Right` between them, `Enter` presses):
+
+- **Test connection** checks every remote with the saved choices, fetch first and then push (no data moves), and opens
+  a results panel: per remote, ok or failed, the identity that answered (the key the server accepted, or the account
+  whose token was accepted), the duration, and a plain reading of a failure. It runs in the background, with a spinner
+  after a moment. The panel scrolls with `Up`/`Down`, `PgUp`/`PgDn`, `Home`/`End`, the wheel and its scrollbar, and
+  closes with `Esc` or its cross. The palette twin is **Repository: Test Connection**.
+- **Save** sends the choices. **Revert** drops the unsaved ones. Closing Settings with unsaved choices asks first.
+- **Use defaults** asks, then forgets the profile: git's helpers for HTTPS and ssh's own setup for SSH. The palette twin
+  is **Repository: Use Default Credentials**, which asks as well.
+
+Saving a **Credential helper** or a **Token command** first asks **Allow this command?**: the command is shown word for
+word (control characters are spelled out, long lines wrap), with its SHA-256 and two answers, `1` **Save and allow**
+and `2` **Cancel**. No answer is chosen until you press an arrow key or a digit, so a stray `Enter` does nothing;
+`Esc`, **Cancel** and the cross of the panel all cancel. `PgUp`/`PgDn`/`Home`/`End` and the scrollbar scroll a long
+command. If the command is stored already and unchanged, saving the other half of the page does not ask again.
+
+A profile that cannot be used (a missing key file, a source this version does not run yet) makes the transfer fail
+with its reason instead of falling back to the machine's own identity.
 
 ### Repo-specific: Sparse checkout
 

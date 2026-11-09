@@ -133,7 +133,8 @@ impl PreferencesState {
             .overrides
             .iter()
             .find(|o| {
-                o.key == "core.sshCommand" && matches!(o.scope.as_str(), "local" | "worktree")
+                o.key.eq_ignore_ascii_case("core.sshCommand")
+                    && matches!(o.scope.as_str(), "local" | "worktree")
             })
             .map(|o| o.value.clone())
     }

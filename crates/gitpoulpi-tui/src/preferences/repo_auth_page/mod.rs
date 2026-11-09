@@ -683,7 +683,7 @@ impl PreferencesState {
             .view
             .overrides
             .iter()
-            .filter(|o| o.key == "core.sshCommand")
+            .filter(|o| o.key.eq_ignore_ascii_case("core.sshCommand"))
             .find(|o| !want_global || matches!(o.scope.as_str(), "global" | "system"))
             .map_or_else(
                 || t::SSH_PROGRAM_DEFAULT.get().to_string(),

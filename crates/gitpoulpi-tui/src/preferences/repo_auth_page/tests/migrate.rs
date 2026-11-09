@@ -12,7 +12,7 @@ fn pinned_page(dir: &std::path::Path, command: &str) -> (PreferencesState, RawQu
     st.ra_take_view(
         RepoAuthView {
             overrides: vec![AuthOverride {
-                key: "core.sshCommand".into(),
+                key: "core.sshcommand".into(),
                 value: command.into(),
                 scope: "local".into(),
                 origin: "file:.git/config".into(),

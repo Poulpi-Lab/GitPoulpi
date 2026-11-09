@@ -5082,7 +5082,7 @@ undo_no_such_entry = "im Rückgängig-Verlauf gibt es keinen Vorgang Nr. {id}"
 split_refused = "dieser {$commit} lässt sich nicht aufteilen: {reason}"
 undo_purged = "der alte Verlauf von Vorgang #{entry} wurde bereinigt, daher lässt er sich nicht rückgängig machen oder wiederholen"
 undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
-undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
+undo_remote_object_missing = "{object} is no longer in this repository (it was garbage collected), so the branch or {$tag} cannot be restored on the remote with a {$push_noun}"
 
 [window]
 connecting = "Verbindung zum Sitzungs-Daemon wird hergestellt..."

@@ -5075,7 +5075,7 @@ undo_no_such_entry = "no hay ninguna operación n.º {id} en el historial de des
 split_refused = { git = "no se puede dividir ese {$commit}: {reason}", local = "no se puede dividir esa {$commit}: {reason}" }
 undo_purged = "el historial antiguo de la operación #{entry} se purgó, así que no se puede deshacer ni rehacer"
 undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
-undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
+undo_remote_object_missing = "{object} is no longer in this repository (it was garbage collected), so the branch or {$tag} cannot be restored on the remote with a {$push_noun}"
 
 [window]
 connecting = "conectando con el daemon de la sesión..."

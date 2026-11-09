@@ -5080,7 +5080,7 @@ undo_no_such_entry = "в історії скасувань немає опера
 split_refused = "не вдалося розділити цей {$commit}: {reason}"
 undo_purged = "стару історію операції #{entry} очищено, тому її не можна ні скасувати, ні повторити"
 undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
-undo_remote_object_missing = "{commit} is no longer in this repository (it was garbage collected), so the remote branch or tag cannot be pushed back"
+undo_remote_object_missing = "{object} is no longer in this repository (it was garbage collected), so the branch or {$tag} cannot be restored on the remote with a {$push_noun}"
 
 [window]
 connecting = "підключення до демона сесії..."

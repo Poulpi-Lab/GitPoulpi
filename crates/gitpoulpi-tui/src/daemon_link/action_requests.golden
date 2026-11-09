@@ -155,12 +155,11 @@
   TagCreate {"annotated_message":"release","at":"0404040404040404040404040404040404040404","name":"v1"}
   ok: true
 == BranchDeleteRemote { remote: "origin", name: "topic", and_local: None }
-  BranchDeleteRemote {"name":"topic","remote":"origin"}
+  BranchDeleteRemote {"and_local":null,"name":"topic","remote":"origin"}
   message: deleted branch topic from origin
   ok: true
 == BranchDeleteRemote { remote: "origin", name: "topic", and_local: Some("topic") }
-  BranchDeleteRemote {"name":"topic","remote":"origin"}
-  BranchDelete {"name":"topic"}
+  BranchDeleteRemote {"and_local":"topic","name":"topic","remote":"origin"}
   message: deleted branch topic and origin/topic
   ok: true
 == TagAnnotate { name: "v1", message: "notes" }
@@ -180,8 +179,7 @@
   message: deleted tag v1 from origin
   ok: true
 == TagDeleteBoth { remote: "origin", name: "v1" }
-  TagDeleteRemote {"name":"v1","remote":"origin"}
-  TagDelete {"name":"v1"}
+  TagDeleteRemote {"and_local":true,"name":"v1","remote":"origin"}
   message: Deleted v1 here and on origin. Undo restores it only here; do a push to put it back on origin.
   ok: true
 == TagDeleteKeepRemote { name: "v1", remotes: ["origin"] }

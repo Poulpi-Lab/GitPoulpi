@@ -298,8 +298,7 @@ impl UndoRefusal {
     pub fn message(&self) -> String {
         match self {
             UndoRefusal::NothingToUndo => "nothing to undo (a push, a fetch or anything else \
-                 done on a remote server is never undone, except deleting a remote \
-                 branch or tag)"
+                 done on a remote server is never undone)"
                 .into(),
             UndoRefusal::NothingToRedo => "nothing to redo".into(),
             UndoRefusal::Disabled => UNDO_DISABLED_MESSAGE.into(),
@@ -372,16 +371,16 @@ impl UndoRefusal {
                     actual,
                 } = &**moved;
                 format!(
-                "{} on {remote} is {}, not {} as the operation left it: it was changed on the \
-                 remote since, so nothing was pushed or deleted there",
+                "{} on {remote} is at {}, not at {} where the operation left it: it was changed \
+                 on the remote since, so nothing was pushed or deleted there",
                 display_ref_name(name),
-                actual.map_or_else(|| "gone".to_string(), |o| format!("at {}", short(o))),
-                expected.map_or_else(|| "gone".to_string(), |o| format!("at {}", short(o))),
+                actual.map_or_else(|| "nothing".to_string(), short),
+                expected.map_or_else(|| "nothing".to_string(), short),
                 )
             }
             UndoRefusal::RemoteObjectMissing { oid } => format!(
-                "{} is no longer in this repository (it was garbage collected), so the remote \
-                 branch or tag cannot be pushed back",
+                "{} is no longer in this repository (it was garbage collected), so the branch or \
+                 tag cannot be restored on the remote with a push",
                 short(*oid)
             ),
             UndoRefusal::StaleEntry {

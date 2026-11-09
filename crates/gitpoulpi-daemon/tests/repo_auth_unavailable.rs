@@ -157,8 +157,8 @@ async fn a_profile_that_cannot_be_used_refuses_the_transfer() {
         error.message
     );
 
-    // The account source is stored (a later version resolves it) but refuses
-    // the transfer today, and the view says so.
+    // An account source that names an account this machine does not have is
+    // stored, but refuses the transfer, and the view says so.
     rig.call(
         OperationKind::RepoAuthSet,
         set(RepoAuthProfile {
@@ -172,14 +172,14 @@ async fn a_profile_that_cannot_be_used_refuses_the_transfer() {
     .await
     .unwrap();
     let error = rig.fetch().await.expect_err("the account source refuses");
-    assert!(unavailable_reason(&error).contains("not available yet"));
+    assert!(unavailable_reason(&error).contains("no longer exists"), "{error:?}");
     let view = rig.view().await;
     assert!(view.configured);
     assert!(view
         .unavailable
         .as_deref()
         .unwrap()
-        .contains("not available yet"));
+        .contains("no longer exists"));
     assert_eq!(view.summary.as_deref(), Some("HTTPS: work"));
 
     // Hand-written helper and token command entries (the file is the source

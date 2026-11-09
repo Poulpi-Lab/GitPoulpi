@@ -216,3 +216,46 @@ fn two_bad_answers_give_the_second_error() {
     assert!(matches!(out, Err(Error::Invalid(m)) if m.contains("H9")));
     assert_eq!(sent.len(), 2);
 }
+
+/// A commit whose hunks are over `ai.limits.diff_bytes`: with nobody to ask
+/// the pieces past the budget lose their diff (today's cut) and the run
+/// reports it; `send_all` sends every hunk.
+#[test]
+fn hunks_over_the_diff_cap_are_cut_and_reported_or_sent_whole() {
+    let big = {
+        let mut s = source();
+        s.files[0].hunks[0].lines = (0..4_000)
+            .map(|i| DiffLine {
+                origin: LineOrigin::Add,
+                content: format!("    call_{i}();\n"),
+                staged: false,
+            })
+            .collect();
+        s
+    };
+    let ask = |job: Job| {
+        let client = Script(Mutex::new(vec![fixture("ok_plain")]), Mutex::default());
+        let parts = tokio::runtime::Builder::new_current_thread()
+            .build()
+            .unwrap()
+            .block_on(job.plan_split_with(&client, &big));
+        let sent = client.1.lock().unwrap().clone();
+        (parts.unwrap(), sent, job.truncated())
+    };
+    let (_, sent, cuts) = ask(job());
+    assert!(sent[0].contains("[diff truncated: showing"), "{}", sent[0]);
+    assert!(
+        sent[0].contains("(diff omitted)"),
+        "later pieces lose their hunk"
+    );
+    assert_eq!(cuts.len(), 1);
+    assert_eq!(cuts[0].part, gitpoulpi_ai::Part::SplitHunks);
+    assert_eq!(cuts[0].setting, "ai.limits.diff_bytes");
+    assert_eq!(cuts[0].limit, 60_000);
+    assert!(cuts[0].bytes > 60_000);
+
+    let (_, sent, cuts) = ask(job().with_send_all(true));
+    assert!(!sent[0].contains("diff truncated") && !sent[0].contains("diff omitted"));
+    assert!(sent[0].contains("call_3999();"), "the whole hunk");
+    assert!(cuts.is_empty());
+}

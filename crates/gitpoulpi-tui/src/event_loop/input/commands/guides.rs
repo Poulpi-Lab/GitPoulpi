@@ -67,6 +67,16 @@ pub(in crate::event_loop) fn start_ai(cx: &mut CommandCtx<'_>, request: AiReques
         .start_into(cx.session, cx.repo, request, &mut *cx.last_message);
 }
 
+/// Opens Settings on the limit "Open setting" of the truncation dialog chose
+/// (`ai_limit_dialog`), once.
+pub(in crate::event_loop) fn open_limit_setting(cx: &mut CommandCtx<'_>) {
+    if let Some(key) = crate::ai_limit_dialog::take_open_setting() {
+        let mut state = PreferencesState::open(cx.repo_root);
+        let _ = state.show_page(None, Some(key));
+        *cx.preferences = Some(state);
+    }
+}
+
 /// A key while the dialog is open.
 pub(in crate::event_loop) fn guide_key(cx: &mut CommandCtx<'_>, key: KeyEvent) {
     drive(cx, |dialog| dialog.on_key(key));
@@ -108,6 +118,9 @@ fn apply(cx: &mut CommandCtx<'_>, dialog: GuideDialog, choice: Choice) {
             cx.ai_ui
                 .start_into(cx.session, cx.repo, request, &mut *cx.last_message);
         }
+        // Never in the window's input mode: a worker asks it (`ai_limit_dialog`).
+        (Kind::Truncation, _) => {}
+        (Kind::TooLarge(_), Choice::Truncated) => {}
         // Settings, on the limit's row.
         (Kind::TooLarge(_), Choice::Secondary) => {
             let mut state = PreferencesState::open(cx.repo_root);

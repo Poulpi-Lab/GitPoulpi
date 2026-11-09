@@ -18,10 +18,21 @@ impl CommitMessage {
     }
 }
 
-pub(crate) async fn generate_commit_message(_: &mut Session) -> Result<CommitMessage, String> {
+/// Stands in for `gitpoulpi_ai::Cut`.
+pub(crate) struct Cut;
+
+pub(crate) async fn generate_commit_message(
+    _: &mut Session,
+    _: bool,
+) -> Result<(CommitMessage, Vec<Cut>), String> {
     Err(not_built())
 }
 
-pub(crate) async fn generate_stash_message(_: &mut Session) -> Result<String, String> {
+pub(crate) async fn generate_stash_message(
+    _: &mut Session,
+    _: bool,
+) -> Result<(String, Vec<Cut>), String> {
     Err(not_built())
 }
+
+pub(crate) fn report_truncated(_: &mut serde_json::Value, _: &mut String, _: &[Cut]) {}

@@ -309,3 +309,42 @@ mod tests {
         assert!(to_argv(&s, &args).is_err());
     }
 }
+
+#[cfg(all(test, feature = "ai"))]
+mod ai_limit_tests {
+    use super::*;
+    use crate::registry;
+    use serde_json::json;
+
+    /// The AI tools take `send_all` (the CLI's `--send-all`): an agent that
+    /// cannot answer a dialog can still ask for every input to be sent whole.
+    /// The `truncated` field of the answer comes from the shared command layer.
+    #[test]
+    fn the_ai_tools_take_send_all_and_it_reaches_clap() {
+        let tool = |name: &str| {
+            registry::tools()
+                .into_iter()
+                .find(|s| s.name == name)
+                .unwrap_or_else(|| panic!("no such tool: {name}"))
+        };
+        for name in [
+            "ai_commit_message",
+            "ai_explain",
+            "ai_resolve_conflict",
+            "ai_split_plan",
+            "hosting_review_suggest",
+            "commit",
+            "stash_push",
+        ] {
+            let schema = crate::schema::arg_schema(&tool(name).command);
+            assert_eq!(
+                schema["properties"]["send_all"]["type"], "boolean",
+                "{name}: {schema}"
+            );
+        }
+        let args: Map<String, Value> = json!({ "send_all": true }).as_object().unwrap().clone();
+        let argv = to_argv(&tool("ai_commit_message"), &args).unwrap();
+        assert!(argv.contains(&"--send-all".to_string()), "{argv:?}");
+        assert!(parse(&argv).is_ok());
+    }
+}

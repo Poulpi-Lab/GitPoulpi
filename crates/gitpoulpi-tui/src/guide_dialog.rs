@@ -13,6 +13,9 @@
 //!   `ai.limits.*`: the size and the limit, [Send anyway] (this request only;
 //!   the request still goes through the privacy pipeline), [Open setting]
 //!   (Settings on the limit's row) and [Cancel].
+//! * **Truncation** (`Truncation`, built and hosted by `ai_limit_dialog`):
+//!   the same warning for the inputs the AI would have silently cut: [Send
+//!   all], [Send truncated], [Open setting] and [Cancel].
 
 use std::cell::RefCell;
 
@@ -35,8 +38,11 @@ const LISTED: usize = 8;
 pub(crate) enum Choice {
     /// Resolve conflicts / Send anyway.
     Primary,
-    /// Open setting (the "too large" dialog only).
+    /// Open setting (the "too large" and truncation dialogs).
     Secondary,
+    /// Send truncated (the truncation dialog only; `Primary` is Send all).
+    #[cfg_attr(not(feature = "ai"), allow(dead_code))]
+    Truncated,
     Cancel,
 }
 
@@ -55,6 +61,9 @@ pub(crate) enum Kind {
     /// An AI request held back; "Send anyway" starts it with its
     /// `oversize_ok` flag set.
     TooLarge(Box<AiRequest>),
+    /// Inputs over their caps, asked by a worker (`ai_limit_dialog`).
+    #[cfg_attr(not(feature = "ai"), allow(dead_code))]
+    Truncation,
 }
 
 #[derive(Debug, Clone)]
@@ -74,12 +83,12 @@ pub(crate) enum Outcome {
     Chose(Choice),
 }
 
-fn key_of(m: gitpoulpi_i18n::M) -> char {
+pub(crate) fn key_of(m: gitpoulpi_i18n::M) -> char {
     m.get().chars().next().unwrap_or(' ').to_ascii_lowercase()
 }
 
 /// "Send anyway (S)": the label with its key.
-fn labelled(label: &str, key: char) -> String {
+pub(crate) fn labelled(label: &str, key: char) -> String {
     format!("{label} ({})", key.to_ascii_uppercase())
 }
 
@@ -156,6 +165,21 @@ impl GuideDialog {
                 (open, Choice::Secondary),
                 (cancel, Choice::Cancel),
             ],
+        }
+    }
+
+    /// A dialog of `kind` made of its parts (the truncation dialog's text is
+    /// built where the cuts are known).
+    #[cfg_attr(not(feature = "ai"), allow(dead_code))]
+    pub(crate) fn assemble(
+        kind: Kind,
+        confirm: Confirm<Choice>,
+        keys: Vec<(char, Choice)>,
+    ) -> Self {
+        Self {
+            kind,
+            confirm: RefCell::new(confirm),
+            keys,
         }
     }
 

@@ -10,9 +10,20 @@ use super::*;
 
 pub(super) async fn stash(session: &mut Session, action: StashAction) -> Result<Emitted, String> {
     match action {
-        StashAction::Push { message, ai } => {
+        StashAction::Push {
+            message,
+            ai,
+            send_all,
+        } => {
+            if send_all && !ai {
+                return Err("--send-all goes with --ai: it sends the whole diff to the AI".into());
+            }
+            let mut truncated = Vec::new();
             let message = if ai {
-                Some(crate::ai_cmd::generate_stash_message(session).await?)
+                let (message, cuts) =
+                    crate::ai_cmd::generate_stash_message(session, send_all).await?;
+                truncated = cuts;
+                Some(message)
             } else {
                 message
             };
@@ -22,16 +33,18 @@ pub(super) async fn stash(session: &mut Session, action: StashAction) -> Result<
                     json!({ "message": message, "include_untracked": false }),
                 )
                 .await?;
-            Ok(match id {
-                Some(id) => emitted(
+            let (mut out, mut human) = match id {
+                Some(id) => (
                     json!({ "stash": id }),
                     format!("stashed as stash@{{{}}}", id.0),
                 ),
-                None => emitted(
+                None => (
                     json!({ "stash": null }),
                     "No local changes to save".to_string(),
                 ),
-            })
+            };
+            crate::ai_cmd::report_truncated(&mut out, &mut human, &truncated);
+            Ok(emitted(out, human))
         }
         StashAction::Pop { id } => {
             let id = stash_id(id)?;

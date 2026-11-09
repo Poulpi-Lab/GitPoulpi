@@ -684,9 +684,9 @@ pub(super) async fn suggest(
     number: u64,
     remote: Option<String>,
     run: gitpoulpi_config::RepoAiReview,
+    send_all: bool,
 ) -> Result<Emitted, String> {
     use gitpoulpi_ai::prompts::{ReviewPrompt, ReviewThreadBrief};
-    use gitpoulpi_ai::review_context::gather_report;
 
     let root = ipc
         .as_deref()
@@ -707,7 +707,8 @@ pub(super) async fn suggest(
         );
     }
     // Fail before any network call when the AI cannot run.
-    let job = crate::ai_cmd::job_for_root(root.as_deref(), gitpoulpi_config::AiAction::CodeReview)?;
+    let job = crate::ai_cmd::job_for_root(root.as_deref(), gitpoulpi_config::AiAction::CodeReview)?
+        .with_send_all(send_all);
     let workdir = context.run_in_repository.apply(job.profile.workdir);
     let job = job.with_workdir(Some(workdir));
     let client = client_for_target(env, target)?;
@@ -767,25 +768,24 @@ pub(super) async fn suggest(
             branch: detail.summary.target_branch.clone(),
         },
     };
-    let gathered = gather_report(
-        &context,
-        &super::review_ctx::SuggestSource {
-            base,
-            env,
-            integrations: &target.integrations,
-        },
-    )
-    .await;
+    // The context files, the description, the comments and the diff are read
+    // and capped together (`[ai.limits]`); what was cut is reported.
     let outcome = job
-        .suggest_review(&ReviewPrompt {
-            title: &detail.summary.title,
-            description: &detail.body,
-            files: &files,
-            threads: &briefs,
-            context: &gathered.files,
-            in_repository: false,
-            budget: 0,
-        })
+        .suggest_review_with_context(
+            &context,
+            &super::review_ctx::SuggestSource {
+                base,
+                env,
+                integrations: &target.integrations,
+            },
+            &ReviewPrompt {
+                title: &detail.summary.title,
+                description: &detail.body,
+                files: &files,
+                threads: &briefs,
+                ..ReviewPrompt::default()
+            },
+        )
         .await
         .map_err(|e| e.to_string())?;
     let mut human = Vec::new();
@@ -811,15 +811,18 @@ pub(super) async fn suggest(
     out["suggestions"] = json_of(&outcome.suggestions.suggestions)?;
     out["cut"] = json!(outcome.cut);
     out["left_out"] = json!(outcome.left_out);
+    if !outcome.truncated.is_empty() {
+        out["truncated"] = json!(outcome.truncated);
+    }
     out["posted"] = json!(false);
     out["context"] = json!({
         "effective": crate::ai_review_ctx::effective_json(&context),
-        "files": gathered
-            .files
+        "files": outcome
+            .context_given
             .iter()
-            .map(|f| json!({ "label": f.label, "cut": f.cut }))
+            .map(|label| json!({ "label": label, "cut": outcome.context_cut.contains(label) }))
             .collect::<Vec<_>>(),
-        "problems": gathered.problems,
+        "problems": outcome.context_problems,
         "agent_in_repository": job.runs_in_repository(),
     });
     let privacy = job.privacy_report().summary();
@@ -846,6 +849,7 @@ pub(super) async fn suggest(
     _number: u64,
     _remote: Option<String>,
     _run: gitpoulpi_config::RepoAiReview,
+    _send_all: bool,
 ) -> Result<Emitted, String> {
     Err(gitpoulpi_core::Error::NotBuilt { feature: "ai" }.to_string())
 }

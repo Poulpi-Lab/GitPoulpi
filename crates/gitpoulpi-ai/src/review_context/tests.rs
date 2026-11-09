@@ -541,3 +541,37 @@ fn the_description_names_the_files_and_the_run_mode() {
         .describe()
         .contains("no project conventions"));
 }
+
+#[test]
+fn every_file_over_a_cap_is_reported_with_the_cap_to_raise() {
+    use crate::limits::{Cut, Part};
+    let source = Fake::default()
+        .with("CLAUDE.md", &"c".repeat(9_000))
+        .with("AGENTS.md", &"a".repeat(9_000))
+        .with("docs/extra.md", &"e".repeat(2_000));
+    let got = block_on(gather_report(&ctx(true, true, "docs/extra.md"), &source));
+    assert_eq!(
+        got.cuts,
+        [
+            Cut::new(Part::ContextFile, "CLAUDE.md", 9_000, 8_192),
+            // The second file is cut by its own cap too (8192 of 16384 left).
+            Cut::new(Part::ContextFile, "AGENTS.md", 9_000, 8_192),
+            // Nothing is left of the total for the third.
+            Cut::new(Part::ContextTotal, "docs/extra.md", 18_384, 16_384),
+        ]
+    );
+    // Within the caps nothing is reported.
+    let small = Fake::default().with("CLAUDE.md", "short");
+    assert!(block_on(gather_report(&ctx(true, false, ""), &small))
+        .cuts
+        .is_empty());
+    // The caps are the caller's: raised, nothing is cut at all.
+    let all = block_on(gather_within(
+        &ctx(true, true, "docs/extra.md"),
+        &source,
+        usize::MAX,
+        usize::MAX,
+    ));
+    assert!(all.cuts.is_empty() && all.files.iter().all(|f| !f.cut));
+    assert!(all.files[0].text.len() == 9_000 && all.problems.is_empty());
+}

@@ -496,6 +496,11 @@ pub enum Commands {
         /// `ai.enabled = true` and a configured profile.
         #[arg(long)]
         ai: bool,
+        /// With `--ai`: send the whole diff even when it is over
+        /// `ai.limits.diff_bytes`. Without it a larger diff is truncated and
+        /// the answer says so (`truncated`).
+        #[arg(long, alias = "no-truncate")]
+        send_all: bool,
         /// Commit as this workspace's default profile (a workspace id; also
         /// `GITPOULPI_WORKSPACE`). Applies when the repository is in the
         /// workspace and the workspace names a profile that exists; else
@@ -515,6 +520,12 @@ pub enum Commands {
         /// network.
         #[arg(long, global = true)]
         print_sent: bool,
+        /// Send every input whole, even over its `ai.limits.*` cap. Without
+        /// it an input over a cap is truncated (a conflict is refused) and
+        /// the answer says what was cut in `truncated: [{part, detail?,
+        /// bytes, limit, setting}]`.
+        #[arg(long, global = true, alias = "no-truncate")]
+        send_all: bool,
         #[command(subcommand)]
         action: AiCommand,
     },

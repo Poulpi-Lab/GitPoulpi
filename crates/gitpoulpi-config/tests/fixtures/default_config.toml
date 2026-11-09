@@ -219,6 +219,12 @@ exclude_sensitive_files = true
 
 [ai.limits]
 conflict_bytes = 40000
+diff_bytes = 60000
+review_file_bytes = 12000
+review_text_bytes = 4000
+review_threads_bytes = 6000
+review_context_file_bytes = 8192
+review_context_bytes = 16384
 
 [ai.sent_preview]
 code_review = true

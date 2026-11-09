@@ -153,32 +153,20 @@ fn run(input: AskInput) -> Answer {
         .build()
         .map_err(|e| e.to_string())?;
     let cancel = input.cancel.clone();
-    let mut notes: Vec<String> = Vec::new();
     let outcome: Result<ReviewOutcome, String> = runtime.block_on(async {
+        // The context files, the description, the comments and the diff are
+        // read and capped together (`[ai.limits]`): over a cap the worker
+        // waits for the answer of "Over the AI limit" (`ai_limit_dialog`).
         let ask = async {
-            let report = gitpoulpi_ai::review_context::gather_report(&context, &source).await;
-            let gathered = report.files;
-            notes = report
-                .problems
-                .into_iter()
-                .map(gitpoulpi_i18n::msg::review_options::context_problem)
-                .collect();
-            notes.extend(
-                gathered
-                    .iter()
-                    .filter(|f| f.cut)
-                    .map(|f| gitpoulpi_i18n::msg::review_options::context_cut(&f.label)),
-            );
             let prompt = ReviewPrompt {
                 title: &input.title,
                 description: &input.description,
                 files: &files,
                 threads: &briefs,
-                context: &gathered,
-                in_repository: false,
-                budget: 0,
+                ..ReviewPrompt::default()
             };
-            job.suggest_review(&prompt).await
+            job.suggest_review_with_context(&context, &source, &prompt)
+                .await
         };
         let canceled = async {
             while !cancel.load(Ordering::Relaxed) {
@@ -191,6 +179,18 @@ fn run(input: AskInput) -> Answer {
         }
     });
     let outcome = outcome?;
+    let mut notes: Vec<String> = outcome
+        .context_problems
+        .iter()
+        .cloned()
+        .map(gitpoulpi_i18n::msg::review_options::context_problem)
+        .collect();
+    notes.extend(
+        outcome
+            .context_cut
+            .iter()
+            .map(gitpoulpi_i18n::msg::review_options::context_cut),
+    );
     Ok(Done {
         items: outcome
             .suggestions

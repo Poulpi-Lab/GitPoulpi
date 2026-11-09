@@ -51,6 +51,12 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         crate::ai_sent_dialog::on_key(key);
         return Ok(Flow::Handled);
     }
+    // "Over the AI limit" (an input would be cut): the same, asked first.
+    if key.kind == KeyEventKind::Press && crate::ai_limit_dialog::is_open() {
+        crate::ai_limit_dialog::on_key(key);
+        super::commands::open_limit_setting(cx);
+        return Ok(Flow::Handled);
+    }
 
     let km = env.km;
     // The integration security check owns the keyboard above everything: it

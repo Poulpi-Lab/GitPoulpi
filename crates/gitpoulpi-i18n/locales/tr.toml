@@ -8969,6 +8969,60 @@ key_send = "s"
 key_open = "o"
 # context: key of the Cancel button of that dialog, one letter
 key_cancel = "c"
+# context: Settings > AI, label of a number: the most bytes of the {$diff} an AI request for a message, an explanation, a stash name, a request description, a commit plan or a split may carry; also the whole {$diff} of a code review
+diff_label = "Largest {$diff} to send (bytes)"
+# context: help under that number
+diff_help = "Over this size, nothing is cut silently: you are asked whether to send all of the {$diff}, send it truncated, open this setting or cancel. Applies to a message for a {$commit}, an explanation, a name for a {$stash}, a description of a request, a plan of {$commits} and a split, and to the whole {$diff} of a code review. 60000 by default."
+# context: Settings > AI, label of a number: the most bytes of one file's {$diff} in a code review
+review_file_label = "Largest file {$diff} in a review (bytes)"
+# context: help under that number
+review_file_help = "Over this size, one file's {$diff} in a code review is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 12000 by default."
+# context: Settings > AI, label of a number: the most bytes of the description of the reviewed request
+review_text_label = "Largest review description (bytes)"
+# context: help under that number
+review_text_help = "Over this size, the description of the reviewed request is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 4000 by default."
+# context: Settings > AI, label of a number: the most bytes of the comments that already exist on the reviewed request
+review_threads_label = "Largest list of existing comments in a review (bytes)"
+# context: help under that number
+review_threads_help = "The comments that already exist are listed so the model does not repeat them. Over this size, the list is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 6000 by default."
+# context: Settings > AI, label of a number: the most bytes of one project context file (CLAUDE.md, AGENTS.md, the extra file) given to a code review
+review_context_file_label = "Largest context file in a review (bytes)"
+# context: help under that number
+review_context_file_help = "Over this size, a context file (CLAUDE.md, AGENTS.md or the extra file) is cut, after you were asked: send all of it, send it truncated, open this setting or cancel. 8192 by default."
+# context: Settings > AI, label of a number: the most bytes of all the project context files together
+review_context_label = "Largest context in a review, all files (bytes)"
+# context: help under that number
+review_context_help = "Over this size, the context files together are cut (the last one is shortened or left out), after you were asked: send all of them, send them truncated, open this setting or cancel. 16384 by default."
+# context: title of the dialog shown when what would be sent to the AI is over a limit and would be cut
+truncate_title = "Over the AI limit"
+# context: first paragraph of that dialog, before the list of what is over its limit
+truncate_intro = "Some of what would be sent to the AI is over a limit GitPoulpi sets (the limits are GitPoulpi's own guard, not the model's):"
+# context: last paragraph of that dialog, explaining the buttons
+truncate_outro = "Send all sends everything this one time. Send truncated cuts what is over its limit, as described above. Either way, secrets are still replaced and sensitive files are still left out."
+# context: list line of that dialog; {size} is the {$diff}'s size (for example "91.2 KB (91234 bytes)"), {limit} the limit in the same form, {key} the name of the setting
+part_diff = "The {$diff} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+# context: list line of that dialog, for the {$commit} being split; sizes like the line above
+part_hunks = "The changes of the {$commit} are {size}, limit {limit} (setting {key}). Truncated, the last ones lose their {$diff}."
+# context: list line of that dialog, for a code review; {name} is the list of files that do not fit
+part_review_diff = "Files that do not fit the review: {name}. The review is {size}, limit {limit} (setting {key}). Truncated, they are left out."
+# context: list line of that dialog, for one file of a code review; {name} is its path
+part_review_file = "The {$diff} of {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+# context: list line of that dialog, for the description of the reviewed request
+part_review_text = "The description is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+# context: list line of that dialog, for the comments that already exist on the reviewed request
+part_review_threads = "The existing comments are {size}, limit {limit} (setting {key}). Truncated, the last ones are left out."
+# context: list line of that dialog, for one project context file of a code review; {name} is the file
+part_context_file = "The context file {name} is {size}, limit {limit} (setting {key}). Truncated, its end is left out."
+# context: list line of that dialog, for the project context files together; {name} is the file that crossed the limit
+part_context_total = "The context files together reach {size} at {name}, limit {limit} (setting {key}). Truncated, the rest is left out."
+# context: button that sends everything of the oversized request this one time, nothing cut
+send_all = "Send all"
+# context: button that sends the request with what is over its limit cut
+send_truncated = "Send truncated"
+# context: key of the Send all button, one letter (shown as "Send all (A)")
+key_send_all = "a"
+# context: key of the Send truncated button, one letter (shown as "Send truncated (T)")
+key_send_truncated = "t"
 
 [conflict_guard]
 # context: title of the dialog that says conflicts must be resolved before an action

@@ -332,6 +332,11 @@ pub enum StashAction {
         /// `ai.enabled = true`, see `docs/user/ai.md`).
         #[arg(long)]
         ai: bool,
+        /// With `--ai`: send the whole diff even when it is over
+        /// `ai.limits.diff_bytes`. Without it a larger diff is truncated and
+        /// the answer says so (`truncated`).
+        #[arg(long, alias = "no-truncate")]
+        send_all: bool,
     },
     Pop {
         id: Option<String>,

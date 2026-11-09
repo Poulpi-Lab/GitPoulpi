@@ -468,32 +468,120 @@ pub const MIN_CONFLICT_BYTES: usize = 1_000;
 /// Largest `ai.limits.conflict_bytes` takes.
 pub const MAX_CONFLICT_BYTES: usize = 50_000_000;
 
+/// Default for `ai.limits.diff_bytes`: the diff part of a commit message,
+/// explain, stash, pull request, composer or split prompt, and the total
+/// diff of a code review.
+pub const DEFAULT_DIFF_BYTES: usize = 60_000;
+/// Default for `ai.limits.review_file_bytes`: one file's diff in a review.
+pub const DEFAULT_REVIEW_FILE_BYTES: usize = 12_000;
+/// Default for `ai.limits.review_text_bytes`: a review's description.
+pub const DEFAULT_REVIEW_TEXT_BYTES: usize = 4_000;
+/// Default for `ai.limits.review_threads_bytes`: the review comments that
+/// already exist, listed so the model does not repeat them.
+pub const DEFAULT_REVIEW_THREADS_BYTES: usize = 6_000;
+/// Default for `ai.limits.review_context_file_bytes`: one project context
+/// file (`CLAUDE.md`, `AGENTS.md`, the extra file) of a review.
+pub const DEFAULT_REVIEW_CONTEXT_FILE_BYTES: usize = 8 * 1024;
+/// Default for `ai.limits.review_context_bytes`: all the context files of a
+/// review together.
+pub const DEFAULT_REVIEW_CONTEXT_BYTES: usize = 16 * 1024;
+/// Smallest `ai.limits.*` (other than the conflict's) takes.
+pub const MIN_LIMIT_BYTES: usize = 1_000;
+/// Largest `ai.limits.*` (other than the conflict's) takes.
+pub const MAX_LIMIT_BYTES: usize = 50_000_000;
+
 /// `[ai.limits]`: how much input a request may carry before GitPoulpi warns
 /// instead of sending. The limit is GitPoulpi's own guard (a model's context
 /// window differs per model), so it is a setting: over it, the user is asked
-/// whether to send anyway.
+/// whether to send anyway (a conflict) or to send everything / send it
+/// truncated (every other input).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct AiLimits {
     /// Bytes of one merge conflict (base + ours + theirs) a "Suggest a
     /// resolution" request may carry.
     pub conflict_bytes: usize,
+    /// Bytes of the diff a commit message, explanation, stash name, pull
+    /// request description, commit plan or split plan may carry; also the
+    /// total diff of a code review.
+    pub diff_bytes: usize,
+    /// Bytes of one file's diff in a code review.
+    pub review_file_bytes: usize,
+    /// Bytes of a review's description.
+    pub review_text_bytes: usize,
+    /// Bytes of the existing review comments given to a code review.
+    pub review_threads_bytes: usize,
+    /// Bytes of one project context file given to a code review.
+    pub review_context_file_bytes: usize,
+    /// Bytes of all the project context files given to a code review.
+    pub review_context_bytes: usize,
 }
 
 impl Default for AiLimits {
     fn default() -> Self {
         Self {
             conflict_bytes: DEFAULT_CONFLICT_BYTES,
+            diff_bytes: DEFAULT_DIFF_BYTES,
+            review_file_bytes: DEFAULT_REVIEW_FILE_BYTES,
+            review_text_bytes: DEFAULT_REVIEW_TEXT_BYTES,
+            review_threads_bytes: DEFAULT_REVIEW_THREADS_BYTES,
+            review_context_file_bytes: DEFAULT_REVIEW_CONTEXT_FILE_BYTES,
+            review_context_bytes: DEFAULT_REVIEW_CONTEXT_BYTES,
         }
     }
 }
 
+fn clamp_limit(value: usize) -> usize {
+    value.clamp(MIN_LIMIT_BYTES, MAX_LIMIT_BYTES)
+}
+
 impl AiLimits {
+    /// The settings keys, in the order Settings shows them.
+    pub const KEYS: [&'static str; 7] = [
+        "ai.limits.conflict_bytes",
+        "ai.limits.diff_bytes",
+        "ai.limits.review_file_bytes",
+        "ai.limits.review_text_bytes",
+        "ai.limits.review_threads_bytes",
+        "ai.limits.review_context_file_bytes",
+        "ai.limits.review_context_bytes",
+    ];
+
     /// `conflict_bytes` with a hand-edited out-of-range value brought back
     /// into `MIN_CONFLICT_BYTES..=MAX_CONFLICT_BYTES`.
     pub fn conflict_bytes_clamped(&self) -> usize {
         self.conflict_bytes
             .clamp(MIN_CONFLICT_BYTES, MAX_CONFLICT_BYTES)
+    }
+
+    /// `diff_bytes`, brought back into `MIN_LIMIT_BYTES..=MAX_LIMIT_BYTES`.
+    pub fn diff_bytes_clamped(&self) -> usize {
+        clamp_limit(self.diff_bytes)
+    }
+
+    /// `review_file_bytes`, clamped like [`Self::diff_bytes_clamped`].
+    pub fn review_file_bytes_clamped(&self) -> usize {
+        clamp_limit(self.review_file_bytes)
+    }
+
+    /// `review_text_bytes`, clamped like [`Self::diff_bytes_clamped`].
+    pub fn review_text_bytes_clamped(&self) -> usize {
+        clamp_limit(self.review_text_bytes)
+    }
+
+    /// `review_threads_bytes`, clamped like [`Self::diff_bytes_clamped`].
+    pub fn review_threads_bytes_clamped(&self) -> usize {
+        clamp_limit(self.review_threads_bytes)
+    }
+
+    /// `review_context_file_bytes`, clamped like [`Self::diff_bytes_clamped`].
+    pub fn review_context_file_bytes_clamped(&self) -> usize {
+        clamp_limit(self.review_context_file_bytes)
+    }
+
+    /// `review_context_bytes`, clamped like [`Self::diff_bytes_clamped`].
+    pub fn review_context_bytes_clamped(&self) -> usize {
+        clamp_limit(self.review_context_bytes)
     }
 }
 
@@ -1399,12 +1487,60 @@ explain_changes = "ghost"
         let raw = toml::to_string(&ai).unwrap();
         assert!(raw.contains("conflict_bytes = 90000"), "{raw}");
         // A hand-edited extreme is brought back into range.
-        let tiny = AiLimits { conflict_bytes: 0 };
+        let tiny = AiLimits {
+            conflict_bytes: 0,
+            ..AiLimits::default()
+        };
         assert_eq!(tiny.conflict_bytes_clamped(), MIN_CONFLICT_BYTES);
         let huge = AiLimits {
             conflict_bytes: usize::MAX,
+            ..AiLimits::default()
         };
         assert_eq!(huge.conflict_bytes_clamped(), MAX_CONFLICT_BYTES);
+    }
+
+    #[test]
+    fn every_other_limit_defaults_to_todays_cap_reads_back_and_clamps() {
+        let ai: AiConfig = toml::from_str("enabled = true").unwrap();
+        let l = ai.limits;
+        assert_eq!(
+            (
+                l.diff_bytes,
+                l.review_file_bytes,
+                l.review_text_bytes,
+                l.review_threads_bytes,
+                l.review_context_file_bytes,
+                l.review_context_bytes
+            ),
+            (60_000, 12_000, 4_000, 6_000, 8_192, 16_384)
+        );
+        let ai: AiConfig = toml::from_str(
+            "[limits]\ndiff_bytes = 90000\nreview_file_bytes = 20000\nreview_text_bytes = 5000\n\
+             review_threads_bytes = 7000\nreview_context_file_bytes = 9000\n\
+             review_context_bytes = 30000\n",
+        )
+        .unwrap();
+        assert_eq!(ai.limits.diff_bytes_clamped(), 90_000);
+        assert_eq!(ai.limits.review_file_bytes_clamped(), 20_000);
+        assert_eq!(ai.limits.review_text_bytes_clamped(), 5_000);
+        assert_eq!(ai.limits.review_threads_bytes_clamped(), 7_000);
+        assert_eq!(ai.limits.review_context_file_bytes_clamped(), 9_000);
+        assert_eq!(ai.limits.review_context_bytes_clamped(), 30_000);
+        assert_eq!(
+            ai.limits.conflict_bytes, 40_000,
+            "an unnamed key keeps its default"
+        );
+        let raw = toml::to_string(&ai).unwrap();
+        assert!(raw.contains("review_context_bytes = 30000"), "{raw}");
+        let zero = AiLimits {
+            diff_bytes: 0,
+            review_file_bytes: 0,
+            review_text_bytes: usize::MAX,
+            ..AiLimits::default()
+        };
+        assert_eq!(zero.diff_bytes_clamped(), MIN_LIMIT_BYTES);
+        assert_eq!(zero.review_file_bytes_clamped(), MIN_LIMIT_BYTES);
+        assert_eq!(zero.review_text_bytes_clamped(), MAX_LIMIT_BYTES);
     }
 
     #[test]

@@ -23,6 +23,8 @@ pub use rewrite_script::{RewriteScriptOutcome, RewriteScriptRequest, ScriptCheck
 
 use crate::parse::PlannedSplit;
 
+use crate::limits::{Cut, LimitGate, LimitPolicy, Limits, Part};
+use crate::review_context::{ContextSource, EffectiveReviewContext, Gathered};
 use crate::vars::{self, PromptContext};
 use crate::{prompts, AiClient, Error, Prepared, Privacy, Result, SendGate};
 
@@ -63,6 +65,9 @@ pub struct Job {
     /// (`ai.limits.conflict_bytes`); `usize::MAX` once the user chose to send
     /// a large one anyway.
     pub conflict_limit: usize,
+    /// The other input caps (`[ai.limits]`), whom to ask when an input is
+    /// over one, and what was truncated (see [`crate::limits`]).
+    pub limit: LimitPolicy,
 }
 
 impl Job {
@@ -102,7 +107,34 @@ impl Job {
                 &gitpoulpi_core::privacy::default_sensitive_patterns(),
             ),
             conflict_limit: config.limits.conflict_bytes_clamped(),
+            limit: LimitPolicy::new(Limits::from_config(&config.limits)),
         })
+    }
+
+    /// Asks `gate` when an input is over a cap (`[ai.limits]`) instead of
+    /// truncating it.
+    pub fn with_limit_gate(mut self, gate: std::sync::Arc<dyn LimitGate>) -> Self {
+        self.limit.gate = Some(gate);
+        self
+    }
+
+    /// Sends every input whole, whatever the caps say (`--send-all`): for a
+    /// frontend that cannot ask.
+    pub fn with_send_all(mut self, send_all: bool) -> Self {
+        self.limit.send_all = send_all;
+        self
+    }
+
+    /// What this job truncated (or would have, when nothing could ask),
+    /// shared with its clones: the `truncated` of the CLI/MCP answers.
+    pub fn truncated(&self) -> Vec<Cut> {
+        self.limit.truncated()
+    }
+
+    /// The byte budget of a diff of `bytes` bytes (`ai.limits.diff_bytes`),
+    /// after asking about it when it is over (see [`LimitPolicy::decide`]).
+    pub async fn diff_budget(&self, part: crate::limits::Part, bytes: usize) -> Result<usize> {
+        self.limit.diff_budget(part, bytes).await
     }
 
     /// Sends a conflict over `ai.limits.conflict_bytes` as well: the user
@@ -376,15 +408,99 @@ impl Job {
             ..input.clone()
         };
         let built = prompts::code_review(input);
+        self.review_outcome(client, input.files, built, Gathered::default())
+            .await
+    }
+
+    /// [`Job::suggest_review`] that also reads the project context files
+    /// (`ctx`, from `source`), so every input cap of a review (the context
+    /// files, the description, the existing comments, each file's diff and
+    /// the whole diff) is decided together: one question, one answer. The
+    /// caps are the job's own (`[ai.limits]`); `input.context` and the
+    /// budgets of `input` are ignored.
+    #[cfg(feature = "network")]
+    pub async fn suggest_review_with_context(
+        &self,
+        ctx: &EffectiveReviewContext,
+        source: &dyn ContextSource,
+        input: &prompts::ReviewPrompt<'_>,
+    ) -> Result<ReviewOutcome> {
+        let client = crate::client_for_network_in(
+            &self.profile,
+            self.api_key.clone(),
+            self.repo_path().as_deref(),
+            &self.privacy,
+        )?;
+        self.suggest_review_with_context_with(&*client, ctx, source, input)
+            .await
+    }
+
+    /// [`Job::suggest_review_with_context`] over a caller-supplied client.
+    pub async fn suggest_review_with_context_with(
+        &self,
+        client: &dyn AiClient,
+        ctx: &EffectiveReviewContext,
+        source: &dyn ContextSource,
+        input: &prompts::ReviewPrompt<'_>,
+    ) -> Result<ReviewOutcome> {
+        let build = |gathered: &Gathered, l: &Limits| {
+            prompts::code_review(&prompts::ReviewPrompt {
+                context: &gathered.files,
+                in_repository: input.in_repository || self.runs_in_repository(),
+                budget: l.diff,
+                file_budget: l.review_file,
+                text_budget: l.review_text,
+                threads_budget: l.review_threads,
+                ..input.clone()
+            })
+        };
+        let l = self.limit.limits;
+        let mut gathered =
+            crate::review_context::gather_within(ctx, source, l.context_file, l.context_total)
+                .await;
+        let mut built = build(&gathered, &l);
+        let mut found = gathered.cuts.clone();
+        found.extend(built.cuts.iter().cloned());
+        if self.limit.decide(found).await? {
+            let none = Limits::unlimited();
+            gathered = crate::review_context::gather_within(
+                ctx,
+                source,
+                none.context_file,
+                none.context_total,
+            )
+            .await;
+            built = build(&gathered, &none);
+        }
+        self.review_outcome(client, input.files, built, gathered)
+            .await
+    }
+
+    async fn review_outcome(
+        &self,
+        client: &dyn AiClient,
+        files: &[FileDiff],
+        built: prompts::BuiltReviewPrompt,
+        gathered: Gathered,
+    ) -> Result<ReviewOutcome> {
         let answer = self.run_with(client, &built.text).await?;
         if answer.trim().is_empty() {
             return Err(Error::Empty);
         }
-        let index = crate::review::DiffIndex::new(input.files);
+        let index = crate::review::DiffIndex::new(files);
         Ok(ReviewOutcome {
             suggestions: crate::review::parse_suggestions(&answer, &index),
             cut: built.cut,
             left_out: built.left_out,
+            context_problems: gathered.problems,
+            context_given: gathered.files.iter().map(|f| f.label.clone()).collect(),
+            context_cut: gathered
+                .files
+                .iter()
+                .filter(|f| f.cut)
+                .map(|f| f.label.clone())
+                .collect(),
+            truncated: self.truncated(),
         })
     }
 
@@ -412,7 +528,13 @@ impl Job {
         source: &SplitSource,
     ) -> Result<Vec<SplitPart>> {
         let (pieces, ids) = split_pieces(source);
-        let prompt = prompts::split_commit(&source.message, &pieces, prompts::DEFAULT_DIFF_BUDGET);
+        let hunk_bytes: usize = pieces
+            .iter()
+            .filter_map(|p| p.diff.as_ref())
+            .map(String::len)
+            .sum();
+        let budget = self.diff_budget(Part::SplitHunks, hunk_bytes).await?;
+        let prompt = prompts::split_commit(&source.message, &pieces, budget);
         let id_names: Vec<String> = ids.iter().map(|(id, _)| id.clone()).collect();
         let check = |answer: &str| -> Result<Vec<SplitPart>> {
             let planned = crate::parse::split_plan(answer, &id_names)?;
@@ -454,6 +576,17 @@ pub struct ReviewOutcome {
     pub cut: Vec<String>,
     /// Files left out of the prompt (over the total budget).
     pub left_out: Vec<String>,
+    /// What the project context files could not give (an unreadable extra
+    /// file, one that no longer fit the total), when they were read by
+    /// [`Job::suggest_review_with_context`].
+    pub context_problems: Vec<String>,
+    /// The context files given to the model, by label.
+    pub context_given: Vec<String>,
+    /// The context files that were shortened.
+    pub context_cut: Vec<String>,
+    /// Every input truncated for this run (the report of CLI/MCP; in the TUI
+    /// the user chose it).
+    pub truncated: Vec<Cut>,
 }
 
 /// The unified-diff-ish text a prompt carries. Not byte-for-byte `git
@@ -1124,6 +1257,243 @@ mod tests {
         let config = AiConfig::default();
         let err = Job::prepare(&config, AiAction::CommitMessage, None, &Fixed(None)).unwrap_err();
         assert!(err.contains("turned off"), "{err}");
+    }
+
+    // -- the input caps (`[ai.limits]`) -----------------------------------------
+
+    struct Answers(crate::limits::LimitAnswer, std::sync::Mutex<Vec<Vec<Cut>>>);
+    #[async_trait::async_trait]
+    impl LimitGate for Answers {
+        async fn ask(&self, cuts: &[Cut]) -> crate::limits::LimitAnswer {
+            self.1.lock().unwrap().push(cuts.to_vec());
+            self.0
+        }
+    }
+
+    struct Context;
+    #[async_trait::async_trait]
+    impl ContextSource for Context {
+        async fn repo_file(&self, path: &str) -> std::result::Result<Option<Vec<u8>>, String> {
+            Ok((path == "CLAUDE.md").then(|| "c".repeat(9_000).into_bytes()))
+        }
+        async fn link_file(&self, _: &str) -> std::result::Result<Option<Vec<u8>>, String> {
+            Ok(None)
+        }
+    }
+
+    fn review_files(lines: usize) -> Vec<FileDiff> {
+        use gitpoulpi_core::domain::{DiffLine, Hunk, HunkId};
+        vec![FileDiff {
+            path: "src/big.rs".into(),
+            status: FileStatus::Modified,
+            hunks: vec![Hunk {
+                id: HunkId(0),
+                old_start: 1,
+                old_lines: 0,
+                new_start: 1,
+                new_lines: lines as u32,
+                lines: (0..lines)
+                    .map(|i| DiffLine {
+                        origin: LineOrigin::Add,
+                        content: format!("let value_{i} = {i};\n"),
+                        staged: false,
+                    })
+                    .collect(),
+            }],
+        }]
+    }
+
+    fn review_context() -> EffectiveReviewContext {
+        EffectiveReviewContext {
+            run_in_repository: gitpoulpi_config::RunInRepo::No,
+            include_claude_md: true,
+            include_agents_md: false,
+            extra_file: String::new(),
+        }
+    }
+
+    const REVIEW_ANSWER: &str = r#"{"summary":"ok","suggestions":[]}"#;
+
+    /// Four inputs over their caps are decided together: one question that
+    /// names each of them with its size, limit and setting.
+    #[test]
+    fn a_review_asks_once_about_every_input_over_its_cap() {
+        let files = review_files(2_000);
+        let description = "d".repeat(5_000);
+        let gate = std::sync::Arc::new(Answers(
+            crate::limits::LimitAnswer::SendTruncated,
+            Default::default(),
+        ));
+        let client = Script(vec![REVIEW_ANSWER].into(), Default::default());
+        let job = job_for(AiAction::CodeReview).with_limit_gate(gate.clone());
+        let out = block_on(job.suggest_review_with_context_with(
+            &client,
+            &review_context(),
+            &Context,
+            &prompts::ReviewPrompt {
+                title: "T",
+                description: &description,
+                files: &files,
+                ..prompts::ReviewPrompt::default()
+            },
+        ))
+        .unwrap();
+        let asked = gate.1.lock().unwrap().clone();
+        assert_eq!(asked.len(), 1, "one question for the whole request");
+        let settings: Vec<&str> = asked[0].iter().map(|c| c.setting).collect();
+        assert_eq!(
+            settings,
+            [
+                "ai.limits.review_context_file_bytes",
+                "ai.limits.review_text_bytes",
+                "ai.limits.review_file_bytes"
+            ]
+        );
+        assert_eq!(asked[0][0].detail, "CLAUDE.md");
+        assert_eq!((asked[0][0].bytes, asked[0][0].limit), (9_000, 8_192));
+        // Truncated: what was sent is today's cut, and the run says so.
+        let sent = client.1.lock().unwrap()[0].clone();
+        assert!(sent.contains("[file cut: showing"), "{sent}");
+        assert!(sent.contains("[text cut]"), "{sent}");
+        assert!(
+            sent.contains("[CLAUDE.md cut: showing 8192 of 9000"),
+            "{sent}"
+        );
+        assert_eq!(out.truncated, asked[0]);
+        assert_eq!(out.context_cut, ["CLAUDE.md"]);
+    }
+
+    #[test]
+    fn send_all_lifts_every_review_cap_and_cancel_sends_nothing() {
+        let files = review_files(2_000);
+        let description = "d".repeat(5_000);
+        let run = |answer| {
+            let gate = std::sync::Arc::new(Answers(answer, Default::default()));
+            let client = Script(vec![REVIEW_ANSWER].into(), Default::default());
+            let job = job_for(AiAction::CodeReview).with_limit_gate(gate);
+            let out = block_on(job.suggest_review_with_context_with(
+                &client,
+                &review_context(),
+                &Context,
+                &prompts::ReviewPrompt {
+                    title: "T",
+                    description: &description,
+                    files: &files,
+                    ..prompts::ReviewPrompt::default()
+                },
+            ));
+            let sent = client.1.lock().unwrap().clone();
+            (out, sent)
+        };
+        let (out, sent) = run(crate::limits::LimitAnswer::SendAll);
+        let out = out.unwrap();
+        let sent = &sent[0];
+        assert!(!sent.contains("cut"), "nothing is cut: {sent}");
+        assert!(sent.contains("value_1999"), "the whole file");
+        assert!(sent.contains(&"d".repeat(5_000)), "the whole description");
+        assert!(sent.contains(&"c".repeat(9_000)), "the whole context file");
+        assert!(out.truncated.is_empty() && out.context_cut.is_empty());
+
+        let (out, sent) = run(crate::limits::LimitAnswer::Cancel);
+        assert_eq!(out.unwrap_err(), Error::Declined);
+        assert!(sent.is_empty(), "nothing is sent after Cancel");
+    }
+
+    /// Nobody to ask (CLI, MCP): today's truncation, reported; `send_all`
+    /// sends everything.
+    #[test]
+    fn without_a_gate_a_review_truncates_and_reports_or_sends_all() {
+        let files = review_files(2_000);
+        let ask = |job: Job| {
+            let client = Script(vec![REVIEW_ANSWER].into(), Default::default());
+            let out = block_on(job.suggest_review_with_context_with(
+                &client,
+                &review_context(),
+                &Context,
+                &prompts::ReviewPrompt {
+                    title: "T",
+                    files: &files,
+                    ..prompts::ReviewPrompt::default()
+                },
+            ))
+            .unwrap();
+            let sent = client.1.lock().unwrap()[0].clone();
+            (out, sent)
+        };
+        let (out, sent) = ask(job_for(AiAction::CodeReview));
+        assert!(sent.contains("[file cut: showing"), "{sent}");
+        let parts: Vec<crate::limits::Part> = out.truncated.iter().map(|c| c.part).collect();
+        assert_eq!(
+            parts,
+            [
+                crate::limits::Part::ContextFile,
+                crate::limits::Part::ReviewFile
+            ]
+        );
+        let (out, sent) = ask(job_for(AiAction::CodeReview).with_send_all(true));
+        assert!(!sent.contains("[file cut"), "{sent}");
+        assert!(out.truncated.is_empty());
+    }
+
+    /// The configured caps reach the job, and a raised one avoids the cut.
+    #[test]
+    fn the_configured_caps_reach_the_job() {
+        let mut config = AiConfig {
+            enabled: true,
+            ..AiConfig::default()
+        };
+        config.limits.diff_bytes = 90_000;
+        config.limits.review_file_bytes = 30_000;
+        let job = Job::prepare(&config, AiAction::CodeReview, None, &Fixed(None)).unwrap();
+        assert_eq!(job.limit.limits.diff, 90_000);
+        assert_eq!(job.limit.limits.review_file, 30_000);
+        assert_eq!(
+            job_for(AiAction::CommitMessage).limit.limits.diff,
+            60_000,
+            "the default is today's value"
+        );
+        let files = review_files(800);
+        let client = Script(vec![REVIEW_ANSWER].into(), Default::default());
+        let out = block_on(job.suggest_review_with_context_with(
+            &client,
+            &review_context(),
+            &Context,
+            &prompts::ReviewPrompt {
+                title: "T",
+                files: &files,
+                ..prompts::ReviewPrompt::default()
+            },
+        ))
+        .unwrap();
+        let sent = client.1.lock().unwrap()[0].clone();
+        assert!(sent.contains("value_799"), "a raised cap keeps the file");
+        // Only the context file (its own cap was not raised) is cut.
+        assert_eq!(out.truncated.len(), 1);
+    }
+
+    /// A diff-style prompt: the budget is the cap, asked about when over.
+    #[test]
+    fn a_diff_over_the_cap_is_asked_about_before_it_is_cut() {
+        let gate = std::sync::Arc::new(Answers(
+            crate::limits::LimitAnswer::SendAll,
+            Default::default(),
+        ));
+        let job = job_for(AiAction::CommitMessage).with_limit_gate(gate.clone());
+        assert_eq!(
+            block_on(job.diff_budget(Part::Diff, 60_000)),
+            Ok(60_000),
+            "at the cap: no question"
+        );
+        assert!(gate.1.lock().unwrap().is_empty());
+        assert_eq!(
+            block_on(job.diff_budget(Part::Diff, 60_001)),
+            Ok(usize::MAX),
+            "send all lifts the cap"
+        );
+        assert_eq!(
+            gate.1.lock().unwrap()[0],
+            [Cut::new(Part::Diff, "", 60_001, 60_000)]
+        );
     }
 }
 

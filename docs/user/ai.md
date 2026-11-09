@@ -447,13 +447,63 @@ gitpoulpi hosting review suggest 12 --claude-md off --context-file docs/REVIEW.m
 effective context as `review_context`. The same four settings are `ai.review.*` in
 `config.toml` ([reference](config-reference.md#ai-built-in-ai-off-by-default)).
 
+## Input limits
+
+Every input GitPoulpi puts in a request has a size limit, a setting under
+`[ai.limits]` (*Settings > AI > Limits*). The limits are GitPoulpi's own guard
+(a model's context window differs per model): raise them when your model has the
+room, lower them to keep requests small.
+
+| Setting (`ai.limits.`) | Default | What it caps |
+|---|---|---|
+| `conflict_bytes` | 40000 | The base, current and incoming blocks of one merge conflict |
+| `diff_bytes` | 60000 | The diff of a message for a commit, an explanation, a stash name, a pull request description, a commit plan or a split; the whole diff of a code review |
+| `review_file_bytes` | 12000 | One file's diff in a code review |
+| `review_text_bytes` | 4000 | The description of the reviewed pull request |
+| `review_threads_bytes` | 6000 | The review comments that already exist |
+| `review_context_file_bytes` | 8192 | One project context file of a review (`CLAUDE.md`, `AGENTS.md`, the extra file) |
+| `review_context_bytes` | 16384 | All the context files of a review together |
+
+**Nothing is cut silently.** When an input is over its limit the request waits
+and *Over the AI limit* lists what is over: which part (the diff, a file, the
+description, a context file), its size, the limit and the setting. A review lists
+every part that is over in one dialog. The buttons, each with its key:
+
+- *Send all* (`A`): this request only, nothing is cut. It still goes through the
+  privacy checks (secrets replaced, sensitive files left out) and, when it is on,
+  the *What is sent* pane, which comes next.
+- *Send truncated* (`T`): what is over its limit is cut, as it always was; each
+  line of the dialog says what is left out (the end of the diff, the last
+  hunks, the files that do not fit).
+- *Open setting* (`O`): cancels the request and opens *Settings > AI > Limits*
+  on the first limit listed. Focus starts here: Enter never sends.
+- *Cancel* (`C`, `Esc`, the cross or a click outside): sends nothing.
+
+A conflict is the exception: it is never cut. *Send anyway* sends it whole once.
+
+Nothing starts an AI request by itself, so there is no background run that
+could ask: every request is one you started. A run that cannot ask (the CLI and
+MCP) truncates like before and says so; see below.
+
+**On the command line**, nothing can answer a dialog, so an input over its limit
+is truncated as before and the answer says what was cut:
+`truncated: [{part, detail?, bytes, limit, setting}]` (present only when something
+was cut; `part` is one of `diff`, `split_hunks`, `review_diff`, `review_file`,
+`review_text`, `review_threads`, `context_file`, `context_total`). `--send-all`
+(alias `--no-truncate`) sends everything whole instead: on `ai` (all its
+commands, including `ai resolve-conflict`, where a conflict over its limit is
+otherwise refused), on `commit --ai`, on `stash push --ai` and on
+`hosting review suggest`. The MCP tools have the same `send_all` argument and the
+same `truncated` field.
+
 ## Privacy
 
 - Nothing is sent until you press a button or run a command. No background AI,
   no telemetry, no GitPoulpi account.
 - What is sent: the prompt (built-in, then your instructions) and the diff you
-  asked about, cut at about 60 KB (with a note saying so); for a pull request,
-  also the branch's commit subjects.
+  asked about; for a pull request, also the branch's commit subjects. A diff
+  over 60 KB (`ai.limits.diff_bytes`) is never cut silently: see
+  [Input limits](#input-limits).
 - A history rewrite script request sends your instruction and the fixed script contract
   (the API of the script sandbox). Author, date and subject of up to 20 commits go
   along **only** if you tick *Send a sample* in the dialog (off by default; the CLI needs
@@ -522,6 +572,7 @@ repository.
 | `failed:` 404 | The **Model** does not exist there: clear it to use the default. |
 | `failed:` connection error (Ollama, LM Studio) | The server is not running, or the **Base URL** has the wrong port or lacks `/v1`. |
 | The key shows `(not set)` after typing it | No credential helper: configure one (`git config --global credential.helper ...`) and enter it again. |
+| *Over the AI limit* | An input of the request is over a limit of `[ai.limits]`: choose *Send all*, *Send truncated*, *Open setting* or *Cancel* (see [Input limits](#input-limits)). |
 | "This conflict is larger than the limit" | The conflict is over `ai.limits.conflict_bytes` (40000 by default). *Send anyway* sends it once; *Open setting* goes to the limit in Settings > AI > Limits. |
 | Wrong language or style | Add instructions; the editor's Quick insert chips make it quick. |
 | The composer says the plan is invalid | The model skipped or repeated a file: try again or use a stronger model. |

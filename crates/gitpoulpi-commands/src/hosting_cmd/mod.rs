@@ -390,6 +390,7 @@ async fn run_review_with(
             agents_md,
             context_file,
             no_context_file,
+            send_all,
             ..
         } => {
             let run = crate::cli::ReviewFlags {
@@ -401,7 +402,7 @@ async fn run_review_with(
                 no_extra_file: None,
             }
             .values();
-            review::suggest(env, ipc, &target, number, remote, run).await
+            review::suggest(env, ipc, &target, number, remote, run, send_all).await
         }
     }
 }

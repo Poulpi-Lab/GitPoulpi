@@ -19,11 +19,15 @@ use gitpoulpi_config::{
 };
 use gitpoulpi_hosting::{HttpRequest, HttpTransport};
 
-/// How much of one context file reaches the model, in bytes.
-pub const MAX_FILE_BYTES: usize = 8 * 1024;
+use crate::limits::{Cut, Part};
 
-/// How much all the context files reach the model together, in bytes.
-pub const MAX_TOTAL_BYTES: usize = 16 * 1024;
+/// How much of one context file reaches the model, in bytes, by default
+/// (`ai.limits.review_context_file_bytes`).
+pub const MAX_FILE_BYTES: usize = gitpoulpi_config::DEFAULT_REVIEW_CONTEXT_FILE_BYTES;
+
+/// How much all the context files reach the model together, in bytes, by
+/// default (`ai.limits.review_context_bytes`).
+pub const MAX_TOTAL_BYTES: usize = gitpoulpi_config::DEFAULT_REVIEW_CONTEXT_BYTES;
 
 /// What a review is given, after the three levels are applied.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
@@ -121,6 +125,9 @@ pub struct Gathered {
     /// does not exist or cannot be fetched, a file that no longer fits the
     /// total cap). `CLAUDE.md` and `AGENTS.md` missing is not a problem.
     pub problems: Vec<String>,
+    /// Every file that was shortened or left out because of a cap: what a
+    /// caller asks about before sending, or reports.
+    pub cuts: Vec<Cut>,
 }
 
 /// Where the files come from. Every read answers `Ok(None)` for a file that
@@ -211,6 +218,16 @@ pub async fn gather(ctx: &EffectiveReviewContext, source: &dyn ContextSource) ->
 
 /// [`gather`], plus what could not be given.
 pub async fn gather_report(ctx: &EffectiveReviewContext, source: &dyn ContextSource) -> Gathered {
+    gather_within(ctx, source, MAX_FILE_BYTES, MAX_TOTAL_BYTES).await
+}
+
+/// [`gather_report`] with the caps of `[ai.limits]` (`usize::MAX`: none).
+pub async fn gather_within(
+    ctx: &EffectiveReviewContext,
+    source: &dyn ContextSource,
+    file_limit: usize,
+    total_limit: usize,
+) -> Gathered {
     let mut out = Gathered::default();
     let mut used = 0usize;
     let mut take = |label: String, found: Result<Option<Vec<u8>>, String>, required: bool| {
@@ -232,15 +249,37 @@ pub async fn gather_report(ctx: &EffectiveReviewContext, source: &dyn ContextSou
         if String::from_utf8_lossy(&bytes).trim().is_empty() {
             return;
         }
-        let remaining = MAX_TOTAL_BYTES.saturating_sub(used);
+        let size = String::from_utf8_lossy(&bytes).trim_end().len();
+        let remaining = total_limit.saturating_sub(used);
         if remaining == 0 {
             out.problems.push(format!(
-                "{label}: left out, the context is over {MAX_TOTAL_BYTES} bytes"
+                "{label}: left out, the context is over {total_limit} bytes"
+            ));
+            out.cuts.push(Cut::new(
+                Part::ContextTotal,
+                label,
+                used.saturating_add(size),
+                total_limit,
             ));
             return;
         }
-        let (text, cut) = capped(&label, &bytes, MAX_FILE_BYTES.min(remaining));
-        used += bytes.len().min(MAX_FILE_BYTES.min(remaining));
+        let allowed = file_limit.min(remaining);
+        let (text, cut) = capped(&label, &bytes, allowed);
+        if cut {
+            // The total ran out before the file's own cap did: that cap is
+            // the one to raise.
+            out.cuts.push(if remaining < file_limit {
+                Cut::new(
+                    Part::ContextTotal,
+                    label.clone(),
+                    used.saturating_add(size),
+                    total_limit,
+                )
+            } else {
+                Cut::new(Part::ContextFile, label.clone(), size, file_limit)
+            });
+        }
+        used += bytes.len().min(allowed);
         out.files.push(ContextFile { label, text, cut });
     };
     if ctx.include_claude_md {

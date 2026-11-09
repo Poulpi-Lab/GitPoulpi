@@ -867,10 +867,31 @@ fn previewed(action: AiAction) -> bool {
     !matches!(action, AiAction::RewriteScript | AiAction::RewriteRules)
 }
 
+/// The byte budget for a diff of `bytes`: `ai.limits.diff_bytes`, or no limit
+/// when the user chose "Send all". Over the limit the worker waits here for
+/// the answer of "Over the AI limit" (`ai_limit_dialog`); Cancel ends the
+/// request as a cancel, not as a failure.
+async fn diff_budget(job: &Job, bytes: usize) -> Result<usize, String> {
+    job.diff_budget(gitpoulpi_ai::Part::Diff, bytes)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// The job with the caps of `[ai.limits]` as the file says now, and the
+/// dialog that asks before an input over one is cut.
+fn with_limits(job: Job) -> Job {
+    let mut job = job;
+    if let Ok(settings) = gitpoulpi_config::Settings::resolve_ambient() {
+        job.limit.limits = gitpoulpi_ai::Limits::from_config(&settings.config().ai.limits);
+    }
+    job.with_limit_gate(crate::ai_limit_dialog::Gate::shared())
+}
+
 /// The job with the privacy settings as the files say now (a window's copy of
 /// the config can be older), and the "What is sent" dialog as its gate when
 /// the user wants to see this action's request first.
 fn with_privacy(job: Job, action: AiAction) -> Job {
+    let job = with_limits(job);
     let Ok(settings) = gitpoulpi_config::Settings::resolve_ambient() else {
         return job;
     };
@@ -990,11 +1011,9 @@ async fn pull_request(
         OperationKind::Diff,
         serde_json::json!({ "target": DiffTarget::CommitRange(base, source_tip) })
     )?;
-    let prompt = prompts::pull_request(
-        &subjects,
-        &render_diff(&diffs),
-        prompts::DEFAULT_DIFF_BUDGET,
-    );
+    let diff = render_diff(&diffs);
+    let budget = diff_budget(&job, diff.len()).await?;
+    let prompt = prompts::pull_request(&subjects, &diff, budget);
     let answer = job.run(&prompt).await.map_err(|e| e.to_string())?;
     parse::pull_request(&answer).map_err(|e| e.to_string())
 }
@@ -1046,7 +1065,9 @@ async fn commit_message(
     if diffs.is_empty() {
         return Err(msg::NO_CHANGES_DESCRIBE.get().into());
     }
-    let prompt = prompts::commit_message(&render_diff(&diffs), prompts::DEFAULT_DIFF_BUDGET);
+    let diff = render_diff(&diffs);
+    let budget = diff_budget(&job, diff.len()).await?;
+    let prompt = prompts::commit_message(&diff, budget);
     let answer = job.run(&prompt).await.map_err(|e| e.to_string())?;
     parse::commit_message(&answer).map_err(|e| e.to_string())
 }
@@ -1093,7 +1114,8 @@ async fn compose(
             diff.push_str(&no_textual_diff(path));
         }
     }
-    let prompt = prompts::commit_composer(&changed, &diff, prompts::DEFAULT_DIFF_BUDGET);
+    let budget = diff_budget(&job, diff.len()).await?;
+    let prompt = prompts::commit_composer(&changed, &diff, budget);
     let answer = job.run(&prompt).await.map_err(|e| e.to_string())?;
     let plan = match parse::composer_plan(&answer, &changed) {
         Ok(plan) => plan,
@@ -1406,7 +1428,8 @@ async fn stash_message(config: &AiConfig, session: &str, repo: &RepoRef) -> Resu
     if diff.trim().is_empty() {
         return Err(msg::NO_CHANGES_STASH.get().into());
     }
-    let prompt = prompts::stash_message(&diff, prompts::DEFAULT_DIFF_BUDGET);
+    let budget = diff_budget(&job, diff.len()).await?;
+    let prompt = prompts::stash_message(&diff, budget);
     let answer = job.run(&prompt).await.map_err(|e| e.to_string())?;
     parse::stash_message(&answer).map_err(|e| e.to_string())
 }
@@ -1446,12 +1469,8 @@ async fn explain(
     if diff.trim().is_empty() {
         return Err(msg::NOTHING_TO_EXPLAIN.get().into());
     }
-    let prompt = prompts::explain_changes(
-        &subject,
-        message.as_deref(),
-        &diff,
-        prompts::DEFAULT_DIFF_BUDGET,
-    );
+    let budget = diff_budget(&job, diff.len()).await?;
+    let prompt = prompts::explain_changes(&subject, message.as_deref(), &diff, budget);
     job.run(&prompt).await.map_err(|e| e.to_string())
 }
 

@@ -103,6 +103,8 @@ mod about;
 mod activity;
 mod activity_log;
 mod after_clone;
+#[cfg_attr(not(feature = "ai"), path = "ai_limit_dialog_stub.rs")]
+mod ai_limit_dialog;
 #[cfg_attr(not(feature = "ai"), path = "ai_sent_dialog_stub.rs")]
 mod ai_sent_dialog;
 #[cfg_attr(not(feature = "ai"), path = "ai_ui_stub.rs")]

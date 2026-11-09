@@ -830,22 +830,30 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         }
 
         #[cfg(feature = "ai")]
-        Commands::Ai { action, print_sent } => {
-            crate::ai_cmd::run(session, action, print_sent).await
-        }
+        Commands::Ai {
+            action,
+            print_sent,
+            send_all,
+        } => crate::ai_cmd::run(session, action, print_sent, send_all).await,
 
         Commands::Commit {
             message,
             amend,
             no_verify,
             ai,
+            send_all,
             #[cfg(feature = "workspaces")]
             workspace,
         } => {
+            if send_all && !ai {
+                return Err("--send-all goes with --ai: it sends the whole diff to the AI".into());
+            }
+            let mut truncated = Vec::new();
             let message = if ai {
-                crate::ai_cmd::generate_commit_message(session)
-                    .await?
-                    .full()
+                let (message, cuts) =
+                    crate::ai_cmd::generate_commit_message(session, send_all).await?;
+                truncated = cuts;
+                message.full()
             } else {
                 message.ok_or("pass -m <message>, or --ai to have one written")?
             };
@@ -873,10 +881,10 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
                     json!({ "message": message, "opts": opts }),
                 )
                 .await?;
-            Ok(emitted(
-                json!({ "commit": oid }),
-                format!("committed {}", short(oid)),
-            ))
+            let mut human = format!("committed {}", short(oid));
+            let mut out = json!({ "commit": oid });
+            crate::ai_cmd::report_truncated(&mut out, &mut human, &truncated);
+            Ok(emitted(out, human))
         }
 
         Commands::Branch { action } => branch(session, action).await,

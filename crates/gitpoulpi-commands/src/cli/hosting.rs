@@ -675,6 +675,12 @@ pub enum ReviewAction {
         /// No extra file for this run, whatever the defaults say.
         #[arg(long)]
         no_context_file: bool,
+        /// Send every input whole, even over its `ai.limits.*` cap (the
+        /// diff, a file's diff, the description, the existing comments, the
+        /// context files). Without it an input over a cap is truncated and
+        /// the answer says what was cut in `truncated`.
+        #[arg(long, alias = "no-truncate")]
+        send_all: bool,
     },
 }
 

@@ -6,6 +6,8 @@
 //! the profile and instructions of the action, with the repository's override.
 
 use gitpoulpi_ai::assist::{changed_paths, render_diff, Job};
+use gitpoulpi_ai::limits::Part;
+use gitpoulpi_ai::Cut;
 use gitpoulpi_ai::{parse, prompts};
 use gitpoulpi_config::AiAction;
 use gitpoulpi_core::domain::{DiffTarget, FileDiff, MergeDocument, Oid, OperationKind};
@@ -22,14 +24,60 @@ use crate::commands::{emitted, Emitted};
 #[derive(Default)]
 pub(crate) struct Ctx {
     print_sent: bool,
+    /// `--send-all`: nothing is truncated.
+    send_all: bool,
     report: Option<std::sync::Arc<gitpoulpi_ai::privacy::Report>>,
+    /// The job's cap decisions, to report what it truncated.
+    limit: Option<gitpoulpi_ai::LimitPolicy>,
+}
+
+/// Adds `truncated: [{part, detail?, bytes, limit, setting}]` to `out` (only
+/// when something was cut) and a line to the human text.
+pub(crate) fn report_truncated(out: &mut serde_json::Value, human: &mut String, truncated: &[Cut]) {
+    if truncated.is_empty() {
+        return;
+    }
+    if let Some(map) = out.as_object_mut() {
+        map.insert("truncated".into(), json!(truncated));
+    }
+    for cut in truncated {
+        human.push_str(&format!(
+            "\ntruncated: {}{} is {} bytes, over the {} byte limit (raise {} or pass --send-all)",
+            cut_name(cut.part),
+            if cut.detail.is_empty() {
+                String::new()
+            } else {
+                format!(" ({})", cut.detail)
+            },
+            cut.bytes,
+            cut.limit,
+            cut.setting
+        ));
+    }
+}
+
+fn cut_name(part: gitpoulpi_ai::Part) -> &'static str {
+    use gitpoulpi_ai::Part;
+    match part {
+        Part::Diff => "the diff",
+        Part::SplitHunks => "the commit's hunks",
+        Part::ReviewDiff => "the review's diff",
+        Part::ReviewFile => "a file's diff",
+        Part::ReviewText => "the description",
+        Part::ReviewThreads => "the existing comments",
+        Part::ContextFile => "a context file",
+        Part::ContextTotal => "the context files",
+    }
 }
 
 impl Ctx {
     /// [`job_for`], tracked by this run.
     fn job(&mut self, session: &Session, action: AiAction) -> Result<Job, String> {
-        let job = job_for(session, action)?.with_print_only(self.print_sent);
+        let job = job_for(session, action)?
+            .with_print_only(self.print_sent)
+            .with_send_all(self.send_all);
         self.report = Some(job.privacy_report());
+        self.limit = Some(job.limit.clone());
         Ok(job)
     }
 
@@ -61,6 +109,12 @@ impl Ctx {
             Ok(mut out) => {
                 if let (Some(p), Some(map)) = (privacy, out.json.as_object_mut()) {
                     map.insert("privacy".into(), p);
+                }
+                if let Some(limit) = &self.limit {
+                    // A command that reported its own (the review) has it already.
+                    if out.json.get("truncated").is_none() {
+                        report_truncated(&mut out.json, &mut out.human, &limit.truncated());
+                    }
                 }
                 Ok(out)
             }
@@ -221,9 +275,11 @@ pub(crate) async fn diff_to_commit(session: &mut Session) -> Result<Vec<FileDiff
 /// Generates a commit message for the staged changes.
 pub(crate) async fn generate_commit_message(
     session: &mut Session,
-) -> Result<parse::CommitMessage, String> {
-    let job = job_for(session, AiAction::CommitMessage)?;
-    commit_message_with(session, &job).await
+    send_all: bool,
+) -> Result<(parse::CommitMessage, Vec<Cut>), String> {
+    let job = job_for(session, AiAction::CommitMessage)?.with_send_all(send_all);
+    let message = commit_message_with(session, &job).await?;
+    Ok((message, job.truncated()))
 }
 
 async fn commit_message_with(
@@ -234,15 +290,23 @@ async fn commit_message_with(
     if diffs.is_empty() {
         return Err("there are no changes to describe".into());
     }
-    let prompt = prompts::commit_message(&render_diff(&diffs), prompts::DEFAULT_DIFF_BUDGET);
+    let diff = render_diff(&diffs);
+    let budget = job
+        .diff_budget(Part::Diff, diff.len())
+        .await
+        .map_err(|e| e.to_string())?;
+    let prompt = prompts::commit_message(&diff, budget);
     let answer = job.run(&prompt).await.map_err(|e| e.to_string())?;
     parse::commit_message(&answer).map_err(|e| e.to_string())
 }
 
 /// Generates a one-line stash name for the working changes (staged and
 /// unstaged together).
-pub(crate) async fn generate_stash_message(session: &mut Session) -> Result<String, String> {
-    let job = job_for(session, AiAction::StashMessage)?;
+pub(crate) async fn generate_stash_message(
+    session: &mut Session,
+    send_all: bool,
+) -> Result<(String, Vec<Cut>), String> {
+    let job = job_for(session, AiAction::StashMessage)?.with_send_all(send_all);
     let staged: Vec<FileDiff> = session
         .call(
             OperationKind::Diff,
@@ -259,9 +323,15 @@ pub(crate) async fn generate_stash_message(session: &mut Session) -> Result<Stri
     if all.is_empty() {
         return Err("there are no changes to stash".into());
     }
-    let prompt = prompts::stash_message(&render_diff(&all), prompts::DEFAULT_DIFF_BUDGET);
+    let diff = render_diff(&all);
+    let budget = job
+        .diff_budget(Part::Diff, diff.len())
+        .await
+        .map_err(|e| e.to_string())?;
+    let prompt = prompts::stash_message(&diff, budget);
     let answer = job.run(&prompt).await.map_err(|e| e.to_string())?;
-    parse::stash_message(&answer).map_err(|e| e.to_string())
+    let message = parse::stash_message(&answer).map_err(|e| e.to_string())?;
+    Ok((message, job.truncated()))
 }
 
 /// The AI's suggestion for conflict `conflict` (1-based) of `path`.
@@ -297,6 +367,12 @@ async fn resolve_conflict(
     let context = prompts::ConflictContext::from_document(&doc, n - 1)
         .ok_or_else(|| format!("there is no conflict {n} in {path}"))?;
     let job = ctx.job(session, AiAction::ConflictResolve)?;
+    // A conflict is refused over its cap, never cut: `--send-all` sends it.
+    let job = if ctx.send_all {
+        job.without_conflict_limit()
+    } else {
+        job
+    };
     let lines = job
         .resolve_conflict(&context)
         .await
@@ -517,10 +593,13 @@ pub(crate) async fn run(
     session: &mut Session,
     action: AiCommand,
     print_sent: bool,
+    send_all: bool,
 ) -> Result<Emitted, String> {
     let mut ctx = Ctx {
         print_sent,
+        send_all,
         report: None,
+        limit: None,
     };
     let result = run_action(session, &mut ctx, action).await;
     ctx.finish(result)
@@ -621,12 +700,12 @@ async fn run_action(
             if diffs.is_empty() {
                 return Err("there is nothing to explain".into());
             }
-            let prompt = prompts::explain_changes(
-                &subject,
-                message.as_deref(),
-                &render_diff(&diffs),
-                prompts::DEFAULT_DIFF_BUDGET,
-            );
+            let diff = render_diff(&diffs);
+            let budget = job
+                .diff_budget(Part::Diff, diff.len())
+                .await
+                .map_err(|e| e.to_string())?;
+            let prompt = prompts::explain_changes(&subject, message.as_deref(), &diff, budget);
             let answer = job.run(&prompt).await.map_err(|e| e.to_string())?;
             let files = changed_paths(&diffs);
             Ok(emitted(

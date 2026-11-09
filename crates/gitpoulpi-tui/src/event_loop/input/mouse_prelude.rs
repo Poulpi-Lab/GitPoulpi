@@ -194,6 +194,16 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         crate::ai_sent_dialog::on_mouse(mouse);
         return Ok(None);
     }
+    // "Over the AI limit" is modal the same way.
+    if crate::ai_limit_dialog::is_open() {
+        *cx.hovered_target = None;
+        *cx.hovered_tab_index = None;
+        *cx.hovered_close_tab = None;
+        *cx.hovered_status_row = None;
+        crate::ai_limit_dialog::on_mouse(mouse);
+        super::commands::open_limit_setting(cx);
+        return Ok(None);
+    }
     if tab_bar_drag(cx, mouse) {
         return Ok(None);
     }

@@ -1023,6 +1023,21 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::PinSshKey,
     ),
     entry(msg::sparse::PALETTE, "", PaletteCommand::SparseCheckout),
+    entry(
+        msg::repo_auth::PALETTE_OPEN,
+        "",
+        PaletteCommand::RepoAuthOpen,
+    ),
+    entry(
+        msg::repo_auth::PALETTE_TEST,
+        "",
+        PaletteCommand::RepoAuthTest,
+    ),
+    entry(
+        msg::repo_auth::PALETTE_DEFAULTS,
+        "",
+        PaletteCommand::RepoAuthDefaults,
+    ),
     // -- Flow (branching workflows) -----------------------------------
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_MENU,

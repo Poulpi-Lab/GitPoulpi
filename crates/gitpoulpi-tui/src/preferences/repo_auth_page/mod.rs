@@ -182,7 +182,12 @@ impl PreferencesState {
         }
         if ra.keys.is_none() && ra.keys_rx.is_none() {
             ra.keys_rx = Some(spawn_key_scan(
-                gitpoulpi_config::home_dir(),
+                // Tests never read the real home folder.
+                if cfg!(test) {
+                    None
+                } else {
+                    gitpoulpi_config::home_dir()
+                },
                 self.config
                     .integrations
                     .iter()
@@ -949,6 +954,10 @@ fn command_hash(profile: &RepoAuthProfile) -> String {
 /// The stored profile with its commands, from the private file (the daemon's
 /// view blanks them). A small local file, read when a view arrives.
 fn read_stored(repo_root: &std::path::Path) -> Option<RepoAuthProfile> {
+    // Tests never read the real private directory.
+    if cfg!(test) {
+        return None;
+    }
     let paths = gitpoulpi_config::ConfigPaths::discover()?;
     gitpoulpi_session::load_repo_auth(&paths, repo_root)
         .ok()

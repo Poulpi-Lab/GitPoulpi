@@ -372,6 +372,21 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::OpenPreferences => {
             *cx.preferences = Some(PreferencesState::open(cx.repo_root));
         }
+        PaletteCommand::RepoAuthOpen => {
+            let mut state = PreferencesState::open(cx.repo_root);
+            state.open_repo_auth_page();
+            *cx.preferences = Some(state);
+        }
+        PaletteCommand::RepoAuthTest => {
+            let mut state = PreferencesState::open(cx.repo_root);
+            state.repo_auth_test_command();
+            *cx.preferences = Some(state);
+        }
+        PaletteCommand::RepoAuthDefaults => {
+            let mut state = PreferencesState::open(cx.repo_root);
+            state.repo_auth_defaults_command();
+            *cx.preferences = Some(state);
+        }
         PaletteCommand::SearchSettings => {
             let mut state = PreferencesState::open(cx.repo_root);
             state.open_search();

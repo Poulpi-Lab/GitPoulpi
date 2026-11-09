@@ -527,6 +527,14 @@ pub(crate) enum PaletteCommand {
     PinSshKey,
     /// Repository: Sparse Checkout... - the directories dialog.
     SparseCheckout,
+    /// Repository: SSH & Credentials... - Settings on the page that picks how
+    /// this repository signs in.
+    RepoAuthOpen,
+    /// Repository: Test Connection - the page's test of every remote.
+    RepoAuthTest,
+    /// Repository: Use Default Credentials - asks first, then clears the
+    /// repository's sign-in settings.
+    RepoAuthDefaults,
     /// Hide or show a whole remote in the graph (every branch of it, the ones
     /// fetched later too) - the remote-name row's menu entry and its eye.
     HideRemoteInGraph,

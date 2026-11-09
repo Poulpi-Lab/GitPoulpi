@@ -77,11 +77,6 @@ impl TextPane {
         self.track
     }
 
-    #[cfg(test)]
-    pub(super) fn rect(&self) -> Rect {
-        self.rect
-    }
-
     /// Scroll keys. `lines`: the arrows scroll by one line too (the results
     /// panel; the confirmation keeps the arrows for its answers).
     pub(super) fn key(&mut self, key: KeyEvent, lines: bool) -> bool {
@@ -350,11 +345,6 @@ impl CommandConfirm {
     #[cfg(test)]
     pub(super) fn pane(&self) -> &TextPane {
         &self.pane
-    }
-
-    #[cfg(test)]
-    pub(super) fn answer_rects(&self) -> [Rect; 2] {
-        self.answers
     }
 
     #[cfg(test)]

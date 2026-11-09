@@ -702,10 +702,11 @@ fn paint_activity(
                     },
                 );
                 hits.push((drawn, Hit::CopyEntry(*i)));
-                // The remedy next to it, when the failure has one.
-                if let Some(remedy) = super::remedy_of(&entries[*i]) {
+                // The remedies next to it, when the failure has some.
+                let mut next_x = drawn.right() + 1;
+                for (nth, remedy) in super::remedies_of(&entries[*i]).iter().enumerate() {
                     let label = remedy.label();
-                    let r = Rect::new(drawn.right() + 1, y, dialog_kit::button_width(&label), 1);
+                    let r = Rect::new(next_x, y, dialog_kit::button_width(&label), 1);
                     let drawn = dialog_kit::button(
                         buf,
                         r.x,
@@ -716,7 +717,8 @@ fn paint_activity(
                             focused: false,
                         },
                     );
-                    hits.push((drawn, Hit::Remedy(*i)));
+                    next_x = drawn.right() + 1;
+                    hits.push((drawn, Hit::Remedy(*i, nth)));
                 }
             }
         }

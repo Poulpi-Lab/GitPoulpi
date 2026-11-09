@@ -46,6 +46,7 @@ fn a_stash_row_shifts_the_commits_below_it_and_is_its_own_selection() {
             index: None,
             worktree: Some(gitpoulpi_core::domain::FileStatus::Modified),
         }],
+        ..WorkingTree::default()
     });
     let stashes = Ok(vec![stash_on_2()]);
     let rows = log_rows_now(

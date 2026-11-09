@@ -287,14 +287,6 @@
   RemoteSetUrl {"name":"up","url":"https://example.test/r.git"}
   message: up now fetches from https://example.test/r.git
   ok: true
-== SetSshCommand { command: Some("ssh -i key") }
-  SetSshCommand {"command":"ssh -i key"}
-  message: this repository now uses ssh -i key
-  ok: true
-== SetSshCommand { command: None }
-  SetSshCommand {"command":null}
-  message: SSH key pin cleared
-  ok: true
 == SparseSet { dirs: ["src", "docs/guide"] }
   SparseSet {"dirs":["src","docs/guide"]}
   message: sparse checkout applied: src docs/guide

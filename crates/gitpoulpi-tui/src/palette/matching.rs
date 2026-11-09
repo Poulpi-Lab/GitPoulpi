@@ -182,9 +182,7 @@ pub(crate) fn needs_repository(label: &str) -> bool {
         "Integrations" => {
             !(rest.contains("Connect Integration") || rest.contains("Review security check"))
         }
-        "Repository" => {
-            rest.contains("SSH Key for This Repository") || rest.contains("Sparse Checkout")
-        }
+        "Repository" => rest.contains("SSH & Credentials") || rest.contains("Sparse Checkout"),
         _ => false,
     }
     // i18n-scan: on

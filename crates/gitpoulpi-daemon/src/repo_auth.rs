@@ -516,9 +516,7 @@ fn settle_command(
         return Ok(());
     }
     Err(Error::NeedsConfirmation(
-        "a credential helper or token command is stored only when a person confirms it: \
-         ask the person to set it in GitPoulpi"
-            .into(),
+        gitpoulpi_core::domain::COMMAND_NEEDS_PERSON.into(),
     ))
 }
 

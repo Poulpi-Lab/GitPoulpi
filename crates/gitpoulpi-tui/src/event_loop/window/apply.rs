@@ -377,6 +377,11 @@ impl WindowState {
                 self.status_result = outcome.status_result;
                 self.optimistic_backup = None;
             }
+            // Who this repository signs in as (the push menu and the
+            // Activity Log read it; nothing is spawned for it).
+            if let Ok(tree) = &self.status_result {
+                crate::activity_log::identity::note(&self.repo.root, tree.repo_auth.as_ref());
+            }
             // A read whose content is what the window already holds is not
             // replaced and its generation is not bumped, so an idle poll
             // leaves the Log layout cache (keyed on the generations) alone.

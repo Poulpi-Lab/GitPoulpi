@@ -18,6 +18,7 @@
 
 mod draft;
 mod panes;
+mod pin;
 mod results;
 #[cfg(test)]
 mod tests;
@@ -37,6 +38,7 @@ use crate::daemon_link::{error_text::error_text, Reply, Requester};
 
 use self::draft::{Draft, HttpsKind, SshKind};
 use self::panes::{CommandConfirm, ConfirmEvent, ResultsEvent, ResultsPane};
+use self::pin::{KeyAcl, PinMove};
 use super::*;
 
 pub(super) use self::draft::split_command;
@@ -72,6 +74,10 @@ pub(crate) enum RaButton {
     /// What the "Use defaults" question runs.
     Clear,
     ImportHelper,
+    /// Moves the repository's own `core.sshCommand` key pin into the profile.
+    MovePin,
+    /// Makes the key file readable by this account only.
+    RestrictKey,
 }
 
 /// A connection test in flight: the fetch check first, then the push check
@@ -116,6 +122,10 @@ pub(super) struct RepoAuthPage {
     /// The profile the open confirmation would save.
     pending: Option<RepoAuthProfile>,
     results: Option<ResultsPane>,
+    /// The key file's permissions (checked and fixed off the render thread).
+    acl: KeyAcl,
+    /// A "Move into GitPoulpi" in flight.
+    pin_move: PinMove,
 }
 
 impl RepoAuthPage {
@@ -221,10 +231,18 @@ impl PreferencesState {
                     ra.reset_on_get = true;
                     ra.get =
                         Some(requester.call(OperationKind::RepoAuthGet, serde_json::json!({})));
+                    // A pin being moved: its key is in the profile now.
+                    self.ra_pin_saved(&requester);
                 }
-                Err(e) => ra.status = Some(t::refused(error_text(&e))),
+                Err(e) => {
+                    ra.pin_move.key = None;
+                    ra.status = Some(t::refused(error_text(&e)));
+                }
             }
         }
+        self.ra_poll_pin_move(&requester);
+        self.ra_poll_key_acl();
+        let ra = &mut self.repo_auth;
         if let Some(answer) = ra.clear.as_ref().and_then(Reply::take) {
             ra.clear = None;
             match answer {
@@ -297,6 +315,8 @@ impl PreferencesState {
                 }
             }
             RaButton::ImportHelper => self.ra_import_helper(),
+            RaButton::MovePin => self.ra_move_pin(),
+            RaButton::RestrictKey => self.ra_restrict_key(),
         }
     }
 
@@ -849,18 +869,30 @@ impl PreferencesState {
                 for key in ra.keys.iter().flatten() {
                     options.push((key.clone(), key.clone()));
                 }
-                f.push(
-                    Field::plain(
-                        t::KEY_PATH.get(),
-                        Control::Combo {
-                            options,
-                            value: d.key.clone(),
-                            custom: true,
-                        },
-                        target(RaTarget::Key),
-                    )
-                    .with_help(t::KEY_HELP.get()),
-                );
+                let exposed = self.ra_key_exposed();
+                let mut key_row = Field::plain(
+                    t::KEY_PATH.get(),
+                    Control::Combo {
+                        options,
+                        value: d.key.clone(),
+                        custom: true,
+                    },
+                    target(RaTarget::Key),
+                )
+                .with_help(t::KEY_HELP.get());
+                if exposed {
+                    key_row = key_row.with_danger(t::ACL_WARNING.get());
+                }
+                f.push(key_row);
+                if exposed {
+                    f.push(Field::buttons(
+                        "",
+                        vec![Btn::new(
+                            t::ACL_BUTTON.get(),
+                            PrefAction::RepoAuth(RaButton::RestrictKey),
+                        )],
+                    ));
+                }
             }
             SshKind::AccountKey => {
                 f.push(self.ra_account_choice(
@@ -893,6 +925,8 @@ impl PreferencesState {
             Control::Info(self.ra_ssh_program()),
             Target::None,
         ));
+
+        f.extend(self.ra_pin_rows());
 
         // -- Remotes ----------------------------------------------------------------
         f.push(Field::heading(t::HEADING_REMOTES.get()));

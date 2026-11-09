@@ -126,6 +126,7 @@ mod tests {
                     Some(FileStatus::Conflicted),
                 ),
             ],
+            ..WorkingTree::default()
         }
     }
 

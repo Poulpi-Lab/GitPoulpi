@@ -21,6 +21,7 @@
 
 mod feed;
 pub(crate) mod friendly;
+pub(crate) mod identity;
 mod panel;
 mod problem;
 mod report;
@@ -71,6 +72,8 @@ pub(crate) fn newest_failure_details() -> Option<String> {
 pub(crate) enum Command {
     Submit(Action),
     OpenIntegrations,
+    /// Open this repository's SSH & credentials page.
+    OpenRepoAuth,
     Message(String),
 }
 
@@ -126,6 +129,13 @@ pub(crate) fn report_failure(
     entry.kind = kind;
     entry.detail = error.detail().cloned();
     entry.retry = Some(action.clone());
+    let typed_repo_auth = friendly::is_repo_auth_error(error);
+    entry.auth = friendly::auth_context(
+        kind,
+        typed_repo_auth,
+        repo != std::path::Path::new(crate::tabs::NO_REPOSITORY),
+        identity::get(repo).as_ref(),
+    );
     let text = match error.detail() {
         Some(d) => format!("{}\n{error}", d.stderr),
         None => error.to_string(),
@@ -138,6 +148,13 @@ pub(crate) fn report_failure(
         // Typed refusals have their own sentence (localised).
         None if error.typed().is_some() => {
             entry.summary = Some(crate::daemon_link::error_text::error_text(error));
+            if typed_repo_auth {
+                entry.hint = Some(
+                    gitpoulpi_i18n::msg::git_error::HINT_REPO_AUTH
+                        .get()
+                        .to_string(),
+                );
+            }
             if kind == gitpoulpi_core::FailureKind::LocalChangesBlockAbort {
                 entry.hint = Some(
                     gitpoulpi_i18n::msg::git_error::HINT_ABORT_BLOCKED
@@ -183,15 +200,24 @@ pub(crate) fn report_success(
     elapsed: std::time::Duration,
 ) {
     let duration = timing::action_finished(action, repo, ms(elapsed), true);
+    let signs_in = identity::line_for(repo).filter(|_| identity::uses_network(action));
     let Some(title) = friendly::done_title(action) else {
         // Not worth a card: the Repository tab gets the timing line.
         if let (Some(label), Some(ms)) = (timing::label_for(action), duration) {
-            feed::push(Entry::operation(repo, label, ms, false));
+            let mut entry = Entry::operation(repo, label, ms, false);
+            if let Some(line) = signs_in {
+                entry.message = line;
+            }
+            feed::push(entry);
         }
         return;
     };
     tracing::info!(target: "tui", repo = repo_text(repo).as_str(), "{title}");
-    let mut entry = Entry::new(Severity::Info, title.clone(), title);
+    let message = match &signs_in {
+        Some(line) => format!("{title}\n{line}"),
+        None => title.clone(),
+    };
+    let mut entry = Entry::new(Severity::Info, title.clone(), message);
     entry.repo = Some(repo.to_path_buf());
     entry.duration_ms = duration;
     entry.list_title = timing::label_for(action).filter(|_| duration.is_some());

@@ -4955,8 +4955,6 @@ remote_added = "aggiunto il remoto {name}"
 remote_removed = "rimosso il remoto {name}"
 remote_renamed = "remoto {old_name} rinominato in {new_name}"
 remote_fetches_from = { git = "{name} ora fa il fetch da {url}", local = "{name} ora recupera da {url}" }
-ssh_command_set = "questo repository ora usa {command}"
-ssh_pin_cleared = "pin della chiave SSH rimosso"
 repo_config_set = "{key} impostato a {value} per questo repository"
 repo_config_unset = "{key} rimosso per questo repository (vale il valore globale)"
 remote_pushes_to = { git = "{name} ora fa il push verso {url}", local = "{name} ora invia a {url}" }

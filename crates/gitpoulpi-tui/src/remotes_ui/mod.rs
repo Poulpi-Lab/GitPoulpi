@@ -295,9 +295,9 @@ pub(crate) enum RemoteUiAction {
     /// The complement: show the remote again, with every branch of it that
     /// was hidden one by one.
     ShowRemote(String),
-    /// Pin this repository to a profile's SSH key (`Some(core.sshCommand)`)
-    /// or clear the pin (`None`) - ADR-0008.
-    PinSshKey(Option<String>),
+    /// The push menu's "Signs in as: ..." row: open this repository's SSH &
+    /// credentials page.
+    OpenRepoAuth,
     Cancel,
 }
 
@@ -317,72 +317,6 @@ impl RemoteUiAction {
             _ => return None,
         })
     }
-}
-
-/// One integration profile's SSH key, as the pin menu offers it.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct SshKeyChoice {
-    /// The profile's display name (its id when it has none).
-    pub(crate) profile: String,
-    pub(crate) private_key_path: String,
-}
-
-/// The profiles that have a private key to pin: generated or custom, with
-/// a path. A profile on the default (agent) setup has nothing to pin.
-pub(crate) fn ssh_key_choices(integrations: &[gitpoulpi_config::Integration]) -> Vec<SshKeyChoice> {
-    integrations
-        .iter()
-        .filter_map(|i| {
-            let path = i.ssh.as_ref()?.private_key_path.as_deref()?.trim();
-            (!path.is_empty()).then(|| SshKeyChoice {
-                profile: if i.name.is_empty() {
-                    i.id.clone()
-                } else {
-                    i.name.clone()
-                },
-                private_key_path: path.to_string(),
-            })
-        })
-        .collect()
-}
-
-/// The pin menu: what is pinned now, one row per profile key (the pinned
-/// one marked), and Clear when there is a pin.
-pub(crate) fn ssh_pin_entries(
-    current: Option<&str>,
-    keys: &[SshKeyChoice],
-) -> Vec<Entry<RemoteUiAction>> {
-    let mut entries = vec![Entry::Disabled {
-        label: match current {
-            Some(cmd) => msg::pinned(cmd),
-            None => msg::NOT_PINNED.get().to_string(),
-        },
-    }];
-    entries.push(Entry::Separator);
-    if keys.is_empty() {
-        entries.push(Entry::Disabled {
-            label: msg::NO_PROFILE_KEY.get().to_string(),
-        });
-    }
-    for key in keys {
-        let command = gitpoulpi_hosting::ssh_key::ssh_command_for_key(&key.private_key_path);
-        let on = current == Some(command.as_str());
-        entries.push(Entry::action(
-            format!("{} {}  ({})", radio(on), key.profile, key.private_key_path),
-            RemoteUiAction::PinSshKey(Some(command)),
-        ));
-    }
-    entries.push(Entry::Separator);
-    match current {
-        Some(_) => entries.push(Entry::action(
-            glyph_label("\u{2717}", msg::CLEAR_PIN.get()),
-            RemoteUiAction::PinSshKey(None),
-        )),
-        None => entries.push(Entry::Disabled {
-            label: msg::CLEAR_PIN_NONE.get().to_string(),
-        }),
-    }
-    entries
 }
 
 /// The remote-name row's menu: copy the name or the web

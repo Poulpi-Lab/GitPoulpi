@@ -6,6 +6,13 @@ use init::WindowState;
 
 impl WindowState {
     pub(in crate::event_loop) fn apply_notices(&mut self) {
+        // The push menu's identity row or the tab menu asked for the SSH &
+        // credentials page.
+        if std::mem::take(&mut self.remote_ui.want_repo_auth) {
+            let mut state = crate::preferences::PreferencesState::open(&self.repo.root);
+            state.open_repo_auth_page();
+            self.preferences = Some(state);
+        }
         // The Git & Encoding page's LFS rows: what the program is, and the
         // "Initialize LFS" button's request.
         if let Some(prefs) = self.preferences.as_mut() {

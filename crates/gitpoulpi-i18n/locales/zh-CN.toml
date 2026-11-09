@@ -4957,8 +4957,6 @@ remote_added = "已添加远程 {name}"
 remote_removed = "已移除远程 {name}"
 remote_renamed = "已将远程 {old_name} 重命名为 {new_name}"
 remote_fetches_from = "{name} 现在从 {url} {$fetch}"
-ssh_command_set = "此仓库现在使用 {command}"
-ssh_pin_cleared = "已清除 SSH 密钥固定"
 repo_config_set = "已为此仓库将 {key} 设为 {value}"
 repo_config_unset = "已为此仓库移除 {key}（使用全局值）"
 remote_pushes_to = { git = "{name} 现在 {$push} 到 {url}", local = "{name} 现在{$push}到 {url}" }

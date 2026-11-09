@@ -1017,11 +1017,6 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         ".",
         PaletteCommand::RemoteActions,
     ),
-    entry(
-        msg::palette::REPOSITORY_SSH_KEY_FOR_THIS_REPOSITORY,
-        "",
-        PaletteCommand::PinSshKey,
-    ),
     entry(msg::sparse::PALETTE, "", PaletteCommand::SparseCheckout),
     entry(
         msg::repo_auth::PALETTE_OPEN,

@@ -72,7 +72,6 @@ pub(crate) fn run_remote_palette_command(
             }
         }
         PaletteCommand::AddRemote => apply_remote_ui_action(RemoteUiAction::AddRemote, ctx),
-        PaletteCommand::PinSshKey => ctx.ui.open_ssh_pin_menu(col, row),
         PaletteCommand::RemoveRemote => {
             on_remote(RemoteUiAction::RemoveRemote, msg::REMOVE_WHICH.get(), ctx)
         }
@@ -301,19 +300,11 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
             refs_tree::submit_ref_visibility(link, hidden_from_graph, solo_refs);
             Some(msg::remote_shown(&remote))
         }
-        RemoteUiAction::PinSshKey(command) => {
-            let said = match &command {
-                Some(cmd) => msg::pinning(cmd),
-                None => msg::CLEARING_PIN.get().to_string(),
-            };
-            // Remember the pin now rather than waiting for the refresh
-            // that follows the daemon's `RepoChanged`: the pin menu
-            // snapshots `ssh_pin` when it opens, so reopening it right
-            // after pinning (a keyboard user, an agent) would otherwise
-            // show the old state until that refresh lands.
-            ui.ssh_pin = command.clone();
-            link.submit_action(Action::SetSshCommand { command });
-            Some(said)
+        // The SSH & credentials page: the window opens it at its next
+        // notice pass (this has no preferences to open).
+        RemoteUiAction::OpenRepoAuth => {
+            ui.want_repo_auth = true;
+            None
         }
         RemoteUiAction::AutoStashContinue => match ui.pending_autostash.take() {
             Some(action) => {

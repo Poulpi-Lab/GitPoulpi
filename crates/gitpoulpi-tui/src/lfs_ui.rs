@@ -684,6 +684,7 @@ mod tests {
                 index: None,
                 worktree: Some(FileStatus::Untracked),
             }],
+            ..WorkingTree::default()
         };
         gate.observe_status(&with_attributes);
         assert!(gate.due(), "a new .gitattributes may start LFS use");

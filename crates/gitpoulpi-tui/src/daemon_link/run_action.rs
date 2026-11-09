@@ -974,19 +974,6 @@ async fn dispatch(
             )
             .await
         }
-        Action::SetSshCommand { command } => {
-            reported::<()>(
-                conn,
-                action_message_tx,
-                OperationKind::SetSshCommand,
-                serde_json::json!({ "command": command }),
-                |()| match &command {
-                    Some(cmd) => l::ssh_command_set(cmd),
-                    None => l::SSH_PIN_CLEARED.get().to_string(),
-                },
-            )
-            .await
-        }
         Action::SparseSet { dirs } => {
             reported::<()>(
                 conn,

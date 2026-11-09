@@ -160,6 +160,14 @@ impl RepoAuthProfile {
     }
 }
 
+/// The prompt of the `NeedsConfirmation` a credential helper or token command
+/// gets when it is sent without a person's confirmation. A frontend that
+/// recognizes it words it in its own language and points at the page where the
+/// person confirms.
+pub const COMMAND_NEEDS_PERSON: &str =
+    "a credential helper or token command is stored only when a person confirms it: \
+     ask the person to set it in GitPoulpi";
+
 /// How the HTTPS identity of a profile is reached.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]

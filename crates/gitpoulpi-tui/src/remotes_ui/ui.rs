@@ -16,6 +16,9 @@ pub(crate) struct RemoteUi {
     /// The repository-local `core.sshCommand`, as the last refresh
     /// reported it.
     pub(crate) ssh_pin: Option<String>,
+    /// Something (the push menu's identity row, the tab menu) asked for the
+    /// SSH & credentials page; the window opens it at its next notice pass.
+    pub(crate) want_repo_auth: bool,
     /// The one open remote-related menu: a remote's menu, a toolbar
     /// dropdown, Set upstream, a remote chooser, or the diverged dialog.
     pub(crate) menu: Option<ContextMenu<RemoteUiAction>>,
@@ -37,6 +40,7 @@ impl RemoteUi {
             remotes: Vec::new(),
             chosen_default: load_chosen_default_remote(repo_root),
             ssh_pin: None,
+            want_repo_auth: false,
             menu: None,
             form: None,
             pending_autostash: None,
@@ -127,9 +131,16 @@ impl RemoteUi {
             return Some(msg::NO_REMOTE_ADD.get().into());
         }
         let default = self.default_remote(refs);
+        let mut entries = push_to_entries(&names, default.as_deref());
+        // Who the push signs in as, when the repository's profile is not
+        // all default: a row that opens the page that chose it.
+        if let Some(line) = crate::activity_log::identity::line_for(&self.repo_root) {
+            entries.push(Entry::Separator);
+            entries.push(Entry::action(line, RemoteUiAction::OpenRepoAuth));
+        }
         self.menu = Some(ContextMenu::new(
             msg::push_to_title(&head.name),
-            push_to_entries(&names, default.as_deref()),
+            entries,
             col,
             row,
         ));
@@ -151,24 +162,6 @@ impl RemoteUi {
                 &self.names(),
                 branch.upstream.as_deref(),
             ),
-            col,
-            row,
-        ));
-    }
-
-    /// The SSH-key pin menu (ADR-0008), reading the profiles from
-    /// `config.toml` now rather than caching them.
-    pub(crate) fn open_ssh_pin_menu(&mut self, col: u16, row: u16) {
-        let integrations = gitpoulpi_config::Settings::resolve_ambient()
-            .map(|s| s.config().integrations.clone())
-            .unwrap_or_default();
-        self.open_ssh_pin_menu_with(&ssh_key_choices(&integrations), col, row);
-    }
-
-    pub(crate) fn open_ssh_pin_menu_with(&mut self, keys: &[SshKeyChoice], col: u16, row: u16) {
-        self.menu = Some(ContextMenu::new(
-            msg::SSH_PIN_TITLE.get(),
-            ssh_pin_entries(self.ssh_pin.as_deref(), keys),
             col,
             row,
         ));

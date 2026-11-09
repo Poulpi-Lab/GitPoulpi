@@ -132,7 +132,7 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
     }
 
     // -- rows per section, then the two sub-panes --
-    let empty_tree = WorkingTree { files: Vec::new() };
+    let empty_tree = WorkingTree::default();
     let tree_ref = status_result.as_ref().unwrap_or(&empty_tree);
     *status_section_lines = StatusSection::ORDER
         .iter()

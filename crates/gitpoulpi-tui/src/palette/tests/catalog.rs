@@ -218,7 +218,7 @@ fn every_mouse_affordance_maps_to_a_palette_command() {
             R::ForcePush { .. } => PaletteCommand::ForcePushWithLease,
             R::HideRemote(_) => PaletteCommand::HideRemoteInGraph,
             R::ShowRemote(_) => PaletteCommand::ShowRemoteInGraph,
-            R::PinSshKey(_) => PaletteCommand::PinSshKey,
+            R::OpenRepoAuth => PaletteCommand::RepoAuthOpen,
             // The auto-stash dialog is the answer to an operation the palette
             // already reaches (checkout, pull, merge, rebase); its yes is
             // Enter on the dialog, and `general.auto_stash = always` skips it.
@@ -532,7 +532,7 @@ fn every_management_control_and_tab_menu_row_maps_to_a_palette_command() {
                 PaletteCommand::Management(M::CloseOrRemoveSelected)
             }
             RepoMenuAction::RemoveFromList => PaletteCommand::Management(M::RemoveSelectedFromList),
-            RepoMenuAction::SshKey => PaletteCommand::PinSshKey,
+            RepoMenuAction::SshKey => PaletteCommand::RepoAuthOpen,
             RepoMenuAction::Sparse => PaletteCommand::SparseCheckout,
             RepoMenuAction::NewTab => PaletteCommand::NewTab,
             other => PaletteCommand::TabMenu(other),

@@ -16,6 +16,7 @@ fn the_wip_list_is_the_head_tree_plus_new_files_changes_marked() {
             entry("new.txt", None, Some(FileStatus::Untracked)),
             entry("src/a.rs", Some(FileStatus::Modified), None),
         ],
+        ..WorkingTree::default()
     };
     let all = wip_all_paths(&paths(&["README.md", "src/a.rs"]), &status);
     assert_eq!(all, paths(&["README.md", "new.txt", "src/a.rs"]));
@@ -52,6 +53,7 @@ fn the_wip_list_draws_every_file_with_changes_marked() {
     use ratatui::backend::TestBackend;
     let status = WorkingTree {
         files: vec![entry("src/a.rs", None, Some(FileStatus::Modified))],
+        ..WorkingTree::default()
     };
     let mut wip = WipAllFiles {
         head_tree: Some((oid(1), paths(&["README.md", "src/a.rs"]))),

@@ -789,11 +789,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         C::AgentBack => (!ctx.agent_back).then_some(msg::palette::WHY_NOTHING_TO_GO_BACK_TO.get()),
         C::CloseRepositoryTab | C::SelectTab => (ctx.open_repository_tabs == 0)
             .then_some(msg::palette::WHY_NO_REPOSITORY_TAB_IS_OPEN.get()),
-        C::PinSshKey
-        | C::SparseCheckout
-        | C::RepoAuthOpen
-        | C::RepoAuthTest
-        | C::RepoAuthDefaults => {
+        C::SparseCheckout | C::RepoAuthOpen | C::RepoAuthTest | C::RepoAuthDefaults => {
             if ctx.in_repository_management {
                 Some(msg::palette::WHY_OPEN_A_REPOSITORY_TAB_FIRST_THE_PIN_IS_PER.get())
             } else {

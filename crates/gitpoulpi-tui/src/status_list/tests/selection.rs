@@ -258,6 +258,7 @@ fn the_selected_conflicted_path_survives_tree_mode_folder_rows() {
                 worktree: Some(FileStatus::Modified),
             },
         ],
+        ..WorkingTree::default()
     });
     let stage = |n: u8| {
         Some(StageEntry {

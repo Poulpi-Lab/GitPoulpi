@@ -92,6 +92,11 @@ pub(in crate::event_loop) fn apply_card_command(
             let _ = state.show_page(Some(gitpoulpi_ipc::ui::SettingsPage::Integrations), None);
             *cx.preferences = Some(state);
         }
+        Command::OpenRepoAuth => {
+            let mut state = PreferencesState::open(cx.repo_root);
+            state.open_repo_auth_page();
+            *cx.preferences = Some(state);
+        }
     }
 }
 

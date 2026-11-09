@@ -1055,7 +1055,7 @@ fn an_entry_with_a_remedy_shows_its_button_and_the_key_and_the_click_hand_over_t
     assert!(screen.contains(" Retry "), "{screen}");
 
     // The click on the button.
-    let button = hit_rect(Hit::Remedy(0));
+    let button = hit_rect(Hit::Remedy(0, 0));
     click(button.x + 1, button.y);
     assert!(!is_open(), "the window closes");
     assert_eq!(

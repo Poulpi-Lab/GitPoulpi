@@ -943,6 +943,7 @@ mod tests {
                 index: Some(FileStatus::Staged),
                 worktree: Some(FileStatus::Modified),
             }],
+            ..WorkingTree::default()
         };
         assert_eq!(section_paths(&tree, StatusSection::Staged).len(), 1);
         assert_eq!(section_paths(&tree, StatusSection::Unstaged).len(), 1);
@@ -1188,6 +1189,7 @@ mod tests {
                 index: Some(FileStatus::Conflicted),
                 worktree: Some(FileStatus::Conflicted),
             }],
+            ..WorkingTree::default()
         };
         assert_eq!(
             section_paths(&tree, StatusSection::Unstaged),
@@ -1289,6 +1291,7 @@ mod tests {
                 entry("other/c.rs", Some(FileStatus::Modified)),
                 entry("src/staged_only.rs", None), // in the index only
             ],
+            ..WorkingTree::default()
         };
         let mut under_src = unstaged_paths_under(&tree, Path::new("src"));
         under_src.sort();
@@ -1320,6 +1323,7 @@ mod tests {
                 entry("b.rs", Some(FileStatus::Untracked)),
                 entry("c.rs", Some(FileStatus::Untracked)),
             ],
+            ..WorkingTree::default()
         };
         let all: Vec<PathBuf> = tree.files.iter().map(|f| f.path.clone()).collect();
         assert_eq!(

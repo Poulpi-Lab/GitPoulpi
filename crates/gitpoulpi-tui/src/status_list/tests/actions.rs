@@ -12,6 +12,7 @@ fn folder_discard_opens_a_confirm_modal_naming_its_own_paths() {
             entry("src/b.rs", Some(FileStatus::Untracked)),
             entry("other/c.rs", Some(FileStatus::Modified)),
         ],
+        ..WorkingTree::default()
     };
     let mut input_mode = InputMode::Normal;
     let mut last_message = None;
@@ -48,7 +49,10 @@ fn folder_discard_opens_a_confirm_modal_naming_its_own_paths() {
 /// confirm modal.
 #[test]
 fn discarding_an_empty_folder_says_so_instead_of_confirming_nothing() {
-    let tree = WorkingTree { files: Vec::new() };
+    let tree = WorkingTree {
+        files: Vec::new(),
+        ..WorkingTree::default()
+    };
     let mut input_mode = InputMode::Normal;
     let mut last_message = None;
     apply_folder_context_action(
@@ -74,6 +78,7 @@ fn discard_all_changes_covers_every_unstaged_path_or_explains_why_not() {
             entry("a.rs", Some(FileStatus::Modified)),
             entry("b.rs", Some(FileStatus::Untracked)),
         ],
+        ..WorkingTree::default()
     };
     let mut input_mode = InputMode::Normal;
     let mut last_message = None;
@@ -92,7 +97,10 @@ fn discard_all_changes_covers_every_unstaged_path_or_explains_why_not() {
     assert!(matches!(input_mode, InputMode::Normal));
     assert!(last_message.unwrap().contains("no working tree"));
 
-    let empty = WorkingTree { files: Vec::new() };
+    let empty = WorkingTree {
+        files: Vec::new(),
+        ..WorkingTree::default()
+    };
     let mut input_mode = InputMode::Normal;
     let mut last_message = None;
     discard_all_changes(Some(&empty), &mut input_mode, &mut last_message);
@@ -113,6 +121,7 @@ fn a_file_menu_opened_before_gits_answer_corrects_itself_in_place() {
     let rel = Path::new("notes.dat");
     let tree = Ok(WorkingTree {
         files: vec![entry("notes.dat", Some(FileStatus::Modified))],
+        ..WorkingTree::default()
     });
     let lfs = crate::lfs_ui::LfsUi::default();
     let mut menu = open_file_menu(

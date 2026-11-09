@@ -84,8 +84,8 @@ enum Hit {
     Header(usize),
     CopyEntry(usize),
     /// An entry's remedy button (Retry, Stash and retry, Pull first, Open
-    /// Integrations).
-    Remedy(usize),
+    /// Integrations, SSH & credentials): the entry, then which of its buttons.
+    Remedy(usize, usize),
     CopyDiagnostics,
     CopyAll,
     OpenFolder,
@@ -871,10 +871,18 @@ pub(crate) fn take_command() -> Option<super::Command> {
 /// The button that does something about the failure `entry` records. An
 /// action runs on the link in front, so an entry of another repository only
 /// offers what does not depend on it (Open Integrations).
-pub(super) fn remedy_of(entry: &Entry) -> Option<super::friendly::Remedy> {
+pub(super) fn remedies_of(entry: &Entry) -> Vec<super::friendly::Remedy> {
     use super::friendly::Remedy;
-    let remedy = super::friendly::remedy(entry.kind, entry.retry.as_ref())?;
-    (matches!(remedy, Remedy::OpenIntegrations) || !belongs_elsewhere(entry)).then_some(remedy)
+    let elsewhere = belongs_elsewhere(entry);
+    super::friendly::remedies(entry.kind, entry.retry.as_ref(), entry.auth)
+        .into_iter()
+        .filter(|r| matches!(r, Remedy::OpenIntegrations) || !elsewhere)
+        .collect()
+}
+
+/// The first (main) button of the entry.
+pub(super) fn remedy_of(entry: &Entry) -> Option<super::friendly::Remedy> {
+    remedies_of(entry).into_iter().next()
 }
 
 fn command_of(remedy: super::friendly::Remedy) -> super::Command {
@@ -886,6 +894,7 @@ fn command_of(remedy: super::friendly::Remedy) -> super::Command {
             Command::Submit(Action::Pull(gitpoulpi_core::domain::PullOptions::default()))
         }
         Remedy::OpenIntegrations => Command::OpenIntegrations,
+        Remedy::OpenRepoAuth => Command::OpenRepoAuth,
         Remedy::StashAndRetry(action) => Command::Submit(Action::AutoStashed(Box::new(action))),
         Remedy::Retry(action) => Command::Submit(action),
     }
@@ -903,8 +912,12 @@ pub(crate) fn last_error_has_remedy() -> bool {
 
 /// Carries out entry `index`'s remedy: the window closes (Settings or the
 /// running action show behind it) and is handed the command.
-fn run_remedy(index: usize) {
-    let Some(command) = entries().get(index).and_then(remedy_of).map(command_of) else {
+fn run_remedy(index: usize, nth: usize) {
+    let Some(command) = entries()
+        .get(index)
+        .and_then(|e| remedies_of(e).into_iter().nth(nth))
+        .map(command_of)
+    else {
         return;
     };
     *COMMAND.lock().unwrap_or_else(|e| e.into_inner()) = Some(command);
@@ -1049,7 +1062,7 @@ pub(crate) fn nav_targets() -> Vec<(Rect, (u16, u16))> {
                 Hit::ClearCancel | Hit::ClearConfirm => Some(*r),
                 _ if s.clear_open => None,
                 Hit::Header(_) if !std::mem::replace(&mut seen_entry, true) => Some(*r),
-                Hit::Header(_) | Hit::CopyEntry(_) | Hit::Remedy(_) => None,
+                Hit::Header(_) | Hit::CopyEntry(_) | Hit::Remedy(..) => None,
                 _ => Some(*r),
             })
             .collect();
@@ -1224,7 +1237,8 @@ fn activity_key(key: KeyEvent, page: isize) {
             }
         }
         KeyCode::Char('c') => copy_entry(with(|s| s.selected)),
-        KeyCode::Char('r') => run_remedy(with(|s| s.selected)),
+        KeyCode::Char('r') => run_remedy(with(|s| s.selected), 0),
+        KeyCode::Char('o') => run_remedy(with(|s| s.selected), 1),
         _ => {
             let _ = page;
         }
@@ -1483,7 +1497,7 @@ fn press(at: ratatui::layout::Position, mouse: MouseEvent) {
             }
         }
         Some(Hit::CopyEntry(i)) => copy_entry(i),
-        Some(Hit::Remedy(i)) => run_remedy(i),
+        Some(Hit::Remedy(i, nth)) => run_remedy(i, nth),
         Some(Hit::CopyDiagnostics) => copy_diagnostics(),
         Some(Hit::CopyAll) => copy_all(),
         Some(Hit::OpenFolder) => open_folder(),

@@ -57,6 +57,8 @@ pub(crate) struct Entry {
     /// Global tab's workspace filter lists the entries of its repositories
     /// and these.
     pub(crate) workspace: Option<String>,
+    /// What the repository's sign-in adds to the buttons of a failure.
+    pub(crate) auth: super::friendly::AuthContext,
 }
 
 impl Entry {
@@ -79,6 +81,7 @@ impl Entry {
             operation: false,
             background: false,
             workspace: None,
+            auth: super::friendly::AuthContext::default(),
         }
     }
 

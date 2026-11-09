@@ -522,9 +522,6 @@ pub(crate) enum PaletteCommand {
     FetchRemote,
     /// Opens the selected remote's whole menu - `.` on a remote row.
     RemoteActions,
-    /// Shows the repository's `core.sshCommand` pin and lets the user pick
-    /// an integration profile's SSH key for it, or clear it (ADR-0008).
-    PinSshKey,
     /// Repository: Sparse Checkout... - the directories dialog.
     SparseCheckout,
     /// Repository: SSH & Credentials... - Settings on the page that picks how

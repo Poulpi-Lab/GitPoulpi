@@ -409,11 +409,6 @@ pub enum Action {
         name: String,
         url: String,
     },
-    /// Set (`Some`) or clear (`None`) the repository-local
-    /// `core.sshCommand` pin (ADR-0008).
-    SetSshCommand {
-        command: Option<String>,
-    },
     /// Make the checkout sparse (cone mode) with exactly these directories
     /// (`OperationKind::SparseSet`). Not journaled: nothing is lost, `SparseDisable`
     /// brings every file back.

@@ -969,7 +969,7 @@ pub(crate) fn activate_wip_row(
     central_view: &mut CentralView,
     collapsed_folders: &mut HashSet<PathBuf>,
 ) {
-    let empty = WorkingTree { files: Vec::new() };
+    let empty = WorkingTree::default();
     let status = status.as_ref().unwrap_or(&empty);
     wip.state.select(Some(i));
     wip.follow = true;

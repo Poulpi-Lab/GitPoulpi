@@ -59,6 +59,13 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
         }),
         TypedError::ConflictRefused(r) => msg::typed_error::conflict_refused(conflict_refusal(r)),
         TypedError::UndoRefused(r) => msg::typed_error::undo_refused(undo_refusal(r)),
+        TypedError::NeedsConfirmation(prompt)
+            if prompt == gitpoulpi_core::domain::COMMAND_NEEDS_PERSON =>
+        {
+            msg::typed_error::REPO_AUTH_NEEDS_CONFIRMATION
+                .get()
+                .to_string()
+        }
         TypedError::NeedsConfirmation(prompt) => msg::typed_error::needs_confirmation(prompt),
         TypedError::LfsUnavailable(reason) => lfs_unavailable(reason),
         TypedError::LfsLockingUnsupported { remote } => {
@@ -69,13 +76,23 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
             operation, stash, ..
         } => pending_autostash(operation, stash.0),
         TypedError::NotBuilt { feature } => msg::typed_error::not_built(feature),
-        // No catalog sentence until the TUI surface of the per-repository
-        // authentication lands: the English text of the error itself.
-        TypedError::RepoAuthUnavailable { .. }
-        | TypedError::GrantRefused { .. }
-        | TypedError::TokenCommandFailed { .. }
-        | TypedError::RepoAuthCommandChanged { .. } => {
-            CoreError::from_typed(typed.clone()).to_string()
+        TypedError::RepoAuthUnavailable { reason } => {
+            msg::typed_error::repo_auth_unavailable(reason)
+        }
+        TypedError::GrantRefused { host, expected } => {
+            msg::typed_error::grant_refused(host, expected)
+        }
+        TypedError::RepoAuthCommandChanged { path } => {
+            msg::typed_error::repo_auth_command_changed(path)
+        }
+        TypedError::TokenCommandFailed { exit, stderr_tail } => {
+            let tail = stderr_tail.trim();
+            match (exit, tail.is_empty()) {
+                (None, true) => msg::typed_error::TOKEN_COMMAND_FAILED.get().to_string(),
+                (None, false) => msg::typed_error::token_command_failed_tail(tail),
+                (Some(code), true) => msg::typed_error::token_command_failed_code(code),
+                (Some(code), false) => msg::typed_error::token_command_failed_code_tail(code, tail),
+            }
         }
         // The action that was running when its job was canceled (the label
         // comes from the jobs cell; a job the window never heard of is `#id`).

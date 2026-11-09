@@ -17,6 +17,7 @@ fn tree(entries: &[(&str, bool, bool)]) -> WorkingTree {
                 worktree: unstaged.then_some(FileStatus::Modified),
             })
             .collect(),
+        ..WorkingTree::default()
     }
 }
 

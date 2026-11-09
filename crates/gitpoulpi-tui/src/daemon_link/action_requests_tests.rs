@@ -296,10 +296,6 @@ fn every_action() -> Vec<Action> {
             name: s("up"),
             url: s("https://example.test/r.git"),
         },
-        Action::SetSshCommand {
-            command: Some(s("ssh -i key")),
-        },
-        Action::SetSshCommand { command: None },
         Action::SparseSet {
             dirs: vec![s("src"), s("docs/guide")],
         },

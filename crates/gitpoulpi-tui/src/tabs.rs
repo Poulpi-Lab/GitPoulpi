@@ -795,7 +795,7 @@ pub(crate) fn apply_repo_menu_action(
         // so a row for another repository has to be switched to first.
         A::SshKey => {
             if target.path == ctx.current.root {
-                ctx.remote_ui.open_ssh_pin_menu(4, 3);
+                ctx.remote_ui.want_repo_auth = true;
                 None
             } else {
                 Some(msg::tabs::switch_first(&target.name))

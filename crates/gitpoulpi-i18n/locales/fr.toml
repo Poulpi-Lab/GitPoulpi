@@ -4970,8 +4970,6 @@ remote_added = "distant {name} ajouté"
 remote_removed = "distant {name} supprimé"
 remote_renamed = "distant {old_name} renommé en {new_name}"
 remote_fetches_from = { git = "{name} fait désormais ses fetch depuis {url}", local = "{name} récupère désormais depuis {url}" }
-ssh_command_set = "ce dépôt utilise désormais {command}"
-ssh_pin_cleared = "clé SSH épinglée retirée"
 repo_config_set = "{key} défini sur {value} pour ce dépôt"
 repo_config_unset = "{key} retiré pour ce dépôt (la valeur globale s'applique)"
 remote_pushes_to = { git = "{name} fait désormais ses push vers {url}", local = "{name} envoie désormais vers {url}" }

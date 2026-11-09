@@ -12,6 +12,7 @@ fn status_rows_built_equal_the_visible_rows_not_the_file_count() {
                 worktree: Some(FileStatus::Modified),
             })
             .collect(),
+        ..WorkingTree::default()
     };
     let lines = build_status_section_lines(
         &tree,

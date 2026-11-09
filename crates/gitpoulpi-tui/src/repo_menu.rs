@@ -32,8 +32,8 @@ pub(crate) enum RepoMenuAction {
     /// Entry `n` of the "Open in" list (`tab_dir::entries()`), run on this
     /// repository: the "Open in" submenu's rows.
     OpenIn(usize),
-    /// Show this repository's `core.sshCommand` pin and choose an
-    /// integration profile's SSH key for it (ADR-0008).
+    /// This repository's SSH & credentials page (it also shows a
+    /// `core.sshCommand` pin and moves it into GitPoulpi).
     SshKey,
     /// The Sparse checkout dialog of this repository.
     Sparse,
@@ -277,7 +277,10 @@ pub(crate) fn repo_menu_entries_with(
         ));
     }
     entries.push(Entry::Separator);
-    entries.push(Entry::action(msg::SSH_KEY.get(), A::SshKey));
+    entries.push(Entry::action(
+        gitpoulpi_i18n::msg::repo_auth::MENU_ROW.get(),
+        A::SshKey,
+    ));
     entries.push(Entry::action(
         gitpoulpi_i18n::msg::sparse::MENU.get(),
         A::Sparse,

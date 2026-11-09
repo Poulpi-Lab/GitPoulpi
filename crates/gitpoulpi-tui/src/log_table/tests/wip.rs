@@ -16,7 +16,10 @@ fn entry(path: &str, index: Option<FileStatus>, worktree: Option<FileStatus>) ->
 }
 
 fn tree(files: Vec<StatusEntry>) -> WorkingTree {
-    WorkingTree { files }
+    WorkingTree {
+        files,
+        ..WorkingTree::default()
+    }
 }
 
 /// The Log table with a WIP row on top of `nodes`, drawn through the

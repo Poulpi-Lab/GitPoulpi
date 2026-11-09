@@ -389,8 +389,8 @@ As teclas depois de um prefixo aparecem com o prefixo (`Ctrl+G s`).
 | `preferences` | `prev_tab` | Aba anterior da página de configurações | `Alt+Left` |
 | `preferences` | `next_tab` | Próxima aba da página de configurações | `Alt+Right` |
 | `ai_popup` | `copy` | Copiar o resultado | `c` |
-| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
-| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
+| `activity_log` | `scroll_left` | Rolar o Registro de atividade para a esquerda | `Left` |
+| `activity_log` | `scroll_right` | Rolar o Registro de atividade para a direita | `Right` |
 | `integrations` | `add` | Adicionar um perfil | `a` |
 | `integrations` | `edit` | Editar o perfil selecionado | `e` |
 | `integrations` | `open_token` | Abrir a página do token | `o` |
@@ -861,8 +861,8 @@ As teclas são as padrão.
 | Registro de atividade: escolher o escopo |  |
 | Registro de atividade: operações do Git |  |
 | Registro de atividade: registro do aplicativo |  |
-| Activity Log: Scroll Left | `Left` |
-| Activity Log: Scroll Right | `Right` |
+| Registro de atividade: rolar para a esquerda | `Left` |
+| Registro de atividade: rolar para a direita | `Right` |
 | Registro de atividade: copiar o último erro |  |
 | Registro de atividade: executar a ação sugerida |  |
 | Registro de atividade: abrir o último erro |  |

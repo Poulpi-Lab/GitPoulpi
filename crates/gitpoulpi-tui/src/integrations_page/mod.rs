@@ -577,6 +577,21 @@ impl IntegrationsPage {
         self.pending.is_some() || self.ssh.job.is_some()
     }
 
+    /// What the last token check of profile `id` found: the scopes git needs
+    /// that the token lacks, and the scopes it has beyond what is needed
+    /// (dangerous first). `None` until a check ran.
+    pub(crate) fn scope_notes(&self, id: &str) -> Option<(Vec<String>, Vec<String>)> {
+        let missing = self.warnings.get(id);
+        let rights = self.rights.get(id);
+        if missing.is_none() && rights.is_none() {
+            return None;
+        }
+        Some((
+            missing.cloned().unwrap_or_default(),
+            rights.map(|r| r.excess.clone()).unwrap_or_default(),
+        ))
+    }
+
     fn kind(&self) -> IntegrationKind {
         self.kinds[self.kind.min(self.kinds.len() - 1)]
     }

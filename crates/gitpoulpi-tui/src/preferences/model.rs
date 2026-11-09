@@ -32,6 +32,7 @@ pub(crate) enum PrefSection {
     MergeBehavior,
     CommitTemplate,
     ConflictPrevention,
+    RepoAuth,
 }
 
 impl PrefSection {
@@ -64,6 +65,7 @@ impl PrefSection {
         PrefSection::Images,
         PrefSection::Keybindings,
         PrefSection::GitAndEncoding,
+        PrefSection::RepoAuth,
         PrefSection::RepoAi,
         PrefSection::Workflow,
         PrefSection::SparseCheckout,
@@ -102,6 +104,7 @@ impl PrefSection {
             PrefSection::ConflictPrevention => {
                 gitpoulpi_i18n::msg::conflict_prevention::SECTION.get()
             }
+            PrefSection::RepoAuth => gitpoulpi_i18n::msg::repo_auth::SECTION.get(),
         }
     }
 
@@ -131,6 +134,7 @@ impl PrefSection {
             PrefSection::MergeBehavior => "merge-behavior",
             PrefSection::CommitTemplate => "commit-template",
             PrefSection::ConflictPrevention => "conflict-prevention",
+            PrefSection::RepoAuth => "ssh-credentials",
         }
     }
 
@@ -160,6 +164,7 @@ impl PrefSection {
             P::MergeBehavior => PrefSection::MergeBehavior,
             P::CommitTemplate => PrefSection::CommitTemplate,
             P::ConflictPrevention => PrefSection::ConflictPrevention,
+            P::SshCredentials => PrefSection::RepoAuth,
         }
     }
 
@@ -210,6 +215,7 @@ impl PrefSection {
                 | PrefSection::MergeBehavior
                 | PrefSection::CommitTemplate
                 | PrefSection::ConflictPrevention
+                | PrefSection::RepoAuth
         )
     }
 }
@@ -347,6 +353,8 @@ pub(super) enum Target {
     Workflow(WfTarget),
     /// A row of the Sparse checkout page (`repo_pages.rs`).
     RepoPage(RpTarget),
+    /// A row of the SSH & credentials page (`repo_auth_page`).
+    RepoAuth(super::repo_auth_page::RaTarget),
     /// Decoration: nothing to commit.
     None,
 }
@@ -430,6 +438,8 @@ pub(super) enum PrefAction {
     McpSecurity(super::mcp_security::McpButton),
     /// A button of the Sparse checkout page.
     RepoPage(RpButton),
+    /// A button of the SSH & credentials page.
+    RepoAuth(super::repo_auth_page::RaButton),
 }
 
 /// A painted chip: (field, chip, line in the field, column, width).

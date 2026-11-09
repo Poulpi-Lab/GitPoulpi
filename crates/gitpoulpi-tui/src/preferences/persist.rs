@@ -252,6 +252,7 @@ impl PreferencesState {
             }
             Target::Repo(field) => self.commit_repo_toggle(*field, value),
             Target::Workflow(t) => self.wf_commit_bool(*t, value),
+            Target::RepoAuth(t) => self.ra_commit_bool(*t, value),
             Target::Ai(t) => self.ai_commit_bool(*t, value),
             _ => {}
         }
@@ -295,6 +296,7 @@ impl PreferencesState {
                 }
             }
             Target::Ai(t) => self.ai_commit_choice(t, next),
+            Target::RepoAuth(t) => self.ra_commit_choice(t, next),
             Target::Repo(field) => {
                 // Index 0 is "(inherited)", i.e. clear the override.
                 // `core.autocrlf` / `core.eol` are git's own repository
@@ -375,6 +377,7 @@ impl PreferencesState {
             (_, Target::OpenIn(t)) => return self.open_in_commit_text(t, draft),
             (_, Target::Workflow(t)) => return self.wf_commit_text(t, draft),
             (_, Target::RepoPage(t)) => return self.rp_commit_text(t, draft),
+            (_, Target::RepoAuth(t)) => return self.ra_commit_text(t, draft),
             (_, Target::ImageEditor(t)) => return self.images_commit_text(t, draft),
             (_, Target::ProfileField(i, slot)) => {
                 let value = draft.trim().to_string();

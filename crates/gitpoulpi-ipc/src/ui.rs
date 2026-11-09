@@ -164,6 +164,9 @@ pub enum SettingsPage {
     CommitTemplate,
     /// The repository's proactive conflict detection (switch, base branches).
     ConflictPrevention,
+    /// The repository's SSH key and HTTPS sign-in (the per-repository
+    /// authentication profile).
+    SshCredentials,
     /// Legacy alias of `appearance`.
     UiCustomization,
     /// Legacy alias of `diff-editor`.
@@ -174,7 +177,7 @@ pub enum SettingsPage {
 
 impl SettingsPage {
     /// The page ids: the sidebar's order, then the legacy aliases.
-    pub const IDS: [&'static str; 25] = [
+    pub const IDS: [&'static str; 26] = [
         "general",
         "sync",
         "profiles",
@@ -197,6 +200,7 @@ impl SettingsPage {
         "merge-behavior",
         "commit-template",
         "conflict-prevention",
+        "ssh-credentials",
         "ui-customization",
         "editor",
         "keyboard-shortcuts",

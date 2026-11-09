@@ -28,6 +28,7 @@ impl PreferencesState {
             || self.ai.prompt_open()
             || self.wf_editor_open()
             || self.rp_editor_open()
+            || self.ra_overlay_open()
             || (self.list_shown() && self.list.owns_pointer())
     }
 

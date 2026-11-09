@@ -148,7 +148,7 @@ pub(crate) fn remote_web_url(url: &str) -> Option<String> {
 /// `(scheme, host, path)` of a remote URL git accepts over the network:
 /// `http(s)://`, `ssh://`, `git://` and the scp-like `[user@]host:path`.
 /// The host loses any user and port.
-fn split_remote_url(url: &str) -> Option<(&str, &str, &str)> {
+pub(crate) fn split_remote_url(url: &str) -> Option<(&str, &str, &str)> {
     if url.chars().any(char::is_whitespace) {
         return None;
     }

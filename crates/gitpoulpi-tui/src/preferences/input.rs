@@ -29,6 +29,7 @@ impl PreferencesState {
             && !self.ai.browse_open()
             && !self.wf_editor_open()
             && !self.rp_editor_open()
+            && !self.ra_overlay_open()
             && !typing_token
             && !(self.keys_active() && self.keys.text_focused())
             && {
@@ -60,6 +61,10 @@ impl PreferencesState {
         self.notice = None;
         if self.confirm_action.is_some() {
             self.confirm_action_key(key);
+            return true;
+        }
+        if self.ra_overlay_open() {
+            self.ra_overlay_key(key);
             return true;
         }
         if self.close_ask.is_some() {
@@ -430,6 +435,7 @@ impl PreferencesState {
         match target {
             Target::Ai(t) => self.ai_commit_combo(*t, value),
             Target::Workflow(t) => self.wf_commit_combo(*t, value),
+            Target::RepoAuth(t) => self.ra_commit_combo(*t, value),
             Target::Global(key) => {
                 self.write_global(key, value);
             }
@@ -616,6 +622,7 @@ impl PreferencesState {
             PrefAction::McpSecurity(button) => self.mcp_button(button),
             PrefAction::Workflow(button) => self.wf_button(button),
             PrefAction::RepoPage(button) => self.rp_button(button),
+            PrefAction::RepoAuth(button) => self.ra_button(button),
             PrefAction::ForgetCredentials => {
                 let refs: Vec<String> = self
                     .config
@@ -720,6 +727,15 @@ impl PreferencesState {
         }
         if self.confirm_action.is_some() {
             self.confirm_action_mouse(kind, col, row);
+            return true;
+        }
+        if self.ra_overlay_open() {
+            self.ra_overlay_mouse(crossterm::event::MouseEvent {
+                kind,
+                column: col,
+                row,
+                modifiers: KeyModifiers::NONE,
+            });
             return true;
         }
         if self.close_ask.is_some() {

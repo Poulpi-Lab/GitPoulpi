@@ -34,8 +34,8 @@ Fönstrets överkant lyder
   `PgUp` / `PgDn`, `Home` / `End`; tillbaka med `Esc` eller `t`). I ett skript
   skriver `gitpoulpi licenses` ut samma text.
 - **Versionen** (`v1.0.0`, eller `vX.Y.Z tillgänglig` när en nyare version finns)
-  står mellan namnet och sökvägen: ett klick öppnar fliken **Versionsanteckningar**, se
-  [Uppdateringar](updates.md).
+  står mellan namnet och sökvägen: ett klick öppnar uppdateringspanelen när en nyare version
+  finns, annars fliken **Versionsanteckningar**. Se [Uppdateringar](updates.md).
 - **Öppna i ▾**, direkt efter sökvägen, öppnar flikens mapp i en terminal, en
   redigerare, en multiplexer eller filhanteraren (`Alt+O`). Se
   [Öppna i](open-in.md).

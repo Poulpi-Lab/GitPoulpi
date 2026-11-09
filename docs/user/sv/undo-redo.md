@@ -149,6 +149,7 @@ vidare. Raderna med `...` öppnar samma bekräftelse eller namnfråga som knappe
 | Lokala ändringar | stage och unstage (fil, mapp, hunk, rader, alla), förkasta (fil, mapp, hunk, rader, en fil-checkout), tillämpa en patch, **ta bort en fil från disk**, **ignorera** (fil, filändelse eller mapp: raden i den `.gitignore` du valde), **behandla som binär eller text** (raden i `.gitattributes`) |
 | Stashes | push, apply, pop, drop |
 | Remotes och konfiguration | lägga till, ta bort, byta namn på, ändra URL eller push-URL för en remote, Git LFS track och untrack |
+| På en server | **att ta bort en gren eller en tag på en remote** (från refens meny, paletten, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, eller ett arbetsflödes avslut som tar bort remote-grenen): se nedan |
 
 Medan en merge, cherry-pick eller revert står stilla på konflikter går också
 **Spara och markera löst**, stage och unstage att ångra (var och en tas tillbaka
@@ -168,12 +169,41 @@ gamla plats). Att ångra borttagningen av en remote ger tillbaka dess
 remote-spårande grenar, dess alias `origin/HEAD` och uppströmsinställningarna för
 de grenar som spårade den.
 
+### Ta bort en gren eller tag på en remote
+
+Före borttagningen frågar GitPoulpi servern vad grenen eller taggen innehåller just
+nu och registrerar det: remoten, namnet och den exakta commiten (för en
+annoterad tag själva tagobjektet, så att dess annotation bevaras). Borttagningen
+görs sedan bara om servern fortfarande har det värdet.
+
+**Ångra pushar tillbaka den** under samma namn, på samma commit, utan att någonsin
+tvinga. Eftersom det är en ändring på en server som andra ser frågar Ångra
+**alltid först** och säger det ("Att ångra detta skapar grenen topic på origin på
+3f2a1c0 igen..."); postens steg säger det också (`gitpoulpi undo --dry-run`). Den
+använder samma inloggningsuppgifter som en push. Den remote-spårande grenen kommer
+tillbaka med den. **Gör om** tar bort den igen, med samma säkerhet.
+
+Ångra vägrar, utan att ändra något, när:
+
+- grenen eller taggen **skapades igen på remoten** sedan dess, eller flyttades: den
+  är på en annan commit än den registrerade, och en push skulle skriva över någon
+  annans arbete (vägran nämner båda commitarna);
+- commiten (eller tagobjektet) **inte längre finns i ditt repository** (den
+  städades bort av skräpsamlingen): ångringen kan inte göras.
+
+"Ta bort lokalt och på remoten" är **en post**: Ångra återställer den lokala och
+den remote grenen eller taggen tillsammans, Gör om tar bort båda igen. Att bara ta
+bort remote-grenen lämnar den lokala ifred; att ångra det gör detsamma. Ett
+arbetsflödes avslut som också tar bort remote-grenen går att ångra som helhet.
+
 ## Vad som inte kan ångras, och varför
 
-- **Allt på en server**: push, ta bort en remote-gren eller tag, pusha en tag,
-  LFS push, lås och lås upp. Det tillståndet delas med andra människor; att
-  ångra det vore en ny push, och det gör inte GitPoulpi åt dig. Ångra blockeras
-  heller aldrig av en sådan operation.
+- **Det mesta på en server**: push, pusha en tag, LFS push, lås och lås upp,
+  öppna en pull request. Det tillståndet delas med andra människor; att ångra en
+  push vore en force-push eller en borttagning hos dem, och det gör inte
+  GitPoulpi åt dig. (Att ta bort en remote-gren eller tag är undantaget: ångringen
+  lägger bara tillbaka det servern höll, och vägrar om något ändrats där.)
+  Ångra blockeras heller aldrig av en sådan operation.
 - **Fetch**: den flyttar bara remote-spårande refs, som speglar servern. Nästa
   fetch skulle göra det igen.
 - **Att avbryta en rebase**: ångra erbjuds inte för den (en rebase flyttar grenar
@@ -289,6 +319,10 @@ Två fall löser sig av sig självt:
   behålls, men ångra stoppar, utan att ändra något, om en av dem ligger i en fil
   den måste skriva om.
 
+- posten tog bort en gren eller tag på en remote: att ångra den **pushar tillbaka
+  den till servern** (se ovan), så den frågar alltid, och det gör även gör om som
+  tar bort den där igen.
+
 Gör om, och varje ångring av en ren ref-flytt, frågar aldrig: andra riktningen
 är en tangent bort.
 
@@ -344,8 +378,10 @@ gitpoulpi undo-forget [--dry-run] [--redo] [--expect <id>] [--yes]
   nyaste gör-om-posten). Den vägrar när posten inte är blockerad, och avslutas
   med **3** utan `--yes`. För MCP ändrar det något, men det är inte destruktivt:
   repositoryt rörs inte.
-- Slutkod **0**: klart, **2**: vägrat (JSON anger skälet), **3**: riskabelt och
-  kräver `--yes`.
+- Slutkod **0**: klart, **2**: vägrat (JSON anger skälet, till exempel
+  `RemoteRefMoved` när en borttagen remote-gren skapades igen), **3**: riskabelt och
+  kräver `--yes` (att ångra borttagningen av en remote-gren eller tag, vilket
+  pushar till servern).
 
 Gå tillbaka utan att ångra allt som kom efter:
 

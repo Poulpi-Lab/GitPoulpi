@@ -132,7 +132,7 @@ Hunks och rader numreras så som `gitpoulpi --json diff` numrerar dem.
 |---|---|
 | `branch list`, `branch create <name> [at]`, `branch delete <name>`, `branch rename <old> <new>` | Lokala grenar. |
 | `branch track <remote/branch> [--name N]` | Skapa en lokal gren som spårar en remote-gren och checka ut den. |
-| `branch delete-remote <name> [--remote R]` | Ta bort en gren på en remote, behåll den lokala. |
+| `branch delete-remote <name> [--remote R]` | Ta bort en gren på en remote, behåll den lokala. `undo --yes` pushar tillbaka den som den var ([ångra](undo-redo.md#ta-bort-en-gren-eller-tag-på-en-remote)). |
 | `branch set-upstream <branch> <remote/branch>`, `branch unset-upstream <branch>` | Upstream. |
 | `branch fast-forward <branch> [target]` | Flytta en gren framåt bara om det är en fast-forward. |
 | `checkout <target> [--autostash]` | Byt gren eller frånkoppla vid en commit. |
@@ -145,7 +145,7 @@ Hunks och rader numreras så som `gitpoulpi --json diff` numrerar dem.
 | `tag list [--unpushed]`, `tag create <name> [at] [-m M]`, `tag annotate <name> -m M` | Tags. `tag list` skriver ut varje tag med var den finns, känt från senaste fetch eller tag-push (aldrig från nätverket): `local` (den finns här), `remote` (remotes som har den), `differs_on` (remotes som har den på en annan commit) och `where`: `local`, `remote` (en remote har den, det här repositoryt har den inte), `both` eller `differs`. |
 | `tag delete <name> [--local \| --remote R \| --both [--remote R]]` | Ta bort en tag: lokalt (standard), bara på en remote (`git push R --delete`; påverkar andra och går inte att ångra), eller här och på remoten som har den. Svaret bär `scope` (`local`, `remote`, `both`) och, för en borttagning enbart lokalt av en tag som en remote fortfarande har, `still_on` (nästa `fetch` tar tillbaka den). En kombinerad borttagning tar bort remote-taggen först; `undo` återställer sedan bara den lokala taggen och `tag push` lägger tillbaka den. |
 | `tag fetch <name> [--remote R]` | Hämta en tag från en remote (som standard den som har den), till exempel en tag med `where: remote`. Skriver aldrig över en lokal tag på en annan commit. |
-| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags på en remote (inga namn: varje tag som ingen remote har). |
+| `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags på en remote (inga namn: varje tag som ingen remote har). Att ta bort en på en remote går att ångra (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Länkade worktrees. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submoduler ([Submoduler](submodules.md)). |
 
@@ -223,7 +223,7 @@ profilen och är valfri när det finns en)
 
 | Kommando | Vad det gör |
 |---|---|
-| `ai [--print-sent] <command>` | `--print-sent` på vilket `ai`-kommando som helst skriver ut det som skulle skickas (den rensade system- och användartexten, `{sent: [{system, user}], privacy, dry_run: true}`) och anropar ingen modell; det kräver `ai.enabled = true`, ingen nyckel och inget nätverk. Varje `ai`-svar bär `privacy: {redactions: N, excluded_files: [...]}`: hur många hemligheter som ersattes och vilka känsliga filer som utelämnades ([AI > Integritet](ai.md#integritet)). |
+| `ai [--print-sent] [--send-all] <command>` | `--send-all` (alias `--no-truncate`) på vilket `ai`-kommando som helst skickar varje indata hel, även över sin gräns `ai.limits.*`; utan det trunkeras en indata över en gräns (en konflikt vägras) och svaret bär `truncated: [{part, detail?, bytes, limit, setting}]` när något klipptes av ([AI > Gränser för indata](ai.md#gränser-för-indata)). `--print-sent` på vilket `ai`-kommando som helst skriver ut det som skulle skickas (den rensade system- och användartexten, `{sent: [{system, user}], privacy, dry_run: true}`) och anropar ingen modell; det kräver `ai.enabled = true`, ingen nyckel och inget nätverk. Varje `ai`-svar bär `privacy: {redactions: N, excluded_files: [...]}`: hur många hemligheter som ersattes och vilka känsliga filer som utelämnades ([AI > Integritet](ai.md#integritet)). |
 | `ai commit-message` | Skriv ut meddelandet AI:n föreslår för de stageade ändringarna (alla ändringar när inget är stageat); committar ingenting. |
 | `ai explain [rev] [--wip]` | Förklara en commit (standard `HEAD`) eller de lokala ändringarna. |
 | `ai split-plan <rev>` | Skriv ut en plan som AI:n föreslår för att dela upp en commit, som `{commit, parts, applied: false}` där `parts` är det `split-commit --plan` godtar. Tillämpar ingenting. Kräver `ai.enabled = true`. |
@@ -234,7 +234,7 @@ profilen och är valfri när det finns en)
 | `ai review-context [--repo PATH \| --project HOST/PROJECT] [--run-in-repo profile\|yes\|no] [--claude-md on\|off] [--agents-md on\|off] [--context-file PATH\|URL] [--no-context-file] [--no-extra-file [on\|off]] [--reset]` | Visa eller ange vad ett kodgranskningsutkast får förutom diffen (`[ai.review]`, se [AI > Granskningskontext](ai.md#granskningskontext)). Utan `--repo` och `--project` är det det globala standardvärdet; `--repo` (den globala flaggan) är en klons egna värden, `--project github.com/owner/name` värdena för ett repository som inte är klonat (`remote-reviews.toml`). Utan inställningsflagga visas bara värdena; med en sparas och skrivs resultatet ut. JSON: `scope` (`global`, `repository`, `project`), `target`, `global`, `own` (bara fälten som repositoryt eller projektet har satt), `effective` (vad en granskning får), `changed`. `--reset` glömmer repositoryts eller projektets egna värden. `--run-in-repo` gäller inte `--project`. Kräver ingen modell; fungerar med AI av. |
 | `ai trust <profile> [--accept-origin URL] [--accept-certificate SHA256] [--allow-insecure-http on\|off]` | Binder en profils API-nyckel till adressen den lagrades för (se [AI > Vart nyckeln tar vägen](ai.md#vart-nyckeln-tar-vägen)). Utan flagga skriver det ut `{profile, current_origin, trusted}`; `--accept-origin` godtar profilens nuvarande bas-URL efter att den ändrats (stavad som nekandet skrev ut den), `--accept-certificate` fäster en självhostad servers certifikat med dess SHA-256-nyckelfingeravtryck, `--allow-insecure-http` tillåter en vanlig `http://`-bas-URL som inte finns på den här datorn. Bara en människa kör det: inte ett MCP-verktyg. Fungerar med AI av. |
 
-Plus `commit --ai` och `stash push --ai`. Modellen anropas från processen
+Plus `commit --ai [--send-all]` och `stash push --ai [--send-all]` (samma `--send-all` och `truncated` som `ai`; `hosting review suggest` tar också `--send-all`). Modellen anropas från processen
 `gitpoulpi`, så API-nycklar passerar aldrig till daemonen eller en MCP-klient.
 
 **Repositories, sessioner, daemon, inställningar**

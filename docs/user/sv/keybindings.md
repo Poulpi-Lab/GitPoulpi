@@ -391,8 +391,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `preferences` | `prev_tab` | Föregående flik på inställningssidan | `Alt+Left` |
 | `preferences` | `next_tab` | Nästa flik på inställningssidan | `Alt+Right` |
 | `ai_popup` | `copy` | Kopiera resultatet | `c` |
-| `activity_log` | `scroll_left` | Scroll the Activity Log Left | `Left` |
-| `activity_log` | `scroll_right` | Scroll the Activity Log Right | `Right` |
+| `activity_log` | `scroll_left` | Rulla Aktivitetsloggen åt vänster | `Left` |
+| `activity_log` | `scroll_right` | Rulla Aktivitetsloggen åt höger | `Right` |
 | `integrations` | `add` | Lägg till en profil | `a` |
 | `integrations` | `edit` | Redigera vald profil | `e` |
 | `integrations` | `open_token` | Öppna tokensidan | `o` |
@@ -865,8 +865,8 @@ Tangenterna är standardvärdena.
 | Aktivitetslogg: Välj omfång |  |
 | Aktivitetslogg: Git-åtgärder |  |
 | Aktivitetslogg: Programlogg |  |
-| Activity Log: Scroll Left | `Left` |
-| Activity Log: Scroll Right | `Right` |
+| Aktivitetslogg: Rulla åt vänster | `Left` |
+| Aktivitetslogg: Rulla åt höger | `Right` |
 | Aktivitetslogg: Kopiera det senaste felet |  |
 | Aktivitetslogg: Kör den föreslagna åtgärden |  |
 | Aktivitetslogg: Öppna det senaste felet |  |

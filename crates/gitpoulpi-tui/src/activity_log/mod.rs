@@ -126,7 +126,11 @@ pub(crate) fn report_failure(
     entry.kind = kind;
     entry.detail = error.detail().cloned();
     entry.retry = Some(action.clone());
-    match friendly::wording(kind) {
+    let text = match error.detail() {
+        Some(d) => format!("{}\n{error}", d.stderr),
+        None => error.to_string(),
+    };
+    match friendly::wording(kind, &text) {
         Some((summary, hint)) => {
             entry.summary = Some(summary);
             entry.hint = Some(hint);
@@ -134,6 +138,13 @@ pub(crate) fn report_failure(
         // Typed refusals have their own sentence (localised).
         None if error.typed().is_some() => {
             entry.summary = Some(crate::daemon_link::error_text::error_text(error));
+            if kind == gitpoulpi_core::FailureKind::LocalChangesBlockAbort {
+                entry.hint = Some(
+                    gitpoulpi_i18n::msg::git_error::HINT_ABORT_BLOCKED
+                        .get()
+                        .to_string(),
+                );
+            }
         }
         None => {}
     }
@@ -216,7 +227,7 @@ pub(crate) fn report_rejection(
     );
     entry.kind = gitpoulpi_core::FailureKind::NonFastForward;
     entry.detail = rejection.detail.as_deref().cloned();
-    if let Some((summary, hint)) = friendly::wording(entry.kind) {
+    if let Some((summary, hint)) = friendly::wording(entry.kind, "") {
         entry.summary = Some(summary);
         entry.hint = Some(hint);
     }

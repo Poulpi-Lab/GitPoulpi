@@ -425,6 +425,56 @@ fn status_of(output: &Output) -> Result<StatusOutput> {
     })
 }
 
+/// Runs an abort (`merge --abort`, `rebase --abort`, ...), whose reset step
+/// fails with "Entry 'x' not uptodate. Cannot merge." when the index's cached
+/// stat data of a file is stale (an antivirus, an indexer or a line-ending
+/// filter touched it; common on Windows). That is not a real change: refresh
+/// the index (`update-index -q --refresh` compares contents) and run the abort
+/// once more. Git's messages are forced to English for the match. The result
+/// is the last run; it still names the files when they really differ.
+pub(crate) fn run_abort(repo_root: &Path, args: &[&str]) -> Result<StatusOutput> {
+    let english = [("LC_ALL", "C"), ("LANGUAGE", "C")];
+    let first = run_status_with_env(repo_root, args, &english)?;
+    if first.success || not_uptodate_paths(&first.stderr).is_empty() {
+        return Ok(first);
+    }
+    // A refresh that fails (it exits 1 when files need an update) still
+    // refreshed what it could: the retry decides.
+    let _ = run_status_with_env(repo_root, &["update-index", "-q", "--refresh"], &english);
+    run_status_with_env(repo_root, args, &english)
+}
+
+/// The files of git's "Entry 'x' not uptodate. Cannot merge." lines.
+pub(crate) fn not_uptodate_paths(stderr: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    for line in stderr.lines() {
+        let Some(at) = line.find("Entry '") else {
+            continue;
+        };
+        let rest = &line[at + "Entry '".len()..];
+        if let Some(end) = rest.find("' not uptodate") {
+            let path = rest[..end].to_string();
+            if !out.contains(&path) {
+                out.push(path);
+            }
+        }
+    }
+    out
+}
+
+/// The error for an abort that failed: the files with local changes it would
+/// overwrite as a typed refusal, else git's failure as usual.
+pub(crate) fn abort_failed(args: &[&str], out: &StatusOutput) -> gitpoulpi_core::Error {
+    let paths = not_uptodate_paths(&out.stderr);
+    if paths.is_empty() {
+        failed_with(args, out.exit_code, &out.stderr)
+    } else {
+        gitpoulpi_core::Error::ConflictRefused(
+            gitpoulpi_core::domain::ConflictRefusal::LocalChanges { paths },
+        )
+    }
+}
+
 fn with_env(mut cmd: Command, env: &[(&str, &str)]) -> Command {
     for (key, value) in env {
         cmd.env(key, value);

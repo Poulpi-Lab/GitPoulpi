@@ -68,14 +68,16 @@ pub fn am_skip(repo: &RepoRef) -> Result<AmOutcome> {
 
 pub fn am_abort(repo: &RepoRef) -> Result<()> {
     require_am(repo)?;
-    let out = run_status_with_env(&repo.root, &["am", "--abort"], &[])?;
+    let out = crate::process::run_abort(&repo.root, &["am", "--abort"])?;
     if out.success {
         Ok(())
-    } else {
+    } else if crate::process::not_uptodate_paths(&out.stderr).is_empty() {
         Err(Error::Backend(format!(
             "git am --abort failed: {}",
             out.stderr
         )))
+    } else {
+        Err(crate::process::abort_failed(&["am", "--abort"], &out))
     }
 }
 

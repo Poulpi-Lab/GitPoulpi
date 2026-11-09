@@ -233,6 +233,8 @@ macro_rules! for_each_contract_check {
             check_snapshot_restore_replaces_a_conflicted_path_with_its_resolution,
             check_operation_state_and_abort,
             check_operation_abort_without_operation_is_a_typed_refusal,
+            check_operation_abort_survives_a_stale_index_entry,
+            check_operation_abort_names_files_with_local_changes,
             check_am_in_progress_is_its_own_operation_state,
             check_am_abort_restores_the_branch_tip,
             check_am_skip_drops_the_stopped_patch_and_goes_on,

@@ -104,7 +104,8 @@ fn push_report(source: Source, message: &str, repo: Option<&std::path::Path>) ->
     let message = gitpoulpi_core::redact(message);
     let mut entry = Entry::new(Severity::Error, source.title(), message);
     entry.kind = kind;
-    let (summary, hint) = friendly::wording(kind).unwrap_or_else(|| source.wording());
+    let (summary, hint) =
+        friendly::wording(kind, &entry.message).unwrap_or_else(|| source.wording());
     let line = format!("{}: {summary}", entry.title);
     entry.summary = Some(summary);
     entry.hint = Some(hint);

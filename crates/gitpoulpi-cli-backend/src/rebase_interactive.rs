@@ -455,14 +455,22 @@ pub fn rebase_skip(repo: &RepoRef) -> Result<RebaseOutcome> {
 pub fn rebase_abort(repo: &RepoRef) -> Result<()> {
     let git_dir = absolute_git_dir(repo)?;
     require_in_progress(&git_dir)?;
-    let output = run_status_with_env(&repo.root, &["rebase", "--abort"], &[])?;
-    cleanup(&git_dir);
+    let output = crate::process::run_abort(&repo.root, &["rebase", "--abort"])?;
     if output.success {
+        cleanup(&git_dir);
         Ok(())
-    } else {
+    } else if crate::process::not_uptodate_paths(&output.stderr).is_empty() {
+        cleanup(&git_dir);
         Err(Error::Backend(format!(
             "git rebase --abort failed: {}",
             output.stderr
         )))
+    } else {
+        // Refused for local changes: the rebase state stays, so the abort
+        // can be asked again once they are dealt with.
+        Err(crate::process::abort_failed(
+            &["rebase", "--abort"],
+            &output,
+        ))
     }
 }

@@ -1119,6 +1119,66 @@ pub fn check_operation_state_and_abort(backend: &dyn GitBackend) {
     assert_eq!(rebase.git(&["status", "--porcelain"]), "");
 }
 
+/// A file the merge brought in whose cached stat data went stale (rewritten
+/// with the same bytes, another mtime: what an antivirus, an indexer or a
+/// line-ending filter does on Windows) must not stop the abort: git's own
+/// `merge --abort` says "Entry 'x' not uptodate. Cannot merge." there, the
+/// backends refresh the index and retry.
+pub fn check_operation_abort_survives_a_stale_index_entry(backend: &dyn GitBackend) {
+    let fx = ConflictFixture::text_with_clean_side_file();
+    let head = fx.git(&["rev-parse", "HEAD"]);
+    let side = fx.root().join("side.txt");
+    let bytes = std::fs::read(&side).unwrap();
+    std::fs::write(&side, &bytes).unwrap();
+    let later = std::time::SystemTime::now() + std::time::Duration::from_secs(120);
+    std::fs::File::options()
+        .write(true)
+        .open(&side)
+        .unwrap()
+        .set_modified(later)
+        .unwrap();
+    // The repro is real: git alone refuses (and changes nothing).
+    assert!(
+        fx.repo().try_git(&["reset", "--merge"]).is_none(),
+        "the stale stat data must make a plain reset --merge fail"
+    );
+    backend.operation_abort(&fx.repo_ref()).unwrap();
+    assert_eq!(backend.operation_state(&fx.repo_ref()).unwrap(), None);
+    assert_eq!(fx.git(&["rev-parse", "HEAD"]), head);
+    assert_eq!(fx.git(&["status", "--porcelain"]), "", "worktree clean");
+    assert_eq!(
+        std::fs::read(&side).unwrap(),
+        b"side one\nside two\n",
+        "the merged-in change is gone"
+    );
+}
+
+/// A file with real unstaged changes the abort would overwrite is a typed
+/// refusal naming it; the merge stays stopped and nothing is touched.
+/// Discarding that file's changes lets the abort go through.
+pub fn check_operation_abort_names_files_with_local_changes(backend: &dyn GitBackend) {
+    let fx = ConflictFixture::text_with_clean_side_file();
+    let side = fx.root().join("side.txt");
+    std::fs::write(&side, "my own work\n").unwrap();
+    match backend.operation_abort(&fx.repo_ref()) {
+        Err(Error::ConflictRefused(ConflictRefusal::LocalChanges { paths })) => {
+            assert_eq!(paths, vec!["side.txt".to_string()]);
+        }
+        other => panic!("expected LocalChanges, got {other:?}"),
+    }
+    assert!(matches!(
+        backend.operation_state(&fx.repo_ref()).unwrap(),
+        Some(OperationState::Merge { .. })
+    ));
+    assert_eq!(std::fs::read(&side).unwrap(), b"my own work\n");
+    // The way out: drop that file's changes (back to what the merge staged),
+    // then the abort succeeds.
+    fx.git(&["checkout", "--", "side.txt"]);
+    backend.operation_abort(&fx.repo_ref()).unwrap();
+    assert_eq!(backend.operation_state(&fx.repo_ref()).unwrap(), None);
+    assert_eq!(fx.git(&["status", "--porcelain"]), "");
+}
+
 /// Takes our side of every conflicted path and stages it: the resolved
 /// result then equals HEAD.
 fn resolve_all_ours(fx: &ConflictFixture, path: &str) {

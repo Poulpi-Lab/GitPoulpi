@@ -127,6 +127,11 @@ pub enum FailureKind {
     NonFastForward,
     /// Credentials missing, wrong or refused.
     AuthFailed,
+    /// The configured credential helper itself could not run (a missing
+    /// script, a helper not on `PATH`, a helper that quit): git then sent no
+    /// credentials and the remote's refusal that follows is a consequence,
+    /// not the cause. [`FailureKind::credential_helper_line`] has the line.
+    CredentialHelperFailed,
     /// A merge, rebase or pull stopped on conflicts.
     MergeConflict,
     /// Local changes would be overwritten: commit, stash or discard.
@@ -138,6 +143,10 @@ pub enum FailureKind {
     NetworkUnreachable,
     /// Another git process holds `index.lock` (or another lock file).
     LockExists,
+    /// An abort refused because files have local changes it would overwrite
+    /// (`ConflictRefusal::LocalChanges`). Never read from text: the typed
+    /// error sets it.
+    LocalChangesBlockAbort,
     Other,
 }
 
@@ -164,6 +173,19 @@ impl FailureKind {
             "remote host identification has changed",
         ]) {
             FailureKind::HostKeyUnverified
+        } else if credential_helper_line(stderr).is_some_and(|(_, certain)| {
+            certain
+                || has(&[
+                    "authentication failed",
+                    "could not read username",
+                    "could not read password",
+                    "terminal prompts disabled",
+                    "invalid username or",
+                    "the requested url returned error: 401",
+                    "the requested url returned error: 403",
+                ])
+        }) {
+            FailureKind::CredentialHelperFailed
         } else if has(&[
             "authentication failed",
             "could not read username",
@@ -211,6 +233,70 @@ impl FailureKind {
             FailureKind::Other
         }
     }
+}
+
+impl FailureKind {
+    /// The stderr line that shows a credential helper failing to run, for a
+    /// [`FailureKind::CredentialHelperFailed`] reading (`None` otherwise).
+    pub fn credential_helper_line(stderr: &str) -> Option<String> {
+        credential_helper_line(stderr).map(|(line, _)| line.trim().to_string())
+    }
+}
+
+/// The first stderr line that reads as a credential helper that could not
+/// run, with whether the line names the helper itself (`certain`) or is a
+/// bare shell failure (`sh: /c/Users/x/token.sh: No such file or directory`)
+/// that only counts next to an authentication failure.
+///
+/// The realistic shapes: a `credential.helper = !script` or an absolute path
+/// run through `sh` (`sh: ...: No such file or directory`, `... not found`,
+/// `Permission denied`, `/bin/sh: 1: x: not found`), `helper = foo` with no
+/// `git-credential-foo` on `PATH` (`git: 'credential-foo' is not a git
+/// command`), a helper that exited asking git to stop (`fatal: credential
+/// helper '...' told us to quit`), and cmd.exe's "is not recognized".
+fn credential_helper_line(stderr: &str) -> Option<(&str, bool)> {
+    for line in stderr.lines() {
+        // A message made of the command and its first stderr line:
+        // `backend error: git fetch ... failed: sh: x: No such file`.
+        let line = line
+            .find(" failed: ")
+            .map_or(line, |i| &line[i + " failed: ".len()..]);
+        let lower = line.trim().to_lowercase();
+        let l = lower.strip_prefix("error: ").unwrap_or(&lower);
+        let l = l.strip_prefix("fatal: ").unwrap_or(l);
+        let shell_failure = [
+            "no such file or directory",
+            "not found",
+            "permission denied",
+            "cannot execute",
+            "exec format error",
+            "bad interpreter",
+        ]
+        .iter()
+        .any(|n| l.contains(n));
+        let names_helper = l.contains("credential");
+        let shell_prefix = [
+            "sh: ",
+            "/bin/sh: ",
+            "bash: ",
+            "/bin/bash: ",
+            "dash: ",
+            "/bin/dash: ",
+        ]
+        .iter()
+        .any(|p| l.starts_with(p));
+        if (l.contains("is not a git command") && l.contains("credential-"))
+            || (l.contains("credential helper") && l.contains("told us to quit"))
+            || (names_helper && shell_failure && (shell_prefix || l.contains("cannot run")))
+            || (names_helper && l.contains("is not recognized as an internal or external command"))
+        {
+            return Some((line, true));
+        }
+        if shell_prefix && shell_failure {
+            return Some((line, false));
+        }
+    }
+    None
 }
 
 /// The last `n` lines of `text`, trimmed of surrounding blank lines.
@@ -524,6 +610,7 @@ mod tests {
             ("Host key verification failed.\nfatal: Could not read from remote repository.", K::HostKeyUnverified),
             ("ssh: connect to host h port 22: Network is unreachable", K::NetworkUnreachable),
             ("something unexpected", K::Other),
+            (HELPER_STDERR, K::CredentialHelperFailed),
         ];
         for (stderr, kind) in cases {
             assert_eq!(FailureKind::classify(stderr), kind, "{stderr}");
@@ -534,5 +621,48 @@ mod tests {
     fn libgit2_auth_failures_are_recognized() {
         let d = ErrorDetail::from_git2("fetch", "Http", "Auth", "authentication required");
         assert_eq!(d.kind(), FailureKind::AuthFailed);
+    }
+
+    const HELPER_STDERR: &str = "sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory\nremote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/Poulpi-Lab/GitPoulpi.git/'";
+
+    #[test]
+    fn a_credential_helper_that_cannot_run_is_not_read_as_a_refusal() {
+        use FailureKind as K;
+        let line = K::credential_helper_line(HELPER_STDERR).unwrap();
+        assert_eq!(
+            line,
+            "sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory"
+        );
+        for stderr in [
+            "git: 'credential-foo' is not a git command. See 'git --help'.\nfatal: Authentication failed for 'https://h/r'",
+            "/bin/sh: 1: /home/me/helper.sh: not found\nfatal: could not read Username for 'https://h': terminal prompts disabled",
+            "sh: /usr/bin/git-credential-manager: Permission denied\nfatal: Authentication failed for 'https://h/r'",
+            "fatal: credential helper '/x/y' told us to quit",
+            "'git-credential-foo' is not recognized as an internal or external command,\nfatal: Authentication failed for 'https://h/r'",
+            "error: cannot run git-credential-foo: No such file or directory\nfatal: Authentication failed for 'https://h/r'",
+        ] {
+            assert_eq!(K::classify(stderr), K::CredentialHelperFailed, "{stderr}");
+            assert!(K::credential_helper_line(stderr).is_some(), "{stderr}");
+        }
+        // A plain refusal, and a bare shell failure without an auth failure
+        // (not provably the helper), keep their readings.
+        let refusal = "fatal: Authentication failed for 'https://h/r'";
+        assert_eq!(K::classify(refusal), K::AuthFailed);
+        let flat = format!("backend error: git fetch --all failed: {HELPER_STDERR}");
+        assert_eq!(K::classify(&flat), K::CredentialHelperFailed);
+        assert_eq!(
+            K::credential_helper_line(&flat).as_deref(),
+            Some("sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory")
+        );
+        assert_eq!(K::credential_helper_line(refusal), None);
+        assert_eq!(
+            K::classify("sh: ./hook.sh: not found"),
+            K::Other,
+            "a bare shell failure is not a helper failure on its own"
+        );
+        assert_eq!(
+            K::classify("ssh: connect to host h port 22: Network is unreachable"),
+            K::NetworkUnreachable
+        );
     }
 }

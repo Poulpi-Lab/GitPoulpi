@@ -4,6 +4,7 @@
 //! The reading of git's message (`FailureKind`) lives in `gitpoulpi-core`;
 //! only the wording and the choice of buttons are here.
 
+use gitpoulpi_core::domain::ConflictRefusal;
 use gitpoulpi_core::{Error as CoreError, FailureKind};
 use gitpoulpi_i18n::msg::git_error as g;
 
@@ -87,6 +88,9 @@ pub(crate) fn kind_of(error: &CoreError) -> FailureKind {
         CoreError::NotFastForward => FailureKind::NonFastForward,
         CoreError::DirtyWorkingTree { .. } => FailureKind::WouldOverwrite,
         CoreError::Conflict { .. } => FailureKind::MergeConflict,
+        CoreError::ConflictRefused(ConflictRefusal::LocalChanges { .. }) => {
+            FailureKind::LocalChangesBlockAbort
+        }
         other => match other.detail() {
             Some(detail) => detail.kind(),
             // A plain message: git's words may still be in it.
@@ -97,7 +101,16 @@ pub(crate) fn kind_of(error: &CoreError) -> FailureKind {
 
 /// The one-line reason and the suggested step for `kind`; `None` when the
 /// failure was not recognized (the entry then shows the raw message).
-pub(crate) fn wording(kind: FailureKind) -> Option<(String, String)> {
+/// `text` is the message (or stderr) the failure came from: a credential
+/// helper failure quotes its offending line.
+pub(crate) fn wording(kind: FailureKind, text: &str) -> Option<(String, String)> {
+    if kind == FailureKind::CredentialHelperFailed {
+        let line = FailureKind::credential_helper_line(text).unwrap_or_default();
+        return Some((
+            g::summary_credential_helper(line),
+            g::HINT_CREDENTIAL_HELPER.get().to_string(),
+        ));
+    }
     let (summary, hint) = match kind {
         FailureKind::NonFastForward => (g::SUMMARY_NON_FF, g::HINT_NON_FF),
         FailureKind::AuthFailed => (g::SUMMARY_AUTH, g::HINT_AUTH),
@@ -106,7 +119,10 @@ pub(crate) fn wording(kind: FailureKind) -> Option<(String, String)> {
         FailureKind::HostKeyUnverified => (g::SUMMARY_HOST_KEY, g::HINT_HOST_KEY),
         FailureKind::NetworkUnreachable => (g::SUMMARY_NETWORK, g::HINT_NETWORK),
         FailureKind::LockExists => (g::SUMMARY_LOCK, g::HINT_LOCK),
-        FailureKind::Other => return None,
+        // The typed refusal has its own (localised) sentence naming the files.
+        FailureKind::CredentialHelperFailed
+        | FailureKind::LocalChangesBlockAbort
+        | FailureKind::Other => return None,
     };
     Some((summary.get().to_string(), hint.get().to_string()))
 }
@@ -139,7 +155,9 @@ pub(crate) fn remedy(kind: FailureKind, action: Option<&Action>) -> Option<Remed
         FailureKind::WouldOverwrite => action
             .filter(|a| stashable(a))
             .map(|a| Remedy::StashAndRetry(a.clone())),
-        FailureKind::NetworkUnreachable => action.map(|a| Remedy::Retry(a.clone())),
+        FailureKind::NetworkUnreachable | FailureKind::LocalChangesBlockAbort => {
+            action.map(|a| Remedy::Retry(a.clone()))
+        }
         _ => None,
     }
 }
@@ -159,11 +177,13 @@ mod tests {
             FailureKind::HostKeyUnverified,
             FailureKind::NetworkUnreachable,
             FailureKind::LockExists,
+            FailureKind::CredentialHelperFailed,
         ] {
-            let (summary, hint) = wording(kind).unwrap_or_else(|| panic!("{kind:?}"));
+            let (summary, hint) =
+                wording(kind, "sh: x: not found").unwrap_or_else(|| panic!("{kind:?}"));
             assert!(!summary.is_empty() && !hint.is_empty());
         }
-        assert!(wording(FailureKind::Other).is_none());
+        assert!(wording(FailureKind::Other, "").is_none());
     }
 
     #[test]
@@ -200,6 +220,41 @@ mod tests {
             Some(Remedy::Retry(push))
         );
         assert_eq!(remedy(FailureKind::LockExists, Some(&pull)), None);
+    }
+
+    #[test]
+    fn a_failing_credential_helper_is_named_with_its_line_and_the_command_to_check() {
+        let message = "backend error: git fetch --porcelain --all --prune failed: sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory\nremote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/Poulpi-Lab/GitPoulpi.git/'";
+        let error = CoreError::Backend(message.into());
+        let kind = kind_of(&error);
+        assert_eq!(kind, FailureKind::CredentialHelperFailed);
+        let (summary, hint) = wording(kind, message).unwrap();
+        assert!(
+            summary
+                .contains("sh: /c/Users/X/.config/poulpi-lab/token.sh: No such file or directory"),
+            "{summary}"
+        );
+        assert!(!summary.contains("refused the credentials"), "{summary}");
+        assert!(
+            hint.contains("git config --show-origin --get-all credential.helper"),
+            "{hint}"
+        );
+        assert_eq!(remedy(kind, None), None);
+    }
+
+    #[test]
+    fn an_abort_blocked_by_local_changes_reads_as_such_and_offers_a_retry() {
+        let error = CoreError::ConflictRefused(ConflictRefusal::LocalChanges {
+            paths: vec!["dev-mods/host.ts".into()],
+        });
+        let kind = kind_of(&error);
+        assert_eq!(kind, FailureKind::LocalChangesBlockAbort);
+        let abort = Action::OperationAbort;
+        assert_eq!(remedy(kind, Some(&abort)), Some(Remedy::Retry(abort)));
+        assert!(
+            crate::daemon_link::error_text::error_text(&error).contains("dev-mods/host.ts"),
+            "the reading names the file"
+        );
     }
 
     #[test]

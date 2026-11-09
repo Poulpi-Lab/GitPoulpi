@@ -5044,6 +5044,7 @@ conflict_not_conflicted = "该文件没有冲突"
 conflict_already = "该文件仍有冲突"
 conflict_no_operation = { git = "没有正在进行的 {$merge}、{$rebase}、{$cherry_pick} 或 revert", local = "没有正在进行的{$merge}、{$rebase}、{$cherry_pick}或还原" }
 conflict_unencodable = "第 {line} 行含有文件编码无法表示的字符"
+conflict_local_changes = "local changes the abort would overwrite: {paths}"
 undo_refused = "无法撤销/重做：{reason}"
 undo_in_progress = "请先完成或中止 {op}"
 undo_ref_moved = "{name} 位于 {actual}，而不是该操作结束时的 {expected}；它在 GitPoulpi 之外被更改了"
@@ -5955,6 +5956,9 @@ summary_network = "无法连接到远程。"
 hint_network = "请检查网络连接和远程地址，然后重试。"
 summary_lock = "另一个 git 进程正在使用此仓库。"
 hint_lock = "请关闭其他 git 工具；如果没有运行中的，请删除锁文件。"
+summary_credential_helper = "The configured credential helper failed: {line}"
+hint_credential_helper = "Run `git config --show-origin --get-all credential.helper` to see where it is set, fix or remove that helper, then retry."
+hint_abort_blocked = "Save a copy of the changes to those files or discard them in the Status pane, then retry the abort."
 action_pull_first = { git = "先 {$Pull}", local = "先{$Pull}" }
 action_integrations = "打开集成"
 action_stash_retry = { git = "{$Stash} 后重试", local = "{$Stash}后重试" }

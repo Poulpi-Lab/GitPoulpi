@@ -97,6 +97,10 @@ pub enum ConflictRefusal {
     /// The text has a character the chosen encoding cannot represent, on
     /// this 1-based line.
     Unencodable { line: usize },
+    /// `operation_abort` found files whose working-tree contents differ from
+    /// what the operation staged (even after the index was refreshed): the
+    /// abort would overwrite those local changes. Nothing was changed.
+    LocalChanges { paths: Vec<String> },
 }
 
 impl ConflictRefusal {
@@ -113,6 +117,10 @@ impl ConflictRefusal {
             ConflictRefusal::Unencodable { line } => {
                 format!("line {line} has a character the file's encoding cannot represent")
             }
+            ConflictRefusal::LocalChanges { paths } => format!(
+                "local changes the abort would overwrite: {}",
+                paths.join(", ")
+            ),
         }
     }
 }

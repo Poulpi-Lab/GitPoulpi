@@ -189,6 +189,9 @@ fn conflict_refusal(refusal: &ConflictRefusal) -> String {
         ConflictRefusal::AlreadyConflicted => msg::typed_error::CONFLICT_ALREADY.get().to_string(),
         ConflictRefusal::NoOperation => msg::typed_error::CONFLICT_NO_OPERATION.get().to_string(),
         ConflictRefusal::Unencodable { line } => msg::typed_error::conflict_unencodable(line),
+        ConflictRefusal::LocalChanges { paths } => {
+            msg::typed_error::conflict_local_changes(paths.join(", "))
+        }
     }
 }
 
@@ -310,6 +313,9 @@ mod tests {
             ConflictRefusal::AlreadyConflicted,
             ConflictRefusal::NoOperation,
             ConflictRefusal::Unencodable { line: 4 },
+            ConflictRefusal::LocalChanges {
+                paths: vec!["a.txt".into(), "dir/b.txt".into()],
+            },
         ];
         let reword = [
             RewordRefusal::NotOnCurrentBranch,

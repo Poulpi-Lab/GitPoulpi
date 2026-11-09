@@ -300,6 +300,37 @@ impl ConflictFixture {
         )
     }
 
+    /// [`ConflictFixture::text`] plus `side.txt`, changed only by theirs:
+    /// the merge brings it in cleanly (staged), so aborting must put the
+    /// old content back - which needs that file's index entry to be
+    /// up to date with the working tree.
+    pub fn text_with_clean_side_file() -> Self {
+        scenario(
+            FixtureOperation::Merge,
+            true,
+            &["notes.txt"],
+            &|r| {
+                write(r, "notes.txt", lines_with(10, &[]).as_bytes());
+                write(r, "side.txt", b"side one\nside two\n");
+            },
+            &|r| {
+                write(
+                    r,
+                    "notes.txt",
+                    lines_with(10, &[(3, "three (ours)")]).as_bytes(),
+                )
+            },
+            &|r| {
+                write(
+                    r,
+                    "notes.txt",
+                    lines_with(10, &[(3, "three (theirs)")]).as_bytes(),
+                );
+                write(r, "side.txt", b"side one\nside two (theirs)\n");
+            },
+        )
+    }
+
     /// Three files (one in a folder), several conflicts in the first.
     /// Paths come back sorted.
     pub fn multi_conflict() -> Self {

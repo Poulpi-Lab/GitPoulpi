@@ -5,7 +5,7 @@ use gitpoulpi_core::domain::{ConflictRefusal, Oid, OperationState, RepoRef};
 use gitpoulpi_core::{Error, Result};
 
 use crate::conflicts::{git_dir, read_trimmed, short, side_labels};
-use crate::process::run;
+use crate::process::{abort_failed, run, run_abort};
 
 /// See `GitBackend::operation_state`. Rebase wins over the others (a
 /// rebase replays commits through cherry-pick machinery and can leave
@@ -72,11 +72,21 @@ pub fn operation_abort(repo: &RepoRef) -> Result<()> {
     };
     match state {
         OperationState::Rebase(_) => crate::rebase_interactive::rebase_abort(repo),
-        OperationState::Merge { .. } => run(&repo.root, &["merge", "--abort"]).map(|_| ()),
-        OperationState::CherryPick { .. } => {
-            run(&repo.root, &["cherry-pick", "--abort"]).map(|_| ())
-        }
-        OperationState::Revert { .. } => run(&repo.root, &["revert", "--abort"]).map(|_| ()),
+        OperationState::Merge { .. } => abort_with(repo, &["merge", "--abort"]),
+        OperationState::CherryPick { .. } => abort_with(repo, &["cherry-pick", "--abort"]),
+        OperationState::Revert { .. } => abort_with(repo, &["revert", "--abort"]),
         OperationState::Am { .. } => crate::stuck::am_abort(repo),
+    }
+}
+
+/// `git <args>` as an abort: a stale index is refreshed and the abort retried
+/// once; files that really have local changes the abort would overwrite are
+/// a typed [`ConflictRefusal::LocalChanges`].
+pub(crate) fn abort_with(repo: &RepoRef, args: &[&str]) -> Result<()> {
+    let out = run_abort(&repo.root, args)?;
+    if out.success {
+        Ok(())
+    } else {
+        Err(abort_failed(args, &out))
     }
 }

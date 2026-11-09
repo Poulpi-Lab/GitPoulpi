@@ -85,6 +85,11 @@ fn click_push(term: &mut Terminal) {
 
 fn open_activity(term: &mut Terminal) {
     term.send_keys("C-n").unwrap();
+    // Wait for the chord prompt: an "A" sent before it is up is lost.
+    term.wait_for("the Ctrl+N chord prompt", STEP, |s| {
+        s.contains("t=select tab")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_text("A").unwrap();
 }
 

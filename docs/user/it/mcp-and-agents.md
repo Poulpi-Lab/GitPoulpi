@@ -387,6 +387,8 @@ solo la tua finestra; *propose* (proposta) apre un dialogo che confermi tu.
 | `repo_list` | `gitpoulpi repo list` | read |
 | `repo_open` | `gitpoulpi repo open` | write |
 | `repo_recent` | `gitpoulpi repo recent` | read |
+| `repo_auth_show` | `gitpoulpi repo-auth show` | read |
+| `repo_auth_test` | `gitpoulpi repo-auth test` | write, network |
 | `repo_config_set` | `gitpoulpi repo-config set` | write |
 | `repo_config_show` | `gitpoulpi repo-config show` | read |
 | `repo_config_unset` | `gitpoulpi repo-config unset` | write |
@@ -491,7 +493,10 @@ Not exposed as tools:
 
 | CLI | Why |
 |---|---|
+| `gitpoulpi hosting integrations trust` | accepting a changed address, account or certificate is the user's decision; an agent is told the security check needs the user |
+| `gitpoulpi ai trust` | binding an API key to another address is the user's decision |
 | `gitpoulpi mcp serve` | the MCP server cannot spawn/serve a copy of itself |
+| `gitpoulpi mcp token` | prints, copies and rotates the key that guards this very server: an agent must not read or replace it |
 | `gitpoulpi completions` | shell completion generation, not a GitBackend operation |
 | `gitpoulpi shell-init` | prints a wrapper function for the user's own shell, not a GitBackend operation |
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |
@@ -512,6 +517,9 @@ Not exposed as tools:
 | `gitpoulpi config set` | an agent must not be able to rewrite its own gating config |
 | `gitpoulpi hosting ssh-key create` | writes a private key and uploads it; too dangerous to let an agent automate |
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
+| `gitpoulpi repo-auth set` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 
 ### Le azioni del workflow di branching sono piano-poi-esecuzione

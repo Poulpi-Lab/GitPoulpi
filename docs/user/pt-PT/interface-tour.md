@@ -100,7 +100,7 @@ e no que está sob o ponteiro. A linha de separadores só contém separadores (o
   **Fechar outros separadores...**, **Fechar separadores à direita...**, **Adicionar aos favoritos** (ou
   **Remover dos favoritos**), **Adicionar à área de trabalho** (ou **Remover da área de
   trabalho**, quando tem áreas de trabalho), **Copiar caminho**, **Abrir em ›**,
-  **Chave SSH...** e **Checkout parcial...**.
+  **SSH e credenciais...** e **Checkout parcial...**.
 - `Ctrl+PageUp` e `Ctrl+PageDown` mudam de separador. `Ctrl+W` fecha o separador
   atual. Um clique com o botão do meio num separador também o fecha (com a mesma
   pergunta).

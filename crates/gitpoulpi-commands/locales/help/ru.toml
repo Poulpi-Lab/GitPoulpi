@@ -258,9 +258,9 @@ lfs = "Git LFS: большие файлы, хранимые вне истори�
 "mcp token --rotate" = "Заменить токен новым; клиентам со старым токеном сразу отказывается в доступе"
 "mcp token --show" = "Вывести и полный токен, чтобы вставить его в настройки клиента"
 "merge --autostash" = 'Прячет локальные изменения, мешающие операции, выполняет её, затем делает pop stash (то же, что `general.auto_stash = "always"`)'
-"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
-"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
-"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
+"merge --ff" = "Fast-forward, если ветка позволяет, иначе коммит слияния (поведение по умолчанию). Переопределяет `git.merge_fast_forward` для этого слияния"
+"merge --ff_only" = "Только fast-forward: отказ, если ветка разошлась. Переопределяет `git.merge_fast_forward` для этого слияния"
+"merge --no_ff" = "Всегда создаёт коммит слияния, даже когда возможен fast-forward. Переопределяет `git.merge_fast_forward` для этого слияния"
 "merge --squash" = "Объединяет коммиты ветки: добавляет их изменения в индекс и не создаёт коммит слияния (`merge --squash`), так что дальше нужен `commit`. Режим Squash из настройки «Поведение слияния». Не отменяется: ничего не сдвинулось, чтобы отказаться, отбросьте изменения в индексе"
 patch = "Записывает файл патча или применяет его к рабочему дереву"
 "patch apply" = "Применяет файл патча к рабочему дереву"

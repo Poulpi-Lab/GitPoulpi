@@ -120,6 +120,31 @@ rede. Confirme primeiro que `git fetch` funciona num terminal simples. Os tokens
 do GitHub/GitLab para pull requests são separados e opcionais: veja
 [Alojamento e gestores de issues](hosting-integration.md).
 
+**Um fetch, pull ou push falha com «O assistente de credenciais configurado falhou», «A chave de anfitrião SSH do remoto ainda não é conhecida» ou um início de sessão recusado, e a sua entrada no Registo de atividade tem um botão «SSH e credenciais...».**
+A falha vem da forma como este repositório inicia sessão. O botão abre
+Definições > SSH e credenciais, onde escolhe outra origem para este
+repositório: os assistentes do próprio git com os assistentes do repositório ignorados, uma
+conta de integração, um ficheiro de chave (com um ficheiro de hosts conhecidos), ou um assistente ou comando
+de token seu; **Testar ligação** verifica depois todos os remotos. Para um
+assistente que não pôde correr, `git config --show-origin --get-all
+credential.helper` mostra onde está definido.
+
+**«O GitPoulpi não enviou o token da conta para ...».** O remoto do repositório
+aponta para um servidor que não é o endereço a que a conta escolhida está associada
+(muitas vezes uma reescrita `url.<x>.insteadOf` na configuração do próprio repositório), por isso o
+token foi retido. Corrija o remoto ou escolha outra origem na página.
+
+**«O comando de token deste repositório falhou», «... mudou desde que o confirmou», «O início de sessão deste repositório não pode ser usado».**
+As escolhas da página não podem ser cumpridas: o comando de token não imprimiu nenhum token
+(as suas últimas linhas de erro são citadas, sem segredos), um script que ele executa
+mudou desde que o confirmou (confirme o comando de novo na página), ou a
+escolha nomeia um ficheiro de chave ou uma conta que já não existe. Cada leitura tem o botão
+**SSH e credenciais...**.
+
+**O OpenSSH diz «bad permissions» para um ficheiro de chave.** Outras contas podem ler a
+chave. Em Definições > SSH e credenciais, a linha **Ficheiro da chave privada** mostra um
+aviso com **Restringir à minha conta**.
+
 **"a fazer stage..." fica na barra de estado.** Uma atualização em segundo plano ainda está
 a correr; desaparece quando a lista de ficheiros se atualiza. `r` força uma
 atualização.

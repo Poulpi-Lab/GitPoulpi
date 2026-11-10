@@ -1285,3 +1285,7 @@ Five pushes once went to a red CI because local runs were treated as
 sufficient. Run the gate the platform needs (`scripts/check.ps1` on Windows,
 the cargo gate on Linux) and, when CI is enabled, watch the run
 (`scripts/watch-ci.ps1` accepts any revision spelling).
+
+### CJK popups "spaced out" in kitty, WezTerm and herdr (images on)
+
+- Only where pictures are drawn (kitty graphics / iTerm2 images, also through herdr with `kitty_graphics = true` and `ui.graph_renderer = "image"`), never in a pty test or foot: `terminal_image::write_images_layered` rewrites the cells a popup drew over a picture with ratatui's `backend.draw`, and the buffer holds a wide glyph's second half as a plain `" "`. Written, that blank is a real space one column right (every CJK char shifted the row, borders pushed out), and a rewrite starting on a second half erased its glyph. `without_continuations` drops the blanks (the backend then moves the cursor to the next cell itself) and `painted_cell` swaps a left-edge second half for its glyph. Any new code that writes buffer cells outside ratatui's own diff must do the same.

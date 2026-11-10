@@ -231,3 +231,87 @@ fn a_sixel_picture_is_exactly_its_cells_in_pixels_and_blends() {
     assert!(buf[(0, 0)].modifier.contains(BLANK_RESERVED));
     assert!(buf[(0, 0)].diff_option != ratatui::buffer::CellDiffOption::Skip);
 }
+
+/// The repaint after a picture writes the cells a popup drew over it. A
+/// double-width glyph's blank second half is in the buffer as a `" "`;
+/// written, it is a real space one column right of where the terminal
+/// already is, so every CJK character shifted the rest of the row (the
+/// owner's "spaced out" popups in kitty). Only the glyph may go out, and the
+/// next character is addressed by its own cursor move.
+#[test]
+fn a_wide_glyphs_blank_second_half_is_never_written_over_a_picture() {
+    let cell = |s: &str| {
+        let mut c = ratatui::buffer::Cell::default();
+        c.set_symbol(s);
+        c
+    };
+    // Row 2: `A` at 4, `简` at 5-6, `体` at 7-8, `B` at 9; the second halves
+    // (6 and 8) are blanks, exactly as ratatui leaves them.
+    let over = [
+        (4, 2, cell("A")),
+        (5, 2, cell("\u{7B80}")),
+        (6, 2, cell(" ")),
+        (7, 2, cell("\u{4F53}")),
+        (8, 2, cell(" ")),
+        (9, 2, cell("B")),
+    ];
+    let mut out = Vec::new();
+    write_image(&mut out, (0, 0), "<IMAGE>", &over).unwrap();
+    let out = String::from_utf8(out).unwrap();
+    let after_image = &out[out.find("<IMAGE>").unwrap() + "<IMAGE>".len()..];
+    // Strip escapes, keeping a marker where the cursor is moved.
+    let mut text = String::new();
+    let mut chars = after_image.chars();
+    while let Some(c) = chars.next() {
+        if c == '\u{1b}' {
+            let mut seq = String::new();
+            for n in chars.by_ref() {
+                seq.push(n);
+                if n.is_ascii_alphabetic() {
+                    break;
+                }
+            }
+            if seq.ends_with('H') {
+                text.push('|');
+            }
+        } else {
+            text.push(c);
+        }
+    }
+    assert!(
+        !text.contains("\u{7B80} ") && !text.contains("\u{4F53} "),
+        "a blank follows a wide glyph: {text:?}"
+    );
+    assert!(
+        text.contains("\u{7B80}|\u{4F53}") && text.contains("\u{4F53}|B"),
+        "each glyph after a wide one is placed by a cursor move: {text:?}"
+    );
+}
+
+/// A picture whose area starts on a wide glyph's second half (the glyph is
+/// one cell left of the area): the repaint redraws that glyph, and never
+/// writes the blank second half alone, which would erase it. The list keeps
+/// one entry per cell so two lists of the same area line up.
+#[test]
+fn a_repaint_starting_on_a_wide_glyphs_second_half_redraws_the_glyph() {
+    use ratatui::buffer::Buffer;
+    use ratatui::layout::Rect;
+    let mut buf = Buffer::empty(Rect::new(0, 0, 10, 2));
+    buf.set_string(2, 1, "\u{968F}x", ratatui::style::Style::default());
+    // 随 sits at 2-3, `x` at 4; the area starts at 3.
+    let area = Rect::new(3, 1, 3, 1);
+    let cells = cells_of(&buf, area);
+    assert_eq!(cells.len(), 3, "one entry per cell of the area");
+    assert_eq!((cells[0].0, cells[0].1), (2, 1), "the glyph, one cell left");
+    assert_eq!(cells[0].2.symbol(), "\u{968F}");
+    let mut hide = Hide::default();
+    hide.add(&buf, area, None);
+    let mut out = Vec::new();
+    write_hide(&mut out, &hide).unwrap();
+    let out = String::from_utf8(out).unwrap();
+    assert!(out.contains('\u{968F}'), "the glyph is rewritten: {out:?}");
+    assert!(
+        !out.contains("[2;4H "),
+        "no bare blank on the glyph's second half: {out:?}"
+    );
+}

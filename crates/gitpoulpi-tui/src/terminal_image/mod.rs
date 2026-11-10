@@ -812,9 +812,8 @@ impl Hide {
         let area = area.intersection(buf.area);
         for y in area.top()..area.bottom() {
             for x in area.left()..area.right() {
-                let cell = &buf[(x, y)];
-                if cell.diff_option != ratatui::buffer::CellDiffOption::Skip {
-                    self.cells.push((x, y, cell.clone()));
+                if buf[(x, y)].diff_option != ratatui::buffer::CellDiffOption::Skip {
+                    self.cells.push(painted_cell(buf, area, x, y));
                 }
             }
         }
@@ -864,7 +863,55 @@ pub(crate) fn cells_of(buf: &Buffer, area: Rect) -> Vec<(u16, u16, ratatui::buff
     let mut out = Vec::with_capacity(usize::from(area.width) * usize::from(area.height));
     for y in area.top()..area.bottom() {
         for x in area.left()..area.right() {
-            out.push((x, y, buf[(x, y)].clone()));
+            out.push(painted_cell(buf, area, x, y));
+        }
+    }
+    out
+}
+
+/// The cell `(x, y)` of `buf` as a repaint of `area` writes it. Where `area`
+/// starts on the blank second half of a double-width glyph, that glyph
+/// (one cell to the left, outside `area`) takes its place in the list, so
+/// the repaint redraws it whole: writing the blank alone would erase it.
+/// The list keeps one entry per cell, so lists taken at different times
+/// still line up.
+fn painted_cell(
+    buf: &Buffer,
+    area: Rect,
+    x: u16,
+    y: u16,
+) -> (u16, u16, ratatui::buffer::Cell) {
+    if x == area.left() && x > buf.area.left() && is_wide(&buf[(x - 1, y)]) {
+        return (x - 1, y, buf[(x - 1, y)].clone());
+    }
+    (x, y, buf[(x, y)].clone())
+}
+
+/// Whether `cell` is a double-width glyph (a CJK character): the cell
+/// after it, in the buffer, is its blank second half.
+fn is_wide(cell: &ratatui::buffer::Cell) -> bool {
+    ratatui::text::Span::raw(cell.symbol()).width() > 1
+}
+
+/// `cells` without the blank second half of every double-width glyph.
+///
+/// The buffer holds that second half as a plain `" "` next to the glyph.
+/// Written out it is a real space: the terminal already advanced two cells
+/// for the glyph, so the space lands on the next cell and pushes the rest of
+/// the row one column right per wide character (CJK text "spaced out", the
+/// popup's border shoved past its edge). Kitty and the terminals that
+/// forward its picture protocol (WezTerm, the multiplexers in front of
+/// them) are where this repaint runs, so it only showed there.
+fn without_continuations(
+    cells: &[(u16, u16, ratatui::buffer::Cell)],
+) -> Vec<(u16, u16, &ratatui::buffer::Cell)> {
+    let mut out = Vec::with_capacity(cells.len());
+    let mut prev: Option<(u16, u16, bool)> = None;
+    for (x, y, cell) in cells {
+        let second_half = matches!(prev, Some((px, py, true)) if py == *y && px + 1 == *x);
+        prev = Some((*x, *y, !second_half && is_wide(cell)));
+        if !second_half {
+            out.push((*x, *y, cell));
         }
     }
     out
@@ -920,9 +967,9 @@ pub(crate) fn write_images_layered<W: std::io::Write>(
     use ratatui::backend::Backend;
     crossterm::queue!(out, SavePosition)?;
     if !under.is_empty() {
-        let under: Vec<_> = under
-            .iter()
-            .map(|(x, y, c)| (*x, *y, as_painted(c)))
+        let under: Vec<_> = without_continuations(under)
+            .into_iter()
+            .map(|(x, y, c)| (x, y, as_painted(c)))
             .collect();
         let mut backend = ratatui::backend::CrosstermBackend::new(&mut *out);
         backend.draw(under.iter().map(|(x, y, cell)| (*x, *y, cell)))?;
@@ -932,9 +979,9 @@ pub(crate) fn write_images_layered<W: std::io::Write>(
         out.write_all(sequence.as_bytes())?;
     }
     if !over.is_empty() {
-        let over: Vec<_> = over
-            .iter()
-            .map(|(x, y, c)| (*x, *y, as_painted(c)))
+        let over: Vec<_> = without_continuations(over)
+            .into_iter()
+            .map(|(x, y, c)| (x, y, as_painted(c)))
             .collect();
         let mut backend = ratatui::backend::CrosstermBackend::new(&mut *out);
         backend.draw(over.iter().map(|(x, y, cell)| (*x, *y, cell)))?;

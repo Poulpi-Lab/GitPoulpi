@@ -485,7 +485,7 @@ tested = "Beispielbild wird in „{label}“ geöffnet..."
 
 [settings_ssh]
 private_key_path = "Pfad des privaten Schlüssels"
-private_key_path_help = "Schlüsseldatei, die {$Fetch}, {$Pull}, {$Push} und Clone ssh anbieten (ssh -i <Schlüssel> -o IdentitiesOnly=yes). Leer: ssh-agent und Ihre ssh-Konfiguration wie gewohnt. Wird ignoriert, wenn GIT_SSH_COMMAND oder core.sshCommand (z. B. SSH-Schlüssel für dieses Repository) gesetzt ist. Gilt ab der nächsten Übertragung."
+private_key_path_help = "Schlüsseldatei, die {$Fetch}, {$Pull}, {$Push} und Clone ssh anbieten (ssh -i <Schlüssel> -o IdentitiesOnly=yes). Leer: ssh-agent und Ihre ssh-Konfiguration wie gewohnt. Wird ignoriert, wenn ein Repository einen eigenen Schlüssel wählt (SSH & Zugangsdaten) oder wenn GIT_SSH_COMMAND oder core.sshCommand gesetzt ist. Gilt ab der nächsten Übertragung."
 public_key_path = "Pfad des öffentlichen Schlüssels"
 public_key_path_help = "Nur genutzt, wenn der Pfad des privaten Schlüssels leer ist: ssh wählt dann den passenden Schlüssel aus dem ssh-agent (oder einen Hardwareschlüssel), statt alle Agent-Schlüssel anzubieten. Schlüsselpaar erzeugen füllt beide. Gleiche Rangfolge wie beim Pfad des privaten Schlüssels."
 key_type = "Schlüsseltyp"
@@ -4086,7 +4086,7 @@ hosting_3 = "{$Pr} erstellen|Das + in der Kopfzeile {$PRS} oder n in diesem Absc
 hosting_4 = "Issues|Der Abschnitt ISSUES listet sie; + oder n erstellt eines. Das Menü einer Zeile öffnet es im Browser oder bearbeitet es."
 hosting_5 = "Verweise|Verweise auf Issues und {$prs} (#12, !53, ABC-7) in einer {$commit}-Nachricht oder einem Branch-Namen werden erkannt. Alt+R im {$commit}-Formular fügt einen ein."
 hosting_6 = { git = "Chip in der Symbolleiste|Links in der Symbolleiste zeigt ein Chip den {$pr} des ausgecheckten Branches (GH #12, GL !53) oder ein blasses „+ {$pr_abbr}“, um einen zu starten. Ein Klick darauf genügt.", local = "Chip in der Symbolleiste|Links in der Symbolleiste zeigt ein Chip die {$pr} des ausgecheckten Branches (GH #12, GL !53) oder ein blasses „+ {$pr_abbr}“, um eine zu starten. Ein Klick darauf genügt." }
-hosting_7 = "SSH-Schlüssel|Einen SSH-Schlüssel pro Profil (Einstellungen > Profile) oder pro Repository (Tab-Menü > „SSH-Schlüssel...“) wählen. Passphrasen bleiben beim ssh-agent Ihres Systems."
+hosting_7 = "SSH-Schlüssel|Einen SSH-Schlüssel pro Profil (Einstellungen > Profile) oder pro Repository (Tab-Menü > „SSH & Zugangsdaten...“) wählen. Passphrasen bleiben beim ssh-agent Ihres Systems."
 setup_1 = "Einstellungen|Ctrl+, oder das Zahnrad. Tab wechselt zwischen Seitenliste und Optionen, j / k bewegen, Enter oder Leertaste ändert einen Wert, / oder Ctrl+F durchsucht alle Optionen, Esc schließt."
 setup_2 = "Designs|Einstellungen > Darstellung > Design: dunkel, hell, dem Terminal folgen oder eine der vielen Vorlagen. Ctrl+N, dann eine Taste wechselt auch Design, Sprache und Graph-Farben, ohne die Einstellungen zu öffnen."
 setup_3 = "Sprache|Einstellungen > Allgemein > Sprache bietet 17 Sprachen. „Git-Begriffe übersetzen“ legt fest, ob auch die Wörter von Git selbst ({$commit}, {$push}...) übersetzt werden."
@@ -9101,7 +9101,7 @@ hosts_help = "Hostnamen, durch Kommas getrennt. Leer bedeutet der Host des Haupt
 # context: label of the field with the minutes a token is kept
 cache_label = "Cache (Minuten)"
 # context: help under the cache field
-cache_help = "Wie lange ein ausgegebenes Token wiederverwendet wird. Leer bedeutet 50."
+cache_help = "Wie lange ein ausgegebenes Token wiederverwendet wird. Leer lassen für 50."
 # context: boxed warning under a command that runs on this computer
 command_warning = "Dieser Befehl wird auf Ihrem Computer ausgeführt, sooft dieses Repository per {$fetch} oder {$push} auf das Remote zugreift. Verwenden Sie nur einen Befehl, den Sie selbst geschrieben haben oder dem Sie vertrauen. Liegt er im Repository-Ordner, fragt GitPoulpi erneut, sobald sich die Datei ändert."
 # context: button that copies this repository's own credential helper into the helper field

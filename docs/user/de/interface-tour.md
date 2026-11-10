@@ -78,7 +78,7 @@ Schaltfläche der [globalen Suche](search.md) steht in der Titelleiste).
   **Andere Tabs schließen...**, **Tabs rechts schließen...**, **Zu Favoriten hinzufügen**
   (oder **Aus Favoriten entfernen**), **Zum Workspace hinzufügen** (oder **Aus dem
   Workspace entfernen**, wenn Sie Workspaces haben), **Pfad kopieren**, **Öffnen in ›**,
-  **SSH-Schlüssel...** und **Sparse Checkout...**.
+  **SSH & Zugangsdaten...** und **Sparse Checkout...**.
 - `Ctrl+PageUp` und `Ctrl+PageDown` wechseln die Tabs. `Ctrl+W` schließt den
   aktuellen Tab. Ein Mittelklick auf einen Tab schließt ihn ebenfalls (mit derselben
   Rückfrage).

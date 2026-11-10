@@ -258,6 +258,9 @@ lfs = "Git LFS: archivos grandes almacenados fuera del historial del repositorio
 "mcp token --rotate" = "Reemplaza el token por uno nuevo; los clientes que tengan el anterior se rechazan al instante"
 "mcp token --show" = "Imprime también el token completo, para que lo pegues en la configuración de un cliente"
 "merge --autostash" = 'Guarda en stash los cambios locales que lo impiden, ejecuta la operación y luego recupera el stash (lo que hace `general.auto_stash = "always"`)'
+"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
+"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
+"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
 "merge --squash" = "Aplasta los commits de la rama (squash): deja sus cambios en stage y no crea ningún commit de merge (`merge --squash`), de modo que después hay que hacer un `commit`. Es el modo Squash del ajuste de comportamiento de Merge. No se puede deshacer: nada se movió; para retroceder, descarta los cambios en stage"
 patch = "Escribe un archivo de parche, o aplica uno al árbol de trabajo"
 "patch apply" = "Aplica un archivo de parche al árbol de trabajo"

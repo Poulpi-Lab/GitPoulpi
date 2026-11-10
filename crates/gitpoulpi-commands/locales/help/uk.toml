@@ -258,6 +258,9 @@ lfs = "Git LFS: великі файли, що зберігаються поза 
 "mcp token --rotate" = "Замінює токен новим; клієнтам зі старим одразу відмовляється"
 "mcp token --show" = "Виводить також повний токен, щоб ви вставили його в конфігурацію клієнта"
 "merge --autostash" = 'Ховає локальні зміни, що блокують це, виконує дію, потім робить pop схованки (те саме, що `general.auto_stash = "always"`)'
+"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
+"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
+"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
 "merge --squash" = "Стискає коміти гілки: додає їхні зміни в індекс і не створює коміт злиття (`merge --squash`), тож далі йде `commit`. Режим Squash налаштування «Поведінка злиття». Не скасовується: нічого не переміщено, щоб відступити, відкиньте зміни в індексі"
 patch = "Записує файл патча або застосовує його до робочого дерева"
 "patch apply" = "Застосовує файл патча до робочого дерева"

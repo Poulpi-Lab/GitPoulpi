@@ -258,6 +258,9 @@ lfs = "Git LFS: grote bestanden buiten de geschiedenis van de repository opgesla
 "mcp token --rotate" = "Vervangt het token door een nieuw; clients met het oude token worden meteen geweigerd"
 "mcp token --show" = "Drukt ook het volledige token af, om in de configuratie van een client te plakken"
 "merge --autostash" = 'Stasht lokale wijzigingen die dit blokkeren, voert het uit en popt dan de stash (wat `general.auto_stash = "always"` doet)'
+"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
+"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
+"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
 "merge --squash" = "Voegt de commits van de branch samen tot één wijziging: staget hun wijzigingen zonder merge-commit (`merge --squash`), zodat daarna een `commit` volgt. De modus Squash van de instelling Merge-gedrag. Niet ongedaan te maken: er is niets verplaatst, verwerp de gestagede wijzigingen om terug te gaan"
 patch = "Schrijf een patchbestand, of pas er een toe op de werkmap"
 "patch apply" = "Pas een patchbestand toe op de werkmap"

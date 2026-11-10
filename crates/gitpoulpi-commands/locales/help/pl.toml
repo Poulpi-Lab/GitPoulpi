@@ -258,6 +258,9 @@ lfs = "Git LFS: duże pliki przechowywane poza historią repozytorium. Wymaga pr
 "mcp token --rotate" = "Zastępuje token nowym; klienci z poprzednim są odrzucani od razu"
 "mcp token --show" = "Wypisuje także pełny token, do wklejenia w konfiguracji klienta"
 "merge --autostash" = 'Robi stash lokalnych zmian, które to blokują, wykonuje operację, a potem robi pop stasha (to, co robi `general.auto_stash = "always"`)'
+"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
+"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
+"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
 "merge --squash" = "Robi squash commitów gałęzi: dodaje ich zmiany do poczekalni i nie tworzy merge commita (`merge --squash`), więc po nim następuje `commit`. To tryb Squash ustawienia „Zachowanie: merge”. Nie można cofnąć: nic się nie przesunęło, aby się wycofać, odrzuć zmiany z poczekalni"
 patch = "Zapisuje plik patcha lub stosuje go do drzewa roboczego"
 "patch apply" = "Stosuje plik patcha do drzewa roboczego"

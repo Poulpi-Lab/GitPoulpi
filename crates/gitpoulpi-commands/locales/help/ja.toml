@@ -258,6 +258,9 @@ lfs = "Git LFS：リポジトリの履歴の外に保存される大きなファ
 "mcp token --rotate" = "トークンを新しいものに置き換えます。古いトークンを持つクライアントはすぐに拒否されます"
 "mcp token --show" = "完全なトークンも出力します（クライアントの設定に貼り付ける用）"
 "merge --autostash" = 'この操作を妨げるローカルの変更をスタッシュし、操作を実行してから、スタッシュを pop します（`general.auto_stash = "always"` と同じ動作）'
+"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
+"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
+"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
 "merge --squash" = "ブランチのコミットをスカッシュします：変更をステージするだけでマージコミットは作らず（`merge --squash`）、続けて `commit` を実行します。設定の Merge behavior の Squash モードに相当します。元に戻せません（何も移動していないため、取りやめるにはステージした変更を破棄してください）"
 patch = "パッチファイルを書き出す、または作業ツリーに適用します"
 "patch apply" = "パッチファイルを作業ツリーに適用します"

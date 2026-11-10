@@ -258,6 +258,9 @@ lfs = "Git LFS: stora filer lagrade utanför repositoryts historik. Kräver prog
 "mcp token --rotate" = "Ersätt token med en ny; klienter som har den gamla nekas direkt"
 "mcp token --show" = "Skriv även ut hela token, så att du kan klistra in den i en klients konfiguration"
 "merge --autostash" = 'Stashar lokala ändringar som blockerar detta, kör åtgärden och poppar sedan stashen (vad `general.auto_stash = "always"` gör)'
+"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
+"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
+"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
 "merge --squash" = "Squasha grenens commits: stagea deras ändringar och skapa ingen merge-commit (`merge --squash`), så en `commit` följer. Läget Squash i inställningen Merge behavior. Kan inte ångras: inget har flyttats, förkasta de stagade ändringarna för att backa"
 patch = "Skriv en patchfil, eller tillämpa en på arbetskatalogen"
 "patch apply" = "Tillämpa en patchfil på arbetskatalogen"

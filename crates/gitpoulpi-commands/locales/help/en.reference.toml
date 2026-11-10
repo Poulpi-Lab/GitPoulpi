@@ -262,6 +262,9 @@ lfs = "Git LFS: large files stored outside the repository's history. Needs the `
 "mcp token --rotate" = "Replace the token with a new one; clients holding the old one are refused at once"
 "mcp token --show" = "Print the full token too, for you to paste into a client's configuration"
 "merge --autostash" = 'Stash local changes that block this, run it, then pop the stash (what `general.auto_stash = "always"` does)'
+"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
+"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
+"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
 "merge --squash" = "Squash the branch's commits: stage their changes and make no merge commit (`merge --squash`), so a `commit` follows. The Merge behavior setting's Squash mode. Not undoable: nothing moved, discard the staged changes to back out"
 patch = "Write a patch file, or apply one to the working tree"
 "patch apply" = "Apply a patch file to the working tree"

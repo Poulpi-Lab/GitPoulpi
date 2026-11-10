@@ -382,11 +382,13 @@ GitHub、Azure DevOps 和 Bitbucket 称为“pull request”。GitLab 称为“m
 
 ### 单个仓库的 SSH 密钥
 
-要让某个仓库使用某个配置的密钥，GitPoulpi 会在该仓库中把 `core.sshCommand` 设置为 `ssh -i "<key>" -o IdentitiesOnly=yes`。这绝不会自动完成。打开标签页菜单（`Ctrl+T`，或右键点击标签页）并选择 **SSH 密钥…**，或者运行命令面板命令 *仓库：此仓库的 SSH 密钥…*。菜单会显示当前的固定、每个拥有私钥的配置，以及 **清除固定**。
+要让某个仓库使用某个特定的密钥，请打开标签页菜单（`Ctrl+T`，或右键点击标签页）并选择 **SSH 与凭据…**，或者运行命令面板命令 *仓库：SSH 与凭据…*，然后在 SSH 下选择 **密钥文件**（或选 **账户密钥**，使用某个集成配置的密钥）。这个选择保存在 GitPoulpi 的私有文件夹中：不会向仓库或 git 的配置写入任何内容。参见[设置](settings.md#仓库专属ssh-与凭据)。
 
-CLI 和 MCP：`gitpoulpi ssh-command show | set --key <file> | clear`。
+仍带有自己的 `core.sshCommand` 的仓库（来自以前的“此仓库的 SSH 密钥”固定）会在该页面中以只读方式显示它，并带有 **移入 GitPoulpi** 按钮。
 
-设置 > SSH 与凭据中的全局密钥（*私钥路径*，或*生成密钥对*）适用于每个没有固定的仓库。仓库的固定优先于它。
+CLI 和 MCP：`gitpoulpi repo-auth`（针对单个仓库的选择），而对于 `core.sshCommand` 固定本身，则是 `gitpoulpi ssh-command show | set --key <file> | clear`。
+
+设置 > SSH 与凭据中的全局密钥（*私钥路径*，或*生成密钥对*）适用于每个没有自己选择的仓库。仓库自己的密钥文件或固定项优先于它。
 
 ## 13b. 分支保护，用于历史重写
 

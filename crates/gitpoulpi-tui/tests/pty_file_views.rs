@@ -196,7 +196,7 @@ fn view_all_files_on_the_wip_row_lists_the_working_tree() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
-    let (ac, ar) = term.screen().find("a.txt").unwrap();
+    let (ac, ar) = snap(&term).find("a.txt").unwrap();
     term.click(ac, ar).unwrap();
     term.wait_for("a.txt's bytes on disk, centrally", STEP, |s| {
         s.contains("File View - a.txt @ WIP")
@@ -205,7 +205,7 @@ fn view_all_files_on_the_wip_row_lists_the_working_tree() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
-    let (bc, br) = term.screen().find(" b.txt").unwrap();
+    let (bc, br) = snap(&term).find(" b.txt").unwrap();
     term.click(bc + 1, br).unwrap();
     term.wait_for("b.txt's unstaged diff", STEP, |s| {
         s.contains("b.txt - unstaged") && s.contains("edited b")
@@ -225,7 +225,7 @@ fn hammering_view_all_files_never_ends_the_process() {
         let (c, r) = term.wait_for_text("View all files", STEP).unwrap();
         term.click(c + 6, r).unwrap();
         // Straight away: the tree is still loading.
-        let (tc, tr) = term.screen().find("files (").unwrap_or((c, r + 3));
+        let (tc, tr) = snap(&term).find("files (").unwrap_or((c, r + 3));
         for _ in 0..100 {
             term.scroll(true, tc + 2, tr + 2).unwrap();
         }
@@ -307,6 +307,9 @@ fn open_bar_view(term: &mut Terminal, label: &str, title: &str, shown: &[&str]) 
         s.contains(&title) && wanted.iter().all(|t| s.contains(t.as_str()))
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Settled: what must be absent is judged on a whole frame.
+    term.wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let text = term.text();
     assert!(!text.contains(NOT_IN_COMMIT), "{text}");
     assert!(!text.contains("backend error"), "{text}");
@@ -446,7 +449,7 @@ fn the_file_view_honours_a_treat_as_text_rule() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
-    let (fc, fr) = term.screen().find("plain.bin").unwrap();
+    let (fc, fr) = snap(&term).find("plain.bin").unwrap();
     term.click(fc, fr).unwrap();
     term.wait_for("the binary notice for the file without a rule", STEP, |s| {
         s.contains("File View - plain.bin @") && s.contains("nothing to show")
@@ -454,7 +457,7 @@ fn the_file_view_honours_a_treat_as_text_rule() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(!term.text().contains("omega line"));
 
-    let (fc, fr) = term.screen().find("forced.dat").unwrap();
+    let (fc, fr) = snap(&term).find("forced.dat").unwrap();
     term.click(fc, fr).unwrap();
     term.wait_for("the forced-text file's lines", STEP, |s| {
         s.contains("File View - forced.dat @")
@@ -464,4 +467,14 @@ fn the_file_view_honours_a_treat_as_text_rule() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

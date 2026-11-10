@@ -64,16 +64,28 @@ fn base64_decode(text: &[u8]) -> Vec<u8> {
     out
 }
 
-/// The last picture the binary sent.
+/// The last picture the binary sent. The stream is read in small pieces
+/// under torn frames, so the last picture may be still arriving: it is read
+/// again (bounded) until it decodes whole.
 fn last_picture(term: &Terminal) -> Picture {
-    let raw = term.raw_output();
+    let deadline = std::time::Instant::now() + Duration::from_secs(90);
+    loop {
+        if let Some(picture) = decode_last(&term.raw_output()) {
+            return picture;
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "the last picture never arrived whole"
+        );
+        std::thread::sleep(Duration::from_millis(250));
+    }
+}
+
+fn decode_last(raw: &[u8]) -> Option<Picture> {
     let marker = b"]1337;File=";
-    let at = raw
-        .windows(marker.len())
-        .rposition(|w| w == marker)
-        .expect("the binary never sent a picture");
+    let at = raw.windows(marker.len()).rposition(|w| w == marker)?;
     let body = &raw[at..];
-    let colon = body.iter().position(|b| *b == b':').expect("payload");
+    let colon = body.iter().position(|b| *b == b':')?;
     let payload: Vec<u8> = body[colon + 1..]
         .iter()
         .copied()
@@ -82,16 +94,16 @@ fn last_picture(term: &Terminal) -> Picture {
     let png_bytes = base64_decode(&payload);
     let mut reader = png::Decoder::new(std::io::Cursor::new(png_bytes))
         .read_info()
-        .expect("a PNG");
-    let mut buf = vec![0; reader.output_buffer_size().expect("size")];
-    let info = reader.next_frame(&mut buf).expect("a frame");
+        .ok()?;
+    let mut buf = vec![0; reader.output_buffer_size()?];
+    let info = reader.next_frame(&mut buf).ok()?;
     assert_eq!(info.color_type, png::ColorType::Rgba, "RGBA expected");
     buf.truncate(info.buffer_size());
-    Picture {
+    Some(Picture {
         width: info.width as usize,
         height: info.height as usize,
         rgba: buf,
-    }
+    })
 }
 
 fn picture_with(setting: &str, cell: &str, session: &str) -> Picture {

@@ -39,8 +39,7 @@ fn launcher_row_is(screen: &xtask::pty::Screen, value: &str) -> bool {
 }
 
 fn click_text(term: &mut Terminal, text: &str) {
-    let (col, row) = term
-        .screen()
+    let (col, row) = snap(term)
         .find_all(text)
         .into_iter()
         .next()
@@ -118,7 +117,7 @@ fn changing_the_terminal_in_the_settings_rewrites_a_created_shortcut_by_itself()
     );
 
     // Pick foot in the terminal combobox: no other press.
-    let (vc, vr) = common::choice_at(&term.screen(), "kitty")
+    let (vc, vr) = common::choice_at(&snap(&term), "kitty")
         .unwrap_or_else(|| panic!("no terminal value:\n{}", term.text()));
     term.click(vc + 1, vr).unwrap();
     let popup = term
@@ -233,13 +232,32 @@ fn create_from_the_palette_then_remove_from_the_settings_row() {
     // The row's Remove button deletes only what we made. The palette left it
     // selected (and scrolled into view), so one click runs it.
     click_text(&mut term, &format!("Remove: {PLACE}"));
-    common::confirm_removal(&mut term, STEP);
-    term.wait_for("the row reads not created", STEP, |s| {
-        launcher_row_is(s, "not created")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The confirm click is retried while the question is up: a click aimed at
+    // a torn frame lands on nothing.
+    common::retry_until(
+        &mut term,
+        "the row reads not created",
+        4,
+        STEP,
+        |t| {
+            if t.screen().contains("This cannot") {
+                common::confirm_removal(t, STEP);
+            }
+        },
+        |s| launcher_row_is(s, "not created"),
+    );
     assert!(!entry.exists(), "the entry is gone");
     assert!(!mac || !bundle.exists(), "the whole bundle is gone");
     assert_eq!(our_icons(), 0, "the icon is gone");
     let _ = term.stop();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

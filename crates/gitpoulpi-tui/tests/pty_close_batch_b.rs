@@ -29,7 +29,9 @@ fn plain_repo(subject: &str) -> FixtureRepo {
 
 /// The cross painted on the row that carries `title`, with no "Esc" beside it.
 fn cross_on_row_of(term: &Terminal, title: &str) -> (u16, u16) {
-    let screen = term.screen();
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let (_, row) = screen
         .find(title)
         .unwrap_or_else(|| panic!("no {title:?} on screen:\n{}", term.text()));
@@ -84,12 +86,15 @@ fn the_undo_history_panel_closes_on_a_click_outside() {
         s.contains("Undo history")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (_, row) = term.screen().find("Undo history").unwrap();
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (_, row) = screen.find("Undo history").unwrap();
     assert!(
-        !term.screen().line(row).contains("Esc"),
+        !screen.line(row).contains("Esc"),
         "no Esc text beside the cross"
     );
-    assert!(term.screen().find_all(CROSS).iter().any(|&(_, r)| r == row));
+    assert!(screen.find_all(CROSS).iter().any(|&(_, r)| r == row));
     // A corner of the screen is outside the panel.
     term.click(0, 0).unwrap();
     term.wait_for_text_to_go("Undo history", STEP)
@@ -136,7 +141,7 @@ fn the_ai_popup_survives_a_click_inside_and_closes_on_a_click_outside() {
     .unwrap_or_else(|e| panic!("{e}"));
     let (col, row) = cross_on_row_of(&term, "Explain working changes");
     // A click on the text inside the popup does not close it.
-    let (tc, tr) = term.screen().find("adds a second line").unwrap();
+    let (tc, tr) = snap(&term).find("adds a second line").unwrap();
     term.click(tc + 2, tr).unwrap();
     term.send_text("x").unwrap();
     let screen = term
@@ -271,4 +276,14 @@ fn a_typed_issue_form_asks_on_esc_and_discard_closes_it() {
         !s.contains("A typed title") && !s.contains("Discard changes?")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

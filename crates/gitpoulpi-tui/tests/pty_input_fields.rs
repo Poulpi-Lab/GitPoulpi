@@ -100,13 +100,14 @@ fn a_long_description_shows_a_scrollbar_thumb_that_drags() {
             term.send_keys("Enter").expect("new line");
         }
     }
-    let screen = term
-        .wait_for(
-            "the last line with the caret, the first scrolled off",
-            STEP,
-            |s| s.contains("dsc30_") && !s.contains("dsc01"),
-        )
-        .unwrap_or_else(|e| panic!("{e}"));
+    term.wait_for(
+        "the last line with the caret, the first scrolled off",
+        STEP,
+        |s| s.contains("dsc30_") && !s.contains("dsc01"),
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
+    // Settled: the thumb and the arrows are read off a whole frame.
+    let screen = snap(&term);
     let (text_col, _) = screen.find("dsc30_").unwrap();
     let desc_rows: Vec<u16> = (0..screen.rows())
         .filter(|r| screen.line(*r).contains("dsc"))
@@ -164,7 +165,7 @@ fn a_long_description_shows_a_scrollbar_thumb_that_drags() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     // ...and dragging the thumb to the top of the track reaches line 1.
-    let screen = term.screen();
+    let screen = snap(&term);
     let thumb_row = desc_rows
         .iter()
         .copied()
@@ -256,7 +257,7 @@ fn the_input_color_setting_applies_live_and_a_custom_hex_is_honoured() {
     let (mut term, config) = launch(repo.root(), "pty-input-color", "", "initial commit");
     let hint = "(click or press / to filter)";
     let filter_bg = |term: &Terminal| {
-        let screen = term.screen();
+        let screen = snap(term);
         let (col, row) = screen.find(hint).expect("the Refs filter hint");
         screen.cell(col + 1, row).unwrap().bg
     };
@@ -277,7 +278,7 @@ fn the_input_color_setting_applies_live_and_a_custom_hex_is_honoured() {
         .wait_for_text("Appearance - global", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     let deadline = std::time::Instant::now() + STEP;
-    while common::choice_at(&term.screen(), "Follow theme").is_none() {
+    while common::choice_at(&snap(&term), "Follow theme").is_none() {
         assert!(
             std::time::Instant::now() < deadline,
             "the Input color row never scrolled into view:\n{}",
@@ -286,11 +287,18 @@ fn the_input_color_setting_applies_live_and_a_custom_hex_is_honoured() {
         term.scroll(true, body_col + 10, body_row + 10).unwrap();
         std::thread::sleep(std::time::Duration::from_millis(150));
     }
-    let (col, row) = common::wait_for_choice(&term, "Follow theme", STEP);
-    term.click(col + 1, row).expect("open the combo");
-    let screen = term
-        .wait_for("the popup", STEP, |s| s.contains("\u{2713} Follow theme"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a click aimed at a torn frame opens nothing.
+    let screen = common::retry_until(
+        &mut term,
+        "the popup",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let (col, row) = common::wait_for_choice(t, "Follow theme", STEP);
+            t.click(col + 1, row).expect("open the combo");
+        },
+        |s| s.contains("\u{2713} Follow theme"),
+    );
     let (tick_col, tick_row) = screen.find("\u{2713} Follow theme").unwrap();
     // Follow theme (ticked), Gray, Blue.
     term.click(tick_col + 2, tick_row + 2).expect("pick Blue");
@@ -323,4 +331,14 @@ fn the_input_color_setting_applies_live_and_a_custom_hex_is_honoured() {
     term.wait_for("the filter hint", STEP, |s| s.contains(hint))
         .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(filter_bg(&term), Color::Rgb(16, 32, 48));
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

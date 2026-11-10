@@ -98,7 +98,7 @@ fn each_lazy_page_adds_exactly_the_configured_commit_count() {
     let deadline = std::time::Instant::now() + STEP;
     while std::time::Instant::now() < deadline {
         term.send_keys("End").unwrap();
-        if let Some(n) = loaded_count(&term.screen()) {
+        if let Some(n) = loaded_count(&snap(&term)) {
             if seen.last() != Some(&n) {
                 seen.push(n);
             }
@@ -113,4 +113,14 @@ fn each_lazy_page_adds_exactly_the_configured_commit_count() {
         "a page was not exactly 300 commits: {seen:?}"
     );
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

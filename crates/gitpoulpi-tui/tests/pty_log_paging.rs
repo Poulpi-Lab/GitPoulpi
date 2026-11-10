@@ -92,9 +92,16 @@ fn scrolling_to_the_lazy_load_trigger_keeps_the_view_and_loads_a_big_page() {
     // arrived, recording the top row just before it does.
     let mut before = None;
     let mut after = None;
+    // In bursts of a few notches, each sampled on a settled screen: under
+    // torn frames the screen lags the wheel, and a sample of a half-drawn
+    // frame is neither the top before the page nor after it.
     for _ in 0..400 {
-        term.scroll(true, wheel_col, wheel_row).unwrap();
-        let screen = term.screen();
+        for _ in 0..3 {
+            term.scroll(true, wheel_col, wheel_row).unwrap();
+        }
+        let screen = term
+            .wait_for_stable(std::time::Duration::from_millis(150), STEP)
+            .unwrap_or_else(|e| panic!("{e}"));
         if screen.contains("graph.max reached") {
             after = top_visible(&screen);
             break;
@@ -108,7 +115,13 @@ fn scrolling_to_the_lazy_load_trigger_keeps_the_view_and_loads_a_big_page() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     let after = after
-        .or_else(|| top_visible(&term.screen()))
+        .or_else(|| {
+            top_visible(
+                &term
+                    .wait_for_stable(std::time::Duration::from_millis(300), STEP)
+                    .unwrap(),
+            )
+        })
         .expect("a commit is visible");
     let before = before.expect("scrolled at least once");
     assert!(

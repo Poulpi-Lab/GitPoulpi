@@ -95,7 +95,7 @@ fn the_images_page_edits_the_viewer_keys_and_the_editor_list() {
     // keyboard on entering the page).
     assert!(config_of(dir).ui.image_view, "on by default");
     let toggle = |term: &mut xtask::pty::Terminal| {
-        let (c, r) = term.screen().find("Preview images").unwrap();
+        let (c, r) = snap(term).find("Preview images").unwrap();
         term.click(c + 1, r).unwrap();
     };
     toggle(&mut term);
@@ -110,7 +110,7 @@ fn the_images_page_edits_the_viewer_keys_and_the_editor_list() {
     // The list is on its own tab; `[+ Add]` opens the dropdown of presets and
     // Enter takes the first one.
     common::settings_tab(&mut term, "Editors");
-    let (c, r) = term.screen().find("+ Add").unwrap();
+    let (c, r) = snap(&term).find("+ Add").unwrap();
     term.click(c + 1, r).unwrap();
     term.wait_for("the dropdown", STEP, |s| s.contains("Add custom"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -142,8 +142,7 @@ fn the_images_page_edits_the_viewer_keys_and_the_editor_list() {
     term.send_keys("Enter").unwrap();
 
     // Back on the list: move up, move down, then remove (it asks first).
-    let (c, r) = term
-        .screen()
+    let (c, r) = snap(&term)
         .find_all("Gamma")
         .into_iter()
         .find(|(c, _)| *c < 70)
@@ -155,8 +154,10 @@ fn the_images_page_edits_the_viewer_keys_and_the_editor_list() {
     wait_labels(dir, "moved back down", |l| l == ["Alpha", "Beta", "Gamma"]);
     term.send_keys("Delete").unwrap();
     let screen = term
-        .wait_for("the removal question", STEP, |s| {
-            s.contains("Cancel") && s.contains("Remove \"")
+        .wait_for("the removal question with its buttons", STEP, |s| {
+            s.contains("Remove \"")
+                && s.find("Cancel")
+                    .is_some_and(|(_, row)| s.find_all("Remove").iter().any(|&(_, r)| r == row))
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (_, row) = screen.find("Cancel").unwrap();
@@ -168,4 +169,14 @@ fn the_images_page_edits_the_viewer_keys_and_the_editor_list() {
     term.click(col + 1, row).unwrap();
     wait_labels(dir, "removed", |l| l == ["Alpha", "Beta"]);
     let _ = term.stop();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

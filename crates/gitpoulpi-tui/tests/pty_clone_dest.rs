@@ -100,8 +100,11 @@ fn open_clone(session: &str, prepare: impl FnOnce(&Path, &str, &FixtureRepo)) ->
 }
 
 fn click_label(term: &mut Terminal, label: &str) {
-    let (col, row) = term
-        .screen()
+    // A settled screen: a torn frame can lack the button.
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (col, row) = screen
         .find(label)
         .unwrap_or_else(|| panic!("no {label:?}:\n{}", term.text()));
     term.click(col + 1, row).expect("click the button");

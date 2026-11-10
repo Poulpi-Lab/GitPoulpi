@@ -65,7 +65,7 @@ fn ticks(s: &Screen, row: u16) -> usize {
 fn line_mode_ticks_the_header_draws_a_thin_line_on_hover_and_drags_from_mid_height() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "pty-colresize-line", "");
-    let screen = term.screen();
+    let screen = snap(&term);
     let (date_x, row) = header(&screen, "Date").unwrap();
     let gap = date_x - 1;
     assert_eq!(text_at(&screen, gap, row), TICK, "{}", term.text());
@@ -81,7 +81,7 @@ fn line_mode_ticks_the_header_draws_a_thin_line_on_hover_and_drags_from_mid_heig
             && text_at(s, gap, row) == LINE
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     assert_ne!(text_at(&screen, gap - 1, row + 4), LINE, "thin: one cell");
     assert_ne!(text_at(&screen, gap + 1, row + 4), LINE, "thin: one cell");
 
@@ -111,7 +111,7 @@ fn line_mode_ticks_the_header_draws_a_thin_line_on_hover_and_drags_from_mid_heig
 fn the_line_does_not_stay_after_a_drag_is_released_away_from_the_boundary() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "pty-colresize-release", "");
-    let screen = term.screen();
+    let screen = snap(&term);
     let (date_x, row) = header(&screen, "Date").unwrap();
     let gap = date_x - 1;
     term.press(gap, row + 4).unwrap();
@@ -151,7 +151,7 @@ fn header_mode_has_no_tick_and_grabs_the_first_letter_of_the_next_header_only() 
         "pty-colresize-header",
         "[ui]\ncolumn_resize = \"header\"\n",
     );
-    let screen = term.screen();
+    let screen = snap(&term);
     let (date_x, row) = header(&screen, "Date").unwrap();
     assert_eq!(ticks(&screen, row), 0, "no tick in the header");
     let plain = screen.cell(date_x, row).unwrap().bg;
@@ -159,7 +159,7 @@ fn header_mode_has_no_tick_and_grabs_the_first_letter_of_the_next_header_only() 
     // The gap below the header is a plain cell: no line.
     term.move_to(date_x - 1, row + 4).unwrap();
     std::thread::sleep(Duration::from_millis(300));
-    assert_ne!(text_at(&term.screen(), date_x - 1, row + 4), LINE);
+    assert_ne!(text_at(&snap(&term), date_x - 1, row + 4), LINE);
     // The first letter of the header lights.
     term.move_to(date_x, row).unwrap();
     term.wait_for("the first letter lit", STEP, |s| {
@@ -172,7 +172,7 @@ fn header_mode_has_no_tick_and_grabs_the_first_letter_of_the_next_header_only() 
     term.drag_to(date_x - 3, row + 4).unwrap();
     term.release(date_x - 3, row + 4).unwrap();
     std::thread::sleep(Duration::from_millis(300));
-    assert_eq!(header(&term.screen(), "Date").unwrap().0, date_x);
+    assert_eq!(header(&snap(&term), "Date").unwrap().0, date_x);
     term.drag((date_x, row), (date_x - 3, row)).unwrap();
     term.wait_for("Date moved left", STEP, |s| {
         header(s, "Date").is_some_and(|(x, _)| x == date_x - 3)
@@ -194,12 +194,23 @@ fn switch(term: &mut Terminal, config: &std::path::Path, from: &str, to: &str, b
     })
     .unwrap_or_else(|e| panic!("{e}"));
     common::settings_page(term, "Log & graph");
-    let (col, row) = common::scroll_settings_to_choice(term, from, STEP);
-    term.click(col + 1, row).unwrap();
     let ticked = format!("\u{2713} {from}");
-    let screen = term
-        .wait_for("the popup", STEP, |s| s.contains(&ticked))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a click aimed at a torn or still-scrolling frame opens nothing.
+    let screen = common::retry_until(
+        term,
+        "the popup",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let (col, row) = common::scroll_settings_to_choice(t, from, STEP);
+            t.click(col + 1, row).unwrap();
+        },
+        |s| {
+            s.find(&ticked).is_some_and(|(_, r)| {
+                u16::try_from(i32::from(r) + below).is_ok_and(|t| s.line(t).contains(to))
+            })
+        },
+    );
     let (tc, tr) = screen.find(&ticked).unwrap();
     let target = u16::try_from(i32::from(tr) + below).unwrap();
     assert!(
@@ -226,8 +237,11 @@ fn switch(term: &mut Terminal, config: &std::path::Path, from: &str, to: &str, b
 fn switching_to_header_in_settings_removes_the_ticks_live() {
     let repo = fixture();
     let (mut term, config) = launch(&repo, "pty-colresize-to-header", "");
-    let (_, row) = header(&term.screen(), "Date").unwrap();
-    assert!(ticks(&term.screen(), row) >= 3);
+    let start = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (_, row) = header(&start, "Date").unwrap();
+    assert!(ticks(&start, row) >= 3);
     switch(&mut term, config.path(), "Line", "Header", 1);
     term.wait_for("the ticks gone", STEP, |s| {
         header(s, "Date").is_some_and(|(_, r)| ticks(s, r) == 0)
@@ -244,8 +258,11 @@ fn switching_to_line_in_settings_brings_the_ticks_back_live() {
         "pty-colresize-to-line",
         "[ui]\ncolumn_resize = \"header\"\n",
     );
-    let (_, row) = header(&term.screen(), "Date").unwrap();
-    assert_eq!(ticks(&term.screen(), row), 0);
+    let start = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (_, row) = header(&start, "Date").unwrap();
+    assert_eq!(ticks(&start, row), 0);
     switch(&mut term, config.path(), "Header", "Line", -1);
     term.wait_for("the ticks back", STEP, |s| {
         header(s, "Date").is_some_and(|(_, r)| ticks(s, r) >= 3)
@@ -262,7 +279,9 @@ fn switching_to_line_in_settings_brings_the_ticks_back_live() {
 fn the_hover_line_never_draws_over_the_command_palette() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "pty-colresize-palette", "");
-    let screen = term.screen();
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let (date_x, row) = header(&screen, "Date").unwrap();
     let gap = date_x - 1;
     term.move_to(gap, row + 4).unwrap();
@@ -271,7 +290,9 @@ fn the_hover_line_never_draws_over_the_command_palette() {
     term.send_keys("C-p").unwrap();
     term.wait_for("the palette", STEP, |s| s.contains("Command Palette"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let (_, title_row) = screen.find_all("Command Palette")[0];
     // The palette's column at the boundary: none of its body rows shows the
     // line glyph, which would only be the leftover hover.
@@ -280,4 +301,14 @@ fn the_hover_line_never_draws_over_the_command_palette() {
         .count();
     assert_eq!(lined, 0, "{}", term.text());
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

@@ -33,17 +33,24 @@ fn glyph_before_author(repo: &FixtureRepo, config_toml: &str, session: &str) -> 
         .config_dir(config.path())
         .size(200, 50)
         .spawn();
+    // The glyph is part of the predicate: a torn frame shows the author's
+    // name before the cell left of it (the border is all that is there).
     let screen = term
-        .wait_for("the commit row with its author", STARTUP, |s| {
-            s.contains("an avatar commit") && s.contains(AUTHOR)
+        .wait_for("the commit row with its author and a glyph", STARTUP, |s| {
+            s.contains("an avatar commit")
+                && s.contains(AUTHOR)
+                && glyph_on_row(s).is_some_and(|g| g != '\u{2502}')
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (_, row) = screen.find("an avatar commit").unwrap();
+    glyph_on_row(&screen).expect("a glyph before the author's name")
+}
+
+fn glyph_on_row(screen: &xtask::pty::Screen) -> Option<char> {
+    let (_, row) = screen.find("an avatar commit")?;
     let line = screen.line(row);
-    let before = line.split(AUTHOR).next().unwrap();
+    let before = line.split(AUTHOR).next()?;
     // `glyph` + the gutter space.
-    let mut chars = before.trim_end_matches(' ').chars().rev();
-    chars.next().expect("a glyph before the author's name")
+    before.trim_end_matches(' ').chars().next_back()
 }
 
 fn is_block(c: char) -> bool {

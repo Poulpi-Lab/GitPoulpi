@@ -123,7 +123,7 @@ fn repo(dirty: bool) -> gitpoulpi_testkit::FixtureRepo {
 }
 
 fn open_file_view(term: &mut Terminal, name: &str) {
-    if term.screen().find(name).is_none() {
+    if snap(term).find(name).is_none() {
         let (c, r) = term.wait_for_text("View all files", STEP).unwrap();
         term.click(c + 6, r).unwrap();
     }
@@ -183,14 +183,14 @@ fn a_working_tree_picture_is_edited_in_place_from_the_file_menu() {
     wait_popup(&term);
     // The default is marked.
     assert!(
-        term.screen().contains("\u{2022} Fake editor"),
+        snap(&term).contains("\u{2022} Fake editor"),
         "{}",
         term.text()
     );
     click_text(&mut term, "Fake editor");
     let got = work.launched();
     assert!(same_file(&got, &repo.root().join("pic.png")), "{got:?}");
-    assert!(!term.screen().contains("Failing editor"), "{}", term.text());
+    assert!(!snap(&term).contains("Failing editor"), "{}", term.text());
     term.stop().unwrap();
 }
 
@@ -212,7 +212,7 @@ fn a_committed_picture_is_handed_over_as_a_read_only_copy() {
     term.wait_for("the list closed", STEP, |s| !s.contains("Failing editor"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        term.screen().contains("File View - pic.png @"),
+        snap(&term).contains("File View - pic.png @"),
         "{}",
         term.text()
     );
@@ -301,7 +301,7 @@ fn the_commit_files_menu_offers_edit_in_on_pictures_only() {
     common::right_click_text_until(&mut term, "note.txt", "the text file's menu", |s| {
         s.contains("Copy file path")
     });
-    assert!(!term.screen().contains("Edit in..."), "{}", term.text());
+    assert!(!snap(&term).contains("Edit in..."), "{}", term.text());
     term.send_keys("Escape").unwrap();
     common::right_click_text_until(&mut term, "pic.png", "the picture's menu", |s| {
         s.contains("Edit in...")
@@ -309,7 +309,7 @@ fn the_commit_files_menu_offers_edit_in_on_pictures_only() {
     click_text(&mut term, "Edit in...");
     wait_popup(&term);
     assert!(
-        term.screen().contains("File View - pic.png @"),
+        snap(&term).contains("File View - pic.png @"),
         "{}",
         term.text()
     );
@@ -317,4 +317,14 @@ fn the_commit_files_menu_offers_edit_in_on_pictures_only() {
     let got = work.launched();
     assert_eq!(std::fs::read(&got).unwrap(), png(RED));
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

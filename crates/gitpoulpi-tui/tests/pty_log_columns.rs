@@ -66,7 +66,7 @@ fn a_hidden_log_column_survives_a_restart_and_applies_to_another_repo() {
         .unwrap_or_else(|e| panic!("{e}"));
 
     let (col, row) = {
-        let screen = term.screen();
+        let screen = snap(&term);
         let (_, header_row) = screen.find_all("Message").into_iter().next().unwrap();
         let (c, _) = screen
             .find_all("SHA")
@@ -76,10 +76,12 @@ fn a_hidden_log_column_survives_a_restart_and_applies_to_another_repo() {
         (c, header_row)
     };
     term.right_click(col + 1, row).unwrap();
-    term.wait_for("the column menu", STEP, |s| s.contains("[x]"))
-        .unwrap_or_else(|e| panic!("{e}"));
     let (mc, mr) = {
-        let screen = term.screen();
+        let screen = term
+            .wait_for("the column menu with its SHA row", STEP, |s| {
+                s.contains("[x]") && s.find_all("SHA").iter().any(|(_, r)| *r != row)
+            })
+            .unwrap_or_else(|e| panic!("{e}"));
         screen
             .find_all("SHA")
             .into_iter()
@@ -110,7 +112,7 @@ fn a_hidden_log_column_survives_a_restart_and_applies_to_another_repo() {
     term.wait_for("the Log header", STEP, |s| s.contains("Message"))
         .unwrap_or_else(|e| panic!("{e}"));
     std::thread::sleep(Duration::from_millis(500));
-    assert!(!header_shows_sha(&term.screen()), "{}", term.text());
+    assert!(!header_shows_sha(&snap(&term)), "{}", term.text());
     quit(term);
 
     // Another repository, another session, same config directory.
@@ -118,6 +120,16 @@ fn a_hidden_log_column_survives_a_restart_and_applies_to_another_repo() {
     term.wait_for("the Log header", STEP, |s| s.contains("Message"))
         .unwrap_or_else(|e| panic!("{e}"));
     std::thread::sleep(Duration::from_millis(500));
-    assert!(!header_shows_sha(&term.screen()), "{}", term.text());
+    assert!(!header_shows_sha(&snap(&term)), "{}", term.text());
     quit(term);
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

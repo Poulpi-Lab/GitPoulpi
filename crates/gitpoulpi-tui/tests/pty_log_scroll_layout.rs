@@ -122,8 +122,8 @@ fn quit(mut term: Terminal) {
 fn the_chooser_row_switches_the_layout_and_the_config_keeps_it() {
     let repo = fixture();
     let (mut term, config) = launch(&repo, "scroll-chooser", "");
-    let row = header_row(&term.screen()).unwrap();
-    let x = title_x(&term.screen(), row, "Author").unwrap();
+    let row = header_row(&snap(&term)).unwrap();
+    let x = title_x(&snap(&term), row, "Author").unwrap();
     term.right_click(x + 1, row).unwrap();
     let s = term
         .wait_for("the chooser", STEP, |s| {
@@ -166,12 +166,9 @@ fn fitting_message_shows_the_bar_and_shift_arrows_scroll_the_header() {
         "scroll-keys",
         "[ui]\nlog_columns_layout = \"scroll\"\n",
     );
-    let row = header_row(&term.screen()).unwrap();
-    assert!(
-        bar(&term.screen()).is_none(),
-        "no bar while the columns fit"
-    );
-    let ref_x = title_x(&term.screen(), row, "Ref").unwrap();
+    let row = header_row(&snap(&term)).unwrap();
+    assert!(bar(&snap(&term)).is_none(), "no bar while the columns fit");
+    let ref_x = title_x(&snap(&term), row, "Ref").unwrap();
     // Pick Message (Shift+C, Tab, Tab) and fit it.
     term.send_keys("C Tab Tab").unwrap();
     term.wait_for("Message picked", STEP, |s| {
@@ -182,7 +179,7 @@ fn fitting_message_shows_the_bar_and_shift_arrows_scroll_the_header() {
     term.wait_for("the bar", STEP, |s| bar(s).is_some())
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Escape").unwrap();
-    assert_eq!(title_x(&term.screen(), row, "Ref"), Some(ref_x));
+    assert_eq!(title_x(&snap(&term), row, "Ref"), Some(ref_x));
 
     // Scroll right until Ref is gone (Ref and Graph are about 30 cells).
     for _ in 0..9 {
@@ -220,15 +217,15 @@ fn fitting_message_shows_the_bar_and_shift_arrows_scroll_the_header() {
 fn in_the_fit_layout_there_is_nothing_to_scroll() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "scroll-fit", "");
-    let row = header_row(&term.screen()).unwrap();
-    let ref_x = title_x(&term.screen(), row, "Ref").unwrap();
+    let row = header_row(&snap(&term)).unwrap();
+    let ref_x = title_x(&snap(&term), row, "Ref").unwrap();
     term.send_keys("S-Right").unwrap();
     term.wait_for("the status line", STEP, |s| {
         s.contains("The columns fit the pane")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert_eq!(title_x(&term.screen(), row, "Ref"), Some(ref_x));
-    assert!(bar(&term.screen()).is_none());
+    assert_eq!(title_x(&snap(&term), row, "Ref"), Some(ref_x));
+    assert!(bar(&snap(&term)).is_none());
     quit(term);
 }
 
@@ -240,8 +237,8 @@ fn in_the_fit_layout_there_is_nothing_to_scroll() {
 fn the_sideways_wheel_and_shift_wheel_scroll_the_columns() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "scroll-wheel", SCROLL_TOML);
-    let row = header_row(&term.screen()).unwrap();
-    let ref_x = title_x(&term.screen(), row, "Ref").unwrap();
+    let row = header_row(&snap(&term)).unwrap();
+    let ref_x = title_x(&snap(&term), row, "Ref").unwrap();
     for _ in 0..8 {
         term.scroll_sideways(false, ref_x + 4, row + 3).unwrap();
     }
@@ -249,7 +246,7 @@ fn the_sideways_wheel_and_shift_wheel_scroll_the_columns() {
         title_x(s, row, "Ref").is_none_or(|x| x < ref_x)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let moved = title_x(&term.screen(), row, "Author");
+    let moved = title_x(&snap(&term), row, "Author");
     for _ in 0..8 {
         term.scroll_sideways(true, ref_x + 4, row + 3).unwrap();
     }
@@ -282,8 +279,8 @@ fn the_sideways_wheel_and_shift_wheel_scroll_the_columns() {
 fn the_bar_thumb_drags_and_a_track_press_jumps() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "scroll-bar", SCROLL_TOML);
-    let row = header_row(&term.screen()).unwrap();
-    let ref_x = title_x(&term.screen(), row, "Ref").unwrap();
+    let row = header_row(&snap(&term)).unwrap();
+    let ref_x = title_x(&snap(&term), row, "Ref").unwrap();
     let s = term
         .wait_for("the bar", STEP, |s| thumb(s).is_some())
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -318,7 +315,7 @@ fn the_bar_thumb_drags_and_a_track_press_jumps() {
 fn while_scrolled_clicks_and_tooltips_hit_the_cells_they_show() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "scroll-hit", SCROLL_TOML);
-    let row = header_row(&term.screen()).unwrap();
+    let row = header_row(&snap(&term)).unwrap();
     // Scroll until Ref, Graph and Message are gone and Author is on screen.
     for _ in 0..30 {
         term.send_keys("S-Right").unwrap();
@@ -350,7 +347,7 @@ fn the_settings_choice_applies_live() {
     let repo = fixture();
     let toml = "[ui.log_column_widths_scroll]\nmessage = 150\n";
     let (mut term, config) = launch(&repo, "scroll-settings", toml);
-    assert!(bar(&term.screen()).is_none());
+    assert!(bar(&snap(&term)).is_none());
     let (gc, gr) = term
         .wait_for_text("\u{2699}", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
@@ -360,11 +357,22 @@ fn the_settings_choice_applies_live() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     common::settings_page(&mut term, "Log & graph");
-    let (col, srow) = common::scroll_settings_to_choice(&mut term, "Fit the pane", STEP);
-    term.click(col + 1, srow).unwrap();
-    let screen = term
-        .wait_for("the popup", STEP, |s| s.contains("\u{2713} Fit the pane"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Retried: a click aimed at a torn or still-scrolling frame opens nothing.
+    // The popup is whole when both rows are drawn.
+    let screen = common::retry_until(
+        &mut term,
+        "the popup",
+        4,
+        std::time::Duration::from_secs(10),
+        |t| {
+            let (col, srow) = common::scroll_settings_to_choice(t, "Fit the pane", STEP);
+            t.click(col + 1, srow).unwrap();
+        },
+        |s| {
+            s.find("\u{2713} Fit the pane")
+                .is_some_and(|(_, r)| s.line(r + 1).contains("Scroll sideways"))
+        },
+    );
     let (tc, tr) = screen.find("\u{2713} Fit the pane").unwrap();
     assert!(
         screen.line(tr + 1).contains("Scroll sideways"),
@@ -391,7 +399,7 @@ fn a_narrow_window_can_reach_the_sha_column_by_scrolling() {
         .ready("older commit")
         .mouse_capture()
         .start();
-    let screen = term.screen();
+    let screen = snap(&term);
     let row = header_row(&screen).unwrap();
     assert!(
         title_x(&screen, row, "SHA").is_none(),
@@ -404,4 +412,14 @@ fn a_narrow_window_can_reach_the_sha_column_by_scrolling() {
     term.wait_for("SHA reached", STEP, |s| title_x(s, row, "SHA").is_some())
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     quit(term);
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

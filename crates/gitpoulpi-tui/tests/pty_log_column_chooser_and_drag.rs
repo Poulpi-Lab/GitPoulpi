@@ -63,10 +63,12 @@ fn quit(mut term: Terminal) {
 }
 
 fn open_chooser(term: &mut Terminal) {
-    let (x, row) = header(&term.screen(), "Author").unwrap();
+    let (x, row) = header(&snap(term), "Author").unwrap();
     term.right_click(x + 1, row).unwrap();
     term.wait_for("the chooser", STEP, chooser_open)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Drawn whole: the checks that follow read every row of it.
+    snap(term);
 }
 
 /// Red when a glyph other than the app's checkbox is drawn, when a row loses
@@ -91,7 +93,7 @@ fn the_chooser_has_real_checkboxes_a_cross_and_works_by_keys_and_clicks() {
     // Keyboard: Up from the first row wraps through the actions (Reset, Fit all,
     // Fit Author) to the last toggleable one (SHA);
     // Space unchecks it and the popup stays open.
-    assert!(sha_shown(&term.screen()), "{}", term.text());
+    assert!(sha_shown(&snap(&term)), "{}", term.text());
     term.send_keys("Up Up Up Up Up").unwrap();
     term.send_text(" ").unwrap();
     term.wait_for("SHA hidden by Space", STEP, |s| {
@@ -105,8 +107,7 @@ fn the_chooser_has_real_checkboxes_a_cross_and_works_by_keys_and_clicks() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Mouse: a click on a row toggles it.
-    let (mc, mr) = term
-        .screen()
+    let (mc, mr) = snap(&term)
         .find("[x] SHA")
         .expect("the SHA row of the chooser");
     term.click(mc + 4, mr).unwrap();
@@ -116,7 +117,7 @@ fn the_chooser_has_real_checkboxes_a_cross_and_works_by_keys_and_clicks() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // The cross closes the popup.
-    let (cx, cy) = term.screen().find('\u{2715}'.to_string().as_str()).unwrap();
+    let (cx, cy) = snap(&term).find('\u{2715}'.to_string().as_str()).unwrap();
     term.click(cx, cy).unwrap();
     term.wait_for("the chooser closed", STEP, |s| !chooser_open(s))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -156,7 +157,7 @@ fn a_dragged_header_shows_a_ghost_and_a_bar_and_reorders_on_release() {
     let config = tempfile::tempdir().unwrap();
     let repo = fixture();
     let mut term = launch(&repo, "header-drag", config.path());
-    let s = term.screen();
+    let s = snap(&term);
     let (author_x, row) = header(&s, "Author").unwrap();
     let (date_x, _) = header(&s, "Date").unwrap();
     assert!(author_x < date_x);
@@ -175,7 +176,7 @@ fn a_dragged_header_shows_a_ghost_and_a_bar_and_reorders_on_release() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // Nothing moved while the button is down.
-    let mid = term.screen();
+    let mid = snap(&term);
     assert!(
         header(&mid, "Author").unwrap().0 < header(&mid, "Date").unwrap().0,
         "{}",
@@ -209,7 +210,7 @@ fn escape_cancels_a_header_drag() {
     let config = tempfile::tempdir().unwrap();
     let repo = fixture();
     let mut term = launch(&repo, "header-drag-esc", config.path());
-    let s = term.screen();
+    let s = snap(&term);
     let (author_x, row) = header(&s, "Author").unwrap();
     let (date_x, _) = header(&s, "Date").unwrap();
 
@@ -225,11 +226,21 @@ fn escape_cancels_a_header_drag() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.release(author_x + 1, row).unwrap();
     std::thread::sleep(Duration::from_millis(500));
-    let after = term.screen();
+    let after = snap(&term);
     assert!(
         header(&after, "Author").unwrap().0 < header(&after, "Date").unwrap().0,
         "the order must not change\n{}",
         term.text()
     );
     quit(term);
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

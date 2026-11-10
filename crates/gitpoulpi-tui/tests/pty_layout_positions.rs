@@ -102,7 +102,7 @@ fn palette_choose(term: &mut Terminal, label: &str, choice: &str) {
 fn the_default_layout_is_a_bottom_toolbar_above_a_bottom_status_line() {
     let repo = fixture();
     let (term, _c) = launch(&repo, "pty-layout-default", "");
-    let s = term.screen();
+    let s = snap(&term);
     let (undo_c, undo_r) = at(&s, "Undo");
     let (_, pull_r) = at(&s, "Pull");
     let (_, log_r) = at(&s, MESSAGE);
@@ -121,7 +121,7 @@ fn the_default_layout_is_a_bottom_toolbar_above_a_bottom_status_line() {
 fn a_top_toolbar_sits_under_the_tabs() {
     let repo = fixture();
     let (term, _c) = launch(&repo, "pty-layout-top", "toolbar_position = \"top\"\n");
-    let s = term.screen();
+    let s = snap(&term);
     let (_, pull_r) = at(&s, "Pull");
     let (_, log_r) = at(&s, MESSAGE);
     let (_, activity_r) = at(&s, "Activity");
@@ -135,7 +135,7 @@ fn a_top_toolbar_sits_under_the_tabs() {
 fn a_left_toolbar_is_a_column_beside_the_panes() {
     let repo = fixture();
     let (term, _c) = launch(&repo, "pty-layout-left", "toolbar_position = \"left\"\n");
-    let s = term.screen();
+    let s = snap(&term);
     let (undo_c, undo_r) = at(&s, "Undo");
     let (pull_c, pull_r) = at(&s, "Pull");
     let (push_c, push_r) = at(&s, "Push");
@@ -156,7 +156,7 @@ fn a_left_toolbar_is_a_column_beside_the_panes() {
 fn a_right_toolbar_is_a_column_at_the_right_edge() {
     let repo = fixture();
     let (term, _c) = launch(&repo, "pty-layout-right", "toolbar_position = \"right\"\n");
-    let s = term.screen();
+    let s = snap(&term);
     let (pull_c, pull_r) = at(&s, "Pull");
     let (push_c, push_r) = at(&s, "Push");
     let (log_c, _) = at(&s, MESSAGE);
@@ -176,7 +176,7 @@ fn clicking_stash_works_in_every_toolbar_position() {
             &format!("pty-layout-click-{pos}"),
             &format!("toolbar_position = \"{pos}\"\n"),
         );
-        let (c, r) = at(&term.screen(), "Stash");
+        let (c, r) = at(&snap(&term), "Stash");
         term.click(c + 1, r).unwrap();
         term.wait_for("the stash to land", STEP, |_| stash_count(repo.root()) == 1)
             .unwrap_or_else(|e| panic!("{pos}: {e}\n{}", term.text()));
@@ -195,7 +195,7 @@ fn the_pull_dropdown_opens_in_view_in_every_toolbar_position() {
             &format!("pty-layout-menu-{pos}"),
             &format!("toolbar_position = \"{pos}\"\n"),
         );
-        let s = term.screen();
+        let s = snap(&term);
         let (c, r) = at(&s, "Pull");
         // `Pull ▾`: the arrow is the chip after the label.
         let arrow = (c..c + 12)
@@ -220,7 +220,7 @@ fn the_alignment_moves_the_buttons_along_the_toolbar() {
             &format!("pty-layout-align-{align}"),
             &format!("toolbar_align = \"{align}\"\n"),
         );
-        let (c, _) = at(&term.screen(), "Undo");
+        let (c, _) = at(&snap(&term), "Undo");
         let _ = term.stop();
         c
     };
@@ -238,7 +238,7 @@ fn the_alignment_also_works_in_a_column() {
             &format!("pty-layout-valign-{align}"),
             &format!("toolbar_position = \"left\"\ntoolbar_align = \"{align}\"\n"),
         );
-        let (_, r) = at(&term.screen(), "Undo");
+        let (_, r) = at(&snap(&term), "Undo");
         let _ = term.stop();
         r
     };
@@ -254,7 +254,7 @@ fn the_status_line_can_go_to_the_top() {
         "pty-layout-status-top",
         "statusbar_position = \"top\"\n",
     );
-    let s = term.screen();
+    let s = snap(&term);
     let (_, activity_r) = at(&s, "Activity");
     let (_, pull_r) = at(&s, "Pull");
     let (_, log_r) = at(&s, MESSAGE);
@@ -275,7 +275,7 @@ fn log_rows_are_clickable_with_the_bands_moved() {
             &format!("pty-layout-log-{toolbar}-{status}"),
             &format!("toolbar_position = \"{toolbar}\"\nstatusbar_position = \"{status}\"\n"),
         );
-        let (c, r) = at(&term.screen(), MESSAGE);
+        let (c, r) = at(&snap(&term), MESSAGE);
         term.click(c + 2, r).unwrap();
         term.wait_for("the commit's detail", STEP, |s| s.contains("notes.txt"))
             .unwrap_or_else(|e| panic!("{toolbar}/{status}: {e}\n{}", term.text()));
@@ -335,15 +335,65 @@ fn the_settings_page_moves_the_toolbar() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     common::settings_page(&mut term, "Appearance");
-    // The first "Bottom" on the page is the toolbar position.
-    let (col, row) = common::scroll_settings_to_choice(&mut term, "Bottom", STEP);
-    term.click(col + 1, row).unwrap();
-    let screen = term
-        .wait_for("the popup", STEP, |s| s.contains("\u{2713} Bottom"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (tc, tr) = screen.find("\u{2713} Bottom").unwrap();
-    // Top, the ticked Bottom, then Left one row below.
-    term.click(tc + 2, tr + 1).unwrap();
+    // The "Bottom" on the Toolbar position row (the status line has one too:
+    // which is the first on screen depends on how far the page scrolled).
+    // Retried: a click aimed at a torn or still-scrolling frame opens nothing.
+    let screen = common::retry_until(
+        &mut term,
+        "the popup",
+        4,
+        std::time::Duration::from_secs(10),
+        |t| {
+            // Scrolled to the row by the wheel, one notch at a time on a
+            // settled screen (the page may still be moving, either way).
+            let mut notch = 0;
+            let (col, row) = loop {
+                let screen = t
+                    .wait_for_stable(std::time::Duration::from_millis(300), STEP)
+                    .unwrap_or_else(|e| panic!("{e}"));
+                let found = screen.find("Toolbar position").and_then(|(_, label_row)| {
+                    screen
+                        .find_all("Bottom")
+                        .into_iter()
+                        .find(|(_, r)| *r == label_row)
+                });
+                if let Some(at) = found {
+                    break at;
+                }
+                assert!(
+                    notch < 40,
+                    "the Toolbar position row never showed:\n{}",
+                    t.text()
+                );
+                // Up first (the row is near the top), then down.
+                t.scroll(notch >= 12, 100, screen.rows() / 2).unwrap();
+                notch += 1;
+            };
+            t.click(col + 1, row).unwrap();
+        },
+        |s| s.contains("\u{2713} Bottom"),
+    );
+    let _ = screen;
+    // Top, the ticked Bottom, then Left one row below. Retried until stored:
+    // a click aimed at a torn frame picks nothing.
+    common::retry_until(
+        &mut term,
+        "the choice stored",
+        4,
+        std::time::Duration::from_secs(10),
+        |t| {
+            let screen = t
+                .wait_for_stable(std::time::Duration::from_millis(300), STEP)
+                .unwrap_or_else(|e| panic!("{e}"));
+            if let Some((tc, tr)) = screen.find("\u{2713} Bottom") {
+                t.click(tc + 2, tr + 1).unwrap();
+            }
+        },
+        |_| {
+            std::fs::read_to_string(config.path().join("config.toml"))
+                .is_ok_and(|t| t.contains("toolbar_position = \"left\""))
+        },
+    );
     wait_config(&config, "toolbar_position = \"left\"");
     term.send_keys("Escape").unwrap();
     term.wait_for("the column", STEP, |s| {
@@ -366,7 +416,17 @@ fn a_narrow_window_falls_back_to_a_bottom_row() {
         .ready_when("the fixture", |s| s.contains("Pull"))
         .mouse_capture()
         .start();
-    let (_, r) = at(&term.screen(), "Pull");
+    let (_, r) = at(&snap(&term), "Pull");
     assert_eq!(r, ROWS - 3, "a row above the status line");
     let _ = term.stop();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

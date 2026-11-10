@@ -81,7 +81,7 @@ fn with_ai_off_no_entry_point_is_visible() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "pty-ai-off", None);
     assert!(
-        generate_pos(&term.screen()).is_none(),
+        generate_pos(&snap(&term)).is_none(),
         "no Generate sparkle while AI is off"
     );
 
@@ -237,7 +237,7 @@ fn the_settings_page_turns_ai_on_and_adds_a_profile() {
         assert!(
             std::time::Instant::now() < deadline,
             "ai.enabled never saved. Screen was:\n{}",
-            term.screen().text()
+            snap(&term).text()
         );
         std::thread::sleep(Duration::from_millis(200));
     }
@@ -246,8 +246,7 @@ fn the_settings_page_turns_ai_on_and_adds_a_profile() {
     common::settings_tab(&mut term, "Profiles (connections)");
     term.wait_for_text("+ Add", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
-    let (col, row) = term
-        .screen()
+    let (col, row) = snap(&term)
         .find_all("+ Add")
         .into_iter()
         .find(|(c, _)| *c < 40)
@@ -261,7 +260,7 @@ fn the_settings_page_turns_ai_on_and_adds_a_profile() {
         assert!(
             std::time::Instant::now() < deadline,
             "the profile never saved. Screen was:\n{}",
-            term.screen().text()
+            snap(&term).text()
         );
         std::thread::sleep(Duration::from_millis(200));
     }
@@ -766,7 +765,7 @@ args = ["-p"]
     term.send_keys("Enter").unwrap();
     settled(&term);
     for _ in 0..40 {
-        let s = term.screen();
+        let s = snap(&term);
         if s.contains("Commit message generation") && s.contains("generate commit messages") {
             break;
         }
@@ -1089,7 +1088,7 @@ fn double_clicking_a_composer_row_opens_the_reword_popup() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     assert!(
-        !term.screen().contains("Reword commit message"),
+        !snap(&term).contains("Reword commit message"),
         "a single click must not open the popup"
     );
     term.double_click(col + 1, row).unwrap();
@@ -1213,13 +1212,29 @@ fn the_repo_instructions_reach_the_prompt_in_both_modes() {
         s.contains("Combine with global")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    let (col, row) = term.wait_for_text("Combine with global", STEP).unwrap();
-    term.click(col + 1, row).expect("open the combo");
-    term.wait_for("the dropdown with both modes", STEP, |s| {
-        s.contains("Replace global") && s.contains("Add to global")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    // The click is retried until the dropdown is up (a click aimed at a torn
+    // frame opens nothing); the keys go to a settled dropdown.
+    common::retry_until(
+        &mut term,
+        "the dropdown with both modes",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let screen = t
+                .wait_for_stable(Duration::from_millis(300), STEP)
+                .unwrap_or_else(|e| panic!("{e}"));
+            if !screen.contains("\u{2713} Add to global") {
+                let (col, row) = screen.find("Combine with global").expect("the combo row");
+                t.click(col + 1, row).expect("open the combo");
+            }
+        },
+        |s| s.contains("\u{2713} Add to global") && s.contains("Replace global"),
+    );
+    term.wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Down").unwrap(); // Add -> Replace
+    term.wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").unwrap();
     wait_for_file_containing(&term, &state, "replace");
 
@@ -1244,7 +1259,7 @@ fn wait_for_file_containing(term: &Terminal, path: &Path, needle: &str) {
             std::time::Instant::now() < deadline,
             "{} never contained {needle:?}. Screen was:\n{}",
             path.display(),
-            term.screen().text()
+            snap(term).text()
         );
         std::thread::sleep(Duration::from_millis(200));
     }
@@ -1257,8 +1272,18 @@ fn wait_for_agent_calls(term: &Terminal, agent: &Path, n: usize) {
         assert!(
             std::time::Instant::now() < deadline,
             "the agent was never called {n} time(s). Screen was:\n{}",
-            term.screen().text()
+            snap(term).text()
         );
         std::thread::sleep(Duration::from_millis(200));
     }
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

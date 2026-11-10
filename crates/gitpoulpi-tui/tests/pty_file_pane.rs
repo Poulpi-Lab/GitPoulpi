@@ -434,10 +434,10 @@ fn the_commit_file_menu_has_the_full_set_and_restore_is_undone_by_ctrl_z() {
     let repo = two_commits();
     let (mut term, _config) = launch(repo.root(), "pty-filepane-restore", "second version");
     select_commit(&mut term, "first version");
-    let screen = open_menu(&mut term, "a.txt", (0, 0), "the commit file menu", |s| {
+    open_menu(&mut term, "a.txt", (0, 0), "the commit file menu", |s| {
         s.contains("Restore file from this commit")
     });
-    for want in [
+    let wants = [
         "File History",
         "File Blame",
         "Open file",
@@ -448,9 +448,14 @@ fn the_commit_file_menu_has_the_full_set_and_restore_is_undone_by_ctrl_z() {
         "Copy file path",
         "Copy full file path",
         "Delete file...",
-    ] {
-        assert!(screen.contains(want), "'{want}' missing:\n{}", term.text());
-    }
+    ];
+    // The frame is read in pieces: wait for the whole menu before judging.
+    let screen = term
+        .wait_for("every menu row drawn", STEP, |s| {
+            wants.iter().all(|w| s.contains(w))
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let _ = screen;
     click_exact(&mut term, "Restore file from this commit");
     term.wait_for("the confirmation", STEP, |s| s.contains("Overwrite"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -596,11 +601,10 @@ fn create_patch_from_a_commit_file_carries_only_that_file() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The list row, not the Log's subject: the one led by the file name.
-    let (col, row) = term
-        .screen()
+    let (col, row) = snap(&term)
         .find_all("a.txt")
         .into_iter()
-        .find(|&(_, r)| !term.screen().line(r).contains("both files.txt"))
+        .find(|&(_, r)| !snap(&term).line(r).contains("both files.txt"))
         .unwrap_or_else(|| panic!("a.txt not listed:\n{}", term.text()));
     term.right_click(col, row).unwrap();
     term.wait_for("the commit file menu", STEP, |s| {
@@ -612,7 +616,7 @@ fn create_patch_from_a_commit_file_carries_only_that_file() {
         s.contains("Create patch") && s.contains("Save here")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term.screen().find("Save here").unwrap();
+    let (c, r) = snap(&term).find("Save here").unwrap();
     term.click(c + 1, r).unwrap();
     let patch = || {
         std::fs::read_dir(repo.root())
@@ -659,4 +663,14 @@ fn ctrl_a_selects_every_file_of_the_focused_list() {
     term.send_keys("C-a").unwrap();
     term.wait_for("3 files selected", STEP, |s| s.contains("3 files selected"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

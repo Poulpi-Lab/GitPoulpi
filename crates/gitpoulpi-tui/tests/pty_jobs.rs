@@ -356,27 +356,32 @@ fn the_panel_opens_by_click_and_its_cancel_button_cancels() {
     let (mut term, _config) = launch(&repo, "pty-jobs-panel-click", 25_000);
     start_push(&mut term);
 
-    let (col, row) = term.screen().find("Push: ").expect("the indicator label");
-    term.click(col + 1, row).unwrap();
-    term.wait_for("the jobs panel", STEP, |s| s.contains("Background jobs"))
-        .unwrap_or_else(|e| {
-            panic!(
-                "{e}
-{}",
-                term.text()
-            )
-        });
     // The row's own button: the second "Cancel" on the screen (the first is
     // the toolbar's "Cancel all").
-    let screen = term.screen();
-    let row_cancel = screen
-        .find_all("Cancel")
-        .into_iter()
-        .find(|(c, r)| {
-            let line = screen.line(*r);
+    let row_cancel_of = |s: &xtask::pty::Screen| {
+        s.find_all("Cancel").into_iter().find(|(c, r)| {
+            let line = s.line(*r);
             line.contains("Push: ") && *c > 60
         })
-        .expect("the row's Cancel button");
+    };
+    // Retried: a click aimed at a torn frame opens nothing; the panel is
+    // whole when the row's button is drawn.
+    let screen = common::retry_until(
+        &mut term,
+        "the jobs panel with the row's Cancel button",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let screen = t.screen();
+            if !screen.contains("Background jobs") {
+                if let Some((col, row)) = screen.find("Push: ") {
+                    t.click(col + 1, row).unwrap();
+                }
+            }
+        },
+        |s| s.contains("Background jobs") && row_cancel_of(s).is_some(),
+    );
+    let row_cancel = row_cancel_of(&screen).expect("the row's Cancel button");
     term.click(row_cancel.0 + 1, row_cancel.1).unwrap();
     term.wait_for("the row says Canceled", STEP, |s| {
         s.text()

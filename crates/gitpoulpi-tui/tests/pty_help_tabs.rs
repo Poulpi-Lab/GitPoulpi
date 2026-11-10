@@ -51,6 +51,9 @@ fn on_tab(s: &Screen, tab: usize) -> bool {
 fn wait_tab(term: &mut Terminal, tab: usize) {
     term.wait_for(MARKERS[tab], STEP, |s| on_tab(s, tab))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Drawn whole: later reads of the screen are not torn frames.
+    term.wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
 /// The popup's tab row (the row of the "Hosting" header, which only it draws
@@ -98,7 +101,15 @@ fn tabs_switch_by_click_and_the_header_under_the_pointer_lights_up() {
     let (mut term, _c) = launch("pty-help-tabs-click", None);
     term.send_text("?").unwrap();
     wait_tab(&mut term, 0);
-    let s = term.screen();
+    let s = term
+        .wait_for("the whole tab row", STEP, |s| {
+            s.find_all("AI & CLI").first().is_some_and(|(_, row)| {
+                ["Setup", "Hosting"]
+                    .iter()
+                    .all(|l| s.find_all(l).iter().any(|(_, r)| r == row))
+            })
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (c, r) = header(&s, "Setup");
     let rest = header(&s, "Hosting");
     let before = s.cell(c + 1, r).map(|x| format!("{:?}", x.bg));
@@ -109,18 +120,18 @@ fn tabs_switch_by_click_and_the_header_under_the_pointer_lights_up() {
     .unwrap_or_else(|e| panic!("{e}"));
     // Only that one: its neighbor keeps the plain look.
     assert_eq!(
-        term.screen()
+        snap(&term)
             .cell(rest.0 + 1, r)
             .map(|x| format!("{:?}", x.bg)),
         s.cell(rest.0 + 1, r).map(|x| format!("{:?}", x.bg))
     );
     term.click(c + 1, r).unwrap();
     wait_tab(&mut term, 6);
-    let (c, r) = header(&term.screen(), "Changes");
+    let (c, r) = header(&snap(&term), "Changes");
     term.click(c + 1, r).unwrap();
     wait_tab(&mut term, 3);
     // A click on a header does not close the popup.
-    assert!(term.screen().contains("Working changes"));
+    assert!(snap(&term).contains("Working changes"));
     term.stop().unwrap();
 }
 
@@ -137,7 +148,7 @@ fn the_filter_narrows_the_current_tab_and_ctrl_d_opens_its_page() {
         s.contains("filter \"palette\"") && !s.contains("Shortcut prefixes")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(term.screen().contains("Command palette"));
+    assert!(snap(&term).contains("Command palette"));
     term.send_keys("C-d").unwrap();
     let url = "https://github.com/Poulpi-Lab/GitPoulpi/blob/main/docs/user/interface-tour.md";
     let deadline = std::time::Instant::now() + STEP;
@@ -150,4 +161,14 @@ fn the_filter_narrows_the_current_tab_and_ctrl_d_opens_its_page() {
         std::thread::sleep(Duration::from_millis(200));
     }
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

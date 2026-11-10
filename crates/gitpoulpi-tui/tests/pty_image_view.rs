@@ -81,7 +81,7 @@ fn repo_with(files: &[(&str, Vec<u8>)]) -> gitpoulpi_testkit::FixtureRepo {
 fn open_file_view(term: &mut Terminal, name: &str) {
     // View all files stays on after the first time (a second open in one
     // session finds the list already there).
-    if term.screen().find(name).is_none() {
+    if snap(term).find(name).is_none() {
         let (c, r) = term.wait_for_text("View all files", STEP).unwrap();
         term.click(c + 6, r).unwrap();
     }
@@ -156,7 +156,7 @@ fn a_png_is_drawn_as_half_block_cells_and_zoom_changes_then_restores_them() {
     assert!(text.contains("100%"), "the zoom label: {text}");
     assert!(!text.contains("nothing to show"), "{text}");
 
-    let cells = half_blocks(&term.screen());
+    let cells = half_blocks(&snap(&term));
     assert_eq!(cells.len(), 8, "4 columns x 2 cell rows: {cells:?}");
     let top = cells.iter().map(|c| c.1).min().unwrap();
     let left = cells.iter().map(|c| c.0).min().unwrap();
@@ -180,7 +180,7 @@ fn a_png_is_drawn_as_half_block_cells_and_zoom_changes_then_restores_them() {
     term.wait_for("the fit back", STEP, |s| half_blocks(s).len() == 8)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(term.text().contains("100%"));
-    assert_eq!(half_blocks(&term.screen()), cells, "the same cells again");
+    assert_eq!(half_blocks(&snap(&term)), cells, "the same cells again");
     term.stop().unwrap();
 }
 
@@ -194,8 +194,7 @@ fn the_header_buttons_zoom_and_fit() {
         .unwrap_or_else(|e| panic!("{e}"));
     term.wait_for_text(" Fit ", STEP).unwrap();
     // The tab bar's own `+` (row 1) is not the header's.
-    let (c, r) = term
-        .screen()
+    let (c, r) = snap(&term)
         .find_all(" + ")
         .into_iter()
         .find(|(_, row)| *row > 1)
@@ -222,7 +221,7 @@ fn a_binary_that_is_not_an_image_keeps_the_old_notice() {
         s.contains("binary file (10 bytes)")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(half_blocks(&term.screen()).is_empty());
+    assert!(half_blocks(&snap(&term)).is_empty());
     term.stop().unwrap();
 }
 
@@ -241,11 +240,11 @@ fn jpeg_and_gif_render() {
     assert!(term.text().contains("JPEG 8\u{d7}8"));
     // The flat color (200, 100, 50) within the JPEG's rounding.
     assert!(
-        half_blocks(&term.screen())
+        half_blocks(&snap(&term))
             .iter()
             .all(|c| near(c.2, (200, 100, 50)) && near(c.3, (200, 100, 50))),
         "{:?}",
-        half_blocks(&term.screen())
+        half_blocks(&snap(&term))
     );
     term.send_keys("Escape").unwrap();
     term.wait_for("back to the graph", STEP, |s| s.contains("Message"))
@@ -254,7 +253,7 @@ fn jpeg_and_gif_render() {
     term.wait_for("the gif", STEP, |s| !half_blocks(s).is_empty())
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(term.text().contains("GIF 2\u{d7}2"));
-    let cells = half_blocks(&term.screen());
+    let cells = half_blocks(&snap(&term));
     assert!(
         cells.iter().any(|c| near(c.2, RED)),
         "the red pixel: {cells:?}"
@@ -272,7 +271,17 @@ fn a_corrupt_png_shows_a_card() {
     open_file_view(&mut term, "bad.png");
     term.wait_for("the card", STEP, |s| s.contains("data is damaged"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(half_blocks(&term.screen()).is_empty());
+    assert!(half_blocks(&snap(&term)).is_empty());
     assert!(!term.exited());
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

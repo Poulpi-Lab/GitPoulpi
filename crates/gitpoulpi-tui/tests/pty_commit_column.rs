@@ -78,10 +78,17 @@ fn fixture() -> gitpoulpi_testkit::FixtureRepo {
         .build()
 }
 
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &Terminal) -> Screen {
+    term.wait_for_stable(Duration::from_millis(250), STEP)
+        .unwrap_or_else(|e| panic!("{e}"))
+}
+
 /// The text rightmost on the screen: the right panel's file list, never the
 /// view's title or the column.
 fn rightmost(term: &Terminal, text: &str) -> (u16, u16) {
-    term.screen()
+    snap(term)
         .find_all(text)
         .into_iter()
         .max_by_key(|(c, _)| *c)
@@ -100,14 +107,20 @@ fn open_from_the_list(term: &mut Terminal, file: &str) {
 /// Selects the Log row `commit` (the Log is the central view), then opens
 /// `file` from the commit's list.
 fn open_file_at(term: &mut Terminal, commit: &str, file: &str) {
-    let (c, r) = term
-        .wait_for_text(commit, STEP)
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    term.click(c, r).unwrap();
-    term.wait_for("the commit's files", STEP, |s| {
-        s.contains("Changed files") && s.find_all(file).into_iter().any(|(col, _)| col > 100)
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Retried: a click aimed at a torn frame selects nothing.
+    common::retry_until(
+        term,
+        "the commit's files",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let screen = snap(t);
+            if let Some((c, r)) = screen.find(commit) {
+                t.click(c, r).unwrap();
+            }
+        },
+        |s| s.contains("Changed files") && s.find_all(file).into_iter().any(|(col, _)| col > 100),
+    );
     open_from_the_list(term, file);
 }
 
@@ -149,7 +162,7 @@ fn column_text(screen: &Screen) -> String {
 
 /// The cell of `text` inside the column (not in the view or the panel).
 fn in_column(term: &Terminal, text: &str) -> (u16, u16) {
-    let screen = term.screen();
+    let screen = snap(term);
     let (x0, title_row) =
         column_origin(&screen).unwrap_or_else(|| panic!("no commit column\n{}", term.text()));
     let x1 = column_right(&screen).unwrap_or(x0 + 30);
@@ -298,11 +311,10 @@ fn the_cross_closes_the_column_and_it_stays_closed() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (_, row) = column_origin(&term.screen()).unwrap();
-    let right = column_right(&term.screen()).unwrap();
+    let (_, row) = column_origin(&snap(&term)).unwrap();
+    let right = column_right(&snap(&term)).unwrap();
     // The cross sits on the column's top border, left of its corner.
-    let cross = term
-        .screen()
+    let cross = snap(&term)
         .find_all("\u{2715}")
         .into_iter()
         .find(|(c, r)| *r == row && *c < right)
@@ -336,7 +348,7 @@ fn picking_a_commit_changes_the_diff_and_the_detail_panels_file_list() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The panel follows: that commit's message and its one file.
-    let screen = term.screen();
+    let screen = snap(&term);
     assert!(
         screen.find_all("add a").into_iter().any(|(c, _)| c > 100),
         "the detail panel shows the picked commit\n{}",
@@ -414,7 +426,7 @@ fn the_width_is_resized_by_drag_and_by_key_and_remembered() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap();
-    let start = column_right(&term.screen()).unwrap();
+    let start = column_right(&snap(&term)).unwrap();
 
     // Palette: Widen, then Narrow twice.
     let palette = |term: &mut Terminal, text: &str| {
@@ -432,7 +444,7 @@ fn the_width_is_resized_by_drag_and_by_key_and_remembered() {
         column_right(s).is_some_and(|r| r > start)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let wide = column_right(&term.screen()).unwrap();
+    let wide = column_right(&snap(&term)).unwrap();
     palette(&mut term, "Narrow the Commit Column");
     palette(&mut term, "Narrow the Commit Column");
     term.wait_for("narrower", STEP, |s| {
@@ -441,14 +453,14 @@ fn the_width_is_resized_by_drag_and_by_key_and_remembered() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Drag the border (the view's left edge, under its bar row) to the right.
-    let now = column_right(&term.screen()).unwrap();
-    let (_, row) = column_origin(&term.screen()).unwrap();
+    let now = column_right(&snap(&term)).unwrap();
+    let (_, row) = column_origin(&snap(&term)).unwrap();
     term.drag((now + 1, row + 6), (now + 11, row + 6)).unwrap();
     term.wait_for("the drag widened it", STEP, |s| {
         column_right(s).is_some_and(|r| r >= now + 10)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let dragged = column_right(&term.screen()).unwrap();
+    let dragged = column_right(&snap(&term)).unwrap();
     assert!(dragged > wide || dragged >= now + 10);
     wait_for_saved(config.path(), "commit_column_cols");
     term.stop().unwrap();
@@ -458,12 +470,7 @@ fn the_width_is_resized_by_drag_and_by_key_and_remembered() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap();
-    assert_eq!(
-        column_right(&term.screen()),
-        Some(dragged),
-        "{}",
-        term.text()
-    );
+    assert_eq!(column_right(&snap(&term)), Some(dragged), "{}", term.text());
     term.stop().unwrap();
 }
 
@@ -679,14 +686,13 @@ fn the_wheel_scrolls_the_column_and_its_end_loads_more_commits() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The next page arrives on its own, and End reaches the root commit.
     let deadline = std::time::Instant::now() + STEP;
-    while !column_text(&term.screen()).contains("commit-0001")
-        && std::time::Instant::now() < deadline
+    while !column_text(&snap(&term)).contains("commit-0001") && std::time::Instant::now() < deadline
     {
         term.send_keys("End").unwrap();
         std::thread::sleep(Duration::from_millis(300));
     }
     assert!(
-        column_text(&term.screen()).contains("commit-0001"),
+        column_text(&snap(&term)).contains("commit-0001"),
         "the column loaded the rest of the history\n{}",
         term.text()
     );
@@ -716,15 +722,14 @@ fn a_closed_column_comes_back_by_the_strip_and_by_the_key() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (x0, row) = column_origin(&term.screen()).unwrap();
+    let (x0, row) = column_origin(&snap(&term)).unwrap();
     assert!(
-        strip_chevron(&term.screen(), x0).is_none(),
+        strip_chevron(&snap(&term), x0).is_none(),
         "no strip while the column is shown\n{}",
         term.text()
     );
-    let right = column_right(&term.screen()).unwrap();
-    let cross = term
-        .screen()
+    let right = column_right(&snap(&term)).unwrap();
+    let cross = snap(&term)
         .find_all("\u{2715}")
         .into_iter()
         .find(|(c, r)| *r == row && *c < right)
@@ -745,7 +750,7 @@ fn a_closed_column_comes_back_by_the_strip_and_by_the_key() {
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     wait_for_saved(config.path(), "commit_column = 1");
     assert!(
-        strip_chevron(&term.screen(), x0).is_none(),
+        strip_chevron(&snap(&term), x0).is_none(),
         "the strip goes with the hidden column\n{}",
         term.text()
     );
@@ -774,7 +779,7 @@ fn the_strips_tooltip_names_the_key() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (x0, _) = column_origin(&term.screen()).unwrap();
+    let (x0, _) = column_origin(&snap(&term)).unwrap();
     term.send_keys("M-c").unwrap();
     let screen = term
         .wait_for("the strip", STEP, |s| {
@@ -801,7 +806,7 @@ fn selector_at(screen: &Screen) -> Option<(u16, u16)> {
 /// A click on the selector's `File` segment.
 fn click_file_segment(term: &mut Terminal) {
     let (col, row) =
-        selector_at(&term.screen()).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
+        selector_at(&snap(term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
     std::thread::sleep(Duration::from_millis(450));
     term.click(col + 3, row).unwrap();
 }
@@ -809,7 +814,7 @@ fn click_file_segment(term: &mut Terminal) {
 /// A click on the selector's `All` segment.
 fn click_all_segment(term: &mut Terminal) {
     let (col, row) =
-        selector_at(&term.screen()).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
+        selector_at(&snap(term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
     std::thread::sleep(Duration::from_millis(450));
     term.click(col + 8, row).unwrap();
 }
@@ -818,7 +823,7 @@ fn click_all_segment(term: &mut Terminal) {
 /// plain click.
 fn ctrl_click_all_segment(term: &mut Terminal) {
     let (col, row) =
-        selector_at(&term.screen()).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
+        selector_at(&snap(term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
     std::thread::sleep(Duration::from_millis(450));
     term.ctrl_click(col + 8, row).unwrap();
 }
@@ -840,34 +845,33 @@ fn the_bar_buttons_do_not_move_when_the_column_opens_closes_or_changes_list() {
     open_head_file(&mut term);
     term.wait_for("the graph column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let home =
-        selector_at(&term.screen()).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
+    let home = selector_at(&snap(&term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
     let edit_at = |s: &Screen| s.find(" Edit ");
-    let edit = edit_at(&term.screen());
+    let edit = edit_at(&snap(&term));
     assert!(edit.is_some(), "{}", term.text());
     // The column starts under the bar row, not beside it.
-    let (_, title_row) = column_origin(&term.screen()).unwrap();
+    let (_, title_row) = column_origin(&snap(&term)).unwrap();
     assert!(title_row > home.1, "{}", term.text());
 
     term.send_keys("M-c").unwrap();
     term.wait_for("hidden", STEP, |s| !s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert_eq!(selector_at(&term.screen()), Some(home), "{}", term.text());
-    assert_eq!(edit_at(&term.screen()), edit, "{}", term.text());
+    assert_eq!(selector_at(&snap(&term)), Some(home), "{}", term.text());
+    assert_eq!(edit_at(&snap(&term)), edit, "{}", term.text());
 
     click_file_segment(&mut term);
     term.wait_for("the file history", STEP, history_shown)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert_eq!(selector_at(&term.screen()), Some(home), "{}", term.text());
-    assert_eq!(edit_at(&term.screen()), edit, "{}", term.text());
+    assert_eq!(selector_at(&snap(&term)), Some(home), "{}", term.text());
+    assert_eq!(edit_at(&snap(&term)), edit, "{}", term.text());
 
     term.send_keys("M-c").unwrap();
     term.wait_for("the list hidden", STEP, |s| {
         !s.contains(" History - c.txt ") && !s.contains(TITLE)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert_eq!(selector_at(&term.screen()), Some(home), "{}", term.text());
-    assert_eq!(edit_at(&term.screen()), edit, "{}", term.text());
+    assert_eq!(selector_at(&snap(&term)), Some(home), "{}", term.text());
+    assert_eq!(edit_at(&snap(&term)), edit, "{}", term.text());
     term.stop().unwrap();
 }
 
@@ -1032,7 +1036,7 @@ fn the_selectors_tooltip_names_the_click_the_reclick_and_the_key() {
     open_head_file(&mut term);
     term.wait_for("the graph column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (col, row) = selector_at(&term.screen()).unwrap();
+    let (col, row) = selector_at(&snap(&term)).unwrap();
     term.move_to(col + 3, row).unwrap();
     term.wait_for("the tooltip", STEP, |s| {
         s.contains("Click: show")
@@ -1083,8 +1087,8 @@ fn the_drag_highlight_follows_the_column_splitter() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap();
-    let (_, row) = column_origin(&term.screen()).unwrap();
-    let start = column_right(&term.screen()).unwrap() + 1;
+    let (_, row) = column_origin(&snap(&term)).unwrap();
+    let start = column_right(&snap(&term)).unwrap() + 1;
     let y = row + 6;
     term.press(start, y).unwrap();
     term.drag_to(start + 8, y).unwrap();
@@ -1093,8 +1097,8 @@ fn the_drag_highlight_follows_the_column_splitter() {
         column_right(s).is_some_and(|r| r + 1 >= start + 12)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let now = column_right(&term.screen()).unwrap() + 1;
-    let screen = term.screen();
+    let now = column_right(&snap(&term)).unwrap() + 1;
+    let screen = snap(&term);
     let lit = screen.cell(now, y).unwrap().bg;
     assert_ne!(
         lit,
@@ -1124,8 +1128,8 @@ fn the_highlight_is_gone_after_a_drag_released_away_from_the_splitter() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap();
-    let (_, row) = column_origin(&term.screen()).unwrap();
-    let start = column_right(&term.screen()).unwrap() + 1;
+    let (_, row) = column_origin(&snap(&term)).unwrap();
+    let start = column_right(&snap(&term)).unwrap() + 1;
     let y = row + 6;
     term.press(start, y).unwrap();
     term.drag_to(start + 8, y).unwrap();
@@ -1134,8 +1138,8 @@ fn the_highlight_is_gone_after_a_drag_released_away_from_the_splitter() {
         column_right(s).is_some_and(|r| r + 1 >= start + 12)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let now = column_right(&term.screen()).unwrap() + 1;
-    let lit = term.screen().cell(now, y).unwrap().bg;
+    let now = column_right(&snap(&term)).unwrap() + 1;
+    let lit = snap(&term).cell(now, y).unwrap().bg;
     term.release(now + 12, y + 3).unwrap();
     term.wait_for("the border is no longer lit", STEP, |s| {
         s.cell(now, y).is_some_and(|c| c.bg != lit)
@@ -1187,7 +1191,7 @@ fn hovering_a_commit_row_of_the_column_shows_the_logs_tooltip() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The date part has the Log's date tooltip too (the full time).
     let (_, row) = in_column(&term, "edit a");
-    let screen = term.screen();
+    let screen = snap(&term);
     let (x0, _) = column_origin(&screen).unwrap();
     let right = column_right(&screen).unwrap();
     term.move_to(right - 2, row).unwrap();
@@ -1213,8 +1217,7 @@ fn hovering_a_row_of_the_file_history_list_shows_the_logs_tooltip() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(!term.text().contains("BODY-ADD-A"), "{}", term.text());
     // The row of "add a" in the list (left of the diff).
-    let (c, r) = term
-        .screen()
+    let (c, r) = snap(&term)
         .find_all("add a")
         .into_iter()
         .find(|(c, _)| *c < 60)
@@ -1242,7 +1245,18 @@ fn a_right_click_on_a_commit_row_opens_its_menu_and_a_row_works() {
     let (c, r) = in_column(&term, "edit b");
     term.right_click(c + 1, r).unwrap();
     let screen = term
-        .wait_for("the menu", STEP, |s| s.contains("Blame at this commit"))
+        .wait_for("the whole menu", STEP, |s| {
+            [
+                "Blame at this commit",
+                "Show in the Log",
+                "Show the diff of this commit",
+                "Open the file at this commit",
+                "Cherry-pick",
+                "Revert",
+            ]
+            .iter()
+            .all(|r| s.contains(r))
+        })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     for row in [
         "Show in the Log",
@@ -1270,7 +1284,7 @@ fn a_right_click_on_a_commit_row_opens_its_menu_and_a_row_works() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The panel followed: the right-clicked commit is the selected one.
     assert!(
-        term.screen()
+        snap(&term)
             .find_all("edit b")
             .into_iter()
             .any(|(c, _)| c > 100),
@@ -1515,7 +1529,7 @@ fn hovering_a_boundary_lights_the_first_letter_and_draws_no_rule() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     assert!(header_rules(&screen).is_empty(), "{}", term.text());
     let (c, r) = first_letter(&screen, "Author");
     let plain = screen.cell(c, r).unwrap().bg;
@@ -1526,7 +1540,7 @@ fn hovering_a_boundary_lights_the_first_letter_and_draws_no_rule() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // Only that letter: the next one is not.
-    let screen = term.screen();
+    let screen = snap(&term);
     assert_eq!(screen.cell(c + 1, r).unwrap().bg, plain, "{}", term.text());
     assert!(header_rules(&screen).is_empty(), "{}", term.text());
     term.move_to(c, r + 6).unwrap();
@@ -1551,7 +1565,7 @@ fn a_boundary_drag_sizes_the_message_with_its_highlight_and_is_remembered() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     let author0 = header_word(&screen, "Author").unwrap();
     let date0 = header_word(&screen, "Date").unwrap();
     let row = header_row(&screen).unwrap();
@@ -1564,7 +1578,7 @@ fn a_boundary_drag_sizes_the_message_with_its_highlight_and_is_remembered() {
         header_word(s, "Author") == author0.checked_sub(6)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     assert_eq!(
         header_word(&screen, "Date"),
         date0.checked_sub(6),
@@ -1604,7 +1618,7 @@ fn a_boundary_drag_sizes_the_message_with_its_highlight_and_is_remembered() {
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(
-        header_word(&term.screen(), "Author"),
+        header_word(&snap(&term), "Author"),
         author0.checked_sub(6),
         "{}",
         term.text()
@@ -1622,7 +1636,7 @@ fn the_keys_size_the_message_part() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let author0 = header_word(&term.screen(), "Author").unwrap();
+    let author0 = header_word(&snap(&term), "Author").unwrap();
     pick(&mut term, "add b");
     term.send_keys("Tab").unwrap();
     term.wait_for("the message is the part to size", STEP, |s| {
@@ -1655,7 +1669,7 @@ fn a_right_click_on_the_header_chooses_the_parts_and_it_is_remembered() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = first_letter(&term.screen(), "Date");
+    let (c, r) = first_letter(&snap(&term), "Date");
     term.right_click(c, r).unwrap();
     term.wait_for("the parts menu", STEP, |s| {
         s.contains("Columns") && s.contains("[ ] Ref") && s.contains("[x] Date")
@@ -1663,7 +1677,7 @@ fn a_right_click_on_the_header_chooses_the_parts_and_it_is_remembered() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The message is listed, not selectable.
     assert!(term.text().contains("[x] Message"), "{}", term.text());
-    let (dc, dr) = term.screen().find("[x] Date").unwrap();
+    let (dc, dr) = snap(&term).find("[x] Date").unwrap();
     term.click(dc + 2, dr).unwrap();
     term.wait_for("Date is gone from the header", STEP, |s| {
         header_word(s, "Date").is_none() && header_word(s, "Author").is_some()
@@ -1677,11 +1691,11 @@ fn a_right_click_on_the_header_chooses_the_parts_and_it_is_remembered() {
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        header_word(&term.screen(), "Date").is_none(),
+        header_word(&snap(&term), "Date").is_none(),
         "{}",
         term.text()
     );
-    assert!(header_word(&term.screen(), "Author").is_some());
+    assert!(header_word(&snap(&term), "Author").is_some());
     term.stop().unwrap();
 }
 
@@ -1731,18 +1745,15 @@ fn the_refs_part_shows_the_branch_labels() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(
-        header_word(&term.screen(), "Ref").is_none(),
-        "off by default"
-    );
-    assert!(!column_text(&term.screen()).contains("zed"));
+    assert!(header_word(&snap(&term), "Ref").is_none(), "off by default");
+    assert!(!column_text(&snap(&term)).contains("zed"));
     run_palette(&mut term, "Column: Toggle Ref");
     term.wait_for("the Refs part with the branch", STEP, |s| {
         header_word(s, "Ref").is_some() && column_text(s).contains("zed")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // It leads the row, before the message.
-    let screen = term.screen();
+    let screen = snap(&term);
     assert!(header_word(&screen, "Ref") < header_word(&screen, "Message"));
     run_palette(&mut term, "Column: Toggle Ref");
     term.wait_for("the Refs part is gone", STEP, |s| {
@@ -1778,7 +1789,7 @@ fn the_commit_columns_parts_are_apart_from_the_logs_columns() {
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        header_word(&term.screen(), "Author").is_some(),
+        header_word(&snap(&term), "Author").is_some(),
         "the Log's choice does not hide the column's part\n{}",
         term.text()
     );
@@ -1794,7 +1805,7 @@ fn the_commit_columns_parts_are_apart_from_the_logs_columns() {
         !s.contains(TITLE) && log_header(s).is_some()
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let header = log_header(&term.screen()).unwrap();
+    let header = log_header(&snap(&term)).unwrap();
     assert!(
         header.contains("Date"),
         "the Log keeps its Date\n{}",
@@ -1839,8 +1850,8 @@ fn the_column_may_be_wider_than_a_hundred_cells_on_a_wide_window() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (x0, row) = column_origin(&term.screen()).unwrap();
-    let start = column_right(&term.screen()).unwrap() + 1;
+    let (x0, row) = column_origin(&snap(&term)).unwrap();
+    let start = column_right(&snap(&term)).unwrap() + 1;
     let y = row + 6;
     term.press(start, y).unwrap();
     term.drag_to(start + 60, y).unwrap();
@@ -1850,7 +1861,7 @@ fn the_column_may_be_wider_than_a_hundred_cells_on_a_wide_window() {
         column_right(s).is_some_and(|r| r + 1 - x0 > 100)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let width = column_right(&term.screen()).unwrap() + 1 - x0;
+    let width = column_right(&snap(&term)).unwrap() + 1 - x0;
     // And the diff keeps its room: the column stops at 70% of the central
     // column, never the whole of it.
     assert!(width < 220, "{width}\n{}", term.text());
@@ -1866,7 +1877,7 @@ fn the_keys_and_the_palette_size_the_parts_and_reset_them() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let author0 = header_word(&term.screen(), "Author").unwrap();
+    let author0 = header_word(&snap(&term), "Author").unwrap();
     pick(&mut term, "add b");
     term.send_keys("Tab").unwrap();
     term.send_keys("Tab").unwrap();
@@ -1920,7 +1931,7 @@ fn the_rows_scroll_sideways_by_shift_wheel_the_horizontal_wheel_and_the_keys() {
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     widen_the_author(&mut term);
-    let screen = term.screen();
+    let screen = snap(&term);
     let author0 = header_word(&screen, "Author").unwrap_or_else(|| panic!("{}", term.text()));
     let (_, row) = column_origin(&screen).unwrap();
     let on_rows = (column_origin(&screen).unwrap().0 + 6, row + 4);
@@ -1987,11 +1998,11 @@ fn an_older_sessions_parts_are_migrated_to_the_config() {
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        header_word(&term.screen(), "Date").is_none(),
+        header_word(&snap(&term), "Date").is_none(),
         "the old session's parts are used\n{}",
         term.text()
     );
-    assert!(header_word(&term.screen(), "Author").is_some());
+    assert!(header_word(&snap(&term), "Author").is_some());
     wait_for_config_list(config.path(), "commit_column_columns_visible");
     assert_eq!(saved_widths(config.path()).get("author"), Some(&14));
     term.stop().unwrap();
@@ -2004,7 +2015,7 @@ fn an_older_sessions_parts_are_migrated_to_the_config() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(header_word(&term.screen(), "Date").is_none());
+    assert!(header_word(&snap(&term), "Date").is_none());
     term.stop().unwrap();
 }
 
@@ -2037,7 +2048,7 @@ fn dragging_a_header_moves_the_part_and_is_remembered_apart_from_the_log() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     let (author0, message0) = (
         header_word(&screen, "Author").unwrap(),
         header_word(&screen, "Message").unwrap(),
@@ -2067,7 +2078,7 @@ fn dragging_a_header_moves_the_part_and_is_remembered_apart_from_the_log() {
         !s.contains(TITLE) && log_header(s).is_some()
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let header = log_header(&term.screen()).unwrap();
+    let header = log_header(&snap(&term)).unwrap();
     assert!(
         header.find("Message") < header.find("Author"),
         "the Log's order did not move: {header}"
@@ -2085,7 +2096,7 @@ fn dragging_a_header_moves_the_part_and_is_remembered_apart_from_the_log() {
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        left_of(&term.screen(), "Author", "Message"),
+        left_of(&snap(&term), "Author", "Message"),
         "{}",
         term.text()
     );
@@ -2105,7 +2116,7 @@ fn a_carried_header_shows_a_ghost_and_a_bar_and_esc_cancels() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     let (author0, message0) = (
         header_word(&screen, "Author").unwrap(),
         header_word(&screen, "Message").unwrap(),
@@ -2121,7 +2132,7 @@ fn a_carried_header_shows_a_ghost_and_a_bar_and_esc_cancels() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        left_of(&term.screen(), "Message", "Author"),
+        left_of(&snap(&term), "Message", "Author"),
         "nothing moves before the release\n{}",
         term.text()
     );
@@ -2133,22 +2144,21 @@ fn a_carried_header_shows_a_ghost_and_a_bar_and_esc_cancels() {
     term.release(message0 + 2, row).unwrap();
     std::thread::sleep(Duration::from_millis(400));
     assert!(
-        left_of(&term.screen(), "Message", "Author"),
+        left_of(&snap(&term), "Message", "Author"),
         "{}",
         term.text()
     );
 
     // The parts menu: a cross in its frame closes it.
-    let (c, r) = first_letter(&term.screen(), "Message");
+    let (c, r) = first_letter(&snap(&term), "Message");
     term.right_click(c + 2, r).unwrap();
     term.wait_for("the parts menu", STEP, |s| s.contains("[x] Date"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(!term.text().contains('\u{2611}'), "{}", term.text());
-    let (cx, cy) = term
-        .screen()
+    let (cx, cy) = snap(&term)
         .find_all("\u{2715}")
         .into_iter()
-        .find(|(_, y)| term.screen().line(*y).contains("Columns"))
+        .find(|(_, y)| snap(&term).line(*y).contains("Columns"))
         .expect("a cross in the menu's frame");
     term.click(cx, cy).unwrap();
     term.wait_for("the menu closed", STEP, |s| !s.contains("[x] Date"))
@@ -2167,7 +2177,7 @@ fn the_keys_and_the_palette_move_the_chosen_part() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(left_of(&term.screen(), "Message", "Author"));
+    assert!(left_of(&snap(&term), "Message", "Author"));
     pick(&mut term, "add b");
     term.send_keys("Tab").unwrap();
     term.wait_for("the message is the part", STEP, |s| {
@@ -2215,8 +2225,8 @@ fn changes_and_sha_are_parts_of_the_column_with_the_logs_values() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(header_word(&term.screen(), "Changes").is_none());
-    assert!(header_word(&term.screen(), "SHA").is_none());
+    assert!(header_word(&snap(&term), "Changes").is_none());
+    assert!(header_word(&snap(&term), "SHA").is_none());
     run_palette(&mut term, "Column: Toggle Changes");
     run_palette(&mut term, "Column: Toggle SHA");
     term.wait_for("both parts and their values", STEP, |s| {
@@ -2233,7 +2243,7 @@ fn changes_and_sha_are_parts_of_the_column_with_the_logs_values() {
         "{visible:?}"
     );
     // The header menu lists all seven.
-    let (c, r) = first_letter(&term.screen(), "Message");
+    let (c, r) = first_letter(&snap(&term), "Message");
     term.right_click(c + 2, r).unwrap();
     term.wait_for("the parts menu", STEP, |s| {
         [
@@ -2258,7 +2268,7 @@ fn the_cell_after_the_last_part_resizes_it_and_lights_while_dragged() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     let row = header_row(&screen).unwrap();
     let border = column_right(&screen).unwrap();
     // Date is last; its automatic width is five cells. Press on the cell
@@ -2292,7 +2302,7 @@ fn line_mode_hovering_a_separator_draws_a_thin_line_down_the_column() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     let (author, row) = first_letter(&screen, "Author");
     let gap = author - 1;
     let text = |s: &Screen, y: u16| s.cell(gap, y).map(|c| c.text.clone()).unwrap_or_default();
@@ -2309,7 +2319,7 @@ fn line_mode_hovering_a_separator_draws_a_thin_line_down_the_column() {
         (row..=row + 6).all(|y| text(s, y) == "\u{2502}")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     assert_ne!(
         screen.cell(gap + 1, row + 3).unwrap().text,
         "\u{2502}",
@@ -2334,7 +2344,7 @@ fn line_mode_a_drag_from_the_middle_of_the_rows_sizes_the_part() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     let (author0, row) = first_letter(&screen, "Author");
     let date0 = header_word(&screen, "Date").unwrap();
     let gap = author0 - 1;
@@ -2347,7 +2357,7 @@ fn line_mode_a_drag_from_the_middle_of_the_rows_sizes_the_part() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(
-        header_word(&term.screen(), "Date"),
+        header_word(&snap(&term), "Date"),
         date0.checked_sub(6),
         "the author kept its width\n{}",
         term.text()
@@ -2370,7 +2380,7 @@ fn line_mode_the_line_does_not_stay_after_a_drag_is_released() {
     open_head_file(&mut term);
     term.wait_for("the column", STEP, |s| s.contains(TITLE))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     let (author0, row) = first_letter(&screen, "Author");
     let gap = author0 - 1;
     let new_gap = gap - 4;

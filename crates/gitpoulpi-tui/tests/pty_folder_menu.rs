@@ -113,7 +113,6 @@ fn the_folder_menu_lists_its_rows_in_order() {
     let repo = fixture();
     let (mut term, _config) = launch(repo.root(), "pty-foldermenu-order", "");
     open_folder_menu_on(&mut term, "alpha");
-    let screen = term.screen();
     let labels = [
         "Stage folder",
         "Discard all changes in folder...",
@@ -123,6 +122,12 @@ fn the_folder_menu_lists_its_rows_in_order() {
         "Open folder",
         "Create a file in this folder",
     ];
+    // The frame is read in pieces: wait for the whole menu before judging.
+    let screen = term
+        .wait_for("every menu row drawn", STEP, |s| {
+            labels.iter().all(|l| s.contains(l))
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let rows: Vec<u16> = labels
         .iter()
         .map(|l| {

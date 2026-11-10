@@ -53,6 +53,9 @@ fn init_is_gone(term: &Terminal) {
 
 /// The cross on the Init dialog's own title row, with no "Esc" beside it.
 fn init_cross(term: &Terminal) -> (u16, u16) {
+    // A settled screen: a torn frame can lack the cross.
+    term.wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let text = term.text();
     let (row, line) = text
         .lines()
@@ -61,7 +64,7 @@ fn init_cross(term: &Terminal) -> (u16, u16) {
         .expect("the title row");
     assert!(line.contains(CROSS), "a cross on the title row: {line:?}");
     assert!(!line.contains("Esc"), "no Esc beside the cross: {line:?}");
-    let (c, r) = term.screen().find(CROSS).expect("the cross");
+    let (c, r) = snap(term).find(CROSS).expect("the cross");
     assert_eq!(r as usize, row, "the first cross is the dialog's");
     (c, r)
 }
@@ -103,4 +106,14 @@ fn esc_closes_init() {
     let (mut term, _config, _repo) = open_init("pty-init-esc");
     term.send_keys("Escape").unwrap();
     init_is_gone(&term);
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

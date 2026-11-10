@@ -5086,7 +5086,7 @@ token_command_failed_tail = "Der Token-Befehl dieses Repositorys ist fehlgeschla
 token_command_failed_code = "Der Token-Befehl dieses Repositorys ist fehlgeschlagen (Exit {code})."
 token_command_failed_code_tail = "Der Token-Befehl dieses Repositorys ist fehlgeschlagen (Exit {code}): {tail}"
 grant_refused = "GitPoulpi hat das Konto-Token nicht an {host} gesendet: Das ist nicht {expected}, die Adresse dieses Kontos."
-credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
+credential_helper_unreachable = "Der Credential-Helper von GitPoulpi konnte den Daemon nicht erreichen, daher wurde die Anmeldung dieses Repositorys nicht gesendet. Versuchen Sie es erneut; besteht das Problem weiter, prüfen Sie SSH & Zugangsdaten."
 repo_auth_needs_confirmation = "Ein Credential-Helper oder Token-Befehl wird nur gespeichert, wenn Sie ihn unter SSH & Zugangsdaten bestätigen."
 
 [window]

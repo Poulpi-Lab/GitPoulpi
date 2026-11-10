@@ -163,6 +163,7 @@ pub(crate) fn is_repo_auth_error(error: &CoreError) -> bool {
     match error {
         CoreError::RepoAuthUnavailable { .. }
         | CoreError::GrantRefused { .. }
+        | CoreError::CredentialHelperUnreachable
         | CoreError::RepoAuthCommandChanged { .. }
         | CoreError::TokenCommandFailed { .. } => true,
         CoreError::NeedsConfirmation(prompt) => {
@@ -333,6 +334,7 @@ mod tests {
                 host: "evil.example".into(),
                 expected: "github.com".into(),
             },
+            CoreError::CredentialHelperUnreachable,
             CoreError::RepoAuthCommandChanged {
                 path: "tools/token.sh".into(),
             },

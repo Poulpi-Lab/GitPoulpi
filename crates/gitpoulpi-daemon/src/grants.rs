@@ -64,6 +64,12 @@ impl std::fmt::Debug for GrantCredential {
 
 struct Entry {
     credential: GrantCredential,
+    /// Whether the helper ever asked the daemon about this grant. A grant that
+    /// was never asked about means the helper could not reach the daemon.
+    asked: bool,
+    /// The user-only file that tells the helper where this daemon is; removed
+    /// with the grant.
+    endpoint_file: Option<PathBuf>,
     root: PathBuf,
     /// Seq of the issue, so "the latest grant of a repository" is defined.
     seq: u64,
@@ -129,12 +135,126 @@ impl GrantGuard {
     /// that is the reason (not git's "terminal prompts disabled"). Every path
     /// that runs a transfer under a grant words its failure through this.
     pub(crate) fn explain(&self, error: gitpoulpi_core::Error) -> gitpoulpi_core::Error {
+        self.reads_as(&error.to_string()).unwrap_or(error)
+    }
+
+    /// The reason behind a failure whose text is `message`, if the grant knows
+    /// one: a refused host, a token command that gave no token, or a helper
+    /// that never reached the daemon (git's "could not read Username ...
+    /// terminal prompts disabled" and no request for this grant ever arrived).
+    pub(crate) fn reads_as(&self, message: &str) -> Option<gitpoulpi_core::Error> {
         if let Some((host, expected)) = self.refused() {
-            gitpoulpi_core::Error::GrantRefused { host, expected }
+            Some(gitpoulpi_core::Error::GrantRefused { host, expected })
         } else if let Some(command_error) = self.command_failure() {
-            command_error
+            Some(command_error)
+        } else if is_no_credential_message(message) && !self.asked() {
+            Some(gitpoulpi_core::Error::CredentialHelperUnreachable)
         } else {
-            error
+            None
+        }
+    }
+
+    fn asked(&self) -> bool {
+        lock().grants.get(&self.id).is_none_or(|e| e.asked)
+    }
+
+    /// Tells the helper where this grant's daemon is: writes the user-only
+    /// endpoint file (once per grant) and returns its path. `None` when the
+    /// daemon of `session` is unknown here or the file cannot be written; the
+    /// helper then falls back to the session's published port file.
+    pub(crate) fn endpoint_file(&self, session: &str) -> Option<PathBuf> {
+        let endpoint = endpoints().get(session)?.1.clone();
+        let paths = gitpoulpi_config::ConfigPaths::discover()?;
+        let dir = paths.ipc_port_file(session).parent()?.to_path_buf();
+        let mut registry = lock();
+        let entry = registry.grants.get_mut(&self.id)?;
+        if let Some(file) = &entry.endpoint_file {
+            return Some(file.clone());
+        }
+        sweep_stale_endpoint_files(&dir);
+        gitpoulpi_config::secure_fs::create_private_dir_all(&dir).ok()?;
+        let file = dir.join(format!("{session}.grant-{}.cred", self.id));
+        gitpoulpi_config::secure_fs::write_private(
+            &file,
+            gitpoulpi_ipc::git_credential::endpoint_file_text(&endpoint).as_bytes(),
+        )
+        .ok()?;
+        entry.endpoint_file = Some(file.clone());
+        Some(file)
+    }
+}
+
+/// git's wording when it needed a credential, got none and may not prompt.
+pub(crate) fn is_no_credential_message(message: &str) -> bool {
+    let lower = message.to_ascii_lowercase();
+    lower.contains("terminal prompts disabled")
+        || lower.contains("could not read username")
+        || lower.contains("could not read password")
+}
+
+/// Endpoint files a crashed daemon left behind (a day old): they name a dead
+/// daemon's token, useless but not worth keeping.
+fn sweep_stale_endpoint_files(dir: &Path) {
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if !(name.contains(".grant-") && name.ends_with(".cred")) {
+            continue;
+        }
+        let old = entry
+            .metadata()
+            .and_then(|m| m.modified())
+            .ok()
+            .and_then(|t| t.elapsed().ok())
+            .is_some_and(|age| age > std::time::Duration::from_secs(24 * 3600));
+        if old {
+            let _ = std::fs::remove_file(entry.path());
+        }
+    }
+}
+
+type EndpointMap = HashMap<String, (u64, gitpoulpi_ipc::Endpoint)>;
+
+fn endpoints() -> std::sync::MutexGuard<'static, EndpointMap> {
+    static ENDPOINTS: OnceLock<Mutex<EndpointMap>> = OnceLock::new();
+    ENDPOINTS
+        .get_or_init(Mutex::default)
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+}
+
+/// Remembers where the daemon of `session` listens, so the grants it issues
+/// can name it to the helper. Dropping the returned guard forgets it (unless a
+/// later daemon of the same session in this process has replaced it).
+#[must_use]
+pub(crate) fn register_endpoint(
+    session: &str,
+    endpoint: gitpoulpi_ipc::Endpoint,
+) -> EndpointGuard {
+    static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let seq = SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    endpoints().insert(session.to_string(), (seq, endpoint));
+    EndpointGuard {
+        session: session.to_string(),
+        seq,
+    }
+}
+
+pub(crate) struct EndpointGuard {
+    session: String,
+    seq: u64,
+}
+
+impl Drop for EndpointGuard {
+    fn drop(&mut self) {
+        let mut map = endpoints();
+        if map
+            .get(&self.session)
+            .is_some_and(|(seq, _)| *seq == self.seq)
+        {
+            map.remove(&self.session);
         }
     }
 }
@@ -145,7 +265,13 @@ impl Drop for GrantGuard {
         if let Some(entry) = registry.grants.get_mut(&self.id) {
             entry.holders = entry.holders.saturating_sub(1);
             if entry.holders == 0 {
-                registry.grants.remove(&self.id);
+                if let Some(file) = registry
+                    .grants
+                    .remove(&self.id)
+                    .and_then(|e| e.endpoint_file)
+                {
+                    let _ = std::fs::remove_file(file);
+                }
             }
         }
     }
@@ -158,6 +284,8 @@ impl Drop for GrantGuard {
 pub(crate) struct Outcome {
     pub accepted: Option<String>,
     pub token_refused: bool,
+    /// A grant is live and the helper never asked about it.
+    pub unasked: bool,
 }
 
 /// [`Outcome`] of the newest live grant of the repository at `root`.
@@ -173,9 +301,11 @@ pub(crate) fn take_outcome(root: &Path) -> Outcome {
             let outcome = Outcome {
                 accepted: entry.accepted.then(|| entry.credential.identity.clone()),
                 token_refused: entry.token_refused,
+                unasked: !entry.asked,
             };
             entry.accepted = false;
             entry.token_refused = false;
+            entry.asked = false;
             outcome
         }
         None => Outcome::default(),
@@ -213,6 +343,8 @@ pub(crate) fn issue(root: &Path, credential: GrantCredential) -> Result<GrantGua
         id.clone(),
         Entry {
             credential,
+            asked: false,
+            endpoint_file: None,
             root: root.to_path_buf(),
             seq,
             holders: 1,
@@ -254,6 +386,7 @@ pub(crate) async fn answer(request: &CredentialGrantRequest) -> CredentialGrantA
         let Some(entry) = registry.grants.get_mut(&request.grant) else {
             return CredentialGrantAnswer::default();
         };
+        entry.asked = true;
         let matches = host_matches(entry, request);
         match request.action {
             CredentialAction::Get if matches => match &entry.credential.command {

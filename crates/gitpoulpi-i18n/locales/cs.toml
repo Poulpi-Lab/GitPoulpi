@@ -5079,6 +5079,7 @@ token_command_failed_tail = "Příkaz tohoto repozitáře pro token selhal: {tai
 token_command_failed_code = "Příkaz tohoto repozitáře pro token selhal (kód ukončení {code})."
 token_command_failed_code_tail = "Příkaz tohoto repozitáře pro token selhal (kód ukončení {code}): {tail}"
 grant_refused = "GitPoulpi neposlal token účtu na {host}: není to {expected}, adresa tohoto účtu."
+credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
 repo_auth_needs_confirmation = "Credential helper nebo příkaz pro token se uloží, až ho potvrdíte v části SSH a přihlášení."
 
 [window]

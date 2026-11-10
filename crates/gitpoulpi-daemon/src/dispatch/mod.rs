@@ -33,7 +33,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use gitpoulpi_core::domain::{ChangeScope, OperationKind, RepoId, RepoRef};
-use gitpoulpi_core::{Error, GitBackend};
+use gitpoulpi_core::GitBackend;
 use gitpoulpi_ipc::{Event, Request, Response, ResponseError};
 use serde_json::Value;
 use tokio::sync::broadcast;
@@ -368,11 +368,16 @@ async fn dispatch_network_inner(
     // A transfer that failed after the grant refused a host (a remote URL
     // rewritten to another server by the repository's own configuration):
     // say that, instead of git's "terminal prompts disabled".
-    if let (Some(grant), Err(_)) = (&grant, &dispatched.response.result) {
-        if grant.refused().is_some() || grant.command_failure().is_some() {
-            // The grant's reason (a refused host, a token command that gave
-            // no token), instead of git's "terminal prompts disabled".
-            let reason = grant.explain(Error::Backend(String::new()));
+    if let (Some(grant), Err(failure)) = (&grant, &dispatched.response.result) {
+        // The grant's reason (a refused host, a token command that gave no
+        // token, a helper that never reached the daemon), instead of git's
+        // "terminal prompts disabled".
+        let text = failure
+            .detail
+            .as_ref()
+            .map(|d| d.stderr.as_str())
+            .unwrap_or_default();
+        if let Some(reason) = grant.reads_as(&format!("{} {text}", failure.message)) {
             dispatched = failed(request, reason.to_string(), reason.typed(), None);
         }
     }

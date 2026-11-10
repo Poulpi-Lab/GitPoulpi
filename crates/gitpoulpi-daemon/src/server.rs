@@ -106,6 +106,12 @@ pub async fn run(
     let listener = TcpListener::bind(("127.0.0.1", 0)).await?;
     let port = listener.local_addr()?.port();
     let _ = port_tx.send(port);
+    // Where a credential helper of this daemon's grants finds it, published
+    // or not (ADR-0010, decision 21); gone when this function returns.
+    let _endpoint = crate::grants::register_endpoint(
+        &info.session,
+        gitpoulpi_ipc::Endpoint::new(port, Some(token.clone())),
+    );
 
     let (events_tx, _) = broadcast::channel::<Event>(256);
     let repo_locks: RepoLocks = Arc::new(StdMutex::new(HashMap::new()));

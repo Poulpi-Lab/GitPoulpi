@@ -5083,6 +5083,7 @@ token_command_failed_tail = "Polecenie tokenu tego repozytorium nie powiodło si
 token_command_failed_code = "Polecenie tokenu tego repozytorium nie powiodło się (kod wyjścia {code})."
 token_command_failed_code_tail = "Polecenie tokenu tego repozytorium nie powiodło się (kod wyjścia {code}): {tail}"
 grant_refused = "GitPoulpi nie wysłał tokenu konta do {host}: to nie jest {expected}, adres tego konta."
+credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
 repo_auth_needs_confirmation = "Pomocnik poświadczeń lub polecenie tokenu jest zapisywane dopiero po potwierdzeniu w sekcji SSH i poświadczenia."
 
 [window]

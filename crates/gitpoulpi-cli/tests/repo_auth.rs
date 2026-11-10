@@ -386,4 +386,30 @@ fn a_token_command_works_from_a_standalone_cli_run() {
         seen.iter().any(|c| c == &format!("x-access-token:{TOKEN}")),
         "the server never got the token: {seen:?}"
     );
+    // The endpoint files of the grants are gone with their operations, and the
+    // embedded daemon published nothing.
+    let config = root.parent().unwrap().join("config");
+    let leftovers: Vec<_> = walk(&config)
+        .into_iter()
+        .filter(|p| {
+            let n = p.file_name().unwrap().to_string_lossy().into_owned();
+            n.ends_with(".cred") || n.ends_with(".port")
+        })
+        .collect();
+    assert!(leftovers.is_empty(), "left behind: {leftovers:?}");
+}
+
+fn walk(dir: &Path) -> Vec<std::path::PathBuf> {
+    let mut found = Vec::new();
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                found.extend(walk(&path));
+            } else {
+                found.push(path);
+            }
+        }
+    }
+    found
 }

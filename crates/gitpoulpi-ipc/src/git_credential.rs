@@ -26,6 +26,39 @@ pub const FLAG: &str = "--gitpoulpi-git-credential";
 pub const ENV_GRANT: &str = "GITPOULPI_CREDENTIAL_GRANT";
 /// The session whose daemon issued the grant.
 pub const ENV_SESSION: &str = "GITPOULPI_CREDENTIAL_SESSION";
+/// The path of the user-only file that names the issuing daemon's endpoint
+/// (its port, then the IPC token): written by the daemon while the grant
+/// lives, removed with it. The path is not a secret; the token is only in the
+/// file. The helper prefers it to the session's published port file, because
+/// the grant exists only in the daemon that issued it and an embedded daemon
+/// of a short-lived CLI run publishes nothing.
+pub const ENV_ENDPOINT: &str = "GITPOULPI_CREDENTIAL_ENDPOINT";
+
+/// What [`ENV_ENDPOINT`]'s file holds: the port, a newline, the token in hex.
+pub fn endpoint_file_text(endpoint: &crate::Endpoint) -> String {
+    format!(
+        "{}\n{}\n",
+        endpoint.port,
+        endpoint
+            .token
+            .as_ref()
+            .map(|t| t.to_hex())
+            .unwrap_or_default()
+    )
+}
+
+/// Parses [`endpoint_file_text`]. `None` for anything else (a missing token
+/// line is a daemon without tokens).
+pub fn parse_endpoint_file(text: &str) -> Option<crate::Endpoint> {
+    let mut lines = text.lines();
+    let port: u16 = lines.next()?.trim().parse().ok()?;
+    let token = lines
+        .next()
+        .map(str::trim)
+        .filter(|t| !t.is_empty())
+        .and_then(crate::Token::from_hex);
+    Some(crate::Endpoint::new(port, token))
+}
 
 /// What git asks of a helper.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -159,8 +192,16 @@ fn ask_daemon(action: CredentialAction, git: GitRequest) -> Option<CredentialGra
     if session.contains(['/', '\\']) || session.contains("..") {
         return None;
     }
-    let paths = gitpoulpi_config::ConfigPaths::discover()?;
-    let endpoint = crate::discovery::endpoint(&paths.ipc_port_file(&session))?;
+    // The daemon that issued the grant first (it may be unpublished), then
+    // whatever the session's port file names.
+    let endpoint = std::env::var_os(ENV_ENDPOINT)
+        .filter(|p| !p.is_empty())
+        .and_then(|p| std::fs::read_to_string(p).ok())
+        .and_then(|text| parse_endpoint_file(&text))
+        .or_else(|| {
+            let paths = gitpoulpi_config::ConfigPaths::discover()?;
+            crate::discovery::endpoint(&paths.ipc_port_file(&session))
+        })?;
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
@@ -241,6 +282,16 @@ mod tests {
             password: Some("hunter2-hunter2".into()),
         };
         assert!(!format!("{answer:?}").contains("hunter2"));
+    }
+
+    #[test]
+    fn the_endpoint_file_round_trips() {
+        let token = crate::Token::generate().unwrap();
+        let endpoint = crate::Endpoint::new(4242, Some(token.clone()));
+        let back = parse_endpoint_file(&endpoint_file_text(&endpoint)).unwrap();
+        assert_eq!(back.port, 4242);
+        assert_eq!(back.token.map(|t| t.to_hex()), Some(token.to_hex()));
+        assert!(parse_endpoint_file("not a port\n").is_none());
     }
 
     #[test]

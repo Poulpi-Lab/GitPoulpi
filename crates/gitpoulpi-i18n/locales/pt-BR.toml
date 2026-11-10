@@ -5079,6 +5079,7 @@ token_command_failed_tail = "O comando de token deste repositório falhou: {tail
 token_command_failed_code = "O comando de token deste repositório falhou (código {code})."
 token_command_failed_code_tail = "O comando de token deste repositório falhou (código {code}): {tail}"
 grant_refused = "O GitPoulpi não enviou o token da conta para {host}: não é {expected}, o endereço dessa conta."
+credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
 repo_auth_needs_confirmation = "Um auxiliar de credenciais ou comando de token só é guardado depois que você o confirma em SSH e credenciais."
 
 [window]

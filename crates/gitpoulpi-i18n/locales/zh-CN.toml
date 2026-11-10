@@ -5081,6 +5081,7 @@ token_command_failed_tail = "此仓库的令牌命令失败：{tail}"
 token_command_failed_code = "此仓库的令牌命令失败（退出码 {code}）。"
 token_command_failed_code_tail = "此仓库的令牌命令失败（退出码 {code}）：{tail}"
 grant_refused = "GitPoulpi 没有把账户令牌发送到 {host}：它不是 {expected}，即该账户的地址。"
+credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
 repo_auth_needs_confirmation = "凭据助手或令牌命令只有在你于“SSH 与凭据”中确认后才会保存。"
 
 [window]

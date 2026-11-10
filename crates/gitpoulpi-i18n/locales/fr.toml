@@ -7566,7 +7566,7 @@ sparse_state = "État"
 sparse_on = "activée"
 sparse_off = "désactivée"
 section_commit = "{$Commit}"
-section_merge = "Options de {$merge}"
+section_merge = "Options de {$merge_noun}"
 section_template = "Modèle de message"
 commit_push_after = "{$Push} à chaque {$commit}"
 commit_push_after_help = { git = "Après un commit réussi, fait un push de la branche extraite vers son amont, comme transfert suivi en arrière-plan. Une branche sans amont est laissée de côté ; l'avis le précise.", local = "Après une validation réussie, pousse la branche extraite vers son amont, comme transfert suivi en arrière-plan. Une branche sans amont est laissée de côté ; l'avis le précise." }

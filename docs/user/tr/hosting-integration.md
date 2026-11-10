@@ -628,18 +628,25 @@ Bir anahtar bağlıyken bölüm `title (SHA256:...)` gösterir ve şunlar bulunu
 
 ### Tek bir depo için SSH anahtarı
 
-Bir deponun bir profilin anahtarını kullanmasını sağlamak için GitPoulpi, o
-depoda `core.sshCommand` değerini `ssh -i "<key>" -o IdentitiesOnly=yes` olarak
-ayarlar. Bu asla kendiliğinden yapılmaz. Sekme menüsünü açın (`Ctrl+T` veya
-sekmeye sağ tık) ve **SSH anahtarı...**'nı seçin ya da *Depo: Bu Depo İçin SSH
-Anahtarı...* palet komutunu çalıştırın. Menü geçerli sabitlemeyi, özel anahtarı
-olan her profili ve **Sabitlemeyi temizle**'yi gösterir.
+Bir deponun belirli bir anahtarı kullanmasını sağlamak için sekme menüsünü
+açın (`Ctrl+T` veya sekmeye sağ tık) ve **SSH ve kimlik bilgileri...**'ni
+seçin ya da *Depo: SSH ve Kimlik Bilgileri...* palet komutunu çalıştırın, sonra
+SSH altında **Anahtar dosyası**'nı (veya bir entegrasyon profilinin anahtarı için
+**Hesap anahtarı**'nı) seçin. Seçim GitPoulpi'nin özel klasöründe tutulur:
+depoya veya git yapılandırmasına hiçbir şey yazılmaz. Bkz.
+[Ayarlar](settings.md#depoya-özel-ssh-ve-kimlik-bilgileri).
 
-CLI ve MCP: `gitpoulpi ssh-command show | set --key <file> | clear`.
+Hâlâ kendi `core.sshCommand` değerine sahip bir depo, eski "Bu depo için SSH
+anahtarı" sabitlemesinden kalan bu değeri o sayfada salt okunur gösterir,
+**GitPoulpi'ye taşı** ile birlikte.
+
+CLI ve MCP: `gitpoulpi repo-auth` (depo başına seçim) ve `core.sshCommand`
+sabitlemesinin kendisi için `gitpoulpi ssh-command show | set --key <file> |
+clear`.
 
 Ayarlar > SSH ve kimlik bilgileri'ndeki genel anahtar (*Özel anahtar yolu* veya
-*Anahtar çifti oluştur*) sabitlemesi olmayan her depoya uygulanır. Bir deponun
-sabitlemesi onun önüne geçer.
+*Anahtar çifti oluştur*) kendi seçimi olmayan her depoya uygulanır. Bir deponun
+anahtar dosyası veya sabitlemesi onun önüne geçer.
 
 ## 13b. Geçmişi yeniden yazma için dal koruması
 

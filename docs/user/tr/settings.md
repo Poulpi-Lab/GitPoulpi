@@ -304,9 +304,12 @@ Anahtar yolları bir sonraki aktarıma uygulanır. `~/` öneki ana klasörünüz
 
 Başka bir yerde yapılmış bir ayar bu yollara her zaman baskındır. Sıra, en yüksek olan önce:
 
+0. Tek bir deponun kendi [SSH ve kimlik bilgileri](#depoya-özel-ssh-ve-kimlik-bilgileri) sayfasında seçilen anahtar
+   (depoya özel grup).
 1. GitPoulpi'nin çalıştığı ortamdaki `GIT_SSH_COMMAND` ya da `GIT_SSH`.
 2. Deponun git yapılandırmasındaki ya da genel git yapılandırmanızdaki `core.sshCommand`.
-   Sekme menüsünün *SSH anahtarı...* öğesi bunu tek bir depo için yazar.
+   Eski sürümlerde sekme menüsünün *SSH anahtarı...* öğesi bunu tek bir depo için yazardı; SSH ve kimlik bilgileri
+   bunu GitPoulpi'ye taşımayı önerir.
 3. Bu sayfanın iki anahtar yolu.
 4. ssh'ın kendi varsayılanları ve ajan.
 
@@ -551,6 +554,58 @@ Kısmi checkout iletişim kutusuyla (`Depo: Kısmi Checkout...`) aynı denetimle
 
 Düğmeler olağan arka plan eylemleri olarak çalışır (biri çalışırken sayfa "kısmi checkout uygulanıyor..." gösterir). İletişim
 kutusu gibi, bunlar da Geri Al yığınında değildir: hiçbir şey kaybolmaz ve **Durdur** her dosyayı geri getirir.
+
+### Depoya Özel: SSH ve kimlik bilgileri
+
+`gitpoulpi ui show settings ssh-credentials`. *Bu deponun* nasıl oturum açtığı, GitPoulpi'nin özel klasöründe
+tutulur: depoya veya git yapılandırmasına hiçbir şey yazılmaz ve geri alınamaz (her ayar gibi). Yalnızca bu deponun
+fetch, pull, push, alt modül ve LFS işlemlerinde kullanılır. CLI karşılığı `gitpoulpi repo-auth` komutudur
+(bkz. [CLI başvurusu](cli-reference.md)). Sayfaya komut paletinden de ulaşılır:
+**Depo: SSH ve Kimlik Bilgileri...**. **Kaydet**'e basana kadar hiçbir şey gönderilmez; sayfa daemon'a sorar, bu
+yüzden asla bloke olmaz.
+
+| Satır | Ne yapar |
+|---|---|
+| **HTTPS: Oturum açma yöntemi** | **Sistem** (git'in kendi yardımcıları, varsayılan), **GitPoulpi hesabı** (bir entegrasyonun token'ı; sunucusu bu deponun uzak depolarından biri olan hesaplar öne gelir ve altındaki satır son token denetiminin bulduğunu söyler: eksik ve fazla kapsamlar), **Kimlik bilgisi yardımcısı** veya **Token komutu**. |
+| **Git kullanıcı adı** | HTTPS uzak depolarına kullanıcı adı olarak gönderilir. **Sistem** ile bir kimlik bilgisi yöneticisinin saklanan birkaç hesaptan birini seçmesini sağlar. |
+| **Bu deponun ayarladığı kimlik bilgisi yardımcılarını yok say** | Yalnızca **Sistem**. Deponun kendisi için ayarladığı yardımcılar (`.git/config` dosyası, içerdiği dosyalar) altında, her birinin geldiği dosyayla listelenir; sistem ve genel yardımcılar çalışmaya devam eder. |
+| **Yardımcı**, **Komut**, **Sunucular**, **Önbellek (dakika)** | Deponun oturum açmak için çalıştırdığı bir komut. *Yardımcı* bir git kimlik bilgisi yardımcısıdır; *token komutu* bir token yazdırır (bağımsız değişken listesi boşluklarla bölünür, boşluk içeren bir bağımsız değişken tırnak içine alınır ve **Şöyle çalışır** altında gösterilir; kabuk çalıştırmaz, depo klasöründe çalışır). **Sunucular** onu bu sunucularla sınırlar (boş: ana uzak deponun sunucusu); **Önbellek** bir token'ın ne kadar süre yeniden kullanılacağıdır (varsayılan 50 dakika). **Bu deponun geçerli yardımcısını kullan**, deponun ayarladığı yardımcıyı alana kopyalar. |
+| **SSH: Oturum açma yöntemi** | **Sistem** (ssh'ın kendi kurulumu, ajan ve varsayılan anahtarlar), **Anahtar dosyası** veya **Hesap anahtarı** (bir entegrasyonun anahtarı). |
+| **Özel anahtar dosyası** | `~/.ssh` içinde bulunan anahtarlardan birini seçin veya bir yol yazın. Yalnızca bu anahtar, deponun alt modüller dahil her SSH uzak deposuna sunulur. Başka hesaplar anahtar dosyasını okuyabiliyorsa (Linux ve macOS'ta grup veya diğerleri için bir izin biti, Windows'ta Everyone, Users veya Authenticated Users için bir girdi) bir uyarı OpenSSH'in böyle bir anahtarı reddettiğini ("bad permissions") söyler ve **Yalnızca hesabıma kısıtla** bunu düzeltir (`chmod 600`, Windows'ta yalnızca hesabınız ve SYSTEM için bir DACL). |
+| **Bilinen sunucular dosyası**, **Sıkı sunucu anahtarı denetimi** | Güvenilen sunucu anahtarlarından oluşan isteğe bağlı bir dosya ve içinde olmayan bir sunucuyu reddetme. |
+| **ssh programı** | Çalışacak program (salt okunur). |
+| **git yapılandırmasında sabitlenmiş** | Yalnızca bu depo kendi `core.sshCommand` değerini ayarlamışsa (GitPoulpi'nin eskiden yazdığı eski "Bu depo için SSH anahtarı" sabitlemesi). Komut salt okunur gösterilir. **GitPoulpi'ye taşı**, eşdeğer **Anahtar dosyası** seçimini kaydeder, sonra sabitlemeyi git yapılandırmasından kaldırır; komut yalın bir `ssh -i <key>` sabitlemesiyse sunulur, o da yalnızca sayfada kaydedilmemiş düzenleme yokken ve SSH seçimi hâlâ **Sistem** iken. Başka her komut bunun yerine bir notla gösterilir: `git config` ile düzenleyin. Taşıma, buradaki her ayar gibi geri alınamaz ve sabitlemenin kaldırılması da Geri Al yığınında değildir (hiçbir şey kaybolmaz: anahtar profildedir). |
+| **Uzak depolar** | Salt okunur: her uzak depo, protokolü ve kullanacağı kimlikle. Profilin geçersiz kıldığı ayarlar (`core.sshCommand`, `credential.helper`) dosyalarıyla listelenir ve kullanılamayan bir profil nedenini söyler. |
+
+Düğmeler (her birinin bir tuşu var: aralarında `Tab`/`Left`/`Right`, `Enter` basar):
+
+- **Bağlantıyı sına**, her uzak depoyu kaydedilen seçimlerle denetler, önce fetch sonra push (veri taşınmaz), ve bir
+  sonuç paneli açar: uzak depo başına tamam veya başarısız, yanıt veren kimlik (sunucunun kabul ettiği anahtar veya
+  token'ı kabul edilen hesap), süre ve bir başarısızlığın sade bir açıklaması. Arka planda çalışır, bir an sonra bir
+  döner simge görünür. Panel `Up`/`Down`, `PgUp`/`PgDn`, `Home`/`End`, tekerlek ve kaydırma çubuğuyla kayar,
+  `Esc` veya çarpısıyla kapanır. Palet karşılığı **Depo: Bağlantıyı Sına**'dır.
+- **Kaydet** seçimleri gönderir. **Geri al** kaydedilmemiş olanları bırakır. Kaydedilmemiş seçimlerle Ayarlar'ı kapatmak önce sorar.
+- **Varsayılanları kullan** sorar, sonra profili unutur: HTTPS için git'in yardımcıları ve SSH için ssh'ın kendi kurulumu.
+  Palet karşılığı **Depo: Varsayılan Kimlik Bilgilerini Kullan**'dır, o da sorar.
+
+Bir **Kimlik bilgisi yardımcısı** veya bir **Token komutu** kaydetmek önce **Bu komuta izin verilsin mi?** diye sorar:
+komut kelimesi kelimesine gösterilir (kontrol karakterleri yazıyla belirtilir, uzun satırlar sarılır), SHA-256 değeri ve
+iki yanıtla: `1` **Kaydet ve izin ver** ve `2` **İptal**. Bir ok tuşuna veya rakama basana kadar hiçbir yanıt seçili
+değildir, bu yüzden yanlışlıkla basılan `Enter` hiçbir şey yapmaz; `Esc`, **İptal** ve panelin çarpısı iptal eder.
+`PgUp`/`PgDn`/`Home`/`End` ve kaydırma çubuğu uzun bir komutu kaydırır. Komut zaten saklıysa ve değişmediyse, sayfanın
+öbür yarısını kaydetmek yeniden sormaz.
+
+Kullanılamayan bir profil (eksik bir anahtar dosyası, bu sürümün henüz çalıştırmadığı bir kaynak), aktarımın makinenin
+kendi kimliğine geri dönmek yerine nedeniyle başarısız olmasına yol açar.
+
+Profil tamamen varsayılan değilse, **Push** menüsü push'un kim olarak oturum açtığını söyleyen bir satırla biter
+(**Oturum açılan hesap: github-corp (token)** veya **SSH anahtarı: work_ed25519**); bu sayfayı açar. Aynı satır
+fetch, pull ve push'un Etkinlik Günlüğü girdilerine de eklenir. Bu sayfanın seçimlerinin yol açtığı bir başarısızlık
+(çalışmayan bir kimlik bilgisi yardımcısı, henüz bilinmeyen bir SSH sunucu anahtarı, reddedilen bir oturum açma,
+başarısız olan bir token komutu, sunucu hesabın adresi olmadığı için gönderilmeyen bir token) Etkinlik Günlüğü
+girdisinde bir **SSH ve kimlik bilgileri...** düğmesi gösterir (girdide `r`); kaynak bir entegrasyon hesabı olabiliyorsa
+**Entegrasyonları aç** düğmesinin yanında. Sekme menüsünün **SSH ve kimlik bilgileri...** satırı da sayfayı açar; eski
+**SSH anahtarı...** sabitleme menüsünün ve palet girdisinin yerini alır.
 
 ### Depoya Özel: LFS
 

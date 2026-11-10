@@ -101,7 +101,7 @@ sekmeler vardır ([genel arama](search.md) düğmesi başlık çubuğundadır).
   **Yeni sekme**, **Sekmeyi kapat**, **Diğer sekmeleri kapat...**, **Sağdaki sekmeleri kapat...**,
   **Favorilere ekle** (veya **Favorilerden kaldır**), **Çalışma alanına ekle** (veya
   **Çalışma alanından çıkar**, çalışma alanlarınız varken), **Yolu kopyala**,
-  **Şurada aç ›**, **SSH anahtarı...** ve **Kısmi checkout...**.
+  **Şurada aç ›**, **SSH ve kimlik bilgileri...** ve **Kısmi checkout...**.
 - `Ctrl+PageUp` ve `Ctrl+PageDown` sekmeler arasında geçiş yapar. `Ctrl+W`
   geçerli sekmeyi kapatır. Bir sekmeye orta tık da onu kapatır (aynı soruyla).
 - `t` (veya `Ctrl+N t`) sekme seçiciyi açar; açık sekmelerin aranabilir bir

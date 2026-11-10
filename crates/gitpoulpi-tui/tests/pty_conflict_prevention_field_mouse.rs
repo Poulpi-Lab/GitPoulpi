@@ -64,7 +64,11 @@ fn open_page(term: &mut Terminal) {
 }
 
 fn text_pos(term: &Terminal, needle: &str) -> (u16, u16) {
-    term.screen().find(needle).unwrap_or_else(|| {
+    // A settled screen: a torn frame has half of a menu or an editor.
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    screen.find(needle).unwrap_or_else(|| {
         panic!(
             "`{needle}` not on screen
 {}",
@@ -81,8 +85,8 @@ fn the_base_branches_editor_takes_click_drag_double_click_and_shift_click() {
     open_page(&mut term);
     // The patterns are editable once the repository keeps its own list.
     click_text(&mut term, "Base branches from");
-    term.wait_for("the source choices", STEP, |s| {
-        s.contains("\u{2713} Default")
+    term.wait_for("the source choices, Own list among them", STEP, |s| {
+        s.contains("\u{2713} Default") && s.contains("Own list     ")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The menu item, not the help text that also names Own list.

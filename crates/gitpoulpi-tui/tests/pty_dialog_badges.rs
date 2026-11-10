@@ -56,7 +56,7 @@ fn press_badge(term: &mut Terminal, label: &str, side: Side) {
     wait(term, "the badge on the control", move |s| {
         badge_of(s, &l, side).is_some()
     });
-    let badge = badge_of(&snap(&term), label, side).expect("badge");
+    let badge = badge_of(&snap(term), label, side).expect("badge");
     term.send_text(&badge.to_string()).unwrap();
 }
 

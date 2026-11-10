@@ -99,7 +99,7 @@ fn pick_language(term: &mut Terminal, current: &str, option: &str) {
         s.contains("\u{2713}") && !s.find_all(option).is_empty()
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = snap(&term);
+    let screen = snap(term);
     let (c, r) = screen
         .find_all(option)
         .into_iter()

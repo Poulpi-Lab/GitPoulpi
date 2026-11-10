@@ -88,7 +88,7 @@ fn snap(term: &Terminal) -> Screen {
 /// The text rightmost on the screen: the right panel's file list, never the
 /// view's title or the column.
 fn rightmost(term: &Terminal, text: &str) -> (u16, u16) {
-    snap(&term)
+    snap(term)
         .find_all(text)
         .into_iter()
         .max_by_key(|(c, _)| *c)
@@ -162,7 +162,7 @@ fn column_text(screen: &Screen) -> String {
 
 /// The cell of `text` inside the column (not in the view or the panel).
 fn in_column(term: &Terminal, text: &str) -> (u16, u16) {
-    let screen = snap(&term);
+    let screen = snap(term);
     let (x0, title_row) =
         column_origin(&screen).unwrap_or_else(|| panic!("no commit column\n{}", term.text()));
     let x1 = column_right(&screen).unwrap_or(x0 + 30);
@@ -806,7 +806,7 @@ fn selector_at(screen: &Screen) -> Option<(u16, u16)> {
 /// A click on the selector's `File` segment.
 fn click_file_segment(term: &mut Terminal) {
     let (col, row) =
-        selector_at(&snap(&term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
+        selector_at(&snap(term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
     std::thread::sleep(Duration::from_millis(450));
     term.click(col + 3, row).unwrap();
 }
@@ -814,7 +814,7 @@ fn click_file_segment(term: &mut Terminal) {
 /// A click on the selector's `All` segment.
 fn click_all_segment(term: &mut Terminal) {
     let (col, row) =
-        selector_at(&snap(&term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
+        selector_at(&snap(term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
     std::thread::sleep(Duration::from_millis(450));
     term.click(col + 8, row).unwrap();
 }
@@ -823,7 +823,7 @@ fn click_all_segment(term: &mut Terminal) {
 /// plain click.
 fn ctrl_click_all_segment(term: &mut Terminal) {
     let (col, row) =
-        selector_at(&snap(&term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
+        selector_at(&snap(term)).unwrap_or_else(|| panic!("the selector\n{}", term.text()));
     std::thread::sleep(Duration::from_millis(450));
     term.ctrl_click(col + 8, row).unwrap();
 }

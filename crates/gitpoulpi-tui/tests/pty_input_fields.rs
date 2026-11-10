@@ -257,7 +257,7 @@ fn the_input_color_setting_applies_live_and_a_custom_hex_is_honoured() {
     let (mut term, config) = launch(repo.root(), "pty-input-color", "", "initial commit");
     let hint = "(click or press / to filter)";
     let filter_bg = |term: &Terminal| {
-        let screen = snap(&term);
+        let screen = snap(term);
         let (col, row) = screen.find(hint).expect("the Refs filter hint");
         screen.cell(col + 1, row).unwrap().bg
     };

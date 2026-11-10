@@ -155,7 +155,7 @@ fn a_shift_range_compares_the_two_ends_of_the_file() {
 
 /// The column where the diff's own frame starts: the splitter's cell.
 fn diff_left(term: &Terminal) -> Option<usize> {
-    snap(&term).text().lines().find_map(|l| {
+    snap(term).text().lines().find_map(|l| {
         let at = l.find("\u{256d} memo.txt")?;
         Some(l[..at].chars().count())
     })
@@ -277,7 +277,7 @@ fn the_row_menu_restores_and_blames_at_that_commit() {
 
 /// The row of the view tabs (File View / Diff View / Blame / History).
 fn bar_row(term: &Terminal) -> u16 {
-    let screen = snap(&term);
+    let screen = snap(term);
     (0..screen.rows())
         .find(|r| {
             let l = screen.line(*r);
@@ -288,7 +288,7 @@ fn bar_row(term: &Terminal) -> u16 {
 
 /// The background of the cell just after where `needle` starts on screen row `row`.
 fn bg_of(term: &Terminal, row: u16, needle: &str) -> xtask::pty::Color {
-    let screen = snap(&term);
+    let screen = snap(term);
     let line = screen.line(row);
     let at = line
         .find(needle)
@@ -422,7 +422,7 @@ fn the_bar_buttons_pick_the_right_side_and_stay_in_the_history() {
 
 /// A click on a label of the view bar.
 fn click_bar(term: &mut Terminal, label: &str) {
-    let screen = snap(&term);
+    let screen = snap(term);
     // The first hit that is not the list's own title (" History - file").
     let (bar, col) = (0..screen.rows())
         .find_map(|r| {
@@ -438,7 +438,7 @@ fn click_bar(term: &mut Terminal, label: &str) {
 
 /// The first cell of the History list's frame on its title row.
 fn list_origin(term: &Terminal) -> Option<(u16, u16)> {
-    let screen = snap(&term);
+    let screen = snap(term);
     let (c, r) = screen.find(" File History - ")?;
     Some((c.saturating_sub(1), r))
 }
@@ -446,7 +446,7 @@ fn list_origin(term: &Terminal) -> Option<(u16, u16)> {
 /// The reopen strip's chevron, in the cell right of the central column's
 /// left edge `x0`.
 fn chevron(term: &Terminal, x0: u16) -> Option<(u16, u16)> {
-    let screen = snap(&term);
+    let screen = snap(term);
     (0..screen.rows()).find_map(|row| {
         let at = screen.line(row).chars().nth(usize::from(x0) + 1)?;
         (at == '\u{203A}').then_some((x0 + 1, row))
@@ -536,7 +536,7 @@ fn the_selector_switches_lists_by_the_mouse_and_the_palette_rows_pick_a_state() 
     term.wait_for("the list", STEP, |s| s.contains("shout two"))
         .unwrap();
     let on_segment = |term: &mut Terminal, dx: u16| {
-        let (col, row) = snap(&term)
+        let (col, row) = snap(term)
             .find(SELECTOR)
             .unwrap_or_else(|| panic!("the selector\n{}", term.text()));
         std::thread::sleep(Duration::from_millis(450));

@@ -1259,7 +1259,7 @@ fn wait_for_file_containing(term: &Terminal, path: &Path, needle: &str) {
             std::time::Instant::now() < deadline,
             "{} never contained {needle:?}. Screen was:\n{}",
             path.display(),
-            snap(&term).text()
+            snap(term).text()
         );
         std::thread::sleep(Duration::from_millis(200));
     }
@@ -1272,7 +1272,7 @@ fn wait_for_agent_calls(term: &Terminal, agent: &Path, n: usize) {
         assert!(
             std::time::Instant::now() < deadline,
             "the agent was never called {n} time(s). Screen was:\n{}",
-            snap(&term).text()
+            snap(term).text()
         );
         std::thread::sleep(Duration::from_millis(200));
     }

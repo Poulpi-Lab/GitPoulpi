@@ -434,7 +434,7 @@ fn the_commit_file_menu_has_the_full_set_and_restore_is_undone_by_ctrl_z() {
     let repo = two_commits();
     let (mut term, _config) = launch(repo.root(), "pty-filepane-restore", "second version");
     select_commit(&mut term, "first version");
-    let screen = open_menu(&mut term, "a.txt", (0, 0), "the commit file menu", |s| {
+    open_menu(&mut term, "a.txt", (0, 0), "the commit file menu", |s| {
         s.contains("Restore file from this commit")
     });
     let wants = [

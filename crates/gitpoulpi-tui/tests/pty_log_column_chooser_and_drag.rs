@@ -63,7 +63,7 @@ fn quit(mut term: Terminal) {
 }
 
 fn open_chooser(term: &mut Terminal) {
-    let (x, row) = header(&snap(&term), "Author").unwrap();
+    let (x, row) = header(&snap(term), "Author").unwrap();
     term.right_click(x + 1, row).unwrap();
     term.wait_for("the chooser", STEP, chooser_open)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

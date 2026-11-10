@@ -123,7 +123,7 @@ fn repo(dirty: bool) -> gitpoulpi_testkit::FixtureRepo {
 }
 
 fn open_file_view(term: &mut Terminal, name: &str) {
-    if snap(&term).find(name).is_none() {
+    if snap(term).find(name).is_none() {
         let (c, r) = term.wait_for_text("View all files", STEP).unwrap();
         term.click(c + 6, r).unwrap();
     }

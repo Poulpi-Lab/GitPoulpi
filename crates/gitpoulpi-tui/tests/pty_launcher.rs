@@ -39,7 +39,7 @@ fn launcher_row_is(screen: &xtask::pty::Screen, value: &str) -> bool {
 }
 
 fn click_text(term: &mut Terminal, text: &str) {
-    let (col, row) = snap(&term)
+    let (col, row) = snap(term)
         .find_all(text)
         .into_iter()
         .next()

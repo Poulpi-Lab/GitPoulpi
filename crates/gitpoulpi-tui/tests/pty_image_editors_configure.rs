@@ -95,7 +95,7 @@ fn the_images_page_edits_the_viewer_keys_and_the_editor_list() {
     // keyboard on entering the page).
     assert!(config_of(dir).ui.image_view, "on by default");
     let toggle = |term: &mut xtask::pty::Terminal| {
-        let (c, r) = snap(&term).find("Preview images").unwrap();
+        let (c, r) = snap(term).find("Preview images").unwrap();
         term.click(c + 1, r).unwrap();
     };
     toggle(&mut term);

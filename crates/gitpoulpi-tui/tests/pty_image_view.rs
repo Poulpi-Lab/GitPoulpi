@@ -81,7 +81,7 @@ fn repo_with(files: &[(&str, Vec<u8>)]) -> gitpoulpi_testkit::FixtureRepo {
 fn open_file_view(term: &mut Terminal, name: &str) {
     // View all files stays on after the first time (a second open in one
     // session finds the list already there).
-    if snap(&term).find(name).is_none() {
+    if snap(term).find(name).is_none() {
         let (c, r) = term.wait_for_text("View all files", STEP).unwrap();
         term.click(c + 6, r).unwrap();
     }

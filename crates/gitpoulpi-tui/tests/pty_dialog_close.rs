@@ -64,7 +64,7 @@ fn init_cross(term: &Terminal) -> (u16, u16) {
         .expect("the title row");
     assert!(line.contains(CROSS), "a cross on the title row: {line:?}");
     assert!(!line.contains("Esc"), "no Esc beside the cross: {line:?}");
-    let (c, r) = snap(&term).find(CROSS).expect("the cross");
+    let (c, r) = snap(term).find(CROSS).expect("the cross");
     assert_eq!(r as usize, row, "the first cross is the dialog's");
     (c, r)
 }

@@ -373,3 +373,34 @@ fn reset_to_the_built_in_default_clears_the_default_list() {
         ""
     );
 }
+
+#[test]
+fn the_repository_page_draws_the_source_choice_and_the_list_buttons() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "ConflictPrevention");
+    let screen = crate::preferences::tests::draw_screen(&mut st);
+    for want in [
+        "Base branches from",
+        "Default (every branch)",
+        "Save as list...",
+        "Reset to default",
+    ] {
+        assert!(screen.contains(want), "{want} missing:\n{screen}");
+    }
+}
+
+#[test]
+fn the_general_page_groups_the_lists_under_the_global_switch() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "General");
+    type_text(&mut st, "New list", "trunk");
+    let labels: Vec<String> = st.fields().iter().map(|f| f.label.clone()).collect();
+    let at = |l: &str| labels.iter().position(|x| x == l).unwrap();
+    assert!(at("Conflict prevention") < at("Enable proactive conflict detection"));
+    assert!(at("Enable proactive conflict detection") < at("Default base branches"));
+    assert!(at("Default base branches") < at("Base branch lists"));
+    assert!(at("Base branch lists") < at("trunk"));
+    assert!(at("trunk") < at("New list"));
+    // The undo group still follows the whole block.
+    assert!(at("New list") < at(gitpoulpi_i18n::msg::settings_general::HEADING_UNDO.get()));
+}

@@ -100,9 +100,22 @@ fn undo_off_removes_the_buttons_after_a_confirmation() {
         .unwrap_or_else(|e| panic!("{e}"));
 
     // Back on: no question, the buttons return.
-    let (col, row) = open_undo_row(&mut term);
-    term.click(col + 1, row).unwrap();
-    wait_config(&path, "undo_enabled = true");
+    open_undo_row(&mut term);
+    // Retried (located afresh): a click placed on a torn frame lands nowhere.
+    common::retry_until(
+        &mut term,
+        "undo_enabled = true saved",
+        4,
+        STEP,
+        |t| {
+            if !config_has(&path, "undo_enabled = true") {
+                if let Some((col, row)) = t.screen().find("Undo enabled") {
+                    t.click(col + 1, row).unwrap();
+                }
+            }
+        },
+        |_| config_has(&path, "undo_enabled = true"),
+    );
     term.send_keys("Escape").unwrap();
     term.wait_for("the buttons back", STEP, |s| {
         !s.contains("Repo-specific settings") && s.contains(UNDO_BUTTON) && s.contains(REDO_BUTTON)

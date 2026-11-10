@@ -217,8 +217,26 @@ fn settings_workflow_pick_git_flow_detect_and_save_the_shared_file() {
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (sc, sr) = screen.find("Save to the shared file").unwrap();
-    term.click(sc + 1, sr).unwrap();
-    term.click(sc + 1, sr).unwrap();
+    // A button needs a selecting click, then the running one; both are
+    // repeated (located afresh) until the file exists: a click placed on a
+    // torn frame lands nowhere.
+    common::retry_until(
+        &mut term,
+        "the shared file saved",
+        4,
+        STEP,
+        |t| {
+            if !shared_file(repo.root()).exists() {
+                let (sc, sr) = t
+                    .screen()
+                    .find("Save to the shared file")
+                    .unwrap_or((sc, sr));
+                t.click(sc + 1, sr).unwrap();
+                t.click(sc + 1, sr).unwrap();
+            }
+        },
+        |_| shared_file(repo.root()).exists(),
+    );
     let text = wait_file(&shared_file(repo.root()), "the shared workflow file");
     assert!(text.contains("template = \"git-flow\""), "{text}");
     assert!(text.contains("pattern = \"feature/{slug}\""), "{text}");

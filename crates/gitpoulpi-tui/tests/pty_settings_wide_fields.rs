@@ -165,8 +165,21 @@ mod env_rows {
             4,
             STEP,
             |t| {
-                if !t.screen().contains("on\u{2588}") {
-                    t.click(cross - 6, row).expect("click the value field");
+                let s = t.screen();
+                if !s.contains("on\u{2588}") {
+                    // Located afresh: the page can still be settling.
+                    if let Some((_, row)) = s.find("Env MY_FLAG") {
+                        if let Some(cross) = s
+                            .line(row)
+                            .chars()
+                            .collect::<Vec<_>>()
+                            .iter()
+                            .rposition(|c| *c == '\u{2715}')
+                        {
+                            t.click(cross as u16 - 6, row)
+                                .expect("click the value field");
+                        }
+                    }
                 }
             },
             |s| s.contains("on\u{2588}"),

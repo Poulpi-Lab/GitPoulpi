@@ -93,7 +93,13 @@ fn picking_core_autocrlf_in_settings_writes_git_config_and_undo_restores_it() {
         .expect("the row's value");
     term.click(vc + 1, vr).unwrap();
     let popup = term
-        .wait_for("the options", STEP, |s| s.contains("\u{2713} true"))
+        .wait_for("the options", STEP, |s| {
+            s.find("\u{2713} true").is_some_and(|(tc, tr)| {
+                s.find_all("input")
+                    .into_iter()
+                    .any(|(c, r)| r > tr && c.abs_diff(tc) < 6)
+            })
+        })
         .unwrap_or_else(|e| panic!("{e}"));
     let (tc, tr) = popup.find("\u{2713} true").unwrap();
     let (ic, ir) = popup

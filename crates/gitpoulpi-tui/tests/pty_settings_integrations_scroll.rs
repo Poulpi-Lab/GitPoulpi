@@ -81,7 +81,7 @@ fn tab_down_to_the_combobox_shows_it_and_a_key_changes_it() {
     }
     let screen = term
         .wait_for("the combobox scrolled into view", STEP, |s| {
-            s.contains(COMBO_LABEL)
+            s.contains(COMBO_LABEL) && s.contains("Ask")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(screen.contains("Ask"), "{}", screen.text());

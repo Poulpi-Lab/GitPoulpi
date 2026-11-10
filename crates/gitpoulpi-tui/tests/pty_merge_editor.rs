@@ -58,6 +58,19 @@ fn open_with_enter(term: &mut Terminal, name: &str, header: &str) {
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
+/// Where B's chunk header checkbox is (the right-hand `[ ] Conflict 1`):
+/// waited for with A's on the same row, since a torn frame can show one.
+fn b_chunk_header(term: &Terminal) -> (u16, u16) {
+    let both = |s: &Screen| {
+        s.find("[ ] Conflict 1")
+            .and_then(|(c, r)| find_from(s, "[ ] Conflict 1", r, c + 1).map(|b| (b, r)))
+    };
+    let screen = term
+        .wait_for("both chunk headers", STEP, |s| both(s).is_some())
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    both(&screen).expect("the predicate just matched")
+}
+
 /// The text of the Output pane: every row under its title rule. What the
 /// A and B panes show never counts, so a wait on a pick is not satisfied by
 /// the panes that always show both sides.
@@ -404,9 +417,7 @@ fn the_mouse_picks_chunks_and_lines_and_the_save_confirms_unpicked_conflicts() {
     open_with_enter(&mut term, "a.txt", "Conflict 1 / 3");
 
     // The checkbox on B's chunk header (the right-hand one).
-    let screen = term.screen();
-    let (c, r) = screen.find("[ ] Conflict 1").expect("A's chunk header");
-    let c = find_from(&screen, "[ ] Conflict 1", r, c + 1).expect("B's chunk header");
+    let (c, r) = b_chunk_header(&term);
     term.click(c + 1, r).unwrap();
     term.wait_for("B's lines in the Output", STEP, |s| {
         let out = output_text(s);
@@ -671,11 +682,19 @@ fn every_entry_point_opens_the_editor() {
     // The Diff view of the file: its bar button and its key.
     // (A click on the row would reopen the editor: the Status pane's `d`
     // opens the diff view, which shows the conflict card.)
-    term.send_keys("d").unwrap();
-    term.wait_for("the diff with the Merge Editor button", STEP, |s| {
-        s.contains(" Merge editor ")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // (Retried: a key sent while the editor is still closing is lost.)
+    common::retry_until(
+        &mut term,
+        "the diff with the Merge Editor button",
+        4,
+        STEP,
+        |t| {
+            if !t.screen().contains(" Merge editor ") {
+                t.send_keys("d").unwrap();
+            }
+        },
+        |s| s.contains(" Merge editor "),
+    );
     let (bc, br) = term
         .wait_for_text(" Merge editor ", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
@@ -812,9 +831,7 @@ fn full_file_toggles_by_key_and_click_and_picks_still_work() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Picking by the mouse works on top of it: B's chunk header checkbox.
-    let screen = term.screen();
-    let (c, r) = screen.find("[ ] Conflict 1").expect("A's chunk header");
-    let c = find_from(&screen, "[ ] Conflict 1", r, c + 1).expect("B's chunk header");
+    let (c, r) = b_chunk_header(&term);
     term.click(c + 1, r).unwrap();
     term.wait_for("B's lines in the Output", STEP, |s| {
         let out = output_text(s);
@@ -853,9 +870,7 @@ fn the_context_menu_the_wheel_the_height_key_and_the_splitter() {
     open_with_enter(&mut term, "a.txt", "Conflict 1 / 3");
 
     // Right-click B's chunk header: the menu's "Take B only" row.
-    let screen = term.screen();
-    let (c, r) = screen.find("[ ] Conflict 1").expect("A's chunk header");
-    let bc = find_from(&screen, "[ ] Conflict 1", r, c + 1).expect("B's chunk header");
+    let (bc, r) = b_chunk_header(&term);
     term.right_click(bc + 1, r).unwrap();
     let menu = term
         .wait_for("the chunk menu", STEP, |s| s.contains("Take B only"))
@@ -1075,6 +1090,14 @@ fn divider_at(s: &Screen) -> (u16, u16) {
     s.find("\u{252c}").unwrap_or((0, 0))
 }
 
+/// [`divider_at`] once the divider is drawn (a torn frame can lack it).
+fn wait_divider(term: &Terminal) -> (u16, u16) {
+    let s = term
+        .wait_for("the A | B divider", STEP, |s| s.find("\u{252c}").is_some())
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    divider_at(&s)
+}
+
 /// Slice SR: the A | B divider is draggable (B gets wider), a double click
 /// resets it, `Alt+arrows` move it by keys, the Output splitter still
 /// drags, and `Reset Pane Sizes` is in the palette.
@@ -1083,7 +1106,7 @@ fn the_ab_divider_drags_double_click_resets_and_the_keys_move_it() {
     let fixture = ConflictFixture::multi_conflict();
     let (mut term, _config) = launch(fixture.root(), "pty-merge-resize", 200, 50);
     open_with_enter(&mut term, "a.txt", "Conflict 1 / 3");
-    let (d0, row) = divider_at(&term.screen());
+    let (d0, row) = wait_divider(&term);
 
     // Hovering the divider lights its rule (the cells become bold-weight).
     term.move_to(d0, row + 3).unwrap();

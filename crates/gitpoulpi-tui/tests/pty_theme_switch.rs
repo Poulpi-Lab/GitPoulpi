@@ -192,13 +192,24 @@ fn the_theme_combo_previews_commits_restores_and_lists_user_themes() {
     .unwrap_or_else(|e| panic!("{e}"));
 
     // The lane combo: Follow theme and every palette; picking one recolors.
-    let nord_lane = lane_fg(&term.screen()).expect("a lane marker");
+    let nord_lane = lane_fg(
+        &term
+            .wait_for("a lane marker", STEP, |s| lane_fg(s).is_some())
+            .unwrap_or_else(|e| panic!("{e}")),
+    )
+    .expect("a lane marker");
     open_settings(&mut term, "Appearance");
     // Input color also reads "Follow theme": take the lane row's combo.
     // The page is longer than the window: bring the lane row into view.
     common::scroll_settings_to(&mut term, "Graph color theme", STEP);
     let screen = term
-        .wait_for("the lane row", STEP, |s| s.contains("Graph color theme"))
+        .wait_for("the lane row with its combo", STEP, |s| {
+            s.find("Graph color theme").is_some_and(|(_, label_row)| {
+                s.find_all("Follow theme")
+                    .into_iter()
+                    .any(|(_, r)| r == label_row)
+            })
+        })
         .unwrap_or_else(|e| panic!("{e}"));
     let (_, label_row) = screen.find("Graph color theme").unwrap();
     let (col, row) = screen

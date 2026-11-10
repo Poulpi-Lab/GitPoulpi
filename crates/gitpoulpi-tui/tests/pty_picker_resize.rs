@@ -104,7 +104,25 @@ fn the_browse_divider_is_ew_resize_lit_like_the_other_resize_lines_and_unlit_on_
     let rest = fg_at(&term, col, row);
 
     // Hover: the sideways resize pointer, and the accent line.
-    term.move_to(col, row).unwrap();
+    // The move is repeated (from beside the line, so each one is a real
+    // move): one sent before the divider's hit target is registered is lost
+    // and no other follows.
+    let mut over = false;
+    for _ in 0..6 {
+        term.move_to(col - 2, row).unwrap();
+        term.move_to(col, row).unwrap();
+        let deadline = std::time::Instant::now() + Duration::from_secs(4);
+        while std::time::Instant::now() < deadline {
+            if pointer_shapes(&term).last().map(String::as_str) == Some("ew-resize") {
+                over = true;
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(50));
+        }
+        if over {
+            break;
+        }
+    }
     wait_shape(&term, "over the divider", "ew-resize");
     let lit = {
         let deadline = std::time::Instant::now() + STEP;

@@ -107,16 +107,31 @@ fn clicking_the_alias_create_button_creates_it() {
 fn enter_on_the_selected_alias_create_row_presses_its_button() {
     let (mut term, _config, home) = open_settings("General", "settings-buttons-enter");
     scroll_to(&mut term, "Create: command alias");
-    let (col, row) = settled_create(&term);
-    // A click left of the button (the empty label column) only selects the row.
-    term.click(col - 3, row).unwrap();
-    std::thread::sleep(Duration::from_millis(500));
-    assert!(
-        std::fs::symlink_metadata(home.path().join(".local/bin/gp")).is_err(),
-        "selecting the row must not press the button"
-    );
-    term.send_keys("Enter").unwrap();
-    wait_link(&term, &home.path().join(".local/bin/gp"));
+    let link = home.path().join(".local/bin/gp");
+    // A click left of the button (the empty label column) only selects the
+    // row, then Enter presses the button. A click lost to a torn frame
+    // selects nothing and Enter then does nothing: try again, located afresh.
+    let deadline = std::time::Instant::now() + xtask::pty::scaled(STEP);
+    while std::fs::symlink_metadata(&link).is_err() {
+        assert!(
+            std::time::Instant::now() < deadline,
+            "the alias was never created\n{}",
+            term.text()
+        );
+        let (col, row) = settled_create(&term);
+        term.click(col - 3, row).unwrap();
+        std::thread::sleep(Duration::from_millis(500));
+        assert!(
+            std::fs::symlink_metadata(&link).is_err(),
+            "selecting the row must not press the button"
+        );
+        term.send_keys("Enter").unwrap();
+        let wait_until = std::time::Instant::now() + Duration::from_secs(5);
+        while std::fs::symlink_metadata(&link).is_err() && std::time::Instant::now() < wait_until {
+            std::thread::sleep(Duration::from_millis(100));
+        }
+    }
+    wait_link(&term, &link);
     let _ = term.stop();
 }
 

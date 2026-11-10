@@ -108,7 +108,7 @@ carries tabs (the [global search](search.md) button is in the title bar).
   **Close other tabs...**, **Close tabs to the right...**, **Add to favorites** (or
   **Remove from favorites**), **Add to workspace** (or **Remove from
   workspace**, when you have workspaces), **Copy path**, **Open in ›**,
-  **SSH key...** and **Sparse checkout...**.
+  **SSH & credentials...** and **Sparse checkout...**.
 - `Ctrl+PageUp` and `Ctrl+PageDown` switch tabs. `Ctrl+W` closes the current
   tab. A middle-click on a tab closes it too (with the same question).
 - `t` (or `Ctrl+N t`) opens the tab picker, a searchable list of the open

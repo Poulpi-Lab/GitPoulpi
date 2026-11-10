@@ -208,7 +208,10 @@ fn commit_and_ref_menus_hold_over_cjk_text() {
                 row,
             );
             let tag = |name: &str| {
-                format!("{name} menu [{} terms={terms} {w}x{h} @{col},{row}]", lang.code())
+                format!(
+                    "{name} menu [{} terms={terms} {w}x{h} @{col},{row}]",
+                    lang.code()
+                )
             };
             check_with_flyouts(&tag("commit"), &commit, w, h, n % 3 == 0);
             check_with_flyouts(&tag("ref"), &refm, w, h, n % 3 == 0);
@@ -279,7 +282,13 @@ fn the_palette_and_help_overlays_hold_over_cjk_text() {
                 &what,
                 w,
                 h,
-                |_| popup.borrow().as_ref().map(|p: &crate::chrome::PalettePopup| p.popup).unwrap(),
+                |_| {
+                    popup
+                        .borrow()
+                        .as_ref()
+                        .map(|p: &crate::chrome::PalettePopup| p.popup)
+                        .unwrap()
+                },
                 |frame| {
                     render_command_palette(
                         frame,

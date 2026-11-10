@@ -62,7 +62,10 @@ fn is_blank(symbol: &str) -> bool {
 }
 
 fn is_rule(symbol: &str) -> bool {
-    symbol.chars().all(|c| ('\u{2500}'..='\u{257F}').contains(&c)) && !symbol.is_empty()
+    symbol
+        .chars()
+        .all(|c| ('\u{2500}'..='\u{257F}').contains(&c))
+        && !symbol.is_empty()
 }
 
 /// Rule (a): a wide glyph keeps its blank continuation and never starts in
@@ -82,7 +85,9 @@ pub(crate) fn wide_violations(buf: &Buffer) -> Vec<String> {
                 continue;
             }
             if x + 1 >= right {
-                out.push(format!("({x},{y}): wide glyph {symbol:?} in the last column"));
+                out.push(format!(
+                    "({x},{y}): wide glyph {symbol:?} in the last column"
+                ));
                 continue;
             }
             for k in 1..w as u16 {
@@ -150,7 +155,9 @@ pub(crate) fn box_violations_of(buf: &Buffer, rect: Rect) -> Vec<String> {
     ] {
         let s = buf[(x, y)].symbol();
         if s != want {
-            out.push(format!("({x},{y}): the corner of {rect:?} is {s:?}, not {want:?}"));
+            out.push(format!(
+                "({x},{y}): the corner of {rect:?} is {s:?}, not {want:?}"
+            ));
         }
     }
     for x in x0 + 1..x1 {

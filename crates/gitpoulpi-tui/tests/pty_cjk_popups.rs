@@ -133,7 +133,18 @@ fn assert_box_around(term: &Terminal, what: &str, col: u16, row: u16) -> (u16, u
         let l = cell_text(&screen, x0, y);
         assert_eq!(l, "\u{2502}", "{what}: left side at ({x0},{y})\n{}", dump());
         let r = cell_text(&screen, x1, y);
-        let ok = r == "\u{2502}" || (has_bar && matches!(r.as_str(), " " | "\u{2588}" | "\u{2503}" | "\u{2191}" | "\u{2193}" | "\u{25A0}" | "\u{2591}" | "\u{2592}"));
+        let ok = r == "\u{2502}"
+            || (has_bar
+                && matches!(
+                    r.as_str(),
+                    " " | "\u{2588}"
+                        | "\u{2503}"
+                        | "\u{2191}"
+                        | "\u{2193}"
+                        | "\u{25A0}"
+                        | "\u{2591}"
+                        | "\u{2592}"
+                ));
         assert!(ok, "{what}: right side at ({x1},{y}) is {r:?}\n{}", dump());
     }
     assert_eq!(
@@ -176,7 +187,11 @@ fn the_commit_context_menu_is_whole_and_unspaced_in_cjk() {
             .unwrap_or_else(|e| panic!("{what}: {e}"));
         // The menu's title row, then its box.
         let title_row = (0..screen.rows())
-            .find(|r| screen.compact_line(*r).contains(&format!("\u{256D}{short}")))
+            .find(|r| {
+                screen
+                    .compact_line(*r)
+                    .contains(&format!("\u{256D}{short}"))
+            })
             .unwrap();
         let title_col = screen.find(&format!("\u{256D}{short}")).unwrap().0;
         let (x0, y0, x1, y1) = assert_box_around(&term, &what, title_col + 1, title_row + 1);
@@ -204,7 +219,11 @@ fn the_commit_context_menu_is_whole_and_unspaced_in_cjk() {
                 shortcut_ends.push((y, hint.chars().count() as u16, inner.trim_end().len()));
             }
         }
-        assert!(cjk_rows >= 5, "{what}: the menu is not in {lang}?\n{}", term.text());
+        assert!(
+            cjk_rows >= 5,
+            "{what}: the menu is not in {lang}?\n{}",
+            term.text()
+        );
         // Every shortcut ends at the same cell, flush with the right border.
         let mut ends = Vec::new();
         for (y, _, _) in &shortcut_ends {
@@ -247,8 +266,9 @@ fn the_settings_language_dropdown_reads_unspaced_and_closes_its_box() {
             .wait_for("the Language choice", STEP, |s| {
                 (0..s.rows()).any(|r| {
                     let l = s.compact_line(r);
-                    l.find(endonym)
-                        .is_some_and(|i| l[i + endonym.len()..].trim_start().starts_with('\u{25BE}'))
+                    l.find(endonym).is_some_and(|i| {
+                        l[i + endonym.len()..].trim_start().starts_with('\u{25BE}')
+                    })
                 })
             })
             .unwrap_or_else(|e| panic!("{what}: {e}\n{}", term.text()));
@@ -284,7 +304,11 @@ fn the_settings_language_dropdown_reads_unspaced_and_closes_its_box() {
                     .collect();
                 inner.contains(name)
             });
-            assert!(found, "{what}: {name:?} is missing or spaced out\n{}", term.text());
+            assert!(
+                found,
+                "{what}: {name:?} is missing or spaced out\n{}",
+                term.text()
+            );
         }
     }
 }

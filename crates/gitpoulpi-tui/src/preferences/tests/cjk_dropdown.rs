@@ -3,9 +3,9 @@
 //! text behind it), at three terminal sizes over a background of CJK text.
 
 use super::*;
-use ratatui::buffer::Buffer;
 use crate::cjk_sweep_tests::{cjk_background, each_cjk};
 use crate::render_check as rc;
+use ratatui::buffer::Buffer;
 
 /// A state on the page that holds the Language row, focused on it.
 fn language_state(dir: &Path) -> PreferencesState {
@@ -58,7 +58,10 @@ fn the_language_dropdown_is_whole_in_every_cjk_language_and_size() {
             .map(|(r, _)| rc::row_text_in(&open, r.y, *r))
             .collect();
         for name in ["简体中文", "日本語", "한국어"] {
-            if let Some(line) = shown.iter().find(|l| l.contains(name.chars().next().unwrap())) {
+            if let Some(line) = shown
+                .iter()
+                .find(|l| l.contains(name.chars().next().unwrap()))
+            {
                 assert!(
                     line.contains(name),
                     "{what}: {name:?} is spaced out: {line:?}"
@@ -103,7 +106,12 @@ fn the_language_combo_over_cjk_text_cuts_no_glyph() {
             let popup = combo.popup_rect();
             let mut all = rc::wide_violations(&buf);
             all.extend(rc::box_violations_of(&buf, popup));
-            assert!(all.is_empty(), "{what}: {}\n{}", all.join("\n"), rc::dump(&buf));
+            assert!(
+                all.is_empty(),
+                "{what}: {}\n{}",
+                all.join("\n"),
+                rc::dump(&buf)
+            );
         }
     });
 }

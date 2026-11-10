@@ -5078,7 +5078,7 @@ token_command_failed_tail = "이 저장소의 토큰 명령이 실패했습니�
 token_command_failed_code = "이 저장소의 토큰 명령이 실패했습니다 (종료 코드 {code})."
 token_command_failed_code_tail = "이 저장소의 토큰 명령이 실패했습니다 (종료 코드 {code}): {tail}"
 grant_refused = "GitPoulpi는 계정 토큰을 {host}에 보내지 않았습니다. {host}은(는) 그 계정의 주소인 {expected}이(가) 아닙니다."
-credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
+credential_helper_unreachable = "GitPoulpi의 자격 증명 도우미가 데몬에 연결하지 못해 이 저장소의 로그인 정보를 보내지 않았습니다. 다시 시도하고, 계속되면 SSH 및 자격 증명을 확인하세요."
 repo_auth_needs_confirmation = "자격 증명 도우미나 토큰 명령은 SSH 및 자격 증명에서 확인한 경우에만 저장됩니다."
 
 [window]

@@ -121,6 +121,31 @@ kullanır. Önce düz bir terminalde `git fetch` çalıştığından emin olun. 
 request'ler için GitHub/GitLab token'ları ayrı ve isteğe bağlıdır: bkz.
 [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md).
 
+**Bir fetch, pull veya push "Yapılandırılmış kimlik bilgisi yardımcısı başarısız oldu", "Uzak deponun SSH ana makine anahtarı henüz bilinmiyor" veya reddedilen bir oturum açmayla başarısız oluyor ve Etkinlik Günlüğü girdisinde bir "SSH ve kimlik bilgileri..." düğmesi var.**
+Başarısızlık bu deponun nasıl oturum açtığından kaynaklanıyor. Düğme
+Ayarlar > SSH ve kimlik bilgileri sayfasını açar; orada bu depo için başka bir
+kaynak seçersiniz: deponun yardımcıları yok sayılmış git'in kendi yardımcıları,
+bir entegrasyon hesabı, bir anahtar dosyası (bilinen sunucular dosyasıyla) veya
+kendi yardımcınız ya da token komutunuz; **Bağlantıyı sına** sonra her uzak
+depoyu denetler. Çalışmayan bir yardımcı için `git config --show-origin
+--get-all credential.helper` nerede ayarlandığını gösterir.
+
+**"GitPoulpi hesap token'ını ... sunucusuna göndermedi".** Deponun uzak deposu,
+seçilen hesabın bağlı olduğu adres olmayan bir sunucuya işaret ediyor (çoğu
+zaman deponun kendi yapılandırmasındaki bir `url.<x>.insteadOf` yeniden yazımı),
+bu yüzden token tutuldu. Uzak depoyu düzeltin veya sayfada başka bir kaynak seçin.
+
+**"Bu deponun token komutu başarısız oldu", "... onayladığınızdan beri değişti", "Bu deponun oturum açma yöntemi kullanılamıyor".**
+Sayfadaki seçimler yerine getirilemiyor: token komutu token yazdırmadı (son hata
+satırları, sırlar çıkarılarak alıntılanır), çalıştırdığı bir betik onayladığınızdan
+beri değişti (komutu sayfada yeniden onaylayın) veya seçim artık olmayan bir
+anahtar dosyasını ya da hesabı adlandırıyor. Her okumada **SSH ve kimlik
+bilgileri...** düğmesi vardır.
+
+**OpenSSH bir anahtar dosyası için "bad permissions" diyor.** Başka hesaplar
+anahtarı okuyabiliyor. Ayarlar > SSH ve kimlik bilgileri'nde **Özel anahtar
+dosyası** satırı, **Yalnızca hesabıma kısıtla** düğmeli bir uyarı gösterir.
+
 **Durum çubuğunda "stage'leniyor..." kalıyor.** Bir arka plan yenilemesi hâlâ
 çalışıyor; dosya listesi güncellenince kaybolur. `r` yenilemeyi zorlar.
 

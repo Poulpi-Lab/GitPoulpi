@@ -217,8 +217,8 @@ up; release to get a menu:
 **Merge or fast-forward.** When the target has no commit of its own (the dragged branch is just ahead of it), a
 merge could simply move the target forward. By default (Settings > Git > **Merge fast-forward** = *never*, or a
 repository's own choice on its Merge options page) the menu row reads *Merge x into y (merge commit)* and makes a real merge commit,
-so the history keeps the branch; use the separate row *Fast-forward y to x* when you want the plain move (that is
-what *Rebase* is for when you want a straight line). With *allowed* the Merge row reads *(fast-forwards)*, and with *only*
+so the history keeps the branch; use the separate row *Fast-forward y to x* when you want the plain move (for a
+straight line, use *Rebase* instead). With *allowed* the Merge row reads *(fast-forwards)*, and with *only*
 *(fast-forward only)*, grayed out with the reason when the branches have diverged. The same rows and labels are in a
 branch's own menu, and `gitpoulpi merge --ff | --no-ff | --ff-only` picks per merge.
 

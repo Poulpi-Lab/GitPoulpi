@@ -1160,8 +1160,8 @@ Tangenterna är standardvärdena.
 | Integrationer: Granska säkerhetskontroll |  |
 | App: Avsluta | `q` |
 | App: Tema... |  |
-| Conflicts: Edit Base Branch Lists... |  |
-| Conflicts: Base Branches of This Repository... |  |
+| Konflikter: Redigera listor över basgrenar... |  |
+| Konflikter: Basgrenar för det här repositoryt... |  |
 | App: Byt tema... | `Ctrl+N y` |
 | App: Byt språk... | `Ctrl+N g` |
 | Startare: Skapa genväg |  |

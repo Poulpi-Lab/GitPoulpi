@@ -212,6 +212,14 @@ att få en meny:
 `Esc` avbryter ett drag. Tangentbordsmotsvarigheten är palettkommandot *Refs:
 Släpp vald ref på utcheckad gren...*.
 
+**Merge eller fast-forward.** När målet inte har någon egen commit (den dragna grenen ligger bara före det) kan en
+merge helt enkelt flytta målet framåt. Som standard (Inställningar > Git > **Fast-forward vid merge** = *never*, eller ett repositorys
+eget val på dess sida Alternativ för merge) lyder menyraden *Merge x i y (merge-commit)* och gör en riktig merge-commit, så att
+historiken behåller grenen; använd den separata raden *Fast-forward y till x* när du vill ha den rena flytten (för en rak linje, använd
+*Rebase* i stället). Med *allowed* lyder Merge-raden *(gör fast-forward)* och med *only* *(bara fast-forward)*, nedtonad med orsaken när
+grenarna har divergerat. Samma rader och etiketter finns i en grens egen meny, och `gitpoulpi merge --ff | --no-ff | --ff-only`
+väljer per merge.
+
 ## Commit-menyn
 
 Högerklicka på en commit (eller tryck `.` på den) för dess meny:

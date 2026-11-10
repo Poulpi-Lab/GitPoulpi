@@ -9092,7 +9092,7 @@ hosts_help = "Nomes de host separados por vírgulas. Vazio significa o host do r
 # context: label of the field with the minutes a token is kept
 cache_label = "Cache (minutos)"
 # context: help under the cache field
-cache_help = "Durante quanto tempo um token obtido é reutilizado. Vazio significa 50."
+cache_help = "Durante quanto tempo um token obtido é reutilizado. Deixe vazio para 50."
 # context: boxed warning under a command that runs on this computer
 command_warning = "Este comando corre no seu computador sempre que este repositório comunica com o remoto. Use apenas um comando que escreveu ou em que confia. Se estiver dentro da pasta do repositório, o GitPoulpi pergunta de novo quando o ficheiro mudar."
 # context: button that copies this repository's own credential helper into the helper field

@@ -57,12 +57,14 @@ fn is_wide(c: char) -> bool {
         | '\u{FF00}'..='\u{FF60}')
 }
 
-/// A blank between two wide characters: the "简 体 中 文" of the report.
+/// A blank after every one of three wide characters in a row: the
+/// "简 体 中 文" of the report. (Korean puts real spaces between words, so a
+/// single blank between two syllables is not it.)
 fn spaced_cjk(line: &str) -> Option<String> {
     let chars: Vec<char> = line.chars().collect();
     chars
-        .windows(3)
-        .find(|w| is_wide(w[0]) && w[1] == ' ' && is_wide(w[2]))
+        .windows(5)
+        .find(|w| is_wide(w[0]) && w[1] == ' ' && is_wide(w[2]) && w[3] == ' ' && is_wide(w[4]))
         .map(|w| w.iter().collect())
 }
 

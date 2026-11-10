@@ -931,6 +931,17 @@ waiting call on a lost connection. Pinned by `tests/pty_loading.rs`.
   leaves the continuation as it was, e.g. the title bar's 🐙 over the border's
   `─`), and a "continuation is not blank" pass erased the octopus. Pinned by
   `wide_edge::tests` (CJK panels/menus and the octopus survival test).
+- **A CJK popup is checked by `render_check`, not by eye.** `render_check.rs`
+  (test-only) holds the buffer invariants: a wide glyph keeps its blank
+  continuation (a `─` under a title glyph is the one tolerated leftover), a
+  popup's box is whole on every row (a scrollbar may stand in for the right
+  border), nothing is written outside the popup, a menu's shortcut column ends
+  flush. `cjk_sweep_tests` runs them for zh-CN, ja and ko at 80x24, 120x30 and
+  200x50 over a background of CJK text (so a popup edge cuts a glyph on every
+  other row); `i18n_layout_tests::check_buffer` runs the wide-glyph rule over
+  every screen it draws. A new popup: add it to the sweep. In a pty,
+  `Screen::line` shows a wide glyph's second half as a space ("简 体"); read
+  rows with `Screen::compact_line` (`pty_cjk_popups`).
 - **Never a combining mark.** `unicode-width` = 0 describes Unicode, not the
   user's font: U+20DD is in no Windows monospace font, the fallback broke the
   grapheme cluster and sheared the whole Graph column.

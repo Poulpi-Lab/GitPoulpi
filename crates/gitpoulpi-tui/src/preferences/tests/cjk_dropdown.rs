@@ -4,7 +4,7 @@
 
 use super::*;
 use crate::cjk_sweep_tests::{cjk_background, each_cjk};
-use crate::render_check as rc;
+use crate::render_check_tests as rc;
 use ratatui::buffer::Buffer;
 
 /// A state on the page that holds the Language row, focused on it.

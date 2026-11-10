@@ -1,6 +1,6 @@
 //! The CJK render sweep: the major surfaces drawn in Simplified Chinese,
 //! Japanese and Korean at 80x24, 120x30 and 200x50 over a background of
-//! CJK text, with `render_check`'s invariants asserted on every buffer:
+//! CJK text, with `render_check_tests`'s invariants asserted on every buffer:
 //!
 //! * (a) no wide glyph whose blank continuation was overwritten, none in the
 //!   last column;
@@ -24,7 +24,7 @@ use ratatui::Terminal;
 use gitpoulpi_i18n::{override_git_terms, override_lang, Lang};
 
 use crate::context_menu::{Entry, Menu};
-use crate::render_check as rc;
+use crate::render_check_tests as rc;
 
 pub(crate) const LANGS: [Lang; 3] = [Lang::ZhCn, Lang::Ja, Lang::Ko];
 pub(crate) const SIZES: [(u16, u16); 3] = [(80, 24), (120, 30), (200, 50)];

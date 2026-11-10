@@ -191,7 +191,7 @@ mod redraw;
 mod refs_tree;
 mod relaunch;
 #[cfg(test)]
-mod render_check;
+mod render_check_tests;
 mod repo_manager;
 mod repo_menu;
 mod repo_probe;

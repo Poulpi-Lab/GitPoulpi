@@ -931,7 +931,7 @@ waiting call on a lost connection. Pinned by `tests/pty_loading.rs`.
   leaves the continuation as it was, e.g. the title bar's 🐙 over the border's
   `─`), and a "continuation is not blank" pass erased the octopus. Pinned by
   `wide_edge::tests` (CJK panels/menus and the octopus survival test).
-- **A CJK popup is checked by `render_check`, not by eye.** `render_check.rs`
+- **A CJK popup is checked by `render_check_tests`, not by eye.** `render_check_tests.rs`
   (test-only) holds the buffer invariants: a wide glyph keeps its blank
   continuation (a `─` under a title glyph is the one tolerated leftover), a
   popup's box is whole on every row (a scrollbar may stand in for the right

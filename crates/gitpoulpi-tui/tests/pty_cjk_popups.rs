@@ -76,92 +76,92 @@ fn cell_text(screen: &Screen, col: u16, row: u16) -> String {
 }
 
 /// The box around the popup that holds `(col, row)`: `(x0, y0, x1, y1)`,
-/// found by walking out to its corners, and asserted whole: a `│` (or a
+/// found by walking out to its corners and checked whole: a `│` (or a
 /// scrollbar's cell, under an arrow) on both sides of every row, `╰ ─ ╯`
-/// along the bottom.
-fn assert_box_around(term: &Terminal, what: &str, col: u16, row: u16) -> (u16, u16, u16, u16) {
-    let screen = term.screen();
-    let dump = || {
-        (0..screen.rows())
-            .map(|r| screen.compact_line(r))
-            .collect::<Vec<_>>()
-            .join("\n")
-    };
-    // Up along the left side to the top-left corner.
+/// along the bottom. `Err` says what is broken, so it doubles as a wait
+/// predicate (a frame still being written is not a broken box).
+fn box_in(screen: &Screen, col: u16, row: u16) -> Result<(u16, u16, u16, u16), String> {
+    let at = |x: u16, y: u16| cell_text(screen, x, y);
     let mut x0 = col;
-    while x0 > 0 && cell_text(&screen, x0, row) != "\u{2502}" {
+    while x0 > 0 && at(x0, row) != "\u{2502}" {
         x0 -= 1;
     }
     let mut y0 = row;
-    while y0 > 0 && cell_text(&screen, x0, y0) != "\u{256D}" {
-        assert_eq!(
-            cell_text(&screen, x0, y0),
-            "\u{2502}",
-            "{what}: the left side breaks at ({x0},{y0})\n{}",
-            dump()
-        );
+    while y0 > 0 && at(x0, y0) != "\u{256D}" {
+        if at(x0, y0) != "\u{2502}" {
+            return Err(format!("the left side breaks at ({x0},{y0})"));
+        }
         y0 -= 1;
     }
-    assert_eq!(cell_text(&screen, x0, y0), "\u{256D}", "{what}\n{}", dump());
-    // Right along the top to the top-right corner.
+    if at(x0, y0) != "\u{256D}" {
+        return Err("no top-left corner".into());
+    }
     let mut x1 = x0 + 1;
-    while x1 < screen.cols() && cell_text(&screen, x1, y0) != "\u{256E}" {
+    while x1 < screen.cols() && at(x1, y0) != "\u{256E}" {
         x1 += 1;
     }
-    assert!(
-        x1 < screen.cols(),
-        "{what}: no top-right corner\n{}",
-        dump()
-    );
-    // Down to the bottom-left corner.
+    if x1 >= screen.cols() {
+        return Err("no top-right corner".into());
+    }
     let mut y1 = y0 + 1;
-    while y1 < screen.rows() && cell_text(&screen, x0, y1) != "\u{2570}" {
+    while y1 < screen.rows() && at(x0, y1) != "\u{2570}" {
         y1 += 1;
     }
-    assert!(
-        y1 < screen.rows(),
-        "{what}: no bottom-left corner\n{}",
-        dump()
-    );
-    let has_bar = (y0 + 1..y1).any(|y| {
-        matches!(
-            cell_text(&screen, x1, y).as_str(),
-            "\u{2191}" | "\u{25B2}" | "\u{2193}" | "\u{25BC}"
-        )
-    });
+    if y1 >= screen.rows() {
+        return Err("no bottom-left corner".into());
+    }
+    let has_bar = (y0 + 1..y1).any(|y| matches!(at(x1, y).as_str(), "\u{2191}" | "\u{25B2}"));
     for y in y0 + 1..y1 {
-        let l = cell_text(&screen, x0, y);
-        assert_eq!(l, "\u{2502}", "{what}: left side at ({x0},{y})\n{}", dump());
-        let r = cell_text(&screen, x1, y);
-        let ok = r == "\u{2502}"
-            || (has_bar
-                && matches!(
-                    r.as_str(),
-                    " " | "\u{2588}"
-                        | "\u{2503}"
-                        | "\u{2191}"
-                        | "\u{2193}"
-                        | "\u{25A0}"
-                        | "\u{2591}"
-                        | "\u{2592}"
-                ));
-        assert!(ok, "{what}: right side at ({x1},{y}) is {r:?}\n{}", dump());
-    }
-    assert_eq!(
-        cell_text(&screen, x1, y1),
-        "\u{256F}",
-        "{what}: bottom-right corner\n{}",
-        dump()
-    );
-    for x in x0 + 1..x1 {
-        assert_eq!(
-            cell_text(&screen, x, y1),
-            "\u{2500}",
-            "{what}: bottom at ({x},{y1})\n{}",
-            dump()
+        if at(x0, y) != "\u{2502}" {
+            return Err(format!("left side at ({x0},{y}) is {:?}", at(x0, y)));
+        }
+        let r = at(x1, y);
+        let bar = matches!(
+            r.as_str(),
+            " " | "\u{2588}"
+                | "\u{2503}"
+                | "\u{2191}"
+                | "\u{2193}"
+                | "\u{25A0}"
+                | "\u{2591}"
+                | "\u{2592}"
         );
+        if r != "\u{2502}" && !(has_bar && bar) {
+            return Err(format!("right side at ({x1},{y}) is {r:?}"));
+        }
     }
-    (x0, y0, x1, y1)
+    if at(x1, y1) != "\u{256F}" {
+        return Err(format!("bottom-right corner is {:?}", at(x1, y1)));
+    }
+    for x in x0 + 1..x1 {
+        if at(x, y1) != "\u{2500}" {
+            return Err(format!("bottom at ({x},{y1}) is {:?}", at(x, y1)));
+        }
+    }
+    Ok((x0, y0, x1, y1))
+}
+
+/// Waits until the popup containing the cell `anchor` finds is a whole box,
+/// and returns it with the screen it was whole on.
+fn wait_for_box(
+    term: &Terminal,
+    what: &str,
+    anchor: impl Fn(&Screen) -> Option<(u16, u16)>,
+    accept: impl Fn((u16, u16, u16, u16), (u16, u16)) -> bool,
+) -> ((u16, u16, u16, u16), Screen) {
+    let screen = term
+        .wait_for(&format!("{what}: a whole popup box"), STEP, |s| {
+            anchor(s).is_some_and(|(c, r)| box_in(s, c, r).is_ok_and(|b| accept(b, (c, r))))
+        })
+        .unwrap_or_else(|e| {
+            let s = term.screen();
+            let why = anchor(&s)
+                .map(|(c, r)| format!("{:?}", box_in(&s, c, r)))
+                .unwrap_or_else(|| "no anchor".into());
+            panic!("{e}\n{why}")
+        });
+    let (c, r) = anchor(&screen).unwrap();
+    (box_in(&screen, c, r).unwrap(), screen)
 }
 
 #[test]
@@ -176,29 +176,28 @@ fn the_commit_context_menu_is_whole_and_unspaced_in_cjk() {
         let what = format!("commit menu in {lang}");
         // The older commit's row, located by its first glyph.
         let (col, row) = term
-            .screen()
-            .find("\u{521D}")
-            .unwrap_or_else(|| panic!("{what}: the base commit is not on screen"));
-        term.right_click(col + 1, row).unwrap();
-        let screen = term
-            .wait_for("the commit menu", STEP, |s| {
-                (0..s.rows()).any(|r| s.compact_line(r).contains(&format!("\u{256D}{short}")))
-            })
+            .wait_for_text("\u{521D}", STEP)
             .unwrap_or_else(|e| panic!("{what}: {e}"));
-        // The menu's title row, then its box.
+        term.right_click(col + 1, row).unwrap();
+        let needle = format!("\u{256D}{short}");
+        let ((x0, y0, x1, y1), screen) = wait_for_box(
+            &term,
+            &what,
+            |s| {
+                (0..s.rows())
+                    .find(|r| s.compact_line(*r).contains(&needle))
+                    .and_then(|r| s.find(&needle).map(|(c, _)| (c + 1, r + 1)))
+            },
+            // The box is the menu's own (its top row is the title row), not
+            // the pane behind it while the menu is still being drawn.
+            |(_, y0, _, _), (_, r)| y0 + 1 == r,
+        );
         let title_row = (0..screen.rows())
-            .find(|r| {
-                screen
-                    .compact_line(*r)
-                    .contains(&format!("\u{256D}{short}"))
-            })
+            .find(|r| screen.compact_line(*r).contains(&needle))
             .unwrap();
-        let title_col = screen.find(&format!("\u{256D}{short}")).unwrap().0;
-        let (x0, y0, x1, y1) = assert_box_around(&term, &what, title_col + 1, title_row + 1);
-        assert_eq!(y0, title_row, "{what}");
+        assert_eq!(y0, title_row, "{what}\n{}", screen.text());
         // Every row of the menu: no blank between two CJK characters, and
         // the text inside the borders fits in them.
-        let screen = term.screen();
         let mut shortcut_ends = Vec::new();
         let mut cjk_rows = 0;
         for y in y0 + 1..y1 {
@@ -282,14 +281,19 @@ fn the_settings_language_dropdown_reads_unspaced_and_closes_its_box() {
             })
             .unwrap();
         term.click(c + 1, r).unwrap();
-        let screen = term
-            .wait_for("the language popup", STEP, |s| {
-                (0..s.rows()).any(|r| s.compact_line(r).contains("Fran\u{e7}ais"))
-            })
-            .unwrap_or_else(|e| panic!("{what}: {e}\n{}", term.text()));
-        // The popup row of Français anchors the box walk.
-        let (fc, fr) = screen.find("Fran\u{e7}ais").unwrap();
-        let (x0, y0, x1, y1) = assert_box_around(&term, &what, fc, fr);
+        let ((x0, y0, x1, y1), _) = wait_for_box(
+            &term,
+            &what,
+            |s| {
+                s.find("Fran\u{e7}ais").filter(|_| {
+                    // The whole list is drawn: its last visible row is a language.
+                    s.find_all("Nederlands").len() + s.find_all("\u{D55C}").len() > 0
+                })
+            },
+            // Not the page behind: a box that is narrow and left of the popup's
+            // anchor would be the sidebar.
+            |(x0, _, _, _), (c, _)| x0 < c,
+        );
         // Each endonym that is listed reads whole inside the box.
         let screen = term.screen();
         for name in [

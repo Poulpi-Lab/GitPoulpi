@@ -5080,7 +5080,7 @@ token_command_failed_tail = "このリポジトリのトークンコマンドが
 token_command_failed_code = "このリポジトリのトークンコマンドが失敗しました（終了コード {code}）。"
 token_command_failed_code_tail = "このリポジトリのトークンコマンドが失敗しました（終了コード {code}）：{tail}"
 grant_refused = "GitPoulpi はアカウントのトークンを {host} に送信しませんでした：{host} はそのアカウントのアドレス {expected} ではありません。"
-credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
+credential_helper_unreachable = "GitPoulpi の認証情報ヘルパーがデーモンに接続できなかったため、このリポジトリのサインインは送信されませんでした。もう一度試し、解決しない場合は SSH と認証情報を確認してください。"
 repo_auth_needs_confirmation = "認証情報ヘルパーまたはトークンコマンドは、SSH と認証情報で確認した場合にのみ保存されます。"
 
 [window]

@@ -258,9 +258,9 @@ lfs = "Git LFS: ficheiros grandes guardados fora do histórico do repositório. 
 "mcp token --rotate" = "Substitui o token por um novo; os clientes que tenham o antigo são recusados de imediato"
 "mcp token --show" = "Mostra também o token completo, para o colar na configuração de um cliente"
 "merge --autostash" = 'Guarda em stash as alterações locais que impedem a operação, executa-a e depois aplica o stash (o que `general.auto_stash = "always"` faz)'
-"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
-"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
-"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
+"merge --ff" = "Fast-forward quando a branch o permite, um commit de merge caso contrário (a predefinição do git). Substitui `git.merge_fast_forward` neste merge"
+"merge --ff_only" = "Apenas fast-forward: recusa quando a branch divergiu. Substitui `git.merge_fast_forward` neste merge"
+"merge --no_ff" = "Faz sempre um commit de merge, mesmo quando um fast-forward é possível. Substitui `git.merge_fast_forward` neste merge"
 "merge --squash" = "Faz squash dos commits da branch: prepara as alterações e não cria commit de merge (`merge --squash`), pelo que um `commit` se segue. É o modo Squash da definição Comportamento do merge. Não se pode desfazer: nada se moveu, descarte as alterações preparadas para recuar"
 patch = "Escreve um ficheiro de patch, ou aplica um à árvore de trabalho"
 "patch apply" = "Aplica um ficheiro de patch à árvore de trabalho"

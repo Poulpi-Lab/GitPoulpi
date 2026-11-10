@@ -1157,8 +1157,8 @@ zastosowania. Klawisze są domyślne.
 | Integracje: Przejrzyj kontrolę bezpieczeństwa |  |
 | Aplikacja: Zakończ | `q` |
 | Aplikacja: Motyw... |  |
-| Conflicts: Edit Base Branch Lists... |  |
-| Conflicts: Base Branches of This Repository... |  |
+| Konflikty: Edytuj listy gałęzi bazowych... |  |
+| Konflikty: Gałęzie bazowe tego repozytorium... |  |
 | Aplikacja: Zmień motyw... | `Ctrl+N y` |
 | Aplikacja: Zmień język... | `Ctrl+N g` |
 | Uruchamianie: Utwórz skrót |  |

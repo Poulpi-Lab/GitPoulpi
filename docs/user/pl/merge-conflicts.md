@@ -158,6 +158,13 @@ w dzienniku), więc pliki, indeks i refy pozostają nietknięte.
 - **Kiedy działa**: w tle, około 2 sekundy po tym, jak repozytorium ucichnie (commit, checkout, fetch, który przesunął
   gałąź, rebase), raz dla każdej pary `(HEAD, baza)`. Pasek znika, gdy tylko HEAD się przesunie, i wraca albo nie,
   zależnie od nowej odpowiedzi. Odłączony HEAD nie jest sprawdzany.
+- **Listy gałęzi bazowych**: skąd repozytorium bierze Gałęzie bazowe, wybiera się na jego stronie **Zapobieganie
+  konfliktom**. **Domyślne** podąża za globalną wartością domyślną (wbudowane `**`, czyli każda gałąź, dopóki w
+  Ustawienia > Ogólne > Zapobieganie konfliktom nie wybierzesz innej listy); **Lista: <nazwa>** podąża za jedną z twoich
+  nazwanych list; **Własna lista** to lista tylko tego repozytorium. Listy są współdzielone: edytuj jedną, a każde
+  repozytorium, które z niej korzysta, użyje zmiany przy następnym sprawdzeniu, bez restartu. **Zapisz jako listę...**
+  zamienia własne wzorce repozytorium w nazwaną listę, **Przywróć domyślne** odrzuca wybór repozytorium. Usunięcie listy,
+  którą repozytorium śledzi, sprawia, że używa ono domyślnej.
 - **Wyłączenie**: **Włącz proaktywne wykrywanie konfliktów** w Ustawienia > Ogólne albo dla jednego repozytorium na jego
   stronie **Zapobieganie konfliktom**. W skrypcie `gitpoulpi conflicts check` wypisuje tę samą odpowiedź jako JSON
   ([Opis CLI](cli-reference.md)).

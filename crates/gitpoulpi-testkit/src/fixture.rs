@@ -308,7 +308,12 @@ fn init_skeleton(bare: bool) -> Result<PathBuf> {
             // drop hooks into the first and read the second.
             std::fs::create_dir_all(skeleton.join("hooks"))?;
             std::fs::create_dir_all(skeleton.join("info"))?;
-            if std::fs::rename(&skeleton, &final_dir).is_err() && !final_dir.join("HEAD").is_file()
+            if std::fs::rename(&skeleton, &final_dir).is_err()
+                && !final_dir.join("HEAD").is_file()
+                // A skeleton left half-made by an interrupted run: replace it.
+                && (std::fs::remove_dir_all(&final_dir).is_err()
+                    || std::fs::rename(&skeleton, &final_dir).is_err())
+                && !final_dir.join("HEAD").is_file()
             {
                 return Err(Error::GitFailed(format!(
                     "cannot place the init skeleton at {}",

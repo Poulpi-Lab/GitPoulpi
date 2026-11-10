@@ -694,7 +694,7 @@ tested = "Opening a sample image in \"{label}\"..."
 
 [settings_ssh]
 private_key_path = "Private key path"
-private_key_path_help = "Key file that fetch, pull, push and clone offer to ssh (ssh -i <key> -o IdentitiesOnly=yes). Empty: ssh-agent and your ssh config as usual. Not used when GIT_SSH_COMMAND or core.sshCommand (e.g. SSH key for this repository) is set. Applies to the next transfer."
+private_key_path_help = "Key file that fetch, pull, push and clone offer to ssh (ssh -i <key> -o IdentitiesOnly=yes). Empty: ssh-agent and your ssh config as usual. Not used when a repository chooses its own key (SSH & credentials), or when GIT_SSH_COMMAND or core.sshCommand is set. Applies to the next transfer."
 public_key_path = "Public key path"
 public_key_path_help = "Used only when Private key path is empty: ssh then picks the matching key held by ssh-agent (or a hardware key) instead of offering every agent key. Generate key pair fills both. Same precedence as Private key path."
 key_type = "Key type"
@@ -4997,7 +4997,7 @@ hosting_3 = "Create a {$pr}|The + in the {$PRS} header, or n in that section, op
 hosting_4 = "Issues|The ISSUES section lists them; + or n creates one. A row's menu opens it in your browser or acts on it."
 hosting_5 = "References|Issue and {$pr} references (#12, !53, ABC-7) in a {$commit} message or a branch name are recognized. Alt+R in the {$commit} form inserts one."
 hosting_6 = "Toolbar chip|At the left of the toolbar, a chip shows the {$pr} of the checked-out branch (GH #12, GL !53) or a dim \"+ {$pr_abbr}\" to start one. Click it."
-hosting_7 = "SSH keys|Choose an SSH key per profile (Settings > Profiles) or per repository (tab menu > \"SSH key...\"). Passphrases stay with your system ssh-agent."
+hosting_7 = "SSH keys|Choose an SSH key per profile (Settings > Profiles) or per repository (tab menu > \"SSH & credentials...\"). Passphrases stay with your system ssh-agent."
 setup_1 = "Settings|Ctrl+, or the gear. Tab switches between the page list and the options, j / k move, Enter or Space changes a value, / or Ctrl+F searches every option, Esc closes."
 setup_2 = "Themes|Settings > Appearance > Theme: dark, light, follow the terminal, or one of many presets. Ctrl+N then a key also changes theme, language and graph colors without opening Settings."
 setup_3 = "Language|Settings > General > Language offers 17 languages. \"Translate git terms\" decides whether git's own words ({$commit}, {$push}...) are translated too."

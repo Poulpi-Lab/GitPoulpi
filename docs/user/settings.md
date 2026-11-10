@@ -546,6 +546,7 @@ Three options are on the **General** tab.
 | **Git backend** | `git2` (libgit2, the default) or `system` (your installed `git`). Global. It applies to daemons started after the change. |
 | **Pull button** | What the Pull button does: merge (fast-forward if possible), fast-forward only, or rebase. Global. The `▾` items do not change it. |
 | **Push button** | **direct** pushes at once; **ask** shows the remote menu first. Global. |
+| **Merge fast-forward** | What a merge you start does when the branch could simply be fast-forwarded: **never** (the default) always makes a merge commit, **allowed** fast-forwards when possible (git's own default), **only** fast-forwards or refuses. Global (`git.merge_fast_forward`); a repository overrides it on its [Merge options](#repo-specific-merge-options) page. |
 | **Default encoding** | The encoding used to show text that is **not valid UTF-8**: file contents, blame, diffs and commit messages. The page has a global row and a row for this repository; the repository row wins. Valid UTF-8 is never re-decoded, and staging never re-encodes anything. |
 | **core.autocrlf**, **core.eol** | This repository's own git settings. The row writes `core.autocrlf` or `core.eol` in the repository's git config. **(inherited)** removes the repository value, so your global git config applies. `Ctrl+Z` restores the previous value. The CLI equivalent is `gitpoulpi repo-config`. |
 | **Git LFS** | Shows Git LFS in the interface. See [Git LFS](lfs.md). |
@@ -656,13 +657,32 @@ output in its Activity Log entry (the status line says the commit failed) and no
 
 ### Repo-specific: Merge options
 
-One switch, **Squash** (off by default). When on, merging a local branch (the branch's menu, a drag and drop, `Merge`
+Two settings. **Fast-forward** says what a merge does when the branch could simply be fast-forwarded:
+
+| Choice | A merge you start... |
+|---|---|
+| **(inherited)** | follows the global **Merge fast-forward** setting on the Git page (default **never**). |
+| **never** | always makes a merge commit (`git merge --no-ff`), even when the branch is just ahead. The commit's first parent is the old tip, the second the merged branch, and its message is git's own (`Merge branch 'x' into y`). |
+| **allowed** | fast-forwards when it can and makes a merge commit otherwise (git's default). |
+| **only** | fast-forwards, and refuses with *cannot fast-forward* when the branches have diverged (`git merge --ff-only`). |
+
+It applies to every merge you start: the branch's menu, a drag and drop, `Merge` in the palette, and `gitpoulpi merge`
+(whose `--ff`, `--no-ff` and `--ff-only` flags override it for one merge). The menus say what the merge will do:
+*Merge x into y (merge commit)*, *(fast-forwards)* or *(fast-forward only)*, and the separate
+*Fast-forward y to x* item (and its palette command) stays one gesture away under every choice. A merge commit is an
+ordinary undo entry, like a fast-forward. The Flow actions choose their own merge strategy and ignore this setting.
+
+Your own choice wins over git's: a merge GitPoulpi starts under **never** or **only** passes the flag explicitly, so a
+`merge.ff` in the repository's git config is overridden. Only under **allowed** is git's `merge.ff` still in effect, and when the repository
+sets it the page shows it under the row. (Only the repository's own `.git/config` is read for that line, not your global git config.)
+
+**Squash** (off by default). When on, merging a local branch (the branch's menu, a drag and drop, `Merge`
 in the palette) stages the branch's changes without making a merge commit (`git merge --squash`): the commit is left to you.
 The commit form opens with git's squash message (`SQUASH_MSG`, comment lines removed), once per
 squash. Nothing is in progress afterwards (no `MERGE_HEAD`), so **Abort** does not apply: to back out, discard the
 staged changes. A squash that stops on conflicts leaves them in the Status pane like any conflicted merge.
 The staged changes are not an undo entry (no ref moved, so there is nothing to restore); the CLI's
-`gitpoulpi merge <branch> --squash` does the same, whatever the setting.
+`gitpoulpi merge <branch> --squash` does the same, whatever the setting. A squash wins over **Fast-forward**.
 
 ### Repo-specific: Message template
 

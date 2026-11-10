@@ -185,7 +185,9 @@ fn the_chooser_fits_the_right_clicked_column() {
     let (x, row) = header(&snap(&term), "Author").unwrap();
     term.right_click(x + 1, row).unwrap();
     term.wait_for("the Fit Author row", STEP, |s| {
-        s.contains("Fit Author to content") && s.contains("Fit all columns to content")
+        s.contains("Fit Author to content")
+            && s.contains("Fit all columns to content")
+            && s.contains("Reset column widths")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(

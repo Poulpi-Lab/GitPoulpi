@@ -232,11 +232,20 @@ fn create_from_the_palette_then_remove_from_the_settings_row() {
     // The row's Remove button deletes only what we made. The palette left it
     // selected (and scrolled into view), so one click runs it.
     click_text(&mut term, &format!("Remove: {PLACE}"));
-    common::confirm_removal(&mut term, STEP);
-    term.wait_for("the row reads not created", STEP, |s| {
-        launcher_row_is(s, "not created")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The confirm click is retried while the question is up: a click aimed at
+    // a torn frame lands on nothing.
+    common::retry_until(
+        &mut term,
+        "the row reads not created",
+        4,
+        STEP,
+        |t| {
+            if t.screen().contains("This cannot") {
+                common::confirm_removal(t, STEP);
+            }
+        },
+        |s| launcher_row_is(s, "not created"),
+    );
     assert!(!entry.exists(), "the entry is gone");
     assert!(!mac || !bundle.exists(), "the whole bundle is gone");
     assert_eq!(our_icons(), 0, "the icon is gone");

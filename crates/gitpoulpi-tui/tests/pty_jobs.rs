@@ -179,7 +179,7 @@ fn launch_with_second_tab(
 fn show_other_tab(term: &mut Terminal) {
     let deadline = std::time::Instant::now() + STEP;
     let col = loop {
-        let bar = snap(&term).line(1);
+        let bar = term.screen().line(1);
         if bar.matches("repo").count() >= 2 {
             break bar[..bar.find("repo").unwrap()].chars().count() as u16;
         }
@@ -227,7 +227,7 @@ fn the_indicator_is_there_from_another_tab() {
         )
     });
 
-    let (col, row) = snap(&term).find("[x]").expect("the [x] button");
+    let (col, row) = term.screen().find("[x]").expect("the [x] button");
     term.click(col + 1, row).unwrap();
     term.wait_for("the canceled push", STEP, canceled_flash)
         .unwrap_or_else(|e| {
@@ -356,27 +356,32 @@ fn the_panel_opens_by_click_and_its_cancel_button_cancels() {
     let (mut term, _config) = launch(&repo, "pty-jobs-panel-click", 25_000);
     start_push(&mut term);
 
-    let (col, row) = snap(&term).find("Push: ").expect("the indicator label");
-    term.click(col + 1, row).unwrap();
-    term.wait_for("the jobs panel", STEP, |s| s.contains("Background jobs"))
-        .unwrap_or_else(|e| {
-            panic!(
-                "{e}
-{}",
-                term.text()
-            )
-        });
     // The row's own button: the second "Cancel" on the screen (the first is
     // the toolbar's "Cancel all").
-    let screen = snap(&term);
-    let row_cancel = screen
-        .find_all("Cancel")
-        .into_iter()
-        .find(|(c, r)| {
-            let line = screen.line(*r);
+    let row_cancel_of = |s: &xtask::pty::Screen| {
+        s.find_all("Cancel").into_iter().find(|(c, r)| {
+            let line = s.line(*r);
             line.contains("Push: ") && *c > 60
         })
-        .expect("the row's Cancel button");
+    };
+    // Retried: a click aimed at a torn frame opens nothing; the panel is
+    // whole when the row's button is drawn.
+    let screen = common::retry_until(
+        &mut term,
+        "the jobs panel with the row's Cancel button",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let screen = t.screen();
+            if !screen.contains("Background jobs") {
+                if let Some((col, row)) = screen.find("Push: ") {
+                    t.click(col + 1, row).unwrap();
+                }
+            }
+        },
+        |s| s.contains("Background jobs") && row_cancel_of(s).is_some(),
+    );
+    let row_cancel = row_cancel_of(&screen).expect("the row's Cancel button");
     term.click(row_cancel.0 + 1, row_cancel.1).unwrap();
     term.wait_for("the row says Canceled", STEP, |s| {
         s.text()
@@ -425,7 +430,7 @@ fn a_job_that_cannot_be_stopped_shows_why() {
         )
     });
 
-    let screen = snap(&term);
+    let screen = term.screen();
     let (col, row) = screen
         .find_all("Cancel")
         .into_iter()
@@ -443,16 +448,10 @@ fn a_job_that_cannot_be_stopped_shows_why() {
         )
     });
     // Still running, not canceled.
-    assert!(!snap(&term).text().contains("Canceled"), "{}", term.text());
+    assert!(
+        !term.screen().text().contains("Canceled"),
+        "{}",
+        term.text()
+    );
     term.stop().unwrap();
-}
-
-/// The screen once it has settled: a torn frame is not a place to locate a
-/// cell or compare colors in.
-fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
-    term.wait_for_stable(
-        std::time::Duration::from_millis(300),
-        std::time::Duration::from_secs(30),
-    )
-    .unwrap_or_else(|e| panic!("{e}"))
 }

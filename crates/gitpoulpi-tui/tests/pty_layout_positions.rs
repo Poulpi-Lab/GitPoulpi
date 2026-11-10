@@ -335,7 +335,8 @@ fn the_settings_page_moves_the_toolbar() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     common::settings_page(&mut term, "Appearance");
-    // The first "Bottom" on the page is the toolbar position.
+    // The "Bottom" on the Toolbar position row (the status line has one too:
+    // which is the first on screen depends on how far the page scrolled).
     // Retried: a click aimed at a torn or still-scrolling frame opens nothing.
     let screen = common::retry_until(
         &mut term,
@@ -343,14 +344,56 @@ fn the_settings_page_moves_the_toolbar() {
         4,
         std::time::Duration::from_secs(10),
         |t| {
-            let (col, row) = common::scroll_settings_to_choice(t, "Bottom", STEP);
+            // Scrolled to the row by the wheel, one notch at a time on a
+            // settled screen (the page may still be moving, either way).
+            let mut notch = 0;
+            let (col, row) = loop {
+                let screen = t
+                    .wait_for_stable(std::time::Duration::from_millis(300), STEP)
+                    .unwrap_or_else(|e| panic!("{e}"));
+                let found = screen.find("Toolbar position").and_then(|(_, label_row)| {
+                    screen
+                        .find_all("Bottom")
+                        .into_iter()
+                        .find(|(_, r)| *r == label_row)
+                });
+                if let Some(at) = found {
+                    break at;
+                }
+                assert!(
+                    notch < 40,
+                    "the Toolbar position row never showed:\n{}",
+                    t.text()
+                );
+                // Up first (the row is near the top), then down.
+                t.scroll(notch >= 12, 100, screen.rows() / 2).unwrap();
+                notch += 1;
+            };
             t.click(col + 1, row).unwrap();
         },
         |s| s.contains("\u{2713} Bottom"),
     );
-    let (tc, tr) = screen.find("\u{2713} Bottom").unwrap();
-    // Top, the ticked Bottom, then Left one row below.
-    term.click(tc + 2, tr + 1).unwrap();
+    let _ = screen;
+    // Top, the ticked Bottom, then Left one row below. Retried until stored:
+    // a click aimed at a torn frame picks nothing.
+    common::retry_until(
+        &mut term,
+        "the choice stored",
+        4,
+        std::time::Duration::from_secs(10),
+        |t| {
+            let screen = t
+                .wait_for_stable(std::time::Duration::from_millis(300), STEP)
+                .unwrap_or_else(|e| panic!("{e}"));
+            if let Some((tc, tr)) = screen.find("\u{2713} Bottom") {
+                t.click(tc + 2, tr + 1).unwrap();
+            }
+        },
+        |_| {
+            std::fs::read_to_string(config.path().join("config.toml"))
+                .is_ok_and(|t| t.contains("toolbar_position = \"left\""))
+        },
+    );
     wait_config(&config, "toolbar_position = \"left\"");
     term.send_keys("Escape").unwrap();
     term.wait_for("the column", STEP, |s| {

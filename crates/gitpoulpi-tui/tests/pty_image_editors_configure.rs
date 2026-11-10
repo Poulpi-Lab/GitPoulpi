@@ -154,8 +154,10 @@ fn the_images_page_edits_the_viewer_keys_and_the_editor_list() {
     wait_labels(dir, "moved back down", |l| l == ["Alpha", "Beta", "Gamma"]);
     term.send_keys("Delete").unwrap();
     let screen = term
-        .wait_for("the removal question", STEP, |s| {
-            s.contains("Cancel") && s.contains("Remove \"")
+        .wait_for("the removal question with its buttons", STEP, |s| {
+            s.contains("Remove \"")
+                && s.find("Cancel")
+                    .is_some_and(|(_, row)| s.find_all("Remove").iter().any(|&(_, r)| r == row))
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (_, row) = screen.find("Cancel").unwrap();

@@ -5,7 +5,6 @@
 
 use std::io::Write;
 use std::ops::ControlFlow;
-use std::path::Path;
 use std::process::{Command, Stdio};
 
 use gitpoulpi_core::domain::rewrite::{
@@ -257,21 +256,25 @@ pub(super) fn run_dirs(repo: &FixtureRepo) -> Vec<String> {
     }
 }
 
+/// Every object id in the repository, reachable or not, loose or packed,
+/// sorted. Ids rather than the files under `.git/objects`: the files include
+/// writers' temporary names (`tmp_obj_*`, `tmp_pack_*`) and move when git
+/// repacks in the background, neither of which is an object the code under
+/// test created; walking the directory tree also races with both.
 pub(super) fn object_files(repo: &FixtureRepo) -> Vec<String> {
-    fn walk(dir: &Path, out: &mut Vec<String>) {
-        for entry in std::fs::read_dir(dir).unwrap() {
-            let path = entry.unwrap().path();
-            if path.is_dir() {
-                walk(&path, out);
-            } else {
-                out.push(path.to_string_lossy().into_owned());
-            }
-        }
-    }
-    let mut out = Vec::new();
-    walk(&repo.root().join(".git").join("objects"), &mut out);
-    out.sort();
-    out
+    let mut ids: Vec<String> = git_text(
+        repo,
+        &[
+            "cat-file",
+            "--batch-all-objects",
+            "--batch-check=%(objectname)",
+        ],
+    )
+    .lines()
+    .map(str::to_string)
+    .collect();
+    ids.sort();
+    ids
 }
 
 pub(super) fn refused(result: Result<impl std::fmt::Debug, Error>, which: RewriteRefusal) {

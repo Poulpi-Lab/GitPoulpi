@@ -485,7 +485,7 @@ tested = "Открывается тестовое изображение в «{l
 
 [settings_ssh]
 private_key_path = "Путь к закрытому ключу"
-private_key_path_help = { git = "Файл ключа, который fetch, pull, push и clone предлагают ssh (ssh -i <ключ> -o IdentitiesOnly=yes). Пусто: ssh-agent и ваша конфигурация ssh как обычно. Игнорируется, если задан GIT_SSH_COMMAND или core.sshCommand (например, SSH-ключ для этого репозитория). Действует со следующей передачи.", local = "Файл ключа, который git предлагает ssh при загрузке, получении, отправке и clone (ssh -i <ключ> -o IdentitiesOnly=yes). Пусто: ssh-agent и ваша конфигурация ssh как обычно. Игнорируется, если задан GIT_SSH_COMMAND или core.sshCommand (например, SSH-ключ для этого репозитория). Действует со следующей передачи." }
+private_key_path_help = { git = "Файл ключа, который fetch, pull, push и clone предлагают ssh (ssh -i <ключ> -o IdentitiesOnly=yes). Пусто: ssh-agent и ваша конфигурация ssh как обычно. Не используется, если репозиторий выбрал собственный ключ («SSH и учётные данные») или задан GIT_SSH_COMMAND или core.sshCommand. Действует со следующей передачи.", local = "Файл ключа, который git предлагает ssh при загрузке, получении, отправке и clone (ssh -i <ключ> -o IdentitiesOnly=yes). Пусто: ssh-agent и ваша конфигурация ssh как обычно. Не используется, если репозиторий выбрал собственный ключ («SSH и учётные данные») или задан GIT_SSH_COMMAND или core.sshCommand. Действует со следующей передачи." }
 public_key_path = "Путь к открытому ключу"
 public_key_path_help = "Используется, только если путь к закрытому ключу пуст: тогда ssh выбирает подходящий ключ из ssh-agent (или аппаратный ключ), а не предлагает все ключи агента. «Создать пару ключей» заполняет оба поля. Приоритет тот же, что у пути к закрытому ключу."
 key_type = "Тип ключа"
@@ -4078,7 +4078,7 @@ hosting_3 = { git = "Создание {$pr}|Плюс в заголовке {$PRS
 hosting_4 = "Задачи|Раздел ЗАДАЧИ их показывает; + или n создаёт новую. Меню строки открывает задачу в браузере или действует над ней."
 hosting_5 = { git = "Ссылки|Ссылки на задачи и {$prs} (#12, !53, ABC-7) в сообщении commit'а или имени ветки распознаются. Alt+R в форме commit'а вставляет ссылку.", local = "Ссылки|Ссылки на задачи и запросы на слияние (#12, !53, ABC-7) в сообщении коммита или имени ветки распознаются. Alt+R в форме коммита вставляет ссылку." }
 hosting_6 = "Чип на панели|Слева на панели инструментов чип показывает {$pr} текущей ветки (GH #12, GL !53) или приглушённый «+ {$pr_abbr}», чтобы начать. Нажмите на него."
-hosting_7 = "Ключи SSH|Выберите ключ SSH для профиля (Настройки > Профили) или для репозитория (меню вкладки > «Ключ SSH...»). Парольные фразы остаются в системном ssh-agent."
+hosting_7 = "Ключи SSH|Выберите ключ SSH для профиля (Настройки > Профили) или для репозитория (меню вкладки > «SSH и учётные данные...»). Парольные фразы остаются в системном ssh-agent."
 setup_1 = "Настройки|Ctrl+, или шестерёнка. Tab переключает список страниц и параметры, j / k двигают, Enter или Пробел меняет значение, / или Ctrl+F ищет по всем параметрам, Esc закрывает."
 setup_2 = "Темы|Настройки > Оформление > Тема: тёмная, светлая, как в терминале или один из многих пресетов. Ctrl+N и клавиша тоже меняют тему, язык и цвета графа, не открывая Настройки."
 setup_3 = "Язык|Настройки > Общие > Язык предлагает 17 языков. «Переводить термины git» решает, переводятся ли собственные слова git ({$commit}, {$push}...)."
@@ -5058,16 +5058,16 @@ undo_already_restored = "всё, что удалила эта операция, 
 undo_no_such_entry = "в истории отмен нет операции №{id}"
 split_refused = "нельзя разделить этот {$commit}: {reason}"
 undo_purged = "старая история операции #{entry} очищена, поэтому её нельзя ни отменить, ни повторить"
-undo_remote_ref_moved = "{name} на {remote} находится на {actual}, а не на {expected}, где её оставила операция: с тех пор её изменили на remote, поэтому там ничего не отправлено и не удалено"
+undo_remote_ref_moved = "{name} на {remote} находится на {actual}, а не на {expected}, где её оставила операция: с тех пор её изменили на remote, поэтому там ничего не изменено"
 undo_remote_object_missing = { git = "{object} больше нет в этом репозитории (его удалила сборка мусора), поэтому ветку или {$tag} нельзя восстановить на remote через push", local = "{object} больше нет в этом репозитории (его удалила сборка мусора), поэтому ветку или {$tag} нельзя восстановить на удалённом сервере отправкой" }
-repo_auth_unavailable = "This repository's sign-in cannot be used: {reason}"
-repo_auth_command_changed = "{path} changed since you confirmed it as this repository's credential command. Confirm the command again."
-token_command_failed = "This repository's token command failed."
-token_command_failed_tail = "This repository's token command failed: {tail}"
-token_command_failed_code = "This repository's token command failed (exit {code})."
-token_command_failed_code_tail = "This repository's token command failed (exit {code}): {tail}"
-grant_refused = "GitPoulpi did not send the account token to {host}: it is not {expected}, that account's address."
-repo_auth_needs_confirmation = "A credential helper or token command is stored only when you confirm it in SSH & credentials."
+repo_auth_unavailable = "Вход этого репозитория использовать нельзя: {reason}"
+repo_auth_command_changed = "{path} изменился после того, как вы подтвердили его как команду учётных данных этого репозитория. Подтвердите команду снова."
+token_command_failed = "Команда токена этого репозитория завершилась ошибкой."
+token_command_failed_tail = "Команда токена этого репозитория завершилась ошибкой: {tail}"
+token_command_failed_code = "Команда токена этого репозитория завершилась ошибкой (код {code})."
+token_command_failed_code_tail = "Команда токена этого репозитория завершилась ошибкой (код {code}): {tail}"
+grant_refused = "GitPoulpi не отправил токен учётной записи на {host}: это не {expected}, адрес этой учётной записи."
+repo_auth_needs_confirmation = "Помощник учётных данных или команда токена сохраняется только после подтверждения в «SSH и учётные данные»."
 
 [window]
 connecting = "подключение к демону сеанса..."
@@ -5932,7 +5932,7 @@ help_scroll = "Журнал активности: прокрутка длинн�
 
 [git_error]
 summary_host_key = "Ключ SSH-хоста этого remote пока неизвестен."
-hint_host_key = "Один раз выполните `ssh -T git@<host>` в терминале, сверьте отпечаток, ответьте yes и повторите."
+hint_host_key = "Один раз выполните `ssh -T git@<host>` в терминале, сверьте отпечаток, ответьте yes и повторите. Или задайте файл known hosts для этого репозитория в «SSH и учётные данные»."
 title_push = { git = "{$Push}: сбой", local = "Отправка: сбой" }
 title_pull = { git = "{$Pull}: сбой", local = "Получение изменений: сбой" }
 title_fetch = { git = "{$Fetch}: сбой", local = "Загрузка: сбой" }
@@ -5948,7 +5948,7 @@ done_pull = { git = "{$Pull}: готово", local = "Получение изм�
 summary_non_ff = "В удалённом репозитории есть {$commits}, которых у вас нет."
 hint_non_ff = { git = "Сначала выполните pull, затем повторите.", local = "Сначала подтяните изменения, затем повторите." }
 summary_auth = "Удалённый репозиторий отклонил учётные данные."
-hint_auth = "Проверьте учётные данные в Настройки > Интеграции, либо запустите ssh-agent со своим ключом, либо задайте ключ SSH для этого репозитория."
+hint_auth = "Проверьте учётные данные в Настройки > Интеграции, запустите ssh-agent со своим ключом или выберите, как этот репозиторий входит, в «SSH и учётные данные»."
 summary_conflict = "Операция остановилась из-за конфликтов."
 hint_conflict = "Разрешите конфликты на панели Status и продолжите."
 summary_overwrite = "Локальные изменения были бы перезаписаны."
@@ -5958,14 +5958,14 @@ hint_network = "Проверьте соединение и адрес удалё
 summary_lock = "Другой процесс git использует этот репозиторий."
 hint_lock = "Закройте другие инструменты git или удалите файл блокировки, если ни один не запущен."
 summary_credential_helper = "Настроенный помощник учётных данных завершился ошибкой: {line}"
-hint_credential_helper = "Выполните `git config --show-origin --get-all credential.helper`, чтобы увидеть, где он задан, исправьте или удалите этот помощник и повторите."
+hint_credential_helper = "Не удалось запустить помощник учётных данных. Выберите другой источник для этого репозитория в «SSH и учётные данные» или исправьте помощника: `git config --show-origin --get-all credential.helper` покажет, где он задан."
 hint_abort_blocked = "Сохраните копию изменений в этих файлах или отбросьте их в панели Status, затем повторите прерывание."
 action_pull_first = { git = "Сначала pull", local = "Сначала подтянуть" }
 action_integrations = "Открыть Интеграции"
 action_stash_retry = { git = "{$Stash} и повторить", local = "Спрятать в стэш и повторить" }
 action_retry = "Повторить"
-action_repo_auth = "SSH & credentials..."
-hint_repo_auth = "Choose another way to sign in for this repository in SSH & credentials, then retry."
+action_repo_auth = "SSH и учётные данные..."
+hint_repo_auth = "Выберите другой способ входа для этого репозитория в «SSH и учётные данные» и повторите."
 
 [failure_card]
 title_clone = "Клонирование не удалось"
@@ -9047,132 +9047,261 @@ need_resolve = { git = "Разрешите конфликты для commit'а",
 why_commit = "в файлах всё ещё есть конфликты: сначала разрешите их"
 
 [repo_auth]
-section = "SSH & credentials"
-intro = "Used by {$fetch}, {$pull}, {$push}, submodules and LFS of this repository only. Nothing is written to the repository or to git's config."
+# context: sidebar entry and page title of the per-repository page that picks how this repository signs in over SSH and HTTPS
+section = "SSH и учётные данные"
+# context: one-line introduction at the top of the SSH & credentials page
+intro = { git = "Используется для {$fetch}, {$pull}, {$push}, подмодулей и LFS только в этом репозитории. Ничего не записывается ни в репозиторий, ни в конфигурацию git.", local = "Используется для загрузки, получения изменений, отправки, подмодулей и LFS только в этом репозитории. Ничего не записывается ни в репозиторий, ни в конфигурацию git." }
+# context: sub-heading of the HTTPS rows on the SSH & credentials page
 heading_https = "HTTPS"
-https_source = "Sign in with"
-https_system = "System (git's helpers)"
-https_account = "GitPoulpi account"
-https_helper = "Credential helper"
-https_token_command = "Token command"
-username = "Git username"
-username_help = "Sent as the user name of HTTPS remotes. Leave it empty to use the account's or helper's own."
-ignore_helpers = "Ignore credential helpers set by this repository"
-ignore_helpers_help = "The system and global helpers keep working. Helpers a repository sets for itself run programs of its choosing."
+# context: label of the choice of how HTTPS remotes sign in
+https_source = "Способ входа"
+# context: choice value: use git's own credential helpers, the machine's identity
+https_system = "Система (помощники git)"
+# context: choice value: use the token of a GitPoulpi integration account
+https_account = "Учётная запись GitPoulpi"
+# context: choice value: use one credential helper command for this repository
+https_helper = "Помощник учётных данных"
+# context: choice value: run a command that prints a token
+https_token_command = "Команда токена"
+# context: label of the git username field
+username = "Имя пользователя git"
+# context: help under the git username field
+username_help = "Передаётся как имя пользователя для remote по HTTPS. Оставьте пустым, чтобы использовать имя учётной записи или помощника."
+# context: label of the checkbox that makes git ignore the credential helpers set inside the repository
+ignore_helpers = "Игнорировать помощники учётных данных, заданные этим репозиторием"
+# context: help under the checkbox that ignores the repository's own credential helpers
+ignore_helpers_help = "Системные и глобальные помощники продолжают работать. Помощники, которые репозиторий задаёт сам, запускают программы по его выбору."
+# context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
-repo_helper_label = "Set by this repository"
-no_repo_helpers = "This repository sets no credential helper of its own."
-account = "Account"
-account_none = "(choose an account)"
+# context: label of the rows that list the credential helpers set by this repository
+repo_helper_label = "Задано этим репозиторием"
+# context: shown when the repository sets no credential helper of its own
+no_repo_helpers = "Этот репозиторий не задаёт собственного помощника учётных данных."
+# context: label of the account picker
+account = "Учётная запись"
+# context: option of the account picker meaning no account chosen yet
+account_none = "(выберите учётную запись)"
+# context: option of the account picker; {name} is the account id, {host} its host
 account_option = "{name}  ({host})"
-scope_label = "Token scopes"
-scope_unknown = "not checked yet; run Test connection"
-helper_label = "Helper"
-helper_help = "A git credential helper: a program name, a path, or a command starting with !."
-command_label = "Command"
-command_help = "The program and its arguments, separated by spaces. Put quotes around an argument that holds spaces. No shell runs it, and it runs in the repository folder."
-argv_label = "Runs as"
-hosts_label = "Hosts"
-hosts_help = "Host names separated by commas. Empty means the host of the main remote."
-cache_label = "Cache (minutes)"
-cache_help = "How long a printed token is reused. Empty means 50."
-command_warning = "This command runs on your computer each time this repository fetches or pushes. Use only a command you wrote or trust. If it is inside the repository folder, GitPoulpi asks again when the file changes."
-import_helper = "Use this repository's current helper"
-import_none = "This repository sets no credential helper to use."
-import_done = "Helper copied. Save asks you to confirm it."
+# context: label of the line under the account picker that says what the account's token may do
+scope_label = "Права токена"
+# context: scope line when no token check has run yet
+scope_unknown = "ещё не проверено; запустите «Проверить подключение»"
+# context: label of the credential helper command field
+helper_label = "Помощник"
+# context: help under the credential helper field
+helper_help = "Помощник учётных данных git: имя программы, путь или команда, начинающаяся с !."
+# context: label of the token command field
+command_label = "Команда"
+# context: help under the token command field
+command_help = "Программа и её аргументы через пробел. Аргумент с пробелами возьмите в кавычки. Оболочка не используется, команда запускается в папке репозитория."
+# context: label of the line that shows how the command was split into arguments
+argv_label = "Запускается как"
+# context: label of the field of host names a command applies to
+hosts_label = "Хосты"
+# context: help under the hosts field
+hosts_help = "Имена хостов через запятую. Пусто: хост основного remote."
+# context: label of the field with the minutes a token is kept
+cache_label = "Кэш (минуты)"
+# context: help under the cache field
+cache_help = "Как долго использовать полученный токен повторно. Оставьте пустым для 50."
+# context: boxed warning under a command that runs on this computer
+command_warning = "Эта команда запускается на вашем компьютере при каждом обращении этого репозитория к серверу. Используйте только команду, которую вы написали или которой доверяете. Если она лежит внутри папки репозитория, GitPoulpi спросит снова при изменении файла."
+# context: button that copies this repository's own credential helper into the helper field
+import_helper = "Взять текущего помощника этого репозитория"
+# context: status when the repository sets no helper to import
+import_none = "Этот репозиторий не задаёт помощника учётных данных."
+# context: status after the helper was copied into the field
+import_done = "Помощник скопирован. При сохранении понадобится подтверждение."
+# context: sub-heading of the SSH rows
 heading_ssh = "SSH"
-ssh_source = "Sign in with"
-ssh_system = "System (ssh's own setup)"
-ssh_key_file = "Key file"
-ssh_account_key = "Account key"
-key_path = "Private key file"
-key_help = "Offered to every SSH remote of this repository, submodules included, and only this key is offered. Offering a public key to another host leaks nothing."
-known_hosts = "Known hosts file"
-known_hosts_help = "Optional. A file of trusted host keys used instead of ssh's default one."
-strict_host = "Strict host key checking"
-strict_host_help = "Refuse a host that is not in the known hosts file instead of asking."
-ssh_program_label = "ssh program"
-ssh_program_default = "ssh from your PATH"
-heading_remotes = "Remotes"
+# context: label of the choice of how SSH remotes sign in
+ssh_source = "Способ входа"
+# context: choice value: ssh's own configuration, the agent and the default keys
+ssh_system = "Система (собственная настройка ssh)"
+# context: choice value: one private key file
+ssh_key_file = "Файл ключа"
+# context: choice value: the key of a GitPoulpi integration account
+ssh_account_key = "Ключ учётной записи"
+# context: label of the private key file field
+key_path = "Файл закрытого ключа"
+# context: help under the key file field
+key_help = "Предлагается всем remote этого репозитория по SSH, включая подмодули, и предлагается только этот ключ. Предложение открытого ключа другому хосту ничего не раскрывает."
+# context: label of the known hosts file field
+known_hosts = "Файл known hosts"
+# context: help under the known hosts field
+known_hosts_help = "Необязательно. Файл доверенных ключей хостов вместо файла ssh по умолчанию."
+# context: label of the checkbox that refuses unknown SSH hosts
+strict_host = "Строгая проверка ключа хоста"
+# context: help under the strict host key checking checkbox
+strict_host_help = "Отклонять хост, которого нет в файле known hosts, вместо того чтобы спрашивать."
+# context: label of the line naming the ssh program that will be used
+ssh_program_label = "Программа ssh"
+# context: ssh program line when nothing overrides it
+ssh_program_default = "ssh из вашего PATH"
+# context: sub-heading of the list of remotes with the identity each one uses
+heading_remotes = "Remote-репозитории"
+# context: one remote row value; {transport} is https or ssh, {who} the identity it signs in with
 remote_value = "{transport}  {who}"
-no_remotes = "This repository has no remote."
-override_overridden = "Overrides {key} = {value}  ({origin})"
-override_competes = "Competes with {key} = {value}  ({origin})"
-unavailable_label = "Cannot be used"
-button_test = "Test connection"
-button_save = "Save"
-button_revert = "Revert"
-button_defaults = "Use defaults"
-dirty_note = "Unsaved changes."
-saved = "Saved. This repository now signs in as chosen."
-reverted = "Back to the saved choices."
-cleared = "Cleared: this repository uses the machine's own identity again."
-nothing_to_clear = "There was nothing to clear."
-test_save_first = "Save first: the test uses the saved choices."
-saving = "Saving..."
-refused = "Not saved: {why}"
-load_failed = "Could not read the sign-in settings: {why}"
-test_running = "{frame} Testing the connection..."
-invalid = "Cannot save: {why}"
-invalid_helper = "the helper is empty"
-invalid_command = "the command is empty"
-invalid_quote = "the command has an unclosed quote"
-invalid_cache = "the cache value is not a whole number of minutes"
-invalid_account = "no account is chosen"
-invalid_key = "the key file is empty"
-confirm_title = "Allow this command?"
-confirm_question = "This repository would run this command on your computer each time it talks to its remote. Read it before you allow it."
-confirm_helper_heading = "Credential helper"
-confirm_command_heading = "Token command"
+# context: shown when the repository has no remote
+no_remotes = "В этом репозитории нет remote."
+# context: row about a git setting the profile overrides; {key} is the setting, {value} its value, {origin} the file
+override_overridden = "Переопределяет {key} = {value}  ({origin})"
+# context: row about a git setting that competes with the profile; {key} is the setting, {value} its value, {origin} the file
+override_competes = "Конкурирует с {key} = {value}  ({origin})"
+# context: label of the line that says why the profile cannot be used right now
+unavailable_label = "Нельзя использовать"
+# context: button that tests the connection of every remote
+button_test = "Проверить подключение"
+# context: button that saves the page's choices
+button_save = "Сохранить"
+# context: button that drops the unsaved choices
+button_revert = "Отменить изменения"
+# context: button that clears this repository's sign-in settings
+button_defaults = "По умолчанию"
+# context: status line; the edited choices are not saved yet
+dirty_note = "Есть несохранённые изменения."
+# context: status after saving
+saved = "Сохранено. Теперь этот репозиторий входит так, как выбрано."
+# context: status after reverting
+reverted = "Возврат к сохранённому выбору."
+# context: status after clearing the profile
+cleared = "Сброшено: этот репозиторий снова использует собственные учётные данные компьютера."
+# context: status when there was no profile to clear
+nothing_to_clear = "Сбрасывать было нечего."
+# context: status when Test connection was pressed with unsaved changes
+test_save_first = "Сначала сохраните: проверка использует сохранённый выбор."
+# context: status line while the settings are being saved
+saving = "Сохранение..."
+# context: status when the daemon refused the profile; {why} is its reason
+refused = "Не сохранено: {why}"
+# context: status when the profile could not be read; {why} is the reason
+load_failed = "Не удалось прочитать настройки входа: {why}"
+# context: status while a connection test runs; {frame} is a spinner glyph
+test_running = "{frame} Проверка подключения..."
+# context: status when the typed command or the cache value cannot be used; {why} is the reason
+invalid = "Сохранить нельзя: {why}"
+# context: reason: the helper field is empty
+invalid_helper = "помощник не указан"
+# context: reason: the command field is empty
+invalid_command = "команда не указана"
+# context: reason: the command has an unclosed quote
+invalid_quote = "в команде не закрыта кавычка"
+# context: reason: the cache value is not a number
+invalid_cache = "значение кэша не является целым числом минут"
+# context: reason: no account was chosen
+invalid_account = "учётная запись не выбрана"
+# context: reason: the key file field is empty
+invalid_key = "файл ключа не указан"
+# context: title of the question asked before a helper or token command is saved
+confirm_title = "Разрешить эту команду?"
+# context: sentence above the command in the confirmation
+confirm_question = "Этот репозиторий будет запускать эту команду на вашем компьютере при каждом обращении к своему remote. Прочитайте её, прежде чем разрешить."
+# context: heading above a credential helper in the confirmation
+confirm_helper_heading = "Помощник учётных данных"
+# context: heading above a token command in the confirmation
+confirm_command_heading = "Команда токена"
+# context: line under the command in the confirmation; {hash} is the SHA-256 of the command
 confirm_hash = "SHA-256: {hash}"
-answer_save = "Save and allow"
-answer_cancel = "Cancel"
-confirm_hint = "Up/Down or 1/2 to choose, Enter to confirm, PgUp/PgDn to scroll, Esc to cancel"
-defaults_title = "Use the default sign-in?"
-defaults_body = "This repository will use the machine's own identity again: git's helpers for HTTPS, ssh's own setup for SSH. The commands and keys chosen here are forgotten."
-defaults_confirm = "Use defaults"
-results_title = "Connection test"
-results_hint = "Up/Down, PgUp/PgDn, Home/End to scroll, Esc to close"
+# context: first numbered answer of the confirmation
+answer_save = "Сохранить и разрешить"
+# context: second numbered answer of the confirmation
+answer_cancel = "Отмена"
+# context: key hint under the numbered answers of the confirmation
+confirm_hint = "Вверх/Вниз или 1/2 для выбора, Enter для подтверждения, PgUp/PgDn для прокрутки, Esc для отмены"
+# context: title of the question asked before the profile is cleared
+defaults_title = "Вернуть вход по умолчанию?"
+# context: body of the question asked before the profile is cleared
+defaults_body = "Этот репозиторий снова будет использовать собственные учётные данные компьютера: помощники git для HTTPS, собственную настройку ssh для SSH. Выбранные здесь команды и ключи будут забыты."
+# context: confirm button of the clear question
+defaults_confirm = "По умолчанию"
+# context: title of the panel with the connection test results
+results_title = "Проверка подключения"
+# context: key hint on the results panel
+results_hint = "Вверх/Вниз, PgUp/PgDn, Home/End для прокрутки, Esc для закрытия"
+# context: results panel line; {name} is the remote, {transport} https or ssh, {who} the identity it signs in with
 results_remote = "{name}  ({transport}, {who})"
+# context: results line, the fetch check
 results_fetch = "{$Fetch}"
+# context: results line, the push check
 results_push = "{$Push}"
-result_ok = "  {op}: ok  {extra}"
-result_failed = "  {op}: failed  {extra}"
-result_branches = { one = "{n} branch", other = "{n} branches" }
-result_ms = "{ms} ms"
-result_accepted_key = "accepted key {path}"
-result_accepted_account = "accepted account {who}"
-result_system = "answered with the machine's own identity"
+# context: results line of a check that worked; {op} is what was checked, {extra} the details
+result_ok = "  {op}: успешно  {extra}"
+# context: results line of a check that failed; {op} is what was checked, {extra} the details
+result_failed = "  {op}: ошибка  {extra}"
+# context: detail of a results line; {n} branches were advertised
+result_branches = { one = "{n} ветка", few = "{n} ветки", many = "{n} веток", other = "{n} веток" }
+# context: detail of a results line; {ms} is the duration in milliseconds
+result_ms = "{ms} мс"
+# context: detail of a results line; {path} is the SSH key the server accepted
+result_accepted_key = "сервер принял ключ {path}"
+# context: detail of a results line; {who} names the account whose token was accepted
+result_accepted_account = "принята учётная запись {who}"
+# context: detail of a results line when the machine's own identity answered
+result_system = "ответили собственные учётные данные компьютера"
+# context: results line that continues a failure; {text} is the reason or the advice
 result_reason = "    {text}"
-result_error = "The test could not run: {why}"
-result_none = "There is no remote to test."
-result_saved_note = "Tested with the saved choices."
-close_body = "SSH & credentials has changes that are not saved."
-palette_open = "Repository: SSH & Credentials..."
-palette_test = "Repository: Test Connection"
-palette_defaults = "Repository: Use Default Credentials"
-scope_ok = "nothing missing, nothing extra"
-scope_missing = "missing: {list}"
-scope_excess = "more than needed: {list}"
-loading = "Reading the sign-in settings..."
-identity_token = "Signs in as: {account} (token)"
-identity_user = "Signs in as: {user}"
-identity_helper = "Signs in with this repository's credential helper"
-identity_command = "Signs in with this repository's token command"
-identity_ignored = "Ignores the credential helpers of this repository"
-identity_ssh = "SSH key: {key}"
-identity_ssh_account = "SSH key of {account}"
+# context: results line when the test itself could not run; {why} is the reason
+result_error = "Не удалось выполнить проверку: {why}"
+# context: results panel line when there is no remote
+result_none = "Нет remote для проверки."
+# context: first results line, saying which choices were tested
+result_saved_note = "Проверено с сохранённым выбором."
+# context: body of the question asked when closing Settings with unsaved sign-in choices
+close_body = "В разделе «SSH и учётные данные» есть несохранённые изменения."
+# context: command palette entry that opens the SSH & credentials page
+palette_open = "Репозиторий: SSH и учётные данные..."
+# context: command palette entry that tests the connection of every remote
+palette_test = "Репозиторий: проверить подключение"
+# context: command palette entry that clears the sign-in settings after asking
+palette_defaults = "Репозиторий: учётные данные по умолчанию"
+# context: scope line when the token has every scope git needs and nothing extra
+scope_ok = "всё нужное есть, лишнего нет"
+# context: part of the scope line; {list} names the scopes the token lacks
+scope_missing = "не хватает: {list}"
+# context: part of the scope line; {list} names the scopes the token has beyond what is needed
+scope_excess = "больше, чем нужно: {list}"
+# context: shown while the page asks the daemon for the current sign-in settings
+loading = "Чтение настроек входа..."
+# context: line saying which GitPoulpi account this repository signs in as over HTTPS; {account} is the account id
+identity_token = "Вход как: {account} (токен)"
+# context: line saying which git user name this repository signs in as over HTTPS
+identity_user = "Вход как: {user}"
+# context: line saying HTTPS sign-in uses a credential helper chosen for this repository
+identity_helper = "Вход через помощник учётных данных этого репозитория"
+# context: line saying HTTPS sign-in uses a token command chosen for this repository
+identity_command = "Вход через команду токена этого репозитория"
+# context: line saying the credential helpers the repository sets itself are not used
+identity_ignored = "Помощники учётных данных этого репозитория игнорируются"
+# context: line saying which key file this repository uses over SSH; {key} is the file name
+identity_ssh = "Ключ SSH: {key}"
+# context: line saying this repository uses the SSH key of a GitPoulpi account; {account} is the account id
+identity_ssh_account = "Ключ SSH учётной записи {account}"
+# context: joins the HTTPS line and the SSH line of the active sign-in
 identity_both = "{https}; {ssh}"
-menu_row = "SSH & credentials..."
-pin_label = "Pinned in git's config"
-pin_help = "This repository sets its own SSH command. GitPoulpi can keep that key in its private store instead of the repository's config."
-pin_move = "Move into GitPoulpi"
-pin_other = "This command is not a plain key pin, so GitPoulpi cannot move it. Edit it with git config."
-pin_save_first = "Save or revert your edits first."
-pin_ssh_taken = "SSH already has a source here. Use the defaults first, then move the pin."
-pin_moved = "Moved: this repository now signs in over SSH with {key}, and its pin is removed."
-pin_unset_failed = "The key is saved, but the pin could not be removed: {why}"
-acl_warning = "Other accounts can read this key file. OpenSSH refuses such a key (bad permissions)."
-acl_button = "Restrict to my account"
-acl_done = "The key file can now be read by your account only."
-acl_failed = "Could not restrict the key file: {why}"
+# context: row of the repository tab menu that opens the SSH & credentials page
+menu_row = "SSH и учётные данные..."
+# context: label of the row showing the SSH command the repository itself sets
+pin_label = "Закреплено в конфигурации git"
+# context: help under the row that shows an SSH key pinned in the repository's config
+pin_help = "Этот репозиторий задаёт собственную команду SSH. GitPoulpi может хранить этот ключ в своём закрытом хранилище вместо конфигурации репозитория."
+# context: button that turns the SSH command pinned in the repository's config into a key choice of this page and removes the pin
+pin_move = "Перенести в GitPoulpi"
+# context: note shown instead of the move button when the pinned SSH command does more than name one key
+pin_other = "Эта команда не просто закрепляет ключ, поэтому GitPoulpi не может её перенести. Измените её через git config."
+# context: status when the move was asked while the page has unsaved edits
+pin_save_first = "Сначала сохраните или отмените свои изменения."
+# context: status when the move was asked but this page already chooses an SSH source
+pin_ssh_taken = "Для SSH здесь уже выбран источник. Сначала верните значения по умолчанию, затем переносите закрепление."
+# context: status after the move; {key} is the key file path
+pin_moved = "Перенесено: теперь этот репозиторий входит по SSH с ключом {key}, а закрепление удалено."
+# context: status when the pin removal failed after the key was saved; {why} is the reason
+pin_unset_failed = "Ключ сохранён, но закрепление удалить не удалось: {why}"
+# context: warning under the key file row when the file is readable by other accounts
+acl_warning = "Другие учётные записи могут читать этот файл ключа. OpenSSH отклоняет такой ключ (bad permissions)."
+# context: button that makes the key file readable by the current account only
+acl_button = "Ограничить моей учётной записью"
+# context: status after the key file was restricted
+acl_done = "Теперь файл ключа может читать только ваша учётная запись."
+# context: status when restricting the key file failed; {why} is the reason
+acl_failed = "Не удалось ограничить доступ к файлу ключа: {why}"

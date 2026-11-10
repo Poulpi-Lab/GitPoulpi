@@ -168,3 +168,25 @@ fn sizes_read_as_a_person_would() {
     assert_eq!(size_text(49_206), "49.2 KB (49206 bytes)");
     assert_eq!(size_text(2_500_000), "2.5 MB (2500000 bytes)");
 }
+
+#[test]
+fn a_cyrillic_key_letter_also_answers_to_the_latin_key_in_its_place() {
+    assert_eq!(latin_twin('в'), Some('d'));
+    assert_eq!(latin_twin('і'), Some('s'));
+    assert_eq!(latin_twin('d'), None);
+    let mut dialog = GuideDialog::conflicts_first(Blocked::Commit, &files(1));
+    dialog.keys = vec![('р', Choice::Primary), ('о', Choice::Cancel)];
+    // The Latin layout's key at the same place as 'р' is 'h'.
+    assert_eq!(
+        dialog.on_key(key(KeyCode::Char('h'))),
+        Outcome::Chose(Choice::Primary)
+    );
+    assert_eq!(
+        dialog.on_key(key(KeyCode::Char('Р'))),
+        Outcome::Chose(Choice::Primary)
+    );
+    assert_eq!(
+        dialog.on_key(key(KeyCode::Char('j'))),
+        Outcome::Chose(Choice::Cancel)
+    );
+}

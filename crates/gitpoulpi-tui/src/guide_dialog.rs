@@ -92,6 +92,42 @@ fn lower(c: char) -> char {
     c.to_lowercase().next().unwrap_or(c)
 }
 
+/// The Latin letter on the same physical key as a Cyrillic letter (Russian and
+/// Ukrainian layouts over QWERTY), so a localized key letter still works when
+/// the keyboard is switched to a Latin layout. `None` for other letters.
+pub(crate) fn latin_twin(c: char) -> Option<char> {
+    const PAIRS: &[(char, char)] = &[
+        ('й', 'q'),
+        ('ц', 'w'),
+        ('у', 'e'),
+        ('к', 'r'),
+        ('е', 't'),
+        ('н', 'y'),
+        ('г', 'u'),
+        ('ш', 'i'),
+        ('щ', 'o'),
+        ('з', 'p'),
+        ('ф', 'a'),
+        ('ы', 's'),
+        ('і', 's'),
+        ('в', 'd'),
+        ('а', 'f'),
+        ('п', 'g'),
+        ('р', 'h'),
+        ('о', 'j'),
+        ('л', 'k'),
+        ('д', 'l'),
+        ('я', 'z'),
+        ('ч', 'x'),
+        ('с', 'c'),
+        ('м', 'v'),
+        ('и', 'b'),
+        ('т', 'n'),
+        ('ь', 'm'),
+    ];
+    PAIRS.iter().find(|(cyr, _)| *cyr == c).map(|&(_, lat)| lat)
+}
+
 /// "Send anyway (S)": the label with its key.
 pub(crate) fn labelled(label: &str, key: char) -> String {
     format!("{label} ({})", key.to_uppercase())
@@ -199,7 +235,11 @@ impl GuideDialog {
                 .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT)
             {
                 let c = lower(c);
-                if let Some((_, choice)) = self.keys.iter().find(|(k, _)| *k == c) {
+                if let Some((_, choice)) = self
+                    .keys
+                    .iter()
+                    .find(|(k, _)| *k == c || latin_twin(*k) == Some(c))
+                {
                     return Outcome::Chose(*choice);
                 }
             }

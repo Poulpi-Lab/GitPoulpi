@@ -1152,6 +1152,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Інтеграції: переглянути перевірку безпеки |  |
 | Застосунок: вийти | `q` |
 | Застосунок: тема... |  |
+| Conflicts: Edit Base Branch Lists... |  |
+| Conflicts: Base Branches of This Repository... |  |
 | Застосунок: змінити тему... | `Ctrl+N y` |
 | Застосунок: змінити мову... | `Ctrl+N g` |
 | Лаунчер: створити ярлик |  |

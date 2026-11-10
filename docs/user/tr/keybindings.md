@@ -1158,6 +1158,8 @@ Tuşlar varsayılanlardır.
 | Entegrasyonlar: Güvenlik Denetimini İncele |  |
 | Uygulama: Çık | `q` |
 | Uygulama: Tema... |  |
+| Conflicts: Edit Base Branch Lists... |  |
+| Conflicts: Base Branches of This Repository... |  |
 | Uygulama: Temayı Değiştir... | `Ctrl+N y` |
 | Uygulama: Dili Değiştir... | `Ctrl+N g` |
 | Başlatıcı: Kısayol Oluştur |  |

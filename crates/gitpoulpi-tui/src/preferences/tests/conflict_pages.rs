@@ -2,6 +2,8 @@
 //! on General: their rows, what they save.
 
 use super::*;
+use crate::preferences::conflict_pages::SourceChoice;
+use crate::preferences::repo_pages::{RpButton, RpTarget};
 use crossterm::event::{KeyEvent, KeyModifiers};
 
 fn saved(dir: &Path) -> gitpoulpi_session::RepoPreferences {
@@ -22,6 +24,11 @@ fn select(st: &mut PreferencesState, label_start: &str) {
                 st.fields().iter().map(|f| &f.label).collect::<Vec<_>>()
             )
         });
+}
+
+fn select_exact(st: &mut PreferencesState, label: &str) {
+    st.focus = PrefFocus::Fields;
+    st.field = st.fields().iter().position(|f| f.label == label).unwrap();
 }
 
 fn key(st: &mut PreferencesState, code: KeyCode, mods: KeyModifiers) {
@@ -79,9 +86,19 @@ fn base_branches_default_to_every_branch_and_the_edit_is_saved() {
         Control::Area(text) => text.clone(),
         other => panic!("{other:?}"),
     };
+    // Followed from the default: read-only, no editor.
+    assert!(matches!(
+        st.fields()
+            .iter()
+            .find(|f| f.label == "Base branches")
+            .unwrap()
+            .control,
+        Control::Info(_)
+    ));
+    st.commit_choice(&Target::RepoPage(RpTarget::BaseSource), 1);
     assert_eq!(area(&st), "**");
 
-    select(&mut st, "Base branches");
+    select_exact(&mut st, "Base branches");
     st.activate();
     // The editor starts on the current text, the cursor at its end.
     key(&mut st, KeyCode::Backspace, KeyModifiers::NONE);
@@ -100,8 +117,8 @@ fn base_branches_default_to_every_branch_and_the_edit_is_saved() {
     );
     assert_eq!(area(&st), "origin/**\n!origin/abc");
 
-    // Back to the default: stored as "not set", so it follows the default.
-    select(&mut st, "Base branches");
+    // Emptied: stored as "not set", the Own list then reads what is in force.
+    select_exact(&mut st, "Base branches");
     st.activate();
     for _ in 0..30 {
         key(&mut st, KeyCode::Backspace, KeyModifiers::NONE);
@@ -123,7 +140,7 @@ fn the_page_carries_the_four_row_pattern_table() {
             _ => None,
         })
         .collect();
-    let patterns: Vec<&str> = infos.iter().map(|(p, _)| *p).collect();
+    let patterns: Vec<&str> = infos.iter().skip(1).map(|(p, _)| *p).collect();
     assert_eq!(
         patterns,
         [
@@ -152,5 +169,207 @@ fn the_global_switch_is_on_the_general_page_and_on_by_default() {
         gitpoulpi_config::Config::default()
             .general
             .conflict_detection
+    );
+}
+
+// -- named lists, the default list and the repository's source ---------------
+
+fn type_text(st: &mut PreferencesState, row: &str, text: &str) {
+    select(st, row);
+    st.activate();
+    for c in text.chars() {
+        key(st, KeyCode::Char(c), KeyModifiers::NONE);
+    }
+    key(st, KeyCode::Enter, KeyModifiers::NONE);
+}
+
+fn config_on_disk(dir: &Path) -> gitpoulpi_config::Config {
+    gitpoulpi_config::Config::load(&dir.join("config.toml")).unwrap()
+}
+
+fn base_row(st: &PreferencesState) -> Control {
+    st.fields()
+        .into_iter()
+        .find(|f| f.label == "Base branches")
+        .unwrap()
+        .control
+}
+
+fn press(st: &mut PreferencesState, label: &str) {
+    let button = st
+        .fields()
+        .into_iter()
+        .find_map(|f| match f.control {
+            Control::Buttons(b) => b.into_iter().find(|b| b.label == label),
+            _ => None,
+        })
+        .unwrap_or_else(|| panic!("no button {label}"));
+    st.press_button(&button);
+}
+
+fn confirm_yes(st: &mut PreferencesState) {
+    assert!(
+        st.confirm_action.is_some(),
+        "a destructive button asks first"
+    );
+    key(st, KeyCode::Tab, KeyModifiers::NONE);
+    key(st, KeyCode::Enter, KeyModifiers::NONE);
+    assert!(st.confirm_action.is_none());
+}
+
+#[test]
+fn a_list_is_created_named_default_and_followed_by_a_repository_without_its_own() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "General");
+    type_text(&mut st, "New list", "trunk");
+    let cfg = config_on_disk(dir.path());
+    assert_eq!(cfg.conflict_prevention.lists["trunk"].patterns, ["**"]);
+    assert_eq!(cfg.conflict_prevention.default_list, "");
+
+    // Edit its patterns in the multi-line editor.
+    st.field = st
+        .fields()
+        .iter()
+        .position(|f| f.label == "Patterns")
+        .unwrap();
+    st.focus = PrefFocus::Fields;
+    st.activate();
+    key(&mut st, KeyCode::Backspace, KeyModifiers::NONE);
+    key(&mut st, KeyCode::Backspace, KeyModifiers::NONE);
+    for c in "origin/main".chars() {
+        key(&mut st, KeyCode::Char(c), KeyModifiers::NONE);
+    }
+    key(&mut st, KeyCode::Char('s'), KeyModifiers::CONTROL);
+    assert_eq!(
+        config_on_disk(dir.path()).conflict_prevention.lists["trunk"].patterns,
+        ["origin/main"]
+    );
+
+    // Make it the default.
+    press(&mut st, "Make default");
+    assert_eq!(
+        config_on_disk(dir.path()).conflict_prevention.default_list,
+        "trunk"
+    );
+
+    // A repository that chose nothing follows it, shown on its page.
+    let mut page = state_at(dir.path(), "ConflictPrevention");
+    page.config = config_on_disk(dir.path());
+    match base_row(&page) {
+        Control::Info(text) => assert_eq!(text, "origin/main"),
+        other => panic!("{other:?}"),
+    }
+    let fields = page.fields();
+    let Control::Choice { options, index } = &fields[1].control else {
+        panic!("the source is a choice")
+    };
+    assert_eq!(options[0], "Default (list trunk)");
+    assert_eq!(*index, 0);
+}
+
+#[test]
+fn a_repository_follows_a_list_then_resets_to_the_default() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "General");
+    type_text(&mut st, "New list", "release");
+    go(&mut st, PrefSection::ConflictPrevention);
+    // The choice is: Default, release, Own list.
+    st.commit_choice(&Target::RepoPage(RpTarget::BaseSource), 1);
+    let prefs = saved(dir.path());
+    assert_eq!(prefs.conflict_base_source.as_deref(), Some("list"));
+    assert_eq!(prefs.conflict_base_list.as_deref(), Some("release"));
+    assert_eq!(st.source_choice(), SourceChoice::List("release".into()));
+
+    // Editing the list changes what the repository uses: it is shared.
+    st.set_conflict_list_patterns(0, "origin/release/**");
+    match base_row(&st) {
+        Control::Info(text) => assert_eq!(text, "origin/release/**"),
+        other => panic!("{other:?}"),
+    }
+
+    press(&mut st, "Reset to default");
+    confirm_yes(&mut st);
+    let prefs = saved(dir.path());
+    assert_eq!(prefs.conflict_base_source, None);
+    assert_eq!(prefs.conflict_base_list, None);
+    assert_eq!(prefs.conflict_base_branches, None);
+    assert_eq!(st.source_choice(), SourceChoice::Default);
+}
+
+#[test]
+fn save_as_list_turns_the_patterns_into_a_followed_list() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "ConflictPrevention");
+    st.commit_choice(&Target::RepoPage(RpTarget::BaseSource), 1);
+    st.set_base_branches("origin/**\n!origin/abc");
+    type_text(&mut st, "Save as list", "mine");
+    let cfg = config_on_disk(dir.path());
+    assert_eq!(
+        cfg.conflict_prevention.lists["mine"].patterns,
+        ["origin/**", "!origin/abc"]
+    );
+    let prefs = saved(dir.path());
+    assert_eq!(prefs.conflict_base_source.as_deref(), Some("list"));
+    assert_eq!(prefs.conflict_base_list.as_deref(), Some("mine"));
+    // A taken name is refused and the field stays open.
+    assert!(!st.conflict_commit_text(RpTarget::SaveAsList, "mine"));
+}
+
+#[test]
+fn an_older_own_list_is_still_the_own_list() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "ConflictPrevention");
+    st.repo_state.preferences.conflict_base_branches = Some("origin/**".into());
+    assert_eq!(st.source_choice(), SourceChoice::Own);
+    assert!(matches!(base_row(&st), Control::Area(t) if t == "origin/**"));
+}
+
+#[test]
+fn deleting_a_list_asks_names_it_and_clears_the_default() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "General");
+    type_text(&mut st, "New list", "old");
+    press(&mut st, "Make default");
+    let asked = st
+        .conflict_confirm_text(PrefAction::RepoPage(RpButton::ConflictListDelete(0)))
+        .unwrap();
+    assert!(asked.contains("old"), "{asked}");
+    press(&mut st, "Delete list");
+    confirm_yes(&mut st);
+    let cfg = config_on_disk(dir.path());
+    assert!(cfg.conflict_prevention.lists.is_empty());
+    assert_eq!(cfg.conflict_prevention.default_list, "");
+}
+
+#[test]
+fn renaming_a_list_keeps_it_the_default_and_the_name_must_be_free() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "General");
+    type_text(&mut st, "New list", "a");
+    type_text(&mut st, "New list", "b");
+    st.commit_choice(&Target::RepoPage(RpTarget::ConflictDefaultList), 1);
+    assert!(!st.conflict_commit_text(RpTarget::ConflictListName(0), "b"));
+    assert!(st.conflict_commit_text(RpTarget::ConflictListName(0), "z"));
+    let cfg = config_on_disk(dir.path());
+    let names: Vec<_> = cfg.conflict_prevention.lists.keys().cloned().collect();
+    assert_eq!(names, ["b", "z"]);
+    assert_eq!(cfg.conflict_prevention.default_list, "z");
+    assert!(!st.conflict_commit_text(RpTarget::ConflictListNew, "  "));
+}
+
+#[test]
+fn reset_to_the_built_in_default_clears_the_default_list() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "General");
+    type_text(&mut st, "New list", "x");
+    press(&mut st, "Make default");
+    assert_eq!(
+        config_on_disk(dir.path()).conflict_prevention.default_list,
+        "x"
+    );
+    press(&mut st, "Reset to built-in default");
+    assert_eq!(
+        config_on_disk(dir.path()).conflict_prevention.default_list,
+        ""
     );
 }

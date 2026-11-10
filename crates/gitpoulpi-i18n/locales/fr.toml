@@ -7644,8 +7644,8 @@ reset_repo = "Reset to default"
 reset_repo_help = "Reset drops this repository's own choice and list: it follows the default again."
 use_workflow = "Use the workflow's base branches"
 use_workflow_help = "Fills Own list with the base branches of this repository's branching workflow."
-palette_lists = "Conflicts: Edit Base Branch Lists..."
-palette_repo = "Conflicts: Base Branches of This Repository..."
+palette_lists = "Conflits : Modifier les listes de branches de base..."
+palette_repo = "Conflits : Branches de base de ce dépôt..."
 
 [rewrite_tools]
 # context: install hint shown next to a missing tool a history rewrite needs; one per tool and OS

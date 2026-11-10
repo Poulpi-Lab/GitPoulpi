@@ -1158,6 +1158,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Integrations: Review security check |  |
 | App: Quit | `q` |
 | App: Theme... |  |
+| Conflicts: Edit Base Branch Lists... |  |
+| Conflicts: Base Branches of This Repository... |  |
 | App: Change Theme... | `Ctrl+N y` |
 | App: Change Language... | `Ctrl+N g` |
 | Launcher: Create Shortcut |  |

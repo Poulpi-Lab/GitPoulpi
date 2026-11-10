@@ -310,9 +310,11 @@ votre dossier personnel.
 Un paramètre fait ailleurs l'emporte toujours sur ces chemins. L'ordre, du plus
 prioritaire au moins prioritaire :
 
+0. Une clé choisie pour un seul dépôt sur sa propre page
+   [SSH et identifiants](#propre-au-dépôt--ssh-et-identifiants) (le groupe propre au dépôt).
 1. `GIT_SSH_COMMAND` ou `GIT_SSH` dans l'environnement où GitPoulpi tourne.
 2. `core.sshCommand` dans la configuration git du dépôt ou votre configuration git
-   globale. L'élément *Clé SSH...* du menu de l'onglet l'écrit pour un dépôt.
+   globale. L'ancienne épingle « Clé SSH... » du menu de l'onglet l'écrivait pour un dépôt.
 3. Les deux chemins de clé de cette page.
 4. Les valeurs par défaut de ssh et l'agent.
 
@@ -542,6 +544,62 @@ Trois options se trouvent sur l'onglet **Général**.
 | **Installer les filtres LFS avant pull et push** | Avant un pull ou un push, lance `git lfs install --local` quand le dépôt utilise LFS et que ses filtres manquent. |
 | **Programme git-lfs** | Le programme `git-lfs` détecté (lecture seule). |
 | **Initialiser LFS pour ce dépôt** | Lance `git lfs install --local` maintenant. |
+
+### Propre au dépôt : SSH et identifiants
+
+`gitpoulpi ui show settings ssh-credentials`. Comment *ce dépôt* se connecte, conservé dans le dossier privé de
+GitPoulpi : rien n'est écrit dans le dépôt ni dans la configuration de git, et ce n'est pas annulable (comme tout
+réglage). Cela ne sert qu'aux fetch, pull, push, sous-modules et LFS de ce dépôt. Son jumeau en CLI est
+`gitpoulpi repo-auth` (voir la [référence de la CLI](cli-reference.md)). On atteint aussi la page depuis la palette de
+commandes : **Dépôt : SSH et identifiants...**. Rien n'est envoyé tant que vous n'appuyez pas sur **Enregistrer** ; la
+page interroge le démon, donc elle ne bloque jamais.
+
+| Ligne | Ce qu'elle fait |
+|---|---|
+| **HTTPS : Se connecter avec** | **Système** (les assistants propres à git, par défaut), **Compte GitPoulpi** (le jeton d'une intégration ; les comptes dont l'hôte est l'un des distants de ce dépôt viennent en premier, et la ligne dessous dit ce qu'a trouvé la dernière vérification du jeton : portées manquantes et en trop), **Assistant d'identifiants** ou **Commande de jeton**. |
+| **Nom d'utilisateur git** | Envoyé comme nom d'utilisateur des distants HTTPS. Avec **Système**, il permet à un gestionnaire d'identifiants de choisir l'un de plusieurs comptes enregistrés. |
+| **Ignorer les assistants d'identifiants définis par ce dépôt** | **Système** seulement. Les assistants que le dépôt définit lui-même (son `.git/config`, les fichiers qu'il inclut) sont listés dessous avec le fichier dont chacun vient ; les assistants du système et globaux continuent de fonctionner. |
+| **Assistant**, **Commande**, **Hôtes**, **Cache (minutes)** | Une commande que le dépôt exécute pour se connecter. Un *assistant* est un assistant d'identifiants git ; une *commande de jeton* affiche un jeton (la liste d'arguments est découpée aux espaces, avec des guillemets autour d'un argument qui contient des espaces, et affichée sous **Exécutée comme** ; aucun shell ne l'exécute, elle s'exécute dans le dossier du dépôt). **Hôtes** la limite à ces hôtes (vide : l'hôte du distant principal) ; **Cache** est la durée de réutilisation d'un jeton (50 minutes par défaut). **Utiliser l'assistant actuel de ce dépôt** copie dans le champ l'assistant que le dépôt définit. |
+| **SSH : Se connecter avec** | **Système** (la configuration propre à ssh, l'agent et les clés par défaut), **Fichier de clé** ou **Clé du compte** (la clé d'une intégration). |
+| **Fichier de clé privée** | Choisissez l'une des clés trouvées dans `~/.ssh` ou saisissez un chemin. Seule cette clé est proposée, à chaque distant SSH du dépôt, sous-modules compris. Quand d'autres comptes peuvent lire le fichier de clé (un bit de permission pour le groupe ou les autres sous Linux et macOS, une entrée pour Tout le monde, Utilisateurs ou Utilisateurs authentifiés sous Windows), un avertissement dit qu'OpenSSH refuse une telle clé (« bad permissions ») et **Limiter à mon compte** corrige cela (`chmod 600`, ou une DACL pour votre compte et SYSTEM seulement sous Windows). |
+| **Fichier known_hosts**, **Vérification stricte de la clé d'hôte** | Un fichier facultatif de clés d'hôtes de confiance, et le refus d'un hôte qui n'y figure pas. |
+| **Programme ssh** | Le programme qui sera exécuté (lecture seule). |
+| **Épinglée dans la config de git** | Seulement quand ce dépôt définit son propre `core.sshCommand` (l'ancienne épingle « Clé SSH de ce dépôt », que GitPoulpi écrivait). La commande est affichée en lecture seule. **Déplacer dans GitPoulpi** enregistre le choix **Fichier de clé** équivalent puis retire l'épingle de la config de git ; il est proposé quand la commande est une simple épingle `ssh -i <key>`, et seulement tant que la page n'a aucune modification non enregistrée et que son choix SSH est encore **Système**. Toute autre commande est affichée avec une note à la place : modifiez-la avec `git config`. Le déplacement n'est pas annulable, comme chaque réglage ici, et le retrait de l'épingle n'est pas non plus dans la pile d'annulation (rien n'est perdu : la clé est dans le profil). |
+| **Distants** | Lecture seule : chaque distant avec son protocole et l'identité qu'il utilisera. Les réglages que le profil remplace (`core.sshCommand`, `credential.helper`) sont listés avec leur fichier, et un profil inutilisable dit pourquoi. |
+
+Boutons (une touche pour chacun : `Tab`/`Left`/`Right` pour passer de l'un à l'autre, `Enter` appuie) :
+
+- **Tester la connexion** vérifie chaque distant avec les choix enregistrés, fetch d'abord puis push (aucune donnée ne
+  circule), et ouvre un panneau de résultats : par distant, ok ou échec, l'identité qui a répondu (la clé que le
+  serveur a acceptée, ou le compte dont le jeton a été accepté), la durée et une lecture claire d'un échec. Il
+  s'exécute en arrière-plan, avec un indicateur d'attente après un instant. Le panneau défile avec `Up`/`Down`,
+  `PgUp`/`PgDn`, `Home`/`End`, la molette et sa barre de défilement, et se ferme avec `Esc` ou sa croix. Le jumeau de
+  palette est **Dépôt : Tester la connexion**.
+- **Enregistrer** envoie les choix. **Rétablir** abandonne ceux qui ne sont pas enregistrés. Fermer les Paramètres avec
+  des choix non enregistrés demande d'abord.
+- **Valeurs par défaut** demande, puis oublie le profil : les assistants de git pour HTTPS et la configuration propre à
+  ssh pour SSH. Le jumeau de palette est **Dépôt : Utiliser les identifiants par défaut**, qui demande aussi.
+
+Enregistrer un **Assistant d'identifiants** ou une **Commande de jeton** demande d'abord **Autoriser cette commande ?** :
+la commande est montrée mot pour mot (les caractères de contrôle sont écrits en toutes lettres, les longues lignes
+sont renvoyées à la ligne), avec son SHA-256 et deux réponses, `1` **Enregistrer et autoriser** et `2` **Annuler**.
+Aucune réponse n'est choisie tant que vous n'appuyez pas sur une flèche ou un chiffre, donc un `Enter` perdu ne fait
+rien ; `Esc`, **Annuler** et la croix du panneau annulent tous. `PgUp`/`PgDn`/`Home`/`End` et la barre de défilement
+font défiler une longue commande. Si la commande est déjà enregistrée et inchangée, enregistrer l'autre moitié de la
+page ne redemande pas.
+
+Un profil inutilisable (un fichier de clé manquant, une source que cette version ne gère pas encore) fait échouer le
+transfert avec sa raison au lieu de se rabattre sur l'identité de la machine.
+
+Quand le profil n'est pas entièrement par défaut, le menu **Push** se termine par une ligne disant avec quelle identité
+le push se connecte (**Connecté en tant que : github-corp (jeton)** ou **Clé SSH : work_ed25519**) ; elle ouvre cette
+page. La même ligne est ajoutée aux entrées du Journal d'activité des fetch, pull et push. Un échec causé par les
+choix de cette page (un assistant d'identifiants qui n'a pas pu s'exécuter, une clé d'hôte SSH pas encore connue, une
+connexion refusée, une commande de jeton qui a échoué, un jeton qui n'a pas été envoyé parce que le serveur n'est pas
+l'adresse du compte) affiche un bouton **SSH et identifiants...** sur son entrée du Journal d'activité (`r` sur
+l'entrée), à côté de **Ouvrir les Intégrations** quand un compte d'intégration peut être la source. La ligne **SSH et
+identifiants...** du menu de l'onglet ouvre aussi la page ; elle remplace l'ancien menu d'épingle **Clé SSH...** et son
+entrée de palette.
 
 ### Propre au dépôt : Extraction partielle
 

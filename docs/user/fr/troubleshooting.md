@@ -39,7 +39,7 @@ Le bouton **Activité** à l'extrémité droite de la ligne d'état (un nombre d
 
   ![Le Journal d'activité, onglet Application : la zone Niveau, les cases Afficher par niveau avec Tout et Rien, le filtre et les lignes du journal](../images/activity-log.png)
 
-- **Opérations Git** (l'onglet sur lequel la fenêtre s'ouvre) : les opérations, la plus récente d'abord, chacune avec l'heure à laquelle elle a eu lieu et sa durée (`Push - 123 ms`) : ouverture du dépôt, chargement du graphe des commits, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Les échecs, les messages d'état, un clone qui a échoué et le Fetch all d'un espace de travail y sont listés aussi ; `Enter` ou un clic en ouvre un (sa raison, l'étape suivante, la commande, le code de sortie et la sortie), `c` ou son bouton Copier le copie, `r` ou son bouton lance l'étape suggérée. `Tab` (ou `Left`/`Right` ici) passe à l'onglet Application.
+- **Opérations Git** (l'onglet sur lequel la fenêtre s'ouvre) : les opérations, la plus récente d'abord, chacune avec l'heure à laquelle elle a eu lieu et sa durée (`Push - 123 ms`) : ouverture du dépôt, chargement du graphe des commits, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Les échecs, les messages d'état, un clone qui a échoué et le Fetch all d'un espace de travail y sont listés aussi ; `Enter` ou un clic en ouvre un (sa raison, l'étape suivante, la commande, le code de sortie et la sortie), `c` ou son bouton Copier le copie, `r` ou son bouton lance l'étape suggérée. `Tab` (ou `p`) passe à l'onglet Application ; `Left`/`Right` font défiler latéralement les longues lignes.
 
   ![Le Journal d'activité, onglet Opérations Git : chaque opération avec son heure et sa durée, un fetch en échec en rouge](../images/activity-log-repository.png)
 
@@ -116,6 +116,32 @@ GitPoulpi utilise l'assistant d'identifiants et le ssh-agent de votre `git` pour
 réseau. Assurez-vous d'abord que `git fetch` fonctionne dans un terminal simple. Les
 jetons GitHub/GitLab pour les pull requests sont distincts et facultatifs : voir
 [Hébergeurs et suivi de tickets](hosting-integration.md).
+
+**Un fetch, un pull ou un push échoue avec « The configured credential helper failed », « The SSH host key of the remote is not known yet » ou une connexion refusée, et son entrée du Journal d'activité a un bouton « SSH et identifiants... ».**
+L'échec vient de la façon dont ce dépôt se connecte. Le bouton ouvre
+Paramètres > SSH et identifiants, où vous choisissez une autre source pour ce
+dépôt : les assistants propres à git en ignorant ceux du dépôt, un compte
+d'intégration, un fichier de clé (avec un fichier known_hosts), ou un assistant ou
+une commande de jeton de votre cru ; **Tester la connexion** vérifie ensuite chaque
+distant. Pour un assistant qui n'a pas pu s'exécuter, `git config --show-origin
+--get-all credential.helper` montre où il est défini.
+
+**« GitPoulpi did not send the account token to ... ».** Le distant du dépôt
+pointe vers un serveur qui n'est pas l'adresse à laquelle le compte choisi est
+lié (souvent une réécriture `url.<x>.insteadOf` dans la configuration du dépôt
+lui-même), donc le jeton a été retenu. Corrigez le distant ou choisissez une autre
+source sur la page.
+
+**« This repository's token command failed », « ... changed since you confirmed it », « This repository's sign-in cannot be used ».**
+Les choix de la page ne peuvent pas être appliqués : la commande de jeton n'a
+affiché aucun jeton (ses dernières lignes d'erreur sont citées, secrets retirés),
+un script qu'elle exécute a changé depuis que vous l'avez confirmée (confirmez de
+nouveau la commande sur la page), ou le choix désigne un fichier de clé ou un
+compte qui n'existe plus. Chaque lecture a le bouton **SSH et identifiants...**.
+
+**OpenSSH dit « bad permissions » pour un fichier de clé.** D'autres comptes
+peuvent lire la clé. Dans Paramètres > SSH et identifiants, la ligne **Fichier de
+clé privée** montre un avertissement avec **Limiter à mon compte**.
 
 **« staging... » reste dans la ligne d'état.** Une actualisation en arrière-plan tourne
 encore ; il disparaît quand la liste des fichiers se met à jour. `r` force une

@@ -639,17 +639,25 @@ Quand une clé est attachée, la section affiche `titre (SHA256:...)` avec :
 
 ### Clé SSH pour un dépôt
 
-Pour qu'un dépôt utilise la clé d'un profil, GitPoulpi règle `core.sshCommand` sur
-`ssh -i "<key>" -o IdentitiesOnly=yes` dans ce dépôt. Cela n'est jamais fait
-automatiquement. Ouvrez le menu de l'onglet (`Ctrl+T`, ou clic droit sur l'onglet)
-et choisissez **Clé SSH...**, ou lancez la commande de palette *Dépôt : Clé SSH de ce dépôt...*.
-Le menu montre l'épingle actuelle, chaque profil qui a une clé privée, et **Retirer l'épingle**.
+Pour qu'un dépôt utilise une clé précise, ouvrez le menu de l'onglet (`Ctrl+T`, ou
+clic droit sur l'onglet) et choisissez **SSH et identifiants...**, ou lancez la
+commande de palette *Dépôt : SSH et identifiants...*, puis choisissez **Fichier de
+clé** (ou **Clé du compte** pour la clé d'un profil d'intégration) sous SSH. Le choix
+est conservé dans le dossier privé de GitPoulpi : rien n'est écrit dans le dépôt ni
+dans la configuration de git. Voir
+[Paramètres](settings.md#propre-au-dépôt--ssh-et-identifiants).
 
-CLI et MCP : `gitpoulpi ssh-command show | set --key <file> | clear`.
+Un dépôt qui a encore son propre `core.sshCommand`, issu de l'ancienne épingle
+« Clé SSH de ce dépôt », l'affiche sur cette page, en lecture seule, avec
+**Déplacer dans GitPoulpi**.
+
+CLI et MCP : `gitpoulpi repo-auth` (le choix par dépôt) et, pour l'épingle
+`core.sshCommand` elle-même, `gitpoulpi ssh-command show | set --key <file> |
+clear`.
 
 La clé globale de Paramètres > SSH et identifiants (*Chemin de la clé privée*, ou
-*Générer une paire de clés*) s'applique à chaque dépôt sans épingle. Une épingle de
-dépôt l'emporte.
+*Générer une paire de clés*) s'applique à chaque dépôt sans choix propre. Le
+fichier de clé ou l'épingle d'un dépôt l'emporte.
 
 ## 13b. Protection des branches, pour une réécriture d'historique
 

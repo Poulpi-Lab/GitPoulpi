@@ -60,7 +60,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.startup_tab_launcher` | `"last"` | GitPoulpi가 만든 바탕 화면 또는 시작 메뉴 바로 가기(`--launcher`를 전달합니다)로 시작할 때, 폴더와 관계없이 처음 여는 탭: `"home"`, `"last"` 또는 `"radar"`. 위의 두 설정보다 우선합니다. `"last"`: `remember_tabs`가 꺼져 있거나 기억된 탭이 없으면 홈으로 열립니다. `"radar"`: Radar가 꺼져 있거나 빌드에 없으면 홈으로 열립니다. 시작할 때 한 번 읽으며, 적용하려면 재시작이 필요합니다. |
 | `general.group_worktree_tabs` | `true` | 저장소에 연결된 worktree의 탭을 그 저장소 탭 바로 뒤에 둡니다. worktree를 열 때, worktree 탭을 멀리 끌어 놓았을 때(그룹 옆으로 다시 붙습니다. 저장소 탭이 그룹의 머리이고 worktree가 그 뒤를 따릅니다), 이 설정을 켤 때 적용됩니다. 끄면 탭이 놓은 자리에 그대로 남습니다. |
 | `general.undo_depth` | `100` | 실행 취소가 되돌릴 수 있는 작업 수. `0` = 무제한. |
-| `general.conflict_detection` | `true` | 사전 충돌 감지: 현재 브랜치를 갈라져 나온 브랜치로 merge하면 충돌이 생길 때 Log에 배지를 표시합니다. 백그라운드에서 계산하며(메모리 안의 merge이므로 파일, 인덱스, ref는 바뀌지 않습니다) 저장소마다 끌 수 있습니다(`[preferences] conflict_detection`). [merge 충돌 해결](merge-conflicts.md#충돌-방지)을 참조하세요. |
+| `general.conflict_detection` | `true` | 사전 충돌 감지: 현재 브랜치를 갈라져 나온 브랜치로 merge하면 충돌이 생길 때 Log에 배지를 표시합니다. 백그라운드에서 계산하며(메모리 안의 merge이므로 파일, 인덱스, ref는 바뀌지 않습니다) 저장소마다 끌 수 있습니다(`[preferences] conflict_detection`). 비교하는 기준 브랜치에는 자체 목록이 있습니다: [`[conflict_prevention]`](#conflict_prevention-기준-브랜치-목록). [merge 충돌 해결](merge-conflicts.md#충돌-방지)을 참조하세요. |
 | `general.dev_mode` | 없음(자동) | 체크아웃에서 GitPoulpi를 빌드하는 사람을 위한 것이며 설정에는 표시되지 않습니다. 없으면 실행 중인 exe가 `<checkout>/target/<profile>/`에 있을 때 켜집니다(`target` 옆에 `Cargo.toml`과 `crates/gitpoulpi-tui`가 있음). `true` / `false`로 강제할 수 있습니다. 개발 모드는 `ui.launcher_build`만 사용할 수 있게 합니다. |
 | `general.journal_outside` | `true` | 셸이나 AI 에이전트가 브랜치, tag, stash, HEAD에 한 작업을 실행 취소 기록의 항목으로 기록하고 외부 작업으로 표시하여 `Ctrl+Z`로 되돌릴 수 있게 합니다. 파일 편집은 기록하지 않습니다. `undo_enabled`가 필요합니다. [실행 취소와 다시 실행](undo-redo.md#gitpoulpi-밖에서-한-변경)을 참고하세요. |
 | `general.undo_enabled` | `true` | `false`: 실행 취소 기록을 아예 하지 않고(가장 빠름), 실행 취소 기록이 지워지며, 실행 취소/다시 버튼이 사라집니다. [실행 취소와 다시 실행](undo-redo.md)을 참고하세요. |
@@ -254,6 +254,7 @@ merge 충돌 편집기([merge 충돌 해결](merge-conflicts.md))입니다. 설�
 |---|---|---|
 | `git.pull_mode` | `"merge"` | Pull(버튼, `Ctrl+G p`, `Git: Pull`)이 하는 일: `merge`(가능하면 fast-forward), `ff_only`, `rebase`. 항상 git에 명시적으로 전달됩니다. 예전 `fetch_all`은 `merge`로 읽힙니다. |
 | `git.push_behavior` | `"direct"` | `direct`는 기본 리모트로 push합니다. `ask`는 먼저 리모트 메뉴를 표시합니다. |
+| `git.merge_fast_forward` | `"never"` | 직접 시작하는 merge(브랜치 메뉴, 드래그 앤 드롭, 팔레트, `gitpoulpi merge`)에서 브랜치를 fast-forward할 수 있을 때의 동작: `never`는 항상 merge commit을 만들고(`--no-ff`), `allowed`는 가능하면 fast-forward하며(git 기본값, `merge.ff`가 적용됨), `only`는 fast-forward하거나 거부합니다. 저장소 자체의 선택(설정 > Merge 옵션, 그 `repo-state.toml`의 `merge_fast_forward`)이 우선하며, CLI의 `--ff`, `--no-ff`, `--ff-only`는 둘 다보다 우선합니다. 즉시 적용됩니다. |
 | `git.default_encoding` | `"utf-8"` | 유효한 UTF-8이 **아닌** 텍스트(파일 내용, blame, diff, `encoding` 헤더가 없는 commit 메시지)의 인코딩: 모든 WHATWG 레이블(`windows-1252`, `shift_jis`, ...). 표시 전용이며 스테이징은 다시 인코딩하지 않습니다. 저장소가 재정의할 수 있습니다. |
 | `git.lfs_enabled` | `true` | Git LFS를 표시하고 제어합니다. 저장소가 재정의할 수 있습니다. [Git LFS](lfs.md)를 참고하세요. |
 | `git.lfs_autofix_filters` | `true` | LFS를 사용하는 저장소를 pull 또는 push하기 전에, 누락된 LFS 필터 / pre-push 훅을 설치합니다(`git lfs install --local`, 이 저장소에만 해당). [Git LFS](lfs.md)를 참고하세요. |
@@ -488,7 +489,18 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | gitignore 방식의 경로 패턴. `/`가 없는 패턴은 모든 깊이의 파일 이름에 일치하고, `/`가 있는 패턴은 전체 경로에 일치합니다(앞의 `/`는 루트에 고정). `*`와 `?`는 한 폴더 안에 머물고 `**`는 폴더를 넘나듭니다. `!`는 앞선 패턴이 일치시킨 것을 다시 허용하며 마지막으로 일치한 것이 적용됩니다. 대소문자는 무시합니다. 스테이징 가드와 `ai.privacy.exclude_sensitive_files`가 사용합니다. |
 | `privacy.staging_guard` | `true` | 패턴에 일치하거나 내용에 인식된 비밀 정보가 있는 파일을 스테이징하면 먼저 묻고(TUI), `--allow-sensitive`가 없으면 거부되며(CLI), `mcp.allow_sensitive_staging`이 에이전트의 `allow_sensitive` 전달을 허용하지 않으면 거부됩니다(MCP). 텍스트 파일은 각각 최대 1 MiB, 전체 32 MiB까지 읽으며, 바이너리 파일은 이름으로만 일치시킵니다. [스테이징과 commit](staging-and-committing.md#민감한-파일)을 참고하세요. |
 
-## `[keybindings]`
+## `[conflict_prevention]` (기준 브랜치 목록)
+
+사전 충돌 감지가 현재 브랜치의 기준으로 삼을 수 있는 브랜치는 패턴 목록으로 정합니다([merge 충돌 해결](merge-conflicts.md#충돌-방지) 참조). 목록에는 이름을 붙여 공유할 수 있으며, 설정 > 일반 > 충돌 방지에서 편집합니다.
+
+| 키 | 기본값 | 값과 효과 |
+|---|---|---|
+| `conflict_prevention.default_list` | `""` | 자체 목록이 없는 저장소가 사용하는 목록의 이름. 비어 있거나 어느 목록에도 없는 이름이면 기본 제공 `**`(모든 브랜치)입니다. 검사할 때마다 다시 읽으므로 변경은 다시 시작하지 않아도 열려 있는 저장소에 적용됩니다. |
+| `conflict_prevention.lists` | 없음 | 이름 붙인 목록, 목록마다 테이블 하나: `[conflict_prevention.lists.release]`와 `patterns = ["origin/release/**", "!origin/release/old"]`. `patterns`가 비어 있으면 모든 브랜치를 허용합니다. 목록을 편집하면 그 목록을 따르는 모든 저장소에 적용됩니다. |
+
+저장소가 어느 목록을 따르는지는 그 `repo-state.toml`(아래)에 있습니다. 우선순위: 저장소 자체의 패턴, 그다음 따르는 이름 붙인 목록, 그다음 `default_list`, 그다음 `**`.
+
+
 
 TUI의 단축키를 다시 할당합니다. 설정 > 키보드 및 마우스에서 편집합니다.
 
@@ -525,7 +537,9 @@ stage_file = "z"
 | `[preferences] squash_merge` | 로컬 브랜치 merge를 squash: 스테이징만 하고 merge commit을 만들지 않음 (없으면 꺼짐) | 설정 > 저장소별 설정 > Merge 옵션 |
 | `[preferences] template_apply`, `template_strip_comments` | 비어 있는 commit 양식을 템플릿으로 미리 채움, commit할 때 `#` 주석 줄 제거 (둘 다 없으면 꺼짐) | 설정 > 저장소별 설정 > 메시지 템플릿 |
 | `[preferences] conflict_detection` | 이 저장소의 사전 충돌 감지. 없으면 `general.conflict_detection`을 따름 | 설정 > 저장소별 설정 > 충돌 방지 |
-| `[preferences] conflict_base_branches` | 기준 브랜치 패턴, 한 줄에 하나 (없으면 `**`) | 설정 > 저장소별 설정 > 충돌 방지 |
+| `[preferences] conflict_base_branches` | 이 저장소 자체의 기준 브랜치 패턴, 한 줄에 하나 (**자체 목록**으로 계속 사용됨) | 설정 > 저장소별 설정 > 충돌 방지 |
+| `[preferences] conflict_base_source` | 기준 브랜치의 출처: `default`(전역 기본 목록), `list`(`conflict_base_list`) 또는 `own`(`conflict_base_branches`). 없으면 자체 패턴이 있을 때는 그것을, 아니면 기본값을 사용 | 설정 > 저장소별 설정 > 충돌 방지 |
+| `[preferences] conflict_base_list` | 출처가 `list`일 때 이 저장소가 따르는 `[conflict_prevention.lists.<name>]`. 삭제된 목록은 기본값으로 되돌아감 | 설정 > 저장소별 설정 > 충돌 방지 |
 | `commit-template.txt` (`repo-state.toml` 옆의 파일) | commit 템플릿. git의 `commit.template`이 이 파일을 가리킴 | 설정 > 저장소별 설정 > 메시지 템플릿 |
 | `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: 이 저장소의 AI 지침 | 설정 > 저장소별 설정 > AI |
 | `[preferences.ai_overrides.<action>]` | 여기서 한 동작의 `profile`, `instructions` | 설정 > 저장소별 설정 > AI |

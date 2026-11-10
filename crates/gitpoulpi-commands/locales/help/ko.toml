@@ -258,9 +258,9 @@ lfs = "Git LFS: 저장소 기록 밖에 저장되는 큰 파일. 파일을 옮�
 "mcp token --rotate" = "토큰을 새 것으로 교체합니다. 이전 토큰을 가진 클라이언트는 즉시 거부됩니다"
 "mcp token --show" = "클라이언트 설정에 붙여 넣을 수 있도록 전체 토큰도 출력합니다"
 "merge --autostash" = '이 작업을 막는 로컬 변경 사항을 stash하고 작업을 실행한 뒤 stash를 pop합니다 (`general.auto_stash = "always"`가 하는 일)'
-"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
-"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
-"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
+"merge --ff" = "브랜치가 허용하면 fast-forward하고, 아니면 병합 커밋을 만듭니다(git 기본값). 이번 병합에 한해 `git.merge_fast_forward`를 덮어씁니다"
+"merge --ff_only" = "fast-forward만 합니다: 브랜치가 갈라져 있으면 거부합니다. 이번 병합에 한해 `git.merge_fast_forward`를 덮어씁니다"
+"merge --no_ff" = "fast-forward가 가능해도 항상 병합 커밋을 만듭니다. 이번 병합에 한해 `git.merge_fast_forward`를 덮어씁니다"
 "merge --squash" = "브랜치의 커밋을 스쿼시합니다: 변경 사항만 스테이징하고 병합 커밋은 만들지 않으므로(`merge --squash`) 이어서 `commit`을 실행해야 합니다. 병합 동작 설정의 스쿼시 모드입니다. 되돌릴 수 없습니다: 아무것도 이동하지 않았으니 취소하려면 스테이징된 변경을 버리십시오"
 patch = "패치 파일을 쓰거나 작업 트리에 적용합니다"
 "patch apply" = "패치 파일을 작업 트리에 적용합니다"

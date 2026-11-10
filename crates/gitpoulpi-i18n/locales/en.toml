@@ -6139,7 +6139,7 @@ undo_no_such_entry = "there is no operation #{id} in the undo history"
 # Status messages, window side: `event_loop/window/*` and `event_loop/init/*`.
 split_refused = "cannot split that {$commit}: {reason}"
 undo_purged = "the old history of operation #{entry} was purged, so it cannot be undone or redone"
-undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was pushed or deleted there"
+undo_remote_ref_moved = "{name} on {remote} is at {actual}, not at {expected} where the operation left it: it was changed on the remote since, so nothing was changed there"
 undo_remote_object_missing = "{object} is no longer in this repository (it was garbage collected), so the branch or {$tag} cannot be restored on the remote with a {$push_noun}"
 # context: one-line reason; {reason} says why the repository's chosen sign-in source cannot be used
 repo_auth_unavailable = "This repository's sign-in cannot be used: {reason}"
@@ -6156,7 +6156,7 @@ token_command_failed_code_tail = "This repository's token command failed (exit {
 # context: one-line reason; {host} is the server git went to, {expected} the address the account's token is bound to
 grant_refused = "GitPoulpi did not send the account token to {host}: it is not {expected}, that account's address."
 # context: one-line reason when a credential command was sent without a person confirming it
-repo_auth_needs_confirmation = "A credential helper or token command is stored only when you confirm it in SSH & credentials."
+repo_auth_needs_confirmation = "A credential helper or token command is saved only after you confirm it in SSH & credentials."
 
 [window]
 connecting = "connecting to the session daemon..."
@@ -7370,7 +7370,7 @@ hint_auth = "Check your credentials in Settings > Integrations, start an ssh-age
 # context: one-line reason
 summary_host_key = "The SSH host key of the remote is not known yet."
 # context: suggested action; keep the command verbatim
-hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry. Or point this repository at a known_hosts file in SSH & credentials."
+hint_host_key = "Run `ssh -T git@<host>` once in a terminal, check the fingerprint and answer yes, then retry. Or set a known hosts file for this repository in SSH & credentials."
 # context: one-line reason
 summary_conflict = "It stopped on conflicts."
 # context: suggested action
@@ -7390,7 +7390,7 @@ hint_lock = "Close other git tools, or remove the lock file if none is running."
 # context: one-line reason when git's credential helper itself could not run, so no credentials were sent; {line} is the offending line of git's output, quoted
 summary_credential_helper = "The configured credential helper failed: {line}"
 # context: suggested action; keep the command verbatim
-hint_credential_helper = "This repository's helper could not run. Pick another source for this repository in SSH & credentials, or fix the helper: `git config --show-origin --get-all credential.helper` shows where it is set."
+hint_credential_helper = "The credential helper could not run. Pick another source for this repository in SSH & credentials, or fix the helper: `git config --show-origin --get-all credential.helper` shows where it is set."
 # context: suggested action when aborting a merge, rebase, cherry-pick or revert is refused because files have local changes
 hint_abort_blocked = "Save a copy of the changes to those files or discard them in the Status pane, then retry the abort."
 # context: button
@@ -11146,7 +11146,7 @@ hosts_help = "Host names separated by commas. Empty means the host of the main r
 # context: label of the field with the minutes a token is kept
 cache_label = "Cache (minutes)"
 # context: help under the cache field
-cache_help = "How long a printed token is reused. Empty means 50."
+cache_help = "How long a printed token is reused. Leave it empty for 50."
 # context: boxed warning under a command that runs on this computer
 command_warning = "This command runs on your computer each time this repository fetches or pushes. Use only a command you wrote or trust. If it is inside the repository folder, GitPoulpi asks again when the file changes."
 # context: button that copies this repository's own credential helper into the helper field

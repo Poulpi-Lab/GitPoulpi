@@ -223,11 +223,15 @@ fn pick_type_save_and_resolve_then_undo_puts_the_conflict_back() {
 /// The position of `needle` lowest on the screen (the Output sits under
 /// the A and B panes, so its copy of a line is the last one).
 fn lowest(term: &Terminal, needle: &str) -> (u16, u16) {
-    term.screen()
-        .find_all(needle)
-        .into_iter()
-        .max_by_key(|(_, r)| *r)
-        .unwrap_or_else(|| panic!("no {needle:?} on screen\n{}", term.text()))
+    // Waited for: a torn frame can lack the line.
+    term.wait_for(&format!("{needle:?} on screen"), STEP, |s| {
+        !s.find_all(needle).is_empty()
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
+    .find_all(needle)
+    .into_iter()
+    .max_by_key(|(_, r)| *r)
+    .expect("the predicate just matched")
 }
 
 /// Typing in the Output marks the conflict edited; a pick replaces the
@@ -244,14 +248,29 @@ fn typing_in_the_output_marks_it_edited_a_pick_replaces_it_and_undo_restores_it(
     .unwrap_or_else(|e| panic!("{e}"));
 
     // Click the Output's copy of the line, go to its end and type.
-    let (c, r) = lowest(&term, "three (ours)");
-    term.click(c + 2, r).unwrap();
-    term.send_keys("End").unwrap();
-    term.send_text("!").unwrap();
-    term.wait_for("the typed text and the edited marker", STEP, |s| {
-        output_text(s).contains("three (ours)!") && s.contains("edited")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Retried (the line located afresh): a click placed on a torn frame
+    // leaves the focus elsewhere, and the typed text would not land.
+    common::retry_until(
+        &mut term,
+        "the typed text and the edited marker",
+        4,
+        STEP,
+        |t| {
+            let s = t.screen();
+            if !output_text(&s).contains("three (ours)!") {
+                if let Some((c, r)) = s
+                    .find_all("three (ours)")
+                    .into_iter()
+                    .max_by_key(|(_, r)| *r)
+                {
+                    t.click(c + 2, r).unwrap();
+                    t.send_keys("End").unwrap();
+                    t.send_text("!").unwrap();
+                }
+            }
+        },
+        |s| output_text(s).contains("three (ours)!") && s.contains("edited"),
+    );
 
     // Esc goes back to the A pane; taking B replaces the edit.
     // (Esc and the letter in separate writes: together they read as Alt+b.)

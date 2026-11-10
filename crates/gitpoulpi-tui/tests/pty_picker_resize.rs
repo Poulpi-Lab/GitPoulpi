@@ -57,16 +57,12 @@ fn wait_divider(term: &Terminal) -> (u16, u16) {
         let bars = divider_bars(s, row);
         (bars.len() >= 3).then(|| (row, bars[2]))
     };
+    // The picker drawn whole: read once it stopped redrawing (a torn frame
+    // mixes the old page's bars with the new one's).
     let screen = term
-        .wait_for("the picker's divider", STEP, |s| found(s).is_some())
-        .unwrap_or_else(|e| {
-            panic!(
-                "{e}
-{}",
-                term.text()
-            )
-        });
-    found(&screen).expect("the predicate just matched")
+        .wait_for_stable(Duration::from_millis(400), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    found(&screen).unwrap_or_else(|| panic!("no divider:\n{}", screen.text()))
 }
 
 fn fg_at(term: &Terminal, col: u16, row: u16) -> Color {

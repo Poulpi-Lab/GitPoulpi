@@ -175,6 +175,7 @@ macro_rules! for_each_contract_check {
             check_predict_merge_conflicts_is_empty_when_the_merge_goes_through,
             check_config_entries_lists_local_keys_under_prefixes,
             check_merge_no_ff_and_squash_shape_the_result,
+            check_merge_fast_forward_policies,
             check_merge_squash_without_commit_stages_the_changes,
             check_a_recorded_parent_is_a_branch_config_key,
             check_revert_creates_an_inverse_commit,

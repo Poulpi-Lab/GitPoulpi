@@ -172,6 +172,112 @@ pub fn check_merge_no_ff_and_squash_shape_the_result(backend: &dyn GitBackend) {
     );
 }
 
+/// The fast-forward policies of a merge (the owner's scenario: a branch made
+/// from `main`, two commits on it, `main` untouched). `no_ff` makes a merge
+/// commit whose first parent is the old `main`; no flag fast-forwards;
+/// `fast_forward_only` fast-forwards when it can and is the typed
+/// `NotFastForward` (nothing moves) once the branches have diverged.
+pub fn check_merge_fast_forward_policies(backend: &dyn GitBackend) {
+    use gitpoulpi_core::domain::{MergeOptions, MergeOutcome, RefKind};
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .branch("topic")
+        .commit_file("t1.txt", "1", "t1")
+        .commit_file("t2.txt", "2", "t2")
+        .checkout("main")
+        .branch("plain")
+        .checkout("main")
+        .branch("strict")
+        .checkout("main")
+        .build();
+    let r = repo.repo_ref();
+    let branch = |name: &str| {
+        backend
+            .refs(&r)
+            .unwrap()
+            .into_iter()
+            .find(|x| matches!(&x.kind, RefKind::LocalBranch { name: n } if n == name))
+            .unwrap()
+    };
+    let topic = branch("topic");
+    let old_main = backend.resolve(&r, "main").unwrap();
+
+    // no_ff: a merge commit, first parent the old main, second the topic tip.
+    let outcome = backend
+        .merge(
+            &r,
+            &topic,
+            &MergeOptions {
+                no_ff: true,
+                ..MergeOptions::default()
+            },
+        )
+        .unwrap();
+    let MergeOutcome::Merged(merged) = outcome else {
+        panic!("--no-ff makes a merge commit, got {outcome:?}");
+    };
+    let parents = repo.git(&["rev-list", "--parents", "-n1", "main"]);
+    let parents: Vec<&str> = parents.split_whitespace().collect();
+    assert_eq!(parents.len(), 3, "two parents: {parents:?}");
+    assert_eq!(parents[0], merged.to_hex());
+    assert_eq!(
+        parents[1],
+        old_main.to_hex(),
+        "first parent is the old main"
+    );
+    assert_eq!(parents[2], topic.target.to_hex());
+    assert!(
+        repo.git(&["log", "-1", "--format=%s", "main"])
+            .starts_with("Merge branch 'topic'"),
+        "the default message of a merge"
+    );
+
+    // No flag: a fast-forward.
+    repo.git(&["checkout", "-q", "plain"]);
+    let outcome = backend.merge(&r, &topic, &MergeOptions::default()).unwrap();
+    assert_eq!(outcome, MergeOutcome::FastForwarded(topic.target));
+
+    // fast_forward_only: a fast-forward when it can...
+    repo.git(&["checkout", "-q", "strict"]);
+    let outcome = backend
+        .merge(
+            &r,
+            &topic,
+            &MergeOptions {
+                fast_forward_only: true,
+                ..MergeOptions::default()
+            },
+        )
+        .unwrap();
+    assert_eq!(outcome, MergeOutcome::FastForwarded(topic.target));
+
+    // ...and the typed refusal once the branch has diverged from the topic.
+    repo.git(&["checkout", "-q", "-b", "other", &old_main.to_hex()]);
+    std::fs::write(repo.root().join("o.txt"), "o").unwrap();
+    repo.git(&["add", "o.txt"]);
+    repo.git(&["commit", "-q", "-m", "other"]);
+    let before = backend.resolve(&r, "other").unwrap();
+    let err = backend
+        .merge(
+            &r,
+            &topic,
+            &MergeOptions {
+                fast_forward_only: true,
+                ..MergeOptions::default()
+            },
+        )
+        .unwrap_err();
+    assert!(
+        matches!(err, gitpoulpi_core::Error::NotFastForward),
+        "typed refusal, got {err:?}"
+    );
+    assert_eq!(
+        backend.resolve(&r, "other").unwrap(),
+        before,
+        "nothing moved"
+    );
+}
+
 /// A branch's recorded parent is one more key in its `branch.<name>` section:
 /// writing the section back keeps the others, and `config_entries` reads it.
 pub fn check_a_recorded_parent_is_a_branch_config_key(backend: &dyn GitBackend) {

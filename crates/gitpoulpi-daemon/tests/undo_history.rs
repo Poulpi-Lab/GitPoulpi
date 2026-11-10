@@ -200,14 +200,55 @@ async fn a_fast_forward_merge_is_undone_and_redone() {
         let tip = rig.commit_in_shell("f.txt", "f", "feature work");
         rig.repo.git(&["checkout", "-q", "main"]);
         let feature = rig.branch_ref("feature").await;
-        rig.ok(OperationKind::Merge, json!({ "from": feature }))
-            .await;
+        // The default policy would make a merge commit: ask for the fast-forward.
+        rig.ok(
+            OperationKind::Merge,
+            json!({ "from": feature, "opts": { "ff": "allowed" } }),
+        )
+        .await;
         assert_eq!(rig.rev("HEAD"), tip, "{name}");
         rig.undo().await;
         assert_eq!(rig.rev("HEAD"), before, "{name}");
         assert!(rig.file("f.txt").is_none(), "{name}");
         rig.redo().await;
         assert_eq!(rig.rev("HEAD"), tip, "{name}");
+        assert!(rig.file("f.txt").is_some(), "{name}");
+        rig.stop().await;
+    }
+}
+
+/// The default policy (`never`) merges a branch that could fast-forward with a
+/// real merge commit (first parent the old tip); undo and redo move it like
+/// any other merge.
+#[tokio::test]
+async fn a_no_ff_merge_of_a_fast_forwardable_branch_is_undone_and_redone() {
+    for (name, backend) in backends() {
+        let mut rig = Rig::new(backend).await;
+        let before = rig.rev("HEAD");
+        rig.repo.git(&["checkout", "-q", "-b", "feature"]);
+        let tip = rig.commit_in_shell("f.txt", "f", "feature work");
+        rig.repo.git(&["checkout", "-q", "main"]);
+        let feature = rig.branch_ref("feature").await;
+        rig.ok(OperationKind::Merge, json!({ "from": feature }))
+            .await;
+        let merged = rig.rev("HEAD");
+        assert_ne!(merged, tip, "{name}: a merge commit, not a fast-forward");
+        let parents = rig.repo.git(&["rev-list", "--parents", "-n1", "HEAD"]);
+        let parents: Vec<&str> = parents.split_whitespace().collect();
+        assert_eq!(parents.len(), 3, "{name}: two parents");
+        assert_eq!(
+            parents[1],
+            before.to_hex(),
+            "{name}: first parent is the old main"
+        );
+        assert_eq!(parents[2], tip.to_hex(), "{name}");
+
+        let out = rig.undo().await;
+        labeled(&out, "Merge feature", name);
+        assert_eq!(rig.rev("HEAD"), before, "{name}");
+        assert!(rig.file("f.txt").is_none(), "{name}");
+        rig.redo().await;
+        assert_eq!(rig.rev("HEAD"), merged, "{name}: the same merge commit");
         assert!(rig.file("f.txt").is_some(), "{name}");
         rig.stop().await;
     }

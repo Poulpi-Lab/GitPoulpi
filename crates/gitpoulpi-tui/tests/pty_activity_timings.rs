@@ -62,13 +62,29 @@ fn wait_pushed(repo: &gitpoulpi_testkit::FixtureRepo) {
     }
 }
 
-fn open_log_by_key(term: &mut Terminal) {
+fn open_log_by_key(term: &mut Terminal) -> Screen {
     term.send_keys("C-n").unwrap();
     term.send_text("A").unwrap();
+    // The title and the tabs: a torn frame can show the first without the rest.
     term.wait_for("the Activity Log by its key", STEP, |s| {
-        s.contains("Activity Log")
+        s.contains("Activity Log") && s.contains(" Git operations ") && s.contains(" Application ")
     })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
+}
+
+/// The screen once two reads a moment apart agree (a torn frame is never the
+/// one a later screen is compared with).
+fn settled(term: &Terminal) -> Screen {
+    let mut last = term.screen();
+    for _ in 0..50 {
+        std::thread::sleep(Duration::from_millis(100));
+        let now = term.screen();
+        if now.text() == last.text() {
+            return now;
+        }
+        last = now;
+    }
+    panic!("the screen never settled:\n{}", last.text());
 }
 
 /// Whether a line reads `<label> - <digits> ms`.
@@ -87,8 +103,7 @@ fn the_tabs_are_operations_then_application() {
     let repo = with_local_origin();
     let config = tempfile::tempdir().unwrap();
     let mut term = launch(repo.root(), "pty-timings-tabs", config.path(), COLS);
-    open_log_by_key(&mut term);
-    let screen = term.screen();
+    let screen = open_log_by_key(&mut term);
     let (ops_col, ops_row) = screen.find(" Git operations ").expect("operations tab");
     let (app_col, app_row) = screen.find(" Application ").expect("Application tab");
     assert_eq!(app_row, ops_row, "one row of tabs");
@@ -107,12 +122,18 @@ fn the_tabs_are_operations_then_application() {
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // A click on the tab name does the same.
-    let (c, r) = term.screen().find(" Application ").unwrap();
-    term.click(c + 2, r).expect("click Application");
-    term.wait_for("the Application tab by click", STEP, |s| {
-        s.contains("Level:")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the Application tab by click",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find(" Application ") {
+                t.click(c + 2, r).expect("click Application");
+            }
+        },
+        |s| s.contains("Level:"),
+    );
 }
 
 #[test]
@@ -125,7 +146,9 @@ fn a_push_and_the_opening_are_listed_with_their_duration() {
     open_log_by_key(&mut term);
     let screen = term
         .wait_for("the timing lines", STEP, |s| {
-            has_timing(s, "Push") && has_timing(s, "Open repository")
+            has_timing(s, "Push")
+                && has_timing(s, "Open repository")
+                && has_timing(s, "Load commit graph")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
@@ -161,7 +184,10 @@ fn timings_off_hides_the_durations_and_extended_adds_background_operations() {
     click_push(&mut term);
     wait_pushed(&repo);
     open_log_by_key(&mut term);
-    let screen = term.screen();
+    // The log is loaded once the push is listed (without its duration).
+    term.wait_for("the push listed", STEP, |s| s.contains("Push done"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let screen = settled(&term);
     assert!(
         !has_timing(&screen, "Push") && !screen.contains(" ms"),
         "no durations when log.timings is off\n{}",
@@ -189,7 +215,7 @@ fn timings_off_hides_the_durations_and_extended_adds_background_operations() {
     open_log_by_key(&mut term);
     term.wait_for("the push line", STEP, |s| has_timing(s, "Push"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(!has_timing(&term.screen(), "Refresh"), "{}", term.text());
+    assert!(!has_timing(&settled(&term), "Refresh"), "{}", term.text());
 }
 
 #[test]
@@ -209,30 +235,45 @@ fn the_log_options_are_in_settings_and_write_the_config() {
     let stored = || std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
 
     // A toggle: one click on the row flips it.
-    let (c, r) = common::scroll_settings_to(&mut term, "Extended logging", STEP);
-    term.click(c + 1, r).expect("click the toggle row");
-    wait_stored(&stored, "extended = true");
+    // Retried until saved: a click aimed at a scrolling or torn frame misses.
+    // (Never toggled back: it stops once the config says true.)
+    common::retry_until(
+        &mut term,
+        "the toggle saved",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if !stored().contains("extended = true") {
+                common::scroll_settings_to(t, "Extended logging", STEP);
+                let (c, r) = settled(t).find("Extended logging").expect("the row");
+                t.click(c + 1, r).expect("click the toggle row");
+            }
+        },
+        |_| stored().contains("extended = true"),
+    );
 
     // The retention is a number and a unit on one line (the full flow is
     // `pty_settings_retention.rs`); the default is one week.
     let (_, _) = common::scroll_settings_to(&mut term, "Keep log files for", STEP);
-    assert!(
-        term.screen()
-            .text()
+    term.wait_for("the retention row with its unit", STEP, |s| {
+        s.text()
             .lines()
-            .any(|l| l.contains("Keep log files for") && l.contains("week")),
-        "{}",
-        term.text()
-    );
+            .any(|l| l.contains("Keep log files for") && l.contains("week"))
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // The level is a dropdown too.
-    let (c, r) = common::scroll_settings_to(&mut term, "Log level", STEP);
-    term.click(c + 1, r).expect("click the level row");
-    let list = term
-        .wait_for("the levels", STEP, |s| {
-            s.contains("Warning") && s.contains("Trace")
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let list = common::retry_until(
+        &mut term,
+        "the levels",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let (c, r) = common::scroll_settings_to(t, "Log level", STEP);
+            t.click(c + 1, r).expect("click the level row");
+        },
+        |s| s.contains("Warning") && s.contains("Trace") && s.contains("Debug"),
+    );
     let (c, r) = list.find("Debug").unwrap();
     term.click(c + 1, r).expect("pick Debug");
     wait_stored(&stored, "level = \"debug\"");
@@ -309,7 +350,7 @@ fn a_long_application_line_scrolls_by_key_track_press_and_drag() {
     );
 
     // The keyboard: Right scrolls a step, Home comes back.
-    let before = screen.text();
+    let before = settled(&term).text();
     term.send_keys("Right").unwrap();
     term.wait_for("the view moved sideways", STEP, |s| s.text() != before)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

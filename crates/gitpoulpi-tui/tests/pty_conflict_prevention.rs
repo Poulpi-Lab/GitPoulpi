@@ -30,12 +30,54 @@ fn launch(repo: &Path, session: &str) -> (Terminal, tempfile::TempDir) {
         .start()
 }
 
+/// Clicks `text` (found on a settled screen) until `done` holds; a click
+/// aimed at a torn or still-scrolling frame lands nowhere.
+fn click_until(
+    term: &mut Terminal,
+    text: &str,
+    what: &str,
+    mut done: impl FnMut(&xtask::pty::Screen) -> bool,
+) {
+    let mut ready = |s: &xtask::pty::Screen| done(s);
+    let mut last = None;
+    for _ in 0..4 {
+        let screen = settled(term);
+        if ready(&screen) {
+            return;
+        }
+        if let Some((col, row)) = screen.find(text) {
+            term.click(col + 1, row).unwrap();
+        }
+        match term.wait_for(what, Duration::from_secs(10), &mut ready) {
+            Ok(_) => return,
+            Err(e @ xtask::pty::Error::Timeout { .. }) => last = Some(e),
+            Err(e) => panic!("{e}"),
+        }
+    }
+    panic!("{}\n{}", last.unwrap(), term.text());
+}
+
 fn click_text(term: &mut Terminal, text: &str) {
     let screen = term
         .wait_for(&format!("`{text}` on screen"), STEP, |s| s.contains(text))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (col, row) = screen.find(text).unwrap();
     term.click(col + 1, row).unwrap();
+}
+
+/// The screen once two reads a moment apart agree (a scrolling page or a
+/// torn frame is not a place to aim a click at).
+fn settled(term: &Terminal) -> xtask::pty::Screen {
+    let mut last = term.screen();
+    for _ in 0..50 {
+        std::thread::sleep(Duration::from_millis(150));
+        let now = term.screen();
+        if now.text() == last.text() {
+            return now;
+        }
+        last = now;
+    }
+    panic!("the screen never settled:\n{}", last.text());
 }
 
 fn wait_badge(term: &mut Terminal) {
@@ -90,11 +132,15 @@ fn the_badge_names_the_conflicting_file_and_opens_the_popup() {
     // The badge's button.
     click_text(&mut term, "Show files");
     let popup = term
-        .wait_for("the popup", STEP, |s| s.contains("Predicted conflicts"))
+        .wait_for("the whole popup", STEP, |s| {
+            s.contains("Predicted conflicts")
+                && s.contains("A merge with origin/main would conflict in:")
+                && s.contains("a.txt")
+                && s.contains("Open merge preview")
+                && s.contains("Rebase onto base")
+        })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(popup.contains("A merge with origin/main would conflict in:"));
-    assert!(popup.contains("a.txt"), "{}", term.text());
-    assert!(popup.contains("Open merge preview") && popup.contains("Rebase onto base"));
+    let _ = popup;
     // Escape closes it.
     term.send_keys("Escape").unwrap();
     term.wait_for("the popup closed", STEP, |s| {
@@ -132,7 +178,9 @@ fn the_popup_merges_the_base_and_the_conflict_is_real() {
     let repo = conflicting_feature();
     let (mut term, _config) = launch(repo.root(), "pty-conflict-merge");
     wait_badge(&mut term);
-    click_text(&mut term, "Show files");
+    click_until(&mut term, "Show files", "the popup", |s| {
+        s.contains("Open merge preview")
+    });
     click_text(&mut term, "Open merge preview");
     wait_for(&term, "the merge stopped on the predicted file", || {
         repo.root().join(".git/MERGE_HEAD").exists()
@@ -152,12 +200,14 @@ fn the_repository_switch_and_the_base_branches_hide_the_badge() {
     open_page(&mut term);
     let screen = term
         .wait_for("the page", STEP, |s| {
-            s.contains("Check for conflicts with the") && s.contains("Base branches")
+            s.contains("Base branches")
+                && s.find("Check for conflicts with the")
+                    .is_some_and(|(_, r)| s.line(r).contains("[x]"))
+                && s.contains("origin/feature/**")
+                && s.contains("!origin/abc")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(screen.contains("origin/feature/**") && screen.contains("!origin/abc"));
     let (c, r) = screen.find("Check for conflicts with the").unwrap();
-    assert!(screen.line(r).contains("[x]"), "on by default");
     term.click(c, r).unwrap();
     term.wait_for("ticked off and saved", STEP, |s| {
         s.line(r).contains("[ ]") && state_file(&repo).contains("conflict_detection = false")
@@ -258,7 +308,27 @@ fn a_default_list_applies_to_a_repository_without_its_own_and_the_source_can_be_
     );
     common::scroll_settings_to(&mut term, "New list", STEP);
     // New list: a click on its row opens the name field.
-    click_text(&mut term, "New list");
+    // (Retried until the name field is open: the value no longer reads
+    // "(not set)".)
+    common::retry_until(
+        &mut term,
+        "the name field open",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            // On a settled screen: the page may still be scrolling.
+            let s = settled(t);
+            if let Some((c, r)) = s.find("New list") {
+                if s.line(r).contains("(not set)") {
+                    t.click(c + 1, r).unwrap();
+                }
+            }
+        },
+        |s| {
+            s.find("New list")
+                .is_some_and(|(_, r)| s.line(r).contains("\u{2588}"))
+        },
+    );
     term.send_text("nomain").unwrap();
     term.send_keys("Enter").unwrap();
     wait_for(&term, "the list saved", || {
@@ -267,11 +337,9 @@ fn a_default_list_applies_to_a_repository_without_its_own_and_the_source_can_be_
 
     // Its patterns: exclude the only candidate.
     common::scroll_settings_to(&mut term, "Patterns", STEP);
-    click_text(&mut term, "Patterns");
-    term.wait_for("the editor", STEP, |s| {
+    click_until(&mut term, "Patterns", "the editor", |s| {
         s.contains("Save") && s.contains("Cancel")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    });
     term.send_keys("Backspace").unwrap();
     term.send_keys("Backspace").unwrap();
     term.send_text("!origin/main").unwrap();

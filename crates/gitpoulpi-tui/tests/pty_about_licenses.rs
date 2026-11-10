@@ -38,12 +38,16 @@ fn start(session: &str) -> (Terminal, tempfile::TempDir, gitpoulpi_testkit::Fixt
 
 /// Pages down until `needle` is on screen.
 fn page_until(term: &mut Terminal, needle: &str) {
+    // Each page is given time to be drawn whole (a torn frame can hide the
+    // needle) before the next PageDown.
     for _ in 0..60 {
-        if term.screen().contains(needle) {
+        if term
+            .wait_for(needle, Duration::from_millis(1500), |s| s.contains(needle))
+            .is_ok()
+        {
             return;
         }
         term.send_keys("PageDown").unwrap();
-        std::thread::sleep(Duration::from_millis(40));
     }
     panic!("never saw {needle}:\n{}", term.text());
 }
@@ -51,12 +55,19 @@ fn page_until(term: &mut Terminal, needle: &str) {
 #[test]
 fn the_licenses_view_shows_the_credits_libgit2_and_the_crates() {
     let (mut term, _dir, _repo) = start("about-licenses-keys");
-    let (col, row) = term.screen().find("\u{1F419}").expect("the octopus");
-    term.click(col, row).unwrap();
-    term.wait_for("the About window and its trademark notice", STEP, |s| {
-        s.contains("About GitPoulpi") && s.contains("not affiliated with")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Retried: the octopus can be drawn before its hit target is registered.
+    common::retry_until(
+        &mut term,
+        "the About window and its trademark notice",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((col, row)) = t.screen().find("\u{1F419}") {
+                t.click(col, row).unwrap();
+            }
+        },
+        |s| s.contains("About GitPoulpi") && s.contains("not affiliated with"),
+    );
     term.send_keys("t").unwrap();
     term.wait_for("the notices", STEP, |s| {
         s.contains("third-party licenses and credits") && s.contains("Licenses and credits")
@@ -92,7 +103,10 @@ fn the_licenses_view_has_a_mouse_and_a_palette_way_in_and_scrolls_with_the_wheel
     // The title is the mouse way back.
     let (bc, br) = term.screen().find("Licenses and credits").unwrap();
     term.click(bc, br).unwrap();
-    term.wait_for_text("License: MIT", STEP).unwrap();
+    term.wait_for("the facts page and its link", STEP, |s| {
+        s.contains("License: MIT") && s.contains("Licenses and credits (t: read)")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The link opens it again (mouse), and the wheel scrolls it.
     let (lc, lr) = term
         .screen()

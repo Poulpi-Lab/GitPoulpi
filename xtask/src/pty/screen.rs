@@ -32,6 +32,9 @@ pub struct Cell {
     pub italic: bool,
     pub underline: bool,
     pub inverse: bool,
+    /// The blank second half of a double-width glyph (`vt100`'s
+    /// `is_wide_continuation`): not a space a human sees.
+    pub wide_continuation: bool,
 }
 
 impl Cell {
@@ -108,6 +111,23 @@ impl Screen {
         (trimmed.to_string(), columns)
     }
 
+    /// One row as a human sees it: like [`Screen::line`], but the blank half
+    /// of a double-width glyph is not a character, so "简体中文" reads as
+    /// written instead of "简 体 中 文".
+    pub fn compact_line(&self, row: u16) -> String {
+        if row >= self.rows {
+            return String::new();
+        }
+        let start = row as usize * self.cols as usize;
+        let mut line = String::new();
+        for cell in &self.cells[start..start + self.cols as usize] {
+            if !cell.wide_continuation {
+                line.push_str(cell.display());
+            }
+        }
+        line.trim_end().to_string()
+    }
+
     /// The whole screen as text, one `\n`-separated line per row.
     pub fn text(&self) -> String {
         (0..self.rows)
@@ -159,6 +179,7 @@ mod tests {
             italic: false,
             underline: false,
             inverse: false,
+            wide_continuation: false,
         }
     }
 
@@ -184,6 +205,17 @@ mod tests {
         assert_eq!(screen.line(0), "ab");
         assert_eq!(screen.line(1), " ab");
         assert_eq!(screen.text(), "ab\n ab");
+    }
+
+    #[test]
+    fn a_compact_line_drops_the_blank_half_of_a_wide_glyph() {
+        let mut wide = plain("\u{7B80}");
+        wide.wide_continuation = false;
+        let mut half = plain("");
+        half.wide_continuation = true;
+        let screen = Screen::from_cells(3, 1, vec![wide, half, plain("x")]);
+        assert_eq!(screen.line(0), "\u{7B80} x");
+        assert_eq!(screen.compact_line(0), "\u{7B80}x");
     }
 
     #[test]

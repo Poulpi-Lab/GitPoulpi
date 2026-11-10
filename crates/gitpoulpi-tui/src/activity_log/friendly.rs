@@ -385,7 +385,7 @@ mod tests {
             vec![Remedy::OpenRepoAuth]
         );
         let (_, host_hint) = wording(FailureKind::HostKeyUnverified, "").unwrap();
-        assert!(host_hint.contains("known_hosts"), "{host_hint}");
+        assert!(host_hint.contains("known hosts"), "{host_hint}");
         // A refused login inside a repository: its page, and the
         // Integrations page unless the identity is a key or a command.
         let plain = auth_context(FailureKind::AuthFailed, false, true, None);

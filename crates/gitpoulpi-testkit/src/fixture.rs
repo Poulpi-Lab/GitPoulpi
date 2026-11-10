@@ -308,13 +308,7 @@ fn init_skeleton(bare: bool) -> Result<PathBuf> {
             // drop hooks into the first and read the second.
             std::fs::create_dir_all(skeleton.join("hooks"))?;
             std::fs::create_dir_all(skeleton.join("info"))?;
-            if std::fs::rename(&skeleton, &final_dir).is_err()
-                && !final_dir.join("HEAD").is_file()
-                // A skeleton left half-made by an interrupted run: replace it.
-                && (std::fs::remove_dir_all(&final_dir).is_err()
-                    || std::fs::rename(&skeleton, &final_dir).is_err())
-                && !final_dir.join("HEAD").is_file()
-            {
+            if !place_skeleton(&skeleton, &final_dir) {
                 return Err(Error::GitFailed(format!(
                     "cannot place the init skeleton at {}",
                     final_dir.display()
@@ -326,6 +320,33 @@ fn init_skeleton(bare: bool) -> Result<PathBuf> {
     })();
     let paths = CACHE.get_or_init(|| made.unwrap_or_else(|e| panic!("init skeleton: {e}")));
     Ok(paths[usize::from(bare)].clone())
+}
+
+/// Moves a fresh skeleton to `final_dir`; true when a usable skeleton (with
+/// `HEAD`) is there afterwards, made by this process or a concurrent one.
+/// Windows can refuse to rename a directory whose files were just written
+/// (an antivirus or indexer holds them for a moment): retry, then replace a
+/// half-made leftover, then fall back to copying.
+fn place_skeleton(skeleton: &std::path::Path, final_dir: &std::path::Path) -> bool {
+    let ready = || final_dir.join("HEAD").is_file();
+    for attempt in 0..10 {
+        if std::fs::rename(skeleton, final_dir).is_ok() || ready() {
+            return true;
+        }
+        if final_dir.exists() {
+            // Left half-made by an interrupted run.
+            let _ = std::fs::remove_dir_all(final_dir);
+        }
+        std::thread::sleep(std::time::Duration::from_millis(20 * (attempt + 1)));
+    }
+    if ready() {
+        return true;
+    }
+    let staging = final_dir.with_extension(format!("copy-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&staging);
+    copy_dir(skeleton, &staging).is_ok()
+        && (std::fs::rename(&staging, final_dir).is_ok() || ready())
+        || ready()
 }
 
 /// Recursive copy of `src` into `dst` (created), empty directories included.

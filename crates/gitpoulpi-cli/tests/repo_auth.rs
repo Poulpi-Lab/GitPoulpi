@@ -315,3 +315,69 @@ fn test_reports_each_remote_with_its_identity() {
     assert_eq!(web["identity"], "system git (user alice)");
     assert_eq!(web["transport"], "https");
 }
+
+/// The argv of a token command that prints `token`, in the platform's
+/// scripting language (`sh` on Unix, `pwsh` on Windows).
+fn token_script_argv(dir: &Path, token: &str) -> Vec<String> {
+    let path = dir.join(if cfg!(windows) { "token.ps1" } else { "token.sh" });
+    if cfg!(windows) {
+        std::fs::write(&path, format!("Write-Output '{token}'\n")).unwrap();
+        ["pwsh", "-NoProfile", "-File"]
+            .into_iter()
+            .map(String::from)
+            .chain([path.to_string_lossy().into_owned()])
+            .collect()
+    } else {
+        std::fs::write(&path, format!("echo '{token}'\n")).unwrap();
+        vec!["sh".into(), path.to_string_lossy().into_owned()]
+    }
+}
+
+/// A grant-based source works from a standalone CLI run: no TUI, no MCP and
+/// no published daemon for the session, so the credential helper git runs
+/// must reach the embedded daemon of this very process (ADR-0010, decision
+/// 21). Loopback only.
+#[test]
+fn a_token_command_works_from_a_standalone_cli_run() {
+    if cfg!(windows)
+        && std::process::Command::new("pwsh")
+            .args(["-NoProfile", "-Command", "exit 0"])
+            .output()
+            .is_err()
+    {
+        eprintln!("SKIPPED: pwsh is not installed");
+        return;
+    }
+    const TOKEN: &str = "plainsecret-0123456789-abcdef";
+    let server = gitpoulpi_testkit::AuthHttpRemote::start_accepting();
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .with_origin()
+        .unwrap()
+        .build();
+    let root = repo.root();
+    repo.git(&["remote", "set-url", "origin", &server.url()]);
+    let tools = tempfile::tempdir().unwrap();
+    let argv = token_script_argv(tools.path(), TOKEN);
+    let session = "ra-standalone-token-command";
+
+    let mut set = vec!["repo-auth", "set", "--https", "token-command", "--yes", "--command"];
+    set.extend(argv.iter().map(String::as_str));
+    ok(root, session, &set);
+
+    let tested = ok(root, session, &["repo-auth", "test"]);
+    let remotes = tested["remotes"].as_array().expect("remotes");
+    assert!(
+        remotes.iter().all(|r| r["ok"] == true),
+        "the connection test must pass: {tested}"
+    );
+    let fetched = ok(root, session, &["fetch"]);
+    assert!(fetched.is_object() || fetched.is_array(), "{fetched}");
+    let seen = server.basic_credentials();
+    assert!(
+        seen.iter().any(|c| c == &format!("x-access-token:{TOKEN}")),
+        "the server never got the token: {seen:?}"
+    );
+}

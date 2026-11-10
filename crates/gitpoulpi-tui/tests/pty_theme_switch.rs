@@ -202,24 +202,29 @@ fn the_theme_combo_previews_commits_restores_and_lists_user_themes() {
     // Input color also reads "Follow theme": take the lane row's combo.
     // The page is longer than the window: bring the lane row into view.
     common::scroll_settings_to(&mut term, "Graph color theme", STEP);
-    let screen = term
-        .wait_for("the lane row with its combo", STEP, |s| {
-            s.find("Graph color theme").is_some_and(|(_, label_row)| {
-                s.find_all("Follow theme")
-                    .into_iter()
-                    .any(|(_, r)| r == label_row)
-            })
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (_, label_row) = screen.find("Graph color theme").unwrap();
-    let (col, row) = screen
-        .find_all("Follow theme")
-        .into_iter()
-        .find(|(_, r)| *r == label_row)
-        .unwrap_or_else(|| panic!("the lane combo:\n{}", screen.text()));
-    term.click(col + 1, row).unwrap();
-    term.wait_for("the popup", STEP, |s| s.contains("\u{2713} Follow theme"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // The click is retried, the combo located afresh each time (the page can
+    // still be settling, and a click on a torn frame lands nowhere).
+    let lane_combo = |s: &xtask::pty::Screen| {
+        let (_, label_row) = s.find("Graph color theme")?;
+        s.find_all("Follow theme")
+            .into_iter()
+            .find(|(_, r)| *r == label_row)
+    };
+    common::retry_until(
+        &mut term,
+        "the popup",
+        4,
+        STEP,
+        |t| {
+            let s = t.screen();
+            if !s.contains("\u{2713} Follow theme") {
+                if let Some((col, row)) = lane_combo(&s) {
+                    t.click(col + 1, row).unwrap();
+                }
+            }
+        },
+        |s| s.contains("\u{2713} Follow theme"),
+    );
     // The list is long, so it is searchable: every palette is reachable.
     for (query, label) in [
         ("gitpoulpi", "GitPoulpi"),

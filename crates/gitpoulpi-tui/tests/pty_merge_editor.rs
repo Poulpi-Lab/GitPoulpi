@@ -682,16 +682,27 @@ fn every_entry_point_opens_the_editor() {
     // The Diff view of the file: its bar button and its key.
     // (A click on the row would reopen the editor: the Status pane's `d`
     // opens the diff view, which shows the conflict card.)
-    // (Retried: a key sent while the editor is still closing is lost.)
+    // (Retried: a key sent while the editor is still closing is lost, and
+    // a late refresh can drop the row's selection, which `d` needs. A retry
+    // selects the row again by opening and closing its editor.)
+    let mut tries = 0;
     common::retry_until(
         &mut term,
         "the diff with the Merge Editor button",
         4,
-        STEP,
+        Duration::from_secs(15),
         |t| {
-            if !t.screen().contains(" Merge editor ") {
-                t.send_keys("d").unwrap();
+            if t.screen().contains(" Merge editor ") {
+                return;
             }
+            if tries > 0 {
+                common::click_text_until(t, "notes.txt", "the editor (reselect)", |s| {
+                    s.contains("Conflict 1 / 1")
+                });
+                close(t);
+            }
+            tries += 1;
+            t.send_keys("d").unwrap();
         },
         |s| s.contains(" Merge editor "),
     );

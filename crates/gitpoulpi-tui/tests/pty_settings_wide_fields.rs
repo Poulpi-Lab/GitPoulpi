@@ -137,7 +137,7 @@ mod env_rows {
         common::settings_tab(&mut term, "Profiles (connections)");
         // The run mode rows push the env rows below the fold.
         common::scroll_settings_to(&mut term, "Env MY_FLAG", STEP);
-        let screen = term
+        let _ = term
             .wait_for("the env rows, whole", STEP, |s| {
                 s.contains("Env CLAUDE_CONFIG_DIR")
                     && s.contains(LONG_ENV)
@@ -145,6 +145,11 @@ mod env_rows {
                         s.line(r).contains('\u{2715}') && s.line(r).contains(" on ")
                     })
             })
+            .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+        // The scroll's last wheel events are still being read: take the
+        // page once it holds still.
+        let screen = term
+            .wait_for_stable(Duration::from_millis(400), STEP)
             .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
         // The long value shows whole.
         assert!(screen.contains(LONG_ENV), "{}", term.text());

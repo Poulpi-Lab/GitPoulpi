@@ -98,6 +98,9 @@ fn the_browse_divider_is_ew_resize_lit_like_the_other_resize_lines_and_unlit_on_
     .unwrap_or_else(|e| panic!("{e}"));
 
     let (row, col) = wait_divider(&term);
+    // Pointer motion is only reported once the mouse mode is on.
+    term.wait_for_mouse_capture(STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     // The unlit colour, read once the picker has stopped redrawing.
     term.wait_for_stable(Duration::from_millis(300), STEP)
         .unwrap_or_else(|e| panic!("{e}"));

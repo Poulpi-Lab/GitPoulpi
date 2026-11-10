@@ -472,18 +472,8 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
     // would advertise a button that isn't there. Only the resize
     // handle's own highlight (`hovered_resize_strip`, applied in
     // `log_table`) lights up.
-    let header_cells: Vec<Cell> = log_visible_order
-        .iter()
-        .map(|&c| {
-            let cell = Cell::from(c.title());
-            // The column the keyboard picked: the header cell inverted.
-            if ctx.log_col_pick == Some(c) {
-                cell.style(Style::default().add_modifier(Modifier::REVERSED))
-            } else {
-                cell
-            }
-        })
-        .collect();
+    let header_cells: Vec<Cell> =
+        crate::log_table::log_header_cells(log_visible_order, log_widths, ctx.log_col_pick);
     if central_view == CentralView::Log {
         frame_hits.extend(log_header_hit_targets(log_area, log_geo));
         // render through a throwaway clone so a

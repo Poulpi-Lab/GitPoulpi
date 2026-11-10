@@ -484,7 +484,7 @@ tested = "Otevírá se ukázkový obrázek v „{label}“..."
 
 [settings_ssh]
 private_key_path = "Cesta k soukromému klíči"
-private_key_path_help = { git = "Soubor klíče, který fetch, pull, push a clone nabízejí ssh (ssh -i <klíč> -o IdentitiesOnly=yes). Prázdné: ssh-agent a vaše konfigurace ssh jako obvykle. Nepoužije se, když si repozitář zvolí vlastní klíč (SSH a přihlašovací údaje) nebo je nastaveno GIT_SSH_COMMAND či core.sshCommand. Platí od dalšího přenosu.", local = "Soubor klíče, který načítání, stahování, odesílání a klonování nabízejí ssh (ssh -i <klíč> -o IdentitiesOnly=yes). Prázdné: ssh-agent a vaše konfigurace ssh jako obvykle. Nepoužije se, když si repozitář zvolí vlastní klíč (SSH a přihlašovací údaje) nebo je nastaveno GIT_SSH_COMMAND či core.sshCommand. Platí od dalšího přenosu." }
+private_key_path_help = { git = "Soubor klíče, který fetch, pull, push a clone nabízejí ssh (ssh -i <klíč> -o IdentitiesOnly=yes). Prázdné: ssh-agent a vaše konfigurace ssh jako obvykle. Nepoužije se, když si repozitář zvolí vlastní klíč (SSH a přihlášení) nebo je nastaveno GIT_SSH_COMMAND či core.sshCommand. Platí od dalšího přenosu.", local = "Soubor klíče, který načítání, stahování, odesílání a klonování nabízejí ssh (ssh -i <klíč> -o IdentitiesOnly=yes). Prázdné: ssh-agent a vaše konfigurace ssh jako obvykle. Nepoužije se, když si repozitář zvolí vlastní klíč (SSH a přihlášení) nebo je nastaveno GIT_SSH_COMMAND či core.sshCommand. Platí od dalšího přenosu." }
 public_key_path = "Cesta k veřejnému klíči"
 public_key_path_help = "Použije se jen když je cesta k soukromému klíči prázdná: ssh pak vybere odpovídající klíč z ssh-agentu (nebo hardwarový klíč) místo nabízení všech klíčů agenta. Vygenerovat pár klíčů vyplní obojí. Stejná přednost jako cesta k soukromému klíči."
 key_type = "Typ klíče"
@@ -4084,7 +4084,7 @@ hosting_3 = "Vytvoření {$pr_abbr}|Plus v záhlaví {$PRS} nebo n v této sekci
 hosting_4 = "Issues|Sekce ISSUES je vypisuje; + nebo n vytvoří nové. Nabídka řádku ho otevře v prohlížeči nebo na něm něco provede."
 hosting_5 = "Odkazy|Odkazy na issues a {$prs} (#12, !53, ABC-7) ve zprávě commitu nebo názvu větve se rozpoznají. Alt+R ve formuláři commitu jeden vloží."
 hosting_6 = "Čip v panelu|Vlevo v panelu nástrojů čip ukazuje {$pr} aktuální větve (GH #12, GL !53) nebo ztlumené „+ {$pr_abbr}“ pro založení. Klikněte na něj."
-hosting_7 = "Klíče SSH|Vyberte klíč SSH pro profil (Nastavení > Profily) nebo pro repozitář (nabídka karty > „SSH a přihlašovací údaje...“). Hesla zůstávají v systémovém ssh-agentu."
+hosting_7 = "Klíče SSH|Vyberte klíč SSH pro profil (Nastavení > Profily) nebo pro repozitář (nabídka karty > „SSH a přihlášení...“). Hesla zůstávají v systémovém ssh-agentu."
 setup_1 = "Nastavení|Ctrl+, nebo ozubené kolo. Tab přepíná mezi seznamem stránek a volbami, j / k posouvají, Enter nebo Space změní hodnotu, / nebo Ctrl+F hledá ve všech volbách, Esc zavře."
 setup_2 = "Motivy|Nastavení > Vzhled > Motiv: tmavý, světlý, podle terminálu nebo jedna z mnoha předvoleb. Ctrl+N a klávesa změní i motiv, jazyk a barvy grafu bez otevření Nastavení."
 setup_3 = "Jazyk|Nastavení > Obecné > Jazyk nabízí 17 jazyků. „Překládat výrazy gitu“ určuje, zda se přeloží i vlastní slova gitu ({$commit}, {$push}...)."
@@ -5071,7 +5071,7 @@ token_command_failed_tail = "Příkaz tohoto repozitáře pro token selhal: {tai
 token_command_failed_code = "Příkaz tohoto repozitáře pro token selhal (kód ukončení {code})."
 token_command_failed_code_tail = "Příkaz tohoto repozitáře pro token selhal (kód ukončení {code}): {tail}"
 grant_refused = "GitPoulpi neposlal token účtu na {host}: není to {expected}, adresa tohoto účtu."
-repo_auth_needs_confirmation = "Credential helper nebo příkaz pro token se uloží, až ho potvrdíte v části SSH a přihlašovací údaje."
+repo_auth_needs_confirmation = "Credential helper nebo příkaz pro token se uloží, až ho potvrdíte v části SSH a přihlášení."
 
 [window]
 connecting = "připojování k daemonu relace..."
@@ -5935,7 +5935,7 @@ help_scroll = "Protokol aktivity: posun dlouhých řádků do stran (také Shift
 
 [git_error]
 summary_host_key = "Hostitelský klíč SSH tohoto remote zatím není znám."
-hint_host_key = "Jednou spusťte v terminálu `ssh -T git@<host>`, zkontrolujte otisk, odpovězte yes a zkuste to znovu. Nebo v části SSH a přihlašovací údaje nastavte pro tento repozitář soubor known_hosts."
+hint_host_key = "Jednou spusťte v terminálu `ssh -T git@<host>`, zkontrolujte otisk, odpovězte yes a zkuste to znovu. Nebo v části SSH a přihlášení nastavte pro tento repozitář soubor known_hosts."
 title_push = "{$Push}: selhání"
 title_pull = "{$Pull}: selhání"
 title_fetch = "{$Fetch}: selhání"
@@ -5951,7 +5951,7 @@ done_pull = "{$Pull}: hotovo"
 summary_non_ff = "Remote má {$commits}, které nemáte."
 hint_non_ff = { git = "Nejdřív proveďte pull a zkuste to znovu.", local = "Nejdřív stáhněte změny a zkuste to znovu." }
 summary_auth = "Remote odmítl přihlašovací údaje."
-hint_auth = "Zkontrolujte přihlašovací údaje v Nastavení > Integrace, spusťte ssh-agent se svým klíčem, nebo v části SSH a přihlašovací údaje zvolte, jak se tento repozitář přihlašuje."
+hint_auth = "Zkontrolujte přihlašovací údaje v Nastavení > Integrace, spusťte ssh-agent se svým klíčem, nebo v části SSH a přihlášení zvolte, jak se tento repozitář přihlašuje."
 summary_conflict = "Operace se zastavila kvůli konfliktům."
 hint_conflict = "Vyřešte konflikty v panelu Stav a pokračujte."
 summary_overwrite = "Místní změny by byly přepsány."
@@ -5961,14 +5961,14 @@ hint_network = "Zkontrolujte připojení a adresu remote a zkuste to znovu."
 summary_lock = "Tento repozitář používá jiný proces git."
 hint_lock = "Zavřete jiné nástroje git, nebo smažte soubor zámku, pokud žádný neběží."
 summary_credential_helper = "Nastavený pomocník přihlašovacích údajů selhal: {line}"
-hint_credential_helper = "Credential helper nelze spustit. Vyberte pro tento repozitář jiný zdroj v části SSH a přihlašovací údaje, nebo pomocníka opravte: `git config --show-origin --get-all credential.helper` ukáže, kde je nastaven."
+hint_credential_helper = "Credential helper nelze spustit. Vyberte pro tento repozitář jiný zdroj v části SSH a přihlášení, nebo pomocníka opravte: `git config --show-origin --get-all credential.helper` ukáže, kde je nastaven."
 hint_abort_blocked = "Zálohujte změny v těchto souborech nebo je zahoďte v panelu Stav a pak zkuste přerušení znovu."
 action_pull_first = "Nejdřív {$Pull}"
 action_integrations = "Otevřít Integrace"
 action_stash_retry = "{$Stash} a zkusit znovu"
 action_retry = "Zkusit znovu"
-action_repo_auth = "SSH a přihlašovací údaje..."
-hint_repo_auth = "V části SSH a přihlašovací údaje zvolte pro tento repozitář jiný způsob přihlášení a zkuste to znovu."
+action_repo_auth = "SSH a přihlášení..."
+hint_repo_auth = "V části SSH a přihlášení zvolte pro tento repozitář jiný způsob přihlášení a zkuste to znovu."
 
 [failure_card]
 title_clone = "Klonování selhalo"
@@ -9037,7 +9037,7 @@ why_commit = "soubory mají stále konflikty: nejdřív je vyřešte"
 
 [repo_auth]
 # context: sidebar entry and page title of the per-repository page that picks how this repository signs in over SSH and HTTPS
-section = "SSH a přihlašovací údaje"
+section = "SSH a přihlášení"
 # context: one-line introduction at the top of the SSH & credentials page
 intro = "Platí jen pro {$fetch}, {$pull}, {$push}, submoduly a LFS tohoto repozitáře. Nic se nezapisuje do repozitáře ani do konfigurace gitu."
 # context: sub-heading of the HTTPS rows on the SSH & credentials page
@@ -9237,9 +9237,9 @@ result_none = "Není žádný remote k otestování."
 # context: first results line, saying which choices were tested
 result_saved_note = "Testováno s uloženými volbami."
 # context: body of the question asked when closing Settings with unsaved sign-in choices
-close_body = "SSH a přihlašovací údaje mají neuložené změny."
+close_body = "SSH a přihlášení mají neuložené změny."
 # context: command palette entry that opens the SSH & credentials page
-palette_open = "Repozitář: SSH a přihlašovací údaje..."
+palette_open = "Repozitář: SSH a přihlášení..."
 # context: command palette entry that tests the connection of every remote
 palette_test = "Repozitář: Otestovat připojení"
 # context: command palette entry that clears the sign-in settings after asking
@@ -9269,7 +9269,7 @@ identity_ssh_account = "Klíč SSH účtu {account}"
 # context: joins the HTTPS line and the SSH line of the active sign-in
 identity_both = "{https}; {ssh}"
 # context: row of the repository tab menu that opens the SSH & credentials page
-menu_row = "SSH a přihlašovací údaje..."
+menu_row = "SSH a přihlášení..."
 # context: label of the row showing the SSH command the repository itself sets
 pin_label = "Připnuto v konfiguraci gitu"
 # context: help under the row that shows an SSH key pinned in the repository's config

@@ -650,9 +650,9 @@ Klávesy jsou výchozí.
 | Remote: Fetch remote... |  |
 | Remote: Akce vybraného remote... | `.` |
 | Repozitář: Částečný checkout... |  |
-| Repository: SSH & Credentials... |  |
-| Repository: Test Connection |  |
-| Repository: Use Default Credentials |  |
+| Repozitář: SSH a přihlášení... |  |
+| Repozitář: Otestovat připojení |  |
+| Repozitář: Výchozí přihlašovací údaje |  |
 | Flow: Otevřít nabídku | `Ctrl+G W` |
 | Flow: Zahájit větev... |  |
 | Flow: Nové issue... |  |

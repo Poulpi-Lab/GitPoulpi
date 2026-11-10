@@ -54,7 +54,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.startup_tab_launcher` | `"last"` | 通过 GitPoulpi 创建的桌面或开始菜单快捷方式（会传入 `--launcher`）启动时，无论文件夹是什么，打开哪个标签页：`"home"`、`"last"` 或 `"radar"`。优先于上面两项设置。`"last"`：`remember_tabs` 关闭或没有记住任何标签页时为主页；`"radar"`：Radar 关闭或构建中没有时为主页。仅在启动时读取；需重启生效。 |
 | `general.group_worktree_tabs` | `true` | 让仓库的关联 worktree 的标签页紧跟在该仓库的标签页之后：worktree 打开时、worktree 标签页被拖走时（它会自动回到所属分组旁边；仓库标签页是分组的头，它的 worktree 跟在后面）以及开启该设置时。关闭则标签页停留在你放置的位置。 |
 | `general.undo_depth` | `100` | 撤销最多可以回退多少次操作；`0` = 不限制。 |
-| `general.conflict_detection` | `true` | 主动冲突检测：当把当前分支 merge 到它的来源分支会产生冲突时，在 Log 上显示一个徽标，在后台计算（内存中的 merge：你的文件、索引和 ref 都不会改变）。仓库可以为自己关闭它（`[preferences] conflict_detection`）。参见[解决 merge 冲突](merge-conflicts.md#冲突预防)。 |
+| `general.conflict_detection` | `true` | 主动冲突检测：当把当前分支 merge 到它的来源分支会产生冲突时，在 Log 上显示一个徽标，在后台计算（内存中的 merge：你的文件、索引和 ref 都不会改变）。仓库可以为自己关闭它（`[preferences] conflict_detection`）。它所比较的基础分支有自己的列表：[`[conflict_prevention]`](#conflict_prevention基础分支列表)。参见[解决 merge 冲突](merge-conflicts.md#冲突预防)。 |
 | `general.dev_mode` | 不存在（自动） | 供从源码检出构建 GitPoulpi 的人使用；从不在设置中显示。不存在时：正在运行的可执行文件位于 `<checkout>/target/<profile>/` 中（`target` 旁边有 `Cargo.toml` 和 `crates/gitpoulpi-tui`）时开启。`true` / `false` 强制设定。开发模式只解锁 `ui.launcher_build`。 |
 | `general.journal_outside` | `true` | 把 shell 或 AI 代理对分支、tag、stash 和 HEAD 所做的操作记为撤销历史中的条目，并标为外部，这样 `Ctrl+Z` 就能撤回它们。文件的修改绝不会被记录。需要 `undo_enabled`。参见[撤销与重做](undo-redo.md#在-gitpoulpi-之外所做的更改)。 |
 | `general.undo_enabled` | `true` | `false`：完全不记录撤销信息（最快），撤销历史会被清除，撤销 / 重做按钮会消失。参见[撤销与重做](undo-redo.md)。 |
@@ -236,6 +236,7 @@ merge 冲突编辑器（[解决 merge 冲突](merge-conflicts.md)）。设置 > 
 |---|---|---|
 | `git.pull_mode` | `"merge"` | Pull（按钮、`Ctrl+G p`、`Git：Pull`）的行为：`merge`（可能时快进）、`ff_only`、`rebase`。始终显式传给 git。旧的 `fetch_all` 按 `merge` 读取。 |
 | `git.push_behavior` | `"direct"` | `direct` push 到默认远程；`ask` 会先显示远程菜单。 |
+| `git.merge_fast_forward` | `"never"` | 当分支本可 fast-forward 时，你发起的 merge（分支菜单、拖放、命令面板、`gitpoulpi merge`）怎么做：`never` 始终生成 merge commit（`--no-ff`），`allowed` 可能时 fast-forward（git 的默认行为，`merge.ff` 生效），`only` 只 fast-forward，否则拒绝。仓库自己的选择（设置 > Merge 选项，其 `repo-state.toml` 中的 `merge_fast_forward`）优先；CLI 的 `--ff`、`--no-ff` 和 `--ff-only` 优先于两者。实时生效。 |
 | `git.default_encoding` | `"utf-8"` | **不是**有效 UTF-8 的文本（文件内容、blame、diff、没有 `encoding` 头的 commit 消息）所用的编码：任何 WHATWG 标签（`windows-1252`、`shift_jis` 等）。仅用于显示；stage 时绝不会重新编码。仓库可以覆盖它。 |
 | `git.lfs_enabled` | `true` | 显示并驱动 Git LFS。仓库可以覆盖它。参见 [Git LFS](lfs.md)。 |
 | `git.lfs_autofix_filters` | `true` | 在对使用 LFS 的仓库执行 pull 或 push 之前，如果缺少 LFS 过滤器 / pre-push 钩子，则安装它们（`git lfs install --local`，仅限此仓库）。参见 [Git LFS](lfs.md)。 |
@@ -442,6 +443,17 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | gitignore 风格的路径模式。不含 `/` 的模式匹配任意深度的文件名，含 `/` 的匹配整个路径（开头的 `/` 把它锚定在根目录）；`*` 和 `?` 只在一个文件夹内，`**` 可以跨文件夹；`!` 重新允许前面某个模式匹配到的内容，最后一次匹配生效；忽略大小写。由 stage 防护和 `ai.privacy.exclude_sensitive_files` 使用。 |
 | `privacy.staging_guard` | `true` | stage 匹配某个模式、或内容含有可识别密钥的文件时，会先询问（TUI），除非给出 `--allow-sensitive`（CLI）或 `mcp.allow_sensitive_staging` 允许代理传入 `allow_sensitive`（MCP），否则会被拒绝。每个文本文件最多读取 1 MiB、总共 32 MiB；二进制文件只按名称匹配。见 [stage 与 commit](staging-and-committing.md#敏感文件)。 |
 
+## `[conflict_prevention]`（基础分支列表）
+
+主动冲突检测可以把哪些分支当作当前分支的基础分支，是一个模式列表（参见[解决 merge 冲突](merge-conflicts.md#冲突预防)）。列表可以命名并共享；设置 > 常规 > 冲突预防 可编辑它们。
+
+| 键 | 默认值 | 取值和效果 |
+|---|---|---|
+| `conflict_prevention.default_list` | `""` | 仓库没有自己的列表时所使用的列表的名称。为空，或没有该名称的列表，表示内置的 `**`（所有分支）。每次检查都会重新读取，所以更改无需重启即可应用于已打开的仓库。 |
+| `conflict_prevention.lists` | 无 | 命名列表，每个一张表：`[conflict_prevention.lists.release]`，其中 `patterns = ["origin/release/**", "!origin/release/old"]`。空的 `patterns` 允许所有分支。编辑列表会应用于每个沿用它的仓库。 |
+
+仓库沿用哪个列表记录在它的 `repo-state.toml` 中（见下）。优先顺序：仓库自己的模式，然后是它沿用的命名列表，然后是 `default_list`，最后是 `**`。
+
 ## `[keybindings]`
 
 重新绑定 TUI 的快捷键；设置 > 键盘与鼠标可编辑它。
@@ -474,7 +486,9 @@ stage_file = "z"
 | `[preferences] squash_merge` | 本地分支的 merge 改为 squash：只暂存，不生成 merge commit（不存在时为关闭） | 设置 > 仓库专属设置 > Merge 选项 |
 | `[preferences] template_apply`, `template_strip_comments` | 用模板预填空的 commit 表单；commit 时移除 `#` 注释行（不存在时两者都为关闭） | 设置 > 仓库专属设置 > 消息模板 |
 | `[preferences] conflict_detection` | 此仓库的主动冲突检测；不存在表示跟随 `general.conflict_detection` | 设置 > 仓库专属设置 > 冲突预防 |
-| `[preferences] conflict_base_branches` | “基础分支”模式，每行一个（不存在时为 `**`） | 设置 > 仓库专属设置 > 冲突预防 |
+| `[preferences] conflict_base_branches` | 仓库自己的“基础分支”模式，每行一个（仍作为 **自有列表** 使用） | 设置 > 仓库专属设置 > 冲突预防 |
+| `[preferences] conflict_base_source` | 基础分支的来源：`default`（全局默认列表）、`list`（`conflict_base_list`）或 `own`（`conflict_base_branches`）。不存在时：有自有模式就用自有模式，否则用默认列表 | 设置 > 仓库专属设置 > 冲突预防 |
+| `[preferences] conflict_base_list` | 来源为 `list` 时，此仓库沿用的 `[conflict_prevention.lists.<name>]`；已删除的列表会回落到默认列表 | 设置 > 仓库专属设置 > 冲突预防 |
 | `commit-template.txt`（`repo-state.toml` 旁边的文件） | commit 模板；git 的 `commit.template` 指向它 | 设置 > 仓库专属设置 > 消息模板 |
 | `[preferences.ai_instructions]` | `text`，`mode = "add" \| "replace"`：此仓库的 AI 指令 | 设置 > 仓库专属设置 > AI |
 | `[preferences.ai_overrides.<action>]` | 此处某个操作的 `profile`、`instructions` | 设置 > 仓库专属设置 > AI |

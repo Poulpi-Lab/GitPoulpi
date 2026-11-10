@@ -258,9 +258,9 @@ lfs = "Git LFS：存放在仓库历史之外的大文件。任何移动或转换
 "mcp token --rotate" = "用新令牌替换当前令牌；持有旧令牌的客户端会立即被拒绝"
 "mcp token --show" = "同时打印完整令牌，供你粘贴到客户端配置中"
 "merge --autostash" = '暂存妨碍此操作的本地更改，执行操作后再 pop 该 stash（即 `general.auto_stash = "always"` 的行为）'
-"merge --ff" = "Fast-forward when the branch allows it, a merge commit otherwise (git's default). Overrides `git.merge_fast_forward` for this merge"
-"merge --ff_only" = "Fast-forward only: refuse when the branch has diverged. Overrides `git.merge_fast_forward` for this merge"
-"merge --no_ff" = "Always make a merge commit, even when a fast-forward is possible. Overrides `git.merge_fast_forward` for this merge"
+"merge --ff" = "分支允许时快进，否则生成 merge 提交（git 的默认行为）。仅对本次合并覆盖 `git.merge_fast_forward`"
+"merge --ff_only" = "只快进：分支已分叉时拒绝。仅对本次合并覆盖 `git.merge_fast_forward`"
+"merge --no_ff" = "始终生成 merge 提交，即使可以快进。仅对本次合并覆盖 `git.merge_fast_forward`"
 "merge --squash" = "压缩该分支的提交：只暂存它们的更改，不生成 merge 提交（`merge --squash`），随后需要再执行一次 `commit`。即“合并行为”设置中的压缩模式。不可撤销：没有任何内容被移动，想退回请丢弃已暂存的更改"
 patch = "写出补丁文件，或将补丁应用到工作区"
 "patch apply" = "将补丁文件应用到工作区"

@@ -111,7 +111,7 @@
 | `branch set-upstream <branch> <remote/branch>`、`branch unset-upstream <branch>` | 上游。 |
 | `branch fast-forward <branch> [target]` | 仅当可以快进时才向前移动分支。 |
 | `checkout <target> [--autostash]` | 切换分支，或在某个 commit 处分离。 |
-| `merge <ref> [--squash] [--autostash]` | merge 到当前分支。`--squash` 只暂存该分支的更改，不生成 commit（`merge --squash`）；之后需要再 `commit`。不可撤销：没有移动任何 ref。 |
+| `merge <ref> [--ff \| --no-ff \| --ff-only \| --squash] [--autostash]` | merge 到当前分支。不带标志时由 fast-forward 设置决定（仓库自己的选择，否则 `git.merge_fast_forward`，默认 `never`：即使可以 fast-forward 也生成 merge commit）。`--ff` 可能时 fast-forward（git 的默认行为），`--no-ff` 始终生成 merge commit，`--ff-only` 只做 fast-forward，否则以 *cannot fast-forward* 失败且不改动任何内容；这些标志互斥。JSON 会说明实际发生的情况：`{"FastForwarded": oid}`、`{"Merged": oid}`（一个 merge commit）、`"UpToDate"` 或 `{"Conflicted": [paths]}`。一个 merge commit 或一次 fast-forward 是一条撤销条目。`--squash` 只暂存该分支的更改，不生成 commit（`merge --squash`）；之后需要再 `commit`。不可撤销：没有移动任何 ref。 |
 | `rebase [onto] [--autostash]` | Rebase；进行中可使用 `--continue`、`--skip`、`--abort`、`--status`。 |
 | `rebase <upstream> --interactive --plan <file\|->` | 根据 JSON 计划（`[{"commit", "action", "message"}]`，动作为 `pick`、`reword`、`squash`、`fixup`、`drop`、`edit`，或它们的单字母形式 `p`、`r`、`s`、`f`、`d`、`e`；不分大小写，和 rebase 待办列表一样）执行非交互式的“交互式”rebase；`--root`、`--onto-commit`、`--autosquash`。请根据 `rebase-plan` 构建计划。 |
 | `cherry-pick <commits>...` 或 `cherry-pick --plan <file\|->` | 按顺序应用 commit（计划：`pick` / `drop` 步骤）。 |

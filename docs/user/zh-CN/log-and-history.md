@@ -112,6 +112,8 @@ git 不为 tag 保存远程跟踪引用，所以 GitPoulpi 是根据你上一次
 
 `Esc` 取消拖动。键盘上的等价操作是命令面板命令 *引用：将所选引用放到已检出分支上…*。
 
+**Merge 还是 fast-forward。**当目标没有自己的 commit（被拖动的分支只是领先于它）时，merge 本可以直接把目标向前移动。默认情况下（设置 > Git > **Merge fast-forward** = *never*，或仓库在其 Merge 选项页中的自有选择），菜单行显示 *将 x merge 到 y（merge commit）* 并生成真正的 merge commit，让历史保留该分支；想要单纯的移动时，请用单独的 *将 y fast-forward 到 x* 一行（想要一条直线时，请改用 *Rebase*）。选择 *allowed* 时，Merge 行显示 *（fast-forward）*，选择 *only* 时显示 *（仅 fast-forward）*，分支已分叉时会置灰并说明原因。分支自己的菜单中有同样的行和标签，`gitpoulpi merge --ff | --no-ff | --ff-only` 可按单次 merge 指定。
+
 ## commit 菜单
 
 右键点击某个 commit（或在其上按 `.`）打开它的菜单：

@@ -136,6 +136,8 @@
 | **仓库数据位置** | GitPoulpi 存放各仓库自身数据的位置（`session.per_repo_state_dir`）：**在 .git 内**（默认：工作区里不会多出任何东西，所有 worktree 共用）、**在工作区内**（一个 `.gitpoulpi` 文件夹；要提交团队共用的 `workflow.toml` 时需要这样）或 **在我的用户数据文件夹中**（仓库之外）。旧版本留下的 `.gitpoulpi` 文件夹会在第一次需要时被移到新位置，并在清空后删除；git 跟踪的文件（已提交的 `workflow.toml`）绝不会被移动或删除，仍然可读。 |
 | **默认分支名** | 你用“初始化”创建的仓库的第一个分支。为空时：由 git 决定。它不会重命名任何已有分支。 |
 | **启用主动冲突检测** | 默认开启（`general.conflict_detection`）。当把当前分支 merge 到它的来源分支会产生冲突时，在你尝试之前就在 Log 上发出警告。仓库可以在自己的 **冲突预防** 页中单独关闭它。参见[解决 merge 冲突](merge-conflicts.md#冲突预防)。关闭设置时生效。 |
+| **默认基础分支** | 在开关下方的 **冲突预防** 分组中（命令面板的 **冲突：编辑基础分支列表…** 会打开它）。仓库自己没有列表时所使用的基础分支模式列表：**内置（`**`）**，即所有分支，或你的某个命名列表（`conflict_prevention.default_list`）。关闭设置时应用于已打开的仓库。**恢复内置默认** 会回到 `**`。 |
+| **基础分支列表** | 同在该分组：你的基础分支模式命名列表（`[conflict_prevention.lists.<name>]`），每个一块，包括它的 **名称**（重命名时，若它是默认列表则仍保持默认；沿用旧名称的仓库会使用默认列表，直到你重新选择它）、它的 **模式**（每行一个，`Enter` 或点击打开编辑器，`Ctrl+S` 保留）、**设为默认** 和 **删除列表**（会先询问，并说明沿用它的仓库将改用默认列表）。在 **新建列表** 中输入名称并按 `Enter` 即可添加；新列表以 `**` 开头。编辑列表会更改每个沿用它的仓库。 |
 | **日志级别**、**日志文件保留时长**、**单个日志文件的最大大小** | 活动日志背后的应用程序日志：记录的最详细的级别（`log.level`）、文件保留多久（一个整数加一个单位，天、周、月或年，在同一行：点击数字即可输入，上下键步进，Tab 移到单位，Enter 打开它的列表；最多 10 年，默认 1 周，`log.retention_days` 和 `log.retention_unit`）以及一天的文件轮转的大小（一个数字加 MiB 或 GiB，1 MiB 到 1 GiB，`log.max_file_mb` 和 `log.max_file_unit`）。 |
 | **显示操作耗时**、**扩展日志** | 活动日志的“Git 操作”标签页：每个操作的耗时（`log.timings`，默认开启），以及后台工作，即刷新和自动 fetch（`log.extended`，默认关闭）。参见[出错时](troubleshooting.md#活动日志)。 |
 | **启用撤销**、**撤销历史深度**、**记录在 GitPoulpi 之外所做的更改** | **撤销历史** 组。开启或关闭撤销，并设置它保留多少次操作（默认 100，`0` 表示不限）。关闭撤销会在确认后清除撤销历史。最后一项还会记录 shell 或代理对分支、tag、stash 和 HEAD 所做的操作。参见[撤销与重做](undo-redo.md)。 |
@@ -431,6 +433,7 @@ commit 图如何绘制，以及 Log 加载多少个 commit。图配色位于 **�
 | **Git 后端** | `git2`（libgit2，默认）或 `system`（你已安装的 `git`）。全局。对更改之后启动的守护进程生效。 |
 | **Pull 按钮** | Pull 按钮的行为：merge（可能时快进）、仅快进，或 rebase。全局。`▾` 菜单中的各项不会改变它。 |
 | **Push 按钮** | **直接** 立即 push；**询问** 先显示远程菜单。全局。 |
+| **Merge fast-forward** | 当分支本可直接 fast-forward 时，你发起的 merge 怎么做：**never**（默认）始终生成 merge commit，**allowed** 可能时 fast-forward（git 自己的默认行为），**only** 只 fast-forward，否则拒绝。全局（`git.merge_fast_forward`）；仓库可在其 [Merge 选项](#仓库专属merge-选项)页中覆盖它。 |
 | **默认编码** | 用于显示 **不是有效 UTF-8** 的文本的编码：文件内容、blame、diff 和 commit 消息。该页有一个全局行和一个此仓库的行；仓库行优先。有效的 UTF-8 绝不会被重新解码，stage 也绝不会重新编码任何内容。 |
 | **core.autocrlf**、**core.eol** | 此仓库自己的 git 设置。该行会把 `core.autocrlf` 或 `core.eol` 写入仓库的 git 配置。**（继承）** 会移除仓库的值，于是你的全局 git 配置生效。`Ctrl+Z` 恢复之前的值。对应的 CLI 命令是 `gitpoulpi repo-config`。 |
 | **Git LFS** | 在界面中显示 Git LFS。参见 [Git LFS](lfs.md)。 |
@@ -505,7 +508,20 @@ commit 图如何绘制，以及 Log 加载多少个 commit。图配色位于 **�
 
 ### 仓库专属：Merge 选项
 
-只有一个开关 **Squash**（默认关闭）。开启后，merge 一个本地分支（分支菜单、拖放、命令面板的 `Merge`）会把该分支的更改暂存起来，但不生成 merge commit（`git merge --squash`）：commit 留给你自己完成。commit 表单会带着 git 的 squash 消息（`SQUASH_MSG`，去掉注释行）打开，每次 squash 一次。之后没有任何进行中的操作（没有 `MERGE_HEAD`），所以 **中止** 不适用：要退回，请丢弃已暂存的更改。遇到冲突而停下的 squash，会像任何有冲突的 merge 一样把冲突留在状态窗格中。已暂存的更改不是撤销条目（没有移动任何 ref，所以没有可恢复的内容）；CLI 的 `gitpoulpi merge <branch> --squash` 无论此设置如何都是同样的效果。
+两项设置。**Fast-forward** 决定分支本可直接 fast-forward 时 merge 怎么做：
+
+| 选择 | 你发起的 merge…… |
+|---|---|
+| **（继承）** | 沿用 Git 页中的全局 **Merge fast-forward** 设置（默认 **never**）。 |
+| **never** | 始终生成 merge commit（`git merge --no-ff`），即使分支只是领先。该 commit 的第一个父 commit 是旧的末端，第二个是被 merge 的分支，消息是 git 自己的（`Merge branch 'x' into y`）。 |
+| **allowed** | 能 fast-forward 时就 fast-forward，否则生成 merge commit（git 的默认行为）。 |
+| **only** | 只 fast-forward，分支已分叉时以 *cannot fast-forward* 拒绝（`git merge --ff-only`）。 |
+
+它适用于你发起的每一次 merge：分支菜单、拖放、命令面板的 `Merge`，以及 `gitpoulpi merge`（其 `--ff`、`--no-ff` 和 `--ff-only` 标志可对单次 merge 覆盖它）。菜单会说明这次 merge 将做什么：*将 x merge 到 y（merge commit）*、*（fast-forward）* 或 *（仅 fast-forward）*，而单独的 *将 y fast-forward 到 x* 项（及其命令面板命令）在每种选择下都只需一步。merge commit 和 fast-forward 一样是普通的撤销条目。Flow 操作自己选择 merge 策略，会忽略此设置。
+
+你自己的选择优先于 git 的：在 **never** 或 **only** 下，GitPoulpi 发起的 merge 会显式传递该标志，所以仓库 git 配置中的 `merge.ff` 会被覆盖。只有在 **allowed** 下，git 的 `merge.ff` 才仍然生效，仓库设置了它时，页面会在该行下方显示。（该行只读取仓库自己的 `.git/config`，不读取你的全局 git 配置。）
+
+**Squash**（默认关闭）。开启后，merge 一个本地分支（分支菜单、拖放、命令面板的 `Merge`）会把该分支的更改暂存起来，但不生成 merge commit（`git merge --squash`）：commit 留给你自己完成。commit 表单会带着 git 的 squash 消息（`SQUASH_MSG`，去掉注释行）打开，每次 squash 一次。之后没有任何进行中的操作（没有 `MERGE_HEAD`），所以 **中止** 不适用：要退回，请丢弃已暂存的更改。遇到冲突而停下的 squash，会像任何有冲突的 merge 一样把冲突留在状态窗格中。已暂存的更改不是撤销条目（没有移动任何 ref，所以没有可恢复的内容）；CLI 的 `gitpoulpi merge <branch> --squash` 无论此设置如何都是同样的效果。squash 优先于 **Fast-forward**。
 
 ### 仓库专属：消息模板
 
@@ -521,7 +537,8 @@ commit 表单开头预填的一段消息（`gitpoulpi ui show settings commit-te
 `gitpoulpi ui show settings conflict-prevention`。本仓库的主动冲突检测页（参见[解决 merge 冲突](merge-conflicts.md#冲突预防)）：
 
 - **检查与基础分支的冲突**：默认开启。取消勾选只会为此仓库关闭检测；全局开关是“常规”页的 **启用主动冲突检测**。两者都必须开启。
-- **基础分支**（默认 `**`）：当前分支可能由其分出的分支，每行一个模式（`Enter` 或点击打开编辑器，`Ctrl+S` 保留）。它下方的模式表是参考：
+- **基础分支来自**：此仓库的基础分支来自哪里。**默认** 沿用全局默认（内置的 `**`，或在 设置 > 常规 的 **默认基础分支** 下选择的列表）；**列表：<名称>** 沿用你的某个命名列表，所以编辑该列表也会改变此仓库；**自有列表** 是仓库自己的列表（选择它时，从当前生效的模式的副本开始）。在有这个选择之前写入、且带有自有模式的仓库文件，会被视为 **自有列表**。
+- **基础分支**（每行一个模式）：选择 **自有列表** 时，`Enter` 或点击打开编辑器，`Ctrl+S` 保留；选择 **默认** 或 **列表** 时，生效的模式以只读方式显示。它下方的模式表是参考：
 
   | 模式 | 匹配 |
   |---|---|
@@ -530,7 +547,10 @@ commit 表单开头预填的一段消息（`gitpoulpi ui show settings commit-te
   | `origin/feature/**` | `origin` 中以 `feature/` 开头的分支 |
   | `!origin/abc` | 排除该分支 |
 
-  本地分支就是它的裸名称（`main`），远程跟踪分支前面带有远程名（`origin/main`）。`*` 和 `?` 只在一个路径段内匹配，`**` 可以跨段。空行和 `#` 注释会被忽略；只有排除项的列表表示“除这些之外的每个分支”。它保存在 `repo-state.toml` 中，设置关闭时重新读取。
+  本地分支就是它的裸名称（`main`），远程跟踪分支前面带有远程名（`origin/main`）。`*` 和 `?` 只在一个路径段内匹配，`**` 可以跨段。空行和 `#` 注释会被忽略；只有排除项的列表表示“除这些之外的每个分支”。这个选择保存在 `repo-state.toml` 中，设置关闭时重新读取。
+- **另存为列表…**：输入名称并按 `Enter`；生效的模式会成为一个命名列表（与 设置 > 常规 所编辑的相同），此仓库随之沿用。
+- **恢复默认**（会先询问）：丢弃此仓库的选择、列表和自有模式；重新沿用默认设置。
+- **使用工作流的基础分支**（为仓库设置了带基础分支的[分支工作流](branching-workflows.md)时显示）：用这些基础分支填充 **自有列表**，每个都作为本地分支和任一远程的分支（`main` 和 `*/main`）。它只复制一次，不会跟随工作流之后的更改。
 
 ### 仓库专属：AI
 

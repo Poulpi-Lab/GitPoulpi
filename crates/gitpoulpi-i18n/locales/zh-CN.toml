@@ -621,8 +621,8 @@ git_lfs_program_help = "从 https://git-lfs.com 安装（Windows：随 Git for W
 initialize_lfs_for_this_repository = "为此仓库初始化 LFS"
 initialize_lfs_for_this_repository_help = "运行 `git lfs install --local`：将 LFS 过滤器和钩子写入此仓库自己的配置，绝不写入全局配置。需要 git-lfs。"
 pull_mode_help = { git = "工具栏的 {$Pull}{hint} 的行为：{$merge}（可能时快进）、ff_only 或 {$rebase}。按钮 ▾ 菜单中的各项会立即执行各自的操作，不会改变此设置。", local = "工具栏的{$Pull}{hint} 的行为：{$merge}（可能时快进）、ff_only 或{$rebase}。按钮 ▾ 菜单中的各项会立即执行各自的操作，不会改变此设置。" }
-merge_fast_forward = "{$Merge} fast-forward"
-merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
+merge_fast_forward = { git = "{$Merge} 的 fast-forward 策略", local = "{$Merge}的快进策略" }
+merge_fast_forward_help = { git = "你发起的 {$merge}（分支菜单、拖放、命令面板、命令行）如何处理本可直接 fast-forward 的分支。never：始终生成 {$merge} {$commit}。allowed：可能时 fast-forward，即 git 的默认行为。only：只 fast-forward，否则拒绝。仓库可在其 {$Merge} 选项页中覆盖此设置。", local = "你发起的{$merge}（分支菜单、拖放、命令面板、命令行）如何处理本可直接快进的分支。never：始终生成{$merge} {$commit}。allowed：可能时快进，即 git 的默认行为。only：只快进，否则拒绝。仓库可在其{$Merge}选项页中覆盖此设置。" }
 repo_heading = "仓库：{repo} - 仅此仓库"
 inherited = "（继承）"
 lfs_not_checked = "（尚未检查）"
@@ -857,9 +857,9 @@ solo = "单独显示"
 create_worktree = { git = "从 {name} 创建 worktree…", local = "从 {name} 创建工作树…" }
 checkout = { git = "Checkout {name}", local = "检出 {name}" }
 merge_into = { git = "将 {name} {$Merge} 到 {head}", local = "将 {name} {$Merge}到 {head}" }
-merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
-merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
-merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
+merge_into_commit = { git = "将 {name} {$Merge} 到 {head}（{$merge} {$commit}）", local = "将 {name} {$Merge}到 {head}（{$merge}{$commit}）" }
+merge_into_ff = { git = "将 {name} {$Merge} 到 {head}（fast-forward）", local = "将 {name} {$Merge}到 {head}（快进）" }
+merge_into_ff_only = { git = "将 {name} {$Merge} 到 {head}（仅 fast-forward）", local = "将 {name} {$Merge}到 {head}（仅快进）" }
 rebase_onto = { git = "将 {head} {$Rebase} 到 {name}", local = "将 {head} {$Rebase}到 {name}" }
 fast_forward = { git = "将 {branch} Fast-forward 到 {target}", local = "将 {branch} 快进到 {target}" }
 pull = "{$Pull}"
@@ -971,9 +971,9 @@ rewrite_workbench = "打开工作台…"
 
 [menu_drop]
 merge_into = { git = "将 {source} {$Merge} 到 {target}", local = "将 {source} {$Merge}到 {target}" }
-merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
-merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
-merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
+merge_into_commit = { git = "将 {source} {$Merge} 到 {target}（{$merge} {$commit}）", local = "将 {source} {$Merge}到 {target}（{$merge}{$commit}）" }
+merge_into_ff = { git = "将 {source} {$Merge} 到 {target}（fast-forward）", local = "将 {source} {$Merge}到 {target}（快进）" }
+merge_into_ff_only = { git = "将 {source} {$Merge} 到 {target}（仅 fast-forward）", local = "将 {source} {$Merge}到 {target}（仅快进）" }
 rebase_onto = { git = "将 {source} {$Rebase} 到 {target}", local = "将 {source} {$Rebase}到 {target}" }
 rebase_interactive = { git = "将 {source} 交互式 {$rebase} 到 {target}…", local = "将 {source} 交互式变基到 {target}…" }
 push_to = { git = "将 {source} {$Push} 到 {target}", local = "将 {source} {$Push}到 {target}" }
@@ -7558,9 +7558,9 @@ commit_skip_hooks = { git = "每次 {$commit} 默认绕过 git 钩子", local = 
 commit_skip_hooks_help = { git = "{$commit} 面板中的“跳过钩子”选项默认勾选（`--no-verify`）：不运行仓库的钩子。单次 {$commit} 时仍可更改。", local = "{$commit}面板中的“跳过钩子”选项默认勾选（`--no-verify`）：不运行仓库的钩子。单次{$commit}时仍可更改。" }
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "开启后，对本地分支执行 {$merge} 会把其更改放入索引并就此停止，不生成 {$merge} {$commit}：请自行在 {$commit} 面板中完成，面板会带着 git 的 {$squash} 消息打开。不会记入撤销历史：想退回请丢弃这些更改。", local = "开启后，对本地分支执行{$merge}会把其更改放入索引并就此停止，不生成{$merge} {$commit}：请自行在{$commit}面板中完成，面板会带着 git 的{$squash}消息打开。不会记入撤销历史：想退回请丢弃这些更改。" }
-merge_fast_forward = "Fast-forward"
-merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
-merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
+merge_fast_forward = { git = "Fast-forward", local = "快进" }
+merge_fast_forward_help = { git = "never：始终生成 {$merge} {$commit}，即使分支本可 fast-forward。allowed：可能时 fast-forward。only：只 fast-forward，否则拒绝。（继承）：Git 页中的全局设置。{$squash} 优先于这三项。", local = "never：始终生成{$merge} {$commit}，即使分支本可快进。allowed：可能时快进。only：只快进，否则拒绝。（继承）：Git 页中的全局设置。{$squash}优先于这三项。" }
+merge_fast_forward_git = "此仓库的 git {key}：{value}。仅当上方选择为 allowed 时生效。"
 template_apply = { git = "用模板预填空的 {$commit} 面板", local = "用模板预填空的{$commit}面板" }
 template_apply_help = "新消息会以下方的模板为起点。"
 template_strip = { git = "生成 {$commit} 时丢弃注释行", local = "生成{$commit}时丢弃注释行" }
@@ -7603,44 +7603,44 @@ palette_show = "冲突：显示预测的冲突"
 none_note = "没有预测到冲突"
 off_note = "冲突检测已关闭"
 badge_button = "显示文件"
-global_heading = "Conflict prevention"
-default_list = "Default base branches"
-default_list_help = "The list that repositories use when they have no list of their own. Built-in is every branch (**). It applies to open repositories at once."
-built_in = "Built-in (**)"
-reset_default = "Reset to built-in default"
-reset_default_help = "Stops using a default list: repositories without a list of their own compare with every branch (**)."
-lists_heading = "Base branch lists"
-lists_none = "No lists yet. Type a name below to create one."
-list_title_default = "{name} (default)"
-list_name = "Name"
-list_name_help = "Renaming a list keeps the default, but a repository that follows the old name uses the default list until you pick this one again."
-list_patterns = "Patterns"
-list_patterns_help = "One per line. Enter or click opens the editor. Every repository that follows this list uses the change at its next check."
-list_make_default = "Make default"
-list_delete = "Delete list"
-list_delete_confirm = "Delete the list {name}? Repositories that follow it use the default list instead."
-list_delete_confirm_here = "Delete the list {name}? This repository follows it, and so may others: they use the default list instead."
-list_new = "New list"
-list_new_help = "Type a name and press Enter. The new list starts with ** (every branch)."
-list_exists = "There is already a list named {name}"
-list_name_empty = "A list needs a name"
-list_saved = "Saved the list {name}"
-list_deleted = "Deleted the list {name}"
-source = "Base branches from"
-source_help = "Default follows Settings > General > Conflict prevention. A list is shared: editing it changes every repository that follows it."
-source_default_built_in = "Default (every branch)"
-source_default_list = "Default (list {name})"
-source_list = "List: {name}"
-source_own = "Own list"
-follows_note = "These come from a shared list. Edit it in Settings > General > Conflict prevention, or choose Own list to change them here only."
-save_as_list = "Save as list..."
-save_as_list_help = "Type a name and press Enter: the patterns above become a list that other repositories can use, and this repository follows it."
-reset_repo = "Reset to default"
-reset_repo_help = "Reset drops this repository's own choice and list: it follows the default again."
-use_workflow = "Use the workflow's base branches"
-use_workflow_help = "Fills Own list with the base branches of this repository's branching workflow."
-palette_lists = "Conflicts: Edit Base Branch Lists..."
-palette_repo = "Conflicts: Base Branches of This Repository..."
+global_heading = "冲突预防"
+default_list = "默认基准分支"
+default_list_help = "没有自己列表的仓库所使用的列表。内置表示所有分支（**）。对已打开的仓库立即生效。"
+built_in = "内置（**）"
+reset_default = "恢复内置默认"
+reset_default_help = "不再使用默认列表：没有自己列表的仓库与所有分支（**）比较。"
+lists_heading = "基准分支列表"
+lists_none = "还没有列表。在下方输入名称即可创建。"
+list_title_default = "{name}（默认）"
+list_name = "名称"
+list_name_help = "重命名列表时，若它是默认列表则仍保持默认。沿用旧名称的仓库会使用默认列表，直到你重新选择改名后的列表。"
+list_patterns = "模式"
+list_patterns_help = "每行一个模式。按 Enter 或点击可打开编辑器。沿用此列表的每个仓库会在下次检查时采用更改。"
+list_make_default = "设为默认"
+list_delete = "删除列表"
+list_delete_confirm = "删除列表 {name}？沿用它的仓库将改用默认列表。"
+list_delete_confirm_here = "删除列表 {name}？此仓库沿用它，其他仓库也可能沿用。它们将改用默认列表。"
+list_new = "新建列表"
+list_new_help = "输入名称并按 Enter。新列表以 **（所有分支）开头。"
+list_exists = "已存在名为 {name} 的列表"
+list_name_empty = "列表需要一个名称"
+list_saved = "已保存列表 {name}"
+list_deleted = "已删除列表 {name}"
+source = "基准分支来自"
+source_help = "“默认”沿用“设置 > 常规 > 冲突预防”。列表是共享的：编辑它会更改所有沿用它的仓库。"
+source_default_built_in = "默认（所有分支）"
+source_default_list = "默认（列表 {name}）"
+source_list = "列表：{name}"
+source_own = "自有列表"
+follows_note = "这些来自共享列表。请在“设置 > 常规 > 冲突预防”中编辑，或选择“自有列表”仅在此处更改。"
+save_as_list = "另存为列表…"
+save_as_list_help = "输入名称并按 Enter：上方的模式将成为可供其他仓库使用的列表，此仓库随之沿用。"
+reset_repo = "恢复默认"
+reset_repo_help = "“恢复默认”会丢弃此仓库自己的选择和列表：重新沿用默认设置。"
+use_workflow = "使用工作流的基准分支"
+use_workflow_help = "用此仓库分支工作流的基准分支填充“自有列表”。"
+palette_lists = "冲突：编辑基准分支列表…"
+palette_repo = "冲突：此仓库的基准分支…"
 
 [rewrite_tools]
 # context: install hint shown next to a missing tool a history rewrite needs; one per tool and OS

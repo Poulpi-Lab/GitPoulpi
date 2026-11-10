@@ -363,18 +363,24 @@ fn a_token_command_works_from_a_standalone_cli_run() {
     let argv = token_script_argv(tools.path(), TOKEN);
     let session = "ra-standalone-token-command";
 
-    let mut set = vec!["repo-auth", "set", "--https", "token-command", "--yes", "--command"];
+    let host = server.host();
+    let mut set = vec![
+        "repo-auth",
+        "set",
+        "--https",
+        "token-command",
+        "--yes",
+        "--hosts",
+        host.as_str(),
+        "--command",
+    ];
     set.extend(argv.iter().map(String::as_str));
     ok(root, session, &set);
 
     let tested = ok(root, session, &["repo-auth", "test"]);
-    let remotes = tested["remotes"].as_array().expect("remotes");
-    assert!(
-        remotes.iter().all(|r| r["ok"] == true),
-        "the connection test must pass: {tested}"
-    );
-    let fetched = ok(root, session, &["fetch"]);
-    assert!(fetched.is_object() || fetched.is_array(), "{fetched}");
+    assert_eq!(tested["ok"], true, "the connection test must pass: {tested}");
+    assert_eq!(tested["reports"][0]["ok"], true, "{tested}");
+    ok(root, session, &["fetch"]);
     let seen = server.basic_credentials();
     assert!(
         seen.iter().any(|c| c == &format!("x-access-token:{TOKEN}")),

@@ -5080,7 +5080,7 @@ token_command_failed_tail = "Het tokencommando van deze repository is mislukt: {
 token_command_failed_code = "Het tokencommando van deze repository is mislukt (exit {code})."
 token_command_failed_code_tail = "Het tokencommando van deze repository is mislukt (exit {code}): {tail}"
 grant_refused = "GitPoulpi heeft het accounttoken niet naar {host} gestuurd: dat is niet {expected}, het adres van dat account."
-credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
+credential_helper_unreachable = "De credential helper van GitPoulpi kon de daemon niet bereiken, dus de inloggegevens van deze repository zijn niet verstuurd. Probeer het opnieuw; blijft het mislukken, controleer dan SSH & inloggegevens."
 repo_auth_needs_confirmation = "Een credential helper of tokencommando wordt alleen opgeslagen nadat je het bevestigt in SSH & inloggegevens."
 
 [window]

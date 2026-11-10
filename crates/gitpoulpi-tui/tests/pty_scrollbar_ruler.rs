@@ -88,6 +88,20 @@ impl Block {
     }
 }
 
+/// Waits for one whole state of the block (a torn frame can show part of
+/// it): returns the screen and the block found on it.
+fn settled(
+    term: &Terminal,
+    what: &str,
+    mut pred: impl FnMut(&Screen, Block) -> bool,
+) -> (Screen, Block) {
+    let s = term
+        .wait_for(what, STEP, |s| Block::of(s).is_some_and(|b| pred(s, b)))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let b = Block::of(&s).expect("the predicate just matched");
+    (s, b)
+}
+
 fn on_bar(s: &Screen, col: u16, row: u16) -> bool {
     s.cell(col, row).is_some_and(|c| c.bg != Color::Default)
 }
@@ -267,8 +281,9 @@ fn dragging_the_horizontal_thumb_to_the_end_reaches_the_last_character() {
             })
             .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
         }
-        let s = term.screen();
-        let b = Block::of(&s).expect("the diff block");
+        let (s, b) = settled(&term, &format!("{layout}: the bar and its thumb"), |s, b| {
+            !h_bar(s, b).is_empty() && !h_thumb(s, b).is_empty() && !s.contains("ENDMARK")
+        });
         assert!(
             !h_bar(&s, b).is_empty(),
             "{layout}: 200 chars overflow: no bar\n{}",
@@ -283,8 +298,9 @@ fn dragging_the_horizontal_thumb_to_the_end_reaches_the_last_character() {
         term.drag((start, b.bottom), (b.right, b.bottom)).unwrap();
         term.wait_for("the end of the long line", STEP, |s| s.contains("ENDMARK"))
             .unwrap_or_else(|e| panic!("{layout}: {e}\n{}", term.text()));
-        let s = term.screen();
-        let b = Block::of(&s).unwrap();
+        let (s, b) = settled(&term, &format!("{layout}: the thumb at the end"), |s, b| {
+            h_thumb(s, b).last().copied() == Some(b.right - 2)
+        });
         let thumb = h_thumb(&s, b);
         assert_eq!(
             thumb.last().copied(),
@@ -309,20 +325,21 @@ fn the_vertical_bar_marks_changes_the_cursor_and_the_selected_word_and_still_dra
     open_diff(&mut term, "big.txt", "line 050");
 
     // Hunks-only has no ruler.
-    let s = term.screen();
-    let b = Block::of(&s).unwrap();
+    let (s, b) = settled(&term, "the hunk view", |s, _| s.contains("line 050"));
     assert!(
         ticks(&s, b, HALF_BLOCK, None).is_empty(),
         "no ruler in hunk mode"
     );
 
     whole_file(&mut term, "needle here");
-    let s = term
-        .wait_for("the ruler", STEP, |s| {
-            Block::of(s).is_some_and(|b| !ticks(s, b, HALF_BLOCK, None).is_empty())
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let b = Block::of(&s).unwrap();
+    let (s, b) = settled(&term, "the whole ruler", |s, b| {
+        !ticks(s, b, HALF_BLOCK, Some(ADD)).is_empty()
+            && (!ticks(s, b, HALF_BLOCK, Some(DEL)).is_empty()
+                || !ticks(s, b, HALF_BLOCK, Some(MODIFIED)).is_empty())
+            && !ticks(s, b, CURSOR, None).is_empty()
+            && s.contains("needle")
+            && s.contains("line 006")
+    });
     assert!(
         !ticks(&s, b, HALF_BLOCK, Some(ADD)).is_empty(),
         "an added line is green"
@@ -340,12 +357,11 @@ fn the_vertical_bar_marks_changes_the_cursor_and_the_selected_word_and_still_dra
     // Double-click the visible `needle`: every other occurrence gets a tick.
     let (c, r) = s.find("needle").expect("needle on line 5");
     term.double_click(c + 2, r).unwrap();
-    let s = term
-        .wait_for("the occurrences on the bar", STEP, |s| {
-            Block::of(s).is_some_and(|b| ticks(s, b, OCCURRENCE, None).len() >= 2)
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let b = Block::of(&s).unwrap();
+    let (s, b) = settled(&term, "the occurrences on the bar", |s, b| {
+        ticks(s, b, OCCURRENCE, None).len() >= 2
+            && !v_thumb(s, b).is_empty()
+            && s.contains("line 006")
+    });
     assert!(
         ticks(&s, b, OCCURRENCE, None).len() >= 2,
         "lines 100 and 180"
@@ -370,8 +386,9 @@ fn the_minimap_is_off_by_default_and_the_palette_and_m_toggle_and_save_it() {
         launch_with(repo.root(), "pty-minimap-toggle", "", (170, 50), "big.txt");
     open_diff(&mut term, "big.txt", "line 050");
     whole_file(&mut term, "needle here");
-    let s = term.screen();
-    let b = Block::of(&s).unwrap();
+    let (s, b) = settled(&term, "the whole file, no minimap", |s, b| {
+        s.contains("needle here") && braille(s, b) == 0
+    });
     assert_eq!(braille(&s, b), 0, "off by default");
 
     // The palette entry.
@@ -411,20 +428,25 @@ fn a_click_on_the_diff_minimap_jumps_to_that_part_of_the_file() {
     );
     open_diff(&mut term, "big.txt", "line 050");
     whole_file(&mut term, "needle here");
-    let s = term
-        .wait_for("the minimap", STEP, |s| {
-            Block::of(s).is_some_and(|b| braille(s, b) > 5)
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let b = Block::of(&s).unwrap();
+    let (s, b) = settled(&term, "the minimap and the top of the file", |s, b| {
+        braille(s, b) > 5 && s.contains("line 006")
+    });
     assert!(s.contains("line 006"));
     // A click three quarters down the minimap: the view centers there.
+    // Retried: a click can be lost to a torn frame.
     let row = b.top + 1 + (b.bottom - b.top - 1) * 3 / 4;
-    term.click(b.right - 5, row).unwrap();
-    term.wait_for("the view jumped", STEP, |s| {
-        !s.contains("line 006") && s.contains("line 15")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the view jumped",
+        4,
+        STEP,
+        |t| {
+            if t.screen().contains("line 006") {
+                t.click(b.right - 5, row).unwrap();
+            }
+        },
+        |s| !s.contains("line 006") && s.contains("line 15"),
+    );
     // Every mouse action has a keyboard twin: PageUp walks back.
     for _ in 0..20 {
         term.send_keys("PageUp").unwrap();
@@ -486,8 +508,9 @@ fn the_editor_bar_marks_the_caret_and_the_selected_word_and_has_a_minimap_that_j
         "big.txt",
     );
     open_editor(&mut term);
-    let s = term.screen();
-    let b = Block::of(&s).expect("the editor block");
+    let (s, b) = settled(&term, "the caret and the minimap on the bar", |s, b| {
+        !ticks(s, b, CURSOR, None).is_empty() && braille(s, b) > 5 && s.contains("needle")
+    });
     assert!(
         !ticks(&s, b, CURSOR, None).is_empty(),
         "the caret is on the bar"
@@ -496,20 +519,25 @@ fn the_editor_bar_marks_the_caret_and_the_selected_word_and_has_a_minimap_that_j
 
     let (c, r) = s.find("needle").expect("needle on line 5");
     term.double_click(c + 2, r).unwrap();
-    term.wait_for("the occurrences on the bar", STEP, |s| {
-        Block::of(s).is_some_and(|b| ticks(s, b, OCCURRENCE, None).len() >= 2)
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (_, b) = settled(&term, "the occurrences on the bar", |s, b| {
+        ticks(s, b, OCCURRENCE, None).len() >= 2 && braille(s, b) > 5 && s.contains("line 006")
+    });
 
     // A click on the minimap centers the view on that part of the file.
-    let s = term.screen();
-    let b = Block::of(&s).unwrap();
+    // Retried: a click can be lost to a torn frame.
     let row = b.top + 1 + (b.bottom - b.top - 1) * 3 / 4;
-    term.click(b.right - 5, row).unwrap();
-    term.wait_for("the editor scrolled", STEP, |s| {
-        !s.contains("line 006") && s.contains("line 15")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the editor scrolled",
+        4,
+        STEP,
+        |t| {
+            if t.screen().contains("line 006") {
+                t.click(b.right - 5, row).unwrap();
+            }
+        },
+        |s| !s.contains("line 006") && s.contains("line 15"),
+    );
 }
 
 #[test]
@@ -518,8 +546,9 @@ fn the_editor_toggles_the_minimap_from_its_bar_and_with_alt_m() {
     let (mut term, config) =
         launch_with(repo.root(), "pty-editor-minimap", "", (170, 50), "big.txt");
     open_editor(&mut term);
-    let s = term.screen();
-    let b = Block::of(&s).expect("the editor block");
+    let (s, b) = settled(&term, "the editor with its Map button", |s, b| {
+        braille(s, b) == 0 && s.find(" Map ").is_some()
+    });
     assert_eq!(braille(&s, b), 0, "off by default");
     let (c, r) = s.find(" Map ").expect("a Map button on the editor bar");
     let idle_bg = s.cell(c + 1, r).unwrap().bg;
@@ -562,8 +591,9 @@ fn the_bar_s_map_button_toggles_the_minimap_by_mouse_and_shows_its_state() {
         launch_with(repo.root(), "pty-minimap-button", "", (170, 50), "big.txt");
     open_diff(&mut term, "big.txt", "line 050");
     whole_file(&mut term, "needle here");
-    let s = term.screen();
-    let b = Block::of(&s).unwrap();
+    let (s, b) = settled(&term, "the whole file with its Map button", |s, b| {
+        braille(s, b) == 0 && s.contains("needle here") && s.find(" Map ").is_some()
+    });
     assert_eq!(braille(&s, b), 0, "off by default");
     let (c, r) = s.find(" Map ").expect("a Map button on the diff bar");
     let idle_bg = s.cell(c + 1, r).unwrap().bg;
@@ -627,7 +657,15 @@ fn selecting_a_word_in_the_diff_tints_its_other_occurrences_and_only_those() {
     open_diff(&mut term, "t.txt", "line 020");
     whole_file(&mut term, "needle here");
 
-    let s = term.screen();
+    let s = term
+        .wait_for("the rows, nothing tinted", STEP, |s| {
+            ["005", "008", "012"]
+                .iter()
+                .all(|n| s.find(&format!("line {n} needle here")).is_some())
+                && word_bg(s, "line 008 needle here", "needle")
+                    == word_bg(s, "line 008 needle here", "line")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(
         word_bg(&s, "line 008 needle here", "needle"),
         word_bg(&s, "line 008 needle here", "line"),
@@ -682,7 +720,15 @@ fn selecting_a_word_in_the_editor_tints_its_other_occurrences() {
     let (mut term, _config) = launch_with(repo.root(), "pty-occ-editor", "", (170, 50), "big.txt");
     open_editor(&mut term);
 
-    let s = term.screen();
+    let s = term
+        .wait_for("the rows, nothing tinted", STEP, |s| {
+            ["005", "008", "012"]
+                .iter()
+                .all(|n| s.find(&format!("line {n} needle here")).is_some())
+                && word_bg(s, "line 008 needle here", "needle")
+                    == word_bg(s, "line 008 needle here", "line")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(
         word_bg(&s, "line 008 needle here", "needle"),
         word_bg(&s, "line 008 needle here", "line"),
@@ -720,8 +766,9 @@ fn a_press_on_the_diff_track_jumps_the_thumb_under_the_pointer_and_keeps_draggin
         launch_with(repo.root(), "pty-track-jump-diff", "", (170, 50), "big.txt");
     open_diff(&mut term, "big.txt", "line 050");
     whole_file(&mut term, "needle here");
-    let s = term.screen();
-    let b = Block::of(&s).unwrap();
+    let (s, b) = settled(&term, "the top of the file and its bar", |s, b| {
+        s.contains("line 006") && !v_bar(s, b).is_empty()
+    });
     assert!(s.contains("line 006"), "the top of the file shows");
     let last_track = b.bottom - 2;
     term.press(b.right, last_track).unwrap();
@@ -749,8 +796,9 @@ fn a_press_on_the_editor_track_jumps_the_thumb_under_the_pointer_and_keeps_dragg
         "big.txt",
     );
     open_editor(&mut term);
-    let s = term.screen();
-    let b = Block::of(&s).expect("the editor block");
+    let (_, b) = settled(&term, "the editor and its bar", |s, b| {
+        s.contains("line 006") && !v_bar(s, b).is_empty()
+    });
     let last_track = b.bottom - 2;
     term.press(b.right, last_track).unwrap();
     term.wait_for("jumped to the end, not one page down", STEP, |s| {

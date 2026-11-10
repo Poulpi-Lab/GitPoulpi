@@ -157,6 +157,13 @@ vecchio disattiva la funzione con una riga nel registro), quindi i tuoi file, l'
 - **Quando gira**: in background, circa 2 secondi dopo che il repository si è calmato (un commit, un checkout, un fetch
   che ha spostato un branch, un rebase), una volta per ogni coppia `(HEAD, base)`. La striscia sparisce appena HEAD si
   sposta e torna, o no, con la nuova risposta. Un HEAD scollegato non viene controllato.
+- **Liste dei branch base**: da dove vengono i Branch base di un repository è una scelta nella sua pagina **Prevenzione
+  dei conflitti**. **Predefinita** segue il valore globale (il `**` incorporato, ogni branch, finché non scegli un'altra lista in
+  Impostazioni > Generale > Prevenzione dei conflitti); **Lista: <nome>** segue una delle tue liste con nome; **Lista propria**
+  è una lista tutta sua. Le liste sono condivise: modificane una e ogni repository che la segue usa la modifica al controllo
+  successivo, senza riavvio. **Salva come lista...** trasforma i pattern propri di un repository in una lista con nome,
+  **Ripristina il valore predefinito** elimina la scelta del repository. Eliminare una lista che un repository segue lo fa
+  usare la lista predefinita.
 - **Disattivarla**: **Attiva il rilevamento proattivo dei conflitti** in Impostazioni > Generali, oppure per un solo
   repository nella sua pagina **Prevenzione dei conflitti**. Da uno script, `gitpoulpi conflicts check` stampa la stessa
   risposta in JSON ([Riferimento della CLI](cli-reference.md)).

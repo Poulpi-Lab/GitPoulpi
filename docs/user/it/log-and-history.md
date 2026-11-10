@@ -208,6 +208,14 @@ bersagli validi si illuminano; rilascia per ottenere un menu:
 `Esc` annulla un trascinamento. L'equivalente da tastiera è il comando della
 palette *Refs: Rilascia il ref selezionato sul branch attivo...*.
 
+**Merge o fast-forward.** Quando la destinazione non ha commit propri (il branch trascinato è semplicemente avanti), un
+merge potrebbe limitarsi a spostare avanti la destinazione. Di base (Impostazioni > Git > **Merge fast-forward** = *never*,
+o la scelta propria di un repository nella sua pagina Opzioni del merge) la riga del menu dice *Merge di x in y (merge commit)* e crea un vero
+commit di merge, così la cronologia conserva il branch; usa la riga separata *Fast-forward di y a x* quando vuoi lo
+spostamento semplice (per una linea retta, usa invece *Rebase*). Con *allowed* la riga Merge dice *(fast-forward)*, e con *only*
+*(solo fast-forward)*, in grigio con il motivo quando i branch sono divergenti. Le stesse righe e le stesse etichette sono nel menu
+del branch, e `gitpoulpi merge --ff | --no-ff | --ff-only` sceglie per ogni merge.
+
 ## Il menu del commit
 
 Clic destro su un commit (o `.` su di esso) per il suo menu:

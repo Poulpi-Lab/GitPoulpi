@@ -5062,16 +5062,16 @@ undo_already_restored = "todo lo que esta operación quitó ya está de vuelta"
 undo_no_such_entry = "no hay ninguna operación n.º {id} en el historial de deshacer"
 split_refused = { git = "no se puede dividir ese {$commit}: {reason}", local = "no se puede dividir esa {$commit}: {reason}" }
 undo_purged = "el historial antiguo de la operación #{entry} se purgó, así que no se puede deshacer ni rehacer"
-undo_remote_ref_moved = { git = "{name} en {remote} está en {actual}, no en {expected}, que es donde terminó la operación: cambió en el remoto desde entonces, así que no se hizo push ni se borró nada allí", local = "{name} en {remote} está en {actual}, no en {expected}, que es donde terminó la operación: cambió en el remoto desde entonces, así que no se envió ni se borró nada allí" }
+undo_remote_ref_moved = "{name} en {remote} está en {actual}, no en {expected}, que es donde terminó la operación: cambió en el remoto desde entonces, así que no se cambió nada allí"
 undo_remote_object_missing = { git = "{object} ya no está en este repositorio (lo eliminó la recolección de basura), así que la rama o el {$tag} no se puede restaurar en el remoto con un {$push_noun}", local = "{object} ya no está en este repositorio (lo eliminó la recolección de basura), así que la rama o la {$tag} no se puede restaurar en el remoto con un {$push_noun}" }
-repo_auth_unavailable = "This repository's sign-in cannot be used: {reason}"
-repo_auth_command_changed = "{path} changed since you confirmed it as this repository's credential command. Confirm the command again."
-token_command_failed = "This repository's token command failed."
-token_command_failed_tail = "This repository's token command failed: {tail}"
-token_command_failed_code = "This repository's token command failed (exit {code})."
-token_command_failed_code_tail = "This repository's token command failed (exit {code}): {tail}"
-grant_refused = "GitPoulpi did not send the account token to {host}: it is not {expected}, that account's address."
-repo_auth_needs_confirmation = "A credential helper or token command is stored only when you confirm it in SSH & credentials."
+repo_auth_unavailable = "No se puede usar el inicio de sesión de este repositorio: {reason}"
+repo_auth_command_changed = "{path} ha cambiado desde que lo confirmaste como comando de credenciales de este repositorio. Vuelve a confirmar el comando."
+token_command_failed = "Falló el comando de token de este repositorio."
+token_command_failed_tail = "Falló el comando de token de este repositorio: {tail}"
+token_command_failed_code = "Falló el comando de token de este repositorio (código de salida {code})."
+token_command_failed_code_tail = "Falló el comando de token de este repositorio (código de salida {code}): {tail}"
+grant_refused = "GitPoulpi no envió el token de la cuenta a {host}: no es {expected}, la dirección de esa cuenta."
+repo_auth_needs_confirmation = "Un credential helper o un comando de token solo se guarda cuando lo confirmas en SSH y credenciales."
 
 [window]
 connecting = "conectando con el daemon de la sesión..."
@@ -5935,7 +5935,7 @@ help_scroll = "Registro de actividad: desplaza las líneas largas hacia los lado
 
 [git_error]
 summary_host_key = "Aún no se conoce la clave de host SSH del remoto."
-hint_host_key = "Ejecuta `ssh -T git@<host>` una vez en un terminal, comprueba la huella y responde yes; después reintenta."
+hint_host_key = "Ejecuta `ssh -T git@<host>` una vez en un terminal, comprueba la huella y responde yes; después reintenta. O define un archivo known_hosts para este repositorio en SSH y credenciales."
 title_push = { git = "Error en {$push}", local = "Error al {$push}" }
 title_pull = { git = "Error en {$pull}", local = "Error al {$pull}" }
 title_fetch = { git = "Error en {$fetch}", local = "Error al {$fetch}" }
@@ -5951,7 +5951,7 @@ done_pull = { git = "{$Pull} completado", local = "Traída completada" }
 summary_non_ff = "El remoto tiene {$commits} que no tienes."
 hint_non_ff = { git = "Haz primero un {$pull} y vuelve a intentarlo.", local = "Primero trae los cambios del remoto y vuelve a intentarlo." }
 summary_auth = "El remoto rechazó las credenciales."
-hint_auth = "Revisa tus credenciales en Ajustes > Integraciones, o inicia un ssh-agent con tu clave, o define una clave SSH para este repositorio."
+hint_auth = "Revisa tus credenciales en Ajustes > Integraciones, inicia un ssh-agent con tu clave, o elige cómo inicia sesión este repositorio en SSH y credenciales."
 summary_conflict = "Se detuvo por conflictos."
 hint_conflict = "Resuelve los conflictos en el panel Estado y continúa."
 summary_overwrite = "Se sobrescribirían cambios locales."
@@ -5961,14 +5961,14 @@ hint_network = "Revisa tu conexión y la dirección del remoto, y reintenta."
 summary_lock = "Otro proceso de git está usando este repositorio."
 hint_lock = "Cierra otras herramientas de git, o borra el archivo de bloqueo si no hay ninguna activa."
 summary_credential_helper = "El helper de credenciales configurado falló: {line}"
-hint_credential_helper = "Ejecuta `git config --show-origin --get-all credential.helper` para ver dónde está definido, corrige o quita ese helper y reintenta."
+hint_credential_helper = "No se pudo ejecutar el credential helper. Elige otro origen para este repositorio en SSH y credenciales, o corrige el helper: `git config --show-origin --get-all credential.helper` muestra dónde está definido."
 hint_abort_blocked = "Guarda una copia de los cambios de esos archivos o descártalos en el panel Estado, y reintenta abortar."
 action_pull_first = "{$Pull} primero"
 action_integrations = "Abrir Integraciones"
 action_stash_retry = "{$Stash} y reintentar"
 action_retry = "Reintentar"
-action_repo_auth = "SSH & credentials..."
-hint_repo_auth = "Choose another way to sign in for this repository in SSH & credentials, then retry."
+action_repo_auth = "SSH y credenciales..."
+hint_repo_auth = "Elige otra forma de iniciar sesión para este repositorio en SSH y credenciales y reintenta."
 
 [failure_card]
 title_clone = "Falló el clonado"
@@ -9039,132 +9039,261 @@ need_resolve = { git = "Resolver conflictos para hacer {$commit}", local = "Reso
 why_commit = "aún hay archivos con conflictos: resuélvelos primero"
 
 [repo_auth]
-section = "SSH & credentials"
-intro = "Used by {$fetch}, {$pull}, {$push}, submodules and LFS of this repository only. Nothing is written to the repository or to git's config."
+# context: sidebar entry and page title of the per-repository page that picks how this repository signs in over SSH and HTTPS
+section = "SSH y credenciales"
+# context: one-line introduction at the top of the SSH & credentials page
+intro = "Lo usan {$fetch}, {$pull}, {$push}, los submódulos y LFS de este repositorio, y solo de este. No se escribe nada en el repositorio ni en la configuración de git."
+# context: sub-heading of the HTTPS rows on the SSH & credentials page
 heading_https = "HTTPS"
-https_source = "Sign in with"
-https_system = "System (git's helpers)"
-https_account = "GitPoulpi account"
+# context: label of the choice of how HTTPS remotes sign in
+https_source = "Iniciar sesión con"
+# context: choice value: use git's own credential helpers, the machine's identity
+https_system = "Sistema (helpers de git)"
+# context: choice value: use the token of a GitPoulpi integration account
+https_account = "Cuenta de GitPoulpi"
+# context: choice value: use one credential helper command for this repository
 https_helper = "Credential helper"
-https_token_command = "Token command"
-username = "Git username"
-username_help = "Sent as the user name of HTTPS remotes. Leave it empty to use the account's or helper's own."
-ignore_helpers = "Ignore credential helpers set by this repository"
-ignore_helpers_help = "The system and global helpers keep working. Helpers a repository sets for itself run programs of its choosing."
+# context: choice value: run a command that prints a token
+https_token_command = "Comando de token"
+# context: label of the git username field
+username = "Usuario de git"
+# context: help under the git username field
+username_help = "Se envía como nombre de usuario en los remotos HTTPS. Déjalo vacío para usar el de la cuenta o del helper."
+# context: label of the checkbox that makes git ignore the credential helpers set inside the repository
+ignore_helpers = "Ignorar los credential helpers definidos por este repositorio"
+# context: help under the checkbox that ignores the repository's own credential helpers
+ignore_helpers_help = "Los helpers del sistema y globales siguen funcionando. Los que un repositorio define por su cuenta ejecutan los programas que él elija."
+# context: one row listing a credential helper set by the repository; {value} is the helper, {origin} the file that sets it
 repo_helper_line = "{value}  ({origin})"
-repo_helper_label = "Set by this repository"
-no_repo_helpers = "This repository sets no credential helper of its own."
-account = "Account"
-account_none = "(choose an account)"
+# context: label of the rows that list the credential helpers set by this repository
+repo_helper_label = "Definidos por este repositorio"
+# context: shown when the repository sets no credential helper of its own
+no_repo_helpers = "Este repositorio no define ningún credential helper propio."
+# context: label of the account picker
+account = "Cuenta"
+# context: option of the account picker meaning no account chosen yet
+account_none = "(elige una cuenta)"
+# context: option of the account picker; {name} is the account id, {host} its host
 account_option = "{name}  ({host})"
-scope_label = "Token scopes"
-scope_unknown = "not checked yet; run Test connection"
+# context: label of the line under the account picker that says what the account's token may do
+scope_label = "Permisos del token"
+# context: scope line when no token check has run yet
+scope_unknown = "aún sin comprobar; ejecuta Probar conexión"
+# context: label of the credential helper command field
 helper_label = "Helper"
-helper_help = "A git credential helper: a program name, a path, or a command starting with !."
-command_label = "Command"
-command_help = "The program and its arguments, separated by spaces. Put quotes around an argument that holds spaces. No shell runs it, and it runs in the repository folder."
-argv_label = "Runs as"
+# context: help under the credential helper field
+helper_help = "Un credential helper de git: un nombre de programa, una ruta o un comando que empiece por !."
+# context: label of the token command field
+command_label = "Comando"
+# context: help under the token command field
+command_help = "El programa y sus argumentos, separados por espacios. Pon comillas a un argumento que contenga espacios. Ninguna shell lo ejecuta, y se ejecuta en la carpeta del repositorio."
+# context: label of the line that shows how the command was split into arguments
+argv_label = "Se ejecuta como"
+# context: label of the field of host names a command applies to
 hosts_label = "Hosts"
-hosts_help = "Host names separated by commas. Empty means the host of the main remote."
-cache_label = "Cache (minutes)"
-cache_help = "How long a printed token is reused. Empty means 50."
-command_warning = "This command runs on your computer each time this repository fetches or pushes. Use only a command you wrote or trust. If it is inside the repository folder, GitPoulpi asks again when the file changes."
-import_helper = "Use this repository's current helper"
-import_none = "This repository sets no credential helper to use."
-import_done = "Helper copied. Save asks you to confirm it."
+# context: help under the hosts field
+hosts_help = "Nombres de host separados por comas. Vacío significa el host del remoto principal."
+# context: label of the field with the minutes a token is kept
+cache_label = "Caché (minutos)"
+# context: help under the cache field
+cache_help = "Cuánto tiempo se reutiliza un token obtenido. Déjalo vacío para 50."
+# context: boxed warning under a command that runs on this computer
+command_warning = "Este comando se ejecuta en tu equipo cada vez que este repositorio se conecta a su remoto. Usa solo un comando que hayas escrito tú o en el que confíes. Si está dentro de la carpeta del repositorio, GitPoulpi vuelve a preguntar cuando el archivo cambie."
+# context: button that copies this repository's own credential helper into the helper field
+import_helper = "Usar el helper actual de este repositorio"
+# context: status when the repository sets no helper to import
+import_none = "Este repositorio no define ningún credential helper que usar."
+# context: status after the helper was copied into the field
+import_done = "Helper copiado. Al guardar se te pedirá confirmarlo."
+# context: sub-heading of the SSH rows
 heading_ssh = "SSH"
-ssh_source = "Sign in with"
-ssh_system = "System (ssh's own setup)"
-ssh_key_file = "Key file"
-ssh_account_key = "Account key"
-key_path = "Private key file"
-key_help = "Offered to every SSH remote of this repository, submodules included, and only this key is offered. Offering a public key to another host leaks nothing."
-known_hosts = "Known hosts file"
-known_hosts_help = "Optional. A file of trusted host keys used instead of ssh's default one."
-strict_host = "Strict host key checking"
-strict_host_help = "Refuse a host that is not in the known hosts file instead of asking."
-ssh_program_label = "ssh program"
-ssh_program_default = "ssh from your PATH"
-heading_remotes = "Remotes"
+# context: label of the choice of how SSH remotes sign in
+ssh_source = "Iniciar sesión con"
+# context: choice value: ssh's own configuration, the agent and the default keys
+ssh_system = "Sistema (configuración propia de ssh)"
+# context: choice value: one private key file
+ssh_key_file = "Archivo de clave"
+# context: choice value: the key of a GitPoulpi integration account
+ssh_account_key = "Clave de la cuenta"
+# context: label of the private key file field
+key_path = "Archivo de clave privada"
+# context: help under the key file field
+key_help = "Se ofrece a todos los remotos SSH de este repositorio, submódulos incluidos, y solo se ofrece esta clave. Ofrecer una clave pública a otro host no revela nada."
+# context: label of the known hosts file field
+known_hosts = "Archivo known_hosts"
+# context: help under the known hosts field
+known_hosts_help = "Opcional. Un archivo de claves de host de confianza que se usa en lugar del predeterminado de ssh."
+# context: label of the checkbox that refuses unknown SSH hosts
+strict_host = "Comprobación estricta de la clave del host"
+# context: help under the strict host key checking checkbox
+strict_host_help = "Rechazar un host que no esté en el archivo known_hosts en lugar de preguntar."
+# context: label of the line naming the ssh program that will be used
+ssh_program_label = "Programa ssh"
+# context: ssh program line when nothing overrides it
+ssh_program_default = "ssh de tu PATH"
+# context: sub-heading of the list of remotes with the identity each one uses
+heading_remotes = "Remotos"
+# context: one remote row value; {transport} is https or ssh, {who} the identity it signs in with
 remote_value = "{transport}  {who}"
-no_remotes = "This repository has no remote."
-override_overridden = "Overrides {key} = {value}  ({origin})"
-override_competes = "Competes with {key} = {value}  ({origin})"
-unavailable_label = "Cannot be used"
-button_test = "Test connection"
-button_save = "Save"
-button_revert = "Revert"
-button_defaults = "Use defaults"
-dirty_note = "Unsaved changes."
-saved = "Saved. This repository now signs in as chosen."
-reverted = "Back to the saved choices."
-cleared = "Cleared: this repository uses the machine's own identity again."
-nothing_to_clear = "There was nothing to clear."
-test_save_first = "Save first: the test uses the saved choices."
-saving = "Saving..."
-refused = "Not saved: {why}"
-load_failed = "Could not read the sign-in settings: {why}"
-test_running = "{frame} Testing the connection..."
-invalid = "Cannot save: {why}"
-invalid_helper = "the helper is empty"
-invalid_command = "the command is empty"
-invalid_quote = "the command has an unclosed quote"
-invalid_cache = "the cache value is not a whole number of minutes"
-invalid_account = "no account is chosen"
-invalid_key = "the key file is empty"
-confirm_title = "Allow this command?"
-confirm_question = "This repository would run this command on your computer each time it talks to its remote. Read it before you allow it."
+# context: shown when the repository has no remote
+no_remotes = "Este repositorio no tiene ningún remoto."
+# context: row about a git setting the profile overrides; {key} is the setting, {value} its value, {origin} the file
+override_overridden = "Anula {key} = {value}  ({origin})"
+# context: row about a git setting that competes with the profile; {key} is the setting, {value} its value, {origin} the file
+override_competes = "Compite con {key} = {value}  ({origin})"
+# context: label of the line that says why the profile cannot be used right now
+unavailable_label = "No se puede usar"
+# context: button that tests the connection of every remote
+button_test = "Probar conexión"
+# context: button that saves the page's choices
+button_save = "Guardar"
+# context: button that drops the unsaved choices
+button_revert = "Revertir"
+# context: button that clears this repository's sign-in settings
+button_defaults = "Usar valores predeterminados"
+# context: status line; the edited choices are not saved yet
+dirty_note = "Cambios sin guardar."
+# context: status after saving
+saved = "Guardado. Este repositorio ya inicia sesión como elegiste."
+# context: status after reverting
+reverted = "De vuelta a las opciones guardadas."
+# context: status after clearing the profile
+cleared = "Borrado: este repositorio vuelve a usar la identidad propia del equipo."
+# context: status when there was no profile to clear
+nothing_to_clear = "No había nada que borrar."
+# context: status when Test connection was pressed with unsaved changes
+test_save_first = "Guarda primero: la prueba usa las opciones guardadas."
+# context: status line while the settings are being saved
+saving = "Guardando..."
+# context: status when the daemon refused the profile; {why} is its reason
+refused = "No guardado: {why}"
+# context: status when the profile could not be read; {why} is the reason
+load_failed = "No se pudo leer la configuración de inicio de sesión: {why}"
+# context: status while a connection test runs; {frame} is a spinner glyph
+test_running = "{frame} Probando la conexión..."
+# context: status when the typed command or the cache value cannot be used; {why} is the reason
+invalid = "No se puede guardar: {why}"
+# context: reason: the helper field is empty
+invalid_helper = "el helper está vacío"
+# context: reason: the command field is empty
+invalid_command = "el comando está vacío"
+# context: reason: the command has an unclosed quote
+invalid_quote = "el comando tiene unas comillas sin cerrar"
+# context: reason: the cache value is not a number
+invalid_cache = "el valor de la caché no es un número entero de minutos"
+# context: reason: no account was chosen
+invalid_account = "no se ha elegido ninguna cuenta"
+# context: reason: the key file field is empty
+invalid_key = "el archivo de clave está vacío"
+# context: title of the question asked before a helper or token command is saved
+confirm_title = "¿Permitir este comando?"
+# context: sentence above the command in the confirmation
+confirm_question = "Este repositorio ejecutaría este comando en tu equipo cada vez que se comunique con su remoto. Léelo antes de permitirlo."
+# context: heading above a credential helper in the confirmation
 confirm_helper_heading = "Credential helper"
-confirm_command_heading = "Token command"
+# context: heading above a token command in the confirmation
+confirm_command_heading = "Comando de token"
+# context: line under the command in the confirmation; {hash} is the SHA-256 of the command
 confirm_hash = "SHA-256: {hash}"
-answer_save = "Save and allow"
-answer_cancel = "Cancel"
-confirm_hint = "Up/Down or 1/2 to choose, Enter to confirm, PgUp/PgDn to scroll, Esc to cancel"
-defaults_title = "Use the default sign-in?"
-defaults_body = "This repository will use the machine's own identity again: git's helpers for HTTPS, ssh's own setup for SSH. The commands and keys chosen here are forgotten."
-defaults_confirm = "Use defaults"
-results_title = "Connection test"
-results_hint = "Up/Down, PgUp/PgDn, Home/End to scroll, Esc to close"
+# context: first numbered answer of the confirmation
+answer_save = "Guardar y permitir"
+# context: second numbered answer of the confirmation
+answer_cancel = "Cancelar"
+# context: key hint under the numbered answers of the confirmation
+confirm_hint = "Arriba/Abajo o 1/2 para elegir, Enter para confirmar, RePág/AvPág para desplazar, Esc para cancelar"
+# context: title of the question asked before the profile is cleared
+defaults_title = "¿Usar el inicio de sesión predeterminado?"
+# context: body of the question asked before the profile is cleared
+defaults_body = "Este repositorio volverá a usar la identidad propia del equipo: los helpers de git para HTTPS, la configuración propia de ssh para SSH. Los comandos y claves elegidos aquí se olvidan."
+# context: confirm button of the clear question
+defaults_confirm = "Usar valores predeterminados"
+# context: title of the panel with the connection test results
+results_title = "Prueba de conexión"
+# context: key hint on the results panel
+results_hint = "Arriba/Abajo, RePág/AvPág, Inicio/Fin para desplazar, Esc para cerrar"
+# context: results panel line; {name} is the remote, {transport} https or ssh, {who} the identity it signs in with
 results_remote = "{name}  ({transport}, {who})"
+# context: results line, the fetch check
 results_fetch = "{$Fetch}"
+# context: results line, the push check
 results_push = "{$Push}"
-result_ok = "  {op}: ok  {extra}"
-result_failed = "  {op}: failed  {extra}"
-result_branches = { one = "{n} branch", other = "{n} branches" }
+# context: results line of a check that worked; {op} is what was checked, {extra} the details
+result_ok = "  {op}: correcto  {extra}"
+# context: results line of a check that failed; {op} is what was checked, {extra} the details
+result_failed = "  {op}: falló  {extra}"
+# context: detail of a results line; {n} branches were advertised
+result_branches = { one = "{n} rama", other = "{n} ramas" }
+# context: detail of a results line; {ms} is the duration in milliseconds
 result_ms = "{ms} ms"
-result_accepted_key = "accepted key {path}"
-result_accepted_account = "accepted account {who}"
-result_system = "answered with the machine's own identity"
+# context: detail of a results line; {path} is the SSH key the server accepted
+result_accepted_key = "clave aceptada {path}"
+# context: detail of a results line; {who} names the account whose token was accepted
+result_accepted_account = "cuenta aceptada {who}"
+# context: detail of a results line when the machine's own identity answered
+result_system = "respondió con la identidad propia del equipo"
+# context: results line that continues a failure; {text} is the reason or the advice
 result_reason = "    {text}"
-result_error = "The test could not run: {why}"
-result_none = "There is no remote to test."
-result_saved_note = "Tested with the saved choices."
-close_body = "SSH & credentials has changes that are not saved."
-palette_open = "Repository: SSH & Credentials..."
-palette_test = "Repository: Test Connection"
-palette_defaults = "Repository: Use Default Credentials"
-scope_ok = "nothing missing, nothing extra"
-scope_missing = "missing: {list}"
-scope_excess = "more than needed: {list}"
-loading = "Reading the sign-in settings..."
-identity_token = "Signs in as: {account} (token)"
-identity_user = "Signs in as: {user}"
-identity_helper = "Signs in with this repository's credential helper"
-identity_command = "Signs in with this repository's token command"
-identity_ignored = "Ignores the credential helpers of this repository"
-identity_ssh = "SSH key: {key}"
-identity_ssh_account = "SSH key of {account}"
+# context: results line when the test itself could not run; {why} is the reason
+result_error = "No se pudo ejecutar la prueba: {why}"
+# context: results panel line when there is no remote
+result_none = "No hay ningún remoto que probar."
+# context: first results line, saying which choices were tested
+result_saved_note = "Probado con las opciones guardadas."
+# context: body of the question asked when closing Settings with unsaved sign-in choices
+close_body = "SSH y credenciales tiene cambios sin guardar."
+# context: command palette entry that opens the SSH & credentials page
+palette_open = "Repositorio: SSH y credenciales..."
+# context: command palette entry that tests the connection of every remote
+palette_test = "Repositorio: Probar conexión"
+# context: command palette entry that clears the sign-in settings after asking
+palette_defaults = "Repositorio: Usar credenciales predeterminadas"
+# context: scope line when the token has every scope git needs and nothing extra
+scope_ok = "no falta nada ni sobra nada"
+# context: part of the scope line; {list} names the scopes the token lacks
+scope_missing = "faltan: {list}"
+# context: part of the scope line; {list} names the scopes the token has beyond what is needed
+scope_excess = "más de lo necesario: {list}"
+# context: shown while the page asks the daemon for the current sign-in settings
+loading = "Leyendo la configuración de inicio de sesión..."
+# context: line saying which GitPoulpi account this repository signs in as over HTTPS; {account} is the account id
+identity_token = "Inicia sesión como: {account} (token)"
+# context: line saying which git user name this repository signs in as over HTTPS
+identity_user = "Inicia sesión como: {user}"
+# context: line saying HTTPS sign-in uses a credential helper chosen for this repository
+identity_helper = "Inicia sesión con el credential helper de este repositorio"
+# context: line saying HTTPS sign-in uses a token command chosen for this repository
+identity_command = "Inicia sesión con el comando de token de este repositorio"
+# context: line saying the credential helpers the repository sets itself are not used
+identity_ignored = "Ignora los credential helpers de este repositorio"
+# context: line saying which key file this repository uses over SSH; {key} is the file name
+identity_ssh = "Clave SSH: {key}"
+# context: line saying this repository uses the SSH key of a GitPoulpi account; {account} is the account id
+identity_ssh_account = "Clave SSH de {account}"
+# context: joins the HTTPS line and the SSH line of the active sign-in
 identity_both = "{https}; {ssh}"
-menu_row = "SSH & credentials..."
-pin_label = "Pinned in git's config"
-pin_help = "This repository sets its own SSH command. GitPoulpi can keep that key in its private store instead of the repository's config."
-pin_move = "Move into GitPoulpi"
-pin_other = "This command is not a plain key pin, so GitPoulpi cannot move it. Edit it with git config."
-pin_save_first = "Save or revert your edits first."
-pin_ssh_taken = "SSH already has a source here. Use the defaults first, then move the pin."
-pin_moved = "Moved: this repository now signs in over SSH with {key}, and its pin is removed."
-pin_unset_failed = "The key is saved, but the pin could not be removed: {why}"
-acl_warning = "Other accounts can read this key file. OpenSSH refuses such a key (bad permissions)."
-acl_button = "Restrict to my account"
-acl_done = "The key file can now be read by your account only."
-acl_failed = "Could not restrict the key file: {why}"
+# context: row of the repository tab menu that opens the SSH & credentials page
+menu_row = "SSH y credenciales..."
+# context: label of the row showing the SSH command the repository itself sets
+pin_label = "Fijada en la configuración de git"
+# context: help under the row that shows an SSH key pinned in the repository's config
+pin_help = "Este repositorio define su propio comando SSH. GitPoulpi puede guardar esa clave en su almacén privado en lugar de en la configuración del repositorio."
+# context: button that turns the SSH command pinned in the repository's config into a key choice of this page and removes the pin
+pin_move = "Mover a GitPoulpi"
+# context: note shown instead of the move button when the pinned SSH command does more than name one key
+pin_other = "Este comando no es una simple clave fijada, así que GitPoulpi no puede moverlo. Edítalo con git config."
+# context: status when the move was asked while the page has unsaved edits
+pin_save_first = "Guarda o revierte primero tus cambios."
+# context: status when the move was asked but this page already chooses an SSH source
+pin_ssh_taken = "SSH ya tiene un origen aquí. Usa primero los valores predeterminados y luego mueve la clave fijada."
+# context: status after the move; {key} is the key file path
+pin_moved = "Movido: este repositorio ahora inicia sesión por SSH con {key}, y se ha quitado su clave fijada."
+# context: status when the pin removal failed after the key was saved; {why} is the reason
+pin_unset_failed = "La clave está guardada, pero no se pudo quitar la clave fijada: {why}"
+# context: warning under the key file row when the file is readable by other accounts
+acl_warning = "Otras cuentas pueden leer este archivo de clave. OpenSSH rechaza una clave así (permisos incorrectos)."
+# context: button that makes the key file readable by the current account only
+acl_button = "Restringir a mi cuenta"
+# context: status after the key file was restricted
+acl_done = "Ahora solo tu cuenta puede leer el archivo de clave."
+# context: status when restricting the key file failed; {why} is the reason
+acl_failed = "No se pudo restringir el archivo de clave: {why}"

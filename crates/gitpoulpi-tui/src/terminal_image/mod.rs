@@ -875,12 +875,7 @@ pub(crate) fn cells_of(buf: &Buffer, area: Rect) -> Vec<(u16, u16, ratatui::buff
 /// the repaint redraws it whole: writing the blank alone would erase it.
 /// The list keeps one entry per cell, so lists taken at different times
 /// still line up.
-fn painted_cell(
-    buf: &Buffer,
-    area: Rect,
-    x: u16,
-    y: u16,
-) -> (u16, u16, ratatui::buffer::Cell) {
+fn painted_cell(buf: &Buffer, area: Rect, x: u16, y: u16) -> (u16, u16, ratatui::buffer::Cell) {
     if x == area.left() && x > buf.area.left() && is_wide(&buf[(x - 1, y)]) {
         return (x - 1, y, buf[(x - 1, y)].clone());
     }

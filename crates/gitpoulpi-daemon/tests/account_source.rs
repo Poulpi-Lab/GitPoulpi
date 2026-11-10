@@ -4,10 +4,10 @@
 //! an environment variable.
 //!
 //! Loopback servers only. The helper git runs is the stand-in binary of this
-//! crate (`gitpoulpi-credential-stub`), wrapped on Unix by a script that logs
-//! its arguments and environment.
+//! crate (`gitpoulpi-credential-stub`), copied under a directory with a space
+//! in its name and logging its arguments and environment (no wrapper script,
+//! so the same test runs on Windows).
 #![cfg(feature = "hosting")]
-#![cfg_attr(not(unix), allow(dead_code))]
 
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
@@ -49,25 +49,14 @@ fn helper() -> &'static Helper {
     HELPER.get_or_init(|| {
         let dir = tempfile::tempdir().unwrap();
         let stub = PathBuf::from(env!("CARGO_BIN_EXE_gitpoulpi-credential-stub"));
+        // A directory with a space: the helper command must survive it under
+        // the `sh` git runs it with (Git for Windows' on Windows).
+        let spaced = dir.path().join("helper dir");
+        std::fs::create_dir_all(&spaced).unwrap();
+        let exe = spaced.join(format!("helper stub{}", std::env::consts::EXE_SUFFIX));
+        std::fs::copy(&stub, &exe).unwrap();
         let log = dir.path().join("helper.log");
-        #[cfg(unix)]
-        let exe = {
-            use std::os::unix::fs::PermissionsExt;
-            let exe = dir.path().join("helper-wrapper.sh");
-            std::fs::write(
-                &exe,
-                format!(
-                    "#!/bin/sh\n{{ printf 'ARGV'; for a in \"$@\"; do printf ' [%s]' \"$a\"; done; echo; env; echo END; }} >> '{}'\nexec '{}' \"$@\"\n",
-                    log.display(),
-                    stub.display()
-                ),
-            )
-            .unwrap();
-            std::fs::set_permissions(&exe, std::fs::Permissions::from_mode(0o755)).unwrap();
-            exe
-        };
-        #[cfg(not(unix))]
-        let exe = stub;
+        std::env::set_var("GITPOULPI_STUB_LOG", &log);
         Helper {
             _dir: dir,
             exe,
@@ -277,7 +266,6 @@ async fn the_accounts_token_reaches_its_own_server_and_nothing_else_sees_it() {
         Some("account acct-main (token, user x-access-token)")
     );
 
-    #[cfg(unix)]
     {
         let log = std::fs::read_to_string(&helper().log).unwrap();
         assert!(log.contains("ARGV [--gitpoulpi-git-credential] [get]"));

@@ -527,4 +527,26 @@ mod tests {
         assert!(!has_foreign_access(&file));
         assert_eq!(std::fs::read(&file).unwrap(), b"x");
     }
+
+    /// A key file readable by Users is found, then restricted (a protected
+    /// user-and-SYSTEM-only DACL), and the owner still reads it.
+    #[cfg(windows)]
+    #[test]
+    fn a_key_readable_by_others_is_found_and_restricted_on_windows() {
+        let dir = tempfile::tempdir().unwrap();
+        let key = dir.path().join("id_work");
+        std::fs::write(&key, "key").unwrap();
+        // BUILTIN\Users, by SID so it works in any display language.
+        let granted = std::process::Command::new("icacls")
+            .arg(&key)
+            .args(["/grant", "*S-1-5-32-545:(R)"])
+            .output()
+            .unwrap();
+        assert!(granted.status.success(), "{granted:?}");
+        assert!(readable_by_others(&key));
+        restrict_to_user(&key).unwrap();
+        assert!(!readable_by_others(&key));
+        assert_eq!(std::fs::read(&key).unwrap(), b"key");
+        assert!(!readable_by_others(&dir.path().join("missing")));
+    }
 }

@@ -1072,6 +1072,6 @@ repo-auth = "Which identity this repository authenticates with (HTTPS and SSH): 
 "repo-auth set --username" = "A user name: with `system`, `credential.username` (lets a credential manager pick one of several accounts); with `integration:<id>`, the user name sent with the token"
 "repo-auth set --yes" = "Confirm a helper or token command without the interactive question (the command and its hash are still printed)"
 "repo-auth show" = "Show which identity this repository authenticates with: the stored profile, the identity each remote will use, the settings the profile overrides and any warning. Never prints a secret; a helper or token command is printed only to a person (an agent gets `{set, sha256}`)"
-"repo-auth test" = "Test the connection of each remote (or one) with the profile applied, without changing anything: lists the remote's branches, or with `--push` asks whether a push would be accepted. Answers the report of each remote plus the identity it used. Reaches the network"
+"repo-auth test" = "Test the connection to each remote (or one) with the profile applied, without changing anything: lists the remote's branches, or with `--push` asks whether a push would be accepted. Reports the result for each remote and the identity it used. Reaches the network"
 "repo-auth test --push" = "Also check that a push would be accepted"
 "repo-auth test --remote" = "Only this remote (default: every remote)"

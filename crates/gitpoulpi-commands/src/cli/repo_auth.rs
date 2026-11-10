@@ -63,10 +63,10 @@ pub enum RepoAuthAction {
     /// Forget the profile: the repository goes back to the machine's own
     /// identity. Only a person can: an agent is refused.
     Clear,
-    /// Test the connection of each remote (or one) with the profile applied,
+    /// Test the connection to each remote (or one) with the profile applied,
     /// without changing anything: lists the remote's branches, or with
-    /// `--push` asks whether a push would be accepted. Answers the report of
-    /// each remote plus the identity it used. Reaches the network.
+    /// `--push` asks whether a push would be accepted. Reports the result for
+    /// each remote and the identity it used. Reaches the network.
     Test {
         /// Only this remote (default: every remote).
         #[arg(long)]

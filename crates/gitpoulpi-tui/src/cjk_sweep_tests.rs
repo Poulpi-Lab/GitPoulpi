@@ -109,7 +109,7 @@ fn check_menu<A: Clone + PartialEq + std::fmt::Debug>(what: &str, menu: &Menu<A>
     // (c): nothing outside the popup changed, except the half-glyph its left
     // edge had to blank (one cell, on the popup's left).
     for (x, y) in rc::changed_outside(&bg, &buf, popup) {
-        let cut = x + 1 == popup.x && bg[(x, y)].symbol().chars().any(|c| !c.is_ascii());
+        let cut = x + 1 == popup.x && !bg[(x, y)].symbol().is_ascii();
         assert!(
             cut,
             "{what}: ({x},{y}) {:?} -> {:?} was written outside the popup {popup:?}\n{}",

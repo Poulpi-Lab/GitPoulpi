@@ -8,8 +8,8 @@
 //! the rules are about what a finished buffer must never contain:
 //!
 //! * **(a) wide cells are whole** ([`wide_violations`]): a wide glyph is
-//!   followed by its blank continuation (a box-drawing line under a title
-//!   glyph is the one tolerated leftover) and never starts in the last column;
+//!   followed by its blank continuation (a horizontal rule `─` under a title glyph
+//!   is the one tolerated leftover: ratatui's `Span` keeps the cell it covers) and never starts in the last column;
 //! * **(b) a box is intact** ([`box_violations_of`], for a popup's known
 //!   rectangle): four corners, a side on every row, a rule along the
 //!   bottom;
@@ -29,6 +29,19 @@ pub(crate) fn row_text(buf: &Buffer, y: u16) -> String {
     let mut out = String::new();
     let mut x = buf.area.x;
     while x < buf.area.right() {
+        let symbol = buf[(x, y)].symbol();
+        out.push_str(symbol);
+        x += display_width(symbol).max(1) as u16;
+    }
+    out
+}
+
+/// Row `y` of `buf` restricted to the columns of `cols`, continuation cells
+/// skipped (a glyph starting left of the range is not included).
+pub(crate) fn row_text_in(buf: &Buffer, y: u16, cols: Rect) -> String {
+    let mut out = String::new();
+    let mut x = cols.x;
+    while x < cols.right().min(buf.area.right()) {
         let symbol = buf[(x, y)].symbol();
         out.push_str(symbol);
         x += display_width(symbol).max(1) as u16;
@@ -78,7 +91,7 @@ pub(crate) fn wide_violations(buf: &Buffer) -> Vec<String> {
                     break;
                 }
                 let next = buf[(x + k, y)].symbol();
-                if !is_blank(next) && !is_rule(next) {
+                if !is_blank(next) && next != "\u{2500}" {
                     out.push(format!(
                         "({x},{y}): wide glyph {symbol:?} followed by {next:?}, not its blank continuation"
                     ));

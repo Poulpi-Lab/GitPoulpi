@@ -179,6 +179,35 @@ pub(crate) fn box_violations_of(buf: &Buffer, rect: Rect) -> Vec<String> {
     out
 }
 
+/// Rule (b) for an overlay built of several stacked boxes (the palette's
+/// input, list and hint band): the first and last column of `rect` hold a
+/// border (or a scrollbar) on every row. Messages are `(x, y): ...`.
+pub(crate) fn edges_violations(buf: &Buffer, rect: Rect) -> Vec<String> {
+    let mut out = Vec::new();
+    let rect = rect.intersection(buf.area);
+    if rect.is_empty() {
+        return out;
+    }
+    let (x0, x1) = (rect.x, rect.right() - 1);
+    let has_bar = (rect.y..rect.bottom()).any(|y| {
+        matches!(
+            buf[(x1, y)].symbol(),
+            "\u{2191}" | "\u{25B2}" | "\u{2193}" | "\u{25BC}"
+        )
+    });
+    for y in rect.y..rect.bottom() {
+        let l = buf[(x0, y)].symbol();
+        if !is_side_like(l) {
+            out.push(format!("({x0},{y}): the left edge of {rect:?} is {l:?}"));
+        }
+        let r = buf[(x1, y)].symbol();
+        if !is_side_like(r) && !(has_bar && is_blank(r)) {
+            out.push(format!("({x1},{y}): the right edge of {rect:?} is {r:?}"));
+        }
+    }
+    out
+}
+
 /// Rule (a) over the whole buffer (rule (b) needs the box's rectangle, see
 /// [`box_violations_of`]); panics with the screen on any violation.
 pub(crate) fn assert_clean(what: &str, buf: &Buffer) {

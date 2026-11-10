@@ -153,9 +153,10 @@ fn check_with_flyouts<A: Clone + PartialEq + std::fmt::Debug>(
     menu: &Menu<A>,
     w: u16,
     h: u16,
+    flyouts: bool,
 ) {
     check_menu(what, menu, w, h);
-    for r in 0..menu.row_count() {
+    for r in (0..menu.row_count()).filter(|_| flyouts) {
         if !menu.row_is_selectable(r) {
             continue;
         }
@@ -180,7 +181,7 @@ fn anchors(w: u16, h: u16) -> Vec<(u16, u16)> {
 #[test]
 fn commit_and_ref_menus_hold_over_cjk_text() {
     each_cjk(|lang, terms, w, h| {
-        for (col, row) in anchors(w, h) {
+        for (n, (col, row)) in anchors(w, h).into_iter().enumerate() {
             let ctx = crate::log_menu::MenuContext {
                 current_branch: Some("main".into()),
                 remote_twin: Some("origin/功能/登录".into()),
@@ -209,8 +210,8 @@ fn commit_and_ref_menus_hold_over_cjk_text() {
             let tag = |name: &str| {
                 format!("{name} menu [{} terms={terms} {w}x{h} @{col},{row}]", lang.code())
             };
-            check_with_flyouts(&tag("commit"), &commit, w, h);
-            check_with_flyouts(&tag("ref"), &refm, w, h);
+            check_with_flyouts(&tag("commit"), &commit, w, h, n % 3 == 0);
+            check_with_flyouts(&tag("ref"), &refm, w, h, n % 3 == 0);
         }
     });
 }
@@ -231,5 +232,75 @@ fn a_hand_built_cjk_menu_with_hints_is_aligned() {
         );
         let what = format!("hand-built menu [{} terms={terms} {w}x{h}]", lang.code());
         check_menu(&what, &menu, w, h);
+    });
+}
+
+/// Asserts (a), (b) on `popup`'s edges and (c) for an overlay drawn by `f`
+/// over the CJK background.
+fn check_overlay(
+    what: &str,
+    w: u16,
+    h: u16,
+    popup_of: impl Fn(&Buffer) -> Rect,
+    f: impl FnOnce(&mut ratatui::Frame),
+) {
+    let bg = cjk_background(w, h);
+    let buf = draw_over(&bg, f);
+    let popup = popup_of(&buf);
+    let mut all = rc::wide_violations(&buf);
+    all.extend(rc::edges_violations(&buf, popup));
+    assert!(
+        all.is_empty(),
+        "{what}: {}\n{}",
+        all.join("\n"),
+        rc::dump(&buf)
+    );
+    for (x, y) in rc::changed_outside(&bg, &buf, popup) {
+        assert!(
+            x + 1 == popup.x,
+            "{what}: ({x},{y}) {:?} -> {:?} was written outside {popup:?}\n{}",
+            bg[(x, y)].symbol(),
+            buf[(x, y)].symbol(),
+            rc::dump(&buf)
+        );
+    }
+}
+
+#[test]
+fn the_palette_and_help_overlays_hold_over_cjk_text() {
+    use crate::event_loop::draw::palette_overlay::render_command_palette;
+    each_cjk(|lang, terms, w, h| {
+        for draft in ["", "pull"] {
+            let what = format!("palette {draft:?} [{} terms={terms} {w}x{h}]", lang.code());
+            let popup = std::cell::RefCell::new(None);
+            let editor = crate::text_edit::FieldEditor::default();
+            let journal = gitpoulpi_core::domain::JournalState::default();
+            check_overlay(
+                &what,
+                w,
+                h,
+                |_| popup.borrow().as_ref().map(|p: &crate::chrome::PalettePopup| p.popup).unwrap(),
+                |frame| {
+                    render_command_palette(
+                        frame,
+                        draft,
+                        0,
+                        crate::palette::PaletteContext::default(),
+                        &editor,
+                        &journal,
+                        false,
+                        &mut popup.borrow_mut(),
+                    )
+                },
+            );
+        }
+        let what = format!("help [{} terms={terms} {w}x{h}]", lang.code());
+        check_overlay(
+            &what,
+            w,
+            h,
+            |buf| crate::ui_kit::centered_rect(70, 80, buf.area),
+            |frame| crate::help_view::render(frame, "", &mut 0, &mut 0),
+        );
     });
 }

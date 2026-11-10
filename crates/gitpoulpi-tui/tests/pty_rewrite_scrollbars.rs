@@ -107,8 +107,10 @@ fn open_secrets_tab(term: &mut Terminal) -> Screen {
     term.wait_for("the Secrets tab", STEP, |s| s.contains("Scan for secrets"))
         .unwrap_or_else(|e| panic!("{e}"));
     term.send_text("s").unwrap();
-    term.wait_for("the findings and their bar", STEP, |s| {
-        bar_ends(s).is_some()
+    // The bar and the detail line under the list: a torn frame can show the
+    // first before the second.
+    term.wait_for("the findings, their bar and the detail line", STEP, |s| {
+        bar_ends(s).is_some() && !detail_path(s).is_empty()
     })
     .unwrap_or_else(|e| panic!("{e}"))
 }
@@ -129,12 +131,15 @@ fn the_secrets_list_has_a_bar_the_thumb_drags_the_wheel_scrolls_and_the_keys_fol
 
     // Drag the thumb (on its top, right under the up arrow) to the bottom:
     // the list moves, the selection does not.
-    term.drag((col, first + 1), (col, last + 3)).unwrap();
-    let dragged = term
-        .wait_for("the list scrolled by the thumb", STEP, |s| {
-            bar_ends(s).is_some() && shown(s) != before
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a drag that starts on a torn frame can miss the thumb.
+    let dragged = common::retry_until(
+        &mut term,
+        "the list scrolled by the thumb",
+        4,
+        Duration::from_secs(10),
+        |t| t.drag((col, first + 1), (col, last + 3)).unwrap(),
+        |s| bar_ends(s).is_some() && !detail_path(s).is_empty() && shown(s) != before,
+    );
     assert_eq!(
         detail_path(&dragged),
         detail_path(&start),
@@ -152,7 +157,7 @@ fn the_secrets_list_has_a_bar_the_thumb_drags_the_wheel_scrolls_and_the_keys_fol
     }
     let wheeled = term
         .wait_for("the list scrolled back by the wheel", STEP, |s| {
-            bar_ends(s).is_some() && shown(s) == before
+            bar_ends(s).is_some() && shown(s) == before && detail_path(s) == detail_path(&start)
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(detail_path(&wheeled), detail_path(&start));

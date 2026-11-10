@@ -126,21 +126,19 @@ fn apply_pushed(term: &mut Terminal, by_mouse: bool) {
     term.wait_for("the summary", STEP, |s| s.contains("keep their id"))
         .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("C-s").unwrap();
-    let screen = term
-        .wait_for("the pushed-history question", STEP, |s| {
-            s.contains("Rewrite pushed history?") && s.contains("Rewrite anyway")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    if by_mouse {
-        let (c, r) = screen.find("Rewrite anyway").unwrap();
-        term.click(c + 1, r).expect("click Rewrite anyway");
-    } else {
-        term.send_keys("1").unwrap();
-    }
-    term.wait_for("the result panel with the push list", STEP, |s| {
-        s.contains("Rewrote 2") && s.contains("Push rewritten branches")
+    term.wait_for("the pushed-history question", STEP, |s| {
+        s.contains("Rewrite pushed history?") && s.contains("Rewrite anyway")
     })
     .unwrap_or_else(|e| panic!("{e}"));
+    if by_mouse {
+        answer_rewrite_anyway(term);
+    } else {
+        term.send_keys("1").unwrap();
+        term.wait_for("the result panel with the push list", STEP, |s| {
+            s.contains("Rewrote 2") && s.contains("Push rewritten branches")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    }
 }
 
 /// Apply asks, the push sends the ticked branch and not the unticked tag,
@@ -157,14 +155,12 @@ fn the_rewritten_branch_is_pushed_and_an_unticked_tag_stays_as_it_was() {
     fill_identity_by_keys(&mut term);
     apply_pushed(&mut term, false);
 
-    let screen = term.screen();
-    assert!(screen.contains("[x] feature"), "{}", screen.text());
-    assert!(screen.contains("[x] v1"), "{}", screen.text());
-    assert!(
-        screen.contains("The remote keeps the new history even if you undo"),
-        "{}",
-        screen.text()
-    );
+    term.wait_for("the push list in full", STEP, |s| {
+        s.contains("[x] feature")
+            && s.contains("[x] v1")
+            && s.contains("The remote keeps the new history even if you undo")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(
         origin_rev(&repo, "refs/heads/feature"),
         old_feature,
@@ -172,10 +168,19 @@ fn the_rewritten_branch_is_pushed_and_an_unticked_tag_stays_as_it_was() {
     );
 
     // Untick the tag with a click on its box.
-    let (c, r) = screen.find("[x] v1").expect("the tag's row");
-    term.click(c + 1, r).expect("untick v1");
-    term.wait_for("the tag unticked", STEP, |s| s.contains("[ ] v1"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a box located on a torn frame can take the click nowhere.
+    common::retry_until(
+        &mut term,
+        "the tag unticked",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find("[x] v1") {
+                t.click(c + 1, r).expect("untick v1");
+            }
+        },
+        |s| s.contains("[ ] v1"),
+    );
 
     // The note first: it reads the applied run, not the push.
     term.send_keys("c").unwrap();
@@ -238,17 +243,21 @@ fn a_remote_that_moved_is_a_rejected_row_and_fetch_and_review_fetches() {
     apply_pushed_after_preview(&mut term);
 
     // Push by clicking the button.
-    let screen = term.screen();
-    let (c, r) = screen
-        .find("Push rewritten branches")
-        .expect("the push button");
-    term.click(c + 1, r).expect("click Push");
-    let screen = term
-        .wait_for("the rejected row", STEP, |s| {
+    common::retry_until(
+        &mut term,
+        "the rejected row with its button",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find("Push rewritten branches") {
+                t.click(c + 1, r).expect("click Push");
+            }
+        },
+        |s| {
             s.contains("rejected: the remote moved since the preview")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(screen.contains("Fetch and review"), "{}", screen.text());
+                && s.contains("Fetch and review")
+        },
+    );
     assert_eq!(
         origin_rev(&repo, "refs/heads/feature"),
         rival,
@@ -260,12 +269,18 @@ fn a_remote_that_moved_is_a_rejected_row_and_fetch_and_review_fetches() {
         "nothing fetched yet"
     );
 
-    let (c, r) = screen.find("Fetch and review").unwrap();
-    term.click(c + 1, r).expect("click Fetch and review");
-    term.wait_for("the workbench closed", STEP, |s| {
-        !s.contains("Rewrite history")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    common::retry_until(
+        &mut term,
+        "the workbench closed",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find("Fetch and review") {
+                t.click(c + 1, r).expect("click Fetch and review");
+            }
+        },
+        |s| !s.contains("Rewrite history"),
+    );
     wait_until("origin/feature fetched", || {
         repo.try_git(&["rev-parse", "refs/remotes/origin/feature"])
             .as_deref()
@@ -276,15 +291,26 @@ fn a_remote_that_moved_is_a_rejected_row_and_fetch_and_review_fetches() {
 /// Apply from a preview that is already on screen.
 fn apply_pushed_after_preview(term: &mut Terminal) {
     term.send_keys("C-s").unwrap();
-    let screen = term
-        .wait_for("the pushed-history question", STEP, |s| {
-            s.contains("Rewrite pushed history?") && s.contains("Rewrite anyway")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen.find("Rewrite anyway").unwrap();
-    term.click(c + 1, r).expect("click Rewrite anyway");
-    term.wait_for("the result panel with the push list", STEP, |s| {
-        s.contains("Rewrote 2") && s.contains("Push rewritten branches")
+    term.wait_for("the pushed-history question", STEP, |s| {
+        s.contains("Rewrite pushed history?") && s.contains("Rewrite anyway")
     })
     .unwrap_or_else(|e| panic!("{e}"));
+    answer_rewrite_anyway(term);
+}
+
+/// Clicks "Rewrite anyway" until the result panel with the push list shows;
+/// a button located on a torn frame can take the click nowhere.
+fn answer_rewrite_anyway(term: &mut Terminal) {
+    common::retry_until(
+        term,
+        "the result panel with the push list",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find("Rewrite anyway") {
+                t.click(c + 1, r).expect("click Rewrite anyway");
+            }
+        },
+        |s| s.contains("Rewrote 2") && s.contains("Push rewritten branches"),
+    );
 }

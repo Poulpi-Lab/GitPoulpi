@@ -93,7 +93,9 @@ fn a_folder_is_removed_from_all_history_by_keys_and_undone() {
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("F5").unwrap();
     let screen = term
-        .wait_for("the summary", STEP, |s| s.contains("keep their id"))
+        .wait_for("the summary naming the removed commit", STEP, |s| {
+            s.contains("keep their id") && s.contains("is removed")
+        })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
         screen.contains("is removed"),
@@ -116,7 +118,7 @@ fn a_folder_is_removed_from_all_history_by_keys_and_undone() {
     assert!(repo.root().join("keep.txt").exists());
     term.send_keys("C-z").unwrap();
     wait_until("history restored", || {
-        repo.git(&["rev-parse", "HEAD"]) == tip
+        repo.try_git(&["rev-parse", "HEAD"]).as_deref() == Some(tip.as_str())
     });
     wait_until("the file is back", || {
         repo.root().join("secrets/key.pem").exists()
@@ -186,24 +188,31 @@ fn a_secret_value_never_reaches_the_screen_not_even_in_the_diff() {
     term.send_keys("Enter").unwrap();
     let diff = term
         .wait_for("the diff with hidden lines", STEP, |s| {
-            s.contains("removed lines hidden: they held a secret")
+            s.contains("removed lines hidden: they held a secret") && s.contains("MODE=prod")
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(!diff.contains(secret), "{}", diff.text());
     assert!(diff.contains("MODE=prod"), "{}", diff.text());
     // The cross closes the diff pane, not the workbench.
-    let (xc, xr) = diff.find("Files changed in").expect("the drill title");
-    let cross = term
-        .screen()
-        .find_all(" \u{2715} ")
-        .into_iter()
-        .find(|&(_, r)| r == xr)
-        .unwrap_or((xc, xr));
-    term.click(cross.0 + 1, cross.1).expect("click the cross");
-    term.wait_for("back on the preview", STEP, |s| {
-        !s.contains("Files changed in") && s.contains("Rewrite history")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a cross located on a torn frame can land nowhere.
+    common::retry_until(
+        &mut term,
+        "back on the preview",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let screen = t.screen();
+            if let Some((xc, xr)) = screen.find("Files changed in") {
+                let cross = screen
+                    .find_all(" \u{2715} ")
+                    .into_iter()
+                    .find(|&(_, r)| r == xr)
+                    .unwrap_or((xc, xr));
+                t.click(cross.0 + 1, cross.1).expect("click the cross");
+            }
+        },
+        |s| !s.contains("Files changed in") && s.contains("Rewrite history"),
+    );
     term.send_keys("C-s").unwrap();
     term.wait_for("the result panel", STEP, |s| s.contains("Rewrote"))
         .unwrap_or_else(|e| panic!("{e}"));
@@ -234,7 +243,11 @@ fn a_dirty_file_in_the_way_is_listed_in_the_refusal() {
     type_into_first_field(&mut term, "secrets");
     term.send_keys("F5").unwrap();
     let screen = term
-        .wait_for("the refusal", STEP, |s| s.contains("uncommitted edits"))
+        .wait_for("the refusal listing the file", STEP, |s| {
+            s.contains("uncommitted edits")
+                && s.contains("secrets/key.pem")
+                && s.contains("discard")
+        })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(screen.contains("secrets/key.pem"), "{}", screen.text());
     assert!(screen.contains("discard"), "{}", screen.text());

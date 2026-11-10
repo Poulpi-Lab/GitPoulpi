@@ -100,10 +100,11 @@ fn a_stash_blocks_the_purge_until_it_is_dropped_then_the_old_blob_is_gone() {
     term.send_keys("e").unwrap();
     let blocked = term
         .wait_for("the checklist with the blocker", STEP, |s| {
-            s.contains("Still holding the old history") && s.contains("stash@{0}")
+            s.contains("Still holding the old history")
+                && s.contains("stash@{0}")
+                && s.contains("Purge old history")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(blocked.contains("Purge old history"), "{}", blocked.text());
     assert!(blocked.contains("Rewrite history") || blocked.contains("#"));
     // Purge stays unavailable: the key does nothing.
     term.send_keys("p").unwrap();
@@ -167,12 +168,12 @@ fn a_stash_blocks_the_purge_until_it_is_dropped_then_the_old_blob_is_gone() {
         .wait_for("the purged refusal", STEP, |s| {
             // The status line is cut at the window's width: the label and
             // the start of the typed reason are what shows.
-            s.contains("(purged): the old history of op")
+            s.contains("(purged): the old history of op") && s.contains("can't undo")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(refused.contains("can't undo"), "{}", refused.text());
+    let _ = refused;
     wait_until("history unchanged", || {
-        repo.git(&["rev-parse", "HEAD"]) == tip
+        repo.try_git(&["rev-parse", "HEAD"]).as_deref() == Some(tip.as_str())
     });
 }
 
@@ -193,21 +194,28 @@ fn the_palette_row_opens_the_screen_and_the_cross_closes_it() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").unwrap();
-    let screen = term
-        .wait_for("the checklist", STEP, |s| {
-            s.contains("Purge old history") && s.contains("stash@{0}")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (_, row) = screen.find("Purge old history").expect("the title");
-    let cross = term
-        .screen()
-        .find_all(" \u{2715} ")
-        .into_iter()
-        .find(|&(_, r)| r == row)
-        .expect("the screen's cross");
-    term.click(cross.0 + 1, cross.1).expect("click the cross");
-    term.wait_for("everything closed", STEP, |s| {
-        !s.contains("Purge old history") && !s.contains("Rewrite history")
+    term.wait_for("the checklist", STEP, |s| {
+        s.contains("Purge old history") && s.contains("stash@{0}")
     })
     .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a cross located on a torn frame can land nowhere.
+    common::retry_until(
+        &mut term,
+        "everything closed",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let screen = t.screen();
+            if let Some((_, row)) = screen.find("Purge old history") {
+                if let Some(cross) = screen
+                    .find_all(" \u{2715} ")
+                    .into_iter()
+                    .find(|&(_, r)| r == row)
+                {
+                    t.click(cross.0 + 1, cross.1).expect("click the cross");
+                }
+            }
+        },
+        |s| !s.contains("Purge old history") && !s.contains("Rewrite history"),
+    );
 }

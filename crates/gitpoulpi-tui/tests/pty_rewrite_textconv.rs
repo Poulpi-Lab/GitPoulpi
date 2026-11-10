@@ -71,14 +71,10 @@ fn a_linux_file_becomes_windows_in_history_and_on_disk_then_undo_restores_it() {
         .unwrap_or_else(|e| panic!("{e}"));
 
     term.send_keys("F5").unwrap();
-    let summary = term
-        .wait_for("the summary", STEP, |s| s.contains("keep their id"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        summary.contains("1 file version is rewritten"),
-        "the summary counts the file:\n{}",
-        summary.text()
-    );
+    term.wait_for("the summary counting the file", STEP, |s| {
+        s.contains("keep their id") && s.contains("1 file version is rewritten")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(
         repo.git(&["rev-parse", "HEAD"]),
         tip,
@@ -86,8 +82,11 @@ fn a_linux_file_becomes_windows_in_history_and_on_disk_then_undo_restores_it() {
     );
 
     term.send_keys("C-s").unwrap();
-    term.wait_for("the result panel", STEP, |s| s.contains("Rewrote 1"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // The whole panel: a torn frame shows the first line before its buttons.
+    term.wait_for("the result panel with its buttons", STEP, |s| {
+        s.contains("Rewrote 1") && s.contains("Purge old history")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(repo.git(&["show", "HEAD:win.txt"]), "a\r\nb");
     assert_eq!(
         std::fs::read(repo.root().join("win.txt")).unwrap(),
@@ -100,15 +99,22 @@ fn a_linux_file_becomes_windows_in_history_and_on_disk_then_undo_restores_it() {
         "a file the filter does not name keeps its blob"
     );
 
-    let (c, r) = term.screen().find("Close").expect("the Close button");
-    term.click(c + 1, r).expect("click Close");
-    term.wait_for("the workbench closed", STEP, |s| {
-        !s.contains("Rewrite history")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a Close button located on a torn frame can take the click nowhere.
+    common::retry_until(
+        &mut term,
+        "the workbench closed",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find("Close") {
+                t.click(c + 1, r).expect("click Close");
+            }
+        },
+        |s| !s.contains("Rewrite history"),
+    );
     term.send_keys("C-z").unwrap();
     wait_until("the old tip is back", || {
-        repo.git(&["rev-parse", "HEAD"]) == tip
+        repo.try_git(&["rev-parse", "HEAD"]).as_deref() == Some(tip.as_str())
     });
     assert_eq!(repo.git(&["rev-parse", "HEAD:win.txt"]), blob);
     assert_eq!(

@@ -115,34 +115,33 @@ fn the_ai_writes_a_script_that_lands_marked_in_the_editor_and_can_be_tested() {
     assert_eq!(agent_calls(&agent), 0, "the dialog alone sends nothing");
 
     send_request(&mut term, "shout the author names");
-    let screen = term
-        .wait_for(
-            "the AI's script in the editor, marked and checked",
-            STEP,
-            |s| {
-                s.contains("--! name: Shout the names")
-                    && s.contains("\u{2726} written by AI: read it before Preview")
-                    && s.contains("OK: rewrite_commit found")
-            },
-        )
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(!screen.contains("What is sent"), "{}", screen.text());
+    term.wait_for(
+        "the AI's script in the editor, marked and checked, the dialog gone",
+        STEP,
+        |s| {
+            s.contains("--! name: Shout the names")
+                && s.contains("\u{2726} written by AI: read it before Preview")
+                && s.contains("OK: rewrite_commit found")
+                && !s.contains("What is sent")
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(agent_calls(&agent), 1);
     assert_eq!(names(&repo), original, "nothing was applied");
 
     // Test on selection: the script runs on the newest commits, writes
     // nothing.
     term.send_keys("F5").unwrap();
-    let screen = term
-        .wait_for("the test result", STEP, |s| {
-            s.contains("would change") && s.contains("author name: Old Name -> OLD NAME")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        screen.contains("\u{2726} written by AI"),
-        "the mark stays until the script is edited\n{}",
-        screen.text()
-    );
+    term.wait_for(
+        "the test result, the AI mark still shown (it stays until the script is edited)",
+        STEP,
+        |s| {
+            s.contains("would change")
+                && s.contains("author name: Old Name -> OLD NAME")
+                && s.contains("\u{2726} written by AI")
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(names(&repo), original, "a test writes nothing");
 }
 
@@ -206,30 +205,21 @@ fn what_is_sent_starts_collapsed_and_its_pane_scrolls_by_key_wheel_and_scrollbar
     open_dialog(&mut term);
 
     // Collapsed: the header with its mark and its key, not the text.
-    let screen = term.screen();
-    assert!(
-        screen.contains("\u{25B8} What is sent"),
-        "{}",
-        screen.text()
-    );
-    assert!(screen.contains("Alt+W: show or hide"), "{}", screen.text());
-    assert!(
-        !screen.contains("Instructions to the model:"),
-        "{}",
-        screen.text()
-    );
+    term.wait_for("the pane collapsed, its key shown", STEP, |s| {
+        s.contains("\u{25B8} What is sent")
+            && s.contains("Alt+W: show or hide")
+            && !s.contains("Instructions to the model:")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
 
     // Alt+W opens it.
     term.send_keys("M-w").unwrap();
-    term.wait_for("the pane open", STEP, |s| {
-        s.contains("\u{25BE} What is sent") && s.contains("Instructions to the model:")
+    term.wait_for("the pane open, longer than its box", STEP, |s| {
+        s.contains("\u{25BE} What is sent")
+            && s.contains("Instructions to the model:")
+            && !s.contains("Your request:")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        !term.screen().contains("Your request:"),
-        "the prompt is longer than the pane\n{}",
-        term.screen().text()
-    );
 
     // Keys: Tab reaches the pane (description, box, pane), PageDown / End /
     // Home scroll it.
@@ -249,58 +239,76 @@ fn what_is_sent_starts_collapsed_and_its_pane_scrolls_by_key_wheel_and_scrollbar
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
-    // The wheel over the pane.
-    let (col, row) = term
-        .wait_for_text("Instructions to the model:", STEP)
-        .unwrap_or_else(|e| panic!("{e}"));
-    term.scroll(true, col + 2, row + 1).unwrap();
-    term.wait_for("the wheel scrolled the pane", STEP, |s| {
-        !s.contains("Instructions to the model:")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
-    term.scroll(false, col + 2, row + 1).unwrap();
-    term.wait_for("the wheel scrolled it back", STEP, |s| {
-        s.contains("Instructions to the model:")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    // The wheel over the pane (re-located on every try: a torn frame can
+    // place the text where it is not).
+    common::retry_until(
+        &mut term,
+        "the wheel scrolled the pane",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((col, row)) = t.screen().find("Instructions to the model:") {
+                t.scroll(true, col + 2, row + 1).unwrap();
+            }
+        },
+        |s| !s.contains("Instructions to the model:"),
+    );
+    // Scrolled back by the wheel up, over the pane's first visible row.
+    let (pane_col, pane_row) = term
+        .screen()
+        .find("Alt+W: show or hide")
+        .map(|(c, r)| (c, r + 2))
+        .unwrap_or_else(|| panic!("no header\n{}", term.screen().text()));
+    common::retry_until(
+        &mut term,
+        "the wheel scrolled it back",
+        4,
+        Duration::from_secs(10),
+        |t| t.scroll(false, pane_col, pane_row).unwrap(),
+        |s| s.contains("Instructions to the model:"),
+    );
 
     // Its own scrollbar: on the pane's right edge, under the header's last
     // column. Dragging the thumb to the bottom shows the end.
-    let (hint_col, head_row) = term
-        .wait_for_text("Alt+W: show or hide", STEP)
-        .unwrap_or_else(|e| panic!("{e}"));
-    let bar_col = hint_col + "Alt+W: show or hide".len() as u16;
-    let screen = term.screen();
-    assert!(
-        screen
-            .find_all("\u{2191}")
-            .contains(&(bar_col, head_row + 1)),
-        "no up arrow at the pane's top right\n{}",
-        screen.text()
+    common::retry_until(
+        &mut term,
+        "the drag reached the end",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let screen = t.screen();
+            let Some((hint_col, head_row)) = screen.find("Alt+W: show or hide") else {
+                return;
+            };
+            let bar_col = hint_col + "Alt+W: show or hide".len() as u16;
+            if !screen
+                .find_all("\u{2191}")
+                .contains(&(bar_col, head_row + 1))
+            {
+                return;
+            }
+            let Some(down) = screen
+                .find_all("\u{2193}")
+                .into_iter()
+                .filter(|(c, _)| *c == bar_col)
+                .map(|(_, r)| r)
+                .max()
+            else {
+                return;
+            };
+            t.drag((bar_col, head_row + 2), (bar_col, down - 1))
+                .unwrap();
+        },
+        |s| s.contains("Your request:"),
     );
-    let down = screen
-        .find_all("\u{2193}")
-        .into_iter()
-        .filter(|(c, _)| *c == bar_col)
-        .map(|(_, r)| r)
-        .max()
-        .unwrap_or_else(|| panic!("no down arrow on the bar\n{}", screen.text()));
-    term.drag((bar_col, head_row + 2), (bar_col, down - 1))
-        .unwrap();
-    term.wait_for("the drag reached the end", STEP, |s| {
-        s.contains("Your request:")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
 
     // A click on the header hides it; Enter on the focused header shows it.
-    let (col, row) = term
-        .wait_for_text("\u{25BE} What is sent", STEP)
-        .unwrap_or_else(|e| panic!("{e}"));
-    term.click(col + 4, row).unwrap();
-    term.wait_for("the pane collapsed", STEP, |s| {
-        s.contains("\u{25B8} What is sent") && !s.contains("Your request:")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    common::click_text_until(
+        &mut term,
+        "\u{25BE} What is sent",
+        "the pane collapsed",
+        |s| s.contains("\u{25B8} What is sent") && !s.contains("Your request:"),
+    );
     term.send_keys("Enter").unwrap();
     term.wait_for("the pane open again", STEP, |s| {
         s.contains("\u{25BE} What is sent") && s.contains("Instructions to the model:")

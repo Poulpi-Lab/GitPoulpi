@@ -119,19 +119,22 @@ fn fill_identity_by_keys(term: &mut Terminal) {
     .unwrap_or_else(|e| panic!("{e}"));
 }
 
-fn preview_by_key(term: &mut Terminal) {
-    term.send_keys("F5").unwrap();
-    term.wait_for("the summary", STEP, |s| s.contains("keep their id"))
-        .unwrap_or_else(|e| panic!("{e}"));
+fn wanted_owned(wanted: &[&str]) -> Vec<String> {
+    wanted.iter().map(|s| s.to_string()).collect()
 }
 
 fn wait_for_emails(repo: &FixtureRepo, wanted: &[&str]) {
     let deadline = std::time::Instant::now() + STEP;
-    while emails(repo) != wanted {
+    // `try_git`: a ref swap in flight can fail one `git log`.
+    let now = || {
+        repo.try_git(&["log", "--format=%ae"])
+            .map(|t| t.lines().map(str::to_string).collect::<Vec<_>>())
+    };
+    while now().as_deref() != Some(wanted_owned(wanted).as_slice()) {
         assert!(
             std::time::Instant::now() < deadline,
             "authors are {:?}, wanted {wanted:?}",
-            emails(repo)
+            now()
         );
         std::thread::sleep(Duration::from_millis(50));
     }
@@ -148,13 +151,11 @@ fn a_rule_is_added_previewed_applied_and_undone_by_keys() {
     fill_identity_by_keys(&mut term);
     // Nothing has been touched by typing.
     assert_eq!(emails(&repo), original);
-    preview_by_key(&mut term);
-    let screen = term.screen();
-    assert!(
-        screen.contains("2 of 3"),
-        "two of the three commits change\n{}",
-        screen.text()
-    );
+    term.send_keys("F5").unwrap();
+    term.wait_for("the summary: two of the three commits change", STEP, |s| {
+        s.contains("keep their id") && s.contains("2 of 3")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(emails(&repo), original, "the preview changes nothing");
     // Apply with Ctrl+S.
     term.send_keys("C-s").unwrap();
@@ -186,53 +187,69 @@ fn the_palette_row_and_the_mouse_reach_a_rule_through_its_dropdown() {
     term.send_keys("Enter").unwrap();
     let screen = term
         .wait_for("the rule's fields", STEP, |s| {
-            s.contains("Rewrite history") && s.contains("Apply to")
+            s.contains("Rewrite history")
+                && s.contains("Apply to")
+                && s.contains("Author and committer")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(screen.contains("Author and committer"));
+    let (_, r) = screen.find("Author and committer").unwrap();
     // A click on the field opens the list; the value did not change.
-    let (c, r) = screen.find("Author and committer").unwrap();
-    term.click(c + 1, r).expect("click the Apply to field");
-    let screen = term
-        .wait_for("the dropdown", STEP, |s| {
-            s.contains("Committer")
-                && s.contains("Author")
-                && s.find_all("Author and committer").len() >= 2
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
+    common::click_text_until(&mut term, "Author and committer", "the dropdown", |s| {
+        s.contains("Committer")
+            && s.contains("Author")
+            && s.find_all("Author and committer").len() >= 2
+    });
     // Pick the plain "Committer" row (the list's own row, below the field).
-    let rows = screen.find_all("Committer");
-    let (pc, pr) = rows
-        .into_iter()
-        .filter(|&(_, row)| row > r)
-        .min_by_key(|&(_, row)| row)
-        .expect("a Committer row under the field");
-    term.click(pc + 1, pr).expect("pick Committer");
-    term.wait_for("the field shows the pick and the list is gone", STEP, |s| {
-        s.find_all("Author and committer").is_empty() && s.contains("Committer")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    common::retry_until(
+        &mut term,
+        "the field shows the pick and the list is gone",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((pc, pr)) = t
+                .screen()
+                .find_all("Committer")
+                .into_iter()
+                .filter(|&(_, row)| row > r)
+                .min_by_key(|&(_, row)| row)
+            {
+                t.click(pc + 1, pr).expect("pick Committer");
+            }
+        },
+        |s| s.find_all("Author and committer").is_empty() && s.contains("Committer"),
+    );
     // The Add rule combo: a click opens the menu, a click picks a kind.
-    let (ac, ar) = term.screen().find("+ Add rule").expect("the Add row");
-    term.click(ac + 2, ar).expect("click Add rule");
-    let screen = term
-        .wait_for("the Add menu", STEP, |s| {
-            s.contains("Search and replace in messages")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (mc, mr) = screen.find("Search and replace in messages").unwrap();
-    term.click(mc + 1, mr).expect("pick the messages rule");
-    term.wait_for("the second rule's fields", STEP, |s| {
-        s.contains("Replace with") && s.contains("Match case")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    common::retry_until(
+        &mut term,
+        "the Add menu",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((ac, ar)) = t.screen().find("+ Add rule") {
+                t.click(ac + 2, ar).expect("click Add rule");
+            }
+        },
+        |s| s.contains("Search and replace in messages"),
+    );
+    common::click_text_until(
+        &mut term,
+        "Search and replace in messages",
+        "the second rule's fields",
+        |s| s.contains("Replace with") && s.contains("Match case"),
+    );
     // The cross closes the workbench.
-    let (xc, xr) = term.screen().find(" \u{2715} ").expect("the close cross");
-    term.click(xc + 1, xr).expect("click the cross");
-    term.wait_for("the workbench closed", STEP, |s| {
-        !s.contains("Rewrite history")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    common::retry_until(
+        &mut term,
+        "the workbench closed",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((xc, xr)) = t.screen().find(" \u{2715} ") {
+                t.click(xc + 1, xr).expect("click the cross");
+            }
+        },
+        |s| !s.contains("Rewrite history"),
+    );
 }
 
 /// A rule whose program is not installed is greyed, says what it needs and
@@ -325,13 +342,13 @@ fn the_signature_question_blocks_the_rewrite_until_it_is_answered() {
     open_by_chord(&mut term);
     fill_identity_by_keys(&mut term);
     term.send_keys("F5").unwrap();
-    term.wait_for("the signature question", STEP, |s| {
-        s.contains("Signed commits change") && s.contains("Remove the signatures")
+    term.wait_for("the signature question with its choices", STEP, |s| {
+        s.contains("Signed commits change")
+            && s.contains("Remove the signatures")
+            && s.contains("Re-sign only the commits that were signed")
+            && s.contains("Re-sign every rewritten commit")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    let screen = term.screen();
-    assert!(screen.contains("Re-sign only the commits that were signed"));
-    assert!(screen.contains("Re-sign every rewritten commit"));
     // Apply while the question is open does nothing: no preview exists and
     // the question keeps the keyboard.
     term.send_keys("C-s").unwrap();
@@ -398,28 +415,18 @@ fn choosing_to_re_sign_without_gpg_says_what_is_missing() {
 fn the_log_menu_opens_the_workbench_from_the_clicked_commit() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "pty-rewrite-menu");
-    let (col, row) = term.wait_for_text("first by old", STEP).unwrap();
-    term.right_click(col + 1, row)
-        .expect("right-click the commit");
-    let menu = term
-        .wait_for("the commit menu with the submenu", STEP, |s| {
-            s.contains("Rewrite history")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = menu.find("Rewrite history").unwrap();
-    term.click(c + 1, r).expect("click Rewrite history");
-    let menu = term
-        .wait_for("the submenu rows", STEP, |s| {
-            s.contains("From this commit to HEAD...") && s.contains("Open the workbench...")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = menu.find("From this commit to HEAD...").unwrap();
-    term.click(c + 1, r)
-        .expect("click From this commit to HEAD");
-    term.wait_for("the workbench scoped after the parent", STEP, |s| {
-        s.contains("Rewrite history") && s.contains("Only commits after")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    common::right_click_text_until(&mut term, "first by old", "the commit menu", |s| {
+        s.contains("Rewrite history")
+    });
+    common::click_text_until(&mut term, "Rewrite history", "the submenu rows", |s| {
+        s.contains("From this commit to HEAD...") && s.contains("Open the workbench...")
+    });
+    common::click_text_until(
+        &mut term,
+        "From this commit to HEAD...",
+        "the workbench scoped after the parent",
+        |s| s.contains("Rewrite history") && s.contains("Only commits after"),
+    );
 }
 
 /// A repository whose tip (by old@example.com) is signed with a generated

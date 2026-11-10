@@ -45,9 +45,20 @@ fn wait_until(what: &str, mut ok: impl FnMut() -> bool) {
     }
 }
 
+/// `git` with the args, retried while it fails: a ref swap in flight (the
+/// rewrite's apply or undo) can fail one read.
+fn git_settled(repo: &FixtureRepo, args: &[&str]) -> String {
+    for _ in 0..100 {
+        if let Some(out) = repo.try_git(args) {
+            return out;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    repo.git(args)
+}
+
 fn history_with_token(repo: &FixtureRepo) -> bool {
-    repo.git(&["log", "HEAD", "-p", "--format=%s"])
-        .contains(TOKEN)
+    git_settled(repo, &["log", "HEAD", "-p", "--format=%s"]).contains(TOKEN)
 }
 
 /// No screen of this test may hold any part of the value past the redacted
@@ -84,65 +95,65 @@ fn a_planted_token_is_found_shown_redacted_removed_and_undone() {
             .into_iter()
             .find(|&(_, row)| row == tabs_row)
     };
-    let screen = term
-        .wait_for("the workbench with its tab strip", STEP, |s| {
-            s.contains("Rewrite history")
-                && s.contains("Add a rule to start")
-                && on_tabs_row(s).is_some()
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-
-    // The Secrets tab by a click on its name (on the tabs' row).
-    let (tab_col, tabs_row) = on_tabs_row(&screen).expect("the Secrets tab");
-    term.click(tab_col + 1, tabs_row).expect("click Secrets");
-    let screen = term
-        .wait_for("the Secrets tab", STEP, |s| {
-            s.contains("rotate it first") && s.contains("Scan for secrets")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(screen.contains("not exhaustive"), "{}", screen.text());
-
-    // Scan with the button.
-    let (c, r) = screen.find("Scan for secrets").unwrap();
-    term.click(c + 1, r).expect("click Scan for secrets");
-    let screen = term
-        .wait_for("the finding and its remove button", STEP, |s| {
-            s.contains("GitHub token") && s.contains("Remove from history (1)")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(screen.contains("config.env"), "{}", screen.text());
-    let preview = format!("ghp_****{}", &TOKEN[TOKEN.len() - 4..]);
-    assert!(
-        screen.contains(&preview),
-        "the redacted preview {preview}\n{}",
-        screen.text()
-    );
-    assert_no_value(&term);
-    assert!(
-        screen.contains("Remove from history (1)"),
-        "{}",
-        screen.text()
-    );
-
-    // Remove: the rule is added; the tab still shows no value.
-    let (c, r) = screen.find("Remove from history (1)").unwrap();
-    term.click(c + 1, r).expect("click Remove from history");
-    term.wait_for("the rule in the list", STEP, |s| {
-        s.contains("1 Search and replace") || s.contains("Rule 1 will remove 1 finding")
+    term.wait_for("the workbench with its tab strip", STEP, |s| {
+        s.contains("Rewrite history")
+            && s.contains("Add a rule to start")
+            && on_tabs_row(s).is_some()
     })
     .unwrap_or_else(|e| panic!("{e}"));
+
+    // The Secrets tab by a click on its name (on the tabs' row), retried: a
+    // click located on a torn frame can land nowhere.
+    common::retry_until(
+        &mut term,
+        "the Secrets tab",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((tab_col, tabs_row)) = on_tabs_row(&t.screen()) {
+                t.click(tab_col + 1, tabs_row).expect("click Secrets");
+            }
+        },
+        |s| {
+            s.contains("rotate it first")
+                && s.contains("Scan for secrets")
+                && s.contains("not exhaustive")
+        },
+    );
+
+    // Scan with the button.
+    let preview = format!("ghp_****{}", &TOKEN[TOKEN.len() - 4..]);
+    let screen = common::click_text_until(
+        &mut term,
+        "Scan for secrets",
+        "the finding, its redacted preview and its remove button",
+        |s| {
+            s.contains("GitHub token")
+                && s.contains("Remove from history (1)")
+                && s.contains("config.env")
+                && s.contains(&preview)
+        },
+    );
+    assert_no_value(&term);
+    let _ = screen;
+
+    // Remove: the rule is added; the tab still shows no value.
+    common::click_text_until(
+        &mut term,
+        "Remove from history (1)",
+        "the rule in the list",
+        |s| s.contains("1 Search and replace") || s.contains("Rule 1 will remove 1 finding"),
+    );
     assert_no_value(&term);
 
     // Preview: the usual counts; nothing was changed by it.
     term.send_keys("F5").unwrap();
-    let screen = term
-        .wait_for("the summary", STEP, |s| s.contains("keep their id"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        screen.contains("2 of 3") || screen.contains("2 commits"),
-        "the commits holding the token change\n{}",
-        screen.text()
-    );
+    term.wait_for(
+        "the summary: the commits holding the token change",
+        STEP,
+        |s| s.contains("keep their id") && (s.contains("2 of 3") || s.contains("2 commits")),
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_no_value(&term);
     assert!(history_with_token(&repo), "the preview changes nothing");
 

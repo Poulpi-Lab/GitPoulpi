@@ -45,10 +45,21 @@ fn wait_until(what: &str, mut ok: impl FnMut() -> bool) {
     }
 }
 
+/// `git` with the args, retried while it fails: a ref swap in flight (the
+/// rewrite's apply or undo) can fail one read.
+fn git_settled(repo: &FixtureRepo, args: &[&str]) -> String {
+    for _ in 0..100 {
+        if let Some(out) = repo.try_git(args) {
+            return out;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    repo.git(args)
+}
+
 /// Whether the big file's content is reachable from HEAD.
 fn history_has_the_dump(repo: &FixtureRepo) -> bool {
-    repo.git(&["log", "HEAD", "--format=", "--name-only"])
-        .contains("dump/big.sql")
+    git_settled(repo, &["log", "HEAD", "--format=", "--name-only"]).contains("dump/big.sql")
 }
 
 fn open_workbench(repo: &FixtureRepo, session: &str, config: &std::path::Path) -> Terminal {
@@ -76,39 +87,39 @@ fn a_deleted_large_file_is_found_removed_from_history_and_undone() {
     assert!(history_has_the_dump(&repo));
     let config = tempfile::tempdir().expect("temp config dir");
     let mut term = open_workbench(&repo, "pty-rewrite-size", config.path());
-    let screen = term.screen();
 
-    // The Size tab by a click on its name (on the tabs' row).
-    let (_, tabs_row) = screen.find("Summary").expect("the tabs");
-    let (tab_col, _) = screen
-        .find_all("Size")
-        .into_iter()
-        .find(|&(_, row)| row == tabs_row)
-        .expect("the Size tab");
-    term.click(tab_col + 1, tabs_row).expect("click Size");
-    let screen = term
-        .wait_for("the Size tab", STEP, |s| {
-            s.contains("Analyse sizes") && s.contains("Nothing analysed yet")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
+    // The Size tab by a click on its name (on the tabs' row), retried: a
+    // click located on a torn frame can land nowhere.
+    common::retry_until(
+        &mut term,
+        "the Size tab",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let screen = t.screen();
+            if let Some((_, tabs_row)) = screen.find("Summary") {
+                if let Some((tab_col, _)) = screen
+                    .find_all("Size")
+                    .into_iter()
+                    .find(|&(_, row)| row == tabs_row)
+                {
+                    t.click(tab_col + 1, tabs_row).expect("click Size");
+                }
+            }
+        },
+        |s| s.contains("Analyse sizes") && s.contains("Nothing analysed yet"),
+    );
 
     // Analyse with the button.
-    let (c, r) = screen.find("Analyse sizes").unwrap();
-    term.click(c + 1, r).expect("click Analyse sizes");
-    let screen = term
-        .wait_for("the analysis", STEP, |s| {
-            s.contains("kept only by the history") && s.contains("dump/big.sql")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        screen.contains("deleted"),
-        "the file left HEAD\n{}",
-        screen.text()
-    );
-    assert!(
-        screen.contains("kept only by the history"),
-        "{}",
-        screen.text()
+    common::click_text_until(
+        &mut term,
+        "Analyse sizes",
+        "the analysis: the file left HEAD, kept only by the history",
+        |s| {
+            s.contains("kept only by the history")
+                && s.contains("dump/big.sql")
+                && s.contains("deleted")
+        },
     );
 
     // Tick the row, then "Remove from history".
@@ -116,39 +127,36 @@ fn a_deleted_large_file_is_found_removed_from_history_and_undone() {
     // in the Log's file list beside the workbench. A click sent as soon as
     // the row is drawn can race its hit target, so it is retried until the
     // row is ticked (and never once it is, which would untick it).
-    let mut screen = screen;
-    for _ in 0..6 {
-        if screen.contains("Remove from history (1)") {
-            break;
-        }
-        let (_, tabs_row) = screen.find("Summary").expect("the tabs");
-        let (c, r) = screen
-            .find_all("deleted")
-            .into_iter()
-            .filter(|&(_, row)| row > tabs_row)
-            .min_by_key(|&(col, _)| col)
-            .expect("the deleted row");
-        term.click(c + 1, r).expect("click the row");
-        if let Ok(ticked) = term.wait_for("the row ticked", Duration::from_secs(5), |s| {
+    common::retry_until(
+        &mut term,
+        "the row ticked",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if screen.contains("Remove from history (1)") {
+                return;
+            }
+            let Some((_, tabs_row)) = screen.find("Summary") else {
+                return;
+            };
+            if let Some((c, r)) = screen
+                .find_all("deleted")
+                .into_iter()
+                .filter(|&(_, row)| row > tabs_row)
+                .min_by_key(|&(col, _)| col)
+            {
+                t.click(c + 1, r).expect("click the row");
+            }
+        },
+        |s| {
             s.contains("Remove from history (1)")
-        }) {
-            screen = ticked;
-        } else {
-            screen = term.screen();
-        }
-    }
-    assert!(
-        screen.contains("Remove from history (1)"),
-        "the row was never ticked\n{}",
-        screen.text()
+                && (s.contains("free up to about") || s.contains("frees up to about"))
+        },
     );
-    assert!(screen.contains("free up to about") || screen.contains("frees up to about"));
-    let (c, r) = screen.find("Remove from history (1)").unwrap();
-    term.click(c + 1, r).expect("click Remove from history");
-    term.wait_for("the rule", STEP, |s| {
+    common::click_text_until(&mut term, "Remove from history (1)", "the rule", |s| {
         s.contains("Rule 1 will remove 1 path")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    });
 
     // Preview: nothing is changed by it. Apply: the file leaves the history.
     term.send_keys("F5").unwrap();

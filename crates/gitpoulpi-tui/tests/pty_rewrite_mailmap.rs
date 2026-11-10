@@ -83,12 +83,10 @@ fn wait_until(what: &str, mut ok: impl FnMut() -> bool) {
 fn merging_two_identities_shows_one_name_in_the_log_and_undo_brings_the_other_back() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "pty-mailmap-merge");
-    let log = term.screen();
-    assert!(
-        log.contains("Alec Old"),
-        "the Log shows the stored author names\n{}",
-        log.text()
-    );
+    term.wait_for("the Log shows the stored author names", STEP, |s| {
+        s.contains("Alec Old")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     let tip = repo.git(&["rev-parse", "HEAD"]);
 
     // Palette: the workbench opens on the Identities tab and lists the pairs.
@@ -237,31 +235,34 @@ fn an_author_rule_on_pushed_commits_offers_the_mailmap_and_opens_the_tab_with_th
     .unwrap_or_else(|e| panic!("{e}"));
 
     term.send_keys("F5").unwrap();
-    let summary = term
-        .wait_for("the summary with the offer", STEP, |s| {
-            s.contains("keep their id") && s.contains("Use .mailmap instead?")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        summary.contains("A .mailmap fixes the display without rewriting."),
-        "{}",
-        summary.text()
-    );
+    term.wait_for("the summary with the offer", STEP, |s| {
+        s.contains("keep their id")
+            && s.contains("Use .mailmap instead?")
+            && s.contains("A .mailmap fixes the display without rewriting.")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
 
     // The button, by mouse: the Identities tab with old@example.com ticked.
     // The sentence above the button says "Use .mailmap instead?" too: the
     // button is the lower of the two.
-    let (c, r) = summary
-        .find_all("Use .mailmap")
-        .into_iter()
-        .max_by_key(|(_, r)| *r)
-        .expect("the button");
-    term.click(c + 1, r).expect("click Use .mailmap");
-    let tab = term
-        .wait_for("the Identities tab with the match ticked", STEP, |s| {
-            s.contains("Old Name <old@example.com>") && s.contains("1 of 2 selected")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a button located on a torn frame can take the click nowhere.
+    let tab = common::retry_until(
+        &mut term,
+        "the Identities tab with the match ticked",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t
+                .screen()
+                .find_all("Use .mailmap")
+                .into_iter()
+                .max_by_key(|(_, r)| *r)
+            {
+                t.click(c + 1, r).expect("click Use .mailmap");
+            }
+        },
+        |s| s.contains("Old Name <old@example.com>") && s.contains("1 of 2 selected"),
+    );
     assert!(!repo.root().join(".mailmap").exists(), "{}", tab.text());
     // Merge into... offers the identity the rule would set, though no
     // commit has it yet.

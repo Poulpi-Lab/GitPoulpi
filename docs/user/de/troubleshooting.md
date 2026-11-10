@@ -41,7 +41,7 @@ Die Schaltfläche **Aktivität** am rechten Ende der Statuszeile (eine Zahl dara
 
 **Protokoll leeren** (`x`, oder der Palettenbefehl `Aktivitätsprotokoll: Anwendungsprotokoll leeren`) steht auf dem Tab **Anwendung**: es fragt zuerst nach und leert dann die Protokolldateien aller aufbewahrten Tage und die Liste auf dem Bildschirm. Das lässt sich nicht rückgängig machen und steht nicht im Undo-Verlauf.
 
-- **Git-Vorgänge** (der Tab, auf dem sich das Fenster öffnet): die Vorgänge, neueste zuerst, jeder mit der Zeit, zu der er lief, und der Dauer (`Push - 123 ms`): Repository öffnen, Commit-Graph laden, Fetch, Pull, Push, Commit, Checkout, Merge, Rebase, Stash, Klonen. Fehlschläge, Statusmeldungen, ein fehlgeschlagener Klon und das Fetch all eines Workspaces stehen hier ebenfalls; `Enter` oder ein Klick öffnet einen Eintrag (sein Grund, nächster Schritt, Befehl, Exit-Code und seine Ausgabe), `c` oder seine Schaltfläche Kopieren kopiert ihn, `r` oder seine Schaltfläche führt den vorgeschlagenen Schritt aus. `Tab` (oder hier `Left`/`Right`) wechselt zum Tab Anwendung.
+- **Git-Vorgänge** (der Tab, auf dem sich das Fenster öffnet): die Vorgänge, neueste zuerst, jeder mit der Zeit, zu der er lief, und der Dauer (`Push - 123 ms`): Repository öffnen, Commit-Graph laden, Fetch, Pull, Push, Commit, Checkout, Merge, Rebase, Stash, Klonen. Fehlschläge, Statusmeldungen, ein fehlgeschlagener Klon und das Fetch all eines Workspaces stehen hier ebenfalls; `Enter` oder ein Klick öffnet einen Eintrag (sein Grund, nächster Schritt, Befehl, Exit-Code und seine Ausgabe), `c` oder seine Schaltfläche Kopieren kopiert ihn, `r` oder seine Schaltfläche führt den vorgeschlagenen Schritt aus. `Tab` (oder `p`) wechselt zum Tab Anwendung; `Left`/`Right` scrollen lange Zeilen seitlich.
 
   ![Das Aktivitätsprotokoll, Tab Git-Vorgänge: jeder Vorgang mit seiner Zeit und Dauer, ein fehlgeschlagener Fetch in Rot](../images/activity-log-repository.png)
 
@@ -116,6 +116,30 @@ GitPoulpi nutzt für das Netz den Credential-Helper und den ssh-agent Ihres `git
 zuerst sicher, dass `git fetch` in einem einfachen Terminal funktioniert. Die Tokens für
 GitHub/GitLab für Pull Requests sind getrennt und optional: siehe
 [Hosting und Issue-Tracker](hosting-integration.md).
+
+**Ein Fetch, Pull oder Push scheitert mit „Der konfigurierte Credential-Helper ist fehlgeschlagen“, „Der SSH-Hostschlüssel des Remotes ist noch nicht bekannt“ oder einer abgelehnten Anmeldung, und sein Eintrag im Aktivitätsprotokoll hat eine Schaltfläche „SSH & Zugangsdaten...“.**
+Der Fehler kommt daher, wie sich dieses Repository anmeldet. Die Schaltfläche öffnet
+Einstellungen > SSH & Zugangsdaten, wo Sie für dieses Repository eine andere Quelle wählen:
+die eigenen Helper von git unter Ignorieren der Helper des Repositorys, ein
+Integrationskonto, eine Schlüsseldatei (mit einer Known-Hosts-Datei) oder einen eigenen Helper
+oder Token-Befehl; **Verbindung testen** prüft dann jedes Remote. Bei einem Helper, der nicht
+lief, zeigt `git config --show-origin --get-all credential.helper`, wo er gesetzt ist.
+
+**„GitPoulpi hat das Konto-Token nicht an ... gesendet“.** Das Remote des Repositorys zeigt auf
+einen Server, der nicht die Adresse ist, an die das gewählte Konto gebunden ist (oft eine
+Umschreibung `url.<x>.insteadOf` in der eigenen Konfiguration des Repositorys), daher wurde das
+Token zurückgehalten. Korrigieren Sie das Remote oder wählen Sie auf der Seite eine andere Quelle.
+
+**„Der Token-Befehl dieses Repositorys ist fehlgeschlagen“, „... hat sich geändert, seit Sie es bestätigt haben“, „Die Anmeldung dieses Repositorys kann nicht verwendet werden“.**
+Die Wahl auf der Seite lässt sich nicht ausführen: Der Token-Befehl hat kein Token ausgegeben
+(seine letzten Fehlerzeilen werden zitiert, Geheimnisse entfernt), ein Skript, das er ausführt,
+hat sich geändert, seit Sie ihn bestätigt haben (bestätigen Sie den Befehl auf der Seite erneut),
+oder die Wahl nennt eine Schlüsseldatei oder ein Konto, die es nicht mehr gibt. Jede dieser
+Meldungen hat die Schaltfläche **SSH & Zugangsdaten...**.
+
+**OpenSSH meldet „bad permissions“ für eine Schlüsseldatei.** Andere Konten können den
+Schlüssel lesen. Auf Einstellungen > SSH & Zugangsdaten zeigt die Zeile **Datei mit privatem
+Schlüssel** eine Warnung mit **Auf mein Konto beschränken**.
 
 **„Staging...“ bleibt in der Statuszeile.** Eine Aktualisierung im Hintergrund läuft noch; sie
 verschwindet, wenn sich die Dateiliste aktualisiert. `r` erzwingt eine Aktualisierung.

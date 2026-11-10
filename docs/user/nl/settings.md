@@ -300,9 +300,11 @@ De sleutelpaden gelden voor de volgende overdracht. Een voorvoegsel `~/` beteken
 
 Een elders gemaakte instelling wint altijd van deze paden. De volgorde, hoogste eerst:
 
+0. Een sleutel die voor één repository is gekozen op haar eigen pagina
+   [SSH & inloggegevens](#repositoryspecifiek-ssh--inloggegevens) (de repositoryspecifieke groep).
 1. `GIT_SSH_COMMAND` of `GIT_SSH` in de omgeving waarin GitPoulpi draait.
 2. `core.sshCommand` in de git-configuratie van de repository of je globale git-configuratie. Het item
-   *SSH-sleutel...* van het tabbladmenu schrijft dit voor één repository.
+   *SSH-sleutel...* van het tabbladmenu in oudere versies schreef dit voor één repository; SSH & inloggegevens biedt aan het in GitPoulpi te verplaatsen.
 3. De twee sleutelpaden van deze pagina.
 4. De eigen standaardwaarden van ssh en de agent.
 
@@ -530,6 +532,60 @@ Drie opties staan op het tabblad **Algemeen**.
 | **LFS-filters installeren vóór pull en push** | Voert vóór een pull of push `git lfs install --local` uit als de repository LFS gebruikt en de filters ontbreken. |
 | **git-lfs-programma** | Het gedetecteerde programma `git-lfs` (alleen lezen). |
 | **LFS initialiseren voor deze repository** | Voert nu `git lfs install --local` uit. |
+
+### Repositoryspecifiek: SSH & inloggegevens
+
+`gitpoulpi ui show settings ssh-credentials`. Hoe *deze repository* inlogt, bewaard in de privémap van GitPoulpi: er wordt
+niets naar de repository of naar de configuratie van git geschreven, en het is niet ongedaan te maken (zoals elke instelling).
+Het wordt alleen gebruikt door fetch, pull, push, submodules en LFS van deze repository. De CLI-tegenhanger is
+`gitpoulpi repo-auth` (zie de [CLI-referentie](cli-reference.md)). De pagina is ook bereikbaar via het opdrachtenpalet:
+**Repository: SSH & inloggegevens...**. Er wordt niets verstuurd tot je op **Opslaan** drukt; de pagina vraagt het aan de
+daemon en blokkeert dus nooit.
+
+| Rij | Wat ze doet |
+|---|---|
+| **HTTPS: Inloggen met** | **Systeem** (de eigen helpers van git, de standaard), **GitPoulpi-account** (het token van een integratie; accounts waarvan de host een van de remotes van deze repository is, komen eerst, en de regel eronder zegt wat de laatste tokencontrole vond: ontbrekende en extra rechten), **Credential helper** of **Tokencommando**. |
+| **Git-gebruikersnaam** | Wordt als gebruikersnaam van HTTPS-remotes verstuurd. Met **Systeem** laat het een credential manager een van meerdere opgeslagen accounts kiezen. |
+| **Credential helpers van deze repository negeren** | Alleen **Systeem**. De helpers die de repository voor zichzelf instelt (haar `.git/config`, bestanden die ze insluit) staan eronder, met het bestand waar elk vandaan komt; de helpers van het systeem en de globale helpers blijven werken. |
+| **Helper**, **Commando**, **Hosts**, **Cache (minuten)** | Een commando dat de repository draait om in te loggen. Een *helper* is een credential helper van git; een *tokencommando* drukt een token af (de argumentenlijst wordt op spaties gesplitst, met aanhalingstekens rond een argument met spaties, en getoond onder **Draait als**; er draait geen shell omheen, het draait in de map van de repository). **Hosts** beperkt het tot die hosts (leeg: de host van de hoofdremote); **Cache** is hoe lang een token opnieuw wordt gebruikt (standaard 50 minuten). **Huidige helper van deze repository gebruiken** kopieert de helper die de repository instelt naar het veld. |
+| **SSH: Inloggen met** | **Systeem** (de eigen instelling van ssh, de agent en de standaardsleutels), **Sleutelbestand** of **Accountsleutel** (de sleutel van een integratie). |
+| **Bestand met privésleutel** | Kies een van de sleutels in `~/.ssh` of typ een pad. Alleen deze sleutel wordt aangeboden, aan elke SSH-remote van de repository, submodules inbegrepen. Als andere accounts het sleutelbestand kunnen lezen (een rechtenbit voor groep of anderen op Linux en macOS, een item voor Everyone, Users of Authenticated Users op Windows), zegt een waarschuwing dat OpenSSH zo'n sleutel weigert ("bad permissions") en lost **Beperken tot mijn account** het op (`chmod 600`, of op Windows een DACL alleen voor jouw account en SYSTEM). |
+| **Bestand met bekende hosts**, **Strikte controle van hostsleutels** | Een optioneel bestand met vertrouwde hostsleutels, en het weigeren van een host die er niet in staat. |
+| **ssh-programma** | Het programma dat zal draaien (alleen-lezen). |
+| **Vastgepind in de configuratie van git** | Alleen als deze repository een eigen `core.sshCommand` instelt (de oude pin "SSH-sleutel voor deze repository", die GitPoulpi vroeger schreef). Het commando wordt alleen-lezen getoond. **Naar GitPoulpi verplaatsen** slaat de gelijkwaardige keuze **Sleutelbestand** op en verwijdert dan de pin uit de configuratie van git; het wordt aangeboden als het commando een gewone pin `ssh -i <key>` is, en alleen zolang de pagina geen niet-opgeslagen wijzigingen heeft en haar SSH-keuze nog **Systeem** is. Elk ander commando wordt met een opmerking getoond: bewerk het met `git config`. Het verplaatsen is niet ongedaan te maken, zoals elke instelling hier, en het verwijderen van de pin staat ook niet op de stapel van Ongedaan maken (er gaat niets verloren: de sleutel staat in het profiel). |
+| **Remotes** | Alleen-lezen: elke remote met haar protocol en de identiteit die ze gebruikt. Instellingen die het profiel overschrijft (`core.sshCommand`, `credential.helper`) worden met hun bestand getoond, en een profiel dat niet kan worden gebruikt, zegt waarom. |
+
+Knoppen (elk met een toets: `Tab`/`Left`/`Right` ertussen, `Enter` drukt):
+
+- **Verbinding testen** controleert elke remote met de opgeslagen keuzes, eerst fetch en dan push (er worden geen gegevens
+  verplaatst), en opent een resultatenpaneel: per remote ok of mislukt, de identiteit die antwoordde (de sleutel die de
+  server accepteerde, of het account waarvan het token werd geaccepteerd), de duur en een heldere uitleg van een mislukking.
+  Het draait op de achtergrond, met na een moment een spinner. Het paneel scrolt met `Up`/`Down`, `PgUp`/`PgDn`,
+  `Home`/`End`, het wiel en zijn schuifbalk, en sluit met `Esc` of zijn kruisje. De tegenhanger in het palet is
+  **Repository: Verbinding testen**.
+- **Opslaan** verstuurt de keuzes. **Terugzetten** laat de niet-opgeslagen keuzes vallen. Instellingen sluiten met
+  niet-opgeslagen keuzes vraagt eerst om bevestiging.
+- **Standaard gebruiken** vraagt om bevestiging en vergeet dan het profiel: de helpers van git voor HTTPS en de eigen
+  instelling van ssh voor SSH. De tegenhanger in het palet is **Repository: Standaard inloggegevens gebruiken**, die ook vraagt.
+
+Een **Credential helper** of een **Tokencommando** opslaan vraagt eerst **Dit commando toestaan?**: het commando wordt woord
+voor woord getoond (stuurtekens worden uitgeschreven, lange regels lopen door), met zijn SHA-256 en twee antwoorden, `1`
+**Opslaan en toestaan** en `2` **Annuleren**. Er is geen antwoord gekozen tot je een pijltjestoets of een cijfer indrukt, dus een
+verdwaalde `Enter` doet niets; `Esc`, **Annuleren** en het kruisje van het paneel annuleren allemaal. `PgUp`/`PgDn`/`Home`/`End`
+en de schuifbalk scrollen een lang commando. Is het commando al opgeslagen en ongewijzigd, dan vraagt het opslaan van de andere
+helft van de pagina niet opnieuw.
+
+Een profiel dat niet kan worden gebruikt (een ontbrekend sleutelbestand, een bron die deze versie nog niet draait) laat de
+overdracht mislukken met zijn reden, in plaats van terug te vallen op de eigen identiteit van de machine.
+
+Als het profiel niet helemaal standaard is, eindigt het menu **Push** met een regel die zegt als wie de push inlogt
+(**Logt in als: github-corp (token)** of **SSH-sleutel: work_ed25519**); ze opent deze pagina. Dezelfde regel wordt toegevoegd
+aan de items van fetch, pull en push in het Activiteitenlogboek. Een mislukking die door de keuzes van deze pagina komt (een credential
+helper die niet kon draaien, een SSH-hostsleutel die nog niet bekend is, een geweigerde aanmelding, een tokencommando dat mislukte,
+een token dat niet werd verstuurd omdat de server niet het adres van het account is) toont een knop **SSH & inloggegevens...**
+op haar item in het Activiteitenlogboek (`r` op het item), naast **Integraties openen** als een integratieaccount de bron kan zijn.
+De rij **SSH & inloggegevens...** van het tabbladmenu opent de pagina ook; ze vervangt het oude menu van de pin **SSH-sleutel...**
+en zijn palet-item.
 
 ### Repositoryspecifiek: Gedeeltelijke checkout
 

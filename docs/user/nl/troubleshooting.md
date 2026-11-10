@@ -42,7 +42,7 @@ De knop **Activiteit** aan het rechteruiteinde van de statusbalk (een getal erop
 
 **Log wissen** (`x`, of het palet-commando `Activiteitenlogboek: Applicatielogboek wissen`) staat op het tabblad **Applicatie**: het vraagt eerst om bevestiging en leegt dan de logbestanden van alle bewaarde dagen en de lijst op het scherm. Het is niet ongedaan te maken en staat niet in de geschiedenis van ongedaan maken.
 
-- **Git-bewerkingen** (het tabblad waarop het venster opent): de bewerkingen, nieuwste eerst, elk met het tijdstip waarop het liep en hoe lang het duurde (`Push - 123 ms`): de repository openen, de commit-grafiek laden, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Mislukkingen, statusmeldingen, een mislukte kloon en het Fetch all van een werkruimte staan hier ook; `Enter` of een klik opent er een (de reden, de volgende stap, de opdracht, de exitcode en de uitvoer), `c` of de knop Kopiëren kopieert hem, `r` of zijn knop voert de voorgestelde stap uit. `Tab` (of hier `Left`/`Right`) wisselt naar het tabblad Applicatie.
+- **Git-bewerkingen** (het tabblad waarop het venster opent): de bewerkingen, nieuwste eerst, elk met het tijdstip waarop het liep en hoe lang het duurde (`Push - 123 ms`): de repository openen, de commit-grafiek laden, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Mislukkingen, statusmeldingen, een mislukte kloon en het Fetch all van een werkruimte staan hier ook; `Enter` of een klik opent er een (de reden, de volgende stap, de opdracht, de exitcode en de uitvoer), `c` of de knop Kopiëren kopieert hem, `r` of zijn knop voert de voorgestelde stap uit. `Tab` (of `p`) wisselt naar het tabblad Applicatie; `Left`/`Right` scrollen lange regels zijwaarts.
 
   ![Het activiteitenlogboek, tabblad Git-bewerkingen: elke bewerking met haar tijdstip en duur, een mislukte fetch in rood](../images/activity-log-repository.png)
 
@@ -120,6 +120,31 @@ GitPoulpi gebruikt voor het netwerk de eigen credential helper en ssh-agent van 
 `git`. Zorg dat `git fetch` eerst in een gewone terminal werkt. De tokens van
 GitHub/GitLab voor pull requests staan los daarvan en zijn optioneel: zie
 [Hosting en issuetrackers](hosting-integration.md).
+
+**Een fetch, pull of push mislukt met "De ingestelde helper voor inloggegevens is mislukt", "De SSH-hostsleutel van de remote is nog niet bekend" of een geweigerde aanmelding, en het item in het Activiteitenlogboek heeft een knop "SSH & inloggegevens...".**
+De mislukking komt door hoe deze repository inlogt. De knop opent
+Instellingen > SSH & inloggegevens, waar je een andere bron voor deze
+repository kiest: de eigen helpers van git met de helpers van de repository genegeerd, een
+integratieaccount, een sleutelbestand (met een bestand met bekende hosts), of een eigen helper of
+tokencommando; **Verbinding testen** controleert dan elke remote. Voor een
+helper die niet kon draaien toont `git config --show-origin --get-all
+credential.helper` waar hij is ingesteld.
+
+**"GitPoulpi heeft het accounttoken niet naar ... gestuurd".** De remote van de repository
+wijst naar een server die niet het adres is waaraan het gekozen account is gebonden
+(vaak een herschrijving met `url.<x>.insteadOf` in de eigen configuratie van de repository), dus het
+token werd achtergehouden. Repareer de remote of kies een andere bron op de pagina.
+
+**"Het tokencommando van deze repository is mislukt", "... is veranderd sinds je het bevestigde", "Het inloggen van deze repository kan niet worden gebruikt".**
+De keuzes van de pagina kunnen niet worden uitgevoerd: het tokencommando drukte geen token af
+(zijn laatste foutregels worden aangehaald, met geheimen verwijderd), een script dat het draait
+is veranderd sinds je het bevestigde (bevestig het commando opnieuw op de pagina), of de
+keuze noemt een sleutelbestand of account dat er niet meer is. Elke melding heeft de knop
+**SSH & inloggegevens...**.
+
+**OpenSSH zegt "bad permissions" voor een sleutelbestand.** Andere accounts kunnen de
+sleutel lezen. Op Instellingen > SSH & inloggegevens toont de rij **Bestand met privésleutel** een
+waarschuwing met **Beperken tot mijn account**.
 
 **"stagen..." blijft in de statusbalk staan.** Een vernieuwing op de achtergrond loopt
 nog; hij verdwijnt als de bestandslijst wordt bijgewerkt. `r` forceert een

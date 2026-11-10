@@ -654,9 +654,9 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Remote: Remote fetchen... |  |
 | Remote: Acties voor geselecteerde remote... | `.` |
 | Repository: Gedeeltelijke checkout... |  |
-| Repository: SSH & Credentials... |  |
-| Repository: Test Connection |  |
-| Repository: Use Default Credentials |  |
+| Repository: SSH & inloggegevens... |  |
+| Repository: Verbinding testen |  |
+| Repository: Standaard inloggegevens gebruiken |  |
 | Flow: Menu openen | `Ctrl+G W` |
 | Flow: Branch starten... |  |
 | Flow: Nieuw issue... |  |

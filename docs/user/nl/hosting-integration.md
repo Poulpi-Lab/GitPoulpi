@@ -635,18 +635,23 @@ Als een sleutel is gekoppeld, toont de sectie `title (SHA256:...)` met:
 
 ### SSH-sleutel voor één repository
 
-Om één repository de sleutel van een profiel te laten gebruiken, stelt GitPoulpi
-`core.sshCommand` in op `ssh -i "<key>" -o IdentitiesOnly=yes` in die repository.
-Dit gebeurt nooit automatisch. Open het tabbladmenu (`Ctrl+T`, of rechtsklik op
-het tabblad) en kies **SSH-sleutel...**, of voer de opdracht
-*Repository: SSH-sleutel voor deze repository...* uit. Het menu toont de huidige pin,
-elk profiel dat een privésleutel heeft, en **Vastpinnen opheffen**.
+Om één repository een bepaalde sleutel te laten gebruiken, open je het tabbladmenu (`Ctrl+T`, of
+rechtsklik op het tabblad) en kies je **SSH & inloggegevens...**, of voer je de opdracht
+*Repository: SSH & inloggegevens...* uit, en kies je onder SSH **Sleutelbestand** (of
+**Accountsleutel** voor de sleutel van een integratieprofiel). De keuze wordt in de privémap van
+GitPoulpi bewaard: er wordt niets naar de repository of naar de configuratie van git geschreven.
+Zie [Instellingen](settings.md#repositoryspecifiek-ssh--inloggegevens).
 
-CLI en MCP: `gitpoulpi ssh-command show | set --key <file> | clear`.
+Een repository die nog een eigen `core.sshCommand` heeft, van de vroegere pin
+"SSH-sleutel voor deze repository", toont die op die pagina, alleen-lezen, met
+**Naar GitPoulpi verplaatsen**.
+
+CLI en MCP: `gitpoulpi repo-auth` (de keuze per repository) en, voor de pin `core.sshCommand`
+zelf, `gitpoulpi ssh-command show | set --key <file> | clear`.
 
 De globale sleutel op Instellingen > SSH & inloggegevens (*Pad van privésleutel*, of
-*Sleutelpaar genereren*) geldt voor elke repository zonder pin. Een pin op een repository
-wint ervan.
+*Sleutelpaar genereren*) geldt voor elke repository zonder eigen keuze.
+Het sleutelbestand of de pin van een repository wint ervan.
 
 ## 13b. Branchbescherming, voor het herschrijven van de geschiedenis
 

@@ -67,7 +67,7 @@ tabbladen (de knop voor het [globale zoeken](search.md) staat in de titelbalk).
   sluiten**, **Andere tabbladen sluiten...**, **Tabbladen rechts sluiten...**, **Aan favorieten
   toevoegen** (of **Uit favorieten verwijderen**), **Aan werkruimte toevoegen** (of **Uit
   werkruimte verwijderen**, als je werkruimtes hebt), **Pad kopiëren**, **Openen in ›**,
-  **SSH-sleutel...** en **Gedeeltelijke checkout...**.
+  **SSH & inloggegevens...** en **Gedeeltelijke checkout...**.
 - `Ctrl+PageUp` en `Ctrl+PageDown` wisselen van tabblad. `Ctrl+W` sluit het huidige tabblad. Een middenklik op een tabblad sluit het ook (met dezelfde vraag).
 - `t` (of `Ctrl+N t`) opent de tabbladkiezer, een doorzoekbare lijst van de geopende
   tabbladen.

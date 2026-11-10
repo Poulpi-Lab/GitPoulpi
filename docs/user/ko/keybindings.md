@@ -1151,8 +1151,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 연동: 보안 확인 검토 |  |
 | 앱: 종료 | `q` |
 | 앱: 테마... |  |
-| Conflicts: Edit Base Branch Lists... |  |
-| Conflicts: Base Branches of This Repository... |  |
+| 충돌: 기준 브랜치 목록 편집... |  |
+| 충돌: 이 저장소의 기준 브랜치... |  |
 | 앱: 테마 변경... | `Ctrl+N y` |
 | 앱: 언어 변경... | `Ctrl+N g` |
 | 런처: 바로 가기 만들기 |  |

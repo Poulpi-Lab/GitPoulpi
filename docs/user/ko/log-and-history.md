@@ -175,6 +175,8 @@ fetch, 웹 링크 복사, 기본 리모트로 설정, 그래프에서 숨기기,
 `Esc`는 드래그를 취소합니다. 키보드 대응 기능은 팔레트 명령
 *Refs: 선택한 Ref를 체크아웃한 브랜치에 놓기...*입니다.
 
+**merge 또는 fast-forward.** 대상에 자기만의 commit이 없을 때(끌어온 브랜치가 그저 앞서 있을 때) merge는 대상을 앞으로 옮기기만 할 수도 있습니다. 기본값(설정 > Git > **Merge fast-forward** = *never*, 또는 저장소 자체의 Merge 옵션 페이지 선택)에서는 메뉴 행이 *Merge x → y (merge commit)*로 표시되고 실제 merge commit을 만들어 기록에 브랜치가 남습니다. 단순히 옮기려면 별도의 행 *y을(를) x(으)로 fast-forward*를 쓰세요(일직선 기록을 원하면 대신 *Rebase*를 씁니다). *allowed*에서는 Merge 행이 *(fast-forward)*로, *only*에서는 *(fast-forward만)*으로 표시되며, 브랜치가 갈라졌을 때는 이유와 함께 회색으로 표시됩니다. 같은 행과 레이블이 브랜치 자체 메뉴에도 있으며, `gitpoulpi merge --ff | --no-ff | --ff-only`는 merge마다 따로 고릅니다.
+
 ## commit 메뉴
 
 commit을 오른쪽 클릭하거나 그 위에서 `.`를 누르면 메뉴가 나옵니다.

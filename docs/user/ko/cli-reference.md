@@ -111,7 +111,7 @@
 | `branch set-upstream <branch> <remote/branch>`, `branch unset-upstream <branch>` | 업스트림. |
 | `branch fast-forward <branch> [target]` | fast-forward일 때만 브랜치를 앞으로 옮깁니다. |
 | `checkout <target> [--autostash]` | 브랜치를 전환하거나 commit에서 분리(detach)합니다. |
-| `merge <ref> [--squash] [--autostash]` | 현재 브랜치로 merge합니다. `--squash`는 브랜치의 변경 사항을 스테이징만 하고 commit은 만들지 않습니다(`merge --squash`). 이어서 `commit`을 실행합니다. ref가 움직이지 않으므로 실행 취소할 수 없습니다. |
+| `merge <ref> [--ff \| --no-ff \| --ff-only \| --squash] [--autostash]` | 현재 브랜치로 merge합니다. 플래그가 없으면 fast-forward 설정이 정합니다(저장소 자체의 선택, 없으면 `git.merge_fast_forward`이며 기본값은 `never`: fast-forward가 가능해도 merge commit을 만듭니다). `--ff`는 가능하면 fast-forward하고(git 기본값), `--no-ff`는 항상 merge commit을 만들고, `--ff-only`는 fast-forward하거나 *cannot fast-forward*로 실패하며 아무것도 바꾸지 않습니다. 이 플래그들은 서로 함께 쓸 수 없습니다. JSON이 어느 쪽이었는지 알려 줍니다: `{"FastForwarded": oid}`, `{"Merged": oid}`(merge commit), `"UpToDate"` 또는 `{"Conflicted": [paths]}`. `--squash`는 브랜치의 변경 사항을 스테이징만 하고 commit은 만들지 않습니다(`merge --squash`). 이어서 `commit`을 실행합니다. ref가 움직이지 않으므로 실행 취소할 수 없습니다. merge commit이나 fast-forward는 실행 취소 항목 하나입니다. |
 | `rebase [onto] [--autostash]` | Rebase. 진행 중에는 `--continue`, `--skip`, `--abort`, `--status`. |
 | `rebase <upstream> --interactive --plan <file\|->` | JSON 계획(`[{"commit", "action", "message"}]`, 동작은 `pick`, `reword`, `squash`, `fixup`, `drop`, `edit`, 또는 한 글자 형태 `p`, `r`, `s`, `f`, `d`, `e`. rebase todo 목록처럼 대소문자 무관)으로 하는 비대화형 "대화형" rebase. `--root`, `--onto-commit`, `--autosquash`. `rebase-plan`으로 만듭니다. |
 | `cherry-pick <commits>...` 또는 `cherry-pick --plan <file\|->` | commit을 순서대로 적용합니다(계획: `pick` / `drop` 단계). |

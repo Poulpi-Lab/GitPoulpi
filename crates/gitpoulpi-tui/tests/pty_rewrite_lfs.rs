@@ -77,20 +77,23 @@ fn a_binary_moves_to_lfs_with_a_pointer_in_the_log_and_the_real_file_on_disk() {
 
     // Preview: the counts, the file on the Commits tab, nothing changed.
     term.send_keys("F5").unwrap();
-    let summary = term
-        .wait_for("the summary", STEP, |s| s.contains("keep their id"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        summary.contains("moves to LFS"),
-        "the summary counts the file:\n{}",
-        summary.text()
-    );
-    let (c, r) = summary.find("Commits").expect("the Commits tab");
-    term.click(c + 1, r).expect("click the Commits tab");
-    term.wait_for("the file that becomes a pointer", STEP, |s| {
-        s.contains("moves art.bin to LFS")
+    term.wait_for("the summary counting the file", STEP, |s| {
+        s.contains("keep their id") && s.contains("moves to LFS")
     })
     .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a click placed from a torn frame can land nowhere.
+    common::retry_until(
+        &mut term,
+        "the file that becomes a pointer",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find("Commits") {
+                t.click(c + 1, r).expect("click the Commits tab");
+            }
+        },
+        |s| s.contains("moves art.bin to LFS"),
+    );
     assert_eq!(
         repo.git(&["rev-parse", "HEAD"]),
         tip,
@@ -99,8 +102,11 @@ fn a_binary_moves_to_lfs_with_a_pointer_in_the_log_and_the_real_file_on_disk() {
 
     // Apply.
     term.send_keys("C-s").unwrap();
-    term.wait_for("the result panel", STEP, |s| s.contains("Rewrote 1"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // The whole panel: a torn frame shows the first line before its buttons.
+    term.wait_for("the result panel with its buttons", STEP, |s| {
+        s.contains("Rewrote 1") && s.contains("Purge old history")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     let pointer = repo.git(&["show", "HEAD:art.bin"]);
     assert!(
         pointer.starts_with("version https://git-lfs.github.com/spec/v1\noid sha256:"),
@@ -115,12 +121,19 @@ fn a_binary_moves_to_lfs_with_a_pointer_in_the_log_and_the_real_file_on_disk() {
     assert_eq!(repo.git(&["status", "--porcelain"]), "");
 
     // The Log: the rewritten commit's diff of the file is an LFS pointer.
-    let (c, r) = term.screen().find("Close").expect("the Close button");
-    term.click(c + 1, r).expect("click Close");
-    term.wait_for("the workbench closed", STEP, |s| {
-        !s.contains("Rewrite history")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: the Close button of a torn frame can sit where it is gone.
+    common::retry_until(
+        &mut term,
+        "the workbench closed",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find("Close") {
+                t.click(c + 1, r).expect("click Close");
+            }
+        },
+        |s| !s.contains("Rewrite history"),
+    );
     let (col, row) = term
         .wait_for_text("add art", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
@@ -141,7 +154,7 @@ fn a_binary_moves_to_lfs_with_a_pointer_in_the_log_and_the_real_file_on_disk() {
     // Undo: the old commit and the real blob come back; the file stays real.
     term.send_keys("C-z").unwrap();
     wait_until("the old tip is back", || {
-        repo.git(&["rev-parse", "HEAD"]) == tip
+        repo.try_git(&["rev-parse", "HEAD"]).as_deref() == Some(tip.as_str())
     });
     assert_eq!(repo.git(&["rev-parse", "HEAD:art.bin"]), blob);
     assert_eq!(

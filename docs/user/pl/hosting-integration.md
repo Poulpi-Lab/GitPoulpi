@@ -634,18 +634,25 @@ Gdy klucz jest dołączony, sekcja pokazuje `title (SHA256:...)` z:
 
 ### Klucz SSH dla jednego repozytorium
 
-Aby jedno repozytorium używało klucza profilu, GitPoulpi ustawia w nim
-`core.sshCommand` na `ssh -i "<key>" -o IdentitiesOnly=yes`. Nigdy nie dzieje
-się to automatycznie. Otwórz menu karty (`Ctrl+T` lub prawy przycisk na karcie)
-i wybierz **Klucz SSH...** albo uruchom polecenie palety
-*Repozytorium: Klucz SSH dla tego repozytorium...*. Menu pokazuje bieżące
-przypięcie, każdy profil mający klucz prywatny i **Wyczyść przypięcie**.
+Aby jedno repozytorium używało określonego klucza, otwórz menu karty (`Ctrl+T`
+lub prawy przycisk na karcie) i wybierz **SSH i poświadczenia...** albo uruchom
+polecenie palety *Repozytorium: SSH i poświadczenia...*, a pod SSH wybierz
+**Plik klucza** (lub **Klucz konta** dla klucza profilu integracji). Wybór jest
+przechowywany w prywatnym folderze GitPoulpi: nic nie jest zapisywane w
+repozytorium ani w konfiguracji gita. Zob.
+[Ustawienia](settings.md#ustawienia-repozytorium-ssh-i-poświadczenia).
 
-CLI i MCP: `gitpoulpi ssh-command show | set --key <file> | clear`.
+Repozytorium, które nadal ma własne `core.sshCommand` z dawnego przypięcia „Klucz
+SSH dla tego repozytorium”, pokazuje je na tej stronie, tylko do odczytu, z
+przyciskiem **Przenieś do GitPoulpi**.
+
+CLI i MCP: `gitpoulpi repo-auth` (wybór dla repozytorium) oraz, dla samego
+przypięcia `core.sshCommand`, `gitpoulpi ssh-command show | set --key <file> |
+clear`.
 
 Klucz globalny z Ustawienia > SSH i poświadczenia (*Ścieżka klucza
 prywatnego* lub *Generuj parę kluczy*) obowiązuje każde repozytorium bez
-przypięcia. Przypięcie repozytorium wygrywa z nim.
+własnego wyboru. Plik klucza lub przypięcie repozytorium wygrywa z nim.
 
 ## 13b. Ochrona gałęzi przy przepisywaniu historii
 

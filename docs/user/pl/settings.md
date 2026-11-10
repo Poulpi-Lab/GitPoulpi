@@ -307,10 +307,13 @@ domowy.
 Ustawienie zrobione gdzie indziej zawsze wygrywa ze ścieżkami z tej strony.
 Kolejność, od najwyższego priorytetu:
 
+0. Klucz wybrany dla jednego repozytorium na jego własnej stronie
+   [SSH i poświadczenia](#ustawienia-repozytorium-ssh-i-poświadczenia) (grupa ustawień repozytorium).
 1. `GIT_SSH_COMMAND` lub `GIT_SSH` w środowisku, w którym działa GitPoulpi.
 2. `core.sshCommand` w konfiguracji git repozytorium lub w globalnej
-   konfiguracji git. Pozycja *Klucz SSH...* w menu karty zapisuje to dla jednego
-   repozytorium.
+   konfiguracji git. Pozycja *Klucz SSH...* w menu karty starszych wersji
+   zapisywała to dla jednego repozytorium, a SSH i poświadczenia oferuje
+   przeniesienie tego do GitPoulpi.
 3. Dwie ścieżki kluczy z tej strony.
 4. Własne domyślne ustawienia ssh i agent.
 
@@ -540,6 +543,58 @@ Trzy opcje są na karcie **Ogólne**.
 | **Instaluj filtry LFS przed pull i push** | Przed pull lub push uruchamia `git lfs install --local`, gdy repozytorium używa LFS, a jego filtrów brakuje. |
 | **Program git-lfs** | Wykryty program `git-lfs` (tylko do odczytu). |
 | **Zainicjuj LFS dla tego repozytorium** | Uruchamia teraz `git lfs install --local`. |
+
+### Ustawienia repozytorium: SSH i poświadczenia
+
+`gitpoulpi ui show settings ssh-credentials`. Jak *to repozytorium* się loguje, przechowywane w prywatnym folderze
+GitPoulpi: nic nie jest zapisywane w repozytorium ani w konfiguracji gita, a zmiany nie można cofnąć (jak żadnego
+ustawienia). Używają tego tylko fetch, pull, push, podmoduły i LFS tego repozytorium. Odpowiednik w CLI to
+`gitpoulpi repo-auth` (zob. [Dokumentacja CLI](cli-reference.md)). Stronę otwiera też paleta poleceń:
+**Repozytorium: SSH i poświadczenia...**. Nic nie jest wysyłane, dopóki nie naciśniesz **Zapisz**; strona pyta demona,
+więc nigdy nie blokuje.
+
+| Wiersz | Co robi |
+|---|---|
+| **HTTPS: Loguj przez** | **System** (własni pomocnicy gita, domyślnie), **Konto GitPoulpi** (token integracji; konta, których host jest jednym ze zdalnych repozytoriów tego repozytorium, są na początku, a wiersz pod spodem mówi, co wykazało ostatnie sprawdzenie tokenu: brakujące i nadmiarowe zakresy), **Pomocnik poświadczeń** lub **Polecenie tokenu**. |
+| **Nazwa użytkownika gita** | Wysyłana jako nazwa użytkownika zdalnych repozytoriów HTTPS. Z **System** pozwala menedżerowi poświadczeń wybrać jedno z kilku zapisanych kont. |
+| **Ignoruj pomocników poświadczeń ustawionych przez to repozytorium** | Tylko **System**. Pomocnicy, których repozytorium ustawia samo (jego `.git/config` i dołączane pliki), są wypisani pod spodem z plikiem, z którego pochodzą; pomocnicy systemowi i globalni nadal działają. |
+| **Pomocnik**, **Polecenie**, **Hosty**, **Pamięć podręczna (minuty)** | Polecenie, które repozytorium uruchamia, by się zalogować. *Pomocnik* to pomocnik poświadczeń gita; *polecenie tokenu* wypisuje token (lista argumentów jest dzielona po spacjach, z cudzysłowem wokół argumentu ze spacjami, i pokazana pod **Uruchamiane jako**; żadna powłoka go nie uruchamia, działa w folderze repozytorium). **Hosty** ogranicza je do tych hostów (puste: host głównego zdalnego repozytorium); **Pamięć podręczna** to czas ponownego użycia tokenu (domyślnie 50 minut). **Użyj obecnego pomocnika tego repozytorium** kopiuje do pola pomocnika, którego ustawia repozytorium. |
+| **SSH: Loguj przez** | **System** (własna konfiguracja ssh, agent i domyślne klucze), **Plik klucza** lub **Klucz konta** (klucz integracji). |
+| **Plik klucza prywatnego** | Wybierz jeden z kluczy znalezionych w `~/.ssh` albo wpisz ścieżkę. Podawany jest tylko ten klucz, każdemu zdalnemu repozytorium SSH tego repozytorium, także podmodułom. Gdy inne konta mogą czytać plik klucza (bit uprawnień dla grupy lub innych na Linuksie i macOS, wpis dla Everyone, Users lub Authenticated Users na Windows), ostrzeżenie mówi, że OpenSSH odrzuca taki klucz („bad permissions”), a **Ogranicz do mojego konta** to naprawia (`chmod 600`, a na Windows DACL tylko dla twojego konta i SYSTEM). |
+| **Plik znanych hostów**, **Ścisła kontrola klucza hosta** | Opcjonalny plik zaufanych kluczy hostów oraz odrzucanie hosta, którego w nim nie ma. |
+| **Program ssh** | Program, który zostanie uruchomiony (tylko do odczytu). |
+| **Przypięty w konfiguracji gita** | Tylko gdy to repozytorium ustawia własne `core.sshCommand` (dawne przypięcie „Klucz SSH dla tego repozytorium”, które GitPoulpi kiedyś zapisywał). Polecenie jest pokazane tylko do odczytu. **Przenieś do GitPoulpi** zapisuje równoważny wybór **Plik klucza**, a potem usuwa przypięcie z konfiguracji gita; jest dostępne, gdy polecenie to zwykłe przypięcie `ssh -i <klucz>`, i tylko gdy strona nie ma niezapisanych zmian, a jej wybór SSH to nadal **System**. Każde inne polecenie jest pokazane z uwagą: edytuj je przez `git config`. Przeniesienia nie można cofnąć, jak każdego ustawienia tutaj, a usunięcie przypięcia też nie trafia na stos cofania (nic nie ginie: klucz jest w profilu). |
+| **Zdalne repozytoria** | Tylko do odczytu: każde zdalne repozytorium z protokołem i tożsamością, której użyje. Ustawienia zastępowane przez profil (`core.sshCommand`, `credential.helper`) są wypisane z plikiem, a profil, którego nie można użyć, mówi dlaczego. |
+
+Przyciski (każdy ma klawisz: `Tab`/`Left`/`Right` między nimi, `Enter` naciska):
+
+- **Testuj połączenie** sprawdza każde zdalne repozytorium z zapisanymi wyborami, najpierw fetch, potem push (żadne dane
+  się nie przesyłają), i otwiera panel wyników: dla każdego zdalnego repozytorium ok lub błąd, tożsamość, która
+  odpowiedziała (klucz zaakceptowany przez serwer albo konto, którego token przyjęto), czas trwania i zwykły opis
+  niepowodzenia. Działa w tle, ze spinnerem po chwili. Panel przewija się przez `Up`/`Down`, `PgUp`/`PgDn`,
+  `Home`/`End`, kółko i pasek przewijania, a zamyka przez `Esc` lub krzyżyk. Odpowiednik w palecie to
+  **Repozytorium: Testuj połączenie**.
+- **Zapisz** wysyła wybory. **Cofnij zmiany** porzuca niezapisane. Zamknięcie Ustawień z niezapisanymi wyborami najpierw pyta.
+- **Użyj domyślnych** pyta, a potem zapomina profil: pomocnicy gita dla HTTPS i własna konfiguracja ssh dla SSH.
+  Odpowiednik w palecie to **Repozytorium: Użyj domyślnych poświadczeń**, który też pyta.
+
+Zapis **Pomocnika poświadczeń** lub **Polecenia tokenu** najpierw pyta **Zezwolić na to polecenie?**: polecenie jest
+pokazane słowo w słowo (znaki sterujące są wypisane, długie wiersze zawijane), z jego SHA-256 i dwiema odpowiedziami,
+`1` **Zapisz i zezwól** oraz `2` **Anuluj**. Żadna odpowiedź nie jest wybrana, dopóki nie naciśniesz strzałki lub cyfry,
+więc przypadkowy `Enter` nic nie robi; `Esc`, **Anuluj** i krzyżyk panelu anulują. `PgUp`/`PgDn`/`Home`/`End` i pasek
+przewijania przewijają długie polecenie. Jeśli polecenie jest już zapisane i niezmienione, zapis drugiej połowy strony
+nie pyta ponownie.
+
+Profil, którego nie można użyć (brakujący plik klucza, źródło, którego ta wersja jeszcze nie obsługuje), powoduje
+niepowodzenie transferu z podaniem powodu zamiast powrotu do tożsamości komputera.
+
+Gdy profil nie jest w całości domyślny, menu **Push** kończy się wierszem mówiącym, jako kto push się loguje (**Loguje
+jako: github-corp (token)** lub **Klucz SSH: work_ed25519**); otwiera on tę stronę. Ten sam wiersz jest dodawany do wpisów
+Dziennika aktywności dla fetch, pull i push. Niepowodzenie spowodowane wyborami z tej strony (pomocnik poświadczeń, który
+nie mógł się uruchomić, jeszcze nieznany klucz hosta SSH, odrzucone logowanie, polecenie tokenu, które zawiodło, token
+niewysłany, bo serwer nie jest adresem konta) pokazuje na swoim wpisie Dziennika aktywności przycisk **SSH i
+poświadczenia...** (`r` na wpisie), obok **Otwórz Integracje**, gdy źródłem może być konto integracji. Wiersz **SSH i
+poświadczenia...** w menu karty też otwiera stronę; zastępuje dawne menu przypięcia **Klucz SSH...** i jego wpis w palecie.
 
 ### Ustawienia repozytorium: Częściowy checkout
 

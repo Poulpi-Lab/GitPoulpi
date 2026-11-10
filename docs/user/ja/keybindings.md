@@ -616,9 +616,9 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | リモート: リモートをFetch... |  |
 | リモート: 選択中のリモートの操作... | `.` |
 | リポジトリ: スパースチェックアウト... |  |
-| Repository: SSH & Credentials... |  |
-| Repository: Test Connection |  |
-| Repository: Use Default Credentials |  |
+| リポジトリ: SSH と認証情報... |  |
+| リポジトリ: 接続テスト |  |
+| リポジトリ: 既定の認証情報を使う |  |
 | Flow: メニューを開く | `Ctrl+G W` |
 | Flow: ブランチを開始... |  |
 | Flow: 新しい Issue... |  |

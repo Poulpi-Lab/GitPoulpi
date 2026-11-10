@@ -484,7 +484,7 @@ tested = "Ouverture d'une image d'exemple dans « {label} »..."
 
 [settings_ssh]
 private_key_path = "Chemin de la clé privée"
-private_key_path_help = { git = "Fichier de clé que {$fetch}, {$pull}, {$push} et clone proposent à ssh (ssh -i <clé> -o IdentitiesOnly=yes). Vide : ssh-agent et votre config ssh comme d'habitude. Ignoré si GIT_SSH_COMMAND ou core.sshCommand (p. ex. Clé SSH pour ce dépôt) est défini. S'applique au prochain transfert.", local = "Fichier de clé que la récupération, le tirage, l'envoi et le clonage proposent à ssh (ssh -i <clé> -o IdentitiesOnly=yes). Vide : ssh-agent et votre config ssh comme d'habitude. Ignoré si GIT_SSH_COMMAND ou core.sshCommand (p. ex. Clé SSH pour ce dépôt) est défini. S'applique au prochain transfert." }
+private_key_path_help = { git = "Fichier de clé que {$fetch}, {$pull}, {$push} et clone proposent à ssh (ssh -i <clé> -o IdentitiesOnly=yes). Vide : ssh-agent et votre config ssh comme d'habitude. Sans effet quand un dépôt choisit sa propre clé (SSH et identifiants), ou quand GIT_SSH_COMMAND ou core.sshCommand est défini. S'applique au prochain transfert.", local = "Fichier de clé que la récupération, le tirage, l'envoi et le clonage proposent à ssh (ssh -i <clé> -o IdentitiesOnly=yes). Vide : ssh-agent et votre config ssh comme d'habitude. Sans effet quand un dépôt choisit sa propre clé (SSH et identifiants), ou quand GIT_SSH_COMMAND ou core.sshCommand est défini. S'applique au prochain transfert." }
 public_key_path = "Chemin de la clé publique"
 public_key_path_help = "Utilisé seulement si le chemin de la clé privée est vide : ssh choisit alors la clé correspondante détenue par ssh-agent (ou une clé matérielle) au lieu de proposer toutes les clés de l'agent. Générer une paire de clés remplit les deux. Même priorité que le chemin de la clé privée."
 key_type = "Type de clé"
@@ -4088,7 +4088,7 @@ hosting_3 = "Créer une {$pr}|Le + de l'en-tête {$PRS}, ou n dans cette section
 hosting_4 = "Tickets|La section TICKETS les liste ; + ou n en crée un. Le menu d'une ligne l'ouvre dans le navigateur ou agit dessus."
 hosting_5 = "Références|Les références de ticket et de {$pr} (#12, !53, ABC-7) dans un message de {$commit} ou un nom de branche sont reconnues. Alt+R dans le formulaire de {$commit} en insère une."
 hosting_6 = "Pastille de la barre d'outils|À gauche de la barre d'outils, une pastille montre la {$pr} de la branche extraite (GH #12, GL !53) ou un « + {$pr_abbr} » estompé pour en démarrer une. Cliquez-la."
-hosting_7 = "Clés SSH|Choisissez une clé SSH par profil (Paramètres > Profils) ou par dépôt (menu de l'onglet > « Clé SSH... »). Les phrases secrètes restent dans votre ssh-agent."
+hosting_7 = "Clés SSH|Choisissez une clé SSH par profil (Paramètres > Profils) ou par dépôt (menu de l'onglet > « SSH et identifiants... »). Les phrases secrètes restent dans votre ssh-agent."
 setup_1 = "Paramètres|Ctrl+, ou l'engrenage. Tab passe de la liste des pages aux options, j / k déplacent, Enter ou Space change une valeur, / ou Ctrl+F cherche dans toutes les options, Esc ferme."
 setup_2 = "Thèmes|Paramètres > Apparence > Thème : sombre, clair, suivre le terminal, ou l'un des nombreux préréglages. Ctrl+N puis une touche change aussi thème, langue et couleurs du graphe sans ouvrir les Paramètres."
 setup_3 = "Langue|Paramètres > Général > Langue propose 17 langues. « Traduire les termes git » décide si les mots propres à git ({$commit}, {$push}...) sont traduits aussi."
@@ -9086,7 +9086,7 @@ argv_label = "Exécutée comme"
 hosts_label = "Hôtes"
 hosts_help = "Noms d'hôtes séparés par des virgules. Vide : l'hôte du distant principal."
 cache_label = "Cache (minutes)"
-cache_help = "Durée de réutilisation d'un jeton affiché. Vide : 50."
+cache_help = "Durée de réutilisation d'un jeton affiché. Laissez vide pour 50."
 command_warning = "Cette commande s'exécute sur votre ordinateur à chaque fois que ce dépôt fait un {$fetch} ou un {$push}. N'utilisez qu'une commande que vous avez écrite ou à laquelle vous faites confiance. Si elle se trouve dans le dossier du dépôt, GitPoulpi redemande dès que le fichier change."
 import_helper = "Utiliser l'assistant actuel de ce dépôt"
 import_none = "Ce dépôt ne définit aucun assistant d'identifiants à utiliser."

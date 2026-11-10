@@ -86,7 +86,7 @@ sous le pointeur. La ligne d'onglets ne porte que des onglets (le bouton de
   l'onglet : **Nouvel onglet**, **Fermer l'onglet**, **Fermer les autres onglets...**, **Fermer les onglets à droite...**,
   **Ajouter aux favoris** (ou **Retirer des favoris**), **Ajouter à l'espace de travail**
   (ou **Retirer de l'espace de travail**, quand vous avez des espaces de travail),
-  **Copier le chemin**, **Ouvrir dans ›**, **Clé SSH...** et **Extraction partielle...**.
+  **Copier le chemin**, **Ouvrir dans ›**, **SSH et identifiants...** et **Extraction partielle...**.
 - `Ctrl+PageUp` et `Ctrl+PageDown` changent d'onglet. `Ctrl+W` ferme l'onglet
   courant. Un clic du milieu sur un onglet le ferme aussi (avec la même question).
 - `t` (ou `Ctrl+N t`) ouvre le sélecteur d'onglets, une liste filtrable des

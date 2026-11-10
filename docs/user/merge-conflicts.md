@@ -158,6 +158,12 @@ in the log), so your files, index and refs are untouched.
 - **When it runs**: in the background, about 2 seconds after the repository goes quiet (a commit, a checkout, a
   fetch that moved a branch, a rebase), once per `(HEAD, base)` pair. The strip hides as soon as HEAD moves and comes
   back, or not, with the new answer. A detached HEAD is not checked.
+- **Base branch lists**: where a repository's Base branches come from is a choice on its **Conflict prevention**
+  page. **Default** follows the global default (the built-in `**`, every branch, until you pick another list in
+  Settings > General > Conflict prevention); **List: <name>** follows one of your named lists; **Own list** is a list
+  of its own. Lists are shared: edit one and every repository that follows it uses the change at the next check, no
+  restart. **Save as list...** turns a repository's own patterns into a named list, **Reset to default** drops the
+  repository's choice. Deleting a list a repository follows makes it use the default.
 - **Off**: **Enable proactive conflict detection** in Settings > General, or for one repository on its **Conflict
   prevention** page. From a script, `gitpoulpi conflicts check` prints the same answer as JSON ([CLI
   reference](cli-reference.md)).

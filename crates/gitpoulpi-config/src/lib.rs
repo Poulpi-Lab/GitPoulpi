@@ -48,7 +48,8 @@ pub use repo_data::{
 pub use schema::{default_clone_root, home_dir, CLONE_START_LAST, CLONE_START_URL};
 pub use schema::{
     read_quantity, AutoCrlf, AutoStashMode, AvatarFallback, AvatarPlacement, AvatarSources,
-    BlameSide, ColorDepth, ColumnResize, CommitCountMethod, ComposerFiles, CredentialsConfig,
+    BaseList, BaseOrigin, BlameSide, ColorDepth, ConflictPreventionConfig, ResolvedBases,
+    BASE_SOURCE_DEFAULT, BASE_SOURCE_LIST, BASE_SOURCE_OWN, ColumnResize, CommitCountMethod, ComposerFiles, CredentialsConfig,
     DefaultBackend, DiffLayout, DisplayUnit, EditorConfig, EditorEol, EolMode, GeneralConfig,
     GitConfig, GraphColorization, GraphLaneBackground, GraphRenderer, GraphRowTintStrength,
     HostingInstance, HttpsMode, ImagePixelatedFrom, ImageProtocol, ImageTextFallback,
@@ -158,6 +159,10 @@ pub struct Config {
     /// What counts as sensitive, and the staging guard: `privacy.*`.
     #[serde(default)]
     pub privacy: PrivacyConfig,
+    /// Named lists of base branch patterns and the default one:
+    /// `conflict_prevention.default_list`, `[conflict_prevention.lists.<name>]`.
+    #[serde(default)]
+    pub conflict_prevention: ConflictPreventionConfig,
 }
 
 /// What [`Config::profile_for`] needs of a workspace: its default profile id
@@ -572,6 +577,47 @@ pub fn set_list_in_file<T: serde::Serialize>(path: &Path, key: &str, items: &[T]
 /// `open_in = []`: an empty list the user chose is not "not configured yet".
 pub fn set_open_in_in_file(path: &Path, entries: Option<&[OpenInEntry]>) -> Result<()> {
     set_entries_in_file(path, "ui.open_in", entries)
+}
+
+/// Replaces the whole `[conflict_prevention]` section (the default list's name
+/// and every named list) in the document at `path`, keeping everything else.
+/// A section equal to the default is removed rather than written empty.
+pub fn set_conflict_prevention_in_file(
+    path: &Path,
+    section: &ConflictPreventionConfig,
+) -> Result<()> {
+    let raw = if path.exists() {
+        std::fs::read_to_string(path)?
+    } else {
+        String::new()
+    };
+    let mut document: toml::Value = if raw.trim().is_empty() {
+        toml::Value::Table(toml::map::Map::new())
+    } else {
+        toml::from_str(&raw)?
+    };
+    if section.is_default() {
+        remove_dotted(&mut document, "conflict_prevention");
+    } else {
+        insert_dotted(
+            &mut document,
+            "conflict_prevention",
+            toml::Value::try_from(section)?,
+        )?;
+    }
+    let _: Config = document
+        .clone()
+        .try_into()
+        .map_err(|err: toml::de::Error| Error::BadValue {
+            key: "conflict_prevention".to_string(),
+            value: "<section>".to_string(),
+            expected: err.to_string(),
+        })?;
+    if let Some(parent) = path.parent() {
+        secure_fs::create_private_dir_all(parent)?;
+    }
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
+    Ok(())
 }
 
 /// [`set_open_in_in_file`] for `[[ui.image_editors]]`.

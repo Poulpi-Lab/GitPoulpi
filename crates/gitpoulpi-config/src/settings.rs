@@ -59,6 +59,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "general.undo_enabled",
     "general.journal_outside",
     "general.conflict_detection",
+    "conflict_prevention.default_list",
     "general.dev_mode",
     "general.auto_stash",
     "general.keep_submodules_up_to_date",

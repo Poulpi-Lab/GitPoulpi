@@ -177,6 +177,8 @@ Sidlistan har två grupper:
 | **Plats för repositorydata** | Var GitPoulpi lagrar sina data per repository (`session.per_repo_state_dir`): **Inuti .git** (standard: inget dyker upp i din arbetskatalog och alla worktrees delar det), **I arbetskatalogen** (en mapp `.gitpoulpi`; krävs för att checka in en `workflow.toml` för teamet) eller **I min användardatamapp** (utanför repositoryt). En mapp `.gitpoulpi` som en äldre version lämnat flyttas till den nya platsen första gången den behövs och tas bort när den är tom; en fil som git spårar (en incheckad `workflow.toml`) flyttas eller raderas aldrig och förblir läsbar. |
 | **Standardnamn på gren** | Den första grenen i ett repository du skapar med Init. Tomt: git bestämmer. Den byter inte namn på någon befintlig gren. |
 | **Aktivera proaktiv konfliktdetektering** | På som standard (`general.conflict_detection`). Varnar i Log när en merge av den aktuella grenen i grenen den startade från skulle ge konflikter, innan du försöker. Ett repository kan stänga av den för sig själv på sidan **Konfliktförebyggande**. Se [Lösa merge-konflikter](merge-conflicts.md#konfliktförebyggande). Gäller när Inställningar stängs. |
+| **Standardlista för basgrenar** | Under reglaget, i gruppen **Konfliktförebyggande** (paletten **Konflikter: Redigera listor över basgrenar...** öppnar den). Listan med mönster för basgrenar som repositories använder när de saknar en egen: **Inbyggd (`**`)**, alltså varje gren, eller en av dina namngivna listor (`conflict_prevention.default_list`). Den gäller öppna repositories när Inställningar stängs. **Återställ till inbyggd standard** går tillbaka till `**`. |
+| **Listor över basgrenar** | Också i den gruppen: dina namngivna listor med mönster för basgrenar (`[conflict_prevention.lists.<namn>]`), ett block var med sitt **Namn** (att byta namn behåller den som standard om den var det; ett repository som följde det gamla namnet använder standardlistan tills du väljer den igen), sina **Mönster** (ett per rad, `Enter` eller ett klick öppnar redigeraren, `Ctrl+S` behåller den), **Gör till standard** och **Ta bort listan** (den frågar först, och säger att repositories som följer den använder standardlistan i stället). Skriv ett namn i **Ny lista** och tryck `Enter` för att lägga till en; den börjar med `**`. Att redigera en lista ändrar varje repository som följer den. |
 | **Loggnivå**, **Behåll loggfiler**, **Största storlek för en loggfil** | Programloggen bakom aktivitetsloggen: den mest utförliga nivån som spelas in (`log.level`), hur länge filer sparas (ett heltal och en enhet, dagar, veckor, månader eller år, på en rad: klicka på talet för att skriva det, Upp och Ned stegar det, Tab går till enheten och Enter öppnar dess lista; högst 10 år, standard 1 vecka, `log.retention_days` och `log.retention_unit`) och storleken då en dags fil roteras (ett tal och MiB eller GiB, 1 MiB till 1 GiB, `log.max_file_mb` och `log.max_file_unit`). |
 | **Visa hur lång tid åtgärder tar**, **Utökad loggning** | Fliken Git-åtgärder i aktivitetsloggen: varje åtgärds tid (`log.timings`, på som standard) och även bakgrundsarbetet, uppdatering och auto-fetch (`log.extended`, av som standard). Se [När något misslyckas](troubleshooting.md#aktivitetsloggen). |
 | **Ångra aktiverat**, **Djup på ångrahistoriken**, **Spela in ändringar gjorda utanför GitPoulpi** | Gruppen **Ångrahistorik**. Slår på eller av Ångra och anger hur många operationer det behåller (standard 100, `0` betyder obegränsat). Att stänga av Ångra raderar ångrahistoriken, efter en bekräftelse. Den sista inställningen spelar också in vad ett skal eller en agent gör med grenar, taggar, stashar och HEAD. Se [Ångra och gör om](undo-redo.md). |
@@ -534,6 +536,7 @@ Tre alternativ finns på fliken **Allmänt**.
 | **Git-backend** | `git2` (libgit2, standard) eller `system` (ditt installerade `git`). Global. Gäller för daemons som startas efter ändringen. |
 | **Pull-knapp** | Vad Pull-knappen gör: merge (fast-forward om möjligt), bara fast-forward, eller rebase. Global. Posterna under `▾` ändrar den inte. |
 | **Push-knapp** | **direkt** pushar genast; **fråga** visar remote-menyn först. Global. |
+| **Fast-forward vid merge** | Vad en merge du startar gör när grenen helt enkelt kunde fast-forwardas: **never** (standard) gör alltid en merge-commit, **allowed** gör fast-forward när det går (gits eget standardbeteende), **only** gör fast-forward eller avvisar. Global (`git.merge_fast_forward`); ett repository åsidosätter den på sin sida [Alternativ för merge](#repo-specifikt-alternativ-för-merge). |
 | **Standardkodning** | Kodningen som används för att visa text som **inte är giltig UTF-8**: filinnehåll, blame, diffar och commit-meddelanden. Sidan har en global rad och en rad för det här repositoryt; repositoryraden vinner. Giltig UTF-8 avkodas aldrig om, och staging omkodar aldrig något. |
 | **core.autocrlf**, **core.eol** | Det här repositoryts egna git-inställningar. Raden skriver `core.autocrlf` eller `core.eol` i repositoryts git-konfiguration. **(ärvd)** tar bort repositoryvärdet, så din globala git-konfiguration gäller. `Ctrl+Z` återställer föregående värde. CLI-motsvarigheten är `gitpoulpi repo-config`. |
 | **Git LFS** | Visar Git LFS i gränssnittet. Se [Git LFS](lfs.md). |
@@ -643,13 +646,32 @@ sin utdata i sin post i aktivitetsloggen (statusraden säger att commiten missly
 
 ### Repo-specifikt: Alternativ för merge
 
-Ett enda reglage, **Squash** (av som standard). När det är på läggs ändringarna från en lokal gren (grenens meny, dra och
+Två inställningar. **Fast-forward** säger vad en merge gör när grenen helt enkelt kunde fast-forwardas:
+
+| Val | En merge du startar... |
+|---|---|
+| **(ärvd)** | följer den globala inställningen **Fast-forward vid merge** på sidan Git (standard **never**). |
+| **never** | gör alltid en merge-commit (`git merge --no-ff`), även när grenen bara ligger före. Commitens första förälder är den gamla spetsen, den andra den mergade grenen, och dess meddelande är gits eget (`Merge branch 'x' into y`). |
+| **allowed** | gör fast-forward när det går och annars en merge-commit (gits standard). |
+| **only** | gör fast-forward, och avvisar med *cannot fast-forward* när grenarna har divergerat (`git merge --ff-only`). |
+
+Den gäller varje merge du startar: grenens meny, dra och släpp, `Merge` i paletten och `gitpoulpi merge` (vars flaggor `--ff`,
+`--no-ff` och `--ff-only` åsidosätter den för en merge). Menyerna säger vad mergen kommer att göra:
+*Merge x i y (merge-commit)*, *(gör fast-forward)* eller *(bara fast-forward)*, och den separata posten
+*Fast-forward y till x* (och dess palettkommando) finns kvar ett handgrepp bort under varje val. En merge-commit är en
+vanlig Ångra-post, som en fast-forward. Flow-åtgärderna väljer sin egen merge-strategi och ignorerar den här inställningen.
+
+Ditt eget val går före gits: en merge som GitPoulpi startar under **never** eller **only** skickar flaggan uttryckligen, så en
+`merge.ff` i repositoryts git-konfiguration åsidosätts. Bara under **allowed** gäller gits `merge.ff` fortfarande, och när repositoryt
+sätter den visar sidan den under raden. (Bara repositoryts egen `.git/config` läses för den raden, inte din globala git-konfiguration.)
+
+**Squash** (av som standard). När det är på läggs ändringarna från en lokal gren (grenens meny, dra och
 släpp, `Merge` i paletten) i indexet utan att göra en merge-commit (`git merge --squash`): commiten överlåts åt dig.
 Commit-formuläret öppnas med gits squash-meddelande (`SQUASH_MSG`, kommentarsraderna borttagna), en gång per
 squash. Efteråt pågår ingenting (ingen `MERGE_HEAD`), så **Avbryt** gäller inte: för att backa ut, förkasta de
 stagade ändringarna. En squash som stoppas av konflikter lämnar dem i Status-rutan som vilken merge med konflikter som helst.
 De stagade ändringarna är inte en Ångra-post (ingen ref flyttades, så det finns inget att återställa); CLI:ts
-`gitpoulpi merge <gren> --squash` gör detsamma, oavsett inställning.
+`gitpoulpi merge <gren> --squash` gör detsamma, oavsett inställning. En squash går före **Fast-forward**.
 
 ### Repo-specifikt: Meddelandemall
 
@@ -675,8 +697,14 @@ Ett meddelande som commit-formuläret börjar med (`gitpoulpi ui show settings c
 - **Aktivera proaktiv konfliktdetektering med målgren**: på som standard. Att avmarkera den stänger av detekteringen
   bara för det här repositoryt; det globala reglaget är **Aktivera proaktiv konfliktdetektering** på sidan Allmänt.
   Båda måste vara på.
-- **Basgrenar** (`**` som standard): grenarna som den aktuella grenen kan ha startat från, ett mönster per rad
-  (`Enter` eller ett klick öppnar redigeraren, `Ctrl+S` behåller den). Mönstertabellen under fältet är referensen:
+- **Basgrenar från**: var det här repositoryts basgrenar kommer från. **Standard** följer den globala standarden
+  (den inbyggda `**`, eller listan som valts under **Standardlista för basgrenar** i Inställningar > Allmänt); **Lista: <namn>**
+  följer en av dina namngivna listor, så att redigera listan ändrar även det här repositoryt; **Egen lista** är en lista för
+  repositoryt självt (att välja den börjar med en kopia av mönstren som gäller). En repositoryfil som skrevs innan det här valet
+  fanns och som har egna mönster läses som **Egen lista**.
+- **Basgrenar** (ett mönster per rad): med **Egen lista** öppnar `Enter` eller ett klick redigeraren och `Ctrl+S` behåller
+  den; med **Standard** eller **Lista** visas mönstren som gäller skrivskyddade. Mönstertabellen under fältet är
+  referensen:
 
   | Mönster | Matchar |
   |---|---|
@@ -687,7 +715,15 @@ Ett meddelande som commit-formuläret börjar med (`gitpoulpi ui show settings c
 
   En lokal gren är bara sitt namn (`main`), en remote-spårande har sin remote framför (`origin/main`). `*` och `?`
   stannar inom ett sökvägssegment, `**` korsar dem. Tomma rader och `#`-kommentarer ignoreras; en lista med enbart
-  uteslutningar betyder ”varje gren utom dessa”. Den lagras i `repo-state.toml` och läses in igen när Inställningar stängs.
+  uteslutningar betyder ”varje gren utom dessa”. Valet lagras i `repo-state.toml` och läses in igen när Inställningar
+  stängs.
+- **Spara som lista...**: skriv ett namn och tryck `Enter`; mönstren som gäller blir en namngiven lista (samma som
+  Inställningar > Allmänt redigerar) och det här repositoryt följer den.
+- **Återställ till standard** (frågar först): tar bort det här repositoryts val, lista och egna mönster; det följer
+  standarden igen.
+- **Använd arbetsflödets basgrenar** (visas när ett [grenarbetsflöde](branching-workflows.md) med basgrenar är
+  inställt för repositoryt): fyller **Egen lista** med de baserna, var och en som lokal gren och som gren på valfri
+  remote (`main` och `*/main`). Den kopierar dem en gång; den följer inte senare ändringar i arbetsflödet.
 
 ### Repo-specifikt: AI
 

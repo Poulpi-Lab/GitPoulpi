@@ -61,7 +61,7 @@ I tabellerna betyder **Omstart** att värdet läses vid start; allt annat gälle
 | `general.startup_tab_launcher` | `"last"` | Fliken som en start öppnar på när GitPoulpi startas från genvägen på skrivbordet eller i Startmenyn som det skapade (den skickar `--launcher`), oavsett mapp: `"home"`, `"last"` eller `"radar"`. Har företräde framför de två inställningarna ovan. `"last"` blir Hem med `remember_tabs` av eller när inget är sparat; `"radar"` blir Hem när Radar är av eller saknas i bygget. Läses en gång vid start; kräver omstart. |
 | `general.group_worktree_tabs` | `true` | Håll flikarna för ett repositorys länkade worktrees direkt efter repositoryts egen flik: när en worktree öppnas, när en worktree-flik dras bort (den hoppar tillbaka intill sin grupp; repositoryts flik är gruppens huvud och dess worktrees följer den) och när inställningen slås på. Av lämnar flikarna där du placerat dem. |
 | `general.undo_depth` | `100` | Hur många operationer Ångra kan gå tillbaka; `0` = obegränsat. |
-| `general.conflict_detection` | `true` | Proaktiv konfliktdetektering: ett märke i Log när en merge av den aktuella grenen i grenen den startade från skulle ge konflikter, beräknat i bakgrunden (en merge i minnet: inget ändras i dina filer, ditt index eller dina refs). Ett repository kan stänga av den för sig själv (`[preferences] conflict_detection`). Se [Lösa merge-konflikter](merge-conflicts.md#konfliktförebyggande). |
+| `general.conflict_detection` | `true` | Proaktiv konfliktdetektering: ett märke i Log när en merge av den aktuella grenen i grenen den startade från skulle ge konflikter, beräknat i bakgrunden (en merge i minnet: inget ändras i dina filer, ditt index eller dina refs). Ett repository kan stänga av den för sig själv (`[preferences] conflict_detection`). Basgrenarna den jämför med har egna listor: [`[conflict_prevention]`](#conflict_prevention-listor-över-basgrenar). Se [Lösa merge-konflikter](merge-conflicts.md#konfliktförebyggande). |
 | `general.dev_mode` | saknas (automatiskt) | För dig som bygger GitPoulpi från en utcheckning; visas aldrig i Inställningar. Saknas: på när den körbara filen som körs ligger i `<checkout>/target/<profile>/` (`Cargo.toml` och `crates/gitpoulpi-tui` bredvid `target`). `true` / `false` tvingar fram läget. Utvecklarläget låser bara upp `ui.launcher_build`. |
 | `general.journal_outside` | `true` | Registrera det ett skal eller en AI-agent gör med grenar, taggar, stashar och HEAD som poster i ångrahistoriken, markerade utanför, så att `Ctrl+Z` kan ta tillbaka det. Ändringar av filer fångas aldrig. Kräver `undo_enabled`. Se [Ångra och gör om](undo-redo.md#ändringar-gjorda-utanför-gitpoulpi). |
 | `general.undo_enabled` | `true` | `false`: ingen bokföring för ångra alls (snabbast), ångrahistoriken raderas, knapparna Ångra/Gör om försvinner. Se [Ångra och gör om](undo-redo.md). |
@@ -260,6 +260,7 @@ Merge-konfliktredigeraren ([Lösa merge-konflikter](merge-conflicts.md)). Instä
 |---|---|---|
 | `git.pull_mode` | `"merge"` | Vad Pull (knappen, `Ctrl+G p`, `Git: Pull`) gör: `merge` (fast-forward när det går), `ff_only`, `rebase`. Skickas alltid uttryckligen till git. Det gamla `fetch_all` läses som `merge`. |
 | `git.push_behavior` | `"direct"` | `direct` pushar till standardremoten; `ask` visar remote-menyn först. |
+| `git.merge_fast_forward` | `"never"` | Vad en merge du startar (grenmenyn, dra och släpp, paletten, `gitpoulpi merge`) gör när grenen kunde fast-forwardas: `never` gör alltid en merge-commit (`--no-ff`), `allowed` gör fast-forward när det går (gits standard, `merge.ff` gäller), `only` gör fast-forward eller avvisar. Ett repositorys eget val (Inställningar > Alternativ för merge, `merge_fast_forward` i dess `repo-state.toml`) går före; CLI:ts `--ff`, `--no-ff` och `--ff-only` går före båda. Direkt. |
 | `git.default_encoding` | `"utf-8"` | Kodning för text som **inte** är giltig UTF-8 (filinnehåll, blame, diffar, commit-meddelanden utan `encoding`-huvud): vilken WHATWG-etikett som helst (`windows-1252`, `shift_jis`, ...). Bara visning; staging kodar aldrig om. Ett repository kan åsidosätta den. |
 | `git.lfs_enabled` | `true` | Visa och styr Git LFS. Ett repository kan åsidosätta den. Se [Git LFS](lfs.md). |
 | `git.lfs_autofix_filters` | `true` | Före en pull eller push av ett repository som använder LFS, installera dess LFS-filter / pre-push-hook (`git lfs install --local`, bara det här repositoryt) när de saknas. Se [Git LFS](lfs.md). |
@@ -516,6 +517,17 @@ En administratör kan ange `mode`, `channel` (som `release_channel`) och `repo`,
 | `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Sökvägsmönster i gitignore-stil. Ett mönster utan `/` matchar filnamnet på vilket djup som helst, ett med `/` hela sökvägen (ett inledande `/` förankrar det i roten); `*` och `?` stannar inom en mapp, `**` korsar mappar; ett `!` tillåter på nytt det ett tidigare mönster matchade och sista träffen gäller; skiftläge ignoreras. Används av stagingskyddet och av `ai.privacy.exclude_sensitive_files`. |
 | `privacy.staging_guard` | `true` | Att stagea en fil som matchar ett mönster, eller vars innehåll har en igenkänd hemlighet, frågar först (TUI), nekas om inte `--allow-sensitive` anges (CLI) eller om inte `mcp.allow_sensitive_staging` låter agenten skicka `allow_sensitive` (MCP). Textfiler upp till 1 MiB var och 32 MiB totalt läses; binärfiler matchas bara på namn. Se [Stage och commit](staging-and-committing.md#känsliga-filer). |
 
+## `[conflict_prevention]` (listor över basgrenar)
+
+Vilka grenar proaktiv konfliktdetektering får ta som bas för den aktuella grenen är en lista med mönster (se [Lösa merge-konflikter](merge-conflicts.md#konfliktförebyggande)). Listor kan ha namn och delas; Inställningar > Allmänt > Konfliktförebyggande redigerar dem.
+
+| Nyckel | Standard | Värden och effekt |
+|---|---|---|
+| `conflict_prevention.default_list` | `""` | Namnet på listan som ett repository använder när det saknar en egen. Tomt, eller ett namn som ingen lista har, betyder den inbyggda `**` (varje gren). Läses in igen vid varje kontroll, så en ändring gäller öppna repositories utan omstart. |
+| `conflict_prevention.lists` | ingen | De namngivna listorna, en tabell var: `[conflict_prevention.lists.release]` med `patterns = ["origin/release/**", "!origin/release/old"]`. Tom `patterns` tillåter varje gren. Att redigera en lista gäller varje repository som följer den. |
+
+Vilken lista ett repository följer finns i dess `repo-state.toml` (nedan). Företräde: repositoryts egna mönster, sedan den namngivna lista det följer, sedan `default_list`, sedan `**`.
+
 ## `[keybindings]`
 
 Binder om TUI:ts genvägar; Inställningar > Tangentbord & mus redigerar den.
@@ -554,7 +566,9 @@ den visas aldrig som en ändring. Skrivs av TUI:t och CLI:t; du redigerar den s�
 | `[preferences] squash_merge` | En merge av en lokal gren gör squash: stagear, ingen merge-commit (av när den saknas) | Inställningar > Repo-specifika inställningar > Alternativ för merge |
 | `[preferences] template_apply`, `template_strip_comments` | Fyll i ett tomt commit-formulär med mallen; ta bort `#`-kommentarsrader när commiten görs (båda av när de saknas) | Inställningar > Repo-specifika inställningar > Meddelandemall |
 | `[preferences] conflict_detection` | Proaktiv konfliktdetektering för det här repositoryt; saknas den gäller `general.conflict_detection` | Inställningar > Repo-specifika inställningar > Konfliktförebyggande |
-| `[preferences] conflict_base_branches` | Mönstren för Basgrenar, ett per rad (`**` när den saknas) | Inställningar > Repo-specifika inställningar > Konfliktförebyggande |
+| `[preferences] conflict_base_branches` | Repositoryts egna mönster för Basgrenar, ett per rad (används fortfarande som **Egen lista**) | Inställningar > Repo-specifika inställningar > Konfliktförebyggande |
+| `[preferences] conflict_base_source` | Var Basgrenar kommer från: `default` (den globala standardlistan), `list` (`conflict_base_list`) eller `own` (`conflict_base_branches`). Saknas den: egna mönster när det finns några, annars standarden | Inställningar > Repo-specifika inställningar > Konfliktförebyggande |
+| `[preferences] conflict_base_list` | Den `[conflict_prevention.lists.<namn>]` som det här repositoryt följer när källan är `list`; en borttagen lista faller tillbaka på standarden | Inställningar > Repo-specifika inställningar > Konfliktförebyggande |
 | `commit-template.txt` (en fil bredvid `repo-state.toml`) | Commit-mallen; gits `commit.template` pekar på den | Inställningar > Repo-specifika inställningar > Meddelandemall |
 | `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: det här repositoryts AI-instruktioner | Inställningar > Repo-specifika inställningar > AI |
 | `[preferences.ai_overrides.<action>]` | `profile`, `instructions` för en åtgärd här | Inställningar > Repo-specifika inställningar > AI |

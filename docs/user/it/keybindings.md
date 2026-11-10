@@ -1162,8 +1162,8 @@ applicano. I tasti sono quelli predefiniti.
 | Integrazioni: Rivedi il controllo di sicurezza |  |
 | App: Esci | `q` |
 | App: Tema... |  |
-| Conflicts: Edit Base Branch Lists... |  |
-| Conflicts: Base Branches of This Repository... |  |
+| Conflitti: Modifica le liste dei branch base... |  |
+| Conflitti: Branch base di questo repository... |  |
 | App: Cambia tema... | `Ctrl+N y` |
 | App: Cambia lingua... | `Ctrl+N g` |
 | Launcher: Crea collegamento |  |

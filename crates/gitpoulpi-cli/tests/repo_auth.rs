@@ -333,7 +333,12 @@ fn token_script_argv(dir: &Path, token: &str) -> Vec<String> {
             .collect()
     } else {
         std::fs::write(&path, format!("echo '{token}'\n")).unwrap();
-        vec!["sh".into(), path.to_string_lossy().into_owned()]
+        // `-e`: a word that starts with a dash belongs to the command too.
+        vec![
+            "sh".into(),
+            "-e".into(),
+            path.to_string_lossy().into_owned(),
+        ]
     }
 }
 

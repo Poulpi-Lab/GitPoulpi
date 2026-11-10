@@ -32,9 +32,9 @@ pub enum RepoAuthAction {
         #[arg(long, value_name = "CMD")]
         helper: Option<String>,
         /// With `--https token-command`: the command and its arguments (the
-        /// first word is the program). Write `--command` last, or put `--`
-        /// before words that start with a dash.
-        #[arg(long, num_args = 1.., value_name = "ARG")]
+        /// first word is the program). Write `--command` last: every word
+        /// after it, dashes included (`sh -c ...`), belongs to the command.
+        #[arg(long, num_args = 1.., allow_hyphen_values = true, value_name = "ARG")]
         command: Vec<String>,
         /// With `helper` or `token-command`: the hosts it may serve
         /// (comma-separated or repeated).

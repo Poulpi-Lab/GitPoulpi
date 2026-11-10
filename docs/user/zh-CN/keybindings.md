@@ -1124,6 +1124,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 集成：查看安全检查 |  |
 | 应用：退出 | `q` |
 | 应用：主题… |  |
+| Conflicts: Edit Base Branch Lists... |  |
+| Conflicts: Base Branches of This Repository... |  |
 | 应用：更改主题… | `Ctrl+N y` |
 | 应用：更改语言… | `Ctrl+N g` |
 | 启动器：创建快捷方式 |  |

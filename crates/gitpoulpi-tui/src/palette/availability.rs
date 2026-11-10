@@ -1070,6 +1070,8 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::Keybindings
         | C::KeybindingsResetAll
         | C::Theme
+        | C::ConflictLists
+        | C::ConflictRepoPage
         | C::ChangeTheme
         | C::ChangeLanguage
         | C::LauncherCreate

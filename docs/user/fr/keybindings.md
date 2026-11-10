@@ -1160,6 +1160,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Intégrations : Revoir le contrôle de sécurité |  |
 | Application : Quitter | `q` |
 | Application : Thème... |  |
+| Conflits : Modifier les listes de branches de base... |  |
+| Conflits : Branches de base de ce dépôt... |  |
 | Application : Changer de thème... | `Ctrl+N y` |
 | Application : Changer de langue... | `Ctrl+N g` |
 | Lanceur : Créer le raccourci |  |

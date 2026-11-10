@@ -1162,6 +1162,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Integraties: Beveiligingscontrole bekijken |  |
 | App: Afsluiten | `q` |
 | App: Thema... |  |
+| Conflicts: Edit Base Branch Lists... |  |
+| Conflicts: Base Branches of This Repository... |  |
 | App: Thema wijzigen... | `Ctrl+N y` |
 | App: Taal wijzigen... | `Ctrl+N g` |
 | Starter: Snelkoppeling maken |  |

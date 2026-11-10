@@ -296,6 +296,7 @@ impl PreferencesState {
                 }
             }
             Target::Ai(t) => self.ai_commit_choice(t, next),
+            Target::RepoPage(t) => self.conflict_commit_choice(t, next),
             Target::RepoAuth(t) => self.ra_commit_choice(t, next),
             Target::Repo(field) => {
                 // Index 0 is "(inherited)", i.e. clear the override.

@@ -88,8 +88,17 @@ pub struct RepoPreferences {
     pub conflict_detection: Option<bool>,
     /// Conflict prevention page: the "Base branches" globs, one per line
     /// (`**` every branch, `origin/main`, `origin/feature/**`, `!origin/abc`).
-    /// `None` is `**`.
+    /// `None` is not set (see `conflict_base_source`).
     pub conflict_base_branches: Option<String>,
+    /// Conflict prevention page: where the Base branches come from,
+    /// `default` (the global default list), `list` (`conflict_base_list`) or
+    /// `own` (`conflict_base_branches`). `None` (a file written before the
+    /// choice existed): own patterns when set, else the default. Resolved by
+    /// `gitpoulpi_config::ConflictPreventionConfig::resolve`.
+    pub conflict_base_source: Option<String>,
+    /// The named list (`[conflict_prevention.lists.<name>]`) this repository
+    /// follows when `conflict_base_source` is `list`.
+    pub conflict_base_list: Option<String>,
     /// The commit identity profile (`[[profiles]]` id) this repository uses;
     /// `None` inherits `general.active_profile`. Chosen from the toolbar's
     /// profile combobox, so it is never mirrored into the Settings screen.

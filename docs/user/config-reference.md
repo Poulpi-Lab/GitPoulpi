@@ -60,7 +60,7 @@ applies at once (or at the next refresh, fetch or Settings close).
 | `general.startup_tab_launcher` | `"last"` | The tab a start opens on when GitPoulpi is started from the desktop or Start menu shortcut it wrote (they pass `--launcher`), whatever the folder: `"home"`, `"last"` or `"radar"`. Wins over the two settings above. `"last"` is Home with `remember_tabs` off or when nothing is remembered; `"radar"` is Home when the Radar is off or not built. Read once at startup; needs a restart. |
 | `general.group_worktree_tabs` | `true` | Keep the tabs of a repository's linked worktrees right after that repository's tab: when a worktree opens, when a worktree tab is dragged away (it snaps back next to its group; the repository tab is the group's head and its worktrees follow it) and when the setting is turned on. Off leaves tabs where you put them. |
 | `general.undo_depth` | `100` | How many operations Undo can step back; `0` = unlimited. |
-| `general.conflict_detection` | `true` | Proactive conflict detection: a badge on the Log when merging the current branch into the branch it started from would conflict, computed in the background (an in-memory merge: nothing in your files, index or refs changes). A repository can turn it off for itself (`[preferences] conflict_detection`). See [Resolving merge conflicts](merge-conflicts.md#conflict-prevention). |
+| `general.conflict_detection` | `true` | Proactive conflict detection: a badge on the Log when merging the current branch into the branch it started from would conflict, computed in the background (an in-memory merge: nothing in your files, index or refs changes). A repository can turn it off for itself (`[preferences] conflict_detection`). The base branches it compares with have their own lists: [`[conflict_prevention]`](#conflict_prevention-base-branch-lists). See [Resolving merge conflicts](merge-conflicts.md#conflict-prevention). |
 | `general.dev_mode` | absent (automatic) | For people who build GitPoulpi from a checkout; never shown in Settings. Absent: on when the running exe sits in `<checkout>/target/<profile>/` (`Cargo.toml` and `crates/gitpoulpi-tui` next to `target`). `true` / `false` forces it. Dev mode only unlocks `ui.launcher_build`. |
 | `general.journal_outside` | `true` | Record what a shell or an AI agent does to branches, tags, stashes and HEAD as entries of the undo history, marked outside, so `Ctrl+Z` can take it back. Edits to files are never captured. Needs `undo_enabled`. See [Undo and redo](undo-redo.md#changes-made-outside-gitpoulpi). |
 | `general.undo_enabled` | `true` | `false`: no undo bookkeeping at all (fastest), the undo history is erased, the Undo/Redo buttons disappear. See [Undo and redo](undo-redo.md). |
@@ -513,6 +513,17 @@ An administrator can set `mode`, `channel` (as `release_channel`) and `repo`, pl
 | `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Gitignore-style path patterns. A pattern without a `/` matches the file name at any depth, one with a `/` the whole path (a leading `/` anchors it at the root); `*` and `?` stay inside one folder, `**` crosses folders; a `!` re-allows what an earlier pattern matched and the last match wins; case is ignored. Used by the staging guard and by `ai.privacy.exclude_sensitive_files`. |
 | `privacy.staging_guard` | `true` | Staging a file that matches a pattern, or whose content holds a recognized secret, asks first (TUI), is refused unless `--allow-sensitive` is given (CLI) or unless `mcp.allow_sensitive_staging` lets the agent pass `allow_sensitive` (MCP). Text files up to 1 MiB each and 32 MiB in all are read; binary files are only matched by name. See [Staging and committing](staging-and-committing.md#sensitive-files). |
 
+## `[conflict_prevention]` (base branch lists)
+
+Which branches proactive conflict detection may take as the base of the current branch is a list of patterns (see [Resolving merge conflicts](merge-conflicts.md#conflict-prevention)). Lists can be named and shared; Settings > General > Conflict prevention edits them.
+
+| Key | Default | Values and effect |
+|---|---|---|
+| `conflict_prevention.default_list` | `""` | The name of the list a repository uses when it has no list of its own. Empty, or a name no list has, means the built-in `**` (every branch). Read again with every check, so a change applies to open repositories without a restart. |
+| `conflict_prevention.lists` | none | The named lists, one table each: `[conflict_prevention.lists.release]` with `patterns = ["origin/release/**", "!origin/release/old"]`. An empty `patterns` allows every branch. Editing a list applies to every repository that follows it. |
+
+Which list a repository follows is in its `repo-state.toml` (below). Precedence: the repository's own patterns, then the named list it follows, then `default_list`, then `**`.
+
 ## `[keybindings]`
 
 Rebinds the TUI's shortcuts; Settings > Keyboard & mouse edits it.
@@ -550,7 +561,9 @@ it never shows as a change. Written by the TUI and the CLI; you rarely edit it.
 | `[preferences] squash_merge` | A local branch merge squashes: stages, no merge commit (off when absent) | Settings > Repo-specific settings > Merge options |
 | `[preferences] template_apply`, `template_strip_comments` | Pre-fill an empty commit form with the template; remove `#` comment lines at commit time (both off when absent) | Settings > Repo-specific settings > Message template |
 | `[preferences] conflict_detection` | Proactive conflict detection for this repository; absent follows `general.conflict_detection` | Settings > Repo-specific settings > Conflict prevention |
-| `[preferences] conflict_base_branches` | The Base branches patterns, one per line (`**` when absent) | Settings > Repo-specific settings > Conflict prevention |
+| `[preferences] conflict_base_branches` | The repository's own Base branches patterns, one per line (still used as **Own list**) | Settings > Repo-specific settings > Conflict prevention |
+| `[preferences] conflict_base_source` | Where the Base branches come from: `default` (the global default list), `list` (`conflict_base_list`) or `own` (`conflict_base_branches`). Absent: own patterns when there are any, else the default | Settings > Repo-specific settings > Conflict prevention |
+| `[preferences] conflict_base_list` | The `[conflict_prevention.lists.<name>]` this repository follows when the source is `list`; a deleted list falls back to the default | Settings > Repo-specific settings > Conflict prevention |
 | `commit-template.txt` (a file beside `repo-state.toml`) | The commit template; git's `commit.template` points at it | Settings > Repo-specific settings > Message template |
 | `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: this repository's AI instructions | Settings > Repo-specific settings > AI |
 | `[preferences.ai_overrides.<action>]` | `profile`, `instructions` for one action here | Settings > Repo-specific settings > AI |

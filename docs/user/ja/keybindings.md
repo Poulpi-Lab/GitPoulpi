@@ -1124,6 +1124,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 連携: セキュリティチェックを確認 |  |
 | アプリ: 終了 | `q` |
 | アプリ: テーマ... |  |
+| Conflicts: Edit Base Branch Lists... |  |
+| Conflicts: Base Branches of This Repository... |  |
 | アプリ: テーマを変更... | `Ctrl+N y` |
 | アプリ: 言語を変更... | `Ctrl+N g` |
 | ランチャー: ショートカットを作成 |  |

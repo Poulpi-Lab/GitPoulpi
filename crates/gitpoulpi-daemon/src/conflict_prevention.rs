@@ -6,7 +6,8 @@
 //! than a read:
 //!
 //! 1. **Settings** (`general.conflict_detection`, the repository's own switch
-//!    and its Base branches globs) are read per request: a request is rare and
+//!    and its Base branches globs: its own list, a named list or the global
+//!    default, `conflict_prevention.*`) are read per request: a request is rare and
 //!    a changed setting applies at once.
 //! 2. **The base** is the branch of the pull request HEAD's branch has in the
 //!    repository's hosting cache (no network call), else the branch among the
@@ -32,8 +33,8 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 
 use gitpoulpi_core::domain::conflict_prevention::{
-    base_allowed, parse_base_globs, pick_base, BaseCandidate, BaseSource, ConflictPrediction,
-    PredictionStatus, MAX_BASE_CANDIDATES,
+    base_allowed, pick_base, BaseCandidate, BaseSource, ConflictPrediction, PredictionStatus,
+    MAX_BASE_CANDIDATES,
 };
 use gitpoulpi_core::domain::{Oid, RefKind, RepoRef};
 use gitpoulpi_core::{Error, GitBackend, Result};
@@ -64,6 +65,10 @@ fn read_settings(root: &Path) -> Settings {
         .as_ref()
         .map(|s| s.config().session.per_repo_state_dir.clone())
         .unwrap_or_else(|| gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION.to_string());
+    let lists = config
+        .as_ref()
+        .map(|s| s.config().conflict_prevention.clone())
+        .unwrap_or_default();
     let prefs = gitpoulpi_session::RepoState::load(&gitpoulpi_session::RepoState::path_for(
         root, &state_dir,
     ))
@@ -71,7 +76,15 @@ fn read_settings(root: &Path) -> Settings {
     .unwrap_or_default();
     Settings {
         enabled: global && prefs.conflict_detection.unwrap_or(true),
-        globs: parse_base_globs(prefs.conflict_base_branches.as_deref().unwrap_or("")),
+        // The lists live in config.toml: read again with every request, so an
+        // edited list or default applies to the next check without a restart.
+        globs: lists
+            .resolve(
+                prefs.conflict_base_source.as_deref(),
+                prefs.conflict_base_list.as_deref(),
+                prefs.conflict_base_branches.as_deref(),
+            )
+            .patterns,
     }
 }
 

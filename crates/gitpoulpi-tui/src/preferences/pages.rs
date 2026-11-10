@@ -34,6 +34,7 @@ pub(super) const GENERAL: &[Row] = &[
     Key("repos.browse_root"),
     Key("session.per_repo_state_dir"),
     Key("general.default_branch_name"),
+    Heading(|| msg::conflict_prevention::GLOBAL_HEADING.get()),
     Key("general.conflict_detection"),
     Heading(|| msg::settings_general::HEADING_UNDO.get()),
     Key("general.undo_enabled"),
@@ -272,6 +273,13 @@ impl PreferencesState {
 
     pub(super) fn general_fields(&self) -> Vec<Field> {
         let mut fields = self.picked(GENERAL);
+        // The default list and the named lists follow the global switch.
+        if let Some(at) = fields
+            .iter()
+            .position(|f| f.target == Target::Global("general.conflict_detection"))
+        {
+            fields.splice(at + 1..at + 1, self.conflict_global_fields());
+        }
         // The alias and PATH buttons sit right under the alias box; the
         // per-place shortcut rows follow.
         let alias_at = fields

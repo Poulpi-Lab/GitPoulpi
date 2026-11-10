@@ -48,24 +48,25 @@ pub use repo_data::{
 pub use schema::{default_clone_root, home_dir, CLONE_START_LAST, CLONE_START_URL};
 pub use schema::{
     read_quantity, AutoCrlf, AutoStashMode, AvatarFallback, AvatarPlacement, AvatarSources,
-    BlameSide, ColorDepth, ColumnResize, CommitCountMethod, ComposerFiles, CredentialsConfig,
-    DefaultBackend, DiffLayout, DisplayUnit, EditorConfig, EditorEol, EolMode, GeneralConfig,
-    GitConfig, GraphColorization, GraphLaneBackground, GraphRenderer, GraphRowTintStrength,
-    HostingInstance, HttpsMode, ImagePixelatedFrom, ImageProtocol, ImageTextFallback,
-    KittyKeyboard, LauncherBuild, LegacyDiffViewMode, LogColumnsLayout, LogConfig, LogLevel,
-    McpConfig, McpTls, MergeConfig, PrTerminology, PrivacyConfig, Profile, PullButtonMode,
-    PushBehavior, ReposConfig, RetentionUnit, RewriteConfig, SearchConfig, SessionConfig,
-    SidebarSectionsScope, SshConfig, StartupTab, StatusbarPosition, TabDirFollow, TabsPosition,
-    ToolbarAlign, ToolbarPosition, UiConfig, UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig,
-    DEFAULT_BLAME_WIDTH, DEFAULT_COMMITS_PER_LAZY_PAGE, DEFAULT_EDITOR_TAB_SIZE,
-    DEFAULT_HOSTING_REFRESH_MINUTES, DEFAULT_INITIAL_COMMITS_IN_GRAPH, DEFAULT_LOG_RETENTION_DAYS,
-    DEFAULT_MAX_COMMITS_IN_GRAPH, DEFAULT_MERGE_SIDE_BY_SIDE_MIN_WIDTH, DEFAULT_MOUSE_SCROLL_LINES,
-    DEFAULT_SEARCH_COMMIT_LIMIT, DEFAULT_UPDATES_REPO, GRAPH_COLOR_FOLLOW_THEME,
-    MAX_AUTO_FETCH_INTERVAL_MINUTES, MAX_BLAME_WIDTH, MAX_EDITOR_TAB_SIZE,
-    MAX_HOSTING_REFRESH_MINUTES, MAX_IMAGE_VIEW_MAX_MIB, MAX_LOG_MAX_FILE_MB,
-    MAX_LOG_RETENTION_DAYS, MAX_MERGE_SIDE_BY_SIDE_MIN_WIDTH, MAX_MOUSE_SCROLL_LINES,
-    MAX_SCRIPT_TIMEOUT_MS, MAX_SCRIPT_TOTAL_TIMEOUT_S, MCP_DEFAULT_PORT, MIB_OR_GIB,
-    MINUTES_OR_HOURS, MIN_BLAME_WIDTH, MIN_COMMITS_PER_LAZY_PAGE, MIN_EDITOR_TAB_SIZE,
+    BaseList, BaseOrigin, BlameSide, ColorDepth, ColumnResize, CommitCountMethod, ComposerFiles,
+    ConflictPreventionConfig, CredentialsConfig, DefaultBackend, DiffLayout, DisplayUnit,
+    EditorConfig, EditorEol, EolMode, GeneralConfig, GitConfig, GraphColorization,
+    GraphLaneBackground, GraphRenderer, GraphRowTintStrength, HostingInstance, HttpsMode,
+    ImagePixelatedFrom, ImageProtocol, ImageTextFallback, KittyKeyboard, LauncherBuild,
+    LegacyDiffViewMode, LogColumnsLayout, LogConfig, LogLevel, McpConfig, McpTls, MergeConfig,
+    PrTerminology, PrivacyConfig, Profile, PullButtonMode, PushBehavior, ReposConfig,
+    ResolvedBases, RetentionUnit, RewriteConfig, SearchConfig, SessionConfig, SidebarSectionsScope,
+    SshConfig, StartupTab, StatusbarPosition, TabDirFollow, TabsPosition, ToolbarAlign,
+    ToolbarPosition, UiConfig, UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig,
+    BASE_SOURCE_DEFAULT, BASE_SOURCE_LIST, BASE_SOURCE_OWN, DEFAULT_BLAME_WIDTH,
+    DEFAULT_COMMITS_PER_LAZY_PAGE, DEFAULT_EDITOR_TAB_SIZE, DEFAULT_HOSTING_REFRESH_MINUTES,
+    DEFAULT_INITIAL_COMMITS_IN_GRAPH, DEFAULT_LOG_RETENTION_DAYS, DEFAULT_MAX_COMMITS_IN_GRAPH,
+    DEFAULT_MERGE_SIDE_BY_SIDE_MIN_WIDTH, DEFAULT_MOUSE_SCROLL_LINES, DEFAULT_SEARCH_COMMIT_LIMIT,
+    DEFAULT_UPDATES_REPO, GRAPH_COLOR_FOLLOW_THEME, MAX_AUTO_FETCH_INTERVAL_MINUTES,
+    MAX_BLAME_WIDTH, MAX_EDITOR_TAB_SIZE, MAX_HOSTING_REFRESH_MINUTES, MAX_IMAGE_VIEW_MAX_MIB,
+    MAX_LOG_MAX_FILE_MB, MAX_LOG_RETENTION_DAYS, MAX_MERGE_SIDE_BY_SIDE_MIN_WIDTH,
+    MAX_MOUSE_SCROLL_LINES, MAX_SCRIPT_TIMEOUT_MS, MAX_SCRIPT_TOTAL_TIMEOUT_S, MCP_DEFAULT_PORT,
+    MIB_OR_GIB, MINUTES_OR_HOURS, MIN_BLAME_WIDTH, MIN_COMMITS_PER_LAZY_PAGE, MIN_EDITOR_TAB_SIZE,
     MIN_INITIAL_COMMITS_IN_GRAPH, MIN_MERGE_SIDE_BY_SIDE_MIN_WIDTH, MIN_MOUSE_SCROLL_LINES,
     SCRIPT_TIMEOUT_UNITS, SCRIPT_TOTAL_TIMEOUT_UNITS, THEME_SYSTEM,
 };
@@ -158,6 +159,10 @@ pub struct Config {
     /// What counts as sensitive, and the staging guard: `privacy.*`.
     #[serde(default)]
     pub privacy: PrivacyConfig,
+    /// Named lists of base branch patterns and the default one:
+    /// `conflict_prevention.default_list`, `[conflict_prevention.lists.<name>]`.
+    #[serde(default)]
+    pub conflict_prevention: ConflictPreventionConfig,
 }
 
 /// What [`Config::profile_for`] needs of a workspace: its default profile id
@@ -572,6 +577,47 @@ pub fn set_list_in_file<T: serde::Serialize>(path: &Path, key: &str, items: &[T]
 /// `open_in = []`: an empty list the user chose is not "not configured yet".
 pub fn set_open_in_in_file(path: &Path, entries: Option<&[OpenInEntry]>) -> Result<()> {
     set_entries_in_file(path, "ui.open_in", entries)
+}
+
+/// Replaces the whole `[conflict_prevention]` section (the default list's name
+/// and every named list) in the document at `path`, keeping everything else.
+/// A section equal to the default is removed rather than written empty.
+pub fn set_conflict_prevention_in_file(
+    path: &Path,
+    section: &ConflictPreventionConfig,
+) -> Result<()> {
+    let raw = if path.exists() {
+        std::fs::read_to_string(path)?
+    } else {
+        String::new()
+    };
+    let mut document: toml::Value = if raw.trim().is_empty() {
+        toml::Value::Table(toml::map::Map::new())
+    } else {
+        toml::from_str(&raw)?
+    };
+    if section.is_default() {
+        remove_dotted(&mut document, "conflict_prevention");
+    } else {
+        insert_dotted(
+            &mut document,
+            "conflict_prevention",
+            toml::Value::try_from(section)?,
+        )?;
+    }
+    let _: Config = document
+        .clone()
+        .try_into()
+        .map_err(|err: toml::de::Error| Error::BadValue {
+            key: "conflict_prevention".to_string(),
+            value: "<section>".to_string(),
+            expected: err.to_string(),
+        })?;
+    if let Some(parent) = path.parent() {
+        secure_fs::create_private_dir_all(parent)?;
+    }
+    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
+    Ok(())
 }
 
 /// [`set_open_in_in_file`] for `[[ui.image_editors]]`.

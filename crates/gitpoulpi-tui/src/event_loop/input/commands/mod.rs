@@ -307,6 +307,8 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::RepoAuthTest
         | PaletteCommand::RepoAuthDefaults
         | PaletteCommand::Theme
+        | PaletteCommand::ConflictLists
+        | PaletteCommand::ConflictRepoPage
         | PaletteCommand::ChangeTheme
         | PaletteCommand::ChangeLanguage
         | PaletteCommand::LauncherCreate

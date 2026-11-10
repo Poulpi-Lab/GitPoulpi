@@ -181,8 +181,22 @@ fn the_repository_switch_and_the_base_branches_hide_the_badge() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
-    // Base branches: exclude the only candidate.
-    click_text(&mut term, "Base branches");
+    // Base branches: switch to the repository's own list, then exclude the
+    // only candidate.
+    let (c, r) = common::wait_for_choice(&term, "Default (every branch)", STEP);
+    term.click(c, r).unwrap();
+    term.send_keys("Down").unwrap();
+    term.send_keys("Enter").unwrap();
+    wait_for(&term, "the own list chosen", || {
+        state_file(&repo).contains("conflict_base_source = \"own\"")
+    });
+    let screen = term.screen();
+    let (c, r) = screen
+        .find_all("Base branches")
+        .into_iter()
+        .find(|(_, r)| !screen.line(*r).contains("from"))
+        .unwrap();
+    term.click(c + 1, r).unwrap();
     term.wait_for("the editor", STEP, |s| {
         s.contains("Save") && s.contains("Cancel")
     })
@@ -214,5 +228,89 @@ fn fixing_the_conflict_on_the_branch_removes_the_badge() {
     // And it stays gone: the prediction for the new HEAD is clean.
     std::thread::sleep(Duration::from_secs(4));
     assert!(!term.text().contains("Conflicts with origin/main"));
+    let _ = term.stop();
+}
+
+/// The global lists: create one, give it patterns, make it the default, and
+/// a repository with no list of its own follows it (the badge goes, because
+/// the default excludes the only candidate) without a restart. Then the
+/// repository follows the list by name and resets back to the default.
+#[test]
+fn a_default_list_applies_to_a_repository_without_its_own_and_the_source_can_be_reset() {
+    let repo = conflicting_feature();
+    let (mut term, config) = launch(repo.root(), "pty-conflict-lists");
+    wait_badge(&mut term);
+    let config_file =
+        || std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+
+    // The palette opens Settings on the global group.
+    common::retry_until(
+        &mut term,
+        "the palette opens the lists",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            t.send_keys("C-p").unwrap();
+            t.send_text("edit base branch lists").unwrap();
+            t.send_keys("Enter").unwrap();
+        },
+        |s| s.contains("General - global"),
+    );
+    common::scroll_settings_to(&mut term, "New list", STEP);
+    // New list: a click on its row opens the name field.
+    click_text(&mut term, "New list");
+    term.send_text("nomain").unwrap();
+    term.send_keys("Enter").unwrap();
+    wait_for(&term, "the list saved", || {
+        config_file().contains("[conflict_prevention.lists.nomain]")
+    });
+
+    // Its patterns: exclude the only candidate.
+    common::scroll_settings_to(&mut term, "Patterns", STEP);
+    click_text(&mut term, "Patterns");
+    term.wait_for("the editor", STEP, |s| {
+        s.contains("Save") && s.contains("Cancel")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Backspace").unwrap();
+    term.send_keys("Backspace").unwrap();
+    term.send_text("!origin/main").unwrap();
+    term.send_keys("C-s").unwrap();
+    wait_for(&term, "the patterns saved", || {
+        config_file().contains("!origin/main")
+    });
+
+    // Make it the default: the badge is still there until Settings closes.
+    common::scroll_settings_to(&mut term, "Make default", STEP);
+    click_text(&mut term, "Make default");
+    wait_for(&term, "the default saved", || {
+        config_file().contains("default_list = \"nomain\"")
+    });
+    close_settings(&mut term);
+    term.wait_for("no base under the default list, no badge", STEP, |s| {
+        !s.contains(BADGE)
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+
+    // The repository's page: it follows the default; pick the list by name.
+    open_page(&mut term);
+    let (c, r) = common::wait_for_choice(&term, "Default (list nomain)", STEP);
+    term.click(c, r).unwrap();
+    term.send_keys("Down").unwrap();
+    term.send_keys("Enter").unwrap();
+    wait_for(&term, "the list followed", || {
+        state_file(&repo).contains("conflict_base_list = \"nomain\"")
+    });
+    // Reset to default (it asks first: Tab to the confirm, Enter).
+    click_text(&mut term, "Reset to default");
+    term.wait_for("the question", STEP, |s| s.contains("Cancel"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Tab").unwrap();
+    term.send_keys("Enter").unwrap();
+    wait_for(&term, "the choice dropped", || {
+        !state_file(&repo).contains("conflict_base_list")
+    });
+    common::wait_for_choice(&term, "Default (list nomain)", STEP);
+
     let _ = term.stop();
 }

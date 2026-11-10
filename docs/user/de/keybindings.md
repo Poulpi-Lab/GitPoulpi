@@ -1153,6 +1153,8 @@ die Standardtasten.
 | Integrationen: Sicherheitsprüfung ansehen |  |
 | App: Beenden | `q` |
 | App: Design... |  |
+| Conflicts: Edit Base Branch Lists... |  |
+| Conflicts: Base Branches of This Repository... |  |
 | App: Design wechseln... | `Ctrl+N y` |
 | App: Sprache wechseln... | `Ctrl+N g` |
 | Starter: Verknüpfung erstellen |  |

@@ -1156,6 +1156,8 @@ As teclas são as predefinidas.
 | Integrações: rever verificação de segurança |  |
 | Aplicação: sair | `q` |
 | Aplicação: tema... |  |
+| Conflicts: Edit Base Branch Lists... |  |
+| Conflicts: Base Branches of This Repository... |  |
 | Aplicação: mudar tema... | `Ctrl+N y` |
 | Aplicação: mudar idioma... | `Ctrl+N g` |
 | Lançador: criar atalho |  |

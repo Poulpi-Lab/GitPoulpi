@@ -41,6 +41,7 @@ macro_rules! config_enum {
     };
 }
 
+mod conflict_prevention;
 mod editor;
 mod general;
 mod git;
@@ -53,6 +54,7 @@ mod ssh;
 mod ui;
 mod updates;
 
+pub use conflict_prevention::*;
 pub use editor::*;
 pub use general::*;
 pub use git::*;

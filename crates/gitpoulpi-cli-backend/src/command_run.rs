@@ -126,3 +126,101 @@ mod tests {
         panic!("the grandchild {pid} is still running");
     }
 }
+
+/// The Windows counterpart, with PowerShell 7 (`pwsh`) as the scripting
+/// language: a test returns early with a message when it is not installed.
+#[cfg(all(test, windows))]
+mod windows_tests {
+    use super::*;
+
+    fn pwsh_installed() -> bool {
+        let found = std::process::Command::new("pwsh")
+            .args(["-NoProfile", "-Command", "exit 0"])
+            .output()
+            .is_ok_and(|o| o.status.success());
+        if !found {
+            eprintln!("SKIPPED: pwsh is not installed");
+        }
+        found
+    }
+
+    fn pwsh(script: &str) -> Vec<String> {
+        ["pwsh", "-NoProfile", "-Command", script]
+            .map(String::from)
+            .to_vec()
+    }
+
+    fn running(pid: u32) -> bool {
+        let out = std::process::Command::new("tasklist")
+            .args(["/FI", &format!("PID eq {pid}"), "/NH"])
+            .output()
+            .unwrap();
+        String::from_utf8_lossy(&out.stdout).contains(&pid.to_string())
+    }
+
+    #[tokio::test]
+    async fn output_exit_code_and_cwd() {
+        if !pwsh_installed() {
+            return;
+        }
+        let dir = tempfile::tempdir().unwrap();
+        let out = run_command(
+            &pwsh("(Get-Location).Path; [Console]::Error.WriteLine('bad'); exit 3"),
+            dir.path(),
+            Duration::from_secs(30),
+        )
+        .await
+        .unwrap();
+        assert_eq!(out.exit_code, Some(3));
+        assert!(out.stderr.contains("bad"));
+        assert_eq!(
+            std::fs::canonicalize(out.stdout.trim()).unwrap(),
+            std::fs::canonicalize(dir.path()).unwrap()
+        );
+    }
+
+    #[tokio::test]
+    async fn a_missing_program_is_a_spawn_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let err = run_command(
+            &["C:\\no\\such\\program.exe".into()],
+            dir.path(),
+            Duration::from_secs(5),
+        )
+        .await
+        .unwrap_err();
+        assert!(matches!(err, CommandRunError::Spawn(_)), "{err:?}");
+    }
+
+    /// The timeout kills the grandchild too: the script starts its own
+    /// `pwsh` that sleeps, and the Job Object ends both.
+    #[tokio::test]
+    async fn a_timeout_kills_the_whole_process_tree() {
+        if !pwsh_installed() {
+            return;
+        }
+        let dir = tempfile::tempdir().unwrap();
+        let pidfile = dir.path().join("pid");
+        let script = format!(
+            "$p = Start-Process pwsh -ArgumentList '-NoProfile','-Command','Start-Sleep 60' -PassThru -NoNewWindow; \
+             Set-Content -LiteralPath '{}' -Value $p.Id; Start-Sleep 60",
+            pidfile.display()
+        );
+        let err = run_command(&pwsh(&script), dir.path(), Duration::from_secs(6))
+            .await
+            .unwrap_err();
+        assert_eq!(err, CommandRunError::TimedOut);
+        let pid: u32 = std::fs::read_to_string(&pidfile)
+            .expect("the script started its child before the timeout")
+            .trim()
+            .parse()
+            .unwrap();
+        for _ in 0..50 {
+            if !running(pid) {
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(100));
+        }
+        panic!("the grandchild {pid} is still running");
+    }
+}

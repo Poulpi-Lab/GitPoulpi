@@ -3,13 +3,12 @@
 //! server refuses it; a command that is not the confirmed one, or whose
 //! in-tree script changed, refuses the transfer.
 //!
-//! Loopback servers only. Scripts are `sh` scripts, so these tests are Unix
-//! only (the Windows hand-checks are in the slice's report). The helper git
-//! runs for the token command is the stand-in binary of this crate, wrapped by
-//! a script that logs its arguments and environment.
-#![cfg(unix)]
+//! Loopback servers only. The token tools are `sh` scripts on Unix and
+//! PowerShell scripts (`pwsh -NoProfile -File x.ps1`) on Windows: the tests
+//! say so and skip when `pwsh` is not installed. The helper git runs for the
+//! token command is the stand-in binary of this crate, copied under a
+//! directory with a space and logging its arguments and environment.
 
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
 
@@ -35,38 +34,138 @@ async fn exclusive() -> tokio::sync::MutexGuard<'static, ()> {
     LOCK.lock().await
 }
 
+/// Whether the scripting language of the token tools is installed: always on
+/// Unix (`sh`), `pwsh` on Windows. A test that needs it returns early with a
+/// message otherwise.
+fn tools_available() -> bool {
+    #[cfg(windows)]
+    {
+        let found = std::process::Command::new("pwsh")
+            .args(["-NoProfile", "-Command", "exit 0"])
+            .output()
+            .is_ok_and(|o| o.status.success());
+        if !found {
+            eprintln!("SKIPPED: pwsh is not installed, the token tools cannot run");
+        }
+        found
+    }
+    #[cfg(not(windows))]
+    {
+        true
+    }
+}
+
+macro_rules! need_tools {
+    () => {
+        if !tools_available() {
+            return;
+        }
+    };
+}
+
 struct Helper {
     _dir: tempfile::TempDir,
     log: PathBuf,
 }
 
-/// The helper git runs for the token command: the stub, wrapped by a script
-/// that logs its arguments and environment.
+/// The helper git runs for the token command: a copy of the stub under a
+/// directory with a space, which logs its arguments and environment.
 fn helper() -> &'static Helper {
     static HELPER: OnceLock<Helper> = OnceLock::new();
     HELPER.get_or_init(|| {
         let dir = tempfile::tempdir().unwrap();
         let stub = PathBuf::from(env!("CARGO_BIN_EXE_gitpoulpi-credential-stub"));
+        let spaced = dir.path().join("helper dir");
+        std::fs::create_dir_all(&spaced).unwrap();
+        let exe = spaced.join(format!("helper stub{}", std::env::consts::EXE_SUFFIX));
+        std::fs::copy(&stub, &exe).unwrap();
         let log = dir.path().join("helper.log");
-        let exe = script(
-            dir.path(),
-            "helper-wrapper.sh",
-            &format!(
-                "{{ printf 'ARGV'; for a in \"$@\"; do printf ' [%s]' \"$a\"; done; echo; env; echo END; }} >> '{}'\nexec '{}' \"$@\"\n",
-                log.display(),
-                stub.display()
-            ),
-        );
+        std::env::set_var("GITPOULPI_STUB_LOG", &log);
         gitpoulpi_daemon::set_credential_helper_exe(Some(exe));
         Helper { _dir: dir, log }
     })
 }
 
-fn script(dir: &Path, name: &str, body: &str) -> PathBuf {
-    let path = dir.join(name);
-    std::fs::write(&path, format!("#!/bin/sh\n{body}")).unwrap();
-    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
-    path
+/// What a token tool does, in order.
+enum Step<'a> {
+    /// Appends a line to the file (counts the runs).
+    Append(&'a Path),
+    /// Writes its working directory to the file.
+    Cwd(&'a Path),
+    /// Prints on stdout.
+    Print(&'a str),
+    /// Prints on stderr.
+    Stderr(&'a str),
+    Exit(i32),
+}
+
+/// The text of a tool in the platform's scripting language.
+fn script_text(steps: &[Step]) -> String {
+    let mut text = String::new();
+    for step in steps {
+        #[cfg(unix)]
+        let line = match step {
+            Step::Append(p) => format!("echo x >> '{}'", p.display()),
+            Step::Cwd(p) => format!("pwd > '{}'", p.display()),
+            Step::Print(t) => format!("echo '{t}'"),
+            Step::Stderr(t) => format!("echo '{t}' >&2"),
+            Step::Exit(n) => format!("exit {n}"),
+        };
+        #[cfg(windows)]
+        let line = match step {
+            Step::Append(p) => format!("Add-Content -LiteralPath '{}' -Value x", p.display()),
+            Step::Cwd(p) => format!(
+                "(Get-Location).Path | Set-Content -LiteralPath '{}'",
+                p.display()
+            ),
+            Step::Print(t) => format!("Write-Output '{t}'"),
+            Step::Stderr(t) => format!("[Console]::Error.WriteLine('{t}')"),
+            Step::Exit(n) => format!("exit {n}"),
+        };
+        text.push_str(&line);
+        text.push('\n');
+    }
+    text
+}
+
+/// The extension of a tool script.
+const EXT: &str = if cfg!(windows) { "ps1" } else { "sh" };
+
+/// The command line that runs the script file `file` (an absolute path or one
+/// relative to the repository's root).
+fn run_script_argv(file: &str) -> Vec<String> {
+    if cfg!(windows) {
+        ["pwsh", "-NoProfile", "-File", file]
+            .map(String::from)
+            .to_vec()
+    } else if Path::new(file).is_absolute() {
+        // Executable, run directly.
+        vec![file.to_string()]
+    } else {
+        vec!["sh".to_string(), file.to_string()]
+    }
+}
+
+/// Writes the tool `dir/<name>.<ext>` and returns the argv that runs it by
+/// its absolute path.
+fn tool(dir: &Path, name: &str, steps: &[Step]) -> Vec<String> {
+    let path = write_script(&dir.join(format!("{name}.{EXT}")), steps);
+    run_script_argv(&path.to_string_lossy())
+}
+
+fn write_script(path: &Path, steps: &[Step]) -> PathBuf {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).unwrap();
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::write(path, format!("#!/bin/sh\n{}", script_text(steps))).unwrap();
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+    }
+    #[cfg(not(unix))]
+    std::fs::write(path, script_text(steps)).unwrap();
+    path.to_path_buf()
 }
 
 fn repo_on(server: &AuthHttpRemote) -> FixtureRepo {
@@ -81,10 +180,10 @@ fn repo_on(server: &AuthHttpRemote) -> FixtureRepo {
     repo
 }
 
-fn token_command(argv: &[&str], hosts: &[&str]) -> RepoAuthProfile {
+fn token_command(argv: &[impl AsRef<str>], hosts: &[&str]) -> RepoAuthProfile {
     RepoAuthProfile {
         https: Some(HttpsAuth::TokenCommand {
-            argv: argv.iter().map(|s| s.to_string()).collect(),
+            argv: argv.iter().map(|s| s.as_ref().to_string()).collect(),
             username: None,
             hosts: hosts.iter().map(|s| s.to_string()).collect(),
             cache_minutes: None,
@@ -189,23 +288,20 @@ fn lines(path: &Path) -> usize {
 /// the token is in neither the helper's arguments nor its environment.
 #[tokio::test]
 async fn a_token_command_serves_its_server_and_is_cached() {
+    need_tools!();
     let _turn = exclusive().await;
     let server = AuthHttpRemote::start_accepting();
     let repo = repo_on(&server);
     let scripts = tempfile::tempdir().unwrap();
     let counter = scripts.path().join("count");
     let cwd = scripts.path().join("cwd");
-    let tool = script(
+    let tool = tool(
         scripts.path(),
-        "token.sh",
-        &format!(
-            "echo x >> '{}'; pwd > '{}'; echo '{TOKEN}'\n",
-            counter.display(),
-            cwd.display()
-        ),
+        "token",
+        &[Step::Append(&counter), Step::Cwd(&cwd), Step::Print(TOKEN)],
     );
     let mut rig = Rig::new("token-command-main", &repo).await;
-    rig.set(token_command(&[&tool.to_string_lossy()], &[]), true)
+    rig.set(token_command(&tool, &[]), true)
         .await
         .expect("a confirmed command is stored");
 
@@ -252,20 +348,19 @@ async fn a_token_command_serves_its_server_and_is_cached() {
 /// command again.
 #[tokio::test]
 async fn a_refused_token_is_erased_from_the_cache() {
+    need_tools!();
     let _turn = exclusive().await;
     let server = AuthHttpRemote::start_rejecting();
     let repo = repo_on(&server);
     let scripts = tempfile::tempdir().unwrap();
     let counter = scripts.path().join("count");
-    let tool = script(
+    let tool = tool(
         scripts.path(),
-        "token.sh",
-        &format!("echo x >> '{}'; echo '{TOKEN}'\n", counter.display()),
+        "token",
+        &[Step::Append(&counter), Step::Print(TOKEN)],
     );
     let mut rig = Rig::new("token-command-erase", &repo).await;
-    rig.set(token_command(&[&tool.to_string_lossy()], &[]), true)
-        .await
-        .unwrap();
+    rig.set(token_command(&tool, &[]), true).await.unwrap();
 
     rig.fetch().await.expect_err("the server refuses the token");
     // Git may ask twice in one transfer (two processes): after an erase the
@@ -284,23 +379,21 @@ async fn a_refused_token_is_erased_from_the_cache() {
 /// token, the command is never run for it, and the failure says why.
 #[tokio::test]
 async fn the_command_serves_only_its_hosts() {
+    need_tools!();
     let _turn = exclusive().await;
     let server = AuthHttpRemote::start_accepting();
     let repo = repo_on(&server);
     let scripts = tempfile::tempdir().unwrap();
     let counter = scripts.path().join("count");
-    let tool = script(
+    let tool = tool(
         scripts.path(),
-        "token.sh",
-        &format!("echo x >> '{}'; echo '{TOKEN}'\n", counter.display()),
+        "token",
+        &[Step::Append(&counter), Step::Print(TOKEN)],
     );
     let mut rig = Rig::new("token-command-hosts", &repo).await;
-    rig.set(
-        token_command(&[&tool.to_string_lossy()], &["git.corp.example"]),
-        true,
-    )
-    .await
-    .unwrap();
+    rig.set(token_command(&tool, &["git.corp.example"]), true)
+        .await
+        .unwrap();
     let error = rig.fetch().await.expect_err("the server is not its host");
     assert_eq!(
         error.kind,
@@ -320,24 +413,23 @@ async fn the_command_serves_only_its_hosts() {
 /// changes it refuses the transfer until the person confirms again.
 #[tokio::test]
 async fn an_edited_in_tree_script_is_refused_until_confirmed_again() {
+    need_tools!();
     let _turn = exclusive().await;
     let server = AuthHttpRemote::start_accepting();
     let repo = repo_on(&server);
-    let tracked = repo.root().join("get-token.sh");
-    std::fs::write(&tracked, format!("echo '{TOKEN}'\n")).unwrap();
+    let name = format!("get-token.{EXT}");
+    let tracked = repo.root().join(&name);
+    write_script(&tracked, &[Step::Print(TOKEN)]);
+    let argv = run_script_argv(&name);
     let mut rig = Rig::new("token-command-in-tree", &repo).await;
-    rig.set(token_command(&["sh", "get-token.sh"], &[]), true)
-        .await
-        .unwrap();
+    rig.set(token_command(&argv, &[]), true).await.unwrap();
     rig.fetch().await.expect("the confirmed script runs");
 
-    std::fs::write(&tracked, "echo evil-token-998877\n").unwrap();
+    write_script(&tracked, &[Step::Print("evil-token-998877")]);
     let error = rig.fetch().await.expect_err("the script changed");
     assert_eq!(
         error.kind,
-        Some(TypedError::RepoAuthCommandChanged {
-            path: "get-token.sh".into()
-        }),
+        Some(TypedError::RepoAuthCommandChanged { path: name.clone() }),
         "{}",
         error.message
     );
@@ -351,14 +443,85 @@ async fn an_edited_in_tree_script_is_refused_until_confirmed_again() {
     );
 
     // Confirming the command again pins the new content.
-    rig.set(token_command(&["sh", "get-token.sh"], &[]), true)
-        .await
-        .unwrap();
+    rig.set(token_command(&argv, &[]), true).await.unwrap();
     rig.fetch().await.expect("confirmed again");
     assert!(server
         .basic_credentials()
         .iter()
         .any(|c| c.contains("evil-token-998877")));
+    rig.handle.shutdown().await.unwrap();
+}
+
+/// Paths with spaces: a script outside the work tree and one inside it (named
+/// relative, in a directory with a space) both run, and the in-tree one is
+/// still hash-pinned.
+#[tokio::test]
+async fn script_paths_with_spaces_run_and_the_in_tree_one_is_pinned() {
+    need_tools!();
+    let _turn = exclusive().await;
+    let server = AuthHttpRemote::start_accepting();
+    let repo = repo_on(&server);
+    let outside = tempfile::tempdir().unwrap();
+    let spaced = outside.path().join("my tools");
+    let absolute = tool(&spaced, "get my token", &[Step::Print(TOKEN)]);
+    let mut rig = Rig::new("token-command-spaces", &repo).await;
+    rig.set(token_command(&absolute, &[]), true).await.unwrap();
+    rig.fetch().await.expect("a script path with spaces runs");
+    assert!(server
+        .basic_credentials()
+        .iter()
+        .any(|c| *c == format!("x-access-token:{TOKEN}")));
+
+    let name = format!("my scripts/get token.{EXT}");
+    let tracked = repo.root().join(&name);
+    write_script(&tracked, &[Step::Print(TOKEN)]);
+    let relative = run_script_argv(&name);
+    rig.set(token_command(&relative, &[]), true).await.unwrap();
+    rig.fetch().await.expect("an in-tree path with spaces runs");
+    write_script(&tracked, &[Step::Print("evil-token-998877")]);
+    let error = rig.fetch().await.expect_err("the script changed");
+    assert_eq!(
+        error.kind,
+        Some(TypedError::RepoAuthCommandChanged { path: name }),
+        "{}",
+        error.message
+    );
+    rig.handle.shutdown().await.unwrap();
+}
+
+/// A `.cmd` file: through `cmd /c` it runs (CreateProcess starts executables,
+/// a batch file needs the interpreter), and named bare as the program it runs
+/// too (the standard library starts a batch file through `cmd.exe`).
+#[cfg(windows)]
+#[tokio::test]
+async fn a_cmd_script_runs_through_cmd_or_bare() {
+    let _turn = exclusive().await;
+    let server = AuthHttpRemote::start_accepting();
+    let repo = repo_on(&server);
+    let dir = tempfile::tempdir().unwrap();
+    let spaced = dir.path().join("cmd tools");
+    std::fs::create_dir_all(&spaced).unwrap();
+    let script = spaced.join("get token.cmd");
+    std::fs::write(&script, format!("@echo off\r\necho {TOKEN}\r\n")).unwrap();
+    let mut rig = Rig::new("token-command-cmd", &repo).await;
+
+    let through_cmd = vec![
+        "cmd".to_string(),
+        "/c".to_string(),
+        script.to_string_lossy().into_owned(),
+    ];
+    rig.set(token_command(&through_cmd, &[]), true)
+        .await
+        .unwrap();
+    rig.fetch().await.expect("cmd /c <script.cmd> runs");
+    assert!(server
+        .basic_credentials()
+        .iter()
+        .any(|c| *c == format!("x-access-token:{TOKEN}")));
+
+    let bare = vec![script.to_string_lossy().into_owned()];
+    rig.set(token_command(&bare, &[]), true).await.unwrap();
+    rig.fetch().await.expect("a bare .cmd runs");
     rig.handle.shutdown().await.unwrap();
 }
 
@@ -370,24 +533,25 @@ async fn view_says_unavailable(rig: &mut Rig) -> bool {
 /// neither a token-shaped value nor the exact registered one survives.
 #[tokio::test]
 async fn a_failing_command_reads_with_a_redacted_stderr() {
+    need_tools!();
     let _turn = exclusive().await;
     let server = AuthHttpRemote::start_accepting();
     let repo = repo_on(&server);
     let scripts = tempfile::tempdir().unwrap();
-    let tool = script(
+    let login_failed = format!("login failed for {TOKEN}");
+    let tool = tool(
         scripts.path(),
-        "token.sh",
-        &format!(
-            "echo 'login failed for {TOKEN}' >&2\n\
-             echo 'Authorization: Bearer abcdef1234567890xyz' >&2\n\
-             echo 'vault is sealed' >&2\nexit 3\n"
-        ),
+        "token",
+        &[
+            Step::Stderr(&login_failed),
+            Step::Stderr("Authorization: Bearer abcdef1234567890xyz"),
+            Step::Stderr("vault is sealed"),
+            Step::Exit(3),
+        ],
     );
     gitpoulpi_core::redact_register_secret(TOKEN);
     let mut rig = Rig::new("token-command-failing", &repo).await;
-    rig.set(token_command(&[&tool.to_string_lossy()], &[]), true)
-        .await
-        .unwrap();
+    rig.set(token_command(&tool, &[]), true).await.unwrap();
     let error = rig.fetch().await.expect_err("the command failed");
     match &error.kind {
         Some(TypedError::TokenCommandFailed { exit, stderr_tail }) => {
@@ -410,6 +574,7 @@ async fn a_failing_command_reads_with_a_redacted_stderr() {
 /// reads as that there too, not as git's "terminal prompts disabled".
 #[tokio::test]
 async fn a_failing_command_reads_the_same_in_a_submodule_update() {
+    need_tools!();
     let _turn = exclusive().await;
     let server = AuthHttpRemote::start_accepting();
     let repo = repo_on(&server);
@@ -429,15 +594,13 @@ async fn a_failing_command_reads_the_same_in_a_submodule_update() {
         &format!("160000,{},sub", head.trim()),
     ]);
     let scripts = tempfile::tempdir().unwrap();
-    let tool = script(
+    let tool = tool(
         scripts.path(),
-        "token.sh",
-        "echo 'vault is sealed' >&2\nexit 3\n",
+        "token",
+        &[Step::Stderr("vault is sealed"), Step::Exit(3)],
     );
     let mut rig = Rig::new("token-command-submodule", &repo).await;
-    rig.set(token_command(&[&tool.to_string_lossy()], &[]), true)
-        .await
-        .unwrap();
+    rig.set(token_command(&tool, &[]), true).await.unwrap();
     let error = rig
         .call(
             OperationKind::SubmoduleUpdate,
@@ -460,16 +623,24 @@ async fn a_failing_command_reads_the_same_in_a_submodule_update() {
 /// helper script.
 #[tokio::test]
 async fn a_helper_source_needs_its_confirmed_hash() {
+    need_tools!();
     let _turn = exclusive().await;
     let server = AuthHttpRemote::start_accepting();
     let repo = repo_on(&server);
-    let tracked = repo.root().join("cred.sh");
-    std::fs::write(
-        &tracked,
+    let name = format!("cred.{EXT}");
+    let tracked = repo.root().join(&name);
+    #[cfg(unix)]
+    let (text, helper_text) = (
         "cat >/dev/null; echo username=hh; echo password=pp-123456\n",
-    )
-    .unwrap();
-    let helper_text = "!sh cred.sh";
+        format!("!sh {name}"),
+    );
+    #[cfg(windows)]
+    let (text, helper_text) = (
+        "$null = [Console]::In.ReadToEnd(); Write-Output 'username=hh'; Write-Output 'password=pp-123456'\n",
+        format!("!pwsh -NoProfile -File {name}"),
+    );
+    std::fs::write(&tracked, text).unwrap();
+    let helper_text = helper_text.as_str();
     let mut rig = Rig::new("token-command-helper", &repo).await;
     rig.set(helper_source(helper_text), true).await.unwrap();
     rig.fetch().await.expect("the helper answers");
@@ -507,7 +678,7 @@ async fn a_helper_source_needs_its_confirmed_hash() {
     std::fs::write(&tracked, "echo password=other\n").unwrap();
     let error = rig.fetch().await.expect_err("the helper script changed");
     assert!(
-        matches!(&error.kind, Some(TypedError::RepoAuthCommandChanged { path }) if path == "cred.sh"),
+        matches!(&error.kind, Some(TypedError::RepoAuthCommandChanged { path }) if *path == name),
         "{error:?}"
     );
     rig.handle.shutdown().await.unwrap();

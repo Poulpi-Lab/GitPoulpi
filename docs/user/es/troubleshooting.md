@@ -41,7 +41,7 @@ El botón **Actividad** en el extremo derecho de la barra de estado (un número 
 
 **Vaciar registro** (`x`, o el comando de la paleta `Registro de actividad: Vaciar el registro de la aplicación`) está en la pestaña **Aplicación**: pregunta primero y luego vacía los archivos de registro de todos los días conservados y la lista en pantalla. No se puede deshacer y no figura en el historial de deshacer.
 
-- **Operaciones de git** (la pestaña en la que se abre la ventana): las operaciones, las más recientes primero, cada una con la hora a la que se ejecutó y lo que tardó (`Push - 123 ms`): abrir el repositorio, cargar el grafo de commits, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Aquí también se listan los fallos, los mensajes de estado, un clon fallido y el Fetch all de un espacio de trabajo; `Enter` o un clic abre uno (su motivo, el paso siguiente, el comando, el código de salida y lo que imprimió), `c` o su botón Copiar lo copia, `r` o su botón ejecuta el paso sugerido. `Tab` (o `Left`/`Right` aquí) pasa a la pestaña Aplicación.
+- **Operaciones de git** (la pestaña en la que se abre la ventana): las operaciones, las más recientes primero, cada una con la hora a la que se ejecutó y lo que tardó (`Push - 123 ms`): abrir el repositorio, cargar el grafo de commits, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Aquí también se listan los fallos, los mensajes de estado, un clon fallido y el Fetch all de un espacio de trabajo; `Enter` o un clic abre uno (su motivo, el paso siguiente, el comando, el código de salida y lo que imprimió), `c` o su botón Copiar lo copia, `r` o su botón ejecuta el paso sugerido. `Tab` (o `p`) pasa a la pestaña Aplicación; `Left`/`Right` desplazan lateralmente las líneas largas.
 ![El Registro de actividad, pestaña Operaciones de git: cada operación con su hora y lo que tardó, un fetch fallido en rojo](../images/activity-log-repository.png)
 
 - **Líneas largas** (ambas pestañas): una cabecera o una línea de detalle más ancha que la ventana nunca se corta. Aparece una barra de desplazamiento horizontal bajo la lista; desplázate hacia los lados con `Left` / `Right` (reasignables como `activity_log.scroll_left` / `activity_log.scroll_right`), `Shift` + la rueda o una rueda horizontal, los comandos de la paleta `Registro de actividad: Desplazar a la izquierda` / `Registro de actividad: Desplazar a la derecha`, o la barra (arrastra el control, o pulsa la pista para traer el control bajo el puntero). `Home` vuelve al principio, y al cambiar de pestaña la otra empieza en el borde izquierdo. El texto con saltos de línea (un resumen, una acción sugerida) sigue con sus saltos.
@@ -118,6 +118,31 @@ GitPoulpi usa el credential helper y el ssh-agent propios de tu `git` para la re
 Asegúrate de que `git fetch` funciona primero en un terminal normal. Los tokens de
 GitHub/GitLab para las pull requests son aparte y opcionales: consulta
 [Alojamiento y gestores de issues](hosting-integration.md).
+
+**Un fetch, pull o push falla con «The configured credential helper failed», «The SSH host key of the remote is not known yet» o un inicio de sesión rechazado, y su entrada del Registro de actividad tiene un botón «SSH y credenciales...».**
+El fallo viene de cómo inicia sesión este repositorio. El botón abre
+Ajustes > SSH y credenciales, donde eliges otro origen para este
+repositorio: los helpers propios de git con los del repositorio ignorados, una
+cuenta de integración, un archivo de clave (con un archivo known_hosts) o un helper o
+comando de token tuyo; **Probar conexión** comprueba después todos los remotos. Para un
+helper que no se pudo ejecutar, `git config --show-origin --get-all
+credential.helper` muestra dónde está definido.
+
+**«GitPoulpi no envió el token de la cuenta a ...».** El remoto del repositorio
+apunta a un servidor que no es la dirección a la que está vinculada la cuenta elegida
+(a menudo una reescritura `url.<x>.insteadOf` en la config del propio repositorio), así que
+el token se retuvo. Corrige el remoto o elige otro origen en la página.
+
+**«Falló el comando de token de este repositorio», «... ha cambiado desde que lo confirmaste», «No se puede usar el inicio de sesión de este repositorio».**
+La página no puede llevar a cabo lo elegido: el comando de token no imprimió ningún token
+(se citan sus últimas líneas de error, sin secretos), un script que ejecuta
+ha cambiado desde que lo confirmaste (vuelve a confirmar el comando en la página), o
+la elección nombra un archivo de clave o una cuenta que ya no existe. Cada mensaje tiene el
+botón **SSH y credenciales...**.
+
+**OpenSSH dice «bad permissions» para un archivo de clave.** Otras cuentas pueden leer la
+clave. En Ajustes > SSH y credenciales, la fila **Archivo de clave privada** muestra una
+advertencia con **Restringir a mi cuenta**.
 
 **«haciendo stage...» se queda en la barra de estado.** Sigue ejecutándose una actualización en
 segundo plano; desaparece cuando se actualiza la lista de archivos. `r` fuerza una

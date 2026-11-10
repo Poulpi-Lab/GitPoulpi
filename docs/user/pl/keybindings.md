@@ -649,9 +649,9 @@ zastosowania. Klawisze są domyślne.
 | Zdalne: Fetch zdalnego... |  |
 | Zdalne: Akcje dla zaznaczonego zdalnego... | `.` |
 | Repozytorium: Częściowy checkout... |  |
-| Repository: SSH & Credentials... |  |
-| Repository: Test Connection |  |
-| Repository: Use Default Credentials |  |
+| Repozytorium: SSH i poświadczenia... |  |
+| Repozytorium: Testuj połączenie |  |
+| Repozytorium: Użyj domyślnych poświadczeń |  |
 | Flow: Otwórz menu | `Ctrl+G W` |
 | Flow: Rozpocznij gałąź... |  |
 | Flow: Nowe zgłoszenie... |  |

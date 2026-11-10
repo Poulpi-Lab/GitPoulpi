@@ -41,7 +41,7 @@ Przycisk **Aktywność** na prawym końcu paska stanu (liczba na nim zlicza bł�
 
 **Wyczyść dziennik** (`x` lub polecenie palety `Dziennik aktywności: Wyczyść dziennik aplikacji`) jest na karcie **Aplikacja**: najpierw pyta, potem opróżnia pliki dziennika ze wszystkich przechowywanych dni i listę na ekranie. Nie można tego cofnąć i nie trafia do historii cofania.
 
-- **Operacje git** (karta, na której otwiera się okno): operacje, od najnowszej, każda z godziną uruchomienia i czasem trwania (`Push - 123 ms`): otwarcie repozytorium, wczytanie grafu commitów, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Niepowodzenia, komunikaty stanu, nieudane klonowanie i Fetch all obszaru roboczego też tu są; `Enter` lub kliknięcie otwiera wpis (jego powód, następny krok, polecenie, kod wyjścia i wyjście), `c` lub jego przycisk Kopiuj go kopiuje, `r` lub jego przycisk wykonuje sugerowany krok. `Tab` (albo tutaj `Left`/`Right`) przełącza na kartę Aplikacja.
+- **Operacje git** (karta, na której otwiera się okno): operacje, od najnowszej, każda z godziną uruchomienia i czasem trwania (`Push - 123 ms`): otwarcie repozytorium, wczytanie grafu commitów, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Niepowodzenia, komunikaty stanu, nieudane klonowanie i Fetch all obszaru roboczego też tu są; `Enter` lub kliknięcie otwiera wpis (jego powód, następny krok, polecenie, kod wyjścia i wyjście), `c` lub jego przycisk Kopiuj go kopiuje, `r` lub jego przycisk wykonuje sugerowany krok. `Tab` (lub `p`) przełącza na kartę Aplikacja; `Left`/`Right` przewijają długie wiersze na boki.
 
   ![Dziennik aktywności, karta Operacje git: każda operacja z godziną i czasem trwania, nieudany fetch na czerwono](../images/activity-log-repository.png)
 
@@ -116,6 +116,32 @@ GitPoulpi używa do sieci własnego menedżera poświadczeń i ssh-agenta twojeg
 Upewnij się najpierw, że `git fetch` działa w zwykłym terminalu. Tokeny GitHub/GitLab
 dla pull requestów są osobne i opcjonalne: zob. [Hosting i trackery
 zgłoszeń](hosting-integration.md).
+
+**Fetch, pull lub push kończy się błędem „Skonfigurowany pomocnik poświadczeń zawiódł”, „Klucz hosta SSH zdalnego repozytorium nie jest jeszcze znany” albo odrzuconym logowaniem, a jego wpis w Dzienniku aktywności ma przycisk „SSH i poświadczenia...”.**
+Błąd wynika z tego, jak to repozytorium się loguje. Przycisk otwiera
+Ustawienia > SSH i poświadczenia, gdzie wybierasz inne źródło dla tego
+repozytorium: własnych pomocników gita z ignorowanymi pomocnikami repozytorium,
+konto integracji, plik klucza (z plikiem znanych hostów) albo własnego
+pomocnika lub polecenie tokenu; **Testuj połączenie** sprawdza potem każde
+zdalne repozytorium. Gdy pomocnik nie mógł się uruchomić, `git config
+--show-origin --get-all credential.helper` pokazuje, gdzie jest ustawiony.
+
+**„GitPoulpi nie wysłał tokenu konta do ...”.** Zdalne repozytorium wskazuje
+serwer, który nie jest adresem, z którym związane jest wybrane konto (często
+przepisanie `url.<x>.insteadOf` we własnej konfiguracji repozytorium), więc
+token został wstrzymany. Napraw zdalne repozytorium lub wybierz inne źródło na
+stronie.
+
+**„Polecenie tokenu tego repozytorium nie powiodło się”, „... zmienił się od chwili, gdy potwierdzono”, „Logowania tego repozytorium nie można użyć”.**
+Wyborów ze strony nie da się wykonać: polecenie tokenu nie wypisało tokenu
+(jego ostatnie wiersze błędu są cytowane, z usuniętymi sekretami), skrypt,
+który uruchamia, zmienił się od potwierdzenia (potwierdź polecenie ponownie na
+stronie) albo wybór wskazuje plik klucza lub konto, których już nie ma. Każdy
+z tych komunikatów ma przycisk **SSH i poświadczenia...**.
+
+**OpenSSH mówi „bad permissions” dla pliku klucza.** Inne konta mogą czytać
+klucz. W Ustawienia > SSH i poświadczenia wiersz **Plik klucza prywatnego**
+pokazuje ostrzeżenie z przyciskiem **Ogranicz do mojego konta**.
 
 **„staging...” zostaje na pasku stanu.** Odświeżanie w tle nadal trwa; znika,
 gdy lista plików się zaktualizuje. `r` wymusza odświeżenie.

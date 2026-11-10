@@ -80,7 +80,7 @@ aktywnej karcie i na karcie pod wskaźnikiem. Rząd kart zawiera tylko karty (pr
   karty: **Nowa karta**, **Zamknij kartę**, **Zamknij inne karty...**, **Zamknij karty po
   prawej...**, **Dodaj do ulubionych** (albo **Usuń z ulubionych**), **Dodaj do
   obszaru roboczego** (albo **Usuń z obszaru roboczego**, gdy masz obszary robocze),
-  **Kopiuj ścieżkę**, **Otwórz w ›**, **Klucz SSH...** i **Częściowy checkout...**.
+  **Kopiuj ścieżkę**, **Otwórz w ›**, **SSH i poświadczenia...** i **Częściowy checkout...**.
 - `Ctrl+PageUp` i `Ctrl+PageDown` przełączają karty. `Ctrl+W` zamyka bieżącą
   kartę. Kliknięcie karty środkowym przyciskiem też ją zamyka (z tym samym
   pytaniem).

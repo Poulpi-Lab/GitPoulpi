@@ -9,7 +9,9 @@ fn nested() -> tempfile::TempDir {
     tmp
 }
 
-/// `(name, depth, open)` of the tree rows below `root`, root excluded.
+/// `(name, depth, open)` of the tree rows below `root`, root excluded; the
+/// depth counts from `root` (1 = its children), so the length of the temp
+/// path (deeper on Windows) does not matter.
 fn below(picker: &FolderPicker, root: &Path) -> Vec<(String, usize, bool)> {
     let rows = picker.left_rows();
     let start = rows
@@ -28,7 +30,7 @@ fn below(picker: &FolderPicker, root: &Path) -> Vec<(String, usize, bool)> {
         .map(|r| match r {
             LeftRow::Tree {
                 name, depth, open, ..
-            } => (name.clone(), *depth, *open),
+            } => (name.clone(), *depth - root_depth, *open),
             other => panic!("{other:?}"),
         })
         .collect()
@@ -48,7 +50,7 @@ fn alt_s() -> KeyEvent {
 fn unchecked_the_tree_is_the_chain_and_the_current_folders_children() {
     let (tmp, picker) = open_at_b2();
     assert!(!picker.show_siblings);
-    let d = tmp.path().components().count();
+    let d = 1;
     assert_eq!(
         below(&picker, tmp.path()),
         [
@@ -64,7 +66,7 @@ fn checked_every_open_level_lists_its_folders_with_the_path_expanded() {
     let (tmp, mut picker) = open_at_b2();
     picker.set_show_siblings(true);
     settle(&mut picker);
-    let d = tmp.path().components().count();
+    let d = 1;
     assert_eq!(
         below(&picker, tmp.path()),
         [
@@ -116,15 +118,23 @@ fn the_checkbox_and_a_sibling_row_work_by_mouse_and_draw_the_fold_marks() {
         PickerOutcome::ShowSiblingsChanged(true)
     );
     settle(&mut picker);
-    let text = draw(&mut picker, 120, 30);
-    assert!(text.contains("Show sibling folders"), "{text}");
-    assert!(text.contains(&format!("{} a", crate::fold_mark::COLLAPSED)));
-    assert!(text.contains(&format!("{} b", crate::fold_mark::EXPANDED)));
+    // The ancestors' own sibling folders can fill the window (a crowded temp
+    // folder, a Windows drive): bring the rows under the temp root into view.
     let a = picker
         .left_rows()
         .iter()
         .position(|r| matches!(r, LeftRow::Tree { name, .. } if name == "a"))
         .unwrap();
+    // Scrolling to "b" keeps "a", just above it, in view too.
+    picker.left_sel = Some(a + 1);
+    picker.follow = true;
+    let text = draw(&mut picker, 120, 30);
+    assert!(text.contains("Show sibling folders"), "{text}");
+    assert!(
+        text.contains(&format!("{} a", crate::fold_mark::COLLAPSED)),
+        "{text}"
+    );
+    assert!(text.contains(&format!("{} b", crate::fold_mark::EXPANDED)));
     click(&mut picker, PickerHit::Left(a), false);
     assert_eq!(picker.dir, tmp.path().join("a"));
 }

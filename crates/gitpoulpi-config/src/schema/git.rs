@@ -1,5 +1,6 @@
 //! The `git` part of the config schema.
 
+use gitpoulpi_core::domain::MergeFastForward;
 use serde::{Deserialize, Serialize};
 
 config_enum! {
@@ -87,6 +88,10 @@ pub struct GitConfig {
     pub pull_mode: PullButtonMode,
     /// Live: whether Push goes straight to the default remote or asks.
     pub push_behavior: PushBehavior,
+    /// Live: whether a merge the user starts may fast-forward: `never`
+    /// (always a merge commit, the default), `allowed` (git's own default)
+    /// or `only`. A repository's Merge options page overrides it.
+    pub merge_fast_forward: MergeFastForward,
 }
 
 impl Default for GitConfig {
@@ -99,6 +104,7 @@ impl Default for GitConfig {
             lfs_autofix_filters: true,
             pull_mode: PullButtonMode::default(),
             push_behavior: PushBehavior::default(),
+            merge_fast_forward: MergeFastForward::default(),
         }
     }
 }

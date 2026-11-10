@@ -168,6 +168,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "git.lfs_enabled",
     "git.lfs_autofix_filters",
     "git.push_behavior",
+    "git.merge_fast_forward",
     "ssh.key_type",
     "ssh.private_key_path",
     "ssh.public_key_path",

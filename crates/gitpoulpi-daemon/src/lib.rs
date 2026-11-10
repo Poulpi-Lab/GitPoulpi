@@ -20,6 +20,7 @@ mod journal_store;
 #[cfg(feature = "lfs")]
 mod lfs_preflight;
 mod mailmap;
+mod merge_policy;
 #[cfg(test)]
 mod op_classification;
 mod opstate;

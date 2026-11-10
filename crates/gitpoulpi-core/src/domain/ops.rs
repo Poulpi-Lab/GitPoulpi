@@ -85,9 +85,56 @@ pub enum CheckoutTarget {
     },
 }
 
+/// Whether a merge the user starts may fast-forward (`git.merge_fast_forward`
+/// and the repository's own override).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MergeFastForward {
+    /// Always make a merge commit (`--no-ff`), even when the branch could
+    /// simply be fast-forwarded.
+    #[default]
+    Never,
+    /// Fast-forward when possible, a merge commit otherwise (git's default,
+    /// and `merge.ff` when the repository sets it).
+    Allowed,
+    /// Fast-forward only (`--ff-only`): a diverged branch is refused with
+    /// the typed `NotFastForward`.
+    Only,
+}
+
+impl MergeFastForward {
+    pub const ALL: &'static [MergeFastForward] = &[Self::Never, Self::Allowed, Self::Only];
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Never => "never",
+            Self::Allowed => "allowed",
+            Self::Only => "only",
+        }
+    }
+
+    pub fn parse(text: &str) -> Option<Self> {
+        Self::ALL
+            .iter()
+            .copied()
+            .find(|m| m.as_str() == text.trim())
+    }
+
+    /// The repository's own choice wins over the global one; a value that is
+    /// not a policy (a hand-edited file) is ignored, never an error.
+    pub fn resolve(repo: Option<&str>, global: Self) -> Self {
+        repo.and_then(Self::parse).unwrap_or(global)
+    }
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct MergeOptions {
+    /// The fast-forward policy of a user-started merge. `None` lets the
+    /// daemon resolve it from the settings (repository override, then
+    /// `git.merge_fast_forward`) into `no_ff` / `fast_forward_only`; a request
+    /// that sets either flag itself is taken as it is.
+    pub ff: Option<MergeFastForward>,
     pub fast_forward_only: bool,
     pub no_commit: bool,
     /// Always make a merge commit, even when a fast-forward is possible

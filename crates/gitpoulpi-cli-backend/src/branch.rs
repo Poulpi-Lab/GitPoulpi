@@ -140,7 +140,7 @@ pub fn fast_forward(repo: &RepoRef, branch: &str, target: Oid) -> Result<FastFor
 
 /// `git merge-base --is-ancestor`: exit 0 yes, 1 no, anything else an
 /// error (an unknown commit).
-fn is_ancestor(repo: &RepoRef, ancestor: &str, descendant: &str) -> Result<bool> {
+pub(crate) fn is_ancestor(repo: &RepoRef, ancestor: &str, descendant: &str) -> Result<bool> {
     let out = crate::process::run_status(
         &repo.root,
         &["merge-base", "--is-ancestor", ancestor, descendant],

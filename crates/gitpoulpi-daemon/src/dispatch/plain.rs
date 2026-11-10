@@ -338,6 +338,7 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
                 .get("opts")
                 .and_then(|v| serde_json::from_value(v.clone()).ok())
                 .unwrap_or_default();
+            let opts = crate::merge_policy::apply(&repo, opts);
             to_json!(backend.merge(&repo, &from, &opts))
         }
         OperationKind::StageFile

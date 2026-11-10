@@ -55,6 +55,13 @@ pub fn merge(repo: &RepoRef, from: &Ref, opts: &MergeOptions) -> Result<MergeOut
         if !conflicts.is_empty() {
             return Ok(MergeOutcome::Conflicted(conflicts));
         }
+        // `--ff-only` on a branch that cannot fast-forward: the typed reading
+        // (asked of the graph, not of git's wording, which is translated).
+        if opts.fast_forward_only
+            && !crate::branch::is_ancestor(repo, &before.to_hex(), &from.target.to_hex())?
+        {
+            return Err(Error::NotFastForward);
+        }
         return Err(Error::Backend(format!(
             "git merge failed: {}",
             output.stderr

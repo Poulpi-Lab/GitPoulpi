@@ -18,9 +18,10 @@ use gitpoulpi_core::domain::{
     short, Blame, BlameContent, Blob, BlobContent, BlobSource, CheckoutTarget, CherryPickOptions,
     CherryPickOutcome, CloneOptions, CommitAmend, CommitGraph, CommitOptions, DiffFileList,
     DiffTarget, DiscardTarget, FetchOptions, FetchOutcome, FileChangeKind, FileDiff,
-    FileHistoryPage, HunkId, LineSelector, LogOptions, MergeOptions, MergeOutcome, Oid,
-    OperationKind, PullMode, PullOptions, PullOutcome, PushOptions, PushOutcome, RebaseAction,
-    RefKind, RepoRef, ResetMode, RevertOutcome, RewordOutcome, StageTarget, WorkingTree,
+    FileHistoryPage, HunkId, LineSelector, LogOptions, MergeFastForward, MergeOptions,
+    MergeOutcome, Oid, OperationKind, PullMode, PullOptions, PullOutcome, PushOptions, PushOutcome,
+    RebaseAction, RefKind, RepoRef, ResetMode, RevertOutcome, RewordOutcome, StageTarget,
+    WorkingTree,
 };
 use serde_json::{json, Value};
 
@@ -941,8 +942,21 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
         Commands::Merge {
             r#ref,
             squash,
+            ff,
+            no_ff,
+            ff_only,
             autostash,
         } => {
+            // No flag: `ff` stays `None` and the daemon applies the setting.
+            let ff_policy = if ff {
+                Some(MergeFastForward::Allowed)
+            } else if no_ff {
+                Some(MergeFastForward::Never)
+            } else if ff_only {
+                Some(MergeFastForward::Only)
+            } else {
+                None
+            };
             let from = find_ref(session, &r#ref).await?;
             let outcome: MergeOutcome = session
                 .call(
@@ -953,6 +967,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
                             "opts": MergeOptions {
                                 squash,
                                 no_commit: squash,
+                                ff: ff_policy,
                                 ..MergeOptions::default()
                             },
                         }),

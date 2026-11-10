@@ -78,6 +78,9 @@ pub struct RepoPreferences {
     /// Merge options: a local branch merge squashes (stages the changes, no
     /// merge commit). `None` is off.
     pub squash_merge: Option<bool>,
+    /// Merge options: whether a merge may fast-forward here, `never` /
+    /// `allowed` / `only`. `None` follows `git.merge_fast_forward`.
+    pub merge_fast_forward: Option<String>,
     /// Message template: an empty commit panel is pre-filled with it.
     pub template_apply: Option<bool>,
     /// Message template: comment lines (`core.commentChar`) are removed from

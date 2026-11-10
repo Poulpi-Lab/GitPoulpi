@@ -365,6 +365,8 @@ CLI 명령마다 도구가 하나씩 있으며, 이름은 경로를 `_`로 이�
 | `repo_list` | `gitpoulpi repo list` | read |
 | `repo_open` | `gitpoulpi repo open` | write |
 | `repo_recent` | `gitpoulpi repo recent` | read |
+| `repo_auth_show` | `gitpoulpi repo-auth show` | read |
+| `repo_auth_test` | `gitpoulpi repo-auth test` | write, network |
 | `repo_config_set` | `gitpoulpi repo-config set` | write |
 | `repo_config_show` | `gitpoulpi repo-config show` | read |
 | `repo_config_unset` | `gitpoulpi repo-config unset` | write |
@@ -493,6 +495,8 @@ Not exposed as tools:
 | `gitpoulpi config set` | an agent must not be able to rewrite its own gating config |
 | `gitpoulpi hosting ssh-key create` | writes a private key and uploads it; too dangerous to let an agent automate |
 | `gitpoulpi hosting login` | takes a secret token on stdin; a token must not pass through an agent's tool-call transcript |
+| `gitpoulpi repo-auth set` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
+| `gitpoulpi repo-auth clear` | which identity a repository authenticates with is the user's decision; an agent could switch a repository to a more privileged token |
 | `gitpoulpi flow trust-hooks` | trusting the shell commands a repository commits is a person's decision; an agent can only run hooks a person trusted |
 <!-- mcp-tools:end -->
 

@@ -643,9 +643,9 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 리모트: 리모트 Fetch... |  |
 | 리모트: 선택한 리모트의 동작... | `.` |
 | 저장소: 스파스 체크아웃... |  |
-| Repository: SSH & Credentials... |  |
-| Repository: Test Connection |  |
-| Repository: Use Default Credentials |  |
+| 저장소: SSH 및 자격 증명... |  |
+| 저장소: 연결 테스트 |  |
+| 저장소: 기본 자격 증명 사용 |  |
 | Flow: 메뉴 열기 | `Ctrl+G W` |
 | Flow: 브랜치 시작... |  |
 | Flow: 새 이슈... |  |

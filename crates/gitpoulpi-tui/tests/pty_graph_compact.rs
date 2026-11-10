@@ -62,6 +62,15 @@ fn graph_cells(s: &Screen, gx: u16, width: u16, header_row: u16) -> Vec<String> 
         .collect()
 }
 
+/// The screen once it has settled (a torn frame has half a header).
+fn snap(term: &xtask::pty::Terminal) -> Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
+}
+
 #[test]
 fn the_graph_at_its_least_width_is_one_dot_per_row_and_one_cell_more_brings_the_tree_back() {
     let repo = fixture();
@@ -73,10 +82,10 @@ fn the_graph_at_its_least_width_is_one_dot_per_row_and_one_cell_more_brings_the_
         })
         .mouse_capture()
         .start();
-    let (gx, row) = header(&term.screen(), "Graph").unwrap();
-    let (mx, _) = header(&term.screen(), "Message").unwrap();
+    let (gx, row) = header(&snap(&term), "Graph").unwrap();
+    let (mx, _) = header(&snap(&term), "Message").unwrap();
     assert!(mx - gx > 3, "the Graph column starts wide");
-    let wide = graph_cells(&term.screen(), gx, mx - gx, row);
+    let wide = graph_cells(&snap(&term), gx, mx - gx, row);
     assert_eq!(wide.len(), 4, "{}", term.text());
     assert!(
         wide.iter().any(|r| r.chars().any(|c| STROKES.contains(c))),
@@ -90,7 +99,7 @@ fn the_graph_at_its_least_width_is_one_dot_per_row_and_one_cell_more_brings_the_
         header(s, "Message").is_some_and(|(x, _)| x == gx + 2)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let compact = graph_cells(&term.screen(), gx, 2, row);
+    let compact = graph_cells(&snap(&term), gx, 2, row);
     assert_eq!(compact.len(), 4);
     for cells in &compact {
         assert!(
@@ -109,7 +118,7 @@ fn the_graph_at_its_least_width_is_one_dot_per_row_and_one_cell_more_brings_the_
         header(s, "Message").is_some_and(|(x, _)| x == gx + 3)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let three = graph_cells(&term.screen(), gx, 3, row);
+    let three = graph_cells(&snap(&term), gx, 3, row);
     assert!(
         three.iter().any(|r| r.chars().any(|c| STROKES.contains(c))),
         "lanes are back one cell wider: {three:?}\n{}",

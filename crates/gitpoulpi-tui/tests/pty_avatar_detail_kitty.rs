@@ -161,7 +161,16 @@ fn the_detail_avatar_is_uploaded_and_placed_over_kitty() {
         .unwrap_or_else(|e| panic!("{e}"));
     term.wait_for_stable(Duration::from_millis(1500), STEP)
         .unwrap();
-    let raw = String::from_utf8_lossy(&term.raw_output()).into_owned();
+    // The stream is read in small pieces under torn frames: wait (bounded)
+    // for the whole upload and the placeholders to have arrived.
+    let deadline = std::time::Instant::now() + Duration::from_secs(60);
+    let mut raw = String::from_utf8_lossy(&term.raw_output()).into_owned();
+    while (uploaded_png_size(&raw, 5, 2).is_none() || raw.matches('\u{10EEEE}').count() < 10)
+        && std::time::Instant::now() < deadline
+    {
+        std::thread::sleep(Duration::from_millis(250));
+        raw = String::from_utf8_lossy(&term.raw_output()).into_owned();
+    }
     let _ = term.stop();
     assert!(uploaded_png_size(&raw, 5, 2).is_some(), "picture uploaded");
     assert!(

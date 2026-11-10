@@ -41,15 +41,15 @@ fn the_changes_column_is_hidden_by_default_and_fills_in_for_the_visible_rows() {
     term.wait_for("the fixture loaded", STARTUP, |s| s.contains("edit a"))
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
-        !term.screen().contains("Changes"),
+        !snap(&term).contains("Changes"),
         "hidden by default: {}",
         term.text()
     );
-    assert!(!term.screen().contains("1 file"), "{}", term.text());
+    assert!(!snap(&term).contains("1 file"), "{}", term.text());
 
     // Right-click the SHA header for the column menu and tick Changes.
     let (col, row) = {
-        let screen = term.screen();
+        let screen = snap(&term);
         let header = header_row(&screen).expect("the Log header");
         let (c, r) = screen
             .find_all("SHA")
@@ -62,7 +62,7 @@ fn the_changes_column_is_hidden_by_default_and_fills_in_for_the_visible_rows() {
     term.wait_for("the column menu", STEP, |s| s.contains("[x]"))
         .unwrap_or_else(|e| panic!("{e}"));
     let (mc, mr) = {
-        let screen = term.screen();
+        let screen = snap(&term);
         screen
             .find_all("Changes")
             .into_iter()
@@ -78,7 +78,7 @@ fn the_changes_column_is_hidden_by_default_and_fills_in_for_the_visible_rows() {
         s.contains("1 file +2 -0") && s.contains("1 file +1 -1") && s.contains("1 file +3 -0")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    assert!(term.screen().contains("Changes"), "{}", term.text());
+    assert!(snap(&term).contains("Changes"), "{}", term.text());
 
     term.send_keys("q").unwrap();
     for _ in 0..100 {
@@ -88,4 +88,14 @@ fn the_changes_column_is_hidden_by_default_and_fills_in_for_the_visible_rows() {
         std::thread::sleep(Duration::from_millis(100));
     }
     let _ = term.stop();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

@@ -61,7 +61,9 @@ fn open_diff(term: &mut Terminal) {
 }
 
 fn cross_without_esc(term: &Terminal) -> (u16, u16) {
-    let screen = term.screen();
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let (c, r) = screen.find(CROSS).expect("the close cross");
     let line = term.text().lines().nth(r as usize).unwrap().to_string();
     assert!(!line.contains("Esc"), "no Esc beside the cross: {line:?}");

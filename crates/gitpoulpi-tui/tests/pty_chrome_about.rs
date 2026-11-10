@@ -42,6 +42,30 @@ fn start(
     (term, dir, repo)
 }
 
+/// Clicks the octopus until the About window is up, then lets it be drawn
+/// whole: the octopus can be drawn before its hit target is registered, and a
+/// torn frame hides parts of the window.
+fn click_octopus(term: &mut Terminal) {
+    common::retry_until(
+        term,
+        "the About window",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((col, row)) = t.screen().find("\u{1F419}") {
+                t.click(col, row).unwrap();
+            }
+        },
+        |s| s.contains("About GitPoulpi"),
+    );
+    settled(term);
+}
+
+fn settled(term: &Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
+}
+
 fn local_config(repo: &std::path::Path, key: &str) -> String {
     let out = std::process::Command::new("git")
         .args(["config", "--local", "--get", key])
@@ -63,7 +87,7 @@ fn palette(term: &mut Terminal, query: &str, entry: &str) {
 #[test]
 fn the_octopus_opens_about_and_the_palette_twin_does_too() {
     let (mut term, _dir, _repo) = start("about-window", "[ui]\ngraph_renderer = \"text\"\n");
-    let screen = term.screen();
+    let screen = snap(&term);
     let (col, row) = screen.find("\u{1F419}").expect("the octopus");
     assert_eq!(row, 0, "{}", term.text());
     let (title_col, title_row) = screen.find("GitPoulpi").expect("the title");
@@ -105,7 +129,7 @@ fn with_an_image_protocol_the_octopus_is_a_picture_that_still_opens_about() {
         .size(200, 50)
         .ready_when("the fixture loaded", |s| s.contains("first-commit"))
         .start();
-    let screen = term.screen();
+    let screen = snap(&term);
     assert!(
         screen.find("\u{1F419}").is_none(),
         "the emoji is replaced by the picture:\n{}",
@@ -126,7 +150,7 @@ fn no_profile_combobox_without_two_profiles() {
         "profile-none",
         "[ui]\ngraph_renderer = \"text\"\n[[profiles]]\nid = \"home\"\nname = \"Home\"\nauthor_name = \"H\"\nauthor_email = \"h@x.test\"\n",
     );
-    assert!(!term.screen().contains("Default ("), "{}", term.text());
+    assert!(!snap(&term).contains("Default ("), "{}", term.text());
     palette(&mut term, "Change Profile", "Repository: Change Profile");
     term.wait_for_text("add a second profile", STEP).unwrap();
     term.stop().unwrap();
@@ -140,13 +164,13 @@ fn the_profile_combobox_stores_the_choice_and_offers_the_git_config() {
     let (col, row) = term
         .wait_for_text("Default (Home)", STEP)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (_, toolbar_row) = term.screen().find("Undo").expect("the toolbar");
+    let (_, toolbar_row) = snap(&term).find("Undo").expect("the toolbar");
     assert_eq!(row, toolbar_row, "on the toolbar row:\n{}", term.text());
     assert!(col > 150, "at the right end: {col}");
     term.click(col + 1, row).unwrap();
     term.wait_for("the list", STEP, |s| s.contains("Work"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (wc, wr) = term.screen().find("Work").unwrap();
+    let (wc, wr) = snap(&term).find("Work").unwrap();
     term.click(wc, wr).unwrap();
     term.wait_for("the question", STEP, |s| {
         s.contains("Work Me <me@work.test>") && s.contains("Write to git config")
@@ -163,7 +187,7 @@ fn the_profile_combobox_stores_the_choice_and_offers_the_git_config() {
     term.wait_for_text_to_go("Write to git config", STEP)
         .unwrap();
     assert_eq!(local_config(repo.root(), "user.email"), baseline);
-    assert!(term.screen().contains("Work"), "{}", term.text());
+    assert!(snap(&term).contains("Work"), "{}", term.text());
     // The palette twin opens the same list; picking the default again asks
     // for Home's identity, and confirming writes it.
     palette(&mut term, "Change Profile", "Repository: Change Profile");
@@ -172,7 +196,7 @@ fn the_profile_combobox_stores_the_choice_and_offers_the_git_config() {
     term.send_keys("Up").unwrap();
     term.send_keys("Enter").unwrap();
     term.wait_for_text("Write to git config", STEP).unwrap();
-    let (bc, br) = term.screen().find("Write to git config").unwrap();
+    let (bc, br) = snap(&term).find("Write to git config").unwrap();
     term.click(bc + 1, br).unwrap();
     for _ in 0..100 {
         if local_config(repo.root(), "user.email") == "me@home.test" {
@@ -189,14 +213,13 @@ fn the_profile_combobox_stores_the_choice_and_offers_the_git_config() {
 #[test]
 fn clicking_the_logo_spins_to_the_next_color_and_the_list_picks_one() {
     let (mut term, dir, _repo) = start("about-logo", "[ui]\ngraph_renderer = \"text\"\n");
-    let (col, row) = term.screen().find("\u{1F419}").expect("the octopus");
-    term.click(col, row).unwrap();
+    click_octopus(&mut term);
     term.wait_for("the About window", STEP, |s| s.contains("License: MIT"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The hint line names both keys.
-    assert!(term.screen().contains("c: color"), "{}", term.text());
+    assert!(snap(&term).contains("c: color"), "{}", term.text());
     // The logo is drawn as half-blocks here (no pixel protocol in the pty).
-    let (lc, lr) = term.screen().find("\u{2580}").expect("the logo");
+    let (lc, lr) = settled(&term).find("\u{2580}").expect("the logo");
     // A click on it spins (does not close) and lands on the next color.
     term.click(lc + 2, lr + 2).unwrap();
     let saved = || std::fs::read_to_string(dir.path().join("config.toml")).unwrap_or_default();
@@ -208,7 +231,7 @@ fn clicking_the_logo_spins_to_the_next_color_and_the_list_picks_one() {
     }
     // Lavender (the default) is followed by Sun.
     assert!(saved().contains("logo_color = \"sun\""), "{}", saved());
-    assert!(term.screen().contains("License: MIT"), "still open");
+    assert!(settled(&term).contains("License: MIT"), "still open");
     // `c` opens the color list; typing narrows it; Enter picks.
     term.send_text("c").unwrap();
     term.wait_for("the color list", STEP, |s| {
@@ -234,11 +257,10 @@ fn clicking_the_logo_spins_to_the_next_color_and_the_list_picks_one() {
 #[test]
 fn the_color_list_rows_are_clickable() {
     let (mut term, dir, _repo) = start("about-list-click", "[ui]\ngraph_renderer = \"text\"\n");
-    let (col, row) = term.screen().find("\u{1F419}").expect("the octopus");
-    term.click(col, row).unwrap();
+    click_octopus(&mut term);
     term.wait_for("the About window", STEP, |s| s.contains("License: MIT"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (lc, lr) = term.screen().find("\u{2580}").expect("the logo");
+    let (lc, lr) = settled(&term).find("\u{2580}").expect("the logo");
     term.right_click(lc + 2, lr + 2).unwrap();
     let screen = term
         .wait_for("the color list", STEP, |s| s.contains("Mint"))
@@ -290,8 +312,7 @@ fn the_links_open_and_the_crate_list_scrolls() {
         .no_exit_pause()
         .ready("first-commit")
         .spawn();
-    let (col, row) = term.screen().find("\u{1F419}").expect("the octopus");
-    term.click(col, row).unwrap();
+    click_octopus(&mut term);
     let docs = "https://github.com/Poulpi-Lab/GitPoulpi/tree/main/docs/user";
     // The docs address is on the screen the wait describes, not asserted
     // after it (the window is drawn over more than one write).
@@ -323,7 +344,7 @@ fn the_links_open_and_the_crate_list_scrolls() {
         "{:?}",
         opened(1)
     );
-    let (dc, dr) = term.screen().find(docs).unwrap();
+    let (dc, dr) = snap(&term).find(docs).unwrap();
     term.click(dc + 4, dr).unwrap();
     assert_eq!(opened(2)[1], docs);
     term.send_text("s").unwrap();
@@ -335,31 +356,26 @@ fn the_links_open_and_the_crate_list_scrolls() {
         "{:?}",
         opened(4)
     );
-    for key in [
-        "[s] Source code",
-        "[d] Documentation",
-        "[i] License",
-        "[l] Third-party",
-    ] {
-        assert!(term.screen().contains(key), "{key}:\n{}", term.text());
-    }
-    assert!(
-        term.screen().contains("License: MIT"),
-        "still open:\n{}",
-        term.text()
-    );
+    term.wait_for("every link's key, the window still open", STEP, |s| {
+        [
+            "[s] Source code",
+            "[d] Documentation",
+            "[i] License",
+            "[l] Third-party",
+            "License: MIT",
+        ]
+        .iter()
+        .all(|k| s.contains(k))
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The crate list, by key, then back with Esc (which does not close).
     term.send_text("l").unwrap();
-    term.wait_for("the crate list", STEP, |s| s.contains("arboard "))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // Each crate shows its license (read from the registry at build time).
-    let screen = term.screen();
-    let (_, arow) = screen.find("arboard").unwrap();
-    assert!(
-        screen.line(arow).contains("MIT OR Apache-2.0"),
-        "{}",
-        term.text()
-    );
+    term.wait_for("the crate list, arboard with its license", STEP, |s| {
+        s.find("arboard")
+            .is_some_and(|(_, r)| s.line(r).contains("MIT OR Apache-2.0"))
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("End").unwrap();
     term.wait_for("scrolled to the end", STEP, |s| {
         !s.contains("arboard ") && s.contains("tracing ")
@@ -369,25 +385,24 @@ fn the_links_open_and_the_crate_list_scrolls() {
     term.wait_for("back to the facts", STEP, |s| s.contains("License: MIT"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // A click on the crate line opens the list too.
-    let (cc, cr) = term.screen().find("Third-party crates:").unwrap();
-    term.click(cc + 2, cr).unwrap();
-    term.wait_for("the crate list by click", STEP, |s| s.contains("arboard "))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::click_text_until(
+        &mut term,
+        "Third-party crates:",
+        "the crate list by click",
+        |s| s.contains("arboard "),
+    );
     // The mouse way back: the list's title is a back link ("‹ Third-party
     // crates (n)"), lit under the pointer like every link.
-    let (bc, br) = term
-        .screen()
-        .find("\u{2039} Third-party crates (")
-        .expect("the back link");
-    term.click(bc, br).unwrap();
-    term.wait_for("back to the facts by click", STEP, |s| {
-        s.contains("License: MIT")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::click_text_until(
+        &mut term,
+        "\u{2039} Third-party crates (",
+        "back to the facts by click",
+        |s| s.contains("License: MIT"),
+    );
     // The ✕ in the top border closes the window.
-    let (xc, xr) = term.screen().find("\u{2715}").expect("the close cross");
-    term.click(xc, xr).unwrap();
-    term.wait_for_text_to_go("About GitPoulpi", STEP).unwrap();
+    common::click_text_until(&mut term, "\u{2715}", "the window closed", |s| {
+        !s.contains("About GitPoulpi")
+    });
     term.stop().unwrap();
 }
 
@@ -396,8 +411,7 @@ fn the_links_open_and_the_crate_list_scrolls() {
 #[test]
 fn the_close_cross_highlights_under_the_pointer() {
     let (mut term, _dir, _repo) = start("about-cross-hover", "[ui]\ngraph_renderer = \"text\"\n");
-    let (col, row) = term.screen().find("\u{1F419}").expect("the octopus");
-    term.click(col, row).unwrap();
+    click_octopus(&mut term);
     let screen = term
         .wait_for("the About window", STEP, |s| s.contains("License: MIT"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -440,18 +454,17 @@ fn logo_cells(
 #[test]
 fn the_octopus_in_about_follows_the_mouse_with_its_pupils() {
     let (mut term, _dir, _repo) = start("about-eyes", "[ui]\ngraph_renderer = \"text\"\n");
-    let (col, row) = term.screen().find("\u{1F419}").expect("the octopus");
-    term.click(col, row).unwrap();
+    click_octopus(&mut term);
     term.wait_for_text("License: MIT", STEP).unwrap();
     // Far top left, then far bottom right: the pupils sit in other cells.
     term.move_to(1, 1).unwrap();
     term.move_to(2, 2).unwrap();
-    let top_left = logo_cells(&term.screen());
+    let top_left = logo_cells(&settled(&term));
     assert!(!top_left.is_empty(), "no half-block logo:\n{}", term.text());
     term.move_to(198, 48).unwrap();
     term.wait_for("the pupils moved", STEP, |s| logo_cells(s) != top_left)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let bottom_right = logo_cells(&term.screen());
+    let bottom_right = logo_cells(&settled(&term));
     // Back to the first corner: the same picture as before.
     term.move_to(1, 1).unwrap();
     term.move_to(2, 2).unwrap();
@@ -466,13 +479,13 @@ fn the_octopus_in_about_follows_the_mouse_with_its_pupils() {
 #[test]
 fn ctrl_n_a_opens_about_and_the_flag_sits_under_the_octopus() {
     let (mut term, _dir, _repo) = start("about-nav-a", "[ui]\ngraph_renderer = \"text\"\n");
-    let (col, row) = term.screen().find("\u{1F419}").expect("the octopus");
+    let (col, row) = snap(&term).find("\u{1F419}").expect("the octopus");
     assert_eq!(row, 0);
     let flag = |s: &xtask::pty::Screen| {
         s.cell(col + 1, row + 1)
             .is_some_and(|c| c.text == "a" && c.bold)
     };
-    assert!(!flag(&term.screen()), "flag shown before the prefix");
+    assert!(!flag(&snap(&term)), "flag shown before the prefix");
     term.send_keys("C-n").unwrap();
     term.wait_for("the flag under the octopus", STEP, flag)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -505,8 +518,7 @@ fn crates_bar(screen: &xtask::pty::Screen) -> Option<(u16, u16, u16)> {
 #[test]
 fn the_crate_list_scrollbar_drags_jumps_and_steps() {
     let (mut term, _dir, _repo) = start("about-crates-bar", "[ui]\ngraph_renderer = \"text\"\n");
-    let (col, row) = term.screen().find("\u{1F419}").expect("the octopus");
-    term.click(col, row).unwrap();
+    click_octopus(&mut term);
     term.wait_for("the About window", STEP, |s| s.contains("License: MIT"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_text("l").unwrap();
@@ -526,9 +538,9 @@ fn the_crate_list_scrollbar_drags_jumps_and_steps() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.release(col - 20, down + 3).unwrap();
-    assert!(term.screen().contains("License: MIT") || term.screen().contains("Third-party"));
+    assert!(snap(&term).contains("License: MIT") || snap(&term).contains("Third-party"));
     // Back to the top by dragging the thumb up.
-    let (col, up, down) = crates_bar(&term.screen()).expect("the bar again");
+    let (col, up, down) = crates_bar(&snap(&term)).expect("the bar again");
     term.press(col, down - 1).unwrap();
     term.drag_to(col, up).unwrap();
     term.wait_for("the head of the crate list", STEP, |s| {
@@ -537,7 +549,7 @@ fn the_crate_list_scrollbar_drags_jumps_and_steps() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.release(col, up).unwrap();
     // The down arrow steps a row: the first crate scrolls away.
-    let first = term.screen().line(up).trim().to_string();
+    let first = snap(&term).line(up).trim().to_string();
     term.click(col, down).unwrap();
     term.wait_for("one row down", STEP, |s| s.line(up).trim() != first)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -569,25 +581,36 @@ fn a_crate_row_opens_its_page_by_click_and_by_enter() {
         .no_exit_pause()
         .ready("first-commit")
         .spawn();
-    let (col, row) = term.screen().find("\u{1F419}").expect("the octopus");
-    term.click(col, row).unwrap();
+    click_octopus(&mut term);
     term.wait_for("the About window", STEP, |s| s.contains("License: MIT"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_text("l").unwrap();
     term.wait_for("the crate list", STEP, |s| s.contains("arboard "))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // Page down until ratatui's row shows (the list is longer than the page).
+    // (Each page is given time to be drawn whole before the next PageDown.)
     let mut found = None;
     for _ in 0..40 {
-        found = term.screen().find("ratatui ");
-        if found.is_some() {
+        let screen = term.wait_for(
+            "ratatui's row with its link",
+            Duration::from_millis(1500),
+            |s| {
+                s.find("ratatui ").is_some_and(|(_, r)| {
+                    s.line(r)
+                        .split_whitespace()
+                        .any(|w| w.contains('/') && w.contains('.') && w.contains("ratatui"))
+                })
+            },
+        );
+        if let Ok(screen) = screen {
+            found = Some(screen);
             break;
         }
         term.send_keys("PageDown").unwrap();
-        std::thread::sleep(Duration::from_millis(150));
     }
-    let (rc, rr) = found.unwrap_or_else(|| panic!("ratatui row:\n{}", term.text()));
-    let line = term.screen().line(rr);
+    let screen = found.unwrap_or_else(|| panic!("ratatui row:\n{}", term.text()));
+    let (rc, rr) = screen.find("ratatui ").unwrap();
+    let line = screen.line(rr);
     let shown = line
         .split_whitespace()
         .find(|w| w.contains('/') && w.contains('.'))
@@ -623,9 +646,19 @@ fn a_crate_row_opens_its_page_by_click_and_by_enter() {
     let third = opened(3)[2].clone();
     assert!(third.starts_with("https://") && third != first, "{third}");
     assert!(
-        term.screen().contains("Enter: open"),
+        snap(&term).contains("Enter: open"),
         "the hint names the key:\n{}",
         term.text()
     );
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

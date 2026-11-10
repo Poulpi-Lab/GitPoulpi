@@ -294,11 +294,11 @@ fn a_clashing_key_is_red_and_c_lists_its_conflicts() {
         "[keybindings.status]\nstage_toggle = \"q\"\n",
     );
     open_page(&mut term);
-    let s = term.screen();
+    let s = snap(&term);
     let (cc, cr) = s.find("[Ctrl+P]").expect("a plain chip");
     let plain = s.cell(cc + 1, cr).unwrap().fg;
     search(&mut term, "status.stage_toggle", "[q]");
-    let s = term.screen();
+    let s = snap(&term);
     let (pc, pr) = s.find("[q]").expect("the clashing chip");
     assert_ne!(
         s.cell(pc + 1, pr).unwrap().fg,
@@ -353,10 +353,7 @@ fn the_palette_key_button_and_alt_k_open_the_shortcut_filtered() {
     );
     // Mouse: the button at the end of the row.
     palette_on(&mut term);
-    let (c, r) = term
-        .screen()
-        .find("[k]")
-        .expect("the key button on the row");
+    let (c, r) = snap(&term).find("[k]").expect("the key button on the row");
     term.click(c, r).unwrap();
     term.wait_for("the page filtered on Settings", STEP, filtered)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -422,4 +419,14 @@ fn a_palette_only_command_can_be_bound_and_the_key_runs_it() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

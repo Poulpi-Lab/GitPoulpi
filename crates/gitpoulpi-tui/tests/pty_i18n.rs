@@ -96,10 +96,10 @@ fn pick_language(term: &mut Terminal, current: &str, option: &str) {
     let (col, row) = common::wait_for_choice(term, current, STEP);
     term.click(col + 1, row).expect("click the language choice");
     term.wait_for("the popup listing the languages", STEP, |s| {
-        s.contains("\u{2713}")
+        s.contains("\u{2713}") && !s.find_all(option).is_empty()
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = snap(&term);
     let (c, r) = screen
         .find_all(option)
         .into_iter()
@@ -270,4 +270,14 @@ fn a_cjk_ui_language_in_the_config_draws_translated_chrome() {
             );
         }
     }
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

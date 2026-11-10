@@ -97,7 +97,7 @@ fn quit(mut term: Terminal) {
 fn a_hand_paced_double_click_on_a_boundary_fits_the_column_and_starts_no_drag() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "autofit-double");
-    let s = term.screen();
+    let s = snap(&term);
     assert!(!full_author(&s), "cut before the fit\n{}", term.text());
     let (date_x, row) = header(&s, "Date").unwrap();
     let (author_x, _) = header(&s, "Author").unwrap();
@@ -111,11 +111,11 @@ fn a_hand_paced_double_click_on_a_boundary_fits_the_column_and_starts_no_drag() 
     hand_press(&mut term, gap, row + 3);
     term.wait_for("the full name", STEP, full_author)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let fitted_x = header(&term.screen(), "Author").unwrap().0;
+    let fitted_x = header(&snap(&term), "Author").unwrap().0;
     // The button is still down: dragging far left must not move anything.
     term.drag_to(author_x + 2, row + 3).unwrap();
     ms(300);
-    let held = term.screen();
+    let held = snap(&term);
     assert!(
         full_author(&held),
         "no drag after a double click\n{}",
@@ -135,7 +135,7 @@ fn a_hand_paced_double_click_on_a_boundary_fits_the_column_and_starts_no_drag() 
 fn keys_and_the_palette_fit_one_column_or_all() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "autofit-keys");
-    assert!(!full_author(&term.screen()));
+    assert!(!full_author(&snap(&term)));
     term.send_keys("C Tab Tab Tab").unwrap();
     term.wait_for("Author picked", STEP, |s| {
         s.contains("Author column picked")
@@ -182,7 +182,7 @@ fn keys_and_the_palette_fit_one_column_or_all() {
 fn the_chooser_fits_the_right_clicked_column() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "autofit-chooser");
-    let (x, row) = header(&term.screen(), "Author").unwrap();
+    let (x, row) = header(&snap(&term), "Author").unwrap();
     term.right_click(x + 1, row).unwrap();
     term.wait_for("the Fit Author row", STEP, |s| {
         s.contains("Fit Author to content") && s.contains("Fit all columns to content")
@@ -217,7 +217,7 @@ fn the_chooser_fits_the_right_clicked_column() {
 fn the_last_column_has_a_grip_that_drags_relative_and_lights_like_the_others() {
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "autofit-last-grip");
-    let s = term.screen();
+    let s = snap(&term);
     let (sha_x, row) = header(&s, "SHA").unwrap();
     let (date_x, _) = header(&s, "Date").unwrap();
     // SHA is 8 cells wide (7 digits and the grip): its grip is cell 7.
@@ -240,7 +240,7 @@ fn the_last_column_has_a_grip_that_drags_relative_and_lights_like_the_others() {
         s.cell(grip, row + 3).is_some_and(|c| c.text == LINE)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let last_fg = term.screen().cell(grip, row + 3).unwrap().fg;
+    let last_fg = snap(&term).cell(grip, row + 3).unwrap().fg;
     let gap = date_x - 1;
     term.move_to(gap, row + 3).unwrap();
     term.wait_for("an internal grip lit", STEP, |s| {
@@ -249,7 +249,7 @@ fn the_last_column_has_a_grip_that_drags_relative_and_lights_like_the_others() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(
-        term.screen().cell(gap, row + 3).unwrap().fg,
+        snap(&term).cell(gap, row + 3).unwrap().fg,
         last_fg,
         "the same accent"
     );
@@ -265,4 +265,14 @@ fn the_last_column_has_a_grip_that_drags_relative_and_lights_like_the_others() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     quit(term);
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

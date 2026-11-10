@@ -108,7 +108,10 @@ fn close_dialog(term: &mut Terminal) {
 }
 
 fn pick_source(term: &mut Terminal, label: &str) {
-    let (col, row) = term.screen().find(label).unwrap();
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (col, row) = screen.find(label).unwrap();
     term.click(col + 2, row).expect("pick the source");
 }
 
@@ -135,7 +138,9 @@ fn on_url(s: &Screen) -> bool {
 fn the_dialog_reopens_on_the_source_it_was_closed_on() {
     let mut s = open_clone("pty-clone-start-last", "");
     // First opening: nothing remembered, so Clone with URL.
-    assert!(on_url(&s.term.screen()), "{}", s.term.screen().text());
+    s.term
+        .wait_for("the URL source", STEP, on_url)
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
     pick_source(&mut s.term, HUB);
     s.term
         .wait_for("the hub list", STEP, |s| {

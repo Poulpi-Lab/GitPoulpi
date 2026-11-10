@@ -35,14 +35,14 @@ fn toggling_the_changes_column_moves_the_wip_counts_between_message_and_column()
         s.find_all("\u{270E} 1").into_iter().next().map(|(_, r)| r)
     };
     let (msg_col, row) = {
-        let s = term.screen();
+        let s = snap(&term);
         let (c, r) = s.find_all("\u{270E} 1").into_iter().next().unwrap();
         (c, r)
     };
 
     // Show the Changes column through the header menu.
     let (col, hrow) = {
-        let screen = term.screen();
+        let screen = snap(&term);
         let header = screen
             .find_all("Message")
             .into_iter()
@@ -56,10 +56,12 @@ fn toggling_the_changes_column_moves_the_wip_counts_between_message_and_column()
             .expect("the SHA header")
     };
     term.right_click(col + 1, hrow).unwrap();
-    term.wait_for("the column menu", STEP, |s| s.contains("[x]"))
-        .unwrap_or_else(|e| panic!("{e}"));
     let (mc, mr) = {
-        let screen = term.screen();
+        let screen = term
+            .wait_for("the column menu with its Changes row", STEP, |s| {
+                s.contains("[x]") && s.contains("[ ] Changes")
+            })
+            .unwrap_or_else(|e| panic!("{e}"));
         screen
             .find_all("[ ] Changes")
             .into_iter()
@@ -74,7 +76,13 @@ fn toggling_the_changes_column_moves_the_wip_counts_between_message_and_column()
             && s.find_all("\u{270E} 1").iter().all(|(c, _)| *c > msg_col)
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    assert!(term.screen().contains("Changes"), "{}", term.text());
+    assert!(
+        term.wait_for_stable(std::time::Duration::from_millis(300), STEP)
+            .unwrap()
+            .contains("Changes"),
+        "{}",
+        term.text()
+    );
 
     term.send_keys("q").unwrap();
     for _ in 0..100 {
@@ -84,4 +92,14 @@ fn toggling_the_changes_column_moves_the_wip_counts_between_message_and_column()
         std::thread::sleep(Duration::from_millis(100));
     }
     let _ = term.stop();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

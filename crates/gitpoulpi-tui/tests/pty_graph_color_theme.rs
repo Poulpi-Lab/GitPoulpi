@@ -45,9 +45,12 @@ fn picking_a_graph_color_theme_recolors_the_lanes() {
         .config_dir(config.path())
         .size(200, 60)
         .spawn();
-    term.wait_for("the fixture loaded", STARTUP, |s| s.contains(MESSAGE))
+    let loaded = term
+        .wait_for("the fixture loaded with its lane marker", STARTUP, |s| {
+            s.contains(MESSAGE) && lane_fg(s).is_some()
+        })
         .unwrap_or_else(|e| panic!("{e}"));
-    let before = lane_fg(&term.screen()).expect("a lane marker");
+    let before = lane_fg(&loaded).expect("a lane marker");
     assert!(matches!(before, Color::Rgb(..)), "{before:?}");
 
     let (gc, gr) = term
@@ -61,19 +64,27 @@ fn picking_a_graph_color_theme_recolors_the_lanes() {
     common::settings_page(&mut term, "Appearance");
     // Input color also reads "Follow theme": take the combo on the
     // Graph color theme row.
-    common::scroll_settings_to(&mut term, "Graph color theme", STEP);
-    let screen = term.screen();
-    let (_, label_row) = screen.find("Graph color theme").unwrap();
-    let (col, row) = screen
-        .find_all("Follow theme")
-        .into_iter()
-        .find(|(_, r)| *r == label_row)
-        .unwrap_or_else(|| panic!("the theme combo:\n{}", screen.text()));
-    term.click(col + 1, row).unwrap();
-    let screen = term
-        .wait_for("the popup", STEP, |s| s.contains("\u{2713} Follow theme"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    let _ = screen;
+    // Retried: a click aimed at a torn or still-scrolling frame opens nothing.
+    common::retry_until(
+        &mut term,
+        "the popup",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            common::scroll_settings_to(t, "Graph color theme", STEP);
+            let screen = t
+                .wait_for_stable(Duration::from_millis(300), STEP)
+                .unwrap_or_else(|e| panic!("{e}"));
+            let (_, label_row) = screen.find("Graph color theme").unwrap();
+            let (col, row) = screen
+                .find_all("Follow theme")
+                .into_iter()
+                .find(|(_, r)| *r == label_row)
+                .unwrap_or_else(|| panic!("the theme combo:\n{}", screen.text()));
+            t.click(col + 1, row).unwrap();
+        },
+        |s| s.contains("\u{2713} Follow theme"),
+    );
     // ~120 palettes: narrow the list to Dracula (first of the matches), pick it.
     term.send_text("Dracula").unwrap();
     term.send_keys("Enter").unwrap();

@@ -185,6 +185,7 @@ fn a_tool_that_is_not_installed_is_in_the_status_line_and_the_log_names_the_prog
     let screen = term
         .wait_for("the tool failure in the status line", STARTUP, |s| {
             s.contains("error: External tool failed: The program could not be run.")
+                && s.contains("Activity (1)")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     no_card(&screen, "External tool failed");

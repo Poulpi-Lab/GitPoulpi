@@ -300,13 +300,21 @@ fn the_plus_menu_radar_row_shows_its_key() {
     s.term
         .wait_for("the Radar tab gone", STEP, |x| !bar(x).contains("Radar"))
         .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
-    let plus = col_in(&bar(&s.term.screen()), " + ");
-    s.term.click(plus + 1, 1).unwrap();
-    s.term
-        .wait_for("the Radar row with its key", STEP, |x| {
-            (2..8).any(|r| x.line(r).contains("Radar") && x.line(r).contains("Alt+R"))
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    // Retried: a click aimed at a torn frame opens nothing.
+    common::retry_until(
+        &mut s.term,
+        "the Radar row with its key",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let screen = t
+                .wait_for_stable(Duration::from_millis(300), STEP)
+                .unwrap_or_else(|e| panic!("{e}"));
+            let plus = col_in(&bar(&screen), " + ");
+            t.click(plus + 1, 1).unwrap();
+        },
+        |x| (2..8).any(|r| x.line(r).contains("Radar") && x.line(r).contains("Alt+R")),
+    );
     s.term.stop().unwrap();
 }
 

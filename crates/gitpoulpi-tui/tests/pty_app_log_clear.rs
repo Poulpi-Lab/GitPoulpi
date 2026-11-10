@@ -49,22 +49,18 @@ fn clear_log_asks_first_cancel_keeps_the_lines_and_confirm_empties_them() {
     wait(&mut term, "Application lines and the button", |s| {
         s.contains("Show:") && s.contains("Clear log") && info_rows(s) >= 2
     });
-    let before = info_rows(&term.screen());
+    let before = info_rows(&snap(&term));
     let files_before = file_lines(config.path());
     assert!(files_before >= 2, "the daemon and the window log to files");
 
     // The button asks first; Cancel keeps every line.
-    let (c, r) = term.screen().find("Clear log").expect("the button");
-    term.click(c + 1, r).expect("click Clear log");
-    wait(&mut term, "the confirmation", |s| {
+    common::click_text_until(&mut term, "Clear log", "the confirmation", |s| {
         s.contains("cannot be undone") && s.contains("all kept days")
     });
-    let (c, r) = term.screen().find("Cancel").expect("Cancel");
-    term.click(c + 1, r).expect("click Cancel");
-    wait(&mut term, "dialog closed", |s| {
+    common::click_text_until(&mut term, "Cancel", "dialog closed", |s| {
         !s.contains("cannot be undone")
     });
-    assert!(info_rows(&term.screen()) >= before, "{}", term.text());
+    assert!(info_rows(&snap(&term)) >= before, "{}", term.text());
 
     // The key twin: x, then y.
     term.send_text("x").unwrap();
@@ -115,4 +111,14 @@ fn walk(dir: &std::path::Path) -> Vec<std::path::PathBuf> {
         }
     }
     out
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

@@ -39,8 +39,7 @@ fn launcher_row_is(screen: &xtask::pty::Screen, value: &str) -> bool {
 }
 
 fn click_text(term: &mut Terminal, text: &str) {
-    let (col, row) = term
-        .screen()
+    let (col, row) = snap(&term)
         .find_all(text)
         .into_iter()
         .next()
@@ -118,7 +117,7 @@ fn changing_the_terminal_in_the_settings_rewrites_a_created_shortcut_by_itself()
     );
 
     // Pick foot in the terminal combobox: no other press.
-    let (vc, vr) = common::choice_at(&term.screen(), "kitty")
+    let (vc, vr) = common::choice_at(&snap(&term), "kitty")
         .unwrap_or_else(|| panic!("no terminal value:\n{}", term.text()));
     term.click(vc + 1, vr).unwrap();
     let popup = term
@@ -242,4 +241,14 @@ fn create_from_the_palette_then_remove_from_the_settings_row() {
     assert!(!mac || !bundle.exists(), "the whole bundle is gone");
     assert_eq!(our_icons(), 0, "the icon is gone");
     let _ = term.stop();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

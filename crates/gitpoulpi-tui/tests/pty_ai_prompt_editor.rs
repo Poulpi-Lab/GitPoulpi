@@ -102,16 +102,17 @@ fn clicking_cancel_discards_the_text() {
     let (c, r) = button(&settled(&term), "Cancel");
     term.click(c + 1, r).expect("click Cancel");
     // Typed text asks before it is thrown away.
+    let discard_button = |s: &Screen| {
+        s.find_all("Discard")
+            .into_iter()
+            .find(|&(_, row)| s.line(row).contains("Keep"))
+    };
     let screen = term
-        .wait_for("the discard question", STEP, |s| {
-            s.contains("Discard changes?")
+        .wait_for("the discard question and its buttons", STEP, |s| {
+            s.contains("Discard changes?") && discard_button(s).is_some()
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen
-        .find_all("Discard")
-        .into_iter()
-        .find(|&(_, row)| screen.line(row).contains("Keep"))
-        .expect("the Discard button");
+    let (c, r) = discard_button(&screen).expect("the Discard button");
     term.click(c + 1, r).expect("click Discard");
     term.wait_for("the editor closed", STEP, |s| {
         !s.contains("Cancel") && !s.contains("Discard changes?")
@@ -119,7 +120,7 @@ fn clicking_cancel_discards_the_text() {
     .unwrap_or_else(|e| panic!("{e}"));
     settled(&term);
     assert!(!config_text(&config).contains("Never persisted words"));
-    assert!(!term.screen().contains("Never persisted words"));
+    assert!(!snap(&term).contains("Never persisted words"));
 }
 
 /// Hovering lights the button; a click outside the popup (on the page
@@ -336,7 +337,7 @@ fn the_settings_page_has_no_quick_insert_row() {
     let _ = term.wait_for("the question or the page", STEP, |s| {
         s.contains("Discard changes?") || !s.contains("Ctrl+S: save")
     });
-    if term.screen().contains("Discard changes?") {
+    if snap(&term).contains("Discard changes?") {
         term.send_keys("Right").unwrap();
         term.send_keys("Enter").unwrap();
     }
@@ -380,7 +381,17 @@ fn dragging_over_the_text_selects_it() {
     term.send_text("Z").unwrap();
     term.wait_for("the selection replaced", STEP, |s| s.contains("Z world"))
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(!term.screen().contains("hello"));
+    assert!(!snap(&term).contains("hello"));
     term.send_keys("C-s").unwrap();
     wait_saved(&config, "Z world");
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

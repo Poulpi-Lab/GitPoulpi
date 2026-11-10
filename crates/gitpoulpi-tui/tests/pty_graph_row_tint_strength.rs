@@ -59,14 +59,14 @@ const TINT: &str = "[ui]\ngraph_lane_background = \"row_tint\"\n";
 fn a_stored_strong_is_more_present_than_the_default_medium() {
     let repo = fixture();
     let (term, _c) = launch(&repo, "tint-strength-a", TINT);
-    let medium = band_bg(&term.screen()).expect("a tinted node");
+    let medium = band_bg(&snap(&term)).expect("a tinted node");
     let _ = term.stop();
     let (term, _c) = launch(
         &repo,
         "tint-strength-b",
         &format!("{TINT}graph_row_tint_strength = \"strong\"\n"),
     );
-    let strong = band_bg(&term.screen()).expect("a tinted node");
+    let strong = band_bg(&snap(&term)).expect("a tinted node");
     let _ = term.stop();
     assert!(
         presence(strong) > presence(medium),
@@ -78,7 +78,10 @@ fn a_stored_strong_is_more_present_than_the_default_medium() {
 fn picking_subtle_fades_the_band() {
     let repo = fixture();
     let (mut term, config) = launch(&repo, "tint-strength-c", TINT);
-    let before = band_bg(&term.screen()).expect("a tinted node");
+    let loaded = term
+        .wait_for("a tinted node", STEP, |s| band_bg(s).is_some())
+        .unwrap_or_else(|e| panic!("{e}"));
+    let before = band_bg(&loaded).expect("a tinted node");
 
     let (gc, gr) = term
         .wait_for_text("\u{2699}", STEP)
@@ -89,11 +92,18 @@ fn picking_subtle_fades_the_band() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     common::settings_page(&mut term, "Appearance");
-    let (col, row) = common::scroll_settings_to_choice(&mut term, "Medium", STEP);
-    term.click(col + 1, row).unwrap();
-    let screen = term
-        .wait_for("the popup", STEP, |s| s.contains("\u{2713} Medium"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: a click aimed at a torn or still-scrolling frame opens nothing.
+    let screen = common::retry_until(
+        &mut term,
+        "the popup",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            let (col, row) = common::scroll_settings_to_choice(t, "Medium", STEP);
+            t.click(col + 1, row).unwrap();
+        },
+        |s| s.contains("\u{2713} Medium"),
+    );
     let (tc, tr) = screen.find("\u{2713} Medium").unwrap();
     // Strong, the ticked Medium, then Subtle one row below.
     term.click(tc + 2, tr + 1).unwrap();
@@ -119,4 +129,14 @@ fn picking_subtle_fades_the_band() {
         "{after:?} vs {before:?}"
     );
     let _ = term.stop();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

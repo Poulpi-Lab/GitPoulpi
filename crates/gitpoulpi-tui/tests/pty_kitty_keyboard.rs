@@ -146,7 +146,16 @@ fn auto_pushes_when_the_terminal_answers_and_pops_on_exit() {
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_text("q").unwrap();
     wait_for_exit(&term);
-    let raw = term.raw_output();
+    // The stream is read in small pieces under torn frames: wait (bounded)
+    // for the whole exit sequence to have arrived.
+    let deadline = std::time::Instant::now() + Duration::from_secs(60);
+    let mut raw = term.raw_output();
+    while (index_of(&raw, POP).is_none() || index_of(&raw, LEAVE_ALT).is_none())
+        && std::time::Instant::now() < deadline
+    {
+        std::thread::sleep(Duration::from_millis(250));
+        raw = term.raw_output();
+    }
     let pop = index_of(&raw, POP).expect("the flags were popped on exit");
     let leave = index_of(&raw, LEAVE_ALT).expect("the alternate screen was left");
     assert!(

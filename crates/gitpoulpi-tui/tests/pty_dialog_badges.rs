@@ -56,7 +56,7 @@ fn press_badge(term: &mut Terminal, label: &str, side: Side) {
     wait(term, "the badge on the control", move |s| {
         badge_of(s, &l, side).is_some()
     });
-    let badge = badge_of(&term.screen(), label, side).expect("badge");
+    let badge = badge_of(&snap(&term), label, side).expect("badge");
     term.send_text(&badge.to_string()).unwrap();
 }
 
@@ -232,15 +232,17 @@ fn selected_path(screen: &Screen) -> Option<String> {
 fn browse_has_one_badge_per_list_and_it_only_focuses_the_list() {
     let mut s = home("pty-badges-browse-lists");
     s.term.send_keys("b").unwrap();
-    wait(&mut s.term, "the picker", |s| {
-        s.contains("Show hidden folders") && s.contains("QUICK ACCESS")
+    wait(&mut s.term, "the picker with its Selected line", |s| {
+        s.contains("Show hidden folders")
+            && s.contains("QUICK ACCESS")
+            && selected_path(s).is_some()
     });
-    let before = selected_path(&s.term.screen()).expect("a Selected line");
+    let before = selected_path(&snap(&s.term)).expect("a Selected line");
     s.term.send_keys("C-n").unwrap();
     wait(&mut s.term, "the list badges", |s| {
         !s.contains("QUICK ACCESS") && s.contains("ICK ACCESS")
     });
-    let screen = s.term.screen();
+    let screen = snap(&s.term);
     let (qcol, qrow) = screen.find("ICK ACCESS").unwrap();
     let places = list_badge(&screen, "ICK ACCESS", None).unwrap();
     // The folders list's header ("Name") is on the same row.
@@ -266,7 +268,7 @@ fn browse_has_one_badge_per_list_and_it_only_focuses_the_list() {
     s.term.send_text(&folders.to_string()).unwrap();
     wait(&mut s.term, "badges gone", |s| s.contains("QUICK ACCESS"));
     assert!(
-        !up_row_lit(&s.term.screen()),
+        !up_row_lit(&snap(&s.term)),
         "the folders badge selected a row\n{}",
         s.term.text()
     );
@@ -281,20 +283,30 @@ fn browse_has_one_badge_per_list_and_it_only_focuses_the_list() {
     wait(&mut s.term, "the parent folder", move |s| {
         selected_path(s).is_some_and(|p| p != start)
     });
-    let before = selected_path(&s.term.screen()).unwrap();
+    let before = selected_path(&snap(&s.term)).unwrap();
 
     // The places badge: focus, no navigation.
     s.term.send_keys("C-n").unwrap();
     wait(&mut s.term, "the badges again", |s| {
         !s.contains("QUICK ACCESS") && s.contains("ICK ACCESS")
     });
-    let places = list_badge(&s.term.screen(), "ICK ACCESS", None).unwrap();
+    let places = list_badge(&snap(&s.term), "ICK ACCESS", None).unwrap();
     s.term.send_text(&places.to_string()).unwrap();
     wait(&mut s.term, "badges gone", |s| s.contains("QUICK ACCESS"));
     assert_eq!(
-        selected_path(&s.term.screen()).as_deref(),
+        selected_path(&snap(&s.term)).as_deref(),
         Some(before.as_str()),
         "the places badge navigated\n{}",
         s.term.text()
     );
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

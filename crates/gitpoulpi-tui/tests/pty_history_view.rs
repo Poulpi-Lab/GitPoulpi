@@ -90,7 +90,7 @@ fn the_selected_commits_diff_follows_the_cursor_across_a_rename() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The rename row says where the file came from (cut at this width).
-    assert!(term.text().contains("notes.txt"), "{}", term.text());
+    assert!(snap(&term).text().contains("notes.txt"), "{}", term.text());
     // The first row's diff: only "four".
     term.wait_for("HEAD's diff of the file", STEP, |s| {
         s.contains("\u{2715}") && s.contains("+four") && !s.contains("+THREE")
@@ -112,7 +112,7 @@ fn the_selected_commits_diff_follows_the_cursor_across_a_rename() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        !term.text().contains("New file"),
+        !snap(&term).text().contains("New file"),
         "an old row's diff must not be asked under the new name:\n{}",
         term.text()
     );
@@ -142,7 +142,7 @@ fn a_shift_range_compares_the_two_ends_of_the_file() {
         s.contains("3 selected") && s.contains("+THREE") && s.contains("+four")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(!term.text().contains("+TWO"), "{}", term.text());
+    assert!(!snap(&term).text().contains("+TWO"), "{}", term.text());
     // Esc drops the range: one commit again, the one the cursor is on
     // ("shout two", whose file was still called notes.txt).
     term.send_keys("Escape").unwrap();
@@ -155,7 +155,7 @@ fn a_shift_range_compares_the_two_ends_of_the_file() {
 
 /// The column where the diff's own frame starts: the splitter's cell.
 fn diff_left(term: &Terminal) -> Option<usize> {
-    term.text().lines().find_map(|l| {
+    snap(&term).text().lines().find_map(|l| {
         let at = l.find("\u{256d} memo.txt")?;
         Some(l[..at].chars().count())
     })
@@ -172,7 +172,7 @@ fn tab_gives_the_keyboard_to_the_diff_and_back() {
     // In the diff, Down moves the diff's cursor: the history row stays.
     term.send_keys("Tab Down").unwrap();
     std::thread::sleep(Duration::from_millis(300));
-    assert!(term.text().contains("+four") && !term.text().contains("+THREE"));
+    assert!(snap(&term).text().contains("+four") && !snap(&term).text().contains("+THREE"));
     // Back in the list, Down selects the next commit.
     term.send_keys("Tab Down").unwrap();
     term.wait_for("the rename commit's diff", STEP, |s| {
@@ -208,7 +208,7 @@ fn the_splitter_resizes_by_key_and_by_drag_and_is_remembered() {
 
     // Drag the splitter (the diff's left border, below its bar) to the right.
     let narrow = diff_left(&term).unwrap();
-    let (_, row) = term.screen().find("\u{256d} memo.txt").unwrap();
+    let (_, row) = snap(&term).find("\u{256d} memo.txt").unwrap();
     term.drag((narrow as u16, row + 4), (narrow as u16 + 30, row + 4))
         .unwrap();
     term.wait_for("the drag widened the list", STEP, |_| {
@@ -277,7 +277,7 @@ fn the_row_menu_restores_and_blames_at_that_commit() {
 
 /// The row of the view tabs (File View / Diff View / Blame / History).
 fn bar_row(term: &Terminal) -> u16 {
-    let screen = term.screen();
+    let screen = snap(&term);
     (0..screen.rows())
         .find(|r| {
             let l = screen.line(*r);
@@ -288,7 +288,7 @@ fn bar_row(term: &Terminal) -> u16 {
 
 /// The background of the cell just after where `needle` starts on screen row `row`.
 fn bg_of(term: &Terminal, row: u16, needle: &str) -> xtask::pty::Color {
-    let screen = term.screen();
+    let screen = snap(&term);
     let line = screen.line(row);
     let at = line
         .find(needle)
@@ -313,22 +313,21 @@ fn rows_are_two_lines_with_author_and_date_even_narrow_and_the_second_line_click
     term.send_keys("M-Left M-Left M-Left M-Left M-Left M-Left M-Left")
         .unwrap();
     std::thread::sleep(Duration::from_millis(300));
-    let (c, r) = term
-        .screen()
+    let (c, r) = snap(&term)
         .find("shout two")
         .unwrap_or_else(|| panic!("{}", term.text()));
-    let below = term.screen().line(r + 1);
+    let below = snap(&term).line(r + 1);
     assert!(
         below.contains("just now") && below.contains("G\u{2026}"),
         "author and date on the line under the summary, even narrow: {below:?}\n{}",
         term.text()
     );
     // The next commit starts two rows down, not one.
-    let (_, r_next) = term.screen().find("add notes").unwrap();
+    let (_, r_next) = snap(&term).find("add notes").unwrap();
     assert_eq!(r_next, r + 2, "two rows per commit");
 
     // A click on the SECOND line of "shout two" selects it: its diff shows.
-    assert!(!term.text().contains("+TWO"), "still on HEAD's diff");
+    assert!(!snap(&term).text().contains("+TWO"), "still on HEAD's diff");
     term.click(c + 3, r + 1).unwrap();
     term.wait_for("shout two's diff", STEP, |s| {
         s.contains("+TWO") && s.contains("-two")
@@ -359,9 +358,9 @@ fn the_bar_buttons_pick_the_right_side_and_stay_in_the_history() {
         bg_of(&term, bar, " Blame "),
         "History is the lit tab"
     );
-    let tab_rows = (0..term.screen().rows())
+    let tab_rows = (0..snap(&term).rows())
         .filter(|r| {
-            let l = term.screen().line(*r);
+            let l = snap(&term).line(*r);
             *r != bar && l.contains(" Blame ") && l.contains('\u{2500}')
         })
         .count();
@@ -396,7 +395,7 @@ fn the_bar_buttons_pick_the_right_side_and_stay_in_the_history() {
         s.contains("Blame - memo.txt") || s.contains("Blame - notes.txt")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(term.text().contains("add notes"), "the list stays");
+    assert!(snap(&term).text().contains("add notes"), "the list stays");
 
     // Back to the diff with the bar's Diff View button: the rename commit's
     // diff, still in the History.
@@ -405,7 +404,7 @@ fn the_bar_buttons_pick_the_right_side_and_stay_in_the_history() {
         s.contains("+THREE") && !s.contains("Blame - ")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(term.text().contains("add notes"), "the list stays");
+    assert!(snap(&term).text().contains("add notes"), "the list stays");
 
     // The keys of the old control still work (the keyboard twins).
     term.send_keys("M-2").unwrap();
@@ -423,7 +422,7 @@ fn the_bar_buttons_pick_the_right_side_and_stay_in_the_history() {
 
 /// A click on a label of the view bar.
 fn click_bar(term: &mut Terminal, label: &str) {
-    let screen = term.screen();
+    let screen = snap(&term);
     // The first hit that is not the list's own title (" History - file").
     let (bar, col) = (0..screen.rows())
         .find_map(|r| {
@@ -439,7 +438,7 @@ fn click_bar(term: &mut Terminal, label: &str) {
 
 /// The first cell of the History list's frame on its title row.
 fn list_origin(term: &Terminal) -> Option<(u16, u16)> {
-    let screen = term.screen();
+    let screen = snap(&term);
     let (c, r) = screen.find(" File History - ")?;
     Some((c.saturating_sub(1), r))
 }
@@ -447,7 +446,7 @@ fn list_origin(term: &Terminal) -> Option<(u16, u16)> {
 /// The reopen strip's chevron, in the cell right of the central column's
 /// left edge `x0`.
 fn chevron(term: &Terminal, x0: u16) -> Option<(u16, u16)> {
-    let screen = term.screen();
+    let screen = snap(&term);
     (0..screen.rows()).find_map(|row| {
         let at = screen.line(row).chars().nth(usize::from(x0) + 1)?;
         (at == '\u{203A}').then_some((x0 + 1, row))
@@ -477,8 +476,7 @@ fn the_list_hides_by_its_cross_and_comes_back_by_the_strip_and_the_key() {
         term.text()
     );
     // The cross sits on the list's top border.
-    let cross = term
-        .screen()
+    let cross = snap(&term)
         .find_all("\u{2715}")
         .into_iter()
         .find(|(c, r)| *r == row && *c > x0 && *c < x0 + 60)
@@ -489,7 +487,7 @@ fn the_list_hides_by_its_cross_and_comes_back_by_the_strip_and_the_key() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The diff stays, and the strip is where the list was.
-    assert!(term.text().contains("+four"), "{}", term.text());
+    assert!(snap(&term).text().contains("+four"), "{}", term.text());
     term.wait_for("the strip", STEP, |_| chevron(&term, x0).is_some())
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The selector stays where it was; its `File` segment is no longer lit.
@@ -515,7 +513,7 @@ fn the_list_hides_by_its_cross_and_comes_back_by_the_strip_and_the_key() {
         !s.contains("shout two") && !s.contains(" History - ")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(term.text().contains("+four"), "{}", term.text());
+    assert!(snap(&term).text().contains("+four"), "{}", term.text());
     term.wait_for("the strip", STEP, |_| chevron(&term, x0).is_some())
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("M-c").unwrap();
@@ -538,8 +536,7 @@ fn the_selector_switches_lists_by_the_mouse_and_the_palette_rows_pick_a_state() 
     term.wait_for("the list", STEP, |s| s.contains("shout two"))
         .unwrap();
     let on_segment = |term: &mut Terminal, dx: u16| {
-        let (col, row) = term
-            .screen()
+        let (col, row) = snap(&term)
             .find(SELECTOR)
             .unwrap_or_else(|| panic!("the selector\n{}", term.text()));
         std::thread::sleep(Duration::from_millis(450));
@@ -596,7 +593,7 @@ fn the_drag_highlight_follows_the_splitter() {
     term.wait_for("the diff frame", STEP, |_| diff_left(&term).is_some())
         .unwrap();
     let start = diff_left(&term).unwrap() as u16;
-    let (_, row) = term.screen().find("\u{256d} memo.txt").unwrap();
+    let (_, row) = snap(&term).find("\u{256d} memo.txt").unwrap();
     let y = row + 4;
     term.press(start, y).unwrap();
     term.drag_to(start + 12, y).unwrap();
@@ -606,7 +603,7 @@ fn the_drag_highlight_follows_the_splitter() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let now = diff_left(&term).unwrap() as u16;
-    let screen = term.screen();
+    let screen = snap(&term);
     let lit = screen.cell(now, y).unwrap().bg;
     assert_ne!(
         lit,
@@ -659,4 +656,14 @@ fn the_file_history_has_one_name_in_the_palette_and_the_title() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Escape").unwrap();
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

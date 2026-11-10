@@ -111,7 +111,7 @@ fn the_saved_list_shows_at_once_and_the_refresh_keeps_the_view_and_the_choice() 
         s.contains("Clone a repository") && s.contains(HUB)
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    let (col, row) = term.screen().find(HUB).unwrap();
+    let (col, row) = snap(&term).find(HUB).unwrap();
     term.click(col + 2, row).expect("pick the source");
 
     // The saved list is there while the host has not answered.
@@ -138,6 +138,13 @@ fn the_saved_list_shows_at_once_and_the_refresh_keeps_the_view_and_the_choice() 
     term.send_keys("Tab").unwrap();
     term.send_keys("Down Down Down Down").unwrap();
     term.send_keys("Enter").unwrap();
+    let first_row = |s: &xtask::pty::Screen| {
+        s.text()
+            .lines()
+            .position(|l| l.contains("harbor-guild (") || l.contains("mara-quinn ("))
+            .map(|i| s.line(i as u16).to_string())
+            .unwrap_or_default()
+    };
     let chosen = term
         .wait_for(
             "lumen-cli chosen, the harbor-guild section on top",
@@ -147,16 +154,10 @@ fn the_saved_list_shows_at_once_and_the_refresh_keeps_the_view_and_the_choice() 
                     && s.text()
                         .lines()
                         .any(|l| l.contains("Full path:") && l.contains("lumen-cli"))
+                    && first_row(s).contains("harbor-guild (3)")
             },
         )
         .unwrap_or_else(|e| panic!("{e}"));
-    let first_row = |s: &xtask::pty::Screen| {
-        s.text()
-            .lines()
-            .position(|l| l.contains("harbor-guild (") || l.contains("mara-quinn ("))
-            .map(|i| s.line(i as u16).to_string())
-            .unwrap_or_default()
-    };
     assert!(
         first_row(&chosen).contains("harbor-guild (3)"),
         "the list is scrolled to lumen-cli:\n{}",
@@ -167,7 +168,14 @@ fn the_saved_list_shows_at_once_and_the_refresh_keeps_the_view_and_the_choice() 
     gate.release();
     let fresh = term
         .wait_for("the fresh list in place", STEP, |s| {
-            !s.contains("refreshing...") && s.contains("harbor-guild (2)")
+            !s.contains("refreshing...")
+                && first_row(s).contains("harbor-guild (2)")
+                && !s.contains("mara-quinn (")
+                && !s.contains("harbor-attic")
+                && s.text()
+                    .lines()
+                    .any(|l| l.contains("Full path:") && l.contains("lumen-cli"))
+                && s.contains("\u{2713}")
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
@@ -193,4 +201,14 @@ fn the_saved_list_shows_at_once_and_the_refresh_keeps_the_view_and_the_choice() 
         mock.saw("GET", "/api/v3/user/repos"),
         "the list was fetched from the host"
     );
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

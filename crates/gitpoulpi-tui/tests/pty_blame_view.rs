@@ -74,6 +74,13 @@ fn open_blame(term: &mut Terminal) {
         s.contains(BLAME_TITLE) && s.contains("row six") && s.contains("Bob Builder")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    settle(term);
+}
+
+/// The view is drawn whole: later reads of the screen are not torn frames.
+fn settle(term: &Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
 }
 
 /// The blame annotation's author: not the commit details' author line (the
@@ -198,7 +205,7 @@ fn the_card_opens_when_the_pointer_rests_on_an_annotation() {
     let repo = repo();
     let (mut term, _config) = launch(repo.root(), "pty-blame-hover", "");
     open_blame(&mut term);
-    let (c, r) = annotation_author(&term.screen()).unwrap();
+    let (c, r) = annotation_author(&snap(&term)).unwrap();
     assert!(!term.text().contains("bob@example.com"));
     term.move_to(c + 2, r).unwrap();
     term.wait_for("the hover card", STEP, |s| {
@@ -228,7 +235,9 @@ fn blame_at_the_parent_reblames_the_file_before_the_commit() {
             && !s.contains("row three!")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    // Before Bob's commit every line is the first commit's.
+    // Before Bob's commit every line is the first commit's (judged on a
+    // settled screen: a torn frame can still hold his annotation).
+    settle(&term);
     let central: String = term
         .text()
         .lines()
@@ -263,7 +272,7 @@ fn right_click_on_a_hunk_opens_its_menu() {
     let repo = repo();
     let (mut term, _config) = launch(repo.root(), "pty-blame-menu", "");
     open_blame(&mut term);
-    let (c, r) = annotation_author(&term.screen()).unwrap();
+    let (c, r) = annotation_author(&snap(&term)).unwrap();
     term.right_click(c + 2, r).unwrap();
     term.wait_for("the menu", STEP, |s| {
         s.contains("Blame at parent") && s.contains("Copy commit SHA")
@@ -284,13 +293,13 @@ fn the_annotation_column_widens_with_its_key_and_by_dragging_its_border() {
     let repo = repo();
     let (mut term, config) = launch(repo.root(), "pty-blame-width", "[ui]\nblame_width = 30\n");
     open_blame(&mut term);
-    let x0 = annotation_author(&term.screen()).unwrap().0;
+    let x0 = annotation_author(&snap(&term)).unwrap().0;
     term.send_keys(">").unwrap();
     term.wait_for("a wider column", STEP, |s| {
         annotation_author(s).is_some_and(|(c, _)| c < x0)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (x1, row) = annotation_author(&term.screen()).unwrap();
+    let (x1, row) = annotation_author(&snap(&term)).unwrap();
     assert_eq!(x0 - x1, 4);
     // The border is three cells left of the annotation text.
     term.drag((x1 - 3, row), (x1 - 3 - 8, row)).unwrap();
@@ -344,16 +353,15 @@ fn a_tall_hunk_shows_its_sha_and_full_date_under_the_summary() {
         s.contains(BLAME_TITLE) && s.contains("line 008")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    settle(&term);
 
     let sha = repo.git(&["rev-parse", "--short=7", "HEAD"]);
     let sha = sha.trim();
-    let (_, summary_row) = term
-        .screen()
+    let (_, summary_row) = snap(&term)
         .find("write the whole file")
         .unwrap_or_else(|| panic!("{}", term.text()));
     // The central column only (the right pane shows the commit too).
-    let meta: String = term
-        .screen()
+    let meta: String = snap(&term)
         .line(summary_row + 1)
         .chars()
         .take(150)
@@ -391,6 +399,7 @@ fn the_blame_minimap_is_heat_colored_and_a_click_scrolls() {
         s.contains(BLAME_TITLE) && s.contains("line 001")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    settle(&term);
     assert!(
         !term.text().contains("line 150"),
         "the file is longer than the pane"
@@ -398,7 +407,7 @@ fn the_blame_minimap_is_heat_colored_and_a_click_scrolls() {
 
     // The braille cells of the minimap, and their color: the heat ramp's
     // middle (one commit, no age spread), not the plain ink.
-    let screen = term.screen();
+    let screen = snap(&term);
     let mut braille = Vec::new();
     for row in 0..screen.rows() {
         for col in 0..screen.cols() {
@@ -431,4 +440,14 @@ fn the_blame_minimap_is_heat_colored_and_a_click_scrolls() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.stop().unwrap();
+}
+
+/// The screen once it has settled: a torn frame is not a place to locate a
+/// cell or compare colors in.
+fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
+    term.wait_for_stable(
+        std::time::Duration::from_millis(300),
+        std::time::Duration::from_secs(30),
+    )
+    .unwrap_or_else(|e| panic!("{e}"))
 }

@@ -345,7 +345,9 @@ fn show_in_folder_and_the_editor_run_the_configured_templates() {
     );
 
     open_menu_on(&mut term, "b.txt");
-    let screen = term.screen();
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let (col, row) = screen
         .find_all("Open in ")
         .into_iter()
@@ -448,7 +450,9 @@ fn hovering_a_menu_row_does_not_hover_the_rows_behind_it() {
     open_menu_on(&mut term, "a.txt");
 
     for label in ["File History", "Show in folder", "Copy file path"] {
-        let screen = term.screen();
+        let screen = term
+            .wait_for_stable(Duration::from_millis(300), STEP)
+            .unwrap_or_else(|e| panic!("{e}"));
         let (col, row) = screen
             .find(label)
             .unwrap_or_else(|| panic!("'{label}' missing:\n{}", term.text()));

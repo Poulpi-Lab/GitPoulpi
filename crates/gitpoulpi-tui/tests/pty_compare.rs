@@ -294,8 +294,13 @@ fn the_panel_lists_a_card_per_selected_commit_and_a_click_goes_to_its_row() {
     term.ctrl_click(col, row3).unwrap();
     term.ctrl_click(col, row2).unwrap();
 
-    let s = wait_detail(&term, "three cards", |d| {
-        d.contains("c4 add c") && d.contains("c3 add b") && d.contains("c2 edit a")
+    let s = wait_detail(&term, "three whole cards", |d| {
+        d.contains("c4 add c")
+            && d.contains("c3 add b")
+            && d.contains("c2 edit a")
+            && d.matches("Testkit").count() >= 3
+            && card_line(d, "c4 add c").ends_with("To")
+            && card_line(d, "c2 edit a").ends_with("From")
     });
     let d = detail_text(&s);
     assert!(

@@ -57,10 +57,14 @@ fn the_merge_editor_bar_and_the_unsaved_dialog_read_on_a_light_theme() {
     let (c, r) = term.wait_for_text("a.txt", STEP).unwrap();
     term.click(c, r).unwrap();
     term.send_keys("Enter").unwrap();
-    term.wait_for("the merge editor", STEP, |s| s.contains("file 1 of 3"))
+    let screen = term
+        .wait_for("the merge editor with its whole bar", STEP, |s| {
+            s.contains("file 1 of 3")
+                && ["A Current", "B Incoming", "Reset", "Full file", "Save"]
+                    .iter()
+                    .all(|l| s.contains(l))
+        })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-
-    let screen = term.screen();
     for label in ["A Current", "B Incoming", "Reset", "Full file", "Save"] {
         let k = label_ratio(&screen, label);
         // `Save` is disabled until something is picked: muted but readable.
@@ -75,11 +79,14 @@ fn the_merge_editor_bar_and_the_unsaved_dialog_read_on_a_light_theme() {
     // An unsaved pick, then Alt+PageDown asks Save / Discard / Cancel.
     term.send_keys("a").unwrap();
     term.send_text("\x1b[6;3~").unwrap();
-    term.wait_for("the unsaved-changes box", STEP, |s| {
-        s.contains("Unsaved changes") && s.contains("Discard (")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = term
+        .wait_for("the unsaved-changes box", STEP, |s| {
+            s.contains("Unsaved changes")
+                && ["Save (", "Discard (", "Cancel ("]
+                    .iter()
+                    .all(|l| s.contains(l))
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     for label in ["Save (", "Discard (", "Cancel ("] {
         let k = label_ratio(&screen, label);
         assert!(k >= 4.5, "{label:?} reads {k:.2} < 4.5\n{}", screen.text());

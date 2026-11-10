@@ -112,6 +112,8 @@ ref のない commit では、その行にポインタを乗せると、Ref 列�
 
 `Esc` でドラッグをキャンセルします。キーボードでの代わりは、パレットコマンド *Refs: 選択中の参照をチェックアウト中のブランチにドロップ...* です。
 
+**Merge か fast-forward か。** ターゲットに独自の commit がない（ドラッグしたブランチが先に進んでいるだけの）場合、merge はターゲットを前に動かすだけで済みます。既定（設定 > Git > **Merge の fast-forward** = *never*、またはリポジトリごとの Merge オプションのページでの選択）では、メニューの行は *x を y に merge（merge commit）* となり、本物の merge commit を作るので、履歴にブランチが残ります。単純に動かしたいときは、別の行 *y を x に fast-forward* を使います（一直線の履歴にしたいなら、代わりに *Rebase* を使います）。*allowed* では Merge の行が *（fast-forward）*、*only* では *（fast-forward のみ）* となり、ブランチが分岐している場合は理由付きでグレー表示されます。同じ行とラベルはブランチ自身のメニューにもあり、`gitpoulpi merge --ff | --no-ff | --ff-only` で merge ごとに選べます。
+
 ## commit メニュー
 
 commit を右クリックする（または選択して `.` を押す）と、メニューが開きます。

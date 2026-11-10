@@ -116,6 +116,31 @@ que `git fetch` funciona em um terminal comum. Os tokens do GitHub/GitLab para p
 requests são separados e opcionais: veja
 [Integrações de hospedagem e de rastreadores de issues](hosting-integration.md).
 
+**Um fetch, pull ou push falha com "O auxiliar de credenciais configurado falhou", "A chave de host SSH do remoto ainda não é conhecida" ou um acesso recusado, e a sua entrada do Registro de atividade tem um botão "SSH e credenciais...".**
+A falha vem de como este repositório entra. O botão abre
+Configurações > SSH e credenciais, onde você escolhe outra origem para este
+repositório: os auxiliares do próprio git com os auxiliares do repositório ignorados, uma
+conta de integração, um arquivo de chave (com um arquivo de hosts conhecidos) ou um auxiliar ou comando
+de token seu; **Testar conexão** então verifica todos os remotos. Para um
+auxiliar que não pôde ser executado, `git config --show-origin --get-all
+credential.helper` mostra onde ele está definido.
+
+**"O GitPoulpi não enviou o token da conta para ...".** O remoto do repositório
+aponta para um servidor que não é o endereço ao qual a conta escolhida está vinculada
+(muitas vezes uma reescrita `url.<x>.insteadOf` na configuração do próprio repositório), então o
+token foi retido. Corrija o remoto ou escolha outra origem na página.
+
+**"O comando de token deste repositório falhou", "... mudou desde que você o confirmou", "Não é possível usar o acesso deste repositório".**
+As escolhas da página não podem ser executadas: o comando de token não imprimiu nenhum token
+(as suas últimas linhas de erro são citadas, sem os segredos), um script que ele executa
+mudou desde que você o confirmou (confirme o comando de novo na página) ou a
+escolha nomeia um arquivo de chave ou uma conta que não existe mais. Cada leitura tem o botão
+**SSH e credenciais...**.
+
+**O OpenSSH diz "bad permissions" para um arquivo de chave.** Outras contas podem ler a
+chave. Em Configurações > SSH e credenciais, a linha **Arquivo de chave privada** mostra um
+aviso com **Restringir à minha conta**.
+
 **“fazendo stage de ...” fica na linha de status.** Uma atualização em segundo plano ainda está
 em andamento; some quando a lista de arquivos é atualizada. `r` força uma atualização.
 

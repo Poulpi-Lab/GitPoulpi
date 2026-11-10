@@ -79,17 +79,23 @@ fn unstaging_a_resolved_file_keeps_the_other_conflicts_and_undo_is_offered() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Unstage it with the Staged section's button.
-    let (c, r) = term.wait_for_text("Unstage all changes", STEP).unwrap();
-    term.click(c + 1, r).unwrap();
-    term.wait_for("nothing staged any more", STEP, |s| {
-        !s.contains("Staged Files (1)")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The unmerged rows are drawn again with it (one whole state), and the
+    // click is retried: it can be lost to a torn frame.
+    let marked = |s: &xtask::pty::Screen, name: &str| {
+        s.find_all(name)
+            .into_iter()
+            .any(|(_, r)| s.line(r).contains(name) && s.line(r).contains('!'))
+    };
+    let screen = common::click_text_until(
+        &mut term,
+        "Unstage all changes",
+        "nothing staged any more",
+        |s| !s.contains("Staged Files (1)") && marked(s, "b.txt"),
+    );
 
     // The two files that were never resolved are still conflicted: git
     // says so, and the Status pane still marks them `!` (not a pencil).
     assert_eq!(unmerged(&fx), ["b.txt", "docs/c.txt"]);
-    let screen = term.screen();
     let row_of = |name: &str| {
         screen
             .find_all(name)
@@ -105,12 +111,9 @@ fn unstaging_a_resolved_file_keeps_the_other_conflicts_and_undo_is_offered() {
     );
 
     // A click on a conflicted row opens the merge editor, not a raw Diff.
-    let (c, r) = term.wait_for_text("b.txt", STEP).unwrap();
-    term.click(c, r).unwrap();
-    term.wait_for("the merge editor on b.txt", STEP, |s| {
+    common::click_text_until(&mut term, "b.txt", "the merge editor on b.txt", |s| {
         s.contains("Conflict 1 /")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    });
     term.send_keys("Escape").unwrap();
     term.wait_for("the editor closed", STEP, |s| !s.contains("Conflict 1 /"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

@@ -229,7 +229,10 @@ fn a_local_only_delete_warns_that_the_next_fetch_brings_it_back() {
     let (mut term, _config) = launch_fetched(repo.root(), "pty-tag-where-local");
     open_delete_dialog(&mut term, "v1", BOTH);
     // The highlighted first row carries the warning before anything runs.
-    assert!(term.screen().contains("brings it back"), "{}", term.text());
+    term.wait_for("the warning on the first row", STEP, |s| {
+        s.contains("brings it back")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     term.send_keys("1").unwrap();
     term.wait_for("the warning after the delete", STEP, |s| {

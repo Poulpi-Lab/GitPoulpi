@@ -80,20 +80,26 @@ fn commit_via_ui(rig: &mut Rig, repo: &FixtureRepo, subject: &str) {
 /// Selects the `feature` branch in the Refs pane and deletes it through
 /// the confirm modal (`Ctrl+G d`).
 fn delete_branch_via_ui(rig: &mut Rig, repo: &FixtureRepo, name: &str) {
-    let (col, row) = rig
-        .term
-        .screen()
-        .find_all(name)
-        .into_iter()
-        .min_by_key(|(col, _)| *col)
-        .unwrap_or_else(|| panic!("no {name} row:\n{}", rig.term.text()));
-    rig.term.click(col, row).unwrap();
-    rig.term.send_keys("C-g d").unwrap();
-    rig.term
-        .wait_for("the delete confirmation", STEP, |s| {
-            s.contains(&format!("Delete branch '{name}'?"))
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+    // The click (the row located afresh) and the key are retried together
+    // until the question shows: a torn frame can lose the click.
+    common::retry_until(
+        &mut rig.term,
+        "the delete confirmation",
+        4,
+        STEP,
+        |t| {
+            if let Some((col, row)) = t
+                .screen()
+                .find_all(name)
+                .into_iter()
+                .min_by_key(|(col, _)| *col)
+            {
+                t.click(col, row).unwrap();
+                t.send_keys("C-g d").unwrap();
+            }
+        },
+        |s| s.contains(&format!("Delete branch '{name}'?")),
+    );
     rig.term.send_keys("y").unwrap();
     wait_until("the branch to be deleted", || {
         git(repo.root(), &["branch", "--list", name]).is_empty()

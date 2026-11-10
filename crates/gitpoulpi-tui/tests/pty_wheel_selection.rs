@@ -46,7 +46,8 @@ fn the_wheel_over_the_settings_search_scrolls_the_window_not_the_selection() {
         .wait_for("many results, the scrollbar painted", STEP, |s| {
             s.find(POPUP).is_some_and(|(_, r)| {
                 (r + 1..r + 12).any(|row| {
-                    s.cell(right_edge(s, r), row)
+                    right_edge_opt(s, r)
+                        .and_then(|c| s.cell(c, row))
                         .is_some_and(|cell| cell.display() == ARROW_UP)
                 })
             })
@@ -66,14 +67,12 @@ fn the_wheel_over_the_settings_search_scrolls_the_window_not_the_selection() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
-fn right_edge(s: &xtask::pty::Screen, title_row: u16) -> u16 {
-    (0..s.cols())
-        .rev()
-        .find(|c| {
-            s.cell(*c, title_row)
-                .is_some_and(|cell| cell.display() == "\u{256e}")
-        })
-        .expect("the popup's top-right corner")
+/// The popup's top-right corner column; `None` on a torn frame.
+fn right_edge_opt(s: &xtask::pty::Screen, title_row: u16) -> Option<u16> {
+    (0..s.cols()).rev().find(|c| {
+        s.cell(*c, title_row)
+            .is_some_and(|cell| cell.display() == "\u{256e}")
+    })
 }
 
 const COUNT: usize = 60;

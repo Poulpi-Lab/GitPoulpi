@@ -70,7 +70,10 @@ fn picking_core_autocrlf_in_settings_writes_git_config_and_undo_restores_it() {
                 let _ = t.wait_for("a redraw", Duration::from_secs(5), |s| s.text() != before);
             }
         },
-        |s| s.contains("core.autocrlf"),
+        |s| {
+            s.find("core.autocrlf")
+                .is_some_and(|(_, r)| s.line(r).contains("true"))
+        },
     );
     assert!(
         !screen.contains("nothing calls"),
@@ -133,18 +136,22 @@ fn the_ssh_key_rows_have_no_coming_note() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     for (row, help) in [("Private key path", "GIT_SSH_COMMAND")] {
-        let mut found = term.screen().contains(row);
-        for _ in 0..20 {
-            if found {
-                break;
-            }
-            term.send_keys("Down").unwrap();
-            std::thread::sleep(Duration::from_millis(150));
-            found = term.screen().contains(row);
-        }
-        let screen = term
-            .wait_for(row, STEP, |s| s.contains(row))
-            .unwrap_or_else(|e| panic!("{e}"));
+        // One Down per poll that has not yet shown the row, each answered by
+        // a redraw before the next (a fixed sleep raced it under load).
+        let screen = common::retry_until(
+            &mut term,
+            row,
+            40,
+            Duration::from_secs(2),
+            |t| {
+                let before = t.screen().text();
+                if !before.contains(row) {
+                    t.send_keys("Down").unwrap();
+                    let _ = t.wait_for("a redraw", Duration::from_secs(5), |s| s.text() != before);
+                }
+            },
+            |s| s.contains(row) && s.contains(help),
+        );
         let text = screen.text();
         assert!(text.contains(help), "{row} explains itself:\n{text}");
         for stale in [

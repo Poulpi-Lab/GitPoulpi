@@ -96,7 +96,9 @@ fn leaving_a_text_field_commits_it_and_esc_cancels() {
 
     // Type in the branch-name field, then click the next text field's row:
     // the first value is kept and saved, the second opens for editing.
-    let (c, r) = term.screen().find("Default branch name").unwrap();
+    let (c, r) = term
+        .wait_for_text("Default branch name", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("the field open", STEP, |s| s.contains("\u{2588}"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -106,7 +108,9 @@ fn leaving_a_text_field_commits_it_and_esc_cancels() {
     term.send_text("Y").unwrap();
     term.wait_for("the typed text", STEP, |s| s.contains("main-Yx"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term.screen().find("Default clone folder").unwrap();
+    let (c, r) = term
+        .wait_for_text("Default clone folder", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("saved on leaving", STEP, |_| {
         stored(config.path()).contains("default_branch_name = \"main-Yx\"")
@@ -155,11 +159,14 @@ fn the_diff_and_editor_page_has_word_wrap_as_a_checkbox_and_the_merge_row_after_
     let mut term = launch(repo.root(), config.path(), "pty-fields-editor");
     open_settings(&mut term);
     go_to_page(&mut term, "Diff & editor");
-    term.wait_for("the Diff & editor page", STEP, |s| {
-        s.contains("Diff & editor - global") && s.contains("Word wrap")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = term
+        .wait_for("the Diff & editor page", STEP, |s| {
+            s.contains("Diff & editor - global")
+                && s.find("Word wrap")
+                    .is_some_and(|(_, r)| s.line(r).contains("[ ]"))
+                && s.contains("Merge editor")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (_, wrap) = screen.find("Word wrap").unwrap();
     assert!(
         screen.line(wrap).contains("[ ]"),
@@ -239,7 +246,9 @@ fn the_first_ai_profile_stays_editable_after_adding_a_second() {
     term.wait_for_stable(Duration::from_millis(300), STEP)
         .unwrap();
     // Rename it: the Name row now edits Alpha.
-    let (c, r) = term.screen().find("Name").unwrap();
+    let (c, r) = term
+        .wait_for_text("Name", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("the name open", STEP, |s| s.contains("\u{2588}"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -269,7 +278,9 @@ fn picking_an_agent_preset_writes_its_arguments_and_the_model_flag() {
     common::settings_tab(&mut term, "Profiles (connections)");
     term.wait_for("the profile editor", STEP, |s| s.contains("Agent type"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term.screen().find("Agent type").unwrap();
+    let (c, r) = term
+        .wait_for_text("Agent type", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("the agent list", STEP, |s| {
         s.contains("OpenAI Codex CLI  (codex)")
@@ -285,7 +296,9 @@ fn picking_an_agent_preset_writes_its_arguments_and_the_model_flag() {
     .unwrap_or_else(|e| panic!("{e}\n{}\n{}", stored(config.path()), term.text()));
 
     // Back to Claude Code, then its model: haiku.
-    let (c, r) = term.screen().find("Agent type").unwrap();
+    let (c, r) = term
+        .wait_for_text("Agent type", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("the agent list", STEP, |s| {
         s.contains("Claude Code  (claude)")
@@ -297,7 +310,9 @@ fn picking_an_agent_preset_writes_its_arguments_and_the_model_flag() {
         t.contains("command = \"claude\"") && t.contains("\"-p\"") && !t.contains("\"exec\"")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}\n{}", stored(config.path()), term.text()));
-    let (c, r) = term.screen().find("Model").expect("a Model row");
+    let (c, r) = term
+        .wait_for_text("Model", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("the model list", STEP, |s| s.contains("claude-opus-5-5"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -328,7 +343,9 @@ fn an_alias_command_keeps_the_agent_type_and_env_vars_are_stored_per_profile() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Type the exact command: an alias that names no known agent.
-    let (c, r) = term.screen().find("Command").unwrap();
+    let (c, r) = term
+        .wait_for_text("Command", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("the command open", STEP, |s| s.contains("\u{2588}"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -349,7 +366,9 @@ fn an_alias_command_keeps_the_agent_type_and_env_vars_are_stored_per_profile() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Add a suggested variable.
-    let (c, r) = term.screen().find("Add an environment variable").unwrap();
+    let (c, r) = term
+        .wait_for_text("Add an environment variable", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("the suggestions", STEP, |s| s.contains("ANTHROPIC_MODEL"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -367,7 +386,9 @@ fn an_alias_command_keeps_the_agent_type_and_env_vars_are_stored_per_profile() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The value is a button of the row's small table; pressing it opens the
     // text field.
-    let (_, r) = term.screen().find("Env ANTHROPIC_MODEL").unwrap();
+    let (_, r) = term
+        .wait_for_text("Env ANTHROPIC_MODEL", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let line = term.screen().line(r);
     let value_c = line
         .find("haiku")
@@ -405,7 +426,9 @@ fn a_click_on_a_value_band_edits_it_and_the_caret_lands_where_clicked() {
         "no dot leader\n{}",
         term.text()
     );
-    let (label_c, row) = term.screen().find("Default branch name").unwrap();
+    let (label_c, row) = term
+        .wait_for_text("Default branch name", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     // The value "main" sits right of the label, in its band.
     let line = term.screen().line(row);
     let value_c = line

@@ -54,16 +54,28 @@ fn a_wide_text_field_shows_a_long_value_whole_and_takes_clicks_on_its_far_right(
     let screen = term
         .wait_for("the whole long value", STEP, |s| s.contains(LONG))
         .unwrap_or_else(|e| panic!("{e}"));
-    let (col, row) = screen.find(LONG).unwrap();
+    let (col, _) = screen.find(LONG).unwrap();
     // The far right of the band, well past where the old 40-cell band ended.
     let far = col + LONG.len() as u16 + 6;
     assert!(far > col + 40, "the click must be past the old band");
-    term.click(far, row)
-        .expect("click the far right of the field");
-    term.wait_for("the field in edit mode (caret drawn)", STEP, |s| {
-        s.contains(&format!("{LONG}\u{2588}"))
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Retried (the field located afresh): a click on a torn frame lands
+    // nowhere.
+    common::retry_until(
+        &mut term,
+        "the field in edit mode (caret drawn)",
+        4,
+        STEP,
+        |t| {
+            let s = t.screen();
+            if !s.contains(&format!("{LONG}\u{2588}")) {
+                if let Some((col, row)) = s.find(LONG) {
+                    t.click(col + LONG.len() as u16 + 6, row)
+                        .expect("click the far right of the field");
+                }
+            }
+        },
+        |s| s.contains(&format!("{LONG}\u{2588}")),
+    );
 }
 
 #[test]
@@ -126,8 +138,12 @@ mod env_rows {
         // The run mode rows push the env rows below the fold.
         common::scroll_settings_to(&mut term, "Env MY_FLAG", STEP);
         let screen = term
-            .wait_for("the env rows", STEP, |s| {
-                s.contains("Env CLAUDE_CONFIG_DIR") && s.contains("Env MY_FLAG")
+            .wait_for("the env rows, whole", STEP, |s| {
+                s.contains("Env CLAUDE_CONFIG_DIR")
+                    && s.contains(LONG_ENV)
+                    && s.find("Env MY_FLAG").is_some_and(|(_, r)| {
+                        s.line(r).contains('\u{2715}') && s.line(r).contains(" on ")
+                    })
             })
             .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
         // The long value shows whole.
@@ -143,16 +159,27 @@ mod env_rows {
             term.text()
         );
         // A click far right inside the field edits the value.
-        term.click(cross - 6, row).expect("click the value field");
-        term.wait_for("the value in edit mode (caret drawn)", STEP, |s| {
-            s.contains("on\u{2588}")
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+        common::retry_until(
+            &mut term,
+            "the value in edit mode (caret drawn)",
+            4,
+            STEP,
+            |t| {
+                if !t.screen().contains("on\u{2588}") {
+                    t.click(cross - 6, row).expect("click the value field");
+                }
+            },
+            |s| s.contains("on\u{2588}"),
+        );
         term.send_keys("Escape").unwrap();
-        term.wait_for("edit closed", STEP, |s| !s.contains("on\u{2588}"))
+        // The cross removes the variable (the row drawn whole again).
+        let screen = term
+            .wait_for("edit closed", STEP, |s| {
+                !s.contains("on\u{2588}")
+                    && s.find("Env MY_FLAG")
+                        .is_some_and(|(_, r)| s.line(r).contains('\u{2715}'))
+            })
             .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-        // The cross removes the variable.
-        let screen = term.screen();
         let (_, row) = screen.find("Env MY_FLAG").unwrap();
         let cross = screen
             .line(row)
@@ -168,7 +195,12 @@ mod env_rows {
         assert!(!stored.contains("MY_FLAG"), "{stored}");
         assert!(stored.contains(LONG_ENV), "{stored}");
         // The editable "Add an environment variable" combo fills the room.
-        let screen = term.screen();
+        let screen = term
+            .wait_for("the add row's combo", STEP, |s| {
+                s.find("Add an environment variable")
+                    .is_some_and(|(_, r)| s.line(r).contains('\u{25BE}'))
+            })
+            .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
         let (_, row) = screen
             .find("Add an environment variable")
             .expect("the add row");

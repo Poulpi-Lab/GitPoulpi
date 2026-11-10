@@ -281,9 +281,11 @@ fn dragging_the_horizontal_thumb_to_the_end_reaches_the_last_character() {
             })
             .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
         }
-        let (s, b) = settled(&term, &format!("{layout}: the bar and its thumb"), |s, b| {
-            !h_bar(s, b).is_empty() && !h_thumb(s, b).is_empty() && !s.contains("ENDMARK")
-        });
+        let (s, b) = settled(
+            &term,
+            &format!("{layout}: the bar and its thumb"),
+            |s, b| !h_bar(s, b).is_empty() && !h_thumb(s, b).is_empty() && !s.contains("ENDMARK"),
+        );
         assert!(
             !h_bar(&s, b).is_empty(),
             "{layout}: 200 chars overflow: no bar\n{}",

@@ -192,7 +192,11 @@ fn settings_workflow_pick_git_flow_detect_and_save_the_shared_file() {
                 t.click(dc + 1, dr)?;
                 t.click(dc + 1, dr)
             },
-            |s| s.contains("Closest template: Git Flow (score"),
+            |s| {
+                s.contains("Closest template: Git Flow (score")
+                    && s.contains("main, develop")
+                    && s.contains("feature: 2 branches (feature/login, feature/search)")
+            },
         )
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
@@ -289,23 +293,25 @@ fn the_start_feature_form_builds_the_name_and_calls_the_fake() {
 
     // The dropdown: one Start row per type, then the fixed rows.
     let (bc, br) = screen.find("Flow \u{25BE}").unwrap();
-    term.act_until(
-        "the Flow dropdown",
-        ATTEMPT,
-        STEP,
-        |t| t.click(bc + 1, br),
-        |s| s.contains("Start Feature...") && s.contains("Finish current branch..."),
-    )
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
-    for want in [
+    let wanted = [
         "Start Feature...",
         "Start Hotfix...",
         "Sync with parent...",
         "Set parent...",
         "Group branches by type",
         "Workflow settings...",
-    ] {
+    ];
+    // One predicate for the whole dropdown (a torn frame can lack rows).
+    let screen = term
+        .act_until(
+            "the Flow dropdown",
+            ATTEMPT,
+            STEP,
+            |t| t.click(bc + 1, br),
+            |s| s.contains("Finish current branch...") && wanted.iter().all(|w| s.contains(w)),
+        )
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    for want in wanted {
         assert!(screen.contains(want), "{want}:\n{}", screen.text());
     }
     let (rc, rr) = screen.find("Start Feature...").unwrap();

@@ -216,15 +216,21 @@ fn an_apt_install_shows_its_command_and_the_panel_opens_four_ways_and_closes_two
 
     // 1. A click on the chip.
     click_text(term, "v99.0.0 available");
-    wait_panel(term);
-    for needle in [
+    let needles = [
         "Installed with: apt",
         "Version 99.0.0 is available",
         APT_COMMAND,
         "Copy command",
         "Open in terminal",
-    ] {
-        assert!(term.screen().contains(needle), "{needle}\n{}", term.text());
+    ];
+    // One predicate for the whole panel (a torn frame can lack lines).
+    let panel = term
+        .wait_for("the whole apt panel", STEP, |s| {
+            needles.iter().all(|n| s.contains(n))
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    for needle in needles {
+        assert!(panel.contains(needle), "{needle}\n{}", term.text());
     }
     assert!(
         !term.screen().contains("Update and restart"),
@@ -250,7 +256,9 @@ fn an_apt_install_shows_its_command_and_the_panel_opens_four_ways_and_closes_two
     wait_panel(term);
 
     // The close cross closes it too.
-    let (col, row) = term.screen().find("\u{2715}").expect("the close cross");
+    let (col, row) = term
+        .wait_for_text("\u{2715}", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 1, row).unwrap();
     wait_closed(term);
 
@@ -316,8 +324,10 @@ fn update_and_restart_writes_the_job_and_starts_the_updater() {
     term.wait_for("the chip", STEP, |s| s.contains("v99.0.0 available"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     click_text(term, "v99.0.0 available");
-    wait_panel(term);
-    assert!(term.screen().contains("Installed with: a release archive"));
+    term.wait_for("the archive panel", STEP, |s| {
+        s.contains("Installed with: a release archive") && s.contains("Update and restart")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(!term.screen().contains("Copy command"), "{}", term.text());
     click_text(term, "Update and restart");
     term.wait_for("the updater runs in this terminal", STEP, |s| {

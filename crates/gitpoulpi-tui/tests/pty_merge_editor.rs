@@ -42,12 +42,16 @@ fn open_with_enter(term: &mut Terminal, name: &str, header: &str) {
     term.wait_for("the file selected", STEP, |s| s.contains(name))
         .unwrap_or_else(|e| panic!("{e}"));
     // A click on a conflicted file already opens its merge editor, and how
-    // soon depends on the machine (a ConPTY is slower than a unix pty): an
-    // Enter sent into an editor that has just opened would pick a chunk. So
-    // let the screen settle and press Enter only when the click left it shut.
-    term.wait_for_stable(Duration::from_millis(300), STEP)
-        .unwrap();
-    if !term.screen().contains(header) {
+    // soon depends on the machine (a ConPTY is slower than a unix pty, a
+    // torn frame shows the old screen a while): an Enter sent into an editor
+    // that has just opened would pick a chunk. So give the click a good while
+    // to show the editor and press Enter only when it left it shut.
+    if term
+        .wait_for("the editor from the click", Duration::from_secs(8), |s| {
+            s.contains(header)
+        })
+        .is_err()
+    {
         term.send_keys("Enter").unwrap();
     }
     term.wait_for("the merge editor", STEP, |s| s.contains(header))
@@ -411,7 +415,9 @@ fn the_mouse_picks_chunks_and_lines_and_the_save_confirms_unpicked_conflicts() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // One line of A, by clicking it.
-    let (c, r) = term.screen().find("A3 ours").expect("A's line");
+    let (c, r) = term
+        .wait_for_text("A3 ours", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("A's line appended after B's", STEP, |s| {
         let out = output_text(s);
@@ -420,22 +426,25 @@ fn the_mouse_picks_chunks_and_lines_and_the_save_confirms_unpicked_conflicts() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // ▼ moves to conflict 2.
-    let (c, r) = term.screen().find("\u{25bc}").expect("the down arrow");
+    let (c, r) = term
+        .wait_for_text("\u{25bc}", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("conflict 2", STEP, |s| s.contains("Conflict 2 / 3"))
         .unwrap_or_else(|e| panic!("{e}"));
 
     // Save & mark resolved: two conflicts have nothing picked, so it asks.
     let (c, r) = term
-        .screen()
-        .find("Save & mark resolved")
-        .expect("the button");
+        .wait_for_text("Save & mark resolved", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("the confirm box", STEP, |s| {
         s.contains("Save anyway?") && s.contains("2 conflicts have nothing picked")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term.screen().find("Save anyway (").expect("Save anyway");
+    let (c, r) = term
+        .wait_for_text("Save anyway (", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("the file resolved", STEP, |s| s.contains("resolved a.txt"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -605,7 +614,9 @@ fn a_file_resolved_elsewhere_gets_a_strip_and_unresolve_reopens_it() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(on_disk(&fixture, "a.txt"), before, "nothing was written");
 
-    let (c, r) = term.screen().find("Unresolve and reopen").unwrap();
+    let (c, r) = term
+        .wait_for_text("Unresolve and reopen", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("the conflict reopened", STEP, |s| {
         s.contains("Conflict 1 / 3") && !s.contains("resolved outside the editor")
@@ -628,24 +639,15 @@ fn every_entry_point_opens_the_editor() {
     };
 
     // A single click.
-    let (c, r) = term
-        .wait_for_text("notes.txt", STEP)
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    term.click(c, r).unwrap();
-    term.wait_for("the editor (single click)", STEP, |s| {
+    common::click_text_until(&mut term, "notes.txt", "the editor (single click)", |s| {
         s.contains("Conflict 1 / 1")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    });
     close(&mut term);
 
     // The row's context menu leads with it.
-    let (c, r) = term.wait_for_text("notes.txt", STEP).unwrap();
-    term.right_click(c, r).unwrap();
-    let screen = term
-        .wait_for("the file menu", STEP, |s| {
-            s.contains("Open in merge editor")
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let screen = common::right_click_text_until(&mut term, "notes.txt", "the file menu", |s| {
+        s.contains("Open in merge editor")
+    });
     let (mc, mr) = screen.find("Open in merge editor").unwrap();
     term.click(mc + 2, mr).unwrap();
     term.wait_for("the editor (menu)", STEP, |s| s.contains("Conflict 1 / 1"))
@@ -674,7 +676,9 @@ fn every_entry_point_opens_the_editor() {
         s.contains(" Merge editor ")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (bc, br) = term.screen().find(" Merge editor ").unwrap();
+    let (bc, br) = term
+        .wait_for_text(" Merge editor ", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(bc + 2, br).unwrap();
     term.wait_for("the editor (diff button)", STEP, |s| {
         s.contains("Conflict 1 / 1")
@@ -706,9 +710,8 @@ fn a_file_edited_outside_offers_the_disk_text() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (c, r) = term
-        .screen()
-        .find("Continue from the file on disk")
-        .unwrap();
+        .wait_for_text("Continue from the file on disk", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("the disk text in the Output, picks off", STEP, |s| {
         output_text(s).contains("hand-resolved line two") && s.contains("edited outside")
@@ -799,7 +802,9 @@ fn full_file_toggles_by_key_and_click_and_picks_still_work() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // The toolbar button (a click) turns it on.
-    let (c, r) = term.screen().find("Full file").expect("the toolbar button");
+    let (c, r) = term
+        .wait_for_text("Full file", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("A's changed lines colored", STEP, |s| {
         bg_of_a15(s) == Some(add_bg)
@@ -1175,13 +1180,10 @@ fn a_click_on_a_conflicted_row_opens_the_editor_and_the_diff_view_shows_a_card()
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // One click on the row: the editor, never the diff view.
-    let (c, r) = term.wait_for_text("notes.txt", STEP).unwrap();
-    term.click(c, r).unwrap();
-    term.wait_for("the editor (click)", STEP, |s| {
+    let screen = common::click_text_until(&mut term, "notes.txt", "the editor (click)", |s| {
         s.contains("A Current") && s.contains("B Incoming")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(!term.screen().contains("Conflicted file"));
+    });
+    assert!(!screen.contains("Conflicted file"));
     term.stop().unwrap();
 }
 
@@ -1209,7 +1211,9 @@ fn unpick_and_reset_by_key_button_and_palette() {
     term.send_text("A").unwrap();
     term.wait_for("everything taken", STEP, |s| s.contains("0 left"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term.screen().find("Reset").expect("the Reset button");
+    let (c, r) = term
+        .wait_for_text("Reset", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 1, r).unwrap();
     term.wait_for("the file reset", STEP, |s| {
         s.contains("3 left") && !output_text(s).contains("A15 ours")

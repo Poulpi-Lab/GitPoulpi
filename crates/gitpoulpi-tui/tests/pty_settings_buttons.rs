@@ -54,14 +54,7 @@ fn open_settings(page: &str, session: &str) -> (Terminal, tempfile::TempDir, tem
 
 /// Scrolls the page body until `text` is on screen.
 fn scroll_to(term: &mut Terminal, text: &str) {
-    for _ in 0..40 {
-        if term.text().contains(text) {
-            return;
-        }
-        term.scroll(true, 100, 20).unwrap();
-        std::thread::sleep(Duration::from_millis(100));
-    }
-    panic!("{text:?} never scrolled into view:\n{}", term.text());
+    common::scroll_settings_to(term, text, Duration::from_secs(30));
 }
 
 fn wait_link(term: &Terminal, link: &std::path::Path) {

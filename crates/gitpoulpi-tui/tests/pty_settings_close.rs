@@ -70,19 +70,30 @@ fn an_unsaved_workflow_draft_asks_before_settings_closes() {
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // + Add > Topic type makes the draft dirty.
-    let (c, r) = term.screen().find("+ Add").unwrap();
-    term.click(c + 1, r).unwrap();
-    term.wait_for("the add menu", STEP, |s| s.contains("Finish rule"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term
-        .screen()
-        .find_all("Topic type")
-        .into_iter()
-        .find(|&(_, row)| row > 10)
-        .expect("the Topic type entry");
-    term.click(c + 1, r).unwrap();
-    term.wait_for("the dirty mark", STEP, |s| s.contains("Unsaved"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Clicks retried, each target located afresh: a click placed on a torn
+    // frame can land nowhere.
+    common::click_text_until(&mut term, "+ Add", "the add menu", |s| {
+        s.contains("Finish rule")
+    });
+    common::retry_until(
+        &mut term,
+        "the dirty mark",
+        4,
+        STEP,
+        |t| {
+            let s = t.screen();
+            if !s.contains("Unsaved") {
+                if let Some((c, r)) = s
+                    .find_all("Topic type")
+                    .into_iter()
+                    .find(|&(_, row)| row > 10)
+                {
+                    t.click(c + 1, r).unwrap();
+                }
+            }
+        },
+        |s| s.contains("Unsaved"),
+    );
 
     // Esc asks; Esc again (Cancel) keeps the draft.
     term.send_keys("Escape").unwrap();
@@ -98,17 +109,13 @@ fn an_unsaved_workflow_draft_asks_before_settings_closes() {
 
     // `q` asks again; Discard and close leaves Settings.
     term.send_keys("q").unwrap();
-    let screen = term
-        .wait_for("the question again", STEP, |s| {
-            s.contains("Close Settings?")
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = screen.find("Discard and close").unwrap();
-    term.click(c + 1, r).unwrap();
-    term.wait_for("Settings closed", STEP, |s| {
-        !s.contains("Repo-specific settings") && !s.contains("Close Settings?")
+    term.wait_for("the question again", STEP, |s| {
+        s.contains("Close Settings?") && s.contains("Discard and close")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::click_text_until(&mut term, "Discard and close", "Settings closed", |s| {
+        !s.contains("Repo-specific settings") && !s.contains("Close Settings?")
+    });
     assert_eq!(
         std::fs::read_to_string(repo.state_dir().join("workflow.toml")).unwrap(),
         WORKFLOW,
@@ -126,14 +133,26 @@ fn a_profile_without_an_email_offers_go_to_it() {
     common::settings_tab(&mut term, "Profiles");
     term.wait_for("the list", STEP, |s| s.contains("+ Add"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term.screen().find("+ Add").unwrap();
-    term.click(c + 1, r).unwrap();
-    term.wait_for("a profile added", STEP, |_| {
+    let added = || {
         std::fs::read_to_string(config.path().join("config.toml"))
             .unwrap_or_default()
             .contains("id = \"profile\"")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    };
+    // The click is retried (located afresh) until the profile is stored.
+    common::retry_until(
+        &mut term,
+        "a profile added",
+        4,
+        STEP,
+        |t| {
+            if !added() {
+                if let Some((c, r)) = t.screen().find("+ Add") {
+                    t.click(c + 1, r).unwrap();
+                }
+            }
+        },
+        |_| added(),
+    );
 
     // Move to another page so Go to it has somewhere to come back from.
     common::settings_page(&mut term, "General");
@@ -156,11 +175,15 @@ fn the_search_popup_closes_on_its_cross() {
     let config = tempfile::tempdir().unwrap();
     let mut term = launch(repo.root(), config.path(), "pty-close-search");
     open_settings(&mut term);
-    let (c, r) = term.screen().find("Search settings...").unwrap();
-    term.click(c + 1, r).unwrap();
-    let screen = term
-        .wait_for("the search popup", STEP, |s| s.contains("Enter: go"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The popup with its title row's cross, as one state.
+    let with_cross = |s: &xtask::pty::Screen| {
+        s.find("Enter: go")
+            .is_some_and(|(_, row)| s.find_all("\u{2715}").into_iter().any(|(_, r)| r == row))
+    };
+    let screen =
+        common::click_text_until(&mut term, "Search settings...", "the search popup", |s| {
+            with_cross(s)
+        });
     let (_, row) = screen.find("Enter: go").unwrap();
     let line = screen.line(row);
     assert!(!line.contains("Esc"), "no Esc text on the title: {line}");
@@ -169,9 +192,18 @@ fn the_search_popup_closes_on_its_cross() {
         .into_iter()
         .find(|&(_, r)| r == row)
         .unwrap_or_else(|| panic!("a cross on the popup's title row:\n{}", term.text()));
-    term.click(c + 1, r).unwrap();
-    term.wait_for("the popup closed", STEP, |s| !s.contains("Enter: go"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the popup closed",
+        4,
+        STEP,
+        |t| {
+            if t.screen().contains("Enter: go") {
+                t.click(c + 1, r).unwrap();
+            }
+        },
+        |s| !s.contains("Enter: go"),
+    );
     assert!(
         term.screen().contains("Repo-specific settings"),
         "still in Settings"

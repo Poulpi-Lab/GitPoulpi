@@ -225,7 +225,9 @@ fn the_skip_hooks_default_starts_the_composer_checked_and_the_commit_passes_the_
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // A click on it unticks it again.
-    let (c, r) = term.screen().find("[x] Skip hooks").unwrap();
+    let (c, r) = term
+        .wait_for_text("[x] Skip hooks", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 4, r).unwrap();
     term.wait_for("the checkbox unticked", STEP, |s| {
         s.contains("[ ] Skip hooks")

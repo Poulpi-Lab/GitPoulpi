@@ -42,9 +42,10 @@ fn log_cell(screen: &Screen) -> (Color, Color) {
 }
 
 /// A cell of Settings' own chrome: the title's first letter.
-fn settings_bg(screen: &Screen) -> Color {
-    let (col, row) = screen.find("Settings - Tab").expect("the Settings title");
-    screen.cell(col, row).expect("a cell").bg
+/// `None` on a frame without the title (a torn frame).
+fn settings_bg(screen: &Screen) -> Option<Color> {
+    let (col, row) = screen.find("Settings - Tab")?;
+    Some(screen.cell(col, row).expect("a cell").bg)
 }
 
 fn open_settings(term: &mut Terminal, page: &str) {
@@ -109,7 +110,9 @@ fn the_theme_combo_previews_commits_restores_and_lists_user_themes() {
         .size(200, 60)
         .spawn();
     let screen = term
-        .wait_for("the fixture loaded", STARTUP, |s| s.contains(MESSAGE))
+        .wait_for("the fixture loaded, both rows", STARTUP, |s| {
+            s.contains(MESSAGE) && s.find(ROW_TEXT).is_some()
+        })
         .unwrap_or_else(|e| panic!("{e}"));
     let (dark_bg, dark_fg) = log_cell(&screen);
     assert_eq!(
@@ -119,17 +122,26 @@ fn the_theme_combo_previews_commits_restores_and_lists_user_themes() {
     );
 
     open_settings(&mut term, "Appearance");
-    let dark_chrome = settings_bg(&term.screen());
+    let dark_chrome = settings_bg(
+        &term
+            .wait_for("Settings' title", STEP, |s| settings_bg(s).is_some())
+            .unwrap_or_else(|e| panic!("{e}")),
+    )
+    .expect("the title is drawn");
     open_theme_combo(&mut term, "System (follows terminal)");
     // Highlight Light: System, Dark, Light. The preview repaints at once.
     term.send_keys("Down").unwrap();
     term.send_keys("Down").unwrap();
-    term.wait_for("Light previewed", STEP, |s| settings_bg(s) != dark_chrome)
-        .unwrap_or_else(|e| panic!("{e}"));
+    term.wait_for("Light previewed", STEP, |s| {
+        settings_bg(s).is_some_and(|b| b != dark_chrome)
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     // Esc closes the combo and restores Dark; nothing was stored.
     term.send_keys("Escape").unwrap();
-    term.wait_for("Dark restored", STEP, |s| settings_bg(s) == dark_chrome)
-        .unwrap_or_else(|e| panic!("{e}"));
+    term.wait_for("Dark restored", STEP, |s| {
+        settings_bg(s) == Some(dark_chrome)
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert!(
         !stored(config.path()).contains("theme = "),
         "{}",

@@ -97,18 +97,32 @@ fn two_weeks_by_mouse_then_by_keys_persists_and_zero_is_refused() {
     let repo = repo();
     let config = tempfile::tempdir().unwrap();
     let mut term = launch(repo.root(), "pty-retention", config.path());
-    let (_, row) = open_row(&mut term);
+    open_row(&mut term);
 
     // A fresh config: one week, as a number and a unit on the one line.
     wait_row(&term, &["week", "\u{25BE}"]);
 
-    // The mouse: click the number, type 2, Enter.
-    let (number, _) = parts(&wait_row(&term, &["week"]), row);
-    term.click(number.0, number.1).expect("click the number");
-    term.send_keys("Backspace").unwrap();
-    term.send_text("2").unwrap();
-    term.send_keys("Enter").unwrap();
-    wait_stored(config.path(), "retention_days = 14");
+    // The mouse: click the number, type 2, Enter. The row is looked up again
+    // on every try (the page scrolls to keep its help in view, and a click
+    // placed on a torn frame lands nowhere).
+    common::retry_until(
+        &mut term,
+        "the number stored",
+        4,
+        STEP,
+        |t| {
+            if !stored(config.path()).contains("retention_days = 14") {
+                let screen = wait_row(t, &["week", "\u{25BE}"]);
+                let row = screen.find(LABEL).expect("the row is on screen").1;
+                let (number, _) = parts(&screen, row);
+                t.click(number.0, number.1).expect("click the number");
+                t.send_keys("Backspace").unwrap();
+                t.send_text("2").unwrap();
+                t.send_keys("Enter").unwrap();
+            }
+        },
+        |_| stored(config.path()).contains("retention_days = 14"),
+    );
     wait_stored(config.path(), "retention_unit = \"weeks\"");
     wait_row(&term, &["weeks"]);
 

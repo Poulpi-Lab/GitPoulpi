@@ -185,7 +185,9 @@ fn the_checklist_hides_and_shows_sections_and_persists() {
 
     // Reset to default shows everything again.
     open_checklist(&mut term, "LOCAL");
-    let (c, r) = term.screen().find("Reset to default").unwrap();
+    let (c, r) = term
+        .wait_for_text("Reset to default", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 1, r).expect("click Reset");
     term.send_keys("Escape").unwrap();
     term.wait_for("every section back", STEP, |s| {

@@ -92,7 +92,9 @@ fn profiles_are_added_reordered_dragged_and_removed_from_the_list() {
 
     // Two profiles through the toolbar button.
     for n in 1..=2 {
-        let (c, r) = term.screen().find("+ Add").unwrap();
+        let (c, r) = term
+            .wait_for_text("+ Add", STEP)
+            .unwrap_or_else(|e| panic!("{e}"));
         term.click(c + 1, r).unwrap();
         let want: Vec<&str> = ["profile", "profile-2"][..n].to_vec();
         wait_for_ids(&term, config.path(), "a profile added", &want);
@@ -122,7 +124,9 @@ fn profiles_are_added_reordered_dragged_and_removed_from_the_list() {
     wait_for_ids(&term, config.path(), "dragged", &["profile", "profile-2"]);
 
     // Edit the selected profile so removing it asks, then remove it.
-    let (c, r) = term.screen().find("Author email").unwrap();
+    let (c, r) = term
+        .wait_for_text("Author email", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("the field open", STEP, |s| s.contains("\u{2588}"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -151,8 +155,10 @@ fn profiles_are_added_reordered_dragged_and_removed_from_the_list() {
 /// (the one on the row of Cancel).
 fn confirm_list_removal(term: &mut Terminal) {
     let screen = term
-        .wait_for("the list's removal question", STEP, |s| {
-            s.contains("Remove \"New profile\"?") && s.contains("Cancel")
+        .wait_for("the list's removal question with its buttons", STEP, |s| {
+            s.contains("Remove \"New profile\"?")
+                && s.find("Cancel")
+                    .is_some_and(|(_, row)| s.find_all("Remove").into_iter().any(|(_, r)| r == row))
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (_, row) = screen.find("Cancel").unwrap();

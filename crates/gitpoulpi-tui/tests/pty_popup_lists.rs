@@ -52,12 +52,15 @@ fn highlighted_rows(s: &Screen, col: u16, rows: std::ops::Range<u16>) -> Vec<u16
 
 /// The column of the popup's top-right corner, scanning right from its title.
 fn right_border(s: &Screen, from: u16, row: u16) -> u16 {
-    (from..s.cols())
-        .find(|c| {
-            s.cell(*c, row)
-                .is_some_and(|cell| cell.display() == "\u{256e}")
-        })
-        .expect("the popup's top-right corner")
+    right_border_opt(s, from, row).expect("the popup's top-right corner")
+}
+
+/// [`right_border`] for wait predicates: a torn frame can lack the corner.
+fn right_border_opt(s: &Screen, from: u16, row: u16) -> Option<u16> {
+    (from..s.cols()).find(|c| {
+        s.cell(*c, row)
+            .is_some_and(|cell| cell.display() == "\u{256e}")
+    })
 }
 
 /// `(column of the title, column of the right border, first list row)` of the palette popup.
@@ -66,15 +69,30 @@ fn palette_geometry(s: &Screen) -> (u16, u16, u16) {
     (c, right_border(s, c, r), r + 3)
 }
 
+/// [`palette_geometry`] for wait predicates: `None` on a torn frame.
+fn palette_geometry_opt(s: &Screen) -> Option<(u16, u16, u16)> {
+    let (c, r) = s.find("Command Palette")?;
+    Some((c, right_border_opt(s, c, r)?, r + 3))
+}
+
 fn selected_offset(s: &Screen) -> Option<u16> {
-    let (c, _, top) = palette_geometry(s);
+    let (c, _, top) = palette_geometry_opt(s)?;
     let rows = highlighted_rows(s, c + 2, top..(top + 31).min(s.rows()));
     (rows.len() == 1).then(|| rows[0] - top)
 }
 
+/// The list's row at `offset`; a sentinel no row equals when the palette's
+/// frame is torn (so `==` waits keep waiting).
 fn list_text(s: &Screen, offset: u16) -> String {
-    let (_, _, top) = palette_geometry(s);
-    s.line(top + offset)
+    match palette_geometry_opt(s) {
+        Some((_, _, top)) => s.line(top + offset),
+        None => "\u{0}torn".to_string(),
+    }
+}
+
+/// The list's first row differs from `first`, on a frame that has a palette.
+fn list_differs(s: &Screen, first: &str) -> bool {
+    palette_geometry_opt(s).is_some() && list_text(s, 0) != first
 }
 
 fn open_palette(term: &mut Terminal) -> Screen {
@@ -85,7 +103,7 @@ fn open_palette(term: &mut Terminal) -> Screen {
     // failed under load.
     term.wait_for("the palette, highlight and scrollbar drawn", STEP, |s| {
         s.contains("Command Palette") && selected_offset(s) == Some(0) && {
-            let (_, right, top) = palette_geometry(s);
+            let (_, right, top) = palette_geometry_opt(s).expect("a selected row has geometry");
             s.cell(right, top).map(|cell| cell.display().to_string()) == Some(ARROW_UP.to_string())
                 && s.find_all("\u{2193}")
                     .into_iter()
@@ -124,7 +142,7 @@ fn the_palette_takes_the_list_keys() {
     // A second page runs past the window: it follows.
     term.send_keys("PageDown").unwrap();
     term.wait_for("the window moved with the second page", STEP, |s| {
-        list_text(s, 0) != first
+        list_differs(s, &first)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("End").unwrap();
@@ -162,7 +180,7 @@ fn the_palette_overflow_paints_the_scrollbar_and_the_wheel_leaves_the_highlight(
     // Over the filter box: inside the popup, on no row, so nothing is hovered.
     term.scroll(true, c + 4, top - 2).unwrap();
     let scrolled = term
-        .wait_for("the window scrolled", STEP, |s| list_text(s, 0) != first)
+        .wait_for("the window scrolled", STEP, |s| list_differs(s, &first))
         .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(
         selected_offset(&scrolled),
@@ -456,10 +474,13 @@ fn a_press_on_the_palette_track_jumps_the_thumb_and_keeps_dragging() {
         .expect("the down arrow");
     // The window at the very end of the list, as the End key shows it.
     term.send_keys("End").unwrap();
+    term.wait_for("End scrolled to the bottom", STEP, |s| {
+        list_differs(s, &first)
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    // The final frame of the jump, read once the palette stopped redrawing.
     let end = term
-        .wait_for("End scrolled to the bottom", STEP, |s| {
-            list_text(s, 0) != first
-        })
+        .wait_for_stable(Duration::from_millis(300), STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     let end_text = list_text(&end, 0);
     term.send_keys("Home").unwrap();

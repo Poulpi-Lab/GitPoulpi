@@ -233,7 +233,9 @@ fn the_global_scope_ignores_but_keeps_the_repository_choice() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
-    let (c, r) = term.screen().find("TAGS").expect("TAGS header");
+    let (c, r) = term
+        .wait_for_text("TAGS", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.right_click(c + 1, r).unwrap();
     term.wait_for("the checklist", STEP, |s| s.contains("Reset to default"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

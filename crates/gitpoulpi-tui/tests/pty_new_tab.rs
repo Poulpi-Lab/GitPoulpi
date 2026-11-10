@@ -141,7 +141,9 @@ fn a_middle_click_closes_a_repository_tab() {
     }
     // The window still shows orbit (the session file's active tab is
     // untouched by the outside open); middle-click the *other* tab.
-    let (col, row) = term.screen().find("moonbase").unwrap();
+    let (col, row) = term
+        .wait_for_text("moonbase", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click_with(Button::Middle, col, row).unwrap();
     term.wait_for("the confirmation", STEP, |s| s.contains("Close the tab"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

@@ -78,6 +78,13 @@ fn workspaces_shows(s: &Screen) -> bool {
 /// where only blanks sit between the label and an `x` (a horizontal bar
 /// draws `Radar x`, the left column pads to its right edge).
 fn close_cell(screen: &Screen, label: &str) -> (u16, u16) {
+    close_cell_opt(screen, label)
+        .unwrap_or_else(|| panic!("no {label:?} tab with a close cross\n{}", screen.text()))
+}
+
+/// [`close_cell`] as a wait predicate target (a torn frame can show the
+/// label before its cross).
+fn close_cell_opt(screen: &Screen, label: &str) -> Option<(u16, u16)> {
     for (col, row) in screen.find_all(label) {
         let tail = col + label.chars().count() as u16;
         let next = (tail..screen.cols()).find(|c| {
@@ -86,10 +93,10 @@ fn close_cell(screen: &Screen, label: &str) -> (u16, u16) {
                 .is_some_and(|cell| !cell.text.trim().is_empty())
         });
         if let Some(c) = next.filter(|c| screen.cell(*c, row).is_some_and(|x| x.text == "x")) {
-            return (c, row);
+            return Some((c, row));
         }
     }
-    panic!("no {label:?} tab with a close cross\n{}", screen.text());
+    None
 }
 
 /// Whether `needle` is on a row of the list (the tab bar's own rows hold
@@ -129,7 +136,9 @@ fn radar_round_trip(position: &str) {
     s.term.send_keys("M-r").unwrap();
     let screen = s
         .term
-        .wait_for("the Radar", STEP, radar_shows)
+        .wait_for("the Radar with its tab's cross", STEP, |x| {
+            radar_shows(x) && close_cell_opt(x, "Radar").is_some()
+        })
         .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
     let (x, y) = close_cell(&screen, "Radar");
     s.term.click(x, y).unwrap();
@@ -181,7 +190,9 @@ fn workspaces_round_trip(position: &str) {
     click_menu_row(&mut s.term, &menu, "Workspaces");
     let screen = s
         .term
-        .wait_for("the Workspaces tab", STEP, workspaces_shows)
+        .wait_for("the Workspaces tab with its cross", STEP, |x| {
+            workspaces_shows(x) && close_cell_opt(x, "Workspaces").is_some()
+        })
         .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
     let (x, y) = close_cell(&screen, "Workspaces");
     assert!(
@@ -340,7 +351,12 @@ fn one_filter_narrows_favorites_and_every_section_and_open_comes_first() {
     term.send_keys("C-o").unwrap();
     let screen = term
         .wait_for("every section filled", STEP, |s| {
-            on_home(s) && s.contains("FAVORITES") && s.contains("recentrepo")
+            on_home(s)
+                && s.contains("OPEN REPOSITORIES")
+                && s.contains("FAVORITES")
+                && s.contains("RECENT REPOSITORIES")
+                && s.contains("ALL REPOSITORIES")
+                && s.contains("recentrepo")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let row = |s: &Screen, needle: &str| s.find(needle).map(|(_, r)| r);

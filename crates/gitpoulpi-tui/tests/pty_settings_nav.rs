@@ -236,7 +236,9 @@ fn a_badge_opens_a_text_field_for_editing() {
     common::settings_tab(&mut term, "Profiles");
     term.wait_for("the list", STEP, |s| s.contains("+ Add"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term.screen().find("+ Add").unwrap();
+    let (c, r) = term
+        .wait_for_text("+ Add", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 1, r).unwrap();
     term.wait_for("a profile", STEP, |_| saved_profiles(config.path()) == 1)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

@@ -10,7 +10,7 @@ mod common;
 use std::time::Duration;
 
 use gitpoulpi_testkit::FixtureRepoBuilder;
-use xtask::pty::{Color, Terminal};
+use xtask::pty::{Color, Screen, Terminal};
 
 const STEP: Duration = Duration::from_secs(30);
 
@@ -40,20 +40,33 @@ fn wait_shape(term: &Terminal, what: &str, want: &str) {
     );
 }
 
-/// The divider's column on the picker's `row`: the `│` after the window's
-/// frame and the dialog's left border (and before the dialog's right border
-/// and the window's frame).
-fn divider_col(term: &Terminal, row: u16) -> u16 {
-    let screen = term.screen();
-    let bars: Vec<u16> = (0..200u16)
+/// The `│` columns on the picker's `row`: the divider is the third, after
+/// the window's frame and the dialog's left border.
+fn divider_bars(screen: &Screen, row: u16) -> Vec<u16> {
+    (0..200u16)
         .filter(|&c| screen.cell(c, row).is_some_and(|x| x.text == "\u{2502}"))
-        .collect();
-    assert!(
-        bars.len() >= 3,
-        "no divider on row {row}: {bars:?}\n{}",
-        term.text()
-    );
-    bars[2]
+        .collect()
+}
+
+/// The picker's divider row and column, waited for as one state with the
+/// folders header (a torn frame can show the header before the divider).
+fn wait_divider(term: &Terminal) -> (u16, u16) {
+    let found = |s: &Screen| {
+        let (_, header) = s.find("FOLDERS")?;
+        let row = header + 3;
+        let bars = divider_bars(s, row);
+        (bars.len() >= 3).then(|| (row, bars[2]))
+    };
+    let screen = term
+        .wait_for("the picker's divider", STEP, |s| found(s).is_some())
+        .unwrap_or_else(|e| {
+            panic!(
+                "{e}
+{}",
+                term.text()
+            )
+        });
+    found(&screen).expect("the predicate just matched")
 }
 
 fn fg_at(term: &Terminal, col: u16, row: u16) -> Color {
@@ -84,9 +97,10 @@ fn the_browse_divider_is_ew_resize_lit_like_the_other_resize_lines_and_unlit_on_
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
-    let (_, header_row) = term.screen().find("FOLDERS").expect("the folders header");
-    let row = header_row + 3;
-    let col = divider_col(&term, row);
+    let (row, col) = wait_divider(&term);
+    // The unlit colour, read once the picker has stopped redrawing.
+    term.wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let rest = fg_at(&term, col, row);
 
     // Hover: the sideways resize pointer, and the accent line.

@@ -112,7 +112,14 @@ fn a_combobox_of_the_issues_pane_and_one_of_settings_are_both_the_hand() {
     let term = &mut rig.term;
     let screen = term
         .wait_for("the sidebar sections", STARTUP, |s| {
-            s.contains("REQUESTS") && s.contains("ISSUES") && s.contains(CHEVRON)
+            s.contains("REQUESTS")
+                && s.contains("ISSUES")
+                && s.find_all(CHEVRON)
+                    .into_iter()
+                    .any(|(c, r)| c > 15 && c < 60 && r > 3)
+                && s.find_all("pointer widgets pro")
+                    .into_iter()
+                    .any(|(_, r)| s.line(r).contains("main"))
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // A combobox row of the sidebar: its `v` sits well right of the section
@@ -146,7 +153,13 @@ fn a_combobox_of_the_issues_pane_and_one_of_settings_are_both_the_hand() {
         s.contains("Repo-specific settings") && s.contains("Search settings")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = term.screen();
+    let screen = term
+        .wait_for("a Settings combobox", STEP, |s| {
+            s.find_all(CHEVRON)
+                .into_iter()
+                .any(|(c, r)| c > 40 && r > 3)
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let combo = screen
         .find_all(CHEVRON)
         .into_iter()

@@ -105,9 +105,17 @@ fn wait_editor(term: &Terminal) {
     .unwrap_or_else(|e| panic!("{e}"));
 }
 
-/// How many `[ n v]` assignment fields show the number `n`.
-fn owned_by(term: &Terminal, n: u8) -> usize {
-    term.screen().find_all(&format!("[ {n} \u{25be}]")).len()
+/// Waits until exactly `want` `[ n v]` assignment fields show the number `n`
+/// (a torn frame can lack some), and returns that count: on a timeout the
+/// last count is what the assertion reports.
+fn owned_by(term: &Terminal, n: u8, want: usize) -> usize {
+    let field = format!("[ {n} \u{25be}]");
+    match term.wait_for(&format!("{want} fields owned by {n}"), STEP, |s| {
+        s.find_all(&field).len() == want
+    }) {
+        Ok(s) => s.find_all(&field).len(),
+        Err(_) => term.screen().find_all(&field).len(),
+    }
 }
 
 /// Gives the second hunk of `a.txt`, `b.txt` and the commit-named file to a
@@ -202,19 +210,29 @@ fn a_commit_is_split_by_mouse_from_the_palette_through_the_assignment_list() {
     term.send_keys("Enter").unwrap();
     wait_editor(&term);
     assert_eq!(
-        owned_by(&term, 1),
+        owned_by(&term, 1, 5),
         5,
         "everything starts in the first commit"
     );
 
     // The third `[1 v]` is the second hunk of a.txt.
-    let mut fields = term.screen().find_all("[ 1 \u{25be}]");
+    let mut fields = term
+        .wait_for("three commit fields", STEP, |s| {
+            s.find_all("[ 1 \u{25be}]").len() >= 3
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
+        .find_all("[ 1 \u{25be}]");
     fields.sort_by_key(|&(_, r)| r);
     let (c, r) = fields[2];
     term.click(c + 1, r).expect("open the list");
     let screen = term
         .wait_for("the list of commits", STEP, |s| {
-            s.contains("Unassigned") && s.contains("+ New commit")
+            s.contains("Unassigned")
+                && s.contains("+ New commit")
+                && s.find_all("2 (no message)").len() >= 2
+                && s.find_all("\u{2715}")
+                    .into_iter()
+                    .any(|(_, r)| s.line(r).contains("Split commit"))
         })
         .unwrap_or_else(|e| panic!("{e}"));
     // "2 (no message)" shows in the commits pane and in the list (the one
@@ -274,7 +292,7 @@ fn a_refusal_keeps_the_editor_open_on_the_same_plan() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     // The plan survived: two changes still belong to the second commit.
-    assert_eq!(owned_by(&term, 2), 2);
+    assert_eq!(owned_by(&term, 2, 2), 2);
     assert_eq!(repo.git(&["rev-parse", "elsewhere"]), base);
     term.send_keys("Escape").unwrap();
     term.wait_for("the editor closed", STEP, |s| !s.contains("Split into 2"))
@@ -345,14 +363,9 @@ fn an_outside_click_is_swallowed_once_the_plan_is_edited_and_the_cross_closes() 
 
 /// Right-click `base` -> Interactively rebase from here...
 fn open_rebase(term: &mut Terminal) {
-    let (col, row) = term.wait_for_text("base", STEP).unwrap();
-    term.right_click(col + 1, row)
-        .expect("right-click the base commit");
-    let menu = term
-        .wait_for("the commit menu", STEP, |s| {
-            s.contains("Interactively rebase from here...")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
+    let menu = common::right_click_text_until(term, "base", "the commit menu", |s| {
+        s.contains("Interactively rebase from here...")
+    });
     let (c, r) = menu.find("Interactively rebase from here...").unwrap();
     term.click(c + 1, r).expect("click the rebase row");
     term.wait_for("the rebase popup", STEP, |s| s.contains("Start rebase"))
@@ -361,7 +374,13 @@ fn open_rebase(term: &mut Terminal) {
 
 /// The "split..." button of the `parser and flag` row.
 fn click_row_split(term: &mut Terminal) {
-    let screen = term.screen();
+    let screen = term
+        .wait_for("the split... button on its row", STEP, |s| {
+            s.find_all("parser and flag")
+                .into_iter()
+                .any(|(_, r)| s.line(r).contains("split..."))
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (_, r) = screen
         .find_all("parser and flag")
         .into_iter()

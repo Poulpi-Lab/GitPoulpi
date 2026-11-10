@@ -83,11 +83,18 @@ fn a_topic_type_is_added_reordered_and_saved_only_for_me() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // + Add > Topic type.
-    let (c, r) = term.screen().find("+ Add").unwrap();
+    let (c, r) = term
+        .wait_for_text("+ Add", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 1, r).unwrap();
-    term.wait_for("the add menu", STEP, |s| s.contains("Finish rule"))
+    let menu = term
+        .wait_for("the add menu", STEP, |s| {
+            s.contains("Finish rule")
+                && s.find_all("Topic type")
+                    .into_iter()
+                    .any(|(_, row)| row > 10)
+        })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let menu = term.screen();
     let (c, r) = menu
         .find_all("Topic type")
         .into_iter()
@@ -115,7 +122,9 @@ fn a_topic_type_is_added_reordered_and_saved_only_for_me() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // The save bar is pinned: Only for me.
-    let (c, r) = term.screen().find("Only for me").unwrap();
+    let (c, r) = term
+        .wait_for_text("Only for me", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 1, r).unwrap();
     let state = repo.state_dir().join("repo-state.toml");
     term.wait_for("repo-state follows", STEP, |_| {

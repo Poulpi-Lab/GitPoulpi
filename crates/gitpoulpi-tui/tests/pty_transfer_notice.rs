@@ -92,9 +92,8 @@ fn status_row(screen: &Screen) -> String {
 
 fn click_pull(term: &mut Terminal) {
     let (col, row) = term
-        .screen()
-        .find("Pull")
-        .expect("the toolbar's Pull button");
+        .wait_for_text("Pull", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 1, row).expect("click Pull");
 }
 

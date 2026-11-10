@@ -106,13 +106,16 @@ fn closing_the_radar_tab_persists_and_the_palette_reopens_it() {
     let config = tempfile::tempdir().unwrap();
     let mut term = start(&repo, config.path(), "pty-radar-close");
     // The cross shows on the hovered (or open) tab only, like the others.
-    let line = bar(&term.screen());
-    assert!(line.contains("Radar"), "{line}");
+    let at_rest = term
+        .wait_for("the Radar tab", STEP, |s| bar(s).contains("Radar"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let line = bar(&at_rest);
     assert!(!line.contains("Radar x"), "no cross at rest: {line}");
     term.move_to(col_in(&line, "Radar") + 2, 1).unwrap();
-    term.wait_for("the cross on hover", STEP, |s| bar(s).contains("Radar x"))
+    let hovered = term
+        .wait_for("the cross on hover", STEP, |s| bar(s).contains("Radar x"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let line = bar(&term.screen());
+    let line = bar(&hovered);
     let x = col_in(&line, "Radar x") + "Radar ".len() as u16;
     term.click(x, 1).unwrap();
     term.wait_for("the tab gone", STEP, |s| !bar(s).contains("Radar"))
@@ -121,16 +124,21 @@ fn closing_the_radar_tab_persists_and_the_palette_reopens_it() {
 
     // Restart: still closed. The setting itself was not touched.
     let mut term = start(&repo, config.path(), "pty-radar-close");
-    assert!(!bar(&term.screen()).contains("Radar"), "stays closed");
+    // The bar drawn (its `+`), and without the Radar tab.
+    let bar_up = term
+        .wait_for("the tab bar", STEP, |s| bar(s).contains(" + "))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(!bar(&bar_up).contains("Radar"), "stays closed");
     let cfg = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
     assert!(!cfg.contains("radar_enabled"), "{cfg}");
 
     // The `+` menu offers it.
-    let plus = col_in(&bar(&term.screen()), " + ");
+    let plus = col_in(&bar(&bar_up), " + ");
     term.click(plus + 1, 1).unwrap();
-    term.wait_for("the + menu", STEP, |s| s.contains("New tab"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(term.screen().text().contains("Radar"), "a Radar row");
+    term.wait_for("the + menu with a Radar row", STEP, |s| {
+        s.contains("New tab") && s.text().contains("Radar")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Escape").unwrap();
     term.wait_for("the menu closed", STEP, |s| !s.contains("New tab"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

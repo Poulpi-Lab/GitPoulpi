@@ -118,6 +118,8 @@ fn the_clone_folder_scope_lists_every_repository_in_it() {
                 && s.contains("alpha")
                 && s.contains("beta")
                 && s.contains("2 not linked")
+                && s.contains("not linked: only its work in progress is shown")
+                && s.contains("Link...")
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
@@ -183,7 +185,13 @@ fn an_unset_folder_is_greyed_and_opens_its_settings_row() {
         &format!("[repos]\nclone_root = '{}'\n", clone.path().display()),
     );
     open_scope(&mut s.term, 2);
-    let screen = s.term.screen();
+    let screen = s
+        .term
+        .wait_for("both folder choices", STEP, |s| {
+            s.contains("Default browse folder (set it in Settings)")
+                && s.contains("Default clone folder")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
     assert!(
         screen.contains("Default browse folder (set it in Settings)"),
         "{}",
@@ -198,7 +206,9 @@ fn an_unset_folder_is_greyed_and_opens_its_settings_row() {
     let screen = s
         .term
         .wait_for("the Settings row", STEP, |s| {
-            s.contains("Default browse folder") && !s.contains("(set it in Settings)")
+            s.contains("Default browse folder")
+                && !s.contains("(set it in Settings)")
+                && s.contains("Default clone folder")
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(screen.contains("Default clone folder"), "{}", screen.text());

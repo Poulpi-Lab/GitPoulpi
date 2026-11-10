@@ -93,6 +93,7 @@ fn is_bar_glyph(s: &str) -> bool {
 
 /// The structural rules every drawn screen must keep.
 fn check_buffer(what: &str, buf: &Buffer) {
+    crate::render_check::assert_clean(what, buf);
     let w = buf.area.width;
     let h = buf.area.height;
     let at = |x: u16, y: u16| buf[(x, y)].symbol();

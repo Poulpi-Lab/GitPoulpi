@@ -157,6 +157,10 @@ mod history_view;
 mod hosting_task;
 #[cfg(test)]
 mod i18n_layout_tests;
+#[cfg(test)]
+mod render_check;
+#[cfg(test)]
+mod cjk_sweep_tests;
 mod image_decode;
 #[cfg_attr(not(feature = "image-view"), path = "image_view_stub.rs")]
 mod image_view;

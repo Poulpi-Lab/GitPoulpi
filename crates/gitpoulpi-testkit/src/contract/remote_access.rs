@@ -5,7 +5,7 @@
 use super::block_on;
 use crate::{AuthHttpRemote, FixtureRepo, FixtureRepoBuilder};
 use gitpoulpi_core::domain::{RemoteAccessOptions, RemoteTransport};
-use gitpoulpi_core::{FailureKind, GitBackend};
+use gitpoulpi_core::GitBackend;
 
 fn repo_with_pushed_origin() -> FixtureRepo {
     let repo = FixtureRepoBuilder::new()
@@ -186,7 +186,11 @@ pub fn check_a_failed_remote_access_check_is_a_classified_report(backend: &dyn G
         assert!(!report.ok, "{report:?}");
         assert_eq!(report.transport, RemoteTransport::Ssh);
         let detail = report.error.expect("a failure carries its detail");
-        assert_eq!(detail.kind(), FailureKind::AuthFailed, "{detail:?}");
+        assert_eq!(
+            detail.kind(),
+            gitpoulpi_core::FailureKind::AuthFailed,
+            "{detail:?}"
+        );
         assert!(detail.stderr.contains("Permission denied"), "{detail:?}");
     }
 }

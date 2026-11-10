@@ -584,7 +584,20 @@ pub(crate) async fn test(
         let mut report = backend.remote_access_check(repo, &name, &opts).await?;
         // The transport reports `store` for a credential that worked: that
         // names the identity (the account), which no backend can see.
-        report.accepted_identity = crate::grants::take_outcome(&repo.root).accepted;
+        let outcome = crate::grants::take_outcome(&repo.root);
+        report.accepted_identity = outcome.accepted;
+        // git had no credential and the helper never asked the daemon: say so
+        // first (the report has no typed error, so the sentence leads its
+        // stderr).
+        if let Some(detail) = report.error.as_mut().filter(|_| outcome.unasked) {
+            if crate::grants::is_no_credential_message(&detail.stderr) {
+                detail.stderr = format!(
+                    "{}\n{}",
+                    gitpoulpi_core::Error::CredentialHelperUnreachable,
+                    detail.stderr
+                );
+            }
+        }
         reports.push(report);
     }
     Ok(reports)

@@ -315,3 +315,108 @@ fn test_reports_each_remote_with_its_identity() {
     assert_eq!(web["identity"], "system git (user alice)");
     assert_eq!(web["transport"], "https");
 }
+
+/// The argv of a token command that prints `token`, in the platform's
+/// scripting language (`sh` on Unix, `pwsh` on Windows).
+fn token_script_argv(dir: &Path, token: &str) -> Vec<String> {
+    let path = dir.join(if cfg!(windows) {
+        "token.ps1"
+    } else {
+        "token.sh"
+    });
+    if cfg!(windows) {
+        std::fs::write(&path, format!("Write-Output '{token}'\n")).unwrap();
+        ["pwsh", "-NoProfile", "-File"]
+            .into_iter()
+            .map(String::from)
+            .chain([path.to_string_lossy().into_owned()])
+            .collect()
+    } else {
+        std::fs::write(&path, format!("echo '{token}'\n")).unwrap();
+        vec!["sh".into(), path.to_string_lossy().into_owned()]
+    }
+}
+
+/// A grant-based source works from a standalone CLI run: no TUI, no MCP and
+/// no published daemon for the session, so the credential helper git runs
+/// must reach the embedded daemon of this very process (ADR-0010, decision
+/// 21). Loopback only.
+#[test]
+fn a_token_command_works_from_a_standalone_cli_run() {
+    if cfg!(windows)
+        && std::process::Command::new("pwsh")
+            .args(["-NoProfile", "-Command", "exit 0"])
+            .output()
+            .is_err()
+    {
+        eprintln!("SKIPPED: pwsh is not installed");
+        return;
+    }
+    const TOKEN: &str = "plainsecret-0123456789-abcdef";
+    let server = gitpoulpi_testkit::AuthHttpRemote::start_accepting();
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .with_origin()
+        .unwrap()
+        .build();
+    let root = repo.root();
+    repo.git(&["remote", "set-url", "origin", &server.url()]);
+    let tools = tempfile::tempdir().unwrap();
+    let argv = token_script_argv(tools.path(), TOKEN);
+    let session = "ra-standalone-token-command";
+
+    let host = server.host();
+    let mut set = vec![
+        "repo-auth",
+        "set",
+        "--https",
+        "token-command",
+        "--yes",
+        "--hosts",
+        host.as_str(),
+        "--command",
+    ];
+    set.extend(argv.iter().map(String::as_str));
+    ok(root, session, &set);
+
+    let tested = ok(root, session, &["repo-auth", "test"]);
+    assert_eq!(
+        tested["ok"], true,
+        "the connection test must pass: {tested}"
+    );
+    assert_eq!(tested["reports"][0]["ok"], true, "{tested}");
+    ok(root, session, &["fetch"]);
+    let seen = server.basic_credentials();
+    assert!(
+        seen.iter().any(|c| c == &format!("x-access-token:{TOKEN}")),
+        "the server never got the token: {seen:?}"
+    );
+    // The endpoint files of the grants are gone with their operations, and the
+    // embedded daemon published nothing.
+    let config = root.parent().unwrap().join("config");
+    let leftovers: Vec<_> = walk(&config)
+        .into_iter()
+        .filter(|p| {
+            let n = p.file_name().unwrap().to_string_lossy().into_owned();
+            n.ends_with(".cred") || n.ends_with(".port")
+        })
+        .collect();
+    assert!(leftovers.is_empty(), "left behind: {leftovers:?}");
+}
+
+fn walk(dir: &Path) -> Vec<std::path::PathBuf> {
+    let mut found = Vec::new();
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                found.extend(walk(&path));
+            } else {
+                found.push(path);
+            }
+        }
+    }
+    found
+}

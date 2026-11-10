@@ -32,5 +32,9 @@ fn main() {
     if let Some(path) = std::env::var_os("GITPOULPI_STUB_LOG") {
         log_call(&path);
     }
+    // A helper that cannot reach the daemon: it prints nothing and exits 0.
+    if std::env::var_os("GITPOULPI_STUB_DEAF").is_some() {
+        std::process::exit(0);
+    }
     gitpoulpi_ipc::git_credential::run_if_requested();
 }

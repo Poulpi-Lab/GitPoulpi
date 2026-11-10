@@ -5084,6 +5084,7 @@ token_command_failed_tail = "Команда токена цього репози
 token_command_failed_code = "Команда токена цього репозиторію завершилася помилкою (код {code})."
 token_command_failed_code_tail = "Команда токена цього репозиторію завершилася помилкою (код {code}): {tail}"
 grant_refused = "GitPoulpi не надіслав токен облікового запису на {host}: це не {expected}, адреса цього облікового запису."
+credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
 repo_auth_needs_confirmation = "Помічник облікових даних або команда токена зберігається лише після того, як ви підтвердите її в розділі «SSH і облікові дані»."
 
 [window]

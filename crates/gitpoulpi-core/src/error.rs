@@ -149,6 +149,13 @@ pub enum Error {
     #[error("GitPoulpi did not send the account's token to {host}: it is not {expected}, the address that account is bound to")]
     GrantRefused { host: String, expected: String },
 
+    /// git needed a credential from GitPoulpi's credential helper and got none
+    /// because the helper never reached the daemon that issued the grant (the
+    /// daemon was gone or its endpoint could not be read). Nothing was sent to
+    /// the server.
+    #[error("GitPoulpi's credential helper could not reach the daemon")]
+    CredentialHelperUnreachable,
+
     /// A background job was canceled (`JobCancel`, or a client that asked for
     /// cancel-on-disconnect went away). The repository is as it was before the
     /// operation, or at its last safe point (see the cancel policy in
@@ -433,6 +440,7 @@ pub enum TypedError {
         host: String,
         expected: String,
     },
+    CredentialHelperUnreachable,
     Canceled {
         job: u64,
     },
@@ -495,6 +503,7 @@ impl Error {
             Error::RepoAuthCommandChanged { path } => {
                 Some(TypedError::RepoAuthCommandChanged { path: path.clone() })
             }
+            Error::CredentialHelperUnreachable => Some(TypedError::CredentialHelperUnreachable),
             Error::GrantRefused { host, expected } => Some(TypedError::GrantRefused {
                 host: host.clone(),
                 expected: expected.clone(),
@@ -587,6 +596,7 @@ impl Error {
             }
             TypedError::RepoAuthCommandChanged { path } => Error::RepoAuthCommandChanged { path },
             TypedError::GrantRefused { host, expected } => Error::GrantRefused { host, expected },
+            TypedError::CredentialHelperUnreachable => Error::CredentialHelperUnreachable,
             TypedError::Canceled { job } => Error::Canceled { job },
             TypedError::NotCancellable { reason } => Error::NotCancellable { reason },
             TypedError::JobConflict { existing } => Error::JobConflict { existing },

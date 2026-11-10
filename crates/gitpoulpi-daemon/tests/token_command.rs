@@ -325,6 +325,13 @@ async fn a_token_command_serves_its_server_and_is_cached() {
     let log = std::fs::read_to_string(&helper().log).unwrap();
     assert!(log.contains("ARGV [--gitpoulpi-git-credential] [get]"));
     assert!(!log.contains(TOKEN), "the token leaked into argv or env");
+    // The helper is told where the issuing daemon is by a file's path, never
+    // by the IPC token itself.
+    assert!(log.contains("GITPOULPI_CREDENTIAL_ENDPOINT="), "{log}");
+    assert!(
+        !log.contains(&rig.handle.token().to_hex()),
+        "the IPC token leaked into argv or env"
+    );
 
     // A view shows no command and no secret.
     let view = rig.view().await;

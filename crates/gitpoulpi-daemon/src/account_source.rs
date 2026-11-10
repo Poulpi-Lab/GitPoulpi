@@ -51,10 +51,11 @@ pub(crate) fn helper_command() -> Result<String, Error> {
     ))
 }
 
-/// What git's child gets in its environment: the grant id and the session
-/// whose daemon serves it. Neither is a secret.
+/// What git's child gets in its environment: the grant id, the session
+/// whose daemon serves it and the path of the file naming that daemon's
+/// endpoint. None of these is a secret.
 pub(crate) fn grant_env(grant: &GrantGuard, session: &str) -> Vec<(String, String)> {
-    vec![
+    let mut env = vec![
         (
             gitpoulpi_ipc::git_credential::ENV_GRANT.to_string(),
             grant.id().to_string(),
@@ -63,7 +64,16 @@ pub(crate) fn grant_env(grant: &GrantGuard, session: &str) -> Vec<(String, Strin
             gitpoulpi_ipc::git_credential::ENV_SESSION.to_string(),
             session.to_string(),
         ),
-    ]
+    ];
+    // Where the issuing daemon listens: the path of a user-only file that
+    // lives as long as the grant, never the token itself.
+    if let Some(file) = grant.endpoint_file(session) {
+        env.push((
+            gitpoulpi_ipc::git_credential::ENV_ENDPOINT.to_string(),
+            file.to_string_lossy().into_owned(),
+        ));
+    }
+    env
 }
 
 /// Resolves account `id` for a transfer of the repository at `root` of

@@ -5085,6 +5085,7 @@ token_command_failed_tail = "Bu deponun token komutu başarısız oldu: {tail}"
 token_command_failed_code = "Bu deponun token komutu başarısız oldu (çıkış {code})."
 token_command_failed_code_tail = "Bu deponun token komutu başarısız oldu (çıkış {code}): {tail}"
 grant_refused = "GitPoulpi hesap token'ını {host} sunucusuna göndermedi: bu, o hesabın adresi olan {expected} değil."
+credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
 repo_auth_needs_confirmation = "Bir kimlik bilgisi yardımcısı veya token komutu, yalnızca SSH ve kimlik bilgileri sayfasında onayladığınızda saklanır."
 
 [window]

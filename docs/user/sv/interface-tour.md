@@ -98,7 +98,7 @@ bär bara flikar (knappen för den [globala sökningen](search.md) sitter i tite
   fliken**, **Stäng övriga flikar...**, **Stäng flikar till höger...**, **Lägg till i
   favoriter** (eller **Ta bort från favoriter**), **Lägg till i arbetsytan** (eller
   **Ta bort från arbetsytan**, när du har arbetsytor), **Kopiera sökväg**, **Öppna
-  i ›**, **SSH-nyckel...** och **Delvis utcheckning...**.
+  i ›**, **SSH & inloggning...** och **Delvis utcheckning...**.
 - `Ctrl+PageUp` och `Ctrl+PageDown` byter flik. `Ctrl+W` stänger den aktuella
   fliken. Ett mittenklick på en flik stänger den också (med samma fråga).
 - `t` (eller `Ctrl+N t`) öppnar flikväljaren, en sökbar lista över de öppna

@@ -304,9 +304,11 @@ Nyckelsökvägarna gäller nästa överföring. Ett prefix `~/` betyder din hemm
 En inställning som gjorts någon annanstans vinner alltid över de här sökvägarna.
 Ordningen, högst först:
 
+0. En nyckel vald för ett repository på dess egen
+   [SSH & inloggning](#repo-specifikt-ssh--inloggning)-sida (den repospecifika gruppen).
 1. `GIT_SSH_COMMAND` eller `GIT_SSH` i miljön GitPoulpi körs i.
 2. `core.sshCommand` i repositoryts git-konfiguration eller din globala
-   git-konfiguration. Flikmenyns post *SSH-nyckel...* skriver den för ett repository.
+   git-konfiguration. Äldre versioners flikmenypost *SSH-nyckel...* skrev den för ett repository, och SSH & inloggning erbjuder att flytta den till GitPoulpi.
 3. De två nyckelsökvägarna på den här sidan.
 4. ssh:s egna standardvärden och agenten.
 
@@ -538,6 +540,56 @@ Tre alternativ finns på fliken **Allmänt**.
 | **Installera LFS-filter före pull och push** | Före en pull eller en push körs `git lfs install --local` när repositoryt använder LFS och dess filter saknas. |
 | **Programmet git-lfs** | Det identifierade programmet `git-lfs` (skrivskyddat). |
 | **Initiera LFS för det här repositoryt** | Kör `git lfs install --local` nu. |
+
+### Repo-specifikt: SSH & inloggning
+
+`gitpoulpi ui show settings ssh-credentials`. Hur *det här repositoryt* loggar in, sparat i GitPoulpis privata mapp: inget
+skrivs till repositoryt eller till gits config, och det kan inte ångras (som vilken inställning som helst). Det används
+bara av fetch, pull, push, submoduler och LFS i det här repositoryt. CLI-motsvarigheten är `gitpoulpi repo-auth`
+(se [CLI-referensen](cli-reference.md)). Sidan nås också från kommandopaletten:
+**Repository: SSH & inloggning...**. Inget skickas förrän du trycker på **Spara**; sidan frågar daemonen, så den
+blockerar aldrig.
+
+| Rad | Vad den gör |
+|---|---|
+| **HTTPS: Logga in med** | **System** (gits egna helpers, standard), **GitPoulpi-konto** (en integrations token; konton vars värd är en av det här repositoryts remotes kommer först, och raden under säger vad den senaste tokenkontrollen fann: saknade och extra behörigheter), **Credential helper** eller **Tokenkommando**. |
+| **Git-användarnamn** | Skickas som användarnamn till HTTPS-remotes. Med **System** låter det en credential manager välja ett av flera sparade konton. |
+| **Ignorera credential helpers som det här repositoryt anger** | Bara **System**. De helpers repositoryt anger själv (dess `.git/config`, filer den inkluderar) listas under raden med filen var och en kommer från; system- och globala helpers fungerar som förut. |
+| **Helper**, **Kommando**, **Värdar**, **Cache (minuter)** | Ett kommando som repositoryt kör för att logga in. En *helper* är en git credential helper; ett *tokenkommando* skriver ut en token (argumentlistan delas vid mellanslag, med citattecken runt ett argument som innehåller mellanslag, och visas under **Körs som**; inget skal kör det, det körs i repositoryts mapp). **Värdar** begränsar det till de värdarna (tomt: huvudremotens värd); **Cache** är hur länge en token återanvänds (50 minuter som standard). **Använd det här repositoryts nuvarande helper** kopierar helpern som repositoryt anger till fältet. |
+| **SSH: Logga in med** | **System** (ssh:s egen konfiguration, agenten och standardnycklarna), **Nyckelfil** eller **Kontonyckel** (en integrations nyckel). |
+| **Privat nyckelfil** | Välj en av nycklarna som finns i `~/.ssh` eller skriv en sökväg. Bara den här nyckeln erbjuds, till varje SSH-remote i repositoryt, submoduler inräknade. När andra konton kan läsa nyckelfilen (en behörighetsbit för grupp eller andra på Linux och macOS, en post för Everyone, Users eller Authenticated Users på Windows) säger en varning att OpenSSH avvisar en sådan nyckel (”bad permissions”) och **Begränsa till mitt konto** åtgärdar det (`chmod 600`, eller en DACL bara för ditt konto och SYSTEM på Windows). |
+| **Known hosts-fil**, **Strikt kontroll av värdnyckel** | En valfri fil med betrodda värdnycklar, och att avvisa en värd som inte finns i den. |
+| **ssh-program** | Programmet som kommer att köras (skrivskyddat). |
+| **Fastsatt i gits config** | Bara när det här repositoryt anger en egen `core.sshCommand` (den gamla fastsättningen ”SSH-nyckel för det här repositoryt”, som GitPoulpi brukade skriva). Kommandot visas skrivskyddat. **Flytta till GitPoulpi** sparar motsvarande val av **Nyckelfil** och tar sedan bort fastsättningen från gits config; det erbjuds när kommandot är en enkel `ssh -i <nyckel>`-fastsättning, och bara medan sidan inte har osparade ändringar och dess SSH-val fortfarande är **System**. Varje annat kommando visas i stället med en anmärkning: redigera det med `git config`. Flytten kan inte ångras, som varje inställning här, och borttagningen av fastsättningen ligger inte heller på Ångra-stacken (inget går förlorat: nyckeln finns i profilen). |
+| **Remotes** | Skrivskyddat: varje remote med sitt protokoll och identiteten den kommer att använda. Inställningar som profilen åsidosätter (`core.sshCommand`, `credential.helper`) listas med sin fil, och en profil som inte kan användas säger varför. |
+
+Knappar (en tangent för var och en: `Tab`/`Left`/`Right` mellan dem, `Enter` trycker):
+
+- **Testa anslutning** kontrollerar varje remote med de sparade valen, fetch först och sedan push (inga data flyttas), och
+  öppnar en resultatpanel: per remote ok eller misslyckades, identiteten som svarade (nyckeln servern godkände, eller kontot
+  vars token godkändes), tiden det tog och en enkel förklaring av ett misslyckande. Den körs i bakgrunden, med en spinner
+  efter en stund. Panelen rullar med `Up`/`Down`, `PgUp`/`PgDn`, `Home`/`End`, hjulet och sin rullningslist, och
+  stängs med `Esc` eller sitt kryss. Palettmotsvarigheten är **Repository: Testa anslutning**.
+- **Spara** skickar valen. **Ångra ändringar** släpper de osparade. Att stänga Inställningar med osparade val frågar först.
+- **Använd standard** frågar och glömmer sedan profilen: gits helpers för HTTPS och ssh:s egen konfiguration för SSH.
+  Palettmotsvarigheten är **Repository: Använd standardinloggning**, som också frågar.
+
+Att spara en **Credential helper** eller ett **Tokenkommando** frågar först **Tillåta det här kommandot?**: kommandot visas
+ord för ord (styrtecken skrivs ut, långa rader bryts), med sin SHA-256 och två svar, `1` **Spara och tillåt**
+och `2` **Avbryt**. Inget svar är valt förrän du trycker på en piltangent eller en siffra, så ett oavsiktligt `Enter` gör
+ingenting; `Esc`, **Avbryt** och panelens kryss avbryter alla. `PgUp`/`PgDn`/`Home`/`End` och rullningslisten rullar ett långt
+kommando. Om kommandot redan är sparat och oförändrat frågar det inte igen när du sparar den andra halvan av sidan.
+
+En profil som inte kan användas (en nyckelfil som saknas, en källa som den här versionen inte kör ännu) gör att överföringen
+misslyckas med sin orsak i stället för att falla tillbaka på maskinens egen identitet.
+
+När profilen inte är helt standard slutar menyn **Push** med en rad som säger vem push loggar in som (**Loggar in som:
+github-corp (token)** eller **SSH-nyckel: work_ed25519**); den öppnar den här sidan. Samma rad läggs till i
+Aktivitetsloggens poster för fetch, pull och push. Ett misslyckande som orsakats av sidans val (en credential helper som inte
+kunde köras, en SSH-värdnyckel som ännu inte är känd, en avvisad inloggning, ett tokenkommando som misslyckades, en token som
+inte skickades eftersom servern inte är kontots adress) visar en knapp **SSH & inloggning...** på sin post i Aktivitetsloggen
+(`r` på posten), bredvid **Öppna Integrationer** när ett integrationskonto kan vara källan. Flikmenyns rad
+**SSH & inloggning...** öppnar också sidan; den ersätter den gamla fastsättningsmenyn **SSH-nyckel...** och dess palettpost.
 
 ### Repo-specifikt: Delvis utcheckning
 

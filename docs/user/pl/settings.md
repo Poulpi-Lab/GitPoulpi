@@ -178,6 +178,8 @@ Lista stron ma dwie grupy:
 | **Lokalizacja danych repozytorium** | Gdzie GitPoulpi przechowuje dane poszczególnych repozytoriów (`session.per_repo_state_dir`): **Wewnątrz .git** (domyślnie: nic nie pojawia się w drzewie roboczym, wszystkie worktree dzielą dane), **W drzewie roboczym** (folder `.gitpoulpi`; potrzebne, by zatwierdzić zespołowy `workflow.toml`) albo **W moim folderze danych użytkownika** (poza repozytorium). Folder `.gitpoulpi` zostawiony przez starszą wersję jest przenoszony na nowe miejsce przy pierwszej potrzebie i usuwany, gdy zostanie pusty; plik śledzony przez git (zatwierdzony `workflow.toml`) nigdy nie jest przenoszony ani usuwany i pozostaje czytelny. |
 | **Domyślna nazwa gałęzi** | Pierwsza gałąź repozytorium tworzonego przez Init. Puste: decyduje git. Nie zmienia nazw istniejących gałęzi. |
 | **Włącz proaktywne wykrywanie konfliktów** | Domyślnie włączone (`general.conflict_detection`). Ostrzega w Log, że merge bieżącej gałęzi do gałęzi, z której powstała, spowodowałby konflikt, zanim go spróbujesz. Repozytorium może to wyłączyć dla siebie na stronie **Zapobieganie konfliktom**. Zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md#zapobieganie-konfliktom). Działa po zamknięciu Ustawień. |
+| **Domyślne gałęzie bazowe** | Pod przełącznikiem, w grupie **Zapobieganie konfliktom** (otwiera ją polecenie palety **Konflikty: Edytuj listy gałęzi bazowych...**). Lista wzorców gałęzi bazowych, której używają repozytoria bez własnej: **Wbudowana (`**`)**, czyli każda gałąź, albo jedna z twoich nazwanych list (`conflict_prevention.default_list`). Działa w otwartych repozytoriach po zamknięciu Ustawień. **Przywróć wbudowaną wartość domyślną** wraca do `**`. |
+| **Listy gałęzi bazowych** | Także w tej grupie: twoje nazwane listy wzorców gałęzi bazowych (`[conflict_prevention.lists.<name>]`), po jednym bloku na listę, z jej **Nazwą** (zmiana nazwy zachowuje status domyślnej, jeśli go miała; repozytorium, które śledziło starą nazwę, używa listy domyślnej, dopóki ponownie jej nie wybierzesz), jej **Wzorcami** (jeden w wierszu, `Enter` lub kliknięcie otwiera edytor, `Ctrl+S` go zachowuje), **Ustaw jako domyślną** i **Usuń listę** (najpierw pyta i mówi, że repozytoria, które z niej korzystają, użyją zamiast niej listy domyślnej). Wpisz nazwę w **Nowa lista** i naciśnij `Enter`, aby dodać listę; zaczyna się od `**`. Edycja listy zmienia każde repozytorium, które z niej korzysta. |
 | **Poziom dziennika**, **Przechowuj pliki dziennika**, **Maksymalny rozmiar pliku dziennika** | Dziennik aplikacji za Dziennikiem aktywności: najbardziej szczegółowy zapisywany poziom (`log.level`), jak długo pliki są przechowywane (liczba całkowita i jednostka, dni, tygodnie, miesiące lub lata, w jednym wierszu: kliknij liczbę, by ją wpisać, Up i Down zmieniają ją o krok, Tab przechodzi do jednostki, a Enter otwiera jej listę; najwyżej od 1 do 10 lat, domyślnie 1 tydzień, `log.retention_days` i `log.retention_unit`) oraz rozmiar, przy którym plik z jednego dnia jest rotowany (liczba i MiB lub GiB, od 1 MiB do 1 GiB, `log.max_file_mb` i `log.max_file_unit`). |
 | **Pokaż czas trwania operacji**, **Rozszerzone logowanie** | Karta Operacje git Dziennika aktywności: czas trwania każdej operacji (`log.timings`, domyślnie włączone) oraz praca w tle, odświeżanie i auto-fetch (`log.extended`, domyślnie wyłączone). Zob. [Gdy coś się nie powiedzie](troubleshooting.md#dziennik-aktywności). |
 | **Cofanie włączone**, **Głębokość historii cofania**, **Zapisuj zmiany wykonane poza GitPoulpi** | Grupa **Historia cofania**. Włącza lub wyłącza Cofanie i ustawia, ile operacji zachowuje (domyślnie 100, `0` oznacza bez limitu). Wyłączenie Cofania kasuje historię cofania, po potwierdzeniu. Ostatnia opcja zapisuje też to, co powłoka lub agent robi z gałęziami, tagami, stashami i HEAD. Zob. [Cofnij i ponów](undo-redo.md). |
@@ -536,6 +538,7 @@ Trzy opcje są na karcie **Ogólne**.
 |---|---|
 | **Backend gita** | `git2` (libgit2, domyślnie) lub `system` (zainstalowany `git`). Globalne. Działa dla demonów uruchomionych po zmianie. |
 | **Przycisk Pull** | Co robi przycisk Pull: merge (fast-forward, jeśli możliwy), tylko fast-forward lub rebase. Globalne. Pozycje `▾` tego nie zmieniają. |
+| **Merge fast-forward** | Co robi merge, który sam uruchamiasz, gdy gałąź dałoby się po prostu przewinąć fast-forward: **never** (domyślnie) zawsze tworzy merge commit, **allowed** robi fast-forward, gdy się da (domyślne zachowanie gita), **only** robi fast-forward albo odmawia. Globalne (`git.merge_fast_forward`); repozytorium nadpisuje to na swojej stronie [Opcje: merge](#ustawienia-repozytorium-opcje-merge). |
 | **Przycisk Push** | **od razu** wypycha natychmiast; **pytaj** najpierw pokazuje menu zdalnych repozytoriów. Globalne. |
 | **Domyślne kodowanie** | Kodowanie używane do pokazania tekstu, który **nie jest poprawnym UTF-8**: zawartości plików, blame, diffów i opisów commitów. Strona ma wiersz globalny i wiersz dla tego repozytorium; wiersz repozytorium wygrywa. Poprawny UTF-8 nigdy nie jest dekodowany ponownie, a staging niczego nie koduje ponownie. |
 | **core.autocrlf**, **core.eol** | Własne ustawienia git tego repozytorium. Wiersz zapisuje `core.autocrlf` lub `core.eol` w konfiguracji git repozytorium. **(dziedziczone)** usuwa wartość repozytorium, więc obowiązuje globalna konfiguracja git. `Ctrl+Z` przywraca poprzednią wartość. Odpowiednik w CLI to `gitpoulpi repo-config`. |
@@ -649,13 +652,32 @@ pokazuje swoje wyjście we wpisie Dziennika aktywności (pasek stanu mówi, że 
 
 ### Ustawienia repozytorium: Opcje: merge
 
-Jeden przełącznik, **Squash** (domyślnie wyłączony). Gdy włączony, merge lokalnej gałęzi (menu gałęzi, przeciągnięcie, `Merge`
+Dwa ustawienia. **Fast-forward** mówi, co robi merge, gdy gałąź dałoby się po prostu przewinąć fast-forward:
+
+| Wybór | Merge, który uruchamiasz... |
+|---|---|
+| **(dziedziczone)** | podąża za globalnym ustawieniem **Merge fast-forward** ze strony Git (domyślnie **never**). |
+| **never** | zawsze tworzy merge commit (`git merge --no-ff`), nawet gdy gałąź jest po prostu przed celem. Pierwszym rodzicem commita jest stary wierzchołek, drugim scalana gałąź, a jego opis to opis gita (`Merge branch 'x' into y`). |
+| **allowed** | robi fast-forward, gdy się da, a w przeciwnym razie tworzy merge commit (domyślne zachowanie gita). |
+| **only** | robi fast-forward i odmawia z komunikatem *cannot fast-forward*, gdy gałęzie się rozeszły (`git merge --ff-only`). |
+
+Dotyczy każdego merge, który uruchamiasz: menu gałęzi, przeciągnięcie, `Merge` w palecie i `gitpoulpi merge`
+(którego flagi `--ff`, `--no-ff` i `--ff-only` nadpisują je dla jednego merge). Menu mówią, co merge zrobi:
+*Merge x do y (merge commit)*, *(fast-forward)* albo *(tylko fast-forward)*, a osobna pozycja
+*Fast-forward y do x* (i jej polecenie palety) pozostaje o jeden gest dalej przy każdym wyborze. Merge commit jest
+zwykłym wpisem cofania, tak jak fast-forward. Akcje Flow wybierają własną strategię merge i ignorują to ustawienie.
+
+Twój własny wybór wygrywa z wyborem gita: merge uruchomiony przez GitPoulpi przy **never** lub **only** przekazuje flagę
+jawnie, więc `merge.ff` w konfiguracji gita repozytorium jest nadpisane. Tylko przy **allowed** nadal obowiązuje `merge.ff` gita, a gdy
+repozytorium je ustawia, strona pokazuje to pod wierszem. (Dla tej linii czytany jest tylko własny `.git/config` repozytorium, nie twoja globalna konfiguracja gita.)
+
+**Squash** (domyślnie wyłączony). Gdy włączony, merge lokalnej gałęzi (menu gałęzi, przeciągnięcie, `Merge`
 w palecie) dodaje zmiany gałęzi do poczekalni bez tworzenia merge commita (`git merge --squash`): commit zostaje po twojej stronie.
 Formularz commita otwiera się z komunikatem squash gita (`SQUASH_MSG`, bez linii komentarzy), raz po każdym
 squashu. Potem nic nie jest w toku (brak `MERGE_HEAD`), więc **Przerwij** nie ma zastosowania: aby się wycofać, odrzuć zmiany
 w poczekalni. Squash, który zatrzymuje się na konfliktach, zostawia je w panelu Status jak każdy merge z konfliktem.
 Zmiany w poczekalni nie są wpisem cofania (żaden ref się nie przesunął, więc nie ma czego przywracać); polecenie CLI
-`gitpoulpi merge <branch> --squash` robi to samo, niezależnie od ustawienia.
+`gitpoulpi merge <branch> --squash` robi to samo, niezależnie od ustawienia. Squash wygrywa z **Fast-forward**.
 
 ### Ustawienia repozytorium: Szablon opisu
 
@@ -681,8 +703,14 @@ Opis, od którego zaczyna się formularz commita (`gitpoulpi ui show settings co
 - **Włącz proaktywne wykrywanie konfliktów z gałęzią docelową**: domyślnie włączone. Odznaczenie wyłącza wykrywanie
   tylko dla tego repozytorium; przełącznik globalny to **Włącz proaktywne wykrywanie konfliktów** na stronie Ogólne.
   Oba muszą być włączone.
-- **Gałęzie bazowe** (domyślnie `**`): gałęzie, z których mogła powstać bieżąca gałąź, jeden wzorzec w wierszu
-  (`Enter` lub kliknięcie otwiera edytor, `Ctrl+S` go zachowuje). Tabela wzorców pod spodem jest ściągą:
+- **Gałęzie bazowe z**: skąd to repozytorium bierze gałęzie bazowe. **Domyślne** podąża za globalną wartością domyślną
+  (wbudowane `**` albo lista wybrana w **Domyślne gałęzie bazowe** w Ustawienia > Ogólne); **Lista: <nazwa>**
+  podąża za jedną z twoich nazwanych list, więc edycja listy zmienia także to repozytorium; **Własna lista** to lista tylko
+  tego repozytorium (jej wybór zaczyna od kopii obowiązujących wzorców). Plik repozytorium zapisany przed
+  pojawieniem się tego wyboru i zawierający własne wzorce jest odczytywany jako **Własna lista**.
+- **Gałęzie bazowe** (jeden wzorzec w wierszu): przy **Własnej liście** `Enter` lub kliknięcie otwiera edytor, a `Ctrl+S` go
+  zachowuje; przy **Domyślne** lub **Lista** obowiązujące wzorce są pokazane tylko do odczytu. Tabela wzorców pod spodem jest
+  ściągą:
 
   | Wzorzec | Pasuje do |
   |---|---|
@@ -693,7 +721,14 @@ Opis, od którego zaczyna się formularz commita (`gitpoulpi ui show settings co
 
   Gałąź lokalna to sama nazwa (`main`), a gałąź śledząca zdalną ma przed nazwą swoje zdalne (`origin/main`). `*` i `?`
   zostają w obrębie jednego segmentu ścieżki, `**` je przekracza. Puste linie i komentarze `#` są ignorowane; lista
-  samych wykluczeń oznacza „każda gałąź oprócz tych”. Zapisywane w `repo-state.toml` i odczytywane ponownie po zamknięciu Ustawień.
+  samych wykluczeń oznacza „każda gałąź oprócz tych”. Wybór jest zapisywany w `repo-state.toml` i odczytywany ponownie po
+  zamknięciu Ustawień.
+- **Zapisz jako listę...**: wpisz nazwę i naciśnij `Enter`; obowiązujące wzorce stają się nazwaną listą (tą samą, którą
+  edytuje Ustawienia > Ogólne), a to repozytorium z niej korzysta.
+- **Przywróć domyślne** (najpierw pyta): odrzuca wybór, listę i własne wzorce tego repozytorium; znów podąża za domyślnymi.
+- **Użyj gałęzi bazowych przepływu pracy** (widoczne, gdy dla repozytorium skonfigurowano [przepływ pracy gałęzi](branching-workflows.md)
+  z gałęziami bazowymi): wypełnia **Własną listę** tymi bazami, każdą jako gałąź lokalną i jako gałąź dowolnego
+  zdalnego (`main` i `*/main`). Kopiuje je jeden raz; nie podąża za późniejszymi zmianami przepływu pracy.
 
 ### Ustawienia repozytorium: AI
 

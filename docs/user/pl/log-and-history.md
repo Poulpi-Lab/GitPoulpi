@@ -208,6 +208,14 @@ się podświetlają; puść, by dostać menu:
 `Esc` anuluje przeciąganie. Odpowiednik z klawiatury to polecenie palety
 *Refs: Upuść zaznaczony ref na bieżącą gałąź...*.
 
+**Merge czy fast-forward.** Gdy cel nie ma żadnego własnego commita (przeciągana gałąź jest po prostu przed nim), merge
+mógłby po prostu przesunąć cel do przodu. Domyślnie (Ustawienia > Git > **Merge fast-forward** = *never* albo własny
+wybór repozytorium na jego stronie Opcje: merge) wiersz menu brzmi *Merge x do y (merge commit)* i tworzy prawdziwy merge commit,
+więc historia zachowuje gałąź; gdy chcesz zwykłego przesunięcia, użyj osobnego wiersza *Fast-forward y do x* (gdy chcesz
+prostą linię historii, użyj zamiast tego *Rebase*). Przy *allowed* wiersz Merge kończy się na *(fast-forward)*, a przy *only* na
+*(tylko fast-forward)*, wyszarzony z podaniem powodu, gdy gałęzie się rozeszły. Te same wiersze i etykiety są w
+menu samej gałęzi, a `gitpoulpi merge --ff | --no-ff | --ff-only` wybiera sposób dla jednego merge.
+
 ## Menu commita
 
 Kliknij commit prawym przyciskiem (albo naciśnij na nim `.`), by zobaczyć jego

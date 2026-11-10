@@ -635,18 +635,24 @@ När en nyckel är kopplad visar sektionen `titel (SHA256:...)` med:
 
 ### SSH-nyckel för ett repository
 
-För att få ett repository att använda en profils nyckel sätter GitPoulpi
-`core.sshCommand` till `ssh -i "<key>" -o IdentitiesOnly=yes` i det repositoryt.
-Det görs aldrig automatiskt. Öppna flikmenyn (`Ctrl+T`, eller högerklicka på
-fliken) och välj **SSH-nyckel...**, eller kör palettkommandot
-*Repository: SSH-nyckel för det här repositoryt...*. Menyn visar den aktuella fastsättningen,
-varje profil som har en privat nyckel, och **Ta bort fastsättningen**.
+För att få ett repository att använda en viss nyckel, öppna flikmenyn (`Ctrl+T`,
+eller högerklicka på fliken) och välj **SSH & inloggning...**, eller kör
+palettkommandot *Repository: SSH & inloggning...*, och välj **Nyckelfil** (eller
+**Kontonyckel** för nyckeln i en integrationsprofil) under SSH. Valet sparas i
+GitPoulpis privata mapp: inget skrivs till repositoryt eller till gits config.
+Se [Inställningar](settings.md#repo-specifikt-ssh--inloggning).
 
-CLI och MCP: `gitpoulpi ssh-command show | set --key <file> | clear`.
+Ett repository som fortfarande har en egen `core.sshCommand`, från den tidigare
+fastsättningen ”SSH-nyckel för det här repositoryt”, visar den på den sidan,
+skrivskyddad, med **Flytta till GitPoulpi**.
+
+CLI och MCP: `gitpoulpi repo-auth` (valet per repository) och, för själva
+`core.sshCommand`-fastsättningen, `gitpoulpi ssh-command show | set --key <file> |
+clear`.
 
 Den globala nyckeln under Inställningar > SSH & inloggning (*Sökväg till privat nyckel*, eller
-*Generera nyckelpar*) gäller för varje repository utan fastsättning. En
-fastsättning för ett repository går före den.
+*Generera nyckelpar*) gäller för varje repository utan ett eget val.
+Ett repositorys nyckelfil eller fastsättning går före den.
 
 ## 13b. Grenskydd, för en historikomskrivning
 

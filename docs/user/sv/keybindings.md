@@ -652,9 +652,9 @@ Tangenterna är standardvärdena.
 | Remote: Fetch remote... |  |
 | Remote: Åtgärder för vald remote... | `.` |
 | Repository: Delvis utcheckning... |  |
-| Repository: SSH & Credentials... |  |
-| Repository: Test Connection |  |
-| Repository: Use Default Credentials |  |
+| Repository: SSH & inloggning... |  |
+| Repository: Testa anslutning |  |
+| Repository: Använd standardinloggning |  |
 | Flow: Öppna menyn | `Ctrl+G W` |
 | Flow: Starta gren... |  |
 | Flow: Nytt ärende... |  |

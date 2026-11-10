@@ -117,6 +117,31 @@ för nätverket. Se först till att `git fetch` fungerar i en vanlig terminal.
 Tokens för GitHub/GitLab till pull requests är separata och valfria: se
 [Värdtjänster och ärendehantering](hosting-integration.md).
 
+**En fetch, pull eller push misslyckas med ”Den konfigurerade credential helpern misslyckades”, ”SSH-värdnyckeln för remoten är ännu inte känd” eller en avvisad inloggning, och dess post i Aktivitetsloggen har en knapp ”SSH & inloggning...”.**
+Misslyckandet kommer från hur det här repositoryt loggar in. Knappen öppnar
+Inställningar > SSH & inloggning, där du väljer en annan källa för det här
+repositoryt: gits egna helpers med repositoryts helpers ignorerade, ett
+integrationskonto, en nyckelfil (med en known hosts-fil), eller en egen helper
+eller ett eget tokenkommando; **Testa anslutning** kontrollerar sedan varje
+remote. För en helper som inte kunde köras visar `git config --show-origin
+--get-all credential.helper` var den är satt.
+
+**”GitPoulpi skickade inte kontots token till ...”.** Repositoryts remote pekar
+på en server som inte är den adress det valda kontot är bundet till (ofta en
+`url.<x>.insteadOf`-omskrivning i repositoryts egen config), så token hölls
+tillbaka. Rätta remoten eller välj en annan källa på sidan.
+
+**”Det här repositoryts tokenkommando misslyckades”, ”... har ändrats sedan du bekräftade det”, ”Det här repositoryts inloggning kan inte användas”.**
+Sidans val kan inte genomföras: tokenkommandot skrev inte ut någon token
+(dess sista felrader citeras, med hemligheter borttagna), ett skript det kör
+har ändrats sedan du bekräftade det (bekräfta kommandot igen på sidan), eller
+valet pekar på en nyckelfil eller ett konto som inte längre finns. Varje
+förklaring har knappen **SSH & inloggning...**.
+
+**OpenSSH säger ”bad permissions” för en nyckelfil.** Andra konton kan läsa
+nyckeln. Under Inställningar > SSH & inloggning visar raden **Privat nyckelfil**
+en varning med **Begränsa till mitt konto**.
+
 **”stagear...” blir kvar på statusraden.** En bakgrundsuppdatering körs fortfarande;
 den försvinner när fillistan uppdateras. `r` tvingar fram en uppdatering.
 

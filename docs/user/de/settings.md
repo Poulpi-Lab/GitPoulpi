@@ -317,9 +317,11 @@ Home-Ordner.
 Eine anderswo getroffene Einstellung gewinnt immer gegen diese Pfade. Die
 Reihenfolge, höchste zuerst:
 
+0. Ein Schlüssel, der für ein Repository auf dessen eigener Seite
+   [SSH & Zugangsdaten](#repository-spezifisch-ssh--zugangsdaten) gewählt wurde (die Gruppe Repository-spezifisch).
 1. `GIT_SSH_COMMAND` oder `GIT_SSH` in der Umgebung, in der GitPoulpi läuft.
 2. `core.sshCommand` in der Git-Konfiguration des Repositorys oder Ihrer globalen
-   Git-Konfiguration. Der Eintrag *SSH-Schlüssel...* des Tab-Menüs schreibt das für
+   Git-Konfiguration. Der frühere Eintrag *SSH-Schlüssel...* des Tab-Menüs schrieb das für
    ein Repository.
 3. Die beiden Schlüsselpfade dieser Seite.
 4. Die eigenen Standardwerte von ssh und der Agent.
@@ -589,6 +591,60 @@ initialisiert ist oder `.gitattributes` es schon nutzt, und bleibt in einem gew�
 solange das erste Lesen des LFS-Zustands eines Repositorys noch nicht angekommen ist, kann sie also einen Moment nach dem
 Öffnen des Repositorys erscheinen). Das Initialisieren auf dieser Seite lässt sie erscheinen. Die Palettenbefehle
 `LFS:` bleiben überall verfügbar, auch **LFS: Für dieses Repository initialisieren**.
+
+### Repository-spezifisch: SSH & Zugangsdaten
+
+`gitpoulpi ui show settings ssh-credentials`. Wie sich *dieses Repository* anmeldet, gespeichert im privaten Ordner von
+GitPoulpi: Es wird nichts in das Repository oder in die Konfiguration von git geschrieben, und es ist nicht
+rückgängig zu machen (wie jede Einstellung). Es gilt nur für Fetch, Pull, Push, Submodule und LFS dieses Repositorys. Das
+CLI-Gegenstück ist `gitpoulpi repo-auth` (siehe die [CLI-Referenz](cli-reference.md)). Die Seite erreichen Sie auch über
+die Befehlspalette: **Repository: SSH & Zugangsdaten...**. Gesendet wird nichts, bis Sie **Speichern** drücken; die Seite
+fragt den Daemon, blockiert also nie.
+
+| Zeile | Was sie bewirkt |
+|---|---|
+| **HTTPS: Anmelden mit** | **System** (die eigenen Helper von git, der Standard), **GitPoulpi-Konto** (das Token einer Integration; Konten, deren Host eines der Remotes dieses Repositorys ist, stehen zuerst, und die Zeile darunter sagt, was die letzte Token-Prüfung ergab: fehlende und überzählige Scopes), **Credential-Helper** oder **Token-Befehl**. |
+| **Git-Benutzername** | Wird als Benutzername von HTTPS-Remotes gesendet. Mit **System** lässt er einen Credential-Manager eines von mehreren gespeicherten Konten wählen. |
+| **Von diesem Repository gesetzte Credential-Helper ignorieren** | Nur bei **System**. Die Helper, die das Repository für sich selbst setzt (seine `.git/config`, eingebundene Dateien), stehen darunter mit der Datei, aus der jeder kommt; die System- und globalen Helper funktionieren weiter. |
+| **Helper**, **Befehl**, **Hosts**, **Cache (Minuten)** | Ein Befehl, den das Repository zur Anmeldung ausführt. Ein *Helper* ist ein git-Credential-Helper; ein *Token-Befehl* gibt ein Token aus (die Argumentliste wird an Leerzeichen getrennt, ein Argument mit Leerzeichen kommt in Anführungszeichen, und sie steht unter **Wird ausgeführt als**; es läuft keine Shell, der Befehl läuft im Repository-Ordner). **Hosts** beschränkt ihn auf diese Hosts (leer: der Host des Haupt-Remotes); **Cache** ist, wie lange ein Token wiederverwendet wird (standardmäßig 50 Minuten). **Aktuellen Helper dieses Repositorys verwenden** kopiert den Helper, den das Repository setzt, in das Feld. |
+| **SSH: Anmelden mit** | **System** (die eigene Einrichtung von ssh, der Agent und die Standardschlüssel), **Schlüsseldatei** oder **Kontoschlüssel** (der Schlüssel einer Integration). |
+| **Datei mit privatem Schlüssel** | Wählen Sie einen der Schlüssel in `~/.ssh` oder geben Sie einen Pfad ein. Nur dieser Schlüssel wird angeboten, jedem SSH-Remote des Repositorys, Submodule eingeschlossen. Können andere Konten die Schlüsseldatei lesen (ein Rechtebit für Gruppe oder Andere unter Linux und macOS, ein Eintrag für Jeder, Benutzer oder Authentifizierte Benutzer unter Windows), warnt eine Meldung, dass OpenSSH einen solchen Schlüssel ablehnt („bad permissions“), und **Auf mein Konto beschränken** behebt das (`chmod 600`, unter Windows eine DACL nur für Ihr Konto und SYSTEM). |
+| **Known-Hosts-Datei**, **Strenge Prüfung des Hostschlüssels** | Eine optionale Datei mit vertrauenswürdigen Hostschlüsseln, und das Ablehnen eines Hosts, der nicht darin steht. |
+| **ssh-Programm** | Das Programm, das ausgeführt wird (schreibgeschützt). |
+| **In der git-Konfiguration festgelegt** | Nur wenn dieses Repository ein eigenes `core.sshCommand` setzt (die alte Festlegung „SSH-Schlüssel für dieses Repository“, die GitPoulpi früher schrieb). Der Befehl wird schreibgeschützt angezeigt. **In GitPoulpi übernehmen** speichert die entsprechende Wahl **Schlüsseldatei** und entfernt dann die Festlegung aus der Konfiguration von git; es wird angeboten, wenn der Befehl eine einfache Festlegung `ssh -i <key>` ist, und nur solange die Seite keine ungespeicherten Änderungen hat und ihre SSH-Wahl noch **System** ist. Jeder andere Befehl wird stattdessen mit einem Hinweis gezeigt: Bearbeiten Sie ihn mit `git config`. Das Übernehmen ist nicht rückgängig zu machen, wie jede Einstellung hier, und das Entfernen der Festlegung steht auch nicht im Undo-Verlauf (nichts geht verloren: Der Schlüssel liegt im Profil). |
+| **Remotes** | Schreibgeschützt: jedes Remote mit seinem Protokoll und der Identität, die es verwendet. Einstellungen, die das Profil überschreibt (`core.sshCommand`, `credential.helper`), stehen mit ihrer Datei da, und ein Profil, das nicht verwendet werden kann, sagt warum. |
+
+Schaltflächen (jede mit einer Taste: `Tab`/`Left`/`Right` zwischen ihnen, `Enter` drückt):
+
+- **Verbindung testen** prüft jedes Remote mit den gespeicherten Einstellungen, erst Fetch, dann Push (es werden keine Daten
+  bewegt), und öffnet ein Ergebnisfenster: je Remote ok oder fehlgeschlagen, die Identität, die geantwortet hat (der
+  Schlüssel, den der Server akzeptierte, oder das Konto, dessen Token akzeptiert wurde), die Dauer und eine einfache
+  Erklärung eines Fehlers. Es läuft im Hintergrund, nach einem Moment mit einem Spinner. Das Fenster scrollt mit
+  `Up`/`Down`, `PgUp`/`PgDn`, `Home`/`End`, dem Mausrad und seiner Scrollleiste und schließt mit `Esc` oder seinem Kreuz.
+  Das Palettengegenstück ist **Repository: Verbindung testen**.
+- **Speichern** sendet die Wahl. **Zurücksetzen** verwirft die ungespeicherten. Wer die Einstellungen mit ungespeicherten
+  Änderungen schließt, wird zuerst gefragt.
+- **Standard verwenden** fragt nach und vergisst dann das Profil: die Helper von git für HTTPS und die eigene Einrichtung von
+  ssh für SSH. Das Palettengegenstück ist **Repository: Standard-Zugangsdaten verwenden**, das ebenfalls nachfragt.
+
+Beim Speichern eines **Credential-Helpers** oder **Token-Befehls** fragt GitPoulpi zuerst **Diesen Befehl erlauben?**: Der
+Befehl wird Wort für Wort gezeigt (Steuerzeichen werden ausgeschrieben, lange Zeilen umbrochen), mit seinem SHA-256 und zwei
+Antworten, `1` **Speichern und erlauben** und `2` **Abbrechen**. Keine Antwort ist vorgewählt, bis Sie eine Pfeiltaste oder
+eine Ziffer drücken, sodass ein versehentliches `Enter` nichts bewirkt; `Esc`, **Abbrechen** und das Kreuz des Fensters
+brechen alle ab. `PgUp`/`PgDn`/`Home`/`End` und die Scrollleiste scrollen einen langen Befehl. Ist der Befehl schon gespeichert
+und unverändert, fragt das Speichern der anderen Hälfte der Seite nicht erneut.
+
+Ein Profil, das nicht verwendet werden kann (eine fehlende Schlüsseldatei, eine Quelle, die diese Version noch nicht
+ausführt), lässt die Übertragung mit seinem Grund scheitern, statt auf die Identität des Rechners zurückzufallen.
+
+Ist das Profil nicht ganz Standard, endet das **Push**-Menü mit einer Zeile, die sagt, als wer sich der Push anmeldet
+(**Anmeldung als: github-corp (Token)** oder **SSH-Schlüssel: work_ed25519**); sie öffnet diese Seite. Dieselbe Zeile steht
+in den Einträgen des Aktivitätsprotokolls zu Fetch, Pull und Push. Ein Fehler, den die Wahl auf dieser Seite verursacht hat
+(ein Credential-Helper, der nicht lief, ein noch unbekannter SSH-Hostschlüssel, eine abgelehnte Anmeldung, ein fehlgeschlagener
+Token-Befehl, ein Token, das nicht gesendet wurde, weil der Server nicht die Adresse des Kontos ist), zeigt an seinem Eintrag im
+Aktivitätsprotokoll eine Schaltfläche **SSH & Zugangsdaten...** (`r` am Eintrag), neben **Integrationen öffnen**, wenn ein
+Integrationskonto die Quelle sein kann. Die Zeile **SSH & Zugangsdaten...** des Tab-Menüs öffnet die Seite ebenfalls; sie
+ersetzt das alte Menü **SSH-Schlüssel...** und seinen Paletteneintrag.
 
 ### Repository-spezifisch: Commit
 

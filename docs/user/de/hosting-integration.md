@@ -629,18 +629,23 @@ Ist ein Schlüssel angehängt, zeigt der Abschnitt `Titel (SHA256:...)` mit:
 
 ### SSH-Schlüssel für ein Repository
 
-Damit ein Repository den Schlüssel eines Profils nutzt, setzt GitPoulpi in diesem
-Repository `core.sshCommand` auf `ssh -i "<key>" -o IdentitiesOnly=yes`. Das geschieht nie
-automatisch. Öffnen Sie das Tab-Menü (`Ctrl+T` oder Rechtsklick auf den Tab) und wählen
-Sie **SSH-Schlüssel...**, oder führen Sie den Palettenbefehl *Repository: SSH-Schlüssel für dieses Repository...*
-aus. Das Menü zeigt die aktuelle Zuordnung, jedes Profil mit einem privaten Schlüssel und
-**Zuordnung aufheben**.
+Damit ein Repository einen bestimmten Schlüssel nutzt, öffnen Sie das Tab-Menü (`Ctrl+T` oder
+Rechtsklick auf den Tab) und wählen **SSH & Zugangsdaten...**, oder führen Sie den Palettenbefehl
+*Repository: SSH & Zugangsdaten...* aus, und wählen unter SSH **Schlüsseldatei** (oder
+**Kontoschlüssel** für den Schlüssel eines Integrationsprofils). Die Wahl liegt im privaten Ordner
+von GitPoulpi: Es wird nichts in das Repository oder in die Konfiguration von git geschrieben. Siehe
+[Einstellungen](settings.md#repository-spezifisch-ssh--zugangsdaten).
 
-CLI und MCP: `gitpoulpi ssh-command show | set --key <file> | clear`.
+Ein Repository, das noch ein eigenes `core.sshCommand` aus der früheren Festlegung „SSH-Schlüssel
+für dieses Repository“ hat, zeigt es auf dieser Seite schreibgeschützt an, mit **In GitPoulpi
+übernehmen**.
+
+CLI und MCP: `gitpoulpi repo-auth` (die Wahl je Repository) und, für die Festlegung von
+`core.sshCommand` selbst, `gitpoulpi ssh-command show | set --key <file> | clear`.
 
 Der globale Schlüssel unter Einstellungen > SSH & Zugangsdaten (*Pfad des privaten
-Schlüssels* oder *Schlüsselpaar erzeugen*) gilt für jedes Repository ohne Zuordnung. Eine
-Zuordnung des Repositorys gewinnt dagegen.
+Schlüssels* oder *Schlüsselpaar erzeugen*) gilt für jedes Repository ohne eigene Wahl.
+Die Schlüsseldatei oder Festlegung eines Repositorys gewinnt dagegen.
 
 ## 13b. Branch-Schutz, für ein Umschreiben des Verlaufs
 

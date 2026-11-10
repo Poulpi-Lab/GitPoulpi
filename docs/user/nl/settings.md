@@ -174,6 +174,8 @@ De paginalijst heeft twee groepen:
 | **Opslaglocatie van repositorygegevens** | Waar GitPoulpi zijn gegevens per repository bewaart (`session.per_repo_state_dir`): **In .git** (standaard: er verschijnt niets in je werkmap, alle worktrees delen het), **In de werkmap** (een map `.gitpoulpi`; nodig om een `workflow.toml` voor het team te committen) of **In mijn gebruikersgegevensmap** (buiten de repository). Een map `.gitpoulpi` die een oudere versie achterliet, wordt de eerste keer dat ze nodig is naar de nieuwe plek verplaatst en verwijderd zodra ze leeg is; een bestand dat git volgt (een gecommitte `workflow.toml`) wordt nooit verplaatst of verwijderd en blijft leesbaar. |
 | **Standaardnaam van branch** | De eerste branch van een repository die je met Init maakt. Leeg: git beslist. Hernoemt geen bestaande branch. |
 | **Proactieve conflictdetectie inschakelen** | Standaard aan (`general.conflict_detection`). Waarschuwt in de Log als het mergen van de huidige branch in de branch waarvan hij is gestart zou conflicteren, voordat je het probeert. Een repository kan dit voor zichzelf uitschakelen op zijn pagina **Conflictpreventie**. Zie [Merge-conflicten oplossen](merge-conflicts.md#conflictpreventie). Geldt zodra Instellingen sluit. |
+| **Standaard basisbranches** | Onder de schakelaar, in de groep **Conflictpreventie** (**Conflicten: Lijsten met basisbranches bewerken...** in het palet opent hem). De lijst met patronen van basisbranches die repositories gebruiken als ze er geen eigen hebben: **Ingebouwd (`**`)**, dat is elke branch, of een van je lijsten met een naam (`conflict_prevention.default_list`). Geldt voor de geopende repositories zodra Instellingen sluit. **Terug naar ingebouwde standaard** gaat terug naar `**`. |
+| **Lijsten met basisbranches** | Ook in die groep: je lijsten met een naam met patronen van basisbranches (`[conflict_prevention.lists.<naam>]`), elk een blok met zijn **Naam** (hernoemen laat hem de standaard blijven als hij dat was; een repository die de oude naam volgde, gebruikt de standaardlijst tot je hem opnieuw kiest), zijn **Patronen** (één per regel, `Enter` of een klik opent de editor, `Ctrl+S` bewaart), **Als standaard instellen** en **Lijst verwijderen** (vraagt eerst, en zegt dat repositories die hem volgen in plaats daarvan de standaardlijst gebruiken). Typ een naam bij **Nieuwe lijst** en druk op `Enter` om er een toe te voegen; hij begint met `**`. Een lijst bewerken wijzigt elke repository die hem volgt. |
 | **Logniveau**, **Logbestanden bewaren**, **Maximale grootte van een logbestand** | Het applicatielogboek achter het activiteitenlogboek: het meest uitgebreide niveau dat wordt vastgelegd (`log.level`), hoe lang bestanden bewaard blijven (een geheel getal en een eenheid, dagen, weken, maanden of jaren, op één regel: klik op het getal om het te typen, Omhoog en Omlaag verhogen of verlagen het, Tab gaat naar de eenheid en Enter opent de lijst ervan; hooguit 1 tot 10 jaar, standaard 1 week, `log.retention_days` en `log.retention_unit`) en de grootte waarbij het bestand van een dag wordt geroteerd (een getal en MiB of GiB, 1 MiB tot 1 GiB, `log.max_file_mb` en `log.max_file_unit`). |
 | **Duur van bewerkingen tonen**, **Uitgebreid loggen** | Het tabblad Git-bewerkingen van het activiteitenlogboek: de duur van elke bewerking (`log.timings`, standaard aan) en ook het achtergrondwerk, vernieuwen en auto-fetch (`log.extended`, standaard uit). Zie [Wanneer er iets mislukt](troubleshooting.md#het-activiteitenlogboek). |
 | **Ongedaan maken ingeschakeld**, **Diepte van de ongedaanmaakgeschiedenis**, **Wijzigingen buiten GitPoulpi vastleggen** | De groep **Geschiedenis van ongedaan maken**. Zet Ongedaan maken aan of uit en bepaalt hoeveel bewerkingen het bewaart (standaard 100, `0` betekent onbeperkt). Ongedaan maken uitzetten wist de ongedaanmaakgeschiedenis, na een bevestiging. De laatste legt ook vast wat een shell of een agent met branches, tags, stashes en HEAD doet. Zie [Ongedaan maken en opnieuw](undo-redo.md). |
@@ -526,6 +528,7 @@ Drie opties staan op het tabblad **Algemeen**.
 | **Git-backend** | `git2` (libgit2, de standaard) of `system` (je geïnstalleerde `git`). Globaal. Geldt voor daemons die na de wijziging worden gestart. |
 | **Pull-knop** | Wat de knop Pull doet: merge (fast-forward indien mogelijk), alleen fast-forward, of rebase. Globaal. De items `▾` wijzigen het niet. |
 | **Push-knop** | **direct** pusht meteen; **ask** toont eerst het remotemenu. Globaal. |
+| **Merge fast-forward** | Wat een merge die je start doet als de branch simpelweg een fast-forward kan zijn: **never** (de standaard) maakt altijd een merge-commit, **allowed** doet een fast-forward als dat kan (de eigen standaard van git), **only** doet een fast-forward of weigert. Globaal (`git.merge_fast_forward`); een repository overschrijft het op zijn pagina [Merge-opties](#repositoryspecifiek-merge-opties). |
 | **Standaardcodering** | De codering waarmee tekst wordt getoond die **geen geldige UTF-8** is: bestandsinhoud, blame, diffs en commit-berichten. De pagina heeft een globale rij en een rij voor deze repository; de rij van de repository wint. Geldige UTF-8 wordt nooit opnieuw gedecodeerd en staging codeert nooit iets opnieuw. |
 | **core.autocrlf**, **core.eol** | De eigen git-instellingen van deze repository. De rij schrijft `core.autocrlf` of `core.eol` in de git-configuratie van de repository. **(overgenomen)** verwijdert de waarde van de repository, zodat je globale git-configuratie geldt. `Ctrl+Z` herstelt de vorige waarde. Het CLI-equivalent is `gitpoulpi repo-config`. |
 | **Git LFS** | Toont Git LFS in de interface. Zie [Git LFS](lfs.md). |
@@ -639,13 +642,32 @@ uitvoer in zijn item van het activiteitenlogboek (de statusbalk zegt dat de comm
 
 ### Repositoryspecifiek: Merge-opties
 
-Eén schakelaar, **Squash** (standaard uit). Aan: bij het mergen van een lokale branch (het menu van de branch, slepen en neerzetten, `Merge`
+Twee instellingen. **Fast-forward** zegt wat een merge doet als de branch simpelweg een fast-forward kan zijn:
+
+| Keuze | Een merge die je start... |
+|---|---|
+| **(inherited)** | volgt de globale instelling **Merge fast-forward** op de Git-pagina (standaard **never**). |
+| **never** | maakt altijd een merge-commit (`git merge --no-ff`), ook als de branch er gewoon op voorloopt. De eerste parent van de commit is de oude top, de tweede de gemergde branch, en het bericht is dat van git zelf (`Merge branch 'x' into y`). |
+| **allowed** | doet een fast-forward als dat kan en maakt anders een merge-commit (de standaard van git). |
+| **only** | doet een fast-forward en weigert met *cannot fast-forward* als de branches uiteen zijn gelopen (`git merge --ff-only`). |
+
+Het geldt voor elke merge die je start: het menu van de branch, slepen en neerzetten, `Merge` in het palet en `gitpoulpi merge`
+(waarvan de vlaggen `--ff`, `--no-ff` en `--ff-only` het voor één merge overschrijven). De menus zeggen wat de merge zal doen:
+*Merge x in y (merge-commit)*, *(fast-forward)* of *(alleen fast-forward)*, en het aparte item
+*Fast-forward y naar x* (en zijn palet-opdracht) blijft bij elke keuze één handeling verwijderd. Een merge-commit is een
+gewoon ongedaanmaak-item, net als een fast-forward. De Flow-acties kiezen hun eigen merge-strategie en negeren deze instelling.
+
+Je eigen keuze wint van die van git: een merge die GitPoulpi start onder **never** of **only** geeft de vlag expliciet mee, dus een
+`merge.ff` in de git-config van de repository wordt overschreven. Alleen onder **allowed** geldt de `merge.ff` van git nog, en als de repository
+hem instelt, toont de pagina hem onder de rij. (Voor die regel wordt alleen de eigen `.git/config` van de repository gelezen, niet je globale git-config.)
+
+**Squash** (standaard uit). Aan: bij het mergen van een lokale branch (het menu van de branch, slepen en neerzetten, `Merge`
 in het palet) komen de wijzigingen van de branch in de index zonder dat er een merge-commit wordt gemaakt (`git merge --squash`): het committen is aan
 jou. Het commitformulier opent met het squashbericht van git (`SQUASH_MSG`, zonder commentaarregels), eenmaal per
 squash. Daarna loopt er niets (geen `MERGE_HEAD`), dus **Afbreken** is niet van toepassing: om terug te gaan, verwerp je de
 gestagede wijzigingen. Een squash die op conflicten stopt, laat ze in het Statuspaneel staan zoals elke merge met conflicten.
 De gestagede wijzigingen zijn geen ongedaanmaak-item (er verplaatste geen ref, dus er is niets te herstellen); de CLI-opdracht
-`gitpoulpi merge <branch> --squash` doet hetzelfde, wat de instelling ook is.
+`gitpoulpi merge <branch> --squash` doet hetzelfde, wat de instelling ook is. Een squash wint van **Fast-forward**.
 
 ### Repositoryspecifiek: Berichtsjabloon
 
@@ -671,8 +693,13 @@ Een bericht waarmee het commitformulier begint (`gitpoulpi ui show settings comm
 - **Proactieve conflictdetectie inschakelen met doelbranch**: standaard aan. Uitvinken schakelt de detectie alleen voor deze
   repository uit; de globale schakelaar is **Proactieve conflictdetectie inschakelen** op de pagina Algemeen.
   Beide moeten aan staan.
-- **Basisbranches** (standaard `**`): de branches waarvan de huidige branch kan zijn gestart, één patroon per regel
-  (`Enter` of een klik opent de editor, `Ctrl+S` bewaart). De patroontabel eronder is de naslag:
+- **Basisbranches van**: waar de basisbranches van deze repository vandaan komen. **Standaard** volgt de globale standaard
+  (de ingebouwde `**`, of de lijst die onder **Standaard basisbranches** in Instellingen > Algemeen is gekozen); **Lijst: <naam>**
+  volgt een van je lijsten met een naam, dus een lijst bewerken wijzigt ook deze repository; **Eigen lijst** is een lijst van de
+  repository zelf (kiezen begint met een kopie van de patronen die gelden). Een repositorybestand dat is geschreven voordat deze keuze bestond
+  en eigen patronen bevat, geldt als **Eigen lijst**.
+- **Basisbranches** (één patroon per regel): bij **Eigen lijst** opent `Enter` of een klik de editor en bewaart `Ctrl+S`; bij
+  **Standaard** of **Lijst** worden de patronen die gelden alleen-lezen getoond. De patroontabel eronder is de naslag:
 
   | Patroon | Komt overeen met |
   |---|---|
@@ -683,7 +710,15 @@ Een bericht waarmee het commitformulier begint (`gitpoulpi ui show settings comm
 
   Een lokale branch is zijn kale naam (`main`), een remote-tracking branch heeft zijn remote ervoor (`origin/main`). `*` en `?`
   blijven binnen één padsegment, `**` loopt eroverheen. Lege regels en `#`-opmerkingen worden genegeerd; een lijst met alleen
-  uitsluitingen betekent "elke branch behalve deze". Het wordt bewaard in `repo-state.toml` en opnieuw gelezen zodra Instellingen sluit.
+  uitsluitingen betekent "elke branch behalve deze". De keuze wordt bewaard in `repo-state.toml` en opnieuw gelezen zodra
+  Instellingen sluit.
+- **Opslaan als lijst...**: typ een naam en druk op `Enter`; de patronen die gelden worden een lijst met een naam (dezelfde die
+  Instellingen > Algemeen bewerkt) en deze repository volgt hem.
+- **Terug naar standaard** (vraagt eerst): laat de keuze, de lijst en de eigen patronen van deze repository vallen; hij volgt weer
+  de standaard.
+- **De basisbranches van de workflow gebruiken** (getoond als voor de repository een [branchingworkflow](branching-workflows.md) met
+  basisbranches is ingesteld): vult **Eigen lijst** met die basisbranches, elk als lokale branch en als branch van elke remote
+  (`main` en `*/main`). Het kopieert ze eenmalig; latere wijzigingen van de workflow worden niet gevolgd.
 
 ### Repositoryspecifiek: AI
 

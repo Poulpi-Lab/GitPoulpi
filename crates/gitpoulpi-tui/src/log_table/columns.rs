@@ -434,6 +434,31 @@ pub(crate) fn log_table<'a>(
     log_table_body(rows, header_cells, visible_order, widths).block(log_block(border_style))
 }
 
+/// The header cells: each title ellipsised to its column's width (display
+/// cells, never half a wide glyph), so a long translation cannot run into
+/// the next column's header. `picked` is the column the keyboard picked: its
+/// cell is inverted.
+pub(crate) fn log_header_cells(
+    order: &[LogColumn],
+    widths: &LogColumnWidths,
+    picked: Option<LogColumn>,
+) -> Vec<Cell<'static>> {
+    order
+        .iter()
+        .map(|&c| {
+            let cell = Cell::from(crate::ui_kit::fit(
+                c.title(),
+                usize::from(widths.width_of(c)),
+            ));
+            if picked == Some(c) {
+                cell.style(Style::default().add_modifier(Modifier::REVERSED))
+            } else {
+                cell
+            }
+        })
+        .collect()
+}
+
 /// The Log's rounded border, drawn apart from the table when the `scroll`
 /// layout renders the table into a scratch buffer.
 pub(crate) fn log_block<'a>(border_style: Style) -> Block<'a> {

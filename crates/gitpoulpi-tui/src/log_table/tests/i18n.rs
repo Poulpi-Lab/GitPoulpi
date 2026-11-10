@@ -119,3 +119,92 @@ fn the_changes_cell_speaks_french_and_shortens_when_narrow() {
         .collect();
     assert_eq!(t, "1 fichier");
 }
+
+/// Renders the header row for `order` at exactly `widths`, through the same
+/// cell builder the Log draws with; one string per column (border excluded).
+fn narrow_header(widths: &LogColumnWidths, order: &[LogColumn]) -> Vec<String> {
+    let total: u16 = order.iter().map(|&c| widths.width_of(c)).sum::<u16>() + 2;
+    let mut terminal = Terminal::new(TestBackend::new(total, 4)).unwrap();
+    terminal
+        .draw(|frame| {
+            let header = log_header_cells(order, widths, None);
+            frame.render_stateful_clipped(
+                log_table(Vec::new(), header, order, widths, Style::default()),
+                Rect::new(0, 0, total, 4),
+                &mut TableState::default(),
+            );
+        })
+        .unwrap();
+    let buf = terminal.backend().buffer().clone();
+    let mut x = 1u16;
+    order
+        .iter()
+        .map(|&c| {
+            let w = widths.width_of(c);
+            // A wide glyph's second cell reads as a blank: skip it.
+            let mut s = String::new();
+            let mut cx = x;
+            while cx < x + w {
+                let sym = buf[(cx, 1)].symbol();
+                s.push_str(sym);
+                cx += (display_width(sym) as u16).max(1);
+            }
+            x += w;
+            s
+        })
+        .collect()
+}
+
+#[test]
+fn a_narrow_column_ellipsises_its_header_in_every_language_and_keeps_the_gap() {
+    for lang in Lang::ALL {
+        let _l = override_lang(lang);
+        for narrow in 1..=8u16 {
+            let widths = LogColumnWidths {
+                author_w: narrow,
+                date_w: 16,
+                ..Default::default()
+            };
+            let order = [LogColumn::Author, LogColumn::Date];
+            let cells = narrow_header(&widths, &order);
+            let author = LogColumn::Author.title();
+            let date = LogColumn::Date.title();
+            let a = cells[0].trim_end();
+            let d = cells[1].trim_end();
+            assert!(
+                display_width(&cells[0]) <= narrow as usize,
+                "{lang:?} {narrow}: {a:?}"
+            );
+            // Date's header starts exactly at its own column when it fits.
+            assert!(
+                display_width(date) > 16 || d == date,
+                "{lang:?} {narrow}: Date header {d:?} != {date:?} (Author cell {a:?})"
+            );
+            if display_width(author) <= narrow as usize {
+                assert_eq!(a, author, "{lang:?} {narrow}");
+            } else {
+                assert!(
+                    a.is_empty()
+                        || (a.ends_with('\u{2026}') && author.starts_with(&a[..a.len() - 3])),
+                    "{lang:?} {narrow}: cut header {a:?} is not an ellipsised prefix of {author:?}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn the_chinese_author_header_never_eats_the_gap_at_three_cells() {
+    let _l = override_lang(Lang::ZhCn);
+    let widths = LogColumnWidths {
+        author_w: 3,
+        date_w: 16,
+        ..Default::default()
+    };
+    let cells = narrow_header(&widths, &[LogColumn::Author, LogColumn::Date]);
+    assert_eq!(
+        cells[0], "\u{4f5c}\u{2026}",
+        "wide glyph + ellipsis, 3 cells"
+    );
+    assert_eq!(cells[1].trim_end(), LogColumn::Date.title());
+}

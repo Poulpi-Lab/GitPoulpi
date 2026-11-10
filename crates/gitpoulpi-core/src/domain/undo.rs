@@ -373,7 +373,7 @@ impl UndoRefusal {
                 } = &**moved;
                 format!(
                 "{} on {remote} is at {}, not at {} where the operation left it: it was changed \
-                 on the remote since, so nothing was pushed or deleted there",
+                 on the remote since, so nothing was changed there",
                 display_ref_name(name),
                 actual.map_or_else(|| "nothing".to_string(), short),
                 expected.map_or_else(|| "nothing".to_string(), short),

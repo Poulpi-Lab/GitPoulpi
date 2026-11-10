@@ -217,6 +217,12 @@ impl PreferencesState {
 
     /// The summary row's typed text.
     pub(super) fn rp_commit_text(&mut self, target: RpTarget, draft: &str) -> bool {
+        if matches!(
+            target,
+            RpTarget::SaveAsList | RpTarget::ConflictListNew | RpTarget::ConflictListName(_)
+        ) {
+            return self.conflict_commit_text(target, draft);
+        }
         if target == RpTarget::TemplateSummary {
             let text = draft.trim_end().replace('\n', " ");
             if text != self.repo_pages.template.summary {

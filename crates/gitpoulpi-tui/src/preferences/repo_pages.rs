@@ -27,6 +27,18 @@ pub(super) enum RpTarget {
     TemplateDescription,
     /// The Conflict prevention page's multi-line Base branches.
     BaseBranches,
+    /// The Conflict prevention page's "Base branches from" choice.
+    BaseSource,
+    /// The Conflict prevention page's "Save as list..." name.
+    SaveAsList,
+    /// General's "Default base branches" choice.
+    ConflictDefaultList,
+    /// General's "New list" name.
+    ConflictListNew,
+    /// General: the name of the list at this index (sorted by name).
+    ConflictListName(usize),
+    /// General: the multi-line patterns of the list at this index.
+    ConflictListPatterns(usize),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,6 +50,16 @@ pub(super) enum RpButton {
     Reapply,
     /// Write the commit template file (Message template page).
     SaveTemplate,
+    /// General: stop using a default list (the built-in `**` again).
+    ConflictResetGlobal,
+    /// General: make the list at this index the default.
+    ConflictListDefault(usize),
+    /// General: delete the list at this index.
+    ConflictListDelete(usize),
+    /// Conflict prevention page: drop this repository's choice and own list.
+    ConflictResetRepo,
+    /// Conflict prevention page: own list from the branching workflow.
+    ConflictUseWorkflow,
 }
 
 /// What a button asked of the daemon, taken by the event loop.
@@ -308,6 +330,11 @@ impl PreferencesState {
             // result as `git sparse-checkout reapply`, with the existing
             // (journal-free, tested) daemon action and no new backend call.
             RpButton::SaveTemplate => self.template_save(),
+            RpButton::ConflictResetGlobal
+            | RpButton::ConflictListDefault(_)
+            | RpButton::ConflictListDelete(_)
+            | RpButton::ConflictResetRepo
+            | RpButton::ConflictUseWorkflow => self.conflict_button(button),
             RpButton::Reapply => {
                 let dirs = self.repo_pages.sparse.dirs.clone();
                 if self.repo_pages.sparse.enabled && !dirs.is_empty() {
@@ -336,7 +363,8 @@ impl PreferencesState {
             RpTarget::SparsePaths => self.rp_paths_text(),
             RpTarget::TemplateDescription => self.repo_pages.template.description.clone(),
             RpTarget::BaseBranches => self.base_branches_text(),
-            RpTarget::TemplateSummary => return,
+            RpTarget::ConflictListPatterns(i) => self.conflict_list_text(i),
+            _ => return,
         };
         let mut field = crate::text_edit::FieldEditor::default();
         field.caret_mut(()).set_cursor(&text, text.len(), false);
@@ -368,6 +396,7 @@ impl PreferencesState {
                     }
                 }
                 RpTarget::BaseBranches => self.set_base_branches(&edit.text),
+                RpTarget::ConflictListPatterns(i) => self.set_conflict_list_patterns(i, &edit.text),
                 _ => self.repo_pages.draft = Some(edit.text),
             }
         }
@@ -470,6 +499,9 @@ impl PreferencesState {
         let title = match edit.target {
             RpTarget::TemplateDescription => t::TEMPLATE_DESCRIPTION.get(),
             RpTarget::BaseBranches => gitpoulpi_i18n::msg::conflict_prevention::BASES.get(),
+            RpTarget::ConflictListPatterns(_) => {
+                gitpoulpi_i18n::msg::conflict_prevention::LIST_PATTERNS.get()
+            }
             _ => t::SPARSE_PATHS.get(),
         };
         edit.close.panel(frame.buffer_mut(), rect, title);

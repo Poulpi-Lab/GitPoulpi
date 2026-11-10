@@ -33,8 +33,8 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 
 use gitpoulpi_core::domain::conflict_prevention::{
-    base_allowed, pick_base, BaseCandidate, BaseSource, ConflictPrediction,
-    PredictionStatus, MAX_BASE_CANDIDATES,
+    base_allowed, pick_base, BaseCandidate, BaseSource, ConflictPrediction, PredictionStatus,
+    MAX_BASE_CANDIDATES,
 };
 use gitpoulpi_core::domain::{Oid, RefKind, RepoRef};
 use gitpoulpi_core::{Error, GitBackend, Result};

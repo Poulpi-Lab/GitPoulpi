@@ -688,6 +688,11 @@ pub(crate) enum PaletteCommand {
     KeybindingsResetAll,
     /// Opens Settings on the Theme row (Appearance).
     Theme,
+    /// Opens Settings > General on the Conflict prevention group: the
+    /// default base branches and the named lists.
+    ConflictLists,
+    /// Opens the Conflict prevention page of this repository.
+    ConflictRepoPage,
     /// Opens the theme picker: a second-level list of every theme that
     /// previews as the highlight moves and, on Enter, applies and saves it.
     ChangeTheme,

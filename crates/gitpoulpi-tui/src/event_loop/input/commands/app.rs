@@ -402,6 +402,19 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             let _ = state.show_page(None, Some("ui.theme"));
             *cx.preferences = Some(state);
         }
+        PaletteCommand::ConflictLists => {
+            let mut state = PreferencesState::open(cx.repo_root);
+            let _ = state.show_page(None, Some("general.conflict_detection"));
+            *cx.preferences = Some(state);
+        }
+        PaletteCommand::ConflictRepoPage => {
+            let mut state = PreferencesState::open(cx.repo_root);
+            let _ = state.show_page(
+                Some(gitpoulpi_ipc::ui::SettingsPage::ConflictPrevention),
+                None,
+            );
+            *cx.preferences = Some(state);
+        }
         PaletteCommand::ChangeTheme => {
             *cx.input_mode =
                 InputMode::ThemePicker(Box::new(crate::theme_picker::ThemePicker::open()));

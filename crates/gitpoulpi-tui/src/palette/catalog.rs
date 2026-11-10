@@ -3588,6 +3588,16 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     // The keyboard route to the same row: Ctrl+, then Appearance > Theme.
     entry(msg::palette::APP_THEME, "", PaletteCommand::Theme),
     entry(
+        msg::conflict_prevention::PALETTE_LISTS,
+        "",
+        PaletteCommand::ConflictLists,
+    ),
+    entry(
+        msg::conflict_prevention::PALETTE_REPO,
+        "",
+        PaletteCommand::ConflictRepoPage,
+    ),
+    entry(
         msg::palette::APP_CHANGE_THEME,
         "",
         PaletteCommand::ChangeTheme,

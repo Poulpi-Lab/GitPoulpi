@@ -24,6 +24,7 @@ pub(super) fn is_destructive(action: PrefAction) -> bool {
         PrefAction::Launcher(L::Remove(_)) => true,
         PrefAction::Tools(T::AliasRemove | T::PathRemove) => true,
         PrefAction::RepoPage(RpButton::Disable) => true,
+        PrefAction::RepoPage(RpButton::ConflictListDelete(_) | RpButton::ConflictResetRepo) => true,
         #[cfg(feature = "mcp")]
         PrefAction::McpSecurity(super::mcp_security::McpButton::Rotate) => true,
         #[cfg(feature = "ai")]
@@ -194,7 +195,8 @@ impl PreferencesState {
         if is_destructive(button.action) {
             let confirm = Confirm::new(
                 button.label.clone(),
-                screen::confirm_action(&button.label),
+                self.conflict_confirm_text(button.action)
+                    .unwrap_or_else(|| screen::confirm_action(&button.label)),
                 vec![
                     (screen::CANCEL.get().to_string(), false),
                     (button.label.clone(), true),

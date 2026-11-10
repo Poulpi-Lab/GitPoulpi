@@ -10,6 +10,8 @@
 //! answers only when git already knows the user name `globaluser`, like a
 //! credential manager that has the account but needs to be told which) and a
 //! global `core.sshCommand` naming the stub.
+#![cfg_attr(not(unix), allow(unused_imports, dead_code))]
+
 
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};

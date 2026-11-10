@@ -521,7 +521,7 @@ Un amministratore può impostare `mode`, `channel` (come `release_channel`) e `r
 
 ## `[conflict_prevention]` (liste dei branch base)
 
-I branch che il rilevamento proattivo dei conflitti può prendere come base del branch corrente sono una lista di pattern (vedi [Risolvere i conflitti di merge](merge-conflicts.md#prevenzione-dei-conflitti)). Le liste possono avere un nome ed essere condivise; Impostazioni > Generale > Prevenzione dei conflitti le modifica.
+I branch che il rilevamento proattivo dei conflitti può prendere come base del branch corrente sono una lista di pattern (vedi [Risolvere i conflitti di merge](merge-conflicts.md#prevenzione-dei-conflitti)). Le liste possono avere un nome ed essere condivise; Impostazioni > Generali > Prevenzione dei conflitti le modifica.
 
 | Chiave | Predefinito | Valori ed effetto |
 |---|---|---|

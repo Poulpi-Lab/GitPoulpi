@@ -74,7 +74,7 @@ viene mai interrogato. Contribuisce solo con la riga del lavoro in corso, ha una
 progetto), e la barra di stato li conta (`3 non collegati (solo lavoro in corso)`).
 
 Una cartella non impostata è in grigio nell'elenco (`Cartella di esplorazione predefinita (impostala nelle
-Impostazioni)`); sceglierla apre la sua riga nelle Impostazioni (Impostazioni > Generale) e lascia l'ambito
+Impostazioni)`); sceglierla apre la sua riga nelle Impostazioni (Impostazioni > Generali) e lascia l'ambito
 com'era. La cartella di clonazione conta come impostata grazie al suo valore predefinito per sistema operativo (la
 cartella da cui parte il dialogo Clona) finché quella cartella esiste; la cartella di esplorazione non ha un
 valore predefinito. L'elenco degli ambiti viene riletto dalle impostazioni a ogni apertura, quindi una modifica

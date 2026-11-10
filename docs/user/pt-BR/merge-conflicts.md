@@ -163,6 +163,12 @@ antigo desativa o recurso com uma linha no registro), então seus arquivos, o í
 - **Quando roda**: em segundo plano, cerca de 2 segundos depois que o repositório sossega (um commit, um checkout, um
   fetch que moveu uma branch, um rebase), uma vez por par `(HEAD, base)`. A faixa some assim que o HEAD se move e
   volta, ou não, com a nova resposta. Um HEAD desanexado não é verificado.
+- **Listas de branches base**: de onde vêm as Branches base de um repositório é uma escolha na página **Prevenção de
+  conflitos** dele. **Padrão** segue o padrão global (o `**` integrado, todas as branches, até você escolher outra lista em
+  Configurações > Geral > Prevenção de conflitos); **Lista: <nome>** segue uma das suas listas com nome; **Lista própria** é uma
+  lista só dele. As listas são compartilhadas: edite uma e todo repositório que a segue usa a mudança na próxima verificação,
+  sem reiniciar. **Salvar como lista...** transforma os padrões próprios de um repositório em uma lista com nome, **Voltar ao padrão** descarta a
+  escolha do repositório. Excluir uma lista que um repositório segue faz com que ele use o padrão.
 - **Desativar**: **Ativar a detecção proativa de conflitos** em Configurações > Geral, ou, para um repositório, na
   página **Prevenção de conflitos** dele. Em um script, `gitpoulpi conflicts check` imprime a mesma resposta em JSON
   ([Referência da CLI](cli-reference.md)).

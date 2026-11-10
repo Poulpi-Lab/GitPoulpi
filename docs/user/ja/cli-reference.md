@@ -111,7 +111,7 @@
 | `branch set-upstream <branch> <remote/branch>`、`branch unset-upstream <branch>` | アップストリーム。 |
 | `branch fast-forward <branch> [target]` | 早送りできる場合にのみ、ブランチを進めます。 |
 | `checkout <target> [--autostash]` | ブランチを切り替える、または commit で HEAD を切り離します。 |
-| `merge <ref> [--squash] [--autostash]` | 現在のブランチに merge します。`--squash` はそのブランチの変更をステージするだけで commit は作りません（`merge --squash`）。続けて `commit` を実行します。元に戻せません：動く ref がないためです。 |
+| `merge <ref> [--ff \| --no-ff \| --ff-only \| --squash] [--autostash]` | 現在のブランチに merge します。フラグがなければ fast-forward の設定が決めます（リポジトリ自身の選択、なければ `git.merge_fast_forward`。既定は `never`：fast-forward できる場合でも merge commit を作ります）。`--ff` は可能なら fast-forward し（git の既定）、`--no-ff` は常に merge commit を作り、`--ff-only` は fast-forward するか、*cannot fast-forward* で失敗して何も変更しません。これらのフラグは同時に指定できません。JSON はどれだったかを示します：`{"FastForwarded": oid}`、`{"Merged": oid}`（merge commit）、`"UpToDate"`、`{"Conflicted": [paths]}`。`--squash` はそのブランチの変更をステージするだけで commit は作りません（`merge --squash`）。続けて `commit` を実行します。元に戻せません：動く ref がないためです。merge commit と fast-forward は、それぞれ元に戻す履歴の 1 項目です。 |
 | `rebase [onto] [--autostash]` | rebase。実行中は `--continue`、`--skip`、`--abort`、`--status` が使えます。 |
 | `rebase <upstream> --interactive --plan <file\|->` | JSON のプラン（`[{"commit", "action", "message"}]`、アクションは `pick`、`reword`、`squash`、`fixup`、`drop`、`edit`、またはその 1 文字形式 `p`、`r`、`s`、`f`、`d`、`e`。rebase の todo リストと同様に大文字小文字は区別しません）から行う、非対話の「インタラクティブ」rebase。`--root`、`--onto-commit`、`--autosquash` も使えます。`rebase-plan` から作成します。 |
 | `cherry-pick <commits>...` または `cherry-pick --plan <file\|->` | commit を順に適用します（プラン：`pick` / `drop` のステップ）。 |

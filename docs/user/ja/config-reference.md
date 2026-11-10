@@ -54,7 +54,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.startup_tab_launcher` | `"last"` | GitPoulpi が作成したデスクトップまたはスタートメニューのショートカット（`--launcher` を渡します）から起動したときに、フォルダーに関係なく最初に開くタブ：`"home"`、`"last"`、または `"radar"`。上の 2 つの設定より優先されます。`"last"` は `remember_tabs` がオフ、または記憶されたタブがなければホームになります。`"radar"` は Radar が無効またはビルドに含まれないときホームになります。起動時に一度だけ読み込まれ、反映には再起動が必要です。 |
 | `general.group_worktree_tabs` | `true` | リポジトリにひも付いた worktree のタブを、そのリポジトリのタブのすぐ後ろに並べます：worktree を開いたとき、worktree のタブをドラッグして離したとき（グループの隣に戻ります。リポジトリのタブがグループの先頭で、worktree がその後に続きます）、この設定をオンにしたとき。オフの場合、タブは置いた場所のままです。 |
 | `general.undo_depth` | `100` | 元に戻す操作でさかのぼれる操作の数です。`0` は無制限です。 |
-| `general.conflict_detection` | `true` | 競合の事前検出：現在のブランチを派生元のブランチへ merge すると競合する場合に、ログにバッジを表示します。バックグラウンドで計算され（メモリ上の merge：ファイル、インデックス、ref は変わりません）、リポジトリごとにオフにできます（`[preferences] conflict_detection`）。[merge の競合を解決する](merge-conflicts.md#競合の予防)を参照してください。 |
+| `general.conflict_detection` | `true` | 競合の事前検出：現在のブランチを派生元のブランチへ merge すると競合する場合に、ログにバッジを表示します。バックグラウンドで計算され（メモリ上の merge：ファイル、インデックス、ref は変わりません）、リポジトリごとにオフにできます（`[preferences] conflict_detection`）。比較するベースブランチには専用の一覧があります：[`[conflict_prevention]`](#conflict_preventionベースブランチの一覧)。[merge の競合を解決する](merge-conflicts.md#競合の予防)を参照してください。 |
 | `general.dev_mode` | なし（自動） | ソースから GitPoulpi をビルドする人向けで、設定には表示されません。なしの場合：実行中の exe が `<checkout>/target/<profile>/` にあるとき（`target` の隣に `Cargo.toml` と `crates/gitpoulpi-tui` があるとき）にオンになります。`true` / `false` で強制できます。開発モードで使えるようになるのは `ui.launcher_build` だけです。 |
 | `general.journal_outside` | `true` | シェルや AI エージェントがブランチ、tag、stash、HEAD に対して行った操作を、外部のものとして印を付けて元に戻す履歴の項目に記録し、`Ctrl+Z` で取り消せるようにします。ファイルの編集は記録されません。`undo_enabled` が必要です。[元に戻す・やり直す](undo-redo.md#gitpoulpi-の外で行われた変更)を参照してください。 |
 | `general.undo_enabled` | `true` | `false`：元に戻すための記録を一切行わず（最速）、元に戻す履歴は消去され、元に戻す／やり直すボタンは表示されなくなります。[元に戻す・やり直す](undo-redo.md)を参照してください。 |
@@ -236,6 +236,7 @@ merge 競合エディター（[merge の競合を解決する](merge-conflicts.m
 |---|---|---|
 | `git.pull_mode` | `"merge"` | Pull（ボタン、`Ctrl+G p`、`Git: Pull`）の動作：`merge`（可能なら fast-forward）、`ff_only`、`rebase`。常に git に明示的に渡されます。古い `fetch_all` は `merge` として読まれます。 |
 | `git.push_behavior` | `"direct"` | `direct` は既定のリモートへ push し、`ask` は先にリモートのメニューを表示します。 |
+| `git.merge_fast_forward` | `"never"` | 自分で開始した merge（ブランチメニュー、ドラッグ＆ドロップ、パレット、`gitpoulpi merge`）が、fast-forward できるブランチをどう扱うか：`never` は常に merge commit を作り（`--no-ff`）、`allowed` は可能なら fast-forward し（git の既定で、`merge.ff` が効きます）、`only` は fast-forward するか拒否します。リポジトリ自身の選択（設定 > Merge オプション、`repo-state.toml` の `merge_fast_forward`）が優先され、CLI の `--ff`、`--no-ff`、`--ff-only` はその両方に優先します。即時に反映されます。 |
 | `git.default_encoding` | `"utf-8"` | 有効な UTF-8 **ではない**テキスト（ファイルの内容、blame、diff、`encoding` ヘッダーのない commit メッセージ）のエンコーディングです。任意の WHATWG ラベルを指定できます（`windows-1252`、`shift_jis` など）。表示のみで、ステージ時に再エンコードすることはありません。リポジトリごとに上書きできます。 |
 | `git.lfs_enabled` | `true` | Git LFS を表示して操作します。リポジトリごとに上書きできます。[Git LFS](lfs.md)を参照してください。 |
 | `git.lfs_autofix_filters` | `true` | LFS を使うリポジトリの pull または push の前に、LFS フィルター / pre-push フックがなければインストールします（`git lfs install --local`、このリポジトリのみ）。[Git LFS](lfs.md)を参照してください。 |
@@ -444,6 +445,17 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 | `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | gitignore 形式のパスパターンです。`/` のないパターンは任意の深さのファイル名に、`/` のあるパターンはパス全体に一致します（先頭の `/` はルートに固定します）。`*` と `?` は 1 つのフォルダー内にとどまり、`**` はフォルダーをまたぎます。`!` は先のパターンが一致したものを再び許可し、最後の一致が優先されます。大文字小文字は区別しません。ステージのガードと `ai.privacy.exclude_sensitive_files` が使います。 |
 | `privacy.staging_guard` | `true` | パターンに一致するファイル、または認識されたシークレットを内容に含むファイルをステージすると、先に確認されます（TUI）。`--allow-sensitive` を付けない限り拒否されます（CLI）。`mcp.allow_sensitive_staging` がエージェントに `allow_sensitive` を渡すことを許している場合を除き、拒否されます（MCP）。テキストファイルは 1 つあたり 1 MiB まで、合計 32 MiB まで読み取ります。バイナリファイルは名前だけで照合されます。[ステージと commit](staging-and-committing.md#機密ファイル)を参照してください。 |
 
+## `[conflict_prevention]`（ベースブランチの一覧）
+
+競合の事前検出が、現在のブランチの派生元（ベース）として扱ってよいブランチは、パターンの一覧で決まります（[merge の競合を解決する](merge-conflicts.md#競合の予防)を参照）。一覧には名前を付けて共有できます。編集は 設定 > 一般 > 競合の予防 で行います。
+
+| キー | 既定値 | 値と効果 |
+|---|---|---|
+| `conflict_prevention.default_list` | `""` | 独自の一覧を持たないリポジトリが使う一覧の名前。空、またはその名前の一覧がない場合は、組み込みの `**`（すべてのブランチ）です。確認のたびに読み直されるため、変更は再起動なしで開いているリポジトリに反映されます。 |
+| `conflict_prevention.lists` | なし | 名前付きの一覧。1 つにつき 1 つのテーブルです：`[conflict_prevention.lists.release]` に `patterns = ["origin/release/**", "!origin/release/old"]`。`patterns` が空ならすべてのブランチを許可します。一覧を編集すると、それに従うすべてのリポジトリに反映されます。 |
+
+リポジトリがどの一覧に従うかは、その `repo-state.toml` にあります（下記）。優先順位：リポジトリ自身のパターン、従っている名前付きの一覧、`default_list`、`**` の順です。
+
 ## `[keybindings]`
 
 TUI のショートカットを割り当て直します。設定 > キーボードとマウスで編集できます。
@@ -476,7 +488,9 @@ stage_file = "z"
 | `[preferences] squash_merge` | ローカルブランチの merge が squash になります：ステージだけで merge commit は作りません（なければオフ） | 設定 > リポジトリ別の設定 > merge オプション |
 | `[preferences] template_apply`、`template_strip_comments` | 空の commit フォームにテンプレートを入れる。commit 時に `#` のコメント行を取り除く（どちらもなければオフ） | 設定 > リポジトリ別の設定 > メッセージテンプレート |
 | `[preferences] conflict_detection` | このリポジトリの競合の事前検出。なければ `general.conflict_detection` に従います | 設定 > リポジトリ別の設定 > 競合の予防 |
-| `[preferences] conflict_base_branches` | ベースブランチのパターン（1 行に 1 つ。なければ `**`） | 設定 > リポジトリ別の設定 > 競合の予防 |
+| `[preferences] conflict_base_branches` | リポジトリ自身のベースブランチのパターン（1 行に 1 つ。**独自の一覧**として引き続き使われます） | 設定 > リポジトリ別の設定 > 競合の予防 |
+| `[preferences] conflict_base_source` | ベースブランチの取得元：`default`（全体の既定の一覧）、`list`（`conflict_base_list`）、`own`（`conflict_base_branches`）。なければ、独自のパターンがあればそれ、なければ既定 | 設定 > リポジトリ別の設定 > 競合の予防 |
+| `[preferences] conflict_base_list` | 取得元が `list` のときにこのリポジトリが従う `[conflict_prevention.lists.<name>]`。削除された一覧は既定に戻ります | 設定 > リポジトリ別の設定 > 競合の予防 |
 | `commit-template.txt`（`repo-state.toml` の隣のファイル） | commit テンプレート。git の `commit.template` がこれを指します | 設定 > リポジトリ別の設定 > メッセージテンプレート |
 | `[preferences.ai_instructions]` | `text`、`mode = "add" \| "replace"`：このリポジトリの AI への指示 | 設定 > リポジトリ別の設定 > AI |
 | `[preferences.ai_overrides.<action>]` | ここでの 1 つのアクションの `profile`、`instructions` | 設定 > リポジトリ別の設定 > AI |

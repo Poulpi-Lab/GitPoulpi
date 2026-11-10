@@ -5094,7 +5094,7 @@ token_command_failed_tail = "La commande de jeton de ce dépôt a échoué : {ta
 token_command_failed_code = "La commande de jeton de ce dépôt a échoué (code de sortie {code})."
 token_command_failed_code_tail = "La commande de jeton de ce dépôt a échoué (code de sortie {code}) : {tail}"
 grant_refused = "GitPoulpi n'a pas envoyé le jeton du compte à {host} : ce n'est pas {expected}, l'adresse de ce compte."
-credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
+credential_helper_unreachable = "L'assistant d'identifiants de GitPoulpi n'a pas pu joindre le démon : la connexion de ce dépôt n'a donc pas été envoyée. Réessayez ; si cela persiste, vérifiez SSH et identifiants."
 repo_auth_needs_confirmation = "Un assistant d'identifiants ou une commande de jeton n'est enregistré que si vous le confirmez dans SSH et identifiants."
 
 [window]

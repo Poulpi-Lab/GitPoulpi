@@ -138,17 +138,17 @@ fn the_secrets_list_has_a_bar_the_thumb_drags_the_wheel_scrolls_and_the_keys_fol
         4,
         Duration::from_secs(10),
         |t| t.drag((col, first + 1), (col, last + 3)).unwrap(),
-        |s| bar_ends(s).is_some() && !detail_path(s).is_empty() && shown(s) != before,
+        |s| {
+            bar_ends(s).is_some()
+                && !detail_path(s).is_empty()
+                && shown(s) != before
+                && shown(s).iter().any(|l| l.contains("cfg39"))
+        },
     );
     assert_eq!(
         detail_path(&dragged),
         detail_path(&start),
         "dragging the bar leaves the selection alone"
-    );
-    assert!(
-        shown(&dragged).iter().any(|l| l.contains("cfg39")),
-        "dragged to the end\n{}",
-        dragged.text()
     );
 
     // The wheel over the list scrolls it back up.

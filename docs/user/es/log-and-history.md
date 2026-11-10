@@ -206,6 +206,15 @@ destinos válidos se iluminan; suelta para obtener un menú:
 `Esc` cancela un arrastre. El equivalente de teclado es el comando de la paleta
 *Refs: Soltar la ref seleccionada sobre la rama activa...*.
 
+**Merge o fast-forward.** Cuando el destino no tiene ningún commit propio (la rama arrastrada solo va por delante), un
+merge podría limitarse a mover el destino hacia delante. Por defecto (Ajustes > Git > **Merge fast-forward** = *never*,
+o la elección propia de un repositorio en su página Opciones de merge) la fila del menú dice *Merge x en y (commit de
+merge)* y crea un commit de merge de verdad, de modo que el historial conserva la rama; usa la fila aparte
+*Fast-forward de y a x* cuando quieras el simple avance (para una línea recta, usa *Rebase* en su lugar). Con
+*allowed* la fila de Merge dice *(con fast-forward)*, y con *only* *(solo fast-forward)*, en gris y con el motivo
+cuando las ramas han divergido. Las mismas filas y rótulos están en el menú propio de una rama, y
+`gitpoulpi merge --ff | --no-ff | --ff-only` elige en cada merge.
+
 ## El menú del commit
 
 Haz clic derecho en un commit (o pulsa `.` sobre él) para ver su menú:

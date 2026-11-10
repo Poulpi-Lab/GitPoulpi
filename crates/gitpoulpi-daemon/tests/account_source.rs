@@ -7,6 +7,7 @@
 //! crate (`gitpoulpi-credential-stub`), wrapped on Unix by a script that logs
 //! its arguments and environment.
 #![cfg(feature = "hosting")]
+#![cfg_attr(not(unix), allow(dead_code))]
 
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};

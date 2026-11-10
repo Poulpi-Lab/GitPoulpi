@@ -838,6 +838,9 @@ git_lfs_program_help = "Install it from https://git-lfs.com (Windows: bundled wi
 initialize_lfs_for_this_repository = "Initialize LFS for this repository"
 initialize_lfs_for_this_repository_help = "Runs `git lfs install --local`: the LFS filters and hooks in this repository's own config, never your global one. Needs git-lfs."
 pull_mode_help = "What the toolbar's {$Pull}{hint} does: merge (fast-forward if possible), ff_only or rebase. The button's ▾ items run their own action at once and do not change this."
+# context: row label on the Git page; what a merge the user starts does when the branch could be fast-forwarded
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Repo: {repo} - this repository only"
 inherited = "(inherited)"
 lfs_not_checked = "(not checked yet)"
@@ -1117,6 +1120,12 @@ create_worktree = { git = "Create worktree from {name}...", local = "Create work
 checkout = { git = "Check out {name}", local = "Check out {name}" }
 # context: ref menu row; {name} is merged into {head} (the checked-out branch or HEAD)
 merge_into = "{$Merge} {name} into {head}"
+# context: ref menu row when {name} could be fast-forwarded into {head} but the setting makes a real merge commit instead
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+# context: ref menu row when the fast-forward setting allows moving {head} to {name} without a merge commit
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+# context: ref menu row when the setting only allows a fast-forward
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 # context: ref menu row; {head} is rebased onto {name}
 rebase_onto = "{$Rebase} {head} onto {name}"
 # context: ref menu row; {branch} is moved forward to {target} (git fast-forward). Also the drag-and-drop menu
@@ -1318,6 +1327,12 @@ rewrite_workbench = "Open the workbench..."
 [menu_drop]
 # context: drag-and-drop menu row; {source} is the dragged ref and {target} the one it was dropped on
 merge_into = "{$Merge} {source} into {target}"
+# context: drag-and-drop menu row when {source} could be fast-forwarded into {target} but the setting makes a real merge commit instead
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+# context: drag-and-drop menu row when the fast-forward setting allows moving {target} to {source} without a merge commit
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+# context: drag-and-drop menu row when the setting only allows a fast-forward
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase} {source} onto {target}"
 # context: drag-and-drop menu row, interactive rebase popup
 rebase_interactive = { git = "Interactive rebase {source} onto {target}...", local = "Interactive rebase {source} onto {target}..." }
@@ -9533,6 +9548,11 @@ commit_skip_hooks_help = "The {$commit} panel's Skip hooks option starts checked
 merge_squash = "{$Squash}"
 # context: help under the squash toggle
 merge_squash_help = "When on, a {$merge} of a local branch puts its changes in the index and stops there, without a {$merge} {$commit}: finish it yourself from the {$commit} panel, which opens with git's squash message. Nothing is journaled: discard the changes to back out."
+# context: row label on the repository Merge options page
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+# context: info row under the fast-forward choice; {key} is a git config key, {value} its value
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 # context: toggle label of the commit template page
 template_apply = "Prefill an empty {$commit} panel with the template"
 # context: help under the apply toggle

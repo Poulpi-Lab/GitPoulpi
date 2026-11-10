@@ -24,8 +24,11 @@ pub(crate) fn menu_context_for_ref(
     section: SidebarSection,
     name: &str,
     _remotes: &[Remote],
+    merge_ff: gitpoulpi_core::domain::MergeFastForward,
 ) -> MenuContext {
-    MenuContext::for_ref(refs, log, section, name)
+    let mut ctx = MenuContext::for_ref(refs, log, section, name);
+    ctx.merge_ff = merge_ff;
+    ctx
 }
 
 /// Never filled in this build.

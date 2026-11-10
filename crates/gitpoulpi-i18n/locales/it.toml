@@ -621,6 +621,8 @@ git_lfs_program_help = "Installalo da https://git-lfs.com (Windows: incluso in G
 initialize_lfs_for_this_repository = "Inizializza LFS per questo repository"
 initialize_lfs_for_this_repository_help = "Esegue `git lfs install --local`: i filtri e gli hook LFS nella configurazione propria di questo repository, mai in quella globale. Richiede git-lfs."
 pull_mode_help = { git = "Cosa fa il pulsante {$Pull}{hint} della barra degli strumenti: merge (fast-forward se possibile), ff_only o rebase. Le voci ▾ del pulsante eseguono subito la propria azione e non cambiano questa impostazione.", local = "Cosa fa il pulsante {$Pull}{hint} della barra degli strumenti: unione (avanzamento rapido se possibile), ff_only o ribasamento. Le voci ▾ del pulsante eseguono subito la propria azione e non cambiano questa impostazione." }
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Repo: {repo} - solo questo repository"
 inherited = "(ereditato)"
 lfs_not_checked = "(non ancora verificato)"
@@ -855,6 +857,9 @@ solo = "Solo"
 create_worktree = { git = "Crea un worktree da {name}...", local = "Crea un albero di lavoro da {name}..." }
 checkout = { git = "Checkout di {name}", local = "Passa a {name}" }
 merge_into = { git = "{$Merge} di {name} in {head}", local = "Unisci {name} in {head}" }
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = { git = "{$Rebase} di {head} su {name}", local = "Ribasa {head} su {name}" }
 fast_forward = { git = "Fast-forward di {branch} a {target}", local = "Avanzamento rapido di {branch} a {target}" }
 pull = "{$Pull}"
@@ -966,6 +971,9 @@ rewrite_workbench = "Apri il pannello di riscrittura..."
 
 [menu_drop]
 merge_into = { git = "{$Merge} di {source} in {target}", local = "Unisci {source} in {target}" }
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = { git = "{$Rebase} di {source} su {target}", local = "Ribasa {source} su {target}" }
 rebase_interactive = { git = "Rebase interattivo di {source} su {target}...", local = "Ribasamento interattivo di {source} su {target}..." }
 push_to = { git = "{$Push} di {source} verso {target}", local = "Invia {source} a {target}" }
@@ -7547,6 +7555,9 @@ commit_skip_hooks = "Ignora gli hook di git per impostazione predefinita a ogni 
 commit_skip_hooks_help = "L'opzione «Salta gli hook» del pannello {$commit} parte selezionata (`--no-verify`): gli hook del repository non vengono eseguiti. Puoi comunque cambiarla per un singolo {$commit}."
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "Se attivo, il {$merge} di un branch locale mette le sue modifiche nell'indice e si ferma lì, senza il {$commit} di {$merge}: completalo tu dal pannello {$commit}, che si apre con il messaggio di squash di git. Nulla viene registrato per l'annullamento: per tornare indietro scarta le modifiche.", local = "Se attivo, l'unione di un branch locale mette le sue modifiche nell'indice e si ferma lì, senza il {$commit} di unione: completalo tu dal pannello {$commit}, che si apre con il messaggio di squash di git. Nulla viene registrato per l'annullamento: per tornare indietro scarta le modifiche." }
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = "Precompila un pannello {$commit} vuoto con il modello"
 template_apply_help = "Un nuovo messaggio parte dal modello qui sotto."
 template_strip = "Elimina le righe di commento quando si crea un {$commit}"

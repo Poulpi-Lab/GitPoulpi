@@ -248,6 +248,9 @@ pub(crate) struct MenuContext {
     pub(crate) local_twin: Option<String>,
     /// For a local branch's menu: its remote-tracking twin (`origin/x`).
     pub(crate) remote_twin: Option<String>,
+    /// The merge fast-forward policy in force (labels the Merge row of a
+    /// branch's menu).
+    pub(crate) merge_ff: gitpoulpi_core::domain::MergeFastForward,
 }
 
 /// Whether moving one branch onto another commit would be a
@@ -274,6 +277,33 @@ impl FfVerdict {
             FfVerdict::AlreadyThere => Some(menu_ref::FF_ALREADY_THERE.get().into()),
             FfVerdict::Ahead => Some(menu_ref::ff_already_ahead(moving)),
             FfVerdict::Diverged => Some(menu_ref::FF_DIVERGED.get().into()),
+        }
+    }
+}
+
+/// What a Merge row says it will do, from the fast-forward policy and
+/// whether the merge could fast-forward at all.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum MergeLabel {
+    /// Nothing to add: the result is a merge commit (or unknown).
+    Plain,
+    /// A fast-forward is possible but the policy makes a merge commit.
+    NewCommit,
+    /// A fast-forward is possible and the policy takes it.
+    FastForwards,
+    /// The policy only allows a fast-forward.
+    FastForwardOnly,
+}
+
+impl MergeLabel {
+    pub(crate) fn of(policy: gitpoulpi_core::domain::MergeFastForward, verdict: FfVerdict) -> Self {
+        use gitpoulpi_core::domain::MergeFastForward as P;
+        let possible = verdict == FfVerdict::Possible;
+        match (policy, possible) {
+            (P::Never, true) => Self::NewCommit,
+            (P::Allowed, true) => Self::FastForwards,
+            (P::Only, _) => Self::FastForwardOnly,
+            _ => Self::Plain,
         }
     }
 }
@@ -374,6 +404,7 @@ impl MenuContext {
             ai_enabled: false,
             local_twin: None,
             remote_twin: None,
+            merge_ff: gitpoulpi_core::domain::MergeFastForward::default(),
         }
     }
 

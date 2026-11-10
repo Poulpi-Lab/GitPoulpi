@@ -621,6 +621,8 @@ git_lfs_program_help = "Installeer het via https://git-lfs.com (Windows: meegele
 initialize_lfs_for_this_repository = "LFS initialiseren voor deze repository"
 initialize_lfs_for_this_repository_help = "Voert `git lfs install --local` uit: de LFS-filters en hooks in de eigen config van deze repository, nooit je globale. Vereist git-lfs."
 pull_mode_help = { git = "Wat de {$Pull}{hint} van de werkbalk doet: merge (fast-forward indien mogelijk), ff_only of rebase. De ▾-items van de knop voeren hun eigen actie meteen uit en wijzigen dit niet.", local = "Wat de {$Pull}{hint} van de werkbalk doet: samenvoegen (fast-forward indien mogelijk), ff_only of rebase. De ▾-items van de knop voeren hun eigen actie meteen uit en wijzigen dit niet." }
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Repo: {repo} - alleen deze repository"
 inherited = "(overgenomen)"
 lfs_not_checked = "(nog niet gecontroleerd)"
@@ -855,6 +857,9 @@ solo = "Solo"
 create_worktree = { git = "Worktree maken van {name}...", local = "Worktree maken van {name}..." }
 checkout = { git = "{name} uitchecken", local = "{name} uitchecken" }
 merge_into = { git = "{$Merge} {name} in {head}", local = "{name} samenvoegen in {head}" }
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = "{$Rebase} {head} op {name}"
 fast_forward = { git = "Fast-forward {branch} naar {target}", local = "Fast-forward {branch} naar {target}" }
 pull = "{$Pull}"
@@ -966,6 +971,9 @@ rewrite_workbench = "Werkbank openen..."
 
 [menu_drop]
 merge_into = { git = "{$Merge} {source} in {target}", local = "{source} samenvoegen in {target}" }
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase} {source} op {target}"
 rebase_interactive = { git = "Interactief rebasen {source} op {target}...", local = "Interactief rebasen {source} op {target}..." }
 push_to = "{$Push} {source} naar {target}"
@@ -7548,6 +7556,9 @@ commit_skip_hooks = "Git-hooks standaard omzeilen bij elke {$commit}"
 commit_skip_hooks_help = "De optie Hooks overslaan in het {$commit}-paneel staat standaard aan (`--no-verify`): de hooks van de repository worden dan niet uitgevoerd. Je kunt dit per {$commit} nog steeds wijzigen."
 merge_squash = "{$Squash}"
 merge_squash_help = "Als dit aan staat, komen bij een {$merge} van een lokale branch de wijzigingen in de index en stopt het daar, zonder {$merge}-{$commit}: rond de {$commit} zelf af vanuit het {$commit}-paneel, dat opent met het squash-bericht van git. Hier wordt niets vastgelegd voor ongedaan maken: verwerp de wijzigingen om terug te gaan."
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = "Een leeg {$commit}-paneel vooraf invullen met het sjabloon"
 template_apply_help = "Een nieuw bericht begint met het onderstaande sjabloon."
 template_strip = "Commentaarregels weglaten bij het maken van een {$commit}"

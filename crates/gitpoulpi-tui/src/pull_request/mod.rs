@@ -58,8 +58,10 @@ pub(crate) fn menu_context_for_ref(
     section: SidebarSection,
     name: &str,
     remotes: &[Remote],
+    merge_ff: gitpoulpi_core::domain::MergeFastForward,
 ) -> MenuContext {
     let mut ctx = MenuContext::for_ref(refs, log, section, name);
+    ctx.merge_ff = merge_ff;
     if section.ref_kind() == Some(RefRowKind::Local) {
         ctx.pr_reason = pull_request_reason(name, refs, remotes, &load_integrations());
     }

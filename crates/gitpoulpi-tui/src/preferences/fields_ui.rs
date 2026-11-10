@@ -709,6 +709,21 @@ impl PreferencesState {
                 crate::keymap::Action::GitPull,
             ))),
             Field::global(
+                msg::settings_git::MERGE_FAST_FORWARD.get(),
+                "git.merge_fast_forward",
+                Control::Choice {
+                    options: MergeFastForward::ALL
+                        .iter()
+                        .map(|m| m.as_str().into())
+                        .collect(),
+                    index: MergeFastForward::ALL
+                        .iter()
+                        .position(|m| *m == git.merge_fast_forward)
+                        .unwrap_or(0),
+                },
+            )
+            .with_help(msg::settings_git::MERGE_FAST_FORWARD_HELP.get()),
+            Field::global(
                 msg::settings_git::DEFAULT_ENCODING.get(),
                 "git.default_encoding",
                 Control::Choice {

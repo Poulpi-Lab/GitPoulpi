@@ -386,6 +386,8 @@ pub(super) enum RepoField {
     SkipHooks,
     /// Merge options page: squash.
     SquashMerge,
+    /// Merge options page: the fast-forward policy of this repository.
+    MergeFastForward,
     /// Message template page: apply to empty commit messages.
     TemplateApply,
     /// Message template page: remove comments from commit messages.

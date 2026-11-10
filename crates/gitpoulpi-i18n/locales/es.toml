@@ -621,6 +621,8 @@ git_lfs_program_help = "Instálalo desde https://git-lfs.com (Windows: incluido 
 initialize_lfs_for_this_repository = "Inicializar LFS en este repositorio"
 initialize_lfs_for_this_repository_help = "Ejecuta `git lfs install --local`: los filtros y hooks LFS en la configuración propia de este repositorio, nunca en la global. Requiere git-lfs."
 pull_mode_help = { git = "Qué hace el {$Pull}{hint} de la barra de herramientas: merge (fast-forward si es posible), ff_only o rebase. Los elementos ▾ del botón ejecutan su propia acción al instante y no cambian esto.", local = "Qué hace el botón {$Pull}{hint} de la barra de herramientas: fusión (avance rápido si es posible), ff_only o reaplicar. Los elementos ▾ del botón ejecutan su propia acción al instante y no cambian esto." }
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Repo: {repo} - solo este repositorio"
 inherited = "(heredado)"
 lfs_not_checked = "(aún sin comprobar)"
@@ -855,6 +857,9 @@ solo = "Solo"
 create_worktree = { git = "Crear worktree desde {name}...", local = "Crear árbol de trabajo desde {name}..." }
 checkout = { git = "Checkout de {name}", local = "Cambiar a {name}" }
 merge_into = "{$Merge} {name} en {head}"
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = "{$Rebase} {head} sobre {name}"
 fast_forward = { git = "Fast-forward de {branch} a {target}", local = "Avance rápido de {branch} a {target}" }
 pull = "{$Pull}"
@@ -966,6 +971,9 @@ rewrite_workbench = "Abrir el editor de reescritura..."
 
 [menu_drop]
 merge_into = "{$Merge} {source} en {target}"
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase} {source} sobre {target}"
 rebase_interactive = { git = "Rebase interactivo de {source} sobre {target}...", local = "Reaplicado interactivo de {source} sobre {target}..." }
 push_to = "{$Push} {source} a {target}"
@@ -7547,6 +7555,9 @@ commit_skip_hooks = { git = "Eludir los hooks de git por defecto en cada commit"
 commit_skip_hooks_help = { git = "La opción «Omitir hooks» del panel de commit empieza marcada (`--no-verify`): los hooks del repositorio no se ejecutan. Puedes cambiarla en un commit concreto.", local = "La opción «Omitir hooks» del panel de confirmación empieza marcada (`--no-verify`): los hooks del repositorio no se ejecutan. Puedes cambiarla en una confirmación concreta." }
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "Activado, un merge de una rama local deja sus cambios en el índice y se detiene ahí, sin commit de merge: termínalo tú desde el panel de commit, que se abre con el mensaje de squash de git. No se registra nada en el historial de deshacer: descarta los cambios para volver atrás.", local = "Activado, una fusión de una rama local deja sus cambios en el índice y se detiene ahí, sin confirmación de fusión: termínala tú desde el panel de confirmación, que se abre con el mensaje de combinación de git. No se registra nada en el historial de deshacer: descarta los cambios para volver atrás." }
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = "Rellenar un panel de {$commit} vacío con la plantilla"
 template_apply_help = "Un mensaje nuevo parte de la plantilla de abajo."
 template_strip = "Quitar las líneas de comentario en cada {$commit}"

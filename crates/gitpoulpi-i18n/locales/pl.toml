@@ -621,6 +621,8 @@ git_lfs_program_help = "Zainstaluj z https://git-lfs.com (Windows: dołączony d
 initialize_lfs_for_this_repository = "Zainicjuj LFS dla tego repozytorium"
 initialize_lfs_for_this_repository_help = "Uruchamia `git lfs install --local`: filtry i hooki LFS w konfiguracji tego repozytorium, nigdy w globalnej. Wymaga git-lfs."
 pull_mode_help = { git = "Co robi {$Pull}{hint} na pasku narzędzi: merge (fast-forward, jeśli się da), ff_only lub rebase. Pozycje ▾ przycisku wykonują własną akcję od razu i tego nie zmieniają.", local = "Co robi Ściągnij{hint} na pasku narzędzi: scalenie (fast-forward, jeśli się da), ff_only lub rebase. Pozycje ▾ przycisku wykonują własną akcję od razu i tego nie zmieniają." }
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Repo: {repo} - tylko to repozytorium"
 inherited = "(dziedziczone)"
 lfs_not_checked = "(jeszcze nie sprawdzono)"
@@ -855,6 +857,9 @@ solo = "Solo"
 create_worktree = { git = "Utwórz worktree z {name}...", local = "Utwórz worktree z {name}..." }
 checkout = { git = "Checkout {name}", local = "Checkout {name}" }
 merge_into = { git = "Merge {name} do {head}", local = "Scal {name} do {head}" }
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = "{$Rebase} {head} na {name}"
 fast_forward = { git = "Fast-forward {branch} do {target}", local = "Fast-forward {branch} do {target}" }
 pull = "{$Pull}"
@@ -966,6 +971,9 @@ rewrite_workbench = "Otwórz warsztat..."
 
 [menu_drop]
 merge_into = { git = "Merge {source} do {target}", local = "Scal {source} do {target}" }
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase} {source} na {target}"
 rebase_interactive = { git = "Interaktywny rebase {source} na {target}...", local = "Interaktywny rebase {source} na {target}..." }
 push_to = "{$Push} {source} do {target}"
@@ -7549,6 +7557,9 @@ commit_skip_hooks = { git = "Domyślnie omijaj hooki gita przy tworzeniu commita
 commit_skip_hooks_help = { git = "Opcja Pomiń hooki w panelu commita jest domyślnie zaznaczona (`--no-verify`): hooki repozytorium się nie uruchamiają. Dla pojedynczego commita nadal możesz to zmienić.", local = "Opcja Pomiń hooki w panelu zatwierdzenia jest domyślnie zaznaczona (`--no-verify`): hooki repozytorium się nie uruchamiają. Dla pojedynczego zatwierdzenia nadal możesz to zmienić." }
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "Włączone: merge lokalnej gałęzi umieszcza jej zmiany w indeksie i na tym się kończy, bez merge commita: dokończ to samodzielnie w panelu commita, który otwiera się z komunikatem squash gita. Nic nie trafia do historii cofania: aby się wycofać, odrzuć zmiany.", local = "Włączone: scalenie lokalnej gałęzi umieszcza jej zmiany w indeksie i na tym się kończy, bez zatwierdzenia scalającego: dokończ to samodzielnie w panelu zatwierdzenia, który otwiera się z komunikatem scalenia gita. Nic nie trafia do historii cofania: aby się wycofać, odrzuć zmiany." }
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = { git = "Wstaw szablon do pustego panelu commita", local = "Wstaw szablon do pustego panelu zatwierdzenia" }
 template_apply_help = "Nowy opis zaczyna się od poniższego szablonu."
 template_strip = { git = "Odrzucaj linie komentarzy przy tworzeniu commita", local = "Odrzucaj linie komentarzy przy tworzeniu zatwierdzenia" }

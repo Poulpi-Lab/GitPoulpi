@@ -623,6 +623,8 @@ git_lfs_program_help = "Установите с https://git-lfs.com (Windows: в
 initialize_lfs_for_this_repository = "Инициализировать LFS для этого репозитория"
 initialize_lfs_for_this_repository_help = "Выполняет `git lfs install --local`: фильтры и хуки LFS в конфигурации самого репозитория, никогда не в глобальной. Нужен git-lfs."
 pull_mode_help = { git = "Что делает кнопка {$Pull}{hint} на панели инструментов: merge (fast-forward, если возможно), ff_only или rebase. Пункты ▾ на кнопке сразу выполняют своё действие и этот выбор не меняют.", local = "Что делает кнопка «{$Pull}»{hint} на панели инструментов: слияние (fast-forward, если возможно), ff_only или перебазирование. Пункты ▾ на кнопке сразу выполняют своё действие и этот выбор не меняют." }
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Репозиторий: {repo} - только этот репозиторий"
 inherited = "(унаследовано)"
 lfs_not_checked = "(ещё не проверено)"
@@ -857,6 +859,9 @@ solo = "Соло"
 create_worktree = { git = "Создать worktree из {name}...", local = "Создать worktree из {name}..." }
 checkout = { git = "Checkout {name}", local = "Checkout {name}" }
 merge_into = { git = "{$Merge} {name} в {head}", local = "Слить {name} в {head}" }
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = { git = "{$Rebase} {head} на {name}", local = "Перебазировать {head} на {name}" }
 fast_forward = { git = "Fast-forward {branch} до {target}", local = "Fast-forward {branch} до {target}" }
 pull = "{$Pull}"
@@ -968,6 +973,9 @@ rewrite_workbench = "Открыть окно переписывания..."
 
 [menu_drop]
 merge_into = { git = "{$Merge} {source} в {target}", local = "Слить {source} в {target}" }
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = { git = "{$Rebase} {source} на {target}", local = "Перебазировать {source} на {target}" }
 rebase_interactive = { git = "Интерактивный rebase {source} на {target}...", local = "Интерактивное перебазирование {source} на {target}..." }
 push_to = "{$Push} {source} в {target}"
@@ -7554,6 +7562,9 @@ commit_skip_hooks = { git = "По умолчанию обходить хуки g
 commit_skip_hooks_help = { git = "Параметр «Пропустить хуки» на панели commit'а по умолчанию отмечен (`--no-verify`): хуки репозитория не запускаются. Для отдельного commit'а это можно изменить.", local = "Параметр «Пропустить хуки» на панели коммита по умолчанию отмечен (`--no-verify`): хуки репозитория не запускаются. Для отдельного коммита это можно изменить." }
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "Если включено, merge локальной ветки помещает её изменения в индекс и на этом останавливается, не создавая merge-commit: завершите его сами на панели commit'а, которая открывается с squash-сообщением git. Ничего не записывается в журнал отмены: чтобы отказаться, отбросьте изменения.", local = "Если включено, слияние локальной ветки помещает её изменения в индекс и на этом останавливается, не создавая коммит слияния: завершите его сами на панели коммита, которая открывается с сообщением объединения от git. Ничего не записывается в журнал отмены: чтобы отказаться, отбросьте изменения." }
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = { git = "Заполнять пустую панель commit'а шаблоном", local = "Заполнять пустую панель коммита шаблоном" }
 template_apply_help = "Новое сообщение начинается с шаблона ниже."
 template_strip = { git = "Отбрасывать строки комментариев при создании commit'а", local = "Отбрасывать строки комментариев при создании коммита" }

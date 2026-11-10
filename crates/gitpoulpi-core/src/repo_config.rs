@@ -24,6 +24,9 @@ pub const COMMIT_GPGSIGN: &str = "commit.gpgSign";
 pub const USER_NAME: &str = "user.name";
 /// The commit identity's e-mail.
 pub const USER_EMAIL: &str = "user.email";
+/// git's own merge fast-forward policy (`true`, `false`, `only`). Read to
+/// show it next to GitPoulpi's choice (`git.merge_fast_forward`).
+pub const MERGE_FF: &str = "merge.ff";
 
 /// Every key the repo-config calls accept, with the values each takes.
 /// An empty list means free text (any non-blank, single-line value).
@@ -35,6 +38,7 @@ pub const REPO_CONFIG_KEYS: &[(&str, &[&str])] = &[
     (COMMIT_TEMPLATE, &[]),
     (CORE_COMMENT_CHAR, &[]),
     (COMMIT_GPGSIGN, &["true", "false"]),
+    (MERGE_FF, &["true", "false", "only"]),
 ];
 
 /// The character that starts a comment line, from `core.commentChar`'s value:

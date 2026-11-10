@@ -256,6 +256,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                             unpushed_tags,
                             selected_count: 0,
                             ai_enabled: cx.ai_ui.enabled(),
+                            merge_ff: cx.commit_settings.merge_ff,
                         },
                         commit,
                     );
@@ -541,6 +542,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                                     *cx.active_ref_section,
                                     &full_name,
                                     &cx.remote_ui.remotes,
+                                    cx.commit_settings.merge_ff,
                                 ),
                                 refs_tree::hidden_in_graph(
                                     &*cx.hidden_from_graph,

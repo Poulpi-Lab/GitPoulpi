@@ -43,6 +43,8 @@ pub(crate) struct MenuSources<'a> {
     pub(crate) selected_count: usize,
     /// `ai.enabled`: whether the AI rows are offered.
     pub(crate) ai_enabled: bool,
+    /// The fast-forward policy in force for this repository (labels the Merge row).
+    pub(crate) merge_ff: gitpoulpi_core::domain::MergeFastForward,
 }
 
 /// A ref's own entries, its rows tagged with table index `idx`.
@@ -52,7 +54,14 @@ pub(crate) fn ref_rows(
     name: &str,
     idx: u8,
 ) -> Vec<Entry<LogContextAction>> {
-    let ctx = menu_context_for_ref(src.refs_result, src.log_result, section, name, src.remotes);
+    let ctx = menu_context_for_ref(
+        src.refs_result,
+        src.log_result,
+        section,
+        name,
+        src.remotes,
+        src.merge_ff,
+    );
     let mut entries = ref_menu_entries(
         section,
         name,
@@ -475,6 +484,7 @@ mod tests {
             unpushed_tags: &unpushed,
             selected_count: 0,
             ai_enabled: false,
+            merge_ff: Default::default(),
         };
         let menu = pill_menu(&src, commit, (SidebarSection::Local, "main".into()));
         let mut all = Vec::new();
@@ -542,6 +552,7 @@ mod tests {
             unpushed_tags: &unpushed,
             selected_count: 0,
             ai_enabled: false,
+            merge_ff: Default::default(),
         };
         let menu = commit_menu(&src, commit);
         let subs: Vec<String> = menu

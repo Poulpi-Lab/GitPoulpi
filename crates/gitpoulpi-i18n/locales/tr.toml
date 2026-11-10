@@ -622,6 +622,8 @@ git_lfs_program_help = "https://git-lfs.com adresinden kurun (Windows: Git for W
 initialize_lfs_for_this_repository = "Bu depo için LFS'yi başlat"
 initialize_lfs_for_this_repository_help = "`git lfs install --local` çalıştırır: LFS filtreleri ve kancaları bu deponun kendi yapılandırmasına yazılır, genel olana asla. git-lfs gerekir."
 pull_mode_help = "Araç çubuğundaki {$Pull}{hint} düğmesinin yaptığı: merge (mümkünse fast-forward), ff_only veya rebase. Düğmenin ▾ öğeleri kendi eylemlerini hemen çalıştırır ve bunu değiştirmez."
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Depo: {repo} - yalnızca bu depo"
 inherited = "(devralınan)"
 lfs_not_checked = "(henüz denetlenmedi)"
@@ -856,6 +858,9 @@ solo = "Solo"
 create_worktree = { git = "{name} üzerinden worktree oluştur...", local = "{name} üzerinden worktree oluştur..." }
 checkout = { git = "{name} checkout", local = "{name} checkout" }
 merge_into = "{$Merge}: {name} → {head}"
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = "{$Rebase}: {head} → {name} üstüne"
 fast_forward = { git = "Fast-forward: {branch} → {target}", local = "Fast-forward: {branch} → {target}" }
 pull = "{$Pull}"
@@ -967,6 +972,9 @@ rewrite_workbench = "Yeniden yazma ekranını aç..."
 
 [menu_drop]
 merge_into = "{$Merge}: {source} → {target}"
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase}: {source} → {target} üstüne"
 rebase_interactive = { git = "Etkileşimli rebase: {source} → {target} üstüne...", local = "Etkileşimli rebase: {source} → {target} üstüne..." }
 push_to = "{$Push}: {source} → {target}"
@@ -7553,6 +7561,9 @@ commit_skip_hooks = "Her {$commit} için git hook'larını varsayılan olarak at
 commit_skip_hooks_help = "{$Commit} panelindeki Hook'ları atla seçeneği işaretli başlar (`--no-verify`): deponun hook'ları çalışmaz. Yine de tek bir {$commit} için değiştirebilirsiniz."
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "Açıkken yerel bir dalın merge'ü, değişikliklerini indekse koyar ve orada durur; merge commit'i oluşturulmaz: işlemi git'in squash mesajıyla açılan commit panelinden kendiniz tamamlayın. Hiçbir şey geri alma geçmişine yazılmaz: vazgeçmek için değişiklikleri atın.", local = "Açıkken yerel bir dalın birleştirilmesi, değişikliklerini indekse koyar ve orada durur; birleştirme commit'i oluşturulmaz: işlemi git'in squash mesajıyla açılan commit panelinden kendiniz tamamlayın. Hiçbir şey geri alma geçmişine yazılmaz: vazgeçmek için değişiklikleri atın." }
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = "Boş {$commit} panelini şablonla önceden doldur"
 template_apply_help = "Yeni bir mesaj aşağıdaki şablonla başlar."
 template_strip = "{$Commit} yapılırken yorum satırlarını çıkar"

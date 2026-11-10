@@ -165,6 +165,7 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                         RefRowKind::Local,
                         refs,
                         cx.log_result.as_ref().ok(),
+                        cx.commit_settings.merge_ff,
                     );
                     if entries.is_empty() {
                         *cx.last_message = Some(msg::input::nothing_to_do(&n, &head.name));
@@ -232,6 +233,7 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                         kind,
                         cx.refs_result.as_deref().unwrap_or(&[]),
                         cx.log_result.as_ref().ok(),
+                        cx.commit_settings.merge_ff,
                     );
                     if entries.is_empty() {
                         *cx.last_message = Some(msg::input::nothing_to_do(&source, &target));

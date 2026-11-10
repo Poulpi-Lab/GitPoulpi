@@ -52,6 +52,7 @@ use gitpoulpi_config::{
     UiLanguage, MAX_MOUSE_SCROLL_LINES, MIN_COMMITS_PER_LAZY_PAGE, MIN_INITIAL_COMMITS_IN_GRAPH,
     MIN_MOUSE_SCROLL_LINES,
 };
+use gitpoulpi_core::domain::MergeFastForward;
 use gitpoulpi_secrets::{CredentialHelperTokens, TokenStore};
 use gitpoulpi_session::RepoState;
 use ratatui::layout::{Constraint, Layout, Rect};

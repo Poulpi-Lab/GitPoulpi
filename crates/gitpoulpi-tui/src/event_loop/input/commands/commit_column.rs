@@ -379,6 +379,7 @@ pub(in crate::event_loop) fn open_menu_for(
             unpushed_tags,
             selected_count,
             ai_enabled: cx.ai_ui.enabled(),
+            merge_ff: cx.commit_settings.merge_ff,
         },
         commit,
     );

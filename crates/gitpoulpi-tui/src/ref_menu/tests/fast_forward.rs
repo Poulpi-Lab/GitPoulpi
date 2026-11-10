@@ -39,6 +39,7 @@ fn fast_forward_rows_are_offered_or_grayed_with_their_reason() {
         ai_enabled: false,
         local_twin: None,
         remote_twin: None,
+        merge_ff: Default::default(),
     };
     let local = ref_menu_entries(SidebarSection::Local, "feature", &ctx, false, false, false);
     assert_eq!(

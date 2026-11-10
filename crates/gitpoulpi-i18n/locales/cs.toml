@@ -621,6 +621,8 @@ git_lfs_program_help = "Nainstalujte z https://git-lfs.com (Windows: součást G
 initialize_lfs_for_this_repository = "Inicializovat LFS pro tento repozitář"
 initialize_lfs_for_this_repository_help = "Spustí `git lfs install --local`: filtry a hooky LFS ve vlastní konfiguraci tohoto repozitáře, nikdy v globální. Vyžaduje git-lfs."
 pull_mode_help = "Co dělá {$Pull}{hint} na panelu nástrojů: {$merge} (fast-forward, pokud lze), ff_only nebo rebase. Položky ▾ tlačítka provedou ihned vlastní akci a toto nemění."
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Repo: {repo} - jen tento repozitář"
 inherited = "(zděděno)"
 lfs_not_checked = "(zatím nezjištěno)"
@@ -855,6 +857,9 @@ solo = "Solo"
 create_worktree = { git = "Vytvořit worktree z {name}...", local = "Vytvořit worktree z {name}..." }
 checkout = { git = "Checkout {name}", local = "Checkout {name}" }
 merge_into = "{$Merge} {name} do {head}"
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = "{$Rebase} {head} na {name}"
 fast_forward = { git = "Fast-forward {branch} na {target}", local = "Fast-forward {branch} na {target}" }
 pull = "{$Pull}"
@@ -966,6 +971,9 @@ rewrite_workbench = "Otevřít nástroj pro přepis..."
 
 [menu_drop]
 merge_into = "{$Merge} {source} do {target}"
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase} {source} na {target}"
 rebase_interactive = { git = "Interaktivní rebase {source} na {target}...", local = "Interaktivní rebase {source} na {target}..." }
 push_to = "{$Push} {source} do {target}"
@@ -7544,6 +7552,9 @@ commit_skip_hooks = "Ve výchozím stavu obcházet git hooky při každém commi
 commit_skip_hooks_help = "Volba Přeskočit hooky v panelu commitu bude ve výchozím stavu zaškrtnutá (`--no-verify`): hooky repozitáře se nespustí. U jednotlivého commitu ji můžete stále změnit."
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "Když je zapnuto, merge lokální větve vloží její změny do indexu a tam se zastaví, bez merge commitu: dokončete jej sami z panelu commitu, který se otevře se zprávou squash od gitu. Do historie vrácení se nic nezapisuje: pro návrat změny zahoďte.", local = "Když je zapnuto, sloučení lokální větve vloží její změny do indexu a tam se zastaví, bez slučovacího commitu: dokončete jej sami z panelu commitu, který se otevře se zprávou squash od gitu. Do historie vrácení se nic nezapisuje: pro návrat změny zahoďte." }
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = "Předvyplnit prázdný panel commitu šablonou"
 template_apply_help = "Nová zpráva začne šablonou uvedenou níže."
 template_strip = "Při vytváření commitu vynechat řádky komentářů"

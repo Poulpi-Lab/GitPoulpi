@@ -623,6 +623,8 @@ git_lfs_program_help = "Installera det från https://git-lfs.com (Windows: ingå
 initialize_lfs_for_this_repository = "Initiera LFS för det här repositoryt"
 initialize_lfs_for_this_repository_help = "Kör `git lfs install --local`: LFS-filtren och hookarna i det här repositoryts egen konfiguration, aldrig din globala. Kräver git-lfs."
 pull_mode_help = { git = "Vad verktygsfältets {$Pull}{hint} gör: merge (fast-forward om möjligt), ff_only eller rebase. Knappens ▾-alternativ kör sin egen åtgärd direkt och ändrar inte detta.", local = "Vad verktygsfältets {$Pull}{hint} gör: sammanslagning (fast-forward om möjligt), ff_only eller rebase. Knappens ▾-alternativ kör sin egen åtgärd direkt och ändrar inte detta." }
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Repo: {repo} - bara det här repositoryt"
 inherited = "(ärvd)"
 lfs_not_checked = "(inte kontrollerad ännu)"
@@ -857,6 +859,9 @@ solo = "Solo"
 create_worktree = { git = "Skapa worktree från {name}...", local = "Skapa worktree från {name}..." }
 checkout = { git = "Checka ut {name}", local = "Checka ut {name}" }
 merge_into = { git = "Merge {name} i {head}", local = "Slå ihop {name} i {head}" }
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = "{$Rebase} {head} på {name}"
 fast_forward = { git = "Fast-forward {branch} till {target}", local = "Fast-forward {branch} till {target}" }
 pull = "{$Pull}"
@@ -968,6 +973,9 @@ rewrite_workbench = "Öppna omskrivningsvyn..."
 
 [menu_drop]
 merge_into = { git = "Merge {source} i {target}", local = "Slå ihop {source} i {target}" }
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase} {source} på {target}"
 rebase_interactive = { git = "Interaktiv rebase av {source} på {target}...", local = "Interaktiv rebase av {source} på {target}..." }
 push_to = "{$Push} {source} till {target}"
@@ -7554,6 +7562,9 @@ commit_skip_hooks = "Kringgå git-hooks som standard för varje {$commit}"
 commit_skip_hooks_help = "Alternativet Hoppa över hooks i panelen för {$commit} är förkryssat från början (`--no-verify`): repositoryts hooks körs inte. Du kan ändå ändra det för en enskild {$commit}."
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "När det är på lägger en merge av en lokal gren sina ändringar i indexet och stannar där, utan någon merge-commit: slutför den själv från commit-panelen, som öppnas med gits squash-meddelande. Inget journalförs: förkasta ändringarna för att backa ut.", local = "När det är på lägger en sammanslagning av en lokal gren sina ändringar i indexet och stannar där, utan någon sammanslagningsincheckning: slutför den själv från incheckningspanelen, som öppnas med gits squash-meddelande. Inget journalförs: förkasta ändringarna för att backa ut." }
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = { git = "Fyll i en tom commit-panel med mallen", local = "Fyll i en tom incheckningspanel med mallen" }
 template_apply_help = "Ett nytt meddelande börjar från mallen nedan."
 template_strip = { git = "Ta bort kommentarsrader när en commit görs", local = "Ta bort kommentarsrader när en incheckning görs" }

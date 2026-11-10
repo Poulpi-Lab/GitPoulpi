@@ -122,12 +122,49 @@ impl PreferencesState {
 
     pub(super) fn merge_fields(&self) -> Vec<Field> {
         let prefs = &self.repo_state.preferences;
-        vec![self.toggle_row(
-            t::MERGE_SQUASH.get(),
-            RepoField::SquashMerge,
-            prefs.squash_merge.unwrap_or(false),
-            t::MERGE_SQUASH_HELP.get(),
-        )]
+        let own = prefs
+            .merge_fast_forward
+            .as_deref()
+            .and_then(MergeFastForward::parse);
+        let mut fields = vec![
+            self.toggle_row(
+                t::MERGE_SQUASH.get(),
+                RepoField::SquashMerge,
+                prefs.squash_merge.unwrap_or(false),
+                t::MERGE_SQUASH_HELP.get(),
+            ),
+            Field::repo(
+                t::MERGE_FAST_FORWARD.get(),
+                RepoField::MergeFastForward,
+                Control::Choice {
+                    options: std::iter::once(
+                        gitpoulpi_i18n::msg::settings_git::INHERITED
+                            .get()
+                            .to_string(),
+                    )
+                    .chain(MergeFastForward::ALL.iter().map(|m| m.as_str().to_string()))
+                    .collect(),
+                    index: own
+                        .and_then(|o| MergeFastForward::ALL.iter().position(|m| *m == o))
+                        .map_or(0, |i| i + 1),
+                },
+            )
+            .live()
+            .with_help(t::MERGE_FAST_FORWARD_HELP.get()),
+        ];
+        // What git itself would do under `allowed`: shown, never edited here.
+        if let Some(git_ff) = self
+            .repo_config
+            .get(gitpoulpi_core::repo_config::MERGE_FF)
+            .and_then(|v| v.as_deref())
+        {
+            fields.push(Field::plain(
+                &t::merge_fast_forward_git(gitpoulpi_core::repo_config::MERGE_FF, git_ff),
+                Control::Info(String::new()),
+                Target::None,
+            ));
+        }
+        fields
     }
 
     pub(super) fn template_fields(&self) -> Vec<Field> {

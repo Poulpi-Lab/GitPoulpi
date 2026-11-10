@@ -93,6 +93,7 @@ pub(crate) fn drop_menu_entries(
     target_kind: RefRowKind,
     refs: &[Ref],
     graph: Option<&CommitGraph>,
+    merge_ff: gitpoulpi_core::domain::MergeFastForward,
 ) -> Vec<context_menu::Entry<RefContextAction>> {
     use context_menu::Entry;
     if !ref_drop_is_valid(source, source_kind, target, target_kind) {
@@ -102,22 +103,33 @@ pub(crate) fn drop_menu_entries(
     let tgt = find_ref(refs, target_kind, target);
     let row = |label: String, op: DropOp| Entry::action(label, RefContextAction::Drop(op));
     // Fast-forward grays out with the reason, like the ref menu's rows.
-    let ff = |label: String| {
-        let verdict = match (graph, tgt, src) {
-            (Some(g), Some(t), Some(s)) => ff_verdict(g, t.target, s.target),
-            _ => FfVerdict::Unknown,
+    let verdict = match (graph, tgt, src) {
+        (Some(g), Some(t), Some(s)) => ff_verdict(g, t.target, s.target),
+        _ => FfVerdict::Unknown,
+    };
+    // The Merge row says what the fast-forward policy will make of this pair.
+    let merge_row = || {
+        let text = match crate::log_menu::MergeLabel::of(merge_ff, verdict) {
+            crate::log_menu::MergeLabel::Plain => msg::merge_into(source, target),
+            crate::log_menu::MergeLabel::NewCommit => msg::merge_into_commit(source, target),
+            crate::log_menu::MergeLabel::FastForwards => msg::merge_into_ff(source, target),
+            crate::log_menu::MergeLabel::FastForwardOnly => msg::merge_into_ff_only(source, target),
         };
-        match verdict.refusal(target) {
-            Some(why) => Entry::disabled(label, &why),
-            None => row(label, DropOp::FastForward),
+        let label = glyph_label("\u{21C6}", text);
+        match verdict {
+            FfVerdict::Diverged if merge_ff == gitpoulpi_core::domain::MergeFastForward::Only => {
+                Entry::disabled(label, &verdict.refusal(target).unwrap_or_default())
+            }
+            _ => row(label, DropOp::Merge),
         }
+    };
+    let ff = |label: String| match verdict.refusal(target) {
+        Some(why) => Entry::disabled(label, &why),
+        None => row(label, DropOp::FastForward),
     };
     match (source_kind, target_kind) {
         (RefRowKind::Local, RefRowKind::Local) => vec![
-            row(
-                glyph_label("\u{21C6}", msg::merge_into(source, target)),
-                DropOp::Merge,
-            ),
+            merge_row(),
             row(
                 glyph_label("\u{27F3}", msg::rebase_onto(source, target)),
                 DropOp::Rebase,
@@ -137,10 +149,7 @@ pub(crate) fn drop_menu_entries(
         )],
         (RefRowKind::Remote, RefRowKind::Local) => {
             let mut rows = vec![
-                row(
-                    glyph_label("\u{21C6}", msg::merge_into(source, target)),
-                    DropOp::Merge,
-                ),
+                merge_row(),
                 row(
                     glyph_label("\u{27F3}", msg::rebase_target_onto(target, source)),
                     DropOp::Rebase,
@@ -361,6 +370,7 @@ mod tests {
             RefRowKind::Local,
             &refs,
             Some(&graph),
+            Default::default(),
         );
         let text = entries_text(&entries);
         assert!(text.contains("Merge feature into main"), "{text}");
@@ -391,6 +401,7 @@ mod tests {
             RefRowKind::Local,
             &refs,
             Some(&graph),
+            Default::default(),
         );
         assert!(
             !labels(&entries).iter().any(|l| l.contains("Fast-forward")),
@@ -410,6 +421,7 @@ mod tests {
             RefRowKind::Remote,
             &refs,
             Some(&graph),
+            Default::default(),
         );
         assert_eq!(labels(&push), vec!["\u{21E7} Push main to origin/main"]);
         assert!(drop_menu_entries(
@@ -418,7 +430,8 @@ mod tests {
             "main",
             RefRowKind::Local,
             &refs,
-            Some(&graph)
+            Some(&graph),
+            Default::default(),
         )
         .is_empty());
     }
@@ -433,6 +446,7 @@ mod tests {
             RefRowKind::Local,
             &refs,
             Some(&graph),
+            Default::default(),
         ));
         assert!(onto_main.iter().any(|l| l.contains("Pull origin/main")));
         assert!(onto_main.iter().any(|l| l.contains("Merge origin/main")));
@@ -443,6 +457,7 @@ mod tests {
             RefRowKind::Local,
             &refs,
             Some(&graph),
+            Default::default(),
         ));
         assert!(!onto_feature.iter().any(|l| l.contains("Pull")));
     }

@@ -621,6 +621,8 @@ git_lfs_program_help = "Installez-le depuis https://git-lfs.com (Windows : four
 initialize_lfs_for_this_repository = "Initialiser LFS pour ce dépôt"
 initialize_lfs_for_this_repository_help = "Lance `git lfs install --local` : les filtres et hooks LFS dans la configuration propre à ce dépôt, jamais la globale. Nécessite git-lfs."
 pull_mode_help = "Ce que fait le bouton {$Pull}{hint} de la barre d'outils : {$merge} (avance rapide si possible), ff_only ou {$rebase}. Les entrées du ▾ du bouton lancent leur propre action tout de suite et ne changent pas ce paramètre."
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Dépôt : {repo} - ce dépôt seulement"
 inherited = "(hérité)"
 lfs_not_checked = "(pas encore vérifié)"
@@ -860,6 +862,9 @@ solo = "Solo"
 create_worktree = { git = "Créer un worktree depuis {name}...", local = "Créer un arbre de travail depuis {name}..." }
 checkout = { git = "Checkout {name}", local = "Basculer sur {name}" }
 merge_into = "{$Merge} {name} dans {head}"
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = "{$Rebase} {head} sur {name}"
 fast_forward = { git = "Fast-forward de {branch} vers {target}", local = "Avance rapide de {branch} vers {target}" }
 pull = "{$Pull}"
@@ -971,6 +976,9 @@ rewrite_workbench = "Ouvrir l'atelier..."
 
 [menu_drop]
 merge_into = "{$Merge} {source} dans {target}"
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase} {source} sur {target}"
 rebase_interactive = { git = "Rebase interactif de {source} sur {target}...", local = "Rebasage interactif de {source} sur {target}..." }
 push_to = "{$Push} {source} vers {target}"
@@ -7566,6 +7574,9 @@ commit_skip_hooks = "Contourner les hooks git par défaut à chaque {$commit}"
 commit_skip_hooks_help = { git = "L'option Ignorer les hooks du formulaire de commit est cochée au départ (`--no-verify`) : les hooks du dépôt ne s'exécutent pas. Vous pouvez toujours la changer pour un commit.", local = "L'option Ignorer les hooks du formulaire de validation est cochée au départ (`--no-verify`) : les hooks du dépôt ne s'exécutent pas. Vous pouvez toujours la changer pour une validation." }
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "Quand l'option est activée, un merge d'une branche locale place ses modifications dans l'index et s'arrête là, sans commit de merge : terminez-le vous-même depuis le volet de commit, qui s'ouvre avec le message de squash de git. Rien n'est journalisé : abandonnez les modifications pour revenir en arrière.", local = "Quand l'option est activée, la fusion d'une branche locale place ses modifications dans l'index et s'arrête là, sans validation de fusion : terminez-la vous-même depuis le volet de validation, qui s'ouvre avec le message de compression de git. Rien n'est journalisé : abandonnez les modifications pour revenir en arrière." }
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = "Préremplir un volet de {$commit} vide avec le modèle"
 template_apply_help = "Un nouveau message part du modèle ci-dessous."
 template_strip = { git = "Supprimer les lignes de commentaire lors d'un commit", local = "Supprimer les lignes de commentaire lors d'une validation" }

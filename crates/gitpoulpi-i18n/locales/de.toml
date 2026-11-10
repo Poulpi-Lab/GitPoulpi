@@ -622,6 +622,8 @@ git_lfs_program_help = "Von https://git-lfs.com installieren (Windows: in Git fo
 initialize_lfs_for_this_repository = "LFS für dieses Repository initialisieren"
 initialize_lfs_for_this_repository_help = "Führt `git lfs install --local` aus: die LFS-Filter und -Hooks in der eigenen Konfiguration dieses Repositorys, nie in Ihrer globalen. Erfordert git-lfs."
 pull_mode_help = "Was die Schaltfläche {$Pull}{hint} der Symbolleiste tut: merge (Fast-Forward, wenn möglich), ff_only oder rebase. Die ▾-Einträge der Schaltfläche führen sofort ihre eigene Aktion aus und ändern dies nicht."
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Repo: {repo} - nur dieses Repository"
 inherited = "(geerbt)"
 lfs_not_checked = "(noch nicht geprüft)"
@@ -856,6 +858,9 @@ solo = "Solo"
 create_worktree = { git = "Worktree aus {name} erstellen...", local = "Worktree aus {name} erstellen..." }
 checkout = { git = "{name} auschecken", local = "{name} auschecken" }
 merge_into = "{$Merge} von {name} in {head}"
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = "{$Rebase} von {head} auf {name}"
 fast_forward = { git = "Fast-Forward von {branch} auf {target}", local = "{branch} auf {target} vorspulen" }
 pull = "{$Pull}"
@@ -967,6 +972,9 @@ rewrite_workbench = "Werkbank öffnen..."
 
 [menu_drop]
 merge_into = "{$Merge} von {source} in {target}"
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase} von {source} auf {target}"
 rebase_interactive = { git = "Interaktiver Rebase von {source} auf {target}...", local = "Interaktiver Rebase von {source} auf {target}..." }
 push_to = "{$Push} von {source} an {target}"
@@ -7551,6 +7559,9 @@ commit_skip_hooks = "Git-Hooks standardmäßig bei jedem {$Commit} umgehen"
 commit_skip_hooks_help = "Die Option „Hooks überspringen“ im {$Commit}-Bereich ist vorab angehakt (`--no-verify`): Die Hooks des Repositorys laufen dann nicht. Für einen einzelnen {$Commit} lässt sich das weiterhin ändern."
 merge_squash = "{$Squash}"
 merge_squash_help = "Wenn an: Ein {$Merge} eines lokalen Branches legt seine Änderungen in den Index und hält dort an, ohne einen {$Merge}-{$Commit}: Schließen Sie ihn selbst im {$Commit}-Bereich ab, der sich mit der Squash-Nachricht von Git öffnet. Nichts wird im Rückgängig-Verlauf erfasst: Zum Zurücknehmen die Änderungen verwerfen."
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = "Leeren {$Commit}-Bereich mit der Vorlage vorbefüllen"
 template_apply_help = "Eine neue Nachricht beginnt mit der Vorlage unten."
 template_strip = "Kommentarzeilen beim {$Commit} weglassen"

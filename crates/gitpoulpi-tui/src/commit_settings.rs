@@ -36,6 +36,10 @@ pub(crate) struct CommitSettings {
     pub(crate) comment_char: char,
     /// The template file (`commit.template`, else the repo data dir's own).
     pub(crate) template_path: PathBuf,
+    /// Whether a merge may fast-forward here: this repository's Merge options
+    /// choice, else `git.merge_fast_forward`. The daemon resolves the same
+    /// way for the merge itself; this copy only labels the menus.
+    pub(crate) merge_ff: gitpoulpi_core::domain::MergeFastForward,
 }
 
 impl Default for CommitSettings {
@@ -47,6 +51,7 @@ impl Default for CommitSettings {
             strip_comments: false,
             comment_char: '#',
             template_path: PathBuf::new(),
+            merge_ff: gitpoulpi_core::domain::MergeFastForward::default(),
         }
     }
 }
@@ -83,6 +88,12 @@ impl CommitSettings {
                     .and_then(|v| v.as_deref()),
             ),
             template_path,
+            merge_ff: gitpoulpi_core::domain::MergeFastForward::resolve(
+                prefs.merge_fast_forward.as_deref(),
+                gitpoulpi_config::Settings::resolve_ambient()
+                    .map(|s| s.config().git.merge_fast_forward)
+                    .unwrap_or_default(),
+            ),
         }
     }
 

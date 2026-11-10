@@ -328,6 +328,13 @@ impl PreferencesState {
                 if field == RepoField::Encoding {
                     self.repo_state.preferences.encoding = value;
                 }
+                if field == RepoField::MergeFastForward {
+                    // Index 0 is (inherited); the rest follow `MergeFastForward::ALL`.
+                    self.repo_state.preferences.merge_fast_forward = next
+                        .checked_sub(1)
+                        .and_then(|i| MergeFastForward::ALL.get(i))
+                        .map(|m| m.as_str().to_string());
+                }
                 self.write_repo_state();
             }
             _ => {}

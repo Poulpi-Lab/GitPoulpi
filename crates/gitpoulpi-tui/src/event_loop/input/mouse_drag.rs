@@ -415,6 +415,7 @@ pub(super) fn up(cx: &mut CommandCtx<'_>, g: &Geo, _mouse: MouseEvent) -> io::Re
                         candidate.kind,
                         cx.refs_result.as_deref().unwrap_or(&[]),
                         cx.log_result.as_ref().ok(),
+                        cx.commit_settings.merge_ff,
                     );
                     if entries.is_empty() {
                         *cx.last_message =

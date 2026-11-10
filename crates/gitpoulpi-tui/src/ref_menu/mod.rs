@@ -495,10 +495,31 @@ pub(crate) fn ref_menu_entries(
                     RefContextAction::Checkout,
                 ));
                 entries.push(Entry::Separator);
-                entries.push(Entry::action(
-                    glyph_label("\u{21C6}", msg::merge_into(full_name, head)),
-                    RefContextAction::MergeIntoCurrent,
-                ));
+                let merge_verdict = ctx.fast_forward.head_to_this;
+                let merge_text = match crate::log_menu::MergeLabel::of(ctx.merge_ff, merge_verdict)
+                {
+                    crate::log_menu::MergeLabel::Plain => msg::merge_into(full_name, head),
+                    crate::log_menu::MergeLabel::NewCommit => {
+                        msg::merge_into_commit(full_name, head)
+                    }
+                    crate::log_menu::MergeLabel::FastForwards => {
+                        msg::merge_into_ff(full_name, head)
+                    }
+                    crate::log_menu::MergeLabel::FastForwardOnly => {
+                        msg::merge_into_ff_only(full_name, head)
+                    }
+                };
+                let merge_label = glyph_label("\u{21C6}", merge_text);
+                // Fast-forward only on a diverged branch cannot work: gray the
+                // row with the reason instead of failing after the click.
+                entries.push(match (ctx.merge_ff, merge_verdict.refusal(head)) {
+                    (gitpoulpi_core::domain::MergeFastForward::Only, Some(why))
+                        if merge_verdict == crate::log_menu::FfVerdict::Diverged =>
+                    {
+                        Entry::disabled(merge_label, &why)
+                    }
+                    _ => Entry::action(merge_label, RefContextAction::MergeIntoCurrent),
+                });
                 entries.push(
                     Entry::action(
                         glyph_label("\u{27F3}", msg::rebase_onto(head, full_name)),

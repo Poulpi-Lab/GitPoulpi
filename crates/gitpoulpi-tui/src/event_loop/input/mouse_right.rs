@@ -181,6 +181,7 @@ pub(super) fn handle(
                         unpushed_tags,
                         selected_count: 0,
                         ai_enabled: cx.ai_ui.enabled(),
+                        merge_ff: cx.commit_settings.merge_ff,
                     },
                     commit,
                     identity,
@@ -255,6 +256,7 @@ pub(super) fn handle(
                     // stashes of a comparison are not counted.
                     selected_count: cx.log_multi.newest_first(&*cx.log_result).len(),
                     ai_enabled: cx.ai_ui.enabled(),
+                    merge_ff: cx.commit_settings.merge_ff,
                 },
                 commit,
             );
@@ -568,6 +570,7 @@ pub(super) fn handle(
                                     section,
                                     full_name,
                                     &cx.remote_ui.remotes,
+                                    cx.commit_settings.merge_ff,
                                 ),
                                 refs_tree::hidden_in_graph(
                                     &*cx.hidden_from_graph,

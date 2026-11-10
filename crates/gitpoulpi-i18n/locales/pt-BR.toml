@@ -621,6 +621,8 @@ git_lfs_program_help = "Instale-o em https://git-lfs.com (Windows: incluído no 
 initialize_lfs_for_this_repository = "Inicializar o LFS neste repositório"
 initialize_lfs_for_this_repository_help = "Executa `git lfs install --local`: os filtros e hooks do LFS na configuração deste repositório, nunca na global. Exige git-lfs."
 pull_mode_help = { git = "O que o botão {$Pull}{hint} da barra de ferramentas faz: merge (fast-forward se possível), ff_only ou rebase. Os itens do ▾ do botão executam a própria ação imediatamente e não mudam isto.", local = "O que o botão {$Pull}{hint} da barra de ferramentas faz: mesclagem (fast-forward se possível), ff_only ou rebase. Os itens do ▾ do botão executam a própria ação imediatamente e não mudam isto." }
+merge_fast_forward = "{$Merge} fast-forward"
+merge_fast_forward_help = "How a {$merge} you start (branch menu, drag and drop, palette, command line) treats a branch that could simply be fast-forwarded. never: always make a {$merge} {$commit}. allowed: fast-forward when possible, as git does by default. only: fast-forward or refuse. A repository can override it on its {$Merge} options page."
 repo_heading = "Repo: {repo} - só este repositório"
 inherited = "(herdado)"
 lfs_not_checked = "(ainda não verificado)"
@@ -855,6 +857,9 @@ solo = "Solo"
 create_worktree = "Criar worktree a partir de {name}..."
 checkout = "Checkout de {name}"
 merge_into = { git = "{$Merge} de {name} em {head}", local = "Mesclar {name} em {head}" }
+merge_into_commit = "{$Merge} {name} into {head} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {name} into {head} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {name} into {head} (fast-forward only)"
 rebase_onto = "{$Rebase} de {head} sobre {name}"
 fast_forward = "Fast-forward de {branch} até {target}"
 pull = "{$Pull}"
@@ -966,6 +971,9 @@ rewrite_workbench = "Abrir o painel de reescrita..."
 
 [menu_drop]
 merge_into = { git = "{$Merge} de {source} em {target}", local = "Mesclar {source} em {target}" }
+merge_into_commit = "{$Merge} {source} into {target} ({$merge} {$commit})"
+merge_into_ff = "{$Merge} {source} into {target} (fast-forwards)"
+merge_into_ff_only = "{$Merge} {source} into {target} (fast-forward only)"
 rebase_onto = "{$Rebase} de {source} sobre {target}"
 rebase_interactive = "Rebase interativo de {source} sobre {target}..."
 push_to = { git = "{$Push} de {source} para {target}", local = "{$Push} {source} para {target}" }
@@ -7546,6 +7554,9 @@ commit_skip_hooks = "Contornar os hooks do git por padrão em todo {$commit}"
 commit_skip_hooks_help = "A opção Ignorar hooks do painel de {$commit} começa marcada (`--no-verify`): os hooks do repositório não são executados. Você ainda pode mudar isso em cada {$commit}."
 merge_squash = "{$Squash}"
 merge_squash_help = { git = "Ativado, o {$merge} de uma branch local coloca as alterações dela no índice e para aí, sem um {$commit} de {$merge}: finalize você mesmo no painel de {$commit}, que abre com a mensagem de squash do git. Nada é registrado no histórico de desfazer: descarte as alterações para voltar atrás.", local = "Ativado, a {$merge} de uma branch local coloca as alterações dela no índice e para aí, sem um {$commit} de {$merge}: finalize você mesmo no painel de {$commit}, que abre com a mensagem de combinação do git. Nada é registrado no histórico de desfazer: descarte as alterações para voltar atrás." }
+merge_fast_forward = "Fast-forward"
+merge_fast_forward_help = "never: always make a {$merge} {$commit}, even when the branch could be fast-forwarded. allowed: fast-forward when possible. only: fast-forward or refuse. (inherited): the global setting on the Git page. Squash wins over all three."
+merge_fast_forward_git = "git's {key} for this repository: {value}. It applies only when the choice above is allowed."
 template_apply = "Preencher um painel de {$commit} vazio com o modelo"
 template_apply_help = "Uma nova mensagem começa pelo modelo abaixo."
 template_strip = "Descartar linhas de comentário ao fazer um {$commit}"

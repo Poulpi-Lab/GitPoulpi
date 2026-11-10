@@ -56,8 +56,18 @@ fn fixture() -> FixtureRepo {
     repo
 }
 
+/// The authors of the history; a read that fails while a ref swap is in
+/// flight (the rewrite's apply or undo) is retried.
 fn names(repo: &FixtureRepo) -> Vec<String> {
-    repo.git(&["log", "--format=%an"])
+    let mut out = None;
+    for _ in 0..100 {
+        out = repo.try_git(&["log", "--format=%an"]);
+        if out.is_some() {
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    out.unwrap_or_else(|| repo.git(&["log", "--format=%an"]))
         .lines()
         .map(str::to_string)
         .collect()

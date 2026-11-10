@@ -32,7 +32,15 @@ fn fixture() -> FixtureRepo {
         .build()
 }
 
+/// The messages of the history; a read that fails while a ref swap is in
+/// flight (the rewrite's apply or undo) is retried.
 fn bodies(repo: &FixtureRepo) -> String {
+    for _ in 0..100 {
+        if let Some(out) = repo.try_git(&["log", "--format=%B%x00"]) {
+            return out;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
     repo.git(&["log", "--format=%B%x00"])
 }
 
@@ -63,39 +71,31 @@ fn a_signed_off_by_is_added_to_the_last_three_commits_and_undo_takes_it_away() {
     .unwrap_or_else(|e| panic!("{e}"));
 
     // Right-click the oldest of the three: "From this commit to HEAD...".
-    let (col, row) = term.wait_for_text("second change", STEP).unwrap();
-    term.right_click(col + 1, row)
-        .expect("right-click the commit");
-    let menu = term
-        .wait_for("the commit menu", STEP, |s| s.contains("Rewrite history"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = menu.find("Rewrite history").unwrap();
-    term.click(c + 1, r).expect("click Rewrite history");
-    let menu = term
-        .wait_for("the submenu rows", STEP, |s| {
-            s.contains("From this commit to HEAD...")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = menu.find("From this commit to HEAD...").unwrap();
-    term.click(c + 1, r).expect("click From this commit");
-    term.wait_for("the workbench scoped after the parent", STEP, |s| {
-        s.contains("Rewrite history") && s.contains("Only commits after")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    common::right_click_text_until(&mut term, "second change", "the commit menu", |s| {
+        s.contains("Rewrite history")
+    });
+    common::click_text_until(&mut term, "Rewrite history", "the submenu rows", |s| {
+        s.contains("From this commit to HEAD...")
+    });
+    common::click_text_until(
+        &mut term,
+        "From this commit to HEAD...",
+        "the workbench scoped after the parent",
+        |s| s.contains("Rewrite history") && s.contains("Only commits after"),
+    );
 
     // Add menu: the trailer rule.
     term.send_text("a").unwrap();
-    let menu = term
-        .wait_for("the Add menu", STEP, |s| {
-            s.contains("Add or remove a trailer")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = menu.find("Add or remove a trailer").unwrap();
-    term.click(c + 1, r).expect("click the trailer rule");
-    term.wait_for("the rule's fields", STEP, |s| {
-        s.contains("If it already exists") && s.contains("Signed-off-by")
+    term.wait_for("the Add menu", STEP, |s| {
+        s.contains("Add or remove a trailer")
     })
     .unwrap_or_else(|e| panic!("{e}"));
+    common::click_text_until(
+        &mut term,
+        "Add or remove a trailer",
+        "the rule's fields",
+        |s| s.contains("If it already exists") && s.contains("Signed-off-by"),
+    );
     // Fields: Action, Trailer (Signed-off-by), Value.
     term.send_keys("Down").unwrap();
     term.send_keys("Down").unwrap();
@@ -114,18 +114,13 @@ fn a_signed_off_by_is_added_to_the_last_three_commits_and_undo_takes_it_away() {
 
     // Preview: the Commits tab shows the trailer each commit gets.
     term.send_keys("F5").unwrap();
-    term.wait_for("the summary", STEP, |s| s.contains("keep their id"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    let summary = term.screen();
-    assert!(summary.contains("3 of 3"), "{}", summary.text());
-    let (c, r) = summary.find("Commits").expect("the Commits tab");
-    term.click(c + 1, r).expect("click the Commits tab");
-    let rows = term
-        .wait_for("the message changes", STEP, |s| {
-            s.contains("message: +Signed-off-by: Sam Roe")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(!rows.contains("message: first"), "{}", rows.text());
+    term.wait_for("the summary counting three commits", STEP, |s| {
+        s.contains("keep their id") && s.contains("3 of 3")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    common::click_text_until(&mut term, "Commits", "the message changes", |s| {
+        s.contains("message: +Signed-off-by: Sam Roe") && !s.contains("message: first")
+    });
     assert_eq!(
         repo.git(&["rev-parse", "HEAD"]),
         before,
@@ -150,7 +145,7 @@ fn a_signed_off_by_is_added_to_the_last_three_commits_and_undo_takes_it_away() {
     // Undo puts the old commits back.
     term.send_keys("C-z").unwrap();
     wait_until("the old tip is back", || {
-        repo.git(&["rev-parse", "HEAD"]) == before
+        repo.try_git(&["rev-parse", "HEAD"]).as_deref() == Some(before.as_str())
     });
     assert!(!bodies(&repo).contains("Signed-off-by"));
 }

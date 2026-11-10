@@ -74,8 +74,18 @@ fn fixture() -> FixtureRepo {
     repo
 }
 
+/// The authors of the history; a read that fails while a ref swap is in
+/// flight (the rewrite's apply or undo) is retried.
 fn names(repo: &FixtureRepo) -> Vec<String> {
-    repo.git(&["log", "--format=%an"])
+    let mut out = None;
+    for _ in 0..100 {
+        out = repo.try_git(&["log", "--format=%an"]);
+        if out.is_some() {
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    out.unwrap_or_else(|| repo.git(&["log", "--format=%an"]))
         .lines()
         .map(str::to_string)
         .collect()
@@ -175,22 +185,14 @@ fn a_shell_script_written_here_is_tested_previewed_applied_and_undone() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("F5").unwrap();
-    let screen = term
-        .wait_for("the test result", STEP, |s| {
-            s.contains("3 commits tested, 3 would change.")
-                && s.contains("author name: Old Name -> OLD NAME")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        screen.contains("3 commits tested, 3 would change."),
-        "{}",
-        screen.text()
-    );
-    assert!(
-        !screen.contains("Trust this script?"),
-        "a script typed here is not asked about\n{}",
-        screen.text()
-    );
+    // No "Trust this script?" in the whole state: a script typed here is not
+    // asked about.
+    term.wait_for("the test result, no trust question", STEP, |s| {
+        s.contains("3 commits tested, 3 would change.")
+            && s.contains("author name: Old Name -> OLD NAME")
+            && !s.contains("Trust this script?")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(names(&repo), original, "a test writes nothing");
 
     term.send_keys("Esc").unwrap();
@@ -199,12 +201,10 @@ fn a_shell_script_written_here_is_tested_previewed_applied_and_undone() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("F5").unwrap();
-    let screen = term
-        .wait_for("the summary", STEP, |s| {
-            s.contains("keep their id") && s.contains("3 of 3")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(screen.contains("3 of 3"), "{}", screen.text());
+    term.wait_for("the summary", STEP, |s| {
+        s.contains("keep their id") && s.contains("3 of 3")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(names(&repo), original, "the preview changes nothing");
     term.send_keys("C-s").unwrap();
     term.wait_for("the result panel", STEP, |s| s.contains("Rewrote 3"))
@@ -252,18 +252,12 @@ fn a_script_nobody_wrote_asks_for_trust_with_no_default() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("F5").unwrap();
-    let screen = term
-        .wait_for("the question with both answers", STEP, |s| {
-            s.contains("Trust this script?")
-                && s.contains("Trust it and go on")
-                && s.contains("Do not trust it")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        screen.contains("Trust it and go on") && screen.contains("Do not trust it"),
-        "{}",
-        screen.text()
-    );
+    term.wait_for("the question with both answers", STEP, |s| {
+        s.contains("Trust this script?")
+            && s.contains("Trust it and go on")
+            && s.contains("Do not trust it")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     // Enter alone does not answer: no default.
     term.send_keys("Enter").unwrap();
     term.wait_for("still asking", STEP, |s| s.contains("Trust this script?"))
@@ -282,11 +276,11 @@ fn a_script_nobody_wrote_asks_for_trust_with_no_default() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("1").unwrap();
-    let screen = term
-        .wait_for("the test result", STEP, |s| {
-            s.contains("would change") && s.contains("author name: Old Name -> OLD NAME")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(!screen.contains("Trust this script?"), "{}", screen.text());
+    term.wait_for("the test result, the question gone", STEP, |s| {
+        s.contains("would change")
+            && s.contains("author name: Old Name -> OLD NAME")
+            && !s.contains("Trust this script?")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(names(&repo), original, "a test writes nothing");
 }

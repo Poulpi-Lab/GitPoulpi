@@ -70,15 +70,22 @@ fn extracting_a_folder_into_a_clone_opens_a_tab_with_only_that_history() {
 
     // The Move dropdown: Extract a folder as the root.
     term.send_keys("Enter").unwrap();
-    let menu = term
-        .wait_for("the kinds", STEP, |s| {
-            s.contains("Extract a folder as the root")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = menu.find("Extract a folder as the root").unwrap();
-    term.click(c + 1, r).expect("click the kind");
-    term.wait_for("the Folder field", STEP, |s| s.contains("Folder"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    term.wait_for("the kinds", STEP, |s| {
+        s.contains("Extract a folder as the root")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    common::retry_until(
+        &mut term,
+        "the Folder field",
+        4,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find("Extract a folder as the root") {
+                t.click(c + 1, r).expect("click the kind");
+            }
+        },
+        |s| s.contains("Folder"),
+    );
     term.send_keys("Down").unwrap();
     term.send_keys("Enter").unwrap();
     term.send_text("lib").unwrap();
@@ -89,31 +96,22 @@ fn extracting_a_folder_into_a_clone_opens_a_tab_with_only_that_history() {
     // The whole post-condition is in the wait: the dialog paints top down,
     // so its title and first line can be on screen before the highlighted
     // way's note and the answers (testing.md, waiting pattern 1).
-    let ask = term
-        .wait_for(
-            "the extract question with its note and answers",
-            STEP,
-            |s| {
-                s.contains("How should the folder be extracted?")
-                    && s.contains("The clone opens in a new tab.")
-                    && s.contains("Into a new clone")
-            },
-        )
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        ask.contains("The clone opens in a new tab."),
-        "the highlighted way says what it does\n{}",
-        ask.text()
-    );
+    term.wait_for(
+        "the extract question with its note and answers",
+        STEP,
+        |s| {
+            s.contains("How should the folder be extracted?")
+                && s.contains("The clone opens in a new tab.")
+                && s.contains("Into a new clone")
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(refs(&repo), before);
-    let (c, r) = ask.find("Into a new clone").unwrap();
-    term.click(c + 1, r).expect("click the clone answer");
+    common::click_text_until(&mut term, "Into a new clone", "the folder picker", |s| {
+        s.contains("Where should the new repository go?")
+    });
 
     // The folder picker: type the folder, choose it.
-    term.wait_for("the folder picker", STEP, |s| {
-        s.contains("Where should the new repository go?")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Tab").unwrap();
     let path = out.path().display().to_string().replace('\\', "/");
     term.send_text(&path).unwrap();
@@ -121,14 +119,12 @@ fn extracting_a_folder_into_a_clone_opens_a_tab_with_only_that_history() {
     term.send_keys("C-s").unwrap();
 
     // The preview is the new repository's history, and says where it goes.
-    let summary = term
-        .wait_for("the summary", STEP, |s| s.contains("New repository:"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        summary.contains("This repository is not changed."),
-        "{}",
-        summary.text()
-    );
+    term.wait_for(
+        "the summary saying the repository is unchanged",
+        STEP,
+        |s| s.contains("New repository:") && s.contains("This repository is not changed."),
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(refs(&repo), before, "the preview changes nothing");
 
     // Apply: the new repository is made and opens in a new tab.

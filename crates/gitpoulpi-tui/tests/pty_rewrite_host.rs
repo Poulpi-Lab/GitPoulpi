@@ -149,11 +149,18 @@ fn a_host_refusal_offers_the_three_ways_with_the_exact_settings_page() {
     // By key (and by mouse: both reach the same overlay).
     term.send_keys("M-h").unwrap();
     let howto = term
-        .wait_for("the three ways", STEP, |s| {
-            s.contains("1. Temporarily lift the protection")
-                && s.contains("2. Push the rewrite under a new branch name")
-                && s.contains("3. Last resort: delete and recreate")
-        })
+        .wait_for(
+            "the three ways, with their pages and the host note",
+            STEP,
+            |s| {
+                s.contains("1. Temporarily lift the protection")
+                    && s.contains("2. Push the rewrite under a new branch name")
+                    && s.contains("3. Last resort: delete and recreate")
+                    && s.contains("https://github.com/octo/thing/settings/branches")
+                    && s.contains("https://github.com/octo/thing/settings/rules")
+                    && s.contains("not linked to a host")
+            },
+        )
         .unwrap_or_else(|e| panic!("{e}"));
     // Way 1's two pages: the classic rules and the rulesets.
     for page in ["settings/branches", "settings/rules"] {

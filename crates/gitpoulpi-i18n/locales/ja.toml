@@ -484,7 +484,7 @@ tested = "サンプル画像を「{label}」で開いています..."
 
 [settings_ssh]
 private_key_path = "秘密鍵のパス"
-private_key_path_help = { git = "{$fetch}・{$pull}・{$push}・clone が ssh に提示する鍵ファイルです（ssh -i <鍵> -o IdentitiesOnly=yes）。空欄：従来どおり ssh-agent と ssh 設定を使います。GIT_SSH_COMMAND または core.sshCommand（例：このリポジトリの SSH 鍵）が設定されている場合は無視されます。次回の転送から有効です。", local = "{$fetch}・{$pull}・{$push}・クローンが ssh に提示する鍵ファイルです（ssh -i <鍵> -o IdentitiesOnly=yes）。空欄：従来どおり ssh-agent と ssh 設定を使います。GIT_SSH_COMMAND または core.sshCommand（例：このリポジトリの SSH 鍵）が設定されている場合は無視されます。次回の転送から有効です。" }
+private_key_path_help = { git = "{$fetch}・{$pull}・{$push}・clone が ssh に提示する鍵ファイルです（ssh -i <鍵> -o IdentitiesOnly=yes）。空欄：従来どおり ssh-agent と ssh 設定を使います。リポジトリが独自の鍵を選んでいる場合（SSH と認証情報）、または GIT_SSH_COMMAND か core.sshCommand が設定されている場合は使われません。次回の転送から有効です。", local = "{$fetch}・{$pull}・{$push}・クローンが ssh に提示する鍵ファイルです（ssh -i <鍵> -o IdentitiesOnly=yes）。空欄：従来どおり ssh-agent と ssh 設定を使います。リポジトリが独自の鍵を選んでいる場合（SSH と認証情報）、または GIT_SSH_COMMAND か core.sshCommand が設定されている場合は使われません。次回の転送から有効です。" }
 public_key_path = "公開鍵のパス"
 public_key_path_help = "秘密鍵のパスが空のときだけ使われます。ssh は ssh-agent（またはハードウェアキー）が保持する対応する鍵を選び、エージェントの全鍵を提示しません。「鍵ペアを生成」で両方が入力されます。優先順位は秘密鍵のパスと同じです。"
 key_type = "鍵の種類"
@@ -4085,7 +4085,7 @@ hosting_3 = "{$Pr}の作成|{$PRS}見出しの + またはそのセクション�
 hosting_4 = "Issue|ISSUES セクションに一覧が出ます。+ または n で作成。行のメニューでブラウザーで開くなどの操作。"
 hosting_5 = "参照|{$commit}メッセージやブランチ名の Issue と{$pr}の参照（#12、!53、ABC-7）が認識されます。{$commit}フォームの Alt+R で挿入。"
 hosting_6 = "ツールバーのチップ|ツールバーのチップに、現在のブランチの{$pr}（GH #12、GL !53）か、作成用の薄い「+ {$pr_abbr}」が出ます。クリックしてください。"
-hosting_7 = "SSH 鍵|プロファイルごと（設定 > プロファイル）またはリポジトリごと（タブメニュー > 「SSH 鍵...」）に SSH 鍵を選びます。パスフレーズはシステムの ssh-agent に残ります。"
+hosting_7 = "SSH 鍵|プロファイルごと（設定 > プロファイル）またはリポジトリごと（タブメニュー > 「SSH と認証情報...」）に SSH 鍵を選びます。パスフレーズはシステムの ssh-agent に残ります。"
 setup_1 = "設定|Ctrl+, または歯車。Tab でページ一覧とオプションを切替、j / k で移動、Enter か Space で値を変更、/ か Ctrl+F で全オプションを検索、Esc で閉じる。"
 setup_2 = "テーマ|設定 > 外観 > テーマ：ダーク、ライト、ターミナルに合わせる、または多数のプリセット。Ctrl+N の後にキーで、設定を開かずにテーマ・言語・グラフの色も変更できます。"
 setup_3 = "言語|設定 > 一般 > 言語は 17 言語に対応。「git 用語を翻訳」で、git 自身の用語（{$commit}、{$push}...）も翻訳するかを決めます。"
@@ -9070,7 +9070,7 @@ argv_label = "実行内容"
 hosts_label = "ホスト"
 hosts_help = "ホスト名をカンマで区切ります。空欄の場合はメインのリモートのホストです。"
 cache_label = "キャッシュ（分）"
-cache_help = "出力されたトークンを再利用する時間です。空欄の場合は 50 分です。"
+cache_help = "出力されたトークンを再利用する時間です。空欄にすると 50 分です。"
 command_warning = "このコマンドは、このリポジトリが{$fetch}または{$push}するたびに、お使いのコンピューターで実行されます。自分で書いたか、信頼できるコマンドだけを使ってください。リポジトリのフォルダー内にある場合、ファイルが変更されると GitPoulpi は再度確認します。"
 import_helper = "このリポジトリの現在のヘルパーを使う"
 import_none = "このリポジトリには使える認証情報ヘルパーがありません。"

@@ -79,7 +79,21 @@ fn the_base_branches_editor_takes_click_drag_double_click_and_shift_click() {
     let (mut term, _config) = launch(repo.root(), "pty-conflict-field-mouse");
     wait_badge(&mut term);
     open_page(&mut term);
-    click_text(&mut term, "Base branches");
+    // The patterns are editable once the repository keeps its own list.
+    click_text(&mut term, "Base branches from");
+    term.wait_for("the source choices", STEP, |s| {
+        s.contains("\u{2713} Default")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The menu item, not the help text that also names Own list.
+    let (c, r) = text_pos(&term, "Own list     ");
+    term.click(c + 1, r).expect("click Own list");
+    term.wait_for("Own list chosen", STEP, |s| {
+        s.contains("Own list") && !s.contains("Default (every branch)")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (c, r) = text_pos(&term, "Base branches  ");
+    term.click(c, r).expect("click the patterns row");
     term.wait_for("the editor", STEP, |s| {
         s.contains("Save") && s.contains("Cancel")
     })

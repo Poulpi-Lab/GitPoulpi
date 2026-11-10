@@ -317,7 +317,7 @@ A setting made elsewhere always wins over these paths. The order, highest first:
    [SSH & credentials](#repo-specific-ssh--credentials) page (the repo-specific group).
 1. `GIT_SSH_COMMAND` or `GIT_SSH` in the environment GitPoulpi runs in.
 2. `core.sshCommand` in the repository's git config or your global git config.
-   The tab menu's *SSH key...* item writes this for one repository.
+   Older versions' tab menu *SSH key...* item wrote this for one repository; SSH & credentials offers to move it into GitPoulpi.
 3. The two key paths of this page.
 4. ssh's own defaults and the agent.
 

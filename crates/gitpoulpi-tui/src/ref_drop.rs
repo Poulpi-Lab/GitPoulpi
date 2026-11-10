@@ -391,6 +391,57 @@ mod tests {
         format!("{entries:?}")
     }
 
+    /// The Merge row says what the policy will make of a pair that could
+    /// fast-forward (`feature` is ahead of `main`), and the explicit
+    /// Fast-forward row stays beside it under every policy.
+    #[test]
+    fn the_merge_row_names_what_the_fast_forward_policy_does() {
+        use gitpoulpi_core::domain::MergeFastForward as P;
+        let (refs, graph) = fixture();
+        let rows = |policy: P, source: &str, target: &str| {
+            labels(&drop_menu_entries(
+                source,
+                RefRowKind::Local,
+                target,
+                RefRowKind::Local,
+                &refs,
+                Some(&graph),
+                policy,
+            ))
+        };
+        let merge_row = |policy: P| {
+            rows(policy, "feature", "main")
+                .into_iter()
+                .find(|l| l.contains("Merge feature"))
+                .unwrap()
+        };
+        assert!(merge_row(P::Never).ends_with("Merge feature into main (merge commit)"));
+        assert!(merge_row(P::Allowed).ends_with("Merge feature into main (fast-forwards)"));
+        assert!(merge_row(P::Only).ends_with("Merge feature into main (fast-forward only)"));
+        for policy in P::ALL {
+            assert!(
+                rows(*policy, "feature", "main")
+                    .iter()
+                    .any(|l| l.ends_with("Fast-forward main to feature")),
+                "{policy:?}: the explicit fast-forward stays one gesture away"
+            );
+        }
+        // A pair that cannot fast-forward: nothing to explain.
+        for policy in [P::Never, P::Allowed] {
+            let diverged = rows(policy, "side", "main");
+            assert!(
+                diverged.iter().any(|l| l.ends_with("Merge side into main")),
+                "{policy:?}: {diverged:?}"
+            );
+        }
+        // Only on a diverged pair: grayed out with the reason, not offered live.
+        let only = rows(P::Only, "side", "main");
+        assert!(
+            !only.iter().any(|l| l.contains("Merge side")),
+            "a live row would fail after the click: {only:?}"
+        );
+    }
+
     #[test]
     fn a_diverged_fast_forward_is_grayed_out_not_offered() {
         let (refs, graph) = fixture();

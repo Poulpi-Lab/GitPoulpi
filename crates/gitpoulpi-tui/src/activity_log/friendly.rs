@@ -373,7 +373,7 @@ mod tests {
         });
         assert_eq!(
             refused,
-            "GitPoulpi did not send the account token to evil.example: it is not github.com, that account's address."
+            "GitPoulpi did not send the account token to evil.example: that is not github.com, the address this account is bound to."
         );
         let silent = crate::daemon_link::error_text::error_text(&CoreError::TokenCommandFailed {
             exit: None,

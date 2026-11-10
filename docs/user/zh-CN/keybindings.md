@@ -616,9 +616,9 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 远程：Fetch 远程… |  |
 | 远程：所选远程的操作… | `.` |
 | 仓库：稀疏检出… |  |
-| Repository: SSH & Credentials... |  |
-| Repository: Test Connection |  |
-| Repository: Use Default Credentials |  |
+| 仓库：SSH 与凭据... |  |
+| 仓库：测试连接 |  |
+| 仓库：使用默认凭据 |  |
 | Flow：打开菜单 | `Ctrl+G W` |
 | Flow：开始分支… |  |
 | Flow：新建议题… |  |

@@ -1158,8 +1158,8 @@ Klávesy jsou výchozí.
 | Integrace: Zkontrolovat zabezpečení |  |
 | Aplikace: Ukončit | `q` |
 | Aplikace: Motiv... |  |
-| Conflicts: Edit Base Branch Lists... |  |
-| Conflicts: Base Branches of This Repository... |  |
+| Konflikty: Upravit seznamy základních větví... |  |
+| Konflikty: Základní větve tohoto repozitáře... |  |
 | Aplikace: Změnit motiv... | `Ctrl+N y` |
 | Aplikace: Změnit jazyk... | `Ctrl+N g` |
 | Spouštěč: Vytvořit zástupce |  |

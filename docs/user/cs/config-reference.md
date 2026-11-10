@@ -61,7 +61,7 @@ projeví okamžitě (nebo při dalším obnovení, fetch či zavření Nastaven�
 | `general.startup_tab_launcher` | `"last"` | Karta, na které se aplikace otevře, když ji spustí zástupce na ploše nebo v nabídce Start, který GitPoulpi vytvořil (předává `--launcher`), ať je složka jakákoli: `"home"`, `"last"` nebo `"radar"`. Má přednost před dvěma nastaveními výše. `"last"` je Domů při vypnutém `remember_tabs` nebo když si nic nepamatuje; `"radar"` je Domů, když je Radar vypnutý nebo není v sestavení. Čte se jednou při startu; vyžaduje restart. |
 | `general.group_worktree_tabs` | `true` | Karty propojených worktree repozitáře drží hned za kartou tohoto repozitáře: při otevření worktree, při odtažení karty worktree (vrátí se ke své skupině; karta repozitáře je hlavou skupiny a její worktree ji následují) a při zapnutí tohoto nastavení. Vypnuto nechá karty, kam je dáte. |
 | `general.undo_depth` | `100` | Kolik operací může Zpět vrátit; `0` = neomezeně. |
-| `general.conflict_detection` | `true` | Proaktivní detekce konfliktů: odznak v Logu, když by merge aktuální větve do větve, ze které vznikla, skončil konfliktem; počítá se na pozadí (merge v paměti: vaše soubory, index ani refy se nemění). Repozitář ji může pro sebe vypnout (`[preferences] conflict_detection`). Viz [Řešení konfliktů při slučování](merge-conflicts.md#prevence-konfliktů). |
+| `general.conflict_detection` | `true` | Proaktivní detekce konfliktů: odznak v Logu, když by merge aktuální větve do větve, ze které vznikla, skončil konfliktem; počítá se na pozadí (merge v paměti: vaše soubory, index ani refy se nemění). Repozitář ji může pro sebe vypnout (`[preferences] conflict_detection`). Základní větve, se kterými se porovnává, mají vlastní seznamy: [`[conflict_prevention]`](#conflict_prevention-seznamy-základních-větví). Viz [Řešení konfliktů při slučování](merge-conflicts.md#prevence-konfliktů). |
 | `general.dev_mode` | chybí (automaticky) | Pro ty, kdo GitPoulpi sestavují z klonu repozitáře; v Nastavení se nikdy nezobrazuje. Chybí: zapnuto, když spuštěný program leží v `<checkout>/target/<profile>/` (`Cargo.toml` a `crates/gitpoulpi-tui` vedle `target`). `true` / `false` ho vynutí. Režim vývojáře odemyká jen `ui.launcher_build`. |
 | `general.journal_outside` | `true` | Zaznamenává, co shell nebo AI agent udělá s větvemi, tagy, stashi a HEADem, jako položky historie vrácení označené jako externí, takže je `Ctrl+Z` může vzít zpět. Úpravy souborů se nikdy nezachycují. Vyžaduje `undo_enabled`. Viz [Zpět a znovu](undo-redo.md#změny-provedené-mimo-gitpoulpi). |
 | `general.undo_enabled` | `true` | `false`: žádná evidence pro vracení (nejrychlejší), historie vracení se smaže, tlačítka Zpět/Znovu zmizí. Viz [Zpět a znovu](undo-redo.md). |
@@ -261,6 +261,7 @@ Editor konfliktů merge ([Řešení konfliktů merge](merge-conflicts.md)). Zobr
 |---|---|---|
 | `git.pull_mode` | `"merge"` | Co dělá Pull (tlačítko, `Ctrl+G p`, `Git: Pull`): `merge` (fast-forward, je-li to možné), `ff_only`, `rebase`. Gitu se vždy předává výslovně. Starý `fetch_all` se čte jako `merge`. |
 | `git.push_behavior` | `"direct"` | `direct` pushuje do výchozího remote; `ask` nejprve zobrazí nabídku remote. |
+| `git.merge_fast_forward` | `"never"` | Co udělá merge, který spustíte (nabídka větve, přetažení, paleta, `gitpoulpi merge`), když lze větev posunout fast-forwardem: `never` vždy vytvoří merge commit (`--no-ff`), `allowed` provede fast-forward, když lze (výchozí chování gitu, platí `merge.ff`), `only` provede fast-forward, nebo odmítne. Vlastní volba repozitáře (Nastavení > Možnosti merge, `merge_fast_forward` v jeho `repo-state.toml`) má přednost; přepínače CLI `--ff`, `--no-ff` a `--ff-only` mají přednost před oběma. Okamžitě. |
 | `git.default_encoding` | `"utf-8"` | Kódování textu, který **není** platné UTF-8 (obsah souborů, blame, diffy, zprávy commitů bez hlavičky `encoding`): libovolný popisek WHATWG (`windows-1252`, `shift_jis`, ...). Jen zobrazení; staging nikdy nepřekóduje. Repozitář ho může přepsat. |
 | `git.lfs_enabled` | `true` | Zobrazí a ovládá Git LFS. Repozitář ho může přepsat. Viz [Git LFS](lfs.md). |
 | `git.lfs_autofix_filters` | `true` | Před pull nebo push repozitáře používajícího LFS nainstaluje jeho filtry LFS / hook pre-push (`git lfs install --local`, jen tento repozitář), pokud chybějí. Viz [Git LFS](lfs.md). |
@@ -514,6 +515,17 @@ Správce může v souboru politiky platné pro celý počítač nebo v registru 
 | `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Vzory cest ve stylu gitignore. Vzor bez `/` odpovídá názvu souboru v jakékoli hloubce, vzor s `/` celé cestě (úvodní `/` ho ukotví v kořeni); `*` a `?` zůstávají uvnitř jedné složky, `**` složky překračuje; `!` znovu povolí to, čemu odpovídal dřívější vzor, a vyhrává poslední shoda; velikost písmen se ignoruje. Používá je ochrana přidávání do indexu a `ai.privacy.exclude_sensitive_files`. |
 | `privacy.staging_guard` | `true` | Přidání souboru do indexu, který odpovídá vzoru nebo jehož obsah obsahuje rozpoznanou tajnou hodnotu, se nejprve zeptá (TUI), je odmítnuto, pokud není zadáno `--allow-sensitive` (CLI), nebo pokud `mcp.allow_sensitive_staging` nedovolí agentovi předat `allow_sensitive` (MCP). Čtou se textové soubory do 1 MiB každý a 32 MiB celkem; binární soubory se porovnávají jen podle názvu. Viz [Přidávání do indexu a commitování](staging-and-committing.md#citlivé-soubory). |
 
+## `[conflict_prevention]` (seznamy základních větví)
+
+Které větve smí proaktivní detekce konfliktů vzít za základ aktuální větve, je seznam vzorů (viz [Řešení konfliktů při slučování](merge-conflicts.md#prevence-konfliktů)). Seznamy mohou mít názvy a být sdílené; upravuje je Nastavení > Obecné > Prevence konfliktů.
+
+| Klíč | Výchozí | Hodnoty a účinek |
+|---|---|---|
+| `conflict_prevention.default_list` | `""` | Název seznamu, který repozitář používá, když nemá vlastní. Prázdný, nebo název, který žádný seznam nemá, znamená vestavěné `**` (každá větev). Čte se znovu při každé kontrole, takže změna platí pro otevřené repozitáře bez restartu. |
+| `conflict_prevention.lists` | žádné | Pojmenované seznamy, každý jako jedna tabulka: `[conflict_prevention.lists.release]` s `patterns = ["origin/release/**", "!origin/release/old"]`. Prázdné `patterns` povolí každou větev. Úprava seznamu platí pro každý repozitář, který ho sleduje. |
+
+Který seznam repozitář sleduje, je v jeho `repo-state.toml` (níže). Pořadí přednosti: vlastní vzory repozitáře, pak pojmenovaný seznam, který sleduje, pak `default_list`, pak `**`.
+
 ## `[keybindings]`
 
 Přiřazuje zkratky TUI znovu; upravuje je Nastavení > Klávesnice a myš.
@@ -552,7 +564,9 @@ zřídka.
 | `[preferences] squash_merge` | Merge lokální větve dělá squash: přidá do indexu, bez merge commitu (bez záznamu vypnuto) | Nastavení > Nastavení repozitáře > Možnosti merge |
 | `[preferences] template_apply`, `template_strip_comments` | Předvyplnit prázdný formulář commitu šablonou; při commitu odstranit řádky komentářů `#` (obojí bez záznamu vypnuto) | Nastavení > Nastavení repozitáře > Šablona zprávy |
 | `[preferences] conflict_detection` | Proaktivní detekce konfliktů pro tento repozitář; bez záznamu platí `general.conflict_detection` | Nastavení > Nastavení repozitáře > Prevence konfliktů |
-| `[preferences] conflict_base_branches` | Vzory Základních větví, jeden na řádek (bez záznamu `**`) | Nastavení > Nastavení repozitáře > Prevence konfliktů |
+| `[preferences] conflict_base_branches` | Vlastní vzory Základních větví repozitáře, jeden na řádek (dál se používají jako **Vlastní seznam**) | Nastavení > Nastavení repozitáře > Prevence konfliktů |
+| `[preferences] conflict_base_source` | Odkud Základní větve pocházejí: `default` (globální výchozí seznam), `list` (`conflict_base_list`) nebo `own` (`conflict_base_branches`). Bez záznamu: vlastní vzory, pokud nějaké jsou, jinak výchozí | Nastavení > Nastavení repozitáře > Prevence konfliktů |
+| `[preferences] conflict_base_list` | `[conflict_prevention.lists.<name>]`, který tento repozitář sleduje, když je zdrojem `list`; smazaný seznam se vrátí k výchozímu | Nastavení > Nastavení repozitáře > Prevence konfliktů |
 | `commit-template.txt` (soubor vedle `repo-state.toml`) | Šablona commitu; ukazuje na ni `commit.template` gitu | Nastavení > Nastavení repozitáře > Šablona zprávy |
 | `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: instrukce AI tohoto repozitáře | Nastavení > Nastavení repozitáře > AI |
 | `[preferences.ai_overrides.<action>]` | `profile`, `instructions` pro jednu akci zde | Nastavení > Nastavení repozitáře > AI |

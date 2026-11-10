@@ -209,6 +209,14 @@ cíle se rozsvítí; po uvolnění se zobrazí nabídka:
 `Esc` přetažení zruší. Klávesovým ekvivalentem je příkaz z palety
 *Refs: Pustit vybraný ref na přepnutou větev...*.
 
+**Merge, nebo fast-forward.** Když cíl nemá žádný vlastní commit (přetažená větev je jen před ním), merge by mohl cíl
+prostě posunout dopředu. Ve výchozím stavu (Nastavení > Git > **Merge fast-forward** = *never*, nebo vlastní volba
+repozitáře na jeho stránce Možnosti merge) řádek nabídky zní *Merge x do y (merge commit)* a vytvoří skutečný merge
+commit, takže historie větev zachová; chcete-li prosté posunutí, použijte samostatný řádek *Fast-forward y na x* (pro
+přímou linii použijte místo toho *Rebase*). S *allowed* řádek Merge zní *(fast-forward)* a s *only*
+*(jen fast-forward)*, zašedlý s důvodem, když se větve rozešly. Stejné řádky a popisky jsou i v nabídce samotné větve
+a `gitpoulpi merge --ff | --no-ff | --ff-only` volí pro jednotlivý merge.
+
 ## Nabídka commitu
 
 Kliknutím pravým tlačítkem na commit (nebo `.` na něm) otevřete jeho nabídku:

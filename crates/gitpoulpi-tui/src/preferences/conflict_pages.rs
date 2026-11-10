@@ -483,7 +483,7 @@ impl PreferencesState {
         match button {
             RpButton::ConflictResetGlobal => {
                 self.config.conflict_prevention.default_list.clear();
-                self.write_conflict_lists(&t::RESET_DEFAULT.get().to_string());
+                self.write_conflict_lists(t::RESET_DEFAULT.get());
             }
             RpButton::ConflictListDefault(index) => {
                 if let Some(name) = self.list_names().get(index).cloned() {

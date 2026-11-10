@@ -289,3 +289,8 @@ repo = "Poulpi-Lab/GitPoulpi"
 [privacy]
 sensitive_patterns = [".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]
 staging_guard = true
+
+[conflict_prevention]
+default_list = ""
+
+[conflict_prevention.lists]

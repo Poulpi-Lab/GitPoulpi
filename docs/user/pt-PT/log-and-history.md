@@ -216,6 +216,14 @@ destinos válidos acendem-se; largue para obter um menu:
 `Esc` cancela um arrastamento. O equivalente de teclado é o comando da paleta
 *Refs: largar a ref selecionada na branch em checkout...*.
 
+**Merge ou fast-forward.** Quando o destino não tem nenhum commit próprio (a branch arrastada está apenas à frente dele), um
+merge podia simplesmente mover o destino para a frente. Por predefinição (Definições > Git > **Fast-forward do merge** = *never*,
+ou a escolha própria de um repositório na sua página Opções de merge) a linha do menu diz *Merge de x em y (commit de merge)* e faz um
+verdadeiro commit de merge, para que o histórico guarde a branch; use a linha separada *Fast-forward de y até x* quando quiser a simples
+movimentação (para uma linha reta, use antes *Rebase*). Com *allowed* a linha de Merge diz *(avança por fast-forward)* e com *only*
+*(apenas fast-forward)*, a cinzento e com o motivo quando as branches divergiram. As mesmas linhas e etiquetas estão no menu
+da própria branch, e `gitpoulpi merge --ff | --no-ff | --ff-only` escolhe para cada merge.
+
 ## O menu do commit
 
 Clique com o botão direito num commit (ou prima `.` sobre ele) para ver o seu

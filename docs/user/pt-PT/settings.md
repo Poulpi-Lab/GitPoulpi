@@ -183,6 +183,8 @@ A lista de páginas tem dois grupos:
 | **Local dos dados do repositório** | Onde o GitPoulpi guarda os dados de cada repositório (`session.per_repo_state_dir`): **Dentro de .git** (predefinição: nada aparece na sua árvore de trabalho e todos os worktrees o partilham), **Na árvore de trabalho** (uma pasta `.gitpoulpi`; necessária para fazer commit de um `workflow.toml` da equipa) ou **Na minha pasta de dados do utilizador** (fora do repositório). Uma pasta `.gitpoulpi` deixada por uma versão mais antiga é movida para o novo local na primeira vez que for precisa, e removida quando fica vazia; um ficheiro que o git acompanha (um `workflow.toml` com commit feito) nunca é movido nem eliminado e continua legível. |
 | **Nome da branch predefinida** | A primeira branch de um repositório que cria com Init. Vazio: o git decide. Não renomeia nenhuma branch existente. |
 | **Ativar a deteção proativa de conflitos** | Ativada por predefinição (`general.conflict_detection`). Avisa no Log quando a integração da branch atual na branch de que partiu daria conflito, antes de a tentar. Um repositório pode desativá-la para si na sua página **Prevenção de conflitos**. Veja [Resolver conflitos de merge](merge-conflicts.md#prevenção-de-conflitos). Aplica-se quando as Definições fecham. |
+| **Branches base predefinidas** | Por baixo do interruptor, no grupo **Prevenção de conflitos** (o comando da paleta **Conflitos: editar as listas de branches base...** abre-o). A lista de padrões de branches base que os repositórios usam quando não têm uma própria: **Incorporada (`**`)**, que é todas as branches, ou uma das suas listas com nome (`conflict_prevention.default_list`). Aplica-se aos repositórios abertos quando as Definições fecham. **Repor a predefinição incorporada** volta a `**`. |
+| **Listas de branches base** | Também nesse grupo: as suas listas com nome de padrões de branches base (`[conflict_prevention.lists.<nome>]`), um bloco para cada uma, com o seu **Nome** (mudar o nome mantém-na como predefinida, se já o era; um repositório que seguia o nome antigo usa a lista predefinida até voltar a escolhê-la), os seus **Padrões** (um por linha, `Enter` ou um clique abre o editor, `Ctrl+S` mantém-nos), **Tornar predefinida** e **Eliminar lista** (pergunta primeiro e diz que os repositórios que a seguem passam a usar a lista predefinida). Escreva um nome em **Nova lista** e prima `Enter` para adicionar uma; começa com `**`. Editar uma lista altera todos os repositórios que a seguem. |
 | **Nível do registo**, **Manter os ficheiros de registo**, **Tamanho máximo de um ficheiro de registo** | O registo da aplicação por trás do Registo de atividade: a linha mais detalhada registada (`log.level`), durante quanto tempo se mantêm os ficheiros (um número inteiro e uma unidade, dias, semanas, meses ou anos, na mesma linha: clique no número para o escrever, Cima e Baixo mudam-no, Tab passa à unidade e Enter abre a sua lista; no máximo 10 anos, predefinição 1 semana, `log.retention_days` e `log.retention_unit`) e o tamanho em que o ficheiro de um dia é rodado (um número e MiB ou GiB, de 1 MiB a 1 GiB, `log.max_file_mb` e `log.max_file_unit`). |
 | **Mostrar a duração das operações**, **Registo alargado** | O separador Operações Git do Registo de atividade: a duração de cada operação (`log.timings`, ligado por predefinição) e também o trabalho em segundo plano, atualização e auto-fetch (`log.extended`, desligado por predefinição). Veja [Quando algo falha](troubleshooting.md#o-registo-de-atividade). |
 | **Desfazer ativado**, **Profundidade do histórico de desfazer**, **Registar alterações feitas fora do GitPoulpi** | O grupo **Histórico de desfazer**. Ativa ou desativa o Desfazer, e define quantas operações guarda (predefinição 100, `0` significa ilimitado). Desativar o Desfazer apaga o histórico de desfazer, após uma confirmação. A última opção regista também o que uma shell ou um agente faz às branches, tags, stashes e a HEAD. Veja [Desfazer e refazer](undo-redo.md). |
@@ -549,6 +551,7 @@ Três opções estão no separador **Geral**.
 | **Backend do git** | `git2` (libgit2, a predefinição) ou `system` (o seu `git` instalado). Global. Vale para daemons iniciados depois da alteração. |
 | **Botão Pull** | O que o botão Pull faz: merge (fast-forward se possível), só fast-forward, ou rebase. Global. Os itens do `▾` não o alteram. |
 | **Botão Push** | **direto** faz push de imediato; **perguntar** mostra primeiro o menu de remotos. Global. |
+| **Fast-forward do merge** | O que um merge que inicia faz quando a branch podia simplesmente avançar por fast-forward: **never** (a predefinição) faz sempre um commit de merge, **allowed** faz fast-forward quando possível (a predefinição do próprio git), **only** faz fast-forward ou recusa. Global (`git.merge_fast_forward`); um repositório substitui-o na sua página [Opções de merge](#específico-do-repositório-opções-de-merge). |
 | **Codificação predefinida** | A codificação usada para mostrar texto que **não é UTF-8 válido**: conteúdo de ficheiros, blame, diffs e mensagens de commit. A página tem uma linha global e uma linha para este repositório; a do repositório ganha. O UTF-8 válido nunca é redecodificado, e o staging nunca recodifica nada. |
 | **core.autocrlf**, **core.eol** | As definições git próprias deste repositório. A linha escreve `core.autocrlf` ou `core.eol` na configuração git do repositório. **(herdado)** remove o valor do repositório, pelo que se aplica a sua configuração git global. `Ctrl+Z` restaura o valor anterior. O equivalente na CLI é `gitpoulpi repo-config`. |
 | **Git LFS** | Mostra o Git LFS na interface. Veja [Git LFS](lfs.md). |
@@ -657,13 +660,32 @@ saída na sua entrada do Registo de atividade (a barra de estado diz que o commi
 
 ### Específico do repositório: Opções de merge
 
-Uma só opção, **Squash** (desativada por predefinição). Quando ativada, fazer merge de uma branch local (o menu da branch, arrastar e largar, `Merge`
+Duas opções. **Fast-forward** diz o que um merge faz quando a branch podia simplesmente avançar por fast-forward:
+
+| Escolha | Um merge que inicia... |
+|---|---|
+| **(herdado)** | segue a definição global **Fast-forward do merge** da página Git (predefinição **never**). |
+| **never** | faz sempre um commit de merge (`git merge --no-ff`), mesmo que a branch esteja apenas à frente. O primeiro pai do commit é o topo antigo, o segundo a branch cujo merge é feito, e a mensagem é a do próprio git (`Merge branch 'x' into y`). |
+| **allowed** | faz fast-forward quando pode e um commit de merge caso contrário (a predefinição do git). |
+| **only** | faz fast-forward e recusa com *cannot fast-forward* quando as branches divergiram (`git merge --ff-only`). |
+
+Aplica-se a todos os merges que inicia: o menu da branch, arrastar e largar, `Merge` na paleta e `gitpoulpi merge`
+(cujas opções `--ff`, `--no-ff` e `--ff-only` a substituem para um merge). Os menus dizem o que o merge vai fazer:
+*Merge de x em y (commit de merge)*, *(avança por fast-forward)* ou *(apenas fast-forward)*, e o item separado
+*Fast-forward de y até x* (e o seu comando da paleta) fica a um gesto de distância em qualquer escolha. Um commit de merge é uma
+entrada normal do Desfazer, como um fast-forward. As ações do Flow escolhem a sua própria estratégia de merge e ignoram esta definição.
+
+A sua escolha prevalece sobre a do git: um merge que o GitPoulpi inicia em **never** ou **only** passa a opção de forma explícita, por isso um
+`merge.ff` na configuração git do repositório é substituído. Só em **allowed** o `merge.ff` do git continua em vigor, e quando o repositório
+o define a página mostra-o por baixo da linha. (Só o `.git/config` do próprio repositório é lido para essa linha, não a sua configuração git global.)
+
+**Squash** (desativada por predefinição). Quando ativada, fazer merge de uma branch local (o menu da branch, arrastar e largar, `Merge`
 na paleta) coloca as alterações da branch em stage sem criar um commit de merge (`git merge --squash`): o commit fica a seu cargo.
 O formulário de commit abre com a mensagem de squash do git (`SQUASH_MSG`, sem as linhas de comentário), uma vez por
 squash. Depois disso nada fica em curso (sem `MERGE_HEAD`), por isso **Abortar** não se aplica: para recuar, descarte as
 alterações em stage. Um squash que pára em conflitos deixa-os no painel Status como qualquer merge em conflito.
 As alterações em stage não são uma entrada do Desfazer (nenhuma ref se moveu, por isso não há nada a restaurar); o
-`gitpoulpi merge <branch> --squash` da CLI faz o mesmo, seja qual for a opção.
+`gitpoulpi merge <branch> --squash` da CLI faz o mesmo, seja qual for a opção. Um squash prevalece sobre **Fast-forward**.
 
 ### Específico do repositório: Modelo de mensagem
 
@@ -689,8 +711,14 @@ Uma mensagem com que o formulário de commit começa (`gitpoulpi ui show setting
 - **Ativar a deteção proativa de conflitos com a branch de destino**: ativada por predefinição. Desmarcá-la desativa a deteção
   apenas para este repositório; o interruptor global é **Ativar a deteção proativa de conflitos** na página Geral.
   Os dois têm de estar ativados.
-- **Branches base** (`**` por predefinição): as branches de que a branch atual pode ter partido, um padrão por linha
-  (`Enter` ou um clique abre o editor, `Ctrl+S` mantém-no). A tabela de padrões por baixo é a referência:
+- **Branches base de**: de onde vêm as branches base deste repositório. **Predefinida** segue a predefinição global
+  (a `**` incorporada, ou a lista escolhida em **Branches base predefinidas** nas Definições > Geral); **Lista: <nome>**
+  segue uma das suas listas com nome, pelo que editar a lista altera também este repositório; **Lista própria** é uma lista
+  só sua (ao escolhê-la parte-se de uma cópia dos padrões em vigor). Um ficheiro de repositório escrito antes de existir esta escolha
+  e que tenha padrões próprios é lido como **Lista própria**.
+- **Branches base** (um padrão por linha): com **Lista própria**, `Enter` ou um clique abre o editor e `Ctrl+S` mantém-no;
+  com **Predefinida** ou **Lista**, os padrões em vigor são mostrados só de leitura. A tabela de padrões por baixo é a
+  referência:
 
   | Padrão | Corresponde a |
   |---|---|
@@ -701,7 +729,15 @@ Uma mensagem com que o formulário de commit começa (`gitpoulpi ui show setting
 
   Uma branch local é o seu nome simples (`main`), uma de acompanhamento remoto tem o remoto à frente (`origin/main`). `*` e `?`
   ficam dentro de um segmento do caminho, `**` atravessa-os. As linhas em branco e os comentários `#` são ignorados; uma lista só de exclusões
-  significa apenas "todas as branches menos estas". É guardado em `repo-state.toml` e relido quando as Definições fecham.
+  significa apenas "todas as branches menos estas". A escolha é guardada em `repo-state.toml` e relida quando as Definições
+  fecham.
+- **Guardar como lista...**: escreva um nome e prima `Enter`; os padrões em vigor passam a ser uma lista com nome (a mesma
+  que as Definições > Geral editam) e este repositório segue-a.
+- **Repor a predefinição** (pergunta primeiro): descarta a escolha, a lista e os padrões próprios deste repositório; volta a
+  seguir a predefinida.
+- **Usar as branches base do fluxo de trabalho** (mostrado quando há um [fluxo de branches](branching-workflows.md) com branches base
+  configurado para o repositório): preenche a **Lista própria** com essas bases, cada uma como branch local e como branch de qualquer
+  remoto (`main` e `*/main`). Copia-as uma só vez; não segue alterações posteriores do fluxo.
 
 ### Específico do repositório: IA
 

@@ -82,11 +82,9 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
         TypedError::GrantRefused { host, expected } => {
             msg::typed_error::grant_refused(host, expected)
         }
-        TypedError::CredentialHelperUnreachable => {
-            msg::typed_error::CREDENTIAL_HELPER_UNREACHABLE
-                .get()
-                .to_string()
-        }
+        TypedError::CredentialHelperUnreachable => msg::typed_error::CREDENTIAL_HELPER_UNREACHABLE
+            .get()
+            .to_string(),
         TypedError::RepoAuthCommandChanged { path } => {
             msg::typed_error::repo_auth_command_changed(path)
         }

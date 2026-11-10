@@ -93,7 +93,11 @@ async fn a_helper_that_never_reaches_the_daemon_is_named_as_such() {
         "{}",
         error.message
     );
-    assert!(error.message.contains("credential helper"), "{}", error.message);
+    assert!(
+        error.message.contains("credential helper"),
+        "{}",
+        error.message
+    );
 
     // The connection test reports it first in its stderr.
     let test = client

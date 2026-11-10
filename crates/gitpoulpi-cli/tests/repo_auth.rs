@@ -319,7 +319,11 @@ fn test_reports_each_remote_with_its_identity() {
 /// The argv of a token command that prints `token`, in the platform's
 /// scripting language (`sh` on Unix, `pwsh` on Windows).
 fn token_script_argv(dir: &Path, token: &str) -> Vec<String> {
-    let path = dir.join(if cfg!(windows) { "token.ps1" } else { "token.sh" });
+    let path = dir.join(if cfg!(windows) {
+        "token.ps1"
+    } else {
+        "token.sh"
+    });
     if cfg!(windows) {
         std::fs::write(&path, format!("Write-Output '{token}'\n")).unwrap();
         ["pwsh", "-NoProfile", "-File"]
@@ -378,7 +382,10 @@ fn a_token_command_works_from_a_standalone_cli_run() {
     ok(root, session, &set);
 
     let tested = ok(root, session, &["repo-auth", "test"]);
-    assert_eq!(tested["ok"], true, "the connection test must pass: {tested}");
+    assert_eq!(
+        tested["ok"], true,
+        "the connection test must pass: {tested}"
+    );
     assert_eq!(tested["reports"][0]["ok"], true, "{tested}");
     ok(root, session, &["fetch"]);
     let seen = server.basic_credentials();

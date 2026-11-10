@@ -229,10 +229,7 @@ fn endpoints() -> std::sync::MutexGuard<'static, EndpointMap> {
 /// can name it to the helper. Dropping the returned guard forgets it (unless a
 /// later daemon of the same session in this process has replaced it).
 #[must_use]
-pub(crate) fn register_endpoint(
-    session: &str,
-    endpoint: gitpoulpi_ipc::Endpoint,
-) -> EndpointGuard {
+pub(crate) fn register_endpoint(session: &str, endpoint: gitpoulpi_ipc::Endpoint) -> EndpointGuard {
     static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     let seq = SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     endpoints().insert(session.to_string(), (seq, endpoint));
@@ -559,7 +556,8 @@ mod tests {
     async fn a_grant_nobody_asked_about_reads_git_s_missing_credential_as_unreachable() {
         let root = Path::new("/repo/unasked");
         let guard = issue(root, credential("h.example")).unwrap();
-        let prompt = "fatal: could not read Username for 'https://h.example': terminal prompts disabled";
+        let prompt =
+            "fatal: could not read Username for 'https://h.example': terminal prompts disabled";
         assert!(matches!(
             guard.reads_as(prompt),
             Some(gitpoulpi_core::Error::CredentialHelperUnreachable)

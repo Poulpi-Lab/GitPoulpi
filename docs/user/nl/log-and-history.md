@@ -197,6 +197,14 @@ Een zwevend label volgt de aanwijzer en geldige doelen lichten op; laat los voor
 `Esc` annuleert een sleepactie. Het toetsenbordequivalent is de opdracht *Refs:
 Geselecteerde ref droppen op uitgecheckte branch...* van het palet.
 
+**Merge of fast-forward.** Heeft het doel geen eigen commit (de gesleepte branch loopt er gewoon op voor), dan kan een
+merge het doel simpelweg vooruit verplaatsen. Standaard (Instellingen > Git > **Merge fast-forward** = *never*, of de eigen keuze
+van een repository op zijn pagina Merge-opties) luidt de menurij *Merge x in y (merge-commit)* en maakt ze een echte merge-commit,
+zodat de geschiedenis de branch bewaart; gebruik de aparte rij *Fast-forward y naar x* voor de gewone verplaatsing (voor een rechte
+lijn gebruik je juist *Rebase*). Bij *allowed* luidt de Merge-rij *(fast-forward)* en bij *only* *(alleen fast-forward)*, grijs
+met de reden als de branches uiteen zijn gelopen. Dezelfde rijen en labels staan in het eigen menu van een branch, en
+`gitpoulpi merge --ff | --no-ff | --ff-only` kiest per merge.
+
 ## Het commit-menu
 
 Klik met rechts op een commit (of druk er `.` op) voor zijn menu:

@@ -484,7 +484,7 @@ tested = "Apertura di un'immagine di esempio in \"{label}\"..."
 
 [settings_ssh]
 private_key_path = "Percorso della chiave privata"
-private_key_path_help = "File di chiave che {$fetch}, {$pull}, {$push} e clone offrono a ssh (ssh -i <chiave> -o IdentitiesOnly=yes). Vuoto: ssh-agent e la tua configurazione ssh come al solito. Ignorato se GIT_SSH_COMMAND o core.sshCommand (es. Chiave SSH per questo repository) è impostato. Vale dal prossimo trasferimento."
+private_key_path_help = "File di chiave che {$fetch}, {$pull}, {$push} e clone offrono a ssh (ssh -i <chiave> -o IdentitiesOnly=yes). Vuoto: ssh-agent e la tua configurazione ssh come al solito. Ignorato se un repository sceglie una propria chiave (SSH e credenziali) o se GIT_SSH_COMMAND o core.sshCommand è impostato. Vale dal prossimo trasferimento."
 public_key_path = "Percorso della chiave pubblica"
 public_key_path_help = "Usato solo se il percorso della chiave privata è vuoto: ssh sceglie allora la chiave corrispondente tenuta da ssh-agent (o una chiave hardware) invece di offrirle tutte. Genera coppia di chiavi compila entrambi. Stessa precedenza del percorso della chiave privata."
 key_type = "Tipo di chiave"
@@ -4084,7 +4084,7 @@ hosting_3 = "Creare una {$pr}|Il + nell'intestazione {$PRS}, o n in quella sezio
 hosting_4 = "Issue|La sezione ISSUE le elenca; + o n ne crea una. Il menu di una riga la apre nel browser o agisce su di essa."
 hosting_5 = "Riferimenti|I riferimenti a issue e {$prs} (#12, !53, ABC-7) in un messaggio di {$commit} o nel nome di un branch sono riconosciuti. Alt+R nel modulo del {$commit} ne inserisce uno."
 hosting_6 = "Chip della barra|A sinistra della barra un chip mostra la {$pr} del branch corrente (GH #12, GL !53) o un «+ {$pr_abbr}» attenuato per avviarne una. Cliccalo."
-hosting_7 = "Chiavi SSH|Scegli una chiave SSH per profilo (Impostazioni > Profili) o per repository (menu della scheda > «Chiave SSH...»). Le passphrase restano nel tuo ssh-agent di sistema."
+hosting_7 = "Chiavi SSH|Scegli una chiave SSH per profilo (Impostazioni > Profili) o per repository (menu della scheda > «SSH e credenziali...»). Le passphrase restano nel tuo ssh-agent di sistema."
 setup_1 = "Impostazioni|Ctrl+, o l'ingranaggio. Tab passa tra l'elenco pagine e le opzioni, j / k si muovono, Enter o Space cambia un valore, / o Ctrl+F cerca in tutte le opzioni, Esc chiude."
 setup_2 = "Temi|Impostazioni > Aspetto > Tema: scuro, chiaro, segui il terminale o uno dei tanti preset. Ctrl+N e un tasto cambiano anche tema, lingua e colori del grafo senza aprire le Impostazioni."
 setup_3 = "Lingua|Impostazioni > Generale > Lingua offre 17 lingue. «Traduci i termini di git» decide se anche le parole proprie di git ({$commit}, {$push}...) sono tradotte."

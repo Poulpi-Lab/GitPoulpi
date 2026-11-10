@@ -106,7 +106,7 @@ scheda attiva e su quella sotto il puntatore. La barra delle schede contiene sol
   scheda**, **Chiudi le altre schede...**, **Chiudi le schede a destra...**, **Aggiungi
   ai preferiti** (o **Rimuovi dai preferiti**), **Aggiungi all'area di lavoro** (o
   **Rimuovi dall'area di lavoro**, quando hai delle aree di lavoro), **Copia il percorso**,
-  **Apri in ›**, **Chiave SSH...** e **Checkout parziale...**.
+  **Apri in ›**, **SSH e credenziali...** e **Checkout parziale...**.
 - `Ctrl+PageUp` e `Ctrl+PageDown` cambiano scheda. `Ctrl+W` chiude la scheda
   corrente. Anche un clic con il tasto centrale su una scheda la chiude (con la
   stessa domanda).

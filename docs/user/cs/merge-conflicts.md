@@ -159,6 +159,13 @@ v protokolu), takže vaše soubory, index a refy zůstanou nedotčené.
 - **Kdy běží**: na pozadí, asi 2 sekundy poté, co se repozitář uklidní (commit, checkout, fetch, který posunul
   větev, rebase), jednou pro každou dvojici `(HEAD, základ)`. Pruh zmizí, jakmile se HEAD pohne, a vrátí se,
   nebo ne, s novou odpovědí. Odpojený HEAD se nekontroluje.
+- **Seznamy základních větví**: odkud se berou Základní větve repozitáře, se volí na jeho stránce **Prevence
+  konfliktů**. **Výchozí** sleduje globální výchozí (vestavěné `**`, každá větev, dokud v Nastavení > Obecné > Prevence
+  konfliktů nevyberete jiný seznam); **Seznam: <název>** sleduje jeden z vašich pojmenovaných seznamů; **Vlastní
+  seznam** je seznam jen tohoto repozitáře. Seznamy jsou sdílené: upravte jeden a každý repozitář, který ho sleduje,
+  použije změnu při další kontrole, bez restartu. **Uložit jako seznam...** změní vlastní vzory repozitáře na
+  pojmenovaný seznam, **Obnovit výchozí** zahodí volbu repozitáře. Smazání seznamu, který repozitář sleduje, způsobí,
+  že použije výchozí.
 - **Vypnutí**: **Zapnout proaktivní detekci konfliktů** v Nastavení > Obecné, nebo pro jeden repozitář na jeho stránce
   **Prevence konfliktů**. Ze skriptu vypíše `gitpoulpi conflicts check` stejnou odpověď jako JSON ([Referenční
   příručka CLI](cli-reference.md)).

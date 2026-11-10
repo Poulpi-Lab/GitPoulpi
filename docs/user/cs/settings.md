@@ -174,6 +174,8 @@ Seznam stránek má dvě skupiny:
 | **Umístění dat repozitáře** | Kde GitPoulpi drží svá data jednotlivých repozitářů (`session.per_repo_state_dir`): **Uvnitř .git** (výchozí: v pracovním stromu se nic neobjeví, všechny worktree ho sdílejí), **V pracovním stromu** (složka `.gitpoulpi`; potřebná, chcete-li commitnout týmový `workflow.toml`) nebo **V mé složce s uživatelskými daty** (mimo repozitář). Složka `.gitpoulpi` ponechaná starší verzí se při první potřebě přesune na nové místo a po vyprázdnění se odstraní; soubor sledovaný gitem (commitnutý `workflow.toml`) se nikdy nepřesune ani nesmaže a zůstane čitelný. |
 | **Výchozí název větve** | První větev repozitáře, který vytvoříte pomocí Init. Prázdné: rozhodne git. Nepřejmenovává žádnou existující větev. |
 | **Zapnout proaktivní detekci konfliktů** | Ve výchozím stavu zapnuto (`general.conflict_detection`). Upozorní v Logu, když by merge aktuální větve do větve, ze které vznikla, skončil konfliktem, ještě než to zkusíte. Repozitář ji může pro sebe vypnout na své stránce **Prevence konfliktů**. Viz [Řešení konfliktů při slučování](merge-conflicts.md#prevence-konfliktů). Projeví se po zavření Nastavení. |
+| **Výchozí základní větve** | Pod přepínačem, ve skupině **Prevence konfliktů** (otevře ji příkaz z palety **Konflikty: Upravit seznamy základních větví...**). Seznam vzorů základních větví, který repozitáře používají, když nemají vlastní: **Vestavěný (`**`)**, tedy každá větev, nebo jeden z vašich pojmenovaných seznamů (`conflict_prevention.default_list`). Platí pro otevřené repozitáře po zavření Nastavení. **Obnovit vestavěný výchozí** vrátí `**`. |
+| **Seznamy základních větví** | Také v této skupině: vaše pojmenované seznamy vzorů základních větví (`[conflict_prevention.lists.<name>]`), každý jako blok s **Názvem** (přejmenováním seznam zůstane výchozím, pokud jím byl; repozitář, který sledoval starý název, používá výchozí seznam, dokud znovu nevyberete přejmenovaný seznam), **Vzory** (jeden na řádek, `Enter` nebo kliknutí otevře editor, `Ctrl+S` ho ponechá), **Nastavit jako výchozí** a **Smazat seznam** (nejprve se zeptá a řekne, že repozitáře, které ho sledují, budou místo něj používat výchozí seznam). Zadejte název do **Nový seznam** a stiskněte `Enter`; seznam začíná vzorem `**`. Úprava seznamu změní každý repozitář, který ho sleduje. |
 | **Úroveň protokolu**, **Uchovávat soubory protokolu**, **Maximální velikost souboru protokolu** | Protokol aplikace za Protokolem aktivity: nejpodrobnější zaznamenávaná úroveň (`log.level`), jak dlouho se soubory uchovávají (celé číslo a jednotka, dny, týdny, měsíce nebo roky, na jednom řádku: kliknutím na číslo ho napíšete, Nahoru a Dolů ho mění po jedné, Tab přejde na jednotku a Enter otevře její seznam; nejvýše 1 až 10 let, výchozí 1 týden, `log.retention_days` a `log.retention_unit`) a velikost, při které se soubor jednoho dne přesouvá (číslo a MiB nebo GiB, 1 MiB až 1 GiB, `log.max_file_mb` a `log.max_file_unit`). |
 | **Zobrazit dobu trvání operací**, **Rozšířené protokolování** | Karta Operace gitu v Protokolu aktivity: doba trvání každé operace (`log.timings`, ve výchozím stavu zapnuto) a také práce na pozadí, obnovení a auto-fetch (`log.extended`, ve výchozím stavu vypnuto). Viz [Když něco selže](troubleshooting.md#protokol-aktivity). |
 | **Zpět povoleno**, **Hloubka historie Zpět**, **Zaznamenávat změny provedené mimo GitPoulpi** | Skupina **Historie vrácení**. Zapíná a vypíná Zpět a nastavuje, kolik operací uchová (výchozí 100, `0` znamená neomezeně). Vypnutí Zpět po potvrzení smaže historii vracení. Poslední volba zaznamenává i to, co shell nebo agent udělá s větvemi, tagy, stashi a HEADem. Viz [Zpět a znovu](undo-redo.md). |
@@ -530,6 +532,7 @@ Tři volby jsou na kartě **Obecné**.
 | **Backend gitu** | `git2` (libgit2, výchozí) nebo `system` (váš nainstalovaný `git`). Globální. Platí pro daemony spuštěné po změně. |
 | **Tlačítko Pull** | Co dělá tlačítko Pull: merge (fast-forward, je-li to možné), pouze fast-forward, nebo rebase. Globální. Položky `▾` ho nemění. |
 | **Tlačítko Push** | **přímo** pushuje hned; **zeptat se** nejprve zobrazí nabídku remote. Globální. |
+| **Merge fast-forward** | Co udělá merge, který spustíte, když lze větev jednoduše posunout fast-forwardem: **never** (výchozí) vždy vytvoří merge commit, **allowed** provede fast-forward, když lze (výchozí chování gitu), **only** provede fast-forward, nebo odmítne. Globální (`git.merge_fast_forward`); repozitář to přepíše na své stránce [Možnosti merge](#nastavení-repozitáře-možnosti-merge). |
 | **Výchozí kódování** | Kódování použité k zobrazení textu, který **není platné UTF-8**: obsah souborů, blame, diffy a zprávy commitů. Stránka má globální řádek a řádek pro tento repozitář; řádek repozitáře má přednost. Platné UTF-8 se nikdy nedekóduje znovu a staging nic nepřekóduje. |
 | **core.autocrlf**, **core.eol** | Vlastní git nastavení tohoto repozitáře. Řádek zapíše `core.autocrlf` nebo `core.eol` do git konfigurace repozitáře. **(zděděno)** odstraní hodnotu repozitáře, takže platí vaše globální git konfigurace. `Ctrl+Z` obnoví předchozí hodnotu. Ekvivalent v CLI je `gitpoulpi repo-config`. |
 | **Git LFS** | Zobrazí Git LFS v rozhraní. Viz [Git LFS](lfs.md). |
@@ -639,13 +642,32 @@ výstup ve svém záznamu v Protokolu aktivity (stavový řádek řekne, že com
 
 ### Nastavení repozitáře: Možnosti merge
 
-Jeden přepínač, **Squash** (ve výchozím stavu vypnuto). Je-li zapnutý, merge lokální větve (nabídka větve, přetažení,
+Dvě nastavení. **Fast-forward** říká, co merge udělá, když lze větev jednoduše posunout fast-forwardem:
+
+| Volba | Merge, který spustíte... |
+|---|---|
+| **(inherited)** | sleduje globální nastavení **Merge fast-forward** na stránce Git (výchozí **never**). |
+| **never** | vždy vytvoří merge commit (`git merge --no-ff`), i když je větev jen před cílem. První rodič commitu je starý konec větve, druhý sloučená větev a zpráva je od gitu (`Merge branch 'x' into y`). |
+| **allowed** | provede fast-forward, když lze, jinak vytvoří merge commit (výchozí chování gitu). |
+| **only** | provede fast-forward a odmítne s *cannot fast-forward*, když se větve rozešly (`git merge --ff-only`). |
+
+Platí pro každý merge, který spustíte: nabídka větve, přetažení, `Merge` v paletě a `gitpoulpi merge` (jehož přepínače
+`--ff`, `--no-ff` a `--ff-only` ho pro jeden merge přepíšou). Nabídky říkají, co merge udělá:
+*Merge x do y (merge commit)*, *(fast-forward)* nebo *(jen fast-forward)*, a samostatná položka
+*Fast-forward y na x* (a její příkaz v paletě) zůstává na dosah jednoho gesta při každé volbě. Merge commit je
+běžný záznam Zpět, stejně jako fast-forward. Akce Flow volí vlastní strategii merge a toto nastavení ignorují.
+
+Vaše vlastní volba má přednost před gitem: merge spuštěný GitPoulpi pod **never** nebo **only** předává přepínač
+výslovně, takže `merge.ff` v git konfiguraci repozitáře se přepíše. Jen pod **allowed** platí `merge.ff` gitu dál, a když
+ho repozitář nastavuje, stránka ho ukáže pod řádkem. (Pro tento řádek se čte jen vlastní `.git/config` repozitáře, ne vaše globální git konfigurace.)
+
+**Squash** (ve výchozím stavu vypnuto). Je-li zapnutý, merge lokální větve (nabídka větve, přetažení,
 `Merge` v paletě) přidá změny větve do indexu bez merge commitu (`git merge --squash`): commit je ponechán na vás.
 Formulář commitu se otevře se zprávou squash od gitu (`SQUASH_MSG`, bez řádků komentářů), jednou na každý
 squash. Potom nic neprobíhá (žádný `MERGE_HEAD`), takže **Přerušit** neplatí: pro návrat zahoďte změny
 v indexu. Squash, který se zastaví na konfliktech, je nechá v panelu Stav jako každý merge v konfliktu.
 Změny v indexu nejsou záznamem Zpět (žádný ref se nehnul, nemá se co obnovit); `gitpoulpi merge <branch> --squash`
-v CLI dělá totéž bez ohledu na nastavení.
+v CLI dělá totéž bez ohledu na nastavení. Squash má přednost před **Fast-forward**.
 
 ### Nastavení repozitáře: Šablona zprávy
 
@@ -671,8 +693,13 @@ Zpráva, kterou formulář commitu začíná (`gitpoulpi ui show settings commit
 - **Zapnout proaktivní detekci konfliktů** (u cílové větve): ve výchozím stavu zapnuto. Zrušení zaškrtnutí vypne detekci
   jen pro tento repozitář; globální přepínač je **Zapnout proaktivní detekci konfliktů** na stránce Obecné.
   Oba musí být zapnuté.
-- **Základní větve** (výchozí `**`): větve, ze kterých mohla aktuální větev vzniknout, jeden vzor na řádek
-  (`Enter` nebo kliknutí otevře editor, `Ctrl+S` ho ponechá). Tabulka vzorů pod ním je přehledem:
+- **Základní větve z**: odkud se berou základní větve tohoto repozitáře. **Výchozí** sleduje globální výchozí
+  (vestavěné `**`, nebo seznam zvolený pod **Výchozí základní větve** v Nastavení > Obecné); **Seznam: <název>**
+  sleduje jeden z vašich pojmenovaných seznamů, takže úprava seznamu změní i tento repozitář; **Vlastní seznam** je
+  seznam jen tohoto repozitáře (jeho volba začne kopií vzorů, které právě platí). Soubor repozitáře zapsaný před
+  existencí této volby a obsahující vlastní vzory se čte jako **Vlastní seznam**.
+- **Základní větve** (jeden vzor na řádek): u **Vlastního seznamu** `Enter` nebo kliknutí otevře editor a `Ctrl+S` ho
+  ponechá; u **Výchozí** nebo **Seznam** se platné vzory zobrazí jen ke čtení. Tabulka vzorů pod ním je přehledem:
 
   | Vzor | Odpovídá |
   |---|---|
@@ -683,7 +710,14 @@ Zpráva, kterou formulář commitu začíná (`gitpoulpi ui show settings commit
 
   Lokální větev je její holý název (`main`), vzdálená sledovací větev má před sebou svůj remote (`origin/main`). `*` a `?`
   zůstávají v jednom segmentu cesty, `**` je překračuje. Prázdné řádky a komentáře `#` se ignorují; seznam jen
-  s vyloučeními znamená „každá větev kromě těchto“. Ukládá se do `repo-state.toml` a znovu se čte po zavření Nastavení.
+  s vyloučeními znamená „každá větev kromě těchto“. Volba se ukládá do `repo-state.toml` a znovu se čte po zavření
+  Nastavení.
+- **Uložit jako seznam...**: zadejte název a stiskněte `Enter`; platné vzory se stanou pojmenovaným seznamem (týmž,
+  který upravuje Nastavení > Obecné) a tento repozitář ho sleduje.
+- **Obnovit výchozí** (nejprve se zeptá): zahodí volbu, seznam a vlastní vzory tohoto repozitáře; znovu sleduje výchozí.
+- **Použít základní větve workflow** (zobrazí se, když je pro repozitář nastaven [větvicí workflow](branching-workflows.md)
+  se základními větvemi): naplní **Vlastní seznam** těmito základními větvemi, každou jako lokální větev i jako větev
+  libovolného remote (`main` a `*/main`). Zkopíruje je jednou; pozdější změny workflow nesleduje.
 
 ### Nastavení repozitáře: AI
 

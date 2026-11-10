@@ -628,18 +628,22 @@ Je-li klíč připojen, sekce ukazuje `title (SHA256:...)` s:
 
 ### Klíč SSH pro jeden repozitář
 
-Aby jeden repozitář používal klíč profilu, GitPoulpi v něm nastaví
-`core.sshCommand` na `ssh -i "<key>" -o IdentitiesOnly=yes`. Nikdy se to
-neděje automaticky. Otevřete nabídku karty (`Ctrl+T` nebo pravé tlačítko na
-kartě) a zvolte **Klíč SSH...**, nebo spusťte příkaz z palety *Repozitář: Klíč
-SSH pro tento repozitář...*. Nabídka ukazuje aktuální připnutí, každý profil s
-privátním klíčem a **Zrušit připnutí**.
+Aby jeden repozitář používal konkrétní klíč, otevřete nabídku karty (`Ctrl+T` nebo
+pravé tlačítko na kartě) a zvolte **SSH a přihlášení...**, nebo spusťte příkaz z palety
+*Repozitář: SSH a přihlášení...*, a v části SSH vyberte **Soubor klíče** (nebo **Klíč účtu**
+pro klíč profilu integrace). Volba se uchovává v soukromé složce GitPoulpi: nic se nezapisuje
+do repozitáře ani do konfigurace gitu. Viz
+[Nastavení](settings.md#nastavení-repozitáře-ssh-a-přihlášení).
 
-CLI a MCP: `gitpoulpi ssh-command show | set --key <file> | clear`.
+Repozitář, který má stále vlastní `core.sshCommand` z dřívějšího připnutí „Klíč SSH pro tento
+repozitář“, ho na této stránce zobrazí jen pro čtení s tlačítkem **Přesunout do GitPoulpi**.
+
+CLI a MCP: `gitpoulpi repo-auth` (volba pro jeden repozitář) a pro samotné připnutí
+`core.sshCommand` `gitpoulpi ssh-command show | set --key <file> | clear`.
 
 Globální klíč v Nastavení > SSH a přihlášení (*Cesta k privátnímu klíči* nebo
-*Vygenerovat pár klíčů*) platí pro každý repozitář bez připnutí. Připnutí
-repozitáře má přednost.
+*Vygenerovat pár klíčů*) platí pro každý repozitář bez vlastní volby. Soubor klíče
+nebo připnutí repozitáře má přednost.
 
 ## 13b. Ochrana větví pro přepis historie
 

@@ -303,10 +303,12 @@ domovskou složku.
 Nastavení provedené jinde vždy vyhraje nad těmito cestami. Pořadí od nejvyšší
 priority:
 
+0. Klíč zvolený pro jeden repozitář na jeho vlastní stránce
+   [SSH a přihlášení](#nastavení-repozitáře-ssh-a-přihlášení) (skupina pro repozitář).
 1. `GIT_SSH_COMMAND` nebo `GIT_SSH` v prostředí, ve kterém GitPoulpi běží.
 2. `core.sshCommand` v git konfiguraci repozitáře nebo ve vaší globální git
-   konfiguraci. Položka *Klíč SSH...* v nabídce karty ji zapisuje pro jeden
-   repozitář.
+   konfiguraci. Položka *Klíč SSH...* v nabídce karty starších verzí ji zapisovala pro jeden
+   repozitář; SSH a přihlášení nabídne její přesun do GitPoulpi.
 3. Dvě cesty ke klíčům z této stránky.
 4. Vlastní výchozí chování ssh a agent.
 
@@ -569,6 +571,56 @@ Tlačítko **`LFS ▾`** na panelu nástrojů se řídí stejným stavem: zobraz
 nebo kde ho `.gitattributes` už používá, a v běžném repozitáři zůstane skryté (a dokud nedoběhlo první čtení LFS
 repozitáře, takže se může objevit chvíli po jeho otevření). Inicializace z této stránky ho zobrazí. Příkazy palety `LFS:`
 zůstávají dostupné všude, včetně **LFS: Inicializovat pro tento repozitář**.
+
+### Nastavení repozitáře: SSH a přihlášení
+
+`gitpoulpi ui show settings ssh-credentials`. Jak se přihlašuje *tento repozitář*; volba se uchovává v soukromé složce
+GitPoulpi: nic se nezapisuje do repozitáře ani do konfigurace gitu a nelze ji vrátit zpět (jako každé nastavení).
+Používají ji jen fetch, pull, push, submoduly a LFS tohoto repozitáře. Jejím dvojčetem v CLI je `gitpoulpi repo-auth`
+(viz [Reference CLI](cli-reference.md)). Stránka je dostupná i z palety příkazů:
+**Repozitář: SSH a přihlášení...**. Nic se neodešle, dokud nestisknete **Uložit**; stránka se ptá daemona, takže nikdy
+neblokuje.
+
+| Řádek | Co dělá |
+|---|---|
+| **HTTPS: Přihlásit pomocí** | **Systém** (vlastní pomocníci gitu, výchozí), **Účet GitPoulpi** (token integrace; účty, jejichž hostitel je jedním z remote tohoto repozitáře, jsou první, a řádek pod tím říká, co našla poslední kontrola tokenu: chybějící a nadbytečná oprávnění), **Credential helper** nebo **Příkaz pro token**. |
+| **Uživatelské jméno gitu** | Odesílá se jako uživatelské jméno pro remote přes HTTPS. Se **Systémem** umožní správci přihlašovacích údajů vybrat jeden z více uložených účtů. |
+| **Ignorovat credential helpery nastavené tímto repozitářem** | Jen **Systém**. Pomocníci, které si repozitář nastavuje sám (jeho `.git/config`, soubory, které zahrnuje), jsou pod tím vypsáni se souborem, z něhož pocházejí; systémoví a globální pomocníci dál fungují. |
+| **Pomocník**, **Příkaz**, **Hostitelé**, **Mezipaměť (minuty)** | Příkaz, který repozitář spouští k přihlášení. *Helper* je credential helper gitu; *příkaz pro token* vytiskne token (seznam argumentů se dělí podle mezer, argument s mezerami patří do uvozovek, a zobrazí se pod **Spustí se jako**; žádný shell ho nespouští, běží ve složce repozitáře). **Hostitelé** ho omezí na tyto hostitele (prázdné: hostitel hlavního remote); **Mezipaměť** říká, jak dlouho se token znovu používá (výchozí 50 minut). **Použít současného pomocníka tohoto repozitáře** zkopíruje do pole pomocníka, kterého si repozitář nastavuje. |
+| **SSH: Přihlásit pomocí** | **Systém** (vlastní nastavení ssh, agent a výchozí klíče), **Soubor klíče** nebo **Klíč účtu** (klíč integrace). |
+| **Soubor soukromého klíče** | Vyberte jeden z klíčů nalezených v `~/.ssh` nebo zadejte cestu. Nabízí se jen tento klíč, každému remote SSH repozitáře, včetně submodulů. Když soubor klíče mohou číst jiné účty (bit oprávnění pro skupinu nebo ostatní v Linuxu a macOS, záznam pro Everyone, Users nebo Authenticated Users ve Windows), varování řekne, že OpenSSH takový klíč odmítne („bad permissions“), a **Omezit na můj účet** to opraví (`chmod 600`, nebo ve Windows DACL jen pro váš účet a SYSTEM). |
+| **Soubor známých hostitelů**, **Přísná kontrola klíče hostitele** | Volitelný soubor důvěryhodných klíčů hostitelů a odmítnutí hostitele, který v něm není. |
+| **Program ssh** | Program, který se spustí (jen pro čtení). |
+| **Připnuto v konfiguraci gitu** | Jen když si tento repozitář nastavuje vlastní `core.sshCommand` (staré připnutí „Klíč SSH pro tento repozitář“, které GitPoulpi dříve zapisoval). Příkaz se zobrazí jen pro čtení. **Přesunout do GitPoulpi** uloží rovnocennou volbu **Soubor klíče** a pak odstraní připnutí z konfigurace gitu; nabízí se, když je příkaz obyčejné připnutí `ssh -i <klíč>`, a jen dokud stránka nemá neuložené úpravy a její volba SSH je stále **Systém**. Jiný příkaz se zobrazí s poznámkou: upravte ho pomocí `git config`. Přesun nelze vrátit zpět, jako každé nastavení tady, a odstranění připnutí také není na zásobníku Zpět (nic se neztratí: klíč je v profilu). |
+| **Remote** | Jen pro čtení: každý remote s protokolem a identitou, kterou použije. Nastavení, která profil přepisuje (`core.sshCommand`, `credential.helper`), jsou vypsána se souborem a profil, který nelze použít, řekne proč. |
+
+Tlačítka (každé má klávesu: `Tab`/`Left`/`Right` mezi nimi, `Enter` stiskne):
+
+- **Otestovat připojení** zkontroluje každý remote s uloženými volbami, nejdřív fetch a pak push (žádná data se
+  nepřenášejí), a otevře panel s výsledky: u každého remote v pořádku nebo selhalo, identita, která odpověděla (klíč,
+  který server přijal, nebo účet, jehož token byl přijat), doba trvání a srozumitelné vysvětlení selhání. Běží na
+  pozadí, po chvíli se spinnerem. Panel se posouvá pomocí `Up`/`Down`, `PgUp`/`PgDn`, `Home`/`End`, kolečka a posuvníku
+  a zavře se klávesou `Esc` nebo křížkem. Dvojčetem v paletě je **Repozitář: Otestovat připojení**.
+- **Uložit** odešle volby. **Vrátit zpět** zahodí neuložené. Zavření Nastavení s neuloženými volbami se nejdřív zeptá.
+- **Výchozí nastavení** se zeptá a pak zapomene profil: pomocníci gitu pro HTTPS a vlastní nastavení ssh pro SSH.
+  Dvojčetem v paletě je **Repozitář: Výchozí přihlašovací údaje**, které se také zeptá.
+
+Uložení **Credential helperu** nebo **Příkazu pro token** se nejdřív zeptá **Povolit tento příkaz?**: příkaz se ukáže
+slovo od slova (řídicí znaky jsou vypsány, dlouhé řádky se zalomí), s jeho SHA-256 a dvěma odpověďmi, `1` **Uložit a
+povolit** a `2` **Zrušit**. Žádná odpověď není předvybraná, dokud nestisknete šipku nebo číslici, takže náhodné `Enter`
+nic neudělá; `Esc`, **Zrušit** i křížek panelu zrušují. `PgUp`/`PgDn`/`Home`/`End` a posuvník posouvají dlouhý příkaz.
+Je-li příkaz už uložen a beze změny, uložení druhé poloviny stránky se znovu nezeptá.
+
+Profil, který nelze použít (chybějící soubor klíče, zdroj, který tato verze zatím nespouští), způsobí, že přenos selže
+s uvedením důvodu, místo aby se vrátil k vlastní identitě počítače.
+
+Když profil není celý výchozí, nabídka **Push** končí řádkem, který říká, jako kdo se push přihlásí (**Přihlášení
+jako: github-corp (token)** nebo **Klíč SSH: work_ed25519**); otevře tuto stránku. Stejný řádek se přidá k záznamům
+Protokolu aktivity pro fetch, pull a push. Selhání způsobené volbami této stránky (credential helper, který nešel
+spustit, dosud neznámý hostitelský klíč SSH, odmítnuté přihlášení, příkaz pro token, který selhal, token, který se
+neodeslal, protože server není adresou účtu) ukáže na svém záznamu v Protokolu aktivity tlačítko **SSH a přihlášení...**
+(`r` na záznamu), vedle **Otevřít Integrace**, může-li být zdrojem účet integrace. Řádek **SSH a přihlášení...** v nabídce
+karty stránku otevře také; nahrazuje starou nabídku připnutí **Klíč SSH...** i její položku v paletě.
 
 ### Nastavení repozitáře: Commit
 

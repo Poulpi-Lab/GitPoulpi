@@ -86,7 +86,7 @@ jen na aktivní kartě a na kartě pod ukazatelem. Řádek karet nese jen karty
   nabídku karty: **Nová karta**, **Zavřít kartu**, **Zavřít ostatní karty...**, **Zavřít karty
   vpravo...**, **Přidat do oblíbených** (nebo **Odebrat z oblíbených**),
   **Přidat do pracovního prostoru** (nebo **Odebrat z pracovního prostoru**, když
-  máte pracovní prostory), **Kopírovat cestu**, **Otevřít v ›**, **Klíč SSH...**
+  máte pracovní prostory), **Kopírovat cestu**, **Otevřít v ›**, **SSH a přihlášení...**
   a **Částečný checkout...**.
 - `Ctrl+PageUp` a `Ctrl+PageDown` přepínají karty. `Ctrl+W` zavře aktuální
   kartu. Zavře ji i prostřední tlačítko na kartě (se stejnou otázkou).

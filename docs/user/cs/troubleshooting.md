@@ -117,6 +117,31 @@ GitPoulpi pro síť používá credential helper a ssh-agent vašeho `git`. Nejp
 se přesvědčte, že `git fetch` funguje v běžném terminálu. Tokeny GitHub/GitLab
 pro pull requesty jsou oddělené a nepovinné: viz [Hostingové služby a issue trackery](hosting-integration.md).
 
+**Fetch, pull nebo push selže s „The configured credential helper failed“, „The SSH host key of the remote is not known yet“ nebo odmítnutým přihlášením a jeho záznam v Protokolu aktivity má tlačítko „SSH a přihlášení...“.**
+Selhání pochází z toho, jak se tento repozitář přihlašuje. Tlačítko otevře
+Nastavení > SSH a přihlášení, kde pro tento repozitář vyberete jiný zdroj:
+vlastní pomocníky gitu s ignorovanými pomocníky repozitáře, účet integrace,
+soubor klíče (se souborem známých hostitelů), nebo vlastní helper či příkaz pro
+token; **Otestovat připojení** pak zkontroluje každý remote. U pomocníka, který
+nešel spustit, ukáže `git config --show-origin --get-all credential.helper`,
+kde je nastaven.
+
+**„GitPoulpi did not send the account token to ...“.** Remote repozitáře
+ukazuje na server, který není adresou, ke které je zvolený účet vázán (často
+přepis `url.<x>.insteadOf` v konfiguraci samotného repozitáře), takže se token
+zadržel. Opravte remote nebo na stránce zvolte jiný zdroj.
+
+**„This repository's token command failed“, „... changed since you confirmed it“, „This repository's sign-in cannot be used“.**
+Volby ze stránky nelze provést: příkaz pro token nevytiskl žádný token (jeho
+poslední chybové řádky jsou citovány, bez tajemství), skript, který spouští, se
+od potvrzení změnil (potvrďte příkaz na stránce znovu), nebo volba odkazuje na
+soubor klíče či účet, které už neexistují. Každé z těchto hlášení má tlačítko
+**SSH a přihlášení...**.
+
+**OpenSSH hlásí „bad permissions“ u souboru klíče.** Klíč mohou číst jiné účty.
+V Nastavení > SSH a přihlášení řádek **Soubor soukromého klíče** ukazuje varování
+s tlačítkem **Omezit na můj účet**.
+
 **„staging...“ zůstává ve stavovém řádku.** Stále běží obnovení na pozadí; zmizí, až se
 aktualizuje seznam souborů. `r` vynutí obnovu.
 

@@ -642,18 +642,25 @@ Quando una chiave è associata, la sezione mostra `titolo (SHA256:...)` con:
 
 ### Chiave SSH per un repository
 
-Per far usare a un repository la chiave di un profilo, GitPoulpi imposta
-`core.sshCommand` a `ssh -i "<key>" -o IdentitiesOnly=yes` in quel repository.
-Non viene mai fatto in automatico. Apri il menu della scheda (`Ctrl+T`, o clic
-destro sulla scheda) e scegli **Chiave SSH...**, oppure esegui il comando della
-palette *Repository: Chiave SSH per questo repository...*. Il menu mostra il pin
-attuale, ogni profilo che ha una chiave privata e **Rimuovi il pin**.
+Per far usare a un repository una chiave particolare, apri il menu della scheda
+(`Ctrl+T`, o clic destro sulla scheda) e scegli **SSH e credenziali...**, oppure
+esegui il comando della palette *Repository: SSH e credenziali...*, e scegli
+**File di chiave** (o **Chiave dell'account** per la chiave di un profilo di
+integrazione) sotto SSH. La scelta resta nella cartella privata di GitPoulpi:
+nulla viene scritto nel repository né nella configurazione di git. Vedi
+[Impostazioni](settings.md#specifico-del-repository-ssh-e-credenziali).
 
-CLI e MCP: `gitpoulpi ssh-command show | set --key <file> | clear`.
+Un repository che ha ancora un proprio `core.sshCommand`, del vecchio pin «Chiave
+SSH per questo repository», lo mostra in quella pagina, in sola lettura, con
+**Sposta in GitPoulpi**.
+
+CLI e MCP: `gitpoulpi repo-auth` (la scelta per repository) e, per il pin
+`core.sshCommand` stesso, `gitpoulpi ssh-command show | set --key <file> |
+clear`.
 
 La chiave globale in Impostazioni > SSH e credenziali (*Percorso della chiave
-privata*, o *Genera coppia di chiavi*) vale per ogni repository senza pin. Il pin
-di un repository ha la precedenza.
+privata*, o *Genera coppia di chiavi*) vale per ogni repository senza una scelta
+propria. Il file di chiave o il pin di un repository ha la precedenza.
 
 ## 13b. Protezione dei branch, per una riscrittura della cronologia
 

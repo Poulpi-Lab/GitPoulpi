@@ -41,7 +41,7 @@ Il pulsante **Attività** all'estremità destra della barra di stato (un numero 
 
 **Svuota il registro** (`x`, o il comando della palette `Registro attività: Svuota il registro dell'applicazione`) è nella scheda **Applicazione**: chiede prima conferma, poi svuota i file di registro di tutti i giorni conservati e l'elenco a schermo. Non si può annullare e non compare nella cronologia di annullamento.
 
-- **Operazioni git** (la scheda su cui si apre la finestra): le operazioni, le più recenti per prime, ciascuna con l'ora in cui è stata eseguita e la durata (`Push - 123 ms`): apertura del repository, caricamento del grafo dei commit, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Qui sono elencati anche i fallimenti, i messaggi di stato, un clone fallito e il Fetch all di un'area di lavoro; `Enter` o un clic ne apre uno (il suo motivo, il passo successivo, il comando, il codice di uscita e l'output), `c` o il suo pulsante Copia lo copia, `r` o il suo pulsante esegue il passo suggerito. `Tab` (o `Sinistra`/`Destra` qui) passa alla scheda Applicazione.
+- **Operazioni git** (la scheda su cui si apre la finestra): le operazioni, le più recenti per prime, ciascuna con l'ora in cui è stata eseguita e la durata (`Push - 123 ms`): apertura del repository, caricamento del grafo dei commit, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. Qui sono elencati anche i fallimenti, i messaggi di stato, un clone fallito e il Fetch all di un'area di lavoro; `Enter` o un clic ne apre uno (il suo motivo, il passo successivo, il comando, il codice di uscita e l'output), `c` o il suo pulsante Copia lo copia, `r` o il suo pulsante esegue il passo suggerito. `Tab` (o `p`) passa alla scheda Applicazione; `Sinistra`/`Destra` scorrono di lato le righe lunghe.
 ![Il Registro attività, scheda Operazioni git: ogni operazione con l'ora e la durata, un fetch fallito in rosso](../images/activity-log-repository.png)
 
 - **Righe lunghe** (entrambe le schede): un'intestazione o una riga di dettaglio più larga della finestra non viene mai tagliata. Sotto l'elenco compare una barra di scorrimento orizzontale; scorri lateralmente con `Sinistra` / `Destra` (riassegnabili come `activity_log.scroll_left` / `activity_log.scroll_right`), `Shift` + la rotella o una rotella orizzontale, `Registro attività: Scorri a sinistra` / `Registro attività: Scorri a destra` della palette, o la barra (trascina il cursore, o premi la guida per portare il cursore sotto il puntatore). `Home` torna all'inizio, e cambiando scheda l'altra scheda riparte dal bordo sinistro. Il testo a capo (un riepilogo, un'azione suggerita) resta a capo.
@@ -120,6 +120,33 @@ GitPoulpi usa per la rete il credential helper e l'ssh-agent del tuo `git`.
 Assicurati prima che `git fetch` funzioni in un normale terminale. I token
 GitHub/GitLab per le pull request sono separati e facoltativi: vedi [Hosting e
 issue tracker](hosting-integration.md).
+
+**Un fetch, pull o push non riesce con «L'helper delle credenziali configurato non è riuscito», «La chiave host SSH del remoto non è ancora nota» o un accesso rifiutato, e la sua voce del Registro attività ha un pulsante «SSH e credenziali...».**
+Il fallimento dipende da come questo repository accede. Il pulsante apre
+Impostazioni > SSH e credenziali, dove scegli un'altra fonte per questo
+repository: gli helper propri di git con gli helper del repository ignorati, un
+account di integrazione, un file di chiave (con un file known_hosts), oppure un
+helper o un comando del token tuo; **Prova la connessione** poi controlla ogni
+remoto. Per un helper che non è stato eseguito, `git config --show-origin
+--get-all credential.helper` mostra dove è impostato.
+
+**«GitPoulpi non ha inviato il token dell'account a ...».** Il remoto del
+repository punta a un server che non è l'indirizzo a cui è legato l'account
+scelto (spesso una riscrittura `url.<x>.insteadOf` nella config del repository
+stesso), quindi il token è stato trattenuto. Correggi il remoto o scegli
+un'altra fonte nella pagina.
+
+**«Il comando del token di questo repository non è riuscito», «... è cambiato da quando lo hai confermato», «L'accesso di questo repository non può essere usato».**
+Le scelte della pagina non possono essere eseguite: il comando del token non ha
+stampato alcun token (le sue ultime righe di errore sono citate, senza i
+segreti), uno script che esegue è cambiato da quando lo hai confermato (conferma
+di nuovo il comando nella pagina), oppure la scelta indica un file di chiave o
+un account che non esiste più. Ogni messaggio ha il pulsante **SSH e
+credenziali...**.
+
+**OpenSSH dice «bad permissions» per un file di chiave.** Altri account possono
+leggere la chiave. In Impostazioni > SSH e credenziali la riga **File della
+chiave privata** mostra un avviso con **Limita al mio account**.
 
 **«stage di tutte le modifiche...» resta nella barra di stato.** Un aggiornamento
 in background è ancora in corso; scompare quando l'elenco dei file si aggiorna. `r`

@@ -180,6 +180,8 @@ La liste des pages a deux groupes :
 | **Emplacement des données du dépôt** | Où GitPoulpi garde ses données propres à chaque dépôt (`session.per_repo_state_dir`) : **Dans .git** (par défaut : rien n'apparaît dans votre arbre de travail, tous les worktrees le partagent), **Dans l'arbre de travail** (un dossier `.gitpoulpi` ; nécessaire pour commiter un `workflow.toml` d'équipe) ou **Dans mon dossier de données utilisateur** (hors du dépôt). Un dossier `.gitpoulpi` laissé par une ancienne version est déplacé vers le nouvel endroit la première fois qu'il sert, puis supprimé une fois vide ; un fichier suivi par git (un `workflow.toml` commité) n'est jamais déplacé ni supprimé et reste lisible. |
 | **Nom de branche par défaut** | La première branche d'un dépôt créé avec Init. Vide : git décide. Cela ne renomme aucune branche existante. |
 | **Activer la détection proactive des conflits** | Activée par défaut (`general.conflict_detection`). Avertit sur le Log quand fusionner la branche courante dans la branche dont elle est partie provoquerait un conflit, avant même que vous essayiez. Un dépôt peut la désactiver pour lui-même sur sa page **Prévention des conflits**. Voir [Résoudre les conflits de merge](merge-conflicts.md#prévention-des-conflits). S'applique à la fermeture des Paramètres. |
+| **Branches de base par défaut** | Sous l'option, dans le groupe **Prévention des conflits** (la commande de palette **Conflits : Modifier les listes de branches de base...** l'ouvre). La liste de motifs de branches de base qu'utilisent les dépôts qui n'ont pas la leur : **Intégrée (`**`)**, c'est-à-dire toutes les branches, ou l'une de vos listes nommées (`conflict_prevention.default_list`). S'applique aux dépôts ouverts à la fermeture des Paramètres. **Revenir à la valeur intégrée** revient à `**`. |
+| **Listes de branches de base** | Aussi dans ce groupe : vos listes nommées de motifs de branches de base (`[conflict_prevention.lists.<nom>]`), un bloc chacune avec son **Nom** (renommer la conserve par défaut si elle l'était ; un dépôt qui suivait l'ancien nom utilise la liste par défaut tant que vous ne la choisissez pas à nouveau), ses **Motifs** (un par ligne, `Enter` ou un clic ouvre l'éditeur, `Ctrl+S` le garde), **Définir par défaut** et **Supprimer la liste** (il demande d'abord, et précise que les dépôts qui la suivent utiliseront la liste par défaut). Saisissez un nom dans **Nouvelle liste** et appuyez sur `Enter` pour en ajouter une ; elle commence par `**`. Modifier une liste change chaque dépôt qui la suit. |
 | **Niveau du journal**, **Durée de conservation des journaux**, **Taille maximale d'un fichier journal** | Le journal de l'application derrière le Journal d'activité : le niveau le plus bavard enregistré (`log.level`), la durée de conservation des fichiers (un nombre entier et une unité, jours, semaines, mois ou années, sur une ligne : cliquez sur le nombre pour le taper, Haut et Bas le font varier, Tab passe à l'unité et Entrée ouvre sa liste ; de 1 à 10 ans au plus, 1 semaine par défaut, `log.retention_days` et `log.retention_unit`) et la taille à laquelle le fichier d'une journée est renouvelé (un nombre et Mio ou Gio, de 1 Mio à 1 Gio, `log.max_file_mb` et `log.max_file_unit`). |
 | **Afficher la durée des opérations**, **Journalisation étendue** | L'onglet Opérations Git du Journal d'activité : la durée de chaque opération (`log.timings`, activé par défaut) et aussi le travail en arrière-plan, actualisation et auto-fetch (`log.extended`, désactivé par défaut). Voir [Quand quelque chose échoue](troubleshooting.md#le-journal-dactivité). |
 | **Annulation activée**, **Profondeur de l'historique**, **Enregistrer les changements faits hors de GitPoulpi** | Le groupe **Historique d'annulation**. Active ou désactive l'annulation, et règle combien d'opérations elle conserve (100 par défaut, `0` signifie illimité). Désactiver l'annulation efface l'historique d'annulation, après confirmation. La dernière option enregistre aussi ce qu'un shell ou un agent fait aux branches, aux tags, aux stashes et à HEAD. Voir [Annuler et rétablir](undo-redo.md). |
@@ -538,6 +540,7 @@ Trois options se trouvent sur l'onglet **Général**.
 | **Moteur Git** | `git2` (libgit2, par défaut) ou `system` (votre `git` installé). Global. S'applique aux démons démarrés après le changement. |
 | **Bouton Pull** | Ce que fait le bouton Pull : merge (fast-forward si possible), fast-forward seul, ou rebase. Global. Les éléments `▾` ne le changent pas. |
 | **Bouton Push** | **direct** pousse aussitôt ; **ask** montre d'abord le menu des remotes. Global. |
+| **Merge fast-forward** | Ce que fait un merge que vous lancez quand la branche pourrait simplement avancer en fast-forward : **never** (par défaut) crée toujours un commit de merge, **allowed** fait un fast-forward quand c'est possible (le comportement par défaut de git), **only** fait un fast-forward ou refuse. Global (`git.merge_fast_forward`) ; un dépôt le remplace sur sa page [Options de merge](#propre-au-dépôt-options-de-merge). |
 | **Encodage par défaut** | L'encodage utilisé pour afficher le texte qui **n'est pas de l'UTF-8 valide** : contenus de fichiers, blame, diffs et messages de commit. La page a une ligne globale et une ligne pour ce dépôt ; celle du dépôt l'emporte. L'UTF-8 valide n'est jamais redécodé, et le stage ne réencode jamais rien. |
 | **core.autocrlf**, **core.eol** | Les paramètres git propres à ce dépôt. La ligne écrit `core.autocrlf` ou `core.eol` dans la configuration git du dépôt. **(hérité)** retire la valeur du dépôt, de sorte que votre configuration git globale s'applique. `Ctrl+Z` restaure la valeur précédente. L'équivalent CLI est `gitpoulpi repo-config`. |
 | **Git LFS** | Affiche Git LFS dans l'interface. Voir [Git LFS](lfs.md). |
@@ -656,7 +659,20 @@ exécute aucun). Un hook qui échoue montre sa sortie dans son entrée du Journa
 
 ### Propre au dépôt : Options de merge
 
-Une seule option, **Squash** (désactivée par défaut). Activée, le merge d'une branche locale (le menu de la branche,
+Deux réglages. **Fast-forward** dit ce que fait un merge quand la branche pourrait simplement avancer en fast-forward :
+
+| Choix | Un merge que vous lancez... |
+|---|---|
+| **(hérité)** | suit le réglage global **Merge fast-forward** de la page Git (**never** par défaut). |
+| **never** | crée toujours un commit de merge (`git merge --no-ff`), même quand la branche est juste en avance. Le premier parent du commit est l'ancienne pointe, le second la branche fusionnée, et son message est celui de git (`Merge branch 'x' into y`). |
+| **allowed** | fait un fast-forward quand il le peut et crée sinon un commit de merge (le comportement par défaut de git). |
+| **only** | fait un fast-forward, et refuse avec *cannot fast-forward* quand les branches ont divergé (`git merge --ff-only`). |
+
+Il s'applique à chaque merge que vous lancez : le menu de la branche, un glisser-déposer, `Merge` dans la palette et `gitpoulpi merge` (dont les options `--ff`, `--no-ff` et `--ff-only` le remplacent pour un seul merge). Les menus disent ce que fera le merge : *Merge x dans y (commit de merge)*, *(fast-forward)* ou *(fast-forward seul)*, et la ligne séparée *Fast-forward de y vers x* (et sa commande de palette) reste à un geste sous chaque choix. Un commit de merge est une entrée d'annulation ordinaire, comme un fast-forward. Les actions Flow choisissent leur propre stratégie de merge et ignorent ce réglage.
+
+Votre propre choix l'emporte sur celui de git : un merge lancé par GitPoulpi sous **never** ou **only** passe l'option explicitement, si bien qu'un `merge.ff` dans la configuration git du dépôt est écrasé. Seul **allowed** laisse `merge.ff` de git s'appliquer, et quand le dépôt le définit la page l'affiche sous la ligne. (Seul le `.git/config` du dépôt est lu pour cette ligne, pas votre configuration git globale.)
+
+**Squash** (désactivée par défaut). Activée, le merge d'une branche locale (le menu de la branche,
 un glisser-déposer, `Merge` dans la palette) indexe les modifications de la branche sans créer de commit de merge
 (`git merge --squash`) : le commit vous est laissé. Le formulaire de commit s'ouvre avec le message de squash
 de git (`SQUASH_MSG`, lignes de commentaire retirées), une fois par squash. Rien n'est en cours ensuite (pas de
@@ -664,7 +680,7 @@ de git (`SQUASH_MSG`, lignes de commentaire retirées), une fois par squash. Rie
 indexées. Un squash qui s'arrête sur des conflits les laisse dans le volet Status comme n'importe quel merge en
 conflit. Les modifications indexées ne sont pas une entrée d'annulation (aucune ref n'a bougé, il n'y a donc rien à
 restaurer) ; la commande `gitpoulpi merge <branche> --squash` de la CLI fait la même chose, quel que soit le
-paramètre.
+paramètre. Un squash l'emporte sur **Fast-forward**.
 
 ### Propre au dépôt : Modèle de message
 
@@ -691,8 +707,14 @@ Un message avec lequel le formulaire de commit démarre (`gitpoulpi ui show sett
 - **Rechercher les conflits avec la branche de base** : activée par défaut. La décocher désactive la
   détection pour ce dépôt seulement ; l'option globale est **Activer la détection proactive des conflits**, sur la page
   Général. Les deux doivent être activées.
-- **Branches de base** (`**` par défaut) : les branches dont la branche courante a pu partir, un motif par ligne
-  (`Enter` ou un clic ouvre l'éditeur, `Ctrl+S` le garde). Le tableau des motifs en dessous sert de référence :
+- **Branches de base issues de** : d'où viennent les branches de base de ce dépôt. **Par défaut** suit la liste globale
+  par défaut (le `**` intégré, ou la liste choisie sous **Branches de base par défaut** dans Paramètres > Général) ;
+  **Liste : <nom>** suit l'une de vos listes nommées, si bien que la modifier change aussi ce dépôt ; **Liste propre**
+  est une liste à lui (la choisir part d'une copie des motifs en vigueur). Un fichier de dépôt écrit avant ce choix et
+  contenant ses propres motifs se lit comme **Liste propre**.
+- **Branches de base** (un motif par ligne) : avec **Liste propre**, `Enter` ou un clic ouvre l'éditeur et `Ctrl+S` le
+  garde ; avec **Par défaut** ou **Liste**, les motifs en vigueur s'affichent en lecture seule. Le tableau des motifs en
+  dessous sert de référence :
 
   | Motif | Correspond à |
   |---|---|
@@ -703,8 +725,16 @@ Un message avec lequel le formulaire de commit démarre (`gitpoulpi ui show sett
 
   Une branche locale s'écrit avec son nom seul (`main`), une branche de suivi distant avec son remote devant
   (`origin/main`). `*` et `?` restent à l'intérieur d'un segment de chemin, `**` les traverse. Les lignes vides et les
-  commentaires `#` sont ignorés ; une liste d'exclusions seules signifie « toutes les branches sauf celles-ci ». Elle
-  est enregistrée dans `repo-state.toml` et relue à la fermeture des Paramètres.
+  commentaires `#` sont ignorés ; une liste d'exclusions seules signifie « toutes les branches sauf celles-ci ». Le
+  choix est enregistré dans `repo-state.toml` et relu à la fermeture des Paramètres.
+- **Enregistrer comme liste...** : saisissez un nom et appuyez sur `Enter` ; les motifs en vigueur deviennent une liste
+  nommée (la même que modifie Paramètres > Général) et ce dépôt la suit.
+- **Revenir au défaut** (demande d'abord) : abandonne le choix, la liste et les motifs propres de ce dépôt ; il suit de
+  nouveau le défaut.
+- **Utiliser les branches de base du workflow** (affiché quand un [workflow de branches](branching-workflows.md) avec
+  des branches de base est configuré pour le dépôt) : remplit **Liste propre** avec ces bases, chacune comme branche
+  locale et comme branche de n'importe quel remote (`main` et `*/main`). Il les copie une fois ; il ne suit pas les
+  changements ultérieurs du workflow.
 
 ### Propre au dépôt : IA
 

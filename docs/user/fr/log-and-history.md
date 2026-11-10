@@ -219,6 +219,8 @@ pointeur et les cibles valides s'allument ; relâchez pour obtenir un menu :
 `Esc` annule un glissement. L'équivalent au clavier est la commande de palette
 *Refs : Déposer la ref sélectionnée sur la branche courante...*.
 
+**Merge ou fast-forward.** Quand la cible n'a aucun commit à elle (la branche glissée est juste en avance), un merge pourrait simplement faire avancer la cible. Par défaut (Paramètres > Git > **Merge fast-forward** = *never*, ou le choix propre à un dépôt sur sa page Options de merge), la ligne du menu affiche *Merge x dans y (commit de merge)* et crée un vrai commit de merge, pour que l'historique garde la branche ; utilisez la ligne séparée *Fast-forward de y vers x* pour un simple déplacement (pour une ligne droite, utilisez plutôt *Rebase*). Avec *allowed*, la ligne Merge affiche *(fast-forward)*, et avec *only* *(fast-forward seul)*, grisée avec la raison quand les branches ont divergé. Les mêmes lignes et libellés se trouvent dans le menu d'une branche, et `gitpoulpi merge --ff | --no-ff | --ff-only` choisit pour chaque merge.
+
 ## Le menu du commit
 
 Faites un clic droit sur un commit (ou appuyez sur `.` dessus) pour son menu :

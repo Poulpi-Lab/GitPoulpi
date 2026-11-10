@@ -1163,8 +1163,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Integraciones: Revisar comprobación de seguridad |  |
 | App: Salir | `q` |
 | App: Tema... |  |
-| Conflicts: Edit Base Branch Lists... |  |
-| Conflicts: Base Branches of This Repository... |  |
+| Conflictos: Editar listas de ramas base... |  |
+| Conflictos: Ramas base de este repositorio... |  |
 | App: Cambiar tema... | `Ctrl+N y` |
 | App: Cambiar idioma... | `Ctrl+N g` |
 | Lanzador: Crear acceso directo |  |

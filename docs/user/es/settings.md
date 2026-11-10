@@ -177,6 +177,8 @@ La lista de páginas tiene dos grupos:
 | **Ubicación de los datos del repositorio** | Dónde guarda GitPoulpi sus datos de cada repositorio (`session.per_repo_state_dir`): **Dentro de .git** (por defecto: nada aparece en tu árbol de trabajo y todos los worktrees lo comparten), **En el árbol de trabajo** (una carpeta `.gitpoulpi`; hace falta para hacer commit de un `workflow.toml` del equipo) o **En mi carpeta de datos de usuario** (fuera del repositorio). Una carpeta `.gitpoulpi` que dejó una versión anterior se traslada al sitio nuevo la primera vez que hace falta, y se elimina cuando queda vacía; un archivo que git sigue (un `workflow.toml` con commit) nunca se mueve ni se borra y sigue siendo legible. |
 | **Nombre de rama por defecto** | La primera rama de un repositorio que creas con Init. Vacío: decide git. No renombra ninguna rama existente. |
 | **Activar la detección proactiva de conflictos** | Activada por defecto (`general.conflict_detection`). Avisa en el Log cuando hacer merge de la rama actual en la rama de la que partió daría conflictos, antes de que lo intentes. Un repositorio puede desactivarla para sí mismo en su página **Prevención de conflictos**. Consulta [Resolver conflictos de merge](merge-conflicts.md#prevención-de-conflictos). Se aplica al cerrar Ajustes. |
+| **Ramas base predeterminadas** | Bajo el interruptor, en el grupo **Prevención de conflictos** (el comando de la paleta **Conflictos: Editar listas de ramas base...** lo abre). La lista de patrones de ramas base que usan los repositorios que no tienen una propia: **Integrada (`**`)**, que son todas las ramas, o una de tus listas con nombre (`conflict_prevention.default_list`). Se aplica a los repositorios abiertos al cerrar Ajustes. **Volver a la lista integrada** regresa a `**`. |
+| **Listas de ramas base** | También en ese grupo: tus listas con nombre de patrones de ramas base (`[conflict_prevention.lists.<name>]`), un bloque cada una con su **Nombre** (renombrar la mantiene como predeterminada si lo era; un repositorio que seguía el nombre anterior usa la lista predeterminada hasta que vuelvas a elegir la renombrada), sus **Patrones** (uno por línea, `Enter` o un clic abre el editor, `Ctrl+S` lo conserva), **Hacer predeterminada** y **Eliminar lista** (pregunta antes, y avisa de que los repositorios que la siguen usarán la lista predeterminada). Escribe un nombre en **Nueva lista** y pulsa `Enter` para añadir una; empieza con `**`. Editar una lista cambia todos los repositorios que la siguen. |
 | **Nivel del registro**, **Conservar los archivos de registro**, **Tamaño máximo de un archivo de registro** | El registro de la aplicación que hay detrás del Registro de actividad: la línea más detallada que se registra (`log.level`), cuánto tiempo se conservan los archivos (un número entero y una unidad, días, semanas, meses o años, en una sola línea: haz clic en el número para escribirlo, Arriba y Abajo lo cambian, Tab pasa a la unidad y Enter abre su lista; hasta 10 años como máximo, por defecto 1 semana, `log.retention_days` y `log.retention_unit`) y el tamaño al que se rota el archivo de un día (un número y MiB o GiB, de 1 MiB a 1 GiB, `log.max_file_mb` y `log.max_file_unit`). |
 | **Mostrar la duración de las operaciones**, **Registro ampliado** | La pestaña Operaciones de git del Registro de actividad: la duración de cada operación (`log.timings`, activado por defecto) y también el trabajo en segundo plano, actualización y auto-fetch (`log.extended`, desactivado por defecto). Consulta [Cuando algo falla](troubleshooting.md#el-registro-de-actividad). |
 | **Deshacer activado**, **Profundidad del historial de deshacer**, **Registrar los cambios hechos fuera de GitPoulpi** | El grupo **Historial de deshacer**. Activa o desactiva Deshacer, y fija cuántas operaciones conserva (por defecto 100, `0` significa sin límite). Desactivar Deshacer borra el historial de deshacer, tras una confirmación. La última opción también registra lo que un shell o un agente hace en ramas, tags, stashes y HEAD. Consulta [Deshacer y rehacer](undo-redo.md). |
@@ -545,6 +547,7 @@ Hay tres opciones en la pestaña **General**.
 |---|---|
 | **Backend de git** | `git2` (libgit2, el valor por defecto) o `system` (tu `git` instalado). Global. Se aplica a los daemons iniciados después del cambio. |
 | **Botón Pull** | Qué hace el botón Pull: merge (fast-forward si es posible), solo fast-forward o rebase. Global. Los elementos de `▾` no lo cambian. |
+| **Merge fast-forward** | Qué hace un merge que inicias cuando la rama podría avanzar con un simple fast-forward: **never** (por defecto) crea siempre un commit de merge, **allowed** hace fast-forward cuando es posible (el comportamiento por defecto de git), **only** hace fast-forward o rechaza. Global (`git.merge_fast_forward`); un repositorio lo anula en su página [Opciones de merge](#ajustes-del-repositorio-opciones-de-merge). |
 | **Botón Push** | **directo** hace push al instante; **preguntar** muestra antes el menú de remotos. Global. |
 | **Codificación por defecto** | La codificación usada para mostrar el texto que **no es UTF-8 válido**: contenido de archivos, blame, diffs y mensajes de commit. La página tiene una fila global y una fila para este repositorio; prevalece la del repositorio. El UTF-8 válido nunca se vuelve a decodificar, y el staging nunca recodifica nada. |
 | **core.autocrlf**, **core.eol** | Los ajustes de git propios de este repositorio. La fila escribe `core.autocrlf` o `core.eol` en la config de git del repositorio. **(heredado)** elimina el valor del repositorio, de modo que se aplica tu config global de git. `Ctrl+Z` restaura el valor anterior. El equivalente en la CLI es `gitpoulpi repo-config`. |
@@ -658,14 +661,35 @@ ejecuta ninguno). Un hook que falla muestra su salida en su entrada del Registro
 
 ### Ajustes del repositorio: Opciones de merge
 
-Un único interruptor, **Squash** (desactivado por defecto). Activado, hacer merge de una rama local (el menú de la
+Dos ajustes. **Fast-forward** indica qué hace un merge cuando la rama podría avanzar con un simple fast-forward:
+
+| Opción | Un merge que inicias... |
+|---|---|
+| **(heredado)** | sigue el ajuste global **Merge fast-forward** de la página Git (por defecto **never**). |
+| **never** | crea siempre un commit de merge (`git merge --no-ff`), aunque la rama solo vaya por delante. El primer padre del commit es la punta anterior, el segundo la rama fusionada, y su mensaje es el propio de git (`Merge branch 'x' into y`). |
+| **allowed** | hace fast-forward cuando puede y crea un commit de merge en caso contrario (el comportamiento por defecto de git). |
+| **only** | hace fast-forward, y rechaza con *cannot fast-forward* cuando las ramas han divergido (`git merge --ff-only`). |
+
+Se aplica a todo merge que inicias: el menú de la rama, un arrastrar y soltar, `Merge` en la paleta y `gitpoulpi merge`
+(cuyos flags `--ff`, `--no-ff` y `--ff-only` lo anulan en un merge concreto). Los menús dicen qué hará el merge:
+*Merge x en y (commit de merge)*, *(con fast-forward)* o *(solo fast-forward)*, y el elemento aparte
+*Fast-forward de y a x* (y su comando de la paleta) sigue a un gesto de distancia con cualquier opción. Un commit de
+merge es una entrada de deshacer normal, como un fast-forward. Las acciones de Flow eligen su propia estrategia de merge
+y ignoran este ajuste.
+
+Tu propia elección prevalece sobre la de git: un merge que inicia GitPoulpi con **never** u **only** pasa el flag de
+forma explícita, así que un `merge.ff` en la configuración git del repositorio queda anulado. Solo con **allowed** sigue
+vigente el `merge.ff` de git, y cuando el repositorio lo define la página lo muestra bajo la fila. (Para esa línea solo
+se lee el `.git/config` del propio repositorio, no tu configuración global de git.)
+
+**Squash** (desactivado por defecto). Activado, hacer merge de una rama local (el menú de la
 rama, un arrastrar y soltar, `Merge` en la paleta) deja en el índice los cambios de la rama sin crear un commit de
 merge (`git merge --squash`): el commit queda en tus manos. El formulario de commit se abre con el mensaje de squash
 de git (`SQUASH_MSG`, sin las líneas de comentario), una vez por cada squash. Después no queda nada en curso (no hay
 `MERGE_HEAD`), así que **Abortar** no se aplica: para volver atrás, descarta los cambios en stage. Un squash que se
 detiene por conflictos los deja en el panel Estado como cualquier merge con conflictos. Los cambios en stage no son una
 entrada de deshacer (no se movió ninguna ref, así que no hay nada que restaurar); el
-`gitpoulpi merge <branch> --squash` de la CLI hace lo mismo, sea cual sea el ajuste.
+`gitpoulpi merge <branch> --squash` de la CLI hace lo mismo, sea cual sea el ajuste. Un squash prevalece sobre **Fast-forward**.
 
 ### Ajustes del repositorio: Plantilla de mensaje
 
@@ -692,8 +716,14 @@ repositorio (consulta [Resolver conflictos de merge](merge-conflicts.md#prevenci
 - **Activar la detección proactiva de conflictos con la rama de destino**: activada por defecto. Al desmarcarla se
   desactiva la detección solo para este repositorio; el interruptor global es **Activar la detección proactiva de
   conflictos** de la página General. Los dos deben estar activados.
-- **Ramas base** (`**` por defecto): las ramas de las que puede haber partido la rama actual, un patrón por línea
-  (`Enter` o un clic abre el editor, `Ctrl+S` lo conserva). La tabla de patrones de debajo es la referencia:
+- **Ramas base desde**: de dónde vienen las ramas base de este repositorio. **Predeterminada** sigue el valor global
+  (el `**` integrado, o la lista elegida en **Ramas base predeterminadas** de Ajustes > General); **Lista: <nombre>**
+  sigue una de tus listas con nombre, así que editar la lista cambia también este repositorio; **Lista propia** es una
+  lista del propio repositorio (al elegirla se parte de una copia de los patrones vigentes). Un archivo de repositorio
+  escrito antes de existir esta elección y que contiene patrones propios se lee como **Lista propia**.
+- **Ramas base** (un patrón por línea): con **Lista propia**, `Enter` o un clic abre el editor y `Ctrl+S` lo conserva;
+  con **Predeterminada** o **Lista**, los patrones vigentes se muestran de solo lectura. La tabla de patrones de debajo
+  es la referencia:
 
   | Patrón | Coincide con |
   |---|---|
@@ -704,8 +734,15 @@ repositorio (consulta [Resolver conflictos de merge](merge-conflicts.md#prevenci
 
   Una rama local es su nombre a secas (`main`); una de seguimiento remoto lleva delante su remoto (`origin/main`). `*`
   y `?` se quedan dentro de un segmento de la ruta, `**` los cruza. Las líneas en blanco y los comentarios con `#`
-  se ignoran; una lista solo de exclusiones significa «todas las ramas salvo estas». Se guarda en `repo-state.toml` y se
+  se ignoran; una lista solo de exclusiones significa «todas las ramas salvo estas». La elección se guarda en `repo-state.toml` y se
   vuelve a leer al cerrar Ajustes.
+- **Guardar como lista...**: escribe un nombre y pulsa `Enter`; los patrones vigentes pasan a ser una lista con nombre
+  (la misma que edita Ajustes > General) y este repositorio la sigue.
+- **Restablecer a predeterminado** (pregunta antes): descarta la elección, la lista y los patrones propios de este
+  repositorio; vuelve a seguir la predeterminada.
+- **Usar las ramas base del flujo de trabajo** (se muestra cuando hay un [flujo de ramas](branching-workflows.md) con
+  ramas base configurado para el repositorio): rellena la **Lista propia** con esas bases, cada una como rama local y
+  como rama de cualquier remoto (`main` y `*/main`). Las copia una sola vez; no sigue los cambios posteriores del flujo.
 
 ### Ajustes del repositorio: IA
 

@@ -107,7 +107,7 @@ que está bajo el puntero. La fila de pestañas solo lleva pestañas (el botón 
   pestaña: **Nueva pestaña**, **Cerrar pestaña**, **Cerrar las demás pestañas...**, **Cerrar las
   pestañas de la derecha...**, **Añadir a favoritos** (o **Quitar de favoritos**),
   **Añadir al espacio de trabajo** (o **Quitar del espacio de trabajo**, cuando tienes
-  espacios de trabajo), **Copiar ruta**, **Abrir en ›**, **Clave SSH...** y
+  espacios de trabajo), **Copiar ruta**, **Abrir en ›**, **SSH y credenciales...** y
   **Checkout parcial...**.
 - `Ctrl+PageUp` y `Ctrl+PageDown` cambian de pestaña. `Ctrl+W` cierra la pestaña
   actual. Un clic central en una pestaña también la cierra (con la misma

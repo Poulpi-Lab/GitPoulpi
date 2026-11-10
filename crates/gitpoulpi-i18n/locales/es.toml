@@ -484,7 +484,7 @@ tested = "Abriendo una imagen de ejemplo en «{label}»..."
 
 [settings_ssh]
 private_key_path = "Ruta de la clave privada"
-private_key_path_help = { git = "Archivo de clave que {$fetch}, {$pull}, {$push} y clone ofrecen a ssh (ssh -i <clave> -o IdentitiesOnly=yes). Vacío: ssh-agent y tu configuración ssh como siempre. Se ignora si GIT_SSH_COMMAND o core.sshCommand (p. ej. Clave SSH de este repositorio) está definido. Se aplica a la siguiente transferencia.", local = "Archivo de clave que se ofrece a ssh en las obtenciones, traídas, envíos y clonados (ssh -i <clave> -o IdentitiesOnly=yes). Vacío: ssh-agent y tu configuración ssh como siempre. Se ignora si GIT_SSH_COMMAND o core.sshCommand (p. ej. Clave SSH de este repositorio) está definido. Se aplica a la siguiente transferencia." }
+private_key_path_help = { git = "Archivo de clave que {$fetch}, {$pull}, {$push} y clone ofrecen a ssh (ssh -i <clave> -o IdentitiesOnly=yes). Vacío: ssh-agent y tu configuración ssh como siempre. No se usa cuando un repositorio elige su propia clave (SSH y credenciales) ni cuando GIT_SSH_COMMAND o core.sshCommand está definido. Se aplica a la siguiente transferencia.", local = "Archivo de clave que se ofrece a ssh en las obtenciones, traídas, envíos y clonados (ssh -i <clave> -o IdentitiesOnly=yes). Vacío: ssh-agent y tu configuración ssh como siempre. No se usa cuando un repositorio elige su propia clave (SSH y credenciales) ni cuando GIT_SSH_COMMAND o core.sshCommand está definido. Se aplica a la siguiente transferencia." }
 public_key_path = "Ruta de la clave pública"
 public_key_path_help = "Solo se usa si la ruta de la clave privada está vacía: ssh elige entonces la clave correspondiente que tenga ssh-agent (o una clave de hardware) en vez de ofrecer todas las del agente. Generar par de claves rellena ambas. Misma prioridad que la ruta de la clave privada."
 key_type = "Tipo de clave"
@@ -4084,7 +4084,7 @@ hosting_3 = "Crear una {$pr}|El + de la cabecera {$PRS}, o n en esa sección, ab
 hosting_4 = "Issues|La sección ISSUES los lista; + o n crea uno. El menú de una fila lo abre en el navegador o actúa sobre él."
 hosting_5 = "Referencias|Las referencias a issues y {$prs} (#12, !53, ABC-7) en un mensaje de {$commit} o un nombre de rama se reconocen. Alt+R en el formulario de {$commit} inserta una."
 hosting_6 = "Chip de la barra|A la izquierda de la barra, un chip muestra la {$pr} de la rama actual (GH #12, GL !53) o un «+ {$pr_abbr}» tenue para iniciar una. Haz clic."
-hosting_7 = "Claves SSH|Elige una clave SSH por perfil (Ajustes > Perfiles) o por repositorio (menú de la pestaña > «Clave SSH...»). Las frases de paso quedan en tu ssh-agent del sistema."
+hosting_7 = "Claves SSH|Elige una clave SSH por perfil (Ajustes > Perfiles) o por repositorio (menú de la pestaña > «SSH y credenciales...»). Las frases de paso quedan en tu ssh-agent del sistema."
 setup_1 = "Ajustes|Ctrl+, o el engranaje. Tab alterna entre la lista de páginas y las opciones, j / k mueven, Enter o Space cambia un valor, / o Ctrl+F busca en todas las opciones, Esc cierra."
 setup_2 = "Temas|Ajustes > Apariencia > Tema: oscuro, claro, seguir el terminal o uno de muchos preajustes. Ctrl+N y una tecla también cambian tema, idioma y colores del grafo sin abrir Ajustes."
 setup_3 = "Idioma|Ajustes > General > Idioma ofrece 17 idiomas. «Traducir términos de git» decide si las palabras propias de git ({$commit}, {$push}...) también se traducen."

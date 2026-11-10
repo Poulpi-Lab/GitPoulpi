@@ -530,10 +530,18 @@ mod tests {
             take_outcome(root),
             Outcome {
                 accepted: Some("account work".into()),
-                token_refused: false
+                token_refused: false,
+                unasked: false
             }
         );
-        assert_eq!(take_outcome(root), Outcome::default());
+        // Nothing asked since: the helper has not reached the daemon.
+        assert_eq!(
+            take_outcome(root),
+            Outcome {
+                unasked: true,
+                ..Outcome::default()
+            }
+        );
         send(CredentialAction::Erase, "h.example").await;
         // Another host's store or erase says nothing about this account.
         send(CredentialAction::Store, "other.example").await;
@@ -541,9 +549,26 @@ mod tests {
             take_outcome(root),
             Outcome {
                 accepted: None,
-                token_refused: true
+                token_refused: true,
+                unasked: false
             }
         );
+    }
+
+    #[tokio::test]
+    async fn a_grant_nobody_asked_about_reads_git_s_missing_credential_as_unreachable() {
+        let root = Path::new("/repo/unasked");
+        let guard = issue(root, credential("h.example")).unwrap();
+        let prompt = "fatal: could not read Username for 'https://h.example': terminal prompts disabled";
+        assert!(matches!(
+            guard.reads_as(prompt),
+            Some(gitpoulpi_core::Error::CredentialHelperUnreachable)
+        ));
+        // Another failure of the same transfer is not about the helper.
+        assert!(guard.reads_as("fatal: unable to access").is_none());
+        // Once the helper has asked, the same words mean something else.
+        let _ = answer(&get(guard.id(), "https", "h.example")).await;
+        assert!(guard.reads_as(prompt).is_none());
     }
 
     #[test]

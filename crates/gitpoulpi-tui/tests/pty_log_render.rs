@@ -170,7 +170,7 @@ Ref                  │Graph  │Message            │Author     │Date      
  v1 🔖  ⬆ ─────────────●───╯   second commit       GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS
                       ○       first commit        GitPoulpi … DDDDDDDDDDDDDDDD SSSSSSS";
 const GOLDEN_NARROW: &str = "\
-Ref      │GrapMessage        │AuthDate     │SHA   │
+Ref      │Gra…Message        │Aut…Date     │SHA   │
           ◌   // WIP      ✎ 1
           ┊ □ On main: parked st… DDDDDDDDD SSSSSSS
  ✓ ma… 💻  ◎─┴─merge side      Gi… DDDDDDDDD SSSSSSS

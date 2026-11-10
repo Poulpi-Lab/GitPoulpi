@@ -12,7 +12,6 @@
 //! global `core.sshCommand` naming the stub.
 #![cfg_attr(not(unix), allow(unused_imports, dead_code))]
 
-
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 

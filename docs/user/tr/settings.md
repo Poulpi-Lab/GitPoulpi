@@ -172,6 +172,8 @@ Sayfa listesinde iki grup vardır:
 | **Depo verilerinin konumu** | GitPoulpi'nin depoya özel verilerini sakladığı yer (`session.per_repo_state_dir`): **.git içinde** (varsayılan: çalışma ağacınızda hiçbir şey belirmez, tüm worktree'ler aynı veriyi paylaşır), **Çalışma ağacında** (`.gitpoulpi` klasörü; bir ekip `workflow.toml` dosyasını commit'lemek için gerekir) veya **Kullanıcı verileri klasörümde** (deponun dışında). Eski bir sürümün bıraktığı `.gitpoulpi` klasörü, ilk gerektiğinde yeni yere taşınır ve boşalınca silinir; git'in izlediği bir dosya (commit'lenmiş bir `workflow.toml`) asla taşınmaz veya silinmez ve okunabilir kalır. |
 | **Varsayılan Dal Adı** | Init ile oluşturduğunuz bir deponun ilk dalı. Boşsa: Git karar verir. Mevcut hiçbir dalı yeniden adlandırmaz. |
 | **Proaktif çakışma algılamayı etkinleştir** | Varsayılan olarak açıktır (`general.conflict_detection`). Geçerli dalı ayrıldığı dala merge etmek çakışacaksa, siz denemeden önce Log'da uyarır. Bir depo bunu kendi **Çakışma önleme** sayfasında kendisi için kapatabilir. Bkz. [Merge çakışmalarını çözmek](merge-conflicts.md#çakışma-önleme). Ayarlar kapanınca uygulanır. |
+| **Varsayılan temel dallar** | Anahtarın altında, **Çakışma önleme** grubunda (paletteki **Çakışmalar: Temel Dal Listelerini Düzenle...** burayı açar). Kendi listesi olmayan depoların kullandığı temel dal desenleri listesi: her dal demek olan **Yerleşik (`**`)** ya da adlandırılmış listelerinizden biri (`conflict_prevention.default_list`). Ayarlar kapanınca açık depolara uygulanır. **Yerleşik varsayılana sıfırla** `**` değerine döner. |
+| **Temel dal listeleri** | Yine o grupta: adlandırılmış temel dal desenleri listeleriniz (`[conflict_prevention.lists.<ad>]`); her biri bir blok ve içinde **Ad** (yeniden adlandırmak, varsayılansa varsayılan olarak kalmasını sağlar; eski adı izleyen bir depo, listeyi yeniden seçene kadar varsayılan listeyi kullanır), **Desenler** (satır başına bir tane, `Enter` veya tıklama düzenleyiciyi açar, `Ctrl+S` korur), **Varsayılan yap** ve **Listeyi sil** (önce sorar ve onu izleyen depoların bunun yerine varsayılan listeyi kullanacağını söyler). Eklemek için **Yeni liste** alanına bir ad yazıp `Enter`'a basın; `**` ile başlar. Bir listeyi düzenlemek, onu izleyen her depoyu değiştirir. |
 | **Günlük düzeyi**, **Günlük dosyalarını sakla**, **Bir günlük dosyasının en büyük boyutu** | Etkinlik Günlüğü'nün arkasındaki uygulama günlüğü: kaydedilen en ayrıntılı düzey (`log.level`), dosyaların ne kadar saklanacağı (tek satırda bir tam sayı ve bir birim: gün, hafta, ay veya yıl; sayıya tıklayıp yazın, Up ve Down onu değiştirir, Tab birime geçer ve Enter listesini açar; en çok 10 yıl, varsayılan 1 hafta, `log.retention_days` ve `log.retention_unit`) ve bir günün dosyasının döndürüldüğü boyut (bir sayı ve MiB ya da GiB, 1 MiB ile 1 GiB arası, `log.max_file_mb` ve `log.max_file_unit`). |
 | **İşlem sürelerini göster**, **Genişletilmiş günlükleme** | Etkinlik Günlüğü'nün Git işlemleri sekmesi: her işlemin süresi (`log.timings`, varsayılan olarak açık) ve ayrıca arka plan işleri, yenileme ve otomatik fetch (`log.extended`, varsayılan olarak kapalı). Bkz. [Bir şey başarısız olduğunda](troubleshooting.md#etkinlik-günlüğü). |
 | **Geri alma açık**, **Geri alma geçmişi derinliği**, **GitPoulpi dışında yapılan değişiklikleri kaydet** | **Geri alma geçmişi** grubu. Geri Al'ı açar ya da kapatır ve kaç işlem tuttuğunu ayarlar (varsayılan 100, `0` sınırsız demektir). Geri Al'ı kapatmak, bir onaydan sonra geri alma geçmişini siler. Sonuncusu, bir kabuğun veya bir ajanın dallar, tag'ler, stash'ler ve HEAD üzerinde yaptıklarını da kaydeder. Bkz. [Geri al ve yinele](undo-redo.md). |
@@ -532,6 +534,7 @@ Aynı ayarlar `config.toml` dosyasının `[keybindings]` tablosunda bulunur; bkz
 | **Git arka ucu** | `git2` (libgit2, varsayılan) ya da `system` (kurulu `git`'iniz). Geneldir. Değişiklikten sonra başlatılan daemon'lara uygulanır. |
 | **Pull düğmesi** | Pull düğmesinin ne yaptığı: merge (mümkünse fast-forward), yalnızca fast-forward ya da rebase. Geneldir. `▾` öğeleri bunu değiştirmez. |
 | **Push düğmesi** | **doğrudan** hemen push eder; **sor** önce uzak depo menüsünü gösterir. Geneldir. |
+| **Merge fast-forward** | Başlattığınız bir merge'ün, dal sadece fast-forward yapılabilecekken yaptığı: **never** (varsayılan) her zaman bir merge commit'i oluşturur, **allowed** mümkünse fast-forward yapar (git'in kendi varsayılanı), **only** fast-forward yapar ya da reddeder. Geneldir (`git.merge_fast_forward`); bir depo bunu kendi [Merge seçenekleri](#depoya-özel-merge-seçenekleri) sayfasında geçersiz kılar. |
 | **Varsayılan kodlama** | **Geçerli UTF-8 olmayan** metni (dosya içerikleri, blame, diff'ler ve commit mesajları) göstermek için kullanılan kodlama. Sayfada genel bir satır ve bu depo için bir satır vardır; depo satırı baskındır. Geçerli UTF-8 asla yeniden çözülmez ve staging hiçbir şeyi yeniden kodlamaz. |
 | **core.autocrlf**, **core.eol** | Bu deponun kendi Git ayarları. Satır, deponun Git yapılandırmasına `core.autocrlf` ya da `core.eol` yazar. **(devralınan)** depo değerini kaldırır, böylece genel Git yapılandırmanız geçerli olur. `Ctrl+Z` önceki değeri geri getirir. CLI karşılığı `gitpoulpi repo-config`'tir. |
 | **Git LFS** | Git LFS'yi arayüzde gösterir. Bkz. [Git LFS](lfs.md). |
@@ -643,13 +646,33 @@ Etkinlik Günlüğü girdisinde gösterir (durum çubuğu commit'in başarısız
 
 ### Depoya Özel: Merge seçenekleri
 
-Tek bir anahtar, **Squash** (varsayılan olarak kapalı). Açıkken yerel bir dalı merge etmek (dalın menüsü, sürükle bırak,
+İki ayar. **Fast-forward**, dal sadece fast-forward yapılabilecekken bir merge'ün ne yapacağını söyler:
+
+| Seçim | Başlattığınız bir merge... |
+|---|---|
+| **(inherited)** | Git sayfasındaki genel **Merge fast-forward** ayarını izler (varsayılan **never**). |
+| **never** | dal tam önünde olsa bile her zaman bir merge commit'i oluşturur (`git merge --no-ff`). Commit'in ilk ebeveyni eski uç, ikincisi merge edilen daldır ve mesajı git'in kendisidir (`Merge branch 'x' into y`). |
+| **allowed** | yapabiliyorsa fast-forward yapar, yapamıyorsa bir merge commit'i oluşturur (git'in varsayılanı). |
+| **only** | fast-forward yapar, dallar ayrışmışsa *cannot fast-forward* ile reddeder (`git merge --ff-only`). |
+
+Başlattığınız her merge için geçerlidir: dalın menüsü, sürükle bırak, paletteki `Merge` ve `gitpoulpi merge` (bunun `--ff`,
+`--no-ff` ve `--ff-only` bayrakları tek bir merge için ayarı geçersiz kılar). Menüler merge'ün ne yapacağını söyler:
+*Merge: x → y (merge commit)*, *(fast-forward)* veya *(yalnızca fast-forward)*; ayrı *Fast-forward: y → x* öğesi (ve palet
+komutu) her seçimde tek bir hareket uzaklıkta kalır. Bir merge commit'i, tıpkı bir fast-forward gibi sıradan bir geri alma
+girdisidir. Flow eylemleri kendi merge stratejilerini seçer ve bu ayarı yok sayar.
+
+Kendi seçiminiz git'inkini geçersiz kılar: **never** veya **only** altında GitPoulpi'nin başlattığı bir merge bayrağı açıkça
+geçirir, bu yüzden deponun git yapılandırmasındaki bir `merge.ff` geçersiz kılınır. Git'in `merge.ff` ayarı yalnızca **allowed**
+altında etkindir ve depo bunu ayarladıysa sayfa onu satırın altında gösterir. (Bu satır için yalnızca deponun kendi
+`.git/config` dosyası okunur, genel git yapılandırmanız değil.)
+
+**Squash** (varsayılan olarak kapalı). Açıkken yerel bir dalı merge etmek (dalın menüsü, sürükle bırak,
 paletteki `Merge`), merge commit'i oluşturmadan dalın değişikliklerini stage'ler (`git merge --squash`): commit'i
 tamamlamak size kalır. Commit formu, her squash için bir kez, git'in squash mesajıyla (`SQUASH_MSG`, yorum satırları çıkarılmış)
 açılır. Sonrasında devam eden bir işlem yoktur (`MERGE_HEAD` yok), bu yüzden **İptal et** geçerli değildir: vazgeçmek için
 stage'lenmiş değişiklikleri atın. Çakışmada duran bir squash, çakışmaları herhangi bir çakışmalı merge gibi Durum panelinde
 bırakır. Stage'lenmiş değişiklikler bir geri alma girdisi değildir (hiçbir ref taşınmadı, geri yüklenecek bir şey yok);
-CLI'nin `gitpoulpi merge <dal> --squash` komutu, ayardan bağımsız olarak aynısını yapar.
+CLI'nin `gitpoulpi merge <dal> --squash` komutu, ayardan bağımsız olarak aynısını yapar. Squash, **Fast-forward** ayarını geçersiz kılar.
 
 ### Depoya Özel: Mesaj şablonu
 
@@ -675,8 +698,13 @@ Commit formunun başladığı bir mesaj (`gitpoulpi ui show settings commit-temp
 - **Proaktif çakışma algılamayı hedef dalla etkinleştir**: varsayılan olarak açık. İşareti kaldırmak algılamayı
   yalnızca bu depo için kapatır; genel anahtar, Genel sayfasındaki **Proaktif çakışma algılamayı etkinleştir**'dir.
   İkisi de açık olmalıdır.
-- **Temel dallar** (varsayılan `**`): geçerli dalın ayrılmış olabileceği dallar, satır başına bir desen
-  (`Enter` veya tıklama düzenleyiciyi açar, `Ctrl+S` korur). Altındaki desen tablosu başvuru niteliğindedir:
+- **Temel dalların kaynağı**: bu deponun temel dallarının nereden geldiği. **Varsayılan** genel varsayılanı izler (yerleşik
+  `**` ya da Ayarlar > Genel'de **Varsayılan temel dallar** altında seçilen liste); **Liste: <ad>** adlandırılmış listelerinizden
+  birini izler, yani listeyi düzenlemek bu depoyu da değiştirir; **Kendi listesi** deponun kendine ait listesidir (seçmek,
+  geçerli desenlerin bir kopyasıyla başlar). Bu seçim var olmadan önce yazılmış ve kendi desenlerini tutan bir depo dosyası
+  **Kendi listesi** olarak okunur.
+- **Temel dallar** (satır başına bir desen): **Kendi listesi** ile `Enter` veya tıklama düzenleyiciyi açar ve `Ctrl+S` korur;
+  **Varsayılan** veya **Liste** ile geçerli desenler salt okunur gösterilir. Altındaki desen tablosu başvuru niteliğindedir:
 
   | Desen | Neyle eşleşir |
   |---|---|
@@ -687,8 +715,15 @@ Commit formunun başladığı bir mesaj (`gitpoulpi ui show settings commit-temp
 
   Yerel bir dal yalın adıdır (`main`), uzak izleme dalının önünde uzak deposu bulunur (`origin/main`). `*` ve `?` tek
   bir yol bölümünün içinde kalır, `**` bölümleri aşar. Boş satırlar ve `#` yorumları yok sayılır; yalnızca hariç tutma
-  içeren bir liste "bunlar dışındaki her dal" anlamına gelir. `repo-state.toml` içinde saklanır ve Ayarlar kapanınca
-  yeniden okunur.
+  içeren bir liste "bunlar dışındaki her dal" anlamına gelir. Seçim `repo-state.toml` içinde saklanır ve Ayarlar
+  kapanınca yeniden okunur.
+- **Liste olarak kaydet...**: bir ad yazıp `Enter`'a basın; geçerli desenler adlandırılmış bir liste olur (Ayarlar > Genel'in
+  düzenlediği listelerle aynı) ve bu depo onu izler.
+- **Varsayılana sıfırla** (önce sorar): bu deponun seçimini, listesini ve kendi desenlerini bırakır; depo yeniden varsayılanı
+  izler.
+- **İş akışının temel dallarını kullan** ([dallanma iş akışı](branching-workflows.md) temel dalları olan bir depo için kurulmuşsa
+  gösterilir): **Kendi listesi**ni o temel dallarla doldurur, her biri yerel dal olarak ve herhangi bir uzak deponun dalı olarak
+  (`main` ve `*/main`). Bir kez kopyalar; iş akışının sonraki değişikliklerini izlemez.
 
 ### Depoya Özel: YZ
 

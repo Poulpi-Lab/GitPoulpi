@@ -62,7 +62,7 @@ Ayarlar kapandığında).
 | `general.startup_tab_launcher` | `"last"` | GitPoulpi'nin oluşturduğu masaüstü veya Başlat menüsü kısayolundan (`--launcher` iletir) başlatıldığında, klasör ne olursa olsun hangi sekmede açılır: `"home"`, `"last"` veya `"radar"`. Yukarıdaki iki ayara göre önceliklidir. `"last"`, `remember_tabs` kapalıysa ya da hatırlanan bir şey yoksa Ana olur; `"radar"`, Radar kapalıysa veya derlemede yoksa Ana olur. Başlangıçta bir kez okunur; yeniden başlatma gerekir. |
 | `general.group_worktree_tabs` | `true` | Bir deponun bağlı worktree'lerinin sekmelerini o deponun sekmesinin hemen ardında tutar: bir worktree açıldığında, bir worktree sekmesi uzağa sürüklendiğinde (grubunun yanına geri oturur; depo sekmesi grubun başıdır ve worktree'leri onu izler) ve ayar açıldığında. Kapalıyken sekmeler bıraktığınız yerde kalır. |
 | `general.undo_depth` | `100` | Geri Al'ın kaç işlem geriye gidebileceği; `0` = sınırsız. |
-| `general.conflict_detection` | `true` | Proaktif çakışma algılama: geçerli dalı ayrıldığı dala merge etmek çakışacaksa Log'da bir rozet; arka planda hesaplanır (bellekte bir merge: dosyalarınızda, indeksinizde ve ref'lerinizde hiçbir şey değişmez). Bir depo bunu kendisi için kapatabilir (`[preferences] conflict_detection`). Bkz. [Merge çakışmalarını çözmek](merge-conflicts.md#çakışma-önleme). |
+| `general.conflict_detection` | `true` | Proaktif çakışma algılama: geçerli dalı ayrıldığı dala merge etmek çakışacaksa Log'da bir rozet; arka planda hesaplanır (bellekte bir merge: dosyalarınızda, indeksinizde ve ref'lerinizde hiçbir şey değişmez). Bir depo bunu kendisi için kapatabilir (`[preferences] conflict_detection`). Karşılaştırdığı temel dalların kendi listeleri vardır: [`[conflict_prevention]`](#conflict_prevention-temel-dal-listeleri). Bkz. [Merge çakışmalarını çözmek](merge-conflicts.md#çakışma-önleme). |
 | `general.dev_mode` | yok (otomatik) | GitPoulpi'yi bir checkout'tan derleyenler için; Ayarlar'da hiç görünmez. Yoksa: çalışan exe `<checkout>/target/<profile>/` içindeyken açıktır (`target`'ın yanında `Cargo.toml` ve `crates/gitpoulpi-tui`). `true` / `false` bunu zorlar. Geliştirici modu yalnızca `ui.launcher_build`'in kilidini açar. |
 | `general.journal_outside` | `true` | Bir kabuğun veya YZ ajanının dallar, tag'ler, stash'ler ve HEAD üzerinde yaptıklarını, dışarıda yapıldı olarak işaretlenmiş geri alma geçmişi girdileri olarak kaydeder; böylece `Ctrl+Z` onları geri alabilir. Dosya düzenlemeleri hiçbir zaman yakalanmaz. `undo_enabled` gerekir. Bkz. [Geri al ve yinele](undo-redo.md#gitpoulpi-dışında-yapılan-değişiklikler). |
 | `general.undo_enabled` | `true` | `false`: hiç geri alma kaydı tutulmaz (en hızlısı), geri alma geçmişi silinir, Geri Al/Yinele düğmeleri kaybolur. Bkz. [Geri al ve yinele](undo-redo.md). |
@@ -263,6 +263,7 @@ Merge çakışma düzenleyicisi ([Merge çakışmalarını çözmek](merge-confl
 |---|---|---|
 | `git.pull_mode` | `"merge"` | Pull'un (düğme, `Ctrl+G p`, `Git: Pull`) yaptığı: `merge` (mümkünse fast-forward), `ff_only`, `rebase`. Git'e her zaman açıkça iletilir. Eski `fetch_all`, `merge` olarak okunur. |
 | `git.push_behavior` | `"direct"` | `direct` varsayılan uzak depoya push eder; `ask` önce uzak depo menüsünü gösterir. |
+| `git.merge_fast_forward` | `"never"` | Başlattığınız bir merge'ün (dal menüsü, sürükle bırak, palet, `gitpoulpi merge`) fast-forward yapılabilecek bir dalda yaptığı: `never` her zaman bir merge commit'i oluşturur (`--no-ff`), `allowed` mümkünse fast-forward yapar (git'in varsayılanı, `merge.ff` geçerlidir), `only` fast-forward yapar ya da reddeder. Deponun kendi seçimi (Ayarlar > Merge seçenekleri, `repo-state.toml` içindeki `merge_fast_forward`) kazanır; CLI'nin `--ff`, `--no-ff` ve `--ff-only` bayrakları ikisini de geçersiz kılar. Anında uygulanır. |
 | `git.default_encoding` | `"utf-8"` | Geçerli UTF-8 **olmayan** metin için kodlama (dosya içerikleri, blame, diff'ler, `encoding` başlığı olmayan commit mesajları): herhangi bir WHATWG etiketi (`windows-1252`, `shift_jis`, ...). Yalnızca gösterim; staging asla yeniden kodlamaz. Bir depo bunu geçersiz kılabilir. |
 | `git.lfs_enabled` | `true` | Git LFS'yi gösterir ve yönetir. Bir depo bunu geçersiz kılabilir. Bkz. [Git LFS](lfs.md). |
 | `git.lfs_autofix_filters` | `true` | LFS kullanan bir depoyu pull ya da push etmeden önce, eksikse LFS filtrelerini / pre-push hook'unu kurar (`git lfs install --local`, yalnızca bu depo). Bkz. [Git LFS](lfs.md). |
@@ -514,6 +515,17 @@ Bir yönetici `mode`, `channel` (`release_channel` olarak) ve `repo` değerlerin
 | `privacy.sensitive_patterns` | `[".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "id_ecdsa*", "*.p12", "*.pfx", "*.jks", "*.keystore", "*.crt", "*.cer", "*.der", "*.kdbx"]` | Gitignore tarzı yol kalıpları. `/` içermeyen bir kalıp dosya adıyla her derinlikte eşleşir, `/` içeren tüm yolla eşleşir (baştaki `/` onu köke sabitler); `*` ve `?` tek bir klasörün içinde kalır, `**` klasörleri aşar; bir `!` önceki bir kalıbın eşleştirdiğini yeniden serbest bırakır ve son eşleşme kazanır; büyük/küçük harf yok sayılır. stage koruması ve `ai.privacy.exclude_sensitive_files` tarafından kullanılır. |
 | `privacy.staging_guard` | `true` | Bir kalıpla eşleşen ya da içeriğinde tanınan bir gizli bilgi bulunan bir dosyayı stage'lemek önce sorar (TUI), `--allow-sensitive` verilmedikçe reddedilir (CLI) ya da `mcp.allow_sensitive_staging` ajanın `allow_sensitive` geçmesine izin vermedikçe reddedilir (MCP). Her biri 1 MiB'a ve toplam 32 MiB'a kadar metin dosyaları okunur; ikili dosyalar yalnızca adıyla eşleştirilir. Bkz. [Stage'leme ve commit](staging-and-committing.md#hassas-dosyalar).
 
+## `[conflict_prevention]` (temel dal listeleri)
+
+Proaktif çakışma algılamanın geçerli dalın temel dalı olarak alabileceği dallar bir desen listesidir (bkz. [Merge çakışmalarını çözmek](merge-conflicts.md#çakışma-önleme)). Listeler adlandırılıp paylaşılabilir; Ayarlar > Genel > Çakışma önleme bunları düzenler.
+
+| Anahtar | Varsayılan | Değerler ve etki |
+|---|---|---|
+| `conflict_prevention.default_list` | `""` | Kendi listesi olmayan bir deponun kullandığı listenin adı. Boş ya da hiçbir listede olmayan bir ad, yerleşik `**` (her dal) anlamına gelir. Her denetimde yeniden okunur, bu yüzden bir değişiklik yeniden başlatmadan açık depolara uygulanır. |
+| `conflict_prevention.lists` | yok | Adlandırılmış listeler, her biri bir tablo: `[conflict_prevention.lists.release]` ve `patterns = ["origin/release/**", "!origin/release/old"]`. Boş bir `patterns` her dala izin verir. Bir listeyi düzenlemek, onu izleyen her depoya uygulanır. |
+
+Bir deponun hangi listeyi izlediği `repo-state.toml` dosyasındadır (aşağıda). Öncelik sırası: deponun kendi desenleri, sonra izlediği adlandırılmış liste, sonra `default_list`, sonra `**`.
+
 ## `[keybindings]`
 
 TUI'nin kısayollarını yeniden atar; Ayarlar > Klavye ve fare bunu düzenler.
@@ -551,7 +563,9 @@ asla bir değişiklik olarak görünmez. TUI ve CLI tarafından yazılır; nadir
 | `[preferences] squash_merge` | Yerel bir dal merge'ü squash yapar: stage'ler, merge commit'i yok (yokken kapalı) | Ayarlar > Depoya Özel Ayarlar > Merge seçenekleri |
 | `[preferences] template_apply`, `template_strip_comments` | Boş bir commit formunu şablonla önceden doldur; commit sırasında `#` yorum satırlarını kaldır (ikisi de yokken kapalı) | Ayarlar > Depoya Özel Ayarlar > Mesaj şablonu |
 | `[preferences] conflict_detection` | Bu depo için proaktif çakışma algılama; yokken `general.conflict_detection` izlenir | Ayarlar > Depoya Özel Ayarlar > Çakışma önleme |
-| `[preferences] conflict_base_branches` | Temel dallar desenleri, satır başına bir tane (yokken `**`) | Ayarlar > Depoya Özel Ayarlar > Çakışma önleme |
+| `[preferences] conflict_base_branches` | Deponun kendi Temel dallar desenleri, satır başına bir tane (hâlâ **Kendi listesi** olarak kullanılır) | Ayarlar > Depoya Özel Ayarlar > Çakışma önleme |
+| `[preferences] conflict_base_source` | Temel dalların nereden geldiği: `default` (genel varsayılan liste), `list` (`conflict_base_list`) veya `own` (`conflict_base_branches`). Yokken: varsa kendi desenleri, yoksa varsayılan | Ayarlar > Depoya Özel Ayarlar > Çakışma önleme |
+| `[preferences] conflict_base_list` | Kaynak `list` olduğunda bu deponun izlediği `[conflict_prevention.lists.<ad>]`; silinmiş bir liste varsayılana döner | Ayarlar > Depoya Özel Ayarlar > Çakışma önleme |
 | `commit-template.txt` (`repo-state.toml` dosyasının yanında bir dosya) | Commit şablonu; git'in `commit.template` ayarı ona işaret eder | Ayarlar > Depoya Özel Ayarlar > Mesaj şablonu |
 | `[preferences.ai_instructions]` | `text`, `mode = "add" \| "replace"`: bu deponun YZ talimatları | Ayarlar > Depoya Özel Ayarlar > YZ |
 | `[preferences.ai_overrides.<action>]` | Burada tek bir eylem için `profile`, `instructions` | Ayarlar > Depoya Özel Ayarlar > YZ |

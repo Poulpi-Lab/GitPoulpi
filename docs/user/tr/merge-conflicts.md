@@ -160,6 +160,12 @@ satırla kapatır), bu yüzden dosyalarınıza, indeksinize ve ref'lerinize doku
 - **Ne zaman çalışır**: arka planda, depo sakinleştikten yaklaşık 2 saniye sonra (bir commit, bir checkout, bir dalı taşıyan
   fetch, bir rebase), her `(HEAD, temel)` çifti için bir kez. HEAD taşındığında şerit hemen gizlenir ve yeni cevapla geri
   gelir ya da gelmez. Ayrık bir HEAD denetlenmez.
+- **Temel dal listeleri**: bir deponun Temel dallarının nereden geldiği, **Çakışma önleme** sayfasındaki bir seçimdir.
+  **Varsayılan** genel varsayılanı izler (Ayarlar > Genel > Çakışma önleme'de başka bir liste seçene kadar yerleşik `**`,
+  yani her dal); **Liste: <ad>** adlandırılmış listelerinizden birini izler; **Kendi listesi** deponun kendine ait listesidir.
+  Listeler paylaşılır: birini düzenleyin, onu izleyen her depo değişikliği bir sonraki denetimde kullanır, yeniden başlatma
+  gerekmez. **Liste olarak kaydet...** deponun kendi desenlerini adlandırılmış bir listeye çevirir, **Varsayılana sıfırla**
+  deponun seçimini bırakır. Bir deponun izlediği listeyi silmek, onu varsayılanı kullanmaya döndürür.
 - **Kapatma**: Ayarlar > Genel'deki **Proaktif çakışma algılamayı etkinleştir**, ya da tek bir depo için onun **Çakışma
   önleme** sayfası. Bir betikten `gitpoulpi conflicts check` aynı cevabı JSON olarak yazdırır ([CLI
   başvurusu](cli-reference.md)).

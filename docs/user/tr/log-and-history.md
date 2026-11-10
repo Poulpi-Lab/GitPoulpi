@@ -206,6 +206,14 @@ aydınlanır; bir menü almak için bırakın:
 `Esc` sürüklemeyi iptal eder. Klavye karşılığı *Refs: Seçili Ref'i Checkout
 Yapılmış Dala Bırak...* palet komutudur.
 
+**Merge mi, fast-forward mı.** Hedefin kendine ait bir commit'i yoksa (sürüklenen dal onun yalnızca önündeyse), bir merge hedefi
+sadece ileri taşıyabilirdi. Varsayılan olarak (Ayarlar > Git > **Merge fast-forward** = *never*, ya da deponun Merge seçenekleri
+sayfasındaki kendi seçimi) menü satırı *Merge: x → y (merge commit)* diye okunur ve gerçek bir merge commit'i oluşturur;
+böylece geçmiş dalı korur. Düz taşımayı istediğinizde ayrı *Fast-forward: y → x* satırını kullanın (düz bir çizgi istediğinizde
+bunun için *Rebase* vardır). *allowed* ile Merge satırı *(fast-forward)*, *only* ile *(yalnızca fast-forward)* okunur;
+dallar ayrışmışsa nedeniyle birlikte gri olur. Aynı satırlar ve etiketler bir dalın kendi menüsünde de vardır ve
+`gitpoulpi merge --ff | --no-ff | --ff-only` merge başına seçim yapar.
+
 ## Commit menüsü
 
 Menüsü için bir commit'e sağ tıklayın (veya üzerinde `.` tuşuna basın):

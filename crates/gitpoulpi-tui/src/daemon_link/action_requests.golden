@@ -195,7 +195,7 @@
   StageAll {"target":"All"}
   ok: true
 == Merge(Ref { kind: LocalBranch { name: "topic" }, target: Oid([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]), visibility: Shown, is_head: false, upstream: None, tag_sync: None })
-  Merge {"from":{"is_head":false,"kind":{"LocalBranch":{"name":"topic"}},"tag_sync":null,"target":"0909090909090909090909090909090909090909","upstream":null,"visibility":"Shown"},"opts":{"fast_forward_only":false,"message":null,"no_commit":false,"no_ff":false,"squash":false}}
+  Merge {"from":{"is_head":false,"kind":{"LocalBranch":{"name":"topic"}},"tag_sync":null,"target":"0909090909090909090909090909090909090909","upstream":null,"visibility":"Shown"},"opts":{"fast_forward_only":false,"ff":null,"message":null,"no_commit":false,"no_ff":false,"squash":false}}
   message: already up to date
   ok: true
 == Rebase(Ref { kind: LocalBranch { name: "topic" }, target: Oid([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]), visibility: Shown, is_head: false, upstream: None, tag_sync: None })

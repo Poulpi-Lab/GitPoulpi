@@ -161,7 +161,11 @@ fn a_picked_key_is_saved_and_the_connection_test_names_the_accepted_key() {
     let key = rig.home.path().join(".ssh/id_work");
     let key_text = key.to_string_lossy().into_owned();
     let (_, r) = common::scroll_settings_to(&mut term, "Private key file", STEP);
-    // The empty value sits on the label's row.
+    // The empty value sits on the label's row (waited for: a torn frame can
+    // show the label before its value).
+    wait(&term, "the key combo's value", |s| {
+        s.find_all("(not set)").into_iter().any(|(_, row)| row == r)
+    });
     let (c, r) = term
         .screen()
         .find_all("(not set)")
@@ -184,10 +188,15 @@ fn a_picked_key_is_saved_and_the_connection_test_names_the_accepted_key() {
     });
 
     // Save: the page says so, and the private file holds the key.
-    click_button(&mut term, "Save");
-    wait(&term, "the saved status", |s| {
-        s.contains("Saved. This repository now signs in as chosen.")
-    });
+    // Retried: a torn frame can place the button where it is not yet drawn.
+    common::retry_until(
+        &mut term,
+        "the saved status",
+        4,
+        Duration::from_secs(10),
+        |t| click_button(t, "Save"),
+        |s| s.contains("Saved. This repository now signs in as chosen."),
+    );
     let deadline = Instant::now() + STEP;
     while !profile_file(config.path()).contains(&key_text) {
         assert!(
@@ -199,20 +208,25 @@ fn a_picked_key_is_saved_and_the_connection_test_names_the_accepted_key() {
     }
 
     // Test connection: both checks run over the stub and the results name the key.
-    click_button(&mut term, "Test connection");
-    let screen = term
-        .wait_for("the results panel", STEP, |s| s.contains("Connection test"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(screen.contains("accepted key"), "{}", term.text());
-    assert!(
-        screen.contains(&key_text) || screen.contains("id_work"),
-        "{}",
-        term.text()
-    );
-    assert!(
-        screen.contains("Fetch: ok") && screen.contains("Push: ok"),
-        "{}",
-        term.text()
+    // One predicate for the whole panel: a torn frame can show the title
+    // before the results.
+    common::retry_until(
+        &mut term,
+        "the results panel naming the accepted key",
+        4,
+        STEP,
+        |t| {
+            if !t.screen().contains("Connection test") {
+                click_button(t, "Test connection");
+            }
+        },
+        |s| {
+            s.contains("Connection test")
+                && s.contains("accepted key")
+                && (s.contains(&key_text) || s.contains("id_work"))
+                && s.contains("Fetch: ok")
+                && s.contains("Push: ok")
+        },
     );
     assert!(
         rig.stub.identity_files().contains(&key_text),
@@ -253,8 +267,7 @@ fn the_results_scrollbar_drags_and_the_cross_closes_the_panel() {
         |s| s.contains("Connection test"),
     );
     // The panel is long: it has a scrollbar (arrows at both ends).
-    let screen = term.screen();
-    assert!(screen.contains("Fetch: ok"), "{}", term.text());
+    wait(&term, "the fetch result", |s| s.contains("Fetch: ok"));
     // Keys scroll the pane.
     term.send_keys("PageDown").unwrap();
     wait(&term, "the pane scrolled by PageDown", |s| {
@@ -281,14 +294,11 @@ fn the_results_scrollbar_drags_and_the_cross_closes_the_panel() {
     let start = term.screen();
     let (first, last, col) = bar_ends(&start).expect("the results bar");
     term.drag((col, first + 1), (col, last + 2)).unwrap();
-    wait(&term, "the drag scrolled the pane", |s| {
-        !s.contains("Tested with the saved choices.")
+    // One predicate for the whole state: a torn frame can lose the top line
+    // before the end of the list is drawn.
+    wait(&term, "the drag scrolled the pane to the end", |s| {
+        !s.contains("Tested with the saved choices.") && s.contains("origin  (ssh,")
     });
-    assert!(
-        term.screen().contains("origin  (ssh,"),
-        "dragged to the end: {}",
-        term.text()
-    );
     // The close cross.
     // (Settings has its own cross on the top row: the panel's is on the row
     // of its title.)

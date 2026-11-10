@@ -203,6 +203,14 @@ gültige Ziele leuchten auf; lassen Sie los, um ein Menü zu erhalten:
 `Esc` bricht das Ziehen ab. Das Tastatur-Gegenstück ist der Palettenbefehl
 *Refs: Ausgewählte Ref auf dem ausgecheckten Branch ablegen...*.
 
+**Merge oder Fast-Forward.** Hat das Ziel keinen eigenen Commit (der gezogene Branch ist ihm nur voraus), könnte ein
+Merge das Ziel einfach vorrücken. Standardmäßig (Einstellungen > Git > **Merge: Fast-Forward** = *never*, oder die eigene Wahl eines
+Repositorys auf seiner Seite Merge-Optionen) lautet die Menüzeile *Merge von x in y (Merge-Commit)* und erzeugt einen echten Merge-Commit,
+damit der Verlauf den Branch behält; für das schlichte Vorrücken gibt es die getrennte Zeile *Fast-Forward von y auf x* (für eine gerade
+Linie ist *Rebase* da). Mit *allowed* lautet die Merge-Zeile *(Fast-Forward)*, mit *only* *(nur Fast-Forward)*, abgeblendet und mit Begründung,
+wenn die Branches auseinandergelaufen sind. Dieselben Zeilen und Beschriftungen stehen im eigenen Menü eines Branches, und
+`gitpoulpi merge --ff | --no-ff | --ff-only` wählt je Merge.
+
 ## Das Commit-Menü
 
 Rechtsklick auf einen Commit (oder `.` darauf) öffnet sein Menü:

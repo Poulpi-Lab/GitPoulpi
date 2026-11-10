@@ -185,6 +185,8 @@ Die Seitenliste hat zwei Gruppen:
 | **Speicherort der Repository-Daten** | Wo GitPoulpi seine Daten je Repository ablegt (`session.per_repo_state_dir`): **In .git (Ordner gitpoulpi)** (Standard: In Ihrem Arbeitsverzeichnis erscheint nichts, alle Worktrees teilen sie), **Im Arbeitsverzeichnis (Ordner .gitpoulpi)** (ein Ordner `.gitpoulpi`; nötig, um eine gemeinsame `workflow.toml` einzuchecken) oder **In meinem Benutzerdatenordner (außerhalb des Repositorys)**. Ein von einer älteren Version hinterlassener Ordner `.gitpoulpi` wird beim ersten Bedarf an den neuen Ort verschoben und entfernt, sobald er leer ist; eine Datei, die Git verfolgt (eine eingecheckte `workflow.toml`), wird nie verschoben oder gelöscht und bleibt lesbar. |
 | **Standard-Branch-Name** | Der erste Branch eines mit Init angelegten Repositorys. Leer: git entscheidet. Er benennt keinen bestehenden Branch um. |
 | **Proaktive Konflikterkennung aktivieren** | Standardmäßig an (`general.conflict_detection`). Warnt im Log, wenn ein Merge des aktuellen Branches in den Branch, von dem er abzweigte, Konflikte verursachen würde, bevor Sie es versuchen. Ein Repository kann sie auf seiner Seite **Konfliktvermeidung** für sich ausschalten. Siehe [Merge-Konflikte lösen](merge-conflicts.md#konfliktvermeidung). Wirkt beim Schließen der Einstellungen. |
+| **Standard-Basis-Branches** | Unter dem Schalter, in der Gruppe **Konfliktvermeidung** (der Palettenbefehl **Konflikte: Basis-Branch-Listen bearbeiten...** öffnet sie). Die Liste von Basis-Branch-Mustern, die Repositories verwenden, wenn sie keine eigenen haben: **Integriert (`**`)**, also jeder Branch, oder eine Ihrer benannten Listen (`conflict_prevention.default_list`). Sie gilt für die geöffneten Repositories, wenn die Einstellungen geschlossen werden. **Auf integrierten Standard zurücksetzen** kehrt zu `**` zurück. |
+| **Basis-Branch-Listen** | Ebenfalls in dieser Gruppe: Ihre benannten Listen von Basis-Branch-Mustern (`[conflict_prevention.lists.<name>]`), je ein Block mit seinem **Namen** (beim Umbenennen bleibt sie der Standard, falls sie es war; ein Repository, das dem alten Namen folgte, verwendet die Standardliste, bis Sie sie erneut wählen), seinen **Mustern** (eines pro Zeile, `Enter` oder ein Klick öffnet den Editor, `Ctrl+S` übernimmt sie), **Zum Standard machen** und **Liste löschen** (fragt zuerst und sagt, dass Repositories, die ihr folgen, stattdessen die Standardliste verwenden). Geben Sie unter **Neue Liste** einen Namen ein und drücken Sie `Enter`, um eine anzulegen; sie beginnt mit `**`. Das Bearbeiten einer Liste ändert jedes Repository, das ihr folgt. |
 | **Protokollstufe**, **Protokolldateien aufbewahren**, **Maximale Größe einer Protokolldatei** | Das Anwendungsprotokoll hinter dem Aktivitätsprotokoll: die ausführlichste aufgezeichnete Stufe (`log.level`), wie lange Dateien aufbewahrt werden (eine ganze Zahl und eine Einheit, Tage, Wochen, Monate oder Jahre, in einer Zeile: ein Klick auf die Zahl erlaubt das Tippen, Auf und Ab ändern sie schrittweise, Tab wechselt zur Einheit und Enter öffnet deren Liste; höchstens 1 bis 10 Jahre, Standard 1 Woche, `log.retention_days` und `log.retention_unit`) und die Größe, bei der die Datei eines Tages rotiert wird (eine Zahl und MiB oder GiB, 1 MiB bis 1 GiB, `log.max_file_mb` und `log.max_file_unit`). |
 | **Dauer der Vorgänge anzeigen**, **Erweiterte Protokollierung** | Der Tab Git-Vorgänge des Aktivitätsprotokolls: die Dauer jedes Vorgangs (`log.timings`, standardmäßig an) und auch die Hintergrundarbeit, Aktualisierung und Auto-Fetch (`log.extended`, standardmäßig aus). Siehe [Wenn etwas fehlschlägt](troubleshooting.md#das-aktivitätsprotokoll). |
 | **Rückgängig aktiviert**, **Tiefe des Rückgängig-Verlaufs**, **Änderungen außerhalb von GitPoulpi aufzeichnen** | Die Gruppe **Rückgängig-Verlauf**. Schaltet Rückgängig ein oder aus und legt fest, wie viele Vorgänge es aufbewahrt (Standard 100, `0` bedeutet unbegrenzt). Rückgängig auszuschalten löscht den Rückgängig-Verlauf, nach einer Bestätigung. Die letzte Option erfasst außerdem, was eine Shell oder ein Agent an Branches, Tags, Stashes und HEAD tut. Siehe [Rückgängig und Wiederholen](undo-redo.md). |
@@ -547,6 +549,7 @@ Drei Optionen stehen auf dem Tab **Allgemein**.
 | **Git-Backend** | `git2` (libgit2, Standard) oder `system` (Ihr installiertes `git`). Global. Gilt für Daemons, die nach der Änderung gestartet werden. |
 | **Pull-Schaltfläche** | Was die Pull-Schaltfläche tut: Merge (Fast-Forward, wenn möglich), nur Fast-Forward oder Rebase. Global. Die `▾`-Einträge ändern sie nicht. |
 | **Push-Schaltfläche** | **direkt** pusht sofort; **ask** zeigt zuerst das Remote-Menü. Global. |
+| **Merge: Fast-Forward** | Was ein von Ihnen gestarteter Merge tut, wenn sich der Branch einfach vorspulen ließe: **never** (Standard) erzeugt immer einen Merge-Commit, **allowed** spult vor, wenn möglich (Gits eigener Standard), **only** spult vor oder lehnt ab. Global (`git.merge_fast_forward`); ein Repository überschreibt es auf seiner Seite [Merge-Optionen](#repository-spezifisch-merge-optionen). |
 | **Standardkodierung** | Die Kodierung, mit der Text angezeigt wird, der **kein gültiges UTF-8 ist**: Dateiinhalte, Blame, Diffs und Commit-Nachrichten. Die Seite hat eine globale Zeile und eine Zeile für dieses Repository; die des Repositorys gewinnt. Gültiges UTF-8 wird nie neu dekodiert, und Staging kodiert nie etwas um. |
 | **core.autocrlf**, **core.eol** | Die eigenen Git-Einstellungen dieses Repositorys. Die Zeile schreibt `core.autocrlf` oder `core.eol` in die Git-Konfiguration des Repositorys. **(geerbt)** entfernt den Wert des Repositorys, sodass Ihre globale Git-Konfiguration gilt. `Ctrl+Z` stellt den vorherigen Wert wieder her. Das CLI-Gegenstück ist `gitpoulpi repo-config`. |
 | **Git LFS** | Zeigt Git LFS in der Oberfläche. Siehe [Git LFS](lfs.md). |
@@ -663,14 +666,33 @@ zeigt seine Ausgabe in seinem Eintrag im Aktivitätsprotokoll (die Statuszeile m
 
 ### Repository-spezifisch: Merge-Optionen
 
-Ein Schalter, **Squash** (standardmäßig aus). Ist er an, legt der Merge eines lokalen Branches (das Menü des Branches,
+Zwei Einstellungen. **Fast-Forward** legt fest, was ein Merge tut, wenn sich der Branch einfach vorspulen ließe:
+
+| Auswahl | Ein von Ihnen gestarteter Merge... |
+|---|---|
+| **(geerbt)** | folgt der globalen Einstellung **Merge: Fast-Forward** auf der Git-Seite (Standard **never**). |
+| **never** | erzeugt immer einen Merge-Commit (`git merge --no-ff`), auch wenn der Branch nur voraus ist. Der erste Elternteil des Commits ist die alte Spitze, der zweite der gemergte Branch, und seine Nachricht ist die von Git (`Merge branch 'x' into y`). |
+| **allowed** | spult per Fast-Forward vor, wenn es geht, und erzeugt sonst einen Merge-Commit (Gits Standard). |
+| **only** | spult per Fast-Forward vor und lehnt mit *cannot fast-forward* ab, wenn die Branches auseinandergelaufen sind (`git merge --ff-only`). |
+
+Sie gilt für jeden Merge, den Sie starten: das Menü des Branches, Drag-and-drop, `Merge` in der Palette und `gitpoulpi merge`
+(dessen Flags `--ff`, `--no-ff` und `--ff-only` sie für einen Merge überschreiben). Die Menüs sagen, was der Merge tun wird:
+*Merge von x in y (Merge-Commit)*, *(Fast-Forward)* oder *(nur Fast-Forward)*, und der getrennte Eintrag
+*Fast-Forward von y auf x* (samt Palettenbefehl) bleibt bei jeder Auswahl eine Geste entfernt. Ein Merge-Commit ist ein
+gewöhnlicher Rückgängig-Eintrag, wie ein Fast-Forward. Die Flow-Aktionen wählen ihre eigene Merge-Strategie und ignorieren diese Einstellung.
+
+Ihre eigene Wahl gewinnt gegen die von Git: Ein Merge, den GitPoulpi unter **never** oder **only** startet, übergibt das Flag
+ausdrücklich, sodass ein `merge.ff` in der Git-Konfiguration des Repositorys überschrieben wird. Nur unter **allowed** gilt Gits `merge.ff`
+noch, und wenn das Repository es setzt, zeigt die Seite es unter der Zeile. (Dafür wird nur die eigene `.git/config` des Repositorys gelesen, nicht Ihre globale Git-Konfiguration.)
+
+**Squash** (standardmäßig aus). Ist er an, legt der Merge eines lokalen Branches (das Menü des Branches,
 Drag-and-drop, `Merge` in der Palette) die Änderungen des Branches in den Index, ohne einen Merge-Commit zu erstellen
 (`git merge --squash`): Der Commit bleibt Ihnen überlassen. Das Commit-Formular öffnet sich mit der Squash-Nachricht von
 Git (`SQUASH_MSG`, Kommentarzeilen entfernt), einmal je Squash. Danach läuft nichts mehr (kein `MERGE_HEAD`), daher gilt
 **Abbrechen** nicht: Zum Zurücknehmen verwerfen Sie die gestagten Änderungen. Ein Squash, der an Konflikten anhält,
 lässt sie im Status-Bereich zurück wie jeder Merge mit Konflikten. Die gestagten Änderungen sind kein Rückgängig-Eintrag
 (keine Ref hat sich bewegt, es gibt also nichts wiederherzustellen); `gitpoulpi merge <branch> --squash` der CLI tut
-dasselbe, gleich welche Einstellung gilt.
+dasselbe, gleich welche Einstellung gilt. Ein Squash gewinnt gegen **Fast-Forward**.
 
 ### Repository-spezifisch: Nachrichtenvorlage
 
@@ -697,8 +719,13 @@ Eine Nachricht, mit der das Commit-Formular beginnt (`gitpoulpi ui show settings
 - **Auf Konflikte mit dem Basis-Branch prüfen**: standardmäßig an. Wer das Häkchen entfernt, schaltet die
   Erkennung nur für dieses Repository aus; der globale Schalter ist **Proaktive Konflikterkennung aktivieren** auf der
   Seite Allgemein. Beide müssen an sein.
-- **Basis-Branches** (standardmäßig `**`): die Branches, von denen der aktuelle Branch abgezweigt sein kann, ein Muster
-  pro Zeile (`Enter` oder ein Klick öffnet den Editor, `Ctrl+S` übernimmt sie). Die Mustertabelle darunter ist die
+- **Basis-Branches aus**: woher die Basis-Branches dieses Repositorys kommen. **Standard** folgt dem globalen Standard
+  (das integrierte `**` oder die Liste unter **Standard-Basis-Branches** in Einstellungen > Allgemein); **Liste: <Name>**
+  folgt einer Ihrer benannten Listen, sodass das Bearbeiten der Liste auch dieses Repository ändert; **Eigene Liste** ist eine Liste
+  nur für dieses Repository (die Wahl beginnt mit einer Kopie der geltenden Muster). Eine Repository-Datei, die vor dieser Auswahl
+  geschrieben wurde und eigene Muster enthält, gilt als **Eigene Liste**.
+- **Basis-Branches** (ein Muster pro Zeile): bei **Eigene Liste** öffnet `Enter` oder ein Klick den Editor und `Ctrl+S` übernimmt
+  sie; bei **Standard** oder **Liste** werden die geltenden Muster nur lesbar angezeigt. Die Mustertabelle darunter ist die
   Referenz:
 
   | Muster | Trifft zu auf |
@@ -710,8 +737,15 @@ Eine Nachricht, mit der das Commit-Formular beginnt (`gitpoulpi ui show settings
 
   Ein lokaler Branch steht mit seinem bloßen Namen (`main`), ein Remote-Tracking-Branch mit seinem Remote davor
   (`origin/main`). `*` und `?` bleiben innerhalb eines Pfadsegments, `**` überschreitet sie. Leerzeilen und
-  `#`-Kommentare werden ignoriert; eine Liste nur aus Ausschlüssen bedeutet „jeder Branch außer diesen“. Gespeichert
-  wird sie in `repo-state.toml`, und sie wird beim Schließen der Einstellungen neu gelesen.
+  `#`-Kommentare werden ignoriert; eine Liste nur aus Ausschlüssen bedeutet „jeder Branch außer diesen“. Die Wahl wird in
+  `repo-state.toml` gespeichert und beim Schließen der Einstellungen neu gelesen.
+- **Als Liste speichern...**: Geben Sie einen Namen ein und drücken Sie `Enter`; die geltenden Muster werden zu einer benannten
+  Liste (derselben, die Einstellungen > Allgemein bearbeitet), und dieses Repository folgt ihr.
+- **Auf Standard zurücksetzen** (fragt zuerst): verwirft die Wahl, die Liste und die eigenen Muster dieses Repositorys; es folgt
+  wieder dem Standard.
+- **Basis-Branches des Workflows verwenden** (erscheint, wenn für das Repository ein [Branching-Workflow](branching-workflows.md)
+  mit Basis-Branches eingerichtet ist): füllt **Eigene Liste** mit diesen Basen, je als lokaler Branch und als Branch eines
+  beliebigen Remotes (`main` und `*/main`). Es kopiert sie einmal; spätere Änderungen des Workflows verfolgt es nicht.
 
 
 ### Repository-spezifisch: KI

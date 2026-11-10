@@ -6169,9 +6169,9 @@ token_command_failed_code = "This repository's token command failed (exit {code}
 # context: one-line reason; {code} is the exit code, {tail} the end of its error output
 token_command_failed_code_tail = "This repository's token command failed (exit {code}): {tail}"
 # context: one-line reason; {host} is the server git went to, {expected} the address the account's token is bound to
-grant_refused = "GitPoulpi did not send the account token to {host}: it is not {expected}, that account's address."
+grant_refused = "GitPoulpi did not send the account token to {host}: that is not {expected}, the address this account is bound to."
 # context: one-line reason; GitPoulpi's helper program that git runs to ask for a password could not connect to the background daemon
-credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again; if it persists, check SSH & credentials."
+credential_helper_unreachable = "GitPoulpi's credential helper could not reach the daemon, so this repository's sign-in was not sent. Try again, and if it keeps happening, check SSH & credentials."
 # context: one-line reason when a credential command was sent without a person confirming it
 repo_auth_needs_confirmation = "A credential helper or token command is saved only after you confirm it in SSH & credentials."
 
@@ -11266,7 +11266,7 @@ ssh_account_key = "Account key"
 # context: label of the private key file field
 key_path = "Private key file"
 # context: help under the key file field
-key_help = "Offered to every SSH remote of this repository, submodules included, and only this key is offered. Offering a public key to another host leaks nothing."
+key_help = "Offered to every SSH remote of this repository, submodules included; no other key is tried. A public key is safe to show to any host."
 # context: label of the known hosts file field
 known_hosts = "Known hosts file"
 # context: help under the known hosts field

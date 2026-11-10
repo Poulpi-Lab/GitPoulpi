@@ -245,3 +245,69 @@ fn the_pages_draw_their_rows() {
     assert!(text.contains("Summary (72 left)"), "{text}");
     assert!(text.contains("Save template"), "{text}");
 }
+
+/// Merge options > Fast-forward: (inherited) writes nothing, a pick is saved
+/// in the repo data in `MergeFastForward`'s own spelling, and git's own
+/// `merge.ff`, when the repository sets it, is shown beside the choice.
+#[test]
+fn the_fast_forward_choice_is_saved_and_git_merge_ff_is_shown() {
+    use gitpoulpi_core::domain::MergeFastForward;
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = state_at(dir.path(), "MergeBehavior");
+    let row = |st: &PreferencesState| {
+        st.fields()
+            .into_iter()
+            .find(|f| f.label == "Fast-forward")
+            .unwrap()
+    };
+    let Control::Choice { options, index } = row(&st).control else {
+        panic!("a choice");
+    };
+    assert_eq!(index, 0, "inherited until chosen");
+    assert_eq!(options, ["(inherited)", "never", "allowed", "only"]);
+    assert_eq!(saved_ff(dir.path()), None);
+    assert!(
+        !st.fields().iter().any(|f| f.label.contains("merge.ff")),
+        "nothing about git's setting while it is unset"
+    );
+
+    for (pick, want) in [(2, "allowed"), (3, "only"), (1, "never")] {
+        st.commit_choice(&Target::Repo(RepoField::MergeFastForward), pick);
+        assert_eq!(saved_ff(dir.path()).as_deref(), Some(want));
+        assert_eq!(
+            MergeFastForward::parse(want),
+            Some(MergeFastForward::ALL[pick - 1])
+        );
+        assert!(matches!(row(&st).control, Control::Choice { index, .. } if index == pick));
+    }
+    st.commit_choice(&Target::Repo(RepoField::MergeFastForward), 0);
+    assert_eq!(saved_ff(dir.path()), None, "back to inherited");
+
+    let mut values = std::collections::BTreeMap::new();
+    values.insert("merge.ff".to_string(), Some("false".to_string()));
+    st.set_repo_config(&values, 1);
+    assert!(
+        st.fields()
+            .iter()
+            .any(|f| f.label.contains("merge.ff") && f.label.contains("false")),
+        "{:?}",
+        st.fields().iter().map(|f| &f.label).collect::<Vec<_>>()
+    );
+}
+
+fn saved_ff(dir: &Path) -> Option<String> {
+    saved(dir).merge_fast_forward
+}
+
+/// The global row on the Git page defaults to `never` and writes the config key.
+#[test]
+fn the_global_fast_forward_row_defaults_to_never() {
+    let dir = tempfile::tempdir().unwrap();
+    let st = state_at(dir.path(), "GitAndEncoding");
+    let row = st
+        .fields()
+        .into_iter()
+        .find(|f| matches!(f.target, Target::Global("git.merge_fast_forward")))
+        .expect("the global row");
+    assert!(matches!(row.control, Control::Choice { index: 0, .. }));
+}

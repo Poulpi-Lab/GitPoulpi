@@ -616,7 +616,18 @@ pub(in crate::event_loop) fn draw_overlay_menus(
     // strip must not sit on top of an open menu. It styles the existing cells
     // rather than writing a glyph, keeping the border character already
     // there, so the strip reads as "this edge is live".
-    if let Some(strip) = hovered_resize_strip {
+    // Overlays always win: the strip is styled over what the panes drew, and
+    // the palette, menus and dialogs are already in the buffer by now, so
+    // while any of them is up the hover is not shown at all.
+    let overlay_up = any_context_menu_open
+        || show_help
+        || ai_ui.popup_open()
+        || preferences.is_some()
+        || repo_dialogs.is_open()
+        || crate::tooltip::blocked_by_mode(input_mode)
+        || ref_popup.is_some()
+        || repo_menu.is_some();
+    if let Some(strip) = hovered_resize_strip.filter(|_| !overlay_up) {
         // A column boundary of a table lights as `ui.column_resize` says (a
         // thin line, or the header block); every other strip is the block.
         let is_column_boundary = frame_hits.iter().any(|(rect, target)| {

@@ -253,3 +253,31 @@ fn switching_to_line_in_settings_brings_the_ticks_back_live() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.stop().unwrap();
 }
+
+/// An overlay always wins over the hover line: with the pointer on a Log
+/// column boundary, opening the command palette must not leave the line
+/// painted through it (it ate a letter of the title and of every row). Red
+/// when the strip is painted after the overlays again.
+#[test]
+fn the_hover_line_never_draws_over_the_command_palette() {
+    let repo = fixture();
+    let (mut term, _config) = launch(&repo, "pty-colresize-palette", "");
+    let screen = term.screen();
+    let (date_x, row) = header(&screen, "Date").unwrap();
+    let gap = date_x - 1;
+    term.move_to(gap, row + 4).unwrap();
+    term.wait_for("the thin line", STEP, |s| text_at(s, gap, row + 4) == LINE)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("C-p").unwrap();
+    term.wait_for("the palette", STEP, |s| s.contains("Command Palette"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let screen = term.screen();
+    let (_, title_row) = screen.find_all("Command Palette")[0];
+    // The palette's column at the boundary: none of its body rows shows the
+    // line glyph, which would only be the leftover hover.
+    let lined = (title_row + 2..title_row + 6)
+        .filter(|r| text_at(&screen, gap, *r) == LINE)
+        .count();
+    assert_eq!(lined, 0, "{}", term.text());
+    term.stop().unwrap();
+}

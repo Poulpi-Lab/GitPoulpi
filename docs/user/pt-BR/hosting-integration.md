@@ -642,18 +642,22 @@ Quando uma chave está associada, a seção mostra `title (SHA256:...)` com:
 
 ### Chave SSH para um repositório
 
-Para fazer um repositório usar a chave de um perfil, o GitPoulpi define
-`core.sshCommand` como `ssh -i "<key>" -o IdentitiesOnly=yes` nesse repositório.
-Isto nunca é feito automaticamente. Abra o menu da aba (`Ctrl+T`, ou clique com o botão direito
-na aba) e escolha **Chave SSH...**, ou execute o comando da paleta
-*Repositório: chave SSH deste repositório...*. O menu mostra a fixação atual,
-cada perfil que tem uma chave privada e **Limpar a fixação**.
+Para fazer um repositório usar uma chave em particular, abra o menu da aba (`Ctrl+T`, ou clique com o
+botão direito na aba) e escolha **SSH e credenciais...**, ou execute o comando da paleta
+*Repositório: SSH e credenciais...*, e escolha **Arquivo de chave** (ou **Chave da conta** para a chave
+de um perfil de integração) em SSH. A escolha fica na pasta privada do GitPoulpi: nada é gravado no
+repositório nem na configuração do git. Veja
+[Configurações](settings.md#específico-do-repositório-ssh-e-credenciais).
 
-CLI e MCP: `gitpoulpi ssh-command show | set --key <file> | clear`.
+Um repositório que ainda tem um `core.sshCommand` próprio, vindo da antiga fixação "Chave SSH deste
+repositório", o mostra nessa página, somente leitura, com **Mover para o GitPoulpi**.
+
+CLI e MCP: `gitpoulpi repo-auth` (a escolha por repositório) e, para a própria fixação de
+`core.sshCommand`, `gitpoulpi ssh-command show | set --key <file> | clear`.
 
 A chave global em Configurações > SSH e credenciais (*Caminho da chave privada*, ou
-*Gerar par de chaves*) vale para todo repositório sem fixação. A fixação de um repositório
-prevalece sobre ela.
+*Gerar par de chaves*) vale para todo repositório sem escolha própria.
+O arquivo de chave ou a fixação de um repositório prevalece sobre ela.
 
 ## 13b. Proteção de branch, para uma reescrita de histórico
 

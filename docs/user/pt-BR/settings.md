@@ -313,9 +313,12 @@ sua pasta pessoal.
 Uma configuração feita em outro lugar sempre vence estes caminhos. A ordem, da maior
 prioridade para a menor:
 
+0. Uma chave escolhida para um repositório na sua própria página
+   [SSH e credenciais](#específico-do-repositório-ssh-e-credenciais) (o grupo específico do repositório).
 1. `GIT_SSH_COMMAND` ou `GIT_SSH` no ambiente em que o GitPoulpi roda.
 2. `core.sshCommand` na configuração git do repositório ou na sua configuração git
-   global. O item *Chave SSH...* do menu da aba grava isto para um repositório.
+   global. O item *Chave SSH...* do menu da aba, nas versões anteriores, gravava isto para um repositório;
+   SSH e credenciais se oferece para movê-lo para o GitPoulpi.
 3. Os dois caminhos de chave desta página.
 4. Os padrões do próprio ssh e o agente.
 
@@ -547,6 +550,56 @@ Três opções ficam na aba **Geral**.
 | **Instalar os filtros LFS antes de pull e push** | Antes de um pull ou de um push, executa `git lfs install --local` quando o repositório usa LFS e seus filtros estão ausentes. |
 | **Programa git-lfs** | O programa `git-lfs` detectado (somente leitura). |
 | **Inicializar o LFS neste repositório** | Executa `git lfs install --local` agora. |
+
+### Específico do repositório: SSH e credenciais
+
+`gitpoulpi ui show settings ssh-credentials`. Como *este repositório* entra, guardado na pasta privada do GitPoulpi: nada
+é gravado no repositório nem na configuração do git, e não pode ser desfeito (como qualquer configuração). É usado por fetch, pull,
+push, submódulos e LFS somente deste repositório. O equivalente na CLI é `gitpoulpi repo-auth`
+(veja a [referência da CLI](cli-reference.md)). A página também é acessível pela paleta de comandos:
+**Repositório: SSH e credenciais...**. Nada é enviado até você pressionar **Salvar**; a página consulta o daemon, então nunca
+trava.
+
+| Linha | O que faz |
+|---|---|
+| **HTTPS: Entrar com** | **Sistema** (os auxiliares do próprio git, o padrão), **Conta do GitPoulpi** (o token de uma integração; as contas cujo host é um dos remotos deste repositório vêm primeiro, e a linha abaixo diz o que a última verificação do token encontrou: escopos faltando e escopos a mais), **Auxiliar de credenciais** ou **Comando de token**. |
+| **Usuário do git** | Enviado como nome de usuário dos remotos HTTPS. Com **Sistema**, permite que um gerenciador de credenciais escolha uma de várias contas guardadas. |
+| **Ignorar auxiliares de credenciais definidos por este repositório** | Somente **Sistema**. Os auxiliares que o repositório define para si (seu `.git/config`, arquivos que ele inclui) são listados abaixo com o arquivo de onde vêm; os auxiliares do sistema e globais continuam funcionando. |
+| **Auxiliar**, **Comando**, **Hosts**, **Cache (minutos)** | Um comando que o repositório executa para entrar. Um *auxiliar* é um auxiliar de credenciais do git; um *comando de token* imprime um token (a lista de argumentos é dividida por espaços, com aspas em volta de um argumento que contenha espaços, e mostrada em **Executa como**; nenhum shell o executa, ele roda na pasta do repositório). **Hosts** o limita a esses hosts (vazio: o host do remoto principal); **Cache** é por quanto tempo um token é reutilizado (50 minutos por padrão). **Usar o auxiliar atual deste repositório** copia para o campo o auxiliar que o repositório define. |
+| **SSH: Entrar com** | **Sistema** (a configuração própria do ssh, o agente e as chaves padrão), **Arquivo de chave** ou **Chave da conta** (a chave de uma integração). |
+| **Arquivo de chave privada** | Escolha uma das chaves encontradas em `~/.ssh` ou digite um caminho. Somente esta chave é oferecida, a todo remoto SSH do repositório, submódulos incluídos. Quando outras contas podem ler o arquivo de chave (um bit de permissão para grupo ou outros no Linux e no macOS, uma entrada para Everyone, Users ou Authenticated Users no Windows), um aviso diz que o OpenSSH recusa essa chave ("bad permissions") e **Restringir à minha conta** a corrige (`chmod 600`, ou uma DACL só para a sua conta e SYSTEM no Windows). |
+| **Arquivo de hosts conhecidos**, **Verificação rigorosa da chave de host** | Um arquivo opcional de chaves de host confiáveis, e a recusa de um host que não está nele. |
+| **Programa ssh** | O programa que será executado (somente leitura). |
+| **Fixada na configuração do git** | Somente quando este repositório define o próprio `core.sshCommand` (a antiga fixação "Chave SSH deste repositório", que o GitPoulpi gravava). O comando é mostrado somente leitura. **Mover para o GitPoulpi** salva a escolha equivalente de **Arquivo de chave** e depois remove a fixação da configuração do git; é oferecido quando o comando é uma simples fixação `ssh -i <chave>`, e só enquanto a página não tem edições não salvas e sua escolha de SSH ainda é **Sistema**. Qualquer outro comando é mostrado com uma nota: edite-o com `git config`. A movimentação não pode ser desfeita, como toda configuração aqui, e a remoção da fixação também não está na pilha de Desfazer (nada se perde: a chave está no perfil). |
+| **Remotos** | Somente leitura: cada remoto com o seu protocolo e a identidade que usará. As configurações que o perfil substitui (`core.sshCommand`, `credential.helper`) são listadas com o seu arquivo, e um perfil que não pode ser usado diz por quê. |
+
+Botões (uma tecla para cada: `Tab`/`Left`/`Right` entre eles, `Enter` aciona):
+
+- **Testar conexão** verifica todos os remotos com as escolhas salvas, fetch primeiro e depois push (nenhum dado se move), e abre
+  um painel de resultados: por remoto, ok ou falhou, a identidade que respondeu (a chave que o servidor aceitou, ou a conta
+  cujo token foi aceito), a duração e uma leitura simples de uma falha. Roda em segundo plano, com um indicador de progresso
+  após um instante. O painel rola com `Up`/`Down`, `PgUp`/`PgDn`, `Home`/`End`, a roda do mouse e sua barra de rolagem, e
+  fecha com `Esc` ou o seu X. O equivalente na paleta é **Repositório: testar conexão**.
+- **Salvar** envia as escolhas. **Reverter** descarta as não salvas. Fechar as Configurações com escolhas não salvas pergunta antes.
+- **Usar padrões** pergunta e depois esquece o perfil: os auxiliares do git para HTTPS e a configuração própria do ssh para SSH. O equivalente
+  na paleta é **Repositório: usar credenciais padrão**, que também pergunta.
+
+Salvar um **Auxiliar de credenciais** ou um **Comando de token** pergunta primeiro **Permitir este comando?**: o comando é mostrado palavra
+por palavra (caracteres de controle são escritos por extenso, linhas longas quebram), com o seu SHA-256 e duas respostas, `1` **Salvar e permitir**
+e `2` **Cancelar**. Nenhuma resposta fica escolhida até você pressionar uma seta ou um dígito, então um `Enter` perdido não faz nada;
+`Esc`, **Cancelar** e o X do painel cancelam. `PgUp`/`PgDn`/`Home`/`End` e a barra de rolagem rolam um comando longo.
+Se o comando já está guardado e inalterado, salvar a outra metade da página não pergunta de novo.
+
+Um perfil que não pode ser usado (um arquivo de chave ausente, uma origem que esta versão ainda não executa) faz a transferência falhar
+com o seu motivo, em vez de recorrer à identidade própria da máquina.
+
+Quando o perfil não é todo padrão, o menu **Push** termina com uma linha dizendo como o push entra (**Entra como:
+github-corp (token)** ou **Chave SSH: work_ed25519**); ela abre esta página. A mesma linha é adicionada às entradas do Registro
+de atividade de fetch, pull e push. Uma falha causada pelas escolhas desta página (um auxiliar de credenciais que não pôde ser executado,
+uma chave de host SSH ainda desconhecida, um acesso recusado, um comando de token que falhou, um token que não foi enviado
+porque o servidor não é o endereço da conta) mostra um botão **SSH e credenciais...** na sua entrada do Registro de atividade
+(`r` na entrada), ao lado de **Abrir Integrações** quando uma conta de integração pode ser a origem. A linha
+**SSH e credenciais...** do menu da aba também abre a página; ela substitui o antigo menu de fixação **Chave SSH...** e o seu item da paleta.
 
 ### Específico do repositório: Checkout parcial
 

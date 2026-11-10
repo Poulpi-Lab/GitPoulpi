@@ -99,7 +99,7 @@ aba sob o ponteiro. A linha de abas só tem abas (o botão da
   **Fechar outras abas...**, **Fechar abas à direita...**, **Adicionar aos favoritos** (ou
   **Remover dos favoritos**), **Adicionar ao espaço de trabalho** (ou **Remover do
   espaço de trabalho**, quando você tem espaços de trabalho), **Copiar caminho**, **Abrir em ›**,
-  **Chave SSH...** e **Checkout parcial...**.
+  **SSH e credenciais...** e **Checkout parcial...**.
 - `Ctrl+PageUp` e `Ctrl+PageDown` alternam entre as abas. `Ctrl+W` fecha a aba
   atual. Um clique com o botão do meio em uma aba também a fecha (com a mesma pergunta).
 - `t` (ou `Ctrl+N t`) abre o seletor de abas, uma lista pesquisável das abas

@@ -648,9 +648,9 @@ As teclas são as padrão.
 | Remoto: fetch do remoto... |  |
 | Remoto: ações do remoto selecionado... | `.` |
 | Repositório: checkout parcial... |  |
-| Repository: SSH & Credentials... |  |
-| Repository: Test Connection |  |
-| Repository: Use Default Credentials |  |
+| Repositório: SSH e credenciais... |  |
+| Repositório: testar conexão |  |
+| Repositório: usar credenciais padrão |  |
 | Flow: abrir o menu | `Ctrl+G W` |
 | Flow: iniciar branch... |  |
 | Flow: nova issue... |  |

@@ -9627,7 +9627,7 @@ reset_default_help = "Stops using a default list: repositories without a list of
 # context: sub-heading above the named lists of base branch patterns
 lists_heading = "Base branch lists"
 # context: row shown when there is no named list yet
-lists_none = "No lists yet. Type a name in New list to create one."
+lists_none = "No lists yet. Type a name below to create one."
 # context: heading of a named list that is the default; {name} is the list's name
 list_title_default = "{name} (default)"
 # context: label of the field holding a list's name

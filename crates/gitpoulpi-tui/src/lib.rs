@@ -112,6 +112,8 @@ mod ai_ui;
 mod avatar;
 mod blame_view;
 pub mod build_features;
+#[cfg(test)]
+mod cjk_sweep_tests;
 mod clipboard;
 mod clone_dialog;
 mod clone_task;
@@ -188,6 +190,8 @@ mod quiet_backend;
 mod redraw;
 mod refs_tree;
 mod relaunch;
+#[cfg(test)]
+mod render_check_tests;
 mod repo_manager;
 mod repo_menu;
 mod repo_probe;

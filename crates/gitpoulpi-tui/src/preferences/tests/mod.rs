@@ -122,3 +122,4 @@ fn the_selected_sidebar_section_has_no_arrow_marker() {
     let screen = draw_screen(&mut st);
     assert!(!screen.contains('\u{25B8}'), "{screen}");
 }
+mod cjk_dropdown;

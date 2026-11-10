@@ -771,6 +771,7 @@ fn snapshot(screen: &vt100::Screen, cols: u16, rows: u16) -> Screen {
                     italic: cell.italic(),
                     underline: cell.underline(),
                     inverse: cell.inverse(),
+                    wide_continuation: cell.is_wide_continuation(),
                 },
                 None => Cell {
                     text: String::new(),
@@ -780,6 +781,7 @@ fn snapshot(screen: &vt100::Screen, cols: u16, rows: u16) -> Screen {
                     italic: false,
                     underline: false,
                     inverse: false,
+                    wide_continuation: false,
                 },
             });
         }

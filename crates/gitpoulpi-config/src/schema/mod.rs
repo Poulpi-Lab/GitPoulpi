@@ -805,6 +805,24 @@ mod tests {
         }
     }
 
+    /// `git.merge_fast_forward` defaults to `never` (a merge makes a merge
+    /// commit) and every spelling round-trips through `set_in_file`.
+    #[test]
+    fn merge_fast_forward_defaults_to_never_and_round_trips() {
+        use gitpoulpi_core::domain::MergeFastForward;
+        let empty: crate::Config = toml::from_str("").unwrap();
+        assert_eq!(empty.git.merge_fast_forward, MergeFastForward::Never);
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("config.toml");
+        for policy in MergeFastForward::ALL {
+            crate::set_in_file(&path, "git.merge_fast_forward", policy.as_str()).unwrap();
+            assert_eq!(
+                crate::Config::load(&path).unwrap().git.merge_fast_forward,
+                *policy
+            );
+        }
+    }
+
     #[test]
     fn diff_show_whitespace_defaults_true_and_diff_word_wrap_defaults_false() {
         // A config-free install gets the Diff view's own defaults.

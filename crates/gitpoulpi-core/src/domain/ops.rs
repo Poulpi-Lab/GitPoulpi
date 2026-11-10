@@ -919,6 +919,28 @@ pub type CloneProgressSink<'a> = &'a (dyn Fn(CloneProgress) + Send + Sync);
 mod tests {
     use super::*;
 
+    #[test]
+    fn the_merge_fast_forward_policy_defaults_to_never_and_the_repo_wins() {
+        use MergeFastForward as P;
+        assert_eq!(P::default(), P::Never, "the owner's expectation");
+        // The repository's choice wins over the global one, either way.
+        assert_eq!(P::resolve(Some("allowed"), P::Never), P::Allowed);
+        assert_eq!(P::resolve(Some("never"), P::Allowed), P::Never);
+        assert_eq!(P::resolve(Some("only"), P::Allowed), P::Only);
+        // Nothing, or a value that is no policy: the global one.
+        assert_eq!(P::resolve(None, P::Only), P::Only);
+        assert_eq!(P::resolve(Some("sometimes"), P::Allowed), P::Allowed);
+        assert_eq!(P::resolve(Some(""), P::Never), P::Never);
+        for p in P::ALL {
+            assert_eq!(P::parse(p.as_str()), Some(*p));
+            assert_eq!(
+                serde_json::to_string(p).unwrap(),
+                format!("\"{}\"", p.as_str()),
+                "the wire spelling is the config spelling"
+            );
+        }
+    }
+
     fn oid(byte: u8) -> Oid {
         Oid([byte; 20])
     }

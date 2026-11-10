@@ -576,7 +576,7 @@ pub enum Commands {
         /// Overrides `git.merge_fast_forward` for this merge.
         #[arg(long = "no-ff", conflicts_with_all = ["ff", "ff_only"])]
         no_ff: bool,
-        /// Fast-forward only: refuse (not_fast_forward) when the branch has
+        /// Fast-forward only: refuse when the branch has
         /// diverged. Overrides `git.merge_fast_forward` for this merge.
         #[arg(long = "ff-only", conflicts_with_all = ["ff", "no_ff"])]
         ff_only: bool,

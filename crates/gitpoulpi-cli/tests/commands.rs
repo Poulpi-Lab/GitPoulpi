@@ -393,7 +393,7 @@ fn merge_fast_forwards_and_rebase_replays() {
     let tip = head(root, session);
 
     run_json(root, session, &["checkout", "main"]);
-    let merged = run_json(root, session, &["merge", "feature"]);
+    let merged = run_json(root, session, &["merge", "feature", "--ff"]);
     assert_eq!(
         parse::<Oid>(merged["FastForwarded"].clone()),
         tip,

@@ -36,6 +36,13 @@ fn stub() -> &'static gitpoulpi_testkit::StubSsh {
     STUB.get_or_init(gitpoulpi_testkit::StubSsh::new)
 }
 
+/// The stub is shared by the whole binary and some tests count its calls:
+/// every test holds this lock so no other test's ssh lands in between.
+fn serial() -> &'static tokio::sync::Mutex<()> {
+    static LOCK: OnceLock<tokio::sync::Mutex<()>> = OnceLock::new();
+    LOCK.get_or_init(|| tokio::sync::Mutex::new(()))
+}
+
 /// Adds to the isolated global git config: a helper that answers a `get` that
 /// names `globaluser` with the password `globalpw`, and (Unix) the stub as `core.sshCommand`. Once,
 /// before any git of this binary runs.
@@ -179,6 +186,7 @@ fn system(username: Option<&str>, ignore_repo_helpers: bool) -> RepoAuthProfile 
 /// repository's helpers" the machine's own (global) helper answers.
 #[tokio::test]
 async fn ignoring_the_repositorys_helpers_lets_the_machines_helper_answer() {
+    let _serial = serial().lock().await;
     setup();
     let server = AuthHttpRemote::start();
     let repo = https_repo(&server);
@@ -258,6 +266,7 @@ async fn ignoring_the_repositorys_helpers_lets_the_machines_helper_answer() {
 /// machine's do.
 #[tokio::test]
 async fn the_repositorys_helpers_run_unless_they_are_ignored() {
+    let _serial = serial().lock().await;
     setup();
     let server = AuthHttpRemote::start();
     let repo = https_repo(&server);
@@ -291,6 +300,7 @@ async fn the_repositorys_helpers_run_unless_they_are_ignored() {
 /// helper runs.
 #[tokio::test]
 async fn a_repository_without_a_profile_keeps_the_global_behaviour() {
+    let _serial = serial().lock().await;
     setup();
     let server = AuthHttpRemote::start();
     let repo = https_repo(&server);
@@ -313,6 +323,7 @@ async fn a_repository_without_a_profile_keeps_the_global_behaviour() {
 #[cfg(unix)]
 #[tokio::test]
 async fn a_key_file_beats_the_repositorys_own_ssh_command() {
+    let _serial = serial().lock().await;
     setup();
     let repo = ssh_repo();
     repo.git(&["config", "core.sshCommand", "/bin/false"]);
@@ -389,6 +400,7 @@ async fn a_key_file_beats_the_repositorys_own_ssh_command() {
 #[cfg(unix)]
 #[tokio::test]
 async fn an_integrations_key_is_resolved_at_each_transfer() {
+    let _serial = serial().lock().await;
     use gitpoulpi_config::{Integration, IntegrationKind, IntegrationSsh, SshMode};
     setup();
     let repo = ssh_repo();
@@ -482,6 +494,7 @@ async fn an_integrations_key_is_resolved_at_each_transfer() {
 /// undo list is unchanged), and clearing nothing says nothing.
 #[tokio::test]
 async fn a_profile_change_is_announced_and_never_journaled() {
+    let _serial = serial().lock().await;
     setup();
     let server = AuthHttpRemote::start();
     let repo = https_repo(&server);

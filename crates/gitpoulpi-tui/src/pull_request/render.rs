@@ -228,7 +228,7 @@ impl PullRequestDialog {
         y += 1;
         let meta_rows = if self.uses_meta() { 2 } else { 0 };
         let footer_rows = 4 + meta_rows; // metadata, draft, message, buttons, breathing room
-        // 8 rows at the default height; the rows a taller dialog gains go to it.
+                                         // 8 rows at the default height; the rows a taller dialog gains go to it.
         let body_cap = 8 + rect.height.saturating_sub(DEFAULT_HEIGHT);
         let body_h = (inner.bottom().saturating_sub(y + footer_rows)).clamp(2, body_cap);
         let body = Rect::new(inner.x, y, inner.width, body_h);

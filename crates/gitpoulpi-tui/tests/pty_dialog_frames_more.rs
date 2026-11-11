@@ -156,11 +156,15 @@ fn the_palette_rows_arrange_and_reset_the_palette_itself() {
     });
     let (tc, tr) = title_at(&s, "Command Palette").unwrap();
     term.send_text("dialog: move or resize").unwrap();
-    wait(&mut term, "the row", |s| s.contains("Dialog: Move or Resize"));
-    term.send_keys("Enter").unwrap();
-    wait(&mut term, "the palette in the arrange mode, still open", |s| {
-        s.contains("Arrange:") && title_at(s, "Command Palette").is_some()
+    wait(&mut term, "the row", |s| {
+        s.contains("Dialog: Move or Resize")
     });
+    term.send_keys("Enter").unwrap();
+    wait(
+        &mut term,
+        "the palette in the arrange mode, still open",
+        |s| s.contains("Arrange:") && title_at(s, "Command Palette").is_some(),
+    );
     term.send_keys("Down").unwrap();
     term.send_keys("Right").unwrap();
     wait(&mut term, "the palette moved by the arrows", |s| {
@@ -171,7 +175,9 @@ fn the_palette_rows_arrange_and_reset_the_palette_itself() {
         title_at(s, "Command Palette") == Some((tc, tr))
     });
     term.send_keys("Escape").unwrap();
-    wait(&mut term, "the arrange mode left", |s| !s.contains("Arrange:"));
+    wait(&mut term, "the arrange mode left", |s| {
+        !s.contains("Arrange:")
+    });
     term.send_keys("Escape").unwrap();
     wait(&mut term, "the palette closed", |s| {
         title_at(s, "Command Palette").is_none()

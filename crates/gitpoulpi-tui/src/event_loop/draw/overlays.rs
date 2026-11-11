@@ -58,7 +58,8 @@ pub(in crate::event_loop) struct OverlaysDrawCtx<'a> {
 
 /// The confirmation moves (never resizes: its size follows its text).
 /// The tab picker moves and resizes: the list grows with the height.
-const TAB_PICKER_WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("tab_picker", 30, 8);
+const TAB_PICKER_WIN: crate::dialog_kit::Win =
+    crate::dialog_kit::Win::resizable("tab_picker", 30, 8);
 
 const CONFIRM_WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("confirm_prompt");
 

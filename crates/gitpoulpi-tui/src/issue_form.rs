@@ -810,8 +810,8 @@ impl IssueDialog {
         // Title, labels and the footer take their rows; the description
         // gets the rest.
         let footer_rows = 5; // labels label + field, spacing, message, buttons
-        // At most 10 rows at the default height; a taller dialog gives the
-        // rows it gains to the description.
+                             // At most 10 rows at the default height; a taller dialog gives the
+                             // rows it gains to the description.
         let body_cap = 10 + rect.height.saturating_sub(DEFAULT_HEIGHT);
         let body_h = inner
             .bottom()

@@ -1556,8 +1556,7 @@ mod prompt_vars;
 
 /// The editor resizes: its text area takes the whole rect, so it grows and
 /// shrinks with it.
-const WIN: crate::dialog_kit::Win =
-    crate::dialog_kit::Win::resizable("settings_ai_editor", 40, 10);
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("settings_ai_editor", 40, 10);
 
 #[cfg(test)]
 mod tests;

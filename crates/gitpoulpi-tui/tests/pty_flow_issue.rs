@@ -268,11 +268,7 @@ fn the_new_issue_form_closes_with_its_cross() {
         |t| {
             let s = t.screen();
             if let Some((_, row)) = s.find("New Feature issue") {
-                if let Some(&(c, r)) = s
-                    .find_all("\u{2715}")
-                    .iter()
-                    .find(|(_, r)| *r == row)
-                {
+                if let Some(&(c, r)) = s.find_all("\u{2715}").iter().find(|(_, r)| *r == row) {
                     t.click(c, r).expect("click the cross");
                 }
             }

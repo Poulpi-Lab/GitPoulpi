@@ -92,7 +92,9 @@ other.
 
 ![The Reflog of main: every position it has had, newest first, with the selected one described on the right](images/reflog.png)
 
-**Show in Log** (`s`), **Create branch here** (`b`) and
+**Show in Log** (`s`), **Create branch here** (`b`), **Create tag here** (`t`),
+**Apply to working tree** (`w`), **Save as stash** (`z`) (the last three work as
+in Lost work below) and
 **Restore `<branch>` to this position** (`r`). The restore is undoable. When the
 branch is checked out and you have local changes it cannot move without
 overwriting, a dropdown asks what to do with them: keep my changes, soft, mixed,
@@ -135,8 +137,8 @@ is open: the palette opens over it and its **Undo History:**, **Reflog:** and
 | View | Palette rows |
 |---|---|
 | Undo history | `Undo History: Undo Up to Here...`, `Redo Up to Here...`, `Restore Only This...`, `Restore the Branch to Where It Was...`, `Refresh`, `Close` |
-| Reflog | `Reflog: Show in Log`, `Create Branch Here...`, `Restore to This Position...`, `Load More`, `Refresh` |
-| Lost work | `Lost Work: Show in Log`, `Create Branch Here...`, `Cherry-pick`, `Scan Again` |
+| Reflog | `Reflog: Show in Log`, `Create Branch Here...`, `Create Tag Here...`, `Apply Changes to Working Tree`, `Save Changes as Stash`, `Restore to This Position...`, `Load More`, `Refresh` |
+| Lost work | `Lost Work: Create Branch Here...`, `Create Tag Here...`, `Cherry-pick`, `Apply Changes to Working Tree`, `Save Changes as Stash`, `Scan Again` |
 
 The rows are grayed out (with the reason) while their view is not open; the three
 openers, `Edit: Undo History...`, `Edit: Reflog...` and `Edit: Recover Lost

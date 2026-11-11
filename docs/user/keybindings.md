@@ -958,17 +958,17 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Undo History: Close | `Esc` |
 | Reflog: Show in Log | `s` |
 | Reflog: Create Branch Here... | `b` |
-| Reflog: Create Tag Here... | `t` |
+| Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as Stash | `z` |
+| Reflog: Save Changes as stash | `z` |
 | Reflog: Restore to This Position... | `r` |
 | Reflog: Load More | `m` |
 | Reflog: Refresh |  |
 | Lost Work: Create Branch Here... | `b` |
-| Lost Work: Create Tag Here... | `t` |
+| Lost Work: Create tag Here... | `t` |
 | Lost Work: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as Stash | `z` |
+| Lost Work: Save Changes as stash | `z` |
 | Lost Work: Scan Again |  |
 | View: Refresh | `r` |
 | View: Refresh (fetch, pull requests, issues) | `F5` |

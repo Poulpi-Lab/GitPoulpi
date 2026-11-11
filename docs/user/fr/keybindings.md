@@ -962,7 +962,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Reflog : Créer une branche ici... | `b` |
 | Reflog : Créer tag ici... | `t` |
 | Reflog : Appliquer les changements à l'arbre de travail | `w` |
-| Reflog : Mettre les changements de côté | `z` |
+| Reflog : Enregistrer en stash | `z` |
 | Reflog : Restaurer à cette position... | `r` |
 | Reflog : Charger la suite | `m` |
 | Reflog : Actualiser |  |
@@ -970,7 +970,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Travail perdu : Créer tag ici... | `t` |
 | Travail perdu : Cherry-pick | `c` |
 | Travail perdu : Appliquer les changements à l'arbre de travail | `w` |
-| Travail perdu : Mettre les changements de côté | `z` |
+| Travail perdu : Enregistrer en stash | `z` |
 | Travail perdu : Relancer la recherche |  |
 | Affichage : Actualiser | `r` |
 | Affichage : Actualiser (fetch, pull requests, tickets) | `F5` |

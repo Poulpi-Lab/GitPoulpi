@@ -924,17 +924,17 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 元に戻す履歴: 閉じる | `Esc` |
 | Reflog: Log で表示 | `s` |
 | Reflog: ここにブランチを作成... | `b` |
-| Reflog: Create Tag Here... | `t` |
+| Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as Stash | `z` |
+| Reflog: Save Changes as stash | `z` |
 | Reflog: この位置に復元... | `r` |
 | Reflog: さらに読み込む | `m` |
 | Reflog: 更新 |  |
 | 失われた作業: ここにブランチを作成... | `b` |
-| Lost Work: Create Tag Here... | `t` |
+| Lost Work: Create tag Here... | `t` |
 | 失われた作業: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as Stash | `z` |
+| Lost Work: Save Changes as stash | `z` |
 | 失われた作業: 再検索 |  |
 | 表示: 更新 | `r` |
 | 表示: 更新（fetch、pull request、Issue） | `F5` |

@@ -958,17 +958,17 @@ Klávesy jsou výchozí.
 | Historie vrácení: Zavřít | `Esc` |
 | Reflog: Zobrazit v Logu | `s` |
 | Reflog: Vytvořit větev tady... | `b` |
-| Reflog: Create Tag Here... | `t` |
+| Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as Stash | `z` |
+| Reflog: Save Changes as stash | `z` |
 | Reflog: Obnovit na tuto pozici... | `r` |
 | Reflog: Načíst další | `m` |
 | Reflog: Obnovit seznam |  |
 | Ztracená práce: Vytvořit větev tady... | `b` |
-| Lost Work: Create Tag Here... | `t` |
+| Lost Work: Create tag Here... | `t` |
 | Ztracená práce: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as Stash | `z` |
+| Lost Work: Save Changes as stash | `z` |
 | Ztracená práce: Hledat znovu |  |
 | Zobrazení: Obnovit | `r` |
 | Zobrazení: Obnovit (fetch, pull requesty, issues) | `F5` |

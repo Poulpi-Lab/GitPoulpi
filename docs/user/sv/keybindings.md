@@ -960,17 +960,17 @@ Tangenterna är standardvärdena.
 | Ångrahistorik: Stäng | `Esc` |
 | Reflog: Visa i Log | `s` |
 | Reflog: Skapa gren här... | `b` |
-| Reflog: Create Tag Here... | `t` |
+| Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as Stash | `z` |
+| Reflog: Save Changes as stash | `z` |
 | Reflog: Återställ till den här positionen... | `r` |
 | Reflog: Ladda fler | `m` |
 | Reflog: Uppdatera |  |
 | Förlorat arbete: Skapa gren här... | `b` |
-| Lost Work: Create Tag Here... | `t` |
+| Lost Work: Create tag Here... | `t` |
 | Förlorat arbete: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as Stash | `z` |
+| Lost Work: Save Changes as stash | `z` |
 | Förlorat arbete: Sök igen |  |
 | Vy: Uppdatera | `r` |
 | Vy: Uppdatera (fetch, pull requests, ärenden) | `F5` |

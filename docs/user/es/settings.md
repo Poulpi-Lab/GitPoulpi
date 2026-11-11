@@ -176,16 +176,17 @@ La lista de páginas tiene dos grupos:
 | **Carpeta de exploración por defecto** | Dónde se abre Examinar. Vacío: la última carpeta que usaste, o si no tu carpeta personal. |
 | **Ubicación de los datos del repositorio** | Dónde guarda GitPoulpi sus datos de cada repositorio (`session.per_repo_state_dir`): **Dentro de .git** (por defecto: nada aparece en tu árbol de trabajo y todos los worktrees lo comparten), **En el árbol de trabajo** (una carpeta `.gitpoulpi`; hace falta para hacer commit de un `workflow.toml` del equipo) o **En mi carpeta de datos de usuario** (fuera del repositorio). Una carpeta `.gitpoulpi` que dejó una versión anterior se traslada al sitio nuevo la primera vez que hace falta, y se elimina cuando queda vacía; un archivo que git sigue (un `workflow.toml` con commit) nunca se mueve ni se borra y sigue siendo legible. |
 | **Nombre de rama por defecto** | La primera rama de un repositorio que creas con Init. Vacío: decide git. No renombra ninguna rama existente. |
-| **Activar la detección proactiva de conflictos** | Activada por defecto (`general.conflict_detection`). Avisa en el Log cuando hacer merge de la rama actual en la rama de la que partió daría conflictos, antes de que lo intentes. Un repositorio puede desactivarla para sí mismo en su página **Prevención de conflictos**. Consulta [Resolver conflictos de merge](merge-conflicts.md#prevención-de-conflictos). Se aplica al cerrar Ajustes. |
-| **Ramas base predeterminadas** | Bajo el interruptor, en el grupo **Prevención de conflictos** (el comando de la paleta **Conflictos: Editar listas de ramas base...** lo abre). La lista de patrones de ramas base que usan los repositorios que no tienen una propia: **Integrada (`**`)**, que son todas las ramas, o una de tus listas con nombre (`conflict_prevention.default_list`). Se aplica a los repositorios abiertos al cerrar Ajustes. **Volver a la lista integrada** regresa a `**`. |
-| **Listas de ramas base** | También en ese grupo: tus listas con nombre de patrones de ramas base (`[conflict_prevention.lists.<name>]`), un bloque cada una con su **Nombre** (renombrar la mantiene como predeterminada si lo era; un repositorio que seguía el nombre anterior usa la lista predeterminada hasta que vuelvas a elegir la renombrada), sus **Patrones** (uno por línea, `Enter` o un clic abre el editor, `Ctrl+S` lo conserva), **Hacer predeterminada** y **Eliminar lista** (pregunta antes, y avisa de que los repositorios que la siguen usarán la lista predeterminada). Escribe un nombre en **Nueva lista** y pulsa `Enter` para añadir una; empieza con `**`. Editar una lista cambia todos los repositorios que la siguen. |
 | **Nivel del registro**, **Conservar los archivos de registro**, **Tamaño máximo de un archivo de registro** | El registro de la aplicación que hay detrás del Registro de actividad: la línea más detallada que se registra (`log.level`), cuánto tiempo se conservan los archivos (un número entero y una unidad, días, semanas, meses o años, en una sola línea: haz clic en el número para escribirlo, Arriba y Abajo lo cambian, Tab pasa a la unidad y Enter abre su lista; hasta 10 años como máximo, por defecto 1 semana, `log.retention_days` y `log.retention_unit`) y el tamaño al que se rota el archivo de un día (un número y MiB o GiB, de 1 MiB a 1 GiB, `log.max_file_mb` y `log.max_file_unit`). |
 | **Mostrar la duración de las operaciones**, **Registro ampliado** | La pestaña Operaciones de git del Registro de actividad: la duración de cada operación (`log.timings`, activado por defecto) y también el trabajo en segundo plano, actualización y auto-fetch (`log.extended`, desactivado por defecto). Consulta [Cuando algo falla](troubleshooting.md#el-registro-de-actividad). |
 | **Deshacer activado**, **Profundidad del historial de deshacer**, **Registrar los cambios hechos fuera de GitPoulpi** | El grupo **Historial de deshacer**. Activa o desactiva Deshacer, y fija cuántas operaciones conserva (por defecto 100, `0` significa sin límite). Desactivar Deshacer borra el historial de deshacer, tras una confirmación. La última opción también registra lo que un shell o un agente hace en ramas, tags, stashes y HEAD. Consulta [Deshacer y rehacer](undo-redo.md). |
 
-#### Lanzador (integración con el escritorio)
+El comando de la paleta **App: Cambiar idioma...** (`Ctrl+N g`) abre la misma
+lista de idiomas. Ahí, el idioma resaltado se previsualiza en directo; `Enter` lo
+conserva y `Esc` restaura el anterior.
 
-El grupo **Lanzador**, el último de la página General, crea un acceso directo que inicia
+### Lanzador
+
+La página **Lanzador** (`gitpoulpi ui show settings launcher`) crea un acceso directo que inicia
 GitPoulpi desde el lanzador del sistema, en el terminal que elijas.
 
 | Fila | Qué hace |
@@ -215,9 +216,9 @@ Actualizar; solo **Crear** (para un acceso directo que aún no existe) y **Quita
 
 **Agrupación en la barra de tareas y el dock.** GitPoulpi se ejecuta dentro de una ventana de terminal, así que la barra de tareas suele mostrarlo bajo el icono del terminal, sin el punto de «en ejecución» bajo el icono de GitPoulpi anclado. Windows: los accesos directos llevan el AppUserModelID `GitPoulpi.GitPoulpi`, y un GitPoulpi iniciado desde uno de ellos da a la ventana de su terminal el mismo ID y su icono (encuentra la ventana poniéndole un instante un título único y luego restaura el título), de modo que la ventana queda bajo el icono de GitPoulpi anclado. Una ventana de terminal con varias pestañas se mueve como un todo: todas sus pestañas se agrupan bajo el icono de GitPoulpi mientras GitPoulpi se ejecuta en ella. Los accesos directos y los anclajes de la barra de tareas creados antes los reescribe la misma sincronización; si un anclaje sigue mostrando el icono del terminal, desancla y vuelve a anclar. Linux: kitty, foot, Alacritty, WezTerm y Ghostty se inician con la clase de ventana `gitpoulpi` y la entrada `.desktop` la nombra (`StartupWMClass`), así que un dock agrupa la ventana bajo el icono del lanzador; los demás terminales conservan su propio icono. macOS: nada que hacer, el Dock agrupa por aplicación.
 
-![Ajustes > General desplazado hasta el grupo Lanzador: el terminal de los accesos directos y la fila del lanzador de aplicaciones](../images/settings-launcher.png)
+![Ajustes > Lanzador: el terminal de los accesos directos y la fila del lanzador de aplicaciones](../images/settings-launcher.png)
 
-##### Alias del comando y PATH, según el sistema
+#### Alias del comando y PATH, según el sistema
 
 | Sistema | Alias | PATH |
 |---|---|---|
@@ -232,9 +233,16 @@ acceso directo del escritorio**, **Lanzador: Quitar accesos directos**, **Lanzad
 status|install|remove [--where launcher|desktop|startmenu]` lo
 hace desde un script.
 
-El comando de la paleta **App: Cambiar idioma...** (`Ctrl+N g`) abre la misma
-lista de idiomas. Ahí, el idioma resaltado se previsualiza en directo; `Enter` lo
-conserva y `Esc` restaura el anterior.
+### Prevención de conflictos
+
+La parte global de la detección proactiva de conflictos (`gitpoulpi ui show settings conflict-prevention-global`); la página de cada repositorio es
+[Ajustes del repositorio: Prevención de conflictos](#ajustes-del-repositorio-prevención-de-conflictos). El comando de la paleta **Conflictos: Editar listas de ramas base...** abre esta página.
+
+| Opción | Qué hace |
+|---|---|
+| **Activar la detección proactiva de conflictos** | Activada por defecto (`general.conflict_detection`). Avisa en el Log cuando hacer merge de la rama actual en la rama de la que partió daría conflictos, antes de que lo intentes. Un repositorio puede desactivarla para sí mismo en su propia página **Prevención de conflictos**. Consulta [Resolver conflictos de merge](merge-conflicts.md#prevención-de-conflictos). Se aplica al cerrar Ajustes. |
+| **Ramas base predeterminadas** | Bajo el interruptor. La lista de patrones de ramas base que usan los repositorios que no tienen una propia: **Integrada (`**`)**, que son todas las ramas, o una de tus listas con nombre (`conflict_prevention.default_list`). Se aplica a los repositorios abiertos al cerrar Ajustes. **Volver a la lista integrada** regresa a `**`. |
+| **Listas de ramas base** | También en esta página: tus listas con nombre de patrones de ramas base (`[conflict_prevention.lists.<name>]`), un bloque cada una con su **Nombre** (renombrar la mantiene como predeterminada si lo era; un repositorio que seguía el nombre anterior usa la lista predeterminada hasta que vuelvas a elegir la renombrada), sus **Patrones** (uno por línea, `Enter` o un clic abre el editor, `Ctrl+S` lo conserva), **Hacer predeterminada** y **Eliminar lista** (pregunta antes, y avisa de que los repositorios que la siguen usarán la lista predeterminada). Escribe un nombre en **Nueva lista** y pulsa `Enter` para añadir una; empieza con `**`. Editar una lista cambia todos los repositorios que la siguen. |
 
 ### Sincronización
 
@@ -405,6 +413,7 @@ las compilaciones que incluyen el servidor; consulta [MCP y agentes](mcp-and-age
 | **Fondo de los carriles del grafo** | **Desactivado** (transparente) o **Tinte de fila**: una banda tenue del color del carril detrás de la columna del grafo, con una barra fina en su borde. |
 | **Intensidad del tinte de fila** | Cuánto se atenúa la banda del tinte de fila: **Fuerte**, **Media** (por defecto) o **Sutil**. La barra del borde conserva su color completo. |
 | **Posición de la barra de herramientas** | `ui.toolbar_position`: Dónde va la barra de herramientas: Arriba, Abajo (por defecto), Izquierda o Derecha. Izquierda y Derecha forman una columna junto a los paneles; una ventana de menos de 80 columnas la dibuja abajo. Se aplica al instante. |
+| **Recordar la posición y el tamaño de los diálogos** | `ui.dialog_geometry`: **Durante esta sesión** (por defecto), **Guardado en disco** o **Nunca**: si un diálogo que moviste o cuyo tamaño cambiaste conserva su sitio. Se aplica al instante. |
 | **Alineación de los botones de la barra de herramientas** | `ui.toolbar_align`: Dónde van los botones a lo largo de la barra: Inicio (por defecto), Centro o Final. El inicio es la izquierda de una fila y la parte superior de una columna; el final es la derecha y la parte inferior. Se aplica al instante. |
 | **Fijar el botón de pull request al final** | `ui.toolbar_pr_pinned`: Activado (por defecto), el botón de pull request queda en el extremo de la barra de herramientas (a la derecha, o abajo en una columna), sea cual sea la alineación. Desactivado, fluye con los demás botones y se alinea con ellos. Se aplica al instante. |
 | **Posición de la barra de estado** | `ui.statusbar_position`: Dónde va la barra de estado (rama, contadores, mensajes, atajos): Arriba, sobre las pestañas de repositorio, o Abajo (por defecto). La pestaña Inicio conserva su propia barra de estado abajo. Se aplica al instante. |
@@ -715,9 +724,9 @@ repositorio (consulta [Resolver conflictos de merge](merge-conflicts.md#prevenci
 
 - **Activar la detección proactiva de conflictos con la rama de destino**: activada por defecto. Al desmarcarla se
   desactiva la detección solo para este repositorio; el interruptor global es **Activar la detección proactiva de
-  conflictos** de la página General. Los dos deben estar activados.
+  conflictos** de la página global **Prevención de conflictos**. Los dos deben estar activados.
 - **Ramas base desde**: de dónde vienen las ramas base de este repositorio. **Predeterminada** sigue el valor global
-  (el `**` integrado, o la lista elegida en **Ramas base predeterminadas** de Ajustes > General); **Lista: <nombre>**
+  (el `**` integrado, o la lista elegida en **Ramas base predeterminadas** de Ajustes > Prevención de conflictos); **Lista: <nombre>**
   sigue una de tus listas con nombre, así que editar la lista cambia también este repositorio; **Lista propia** es una
   lista del propio repositorio (al elegirla se parte de una copia de los patrones vigentes). Un archivo de repositorio
   escrito antes de existir esta elección y que contiene patrones propios se lee como **Lista propia**.
@@ -737,7 +746,7 @@ repositorio (consulta [Resolver conflictos de merge](merge-conflicts.md#prevenci
   se ignoran; una lista solo de exclusiones significa «todas las ramas salvo estas». La elección se guarda en `repo-state.toml` y se
   vuelve a leer al cerrar Ajustes.
 - **Guardar como lista...**: escribe un nombre y pulsa `Enter`; los patrones vigentes pasan a ser una lista con nombre
-  (la misma que edita Ajustes > General) y este repositorio la sigue.
+  (la misma que edita Ajustes > Prevención de conflictos) y este repositorio la sigue.
 - **Restablecer a predeterminado** (pregunta antes): descarta la elección, la lista y los patrones propios de este
   repositorio; vuelve a seguir la predeterminada.
 - **Usar las ramas base del flujo de trabajo** (se muestra cuando hay un [flujo de ramas](branching-workflows.md) con

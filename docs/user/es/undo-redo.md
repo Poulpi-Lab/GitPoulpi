@@ -47,8 +47,10 @@ encabezado las cuenta («Se pueden deshacer 12 acciones (hasta 100)»).
 Las acciones que has deshecho quedan **encima** de la más reciente, bajo un divisor
 («deshechas - Rehacer las recupera»), atenuadas, y la que Rehacer recupera primero queda junto
 al divisor. La selección empieza en la acción más reciente, no en ellas. Las flechas mueven la
-selección (los encabezados y el divisor se saltan), `Tab` alterna entre las tres vistas y `Esc`
-cierra. Para la fila seleccionada:
+selección (los encabezados y el divisor se saltan), `1` / `2` / `3` (o `Ctrl+Tab` /
+`Ctrl+Shift+Tab`) alternan entre las tres vistas y `Esc` cierra. `Enter` nunca ejecuta una
+acción: cada botón tiene su propia letra, que se muestra en la línea de ayuda bajo los
+botones. Para la fila seleccionada:
 
 - **Deshacer hasta aquí** (`u`): deshace esa acción y todas las más recientes, de la más
   reciente a la más antigua, tras una sola confirmación que las lista todas. Un paso que el
@@ -89,8 +91,10 @@ usan el formato reftable de git se leen como cualquier otro.
 
 ![El Reflog de main: todas las posiciones que ha tenido, de la más reciente a la más antigua, con la seleccionada descrita a la derecha](../images/reflog.png)
 
-**Mostrar en el Log** (`s`), **Crear rama
-aquí** (`b`) y **Restaurar `<rama>` a esta posición** (`r`). La restauración se puede deshacer.
+**Mostrar en el Log** (`l`), **Crear rama
+aquí** (`b`), **Crear tag aquí** (`t`), **Aplicar al árbol de trabajo** (`w`), **Guardar como
+stash** (`s`) (las tres últimas funcionan como en Trabajo perdido, más abajo) y
+**Restaurar `<rama>` a esta posición** (`r`). La restauración se puede deshacer.
 Cuando la rama tiene checkout y hay cambios locales que no puede mover sin sobrescribirlos, un
 desplegable pregunta qué hacer con ellos: conservar mis cambios, soft, mixed o hard. Hard
 descarta los cambios de tus archivos, pero antes los guarda, así que `Ctrl+Z` todavía los
@@ -107,8 +111,50 @@ mientras se muestra un indicador de progreso; nunca bloquea la interfaz.
 ![Trabajo perdido: los dos commits de una rama eliminada (encontrados a través del reflog) y commits huérfanos](../images/lost-work.png)
 
 **Crear rama aquí**
-(`b`) recupera un commit con el nombre que elijas, **Cherry-pick** (`c`) lo aplica a la rama
-actual y **Mostrar en el Log** (`s`) sirve para los que aún son alcanzables.
+(`b`) recupera un commit con el nombre que elijas, **Crear tag aquí** (`t`) lo fija con un tag
+(nombre por defecto `restored-<id corto>`) y **Cherry-pick** (`c`) lo aplica a la rama actual.
+Un commit perdido no está en el Log, así que esta vista no tiene «Mostrar en el Log» (la vista
+Reflog lo conserva para los commits que aún son alcanzables).
+
+**Restaurar cambios** devuelve lo que cambió el commit sin hacer commit de ello: **Aplicar al
+árbol de trabajo** (`w`) reproduce los cambios del commit sobre los archivos, todo o nada (el
+índice y HEAD se quedan como están; un commit de merge se rechaza). Cuando no se puede aplicar
+limpiamente, no se toca nada y el diálogo ofrece **Guardar como stash** (`s`), que conserva esos
+mismos cambios como un stash nuevo; esa acción también está siempre disponible por sí sola. Las
+dos quedan en el diario: `Ctrl+Z` devuelve los archivos a su estado anterior, o vuelve a
+eliminar el stash. Las mismas acciones son `gitpoulpi apply-commit <rev>` y `gitpoulpi stash
+from-commit <rev> [-m M]`, y la vista Reflog también las tiene.
+
+### Paneles, hunks y la ventana
+
+Reflog y Trabajo perdido muestran la lista de commits a la izquierda y, a la derecha, la
+cabecera del commit seleccionado, **todos los archivos que cambió** y los hunks del archivo
+seleccionado (solo los hunks, ajustados al panel). La lista de archivos es la del panel derecho
+de la ventana principal: `Ruta` o `Árbol` (`v`, o haz clic en el selector), una carpeta se
+pliega con `Enter`, `Izquierda` o `Derecha`, un clic o las flechas eligen un archivo y sus hunks
+aparecen debajo (se le pide al daemon fuera del hilo de la interfaz; se conservan los últimos
+archivos). La lista de commits, la de archivos y los hunks tienen cada uno una barra de
+desplazamiento que puedes pulsar y arrastrar.
+
+- `Tab` / `Shift+Tab` recorren los paneles (lista, archivos, hunks); las flechas, `RePág`,
+  `AvPág`, `Inicio` y `Fin` actúan sobre el panel que tiene el teclado (su borde está
+  iluminado). `Enter` sobre un archivo pasa a sus hunks.
+- **Divisores**: arrastra el que hay entre la lista y el panel derecho, o el que hay entre los
+  archivos y los hunks; haz doble clic en un divisor para restablecerlo. Con el teclado:
+  `Alt+Izquierda` / `Alt+Derecha`, `Alt+Arriba` / `Alt+Abajo`, `Alt+0` restablece ambos. La
+  paleta tiene `Reflog / Trabajo perdido: Restablecer tamaños de los paneles`, `Panel siguiente`
+  y `Lista de archivos como ruta o árbol`.
+- `Ctrl+N` muestra sus marcas sobre las tres pestañas de vista y los tres paneles, como en la
+  ventana principal; la tecla de una marca salta allí.
+- **Mover y redimensionar el diálogo**: arrastra la barra de título para moverlo, arrastra los
+  bordes izquierdo, derecho e inferior o una esquina inferior (el agarre `◢`) para cambiar su
+  tamaño (nunca por debajo de 60 x 16, siempre dentro de la pantalla). La cruz de cierre
+  conserva su clic y soltar fuera del diálogo nunca lo cierra. El equivalente con el teclado es
+  `Ctrl+N` y luego `m`: las flechas lo mueven, `Shift`+flechas cambian su tamaño, `0` lo
+  restablece, `Enter` o `Esc` salen (el borde lo indica mientras está activo). La paleta tiene
+  `Diálogo: Mover o cambiar de tamaño` y `Diálogo: Restablecer posición y tamaño`. Si el sitio
+  se conserva lo decide `ui.dialog_geometry` (Ajustes > Apariencia > Disposición): `session`
+  (por defecto), `saved` (se restaura en el próximo arranque) o `never`.
 
 ## Desde la paleta de comandos
 
@@ -120,8 +166,8 @@ abierto: la paleta se abre encima y sus filas **Historial de deshacer:**, **Refl
 | Vista | Filas de la paleta |
 |---|---|
 | Historial de deshacer | `Historial de deshacer: Deshacer hasta aquí...`, `Rehacer hasta aquí...`, `Restaurar solo esta...`, `Restaurar la rama a donde estaba...`, `Actualizar`, `Cerrar` |
-| Reflog | `Reflog: Mostrar en el Log`, `Crear rama aquí...`, `Restaurar a esta posición...`, `Cargar más`, `Actualizar` |
-| Trabajo perdido | `Trabajo perdido: Mostrar en el Log`, `Crear rama aquí...`, `Cherry-pick`, `Buscar de nuevo` |
+| Reflog | `Reflog: Mostrar en el Log`, `Crear rama aquí...`, `Crear tag aquí...`, `Aplicar cambios al árbol de trabajo`, `Guardar cambios como stash`, `Restaurar a esta posición...`, `Cargar más`, `Actualizar` |
+| Trabajo perdido | `Trabajo perdido: Crear rama aquí...`, `Crear tag aquí...`, `Cherry-pick`, `Aplicar cambios al árbol de trabajo`, `Guardar cambios como stash`, `Buscar de nuevo` |
 
 Las filas aparecen atenuadas (con el motivo) mientras su vista no está abierta; los tres
 abridores, `Edición: Historial de deshacer...`, `Edición: Reflog...` y `Edición:
@@ -140,8 +186,8 @@ de nombre que el botón.
 | Ramas y tags | crear, eliminar, renombrar, establecer o quitar el upstream, crear una rama de seguimiento, crear / eliminar / anotar un tag, fast-forward, hacer checkout de una pull request como rama |
 | Moverse | checkout de una rama o de un commit (incluido un HEAD desacoplado) |
 | Historial | merge (fast-forward o commit de merge), rebase (simple e interactivo, una vez terminado), cherry-pick, revert, reset (soft, mixed y hard), la parte local de un pull |
-| Cambios de trabajo | stage y unstage (archivo, carpeta, hunk, líneas, todo), descartar (archivo, carpeta, hunk, líneas, un checkout de archivo), aplicar un parche, **eliminar un archivo del disco**, **ignorar** (archivo, extensión o carpeta: la línea del `.gitignore` que elijas), **tratar como binario o texto** (la línea de `.gitattributes`) |
-| Stashes | push, apply, pop, drop |
+| Cambios de trabajo | stage y unstage (archivo, carpeta, hunk, líneas, todo), descartar (archivo, carpeta, hunk, líneas, un checkout de archivo), aplicar un parche o los cambios de un commit (`apply-commit`), **eliminar un archivo del disco**, **ignorar** (archivo, extensión o carpeta: la línea del `.gitignore` que elijas), **tratar como binario o texto** (la línea de `.gitattributes`) |
+| Stashes | push, apply, pop, drop, guardar los cambios de un commit como stash (`stash from-commit`) |
 | Remotos y configuración | añadir, quitar, renombrar, cambiar la URL o la URL de push de un remoto, track y untrack de Git LFS |
 | En un servidor | **eliminar una rama o un tag en un remoto** (desde el menú de la ref, la paleta, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, o el cierre de un flujo que elimina la rama remota): véase abajo |
 
@@ -391,7 +437,9 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   hizo un shell. `reflog-restore` mueve una rama (o `HEAD`) a una de esas posiciones; una
   rama con checkout y cambios sin commit necesita `--mode`. También se registra en el
   diario.
-- `lost-commits` lista los commits que no alcanza ninguna rama, tag, remoto ni stash.
+- `lost-commits` lista los commits que no alcanza ninguna rama, tag, remoto ni stash. Para
+  recuperar el trabajo de uno sin hacer commit de él: `apply-commit <rev>` (al árbol de
+  trabajo, todo o nada) o `stash from-commit <rev>` (como stash); ambos quedan en el diario.
 - Cuando un movimiento hecho en un shell bloquea la entrada más reciente, el rechazo lleva la
   posición del reflog que contiene lo que la entrada espera (`reason.RefMoved.restore`), para
   pasarla a `reflog-restore`.

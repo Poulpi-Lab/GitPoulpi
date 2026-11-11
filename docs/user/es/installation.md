@@ -69,7 +69,7 @@ El archivo `.sha256` solo detecta una descarga dañada. La firma es lo que demue
 
 Cada versión incluye además un instalador por sistema operativo. Los dos toman las mismas decisiones
 (accesos directos, PATH, un alias del comando como `gp`) llamando al propio `gitpoulpi` instalado, el
-código que hay detrás de Ajustes > General > Lanzador, de modo que lo que configura el instalador y lo que muestra
+código que hay detrás de Ajustes > Lanzador, de modo que lo que configura el instalador y lo que muestra
 Ajustes siempre coinciden.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
@@ -132,7 +132,7 @@ Cada canal de abajo escribe la misma marca `.gitpoulpi-dist` junto a los program
 
 Los nombres de arriba son aquellos en los que publica el proceso de publicación de versiones (consulta [Releasing](../../developer/releasing.md)): un canal que aún no está activo responde «not found», y el archivo de la versión o el instalador siempre funcionan.
 
-Se aplica el manejo propio del PATH de cada gestor de paquetes: Chocolatey, winget, Scoop y Homebrew ponen los programas en el PATH por sí mismos, y ninguno crea el alias `gp` (ejecuta `gitpoulpi alias create gp`, o Ajustes > General > Lanzador).
+Se aplica el manejo propio del PATH de cada gestor de paquetes: Chocolatey, winget, Scoop y Homebrew ponen los programas en el PATH por sí mismos, y ninguno crea el alias `gp` (ejecuta `gitpoulpi alias create gp`, o Ajustes > Lanzador).
 
 ### apt (Debian y Ubuntu)
 

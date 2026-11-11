@@ -446,6 +446,18 @@ Las teclas de los campos de texto están en [Atajos de teclado](keybindings.md).
 
 Consulta [Imágenes](image-view.md) para el ratón en la vista de imagen.
 
+## Mover y redimensionar diálogos
+
+El diálogo Historial de deshacer / Reflog / Trabajo perdido se puede mover y redimensionar:
+
+- **Arrastra la barra de título** para moverlo (la cruz de cierre conserva su clic).
+- **Arrastra el borde izquierdo, derecho o inferior**, o una esquina inferior (el agarre `◢`), para cambiar su tamaño. El diálogo se queda en pantalla y nunca baja de 60 x 16.
+- El arrastre continúa cuando el puntero sale del diálogo, y soltar fuera nunca lo cierra.
+- **Arrastra los divisores** entre su lista, su lista de archivos y sus hunks; haz doble clic en uno para restablecerlo.
+- Los equivalentes con el teclado son `Ctrl+N` y luego `m` (las flechas mueven, `Shift`+flechas cambian el tamaño, `0` restablece, `Enter` o `Esc` salen) y `Alt`+flechas para los divisores; la paleta tiene `Diálogo: Mover o cambiar de tamaño` y `Diálogo: Restablecer posición y tamaño`.
+
+El puntero muestra una forma de mover sobre la barra de título y una de redimensionar sobre los bordes y las esquinas (terminales con `OSC 22`).
+
 ## Forma del puntero del ratón
 
 Algunos terminales dejan que GitPoulpi cambie el puntero del ratón: un puntero de

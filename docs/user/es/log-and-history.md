@@ -63,7 +63,7 @@ elección se recuerda, en celdas del terminal. Con el valor por defecto `ui.colu
 conservan su ancho cuando se cambia el tamaño de la ventana o se maximiza: solo
 **Mensaje** crece o se reduce (en una ventana muy estrecha las demás columnas
 ceden temporalmente, Grafo la primera, y vuelven a tus anchos cuando la ventana
-vuelve a crecer). Arrastra la columna Grafo hasta su ancho mínimo, un punto de commit, y el grafo se vuelve compacto: cada commit queda en un solo carril, uno bajo otro, sin líneas de rama ni de merge. Una celda más ancha y el árbol vuelve.
+vuelve a crecer). Arrastra la columna Grafo hasta su ancho mínimo, un punto de commit, y el grafo se vuelve compacto: cada commit queda en un solo carril, uno bajo otro, sin líneas de rama ni de merge. Una celda más ancha y el árbol vuelve. Con las imágenes de los autores en los círculos de commit (Ajustes > Historial y grafo > Avatares de autor: grafo) el círculo ocupa dos celdas, así que la columna se detiene una celda antes (tres celdas) y nunca recorta una imagen.
 
 Al arrastrar una cabecera aparece un fantasma de su nombre que sigue al puntero y una barra de acento donde caería la columna; el orden cambia al soltar y `Esc` cancela. El selector que abre el clic derecho es una lista de casillas (`[x]` / `[ ]`) con una ✕ en su título; también se alcanza desde la paleta (`Ver: Log: elegir las columnas que se muestran`), se mueve con las flechas y se alterna con `Espacio` / `Intro`.
 

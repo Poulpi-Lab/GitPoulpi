@@ -111,7 +111,7 @@ cambia según el terminal y la fuente, y por eso GitPoulpi evita los glifos VS16
   fondo opaco; menos probado.
 - **Consola de Windows, ConEmu, cmd**: evítalos. Las imágenes se dibujan mal o no se
   dibujan. Al hacer doble clic en el exe, GitPoulpi se reabre en el terminal que hayas
-  elegido (*Ajustes > General > Lanzador*).
+  elegido (*Ajustes > Lanzador*).
 
 ### Linux
 

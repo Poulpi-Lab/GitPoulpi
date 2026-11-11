@@ -137,6 +137,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `nav_prefix` | `status_narrower` | Smalna av Status-rutan | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: visa den väntande vyn | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: tillbaka (eller avfärda den väntande vyn) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filtrera refs efter namn | `/` |
 | `refs` | `solo` | Solo för markeringen | `o` |
 | `refs` | `clear_solo` | Sluta solo | `Shift+O` |
@@ -958,11 +959,11 @@ Tangenterna är standardvärdena.
 | Ångrahistorik: Återställ grenen till där den var... | `o` |
 | Ångrahistorik: Uppdatera |  |
 | Ångrahistorik: Stäng | `Esc` |
-| Reflog: Visa i Log | `s` |
+| Reflog: Visa i Log | `l` |
 | Reflog: Skapa gren här... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Återställ till den här positionen... | `r` |
 | Reflog: Ladda fler | `m` |
 | Reflog: Uppdatera |  |
@@ -970,8 +971,13 @@ Tangenterna är standardvärdena.
 | Lost Work: Create tag Here... | `t` |
 | Förlorat arbete: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Förlorat arbete: Sök igen |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Vy: Uppdatera | `r` |
 | Vy: Uppdatera (fetch, pull requests, ärenden) | `F5` |
 | Vy: Växla hjälpöverlägg | `?` |

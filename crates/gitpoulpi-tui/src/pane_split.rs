@@ -18,6 +18,17 @@ pub(crate) const KEY_STEP_PERMILLE: u32 = 50;
 /// right, summing to `usable`. Every pane keeps [`MIN_PANE_W`] when the room
 /// allows it; a narrower row falls back to the equal share.
 pub(crate) fn widths(weights: Option<&[u16]>, usable: u16, n: usize) -> Vec<u16> {
+    widths_min(weights, usable, n, MIN_PANE_W)
+}
+
+/// [`widths`] with another floor per pane: the rows of a column of panes
+/// (a few lines each) share a height the same way.
+pub(crate) fn widths_min(
+    weights: Option<&[u16]>,
+    usable: u16,
+    n: usize,
+    min_pane: u16,
+) -> Vec<u16> {
     let n16 = n.max(1) as u16;
     let equal = |usable: u16| -> Vec<u16> {
         let each = usable / n16;
@@ -33,7 +44,7 @@ pub(crate) fn widths(weights: Option<&[u16]>, usable: u16, n: usize) -> Vec<u16>
     let Some(weights) = weights.filter(|w| w.len() == n) else {
         return equal(usable);
     };
-    if usable < n16 * MIN_PANE_W {
+    if usable < n16 * min_pane {
         return equal(usable);
     }
     let ws: Vec<u32> = weights.iter().map(|w| u32::from(*w).max(1)).collect();
@@ -44,7 +55,7 @@ pub(crate) fn widths(weights: Option<&[u16]>, usable: u16, n: usize) -> Vec<u16>
     for w in &ws {
         cum += w;
         let edge = (u32::from(usable) * cum * 2 + total) / (total * 2);
-        out.push(((edge - prev) as u16).max(MIN_PANE_W));
+        out.push(((edge - prev) as u16).max(min_pane));
         prev = edge;
     }
     // Rounding and the floors: settle on exactly `usable`.
@@ -59,7 +70,7 @@ pub(crate) fn widths(weights: Option<&[u16]>, usable: u16, n: usize) -> Vec<u16>
             out[i] += usable - sum;
         } else {
             let i = (0..out.len()).max_by_key(|i| out[*i]).unwrap_or(0);
-            let take = (sum - usable).min(out[i].saturating_sub(MIN_PANE_W));
+            let take = (sum - usable).min(out[i].saturating_sub(min_pane));
             if take == 0 {
                 return equal(usable);
             }
@@ -83,11 +94,21 @@ pub(crate) fn weights_for(widths: &[u16]) -> Vec<u16> {
 /// at least [`MIN_PANE_W`]. `None` when the move is not possible (no such
 /// divider, or the pair is too narrow to hold two minimum panes).
 pub(crate) fn move_divider(current: &[u16], i: usize, left: i32) -> Option<Vec<u16>> {
+    move_divider_min(current, i, left, MIN_PANE_W)
+}
+
+/// [`move_divider`] with another floor per pane.
+pub(crate) fn move_divider_min(
+    current: &[u16],
+    i: usize,
+    left: i32,
+    min_pane: u16,
+) -> Option<Vec<u16>> {
     if i + 1 >= current.len() {
         return None;
     }
     let pair = i32::from(current[i]) + i32::from(current[i + 1]);
-    let min = i32::from(MIN_PANE_W);
+    let min = i32::from(min_pane);
     if pair < 2 * min {
         return None;
     }

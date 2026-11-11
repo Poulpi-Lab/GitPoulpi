@@ -136,6 +136,7 @@ prefiksem (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Zwęź panel Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: Pokaż oczekujący widok | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: Wstecz (lub odrzuć oczekujący widok) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filtruj refy po nazwie | `/` |
 | `refs` | `solo` | Solo dla zaznaczenia | `o` |
 | `refs` | `clear_solo` | Zakończ solo | `Shift+O` |
@@ -955,11 +956,11 @@ zastosowania. Klawisze są domyślne.
 | Historia cofania: Przywróć gałąź tam, gdzie była... | `o` |
 | Historia cofania: Odśwież |  |
 | Historia cofania: Zamknij | `Esc` |
-| Reflog: Pokaż w Log | `s` |
+| Reflog: Pokaż w Log | `l` |
 | Reflog: Utwórz gałąź tutaj... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Przywróć do tej pozycji... | `r` |
 | Reflog: Wczytaj więcej | `m` |
 | Reflog: Odśwież |  |
@@ -967,8 +968,13 @@ zastosowania. Klawisze są domyślne.
 | Lost Work: Create tag Here... | `t` |
 | Utracona praca: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Utracona praca: Szukaj ponownie |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Widok: Odśwież | `r` |
 | Widok: Odśwież (fetch, pull requesty, zgłoszenia) | `F5` |
 | Widok: Przełącz pomoc | `?` |

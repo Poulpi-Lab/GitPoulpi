@@ -526,6 +526,9 @@ toolbar_position = "ツールバーの位置"
 toolbar_position_help = "ツールバーの位置：上、下（既定）、左、右。左と右ではペインの横に縦の列になり、80 列未満のウィンドウでは下に描画します。すぐに反映されます。"
 toolbar_align = "ツールバーのボタンの配置"
 toolbar_align_help = "ツールバー上のボタンの位置：先頭（既定）、中央、末尾。先頭は行では左、列では上、末尾は右と下です。すぐに反映されます。"
+# context: label of the setting that decides whether a dialog the user moved or resized keeps its place
+dialog_geometry = "Remember dialog position and size"
+dialog_geometry_help = "Dialogs can be moved (drag the title bar, or Ctrl+N then m) and resized (drag the borders and bottom corners). For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
 toolbar_pr_pinned = "{$pr}ボタンを末尾に固定"
 toolbar_pr_pinned_help = "オン（既定）では、配置にかかわらず{$pr}ボタンをツールバーの末端（右、列では下）に置きます。オフでは他のボタンと一緒に並び、同じ配置になります。すぐに反映されます。"
 statusbar_position = "ステータスバーの位置"
@@ -754,6 +757,12 @@ pos_right = "右"
 align_start = "先頭"
 align_center = "中央"
 align_end = "末尾"
+# context: dropdown choice: a moved dialog keeps its place until GitPoulpi closes
+geometry_session = "For this session"
+# context: dropdown choice: a moved dialog keeps its place on disk, for the next launch too
+geometry_saved = "Saved to disk"
+# context: dropdown choice: dialogs always open at their default place and size
+geometry_never = "Never"
 layout_fit = "ペインに合わせる"
 layout_scroll = "横スクロール"
 
@@ -2297,6 +2306,8 @@ nav_prefix_activity_log = "アクティビティログを開く"
 nav_prefix_global_log = "グローバルアクティビティログを開く"
 nav_prefix_jobs = "バックグラウンドタスクを表示"
 nav_prefix_updates = "更新パネルを表示"
+# context: name of the key after Ctrl+N that moves or resizes the open dialog from the keyboard
+nav_prefix_arrange_dialog = "Arrange the open dialog (move, resize)"
 nav_prefix_help = "ヘルプの表示切り替え"
 nav_prefix_select_tab = "タブを選択"
 nav_prefix_change_theme = "テーマを変更"
@@ -3412,6 +3423,12 @@ undo_history_restore_only = "元に戻す履歴: これだけ復元..."
 undo_history_offer = "元に戻す履歴: ブランチを元の位置に復元..."
 undo_history_refresh = "元に戻す履歴: 更新"
 undo_history_close = "元に戻す履歴: 閉じる"
+safety_next_pane = "Reflog / Lost Work: Next Pane"
+safety_path_tree = "Reflog / Lost Work: Path or Tree File List"
+safety_reset_panes = "Reflog / Lost Work: Reset Pane Sizes"
+# context: palette row: puts the open dialog in the mode where the arrow keys move it and Shift+arrows resize it
+dialog_move_resize = "Dialog: Move/resize"
+dialog_reset_geometry = "Dialog: Reset position and size"
 reflog_show_in_log = "Reflog: Log で表示"
 reflog_create_branch = "Reflog: ここにブランチを作成..."
 reflog_create_tag = "Reflog: Create {$tag} Here..."
@@ -3675,6 +3692,7 @@ navigation_prefix_then_12 = "一覧からテーマを選ぶ - 入力で絞り込
 navigation_prefix_then_13 = "一覧から言語を選択 - 入力で絞り込み、Enter で適用して保存、Esc でキャンセル（パレットの `アプリ: 言語を変更...` でも可）"
 navigation_prefix_then_14 = "`アプリ: グラフのカラーテーマを変更...`"
 navigation_prefix_then_15 = "`アプリ: グラフの行の色付けを切り替え`"
+navigation_prefix_then_19 = "arrange the open dialog from the keyboard: the arrows move it, Shift+arrows resize it, 0 puts it back, Enter leaves (the twin of dragging its title bar and borders; also `Dialog: Move/resize` in the palette)"
 git_actions_then_1 = { git = "選択中の{$unstaged}のファイルを{$stage}（Status ペイン）", local = "選択中の未ステージのファイルをステージ（Status ペイン）" }
 git_actions_then_2 = { git = "選択中の{$staged}のファイルを{$unstage}（Status ペイン）", local = "選択中のステージ済みのファイルをステージ解除（Status ペイン）" }
 git_actions_then_3 = { git = "すべての変更を{$stage}", local = "すべての変更をステージ" }
@@ -6214,6 +6232,21 @@ hint_tag = "{$tag} here"
 hint_apply = "apply"
 hint_stash = "{$stash}"
 hint_menu = "メニュー"
+# context: footer hint: the key moves the keyboard to the next pane (commit list, files, changes)
+hint_pane = "next pane"
+# context: footer hint: the keys 1 2 3 open one of the three views
+hint_views = "view"
+# context: footer hint: the key switches the file list between a flat path list and a folder tree
+hint_tree = "path or tree"
+# context: footer hint: the keys move the dividers between the panes
+hint_resize = "resize panes"
+# context: title of the changes box of the dialog; {path} is a file path
+pane_diff = "Changes in {path}"
+# context: title of the changes box of the dialog while no file is selected
+pane_diff_plain = "Changes"
+pane_diff_none = "Select a file to see its changes"
+pane_diff_loading = "reading the changes..."
+why_open_panes = "open the Reflog or Lost work view first"
 tip_depth = { one = "{n} 件の操作を元に戻せます", other = "{n} 件の操作を元に戻せます" }
 tip_chip = "元に戻す履歴：取り消せるすべての操作を1件ずつ"
 offer_tip = "{name} を {op} が残した位置に復元：{key}"
@@ -9259,3 +9292,12 @@ acl_warning = "他のアカウントがこの鍵ファイルを読み取れま�
 acl_button = "自分のアカウントに限定"
 acl_done = "この鍵ファイルは自分のアカウントだけが読み取れるようになりました。"
 acl_failed = "鍵ファイルを限定できませんでした：{why}"
+
+[dialog_frame]
+# context: shown on the border of a dialog in the arrange mode; {done} is the name of the key that leaves it
+arrange_hint = "Arrange: arrows move, Shift+arrows resize, 0 resets, {done} leaves"
+# context: status line when the arrange mode starts
+arranging = "Arranging the dialog: arrows move, Shift+arrows resize, 0 resets, Enter leaves"
+# context: status line after the dialog went back to its default place and size
+reset_done = "dialog back at its default place and size"
+why_no_dialog = "no dialog that can be arranged is open"

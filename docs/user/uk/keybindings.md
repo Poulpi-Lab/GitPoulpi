@@ -133,6 +133,7 @@ stage_file = "z"
 | `nav_prefix` | `status_narrower` | Звузити панель Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Агент: показати відкладений вигляд | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Агент: назад (або відхилити відкладений вигляд) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Фільтр refs за назвою | `/` |
 | `refs` | `solo` | Solo для вибраного | `o` |
 | `refs` | `clear_solo` | Припинити solo | `Shift+O` |
@@ -950,11 +951,11 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Історія скасувань: відновити гілку туди, де вона була... | `o` |
 | Історія скасувань: оновити |  |
 | Історія скасувань: закрити | `Esc` |
-| Reflog: показати в Log | `s` |
+| Reflog: показати в Log | `l` |
 | Reflog: створити гілку тут... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: відновити на цю позицію... | `r` |
 | Reflog: завантажити ще | `m` |
 | Reflog: оновити |  |
@@ -962,8 +963,13 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Lost Work: Create tag Here... | `t` |
 | Втрачена робота: cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Втрачена робота: сканувати знову |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Вигляд: оновити | `r` |
 | Вигляд: оновити (fetch, pull requests, issues) | `F5` |
 | Вигляд: довідка | `?` |

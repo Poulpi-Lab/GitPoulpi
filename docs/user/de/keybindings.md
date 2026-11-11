@@ -134,6 +134,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Status-Bereich verschmälern | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: Ausstehende Ansicht zeigen | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: Zurück (oder ausstehende Ansicht verwerfen) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Refs nach Namen filtern | `/` |
 | `refs` | `solo` | Auswahl solo schalten | `o` |
 | `refs` | `clear_solo` | Solo beenden | `Shift+O` |
@@ -951,11 +952,11 @@ die Standardtasten.
 | Rückgängig-Verlauf: Branch dorthin zurücksetzen, wo er war... | `o` |
 | Rückgängig-Verlauf: Aktualisieren |  |
 | Rückgängig-Verlauf: Schließen | `Esc` |
-| Reflog: Im Log zeigen | `s` |
+| Reflog: Im Log zeigen | `l` |
 | Reflog: Branch hier erstellen... | `b` |
 | Reflog: Create Tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as Stash | `z` |
+| Reflog: Save Changes as Stash | `s` |
 | Reflog: Auf diese Position zurücksetzen... | `r` |
 | Reflog: Mehr laden | `m` |
 | Reflog: Aktualisieren |  |
@@ -963,8 +964,13 @@ die Standardtasten.
 | Lost Work: Create Tag Here... | `t` |
 | Verlorene Arbeit: Cherry-Pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as Stash | `z` |
+| Lost Work: Save Changes as Stash | `s` |
 | Verlorene Arbeit: Erneut suchen |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Ansicht: Aktualisieren | `r` |
 | Ansicht: Aktualisieren (Fetch, Pull Requests, Issues) | `F5` |
 | Ansicht: Hilfe-Überlagerung umschalten | `?` |

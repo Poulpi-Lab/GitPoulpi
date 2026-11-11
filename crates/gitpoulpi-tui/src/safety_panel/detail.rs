@@ -1,9 +1,10 @@
 //! The commit shown beside the Reflog and Lost work lists: its message, its
-//! author and the files it changed. Two small reads per commit (the log
+//! author and every file it changed. Two small reads per commit (the log
 //! entry and the changed-file list), both off the render thread and cached
 //! for the life of the panel, so moving the selection costs nothing twice.
 
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 use gitpoulpi_core::domain::{
     CommitGraph, CommitNode, DiffFileList, DiffTarget, FileStatus, LogOptions, Oid, OperationKind,
@@ -11,14 +12,12 @@ use gitpoulpi_core::domain::{
 
 use crate::daemon_link::{Reply, Requester};
 
-/// How many changed files the side pane lists before "and N more".
-pub(crate) const FILES_SHOWN: usize = 12;
-
 #[derive(Clone)]
 pub(crate) struct Loaded {
     pub(crate) node: Option<CommitNode>,
-    pub(crate) files: Vec<(FileStatus, String)>,
-    pub(crate) file_count: usize,
+    /// Every changed file, in the daemon's order.
+    pub(crate) paths: Vec<PathBuf>,
+    pub(crate) statuses: HashMap<PathBuf, FileStatus>,
 }
 
 #[derive(Default)]
@@ -36,6 +35,13 @@ impl Detail {
         self.shown.and_then(|oid| self.cache.get(&oid))
     }
 
+    /// Puts a commit's details in the cache, as if the reads had landed.
+    #[cfg(test)]
+    pub(crate) fn fill(&mut self, oid: Oid, loaded: Loaded) {
+        self.cache.insert(oid, loaded);
+        self.shown = Some(oid);
+    }
+
     /// Whether the selected commit is still being read.
     pub(crate) fn loading(&self) -> bool {
         self.node_reply.is_some() || self.files_reply.is_some()
@@ -49,8 +55,8 @@ impl Detail {
                 self.node_reply = None;
                 let entry = self.partial.entry(oid).or_insert(Loaded {
                     node: None,
-                    files: Vec::new(),
-                    file_count: 0,
+                    paths: Vec::new(),
+                    statuses: HashMap::new(),
                 });
                 entry.node = result.ok().and_then(|g| g.nodes.into_iter().next());
                 self.seal(oid);
@@ -62,17 +68,12 @@ impl Detail {
                 self.files_reply = None;
                 let entry = self.partial.entry(oid).or_insert(Loaded {
                     node: None,
-                    files: Vec::new(),
-                    file_count: 0,
+                    paths: Vec::new(),
+                    statuses: HashMap::new(),
                 });
                 if let Ok(list) = result {
-                    entry.file_count = list.files.len();
-                    entry.files = list
-                        .files
-                        .into_iter()
-                        .take(FILES_SHOWN)
-                        .map(|f| (f.status, f.path.display().to_string()))
-                        .collect();
+                    entry.paths = list.files.iter().map(|f| f.path.clone()).collect();
+                    entry.statuses = list.files.into_iter().map(|f| (f.path, f.status)).collect();
                 }
                 self.seal(oid);
             }

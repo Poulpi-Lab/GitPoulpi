@@ -207,6 +207,9 @@ pub(crate) enum NavigationAction {
     /// `Ctrl+N Backspace` - dismiss the chip, else go back to the view
     /// before the agent's last change.
     AgentBack,
+    /// `Ctrl+N m` - arrange the open dialog: its arrows move it, Shift+arrows
+    /// resize it (the keyboard twin of dragging its title bar and borders).
+    ArrangeDialog,
     /// `Esc`, or any key this table doesn't name - back to `Normal` with
     /// nothing done.
     Cancel,
@@ -265,6 +268,7 @@ pub(crate) fn navigation_key_action_mods(
         }
         Some(Bind::NavAgentShow) => NavigationAction::AgentShow,
         Some(Bind::NavAgentBack) => NavigationAction::AgentBack,
+        Some(Bind::NavArrangeDialog) => NavigationAction::ArrangeDialog,
         _ => match code {
             KeyCode::Char(c) if c.is_ascii_alphanumeric() => NavigationAction::FocusByBadge(c),
             _ => NavigationAction::Cancel,

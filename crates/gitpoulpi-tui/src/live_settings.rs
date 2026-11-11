@@ -2,7 +2,7 @@
 //! patterns, auto-prune, minimap, delete-orig, active profile, diff-view
 //! prefs) and the date-pattern tokenizer. Re-exported by `preferences`.
 
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 use std::sync::RwLock;
 
 use gitpoulpi_config::Config;
@@ -387,6 +387,30 @@ pub(crate) fn chrome_layout() -> crate::chrome::ChromeLayout {
     >| {
         (*m.lock().unwrap_or_else(|e| e.into_inner())).unwrap_or_default()
     })
+}
+
+// `ui.dialog_geometry`: whether a moved or resized dialog keeps its place
+// (`dialog_kit::frame`). Stored as 0 session, 1 saved, 2 never.
+published!(DIALOG_GEOMETRY: AtomicU8 = AtomicU8::new(0));
+
+pub(crate) fn install_dialog_geometry(mode: gitpoulpi_config::DialogGeometry) {
+    use gitpoulpi_config::DialogGeometry as G;
+    let n = match mode {
+        G::Session => 0,
+        G::Saved => 1,
+        G::Never => 2,
+    };
+    cell!(DIALOG_GEOMETRY, |m: &AtomicU8| m
+        .store(n, Ordering::Relaxed));
+}
+
+pub(crate) fn dialog_geometry() -> gitpoulpi_config::DialogGeometry {
+    use gitpoulpi_config::DialogGeometry as G;
+    match cell!(DIALOG_GEOMETRY, |m: &AtomicU8| m.load(Ordering::Relaxed)) {
+        1 => G::Saved,
+        2 => G::Never,
+        _ => G::Session,
+    }
 }
 
 /// `ui.mermaid_*`: what the Log's Copy as Mermaid gitGraph popup last used,

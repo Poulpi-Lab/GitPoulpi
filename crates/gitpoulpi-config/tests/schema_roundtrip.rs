@@ -88,6 +88,7 @@ fn every_enum_value_round_trips_through_toml_under_its_as_str_name() {
         GraphRowTintStrength,
         ToolbarPosition,
         ToolbarAlign,
+        DialogGeometry,
         StatusbarPosition,
         TabsPosition,
         DiffLayout,
@@ -122,6 +123,7 @@ fn the_all_lists_have_the_pinned_lengths() {
     assert_eq!(GraphRowTintStrength::ALL.len(), 3);
     assert_eq!(ToolbarPosition::ALL.len(), 4);
     assert_eq!(ToolbarAlign::ALL.len(), 3);
+    assert_eq!(DialogGeometry::ALL.len(), 3);
     assert_eq!(StatusbarPosition::ALL.len(), 2);
     assert_eq!(TabsPosition::ALL.len(), 3);
     assert_eq!(DiffLayout::ALL.len(), 2);

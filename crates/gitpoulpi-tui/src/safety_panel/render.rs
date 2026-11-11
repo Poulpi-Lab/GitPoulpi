@@ -10,8 +10,10 @@ use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 use ratatui::widgets::{Block, BorderType, Borders, Widget};
 
+use super::panes::{self, Divider, Pane};
 use super::{label, rows, Act, Confirm, ModePick, NamePrompt, Overlay, RowMenu, SafetyPanel, Tab};
 use crate::dialog_kit::{self, ButtonState};
+use crate::status_pane::FileListMode;
 use crate::{display_width, th};
 
 /// One list row: `(label, age, tag, tag style, dimmed)`. Age and tag are
@@ -52,8 +54,17 @@ pub(crate) enum Hit {
     /// A popup's body: swallows a click that misses its buttons.
     Body,
     MenuItem(usize),
+    /// A pane of the Reflog / Lost work views (focus follows a press).
+    Pane(Pane),
+    /// A row of the file list (an index into the tree rows).
+    File(usize),
+    /// The Path / Tree toggle.
+    Mode(FileListMode),
+    /// A divider between panes.
+    Divider(Divider),
 }
 
+#[cfg(test)]
 pub(crate) fn safety_rect(frame: Rect) -> Rect {
     dialog_kit::centered(
         frame,
@@ -106,6 +117,20 @@ fn style_row(selected: bool, hovered: bool) -> Style {
 }
 
 impl SafetyPanel {
+    /// Paints the dialog where its frame puts it inside `screen` (the user's
+    /// move and resize, clamped), then the frame's own marks.
+    pub(crate) fn render_in(&mut self, screen: Rect, buf: &mut Buffer) {
+        let rect = self.window.layout(screen);
+        self.render(rect, buf);
+        let hint = gitpoulpi_i18n::msg::dialog_frame::arrange_hint(dialog_kit::key_name(
+            crate::keymap::chord::Key::Enter,
+        ));
+        self.window.paint(buf, &hint);
+        if self.overlay.is_none() || self.window.dragging() {
+            self.window.register_pointer(self.close.rect());
+        }
+    }
+
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
         let state = self.journal_state();
         let title = match self.tab {
@@ -134,25 +159,25 @@ impl SafetyPanel {
         let bottom_rows = 3 + detail_rows;
         let body_top = inner.y + 2;
         let body_h = inner.height.saturating_sub(2 + bottom_rows);
-        let (list_w, side) = if self.tab == Tab::History {
-            (inner.width, None)
+        let body = Rect::new(inner.x, body_top, inner.width, body_h);
+        if self.tab == Tab::History {
+            self.list_body = body;
+            self.render_list(buf, body, &state, &mut hits);
+            hits.push((body, Hit::Pane(Pane::List)));
         } else {
-            let list_w = inner.width * 55 / 100;
-            (
-                list_w,
-                Some(Rect::new(
-                    inner.x + list_w + 1,
-                    body_top,
-                    inner.width.saturating_sub(list_w + 1),
-                    body_h,
-                )),
-            )
-        };
-        let body = Rect::new(inner.x, body_top, list_w, body_h);
-        self.list_body = body;
-        self.render_list(buf, body, &state, &mut hits);
-        if let Some(side) = side {
-            self.render_side(buf, side);
+            self.panes.layout = panes::layout(
+                body,
+                self.panes.cols.as_deref(),
+                self.panes.rows.as_deref(),
+                self.header_lines(),
+            );
+            let list = self.panes.layout.list;
+            self.list_body = list;
+            // The right pane first: its dividers sit on the border cells of
+            // the boxes, and the first rect that holds a point answers.
+            self.render_right(buf, &mut hits);
+            self.render_list(buf, list, &state, &mut hits);
+            hits.push((list, Hit::Pane(Pane::List)));
         }
 
         let mut y = body_top + body_h;
@@ -345,10 +370,15 @@ impl SafetyPanel {
         state: &JournalState,
         hits: &mut Vec<(Rect, Hit)>,
     ) {
+        let list_border = if self.tab != Tab::History && self.panes.focus == Pane::List {
+            th().ui.accent
+        } else {
+            th().ui.muted
+        };
         Block::default()
             .border_type(BorderType::Rounded)
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(th().ui.muted))
+            .border_style(Style::default().fg(list_border))
             .style(Style::default().bg(th().ui.panel))
             .render(body, buf);
         let content = Rect::new(
@@ -362,7 +392,7 @@ impl SafetyPanel {
         {
             let list = self.list_mut();
             list.view_rows = view_rows;
-            list.clamp(len);
+            list.clamp_selected(len);
             list.offset = list.offset.min(len.saturating_sub(view_rows.max(1)));
         }
         if len == 0 {
@@ -485,86 +515,6 @@ impl SafetyPanel {
         }
     }
 
-    fn render_side(&self, buf: &mut Buffer, side: Rect) {
-        Block::default()
-            .border_type(BorderType::Rounded)
-            .borders(Borders::ALL)
-            .border_style(Style::default().fg(th().ui.muted))
-            .style(Style::default().bg(th().ui.panel))
-            .render(side, buf);
-        let inner = Rect::new(
-            side.x + 2,
-            side.y + 1,
-            side.width.saturating_sub(4),
-            side.height.saturating_sub(2),
-        );
-        let (detail, oid) = match self.tab {
-            Tab::Reflog => (&self.reflog.detail, self.selected_reflog().map(|e| e.new)),
-            Tab::Lost => (&self.lost.detail, self.selected_lost().map(|c| c.oid)),
-            Tab::History => return,
-        };
-        let Some(oid) = oid else {
-            return;
-        };
-        let mut y = inner.y;
-        let bottom = inner.y + inner.height;
-        let line = |buf: &mut Buffer, text: &str, style: Style, y: &mut u16| {
-            if *y < bottom {
-                dialog_kit::put(buf, inner.x, *y, text, inner.width, style);
-                *y += 1;
-            }
-        };
-        line(
-            buf,
-            &short(oid),
-            Style::default()
-                .fg(th().ui.accent)
-                .bg(th().ui.panel)
-                .add_modifier(Modifier::BOLD),
-            &mut y,
-        );
-        let Some(loaded) = detail.current() else {
-            let spin = crate::activity::spinner_frame(self.lost.scan_elapsed());
-            let text = format!("{spin} {}", m::DETAIL_LOADING.get());
-            line(buf, &text, style_muted(), &mut y);
-            return;
-        };
-        if let Some(node) = &loaded.node {
-            line(
-                buf,
-                &m::detail_author(&node.author_name, rows::age(node.timestamp)),
-                style_muted(),
-                &mut y,
-            );
-            y += 1;
-            for text in node.message.lines().take(6) {
-                line(buf, text, style_text(), &mut y);
-            }
-            y += 1;
-        }
-        if loaded.file_count > 0 {
-            line(
-                buf,
-                &m::detail_files(loaded.file_count as u64),
-                style_muted(),
-                &mut y,
-            );
-            for (status, path) in &loaded.files {
-                let text = format!("{}  {}", rows::status_letter(*status), path);
-                line(buf, &text, style_text(), &mut y);
-            }
-            let more = loaded.file_count.saturating_sub(loaded.files.len());
-            if more > 0 {
-                line(
-                    buf,
-                    &m::detail_more_files(more as u64),
-                    style_muted(),
-                    &mut y,
-                );
-            }
-        }
-    }
-
     fn render_history_detail(&self, buf: &mut Buffer, area: Rect, state: &JournalState) {
         let Some(row) = self.selected_history() else {
             return;
@@ -605,7 +555,11 @@ impl SafetyPanel {
         let mut x = inner.x;
         let busy = self.job.is_some();
         for act in self.actions(state) {
-            let label = act_label(act, self, state);
+            // The button names its own letter, as the toolbar's `[key]`.
+            let label = match super::input::key_of(act, self.tab) {
+                Some(c) => format!("{} [{c}]", act_label(act, self, state)),
+                None => act_label(act, self, state),
+            };
             let w = dialog_kit::button_width(&label);
             if x + w + 1 >= close_x {
                 break;
@@ -635,10 +589,12 @@ impl SafetyPanel {
 
     fn render_hints(&self, buf: &mut Buffer, inner: Rect, y: u16) {
         let tab = dialog_kit::key_name(crate::keymap::chord::Key::Tab);
-        let mut pairs: Vec<(String, &str)> = vec![
-            ("\u{2191}\u{2193}".to_string(), m::HINT_MOVE.get()),
-            (tab, m::HINT_VIEW.get()),
-        ];
+        let mut pairs: Vec<(String, &str)> =
+            vec![("\u{2191}\u{2193}".to_string(), m::HINT_MOVE.get())];
+        if self.tab != Tab::History {
+            pairs.push((tab, m::HINT_PANE.get()));
+        }
+        pairs.push(("1-3".into(), m::HINT_VIEWS.get()));
         match self.tab {
             Tab::History => {
                 pairs.push(("u".into(), m::HINT_UNDO_TO.get()));
@@ -650,8 +606,9 @@ impl SafetyPanel {
                 pairs.push(("b".into(), m::HINT_BRANCH.get()));
                 pairs.push(("t".into(), m::HINT_TAG.get()));
                 pairs.push(("w".into(), m::HINT_APPLY.get()));
-                pairs.push(("z".into(), m::HINT_STASH.get()));
-                pairs.push(("s".into(), m::HINT_SHOW.get()));
+                pairs.push(("s".into(), m::HINT_STASH.get()));
+                pairs.push(("l".into(), m::HINT_SHOW.get()));
+                pairs.push(("v".into(), m::HINT_TREE.get()));
                 if self.reflog.more {
                     pairs.push(("m".into(), m::BTN_LOAD_MORE.get()));
                 }
@@ -661,10 +618,14 @@ impl SafetyPanel {
                 pairs.push(("t".into(), m::HINT_TAG.get()));
                 pairs.push(("c".into(), m::HINT_PICK.get()));
                 pairs.push(("w".into(), m::HINT_APPLY.get()));
-                pairs.push(("z".into(), m::HINT_STASH.get()));
+                pairs.push(("s".into(), m::HINT_STASH.get()));
+                pairs.push(("v".into(), m::HINT_TREE.get()));
             }
         }
         pairs.push((".".into(), m::HINT_MENU.get()));
+        if self.tab != Tab::History {
+            pairs.push((dialog_kit::alt_arrows(), m::HINT_RESIZE.get()));
+        }
         let view: Vec<(&str, &str)> = pairs.iter().map(|(k, w)| (k.as_str(), *w)).collect();
         dialog_kit::hints(buf, inner.x, y, inner.width, &view);
     }

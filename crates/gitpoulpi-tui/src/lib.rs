@@ -265,6 +265,7 @@ mod docs_tables;
 mod event_loop;
 mod exit_log;
 mod file_panel;
+mod file_rows;
 mod git_actions;
 #[cfg_attr(not(feature = "hosting"), path = "hosting_ui_stub.rs")]
 mod hosting_ui;

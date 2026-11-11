@@ -137,6 +137,7 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Durum Panelini Daralt | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Ajan: Bekleyen Görünümü Göster | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Ajan: Geri (veya Bekleyen Görünümü Kapat) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Ref'leri Ada Göre Filtrele | `/` |
 | `refs` | `solo` | Seçimi Solo Yap | `o` |
 | `refs` | `clear_solo` | Solo'yu Durdur | `Shift+O` |
@@ -956,11 +957,11 @@ Tuşlar varsayılanlardır.
 | Geri Alma Geçmişi: Dalı Eski Yerine Geri Yükle... | `o` |
 | Geri Alma Geçmişi: Yenile |  |
 | Geri Alma Geçmişi: Kapat | `Esc` |
-| Reflog: Log'da Göster | `s` |
+| Reflog: Log'da Göster | `l` |
 | Reflog: Burada Dal Oluştur... | `b` |
 | Reflog: Create Tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as Stash | `z` |
+| Reflog: Save Changes as Stash | `s` |
 | Reflog: Bu Konuma Geri Yükle... | `r` |
 | Reflog: Daha Fazla Yükle | `m` |
 | Reflog: Yenile |  |
@@ -968,8 +969,13 @@ Tuşlar varsayılanlardır.
 | Lost Work: Create Tag Here... | `t` |
 | Kaybolan Çalışma: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as Stash | `z` |
+| Lost Work: Save Changes as Stash | `s` |
 | Kaybolan Çalışma: Yeniden Tara |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Görünüm: Yenile | `r` |
 | Görünüm: Yenile (fetch, Pull Request'ler, issue'lar) | `F5` |
 | Görünüm: Yardım Katmanını Aç/Kapat | `?` |

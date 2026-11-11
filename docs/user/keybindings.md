@@ -135,6 +135,7 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Narrow Status Pane | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: Show the Pending View | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: Back (or Dismiss the Pending View) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filter Refs by Name | `/` |
 | `refs` | `solo` | Solo the Selection | `o` |
 | `refs` | `clear_solo` | Stop Soloing | `Shift+O` |
@@ -956,11 +957,11 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Undo History: Restore the Branch to Where It Was... | `o` |
 | Undo History: Refresh |  |
 | Undo History: Close | `Esc` |
-| Reflog: Show in Log | `s` |
+| Reflog: Show in Log | `l` |
 | Reflog: Create Branch Here... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Restore to This Position... | `r` |
 | Reflog: Load More | `m` |
 | Reflog: Refresh |  |
@@ -968,8 +969,13 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Lost Work: Create tag Here... | `t` |
 | Lost Work: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Lost Work: Scan Again |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | View: Refresh | `r` |
 | View: Refresh (fetch, pull requests, issues) | `F5` |
 | View: Toggle Help Overlay | `?` |

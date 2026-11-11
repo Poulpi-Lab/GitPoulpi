@@ -526,6 +526,9 @@ toolbar_position = "Umístění panelu nástrojů"
 toolbar_position_help = "Kde je panel nástrojů: Nahoře, Dole (výchozí), Vlevo nebo Vpravo. Vlevo a Vpravo z něj udělají sloupec vedle panelů; v okně užším než 80 sloupců se kreslí dole. Projeví se hned."
 toolbar_align = "Zarovnání tlačítek panelu nástrojů"
 toolbar_align_help = "Kde leží tlačítka podél panelu: Začátek (výchozí), Střed nebo Konec. Začátek je levá strana řádku a horní část sloupce; konec je pravá strana a spodek. Projeví se hned."
+# context: label of the setting that decides whether a dialog the user moved or resized keeps its place
+dialog_geometry = "Remember dialog position and size"
+dialog_geometry_help = "Dialogs can be moved (drag the title bar, or Ctrl+N then m) and resized (drag the borders and bottom corners). For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
 toolbar_pr_pinned = "Připnout tlačítko {$pr} na konec"
 toolbar_pr_pinned_help = "Zapnuto (výchozí): tlačítko {$pr} leží na samém konci panelu nástrojů (vpravo, ve sloupci dole) při jakémkoli zarovnání. Vypnuto: plyne spolu s ostatními tlačítky a zarovnává se s nimi. Projeví se hned."
 statusbar_position = "Umístění stavového řádku"
@@ -754,6 +757,12 @@ pos_right = "Vpravo"
 align_start = "Začátek"
 align_center = "Střed"
 align_end = "Konec"
+# context: dropdown choice: a moved dialog keeps its place until GitPoulpi closes
+geometry_session = "For this session"
+# context: dropdown choice: a moved dialog keeps its place on disk, for the next launch too
+geometry_saved = "Saved to disk"
+# context: dropdown choice: dialogs always open at their default place and size
+geometry_never = "Never"
 layout_fit = "Přizpůsobit panelu"
 layout_scroll = "Posouvat do stran"
 
@@ -2298,6 +2307,8 @@ nav_prefix_activity_log = "Otevřít Protokol aktivity"
 nav_prefix_global_log = "Otevřít globální protokol aktivity"
 nav_prefix_jobs = "Zobrazit úlohy na pozadí"
 nav_prefix_updates = "Zobrazit panel aktualizací"
+# context: name of the key after Ctrl+N that moves or resizes the open dialog from the keyboard
+nav_prefix_arrange_dialog = "Arrange the open dialog (move, resize)"
 nav_prefix_help = "Přepnout nápovědu"
 nav_prefix_select_tab = "Vybrat kartu"
 nav_prefix_change_theme = "Změnit motiv"
@@ -3411,6 +3422,12 @@ undo_history_restore_only = "Historie vrácení: Obnovit jen tuto..."
 undo_history_offer = "Historie vrácení: Obnovit větev tam, kde byla..."
 undo_history_refresh = "Historie vrácení: Obnovit seznam"
 undo_history_close = "Historie vrácení: Zavřít"
+safety_next_pane = "Reflog / Lost Work: Next Pane"
+safety_path_tree = "Reflog / Lost Work: Path or Tree File List"
+safety_reset_panes = "Reflog / Lost Work: Reset Pane Sizes"
+# context: palette row: puts the open dialog in the mode where the arrow keys move it and Shift+arrows resize it
+dialog_move_resize = "Dialog: Move/resize"
+dialog_reset_geometry = "Dialog: Reset position and size"
 reflog_show_in_log = "Reflog: Zobrazit v Logu"
 reflog_create_branch = "Reflog: Vytvořit větev tady..."
 reflog_create_tag = "Reflog: Create {$tag} Here..."
@@ -3674,6 +3691,7 @@ navigation_prefix_then_12 = "vyberte motiv ze seznamu - psaním filtrujte, zvýr
 navigation_prefix_then_13 = "vyberte jazyk ze seznamu - psaním filtrujte, Enter jej použije a uloží, Esc zruší (také `Aplikace: Změnit jazyk...` v paletě)"
 navigation_prefix_then_14 = "`Aplikace: Změnit barevný motiv grafu...`"
 navigation_prefix_then_15 = "`Aplikace: Přepnout zbarvení řádků grafu`"
+navigation_prefix_then_19 = "arrange the open dialog from the keyboard: the arrows move it, Shift+arrows resize it, 0 puts it back, Enter leaves (the twin of dragging its title bar and borders; also `Dialog: Move/resize` in the palette)"
 git_actions_then_1 = { git = "stage vybraného souboru unstaged (panel Stav)", local = "přidá vybraný soubor mimo index do indexu (panel Stav)" }
 git_actions_then_2 = { git = "unstage vybraného souboru staged (panel Stav)", local = "odebere vybraný soubor z indexu (panel Stav)" }
 git_actions_then_3 = { git = "stage všech změn", local = "přidá všechny změny do indexu" }
@@ -6213,6 +6231,21 @@ hint_tag = "{$tag} here"
 hint_apply = "apply"
 hint_stash = "{$stash}"
 hint_menu = "nabídka"
+# context: footer hint: the key moves the keyboard to the next pane (commit list, files, changes)
+hint_pane = "next pane"
+# context: footer hint: the keys 1 2 3 open one of the three views
+hint_views = "view"
+# context: footer hint: the key switches the file list between a flat path list and a folder tree
+hint_tree = "path or tree"
+# context: footer hint: the keys move the dividers between the panes
+hint_resize = "resize panes"
+# context: title of the changes box of the dialog; {path} is a file path
+pane_diff = "Changes in {path}"
+# context: title of the changes box of the dialog while no file is selected
+pane_diff_plain = "Changes"
+pane_diff_none = "Select a file to see its changes"
+pane_diff_loading = "reading the changes..."
+why_open_panes = "open the Reflog or Lost work view first"
 tip_depth = { one = "Lze vrátit {n} akci", few = "Lze vrátit {n} akce", other = "Lze vrátit {n} akcí" }
 tip_chip = "Historie vrácení: každá akce, kterou lze vzít zpět, jedna po druhé"
 offer_tip = "Obnovit {name} tam, kde ji nechala akce {op}: {key}"
@@ -9382,3 +9415,12 @@ acl_button = "Omezit na můj účet"
 acl_done = "Soubor klíče nyní může číst jen váš účet."
 # context: status when restricting the key file failed; {why} is the reason
 acl_failed = "Soubor klíče se nepodařilo omezit: {why}"
+
+[dialog_frame]
+# context: shown on the border of a dialog in the arrange mode; {done} is the name of the key that leaves it
+arrange_hint = "Arrange: arrows move, Shift+arrows resize, 0 resets, {done} leaves"
+# context: status line when the arrange mode starts
+arranging = "Arranging the dialog: arrows move, Shift+arrows resize, 0 resets, Enter leaves"
+# context: status line after the dialog went back to its default place and size
+reset_done = "dialog back at its default place and size"
+why_no_dialog = "no dialog that can be arranged is open"

@@ -51,8 +51,8 @@ fn hand(yes: bool) -> CursorShape {
 
 /// [`hand`], and the I-beam over a text field the paint registered.
 fn hand_or_text(yes: bool, col: u16, row: u16) -> CursorShape {
-    if crate::pointer_map::at(col, row) == Some(crate::pointer_map::Kind::ColResize) {
-        return CursorShape::ColResize;
+    if let Some(shape) = crate::pointer_map::at(col, row).and_then(|k| k.resize_shape()) {
+        return shape;
     }
     match hand(yes) {
         CursorShape::Default if registered_field(col, row) => CursorShape::Text,
@@ -146,7 +146,11 @@ fn shape_over_owned_surface(cx: &mut CommandCtx<'_>, col: u16, row: u16) -> Curs
         Some(crate::pointer_map::Kind::Field) => return CursorShape::Text,
         Some(crate::pointer_map::Kind::Hand) => return CursorShape::Pointer,
         Some(crate::pointer_map::Kind::Plain) => return CursorShape::Default,
-        Some(crate::pointer_map::Kind::ColResize) => return CursorShape::ColResize,
+        Some(kind) => {
+            if let Some(shape) = kind.resize_shape() {
+                return shape;
+            }
+        }
         None => {}
     }
     desired_cursor_shape(

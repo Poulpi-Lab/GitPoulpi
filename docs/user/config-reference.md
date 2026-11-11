@@ -95,6 +95,7 @@ author_email = "jane@work.example"
 | `ui.graph_lane_background` | `"off"` | `off` or `row_tint` (a faint band of the lane color behind the graph, plus a bar at its edge). **App: Toggle Graph Row Tints** (`Ctrl+N Shift+T`) flips it; **App: Change Graph Color Theme...** (`Ctrl+N Shift+Y`) picks `ui.graph_color_theme`. |
 | `ui.graph_row_tint_strength` | `"medium"` | `strong`, `medium`, `subtle` (only with `row_tint`). |
 | `ui.toolbar_position` | `"bottom"` | `top`, `bottom`, `left`, `right`. `left` and `right` draw a column; a window under 80 columns falls back to `bottom`. |
+| `ui.dialog_geometry` | `"session"` | `session`, `saved`, `never`: whether a dialog you moved or resized (drag its title bar or borders, or `Ctrl+N m`) keeps its place: until GitPoulpi closes (default), on disk for the next launch (`dialog_geometry.txt` in the data folder), or not at all. |
 | `ui.toolbar_align` | `"start"` | `start`, `center`, `end`: where the buttons sit along the toolbar (left, middle, right of a row; top, middle, bottom of a column). |
 | `ui.toolbar_pr_pinned` | `true` | The pull request button is pinned to the far end of the toolbar; `false` lets it flow with the other buttons. |
 | `ui.statusbar_position` | `"bottom"` | `top` (above the repository tabs) or `bottom`. |

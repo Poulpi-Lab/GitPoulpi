@@ -118,6 +118,9 @@ impl PreferencesState {
                             == gitpoulpi_config::SidebarSectionsScope::Global,
                     );
                 }
+                if key == "ui.dialog_geometry" {
+                    crate::live_settings::install_dialog_geometry(self.config.ui.dialog_geometry);
+                }
                 if matches!(
                     key,
                     "ui.toolbar_position"

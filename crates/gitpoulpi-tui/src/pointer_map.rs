@@ -21,6 +21,29 @@ pub(crate) enum Kind {
     Plain,
     /// A column divider: the sideways resize pointer (`ew-resize`).
     ColResize,
+    /// A row divider or a bottom border: the vertical resize pointer.
+    RowResize,
+    /// A dialog's title bar: the move pointer.
+    Move,
+    /// A dialog's bottom right corner (`nwse-resize`).
+    NwseResize,
+    /// A dialog's bottom left corner (`nesw-resize`).
+    NeswResize,
+}
+
+impl Kind {
+    /// The pointer a frame / divider kind shows (`None`: a control kind).
+    pub(crate) fn resize_shape(self) -> Option<crate::cursor::CursorShape> {
+        use crate::cursor::CursorShape as S;
+        match self {
+            Kind::ColResize => Some(S::ColResize),
+            Kind::RowResize => Some(S::RowResize),
+            Kind::Move => Some(S::Move),
+            Kind::NwseResize => Some(S::NwseResize),
+            Kind::NeswResize => Some(S::NeswResize),
+            Kind::Hand | Kind::Field | Kind::Plain => None,
+        }
+    }
 }
 
 type Map = Vec<(Rect, Kind)>;
@@ -122,8 +145,8 @@ pub(crate) fn shape_at(col: u16, row: u16) -> crate::cursor::CursorShape {
     match at(col, row) {
         Some(Kind::Field) => CursorShape::Text,
         Some(Kind::Hand) => CursorShape::Pointer,
-        Some(Kind::ColResize) => CursorShape::ColResize,
-        Some(Kind::Plain) | None => CursorShape::Default,
+        Some(k) if k.resize_shape().is_some() => k.resize_shape().unwrap_or(CursorShape::Default),
+        Some(_) | None => CursorShape::Default,
     }
 }
 

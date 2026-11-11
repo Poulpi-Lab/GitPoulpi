@@ -139,6 +139,7 @@ pub(super) fn init(
     live_settings::install_column_resize(settings.config().ui.column_resize);
     live_settings::install_log_columns_layout(settings.config().ui.log_columns_layout);
     live_settings::install_chrome_layout(&settings.config().ui);
+    live_settings::install_dialog_geometry(settings.config().ui.dialog_geometry);
     live_settings::install_mermaid(&settings.config().ui);
     live_settings::install_blame(&settings.config().ui);
     live_settings::install_image_view(&settings.config().ui);

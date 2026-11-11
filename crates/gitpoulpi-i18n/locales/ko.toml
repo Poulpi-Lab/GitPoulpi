@@ -526,6 +526,9 @@ toolbar_position = "도구 모음 위치"
 toolbar_position_help = "도구 모음의 위치: 위, 아래(기본값), 왼쪽, 오른쪽. 왼쪽과 오른쪽은 창 옆에 세로 열을 만들며, 80열 미만의 창에서는 아래에 그립니다. 즉시 적용됩니다."
 toolbar_align = "도구 모음 버튼 정렬"
 toolbar_align_help = "도구 모음에서 버튼이 놓이는 위치: 시작(기본값), 가운데, 끝. 시작은 행에서는 왼쪽, 열에서는 위이며, 끝은 오른쪽과 아래입니다. 즉시 적용됩니다."
+# context: label of the setting that decides whether a dialog the user moved or resized keeps its place
+dialog_geometry = "Remember dialog position and size"
+dialog_geometry_help = "Dialogs can be moved (drag the title bar, or Ctrl+N then m) and resized (drag the borders and bottom corners). For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
 toolbar_pr_pinned = "{$pr} 버튼을 끝에 고정"
 toolbar_pr_pinned_help = "켜면(기본값) 정렬과 관계없이 {$pr} 버튼이 도구 모음의 맨 끝(오른쪽, 열에서는 아래)에 놓입니다. 끄면 다른 버튼과 함께 배치되고 같은 정렬을 따릅니다. 즉시 적용됩니다."
 statusbar_position = "상태 표시줄 위치"
@@ -754,6 +757,12 @@ pos_right = "오른쪽"
 align_start = "시작"
 align_center = "가운데"
 align_end = "끝"
+# context: dropdown choice: a moved dialog keeps its place until GitPoulpi closes
+geometry_session = "For this session"
+# context: dropdown choice: a moved dialog keeps its place on disk, for the next launch too
+geometry_saved = "Saved to disk"
+# context: dropdown choice: dialogs always open at their default place and size
+geometry_never = "Never"
 layout_fit = "창에 맞춤"
 layout_scroll = "옆으로 스크롤"
 
@@ -2295,6 +2304,8 @@ nav_prefix_activity_log = "활동 로그 열기"
 nav_prefix_global_log = "전체 활동 로그 열기"
 nav_prefix_jobs = "백그라운드 작업 표시"
 nav_prefix_updates = "업데이트 패널 보기"
+# context: name of the key after Ctrl+N that moves or resizes the open dialog from the keyboard
+nav_prefix_arrange_dialog = "Arrange the open dialog (move, resize)"
 nav_prefix_help = "도움말 전환"
 nav_prefix_select_tab = "탭 선택"
 nav_prefix_change_theme = "테마 변경"
@@ -3410,6 +3421,12 @@ undo_history_restore_only = "실행 취소 기록: 이것만 복원..."
 undo_history_offer = "실행 취소 기록: 브랜치를 원래 위치로 복원..."
 undo_history_refresh = "실행 취소 기록: 새로 고침"
 undo_history_close = "실행 취소 기록: 닫기"
+safety_next_pane = "Reflog / Lost Work: Next Pane"
+safety_path_tree = "Reflog / Lost Work: Path or Tree File List"
+safety_reset_panes = "Reflog / Lost Work: Reset Pane Sizes"
+# context: palette row: puts the open dialog in the mode where the arrow keys move it and Shift+arrows resize it
+dialog_move_resize = "Dialog: Move/resize"
+dialog_reset_geometry = "Dialog: Reset position and size"
 reflog_show_in_log = "Reflog: Log에서 보기"
 reflog_create_branch = "Reflog: 여기에 브랜치 만들기..."
 reflog_create_tag = "Reflog: Create {$tag} Here..."
@@ -3673,6 +3690,7 @@ navigation_prefix_then_12 = "목록에서 테마 선택 - 입력하여 필터링
 navigation_prefix_then_13 = "목록에서 언어 선택 - 입력으로 필터링, Enter로 적용 및 저장, Esc로 취소 (팔레트의 `앱: 언어 변경...`도 가능)"
 navigation_prefix_then_14 = "`앱: 그래프 색상 테마 변경...`"
 navigation_prefix_then_15 = "`앱: 그래프 행 색조 전환`"
+navigation_prefix_then_19 = "arrange the open dialog from the keyboard: the arrows move it, Shift+arrows resize it, 0 puts it back, Enter leaves (the twin of dragging its title bar and borders; also `Dialog: Move/resize` in the palette)"
 git_actions_then_1 = "선택한 {$stage} 안 된 파일 {$stage} (Status 창)"
 git_actions_then_2 = "선택한 {$staged} 파일 {$unstage} (Status 창)"
 git_actions_then_3 = "모든 변경 사항 {$stage}"
@@ -6212,6 +6230,21 @@ hint_tag = "{$tag} here"
 hint_apply = "apply"
 hint_stash = "{$stash}"
 hint_menu = "메뉴"
+# context: footer hint: the key moves the keyboard to the next pane (commit list, files, changes)
+hint_pane = "next pane"
+# context: footer hint: the keys 1 2 3 open one of the three views
+hint_views = "view"
+# context: footer hint: the key switches the file list between a flat path list and a folder tree
+hint_tree = "path or tree"
+# context: footer hint: the keys move the dividers between the panes
+hint_resize = "resize panes"
+# context: title of the changes box of the dialog; {path} is a file path
+pane_diff = "Changes in {path}"
+# context: title of the changes box of the dialog while no file is selected
+pane_diff_plain = "Changes"
+pane_diff_none = "Select a file to see its changes"
+pane_diff_loading = "reading the changes..."
+why_open_panes = "open the Reflog or Lost work view first"
 tip_depth = { one = "작업 {n}개를 실행 취소할 수 있습니다", other = "작업 {n}개를 실행 취소할 수 있습니다" }
 tip_chip = "실행 취소 기록: 되돌릴 수 있는 모든 작업을 하나씩"
 offer_tip = "{name}을(를) {op}이(가) 남긴 위치로 복원: {key}"
@@ -9382,3 +9415,12 @@ acl_button = "내 계정으로 제한"
 acl_done = "이제 내 계정만 키 파일을 읽을 수 있습니다."
 # context: status when restricting the key file failed; {why} is the reason
 acl_failed = "키 파일을 제한하지 못했습니다: {why}"
+
+[dialog_frame]
+# context: shown on the border of a dialog in the arrange mode; {done} is the name of the key that leaves it
+arrange_hint = "Arrange: arrows move, Shift+arrows resize, 0 resets, {done} leaves"
+# context: status line when the arrange mode starts
+arranging = "Arranging the dialog: arrows move, Shift+arrows resize, 0 resets, Enter leaves"
+# context: status line after the dialog went back to its default place and size
+reset_done = "dialog back at its default place and size"
+why_no_dialog = "no dialog that can be arranged is open"

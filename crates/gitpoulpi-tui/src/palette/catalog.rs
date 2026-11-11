@@ -2630,7 +2630,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(
         msg::palette::REFLOG_SHOW_IN_LOG,
-        "s",
+        "l",
         PaletteCommand::Safety(SafetyCmd::ReflogShow),
     ),
     entry(
@@ -2650,7 +2650,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(
         msg::palette::REFLOG_SAVE_AS_STASH,
-        "z",
+        "s",
         PaletteCommand::Safety(SafetyCmd::ReflogStash),
     ),
     entry(
@@ -2690,13 +2690,39 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(
         msg::palette::LOST_WORK_SAVE_AS_STASH,
-        "z",
+        "s",
         PaletteCommand::Safety(SafetyCmd::LostStash),
     ),
     entry(
         msg::palette::LOST_WORK_REFRESH,
         "",
         PaletteCommand::Safety(SafetyCmd::LostRefresh),
+    ),
+    // -- Reflog / Lost work panes and the dialog's frame ------------
+    entry(
+        msg::palette::SAFETY_NEXT_PANE,
+        "Tab",
+        PaletteCommand::Safety(SafetyCmd::NextPane),
+    ),
+    entry(
+        msg::palette::SAFETY_PATH_TREE,
+        "v",
+        PaletteCommand::Safety(SafetyCmd::PathTree),
+    ),
+    entry(
+        msg::palette::SAFETY_RESET_PANES,
+        "",
+        PaletteCommand::Safety(SafetyCmd::ResetPanes),
+    ),
+    entry(
+        msg::palette::DIALOG_MOVE_RESIZE,
+        "Ctrl+N m",
+        PaletteCommand::Safety(SafetyCmd::ArrangeDialog),
+    ),
+    entry(
+        msg::palette::DIALOG_RESET_GEOMETRY,
+        "",
+        PaletteCommand::Safety(SafetyCmd::ResetDialog),
     ),
     // -- View ------------------------------------------------------
     entry(msg::palette::VIEW_REFRESH, "r", PaletteCommand::Refresh),

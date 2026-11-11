@@ -1,7 +1,7 @@
 //! What a row says, as plain data: its state, its age, its words. Pure, so
 //! the tests pin them without drawing anything.
 
-use gitpoulpi_core::domain::{FileStatus, JournalState};
+use gitpoulpi_core::domain::JournalState;
 use gitpoulpi_i18n::msg::undo_safety as m;
 
 use super::HistoryRow;
@@ -77,16 +77,6 @@ pub(crate) fn history_detail(row: &HistoryRow, state: &RowState) -> Vec<String> 
         }
     }
     lines
-}
-
-pub(crate) fn status_letter(status: FileStatus) -> char {
-    match status {
-        FileStatus::Untracked | FileStatus::Added | FileStatus::Staged => 'A',
-        FileStatus::Modified => 'M',
-        FileStatus::Conflicted => 'U',
-        FileStatus::Renamed => 'R',
-        FileStatus::Deleted => 'D',
-    }
 }
 
 /// `Name <email>` to `Name`.

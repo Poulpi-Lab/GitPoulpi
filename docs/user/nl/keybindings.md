@@ -138,6 +138,7 @@ prefix getoond (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Statuspaneel versmallen | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: openstaande weergave tonen | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: terug (of openstaande weergave sluiten) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Refs filteren op naam | `/` |
 | `refs` | `solo` | Selectie solo | `o` |
 | `refs` | `clear_solo` | Solo stoppen | `Shift+O` |
@@ -960,11 +961,11 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Geschiedenis: De branch herstellen naar waar hij was... | `o` |
 | Geschiedenis: Vernieuwen |  |
 | Geschiedenis: Sluiten | `Esc` |
-| Reflog: Tonen in het Log | `s` |
+| Reflog: Tonen in het Log | `l` |
 | Reflog: Branch hier maken... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Herstellen naar deze positie... | `r` |
 | Reflog: Meer laden | `m` |
 | Reflog: Vernieuwen |  |
@@ -972,8 +973,13 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Lost Work: Create tag Here... | `t` |
 | Verloren werk: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Verloren werk: Opnieuw zoeken |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Weergave: Vernieuwen | `r` |
 | Weergave: Vernieuwen (fetch, pull requests, issues) | `F5` |
 | Weergave: Help-overlay omschakelen | `?` |

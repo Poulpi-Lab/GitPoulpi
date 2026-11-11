@@ -139,6 +139,7 @@ stage_file = "z"
 | `nav_prefix` | `status_narrower` | Сузить панель Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Агент: показать ожидающий вид | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Агент: назад (или закрыть ожидающий вид) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Фильтр ссылок по имени | `/` |
 | `refs` | `solo` | Solo для выбранного | `o` |
 | `refs` | `clear_solo` | Снять solo | `Shift+O` |
@@ -962,11 +963,11 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | История отмен: восстановить ветку туда, где она была... | `o` |
 | История отмен: обновить |  |
 | История отмен: закрыть | `Esc` |
-| Reflog: показать в Log | `s` |
+| Reflog: показать в Log | `l` |
 | Reflog: создать ветку здесь... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: восстановить на эту позицию... | `r` |
 | Reflog: загрузить ещё | `m` |
 | Reflog: обновить |  |
@@ -974,8 +975,13 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Lost Work: Create tag Here... | `t` |
 | Потерянная работа: cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Потерянная работа: искать заново |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Вид: обновить | `r` |
 | Вид: обновить (fetch, pull requests, задачи) | `F5` |
 | Вид: справка | `?` |

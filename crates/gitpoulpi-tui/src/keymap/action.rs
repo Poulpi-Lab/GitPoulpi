@@ -458,6 +458,7 @@ actions! {
     NavStatusNarrower => (NavPrefix, "nav_prefix.status_narrower", NAV_PREFIX_STATUS_NARROWER, ["Shift+Right"]),
     NavAgentShow => (NavPrefix, "nav_prefix.agent_show", NAV_PREFIX_AGENT_SHOW, ["Enter"]),
     NavAgentBack => (NavPrefix, "nav_prefix.agent_back", NAV_PREFIX_AGENT_BACK, ["Backspace"]),
+    NavArrangeDialog => (NavPrefix, "nav_prefix.arrange_dialog", NAV_PREFIX_ARRANGE_DIALOG, ["m"]),
     // ---- refs pane ----
     RefsFilter => (Refs, "refs.filter", REFS_FILTER, ["/"]),
     RefsSolo => (Refs, "refs.solo", REFS_SOLO, ["o"]),

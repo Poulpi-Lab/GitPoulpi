@@ -127,6 +127,7 @@ pub(super) const APPEARANCE: &[Row] = &[
     Heading(|| msg::settings_ui::HEADING_LAYOUT.get()),
     Key("ui.toolbar_position"),
     Key("ui.toolbar_align"),
+    Key("ui.dialog_geometry"),
     Key("ui.toolbar_pr_pinned"),
     Key("ui.statusbar_position"),
     Key("ui.tabs_position"),

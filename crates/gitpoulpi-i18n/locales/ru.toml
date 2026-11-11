@@ -528,6 +528,9 @@ toolbar_position = "Положение панели инструментов"
 toolbar_position_help = "Где находится панель инструментов: Сверху, Снизу (по умолчанию), Слева или Справа. Слева и Справа делают из неё колонку рядом с панелями; в окне меньше 80 столбцов она рисуется снизу. Применяется сразу."
 toolbar_align = "Выравнивание кнопок панели инструментов"
 toolbar_align_help = "Где кнопки стоят вдоль панели: В начале (по умолчанию), По центру или В конце. Начало - это левый край строки и верх колонки; конец - правый край и низ. Применяется сразу."
+# context: label of the setting that decides whether a dialog the user moved or resized keeps its place
+dialog_geometry = "Remember dialog position and size"
+dialog_geometry_help = "Dialogs can be moved (drag the title bar, or Ctrl+N then m) and resized (drag the borders and bottom corners). For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
 toolbar_pr_pinned = "Закрепить кнопку {$pr} в конце"
 toolbar_pr_pinned_help = "Вкл. (по умолчанию): кнопка {$pr} стоит на дальнем конце панели инструментов (справа, а в колонке снизу) при любом выравнивании. Выкл.: она идёт вместе с остальными кнопками и выравнивается с ними. Применяется сразу."
 statusbar_position = "Положение строки состояния"
@@ -756,6 +759,12 @@ pos_right = "Справа"
 align_start = "В начале"
 align_center = "По центру"
 align_end = "В конце"
+# context: dropdown choice: a moved dialog keeps its place until GitPoulpi closes
+geometry_session = "For this session"
+# context: dropdown choice: a moved dialog keeps its place on disk, for the next launch too
+geometry_saved = "Saved to disk"
+# context: dropdown choice: dialogs always open at their default place and size
+geometry_never = "Never"
 layout_fit = "По размеру панели"
 layout_scroll = "Прокрутка вбок"
 
@@ -2290,6 +2299,8 @@ nav_prefix_activity_log = "Открыть Журнал активности"
 nav_prefix_global_log = "Открыть общий журнал активности"
 nav_prefix_jobs = "Показать фоновые задачи"
 nav_prefix_updates = "Показать панель обновлений"
+# context: name of the key after Ctrl+N that moves or resizes the open dialog from the keyboard
+nav_prefix_arrange_dialog = "Arrange the open dialog (move, resize)"
 nav_prefix_help = "Показать/скрыть справку"
 nav_prefix_select_tab = "Выбрать вкладку"
 nav_prefix_change_theme = "Сменить тему"
@@ -3404,6 +3415,12 @@ undo_history_restore_only = "История отмен: восстановить
 undo_history_offer = "История отмен: восстановить ветку туда, где она была..."
 undo_history_refresh = "История отмен: обновить"
 undo_history_close = "История отмен: закрыть"
+safety_next_pane = "Reflog / Lost Work: Next Pane"
+safety_path_tree = "Reflog / Lost Work: Path or Tree File List"
+safety_reset_panes = "Reflog / Lost Work: Reset Pane Sizes"
+# context: palette row: puts the open dialog in the mode where the arrow keys move it and Shift+arrows resize it
+dialog_move_resize = "Dialog: Move/resize"
+dialog_reset_geometry = "Dialog: Reset position and size"
 reflog_show_in_log = "Reflog: показать в Log"
 reflog_create_branch = "Reflog: создать ветку здесь..."
 reflog_create_tag = "Reflog: Create {$tag} Here..."
@@ -3668,6 +3685,7 @@ navigation_prefix_then_12 = "выбрать тему из списка - наб�
 navigation_prefix_then_13 = "выбрать язык из списка - введите текст для фильтра, Enter применяет и сохраняет его, Esc отменяет (также `Приложение: сменить язык...` в палитре)"
 navigation_prefix_then_14 = "`Приложение: сменить цветовую тему графа...`"
 navigation_prefix_then_15 = "`Приложение: переключить подсветку строк графа`"
+navigation_prefix_then_19 = "arrange the open dialog from the keyboard: the arrows move it, Shift+arrows resize it, 0 puts it back, Enter leaves (the twin of dragging its title bar and borders; also `Dialog: Move/resize` in the palette)"
 git_actions_then_1 = { git = "добавить в индекс выбранный unstaged файл (панель Status)", local = "добавить в индекс выбранный неиндексированный файл (панель Status)" }
 git_actions_then_2 = { git = "unstage выбранный файл (панель Status)", local = "убрать из индекса выбранный файл (панель Status)" }
 git_actions_then_3 = { git = "stage все изменения", local = "добавить в индекс все изменения" }
@@ -6210,6 +6228,21 @@ hint_tag = "{$tag} here"
 hint_apply = "apply"
 hint_stash = "{$stash}"
 hint_menu = "меню"
+# context: footer hint: the key moves the keyboard to the next pane (commit list, files, changes)
+hint_pane = "next pane"
+# context: footer hint: the keys 1 2 3 open one of the three views
+hint_views = "view"
+# context: footer hint: the key switches the file list between a flat path list and a folder tree
+hint_tree = "path or tree"
+# context: footer hint: the keys move the dividers between the panes
+hint_resize = "resize panes"
+# context: title of the changes box of the dialog; {path} is a file path
+pane_diff = "Changes in {path}"
+# context: title of the changes box of the dialog while no file is selected
+pane_diff_plain = "Changes"
+pane_diff_none = "Select a file to see its changes"
+pane_diff_loading = "reading the changes..."
+why_open_panes = "open the Reflog or Lost work view first"
 tip_depth = { one = "Можно отменить {n} действие", few = "Можно отменить {n} действия", many = "Можно отменить {n} действий", other = "Можно отменить {n} действий" }
 tip_chip = "История отмен: каждое действие, которое можно откатить, по одному"
 offer_tip = "Восстановить {name} туда, где её оставило {op}: {key}"
@@ -9393,3 +9426,12 @@ acl_button = "Ограничить моей учётной записью"
 acl_done = "Теперь файл ключа может читать только ваша учётная запись."
 # context: status when restricting the key file failed; {why} is the reason
 acl_failed = "Не удалось ограничить доступ к файлу ключа: {why}"
+
+[dialog_frame]
+# context: shown on the border of a dialog in the arrange mode; {done} is the name of the key that leaves it
+arrange_hint = "Arrange: arrows move, Shift+arrows resize, 0 resets, {done} leaves"
+# context: status line when the arrange mode starts
+arranging = "Arranging the dialog: arrows move, Shift+arrows resize, 0 resets, Enter leaves"
+# context: status line after the dialog went back to its default place and size
+reset_done = "dialog back at its default place and size"
+why_no_dialog = "no dialog that can be arranged is open"

@@ -49,8 +49,8 @@ pub use schema::{default_clone_root, home_dir, CLONE_START_LAST, CLONE_START_URL
 pub use schema::{
     read_quantity, AutoCrlf, AutoStashMode, AvatarFallback, AvatarPlacement, AvatarSources,
     BaseList, BaseOrigin, BlameSide, ColorDepth, ColumnResize, CommitCountMethod, ComposerFiles,
-    ConflictPreventionConfig, CredentialsConfig, DefaultBackend, DiffLayout, DisplayUnit,
-    EditorConfig, EditorEol, EolMode, GeneralConfig, GitConfig, GraphColorization,
+    ConflictPreventionConfig, CredentialsConfig, DefaultBackend, DialogGeometry, DiffLayout,
+    DisplayUnit, EditorConfig, EditorEol, EolMode, GeneralConfig, GitConfig, GraphColorization,
     GraphLaneBackground, GraphRenderer, GraphRowTintStrength, HostingInstance, HttpsMode,
     ImagePixelatedFrom, ImageProtocol, ImageTextFallback, KittyKeyboard, LauncherBuild,
     LegacyDiffViewMode, LogColumnsLayout, LogConfig, LogLevel, McpConfig, McpTls, MergeConfig,

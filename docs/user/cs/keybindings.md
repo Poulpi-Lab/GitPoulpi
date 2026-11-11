@@ -136,6 +136,7 @@ předponou (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Zúžit panel Stav | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: Zobrazit čekající pohled | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: Zpět (nebo zavřít čekající pohled) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filtrovat refs podle názvu | `/` |
 | `refs` | `solo` | Solo pro výběr | `o` |
 | `refs` | `clear_solo` | Ukončit solo | `Shift+O` |
@@ -956,11 +957,11 @@ Klávesy jsou výchozí.
 | Historie vrácení: Obnovit větev tam, kde byla... | `o` |
 | Historie vrácení: Obnovit seznam |  |
 | Historie vrácení: Zavřít | `Esc` |
-| Reflog: Zobrazit v Logu | `s` |
+| Reflog: Zobrazit v Logu | `l` |
 | Reflog: Vytvořit větev tady... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Obnovit na tuto pozici... | `r` |
 | Reflog: Načíst další | `m` |
 | Reflog: Obnovit seznam |  |
@@ -968,8 +969,13 @@ Klávesy jsou výchozí.
 | Lost Work: Create tag Here... | `t` |
 | Ztracená práce: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Ztracená práce: Hledat znovu |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Zobrazení: Obnovit | `r` |
 | Zobrazení: Obnovit (fetch, pull requesty, issues) | `F5` |
 | Zobrazení: Přepnout nápovědu | `?` |

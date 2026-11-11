@@ -94,7 +94,7 @@ author_email = "jane@work.example"
 | `ui.graph_lane_background` | `"off"` | `off` 또는 `row_tint`(그래프 뒤의 옅은 레인 색 띠와 그 가장자리의 막대). **앱: 그래프 행 색조 전환**(`Ctrl+N Shift+T`)이 이를 전환하고, **앱: 그래프 색상 테마 변경...**(`Ctrl+N Shift+Y`)이 `ui.graph_color_theme`을 고릅니다. |
 | `ui.graph_row_tint_strength` | `"medium"` | `strong`, `medium`, `subtle`(`row_tint`일 때만). |
 | `ui.toolbar_position` | `"bottom"` | `top`, `bottom`, `left`, `right`. `left`와 `right`는 세로 열로 그리며, 80열 미만의 창에서는 `bottom`으로 되돌아갑니다. |
-| `ui.dialog_geometry` | `"session"` | `session`, `saved`, `never`: 옮기거나 크기를 바꾼 대화상자(제목 표시줄이나 테두리를 끌거나 `Ctrl+N m`)가 자리를 유지할지 정합니다. GitPoulpi를 닫을 때까지(기본값), 다음 실행에도(데이터 폴더의 `dialog_geometry.txt`에 디스크 저장), 또는 유지하지 않음. |
+| `ui.dialog_geometry` | `"session"` | `session`, `saved`, `never`: 옮기거나 크기를 바꾼 대화상자(제목 표시줄이나 테두리를 끌거나 `Ctrl+N m`)가 자리를 유지할지 정합니다. 모든 대화상자에 적용되는 하나의 설정이며 각 대화상자가 자신의 위치와 크기를 따로 기억합니다. GitPoulpi를 닫을 때까지(기본값), 다음 실행에도(모든 대화상자가 데이터 폴더의 하나의 `dialog_geometry.txt`에 디스크 저장), 또는 유지하지 않음(모든 대화상자가 기본 위치와 크기로 열림). |
 | `ui.toolbar_align` | `"start"` | `start`, `center`, `end`: 도구 모음에서 버튼이 놓이는 위치(행의 왼쪽·가운데·오른쪽, 열의 위·가운데·아래). |
 | `ui.toolbar_pr_pinned` | `true` | 풀 리퀘스트 버튼을 도구 모음의 맨 끝에 고정합니다. `false`이면 다른 버튼과 함께 배치됩니다. |
 | `ui.statusbar_position` | `"bottom"` | `top`(저장소 탭 위) 또는 `bottom`. |

@@ -459,6 +459,8 @@ En `config.toml` es la tabla `[keybindings.palette]`, con el nombre del comando 
 
 La banda de ayuda bajo la lista indica esta tecla (`Alt+K` por defecto). Es la acción `palette.configure_shortcut`, así que se reasigna como cualquier otra.
 
+La paleta y los selectores (tema, idioma, pestaña, búsqueda del espacio de trabajo) se mueven y redimensionan como un diálogo: arrastra el borde superior, o pulsa `Alt+G` (la acción `palette.arrange`; la fila `Diálogo: Mover o cambiar de tamaño` de la paleta hace lo mismo). Las flechas lo mueven, `Shift`+flechas cambian su tamaño, `0` lo restablece, `Enter` o `Esc` salen del modo y el popup sigue abierto. `ui.dialog_geometry` decide si se conserva el lugar.
+
 ### Todos los comandos de la paleta
 
 Generada a partir de la aplicación (un test la mantiene al día). Los comandos de

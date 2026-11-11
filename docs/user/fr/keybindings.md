@@ -138,7 +138,7 @@ préfixe (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Rétrécir le volet Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent : afficher la vue en attente | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent : retour (ou fermer la vue en attente) | `Ctrl+N Backspace` |
-| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
+| `nav_prefix` | `arrange_dialog` | Disposer le dialogue (déplacer, taille) | `Ctrl+N m` |
 | `refs` | `filter` | Filtrer les refs par nom | `/` |
 | `refs` | `solo` | Isoler la sélection | `o` |
 | `refs` | `clear_solo` | Arrêter le solo | `Shift+O` |

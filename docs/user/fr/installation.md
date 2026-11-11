@@ -68,7 +68,7 @@ Le fichier `.sha256` ne détecte qu'un téléchargement abîmé. La signature es
 
 Chaque version publiée propose aussi un installateur par système. Tous deux font
 les mêmes choix (raccourcis, PATH, alias de commande comme `gp`) en appelant le
-`gitpoulpi` installé lui-même, le code derrière Paramètres > Général > Lanceur :
+`gitpoulpi` installé lui-même, le code derrière Paramètres > Lanceur :
 ce que l'installateur met en place et ce que les Paramètres affichent concordent
 donc toujours.
 
@@ -135,7 +135,7 @@ Chaque canal ci-dessous écrit le même marqueur `.gitpoulpi-dist` à côté des
 
 Les noms ci-dessus sont ceux vers lesquels le processus de publication publie (voir [Releasing](../../developer/releasing.md)) : un canal qui n'est pas encore en ligne répond « not found », et l'archive de version ou l'installeur fonctionne toujours.
 
-La gestion du PATH propre à chaque gestionnaire de paquets s'applique : Chocolatey, winget, Scoop et Homebrew placent eux-mêmes les programmes dans le PATH, et aucun ne crée l'alias `gp` (lancez `gitpoulpi alias create gp`, ou Paramètres > Général > Lanceur).
+La gestion du PATH propre à chaque gestionnaire de paquets s'applique : Chocolatey, winget, Scoop et Homebrew placent eux-mêmes les programmes dans le PATH, et aucun ne crée l'alias `gp` (lancez `gitpoulpi alias create gp`, ou Paramètres > Lanceur).
 
 ### apt (Debian et Ubuntu)
 

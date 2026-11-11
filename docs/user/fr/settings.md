@@ -179,23 +179,24 @@ La liste des pages a deux groupes :
 | **Dossier de navigation par défaut** | Où Parcourir s'ouvre. Vide : le dernier dossier utilisé, sinon votre dossier personnel. |
 | **Emplacement des données du dépôt** | Où GitPoulpi garde ses données propres à chaque dépôt (`session.per_repo_state_dir`) : **Dans .git** (par défaut : rien n'apparaît dans votre arbre de travail, tous les worktrees le partagent), **Dans l'arbre de travail** (un dossier `.gitpoulpi` ; nécessaire pour commiter un `workflow.toml` d'équipe) ou **Dans mon dossier de données utilisateur** (hors du dépôt). Un dossier `.gitpoulpi` laissé par une ancienne version est déplacé vers le nouvel endroit la première fois qu'il sert, puis supprimé une fois vide ; un fichier suivi par git (un `workflow.toml` commité) n'est jamais déplacé ni supprimé et reste lisible. |
 | **Nom de branche par défaut** | La première branche d'un dépôt créé avec Init. Vide : git décide. Cela ne renomme aucune branche existante. |
-| **Activer la détection proactive des conflits** | Activée par défaut (`general.conflict_detection`). Avertit sur le Log quand fusionner la branche courante dans la branche dont elle est partie provoquerait un conflit, avant même que vous essayiez. Un dépôt peut la désactiver pour lui-même sur sa page **Prévention des conflits**. Voir [Résoudre les conflits de merge](merge-conflicts.md#prévention-des-conflits). S'applique à la fermeture des Paramètres. |
-| **Branches de base par défaut** | Sous l'option, dans le groupe **Prévention des conflits** (la commande de palette **Conflits : Modifier les listes de branches de base...** l'ouvre). La liste de motifs de branches de base qu'utilisent les dépôts qui n'ont pas la leur : **Intégrée (`**`)**, c'est-à-dire toutes les branches, ou l'une de vos listes nommées (`conflict_prevention.default_list`). S'applique aux dépôts ouverts à la fermeture des Paramètres. **Revenir à la valeur intégrée** revient à `**`. |
-| **Listes de branches de base** | Aussi dans ce groupe : vos listes nommées de motifs de branches de base (`[conflict_prevention.lists.<nom>]`), un bloc chacune avec son **Nom** (renommer la conserve par défaut si elle l'était ; un dépôt qui suivait l'ancien nom utilise la liste par défaut tant que vous ne la choisissez pas à nouveau), ses **Motifs** (un par ligne, `Enter` ou un clic ouvre l'éditeur, `Ctrl+S` le garde), **Définir par défaut** et **Supprimer la liste** (il demande d'abord, et précise que les dépôts qui la suivent utiliseront la liste par défaut). Saisissez un nom dans **Nouvelle liste** et appuyez sur `Enter` pour en ajouter une ; elle commence par `**`. Modifier une liste change chaque dépôt qui la suit. |
 | **Niveau du journal**, **Durée de conservation des journaux**, **Taille maximale d'un fichier journal** | Le journal de l'application derrière le Journal d'activité : le niveau le plus bavard enregistré (`log.level`), la durée de conservation des fichiers (un nombre entier et une unité, jours, semaines, mois ou années, sur une ligne : cliquez sur le nombre pour le taper, Haut et Bas le font varier, Tab passe à l'unité et Entrée ouvre sa liste ; de 1 à 10 ans au plus, 1 semaine par défaut, `log.retention_days` et `log.retention_unit`) et la taille à laquelle le fichier d'une journée est renouvelé (un nombre et Mio ou Gio, de 1 Mio à 1 Gio, `log.max_file_mb` et `log.max_file_unit`). |
 | **Afficher la durée des opérations**, **Journalisation étendue** | L'onglet Opérations Git du Journal d'activité : la durée de chaque opération (`log.timings`, activé par défaut) et aussi le travail en arrière-plan, actualisation et auto-fetch (`log.extended`, désactivé par défaut). Voir [Quand quelque chose échoue](troubleshooting.md#le-journal-dactivité). |
 | **Annulation activée**, **Profondeur de l'historique**, **Enregistrer les changements faits hors de GitPoulpi** | Le groupe **Historique d'annulation**. Active ou désactive l'annulation, et règle combien d'opérations elle conserve (100 par défaut, `0` signifie illimité). Désactiver l'annulation efface l'historique d'annulation, après confirmation. La dernière option enregistre aussi ce qu'un shell ou un agent fait aux branches, aux tags, aux stashes et à HEAD. Voir [Annuler et rétablir](undo-redo.md). |
 
-#### Lanceur (intégration au bureau)
+La commande de palette **Application : Changer de langue...** (`Ctrl+N g`) ouvre
+la même liste de langues. Là, la langue en surbrillance est prévisualisée en
+direct ; `Enter` la garde et `Esc` rétablit la précédente.
 
-Le groupe **Lanceur**, le dernier de la page Général, crée un raccourci qui démarre
+### Lanceur
+
+La page **Lanceur** (`gitpoulpi ui show settings launcher`) crée un raccourci qui démarre
 GitPoulpi depuis le lanceur du système, dans le terminal de votre choix.
 
 | Ligne | Ce qu'elle fait |
 |---|---|
 | **Terminal des raccourcis** | `ui.launch_terminal` : **Automatique**, **Par défaut (système)**, ou l'un des terminaux trouvés sur cette machine (la même détection que **Ouvrir dans**). Automatique : Windows Terminal sous Windows (sinon WezTerm, Alacritty, la console simple), `xdg-terminal-exec` sous Linux (Omarchy ; sinon le premier terminal trouvé), Terminal sous macOS, sauf si iTerm2, Ghostty, WezTerm ou kitty est installé. |
 | **Rouvrir dans ce terminal au double-clic** | Windows uniquement (`ui.relaunch_in_terminal`). Un double-clic sur l'exe ouvre la console par défaut, qui affiche mal les images : GitPoulpi se rouvre dans le terminal choisi et la première fenêtre se ferme. Rien de tel quand il a été lancé depuis un terminal. |
-| **Afficher la fenêtre ouverte au clic** | `ui.reuse_window` (activé par défaut). Un clic sur un raccourci GitPoulpi (`gitpoulpi launch`) affiche la fenêtre d'un GitPoulpi déjà ouvert au lieu d'en démarrer un autre. Un nouveau terminal ne démarre que si aucun n'est ouvert, si le réglage est désactivé ou si la fenêtre ne peut pas passer au premier plan. Elle y passe sous Windows, dans WezTerm et sous Hyprland ; sur les autres bureaux Linux, le clic démarre toujours une nouvelle fenêtre. Sans effet sous macOS (le Dock s'en charge déjà). Hold **Shift** while clicking (Windows) or use the **New Window** launcher action (Linux) to open another window on purpose; `gitpoulpi launch --new-window` does it from a script. |
+| **Afficher la fenêtre ouverte au clic** | `ui.reuse_window` (activé par défaut). Un clic sur un raccourci GitPoulpi (`gitpoulpi launch`) affiche la fenêtre d'un GitPoulpi déjà ouvert au lieu d'en démarrer un autre. Un nouveau terminal ne démarre que si aucun n'est ouvert, si le réglage est désactivé ou si la fenêtre ne peut pas passer au premier plan. Elle y passe sous Windows, dans WezTerm et sous Hyprland ; sur les autres bureaux Linux, le clic démarre toujours une nouvelle fenêtre. Sans effet sous macOS (le Dock s'en charge déjà). Maintenez **Shift** en cliquant (Windows) ou utilisez l'action de lanceur **Nouvelle fenêtre** (Linux) pour ouvrir volontairement une autre fenêtre ; `gitpoulpi launch --new-window` le fait depuis un script. |
 | **Alias de commande** | `ui.command_alias` : une liste déroulante avec **Aucun** et `gp`, ou tapez le nom de votre choix (lettres, chiffres, `-`, `_`, `.` ; ni espaces ni séparateurs de chemin). Le bouton **Créer** de la ligne fait de ce nom la commande qui démarre GitPoulpi (il devient **Supprimer** une fois l'alias créé, et supprime alors tous les alias créés par GitPoulpi). Un avertissement s'affiche sous la ligne quand le nom lance déjà autre chose dans votre PATH, et sous Windows quand PowerShell a un alias intégré de ce nom (`gp` y est `Get-ItemProperty`, et il l'emporte sur n'importe quel fichier). Un alias ou une fonction du shell est invisible d'ici : oh-my-zsh définit lui-même `gp` et il l'emporte sur le nôtre. |
 | **Alias nouvel onglet** | `ui.command_alias_add` : une seconde commande, par exemple `gpa`, qui ouvre le dossier courant dans un nouvel onglet du GitPoulpi déjà lancé (`gitpoulpi --add`) au lieu d'en démarrer un autre ; si aucun n'est lancé, elle démarre GitPoulpi normalement, et s'il y en a plusieurs elle demande lequel rejoindre. Une liste déroulante avec **Aucun**, `gpa` et le nom de l'alias suivi d'un `a`, ou tapez le nom de votre choix (mêmes règles que ci-dessus). Le seul bouton **Créer** crée les deux commandes, **Supprimer** supprime toutes les commandes créées par GitPoulpi ; chacune a sa propre ligne d'état. Sous Linux et macOS, c'est un script de deux lignes, sous Windows un `.cmd`. Voir la [référence CLI](cli-reference.md#ajouter-un-dossier-à-la-fenêtre-ouverte). |
 | **Ajouter GitPoulpi au PATH** | Place le dossier d'où GitPoulpi s'exécute et le dossier de l'alias dans votre PATH, pour les nouveaux terminaux. Le bouton de la ligne affiche **Ajouter** ou **Retirer**, et **Retirer** retire exactement ce qui a été ajouté. Les dossiers déjà présents dans le PATH sont laissés tels quels (la ligne indique alors **déjà dans le PATH**). |
@@ -214,9 +215,9 @@ la couleur de votre logo (À propos > couleur) ; sous Linux, chaque couleur a s
 
 **Regroupement dans la barre des tâches et le dock.** GitPoulpi tourne dans une fenêtre de terminal, donc la barre des tâches l'affiche normalement sous l'icône du terminal, sans point « en cours d'exécution » sous l'icône GitPoulpi épinglée. Windows : les raccourcis portent l'AppUserModelID `GitPoulpi.GitPoulpi`, et un GitPoulpi lancé depuis l'un d'eux donne le même ID et son icône à la fenêtre de son terminal (il retrouve la fenêtre en lui donnant un instant un titre unique, puis rétablit le titre), si bien que la fenêtre se range sous l'icône GitPoulpi épinglée. Une fenêtre de terminal à plusieurs onglets se déplace d'un bloc : tous ses onglets se regroupent sous l'icône de GitPoulpi tant que GitPoulpi y tourne. Les raccourcis et les épingles de barre des tâches créés plus tôt sont réécrits par la même synchronisation ; si une épingle affiche encore l'icône du terminal, désépinglez-la puis épinglez-la de nouveau. Linux : kitty, foot, Alacritty, WezTerm et Ghostty démarrent avec la classe de fenêtre `gitpoulpi` et l'entrée `.desktop` la nomme (`StartupWMClass`), donc un dock range la fenêtre sous l'icône du lanceur ; les autres terminaux gardent leur propre icône. macOS : rien à faire, le Dock regroupe par application.
 
-![Paramètres > Général, défilé jusqu'au groupe Lanceur : le terminal des raccourcis et la ligne du lanceur d'applications](../images/settings-launcher.png)
+![Paramètres > Lanceur : le terminal des raccourcis et la ligne du lanceur d'applications](../images/settings-launcher.png)
 
-##### Alias de commande et PATH, selon le système
+#### Alias de commande et PATH, selon le système
 
 | Système | Alias | PATH |
 |---|---|---|
@@ -230,9 +231,16 @@ le raccourci du bureau**, **Lanceur : Supprimer les raccourcis**, **Lanceur : 
 status|install|remove [--where launcher|desktop|startmenu]` fait de
 même depuis un script.
 
-La commande de palette **Application : Changer de langue...** (`Ctrl+N g`) ouvre
-la même liste de langues. Là, la langue en surbrillance est prévisualisée en
-direct ; `Enter` la garde et `Esc` rétablit la précédente.
+### Prévention des conflits
+
+La partie globale de la détection proactive des conflits (`gitpoulpi ui show settings conflict-prevention-global`) ; la page propre à un dépôt est
+[Propre au dépôt : Prévention des conflits](#propre-au-dépôt--prévention-des-conflits). La commande de palette **Conflits : Modifier les listes de branches de base...** ouvre cette page.
+
+| Option | Ce qu'elle fait |
+|---|---|
+| **Activer la détection proactive des conflits** | Activée par défaut (`general.conflict_detection`). Avertit sur le Log quand fusionner la branche courante dans la branche dont elle est partie provoquerait un conflit, avant même que vous essayiez. Un dépôt peut la désactiver pour lui-même sur sa propre page **Prévention des conflits**. Voir [Résoudre les conflits de merge](merge-conflicts.md#prévention-des-conflits). S'applique à la fermeture des Paramètres. |
+| **Branches de base par défaut** | Sous l'option. La liste de motifs de branches de base qu'utilisent les dépôts qui n'ont pas la leur : **Intégrée (`**`)**, c'est-à-dire toutes les branches, ou l'une de vos listes nommées (`conflict_prevention.default_list`). S'applique aux dépôts ouverts à la fermeture des Paramètres. **Revenir à la valeur intégrée** revient à `**`. |
+| **Listes de branches de base** | Aussi sur cette page : vos listes nommées de motifs de branches de base (`[conflict_prevention.lists.<nom>]`), un bloc chacune avec son **Nom** (renommer la conserve par défaut si elle l'était ; un dépôt qui suivait l'ancien nom utilise la liste par défaut tant que vous ne la choisissez pas à nouveau), ses **Motifs** (un par ligne, `Enter` ou un clic ouvre l'éditeur, `Ctrl+S` le garde), **Définir par défaut** et **Supprimer la liste** (il demande d'abord, et précise que les dépôts qui la suivent utiliseront la liste par défaut). Saisissez un nom dans **Nouvelle liste** et appuyez sur `Enter` pour en ajouter une ; elle commence par `**`. Modifier une liste change chaque dépôt qui la suit. |
 
 ### Synchronisation
 
@@ -402,6 +410,7 @@ que dans les builds qui incluent le serveur ; voir [MCP et agents](mcp-and-agen
 | **Fond des voies du graphe** | **Désactivé** (transparent) ou **Teinte de ligne** : une bande légère de la couleur de la voie derrière la colonne du graphe, avec une fine barre à son bord. |
 | **Force de la teinte** | À quel point la bande de Teinte de ligne est estompée : **Forte**, **Moyenne** (par défaut) ou **Subtile**. La barre du bord garde sa couleur pleine. |
 | **Position de la barre d'outils** | `ui.toolbar_position` : où se place la barre d'outils : **Haut**, **Bas** (par défaut), **Gauche** ou **Droite**. Gauche et Droite en font une colonne à côté des volets ; une fenêtre de moins de 80 colonnes la dessine en bas. S'applique immédiatement. |
+| **Mémoriser la position et la taille des dialogues** | `ui.dialog_geometry` : **Pour cette session** (par défaut), **Enregistrés sur disque** ou **Jamais** : si un dialogue que vous avez déplacé ou redimensionné garde sa place. S'applique immédiatement. |
 | **Alignement des boutons de la barre d'outils** | `ui.toolbar_align` : où se placent les boutons le long de la barre d'outils : **Début** (par défaut), **Centre** ou **Fin**. Le début est la gauche d'une ligne et le haut d'une colonne ; la fin est la droite et le bas. S'applique immédiatement. |
 | **Épingler le bouton pull request en bout de barre** | `ui.toolbar_pr_pinned` : activé (par défaut), le bouton pull request se place à l'extrémité de la barre d'outils (à droite, ou en bas dans une colonne), quel que soit l'alignement. Désactivé, il suit les autres boutons et s'aligne avec eux. S'applique immédiatement. |
 | **Position de la ligne d'état** | `ui.statusbar_position` : où se place la ligne d'état (branche, compteurs, messages, aide des touches) : **Haut** (au-dessus des onglets de dépôt) ou **Bas** (par défaut). L'onglet Accueil garde sa propre ligne d'état en bas. S'applique immédiatement. |
@@ -705,10 +714,10 @@ Un message avec lequel le formulaire de commit démarre (`gitpoulpi ui show sett
 (voir [Résoudre les conflits de merge](merge-conflicts.md#prévention-des-conflits)) :
 
 - **Rechercher les conflits avec la branche de base** : activée par défaut. La décocher désactive la
-  détection pour ce dépôt seulement ; l'option globale est **Activer la détection proactive des conflits**, sur la page
-  Général. Les deux doivent être activées.
+  détection pour ce dépôt seulement ; l'option globale est **Activer la détection proactive des conflits**, sur la page globale
+  **Prévention des conflits**. Les deux doivent être activées.
 - **Branches de base issues de** : d'où viennent les branches de base de ce dépôt. **Par défaut** suit la liste globale
-  par défaut (le `**` intégré, ou la liste choisie sous **Branches de base par défaut** dans Paramètres > Général) ;
+  par défaut (le `**` intégré, ou la liste choisie sous **Branches de base par défaut** dans Paramètres > Prévention des conflits) ;
   **Liste : <nom>** suit l'une de vos listes nommées, si bien que la modifier change aussi ce dépôt ; **Liste propre**
   est une liste à lui (la choisir part d'une copie des motifs en vigueur). Un fichier de dépôt écrit avant ce choix et
   contenant ses propres motifs se lit comme **Liste propre**.
@@ -728,7 +737,7 @@ Un message avec lequel le formulaire de commit démarre (`gitpoulpi ui show sett
   commentaires `#` sont ignorés ; une liste d'exclusions seules signifie « toutes les branches sauf celles-ci ». Le
   choix est enregistré dans `repo-state.toml` et relu à la fermeture des Paramètres.
 - **Enregistrer comme liste...** : saisissez un nom et appuyez sur `Enter` ; les motifs en vigueur deviennent une liste
-  nommée (la même que modifie Paramètres > Général) et ce dépôt la suit.
+  nommée (la même que modifie Paramètres > Prévention des conflits) et ce dépôt la suit.
 - **Revenir au défaut** (demande d'abord) : abandonne le choix, la liste et les motifs propres de ce dépôt ; il suit de
   nouveau le défaut.
 - **Utiliser les branches de base du workflow** (affiché quand un [workflow de branches](branching-workflows.md) avec

@@ -122,7 +122,7 @@ selon le terminal et la police, c'est pourquoi GitPoulpi évite les glyphes VS16
   d'iTerm2 avec un fond opaque ; moins testé.
 - **Console Windows, ConEmu, cmd** : à éviter. Les images sont mal dessinées ou
   pas du tout. Un double-clic sur l'exe rouvre GitPoulpi dans le terminal que
-  vous avez choisi (*Paramètres > Général > Lanceur*).
+  vous avez choisi (*Paramètres > Lanceur*).
 
 ### Linux
 

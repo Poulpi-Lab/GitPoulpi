@@ -54,8 +54,10 @@ Les actions que vous avez annulées se trouvent **au-dessus** de l'action la plu
 récente, sous un séparateur (« annulées - Rétablir les ramène »), atténuées, celle
 que Rétablir ramène en premier étant la plus proche du séparateur. La sélection
 commence sur l'action la plus récente, pas sur elles. Les flèches se déplacent
-(les intertitres et le séparateur sont sautés), `Tab` passe d'une des trois vues
-à l'autre, `Esc` ferme. Pour la ligne sélectionnée :
+(les intertitres et le séparateur sont sautés), `1` / `2` / `3` (ou `Ctrl+Tab` /
+`Ctrl+Shift+Tab`) passent d'une des trois vues à l'autre, `Esc` ferme. `Enter`
+n'exécute jamais une action : chaque bouton a sa propre lettre, indiquée dans la
+ligne d'aide sous les boutons. Pour la ligne sélectionnée :
 
 - **Annuler jusqu'ici** (`u`) : annule cette action et toutes les plus récentes,
   de la plus récente à la plus ancienne, après une seule confirmation qui les
@@ -100,9 +102,10 @@ au format reftable de git sont lus comme les autres.
 
 ![Le Reflog de main : chaque position qu'elle a eue, la plus récente en haut, avec la sélectionnée décrite à droite](../images/reflog.png)
 
-**Afficher dans le Log**
-(`s`), **Créer une branche ici** (`b`) et **Restaurer `<branche>` à cette
-position** (`r`). La restauration est annulable. Quand la branche est extraite
+**Afficher dans le Log** (`l`), **Créer une branche ici** (`b`), **Créer un tag ici** (`t`),
+**Appliquer à l'arbre de travail** (`w`), **Enregistrer en stash** (`s`) (les trois
+derniers fonctionnent comme dans Travail perdu ci-dessous) et **Restaurer
+`<branche>` à cette position** (`r`). La restauration est annulable. Quand la branche est extraite
 et que vous avez des modifications locales qu'elle ne peut pas déplacer sans
 écraser, une liste déroulante demande ce qu'il faut en faire : garder mes
 modifications, soft, mixed ou hard. Hard abandonne les modifications de vos
@@ -121,9 +124,55 @@ qu'un indicateur tourne ; elle ne bloque jamais l'interface.
 ![Travail perdu : les deux commits d'une branche supprimée (retrouvés par le reflog) et des commits orphelins](../images/lost-work.png)
 
 **Créer une branche
-ici** (`b`) récupère un commit sous un nom de votre choix, **Cherry-pick** (`c`)
-l'applique à la branche courante, **Afficher dans le Log** (`s`) fonctionne pour
-ceux qui sont encore atteignables.
+ici** (`b`) récupère un commit sous un nom de votre choix, **Créer un tag ici**
+(`t`) le marque d'un tag (nom par défaut `restored-<id court>`), **Cherry-pick**
+(`c`) l'applique à la branche courante. Un commit perdu n'est pas dans le Log :
+cette vue n'a donc pas de « Afficher dans le Log » (la vue Reflog le garde pour
+les commits encore atteignables).
+
+**Récupérer les changements** remet ce qu'a changé le commit sans le commiter :
+**Appliquer à l'arbre de travail** (`w`) rejoue les changements du commit sur les
+fichiers, en tout ou rien (l'index et HEAD ne bougent pas ; un commit de merge est
+refusé). Quand ils ne peuvent pas s'appliquer proprement, rien n'est touché et la
+boîte propose **Enregistrer en stash** (`s`), qui garde les mêmes changements dans
+un nouveau stash ; cette action est d'ailleurs toujours disponible seule. Les deux
+sont journalisées : `Ctrl+Z` remet les fichiers en place, ou supprime de nouveau le
+stash. Les mêmes actions existent en `gitpoulpi apply-commit <rev>` et
+`gitpoulpi stash from-commit <rev> [-m M]`, et la vue Reflog les a aussi.
+
+### Volets, hunks et fenêtre
+
+Reflog et Travail perdu montrent la liste des commits à gauche et, à droite,
+l'en-tête du commit sélectionné, **chaque fichier qu'il a modifié** et les hunks du
+fichier sélectionné (les hunks seuls, à la largeur du volet). La liste des fichiers
+est celle du volet de droite de la fenêtre principale : `Chemin` ou `Arbre` (`v`,
+ou cliquez sur la bascule), un dossier se plie avec `Enter`, `Left` ou `Right`, un
+clic ou les flèches choisissent un fichier et ses hunks apparaissent en dessous (le
+démon est interrogé hors du fil de l'interface ; les derniers fichiers sont gardés).
+La liste des commits, celle des fichiers et les hunks ont chacun une barre de
+défilement que vous pouvez presser et glisser.
+
+- `Tab` / `Shift+Tab` parcourent les volets (liste, fichiers, hunks) ; les flèches,
+  `PageUp`, `PageDown`, `Home` et `End` agissent sur le volet qui a le clavier (sa
+  bordure est allumée). `Enter` sur un fichier passe à ses hunks.
+- **Séparateurs** : glissez celui entre la liste et le volet de droite, ou celui
+  entre les fichiers et les hunks ; double-cliquez un séparateur pour le
+  réinitialiser. Au clavier : `Alt+Left` / `Alt+Right`, `Alt+Up` / `Alt+Down`,
+  `Alt+0` réinitialise les deux. La palette a `Reflog / Travail perdu : Réinitialiser
+  la taille des volets`, `Volet suivant` et `Liste des fichiers en chemins ou en arbre`.
+- `Ctrl+N` affiche ses badges sur les trois onglets de vue et les trois volets,
+  comme dans la fenêtre principale ; une touche de badge y saute.
+- **Déplacer et redimensionner la boîte** : glissez la barre de titre pour la
+  déplacer, glissez les bordures gauche, droite et basse ou un coin du bas (la
+  poignée `◢`) pour la redimensionner (jamais en dessous de 60 x 16, toujours à
+  l'écran). La croix de fermeture garde son clic et relâcher hors de la boîte ne
+  la ferme jamais. Le pendant clavier est `Ctrl+N` puis `m` : les flèches
+  déplacent, `Shift`+flèches redimensionnent, `0` réinitialise, `Enter` ou `Esc`
+  quittent (la bordure l'indique tant que le mode est actif). La palette a
+  `Dialogue : Déplacer/redimensionner` et `Dialogue : Réinitialiser la position et
+  la taille`. Que la place soit gardée ou non dépend de `ui.dialog_geometry`
+  (Paramètres > Apparence > Disposition) : `session` (par défaut), `saved`
+  (restaurée au prochain lancement) ou `never`.
 
 ## Depuis la palette de commandes
 
@@ -136,8 +185,8 @@ agissent sur la ligne sélectionnée de la vue affichée.
 | Vue | Lignes de la palette |
 |---|---|
 | Historique d'annulation | `Historique d'annulation : Annuler jusqu'ici...`, `Rétablir jusqu'ici...`, `Restaurer seulement celle-ci...`, `Restaurer la branche là où elle était...`, `Actualiser`, `Fermer` |
-| Reflog | `Reflog : Afficher dans le Log`, `Créer une branche ici...`, `Restaurer à cette position...`, `Charger la suite`, `Actualiser` |
-| Travail perdu | `Travail perdu : Afficher dans le Log`, `Créer une branche ici...`, `Cherry-pick`, `Relancer la recherche` |
+| Reflog | `Reflog : Afficher dans le Log`, `Créer une branche ici...`, `Créer un tag ici...`, `Appliquer les changements à l'arbre de travail`, `Enregistrer en stash`, `Restaurer à cette position...`, `Charger la suite`, `Actualiser` |
+| Travail perdu | `Travail perdu : Créer une branche ici...`, `Créer un tag ici...`, `Cherry-pick`, `Appliquer les changements à l'arbre de travail`, `Enregistrer en stash`, `Relancer la recherche` |
 
 Les lignes sont grisées (avec la raison) tant que leur vue n'est pas ouverte ;
 les trois ouvertures, `Édition : Historique d'annulation...`, `Édition : Reflog...`
@@ -157,8 +206,8 @@ saisie de nom que le bouton.
 | Branches et tags | créer, supprimer, renommer, définir ou retirer l'amont, créer une branche de suivi, créer / supprimer / annoter un tag, fast-forward, extraire une pull request comme branche |
 | Se déplacer | checkout d'une branche ou d'un commit (y compris un HEAD détaché) |
 | Historique | merge (fast-forward ou commit de merge), rebase (simple et interactif, une fois terminé), cherry-pick, revert, reset (soft, mixed et hard), la partie locale d'un pull |
-| Modifications locales | stage et unstage (fichier, dossier, hunk, lignes, tout), abandon (fichier, dossier, hunk, lignes, un checkout de fichier), appliquer un patch, **supprimer un fichier du disque**, **ignorer** (fichier, extension ou dossier : la ligne du `.gitignore` choisi), **traiter comme binaire ou texte** (la ligne de `.gitattributes`) |
-| Stashes | push, apply, pop, drop |
+| Modifications locales | stage et unstage (fichier, dossier, hunk, lignes, tout), abandon (fichier, dossier, hunk, lignes, un checkout de fichier), appliquer un patch ou les changements d'un commit (`apply-commit`), **supprimer un fichier du disque**, **ignorer** (fichier, extension ou dossier : la ligne du `.gitignore` choisi), **traiter comme binaire ou texte** (la ligne de `.gitattributes`) |
+| Stashes | push, apply, pop, drop, enregistrer en stash les changements d'un commit (`stash from-commit`) |
 | Remotes et configuration | ajouter, retirer, renommer, changer l'URL ou l'URL de push d'un remote, suivre et ne plus suivre avec Git LFS |
 | Sur un serveur | **supprimer une branche ou un tag sur un remote** (depuis le menu de la ref, la palette, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, ou une fin de workflow qui supprime la branche distante) : voir ci-dessous |
 
@@ -442,7 +491,9 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   (ou `HEAD`) à l'une de ces positions ; une branche extraite avec des
   modifications non commitées demande `--mode`. Elle est aussi journalisée.
 - `lost-commits` liste les commits qu'aucune branche, aucun tag, aucun distant
-  ni aucun stash n'atteint.
+  ni aucun stash n'atteint. Pour en récupérer le travail sans le commiter :
+  `apply-commit <rev>` (dans l'arbre de travail, tout ou rien) ou
+  `stash from-commit <rev>` (dans un stash) ; les deux sont journalisées.
 - Quand un déplacement fait dans un shell bloque l'entrée la plus récente, le
   refus porte la position du reflog qui contient ce que l'entrée attend
   (`reason.RefMoved.restore`), à passer à `reflog-restore`.

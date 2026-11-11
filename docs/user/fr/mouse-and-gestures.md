@@ -43,8 +43,9 @@ valent partout :
   l'extérieur, pour qu'un clic égaré ne fasse rien perdre. `✕` et `Esc` demandent d'abord **Abandonner les
   modifications ?** ; **Continuer** revient au formulaire. Un formulaire où rien n'a été saisi se ferme
   aussitôt, tout comme une boîte de dialogue à une seule ligne.
-- Les menus, les listes déroulantes, la palette et les sélecteurs n'ont pas de `✕` : ils se ferment avec `Esc`
-  ou un clic à l'extérieur.
+- La palette de commandes, les sélecteurs (onglet, thème, langue), les petites boîtes de revue, de tableau,
+  de fusion et du compositeur, ainsi que la confirmation portent aussi le `✕`. Les menus contextuels et les
+  listes déroulantes n'en ont pas : ils se ferment avec `Esc` ou un clic à l'extérieur.
 
 ## Listes dans les Paramètres
 
@@ -417,13 +418,32 @@ Voir [Images](image-view.md) pour la souris dans la vue image.
 
 ## Déplacer et redimensionner les boîtes
 
-La boîte Historique d'annulation / Reflog / Travail perdu peut être déplacée et redimensionnée :
+Les boîtes peuvent être déplacées, et les grandes fenêtres redimensionnées :
 
-- **Glissez la barre de titre** pour la déplacer (la croix de fermeture garde son clic).
-- **Glissez la bordure gauche, droite ou basse**, ou un coin du bas (la poignée `◢`), pour la redimensionner. La boîte reste à l'écran et ne devient jamais plus petite que 60 x 16.
+- **Glissez la barre de titre** pour déplacer une boîte (la croix de fermeture garde son clic). La palette de commandes et les sélecteurs n'ont pas de barre de titre à part : glissez la bordure du haut.
+- **Glissez la bordure gauche, droite ou basse**, ou un coin du bas (la poignée `◢`), pour redimensionner une fenêtre. La boîte reste à l'écran et ne devient jamais plus petite que son minimum (60 x 16 pour l'Historique d'annulation, moins pour les autres). Une fenêtre agrandie utilise la place : zones de texte et listes grandissent, le texte se replie à la nouvelle largeur.
 - Le glisser continue quand le pointeur sort de la boîte, et relâcher à l'extérieur ne la ferme jamais.
-- **Glissez les séparateurs** entre sa liste, sa liste de fichiers et ses hunks ; double-cliquez-en un pour le réinitialiser.
-- Les équivalents clavier sont `Ctrl+N` puis `m` (les flèches déplacent, `Shift`+flèches redimensionnent, `0` réinitialise, `Enter` ou `Esc` quittent) et `Alt`+flèches pour les séparateurs ; la palette a `Dialogue : Déplacer/redimensionner` et `Dialogue : Réinitialiser la position et la taille`.
+- **Glissez les séparateurs** dans la vue Reflog / Travail perdu de l'Historique d'annulation ; double-cliquez-en un pour le réinitialiser.
+- Les équivalents clavier sont `Ctrl+N` puis `m` (les flèches déplacent, `Shift`+flèches redimensionnent, `0` réinitialise, `Enter` ou `Esc` quittent) et `Alt`+flèches pour les séparateurs ; la palette a `Dialogue : Déplacer/redimensionner` et `Dialogue : Réinitialiser la position et la taille`. Ils agissent sur la boîte au premier plan. Les surfaces qui utilisent `Ctrl+N` pour leurs propres badges (le formulaire du message de commit, la page de réécriture de l'historique) prennent le même `m` après leur `Ctrl+N`, et la ligne d'état le nomme. La palette de commandes et les sélecteurs utilisent `Ctrl+N` pour descendre dans la liste : pour eux la touche est `Alt+G` (`palette.arrange`), ou la ligne `Dialogue : Déplacer/redimensionner` de la palette ; les deux placent la fenêtre au premier plan et la laissent ouverte.
+- **Un seul réglage** (`ui.dialog_geometry`, Paramètres > Apparence > Disposition) couvre toutes les boîtes : chacune mémorise sa propre place et sa propre taille pour cette session, sur disque pour le prochain lancement, ou jamais.
+
+| Boîte | Déplacer | Redimensionner |
+|---|---|---|
+| Historique d'annulation / Reflog / Travail perdu, Journal d'activité, panneau des tâches, sélecteur de dossier | oui | oui |
+| Palette de commandes, sélecteurs d'onglet / de thème / de langue, recherche dans l'espace de travail | oui | oui (la liste grandit avec la hauteur, les lignes avec la largeur) |
+| Clone (la liste des dépôts), Pull request et Nouveau ticket (la description), « Ce qui est envoyé » (le volet), Mermaid (l'aperçu), options de revue (les champs, largeur seulement) | oui | oui |
+| Éditeurs de texte long des Paramètres (modèles, hooks, prompts IA), la zone IA du formulaire d'espace de travail | oui | oui (la zone de texte) |
+| Réécriture de l'historique : les deux boîtes d'aide IA | oui | oui (la description, le volet envoyé) |
+| À propos, panneau de mise à jour, contrôle de sécurité, conflits prévus, « Limite IA dépassée », suppression de tag, fichiers sensibles | oui | non (la taille suit le texte) |
+| Init, Worktree, Sparse checkout, boîte Flow, boîtes du flux de tickets, formulaire du message de commit (reword), formulaire d'espace de travail, sélecteurs de label / jalon | oui | non |
+| Confirmations (chaque « Êtes-vous sûr ? ») | oui | non |
+| Boîtes de revue et de tableau : leurs petites boîtes (commentaire, terminer, choisir, colonnes) | oui | non |
+| Fenêtres de la page des raccourcis (confirmation de réinitialisation, capture de touche), fenêtre de réponse IA | oui | non |
+| Paramètres : les résultats et la confirmation d'authentification du dépôt | oui | non |
+| Réécriture de l'historique : boîtes de purge, d'identité et de question | oui | non |
+| Fenêtre de déplacement de fichier du compositeur de commit, avis de fusion | oui | non |
+
+Non déplaçables : les écrans pleine page (Paramètres, Aide, pages Revue et Tableau, qui remplissent déjà la fenêtre), les menus contextuels et les listes déroulantes (ils pendent à ce qui les a ouverts), les infobulles, et les petites fenêtres à l'intérieur d'une page (le formulaire des remotes, l'éditeur de scission de commit).
 
 Le pointeur prend une forme de déplacement sur la barre de titre et une forme de redimensionnement sur les bordures et les coins (terminaux avec `OSC 22`).
 

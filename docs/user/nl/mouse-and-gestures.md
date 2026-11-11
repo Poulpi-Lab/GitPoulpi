@@ -394,6 +394,18 @@ De toetsen voor tekstvelden staan in [Sneltoetsen](keybindings.md).
 
 Zie [Afbeeldingen](image-view.md) voor de muis in de afbeeldingsweergave.
 
+## Dialogen verplaatsen en schalen
+
+Het dialoog Geschiedenis van ongedaan maken / Reflog / Verloren werk kan worden verplaatst en geschaald:
+
+- **Sleep de titelbalk** om het te verplaatsen (het sluitkruis houdt zijn klik).
+- **Sleep de linker-, rechter- of onderrand**, of een onderhoek (het `◢`-handvat), om het te schalen. Het dialoog blijft op het scherm en wordt nooit kleiner dan 60 x 16.
+- De sleepbeweging gaat door als de aanwijzer het dialoog verlaat, en loslaten erbuiten sluit het nooit.
+- **Sleep de scheidingen** tussen de lijst, de bestandslijst en de hunks; dubbelklik op een scheiding om hem te herstellen.
+- De toetsenbordtegenstukken zijn `Ctrl+N` en dan `m` (pijlen verplaatsen, `Shift`+pijlen schalen, `0` herstelt, `Enter` of `Esc` verlaat de modus) en `Alt`+pijlen voor de scheidingen; het palet heeft `Dialoog: Verplaatsen of schalen` en `Dialoog: Positie en grootte herstellen`.
+
+De aanwijzer toont een verplaatsvorm boven de titelbalk en een schaalvorm boven de randen en hoeken (terminals met `OSC 22`).
+
 ## Vorm van de muisaanwijzer
 
 Sommige terminals laten GitPoulpi de muisaanwijzer veranderen: een formaataanwijzer boven

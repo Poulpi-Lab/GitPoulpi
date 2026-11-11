@@ -60,7 +60,7 @@ De cellen "nee (niet geïmplementeerd)" voor OSC 22 komen voort uit het ontbreke
 - **Windows Terminal.** True color, muis, OSC 52 en goede emoji. GitPoulpi tekent daar de avatars als sixel-afbeeldingen (Windows Terminal 1.22 of nieuwer); de grafiek bestaat uit tekens. Kies een Nerd Font in *Settings > Profiles > Defaults > Appearance > Font face*. Houd `Shift` ingedrukt om tekst te selecteren terwijl de muis is vastgelegd. De aanwijzervorm verandert niet. Gebruik op een build ouder dan 1.25 (zonder kitty-toetsenbordprotocol) de `Alt`-varianten.
 - **Rio** werkt met een ondoorzichtige afbeeldingsachtergrond; minder getest.
 - **mintty** (Git Bash, MSYS2, Cygwin) tekent afbeeldingen via het iTerm2-protocol met een ondoorzichtige achtergrond; minder getest.
-- **Windows-console, ConEmu, cmd**: vermijden. Afbeeldingen worden slecht of helemaal niet getekend. Dubbelklikken op het exe-bestand opent GitPoulpi opnieuw in de terminal van je keuze (*Instellingen > Algemeen > Starter*).
+- **Windows-console, ConEmu, cmd**: vermijden. Afbeeldingen worden slecht of helemaal niet getekend. Dubbelklikken op het exe-bestand opent GitPoulpi opnieuw in de terminal van je keuze (*Instellingen > Starter*).
 
 ### Linux
 

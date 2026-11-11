@@ -227,6 +227,10 @@ fn resizing_the_settings_editor_grows_its_text_area() {
     let s = wait(&mut term, "the first rows of the text shown", |s| {
         s.contains("row00") && s.contains("row05") && count(s) > 5
     });
+    // A settled screen: a torn frame can show a part of the area.
+    let s = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let before = count(&s);
     let (gx, gy) = grip(&s).unwrap();
     let grow = 3u16;

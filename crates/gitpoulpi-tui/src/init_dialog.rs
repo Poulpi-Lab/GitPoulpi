@@ -283,7 +283,8 @@ impl InitDialog {
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
         self.field_parts();
         self.edit.begin_frame();
-        self.close.panel(buf, rect, msg::init::TITLE.get());
+        self.close
+            .framed(buf, rect, msg::init::TITLE.get(), &WIN, true);
         let mut hits = Vec::new();
         let inner = Rect::new(
             rect.x + 2,
@@ -506,8 +507,13 @@ impl dialog_kit::Dismiss for InitDialog {
 
 /// The Init dialog's size in a frame.
 pub(crate) fn init_rect(frame: Rect) -> Rect {
-    dialog_kit::centered(frame, frame.width.saturating_sub(4).min(90), 14)
+    WIN.place(
+        frame,
+        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(90), 14),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("init");
 
 /// Why `name` cannot be a single new folder's name, if it cannot.
 pub(crate) fn folder_name_error(name: &str) -> Option<String> {

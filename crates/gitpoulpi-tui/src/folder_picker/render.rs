@@ -13,7 +13,7 @@ impl FolderPicker {
     /// the hit rects.
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
         let title = self.title.clone();
-        self.close.panel(buf, rect, &title);
+        self.close.framed(buf, rect, &title, &WIN, true);
         let mut hits: Vec<(Rect, PickerHit)> = Vec::new();
         let inner = Rect::new(
             rect.x + 1,

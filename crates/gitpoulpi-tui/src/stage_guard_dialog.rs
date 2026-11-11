@@ -33,6 +33,8 @@ use ratatui::Frame;
 
 use crate::daemon_link::{Action, DaemonLink};
 use crate::dialog_kit;
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("stage_guard");
 use crate::scrollbar::{self, BarDrag, Track};
 use crate::th;
 use crate::ui_kit::display_width;
@@ -353,10 +355,10 @@ pub(crate) fn render(frame: &mut Frame) {
     let fixed = 2 + 1 + 2 + 2 + 1 + 2;
     let want_pane = (open.lines.len() as u16 + 2).max(5);
     let height = (fixed + want_pane).min(area.height.saturating_sub(2));
-    let outer = dialog_kit::centered(area, width, height);
+    let outer = WIN.place(area, dialog_kit::centered(area, width, height));
     open.frame = outer;
     let buf = frame.buffer_mut();
-    open.close.panel(buf, outer, msg::TITLE.get());
+    open.close.framed(buf, outer, msg::TITLE.get(), &WIN, true);
     let inner = Rect::new(
         outer.x + 2,
         outer.y + 1,

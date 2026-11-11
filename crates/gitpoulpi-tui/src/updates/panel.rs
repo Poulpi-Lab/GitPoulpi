@@ -648,6 +648,9 @@ fn button_rows(labels: &[String], width: u16) -> Vec<std::ops::Range<usize>> {
     rows
 }
 
+/// The panel moves (its size follows its text).
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("updates");
+
 pub(crate) fn render(frame: &mut Frame) {
     if !is_open() {
         return;
@@ -667,7 +670,7 @@ pub(crate) fn render(frame: &mut Frame) {
     // Border, blank, body, blank, buttons, notice, hint, border.
     let chrome = 6 + button_lines.len() as u16;
     let want_h = (rows.len() as u16 + chrome).clamp(chrome + 3, area.height.saturating_sub(2));
-    let rect = dialog_kit::centered(area, want_w, want_h);
+    let rect = WIN.place(area, dialog_kit::centered(area, want_w, want_h));
     let buf = frame.buffer_mut();
     dialog_kit::panel(buf, rect, msg::PANEL_TITLE.get());
 
@@ -675,6 +678,7 @@ pub(crate) fn render(frame: &mut Frame) {
     let over = |r: Rect| pointer.is_some_and(|(x, y)| r.contains((x, y).into()));
     let close_spot = Rect::new(rect.right().saturating_sub(5), rect.y, 3, 1);
     let close = crate::chrome::close_cross::paint(buf, rect, over(close_spot)).unwrap_or_default();
+    WIN.decorate(buf, rect, Some(close), true);
 
     let x0 = rect.x + 2;
     let body = Rect::new(

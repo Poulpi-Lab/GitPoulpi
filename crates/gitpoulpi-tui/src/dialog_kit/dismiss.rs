@@ -49,6 +49,20 @@ impl CloseHit {
         }
     }
 
+    /// [`CloseHit::panel`] for a dialog that moves (and may resize): the
+    /// frame's grips, banner and gesture registration are added.
+    pub(crate) fn framed(
+        &mut self,
+        buf: &mut Buffer,
+        rect: Rect,
+        title: &str,
+        win: &super::Win,
+        enabled: bool,
+    ) {
+        self.panel(buf, rect, title);
+        win.decorate(buf, rect, self.rect, enabled);
+    }
+
     /// The cross as last painted.
     #[allow(dead_code)] // tests and the confirmations of C3 / X1
     pub(crate) fn rect(&self) -> Option<Rect> {
@@ -139,6 +153,10 @@ pub(crate) enum ConfirmEvent<C> {
     /// answer the Cancel choice).
     Chose(C),
 }
+
+/// Every confirmation moves (never resizes: its size follows its text) and
+/// they share one place.
+const CONFIRM_WIN: super::Win = super::Win::movable("confirm");
 
 /// A modal confirmation: `[(label, choice)]` buttons, Left / Right / Tab
 /// move, Enter presses, Esc / the cross / a click outside is Cancel.
@@ -276,12 +294,13 @@ impl<C: Copy + PartialEq> Confirm<C> {
             crate::ui_kit::wrap_words(&self.body, inner_w)
         };
         let want_h = lines.len() as u16 + 4;
-        let panel_rect = centered(bounds, want_w, want_h);
+        let panel_rect = CONFIRM_WIN.place(bounds, centered(bounds, want_w, want_h));
         self.panel = panel_rect;
         if panel_rect.width < 8 || panel_rect.height < 5 {
             return Vec::new();
         }
-        self.close.panel(buf, panel_rect, &self.title);
+        self.close
+            .framed(buf, panel_rect, &self.title, &CONFIRM_WIN, true);
         let text = Style::default().fg(th().ui.text).bg(th().ui.panel);
         let room = (panel_rect.height - 4) as usize;
         for (i, line) in lines.iter().take(room).enumerate() {

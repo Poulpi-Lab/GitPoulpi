@@ -217,6 +217,9 @@ fn lines(jobs: &[JobInfo]) -> Vec<Line> {
     out
 }
 
+/// The panel: movable and resizable.
+const WIN: dialog_kit::Win = dialog_kit::Win::resizable("jobs", 50, 11);
+
 pub(crate) fn render(frame: &mut Frame) {
     if !is_open() {
         return;
@@ -230,7 +233,7 @@ pub(crate) fn render(frame: &mut Frame) {
     let rows = lines(&jobs);
     let want_w = area.width.saturating_sub(4).min(110);
     let want_h = (rows.len() as u16 + 9).clamp(11, area.height.saturating_sub(2).min(30));
-    let rect = dialog_kit::centered(area, want_w, want_h);
+    let rect = WIN.place(area, dialog_kit::centered(area, want_w, want_h));
     let buf = frame.buffer_mut();
     dialog_kit::panel(buf, rect, m::TITLE.get());
 
@@ -240,6 +243,7 @@ pub(crate) fn render(frame: &mut Frame) {
 
     let close_spot = Rect::new(rect.right().saturating_sub(5), rect.y, 3, 1);
     let close = crate::chrome::close_cross::paint(buf, rect, over(close_spot)).unwrap_or_default();
+    WIN.decorate(buf, rect, Some(close), true);
 
     let (x0, inner_w) = (rect.x + 2, rect.width.saturating_sub(4));
     let mut hits: Vec<(Rect, PanelHit)> = Vec::new();

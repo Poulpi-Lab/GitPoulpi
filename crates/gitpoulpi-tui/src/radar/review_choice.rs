@@ -83,6 +83,9 @@ pub(crate) struct ReviewChoice {
     close: dialog_kit::CloseHit,
 }
 
+/// The choice moves (its size follows its options).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("review_choice");
+
 impl ReviewChoice {
     /// `cloned`: a known clone exists (offers `l`, else `c`).
     pub(crate) fn new(caption: String, project: String, profile: String, cloned: bool) -> Self {
@@ -241,10 +244,11 @@ impl ReviewChoice {
             self.hits.clear();
             return;
         }
-        let outer = dialog_kit::centered(body, width, height);
+        let outer = WIN.place(body, crate::dialog_kit::centered(body, width, height));
         self.frame = outer;
         self.hits.clear();
-        self.close.panel(buf, outer, msg::CHOICE_TITLE.get());
+        self.close
+            .framed(buf, outer, msg::CHOICE_TITLE.get(), &WIN, true);
         let inner_w = outer.width.saturating_sub(4);
         let text = Style::default().fg(th().ui.text).bg(th().ui.panel);
         let muted = Style::default().fg(th().ui.muted).bg(th().ui.panel);

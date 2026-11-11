@@ -671,7 +671,7 @@ impl WorkspaceDialog {
         } else {
             m::DIALOG_TITLE_NEW.get()
         };
-        self.close.panel(buf, rect, title);
+        self.close.framed(buf, rect, title, &WIN, true);
         let mut hits: Vec<(Rect, Hit)> = Vec::new();
         let inner = Rect::new(
             rect.x + 2,
@@ -997,8 +997,13 @@ impl dialog_kit::Dismiss for WorkspaceDialog {
 
 /// The form's size in a frame.
 pub(crate) fn rect(frame: Rect) -> Rect {
-    dialog_kit::centered(frame, frame.width.saturating_sub(4).min(86), 22)
+    WIN.place(
+        frame,
+        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(86), 22),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("workspace");
 
 #[cfg(test)]
 mod tests {

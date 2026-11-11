@@ -232,7 +232,8 @@ impl SparseDialog {
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
         self.field_parts();
         self.edit.begin_frame();
-        self.close.panel(buf, rect, msg::sparse::TITLE.get());
+        self.close
+            .framed(buf, rect, msg::sparse::TITLE.get(), &WIN, true);
         let mut hits = Vec::new();
         let inner = Rect::new(
             rect.x + 2,
@@ -397,8 +398,13 @@ impl dialog_kit::Dismiss for SparseDialog {
 }
 
 pub(crate) fn sparse_rect(frame: Rect) -> Rect {
-    dialog_kit::centered(frame, frame.width.saturating_sub(4).min(100), 11)
+    WIN.place(
+        frame,
+        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(100), 11),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("sparse");
 
 #[cfg(test)]
 mod tests {

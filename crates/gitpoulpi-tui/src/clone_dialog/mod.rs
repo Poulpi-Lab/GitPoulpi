@@ -1367,12 +1367,20 @@ impl CloneDialog {
 /// The Clone dialog's size in a frame: taller when hosted sources add a
 /// repository list.
 pub(crate) fn clone_rect(frame: Rect) -> Rect {
-    dialog_kit::centered(frame, frame.width.saturating_sub(4).min(110), 22)
+    WIN.place(
+        frame,
+        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(110), 22),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("clone");
 
 /// [`clone_rect`] for a dialog that lists a hosted account's repositories.
 pub(crate) fn clone_rect_hosted(frame: Rect) -> Rect {
-    dialog_kit::centered(frame, frame.width.saturating_sub(4).min(110), 29)
+    WIN.place(
+        frame,
+        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(110), 29),
+    )
 }
 
 impl CloneDialog {

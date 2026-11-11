@@ -8,6 +8,8 @@ use ratatui::style::{Modifier, Style};
 use super::body::{self, Tone};
 use super::{Dialog, Painted};
 use crate::dialog_kit;
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("trust");
 use crate::scrollbar::{self, Track};
 use crate::th;
 
@@ -34,10 +36,10 @@ pub(super) fn paint(d: &mut Dialog, buf: &mut Buffer, area: Rect) {
     let room = area.height.saturating_sub(2).saturating_sub(fixed);
     let body_rows = (lines.len() as u16).min(room.max(MIN_BODY));
     let height = (fixed + body_rows).min(area.height.saturating_sub(2));
-    let outer = dialog_kit::centered(area, width, height);
+    let outer = WIN.place(area, dialog_kit::centered(area, width, height));
     let body_rows = body_rows.min(outer.height.saturating_sub(fixed));
 
-    d.close.panel(buf, outer, msg::TITLE.get());
+    d.close.framed(buf, outer, msg::TITLE.get(), &WIN, true);
     let plain = Style::default().fg(th().ui.text).bg(th().ui.panel);
     let muted = Style::default().fg(th().ui.muted).bg(th().ui.panel);
     let heading = Style::default()

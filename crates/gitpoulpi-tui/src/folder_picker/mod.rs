@@ -987,12 +987,18 @@ impl FolderPicker {
 
 /// The picker's size in a frame: generous, capped, centered.
 pub(crate) fn picker_rect(frame: Rect) -> Rect {
-    dialog_kit::centered(
+    WIN.place(
         frame,
-        frame.width.saturating_sub(4).min(120),
-        frame.height.saturating_sub(2).min(32),
+        dialog_kit::centered(
+            frame,
+            frame.width.saturating_sub(4).min(120),
+            frame.height.saturating_sub(2).min(32),
+        ),
     )
 }
+
+/// The picker moves and resizes.
+pub(crate) const WIN: dialog_kit::Win = dialog_kit::Win::resizable("folder_picker", 44, 12);
 
 #[cfg(test)]
 mod tests;

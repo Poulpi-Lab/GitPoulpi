@@ -379,6 +379,7 @@ pub(crate) fn top_id() -> Option<&'static str> {
 }
 
 /// The arrange mode is on for some dialog.
+#[cfg(test)]
 pub(crate) fn is_arranging() -> bool {
     with_store(|s| s.arrange.is_some())
 }

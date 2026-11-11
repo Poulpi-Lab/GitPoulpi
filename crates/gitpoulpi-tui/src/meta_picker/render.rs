@@ -13,6 +13,8 @@ use crate::dialog_kit::{self, ButtonState};
 use crate::keymap::Action as Bind;
 use crate::th;
 
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("meta_picker");
+
 impl MetaPicker {
     /// Replaces the line under the list (an error, or nothing).
     pub(crate) fn say(&mut self, text: String) {
@@ -26,7 +28,10 @@ impl MetaPicker {
         } else {
             (66, 22)
         };
-        dialog_kit::centered(area, w.min(area.width.saturating_sub(2)), h)
+        WIN.place(
+            area,
+            dialog_kit::centered(area, w.min(area.width.saturating_sub(2)), h),
+        )
     }
 
     /// Paints the popup centered in `area`. `sending` is when the edit went
@@ -36,7 +41,8 @@ impl MetaPicker {
         self.edit.begin_frame();
         let rect = self.rect_in(area);
         self.frame = rect;
-        self.close.panel(buf, rect, self.field.title());
+        self.close
+            .framed(buf, rect, self.field.title(), &WIN, true);
         let mut hits: Vec<(Rect, Hit)> = Vec::new();
         let inner = Rect::new(
             rect.x + 2,

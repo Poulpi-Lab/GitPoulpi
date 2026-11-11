@@ -40,6 +40,13 @@ impl DiscardGuard {
         self.close.panel(buf, rect, title);
     }
 
+    /// [`DiscardGuard::panel`] for a form that moves.
+    pub(crate) fn framed(&mut self, buf: &mut Buffer, rect: Rect, title: &str, win: &super::Win) {
+        self.frame = rect;
+        let enabled = self.confirm.is_none();
+        self.close.framed(buf, rect, title, win, enabled);
+    }
+
     /// Paints the confirmation over the form when it is open (call last).
     pub(crate) fn render(&mut self, buf: &mut Buffer) {
         let area = buf.area;

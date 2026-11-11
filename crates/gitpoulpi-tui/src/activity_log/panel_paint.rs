@@ -124,6 +124,9 @@ fn activity_lines(entries: &[Entry], expanded: &[u64], width: usize) -> Vec<Line
     out
 }
 
+/// The window: movable and resizable.
+const WIN: dialog_kit::Win = dialog_kit::Win::resizable("activity_log", 60, 14);
+
 /// Paints the window when open.
 pub(crate) fn render(frame: &mut Frame) {
     if !is_open() {
@@ -135,7 +138,7 @@ pub(crate) fn render(frame: &mut Frame) {
     }
     let want_w = area.width.saturating_sub(4).min(120);
     let want_h = area.height.saturating_sub(2).min(40);
-    let rect = dialog_kit::centered(area, want_w, want_h);
+    let rect = WIN.place(area, dialog_kit::centered(area, want_w, want_h));
     let buf = frame.buffer_mut();
     dialog_kit::panel(buf, rect, msg::TITLE.get());
 
@@ -152,6 +155,7 @@ pub(crate) fn render(frame: &mut Frame) {
 
     let close_spot = Rect::new(rect.right().saturating_sub(5), rect.y, 3, 1);
     let close = crate::chrome::close_cross::paint(buf, rect, over(close_spot)).unwrap_or_default();
+    WIN.decorate(buf, rect, Some(close), !level_open);
 
     let mut hits: Vec<(Rect, Hit)> = Vec::new();
     let (x0, inner_w) = (rect.x + 2, rect.width.saturating_sub(4));

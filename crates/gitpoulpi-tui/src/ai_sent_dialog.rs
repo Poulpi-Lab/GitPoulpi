@@ -33,6 +33,9 @@ use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 use ratatui::Frame;
 
+/// The "what is sent" window moves (its size follows its text).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("ai_sent");
+
 use crate::dialog_kit::{self, ButtonState, CheckState};
 use crate::sent_pane::{wrap_width, SentPane, MAX_WIDTH};
 use crate::th;
@@ -437,11 +440,14 @@ pub(crate) fn render(frame: &mut Frame) {
         budget.saturating_sub(fixed(shown_summary)) as u16,
     );
     let height = (fixed(shown_summary) as u16 + pane_rows).min(room.height);
-    let outer = Rect::new(
-        room.x + (room.width - width) / 2,
-        room.y + (room.height - height) / 2,
-        width,
-        height,
+    let outer = WIN.place(
+        room,
+        Rect::new(
+            room.x + (room.width - width) / 2,
+            room.y + (room.height - height) / 2,
+            width,
+            height,
+        ),
     );
     open.frame = outer;
     open.hits.clear();
@@ -451,7 +457,7 @@ pub(crate) fn render(frame: &mut Frame) {
         crate::theme::AI_SPARK,
         msg::title(open.via.as_str())
     );
-    open.close.panel(buf, outer, &title);
+    open.close.framed(buf, outer, &title, &WIN, true);
     let inner = Rect::new(
         outer.x + 1,
         outer.y + 1,

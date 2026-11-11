@@ -25,7 +25,8 @@ impl CloneDialog {
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
         self.edit.sync(self.field_focus());
         self.edit.begin_frame();
-        self.close.panel(buf, rect, msg::clone::TITLE.get());
+        self.close
+            .framed(buf, rect, msg::clone::TITLE.get(), &super::WIN, true);
         let mut hits: Vec<(Rect, CloneHit)> = Vec::new();
         let inner = Rect::new(
             rect.x + 1,

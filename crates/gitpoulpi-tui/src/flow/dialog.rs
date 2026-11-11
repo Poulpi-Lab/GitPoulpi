@@ -1248,7 +1248,7 @@ impl FlowDialog {
         self.field_parts();
         self.edit.begin_frame();
         let title = self.title();
-        self.close.panel(buf, rect, &title);
+        self.close.framed(buf, rect, &title, &WIN, true);
         let mut hits: Vec<(Rect, Focus)> = Vec::new();
         let inner = Rect::new(
             rect.x + 2,
@@ -1841,5 +1841,10 @@ fn step_line(index: usize, step: &FlowStep) -> (String, Style) {
 
 /// The dialog's rect: wide enough for a branch name and a step list.
 pub(crate) fn flow_rect(frame: Rect) -> Rect {
-    dialog_kit::centered(frame, frame.width.saturating_sub(4).min(96), 26)
+    WIN.place(
+        frame,
+        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(96), 26),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("flow");

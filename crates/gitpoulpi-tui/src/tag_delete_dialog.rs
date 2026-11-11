@@ -29,6 +29,8 @@ use ratatui::Frame;
 
 use crate::daemon_link::{Action, DaemonLink};
 use crate::dialog_kit;
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("tag_delete");
 use crate::modes::{ConfirmAction, InputMode, PendingDestructive};
 use crate::th;
 use gitpoulpi_i18n::msg::tag_where as msg;
@@ -338,9 +340,10 @@ pub(crate) fn render(frame: &mut Frame) {
     );
     let height = (open.options.len() as u16 + detail_lines.len() as u16 + 6)
         .min(area.height.saturating_sub(2));
-    let outer = dialog_kit::centered(area, width, height);
+    let outer = WIN.place(area, dialog_kit::centered(area, width, height));
     let buf = frame.buffer_mut();
-    open.close.panel(buf, outer, msg::DLG_TITLE.get());
+    open.close
+        .framed(buf, outer, msg::DLG_TITLE.get(), &WIN, true);
     let text = Style::default().fg(th().ui.text).bg(th().ui.panel);
     dialog_kit::put(
         buf,

@@ -695,7 +695,7 @@ impl IssueDialog {
             }
             _ => msg::issue_form::TITLE.get(),
         };
-        self.guard.panel(buf, rect, title);
+        self.guard.framed(buf, rect, title, &WIN);
         let mut hits: Vec<(Rect, IssueHit)> = Vec::new();
         let inner = Rect::new(
             rect.x + 2,
@@ -979,8 +979,13 @@ impl IssueDialog {
 
 /// The rectangle the form draws in, centered like every other repo dialog.
 pub(crate) fn issue_rect(area: Rect) -> Rect {
-    dialog_kit::centered(area, area.width.saturating_sub(4).min(80), 22)
+    WIN.place(
+        area,
+        dialog_kit::centered(area, area.width.saturating_sub(4).min(80), 22),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("issue");
 
 impl dialog_kit::Dismiss for IssueDialog {
     fn is_dirty(&self) -> bool {

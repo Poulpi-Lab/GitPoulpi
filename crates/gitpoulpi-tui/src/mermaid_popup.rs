@@ -517,6 +517,8 @@ fn put_script_line(buf: &mut Buffer, x: u16, y: u16, width: u16, line: &str) {
     );
 }
 
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("mermaid");
+
 /// Paints the popup, last, over the panes.
 pub(crate) fn render(frame: &mut Frame) {
     let Ok(mut slot) = POPUP.lock() else {
@@ -529,13 +531,16 @@ pub(crate) fn render(frame: &mut Frame) {
     if area.width < 30 || area.height < 12 {
         return;
     }
-    let outer = dialog_kit::centered(
+    let outer = WIN.place(
         area,
-        100.min(area.width.saturating_sub(2)),
-        32.min(area.height.saturating_sub(2)),
+        dialog_kit::centered(
+            area,
+            100.min(area.width.saturating_sub(2)),
+            32.min(area.height.saturating_sub(2)),
+        ),
     );
     let buf = frame.buffer_mut();
-    open.cross.panel(buf, outer, msg::TITLE.get());
+    open.cross.framed(buf, outer, msg::TITLE.get(), &WIN, true);
     open.rects = Rects {
         outer,
         ..Rects::default()

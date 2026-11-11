@@ -21,6 +21,9 @@ use ratatui::Frame;
 use crate::dialog_kit::{self, ButtonState};
 use crate::th;
 
+/// The popup moves (its size follows its rows).
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("conflict_popup");
+
 /// What the popup asks the window to do (it closes itself first).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum PopupAction {
@@ -199,15 +202,19 @@ pub(crate) fn render(frame: &mut Frame) {
     if width < 36 || area.height < height + 2 {
         return;
     }
-    let outer = Rect::new(
-        area.x + (area.width - width) / 2,
-        area.y + (area.height - height) / 3,
-        width,
-        height,
+    let outer = WIN.place(
+        area,
+        Rect::new(
+            area.x + (area.width - width) / 2,
+            area.y + (area.height - height) / 3,
+            width,
+            height,
+        ),
     );
     let panel_style = Style::default().fg(th().ui.text).bg(th().ui.panel);
     let buf = frame.buffer_mut();
-    open.close.panel(buf, outer, msg::POPUP_TITLE.get());
+    open.close
+        .framed(buf, outer, msg::POPUP_TITLE.get(), &WIN, true);
     dialog_kit::put(
         buf,
         outer.x + 2,

@@ -331,8 +331,13 @@ impl WorktreeDialog {
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
         self.field_parts();
         self.edit.begin_frame();
-        self.close
-            .panel(buf, rect, &msg::worktree::title(&self.seed.label));
+        self.close.framed(
+            buf,
+            rect,
+            &msg::worktree::title(&self.seed.label),
+            &WIN,
+            true,
+        );
         let mut hits = Vec::new();
         let inner = Rect::new(
             rect.x + 2,
@@ -546,8 +551,13 @@ impl dialog_kit::Dismiss for WorktreeDialog {
 }
 
 pub(crate) fn worktree_rect(frame: Rect) -> Rect {
-    dialog_kit::centered(frame, frame.width.saturating_sub(4).min(90), 12)
+    WIN.place(
+        frame,
+        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(90), 12),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("worktree");
 
 #[cfg(test)]
 mod tests {

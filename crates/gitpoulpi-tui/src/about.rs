@@ -798,6 +798,9 @@ fn look_toward(pointer: Option<(u16, u16)>, logo: Rect) -> logo_colors::Look {
     (step(dx, ax, ay), step(dy, ay, ax))
 }
 
+/// The window moves (its size follows its text).
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("about");
+
 /// Paints the window over `frame`. Call it with the other popups.
 pub(crate) fn render(frame: &mut Frame) {
     if !is_open() {
@@ -827,7 +830,7 @@ pub(crate) fn render(frame: &mut Frame) {
         text.len() as u16 + u16::from(notice.is_some())
     };
     let inner_h = rows.max(if with_logo { LOGO_ROWS } else { 0 }) + 2;
-    let rect = dialog_kit::centered(area, inner_w + 4, inner_h + 2);
+    let rect = WIN.place(area, dialog_kit::centered(area, inner_w + 4, inner_h + 2));
     let buf = frame.buffer_mut();
     dialog_kit::panel(buf, rect, msg::TITLE.get());
     // The window's close control, where every window has it.
@@ -840,6 +843,7 @@ pub(crate) fn render(frame: &mut Frame) {
     });
     let close_button = crate::chrome::close_cross::paint(buf, rect, hovered).unwrap_or_default();
     with(|s| s.close_button = close_button);
+    WIN.decorate(buf, rect, Some(close_button), with(|s| s.picker.is_none()));
     let (x0, y0) = (rect.x + 2, rect.y + 1);
     if with_logo {
         let area = Rect::new(x0, y0 + 1, LOGO_COLS, LOGO_ROWS);

@@ -51,6 +51,7 @@ impl IssueFlowDialog {
         self.field_parts();
         self.edit.begin_frame();
         dialog_kit::panel(buf, rect, &self.title_text());
+        WIN.decorate(buf, rect, None, true);
         let mut hits: Vec<(Rect, Focus)> = Vec::new();
         let inner = Rect::new(
             rect.x + 2,
@@ -335,5 +336,10 @@ impl IssueFlowDialog {
 
 /// The rectangle the dialog draws in.
 pub(crate) fn issue_flow_rect(frame: Rect) -> Rect {
-    dialog_kit::centered(frame, frame.width.saturating_sub(4).min(90), 14)
+    WIN.place(
+        frame,
+        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(90), 14),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("issue_flow");

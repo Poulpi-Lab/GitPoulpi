@@ -8,7 +8,8 @@ impl PullRequestDialog {
         });
         self.edit.begin_frame();
         self.sync_meta_scope();
-        self.guard.panel(buf, rect, msg::pull_request::TITLE.get());
+        self.guard
+            .framed(buf, rect, msg::pull_request::TITLE.get(), &WIN);
         let mut hits: Vec<(Rect, PrHit)> = Vec::new();
         let inner = Rect::new(
             rect.x + 2,
@@ -413,8 +414,13 @@ impl PullRequestDialog {
 /// The rectangle the form dialog draws in, centered like every other
 /// repo dialog.
 pub(crate) fn pull_request_rect(area: Rect) -> Rect {
-    dialog_kit::centered(area, area.width.saturating_sub(4).min(86), 30)
+    WIN.place(
+        area,
+        dialog_kit::centered(area, area.width.saturating_sub(4).min(86), 30),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("pull_request");
 
 /// What a running `create_pull_request` call reports.
 pub(crate) enum PullRequestEvent {

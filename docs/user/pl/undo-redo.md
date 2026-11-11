@@ -52,10 +52,12 @@ Akcje, które cofnięto, leżą **nad** najnowszą akcją, pod linią podziału
 („cofnięte - Ponów je przywróci”), przyciemnione, a ta, którą Ponów przywróci
 jako następną, jest najbliżej linii. Zaznaczenie zaczyna się na najnowszej
 akcji, nie na nich. Strzałki przesuwają zaznaczenie (nagłówki dni i linia
-podziału są pomijane), `Tab` przełącza trzy widoki, `Esc` zamyka. Dla
+podziału są pomijane), `1` / `2` / `3` (albo `Ctrl+Tab` / `Ctrl+Shift+Tab`)
+przełączają trzy widoki, `Esc` zamyka. `Enter` nigdy nie uruchamia akcji: każdy
+przycisk ma własną literę, widoczną w wierszu podpowiedzi pod przyciskami. Dla
 zaznaczonego wiersza:
 
-- **Cofnij do tego miejsca** (`u`): cofa tę akcję i każdą nowszą, od
+- **Cofnij do tego miejsca** (`c`): cofa tę akcję i każdą nowszą, od
   najnowszej, po jednym potwierdzeniu, które je wszystkie wymienia. Krok, który
   demon uzna za ryzykowny, pyta jeszcze raz, zanim się wykona.
 - **Przywróć tylko tę** (`r`): przywraca to, co usunęła ta jedna akcja, i
@@ -69,7 +71,7 @@ zaznaczonego wiersza:
   commit dostają gałąź `restore/<branch>-<sha>` na dawnym końcu - twoja bieżąca
   gałąź i pliki nigdy się nie przesuwają. Potwierdzenie pokazuje dokładnie, co
   się stanie, a przywrócenie jest nową akcją: `Ctrl+Z` je cofa.
-- **Ponów do tego miejsca** (`y`) na cofniętym wierszu.
+- **Ponów do tego miejsca** (`p`) na cofniętym wierszu.
 - **Przywróć main tam, gdzie zostawiła ją akcja Commit** (`o`, albo
   `Alt+Shift+Z` / `Edycja: Przywróć gałąź tam, gdzie zostawiła ją zablokowana
   akcja` spoza panelu): gdy inny program przesunął gałąź i zablokował Cofnij,
@@ -91,13 +93,15 @@ obok listy.
 Reflog jest czytany po 200 pozycji naraz. Dłuższy doczytuje się sam: przesunięcie
 kursora (albo przewijanie) blisko końca listy pobiera następną stronę, a ostatni
 wiersz brzmi **... Wczytaj więcej**, dopóki jest co wczytać. **Wczytaj więcej**
-(`m`, albo `Reflog: Wczytaj więcej` w palecie) pobiera ją od razu i pisze na pasku
+(`w`, albo `Reflog: Wczytaj więcej` w palecie) pobiera ją od razu i pisze na pasku
 stanu „wczytane pozycje: N”. Repozytoria w formacie reftable gita są czytane tak
 samo jak inne.
 
 ![Reflog gałęzi main: każda pozycja, na której była, od najnowszej, z opisem zaznaczonej po prawej](../images/reflog.png)
 
-Są też **Pokaż w Log** (`s`), **Utwórz gałąź tutaj** (`b`) i **Przywróć
+Są też **Pokaż w Log** (`l`), **Utwórz gałąź tutaj** (`u`), **Utwórz tag tutaj**
+(`t`), **Zastosuj w drzewie roboczym** (`z`), **Zapisz jako stash** (`s`) (trzy
+ostatnie działają tak jak w Utraconej pracy niżej) oraz **Przywróć
 `<branch>` do tej pozycji** (`r`). Przywrócenie można cofnąć. Gdy gałąź jest
 bieżąca, a masz lokalne zmiany, których nie może ominąć bez nadpisania, lista
 rozwijana pyta, co z nimi zrobić: zachować moje zmiany, soft, mixed albo hard.
@@ -114,9 +118,53 @@ commitów uzupełnia ją, gdy kręci się wskaźnik; nigdy nie blokuje interfejs
 
 ![Utracona praca: dwa commity usuniętej gałęzi (znalezione przez reflog) i commity osierocone](../images/lost-work.png)
 
-**Utwórz gałąź tutaj** (`b`) odzyskuje commit pod wybraną nazwą, **Cherry-pick**
-(`c`) stosuje go na bieżącej gałęzi, a **Pokaż w Log** (`s`) działa dla tych,
-które nadal są osiągalne.
+**Utwórz gałąź tutaj** (`u`) odzyskuje commit pod wybraną nazwą, **Utwórz tag
+tutaj** (`t`) przypina go tagiem (domyślna nazwa `restored-<krótki id>`),
+**Cherry-pick** (`c`) stosuje go na bieżącej gałęzi. Utracony commit nie jest w
+Log, więc ten widok nie ma „Pokaż w Log” (widok Reflog zachowuje je dla commitów,
+które nadal są osiągalne).
+
+**Przywróć zmiany** oddaje to, co zmienił commit, bez commitowania:
+**Zastosuj w drzewie roboczym** (`z`) odtwarza zmiany commita w plikach, wszystko
+albo nic (indeks i HEAD zostają; merge commit jest odrzucany). Gdy nie da się
+tego zastosować czysto, nic nie jest ruszane, a okno proponuje **Zapisz jako
+stash** (`s`), który zamiast tego zachowuje te same zmiany jako nowy stash; ta
+akcja jest też zawsze dostępna osobno. Obie są zapisywane w historii: `Ctrl+Z`
+przywraca pliki albo znów porzuca stash. Te same akcje to `gitpoulpi apply-commit
+<rev>` i `gitpoulpi stash from-commit <rev> [-m M]`, a widok Reflog też je ma.
+
+### Panele, hunki i okno
+
+Reflog i Utracona praca pokazują listę commitów po lewej, a po prawej nagłówek
+wybranego commita, **każdy zmieniony przez niego plik** i hunki wybranego pliku
+(tylko hunki, zawijane do szerokości panelu). Lista plików jest taka jak w prawym
+panelu głównego okna: `Ścieżki` lub `Drzewo` (`v`, albo kliknij przełącznik),
+folder zwija się klawiszami `Enter`, `Left` lub `Right`, kliknięcie albo strzałki
+wybierają plik, a jego hunki pojawiają się niżej (demon jest pytany poza wątkiem
+interfejsu; kilka ostatnich plików jest pamiętanych). Lista commitów, lista
+plików i hunki mają każde pasek przewijania, który można nacisnąć i przeciągnąć.
+
+- `Tab` / `Shift+Tab` przechodzą między panelami (lista, pliki, hunki); strzałki,
+  `PageUp`, `PageDown`, `Home` i `End` działają na panelu, który ma klawiaturę
+  (jego ramka jest podświetlona). `Enter` na pliku przenosi do jego hunków.
+- **Separatory**: przeciągnij ten między listą a prawym panelem albo ten między
+  plikami a hunkami; dwukrotne kliknięcie separatora przywraca go. Klawiatura:
+  `Alt+Left` / `Alt+Right`, `Alt+Up` / `Alt+Down`, `Alt+0` przywraca oba. Paleta ma
+  `Reflog / Utracona praca: Przywróć rozmiary paneli`, `Następny panel` i
+  `Lista plików jako ścieżki lub drzewo`.
+- `Ctrl+N` pokazuje swoje plakietki nad trzema kartami widoków i trzema panelami,
+  tak jak w głównym oknie; klawisz plakietki przenosi tam.
+- **Przesuwanie i zmiana rozmiaru okna**: przeciągnij pasek tytułu, aby je
+  przesunąć, przeciągnij lewą, prawą i dolną krawędź albo dolny róg (uchwyt `◢`),
+  aby zmienić rozmiar (nigdy poniżej 60 x 16, zawsze na ekranie). Krzyżyk
+  zamknięcia zachowuje swoje kliknięcie, a puszczenie przycisku poza oknem nigdy
+  go nie zamyka. Odpowiednik z klawiatury to `Ctrl+N`, potem `m`: strzałki
+  przesuwają, `Shift`+strzałki zmieniają rozmiar, `0` przywraca, `Enter` lub `Esc`
+  kończą (mówi o tym ramka, gdy tryb jest włączony). Paleta ma `Okno: Przesuń lub
+  zmień rozmiar` i `Okno: Przywróć położenie i rozmiar`. To, czy miejsce jest
+  zapamiętywane, ustawia `ui.dialog_geometry` (*Ustawienia > Wygląd >
+  Zapamiętuj położenie i rozmiar okien dialogowych*): `session` (domyślnie),
+  `saved` (przywracane przy następnym uruchomieniu) lub `never`.
 
 ## Z palety poleceń
 
@@ -129,8 +177,8 @@ widoku widocznego na ekranie.
 | Widok | Wiersze palety |
 |---|---|
 | Historia cofania | `Historia cofania: Cofnij do tego miejsca...`, `Ponów do tego miejsca...`, `Przywróć tylko tę...`, `Przywróć gałąź tam, gdzie była...`, `Odśwież`, `Zamknij` |
-| Reflog | `Reflog: Pokaż w Log`, `Utwórz gałąź tutaj...`, `Przywróć do tej pozycji...`, `Wczytaj więcej`, `Odśwież` |
-| Utracona praca | `Utracona praca: Pokaż w Log`, `Utwórz gałąź tutaj...`, `Cherry-pick`, `Szukaj ponownie` |
+| Reflog | `Reflog: Pokaż w Log`, `Utwórz gałąź tutaj...`, `Utwórz tag tutaj...`, `Zastosuj zmiany w drzewie roboczym`, `Zapisz zmiany jako stash`, `Przywróć do tej pozycji...`, `Wczytaj więcej`, `Odśwież` |
+| Utracona praca | `Utracona praca: Utwórz gałąź tutaj...`, `Utwórz tag tutaj...`, `Cherry-pick`, `Zastosuj zmiany w drzewie roboczym`, `Zapisz zmiany jako stash`, `Szukaj ponownie` |
 
 Wiersze są wyszarzone (z podaniem powodu), dopóki ich widok nie jest otwarty;
 trzy wiersze otwierające, `Edycja: Historia cofania...`, `Edycja: Reflog...` i
@@ -149,8 +197,8 @@ potwierdzenie lub pole nazwy co przycisk.
 | Gałęzie i tagi | tworzenie, usuwanie, zmiana nazwy, ustawienie lub usunięcie upstreamu, utworzenie gałęzi śledzącej, utworzenie / usunięcie / opisanie tagu, fast-forward, checkout pull requesta jako gałęzi |
 | Przemieszczanie się | checkout gałęzi lub commita (także odłączony HEAD) |
 | Historia | merge (fast-forward lub commit scalający), rebase (zwykły i interaktywny, po zakończeniu), cherry-pick, revert, reset (soft, mixed i hard), lokalna część pulla |
-| Zmiany robocze | stage i unstage (plik, folder, hunk, linie, wszystko), odrzucenie (plik, folder, hunk, linie, checkout pliku), zastosowanie patcha, **usunięcie pliku z dysku**, **ignorowanie** (plik, rozszerzenie lub folder: wiersz w wybranym `.gitignore`), **traktowanie jako binarny lub tekstowy** (wiersz w `.gitattributes`) |
-| Stashe | push, apply, pop, drop |
+| Zmiany robocze | stage i unstage (plik, folder, hunk, linie, wszystko), odrzucenie (plik, folder, hunk, linie, checkout pliku), zastosowanie patcha lub zmian commita (`apply-commit`), **usunięcie pliku z dysku**, **ignorowanie** (plik, rozszerzenie lub folder: wiersz w wybranym `.gitignore`), **traktowanie jako binarny lub tekstowy** (wiersz w `.gitattributes`) |
+| Stashe | push, apply, pop, drop, zapisanie zmian commita jako stasha (`stash from-commit`) |
 | Zdalne repozytoria i konfiguracja | dodanie, usunięcie, zmiana nazwy, zmiana adresu URL lub push URL zdalnego repozytorium, Git LFS track i untrack |
 | Na serwerze | **usunięcie gałęzi lub tagu na zdalnym repozytorium** (z menu refa, palety, `branch delete-remote`, `tag delete-remote`, `tag delete --both` albo zakończenia workflow, które usuwa gałąź zdalną): zob. niżej |
 
@@ -414,7 +462,9 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   jedną z tych pozycji; bieżąca gałąź z niezatwierdzonymi zmianami wymaga
   `--mode`. To też trafia do dziennika.
 - `lost-commits` wypisuje commity, do których nie sięga żadna gałąź, tag,
-  zdalne repozytorium ani stash.
+  zdalne repozytorium ani stash. Aby odzyskać pracę jednego z nich bez
+  commitowania: `apply-commit <rev>` (do drzewa roboczego, wszystko albo nic)
+  lub `stash from-commit <rev>` (jako stash); oba są zapisywane w historii.
 - Gdy ruch w powłoce blokuje najnowszy wpis, odmowa zawiera pozycję reflogu,
   która trzyma to, czego wpis oczekuje (`reason.RefMoved.restore`), do
   przekazania w `reflog-restore`.

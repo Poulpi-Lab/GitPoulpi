@@ -66,7 +66,7 @@ Plik `.sha256` wychwytuje tylko uszkodzone pobranie. Dopiero podpis pokazuje, ż
 
 Każde wydanie zawiera też instalator dla każdego systemu. Oba podejmują te same decyzje
 (skróty, PATH, alias polecenia, taki jak `gp`), wywołując zainstalowane
-`gitpoulpi`, czyli ten sam kod, który stoi za Ustawienia > Ogólne > Uruchamianie z systemu, więc to, co
+`gitpoulpi`, czyli ten sam kod, który stoi za Ustawienia > Uruchamianie z systemu, więc to, co
 instalator konfiguruje, i to, co pokazują Ustawienia, zawsze się zgadza.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
@@ -130,7 +130,7 @@ Każdy z poniższych kanałów zapisuje obok programów ten sam znacznik `.gitpo
 
 Powyższe nazwy to te, do których publikuje proces wydawniczy (zob. [Wydawanie](../../developer/releasing.md)): kanał, który jeszcze nie działa, odpowiada „not found”, a archiwum wydania lub instalator zawsze działają.
 
-Obowiązuje własna obsługa PATH menedżera pakietów: Chocolatey, winget, Scoop i Homebrew same dodają programy do PATH, a żaden z nich nie tworzy aliasu `gp` (uruchom `gitpoulpi alias create gp` albo Ustawienia > Ogólne > Uruchamianie z systemu).
+Obowiązuje własna obsługa PATH menedżera pakietów: Chocolatey, winget, Scoop i Homebrew same dodają programy do PATH, a żaden z nich nie tworzy aliasu `gp` (uruchom `gitpoulpi alias create gp` albo Ustawienia > Uruchamianie z systemu).
 
 ### apt (Debian i Ubuntu)
 

@@ -116,7 +116,7 @@ GitPoulpi unika glifów VS16 (zob. [Czego używa GitPoulpi](#czego-używa-gitpou
   nieprzezroczystym tłem; mniej przetestowane.
 - **Konsola Windows, ConEmu, cmd**: unikaj. Obrazy są rysowane źle albo wcale.
   Podwójne kliknięcie pliku exe otwiera GitPoulpi ponownie w wybranym przez
-  ciebie terminalu (*Ustawienia > Ogólne > Uruchamianie z systemu*).
+  ciebie terminalu (*Ustawienia > Uruchamianie z systemu*).
 
 ### Linux
 

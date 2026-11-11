@@ -412,6 +412,18 @@ Klawisze pól tekstowych są w [Skrótach klawiszowych](keybindings.md).
 
 Mysz w widoku obrazu opisują [Obrazy](image-view.md).
 
+## Przesuwanie i zmiana rozmiaru okien dialogowych
+
+Okno Historia cofania / Reflog / Utracona praca można przesuwać i zmieniać jego rozmiar:
+
+- **Przeciągnij pasek tytułu**, aby je przesunąć (krzyżyk zamknięcia zachowuje swoje kliknięcie).
+- **Przeciągnij lewą, prawą lub dolną krawędź** albo dolny róg (uchwyt `◢`), aby zmienić rozmiar. Okno zostaje na ekranie i nigdy nie robi się mniejsze niż 60 x 16.
+- Przeciąganie trwa dalej, gdy wskaźnik opuści okno, a puszczenie przycisku poza oknem nigdy go nie zamyka.
+- **Przeciągnij separatory** między jego listą, listą plików i hunkami; dwukrotne kliknięcie przywraca separator.
+- Odpowiedniki z klawiatury to `Ctrl+N`, potem `m` (strzałki przesuwają, `Shift`+strzałki zmieniają rozmiar, `0` przywraca, `Enter` lub `Esc` kończą) oraz `Alt`+strzałki dla separatorów; paleta ma `Okno: Przesuń lub zmień rozmiar` i `Okno: Przywróć położenie i rozmiar`.
+
+Wskaźnik ma kształt przesuwania nad paskiem tytułu i kształt zmiany rozmiaru nad krawędziami i rogami (terminale z `OSC 22`).
+
 ## Kształt wskaźnika myszy
 
 Niektóre terminale pozwalają GitPoulpi zmienić wskaźnik myszy: wskaźnik zmiany rozmiaru nad

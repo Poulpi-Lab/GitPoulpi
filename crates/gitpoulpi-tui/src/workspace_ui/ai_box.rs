@@ -88,6 +88,8 @@ pub(super) struct AiBox {
     pub(super) focus: Part,
     hover: Option<Part>,
     hits: Vec<(Rect, Part)>,
+    /// The close cross on the frame.
+    close: dialog_kit::CloseHit,
 }
 
 fn mode_value(mode: RepoInstructionsMode) -> &'static str {
@@ -124,6 +126,7 @@ impl AiBox {
             drag: Default::default(),
             focus: Part::Text,
             hover: None,
+            close: dialog_kit::CloseHit::default(),
             hits: Vec::new(),
         };
         me.load("");
@@ -282,6 +285,14 @@ impl AiBox {
             return AiBoxOutcome::Stay;
         }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
+        if matches!(mouse.kind, MouseEventKind::Moved) {
+            self.close.set_hover(mouse.column, mouse.row);
+        }
+        if matches!(mouse.kind, MouseEventKind::Down(MouseButton::Left))
+            && self.close.hit(mouse.column, mouse.row)
+        {
+            return AiBoxOutcome::Cancel;
+        }
         if !matches!(mouse.kind, MouseEventKind::Down(_)) && self.edit.is_dragging() {
             self.edit
                 .dialog_mouse(Some(()), &self.text, mouse.kind, mouse.column, mouse.row);
@@ -325,8 +336,7 @@ impl AiBox {
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
         let rect = WIN.place(area, dialog_kit::centered(area, 80, 20));
         self.edit.begin_frame();
-        dialog_kit::panel(buf, rect, m::BOX_TITLE.get());
-        WIN.decorate(buf, rect, None, true);
+        self.close.framed(buf, rect, m::BOX_TITLE.get(), &WIN, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -433,5 +443,5 @@ impl AiBox {
     }
 }
 
-/// The dialog moves (its size follows its content).
-const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("workspace_ai");
+/// The dialog resizes: the text area takes the rows it gains.
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("workspace_ai", 50, 14);

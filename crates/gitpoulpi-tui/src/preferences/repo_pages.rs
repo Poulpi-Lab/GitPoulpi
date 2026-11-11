@@ -590,5 +590,7 @@ impl PreferencesState {
     }
 }
 
-/// The editor moves (its size follows the screen).
-const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("settings_repo_pages_editor");
+/// The editor resizes: its text area takes the whole rect, so it grows and
+/// shrinks with it.
+const WIN: crate::dialog_kit::Win =
+    crate::dialog_kit::Win::resizable("settings_repo_pages_editor", 40, 10);

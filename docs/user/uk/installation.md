@@ -66,7 +66,7 @@ gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoul
 
 До кожного випуску додано інсталятор для кожної ОС. Обидва роблять однакові вибори
 (ярлики, PATH, псевдонім команди на кшталт `gp`), викликаючи сам встановлений
-`gitpoulpi` - той самий код, що стоїть за Налаштування > Загальні > Лаунчер, тож те,
+`gitpoulpi` - той самий код, що стоїть за Налаштування > Лаунчер, тож те,
 що налаштував інсталятор, і те, що показують Налаштування, завжди збігаються.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
@@ -130,7 +130,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 
 Наведені назви - це ті, у які публікує процес випуску (див. [Випуск](../../developer/releasing.md)): канал, що ще не діє, відповідає «не знайдено», а архів випуску чи інсталятор працюють завжди.
 
-Діє власна обробка PATH менеджера пакунків: Chocolatey, winget, Scoop і Homebrew самі кладуть програми в PATH, і жоден із них не створює псевдонім `gp` (виконайте `gitpoulpi alias create gp` або Налаштування > Загальні > Лаунчер).
+Діє власна обробка PATH менеджера пакунків: Chocolatey, winget, Scoop і Homebrew самі кладуть програми в PATH, і жоден із них не створює псевдонім `gp` (виконайте `gitpoulpi alias create gp` або Налаштування > Лаунчер).
 
 ### apt (Debian і Ubuntu)
 

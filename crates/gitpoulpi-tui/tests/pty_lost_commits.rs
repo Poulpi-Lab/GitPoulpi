@@ -125,3 +125,99 @@ fn a_discard_says_the_key_that_undoes_it() {
     });
     rig.term.stop().unwrap();
 }
+
+/// A lost commit cannot be shown in the Log, so the view has no such
+/// button. It can be tagged (`t`), its changes applied to the working tree
+/// (`w`) and kept as a stash (`z`), each leaving the repository as the
+/// action says.
+#[test]
+fn a_lost_commit_is_tagged_applied_and_stashed() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit_file("a.txt", "one\n", "initial commit")
+        .unwrap()
+        .branch("doomed")
+        .unwrap()
+        .checkout("doomed")
+        .unwrap()
+        .commit_file("d.txt", "d\n", "doomed work")
+        .unwrap()
+        .checkout("main")
+        .unwrap()
+        .build();
+    let lost = git(repo.root(), &["rev-parse", "doomed"]);
+    git(repo.root(), &["branch", "-D", "doomed"]);
+
+    let mut rig = launch(&repo, "pty-lost-restore");
+    rig.term.send_keys("C-p").unwrap();
+    rig.term.send_text("recover lost").unwrap();
+    rig.term
+        .wait_for("the palette row", STEP, |s| s.contains("Recover Lost"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+    rig.term.send_keys("Enter").unwrap();
+    rig.term
+        .wait_for("the lost commit and its buttons", STEP, |s| {
+            s.contains("doomed work")
+                && s.contains("Create tag here")
+                && s.contains("Apply to working tree")
+                && s.contains("Save as")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+    assert!(
+        !rig.term.text().contains("Show in Log"),
+        "a lost commit is not in the Log:\n{}",
+        rig.term.text()
+    );
+
+    // Tag: the default name is offered.
+    let name = format!("restored-{}", &lost[..7]);
+    rig.term.send_keys("t").unwrap();
+    rig.term
+        .wait_for("the tag name prompt", STEP, |s| {
+            s.contains("Name of the new tag") && s.contains(&name)
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+    rig.term.send_keys("Enter").unwrap();
+    wait_until("the tag", || {
+        git(repo.root(), &["tag", "--list", &name]).contains(&name)
+    });
+    assert_eq!(
+        git(repo.root(), &["rev-parse", &format!("{name}^{{commit}}")]),
+        lost
+    );
+
+    rig.term
+        .wait_for("the tag reported", STEP, |s| s.contains("created tag"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+
+    // Apply: the file appears in the working tree, nothing is staged.
+    rig.term.send_keys("w").unwrap();
+    wait_until("the applied file", || repo.root().join("d.txt").exists());
+    assert_eq!(
+        std::fs::read_to_string(repo.root().join("d.txt")).unwrap(),
+        "d\n"
+    );
+    assert_eq!(git(repo.root(), &["diff", "--cached", "--name-only"]), "");
+
+    // Apply again: the file is in the way, nothing changes and the stash is offered.
+    rig.term
+        .wait_for("the apply reported", STEP, |s| {
+            s.contains("applied the changes")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+    rig.term.send_keys("w").unwrap();
+    rig.term
+        .wait_for("the stash offer", STEP, |s| {
+            s.contains("could not be applied") && s.contains("Nothing was changed")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+    rig.term.send_keys("Enter").unwrap();
+    wait_until("the stash", || {
+        !git(repo.root(), &["stash", "list"]).is_empty()
+    });
+    assert_eq!(
+        git(repo.root(), &["stash", "show", "--name-only", "stash@{0}"]),
+        "d.txt"
+    );
+    rig.term.stop().unwrap();
+}

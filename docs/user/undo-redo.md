@@ -157,8 +157,9 @@ scrollbar you can press and drag.
   the arrows move, `Shift`+arrows resize, `0` resets, `Enter` or `Esc` leave (the
   border says so while it is on). The palette has `Dialog: Move or Resize` and
   `Dialog: Reset Position and Size`. Whether the place is kept is
-  `ui.dialog_geometry` (Settings > Appearance > Layout): `session` (default),
-  `saved` (restored at the next launch) or `never`.
+  `ui.dialog_geometry` (*Settings > Appearance > Layout > Remember dialog
+  position and size*): `session` (default), `saved` (restored at the next
+  launch) or `never`.
 
 ## From the command palette
 

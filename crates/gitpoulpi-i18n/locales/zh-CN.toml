@@ -6134,6 +6134,18 @@ file_not_listed = { git = "此 {$commit} 未列出该文件（在那里被重命
 no_previous = { git = "此 {$commit} 新增了该文件：没有更早的内容可供 Blame", local = "此{$commit}新增了该文件：没有更早的内容可供追溯" }
 
 [undo_safety]
+key_undo_to = "u"
+key_redo_to = "y"
+key_restore_only = "r"
+key_offer = "o"
+key_restore_ref = "r"
+key_show_in_log = "l"
+key_create_branch = "b"
+key_create_tag = "t"
+key_apply = "w"
+key_stash = "s"
+key_load_more = "m"
+key_cherry_pick = "c"
 title_history = "撤销历史"
 title_reflog = "Reflog"
 title_lost = "丢失的工作"

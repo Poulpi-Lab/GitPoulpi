@@ -583,3 +583,61 @@ fn every_action_button_shows_the_letter_that_runs_it() {
     }
     assert_eq!(super::input::key_of(Act::ShowInLog, Tab::Reflog), Some('l'));
 }
+
+/// Every shipped language's letters: one character each, never Enter, unique
+/// per view (a Cyrillic letter also counts as its Latin twin, the key it
+/// shares on a Latin layout) and clear of the view and navigation keys.
+#[test]
+fn action_letters_are_unique_single_chars_in_every_language_and_view() {
+    use super::input::{acts_in, letter_in};
+    use crate::guide_dialog::latin_twin;
+    use gitpoulpi_i18n::{msg::undo_safety as m, SHIPPED};
+    // `1 2 3` switch views, `q` closes, `v` toggles the diff mode, `j k` move,
+    // `G` goes to the end, `.` opens the menu.
+    const RESERVED: [char; 9] = ['1', '2', '3', 'q', 'v', 'j', 'k', 'g', '.'];
+    assert!(!SHIPPED.is_empty());
+    for &lang in SHIPPED {
+        for msg in [
+            m::KEY_UNDO_TO,
+            m::KEY_REDO_TO,
+            m::KEY_RESTORE_ONLY,
+            m::KEY_OFFER,
+            m::KEY_RESTORE_REF,
+            m::KEY_SHOW_IN_LOG,
+            m::KEY_CREATE_BRANCH,
+            m::KEY_CREATE_TAG,
+            m::KEY_APPLY,
+            m::KEY_STASH,
+            m::KEY_LOAD_MORE,
+            m::KEY_CHERRY_PICK,
+        ] {
+            let text = msg.get_in(lang);
+            assert_eq!(text.chars().count(), 1, "{}: {text:?}", lang.code());
+            assert!(
+                !text.chars().any(|c| c.is_control() || c.is_whitespace()),
+                "{}: {text:?} is not a typeable letter",
+                lang.code()
+            );
+        }
+        for tab in [Tab::History, Tab::Reflog, Tab::Lost] {
+            let mut seen: Vec<(char, Act)> = Vec::new();
+            for &act in acts_in(tab) {
+                let k = letter_in(act, lang);
+                for c in [Some(k), latin_twin(k)].into_iter().flatten() {
+                    assert!(
+                        !RESERVED.contains(&c),
+                        "{} {tab:?}: {act:?} uses the reserved key {c:?}",
+                        lang.code()
+                    );
+                    if let Some((_, other)) = seen.iter().find(|(s, _)| *s == c) {
+                        panic!(
+                            "{} {tab:?}: {act:?} and {other:?} share the key {c:?}",
+                            lang.code()
+                        );
+                    }
+                    seen.push((c, act));
+                }
+            }
+        }
+    }
+}

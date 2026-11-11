@@ -17,29 +17,71 @@ enum Bar {
     Diff,
 }
 
-/// The letter that does `act` (the buttons show it in the hint line).
-pub(super) fn act_for_key(c: char, tab: Tab) -> Option<Act> {
-    match (c, tab) {
-        ('u', Tab::History) => Some(Act::UndoTo),
-        ('y', Tab::History) => Some(Act::RedoTo),
-        ('r', Tab::History) => Some(Act::RestoreOnly),
-        ('o', Tab::History) => Some(Act::Offer),
-        ('r', Tab::Reflog) => Some(Act::RestoreRef),
-        ('l', Tab::Reflog) => Some(Act::ShowInLog),
-        ('b', Tab::Reflog | Tab::Lost) => Some(Act::CreateBranch),
-        ('t', Tab::Reflog | Tab::Lost) => Some(Act::CreateTag),
-        ('w', Tab::Reflog | Tab::Lost) => Some(Act::ApplyToWorktree),
-        ('s', Tab::Reflog | Tab::Lost) => Some(Act::SaveAsStash),
-        ('m', Tab::Reflog) => Some(Act::LoadMore),
-        ('c', Tab::Lost) => Some(Act::CherryPick),
-        _ => None,
+/// The actions of a view, in button order. The same action keeps the same
+/// catalog key in the views that share it.
+pub(super) fn acts_in(tab: Tab) -> &'static [Act] {
+    match tab {
+        Tab::History => &[Act::UndoTo, Act::RedoTo, Act::RestoreOnly, Act::Offer],
+        Tab::Reflog => &[
+            Act::RestoreRef,
+            Act::ShowInLog,
+            Act::CreateBranch,
+            Act::CreateTag,
+            Act::ApplyToWorktree,
+            Act::SaveAsStash,
+            Act::LoadMore,
+        ],
+        Tab::Lost => &[
+            Act::CreateBranch,
+            Act::CreateTag,
+            Act::ApplyToWorktree,
+            Act::SaveAsStash,
+            Act::CherryPick,
+        ],
     }
 }
 
-/// The letter of `act` in `tab`: the inverse of [`act_for_key`], so a button
-/// can never name a key that does something else.
+/// The catalog entry holding the letter of `act`.
+fn key_msg(act: Act) -> gitpoulpi_i18n::M {
+    use gitpoulpi_i18n::msg::undo_safety as m;
+    match act {
+        Act::UndoTo => m::KEY_UNDO_TO,
+        Act::RedoTo => m::KEY_REDO_TO,
+        Act::RestoreOnly => m::KEY_RESTORE_ONLY,
+        Act::Offer => m::KEY_OFFER,
+        Act::RestoreRef => m::KEY_RESTORE_REF,
+        Act::ShowInLog => m::KEY_SHOW_IN_LOG,
+        Act::CreateBranch => m::KEY_CREATE_BRANCH,
+        Act::CreateTag => m::KEY_CREATE_TAG,
+        Act::ApplyToWorktree => m::KEY_APPLY,
+        Act::SaveAsStash => m::KEY_STASH,
+        Act::LoadMore => m::KEY_LOAD_MORE,
+        Act::CherryPick => m::KEY_CHERRY_PICK,
+    }
+}
+
+/// The letter of `act` in `lang` (lowercased; may be Cyrillic and so on).
+pub(super) fn letter_in(act: Act, lang: gitpoulpi_i18n::Lang) -> char {
+    let c = key_msg(act).get_in(lang).chars().next().unwrap_or(' ');
+    c.to_lowercase().next().unwrap_or(c)
+}
+
+/// The letter that does `act` (the buttons show it in the hint line): `None`
+/// when the view has no such action.
 pub(super) fn key_of(act: Act, tab: Tab) -> Option<char> {
-    ('a'..='z').find(|c| act_for_key(*c, tab) == Some(act))
+    acts_in(tab)
+        .contains(&act)
+        .then(|| letter_in(act, gitpoulpi_i18n::current()))
+}
+
+/// The action a typed letter runs in `tab`: the catalog letter, or its Latin
+/// twin when the keyboard is on a Latin layout (Cyrillic languages).
+pub(super) fn act_for_key(c: char, tab: Tab) -> Option<Act> {
+    let lang = gitpoulpi_i18n::current();
+    acts_in(tab).iter().copied().find(|&act| {
+        let k = letter_in(act, lang);
+        k == c || crate::guide_dialog::latin_twin(k) == Some(c)
+    })
 }
 
 impl SafetyPanel {

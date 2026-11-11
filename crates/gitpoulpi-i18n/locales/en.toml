@@ -7641,6 +7641,34 @@ no_previous = "this {$commit} added the file: there is nothing earlier to blame"
 # BEGIN undo-safety
 # Undo history, Reflog and Lost work panel (the "you can always go back" views).
 [undo_safety]
+# context: the next key_* entries are the letters of the action buttons of this dialog (shown as "[x]").
+# context: each is exactly one character; the same action keeps the same letter in Reflog and Lost work;
+# context: letters must be unique within each view (Undo history, Reflog, Lost work) and must not be
+# context: 1, 2, 3, q, v, j, k, g, '.' (view and navigation keys); pick the letter matching your label.
+# context: Undo history: key of the Undo to here button, one letter
+key_undo_to = "u"
+# context: Undo history: key of the Redo to here button, one letter
+key_redo_to = "y"
+# context: Undo history: key of the button restoring only this action's changes, one letter
+key_restore_only = "r"
+# context: Undo history: key of the button that offers the undo to the toolbar, one letter
+key_offer = "o"
+# context: Reflog: key of the button that moves the branch back to the selected position, one letter
+key_restore_ref = "r"
+# context: Reflog: key of the Show in Log button, one letter
+key_show_in_log = "l"
+# context: Reflog and Lost work: key of the Create branch here button, one letter
+key_create_branch = "b"
+# context: Reflog and Lost work: key of the Create tag here button, one letter
+key_create_tag = "t"
+# context: Reflog and Lost work: key of the Apply to working tree button, one letter
+key_apply = "w"
+# context: Reflog and Lost work: key of the Save as stash button, one letter
+key_stash = "s"
+# context: Reflog: key of the Load more button, one letter
+key_load_more = "m"
+# context: Lost work: key of the Cherry-pick button, one letter
+key_cherry_pick = "c"
 title_history = "Undo history"
 title_reflog = "Reflog"
 title_lost = "Lost work"

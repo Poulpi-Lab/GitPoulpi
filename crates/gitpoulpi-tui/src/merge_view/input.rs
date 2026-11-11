@@ -1141,7 +1141,7 @@ impl MergeView {
             MergeHit::PromptDiscard if self.ui.prompt.is_some() => {
                 return self.prompt_answer(PromptAnswer::Secondary)
             }
-            MergeHit::PromptCancel if self.ui.prompt.is_some() => {
+            MergeHit::PromptCancel | MergeHit::PromptClose if self.ui.prompt.is_some() => {
                 return self.prompt_answer(PromptAnswer::Cancel)
             }
             MergeHit::MenuRow(i) if self.ui.menu.is_some() => return self.run_menu_row(i),
@@ -1236,7 +1236,8 @@ impl MergeView {
             MergeHit::MenuRow(_)
             | MergeHit::PromptSave
             | MergeHit::PromptDiscard
-            | MergeHit::PromptCancel => Outcome::default(),
+            | MergeHit::PromptCancel
+            | MergeHit::PromptClose => Outcome::default(),
         }
     }
 

@@ -162,6 +162,8 @@ pub(crate) enum MergeHit {
     PromptSave,
     PromptDiscard,
     PromptCancel,
+    /// The box's close cross: Cancel, like Esc.
+    PromptClose,
     /// The two buttons of the strip that replaces the key hints.
     StripPrimary,
     StripSecondary,

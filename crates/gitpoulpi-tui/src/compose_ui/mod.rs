@@ -114,6 +114,7 @@ struct FileDrag {
 struct MoveFile {
     from: (usize, usize),
     combo: std::cell::RefCell<Combo>,
+    close: std::cell::RefCell<crate::dialog_kit::CloseHit>,
 }
 
 impl std::fmt::Debug for ComposeForm {
@@ -240,6 +241,7 @@ impl ComposeForm {
         self.moving = Some(MoveFile {
             from,
             combo: std::cell::RefCell::new(combo),
+            close: std::cell::RefCell::default(),
         });
     }
 
@@ -258,6 +260,18 @@ impl ComposeForm {
         let Some(m) = self.moving.as_mut() else {
             return;
         };
+        let close = m.close.get_mut();
+        match mouse.kind {
+            crossterm::event::MouseEventKind::Moved => close.set_hover(mouse.column, mouse.row),
+            // The dialog's close cross: Esc, the move is dropped.
+            crossterm::event::MouseEventKind::Down(crossterm::event::MouseButton::Left)
+                if close.hit(mouse.column, mouse.row) =>
+            {
+                self.moving = None;
+                return;
+            }
+            _ => {}
+        }
         let out = m.combo.get_mut().on_mouse(mouse);
         self.after_move_input(out);
     }

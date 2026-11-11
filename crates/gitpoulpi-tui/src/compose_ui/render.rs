@@ -11,8 +11,9 @@ impl ComposeForm {
         }
         let rect = WIN.place(area, crate::dialog_kit::centered(area, w, h));
         let buf = frame.buffer_mut();
-        crate::dialog_kit::panel(buf, rect, &format!(" {} ", msg::MOVE_TITLE.get()));
-        WIN.decorate(buf, rect, None, true);
+        m.close
+            .borrow_mut()
+            .framed(buf, rect, msg::MOVE_TITLE.get(), &WIN, true);
         let file = self
             .commits
             .get(m.from.0)

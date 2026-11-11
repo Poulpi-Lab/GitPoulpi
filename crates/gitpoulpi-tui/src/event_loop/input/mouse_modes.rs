@@ -157,6 +157,19 @@ pub(in crate::event_loop) fn popup_list_mouse(
                 }
             }
         }
+        // The palette's and the pickers' close cross: closes like Esc.
+        MouseEventKind::Down(MouseButton::Left)
+            if !matches!(&*cx.input_mode, InputMode::WorkspaceSearch(_))
+                && crate::chrome::popup_cross_at(mcol, mrow) =>
+        {
+            if let InputMode::ThemePicker(picker) = &mut *cx.input_mode {
+                picker.restore();
+            }
+            if let InputMode::LanguagePicker(picker) = &mut *cx.input_mode {
+                picker.restore(&mut *cx.ui_graph_theme);
+            }
+            *cx.input_mode = InputMode::Normal;
+        }
         // The workspace search's close cross.
         MouseEventKind::Down(MouseButton::Left)
             if matches!(&*cx.input_mode, InputMode::WorkspaceSearch(_))

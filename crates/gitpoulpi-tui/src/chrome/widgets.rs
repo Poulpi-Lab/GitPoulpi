@@ -53,6 +53,30 @@ pub(crate) fn set_popup_pointer(pos: Option<(u16, u16)>) {
     POPUP_POINTER.with(|p| p.set(pos));
 }
 
+thread_local! {
+    /// The close cross of the open palette / picker, as painted last frame.
+    static POPUP_CROSS: std::cell::Cell<Option<Rect>> = const { std::cell::Cell::new(None) };
+}
+
+/// Paints the close cross on a list popup's top border (hover from the popup
+/// pointer), remembers it for [`popup_cross_at`] and returns it for
+/// `Win::decorate`.
+pub(crate) fn paint_popup_cross(buf: &mut ratatui::buffer::Buffer, popup: Rect) -> Option<Rect> {
+    let hovered = popup_pointer().is_some_and(|(x, y)| {
+        Rect::new(popup.right().saturating_sub(5), popup.y, 3, 1).contains((x, y).into())
+    });
+    let cross = close_cross::paint(buf, popup, hovered);
+    POPUP_CROSS.with(|c| c.set(cross));
+    cross
+}
+
+/// Whether `(col, row)` is on the open list popup's close cross.
+pub(crate) fn popup_cross_at(col: u16, row: u16) -> bool {
+    POPUP_CROSS
+        .with(|c| c.get())
+        .is_some_and(|r| r.contains((col, row).into()))
+}
+
 /// Where the pointer rests over the open palette / tab picker.
 pub(crate) fn popup_pointer() -> Option<(u16, u16)> {
     POPUP_POINTER.with(|p| p.get())

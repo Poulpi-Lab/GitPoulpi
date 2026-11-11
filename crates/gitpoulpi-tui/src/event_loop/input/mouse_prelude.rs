@@ -587,6 +587,7 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                             | crate::merge_view::MergeHit::PromptSave
                             | crate::merge_view::MergeHit::PromptDiscard
                             | crate::merge_view::MergeHit::PromptCancel
+                            | crate::merge_view::MergeHit::PromptClose
                     ))
                 );
                 if !on_popup {

@@ -32,6 +32,7 @@ pub(super) struct LabelsPrompt {
     edit: FieldEditor<()>,
     focus: Part,
     hover: Option<Part>,
+    close: dialog_kit::CloseHit,
     hits: Vec<(Rect, Part)>,
     /// Labels of the project that look like statuses, proposed in the hint.
     pub(super) proposal: String,
@@ -44,6 +45,7 @@ impl LabelsPrompt {
             edit: FieldEditor::default(),
             focus: Part::Text,
             hover: None,
+            close: dialog_kit::CloseHit::default(),
             hits: Vec::new(),
             proposal: proposal.join(", "),
         };
@@ -106,7 +108,13 @@ impl LabelsPrompt {
         }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
         match mouse.kind {
-            MouseEventKind::Moved => self.hover = hit,
+            MouseEventKind::Moved => {
+                self.hover = hit;
+                self.close.set_hover(mouse.column, mouse.row);
+            }
+            MouseEventKind::Down(MouseButton::Left) if self.close.hit(mouse.column, mouse.row) => {
+                return PromptOutcome::Cancel;
+            }
             MouseEventKind::Down(MouseButton::Left) => match hit {
                 Some(Part::Text) => {
                     self.focus = Part::Text;
@@ -135,8 +143,8 @@ impl LabelsPrompt {
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
         let rect = WIN.place(area, dialog_kit::centered(area, 76, 10));
         self.edit.begin_frame();
-        dialog_kit::panel(buf, rect, msg::COLUMNS_TITLE.get());
-        WIN.decorate(buf, rect, None, true);
+        self.close
+            .framed(buf, rect, msg::COLUMNS_TITLE.get(), &WIN, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,

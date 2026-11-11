@@ -535,7 +535,8 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
                 ),
             hint_area,
         );
-        TAB_PICKER_WIN.decorate(frame.buffer_mut(), popup, None, true);
+        let cross = crate::chrome::paint_popup_cross(frame.buffer_mut(), popup);
+        TAB_PICKER_WIN.decorate(frame.buffer_mut(), popup, cross, true);
     }
 
     if !settings_open {
@@ -631,7 +632,15 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         );
         frame_hits.insert(0, (confirm_rect, HitTarget::ConfirmButton(true)));
         frame_hits.insert(0, (cancel_rect, HitTarget::ConfirmButton(false)));
-        CONFIRM_WIN.decorate(frame.buffer_mut(), popup, None, true);
+        let cross = crate::chrome::close_cross::paint(
+            frame.buffer_mut(),
+            popup,
+            matches!(hovered_target, Some(HitTarget::ConfirmClose)),
+        );
+        if let Some(cross) = cross {
+            frame_hits.insert(0, (cross, HitTarget::ConfirmClose));
+        }
+        CONFIRM_WIN.decorate(frame.buffer_mut(), popup, cross, true);
     }
 
     // A guiding dialog (conflicts first / input too large): it paints its

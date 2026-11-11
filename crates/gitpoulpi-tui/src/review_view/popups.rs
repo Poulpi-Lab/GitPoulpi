@@ -76,6 +76,7 @@ pub(super) struct ComposeBox {
     drag: crate::scrollbar::BarDrag,
     focus: ComposePart,
     hover: Option<ComposePart>,
+    close: dialog_kit::CloseHit,
     hits: Vec<(Rect, ComposePart)>,
 }
 
@@ -91,6 +92,7 @@ impl ComposeBox {
             drag: Default::default(),
             focus: ComposePart::Text,
             hover: None,
+            close: dialog_kit::CloseHit::default(),
             hits: Vec::new(),
         };
         // The caret starts at the end of what is being edited.
@@ -178,7 +180,13 @@ impl ComposeBox {
             return ComposeOutcome::Stay;
         }
         match mouse.kind {
-            MouseEventKind::Moved => self.hover = hit,
+            MouseEventKind::Moved => {
+                self.hover = hit;
+                self.close.set_hover(mouse.column, mouse.row);
+            }
+            MouseEventKind::Down(MouseButton::Left) if self.close.hit(mouse.column, mouse.row) => {
+                return ComposeOutcome::Cancel;
+            }
             MouseEventKind::Down(MouseButton::Left) => match hit {
                 Some(ComposePart::Text) => {
                     self.focus = ComposePart::Text;
@@ -207,8 +215,8 @@ impl ComposeBox {
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
         let rect = WIN_REVIEW_TEXT.place(area, dialog_kit::centered(area, 84, 16));
         self.edit.begin_frame();
-        dialog_kit::panel(buf, rect, &self.title);
-        WIN_REVIEW_TEXT.decorate(buf, rect, None, true);
+        self.close
+            .framed(buf, rect, &self.title, &WIN_REVIEW_TEXT, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -361,6 +369,7 @@ pub(super) struct FinishDialog {
     ai_summary: Option<String>,
     focus: FinishPart,
     hover: Option<FinishPart>,
+    close: dialog_kit::CloseHit,
     hits: Vec<(Rect, FinishPart)>,
     pub(super) message: Option<String>,
     pub(super) busy: bool,
@@ -423,6 +432,7 @@ impl FinishDialog {
             ai_summary,
             focus: FinishPart::Body,
             hover: None,
+            close: dialog_kit::CloseHit::default(),
             hits: Vec::new(),
             message: None,
             busy: false,
@@ -704,7 +714,13 @@ impl FinishDialog {
             return FinishOutcome::Stay;
         }
         match mouse.kind {
-            MouseEventKind::Moved => self.hover = hit,
+            MouseEventKind::Moved => {
+                self.hover = hit;
+                self.close.set_hover(mouse.column, mouse.row);
+            }
+            MouseEventKind::Down(MouseButton::Left) if self.close.hit(mouse.column, mouse.row) => {
+                return FinishOutcome::Cancel;
+            }
             MouseEventKind::Down(MouseButton::Left) => match hit {
                 Some(FinishPart::Body) => {
                     self.focus = FinishPart::Body;
@@ -751,8 +767,8 @@ impl FinishDialog {
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer, spinner: char) {
         let rect = WIN_REVIEW_FINISH.place(area, dialog_kit::centered(area, 84, 20));
         self.edit.begin_frame();
-        dialog_kit::panel(buf, rect, msg::FINISH_TITLE.get());
-        WIN_REVIEW_FINISH.decorate(buf, rect, None, true);
+        self.close
+            .framed(buf, rect, msg::FINISH_TITLE.get(), &WIN_REVIEW_FINISH, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -958,6 +974,7 @@ pub(super) struct Confirm {
     yes: &'static str,
     focus: ConfirmPart,
     hover: Option<ConfirmPart>,
+    close: dialog_kit::CloseHit,
     hits: Vec<(Rect, ConfirmPart)>,
 }
 
@@ -969,6 +986,7 @@ impl Confirm {
             yes,
             focus: ConfirmPart::No,
             hover: None,
+            close: dialog_kit::CloseHit::default(),
             hits: Vec::new(),
         }
     }
@@ -994,7 +1012,13 @@ impl Confirm {
     pub(super) fn on_mouse(&mut self, mouse: MouseEvent) -> ConfirmOutcome {
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
         match mouse.kind {
-            MouseEventKind::Moved => self.hover = hit,
+            MouseEventKind::Moved => {
+                self.hover = hit;
+                self.close.set_hover(mouse.column, mouse.row);
+            }
+            MouseEventKind::Down(MouseButton::Left) if self.close.hit(mouse.column, mouse.row) => {
+                return ConfirmOutcome::No;
+            }
             MouseEventKind::Down(MouseButton::Left) => match hit {
                 Some(ConfirmPart::Yes) => return ConfirmOutcome::Yes,
                 Some(ConfirmPart::No) => return ConfirmOutcome::No,
@@ -1007,8 +1031,8 @@ impl Confirm {
 
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
         let rect = WIN_REVIEW_PICK.place(area, dialog_kit::centered(area, 64, 8));
-        dialog_kit::panel(buf, rect, self.title);
-        WIN_REVIEW_PICK.decorate(buf, rect, None, true);
+        self.close
+            .framed(buf, rect, self.title, &WIN_REVIEW_PICK, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,

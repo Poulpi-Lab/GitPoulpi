@@ -270,7 +270,8 @@ pub(crate) fn render_command_palette(
     // The frame, over the borders just drawn: drag the top border to move,
     // the sides and the bottom to resize (the list takes the rows, the rows
     // the width).
-    WIN.decorate(frame.buffer_mut(), popup, None, true);
+    let cross = crate::chrome::paint_popup_cross(frame.buffer_mut(), popup);
+    WIN.decorate(frame.buffer_mut(), popup, cross, true);
 }
 
 #[cfg(test)]

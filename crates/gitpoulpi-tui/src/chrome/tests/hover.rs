@@ -107,7 +107,9 @@ fn hover_style_for(target: &HitTarget) -> HoverKind {
         HitTarget::ColumnMenuItem(_) | HitTarget::ColumnMenuAction(_) => {
             Required("event_loop.rs hover_style (item 15)")
         }
-        HitTarget::ColumnMenuClose => Required("close_cross::paint's plain_button_style"),
+        HitTarget::ColumnMenuClose | HitTarget::ConfirmClose => {
+            Required("close_cross::paint's plain_button_style")
+        }
         HitTarget::RefContextMenuItem(_)
         | HitTarget::LogContextMenuItem(_)
         | HitTarget::WipContextMenuItem(_)
@@ -478,6 +480,7 @@ fn sample_hit_targets() -> Vec<HitTarget> {
         HitTarget::CommitFilterField,
         HitTarget::ViewAllFilesCheckbox,
         HitTarget::ConfirmButton(true),
+        HitTarget::ConfirmClose,
         HitTarget::CollapsePane(PaneSide::Refs),
         HitTarget::RestorePane(PaneSide::Refs),
         HitTarget::CloseApp,

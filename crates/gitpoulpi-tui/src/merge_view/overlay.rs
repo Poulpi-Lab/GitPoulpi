@@ -198,7 +198,15 @@ impl MergeView {
         }
         let rect = WIN.place(area, dialog_kit::centered(area, w, h));
         dialog_kit::panel(buf, rect, &title);
-        WIN.decorate(buf, rect, None, true);
+        let cross = crate::chrome::close_cross::paint(
+            buf,
+            rect.intersection(buf.area),
+            hovered == Some(MergeHit::PromptClose),
+        );
+        if let Some(cross) = cross {
+            hits.push((cross, MergeHit::PromptClose));
+        }
+        WIN.decorate(buf, rect, cross, true);
         let inner_w = rect.width.saturating_sub(4);
         for (i, line) in lines.iter().enumerate() {
             dialog_kit::put(

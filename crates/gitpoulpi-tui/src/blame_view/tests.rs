@@ -398,6 +398,32 @@ fn the_card_key_toggles_and_esc_closes_it_before_anything_else() {
 }
 
 #[test]
+fn the_card_close_cross_dismisses_it_like_esc() {
+    with_side(false, || {
+        let km = Keymap::defaults();
+        let mut insight = insight();
+        insight.blame_key(&km, &key(KeyCode::Char('i')), 10);
+        let (buf, drawn) = draw(&mut insight, 110, None, Instant::now());
+        assert!(screen(&buf).contains(&oid(1).to_hex()), "{}", screen(&buf));
+        let cross = drawn
+            .popup_hits
+            .iter()
+            .find(|(_, h)| *h == BlameHit::CardClose)
+            .map(|(r, _)| *r)
+            .expect("the card paints a close cross");
+        assert!(screen(&buf).contains('\u{2715}'));
+        insight.blame_mouse(
+            MouseEventKind::Down(crossterm::event::MouseButton::Left),
+            cross.x + 1,
+            Some(BlameHit::CardClose),
+        );
+        assert!(!insight.blame.as_ref().unwrap().pinned);
+        let (buf, _) = draw(&mut insight, 110, None, Instant::now());
+        assert!(!screen(&buf).contains(&oid(1).to_hex()), "{}", screen(&buf));
+    });
+}
+
+#[test]
 fn action_keys_become_ops_and_enter_is_left_to_the_log_jump() {
     let km = Keymap::defaults();
     let mut insight = insight();

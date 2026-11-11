@@ -45,7 +45,9 @@ same rules everywhere:
   typed closes at once, and so does a single-line dialog.
 - The command palette, the pickers (tab, theme, language), the small review,
   board, merge and composer dialogs and the confirmation prompt carry the `✕`
-  too. Context menus and dropdowns have none: they close on `Esc` or a click
+  too, and so do the Activity Log's clear confirmation, the Undo history /
+  Reflog / Lost work confirmations and prompts (both also move by their title)
+  and the blame card (its `✕` dismisses the card like `Esc`). Context menus and dropdowns have none: they close on `Esc` or a click
   outside.
 
 ## Lists in Settings

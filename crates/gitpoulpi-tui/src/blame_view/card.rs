@@ -51,7 +51,7 @@ pub(super) fn paint(
             sel: Some(menu.sel),
         };
         let (x, y) = (menu.x, menu.y);
-        draw(buf, inner, &popup, &move |_| x, y, env, drawn);
+        draw(buf, inner, &popup, &move |_| x, y, false, env, drawn);
         return;
     }
     let Some(hi) = view.card_hunk(selected, env.now) else {
@@ -96,7 +96,7 @@ pub(super) fn paint(
             ann_x.saturating_sub(w)
         }
     };
-    draw(buf, inner, &popup, &place, y, env, drawn);
+    draw(buf, inner, &popup, &place, y, true, env, drawn);
 }
 
 fn header_lines(line: &BlameLine, env: &BlameEnv<'_>) -> Vec<(String, Style)> {
@@ -129,6 +129,7 @@ fn header_lines(line: &BlameLine, env: &BlameEnv<'_>) -> Vec<(String, Style)> {
     ]
 }
 
+#[allow(clippy::too_many_arguments)]
 /// Draws `popup` inside `bounds`, `place` giving its x for its width, `y`
 /// the row it hangs from.
 fn draw(
@@ -137,6 +138,7 @@ fn draw(
     popup: &Popup,
     place: &dyn Fn(u16) -> u16,
     y: u16,
+    closable: bool,
     env: &BlameEnv<'_>,
     drawn: &mut Drawn,
 ) {
@@ -178,6 +180,12 @@ fn draw(
         .border_style(Style::default().fg(th().ui.accent))
         .style(Style::default().bg(th().ui.popup_bg))
         .render(rect, buf);
+    // The card (not the menu) carries the close cross; it is Esc.
+    let cross = if closable {
+        crate::chrome::close_cross::paint(buf, rect, env.hovered == Some(BlameHit::CardClose))
+    } else {
+        None
+    };
     let text_w = (width - 4) as usize;
     let mut cy = rect.y + 1;
     for (text, style) in &popup.header {
@@ -224,6 +232,9 @@ fn draw(
         }
         drawn.popup_hits.push((row, BlameHit::Op(op)));
         cy += 1;
+    }
+    if let Some(cross) = cross {
+        drawn.popup_hits.push((cross, BlameHit::CardClose));
     }
     // The body last: the rows above are inner-first.
     drawn.popup_hits.push((rect, BlameHit::Card));

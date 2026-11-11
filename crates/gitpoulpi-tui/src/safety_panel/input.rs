@@ -388,7 +388,9 @@ impl SafetyPanel {
             MouseEventKind::Down(MouseButton::Left) => {
                 // The cross and a click outside the panel are Esc: the
                 // innermost open thing (menu, confirmation) cancels first.
-                if self.close.hit(col, row) || !self.frame.contains((col, row).into()) {
+                if self.close.hit(col, row)
+                    || (!self.frame.contains((col, row).into()) && hit.is_none())
+                {
                     if self.overlay.take().is_some() {
                         return PanelOutcome::Stay;
                     }
@@ -436,7 +438,7 @@ impl SafetyPanel {
                 }
                 other => self.overlay = other,
             },
-            (Hit::Cancel, true) => self.overlay = None,
+            (Hit::Cancel | Hit::PopupClose, true) => self.overlay = None,
             (Hit::ModeField, true) => {
                 if let Some(Overlay::Mode(p)) = self.overlay.as_mut() {
                     p.combo.open();

@@ -385,23 +385,36 @@ pub(crate) fn render(frame: &mut Frame) {
     }
 }
 
+/// The clear confirmation moves (its size follows its text).
+const CLEAR_WIN: dialog_kit::Win = dialog_kit::Win::movable("activity_log_clear");
+
 /// The clear confirmation, centred over the window: what goes, that it
 /// cannot be undone, and Cancel (the default) / Clear. Returns its hits.
 fn paint_clear_confirm(buf: &mut Buffer, window: Rect) -> Vec<(Rect, Hit)> {
     use ratatui::widgets::{Paragraph, Widget, Wrap};
     let w = window.width.saturating_sub(8).clamp(20, 64);
-    let rect = dialog_kit::centered(window, w, 9);
+    let rect = CLEAR_WIN.place(buf.area, dialog_kit::centered(window, w, 9));
     dialog_kit::fill(buf, rect, Style::default().bg(th().ui.panel));
     dialog_kit::panel(buf, rect, msg::CLEAR_TITLE.get());
+    let (selected, pointer) = with(|s| (s.clear_sel, s.pointer));
+    let cross_spot = Rect::new(rect.right().saturating_sub(5), rect.y, 3, 1);
+    let cross = crate::chrome::close_cross::paint(
+        buf,
+        rect,
+        pointer.is_some_and(|(c, r)| cross_spot.contains((c, r).into())),
+    );
+    CLEAR_WIN.decorate(buf, rect, cross, true);
     let inner_w = rect.width.saturating_sub(4);
     Paragraph::new(msg::CLEAR_QUESTION.get())
         .style(Style::default().fg(th().ui.text).bg(th().ui.panel))
         .wrap(Wrap { trim: true })
         .render(Rect::new(rect.x + 2, rect.y + 2, inner_w, 3), buf);
-    let (selected, pointer) = with(|s| (s.clear_sel, s.pointer));
     let y = rect.y + 5;
     let mut x = rect.x + 2;
     let mut hits = Vec::new();
+    if let Some(cross) = cross {
+        hits.push((cross, Hit::ClearClose));
+    }
     for (i, (label, hit)) in [
         (msg::CLEAR_CANCEL.get(), Hit::ClearCancel),
         (msg::CLEAR_CONFIRM.get(), Hit::ClearConfirm),

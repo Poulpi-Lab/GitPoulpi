@@ -59,10 +59,10 @@ commence sur l'action la plus récente, pas sur elles. Les flèches se déplacen
 n'exécute jamais une action : chaque bouton a sa propre lettre, indiquée dans la
 ligne d'aide sous les boutons. Pour la ligne sélectionnée :
 
-- **Annuler jusqu'ici** (`u`) : annule cette action et toutes les plus récentes,
+- **Annuler jusqu'ici** (`a`) : annule cette action et toutes les plus récentes,
   de la plus récente à la plus ancienne, après une seule confirmation qui les
   liste toutes. Une étape que le démon juge risquée redemande avant de s'exécuter.
-- **Restaurer seulement celle-ci** (`r`) : ramène ce que cette seule action a
+- **Restaurer seulement celle-ci** (`s`) : ramène ce que cette seule action a
   supprimé et garde tout ce qui a été fait après. Une branche ou un tag supprimé
   revient sur le commit qu'il avait (si son nom est pris entre-temps, on vous en
   demande un autre, avec un nom libre déjà rempli) ; un stash abandonné est remis
@@ -74,8 +74,8 @@ ligne d'aide sous les boutons. Pour la ligne sélectionnée :
   `restore/<branche>-<sha>` à l'ancien sommet : votre branche courante et vos
   fichiers ne bougent jamais. La confirmation montre exactement ce qui va être
   fait, et la restauration est une nouvelle action : `Ctrl+Z` la reprend.
-- **Rétablir jusqu'ici** (`y`) sur une ligne annulée.
-- **Restaurer main là où Commit l'a laissée** (`o`, ou `Alt+Shift+Z` /
+- **Rétablir jusqu'ici** (`t`) sur une ligne annulée.
+- **Restaurer main là où Commit l'a laissée** (`r`, ou `Alt+Shift+Z` /
   `Édition : Restaurer la branche là où l'action bloquée l'a laissée` depuis
   l'extérieur du panneau) : quand un autre programme a déplacé la branche et
   bloqué Annuler, le reflog sait encore où l'action l'avait laissée.
@@ -96,14 +96,14 @@ position sélectionnée s'affichent à côté de la liste.
 Le reflog est lu 200 positions à la fois. Un reflog plus long continue tout
 seul : déplacer le curseur (ou défiler) près de la fin de la liste charge la page
 suivante, et la dernière ligne indique **... Charger la suite** tant qu'il en
-reste. **Charger la suite** (`m`, ou `Reflog : Charger la suite` dans la palette)
+reste. **Charger la suite** (`c`, ou `Reflog : Charger la suite` dans la palette)
 la charge tout de suite et affiche « positions chargées : N » dans la ligne d'état. Les dépôts
 au format reftable de git sont lus comme les autres.
 
 ![Le Reflog de main : chaque position qu'elle a eue, la plus récente en haut, avec la sélectionnée décrite à droite](../images/reflog.png)
 
 **Afficher dans le Log** (`l`), **Créer une branche ici** (`b`), **Créer un tag ici** (`t`),
-**Appliquer à l'arbre de travail** (`w`), **Enregistrer en stash** (`s`) (les trois
+**Appliquer à l'arbre de travail** (`a`), **Enregistrer en stash** (`e`) (les trois
 derniers fonctionnent comme dans Travail perdu ci-dessous) et **Restaurer
 `<branche>` à cette position** (`r`). La restauration est annulable. Quand la branche est extraite
 et que vous avez des modifications locales qu'elle ne peut pas déplacer sans
@@ -131,10 +131,10 @@ cette vue n'a donc pas de « Afficher dans le Log » (la vue Reflog le garde pou
 les commits encore atteignables).
 
 **Récupérer les changements** remet ce qu'a changé le commit sans le commiter :
-**Appliquer à l'arbre de travail** (`w`) rejoue les changements du commit sur les
+**Appliquer à l'arbre de travail** (`a`) rejoue les changements du commit sur les
 fichiers, en tout ou rien (l'index et HEAD ne bougent pas ; un commit de merge est
 refusé). Quand ils ne peuvent pas s'appliquer proprement, rien n'est touché et la
-boîte propose **Enregistrer en stash** (`s`), qui garde les mêmes changements dans
+boîte propose **Enregistrer en stash** (`e`), qui garde les mêmes changements dans
 un nouveau stash ; cette action est d'ailleurs toujours disponible seule. Les deux
 sont journalisées : `Ctrl+Z` remet les fichiers en place, ou supprime de nouveau le
 stash. Les mêmes actions existent en `gitpoulpi apply-commit <rev>` et

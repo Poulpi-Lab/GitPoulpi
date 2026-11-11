@@ -61,11 +61,11 @@ Die Pfeiltasten bewegen (Überschriften und Trenner werden übersprungen), `1` /
 `Enter` führt nie eine Aktion aus: Jede Schaltfläche hat ihren eigenen Buchstaben, der in der
 Hinweiszeile unter den Schaltflächen steht. Für die gewählte Zeile gilt:
 
-- **Bis hierher rückgängig** (`u`): macht diese Aktion und jede neuere
+- **Bis hierher rückgängig** (`r`): macht diese Aktion und jede neuere
   rückgängig, die neueste zuerst, nach einer einzigen Bestätigung, die alle
   auflistet. Einen Schritt, den der Daemon für riskant hält, bestätigen Sie vor
   der Ausführung noch einmal.
-- **Nur diese wiederherstellen** (`r`): holt zurück, was diese eine Aktion
+- **Nur diese wiederherstellen** (`n`): holt zurück, was diese eine Aktion
   entfernt hat, und behält alles, was danach getan wurde. Ein gelöschter Branch
   oder Tag kommt an dem Commit zurück, den er hatte (ist sein Name inzwischen
   vergeben, werden Sie nach einem anderen gefragt, ein freier ist vorausgefüllt);
@@ -78,8 +78,8 @@ Hinweiszeile unter den Schaltflächen steht. Für die gewählte Zeile gilt:
   aktueller Branch und Ihre Dateien bewegen sich nie. Die Bestätigung zeigt genau,
   was geschehen wird, und die Wiederherstellung ist eine neue Aktion: `Ctrl+Z`
   nimmt sie zurück.
-- **Bis hierher wiederholen** (`y`) bei einer rückgängig gemachten Zeile.
-- **main auf den Stand nach „Commit“ zurücksetzen** (`o`, oder außerhalb des
+- **Bis hierher wiederholen** (`w`) bei einer rückgängig gemachten Zeile.
+- **main auf den Stand nach „Commit“ zurücksetzen** (`z`, oder außerhalb des
   Fensters `Alt+Shift+Z` / `Bearbeiten: Branch dorthin zurücksetzen, wo die
   blockierte Aktion ihn gelassen hat`): Hat ein anderes Programm den Branch
   verschoben und Rückgängig blockiert, weiß das Reflog noch, wo die Aktion ihn
@@ -108,8 +108,8 @@ git werden wie jedes andere gelesen.
 ![Das Reflog von main: jede Position, die main hatte, die neueste zuerst, rechts die Beschreibung der gewählten](../images/reflog.png)
 
 **Im Log zeigen** (`l`), **Branch hier erstellen** (`b`), **Tag hier erstellen** (`t`),
-**Auf Arbeitsverzeichnis anwenden** (`w`), **Als Stash sichern** (`s`) (die letzten drei
-funktionieren wie unter Verlorene Arbeit unten) und **`<branch>` auf diese Position zurücksetzen** (`r`). Das Zurücksetzen
+**Auf Arbeitsverzeichnis anwenden** (`a`), **Als Stash sichern** (`s`) (die letzten drei
+funktionieren wie unter Verlorene Arbeit unten) und **`<branch>` auf diese Position zurücksetzen** (`z`). Das Zurücksetzen
 lässt sich rückgängig machen. Ist der Branch ausgecheckt und gibt es lokale
 Änderungen, die er nur durch Überschreiben verschieben könnte, fragt ein
 Dropdown, was damit geschehen soll: meine Änderungen behalten, Soft, Mixed oder
@@ -134,7 +134,7 @@ Ein verlorener Commit steht nicht im Log, deshalb hat diese Ansicht kein „Im L
 zeigen“ (die Reflog-Ansicht behält es für die noch erreichbaren Commits).
 
 **Änderungen wiederherstellen** bringt zurück, was der Commit geändert hat, ohne es zu
-committen: **Auf Arbeitsverzeichnis anwenden** (`w`) spielt die Änderungen des Commits
+committen: **Auf Arbeitsverzeichnis anwenden** (`a`) spielt die Änderungen des Commits
 auf die Dateien ein, ganz oder gar nicht (Index und HEAD bleiben; ein Merge-Commit wird
 abgelehnt). Lässt sich nicht sauber anwenden, wird nichts angefasst und der Dialog bietet
 **Als Stash sichern** (`s`) an, das dieselben Änderungen stattdessen als neuen Stash

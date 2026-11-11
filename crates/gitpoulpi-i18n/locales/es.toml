@@ -6131,15 +6131,15 @@ file_not_listed = { git = "este commit no lista el archivo (¿renombrado allí?)
 no_previous = { git = "este commit añadió el archivo: no hay nada anterior de lo que hacer blame", local = "esta confirmación añadió el archivo: no hay nada anterior de lo que hacer blame" }
 
 [undo_safety]
-key_undo_to = "u"
-key_redo_to = "y"
-key_restore_only = "r"
-key_offer = "o"
+key_undo_to = "d"
+key_redo_to = "r"
+key_restore_only = "s"
+key_offer = "t"
 key_restore_ref = "r"
 key_show_in_log = "l"
 key_create_branch = "b"
 key_create_tag = "t"
-key_apply = "w"
+key_apply = "a"
 key_stash = "s"
 key_load_more = "m"
 key_cherry_pick = "c"

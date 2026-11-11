@@ -52,10 +52,10 @@ selección (los encabezados y el divisor se saltan), `1` / `2` / `3` (o `Ctrl+Ta
 acción: cada botón tiene su propia letra, que se muestra en la línea de ayuda bajo los
 botones. Para la fila seleccionada:
 
-- **Deshacer hasta aquí** (`u`): deshace esa acción y todas las más recientes, de la más
+- **Deshacer hasta aquí** (`d`): deshace esa acción y todas las más recientes, de la más
   reciente a la más antigua, tras una sola confirmación que las lista todas. Un paso que el
   daemon considera arriesgado vuelve a preguntar antes de ejecutarse.
-- **Restaurar solo esta** (`r`): recupera lo que quitó esa única acción y conserva todo lo que
+- **Restaurar solo esta** (`s`): recupera lo que quitó esa única acción y conserva todo lo que
   se hizo después. Una rama o un tag eliminados vuelven en el commit que tenían (si su nombre
   ya está en uso se te pide otro, con uno libre ya escrito); un stash descartado se devuelve
   a lo alto de la lista de stashes; un archivo descartado o eliminado se escribe de nuevo en
@@ -65,8 +65,8 @@ botones. Para la fila seleccionada:
   rama `restore/<rama>-<sha>` en la punta antigua: tu rama actual y tus archivos nunca se
   mueven. La confirmación muestra exactamente lo que hará, y la restauración es una acción
   nueva: `Ctrl+Z` la revierte.
-- **Rehacer hasta aquí** (`y`) en una fila deshecha.
-- **Restaurar main a donde la dejó Commit** (`o`, o `Alt+Shift+Z` /
+- **Rehacer hasta aquí** (`r`) en una fila deshecha.
+- **Restaurar main a donde la dejó Commit** (`t`, o `Alt+Shift+Z` /
   `Edición: Restaurar la rama a donde la dejó la acción bloqueada` desde fuera del panel):
   cuando otro programa movió la rama y bloqueó Deshacer, el reflog todavía sabe dónde la dejó
   la acción.
@@ -92,7 +92,7 @@ usan el formato reftable de git se leen como cualquier otro.
 ![El Reflog de main: todas las posiciones que ha tenido, de la más reciente a la más antigua, con la seleccionada descrita a la derecha](../images/reflog.png)
 
 **Mostrar en el Log** (`l`), **Crear rama
-aquí** (`b`), **Crear tag aquí** (`t`), **Aplicar al árbol de trabajo** (`w`), **Guardar como
+aquí** (`b`), **Crear tag aquí** (`t`), **Aplicar al árbol de trabajo** (`a`), **Guardar como
 stash** (`s`) (las tres últimas funcionan como en Trabajo perdido, más abajo) y
 **Restaurar `<rama>` a esta posición** (`r`). La restauración se puede deshacer.
 Cuando la rama tiene checkout y hay cambios locales que no puede mover sin sobrescribirlos, un
@@ -117,7 +117,7 @@ Un commit perdido no está en el Log, así que esta vista no tiene «Mostrar en 
 Reflog lo conserva para los commits que aún son alcanzables).
 
 **Restaurar cambios** devuelve lo que cambió el commit sin hacer commit de ello: **Aplicar al
-árbol de trabajo** (`w`) reproduce los cambios del commit sobre los archivos, todo o nada (el
+árbol de trabajo** (`a`) reproduce los cambios del commit sobre los archivos, todo o nada (el
 índice y HEAD se quedan como están; un commit de merge se rechaza). Cuando no se puede aplicar
 limpiamente, no se toca nada y el diálogo ofrece **Guardar como stash** (`s`), que conserva esos
 mismos cambios como un stash nuevo; esa acción también está siempre disponible por sí sola. Las

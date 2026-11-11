@@ -50,13 +50,15 @@ vrátit 12 akcí (až 100)“).
 Akce, které jste vrátili, jsou **nad** nejnovější akcí, pod děličem („vráceno -
 Znovu to obnoví“), ztlumené, a ta, kterou Znovu přinese zpět jako další, je
 nejblíž děliči. Výběr začíná na nejnovější akci, ne na nich. Šipky se pohybují
-(nadpisy a dělič se přeskakují), `Tab` přepíná mezi třemi zobrazeními, `Esc`
-zavře panel. Pro vybraný řádek:
+(nadpisy a dělič se přeskakují), `1` / `2` / `3` (nebo `Ctrl+Tab` /
+`Ctrl+Shift+Tab`) přepínají mezi třemi zobrazeními, `Esc` zavře panel. `Enter`
+nikdy nespustí akci: každé tlačítko má své písmeno, které ukazuje řádek nápovědy
+pod tlačítky. Pro vybraný řádek:
 
-- **Vrátit až sem** (`u`): vrátí tuto akci i všechny novější, nejnovější první,
+- **Vrátit až sem** (`a`): vrátí tuto akci i všechny novější, nejnovější první,
   po jediném potvrzení, které je všechny vypíše. Krok, který daemon pokládá za
   riskantní, se před spuštěním zeptá znovu.
-- **Obnovit jen tuto** (`r`): přinese zpět to, co tato jedna akce odstranila, a
+- **Obnovit jen tuto** (`o`): přinese zpět to, co tato jedna akce odstranila, a
   zachová vše, co se udělalo po ní. Smazaná větev nebo tag se vrátí na commit,
   který měly (je-li jejich název mezitím obsazený, budete vyzváni k jinému,
   volný název je předvyplněný); zahozený stash se vrátí na vrch seznamu
@@ -67,8 +69,8 @@ zavře panel. Pro vybraný řádek:
   větev `restore/<větev>-<sha>` na starém vrcholu - vaše aktuální větev a
   soubory se nikdy nepohnou. Potvrzení přesně ukáže, co se stane, a obnovení je
   nová akce: `Ctrl+Z` ji vezme zpět.
-- **Zopakovat až sem** (`y`) na vráceném řádku.
-- **Obnovit main tam, kde ji nechala akce commit** (`o`, nebo `Alt+Shift+Z` /
+- **Zopakovat až sem** (`z`) na vráceném řádku.
+- **Obnovit main tam, kde ji nechala akce commit** (`t`, nebo `Alt+Shift+Z` /
   `Úpravy: Obnovit větev tam, kde ji nechala blokovaná akce` mimo panel): když
   větev posunul jiný program a zablokoval Zpět, reflog stále ví, kde ji akce
   nechala.
@@ -83,8 +85,10 @@ Nabídka refu lokální větve má **Reflog...**; `Úpravy: Reflog...` ukáže r
 HEAD a Historie vrácení má pro něj kartu. Vypíše pozice, na kterých větev byla,
 nejnovější první: krátké SHA, zaznamenaný důvod, před jak dlouhou dobou, kdo -
 včetně posunů provedených v shellu. Zpráva vybrané pozice a změněné soubory se
-ukážou vedle seznamu. **Zobrazit v Logu** (`s`), **Vytvořit větev tady** (`b`)
-a **Obnovit `<větev>` na tuto pozici** (`r`). Obnovení lze vrátit. Je-li větev
+ukážou vedle seznamu. **Zobrazit v Logu** (`z`), **Vytvořit větev tady** (`b`),
+**Vytvořit tag tady** (`t`), **Použít na pracovní strom** (`p`), **Uložit jako
+stash** (`u`) (poslední tři fungují jako ve Ztracené práci níže) a
+**Obnovit `<větev>` na tuto pozici** (`o`). Obnovení lze vrátit. Je-li větev
 checkoutnutá a máte lokální změny, které by přesun musel přepsat, rozbalovací
 seznam se zeptá, co s nimi: ponechat moje změny, soft, mixed, nebo hard. Hard
 změny v souborech zahodí, ale nejdřív je uloží, takže je `Ctrl+Z` stále vrátí
@@ -92,7 +96,7 @@ změny v souborech zahodí, ale nejdřív je uloží, takže je `Ctrl+Z` stále 
 
 Reflog se čte po 200 pozicích. Delší pokračuje sám: pohyb kurzoru (nebo
 posouvání) poblíž konce seznamu načte další stránku a poslední řádek zní
-**... Načíst další**, dokud nějaká je. **Načíst další** (`m`, nebo `Reflog:
+**... Načíst další**, dokud nějaká je. **Načíst další** (`n`, nebo `Reflog:
 Načíst další` v paletě) ji načte hned a stavový řádek řekne „načtené pozice: N“.
 Repozitáře používající formát reftable gitu se čtou jako každé jiné.
 
@@ -108,9 +112,53 @@ doplňuje, zatímco se točí spinner; rozhraní nikdy neblokuje.
 
 ![Ztracená práce: dva commity smazané větve (nalezené přes reflog) a osiřelé commity](../images/lost-work.png)
 
-**Vytvořit větev tady** (`b`) obnoví commit pod názvem, který zvolíte, **Cherry-pick** (`c`) ho
-použije na aktuální větev, **Zobrazit v Logu** (`s`) funguje u těch, které jsou
-stále dosažitelné.
+**Vytvořit větev tady** (`b`) obnoví commit pod názvem, který zvolíte,
+**Vytvořit tag tady** (`t`) ho připne tagem (výchozí název `restored-<krátké
+id>`), **Cherry-pick** (`c`) ho použije na aktuální větev. Ztracený commit není
+v Logu, takže toto zobrazení nemá „Zobrazit v Logu“ (zobrazení Reflog ho má pro
+commity, které jsou stále dosažitelné).
+
+**Obnovit změny** vrátí to, co commit změnil, bez commitování: **Použít na
+pracovní strom** (`p`) přehraje změny commitu na soubory, vše nebo nic (index a
+HEAD zůstanou; merge commit se odmítne). Když se změny nedají použít čistě, nic
+se nedotkne a dialog nabídne **Uložit jako stash** (`u`), který stejné změny
+zachová jako nový stash; tato akce je vždy dostupná i samostatně. Obě se
+zapisují do žurnálu: `Ctrl+Z` vrátí soubory zpět, nebo stash znovu zahodí. Totéž
+dělají `gitpoulpi apply-commit <rev>` a `gitpoulpi stash from-commit <rev> [-m M]`
+a zobrazení Reflog je má také.
+
+### Panely, hunky a okno
+
+Reflog a Ztracená práce ukazují vlevo seznam commitů a vpravo hlavičku
+vybraného commitu, **každý soubor, který změnil**, a hunky vybraného souboru
+(jen hunky, zalomené na šířku panelu). Seznam souborů je ten z pravého panelu
+hlavního okna: `Cesty` nebo `Strom` (`v`, nebo klikněte na přepínač), složka se
+sbalí pomocí `Enter`, `Left` nebo `Right`, kliknutí nebo šipky vyberou soubor
+a jeho hunky se objeví pod ním (daemon se ptá mimo vlákno rozhraní; posledních
+několik souborů se drží v paměti). Seznam commitů, seznam souborů a hunky mají
+každý posuvník, který lze stisknout a táhnout.
+
+- `Tab` / `Shift+Tab` procházejí panely (seznam, soubory, hunky); šipky,
+  `PageUp`, `PageDown`, `Home` a `End` působí na panel, který má klávesnici
+  (jeho okraj svítí). `Enter` na souboru přejde na jeho hunky.
+- **Děliče**: přetáhněte ten mezi seznamem a pravým panelem, nebo ten mezi
+  soubory a hunky; dvojklik na dělič ho obnoví. Klávesnice: `Alt+Left` /
+  `Alt+Right`, `Alt+Up` / `Alt+Down`, `Alt+0` obnoví oba. Paleta má
+  `Reflog / Ztracená práce: Obnovit velikosti panelů`, `Další panel` a
+  `Seznam souborů jako cesty nebo strom`.
+- `Ctrl+N` ukáže své odznaky nad třemi kartami zobrazení a třemi panely, jako
+  v hlavním okně; klávesa odznaku tam skočí.
+- **Přesun a změna velikosti dialogu**: přetažením záhlaví ho přesunete,
+  přetažením levého, pravého a spodního okraje nebo spodního rohu (úchyt `◢`)
+  změníte velikost (nikdy pod 60 x 16, vždy na obrazovce). Zavírací křížek si
+  nechává své kliknutí a uvolnění tlačítka mimo dialog ho nikdy nezavře.
+  Klávesnicový protějšek je `Ctrl+N` a pak `m`: šipky přesouvají, `Shift`+šipky
+  mění velikost, `0` obnoví výchozí, `Enter` nebo `Esc` režim opustí (okraj to
+  říká, dokud je zapnutý). Paleta má `Dialog: Přesunout nebo změnit velikost` a
+  `Dialog: Obnovit pozici a velikost`. Zda se místo zachová, určuje
+  `ui.dialog_geometry` (*Nastavení > Vzhled > Rozvržení > Pamatovat si pozici a
+  velikost dialogů*): `session` (výchozí), `saved` (obnoví se při příštím
+  spuštění) nebo `never`.
 
 ## Z palety příkazů
 
@@ -123,8 +171,8 @@ zobrazení, které je na obrazovce.
 | Zobrazení | Řádky palety |
 |---|---|
 | Historie vrácení | `Historie vrácení: Vrátit až sem...`, `Zopakovat až sem...`, `Obnovit jen tuto...`, `Obnovit větev tam, kde byla...`, `Obnovit seznam`, `Zavřít` |
-| Reflog | `Reflog: Zobrazit v Logu`, `Vytvořit větev tady...`, `Obnovit na tuto pozici...`, `Načíst další`, `Obnovit seznam` |
-| Ztracená práce | `Ztracená práce: Zobrazit v Logu`, `Vytvořit větev tady...`, `Cherry-pick`, `Hledat znovu` |
+| Reflog | `Reflog: Zobrazit v Logu`, `Vytvořit větev tady...`, `Vytvořit tag tady...`, `Použít změny na pracovní strom`, `Uložit změny jako stash`, `Obnovit na tuto pozici...`, `Načíst další`, `Obnovit seznam` |
+| Ztracená práce | `Ztracená práce: Vytvořit větev tady...`, `Vytvořit tag tady...`, `Cherry-pick`, `Použít změny na pracovní strom`, `Uložit změny jako stash`, `Hledat znovu` |
 
 Řádky jsou zašedlé (s důvodem), dokud jejich zobrazení není otevřené; tři otevírací
 řádky, `Úpravy: Historie vrácení...`, `Úpravy: Reflog...` a `Úpravy: Zachránit
@@ -142,8 +190,8 @@ obnovit samostatně, „zpět lze přesunout jen větev nebo HEAD“ a podobně.
 | Větve a tagy | vytvoření, smazání, přejmenování, nastavení nebo zrušení upstreamu, vytvoření sledující větve, vytvoření / smazání / anotace tagu, fast-forward, checkout pull requestu jako větve |
 | Pohyb po repozitáři | checkout větve nebo commitu (včetně odpojeného HEAD) |
 | Historie | merge (fast-forward nebo merge commit), rebase (obyčejný i interaktivní, až skončí), cherry-pick, revert, reset (soft, mixed i hard), lokální část pullu |
-| Pracovní změny | stage a unstage (soubor, složka, hunk, řádky, vše), zahození (soubor, složka, hunk, řádky, checkout souboru), aplikace patche, **smazání souboru z disku**, **ignorování** (soubor, přípona nebo složka: řádek v `.gitignore`, který jste zvolili), **považování za binární nebo textový** (řádek v `.gitattributes`) |
-| Stashe | push, apply, pop, drop |
+| Pracovní změny | stage a unstage (soubor, složka, hunk, řádky, vše), zahození (soubor, složka, hunk, řádky, checkout souboru), aplikace patche nebo změn commitu (`apply-commit`), **smazání souboru z disku**, **ignorování** (soubor, přípona nebo složka: řádek v `.gitignore`, který jste zvolili), **považování za binární nebo textový** (řádek v `.gitattributes`) |
+| Stashe | push, apply, pop, drop, uložení změn commitu jako stashe (`stash from-commit`) |
 | Remoty a konfigurace | přidání, odebrání, přejmenování, změna URL nebo push URL remotu, Git LFS track a untrack |
 | Na serveru | **smazání větve nebo tagu na remote** (z nabídky refu, z palety, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, nebo dokončení workflow, které maže vzdálenou větev): viz níže |
 
@@ -402,7 +450,9 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   pozic; checkoutnutá větev s necommitnutými změnami potřebuje `--mode`. I to
   se zapisuje do žurnálu.
 - `lost-commits` vypíše commity, ke kterým nevede žádná větev, tag, remote ani
-  stash.
+  stash. Chcete-li získat zpět práci jednoho z nich bez commitování:
+  `apply-commit <rev>` (na pracovní strom, vše nebo nic) nebo
+  `stash from-commit <rev>` (jako stash); obojí se zapisuje do žurnálu.
 - Když posun v shellu zablokuje nejnovější položku, odmítnutí nese pozici
   reflogu, která drží to, co položka očekává (`reason.RefMoved.restore`), k
   předání do `reflog-restore`.

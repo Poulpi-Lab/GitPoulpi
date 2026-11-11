@@ -109,7 +109,7 @@ podle terminálu a písma, a proto se GitPoulpi glyfům s VS16 vyhýbá (viz
   neprůhledným pozadím; méně otestováno.
 - **Konzole Windows, ConEmu, cmd**: vyhněte se. Obrázky se kreslí špatně nebo vůbec.
   Dvojklik na exe znovu otevře GitPoulpi ve vámi zvoleném terminálu
-  (*Nastavení > Obecné > Spouštěč*).
+  (*Nastavení > Spouštěč*).
 
 ### Linux
 

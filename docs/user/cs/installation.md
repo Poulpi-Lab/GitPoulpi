@@ -66,7 +66,7 @@ Soubor `.sha256` zachytí jen poškozené stažení. Podpis je to, co ukazuje, �
 
 Každé vydání obsahuje také instalátor pro každý systém. Oba dělají stejné volby
 (zástupce, PATH, alias příkazu jako `gp`) tak, že volají nainstalovaný
-`gitpoulpi`, tedy kód za Nastavením > Obecné > Spouštěč, takže to, co instalátor
+`gitpoulpi`, tedy kód za Nastavením > Spouštěč, takže to, co instalátor
 nastaví, a to, co ukazuje Nastavení, se vždy shoduje.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
@@ -130,7 +130,7 @@ Každý kanál níže zapisuje vedle programů stejnou značku `.gitpoulpi-dist`
 
 Názvy výše jsou ty, do kterých proces vydání publikuje (viz [Vydávání](../../developer/releasing.md)): kanál, který ještě není aktivní, odpoví "not found" a archiv vydání nebo instalační program funguje vždy.
 
-Platí vlastní zacházení správce balíčků s PATH: Chocolatey, winget, Scoop a Homebrew dávají programy do PATH samy a žádný z nich nevytváří alias `gp` (spusťte `gitpoulpi alias create gp`, nebo Nastavení > Obecné > Spouštěč).
+Platí vlastní zacházení správce balíčků s PATH: Chocolatey, winget, Scoop a Homebrew dávají programy do PATH samy a žádný z nich nevytváří alias `gp` (spusťte `gitpoulpi alias create gp`, nebo Nastavení > Spouštěč).
 
 ### apt (Debian a Ubuntu)
 

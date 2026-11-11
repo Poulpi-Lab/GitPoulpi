@@ -444,6 +444,18 @@ As teclas dos campos de texto estão em [Atalhos de teclado](keybindings.md).
 
 Veja [Imagens](image-view.md) para o rato na vista de imagem.
 
+## Mover e redimensionar janelas
+
+A janela Histórico de desfazer / Reflog / Trabalho perdido pode ser movida e redimensionada:
+
+- **Arraste a barra de título** para a mover (a cruz de fechar mantém o seu clique).
+- **Arraste a margem esquerda, direita ou inferior**, ou um canto inferior (a pega `◢`), para a redimensionar. A janela fica no ecrã e nunca fica menor do que 60 x 16.
+- O arrasto continua quando o ponteiro sai da janela, e largar fora nunca a fecha.
+- **Arraste os divisores** entre a lista, a lista de ficheiros e os hunks; faça duplo clique num para o repor.
+- Os equivalentes de teclado são `Ctrl+N` e depois `m` (as setas movem, `Shift`+setas redimensionam, `0` repõe, `Enter` ou `Esc` saem) e `Alt`+setas para os divisores; a paleta tem `Janela: mover ou redimensionar` e `Janela: repor posição e tamanho`.
+
+O ponteiro mostra uma forma de mover sobre a barra de título e uma forma de redimensionar sobre as margens e os cantos (terminais com `OSC 22`).
+
 ## Forma do ponteiro do rato
 
 Alguns terminais deixam o GitPoulpi mudar o ponteiro do rato: um ponteiro de

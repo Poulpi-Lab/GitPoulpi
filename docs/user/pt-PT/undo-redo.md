@@ -53,13 +53,15 @@ conta-as ("12 ações podem ser desfeitas (até 100)").
 As ações que desfez ficam **acima** da ação mais recente, sob um separador
 ("desfeitas - Refazer repõe-nas"), esbatidas, com a que o Refazer repõe a seguir
 mais perto do separador. A seleção começa na ação mais recente, não nelas. As
-setas movem a seleção (os títulos e o separador são saltados), `Tab` alterna
-entre as três vistas e `Esc` fecha. Para a linha selecionada:
+setas movem a seleção (os títulos e o separador são saltados), `1` / `2` / `3`
+(ou `Ctrl+Tab` / `Ctrl+Shift+Tab`) alternam entre as três vistas e `Esc` fecha.
+`Enter` nunca executa uma ação: cada botão tem a sua letra, mostrada na linha de
+ajuda sob os botões. Para a linha selecionada:
 
-- **Desfazer até aqui** (`u`): desfaz essa ação e todas as mais recentes, da mais
+- **Desfazer até aqui** (`d`): desfaz essa ação e todas as mais recentes, da mais
   recente para a mais antiga, depois de uma única confirmação que as lista todas.
   Um passo que o daemon considere arriscado volta a perguntar antes de correr.
-- **Restaurar só esta** (`r`): repõe o que essa ação removeu e mantém tudo o que
+- **Restaurar só esta** (`s`): repõe o que essa ação removeu e mantém tudo o que
   foi feito depois dela. Uma branch ou tag eliminada volta no commit que tinha
   (se o nome entretanto foi ocupado, é-lhe pedido outro, com um livre já
   preenchido); um stash descartado volta ao topo da lista de stashes; um ficheiro
@@ -70,7 +72,7 @@ entre as três vistas e `Esc` fecha. Para a linha selecionada:
   ou commit gera uma branch `restore/<branch>-<sha>` na ponta antiga - a sua
   branch atual e os seus ficheiros nunca se movem. A confirmação mostra
   exatamente o que vai fazer, e o restauro é uma nova ação: `Ctrl+Z` desfaz-o.
-- **Refazer até aqui** (`y`) numa linha desfeita.
+- **Refazer até aqui** (`r`) numa linha desfeita.
 - **Restaurar main para onde Commit a deixou** (`o`, ou `Alt+Shift+Z` /
   `Editar: restaurar a branch para onde a ação bloqueada a deixou` fora do
   painel): quando outro programa moveu a branch e bloqueou o Desfazer, o reflog
@@ -99,7 +101,9 @@ quaisquer outros.
 
 ![O Reflog de main: todas as posições por onde passou, da mais recente para a mais antiga, com a selecionada descrita à direita](../images/reflog.png)
 
-**Mostrar no Log** (`s`), **Criar branch aqui** (`b`) e **Restaurar
+**Mostrar no Log** (`l`), **Criar branch aqui** (`b`), **Criar tag aqui** (`t`),
+**Aplicar à árvore de trabalho** (`a`), **Guardar como stash** (`s`) (os três
+últimos funcionam como em Trabalho perdido, abaixo) e **Restaurar
 `<branch>` para esta posição** (`r`). O restauro é desfazível. Quando a branch
 está em checkout e tem alterações locais que ela não consegue mover sem as
 substituir, uma lista pergunta o que fazer com elas: manter as minhas alterações,
@@ -117,8 +121,54 @@ preenchendo enquanto um indicador de progresso roda; nunca bloqueia a interface.
 ![Trabalho perdido: os dois commits de uma branch eliminada (encontrados através do reflog) e commits soltos](../images/lost-work.png)
 
 **Criar branch aqui** (`b`) recupera um commit com um nome à sua escolha,
-**Cherry-pick** (`c`) aplica-o à branch atual e **Mostrar no Log** (`s`) funciona
-para os que ainda são alcançáveis.
+**Criar tag aqui** (`t`) fixa-o com uma tag (nome predefinido
+`restored-<id curto>`), **Cherry-pick** (`c`) aplica-o à branch atual. Um commit
+perdido não está no Log, pelo que esta vista não tem "Mostrar no Log" (a vista
+Reflog mantém-no para os commits ainda alcançáveis).
+
+**Restaurar alterações** repõe o que o commit alterou sem o commitar:
+**Aplicar à árvore de trabalho** (`a`) repete as alterações do commit sobre os
+ficheiros, tudo ou nada (o índice e HEAD ficam; um commit de merge é recusado).
+Quando não consegue aplicar limpo, nada é tocado e a janela oferece **Guardar
+como stash** (`s`), que guarda as mesmas alterações como um novo stash; essa
+ação está também sempre disponível por si. Ambas ficam no diário: `Ctrl+Z` repõe
+os ficheiros ou elimina o stash de novo. As mesmas ações são
+`gitpoulpi apply-commit <rev>` e `gitpoulpi stash from-commit <rev> [-m M]`, e a
+vista Reflog também as tem.
+
+### Painéis, hunks e a janela
+
+Reflog e Trabalho perdido mostram a lista de commits à esquerda e, à direita, o
+cabeçalho do commit selecionado, **todos os ficheiros que alterou** e os hunks do
+ficheiro selecionado (só hunks, quebrados à largura do painel). A lista de
+ficheiros é a do painel direito da janela principal: `Caminho` ou `Árvore` (`v`,
+ou clique no alternador), uma pasta recolhe-se com `Enter`, `Esquerda` ou
+`Direita`, um clique ou as setas escolhem um ficheiro e os seus hunks aparecem
+por baixo (o daemon é consultado fora da thread da interface; os últimos
+ficheiros ficam em cache). A lista de commits, a lista de ficheiros e os hunks
+têm cada um uma barra de deslocamento que pode premir e arrastar.
+
+- `Tab` / `Shift+Tab` percorrem os painéis (lista, ficheiros, hunks); as setas,
+  `PageUp`, `PageDown`, `Home` e `End` atuam no painel que tem o teclado (a sua
+  margem está acesa). `Enter` num ficheiro passa para os seus hunks.
+- **Divisores**: arraste o que fica entre a lista e o painel direito, ou o que
+  fica entre os ficheiros e os hunks; faça duplo clique num divisor para o
+  repor. No teclado: `Alt+Esquerda` / `Alt+Direita`, `Alt+Cima` / `Alt+Baixo`,
+  `Alt+0` repõe os dois. A paleta tem `Reflog / Trabalho perdido: repor tamanhos
+  dos painéis`, `painel seguinte` e `lista de ficheiros em caminhos ou árvore`.
+- `Ctrl+N` mostra as suas insígnias sobre os três separadores de vista e os três
+  painéis, como na janela principal; uma tecla de insígnia salta para lá.
+- **Mover e redimensionar a janela**: arraste a barra de título para a mover,
+  arraste as margens esquerda, direita e inferior ou um canto inferior (a pega
+  `◢`) para a redimensionar (nunca abaixo de 60 x 16, sempre dentro do ecrã). A
+  cruz de fechar mantém o seu clique e largar fora da janela nunca a fecha. O
+  equivalente de teclado é `Ctrl+N` e depois `m`: as setas movem,
+  `Shift`+setas redimensionam, `0` repõe, `Enter` ou `Esc` saem (a margem di-lo
+  enquanto está ativo). A paleta tem `Janela: mover ou redimensionar` e
+  `Janela: repor posição e tamanho`. Se o lugar é mantido decide-o
+  `ui.dialog_geometry` (*Definições > Aspeto > Memorizar posição e tamanho das
+  janelas*): `session` (predefinição), `saved` (reposto no próximo arranque) ou
+  `never`.
 
 ## A partir da paleta de comandos
 
@@ -131,8 +181,8 @@ no ecrã.
 | Vista | Linhas da paleta |
 |---|---|
 | Histórico de desfazer | `Histórico de desfazer: desfazer até aqui...`, `refazer até aqui...`, `restaurar só esta...`, `restaurar a branch para onde estava...`, `atualizar`, `fechar` |
-| Reflog | `Reflog: mostrar no Log`, `criar branch aqui...`, `restaurar para esta posição...`, `carregar mais`, `atualizar` |
-| Trabalho perdido | `Trabalho perdido: mostrar no Log`, `criar branch aqui...`, `Cherry-pick`, `procurar de novo` |
+| Reflog | `Reflog: mostrar no Log`, `criar branch aqui...`, `criar tag aqui...`, `aplicar alterações à árvore de trabalho`, `guardar alterações como stash`, `restaurar para esta posição...`, `carregar mais`, `atualizar` |
+| Trabalho perdido | `Trabalho perdido: criar branch aqui...`, `criar tag aqui...`, `Cherry-pick`, `aplicar alterações à árvore de trabalho`, `guardar alterações como stash`, `procurar de novo` |
 
 As linhas ficam a cinzento (com o motivo) enquanto a sua vista não está aberta; as três
 de abertura, `Editar: histórico de desfazer...`, `Editar: Reflog...` e `Editar:
@@ -151,8 +201,8 @@ pedido de nome que o botão.
 | Branches e tags | criar, eliminar, renomear, definir ou retirar o upstream, criar uma branch de acompanhamento, criar / eliminar / anotar uma tag, fast-forward, fazer checkout de um pull request como branch |
 | Movimento | checkout de uma branch ou de um commit (incluindo um HEAD desanexado) |
 | Histórico | merge (fast-forward ou commit de merge), rebase (simples e interativo, depois de terminado), cherry-pick, revert, reset (soft, mixed e hard), a parte local de um pull |
-| Alterações em curso | stage e unstage (ficheiro, pasta, hunk, linhas, tudo), descartar (ficheiro, pasta, hunk, linhas, um checkout de ficheiro), aplicar um patch, **eliminar um ficheiro do disco**, **ignorar** (ficheiro, extensão ou pasta: a linha do `.gitignore`) |
-| Stashes | push, apply, pop, drop |
+| Alterações em curso | stage e unstage (ficheiro, pasta, hunk, linhas, tudo), descartar (ficheiro, pasta, hunk, linhas, um checkout de ficheiro), aplicar um patch ou as alterações de um commit (`apply-commit`), **eliminar um ficheiro do disco**, **ignorar** (ficheiro, extensão ou pasta: a linha do `.gitignore`) |
+| Stashes | push, apply, pop, drop, guardar as alterações de um commit como stash (`stash from-commit`) |
 | Remotos e configuração | adicionar, remover, renomear, alterar o URL ou o URL de push de um remoto, track e untrack do Git LFS |
 | Num servidor | **eliminar uma branch ou uma tag num remoto** (a partir do menu da ref, da paleta, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, ou de um fim de fluxo que elimina a branch remota): veja abaixo |
 
@@ -425,7 +475,9 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   para uma dessas posições; uma branch em checkout com alterações por commitar
   precisa de `--mode`. Também é registado no diário.
 - `lost-commits` lista os commits que nenhuma branch, tag, remoto ou stash
-  alcança.
+  alcança. Para recuperar o trabalho de um sem o commitar: `apply-commit <rev>`
+  (para a árvore de trabalho, tudo ou nada) ou `stash from-commit <rev>` (como
+  stash); ambos ficam no diário.
 - Quando um movimento feito numa shell bloqueia a entrada mais recente, a recusa
   traz a posição do reflog que contém o que a entrada espera
   (`reason.RefMoved.restore`), para passar a `reflog-restore`.

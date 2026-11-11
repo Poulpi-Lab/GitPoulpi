@@ -167,11 +167,11 @@ no registo), pelo que os seus ficheiros, o índice e as refs não são tocados.
   a aparecer, ou não, com a nova resposta. Um HEAD desanexado não é verificado.
 - **Listas de branches base**: de onde vêm as Branches base de um repositório é uma escolha na sua página **Prevenção de
   conflitos**. **Predefinida** segue a predefinição global (a `**` incorporada, todas as branches, até escolher outra lista em
-  Definições > Geral > Prevenção de conflitos); **Lista: <nome>** segue uma das suas listas com nome; **Lista própria** é uma lista
+  Definições > Prevenção de conflitos); **Lista: <nome>** segue uma das suas listas com nome; **Lista própria** é uma lista
   só sua. As listas são partilhadas: edite uma e todos os repositórios que a seguem usam a alteração na verificação seguinte, sem
   reiniciar. **Guardar como lista...** transforma os padrões próprios de um repositório numa lista com nome, **Repor a predefinição**
   descarta a escolha do repositório. Eliminar uma lista que um repositório segue faz com que ele use a predefinida.
-- **Desativada**: **Ativar a deteção proativa de conflitos** em Definições > Geral, ou, para um só repositório, na sua página **Prevenção
+- **Desativada**: **Ativar a deteção proativa de conflitos** em Definições > Prevenção de conflitos, ou, para um só repositório, na sua página **Prevenção
   de conflitos**. A partir de um script, `gitpoulpi conflicts check` imprime a mesma resposta em JSON ([Referência
   da CLI](cli-reference.md)).
 

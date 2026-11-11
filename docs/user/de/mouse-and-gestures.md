@@ -44,8 +44,10 @@ gelten dieselben Regeln:
   Request) ignoriert einen Klick außerhalb, damit ein versehentlicher Klick nichts
   verliert. `✕` und `Esc` fragen zuerst **Änderungen verwerfen?**; **Weiter bearbeiten**
   geht zurück. Ein Formular ohne Eingabe schließt sofort, ebenso ein einzeiliger Dialog.
-- Menüs, Dropdownlisten, die Palette und Auswahllisten haben kein `✕`: Sie schließen mit
-  `Esc` oder einem Klick außerhalb.
+- Die Befehlspalette, die Auswahllisten (Tab, Theme, Sprache), die kleinen Dialoge von
+  Review, Board, Merge und Composer sowie die Bestätigungsabfrage haben ebenfalls ein `✕`.
+  Kontextmenüs und Dropdownlisten haben keins: Sie schließen mit `Esc` oder einem Klick
+  außerhalb.
 
 ## Listen in den Einstellungen
 
@@ -429,13 +431,32 @@ Siehe [Bilder](image-view.md) für die Maus in der Bildansicht.
 
 ## Dialoge verschieben und in der Größe ändern
 
-Der Dialog Rückgängig-Verlauf / Reflog / Verlorene Arbeit lässt sich verschieben und in der Größe ändern:
+Dialoge lassen sich verschieben, die größeren Fenster auch in der Größe ändern:
 
-- **Die Titelleiste ziehen**, um ihn zu verschieben (das Schließkreuz behält seinen Klick).
-- **Den linken, rechten oder unteren Rand** oder eine untere Ecke (den Griff `◢`) ziehen, um die Größe zu ändern. Der Dialog bleibt auf dem Bildschirm und wird nie kleiner als 60 x 16.
+- **Die Titelleiste ziehen**, um einen Dialog zu verschieben (das Schließkreuz behält seinen Klick). Die Befehlspalette und die Auswahllisten haben keine eigene Titelleiste: Ziehen Sie den oberen Rand.
+- **Den linken, rechten oder unteren Rand** oder eine untere Ecke (den Griff `◢`) ziehen, um die Größe eines Fensters zu ändern. Der Dialog bleibt auf dem Bildschirm und wird nie kleiner als sein Minimum (60 x 16 beim Rückgängig-Verlauf, bei den anderen kleiner). Ein vergrößertes Fenster nutzt den Platz: Textbereiche und Listen wachsen, Text bricht an der neuen Breite um.
 - Das Ziehen läuft weiter, wenn der Zeiger den Dialog verlässt, und ein Loslassen außerhalb schließt ihn nie.
-- **Die Trennlinien** zwischen Liste, Dateiliste und Hunks ziehen; ein Doppelklick auf eine setzt sie zurück.
-- Die Tastatur-Gegenstücke sind `Ctrl+N` und dann `m` (Pfeile verschieben, `Shift`+Pfeile ändern die Größe, `0` setzt zurück, `Enter` oder `Esc` beenden) und `Alt`+Pfeile für die Trennlinien; die Palette hat `Dialog: Verschieben/Größe ändern` und `Dialog: Position und Größe zurücksetzen`.
+- **Die Trennlinien** in der Ansicht Reflog / Verlorene Arbeit des Rückgängig-Verlaufs ziehen; ein Doppelklick auf eine setzt sie zurück.
+- Die Tastatur-Gegenstücke sind `Ctrl+N` und dann `m` (Pfeile verschieben, `Shift`+Pfeile ändern die Größe, `0` setzt zurück, `Enter` oder `Esc` beenden) und `Alt`+Pfeile für die Trennlinien; die Palette hat `Dialog: Verschieben/Größe ändern` und `Dialog: Position und Größe zurücksetzen`. Sie wirken auf den obersten Dialog. Die Oberflächen, die `Ctrl+N` für eigene Badges nutzen (das Formular der Commit-Nachricht, die Seite Verlauf umschreiben), nehmen nach ihrem `Ctrl+N` dasselbe `m`, und die Statuszeile nennt es. Die Befehlspalette und die Auswahllisten nutzen `Ctrl+N`, um in der Liste nach unten zu gehen; für sie ist die Taste `Alt+G` (`palette.arrange`) oder die Palettenzeile `Dialog: Verschieben/Größe ändern`: beide ordnen das vorderste Popup an und lassen es offen.
+- **Eine Einstellung** (`ui.dialog_geometry`, Einstellungen > Darstellung > Layout) gilt für jeden Dialog: Jeder merkt sich seine eigene Position und Größe für diese Sitzung, auf der Festplatte für den nächsten Start oder gar nicht.
+
+| Dialog | Verschieben | Größe ändern |
+|---|---|---|
+| Rückgängig-Verlauf / Reflog / Verlorene Arbeit, Aktivitätslog, Aufgabenpanel, Ordnerauswahl | ja | ja |
+| Befehlspalette, Auswahllisten für Tab / Theme / Sprache, Workspace-Suche | ja | ja (die Liste wächst mit der Höhe, die Zeilen mit der Breite) |
+| Clone (die Repository-Liste), Pull Request und Neues Issue (die Beschreibung), "Was gesendet wird" (der Bereich), Mermaid (die Vorschau), Review-Optionen (die Felder, nur die Breite) | ja | ja |
+| Langtext-Editoren in den Einstellungen (Vorlagen, Hooks, KI-Prompts), das KI-Feld im Workspace-Formular | ja | ja (der Textbereich) |
+| Verlauf umschreiben: die zwei KI-Hilfsdialoge | ja | ja (die Beschreibung, der Sendebereich) |
+| Über, Update-Panel, Sicherheitsprüfung, vorhergesagte Konflikte, "Über dem KI-Limit", Tag löschen, sensible Dateien | ja | nein (die Größe folgt dem Text) |
+| Init, Worktree, Sparse Checkout, Flow-Dialog, Issue-Flow-Dialoge, Formular der Commit-Nachricht (Umformulieren), Workspace-Formular, Auswahllisten für Labels / Meilensteine | ja | nein |
+| Bestätigungen (jedes "Sind Sie sicher?") | ja | nein |
+| Review- und Board-Dialoge: ihre kleinen Dialoge (Kommentar, Abschluss, Auswahl, Spalten) | ja | nein |
+| Popups der Tastenkürzel-Seite (Zurücksetzen bestätigen, Tastenerfassung), das Popup der KI-Antwort | ja | nein |
+| Einstellungen: die Ergebnisse und die Bestätigung der Repository-Authentifizierung | ja | nein |
+| Verlauf umschreiben: Purge-, Identitäts- und Frage-Dialoge | ja | nein |
+| Popup zum Verschieben einer Datei im Commit-Composer, Merge-Hinweise | ja | nein |
+
+Nicht verschiebbar: die Vollseiten (Einstellungen, Hilfe, die Seiten Review und Board, die schon das Fenster füllen), Kontextmenüs und Dropdownlisten (sie hängen an dem, was sie geöffnet hat), Tooltips und die kleinen Popups innerhalb einer Seite (das Formular der Remotes, der Editor zum Aufteilen eines Commits).
 
 Der Zeiger zeigt eine Verschiebeform über der Titelleiste und eine Größenform über Rändern und Ecken (Terminals mit `OSC 22`).
 

@@ -39,9 +39,16 @@ impl EditorClose {
         text != self.original
     }
 
-    /// Paints the closable frame.
-    pub(super) fn panel(&mut self, buf: &mut Buffer, rect: Rect, title: &str) {
-        self.guard.panel(buf, rect, title);
+    /// Paints the closable frame of an editor that moves.
+    pub(super) fn framed(
+        &mut self,
+        buf: &mut Buffer,
+        rect: Rect,
+        title: &str,
+        win: &crate::dialog_kit::Win,
+        _enabled: bool,
+    ) {
+        self.guard.framed(buf, rect, title, win);
     }
 
     /// Paints the confirmation when it is open (call last).

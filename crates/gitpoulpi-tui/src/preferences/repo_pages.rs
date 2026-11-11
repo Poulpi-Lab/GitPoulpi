@@ -490,11 +490,14 @@ impl PreferencesState {
         };
         let width = (area.width * 4 / 5).max(30).min(area.width);
         let height = (area.height / 2).max(8).min(area.height);
-        let rect = Rect::new(
-            area.x + (area.width - width) / 2,
-            area.y + (area.height - height) / 2,
-            width,
-            height,
+        let rect = WIN.place(
+            area,
+            Rect::new(
+                area.x + (area.width - width) / 2,
+                area.y + (area.height - height) / 2,
+                width,
+                height,
+            ),
         );
         let title = match edit.target {
             RpTarget::TemplateDescription => t::TEMPLATE_DESCRIPTION.get(),
@@ -504,7 +507,8 @@ impl PreferencesState {
             }
             _ => t::SPARSE_PATHS.get(),
         };
-        edit.close.panel(frame.buffer_mut(), rect, title);
+        edit.close
+            .framed(frame.buffer_mut(), rect, title, &WIN, true);
         super::editor_close::footer(
             frame.buffer_mut(),
             rect,
@@ -585,3 +589,6 @@ impl PreferencesState {
         }
     }
 }
+
+/// The editor moves (its size follows the screen).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("settings_repo_pages_editor");

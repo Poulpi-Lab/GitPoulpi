@@ -816,7 +816,8 @@ impl RewriteView {
             if let Some(cross) =
                 crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::RaClose))
             {
-                hits.push((cross, RewriteHit::RaClose));
+                WIN_RULES_AI.decorate(buf, rect, Some(cross), true);
+            hits.push((cross, RewriteHit::RaClose));
             }
             dialog_kit::put(
                 buf,
@@ -849,7 +850,7 @@ impl RewriteView {
         } else {
             fixed(field_h, gap) + pane_h
         };
-        let rect = centered(room, inner_h);
+        let rect = WIN_RULES_AI.place(room, centered(room, inner_h));
         dialog_kit::panel(buf, rect, &title);
         if let Some(cross) =
             crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::RaClose))
@@ -1114,3 +1115,6 @@ impl RewriteView {
         hits
     }
 }
+
+/// The dialog moves (its size follows its content).
+const WIN_RULES_AI: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("rewrite_rules_ai");

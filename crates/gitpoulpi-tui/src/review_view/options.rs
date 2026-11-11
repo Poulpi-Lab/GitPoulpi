@@ -622,11 +622,14 @@ impl OptionsDialog {
     }
 
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
-        let rect = dialog_kit::centered(area, area.width.saturating_sub(4).min(86), 15);
+        let rect = WIN.place(
+            area,
+            dialog_kit::centered(area, area.width.saturating_sub(4).min(86), 15),
+        );
         self.panel = rect;
         self.edit.begin_frame();
         let title = format!("{} {}", crate::theme::AI_SPARK, msg::TITLE.get());
-        self.close.panel(buf, rect, &title);
+        self.close.framed(buf, rect, &title, &WIN, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -1055,3 +1058,6 @@ mod tests {
         assert!(!dialog.order().contains(&Part::Run), "not focusable");
     }
 }
+
+/// The options dialog moves.
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("review_options");

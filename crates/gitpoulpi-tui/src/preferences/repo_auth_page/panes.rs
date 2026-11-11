@@ -201,8 +201,13 @@ fn wrap_hard_words(text: &str, width: usize) -> Vec<String> {
 
 /// A centred, closable panel: where the frame is, and the cross.
 fn frame_rect(area: Rect, want_w: u16, want_h: u16) -> Rect {
-    dialog_kit::centered(area, want_w.min(area.width), want_h.min(area.height))
+    WIN.place(
+        area,
+        dialog_kit::centered(area, want_w.min(area.width), want_h.min(area.height)),
+    )
 }
+
+const WIN: dialog_kit::Win = dialog_kit::Win::movable("repo_auth");
 
 // ----------------------------------------------------------------- results
 
@@ -266,7 +271,8 @@ impl ResultsPane {
         let rect = frame_rect(area, 96, area.height.saturating_sub(4).max(8));
         self.frame = rect;
         dialog_kit::fill(buf, rect, Style::default().bg(th().ui.panel));
-        self.close.panel(buf, rect, t::RESULTS_TITLE.get());
+        self.close
+            .framed(buf, rect, t::RESULTS_TITLE.get(), &WIN, true);
         // The pane sits on the panel's own frame: one box, the bar on its
         // right edge, the key hint on the bottom border.
         self.pane.render(buf, rect, false);
@@ -402,7 +408,8 @@ impl CommandConfirm {
         let rect = frame_rect(area, 90, 20);
         self.frame = rect;
         dialog_kit::fill(buf, rect, Style::default().bg(th().ui.panel));
-        self.close.panel(buf, rect, t::CONFIRM_TITLE.get());
+        self.close
+            .framed(buf, rect, t::CONFIRM_TITLE.get(), &WIN, true);
         let body = Rect::new(
             rect.x + 2,
             rect.y + 1,

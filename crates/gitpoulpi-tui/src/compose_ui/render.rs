@@ -9,9 +9,10 @@ impl ComposeForm {
         if w < 30 || h < 6 {
             return;
         }
-        let rect = crate::dialog_kit::centered(area, w, h);
+        let rect = WIN.place(area, crate::dialog_kit::centered(area, w, h));
         let buf = frame.buffer_mut();
         crate::dialog_kit::panel(buf, rect, &format!(" {} ", msg::MOVE_TITLE.get()));
+        WIN.decorate(buf, rect, None, true);
         let file = self
             .commits
             .get(m.from.0)
@@ -466,3 +467,6 @@ impl ComposeForm {
         hits
     }
 }
+
+/// The dialog moves (its size follows its content).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("compose_move");

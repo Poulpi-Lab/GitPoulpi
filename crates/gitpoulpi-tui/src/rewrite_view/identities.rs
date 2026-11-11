@@ -710,13 +710,14 @@ impl RewriteView {
         let room = (bounds.height as usize).saturating_sub(prompt.len() + 6);
         let shown = pick.candidates.len().min(room.max(1));
         let height = (prompt.len() + shown + 5) as u16;
-        let rect = dialog_kit::centered(bounds, width, height);
+        let rect = WIN_IDENT.place(bounds, dialog_kit::centered(bounds, width, height));
         dialog_kit::panel(buf, rect, m::PICK_TITLE.get());
         if let Some(cross) = crate::chrome::close_cross::paint(
             buf,
             rect,
             hovered == Some(RewriteHit::IdentPickCancel),
         ) {
+            WIN_IDENT.decorate(buf, rect, Some(cross), true);
             hits.push((cross, RewriteHit::IdentPickCancel));
         }
         let mut y = rect.y + 2;
@@ -779,3 +780,6 @@ impl RewriteView {
         hits
     }
 }
+
+/// The dialog moves (its size follows its content).
+const WIN_IDENT: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("rewrite_identities");

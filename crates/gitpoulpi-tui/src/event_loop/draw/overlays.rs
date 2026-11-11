@@ -56,6 +56,9 @@ pub(in crate::event_loop) struct OverlaysDrawCtx<'a> {
     pub(in crate::event_loop) undo_busy: bool,
 }
 
+/// The confirmation moves (never resizes: its size follows its text).
+const CONFIRM_WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("confirm_prompt");
+
 pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut OverlaysDrawCtx<'_>) {
     let active_tab = ctx.active_tab;
     let central_view = ctx.central_view;
@@ -558,7 +561,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
             + 2;
         let area_w = u32::from(frame.area().width.max(1));
         let needed_pct = ((buttons_w as u32 + 4) * 100).div_ceil(area_w).min(100) as u16;
-        let popup = centered_rect(needed_pct.max(44), 18, frame.area());
+        let popup = CONFIRM_WIN.place(frame.area(), centered_rect(needed_pct.max(44), 18, frame.area()));
         frame.render_clipped(Clear, popup);
         frame.render_clipped(
             Block::default()
@@ -620,6 +623,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         );
         frame_hits.insert(0, (confirm_rect, HitTarget::ConfirmButton(true)));
         frame_hits.insert(0, (cancel_rect, HitTarget::ConfirmButton(false)));
+        CONFIRM_WIN.decorate(frame.buffer_mut(), popup, None, true);
     }
 
     // A guiding dialog (conflicts first / input too large): it paints its

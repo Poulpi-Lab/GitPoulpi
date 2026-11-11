@@ -1304,11 +1304,14 @@ impl PreferencesState {
         let hovered = |r: Rect| mouse.is_some_and(|(c, row)| r.contains((c, row).into()));
         let width = (area.width * 4 / 5).max(30).min(area.width);
         let height = (area.height * 3 / 5).max(8).min(area.height);
-        let rect = Rect::new(
-            area.x + (area.width - width) / 2,
-            area.y + (area.height - height) / 2,
-            width,
-            height,
+        let rect = WIN.place(
+            area,
+            Rect::new(
+                area.x + (area.width - width) / 2,
+                area.y + (area.height - height) / 2,
+                width,
+                height,
+            ),
         );
         let title = msg::editor_title(
             if edit.scope == AiScope::Repo && edit.section == AiSection::Global {
@@ -1317,7 +1320,8 @@ impl PreferencesState {
                 edit.section.title()
             },
         );
-        edit.close.panel(frame.buffer_mut(), rect, &title);
+        edit.close
+            .framed(frame.buffer_mut(), rect, &title, &WIN, true);
         super::editor_close::footer(
             frame.buffer_mut(),
             rect,
@@ -1552,3 +1556,6 @@ mod prompt_vars;
 
 #[cfg(test)]
 mod tests;
+
+/// The editor moves (its size follows the screen).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("settings_ai_editor");

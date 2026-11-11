@@ -205,9 +205,10 @@ impl ComposeBox {
     }
 
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
-        let rect = dialog_kit::centered(area, 84, 16);
+        let rect = WIN_REVIEW_TEXT.place(area, dialog_kit::centered(area, 84, 16));
         self.edit.begin_frame();
         dialog_kit::panel(buf, rect, &self.title);
+        WIN_REVIEW_TEXT.decorate(buf, rect, None, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -748,9 +749,10 @@ impl FinishDialog {
     }
 
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer, spinner: char) {
-        let rect = dialog_kit::centered(area, 84, 20);
+        let rect = WIN_REVIEW_FINISH.place(area, dialog_kit::centered(area, 84, 20));
         self.edit.begin_frame();
         dialog_kit::panel(buf, rect, msg::FINISH_TITLE.get());
+        WIN_REVIEW_FINISH.decorate(buf, rect, None, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -1004,8 +1006,9 @@ impl Confirm {
     }
 
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
-        let rect = dialog_kit::centered(area, 64, 8);
+        let rect = WIN_REVIEW_PICK.place(area, dialog_kit::centered(area, 64, 8));
         dialog_kit::panel(buf, rect, self.title);
+        WIN_REVIEW_PICK.decorate(buf, rect, None, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -1067,3 +1070,12 @@ impl Confirm {
         self.hits = vec![(yes, ConfirmPart::Yes), (no, ConfirmPart::No)];
     }
 }
+
+/// The dialog moves (its size follows its content).
+const WIN_REVIEW_TEXT: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("review_text");
+
+/// The dialog moves (its size follows its content).
+const WIN_REVIEW_FINISH: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("review_finish");
+
+/// The dialog moves (its size follows its content).
+const WIN_REVIEW_PICK: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("review_pick");

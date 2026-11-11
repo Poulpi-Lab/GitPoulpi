@@ -34,13 +34,7 @@ pub(crate) struct DiscardGuard {
 }
 
 impl DiscardGuard {
-    /// Paints the closable frame and remembers it.
-    pub(crate) fn panel(&mut self, buf: &mut Buffer, rect: Rect, title: &str) {
-        self.frame = rect;
-        self.close.panel(buf, rect, title);
-    }
-
-    /// [`DiscardGuard::panel`] for a form that moves.
+    /// Paints the closable frame of a form that moves, and remembers it.
     pub(crate) fn framed(&mut self, buf: &mut Buffer, rect: Rect, title: &str, win: &super::Win) {
         self.frame = rect;
         let enabled = self.confirm.is_none();

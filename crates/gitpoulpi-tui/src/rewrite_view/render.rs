@@ -1520,13 +1520,14 @@ impl RewriteView {
             .min((bounds.height as usize).saturating_sub(fixed).max(2));
         self.paint.question_room.set(room);
         let height = (room + fixed) as u16;
-        let rect = dialog_kit::centered(bounds, width, height);
+        let rect = WIN_QUESTION.place(bounds, dialog_kit::centered(bounds, width, height));
         dialog_kit::panel(buf, rect, q.title.get());
         if let Some(cross) = crate::chrome::close_cross::paint(
             buf,
             rect,
             hovered == Some(RewriteHit::QuestionCancel),
         ) {
+            WIN_QUESTION.decorate(buf, rect, Some(cross), true);
             hits.push((cross, RewriteHit::QuestionCancel));
         }
         let mut y = rect.y + 2;
@@ -1884,3 +1885,6 @@ pub(crate) fn rewrite_hit_at(
         _ => None,
     })
 }
+
+/// The dialog moves (its size follows its content).
+const WIN_QUESTION: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("rewrite_question");

@@ -1088,11 +1088,12 @@ impl RewriteView {
             }
         };
         let height = (lines.len() + options.len() + 5).min(bounds.height as usize) as u16;
-        let rect = dialog_kit::centered(bounds, width, height);
+        let rect = WIN_PURGE.place(bounds, dialog_kit::centered(bounds, width, height));
         dialog_kit::panel(buf, rect, &title);
         if let Some(cross) =
             crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::PurgeCancel))
         {
+            WIN_PURGE.decorate(buf, rect, Some(cross), true);
             hits.push((cross, RewriteHit::PurgeCancel));
         }
         let last_text = rect.bottom().saturating_sub(options.len() as u16 + 2);
@@ -1120,3 +1121,6 @@ impl RewriteView {
         hits
     }
 }
+
+/// The dialog moves (its size follows its content).
+const WIN_PURGE: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("rewrite_purge");

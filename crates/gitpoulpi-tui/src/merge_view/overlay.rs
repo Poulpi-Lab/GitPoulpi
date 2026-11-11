@@ -196,8 +196,9 @@ impl MergeView {
         if w < 12 || h < 5 {
             return;
         }
-        let rect = dialog_kit::centered(area, w, h);
+        let rect = WIN.place(area, dialog_kit::centered(area, w, h));
         dialog_kit::panel(buf, rect, &title);
+        WIN.decorate(buf, rect, None, true);
         let inner_w = rect.width.saturating_sub(4);
         for (i, line) in lines.iter().enumerate() {
             dialog_kit::put(
@@ -303,3 +304,6 @@ impl MergeView {
         let _ = th().ui.muted;
     }
 }
+
+/// The dialog moves (its size follows its content).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("merge_notice");

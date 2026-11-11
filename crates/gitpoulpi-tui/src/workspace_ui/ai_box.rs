@@ -323,9 +323,10 @@ impl AiBox {
     }
 
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
-        let rect = dialog_kit::centered(area, 80, 20);
+        let rect = WIN.place(area, dialog_kit::centered(area, 80, 20));
         self.edit.begin_frame();
         dialog_kit::panel(buf, rect, m::BOX_TITLE.get());
+        WIN.decorate(buf, rect, None, true);
         let inner = Rect::new(
             rect.x + 2,
             rect.y + 1,
@@ -431,3 +432,6 @@ impl AiBox {
         self.mode.render_popup(buf, buf.area);
     }
 }
+
+/// The dialog moves (its size follows its content).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("workspace_ai");

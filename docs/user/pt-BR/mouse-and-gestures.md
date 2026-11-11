@@ -43,8 +43,10 @@ mesmas regras valem em todo lugar:
   request) ignora um clique fora, para que um clique perdido não o apague. O `✕` e o
   `Esc` perguntam antes **Descartar alterações?**; **Voltar a editar** retorna. Um
   formulário sem nada digitado fecha na hora, e um diálogo de uma linha também.
-- Menus, listas suspensas, a paleta e os seletores não têm `✕`: eles fecham com `Esc`
-  ou com um clique fora.
+- A paleta de comandos, os seletores (aba, tema, idioma), os pequenos diálogos de
+  revisão, quadro, merge e compositor e o prompt de confirmação também têm o `✕`.
+  Menus de contexto e listas suspensas não têm: eles fecham com `Esc` ou com um
+  clique fora.
 
 ## Listas nas Configurações
 
@@ -432,13 +434,32 @@ Veja [Imagens](image-view.md) para o mouse na visualização de imagem.
 
 ## Mover e redimensionar diálogos
 
-O diálogo Histórico de desfazer / Reflog / Trabalho perdido pode ser movido e redimensionado:
+Os diálogos podem ser movidos, e as janelas maiores redimensionadas:
 
-- **Arraste a barra de título** para movê-lo (a cruz de fechar mantém o clique).
-- **Arraste a borda esquerda, direita ou inferior**, ou um canto inferior (a alça `◢`), para redimensioná-lo. O diálogo fica na tela e nunca encolhe abaixo de 60 x 16.
+- **Arraste a barra de título** para mover um diálogo (a cruz de fechar mantém o clique). A paleta de comandos e os seletores não têm barra de título própria: arraste a borda superior.
+- **Arraste a borda esquerda, direita ou inferior**, ou um canto inferior (a alça `◢`), para redimensionar uma janela. O diálogo fica na tela e nunca encolhe abaixo do seu mínimo (60 x 16 para o Histórico de desfazer, menor para os outros). Uma janela redimensionada aproveita o espaço: áreas de texto e listas crescem, o texto quebra na nova largura.
 - O arrasto continua quando o ponteiro sai do diálogo, e soltar fora nunca o fecha.
-- **Arraste os divisores** entre a lista, a lista de arquivos e os hunks; um clique duplo em um deles o restaura.
-- Os equivalentes de teclado são `Ctrl+N` e depois `m` (as setas movem, `Shift`+setas redimensionam, `0` restaura, `Enter` ou `Esc` saem) e `Alt`+setas para os divisores; a paleta tem `Diálogo: mover ou redimensionar` e `Diálogo: restaurar posição e tamanho`.
+- **Arraste os divisores** dentro da visão Reflog / Trabalho perdido do Histórico de desfazer; um clique duplo em um deles o restaura.
+- Os equivalentes de teclado são `Ctrl+N` e depois `m` (as setas movem, `Shift`+setas redimensionam, `0` restaura, `Enter` ou `Esc` saem) e `Alt`+setas para os divisores; a paleta tem `Diálogo: mover ou redimensionar` e `Diálogo: restaurar posição e tamanho`. Eles agem no diálogo do topo. As telas que usam `Ctrl+N` para selos próprios (o formulário de mensagem de commit, a página de reescrita do histórico) aceitam o mesmo `m` depois do `Ctrl+N`, e a linha de status o indica. A paleta de comandos e os seletores usam `Ctrl+N` para descer na lista; para eles a tecla é `Alt+G` (`palette.arrange`), ou a própria linha `Diálogo: mover ou redimensionar` da paleta: ambos ajustam o popup da frente e o deixam aberto.
+- **Uma só configuração** (`ui.dialog_geometry`, Configurações > Aparência > Layout) vale para todos os diálogos: cada um lembra a própria posição e o próprio tamanho nesta sessão, em disco para a próxima abertura, ou nunca.
+
+| Diálogo | Mover | Redimensionar |
+|---|---|---|
+| Histórico de desfazer / Reflog / Trabalho perdido, Log de atividade, painel de tarefas, seletor de pasta | sim | sim |
+| Paleta de comandos, seletores de aba / tema / idioma, busca no workspace | sim | sim (a lista cresce com a altura, as linhas com a largura) |
+| Clone (a lista de repositórios), Pull request e Nova issue (a descrição), "O que é enviado" (o painel), Mermaid (a prévia), opções de revisão (os campos, só a largura) | sim | sim |
+| Editores de texto longo das Configurações (modelos, hooks, prompts de IA), a caixa de IA do formulário de workspace | sim | sim (a área de texto) |
+| Reescrita do histórico: os dois diálogos auxiliares de IA | sim | sim (a descrição, o painel enviado) |
+| Sobre, painel de atualização, verificação de segurança, conflitos previstos, "Acima do limite de IA", exclusão de tag, arquivos sensíveis | sim | não (o tamanho segue o texto) |
+| Init, Worktree, Sparse checkout, diálogo Flow, diálogos de fluxo de issues, formulário de mensagem de commit (reword), formulário de Workspace, seletores de rótulo / marco | sim | não |
+| Confirmações (todo "Tem certeza?") | sim | não |
+| Diálogos de Revisão e de Quadro: seus pequenos diálogos (comentário, concluir, escolher, colunas) | sim | não |
+| Popups da página de atalhos (confirmação de redefinição, captura de tecla), o popup de resposta da IA | sim | não |
+| Configurações: os resultados e a confirmação da autenticação do repositório | sim | não |
+| Reescrita do histórico: diálogos de purge, de identidade e de pergunta | sim | não |
+| Popup de mover arquivo do compositor de commits, avisos de merge | sim | não |
+
+Não podem ser movidos: as telas de página inteira (Configurações, Ajuda, as páginas de Revisão e de Quadro, que já ocupam a janela), menus de contexto e listas suspensas (ficam presos ao que os abriu), dicas (tooltips) e os pequenos popups dentro de uma página (o formulário de remotos, o editor de divisão de commit).
 
 O ponteiro mostra uma forma de mover sobre a barra de título e uma forma de redimensionar sobre as bordas e os cantos (terminais com `OSC 22`).
 

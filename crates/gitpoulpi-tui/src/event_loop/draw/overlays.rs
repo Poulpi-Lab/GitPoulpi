@@ -427,7 +427,15 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     // `PalettePopup`/`palette_row_at` geometry and hit test.
     if let InputMode::TabPicker { draft, selected } = &input_mode {
         let indices = filter_tab_indices(repo_tabs, draft);
-        let popup = TAB_PICKER_WIN.place(frame.area(), centered_rect(46, 50, frame.area()));
+        // Wide enough for the title and its close cross on a narrow screen.
+        let area = frame.area();
+        let mut default = centered_rect(46, 50, area);
+        let min_w = 28.min(area.width);
+        if default.width < min_w {
+            default.x = area.x + (area.width - min_w) / 2;
+            default.width = min_w;
+        }
+        let popup = TAB_PICKER_WIN.place(area, default);
         frame.render_clipped(Clear, popup);
         let [input_area, list_area, hint_area] = Layout::vertical([
             Constraint::Length(3),

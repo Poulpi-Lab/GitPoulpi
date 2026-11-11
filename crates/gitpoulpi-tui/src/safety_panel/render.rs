@@ -12,8 +12,8 @@ use ratatui::widgets::{Block, BorderType, Borders, Widget};
 
 use super::panes::{self, Divider, Pane};
 use super::{label, rows, Act, Confirm, ModePick, NamePrompt, Overlay, RowMenu, SafetyPanel, Tab};
-use crate::status_pane::FileListMode;
 use crate::dialog_kit::{self, ButtonState};
+use crate::status_pane::FileListMode;
 use crate::{display_width, th};
 
 /// One list row: `(label, age, tag, tag style, dimmed)`. Age and tag are
@@ -122,9 +122,9 @@ impl SafetyPanel {
     pub(crate) fn render_in(&mut self, screen: Rect, buf: &mut Buffer) {
         let rect = self.window.layout(screen);
         self.render(rect, buf);
-        let hint = gitpoulpi_i18n::msg::dialog_frame::arrange_hint(
-            dialog_kit::key_name(crate::keymap::chord::Key::Enter),
-        );
+        let hint = gitpoulpi_i18n::msg::dialog_frame::arrange_hint(dialog_kit::key_name(
+            crate::keymap::chord::Key::Enter,
+        ));
         self.window.paint(buf, &hint);
         if self.overlay.is_none() || self.window.dragging() {
             self.window.register_pointer(self.close.rect());
@@ -585,7 +585,8 @@ impl SafetyPanel {
 
     fn render_hints(&self, buf: &mut Buffer, inner: Rect, y: u16) {
         let tab = dialog_kit::key_name(crate::keymap::chord::Key::Tab);
-        let mut pairs: Vec<(String, &str)> = vec![("\u{2191}\u{2193}".to_string(), m::HINT_MOVE.get())];
+        let mut pairs: Vec<(String, &str)> =
+            vec![("\u{2191}\u{2193}".to_string(), m::HINT_MOVE.get())];
         if self.tab != Tab::History {
             pairs.push((tab, m::HINT_PANE.get()));
         }

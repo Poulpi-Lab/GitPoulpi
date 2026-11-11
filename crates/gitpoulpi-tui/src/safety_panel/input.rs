@@ -302,7 +302,11 @@ impl SafetyPanel {
         // goes (its release is the frame's, so letting go outside never
         // closes). The close cross keeps its click.
         let on_cross = self.close.hit(col, row);
-        if self.window.on_mouse(mouse, on_cross, self.overlay.is_none()) == FrameMouse::Consumed {
+        if self
+            .window
+            .on_mouse(mouse, on_cross, self.overlay.is_none())
+            == FrameMouse::Consumed
+        {
             self.overlay = None;
             return PanelOutcome::Stay;
         }

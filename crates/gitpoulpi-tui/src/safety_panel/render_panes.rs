@@ -11,7 +11,9 @@ use gitpoulpi_i18n::msg::undo_safety as m;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
-use ratatui::widgets::{Block, BorderType, Borders, List, ListState as RState, StatefulWidget, Widget};
+use ratatui::widgets::{
+    Block, BorderType, Borders, List, ListState as RState, StatefulWidget, Widget,
+};
 
 use super::panes::{DiffShown, Divider, Pane};
 use super::render::Hit;
@@ -138,7 +140,11 @@ impl SafetyPanel {
             let mid = lay.grab_v.y + lay.grab_v.height / 2;
             dialog_kit::put(buf, x, mid, vgrip, 1, grip);
         }
-        let hmark = if lit(Divider::Horizontal) { "\u{2550}" } else { "\u{2500}" };
+        let hmark = if lit(Divider::Horizontal) {
+            "\u{2550}"
+        } else {
+            "\u{2500}"
+        };
         if lay.grab_h.width > 6 {
             let x = lay.grab_h.x + lay.grab_h.width / 2;
             dialog_kit::put(buf, x, lay.grab_h.y, hmark, 1, grip);
@@ -189,7 +195,14 @@ impl SafetyPanel {
             if y >= area.bottom() {
                 break;
             }
-            dialog_kit::put(buf, area.x + 1, y, line, area.width.saturating_sub(1), text());
+            dialog_kit::put(
+                buf,
+                area.x + 1,
+                y,
+                line,
+                area.width.saturating_sub(1),
+                text(),
+            );
         }
     }
 
@@ -252,11 +265,21 @@ impl SafetyPanel {
             } else {
                 cd::NO_FILE_CHANGES_PAREN.get().to_string()
             };
-            dialog_kit::put(buf, inner.x + 1, inner.y, &words, inner.width.saturating_sub(1), muted());
+            dialog_kit::put(
+                buf,
+                inner.x + 1,
+                inner.y,
+                &words,
+                inner.width.saturating_sub(1),
+                muted(),
+            );
             hits.push((rect, Hit::Pane(Pane::Files)));
             return;
         }
-        let statuses = self.detail().map(|d| d.statuses.clone()).unwrap_or_default();
+        let statuses = self
+            .detail()
+            .map(|d| d.statuses.clone())
+            .unwrap_or_default();
         let items = crate::file_rows::FileRows {
             rows: &self.panes.tree,
             paths: &paths,
@@ -267,7 +290,8 @@ impl SafetyPanel {
         }
         .items();
         let files = self.panes.files;
-        let selected = (files.selected >= files.offset && files.selected < files.offset + view_rows)
+        let selected = (files.selected >= files.offset
+            && files.selected < files.offset + view_rows)
             .then_some(files.selected);
         let mut state = RState::default().with_offset(files.offset);
         // `select(None)` would reset the offset a scrollbar set.
@@ -327,7 +351,14 @@ impl SafetyPanel {
             return;
         }
         let say = |buf: &mut Buffer, words: &str, style: Style| {
-            dialog_kit::put(buf, inner.x + 1, inner.y, words, inner.width.saturating_sub(1), style);
+            dialog_kit::put(
+                buf,
+                inner.x + 1,
+                inner.y,
+                words,
+                inner.width.saturating_sub(1),
+                style,
+            );
         };
         // The diff is borrowed out of the pane for the lines; take a copy of
         // what is needed so the pane can lay it out.
@@ -339,7 +370,11 @@ impl SafetyPanel {
             }
             DiffShown::Loading => {
                 let spin = crate::activity::spinner_frame(self.lost.scan_elapsed());
-                say(buf, &format!("{spin} {}", m::PANE_DIFF_LOADING.get()), muted());
+                say(
+                    buf,
+                    &format!("{spin} {}", m::PANE_DIFF_LOADING.get()),
+                    muted(),
+                );
                 return;
             }
             DiffShown::Failed(why) => {

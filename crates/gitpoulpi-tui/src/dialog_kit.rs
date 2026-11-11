@@ -18,13 +18,13 @@ use crate::{button_bg, display_width, fit, text_field};
 mod discard;
 mod dismiss;
 mod frame;
-pub(crate) use frame::{FloatingFrame, FrameMouse};
 pub(crate) use discard::{DiscardGuard, Verdict};
 #[allow(unused_imports)]
 pub(crate) use dismiss::{
     dismiss, panel_closable, CloseHit, Confirm, ConfirmEvent, Dismiss, DismissAction, DismissKind,
     Guard,
 };
+pub(crate) use frame::{FloatingFrame, FrameMouse};
 
 /// Paints `rect` with `style` (spaces).
 pub(crate) fn fill(buf: &mut Buffer, rect: Rect, style: Style) {

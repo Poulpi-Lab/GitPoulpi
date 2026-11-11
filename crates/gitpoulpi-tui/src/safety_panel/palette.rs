@@ -174,13 +174,21 @@ impl SafetyPanel {
             }
             SafetyCmd::ArrangeDialog => {
                 self.arrange();
-                self.say(gitpoulpi_i18n::msg::dialog_frame::ARRANGING.get().to_string());
+                self.say(
+                    gitpoulpi_i18n::msg::dialog_frame::ARRANGING
+                        .get()
+                        .to_string(),
+                );
                 return (PanelOutcome::Stay, None);
             }
             SafetyCmd::ResetDialog => {
                 self.overlay = None;
                 self.window.reset();
-                self.say(gitpoulpi_i18n::msg::dialog_frame::RESET_DONE.get().to_string());
+                self.say(
+                    gitpoulpi_i18n::msg::dialog_frame::RESET_DONE
+                        .get()
+                        .to_string(),
+                );
                 return (PanelOutcome::Stay, None);
             }
             _ => {}

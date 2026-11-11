@@ -60,12 +60,7 @@ fn lost_repo() -> (FixtureRepo, String) {
 
 /// Commits `files` on a new branch `name` with the message `message`, goes
 /// back to `main` and deletes the branch: its commit is lost work.
-fn lose_commit(
-    repo: &FixtureRepo,
-    name: &str,
-    word: &str,
-    files: &[(&str, &str)],
-) -> String {
+fn lose_commit(repo: &FixtureRepo, name: &str, word: &str, files: &[(&str, &str)]) -> String {
     let root = repo.root();
     common::git(root, &["checkout", "-b", name]);
     for (path, text) in files {
@@ -109,12 +104,16 @@ fn open_lost(rig: &mut Rig, lost: &str) {
     });
     rig.term.send_keys("Enter").unwrap();
     let short = lost[..7].to_string();
-    wait(&mut rig.term, "the lost commit with its first file", move |s| {
-        s.contains(&short)
-            && s.contains("2 files changed")
-            && s.contains("Changes in a.txt")
-            && s.contains("changed-in-doomed")
-    });
+    wait(
+        &mut rig.term,
+        "the lost commit with its first file",
+        move |s| {
+            s.contains(&short)
+                && s.contains("2 files changed")
+                && s.contains("Changes in a.txt")
+                && s.contains("changed-in-doomed")
+        },
+    );
 }
 
 /// Opens the Undo history (Alt+Z) and switches to Reflog with `2`, then
@@ -125,12 +124,16 @@ fn open_reflog(rig: &mut Rig) {
         s.contains("can be undone") || s.contains("Undo history")
     });
     rig.term.send_keys("2").unwrap();
-    wait(&mut rig.term, "the newest reflog position with its first file", |s| {
-        s.contains("commit: second commit")
-            && s.contains("2 files changed")
-            && s.contains("Changes in a.txt")
-            && s.contains("changed-in-second")
-    });
+    wait(
+        &mut rig.term,
+        "the newest reflog position with its first file",
+        |s| {
+            s.contains("commit: second commit")
+                && s.contains("2 files changed")
+                && s.contains("Changes in a.txt")
+                && s.contains("changed-in-second")
+        },
+    );
 }
 
 /// The dialog's grip (the bottom right corner) or `None`.
@@ -241,7 +244,9 @@ fn tab_walks_the_panes_and_ctrl_tab_walks_the_views() {
         s.contains("can be undone") && !s.contains("2 files changed")
     });
     rig.term.send_keys("3").unwrap();
-    wait(&mut rig.term, "Lost work", |s| s.contains("2 files changed"));
+    wait(&mut rig.term, "Lost work", |s| {
+        s.contains("2 files changed")
+    });
     rig.term.stop().unwrap();
 }
 
@@ -278,16 +283,20 @@ fn the_vertical_divider_moves_by_drag_by_keys_and_resets() {
         files_title_col(s).is_some_and(|c| c < home + 18 && c > home)
     });
     rig.term.send_keys("M-Right M-Right").unwrap();
-    wait(&mut rig.term, "the divider right of where the drag left it", |s| {
-        files_title_col(s).is_some_and(|c| c > home + 18)
-    });
+    wait(
+        &mut rig.term,
+        "the divider right of where the drag left it",
+        |s| files_title_col(s).is_some_and(|c| c > home + 18),
+    );
     rig.term.send_keys("M-0").unwrap();
     wait(&mut rig.term, "the default place", |s| {
         files_title_col(s) == Some(home)
     });
     // A double click on the divider resets it too.
     rig.term.send_keys("M-Right").unwrap();
-    wait(&mut rig.term, "moved", |s| files_title_col(s).is_some_and(|c| c > home));
+    wait(&mut rig.term, "moved", |s| {
+        files_title_col(s).is_some_and(|c| c > home)
+    });
     let s = rig.term.screen();
     let gap = files_title_col(&s).unwrap() - 3;
     act_until(
@@ -404,23 +413,32 @@ fn ctrl_n_m_arranges_the_dialog_from_the_keyboard() {
     let home_grip = grip(&rig.term.screen()).unwrap();
     rig.term.send_keys("C-n").unwrap();
     rig.term.send_text("m").unwrap();
-    wait(&mut rig.term, "the arrange banner", |s| s.contains("Arrange:"));
+    wait(&mut rig.term, "the arrange banner", |s| {
+        s.contains("Arrange:")
+    });
     rig.term.send_keys("Left Left Up").unwrap();
-    wait(&mut rig.term, "the dialog 4 columns left and a row up", |s| {
-        title_at(s, " Lost work ") == Some((home_title.0 - 4, home_title.1 - 1))
-            && s.contains("Arrange:")
-    });
+    wait(
+        &mut rig.term,
+        "the dialog 4 columns left and a row up",
+        |s| {
+            title_at(s, " Lost work ") == Some((home_title.0 - 4, home_title.1 - 1))
+                && s.contains("Arrange:")
+        },
+    );
     rig.term.send_keys("S-Left S-Left").unwrap();
-    wait(&mut rig.term, "the grip 4 columns left of the moved one", |s| {
-        grip(s) == Some((home_grip.0 - 4 - 4, home_grip.1 - 1))
-    });
+    wait(
+        &mut rig.term,
+        "the grip 4 columns left of the moved one",
+        |s| grip(s) == Some((home_grip.0 - 4 - 4, home_grip.1 - 1)),
+    );
     rig.term.send_keys("0").unwrap();
     wait(&mut rig.term, "everything back", |s| {
         title_at(s, " Lost work ") == Some(home_title) && grip(s) == Some(home_grip)
     });
     rig.term.send_keys("Right Enter").unwrap();
     wait(&mut rig.term, "moved and left", |s| {
-        title_at(s, " Lost work ") == Some((home_title.0 + 2, home_title.1)) && !s.contains("Arrange:")
+        title_at(s, " Lost work ") == Some((home_title.0 + 2, home_title.1))
+            && !s.contains("Arrange:")
     });
     rig.term.stop().unwrap();
 }
@@ -441,7 +459,7 @@ fn ctrl_n_badges_jump_to_a_pane_and_to_a_view() {
     // that is not the one the title has there).
     let badge_at = |s: &Screen, (col, row): (u16, u16), plain: &str| -> Option<char> {
         let c = s.cell(col, row)?.text.chars().next()?;
-        (c.is_ascii_alphanumeric() && plain.chars().next() != Some(c)).then_some(c)
+        (c.is_ascii_alphanumeric() && !plain.starts_with(c)).then_some(c)
     };
     // The hunks pane gets the keyboard: Down there scrolls, it does not pick
     // another file (a.txt stays), whereas on the files pane it picks d.txt.
@@ -454,11 +472,15 @@ fn ctrl_n_badges_jump_to_a_pane_and_to_a_view() {
     let diff_badge = badge_at(&s, diff_at, "C").unwrap();
     rig.term.send_text(&diff_badge.to_string()).unwrap();
     rig.term.send_keys("Down").unwrap();
-    wait(&mut rig.term, "a.txt still shown after Down on the hunks", |s| {
-        s.contains("Changes in a.txt")
-            && s.contains("changed-in-doomed")
-            && badge_at(s, files_at, "2").is_none()
-    });
+    wait(
+        &mut rig.term,
+        "a.txt still shown after Down on the hunks",
+        |s| {
+            s.contains("Changes in a.txt")
+                && s.contains("changed-in-doomed")
+                && badge_at(s, files_at, "2").is_none()
+        },
+    );
     rig.term.send_keys("C-n").unwrap();
     let s = wait(&mut rig.term, "badges again", |s| {
         badge_at(s, files_at, "2").is_some()
@@ -496,15 +518,22 @@ fn the_files_and_hunks_scrollbars_can_be_pressed_and_dragged() {
         .map(|n| (format!("f{n:02}.txt"), "x\n".to_string()))
         .collect();
     files.push(("f00.txt".into(), long));
-    let refs: Vec<(&str, &str)> = files.iter().map(|(a, b)| (a.as_str(), b.as_str())).collect();
+    let refs: Vec<(&str, &str)> = files
+        .iter()
+        .map(|(a, b)| (a.as_str(), b.as_str()))
+        .collect();
     lose_commit(&repo, "doomed", "many files", &refs);
     let mut rig = launch(repo, "pty-panes-bars", "");
     rig.term.send_keys("C-p").unwrap();
     rig.term.send_text("recover lost").unwrap();
-    wait(&mut rig.term, "the palette row", |s| s.contains("Recover Lost"));
+    wait(&mut rig.term, "the palette row", |s| {
+        s.contains("Recover Lost")
+    });
     rig.term.send_keys("Enter").unwrap();
     wait(&mut rig.term, "the first file and its hunks", |s| {
-        s.contains("70 files changed") && s.contains("Changes in f00.txt") && s.contains("row number 000")
+        s.contains("70 files changed")
+            && s.contains("Changes in f00.txt")
+            && s.contains("row number 000")
     });
     let s = rig.term.screen();
     let (gx, gy) = grip(&s).unwrap();

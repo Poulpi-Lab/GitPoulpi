@@ -129,12 +129,7 @@ pub(super) fn layout(
         header: Rect::new(side_x, body.y, side_w, header_h),
         files,
         diff,
-        grab_v: Rect::new(
-            side_x.saturating_sub(1),
-            body.y + header_h,
-            2,
-            boxes_h,
-        ),
+        grab_v: Rect::new(side_x.saturating_sub(1), body.y + header_h, 2, boxes_h),
         grab_h: Rect::new(side_x, files.bottom().saturating_sub(1), side_w, 1),
     }
 }
@@ -224,7 +219,12 @@ impl DiffPane {
 
     /// The hunks of `file` as lines `width` cells wide (hunks only, wrapped),
     /// laid out once per file and width.
-    pub(crate) fn lines(&mut self, key: &DiffKey, file: &FileDiff, width: u16) -> Rc<[Line<'static>]> {
+    pub(crate) fn lines(
+        &mut self,
+        key: &DiffKey,
+        file: &FileDiff,
+        width: u16,
+    ) -> Rc<[Line<'static>]> {
         if let Some((k, w, lines)) = &self.laid {
             if k == key && *w == width {
                 return Rc::clone(lines);
@@ -469,11 +469,9 @@ impl Panes {
                     2,
                 );
                 let step = pane_split::key_step(usable);
-                if let Some(next) = pane_split::move_divider(
-                    &current,
-                    0,
-                    i32::from(current[0]) + towards * step,
-                ) {
+                if let Some(next) =
+                    pane_split::move_divider(&current, 0, i32::from(current[0]) + towards * step)
+                {
                     self.cols = Some(pane_split::weights_for(&next));
                 }
             }
@@ -506,6 +504,7 @@ impl Panes {
 }
 
 #[cfg(test)]
+#[allow(clippy::field_reassign_with_default)]
 mod tests {
     use super::*;
 
@@ -516,7 +515,10 @@ mod tests {
         let l = layout(BODY, None, None, 4);
         assert_eq!(l.list.width + 1 + l.files.width, BODY.width);
         assert_eq!(l.list.height, BODY.height);
-        assert_eq!(l.header.height + l.files.height + l.diff.height, BODY.height);
+        assert_eq!(
+            l.header.height + l.files.height + l.diff.height,
+            BODY.height
+        );
         assert_eq!(l.files.bottom(), l.diff.y);
         assert_eq!(l.files.x, l.diff.x);
         assert!(l.grab_v.contains((l.files.x - 1, l.files.y).into()));
@@ -539,7 +541,11 @@ mod tests {
         let moved = layout(BODY, p.cols.as_deref(), None, 4);
         assert_eq!(moved.list.width, 30);
         let wider = layout(Rect::new(4, 5, 241, 30), p.cols.as_deref(), None, 4);
-        assert!((59..=61).contains(&wider.list.width), "{}", wider.list.width);
+        assert!(
+            (59..=61).contains(&wider.list.width),
+            "{}",
+            wider.list.width
+        );
     }
 
     #[test]

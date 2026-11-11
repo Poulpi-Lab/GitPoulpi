@@ -72,8 +72,12 @@ impl Geo {
     fn clamped(self, screen: Rect) -> Self {
         let w = self.w.max(MIN_W.min(screen.width)).min(screen.width);
         let h = self.h.max(MIN_H.min(screen.height)).min(screen.height);
-        let x = self.x.clamp(screen.x, screen.right().saturating_sub(w).max(screen.x));
-        let y = self.y.clamp(screen.y, screen.bottom().saturating_sub(h).max(screen.y));
+        let x = self
+            .x
+            .clamp(screen.x, screen.right().saturating_sub(w).max(screen.x));
+        let y = self
+            .y
+            .clamp(screen.y, screen.bottom().saturating_sub(h).max(screen.y));
         Self { x, y, w, h }
     }
 }
@@ -370,7 +374,10 @@ impl FloatingFrame {
                 self.arrange = false;
                 self.drag = Some(Drag {
                     grip,
-                    held: (col.saturating_sub(self.rect.x), row.saturating_sub(self.rect.y)),
+                    held: (
+                        col.saturating_sub(self.rect.x),
+                        row.saturating_sub(self.rect.y),
+                    ),
                     start: Geo::of(self.rect),
                 });
                 FrameMouse::Consumed
@@ -395,7 +402,10 @@ impl FloatingFrame {
         };
         let s = drag.start;
         let (col, row) = (i32::from(col), i32::from(row));
-        let (right, bottom) = (i32::from(s.x) + i32::from(s.w), i32::from(s.y) + i32::from(s.h));
+        let (right, bottom) = (
+            i32::from(s.x) + i32::from(s.w),
+            i32::from(s.y) + i32::from(s.h),
+        );
         let mut x = i32::from(s.x);
         let mut y = i32::from(s.y);
         let mut w = i32::from(s.w);
@@ -528,8 +538,14 @@ impl FloatingFrame {
             }
         }
         pointer_map::register(title, Kind::Move);
-        pointer_map::register(Rect::new(left, r.y + 1, 1, r.height.saturating_sub(2)), Kind::ColResize);
-        pointer_map::register(Rect::new(right, r.y + 1, 1, r.height.saturating_sub(2)), Kind::ColResize);
+        pointer_map::register(
+            Rect::new(left, r.y + 1, 1, r.height.saturating_sub(2)),
+            Kind::ColResize,
+        );
+        pointer_map::register(
+            Rect::new(right, r.y + 1, 1, r.height.saturating_sub(2)),
+            Kind::ColResize,
+        );
         pointer_map::register(Rect::new(left + 1, bottom, r.width - 2, 1), Kind::RowResize);
         pointer_map::register(Rect::new(left, bottom, 1, 1), Kind::NeswResize);
         pointer_map::register(Rect::new(right, bottom, 1, 1), Kind::NwseResize);
@@ -633,22 +649,50 @@ mod tests {
         let mut f = frame();
         let r = f.rect();
         let (cx, cy) = (r.right() - 1, r.bottom() - 1);
-        f.on_mouse(mouse(MouseEventKind::Down(MouseButton::Left), cx, cy), false, true);
-        f.on_mouse(mouse(MouseEventKind::Drag(MouseButton::Left), 100, 30), false, true);
-        f.on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), 100, 30), false, true);
+        f.on_mouse(
+            mouse(MouseEventKind::Down(MouseButton::Left), cx, cy),
+            false,
+            true,
+        );
+        f.on_mouse(
+            mouse(MouseEventKind::Drag(MouseButton::Left), 100, 30),
+            false,
+            true,
+        );
+        f.on_mouse(
+            mouse(MouseEventKind::Up(MouseButton::Left), 100, 30),
+            false,
+            true,
+        );
         let small = f.layout(SCREEN);
         assert_eq!((small.x, small.y), (r.x, r.y));
         assert_eq!((small.width, small.height), (100 - r.x + 1, 30 - r.y + 1));
         // Far too small: stops at the minimum.
         let (cx, cy) = (small.right() - 1, small.bottom() - 1);
-        f.on_mouse(mouse(MouseEventKind::Down(MouseButton::Left), cx, cy), false, true);
-        f.on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), 0, 0), false, true);
+        f.on_mouse(
+            mouse(MouseEventKind::Down(MouseButton::Left), cx, cy),
+            false,
+            true,
+        );
+        f.on_mouse(
+            mouse(MouseEventKind::Up(MouseButton::Left), 0, 0),
+            false,
+            true,
+        );
         let min = f.layout(SCREEN);
         assert_eq!((min.width, min.height), (MIN_W, MIN_H));
         // The left border moves the left edge, the right edge stays.
         let right = min.right();
-        f.on_mouse(mouse(MouseEventKind::Down(MouseButton::Left), min.x, min.y + 3), false, true);
-        f.on_mouse(mouse(MouseEventKind::Up(MouseButton::Left), min.x - 5, min.y + 3), false, true);
+        f.on_mouse(
+            mouse(MouseEventKind::Down(MouseButton::Left), min.x, min.y + 3),
+            false,
+            true,
+        );
+        f.on_mouse(
+            mouse(MouseEventKind::Up(MouseButton::Left), min.x - 5, min.y + 3),
+            false,
+            true,
+        );
         let wider = f.layout(SCREEN);
         assert_eq!(wider.right(), right);
         assert_eq!(wider.width, MIN_W + 5);
@@ -671,7 +715,10 @@ mod tests {
             kind: KeyEventKind::Press,
             state: crossterm::event::KeyEventState::NONE,
         };
-        assert!(!f.on_key(key(KeyCode::Left, KeyModifiers::NONE)), "not arranging");
+        assert!(
+            !f.on_key(key(KeyCode::Left, KeyModifiers::NONE)),
+            "not arranging"
+        );
         f.arrange_start();
         let before = f.rect();
         assert!(f.on_key(key(KeyCode::Left, KeyModifiers::NONE)));
@@ -701,8 +748,24 @@ mod tests {
     #[test]
     fn the_saved_file_round_trips() {
         let mut geos = HashMap::new();
-        geos.insert("a".to_string(), Geo { x: 1, y: 2, w: 70, h: 20 });
-        geos.insert("b".to_string(), Geo { x: 0, y: 0, w: 99, h: 30 });
+        geos.insert(
+            "a".to_string(),
+            Geo {
+                x: 1,
+                y: 2,
+                w: 70,
+                h: 20,
+            },
+        );
+        geos.insert(
+            "b".to_string(),
+            Geo {
+                x: 0,
+                y: 0,
+                w: 99,
+                h: 30,
+            },
+        );
         assert_eq!(parse_saved(&render_saved(&geos)), geos);
         assert!(parse_saved("garbage\n1 2 3\n").is_empty());
     }

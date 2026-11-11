@@ -26,12 +26,12 @@ mod label_tests;
 #[cfg(test)]
 mod layout_tests;
 mod palette;
+#[cfg(test)]
+mod pane_tests;
 mod panes;
 mod render;
 mod render_panes;
 mod rows;
-#[cfg(test)]
-mod pane_tests;
 #[cfg(test)]
 mod tests;
 
@@ -668,9 +668,7 @@ impl SafetyPanel {
     pub(crate) fn busy(&self) -> bool {
         self.job.is_some()
             || self.panes.busy()
-            || (self.tab != Tab::History
-                && self.pane_commit().is_some()
-                && self.detail().is_none())
+            || (self.tab != Tab::History && self.pane_commit().is_some() && self.detail().is_none())
             || self.history.load.is_some()
             || self.reflog.load.is_some()
             || self.reflog.fetching_more()

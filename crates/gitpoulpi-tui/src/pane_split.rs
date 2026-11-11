@@ -23,7 +23,12 @@ pub(crate) fn widths(weights: Option<&[u16]>, usable: u16, n: usize) -> Vec<u16>
 
 /// [`widths`] with another floor per pane: the rows of a column of panes
 /// (a few lines each) share a height the same way.
-pub(crate) fn widths_min(weights: Option<&[u16]>, usable: u16, n: usize, min_pane: u16) -> Vec<u16> {
+pub(crate) fn widths_min(
+    weights: Option<&[u16]>,
+    usable: u16,
+    n: usize,
+    min_pane: u16,
+) -> Vec<u16> {
     let n16 = n.max(1) as u16;
     let equal = |usable: u16| -> Vec<u16> {
         let each = usable / n16;

@@ -400,7 +400,8 @@ pub(crate) fn install_dialog_geometry(mode: gitpoulpi_config::DialogGeometry) {
         G::Saved => 1,
         G::Never => 2,
     };
-    cell!(DIALOG_GEOMETRY, |m: &AtomicU8| m.store(n, Ordering::Relaxed));
+    cell!(DIALOG_GEOMETRY, |m: &AtomicU8| m
+        .store(n, Ordering::Relaxed));
 }
 
 pub(crate) fn dialog_geometry() -> gitpoulpi_config::DialogGeometry {

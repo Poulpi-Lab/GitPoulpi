@@ -123,7 +123,10 @@ fn lost_panel() -> SafetyPanel {
             paths: paths.clone(),
         },
     );
-    for (path, old, new) in [("src/a.rs", "old_line()", "new_line()"), ("README.md", "# before", "# after")] {
+    for (path, old, new) in [
+        ("src/a.rs", "old_line()", "new_line()"),
+        ("README.md", "# before", "# after"),
+    ] {
         panel.panes.diff.keep(
             (c, PathBuf::from(path)),
             FileDiff {
@@ -182,9 +185,15 @@ fn the_dialog_at_200_by_50_lays_out_list_files_and_hunks() {
         assert!(text.contains(want), "{want:?} missing\n{text}");
     }
     let lay = panel.panes.layout;
-    assert!(lay.list.right() < lay.files.x, "the list is left of the right pane");
+    assert!(
+        lay.list.right() < lay.files.x,
+        "the list is left of the right pane"
+    );
     assert_eq!(lay.files.x, lay.diff.x);
-    assert!(lay.files.bottom() <= lay.diff.y, "the files are above the hunks");
+    assert!(
+        lay.files.bottom() <= lay.diff.y,
+        "the files are above the hunks"
+    );
     // Every pane has a hit, and so has each divider.
     for hit in [
         Hit::Pane(Pane::List),
@@ -235,7 +244,10 @@ fn the_file_cursor_picks_which_hunks_show_and_v_flips_path_and_tree() {
     panel.on_key(key(KeyCode::Tab));
     panel.on_key(key(KeyCode::Down));
     let text = buffer_text(&panel.paint_at(SCREEN));
-    assert!(text.contains("Changes in README.md") && text.contains("# after"), "{text}");
+    assert!(
+        text.contains("Changes in README.md") && text.contains("# after"),
+        "{text}"
+    );
     assert!(!text.contains("new_line()"));
     panel.on_key(key(KeyCode::Char('v')));
     assert_eq!(panel.panes.mode, crate::status_pane::FileListMode::Tree);
@@ -294,7 +306,10 @@ fn dragging_the_horizontal_divider_gives_the_files_more_rows() {
 fn the_alt_keys_move_the_dividers_and_alt_0_resets_them() {
     let mut panel = lost_panel();
     panel.paint_at(SCREEN);
-    let (w, h) = (panel.panes.layout.list.width, panel.panes.layout.files.height);
+    let (w, h) = (
+        panel.panes.layout.list.width,
+        panel.panes.layout.files.height,
+    );
     panel.on_key(mods(KeyCode::Right, KeyModifiers::ALT));
     panel.on_key(mods(KeyCode::Down, KeyModifiers::ALT));
     panel.paint_at(SCREEN);
@@ -307,7 +322,10 @@ fn the_alt_keys_move_the_dividers_and_alt_0_resets_them() {
     panel.on_key(mods(KeyCode::Char('0'), KeyModifiers::ALT));
     panel.paint_at(SCREEN);
     assert_eq!(
-        (panel.panes.layout.list.width, panel.panes.layout.files.height),
+        (
+            panel.panes.layout.list.width,
+            panel.panes.layout.files.height
+        ),
         (w, h)
     );
 }
@@ -317,12 +335,17 @@ fn the_diff_and_the_files_each_have_a_bar_that_can_be_pressed_and_dragged() {
     let mut panel = lost_panel();
     // Many files and a long diff, so both bars exist.
     let c = oid('c');
-    let paths: Vec<PathBuf> = (0..80).map(|n| PathBuf::from(format!("f{n:02}.rs"))).collect();
+    let paths: Vec<PathBuf> = (0..80)
+        .map(|n| PathBuf::from(format!("f{n:02}.rs")))
+        .collect();
     panel.lost.detail.fill(
         c,
         Loaded {
             node: None,
-            statuses: paths.iter().map(|p| (p.clone(), FileStatus::Added)).collect(),
+            statuses: paths
+                .iter()
+                .map(|p| (p.clone(), FileStatus::Added))
+                .collect(),
             paths: paths.clone(),
         },
     );
@@ -352,13 +375,18 @@ fn the_diff_and_the_files_each_have_a_bar_that_can_be_pressed_and_dragged() {
     panel.on_mouse(down(col, lay.files.bottom() - 3));
     assert!(panel.panes.files.offset > 0, "the files bar jumped");
     panel.on_mouse(up(col, lay.files.bottom() - 3));
-    let before = panel.panes.files.offset;
     let shown = buffer_text(&panel.paint_at(SCREEN));
-    assert!(shown.contains("f6") && !shown.contains("+ f00.txt"), "painted after the jump\n{shown}");
+    assert!(
+        shown.contains("f6") && !shown.contains("+ f00.txt"),
+        "painted after the jump\n{shown}"
+    );
     panel.on_mouse(down(col, lay.files.bottom() - 3));
     let top = panel.panes.files.offset;
     panel.on_mouse(drag(col, lay.files.y + 2));
-    assert!(panel.panes.files.offset < top, "and the thumb followed the drag up");
+    assert!(
+        panel.panes.files.offset < top,
+        "and the thumb followed the drag up"
+    );
     panel.on_mouse(up(col, lay.files.y + 2));
     assert!(panel.panes.files.grab.is_none());
     // Diff bar.
@@ -382,7 +410,10 @@ fn dragging_the_title_moves_the_dialog_and_a_release_outside_never_closes_it() {
     assert!(matches!(outcome, PanelOutcome::Stay));
     panel.on_mouse(drag(f.x + 10, f.y + 2));
     let outcome = panel.on_mouse(up(3, 1));
-    assert!(matches!(outcome, PanelOutcome::Stay), "a release outside is not a click");
+    assert!(
+        matches!(outcome, PanelOutcome::Stay),
+        "a release outside is not a click"
+    );
     panel.paint_at(SCREEN);
     assert_ne!(panel.frame.x, f.x);
     assert_eq!((panel.frame.width, panel.frame.height), (f.width, f.height));
@@ -427,7 +458,10 @@ fn arrange_mode_moves_resizes_and_resets_from_the_keyboard() {
     panel.arrange();
     assert!(panel.window.arranging());
     // The arrange mode takes the keys: `q` is not "close" there.
-    assert!(matches!(panel.on_key(key(KeyCode::Char('q'))), PanelOutcome::Stay));
+    assert!(matches!(
+        panel.on_key(key(KeyCode::Char('q'))),
+        PanelOutcome::Stay
+    ));
     panel.on_key(key(KeyCode::Right));
     panel.on_key(mods(KeyCode::Down, KeyModifiers::SHIFT));
     let buf = panel.paint_at(SCREEN);
@@ -439,7 +473,10 @@ fn arrange_mode_moves_resizes_and_resets_from_the_keyboard() {
     assert_eq!(panel.frame, f);
     panel.on_key(key(KeyCode::Esc));
     assert!(!panel.window.arranging());
-    assert!(matches!(panel.on_key(key(KeyCode::Esc)), PanelOutcome::Close));
+    assert!(matches!(
+        panel.on_key(key(KeyCode::Esc)),
+        PanelOutcome::Close
+    ));
 }
 
 #[test]
@@ -490,7 +527,11 @@ fn ctrl_n_badges_name_the_view_tabs_and_the_panes_and_a_press_jumps_there() {
     panel.on_mouse(up(cell.0, cell.1));
     assert_eq!(panel.panes.focus, Pane::Diff);
     let tab = panel.hit_rect(Hit::Tab(Tab::History));
-    let cell = targets.iter().find(|(_, at)| *at == (tab.x, tab.y)).unwrap().1;
+    let cell = targets
+        .iter()
+        .find(|(_, at)| *at == (tab.x, tab.y))
+        .unwrap()
+        .1;
     panel.on_mouse(down(cell.0, cell.1));
     assert_eq!(panel.tab, Tab::History);
 }
@@ -499,7 +540,10 @@ fn ctrl_n_badges_name_the_view_tabs_and_the_panes_and_a_press_jumps_there() {
 fn enter_never_runs_an_action_it_only_navigates_in_the_file_list() {
     let mut panel = lost_panel();
     panel.paint_at(SCREEN);
-    assert!(matches!(panel.on_key(key(KeyCode::Enter)), PanelOutcome::Stay));
+    assert!(matches!(
+        panel.on_key(key(KeyCode::Enter)),
+        PanelOutcome::Stay
+    ));
     assert!(
         panel.overlay.is_none() && panel.job.is_none(),
         "Enter on the commit does nothing"
@@ -507,5 +551,9 @@ fn enter_never_runs_an_action_it_only_navigates_in_the_file_list() {
     panel.on_key(key(KeyCode::Tab));
     panel.on_key(key(KeyCode::Enter));
     assert!(panel.overlay.is_none() && panel.job.is_none());
-    assert_eq!(panel.panes.focus, Pane::Diff, "Enter on a file goes to its hunks");
+    assert_eq!(
+        panel.panes.focus,
+        Pane::Diff,
+        "Enter on a file goes to its hunks"
+    );
 }

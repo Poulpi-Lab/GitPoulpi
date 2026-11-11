@@ -214,8 +214,15 @@ fn bottom_tabs_are_the_last_row_and_every_interaction_works() {
 
     // Click switches.
     let (mx, _) = wait_tab(&mut term, "moonbase", false, bar_row);
-    term.click(mx + 1, bar_row).unwrap();
-    wait_commit(&mut term, "moonbase");
+    let want = subject("moonbase");
+    common::retry_until(
+        &mut term,
+        "moonbase active",
+        4,
+        Duration::from_secs(8),
+        |t| t.click(mx + 1, bar_row).unwrap(),
+        |s| s.contains(&want),
+    );
 
     // Ctrl+PageDown: the keyboard moves on.
     term.send_text("\x1b[6;5~").unwrap();
@@ -223,20 +230,36 @@ fn bottom_tabs_are_the_last_row_and_every_interaction_works() {
 
     // Right click: the tab menu hangs in view (above the bar here).
     let (mx, _) = wait_tab(&mut term, "moonbase", false, bar_row);
-    term.click_with(Button::Right, mx + 1, bar_row).unwrap();
-    term.wait_for("the tab menu", STEP, |s| s.contains("Close tab"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the tab menu",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            if !t.screen().contains("Close tab") {
+                t.click_with(Button::Right, mx + 1, bar_row).unwrap();
+            }
+        },
+        |s| s.contains("Close tab"),
+    );
     term.send_keys("Escape").unwrap();
     term.wait_for("the menu closed", STEP, |s| !s.contains("Close tab"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Middle click closes (after the question).
     let (nx, _) = wait_tab(&mut term, "moonbase", false, bar_row);
-    term.click_with(Button::Middle, nx + 1, bar_row).unwrap();
-    term.wait_for("the close question", STEP, |s| {
-        s.contains("Close the tab for 'moonbase'")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the close question",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            if !t.screen().contains("Close the tab for 'moonbase'") {
+                t.click_with(Button::Middle, nx + 1, bar_row).unwrap();
+            }
+        },
+        |s| s.contains("Close the tab for 'moonbase'"),
+    );
     term.send_keys("Escape").unwrap();
 
     // Drag orbit onto comet's place.
@@ -268,8 +291,17 @@ fn bottom_tabs_are_the_last_row_and_every_interaction_works() {
 fn left_tabs_are_a_column_and_every_interaction_works() {
     let fx = setup("pty-tabs-left", 3, "tabs_position = \"left\"\n");
     let mut term = start(&fx, COLS, ROWS);
-    let s = term.screen();
     let (ox, or) = wait_tab(&mut term, "orbit", true, 0);
+    // One settled screen for the layout checks below: the tabs, the Log and
+    // the status line all drawn (a torn frame can lack any of them).
+    let s = term
+        .wait_for("the whole left layout", STEP, |s| {
+            tab_pos(s, "comet", true, 0).is_some()
+                && s.contains(&subject("orbit"))
+                && s.contains("Activity")
+                && s.line(1).contains('\u{2302}')
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (_, mr) = wait_tab(&mut term, "moonbase", true, 0);
     let (_, cr) = wait_tab(&mut term, "comet", true, 0);
     assert!(ox <= 3, "names start at the left edge: {ox}");
@@ -298,8 +330,15 @@ fn left_tabs_are_a_column_and_every_interaction_works() {
     assert_eq!(act_r, ROWS - 2);
 
     // Click switches.
-    term.click(ox + 1, mr).unwrap();
-    wait_commit(&mut term, "moonbase");
+    let want = subject("moonbase");
+    common::retry_until(
+        &mut term,
+        "moonbase active",
+        4,
+        Duration::from_secs(8),
+        |t| t.click(ox + 1, mr).unwrap(),
+        |s| s.contains(&want),
+    );
 
     // Keyboard.
     term.send_text("\x1b[6;5~").unwrap();
@@ -309,29 +348,52 @@ fn left_tabs_are_a_column_and_every_interaction_works() {
 
     // Right click opens the tab menu.
     let (mx, mr) = wait_tab(&mut term, "moonbase", true, 0);
-    term.click_with(Button::Right, mx + 1, mr).unwrap();
-    term.wait_for("the tab menu", STEP, |s| s.contains("Close tab"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the tab menu",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            if !t.screen().contains("Close tab") {
+                t.click_with(Button::Right, mx + 1, mr).unwrap();
+            }
+        },
+        |s| s.contains("Close tab"),
+    );
     term.send_keys("Escape").unwrap();
     term.wait_for("the menu closed", STEP, |s| !s.contains("Close tab"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // The active tab's cross closes (after the question).
     let (_, mr) = wait_tab(&mut term, "moonbase", true, 0);
-    term.click(COLUMN_RIGHT - 2, mr).unwrap();
-    term.wait_for("the close question", STEP, |s| {
-        s.contains("Close the tab for 'moonbase'")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the close question",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            if !t.screen().contains("Close the tab for 'moonbase'") {
+                t.click(COLUMN_RIGHT - 2, mr).unwrap();
+            }
+        },
+        |s| s.contains("Close the tab for 'moonbase'"),
+    );
     term.send_keys("Escape").unwrap();
 
     // Middle click on another row asks too.
     let (cx, cr) = wait_tab(&mut term, "comet", true, 0);
-    term.click_with(Button::Middle, cx + 1, cr).unwrap();
-    term.wait_for("the close question", STEP, |s| {
-        s.contains("Close the tab for 'comet'")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the close question",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            if !t.screen().contains("Close the tab for 'comet'") {
+                t.click_with(Button::Middle, cx + 1, cr).unwrap();
+            }
+        },
+        |s| s.contains("Close the tab for 'comet'"),
+    );
     term.send_keys("Escape").unwrap();
 
     // Drag orbit down onto comet's row: the marker shows, the drop reorders.

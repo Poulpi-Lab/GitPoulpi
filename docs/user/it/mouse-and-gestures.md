@@ -439,7 +439,7 @@ Le finestre si possono spostare, e quelle più grandi ridimensionare:
 - Il trascinamento continua quando il puntatore esce dalla finestra, e rilasciare fuori non la chiude mai.
 - **Trascina i divisori** all'interno della vista Reflog / Lavoro perso della Cronologia annullamenti; il doppio clic su uno lo reimposta.
 - Gli equivalenti da tastiera sono `Ctrl+N` poi `m` (le frecce spostano, `Maiusc`+frecce ridimensionano, `0` reimposta, `Invio` o `Esc` escono) e `Alt`+frecce per i divisori; la palette ha `Finestra: Sposta o ridimensiona` e `Finestra: Reimposta posizione e dimensione`. Agiscono sulla finestra in primo piano. Le superfici che usano `Ctrl+N` per badge propri (il modulo del messaggio di commit, la pagina di riscrittura della cronologia) accettano lo stesso `m` dopo il loro `Ctrl+N`, e la barra di stato lo indica. La palette dei comandi e i selettori usano `Ctrl+N` per scendere nell'elenco, quindi per loro il tasto è `Alt+G` (`palette.arrange`), oppure la riga `Finestra: Sposta o ridimensiona` della palette: entrambi dispongono il popup in primo piano e lo lasciano aperto.
-- **Un'unica impostazione** (`ui.dialog_geometry`, Impostazioni > Aspetto > Layout) vale per tutte le finestre: ognuna ricorda la propria posizione e dimensione per questa sessione, su disco per il prossimo avvio, oppure mai.
+- **Un'unica impostazione** (`ui.dialog_geometry`, Impostazioni > Aspetto > Disposizione) vale per tutte le finestre: ognuna ricorda la propria posizione e dimensione per questa sessione, su disco per il prossimo avvio, oppure mai.
 
 | Dialogo | Sposta | Ridimensiona |
 |---|---|---|

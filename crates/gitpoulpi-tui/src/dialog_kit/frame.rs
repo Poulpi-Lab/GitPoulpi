@@ -472,7 +472,9 @@ fn grip_at(l: &Live, col: u16, row: u16) -> Option<Grip> {
     }
     match col {
         c if c == left => Some(Grip::Left),
-        c if c == right => Some(Grip::Right),
+        // The list popups draw their scrollbar on the right border: a press
+        // there is the scrollbar's; the corner and the other edges resize.
+        c if c == right && !POPUPS.contains(&l.id) => Some(Grip::Right),
         _ => None,
     }
 }

@@ -235,7 +235,10 @@ fn dialog_frame_key(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) ->
         InputMode::Rewrite(view) => !view.badge_ready(),
         _ => false,
     };
+    // A popup of the list family never lives in these modes: the registry
+    // still names it until the next paint after it closed.
     if frame::any_live()
+        && !frame::top_is_popup()
         && plain_mode
         && !own_badges
         && !frame::top_is("review_choice")

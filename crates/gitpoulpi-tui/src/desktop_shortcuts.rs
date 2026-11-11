@@ -1,4 +1,4 @@
-//! The scriptable twin of Settings > General > Launcher, for
+//! The scriptable twin of Settings > Launcher, for
 //! `gitpoulpi desktop shortcut status|install|remove`. Same code as the
 //! screen (`launcher`), run on the calling thread: a CLI has no frame to keep.
 

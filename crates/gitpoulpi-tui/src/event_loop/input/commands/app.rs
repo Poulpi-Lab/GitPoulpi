@@ -404,7 +404,10 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         }
         PaletteCommand::ConflictLists => {
             let mut state = PreferencesState::open(cx.repo_root);
-            let _ = state.show_page(None, Some("general.conflict_detection"));
+            let _ = state.show_page(
+                Some(gitpoulpi_ipc::ui::SettingsPage::ConflictPreventionGlobal),
+                None,
+            );
             *cx.preferences = Some(state);
         }
         PaletteCommand::ConflictRepoPage => {

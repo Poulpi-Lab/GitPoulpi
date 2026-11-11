@@ -68,7 +68,7 @@ fn settle(st: &mut PreferencesState) {
 }
 
 fn row(st: &PreferencesState, label: &str) -> Option<Field> {
-    st.fields_of(PrefSection::General)
+    st.fields_of(PrefSection::Launcher)
         .into_iter()
         .find(|f| f.label == label)
 }

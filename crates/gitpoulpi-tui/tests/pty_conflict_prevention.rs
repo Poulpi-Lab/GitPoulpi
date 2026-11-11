@@ -106,7 +106,7 @@ fn open_page(term: &mut Terminal) {
         s.contains("Repo-specific settings")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    common::settings_page(term, "Conflict prevention");
+    common::settings_page_nth(term, "Conflict prevention", 1);
 }
 
 fn close_settings(term: &mut Terminal) {
@@ -304,7 +304,7 @@ fn a_default_list_applies_to_a_repository_without_its_own_and_the_source_can_be_
             t.send_text("edit base branch lists").unwrap();
             t.send_keys("Enter").unwrap();
         },
-        |s| s.contains("General - global"),
+        |s| s.contains("Conflict prevention - global"),
     );
     common::scroll_settings_to(&mut term, "New list", STEP);
     // New list: a click on its row opens the name field.

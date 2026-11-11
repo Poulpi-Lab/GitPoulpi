@@ -59,14 +59,14 @@ fn launcher_name() -> &'static str {
 }
 
 fn labels(st: &PreferencesState) -> Vec<String> {
-    st.fields_of(PrefSection::General)
+    st.fields_of(PrefSection::Launcher)
         .iter()
         .map(|f| f.label.clone())
         .collect()
 }
 
 fn coming(st: &PreferencesState, label: &str) -> bool {
-    st.fields_of(PrefSection::General)
+    st.fields_of(PrefSection::Launcher)
         .iter()
         .find(|f| f.label == label)
         .unwrap_or_else(|| panic!("no row {label}"))
@@ -78,7 +78,7 @@ fn coming(st: &PreferencesState, label: &str) -> bool {
 fn the_terminal_combobox_offers_automatic_the_os_default_and_what_is_installed() {
     let tmp = tempfile::tempdir().unwrap();
     let st = launcher_state(tmp.path());
-    let fields = st.fields_of(PrefSection::General);
+    let fields = st.fields_of(PrefSection::Launcher);
     let combo = fields
         .iter()
         .find(|f| f.target == Target::Global("ui.launch_terminal"))
@@ -208,7 +208,7 @@ fn the_launcher_group_has_the_reuse_window_toggle_on_by_default() {
     let mut st = launcher_state(dir.path());
     let label = gitpoulpi_i18n::msg::launcher::REUSE.get();
     let row = |st: &PreferencesState| {
-        st.fields_of(PrefSection::General)
+        st.fields_of(PrefSection::Launcher)
             .into_iter()
             .find(|f| f.label == label)
             .unwrap_or_else(|| panic!("no row {label}: {:?}", labels(st)))
@@ -227,7 +227,7 @@ fn the_launcher_group_has_the_reuse_window_toggle_on_by_default() {
 // -- Dev mode: the launcher build choice ----------------------------------
 
 fn build_field(st: &PreferencesState) -> Option<Field> {
-    st.fields_of(PrefSection::General)
+    st.fields_of(PrefSection::Launcher)
         .into_iter()
         .find(|f| f.target == Target::Global("ui.launcher_build"))
 }
@@ -268,8 +268,12 @@ fn the_launcher_build_row_is_painted_in_dev_mode_and_absent_otherwise() {
     let tmp = tempfile::tempdir().unwrap();
     let mut st = launcher_state(tmp.path());
     st.config.general.dev_mode = Some(true);
+    st.section = PrefSection::ALL
+        .iter()
+        .position(|s| *s == PrefSection::Launcher)
+        .unwrap();
     let at = st
-        .fields_of(PrefSection::General)
+        .fields_of(PrefSection::Launcher)
         .iter()
         .position(|f| f.target == Target::Global("ui.launcher_build"))
         .unwrap();

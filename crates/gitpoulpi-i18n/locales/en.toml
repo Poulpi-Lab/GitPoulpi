@@ -6960,6 +6960,8 @@ midnight = "Midnight"
 
 [launcher]
 heading = "Launcher"
+# context: sidebar entry and page title of the Launcher page in Settings
+section = "Launcher"
 terminal = "Terminal for shortcuts"
 terminal_help = "The terminal GitPoulpi is started in by the shortcuts below (and by a double-click on Windows). Automatic picks from what is installed."
 terminal_auto = "Automatic"
@@ -9590,14 +9592,16 @@ template_external = "This repository's {setting} setting points to {path}: this 
 [conflict_prevention]
 # context: sidebar entry and page title of the per-repository Conflict prevention page
 section = "Conflict prevention"
-# context: label of the global toggle in Settings > General
+# context: sidebar entry and page title of the global Conflict prevention page in Settings (the repository-specific one is `section`)
+section_global = "Conflict prevention"
+# context: label of the global toggle in Settings > Conflict prevention
 global_enable = "Enable proactive conflict detection"
 # context: help under the global toggle
 global_enable_help = "Warns when a {$merge} of the current branch into the branch it started from would conflict. The check runs in the background and never touches your files. A repository can turn it off for itself on its Conflict prevention page."
 # context: label of the per-repository toggle
 repo_enable = "Check for conflicts with the base branch"
 # context: help under the per-repository toggle; {repo} is the repository's name
-repo_enable_help = "Applies to {repo} only: clear the box to skip the check here. The switch for all repositories is in Settings > General."
+repo_enable_help = "Applies to {repo} only: clear the box to skip the check here. The switch for all repositories is in Settings > Conflict prevention."
 # context: label of the multi-line field listing the base branch patterns
 bases = "Base branches"
 # context: help under the base branches field
@@ -9634,9 +9638,9 @@ none_note = "No predicted conflicts"
 off_note = "Conflict detection is off"
 # context: button of the conflict badge that opens the list of conflicting files
 badge_button = "Show files"
-# context: sub-heading in Settings > General above the proactive conflict detection rows
+# context: sub-heading on the Settings > Conflict prevention page above the proactive conflict detection rows
 global_heading = "Conflict prevention"
-# context: label of the choice of the default list of base branch patterns, in Settings > General
+# context: label of the choice of the default list of base branch patterns, in Settings > Conflict prevention
 default_list = "Default base branches"
 # context: help under the default list choice; ** is a glob, never translated
 default_list_help = "The list that repositories use when they have no list of their own. Built-in means every branch (**). It applies to open repositories at once."
@@ -9683,7 +9687,7 @@ list_deleted = "Deleted the list {name}"
 # context: label of the choice of where a repository's base branches come from
 source = "Base branches from"
 # context: help under the base branches source choice
-source_help = "Default follows Settings > General > Conflict prevention. A list is shared: editing it changes every repository that follows it."
+source_help = "Default follows Settings > Conflict prevention. A list is shared: editing it changes every repository that follows it."
 # context: source choice: the global default, which is every branch
 source_default_built_in = "Default (every branch)"
 # context: source choice: the global default, which is a list; {name} is the list's name
@@ -9693,7 +9697,7 @@ source_list = "List: {name}"
 # context: source choice: patterns of this repository only
 source_own = "Own list"
 # context: help under the patterns of a followed list
-follows_note = "These come from a shared list. Edit it in Settings > General > Conflict prevention, or choose Own list to change them here only."
+follows_note = "These come from a shared list. Edit it in Settings > Conflict prevention, or choose Own list to change them here only."
 # context: label of the field that saves the patterns as a named list
 save_as_list = "Save as list..."
 # context: help under the save as list field

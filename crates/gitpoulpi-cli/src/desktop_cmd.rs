@@ -1,5 +1,5 @@
 //! `gitpoulpi desktop shortcut status|install|remove`: the scriptable twin of
-//! Settings > General > Launcher (`gitpoulpi_tui::desktop_shortcuts`).
+//! Settings > Launcher (`gitpoulpi_tui::desktop_shortcuts`).
 
 use gitpoulpi_commands::cli::{DesktopAction, ShortcutAction};
 use serde_json::json;

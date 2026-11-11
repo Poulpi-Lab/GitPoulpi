@@ -106,7 +106,7 @@ differs per terminal and font, which is why GitPoulpi avoids VS16 glyphs (see
   opaque backdrop; less tested.
 - **Windows console, ConEmu, cmd**: avoid. Pictures are drawn badly or not at all.
   Double-clicking the exe reopens GitPoulpi in your chosen terminal
-  (*Settings > General > Launcher*).
+  (*Settings > Launcher*).
 
 ### Linux
 

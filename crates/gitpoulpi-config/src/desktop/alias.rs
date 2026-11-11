@@ -1,5 +1,5 @@
 //! The command alias (`gp` or any name): a launcher in a per-user `bin`
-//! directory that starts `gitpoulpi-tui` (Settings > General > Launcher,
+//! directory that starts `gitpoulpi-tui` (Settings > Launcher,
 //! `gitpoulpi alias ...`).
 //!
 //! | OS | What is written | How it is known to be ours |

@@ -5646,6 +5646,7 @@ midnight = "Gece yarısı"
 
 [launcher]
 heading = "Başlatıcı"
+section = "Başlatıcı"
 terminal = "Kısayollar için terminal"
 terminal_help = "Aşağıdaki kısayolların (ve Windows'ta çift tıklamanın) GitPoulpi'yi başlattığı terminal. Otomatik, kurulu olanlar arasından seçer."
 terminal_auto = "Otomatik"
@@ -7585,6 +7586,7 @@ template_external = "Bu deponun {setting} ayarı {path} dosyasını gösteriyor:
 
 [conflict_prevention]
 section = "Çakışma önleme"
+section_global = "Çakışma önleme"
 global_enable = "Proaktif çakışma algılamayı etkinleştir"
 global_enable_help = { git = "Geçerli dalı ayrıldığı dala merge etmek çakışmaya yol açacaksa uyarır. Denetim arka planda çalışır ve dosyalarınıza asla dokunmaz. Bir depo bunu kendi Çakışma önleme sayfasında kendisi için kapatabilir.", local = "Geçerli dalı ayrıldığı dala birleştirmek çakışmaya yol açacaksa uyarır. Denetim arka planda çalışır ve dosyalarınıza asla dokunmaz. Bir depo bunu kendi Çakışma önleme sayfasında kendisi için kapatabilir." }
 repo_enable = "Temel dalla çakışmaları denetle"

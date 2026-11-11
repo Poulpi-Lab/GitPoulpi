@@ -5641,6 +5641,7 @@ midnight = "Middernacht"
 
 [launcher]
 heading = "Starter"
+section = "Starter"
 terminal = "Terminal voor snelkoppelingen"
 terminal_help = "De terminal waarin de snelkoppelingen hieronder GitPoulpi starten (en dubbelklikken in Windows). Automatisch kiest uit wat is geïnstalleerd."
 terminal_auto = "Automatisch"
@@ -7580,6 +7581,7 @@ template_external = "De instelling {setting} van deze repository wijst naar {pat
 
 [conflict_prevention]
 section = "Conflictpreventie"
+section_global = "Conflictpreventie"
 global_enable = "Proactieve conflictdetectie inschakelen"
 global_enable_help = "Waarschuwt als een {$merge} van de huidige branch in de branch waarvan hij is gestart, zou conflicteren. De controle draait op de achtergrond en raakt je bestanden nooit aan. Een repository kan dit voor zichzelf uitschakelen op de pagina Conflictpreventie."
 repo_enable = "Controleren op conflicten met de basisbranch"

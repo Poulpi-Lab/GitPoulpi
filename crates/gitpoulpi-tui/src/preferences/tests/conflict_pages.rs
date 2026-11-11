@@ -1,5 +1,5 @@
 //! The Conflict prevention page of the repository group and the global switch
-//! on General: their rows, what they save.
+//! on Conflict prevention (global): their rows, what they save.
 
 use super::*;
 use crate::preferences::conflict_pages::SourceChoice;
@@ -60,7 +60,7 @@ fn the_switch_starts_on_and_is_saved_in_the_repo_data() {
     let help = switch.help.clone().unwrap();
     assert!(
         help.contains("clear the box to skip the check here")
-            && help.contains("Settings > General"),
+            && help.contains("Settings > Conflict prevention"),
         "{help}"
     );
     assert_eq!(saved(dir.path()).conflict_detection, None);
@@ -156,14 +156,14 @@ fn the_page_carries_the_four_row_pattern_table() {
 }
 
 #[test]
-fn the_global_switch_is_on_the_general_page_and_on_by_default() {
+fn the_global_switch_is_on_the_conflict_prevention_page_and_on_by_default() {
     let dir = tempfile::tempdir().unwrap();
-    let st = state_at(dir.path(), "General");
+    let st = state_at(dir.path(), "ConflictGlobal");
     let fields = st.fields();
     let row = fields
         .iter()
         .find(|f| f.label == "Enable proactive conflict detection")
-        .expect("the General page has the global switch");
+        .expect("the Conflict prevention page has the global switch");
     assert!(matches!(row.control, Control::Toggle(true)));
     assert!(
         gitpoulpi_config::Config::default()
@@ -220,7 +220,7 @@ fn confirm_yes(st: &mut PreferencesState) {
 #[test]
 fn a_list_is_created_named_default_and_followed_by_a_repository_without_its_own() {
     let dir = tempfile::tempdir().unwrap();
-    let mut st = state_at(dir.path(), "General");
+    let mut st = state_at(dir.path(), "ConflictGlobal");
     type_text(&mut st, "New list", "trunk");
     let cfg = config_on_disk(dir.path());
     assert_eq!(cfg.conflict_prevention.lists["trunk"].patterns, ["**"]);
@@ -270,7 +270,7 @@ fn a_list_is_created_named_default_and_followed_by_a_repository_without_its_own(
 #[test]
 fn a_repository_follows_a_list_then_resets_to_the_default() {
     let dir = tempfile::tempdir().unwrap();
-    let mut st = state_at(dir.path(), "General");
+    let mut st = state_at(dir.path(), "ConflictGlobal");
     type_text(&mut st, "New list", "release");
     go(&mut st, PrefSection::ConflictPrevention);
     // The choice is: Default, release, Own list.
@@ -327,7 +327,7 @@ fn an_older_own_list_is_still_the_own_list() {
 #[test]
 fn deleting_a_list_asks_names_it_and_clears_the_default() {
     let dir = tempfile::tempdir().unwrap();
-    let mut st = state_at(dir.path(), "General");
+    let mut st = state_at(dir.path(), "ConflictGlobal");
     type_text(&mut st, "New list", "old");
     press(&mut st, "Make default");
     let asked = st
@@ -344,7 +344,7 @@ fn deleting_a_list_asks_names_it_and_clears_the_default() {
 #[test]
 fn renaming_a_list_keeps_it_the_default_and_the_name_must_be_free() {
     let dir = tempfile::tempdir().unwrap();
-    let mut st = state_at(dir.path(), "General");
+    let mut st = state_at(dir.path(), "ConflictGlobal");
     type_text(&mut st, "New list", "a");
     type_text(&mut st, "New list", "b");
     st.commit_choice(&Target::RepoPage(RpTarget::ConflictDefaultList), 1);
@@ -360,7 +360,7 @@ fn renaming_a_list_keeps_it_the_default_and_the_name_must_be_free() {
 #[test]
 fn reset_to_the_built_in_default_clears_the_default_list() {
     let dir = tempfile::tempdir().unwrap();
-    let mut st = state_at(dir.path(), "General");
+    let mut st = state_at(dir.path(), "ConflictGlobal");
     type_text(&mut st, "New list", "x");
     press(&mut st, "Make default");
     assert_eq!(
@@ -390,9 +390,9 @@ fn the_repository_page_draws_the_source_choice_and_the_list_buttons() {
 }
 
 #[test]
-fn the_general_page_groups_the_lists_under_the_global_switch() {
+fn the_conflict_prevention_page_groups_the_lists_under_the_global_switch() {
     let dir = tempfile::tempdir().unwrap();
-    let mut st = state_at(dir.path(), "General");
+    let mut st = state_at(dir.path(), "ConflictGlobal");
     type_text(&mut st, "New list", "trunk");
     let labels: Vec<String> = st.fields().iter().map(|f| f.label.clone()).collect();
     let at = |l: &str| labels.iter().position(|x| x == l).unwrap();
@@ -401,6 +401,8 @@ fn the_general_page_groups_the_lists_under_the_global_switch() {
     assert!(at("Default base branches") < at("Base branch lists"));
     assert!(at("Base branch lists") < at("trunk"));
     assert!(at("trunk") < at("New list"));
-    // The undo group still follows the whole block.
-    assert!(at("New list") < at(gitpoulpi_i18n::msg::settings_general::HEADING_UNDO.get()));
+    // Nothing of General is left on this page.
+    assert!(!labels
+        .iter()
+        .any(|l| l == gitpoulpi_i18n::msg::settings_general::HEADING_UNDO.get()));
 }

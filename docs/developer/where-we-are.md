@@ -309,7 +309,7 @@ not closed since:
   `gemini` process). (5) Windows: repeat once (ConPTY).
 
 - `gp -a` / `gpa` (`docs/user/cli-reference.md#add-a-folder-to-the-open-window`; the tab, the question and the exit codes are
-  PTY- and CLI-tested, the window coming forward is not): (1) Settings > General > Launcher: type `gpa` in **Add-tab alias**,
+  PTY- and CLI-tested, the window coming forward is not): (1) Settings > Launcher: type `gpa` in **Add-tab alias**,
   press **Create**, open a new terminal in another repository's folder with GitPoulpi running elsewhere, type `gpa`: the
   running window shows a new tab for that folder and comes forward (Windows: foreground; WezTerm; Hyprland: focus), the terminal
   prints one line and returns. (2) With two GitPoulpi sessions open, `gpa` lists both with their tabs; `2` + Enter joins the
@@ -457,7 +457,7 @@ not closed since:
 - Windows launcher (never compiled when written): build `dist`, run the installer, pin the Start menu
   entry to the taskbar, click it: GitPoulpi opens in its terminal under the pinned icon with the
   "running" dot; click the pinned icon again: the same window comes forward (no second terminal, no
-  console flash); with Settings > General > Launcher > "Show the open window on click" off, a click
+  console flash); with Settings > Launcher > "Show the open window on click" off, a click
   opens a second window. Minimized window: it is restored. Check the window title is back to normal
   a second after start. WezTerm and Windows Terminal both. If grouping does not happen, look for
   "window grouping" lines in the Activity Log.
@@ -490,7 +490,7 @@ and a scratch repository.
 **Open with for binary files (Windows registry and macOS never run by the author)**
 - On Windows: a `.pdf`, `.docx` and `.xlsx` in the Diff view and the File View: the Open in list holds the user's choice first (bullet) then the registered programs (`UserChoice`, `OpenWithProgids`, `OpenWithList`); launching one opens the file; a commit's version opens as a read-only temp copy. On macOS only the default application is expected.
 **Launcher shortcuts (Windows and macOS never run by the author)**
-- Windows: Settings > General > Launcher: Create the Start menu and Desktop `.lnk` (PowerShell `WScript.Shell`, `-EncodedCommand`); check the target (`wt.exe "<exe>"`), the icon (`%LOCALAPPDATA%\GitPoulpi\gitpoulpi-<hash>.ico`, octopus in the logo colour; only the file of the current colour is left), Remove; pin to the taskbar by hand, then change the logo colour and check the pinned icon follows. Double-click the exe with `ui.launch_terminal = windows-terminal`: it must reopen in Windows Terminal and the first console close; from a shell it must stay.
+- Windows: Settings > Launcher: Create the Start menu and Desktop `.lnk` (PowerShell `WScript.Shell`, `-EncodedCommand`); check the target (`wt.exe "<exe>"`), the icon (`%LOCALAPPDATA%\GitPoulpi\gitpoulpi-<hash>.ico`, octopus in the logo colour; only the file of the current colour is left), Remove; pin to the taskbar by hand, then change the logo colour and check the pinned icon follows. Double-click the exe with `ui.launch_terminal = windows-terminal`: it must reopen in Windows Terminal and the first console close; from a shell it must stay.
 - Windows, WezTerm: open the Command Palette (`Ctrl+P`) with the list scrolling; every row that has a key button ends in `[k]` (a plain button), no bar mark, and nothing from behind the popup shows next to the scrollbar. Scroll and filter to repaint.
 - macOS: `~/Applications/GitPoulpi.app` opens in Terminal.app, iTerm2, WezTerm, kitty, Ghostty (written from Apple's layout; untested).
 - Linux: the `.desktop` entry shows in the launcher (Omarchy: `omarchy-launch-walker`), icon in the user's logo colour.

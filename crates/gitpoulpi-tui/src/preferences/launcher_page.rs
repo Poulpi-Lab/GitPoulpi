@@ -1,4 +1,4 @@
-//! The Launcher group at the end of Settings > General: the terminal shortcuts
+//! The Launcher page (Settings > Launcher): the terminal shortcuts
 //! start GitPoulpi in, and one state / Create / Remove trio per place
 //! the OS offers (`gitpoulpi_config::desktop`). There is no Update button: a
 //! shortcut we made follows the settings by itself (`launcher::sync_shortcuts`,

@@ -5643,6 +5643,7 @@ midnight = "午夜蓝"
 
 [launcher]
 heading = "启动器"
+section = "启动器"
 terminal = "快捷方式使用的终端"
 terminal_help = "下方的快捷方式（以及 Windows 上的双击）用来启动 GitPoulpi 的终端。自动：从已安装的终端中选择。"
 terminal_auto = "自动"
@@ -7582,6 +7583,7 @@ template_external = "此仓库的 {setting} 设置指向 {path}：本页编辑�
 
 [conflict_prevention]
 section = "冲突预防"
+section_global = "冲突预防"
 global_enable = "启用主动冲突检测"
 global_enable_help = { git = "当前分支 {$merge} 到其来源分支会产生冲突时发出警告。检查在后台运行，不会改动你的文件。各仓库可在自己的“冲突预防”页中单独关闭。", local = "当前分支{$merge}到其来源分支会产生冲突时发出警告。检查在后台运行，不会改动你的文件。各仓库可在自己的“冲突预防”页中单独关闭。" }
 repo_enable = "检查与基础分支的冲突"

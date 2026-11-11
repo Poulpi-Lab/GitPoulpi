@@ -688,7 +688,7 @@ pub(crate) enum PaletteCommand {
     KeybindingsResetAll,
     /// Opens Settings on the Theme row (Appearance).
     Theme,
-    /// Opens Settings > General on the Conflict prevention group: the
+    /// Opens Settings > Conflict prevention (global): the
     /// default base branches and the named lists.
     ConflictLists,
     /// Opens the Conflict prevention page of this repository.

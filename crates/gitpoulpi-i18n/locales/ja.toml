@@ -5641,6 +5641,7 @@ midnight = "ミッドナイト"
 
 [launcher]
 heading = "ランチャー"
+section = "ランチャー"
 terminal = "ショートカット用のターミナル"
 terminal_help = "下のショートカット（および Windows でのダブルクリック）が GitPoulpi を起動するターミナル。自動はインストール済みのものから選びます。"
 terminal_auto = "自動"
@@ -7582,6 +7583,7 @@ template_external = "このリポジトリの {setting} は {path} を指して�
 
 [conflict_prevention]
 section = "競合の予防"
+section_global = "競合の予防"
 global_enable = "競合の事前検出を有効化"
 global_enable_help = "現在のブランチを元のブランチへ{$merge}すると競合する場合に警告します。確認はバックグラウンドで実行され、ファイルには一切触れません。リポジトリごとに、「競合の予防」ページでオフにできます。"
 repo_enable = "ベースブランチとの競合を確認する"

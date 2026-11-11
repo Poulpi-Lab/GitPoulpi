@@ -102,13 +102,13 @@ fn the_screen_draws_both_scopes_in_the_sidebar_and_the_general_page_beside_them(
 
     let dir = tempfile::tempdir().unwrap();
     let mut state = state(dir.path());
-    let mut terminal = Terminal::new(TestBackend::new(100, 34)).unwrap();
+    let mut terminal = Terminal::new(TestBackend::new(100, 40)).unwrap();
     terminal
         .draw(|frame| state.render(frame, frame.area()))
         .unwrap();
 
     let buffer = terminal.backend().buffer();
-    let rendered: Vec<String> = (0..34)
+    let rendered: Vec<String> = (0..40)
         .map(|y| (0..100).map(|x| buffer[(x, y)].symbol()).collect())
         .collect();
     let screen = rendered.join("\n");
@@ -139,7 +139,7 @@ fn the_screen_draws_both_scopes_in_the_sidebar_and_the_general_page_beside_them(
         .draw(|frame| state.render(frame, frame.area()))
         .unwrap();
     let buffer = terminal.backend().buffer();
-    let screen = (0..34)
+    let screen = (0..40)
         .map(|y| {
             (0..100)
                 .map(|x| buffer[(x, y)].symbol())

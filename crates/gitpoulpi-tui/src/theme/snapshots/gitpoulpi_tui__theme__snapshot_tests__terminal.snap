@@ -11,19 +11,19 @@ expression: "dump(&theme, &buf)"
 06 |│                           │   Colors of the whole          │|
 07 |│Settings                   │   interface. Moving through    │ @@ -10,3 +10,3 @@|
 08 |│  General                  │   the list previews each       │    10    10  fn main() {|
-09 |│  Synchronization          │   theme; Enter keeps it, Esc   │    11       -    let x = 1;|
-10 |│  Profiles                 │   goes back. System follows    │          11 +    ╭a1b2c3d────────────────────────────╮|
-11 |│  SSH & credentials        │   the terminal's light or dark │    12    12  }   │⊕ Cherry-pick onto main    Ctrl+G y│|
-12 |│  Integrations             │   background, detected once at │                  │↺ Revert commit...         Ctrl+G v│|
-13 |│  AI                       │   start-up (Dark when it       │                  │← Reset main to this commit ›      │|
-14 |│  Agents & MCP             │   cannot be told). Your own    │                  │✎ Edit commit message...   Ctrl+G e│|
-15 |│  Appearance               │   theme files in the config    │                  │✐ Amend...                 Ctrl+G E│|
-16 |│  Log & graph              │   folder's themes/ directory   │                  │◑ Split commit...                  │|
-17 |│  Diff & editor            │   are listed last.             │                  │◈ Interactively rebase from here...│|
-18 |│  Open in                  │                                │                  │↻ Rewrite history ›                │|
-19 |│  Images                   │ Colors                         │                  │───────────────────────────────────│|
-20 |│  Keyboard & mouse         │                                │                  │↳ Create branch here...            │|
-21 |│                           │                               ↓│                  │◇ Create tag here...               │|
+09 |│  Launcher                 │   theme; Enter keeps it, Esc   │    11       -    let x = 1;|
+10 |│  Conflict prevention      │   goes back. System follows    │          11 +    ╭a1b2c3d────────────────────────────╮|
+11 |│  Synchronization          │   the terminal's light or dark │    12    12  }   │⊕ Cherry-pick onto main    Ctrl+G y│|
+12 |│  Profiles                 │   background, detected once at │                  │↺ Revert commit...         Ctrl+G v│|
+13 |│  SSH & credentials        │   start-up (Dark when it       │                  │← Reset main to this commit ›      │|
+14 |│  Integrations             │   cannot be told). Your own    │                  │✎ Edit commit message...   Ctrl+G e│|
+15 |│  AI                       │   theme files in the config    │                  │✐ Amend...                 Ctrl+G E│|
+16 |│  Agents & MCP             │   folder's themes/ directory   │                  │◑ Split commit...                  │|
+17 |│  Appearance               │   are listed last.             │                  │◈ Interactively rebase from here...│|
+18 |│  Log & graph              │                                │                  │↻ Rewrite history ›                │|
+19 |│  Diff & editor            │ Colors                         │                  │───────────────────────────────────│|
+20 |│  Open in                  │                                │                  │↳ Create branch here...            │|
+21 |│  Images                   │                               ↓│                  │◇ Create tag here...               │|
 22 |╰────────────────────────────────────────────────────────────╯                  │◇ Create annotated tag here...     │|
 23 |                                                                                │✓ Check out this commit            │|
 24 |                                                                                │⊞ Create worktree here...          │|
@@ -169,7 +169,7 @@ expression: "dump(&theme, &buf)"
 14 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
 14 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
 15 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
-15 001-026 -/ui.selection+ui.button_hover+merge.ours_pick+chrome.toolbar_bg_hover
+15 001-026 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
 15 028-028 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
 15 030-056 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
 15 060-060 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/ui.on_accent+ui.input_rest+ui.text_selection_fg+scrollbar.track+minimap.bg+merge.strip_fg+editor.current_line+editor.find_hit_fg+hosting.chip_fg+chrome.on_bright
@@ -185,7 +185,7 @@ expression: "dump(&theme, &buf)"
 16 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
 16 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
 17 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
-17 001-026 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
+17 001-026 -/ui.selection+ui.button_hover+merge.ours_pick+chrome.toolbar_bg_hover
 17 028-028 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
 17 030-047 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
 17 060-060 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/ui.on_accent+ui.input_rest+ui.text_selection_fg+scrollbar.track+minimap.bg+merge.strip_fg+editor.current_line+editor.find_hit_fg+hosting.chip_fg+chrome.on_bright
@@ -221,6 +221,7 @@ expression: "dump(&theme, &buf)"
 20 080-080 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
 20 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
 21 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
+21 001-026 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
 21 028-028 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
 21 060-060 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/ui.on_accent+ui.input_rest+ui.text_selection_fg+scrollbar.track+minimap.bg+merge.strip_fg+editor.current_line+editor.find_hit_fg+hosting.chip_fg+chrome.on_bright
 21 061-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-

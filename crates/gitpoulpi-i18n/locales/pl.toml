@@ -5644,6 +5644,7 @@ midnight = "Północ"
 
 [launcher]
 heading = "Uruchamianie z systemu"
+section = "Uruchamianie z systemu"
 terminal = "Terminal dla skrótów"
 terminal_help = "Terminal, w którym poniższe skróty uruchamiają GitPoulpi (i dwukrotne kliknięcie w Windows). Automatycznie wybiera spośród zainstalowanych."
 terminal_auto = "Automatycznie"
@@ -7581,6 +7582,7 @@ template_external = "Ustawienie {setting} tego repozytorium wskazuje na {path}: 
 
 [conflict_prevention]
 section = "Zapobieganie konfliktom"
+section_global = "Zapobieganie konfliktom"
 global_enable = "Włącz proaktywne wykrywanie konfliktów"
 global_enable_help = { git = "Ostrzega, gdy merge bieżącej gałęzi do gałęzi, z której powstała, spowodowałby konflikt. Sprawdzanie działa w tle i nigdy nie rusza twoich plików. Repozytorium może je wyłączyć dla siebie na stronie Zapobieganie konfliktom.", local = "Ostrzega, gdy scalenie bieżącej gałęzi do gałęzi, z której powstała, spowodowałoby konflikt. Sprawdzanie działa w tle i nigdy nie rusza twoich plików. Repozytorium może je wyłączyć dla siebie na stronie Zapobieganie konfliktom." }
 repo_enable = "Sprawdzaj konflikty z gałęzią bazową"

@@ -5640,6 +5640,7 @@ midnight = "Medianoche"
 
 [launcher]
 heading = "Lanzador"
+section = "Lanzador"
 terminal = "Terminal de los accesos directos"
 terminal_help = "El terminal en el que los accesos directos de abajo inician GitPoulpi (y el doble clic en Windows). Automático elige entre los instalados."
 terminal_auto = "Automático"
@@ -7579,6 +7580,7 @@ template_external = "El ajuste {setting} de este repositorio apunta a {path}: es
 
 [conflict_prevention]
 section = "Prevención de conflictos"
+section_global = "Prevención de conflictos"
 global_enable = "Activar la detección proactiva de conflictos"
 global_enable_help = { git = "Avisa cuando un merge de la rama actual en la rama de la que partió daría conflictos. La comprobación se ejecuta en segundo plano y nunca toca tus archivos. Cada repositorio puede desactivarla para sí mismo en su página Prevención de conflictos.", local = "Avisa cuando una fusión de la rama actual en la rama de la que partió daría conflictos. La comprobación se ejecuta en segundo plano y nunca toca tus archivos. Cada repositorio puede desactivarla para sí mismo en su página Prevención de conflictos." }
 repo_enable = "Comprobar conflictos con la rama base"

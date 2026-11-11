@@ -11,6 +11,8 @@ use gitpoulpi_i18n::msg::{settings_general, settings_open_in, settings_screen as
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum PrefSection {
     General,
+    Launcher,
+    ConflictGlobal,
     Sync,
     Profiles,
     Ssh,
@@ -52,6 +54,8 @@ impl PrefSection {
 
     pub(crate) const ALL: &'static [PrefSection] = &[
         PrefSection::General,
+        PrefSection::Launcher,
+        PrefSection::ConflictGlobal,
         PrefSection::Sync,
         PrefSection::Profiles,
         PrefSection::Ssh,
@@ -79,6 +83,10 @@ impl PrefSection {
     pub(crate) fn title(self) -> &'static str {
         match self {
             PrefSection::General => screen::SECTION_GENERAL.get(),
+            PrefSection::Launcher => gitpoulpi_i18n::msg::launcher::SECTION.get(),
+            PrefSection::ConflictGlobal => {
+                gitpoulpi_i18n::msg::conflict_prevention::SECTION_GLOBAL.get()
+            }
             PrefSection::Sync => screen::SECTION_SYNC.get(),
             PrefSection::Profiles => screen::SECTION_PROFILES.get(),
             PrefSection::Ssh => screen::SECTION_SSH.get(),
@@ -113,6 +121,8 @@ impl PrefSection {
     pub(super) const fn id(self) -> &'static str {
         match self {
             PrefSection::General => "general",
+            PrefSection::Launcher => "launcher",
+            PrefSection::ConflictGlobal => "conflict-prevention-global",
             PrefSection::Sync => "sync",
             PrefSection::Profiles => "profiles",
             PrefSection::Ssh => "ssh",
@@ -143,6 +153,8 @@ impl PrefSection {
         use gitpoulpi_ipc::ui::SettingsPage as P;
         match page {
             P::General => PrefSection::General,
+            P::Launcher => PrefSection::Launcher,
+            P::ConflictPreventionGlobal => PrefSection::ConflictGlobal,
             P::Sync => PrefSection::Sync,
             P::Profiles => PrefSection::Profiles,
             P::Ssh => PrefSection::Ssh,

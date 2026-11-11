@@ -184,16 +184,17 @@ The page list has two groups:
 | **Default browse folder** | Where Browse opens. Empty: the last folder you used, else your home folder. |
 | **Repository data location** | Where GitPoulpi keeps its per-repository data (`session.per_repo_state_dir`): **Inside .git** (default: nothing appears in your working tree, all worktrees share it), **In the working tree** (a `.gitpoulpi` folder; needed to commit a team `workflow.toml`) or **In my user data folder** (outside the repository). A `.gitpoulpi` folder left by an older version is moved to the new place the first time it is needed, and removed once empty; a file git tracks (a committed `workflow.toml`) is never moved or deleted and stays readable. |
 | **Default branch name** | The first branch of a repository you create with Init. Empty: git decides. It renames no existing branch. |
-| **Enable proactive conflict detection** | On by default (`general.conflict_detection`). Warns on the Log when merging the current branch into the branch it started from would conflict, before you try. A repository can turn it off for itself on its **Conflict prevention** page. See [Resolving merge conflicts](merge-conflicts.md#conflict-prevention). Applies when Settings closes. |
-| **Default base branches** | Under the switch, in the **Conflict prevention** group (the palette's **Conflicts: Edit Base Branch Lists...** opens it). The list of base branch patterns that repositories use when they have none of their own: **Built-in (`**`)**, which is every branch, or one of your named lists (`conflict_prevention.default_list`). It applies to the open repositories when Settings closes. **Reset to built-in default** goes back to `**`. |
-| **Base branch lists** | Also in that group: your named lists of base branch patterns (`[conflict_prevention.lists.<name>]`), one block each with its **Name** (renaming keeps it as the default if it was; a repository that followed the old name uses the default list until you pick the renamed list again), its **Patterns** (one per line, `Enter` or a click opens the editor, `Ctrl+S` keeps it), **Make default** and **Delete list** (it asks first, and says that repositories following it use the default list instead). Type a name in **New list** and press `Enter` to add one; it starts with `**`. Editing a list changes every repository that follows it. |
 | **Log level**, **Keep log files for**, **Maximum size of a log file** | The application log behind the Activity Log: the most verbose level recorded (`log.level`), how long files are kept (a whole number and a unit, days, weeks, months or years, on one line: click the number to type it, Up and Down step it, Tab goes to the unit and Enter opens its list; 1 to 10 years at most, default 1 week, `log.retention_days` and `log.retention_unit`) and the size at which a day's file is rotated (a number and MiB or GiB, 1 MiB to 1 GiB, `log.max_file_mb` and `log.max_file_unit`). |
 | **Show how long operations take**, **Extended logging** | The Activity Log's Git operations tab: the duration of each operation (`log.timings`, on by default) and the background work too, refresh and auto-fetch (`log.extended`, off by default). See [When something fails](troubleshooting.md#the-activity-log). |
 | **Undo enabled**, **Undo history depth**, **Record changes made outside GitPoulpi** | The **Undo history** group. Turns Undo on or off, and sets how many operations it keeps (default 100, `0` means unlimited). Turning Undo off erases the undo history, after a confirmation. The last one also records what a shell or an agent does to branches, tags, stashes and HEAD. See [Undo and redo](undo-redo.md). |
 
-#### Launcher (desktop integration)
+The palette command **App: Change Language...** (`Ctrl+N g`) opens the same
+language list. There, the highlighted language previews live; `Enter` keeps it
+and `Esc` restores the previous one.
 
-The **Launcher** group, the last on the General page, creates a shortcut that starts
+### Launcher
+
+The **Launcher** page (`gitpoulpi ui show settings launcher`) creates a shortcut that starts
 GitPoulpi from the OS launcher, in the terminal you choose.
 
 | Row | What it does |
@@ -221,9 +222,9 @@ shortcut that does not exist yet) and **Remove**.
 
 **Taskbar and dock grouping.** GitPoulpi runs inside a terminal window, so a taskbar normally shows it under the terminal's icon, with no "running" dot under the pinned GitPoulpi icon. Windows: the shortcuts carry the AppUserModelID `GitPoulpi.GitPoulpi`, and a GitPoulpi started from one gives its terminal window the same ID and icon (it finds the window through the terminal program that runs it, else by giving it a unique title for a moment, and keeps `GitPoulpi` as the window title; the steps are in the Activity log as `window grouping: ...`), so the window sits under the pinned GitPoulpi icon. Hold **Shift** while clicking the pinned icon to open a new window instead of showing the open one. A terminal window with several tabs moves as a whole: all its tabs group under GitPoulpi's icon while GitPoulpi runs in it. Shortcuts and taskbar pins made earlier are rewritten by the same sync; if a pin still shows the terminal's icon, unpin it and pin it again. The icon file name carries a hash of the picture (`gitpoulpi-<hash>.ico` in the GitPoulpi folder of the local app data), so a new logo color reaches the pinned button too; older files are deleted once no shortcut uses them. Linux: kitty, foot, Alacritty, WezTerm and Ghostty are started with the window class `gitpoulpi` and the `.desktop` entry names it (`StartupWMClass`), so a dock groups the window under the launcher's icon; other terminals keep their own icon. macOS: nothing to do, the Dock groups by app.
 
-![Settings > General scrolled to the Launcher group: terminal for shortcuts and the app launcher row](images/settings-launcher.png)
+![Settings > Launcher: terminal for shortcuts and the app launcher row](images/settings-launcher.png)
 
-##### Command alias and PATH, per system
+#### Command alias and PATH, per system
 
 | System | Alias | PATH |
 |---|---|---|
@@ -235,9 +236,16 @@ New terminals see the PATH change, not the ones already open. Neither action is 
 The palette has the same actions (**Launcher: Create Shortcut**, **Launcher: Create Desktop Shortcut**, **Launcher: Remove Shortcuts**, **Launcher: Create Command Alias**, **Launcher: Remove Command Alias**, **Launcher: Add to PATH**, **Launcher: Remove from PATH**), and `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` does it from a script.
 
-The palette command **App: Change Language...** (`Ctrl+N g`) opens the same
-language list. There, the highlighted language previews live; `Enter` keeps it
-and `Esc` restores the previous one.
+### Conflict prevention
+
+The global part of proactive conflict detection (`gitpoulpi ui show settings conflict-prevention-global`); a repository's own page is
+[Repo-specific: Conflict prevention](#repo-specific-conflict-prevention). The palette's **Conflicts: Edit Base Branch Lists...** opens this page.
+
+| Option | What it does |
+|---|---|
+| **Enable proactive conflict detection** | On by default (`general.conflict_detection`). Warns on the Log when merging the current branch into the branch it started from would conflict, before you try. A repository can turn it off for itself on its own **Conflict prevention** page. See [Resolving merge conflicts](merge-conflicts.md#conflict-prevention). Applies when Settings closes. |
+| **Default base branches** | Under the switch. The list of base branch patterns that repositories use when they have none of their own: **Built-in (`**`)**, which is every branch, or one of your named lists (`conflict_prevention.default_list`). It applies to the open repositories when Settings closes. **Reset to built-in default** goes back to `**`. |
+| **Base branch lists** | Also on this page: your named lists of base branch patterns (`[conflict_prevention.lists.<name>]`), one block each with its **Name** (renaming keeps it as the default if it was; a repository that followed the old name uses the default list until you pick the renamed list again), its **Patterns** (one per line, `Enter` or a click opens the editor, `Ctrl+S` keeps it), **Make default** and **Delete list** (it asks first, and says that repositories following it use the default list instead). Type a name in **New list** and press `Enter` to add one; it starts with `**`. Editing a list changes every repository that follows it. |
 
 ### Synchronization
 
@@ -706,10 +714,10 @@ A message the commit form starts with (`gitpoulpi ui show settings commit-templa
 (see [Resolving merge conflicts](merge-conflicts.md#conflict-prevention)):
 
 - **Check for conflicts with the base branch**: on by default. Unchecking it disables the detection
-  only for this repository; the global switch is **Enable proactive conflict detection** on the General page.
+  only for this repository; the global switch is **Enable proactive conflict detection** on the global **Conflict prevention** page.
   Both must be on.
 - **Base branches from**: where this repository's base branches come from. **Default** follows the global default
-  (the built-in `**`, or the list chosen under **Default base branches** in Settings > General); **List: <name>**
+  (the built-in `**`, or the list chosen under **Default base branches** in Settings > Conflict prevention); **List: <name>**
   follows one of your named lists, so editing the list changes this repository too; **Own list** is a list of its own
   (choosing it starts from a copy of the patterns in force). A repository file written before this choice existed
   and holding its own patterns reads as **Own list**.
@@ -729,7 +737,7 @@ A message the commit form starts with (`gitpoulpi ui show settings commit-templa
   only means "every branch except these". The choice is stored in `repo-state.toml` and read again when Settings
   closes.
 - **Save as list...**: type a name and press `Enter`; the patterns in force become a named list (the same ones
-  Settings > General edits) and this repository follows it.
+  Settings > Conflict prevention edits) and this repository follows it.
 - **Reset to default** (asks first): drops this repository's choice, list and own patterns; it follows the default
   again.
 - **Use the workflow's base branches** (shown when a [branching workflow](branching-workflows.md) with base branches

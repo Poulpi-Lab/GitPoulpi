@@ -98,7 +98,7 @@ author_email = "jane@work.example"
 | `ui.graph_row_tint_strength` | `"medium"` | `strong`, `medium`, `subtle` (tylko z `row_tint`). |
 | `ui.toolbar_position` | `"bottom"` | `top`, `bottom`, `left`, `right`. `left` i `right` rysują kolumnę; okno węższe niż 80 kolumn wraca do `bottom`. |
 | `ui.toolbar_align` | `"start"` | `start`, `center`, `end`: gdzie leżą przyciski wzdłuż paska (lewo, środek, prawo wiersza; góra, środek, dół kolumny). |
-| `ui.dialog_geometry` | `"session"` | `session`, `saved`, `never`: czy okno dialogowe, które przesunąłeś lub którego rozmiar zmieniłeś (przeciągnij pasek tytułu lub krawędzie albo `Ctrl+N m`), zachowuje swoje miejsce: do zamknięcia GitPoulpi (domyślnie), na dysku do następnego uruchomienia (`dialog_geometry.txt` w folderze danych) albo wcale. |
+| `ui.dialog_geometry` | `"session"` | `session`, `saved`, `never`: czy okno dialogowe, które przesunąłeś lub którego rozmiar zmieniłeś (przeciągnij pasek tytułu lub krawędzie albo `Ctrl+N m`), zachowuje swoje miejsce. Jedno ustawienie dla wszystkich okien (każde pamięta własne miejsce i rozmiar): do zamknięcia GitPoulpi (domyślnie), na dysku do następnego uruchomienia (wszystkie okna w jednym `dialog_geometry.txt` w folderze danych) albo wcale (każde okno otwiera się w domyślnym miejscu i o domyślnym rozmiarze). |
 | `ui.toolbar_pr_pinned` | `true` | Przycisk pull requesta jest przypięty na końcu paska narzędzi; `false` pozwala mu płynąć razem z innymi przyciskami. |
 | `ui.statusbar_position` | `"bottom"` | `top` (nad kartami repozytoriów) albo `bottom`. |
 | `ui.tabs_position` | `"top"` | `top`, `bottom` (ostatni wiersz okna, pod paskiem stanu) lub `left` (kolumna przy lewej krawędzi; poniżej 80 kolumn zostaje u góry). |

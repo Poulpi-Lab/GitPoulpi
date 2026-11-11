@@ -456,6 +456,8 @@ I `config.toml` är det tabellen `[keybindings.palette]`, uppkallad efter komman
 
 Hjälpraden under listan anger den här tangenten (`Alt+K` som standard). Det är åtgärden `palette.configure_shortcut`, så den kan ändras som alla andra.
 
+Paletten och väljarna (tema, språk, flik, arbetsytesökning) flyttas och ändrar storlek som en dialogruta: dra i den övre kanten, eller tryck `Alt+G` (åtgärden `palette.arrange`; paletträden `Dialogruta: Flytta/ändra storlek` gör detsamma). Piltangenterna flyttar, `Shift`+pilar ändrar storlek, `0` återställer, `Enter` eller `Esc` lämnar läget och popupen förblir öppen. `ui.dialog_geometry` avgör om platsen behålls.
+
 ### Varje palettkommando
 
 Genereras från appen (ett test håller den aktuell). AI-kommandon visas bara

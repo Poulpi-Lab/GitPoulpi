@@ -44,8 +44,10 @@ samma regler gäller överallt:
   `✕` och `Esc` frågar **Förkasta ändringar?** först; **Fortsätt redigera** går
   tillbaka. Ett formulär utan inskriven text stängs direkt, och det gör också en
   dialogruta med en enda rad.
-- Menyer, rullgardinslistor, paletten och väljare har inget `✕`: de stängs med `Esc`
-  eller ett klick utanför.
+- Kommandopaletten, väljarna (flik, tema, språk), de små dialogrutorna för granskning,
+  tavla, sammanslagning och meddelanderedigeraren samt bekräftelsefrågan har också `✕`.
+  Snabbmenyer och rullgardinslistor har inget: de stängs med `Esc` eller ett klick
+  utanför.
 
 ## Listor i Inställningar
 
@@ -417,13 +419,32 @@ Se [Bilder](image-view.md) för musen i bildvyn.
 
 ## Flytta och ändra storlek på dialogrutor
 
-Dialogrutan Ångrahistorik / Reflog / Förlorat arbete kan flyttas och ändras i storlek:
+Dialogrutor kan flyttas, och de större fönstren kan ändras i storlek:
 
-- **Dra i titelraden** för att flytta den (stängningskorset behåller sitt klick).
-- **Dra i vänster, höger eller nedre kant**, eller i ett nedre hörn (greppet `◢`), för att ändra storlek. Dialogrutan stannar på skärmen och blir aldrig mindre än 60 x 16.
+- **Dra i titelraden** för att flytta en dialogruta (stängningskorset behåller sitt klick). Kommandopaletten och väljarna har ingen egen titelrad: dra i den övre kanten.
+- **Dra i vänster, höger eller nedre kant**, eller i ett nedre hörn (greppet `◢`), för att ändra storlek på ett fönster. Dialogrutan stannar på skärmen och blir aldrig mindre än sin minimistorlek (60 x 16 för Ångrahistoriken, mindre för de andra). Ett fönster med ändrad storlek utnyttjar utrymmet: textfält och listor växer, och texten radbryts efter den nya bredden.
 - Draget fortsätter när pekaren lämnar dialogrutan, och att släppa utanför stänger den aldrig.
-- **Dra i avdelarna** mellan dess lista, dess fillista och dess hunkar; dubbelklicka på en för att återställa den.
-- Tangentbordstvillingarna är `Ctrl+N` och sedan `m` (piltangenterna flyttar, `Shift`+pilar ändrar storlek, `0` återställer, `Enter` eller `Esc` lämnar) och `Alt`+pilar för avdelarna; paletten har `Dialogruta: Flytta/ändra storlek` och `Dialogruta: Återställ position och storlek`.
+- **Dra i avdelarna** i Ångrahistorikens vy Reflog / Förlorat arbete; dubbelklicka på en för att återställa den.
+- Tangentbordstvillingarna är `Ctrl+N` och sedan `m` (piltangenterna flyttar, `Shift`+pilar ändrar storlek, `0` återställer, `Enter` eller `Esc` lämnar) och `Alt`+pilar för avdelarna; paletten har `Dialogruta: Flytta/ändra storlek` och `Dialogruta: Återställ position och storlek`. De verkar på dialogrutan överst. Ytorna som använder `Ctrl+N` för egna märken (meddelandeformuläret för commit, sidan för historikomskrivning) tar samma `m` efter sin `Ctrl+N`, och statusraden anger det. Kommandopaletten och väljarna använder `Ctrl+N` för att gå nedåt i listan, så för dem är tangenten `Alt+G` (`palette.arrange`), eller palettens egen rad `Dialogruta: Flytta/ändra storlek`: båda ordnar popupen längst fram och lämnar den öppen.
+- **En enda inställning** (`ui.dialog_geometry`, Inställningar > Utseende > Layout) gäller alla dialogrutor: var och en kommer ihåg sin egen plats och storlek under den här sessionen, på disk till nästa start, eller aldrig.
+
+| Dialogruta | Flytta | Ändra storlek |
+|---|---|---|
+| Ångrahistorik / Reflog / Förlorat arbete, Aktivitetslogg, jobbpanel, mappväljare | ja | ja |
+| Kommandopalett, flik- / tema- / språkväljare, arbetsytesökning | ja | ja (listan växer med höjden, raderna med bredden) |
+| Klona (förvarslistan), Pull request och Nytt ärende (beskrivningen), "Vad som skickas" (rutan), Mermaid (förhandsvisningen), granskningsalternativ (fälten, bara bredd) | ja | ja |
+| Långtextredigerare i Inställningar (mallar, hookar, AI-prompter), arbetsytsformulärets AI-ruta | ja | ja (textfältet) |
+| Historikomskrivning: de två AI-hjälpdialogrutorna | ja | ja (beskrivningen, rutan med det som skickas) |
+| Om, uppdateringspanel, säkerhetskontroll, förutsedda konflikter, "Över AI-gränsen", borttagning av tagg, känsliga filer | ja | nej (storleken följer texten) |
+| Init, Worktree, Sparse checkout, Flow-dialogruta, ärendeflödesdialogrutor, meddelandeformulär (reword) för commit, Arbetsytsformulär, etikett- / milstolpeväljare | ja | nej |
+| Bekräftelser (varje "Är du säker?") | ja | nej |
+| Gransknings- och tavledialogrutor: deras små dialogrutor (kommentar, avsluta, välj, kolumner) | ja | nej |
+| Popupar på sidan Tangentbord (bekräftelse av återställning, tangentfångst), AI-svarspopupen | ja | nej |
+| Inställningar: resultat och bekräftelse för förvarsautentisering | ja | nej |
+| Historikomskrivning: dialogrutor för rensning, identitet och frågor | ja | nej |
+| Flytta-fil-popupen i commit-redigeraren, sammanslagningsmeddelanden | ja | nej |
+
+Kan inte flyttas: helsidesvyerna (Inställningar, Hjälp, sidorna Granskning och Tavla, som redan fyller fönstret), snabbmenyer och rullgardinslistor (de hänger på det som öppnade dem), verktygstips och de små popuparna inne på en sida (formuläret för fjärrförvar, redigeraren för delade commits).
 
 Pekaren visar en flyttform över titelraden och en storleksform över kanterna och hörnen (terminaler med `OSC 22`).
 

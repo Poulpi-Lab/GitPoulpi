@@ -114,7 +114,7 @@ o GitPoulpi evita glifos VS16 (veja [O que o GitPoulpi usa](#o-que-o-gitpoulpi-u
   com um fundo opaco; menos testado.
 - **Consola do Windows, ConEmu, cmd**: evite. As imagens são mal desenhadas ou nem
   aparecem. Um clique duplo no exe volta a abrir o GitPoulpi no terminal que escolheu
-  (*Definições > Geral > Lançador*).
+  (*Definições > Lançador*).
 
 ### Linux
 

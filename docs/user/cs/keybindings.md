@@ -454,6 +454,8 @@ V `config.toml` jde o tabulku `[keybindings.palette]` pojmenovanou podle příka
 
 Řádek nápovědy pod seznamem uvádí tuto klávesu (výchozí `Alt+K`). Je to akce `palette.configure_shortcut`, takže ji lze přeřadit jako kteroukoli jinou.
 
+Paleta a výběry (motiv, jazyk, karta, hledání pracovního prostoru) se přesouvají a mění velikost jako dialog: táhněte za horní okraj, nebo stiskněte `Alt+G` (akce `palette.arrange`; totéž dělá řádek palety `Dialog: Přesunout nebo změnit velikost`). Šipky okno přesouvají, `Shift`+šipky mění velikost, `0` ho vrátí zpět, `Enter` nebo `Esc` režim opustí a vyskakovací okno zůstane otevřené. O tom, zda si místo zapamatuje, rozhoduje `ui.dialog_geometry`.
+
 ### Všechny příkazy palety
 
 Generováno z aplikace (test to udržuje aktuální). Příkazy AI se objeví jen,

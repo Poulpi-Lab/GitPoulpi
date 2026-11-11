@@ -87,6 +87,7 @@ author_email = "jane@work.example"
 | `ui.graph_lane_background` | `"off"` | `off` または `row_tint`（グラフの背後にレーン色の淡い帯と、その端のバーを描きます）。**アプリ: グラフの行の色付けを切り替え**（`Ctrl+N Shift+T`）で切り替わり、**アプリ: グラフのカラーテーマを変更...**（`Ctrl+N Shift+Y`）で `ui.graph_color_theme` を選べます。 |
 | `ui.graph_row_tint_strength` | `"medium"` | `strong`、`medium`、`subtle`（`row_tint` のときのみ）。 |
 | `ui.toolbar_position` | `"bottom"` | `top`、`bottom`、`left`、`right`。`left` と `right` は縦の列として描画し、80 列未満のウィンドウでは `bottom` に戻ります。 |
+| `ui.dialog_geometry` | `"session"` | `session`、`saved`、`never`：移動またはサイズ変更したダイアログ（タイトルバーか枠をドラッグ、または `Ctrl+N m`）がその位置を保つかどうか。GitPoulpi を閉じるまで（既定）、次回の起動まで保存（データフォルダーの `dialog_geometry.txt`）、または保持しない。 |
 | `ui.toolbar_align` | `"start"` | `start`、`center`、`end`：ツールバー上でのボタンの位置（行では左・中央・右、列では上・中央・下）。 |
 | `ui.toolbar_pr_pinned` | `true` | プルリクエストのボタンをツールバーの末端に固定します。`false` にすると他のボタンと一緒に並びます。 |
 | `ui.statusbar_position` | `"bottom"` | `top`（リポジトリのタブの上）または `bottom`。 |
@@ -158,10 +159,10 @@ diff の中で切り替えたトグルはここにすぐ保存され、その後
 | `ui.terminal_launch_command` | `""` | `custom` のテンプレート。`{repo}` はフォルダーです。 |
 | `ui.open_in` | *(なし)* | [開く場所](open-in.md)の一覧で、`label` と `command` を持つテーブルの配列 `[[ui.open_in]]` です。なしは「まだ設定されていない」ことを意味し、一覧は旧 `ui.terminal_launch*` キー（`auto` 以外の値は最初のエントリになります）、OS のファイルエクスプローラー、環境から検出したマルチプレクサとターミナル（herdr、tmux、zellij、WezTerm、kitty、Windows Terminal など）、`PATH` で見つかったエディターから組み立てられます。設定画面から最初に保存したときに一覧が書き込まれます。`open_in = []` は空の一覧です。`config set` では設定できません（ファイルを編集してください）。 |
 | `ui.open_in_default` | `""` | 「既定の開く場所を実行」が実行するエントリのラベルです。空または未知の場合は最初のエントリになります。 |
-| `ui.launch_terminal` | `"auto"` | デスクトップのショートカット（設定 > 一般 > ランチャー）と、Windows での開き直しが GitPoulpi を起動するターミナルです。`auto` はインストール済みのものから選びます（Windows：Windows Terminal、なければ WezTerm、Alacritty、通常のコンソール。Linux：`xdg-terminal-exec`、なければ最初に見つかったターミナル。macOS：iTerm2、Ghostty、WezTerm、kitty のいずれかがあればそれ、なければ Terminal）。`default` は OS 自身の既定です。`windows-terminal`、`wezterm`、`alacritty`、`console`、`kitty`、`foot`、`ghostty`、`gnome-terminal`、`konsole`、`iterm`、`apple-terminal` のようなターミナル ID も指定できます。 |
+| `ui.launch_terminal` | `"auto"` | デスクトップのショートカット（設定 > ランチャー）と、Windows での開き直しが GitPoulpi を起動するターミナルです。`auto` はインストール済みのものから選びます（Windows：Windows Terminal、なければ WezTerm、Alacritty、通常のコンソール。Linux：`xdg-terminal-exec`、なければ最初に見つかったターミナル。macOS：iTerm2、Ghostty、WezTerm、kitty のいずれかがあればそれ、なければ Terminal）。`default` は OS 自身の既定です。`windows-terminal`、`wezterm`、`alacritty`、`console`、`kitty`、`foot`、`ghostty`、`gnome-terminal`、`konsole`、`iterm`、`apple-terminal` のようなターミナル ID も指定できます。 |
 | `ui.launcher_build` | `"current"` | 開発モードのときだけ有効です（`general.dev_mode` を参照。そのときだけ設定 > ランチャーに表示され、それ以外は無視されます）。`"current"`：ショートカットとコマンドエイリアスは、それらを作成したビルドを起動します。`"newest"`：ソースの `target/dist` と `target/release` のうち最も新しくビルドされたものを、クリックのたびに判定して起動します。どちらのビルドを起動しても、ショートカットは書き換えられません。 |
-| `ui.command_alias` | `""` | ターミナルから GitPoulpi を起動するコマンドの名前です（例：`gp`。設定 > 一般 > ランチャー、`gitpoulpi alias create`）。空：なし。英数字と `-`、`_`、`.` のみ。**作成：コマンドのエイリアス**ボタンが使う名前にすぎず、作成するまで何も存在しません。 |
-| `ui.command_alias_add` | `""` | `gitpoulpi --add` を実行する 2つ目のコマンドの名前です（例：`gpa`）。すでに起動中の GitPoulpi に、現在のフォルダーを新しいタブとして開きます（設定 > 一般 > ランチャー、`gitpoulpi alias create gpa --add`）。空：なし。名前の規則は同じで、**作成**ボタンで `ui.command_alias` と一緒に作られます。 |
+| `ui.command_alias` | `""` | ターミナルから GitPoulpi を起動するコマンドの名前です（例：`gp`。設定 > ランチャー、`gitpoulpi alias create`）。空：なし。英数字と `-`、`_`、`.` のみ。**作成：コマンドのエイリアス**ボタンが使う名前にすぎず、作成するまで何も存在しません。 |
+| `ui.command_alias_add` | `""` | `gitpoulpi --add` を実行する 2つ目のコマンドの名前です（例：`gpa`）。すでに起動中の GitPoulpi に、現在のフォルダーを新しいタブとして開きます（設定 > ランチャー、`gitpoulpi alias create gpa --add`）。空：なし。名前の規則は同じで、**作成**ボタンで `ui.command_alias` と一緒に作られます。 |
 | `ui.relaunch_in_terminal` | `true` | Windows のみ：exe がダブルクリックで専用のコンソールに起動された場合、GitPoulpi は `ui.launch_terminal` で開き直して終了します。オフの場合はそのコンソールにとどまります。 |
 | `ui.reuse_window` | `true` | GitPoulpi のショートカット（`gitpoulpi launch`）をクリックすると、新しく起動せず、すでに開いている GitPoulpi のウィンドウを表示します。 オフ：クリックのたびに新しいウィンドウを起動します。 |
 
@@ -447,7 +448,7 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 ## `[conflict_prevention]`（ベースブランチの一覧）
 
-競合の事前検出が、現在のブランチの派生元（ベース）として扱ってよいブランチは、パターンの一覧で決まります（[merge の競合を解決する](merge-conflicts.md#競合の予防)を参照）。一覧には名前を付けて共有できます。編集は 設定 > 一般 > 競合の予防 で行います。
+競合の事前検出が、現在のブランチの派生元（ベース）として扱ってよいブランチは、パターンの一覧で決まります（[merge の競合を解決する](merge-conflicts.md#競合の予防)を参照）。一覧には名前を付けて共有できます。編集は 設定 > 競合の予防 で行います。
 
 | キー | 既定値 | 値と効果 |
 |---|---|---|

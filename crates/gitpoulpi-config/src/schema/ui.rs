@@ -292,6 +292,21 @@ pub enum ToolbarAlign {
 }
 
 config_enum! {
+/// Whether a dialog the user moved or resized (drag its title bar or its
+/// edges, or `Ctrl+N m`) keeps that place: `ui.dialog_geometry`.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum DialogGeometry {
+    /// Kept while GitPoulpi runs, forgotten at the next launch. The default.
+    #[default]
+    Session => "session",
+    /// Kept on disk and restored at the next launch.
+    Saved => "saved",
+    /// Every dialog opens at its default place and size.
+    Never => "never",
+}
+}
+
+config_enum! {
 /// Where the status line (branch, counts, messages, key hints) sits:
 /// `ui.statusbar_position`.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -517,6 +532,9 @@ pub struct UiConfig {
     /// Live: where the toolbar's buttons sit along it. See [`ToolbarAlign`];
     /// `start` is the default.
     pub toolbar_align: ToolbarAlign,
+    /// Live: whether a moved or resized dialog keeps its place. See
+    /// [`DialogGeometry`]; `session` is the default.
+    pub dialog_geometry: DialogGeometry,
     /// Live: the linked pull request (merge request) button is pinned to the
     /// toolbar's far end (right, or bottom in a column) instead of flowing
     /// with the other buttons, and **on by default**.
@@ -1122,6 +1140,7 @@ impl Default for UiConfig {
             graph_row_tint_strength: GraphRowTintStrength::default(),
             toolbar_position: ToolbarPosition::default(),
             toolbar_align: ToolbarAlign::default(),
+            dialog_geometry: DialogGeometry::default(),
             toolbar_pr_pinned: true,
             statusbar_position: StatusbarPosition::default(),
             tabs_position: TabsPosition::default(),

@@ -526,6 +526,9 @@ toolbar_position = "Positie van de werkbalk"
 toolbar_position_help = "Waar de werkbalk staat: Boven, Onder (standaard), Links of Rechts. Links en Rechts maken er een kolom naast de panelen van; in een venster smaller dan 80 kolommen staat hij onderaan. Werkt direct."
 toolbar_align = "Uitlijning van de werkbalkknoppen"
 toolbar_align_help = "Waar de knoppen langs de balk staan: Begin (standaard), Midden of Einde. Begin is links in een rij en boven in een kolom; Einde is rechts en onder. Werkt direct."
+# context: label of the setting that decides whether a dialog the user moved or resized keeps its place
+dialog_geometry = "Remember dialog position and size"
+dialog_geometry_help = "Dialogs can be moved (drag the title bar, or Ctrl+N then m) and resized (drag the borders and bottom corners). For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
 toolbar_pr_pinned = "Zet de {$pr}-knop vast aan het einde"
 toolbar_pr_pinned_help = "Aan (standaard): de {$pr}-knop staat helemaal aan het einde van de werkbalk (rechts, in een kolom onderaan), wat de uitlijning ook is. Uit: hij stroomt mee met de andere knoppen en wordt met hen uitgelijnd. Werkt direct."
 statusbar_position = "Positie van de statusbalk"
@@ -754,6 +757,12 @@ pos_right = "Rechts"
 align_start = "Begin"
 align_center = "Midden"
 align_end = "Einde"
+# context: dropdown choice: a moved dialog keeps its place until GitPoulpi closes
+geometry_session = "For this session"
+# context: dropdown choice: a moved dialog keeps its place on disk, for the next launch too
+geometry_saved = "Saved to disk"
+# context: dropdown choice: dialogs always open at their default place and size
+geometry_never = "Never"
 layout_fit = "Aan paneel passen"
 layout_scroll = "Zijwaarts scrollen"
 
@@ -2299,6 +2308,8 @@ nav_prefix_activity_log = "Activiteitenlogboek openen"
 nav_prefix_global_log = "Globaal activiteitenlogboek openen"
 nav_prefix_jobs = "Achtergrondtaken tonen"
 nav_prefix_updates = "Het updatepaneel tonen"
+# context: name of the key after Ctrl+N that moves or resizes the open dialog from the keyboard
+nav_prefix_arrange_dialog = "Arrange the open dialog (move, resize)"
 nav_prefix_help = "Help omschakelen"
 nav_prefix_select_tab = "Tabblad kiezen"
 nav_prefix_change_theme = "Thema wijzigen"
@@ -3412,6 +3423,12 @@ undo_history_restore_only = "Geschiedenis: Alleen dit herstellen..."
 undo_history_offer = "Geschiedenis: De branch herstellen naar waar hij was..."
 undo_history_refresh = "Geschiedenis: Vernieuwen"
 undo_history_close = "Geschiedenis: Sluiten"
+safety_next_pane = "Reflog / Lost Work: Next Pane"
+safety_path_tree = "Reflog / Lost Work: Path or Tree File List"
+safety_reset_panes = "Reflog / Lost Work: Reset Pane Sizes"
+# context: palette row: puts the open dialog in the mode where the arrow keys move it and Shift+arrows resize it
+dialog_move_resize = "Dialog: Move/resize"
+dialog_reset_geometry = "Dialog: Reset position and size"
 reflog_show_in_log = "Reflog: Tonen in het Log"
 reflog_create_branch = "Reflog: Branch hier maken..."
 reflog_create_tag = "Reflog: Create {$tag} Here..."
@@ -3675,6 +3692,7 @@ navigation_prefix_then_12 = "kies een thema uit de lijst - typ om te filteren, d
 navigation_prefix_then_13 = "een taal uit de lijst kiezen - typ om te filteren, Enter past hem toe en slaat hem op, Esc annuleert (ook `App: Taal wijzigen...` in het palet)"
 navigation_prefix_then_14 = "`App: Kleurthema van de grafiek wijzigen...`"
 navigation_prefix_then_15 = "`App: Rijkleuring van de grafiek omschakelen`"
+navigation_prefix_then_19 = "arrange the open dialog from the keyboard: the arrows move it, Shift+arrows resize it, 0 puts it back, Enter leaves (the twin of dragging its title bar and borders; also `Dialog: Move/resize` in the palette)"
 git_actions_then_1 = "het geselecteerde unstaged bestand stagen (Statuspaneel)"
 git_actions_then_2 = "het geselecteerde staged bestand unstagen (Statuspaneel)"
 git_actions_then_3 = "alle wijzigingen stagen"
@@ -6214,6 +6232,21 @@ hint_tag = "{$tag} here"
 hint_apply = "apply"
 hint_stash = "{$stash}"
 hint_menu = "menu"
+# context: footer hint: the key moves the keyboard to the next pane (commit list, files, changes)
+hint_pane = "next pane"
+# context: footer hint: the keys 1 2 3 open one of the three views
+hint_views = "view"
+# context: footer hint: the key switches the file list between a flat path list and a folder tree
+hint_tree = "path or tree"
+# context: footer hint: the keys move the dividers between the panes
+hint_resize = "resize panes"
+# context: title of the changes box of the dialog; {path} is a file path
+pane_diff = "Changes in {path}"
+# context: title of the changes box of the dialog while no file is selected
+pane_diff_plain = "Changes"
+pane_diff_none = "Select a file to see its changes"
+pane_diff_loading = "reading the changes..."
+why_open_panes = "open the Reflog or Lost work view first"
 tip_depth = { one = "{n} actie kan ongedaan worden gemaakt", other = "{n} acties kunnen ongedaan worden gemaakt" }
 tip_chip = "Geschiedenis van ongedaan maken: elke actie die je kunt terugdraaien, een voor een"
 offer_tip = "{name} herstellen naar waar {op} het achterliet: {key}"
@@ -9257,3 +9290,12 @@ acl_warning = "Andere accounts kunnen dit sleutelbestand lezen. OpenSSH weigert 
 acl_button = "Beperken tot mijn account"
 acl_done = "Het sleutelbestand kan nu alleen door jouw account worden gelezen."
 acl_failed = "Het sleutelbestand kon niet worden beperkt: {why}"
+
+[dialog_frame]
+# context: shown on the border of a dialog in the arrange mode; {done} is the name of the key that leaves it
+arrange_hint = "Arrange: arrows move, Shift+arrows resize, 0 resets, {done} leaves"
+# context: status line when the arrange mode starts
+arranging = "Arranging the dialog: arrows move, Shift+arrows resize, 0 resets, Enter leaves"
+# context: status line after the dialog went back to its default place and size
+reset_done = "dialog back at its default place and size"
+why_no_dialog = "no dialog that can be arranged is open"

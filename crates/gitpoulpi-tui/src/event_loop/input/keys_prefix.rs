@@ -348,7 +348,9 @@ pub(super) fn navigation(cx: &mut CommandCtx<'_>, key: KeyEvent) -> io::Result<F
     if (cx.repo_dialogs.is_open() || crate::activity_log::is_open())
         && !matches!(
             action,
-            NavigationAction::FocusByBadge(_) | NavigationAction::Cancel
+            NavigationAction::FocusByBadge(_)
+                | NavigationAction::Cancel
+                | NavigationAction::ArrangeDialog
         )
     {
         *cx.last_message = Some(msg::input::NAVIGATION_CANCELED.get().into());
@@ -601,6 +603,13 @@ pub(super) fn navigation(cx: &mut CommandCtx<'_>, key: KeyEvent) -> io::Result<F
         NavigationAction::OpenGlobalLog => crate::activity_log::open_global_panel(),
         NavigationAction::ShowJobs => crate::jobs_ui::run(crate::jobs_ui::JobsCmd::Show),
         NavigationAction::ShowUpdates => crate::updates::panel::open(),
+        NavigationAction::ArrangeDialog => {
+            *cx.last_message = Some(if cx.repo_dialogs.arrange_start() {
+                msg::dialog_frame::ARRANGING.get().into()
+            } else {
+                msg::dialog_frame::WHY_NO_DIALOG.get().into()
+            });
+        }
         NavigationAction::ToggleHelp => {
             *cx.show_help = true;
         }

@@ -135,6 +135,7 @@ As teclas depois de um prefixo aparecem com o prefixo (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Estreitar o painel Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agente: mostrar a visualização pendente | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agente: voltar (ou dispensar a visualização pendente) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filtrar refs por nome | `/` |
 | `refs` | `solo` | Solo na seleção | `o` |
 | `refs` | `clear_solo` | Parar o solo | `Shift+O` |
@@ -968,6 +969,11 @@ As teclas são as padrão.
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as stash | `z` |
 | Trabalho perdido: buscar de novo |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Exibir: atualizar | `r` |
 | Exibir: atualizar (fetch, pull requests, issues) | `F5` |
 | Exibir: alternar a ajuda | `?` |

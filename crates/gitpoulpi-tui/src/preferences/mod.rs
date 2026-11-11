@@ -48,7 +48,7 @@ use gitpoulpi_config::{
     set_in_file, set_list_in_file, AvatarFallback, AvatarPlacement, AvatarSources, ColorDepth,
     ComposerFiles, Config, ConfigPaths, DefaultBackend, DiffLayout, GraphLaneBackground,
     GraphRenderer, GraphRowTintStrength, ImageProtocol, KittyKeyboard, Profile, PullButtonMode,
-    PushBehavior, StatusbarPosition, TabDirFollow, TabsPosition, ToolbarAlign, ToolbarPosition,
+    PushBehavior, StatusbarPosition, TabDirFollow, TabsPosition, ToolbarAlign, ToolbarPosition, DialogGeometry,
     UiLanguage, MAX_MOUSE_SCROLL_LINES, MIN_COMMITS_PER_LAZY_PAGE, MIN_INITIAL_COMMITS_IN_GRAPH,
     MIN_MOUSE_SCROLL_LINES,
 };

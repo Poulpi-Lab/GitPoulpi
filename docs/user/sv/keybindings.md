@@ -137,6 +137,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `nav_prefix` | `status_narrower` | Smalna av Status-rutan | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: visa den väntande vyn | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: tillbaka (eller avfärda den väntande vyn) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filtrera refs efter namn | `/` |
 | `refs` | `solo` | Solo för markeringen | `o` |
 | `refs` | `clear_solo` | Sluta solo | `Shift+O` |
@@ -972,6 +973,11 @@ Tangenterna är standardvärdena.
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as stash | `z` |
 | Förlorat arbete: Sök igen |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Vy: Uppdatera | `r` |
 | Vy: Uppdatera (fetch, pull requests, ärenden) | `F5` |
 | Vy: Växla hjälpöverlägg | `?` |

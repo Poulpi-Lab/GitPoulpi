@@ -526,6 +526,9 @@ toolbar_position = "Położenie paska narzędzi"
 toolbar_position_help = "Gdzie leży pasek narzędzi: U góry, Na dole (domyślnie), Po lewej lub Po prawej. Po lewej i Po prawej robią z niego kolumnę obok paneli; w oknie węższym niż 80 kolumn jest rysowany na dole. Działa od razu."
 toolbar_align = "Wyrównanie przycisków paska narzędzi"
 toolbar_align_help = "Gdzie leżą przyciski wzdłuż paska: Początek (domyślnie), Środek lub Koniec. Początek to lewa strona wiersza i góra kolumny; koniec to prawa strona i dół. Działa od razu."
+# context: label of the setting that decides whether a dialog the user moved or resized keeps its place
+dialog_geometry = "Remember dialog position and size"
+dialog_geometry_help = "Dialogs can be moved (drag the title bar, or Ctrl+N then m) and resized (drag the borders and bottom corners). For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
 toolbar_pr_pinned = "Przypnij przycisk {$pr} na końcu"
 toolbar_pr_pinned_help = "Włączone (domyślnie): przycisk {$pr} leży na samym końcu paska narzędzi (po prawej, w kolumnie na dole) przy każdym wyrównaniu. Wyłączone: płynie razem z innymi przyciskami i jest z nimi wyrównany. Działa od razu."
 statusbar_position = "Położenie paska stanu"
@@ -754,6 +757,12 @@ pos_right = "Po prawej"
 align_start = "Początek"
 align_center = "Środek"
 align_end = "Koniec"
+# context: dropdown choice: a moved dialog keeps its place until GitPoulpi closes
+geometry_session = "For this session"
+# context: dropdown choice: a moved dialog keeps its place on disk, for the next launch too
+geometry_saved = "Saved to disk"
+# context: dropdown choice: dialogs always open at their default place and size
+geometry_never = "Never"
 layout_fit = "Dopasuj do panelu"
 layout_scroll = "Przewijaj w poziomie"
 
@@ -2297,6 +2306,8 @@ nav_prefix_activity_log = "Otwórz Dziennik aktywności"
 nav_prefix_global_log = "Otwórz globalny dziennik aktywności"
 nav_prefix_jobs = "Pokaż zadania w tle"
 nav_prefix_updates = "Pokaż panel aktualizacji"
+# context: name of the key after Ctrl+N that moves or resizes the open dialog from the keyboard
+nav_prefix_arrange_dialog = "Arrange the open dialog (move, resize)"
 nav_prefix_help = "Przełącz pomoc"
 nav_prefix_select_tab = "Wybierz kartę"
 nav_prefix_change_theme = "Zmień motyw"
@@ -3410,6 +3421,12 @@ undo_history_restore_only = "Historia cofania: Przywróć tylko tę..."
 undo_history_offer = "Historia cofania: Przywróć gałąź tam, gdzie była..."
 undo_history_refresh = "Historia cofania: Odśwież"
 undo_history_close = "Historia cofania: Zamknij"
+safety_next_pane = "Reflog / Lost Work: Next Pane"
+safety_path_tree = "Reflog / Lost Work: Path or Tree File List"
+safety_reset_panes = "Reflog / Lost Work: Reset Pane Sizes"
+# context: palette row: puts the open dialog in the mode where the arrow keys move it and Shift+arrows resize it
+dialog_move_resize = "Dialog: Move/resize"
+dialog_reset_geometry = "Dialog: Reset position and size"
 reflog_show_in_log = "Reflog: Pokaż w Log"
 reflog_create_branch = "Reflog: Utwórz gałąź tutaj..."
 reflog_create_tag = "Reflog: Create {$tag} Here..."
@@ -3673,6 +3690,7 @@ navigation_prefix_then_12 = "wybierz motyw z listy - pisz, aby filtrować, podś
 navigation_prefix_then_13 = "wybierz język z listy - wpisz, aby filtrować, Enter go zastosuje i zapisze, Esc anuluje (także `Aplikacja: Zmień język...` w palecie)"
 navigation_prefix_then_14 = "`Aplikacja: Zmień motyw kolorów grafu...`"
 navigation_prefix_then_15 = "`Aplikacja: Przełącz zabarwienie wierszy grafu`"
+navigation_prefix_then_19 = "arrange the open dialog from the keyboard: the arrows move it, Shift+arrows resize it, 0 puts it back, Enter leaves (the twin of dragging its title bar and borders; also `Dialog: Move/resize` in the palette)"
 git_actions_then_1 = { git = "stage zaznaczony plik unstaged (panel Status)", local = "dodaj zaznaczony plik spoza poczekalni (panel Status)" }
 git_actions_then_2 = { git = "unstage zaznaczony plik staged (panel Status)", local = "usuń zaznaczony plik z poczekalni (panel Status)" }
 git_actions_then_3 = { git = "stage wszystkie zmiany", local = "dodaj wszystkie zmiany do poczekalni" }
@@ -6217,6 +6235,21 @@ hint_tag = "{$tag} here"
 hint_apply = "apply"
 hint_stash = "{$stash}"
 hint_menu = "menu"
+# context: footer hint: the key moves the keyboard to the next pane (commit list, files, changes)
+hint_pane = "next pane"
+# context: footer hint: the keys 1 2 3 open one of the three views
+hint_views = "view"
+# context: footer hint: the key switches the file list between a flat path list and a folder tree
+hint_tree = "path or tree"
+# context: footer hint: the keys move the dividers between the panes
+hint_resize = "resize panes"
+# context: title of the changes box of the dialog; {path} is a file path
+pane_diff = "Changes in {path}"
+# context: title of the changes box of the dialog while no file is selected
+pane_diff_plain = "Changes"
+pane_diff_none = "Select a file to see its changes"
+pane_diff_loading = "reading the changes..."
+why_open_panes = "open the Reflog or Lost work view first"
 tip_depth = { one = "Można cofnąć {n} akcję", few = "Można cofnąć {n} akcje", many = "Można cofnąć {n} akcji", other = "Można cofnąć {n} akcji" }
 tip_chip = "Historia cofania: każda akcja, którą można wycofać, po kolei"
 offer_tip = "Przywróć {name} tam, gdzie zostawiła ją akcja {op}: {key}"
@@ -9258,3 +9291,12 @@ acl_warning = "Inne konta mogą czytać ten plik klucza. OpenSSH odrzuca taki kl
 acl_button = "Ogranicz do mojego konta"
 acl_done = "Plik klucza może teraz czytać tylko twoje konto."
 acl_failed = "Nie udało się ograniczyć pliku klucza: {why}"
+
+[dialog_frame]
+# context: shown on the border of a dialog in the arrange mode; {done} is the name of the key that leaves it
+arrange_hint = "Arrange: arrows move, Shift+arrows resize, 0 resets, {done} leaves"
+# context: status line when the arrange mode starts
+arranging = "Arranging the dialog: arrows move, Shift+arrows resize, 0 resets, Enter leaves"
+# context: status line after the dialog went back to its default place and size
+reset_done = "dialog back at its default place and size"
+why_no_dialog = "no dialog that can be arranged is open"

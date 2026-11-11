@@ -95,6 +95,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ui.graph_row_tint_strength",
     "ui.toolbar_position",
     "ui.toolbar_align",
+    "ui.dialog_geometry",
     "ui.toolbar_pr_pinned",
     "ui.statusbar_position",
     "ui.tabs_position",

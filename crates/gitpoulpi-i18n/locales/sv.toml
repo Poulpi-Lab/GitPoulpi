@@ -528,6 +528,9 @@ toolbar_position = "Verktygsfältets position"
 toolbar_position_help = "Var verktygsfältet sitter: Överst, Nederst (standard), Vänster eller Höger. Vänster och Höger gör det till en kolumn bredvid panelerna; i ett fönster smalare än 80 kolumner ritas det nederst. Gäller direkt."
 toolbar_align = "Justering av verktygsfältets knappar"
 toolbar_align_help = "Var knapparna sitter längs fältet: Början (standard), Mitten eller Slutet. Början är vänster i en rad och överst i en kolumn; slutet är höger och nederst. Gäller direkt."
+# context: label of the setting that decides whether a dialog the user moved or resized keeps its place
+dialog_geometry = "Remember dialog position and size"
+dialog_geometry_help = "Dialogs can be moved (drag the title bar, or Ctrl+N then m) and resized (drag the borders and bottom corners). For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
 toolbar_pr_pinned = { git = "Fäst {$pr}-knappen i slutet", local = "Fäst {$pr_abbr}-knappen i slutet" }
 toolbar_pr_pinned_help = { git = "På (standard): {$pr}-knappen sitter längst bort i verktygsfältet (höger, i en kolumn nederst) oavsett justering. Av: den flödar med de andra knapparna och justeras med dem. Gäller direkt.", local = "På (standard): {$pr_abbr}-knappen sitter längst bort i verktygsfältet (höger, i en kolumn nederst) oavsett justering. Av: den flödar med de andra knapparna och justeras med dem. Gäller direkt." }
 statusbar_position = "Statusradens position"
@@ -756,6 +759,12 @@ pos_right = "Höger"
 align_start = "Början"
 align_center = "Mitten"
 align_end = "Slutet"
+# context: dropdown choice: a moved dialog keeps its place until GitPoulpi closes
+geometry_session = "For this session"
+# context: dropdown choice: a moved dialog keeps its place on disk, for the next launch too
+geometry_saved = "Saved to disk"
+# context: dropdown choice: dialogs always open at their default place and size
+geometry_never = "Never"
 layout_fit = "Anpassa efter rutan"
 layout_scroll = "Rulla i sidled"
 
@@ -2300,6 +2309,8 @@ nav_prefix_activity_log = "Öppna Aktivitetsloggen"
 nav_prefix_global_log = "Öppna den globala aktivitetsloggen"
 nav_prefix_jobs = "Visa bakgrundsjobben"
 nav_prefix_updates = "Visa uppdateringspanelen"
+# context: name of the key after Ctrl+N that moves or resizes the open dialog from the keyboard
+nav_prefix_arrange_dialog = "Arrange the open dialog (move, resize)"
 nav_prefix_help = "Växla hjälp"
 nav_prefix_select_tab = "Välj flik"
 nav_prefix_change_theme = "Byt tema"
@@ -3414,6 +3425,12 @@ undo_history_restore_only = "Ångrahistorik: Återställ bara den här..."
 undo_history_offer = "Ångrahistorik: Återställ grenen till där den var..."
 undo_history_refresh = "Ångrahistorik: Uppdatera"
 undo_history_close = "Ångrahistorik: Stäng"
+safety_next_pane = "Reflog / Lost Work: Next Pane"
+safety_path_tree = "Reflog / Lost Work: Path or Tree File List"
+safety_reset_panes = "Reflog / Lost Work: Reset Pane Sizes"
+# context: palette row: puts the open dialog in the mode where the arrow keys move it and Shift+arrows resize it
+dialog_move_resize = "Dialog: Move/resize"
+dialog_reset_geometry = "Dialog: Reset position and size"
 reflog_show_in_log = "Reflog: Visa i Log"
 reflog_create_branch = "Reflog: Skapa gren här..."
 reflog_create_tag = "Reflog: Create {$tag} Here..."
@@ -3677,6 +3694,7 @@ navigation_prefix_then_12 = "välj ett tema i listan - skriv för att filtrera, 
 navigation_prefix_then_13 = "välj ett språk i listan - skriv för att filtrera, Enter använder och sparar det, Esc avbryter (även `App: Byt språk...` i paletten)"
 navigation_prefix_then_14 = "`App: Byt färgtema för grafen...`"
 navigation_prefix_then_15 = "`App: Växla radfärgning i grafen`"
+navigation_prefix_then_19 = "arrange the open dialog from the keyboard: the arrows move it, Shift+arrows resize it, 0 puts it back, Enter leaves (the twin of dragging its title bar and borders; also `Dialog: Move/resize` in the palette)"
 git_actions_then_1 = "stage den valda unstaged filen (Status-rutan)"
 git_actions_then_2 = "unstage den valda staged filen (Status-rutan)"
 git_actions_then_3 = "stage alla ändringar"
@@ -6220,6 +6238,21 @@ hint_tag = "{$tag} here"
 hint_apply = "apply"
 hint_stash = "{$stash}"
 hint_menu = "meny"
+# context: footer hint: the key moves the keyboard to the next pane (commit list, files, changes)
+hint_pane = "next pane"
+# context: footer hint: the keys 1 2 3 open one of the three views
+hint_views = "view"
+# context: footer hint: the key switches the file list between a flat path list and a folder tree
+hint_tree = "path or tree"
+# context: footer hint: the keys move the dividers between the panes
+hint_resize = "resize panes"
+# context: title of the changes box of the dialog; {path} is a file path
+pane_diff = "Changes in {path}"
+# context: title of the changes box of the dialog while no file is selected
+pane_diff_plain = "Changes"
+pane_diff_none = "Select a file to see its changes"
+pane_diff_loading = "reading the changes..."
+why_open_panes = "open the Reflog or Lost work view first"
 tip_depth = { one = "{n} åtgärd kan ångras", other = "{n} åtgärder kan ångras" }
 tip_chip = "Ångrahistorik: varje åtgärd du kan ta tillbaka, en i taget"
 offer_tip = "Återställ {name} till där {op} lämnade den: {key}"
@@ -9263,3 +9296,12 @@ acl_warning = "Andra konton kan läsa den här nyckelfilen. OpenSSH avvisar en s
 acl_button = "Begränsa till mitt konto"
 acl_done = "Nyckelfilen kan nu bara läsas av ditt konto."
 acl_failed = "Kunde inte begränsa nyckelfilen: {why}"
+
+[dialog_frame]
+# context: shown on the border of a dialog in the arrange mode; {done} is the name of the key that leaves it
+arrange_hint = "Arrange: arrows move, Shift+arrows resize, 0 resets, {done} leaves"
+# context: status line when the arrange mode starts
+arranging = "Arranging the dialog: arrows move, Shift+arrows resize, 0 resets, Enter leaves"
+# context: status line after the dialog went back to its default place and size
+reset_done = "dialog back at its default place and size"
+why_no_dialog = "no dialog that can be arranged is open"

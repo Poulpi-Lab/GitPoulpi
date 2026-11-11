@@ -1065,6 +1065,9 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
     use crate::keymap::Action as A;
     match entry.command {
         PaletteCommand::ToggleHelp => Some(A::GlobalHelp),
+        PaletteCommand::Safety(crate::safety_panel::SafetyCmd::ArrangeDialog) => {
+            Some(A::NavArrangeDialog)
+        }
         PaletteCommand::AboutGitPoulpi => Some(A::NavOpenAbout),
         PaletteCommand::OpenActivityLog => Some(A::NavOpenActivityLog),
         PaletteCommand::OpenGlobalLog => Some(A::NavOpenGlobalLog),

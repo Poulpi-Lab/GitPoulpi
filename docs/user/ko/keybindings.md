@@ -133,6 +133,7 @@ stage_file = "z"
 | `nav_prefix` | `status_narrower` | Status 창 좁히기 | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | 에이전트: 대기 중인 보기 표시 | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | 에이전트: 뒤로 (또는 대기 중인 보기 닫기) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | 이름으로 Refs 필터 | `/` |
 | `refs` | `solo` | 선택 항목만 보기 | `o` |
 | `refs` | `clear_solo` | 솔로 해제 | `Shift+O` |
@@ -963,6 +964,11 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as stash | `z` |
 | 잃어버린 작업: 다시 검사 |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | 보기: 새로 고침 | `r` |
 | 보기: 새로 고침 (fetch, pull request, 이슈) | `F5` |
 | 보기: 도움말 오버레이 전환 | `?` |

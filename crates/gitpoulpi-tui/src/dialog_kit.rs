@@ -17,6 +17,8 @@ use crate::{button_bg, display_width, fit, text_field};
 
 mod discard;
 mod dismiss;
+mod frame;
+pub(crate) use frame::{FloatingFrame, FrameMouse};
 pub(crate) use discard::{DiscardGuard, Verdict};
 #[allow(unused_imports)]
 pub(crate) use dismiss::{

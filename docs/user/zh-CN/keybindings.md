@@ -121,6 +121,7 @@ stage_file = "z"
 | `nav_prefix` | `status_narrower` | 收窄状态窗格 | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | 代理：显示待处理的视图 | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | 代理：返回（或关闭待处理的视图） | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | 按名称筛选引用 | `/` |
 | `refs` | `solo` | 单独显示所选项 | `o` |
 | `refs` | `clear_solo` | 停止单独显示 | `Shift+O` |
@@ -936,6 +937,11 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as stash | `z` |
 | 丢失的工作：重新扫描 |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | 视图：刷新 | `r` |
 | 视图：刷新（fetch、pull request、议题） | `F5` |
 | 视图：切换帮助浮层 | `?` |

@@ -41,7 +41,7 @@ use crate::pull_request::{
 use crate::review_cmd::ReviewCmd;
 #[cfg(feature = "hosting")]
 use crate::review_view::{ReviewEffect, ReviewTarget, ReviewView};
-use crate::safety_panel::{safety_rect, PanelEffect, PanelOutcome, SafetyPanel};
+use crate::safety_panel::{PanelEffect, PanelOutcome, SafetyPanel};
 use crate::sparse_dialog::{sparse_rect, SparseDialog, SparseOutcome};
 use crate::workspace_ui::dialog::{rect as workspace_rect, Outcome as WsOutcome, WorkspaceDialog};
 use crate::worktree_dialog::{worktree_rect, WorktreeDialog, WorktreeOutcome};
@@ -389,6 +389,19 @@ impl RepoDialogs {
             refname,
             depth,
         ))));
+    }
+
+    /// `Ctrl+N m`: puts the open dialog in the arrange mode (arrows move it,
+    /// Shift+arrows resize it). `false` when the dialog on top cannot be moved
+    /// (or none is open).
+    pub(crate) fn arrange_start(&mut self) -> bool {
+        match self.dialog.as_mut() {
+            Some(RepoDialog::Safety(panel)) => {
+                panel.arrange();
+                true
+            }
+            _ => false,
+        }
     }
 
     /// The view the Undo history / Reflog / Lost work panel is open on.
@@ -952,6 +965,7 @@ impl RepoDialogs {
             Some(RepoDialog::Worktree { form, .. }) => form.nav_targets(),
             Some(RepoDialog::Workspace { form, .. }) => form.nav_targets(),
             Some(RepoDialog::Sparse(form)) => form.nav_targets(),
+            Some(RepoDialog::Safety(panel)) => panel.nav_targets(),
             Some(RepoDialog::Flow(form)) => form.nav_targets(),
             #[cfg(feature = "hosting")]
             Some(RepoDialog::IssueFlow(form)) => form.nav_targets(),
@@ -970,9 +984,10 @@ impl RepoDialogs {
     pub(crate) fn pointer_hand_at(&mut self, col: u16, row: u16) -> bool {
         use crate::pointer_map::{self, Kind};
         match pointer_map::at(col, row) {
-            Some(Kind::Field | Kind::Plain | Kind::ColResize) => return false,
+            Some(Kind::Field | Kind::Plain) => return false,
+            Some(k) if k.resize_shape().is_some() => return false,
             Some(Kind::Hand) => return true,
-            None => {}
+            Some(_) | None => {}
         }
         if self.picker_ref().is_none() {
             if let Some(RepoDialog::Workspace { form, .. }) = self.dialog.as_ref() {
@@ -2164,7 +2179,7 @@ impl RepoDialogs {
             Some(RepoDialog::IssueFlow(form)) => {
                 form.render(crate::flow::issue_flow::issue_flow_rect(area), buf)
             }
-            Some(RepoDialog::Safety(panel)) => panel.render(safety_rect(area), buf),
+            Some(RepoDialog::Safety(panel)) => panel.render_in(area, buf),
         }
     }
 }

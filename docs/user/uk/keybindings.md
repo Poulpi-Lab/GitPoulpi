@@ -133,6 +133,7 @@ stage_file = "z"
 | `nav_prefix` | `status_narrower` | Звузити панель Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Агент: показати відкладений вигляд | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Агент: назад (або відхилити відкладений вигляд) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Фільтр refs за назвою | `/` |
 | `refs` | `solo` | Solo для вибраного | `o` |
 | `refs` | `clear_solo` | Припинити solo | `Shift+O` |
@@ -964,6 +965,11 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as stash | `z` |
 | Втрачена робота: сканувати знову |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Вигляд: оновити | `r` |
 | Вигляд: оновити (fetch, pull requests, issues) | `F5` |
 | Вигляд: довідка | `?` |

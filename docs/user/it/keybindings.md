@@ -138,6 +138,7 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `nav_prefix` | `status_narrower` | Restringi il pannello Stato | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agente: mostra la vista in sospeso | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agente: indietro (o chiudi la vista in sospeso) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filtra i Refs per nome | `/` |
 | `refs` | `solo` | Solo sulla selezione | `o` |
 | `refs` | `clear_solo` | Termina il solo | `Shift+O` |
@@ -974,6 +975,11 @@ applicano. I tasti sono quelli predefiniti.
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as stash | `z` |
 | Lavoro perso: Cerca di nuovo |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Vista: Aggiorna | `r` |
 | Vista: Aggiorna (fetch, pull request, issue) | `F5` |
 | Vista: Mostra o nascondi l'aiuto | `?` |

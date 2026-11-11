@@ -2698,6 +2698,32 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "",
         PaletteCommand::Safety(SafetyCmd::LostRefresh),
     ),
+    // -- Reflog / Lost work panes and the dialog's frame ------------
+    entry(
+        msg::palette::SAFETY_NEXT_PANE,
+        "Tab",
+        PaletteCommand::Safety(SafetyCmd::NextPane),
+    ),
+    entry(
+        msg::palette::SAFETY_PATH_TREE,
+        "v",
+        PaletteCommand::Safety(SafetyCmd::PathTree),
+    ),
+    entry(
+        msg::palette::SAFETY_RESET_PANES,
+        "",
+        PaletteCommand::Safety(SafetyCmd::ResetPanes),
+    ),
+    entry(
+        msg::palette::DIALOG_MOVE_RESIZE,
+        "Ctrl+N m",
+        PaletteCommand::Safety(SafetyCmd::ArrangeDialog),
+    ),
+    entry(
+        msg::palette::DIALOG_RESET_GEOMETRY,
+        "",
+        PaletteCommand::Safety(SafetyCmd::ResetDialog),
+    ),
     // -- View ------------------------------------------------------
     entry(msg::palette::VIEW_REFRESH, "r", PaletteCommand::Refresh),
     entry(

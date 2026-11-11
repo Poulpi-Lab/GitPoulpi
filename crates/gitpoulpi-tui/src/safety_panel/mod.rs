@@ -26,7 +26,9 @@ mod label_tests;
 #[cfg(test)]
 mod layout_tests;
 mod palette;
+mod panes;
 mod render;
+mod render_panes;
 mod rows;
 #[cfg(test)]
 mod tests;
@@ -47,7 +49,14 @@ use detail::Detail;
 
 pub(crate) use label::summary_text;
 pub(crate) use palette::SafetyCmd;
+use panes::Panes;
+#[cfg(test)]
 pub(crate) use render::safety_rect;
+
+/// The id the dialog's geometry is kept under (`dialog_kit::frame`).
+pub(crate) const DIALOG_ID: &str = "safety";
+/// The default size, at most (centered, shrunk to the screen).
+const DEFAULT_SIZE: (u16, u16) = (160, 44);
 
 /// How many reflog positions one request fetches.
 const REFLOG_PAGE: usize = 200;
@@ -405,6 +414,10 @@ pub(crate) struct SafetyPanel {
     /// The panel frame and its close cross, as the last render painted them.
     pub(crate) frame: Rect,
     pub(crate) close: crate::dialog_kit::CloseHit,
+    /// Where the dialog sits and how big it is (movable, resizable).
+    pub(crate) window: crate::dialog_kit::FloatingFrame,
+    /// The commit list's neighbours (Reflog and Lost work): file list, diff.
+    pub(crate) panes: Panes,
     /// The bound key of Undo, for the "Ctrl+Z undoes this" words.
     undo_key: String,
 }
@@ -436,6 +449,8 @@ impl SafetyPanel {
             list_body: Rect::default(),
             frame: Rect::default(),
             close: Default::default(),
+            window: crate::dialog_kit::FloatingFrame::new(DIALOG_ID, DEFAULT_SIZE),
+            panes: Panes::default(),
             undo_key: String::new(),
         };
         panel.start_load(tab);
@@ -604,6 +619,7 @@ impl SafetyPanel {
             Tab::Lost => self.lost.detail.poll(&self.requester, want),
             Tab::History => {}
         }
+        self.poll_panes(want);
         effects
     }
 
@@ -641,6 +657,10 @@ impl SafetyPanel {
     /// Whether anything is still running (the frame loop keeps drawing).
     pub(crate) fn busy(&self) -> bool {
         self.job.is_some()
+            || self.panes.busy()
+            || (self.tab != Tab::History
+                && self.pane_commit().is_some()
+                && self.detail().is_none())
             || self.history.load.is_some()
             || self.reflog.load.is_some()
             || self.reflog.fetching_more()

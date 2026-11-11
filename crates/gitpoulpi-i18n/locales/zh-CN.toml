@@ -526,6 +526,9 @@ toolbar_position = "工具栏位置"
 toolbar_position_help = "工具栏的位置：顶部、底部（默认）、左侧或右侧。左侧和右侧会在窗格旁形成一列；窗口窄于 80 列时改为画在底部。立即生效。"
 toolbar_align = "工具栏按钮对齐"
 toolbar_align_help = "按钮在工具栏上的位置：起始（默认）、居中或末尾。起始是一行的左侧和一列的顶部；末尾是右侧和底部。立即生效。"
+# context: label of the setting that decides whether a dialog the user moved or resized keeps its place
+dialog_geometry = "Remember dialog position and size"
+dialog_geometry_help = "Dialogs can be moved (drag the title bar, or Ctrl+N then m) and resized (drag the borders and bottom corners). For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
 toolbar_pr_pinned = { git = "将 {$pr} 按钮固定在末端", local = "将{$pr}按钮固定在末端" }
 toolbar_pr_pinned_help = { git = "开启（默认）时，无论对齐方式如何，{$pr} 按钮都位于工具栏的最末端（右侧，竖排时在底部）。关闭时，它与其他按钮一起排列并随之对齐。立即生效。", local = "开启（默认）时，无论对齐方式如何，{$pr}按钮都位于工具栏的最末端（右侧，竖排时在底部）。关闭时，它与其他按钮一起排列并随之对齐。立即生效。" }
 statusbar_position = "状态栏位置"
@@ -754,6 +757,12 @@ pos_right = "右侧"
 align_start = "起始"
 align_center = "居中"
 align_end = "末尾"
+# context: dropdown choice: a moved dialog keeps its place until GitPoulpi closes
+geometry_session = "For this session"
+# context: dropdown choice: a moved dialog keeps its place on disk, for the next launch too
+geometry_saved = "Saved to disk"
+# context: dropdown choice: dialogs always open at their default place and size
+geometry_never = "Never"
 layout_fit = "适应窗格"
 layout_scroll = "横向滚动"
 
@@ -2296,6 +2305,8 @@ nav_prefix_activity_log = "打开活动日志"
 nav_prefix_global_log = "打开全局活动日志"
 nav_prefix_jobs = "显示后台任务"
 nav_prefix_updates = "显示更新面板"
+# context: name of the key after Ctrl+N that moves or resizes the open dialog from the keyboard
+nav_prefix_arrange_dialog = "Arrange the open dialog (move, resize)"
 nav_prefix_help = "切换帮助"
 nav_prefix_select_tab = "选择标签页"
 nav_prefix_change_theme = "更改主题"
@@ -3411,6 +3422,12 @@ undo_history_restore_only = "撤销历史：仅恢复此项…"
 undo_history_offer = "撤销历史：将分支恢复到原来的位置…"
 undo_history_refresh = "撤销历史：刷新"
 undo_history_close = "撤销历史：关闭"
+safety_next_pane = "Reflog / Lost Work: Next Pane"
+safety_path_tree = "Reflog / Lost Work: Path or Tree File List"
+safety_reset_panes = "Reflog / Lost Work: Reset Pane Sizes"
+# context: palette row: puts the open dialog in the mode where the arrow keys move it and Shift+arrows resize it
+dialog_move_resize = "Dialog: Move/resize"
+dialog_reset_geometry = "Dialog: Reset position and size"
 reflog_show_in_log = "Reflog：在 Log 中显示"
 reflog_create_branch = "Reflog：在此创建分支…"
 reflog_create_tag = "Reflog: Create {$tag} Here..."
@@ -3674,6 +3691,7 @@ navigation_prefix_then_12 = "从列表中选择主题 - 输入以筛选，高亮
 navigation_prefix_then_13 = "从列表中选择语言 - 输入以筛选，Enter 应用并保存，Esc 取消（命令面板中也有 `应用：更改语言…`）"
 navigation_prefix_then_14 = "`应用：更改图配色主题…`"
 navigation_prefix_then_15 = "`应用：切换图行着色`"
+navigation_prefix_then_19 = "arrange the open dialog from the keyboard: the arrows move it, Shift+arrows resize it, 0 puts it back, Enter leaves (the twin of dragging its title bar and borders; also `Dialog: Move/resize` in the palette)"
 git_actions_then_1 = { git = "{$stage} 所选的 {$unstaged} 文件（状态窗格）", local = "暂存所选的未暂存文件（状态窗格）" }
 git_actions_then_2 = { git = "{$unstage} 所选的 {$staged} 文件（状态窗格）", local = "取消暂存所选的已暂存文件（状态窗格）" }
 git_actions_then_3 = { git = "{$stage} 所有更改", local = "暂存所有更改" }
@@ -6216,6 +6234,21 @@ hint_tag = "{$tag} here"
 hint_apply = "apply"
 hint_stash = "{$stash}"
 hint_menu = "菜单"
+# context: footer hint: the key moves the keyboard to the next pane (commit list, files, changes)
+hint_pane = "next pane"
+# context: footer hint: the keys 1 2 3 open one of the three views
+hint_views = "view"
+# context: footer hint: the key switches the file list between a flat path list and a folder tree
+hint_tree = "path or tree"
+# context: footer hint: the keys move the dividers between the panes
+hint_resize = "resize panes"
+# context: title of the changes box of the dialog; {path} is a file path
+pane_diff = "Changes in {path}"
+# context: title of the changes box of the dialog while no file is selected
+pane_diff_plain = "Changes"
+pane_diff_none = "Select a file to see its changes"
+pane_diff_loading = "reading the changes..."
+why_open_panes = "open the Reflog or Lost work view first"
 tip_depth = { one = "可撤销 {n} 项操作", other = "可撤销 {n} 项操作" }
 tip_chip = "撤销历史：你可以撤回的每一项操作，逐项处理"
 offer_tip = "将 {name} 恢复到“{op}”留下的位置：{key}"
@@ -9259,3 +9292,12 @@ acl_warning = "其他账户可以读取此密钥文件。OpenSSH 会拒绝这样
 acl_button = "仅限我的账户"
 acl_done = "现在只有你的账户可以读取此密钥文件。"
 acl_failed = "无法限制密钥文件：{why}"
+
+[dialog_frame]
+# context: shown on the border of a dialog in the arrange mode; {done} is the name of the key that leaves it
+arrange_hint = "Arrange: arrows move, Shift+arrows resize, 0 resets, {done} leaves"
+# context: status line when the arrange mode starts
+arranging = "Arranging the dialog: arrows move, Shift+arrows resize, 0 resets, Enter leaves"
+# context: status line after the dialog went back to its default place and size
+reset_done = "dialog back at its default place and size"
+why_no_dialog = "no dialog that can be arranged is open"

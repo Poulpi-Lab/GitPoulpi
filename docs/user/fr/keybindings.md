@@ -138,6 +138,7 @@ préfixe (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Rétrécir le volet Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent : afficher la vue en attente | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent : retour (ou fermer la vue en attente) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filtrer les refs par nom | `/` |
 | `refs` | `solo` | Isoler la sélection | `o` |
 | `refs` | `clear_solo` | Arrêter le solo | `Shift+O` |
@@ -972,6 +973,11 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Travail perdu : Appliquer les changements à l'arbre de travail | `w` |
 | Travail perdu : Enregistrer en stash | `z` |
 | Travail perdu : Relancer la recherche |  |
+| Reflog / Travail perdu : Volet suivant | `Tab` |
+| Reflog / Travail perdu : Liste des fichiers en chemins ou en arbre | `v` |
+| Reflog / Travail perdu : Réinitialiser la taille des volets |  |
+| Dialogue : Déplacer/redimensionner | `Ctrl+N m` |
+| Dialogue : Réinitialiser la position et la taille |  |
 | Affichage : Actualiser | `r` |
 | Affichage : Actualiser (fetch, pull requests, tickets) | `F5` |
 | Affichage : Afficher ou masquer l'aide | `?` |

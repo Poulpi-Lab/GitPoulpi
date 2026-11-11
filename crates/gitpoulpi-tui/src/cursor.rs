@@ -64,6 +64,12 @@ pub(crate) enum CursorShape {
     /// banner, see `RefDrag` in `lib.rs`) carries the gesture, with the OS
     /// pointer as the bonus.
     Grab,
+    /// A dialog's title bar: it can be dragged (`move`).
+    Move,
+    /// A dialog's bottom right corner (`nwse-resize`).
+    NwseResize,
+    /// A dialog's bottom left corner (`nesw-resize`).
+    NeswResize,
     /// An editable text field (search box, filter, Settings text row, dialog
     /// input, composer): the I-beam, OSC 22 `text`.
     Text,
@@ -82,6 +88,9 @@ impl CursorShape {
             CursorShape::RowResize => Some("ns-resize"),
             CursorShape::Grab => Some("grab"),
             CursorShape::Text => Some("text"),
+            CursorShape::Move => Some("move"),
+            CursorShape::NwseResize => Some("nwse-resize"),
+            CursorShape::NeswResize => Some("nesw-resize"),
         }
     }
 }

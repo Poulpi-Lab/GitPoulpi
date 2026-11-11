@@ -136,6 +136,7 @@ prefiksem (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Zwęź panel Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: Pokaż oczekujący widok | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: Wstecz (lub odrzuć oczekujący widok) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filtruj refy po nazwie | `/` |
 | `refs` | `solo` | Solo dla zaznaczenia | `o` |
 | `refs` | `clear_solo` | Zakończ solo | `Shift+O` |
@@ -969,6 +970,11 @@ zastosowania. Klawisze są domyślne.
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as stash | `z` |
 | Utracona praca: Szukaj ponownie |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Widok: Odśwież | `r` |
 | Widok: Odśwież (fetch, pull requesty, zgłoszenia) | `F5` |
 | Widok: Przełącz pomoc | `?` |

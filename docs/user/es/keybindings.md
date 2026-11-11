@@ -139,6 +139,7 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Estrechar el panel Estado | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agente: Mostrar la vista pendiente | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agente: Volver (o descartar la vista pendiente) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Filtrar refs por nombre | `/` |
 | `refs` | `solo` | Solo de la selección | `o` |
 | `refs` | `clear_solo` | Quitar el solo | `Shift+O` |
@@ -975,6 +976,11 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as stash | `z` |
 | Trabajo perdido: Buscar de nuevo |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Ver: Actualizar | `r` |
 | Ver: Actualizar (fetch, pull requests, issues) | `F5` |
 | Ver: Alternar la ayuda superpuesta | `?` |

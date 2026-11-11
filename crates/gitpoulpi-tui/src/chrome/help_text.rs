@@ -108,6 +108,7 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
     Item(keys!("{nav_prefix.change_language}"), msg::help_text::NAVIGATION_PREFIX_THEN_13),
     Item(keys!("{nav_prefix.change_graph_color_theme}"), msg::help_text::NAVIGATION_PREFIX_THEN_14),
     Item(keys!("{nav_prefix.toggle_graph_row_tints}"), msg::help_text::NAVIGATION_PREFIX_THEN_15),
+    Item(keys!("{nav_prefix.arrange_dialog}"), msg::help_text::NAVIGATION_PREFIX_THEN_19),
     Item(keys!("{nav_prefix.agent_show}"), msg::help_text::NAVIGATION_PREFIX_THEN_9),
     Item(keys!("{nav_prefix.agent_back}"), msg::help_text::NAVIGATION_PREFIX_THEN_10),
     Item(Msg(msg::help_keys::NAVIGATION_PREFIX_THEN_11_KEYS), msg::help_text::NAVIGATION_PREFIX_THEN_11),

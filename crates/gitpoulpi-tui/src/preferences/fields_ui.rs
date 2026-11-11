@@ -204,6 +204,21 @@ impl PreferencesState {
             )
             .with_help(msg::settings_ui::TOOLBAR_ALIGN_HELP.get()),
             Field::global(
+                msg::settings_ui::DIALOG_GEOMETRY.get(),
+                "ui.dialog_geometry",
+                Control::Choice {
+                    options: DialogGeometry::ALL
+                        .iter()
+                        .map(|b| b.as_str().into())
+                        .collect(),
+                    index: DialogGeometry::ALL
+                        .iter()
+                        .position(|b| *b == ui.dialog_geometry)
+                        .unwrap_or(0),
+                },
+            )
+            .with_help(msg::settings_ui::DIALOG_GEOMETRY_HELP.get()),
+            Field::global(
                 msg::settings_ui::TOOLBAR_PR_PINNED.get(),
                 "ui.toolbar_pr_pinned",
                 Control::Toggle(ui.toolbar_pr_pinned),

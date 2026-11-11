@@ -33,6 +33,17 @@ pub(crate) enum SafetyCmd {
     LostRefresh,
     /// Closes the panel, whatever view is open.
     Close,
+    /// Reflog and Lost work: the keyboard goes to the next pane (`Tab`).
+    NextPane,
+    /// Reflog and Lost work: Path / Tree for the file list (`v`).
+    PathTree,
+    /// Reflog and Lost work: the dividers back to their default places
+    /// (`Alt+0`).
+    ResetPanes,
+    /// `Dialog: Move/resize` (`Ctrl+N m`): the arrange mode.
+    ArrangeDialog,
+    /// `Dialog: Reset position and size`.
+    ResetDialog,
 }
 
 impl SafetyCmd {
@@ -58,8 +69,18 @@ impl SafetyCmd {
             | Self::LostApply
             | Self::LostStash
             | Self::LostRefresh => Some(Tab::Lost),
-            Self::Close => None,
+            Self::Close
+            | Self::NextPane
+            | Self::PathTree
+            | Self::ResetPanes
+            | Self::ArrangeDialog
+            | Self::ResetDialog => None,
         }
+    }
+
+    /// The rows that need the panes (Reflog or Lost work, not History).
+    fn needs_panes(self) -> bool {
+        matches!(self, Self::NextPane | Self::PathTree | Self::ResetPanes)
     }
 
     /// The row action it runs (`None` for a refresh and Close).
@@ -77,9 +98,15 @@ impl SafetyCmd {
             Self::ReflogRestore => Act::RestoreRef,
             Self::ReflogMore => Act::LoadMore,
             Self::LostPick => Act::CherryPick,
-            Self::HistoryRefresh | Self::ReflogRefresh | Self::LostRefresh | Self::Close => {
-                return None
-            }
+            Self::HistoryRefresh
+            | Self::ReflogRefresh
+            | Self::LostRefresh
+            | Self::Close
+            | Self::NextPane
+            | Self::PathTree
+            | Self::ResetPanes
+            | Self::ArrangeDialog
+            | Self::ResetDialog => return None,
         })
     }
 
@@ -91,6 +118,13 @@ impl SafetyCmd {
             Tab::Reflog => m::WHY_OPEN_REFLOG.get(),
             Tab::Lost => m::WHY_OPEN_LOST.get(),
         };
+        if self.needs_panes() {
+            return match open {
+                Some(Tab::Reflog | Tab::Lost) => None,
+                Some(Tab::History) => Some(m::WHY_OPEN_PANES.get()),
+                None => Some(need(Tab::History)),
+            };
+        }
         match (self.tab(), open) {
             // Close needs the panel, not a view.
             (None, Some(_)) => None,
@@ -120,6 +154,36 @@ impl SafetyPanel {
         }
         if let Some(why) = cmd.unavailable(Some(self.tab)) {
             return (PanelOutcome::Stay, Some(why.to_string()));
+        }
+        // The pane and window rows act on the panel itself, not on a row.
+        match cmd {
+            SafetyCmd::NextPane => {
+                self.overlay = None;
+                self.cycle_focus_pub(true);
+                return (PanelOutcome::Stay, None);
+            }
+            SafetyCmd::PathTree => {
+                self.overlay = None;
+                self.panes.toggle_mode();
+                return (PanelOutcome::Stay, None);
+            }
+            SafetyCmd::ResetPanes => {
+                self.overlay = None;
+                self.panes.reset_dividers();
+                return (PanelOutcome::Stay, None);
+            }
+            SafetyCmd::ArrangeDialog => {
+                self.arrange();
+                self.say(gitpoulpi_i18n::msg::dialog_frame::ARRANGING.get().to_string());
+                return (PanelOutcome::Stay, None);
+            }
+            SafetyCmd::ResetDialog => {
+                self.overlay = None;
+                self.window.reset();
+                self.say(gitpoulpi_i18n::msg::dialog_frame::RESET_DONE.get().to_string());
+                return (PanelOutcome::Stay, None);
+            }
+            _ => {}
         }
         if self.job.is_some() {
             return self.refuse(m::WHY_BUSY.get().to_string());

@@ -134,6 +134,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Status-Bereich verschmälern | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: Ausstehende Ansicht zeigen | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: Zurück (oder ausstehende Ansicht verwerfen) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Refs nach Namen filtern | `/` |
 | `refs` | `solo` | Auswahl solo schalten | `o` |
 | `refs` | `clear_solo` | Solo beenden | `Shift+O` |
@@ -965,6 +966,11 @@ die Standardtasten.
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as Stash | `z` |
 | Verlorene Arbeit: Erneut suchen |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Ansicht: Aktualisieren | `r` |
 | Ansicht: Aktualisieren (Fetch, Pull Requests, Issues) | `F5` |
 | Ansicht: Hilfe-Überlagerung umschalten | `?` |

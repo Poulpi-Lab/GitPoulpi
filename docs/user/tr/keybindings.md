@@ -137,6 +137,7 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Durum Panelini Daralt | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Ajan: Bekleyen Görünümü Göster | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Ajan: Geri (veya Bekleyen Görünümü Kapat) | `Ctrl+N Backspace` |
+| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
 | `refs` | `filter` | Ref'leri Ada Göre Filtrele | `/` |
 | `refs` | `solo` | Seçimi Solo Yap | `o` |
 | `refs` | `clear_solo` | Solo'yu Durdur | `Shift+O` |
@@ -970,6 +971,11 @@ Tuşlar varsayılanlardır.
 | Lost Work: Apply Changes to Working Tree | `w` |
 | Lost Work: Save Changes as Stash | `z` |
 | Kaybolan Çalışma: Yeniden Tara |  |
+| Reflog / Lost Work: Next Pane | `Tab` |
+| Reflog / Lost Work: Path or Tree File List | `v` |
+| Reflog / Lost Work: Reset Pane Sizes |  |
+| Dialog: Move/resize | `Ctrl+N m` |
+| Dialog: Reset position and size |  |
 | Görünüm: Yenile | `r` |
 | Görünüm: Yenile (fetch, Pull Request'ler, issue'lar) | `F5` |
 | Görünüm: Yardım Katmanını Aç/Kapat | `?` |

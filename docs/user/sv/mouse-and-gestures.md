@@ -415,6 +415,18 @@ Tangenterna för textfält står i [Kortkommandon](keybindings.md).
 
 Se [Bilder](image-view.md) för musen i bildvyn.
 
+## Flytta och ändra storlek på dialogrutor
+
+Dialogrutan Ångrahistorik / Reflog / Förlorat arbete kan flyttas och ändras i storlek:
+
+- **Dra i titelraden** för att flytta den (stängningskorset behåller sitt klick).
+- **Dra i vänster, höger eller nedre kant**, eller i ett nedre hörn (greppet `◢`), för att ändra storlek. Dialogrutan stannar på skärmen och blir aldrig mindre än 60 x 16.
+- Draget fortsätter när pekaren lämnar dialogrutan, och att släppa utanför stänger den aldrig.
+- **Dra i avdelarna** mellan dess lista, dess fillista och dess hunkar; dubbelklicka på en för att återställa den.
+- Tangentbordstvillingarna är `Ctrl+N` och sedan `m` (piltangenterna flyttar, `Shift`+pilar ändrar storlek, `0` återställer, `Enter` eller `Esc` lämnar) och `Alt`+pilar för avdelarna; paletten har `Dialogruta: Flytta/ändra storlek` och `Dialogruta: Återställ position och storlek`.
+
+Pekaren visar en flyttform över titelraden och en storleksform över kanterna och hörnen (terminaler med `OSC 22`).
+
 ## Muspekarens form
 
 Vissa terminaler låter GitPoulpi ändra muspekaren: en storleksändringspekare över

@@ -52,9 +52,11 @@ De åtgärder du har ångrat ligger **ovanför** den nyaste åtgärden, under en
 avdelare (”ångrade - Gör om hämtar tillbaka dem”), dämpade, med den som Gör om
 hämtar tillbaka härnäst närmast avdelaren. Markeringen börjar på den nyaste
 åtgärden, inte på dem. Piltangenterna flyttar (rubrikerna och avdelaren hoppas
-över), `Tab` växlar mellan de tre vyerna, `Esc` stänger. För den markerade raden:
+över), `1` / `2` / `3` (eller `Ctrl+Tab` / `Ctrl+Shift+Tab`) växlar mellan de tre vyerna, `Esc` stänger.
+`Enter` kör aldrig en åtgärd: varje knapp har sin egen bokstav, som visas i
+tipsraden under knapparna. För den markerade raden:
 
-- **Ångra hit** (`u`): ångrar den åtgärden och varje nyare, nyaste först, efter en
+- **Ångra hit** (`a`): ångrar den åtgärden och varje nyare, nyaste först, efter en
   enda bekräftelse som listar dem alla. Ett steg som daemonen bedömer som
   riskabelt frågar igen innan det körs.
 - **Återställ bara den här** (`r`): ger tillbaka det som den enda åtgärden tog
@@ -68,8 +70,8 @@ hämtar tillbaka härnäst närmast avdelaren. Markeringen börjar på den nyast
   en gren `restore/<gren>-<sha>` vid den gamla spetsen - din nuvarande gren och
   dina filer flyttas aldrig. Bekräftelsen visar exakt vad som kommer att göras,
   och återställningen är en ny åtgärd: `Ctrl+Z` tar tillbaka den.
-- **Gör om hit** (`y`) på en ångrad rad.
-- **Återställ main till där Commit lämnade den** (`o`, eller `Alt+Shift+Z` /
+- **Gör om hit** (`o`) på en ångrad rad.
+- **Återställ main till där Commit lämnade den** (`e`, eller `Alt+Shift+Z` /
   `Redigera: Återställ grenen till där den blockerade åtgärden lämnade den`
   utanför panelen): när ett annat program har flyttat grenen och blockerat Ångra
   vet reflog fortfarande var åtgärden lämnade den.
@@ -88,15 +90,17 @@ filer visas bredvid listan.
 
 Reflog läses 200 positioner åt gången. En längre reflog fortsätter av sig själv:
 flyttar du markören (eller rullar) nära slutet av listan hämtas nästa sida, och
-sista raden lyder **... Ladda fler** så länge det finns en. **Ladda fler** (`m`,
+sista raden lyder **... Ladda fler** så länge det finns en. **Ladda fler** (`l`,
 eller `Reflog: Ladda fler` i paletten) hämtar den direkt och skriver ”inlästa
 positioner: N” på statusraden. Repositories som använder gits reftable-format
 läses som alla andra.
 
 ![Reflog för main: varje position den har haft, nyaste först, med den markerade beskriven till höger](../images/reflog.png)
 
-**Visa i Log** (`s`), **Skapa gren här** (`b`) och **Återställ `<gren>` till den
-här positionen** (`r`). Återställningen går att ångra. När grenen är utcheckad och
+**Visa i Log** (`i`), **Skapa gren här** (`n`), **Skapa tag här** (`a`),
+**Tillämpa på arbetskatalogen** (`t`), **Spara som stash** (`s`) (de tre sista
+fungerar som i Förlorat arbete nedan) och
+**Återställ `<gren>` till den här positionen** (`r`). Återställningen går att ångra. När grenen är utcheckad och
 du har lokala ändringar som den inte kan flytta utan att skriva över, frågar en
 rullgardin vad som ska hända med dem: behåll mina ändringar, soft, mixed eller
 hard. Hard förkastar ändringarna i dina filer men sparar dem först, så `Ctrl+Z`
@@ -113,9 +117,53 @@ gränssnittet.
 
 ![Förlorat arbete: de två commits som hörde till en borttagen gren (hittade via reflog) och dinglande commits](../images/lost-work.png)
 
-**Skapa gren här** (`b`) räddar en commit under ett namn du väljer,
-**Cherry-pick** (`c`) tillämpar den på den aktuella grenen, **Visa i Log** (`s`)
-fungerar för de som fortfarande går att nå.
+**Skapa gren här** (`n`) räddar en commit under ett namn du väljer,
+**Skapa tag här** (`a`) fäster den med en tag (standardnamn `restored-<kort id>`),
+**Cherry-pick** (`c`) tillämpar den på den aktuella grenen. En förlorad commit
+finns inte i Log, så den här vyn har ingen "Visa i Log" (Reflog-vyn behåller den
+för de commits som fortfarande går att nå).
+
+**Återställ ändringar** lägger tillbaka det en commit ändrade utan att checka in
+det: **Tillämpa på arbetskatalogen** (`t`) spelar upp commitens ändringar på
+filerna, allt eller inget (indexet och HEAD förblir; en merge-commit avvisas). När
+den inte kan tillämpas rent rörs ingenting och dialogrutan erbjuder **Spara som
+stash** (`s`), som i stället behåller samma ändringar som en ny stash; den åtgärden
+finns också alltid på egen hand. Båda journalförs: `Ctrl+Z` lägger tillbaka
+filerna, eller släpper stashen igen. Samma åtgärder är `gitpoulpi apply-commit <rev>`
+och `gitpoulpi stash from-commit <rev> [-m M]`, och Reflog-vyn har dem också.
+
+### Rutor, hunkar och fönstret
+
+Reflog och Förlorat arbete visar commitlistan till vänster och, till höger, den
+markerade commitens huvud, **varje fil den ändrade** och den markerade filens
+hunkar (bara hunkar, radbrutna efter rutan). Fillistan är den i huvudfönstrets
+högra ruta: `Sökväg` eller `Träd` (`v`, eller klicka på växlaren), en mapp viks
+med `Enter`, `Left` eller `Right`, ett klick eller piltangenterna väljer en fil
+och dess hunkar visas under (daemonen tillfrågas utanför gränssnittstråden; de
+senaste filerna behålls). Commitlistan, fillistan och hunkarna har var sin
+rullningslist som du kan trycka på och dra.
+
+- `Tab` / `Shift+Tab` går mellan rutorna (lista, filer, hunkar); piltangenterna,
+  `PageUp`, `PageDown`, `Home` och `End` verkar på rutan som har tangentbordet (dess
+  kant är upplyst). `Enter` på en fil går till dess hunkar.
+- **Avdelare**: dra den mellan listan och den högra rutan, eller den mellan filerna
+  och hunkarna; dubbelklicka på en avdelare för att återställa den. Tangentbordet:
+  `Alt+Left` / `Alt+Right`, `Alt+Up` / `Alt+Down`, `Alt+0` återställer båda.
+  Paletten har `Reflog / Förlorat arbete: Återställ rutornas storlek`, `Nästa ruta`
+  och `Fillista som sökvägar eller träd`.
+- `Ctrl+N` visar sina märken över de tre vyflikarna och de tre rutorna, som i
+  huvudfönstret; en märkestangent hoppar dit.
+- **Flytta och ändra storlek på dialogrutan**: dra i titelraden för att flytta den,
+  dra i vänster, höger och nedre kant eller ett nedre hörn (greppet `◢`) för att
+  ändra storlek (aldrig under 60 x 16, alltid på skärmen). Stängningskorset behåller
+  sitt klick och att släppa utanför dialogrutan stänger den aldrig. Tangentbordstvillingen
+  är `Ctrl+N` och sedan `m`: piltangenterna flyttar, `Shift`+pilar ändrar storlek, `0`
+  återställer, `Enter` eller `Esc` lämnar (kanten säger det medan läget är på).
+  Paletten har `Dialogruta: Flytta/ändra storlek` och
+  `Dialogruta: Återställ position och storlek`. Om platsen behålls styrs av
+  `ui.dialog_geometry` (*Inställningar > Utseende > Layout > Kom ihåg dialogrutans
+  position och storlek*): `session` (standard), `saved` (återställs vid nästa
+  start) eller `never`.
 
 ## Från kommandopaletten
 
@@ -127,8 +175,8 @@ och **Förlorat arbete:** verkar på den valda raden i den vy som syns.
 | Vy | Palettrader |
 |---|---|
 | Ångrahistorik | `Ångrahistorik: Ångra hit...`, `Gör om hit...`, `Återställ bara den här...`, `Återställ grenen till där den var...`, `Uppdatera`, `Stäng` |
-| Reflog | `Reflog: Visa i Log`, `Skapa gren här...`, `Återställ till den här positionen...`, `Ladda fler`, `Uppdatera` |
-| Förlorat arbete | `Förlorat arbete: Visa i Log`, `Skapa gren här...`, `Cherry-pick`, `Sök igen` |
+| Reflog | `Reflog: Visa i Log`, `Skapa gren här...`, `Skapa tag här...`, `Tillämpa ändringarna på arbetskatalogen`, `Spara ändringarna som stash`, `Återställ till den här positionen...`, `Ladda fler`, `Uppdatera` |
+| Förlorat arbete | `Förlorat arbete: Skapa gren här...`, `Skapa tag här...`, `Cherry-pick`, `Tillämpa ändringarna på arbetskatalogen`, `Spara ändringarna som stash`, `Sök igen` |
 
 Raderna är gråade (med skälet) medan deras vy inte är öppen; de tre öppnarna,
 `Redigera: Ångrahistorik...`, `Redigera: Reflog...` och `Redigera: Rädda förlorade
@@ -146,8 +194,8 @@ vidare. Raderna med `...` öppnar samma bekräftelse eller namnfråga som knappe
 | Grenar och tags | skapa, ta bort, byta namn, ställa in eller ta bort upstream, skapa en spårande gren, skapa / ta bort / annotera en tag, fast-forward, checka ut en pull request som gren |
 | Förflyttning | checkout av en gren eller en commit (även en frånkopplad HEAD) |
 | Historik | merge (fast-forward eller merge-commit), rebase (vanlig och interaktiv, när den har avslutats), cherry-pick, revert, reset (soft, mixed och hard), den lokala delen av en pull |
-| Lokala ändringar | stage och unstage (fil, mapp, hunk, rader, alla), förkasta (fil, mapp, hunk, rader, en fil-checkout), tillämpa en patch, **ta bort en fil från disk**, **ignorera** (fil, filändelse eller mapp: raden i den `.gitignore` du valde), **behandla som binär eller text** (raden i `.gitattributes`) |
-| Stashes | push, apply, pop, drop |
+| Lokala ändringar | stage och unstage (fil, mapp, hunk, rader, alla), förkasta (fil, mapp, hunk, rader, en fil-checkout), tillämpa en patch eller en commits ändringar (`apply-commit`), **ta bort en fil från disk**, **ignorera** (fil, filändelse eller mapp: raden i den `.gitignore` du valde), **behandla som binär eller text** (raden i `.gitattributes`) |
+| Stashes | push, apply, pop, drop, spara en commits ändringar som stash (`stash from-commit`) |
 | Remotes och konfiguration | lägga till, ta bort, byta namn på, ändra URL eller push-URL för en remote, Git LFS track och untrack |
 | På en server | **att ta bort en gren eller en tag på en remote** (från refens meny, paletten, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, eller ett arbetsflödes avslut som tar bort remote-grenen): se nedan |
 
@@ -411,7 +459,10 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   skal gjorde. `reflog-restore` flyttar en gren (eller `HEAD`) till en av de
   positionerna; en utcheckad gren med oincheckade ändringar kräver `--mode`. Den
   journalförs också.
-- `lost-commits` listar commits som ingen gren, tag, remote eller stash når.
+- `lost-commits` listar commits som ingen gren, tag, remote eller stash når. För
+  att få tillbaka arbetet från en utan att checka in det: `apply-commit <rev>` (till
+  arbetskatalogen, allt eller inget) eller `stash from-commit <rev>` (som en
+  stash); båda journalförs.
 - När en flytt i ett skal blockerar den nyaste posten bär avslaget den
   reflog-position som håller det posten förväntar sig (`reason.RefMoved.restore`),
   att ges till `reflog-restore`.

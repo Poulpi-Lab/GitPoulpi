@@ -110,7 +110,7 @@ GitPoulpi VS16-tecken (se [Vad GitPoulpi använder](#vad-gitpoulpi-använder)).
   ogenomskinlig bakgrund; mindre testat.
 - **Windows-konsolen, ConEmu, cmd**: undvik. Bilder ritas dåligt eller inte alls.
   Ett dubbelklick på exe-filen öppnar GitPoulpi igen i den terminal du har valt
-  (*Inställningar > Allmänt > Startare*).
+  (*Inställningar > Startare*).
 
 ### Linux
 

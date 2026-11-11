@@ -66,7 +66,7 @@ Filen `.sha256` fångar bara en skadad nedladdning. Det är signaturen som visar
 
 Varje release innehåller också ett installationsprogram per operativsystem. Båda gör samma val
 (genvägar, PATH, ett kommandoalias som `gp`) genom att anropa det installerade
-`gitpoulpi` självt, koden bakom Inställningar > Allmänt > Startare, så det som
+`gitpoulpi` självt, koden bakom Inställningar > Startare, så det som
 installationsprogrammet ställer in och det som Inställningar visar stämmer alltid överens.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
@@ -130,7 +130,7 @@ Varje kanal nedan skriver samma markering `.gitpoulpi-dist` bredvid programmen, 
 
 Namnen ovan är de som releaseprocessen publicerar till (se [Släppa en release](../../developer/releasing.md)): en kanal som inte är live än svarar "not found", och releasearkivet eller installationsprogrammet fungerar alltid.
 
-En pakethanterares egen PATH-hantering gäller: Chocolatey, winget, Scoop och Homebrew lägger själva programmen i PATH, och ingen av dem skapar aliaset `gp` (kör `gitpoulpi alias create gp`, eller Inställningar > Allmänt > Startare).
+En pakethanterares egen PATH-hantering gäller: Chocolatey, winget, Scoop och Homebrew lägger själva programmen i PATH, och ingen av dem skapar aliaset `gp` (kör `gitpoulpi alias create gp`, eller Inställningar > Startare).
 
 ### apt (Debian och Ubuntu)
 

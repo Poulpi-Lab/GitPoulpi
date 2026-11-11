@@ -452,6 +452,8 @@ In `config.toml` these are the `[keybindings.palette]` table, named after the co
 
 The hint band under the list names this key (`Alt+K` by default). It is the action `palette.configure_shortcut`, so it can be rebound like any other.
 
+The palette and the pickers (theme, language, tab, workspace search) move and resize like a dialog: drag the top border, or press `Alt+G` (the action `palette.arrange`; the palette row `Dialog: Move or Resize` does the same). Arrows move it, `Shift`+arrows resize it, `0` resets it, `Enter` or `Esc` leave the mode and the popup stays open. `ui.dialog_geometry` decides whether the place is kept.
+
 ### Every palette command
 
 Generated from the app (a test keeps it current). AI commands only appear

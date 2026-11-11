@@ -426,25 +426,29 @@ See [Pictures](image-view.md) for the mouse in the image view.
 
 Dialogs can be moved, and the larger windows resized:
 
-- **Drag the title bar** to move a dialog (the close cross keeps its click).
-- **Drag the left, right or bottom border**, or a bottom corner (the `◢` grip), to resize a window. The dialog stays on screen and never gets smaller than its minimum (60 x 16 for the Undo history, smaller for the others).
+- **Drag the title bar** to move a dialog (the close cross keeps its click). The command palette and the pickers have no separate title bar: drag the top border.
+- **Drag the left, right or bottom border**, or a bottom corner (the `◢` grip), to resize a window. The dialog stays on screen and never gets smaller than its minimum (60 x 16 for the Undo history, smaller for the others). A resized window uses the room: text areas and lists grow, text wraps to the new width.
 - The drag goes on when the pointer leaves the dialog, and releasing outside never closes it.
 - **Drag the dividers** inside the Undo history's Reflog / Lost work view; double-click one to reset it.
-- The keyboard twins are `Ctrl+N` then `m` (arrows move, `Shift`+arrows resize, `0` resets, `Enter` or `Esc` leave) and `Alt`+arrows for the dividers; the palette has `Dialog: Move or Resize` and `Dialog: Reset Position and Size`. They act on the dialog on top.
+- The keyboard twins are `Ctrl+N` then `m` (arrows move, `Shift`+arrows resize, `0` resets, `Enter` or `Esc` leave) and `Alt`+arrows for the dividers; the palette has `Dialog: Move or Resize` and `Dialog: Reset Position and Size`. They act on the dialog on top. The surfaces that use `Ctrl+N` for badges of their own (the commit message form, the history rewrite page) take the same `m` after their `Ctrl+N`, and the status line names it. The command palette and the pickers use `Ctrl+N` to move down the list, so for them the key is `Alt+G` (`palette.arrange`), or the palette's own `Dialog: Move or Resize` row: both arrange the popup in front and leave it open.
 - **One setting** (`ui.dialog_geometry`, Settings > Appearance > Layout) covers every dialog: each remembers its own place and size for this session, on disk for the next launch, or never.
 
 | Dialog | Move | Resize |
 |---|---|---|
 | Undo history / Reflog / Lost work, Activity Log, jobs panel, folder picker | yes | yes |
-| About, update panel, security check, predicted conflicts, "What is sent", "Over the AI limit", tag delete, sensitive files, Mermaid copy | yes | no (the size follows the text) |
-| Clone, Init, Worktree, Sparse checkout, Flow and issue-flow dialogs, Pull request, New issue, Workspace form and its AI box, label / milestone pickers | yes | no |
+| Command palette, tab / theme / language pickers, workspace search | yes | yes (the list grows with the height, the rows with the width) |
+| Clone (the repository list), Pull request and New issue (the description), "What is sent" (the pane), Mermaid (the preview), review options (the fields, width only) | yes | yes |
+| Settings long-text editors (templates, hooks, AI prompts), the workspace form's AI box | yes | yes (the text area) |
+| History rewrite: the two AI helper dialogs | yes | yes (the description, the sent pane) |
+| About, update panel, security check, predicted conflicts, "Over the AI limit", tag delete, sensitive files | yes | no (the size follows the text) |
+| Init, Worktree, Sparse checkout, Flow dialog, issue-flow dialogs, commit message (reword) form, Workspace form, label / milestone pickers | yes | no |
 | Confirmations (every "Are you sure?") | yes | no |
-| Review and Board dialogs: their small dialogs (comment, finish, options, columns, pick) | yes | no |
-| Settings: the long-text editors (templates, hooks, AI prompts), the repository authentication results and confirmation | yes | no |
-| History rewrite: purge, identity and question dialogs, AI helper panes | yes | no |
+| Review and Board dialogs: their small dialogs (comment, finish, pick, columns) | yes | no |
+| Settings: the repository authentication results and confirmation | yes | no |
+| History rewrite: purge, identity and question dialogs | yes | no |
 | Move-a-file popup of the commit composer, merge notices | yes | no |
 
-Not movable: the full-page screens (Settings, Help, the Review and Board pages, which already fill the window), context menus and dropdowns (they hang off what opened them), the command palette and its pickers (theme, language, tab, workspace search), and tooltips.
+Not movable: the full-page screens (Settings, Help, the Review and Board pages, which already fill the window), context menus and dropdowns (they hang off what opened them), tooltips, and the small popups inside a page (the keybindings page's popups, the remotes form, the split-commit editor).
 
 The pointer shows a move shape over the title bar and a resize shape over the borders and corners (terminals with `OSC 22`).
 

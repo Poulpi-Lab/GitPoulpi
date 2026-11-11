@@ -327,27 +327,40 @@ fn reveal_in_graph_in_the_menu_works_with_the_click_setting_off() {
         term.text()
     );
     wait_label(&term, "TAGS (", TAG);
-    // A click sent as the menu or its entry is drawn can be dropped (the hit
-    // target is registered a frame later) and the stray click closes the
-    // menu: each attempt opens the menu if it is gone, else clicks the entry.
+    // Three steps, each retried on its own: a click sent as the menu or its
+    // entry is drawn can be dropped (the hit target is registered a frame
+    // later). The reveal itself pages a deep history, which can take seconds
+    // under load: it is awaited without touching the menu again.
     common::retry_until(
         &mut term,
-        "commit-0001 in the Log",
-        15,
-        Duration::from_secs(2),
+        "the tag's menu",
+        8,
+        Duration::from_secs(3),
         |t| {
-            let screen = t.screen();
-            if log_row(&screen, "commit-0001").is_some() {
-                return; // revealed; only the menu's closing is awaited
-            }
-            if let Some((c, r)) = screen.find("Reveal in graph") {
-                t.click(c + 1, r).unwrap();
-            } else if let Some((col, row)) = label_under(&screen, "TAGS (", TAG) {
-                t.right_click(col + 1, row).unwrap();
+            if !t.screen().contains("Reveal in graph") {
+                if let Some((col, row)) = label_under(&t.screen(), "TAGS (", TAG) {
+                    t.right_click(col + 1, row).unwrap();
+                }
             }
         },
-        |s| log_row(s, "commit-0001").is_some() && !s.contains("Reveal in graph"),
+        |s| s.contains("Reveal in graph"),
     );
+    common::retry_until(
+        &mut term,
+        "the menu closed by Reveal in graph",
+        8,
+        Duration::from_secs(3),
+        |t| {
+            if let Some((c, r)) = t.screen().find("Reveal in graph") {
+                t.click(c + 1, r).unwrap();
+            }
+        },
+        |s| !s.contains("Reveal in graph"),
+    );
+    term.wait_for("commit-0001 in the Log", STEP, |s| {
+        log_row(s, "commit-0001").is_some()
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
 /// The Refs pane's key (`g`) is the keyboard twin: select the row, press it.

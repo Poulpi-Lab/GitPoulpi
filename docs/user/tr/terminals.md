@@ -108,7 +108,7 @@ nedeni budur ([GitPoulpi'nin kullandıkları](#gitpoulpinin-kullandıkları)'na 
   çizer; daha az denenmiştir.
 - **Windows konsolu, ConEmu, cmd**: kaçının. Resimler kötü çizilir ya da hiç çizilmez.
   Exe'ye çift tıklamak GitPoulpi'yi seçtiğiniz terminalde yeniden açar
-  (*Ayarlar > Genel > Başlatıcı*).
+  (*Ayarlar > Başlatıcı*).
 
 ### Linux
 

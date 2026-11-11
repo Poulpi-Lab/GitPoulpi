@@ -427,6 +427,18 @@ Metin alanlarının tuşları [Klavye kısayolları](keybindings.md) sayfasında
 
 Görsel görünümünde fare için bkz. [Görseller](image-view.md).
 
+## Pencereleri taşımak ve boyutlandırmak
+
+Geri alma geçmişi / Reflog / Kaybolan çalışma penceresi taşınabilir ve yeniden boyutlandırılabilir:
+
+- Taşımak için **başlık çubuğunu sürükleyin** (kapatma çarpısı kendi tıklamasını korur).
+- Boyutlandırmak için **sol, sağ veya alt kenarı** ya da bir alt köşeyi (`◢` tutamağı) **sürükleyin**. Pencere ekranda kalır ve hiçbir zaman 60 x 16'dan küçük olmaz.
+- İmleç pencereden çıksa da sürükleme devam eder ve pencerenin dışında bırakmak onu asla kapatmaz.
+- Listesi, dosya listesi ve hunk'ları arasındaki **ayraçları sürükleyin**; sıfırlamak için birine çift tıklayın.
+- Klavye karşılıkları: `Ctrl+N` ardından `m` (oklar taşır, `Shift`+oklar boyutlandırır, `0` sıfırlar, `Enter` veya `Esc` çıkar) ve ayraçlar için `Alt`+oklar; paletteki `Pencere: Taşı veya Boyutlandır` ve `Pencere: Konumu ve Boyutu Sıfırla` satırları da vardır.
+
+İmleç, başlık çubuğunun üstünde bir taşıma şekli, kenarların ve köşelerin üstünde bir boyutlandırma şekli gösterir (`OSC 22` destekleyen terminaller).
+
 ## Fare imleci şekli
 
 Bazı terminaller GitPoulpi'nin fare imlecini değiştirmesine izin verir:

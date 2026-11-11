@@ -128,7 +128,7 @@ PATH, 바로 가기에 대해 묻습니다.
 
 위의 이름은 릴리스 절차가 게시하는 대상입니다([릴리스](../../developer/releasing.md) 참고). 아직 게시되지 않은 채널은 "찾을 수 없음"으로 응답하며, 릴리스 아카이브나 설치 프로그램은 항상 동작합니다.
 
-패키지 관리자 자체의 PATH 처리가 적용됩니다. Chocolatey, winget, Scoop, Homebrew는 프로그램을 PATH에 직접 올려 주며, 어느 것도 `gp` 별칭을 만들지 않습니다(`gitpoulpi alias create gp`를 실행하거나 설정 > 일반 > 런처를 사용하세요).
+패키지 관리자 자체의 PATH 처리가 적용됩니다. Chocolatey, winget, Scoop, Homebrew는 프로그램을 PATH에 직접 올려 주며, 어느 것도 `gp` 별칭을 만들지 않습니다(`gitpoulpi alias create gp`를 실행하거나 설정 > 런처를 사용하세요).
 
 ### apt (Debian, Ubuntu)
 

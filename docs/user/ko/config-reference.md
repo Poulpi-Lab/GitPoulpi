@@ -94,6 +94,7 @@ author_email = "jane@work.example"
 | `ui.graph_lane_background` | `"off"` | `off` 또는 `row_tint`(그래프 뒤의 옅은 레인 색 띠와 그 가장자리의 막대). **앱: 그래프 행 색조 전환**(`Ctrl+N Shift+T`)이 이를 전환하고, **앱: 그래프 색상 테마 변경...**(`Ctrl+N Shift+Y`)이 `ui.graph_color_theme`을 고릅니다. |
 | `ui.graph_row_tint_strength` | `"medium"` | `strong`, `medium`, `subtle`(`row_tint`일 때만). |
 | `ui.toolbar_position` | `"bottom"` | `top`, `bottom`, `left`, `right`. `left`와 `right`는 세로 열로 그리며, 80열 미만의 창에서는 `bottom`으로 되돌아갑니다. |
+| `ui.dialog_geometry` | `"session"` | `session`, `saved`, `never`: 옮기거나 크기를 바꾼 대화상자(제목 표시줄이나 테두리를 끌거나 `Ctrl+N m`)가 자리를 유지할지 정합니다. GitPoulpi를 닫을 때까지(기본값), 다음 실행에도(데이터 폴더의 `dialog_geometry.txt`에 디스크 저장), 또는 유지하지 않음. |
 | `ui.toolbar_align` | `"start"` | `start`, `center`, `end`: 도구 모음에서 버튼이 놓이는 위치(행의 왼쪽·가운데·오른쪽, 열의 위·가운데·아래). |
 | `ui.toolbar_pr_pinned` | `true` | 풀 리퀘스트 버튼을 도구 모음의 맨 끝에 고정합니다. `false`이면 다른 버튼과 함께 배치됩니다. |
 | `ui.statusbar_position` | `"bottom"` | `top`(저장소 탭 위) 또는 `bottom`. |
@@ -173,10 +174,10 @@ commit 상세, 날짜 툴팁, *복사 > 날짜*). 토큰: `YYYY` `YY` `MMMM` `MM
 | `ui.terminal_launch_command` | `""` | `custom` 템플릿. `{repo}`는 폴더입니다. |
 | `ui.open_in` | *(없음)* | [열기 위치](open-in.md) 목록. `label`과 `command`를 가진 테이블 배열 `[[ui.open_in]]`입니다. 없으면 "아직 구성되지 않음"을 뜻하며, 목록은 레거시 `ui.terminal_launch*` 키(`auto`가 아닌 값은 첫 항목이 됨), OS 파일 탐색기, 환경에서 감지한 멀티플렉서와 터미널(herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...), `PATH`에서 찾은 편집기로부터 계산됩니다. 설정에서 처음 저장할 때 목록이 기록됩니다. `open_in = []`는 빈 목록입니다. `config set`으로는 설정할 수 없습니다(파일을 편집). |
 | `ui.open_in_default` | `""` | "기본 위치에서 열기"가 실행하는 항목의 레이블. 비어 있거나 알 수 없는 값이면 첫 항목. |
-| `ui.launch_terminal` | `"auto"` | 데스크톱 바로 가기(설정 > 일반 > 런처)와 Windows의 다시 열기가 GitPoulpi를 시작하는 터미널입니다. `auto`는 설치된 것 중에서 고릅니다(Windows: Windows Terminal, 없으면 WezTerm, Alacritty, 일반 콘솔. Linux: `xdg-terminal-exec`, 없으면 처음 찾은 터미널. macOS: iTerm2, Ghostty, WezTerm, kitty가 설치되어 있으면 그것, 없으면 Terminal). `default`는 OS 자체의 기본값이며, `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal` 같은 터미널 ID를 지정할 수도 있습니다. |
+| `ui.launch_terminal` | `"auto"` | 데스크톱 바로 가기(설정 > 런처)와 Windows의 다시 열기가 GitPoulpi를 시작하는 터미널입니다. `auto`는 설치된 것 중에서 고릅니다(Windows: Windows Terminal, 없으면 WezTerm, Alacritty, 일반 콘솔. Linux: `xdg-terminal-exec`, 없으면 처음 찾은 터미널. macOS: iTerm2, Ghostty, WezTerm, kitty가 설치되어 있으면 그것, 없으면 Terminal). `default`는 OS 자체의 기본값이며, `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal` 같은 터미널 ID를 지정할 수도 있습니다. |
 | `ui.launcher_build` | `"current"` | 개발 모드 전용(`general.dev_mode` 참고. 그때만 설정 > 런처에 표시되며 그 밖에는 무시됨). `"current"`: 바로 가기와 명령 별칭이 자신을 만든 빌드를 시작합니다. `"newest"`: 체크아웃의 `target/dist`와 `target/release` 중 가장 최근에 빌드된 것을 클릭할 때마다 판단해 시작하며, 어느 빌드를 시작해도 바로 가기를 다시 쓰지 않습니다. |
-| `ui.command_alias` | `""` | 터미널에서 GitPoulpi를 시작하는 명령의 이름, 예를 들어 `gp`(설정 > 일반 > 런처, `gitpoulpi alias create`). 비어 있으면 없음입니다. 영문자, 숫자, `-`, `_`, `.`만 쓸 수 있습니다. **만들기: 명령 별칭** 버튼이 쓰는 이름일 뿐이며 만들기 전에는 아무것도 생기지 않습니다. |
-| `ui.command_alias_add` | `""` | `gitpoulpi --add`를 실행하는 두 번째 명령의 이름, 예를 들어 `gpa`. 현재 폴더를 이미 실행 중인 GitPoulpi의 새 탭으로 엽니다(설정 > 일반 > 런처, `gitpoulpi alias create gpa --add`). 비어 있으면 없음입니다. 이름 규칙은 같으며, **만들기** 버튼이 `ui.command_alias`와 함께 만듭니다. |
+| `ui.command_alias` | `""` | 터미널에서 GitPoulpi를 시작하는 명령의 이름, 예를 들어 `gp`(설정 > 런처, `gitpoulpi alias create`). 비어 있으면 없음입니다. 영문자, 숫자, `-`, `_`, `.`만 쓸 수 있습니다. **만들기: 명령 별칭** 버튼이 쓰는 이름일 뿐이며 만들기 전에는 아무것도 생기지 않습니다. |
+| `ui.command_alias_add` | `""` | `gitpoulpi --add`를 실행하는 두 번째 명령의 이름, 예를 들어 `gpa`. 현재 폴더를 이미 실행 중인 GitPoulpi의 새 탭으로 엽니다(설정 > 런처, `gitpoulpi alias create gpa --add`). 비어 있으면 없음입니다. 이름 규칙은 같으며, **만들기** 버튼이 `ui.command_alias`와 함께 만듭니다. |
 | `ui.relaunch_in_terminal` | `true` | Windows 전용: exe가 더블 클릭으로 자체 콘솔에서 시작되면 GitPoulpi가 `ui.launch_terminal`에서 다시 열리고 종료합니다. 끄면 그 콘솔에 그대로 있습니다. |
 | `ui.reuse_window` | `true` | GitPoulpi 바로 가기(`gitpoulpi launch`)를 클릭하면 새로 시작하지 않고 이미 열려 있는 GitPoulpi의 창을 보여 줍니다. 끄면 클릭할 때마다 새 창을 시작합니다. |
 
@@ -491,7 +492,7 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 ## `[conflict_prevention]` (기준 브랜치 목록)
 
-사전 충돌 감지가 현재 브랜치의 기준으로 삼을 수 있는 브랜치는 패턴 목록으로 정합니다([merge 충돌 해결](merge-conflicts.md#충돌-방지) 참조). 목록에는 이름을 붙여 공유할 수 있으며, 설정 > 일반 > 충돌 방지에서 편집합니다.
+사전 충돌 감지가 현재 브랜치의 기준으로 삼을 수 있는 브랜치는 패턴 목록으로 정합니다([merge 충돌 해결](merge-conflicts.md#충돌-방지) 참조). 목록에는 이름을 붙여 공유할 수 있으며, 설정 > 충돌 방지에서 편집합니다.
 
 | 키 | 기본값 | 값과 효과 |
 |---|---|---|

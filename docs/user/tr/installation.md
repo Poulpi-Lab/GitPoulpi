@@ -67,7 +67,7 @@ gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoul
 
 Her sürüm, işletim sistemi başına bir yükleyiciyle de gelir. İkisi de aynı seçimleri
 (kısayollar, PATH, `gp` gibi bir komut takma adı) kurulu `gitpoulpi` programının kendisini
-çağırarak yapar; bu kod Ayarlar > Genel > Başlatıcı'nın arkasındaki koddur, yani yükleyicinin
+çağırarak yapar; bu kod Ayarlar > Başlatıcı'nın arkasındaki koddur, yani yükleyicinin
 kurduğu ile Ayarlar'ın gösterdiği her zaman aynıdır.
 
 ### Windows: `gitpoulpi-<sürüm>-x86_64-pc-windows-msvc-setup.exe`
@@ -131,7 +131,7 @@ Aşağıdaki her kanal, programların yanına kendi kanal adıyla aynı `.gitpou
 
 Yukarıdaki adlar, sürüm sürecinin yayımladığı adlardır (bkz. [Sürüm yayımlama](../../developer/releasing.md)): henüz canlı olmayan bir kanal "bulunamadı" yanıtı verir ve sürüm arşivi veya yükleyici her zaman çalışır.
 
-Paket yöneticisinin kendi PATH işleyişi geçerlidir: Chocolatey, winget, Scoop ve Homebrew programları PATH'e kendileri koyar ve hiçbiri `gp` takma adını oluşturmaz (`gitpoulpi alias create gp` çalıştırın ya da Ayarlar > Genel > Başlatıcı).
+Paket yöneticisinin kendi PATH işleyişi geçerlidir: Chocolatey, winget, Scoop ve Homebrew programları PATH'e kendileri koyar ve hiçbiri `gp` takma adını oluşturmaz (`gitpoulpi alias create gp` çalıştırın ya da Ayarlar > Başlatıcı).
 
 ### apt (Debian ve Ubuntu)
 

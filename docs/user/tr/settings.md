@@ -171,16 +171,16 @@ Sayfa listesinde iki grup vardır:
 | **Varsayılan gözatma klasörü** | Gözat'ın açıldığı yer. Boşsa: en son kullandığınız klasör, yoksa ana klasörünüz. |
 | **Depo verilerinin konumu** | GitPoulpi'nin depoya özel verilerini sakladığı yer (`session.per_repo_state_dir`): **.git içinde** (varsayılan: çalışma ağacınızda hiçbir şey belirmez, tüm worktree'ler aynı veriyi paylaşır), **Çalışma ağacında** (`.gitpoulpi` klasörü; bir ekip `workflow.toml` dosyasını commit'lemek için gerekir) veya **Kullanıcı verileri klasörümde** (deponun dışında). Eski bir sürümün bıraktığı `.gitpoulpi` klasörü, ilk gerektiğinde yeni yere taşınır ve boşalınca silinir; git'in izlediği bir dosya (commit'lenmiş bir `workflow.toml`) asla taşınmaz veya silinmez ve okunabilir kalır. |
 | **Varsayılan Dal Adı** | Init ile oluşturduğunuz bir deponun ilk dalı. Boşsa: Git karar verir. Mevcut hiçbir dalı yeniden adlandırmaz. |
-| **Proaktif çakışma algılamayı etkinleştir** | Varsayılan olarak açıktır (`general.conflict_detection`). Geçerli dalı ayrıldığı dala merge etmek çakışacaksa, siz denemeden önce Log'da uyarır. Bir depo bunu kendi **Çakışma önleme** sayfasında kendisi için kapatabilir. Bkz. [Merge çakışmalarını çözmek](merge-conflicts.md#çakışma-önleme). Ayarlar kapanınca uygulanır. |
-| **Varsayılan temel dallar** | Anahtarın altında, **Çakışma önleme** grubunda (paletteki **Çakışmalar: Temel Dal Listelerini Düzenle...** burayı açar). Kendi listesi olmayan depoların kullandığı temel dal desenleri listesi: her dal demek olan **Yerleşik (`**`)** ya da adlandırılmış listelerinizden biri (`conflict_prevention.default_list`). Ayarlar kapanınca açık depolara uygulanır. **Yerleşik varsayılana sıfırla** `**` değerine döner. |
-| **Temel dal listeleri** | Yine o grupta: adlandırılmış temel dal desenleri listeleriniz (`[conflict_prevention.lists.<ad>]`); her biri bir blok ve içinde **Ad** (yeniden adlandırmak, varsayılansa varsayılan olarak kalmasını sağlar; eski adı izleyen bir depo, listeyi yeniden seçene kadar varsayılan listeyi kullanır), **Desenler** (satır başına bir tane, `Enter` veya tıklama düzenleyiciyi açar, `Ctrl+S` korur), **Varsayılan yap** ve **Listeyi sil** (önce sorar ve onu izleyen depoların bunun yerine varsayılan listeyi kullanacağını söyler). Eklemek için **Yeni liste** alanına bir ad yazıp `Enter`'a basın; `**` ile başlar. Bir listeyi düzenlemek, onu izleyen her depoyu değiştirir. |
 | **Günlük düzeyi**, **Günlük dosyalarını sakla**, **Bir günlük dosyasının en büyük boyutu** | Etkinlik Günlüğü'nün arkasındaki uygulama günlüğü: kaydedilen en ayrıntılı düzey (`log.level`), dosyaların ne kadar saklanacağı (tek satırda bir tam sayı ve bir birim: gün, hafta, ay veya yıl; sayıya tıklayıp yazın, Up ve Down onu değiştirir, Tab birime geçer ve Enter listesini açar; en çok 10 yıl, varsayılan 1 hafta, `log.retention_days` ve `log.retention_unit`) ve bir günün dosyasının döndürüldüğü boyut (bir sayı ve MiB ya da GiB, 1 MiB ile 1 GiB arası, `log.max_file_mb` ve `log.max_file_unit`). |
 | **İşlem sürelerini göster**, **Genişletilmiş günlükleme** | Etkinlik Günlüğü'nün Git işlemleri sekmesi: her işlemin süresi (`log.timings`, varsayılan olarak açık) ve ayrıca arka plan işleri, yenileme ve otomatik fetch (`log.extended`, varsayılan olarak kapalı). Bkz. [Bir şey başarısız olduğunda](troubleshooting.md#etkinlik-günlüğü). |
 | **Geri alma açık**, **Geri alma geçmişi derinliği**, **GitPoulpi dışında yapılan değişiklikleri kaydet** | **Geri alma geçmişi** grubu. Geri Al'ı açar ya da kapatır ve kaç işlem tuttuğunu ayarlar (varsayılan 100, `0` sınırsız demektir). Geri Al'ı kapatmak, bir onaydan sonra geri alma geçmişini siler. Sonuncusu, bir kabuğun veya bir ajanın dallar, tag'ler, stash'ler ve HEAD üzerinde yaptıklarını da kaydeder. Bkz. [Geri al ve yinele](undo-redo.md). |
 
-#### Başlatıcı (masaüstü entegrasyonu)
+**Uygulama: Dili Değiştir...** palet komutu (`Ctrl+N g`) aynı dil listesini açar. Orada
+vurgulanan dil canlı önizlenir; `Enter` onu korur, `Esc` öncekini geri getirir.
 
-Genel sayfasının son grubu olan **Başlatıcı**, GitPoulpi'yi işletim sisteminin
+### Başlatıcı
+
+**Başlatıcı** sayfası (`gitpoulpi ui show settings launcher`), GitPoulpi'yi işletim sisteminin
 başlatıcısından, seçtiğiniz terminalde başlatan bir kısayol oluşturur.
 
 | Satır | Ne yapar |
@@ -212,9 +212,9 @@ olmayan bir kısayol için) ve **Kaldır** vardır.
 
 **Görev çubuğu ve dock gruplaması.** GitPoulpi bir terminal penceresinde çalışır; bu yüzden görev çubuğu onu normalde terminalin simgesi altında, sabitlenmiş GitPoulpi simgesinin altında “çalışıyor” noktası olmadan gösterir. Windows: kısayollar `GitPoulpi.GitPoulpi` AppUserModelID'sini taşır ve onlardan başlatılan GitPoulpi, terminal penceresine aynı kimliği ve kendi simgesini verir (pencereyi, ona bir an benzersiz bir başlık vererek bulur, sonra başlığı geri yükler); böylece pencere sabitlenmiş GitPoulpi simgesinin altında yer alır. Birden çok sekmeli bir terminal penceresi bir bütün olarak taşınır: GitPoulpi içinde çalıştığı sürece tüm sekmeleri GitPoulpi simgesi altında gruplanır. Daha önce yapılmış kısayollar ve görev çubuğu sabitlemeleri aynı eşitlemeyle yeniden yazılır; bir sabitleme hâlâ terminalin simgesini gösteriyorsa sabitlemeyi kaldırıp yeniden sabitleyin. Linux: kitty, foot, Alacritty, WezTerm ve Ghostty `gitpoulpi` pencere sınıfıyla başlatılır ve `.desktop` girdisi bunu belirtir (`StartupWMClass`); böylece dock pencereyi başlatıcının simgesi altında gruplar; diğer terminaller kendi simgelerini korur. macOS: yapılacak bir şey yok, Dock uygulamaya göre gruplar.
 
-![Ayarlar > Genel, Başlatıcı grubuna kadar kaydırılmış: kısayollar için terminal ve uygulama başlatıcısı satırı](../images/settings-launcher.png)
+![Ayarlar > Başlatıcı: kısayollar için terminal ve uygulama başlatıcısı satırı](../images/settings-launcher.png)
 
-##### Komut takma adı ve PATH, sisteme göre
+#### Komut takma adı ve PATH, sisteme göre
 
 | Sistem | Takma ad | PATH |
 |---|---|---|
@@ -229,8 +229,16 @@ oluştur**, **Başlatıcı: kısayolları kaldır**, **Başlatıcı: komut takma
 **Başlatıcı: komut takma adını kaldır**, **Başlatıcı: PATH'e ekle**, **Başlatıcı: PATH'ten kaldır**); bir betikten `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` aynısını yapar.
 
-**Uygulama: Dili Değiştir...** palet komutu (`Ctrl+N g`) aynı dil listesini açar. Orada
-vurgulanan dil canlı önizlenir; `Enter` onu korur, `Esc` öncekini geri getirir.
+### Çakışma önleme
+
+Proaktif çakışma algılamanın genel kısmı (`gitpoulpi ui show settings conflict-prevention-global`); bir deponun kendi sayfası
+[Depoya Özel: Çakışma önleme](#depoya-özel-çakışma-önleme)'dir. Paletteki **Çakışmalar: Temel Dal Listelerini Düzenle...** bu sayfayı açar.
+
+| Seçenek | Ne yapar |
+|---|---|
+| **Proaktif çakışma algılamayı etkinleştir** | Varsayılan olarak açıktır (`general.conflict_detection`). Geçerli dalı ayrıldığı dala merge etmek çakışacaksa, siz denemeden önce Log'da uyarır. Bir depo bunu kendi **Çakışma önleme** sayfasında kendisi için kapatabilir. Bkz. [Merge çakışmalarını çözmek](merge-conflicts.md#çakışma-önleme). Ayarlar kapanınca uygulanır. |
+| **Varsayılan temel dallar** | Anahtarın altında. Kendi listesi olmayan depoların kullandığı temel dal desenleri listesi: her dal demek olan **Yerleşik (`**`)** ya da adlandırılmış listelerinizden biri (`conflict_prevention.default_list`). Ayarlar kapanınca açık depolara uygulanır. **Yerleşik varsayılana sıfırla** `**` değerine döner. |
+| **Temel dal listeleri** | Yine bu sayfada: adlandırılmış temel dal desenleri listeleriniz (`[conflict_prevention.lists.<ad>]`); her biri bir blok ve içinde **Ad** (yeniden adlandırmak, varsayılansa varsayılan olarak kalmasını sağlar; eski adı izleyen bir depo, listeyi yeniden seçene kadar varsayılan listeyi kullanır), **Desenler** (satır başına bir tane, `Enter` veya tıklama düzenleyiciyi açar, `Ctrl+S` korur), **Varsayılan yap** ve **Listeyi sil** (önce sorar ve onu izleyen depoların bunun yerine varsayılan listeyi kullanacağını söyler). Eklemek için **Yeni liste** alanına bir ad yazıp `Enter`'a basın; `**` ile başlar. Bir listeyi düzenlemek, onu izleyen her depoyu değiştirir. |
 
 ### Eşitleme
 
@@ -397,6 +405,7 @@ görünür; bkz. [MCP ve ajanlar](mcp-and-agents.md).
 | **Grafik şerit arka planı** | **Kapalı** (saydam) ya da **Satır tonu**: grafik sütununun arkasında şerit renginin soluk bir bandı ve kenarında ince bir çubuk. |
 | **Satır tonu gücü** | Satır tonu bandının ne kadar soluk olduğu: **Güçlü**, **Orta** (varsayılan) ya da **Hafif**. Kenardaki çubuk tam rengini korur. |
 | **Araç çubuğu konumu** | `ui.toolbar_position`: Araç çubuğunun yeri: Üst, Alt (varsayılan), Sol veya Sağ. Sol ve Sağ onu bölmelerin yanında bir sütun yapar; 80 sütundan dar bir pencerede altta çizilir. Hemen uygulanır. |
+| **Pencere konumunu ve boyutunu hatırla** | `ui.dialog_geometry`: **Bu oturum için** (varsayılan), **Diske kaydedilir** veya **Asla**: taşıdığınız ya da yeniden boyutlandırdığınız bir pencerenin yerini koruyup korumayacağı. Hemen uygulanır. |
 | **Araç çubuğu düğmelerinin hizası** | `ui.toolbar_align`: Düğmelerin çubuk boyunca yeri: Baş (varsayılan), Orta veya Son. Baş, satırda sol ve sütunda üsttür; Son sağ ve alttır. Hemen uygulanır. |
 | **Pull Request düğmesini sona sabitle** | `ui.toolbar_pr_pinned`: Açıkken (varsayılan) pull request düğmesi hizadan bağımsız olarak araç çubuğunun en ucunda durur (sağda, sütunda altta). Kapalıyken diğer düğmelerle birlikte akar ve onlarla hizalanır. Hemen uygulanır. |
 | **Durum çubuğu konumu** | `ui.statusbar_position`: Durum çubuğunun (dal, sayılar, iletiler, tuş ipuçları) yeri: Üst (depo sekmelerinin üstü) veya Alt (varsayılan). Ana sayfa sekmesi altta kendi durum çubuğunu korur. Hemen uygulanır. |
@@ -696,10 +705,10 @@ Commit formunun başladığı bir mesaj (`gitpoulpi ui show settings commit-temp
 (bkz. [Merge çakışmalarını çözmek](merge-conflicts.md#çakışma-önleme)):
 
 - **Proaktif çakışma algılamayı hedef dalla etkinleştir**: varsayılan olarak açık. İşareti kaldırmak algılamayı
-  yalnızca bu depo için kapatır; genel anahtar, Genel sayfasındaki **Proaktif çakışma algılamayı etkinleştir**'dir.
+  yalnızca bu depo için kapatır; genel anahtar, genel **Çakışma önleme** sayfasındaki **Proaktif çakışma algılamayı etkinleştir**'dir.
   İkisi de açık olmalıdır.
 - **Temel dalların kaynağı**: bu deponun temel dallarının nereden geldiği. **Varsayılan** genel varsayılanı izler (yerleşik
-  `**` ya da Ayarlar > Genel'de **Varsayılan temel dallar** altında seçilen liste); **Liste: <ad>** adlandırılmış listelerinizden
+  `**` ya da Ayarlar > Çakışma önleme'de **Varsayılan temel dallar** altında seçilen liste); **Liste: <ad>** adlandırılmış listelerinizden
   birini izler, yani listeyi düzenlemek bu depoyu da değiştirir; **Kendi listesi** deponun kendine ait listesidir (seçmek,
   geçerli desenlerin bir kopyasıyla başlar). Bu seçim var olmadan önce yazılmış ve kendi desenlerini tutan bir depo dosyası
   **Kendi listesi** olarak okunur.
@@ -717,7 +726,7 @@ Commit formunun başladığı bir mesaj (`gitpoulpi ui show settings commit-temp
   bir yol bölümünün içinde kalır, `**` bölümleri aşar. Boş satırlar ve `#` yorumları yok sayılır; yalnızca hariç tutma
   içeren bir liste "bunlar dışındaki her dal" anlamına gelir. Seçim `repo-state.toml` içinde saklanır ve Ayarlar
   kapanınca yeniden okunur.
-- **Liste olarak kaydet...**: bir ad yazıp `Enter`'a basın; geçerli desenler adlandırılmış bir liste olur (Ayarlar > Genel'in
+- **Liste olarak kaydet...**: bir ad yazıp `Enter`'a basın; geçerli desenler adlandırılmış bir liste olur (Ayarlar > Çakışma önleme'nin
   düzenlediği listelerle aynı) ve bu depo onu izler.
 - **Varsayılana sıfırla** (önce sorar): bu deponun seçimini, listesini ve kendi desenlerini bırakır; depo yeniden varsayılanı
   izler.

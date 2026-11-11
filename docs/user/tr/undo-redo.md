@@ -50,8 +50,10 @@ bunları sayar ("12 eylem geri alınabilir (en çok 100)").
 Geri aldığınız eylemler, en yeni eylemin **üstünde**, bir ayracın altında ("geri
 alındı - Yinele bunları geri getirir") soluk renkte durur; Yinele'nin geri
 getireceği ayraca en yakın olanıdır. Seçim bunların üzerinde değil, en yeni
-eylemde başlar. Ok tuşları gezinir (başlıklar ve ayraç atlanır), `Tab` üç görünüm
-arasında geçiş yapar, `Esc` kapatır. Seçili satır için:
+eylemde başlar. Ok tuşları gezinir (başlıklar ve ayraç atlanır), `1` / `2` / `3`
+(veya `Ctrl+Tab` / `Ctrl+Shift+Tab`) üç görünüm arasında geçiş yapar, `Esc` kapatır.
+`Enter` hiçbir zaman bir eylem çalıştırmaz: her düğmenin düğmelerin altındaki ipucu
+satırında gösterilen kendi harfi vardır. Seçili satır için:
 
 - **Buraya kadar geri al** (`u`): o eylemi ve ondan yeni her eylemi, en yeniden
   başlayarak geri alır; hepsini listeleyen tek bir onaydan sonra. Daemon'un riskli
@@ -89,13 +91,15 @@ mesajı ve değişen dosyaları listenin yanında gösterilir.
 Reflog 200 konumluk sayfalar halinde okunur. Daha uzun olan kendiliğinden devam
 eder: imleci (veya kaydırmayı) listenin sonuna yaklaştırmak sonraki sayfayı
 getirir ve bir sonraki varken son satır **... Daha fazla yükle** der. **Daha fazla
-yükle** (`m`, veya paletteki `Reflog: Daha Fazla Yükle`) onu hemen getirir ve
+yükle** (`d`, veya paletteki `Reflog: Daha Fazla Yükle`) onu hemen getirir ve
 durum çubuğunda "yüklenen konumlar: N" der. Git'in reftable biçimini kullanan
 depolar da diğerleri gibi okunur.
 
 ![main dalının Reflog'u: bulunduğu her konum, en yeni önce; seçili olan sağda anlatılıyor](../images/reflog.png)
 
-**Log'da göster** (`s`), **Burada dal oluştur** (`b`) ve
+**Log'da göster** (`l`), **Burada dal oluştur** (`b`), **Burada tag oluştur** (`t`),
+**Çalışma ağacına uygula** (`a`), **Stash olarak kaydet** (`s`) (son üçü aşağıda Kaybolan
+çalışma'daki gibi çalışır) ve
 **`<dal>` dalını bu konuma geri yükle** (`r`). Geri yükleme geri alınabilir. Dal
 checkout edilmişse ve üzerine yazmadan taşıyamayacağı yerel değişiklikleriniz
 varsa, bir açılır liste onlara ne olacağını sorar: değişikliklerimi koru, soft,
@@ -113,8 +117,51 @@ döndürücü gösterilirken dolar; arayüzü asla bloklamaz.
 ![Kaybolan çalışma: silinmiş bir dalın iki commit'i (reflog üzerinden bulundu) ve sahipsiz commit'ler](../images/lost-work.png)
 
 **Burada dal oluştur** (`b`) bir commit'i seçtiğiniz bir adla kurtarır,
-**Cherry-pick** (`c`) onu geçerli dala uygular, **Log'da göster** (`s`) hâlâ
-ulaşılabilir olanlar için çalışır.
+**Burada tag oluştur** (`t`) onu bir tag ile sabitler (varsayılan ad
+`restored-<kısa kimlik>`), **Cherry-pick** (`c`) onu geçerli dala uygular. Kaybolan
+bir commit Log'da yoktur; bu yüzden bu görünümde "Log'da göster" yoktur (Reflog
+görünümü bunu hâlâ ulaşılabilir commit'ler için korur).
+
+**Değişiklikleri geri getir**, commit'in değiştirdiklerini commit'lemeden geri koyar:
+**Çalışma ağacına uygula** (`a`) commit'in değişikliklerini dosyalara yeniden uygular,
+ya hep ya hiç (dizin ve HEAD olduğu gibi kalır; merge commit'i reddedilir). Temiz
+uygulanamadığında hiçbir şeye dokunulmaz ve pencere **Stash olarak kaydet** (`s`)
+önerir; bu, aynı değişiklikleri bunun yerine yeni bir stash olarak saklar ve bu eylem
+tek başına da her zaman kullanılabilir. İkisi de journal'a yazılır: `Ctrl+Z` dosyaları
+geri koyar ya da stash'i yeniden siler. Aynı eylemler `gitpoulpi apply-commit <rev>` ve
+`gitpoulpi stash from-commit <rev> [-m M]` komutlarıdır ve Reflog görünümünde de vardır.
+
+### Paneller, hunk'lar ve pencere
+
+Reflog ve Kaybolan çalışma solda commit listesini, sağda ise seçili commit'in
+başlığını, **değiştirdiği her dosyayı** ve seçili dosyanın hunk'larını gösterir
+(yalnızca hunk'lar, panele sığacak şekilde sarılır). Dosya listesi ana pencerenin
+sağ panelindekiyle aynıdır: `Yol` veya `Ağaç` (`v`, ya da düğmeye tıklayın), bir klasör
+`Enter`, `Left` veya `Right` ile katlanır, bir tıklama ya da oklar bir dosya seçer ve
+hunk'ları altında görünür (daemon'a arayüz iş parçacığının dışında sorulur; son birkaç
+dosya tutulur). Commit listesinin, dosya listesinin ve hunk'ların her birinin basıp
+sürükleyebileceğiniz bir kaydırma çubuğu vardır.
+
+- `Tab` / `Shift+Tab` panelleri dolaşır (liste, dosyalar, hunk'lar); oklar, `PageUp`,
+  `PageDown`, `Home` ve `End` klavyenin bulunduğu panelde çalışır (kenarlığı yanar).
+  Bir dosyada `Enter` hunk'larına geçer.
+- **Ayraçlar**: liste ile sağ panel arasındakini ya da dosyalar ile hunk'lar
+  arasındakini sürükleyin; bir ayraca çift tıklamak onu sıfırlar. Klavye:
+  `Alt+Left` / `Alt+Right`, `Alt+Up` / `Alt+Down`, `Alt+0` ikisini de sıfırlar.
+  Paletteki `Reflog / Kaybolan Çalışma: Panel Boyutlarını Sıfırla`, `Sonraki Panel` ve
+  `Dosya Listesi Yol veya Ağaç` satırları aynısını yapar.
+- `Ctrl+N` ana pencerede olduğu gibi üç görünüm sekmesinin ve üç panelin üzerinde
+  rozetler gösterir; bir rozet tuşu oraya atlar.
+- **Pencereyi taşıyın ve boyutlandırın**: taşımak için başlık çubuğunu, boyutlandırmak
+  için sol, sağ ve alt kenarları ya da bir alt köşeyi (`◢` tutamağı) sürükleyin (hiçbir
+  zaman 60 x 16'dan küçük olmaz, hep ekranda kalır). Kapatma çarpısı kendi tıklamasını
+  korur ve pencerenin dışında bırakmak onu asla kapatmaz. Klavye karşılığı `Ctrl+N` ve
+  ardından `m`'dir: oklar taşır, `Shift`+oklar boyutlandırır, `0` sıfırlar, `Enter` veya
+  `Esc` çıkar (açıkken kenarlık bunu söyler). Paletteki `Pencere: Taşı veya
+  Boyutlandır` ve `Pencere: Konumu ve Boyutu Sıfırla` satırları da vardır. Yerin
+  korunup korunmayacağı `ui.dialog_geometry` ayarıdır (*Ayarlar > Görünüm > Düzen >
+  Pencere konumunu ve boyutunu hatırla*): `session` (varsayılan), `saved` (sonraki
+  açılışta geri yüklenir) veya `never`.
 
 ## Komut paletinden
 
@@ -126,8 +173,8 @@ basın: palet üstünde açılır ve **Geri Alma Geçmişi:**, **Reflog:** ve **
 | Görünüm | Palet satırları |
 |---|---|
 | Geri alma geçmişi | `Geri Alma Geçmişi: Buraya Kadar Geri Al...`, `Buraya Kadar Yinele...`, `Yalnızca Bunu Geri Yükle...`, `Dalı Eski Yerine Geri Yükle...`, `Yenile`, `Kapat` |
-| Reflog | `Reflog: Log'da Göster`, `Burada Dal Oluştur...`, `Bu Konuma Geri Yükle...`, `Daha Fazla Yükle`, `Yenile` |
-| Kaybolan çalışma | `Kaybolan Çalışma: Log'da Göster`, `Burada Dal Oluştur...`, `Cherry-pick`, `Yeniden Tara` |
+| Reflog | `Reflog: Log'da Göster`, `Burada Dal Oluştur...`, `Burada Tag Oluştur...`, `Değişiklikleri Çalışma Ağacına Uygula`, `Değişiklikleri Stash Olarak Kaydet`, `Bu Konuma Geri Yükle...`, `Daha Fazla Yükle`, `Yenile` |
+| Kaybolan çalışma | `Kaybolan Çalışma: Burada Dal Oluştur...`, `Burada Tag Oluştur...`, `Cherry-pick`, `Değişiklikleri Çalışma Ağacına Uygula`, `Değişiklikleri Stash Olarak Kaydet`, `Yeniden Tara` |
 
 Görünümleri açık değilken satırlar (nedeniyle birlikte) soluk gösterilir; üç açıcı,
 `Düzenle: Geri Alma Geçmişi...`, `Düzenle: Reflog...` ve `Düzenle: Kaybolan Commit'ler
@@ -145,8 +192,8 @@ satırları düğmeyle aynı onayı ya da ad istemini açar.
 | Dallar ve tag'ler | oluşturma, silme, yeniden adlandırma, upstream'i ayarlama veya kaldırma, izleme dalı oluşturma, tag oluşturma / silme / not ekleme, fast-forward, bir pull request'i dal olarak checkout etme |
 | Dolaşma | bir dalın veya bir commit'in checkout'u (ayrık HEAD dahil) |
 | Geçmiş | merge (fast-forward ya da merge commit), rebase (sade ve etkileşimli, bittikten sonra), cherry-pick, revert, reset (soft, mixed ve hard), bir pull'un yerel kısmı |
-| Çalışma değişiklikleri | stage ve unstage (dosya, klasör, hunk, satırlar, tümü), atma (dosya, klasör, hunk, satırlar, bir dosya checkout'u), yama uygulama, **bir dosyayı diskten silme**, **yok sayma** (dosya, uzantı veya klasör: seçtiğiniz `.gitignore` dosyasındaki satır), **ikili ya da metin olarak ele alma** (`.gitattributes` satırı) |
-| Stash'ler | push, apply, pop, drop |
+| Çalışma değişiklikleri | stage ve unstage (dosya, klasör, hunk, satırlar, tümü), atma (dosya, klasör, hunk, satırlar, bir dosya checkout'u), yama veya bir commit'in değişikliklerini uygulama (`apply-commit`), **bir dosyayı diskten silme**, **yok sayma** (dosya, uzantı veya klasör: seçtiğiniz `.gitignore` dosyasındaki satır), **ikili ya da metin olarak ele alma** (`.gitattributes` satırı) |
+| Stash'ler | push, apply, pop, drop, bir commit'in değişikliklerini stash olarak kaydetme (`stash from-commit`) |
 | Uzak depolar ve yapılandırma | bir uzak depoyu ekleme, kaldırma, yeniden adlandırma, URL'sini veya push URL'sini değiştirme, Git LFS izleme ve izlemeyi bırakma |
 | Bir sunucuda | **bir uzak depodaki dalı veya tag'i silme** (ref'in menüsünden, paletten, `branch delete-remote`, `tag delete-remote`, `tag delete --both` ile ya da uzak dalı da silen bir iş akışı bitirmesiyle): aşağıya bakın |
 
@@ -413,7 +460,9 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   konumlardan birine taşır; commit edilmemiş değişiklikleri olan, checkout edilmiş
   bir dal için `--mode` gerekir. O da günlüğe yazılır.
 - `lost-commits`, hiçbir dalın, tag'in, uzak deponun veya stash'in ulaşmadığı
-  commit'leri listeler.
+  commit'leri listeler. Birinin işini commit'lemeden geri almak için:
+  `apply-commit <rev>` (çalışma ağacına, ya hep ya hiç) veya `stash from-commit <rev>`
+  (stash olarak); ikisi de journal'a yazılır.
 - Bir kabuk hareketi en yeni girdiyi engellediğinde, ret girdinin beklediğini tutan
   reflog konumunu taşır (`reason.RefMoved.restore`); onu `reflog-restore`'a verin.
 

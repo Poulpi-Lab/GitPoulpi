@@ -974,8 +974,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |
 | Reflog / Lost Work: Reset Pane Sizes |  |
-| Dialog: Move/resize | `Ctrl+N m` |
-| Dialog: Reset position and size |  |
+| Dialog: Move or Resize | `Ctrl+N m` |
+| Dialog: Reset Position and Size |  |
 | View: Refresh | `r` |
 | View: Refresh (fetch, pull requests, issues) | `F5` |
 | View: Toggle Help Overlay | `?` |

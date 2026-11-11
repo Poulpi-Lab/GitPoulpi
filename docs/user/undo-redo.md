@@ -155,8 +155,8 @@ scrollbar you can press and drag.
   below 60 x 16, always on screen). The close cross keeps its click and letting
   go outside the dialog never closes it. The keyboard twin is `Ctrl+N` then `m`:
   the arrows move, `Shift`+arrows resize, `0` resets, `Enter` or `Esc` leave (the
-  border says so while it is on). The palette has `Dialog: Move/resize` and
-  `Dialog: Reset position and size`. Whether the place is kept is
+  border says so while it is on). The palette has `Dialog: Move or Resize` and
+  `Dialog: Reset Position and Size`. Whether the place is kept is
   `ui.dialog_geometry` (Settings > Appearance > Layout): `session` (default),
   `saved` (restored at the next launch) or `never`.
 

@@ -430,7 +430,7 @@ The Undo history / Reflog / Lost work dialog can be moved and resized:
 - **Drag the left, right or bottom border**, or a bottom corner (the `◢` grip), to resize it. The dialog stays on screen and never gets smaller than 60 x 16.
 - The drag goes on when the pointer leaves the dialog, and releasing outside never closes it.
 - **Drag the dividers** between its list, its file list and its hunks; double-click one to reset it.
-- The keyboard twins are `Ctrl+N` then `m` (arrows move, `Shift`+arrows resize, `0` resets, `Enter` or `Esc` leave) and `Alt`+arrows for the dividers; the palette has `Dialog: Move/resize` and `Dialog: Reset position and size`.
+- The keyboard twins are `Ctrl+N` then `m` (arrows move, `Shift`+arrows resize, `0` resets, `Enter` or `Esc` leave) and `Alt`+arrows for the dividers; the palette has `Dialog: Move or Resize` and `Dialog: Reset Position and Size`.
 
 The pointer shows a move shape over the title bar and a resize shape over the borders and corners (terminals with `OSC 22`).
 

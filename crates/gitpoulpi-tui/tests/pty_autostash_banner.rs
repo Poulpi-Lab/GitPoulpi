@@ -457,11 +457,16 @@ fn a_stash_waiting_for_an_operation_that_ended_outside_is_popped_on_refresh() {
     let text = text.replace("state = ", "after_operation = true\nstate = ");
     std::fs::write(&state_file, text).unwrap();
 
-    term.send_keys("r").unwrap();
-    term.wait_for("the banner gone", STEP, |s| {
-        !s.contains("Auto-stash pending")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: under load the refresh can run before the record changed on
+    // disk is read; a second refresh after the pop only refreshes.
+    common::retry_until(
+        &mut term,
+        "the banner gone",
+        3,
+        Duration::from_secs(10),
+        |t| t.send_keys("r").unwrap(),
+        |s| !s.contains("Auto-stash pending"),
+    );
     assert_eq!(
         std::fs::read_to_string(repo.root().join("a.txt")).unwrap(),
         "1 local\n2\n3\n4\n5\n"

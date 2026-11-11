@@ -44,8 +44,9 @@ obowiązują te same reguły:
   kliknięcie poza, więc przypadkowe kliknięcie nie zgubi tekstu. `✕` i `Esc` najpierw
   pytają **Odrzucić zmiany?**; **Edytuj dalej** wraca do formularza. Formularz bez
   wpisanego tekstu zamyka się od razu, tak samo jak jednowierszowy dialog.
-- Menu, listy rozwijane, paleta i selektory nie mają `✕`: zamykają się `Esc` lub
-  kliknięciem poza.
+- Paleta poleceń, selektory (kart, motywu, języka), małe dialogi Przeglądu, Tablicy,
+  merge i edytora oraz monit o potwierdzenie też mają `✕`. Menu kontekstowe i listy
+  rozwijane go nie mają: zamykają się `Esc` lub kliknięciem poza.
 
 ## Listy w Ustawieniach
 
@@ -414,13 +415,32 @@ Mysz w widoku obrazu opisują [Obrazy](image-view.md).
 
 ## Przesuwanie i zmiana rozmiaru okien dialogowych
 
-Okno Historia cofania / Reflog / Utracona praca można przesuwać i zmieniać jego rozmiar:
+Okna dialogowe można przesuwać, a większe okna także zmieniać ich rozmiar:
 
-- **Przeciągnij pasek tytułu**, aby je przesunąć (krzyżyk zamknięcia zachowuje swoje kliknięcie).
-- **Przeciągnij lewą, prawą lub dolną krawędź** albo dolny róg (uchwyt `◢`), aby zmienić rozmiar. Okno zostaje na ekranie i nigdy nie robi się mniejsze niż 60 x 16.
+- **Przeciągnij pasek tytułu**, aby przesunąć okno (krzyżyk zamknięcia zachowuje swoje kliknięcie). Paleta poleceń i selektory nie mają osobnego paska tytułu: przeciągnij górną krawędź.
+- **Przeciągnij lewą, prawą lub dolną krawędź** albo dolny róg (uchwyt `◢`), aby zmienić rozmiar okna. Okno zostaje na ekranie i nigdy nie robi się mniejsze niż jego minimum (60 x 16 dla Historii cofania, mniej dla pozostałych). Okno o zmienionym rozmiarze wykorzystuje miejsce: pola tekstowe i listy rosną, a tekst zawija się do nowej szerokości.
 - Przeciąganie trwa dalej, gdy wskaźnik opuści okno, a puszczenie przycisku poza oknem nigdy go nie zamyka.
-- **Przeciągnij separatory** między jego listą, listą plików i hunkami; dwukrotne kliknięcie przywraca separator.
-- Odpowiedniki z klawiatury to `Ctrl+N`, potem `m` (strzałki przesuwają, `Shift`+strzałki zmieniają rozmiar, `0` przywraca, `Enter` lub `Esc` kończą) oraz `Alt`+strzałki dla separatorów; paleta ma `Okno: Przesuń lub zmień rozmiar` i `Okno: Przywróć położenie i rozmiar`.
+- **Przeciągnij separatory** wewnątrz widoku Reflog / Utracona praca w Historii cofania; dwukrotne kliknięcie przywraca separator.
+- Odpowiedniki z klawiatury to `Ctrl+N`, potem `m` (strzałki przesuwają, `Shift`+strzałki zmieniają rozmiar, `0` przywraca, `Enter` lub `Esc` kończą) oraz `Alt`+strzałki dla separatorów; paleta ma `Okno: Przesuń lub zmień rozmiar` i `Okno: Przywróć położenie i rozmiar`. Działają na okno na wierzchu. Powierzchnie, które używają `Ctrl+N` do własnych znaczników (formularz opisu commita, strona przepisywania historii), przyjmują to samo `m` po swoim `Ctrl+N`, a pasek stanu je podaje. Paleta poleceń i selektory używają `Ctrl+N` do przesuwania w dół listy, więc dla nich klawiszem jest `Alt+G` (`palette.arrange`) albo własny wiersz palety `Okno: Przesuń lub zmień rozmiar`: oba ustawiają okno na wierzchu i zostawiają je otwarte.
+- **Jedno ustawienie** (`ui.dialog_geometry`, Ustawienia > Wygląd > Układ) obejmuje wszystkie okna: każde pamięta własne miejsce i rozmiar na tę sesję, na dysku do następnego uruchomienia albo wcale.
+
+| Okno | Przesuwanie | Zmiana rozmiaru |
+|---|---|---|
+| Historia cofania / Reflog / Utracona praca, Dziennik aktywności, panel zadań, wybór folderu | tak | tak |
+| Paleta poleceń, selektory kart / motywu / języka, wyszukiwanie w obszarze roboczym | tak | tak (lista rośnie z wysokością, wiersze z szerokością) |
+| Clone (lista repozytoriów), Pull request i Nowe zgłoszenie (opis), „Co jest wysyłane” (panel), Mermaid (podgląd), opcje przeglądu (pola, tylko szerokość) | tak | tak |
+| Edytory długich tekstów w Ustawieniach (szablony, hooki, prompty AI), pole AI formularza obszaru roboczego | tak | tak (pole tekstowe) |
+| Przepisywanie historii: dwa dialogi pomocnika AI | tak | tak (opis, panel wysyłanych danych) |
+| O programie, panel aktualizacji, kontrola bezpieczeństwa, przewidywane konflikty, „Przekroczono limit AI”, usunięcie tagu, pliki wrażliwe | tak | nie (rozmiar wynika z tekstu) |
+| Init, Worktree, Sparse checkout, dialog Flow, dialogi przepływu zgłoszeń, formularz opisu commita (reword), formularz obszaru roboczego, selektory etykiet / kamieni milowych | tak | nie |
+| Potwierdzenia (każde „Na pewno?”) | tak | nie |
+| Dialogi Przeglądu i Tablicy: ich małe dialogi (komentarz, zakończenie, wybór, kolumny) | tak | nie |
+| Okna strony Klawiatura i mysz (potwierdzenie resetu, przechwycenie klawisza), okno odpowiedzi AI | tak | nie |
+| Ustawienia: wyniki i potwierdzenie uwierzytelniania repozytorium | tak | nie |
+| Przepisywanie historii: dialogi czyszczenia, tożsamości i pytań | tak | nie |
+| Okno przenoszenia pliku w edytorze commita, komunikaty merge | tak | nie |
+
+Nie można przesuwać: ekranów pełnostronicowych (Ustawienia, Pomoc, strony Przeglądu i Tablicy, które już wypełniają okno), menu kontekstowych i list rozwijanych (wiszą przy elemencie, który je otworzył), podpowiedzi oraz małych okien wewnątrz strony (formularz zdalnych repozytoriów, edytor dzielenia commita).
 
 Wskaźnik ma kształt przesuwania nad paskiem tytułu i kształt zmiany rozmiaru nad krawędziami i rogami (terminale z `OSC 22`).
 

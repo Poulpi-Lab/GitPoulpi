@@ -453,6 +453,8 @@ W `config.toml` jest to tabela `[keybindings.palette]`, nazwana od polecenia (`t
 
 Pasek podpowiedzi pod listą podaje ten klawisz (domyślnie `Alt+K`). To akcja `palette.configure_shortcut`, więc można ją przypisać na nowo jak każdą inną.
 
+Paleta i selektory (motywu, języka, kart, wyszukiwania w obszarze roboczym) przesuwają się i zmieniają rozmiar jak okno dialogowe: przeciągnij górną krawędź albo naciśnij `Alt+G` (akcja `palette.arrange`; wiersz palety `Okno: Przesuń lub zmień rozmiar` robi to samo). Strzałki przesuwają, `Shift`+strzałki zmieniają rozmiar, `0` przywraca, `Enter` lub `Esc` kończą tryb, a okno zostaje otwarte. To, czy miejsce jest zapamiętywane, rozstrzyga `ui.dialog_geometry`.
+
 ### Każde polecenie palety
 
 Generowane z aplikacji (test dba o aktualność). Polecenia AI pojawiają się

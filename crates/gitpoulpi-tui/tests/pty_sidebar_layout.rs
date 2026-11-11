@@ -153,12 +153,20 @@ fn settings_reopens_on_the_section_it_was_left_on() {
     term.send_keys(",").unwrap();
     term.wait_for("Settings open", STEP, |s| s.contains("Git & encoding"))
         .unwrap_or_else(|e| panic!("{e}"));
-    // The sections are focused when it opens: move down to Profiles
-    // (past Synchronization).
-    term.send_keys("Down").unwrap();
-    term.send_keys("Down").unwrap();
-    term.wait_for("Profiles' body", STEP, |s| s.contains("Profiles - global"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // The sections are focused when it opens: move down to Profiles, one
+    // step at a time (the number of pages above it changes as pages are added).
+    common::retry_until(
+        &mut term,
+        "Profiles' body",
+        12,
+        Duration::from_secs(2),
+        |t| {
+            if !t.screen().contains("Profiles - global") {
+                t.send_keys("Down").unwrap();
+            }
+        },
+        |s| s.contains("Profiles - global"),
+    );
     term.send_keys("Escape").unwrap();
     term.wait_for_text_to_go("Git & encoding", STEP)
         .unwrap_or_else(|e| panic!("{e}"));

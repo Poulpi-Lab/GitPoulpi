@@ -727,6 +727,14 @@ fn the_clear_button_asks_first_cancel_keeps_the_lines_and_confirm_clears_them() 
     assert!(screen.contains("clear-marker-two"), "{screen}");
     assert!(app_lines(&log) >= 2);
 
+    // The close cross is Esc: the dialog goes, nothing is cleared.
+    click(button.x + 1, button.y);
+    draw(&mut terminal);
+    let cross = hit_rect(Hit::ClearClose);
+    click(cross.x + 1, cross.y);
+    assert!(!with(|s| s.clear_open) && is_open());
+    assert!(app_lines(&log) >= 2, "the cross must not clear the log");
+
     // By key: x opens, Esc cancels, x then y confirms.
     key(KeyCode::Char('x'));
     assert!(with(|s| s.clear_open));

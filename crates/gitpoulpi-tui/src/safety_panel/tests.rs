@@ -452,6 +452,34 @@ fn an_outside_click_cancels_an_open_confirmation_before_closing() {
     assert!(matches!(panel.on_mouse(press(0, 0)), PanelOutcome::Close));
 }
 
+#[test]
+fn the_red_confirmation_cross_cancels_it_and_confirms_nothing() {
+    let mut panel = panel_with(&[(1, "old"), (2, "new")], &[]);
+    painted(&mut panel);
+    panel.overlay = Some(Overlay::Confirm(Confirm {
+        title: "t".into(),
+        lines: vec!["b".into()],
+        warning: Some("danger".into()),
+        button: "Go".into(),
+        red: true,
+        next: Next::Restore { id: 1, name: None },
+    }));
+    let text = painted(&mut panel);
+    assert_eq!(text.matches('\u{2715}').count(), 2, "panel + popup\n{text}");
+    let cross = panel
+        .hits
+        .iter()
+        .find(|(_, h)| *h == super::render::Hit::PopupClose)
+        .map(|(r, _)| *r)
+        .expect("the popup paints a cross");
+    assert!(matches!(
+        panel.on_mouse(press(cross.x + 1, cross.y)),
+        PanelOutcome::Stay
+    ));
+    assert!(panel.overlay.is_none(), "the cross cancels the popup");
+    assert!(panel.job.is_none(), "nothing was confirmed");
+}
+
 fn lost_panel() -> (SafetyPanel, Arc<crate::activity::Activity>) {
     let activity = Arc::new(crate::activity::Activity::default());
     let mut panel = SafetyPanel::open(activity.clone(), Tab::Lost, None, 100);

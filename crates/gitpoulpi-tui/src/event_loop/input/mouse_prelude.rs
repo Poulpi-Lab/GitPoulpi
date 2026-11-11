@@ -701,7 +701,11 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
             if let Some(insight) = cx.file_insight.as_mut().filter(|f| f.blame.is_some()) {
                 if matches!(
                     hit,
-                    Some(crate::blame_view::BlameHit::Card | crate::blame_view::BlameHit::Op(_))
+                    Some(
+                        crate::blame_view::BlameHit::Card
+                            | crate::blame_view::BlameHit::CardClose
+                            | crate::blame_view::BlameHit::Op(_)
+                    )
                 ) {
                     return Ok(None);
                 }

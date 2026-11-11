@@ -112,6 +112,8 @@ pub(crate) enum BlameHit {
     Handle,
     /// The card or menu's body (swallows the pointer).
     Card,
+    /// The card's close cross: like Esc, the card is dismissed.
+    CardClose,
     /// A row of the card or menu.
     Op(BlameOp),
 }

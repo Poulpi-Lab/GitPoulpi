@@ -649,7 +649,9 @@ pub(crate) fn desired_cursor_shape(
         Some(HitTarget::Blame(crate::blame_view::BlameHit::Handle)) => {
             return CursorShape::ColResize
         }
-        Some(HitTarget::Blame(crate::blame_view::BlameHit::Op(_))) => return CursorShape::Pointer,
+        Some(HitTarget::Blame(
+            crate::blame_view::BlameHit::Op(_) | crate::blame_view::BlameHit::CardClose,
+        )) => return CursorShape::Pointer,
         Some(HitTarget::Blame(_)) => {}
         // The merge editor's resize handles take the resize pointer, not
         // the hand: the Output's title rule moves up and down, the

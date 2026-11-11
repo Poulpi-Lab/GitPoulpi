@@ -47,6 +47,8 @@ pub(crate) enum Hit {
     Row(usize),
     Act(Act),
     Close,
+    /// The cross of a confirmation / prompt popup: Esc, nothing happens.
+    PopupClose,
     Cancel,
     Confirm,
     NameField,
@@ -672,8 +674,10 @@ fn popup_frame(
     want_h: u16,
     title: &str,
     red: bool,
+    hover: Option<Hit>,
+    hits: &mut Vec<(Rect, Hit)>,
 ) -> Rect {
-    let rect = dialog_kit::centered(outer, want_w, want_h);
+    let rect = POPUP_WIN.place(buf.area, dialog_kit::centered(outer, want_w, want_h));
     dialog_kit::panel(buf, rect, title);
     if red {
         // Recolor the border in place: re-rendering a Block would erase the title.
@@ -687,8 +691,17 @@ fn popup_frame(
             buf[(rect.right() - 1, y)].set_style(style);
         }
     }
+    // The cross is painted after the red border so it keeps its look.
+    let cross = crate::chrome::close_cross::paint(buf, rect, hover == Some(Hit::PopupClose));
+    POPUP_WIN.decorate(buf, rect, cross, true);
+    if let Some(cross) = cross {
+        hits.push((cross, Hit::PopupClose));
+    }
     rect
 }
+
+/// The confirmation / prompt popups move (their size follows their text).
+const POPUP_WIN: dialog_kit::Win = dialog_kit::Win::movable("safety_popup");
 
 fn danger_button(buf: &mut Buffer, x: u16, y: u16, label: &str, hovered: bool) -> Rect {
     let bg = if hovered {
@@ -727,6 +740,8 @@ fn render_confirm(
         h,
         &c.title,
         c.red,
+        hover,
+        hits,
     );
     let inner = Rect::new(
         rect.x + 2,
@@ -804,6 +819,8 @@ fn render_name(
         8,
         m::TITLE_NAME.get(),
         false,
+        hover,
+        hits,
     );
     let inner = Rect::new(
         rect.x + 2,
@@ -882,6 +899,8 @@ fn render_mode(
         if hard { 11 } else { 10 },
         m::MODE_TITLE.get(),
         false,
+        hover,
+        hits,
     );
     let inner = Rect::new(
         rect.x + 2,

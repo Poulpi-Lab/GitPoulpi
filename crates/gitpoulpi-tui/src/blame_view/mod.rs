@@ -142,7 +142,7 @@ impl BlameView {
                 }
             }
             // On the card itself the hovered hunk stays.
-            Some(BlameHit::Card | BlameHit::Op(_)) => {}
+            Some(BlameHit::Card | BlameHit::CardClose | BlameHit::Op(_)) => {}
             _ => {
                 self.hover = None;
                 self.dismissed = None;
@@ -382,6 +382,13 @@ impl FileInsight {
         }
         match (kind, hit) {
             (MouseEventKind::Down(Left), Some(BlameHit::Op(op))) => MouseOutcome::Run(op),
+            (MouseEventKind::Down(Left), Some(BlameHit::CardClose)) => {
+                // The cross is Esc on the card.
+                view.dismissed = view.hover.map(|(h, _)| h);
+                view.pinned = false;
+                view.hover = None;
+                MouseOutcome::Handled
+            }
             (MouseEventKind::Down(Left), Some(BlameHit::Card)) => MouseOutcome::Handled,
             (MouseEventKind::Down(Left), Some(BlameHit::Handle)) => {
                 view.drag = true;

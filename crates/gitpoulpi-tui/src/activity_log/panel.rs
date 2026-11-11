@@ -94,6 +94,8 @@ enum Hit {
     /// The confirmation's buttons.
     ClearCancel,
     ClearConfirm,
+    /// The confirmation's close cross: like Esc, nothing is cleared.
+    ClearClose,
     Filter,
     /// A level's display checkbox (Application tab).
     Toggle(Level),
@@ -1060,6 +1062,7 @@ pub(crate) fn nav_targets() -> Vec<(Rect, (u16, u16))> {
             .iter()
             .filter_map(|(r, hit)| match hit {
                 Hit::ClearCancel | Hit::ClearConfirm => Some(*r),
+                Hit::ClearClose => None,
                 _ if s.clear_open => None,
                 Hit::Header(_) if !std::mem::replace(&mut seen_entry, true) => Some(*r),
                 Hit::Header(_) | Hit::CopyEntry(_) | Hit::Remedy(..) => None,
@@ -1093,10 +1096,10 @@ pub(crate) fn pointer_hand(col: u16, row: u16) -> bool {
             return true;
         }
         if s.clear_open {
-            return s
-                .hits
-                .iter()
-                .any(|(r, h)| matches!(h, Hit::ClearCancel | Hit::ClearConfirm) && r.contains(at));
+            return s.hits.iter().any(|(r, h)| {
+                matches!(h, Hit::ClearCancel | Hit::ClearConfirm | Hit::ClearClose)
+                    && r.contains(at)
+            });
         }
         if (s.tab == Tab::Application && s.level_field.contains(at)) || s.scope_field.contains(at) {
             return true;
@@ -1368,7 +1371,7 @@ pub(crate) fn on_mouse(mouse: MouseEvent) {
             let hit = with(|s| s.hits.iter().find(|(r, _)| r.contains(at)).map(|(_, h)| *h));
             match hit {
                 Some(Hit::ClearConfirm) => clear_log(),
-                Some(Hit::ClearCancel) => with(|s| s.clear_open = false),
+                Some(Hit::ClearCancel | Hit::ClearClose) => with(|s| s.clear_open = false),
                 _ => {}
             }
         }
@@ -1502,7 +1505,7 @@ fn press(at: ratatui::layout::Position, mouse: MouseEvent) {
         Some(Hit::CopyAll) => copy_all(),
         Some(Hit::OpenFolder) => open_folder(),
         Some(Hit::ClearLog) => with(ask_clear_log_in),
-        Some(Hit::ClearCancel | Hit::ClearConfirm) => {}
+        Some(Hit::ClearCancel | Hit::ClearConfirm | Hit::ClearClose) => {}
         Some(Hit::Filter) => with(|s| s.filter_focus = true),
         Some(Hit::Toggle(level)) => level_cmd(LevelCmd::Toggle(level)),
         Some(Hit::ShowAll) => level_cmd(LevelCmd::All),

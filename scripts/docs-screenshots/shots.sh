@@ -4,7 +4,7 @@
 #
 # Every picture of docs/user/images is a shot here (themes included).
 
-ALL_SHOTS=(hero about about-crates failure-card activity-log activity-log-repository compare-cards log-mermaid sparse-checkout palette palette-settings theme-picker log-graph log-columns-menu log-changes-column context-menu diff diff-split blame blame-card file-history file-history-blame editor editor-encoding-menu editor-eol-menu file-pane-multiselect commit-file-menu commit-column-all commit-column-menu ignore-picker open-with composer ai-explain help help-hosting rebase settings settings-launcher settings-search settings-profiles settings-ssh settings-integrations settings-connect settings-ai settings-ui settings-editor settings-git settings-repo-ai workflow-settings workflow-sidebar workflow-start undo-toolbar pull-push-tooltip settings-keyboard settings-keyboard-conflicts settings-language settings-ai-presets ai-commit-message theme-serie theme-material settings-appearance-theme settings-log-graph-lanes settings-ai-agent settings-open-in settings-open-in-presets open-in-menu theme-dark theme-light theme-catppuccin-latte theme-catppuccin-mocha theme-cyberpunk theme-dracula theme-everforest-dark theme-gruvbox-dark theme-gruvbox-light theme-kanagawa theme-matrix theme-fire theme-fire-light theme-sunset theme-monokai theme-nord theme-one-dark theme-rose-pine theme-solarized-dark theme-solarized-light theme-terminal theme-tokyo-night theme-catppuccin-frappe theme-catppuccin-macchiato theme-kanagawa-lotus theme-one-light theme-rose-pine-dawn theme-rose-pine-moon theme-tokyo-night-day theme-vesper theme-github-dark theme-github-light theme-vscode-dark theme-vscode-light theme-apprentice theme-ayu-dark theme-ayu-light theme-ayu-mirage theme-cobalt2 theme-deus theme-dracula-soft theme-everforest-light theme-github-dark-colorblind theme-github-dark-dimmed theme-github-dark-high-contrast theme-github-dark-legacy theme-github-light-colorblind theme-github-light-high-contrast theme-github-light-legacy theme-gotham theme-gruvbox-dark-hard-contrast theme-gruvbox-dark-soft-contrast theme-gruvbox-light-hard-contrast theme-gruvbox-light-soft-contrast theme-iceberg-dark theme-iceberg-light theme-jellybeans theme-kanagawa-dragon theme-lucario theme-miasma theme-moonfly theme-night-owl-dark theme-night-owl-light theme-nightfly theme-nightfox theme-nightfox-carbonfox theme-nightfox-dawnfox theme-nightfox-dayfox theme-nightfox-duskfox theme-nightfox-nordfox theme-nightfox-terafox theme-noctis theme-noctis-azureus theme-noctis-bordo theme-noctis-hibernus theme-noctis-lilac theme-noctis-lux theme-noctis-minimus theme-noctis-obscuro theme-noctis-sereno theme-noctis-uva theme-noctis-viola theme-nordic theme-one-half-dark theme-one-half-light theme-panda theme-posterpole theme-posterpole-gray theme-seoul256-dark theme-seoul256-light theme-shades-of-purple theme-shades-of-purple-super-dark theme-sonokai theme-sonokai-andromeda theme-sonokai-atlantis theme-sonokai-espresso theme-sonokai-maia theme-sonokai-shusia theme-srcery theme-tender theme-tokyo-night-moon theme-tokyo-night-storm theme-tomorrow theme-tomorrow-night theme-tomorrow-night-blue theme-tomorrow-night-bright theme-tomorrow-night-eighties theme-zenbones-duckbones theme-zenbones-forestbones-dark theme-zenbones-forestbones-light theme-zenbones-kanagawabones theme-zenbones-neobones-dark theme-zenbones-neobones-light theme-zenbones-nordbones theme-zenbones-rosebones-dark theme-zenbones-rosebones-light theme-zenbones-seoulbones-dark theme-zenbones-seoulbones-light theme-zenbones-tokyobones-dark theme-zenbones-tokyobones-light theme-zenbones-vimbones theme-zenbones-zenburned theme-zenbones-zenwritten-dark theme-zenbones-zenwritten-light undo-history reflog lost-work history-rewrite tag-delete settings-quantity conflict-banner merge-editor-card merge-editor merge-editor-full-file home clone clone-hosted clone-hosted-search init tab-picker new-tab workspace-search workspaces workspace-switch workspace-edit radar review-overview review-files local-issues issue-board review-ai lfs-menu)
+ALL_SHOTS=(hero about about-crates failure-card activity-log activity-log-repository compare-cards log-mermaid sparse-checkout palette palette-settings theme-picker log-graph log-columns-menu log-changes-column context-menu diff diff-split blame blame-card file-history file-history-blame editor editor-encoding-menu editor-eol-menu file-pane-multiselect commit-file-menu commit-column-all commit-column-menu ignore-picker open-with composer ai-explain help help-hosting rebase settings settings-launcher settings-conflict-prevention settings-search settings-profiles settings-ssh settings-integrations settings-connect settings-ai settings-ui settings-editor settings-git settings-repo-ai workflow-settings workflow-sidebar workflow-start undo-toolbar pull-push-tooltip settings-keyboard settings-keyboard-conflicts settings-language settings-ai-presets ai-commit-message theme-serie theme-material settings-appearance-theme settings-log-graph-lanes settings-ai-agent settings-open-in settings-open-in-presets open-in-menu theme-dark theme-light theme-catppuccin-latte theme-catppuccin-mocha theme-cyberpunk theme-dracula theme-everforest-dark theme-gruvbox-dark theme-gruvbox-light theme-kanagawa theme-matrix theme-fire theme-fire-light theme-sunset theme-monokai theme-nord theme-one-dark theme-rose-pine theme-solarized-dark theme-solarized-light theme-terminal theme-tokyo-night theme-catppuccin-frappe theme-catppuccin-macchiato theme-kanagawa-lotus theme-one-light theme-rose-pine-dawn theme-rose-pine-moon theme-tokyo-night-day theme-vesper theme-github-dark theme-github-light theme-vscode-dark theme-vscode-light theme-apprentice theme-ayu-dark theme-ayu-light theme-ayu-mirage theme-cobalt2 theme-deus theme-dracula-soft theme-everforest-light theme-github-dark-colorblind theme-github-dark-dimmed theme-github-dark-high-contrast theme-github-dark-legacy theme-github-light-colorblind theme-github-light-high-contrast theme-github-light-legacy theme-gotham theme-gruvbox-dark-hard-contrast theme-gruvbox-dark-soft-contrast theme-gruvbox-light-hard-contrast theme-gruvbox-light-soft-contrast theme-iceberg-dark theme-iceberg-light theme-jellybeans theme-kanagawa-dragon theme-lucario theme-miasma theme-moonfly theme-night-owl-dark theme-night-owl-light theme-nightfly theme-nightfox theme-nightfox-carbonfox theme-nightfox-dawnfox theme-nightfox-dayfox theme-nightfox-duskfox theme-nightfox-nordfox theme-nightfox-terafox theme-noctis theme-noctis-azureus theme-noctis-bordo theme-noctis-hibernus theme-noctis-lilac theme-noctis-lux theme-noctis-minimus theme-noctis-obscuro theme-noctis-sereno theme-noctis-uva theme-noctis-viola theme-nordic theme-one-half-dark theme-one-half-light theme-panda theme-posterpole theme-posterpole-gray theme-seoul256-dark theme-seoul256-light theme-shades-of-purple theme-shades-of-purple-super-dark theme-sonokai theme-sonokai-andromeda theme-sonokai-atlantis theme-sonokai-espresso theme-sonokai-maia theme-sonokai-shusia theme-srcery theme-tender theme-tokyo-night-moon theme-tokyo-night-storm theme-tomorrow theme-tomorrow-night theme-tomorrow-night-blue theme-tomorrow-night-bright theme-tomorrow-night-eighties theme-zenbones-duckbones theme-zenbones-forestbones-dark theme-zenbones-forestbones-light theme-zenbones-kanagawabones theme-zenbones-neobones-dark theme-zenbones-neobones-light theme-zenbones-nordbones theme-zenbones-rosebones-dark theme-zenbones-rosebones-light theme-zenbones-seoulbones-dark theme-zenbones-seoulbones-light theme-zenbones-tokyobones-dark theme-zenbones-tokyobones-light theme-zenbones-vimbones theme-zenbones-zenburned theme-zenbones-zenwritten-dark theme-zenbones-zenwritten-light undo-history reflog lost-work history-rewrite tag-delete settings-quantity conflict-banner merge-editor-card merge-editor merge-editor-full-file home clone clone-hosted clone-hosted-search init tab-picker new-tab workspace-search workspaces workspace-switch workspace-edit radar review-overview review-files local-issues issue-board review-ai lfs-menu)
 
 # --- helpers shared by the shots -------------------------------------------
 seed_config() {
@@ -384,7 +384,7 @@ shot_clone-hosted-search() {
 shot_init()  { screen | grep -qF "OPEN REPOSITORIES" || { esc_all; key ctrl+o; wait_text "OPEN REPOSITORIES"; }; clickt_home Init; wait_text "Initialize in"; shot init; esc; esc; }
 clickt_home() { click_text "$1" 1 1; sleep 0.8; }
 shot_log-graph() {
-  esc_all; click_text "Merge branch 'feat" 1 3; wait_text "Merge branch 'feature/moons'"; shot log-graph
+  esc_all; click_text "Merge branch 'fea" 1 3; wait_text "Merge branch 'feature/moons'"; shot log-graph
 }
 shot_log-columns-menu() {
   esc_all; rclick_text "Author" 1 2; wait_text "Changes"; shot log-columns-menu
@@ -472,14 +472,14 @@ shot_activity-log-repository() {
 }
 shot_compare-cards() {
   restart_tui 'avatars = "graph"'
-  click_text "Merge branch 'feat" 1 3; sleep 0.5
+  click_text "Merge branch 'fea" 1 3; sleep 0.5
   key space; key shift+Down; key shift+Down; sleep 1
   shot compare-cards; esc_all; restart_tui ""
 }
 # Copy as Mermaid gitGraph: three rows selected (as in compare-cards), the
 # popup open on its live preview.
 shot_log-mermaid() {
-  click_text "Merge branch 'feat" 1 3; sleep 0.5
+  click_text "Merge branch 'fea" 1 3; sleep 0.5
   key space; key shift+Down; key shift+Down; sleep 0.5
   key shift+y; wait_text "Copy as Mermaid gitGraph"; sleep 0.8
   shot log-mermaid; esc_all
@@ -511,9 +511,13 @@ settings_tab() {   # General is the strip's first match: it is above the sidebar
   if [ "$1" = General ]; then click_text " General " 1 2; else click_text "General   $1" 1 11; fi; sleep 0.7
 }
 shot_settings()          { settings_open; settings_page "General"; shot settings; }
-shot_settings-launcher() {   # General, scrolled to the Launcher group
-  settings_open; settings_page "General"; local i; for i in 1 2 3 4 5 6; do wheel 100 30 1; done; sleep 0.6
+shot_settings-launcher() {   # the Launcher page (own sidebar entry)
+  settings_open; settings_page "Launcher"; sleep 0.6
   shot settings-launcher
+}
+shot_settings-conflict-prevention() {   # the global Conflict prevention page
+  settings_open; settings_page "Conflict prevention"; sleep 0.6
+  shot settings-conflict-prevention
 }
 shot_settings-search()   { click_text "Search settings" 1 2; text "diff"; sleep 0.8; shot settings-search; esc; esc; }
 shot_settings-profiles() { settings_open; settings_page "Profiles"; settings_tab "Profiles"; shot settings-profiles; }
@@ -689,19 +693,19 @@ shot_tab-picker() {
 shot_theme-serie() {
   restart_tui 'graph_color_theme = "serie"
 graph_lane_background = "row_tint"'
-  click_text "Merge branch 'feat" 1 3; sleep 0.6; shot theme-serie
+  click_text "Merge branch 'fea" 1 3; sleep 0.6; shot theme-serie
 }
 shot_theme-material() {
   restart_tui 'graph_color_theme = "material"
 graph_lane_background = "row_tint"'
-  click_text "Merge branch 'feat" 1 3; sleep 0.6; shot theme-material
+  click_text "Merge branch 'fea" 1 3; sleep 0.6; shot theme-material
   restart_tui ""
 }
 
 # the main window in a whole theme (ui.theme), a merge commit selected
 theme_shot() {
   restart_tui "theme = \"$1\""
-  click_text "Merge branch 'feat" 1 3; sleep 0.8; shot "theme-$1"
+  click_text "Merge branch 'fea" 1 3; sleep 0.8; shot "theme-$1"
 }
 # every built-in preset (the gallery in docs/user/themes.md), registry order
 THEME_SLUGS=(dark light catppuccin-latte catppuccin-mocha cyberpunk dracula

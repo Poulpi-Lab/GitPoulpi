@@ -247,6 +247,8 @@ The global part of proactive conflict detection (`gitpoulpi ui show settings con
 | **Default base branches** | Under the switch. The list of base branch patterns that repositories use when they have none of their own: **Built-in (`**`)**, which is every branch, or one of your named lists (`conflict_prevention.default_list`). It applies to the open repositories when Settings closes. **Reset to built-in default** goes back to `**`. |
 | **Base branch lists** | Also on this page: your named lists of base branch patterns (`[conflict_prevention.lists.<name>]`), one block each with its **Name** (renaming keeps it as the default if it was; a repository that followed the old name uses the default list until you pick the renamed list again), its **Patterns** (one per line, `Enter` or a click opens the editor, `Ctrl+S` keeps it), **Make default** and **Delete list** (it asks first, and says that repositories following it use the default list instead). Type a name in **New list** and press `Enter` to add one; it starts with `**`. Editing a list changes every repository that follows it. |
 
+![Settings > Conflict prevention: the global switch and the default base branches](images/settings-conflict-prevention.png)
+
 ### Synchronization
 
 How GitPoulpi keeps a repository in step with its remotes, and what it does with

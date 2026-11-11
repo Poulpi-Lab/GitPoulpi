@@ -278,6 +278,35 @@ fn our_icos(dirs: &Dirs) -> Vec<PathBuf> {
         .collect()
 }
 
+/// Every `.lnk` Explorer keeps for taskbar pins: `User Pinned\TaskBar` and
+/// the folders (one deep) of `ImplicitAppShortcuts`. Sorted.
+pub(super) fn pinned_lnks(dirs: &Dirs) -> Vec<PathBuf> {
+    fn lnks_in(dir: &Path, out: &mut Vec<PathBuf>) {
+        out.extend(
+            std::fs::read_dir(dir)
+                .into_iter()
+                .flatten()
+                .flatten()
+                .map(|e| e.path())
+                .filter(|p| p.extension().is_some_and(|x| x.eq_ignore_ascii_case("lnk"))),
+        );
+    }
+    let mut out = Vec::new();
+    if let Some(dir) = dirs.taskbar_pinned.as_ref() {
+        lnks_in(dir, &mut out);
+    }
+    if let Some(dir) = dirs.implicit_pinned.as_ref() {
+        lnks_in(dir, &mut out);
+        for sub in std::fs::read_dir(dir).into_iter().flatten().flatten() {
+            if sub.path().is_dir() {
+                lnks_in(&sub.path(), &mut out);
+            }
+        }
+    }
+    out.sort();
+    out
+}
+
 /// Every shortcut that may name one of our icons: the Start menu and Desktop
 /// entries and ALL shortcuts pinned to the taskbar (a pin whose marker
 /// Windows stripped still points at our file, and must not lose it).
@@ -287,16 +316,7 @@ fn icon_holders(dirs: &Dirs) -> Vec<PathBuf> {
         .flatten()
         .map(|d| d.join(FILE))
         .collect();
-    if let Some(pins) = dirs.taskbar_pinned.as_ref() {
-        all.extend(
-            std::fs::read_dir(pins)
-                .into_iter()
-                .flatten()
-                .flatten()
-                .map(|e| e.path())
-                .filter(|p| p.extension().is_some_and(|x| x.eq_ignore_ascii_case("lnk"))),
-        );
-    }
+    all.extend(pinned_lnks(dirs));
     all
 }
 
@@ -393,7 +413,10 @@ pub(super) fn status(place: Place, dirs: &Dirs, req: &Request) -> Status {
     let ico = ico_path(dirs, req.icons);
     let icon_stale = !req.icons.pngs.is_empty()
         && (std::fs::read(&ico).ok().as_deref() != Some(req.icons.ico().as_slice())
-            || !contains_text(&bytes, &ico.to_string_lossy()));
+            || !contains_text(&bytes, &ico.to_string_lossy())
+            // A pinned copy still on the old icon: the Start menu entry may
+            // already be current (an earlier run, the CLI) while the pin is not.
+            || !pinned_to_repoint(dirs, req).is_empty());
     Status {
         state: if current {
             State::Installed
@@ -466,19 +489,12 @@ pub(super) fn install(place: Place, dirs: &Dirs, req: &Request) -> Result<PathBu
 /// our marker (the description survives the copy) or the path of our exe (the
 /// target, or the argument of a terminal's command line). Sorted.
 pub(super) fn pinned_ours(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
-    let Some(dir) = dirs.taskbar_pinned.as_ref() else {
-        return Vec::new();
-    };
     let exes: Vec<String> = exe_spellings(req.exe, req.newest)
         .into_iter()
         .filter(|e| !e.is_empty())
         .collect();
-    let mut found: Vec<PathBuf> = std::fs::read_dir(dir)
+    let mut found: Vec<PathBuf> = pinned_lnks(dirs)
         .into_iter()
-        .flatten()
-        .flatten()
-        .map(|e| e.path())
-        .filter(|p| p.extension().is_some_and(|x| x.eq_ignore_ascii_case("lnk")))
         .filter(|p| {
             std::fs::read(p).is_ok_and(|b| {
                 contains_text(&b, MARKER) || exes.iter().any(|e| contains_text(&b, e))
@@ -521,13 +537,15 @@ pub(super) fn shortcuts_to_repoint(dirs: &Dirs, req: &Request) -> Vec<PathBuf> {
 /// `WScript.Shell` drops the AppUserModelID of a shortcut, so it is written
 /// again after.
 pub(super) fn pinned_script(lnks: &[PathBuf], icon: &Path) -> String {
+    // One shortcut that cannot be saved (locked, read-only) must not stop the
+    // others nor the notification: each is its own `try`.
     let mut s = String::from("$ErrorActionPreference = 'Stop'\n");
     if !lnks.is_empty() {
         s.push_str("$sh = New-Object -ComObject WScript.Shell\n");
     }
     for lnk in lnks {
         s.push_str(&format!(
-            "$p = $sh.CreateShortcut({lnk})\n$p.IconLocation = {icon}\n$p.Save()\n",
+            "try {{ $p = $sh.CreateShortcut({lnk}); $p.IconLocation = {icon}; $p.Save() }} catch {{ }}\n",
             lnk = ps_quote(&lnk.to_string_lossy()),
             icon = ps_quote(&format!("{},0", icon.to_string_lossy())),
         ));
@@ -546,6 +564,8 @@ const NOTIFY_ASSOC: &str =
     "[Gp.Shell]::SHChangeNotify(0x08000000, 0, [IntPtr]::Zero, [IntPtr]::Zero)\n";
 /// `SHCNE_UPDATEITEM` and `SHCNF_PATHW` (shlobj_core.h).
 const SHCNE_UPDATEITEM: u32 = 0x0000_2000;
+/// `SHCNE_UPDATEDIR`: the folder of a pinned shortcut changed.
+const SHCNE_UPDATEDIR: u32 = 0x0000_1000;
 const SHCNF_PATHW: u32 = 0x0005;
 
 /// The PowerShell that notifies the shell of `lnks` (updated items) and, when
@@ -559,6 +579,15 @@ fn notify_script(lnks: &[PathBuf], assoc: bool) -> String {
         s.push_str(&format!(
             "[Gp.Shell]::SHChangeNotifyPath({SHCNE_UPDATEITEM:#x}, {SHCNF_PATHW:#x}, {lnk}, [IntPtr]::Zero)\n",
             lnk = ps_quote(&lnk.to_string_lossy()),
+        ));
+    }
+    let mut dirs: Vec<&Path> = lnks.iter().filter_map(|l| l.parent()).collect();
+    dirs.sort();
+    dirs.dedup();
+    for dir in dirs {
+        s.push_str(&format!(
+            "[Gp.Shell]::SHChangeNotifyPath({SHCNE_UPDATEDIR:#x}, {SHCNF_PATHW:#x}, {dir}, [IntPtr]::Zero)\n",
+            dir = ps_quote(&dir.to_string_lossy()),
         ));
     }
     if assoc {
@@ -941,6 +970,56 @@ mod tests {
             s.find("Add-Type -Namespace Gp").unwrap() < s.find("SHChangeNotifyPath(0x").unwrap()
         );
         assert!(!pinned_script(&[], Path::new("x.ico")).contains("SHChangeNotifyPath(0x"));
+    }
+
+    #[test]
+    fn implicit_app_shortcuts_count_as_pins_and_a_stale_pin_makes_the_icon_stale() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dirs = pinned_dirs(tmp.path());
+        let implicit = tmp.path().join("Implicit");
+        dirs.implicit_pinned = Some(implicit.clone());
+        let sub = implicit.join("ab12");
+        std::fs::create_dir_all(&sub).unwrap();
+        std::fs::create_dir_all(dirs.taskbar_pinned.as_ref().unwrap()).unwrap();
+        let exe = PathBuf::from(r"C:\gp\gitpoulpi.exe");
+        let icons = icon_set(1);
+        let r = req(&exe, "console", &icons);
+        std::fs::write(
+            sub.join("GitPoulpi.lnk"),
+            utf16(&format!("{MARKER} C:\\old.ico")),
+        )
+        .unwrap();
+        std::fs::write(sub.join("Other.lnk"), utf16("notepad")).unwrap();
+        assert_eq!(pinned_ours(&dirs, &r), [sub.join("GitPoulpi.lnk")]);
+        assert_eq!(pinned_lnks(&dirs).len(), 2);
+        // The Start menu entry already names the current icon, the pin does not.
+        let start = tmp.path().join("Start");
+        std::fs::create_dir_all(&start).unwrap();
+        dirs.start_menu = Some(start.clone());
+        let ico = ico_path(&dirs, &icons);
+        write_icon(&dirs, &r).unwrap();
+        std::fs::write(
+            start.join(FILE),
+            utf16(&format!("{MARKER} {}", ico.display())),
+        )
+        .unwrap();
+        assert!(status(Place::StartMenu, &dirs, &r).icon_stale);
+        std::fs::write(
+            sub.join("GitPoulpi.lnk"),
+            utf16(&format!("{MARKER} {}", ico.display())),
+        )
+        .unwrap();
+        assert!(!status(Place::StartMenu, &dirs, &r).icon_stale);
+    }
+
+    #[test]
+    fn one_unsaveable_pin_does_not_stop_the_others_or_the_notification() {
+        let a = PathBuf::from("C:/u/Pins/A.lnk");
+        let b = PathBuf::from("C:/u/Pins/B.lnk");
+        let s = pinned_script(&[a, b], Path::new("x.ico"));
+        assert_eq!(s.matches("try { $p = $sh.CreateShortcut(").count(), 2);
+        assert!(s.contains(r"SHChangeNotifyPath(0x1000, 0x5, 'C:/u/Pins', [IntPtr]::Zero)"));
+        assert!(s.contains("SHChangeNotify(0x08000000"));
     }
 
     #[test]

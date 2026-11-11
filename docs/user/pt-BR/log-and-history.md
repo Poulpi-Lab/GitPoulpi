@@ -62,7 +62,7 @@ redimensionar uma coluna; a escolha é lembrada, em células do terminal. Com o 
 outras colunas mantêm a largura quando a janela é redimensionada ou maximizada: só a
 **Mensagem** cresce ou encolhe (em uma janela muito estreita as outras colunas cedem
 temporariamente, o Grafo primeiro, e voltam às suas larguras quando a janela volta a
-crescer). Arraste o Grafo até a largura mínima, um ponto de commit, e o grafo fica compacto: todos os commits em uma única faixa, um sob o outro, sem linhas de branch nem de merge. Uma célula a mais e a árvore volta. Com as imagens dos autores nos círculos dos commits (Configurações > Log e grafo > Avatares: grafo), o círculo ocupa duas células, então a coluna para uma célula antes (três células) e nunca corta uma imagem.
+crescer). Arraste o Grafo até a largura mínima, um ponto de commit, e o grafo fica compacto: todos os commits em uma única faixa, um sob o outro, sem linhas de branch nem de merge. Uma célula a mais e a árvore volta. Com as imagens dos autores nos círculos dos commits (Configurações > Aparência > Avatares: grafo), o círculo ocupa duas células, então a coluna para uma célula antes (três células) e nunca corta uma imagem.
 
 Arrastar um cabeçalho mostra um fantasma do nome dele seguindo o ponteiro e uma barra de destaque onde a coluna cairia; a ordem muda ao soltar, e `Esc` cancela. O seletor aberto pelo clique direito é uma lista de verificação (`[x]` / `[ ]`) com um ✕ no título; ele também se abre pela paleta (`Exibir: Log: escolher as colunas a mostrar`), percorre-se com as setas e alterna-se com `Space` / `Enter`.
 

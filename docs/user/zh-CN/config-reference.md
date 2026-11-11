@@ -88,6 +88,7 @@ author_email = "jane@work.example"
 | `ui.graph_row_tint_strength` | `"medium"` | `strong`、`medium`、`subtle`（仅配合 `row_tint`）。 |
 | `ui.toolbar_position` | `"bottom"` | `top`、`bottom`、`left`、`right`。`left` 和 `right` 绘制为一列；窗口窄于 80 列时回退为 `bottom`。 |
 | `ui.toolbar_align` | `"start"` | `start`、`center`、`end`：按钮在工具栏上的位置（一行的左、中、右；一列的上、中、下）。 |
+| `ui.dialog_geometry` | `"session"` | `session`、`saved`、`never`：你移动或调整过大小的对话框（拖动标题栏或边框，或按 `Ctrl+N m`）是否保持其位置：保持到 GitPoulpi 关闭（默认）、保存在磁盘上留到下次启动（数据文件夹中的 `dialog_geometry.txt`），或完全不保持。 |
 | `ui.toolbar_pr_pinned` | `true` | 拉取请求按钮固定在工具栏的最末端；`false` 则让它与其他按钮一起排列。 |
 | `ui.statusbar_position` | `"bottom"` | `top`（仓库标签页上方）或 `bottom`。 |
 | `ui.tabs_position` | `"top"` | `top`、`bottom`（窗口最后一行，位于状态栏下方）或 `left`（左边缘的一列；窄于 80 列时仍在顶部）。 |
@@ -158,10 +159,10 @@ author_email = "jane@work.example"
 | `ui.terminal_launch_command` | `""` | `custom` 模板；`{repo}` 是文件夹。 |
 | `ui.open_in` | *（不存在）* | [打开方式](open-in.md)列表，由表组成的数组 `[[ui.open_in]]`，含 `label` 和 `command`。不存在表示“尚未配置”：列表由旧的 `ui.terminal_launch*` 键（非 `auto` 的值会成为第一项）、操作系统的文件管理器、从环境中检测到的多路复用器和终端（herdr、tmux、zellij、WezTerm、kitty、Windows Terminal 等）以及 `PATH` 上找到的编辑器计算得出。首次从设置保存时会写入该列表。`open_in = []` 是空列表。无法用 `config set` 设置（请编辑文件）。 |
 | `ui.open_in_default` | `""` | “用默认方式打开”所运行条目的标签；留空或未知表示第一项。 |
-| `ui.launch_terminal` | `"auto"` | 桌面快捷方式（设置 > 常规 > 启动器）和 Windows 上的重新打开用来启动 GitPoulpi 的终端。`auto` 从已安装的终端中选择（Windows：Windows Terminal，否则依次为 WezTerm、Alacritty、普通控制台；Linux：`xdg-terminal-exec`，否则为找到的第一个终端；macOS：如果安装了 iTerm2、Ghostty、WezTerm 或 kitty 则使用它，否则使用 Terminal），`default` 为系统自身的默认终端，也可以是终端 ID，例如 `windows-terminal`、`wezterm`、`alacritty`、`console`、`kitty`、`foot`、`ghostty`、`gnome-terminal`、`konsole`、`iterm`、`apple-terminal`。 |
+| `ui.launch_terminal` | `"auto"` | 桌面快捷方式（设置 > 启动器）和 Windows 上的重新打开用来启动 GitPoulpi 的终端。`auto` 从已安装的终端中选择（Windows：Windows Terminal，否则依次为 WezTerm、Alacritty、普通控制台；Linux：`xdg-terminal-exec`，否则为找到的第一个终端；macOS：如果安装了 iTerm2、Ghostty、WezTerm 或 kitty 则使用它，否则使用 Terminal），`default` 为系统自身的默认终端，也可以是终端 ID，例如 `windows-terminal`、`wezterm`、`alacritty`、`console`、`kitty`、`foot`、`ghostty`、`gnome-terminal`、`konsole`、`iterm`、`apple-terminal`。 |
 | `ui.launcher_build` | `"current"` | 仅限开发模式（见 `general.dev_mode`；只有这时才在设置 > 启动器中显示，否则会被忽略）。`"current"`：快捷方式和命令别名启动创建它们的那个构建。`"newest"`：它们启动检出目录中 `target/dist` 和 `target/release` 里最近构建的那一个，每次点击时决定，并且启动任何一个构建都不会改写它们。 |
-| `ui.command_alias` | `""` | 在终端中启动 GitPoulpi 的命令名称，例如 `gp`（设置 > 常规 > 启动器，`gitpoulpi alias create`）。留空：无。只能使用字母、数字、`-`、`_` 和 `.`。它只是 **创建：命令别名** 按钮所用的名称；在你创建之前什么都不存在。 |
-| `ui.command_alias_add` | `""` | 第二个命令的名称，例如 `gpa`，它运行 `gitpoulpi --add`：把当前文件夹作为新标签页在已运行的 GitPoulpi 中打开（设置 > 常规 > 启动器，`gitpoulpi alias create gpa --add`）。留空：无。名称规则相同；由 **创建** 按钮与 `ui.command_alias` 一起创建。 |
+| `ui.command_alias` | `""` | 在终端中启动 GitPoulpi 的命令名称，例如 `gp`（设置 > 启动器，`gitpoulpi alias create`）。留空：无。只能使用字母、数字、`-`、`_` 和 `.`。它只是 **创建：命令别名** 按钮所用的名称；在你创建之前什么都不存在。 |
+| `ui.command_alias_add` | `""` | 第二个命令的名称，例如 `gpa`，它运行 `gitpoulpi --add`：把当前文件夹作为新标签页在已运行的 GitPoulpi 中打开（设置 > 启动器，`gitpoulpi alias create gpa --add`）。留空：无。名称规则相同；由 **创建** 按钮与 `ui.command_alias` 一起创建。 |
 | `ui.relaunch_in_terminal` | `true` | 仅限 Windows：当 exe 通过双击在自己的控制台中启动时，GitPoulpi 会在 `ui.launch_terminal` 中重新打开并退出。关闭：留在该控制台中。 |
 | `ui.reuse_window` | `true` | 点击 GitPoulpi 快捷方式（`gitpoulpi launch`）时，显示已打开的 GitPoulpi 的窗口，而不是再启动一个。 关闭：每次点击都会启动新窗口。 |
 
@@ -445,7 +446,7 @@ ANTHROPIC_API_KEY = "${env:ANTHROPIC_API_KEY}"   # ${env:NAME} = one of GitPoulp
 
 ## `[conflict_prevention]`（基础分支列表）
 
-主动冲突检测可以把哪些分支当作当前分支的基础分支，是一个模式列表（参见[解决 merge 冲突](merge-conflicts.md#冲突预防)）。列表可以命名并共享；设置 > 常规 > 冲突预防 可编辑它们。
+主动冲突检测可以把哪些分支当作当前分支的基础分支，是一个模式列表（参见[解决 merge 冲突](merge-conflicts.md#冲突预防)）。列表可以命名并共享；设置 > 冲突预防 可编辑它们。
 
 | 键 | 默认值 | 取值和效果 |
 |---|---|---|

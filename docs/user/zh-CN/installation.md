@@ -50,7 +50,7 @@ gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoul
 
 ## 使用安装程序
 
-每个发布版本还为各个系统提供了安装程序。两者做出的选择相同（快捷方式、PATH、`gp` 之类的命令别名），都是调用已安装的 `gitpoulpi` 本身来完成，也就是“设置 > 常规 > 启动器”背后的那段代码，所以安装程序设置的内容与设置界面显示的内容始终一致。
+每个发布版本还为各个系统提供了安装程序。两者做出的选择相同（快捷方式、PATH、`gp` 之类的命令别名），都是调用已安装的 `gitpoulpi` 本身来完成，也就是“设置 > 启动器”背后的那段代码，所以安装程序设置的内容与设置界面显示的内容始终一致。
 
 ### Windows：`gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
 
@@ -109,7 +109,7 @@ curl -fsSL https://github.com/Poulpi-Lab/GitPoulpi/releases/latest/download/inst
 
 上面的名称是发布流程所发布到的名称（见[发布](../../developer/releasing.md)）：尚未上线的通道会回答“not found”，而发布压缩包或安装程序始终可用。
 
-包管理器自己的 PATH 处理会生效：Chocolatey、winget、Scoop 和 Homebrew 会自己把程序放进 PATH，而且它们都不会创建 `gp` 别名（请运行 `gitpoulpi alias create gp`，或使用设置 > 常规 > 启动器）。
+包管理器自己的 PATH 处理会生效：Chocolatey、winget、Scoop 和 Homebrew 会自己把程序放进 PATH，而且它们都不会创建 `gp` 别名（请运行 `gitpoulpi alias create gp`，或使用设置 > 启动器）。
 
 ### apt（Debian 和 Ubuntu）
 

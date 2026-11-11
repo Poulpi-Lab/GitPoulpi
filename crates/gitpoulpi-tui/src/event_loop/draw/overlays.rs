@@ -561,7 +561,10 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
             + 2;
         let area_w = u32::from(frame.area().width.max(1));
         let needed_pct = ((buttons_w as u32 + 4) * 100).div_ceil(area_w).min(100) as u16;
-        let popup = CONFIRM_WIN.place(frame.area(), centered_rect(needed_pct.max(44), 18, frame.area()));
+        let popup = CONFIRM_WIN.place(
+            frame.area(),
+            centered_rect(needed_pct.max(44), 18, frame.area()),
+        );
         frame.render_clipped(Clear, popup);
         frame.render_clipped(
             Block::default()

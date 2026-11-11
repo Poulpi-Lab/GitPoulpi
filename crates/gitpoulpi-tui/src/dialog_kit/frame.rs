@@ -1004,7 +1004,10 @@ mod tests {
         assert_ne!(a2, want());
         assert_eq!(o2.width, 61);
         let text = std::fs::read_to_string(&file).unwrap();
-        assert!(text.contains("t_big ") && text.contains("t_other "), "{text}");
+        assert!(
+            text.contains("t_big ") && text.contains("t_other "),
+            "{text}"
+        );
         // A new launch: the map starts empty, the file restores both.
         STORE.with(|s| *s.borrow_mut() = None);
         assert_eq!(BIG.place(SCREEN, want()), a2);
@@ -1013,7 +1016,10 @@ mod tests {
         show(OTHER, other_want());
         assert!(reset_top());
         let text = std::fs::read_to_string(&file).unwrap();
-        assert!(text.contains("t_big ") && !text.contains("t_other "), "{text}");
+        assert!(
+            text.contains("t_big ") && !text.contains("t_other "),
+            "{text}"
+        );
         let _ = std::fs::remove_dir_all(&dir);
         fresh();
     }

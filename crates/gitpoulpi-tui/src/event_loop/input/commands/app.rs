@@ -269,14 +269,18 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             *cx.last_message = Some(if crate::dialog_kit::frame::arrange_top() {
                 gitpoulpi_i18n::msg::dialog_frame::ARRANGING.get().into()
             } else {
-                gitpoulpi_i18n::msg::dialog_frame::WHY_NO_DIALOG.get().into()
+                gitpoulpi_i18n::msg::dialog_frame::WHY_NO_DIALOG
+                    .get()
+                    .into()
             });
         }
         PaletteCommand::Safety(crate::safety_panel::SafetyCmd::ResetDialog) => {
             *cx.last_message = Some(if crate::dialog_kit::frame::reset_top() {
                 gitpoulpi_i18n::msg::dialog_frame::RESET_DONE.get().into()
             } else {
-                gitpoulpi_i18n::msg::dialog_frame::WHY_NO_DIALOG.get().into()
+                gitpoulpi_i18n::msg::dialog_frame::WHY_NO_DIALOG
+                    .get()
+                    .into()
             });
         }
         PaletteCommand::Safety(cmd) => {

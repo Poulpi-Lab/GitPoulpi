@@ -631,7 +631,7 @@ impl RewriteView {
                 crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::AiClose))
             {
                 WIN_SCRIPT_AI.decorate(buf, rect, Some(cross), true);
-            hits.push((cross, RewriteHit::AiClose));
+                hits.push((cross, RewriteHit::AiClose));
             }
             dialog_kit::put(
                 buf,

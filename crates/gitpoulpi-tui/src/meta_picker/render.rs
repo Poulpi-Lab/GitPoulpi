@@ -41,8 +41,7 @@ impl MetaPicker {
         self.edit.begin_frame();
         let rect = self.rect_in(area);
         self.frame = rect;
-        self.close
-            .framed(buf, rect, self.field.title(), &WIN, true);
+        self.close.framed(buf, rect, self.field.title(), &WIN, true);
         let mut hits: Vec<(Rect, Hit)> = Vec::new();
         let inner = Rect::new(
             rect.x + 2,

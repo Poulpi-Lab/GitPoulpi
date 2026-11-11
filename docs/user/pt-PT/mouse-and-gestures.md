@@ -455,7 +455,7 @@ As janelas podem ser movidas, e as janelas maiores redimensionadas:
 - O arrasto continua quando o ponteiro sai da janela, e largar fora nunca a fecha.
 - **Arraste os divisores** dentro da vista Reflog / Trabalho perdido do Histórico de desfazer; faça duplo clique num para o repor.
 - Os equivalentes de teclado são `Ctrl+N` e depois `m` (as setas movem, `Shift`+setas redimensionam, `0` repõe, `Enter` ou `Esc` saem) e `Alt`+setas para os divisores; a paleta tem `Janela: mover ou redimensionar` e `Janela: repor posição e tamanho`. Atuam sobre a janela de cima. As superfícies que usam `Ctrl+N` para os seus próprios distintivos (o formulário da mensagem de commit, a página de reescrita do histórico) aceitam o mesmo `m` depois do seu `Ctrl+N`, e a linha de estado indica-o. A paleta de comandos e os seletores usam `Ctrl+N` para descer na lista, por isso a tecla é `Alt+G` (`palette.arrange`), ou a própria linha `Janela: mover ou redimensionar` da paleta: ambas dispõem o popup da frente e deixam-no aberto.
-- **Uma única definição** (`ui.dialog_geometry`, Definições > Aspeto) cobre todas as janelas: cada uma memoriza o seu próprio lugar e tamanho nesta sessão, em disco para o próximo arranque, ou nunca.
+- **Uma única definição** (`ui.dialog_geometry`, Definições > Aspeto > Disposição) cobre todas as janelas: cada uma memoriza o seu próprio lugar e tamanho nesta sessão, em disco para o próximo arranque, ou nunca.
 
 | Janela | Mover | Redimensionar |
 |---|---|---|

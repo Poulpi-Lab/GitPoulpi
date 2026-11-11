@@ -415,6 +415,18 @@ Les touches des champs de texte sont dans [Raccourcis clavier](keybindings.md).
 
 Voir [Images](image-view.md) pour la souris dans la vue image.
 
+## Déplacer et redimensionner les boîtes
+
+La boîte Historique d'annulation / Reflog / Travail perdu peut être déplacée et redimensionnée :
+
+- **Glissez la barre de titre** pour la déplacer (la croix de fermeture garde son clic).
+- **Glissez la bordure gauche, droite ou basse**, ou un coin du bas (la poignée `◢`), pour la redimensionner. La boîte reste à l'écran et ne devient jamais plus petite que 60 x 16.
+- Le glisser continue quand le pointeur sort de la boîte, et relâcher à l'extérieur ne la ferme jamais.
+- **Glissez les séparateurs** entre sa liste, sa liste de fichiers et ses hunks ; double-cliquez-en un pour le réinitialiser.
+- Les équivalents clavier sont `Ctrl+N` puis `m` (les flèches déplacent, `Shift`+flèches redimensionnent, `0` réinitialise, `Enter` ou `Esc` quittent) et `Alt`+flèches pour les séparateurs ; la palette a `Dialogue : Déplacer/redimensionner` et `Dialogue : Réinitialiser la position et la taille`.
+
+Le pointeur prend une forme de déplacement sur la barre de titre et une forme de redimensionnement sur les bordures et les coins (terminaux avec `OSC 22`).
+
 ## Forme du pointeur de la souris
 
 Certains terminaux laissent GitPoulpi changer le pointeur de la souris : un pointeur

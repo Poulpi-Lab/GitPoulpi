@@ -2312,7 +2312,7 @@ nav_prefix_global_log = "Ouvrir le journal d'activité global"
 nav_prefix_jobs = "Afficher les tâches en arrière-plan"
 nav_prefix_updates = "Afficher le panneau de mise à jour"
 # context: name of the key after Ctrl+N that moves or resizes the open dialog from the keyboard
-nav_prefix_arrange_dialog = "Disposer le dialogue ouvert (déplacer, redimensionner)"
+nav_prefix_arrange_dialog = "Disposer le dialogue (déplacer, taille)"
 nav_prefix_help = "Afficher ou masquer l'aide"
 nav_prefix_select_tab = "Sélectionner un onglet"
 nav_prefix_change_theme = "Changer de thème"

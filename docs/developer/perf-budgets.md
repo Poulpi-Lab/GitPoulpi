@@ -180,3 +180,7 @@ Baseline: release, 2026-10-03, Linux, load average 6-13 (other builds running), 
 Already fine and left alone: the three panes' paint walks only build the visible rows (since S5), `side_changes` is computed once per document, and the alignment is computed once at open.
 
 Rerunning on a different machine: the daemon budgets scale with the spawn floor, the TUI ones do not. On Windows, treat a first failure as a prompt to re-baseline here, not as proof of a regression.
+
+## Trap: keep-alive pins in a packed repository (system backend)
+
+`update_refs` writes undo pins as loose ref files without a process, but only when it can tell the object exists without one. It used to check loose objects only, so in a repository whose objects are packed (a `gc`, a clone, the perf fixture's fast-import) an unstage's pin (the "after" tree is HEAD's own, packed) fell back to `git update-ref`: stage/unstage file 2 spawns instead of 1, stage all 3 instead of 2, unstage all 2 instead of 1. `journal_ops::in_a_pack` now looks the id up in the pack indexes (seek-based binary search, no process). Guard: `gitpoulpi-daemon/tests/spawn_budget.rs::staging_in_a_packed_repository_costs_one_spawn` (repacks the fixture first; falsified by disabling the lookup). The existing daemon spawn tests ran on loose-object fixtures and could not see it.

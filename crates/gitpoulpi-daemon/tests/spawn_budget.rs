@@ -823,6 +823,55 @@ async fn spawns(
     total_spawn_count() - before
 }
 
+/// A repository whose objects live in a pack (after a `gc`, a clone, a
+/// fast-import) stages and unstages for the one `add` / `restore`: an
+/// unstage's "after" index tree is HEAD's own, which is packed, and the
+/// keep-alive pin for it must still be written without `update-ref`.
+#[tokio::test]
+async fn staging_in_a_packed_repository_costs_one_spawn() {
+    let sb = SpawnBudget::serial(total_spawn_count);
+    std::env::set_var("GITPOULPI_GENERAL_JOURNAL_OUTSIDE", "false");
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit_file("a.txt", "one\n", "first")
+        .unwrap()
+        .commit_file("b.txt", "bee\n", "second")
+        .unwrap()
+        .build();
+    let packed = std::process::Command::new("git")
+        .current_dir(repo.root())
+        .args(["repack", "-a", "-d", "-q"])
+        .status()
+        .unwrap();
+    assert!(packed.success());
+    let repo_ref = repo.repo_ref();
+    let backend: Arc<dyn gitpoulpi_core::GitBackend> = Arc::new(SystemGitBackend::new());
+    let handle = Daemon::new("spawn-budget").spawn(backend).await.unwrap();
+    let mut client = Client::connect(&handle.endpoint()).await.unwrap();
+    let id = &repo_ref.id;
+    call(
+        &mut client,
+        1,
+        id,
+        OperationKind::Status,
+        serde_json::json!({}),
+    )
+    .await;
+    std::fs::write(repo.root().join("a.txt"), "edited a\n").unwrap();
+    let file = serde_json::json!({ "target": StageTarget::File("a.txt".into()) });
+    let all = serde_json::json!({ "target": "All" });
+    let n = spawns(&mut client, id, OperationKind::StageFile, file.clone()).await;
+    assert_eq!(n, 1, "StageFile in a packed repository");
+    let n = spawns(&mut client, id, OperationKind::UnstageFile, file).await;
+    assert_eq!(n, 1, "UnstageFile in a packed repository");
+    let n = spawns(&mut client, id, OperationKind::StageAll, all.clone()).await;
+    assert!(n <= 2, "StageAll in a packed repository: {n}");
+    let n = spawns(&mut client, id, OperationKind::UnstageAll, all).await;
+    assert_eq!(n, 1, "UnstageAll in a packed repository");
+    drop(sb);
+    handle.shutdown().await.unwrap();
+}
+
 /// What recording each history-moving operation
 /// adds to the system backend's spawns: a heads-only ref snapshot before
 /// and after, plus the pin (a merge, revert or cherry-pick journaled costs

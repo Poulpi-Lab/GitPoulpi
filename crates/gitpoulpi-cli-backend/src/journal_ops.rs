@@ -490,13 +490,14 @@ fn write_pins_directly(repo: &RepoRef, updates: &[RefUpdate]) -> bool {
         return false;
     };
     // `git update-ref` refuses an id the repository does not have; a file
-    // written here would not. Only a loose object is checked without a
-    // process: anything else (packed, in an alternate, missing) takes the
-    // `update-ref` path, which verifies it.
+    // written here would not. A loose object or one listed by a pack index
+    // is checked without a process (an unstage's "after" tree is usually
+    // HEAD's own, packed after a `gc`): anything else (in an alternate,
+    // missing) takes the `update-ref` path, which verifies it.
     let objects = root.join("objects");
     if creates.iter().any(|(_, oid)| {
         let hex = oid.to_string();
-        !objects.join(&hex[..2]).join(&hex[2..]).is_file()
+        !objects.join(&hex[..2]).join(&hex[2..]).is_file() && !in_a_pack(&objects, oid)
     }) {
         return false;
     }
@@ -521,6 +522,73 @@ fn write_pins_directly(repo: &RepoRef, updates: &[RefUpdate]) -> bool {
         }
     }
     true
+}
+
+/// Whether some pack index of `objects/pack` lists `oid` (idx version 2:
+/// 8-byte header, 256-entry fanout, then the sorted 20-byte names). An
+/// unreadable or unknown index counts as "not found", which only costs the
+/// `update-ref` process that would have run anyway.
+fn in_a_pack(objects: &std::path::Path, oid: &Oid) -> bool {
+    let Some(want) = hex_bytes(&oid.to_string()) else {
+        return false;
+    };
+    let Ok(dir) = std::fs::read_dir(objects.join("pack")) else {
+        return false;
+    };
+    dir.flatten()
+        .filter(|e| e.path().extension().is_some_and(|x| x == "idx"))
+        .any(|e| {
+            std::fs::File::open(e.path())
+                .ok()
+                .and_then(|mut f| idx_lists(&mut f, &want))
+                .unwrap_or(false)
+        })
+}
+
+fn hex_bytes(hex: &str) -> Option<Vec<u8>> {
+    if hex.len() != 40 {
+        return None;
+    }
+    (0..hex.len())
+        .step_by(2)
+        .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).ok())
+        .collect()
+}
+
+/// Binary search of one idx file by seeking: only the 1 KB header and
+/// about log2(n) 20-byte names are read, never the whole index.
+fn idx_lists(file: &mut std::fs::File, want: &[u8]) -> Option<bool> {
+    use std::io::{Read, Seek, SeekFrom};
+    const FANOUT: u64 = 8;
+    let mut head = [0u8; 8 + 1024];
+    file.read_exact(&mut head).ok()?;
+    if head[..8] != [0xff, b't', b'O', b'c', 0, 0, 0, 2] {
+        return None;
+    }
+    let fan = |i: usize| -> u64 {
+        let o = FANOUT as usize + i * 4;
+        u64::from(u32::from_be_bytes([
+            head[o],
+            head[o + 1],
+            head[o + 2],
+            head[o + 3],
+        ]))
+    };
+    let first = want[0] as usize;
+    let (mut lo, mut hi) = (if first == 0 { 0 } else { fan(first - 1) }, fan(first));
+    let names = FANOUT + 1024;
+    while lo < hi {
+        let mid = (lo + hi) / 2;
+        let mut name = [0u8; 20];
+        file.seek(SeekFrom::Start(names + mid * 20)).ok()?;
+        file.read_exact(&mut name).ok()?;
+        match name.as_slice().cmp(want) {
+            std::cmp::Ordering::Equal => return Some(true),
+            std::cmp::Ordering::Less => lo = mid + 1,
+            std::cmp::Ordering::Greater => hi = mid,
+        }
+    }
+    Some(false)
 }
 
 /// Releases pin refs as loose ref files, when `updates` is nothing but

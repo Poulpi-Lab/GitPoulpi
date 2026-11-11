@@ -265,13 +265,21 @@ fn bottom_tabs_are_the_last_row_and_every_interaction_works() {
     // Drag orbit onto comet's place.
     let (ox, _) = wait_tab(&mut term, "orbit", false, bar_row);
     let (cx, _) = wait_tab(&mut term, "comet", false, bar_row);
-    term.press(ox + 1, bar_row).unwrap();
-    term.drag_to(ox + 5, bar_row).unwrap();
-    term.drag_to(cx + 8, bar_row).unwrap();
-    term.wait_for("the insertion marker", STEP, |s| {
-        s.line(bar_row).contains('\u{2503}')
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // A press that lands on a torn frame starts no drag: release and start
+    // over until the marker shows.
+    common::retry_until(
+        &mut term,
+        "the insertion marker",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            t.release(cx + 8, bar_row).unwrap();
+            t.press(ox + 1, bar_row).unwrap();
+            t.drag_to(ox + 5, bar_row).unwrap();
+            t.drag_to(cx + 8, bar_row).unwrap();
+        },
+        |s| s.line(bar_row).contains('\u{2503}'),
+    );
     term.release(cx + 8, bar_row).unwrap();
     let deadline = std::time::Instant::now() + STEP;
     while order(&fx) != ["moonbase", "comet", "orbit"] && std::time::Instant::now() < deadline {
@@ -399,13 +407,21 @@ fn left_tabs_are_a_column_and_every_interaction_works() {
     // Drag orbit down onto comet's row: the marker shows, the drop reorders.
     let (ox, or) = wait_tab(&mut term, "orbit", true, 0);
     let (_, cr) = wait_tab(&mut term, "comet", true, 0);
-    term.press(ox + 1, or).unwrap();
-    term.drag_to(ox + 1, or + 1).unwrap();
-    term.drag_to(ox + 3, cr).unwrap();
-    term.wait_for("the insertion marker", STEP, |s| {
-        (1..ROWS - 1).any(|r| s.line(r).chars().nth(1) == Some('\u{2501}'))
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // A press that lands on a torn frame starts no drag: release and start
+    // over until the marker shows.
+    common::retry_until(
+        &mut term,
+        "the insertion marker",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            t.release(ox + 3, cr).unwrap();
+            t.press(ox + 1, or).unwrap();
+            t.drag_to(ox + 1, or + 1).unwrap();
+            t.drag_to(ox + 3, cr).unwrap();
+        },
+        |s| (1..ROWS - 1).any(|r| s.line(r).chars().nth(1) == Some('\u{2501}')),
+    );
     term.release(ox + 3, cr).unwrap();
     let deadline = std::time::Instant::now() + STEP;
     while order(&fx) != ["moonbase", "comet", "orbit"] && std::time::Instant::now() < deadline {

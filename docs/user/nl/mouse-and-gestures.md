@@ -36,7 +36,7 @@ Elk venster met een kader en elke dialoog heeft rechtsboven in de rand een `✕`
 - **Klik buiten** een dialoog, een hulp- of infopaneel of een pop-up om die te sluiten. Een klik buiten sluit nooit een volledige weergave (Instellingen, de Diff-weergave, de Bestandsweergave, de editors, Review, Board): die hebben geen buitenkant.
 - Een klik **binnen** een paneel sluit het nooit.
 - Een formulier met tekst die je hebt getypt (een nieuw issue, een pull of merge request) negeert een klik buiten, zodat een verdwaalde klik niets kwijtraakt. `✕` en `Esc` vragen eerst **Wijzigingen verwerpen?**; met **Verder bewerken** ga je terug. Een formulier waarin niets is getypt sluit meteen, en een dialoog met één regel ook.
-- Menu's, keuzelijsten, het palet en kiezers hebben geen `✕`: ze sluiten met `Esc` of een klik buiten.
+- Het opdrachtpalet, de kiezers (tab, thema, taal), de kleine review-, board-, merge- en composerdialogen en de bevestigingsvraag hebben ook een `✕`. Contextmenu's en keuzelijsten hebben er geen: ze sluiten met `Esc` of een klik buiten.
 
 ## Lijsten in de Instellingen
 
@@ -396,13 +396,32 @@ Zie [Afbeeldingen](image-view.md) voor de muis in de afbeeldingsweergave.
 
 ## Dialogen verplaatsen en schalen
 
-Het dialoog Geschiedenis van ongedaan maken / Reflog / Verloren werk kan worden verplaatst en geschaald:
+Dialogen kunnen worden verplaatst en de grotere vensters geschaald:
 
-- **Sleep de titelbalk** om het te verplaatsen (het sluitkruis houdt zijn klik).
-- **Sleep de linker-, rechter- of onderrand**, of een onderhoek (het `◢`-handvat), om het te schalen. Het dialoog blijft op het scherm en wordt nooit kleiner dan 60 x 16.
+- **Sleep de titelbalk** om een dialoog te verplaatsen (het sluitkruis houdt zijn klik). Het opdrachtpalet en de kiezers hebben geen aparte titelbalk: sleep de bovenrand.
+- **Sleep de linker-, rechter- of onderrand**, of een onderhoek (het `◢`-handvat), om een venster te schalen. Het dialoog blijft op het scherm en wordt nooit kleiner dan zijn minimum (60 x 16 voor de Geschiedenis van ongedaan maken, kleiner voor de andere). Een geschaald venster gebruikt de ruimte: tekstvelden en lijsten groeien, tekst loopt door op de nieuwe breedte.
 - De sleepbeweging gaat door als de aanwijzer het dialoog verlaat, en loslaten erbuiten sluit het nooit.
-- **Sleep de scheidingen** tussen de lijst, de bestandslijst en de hunks; dubbelklik op een scheiding om hem te herstellen.
-- De toetsenbordtegenstukken zijn `Ctrl+N` en dan `m` (pijlen verplaatsen, `Shift`+pijlen schalen, `0` herstelt, `Enter` of `Esc` verlaat de modus) en `Alt`+pijlen voor de scheidingen; het palet heeft `Dialoog: Verplaatsen of schalen` en `Dialoog: Positie en grootte herstellen`.
+- **Sleep de scheidingen** binnen de weergave Reflog / Verloren werk van de Geschiedenis van ongedaan maken; dubbelklik op een scheiding om hem te herstellen.
+- De toetsenbordtegenstukken zijn `Ctrl+N` en dan `m` (pijlen verplaatsen, `Shift`+pijlen schalen, `0` herstelt, `Enter` of `Esc` verlaat de modus) en `Alt`+pijlen voor de scheidingen; het palet heeft `Dialoog: Verplaatsen of schalen` en `Dialoog: Positie en grootte herstellen`. Ze werken op het bovenste dialoog. De vlakken die `Ctrl+N` voor eigen badges gebruiken (het commitberichtformulier, de pagina voor het herschrijven van de geschiedenis) nemen dezelfde `m` na hun `Ctrl+N`, en de statusregel noemt hem. Het opdrachtpalet en de kiezers gebruiken `Ctrl+N` om in de lijst omlaag te gaan, dus voor hen is de toets `Alt+G` (`palette.arrange`), of de eigen rij `Dialoog: Verplaatsen of schalen` van het palet: beide schikken de popup vooraan en laten hem open.
+- **Een instelling** (`ui.dialog_geometry`, Instellingen > Weergave > Indeling) geldt voor elk dialoog: elk onthoudt zijn eigen plaats en grootte voor deze sessie, op schijf voor de volgende start, of nooit.
+
+| Dialoog | Verplaatsen | Schalen |
+|---|---|---|
+| Geschiedenis van ongedaan maken / Reflog / Verloren werk, Activiteitenlog, takenpaneel, mapkiezer | ja | ja |
+| Opdrachtpalet, tab-/thema-/taalkiezers, werkruimtezoeker | ja | ja (de lijst groeit met de hoogte, de rijen met de breedte) |
+| Clone (de repositorylijst), Pull request en Nieuw issue (de beschrijving), "Wat wordt verzonden" (het paneel), Mermaid (het voorbeeld), review-opties (de velden, alleen breedte) | ja | ja |
+| Lange-tekstbewerkers in Instellingen (sjablonen, hooks, AI-prompts), het AI-vak van het werkruimteformulier | ja | ja (het tekstveld) |
+| Geschiedenis herschrijven: de twee AI-hulpdialogen | ja | ja (de beschrijving, het verzonden paneel) |
+| Info, updatepaneel, beveiligingscontrole, voorspelde conflicten, "Over de AI-limiet", tag verwijderen, gevoelige bestanden | ja | nee (de grootte volgt de tekst) |
+| Init, Worktree, Sparse checkout, Flow-dialoog, issueflow-dialogen, commitberichtformulier (reword), werkruimteformulier, label-/mijlpaalkiezers | ja | nee |
+| Bevestigingen (elke "Weet je het zeker?") | ja | nee |
+| Review- en Board-dialogen: hun kleine dialogen (opmerking, afronden, kiezen, kolommen) | ja | nee |
+| Popups van de toetsenbordpagina (resetbevestiging, toetsopname), de AI-antwoordpopup | ja | nee |
+| Instellingen: de resultaten en bevestiging van de repositoryauthenticatie | ja | nee |
+| Geschiedenis herschrijven: purge-, identiteits- en vraagdialogen | ja | nee |
+| Verplaats-bestand-popup van de commitcomposer, merge-meldingen | ja | nee |
+
+Niet verplaatsbaar: de schermvullende pagina's (Instellingen, Help, de Review- en Board-pagina's, die het venster al vullen), contextmenu's en keuzelijsten (ze hangen aan wat ze opende), tooltips en de kleine popups binnen een pagina (het remotes-formulier, de editor voor het splitsen van een commit).
 
 De aanwijzer toont een verplaatsvorm boven de titelbalk en een schaalvorm boven de randen en hoeken (terminals met `OSC 22`).
 

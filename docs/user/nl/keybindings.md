@@ -458,6 +458,8 @@ In `config.toml` is dit de tabel `[keybindings.palette]`, genoemd naar de opdrac
 
 De hintbalk onder de lijst noemt deze toets (standaard `Alt+K`). Het is de actie `palette.configure_shortcut`, dus hij is net als elke andere opnieuw toe te wijzen.
 
+Het palet en de kiezers (thema, taal, tab, werkruimtezoeker) verplaatsen en schalen als een dialoog: sleep de bovenrand, of druk op `Alt+G` (de actie `palette.arrange`; de paletrij `Dialoog: Verplaatsen of schalen` doet hetzelfde). Pijlen verplaatsen het, `Shift`+pijlen schalen het, `0` herstelt het, `Enter` of `Esc` verlaat de modus en de popup blijft open. `ui.dialog_geometry` bepaalt of de plaats wordt bewaard.
+
 ### Elke opdracht van het palet
 
 Gegenereerd door de app (een test houdt het actueel). AI-opdrachten verschijnen

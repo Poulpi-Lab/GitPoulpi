@@ -218,7 +218,19 @@ fn dialog_frame_key(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) ->
     }
     let own_badges = (cx.repo_dialogs.is_open() && !cx.repo_dialogs.nav_targets().is_empty())
         || (crate::activity_log::is_open() && !crate::activity_log::nav_targets().is_empty());
-    if frame::any_live() && !own_badges && env.km.is(Bind::GlobalNavPrefix, &key) {
+    // Surfaces with a `Ctrl+N` badge prefix of their own (the Radar's review
+    // choice over Home, the commit message form, the rewrite page) keep it:
+    // theirs reaches `m` through `InputMode::Navigation`.
+    let plain_mode = matches!(
+        *cx.input_mode,
+        InputMode::Normal | InputMode::Confirm { .. } | InputMode::Guide(_)
+    );
+    if frame::any_live()
+        && plain_mode
+        && !own_badges
+        && !frame::top_is("review_choice")
+        && env.km.is(Bind::GlobalNavPrefix, &key)
+    {
         frame::arm_prefix();
         return Some(Flow::Handled);
     }

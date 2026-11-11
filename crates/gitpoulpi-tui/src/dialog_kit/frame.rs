@@ -373,9 +373,13 @@ pub(crate) fn any_live() -> bool {
 }
 
 /// The id of the dialog on top.
-#[cfg(test)]
 pub(crate) fn top_id() -> Option<&'static str> {
     with_store(|s| s.live.last().map(|l| l.id))
+}
+
+/// The dialog on top is `id`.
+pub(crate) fn top_is(id: &str) -> bool {
+    top_id() == Some(id)
 }
 
 /// The arrange mode is on for some dialog.

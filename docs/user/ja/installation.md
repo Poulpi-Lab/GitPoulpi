@@ -64,7 +64,7 @@ gh attestation verify gitpoulpi-<version>-<target>.tar.gz --repo <owner>/gitpoul
 
 ## インストーラーで
 
-各リリースには、OS ごとのインストーラーも付いています。どちらも、インストールされた `gitpoulpi` 自身（設定 > 一般 > ランチャーの裏側にあるコード）を呼び出して同じ選択（ショートカット、PATH、`gp` のようなコマンドのエイリアス）を行うため、インストーラーの設定内容と設定画面の表示はつねに一致します。
+各リリースには、OS ごとのインストーラーも付いています。どちらも、インストールされた `gitpoulpi` 自身（設定 > ランチャーの裏側にあるコード）を呼び出して同じ選択（ショートカット、PATH、`gp` のようなコマンドのエイリアス）を行うため、インストーラーの設定内容と設定画面の表示はつねに一致します。
 
 ### Windows：`gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
 
@@ -123,7 +123,7 @@ OS と CPU に合ったアーカイブを選び、`.sha256` を確認して、`~
 
 上の名前は、リリースの手順が公開先としているものです（[リリース](../../developer/releasing.md)を参照）。まだ公開されていないチャンネルは「見つかりません」と応答しますが、リリースアーカイブやインストーラーはつねに使えます。
 
-パッケージマネージャー自身の PATH の扱いが適用されます。Chocolatey、winget、Scoop、Homebrew はプログラムを自分で PATH に追加しますが、どれも `gp` エイリアスは作りません（`gitpoulpi alias create gp` を実行するか、設定 > 一般 > ランチャーを使ってください）。
+パッケージマネージャー自身の PATH の扱いが適用されます。Chocolatey、winget、Scoop、Homebrew はプログラムを自分で PATH に追加しますが、どれも `gp` エイリアスは作りません（`gitpoulpi alias create gp` を実行するか、設定 > ランチャーを使ってください）。
 
 ### apt（Debian と Ubuntu）
 

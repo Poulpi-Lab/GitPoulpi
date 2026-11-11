@@ -121,7 +121,7 @@ stage_file = "z"
 | `nav_prefix` | `status_narrower` | Status ペインを狭める | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | エージェント：保留中のビューを表示 | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | エージェント：戻る（保留中のビューを閉じる） | `Ctrl+N Backspace` |
-| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
+| `nav_prefix` | `arrange_dialog` | 開いているダイアログを調整（移動、サイズ変更） | `Ctrl+N m` |
 | `refs` | `filter` | 名前で参照を絞り込み | `/` |
 | `refs` | `solo` | 選択項目をソロ表示 | `o` |
 | `refs` | `clear_solo` | ソロ表示を解除 | `Shift+O` |
@@ -925,23 +925,23 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 元に戻す履歴: 閉じる | `Esc` |
 | Reflog: Log で表示 | `l` |
 | Reflog: ここにブランチを作成... | `b` |
-| Reflog: Create tag Here... | `t` |
-| Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `s` |
+| Reflog: ここにtagを作成... | `t` |
+| Reflog: 変更を作業ツリーに適用 | `w` |
+| Reflog: 変更をstashとして保存 | `s` |
 | Reflog: この位置に復元... | `r` |
 | Reflog: さらに読み込む | `m` |
 | Reflog: 更新 |  |
 | 失われた作業: ここにブランチを作成... | `b` |
-| Lost Work: Create tag Here... | `t` |
+| 失われた作業: ここにtagを作成... | `t` |
 | 失われた作業: Cherry-pick | `c` |
-| Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `s` |
+| 失われた作業: 変更を作業ツリーに適用 | `w` |
+| 失われた作業: 変更をstashとして保存 | `s` |
 | 失われた作業: 再検索 |  |
-| Reflog / Lost Work: Next Pane | `Tab` |
-| Reflog / Lost Work: Path or Tree File List | `v` |
-| Reflog / Lost Work: Reset Pane Sizes |  |
-| Dialog: Move/resize | `Ctrl+N m` |
-| Dialog: Reset position and size |  |
+| Reflog / 失われた作業: 次のペイン | `Tab` |
+| Reflog / 失われた作業: パス一覧とツリーの切り替え | `v` |
+| Reflog / 失われた作業: ペインのサイズをリセット |  |
+| ダイアログ: 移動 / サイズ変更 | `Ctrl+N m` |
+| ダイアログ: 位置とサイズをリセット |  |
 | 表示: 更新 | `r` |
 | 表示: 更新（fetch、pull request、Issue） | `F5` |
 | 表示: ヘルプオーバーレイを切り替え | `?` |

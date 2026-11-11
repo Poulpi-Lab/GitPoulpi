@@ -208,8 +208,10 @@ fn undoing_a_delete_here_and_on_the_remote_brings_the_tag_back_in_both_places() 
         "asking changes nothing on the server"
     );
     term.send_keys("y").unwrap();
-    term.wait_for("the tag back on origin", STEP, |_| {
-        remote_tags(&repo).contains("v1")
+    // Both places, in one predicate: the undo restores the remote tag and
+    // the local one as two steps, in no guaranteed order.
+    term.wait_for("the tag back on origin and here", STEP, |_| {
+        remote_tags(&repo).contains("v1") && local_has(&repo, "v1")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(
@@ -217,7 +219,6 @@ fn undoing_a_delete_here_and_on_the_remote_brings_the_tag_back_in_both_places() 
         object,
         "the same tag object"
     );
-    assert!(local_has(&repo, "v1"), "and the local tag is back too");
 }
 
 /// The local-only delete of a tag a remote has: it works, it says the remote

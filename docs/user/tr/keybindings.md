@@ -454,6 +454,8 @@ Paletin her satırı bir tuş düğmesiyle (`[k]`) biter ve `Alt+K` vurgulu sat�
 
 Listenin altındaki ipucu çubuğu bu tuşu gösterir (varsayılan `Alt+K`). Bu, `palette.configure_shortcut` eylemidir; diğerleri gibi yeniden atanabilir.
 
+Palet ve seçiciler (tema, dil, sekme, çalışma alanı araması) bir pencere gibi taşınır ve boyutlandırılır: üst kenarlığı sürükleyin ya da `Alt+G` tuşuna basın (`palette.arrange` eylemi; paletteki `Pencere: Taşı veya Boyutlandır` satırı aynı işi yapar). Oklar taşır, `Shift`+oklar boyutlandırır, `0` sıfırlar, `Enter` veya `Esc` kipten çıkar ve açılır pencere açık kalır. Yerin korunup korunmayacağını `ui.dialog_geometry` belirler.
+
 ### Her palet komutu
 
 Uygulamadan üretilir (bir test onu güncel tutar). YZ komutları yalnızca YZ

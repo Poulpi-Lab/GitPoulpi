@@ -45,8 +45,9 @@ vardır ve kurallar her yerde aynıdır:
   kaybettirmez. `✕` ve `Esc` önce **Değişiklikler atılsın mı?** diye sorar;
   **Düzenlemeye dön** forma geri götürür. Hiçbir şey yazılmamış bir form ve tek
   satırlık bir iletişim kutusu hemen kapanır.
-- Menülerin, açılır listelerin, paletin ve seçicilerin `✕`'i yoktur: `Esc` ile ya
-  da dışarıya tıklayarak kapanırlar.
+- Komut paleti, seçiciler (sekme, tema, dil), küçük İnceleme, Pano, birleştirme
+  ve yazma pencereleri ile onay istemi de `✕` taşır. Bağlam menülerinin ve açılır
+  listelerin `✕`'i yoktur: `Esc` ile ya da dışarıya tıklayarak kapanırlar.
 
 ## Ayarlar'daki listeler
 
@@ -429,13 +430,32 @@ Görsel görünümünde fare için bkz. [Görseller](image-view.md).
 
 ## Pencereleri taşımak ve boyutlandırmak
 
-Geri alma geçmişi / Reflog / Kaybolan çalışma penceresi taşınabilir ve yeniden boyutlandırılabilir:
+Pencereler taşınabilir, büyük pencereler ayrıca yeniden boyutlandırılabilir:
 
-- Taşımak için **başlık çubuğunu sürükleyin** (kapatma çarpısı kendi tıklamasını korur).
-- Boyutlandırmak için **sol, sağ veya alt kenarı** ya da bir alt köşeyi (`◢` tutamağı) **sürükleyin**. Pencere ekranda kalır ve hiçbir zaman 60 x 16'dan küçük olmaz.
+- Bir pencereyi taşımak için **başlık çubuğunu sürükleyin** (kapatma çarpısı kendi tıklamasını korur). Komut paletinin ve seçicilerin ayrı bir başlık çubuğu yoktur: üst kenarlığı sürükleyin.
+- Bir pencereyi boyutlandırmak için **sol, sağ veya alt kenarı** ya da bir alt köşeyi (`◢` tutamağı) **sürükleyin**. Pencere ekranda kalır ve hiçbir zaman en küçük boyutundan küçük olmaz (Geri alma geçmişi için 60 x 16, diğerleri için daha küçük). Boyutlandırılmış bir pencere yeri kullanır: metin alanları ve listeler büyür, metin yeni genişliğe göre kaydırılır.
 - İmleç pencereden çıksa da sürükleme devam eder ve pencerenin dışında bırakmak onu asla kapatmaz.
-- Listesi, dosya listesi ve hunk'ları arasındaki **ayraçları sürükleyin**; sıfırlamak için birine çift tıklayın.
-- Klavye karşılıkları: `Ctrl+N` ardından `m` (oklar taşır, `Shift`+oklar boyutlandırır, `0` sıfırlar, `Enter` veya `Esc` çıkar) ve ayraçlar için `Alt`+oklar; paletteki `Pencere: Taşı veya Boyutlandır` ve `Pencere: Konumu ve Boyutu Sıfırla` satırları da vardır.
+- Geri alma geçmişinin Reflog / Kaybolan çalışma görünümü içindeki **ayraçları sürükleyin**; sıfırlamak için birine çift tıklayın.
+- Klavye karşılıkları: `Ctrl+N` ardından `m` (oklar taşır, `Shift`+oklar boyutlandırır, `0` sıfırlar, `Enter` veya `Esc` çıkar) ve ayraçlar için `Alt`+oklar; paletteki `Pencere: Taşı veya Boyutlandır` ve `Pencere: Konumu ve Boyutu Sıfırla` satırları da vardır. Bunlar en üstteki pencerede çalışır. `Ctrl+N`'i kendi rozetleri için kullanan yüzeyler (commit mesajı formu, geçmişi yeniden yazma sayfası) `Ctrl+N`'lerinden sonra aynı `m`'yi alır ve durum satırı bunu söyler. Komut paleti ve seçiciler `Ctrl+N`'i listede aşağı inmek için kullanır; bu yüzden onlar için tuş `Alt+G`'dir (`palette.arrange`) ya da paletin kendi `Pencere: Taşı veya Boyutlandır` satırıdır: ikisi de öndeki açılır pencereyi düzenler ve açık bırakır.
+- **Tek bir ayar** (`ui.dialog_geometry`, Ayarlar > Görünüm > Düzen) her pencereyi kapsar: her biri kendi konumunu ve boyutunu bu oturum için, sonraki açılış için diskte ya da hiç hatırlamaz.
+
+| Pencere | Taşı | Boyutlandır |
+|---|---|---|
+| Geri alma geçmişi / Reflog / Kaybolan çalışma, Etkinlik günlüğü, işler paneli, klasör seçici | evet | evet |
+| Komut paleti, sekme / tema / dil seçicileri, çalışma alanı araması | evet | evet (liste yükseklikle, satırlar genişlikle büyür) |
+| Klon (depo listesi), Pull request ve Yeni issue (açıklama), "Gönderilenler" (bölme), Mermaid (önizleme), inceleme seçenekleri (alanlar, yalnızca genişlik) | evet | evet |
+| Ayarlar uzun metin düzenleyicileri (şablonlar, hook'lar, AI istemleri), çalışma alanı formunun AI kutusu | evet | evet (metin alanı) |
+| Geçmişi yeniden yazma: iki AI yardımcı penceresi | evet | evet (açıklama, gönderilen bölme) |
+| Hakkında, güncelleme paneli, güvenlik denetimi, öngörülen çakışmalar, "AI sınırı aşıldı", etiket silme, hassas dosyalar | evet | hayır (boyut metni izler) |
+| Init, Worktree, Sparse checkout, Flow penceresi, issue-flow pencereleri, commit mesajı (yeniden adlandırma) formu, Çalışma alanı formu, etiket / kilometre taşı seçicileri | evet | hayır |
+| Onaylar (her "Emin misiniz?") | evet | hayır |
+| İnceleme ve Pano pencereleri: küçük pencereleri (yorum, bitir, seç, sütunlar) | evet | hayır |
+| Klavye sayfası açılır pencereleri (sıfırlama onayı, tuş yakalama), AI yanıt penceresi | evet | hayır |
+| Ayarlar: depo kimlik doğrulama sonuçları ve onayı | evet | hayır |
+| Geçmişi yeniden yazma: temizleme, kimlik ve soru pencereleri | evet | hayır |
+| Commit yazıcısının dosya taşıma penceresi, birleştirme bildirimleri | evet | hayır |
+
+Taşınamayanlar: tam sayfa ekranlar (Ayarlar, Yardım, zaten pencereyi dolduran İnceleme ve Pano sayfaları), bağlam menüleri ve açılır listeler (onları açan şeye bağlıdırlar), ipuçları ve sayfa içindeki küçük açılır pencereler (remote formu, commit bölme düzenleyicisi).
 
 İmleç, başlık çubuğunun üstünde bir taşıma şekli, kenarların ve köşelerin üstünde bir boyutlandırma şekli gösterir (`OSC 22` destekleyen terminaller).
 

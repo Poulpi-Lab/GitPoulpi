@@ -158,12 +158,12 @@ archivos, el índice y las refs no se tocan.
   oculta en cuanto HEAD se mueve y vuelve, o no, con la respuesta nueva. Un HEAD desacoplado no se comprueba.
 - **Listas de ramas base**: de dónde vienen las Ramas base de un repositorio es una elección de su página
   **Prevención de conflictos**. **Predeterminada** sigue el valor global (el `**` integrado, todas las ramas, hasta que
-  elijas otra lista en Ajustes > General > Prevención de conflictos); **Lista: <nombre>** sigue una de tus listas con
+  elijas otra lista en Ajustes > Prevención de conflictos); **Lista: <nombre>** sigue una de tus listas con
   nombre; **Lista propia** es una lista del propio repositorio. Las listas son compartidas: edita una y todos los
   repositorios que la siguen usan el cambio en la siguiente comprobación, sin reiniciar. **Guardar como lista...**
   convierte los patrones propios de un repositorio en una lista con nombre, **Restablecer a predeterminado** descarta la
   elección del repositorio. Eliminar una lista que sigue un repositorio hace que use la predeterminada.
-- **Desactivarla**: **Activar la detección proactiva de conflictos** en Ajustes > General, o, para un solo
+- **Desactivarla**: **Activar la detección proactiva de conflictos** en Ajustes > Prevención de conflictos, o, para un solo
   repositorio, en su página **Prevención de conflictos**. Desde un script, `gitpoulpi conflicts check` imprime la
   misma respuesta como JSON ([referencia de la CLI](cli-reference.md)).
 

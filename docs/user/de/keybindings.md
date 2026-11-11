@@ -449,6 +449,8 @@ In der `config.toml` ist das die Tabelle `[keybindings.palette]`, benannt nach d
 
 Die Hinweiszeile unter der Liste nennt diese Taste (standardmäßig `Alt+K`). Es ist die Aktion `palette.configure_shortcut` und lässt sich wie jede andere neu belegen.
 
+Die Palette und die Auswahllisten (Theme, Sprache, Tab, Workspace-Suche) lassen sich wie ein Dialog verschieben und in der Größe ändern: Ziehen Sie den oberen Rahmen oder drücken Sie `Alt+G` (die Aktion `palette.arrange`; die Palettenzeile `Dialog: Verschieben/Größe ändern` macht dasselbe). Pfeile verschieben ihn, `Shift`+Pfeile ändern die Größe, `0` stellt ihn zurück, `Enter` oder `Esc` beenden den Modus, und das Popup bleibt offen. `ui.dialog_geometry` legt fest, ob die Position gemerkt wird.
+
 ### Alle Palettenbefehle
 
 Aus der App erzeugt (ein Test hält sie aktuell). KI-Befehle erscheinen nur, solange die KI

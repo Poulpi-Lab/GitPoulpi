@@ -458,6 +458,8 @@ In `config.toml` è la tabella `[keybindings.palette]`, con il nome del comando 
 
 La riga di aiuto sotto l'elenco indica questo tasto (`Alt+K` di default). È l'azione `palette.configure_shortcut`, quindi si riassegna come le altre.
 
+La palette e i selettori (tema, lingua, schede, ricerca nei workspace) si spostano e ridimensionano come un dialogo: trascina il bordo superiore, oppure premi `Alt+G` (l'azione `palette.arrange`; la riga della palette `Finestra: Sposta o ridimensiona` fa lo stesso). Le frecce lo spostano, `Maiusc`+frecce lo ridimensionano, `0` lo reimposta, `Invio` o `Esc` escono dalla modalità e il popup resta aperto. `ui.dialog_geometry` decide se la posizione viene conservata.
+
 ### Tutti i comandi della palette
 
 Generato dall'app (un test lo tiene aggiornato). I comandi IA compaiono solo

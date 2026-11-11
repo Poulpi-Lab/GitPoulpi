@@ -239,3 +239,49 @@ fn stopping_the_wait_keeps_the_issue_and_the_next_fetch_offers_the_branch() {
         Some("main")
     );
 }
+
+/// The form's close cross (top right of its frame) closes it like Esc does:
+/// nothing is created.
+#[test]
+fn the_new_issue_form_closes_with_its_cross() {
+    let mut rig = rig("pty-flow-issue-cross", 1500);
+    rig.term
+        .wait_for("the Flow button", STEP, |s| s.contains("Flow \u{25BE}"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+    palette(
+        &mut rig.term,
+        "New Feature Issue",
+        "Flow: New Feature Issue...",
+    );
+    rig.term
+        .wait_for("the New issue form", STEP, |s| {
+            s.contains("New Feature issue") && s.contains("Pick the branch up when it is there")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+    // The cross sits on the title row of the frame; the click is retried from
+    // where the row is found afresh (a torn frame can lack it).
+    common::retry_until(
+        &mut rig.term,
+        "the form closed by its cross",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            let s = t.screen();
+            if let Some((_, row)) = s.find("New Feature issue") {
+                if let Some(&(c, r)) = s
+                    .find_all("\u{2715}")
+                    .iter()
+                    .find(|(_, r)| *r == row)
+                {
+                    t.click(c, r).expect("click the cross");
+                }
+            }
+        },
+        |s| !s.contains("Pick the branch up when it is there") && !s.contains("New Feature issue"),
+    );
+    assert_eq!(head(&rig.repo), "main");
+    assert!(
+        rig.host.bodies("POST", "/issues").is_empty(),
+        "closing creates no issue"
+    );
+}

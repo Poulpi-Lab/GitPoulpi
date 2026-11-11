@@ -113,6 +113,11 @@ impl SafetyCmd {
     /// Why the palette greys the row when `open` (the view on screen, if
     /// any) is not the one it belongs to.
     pub(crate) fn unavailable(self, open: Option<Tab>) -> Option<&'static str> {
+        // The dialog frame's rows belong to every framed dialog (and to the
+        // palette itself), not to this panel.
+        if matches!(self, Self::ArrangeDialog | Self::ResetDialog) {
+            return None;
+        }
         let need = |tab: Tab| match tab {
             Tab::History => m::WHY_OPEN_HISTORY.get(),
             Tab::Reflog => m::WHY_OPEN_REFLOG.get(),

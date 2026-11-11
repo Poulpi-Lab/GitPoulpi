@@ -377,6 +377,22 @@ pub(crate) fn top_id() -> Option<&'static str> {
     with_store(|s| s.live.last().map(|l| l.id))
 }
 
+/// The popups of the filterable-list family (the command palette, the tab,
+/// theme and language pickers, the workspace search): they take their own
+/// keys, so `Ctrl+N m` is not theirs; `palette.arrange` is.
+const POPUPS: [&str; 5] = [
+    "palette",
+    "tab_picker",
+    "picker_theme",
+    "picker_language",
+    "workspace_search",
+];
+
+/// The dialog on top is one of the filterable-list popups ([`POPUPS`]).
+pub(crate) fn top_is_popup() -> bool {
+    top_id().is_some_and(|id| POPUPS.contains(&id))
+}
+
 /// The dialog on top is `id`.
 pub(crate) fn top_is(id: &str) -> bool {
     top_id() == Some(id)

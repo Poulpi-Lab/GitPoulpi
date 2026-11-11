@@ -690,6 +690,23 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                             break 'dispatch;
                         }
                     }
+                    // "Dialog: Move or Resize" / "Reset" chosen in the palette
+                    // act on the palette itself, which stays open.
+                    if let Some((_, PaletteCommand::Safety(cmd), None)) = chosen {
+                        use crate::safety_panel::SafetyCmd;
+                        if crate::dialog_kit::frame::top_is_popup()
+                            && matches!(cmd, SafetyCmd::ArrangeDialog | SafetyCmd::ResetDialog)
+                        {
+                            *cx.last_message = Some(if cmd == SafetyCmd::ArrangeDialog {
+                                crate::dialog_kit::frame::arrange_top();
+                                msg::dialog_frame::ARRANGING.get().into()
+                            } else {
+                                crate::dialog_kit::frame::reset_top();
+                                msg::dialog_frame::RESET_DONE.get().into()
+                            });
+                            break 'dispatch;
+                        }
+                    }
                     *cx.input_mode = InputMode::Normal;
                     let Some((name, cmd, unavailable)) = chosen else {
                         *cx.last_message =

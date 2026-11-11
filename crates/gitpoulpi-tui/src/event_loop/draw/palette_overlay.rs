@@ -2,6 +2,9 @@
 
 use super::super::*;
 
+/// The palette moves and resizes: the list grows with the height.
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("palette", 40, 8);
+
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn render_command_palette(
     frame: &mut Frame,
@@ -19,7 +22,7 @@ pub(crate) fn render_command_palette(
     let matches = palette_matches(draft, palette_ctx);
     // Tall: the catalogue is the whole app's command surface, so the popup
     // earns the room.
-    let popup = centered_rect(62, 72, frame.area());
+    let popup = WIN.place(frame.area(), centered_rect(62, 72, frame.area()));
     frame.render_clipped(Clear, popup);
     // The hint band is 2 rows: one for the text, one for the
     // popup's bottom border, which only this last block draws.
@@ -264,6 +267,10 @@ pub(crate) fn render_command_palette(
         ),
         hint_area,
     );
+    // The frame, over the borders just drawn: drag the top border to move,
+    // the sides and the bottom to resize (the list takes the rows, the rows
+    // the width).
+    WIN.decorate(frame.buffer_mut(), popup, None, true);
 }
 
 #[cfg(test)]

@@ -204,6 +204,12 @@ fn dialog_frame_key(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) ->
     if frame::on_key(key) {
         return Some(Flow::Handled);
     }
+    // The palette and the pickers take `Ctrl+N` as "down": their own key.
+    if frame::top_is_popup() && env.km.is(Bind::PaletteArrange, &key) {
+        *cx.last_message = Some(gitpoulpi_i18n::msg::dialog_frame::ARRANGING.get().into());
+        frame::arrange_top();
+        return Some(Flow::Handled);
+    }
     if frame::take_prefix() {
         let action = crate::chrome::navigation_key_action_mods(key.code, key.modifiers);
         if action == crate::chrome::NavigationAction::ArrangeDialog {
@@ -218,13 +224,17 @@ fn dialog_frame_key(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) ->
     }
     let own_badges = (cx.repo_dialogs.is_open() && !cx.repo_dialogs.nav_targets().is_empty())
         || (crate::activity_log::is_open() && !crate::activity_log::nav_targets().is_empty());
-    // Surfaces with a `Ctrl+N` badge prefix of their own (the Radar's review
-    // choice over Home, the commit message form, the rewrite page) keep it:
-    // theirs reaches `m` through `InputMode::Navigation`.
-    let plain_mode = matches!(
-        *cx.input_mode,
-        InputMode::Normal | InputMode::Confirm { .. } | InputMode::Guide(_)
-    );
+    // Surfaces with a `Ctrl+N` badge prefix of their own keep it: the Radar's
+    // review choice over Home, and the commit message form and the rewrite
+    // page while they badge their controls (a flag on the form, read in
+    // `keys_modes`, where `m` starts the arrange mode too). A dialog the
+    // rewrite page opened (a question, purge, the AI dialogs...) badges
+    // nothing, so there `Ctrl+N` is the frame's prefix.
+    let plain_mode = match &*cx.input_mode {
+        InputMode::Normal | InputMode::Confirm { .. } | InputMode::Guide(_) => true,
+        InputMode::Rewrite(view) => !view.badge_ready(),
+        _ => false,
+    };
     if frame::any_live()
         && plain_mode
         && !own_badges

@@ -270,6 +270,7 @@ pub(crate) fn render(
         .collect();
     let view = PickerView {
         field: crate::modes::MainField::ThemePicker,
+        win: "picker_theme",
         title: msg::overlays::change_theme_title(found.len(), picker.all.len()),
         draft: &picker.draft,
         selected: picker.selected,

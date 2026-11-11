@@ -115,6 +115,11 @@ pub(in crate::event_loop) fn popup_list_mouse(
         crate::chrome::set_popup_pointer(None);
         return ListMouse::Pass;
     };
+    // The popup's own frame: a press on its top border or edges, the drag and
+    // its release (the palette and the pickers move and resize like a dialog).
+    if crate::dialog_kit::frame::on_mouse(*m) == crate::dialog_kit::frame::FrameMouse::Consumed {
+        return ListMouse::Swallow;
+    }
     let (mcol, mrow) = (m.column, m.row);
     crate::chrome::set_popup_pointer(Some((mcol, mrow)));
     // The modal list owns the pointer shape: its text field is the I-beam,

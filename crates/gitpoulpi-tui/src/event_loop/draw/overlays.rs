@@ -57,6 +57,9 @@ pub(in crate::event_loop) struct OverlaysDrawCtx<'a> {
 }
 
 /// The confirmation moves (never resizes: its size follows its text).
+/// The tab picker moves and resizes: the list grows with the height.
+const TAB_PICKER_WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("tab_picker", 30, 8);
+
 const CONFIRM_WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("confirm_prompt");
 
 pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut OverlaysDrawCtx<'_>) {
@@ -423,7 +426,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     // `PalettePopup`/`palette_row_at` geometry and hit test.
     if let InputMode::TabPicker { draft, selected } = &input_mode {
         let indices = filter_tab_indices(repo_tabs, draft);
-        let popup = centered_rect(46, 50, frame.area());
+        let popup = TAB_PICKER_WIN.place(frame.area(), centered_rect(46, 50, frame.area()));
         frame.render_clipped(Clear, popup);
         let [input_area, list_area, hint_area] = Layout::vertical([
             Constraint::Length(3),
@@ -531,6 +534,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
                 ),
             hint_area,
         );
+        TAB_PICKER_WIN.decorate(frame.buffer_mut(), popup, None, true);
     }
 
     if !settings_open {

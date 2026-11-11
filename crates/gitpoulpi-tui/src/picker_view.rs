@@ -16,6 +16,8 @@ pub(crate) struct PickerRow<'a> {
 /// What the popup shows besides its rows.
 pub(crate) struct PickerView<'a> {
     pub(crate) field: crate::modes::MainField,
+    /// The picker's id in the dialog frame (its place and size are kept by it).
+    pub(crate) win: &'static str,
     pub(crate) title: String,
     pub(crate) draft: &'a str,
     pub(crate) selected: usize,
@@ -39,7 +41,8 @@ pub(crate) fn render(
     use ratatui::style::{Modifier, Style};
     use ratatui::text::{Line, Span};
     use ratatui::widgets::{Block, BorderType, Borders, List, ListItem, Paragraph};
-    let popup = centered_rect(46, 60, frame.area());
+    let win = crate::dialog_kit::Win::resizable(view.win, 30, 10);
+    let popup = win.place(frame.area(), centered_rect(46, 60, frame.area()));
     frame.render_clipped(Clear, popup);
     let seg_h = u16::from(view.segments.is_some());
     let [input_area, seg_area, list_area, hint_area] = Layout::vertical([
@@ -165,5 +168,6 @@ pub(crate) fn render(
             ),
         hint_area,
     );
+    win.decorate(frame.buffer_mut(), popup, None, true);
     popup_rects
 }

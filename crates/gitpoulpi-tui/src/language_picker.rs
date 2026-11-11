@@ -502,6 +502,7 @@ pub(crate) fn render(
     };
     let view = PickerView {
         field: crate::modes::MainField::LanguagePicker,
+        win: "picker_language",
         title,
         draft: &picker.draft,
         selected: picker.selected,

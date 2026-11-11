@@ -280,7 +280,7 @@ pub(crate) fn render(
     field_editor: &crate::text_edit::FieldEditor<crate::modes::MainField>,
 ) -> crate::chrome::PalettePopup {
     let field = crate::modes::MainField::WorkspaceSearch;
-    let popup = centered_rect(86, 72, frame.area());
+    let popup = WIN.place(frame.area(), centered_rect(86, 72, frame.area()));
     frame.render_clipped(Clear, popup);
     let [input_area, chips_area, list_area, hint_area] = Layout::vertical([
         Constraint::Length(3),
@@ -390,5 +390,10 @@ pub(crate) fn render(
         ),
         hint_area,
     );
+    let cross = CLOSE.with(|c| c.get());
+    WIN.decorate(frame.buffer_mut(), popup, cross, true);
     rects
 }
+
+/// The search moves and resizes: the list grows with the height.
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("workspace_search", 50, 12);

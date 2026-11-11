@@ -222,8 +222,10 @@ fn pick_the_name_in_the_combobox_then_add_and_remove_gitpoulpi_on_path() {
     // PATH: the palette twin (from the main window) writes a marked block,
     // and only that.
     term.send_keys("Esc").unwrap();
-    term.wait_for("Settings closed", STEP, |s| !s.contains("Launcher - global"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.wait_for("Settings closed", STEP, |s| {
+        !s.contains("Launcher - global")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     palette(&mut term, "add to path", "Launcher: Add to PATH");
     wait_until("no block in .bashrc", &term, || {
         std::fs::read_to_string(&rc).is_ok_and(|t| t.contains("X-GitPoulpi=1"))
@@ -240,8 +242,10 @@ fn pick_the_name_in_the_combobox_then_add_and_remove_gitpoulpi_on_path() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     term.send_keys("Esc").unwrap();
-    term.wait_for("Settings closed", STEP, |s| !s.contains("Launcher - global"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.wait_for("Settings closed", STEP, |s| {
+        !s.contains("Launcher - global")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     palette(&mut term, "remove from path", "Launcher: Remove from PATH");
     wait_until("the block is still there", &term, || {
         std::fs::read_to_string(&rc).is_ok_and(|t| t == "export KEEP=1\n")

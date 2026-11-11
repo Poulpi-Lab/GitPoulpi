@@ -304,7 +304,7 @@ fn the_newest_of_a_burst_wins_and_the_rest_are_superseded_or_spaced() {
 
 #[test]
 fn the_launcher_and_global_conflict_prevention_pages_open_by_their_ids() {
-    let mut rig = launch("pty-ui-nav-own-pages", fixture(), "second commit");
+    let rig = launch("pty-ui-nav-own-pages", fixture(), "second commit");
     for (page, title) in [
         (SettingsPage::Launcher, "Launcher - global"),
         (

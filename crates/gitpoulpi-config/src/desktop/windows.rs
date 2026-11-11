@@ -1022,6 +1022,65 @@ mod tests {
         assert!(s.contains("SHChangeNotify(0x08000000"));
     }
 
+    /// Real PowerShell, real `.lnk` files: a new colour reaches the Start menu
+    /// entry and every pinned copy (`TaskBar` and `ImplicitAppShortcuts`),
+    /// never another app's pin, and the old icon file goes away.
+    #[cfg(windows)]
+    #[test]
+    fn windows_a_new_colour_reaches_every_pinned_copy_and_only_ours() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dirs = pinned_dirs(tmp.path());
+        dirs.start_menu = Some(tmp.path().join("Start"));
+        dirs.implicit_pinned = Some(tmp.path().join("Implicit"));
+        let sub = tmp.path().join("Implicit").join("ab12");
+        std::fs::create_dir_all(&sub).unwrap();
+        std::fs::create_dir_all(dirs.taskbar_pinned.as_ref().unwrap()).unwrap();
+        let exe = tmp.path().join("gitpoulpi.exe");
+        std::fs::write(&exe, b"x").unwrap();
+        let (a, b) = (icon_set(1), icon_set(2));
+        let mut r = req(&exe, "console", &a);
+        r.refresh_icon_cache = true;
+
+        let start = install(Place::StartMenu, &dirs, &r).unwrap();
+        let pin = dirs.taskbar_pinned.as_ref().unwrap().join("GitPoulpi.lnk");
+        let implicit = sub.join("GitPoulpi.lnk");
+        std::fs::copy(&start, &pin).unwrap();
+        std::fs::copy(&start, &implicit).unwrap();
+        let other = dirs.taskbar_pinned.as_ref().unwrap().join("Notepad.lnk");
+        run_powershell(&format!(
+            "$s = (New-Object -ComObject WScript.Shell).CreateShortcut({}); \
+             $s.TargetPath = 'C:\\Windows\\notepad.exe'; $s.IconLocation = 'C:\\Windows\\notepad.exe,0'; $s.Save()",
+            ps_quote(&other.to_string_lossy())
+        ))
+        .unwrap();
+        let other_before = std::fs::read(&other).unwrap();
+        let (old_ico, new_ico) = (ico_path(&dirs, &a), ico_path(&dirs, &b));
+        let names = |p: &Path, ico: &Path| {
+            contains_text(&std::fs::read(p).unwrap(), &ico.to_string_lossy())
+        };
+        assert!(names(&pin, &old_ico), "the pin copies the Start menu entry");
+
+        let mut rb = req(&exe, "console", &b);
+        rb.refresh_icon_cache = true;
+        refresh_icon(&dirs, &rb).unwrap();
+
+        for lnk in [&start, &pin, &implicit] {
+            assert!(names(lnk, &new_ico), "{} names the new icon", lnk.display());
+            assert!(
+                !names(lnk, &old_ico),
+                "{} dropped the old icon",
+                lnk.display()
+            );
+        }
+        assert_eq!(
+            std::fs::read(&other).unwrap(),
+            other_before,
+            "not ours: untouched"
+        );
+        assert!(new_ico.exists());
+        assert!(!old_ico.exists(), "the old icon file is deleted");
+    }
+
     #[test]
     fn pinned_copies_are_ours_by_marker_or_by_exe_path_only() {
         let tmp = tempfile::tempdir().unwrap();

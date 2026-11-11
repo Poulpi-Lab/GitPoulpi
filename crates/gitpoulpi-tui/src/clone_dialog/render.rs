@@ -25,6 +25,7 @@ impl CloneDialog {
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
         self.edit.sync(self.field_focus());
         self.edit.begin_frame();
+        self.list_rows = (rect.height.saturating_sub(ROWS_AROUND_LIST) as usize).max(MIN_LIST_ROWS);
         self.close
             .framed(buf, rect, msg::clone::TITLE.get(), &super::WIN, true);
         let mut hits: Vec<(Rect, CloneHit)> = Vec::new();
@@ -618,10 +619,10 @@ impl CloneDialog {
                 // The offset may be stale after a search or a new load.
                 let offset = self
                     .repo_offset
-                    .min(list_rows.len().saturating_sub(LIST_ROWS));
+                    .min(list_rows.len().saturating_sub(self.list_rows));
                 // The bar lives in the rightmost column of the list; the
                 // rows keep off it.
-                let body = Rect::new(fx, y.saturating_sub(1), fw, LIST_ROWS as u16 + 2);
+                let body = Rect::new(fx, y.saturating_sub(1), fw, self.list_rows as u16 + 2);
                 let bar = crate::scrollbar::Track::vertical(body, list_rows.len(), offset);
                 if let Some(track) = bar {
                     crate::scrollbar::render_buf(buf, track, true, false);
@@ -632,7 +633,7 @@ impl CloneDialog {
                     .iter()
                     .enumerate()
                     .skip(offset)
-                    .take(LIST_ROWS)
+                    .take(self.list_rows)
                     .map(|(i, r)| (i - offset, r))
                 {
                     let row_y = y + slot as u16;
@@ -770,6 +771,6 @@ impl CloneDialog {
         for entry in painted.into_iter().rev() {
             hits.insert(0, entry);
         }
-        y + LIST_ROWS as u16
+        y + self.list_rows as u16
     }
 }

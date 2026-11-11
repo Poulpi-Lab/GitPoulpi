@@ -660,12 +660,27 @@ impl RewriteView {
             .sent
             .body_rows(lines.len(), budget.saturating_sub(fixed(gap)));
         let rect = WIN_SCRIPT_AI.place(room, centered(room, fixed(gap) + pane_h));
+        // The layout follows the rect the dialog has (the user may have
+        // resized it): the text wraps to its width, the pane takes the rows.
+        let lines = if rect.width.saturating_sub(4) == wide_inner {
+            lines
+        } else {
+            self.ai_sent_lines(wrap_width(rect.width.saturating_sub(4)))
+        };
+        let gap = if fixed(1) + self.script.ai.sent.least_rows() <= rect.height.saturating_sub(2) {
+            1
+        } else {
+            0
+        };
         dialog_kit::panel(buf, rect, &title);
+        let mut cross_rect = None;
         if let Some(cross) =
             crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::AiClose))
         {
             hits.push((cross, RewriteHit::AiClose));
+            cross_rect = Some(cross);
         }
+        WIN_SCRIPT_AI.decorate(buf, rect, cross_rect, true);
         let inner = Rect::new(
             rect.x + 1,
             rect.y + 1,
@@ -831,5 +846,7 @@ impl RewriteView {
     }
 }
 
-/// The dialog moves (its size follows its content).
-const WIN_SCRIPT_AI: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("rewrite_script_ai");
+/// The dialog resizes: the sent pane takes the rows it gains, the text wraps
+/// to its width.
+const WIN_SCRIPT_AI: crate::dialog_kit::Win =
+    crate::dialog_kit::Win::resizable("rewrite_script_ai", 50, 12);

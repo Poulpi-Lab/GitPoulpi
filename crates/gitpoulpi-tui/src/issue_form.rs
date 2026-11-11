@@ -810,7 +810,13 @@ impl IssueDialog {
         // Title, labels and the footer take their rows; the description
         // gets the rest.
         let footer_rows = 5; // labels label + field, spacing, message, buttons
-        let body_h = inner.bottom().saturating_sub(y + footer_rows).clamp(2, 10);
+        // At most 10 rows at the default height; a taller dialog gives the
+        // rows it gains to the description.
+        let body_cap = 10 + rect.height.saturating_sub(DEFAULT_HEIGHT);
+        let body_h = inner
+            .bottom()
+            .saturating_sub(y + footer_rows)
+            .clamp(2, body_cap);
         let body = Rect::new(inner.x, y, inner.width, body_h);
         self.body_bar = dialog_kit::text_area(
             buf,
@@ -981,11 +987,15 @@ impl IssueDialog {
 pub(crate) fn issue_rect(area: Rect) -> Rect {
     WIN.place(
         area,
-        dialog_kit::centered(area, area.width.saturating_sub(4).min(80), 22),
+        dialog_kit::centered(area, area.width.saturating_sub(4).min(80), DEFAULT_HEIGHT),
     )
 }
 
-const WIN: dialog_kit::Win = dialog_kit::Win::movable("issue");
+/// Resizable: the description grows with the height.
+const WIN: dialog_kit::Win = dialog_kit::Win::resizable("issue", 50, 18);
+
+/// The form's default height.
+const DEFAULT_HEIGHT: u16 = 22;
 
 impl dialog_kit::Dismiss for IssueDialog {
     fn is_dirty(&self) -> bool {

@@ -624,7 +624,7 @@ impl OptionsDialog {
     pub(super) fn render(&mut self, area: Rect, buf: &mut Buffer) {
         let rect = WIN.place(
             area,
-            dialog_kit::centered(area, area.width.saturating_sub(4).min(86), 15),
+            dialog_kit::centered(area, area.width.saturating_sub(4).min(DEFAULT_WIDTH), 15),
         );
         self.panel = rect;
         self.edit.begin_frame();
@@ -650,7 +650,12 @@ impl OptionsDialog {
         let field = Rect::new(
             inner.x + label_w,
             y,
-            inner.width.saturating_sub(label_w).min(30),
+            // 30 cells at the default width; the width the dialog gains goes
+            // to the choice, as to the path field below.
+            inner
+                .width
+                .saturating_sub(label_w)
+                .min(30 + rect.width.saturating_sub(DEFAULT_WIDTH)),
             1,
         );
         if let Some(why) = self.defaults.run_blocked.clone() {
@@ -886,8 +891,12 @@ impl Dismiss for OptionsDialog {
     }
 }
 
-/// The options dialog moves.
-const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("review_options");
+/// The options dialog resizes in width (its choice and path field grow); its
+/// height is what its rows need.
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("review_options", 60, 15);
+
+/// The default width.
+const DEFAULT_WIDTH: u16 = 86;
 
 #[cfg(test)]
 mod tests {

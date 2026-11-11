@@ -517,7 +517,8 @@ fn put_script_line(buf: &mut Buffer, x: u16, y: u16, width: u16, line: &str) {
     );
 }
 
-const WIN: dialog_kit::Win = dialog_kit::Win::movable("mermaid");
+/// Resizable: the preview (and its scrollbar) grows with the height.
+const WIN: dialog_kit::Win = dialog_kit::Win::resizable("mermaid", 60, 16);
 
 /// Paints the popup, last, over the panes.
 pub(crate) fn render(frame: &mut Frame) {

@@ -224,8 +224,17 @@ pub(crate) enum CloneOutcome {
     },
 }
 
-/// Rows of the repository list.
+/// Rows of the repository list at the dialog's default height; a taller
+/// dialog (resized by the user) lists more (`CloneDialog::list_rows`).
 const LIST_ROWS: usize = 6;
+
+/// The dialog's height with the repository list at [`LIST_ROWS`].
+const HOSTED_HEIGHT: u16 = 29;
+/// The fewest rows the list keeps; the dialog never gets shorter than that
+/// needs (`WIN`).
+const MIN_LIST_ROWS: usize = 1;
+/// Dialog rows around the list: the hosted height minus [`LIST_ROWS`].
+const ROWS_AROUND_LIST: u16 = HOSTED_HEIGHT - LIST_ROWS as u16;
 
 #[derive(Debug, Clone)]
 pub(crate) struct CloneDialog {
@@ -268,6 +277,8 @@ pub(crate) struct CloneDialog {
     /// Rows of the list as last painted (headers + repositories), and its
     /// scrollbar track and drag.
     list_len: usize,
+    /// Rows the list showed at the last paint (more when the dialog is taller).
+    list_rows: usize,
     list_bar: Option<crate::scrollbar::Track>,
     bar_drag: crate::scrollbar::BarDrag,
     /// The URL of the repository chosen in a hosted source.
@@ -339,6 +350,7 @@ impl CloneDialog {
             repo_cursor: 0,
             repo_offset: 0,
             list_len: 0,
+            list_rows: LIST_ROWS,
             list_bar: None,
             bar_drag: Default::default(),
             hosted_url: None,
@@ -569,7 +581,7 @@ impl CloneDialog {
                 anchor::row_keys(&self.grouped()),
                 cursor,
                 self.repo_offset,
-                LIST_ROWS,
+                self.list_rows,
             )
         });
         self.projects
@@ -578,7 +590,7 @@ impl CloneDialog {
         self.refresh_failed.remove(profile_id);
         if let Some(held) = held {
             let rows = anchor::row_keys(&self.grouped());
-            (self.repo_cursor, self.repo_offset) = anchor::restore(&held, &rows, LIST_ROWS);
+            (self.repo_cursor, self.repo_offset) = anchor::restore(&held, &rows, self.list_rows);
         }
         // Rows moved: neither the hover nor a hit painted before the swap
         // may point at another project.
@@ -697,8 +709,8 @@ impl CloneDialog {
         };
         if head < self.repo_offset {
             self.repo_offset = head;
-        } else if at >= self.repo_offset + LIST_ROWS {
-            self.repo_offset = at + 1 - LIST_ROWS;
+        } else if at >= self.repo_offset + self.list_rows {
+            self.repo_offset = at + 1 - self.list_rows;
         }
     }
 
@@ -1223,7 +1235,7 @@ impl CloneDialog {
                 });
             }
             KeyCode::PageUp | KeyCode::PageDown if in_list => {
-                let step = LIST_ROWS as i32;
+                let step = self.list_rows as i32;
                 self.move_repo_cursor(if key.code == KeyCode::PageDown {
                     step
                 } else {
@@ -1373,13 +1385,16 @@ pub(crate) fn clone_rect(frame: Rect) -> Rect {
     )
 }
 
-const WIN: dialog_kit::Win = dialog_kit::Win::movable("clone");
+/// Resizable: a taller dialog lists more repositories, a wider one gives the
+/// fields and the rows more room.
+const WIN: dialog_kit::Win =
+    dialog_kit::Win::resizable("clone", 70, ROWS_AROUND_LIST + MIN_LIST_ROWS as u16);
 
 /// [`clone_rect`] for a dialog that lists a hosted account's repositories.
 pub(crate) fn clone_rect_hosted(frame: Rect) -> Rect {
     WIN.place(
         frame,
-        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(110), 29),
+        dialog_kit::centered(frame, frame.width.saturating_sub(4).min(110), HOSTED_HEIGHT),
     )
 }
 

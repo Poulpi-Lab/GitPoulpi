@@ -851,12 +851,36 @@ impl RewriteView {
             fixed(field_h, gap) + pane_h
         };
         let rect = WIN_RULES_AI.place(room, centered(room, inner_h));
+        // The layout follows the rect the dialog has (the user may have
+        // resized it): the text wraps to its width, the rows it gains go to
+        // the description (or, with the sent pane open, to the pane).
+        let lines = if d.result.is_some() || rect.width.saturating_sub(4) == wide_inner {
+            lines
+        } else {
+            self.rules_sent_lines(wrap_width(rect.width.saturating_sub(4)))
+        };
+        let budget_now = rect.height.saturating_sub(2);
+        let (field_h, gap) = [(5u16, 1u16), (3, 1), (3, 0)]
+            .into_iter()
+            .find(|&(fh, g)| fixed(fh, g) + extra <= budget_now)
+            .unwrap_or((3, 0));
+        let rows_free = budget_now.saturating_sub(fixed(field_h, gap));
+        let field_h = if d.result.is_some() {
+            field_h
+        } else if self.rules_ai.sent.open {
+            field_h + rows_free.saturating_sub(self.rules_ai.sent.body_rows(lines.len(), rows_free))
+        } else {
+            field_h + rows_free
+        };
         dialog_kit::panel(buf, rect, &title);
+        let mut cross_rect = None;
         if let Some(cross) =
             crate::chrome::close_cross::paint(buf, rect, hovered == Some(RewriteHit::RaClose))
         {
             hits.push((cross, RewriteHit::RaClose));
+            cross_rect = Some(cross);
         }
+        WIN_RULES_AI.decorate(buf, rect, cross_rect, true);
         let inner = Rect::new(
             rect.x + 1,
             rect.y + 1,
@@ -1116,5 +1140,7 @@ impl RewriteView {
     }
 }
 
-/// The dialog moves (its size follows its content).
-const WIN_RULES_AI: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("rewrite_rules_ai");
+/// The dialog resizes: the description and the sent pane take the rows it
+/// gains, the text wraps to its width.
+const WIN_RULES_AI: crate::dialog_kit::Win =
+    crate::dialog_kit::Win::resizable("rewrite_rules_ai", 50, 16);

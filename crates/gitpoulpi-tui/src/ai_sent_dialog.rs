@@ -33,8 +33,9 @@ use ratatui::layout::Rect;
 use ratatui::style::{Modifier, Style};
 use ratatui::Frame;
 
-/// The "what is sent" window moves (its size follows its text).
-const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("ai_sent");
+/// The "what is sent" window resizes: the pane that shows the prompt takes
+/// the rows it gains, and its lines wrap to the width it has.
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("ai_sent", 50, 12);
 
 use crate::dialog_kit::{self, ButtonState, CheckState};
 use crate::sent_pane::{wrap_width, SentPane, MAX_WIDTH};
@@ -449,6 +450,19 @@ pub(crate) fn render(frame: &mut Frame) {
             height,
         ),
     );
+    // The text follows the width the window has (the pane's rows follow its
+    // height below).
+    let wide = outer.width.saturating_sub(4);
+    let lines = if outer.width == width {
+        lines
+    } else {
+        pane_lines(&open.sent, wrap_width(wide))
+    };
+    let intro = if outer.width == width {
+        intro
+    } else {
+        wrap_words(msg::INTRO.get(), wide as usize)
+    };
     open.frame = outer;
     open.hits.clear();
     let buf = frame.buffer_mut();

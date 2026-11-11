@@ -228,7 +228,9 @@ impl PullRequestDialog {
         y += 1;
         let meta_rows = if self.uses_meta() { 2 } else { 0 };
         let footer_rows = 4 + meta_rows; // metadata, draft, message, buttons, breathing room
-        let body_h = (inner.bottom().saturating_sub(y + footer_rows)).clamp(2, 8);
+        // 8 rows at the default height; the rows a taller dialog gains go to it.
+        let body_cap = 8 + rect.height.saturating_sub(DEFAULT_HEIGHT);
+        let body_h = (inner.bottom().saturating_sub(y + footer_rows)).clamp(2, body_cap);
         let body = Rect::new(inner.x, y, inner.width, body_h);
         self.body_bar = dialog_kit::text_area(
             buf,
@@ -416,11 +418,15 @@ impl PullRequestDialog {
 pub(crate) fn pull_request_rect(area: Rect) -> Rect {
     WIN.place(
         area,
-        dialog_kit::centered(area, area.width.saturating_sub(4).min(86), 30),
+        dialog_kit::centered(area, area.width.saturating_sub(4).min(86), DEFAULT_HEIGHT),
     )
 }
 
-const WIN: dialog_kit::Win = dialog_kit::Win::movable("pull_request");
+/// Resizable: the description grows with the height.
+const WIN: dialog_kit::Win = dialog_kit::Win::resizable("pull_request", 60, 24);
+
+/// The dialog's default height.
+const DEFAULT_HEIGHT: u16 = 30;
 
 /// What a running `create_pull_request` call reports.
 pub(crate) enum PullRequestEvent {

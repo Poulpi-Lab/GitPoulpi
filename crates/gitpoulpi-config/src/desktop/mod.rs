@@ -108,6 +108,9 @@ pub struct Dirs {
     /// Windows: `User Pinned\TaskBar`, where Explorer keeps a copy of every
     /// shortcut pinned to the taskbar.
     pub taskbar_pinned: Option<PathBuf>,
+    /// Windows: `User Pinned\ImplicitAppShortcuts`, the copies Explorer keeps
+    /// (one folder deep) for pins it matched by AppUserModelID.
+    pub implicit_pinned: Option<PathBuf>,
 }
 
 impl Dirs {
@@ -142,6 +145,9 @@ impl Dirs {
                         appdata
                             .join("Microsoft/Internet Explorer/Quick Launch/User Pinned/TaskBar"),
                     ),
+                    implicit_pinned: Some(appdata.join(
+                        "Microsoft/Internet Explorer/Quick Launch/User Pinned/ImplicitAppShortcuts",
+                    )),
                     assets: var("LOCALAPPDATA")
                         .unwrap_or_else(|| profile.join("AppData/Local"))
                         .join("GitPoulpi"),

@@ -68,7 +68,7 @@ The `.sha256` file only catches a damaged download. The signature is what shows 
 
 Each release also ships an installer per OS. Both make the same choices
 (shortcuts, PATH, a command alias such as `gp`) by calling the installed
-`gitpoulpi` itself, the code behind Settings > General > Launcher, so what the
+`gitpoulpi` itself, the code behind Settings > Launcher, so what the
 installer sets up and what Settings shows always agree.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
@@ -132,7 +132,7 @@ Every channel below writes the same `.gitpoulpi-dist` marker next to the program
 
 The names above are the ones the release process publishes to (see [Releasing](../developer/releasing.md)): a channel that is not live yet answers "not found", and the release archive or installer always works.
 
-A package manager's own PATH handling applies: Chocolatey, winget, Scoop and Homebrew put the programs on the PATH themselves, and none of them makes the `gp` alias (run `gitpoulpi alias create gp`, or Settings > General > Launcher).
+A package manager's own PATH handling applies: Chocolatey, winget, Scoop and Homebrew put the programs on the PATH themselves, and none of them makes the `gp` alias (run `gitpoulpi alias create gp`, or Settings > Launcher).
 
 ### apt (Debian and Ubuntu)
 

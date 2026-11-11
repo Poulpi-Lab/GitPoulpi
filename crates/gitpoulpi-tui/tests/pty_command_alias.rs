@@ -1,4 +1,4 @@
-//! Settings > General > Launcher: the command alias and "Add GitPoulpi to
+//! Settings > Launcher: the command alias and "Add GitPoulpi to
 //! PATH" rows. HOME, XDG_* and the config directory point at scratch
 //! directories, so nothing here can reach the real `~/.local/bin` or the real
 //! shell startup files.
@@ -107,10 +107,20 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
         |s| s.contains("This cannot be") && s.contains("Cancel"),
     )
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    common::confirm_removal(&mut term, STEP);
-    wait_until("the link is still there", &term, || {
-        std::fs::symlink_metadata(&link).is_err()
-    });
+    // A click that landed on a torn frame misses: confirm again while the
+    // question is still up and the link is still there.
+    let deadline = std::time::Instant::now() + STARTUP;
+    while std::fs::symlink_metadata(&link).is_ok() {
+        assert!(
+            std::time::Instant::now() < deadline,
+            "the link is still there\n{}",
+            term.text()
+        );
+        if term.text().contains("This cannot") {
+            common::confirm_removal(&mut term, STEP);
+        }
+        std::thread::sleep(Duration::from_millis(500));
+    }
     let _ = term.stop();
 }
 
@@ -212,8 +222,10 @@ fn pick_the_name_in_the_combobox_then_add_and_remove_gitpoulpi_on_path() {
     // PATH: the palette twin (from the main window) writes a marked block,
     // and only that.
     term.send_keys("Esc").unwrap();
-    term.wait_for("Settings closed", STEP, |s| !s.contains("General - global"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.wait_for("Settings closed", STEP, |s| {
+        !s.contains("Launcher - global")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     palette(&mut term, "add to path", "Launcher: Add to PATH");
     wait_until("no block in .bashrc", &term, || {
         std::fs::read_to_string(&rc).is_ok_and(|t| t.contains("X-GitPoulpi=1"))
@@ -230,8 +242,10 @@ fn pick_the_name_in_the_combobox_then_add_and_remove_gitpoulpi_on_path() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     term.send_keys("Esc").unwrap();
-    term.wait_for("Settings closed", STEP, |s| !s.contains("General - global"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.wait_for("Settings closed", STEP, |s| {
+        !s.contains("Launcher - global")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     palette(&mut term, "remove from path", "Launcher: Remove from PATH");
     wait_until("the block is still there", &term, || {
         std::fs::read_to_string(&rc).is_ok_and(|t| t == "export KEEP=1\n")

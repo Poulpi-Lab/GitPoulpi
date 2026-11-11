@@ -80,7 +80,7 @@ fn settled_create(term: &Terminal) -> (u16, u16) {
 
 #[test]
 fn clicking_the_alias_create_button_creates_it() {
-    let (mut term, _config, home) = open_settings("General", "settings-buttons-click");
+    let (mut term, _config, home) = open_settings("Launcher", "settings-buttons-click");
     scroll_to(&mut term, "Create: command alias");
     let link = home.path().join(".local/bin/gp");
     // A click that raced a late scroll hits nothing, so press again, located
@@ -105,7 +105,7 @@ fn clicking_the_alias_create_button_creates_it() {
 
 #[test]
 fn enter_on_the_selected_alias_create_row_presses_its_button() {
-    let (mut term, _config, home) = open_settings("General", "settings-buttons-enter");
+    let (mut term, _config, home) = open_settings("Launcher", "settings-buttons-enter");
     scroll_to(&mut term, "Create: command alias");
     let link = home.path().join(".local/bin/gp");
     // A click left of the button (the empty label column) only selects the

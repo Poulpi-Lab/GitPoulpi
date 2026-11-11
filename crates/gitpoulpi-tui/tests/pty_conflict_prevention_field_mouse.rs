@@ -60,7 +60,7 @@ fn open_page(term: &mut Terminal) {
         s.contains("Repo-specific settings")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    common::settings_page(term, "Conflict prevention");
+    common::settings_page_nth(term, "Conflict prevention", 1);
 }
 
 fn text_pos(term: &Terminal, needle: &str) -> (u16, u16) {

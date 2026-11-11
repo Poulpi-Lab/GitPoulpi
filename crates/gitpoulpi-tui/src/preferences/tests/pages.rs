@@ -27,7 +27,6 @@ fn each_setting_is_on_the_page_the_owner_chose() {
                 "repos.clone_root",
                 "repos.browse_root",
                 "general.default_branch_name",
-                "general.conflict_detection",
                 "general.undo_enabled",
                 "general.undo_depth",
                 "log.level",
@@ -36,6 +35,17 @@ fn each_setting_is_on_the_page_the_owner_chose() {
                 "log.timings",
                 "log.extended",
                 "general.journal_outside",
+            ],
+        ),
+        (PrefSection::ConflictGlobal, &["general.conflict_detection"]),
+        (
+            PrefSection::Launcher,
+            &[
+                "ui.launch_terminal",
+                "ui.relaunch_in_terminal",
+                "ui.reuse_window",
+                "ui.command_alias",
+                "ui.command_alias_add",
             ],
         ),
         (
@@ -429,5 +439,33 @@ fn the_workbench_settings_follow_the_feature() {
                 title.get()
             );
         }
+    }
+}
+
+#[test]
+fn the_launcher_and_conflict_prevention_have_their_own_pages_the_palette_and_ids_reach() {
+    let dir = tempfile::tempdir().unwrap();
+    for (key, section, id) in [
+        ("ui.launch_terminal", PrefSection::Launcher, "launcher"),
+        (
+            "general.conflict_detection",
+            PrefSection::ConflictGlobal,
+            "conflict-prevention-global",
+        ),
+    ] {
+        let mut st = state(dir.path());
+        // The palette's `Settings: ...` row opens the row by its key.
+        st.show_page(None, Some(key)).unwrap();
+        assert_eq!(st.current_section(), section, "{key}");
+        assert_eq!(section.id(), id);
+        assert!(!section.is_repo_scoped());
+        let page = gitpoulpi_ipc::ui::SettingsPage::parse(id).unwrap();
+        assert_eq!(PrefSection::from_page(page), section);
+        // ... and the page's id opens the page.
+        let mut st = state(dir.path());
+        st.show_page(Some(page), None).unwrap();
+        assert_eq!(st.current_section(), section);
+        // General no longer lists the row.
+        assert!(!keys_of(&st, PrefSection::General).contains(&key));
     }
 }

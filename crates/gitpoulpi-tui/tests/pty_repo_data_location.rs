@@ -112,26 +112,24 @@ fn the_location_is_a_dropdown_in_general_settings() {
 }
 
 #[test]
-fn undo_history_holds_only_undo_items_and_the_launcher_rows_follow_the_launcher_heading() {
+fn undo_history_holds_only_undo_items_and_the_launcher_rows_are_on_their_own_page() {
     let repo = fixture();
     let config = tempfile::tempdir().unwrap();
     let mut term = launch(repo.root(), "pty-general-groups", config.path());
     open_general(&mut term);
     let screen = term
-        .wait_for("the Launcher group, every row drawn", STEP, |s| {
+        .wait_for("the General groups, every row drawn", STEP, |s| {
             [
                 "Undo history",
                 "Undo history depth",
                 "Record changes made outside",
                 "Application log",
-                "Launcher",
-                "Terminal for shortcuts",
             ]
             .iter()
             .all(|n| s.find_all(n).into_iter().any(|(c, _)| c > 28))
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let row = |needle: &str| {
+    let row = |screen: &xtask::pty::Screen, needle: &str| {
         screen
             .find_all(needle)
             .into_iter()
@@ -140,16 +138,29 @@ fn undo_history_holds_only_undo_items_and_the_launcher_rows_follow_the_launcher_
             .next()
             .unwrap_or_else(|| panic!("no {needle:?} row\n{}", screen.text()))
     };
-    let undo = row("Undo history");
-    let depth = row("Undo history depth");
-    let outside = row("Record changes made outside");
-    let log = row("Application log");
-    let launcher = row("Launcher");
-    let terminal = row("Terminal for shortcuts");
+    let undo = row(&screen, "Undo history");
+    let depth = row(&screen, "Undo history depth");
+    let outside = row(&screen, "Record changes made outside");
+    let log = row(&screen, "Application log");
     assert!(
-        undo < depth && depth < outside && outside < log && log < launcher && launcher < terminal,
-        "order: undo {undo}, depth {depth}, outside {outside}, log {log}, launcher {launcher}, terminal {terminal}\n{}",
+        undo < depth && depth < outside && outside < log,
+        "order: undo {undo}, depth {depth}, outside {outside}, log {log}\n{}",
         screen.text()
     );
+    // The launcher rows are not on General any more: they have their page.
+    assert!(
+        !screen.text().contains("Terminal for shortcuts"),
+        "{}",
+        screen.text()
+    );
+    common::settings_page(&mut term, "Launcher");
+    // (Not asserted: what General's rows left on a torn frame. The page's
+    // rows are pinned by the `pages` unit test.)
+    term.wait_for("the Launcher page, every row drawn", STEP, |s| {
+        s.find_all("Terminal for shortcuts")
+            .into_iter()
+            .any(|(c, _)| c > 28)
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let _ = term.stop();
 }

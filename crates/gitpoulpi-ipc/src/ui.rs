@@ -136,6 +136,10 @@ pub enum FileMode {
 #[serde(rename_all = "kebab-case")]
 pub enum SettingsPage {
     General,
+    /// The launcher (terminal, shortcuts, icon color, command alias).
+    Launcher,
+    /// The global part of proactive conflict detection (switch, base lists).
+    ConflictPreventionGlobal,
     Sync,
     Profiles,
     Ssh,
@@ -177,8 +181,10 @@ pub enum SettingsPage {
 
 impl SettingsPage {
     /// The page ids: the sidebar's order, then the legacy aliases.
-    pub const IDS: [&'static str; 26] = [
+    pub const IDS: [&'static str; 28] = [
         "general",
+        "launcher",
+        "conflict-prevention-global",
         "sync",
         "profiles",
         "ssh",

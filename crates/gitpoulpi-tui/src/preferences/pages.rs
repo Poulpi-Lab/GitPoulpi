@@ -34,8 +34,6 @@ pub(super) const GENERAL: &[Row] = &[
     Key("repos.browse_root"),
     Key("session.per_repo_state_dir"),
     Key("general.default_branch_name"),
-    Heading(|| msg::conflict_prevention::GLOBAL_HEADING.get()),
-    Key("general.conflict_detection"),
     Heading(|| msg::settings_general::HEADING_UNDO.get()),
     Key("general.undo_enabled"),
     Key("general.undo_depth"),
@@ -46,8 +44,11 @@ pub(super) const GENERAL: &[Row] = &[
     Key("log.max_file_mb"),
     Key("log.timings"),
     Key("log.extended"),
-    // Last on the page: the launcher's per-place rows are appended after
-    // these (see `general_fields`), so nothing above them shifts.
+];
+
+/// The Launcher page: the launcher's own rows; its per-place rows are
+/// appended after these (see `launcher_fields`), so nothing above them shifts.
+pub(super) const LAUNCHER: &[Row] = &[
     Heading(|| msg::launcher::HEADING.get()),
     Key("ui.launch_terminal"),
     Key("ui.launcher_build"),
@@ -55,6 +56,13 @@ pub(super) const GENERAL: &[Row] = &[
     Key("ui.reuse_window"),
     Key("ui.command_alias"),
     Key("ui.command_alias_add"),
+];
+
+/// The global part of proactive conflict detection: the default switch; the
+/// default list and the named lists follow it (see `conflict_global_page_fields`).
+pub(super) const CONFLICT_GLOBAL: &[Row] = &[
+    Heading(|| msg::conflict_prevention::GLOBAL_HEADING.get()),
+    Key("general.conflict_detection"),
 ];
 
 pub(super) const SYNC: &[Row] = &[
@@ -200,9 +208,11 @@ pub(super) const KEYBOARD: &[Row] = &[
 /// The config keys every plain row is registered under, for the pools'
 /// completeness test.
 #[cfg(test)]
-pub(super) fn tables() -> [(PrefSection, &'static [Row]); 11] {
+pub(super) fn tables() -> [(PrefSection, &'static [Row]); 13] {
     [
         (PrefSection::General, GENERAL),
+        (PrefSection::Launcher, LAUNCHER),
+        (PrefSection::ConflictGlobal, CONFLICT_GLOBAL),
         (PrefSection::Sync, SYNC),
         (PrefSection::Sync, SYNC_REWRITE),
         (PrefSection::Integrations, INTEGRATIONS),
@@ -272,14 +282,12 @@ impl PreferencesState {
     }
 
     pub(super) fn general_fields(&self) -> Vec<Field> {
-        let mut fields = self.picked(GENERAL);
-        // The default list and the named lists follow the global switch.
-        if let Some(at) = fields
-            .iter()
-            .position(|f| f.target == Target::Global("general.conflict_detection"))
-        {
-            fields.splice(at + 1..at + 1, self.conflict_global_fields());
-        }
+        self.picked(GENERAL)
+    }
+
+    /// The Launcher page.
+    pub(super) fn launcher_fields(&self) -> Vec<Field> {
+        let mut fields = self.picked(LAUNCHER);
         // The alias and PATH buttons sit right under the alias box; the
         // per-place shortcut rows follow.
         let alias_at = fields
@@ -288,6 +296,19 @@ impl PreferencesState {
             .map_or(fields.len(), |i| i + 1);
         fields.splice(alias_at..alias_at, self.tools_action_rows());
         fields.extend(self.launcher_action_rows());
+        fields
+    }
+
+    /// The global Conflict prevention page.
+    pub(super) fn conflict_global_page_fields(&self) -> Vec<Field> {
+        let mut fields = self.picked(CONFLICT_GLOBAL);
+        // The default list and the named lists follow the global switch.
+        if let Some(at) = fields
+            .iter()
+            .position(|f| f.target == Target::Global("general.conflict_detection"))
+        {
+            fields.splice(at + 1..at + 1, self.conflict_global_fields());
+        }
         fields
     }
 

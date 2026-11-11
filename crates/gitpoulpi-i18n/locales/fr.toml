@@ -5672,6 +5672,7 @@ midnight = "Minuit"
 
 [launcher]
 heading = "Lanceur"
+section = "Lanceur"
 terminal = "Terminal des raccourcis"
 terminal_help = "Le terminal dans lequel les raccourcis ci-dessous démarrent GitPoulpi (et le double-clic sous Windows). Automatique choisit parmi ce qui est installé."
 terminal_auto = "Automatique"
@@ -7612,6 +7613,7 @@ template_external = "Le paramètre {setting} de ce dépôt pointe vers {path} :
 
 [conflict_prevention]
 section = "Prévention des conflits"
+section_global = "Prévention des conflits"
 global_enable = "Activer la détection proactive des conflits"
 global_enable_help = { git = "Avertit quand un merge de la branche courante dans la branche dont elle est partie provoquerait un conflit. La vérification s'exécute en arrière-plan et ne touche jamais à vos fichiers. Un dépôt peut la désactiver pour lui-même dans sa page Prévention des conflits.", local = "Avertit quand la fusion de la branche courante dans la branche dont elle est partie provoquerait un conflit. La vérification s'exécute en arrière-plan et ne touche jamais à vos fichiers. Un dépôt peut la désactiver pour lui-même dans sa page Prévention des conflits." }
 repo_enable = "Rechercher les conflits avec la branche de base"

@@ -5661,6 +5661,7 @@ midnight = "Mitternacht"
 
 [launcher]
 heading = "Starter"
+section = "Starter"
 terminal = "Terminal für Verknüpfungen"
 terminal_help = "Das Terminal, in dem die Verknüpfungen unten GitPoulpi starten (und der Doppelklick unter Windows). Automatisch wählt unter den installierten."
 terminal_auto = "Automatisch"
@@ -7597,6 +7598,7 @@ template_external = "Die Einstellung {setting} dieses Repositorys verweist auf {
 
 [conflict_prevention]
 section = "Konfliktvermeidung"
+section_global = "Konfliktvermeidung"
 global_enable = "Proaktive Konflikterkennung aktivieren"
 global_enable_help = "Warnt, wenn ein {$Merge} des aktuellen Branches in den Branch, von dem er abzweigte, Konflikte verursachen würde. Die Prüfung läuft im Hintergrund und berührt nie Ihre Dateien. Ein Repository kann sie auf seiner Seite „Konfliktvermeidung“ für sich ausschalten."
 repo_enable = "Auf Konflikte mit dem Basis-Branch prüfen"

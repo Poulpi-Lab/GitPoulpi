@@ -5661,6 +5661,7 @@ midnight = "Midnatt"
 
 [launcher]
 heading = "Startare"
+section = "Startare"
 terminal = "Terminal för genvägar"
 terminal_help = "Terminalen som genvägarna nedan startar GitPoulpi i (och dubbelklick i Windows). Automatiskt väljer bland det som är installerat."
 terminal_auto = "Automatiskt"
@@ -7600,6 +7601,7 @@ template_external = "Det här repositoryts inställning {setting} pekar på {pat
 
 [conflict_prevention]
 section = "Konfliktförebyggande"
+section_global = "Konfliktförebyggande"
 global_enable = "Aktivera proaktiv konfliktdetektering"
 global_enable_help = "Varnar när en {$merge} av den aktuella grenen i grenen den startade från skulle ge konflikter. Kontrollen körs i bakgrunden och rör aldrig dina filer. Ett repository kan stänga av den för sig själv på sin sida Konfliktförebyggande."
 repo_enable = "Kontrollera konflikter mot basbranchen"

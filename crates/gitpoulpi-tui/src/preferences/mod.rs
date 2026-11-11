@@ -864,6 +864,8 @@ impl PreferencesState {
     fn fields_of_plain(&self, section: PrefSection) -> Vec<Field> {
         match section {
             PrefSection::General => self.general_fields(),
+            PrefSection::Launcher => self.launcher_fields(),
+            PrefSection::ConflictGlobal => self.conflict_global_page_fields(),
             PrefSection::Sync => self.sync_fields(),
             PrefSection::Profiles => Vec::new(),
             PrefSection::Ssh => self.ssh_fields(),

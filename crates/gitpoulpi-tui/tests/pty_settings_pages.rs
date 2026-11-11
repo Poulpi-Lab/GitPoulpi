@@ -41,6 +41,8 @@ fn every_regrouped_page_opens_and_shows_its_rows() {
     let (mut term, _config, _repo) = open_settings("pty-settings-pages");
     for (title, row) in [
         ("General", "Default branch name"),
+        ("Launcher", "Terminal for shortcuts"),
+        ("Conflict prevention", "Enable proactive"),
         ("Synchronization", "Auto-prune"),
         ("SSH & credentials", "Forget all usernames and"),
         ("Integrations", "Review request terminology"),

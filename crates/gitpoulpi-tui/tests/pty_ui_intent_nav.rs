@@ -301,3 +301,23 @@ fn the_newest_of_a_burst_wins_and_the_rest_are_superseded_or_spaced() {
     });
     assert!(matches!(out, UiOutcome::Applied { .. }), "{out:?}");
 }
+
+#[test]
+fn the_launcher_and_global_conflict_prevention_pages_open_by_their_ids() {
+    let rig = launch("pty-ui-nav-own-pages", fixture(), "second commit");
+    for (page, title) in [
+        (SettingsPage::Launcher, "Launcher - global"),
+        (
+            SettingsPage::ConflictPreventionGlobal,
+            "Conflict prevention - global",
+        ),
+    ] {
+        applied(rig.show(UiIntent::ShowSettings {
+            page: Some(page),
+            setting: None,
+        }));
+        rig.wait_for(title, |t| t.contains(title));
+        applied(rig.show(UiIntent::Back));
+        rig.wait_for("Settings closed", |t| !t.contains("Settings - Tab"));
+    }
+}

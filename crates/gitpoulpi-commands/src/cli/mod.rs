@@ -1090,7 +1090,7 @@ pub enum Commands {
         command: Vec<String>,
     },
     /// The command alias (`gp` or any name) that starts GitPoulpi from a
-    /// terminal: the scriptable twin of Settings > General > Launcher.
+    /// terminal: the scriptable twin of Settings > Launcher.
     Alias {
         #[command(subcommand)]
         action: AliasAction,

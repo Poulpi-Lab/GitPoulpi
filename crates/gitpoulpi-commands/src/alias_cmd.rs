@@ -1,5 +1,5 @@
 //! `gitpoulpi alias status|create|remove` and `gitpoulpi path status|add|remove`:
-//! the scriptable twins of Settings > General > Launcher's command alias and
+//! the scriptable twins of Settings > Launcher's command alias and
 //! "Add GitPoulpi to PATH" rows, and what the installers call. The work is
 //! `gitpoulpi_config::desktop::{alias, path}`; nothing here needs a daemon or
 //! a repository. Not journaled: there is no git state to undo.

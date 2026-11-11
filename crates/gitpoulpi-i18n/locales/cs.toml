@@ -5654,6 +5654,7 @@ midnight = "Půlnoc"
 
 [launcher]
 heading = "Spouštěč"
+section = "Spouštěč"
 terminal = "Terminál pro zástupce"
 terminal_help = "Terminál, v němž zástupce níže spouštějí GitPoulpi (a dvojklik ve Windows). Automaticky vybírá z nainstalovaných."
 terminal_auto = "Automaticky"
@@ -7590,6 +7591,7 @@ template_external = "Nastavení {setting} tohoto repozitáře ukazuje na {path}:
 
 [conflict_prevention]
 section = "Prevence konfliktů"
+section_global = "Prevence konfliktů"
 global_enable = "Zapnout proaktivní detekci konfliktů"
 global_enable_help = { git = "Upozorní, když by merge aktuální větve do větve, ze které vznikla, skončil konfliktem. Kontrola běží na pozadí a vašich souborů se nikdy nedotkne. Repozitář ji může pro sebe vypnout na své stránce Prevence konfliktů.", local = "Upozorní, když by sloučení aktuální větve do větve, ze které vznikla, skončilo konfliktem. Kontrola běží na pozadí a vašich souborů se nikdy nedotkne. Repozitář ji může pro sebe vypnout na své stránce Prevence konfliktů." }
 repo_enable = "Kontrolovat konflikty se základní větví"

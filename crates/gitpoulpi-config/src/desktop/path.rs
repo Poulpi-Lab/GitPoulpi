@@ -1,6 +1,6 @@
 //! "Add GitPoulpi to PATH": the directory the GitPoulpi programs live in and
 //! the alias `bin` directory ([`super::alias`]) go on the user's `PATH`
-//! (Settings > General > Launcher, `gitpoulpi path ...`).
+//! (Settings > Launcher, `gitpoulpi path ...`).
 //!
 //! | OS | Where | How it is known to be ours |
 //! |---|---|---|

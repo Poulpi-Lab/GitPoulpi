@@ -1,4 +1,4 @@
-//! Settings > General > Launcher: the palette's `Launcher: Create Shortcut`
+//! Settings > Launcher: the palette's `Launcher: Create Shortcut`
 //! writes the `.desktop` entry and its icon into a temp `XDG_DATA_HOME`, the
 //! row then reads "created", and its Remove button deletes both again.
 //!

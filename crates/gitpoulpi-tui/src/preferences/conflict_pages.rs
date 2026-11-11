@@ -1,6 +1,6 @@
 //! The Conflict prevention page (Settings > Repository; plan
 //! `repo-settings.md`, slice 3) and the global "Conflict prevention" group of
-//! Settings > General: the switches, and where the Base branches come from.
+//! Settings > Conflict prevention: the switches, and where the Base branches come from.
 //!
 //! A repository's Base branches are one of three things, chosen on its page:
 //! the global **Default** (`conflict_prevention.default_list`, else `**`), a
@@ -14,7 +14,7 @@
 //! Nothing here applies anything itself: the daemon reads the settings with
 //! every check, and the window asks again when Settings closes
 //! (`conflict_badge`), so an edited list or default reaches open repositories
-//! without a restart. The General group edits the lists: create, rename, edit,
+//! without a restart. The global page edits the lists: create, rename, edit,
 //! delete, make default, reset.
 
 use gitpoulpi_config::{
@@ -225,7 +225,7 @@ impl PreferencesState {
         fields
     }
 
-    // -- the global group (Settings > General) ---------------------------------
+    // -- the global page (Settings > Conflict prevention) ---------------------------------
 
     /// The rows after the global switch: the default list and the lists.
     pub(super) fn conflict_global_fields(&self) -> Vec<Field> {

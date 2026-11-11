@@ -5654,6 +5654,7 @@ midnight = "Meia-noite"
 
 [launcher]
 heading = "Lançador"
+section = "Lançador"
 terminal = "Terminal dos atalhos"
 terminal_help = "O terminal em que os atalhos abaixo iniciam o GitPoulpi (e o clique duplo no Windows). Automático escolhe entre os instalados."
 terminal_auto = "Automático"
@@ -7592,6 +7593,7 @@ template_external = "A configuração {setting} deste repositório aponta para {
 
 [conflict_prevention]
 section = "Prevenção de conflitos"
+section_global = "Prevenção de conflitos"
 global_enable = "Ativar a detecção proativa de conflitos"
 global_enable_help = { git = "Avisa quando um {$merge} da branch atual na branch de onde ela partiu teria conflito. A verificação roda em segundo plano e nunca toca nos seus arquivos. Um repositório pode desativá-la para si na própria página Prevenção de conflitos.", local = "Avisa quando uma {$merge} da branch atual na branch de onde ela partiu teria conflito. A verificação roda em segundo plano e nunca toca nos seus arquivos. Um repositório pode desativá-la para si na própria página Prevenção de conflitos." }
 repo_enable = "Verificar conflitos com a branch base"

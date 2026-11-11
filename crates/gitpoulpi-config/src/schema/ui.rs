@@ -640,7 +640,7 @@ pub struct UiConfig {
     pub reuse_window: bool,
     /// Live: the name of the command that starts GitPoulpi (`gp`, or any
     /// name without spaces or path separators). Empty (the default): none.
-    /// Settings > General > Launcher creates and removes it; see
+    /// Settings > Launcher creates and removes it; see
     /// `gitpoulpi_config::desktop::alias`.
     pub command_alias: String,
     /// Live: the name of the second command, which opens the current folder

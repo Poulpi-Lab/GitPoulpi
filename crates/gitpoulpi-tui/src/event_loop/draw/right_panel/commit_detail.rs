@@ -682,71 +682,15 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
             (Some(commit), Some(outcome)) if outcome.commit == commit.id => Some(outcome),
             _ => None,
         };
-        commit_file_rows
-            .iter()
-            .map(|row| match row {
-                TreeRow::Folder {
-                    depth,
-                    label,
-                    collapsed,
-                    path,
-                } => {
-                    let chevron = crate::fold_mark::glyph(*collapsed);
-                    let item = ListItem::new(Line::from(Span::styled(
-                        format!("{}{chevron} {label}/", "  ".repeat(*depth)),
-                        Style::default()
-                            .fg(th().ui.muted)
-                            .add_modifier(Modifier::BOLD),
-                    )));
-                    if file_sel.contains(FileList::Commit, path, true) {
-                        item.style(Style::default().bg(th().ui.selection))
-                    } else {
-                        item
-                    }
-                }
-                TreeRow::File {
-                    depth,
-                    label,
-                    index,
-                } => {
-                    let status = commit_paths
-                        .get(*index)
-                        .and_then(|p| commit_file_status(shown_outcome, p));
-                    let marker = status.map(status_marker).unwrap_or(" ");
-                    let color = status.map(file_status_color).unwrap_or(th().ui.muted);
-                    let mut spans = vec![
-                        Span::styled(
-                            format!("{}{marker} ", "  ".repeat(*depth)),
-                            Style::default().fg(color),
-                        ),
-                        Span::styled(label.clone(), Style::default().fg(th().ui.text)),
-                    ];
-                    // Tagged by whether the path is an LFS file
-                    // in the *current* index: the file was
-                    // almost certainly an LFS file when the
-                    // commit was made too, and asking per
-                    // commit would cost a read per selection.
-                    if commit_paths.get(*index).is_some_and(|p| lfs.is_lfs(p)) {
-                        spans.push(Span::styled(
-                            " LFS",
-                            Style::default()
-                                .fg(th().ui.accent)
-                                .add_modifier(Modifier::BOLD),
-                        ));
-                    }
-                    let item = ListItem::new(Line::from(spans));
-                    // Multi-selected rows (Ctrl/Shift+click) read as picked.
-                    if commit_paths
-                        .get(*index)
-                        .is_some_and(|p| file_sel.contains(FileList::Commit, p, false))
-                    {
-                        item.style(Style::default().bg(th().ui.selection))
-                    } else {
-                        item
-                    }
-                }
-            })
-            .collect()
+        crate::file_rows::FileRows {
+            rows: commit_file_rows,
+            paths: &commit_paths,
+            status_of: &|p| commit_file_status(shown_outcome, p),
+            is_lfs: &|p| lfs.is_lfs(p),
+            file_picked: &|p| file_sel.contains(FileList::Commit, p, false),
+            folder_picked: &|p| file_sel.contains(FileList::Commit, p, true),
+        }
+        .items()
     };
     // The hint has to describe the click that is wired: a single click opens
     // the diff.

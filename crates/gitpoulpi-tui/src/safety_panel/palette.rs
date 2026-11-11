@@ -40,9 +40,9 @@ pub(crate) enum SafetyCmd {
     /// Reflog and Lost work: the dividers back to their default places
     /// (`Alt+0`).
     ResetPanes,
-    /// `Dialog: Move/resize` (`Ctrl+N m`): the arrange mode.
+    /// `Dialog: Move or Resize` (`Ctrl+N m`): the arrange mode.
     ArrangeDialog,
-    /// `Dialog: Reset position and size`.
+    /// `Dialog: Reset Position and Size`.
     ResetDialog,
 }
 

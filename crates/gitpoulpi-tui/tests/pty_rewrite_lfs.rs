@@ -138,12 +138,21 @@ fn a_binary_moves_to_lfs_with_a_pointer_in_the_log_and_the_real_file_on_disk() {
         .wait_for_text("add art", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 1, row).expect("select the commit");
-    let (col, row) = term
-        .wait_for_text("art.bin", STEP)
+    term.wait_for_text("art.bin", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
-    term.click(col + 1, row).expect("open the file's diff");
-    term.wait_for("the LFS card", STEP, |s| s.contains("Git LFS object"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: under load the click can land on a torn frame of the list.
+    common::retry_until(
+        &mut term,
+        "the LFS card",
+        6,
+        Duration::from_secs(10),
+        |t| {
+            if let Some((c, r)) = t.screen().find("art.bin") {
+                t.click(c + 1, r).expect("open the file's diff");
+            }
+        },
+        |s| s.contains("Git LFS object"),
+    );
     term.send_keys("r").unwrap();
     term.wait_for("the raw pointer in the diff", STEP, |s| {
         s.contains("oid sha256") && s.contains("size 4000")

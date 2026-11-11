@@ -465,11 +465,14 @@ impl RemoteForm {
         self.edit.begin_frame();
         let width = area.width.saturating_sub(4).min(72);
         let height = 12u16.min(area.height);
-        let popup = Rect::new(
-            area.x + area.width.saturating_sub(width) / 2,
-            area.y + area.height.saturating_sub(height) / 3,
-            width,
-            height,
+        let popup = WIN.place(
+            area,
+            Rect::new(
+                area.x + area.width.saturating_sub(width) / 2,
+                area.y + area.height.saturating_sub(height) / 3,
+                width,
+                height,
+            ),
         );
         frame.render_clipped(Clear, popup);
         frame.render_clipped(
@@ -492,6 +495,7 @@ impl RemoteForm {
         if let Some(cross) = cross {
             hits.push((cross, RemoteFormHit::Close));
         }
+        WIN.decorate(buf, popup, cross, true);
         let inner = Rect::new(
             popup.x + 2,
             popup.y + 1,
@@ -631,3 +635,6 @@ impl RemoteForm {
         hits
     }
 }
+
+/// The Add / Edit Remote popup moves (its size follows its tabs).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("remote_form");

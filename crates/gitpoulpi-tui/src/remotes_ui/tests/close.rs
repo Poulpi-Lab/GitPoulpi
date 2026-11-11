@@ -62,3 +62,14 @@ fn a_click_outside_closes_a_pristine_form_and_is_swallowed_when_dirty() {
     form.fetch_url.push('x');
     assert_eq!(form.on_outside_click(0, 0), Some(FormOutcome::Stay));
 }
+
+#[test]
+fn the_popup_moves_and_arranges_but_does_not_resize() {
+    let form = RemoteForm::add(vec![]);
+    crate::dialog_kit::frame::testing::check_gestures(false, || {
+        let mut terminal = Terminal::new(TestBackend::new(160, 50)).unwrap();
+        terminal
+            .draw(|f| drop(form.render(f, f.area(), None)))
+            .unwrap();
+    });
+}

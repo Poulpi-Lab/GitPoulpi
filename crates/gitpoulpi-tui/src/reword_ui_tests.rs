@@ -535,3 +535,16 @@ fn the_amend_dialog_paints_labels_prefilled_fields_and_a_hit_for_each() {
         assert!(hits.iter().any(|(_, p)| *p == part), "no hit for {part:?}");
     }
 }
+
+#[test]
+fn the_form_moves_and_arranges_but_does_not_resize() {
+    use ratatui::backend::TestBackend;
+    use ratatui::Terminal;
+    let form = RewordForm::new(oid(1), "summary\n\nbody", None);
+    crate::dialog_kit::frame::testing::check_gestures(false, || {
+        let mut terminal = Terminal::new(TestBackend::new(160, 50)).unwrap();
+        terminal
+            .draw(|frame| drop(form.render(frame, frame.area(), None)))
+            .unwrap();
+    });
+}

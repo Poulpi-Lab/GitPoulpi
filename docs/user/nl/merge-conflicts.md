@@ -165,12 +165,12 @@ index en de refs blijven onaangeroerd.
   nieuwe antwoord. Een losgekoppelde HEAD wordt niet gecontroleerd.
 - **Lijsten met basisbranches**: waar de basisbranches van een repository vandaan komen, is een keuze op zijn pagina
   **Conflictpreventie**. **Standaard** volgt de globale standaard (de ingebouwde `**`, elke branch, tot je in
-  Instellingen > Algemeen > Conflictpreventie een andere lijst kiest); **Lijst: <naam>** volgt een van je lijsten met
+  Instellingen > Conflictpreventie een andere lijst kiest); **Lijst: <naam>** volgt een van je lijsten met
   een naam; **Eigen lijst** is een lijst van de repository zelf. Lijsten worden gedeeld: bewerk er een en elke repository
   die hem volgt gebruikt de wijziging bij de volgende controle, zonder herstart. **Opslaan als lijst...** maakt van de
   eigen patronen van een repository een lijst met een naam, **Terug naar standaard** laat de keuze van de repository vallen.
   Een lijst verwijderen die een repository volgt, laat hem de standaard gebruiken.
-- **Uit**: **Proactieve conflictdetectie inschakelen** in Instellingen > Algemeen, of voor één
+- **Uit**: **Proactieve conflictdetectie inschakelen** in Instellingen > Conflictpreventie, of voor één
   repository op zijn pagina **Conflictpreventie**. Vanuit een script drukt `gitpoulpi conflicts check`
   hetzelfde antwoord af als JSON ([CLI-referentie](cli-reference.md)).
 

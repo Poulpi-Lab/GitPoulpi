@@ -54,13 +54,15 @@ De acties die je ongedaan hebt gemaakt staan **boven** de nieuwste actie, onder
 een scheidingslijn ("ongedaan gemaakt - Opnieuw brengt ze terug"), gedimd, met
 degene die Opnieuw als eerste terugbrengt het dichtst bij de lijn. De selectie
 begint op de nieuwste actie, niet daarop. De pijltoetsen bewegen (de koppen en
-de scheidingslijn worden overgeslagen), `Tab` wisselt tussen de drie
-weergaven, `Esc` sluit. Voor de geselecteerde rij:
+de scheidingslijn worden overgeslagen), `1` / `2` / `3`
+(of `Ctrl+Tab` / `Ctrl+Shift+Tab`) wisselen tussen de drie weergaven, `Esc` sluit.
+`Enter` voert nooit een actie uit: elke knop heeft zijn eigen letter, te zien in de
+hintregel onder de knoppen. Voor de geselecteerde rij:
 
-- **Ongedaan maken tot hier** (`u`): maakt die actie en elke nieuwere ongedaan,
+- **Ongedaan maken tot hier** (`o`): maakt die actie en elke nieuwere ongedaan,
   de nieuwste eerst, na één bevestiging die ze allemaal opsomt. Een stap die de
   daemon riskant vindt, vraagt opnieuw voordat hij wordt uitgevoerd.
-- **Alleen dit herstellen** (`r`): brengt terug wat die ene actie verwijderde en
+- **Alleen dit herstellen** (`a`): brengt terug wat die ene actie verwijderde en
   laat alles wat erna kwam staan. Een verwijderde branch of tag komt terug op de
   commit die hij had (is zijn naam inmiddels bezet, dan wordt om een andere
   gevraagd, met een vrije al ingevuld); een gedropte stash wordt bovenaan de
@@ -72,8 +74,8 @@ weergaven, `Esc` sluit. Voor de geselecteerde rij:
   `restore/<branch>-<sha>` op de oude punt - je huidige branch en bestanden
   verplaatsen nooit. De bevestiging toont precies wat er gaat gebeuren, en het
   herstel is een nieuwe actie: `Ctrl+Z` draait het terug.
-- **Opnieuw tot hier** (`y`) op een ongedane rij.
-- **main herstellen naar waar Commit het achterliet** (`o`, of `Alt+Shift+Z` /
+- **Opnieuw tot hier** (`n`) op een ongedane rij.
+- **main herstellen naar waar Commit het achterliet** (`h`, of `Alt+Shift+Z` /
   `Bewerken: De branch herstellen naar waar de geblokkeerde actie hem
   achterliet` van buiten het paneel): als een ander programma de branch
   verplaatste en Ongedaan maken blokkeerde, weet de reflog nog waar de actie hem
@@ -100,8 +102,10 @@ Repositories met het reftable-formaat van git worden net als alle andere gelezen
 
 ![De Reflog van main: elke positie die hij heeft gehad, nieuwste eerst, met de geselecteerde beschreven aan de rechterkant](../images/reflog.png)
 
-**Tonen in het Log** (`s`), **Branch hier maken** (`b`) en
-**`<branch>` herstellen naar deze positie** (`r`). Het herstel is ongedaan te
+**Tonen in het Log** (`l`), **Branch hier maken** (`b`), **Tag hier maken** (`t`),
+**Toepassen op de werkmap** (`w`), **Bewaren als stash** (`s`) (de laatste drie werken
+zoals bij Verloren werk hieronder) en
+**`<branch>` herstellen naar deze positie** (`h`). Het herstel is ongedaan te
 maken. Als de branch is uitgecheckt en je lokale wijzigingen hebt die hij niet
 kan verplaatsen zonder ze te overschrijven, vraagt een keuzelijst wat ermee moet
 gebeuren: mijn wijzigingen behouden, soft, mixed of hard. Hard gooit de
@@ -119,8 +123,54 @@ zich aan terwijl een spinner draait; hij blokkeert de interface nooit.
 ![Verloren werk: de twee commits van een verwijderde branch (gevonden via de reflog) en losse commits](../images/lost-work.png)
 
 **Branch hier maken** (`b`) herstelt een commit onder een naam naar keuze,
-**Cherry-pick** (`c`) past hem toe op de huidige branch, **Tonen in het Log**
-(`s`) werkt voor de commits die nog bereikbaar zijn.
+**Tag hier maken** (`t`) zet er een tag op (standaardnaam `restored-<korte id>`),
+**Cherry-pick** (`c`) past hem toe op de huidige branch. Een verloren commit staat
+niet in het Log, dus deze weergave heeft geen "Tonen in het Log" (de Reflog houdt
+het voor de commits die nog bereikbaar zijn).
+
+**Wijzigingen terughalen** zet terug wat de commit wijzigde, zonder te committen:
+**Toepassen op de werkmap** (`w`) speelt de wijzigingen van de commit af op de
+bestanden, alles of niets (de index en HEAD blijven staan; een merge-commit wordt
+geweigerd). Past het niet netjes, dan blijft alles ongemoeid en biedt het dialoog
+**Bewaren als stash** (`s`) aan, dat dezelfde wijzigingen in plaats daarvan als
+nieuwe stash bewaart; die actie is ook altijd los beschikbaar. Beide staan in het
+journaal: `Ctrl+Z` zet de bestanden terug, of laat de stash weer vallen. Dezelfde
+acties zijn `gitpoulpi apply-commit <rev>` en `gitpoulpi stash from-commit <rev>
+[-m M]`, en de Reflog-weergave heeft ze ook.
+
+### Panelen, hunks en het venster
+
+Reflog en Verloren werk tonen links de commitlijst en rechts de kop van de
+geselecteerde commit, **elk bestand dat hij wijzigde** en de hunks van het
+geselecteerde bestand (alleen hunks, afgebroken op de paneelbreedte). De
+bestandslijst is die van het rechterpaneel van het hoofdvenster: `Pad` of `Boom`
+(`v`, of klik op de schakelaar), een map klapt in of uit met `Enter`, `Links` of
+`Rechts`, een klik of de pijlen kiezen een bestand en zijn hunks verschijnen
+eronder (de daemon wordt buiten de interfacethread gevraagd; de laatste paar
+bestanden blijven bewaard). De commitlijst, de bestandslijst en de hunks hebben elk
+een schuifbalk die je kunt indrukken en slepen.
+
+- `Tab` / `Shift+Tab` lopen langs de panelen (lijst, bestanden, hunks); de pijlen,
+  `PageUp`, `PageDown`, `Home` en `End` werken op het paneel dat het toetsenbord
+  heeft (zijn rand is verlicht). `Enter` op een bestand gaat naar zijn hunks.
+- **Scheidingen**: sleep die tussen de lijst en het rechterpaneel, of die tussen de
+  bestanden en de hunks; dubbelklik op een scheiding om hem te herstellen. Met het
+  toetsenbord: `Alt+Links` / `Alt+Rechts`, `Alt+Omhoog` / `Alt+Omlaag`, `Alt+0`
+  herstelt beide. Het palet heeft `Reflog / Verloren werk: Paneelgroottes
+  herstellen`, `Volgend paneel` en `Bestandslijst als paden of boomstructuur`.
+- `Ctrl+N` toont zijn badges over de drie weergavetabbladen en de drie panelen,
+  zoals in het hoofdvenster; een badgetoets springt erheen.
+- **Het dialoog verplaatsen en schalen**: sleep de titelbalk om het te verplaatsen,
+  sleep de linker-, rechter- en onderrand of een onderhoek (het `◢`-handvat) om het
+  te schalen (nooit kleiner dan 60 x 16, altijd op het scherm). Het sluitkruis
+  houdt zijn klik en loslaten buiten het dialoog sluit het nooit. Het
+  toetsenbordtegenstuk is `Ctrl+N` en dan `m`: de pijlen verplaatsen, `Shift`+pijlen
+  schalen, `0` herstelt, `Enter` of `Esc` verlaat de modus (de rand zegt dat zolang
+  hij aan staat). Het palet heeft `Dialoog: Verplaatsen of schalen` en `Dialoog:
+  Positie en grootte herstellen`. Of de plaats wordt onthouden, is
+  `ui.dialog_geometry` (*Instellingen > Weergave > Positie en grootte
+  van dialogen onthouden*): `session` (standaard), `saved` (hersteld bij de
+  volgende start) of `never`.
 
 ## Vanuit het opdrachtenpalet
 
@@ -129,8 +179,8 @@ Elke rijactie van de drie weergaven is ook een rij in het opdrachtenpalet, zodat
 | Weergave | Rijen in het palet |
 |---|---|
 | Geschiedenis van ongedaan maken | `Geschiedenis: Ongedaan maken tot hier...`, `Opnieuw tot hier...`, `Alleen dit herstellen...`, `De branch herstellen naar waar hij was...`, `Vernieuwen`, `Sluiten` |
-| Reflog | `Reflog: Tonen in het Log`, `Branch hier maken...`, `Herstellen naar deze positie...`, `Meer laden`, `Vernieuwen` |
-| Verloren werk | `Verloren werk: Tonen in het Log`, `Branch hier maken...`, `Cherry-pick`, `Opnieuw zoeken` |
+| Reflog | `Reflog: Tonen in het Log`, `Branch hier maken...`, `Tag hier maken...`, `Wijzigingen toepassen op de werkmap`, `Wijzigingen bewaren als stash`, `Herstellen naar deze positie...`, `Meer laden`, `Vernieuwen` |
+| Verloren werk | `Verloren werk: Branch hier maken...`, `Tag hier maken...`, `Cherry-pick`, `Wijzigingen toepassen op de werkmap`, `Wijzigingen bewaren als stash`, `Opnieuw zoeken` |
 
 De rijen zijn grijs (met de reden) zolang hun weergave niet open is; de drie openers, `Bewerken: Geschiedenis van ongedaan maken...`, `Bewerken: Reflog...` en `Bewerken: Verloren commits terughalen...`, schakelen een open paneel ook om naar hun weergave. Een rij die de selectie niet kan uitvoeren zegt in de statusbalk waarom, in plaats van niets te doen: "deze actie is al ongedaan gemaakt: gebruik Opnieuw tot hier", de reden waarom een item niet afzonderlijk kan worden hersteld, "alleen een branch of HEAD kan worden teruggezet", enzovoort. De rijen met `...` openen dezelfde bevestiging of naamprompt als de knop.
 
@@ -142,8 +192,8 @@ De rijen zijn grijs (met de reden) zolang hun weergave niet open is; de drie ope
 | Branches en tags | maken, verwijderen, hernoemen, de upstream instellen of wissen, een trackingbranch maken, een tag maken / verwijderen / annoteren, fast-forward, een pull request als branch uitchecken |
 | Rondbewegen | checkout van een branch of een commit (ook een detached HEAD) |
 | Geschiedenis | merge (fast-forward of merge-commit), rebase (gewoon en interactief, zodra hij klaar is), cherry-pick, revert, reset (soft, mixed en hard), het lokale deel van een pull |
-| Lokale wijzigingen | stage en unstage (bestand, map, hunk, regels, alles), verwerpen (bestand, map, hunk, regels, een bestandscheckout), een patch toepassen, **een bestand van schijf verwijderen**, **negeren** (bestand, extensie of map: de regel in het `.gitignore` dat je koos), **als binair of tekst behandelen** (de regel in `.gitattributes`) |
-| Stashes | push, apply, pop, drop |
+| Lokale wijzigingen | stage en unstage (bestand, map, hunk, regels, alles), verwerpen (bestand, map, hunk, regels, een bestandscheckout), een patch of de wijzigingen van een commit toepassen (`apply-commit`), **een bestand van schijf verwijderen**, **negeren** (bestand, extensie of map: de regel in het `.gitignore` dat je koos), **als binair of tekst behandelen** (de regel in `.gitattributes`) |
+| Stashes | push, apply, pop, drop, de wijzigingen van een commit als stash bewaren (`stash from-commit`) |
 | Remotes en configuratie | een remote toevoegen, verwijderen, hernoemen, de URL of push-URL wijzigen, Git LFS track en untrack |
 | Op een server | **een branch of tag op een remote verwijderen** (via het menu van de ref, het palet, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, of een workflow-afronding die de remote branch verwijdert): zie hieronder |
 
@@ -419,7 +469,10 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   shell deed. `reflog-restore` verplaatst een branch (of `HEAD`) naar een van die
   posities; een uitgecheckte branch met niet-gecommitte wijzigingen vraagt om
   `--mode`. Het wordt ook gejournaald.
-- `lost-commits` toont commits die geen branch, tag, remote of stash bereikt.
+- `lost-commits` toont commits die geen branch, tag, remote of stash bereikt. Om het
+  werk van één ervan terug te krijgen zonder te committen: `apply-commit <rev>` (op
+  de werkmap, alles of niets) of `stash from-commit <rev>` (als stash); beide staan
+  in het journaal.
 - Als een verplaatsing in een shell het nieuwste item blokkeert, bevat de
   weigering de reflog-positie die bevat wat het item verwacht
   (`reason.RefMoved.restore`), om aan `reflog-restore` te geven.

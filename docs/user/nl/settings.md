@@ -173,16 +173,16 @@ De paginalijst heeft twee groepen:
 | **Standaard bladermap** | Waar Bladeren opent. Leeg: de laatste map die je gebruikte, anders je thuismap. |
 | **Opslaglocatie van repositorygegevens** | Waar GitPoulpi zijn gegevens per repository bewaart (`session.per_repo_state_dir`): **In .git** (standaard: er verschijnt niets in je werkmap, alle worktrees delen het), **In de werkmap** (een map `.gitpoulpi`; nodig om een `workflow.toml` voor het team te committen) of **In mijn gebruikersgegevensmap** (buiten de repository). Een map `.gitpoulpi` die een oudere versie achterliet, wordt de eerste keer dat ze nodig is naar de nieuwe plek verplaatst en verwijderd zodra ze leeg is; een bestand dat git volgt (een gecommitte `workflow.toml`) wordt nooit verplaatst of verwijderd en blijft leesbaar. |
 | **Standaardnaam van branch** | De eerste branch van een repository die je met Init maakt. Leeg: git beslist. Hernoemt geen bestaande branch. |
-| **Proactieve conflictdetectie inschakelen** | Standaard aan (`general.conflict_detection`). Waarschuwt in de Log als het mergen van de huidige branch in de branch waarvan hij is gestart zou conflicteren, voordat je het probeert. Een repository kan dit voor zichzelf uitschakelen op zijn pagina **Conflictpreventie**. Zie [Merge-conflicten oplossen](merge-conflicts.md#conflictpreventie). Geldt zodra Instellingen sluit. |
-| **Standaard basisbranches** | Onder de schakelaar, in de groep **Conflictpreventie** (**Conflicten: Lijsten met basisbranches bewerken...** in het palet opent hem). De lijst met patronen van basisbranches die repositories gebruiken als ze er geen eigen hebben: **Ingebouwd (`**`)**, dat is elke branch, of een van je lijsten met een naam (`conflict_prevention.default_list`). Geldt voor de geopende repositories zodra Instellingen sluit. **Terug naar ingebouwde standaard** gaat terug naar `**`. |
-| **Lijsten met basisbranches** | Ook in die groep: je lijsten met een naam met patronen van basisbranches (`[conflict_prevention.lists.<naam>]`), elk een blok met zijn **Naam** (hernoemen laat hem de standaard blijven als hij dat was; een repository die de oude naam volgde, gebruikt de standaardlijst tot je hem opnieuw kiest), zijn **Patronen** (één per regel, `Enter` of een klik opent de editor, `Ctrl+S` bewaart), **Als standaard instellen** en **Lijst verwijderen** (vraagt eerst, en zegt dat repositories die hem volgen in plaats daarvan de standaardlijst gebruiken). Typ een naam bij **Nieuwe lijst** en druk op `Enter` om er een toe te voegen; hij begint met `**`. Een lijst bewerken wijzigt elke repository die hem volgt. |
 | **Logniveau**, **Logbestanden bewaren**, **Maximale grootte van een logbestand** | Het applicatielogboek achter het activiteitenlogboek: het meest uitgebreide niveau dat wordt vastgelegd (`log.level`), hoe lang bestanden bewaard blijven (een geheel getal en een eenheid, dagen, weken, maanden of jaren, op één regel: klik op het getal om het te typen, Omhoog en Omlaag verhogen of verlagen het, Tab gaat naar de eenheid en Enter opent de lijst ervan; hooguit 1 tot 10 jaar, standaard 1 week, `log.retention_days` en `log.retention_unit`) en de grootte waarbij het bestand van een dag wordt geroteerd (een getal en MiB of GiB, 1 MiB tot 1 GiB, `log.max_file_mb` en `log.max_file_unit`). |
 | **Duur van bewerkingen tonen**, **Uitgebreid loggen** | Het tabblad Git-bewerkingen van het activiteitenlogboek: de duur van elke bewerking (`log.timings`, standaard aan) en ook het achtergrondwerk, vernieuwen en auto-fetch (`log.extended`, standaard uit). Zie [Wanneer er iets mislukt](troubleshooting.md#het-activiteitenlogboek). |
 | **Ongedaan maken ingeschakeld**, **Diepte van de ongedaanmaakgeschiedenis**, **Wijzigingen buiten GitPoulpi vastleggen** | De groep **Geschiedenis van ongedaan maken**. Zet Ongedaan maken aan of uit en bepaalt hoeveel bewerkingen het bewaart (standaard 100, `0` betekent onbeperkt). Ongedaan maken uitzetten wist de ongedaanmaakgeschiedenis, na een bevestiging. De laatste legt ook vast wat een shell of een agent met branches, tags, stashes en HEAD doet. Zie [Ongedaan maken en opnieuw](undo-redo.md). |
 
-#### Starter (bureaubladintegratie)
+De opdracht **App: Taal wijzigen...** van het palet (`Ctrl+N g`) opent dezelfde talenlijst. Daar toont
+de gemarkeerde taal live een voorbeeld; `Enter` houdt haar en `Esc` herstelt de vorige.
 
-De groep **Starter**, de laatste op de pagina Algemeen, maakt een snelkoppeling die GitPoulpi
+### Starter
+
+De pagina **Starter** (`gitpoulpi ui show settings launcher`) maakt een snelkoppeling die GitPoulpi
 start vanuit de starter van het besturingssysteem, in de terminal die je kiest.
 
 | Rij | Wat ze doet |
@@ -208,9 +208,9 @@ logokleur (Over GitPoulpi > kleur); op Linux heeft elke kleur zijn eigen pictogr
 
 **Groeperen in taakbalk en Dock.** GitPoulpi draait in een terminalvenster, dus de taakbalk toont het normaal onder het pictogram van de terminal, zonder “actief”-stip onder het vastgemaakte GitPoulpi-pictogram. Windows: de snelkoppelingen dragen de AppUserModelID `GitPoulpi.GitPoulpi`, en een GitPoulpi dat vanuit een ervan is gestart geeft zijn terminalvenster dezelfde ID en zijn pictogram (het vindt het venster door het even een unieke titel te geven en zet de titel daarna terug), zodat het venster onder het vastgemaakte GitPoulpi-pictogram staat. Een terminalvenster met meerdere tabbladen verplaatst als geheel: al zijn tabbladen groeperen onder het GitPoulpi-pictogram zolang GitPoulpi erin draait. Eerder gemaakte snelkoppelingen en vastgemaakte taakbalkitems worden door dezelfde synchronisatie herschreven; toont een vastgemaakt item nog het pictogram van de terminal, maak het dan los en maak het opnieuw vast. Linux: kitty, foot, Alacritty, WezTerm en Ghostty worden gestart met de vensterklasse `gitpoulpi` en het `.desktop`-bestand noemt die (`StartupWMClass`), zodat een dock het venster onder het pictogram van de starter groepeert; andere terminals houden hun eigen pictogram. macOS: niets te doen, het Dock groepeert per app.
 
-![Instellingen > Algemeen, gescrold naar de groep Starter: de terminal voor snelkoppelingen en de rij van de app-starter](../images/settings-launcher.png)
+![Instellingen > Starter: de terminal voor snelkoppelingen en de rij van de app-starter](../images/settings-launcher.png)
 
-##### Opdrachtalias en PATH, per systeem
+#### Opdrachtalias en PATH, per systeem
 
 | Systeem | Alias | PATH |
 |---|---|---|
@@ -224,8 +224,16 @@ Bureaublad-snelkoppeling maken**, **Starter: Snelkoppelingen verwijderen**, **St
 `gitpoulpi desktop shortcut status|install|remove [--where launcher|desktop|startmenu]`
 doet het vanuit een script.
 
-De opdracht **App: Taal wijzigen...** van het palet (`Ctrl+N g`) opent dezelfde talenlijst. Daar toont
-de gemarkeerde taal live een voorbeeld; `Enter` houdt haar en `Esc` herstelt de vorige.
+### Conflictpreventie
+
+Het globale deel van de proactieve conflictdetectie (`gitpoulpi ui show settings conflict-prevention-global`); de eigen pagina van een repository is
+[Repositoryspecifiek: Conflictpreventie](#repositoryspecifiek-conflictpreventie). **Conflicten: Lijsten met basisbranches bewerken...** in het palet opent deze pagina.
+
+| Optie | Wat ze doet |
+|---|---|
+| **Proactieve conflictdetectie inschakelen** | Standaard aan (`general.conflict_detection`). Waarschuwt in de Log als het mergen van de huidige branch in de branch waarvan hij is gestart zou conflicteren, voordat je het probeert. Een repository kan dit voor zichzelf uitschakelen op zijn eigen pagina **Conflictpreventie**. Zie [Merge-conflicten oplossen](merge-conflicts.md#conflictpreventie). Geldt zodra Instellingen sluit. |
+| **Standaard basisbranches** | Onder de schakelaar. De lijst met patronen van basisbranches die repositories gebruiken als ze er geen eigen hebben: **Ingebouwd (`**`)**, dat is elke branch, of een van je lijsten met een naam (`conflict_prevention.default_list`). Geldt voor de geopende repositories zodra Instellingen sluit. **Terug naar ingebouwde standaard** gaat terug naar `**`. |
+| **Lijsten met basisbranches** | Ook op deze pagina: je lijsten met een naam met patronen van basisbranches (`[conflict_prevention.lists.<naam>]`), elk een blok met zijn **Naam** (hernoemen laat hem de standaard blijven als hij dat was; een repository die de oude naam volgde, gebruikt de standaardlijst tot je hem opnieuw kiest), zijn **Patronen** (één per regel, `Enter` of een klik opent de editor, `Ctrl+S` bewaart), **Als standaard instellen** en **Lijst verwijderen** (vraagt eerst, en zegt dat repositories die hem volgen in plaats daarvan de standaardlijst gebruiken). Typ een naam bij **Nieuwe lijst** en druk op `Enter` om er een toe te voegen; hij begint met `**`. Een lijst bewerken wijzigt elke repository die hem volgt. |
 
 ### Synchronisatie
 
@@ -393,6 +401,7 @@ de server bevatten; zie [MCP en agents](mcp-and-agents.md).
 | **Achtergrond van grafiekbanen** | **Uit** (transparant) of **Rijtint**: een zwakke band in de baankleur achter de grafiekkolom, met een dunne balk aan de rand ervan. |
 | **Sterkte van rijtint** | Hoe vervaagd de band van Rijtint is: **Sterk**, **Gemiddeld** (standaard) of **Subtiel**. De balk aan de rand behoudt zijn volle kleur. |
 | **Positie van de werkbalk** | `ui.toolbar_position`: Waar de werkbalk staat: Boven, Onder (standaard), Links of Rechts. Links en Rechts maken er een kolom naast de panelen van; in een venster smaller dan 80 kolommen staat hij onderaan. Werkt direct. |
+| **Positie en grootte van dialogen onthouden** | `ui.dialog_geometry`: **Voor deze sessie** (standaard), **Op schijf opgeslagen** of **Nooit**: of een dialoog dat je hebt verplaatst of geschaald zijn plaats houdt. Werkt direct. |
 | **Uitlijning van de werkbalkknoppen** | `ui.toolbar_align`: Waar de knoppen langs de balk staan: Begin (standaard), Midden of Einde. Begin is links in een rij en boven in een kolom; Einde is rechts en onder. Werkt direct. |
 | **Zet de pull request-knop vast aan het einde** | `ui.toolbar_pr_pinned`: Aan (standaard): de pull request-knop staat helemaal aan het einde van de werkbalk (rechts, in een kolom onderaan), wat de uitlijning ook is. Uit: hij stroomt mee met de andere knoppen en wordt met hen uitgelijnd. Werkt direct. |
 | **Positie van de statusbalk** | `ui.statusbar_position`: Waar de statusbalk (branch, tellers, meldingen, toetstips) staat: Boven, boven de tabbladen van de repository, of Onder (standaard). Het tabblad Start houdt zijn eigen statusbalk onderaan. Werkt direct. |
@@ -691,10 +700,10 @@ Een bericht waarmee het commitformulier begint (`gitpoulpi ui show settings comm
 (zie [Merge-conflicten oplossen](merge-conflicts.md#conflictpreventie)):
 
 - **Proactieve conflictdetectie inschakelen met doelbranch**: standaard aan. Uitvinken schakelt de detectie alleen voor deze
-  repository uit; de globale schakelaar is **Proactieve conflictdetectie inschakelen** op de pagina Algemeen.
+  repository uit; de globale schakelaar is **Proactieve conflictdetectie inschakelen** op de globale pagina **Conflictpreventie**.
   Beide moeten aan staan.
 - **Basisbranches van**: waar de basisbranches van deze repository vandaan komen. **Standaard** volgt de globale standaard
-  (de ingebouwde `**`, of de lijst die onder **Standaard basisbranches** in Instellingen > Algemeen is gekozen); **Lijst: <naam>**
+  (de ingebouwde `**`, of de lijst die onder **Standaard basisbranches** in Instellingen > Conflictpreventie is gekozen); **Lijst: <naam>**
   volgt een van je lijsten met een naam, dus een lijst bewerken wijzigt ook deze repository; **Eigen lijst** is een lijst van de
   repository zelf (kiezen begint met een kopie van de patronen die gelden). Een repositorybestand dat is geschreven voordat deze keuze bestond
   en eigen patronen bevat, geldt als **Eigen lijst**.
@@ -713,7 +722,7 @@ Een bericht waarmee het commitformulier begint (`gitpoulpi ui show settings comm
   uitsluitingen betekent "elke branch behalve deze". De keuze wordt bewaard in `repo-state.toml` en opnieuw gelezen zodra
   Instellingen sluit.
 - **Opslaan als lijst...**: typ een naam en druk op `Enter`; de patronen die gelden worden een lijst met een naam (dezelfde die
-  Instellingen > Algemeen bewerkt) en deze repository volgt hem.
+  Instellingen > Conflictpreventie bewerkt) en deze repository volgt hem.
 - **Terug naar standaard** (vraagt eerst): laat de keuze, de lijst en de eigen patronen van deze repository vallen; hij volgt weer
   de standaard.
 - **De basisbranches van de workflow gebruiken** (getoond als voor de repository een [branchingworkflow](branching-workflows.md) met

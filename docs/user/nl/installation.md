@@ -67,7 +67,7 @@ Het `.sha256`-bestand vangt alleen een beschadigde download op. De handtekening 
 Elke release levert ook een installatieprogramma per besturingssysteem. Beide
 maken dezelfde keuzes (snelkoppelingen, PATH, een opdrachtalias zoals `gp`) door
 het geïnstalleerde `gitpoulpi` zelf aan te roepen, de code achter Instellingen >
-Algemeen > Starter. Wat het installatieprogramma instelt en wat Instellingen toont
+Starter. Wat het installatieprogramma instelt en wat Instellingen toont
 komen dus altijd overeen.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
@@ -132,7 +132,7 @@ Elk kanaal hieronder schrijft dezelfde markering `.gitpoulpi-dist` naast de prog
 
 De namen hierboven zijn die waarnaar het releaseproces publiceert (zie [Releasen](../../developer/releasing.md)): een kanaal dat nog niet live is, antwoordt "not found", en het releasearchief of installatieprogramma werkt altijd.
 
-De eigen PATH-afhandeling van een pakketbeheerder geldt: Chocolatey, winget, Scoop en Homebrew zetten de programma's zelf op de PATH, en geen ervan maakt het alias `gp` (voer `gitpoulpi alias create gp` uit, of Instellingen > Algemeen > Starter).
+De eigen PATH-afhandeling van een pakketbeheerder geldt: Chocolatey, winget, Scoop en Homebrew zetten de programma's zelf op de PATH, en geen ervan maakt het alias `gp` (voer `gitpoulpi alias create gp` uit, of Instellingen > Starter).
 
 ### apt (Debian en Ubuntu)
 

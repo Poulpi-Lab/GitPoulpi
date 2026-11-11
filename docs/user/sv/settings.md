@@ -176,16 +176,17 @@ Sidlistan har två grupper:
 | **Standardmapp för bläddring** | Där Bläddra öppnas. Tomt: den senaste mappen du använde, annars din hemmapp. |
 | **Plats för repositorydata** | Var GitPoulpi lagrar sina data per repository (`session.per_repo_state_dir`): **Inuti .git** (standard: inget dyker upp i din arbetskatalog och alla worktrees delar det), **I arbetskatalogen** (en mapp `.gitpoulpi`; krävs för att checka in en `workflow.toml` för teamet) eller **I min användardatamapp** (utanför repositoryt). En mapp `.gitpoulpi` som en äldre version lämnat flyttas till den nya platsen första gången den behövs och tas bort när den är tom; en fil som git spårar (en incheckad `workflow.toml`) flyttas eller raderas aldrig och förblir läsbar. |
 | **Standardnamn på gren** | Den första grenen i ett repository du skapar med Init. Tomt: git bestämmer. Den byter inte namn på någon befintlig gren. |
-| **Aktivera proaktiv konfliktdetektering** | På som standard (`general.conflict_detection`). Varnar i Log när en merge av den aktuella grenen i grenen den startade från skulle ge konflikter, innan du försöker. Ett repository kan stänga av den för sig själv på sidan **Konfliktförebyggande**. Se [Lösa merge-konflikter](merge-conflicts.md#konfliktförebyggande). Gäller när Inställningar stängs. |
-| **Standardlista för basgrenar** | Under reglaget, i gruppen **Konfliktförebyggande** (paletten **Konflikter: Redigera listor över basgrenar...** öppnar den). Listan med mönster för basgrenar som repositories använder när de saknar en egen: **Inbyggd (`**`)**, alltså varje gren, eller en av dina namngivna listor (`conflict_prevention.default_list`). Den gäller öppna repositories när Inställningar stängs. **Återställ till inbyggd standard** går tillbaka till `**`. |
-| **Listor över basgrenar** | Också i den gruppen: dina namngivna listor med mönster för basgrenar (`[conflict_prevention.lists.<namn>]`), ett block var med sitt **Namn** (att byta namn behåller den som standard om den var det; ett repository som följde det gamla namnet använder standardlistan tills du väljer den igen), sina **Mönster** (ett per rad, `Enter` eller ett klick öppnar redigeraren, `Ctrl+S` behåller den), **Gör till standard** och **Ta bort listan** (den frågar först, och säger att repositories som följer den använder standardlistan i stället). Skriv ett namn i **Ny lista** och tryck `Enter` för att lägga till en; den börjar med `**`. Att redigera en lista ändrar varje repository som följer den. |
 | **Loggnivå**, **Behåll loggfiler**, **Största storlek för en loggfil** | Programloggen bakom aktivitetsloggen: den mest utförliga nivån som spelas in (`log.level`), hur länge filer sparas (ett heltal och en enhet, dagar, veckor, månader eller år, på en rad: klicka på talet för att skriva det, Upp och Ned stegar det, Tab går till enheten och Enter öppnar dess lista; högst 10 år, standard 1 vecka, `log.retention_days` och `log.retention_unit`) och storleken då en dags fil roteras (ett tal och MiB eller GiB, 1 MiB till 1 GiB, `log.max_file_mb` och `log.max_file_unit`). |
 | **Visa hur lång tid åtgärder tar**, **Utökad loggning** | Fliken Git-åtgärder i aktivitetsloggen: varje åtgärds tid (`log.timings`, på som standard) och även bakgrundsarbetet, uppdatering och auto-fetch (`log.extended`, av som standard). Se [När något misslyckas](troubleshooting.md#aktivitetsloggen). |
 | **Ångra aktiverat**, **Djup på ångrahistoriken**, **Spela in ändringar gjorda utanför GitPoulpi** | Gruppen **Ångrahistorik**. Slår på eller av Ångra och anger hur många operationer det behåller (standard 100, `0` betyder obegränsat). Att stänga av Ångra raderar ångrahistoriken, efter en bekräftelse. Den sista inställningen spelar också in vad ett skal eller en agent gör med grenar, taggar, stashar och HEAD. Se [Ångra och gör om](undo-redo.md). |
 
-#### Startare (skrivbordsintegration)
+Palettkommandot **App: Byt språk...** (`Ctrl+N g`) öppnar samma språklista. Där
+förhandsvisas det markerade språket live; `Enter` behåller det och `Esc`
+återställer det förra.
 
-Gruppen **Startare**, den sista på sidan Allmänt, skapar en genväg som startar GitPoulpi från
+### Startare
+
+Sidan **Startare** (`gitpoulpi ui show settings launcher`) skapar en genväg som startar GitPoulpi från
 operativsystemets startare, i den terminal du väljer.
 
 | Rad | Vad den gör |
@@ -210,9 +211,9 @@ Ikonen är bläckfisken i din logotypfärg (Om GitPoulpi > färg); på Linux har
 
 **Gruppering i aktivitetsfältet och dockan.** GitPoulpi körs i ett terminalfönster, så aktivitetsfältet visar det normalt under terminalens ikon, utan punkten ”körs” under den fästa GitPoulpi-ikonen. Windows: genvägarna bär AppUserModelID `GitPoulpi.GitPoulpi`, och en GitPoulpi som startats från en av dem ger sitt terminalfönster samma ID och sin ikon (den hittar fönstret genom att ge det en unik titel en stund och återställer sedan titeln), så fönstret hamnar under den fästa GitPoulpi-ikonen. Ett terminalfönster med flera flikar flyttas som en helhet: alla dess flikar grupperas under GitPoulpis ikon så länge GitPoulpi körs i det. Genvägar och fästa objekt i aktivitetsfältet som gjorts tidigare skrivs om av samma synkronisering; visar ett fäst objekt fortfarande terminalens ikon, lossa det och fäst det igen. Linux: kitty, foot, Alacritty, WezTerm och Ghostty startas med fönsterklassen `gitpoulpi` och `.desktop`-posten anger den (`StartupWMClass`), så en dock grupperar fönstret under startarens ikon; andra terminaler behåller sin egen ikon. macOS: inget att göra, Dock grupperar per app.
 
-![Inställningar > Allmänt, rullad till gruppen Startare: terminalen för genvägar och raden för appstartaren](../images/settings-launcher.png)
+![Inställningar > Startare: terminalen för genvägar och raden för appstartaren](../images/settings-launcher.png)
 
-##### Kommandoalias och PATH, per system
+#### Kommandoalias och PATH, per system
 
 | System | Alias | PATH |
 |---|---|---|
@@ -226,9 +227,16 @@ skrivbordsgenväg**, **Startare: Ta bort genvägar**, **Startare: Skapa kommando
 `gitpoulpi desktop shortcut status|install|remove [--where launcher|desktop|startmenu]`
 gör det från ett skript.
 
-Palettkommandot **App: Byt språk...** (`Ctrl+N g`) öppnar samma språklista. Där
-förhandsvisas det markerade språket live; `Enter` behåller det och `Esc`
-återställer det förra.
+### Konfliktförebyggande
+
+Den globala delen av proaktiv konfliktdetektering (`gitpoulpi ui show settings conflict-prevention-global`); ett repositorys egen sida är
+[Repo-specifikt: Konfliktförebyggande](#repo-specifikt-konfliktförebyggande). Paletten **Konflikter: Redigera listor över basgrenar...** öppnar den här sidan.
+
+| Alternativ | Vad det gör |
+|---|---|
+| **Aktivera proaktiv konfliktdetektering** | På som standard (`general.conflict_detection`). Varnar i Log när en merge av den aktuella grenen i grenen den startade från skulle ge konflikter, innan du försöker. Ett repository kan stänga av den för sig själv på sin egen sida **Konfliktförebyggande**. Se [Lösa merge-konflikter](merge-conflicts.md#konfliktförebyggande). Gäller när Inställningar stängs. |
+| **Standardlista för basgrenar** | Under reglaget. Listan med mönster för basgrenar som repositories använder när de saknar en egen: **Inbyggd (`**`)**, alltså varje gren, eller en av dina namngivna listor (`conflict_prevention.default_list`). Den gäller öppna repositories när Inställningar stängs. **Återställ till inbyggd standard** går tillbaka till `**`. |
+| **Listor över basgrenar** | Också på den här sidan: dina namngivna listor med mönster för basgrenar (`[conflict_prevention.lists.<namn>]`), ett block var med sitt **Namn** (att byta namn behåller den som standard om den var det; ett repository som följde det gamla namnet använder standardlistan tills du väljer den igen), sina **Mönster** (ett per rad, `Enter` eller ett klick öppnar redigeraren, `Ctrl+S` behåller den), **Gör till standard** och **Ta bort listan** (den frågar först, och säger att repositories som följer den använder standardlistan i stället). Skriv ett namn i **Ny lista** och tryck `Enter` för att lägga till en; den börjar med `**`. Att redigera en lista ändrar varje repository som följer den. |
 
 ### Synkronisering
 
@@ -396,6 +404,7 @@ servern; se [MCP och agenter](mcp-and-agents.md).
 | **Bakgrund för grafspår** | **Av** (transparent) eller **Radfärg**: ett svagt band av spårfärgen bakom grafkolumnen, med en tunn list i kanten. |
 | **Styrka på radfärgning** | Hur blekt Radfärg-bandet är: **Stark**, **Medel** (standard) eller **Svag**. Kantlisten behåller sin fulla färg. |
 | **Verktygsfältets position** | `ui.toolbar_position`: Var verktygsfältet sitter: Överst, Nederst (standard), Vänster eller Höger. Vänster och Höger gör det till en kolumn bredvid panelerna; i ett fönster smalare än 80 kolumner ritas det nederst. Gäller direkt. |
+| **Kom ihåg dialogrutans position och storlek** | `ui.dialog_geometry`: **Under den här sessionen** (standard), **Sparat på disk** eller **Aldrig**: om en dialogruta du flyttat eller ändrat storlek på behåller sin plats. Gäller direkt. |
 | **Justering av verktygsfältets knappar** | `ui.toolbar_align`: Var knapparna sitter längs fältet: Början (standard), Mitten eller Slutet. Början är vänster i en rad och överst i en kolumn; slutet är höger och nederst. Gäller direkt. |
 | **Fäst pull request-knappen i slutet** | `ui.toolbar_pr_pinned`: På (standard): pull request-knappen sitter längst bort i verktygsfältet (höger, i en kolumn nederst) oavsett justering. Av: den flödar med de andra knapparna och justeras med dem. Gäller direkt. |
 | **Statusradens position** | `ui.statusbar_position`: Var statusraden (gren, antal, meddelanden, tangenttips) sitter: Överst, ovanför repositoryfliken, eller Nederst (standard). Fliken Hem behåller sin egen statusrad nederst. Gäller direkt. |
@@ -695,10 +704,10 @@ Ett meddelande som commit-formuläret börjar med (`gitpoulpi ui show settings c
 (se [Lösa merge-konflikter](merge-conflicts.md#konfliktförebyggande)):
 
 - **Aktivera proaktiv konfliktdetektering med målgren**: på som standard. Att avmarkera den stänger av detekteringen
-  bara för det här repositoryt; det globala reglaget är **Aktivera proaktiv konfliktdetektering** på sidan Allmänt.
+  bara för det här repositoryt; det globala reglaget är **Aktivera proaktiv konfliktdetektering** på den globala sidan **Konfliktförebyggande**.
   Båda måste vara på.
 - **Basgrenar från**: var det här repositoryts basgrenar kommer från. **Standard** följer den globala standarden
-  (den inbyggda `**`, eller listan som valts under **Standardlista för basgrenar** i Inställningar > Allmänt); **Lista: <namn>**
+  (den inbyggda `**`, eller listan som valts under **Standardlista för basgrenar** i Inställningar > Konfliktförebyggande); **Lista: <namn>**
   följer en av dina namngivna listor, så att redigera listan ändrar även det här repositoryt; **Egen lista** är en lista för
   repositoryt självt (att välja den börjar med en kopia av mönstren som gäller). En repositoryfil som skrevs innan det här valet
   fanns och som har egna mönster läses som **Egen lista**.
@@ -718,7 +727,7 @@ Ett meddelande som commit-formuläret börjar med (`gitpoulpi ui show settings c
   uteslutningar betyder ”varje gren utom dessa”. Valet lagras i `repo-state.toml` och läses in igen när Inställningar
   stängs.
 - **Spara som lista...**: skriv ett namn och tryck `Enter`; mönstren som gäller blir en namngiven lista (samma som
-  Inställningar > Allmänt redigerar) och det här repositoryt följer den.
+  Inställningar > Konfliktförebyggande redigerar) och det här repositoryt följer den.
 - **Återställ till standard** (frågar först): tar bort det här repositoryts val, lista och egna mönster; det följer
   standarden igen.
 - **Använd arbetsflödets basgrenar** (visas när ett [grenarbetsflöde](branching-workflows.md) med basgrenar är

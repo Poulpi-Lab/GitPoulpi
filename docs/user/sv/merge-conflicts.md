@@ -163,11 +163,11 @@ i loggen), så dina filer, ditt index och dina refs rörs inte.
   tillbaka, eller inte, med det nya svaret. En frånkopplad HEAD kontrolleras inte.
 - **Listor över basgrenar**: var ett repositorys Basgrenar kommer från är ett val på dess sida **Konfliktförebyggande**.
   **Standard** följer den globala standarden (den inbyggda `**`, varje gren, tills du väljer en annan lista i
-  Inställningar > Allmänt > Konfliktförebyggande); **Lista: <namn>** följer en av dina namngivna listor; **Egen lista** är en
+  Inställningar > Konfliktförebyggande); **Lista: <namn>** följer en av dina namngivna listor; **Egen lista** är en
   lista för repositoryt själv. Listor delas: redigera en så använder varje repository som följer den ändringen vid nästa
   kontroll, utan omstart. **Spara som lista...** gör ett repositorys egna mönster till en namngiven lista, **Återställ till
   standard** tar bort repositoryts val. Att ta bort en lista som ett repository följer gör att det använder standarden.
-- **Av**: **Aktivera proaktiv konfliktdetektering** i Inställningar > Allmänt, eller för ett repository på dess sida
+- **Av**: **Aktivera proaktiv konfliktdetektering** i Inställningar > Konfliktförebyggande, eller för ett repository på dess sida
   **Konfliktförebyggande**. Från ett skript skriver `gitpoulpi conflicts check` ut samma svar som JSON
   ([CLI-referens](cli-reference.md)).
 

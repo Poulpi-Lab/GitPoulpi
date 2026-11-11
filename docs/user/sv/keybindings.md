@@ -137,7 +137,7 @@ Varje tangent du kan binda om, med id:t som används i
 | `nav_prefix` | `status_narrower` | Smalna av Status-rutan | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: visa den väntande vyn | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: tillbaka (eller avfärda den väntande vyn) | `Ctrl+N Backspace` |
-| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
+| `nav_prefix` | `arrange_dialog` | Ordna den öppna dialogrutan (flytta, ändra storlek) | `Ctrl+N m` |
 | `refs` | `filter` | Filtrera refs efter namn | `/` |
 | `refs` | `solo` | Solo för markeringen | `o` |
 | `refs` | `clear_solo` | Sluta solo | `Shift+O` |
@@ -961,23 +961,23 @@ Tangenterna är standardvärdena.
 | Ångrahistorik: Stäng | `Esc` |
 | Reflog: Visa i Log | `l` |
 | Reflog: Skapa gren här... | `b` |
-| Reflog: Create tag Here... | `t` |
-| Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `s` |
+| Reflog: Skapa tag här... | `t` |
+| Reflog: Tillämpa ändringarna på arbetskatalogen | `w` |
+| Reflog: Spara ändringarna som stash | `s` |
 | Reflog: Återställ till den här positionen... | `r` |
 | Reflog: Ladda fler | `m` |
 | Reflog: Uppdatera |  |
 | Förlorat arbete: Skapa gren här... | `b` |
-| Lost Work: Create tag Here... | `t` |
+| Förlorat arbete: Skapa tag här... | `t` |
 | Förlorat arbete: Cherry-pick | `c` |
-| Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `s` |
+| Förlorat arbete: Tillämpa ändringarna på arbetskatalogen | `w` |
+| Förlorat arbete: Spara ändringarna som stash | `s` |
 | Förlorat arbete: Sök igen |  |
-| Reflog / Lost Work: Next Pane | `Tab` |
-| Reflog / Lost Work: Path or Tree File List | `v` |
-| Reflog / Lost Work: Reset Pane Sizes |  |
-| Dialog: Move/resize | `Ctrl+N m` |
-| Dialog: Reset position and size |  |
+| Reflog / Förlorat arbete: Nästa ruta | `Tab` |
+| Reflog / Förlorat arbete: Fillista som sökvägar eller träd | `v` |
+| Reflog / Förlorat arbete: Återställ rutornas storlek |  |
+| Dialogruta: Flytta/ändra storlek | `Ctrl+N m` |
+| Dialogruta: Återställ position och storlek |  |
 | Vy: Uppdatera | `r` |
 | Vy: Uppdatera (fetch, pull requests, ärenden) | `F5` |
 | Vy: Växla hjälpöverlägg | `?` |

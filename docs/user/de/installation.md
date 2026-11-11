@@ -67,7 +67,7 @@ Die `.sha256`-Datei erkennt nur einen beschädigten Download. Die Signatur zeigt
 
 Jedes Release enthält außerdem ein Installationsprogramm je Betriebssystem. Beide treffen dieselben Entscheidungen
 (Verknüpfungen, PATH, ein Befehlsalias wie `gp`), indem sie das installierte `gitpoulpi` selbst aufrufen, also den Code
-hinter Einstellungen > Allgemein > Starter. Was das Installationsprogramm einrichtet und was die Einstellungen zeigen,
+hinter Einstellungen > Starter. Was das Installationsprogramm einrichtet und was die Einstellungen zeigen,
 stimmt deshalb immer überein.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
@@ -132,7 +132,7 @@ Jeder der folgenden Kanäle schreibt dieselbe Markierung `.gitpoulpi-dist` neben
 
 Die obigen Namen sind die, zu denen der Release-Prozess veröffentlicht (siehe [Releasing](../../developer/releasing.md)): Ein Kanal, der noch nicht live ist, antwortet „not found“, und das Release-Archiv oder das Installationsprogramm funktioniert immer.
 
-Es gilt die eigene PATH-Behandlung des Paketmanagers: Chocolatey, winget, Scoop und Homebrew legen die Programme selbst in den PATH, und keiner von ihnen erzeugt den Alias `gp` (führen Sie `gitpoulpi alias create gp` aus, oder Einstellungen > Allgemein > Starter).
+Es gilt die eigene PATH-Behandlung des Paketmanagers: Chocolatey, winget, Scoop und Homebrew legen die Programme selbst in den PATH, und keiner von ihnen erzeugt den Alias `gp` (führen Sie `gitpoulpi alias create gp` aus, oder Einstellungen > Starter).
 
 ### apt (Debian und Ubuntu)
 

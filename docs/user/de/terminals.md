@@ -118,7 +118,7 @@ Schrift, weshalb GitPoulpi VS16-Glyphen meidet (siehe
   mit undurchsichtigem Hintergrund; weniger getestet.
 - **Windows-Konsole, ConEmu, cmd**: besser meiden. Bilder werden schlecht oder gar
   nicht gezeichnet. Ein Doppelklick auf die exe öffnet GitPoulpi erneut in dem
-  Terminal Ihrer Wahl (*Einstellungen > Allgemein > Starter*).
+  Terminal Ihrer Wahl (*Einstellungen > Starter*).
 
 ### Linux
 

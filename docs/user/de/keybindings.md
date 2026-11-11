@@ -134,7 +134,7 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Status-Bereich verschmälern | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: Ausstehende Ansicht zeigen | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: Zurück (oder ausstehende Ansicht verwerfen) | `Ctrl+N Backspace` |
-| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
+| `nav_prefix` | `arrange_dialog` | Geöffneten Dialog anordnen (verschieben, Größe ändern) | `Ctrl+N m` |
 | `refs` | `filter` | Refs nach Namen filtern | `/` |
 | `refs` | `solo` | Auswahl solo schalten | `o` |
 | `refs` | `clear_solo` | Solo beenden | `Shift+O` |
@@ -954,23 +954,23 @@ die Standardtasten.
 | Rückgängig-Verlauf: Schließen | `Esc` |
 | Reflog: Im Log zeigen | `l` |
 | Reflog: Branch hier erstellen... | `b` |
-| Reflog: Create Tag Here... | `t` |
-| Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as Stash | `s` |
+| Reflog: Tag hier erstellen... | `t` |
+| Reflog: Änderungen auf Arbeitsverzeichnis anwenden | `w` |
+| Reflog: Änderungen als Stash sichern | `s` |
 | Reflog: Auf diese Position zurücksetzen... | `r` |
 | Reflog: Mehr laden | `m` |
 | Reflog: Aktualisieren |  |
 | Verlorene Arbeit: Branch hier erstellen... | `b` |
-| Lost Work: Create Tag Here... | `t` |
+| Verlorene Arbeit: Tag hier erstellen... | `t` |
 | Verlorene Arbeit: Cherry-Pick | `c` |
-| Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as Stash | `s` |
+| Verlorene Arbeit: Änderungen auf Arbeitsverzeichnis anwenden | `w` |
+| Verlorene Arbeit: Änderungen als Stash sichern | `s` |
 | Verlorene Arbeit: Erneut suchen |  |
-| Reflog / Lost Work: Next Pane | `Tab` |
-| Reflog / Lost Work: Path or Tree File List | `v` |
-| Reflog / Lost Work: Reset Pane Sizes |  |
-| Dialog: Move/resize | `Ctrl+N m` |
-| Dialog: Reset position and size |  |
+| Reflog / Verlorene Arbeit: Nächster Bereich | `Tab` |
+| Reflog / Verlorene Arbeit: Dateiliste als Pfade oder Baum | `v` |
+| Reflog / Verlorene Arbeit: Bereichsgrößen zurücksetzen |  |
+| Dialog: Verschieben/Größe ändern | `Ctrl+N m` |
+| Dialog: Position und Größe zurücksetzen |  |
 | Ansicht: Aktualisieren | `r` |
 | Ansicht: Aktualisieren (Fetch, Pull Requests, Issues) | `F5` |
 | Ansicht: Hilfe-Überlagerung umschalten | `?` |

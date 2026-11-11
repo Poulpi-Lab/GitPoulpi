@@ -427,6 +427,18 @@ Die Tasten für Textfelder stehen in [Tastenkürzel](keybindings.md).
 
 Siehe [Bilder](image-view.md) für die Maus in der Bildansicht.
 
+## Dialoge verschieben und in der Größe ändern
+
+Der Dialog Rückgängig-Verlauf / Reflog / Verlorene Arbeit lässt sich verschieben und in der Größe ändern:
+
+- **Die Titelleiste ziehen**, um ihn zu verschieben (das Schließkreuz behält seinen Klick).
+- **Den linken, rechten oder unteren Rand** oder eine untere Ecke (den Griff `◢`) ziehen, um die Größe zu ändern. Der Dialog bleibt auf dem Bildschirm und wird nie kleiner als 60 x 16.
+- Das Ziehen läuft weiter, wenn der Zeiger den Dialog verlässt, und ein Loslassen außerhalb schließt ihn nie.
+- **Die Trennlinien** zwischen Liste, Dateiliste und Hunks ziehen; ein Doppelklick auf eine setzt sie zurück.
+- Die Tastatur-Gegenstücke sind `Ctrl+N` und dann `m` (Pfeile verschieben, `Shift`+Pfeile ändern die Größe, `0` setzt zurück, `Enter` oder `Esc` beenden) und `Alt`+Pfeile für die Trennlinien; die Palette hat `Dialog: Verschieben/Größe ändern` und `Dialog: Position und Größe zurücksetzen`.
+
+Der Zeiger zeigt eine Verschiebeform über der Titelleiste und eine Größenform über Rändern und Ecken (Terminals mit `OSC 22`).
+
 ## Form des Mauszeigers
 
 Manche Terminals lassen GitPoulpi den Mauszeiger ändern: einen Größenänderungszeiger über

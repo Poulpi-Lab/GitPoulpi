@@ -637,3 +637,18 @@ fn enter_on_a_lost_commit_changes_nothing() {
     assert!(!branches.contains("restored-"), "{branches}");
     rig.term.stop().unwrap();
 }
+
+/// Every action button names the letter that runs it.
+#[test]
+fn the_action_buttons_show_their_letters() {
+    let (repo, lost) = lost_repo();
+    let mut rig = launch(repo, "pty-panes-letters", "");
+    open_lost(&mut rig, &lost);
+    wait(&mut rig.term, "the buttons with their letters", |s| {
+        s.contains("Create branch here [b]")
+            && s.contains("Create tag here [t]")
+            && s.contains("Apply to working tree [w]")
+            && s.contains("Save as stash [s]")
+    });
+    rig.term.stop().unwrap();
+}

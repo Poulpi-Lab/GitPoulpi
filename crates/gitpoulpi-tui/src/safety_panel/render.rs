@@ -555,7 +555,11 @@ impl SafetyPanel {
         let mut x = inner.x;
         let busy = self.job.is_some();
         for act in self.actions(state) {
-            let label = act_label(act, self, state);
+            // The button names its own letter, as the toolbar's `[key]`.
+            let label = match super::input::key_of(act, self.tab) {
+                Some(c) => format!("{} [{c}]", act_label(act, self, state)),
+                None => act_label(act, self, state),
+            };
             let w = dialog_kit::button_width(&label);
             if x + w + 1 >= close_x {
                 break;

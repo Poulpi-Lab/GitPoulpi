@@ -36,6 +36,12 @@ pub(super) fn act_for_key(c: char, tab: Tab) -> Option<Act> {
     }
 }
 
+/// The letter of `act` in `tab`: the inverse of [`act_for_key`], so a button
+/// can never name a key that does something else.
+pub(super) fn key_of(act: Act, tab: Tab) -> Option<char> {
+    ('a'..='z').find(|c| act_for_key(*c, tab) == Some(act))
+}
+
 impl SafetyPanel {
     pub(crate) fn on_key(&mut self, key: KeyEvent) -> PanelOutcome {
         if self.overlay.is_some() {

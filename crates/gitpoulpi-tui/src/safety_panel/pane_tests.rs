@@ -557,3 +557,29 @@ fn enter_never_runs_an_action_it_only_navigates_in_the_file_list() {
         "Enter on a file goes to its hunks"
     );
 }
+
+#[test]
+fn every_action_button_shows_the_letter_that_runs_it() {
+    let mut panel = lost_panel();
+    let text = buffer_text(&panel.paint_at(SCREEN));
+    for want in [
+        "Create branch here [b]",
+        "Create tag here [t]",
+        "Cherry-pick [c]",
+        "Apply to working tree [w]",
+        "Save as stash [s]",
+    ] {
+        assert!(text.contains(want), "{want:?} missing\n{text}");
+    }
+    // The letter on a button is the one the key map runs.
+    for (act, tab) in [
+        (Act::CreateBranch, Tab::Lost),
+        (Act::SaveAsStash, Tab::Reflog),
+        (Act::ShowInLog, Tab::Reflog),
+        (Act::RestoreRef, Tab::Reflog),
+    ] {
+        let c = super::input::key_of(act, tab).expect("a letter");
+        assert_eq!(super::input::act_for_key(c, tab), Some(act));
+    }
+    assert_eq!(super::input::key_of(Act::ShowInLog, Tab::Reflog), Some('l'));
+}

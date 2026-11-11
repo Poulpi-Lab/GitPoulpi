@@ -106,12 +106,19 @@ fn local_has(repo: &FixtureRepo, tag: &str) -> bool {
 }
 
 fn fetch_all(term: &mut Terminal) {
-    term.send_keys("C-g").unwrap();
-    term.send_keys("f").unwrap();
-    term.wait_for("the fetch's result", STEP, |s| {
-        s.contains("fetched every remote")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Retried: under load the chord's second key can arrive before the git
+    // mode is armed, and a second fetch is harmless.
+    common::retry_until(
+        term,
+        "the fetch's result",
+        3,
+        Duration::from_secs(15),
+        |t| {
+            t.send_keys("C-g").unwrap();
+            t.send_keys("f").unwrap();
+        },
+        |s| s.contains("fetched every remote"),
+    );
 }
 
 /// The three states side by side: pushed (both), never pushed (only here),

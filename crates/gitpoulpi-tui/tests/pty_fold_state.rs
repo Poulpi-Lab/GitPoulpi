@@ -304,7 +304,7 @@ fn the_footer_names_the_context_menu_key() {
         .ready("alpha-commit")
         .spawn();
     term.wait_for("the menu hint before quit", STEP, |s| {
-        s.contains("Ctrl+P: commands  Shift+F10: menu  q: quit")
+        s.contains("Ctrl+P: commands  Shift+F10/.: menu  q: quit")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     exit(term);

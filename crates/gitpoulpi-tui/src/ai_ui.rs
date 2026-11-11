@@ -701,7 +701,7 @@ impl AiPopup {
     }
 
     pub(crate) fn render(&self, frame: &mut Frame, area: Rect) {
-        let rect = crate::centered_rect(70, 80, area);
+        let rect = WIN.place(area, crate::centered_rect(70, 80, area));
         frame.render_widget(Clear, rect);
         // Only a finished answer has a hint (copy); Esc is not advertised.
         let hint = match &self.body {
@@ -748,6 +748,7 @@ impl AiPopup {
             rect,
             self.cross_hover.get(),
         ));
+        WIN.decorate(frame.buffer_mut(), rect, self.cross.get(), true);
         // The bar, in the right border, when the text outgrows the box.
         self.bar.set(crate::scrollbar::Track::vertical(
             rect,
@@ -759,6 +760,9 @@ impl AiPopup {
         }
     }
 }
+
+/// The answer popup moves like any dialog.
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("ai_popup");
 
 // ---------------------------------------------------------------------
 // The worker

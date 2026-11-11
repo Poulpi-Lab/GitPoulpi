@@ -162,6 +162,8 @@ pub(super) struct KeybindingsPage {
     search_rect: Rect,
     reset_all_rect: Rect,
     popup_hits: Vec<(Rect, Hit)>,
+    /// The close cross of the open popup (confirm / capture).
+    popup_close: dialog_kit::CloseHit,
     last_click: Option<(usize, Instant)>,
     /// The `gitpoulpi_i18n::epoch()` the combos' option labels were built for.
     labels_epoch: u64,
@@ -227,6 +229,7 @@ impl KeybindingsPage {
             search_rect: Rect::default(),
             reset_all_rect: Rect::default(),
             popup_hits: Vec::new(),
+            popup_close: dialog_kit::CloseHit::default(),
             last_click: None,
             labels_epoch: gitpoulpi_i18n::epoch(),
         };
@@ -990,6 +993,11 @@ impl PreferencesState {
         if self.keys.popup.is_some() {
             if kind == MouseEventKind::Down(MouseButton::Left) {
                 let hit = dialog_kit::hit_at(&self.keys.popup_hits, col, row);
+                // The close cross: Esc's way out (the popup is dropped).
+                if self.keys.popup_close.hit(col, row) {
+                    self.keys.popup = None;
+                    return true;
+                }
                 match hit {
                     Some(Hit::Button(btn)) => self.keys_activate(btn),
                     Some(Hit::Popup) => {}

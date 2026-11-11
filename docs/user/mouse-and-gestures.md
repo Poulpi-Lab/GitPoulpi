@@ -43,8 +43,10 @@ same rules everywhere:
   an outside click, so a stray click cannot lose it. `✕` and `Esc` ask
   **Discard changes?** first; **Keep editing** goes back. A form with nothing
   typed closes at once, and so does a single-line dialog.
-- Menus, dropdowns, the palette and pickers have no `✕`: they close on `Esc` or
-  a click outside.
+- The command palette, the pickers (tab, theme, language), the small review,
+  board, merge and composer dialogs and the confirmation prompt carry the `✕`
+  too. Context menus and dropdowns have none: they close on `Esc` or a click
+  outside.
 
 ## Lists in Settings
 
@@ -444,11 +446,12 @@ Dialogs can be moved, and the larger windows resized:
 | Init, Worktree, Sparse checkout, Flow dialog, issue-flow dialogs, commit message (reword) form, Workspace form, label / milestone pickers | yes | no |
 | Confirmations (every "Are you sure?") | yes | no |
 | Review and Board dialogs: their small dialogs (comment, finish, pick, columns) | yes | no |
+| Keybindings page popups (reset confirmation, key capture), the AI answer popup | yes | no |
 | Settings: the repository authentication results and confirmation | yes | no |
 | History rewrite: purge, identity and question dialogs | yes | no |
 | Move-a-file popup of the commit composer, merge notices | yes | no |
 
-Not movable: the full-page screens (Settings, Help, the Review and Board pages, which already fill the window), context menus and dropdowns (they hang off what opened them), tooltips, and the small popups inside a page (the keybindings page's popups, the remotes form, the split-commit editor).
+Not movable: the full-page screens (Settings, Help, the Review and Board pages, which already fill the window), context menus and dropdowns (they hang off what opened them), tooltips, and the small popups inside a page (the remotes form, the split-commit editor).
 
 The pointer shows a move shape over the title bar and a resize shape over the borders and corners (terminals with `OSC 22`).
 

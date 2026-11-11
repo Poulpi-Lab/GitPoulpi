@@ -406,10 +406,14 @@ pub(super) fn render_popup(
     let Some(popup) = page.popup.clone() else {
         return;
     };
+    if let Some((c, r)) = pointer {
+        page.popup_close.set_hover(c, r);
+    }
     match popup {
         Popup::ConfirmReset { focus } => {
-            let rect = dialog_kit::centered(screen, 62, 8);
-            dialog_kit::panel(buf, rect, msg::CONFIRM_TITLE.get());
+            let rect = WIN_RESET.place(screen, dialog_kit::centered(screen, 62, 8));
+            page.popup_close
+                .framed(buf, rect, msg::CONFIRM_TITLE.get(), &WIN_RESET, true);
             let inner = Rect::new(rect.x + 2, rect.y + 2, rect.width.saturating_sub(4), 3);
             let text = [msg::CONFIRM_LINE_1.get(), msg::CONFIRM_LINE_2.get()];
             for (i, line) in text.iter().enumerate() {
@@ -457,8 +461,9 @@ pub(super) fn render_popup(
             };
             // Wide enough for the sentence in this language (72 in English).
             let want = (display_width(&press) + 4).min(screen.width as usize) as u16;
-            let rect = dialog_kit::centered(screen, want.max(72), 15);
-            dialog_kit::panel(buf, rect, msg::CAPTURE_TITLE.get());
+            let rect = WIN_CAPTURE.place(screen, dialog_kit::centered(screen, want.max(72), 15));
+            page.popup_close
+                .framed(buf, rect, msg::CAPTURE_TITLE.get(), &WIN_CAPTURE, true);
             let style = Style::default().fg(th().ui.text).bg(th().ui.panel);
             let dim = Style::default().fg(th().ui.muted).bg(th().ui.panel);
             let x = rect.x + 2;
@@ -606,3 +611,7 @@ pub(super) fn render_popup(
         }
     }
 }
+
+/// The two popups move like any dialog (their size follows their content).
+const WIN_RESET: dialog_kit::Win = dialog_kit::Win::movable("keys_reset");
+const WIN_CAPTURE: dialog_kit::Win = dialog_kit::Win::movable("keys_capture");

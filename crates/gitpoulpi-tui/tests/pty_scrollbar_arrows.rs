@@ -102,16 +102,28 @@ fn holding_the_down_arrow_keeps_scrolling_until_released() {
 
     // Button down on the arrow, no release: one row at once, then it repeats.
     term.press(col, down_row).expect("press the down arrow");
-    std::thread::sleep(Duration::from_millis(1000));
-    let held = top_visible(&term.screen()).expect("a Log row");
+    // Waited for (not a fixed sleep: a torn frame delays what is drawn).
+    let held_screen = term
+        .wait_for("the held arrow kept scrolling", STEP, |s| {
+            top_visible(s).is_some_and(|t| t <= 99 - 5)
+        })
+        .unwrap_or_else(|e| {
+            panic!(
+                "holding the arrow must keep scrolling: {e}\n{}",
+                term.text()
+            )
+        });
+    let held = top_visible(&held_screen).expect("a Log row");
     assert!(
         held <= 99 - 5,
         "holding the arrow must keep scrolling, top is commit-{held}"
     );
 
     term.release(col, down_row).expect("release");
-    std::thread::sleep(Duration::from_millis(200));
-    let stopped = top_visible(&term.screen()).expect("a Log row");
+    let stopped_screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let stopped = top_visible(&stopped_screen).expect("a Log row");
     std::thread::sleep(Duration::from_millis(500));
     assert_eq!(
         top_visible(&term.screen()),

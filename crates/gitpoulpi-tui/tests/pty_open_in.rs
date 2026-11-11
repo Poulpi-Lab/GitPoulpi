@@ -318,7 +318,9 @@ fn open_in_sits_in_the_title_bar_next_to_the_path_and_the_gear_left_of_the_quit_
     // the bar's right end, where it used to be).
     term.click(col + 1, row).unwrap();
     wait_popup(&term);
-    let (list_col, _) = term.screen().find("First entry").expect("a list row");
+    let (list_col, _) = term
+        .wait_for_text("First entry", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     assert!(
         list_col.abs_diff(col) < 12,
         "the list ({list_col}) hangs under the button ({col}):\n{}",

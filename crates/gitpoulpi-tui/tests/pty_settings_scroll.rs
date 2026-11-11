@@ -40,11 +40,19 @@ fn open_settings() -> (Terminal, tempfile::TempDir, gitpoulpi_testkit::FixtureRe
 
 fn arrow(term: &Terminal, glyph: &str) -> (u16, u16) {
     // The bar is the right-most column: the glyph with the largest column.
-    term.screen()
+    // Waited for: a torn frame can lack the bar.
+    let screen = term
+        .wait_for(
+            &format!("the {glyph} arrow"),
+            Duration::from_secs(30),
+            |s| !s.find_all(glyph).is_empty(),
+        )
+        .unwrap_or_else(|e| panic!("no {glyph} arrow: {e}\n{}", term.text()));
+    screen
         .find_all(glyph)
         .into_iter()
         .max_by_key(|(c, _)| *c)
-        .unwrap_or_else(|| panic!("no {glyph} arrow\n{}", term.text()))
+        .expect("the predicate just matched")
 }
 
 fn bg(term: &Terminal, (c, r): (u16, u16)) -> String {
@@ -57,23 +65,25 @@ fn hovering_either_settings_arrow_lights_it() {
     // Scroll down so both arrows are live.
     let down = arrow(&term, DOWN);
     term.click(down.0, down.1).unwrap();
-    std::thread::sleep(Duration::from_millis(400));
+    // The scroll's final frame: read once the page stopped redrawing.
+    term.wait_for_stable(Duration::from_millis(400), Duration::from_secs(30))
+        .unwrap_or_else(|e| panic!("{e}"));
     let up = arrow(&term, UP);
     let down = arrow(&term, DOWN);
     term.move_to(up.0 - 8, up.1 + 2).unwrap();
-    std::thread::sleep(Duration::from_millis(300));
+    term.wait_for_stable(Duration::from_millis(300), Duration::from_secs(30))
+        .unwrap_or_else(|e| panic!("{e}"));
     let (up_rest, down_rest) = (bg(&term, up), bg(&term, down));
     term.move_to(up.0, up.1).unwrap();
-    std::thread::sleep(Duration::from_millis(300));
-    assert_ne!(bg(&term, up), up_rest, "up arrow not lit\n{}", term.text());
+    term.wait_for("the up arrow lit", Duration::from_secs(30), |s| {
+        format!("{:?}", s.cell(up.0, up.1).unwrap().bg) != up_rest
+    })
+    .unwrap_or_else(|e| panic!("up arrow not lit: {e}\n{}", term.text()));
     term.move_to(down.0, down.1).unwrap();
-    std::thread::sleep(Duration::from_millis(300));
-    assert_ne!(
-        bg(&term, down),
-        down_rest,
-        "down arrow not lit\n{}",
-        term.text()
-    );
+    term.wait_for("the down arrow lit", Duration::from_secs(30), |s| {
+        format!("{:?}", s.cell(down.0, down.1).unwrap().bg) != down_rest
+    })
+    .unwrap_or_else(|e| panic!("down arrow not lit: {e}\n{}", term.text()));
 }
 
 #[test]

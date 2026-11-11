@@ -198,7 +198,10 @@ fn a_and_d_filter_the_account_rows_and_radar_toml_remembers() {
     let screen = s
         .term
         .wait_for("only the clone's rows left", STEP, |s| {
-            !s.contains("Harden the token build") && s.contains("[ ] Not cloned")
+            !s.contains("Harden the token build")
+                && s.contains("[ ] Not cloned")
+                && s.contains("Lower the render budget")
+                && !s.contains("Rename the spacing scale")
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
@@ -251,6 +254,8 @@ fn unticking_not_cloned_by_mouse_with_a_far_row_selected_does_not_crash() {
         .term
         .wait_for("the checkbox unticked", STEP, |s| {
             s.contains("[ ] Not cloned")
+                && !s.contains("Harden the token build")
+                && s.contains("Lower the render budget")
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(

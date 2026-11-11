@@ -90,12 +90,19 @@ fn the_mouse_rows_are_the_first_tab_of_keyboard_and_mouse_and_space_ticks_one() 
 /// The scrollbar's down arrow on the right of the settings body: the last
 /// `↓` on screen (the bar's own glyph, below everything else on the page).
 fn down_arrow(term: &Terminal) -> (u16, u16) {
-    let s = term.screen();
-    (0..s.rows())
-        .rev()
-        .flat_map(|r| (0..s.cols()).rev().map(move |c| (c, r)))
-        .find(|&(c, r)| s.cell(c, r).is_some_and(|x| x.text == "\u{2193}"))
-        .unwrap_or_else(|| panic!("no scrollbar arrow\n{}", term.text()))
+    let arrow = |s: &xtask::pty::Screen| {
+        (0..s.rows())
+            .rev()
+            .flat_map(|r| (0..s.cols()).rev().map(move |c| (c, r)))
+            .find(|&(c, r)| s.cell(c, r).is_some_and(|x| x.text == "\u{2193}"))
+    };
+    // Waited for: a torn frame can lack the bar.
+    let s = term
+        .wait_for("the scrollbar's arrow", Duration::from_secs(30), |s| {
+            arrow(s).is_some()
+        })
+        .unwrap_or_else(|e| panic!("no scrollbar arrow: {e}\n{}", term.text()));
+    arrow(&s).expect("the predicate just matched")
 }
 
 #[test]

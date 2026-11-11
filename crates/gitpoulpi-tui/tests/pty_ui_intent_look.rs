@@ -114,11 +114,21 @@ impl Rig {
             .unwrap_or_else(|e| panic!("{e}"));
     }
 
-    /// The background of the first cell showing `needle`.
-    fn bg_of(&self, needle: &str) -> Option<Color> {
-        let screen = self.term.screen();
-        let (col, row) = screen.find(needle)?;
-        Some(screen.cell(col, row)?.bg)
+    /// Waits until the first cell showing `needle` is (`lit`) or is not
+    /// (`!lit`) the highlight's background, on a frame that shows `needle`:
+    /// a torn frame can show the text before its tint.
+    fn expect_bg(&self, needle: &str, lit: bool) {
+        let bg_at = |s: &xtask::pty::Screen| {
+            let (col, row) = s.find(needle)?;
+            Some(s.cell(col, row)?.bg)
+        };
+        self.term
+            .wait_for(
+                &format!("{needle:?} {}tinted", if lit { "" } else { "not " }),
+                STEP,
+                |s| bg_at(s).is_some_and(|bg| (bg == HIGHLIGHT) == lit),
+            )
+            .unwrap_or_else(|e| panic!("{e}"));
     }
 }
 
@@ -191,11 +201,7 @@ fn show_diff_at_a_line_in_split_layout_tints_its_row() {
     rig.wait_for("line 120 in the split diff", |t| {
         t.contains("line 120 changed")
     });
-    assert_eq!(
-        rig.bg_of("line 120 changed"),
-        Some(HIGHLIGHT),
-        "the row is tinted"
-    );
+    rig.expect_bg("line 120 changed", true);
     // `ui state --text`: the visible text holds the highlighted line.
     let text = common::ui_state_text(rig.config.path(), &rig.session)
         .text
@@ -215,7 +221,7 @@ fn a_line_outside_the_hunks_switches_to_the_whole_file() {
     assert_eq!(diff["whole_file"], true, "{diff}");
     assert_eq!(diff["cursor_line"], 200, "{diff}");
     rig.wait_for("line 200 on screen", |t| t.contains("line 200"));
-    assert_eq!(rig.bg_of("line 200"), Some(HIGHLIGHT));
+    rig.expect_bg("line 200", true);
     // A hunks-only request cannot reach it: Partial, not a lie.
     let mut intent = rig.diff(DiffAt::Commit(oid(&head)), Some(200));
     if let UiIntent::ShowDiff { whole_file, .. } = &mut intent {
@@ -240,7 +246,7 @@ fn show_diff_unstaged_on_a_modified_file() {
     rig.wait_for("the unstaged title and the line", |t| {
         t.contains("unstaged") && t.contains("line 50 changed")
     });
-    assert_eq!(rig.bg_of("line 50 changed"), Some(HIGHLIGHT));
+    rig.expect_bg("line 50 changed", true);
     // Highlight on the open diff, moving the band.
     let out = rig.show(UiIntent::Highlight {
         range: LineRange {
@@ -257,7 +263,7 @@ fn show_diff_unstaged_on_a_modified_file() {
         serde_json::json!([52, 52])
     );
     rig.wait_for("line 52 tinted", |t| t.contains("line 52"));
-    assert_eq!(rig.bg_of("line 52"), Some(HIGHLIGHT));
+    rig.expect_bg("line 52", true);
 }
 
 #[test]
@@ -334,11 +340,7 @@ fn show_file_at_a_line_and_column_scrolls_sideways_and_tints_the_line() {
     assert_eq!(file["selected_line"], 300, "{file}");
     assert_eq!(file["h_offset"], 143, "{file}");
     rig.wait_for("the column on screen", |t| t.contains("NEEDLE tail"));
-    assert_eq!(
-        rig.bg_of("NEEDLE tail"),
-        Some(HIGHLIGHT),
-        "the line is tinted"
-    );
+    rig.expect_bg("NEEDLE tail", true);
     let text = common::ui_state_text(rig.config.path(), &rig.session)
         .text
         .expect("text");
@@ -363,7 +365,7 @@ fn show_blame_at_a_line_shows_the_author_on_that_row() {
     rig.wait_for("the blame row", |t| {
         t.contains("Zed Blamer") && t.lines().any(|l| l.contains("line 30"))
     });
-    assert_eq!(rig.bg_of("line 30"), Some(HIGHLIGHT));
+    rig.expect_bg("line 30", true);
 }
 
 #[test]
@@ -436,7 +438,7 @@ fn a_highlight_outside_the_hunks_widens_to_the_whole_file() {
     assert_eq!(diff["cursor_line"], 200, "{diff}");
     assert_eq!(diff["highlight"]["lines"], serde_json::json!([200, 200]));
     rig.wait_for("line 200 on screen", |t| t.contains("line 200"));
-    assert_eq!(rig.bg_of("line 200"), Some(HIGHLIGHT));
+    rig.expect_bg("line 200", true);
 }
 
 #[test]
@@ -449,12 +451,12 @@ fn the_highlight_band_goes_when_the_user_moves_the_cursor() {
         serde_json::json!([120, 120])
     );
     rig.wait_for("line 120 tinted", |t| t.contains("line 120 changed"));
-    assert_eq!(rig.bg_of("line 120 changed"), Some(HIGHLIGHT));
+    rig.expect_bg("line 120 changed", true);
     rig.term.send_keys("Down").unwrap();
     rig.wait_for("the band is gone from the state", |_| {
         rig.state().diff.is_some_and(|d| d["highlight"].is_null())
     });
-    assert_ne!(rig.bg_of("line 120 changed"), Some(HIGHLIGHT));
+    rig.expect_bg("line 120 changed", false);
 }
 
 #[test]

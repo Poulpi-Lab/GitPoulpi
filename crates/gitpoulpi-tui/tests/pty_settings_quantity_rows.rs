@@ -44,13 +44,32 @@ fn open_sync(term: &mut Terminal) {
     common::settings_page(term, "Synchronization");
 }
 
-fn row_text(term: &Terminal, label: &str) -> String {
-    term.screen()
+/// The row of `label` once it satisfies `want` (waited for: a torn frame
+/// can show the label before its value).
+fn wait_row(term: &Terminal, label: &str, want: impl Fn(&str) -> bool) -> String {
+    let screen = term
+        .wait_for(&format!("the {label} row"), STEP, |s| {
+            s.text().lines().any(|l| l.contains(label) && want(l))
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    screen
         .text()
         .lines()
-        .find(|l| l.contains(label))
-        .unwrap_or_default()
+        .find(|l| l.contains(label) && want(l))
+        .expect("the predicate just matched")
         .to_string()
+}
+
+/// The screen once the row `row` of `label` shows its number and its unit's
+/// arrow (what [`parts`] reads).
+fn wait_parts(term: &Terminal, label: &str, row: u16) -> Screen {
+    term.wait_for(&format!("the {label} row's number and unit"), STEP, |s| {
+        let line = s.line(row);
+        line.find(label).is_some_and(|i| {
+            line[i + label.len()..].chars().any(|c| c.is_ascii_digit()) && line.contains('\u{25BE}')
+        })
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
 }
 
 /// The first cell of the number on the row of `label`, and of the unit's
@@ -102,13 +121,13 @@ fn two_rows_by_mouse_and_by_keys_keep_their_base_unit() {
     // The older value reads back in the largest even unit, number and unit
     // on one line; looking changed nothing.
     let (_, fetch_row) = common::scroll_settings_to(&mut term, FETCH, STEP);
-    let line = row_text(&term, FETCH);
+    let line = wait_row(&term, FETCH, |l| l.contains('1') && l.contains("hour"));
     assert!(line.contains('1') && line.contains("hour"), "{line}");
     assert!(!stored(config.path()).contains("auto_fetch_interval_unit"));
 
     // The mouse: click the unit (the list names the units for 1: "minute"
     // and "hour"), pick the minute.
-    let screen = term.screen();
+    let screen = wait_parts(&term, FETCH, fetch_row);
     let (_, arrow) = parts(&screen, FETCH, fetch_row);
     term.click(arrow.0, arrow.1).expect("click the unit");
     let list = term
@@ -129,7 +148,7 @@ fn two_rows_by_mouse_and_by_keys_keep_their_base_unit() {
     wait_stored(config.path(), "auto_fetch_interval_unit = \"minutes\"");
 
     // The mouse: click the number, type 15.
-    let screen = term.screen();
+    let screen = wait_parts(&term, FETCH, fetch_row);
     let (number, _) = parts(&screen, FETCH, fetch_row);
     term.click(number.0, number.1).expect("click the number");
     term.send_keys("Backspace").unwrap();
@@ -139,9 +158,9 @@ fn two_rows_by_mouse_and_by_keys_keep_their_base_unit() {
 
     // The keys, on the script time limit (milliseconds under the hood).
     let (_, script_row) = common::scroll_settings_to(&mut term, SCRIPT, STEP);
-    let line = row_text(&term, SCRIPT);
+    let line = wait_row(&term, SCRIPT, |l| l.contains('5') && l.contains("seconds"));
     assert!(line.contains('5') && line.contains("seconds"), "{line}");
-    let screen = term.screen();
+    let screen = wait_parts(&term, SCRIPT, script_row);
     let (number, _) = parts(&screen, SCRIPT, script_row);
     term.click(number.0, number.1).expect("click the number");
     term.send_keys("Backspace").unwrap();
@@ -166,7 +185,9 @@ fn two_rows_by_mouse_and_by_keys_keep_their_base_unit() {
     term.send_text("1500").unwrap();
     term.send_keys("Enter").unwrap();
     wait_stored(config.path(), "script_timeout_ms = 1500");
-    let line = row_text(&term, SCRIPT);
+    let line = wait_row(&term, SCRIPT, |l| {
+        l.contains("1500") && l.contains("milliseconds")
+    });
     assert!(
         line.contains("1500") && line.contains("milliseconds"),
         "{line}"

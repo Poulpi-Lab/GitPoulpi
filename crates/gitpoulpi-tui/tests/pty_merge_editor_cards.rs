@@ -28,22 +28,27 @@ fn launch(repo: &Path, session: &str) -> (Terminal, tempfile::TempDir) {
 }
 
 /// Opens `name` from the Status pane with Enter and waits for the card's
-/// headline.
-fn open_card(term: &mut Terminal, name: &str, headline: &str) {
+/// headline together with every text in `with` (one whole state: a torn
+/// frame can show the headline before the rest). Returns that screen's text.
+fn open_card(term: &mut Terminal, name: &str, headline: &str, with: &[&str]) -> String {
     // The conflicted row reads `! name`: a bare name may match other text.
     let (c, r) = term
         .wait_for_text(&format!("! {name}"), STEP)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.click(c + 2, r).unwrap();
     term.send_keys("Enter").unwrap();
-    term.wait_for("the card", STEP, |s| s.contains(headline))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let t = term.text();
+    let t = term
+        .wait_for("the card", STEP, |s| {
+            s.contains(headline) && with.iter().all(|w| s.contains(w))
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
+        .text();
     // A card has no text panes and no Output.
     assert!(!t.contains("Output \u{b7}"), "{t}");
     // Nothing edited the file: no "edited outside the editor" strip (a
     // card has no text to continue from).
     assert!(!t.contains("edited outside"), "{t}");
+    t
 }
 
 fn wait_resolved(term: &mut Terminal, name: &str) {
@@ -70,8 +75,12 @@ fn a_binary_file_shows_a_card_and_b_takes_their_bytes() {
     let fixture = ConflictFixture::binary();
     let theirs = fixture.stage_bytes(3, "image.bin").unwrap();
     let (mut term, _config) = launch(fixture.root(), "pty-card-binary");
-    open_card(&mut term, "image.bin", "Binary file");
-    let t = term.text();
+    let t = open_card(
+        &mut term,
+        "image.bin",
+        "Binary file",
+        &["Keep A", "Take B", "Take base"],
+    );
     assert!(t.contains("Keep A") && t.contains("Take B") && t.contains("Take base"));
     term.send_keys("b").unwrap();
     wait_resolved(&mut term, "image.bin");
@@ -90,7 +99,7 @@ fn a_card_button_works_with_the_mouse() {
     let fixture = ConflictFixture::binary();
     let ours = fixture.stage_bytes(2, "image.bin").unwrap();
     let (mut term, _config) = launch(fixture.root(), "pty-card-mouse");
-    open_card(&mut term, "image.bin", "Binary file");
+    open_card(&mut term, "image.bin", "Binary file", &[]);
     let (c, r) = term
         .wait_for_text("Keep A", STEP)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -108,8 +117,12 @@ fn an_lfs_pointer_shows_both_objects_and_a_keeps_ours() {
     let fixture = ConflictFixture::lfs_pointer();
     let ours = fixture.stage_bytes(2, "big.dat").unwrap();
     let (mut term, _config) = launch(fixture.root(), "pty-card-lfs");
-    open_card(&mut term, "big.dat", "Git LFS pointer");
-    let t = term.text();
+    let t = open_card(
+        &mut term,
+        "big.dat",
+        "Git LFS pointer",
+        &["bbbbbbbbbbbb", "cccccccccccc"],
+    );
     assert!(
         t.contains("bbbbbbbbbbbb") && t.contains("cccccccccccc"),
         "{t}"
@@ -126,8 +139,12 @@ fn an_lfs_pointer_shows_both_objects_and_a_keeps_ours() {
 fn deleted_in_a_changed_in_b_d_accepts_the_deletion() {
     let fixture = ConflictFixture::delete_modify(true);
     let (mut term, _config) = launch(fixture.root(), "pty-card-delete-a");
-    open_card(&mut term, "gone.txt", "Deleted in A, changed in B");
-    let t = term.text();
+    let t = open_card(
+        &mut term,
+        "gone.txt",
+        "Deleted in A, changed in B",
+        &["Keep the file", "Accept the deletion"],
+    );
     assert!(t.contains("Keep the file") && t.contains("Accept the deletion"));
     term.send_text("D").unwrap();
     wait_resolved(&mut term, "gone.txt");
@@ -143,7 +160,7 @@ fn changed_in_a_deleted_in_b_k_keeps_the_file() {
     let fixture = ConflictFixture::delete_modify(false);
     let ours = fixture.stage_bytes(2, "gone.txt").unwrap();
     let (mut term, _config) = launch(fixture.root(), "pty-card-delete-b");
-    open_card(&mut term, "gone.txt", "Changed in A, deleted in B");
+    open_card(&mut term, "gone.txt", "Changed in A, deleted in B", &[]);
     term.send_keys("k").unwrap();
     wait_resolved(&mut term, "gone.txt");
     assert_eq!(
@@ -161,8 +178,12 @@ fn a_rename_leftover_can_be_deleted() {
     let fixture = ConflictFixture::rename_delete();
     let (mut term, _config) = launch(fixture.root(), "pty-card-rename");
     // The base and A have it, B deleted it.
-    open_card(&mut term, "b.txt", "Changed in A, deleted in B");
-    let t = term.text();
+    let t = open_card(
+        &mut term,
+        "b.txt",
+        "Changed in A, deleted in B",
+        &["Keep the file", "Accept the deletion"],
+    );
     assert!(
         t.contains("Keep the file") && t.contains("Accept the deletion"),
         "{t}"
@@ -178,8 +199,12 @@ fn a_rename_leftover_can_be_deleted() {
 fn a_symlink_shows_both_targets_and_b_takes_theirs() {
     let fixture = ConflictFixture::symlink();
     let (mut term, _config) = launch(fixture.root(), "pty-card-symlink");
-    open_card(&mut term, "link", "Symbolic link");
-    let t = term.text();
+    let t = open_card(
+        &mut term,
+        "link",
+        "Symbolic link",
+        &["target-ours", "target-theirs"],
+    );
     assert!(
         t.contains("target-ours") && t.contains("target-theirs"),
         "{t}"
@@ -197,8 +222,12 @@ fn a_symlink_shows_both_targets_and_b_takes_theirs() {
 fn a_mode_only_conflict_names_both_modes_and_a_keeps_ours() {
     let fixture = ConflictFixture::mode_only();
     let (mut term, _config) = launch(fixture.root(), "pty-card-mode");
-    open_card(&mut term, "run.sh", "Only the file mode differs");
-    let t = term.text();
+    let t = open_card(
+        &mut term,
+        "run.sh",
+        "Only the file mode differs",
+        &["100644", "100755"],
+    );
     assert!(t.contains("100644") && t.contains("100755"), "{t}");
     term.send_keys("b").unwrap();
     wait_resolved(&mut term, "run.sh");
@@ -210,8 +239,12 @@ fn a_mode_only_conflict_names_both_modes_and_a_keeps_ours() {
 fn a_submodule_shows_both_commits_and_b_takes_theirs() {
     let fixture = ConflictFixture::submodule();
     let (mut term, _config) = launch(fixture.root(), "pty-card-submodule");
-    open_card(&mut term, "sub", "Submodule");
-    let t = term.text();
+    let t = open_card(
+        &mut term,
+        "sub",
+        "Submodule",
+        &["commit 3333333", "commit 2222222"],
+    );
     assert!(
         t.contains("commit 3333333") && t.contains("commit 2222222"),
         "{t}"
@@ -231,8 +264,12 @@ fn a_file_over_the_size_cap_is_a_card_and_a_keeps_ours() {
     let fixture = ConflictFixture::huge();
     let ours = fixture.stage_bytes(2, "huge.txt").unwrap();
     let (mut term, _config) = launch(fixture.root(), "pty-card-huge");
-    open_card(&mut term, "huge.txt", "File too large");
-    let t = term.text();
+    let t = open_card(
+        &mut term,
+        "huge.txt",
+        "File too large",
+        &["Open in merge tool"],
+    );
     assert!(t.contains("Open in merge tool"), "{t}");
     term.send_keys("a").unwrap();
     wait_resolved(&mut term, "huge.txt");
@@ -249,7 +286,7 @@ fn saving_on_a_card_does_nothing() {
     let fixture = ConflictFixture::binary();
     let before = std::fs::read(fixture.root().join("image.bin")).unwrap();
     let (mut term, _config) = launch(fixture.root(), "pty-card-save");
-    open_card(&mut term, "image.bin", "Binary file");
+    open_card(&mut term, "image.bin", "Binary file", &[]);
     term.send_keys("C-s").unwrap();
     term.send_keys("Escape").unwrap();
     term.wait_for("the card closed", STEP, |s| !s.contains("Binary file"))
@@ -295,7 +332,7 @@ fn a_conflicted_picture_previews_a_b_and_base_and_the_buttons_still_work() {
     let fixture = ConflictFixture::image();
     let theirs = fixture.stage_bytes(3, "pic.png").unwrap();
     let (mut term, _config) = launch(fixture.root(), "pty-card-picture");
-    open_card(&mut term, "pic.png", "Binary file");
+    open_card(&mut term, "pic.png", "Binary file", &[]);
     term.wait_for("the three pictures", STEP, |s| {
         ![(255, 0, 0), (0, 0, 255), (0, 255, 0)]
             .iter()
@@ -327,7 +364,7 @@ fn a_conflicted_picture_previews_a_b_and_base_and_the_buttons_still_work() {
 fn a_conflicted_binary_that_is_not_a_picture_has_no_preview() {
     let fixture = ConflictFixture::binary();
     let (mut term, _config) = launch(fixture.root(), "pty-card-nopicture");
-    open_card(&mut term, "image.bin", "Binary file");
+    open_card(&mut term, "image.bin", "Binary file", &[]);
     let s = term.screen();
     for c in [(255, 0, 0), (0, 0, 255), (0, 255, 0)] {
         assert!(picture_columns(&s, c).is_empty());

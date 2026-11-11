@@ -50,7 +50,14 @@ fn an_update_shutdown_closes_the_window_with_one_line() {
         );
         std::thread::sleep(Duration::from_millis(100));
     }
-    let raw = String::from_utf8_lossy(&term.raw_output()).into_owned();
+    // The line is read from the output after the exit: give the reader a
+    // moment to deliver it.
+    let deadline = Instant::now() + STEP;
+    let mut raw = String::from_utf8_lossy(&term.raw_output()).into_owned();
+    while !raw.contains("closing for an update") && Instant::now() < deadline {
+        std::thread::sleep(Duration::from_millis(100));
+        raw = String::from_utf8_lossy(&term.raw_output()).into_owned();
+    }
     assert!(raw.contains("closing for an update"), "{raw}");
     term.stop().unwrap();
 }

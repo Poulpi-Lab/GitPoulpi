@@ -34,6 +34,13 @@ fn log_left(s: &Screen) -> u16 {
         .expect("the Refs/Log corners")
 }
 
+/// [`log_left`] equals `want`, without panicking on a frame that lacks the
+/// corners (a torn frame): a wait predicate.
+fn log_left_is(s: &Screen, want: u16) -> bool {
+    s.find("\u{256e}\u{256d}")
+        .is_some_and(|(c, _)| c + 2 == want)
+}
+
 fn launch_main(repo: &Path, config: &Path, cols: u16, rows: u16, ready: &str) -> Terminal {
     common::launch(repo)
         .session("persist-main")
@@ -78,10 +85,14 @@ fn the_pane_divider_survives_a_tab_switch_a_restart_and_a_small_terminal() {
     // Refs ends at 20% of the panes row; drag its divider well to the right.
     let divider = default_left - 1;
     term.drag((divider, 12), (divider + 24, 12)).unwrap();
+    term.wait_for("the Log moved right", STEP, |s| {
+        s.find("\u{256e}\u{256d}")
+            .is_some_and(|(c, _)| c + 2 > default_left + 10)
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The drag's last frame: read once the window stopped redrawing.
     let moved = term
-        .wait_for("the Log moved right", STEP, |s| {
-            log_left(s) > default_left + 10
-        })
+        .wait_for_stable(Duration::from_millis(400), STEP)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let moved_left = log_left(&moved);
 
@@ -98,9 +109,12 @@ fn the_pane_divider_survives_a_tab_switch_a_restart_and_a_small_terminal() {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").unwrap();
+    // One predicate for the whole state: bravo drawn with the dragged size.
     let in_bravo = term
-        .wait_for("bravo open", STEP, |s| {
-            s.contains("bravo-only-commit") && !s.contains("Repository Management")
+        .wait_for("bravo open at the dragged size", STEP, |s| {
+            s.contains("bravo-only-commit")
+                && !s.contains("Repository Management")
+                && log_left_is(s, moved_left)
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(log_left(&in_bravo), moved_left, "{}", term.text());
@@ -108,8 +122,10 @@ fn the_pane_divider_survives_a_tab_switch_a_restart_and_a_small_terminal() {
     // Ctrl+PageUp back to alpha, Ctrl+PageDown to bravo again.
     term.send_text("\x1b[5;5~").unwrap();
     let back = term
-        .wait_for("alpha active", STEP, |s| {
-            s.contains("alpha-only-commit") && !s.contains("bravo-only-commit")
+        .wait_for("alpha active at the dragged size", STEP, |s| {
+            s.contains("alpha-only-commit")
+                && !s.contains("bravo-only-commit")
+                && log_left_is(s, moved_left)
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(log_left(&back), moved_left, "{}", term.text());

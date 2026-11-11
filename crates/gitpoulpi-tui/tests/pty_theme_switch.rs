@@ -42,9 +42,10 @@ fn log_cell(screen: &Screen) -> (Color, Color) {
 }
 
 /// A cell of Settings' own chrome: the title's first letter.
-fn settings_bg(screen: &Screen) -> Color {
-    let (col, row) = screen.find("Settings - Tab").expect("the Settings title");
-    screen.cell(col, row).expect("a cell").bg
+/// `None` on a frame without the title (a torn frame).
+fn settings_bg(screen: &Screen) -> Option<Color> {
+    let (col, row) = screen.find("Settings - Tab")?;
+    Some(screen.cell(col, row).expect("a cell").bg)
 }
 
 fn open_settings(term: &mut Terminal, page: &str) {
@@ -109,7 +110,9 @@ fn the_theme_combo_previews_commits_restores_and_lists_user_themes() {
         .size(200, 60)
         .spawn();
     let screen = term
-        .wait_for("the fixture loaded", STARTUP, |s| s.contains(MESSAGE))
+        .wait_for("the fixture loaded, both rows", STARTUP, |s| {
+            s.contains(MESSAGE) && s.find(ROW_TEXT).is_some()
+        })
         .unwrap_or_else(|e| panic!("{e}"));
     let (dark_bg, dark_fg) = log_cell(&screen);
     assert_eq!(
@@ -119,17 +122,26 @@ fn the_theme_combo_previews_commits_restores_and_lists_user_themes() {
     );
 
     open_settings(&mut term, "Appearance");
-    let dark_chrome = settings_bg(&term.screen());
+    let dark_chrome = settings_bg(
+        &term
+            .wait_for("Settings' title", STEP, |s| settings_bg(s).is_some())
+            .unwrap_or_else(|e| panic!("{e}")),
+    )
+    .expect("the title is drawn");
     open_theme_combo(&mut term, "System (follows terminal)");
     // Highlight Light: System, Dark, Light. The preview repaints at once.
     term.send_keys("Down").unwrap();
     term.send_keys("Down").unwrap();
-    term.wait_for("Light previewed", STEP, |s| settings_bg(s) != dark_chrome)
-        .unwrap_or_else(|e| panic!("{e}"));
+    term.wait_for("Light previewed", STEP, |s| {
+        settings_bg(s).is_some_and(|b| b != dark_chrome)
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     // Esc closes the combo and restores Dark; nothing was stored.
     term.send_keys("Escape").unwrap();
-    term.wait_for("Dark restored", STEP, |s| settings_bg(s) == dark_chrome)
-        .unwrap_or_else(|e| panic!("{e}"));
+    term.wait_for("Dark restored", STEP, |s| {
+        settings_bg(s) == Some(dark_chrome)
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     assert!(
         !stored(config.path()).contains("theme = "),
         "{}",
@@ -180,23 +192,39 @@ fn the_theme_combo_previews_commits_restores_and_lists_user_themes() {
     .unwrap_or_else(|e| panic!("{e}"));
 
     // The lane combo: Follow theme and every palette; picking one recolors.
-    let nord_lane = lane_fg(&term.screen()).expect("a lane marker");
+    let nord_lane = lane_fg(
+        &term
+            .wait_for("a lane marker", STEP, |s| lane_fg(s).is_some())
+            .unwrap_or_else(|e| panic!("{e}")),
+    )
+    .expect("a lane marker");
     open_settings(&mut term, "Appearance");
     // Input color also reads "Follow theme": take the lane row's combo.
     // The page is longer than the window: bring the lane row into view.
     common::scroll_settings_to(&mut term, "Graph color theme", STEP);
-    let screen = term
-        .wait_for("the lane row", STEP, |s| s.contains("Graph color theme"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (_, label_row) = screen.find("Graph color theme").unwrap();
-    let (col, row) = screen
-        .find_all("Follow theme")
-        .into_iter()
-        .find(|(_, r)| *r == label_row)
-        .unwrap_or_else(|| panic!("the lane combo:\n{}", screen.text()));
-    term.click(col + 1, row).unwrap();
-    term.wait_for("the popup", STEP, |s| s.contains("\u{2713} Follow theme"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    // The click is retried, the combo located afresh each time (the page can
+    // still be settling, and a click on a torn frame lands nowhere).
+    let lane_combo = |s: &xtask::pty::Screen| {
+        let (_, label_row) = s.find("Graph color theme")?;
+        s.find_all("Follow theme")
+            .into_iter()
+            .find(|(_, r)| *r == label_row)
+    };
+    common::retry_until(
+        &mut term,
+        "the popup",
+        4,
+        STEP,
+        |t| {
+            let s = t.screen();
+            if !s.contains("\u{2713} Follow theme") {
+                if let Some((col, row)) = lane_combo(&s) {
+                    t.click(col + 1, row).unwrap();
+                }
+            }
+        },
+        |s| s.contains("\u{2713} Follow theme"),
+    );
     // The list is long, so it is searchable: every palette is reachable.
     for (query, label) in [
         ("gitpoulpi", "GitPoulpi"),

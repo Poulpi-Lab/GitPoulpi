@@ -144,8 +144,12 @@ fn dragging_a_tab_shows_a_ghost_and_a_marker_and_a_drop_reorders() {
         "nothing moved before the drop"
     );
     term.release(cx + 12, row).unwrap();
-    wait_bar(&mut term, &["moonbase", "comet", "orbit"]);
-    assert!(!term.text().contains("\u{21C4} orbit"), "the ghost is gone");
+    // One predicate: the new order, and the ghost gone.
+    term.wait_for("the new order, the ghost gone", STEP, |s| {
+        let line = s.text().lines().nth(1).unwrap_or("").to_string();
+        bar_order(&line) == ["moonbase", "comet", "orbit"] && !s.text().contains("\u{21C4} orbit")
+    })
+    .unwrap_or_else(|e| panic!("the ghost is gone: {e}\n{}", term.text()));
     assert_eq!(order(t.config.path()), ["moonbase", "comet", "orbit"]);
     term.stop().unwrap();
 }
@@ -303,13 +307,16 @@ fn the_pinned_chips_stay_put_and_a_drop_before_the_first_tab_lands_first() {
     let t = three();
     let mut term = start(&t);
     wait_bar(&mut term, &["orbit", "moonbase", "comet"]);
-    let home_before = term.screen().find("\u{2302}").unwrap();
+    let home_before = term
+        .wait_for_text("\u{2302}", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let (cx, row) = tab_pos(&term, "comet");
     // Drag the last tab as far left as the bar goes: over the Home button.
     term.drag((cx + 1, row), (0, row)).unwrap();
     wait_bar(&mut term, &["comet", "orbit", "moonbase"]);
     assert_eq!(
-        term.screen().find("\u{2302}").unwrap(),
+        term.wait_for_text("\u{2302}", STEP)
+            .unwrap_or_else(|e| panic!("{e}")),
         home_before,
         "Home did not move"
     );

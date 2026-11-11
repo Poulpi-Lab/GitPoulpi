@@ -99,10 +99,6 @@ fn select_wip(term: &mut Terminal) {
     .unwrap_or_else(|e| panic!("{e}"));
 }
 
-fn menu_open(term: &Terminal, kind: Kind) -> bool {
-    term.screen().contains(kind.marker())
-}
-
 fn wait_menu(term: &Terminal, kind: Kind) {
     term.wait_for(&format!("the {kind:?} menu"), STEP, |s| {
         s.contains(kind.marker())
@@ -343,8 +339,11 @@ fn one_click_away_closes_the_replacing_menu() {
     open_by_mouse(&mut term, Kind::Log);
     term.wait_for_text("\u{25CC}", STEP).unwrap();
     right_click_until_menu(&mut term, Kind::Wip, |s| first(s, "\u{25CC}", 0));
-    wait_menu(&term, Kind::Wip);
-    assert!(!menu_open(&term, Kind::Log));
+    // One whole state (a torn frame can show the old menu next to the new).
+    term.wait_for("only the Wip menu", STEP, |s| {
+        s.contains(Kind::Wip.marker()) && !s.contains(Kind::Log.marker())
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let cols = term.screen().cols();
     term.click(cols - 1, 0).unwrap();
     wait_closed(&term, Kind::Wip);

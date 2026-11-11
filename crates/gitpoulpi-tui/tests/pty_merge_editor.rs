@@ -42,16 +42,33 @@ fn open_with_enter(term: &mut Terminal, name: &str, header: &str) {
     term.wait_for("the file selected", STEP, |s| s.contains(name))
         .unwrap_or_else(|e| panic!("{e}"));
     // A click on a conflicted file already opens its merge editor, and how
-    // soon depends on the machine (a ConPTY is slower than a unix pty): an
-    // Enter sent into an editor that has just opened would pick a chunk. So
-    // let the screen settle and press Enter only when the click left it shut.
-    term.wait_for_stable(Duration::from_millis(300), STEP)
-        .unwrap();
-    if !term.screen().contains(header) {
+    // soon depends on the machine (a ConPTY is slower than a unix pty, a
+    // torn frame shows the old screen a while): an Enter sent into an editor
+    // that has just opened would pick a chunk. So give the click a good while
+    // to show the editor and press Enter only when it left it shut.
+    if term
+        .wait_for("the editor from the click", Duration::from_secs(8), |s| {
+            s.contains(header)
+        })
+        .is_err()
+    {
         term.send_keys("Enter").unwrap();
     }
     term.wait_for("the merge editor", STEP, |s| s.contains(header))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+}
+
+/// Where B's chunk header checkbox is (the right-hand `[ ] Conflict 1`):
+/// waited for with A's on the same row, since a torn frame can show one.
+fn b_chunk_header(term: &Terminal) -> (u16, u16) {
+    let both = |s: &Screen| {
+        s.find("[ ] Conflict 1")
+            .and_then(|(c, r)| find_from(s, "[ ] Conflict 1", r, c + 1).map(|b| (b, r)))
+    };
+    let screen = term
+        .wait_for("both chunk headers", STEP, |s| both(s).is_some())
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    both(&screen).expect("the predicate just matched")
 }
 
 /// The text of the Output pane: every row under its title rule. What the
@@ -206,11 +223,15 @@ fn pick_type_save_and_resolve_then_undo_puts_the_conflict_back() {
 /// The position of `needle` lowest on the screen (the Output sits under
 /// the A and B panes, so its copy of a line is the last one).
 fn lowest(term: &Terminal, needle: &str) -> (u16, u16) {
-    term.screen()
-        .find_all(needle)
-        .into_iter()
-        .max_by_key(|(_, r)| *r)
-        .unwrap_or_else(|| panic!("no {needle:?} on screen\n{}", term.text()))
+    // Waited for: a torn frame can lack the line.
+    term.wait_for(&format!("{needle:?} on screen"), STEP, |s| {
+        !s.find_all(needle).is_empty()
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
+    .find_all(needle)
+    .into_iter()
+    .max_by_key(|(_, r)| *r)
+    .expect("the predicate just matched")
 }
 
 /// Typing in the Output marks the conflict edited; a pick replaces the
@@ -227,14 +248,29 @@ fn typing_in_the_output_marks_it_edited_a_pick_replaces_it_and_undo_restores_it(
     .unwrap_or_else(|e| panic!("{e}"));
 
     // Click the Output's copy of the line, go to its end and type.
-    let (c, r) = lowest(&term, "three (ours)");
-    term.click(c + 2, r).unwrap();
-    term.send_keys("End").unwrap();
-    term.send_text("!").unwrap();
-    term.wait_for("the typed text and the edited marker", STEP, |s| {
-        output_text(s).contains("three (ours)!") && s.contains("edited")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Retried (the line located afresh): a click placed on a torn frame
+    // leaves the focus elsewhere, and the typed text would not land.
+    common::retry_until(
+        &mut term,
+        "the typed text and the edited marker",
+        4,
+        STEP,
+        |t| {
+            let s = t.screen();
+            if !output_text(&s).contains("three (ours)!") {
+                if let Some((c, r)) = s
+                    .find_all("three (ours)")
+                    .into_iter()
+                    .max_by_key(|(_, r)| *r)
+                {
+                    t.click(c + 2, r).unwrap();
+                    t.send_keys("End").unwrap();
+                    t.send_text("!").unwrap();
+                }
+            }
+        },
+        |s| output_text(s).contains("three (ours)!") && s.contains("edited"),
+    );
 
     // Esc goes back to the A pane; taking B replaces the edit.
     // (Esc and the letter in separate writes: together they read as Alt+b.)
@@ -400,9 +436,7 @@ fn the_mouse_picks_chunks_and_lines_and_the_save_confirms_unpicked_conflicts() {
     open_with_enter(&mut term, "a.txt", "Conflict 1 / 3");
 
     // The checkbox on B's chunk header (the right-hand one).
-    let screen = term.screen();
-    let (c, r) = screen.find("[ ] Conflict 1").expect("A's chunk header");
-    let c = find_from(&screen, "[ ] Conflict 1", r, c + 1).expect("B's chunk header");
+    let (c, r) = b_chunk_header(&term);
     term.click(c + 1, r).unwrap();
     term.wait_for("B's lines in the Output", STEP, |s| {
         let out = output_text(s);
@@ -411,7 +445,9 @@ fn the_mouse_picks_chunks_and_lines_and_the_save_confirms_unpicked_conflicts() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // One line of A, by clicking it.
-    let (c, r) = term.screen().find("A3 ours").expect("A's line");
+    let (c, r) = term
+        .wait_for_text("A3 ours", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("A's line appended after B's", STEP, |s| {
         let out = output_text(s);
@@ -420,22 +456,25 @@ fn the_mouse_picks_chunks_and_lines_and_the_save_confirms_unpicked_conflicts() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // ▼ moves to conflict 2.
-    let (c, r) = term.screen().find("\u{25bc}").expect("the down arrow");
+    let (c, r) = term
+        .wait_for_text("\u{25bc}", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.wait_for("conflict 2", STEP, |s| s.contains("Conflict 2 / 3"))
         .unwrap_or_else(|e| panic!("{e}"));
 
     // Save & mark resolved: two conflicts have nothing picked, so it asks.
     let (c, r) = term
-        .screen()
-        .find("Save & mark resolved")
-        .expect("the button");
+        .wait_for_text("Save & mark resolved", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("the confirm box", STEP, |s| {
         s.contains("Save anyway?") && s.contains("2 conflicts have nothing picked")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term.screen().find("Save anyway (").expect("Save anyway");
+    let (c, r) = term
+        .wait_for_text("Save anyway (", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("the file resolved", STEP, |s| s.contains("resolved a.txt"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -605,7 +644,9 @@ fn a_file_resolved_elsewhere_gets_a_strip_and_unresolve_reopens_it() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(on_disk(&fixture, "a.txt"), before, "nothing was written");
 
-    let (c, r) = term.screen().find("Unresolve and reopen").unwrap();
+    let (c, r) = term
+        .wait_for_text("Unresolve and reopen", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("the conflict reopened", STEP, |s| {
         s.contains("Conflict 1 / 3") && !s.contains("resolved outside the editor")
@@ -628,24 +669,15 @@ fn every_entry_point_opens_the_editor() {
     };
 
     // A single click.
-    let (c, r) = term
-        .wait_for_text("notes.txt", STEP)
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    term.click(c, r).unwrap();
-    term.wait_for("the editor (single click)", STEP, |s| {
+    common::click_text_until(&mut term, "notes.txt", "the editor (single click)", |s| {
         s.contains("Conflict 1 / 1")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    });
     close(&mut term);
 
     // The row's context menu leads with it.
-    let (c, r) = term.wait_for_text("notes.txt", STEP).unwrap();
-    term.right_click(c, r).unwrap();
-    let screen = term
-        .wait_for("the file menu", STEP, |s| {
-            s.contains("Open in merge editor")
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let screen = common::right_click_text_until(&mut term, "notes.txt", "the file menu", |s| {
+        s.contains("Open in merge editor")
+    });
     let (mc, mr) = screen.find("Open in merge editor").unwrap();
     term.click(mc + 2, mr).unwrap();
     term.wait_for("the editor (menu)", STEP, |s| s.contains("Conflict 1 / 1"))
@@ -669,12 +701,33 @@ fn every_entry_point_opens_the_editor() {
     // The Diff view of the file: its bar button and its key.
     // (A click on the row would reopen the editor: the Status pane's `d`
     // opens the diff view, which shows the conflict card.)
-    term.send_keys("d").unwrap();
-    term.wait_for("the diff with the Merge Editor button", STEP, |s| {
-        s.contains(" Merge editor ")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (bc, br) = term.screen().find(" Merge editor ").unwrap();
+    // (Retried: a key sent while the editor is still closing is lost, and
+    // a late refresh can drop the row's selection, which `d` needs. A retry
+    // selects the row again by opening and closing its editor.)
+    let mut tries = 0;
+    common::retry_until(
+        &mut term,
+        "the diff with the Merge Editor button",
+        4,
+        Duration::from_secs(15),
+        |t| {
+            if t.screen().contains(" Merge editor ") {
+                return;
+            }
+            if tries > 0 {
+                common::click_text_until(t, "notes.txt", "the editor (reselect)", |s| {
+                    s.contains("Conflict 1 / 1")
+                });
+                close(t);
+            }
+            tries += 1;
+            t.send_keys("d").unwrap();
+        },
+        |s| s.contains(" Merge editor "),
+    );
+    let (bc, br) = term
+        .wait_for_text(" Merge editor ", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(bc + 2, br).unwrap();
     term.wait_for("the editor (diff button)", STEP, |s| {
         s.contains("Conflict 1 / 1")
@@ -706,9 +759,8 @@ fn a_file_edited_outside_offers_the_disk_text() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (c, r) = term
-        .screen()
-        .find("Continue from the file on disk")
-        .unwrap();
+        .wait_for_text("Continue from the file on disk", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("the disk text in the Output, picks off", STEP, |s| {
         output_text(s).contains("hand-resolved line two") && s.contains("edited outside")
@@ -799,7 +851,9 @@ fn full_file_toggles_by_key_and_click_and_picks_still_work() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // The toolbar button (a click) turns it on.
-    let (c, r) = term.screen().find("Full file").expect("the toolbar button");
+    let (c, r) = term
+        .wait_for_text("Full file", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 2, r).unwrap();
     term.wait_for("A's changed lines colored", STEP, |s| {
         bg_of_a15(s) == Some(add_bg)
@@ -807,9 +861,7 @@ fn full_file_toggles_by_key_and_click_and_picks_still_work() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Picking by the mouse works on top of it: B's chunk header checkbox.
-    let screen = term.screen();
-    let (c, r) = screen.find("[ ] Conflict 1").expect("A's chunk header");
-    let c = find_from(&screen, "[ ] Conflict 1", r, c + 1).expect("B's chunk header");
+    let (c, r) = b_chunk_header(&term);
     term.click(c + 1, r).unwrap();
     term.wait_for("B's lines in the Output", STEP, |s| {
         let out = output_text(s);
@@ -848,9 +900,7 @@ fn the_context_menu_the_wheel_the_height_key_and_the_splitter() {
     open_with_enter(&mut term, "a.txt", "Conflict 1 / 3");
 
     // Right-click B's chunk header: the menu's "Take B only" row.
-    let screen = term.screen();
-    let (c, r) = screen.find("[ ] Conflict 1").expect("A's chunk header");
-    let bc = find_from(&screen, "[ ] Conflict 1", r, c + 1).expect("B's chunk header");
+    let (bc, r) = b_chunk_header(&term);
     term.right_click(bc + 1, r).unwrap();
     let menu = term
         .wait_for("the chunk menu", STEP, |s| s.contains("Take B only"))
@@ -1070,6 +1120,14 @@ fn divider_at(s: &Screen) -> (u16, u16) {
     s.find("\u{252c}").unwrap_or((0, 0))
 }
 
+/// [`divider_at`] once the divider is drawn (a torn frame can lack it).
+fn wait_divider(term: &Terminal) -> (u16, u16) {
+    let s = term
+        .wait_for("the A | B divider", STEP, |s| s.find("\u{252c}").is_some())
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    divider_at(&s)
+}
+
 /// Slice SR: the A | B divider is draggable (B gets wider), a double click
 /// resets it, `Alt+arrows` move it by keys, the Output splitter still
 /// drags, and `Reset Pane Sizes` is in the palette.
@@ -1078,7 +1136,7 @@ fn the_ab_divider_drags_double_click_resets_and_the_keys_move_it() {
     let fixture = ConflictFixture::multi_conflict();
     let (mut term, _config) = launch(fixture.root(), "pty-merge-resize", 200, 50);
     open_with_enter(&mut term, "a.txt", "Conflict 1 / 3");
-    let (d0, row) = divider_at(&term.screen());
+    let (d0, row) = wait_divider(&term);
 
     // Hovering the divider lights its rule (the cells become bold-weight).
     term.move_to(d0, row + 3).unwrap();
@@ -1175,13 +1233,10 @@ fn a_click_on_a_conflicted_row_opens_the_editor_and_the_diff_view_shows_a_card()
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // One click on the row: the editor, never the diff view.
-    let (c, r) = term.wait_for_text("notes.txt", STEP).unwrap();
-    term.click(c, r).unwrap();
-    term.wait_for("the editor (click)", STEP, |s| {
+    let screen = common::click_text_until(&mut term, "notes.txt", "the editor (click)", |s| {
         s.contains("A Current") && s.contains("B Incoming")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(!term.screen().contains("Conflicted file"));
+    });
+    assert!(!screen.contains("Conflicted file"));
     term.stop().unwrap();
 }
 
@@ -1209,7 +1264,9 @@ fn unpick_and_reset_by_key_button_and_palette() {
     term.send_text("A").unwrap();
     term.wait_for("everything taken", STEP, |s| s.contains("0 left"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (c, r) = term.screen().find("Reset").expect("the Reset button");
+    let (c, r) = term
+        .wait_for_text("Reset", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 1, r).unwrap();
     term.wait_for("the file reset", STEP, |s| {
         s.contains("3 left") && !output_text(s).contains("A15 ours")

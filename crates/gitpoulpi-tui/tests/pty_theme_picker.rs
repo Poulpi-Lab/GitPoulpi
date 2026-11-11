@@ -71,13 +71,17 @@ fn the_palette_changes_the_theme_previews_and_escapes() {
         .size(200, 70)
         .spawn();
     let screen = term
-        .wait_for("the fixture loaded", STARTUP, |s| s.contains(MESSAGE))
+        .wait_for("the fixture loaded, both rows", STARTUP, |s| {
+            s.contains(MESSAGE) && s.find(ROW_TEXT).is_some()
+        })
         .unwrap_or_else(|e| panic!("{e}"));
     let dark_bg = log_bg(&screen);
 
     // The list: System first, a tick on the current theme, user themes in.
     open_picker(&mut term);
-    let screen = term.screen();
+    let screen = term
+        .wait_for("the current theme ticked", STEP, |s| s.contains("\u{2713}"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(screen.contains("\u{2713}"), "{}", screen.text());
     // ~120 themes: the user theme is far down, so narrow the list to it.
     term.send_text("My X").unwrap();

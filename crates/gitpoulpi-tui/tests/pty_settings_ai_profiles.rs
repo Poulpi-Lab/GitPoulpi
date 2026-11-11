@@ -81,7 +81,9 @@ fn a_profile_is_duplicated_and_its_env_variables_removed_by_their_buttons() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Duplicate the profile with the list's toolbar button.
-    let (c, r) = term.screen().find("Duplicate").unwrap();
+    let (c, r) = term
+        .wait_for_text("Duplicate", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 1, r).unwrap();
     wait_stored(&term, config.path(), "a copy stored", |t| {
         t.matches("[[ai.profiles]]").count() == 2
@@ -94,7 +96,9 @@ fn a_profile_is_duplicated_and_its_env_variables_removed_by_their_buttons() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // Keyboard: select the MY_FLAG row, Right to its remove button, Enter.
-    let (c, r) = term.screen().find("Env MY_FLAG").unwrap();
+    let (c, r) = term
+        .wait_for_text("Env MY_FLAG", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c, r).unwrap();
     term.send_keys("Right").unwrap();
     term.send_keys("Enter").unwrap();
@@ -106,7 +110,9 @@ fn a_profile_is_duplicated_and_its_env_variables_removed_by_their_buttons() {
 
     // Mouse: the [x] on the OTHER_FLAG row (not the close cross, which sits
     // on another row).
-    let (_, row) = term.screen().find("Env OTHER_FLAG").unwrap();
+    let (_, row) = term
+        .wait_for_text("Env OTHER_FLAG", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let (cross, _) = term
         .screen()
         .find_all("\u{2715}")

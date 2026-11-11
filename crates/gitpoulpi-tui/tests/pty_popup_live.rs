@@ -59,9 +59,12 @@ fn the_graph_color_picker_previews_live_and_escape_restores() {
         .config_dir(config.path())
         .size(200, 60)
         .spawn();
-    term.wait_for("loaded", STARTUP, |s| s.contains(MESSAGE))
+    let loaded = term
+        .wait_for("loaded, with a lane marker", STARTUP, |s| {
+            s.contains(MESSAGE) && lane_fg(s).is_some()
+        })
         .unwrap_or_else(|e| panic!("{e}"));
-    let before = lane_fg(&term.screen()).expect("a lane marker");
+    let before = lane_fg(&loaded).expect("a lane marker");
 
     open_from_palette(
         &mut term,
@@ -176,7 +179,9 @@ fn the_theme_picker_prefilter_works_by_keyboard_and_click() {
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(light < all);
     // Click Colored; typing combines with it.
-    let (col, row) = term.screen().find("Colored").expect("the segment");
+    let (col, row) = term
+        .wait_for_text("Colored", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 1, row).unwrap();
     let colored = term
         .wait_for("colored only", STEP, |s| {

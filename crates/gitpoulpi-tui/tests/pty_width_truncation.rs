@@ -5,6 +5,8 @@
 
 mod common;
 
+use std::time::Duration;
+
 use gitpoulpi_testkit::FixtureRepoBuilder;
 
 #[test]
@@ -37,7 +39,10 @@ fn a_cjk_subject_is_truncated_by_width_and_keeps_the_columns_aligned() {
         })
         .start();
 
-    let screen = term.screen();
+    // The Log's last frame, read once the window stopped redrawing.
+    let screen = term
+        .wait_for_stable(Duration::from_millis(400), Duration::from_secs(30))
+        .unwrap_or_else(|e| panic!("{e}"));
     let cjk_row = screen.find("日").unwrap().1;
     let ascii_row = screen.find("ascii subject").unwrap().1;
     let cjk_line = screen.line(cjk_row);

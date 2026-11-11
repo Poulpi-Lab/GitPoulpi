@@ -91,13 +91,22 @@ fn the_jobs_indicator_the_panel_rows_and_cancel_buttons_show_the_pointing_hand()
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // The indicator's label opens the panel: the hand.
-    let (col, row) = term.screen().find("Push: ").expect("the indicator label");
+    let (col, row) = term
+        .wait_for_text("Push: ", STEP)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     hover(&mut term, "the indicator", (col + 1, row), "pointer");
     term.click(col + 1, row).unwrap();
-    term.wait_for("the jobs panel", STEP, |s| s.contains("Background jobs"))
+    // One predicate for the whole panel: a torn frame can show the title
+    // before its buttons.
+    let screen = term
+        .wait_for("the jobs panel", STEP, |s| {
+            s.contains("Background jobs")
+                && s.contains("Cancel all")
+                && s.find_all("Cancel")
+                    .into_iter()
+                    .any(|(c, r)| s.line(r).contains("Push: ") && c > 60)
+        })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-
-    let screen = term.screen();
     // "Cancel all" is the toolbar's button; the row's own Cancel sits on the
     // row of the job.
     let all = screen.find("Cancel all").expect("Cancel all");
@@ -192,13 +201,18 @@ fn the_version_chip_and_the_release_notes_buttons_show_the_pointing_hand() {
         s.contains("v99.0.0 available")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (col, row) = term.screen().find("v99.0.0 available").unwrap();
+    let (col, row) = term
+        .wait_for_text("v99.0.0 available", STEP)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     hover(&mut term, "the version chip", (col + 1, row), "pointer");
     term.click(col + 1, row).unwrap();
     // The chip opens the update panel; its Release notes button leads on.
-    term.wait_for("the update panel", STEP, |s| s.contains("Installed with:"))
+    let panel = term
+        .wait_for("the update panel", STEP, |s| {
+            s.contains("Installed with:") && s.contains("Release notes")
+        })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let notes_button = term.screen().find("Release notes").unwrap();
+    let notes_button = panel.find("Release notes").unwrap();
     hover(
         &mut term,
         "the panel's Release notes",
@@ -357,7 +371,9 @@ fn the_file_editor_text_is_an_i_beam_and_its_buttons_the_hand() {
         s.contains("notes.txt - unstaged") && s.contains(" Edit ")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    let (ec, er) = term.screen().find(" Edit ").unwrap();
+    let (ec, er) = term
+        .wait_for_text(" Edit ", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(ec + 2, er).unwrap();
     term.wait_for("the editor", STEP, |s| {
         s.contains("Edit - notes.txt @ working tree") && s.contains("alpha")
@@ -402,8 +418,9 @@ fn the_global_search_is_an_i_beam_on_its_field_and_an_arrow_elsewhere() {
     // Ctrl+Alt+F as a terminal sends it: ESC, then Ctrl+F.
     term.send_text("\x1b\x06").unwrap();
     let screen = term
-        .wait_for("the popup", STEP, |s| {
-            s.contains("Search open repositories")
+        .wait_for("the popup with its close cross", STEP, |s| {
+            s.find("Search open repositories")
+                .is_some_and(|(_, tr)| s.find_all("\u{2715}").into_iter().any(|(_, r)| r == tr))
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (title_col, title_row) = screen.find("Search open repositories").unwrap();

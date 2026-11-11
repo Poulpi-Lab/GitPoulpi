@@ -38,7 +38,9 @@ fn skip_on_the_am_banner_drops_the_patch_and_the_banner_vanishes() {
     let (repo, _) = am_fixture(true);
     let mut term = launch(repo.root(), "pty-am-skip", "main change");
     wait_am_banner(&mut term);
-    let (col, row) = term.screen().find("Skip").unwrap();
+    let (col, row) = term
+        .wait_for_text("Skip", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 1, row).unwrap();
     term.wait_for("the banner gone", STEP, |s| {
         !s.contains("Applying patches (git am)")
@@ -54,7 +56,9 @@ fn abort_on_the_am_banner_asks_then_restores_the_branch() {
     let head = repo.git(&["rev-parse", "HEAD"]);
     let mut term = launch(repo.root(), "pty-am-abort", "main change");
     wait_am_banner(&mut term);
-    let (col, row) = term.screen().find("Abort").unwrap();
+    let (col, row) = term
+        .wait_for_text("Abort", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 1, row).unwrap();
     term.wait_for("the confirmation", STEP, |s| s.contains("Abort git am?"))
         .unwrap_or_else(|e| panic!("{e}"));
@@ -113,7 +117,9 @@ fn a_stale_lock_shows_a_strip_and_removing_it_asks_first() {
         s.contains("leftover index.lock") && s.contains("Remove index.lock")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    let (col, row) = term.screen().find("Remove index.lock").unwrap();
+    let (col, row) = term
+        .wait_for_text("Remove index.lock", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 1, row).unwrap();
     term.wait_for("the confirmation", STEP, |s| {
         s.contains("Delete the leftover")

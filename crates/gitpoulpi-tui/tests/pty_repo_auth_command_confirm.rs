@@ -98,13 +98,19 @@ fn a_command_is_confirmed_with_no_default_answer_and_escape_saves_nothing() {
 
     // Save opens the question, with nothing chosen.
     click_button(&mut term, "Save");
+    let sha = gitpoulpi_core::domain::command_sha256(&["pass", "show", "work-token"]);
+    // One predicate for the whole question: a torn frame can show the title
+    // before the rest.
     let screen = term
-        .wait_for("the confirmation", STEP, |s| {
+        .wait_for("the whole confirmation", STEP, |s| {
             s.contains("Allow this command?")
+                && s.contains(&format!("$ {COMMAND}"))
+                && s.contains(&sha)
+                && s.contains("1. Save and allow")
+                && s.contains("2. Cancel")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(screen.contains(&format!("$ {COMMAND}")), "{}", term.text());
-    let sha = gitpoulpi_core::domain::command_sha256(&["pass", "show", "work-token"]);
     assert!(screen.contains(&sha), "the hash is shown: {}", term.text());
     assert!(
         screen.contains("1. Save and allow") && screen.contains("2. Cancel"),

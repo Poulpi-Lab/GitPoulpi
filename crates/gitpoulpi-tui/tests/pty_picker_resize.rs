@@ -10,7 +10,7 @@ mod common;
 use std::time::Duration;
 
 use gitpoulpi_testkit::FixtureRepoBuilder;
-use xtask::pty::{Color, Terminal};
+use xtask::pty::{Color, Screen, Terminal};
 
 const STEP: Duration = Duration::from_secs(30);
 
@@ -40,20 +40,29 @@ fn wait_shape(term: &Terminal, what: &str, want: &str) {
     );
 }
 
-/// The divider's column on the picker's `row`: the `│` after the window's
-/// frame and the dialog's left border (and before the dialog's right border
-/// and the window's frame).
-fn divider_col(term: &Terminal, row: u16) -> u16 {
-    let screen = term.screen();
-    let bars: Vec<u16> = (0..200u16)
+/// The `│` columns on the picker's `row`: the divider is the third, after
+/// the window's frame and the dialog's left border.
+fn divider_bars(screen: &Screen, row: u16) -> Vec<u16> {
+    (0..200u16)
         .filter(|&c| screen.cell(c, row).is_some_and(|x| x.text == "\u{2502}"))
-        .collect();
-    assert!(
-        bars.len() >= 3,
-        "no divider on row {row}: {bars:?}\n{}",
-        term.text()
-    );
-    bars[2]
+        .collect()
+}
+
+/// The picker's divider row and column, waited for as one state with the
+/// folders header (a torn frame can show the header before the divider).
+fn wait_divider(term: &Terminal) -> (u16, u16) {
+    let found = |s: &Screen| {
+        let (_, header) = s.find("FOLDERS")?;
+        let row = header + 3;
+        let bars = divider_bars(s, row);
+        (bars.len() >= 3).then(|| (row, bars[2]))
+    };
+    // The picker drawn whole: read once it stopped redrawing (a torn frame
+    // mixes the old page's bars with the new one's).
+    let screen = term
+        .wait_for_stable(Duration::from_millis(400), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    found(&screen).unwrap_or_else(|| panic!("no divider:\n{}", screen.text()))
 }
 
 fn fg_at(term: &Terminal, col: u16, row: u16) -> Color {
@@ -84,13 +93,35 @@ fn the_browse_divider_is_ew_resize_lit_like_the_other_resize_lines_and_unlit_on_
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
-    let (_, header_row) = term.screen().find("FOLDERS").expect("the folders header");
-    let row = header_row + 3;
-    let col = divider_col(&term, row);
+    let (row, col) = wait_divider(&term);
+    // Pointer motion is only reported once the mouse mode is on.
+    term.wait_for_mouse_capture(STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    // The unlit colour, read once the picker has stopped redrawing.
+    term.wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     let rest = fg_at(&term, col, row);
 
     // Hover: the sideways resize pointer, and the accent line.
-    term.move_to(col, row).unwrap();
+    // The move is repeated (from beside the line, so each one is a real
+    // move): one sent before the divider's hit target is registered is lost
+    // and no other follows.
+    let mut over = false;
+    for _ in 0..6 {
+        term.move_to(col - 2, row).unwrap();
+        term.move_to(col, row).unwrap();
+        let deadline = std::time::Instant::now() + Duration::from_secs(4);
+        while std::time::Instant::now() < deadline {
+            if pointer_shapes(&term).last().map(String::as_str) == Some("ew-resize") {
+                over = true;
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(50));
+        }
+        if over {
+            break;
+        }
+    }
     wait_shape(&term, "over the divider", "ew-resize");
     let lit = {
         let deadline = std::time::Instant::now() + STEP;

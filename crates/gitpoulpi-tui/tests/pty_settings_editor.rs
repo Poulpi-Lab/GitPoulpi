@@ -251,7 +251,9 @@ fn open_the_editor(term: &mut Terminal) {
         s.contains("notes.txt - unstaged") && s.contains("gamma") && s.contains(" Edit ")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    let (ec, er) = term.screen().find(" Edit ").unwrap();
+    let (ec, er) = term
+        .wait_for_text(" Edit ", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(ec + 2, er).unwrap();
     term.wait_for("the editor", STEP, |s| {
         s.contains("Edit - notes.txt @ working tree") && s.contains("alpha")
@@ -273,13 +275,15 @@ fn editor_settings_change_the_editor_tab_stops_gutter_status_and_saved_endings()
 
     // The tab is eight cells wide and there is no number column: the
     // border, then eight blanks, then the text.
-    let row = row_of(&term, "alpha").expect("alpha is on screen");
-    assert!(
-        row.contains("\u{2502}        alpha"),
-        "tab_size = 8, no gutter: {row:?}"
-    );
+    // One predicate for the whole editor (a torn frame can show the text
+    // before the gutter or the status bar).
     // The status bar says what the next save writes: CRLF, for an LF file.
-    assert!(term.screen().contains("CRLF"), "{}", term.text());
+    term.wait_for("tab_size = 8, no gutter, and the CRLF status", STEP, |s| {
+        s.find("alpha")
+            .is_some_and(|(_, r)| s.line(r).contains("\u{2502}        alpha"))
+            && s.contains("CRLF")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     term.send_text("X").unwrap();
     term.send_keys("C-s").unwrap();
@@ -298,12 +302,16 @@ fn defaults_draw_the_gutter_and_four_wide_tabs() {
     let config = tempfile::tempdir().unwrap();
     let mut term = launch(repo.root(), config.path(), "pty-settings-editor-default");
     open_the_editor(&mut term);
-    let row = row_of(&term, "alpha").expect("alpha is on screen");
-    assert!(
-        row.contains("\u{2502}1     alpha"),
-        "number, one space, four tab cells: {row:?}"
-    );
-    assert!(term.screen().contains("LF"), "{}", term.text());
+    term.wait_for(
+        "number, one space, four tab cells, and the LF status",
+        STEP,
+        |s| {
+            s.find("alpha")
+                .is_some_and(|(_, r)| s.line(r).contains("\u{2502}1     alpha"))
+                && s.contains("LF")
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
 #[test]

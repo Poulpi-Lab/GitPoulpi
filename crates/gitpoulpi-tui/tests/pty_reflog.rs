@@ -73,7 +73,8 @@ fn restoring_a_branch_to_an_earlier_reflog_position_is_undoable() {
     let mut rig = launch(&repo, "pty-reflog-branch");
     let (col, row) = rig
         .term
-        .screen()
+        .wait_for("the topic row", STEP, |s| s.contains("topic"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()))
         .find_all("topic")
         .into_iter()
         .min_by_key(|(col, _)| *col)

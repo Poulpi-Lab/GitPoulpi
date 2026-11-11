@@ -227,7 +227,12 @@ fn interactive_cherry_pick_applies_reword_drop_and_squash() {
     .unwrap_or_else(|e| panic!("{e}"));
 
     // Row 1 (t3): Drop, by clicking its dropdown and then "Drop".
-    let screen = term.screen();
+    let screen = term
+        .wait_for("the t3 row with its action button", STEP, |s| {
+            plan_row(s, "t3 third pick")
+                .is_some_and(|r3| s.find_all("Pick").iter().any(|(_, y)| *y == r3))
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let r3 = plan_row(&screen, "t3 third pick").unwrap();
     let (bx, _) = screen
         .find_all("Pick")
@@ -240,6 +245,9 @@ fn interactive_cherry_pick_applies_reword_drop_and_squash() {
             s.find_all("Squash")
                 .iter()
                 .any(|(_, y)| *y > r3 && *y < r3 + 6)
+                && s.find_all("Drop")
+                    .iter()
+                    .any(|(x, y)| *y > r3 && *y < r3 + 6 && *x >= bx && *x < bx + 12)
         })
         .unwrap_or_else(|e| panic!("{e}"));
     let (dx, dy) = open

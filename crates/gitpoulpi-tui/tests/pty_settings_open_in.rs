@@ -97,7 +97,9 @@ fn a_preset_is_added_from_the_dropdown_dragged_to_the_top_starred_and_removed() 
     assert!(term.screen().line(alpha_row).contains('\u{2605}'));
 
     // [+ Add] opens the dropdown; typing narrows it, Enter adds the preset.
-    let (c, r) = term.screen().find("+ Add").unwrap();
+    let (c, r) = term
+        .wait_for_text("+ Add", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 1, r).unwrap();
     term.send_text("gitk").unwrap();
     term.wait_for("the preset in the dropdown", STEP, |s| s.contains("gitk"))
@@ -135,8 +137,10 @@ fn a_preset_is_added_from_the_dropdown_dragged_to_the_top_starred_and_removed() 
     // It is the selected row: Delete asks, Remove confirms.
     term.send_keys("Delete").unwrap();
     let screen = term
-        .wait_for("the removal question", STEP, |s| {
-            s.contains("Cancel") && s.contains("Remove \"")
+        .wait_for("the removal question with its buttons", STEP, |s| {
+            s.contains("Remove \"")
+                && s.find("Cancel")
+                    .is_some_and(|(_, row)| s.find_all("Remove").into_iter().any(|(_, r)| r == row))
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (_, row) = screen.find("Cancel").unwrap();
@@ -178,7 +182,9 @@ fn the_add_preset_picker_groups_presets_by_category() {
     common::settings_tab(&mut term, "Entries");
     term.wait_for("the Open in page", STEP, |s| s.contains("+ Add"))
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = term.screen().find("+ Add").unwrap();
+    let (c, r) = term
+        .wait_for_text("+ Add", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(c + 1, r).unwrap();
     term.send_text("Git tool: gitk").unwrap();
     term.wait_for("the Git tool category", STEP, |s| {

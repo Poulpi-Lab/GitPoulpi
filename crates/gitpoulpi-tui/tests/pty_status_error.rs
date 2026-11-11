@@ -96,8 +96,14 @@ fn no_card(screen: &Screen) {
 }
 
 fn wait_for_error(term: &Terminal) -> Screen {
+    wait_for_error_with(term, &[])
+}
+
+/// The error line together with every text in `with` (one whole state: a
+/// torn frame can show the line before the rest).
+fn wait_for_error_with(term: &Terminal, with: &[&str]) -> Screen {
     term.wait_for("the error in the status line", STEP, |s| {
-        error_row(s).is_some()
+        error_row(s).is_some() && with.iter().all(|w| s.contains(w))
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
 }
@@ -128,7 +134,7 @@ fn a_failed_fetch_has_no_card_and_a_click_on_the_status_line_opens_its_entry() {
     let config = tempfile::tempdir().unwrap();
     let mut term = launch(repo.root(), "pty-status-error-fetch", config.path(), None);
     fetch_all(&mut term);
-    let screen = wait_for_error(&term);
+    let screen = wait_for_error_with(&term, &["The remote could not be reached."]);
     no_card(&screen);
     assert!(
         screen.contains("The remote could not be reached."),
@@ -423,7 +429,7 @@ fn the_error_shows_while_the_activity_log_is_open() {
     term.send_text("A").unwrap();
     term.wait_for("the Activity Log", STEP, |s| s.contains("Application"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let screen = wait_for_error(&term);
+    let screen = wait_for_error_with(&term, &["Application"]);
     no_card(&screen);
     assert!(screen.contains("Application"), "{}", screen.text());
 }

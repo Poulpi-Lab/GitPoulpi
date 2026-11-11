@@ -118,8 +118,17 @@ fn undo_history_holds_only_undo_items_and_the_launcher_rows_follow_the_launcher_
     let mut term = launch(repo.root(), "pty-general-groups", config.path());
     open_general(&mut term);
     let screen = term
-        .wait_for("the Launcher group", STEP, |s| {
-            s.contains("Undo history") && s.contains("Launcher")
+        .wait_for("the Launcher group, every row drawn", STEP, |s| {
+            [
+                "Undo history",
+                "Undo history depth",
+                "Record changes made outside",
+                "Application log",
+                "Launcher",
+                "Terminal for shortcuts",
+            ]
+            .iter()
+            .all(|n| s.find_all(n).into_iter().any(|(c, _)| c > 28))
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let row = |needle: &str| {

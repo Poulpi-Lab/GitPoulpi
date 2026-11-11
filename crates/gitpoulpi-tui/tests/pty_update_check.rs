@@ -204,7 +204,9 @@ fn a_newer_release_turns_the_chip_into_available_and_a_click_opens_its_notes() {
         s.contains("Installed with:") && s.contains("Release notes")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let (nc, nr) = term.screen().find("Release notes").unwrap();
+    let (nc, nr) = term
+        .wait_for_text("Release notes", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(nc + 1, nr).unwrap();
     term.wait_for("the Release notes tab with the release body", STEP, |s| {
         s.contains("the shiny fake feature")
@@ -222,7 +224,9 @@ fn a_newer_release_turns_the_chip_into_available_and_a_click_opens_its_notes() {
         term.text()
     );
     // Download: the release page, through the browser stub.
-    let (dc, dr) = term.screen().find("Download").unwrap();
+    let (dc, dr) = term
+        .wait_for_text("Download", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(dc + 1, dr).unwrap();
     term.wait_for("the release page was opened", STEP, |_| {
         std::fs::read_to_string(log.path())
@@ -231,7 +235,9 @@ fn a_newer_release_turns_the_chip_into_available_and_a_click_opens_its_notes() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // Skip this version: the notice goes, and the chip is the plain version.
-    let (sc, sr) = term.screen().find("Skip this version").unwrap();
+    let (sc, sr) = term
+        .wait_for_text("Skip this version", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(sc + 1, sr).unwrap();
     term.wait_for("the skipped notice", STEP, |s| {
         s.contains("(skipped)") && !s.contains("v99.0.0 available")
@@ -315,9 +321,8 @@ fn a_signed_security_notice_turns_the_chip_red_and_the_panel_lists_it() {
     );
     // The chip is red: the cell under its first letter has the danger colour.
     let (col, row) = term
-        .screen()
-        .find("Security notice: this version")
-        .expect("the chip");
+        .wait_for_text("Security notice: this version", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(row, 0);
     let fg = term.screen().cell(col + 1, row).expect("a cell").fg;
     let reddish = match fg {

@@ -99,7 +99,9 @@ fn open(session: &str) -> Setup {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     // Picking the source asks the host for its repositories.
-    let (col, row) = term.screen().find("GitHub \u{00B7} hub").unwrap();
+    let (col, row) = term
+        .wait_for_text("GitHub \u{00B7} hub", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 2, row).expect("pick the source");
     Setup {
         term,
@@ -124,7 +126,16 @@ fn a_changed_address_opens_the_dialog_and_nothing_is_sent_to_either_host() {
     let screen = s
         .term
         .wait_for("the security check dialog", STEP, |x| {
-            x.contains("Integration security check") && x.contains("2  Trust the new address")
+            x.contains("Integration security check")
+                && x.contains("2  Trust the new address")
+                && x.contains("1  Disconnect")
+                && x.contains("3  Cancel")
+                && {
+                    // The sentence may wrap: compare without line breaks.
+                    let flat = x.text().split_whitespace().collect::<Vec<_>>().join(" ");
+                    let wanted = want.split_whitespace().collect::<Vec<_>>().join(" ");
+                    flat.contains(&wanted) || flat.contains("The token was not sent.")
+                }
         })
         .unwrap_or_else(|e| panic!("{e}"));
     // The sentence may wrap: compare without line breaks.

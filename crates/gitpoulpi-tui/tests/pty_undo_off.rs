@@ -66,12 +66,10 @@ fn undo_off_removes_the_buttons_after_a_confirmation() {
     .unwrap_or_else(|e| panic!("{e}"));
 
     // Unticking asks first; Cancel keeps undo on.
-    let (col, row) = open_undo_row(&mut term);
-    term.click(col + 1, row).unwrap();
-    term.wait_for("the question", STEP, |s| {
+    open_undo_row(&mut term);
+    common::click_text_until(&mut term, "Undo enabled", "the question", |s| {
         s.contains("Turning Undo off erases")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    });
     term.send_keys("Enter").unwrap(); // Cancel is the default button
     term.wait_for("the question gone", STEP, |s| {
         !s.contains("Turning Undo off erases")
@@ -80,12 +78,9 @@ fn undo_off_removes_the_buttons_after_a_confirmation() {
     assert!(!config_has(&path, "undo_enabled"), "Cancel keeps it on");
 
     // Turn off: Tab to the second button, Enter.
-    let (col, row) = term.wait_for_text("Undo enabled", STEP).unwrap();
-    term.click(col + 1, row).unwrap();
-    term.wait_for("the question", STEP, |s| {
+    common::click_text_until(&mut term, "Undo enabled", "the question", |s| {
         s.contains("Turning Undo off erases")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    });
     term.send_keys("Tab").unwrap();
     term.send_keys("Enter").unwrap();
     wait_config(&path, "undo_enabled = false");
@@ -105,9 +100,22 @@ fn undo_off_removes_the_buttons_after_a_confirmation() {
         .unwrap_or_else(|e| panic!("{e}"));
 
     // Back on: no question, the buttons return.
-    let (col, row) = open_undo_row(&mut term);
-    term.click(col + 1, row).unwrap();
-    wait_config(&path, "undo_enabled = true");
+    open_undo_row(&mut term);
+    // Retried (located afresh): a click placed on a torn frame lands nowhere.
+    common::retry_until(
+        &mut term,
+        "undo_enabled = true saved",
+        4,
+        STEP,
+        |t| {
+            if !config_has(&path, "undo_enabled = true") {
+                if let Some((col, row)) = t.screen().find("Undo enabled") {
+                    t.click(col + 1, row).unwrap();
+                }
+            }
+        },
+        |_| config_has(&path, "undo_enabled = true"),
+    );
     term.send_keys("Escape").unwrap();
     term.wait_for("the buttons back", STEP, |s| {
         !s.contains("Repo-specific settings") && s.contains(UNDO_BUTTON) && s.contains(REDO_BUTTON)
@@ -136,8 +144,15 @@ fn started_with_undo_off_the_buttons_are_absent_and_ctrl_z_says_why() {
         s.contains("Pull") && s.contains("initial commit")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    let screen = term.screen();
-    assert!(!screen.contains(UNDO_BUTTON) && !screen.contains(REDO_BUTTON));
+    // The bar's last frame, read once the window stopped redrawing.
+    let screen = term
+        .wait_for_stable(Duration::from_millis(400), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(
+        !screen.contains(UNDO_BUTTON) && !screen.contains(REDO_BUTTON),
+        "{}",
+        screen.text()
+    );
     term.send_keys("C-z").unwrap();
     term.wait_for("the reason", STEP, |s| s.contains("turned off"))
         .unwrap_or_else(|e| panic!("{e}"));

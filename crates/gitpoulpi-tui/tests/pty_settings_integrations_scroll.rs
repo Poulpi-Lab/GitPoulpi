@@ -44,8 +44,12 @@ fn open_radar_block(
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").unwrap();
+    // The whole scrolled state: the block in view, the card's top and the
+    // combobox scrolled out (a torn frame can show the block mid-scroll).
     term.wait_for("the Radar block scrolled into view", STEP, |s| {
         s.contains("[ ] Requests waiting for my review")
+            && !s.contains("Personal access token")
+            && !s.contains(COMBO_LABEL)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     (term, config, repo)
@@ -77,7 +81,7 @@ fn tab_down_to_the_combobox_shows_it_and_a_key_changes_it() {
     }
     let screen = term
         .wait_for("the combobox scrolled into view", STEP, |s| {
-            s.contains(COMBO_LABEL)
+            s.contains(COMBO_LABEL) && s.contains("Ask")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(screen.contains("Ask"), "{}", screen.text());
@@ -118,9 +122,8 @@ fn tab_down_to_the_combobox_shows_it_and_a_key_changes_it() {
 fn the_wheel_scrolls_the_card_both_ways() {
     let (mut term, _config, _repo) = open_radar_block("pty-integrations-scroll-wheel");
     let (col, row) = term
-        .screen()
-        .find("[ ] Requests waiting for my review")
-        .expect("the Radar block");
+        .wait_for_text("[ ] Requests waiting for my review", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
     for _ in 0..8 {
         term.scroll(false, col + 2, row).unwrap();
     }

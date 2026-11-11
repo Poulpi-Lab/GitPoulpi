@@ -65,7 +65,10 @@ fn open_options(term: &mut xtask::pty::Terminal) -> xtask::pty::Screen {
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("s").expect("Draft review");
     term.wait_for("the review options", STEP, |s| {
-        s.contains("Review options") && s.contains("AGENTS.md")
+        s.contains("Review options")
+            && s.contains("AGENTS.md")
+            && s.contains("No extra file")
+            && s.contains("Browse...")
     })
     .unwrap_or_else(|e| panic!("{e}"))
 }

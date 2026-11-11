@@ -121,9 +121,9 @@ fn the_palette_moves_resizes_and_keeps_its_place_when_reopened() {
             && grip(s) == Some((gx + gw, gy + gh))
             && palette_rows(s) == rows + gh as usize
     });
-    // The keyboard twin (`palette.arrange`, Alt+M): the arrows move it while
+    // The keyboard twin (`palette.arrange`, Alt+G): the arrows move it while
     // it stays open, Esc leaves the mode and a second Esc closes it.
-    term.send_keys("M-m").unwrap();
+    term.send_keys("M-g").unwrap();
     wait(&mut term, "the arrange banner", |s| s.contains("Arrange:"));
     term.send_keys("Left").unwrap();
     wait(&mut term, "the palette two columns left", |s| {

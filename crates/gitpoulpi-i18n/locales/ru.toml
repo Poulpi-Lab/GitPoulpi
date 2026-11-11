@@ -2477,6 +2477,7 @@ git_prefix_lfs_push_all = { git = "LFS: push всех объектов", local =
 git_prefix_lfs_prune = "LFS: очистить локальные объекты"
 composer_insert_issue_ref = "Вставить ссылку на задачу"
 palette_configure_shortcut = "Палитра: задать сочетание для выделенной команды"
+palette_arrange = "Popup: Move or Resize the Palette or Picker in Front"
 global_undo_history = "Открыть историю отмен"
 global_undo_offer = "Восстановить ветку туда, где её оставило заблокированное действие"
 global_radar = "Открыть Radar"
@@ -4183,6 +4184,8 @@ resize_section = "размер раздела"
 resize_message = "размер сообщения"
 resize_refs = "размер Refs"
 resize_status = "размер Status"
+# context: Ctrl+N hint, key arranges (moves, resizes) the open dialog
+arrange = "arrange"
 all_keys = "{key}=все клавиши"
 esc_cancel = "(Esc - отмена)"
 

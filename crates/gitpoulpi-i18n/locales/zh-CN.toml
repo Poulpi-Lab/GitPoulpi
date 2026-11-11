@@ -2485,6 +2485,7 @@ git_prefix_lfs_push_all = { git = "LFS：{$Push} 所有对象", local = "LFS：{
 git_prefix_lfs_prune = "LFS：清理本地对象"
 composer_insert_issue_ref = "插入议题引用"
 palette_configure_shortcut = "命令面板：设置高亮命令的快捷键"
+palette_arrange = "Popup: Move or Resize the Palette or Picker in Front"
 global_undo_history = "打开撤销历史"
 global_undo_offer = "将分支恢复到被阻止操作完成后的位置"
 global_radar = "打开 Radar"
@@ -4190,6 +4191,8 @@ resize_section = "调整分区"
 resize_message = "调整消息列"
 resize_refs = "调整引用"
 resize_status = "调整状态"
+# context: Ctrl+N hint, key arranges (moves, resizes) the open dialog
+arrange = "arrange"
 all_keys = "{key}=全部按键"
 esc_cancel = "（Esc 取消）"
 

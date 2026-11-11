@@ -125,6 +125,9 @@ fn is_side_like(symbol: &str) -> bool {
             | "\u{2193}"
             | "\u{25B2}"
             | "\u{25BC}"
+            // The dialog frame's corner grips.
+            | "\u{25E2}"
+            | "\u{25E3}"
             | "\u{2591}"
             | "\u{2592}"
             | "\u{2588}"

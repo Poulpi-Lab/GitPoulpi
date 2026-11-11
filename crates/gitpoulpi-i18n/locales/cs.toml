@@ -2485,6 +2485,7 @@ git_prefix_lfs_push_all = { git = "LFS: Push všech objektů", local = "LFS: Ode
 git_prefix_lfs_prune = "LFS: Vyčistit lokální objekty"
 composer_insert_issue_ref = "Vložit odkaz na issue"
 palette_configure_shortcut = "Paleta: nastavit zkratku zvýrazněného příkazu"
+palette_arrange = "Popup: Move or Resize the Palette or Picker in Front"
 global_undo_history = "Otevřít historii vrácení"
 global_undo_offer = "Obnovit větev tam, kde ji nechala blokovaná akce"
 global_radar = "Otevřít Radar"
@@ -4189,6 +4190,8 @@ resize_section = "velikost sekce"
 resize_message = "šířka Zprávy"
 resize_refs = "šířka Refs"
 resize_status = "šířka Stavu"
+# context: Ctrl+N hint, key arranges (moves, resizes) the open dialog
+arrange = "arrange"
 all_keys = "{key}=všechny klávesy"
 esc_cancel = "(Esc zruší)"
 

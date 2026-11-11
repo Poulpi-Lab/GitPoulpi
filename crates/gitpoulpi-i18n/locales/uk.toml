@@ -2485,6 +2485,7 @@ git_prefix_lfs_push_all = { git = "LFS: push усіх об'єктів", local = 
 git_prefix_lfs_prune = "LFS: очистити локальні об'єкти"
 composer_insert_issue_ref = "Вставити посилання на issue"
 palette_configure_shortcut = "Палітра: задати скорочення для виділеної команди"
+palette_arrange = "Popup: Move or Resize the Palette or Picker in Front"
 global_undo_history = "Відкрити історію скасувань"
 global_undo_offer = "Відновити гілку туди, де її залишила заблокована дія"
 global_radar = "Відкрити Radar"
@@ -4189,6 +4190,8 @@ resize_section = "розмір секції"
 resize_message = "розмір Message"
 resize_refs = "розмір Refs"
 resize_status = "розмір Status"
+# context: Ctrl+N hint, key arranges (moves, resizes) the open dialog
+arrange = "arrange"
 all_keys = "{key}=усі клавіші"
 esc_cancel = "(Esc - скасувати)"
 

@@ -736,7 +736,7 @@ actions! {
     IntegrationsRemove => (Integrations, "integrations.remove", INTEGRATIONS_REMOVE, ["d", "Delete"]),
     // ---- the palette itself ----
     PaletteConfigureShortcut => (Palette, "palette.configure_shortcut", PALETTE_CONFIGURE_SHORTCUT, ["Alt+K"]),
-    PaletteArrange => (Palette, "palette.arrange", PALETTE_ARRANGE, ["Alt+M"]),
+    PaletteArrange => (Palette, "palette.arrange", PALETTE_ARRANGE, ["Alt+G"]),
     // ---- prompt ----
     PromptAiStashMessage => (Prompt, "prompt.ai_stash_message", PROMPT_AI_STASH_MESSAGE, ["Ctrl+G"], @Ai),
 }

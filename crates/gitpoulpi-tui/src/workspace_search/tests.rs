@@ -667,9 +667,7 @@ fn the_pointer_over_the_global_search_follows_the_pointer_rules() {
     );
     assert_eq!(shape(0, 0), CursorShape::Default);
     assert_eq!(shape(119, 39), CursorShape::Default);
-    // The label of the input box (its border row) is not the field.
-    assert_eq!(
-        shape(popup.popup.x + 3, popup.popup.y),
-        CursorShape::Default
-    );
+    // The label of the input box (its border row) is not the field: it is
+    // the frame's title bar (drag to move the popup).
+    assert_eq!(shape(popup.popup.x + 3, popup.popup.y), CursorShape::Move);
 }

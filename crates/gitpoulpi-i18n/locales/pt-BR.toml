@@ -2485,6 +2485,7 @@ git_prefix_lfs_push_all = { git = "LFS: {$Push} de todos os objetos", local = "L
 git_prefix_lfs_prune = "LFS: limpar objetos locais"
 composer_insert_issue_ref = "Inserir uma referência de issue"
 palette_configure_shortcut = "Paleta: definir o atalho do comando destacado"
+palette_arrange = "Popup: Move or Resize the Palette or Picker in Front"
 global_undo_history = "Abrir o histórico de desfazer"
 global_undo_offer = "Restaurar a branch para onde a ação bloqueada a deixou"
 global_radar = "Abrir Radar"
@@ -4189,6 +4190,8 @@ resize_section = "redimensionar seção"
 resize_message = "redimensionar Mensagem"
 resize_refs = "redimensionar Refs"
 resize_status = "redimensionar Status"
+# context: Ctrl+N hint, key arranges (moves, resizes) the open dialog
+arrange = "arrange"
 all_keys = "{key}=todas as teclas"
 esc_cancel = "(Esc cancela)"
 

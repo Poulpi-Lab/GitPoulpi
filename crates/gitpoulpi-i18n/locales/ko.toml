@@ -6130,6 +6130,18 @@ file_not_listed = "이 {$commit}에는 해당 파일이 없습니다(그곳에�
 no_previous = "이 {$commit}에서 파일이 추가되었습니다. 그 이전에 Blame할 내용이 없습니다"
 
 [undo_safety]
+key_undo_to = "u"
+key_redo_to = "y"
+key_restore_only = "r"
+key_offer = "o"
+key_restore_ref = "r"
+key_show_in_log = "l"
+key_create_branch = "b"
+key_create_tag = "t"
+key_apply = "w"
+key_stash = "s"
+key_load_more = "m"
+key_cherry_pick = "c"
 title_history = "실행 취소 기록"
 title_reflog = "Reflog"
 title_lost = "잃어버린 작업"

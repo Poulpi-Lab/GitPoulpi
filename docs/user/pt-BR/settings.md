@@ -179,16 +179,17 @@ A lista de páginas tem dois grupos:
 | **Pasta de navegação padrão** | Onde Procurar abre. Vazio: a última pasta que você usou, senão sua pasta pessoal. |
 | **Local dos dados do repositório** | Onde o GitPoulpi guarda os dados de cada repositório (`session.per_repo_state_dir`): **Dentro de .git** (o padrão: nada aparece na sua árvore de trabalho e todos os worktrees o compartilham), **Na árvore de trabalho** (uma pasta `.gitpoulpi`; necessária para fazer commit de um `workflow.toml` da equipe) ou **Na minha pasta de dados de usuário** (fora do repositório). Uma pasta `.gitpoulpi` deixada por uma versão antiga é movida para o novo lugar na primeira vez em que for necessária, e removida quando fica vazia; um arquivo que o git rastreia (um `workflow.toml` com commit feito) nunca é movido nem excluído e continua legível. |
 | **Nome da branch padrão** | A primeira branch de um repositório que você cria com Init. Vazio: o git decide. Não renomeia nenhuma branch existente. |
-| **Ativar a detecção proativa de conflitos** | Ativada por padrão (`general.conflict_detection`). Avisa no Log quando um merge da branch atual na branch de onde ela partiu daria conflito, antes de você tentar. Um repositório pode desativá-la para si na página **Prevenção de conflitos** dele. Veja [Resolver conflitos de merge](merge-conflicts.md#prevenção-de-conflitos). Aplicado ao fechar as Configurações. |
-| **Branches base padrão** | Sob a chave, no grupo **Prevenção de conflitos** (**Conflitos: editar listas de branches base...** na paleta o abre). A lista de padrões de branches base que os repositórios usam quando não têm uma própria: **Integrada (`**`)**, que é todas as branches, ou uma das suas listas com nome (`conflict_prevention.default_list`). Vale para os repositórios abertos quando as Configurações fecham. **Voltar ao padrão integrado** volta ao `**`. |
-| **Listas de branches base** | Também nesse grupo: suas listas com nome de padrões de branches base (`[conflict_prevention.lists.<name>]`), um bloco cada, com **Nome** (renomear a mantém como padrão, se ela já era; um repositório que seguia o nome antigo usa a lista padrão até você escolher a lista renomeada de novo), **Padrões** (um por linha, `Enter` ou um clique abre o editor, `Ctrl+S` o mantém), **Tornar padrão** e **Excluir lista** (pergunta antes, e avisa que os repositórios que a seguem passam a usar a lista padrão). Digite um nome em **Nova lista** e pressione `Enter` para adicionar uma; ela começa com `**`. Editar uma lista altera todo repositório que a segue. |
 | **Nível do registro**, **Manter os arquivos de registro por**, **Tamanho máximo de um arquivo de registro** | O registro do aplicativo por trás do Registro de atividade: a linha mais detalhada registrada (`log.level`), por quanto tempo os arquivos são mantidos (um número inteiro e uma unidade, dias, semanas, meses ou anos, na mesma linha: clique no número para digitá-lo, Cima e Baixo o ajustam, Tab vai para a unidade e Enter abre a lista dela; de 1 a no máximo 10 anos, padrão 1 semana, `log.retention_days` e `log.retention_unit`) e o tamanho em que o arquivo de um dia é rotacionado (um número e MiB ou GiB, de 1 MiB a 1 GiB, `log.max_file_mb` e `log.max_file_unit`). |
 | **Mostrar a duração das operações**, **Registro estendido** | A aba Operações do Git do Registro de atividade: a duração de cada operação (`log.timings`, ligado por padrão) e também o trabalho em segundo plano, atualização e auto-fetch (`log.extended`, desligado por padrão). Veja [Quando algo falha](troubleshooting.md#o-registro-de-atividade). |
 | **Desfazer ativado**, **Profundidade do histórico de desfazer**, **Registrar alterações feitas fora do GitPoulpi** | O grupo **Histórico de desfazer**. Ativa ou desativa o Desfazer, e define quantas operações ele mantém (padrão 100, `0` significa ilimitado). Desativar o Desfazer apaga o histórico de desfazer, após uma confirmação. A última opção também registra o que um shell ou um agente faz em branches, tags, stashes e HEAD. Veja [Desfazer e refazer](undo-redo.md). |
 
-#### Lançador (integração com a área de trabalho)
+O comando da paleta **App: mudar idioma...** (`Ctrl+N g`) abre a mesma lista de
+idiomas. Ali, o idioma destacado é pré-visualizado ao vivo; `Enter` o mantém e
+`Esc` restaura o anterior.
 
-O grupo **Lançador**, o último da página Geral, cria um atalho que inicia o GitPoulpi pelo
+### Lançador
+
+A página **Lançador** (`gitpoulpi ui show settings launcher`) cria um atalho que inicia o GitPoulpi pelo
 lançador do sistema operacional, no terminal que você escolher.
 
 | Linha | O que faz |
@@ -219,9 +220,9 @@ Atualizar; só **Criar** (para um atalho que ainda não existe) e **Remover**.
 
 **Agrupamento na barra de tarefas e no dock.** O GitPoulpi roda dentro de uma janela de terminal, então a barra de tarefas normalmente o mostra sob o ícone do terminal, sem o ponto de “em execução” sob o ícone fixado do GitPoulpi. Windows: os atalhos levam o AppUserModelID `GitPoulpi.GitPoulpi`, e um GitPoulpi iniciado por um deles dá à janela do seu terminal o mesmo ID e o seu ícone (ele encontra a janela dando a ela por um instante um título único e depois restaura o título), de modo que a janela fica sob o ícone fixado do GitPoulpi. Uma janela de terminal com várias abas se move como um todo: todas as suas abas se agrupam sob o ícone do GitPoulpi enquanto o GitPoulpi roda nela. Atalhos e itens fixados na barra de tarefas criados antes são reescritos pela mesma sincronização; se um item fixado ainda mostrar o ícone do terminal, desafixe e fixe de novo. Linux: kitty, foot, Alacritty, WezTerm e Ghostty são iniciados com a classe de janela `gitpoulpi` e a entrada `.desktop` a nomeia (`StartupWMClass`), então um dock agrupa a janela sob o ícone do lançador; os outros terminais mantêm o próprio ícone. macOS: nada a fazer, o Dock agrupa por aplicativo.
 
-![Configurações > Geral rolada até o grupo Lançador: o terminal dos atalhos e a linha do lançador de aplicativos](../images/settings-launcher.png)
+![Configurações > Lançador: o terminal dos atalhos e a linha do lançador de aplicativos](../images/settings-launcher.png)
 
-##### Alias de comando e PATH, por sistema
+#### Alias de comando e PATH, por sistema
 
 | Sistema | Alias | PATH |
 |---|---|---|
@@ -234,9 +235,16 @@ A paleta tem as mesmas ações (**Lançador: criar atalho**, **Lançador: criar 
 trabalho**, **Lançador: remover atalhos**, **Lançador: criar alias de comando**, **Lançador: remover alias de comando**, **Lançador: adicionar ao PATH**, **Lançador: remover do PATH**), e `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` faz o mesmo a partir de um script.
 
-O comando da paleta **App: mudar idioma...** (`Ctrl+N g`) abre a mesma lista de
-idiomas. Ali, o idioma destacado é pré-visualizado ao vivo; `Enter` o mantém e
-`Esc` restaura o anterior.
+### Prevenção de conflitos
+
+A parte global da detecção proativa de conflitos (`gitpoulpi ui show settings conflict-prevention-global`); a página própria de um repositório é
+[Específico do repositório: Prevenção de conflitos](#específico-do-repositório-prevenção-de-conflitos). **Conflitos: editar listas de branches base...** na paleta abre esta página.
+
+| Opção | O que faz |
+|---|---|
+| **Ativar a detecção proativa de conflitos** | Ativada por padrão (`general.conflict_detection`). Avisa no Log quando um merge da branch atual na branch de onde ela partiu daria conflito, antes de você tentar. Um repositório pode desativá-la para si na própria página **Prevenção de conflitos**. Veja [Resolver conflitos de merge](merge-conflicts.md#prevenção-de-conflitos). Aplicado ao fechar as Configurações. |
+| **Branches base padrão** | Sob a chave. A lista de padrões de branches base que os repositórios usam quando não têm uma própria: **Integrada (`**`)**, que é todas as branches, ou uma das suas listas com nome (`conflict_prevention.default_list`). Vale para os repositórios abertos quando as Configurações fecham. **Voltar ao padrão integrado** volta ao `**`. |
+| **Listas de branches base** | Também nesta página: suas listas com nome de padrões de branches base (`[conflict_prevention.lists.<name>]`), um bloco cada, com **Nome** (renomear a mantém como padrão, se ela já era; um repositório que seguia o nome antigo usa a lista padrão até você escolher a lista renomeada de novo), **Padrões** (um por linha, `Enter` ou um clique abre o editor, `Ctrl+S` o mantém), **Tornar padrão** e **Excluir lista** (pergunta antes, e avisa que os repositórios que a seguem passam a usar a lista padrão). Digite um nome em **Nova lista** e pressione `Enter` para adicionar uma; ela começa com `**`. Editar uma lista altera todo repositório que a segue. |
 
 ### Sincronização
 
@@ -407,6 +415,7 @@ o servidor; veja [MCP e agentes](mcp-and-agents.md).
 | **Fundo das faixas do grafo** | **Desativado** (transparente) ou **Tom da linha**: uma faixa suave na cor da faixa atrás da coluna do grafo, com uma barra fina na sua borda. |
 | **Intensidade do tom da linha** | Quão esmaecida é a faixa de Tom da linha: **Forte**, **Média** (padrão) ou **Sutil**. A barra da borda mantém sua cor plena. |
 | **Posição da barra de ferramentas** | `ui.toolbar_position`: Onde fica a barra de ferramentas: Topo, Base (padrão), Esquerda ou Direita. Esquerda e Direita formam uma coluna ao lado dos painéis; uma janela com menos de 80 colunas a desenha na base. Aplicado imediatamente. |
+| **Lembrar posição e tamanho dos diálogos** | `ui.dialog_geometry`: **Nesta sessão** (padrão), **Salvo em disco** ou **Nunca**: se um diálogo que você moveu ou redimensionou mantém o lugar. Aplicado imediatamente. |
 | **Alinhamento dos botões da barra de ferramentas** | `ui.toolbar_align`: Onde ficam os botões ao longo da barra: Início (padrão), Centro ou Fim. O início é a esquerda de uma linha e o topo de uma coluna; o fim é a direita e a base. Aplicado imediatamente. |
 | **Fixar o botão de pull request no fim** | `ui.toolbar_pr_pinned`: Ativado (padrão), o botão de pull request fica na extremidade da barra de ferramentas (à direita, ou na base em uma coluna), qualquer que seja o alinhamento. Desativado, ele flui com os outros botões e se alinha com eles. Aplicado imediatamente. |
 | **Posição da linha de status** | `ui.statusbar_position`: Onde fica a linha de status (branch, contagens, mensagens, atalhos): Topo, acima das abas de repositório, ou Base (padrão). A aba Início mantém a própria linha de status na base. Aplicado imediatamente. |
@@ -706,10 +715,10 @@ Uma mensagem com a qual o formulário de commit começa (`gitpoulpi ui show sett
 (veja [Resolver conflitos de merge](merge-conflicts.md#prevenção-de-conflitos)):
 
 - **Ativar a detecção proativa de conflitos com a branch de destino**: ativada por padrão. Desmarcá-la desativa a detecção
-  só para este repositório; a opção global é **Ativar a detecção proativa de conflitos** na página Geral.
+  só para este repositório; a opção global é **Ativar a detecção proativa de conflitos** na página global **Prevenção de conflitos**.
   As duas precisam estar ativadas.
 - **Branches base de**: de onde vêm as branches base deste repositório. **Padrão** segue o padrão global
-  (o `**` integrado, ou a lista escolhida em **Branches base padrão** em Configurações > Geral); **Lista: <nome>**
+  (o `**` integrado, ou a lista escolhida em **Branches base padrão** em Configurações > Prevenção de conflitos); **Lista: <nome>**
   segue uma das suas listas com nome, então editar a lista altera este repositório também; **Lista própria** é uma lista só dele
   (escolhê-la começa por uma cópia dos padrões em vigor). Um arquivo de repositório escrito antes dessa escolha existir
   e com padrões próprios é lido como **Lista própria**.
@@ -729,7 +738,7 @@ Uma mensagem com a qual o formulário de commit começa (`gitpoulpi ui show sett
   de exclusões significa "todas as branches, menos estas". A escolha fica guardada em `repo-state.toml` e é lida de novo
   quando as Configurações fecham.
 - **Salvar como lista...**: digite um nome e pressione `Enter`; os padrões em vigor viram uma lista com nome (a mesma que
-  Configurações > Geral edita) e este repositório a segue.
+  Configurações > Prevenção de conflitos edita) e este repositório a segue.
 - **Voltar ao padrão** (pergunta antes): descarta a escolha, a lista e os padrões próprios deste repositório; ele volta a seguir
   o padrão.
 - **Usar as branches base do fluxo** (mostrado quando um [fluxo de branches](branching-workflows.md) com branches base

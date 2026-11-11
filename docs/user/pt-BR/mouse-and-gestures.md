@@ -430,6 +430,18 @@ As teclas dos campos de texto estão em [Atalhos de teclado](keybindings.md).
 
 Veja [Imagens](image-view.md) para o mouse na visualização de imagem.
 
+## Mover e redimensionar diálogos
+
+O diálogo Histórico de desfazer / Reflog / Trabalho perdido pode ser movido e redimensionado:
+
+- **Arraste a barra de título** para movê-lo (a cruz de fechar mantém o clique).
+- **Arraste a borda esquerda, direita ou inferior**, ou um canto inferior (a alça `◢`), para redimensioná-lo. O diálogo fica na tela e nunca encolhe abaixo de 60 x 16.
+- O arrasto continua quando o ponteiro sai do diálogo, e soltar fora nunca o fecha.
+- **Arraste os divisores** entre a lista, a lista de arquivos e os hunks; um clique duplo em um deles o restaura.
+- Os equivalentes de teclado são `Ctrl+N` e depois `m` (as setas movem, `Shift`+setas redimensionam, `0` restaura, `Enter` ou `Esc` saem) e `Alt`+setas para os divisores; a paleta tem `Diálogo: mover ou redimensionar` e `Diálogo: restaurar posição e tamanho`.
+
+O ponteiro mostra uma forma de mover sobre a barra de título e uma forma de redimensionar sobre as bordas e os cantos (terminais com `OSC 22`).
+
 ## Forma do ponteiro do mouse
 
 Alguns terminais deixam o GitPoulpi mudar o ponteiro do mouse: um ponteiro de

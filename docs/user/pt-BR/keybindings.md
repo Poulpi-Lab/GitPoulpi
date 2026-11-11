@@ -135,7 +135,7 @@ As teclas depois de um prefixo aparecem com o prefixo (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Estreitar o painel Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agente: mostrar a visualização pendente | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agente: voltar (ou dispensar a visualização pendente) | `Ctrl+N Backspace` |
-| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
+| `nav_prefix` | `arrange_dialog` | Organizar o diálogo aberto (mover, redimensionar) | `Ctrl+N m` |
 | `refs` | `filter` | Filtrar refs por nome | `/` |
 | `refs` | `solo` | Solo na seleção | `o` |
 | `refs` | `clear_solo` | Parar o solo | `Shift+O` |
@@ -957,23 +957,23 @@ As teclas são as padrão.
 | Histórico de desfazer: fechar | `Esc` |
 | Reflog: mostrar no Log | `l` |
 | Reflog: criar branch aqui... | `b` |
-| Reflog: Create tag Here... | `t` |
-| Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `s` |
+| Reflog: criar tag aqui... | `t` |
+| Reflog: aplicar alterações à árvore de trabalho | `w` |
+| Reflog: salvar alterações como stash | `s` |
 | Reflog: restaurar para esta posição... | `r` |
 | Reflog: carregar mais | `m` |
 | Reflog: atualizar |  |
 | Trabalho perdido: criar branch aqui... | `b` |
-| Lost Work: Create tag Here... | `t` |
+| Trabalho perdido: criar tag aqui... | `t` |
 | Trabalho perdido: cherry-pick | `c` |
-| Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `s` |
+| Trabalho perdido: aplicar alterações à árvore de trabalho | `w` |
+| Trabalho perdido: salvar alterações como stash | `s` |
 | Trabalho perdido: buscar de novo |  |
-| Reflog / Lost Work: Next Pane | `Tab` |
-| Reflog / Lost Work: Path or Tree File List | `v` |
-| Reflog / Lost Work: Reset Pane Sizes |  |
-| Dialog: Move/resize | `Ctrl+N m` |
-| Dialog: Reset position and size |  |
+| Reflog / Trabalho perdido: próximo painel | `Tab` |
+| Reflog / Trabalho perdido: lista de arquivos por caminho ou árvore | `v` |
+| Reflog / Trabalho perdido: restaurar tamanhos dos painéis |  |
+| Diálogo: mover ou redimensionar | `Ctrl+N m` |
+| Diálogo: restaurar posição e tamanho |  |
 | Exibir: atualizar | `r` |
 | Exibir: atualizar (fetch, pull requests, issues) | `F5` |
 | Exibir: alternar a ajuda | `?` |

@@ -1286,6 +1286,17 @@ mod tests {
     use super::*;
 
     #[test]
+    fn the_about_window_moves_and_arranges_but_does_not_resize() {
+        use ratatui::backend::TestBackend;
+        let mut terminal = ratatui::Terminal::new(TestBackend::new(160, 50)).unwrap();
+        open();
+        crate::dialog_kit::frame::testing::check_gestures(false, || {
+            terminal.draw(render).unwrap();
+        });
+        close();
+    }
+
+    #[test]
     fn the_eyes_follow_the_pointer_quadrant() {
         let logo = Rect::new(40, 10, 16, 8);
         let at = |x, y| look_toward(Some((x, y)), logo);

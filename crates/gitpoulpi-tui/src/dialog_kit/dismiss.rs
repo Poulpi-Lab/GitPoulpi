@@ -368,6 +368,21 @@ mod tests {
     }
 
     #[test]
+    fn a_confirmation_moves_and_arranges_but_does_not_resize() {
+        let mut confirm = Confirm::new(
+            "Sure?",
+            "This cannot be undone.",
+            vec![("Yes".to_string(), 1u8), ("No".to_string(), 0u8)],
+            0u8,
+        );
+        super::super::frame::testing::check_gestures(false, || {
+            let area = Rect::new(0, 0, 160, 50);
+            let mut buf = Buffer::empty(area);
+            confirm.render(&mut buf, area);
+        });
+    }
+
+    #[test]
     fn dismiss_decides_close_swallow_or_confirm() {
         use DismissAction::*;
         use DismissKind::*;

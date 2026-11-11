@@ -383,3 +383,13 @@ fn a_job_row_is_the_arrow_and_lights_while_its_cancel_button_keeps_the_hand() {
     assert_eq!(lit[(row.x + 2, row.y)].bg, crate::th().ui.hover);
     with(|c| c.pointer = None);
 }
+
+#[test]
+fn the_jobs_panel_moves_resizes_and_arranges() {
+    changed(job(1, OperationKind::Push, "/work/alpha"));
+    panel::open();
+    crate::dialog_kit::frame::testing::check_gestures(true, || {
+        draw_panel(160, 50);
+    });
+    panel::close();
+}

@@ -705,6 +705,88 @@ fn paint_marks(buf: &mut Buffer, rect: Rect, resizable: bool, arranging: bool) {
     }
 }
 
+/// What every adopting dialog's own test shares.
+#[cfg(test)]
+pub(crate) mod testing {
+    use super::*;
+
+    /// The rect the dialog on top registered at the last paint.
+    pub(crate) fn top_rect() -> Option<Rect> {
+        with_store(|s| s.live.last().map(|l| l.rect))
+    }
+
+    /// A press, a drag and the release, as the terminal reports them.
+    pub(crate) fn drag(from: (u16, u16), to: (u16, u16)) {
+        for (kind, at) in [
+            (MouseEventKind::Down(MouseButton::Left), from),
+            (MouseEventKind::Drag(MouseButton::Left), to),
+            (MouseEventKind::Up(MouseButton::Left), to),
+        ] {
+            on_mouse(MouseEvent {
+                kind,
+                column: at.0,
+                row: at.1,
+                modifiers: KeyModifiers::NONE,
+            });
+        }
+    }
+
+    /// A clean store, `session` mode.
+    pub(crate) fn reset() {
+        with_store(|s| *s = Store::default());
+        crate::live_settings::install_dialog_geometry(DialogGeometry::Session);
+    }
+
+    /// Drives a dialog through the gestures: `paint` draws it (on a screen
+    /// big enough to have room around it). A title drag moves it, `Ctrl+N m`'s
+    /// arrange mode moves it with the arrows, and (when `resizable`) a drag
+    /// of the bottom right corner grows it; the size of a movable-only one
+    /// stays what its content wants.
+    pub(crate) fn check_gestures(resizable: bool, mut paint: impl FnMut()) {
+        reset();
+        let mut frame = || {
+            begin_frame();
+            paint();
+            top_rect().expect("the dialog registers itself when painted")
+        };
+        let r = frame();
+        drag((r.x + 3, r.y), (r.x + 8, r.y + 1));
+        let moved = frame();
+        assert_eq!(
+            (moved.x, moved.y, moved.width, moved.height),
+            (r.x + 5, r.y + 1, r.width, r.height),
+            "a title drag moves it"
+        );
+        assert!(arrange_top());
+        assert!(on_key(KeyEvent::new(KeyCode::Right, KeyModifiers::NONE)));
+        let nudged = frame();
+        assert_eq!(nudged.x, moved.x + 2, "the arrow keys move it");
+        assert!(on_key(KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE)));
+        assert!(!is_arranging());
+        if resizable {
+            let (cx, cy) = (nudged.right() - 1, nudged.bottom() - 1);
+            drag((cx, cy), (cx + 4, cy + 2));
+            let grown = frame();
+            assert_eq!(
+                (grown.x, grown.y, grown.width, grown.height),
+                (nudged.x, nudged.y, nudged.width + 4, nudged.height + 2),
+                "a corner drag resizes it"
+            );
+            assert!(arrange_top());
+            on_key(KeyEvent::new(KeyCode::Down, KeyModifiers::SHIFT));
+            assert_eq!(frame().height, grown.height + 1, "Shift+arrows resize it");
+            on_key(KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE));
+        } else {
+            // No resize grip: the corner is not taken.
+            let (cx, cy) = (nudged.right() - 1, nudged.bottom() - 1);
+            drag((cx, cy), (cx + 4, cy + 2));
+            let same = frame();
+            assert_eq!((same.width, same.height), (nudged.width, nudged.height));
+        }
+        reset();
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

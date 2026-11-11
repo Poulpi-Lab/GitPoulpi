@@ -1115,3 +1115,14 @@ fn the_window_shows_the_pointing_hand_on_controls_and_the_arrow_on_the_filter() 
     assert!(!pointer_hand(0, 0), "outside the window");
     close();
 }
+
+#[test]
+fn the_window_moves_resizes_and_arranges() {
+    let _lock = lock();
+    terminal();
+    let mut terminal = Terminal::new(TestBackend::new(160, 50)).unwrap();
+    crate::dialog_kit::frame::testing::check_gestures(true, || {
+        draw(&mut terminal);
+    });
+    close();
+}

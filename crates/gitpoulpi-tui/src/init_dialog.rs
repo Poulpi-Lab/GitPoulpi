@@ -705,6 +705,14 @@ mod tests {
     }
 
     #[test]
+    fn it_moves_and_arranges_but_does_not_resize() {
+        let mut dialog = InitDialog::new(&abs("work"), "main");
+        crate::dialog_kit::frame::testing::check_gestures(false, || {
+            draw(&mut dialog, 160, 50);
+        });
+    }
+
+    #[test]
     fn it_renders_at_two_widths_and_every_button_is_where_it_is_hit() {
         for width in [72u16, 140] {
             let mut dialog = InitDialog::new(&abs("work"), "main");

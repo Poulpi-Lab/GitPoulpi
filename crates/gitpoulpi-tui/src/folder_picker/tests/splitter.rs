@@ -197,3 +197,14 @@ fn the_selected_folder_row_has_no_arrow_marker() {
     let text = draw(&mut picker, 110, 30);
     assert!(!text.contains('\u{25B8}'), "{text}");
 }
+
+#[test]
+fn the_picker_moves_resizes_and_arranges() {
+    let tmp = tree();
+    let mut picker = picker_at(tmp.path());
+    crate::dialog_kit::frame::testing::check_gestures(true, || {
+        let mut buf = Buffer::empty(Rect::new(0, 0, 160, 50));
+        crate::pointer_map::begin_frame();
+        picker.render(picker_rect(buf.area), &mut buf);
+    });
+}

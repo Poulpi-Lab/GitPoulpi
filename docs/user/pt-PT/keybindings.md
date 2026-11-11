@@ -452,6 +452,8 @@ No `config.toml` é a tabela `[keybindings.palette]`, com o nome do comando (`to
 
 A faixa de ajuda abaixo da lista indica esta tecla (`Alt+K` por predefinição). É a ação `palette.configure_shortcut`, por isso pode ser reatribuída como qualquer outra.
 
+A paleta e os seletores (tema, idioma, separador, pesquisa de workspaces) movem-se e redimensionam-se como uma janela: arraste a margem superior, ou prima `Alt+G` (a ação `palette.arrange`; a linha da paleta `Janela: mover ou redimensionar` faz o mesmo). As setas movem-na, `Shift`+setas redimensionam-na, `0` repõe-na, `Enter` ou `Esc` saem do modo e o popup fica aberto. `ui.dialog_geometry` decide se o lugar é mantido.
+
 ### Todos os comandos da paleta
 
 Gerada a partir da aplicação (um teste mantém-na atualizada). Os comandos de IA só aparecem

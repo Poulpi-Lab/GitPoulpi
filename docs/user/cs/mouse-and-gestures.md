@@ -44,8 +44,9 @@ stejná pravidla:
   kliknutí mimo ignoruje, aby o text nešlo přijít omylem. `✕` a `Esc` se nejdřív
   zeptají **Zahodit změny?**; **Upravovat dál** vás vrátí zpět. Formulář bez
   napsaného textu se zavře hned, stejně jako jednořádkový dialog.
-- Nabídky, rozbalovací seznamy, paleta a výběry nemají `✕`: zavírají se klávesou
-  `Esc` nebo kliknutím mimo.
+- Paleta příkazů, výběry (karta, motiv, jazyk), malé dialogy Kontroly, Tabule,
+  merge a editoru zpráv i potvrzovací výzva mají `✕` také. Kontextové nabídky a
+  rozbalovací seznamy ho nemají: zavírají se klávesou `Esc` nebo kliknutím mimo.
 
 ## Seznamy v Nastavení
 
@@ -415,13 +416,32 @@ Myš v zobrazení obrázků viz [Obrázky](image-view.md).
 
 ## Přesun a změna velikosti dialogů
 
-Dialog Historie vrácení / Reflog / Ztracená práce lze přesouvat a měnit mu velikost:
+Dialogy lze přesouvat a větším oknům měnit velikost:
 
-- **Přetažením záhlaví** ho přesunete (zavírací křížek si nechává své kliknutí).
-- **Přetažením levého, pravého nebo spodního okraje**, nebo spodního rohu (úchyt `◢`), změníte velikost. Dialog zůstává na obrazovce a nikdy není menší než 60 x 16.
+- **Přetažením záhlaví** dialog přesunete (zavírací křížek si nechává své kliknutí). Paleta příkazů a výběry nemají samostatné záhlaví: táhněte za horní okraj.
+- **Přetažením levého, pravého nebo spodního okraje**, nebo spodního rohu (úchyt `◢`), změníte velikost okna. Dialog zůstává na obrazovce a nikdy není menší než své minimum (60 x 16 u Historie vrácení, u ostatních menší). Okno s upravenou velikostí využije místo: textová pole a seznamy rostou, text se zalamuje na novou šířku.
 - Tažení pokračuje, i když ukazatel opustí dialog, a uvolnění mimo dialog ho nikdy nezavře.
-- **Přetažením dělicích čar** mezi seznamem, seznamem souborů a hunky změníte jejich velikost; dvojklik na dělicí čáru ji obnoví.
-- Klávesnicové protějšky jsou `Ctrl+N` a pak `m` (šipky přesouvají, `Shift`+šipky mění velikost, `0` obnoví výchozí, `Enter` nebo `Esc` režim opustí) a `Alt`+šipky pro dělicí čáry; paleta má `Dialog: Přesunout nebo změnit velikost` a `Dialog: Obnovit pozici a velikost`.
+- **Přetažením dělicích čar** uvnitř zobrazení Reflog / Ztracená práce v Historii vrácení změníte jejich velikost; dvojklik na dělicí čáru ji obnoví.
+- Klávesnicové protějšky jsou `Ctrl+N` a pak `m` (šipky přesouvají, `Shift`+šipky mění velikost, `0` obnoví výchozí, `Enter` nebo `Esc` režim opustí) a `Alt`+šipky pro dělicí čáry; paleta má `Dialog: Přesunout nebo změnit velikost` a `Dialog: Obnovit pozici a velikost`. Působí na dialog nahoře. Plochy, které používají `Ctrl+N` pro vlastní odznaky (formulář zprávy commitu, stránka přepisu historie), přijmou stejné `m` po svém `Ctrl+N` a stavový řádek ho uvádí. Paleta příkazů a výběry používají `Ctrl+N` k posunu v seznamu, takže pro ně platí `Alt+G` (`palette.arrange`), nebo vlastní řádek palety `Dialog: Přesunout nebo změnit velikost`: oba uspořádají okno v popředí a nechají ho otevřené.
+- **Jedno nastavení** (`ui.dialog_geometry`, Nastavení > Vzhled > Rozvržení) platí pro všechny dialogy: každý si pamatuje své místo a velikost pro tuto relaci, na disku pro příští spuštění, nebo vůbec.
+
+| Dialog | Přesun | Změna velikosti |
+|---|---|---|
+| Historie vrácení / Reflog / Ztracená práce, Log aktivity, panel úloh, výběr složky | ano | ano |
+| Paleta příkazů, výběry karty / motivu / jazyka, hledání pracovního prostoru | ano | ano (seznam roste s výškou, řádky se šířkou) |
+| Klonování (seznam repozitářů), Pull request a Nové issue (popis), "Co se odesílá" (panel), Mermaid (náhled), možnosti kontroly (pole, jen šířka) | ano | ano |
+| Editory dlouhých textů v Nastavení (šablony, háčky, prompty AI), pole AI ve formuláři pracovního prostoru | ano | ano (textové pole) |
+| Přepis historie: dva pomocné dialogy AI | ano | ano (popis, panel odesílaného) |
+| O aplikaci, panel aktualizací, bezpečnostní kontrola, předpovězené konflikty, "Nad limitem AI", smazání tagu, citlivé soubory | ano | ne (velikost se řídí textem) |
+| Init, Worktree, Sparse checkout, dialog Flow, dialogy toku issue, formulář zprávy commitu (reword), formulář pracovního prostoru, výběry štítků / milníků | ano | ne |
+| Potvrzení (každé "Jste si jistí?") | ano | ne |
+| Dialogy Kontroly a Tabule: jejich malé dialogy (komentář, dokončení, výběr, sloupce) | ano | ne |
+| Vyskakovací okna stránky Klávesové zkratky (potvrzení obnovení, zachycení klávesy), vyskakovací okno odpovědi AI | ano | ne |
+| Nastavení: výsledky a potvrzení ověření repozitáře | ano | ne |
+| Přepis historie: dialogy purge, identity a otázek | ano | ne |
+| Vyskakovací okno přesunu souboru v editoru commitu, upozornění merge | ano | ne |
+
+Nelze přesouvat: celostránkové obrazovky (Nastavení, Nápověda, stránky Kontroly a Tabule, které už vyplňují okno), kontextové nabídky a rozbalovací seznamy (visí na tom, co je otevřelo), popisky a malá vyskakovací okna uvnitř stránky (formulář vzdálených repozitářů, editor rozdělení commitu).
 
 Ukazatel ukazuje tvar přesunu nad záhlavím a tvar změny velikosti nad okraji a rohy (terminály s `OSC 22`).
 

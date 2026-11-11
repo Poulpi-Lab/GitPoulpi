@@ -82,6 +82,9 @@ fn sample(kind: K) -> Option<&'static str> {
 /// download operations, not `journaled` (see `label.rs`), so no history row,
 /// restore wrapper or retired entry can carry them.
 const WITHOUT_WORDS: &[K] = &[
+    // Journaled, but their catalog words wait for the translators.
+    K::ApplyCommit,
+    K::StashFromCommit,
     K::Init,
     K::Fetch,
     K::FetchAll,

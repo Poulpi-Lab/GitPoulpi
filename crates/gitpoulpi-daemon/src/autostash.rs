@@ -470,6 +470,7 @@ pub fn settle_manual(backend: &dyn GitBackend, request: &Request, dispatched: &m
             | OperationKind::StashDrop
             // A new stash shifts the pending one's index.
             | OperationKind::StashPush
+            | OperationKind::StashFromCommit
     ) {
         return;
     }
@@ -666,6 +667,7 @@ fn pop_when_ended(backend: &dyn GitBackend, request: &Request) -> Option<Dispatc
             | OperationKind::StashApply
             | OperationKind::StashDrop
             | OperationKind::StashPush
+            | OperationKind::StashFromCommit
             | OperationKind::AutoStashStartOver
     ) {
         return None;

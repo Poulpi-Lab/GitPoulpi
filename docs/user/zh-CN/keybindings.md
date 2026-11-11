@@ -924,12 +924,17 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 撤销历史：关闭 | `Esc` |
 | Reflog：在 Log 中显示 | `s` |
 | Reflog：在此创建分支… | `b` |
+| Reflog: Create tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as stash | `z` |
 | Reflog：恢复到此位置… | `r` |
 | Reflog：加载更多 | `m` |
 | Reflog：刷新 |  |
-| 丢失的工作：在 Log 中显示 | `s` |
 | 丢失的工作：在此创建分支… | `b` |
+| Lost Work: Create tag Here... | `t` |
 | 丢失的工作：Cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as stash | `z` |
 | 丢失的工作：重新扫描 |  |
 | 视图：刷新 | `r` |
 | 视图：刷新（fetch、pull request、议题） | `F5` |

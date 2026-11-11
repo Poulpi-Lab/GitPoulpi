@@ -92,7 +92,9 @@ other.
 
 ![The Reflog of main: every position it has had, newest first, with the selected one described on the right](images/reflog.png)
 
-**Show in Log** (`s`), **Create branch here** (`b`) and
+**Show in Log** (`s`), **Create branch here** (`b`), **Create tag here** (`t`),
+**Apply to working tree** (`w`), **Save as stash** (`z`) (the last three work as
+in Lost work below) and
 **Restore `<branch>` to this position** (`r`). The restore is undoable. When the
 branch is checked out and you have local changes it cannot move without
 overwriting, a dropdown asks what to do with them: keep my changes, soft, mixed,
@@ -110,8 +112,20 @@ spinner shows; it never blocks the interface.
 ![Lost work: the two commits of a deleted branch (found through the reflog) and dangling commits](images/lost-work.png)
 
 **Create branch here** (`b`)
-recovers a commit under a name you choose, **Cherry-pick** (`c`) applies it to
-the current branch, **Show in Log** (`s`) works for the ones still reachable.
+recovers a commit under a name you choose, **Create tag here** (`t`) pins it
+with a tag (default name `restored-<short id>`), **Cherry-pick** (`c`) applies
+it to the current branch. A lost commit is not in the Log, so this view has no
+"Show in Log" (the Reflog view keeps it for the commits still reachable).
+
+**Restore changes** puts what the commit changed back without committing it:
+**Apply to working tree** (`w`) replays the commit's changes onto the files,
+all or nothing (the index and HEAD stay; a merge commit is refused). When it
+cannot apply cleanly, nothing is touched and the dialog offers **Save as stash**
+(`z`), which keeps the same changes as a new stash instead; that action is also
+always available on its own. Both are journaled: `Ctrl+Z` puts the files back,
+or drops the stash again. The same actions are `gitpoulpi apply-commit <rev>`
+and `gitpoulpi stash from-commit <rev> [-m M]`, and the Reflog view has them
+too.
 
 ## From the command palette
 
@@ -123,8 +137,8 @@ is open: the palette opens over it and its **Undo History:**, **Reflog:** and
 | View | Palette rows |
 |---|---|
 | Undo history | `Undo History: Undo Up to Here...`, `Redo Up to Here...`, `Restore Only This...`, `Restore the Branch to Where It Was...`, `Refresh`, `Close` |
-| Reflog | `Reflog: Show in Log`, `Create Branch Here...`, `Restore to This Position...`, `Load More`, `Refresh` |
-| Lost work | `Lost Work: Show in Log`, `Create Branch Here...`, `Cherry-pick`, `Scan Again` |
+| Reflog | `Reflog: Show in Log`, `Create Branch Here...`, `Create Tag Here...`, `Apply Changes to Working Tree`, `Save Changes as Stash`, `Restore to This Position...`, `Load More`, `Refresh` |
+| Lost work | `Lost Work: Create Branch Here...`, `Create Tag Here...`, `Cherry-pick`, `Apply Changes to Working Tree`, `Save Changes as Stash`, `Scan Again` |
 
 The rows are grayed out (with the reason) while their view is not open; the three
 openers, `Edit: Undo History...`, `Edit: Reflog...` and `Edit: Recover Lost
@@ -142,8 +156,8 @@ open the same confirmation or name prompt as the button.
 | Branches and tags | create, delete, rename, set or unset the upstream, create a tracking branch, create / delete / annotate a tag, fast-forward, check a pull request out as a branch |
 | Moving around | checkout of a branch or a commit (including a detached HEAD) |
 | History | merge (fast-forward or merge commit), rebase (plain and interactive, once it has finished), cherry-pick, revert, reset (soft, mixed and hard), the local part of a pull |
-| Working changes | stage and unstage (file, folder, hunk, lines, all), discard (file, folder, hunk, lines, a file checkout), apply a patch, **delete a file from disk**, **ignore** (file, extension or folder: the line in the `.gitignore` you chose), **treat as binary or text** (the `.gitattributes` line) |
-| Stashes | push, apply, pop, drop |
+| Working changes | stage and unstage (file, folder, hunk, lines, all), discard (file, folder, hunk, lines, a file checkout), apply a patch or a commit's changes (`apply-commit`), **delete a file from disk**, **ignore** (file, extension or folder: the line in the `.gitignore` you chose), **treat as binary or text** (the `.gitattributes` line) |
+| Stashes | push, apply, pop, drop, save a commit's changes as a stash (`stash from-commit`) |
 | Remotes and config | add, remove, rename, change the URL or push URL of a remote, Git LFS track and untrack |
 | On a server | **deleting a branch or a tag on a remote** (from the ref's menu, the palette, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, or a workflow finish that deletes the remote branch): see below |
 
@@ -401,7 +415,10 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   what a shell did. `reflog-restore` moves a branch (or `HEAD`) to one of those
   positions; a checked-out branch with uncommitted changes needs `--mode`.
   It is journaled too.
-- `lost-commits` lists commits no branch, tag, remote or stash reaches.
+- `lost-commits` lists commits no branch, tag, remote or stash reaches. To
+  get the work of one back without committing it: `apply-commit <rev>` (to the
+  working tree, all or nothing) or `stash from-commit <rev>` (as a stash); both
+  are journaled.
 - When a shell move blocks the newest entry, the refusal carries the reflog
   position that holds what the entry expects (`reason.RefMoved.restore`), to
   be passed to `reflog-restore`.

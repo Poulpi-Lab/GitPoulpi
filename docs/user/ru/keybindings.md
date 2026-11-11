@@ -964,12 +964,17 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | История отмен: закрыть | `Esc` |
 | Reflog: показать в Log | `s` |
 | Reflog: создать ветку здесь... | `b` |
+| Reflog: Create tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as stash | `z` |
 | Reflog: восстановить на эту позицию... | `r` |
 | Reflog: загрузить ещё | `m` |
 | Reflog: обновить |  |
-| Потерянная работа: показать в Log | `s` |
 | Потерянная работа: создать ветку здесь... | `b` |
+| Lost Work: Create tag Here... | `t` |
 | Потерянная работа: cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as stash | `z` |
 | Потерянная работа: искать заново |  |
 | Вид: обновить | `r` |
 | Вид: обновить (fetch, pull requests, задачи) | `F5` |

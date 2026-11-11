@@ -958,12 +958,17 @@ Tuşlar varsayılanlardır.
 | Geri Alma Geçmişi: Kapat | `Esc` |
 | Reflog: Log'da Göster | `s` |
 | Reflog: Burada Dal Oluştur... | `b` |
+| Reflog: Create Tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as Stash | `z` |
 | Reflog: Bu Konuma Geri Yükle... | `r` |
 | Reflog: Daha Fazla Yükle | `m` |
 | Reflog: Yenile |  |
-| Kaybolan Çalışma: Log'da Göster | `s` |
 | Kaybolan Çalışma: Burada Dal Oluştur... | `b` |
+| Lost Work: Create Tag Here... | `t` |
 | Kaybolan Çalışma: Cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as Stash | `z` |
 | Kaybolan Çalışma: Yeniden Tara |  |
 | Görünüm: Yenile | `r` |
 | Görünüm: Yenile (fetch, Pull Request'ler, issue'lar) | `F5` |

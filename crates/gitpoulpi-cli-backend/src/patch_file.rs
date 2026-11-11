@@ -17,7 +17,7 @@ use std::path::Path;
 use gitpoulpi_core::domain::{PatchApplied, PatchCreated, PatchSource, RepoRef};
 use gitpoulpi_core::{Error, Result};
 
-use crate::process::{run, run_bytes};
+use crate::process::{run, run_bytes, run_bytes_with_stdin};
 
 /// Refuses (writing nothing) if `dest` exists or its parent is missing.
 /// Checked up front so every `patch_create` branch below can build its
@@ -185,6 +185,58 @@ pub fn patch_apply(repo: &RepoRef, patch: &Path) -> Result<PatchApplied> {
 
     run(&repo.root, &["apply", "--whitespace=nowarn", &patch_arg])?;
 
+    Ok(PatchApplied { files })
+}
+
+/// [`GitBackend::apply_commit_to_worktree`]: the commit's own diff
+/// (`diff-tree -p --root --binary`, so a root commit is read against the
+/// empty tree and binary files carry their bytes) piped into `git apply`,
+/// checked first so a patch that does not apply leaves the tree untouched.
+///
+/// [`GitBackend::apply_commit_to_worktree`]: gitpoulpi_core::GitBackend::apply_commit_to_worktree
+pub fn apply_commit_to_worktree(
+    repo: &RepoRef,
+    commit: gitpoulpi_core::domain::Oid,
+) -> Result<PatchApplied> {
+    if parent_count(repo, &commit)? > 1 {
+        return Err(Error::ApplyRefused(
+            gitpoulpi_core::domain::ApplyRefusal::MergeCommit,
+        ));
+    }
+    let diff = run_bytes(
+        &repo.root,
+        &[
+            "diff-tree",
+            "-p",
+            "--root",
+            "--binary",
+            "--no-renames",
+            "--no-ext-diff",
+            "--no-textconv",
+            "--no-color",
+            "--no-commit-id",
+            "--src-prefix=a/",
+            "--dst-prefix=b/",
+            "-r",
+            &commit.to_hex(),
+        ],
+    )?;
+    if diff.is_empty() {
+        return Err(Error::Backend(format!(
+            "{} changes nothing to apply",
+            short_hex(&commit.to_hex())
+        )));
+    }
+    let numstat = run_bytes_with_stdin(
+        &repo.root,
+        &["apply", "--check", "--numstat", "-z", "-"],
+        &diff,
+    )?;
+    let files = parse_numstat_z(&String::from_utf8_lossy(&numstat));
+    if files.is_empty() {
+        return Err(Error::Backend("the commit applies no changes".into()));
+    }
+    run_bytes_with_stdin(&repo.root, &["apply", "--whitespace=nowarn", "-"], &diff)?;
     Ok(PatchApplied { files })
 }
 

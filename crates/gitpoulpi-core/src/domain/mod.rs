@@ -73,14 +73,14 @@ pub use network_auth::{
 pub use operation::{OpTraits, Operation, OperationKind};
 pub use ops::{
     autosquash_order, normalize_reword_message, normalize_sparse_dirs, parse_fetch_refspec,
-    validate_plan, CheckoutTarget, CherryPickOptions, CherryPickOutcome, CloneOptions, ClonePhase,
-    CloneProgress, CloneProgressSink, CommitAuthor, CommitOptions, FastForwardOutcome,
-    FetchOptions, FetchOutcome, InitOptions, InteractiveRebase, LogOptions, MergeFastForward,
-    MergeOptions, MergeOutcome, PatchApplied, PatchCreated, PatchSource, PlanCommit, PullMode,
-    PullOptions, PullOutcome, PushOptions, PushOutcome, PushRejectReason, PushRejection,
-    RebaseAction, RebaseOptions, RebaseOutcome, RebasePlanDraft, RebaseRefusal, RebaseState,
-    RebaseStep, ResetMode, RevertOutcome, RewordOutcome, RewordRefusal, SparseState, TagSelection,
-    WorktreeAddOptions, WorktreeStart, FETCH_REFSPEC_NAMESPACE,
+    validate_plan, ApplyRefusal, CheckoutTarget, CherryPickOptions, CherryPickOutcome,
+    CloneOptions, ClonePhase, CloneProgress, CloneProgressSink, CommitAuthor, CommitOptions,
+    FastForwardOutcome, FetchOptions, FetchOutcome, InitOptions, InteractiveRebase, LogOptions,
+    MergeFastForward, MergeOptions, MergeOutcome, PatchApplied, PatchCreated, PatchSource,
+    PlanCommit, PullMode, PullOptions, PullOutcome, PushOptions, PushOutcome, PushRejectReason,
+    PushRejection, RebaseAction, RebaseOptions, RebaseOutcome, RebasePlanDraft, RebaseRefusal,
+    RebaseState, RebaseStep, ResetMode, RevertOutcome, RewordOutcome, RewordRefusal, SparseState,
+    TagSelection, WorktreeAddOptions, WorktreeStart, FETCH_REFSPEC_NAMESPACE,
 };
 pub use ref_filter::{visible_tips, RefFilter};
 pub use reflog::{

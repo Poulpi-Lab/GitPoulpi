@@ -475,6 +475,10 @@ impl GitBackend for SystemGitBackend {
     fn patch_apply(&self, repo: &RepoRef, patch: &Path) -> Result<PatchApplied> {
         patch_file::patch_apply(repo, patch)
     }
+
+    fn apply_commit_to_worktree(&self, repo: &RepoRef, commit: Oid) -> Result<PatchApplied> {
+        patch_file::apply_commit_to_worktree(repo, commit)
+    }
     fn tag_create(
         &self,
         repo: &RepoRef,
@@ -707,6 +711,10 @@ impl GitBackend for SystemGitBackend {
     }
     fn stash_store(&self, repo: &RepoRef, commit: Oid, message: &str) -> Result<()> {
         stash_ops::stash_store(repo, commit, message)
+    }
+
+    fn stash_from_commit(&self, repo: &RepoRef, commit: Oid, message: Option<&str>) -> Result<Oid> {
+        stash_ops::stash_from_commit(repo, commit, message)
     }
     fn stash_paths(&self, repo: &RepoRef, commit: Oid) -> Result<Vec<String>> {
         stash_ops::stash_paths(repo, commit)

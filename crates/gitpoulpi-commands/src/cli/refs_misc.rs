@@ -347,6 +347,15 @@ pub enum StashAction {
     Drop {
         id: Option<String>,
     },
+    /// Save the changes one commit made (even a lost one) as a new stash,
+    /// without touching the working tree. `undo` drops it again.
+    FromCommit {
+        /// The commit whose changes to keep (any revision: a sha, `HEAD~2`, ...).
+        commit: String,
+        /// The stash message; omitted, one naming the commit.
+        #[arg(short = 'm', long)]
+        message: Option<String>,
+    },
     List,
 }
 

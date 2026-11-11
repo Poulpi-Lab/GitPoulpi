@@ -953,12 +953,17 @@ die Standardtasten.
 | Rückgängig-Verlauf: Schließen | `Esc` |
 | Reflog: Im Log zeigen | `s` |
 | Reflog: Branch hier erstellen... | `b` |
+| Reflog: Create Tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as Stash | `z` |
 | Reflog: Auf diese Position zurücksetzen... | `r` |
 | Reflog: Mehr laden | `m` |
 | Reflog: Aktualisieren |  |
-| Verlorene Arbeit: Im Log zeigen | `s` |
 | Verlorene Arbeit: Branch hier erstellen... | `b` |
+| Lost Work: Create Tag Here... | `t` |
 | Verlorene Arbeit: Cherry-Pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as Stash | `z` |
 | Verlorene Arbeit: Erneut suchen |  |
 | Ansicht: Aktualisieren | `r` |
 | Ansicht: Aktualisieren (Fetch, Pull Requests, Issues) | `F5` |

@@ -76,6 +76,19 @@ pub(super) async fn stash(session: &mut Session, action: StashAction) -> Result<
                 format!("dropped stash@{{{}}}", id.0),
             ))
         }
+        StashAction::FromCommit { commit, message } => {
+            let oid = resolve(session, &commit).await?;
+            let stash: Oid = session
+                .call(
+                    OperationKind::StashFromCommit,
+                    json!({ "commit": oid, "message": message }),
+                )
+                .await?;
+            Ok(emitted(
+                json!({ "stash": StashId(0), "commit": stash, "from": oid }),
+                format!("saved the changes of {} as stash@{{0}}", short(oid)),
+            ))
+        }
         StashAction::List => {
             let stashes: Vec<Stash> = session.call(OperationKind::Stashes, json!({})).await?;
             let human = stashes

@@ -957,12 +957,17 @@ zastosowania. Klawisze są domyślne.
 | Historia cofania: Zamknij | `Esc` |
 | Reflog: Pokaż w Log | `s` |
 | Reflog: Utwórz gałąź tutaj... | `b` |
+| Reflog: Create tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as stash | `z` |
 | Reflog: Przywróć do tej pozycji... | `r` |
 | Reflog: Wczytaj więcej | `m` |
 | Reflog: Odśwież |  |
-| Utracona praca: Pokaż w Log | `s` |
 | Utracona praca: Utwórz gałąź tutaj... | `b` |
+| Lost Work: Create tag Here... | `t` |
 | Utracona praca: Cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as stash | `z` |
 | Utracona praca: Szukaj ponownie |  |
 | Widok: Odśwież | `r` |
 | Widok: Odśwież (fetch, pull requesty, zgłoszenia) | `F5` |

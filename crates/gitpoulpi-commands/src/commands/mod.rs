@@ -1103,6 +1103,19 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
             Ok(emitted(to_value(&outcome)?, human))
         }
 
+        Commands::ApplyCommit { commit } => {
+            let oid = resolve(session, &commit).await?;
+            let applied: gitpoulpi_core::domain::PatchApplied = session
+                .call(OperationKind::ApplyCommit, json!({ "commit": oid }))
+                .await?;
+            let human = format!(
+                "applied the changes of {} to the working tree ({} file(s))",
+                short(oid),
+                applied.files.len()
+            );
+            Ok(emitted(to_value(&applied)?, human))
+        }
+
         Commands::Reword { commit, message } => {
             let oid = resolve(session, &commit).await?;
             let outcome: RewordOutcome = session

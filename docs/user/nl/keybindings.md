@@ -962,12 +962,17 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Geschiedenis: Sluiten | `Esc` |
 | Reflog: Tonen in het Log | `s` |
 | Reflog: Branch hier maken... | `b` |
+| Reflog: Create tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as stash | `z` |
 | Reflog: Herstellen naar deze positie... | `r` |
 | Reflog: Meer laden | `m` |
 | Reflog: Vernieuwen |  |
-| Verloren werk: Tonen in het Log | `s` |
 | Verloren werk: Branch hier maken... | `b` |
+| Lost Work: Create tag Here... | `t` |
 | Verloren werk: Cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as stash | `z` |
 | Verloren werk: Opnieuw zoeken |  |
 | Weergave: Vernieuwen | `r` |
 | Weergave: Vernieuwen (fetch, pull requests, issues) | `F5` |

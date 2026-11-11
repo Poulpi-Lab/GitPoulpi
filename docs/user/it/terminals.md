@@ -106,7 +106,7 @@ cambia con il terminale e il font, ed è per questo che GitPoulpi evita i glifi 
   sfondo opaco; meno testato.
 - **Console di Windows, ConEmu, cmd**: da evitare. Le immagini vengono disegnate male o per niente.
   Il doppio clic sull'exe riapre GitPoulpi nel terminale che hai scelto
-  (*Impostazioni > Generali > Launcher*).
+  (*Impostazioni > Launcher*).
 
 ### Linux
 

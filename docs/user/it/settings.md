@@ -181,16 +181,17 @@ L'elenco delle pagine ha due gruppi:
 | **Cartella di esplorazione predefinita** | Dove si apre Sfoglia. Vuoto: l'ultima cartella usata, altrimenti la tua cartella home. |
 | **Posizione dei dati del repository** | Dove GitPoulpi conserva i suoi dati per ogni repository (`session.per_repo_state_dir`): **Dentro .git** (predefinito: nella directory di lavoro non compare nulla e tutti i worktree lo condividono), **Nella directory di lavoro** (una cartella `.gitpoulpi`; serve per fare il commit di un `workflow.toml` di squadra) o **Nella mia cartella dati utente** (fuori dal repository). Una cartella `.gitpoulpi` lasciata da una versione precedente viene spostata nella nuova posizione la prima volta che serve, e rimossa quando è vuota; un file tracciato da git (un `workflow.toml` di cui è stato fatto il commit) non viene mai spostato né eliminato e resta leggibile. |
 | **Nome del branch predefinito** | Il primo branch di un repository creato con Init. Vuoto: decide git. Non rinomina nessun branch esistente. |
-| **Attiva il rilevamento proattivo dei conflitti** | Attivo di base (`general.conflict_detection`). Avvisa nel Log quando il merge del branch corrente nel branch da cui è partito andrebbe in conflitto, prima che tu lo provi. Un repository può disattivarlo per sé nella sua pagina **Prevenzione dei conflitti**. Vedi [Risolvere i conflitti di merge](merge-conflicts.md#prevenzione-dei-conflitti). Si applica alla chiusura delle Impostazioni. |
-| **Branch base predefiniti** | Sotto l'interruttore, nel gruppo **Prevenzione dei conflitti** (la voce di palette **Conflitti: Modifica le liste dei branch base...** lo apre). La lista di pattern dei branch base che i repository usano quando non ne hanno una propria: **Predefinita (`**`)**, cioè ogni branch, oppure una delle tue liste con nome (`conflict_prevention.default_list`). Si applica ai repository aperti alla chiusura delle Impostazioni. **Ripristina il valore predefinito** torna a `**`. |
-| **Liste dei branch base** | Anch'esse in quel gruppo: le tue liste con nome di pattern dei branch base (`[conflict_prevention.lists.<nome>]`), un blocco ciascuna con il suo **Nome** (rinominare una lista la mantiene come predefinita, se lo era; un repository che seguiva il vecchio nome usa la lista predefinita finché non scegli di nuovo la lista rinominata), i suoi **Pattern** (uno per riga, `Enter` o un clic apre l'editor, `Ctrl+S` lo conserva), **Rendi predefinita** ed **Elimina lista** (chiede prima, e avverte che i repository che la seguono useranno invece la lista predefinita). Scrivi un nome in **Nuova lista** e premi `Enter` per aggiungerne una; parte con `**`. Modificare una lista cambia ogni repository che la segue. |
 | **Livello del registro**, **Conserva i file di registro per**, **Dimensione massima di un file di registro** | Il registro dell'applicazione dietro il Registro attività: la riga più dettagliata registrata (`log.level`), per quanto tempo vengono conservati i file (un numero intero e un'unità, giorni, settimane, mesi o anni, su una riga: clicca il numero per scriverlo, Su e Giù lo cambiano, Tab passa all'unità ed Enter ne apre l'elenco; da 1 a 10 anni al massimo, predefinito 1 settimana, `log.retention_days` e `log.retention_unit`) e la dimensione a cui il file di un giorno viene ruotato (un numero e MiB o GiB, da 1 MiB a 1 GiB, `log.max_file_mb` e `log.max_file_unit`). |
 | **Mostra la durata delle operazioni**, **Registrazione estesa** | La scheda Operazioni git del Registro attività: la durata di ogni operazione (`log.timings`, attivo per impostazione predefinita) e anche il lavoro in background, aggiornamento e auto-fetch (`log.extended`, disattivo per impostazione predefinita). Vedi [Quando qualcosa non funziona](troubleshooting.md#il-registro-attività). |
 | **Annulla attivo**, **Profondità della cronologia di annullamento**, **Registra le modifiche fatte fuori da GitPoulpi** | Il gruppo **Cronologia annullamenti**. Attiva o disattiva Annulla, e imposta quante operazioni conserva (predefinito 100, `0` significa illimitato). Disattivare Annulla cancella la cronologia di annullamento, dopo una conferma. L'ultima registra anche ciò che una shell o un agente fa a branch, tag, stash e HEAD. Vedi [Annulla e ripeti](undo-redo.md). |
 
-#### Launcher (integrazione con il desktop)
+Il comando della palette **App: Cambia lingua...** (`Ctrl+N g`) apre lo stesso
+elenco di lingue. Lì la lingua evidenziata mostra l'anteprima dal vivo; `Enter` la
+mantiene ed `Esc` ripristina la precedente.
 
-Il gruppo **Launcher**, l'ultimo della pagina Generali, crea un collegamento che avvia
+### Launcher
+
+La pagina **Launcher** (`gitpoulpi ui show settings launcher`) crea un collegamento che avvia
 GitPoulpi dal launcher del sistema, nel terminale che scegli.
 
 | Riga | Cosa fa |
@@ -222,9 +223,9 @@ Aggiorna; solo **Crea** (per un collegamento che non esiste ancora) e **Rimuovi*
 
 **Raggruppamento nella barra delle applicazioni e nel dock.** GitPoulpi gira in una finestra di terminale, quindi la barra delle applicazioni di norma la mostra sotto l'icona del terminale, senza il punto «in esecuzione» sotto l'icona di GitPoulpi bloccata. Windows: i collegamenti portano l'AppUserModelID `GitPoulpi.GitPoulpi`, e un GitPoulpi avviato da uno di essi dà alla finestra del suo terminale lo stesso ID e la sua icona (trova la finestra dandole per un attimo un titolo univoco, poi ripristina il titolo), così la finestra si colloca sotto l'icona di GitPoulpi bloccata. Una finestra di terminale con più schede si sposta come un tutt'uno: tutte le sue schede si raggruppano sotto l'icona di GitPoulpi finché GitPoulpi vi gira. I collegamenti e i blocchi nella barra creati prima vengono riscritti dalla stessa sincronizzazione; se un blocco mostra ancora l'icona del terminale, sbloccalo e bloccalo di nuovo. Linux: kitty, foot, Alacritty, WezTerm e Ghostty vengono avviati con la classe di finestra `gitpoulpi` e la voce `.desktop` la nomina (`StartupWMClass`), così un dock raggruppa la finestra sotto l'icona del lanciatore; gli altri terminali mantengono la propria icona. macOS: niente da fare, il Dock raggruppa per app.
 
-![Impostazioni > Generali scorse fino al gruppo Launcher: il terminale dei collegamenti e la riga del launcher delle applicazioni](../images/settings-launcher.png)
+![Impostazioni > Launcher: il terminale dei collegamenti e la riga del launcher delle applicazioni](../images/settings-launcher.png)
 
-##### Alias del comando e PATH, sistema per sistema
+#### Alias del comando e PATH, sistema per sistema
 
 | Sistema | Alias | PATH |
 |---|---|---|
@@ -239,9 +240,16 @@ collegamento sul desktop**, **Launcher: Rimuovi collegamenti**, **Launcher: Crea
 status|install|remove [--where launcher|desktop|startmenu]` fa lo
 stesso da uno script.
 
-Il comando della palette **App: Cambia lingua...** (`Ctrl+N g`) apre lo stesso
-elenco di lingue. Lì la lingua evidenziata mostra l'anteprima dal vivo; `Enter` la
-mantiene ed `Esc` ripristina la precedente.
+### Prevenzione dei conflitti
+
+La parte globale del rilevamento proattivo dei conflitti (`gitpoulpi ui show settings conflict-prevention-global`); la pagina propria di un repository è
+[Specifico del repository: Prevenzione dei conflitti](#specifico-del-repository-prevenzione-dei-conflitti). La voce di palette **Conflitti: Modifica le liste dei branch base...** apre questa pagina.
+
+| Opzione | Cosa fa |
+|---|---|
+| **Attiva il rilevamento proattivo dei conflitti** | Attivo di base (`general.conflict_detection`). Avvisa nel Log quando il merge del branch corrente nel branch da cui è partito andrebbe in conflitto, prima che tu lo provi. Un repository può disattivarlo per sé nella sua pagina **Prevenzione dei conflitti**. Vedi [Risolvere i conflitti di merge](merge-conflicts.md#prevenzione-dei-conflitti). Si applica alla chiusura delle Impostazioni. |
+| **Branch base predefiniti** | Sotto l'interruttore. La lista di pattern dei branch base che i repository usano quando non ne hanno una propria: **Predefinita (`**`)**, cioè ogni branch, oppure una delle tue liste con nome (`conflict_prevention.default_list`). Si applica ai repository aperti alla chiusura delle Impostazioni. **Ripristina il valore predefinito** torna a `**`. |
+| **Liste dei branch base** | Anch'esse in questa pagina: le tue liste con nome di pattern dei branch base (`[conflict_prevention.lists.<nome>]`), un blocco ciascuna con il suo **Nome** (rinominare una lista la mantiene come predefinita, se lo era; un repository che seguiva il vecchio nome usa la lista predefinita finché non scegli di nuovo la lista rinominata), i suoi **Pattern** (uno per riga, `Enter` o un clic apre l'editor, `Ctrl+S` lo conserva), **Rendi predefinita** ed **Elimina lista** (chiede prima, e avverte che i repository che la seguono useranno invece la lista predefinita). Scrivi un nome in **Nuova lista** e premi `Enter` per aggiungerne una; parte con `**`. Modificare una lista cambia ogni repository che la segue. |
 
 ### Sincronizzazione
 
@@ -412,6 +420,7 @@ build che includono il server; vedi [MCP e agenti](mcp-and-agents.md).
 | **Sfondo delle corsie del grafo** | **Disattivato** (trasparente) o **Tinta di riga**: una tenue fascia del colore della corsia dietro la colonna del grafo, con una sottile barra sul bordo. |
 | **Intensità della tinta di riga** | Quanto è sbiadita la fascia Tinta di riga: **Forte**, **Media** (predefinita) o **Sottile**. La barra sul bordo mantiene il colore pieno. |
 | **Posizione della barra degli strumenti** | `ui.toolbar_position`: Dove sta la barra degli strumenti: In alto, In basso (predefinito), A sinistra o A destra. A sinistra e A destra ne fanno una colonna accanto ai pannelli; una finestra sotto le 80 colonne la disegna in basso. Si applica subito. |
+| **Ricorda posizione e dimensione delle finestre** | `ui.dialog_geometry`: **Per questa sessione** (predefinito), **Salvata su disco** o **Mai**: se una finestra che hai spostato o ridimensionato mantiene la sua posizione. Si applica subito. |
 | **Allineamento dei pulsanti della barra degli strumenti** | `ui.toolbar_align`: Dove stanno i pulsanti lungo la barra: Inizio (predefinito), Centro o Fine. L'inizio è la sinistra di una riga e l'alto di una colonna; la fine è la destra e il basso. Si applica subito. |
 | **Fissa il pulsante pull request in fondo** | `ui.toolbar_pr_pinned`: Attivo (predefinito), il pulsante pull request sta all'estremità della barra degli strumenti (a destra, o in basso in una colonna), qualunque sia l'allineamento. Disattivo, scorre con gli altri pulsanti e si allinea con loro. Si applica subito. |
 | **Posizione della barra di stato** | `ui.statusbar_position`: Dove sta la barra di stato (branch, conteggi, messaggi, scorciatoie): In alto, sopra le schede dei repository, o In basso (predefinito). La scheda Home mantiene la propria barra di stato in basso. Si applica subito. |
@@ -716,9 +725,9 @@ repository (vedi [Risolvere i conflitti di merge](merge-conflicts.md#prevenzione
 
 - **Controlla i conflitti con il branch di base**: attivo di base. Togliendo la
   spunta il rilevamento si disattiva solo per questo repository; l'interruttore globale è **Attiva il rilevamento
-  proattivo dei conflitti** nella pagina Generali. Devono essere attivi entrambi.
+  proattivo dei conflitti** nella pagina globale **Prevenzione dei conflitti**. Devono essere attivi entrambi.
 - **Branch base da**: da dove vengono i branch base di questo repository. **Predefinita** segue il valore globale
-  (il `**` incorporato, o la lista scelta in **Branch base predefiniti** in Impostazioni > Generale); **Lista: <nome>**
+  (il `**` incorporato, o la lista scelta in **Branch base predefiniti** in Impostazioni > Prevenzione dei conflitti); **Lista: <nome>**
   segue una delle tue liste con nome, quindi modificare la lista cambia anche questo repository; **Lista propria** è una lista
   tutta sua (sceglierla parte da una copia dei pattern in vigore). Un file del repository scritto prima di questa scelta
   e con pattern propri si legge come **Lista propria**.

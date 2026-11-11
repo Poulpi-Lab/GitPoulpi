@@ -60,7 +60,7 @@ OSC 22 一列中的“否（未实现）”，来自项目更新日志和文档�
 - **Windows Terminal。** 真彩色、鼠标、OSC 52 和良好的表情符号支持。GitPoulpi 把头像绘制为 sixel 图片（需要 Windows Terminal 1.22 或更高版本）；图用字符。在 *设置 > 配置文件 > 默认值 > 外观 > 字体* 中选一款 Nerd Font。鼠标被捕获时，按住 `Shift` 可选择文本。指针形状不会改变。在早于 1.25 的版本（没有 kitty 键盘协议）上，请使用 `Alt` 变体。
 - **Rio** 可以配合不透明的图片背景使用；测试较少。
 - **mintty**（Git Bash、MSYS2、Cygwin）通过 iTerm2 协议绘制图片，背景不透明；测试较少。
-- **Windows 控制台、ConEmu、cmd**：避免使用。图片绘制得很差，或根本不绘制。双击 exe 会在你选择的终端中重新打开 GitPoulpi（*设置 > 常规 > 启动器*）。
+- **Windows 控制台、ConEmu、cmd**：避免使用。图片绘制得很差，或根本不绘制。双击 exe 会在你选择的终端中重新打开 GitPoulpi（*设置 > 启动器*）。
 
 ### Linux
 

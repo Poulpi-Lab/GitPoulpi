@@ -92,8 +92,10 @@
 | `reword <commit> -m <msg>` | 为当前分支上的某个 commit 设置新消息；其后代会被重新创建，索引和工作区不受影响。 |
 | `amend <commit> [-m MSG \| --summary S \| --description D] [--author-name N] [--author-email E] [--author-date D] [--committer-name N] [--committer-email E] [--committer-date D]` | 修改 commit 属性中的任意一部分（规则和拒绝情形与 `reword` 相同；后代保留各自的作者）。日期格式为 `YYYY-MM-DD HH:MM:SS +HH:MM`、`YYYY-MM-DDTHH:MM:SS+HH:MM` 或原始的 `1700000000 +0100`。未指定的内容保持不变；除非有 `--committer-*` 选项另行指定，提交者是你，时间是现在。输出 `reword` 的结果 `{reworded, previous_head, new_head, replayed}`；一次 `undo` 即可还原。会被拒绝的情形：commit 不在当前分支上、有操作正在进行、消息为空、姓名或邮箱为空（或包含 `<`、`>` 或换行，或邮箱中有空格）、日期无效。 |
 | `stash push [--message M] [--ai]`、`stash pop [ID]`、`stash apply [ID]`、`stash drop [ID]`、`stash list` | Stash（`ID` 是 `stash@{n}` 中的 `n`，默认为 0）。 |
+| `stash from-commit <rev> [-m M]` | 把某个 commit（已丢失的也行；根 commit 相对于空，merge 相对于它的第一个父 commit）所做的更改保存为列表最上面的一个新 stash。工作区、索引和 HEAD 都不会被触碰。输出 `{stash, commit, from}`；一次 `undo` 会丢弃它，`redo` 会再次存入。 |
 | `patch create -o <file> <revs>... \| --range A..B \| --wip [paths]` | 根据 commit、范围或工作区更改写出补丁。 |
 | `patch apply <file>` | 把补丁应用到工作区。 |
+| `apply-commit <rev>` | 只把某个 commit（已丢失的也行）所做的更改应用到工作区；索引和 HEAD 保持不变。要么全部成功，要么什么都不改：只要有文件无法干净地应用，就不会改动任何内容，命令失败（想保留这些更改请用 `stash from-commit`）。merge commit 会被拒绝。二进制文件和换行符与 commit 中一致。输出 `{files}`；一次 `undo` 会把文件恢复原状。 |
 | `undo-forget [--dry-run] [--redo] [--expect ID] [--yes]` | 丢弃被阻塞的最新日志条目（已中断，或仓库已继续前进），使其下面的条目可以被撤销。绝不会触碰仓库。没有 `--yes` 时退出码为 3。 |
 | `undo [--dry-run] [--list [--all]] [--expect ID] [--yes]`、`redo [--dry-run] [--expect ID] [--yes]` | 撤回 / 恢复上一次操作。退出码 2 表示被拒绝，3 表示需要 `--yes`。`undo --list` 还会逐个条目说明“仅恢复此项”能带回什么，以及是谁做的（`"source": "gitpoulpi"`；若是 shell 或 AI 代理用纯 git 做出的更改，则为 `"outside"`，由守护进程连同 git 记录的原因和提交者一起记下）。参见[撤销与重做](undo-redo.md)。 |
 | `undo-restore <id> [--name N] [--dry-run]`（也可写作 `undo restore <id>`） | “仅恢复此项”：带回更早某个条目移除的内容（已删除的分支或 tag、已丢弃的 stash、已丢弃或已删除的文件、已移除的远程、ignore 行），而不撤销它之后的条目。绝不覆盖：已更改的文件旁会生成 `<name>.restored`；reset、amend 或 rebase 的结果会作为新分支回到旧的顶端。新增一个日志条目，所以 `undo` 可以撤回它。退出码 2 表示被拒绝（名称已被占用、没有可恢复的内容等）。 |
@@ -224,7 +226,7 @@
 | `config path`、`config get <key>`、`config set <key> <value>` | 设置（[配置参考](config-reference.md)）。`config set ui.theme` 和 `ui.graph_color_theme` 会对照注册表检查名称。 |
 | `licenses` | 程序内置的第三方许可证声明和致谢（即“关于 > 许可证”的文字）。只读；无需守护进程。 |
 | `theme list`、`theme export <slug>` | 配色主题：JSON 列表（slug、label、source、light、lane palette）以及输出到 stdout 的完整主题文件（[主题](themes.md)）。只读；无需守护进程。 |
-| `desktop shortcut status` | 在 `ui.launch_terminal` 指定的终端中启动 GitPoulpi 的启动器快捷方式（设置 > 常规 > 启动器 的作用相同）：显示每个快捷方式的状态（`not_installed`、`installed`、`outdated`、`foreign`）和所用的终端。不需要守护进程；不是 MCP 工具。 |
+| `desktop shortcut status` | 在 `ui.launch_terminal` 指定的终端中启动 GitPoulpi 的启动器快捷方式（设置 > 启动器 的作用相同）：显示每个快捷方式的状态（`not_installed`、`installed`、`outdated`、`foreign`）和所用的终端。不需要守护进程；不是 MCP 工具。 |
 | `desktop shortcut install [--where launcher\|desktop\|startmenu]` | 创建或更新快捷方式：Linux 上是 `.desktop` 条目和图标，Windows 上是开始菜单或桌面上的 `.lnk`，macOS 上是 `~/Applications/GitPoulpi.app`。默认：操作系统的启动器。 |
 | `desktop shortcut remove [--where ...]` | 移除 GitPoulpi 创建的快捷方式（默认：全部）；不属于 GitPoulpi 的文件绝不会被改动。 |
 | `alias status`、`alias create <name> [--add]`、`alias remove [name]` | 命令别名（`gp` 或任意名称），加 `--add` 时还有添加变体（`gpa`，运行 `gitpoulpi --add`：在 Linux 和 macOS 上是带标记的 `/bin/sh` 脚本，在 Windows 上是 `.cmd`）：返回 JSON，包含 GitPoulpi 创建的每个别名的状态（`installed`、`outdated`、`foreign`）和 `kind`（`open` 或 `add`）、bin 文件夹和目标。`create` 还会报告警告（该名称在 PATH 中已经运行着别的程序、PowerShell 自带的别名）以及 bin 文件夹是否在 PATH 中；它会拒绝不属于 GitPoulpi 的文件。不带名称的 `remove` 会移除 GitPoulpi 创建的所有别名。无需守护进程；安装程序会调用这些命令。 |

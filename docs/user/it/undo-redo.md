@@ -52,13 +52,15 @@ Le azioni che hai annullato stanno **sopra** l'azione più recente, sotto un
 divisore («annullate - Ripeti le riporta indietro»), attenuate, con quella che
 Ripeti riporta indietro per prima più vicina al divisore. La selezione parte
 dall'azione più recente, non da loro. Le frecce si spostano (le intestazioni e il
-divisore vengono saltati), `Tab` passa tra le tre viste, `Esc` chiude. Per la
-riga selezionata:
+divisore vengono saltati), `1` / `2` / `3`
+(o `Ctrl+Tab` / `Ctrl+Shift+Tab`) passano tra le tre viste, `Esc` chiude.
+`Invio` non esegue mai un'azione: ogni pulsante ha la sua lettera, mostrata nella
+riga di suggerimenti sotto i pulsanti. Per la riga selezionata:
 
 - **Annulla fino a qui** (`u`): annulla quell'azione e tutte le più recenti,
   dalla più recente, dopo un'unica conferma che le elenca tutte. Un passaggio che il
   daemon giudica rischioso chiede di nuovo prima di partire.
-- **Ripristina solo questa** (`r`): riporta indietro ciò che quella singola azione
+- **Ripristina solo questa** (`o`): riporta indietro ciò che quella singola azione
   ha rimosso e conserva tutto ciò che è stato fatto dopo. Un branch o un tag eliminato
   torna sul commit che aveva (se il suo nome ora è occupato ti viene chiesto un altro,
   con uno libero già inserito); uno stash scartato torna in cima all'elenco degli
@@ -69,8 +71,8 @@ riga selezionata:
   un branch `restore/<branch>-<sha>` sulla vecchia punta: il tuo branch corrente e i
   tuoi file non si muovono mai. La conferma mostra esattamente cosa farà, e il
   ripristino è una nuova azione: `Ctrl+Z` lo annulla.
-- **Ripeti fino a qui** (`y`) su una riga annullata.
-- **Ripristina main dove l'aveva lasciato Commit** (`o`, oppure `Alt+Shift+Z` /
+- **Ripeti fino a qui** (`p`) su una riga annullata.
+- **Ripristina main dove l'aveva lasciato Commit** (`d`, oppure `Alt+Shift+Z` /
   `Modifica: Ripristina il branch dove l'aveva lasciato l'azione bloccata` da fuori
   dal pannello): quando un altro programma ha spostato il branch e ha bloccato
   Annulla, il reflog sa ancora dove l'azione lo aveva lasciato.
@@ -97,7 +99,9 @@ come tutti gli altri.
 
 ![Il Reflog di main: ogni posizione che ha avuto, dalla più recente, con quella selezionata descritta a destra](../images/reflog.png)
 
-**Mostra nel Log** (`s`), **Crea branch qui** (`b`) e
+**Mostra nel Log** (`l`), **Crea branch qui** (`b`), **Crea tag qui** (`t`),
+**Applica alla directory di lavoro** (`a`), **Salva come stash** (`s`) (gli ultimi
+tre funzionano come in Lavoro perso qui sotto) e
 **Ripristina `<branch>` a questa posizione** (`r`). Il ripristino è annullabile.
 Quando il branch è quello attivo e hai modifiche locali che non potrebbe spostare
 senza sovrascriverle, un menu a discesa chiede cosa farne: mantenerle, soft, mixed
@@ -114,9 +118,51 @@ completa mentre gira un indicatore di attività; non blocca mai l'interfaccia.
 
 ![Lavoro perso: i due commit di un branch eliminato (trovati tramite il reflog) e i commit orfani](../images/lost-work.png)
 
-**Crea branch qui** (`b`) recupera un commit con un nome che scegli, **Cherry-pick**
-(`c`) lo applica al branch corrente, **Mostra nel Log** (`s`) funziona per quelli
-ancora raggiungibili.
+**Crea branch qui** (`b`) recupera un commit con un nome che scegli, **Crea tag qui**
+(`t`) lo fissa con un tag (nome predefinito `restored-<id breve>`), **Cherry-pick**
+(`c`) lo applica al branch corrente. Un commit perso non è nel Log, quindi questa vista
+non ha «Mostra nel Log» (la vista Reflog lo tiene per i commit ancora raggiungibili).
+
+**Recupera le modifiche** rimette ciò che il commit ha cambiato senza fare un commit:
+**Applica alla directory di lavoro** (`a`) riapplica le modifiche del commit ai file,
+tutto o niente (indice e HEAD restano; un commit di merge viene rifiutato). Quando non
+si applica in modo pulito, nulla viene toccato e la finestra propone **Salva come stash**
+(`s`), che conserva invece le stesse modifiche come nuovo stash; quell'azione è sempre
+disponibile anche da sola. Entrambe sono registrate nel journal: `Ctrl+Z` rimette a posto
+i file, o elimina di nuovo lo stash. Le stesse azioni sono `gitpoulpi apply-commit <rev>`
+e `gitpoulpi stash from-commit <rev> [-m M]`, e la vista Reflog le ha anch'essa.
+
+### Pannelli, hunk e la finestra
+
+Reflog e Lavoro perso mostrano a sinistra l'elenco dei commit e, a destra, l'intestazione
+del commit selezionato, **ogni file che ha cambiato** e gli hunk del file selezionato
+(solo hunk, a capo nel pannello). L'elenco dei file è quello del pannello destro della
+finestra principale: `Percorsi` o `Albero` (`v`, o clic sull'interruttore), una cartella
+si apre e si chiude con `Invio`, `Sinistra` o `Destra`, un clic o le frecce scelgono un
+file e i suoi hunk compaiono sotto (si chiede al daemon fuori dal thread
+dell'interfaccia; gli ultimi file vengono tenuti). L'elenco dei commit, quello dei file
+e gli hunk hanno ciascuno una barra di scorrimento che puoi premere e trascinare.
+
+- `Tab` / `Shift+Tab` passano tra i pannelli (elenco, file, hunk); le frecce, `PageUp`,
+  `PageDown`, `Home` e `End` agiscono sul pannello che ha la tastiera (il suo
+  bordo è acceso). `Invio` su un file passa ai suoi hunk.
+- **Divisori**: trascina quello tra l'elenco e il pannello destro, o quello tra i file e
+  gli hunk; il doppio clic su un divisore lo reimposta. Da tastiera:
+  `Alt+Sinistra` / `Alt+Destra`, `Alt+Su` / `Alt+Giù`, `Alt+0` reimposta entrambi.
+  La palette ha `Reflog / Lavoro perso: Reimposta le dimensioni dei pannelli`,
+  `Pannello successivo` e `Elenco file a percorsi o ad albero`.
+- `Ctrl+N` mostra i suoi badge sulle tre schede delle viste e sui tre pannelli, come
+  nella finestra principale; un tasto del badge salta lì.
+- **Sposta e ridimensiona la finestra**: trascina la barra del titolo per spostarla,
+  trascina i bordi sinistro, destro e inferiore o un angolo in basso (la maniglia `◢`)
+  per ridimensionarla (mai sotto 60 x 16, sempre sullo schermo). La croce di chiusura
+  conserva il suo clic e rilasciare fuori dalla finestra non la chiude mai. L'equivalente
+  da tastiera è `Ctrl+N` poi `m`: le frecce spostano, `Maiusc`+frecce ridimensionano, `0`
+  reimposta, `Invio` o `Esc` escono (il bordo lo dice finché è attivo). La palette ha
+  `Finestra: Sposta o ridimensiona` e `Finestra: Reimposta posizione e dimensione`. Se la
+  posizione viene mantenuta lo decide `ui.dialog_geometry` (*Impostazioni > Aspetto >
+  Layout > Ricorda posizione e dimensione delle finestre*): `session` (predefinito),
+  `saved` (ripristinata al prossimo avvio) o `never`.
 
 ## Dalla palette dei comandi
 
@@ -128,8 +174,8 @@ aperto: la palette si apre sopra di esso e le sue righe **Cronologia annullament
 | Vista | Righe della palette |
 |---|---|
 | Cronologia annullamenti | `Cronologia annullamenti: Annulla fino a qui...`, `Ripeti fino a qui...`, `Ripristina solo questa...`, `Ripristina il branch dove si trovava...`, `Aggiorna`, `Chiudi` |
-| Reflog | `Reflog: Mostra nel Log`, `Crea branch qui...`, `Ripristina a questa posizione...`, `Carica altro`, `Aggiorna` |
-| Lavoro perso | `Lavoro perso: Mostra nel Log`, `Crea branch qui...`, `Cherry-pick`, `Cerca di nuovo` |
+| Reflog | `Reflog: Mostra nel Log`, `Crea branch qui...`, `Crea tag qui...`, `Applica le modifiche alla directory di lavoro`, `Salva le modifiche come stash`, `Ripristina a questa posizione...`, `Carica altro`, `Aggiorna` |
+| Lavoro perso | `Lavoro perso: Crea branch qui...`, `Crea tag qui...`, `Cherry-pick`, `Applica le modifiche alla directory di lavoro`, `Salva le modifiche come stash`, `Cerca di nuovo` |
 
 Le righe sono grigie (con il motivo) finché la loro vista non è aperta; i tre comandi di
 apertura, `Modifica: Cronologia annullamenti...`, `Modifica: Reflog...` e `Modifica: Recupera
@@ -147,8 +193,8 @@ righe con `...` aprono la stessa conferma o lo stesso prompt del nome del pulsan
 | Branch e tag | creare, eliminare, rinominare, impostare o rimuovere l'upstream, creare un branch di tracking, creare / eliminare / annotare un tag, fast-forward, fare il checkout di una pull request come branch |
 | Spostarsi | checkout di un branch o di un commit (compreso un HEAD staccato) |
 | Cronologia | merge (fast-forward o merge commit), rebase (semplice e interattivo, una volta terminato), cherry-pick, revert, reset (soft, mixed e hard), la parte locale di un pull |
-| Modifiche in corso | stage e unstage (file, cartella, hunk, righe, tutto), scarto (file, cartella, hunk, righe, un checkout di file), applicare una patch, **eliminare un file dal disco**, **ignorare** (file, estensione o cartella: la riga del `.gitignore` che hai scelto), **trattare come binario o testo** (la riga di `.gitattributes`) |
-| Stash | push, apply, pop, drop |
+| Modifiche in corso | stage e unstage (file, cartella, hunk, righe, tutto), scarto (file, cartella, hunk, righe, un checkout di file), applicare una patch o le modifiche di un commit (`apply-commit`), **eliminare un file dal disco**, **ignorare** (file, estensione o cartella: la riga del `.gitignore` che hai scelto), **trattare come binario o testo** (la riga di `.gitattributes`) |
+| Stash | push, apply, pop, drop, salvare le modifiche di un commit come stash (`stash from-commit`) |
 | Remoti e configurazione | aggiungere, rimuovere, rinominare, cambiare l'URL o l'URL di push di un remoto, track e untrack di Git LFS |
 | Su un server | **eliminare un branch o un tag su un remoto** (dal menu del riferimento, dalla palette, `branch delete-remote`, `tag delete-remote`, `tag delete --both`, o un finish del workflow che elimina il branch remoto): vedi sotto |
 
@@ -412,7 +458,10 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   le mosse fatte da una shell. `reflog-restore` sposta un branch (o `HEAD`) su una di
   quelle posizioni; un branch attivo con modifiche non committate richiede `--mode`.
   Anch'esso è registrato nel journal.
-- `lost-commits` elenca i commit che nessun branch, tag, remoto o stash raggiunge.
+- `lost-commits` elenca i commit che nessun branch, tag, remoto o stash raggiunge. Per
+  riavere il lavoro di uno senza fare un commit: `apply-commit <rev>` (nella directory
+  di lavoro, tutto o niente) o `stash from-commit <rev>` (come stash); entrambi sono
+  registrati nel journal.
 - Quando una mossa fatta in una shell blocca la voce più recente, il rifiuto porta
   con sé la posizione del reflog che contiene ciò che la voce si aspetta
   (`reason.RefMoved.restore`), da passare a `reflog-restore`.

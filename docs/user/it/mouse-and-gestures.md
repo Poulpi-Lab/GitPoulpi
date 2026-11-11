@@ -429,6 +429,18 @@ I tasti per i campi di testo sono in [Scorciatoie da tastiera](keybindings.md).
 
 Per il mouse nella vista immagine vedi [Immagini](image-view.md).
 
+## Spostare e ridimensionare le finestre
+
+La finestra Cronologia annullamenti / Reflog / Lavoro perso si può spostare e ridimensionare:
+
+- **Trascina la barra del titolo** per spostarla (la croce di chiusura conserva il suo clic).
+- **Trascina il bordo sinistro, destro o inferiore**, oppure un angolo in basso (la maniglia `◢`), per ridimensionarla. La finestra resta sullo schermo e non diventa mai più piccola di 60 x 16.
+- Il trascinamento continua quando il puntatore esce dalla finestra, e rilasciare fuori non la chiude mai.
+- **Trascina i divisori** tra il suo elenco, l'elenco dei file e gli hunk; il doppio clic su uno lo reimposta.
+- Gli equivalenti da tastiera sono `Ctrl+N` poi `m` (le frecce spostano, `Maiusc`+frecce ridimensionano, `0` reimposta, `Invio` o `Esc` escono) e `Alt`+frecce per i divisori; la palette ha `Finestra: Sposta o ridimensiona` e `Finestra: Reimposta posizione e dimensione`.
+
+Il puntatore mostra una forma di spostamento sopra la barra del titolo e una di ridimensionamento sopra i bordi e gli angoli (terminali con `OSC 22`).
+
 ## Forma del puntatore del mouse
 
 Alcuni terminali permettono a GitPoulpi di cambiare il puntatore del mouse: un

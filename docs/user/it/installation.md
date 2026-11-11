@@ -66,7 +66,7 @@ Il file `.sha256` intercetta solo un download danneggiato. La firma è ciò che 
 
 Ogni release include anche un installer per ogni sistema. Entrambi fanno le stesse scelte
 (collegamenti, PATH, un alias del comando come `gp`) chiamando lo stesso `gitpoulpi`
-installato, cioè il codice che sta dietro Impostazioni > Generali > Launcher, così ciò che
+installato, cioè il codice che sta dietro Impostazioni > Launcher, così ciò che
 l'installer configura e ciò che mostrano le Impostazioni coincidono sempre.
 
 ### Windows: `gitpoulpi-<version>-x86_64-pc-windows-msvc-setup.exe`
@@ -130,7 +130,7 @@ Ogni canale qui sotto scrive lo stesso marcatore `.gitpoulpi-dist` accanto ai pr
 
 I nomi qui sopra sono quelli su cui pubblica il processo di rilascio (vedi [Releasing](../../developer/releasing.md)): un canale non ancora attivo risponde «not found», e l'archivio di rilascio o l'installer funzionano sempre.
 
-Si applica la gestione del PATH propria di ciascun gestore di pacchetti: Chocolatey, winget, Scoop e Homebrew mettono da soli i programmi nel PATH, e nessuno di loro crea l'alias `gp` (esegui `gitpoulpi alias create gp`, oppure Impostazioni > Generali > Launcher).
+Si applica la gestione del PATH propria di ciascun gestore di pacchetti: Chocolatey, winget, Scoop e Homebrew mettono da soli i programmi nel PATH, e nessuno di loro crea l'alias `gp` (esegui `gitpoulpi alias create gp`, oppure Impostazioni > Launcher).
 
 ### apt (Debian e Ubuntu)
 

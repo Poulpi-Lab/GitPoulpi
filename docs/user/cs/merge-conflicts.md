@@ -166,7 +166,7 @@ v protokolu), takže vaše soubory, index a refy zůstanou nedotčené.
   použije změnu při další kontrole, bez restartu. **Uložit jako seznam...** změní vlastní vzory repozitáře na
   pojmenovaný seznam, **Obnovit výchozí** zahodí volbu repozitáře. Smazání seznamu, který repozitář sleduje, způsobí,
   že použije výchozí.
-- **Vypnutí**: **Zapnout proaktivní detekci konfliktů** v Nastavení > Obecné, nebo pro jeden repozitář na jeho stránce
+- **Vypnutí**: **Zapnout proaktivní detekci konfliktů** v Nastavení > Prevence konfliktů, nebo pro jeden repozitář na jeho stránce
   **Prevence konfliktů**. Ze skriptu vypíše `gitpoulpi conflicts check` stejnou odpověď jako JSON ([Referenční
   příručka CLI](cli-reference.md)).
 

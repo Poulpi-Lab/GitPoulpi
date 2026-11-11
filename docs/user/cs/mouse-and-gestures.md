@@ -413,6 +413,18 @@ Klávesy pro textová pole jsou v [Klávesových zkratkách](keybindings.md).
 
 Myš v zobrazení obrázků viz [Obrázky](image-view.md).
 
+## Přesun a změna velikosti dialogů
+
+Dialog Historie vrácení / Reflog / Ztracená práce lze přesouvat a měnit mu velikost:
+
+- **Přetažením záhlaví** ho přesunete (zavírací křížek si nechává své kliknutí).
+- **Přetažením levého, pravého nebo spodního okraje**, nebo spodního rohu (úchyt `◢`), změníte velikost. Dialog zůstává na obrazovce a nikdy není menší než 60 x 16.
+- Tažení pokračuje, i když ukazatel opustí dialog, a uvolnění mimo dialog ho nikdy nezavře.
+- **Přetažením dělicích čar** mezi seznamem, seznamem souborů a hunky změníte jejich velikost; dvojklik na dělicí čáru ji obnoví.
+- Klávesnicové protějšky jsou `Ctrl+N` a pak `m` (šipky přesouvají, `Shift`+šipky mění velikost, `0` obnoví výchozí, `Enter` nebo `Esc` režim opustí) a `Alt`+šipky pro dělicí čáry; paleta má `Dialog: Přesunout nebo změnit velikost` a `Dialog: Obnovit pozici a velikost`.
+
+Ukazatel ukazuje tvar přesunu nad záhlavím a tvar změny velikosti nad okraji a rohy (terminály s `OSC 22`).
+
 ## Tvar ukazatele myši
 
 Některé terminály nechají GitPoulpi měnit ukazatel myši: ukazatel změny

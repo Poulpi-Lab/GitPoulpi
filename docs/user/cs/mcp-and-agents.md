@@ -422,8 +422,10 @@ který potvrdíte.
 | `ssh_command_set` | `gitpoulpi ssh-command set` | write |
 | `ssh_command_show` | `gitpoulpi ssh-command show` | read |
 | `stage` | `gitpoulpi stage` | write |
+| `apply_commit` | `gitpoulpi apply-commit` | write |
 | `stash_apply` | `gitpoulpi stash apply` | write |
 | `stash_drop` | `gitpoulpi stash drop` | destructive |
+| `stash_from_commit` | `gitpoulpi stash from-commit` | write |
 | `stash_list` | `gitpoulpi stash list` | read |
 | `stash_pop` | `gitpoulpi stash pop` | write |
 | `stash_push` | `gitpoulpi stash push` | write |

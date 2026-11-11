@@ -173,16 +173,17 @@ Seznam stránek má dvě skupiny:
 | **Výchozí složka pro procházení** | Kde se otevře Procházet. Prázdné: poslední použitá složka, jinak domovská složka. |
 | **Umístění dat repozitáře** | Kde GitPoulpi drží svá data jednotlivých repozitářů (`session.per_repo_state_dir`): **Uvnitř .git** (výchozí: v pracovním stromu se nic neobjeví, všechny worktree ho sdílejí), **V pracovním stromu** (složka `.gitpoulpi`; potřebná, chcete-li commitnout týmový `workflow.toml`) nebo **V mé složce s uživatelskými daty** (mimo repozitář). Složka `.gitpoulpi` ponechaná starší verzí se při první potřebě přesune na nové místo a po vyprázdnění se odstraní; soubor sledovaný gitem (commitnutý `workflow.toml`) se nikdy nepřesune ani nesmaže a zůstane čitelný. |
 | **Výchozí název větve** | První větev repozitáře, který vytvoříte pomocí Init. Prázdné: rozhodne git. Nepřejmenovává žádnou existující větev. |
-| **Zapnout proaktivní detekci konfliktů** | Ve výchozím stavu zapnuto (`general.conflict_detection`). Upozorní v Logu, když by merge aktuální větve do větve, ze které vznikla, skončil konfliktem, ještě než to zkusíte. Repozitář ji může pro sebe vypnout na své stránce **Prevence konfliktů**. Viz [Řešení konfliktů při slučování](merge-conflicts.md#prevence-konfliktů). Projeví se po zavření Nastavení. |
-| **Výchozí základní větve** | Pod přepínačem, ve skupině **Prevence konfliktů** (otevře ji příkaz z palety **Konflikty: Upravit seznamy základních větví...**). Seznam vzorů základních větví, který repozitáře používají, když nemají vlastní: **Vestavěný (`**`)**, tedy každá větev, nebo jeden z vašich pojmenovaných seznamů (`conflict_prevention.default_list`). Platí pro otevřené repozitáře po zavření Nastavení. **Obnovit vestavěný výchozí** vrátí `**`. |
-| **Seznamy základních větví** | Také v této skupině: vaše pojmenované seznamy vzorů základních větví (`[conflict_prevention.lists.<name>]`), každý jako blok s **Názvem** (přejmenováním seznam zůstane výchozím, pokud jím byl; repozitář, který sledoval starý název, používá výchozí seznam, dokud znovu nevyberete přejmenovaný seznam), **Vzory** (jeden na řádek, `Enter` nebo kliknutí otevře editor, `Ctrl+S` ho ponechá), **Nastavit jako výchozí** a **Smazat seznam** (nejprve se zeptá a řekne, že repozitáře, které ho sledují, budou místo něj používat výchozí seznam). Zadejte název do **Nový seznam** a stiskněte `Enter`; seznam začíná vzorem `**`. Úprava seznamu změní každý repozitář, který ho sleduje. |
 | **Úroveň protokolu**, **Uchovávat soubory protokolu**, **Maximální velikost souboru protokolu** | Protokol aplikace za Protokolem aktivity: nejpodrobnější zaznamenávaná úroveň (`log.level`), jak dlouho se soubory uchovávají (celé číslo a jednotka, dny, týdny, měsíce nebo roky, na jednom řádku: kliknutím na číslo ho napíšete, Nahoru a Dolů ho mění po jedné, Tab přejde na jednotku a Enter otevře její seznam; nejvýše 1 až 10 let, výchozí 1 týden, `log.retention_days` a `log.retention_unit`) a velikost, při které se soubor jednoho dne přesouvá (číslo a MiB nebo GiB, 1 MiB až 1 GiB, `log.max_file_mb` a `log.max_file_unit`). |
 | **Zobrazit dobu trvání operací**, **Rozšířené protokolování** | Karta Operace gitu v Protokolu aktivity: doba trvání každé operace (`log.timings`, ve výchozím stavu zapnuto) a také práce na pozadí, obnovení a auto-fetch (`log.extended`, ve výchozím stavu vypnuto). Viz [Když něco selže](troubleshooting.md#protokol-aktivity). |
 | **Zpět povoleno**, **Hloubka historie Zpět**, **Zaznamenávat změny provedené mimo GitPoulpi** | Skupina **Historie vrácení**. Zapíná a vypíná Zpět a nastavuje, kolik operací uchová (výchozí 100, `0` znamená neomezeně). Vypnutí Zpět po potvrzení smaže historii vracení. Poslední volba zaznamenává i to, co shell nebo agent udělá s větvemi, tagy, stashi a HEADem. Viz [Zpět a znovu](undo-redo.md). |
 
-#### Spouštěč (integrace s plochou)
+Příkaz z palety **Aplikace: Změnit jazyk...** (`Ctrl+N g`) otevře stejný seznam
+jazyků. Zvýrazněný jazyk se zde ukazuje živě; `Enter` ho ponechá a `Esc`
+obnoví předchozí.
 
-Skupina **Spouštěč**, poslední na stránce Obecné, vytvoří zástupce, který spouští
+### Spouštěč
+
+Stránka **Spouštěč** (`gitpoulpi ui show settings launcher`) vytvoří zástupce, který spouští
 GitPoulpi ze spouštěče systému ve zvoleném terminálu.
 
 | Řádek | Co dělá |
@@ -208,9 +209,9 @@ barva vlastní název ikony, takže spouštěč, který ikony ukládá do mezipa
 
 **Seskupování na hlavním panelu a v docku.** GitPoulpi běží v okně terminálu, takže hlavní panel ho obvykle ukazuje pod ikonou terminálu, bez tečky „běží“ pod připnutou ikonou GitPoulpi. Windows: zástupci nesou AppUserModelID `GitPoulpi.GitPoulpi` a GitPoulpi spuštěný z některého z nich dá oknu svého terminálu stejné ID a svou ikonu (okno najde tak, že mu na okamžik nastaví jedinečný titulek a pak ho obnoví), takže okno leží pod připnutou ikonou GitPoulpi. Okno terminálu s více kartami se přesouvá jako celek: všechny jeho karty se seskupí pod ikonou GitPoulpi, dokud v něm GitPoulpi běží. Dříve vytvořené zástupce a připnutí na hlavním panelu přepíše stejná synchronizace; pokud připnutí stále ukazuje ikonu terminálu, odepněte ho a připněte znovu. Linux: kitty, foot, Alacritty, WezTerm a Ghostty se spouštějí s třídou okna `gitpoulpi` a záznam `.desktop` ji uvádí (`StartupWMClass`), takže dock seskupí okno pod ikonu spouštěče; ostatní terminály si nechávají vlastní ikonu. macOS: není co dělat, Dock seskupuje podle aplikace.
 
-![Nastavení > Obecné, posunuté ke skupině Spouštěč: terminál pro zástupce a řádek spouštěče aplikací](../images/settings-launcher.png)
+![Nastavení > Spouštěč: terminál pro zástupce a řádek spouštěče aplikací](../images/settings-launcher.png)
 
-##### Alias příkazu a PATH podle systému
+#### Alias příkazu a PATH podle systému
 
 | Systém | Alias | PATH |
 |---|---|---|
@@ -223,9 +224,16 @@ Paleta nabízí stejné akce (**Spouštěč: Vytvořit zástupce**, **Spouště�
 **Spouštěč: Odebrat zástupce**, **Spouštěč: Vytvořit alias příkazu**, **Spouštěč: Odebrat alias příkazu**, **Spouštěč: Přidat do PATH**, **Spouštěč: Odebrat z PATH**) a `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` totéž udělá ze skriptu.
 
-Příkaz z palety **Aplikace: Změnit jazyk...** (`Ctrl+N g`) otevře stejný seznam
-jazyků. Zvýrazněný jazyk se zde ukazuje živě; `Enter` ho ponechá a `Esc`
-obnoví předchozí.
+### Prevence konfliktů
+
+Globální část proaktivní detekce konfliktů (`gitpoulpi ui show settings conflict-prevention-global`); vlastní stránka repozitáře je
+[Nastavení repozitáře: Prevence konfliktů](#nastavení-repozitáře-prevence-konfliktů). Příkaz z palety **Konflikty: Upravit seznamy základních větví...** otevře tuto stránku.
+
+| Volba | Co dělá |
+|---|---|
+| **Zapnout proaktivní detekci konfliktů** | Ve výchozím stavu zapnuto (`general.conflict_detection`). Upozorní v Logu, když by merge aktuální větve do větve, ze které vznikla, skončil konfliktem, ještě než to zkusíte. Repozitář ji může pro sebe vypnout na své vlastní stránce **Prevence konfliktů**. Viz [Řešení konfliktů při slučování](merge-conflicts.md#prevence-konfliktů). Projeví se po zavření Nastavení. |
+| **Výchozí základní větve** | Pod přepínačem. Seznam vzorů základních větví, který repozitáře používají, když nemají vlastní: **Vestavěný (`**`)**, tedy každá větev, nebo jeden z vašich pojmenovaných seznamů (`conflict_prevention.default_list`). Platí pro otevřené repozitáře po zavření Nastavení. **Obnovit vestavěný výchozí** vrátí `**`. |
+| **Seznamy základních větví** | Také na této stránce: vaše pojmenované seznamy vzorů základních větví (`[conflict_prevention.lists.<name>]`), každý jako blok s **Názvem** (přejmenováním seznam zůstane výchozím, pokud jím byl; repozitář, který sledoval starý název, používá výchozí seznam, dokud znovu nevyberete přejmenovaný seznam), **Vzory** (jeden na řádek, `Enter` nebo kliknutí otevře editor, `Ctrl+S` ho ponechá), **Nastavit jako výchozí** a **Smazat seznam** (nejprve se zeptá a řekne, že repozitáře, které ho sledují, budou místo něj používat výchozí seznam). Zadejte název do **Nový seznam** a stiskněte `Enter`; seznam začíná vzorem `**`. Úprava seznamu změní každý repozitář, který ho sleduje. |
 
 ### Synchronizace
 
@@ -394,6 +402,7 @@ obsahují; viz [MCP a agenti](mcp-and-agents.md).
 | **Pozadí drah grafu** | **Vypnuto** (průhledné) nebo **Podbarvení řádku**: slabý pruh barvy dráhy za sloupcem grafu s tenkou lištou na okraji. |
 | **Síla podbarvení řádku** | Jak vybledlý je pruh podbarvení: **Silné**, **Střední** (výchozí) nebo **Jemné**. Okrajová lišta si ponechá plnou barvu. |
 | **Umístění panelu nástrojů** | `ui.toolbar_position`: Kde je panel nástrojů: Nahoře, Dole (výchozí), Vlevo nebo Vpravo. Vlevo a Vpravo z něj udělají sloupec vedle panelů; v okně užším než 80 sloupců se kreslí dole. Projeví se hned. |
+| **Pamatovat si pozici a velikost dialogů** | `ui.dialog_geometry`: **Pro tuto relaci** (výchozí), **Uložit na disk** nebo **Nikdy**: zda dialog, který jste přesunuli nebo jemuž jste změnili velikost, drží své místo. Projeví se hned. |
 | **Zarovnání tlačítek panelu nástrojů** | `ui.toolbar_align`: Kde leží tlačítka podél panelu: Začátek (výchozí), Střed nebo Konec. Začátek je levá strana řádku a horní část sloupce; konec je pravá strana a spodek. Projeví se hned. |
 | **Připnout tlačítko pull request na konec** | `ui.toolbar_pr_pinned`: Zapnuto (výchozí): tlačítko pull request leží na samém konci panelu nástrojů (vpravo, ve sloupci dole) při jakémkoli zarovnání. Vypnuto: plyne spolu s ostatními tlačítky a zarovnává se s nimi. Projeví se hned. |
 | **Umístění stavového řádku** | `ui.statusbar_position`: Kde je stavový řádek (větev, počty, zprávy, nápověda kláves): Nahoře, nad kartami repozitářů, nebo Dole (výchozí). Karta Domů si ponechává vlastní stavový řádek dole. Projeví se hned. |
@@ -691,10 +700,10 @@ Zpráva, kterou formulář commitu začíná (`gitpoulpi ui show settings commit
 (viz [Řešení konfliktů při slučování](merge-conflicts.md#prevence-konfliktů)):
 
 - **Zapnout proaktivní detekci konfliktů** (u cílové větve): ve výchozím stavu zapnuto. Zrušení zaškrtnutí vypne detekci
-  jen pro tento repozitář; globální přepínač je **Zapnout proaktivní detekci konfliktů** na stránce Obecné.
+  jen pro tento repozitář; globální přepínač je **Zapnout proaktivní detekci konfliktů** na globální stránce **Prevence konfliktů**.
   Oba musí být zapnuté.
 - **Základní větve z**: odkud se berou základní větve tohoto repozitáře. **Výchozí** sleduje globální výchozí
-  (vestavěné `**`, nebo seznam zvolený pod **Výchozí základní větve** v Nastavení > Obecné); **Seznam: <název>**
+  (vestavěné `**`, nebo seznam zvolený pod **Výchozí základní větve** v Nastavení > Prevence konfliktů); **Seznam: <název>**
   sleduje jeden z vašich pojmenovaných seznamů, takže úprava seznamu změní i tento repozitář; **Vlastní seznam** je
   seznam jen tohoto repozitáře (jeho volba začne kopií vzorů, které právě platí). Soubor repozitáře zapsaný před
   existencí této volby a obsahující vlastní vzory se čte jako **Vlastní seznam**.
@@ -713,7 +722,7 @@ Zpráva, kterou formulář commitu začíná (`gitpoulpi ui show settings commit
   s vyloučeními znamená „každá větev kromě těchto“. Volba se ukládá do `repo-state.toml` a znovu se čte po zavření
   Nastavení.
 - **Uložit jako seznam...**: zadejte název a stiskněte `Enter`; platné vzory se stanou pojmenovaným seznamem (týmž,
-  který upravuje Nastavení > Obecné) a tento repozitář ho sleduje.
+  který upravuje Nastavení > Prevence konfliktů) a tento repozitář ho sleduje.
 - **Obnovit výchozí** (nejprve se zeptá): zahodí volbu, seznam a vlastní vzory tohoto repozitáře; znovu sleduje výchozí.
 - **Použít základní větve workflow** (zobrazí se, když je pro repozitář nastaven [větvicí workflow](branching-workflows.md)
   se základními větvemi): naplní **Vlastní seznam** těmito základními větvemi, každou jako lokální větev i jako větev

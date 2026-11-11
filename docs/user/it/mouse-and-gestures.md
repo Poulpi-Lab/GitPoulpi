@@ -43,8 +43,9 @@ valgono le stesse regole:
   ignora un clic all'esterno, così un clic involontario non te lo fa perdere. `✕` e `Esc`
   chiedono prima **Scartare le modifiche?**; **Modifica ancora** torna indietro. Un modulo
   senza testo digitato si chiude subito, come un dialogo a riga singola.
-- I menu, gli elenchi a discesa, la palette e i selettori non hanno la `✕`: si chiudono con
-  `Esc` o con un clic all'esterno.
+- Anche la palette dei comandi, i selettori (schede, tema, lingua), i piccoli dialoghi di
+  revisione, board, merge e compositore e la richiesta di conferma hanno la `✕`. I menu
+  contestuali e gli elenchi a discesa no: si chiudono con `Esc` o con un clic all'esterno.
 
 ## Elenchi nelle Impostazioni
 
@@ -431,13 +432,32 @@ Per il mouse nella vista immagine vedi [Immagini](image-view.md).
 
 ## Spostare e ridimensionare le finestre
 
-La finestra Cronologia annullamenti / Reflog / Lavoro perso si può spostare e ridimensionare:
+Le finestre si possono spostare, e quelle più grandi ridimensionare:
 
-- **Trascina la barra del titolo** per spostarla (la croce di chiusura conserva il suo clic).
-- **Trascina il bordo sinistro, destro o inferiore**, oppure un angolo in basso (la maniglia `◢`), per ridimensionarla. La finestra resta sullo schermo e non diventa mai più piccola di 60 x 16.
+- **Trascina la barra del titolo** per spostare una finestra (la croce di chiusura conserva il suo clic). La palette dei comandi e i selettori non hanno una barra del titolo separata: trascina il bordo superiore.
+- **Trascina il bordo sinistro, destro o inferiore**, oppure un angolo in basso (la maniglia `◢`), per ridimensionare una finestra. La finestra resta sullo schermo e non diventa mai più piccola del suo minimo (60 x 16 per la Cronologia annullamenti, meno per le altre). Una finestra ridimensionata usa lo spazio: le aree di testo e gli elenchi crescono, il testo va a capo alla nuova larghezza.
 - Il trascinamento continua quando il puntatore esce dalla finestra, e rilasciare fuori non la chiude mai.
-- **Trascina i divisori** tra il suo elenco, l'elenco dei file e gli hunk; il doppio clic su uno lo reimposta.
-- Gli equivalenti da tastiera sono `Ctrl+N` poi `m` (le frecce spostano, `Maiusc`+frecce ridimensionano, `0` reimposta, `Invio` o `Esc` escono) e `Alt`+frecce per i divisori; la palette ha `Finestra: Sposta o ridimensiona` e `Finestra: Reimposta posizione e dimensione`.
+- **Trascina i divisori** all'interno della vista Reflog / Lavoro perso della Cronologia annullamenti; il doppio clic su uno lo reimposta.
+- Gli equivalenti da tastiera sono `Ctrl+N` poi `m` (le frecce spostano, `Maiusc`+frecce ridimensionano, `0` reimposta, `Invio` o `Esc` escono) e `Alt`+frecce per i divisori; la palette ha `Finestra: Sposta o ridimensiona` e `Finestra: Reimposta posizione e dimensione`. Agiscono sulla finestra in primo piano. Le superfici che usano `Ctrl+N` per badge propri (il modulo del messaggio di commit, la pagina di riscrittura della cronologia) accettano lo stesso `m` dopo il loro `Ctrl+N`, e la barra di stato lo indica. La palette dei comandi e i selettori usano `Ctrl+N` per scendere nell'elenco, quindi per loro il tasto è `Alt+G` (`palette.arrange`), oppure la riga `Finestra: Sposta o ridimensiona` della palette: entrambi dispongono il popup in primo piano e lo lasciano aperto.
+- **Un'unica impostazione** (`ui.dialog_geometry`, Impostazioni > Aspetto > Layout) vale per tutte le finestre: ognuna ricorda la propria posizione e dimensione per questa sessione, su disco per il prossimo avvio, oppure mai.
+
+| Dialogo | Sposta | Ridimensiona |
+|---|---|---|
+| Cronologia annullamenti / Reflog / Lavoro perso, Registro attività, pannello dei job, selettore di cartelle | sì | sì |
+| Palette dei comandi, selettori di scheda / tema / lingua, ricerca nei workspace | sì | sì (l'elenco cresce con l'altezza, le righe con la larghezza) |
+| Clona (l'elenco dei repository), Pull request e Nuova issue (la descrizione), «Cosa viene inviato» (il pannello), Mermaid (l'anteprima), opzioni di revisione (i campi, solo la larghezza) | sì | sì |
+| Editor di testo lungo delle Impostazioni (modelli, hook, prompt IA), la casella IA del modulo del workspace | sì | sì (l'area di testo) |
+| Riscrittura della cronologia: i due dialoghi di aiuto IA | sì | sì (la descrizione, il pannello inviato) |
+| Informazioni, pannello degli aggiornamenti, controllo di sicurezza, conflitti previsti, «Oltre il limite IA», eliminazione di tag, file sensibili | sì | no (la dimensione segue il testo) |
+| Init, Worktree, Sparse checkout, dialogo Flow, dialoghi del flusso delle issue, modulo del messaggio di commit (reword), modulo del Workspace, selettori di etichetta / milestone | sì | no |
+| Conferme (ogni «Sei sicuro?») | sì | no |
+| Dialoghi di Revisione e Board: i loro piccoli dialoghi (commento, termina, scelta, colonne) | sì | no |
+| Popup della pagina Scorciatoie (conferma di ripristino, cattura del tasto), il popup della risposta IA | sì | no |
+| Impostazioni: i risultati e la conferma dell'autenticazione del repository | sì | no |
+| Riscrittura della cronologia: dialoghi di eliminazione, identità e domande | sì | no |
+| Popup di spostamento di un file del compositore di commit, avvisi di merge | sì | no |
+
+Non si possono spostare: le schermate a pagina intera (Impostazioni, Aiuto, le pagine Revisione e Board, che riempiono già la finestra), i menu contestuali e gli elenchi a discesa (restano agganciati a ciò che li ha aperti), i tooltip e i piccoli popup dentro una pagina (il modulo dei remote, l'editor di divisione del commit).
 
 Il puntatore mostra una forma di spostamento sopra la barra del titolo e una di ridimensionamento sopra i bordi e gli angoli (terminali con `OSC 22`).
 

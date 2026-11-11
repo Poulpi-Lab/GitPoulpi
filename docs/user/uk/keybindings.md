@@ -952,12 +952,17 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Історія скасувань: закрити | `Esc` |
 | Reflog: показати в Log | `s` |
 | Reflog: створити гілку тут... | `b` |
+| Reflog: Create Tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as Stash | `z` |
 | Reflog: відновити на цю позицію... | `r` |
 | Reflog: завантажити ще | `m` |
 | Reflog: оновити |  |
-| Втрачена робота: показати в Log | `s` |
 | Втрачена робота: створити гілку тут... | `b` |
+| Lost Work: Create Tag Here... | `t` |
 | Втрачена робота: cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as Stash | `z` |
 | Втрачена робота: сканувати знову |  |
 | Вигляд: оновити | `r` |
 | Вигляд: оновити (fetch, pull requests, issues) | `F5` |

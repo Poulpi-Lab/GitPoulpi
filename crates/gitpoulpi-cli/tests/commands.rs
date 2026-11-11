@@ -2018,3 +2018,95 @@ fn amend_changes_chosen_properties_and_refuses_bad_input() {
     }
     assert_eq!(head(repo.root(), session), outcome.new_head);
 }
+
+/// `apply-commit` replays a lost commit's changes onto the working tree
+/// (JSON `{files}`), `undo` takes them back, a merge commit is an error.
+#[test]
+fn apply_commit_restores_a_lost_commit_and_undo_takes_it_back() {
+    use gitpoulpi_core::domain::PatchApplied;
+
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit_file("keep.txt", "keep\n", "first")
+        .unwrap()
+        .build();
+    let session = "cli-test-apply-commit";
+    std::fs::write(repo.root().join("keep.txt"), "keep\nplus\n").unwrap();
+    std::fs::write(repo.root().join("added.txt"), "new\n").unwrap();
+    repo.git(&["add", "-A"]);
+    repo.git(&["commit", "-q", "-m", "lost work"]);
+    let lost = repo.git(&["rev-parse", "HEAD"]);
+    repo.git(&["reset", "-q", "--hard", "HEAD~1"]);
+
+    let applied: PatchApplied = parse(run_json(
+        repo.root(),
+        session,
+        &["apply-commit", lost.trim()],
+    ));
+    let mut files = applied.files;
+    files.sort();
+    assert_eq!(files, ["added.txt", "keep.txt"]);
+    assert_eq!(
+        std::fs::read_to_string(repo.root().join("keep.txt")).unwrap(),
+        "keep\nplus\n"
+    );
+
+    let _undone: Value = run_json(repo.root(), session, &["undo", "--yes"]);
+    assert_eq!(
+        std::fs::read_to_string(repo.root().join("keep.txt")).unwrap(),
+        "keep\n"
+    );
+    assert!(!repo.root().join("added.txt").exists());
+
+    // Changed meanwhile: the apply fails and nothing moves.
+    std::fs::write(repo.root().join("keep.txt"), "other\n").unwrap();
+    let output = Command::cargo_bin("gitpoulpi")
+        .unwrap()
+        .env("GITPOULPI_CONFIG_DIR", isolated_config_dir())
+        .args(["--json", "--session", session])
+        .args(["--repo", &repo.root().to_string_lossy()])
+        .args(["apply-commit", lost.trim()])
+        .current_dir(repo.root())
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let value: Value = serde_json::from_slice(&output.stdout).expect("error output was not JSON");
+    assert!(value["error"].is_string(), "{value}");
+    assert!(!repo.root().join("added.txt").exists());
+}
+
+/// `stash from-commit` puts a stash of the commit's changes on top of the
+/// list and leaves the tree alone; `undo` drops it.
+#[test]
+fn stash_from_commit_saves_a_lost_commit_as_a_stash() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit_file("a.txt", "a\n", "first")
+        .unwrap()
+        .build();
+    let session = "cli-test-stash-from-commit";
+    std::fs::write(repo.root().join("a.txt"), "a\nlost\n").unwrap();
+    repo.git(&["commit", "-q", "-am", "lost work"]);
+    let lost = repo.git(&["rev-parse", "HEAD"]);
+    repo.git(&["reset", "-q", "--hard", "HEAD~1"]);
+
+    let out = run_json(
+        repo.root(),
+        session,
+        &["stash", "from-commit", lost.trim(), "-m", "rescued"],
+    );
+    assert_eq!(out["from"], lost.trim());
+    assert!(out["commit"].is_string(), "{out}");
+    let list = run_json(repo.root(), session, &["stash", "list"]);
+    let list = list.as_array().unwrap();
+    assert_eq!(list.len(), 1, "{list:?}");
+    assert!(list[0]["message"].as_str().unwrap().contains("rescued"));
+    assert_eq!(
+        std::fs::read_to_string(repo.root().join("a.txt")).unwrap(),
+        "a\n"
+    );
+
+    let _undone: Value = run_json(repo.root(), session, &["undo", "--yes"]);
+    let list = run_json(repo.root(), session, &["stash", "list"]);
+    assert!(list.as_array().unwrap().is_empty(), "{list}");
+}

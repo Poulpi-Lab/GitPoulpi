@@ -951,12 +951,17 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 실행 취소 기록: 닫기 | `Esc` |
 | Reflog: Log에서 보기 | `s` |
 | Reflog: 여기에 브랜치 만들기... | `b` |
+| Reflog: Create Tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as Stash | `z` |
 | Reflog: 이 위치로 복원... | `r` |
 | Reflog: 더 불러오기 | `m` |
 | Reflog: 새로 고침 |  |
-| 잃어버린 작업: Log에서 보기 | `s` |
 | 잃어버린 작업: 여기에 브랜치 만들기... | `b` |
+| Lost Work: Create Tag Here... | `t` |
 | 잃어버린 작업: Cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as Stash | `z` |
 | 잃어버린 작업: 다시 검사 |  |
 | 보기: 새로 고침 | `r` |
 | 보기: 새로 고침 (fetch, pull request, 이슈) | `F5` |

@@ -42,6 +42,9 @@ gitpoulpi --json diff [--staged]
 gitpoulpi --json stage --file src/main.rs [--hunk 0 [--lines 2,3]]
 gitpoulpi --json commit -m "fix: handle empty input"
 gitpoulpi --json undo --dry-run            # then: undo [--yes]
+gitpoulpi --json lost-commits               # then, to get one's work back without committing it:
+gitpoulpi --json apply-commit <rev>        # its changes onto the working tree, all or nothing (fails: nothing changed); undoable
+gitpoulpi --json stash from-commit <rev> [-m "rescued"]   # or keep them as a stash; working tree untouched; undoable
 gitpoulpi --json branch create feature HEAD~1
 gitpoulpi --json checkout feature --autostash
 gitpoulpi --json pull --mode ff-only

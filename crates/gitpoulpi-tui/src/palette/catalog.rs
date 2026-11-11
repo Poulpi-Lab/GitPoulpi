@@ -2639,6 +2639,21 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::Safety(SafetyCmd::ReflogBranch),
     ),
     entry(
+        msg::palette::REFLOG_CREATE_TAG,
+        "t",
+        PaletteCommand::Safety(SafetyCmd::ReflogTag),
+    ),
+    entry(
+        msg::palette::REFLOG_APPLY_TO_WORKTREE,
+        "w",
+        PaletteCommand::Safety(SafetyCmd::ReflogApply),
+    ),
+    entry(
+        msg::palette::REFLOG_SAVE_AS_STASH,
+        "z",
+        PaletteCommand::Safety(SafetyCmd::ReflogStash),
+    ),
+    entry(
         msg::palette::REFLOG_RESTORE,
         "r",
         PaletteCommand::Safety(SafetyCmd::ReflogRestore),
@@ -2654,19 +2669,29 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::Safety(SafetyCmd::ReflogRefresh),
     ),
     entry(
-        msg::palette::LOST_WORK_SHOW_IN_LOG,
-        "s",
-        PaletteCommand::Safety(SafetyCmd::LostShow),
-    ),
-    entry(
         msg::palette::LOST_WORK_CREATE_BRANCH,
         "b",
         PaletteCommand::Safety(SafetyCmd::LostBranch),
     ),
     entry(
+        msg::palette::LOST_WORK_CREATE_TAG,
+        "t",
+        PaletteCommand::Safety(SafetyCmd::LostTag),
+    ),
+    entry(
         msg::palette::LOST_WORK_CHERRY_PICK,
         "c",
         PaletteCommand::Safety(SafetyCmd::LostPick),
+    ),
+    entry(
+        msg::palette::LOST_WORK_APPLY_TO_WORKTREE,
+        "w",
+        PaletteCommand::Safety(SafetyCmd::LostApply),
+    ),
+    entry(
+        msg::palette::LOST_WORK_SAVE_AS_STASH,
+        "z",
+        PaletteCommand::Safety(SafetyCmd::LostStash),
     ),
     entry(
         msg::palette::LOST_WORK_REFRESH,

@@ -9,6 +9,7 @@ use gitpoulpi_core::domain::{
     EntryState, EntrySummary, JournalListing, ListedEntry, OperationKind, RestoreOffer,
 };
 
+use super::input::act_for_key;
 use super::*;
 
 pub(super) fn key(code: KeyCode) -> KeyEvent {
@@ -449,4 +450,154 @@ fn an_outside_click_cancels_an_open_confirmation_before_closing() {
     assert!(panel.overlay.is_none(), "the confirmation got Cancel");
     painted(&mut panel);
     assert!(matches!(panel.on_mouse(press(0, 0)), PanelOutcome::Close));
+}
+
+fn lost_panel() -> (SafetyPanel, Arc<crate::activity::Activity>) {
+    let activity = Arc::new(crate::activity::Activity::default());
+    let mut panel = SafetyPanel::open(activity.clone(), Tab::Lost, None, 100);
+    panel.lost.commits = vec![gitpoulpi_core::domain::LostCommit {
+        oid: oid_of('c'),
+        summary: "lost work".into(),
+        author: "A".into(),
+        time: 0,
+        parents: vec![oid_of('d')],
+        source: gitpoulpi_core::domain::LostSource::Reflog,
+    }];
+    panel.lost.loaded = true;
+    // The open view asked the daemon for its lists; only the actions count.
+    activity.raw.queued();
+    (panel, activity)
+}
+
+/// Lost work has no "Show in Log" (a lost commit is not in the Log) but a
+/// tag, "Apply to working tree" and "Save as stash"; Reflog keeps its own.
+#[test]
+fn lost_work_offers_tag_apply_and_stash_but_no_show_in_log() {
+    let (panel, _) = lost_panel();
+    let state = panel.journal_state();
+    let acts = panel.actions(&state);
+    assert!(!acts.contains(&Act::ShowInLog), "{acts:?}");
+    for act in [
+        Act::CreateBranch,
+        Act::CreateTag,
+        Act::CherryPick,
+        Act::ApplyToWorktree,
+        Act::SaveAsStash,
+    ] {
+        assert!(acts.contains(&act), "{act:?} in {acts:?}");
+    }
+    // The letter `s` does nothing in Lost work; it is Show in Log in the Reflog.
+    assert_eq!(act_for_key('s', Tab::Lost), None);
+    assert_eq!(act_for_key('s', Tab::Reflog), Some(Act::ShowInLog));
+    for tab in [Tab::Lost, Tab::Reflog] {
+        assert_eq!(act_for_key('t', tab), Some(Act::CreateTag));
+        assert_eq!(act_for_key('w', tab), Some(Act::ApplyToWorktree));
+        assert_eq!(act_for_key('z', tab), Some(Act::SaveAsStash));
+    }
+}
+
+#[test]
+fn create_tag_asks_for_a_name_that_defaults_to_restored_short_id() {
+    let (mut panel, activity) = lost_panel();
+    panel.on_key(key(KeyCode::Char('t')));
+    let Some(Overlay::Name(n)) = &panel.overlay else {
+        panic!("a name prompt");
+    };
+    assert!(matches!(n.purpose, NameFor::Tag { at } if at == oid_of('c')));
+    assert_eq!(n.value, format!("restored-{}", short(oid_of('c'))));
+    panel.on_key(key(KeyCode::Enter));
+    assert!(matches!(panel.job, Some(Job::Tag { .. })));
+    let sent = activity.raw.queued();
+    assert_eq!(sent.len(), 1, "{sent:?}");
+    assert_eq!(sent[0].0, OperationKind::TagCreate);
+    assert_eq!(sent[0].1["at"], serde_json::json!(oid_of('c')));
+    assert_eq!(
+        sent[0].1["name"],
+        format!("restored-{}", short(oid_of('c')))
+    );
+}
+
+#[test]
+fn apply_runs_the_apply_operation_and_save_as_stash_the_stash_one() {
+    let (mut panel, activity) = lost_panel();
+    panel.on_key(key(KeyCode::Char('w')));
+    assert!(matches!(panel.job, Some(Job::Apply { .. })));
+    let sent = activity.raw.queued();
+    assert_eq!(sent[0].0, OperationKind::ApplyCommit);
+    assert_eq!(sent[0].1["commit"], serde_json::json!(oid_of('c')));
+
+    panel.job = None;
+    panel.on_key(key(KeyCode::Char('z')));
+    assert!(matches!(panel.job, Some(Job::Stash { .. })));
+    let sent = activity.raw.queued();
+    assert_eq!(sent[0].0, OperationKind::StashFromCommit);
+    assert_eq!(sent[0].1["commit"], serde_json::json!(oid_of('c')));
+}
+
+/// A failed apply changes nothing and offers the stash; accepting it runs
+/// the stash operation, declining leaves the panel as it was.
+#[test]
+fn a_failed_apply_offers_save_as_stash() {
+    let (mut panel, activity) = lost_panel();
+    panel.job = Some(Job::Apply {
+        commit: oid_of('c'),
+        pending: Reply::ready(Err(CoreError::Backend("hunk 1 does not apply".into()))),
+    });
+    panel.poll();
+    let Some(Overlay::Confirm(c)) = &panel.overlay else {
+        panic!("a question");
+    };
+    assert!(
+        c.lines[0].contains("hunk 1 does not apply"),
+        "{:?}",
+        c.lines
+    );
+    assert_eq!(c.button, m::BTN_STASH.get());
+    assert!(matches!(c.next, Next::Stash { commit } if commit == oid_of('c')));
+    assert!(panel.job.is_none());
+
+    panel.on_key(key(KeyCode::Enter));
+    assert!(matches!(panel.job, Some(Job::Stash { .. })));
+    assert!(activity
+        .raw
+        .queued()
+        .iter()
+        .any(|(op, _)| *op == OperationKind::StashFromCommit));
+
+    // Esc on the question declines it.
+    panel.job = Some(Job::Apply {
+        commit: oid_of('c'),
+        pending: Reply::ready(Err(CoreError::ApplyRefused(
+            gitpoulpi_core::domain::ApplyRefusal::MergeCommit,
+        ))),
+    });
+    panel.poll();
+    assert!(panel.overlay.is_some());
+    panel.on_key(key(KeyCode::Esc));
+    assert!(panel.overlay.is_none() && panel.job.is_none());
+}
+
+#[test]
+fn the_palette_rows_of_the_new_actions_say_why_they_are_greyed() {
+    let activity = Arc::new(crate::activity::Activity::default());
+    let mut panel = SafetyPanel::open(activity, Tab::Lost, None, 100);
+    let state = panel.journal_state();
+    // No row yet.
+    for cmd in [
+        SafetyCmd::LostTag,
+        SafetyCmd::LostApply,
+        SafetyCmd::LostStash,
+    ] {
+        let (_, why) = panel.run_command(cmd, &state);
+        assert_eq!(why.as_deref(), Some(m::WHY_NO_ROW.get()), "{cmd:?}");
+    }
+    // The Reflog rows need the Reflog view.
+    for cmd in [
+        SafetyCmd::ReflogTag,
+        SafetyCmd::ReflogApply,
+        SafetyCmd::ReflogStash,
+    ] {
+        let (_, why) = panel.run_command(cmd, &state);
+        assert_eq!(why.as_deref(), Some(m::WHY_OPEN_REFLOG.get()), "{cmd:?}");
+    }
 }

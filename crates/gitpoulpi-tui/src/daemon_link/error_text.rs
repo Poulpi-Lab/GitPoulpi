@@ -44,6 +44,8 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
             RewordRefusal::InvalidDate => msg::typed_error::REWORD_INVALID_DATE,
         }),
         TypedError::SplitRefused(r) => msg::typed_error::split_refused(split_refusal(*r)),
+        // English until the catalogs get words for it (the translators run later).
+        TypedError::ApplyRefused(r) => CoreError::ApplyRefused(*r).to_string(),
         TypedError::RewriteRefused(refusal, detail) => {
             msg::typed_error::rewrite_refused(rewrite_refusal(*refusal), rewrite_detail(detail))
         }

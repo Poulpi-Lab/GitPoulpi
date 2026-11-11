@@ -19,12 +19,17 @@ pub(crate) enum SafetyCmd {
     HistoryRefresh,
     ReflogShow,
     ReflogBranch,
+    ReflogTag,
+    ReflogApply,
+    ReflogStash,
     ReflogRestore,
     ReflogMore,
     ReflogRefresh,
-    LostShow,
     LostBranch,
+    LostTag,
     LostPick,
+    LostApply,
+    LostStash,
     LostRefresh,
     /// Closes the panel, whatever view is open.
     Close,
@@ -41,12 +46,18 @@ impl SafetyCmd {
             | Self::HistoryRefresh => Some(Tab::History),
             Self::ReflogShow
             | Self::ReflogBranch
+            | Self::ReflogTag
+            | Self::ReflogApply
+            | Self::ReflogStash
             | Self::ReflogRestore
             | Self::ReflogMore
             | Self::ReflogRefresh => Some(Tab::Reflog),
-            Self::LostShow | Self::LostBranch | Self::LostPick | Self::LostRefresh => {
-                Some(Tab::Lost)
-            }
+            Self::LostBranch
+            | Self::LostTag
+            | Self::LostPick
+            | Self::LostApply
+            | Self::LostStash
+            | Self::LostRefresh => Some(Tab::Lost),
             Self::Close => None,
         }
     }
@@ -58,8 +69,11 @@ impl SafetyCmd {
             Self::RedoTo => Act::RedoTo,
             Self::RestoreOnly => Act::RestoreOnly,
             Self::Offer => Act::Offer,
-            Self::ReflogShow | Self::LostShow => Act::ShowInLog,
+            Self::ReflogShow => Act::ShowInLog,
             Self::ReflogBranch | Self::LostBranch => Act::CreateBranch,
+            Self::ReflogTag | Self::LostTag => Act::CreateTag,
+            Self::ReflogApply | Self::LostApply => Act::ApplyToWorktree,
+            Self::ReflogStash | Self::LostStash => Act::SaveAsStash,
             Self::ReflogRestore => Act::RestoreRef,
             Self::ReflogMore => Act::LoadMore,
             Self::LostPick => Act::CherryPick,

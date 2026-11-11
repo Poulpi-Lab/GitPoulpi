@@ -960,12 +960,17 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Historique d'annulation : Fermer | `Esc` |
 | Reflog : Afficher dans le Log | `s` |
 | Reflog : Créer une branche ici... | `b` |
+| Reflog : Créer tag ici... | `t` |
+| Reflog : Appliquer les changements à l'arbre de travail | `w` |
+| Reflog : Mettre les changements de côté | `z` |
 | Reflog : Restaurer à cette position... | `r` |
 | Reflog : Charger la suite | `m` |
 | Reflog : Actualiser |  |
-| Travail perdu : Afficher dans le Log | `s` |
 | Travail perdu : Créer une branche ici... | `b` |
+| Travail perdu : Créer tag ici... | `t` |
 | Travail perdu : Cherry-pick | `c` |
+| Travail perdu : Appliquer les changements à l'arbre de travail | `w` |
+| Travail perdu : Mettre les changements de côté | `z` |
 | Travail perdu : Relancer la recherche |  |
 | Affichage : Actualiser | `r` |
 | Affichage : Actualiser (fetch, pull requests, tickets) | `F5` |

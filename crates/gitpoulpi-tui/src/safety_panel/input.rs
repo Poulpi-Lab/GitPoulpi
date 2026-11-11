@@ -9,15 +9,18 @@ use crate::combo::ComboOutcome;
 use crate::dialog_kit;
 
 /// The letter that does `act` (the buttons show it in the hint line).
-fn act_for_key(c: char, tab: Tab) -> Option<Act> {
+pub(super) fn act_for_key(c: char, tab: Tab) -> Option<Act> {
     match (c, tab) {
         ('u', Tab::History) => Some(Act::UndoTo),
         ('y', Tab::History) => Some(Act::RedoTo),
         ('r', Tab::History) => Some(Act::RestoreOnly),
         ('o', Tab::History) => Some(Act::Offer),
         ('r', Tab::Reflog) => Some(Act::RestoreRef),
-        ('s', Tab::Reflog | Tab::Lost) => Some(Act::ShowInLog),
+        ('s', Tab::Reflog) => Some(Act::ShowInLog),
         ('b', Tab::Reflog | Tab::Lost) => Some(Act::CreateBranch),
+        ('t', Tab::Reflog | Tab::Lost) => Some(Act::CreateTag),
+        ('w', Tab::Reflog | Tab::Lost) => Some(Act::ApplyToWorktree),
+        ('z', Tab::Reflog | Tab::Lost) => Some(Act::SaveAsStash),
         ('m', Tab::Reflog) => Some(Act::LoadMore),
         ('c', Tab::Lost) => Some(Act::CherryPick),
         _ => None,

@@ -962,12 +962,17 @@ applicano. I tasti sono quelli predefiniti.
 | Cronologia annullamenti: Chiudi | `Esc` |
 | Reflog: Mostra nel Log | `s` |
 | Reflog: Crea branch qui... | `b` |
+| Reflog: Create Tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as Stash | `z` |
 | Reflog: Ripristina a questa posizione... | `r` |
 | Reflog: Carica altro | `m` |
 | Reflog: Aggiorna |  |
-| Lavoro perso: Mostra nel Log | `s` |
 | Lavoro perso: Crea branch qui... | `b` |
+| Lost Work: Create Tag Here... | `t` |
 | Lavoro perso: Cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as Stash | `z` |
 | Lavoro perso: Cerca di nuovo |  |
 | Vista: Aggiorna | `r` |
 | Vista: Aggiorna (fetch, pull request, issue) | `F5` |

@@ -87,9 +87,12 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::TagPush
         | K::TagDeleteRemote
         | K::TagFetch => Family::Tag,
-        K::StashPush | K::StashPop | K::StashApply | K::StashDrop | K::AutoStashStartOver => {
-            Family::Stash
-        }
+        K::StashPush
+        | K::StashFromCommit
+        | K::StashPop
+        | K::StashApply
+        | K::StashDrop
+        | K::AutoStashStartOver => Family::Stash,
         K::Reset | K::JournalRestore | K::ReflogRestore | K::Undo | K::Redo => Family::Move,
         K::Merge
         | K::Rebase
@@ -109,6 +112,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::AmAbort => Family::Merge,
         K::Discard | K::DiscardHunk | K::DiscardLine | K::DeleteFile => Family::Discard,
         K::PatchApply
+        | K::ApplyCommit
         | K::ConvertFiles
         | K::AddToGitignore
         | K::MailmapAdd
@@ -479,6 +483,8 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
             let (name, target) = rest("Restore ")?.rsplit_once(" to ")?;
             Some(l::reflog_restore(name, target))
         }
+        // `ApplyCommit` / `StashFromCommit` rows read as the daemon stored
+        // them until their catalog words are translated (see `WITHOUT_WORDS`).
         // Recorded by no code path today, or with no words of their own:
         // the stored text stands. The server operations here (LFS fetch,
         // pull, checkout, push, TagPush, ...) cannot reach the journal at all:
@@ -487,6 +493,8 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         // source entry's words and an outside move is `K::Outside`. Give one
         // a template here the day it is journaled.
         K::Init
+        | K::ApplyCommit
+        | K::StashFromCommit
         | K::Fetch
         | K::FetchAll
         | K::FetchRefspec

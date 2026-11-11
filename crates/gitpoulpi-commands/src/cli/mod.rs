@@ -658,6 +658,15 @@ pub enum Commands {
         #[arg(short = 'm', long, value_name = "PARENT")]
         mainline: Option<u32>,
     },
+    /// Apply the changes one commit made (even a lost one) to the working
+    /// tree only: the index and HEAD stay. All or nothing: when a file does
+    /// not apply cleanly nothing changes (`stash from-commit` keeps the
+    /// changes as a stash instead). A merge commit is refused. `undo`
+    /// takes it back.
+    ApplyCommit {
+        /// The commit whose changes to apply (any revision: a sha, `HEAD~2`, ...).
+        commit: String,
+    },
     /// Give a commit of the current branch a new message (its
     /// descendants are re-created on top; index and working tree are
     /// left alone). A pushed commit then needs a force push.

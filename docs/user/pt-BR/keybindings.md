@@ -956,12 +956,17 @@ As teclas são as padrão.
 | Histórico de desfazer: fechar | `Esc` |
 | Reflog: mostrar no Log | `s` |
 | Reflog: criar branch aqui... | `b` |
+| Reflog: Create Tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as Stash | `z` |
 | Reflog: restaurar para esta posição... | `r` |
 | Reflog: carregar mais | `m` |
 | Reflog: atualizar |  |
-| Trabalho perdido: mostrar no Log | `s` |
 | Trabalho perdido: criar branch aqui... | `b` |
+| Lost Work: Create Tag Here... | `t` |
 | Trabalho perdido: cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as Stash | `z` |
 | Trabalho perdido: buscar de novo |  |
 | Exibir: atualizar | `r` |
 | Exibir: atualizar (fetch, pull requests, issues) | `F5` |

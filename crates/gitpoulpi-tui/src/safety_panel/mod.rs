@@ -5,9 +5,12 @@
 //!   when and its state. *Undo up to here*, *Restore only this* (the one
 //!   entry's removal undone, later actions kept) and *Redo up to here*.
 //! - **Reflog**: where a branch or HEAD was before, including moves made
-//!   outside GitPoulpi. *Show in Log*, *Create branch here*, *Restore the
-//!   branch to this position*.
-//! - **Lost work**: commits no ref reaches. *Create branch here*, *Cherry-pick*.
+//!   outside GitPoulpi. *Show in Log*, *Create branch here*, *Create tag
+//!   here*, *Apply to working tree* / *Save as stash*, *Restore the branch
+//!   to this position*.
+//! - **Lost work**: commits no ref reaches. *Create branch here*, *Create
+//!   tag here*, *Cherry-pick*, *Apply to working tree* / *Save as stash*
+//!   (no "Show in Log": a lost commit is not in the Log).
 //!
 //! The panel is an IPC client like the rest of the TUI: every read and
 //! every change is a request on the link's connection (`daemon_link::raw`),
@@ -73,6 +76,12 @@ pub(crate) enum Act {
     CreateBranch,
     RestoreRef,
     CherryPick,
+    /// `Create tag here` (`t`): a tag at the selected commit.
+    CreateTag,
+    /// `Apply to working tree` (`w`): the commit's changes onto the files.
+    ApplyToWorktree,
+    /// `Save as stash` (`z`): the commit's changes kept as a stash.
+    SaveAsStash,
     /// Reflog only: fetch the next page of positions.
     LoadMore,
 }
@@ -247,6 +256,11 @@ pub(crate) enum Next {
         oid: Oid,
         mode: Option<String>,
     },
+    /// Keep the commit's changes as a stash (what is offered when applying
+    /// them to the working tree failed).
+    Stash {
+        commit: Oid,
+    },
 }
 
 pub(crate) struct Confirm {
@@ -271,6 +285,8 @@ pub(crate) enum NameFor {
     Restore { id: u64 },
     /// `Create branch here`.
     Branch { at: Oid },
+    /// `Create tag here`.
+    Tag { at: Oid },
 }
 
 pub(crate) struct NamePrompt {
@@ -330,6 +346,18 @@ pub(crate) enum Job {
         at: Oid,
         pending: Reply<()>,
     },
+    Tag {
+        name: String,
+        at: Oid,
+        pending: Reply<()>,
+    },
+    /// `Apply to working tree`.
+    Apply {
+        commit: Oid,
+        pending: Reply<gitpoulpi_core::domain::PatchApplied>,
+    },
+    /// `Save as stash`.
+    Stash { commit: Oid, pending: Reply<Oid> },
 }
 
 impl Job {
@@ -680,7 +708,13 @@ impl SafetyPanel {
             Tab::Reflog => {
                 let mut acts = Vec::new();
                 if self.selected_reflog().is_some() {
-                    acts.extend([Act::ShowInLog, Act::CreateBranch]);
+                    acts.extend([
+                        Act::ShowInLog,
+                        Act::CreateBranch,
+                        Act::CreateTag,
+                        Act::ApplyToWorktree,
+                        Act::SaveAsStash,
+                    ]);
                     if self.reflog_target().is_some() {
                         acts.push(Act::RestoreRef);
                     }
@@ -694,7 +728,14 @@ impl SafetyPanel {
                 if self.selected_lost().is_none() {
                     return Vec::new();
                 }
-                vec![Act::ShowInLog, Act::CreateBranch, Act::CherryPick]
+                // No "Show in Log": a lost commit is not in the Log.
+                vec![
+                    Act::CreateBranch,
+                    Act::CreateTag,
+                    Act::CherryPick,
+                    Act::ApplyToWorktree,
+                    Act::SaveAsStash,
+                ]
             }
         }
     }
@@ -749,12 +790,31 @@ impl SafetyPanel {
                     return PanelOutcome::Effect(PanelEffect::CherryPick(c.oid));
                 }
             }
+            Act::CreateTag => {
+                if let Some(at) = self.selected_commit() {
+                    self.overlay = Some(Overlay::Name(NamePrompt::new(
+                        m::name_tag(short(at)),
+                        format!("restored-{}", short(at)),
+                        NameFor::Tag { at },
+                    )));
+                }
+            }
+            Act::ApplyToWorktree => {
+                if let Some(commit) = self.selected_commit() {
+                    let pending = self.requester.call(
+                        OperationKind::ApplyCommit,
+                        serde_json::json!({ "commit": commit }),
+                    );
+                    self.job = Some(Job::Apply { commit, pending });
+                }
+            }
+            Act::SaveAsStash => {
+                if let Some(commit) = self.selected_commit() {
+                    self.start_stash(commit);
+                }
+            }
             Act::CreateBranch => {
-                let oid = match self.tab {
-                    Tab::Reflog => self.selected_reflog().map(|e| e.new),
-                    Tab::Lost => self.selected_lost().map(|c| c.oid),
-                    Tab::History => None,
-                };
+                let oid = self.selected_commit();
                 if let Some(at) = oid {
                     self.overlay = Some(Overlay::Name(NamePrompt::new(
                         m::name_branch(short(at)),
@@ -772,6 +832,23 @@ impl SafetyPanel {
             }
         }
         PanelOutcome::Stay
+    }
+
+    /// The commit the selected row of the Reflog or Lost work view names.
+    fn selected_commit(&self) -> Option<Oid> {
+        match self.tab {
+            Tab::Reflog => self.selected_reflog().map(|e| e.new),
+            Tab::Lost => self.selected_lost().map(|c| c.oid),
+            Tab::History => None,
+        }
+    }
+
+    fn start_stash(&mut self, commit: Oid) {
+        let pending = self.requester.call(
+            OperationKind::StashFromCommit,
+            serde_json::json!({ "commit": commit }),
+        );
+        self.job = Some(Job::Stash { commit, pending });
     }
 
     /// The rows an "up to here" on the selected row covers, in the order
@@ -893,6 +970,7 @@ impl SafetyPanel {
                     pending,
                 });
             }
+            Next::Stash { commit } => self.start_stash(commit),
             Next::ReflogRestore { refname, oid, mode } => {
                 let pending = self.requester.call(
                     OperationKind::ReflogRestore,
@@ -926,6 +1004,17 @@ impl SafetyPanel {
                     serde_json::json!({ "name": value, "at": at }),
                 );
                 self.job = Some(Job::Branch {
+                    name: value,
+                    at,
+                    pending,
+                });
+            }
+            NameFor::Tag { at } => {
+                let pending = self.requester.call(
+                    OperationKind::TagCreate,
+                    serde_json::json!({ "name": value, "at": at, "annotated_message": null }),
+                );
+                self.job = Some(Job::Tag {
                     name: value,
                     at,
                     pending,
@@ -1101,6 +1190,46 @@ impl SafetyPanel {
                 None => self.job = Some(Job::Branch { name, at, pending }),
                 Some(Ok(())) => {
                     let text = m::done_branch(name, short(at));
+                    effects.push(PanelEffect::Message(text.clone()));
+                    self.say(text);
+                }
+                Some(Err(e)) => self.complain(error_text::error_text(&e)),
+            },
+            Job::Tag { name, at, pending } => match pending.take() {
+                None => self.job = Some(Job::Tag { name, at, pending }),
+                Some(Ok(())) => {
+                    let text = m::done_tag(name, short(at));
+                    effects.push(PanelEffect::Message(text.clone()));
+                    self.say(text);
+                }
+                Some(Err(e)) => self.complain(error_text::error_text(&e)),
+            },
+            Job::Apply { commit, pending } => match pending.take() {
+                None => self.job = Some(Job::Apply { commit, pending }),
+                Some(Ok(_)) => {
+                    let text = m::done_apply(short(commit), self.undo_key());
+                    effects.push(PanelEffect::Message(text.clone()));
+                    self.say(text);
+                }
+                // Nothing changed: offer to keep the changes as a stash.
+                Some(Err(e)) => {
+                    self.overlay = Some(Overlay::Confirm(Confirm {
+                        title: m::APPLY_FAILED_TITLE.get().to_string(),
+                        lines: vec![
+                            error_text::error_text(&e),
+                            m::APPLY_FAILED_NOTHING.get().to_string(),
+                        ],
+                        warning: None,
+                        button: m::BTN_STASH.get().to_string(),
+                        red: false,
+                        next: Next::Stash { commit },
+                    }));
+                }
+            },
+            Job::Stash { commit, pending } => match pending.take() {
+                None => self.job = Some(Job::Stash { commit, pending }),
+                Some(Ok(_)) => {
+                    let text = m::done_stash(short(commit), self.undo_key());
                     effects.push(PanelEffect::Message(text.clone()));
                     self.say(text);
                 }

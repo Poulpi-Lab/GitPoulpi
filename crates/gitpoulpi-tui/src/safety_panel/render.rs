@@ -79,6 +79,9 @@ fn act_label(act: Act, panel: &SafetyPanel, state: &JournalState) -> String {
                 .unwrap_or_else(|| panel.reflog.refname.clone()),
         ),
         Act::CherryPick => m::BTN_CHERRY_PICK.get().to_string(),
+        Act::CreateTag => m::BTN_CREATE_TAG.get().to_string(),
+        Act::ApplyToWorktree => m::BTN_APPLY.get().to_string(),
+        Act::SaveAsStash => m::BTN_STASH.get().to_string(),
         Act::LoadMore => m::BTN_LOAD_MORE.get().to_string(),
     }
 }
@@ -645,6 +648,9 @@ impl SafetyPanel {
             Tab::Reflog => {
                 pairs.push(("r".into(), m::HINT_RESTORE.get()));
                 pairs.push(("b".into(), m::HINT_BRANCH.get()));
+                pairs.push(("t".into(), m::HINT_TAG.get()));
+                pairs.push(("w".into(), m::HINT_APPLY.get()));
+                pairs.push(("z".into(), m::HINT_STASH.get()));
                 pairs.push(("s".into(), m::HINT_SHOW.get()));
                 if self.reflog.more {
                     pairs.push(("m".into(), m::BTN_LOAD_MORE.get()));
@@ -652,8 +658,10 @@ impl SafetyPanel {
             }
             Tab::Lost => {
                 pairs.push(("b".into(), m::HINT_BRANCH.get()));
+                pairs.push(("t".into(), m::HINT_TAG.get()));
                 pairs.push(("c".into(), m::HINT_PICK.get()));
-                pairs.push(("s".into(), m::HINT_SHOW.get()));
+                pairs.push(("w".into(), m::HINT_APPLY.get()));
+                pairs.push(("z".into(), m::HINT_STASH.get()));
             }
         }
         pairs.push((".".into(), m::HINT_MENU.get()));
@@ -690,6 +698,9 @@ fn act_label_static(act: Act) -> String {
         Act::CreateBranch => m::BTN_CREATE_BRANCH.get().to_string(),
         Act::RestoreRef => m::MENU_RESTORE_REF.get().to_string(),
         Act::CherryPick => m::BTN_CHERRY_PICK.get().to_string(),
+        Act::CreateTag => m::BTN_CREATE_TAG.get().to_string(),
+        Act::ApplyToWorktree => m::BTN_APPLY.get().to_string(),
+        Act::SaveAsStash => m::BTN_STASH.get().to_string(),
         Act::LoadMore => m::BTN_LOAD_MORE.get().to_string(),
     }
 }

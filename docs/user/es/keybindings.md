@@ -963,12 +963,17 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Historial de deshacer: Cerrar | `Esc` |
 | Reflog: Mostrar en el Log | `s` |
 | Reflog: Crear rama aquí... | `b` |
+| Reflog: Create Tag Here... | `t` |
+| Reflog: Apply Changes to Working Tree | `w` |
+| Reflog: Save Changes as Stash | `z` |
 | Reflog: Restaurar a esta posición... | `r` |
 | Reflog: Cargar más | `m` |
 | Reflog: Actualizar |  |
-| Trabajo perdido: Mostrar en el Log | `s` |
 | Trabajo perdido: Crear rama aquí... | `b` |
+| Lost Work: Create Tag Here... | `t` |
 | Trabajo perdido: Cherry-pick | `c` |
+| Lost Work: Apply Changes to Working Tree | `w` |
+| Lost Work: Save Changes as Stash | `z` |
 | Trabajo perdido: Buscar de nuevo |  |
 | Ver: Actualizar | `r` |
 | Ver: Actualizar (fetch, pull requests, issues) | `F5` |

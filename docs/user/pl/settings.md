@@ -177,16 +177,17 @@ Lista stron ma dwie grupy:
 | **Domyślny folder przeglądania** | Folder, w którym otwiera się Przeglądaj. Puste: ostatnio użyty folder, w przeciwnym razie katalog domowy. |
 | **Lokalizacja danych repozytorium** | Gdzie GitPoulpi przechowuje dane poszczególnych repozytoriów (`session.per_repo_state_dir`): **Wewnątrz .git** (domyślnie: nic nie pojawia się w drzewie roboczym, wszystkie worktree dzielą dane), **W drzewie roboczym** (folder `.gitpoulpi`; potrzebne, by zatwierdzić zespołowy `workflow.toml`) albo **W moim folderze danych użytkownika** (poza repozytorium). Folder `.gitpoulpi` zostawiony przez starszą wersję jest przenoszony na nowe miejsce przy pierwszej potrzebie i usuwany, gdy zostanie pusty; plik śledzony przez git (zatwierdzony `workflow.toml`) nigdy nie jest przenoszony ani usuwany i pozostaje czytelny. |
 | **Domyślna nazwa gałęzi** | Pierwsza gałąź repozytorium tworzonego przez Init. Puste: decyduje git. Nie zmienia nazw istniejących gałęzi. |
-| **Włącz proaktywne wykrywanie konfliktów** | Domyślnie włączone (`general.conflict_detection`). Ostrzega w Log, że merge bieżącej gałęzi do gałęzi, z której powstała, spowodowałby konflikt, zanim go spróbujesz. Repozytorium może to wyłączyć dla siebie na stronie **Zapobieganie konfliktom**. Zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md#zapobieganie-konfliktom). Działa po zamknięciu Ustawień. |
-| **Domyślne gałęzie bazowe** | Pod przełącznikiem, w grupie **Zapobieganie konfliktom** (otwiera ją polecenie palety **Konflikty: Edytuj listy gałęzi bazowych...**). Lista wzorców gałęzi bazowych, której używają repozytoria bez własnej: **Wbudowana (`**`)**, czyli każda gałąź, albo jedna z twoich nazwanych list (`conflict_prevention.default_list`). Działa w otwartych repozytoriach po zamknięciu Ustawień. **Przywróć wbudowaną wartość domyślną** wraca do `**`. |
-| **Listy gałęzi bazowych** | Także w tej grupie: twoje nazwane listy wzorców gałęzi bazowych (`[conflict_prevention.lists.<name>]`), po jednym bloku na listę, z jej **Nazwą** (zmiana nazwy zachowuje status domyślnej, jeśli go miała; repozytorium, które śledziło starą nazwę, używa listy domyślnej, dopóki ponownie jej nie wybierzesz), jej **Wzorcami** (jeden w wierszu, `Enter` lub kliknięcie otwiera edytor, `Ctrl+S` go zachowuje), **Ustaw jako domyślną** i **Usuń listę** (najpierw pyta i mówi, że repozytoria, które z niej korzystają, użyją zamiast niej listy domyślnej). Wpisz nazwę w **Nowa lista** i naciśnij `Enter`, aby dodać listę; zaczyna się od `**`. Edycja listy zmienia każde repozytorium, które z niej korzysta. |
 | **Poziom dziennika**, **Przechowuj pliki dziennika**, **Maksymalny rozmiar pliku dziennika** | Dziennik aplikacji za Dziennikiem aktywności: najbardziej szczegółowy zapisywany poziom (`log.level`), jak długo pliki są przechowywane (liczba całkowita i jednostka, dni, tygodnie, miesiące lub lata, w jednym wierszu: kliknij liczbę, by ją wpisać, Up i Down zmieniają ją o krok, Tab przechodzi do jednostki, a Enter otwiera jej listę; najwyżej od 1 do 10 lat, domyślnie 1 tydzień, `log.retention_days` i `log.retention_unit`) oraz rozmiar, przy którym plik z jednego dnia jest rotowany (liczba i MiB lub GiB, od 1 MiB do 1 GiB, `log.max_file_mb` i `log.max_file_unit`). |
 | **Pokaż czas trwania operacji**, **Rozszerzone logowanie** | Karta Operacje git Dziennika aktywności: czas trwania każdej operacji (`log.timings`, domyślnie włączone) oraz praca w tle, odświeżanie i auto-fetch (`log.extended`, domyślnie wyłączone). Zob. [Gdy coś się nie powiedzie](troubleshooting.md#dziennik-aktywności). |
 | **Cofanie włączone**, **Głębokość historii cofania**, **Zapisuj zmiany wykonane poza GitPoulpi** | Grupa **Historia cofania**. Włącza lub wyłącza Cofanie i ustawia, ile operacji zachowuje (domyślnie 100, `0` oznacza bez limitu). Wyłączenie Cofania kasuje historię cofania, po potwierdzeniu. Ostatnia opcja zapisuje też to, co powłoka lub agent robi z gałęziami, tagami, stashami i HEAD. Zob. [Cofnij i ponów](undo-redo.md). |
 
-#### Uruchamianie z systemu (integracja z pulpitem)
+Polecenie palety **Aplikacja: Zmień język...** (`Ctrl+N g`) otwiera tę samą
+listę języków. Wyróżniony język jest tam podglądany na żywo; `Enter` go zachowuje,
+a `Esc` przywraca poprzedni.
 
-Grupa **Uruchamianie z systemu**, ostatnia na stronie Ogólne, tworzy skrót, który uruchamia GitPoulpi
+### Uruchamianie z systemu
+
+Strona **Uruchamianie z systemu** (`gitpoulpi ui show settings launcher`) tworzy skrót, który uruchamia GitPoulpi
 z menu aplikacji systemu, w wybranym terminalu.
 
 | Wiersz | Co robi |
@@ -212,9 +213,9 @@ O programie, klawisz `c`); w Linuksie każdy kolor ma własną nazwę ikony, wi�
 
 **Grupowanie na pasku zadań i w docku.** GitPoulpi działa w oknie terminala, więc pasek zadań zwykle pokazuje je pod ikoną terminala, bez kropki „uruchomione” pod przypiętą ikoną GitPoulpi. Windows: skróty niosą AppUserModelID `GitPoulpi.GitPoulpi`, a GitPoulpi uruchomiony z jednego z nich nadaje oknu swojego terminala ten sam identyfikator i swoją ikonę (znajduje okno, nadając mu na chwilę unikalny tytuł, po czym przywraca tytuł), dzięki czemu okno trafia pod przypiętą ikonę GitPoulpi. Okno terminala z wieloma kartami przenosi się jako całość: wszystkie jego karty grupują się pod ikoną GitPoulpi, dopóki działa w nim GitPoulpi. Wcześniej utworzone skróty i przypięcia na pasku zadań są przepisywane tą samą synchronizacją; jeśli przypięcie nadal pokazuje ikonę terminala, odepnij je i przypnij ponownie. Linux: kitty, foot, Alacritty, WezTerm i Ghostty są uruchamiane z klasą okna `gitpoulpi`, a wpis `.desktop` ją podaje (`StartupWMClass`), więc dock grupuje okno pod ikoną programu startowego; pozostałe terminale zachowują własną ikonę. macOS: nic do zrobienia, Dock grupuje według aplikacji.
 
-![Ustawienia > Ogólne, przewinięte do grupy Uruchamianie z systemu: terminal dla skrótów i wiersz menu aplikacji](../images/settings-launcher.png)
+![Ustawienia > Uruchamianie z systemu: terminal dla skrótów i wiersz menu aplikacji](../images/settings-launcher.png)
 
-##### Alias polecenia i PATH w poszczególnych systemach
+#### Alias polecenia i PATH w poszczególnych systemach
 
 | System | Alias | PATH |
 |---|---|---|
@@ -228,9 +229,16 @@ Paleta ma te same akcje (**Uruchamianie: Utwórz skrót**, **Uruchamianie: Utwó
 **Uruchamianie: Dodaj do PATH**, **Uruchamianie: Usuń z PATH**), a `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` robi to samo ze skryptu.
 
-Polecenie palety **Aplikacja: Zmień język...** (`Ctrl+N g`) otwiera tę samą
-listę języków. Wyróżniony język jest tam podglądany na żywo; `Enter` go zachowuje,
-a `Esc` przywraca poprzedni.
+### Zapobieganie konfliktom
+
+Globalna część proaktywnego wykrywania konfliktów (`gitpoulpi ui show settings conflict-prevention-global`); strona jednego repozytorium to
+[Ustawienia repozytorium: Zapobieganie konfliktom](#ustawienia-repozytorium-zapobieganie-konfliktom). Otwiera ją polecenie palety **Konflikty: Edytuj listy gałęzi bazowych...**.
+
+| Opcja | Co robi |
+|---|---|
+| **Włącz proaktywne wykrywanie konfliktów** | Domyślnie włączone (`general.conflict_detection`). Ostrzega w Log, że merge bieżącej gałęzi do gałęzi, z której powstała, spowodowałby konflikt, zanim go spróbujesz. Repozytorium może to wyłączyć dla siebie na jego własnej stronie **Zapobieganie konfliktom**. Zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md#zapobieganie-konfliktom). Działa po zamknięciu Ustawień. |
+| **Domyślne gałęzie bazowe** | Pod przełącznikiem. Lista wzorców gałęzi bazowych, której używają repozytoria bez własnej: **Wbudowana (`**`)**, czyli każda gałąź, albo jedna z twoich nazwanych list (`conflict_prevention.default_list`). Działa w otwartych repozytoriach po zamknięciu Ustawień. **Przywróć wbudowaną wartość domyślną** wraca do `**`. |
+| **Listy gałęzi bazowych** | Także na tej stronie: twoje nazwane listy wzorców gałęzi bazowych (`[conflict_prevention.lists.<name>]`), po jednym bloku na listę, z jej **Nazwą** (zmiana nazwy zachowuje status domyślnej, jeśli go miała; repozytorium, które śledziło starą nazwę, używa listy domyślnej, dopóki ponownie jej nie wybierzesz), jej **Wzorcami** (jeden w wierszu, `Enter` lub kliknięcie otwiera edytor, `Ctrl+S` go zachowuje), **Ustaw jako domyślną** i **Usuń listę** (najpierw pyta i mówi, że repozytoria, które z niej korzystają, użyją zamiast niej listy domyślnej). Wpisz nazwę w **Nowa lista** i naciśnij `Enter`, aby dodać listę; zaczyna się od `**`. Edycja listy zmienia każde repozytorium, które z niej korzysta. |
 
 ### Synchronizacja
 
@@ -401,6 +409,7 @@ punkt końcowy HTTP. Wiersze MCP są widoczne tylko w kompilacjach zawierającyc
 | **Tło ścieżek grafu** | **Wył.** (przezroczyste) lub **Podbarwienie wiersza**: delikatny pas koloru ścieżki za kolumną grafu, z cienkim paskiem na brzegu. |
 | **Intensywność podbarwienia** | Jak blady jest pas podbarwienia: **Mocne**, **Średnie** (domyślnie) lub **Subtelne**. Pasek na brzegu zachowuje pełny kolor. |
 | **Położenie paska narzędzi** | `ui.toolbar_position`: Gdzie leży pasek narzędzi: U góry, Na dole (domyślnie), Po lewej lub Po prawej. Po lewej i Po prawej robią z niego kolumnę obok paneli; w oknie węższym niż 80 kolumn jest rysowany na dole. Działa od razu. |
+| **Zapamiętuj położenie i rozmiar okien dialogowych** | `ui.dialog_geometry`: **Na tę sesję** (domyślnie), **Zapisane na dysku** lub **Nigdy**: czy okno dialogowe, które przesunąłeś lub którego rozmiar zmieniłeś, zachowuje swoje miejsce. Działa od razu. |
 | **Wyrównanie przycisków paska narzędzi** | `ui.toolbar_align`: Gdzie leżą przyciski wzdłuż paska: Początek (domyślnie), Środek lub Koniec. Początek to lewa strona wiersza i góra kolumny; koniec to prawa strona i dół. Działa od razu. |
 | **Przypnij przycisk pull request na końcu** | `ui.toolbar_pr_pinned`: Włączone (domyślnie): przycisk pull request leży na samym końcu paska narzędzi (po prawej, w kolumnie na dole) przy każdym wyrównaniu. Wyłączone: płynie razem z innymi przyciskami i jest z nimi wyrównany. Działa od razu. |
 | **Położenie paska stanu** | `ui.statusbar_position`: Gdzie leży pasek stanu (gałąź, liczniki, komunikaty, podpowiedzi klawiszy): U góry, nad kartami repozytoriów, lub Na dole (domyślnie). Karta Home zachowuje własny pasek stanu na dole. Działa od razu. |
@@ -701,10 +710,10 @@ Opis, od którego zaczyna się formularz commita (`gitpoulpi ui show settings co
 (zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md#zapobieganie-konfliktom)):
 
 - **Włącz proaktywne wykrywanie konfliktów z gałęzią docelową**: domyślnie włączone. Odznaczenie wyłącza wykrywanie
-  tylko dla tego repozytorium; przełącznik globalny to **Włącz proaktywne wykrywanie konfliktów** na stronie Ogólne.
+  tylko dla tego repozytorium; przełącznik globalny to **Włącz proaktywne wykrywanie konfliktów** na globalnej stronie **Zapobieganie konfliktom**.
   Oba muszą być włączone.
 - **Gałęzie bazowe z**: skąd to repozytorium bierze gałęzie bazowe. **Domyślne** podąża za globalną wartością domyślną
-  (wbudowane `**` albo lista wybrana w **Domyślne gałęzie bazowe** w Ustawienia > Ogólne); **Lista: <nazwa>**
+  (wbudowane `**` albo lista wybrana w **Domyślne gałęzie bazowe** w Ustawienia > Zapobieganie konfliktom); **Lista: <nazwa>**
   podąża za jedną z twoich nazwanych list, więc edycja listy zmienia także to repozytorium; **Własna lista** to lista tylko
   tego repozytorium (jej wybór zaczyna od kopii obowiązujących wzorców). Plik repozytorium zapisany przed
   pojawieniem się tego wyboru i zawierający własne wzorce jest odczytywany jako **Własna lista**.
@@ -724,7 +733,7 @@ Opis, od którego zaczyna się formularz commita (`gitpoulpi ui show settings co
   samych wykluczeń oznacza „każda gałąź oprócz tych”. Wybór jest zapisywany w `repo-state.toml` i odczytywany ponownie po
   zamknięciu Ustawień.
 - **Zapisz jako listę...**: wpisz nazwę i naciśnij `Enter`; obowiązujące wzorce stają się nazwaną listą (tą samą, którą
-  edytuje Ustawienia > Ogólne), a to repozytorium z niej korzysta.
+  edytuje Ustawienia > Zapobieganie konfliktom), a to repozytorium z niej korzysta.
 - **Przywróć domyślne** (najpierw pyta): odrzuca wybór, listę i własne wzorce tego repozytorium; znów podąża za domyślnymi.
 - **Użyj gałęzi bazowych przepływu pracy** (widoczne, gdy dla repozytorium skonfigurowano [przepływ pracy gałęzi](branching-workflows.md)
   z gałęziami bazowymi): wypełnia **Własną listę** tymi bazami, każdą jako gałąź lokalną i jako gałąź dowolnego

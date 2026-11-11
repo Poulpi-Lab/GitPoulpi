@@ -237,6 +237,7 @@ tylko twoim oknem; *propozycja* otwiera okno dialogowe, które potwierdzasz.
 | `ai_split_plan` | `gitpoulpi ai split-plan` | read, network |
 | `alias_status` | `gitpoulpi alias status` | read |
 | `amend` | `gitpoulpi amend` | destructive |
+| `apply_commit` | `gitpoulpi apply-commit` | write |
 | `autostash_start_over` | `gitpoulpi autostash start-over` | destructive |
 | `blame` | `gitpoulpi blame` | read |
 | `branch_create` | `gitpoulpi branch create` | write |
@@ -427,6 +428,7 @@ tylko twoim oknem; *propozycja* otwiera okno dialogowe, które potwierdzasz.
 | `stage` | `gitpoulpi stage` | write |
 | `stash_apply` | `gitpoulpi stash apply` | write |
 | `stash_drop` | `gitpoulpi stash drop` | destructive |
+| `stash_from_commit` | `gitpoulpi stash from-commit` | write |
 | `stash_list` | `gitpoulpi stash list` | read |
 | `stash_pop` | `gitpoulpi stash pop` | write |
 | `stash_push` | `gitpoulpi stash push` | write |

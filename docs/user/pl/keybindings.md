@@ -136,7 +136,7 @@ prefiksem (`Ctrl+G s`).
 | `nav_prefix` | `status_narrower` | Zwęź panel Status | `Ctrl+N Shift+Right` |
 | `nav_prefix` | `agent_show` | Agent: Pokaż oczekujący widok | `Ctrl+N Enter` |
 | `nav_prefix` | `agent_back` | Agent: Wstecz (lub odrzuć oczekujący widok) | `Ctrl+N Backspace` |
-| `nav_prefix` | `arrange_dialog` | Arrange the open dialog (move, resize) | `Ctrl+N m` |
+| `nav_prefix` | `arrange_dialog` | Ustaw otwarte okno (przesuń, zmień rozmiar) | `Ctrl+N m` |
 | `refs` | `filter` | Filtruj refy po nazwie | `/` |
 | `refs` | `solo` | Solo dla zaznaczenia | `o` |
 | `refs` | `clear_solo` | Zakończ solo | `Shift+O` |
@@ -958,23 +958,23 @@ zastosowania. Klawisze są domyślne.
 | Historia cofania: Zamknij | `Esc` |
 | Reflog: Pokaż w Log | `l` |
 | Reflog: Utwórz gałąź tutaj... | `b` |
-| Reflog: Create tag Here... | `t` |
-| Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `s` |
+| Reflog: Utwórz tag tutaj... | `t` |
+| Reflog: Zastosuj zmiany w drzewie roboczym | `w` |
+| Reflog: Zapisz zmiany jako: stash | `s` |
 | Reflog: Przywróć do tej pozycji... | `r` |
 | Reflog: Wczytaj więcej | `m` |
 | Reflog: Odśwież |  |
 | Utracona praca: Utwórz gałąź tutaj... | `b` |
-| Lost Work: Create tag Here... | `t` |
+| Utracona praca: Utwórz tag tutaj... | `t` |
 | Utracona praca: Cherry-pick | `c` |
-| Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `s` |
+| Utracona praca: Zastosuj zmiany w drzewie roboczym | `w` |
+| Utracona praca: Zapisz zmiany jako: stash | `s` |
 | Utracona praca: Szukaj ponownie |  |
-| Reflog / Lost Work: Next Pane | `Tab` |
-| Reflog / Lost Work: Path or Tree File List | `v` |
-| Reflog / Lost Work: Reset Pane Sizes |  |
-| Dialog: Move/resize | `Ctrl+N m` |
-| Dialog: Reset position and size |  |
+| Reflog / Utracona praca: Następny panel | `Tab` |
+| Reflog / Utracona praca: Lista plików jako ścieżki lub drzewo | `v` |
+| Reflog / Utracona praca: Przywróć rozmiary paneli |  |
+| Okno: Przesuń lub zmień rozmiar | `Ctrl+N m` |
+| Okno: Przywróć położenie i rozmiar |  |
 | Widok: Odśwież | `r` |
 | Widok: Odśwież (fetch, pull requesty, zgłoszenia) | `F5` |
 | Widok: Przełącz pomoc | `?` |

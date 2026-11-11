@@ -7,6 +7,32 @@ use crate::event_loop::*;
 use init::WindowState;
 
 impl WindowState {
+    /// A popup or dialog is over the live main window and is not a full page:
+    /// the Log's pictures (graph, avatars) stay under it. The cells the dialog
+    /// painted cover them, so a picture never crosses its box. Settings, Help
+    /// and the other full pages are left out on purpose: they replace the window.
+    fn overlay_keeps_the_log(
+        input_mode: &InputMode,
+        repo_dialogs: &crate::repo_dialogs::RepoDialogs,
+    ) -> bool {
+        matches!(
+            input_mode,
+            InputMode::ThemePicker(_)
+                | InputMode::LanguagePicker(_)
+                | InputMode::WorkspaceSearch(_)
+                | InputMode::TabPicker { .. }
+                | InputMode::CommandPalette { .. }
+        ) || crate::activity_log::is_open()
+            || repo_dialogs.is_open()
+            || crate::jobs_ui::panel_open()
+            || crate::updates::panel::is_open()
+            || crate::about::is_open()
+            || crate::trust_dialog::is_open()
+            || crate::conflict_popup::is_open()
+            || crate::ai_sent_dialog::is_open()
+            || crate::ai_limit_dialog::is_open()
+    }
+
     /// Polls the status bar's total and asks for a new count when the refs
     /// moved (`graph::total`). Nothing here waits: the request is a channel
     /// send and the answer is read on a later frame.
@@ -702,24 +728,13 @@ impl WindowState {
                 // The palette and its pickers paint over the live app (the
                 // theme / language / graph color pickers preview on it): the
                 // Log's graph picture stays under them.
-                self.graph_image.keep_under_overlay(matches!(
-                    self.input_mode,
-                    InputMode::ThemePicker(_)
-                        | InputMode::LanguagePicker(_)
-                        | InputMode::WorkspaceSearch(_)
-                        | InputMode::TabPicker { .. }
-                        | InputMode::CommandPalette { .. }
-                ));
+                let keep = Self::overlay_keeps_the_log(&self.input_mode, &self.repo_dialogs);
+                self.graph_image.keep_under_overlay(keep);
                 self.graph_image.finish_frame(frame.buffer_mut());
-                // The commit column's picture, the same overlay rule.
-                self.commit_graph_image.keep_under_overlay(matches!(
-                    self.input_mode,
-                    InputMode::ThemePicker(_)
-                        | InputMode::LanguagePicker(_)
-                        | InputMode::WorkspaceSearch(_)
-                        | InputMode::TabPicker { .. }
-                        | InputMode::CommandPalette { .. }
-                ));
+                // The commit column's picture and the Log's avatars, the
+                // same overlay rule.
+                self.commit_graph_image.keep_under_overlay(keep);
+                self.log_avatar_images.keep_under_overlay(keep);
                 self.commit_graph_image.finish_frame(frame.buffer_mut());
                 self.detail_avatar_image.finish_frame(frame.buffer_mut());
                 minimap::finish_frame(frame.buffer_mut());

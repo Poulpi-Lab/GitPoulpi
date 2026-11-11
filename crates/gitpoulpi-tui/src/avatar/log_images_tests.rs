@@ -631,6 +631,47 @@ fn a_page_over_the_log_erases_the_avatars_and_sends_nothing_under_it() {
     assert!(closed.contains("]1337;File="));
 }
 
+/// A dialog over the live Log (the Activity Log, the Undo history) is not a
+/// page: with `keep_under_overlay` the pictures are not erased however many
+/// slots it covers. Kitty: no delete. iTerm2: no picture is written inside
+/// the dialog (its cells are rewritten over them) and none outside is sent
+/// again. Red without the flag: the whole column is erased.
+#[test]
+fn a_dialog_over_the_log_keeps_the_avatars_it_does_not_cover() {
+    for (kitty, rows_covered) in [(false, 7), (true, 7), (false, 12), (true, 12)] {
+        let mut img = if kitty { kitty_images() } else { images() };
+        img.keep_under_overlay(true);
+        let rows: Vec<Row> = (0..9).map(|_| row("ada")).collect();
+        let _ = frame(&mut img, &rows, &faces(), SCREEN, None);
+        // The dialog covers all but the last rows (7), or every row (12).
+        let dialog = Rect::new(AUTHOR_X - 4, 0, 20, rows_covered);
+        let (buf, opened) = frame(&mut img, &rows, &faces(), SCREEN, Some(dialog));
+        assert!(!opened.contains("a=d"), "kitty={kitty}: deleted {opened:?}");
+        assert!(
+            !opened.contains("]1337;File="),
+            "kitty={kitty}: a picture was sent under the dialog {opened:?}"
+        );
+        for y in dialog.top()..dialog.bottom() {
+            for x in dialog.left()..dialog.right() {
+                assert!(
+                    !buf[(x, y)].symbol().starts_with('\u{10EEEE}'),
+                    "kitty={kitty}: a placeholder inside the dialog at {x},{y}"
+                );
+            }
+        }
+        if rows_covered >= SCREEN.height {
+            continue;
+        }
+        // The rows below the dialog still hold their picture.
+        let kept = if kitty {
+            buf[(AUTHOR_X, TOP + 8)].symbol().starts_with('\u{10EEEE}')
+        } else {
+            buf[(AUTHOR_X, TOP + 8)].diff_option == ratatui::buffer::CellDiffOption::Skip
+        };
+        assert!(kept, "kitty={kitty}: the picture outside the dialog is gone");
+    }
+}
+
 /// The transparent iTerm2 path (WezTerm): a page whose text sits in one
 /// corner and which is blank over the avatars (Settings under its last
 /// section) must still erase them. A blank cell equals the blank the

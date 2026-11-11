@@ -324,9 +324,16 @@ pub(crate) struct LogAvatarImages {
     /// draws none (Settings, Diff, Home...) they are erased.
     shown: Vec<(Rect, Option<u32>)>,
     hide: Option<terminal_image::Hide>,
+    /// A dialog over the live Log (not a full page): the pictures stay under
+    /// it however many slots it covers; the cells it painted cover them.
+    keep_under_overlay: bool,
 }
 
 impl LogAvatarImages {
+    pub(crate) fn keep_under_overlay(&mut self, keep: bool) {
+        self.keep_under_overlay = keep;
+    }
+
     pub(crate) fn new(capability: Capability) -> LogAvatarImages {
         LogAvatarImages {
             capability,
@@ -340,6 +347,7 @@ impl LogAvatarImages {
             pending_under: Vec::new(),
             shown: Vec::new(),
             hide: None,
+            keep_under_overlay: false,
         }
     }
 
@@ -421,7 +429,8 @@ impl LogAvatarImages {
         // nothing until a slot is visible again.
         // A popup or tooltip cannot cover a tall column of slots; a page
         // can. Only a column spanning `PAGE_ROWS` rows counts.
-        let all_covered = self.spans_a_page()
+        let all_covered = !self.keep_under_overlay
+            && self.spans_a_page()
             && (self.drawn.iter()).all(|d| {
                 matches!(self.encoded.get(&d.key), Some(Some(e)) if e.mostly_overdrawn(buf, d.area))
             });

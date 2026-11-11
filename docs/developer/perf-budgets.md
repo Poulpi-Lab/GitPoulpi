@@ -23,8 +23,6 @@ Baseline: median of 3 runs, release, 2026-10-02, Linux, load average about 5 (no
 | log 200 | 18.1 | 40 | 15.8 | 45 |
 | log 5000, cold, `log.use_mailmap` off / on / on with a 300-entry `.mailmap` (S16; three asks with different limits so none is cached, median; 2026-10-22, release, load average 13) | 45-49 / 45-49 / 45-53 | 88 | 42-66 / 42-55 / 42-63 | 88 |
 | refs | 0.7 | 10 | 5.1 | 14 |
-
-Re-check 2026-11-11 (main 4b57a49ff, no regression found): a single run at load 22 gave 140 ms for the cold log and the (mailmap off) rows, a first-ask outlier on a saturated 20-core machine (two VMs running). Nine further runs at load 16-20 gave 57-60 ms on git2 and 57-90 ms on system (cold, all three mailmap variants), within the 91-97 ms load-scaled budget; `diff files (big commit)` 3.6-4.7 ms and `stage file (undo off)` 10 ms. The earlier 145-153 ms and the 14-21 ms git2 rows were load noise, so no budget changed. Judge a cold row on 3+ runs, never one.
 | commit stats x60 (cold) | 26.7 | 55 | 16.5 | 40 |
 | commit stats x60 (warm) | 0.1 | 10 | 0.2 | 10 |
 | diff files / 1 file (big commit) | 3.0 / 1.0 | 10 | 5.8 / 3.2 | 15 |
@@ -41,6 +39,8 @@ Re-check 2026-11-11 (main 4b57a49ff, no regression found): a single run at load 
 | undo (branch delete) | 1.3 | 10 | 7.8 | 19 |
 | commit count (cold, 5,000 commits) | 3.9-22.7 | 39 (1 spawn) | 3.5-4.5 | 39 (1 spawn) |
 | commit count (warm) | 0.4-0.7 | reported | 3-5 (not cached, see below) | reported |
+
+Re-check 2026-11-11 (main 4b57a49ff, no regression found): a single run at load 22 gave 140 ms for the cold log and the (mailmap off) rows, a first-ask outlier on a saturated 20-core machine (two VMs running). Nine further runs at load 16-20 gave 57-60 ms on git2 and 57-90 ms on system (cold, all three mailmap variants), within the 91-97 ms load-scaled budget; `diff files (big commit)` 3.6-4.7 ms and `stage file (undo off)` 10 ms. The earlier 145-153 ms and the 14-21 ms git2 rows were load noise, so no budget changed. Judge a cold row on 3+ runs, never one.
 
 ### Outside-change snapshot (`outside_rows` in `xtask/src/perf.rs`, `tests/spawn_budget_outside.rs`)
 

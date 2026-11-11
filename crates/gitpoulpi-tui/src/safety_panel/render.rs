@@ -667,6 +667,7 @@ fn act_label_static(act: Act) -> String {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn popup_frame(
     buf: &mut Buffer,
     outer: Rect,

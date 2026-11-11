@@ -3,8 +3,8 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::{
-    ConflictRefusal, LfsUnavailableReason, PushRejection, RebaseRefusal, RewordRefusal,
-    RewriteRefusal, SplitRefusal, UndoRefusal,
+    ApplyRefusal, ConflictRefusal, LfsUnavailableReason, PushRejection, RebaseRefusal,
+    RewordRefusal, RewriteRefusal, SplitRefusal, UndoRefusal,
 };
 use crate::failure::ErrorDetail;
 
@@ -52,6 +52,11 @@ pub enum Error {
     /// [`RewriteRefusal`]); the string says which rule, path or ref.
     #[error("cannot rewrite history: {}{}", rewrite_reason(*.0), rewrite_detail(.1))]
     RewriteRefused(RewriteRefusal, String),
+
+    /// `apply_commit_to_worktree` refused before changing anything (see
+    /// [`ApplyRefusal`]).
+    #[error("cannot apply that commit: {}", apply_reason(*.0))]
+    ApplyRefused(ApplyRefusal),
 
     /// An interactive rebase (or `continue`/`skip`/`abort`) refused
     /// before changing anything (see [`RebaseRefusal`]).
@@ -349,6 +354,12 @@ fn rewrite_reason(refusal: RewriteRefusal) -> &'static str {
     }
 }
 
+fn apply_reason(refusal: ApplyRefusal) -> &'static str {
+    match refusal {
+        ApplyRefusal::MergeCommit => "a merge commit has no single set of changes to apply",
+    }
+}
+
 fn split_reason(refusal: SplitRefusal) -> &'static str {
     match refusal {
         SplitRefusal::NotOnCurrentBranch => {
@@ -405,6 +416,7 @@ pub enum TypedError {
     NotFastForward,
     RewordRefused(RewordRefusal),
     SplitRefused(SplitRefusal),
+    ApplyRefused(ApplyRefusal),
     RewriteRefused(RewriteRefusal, String),
     RebaseRefused(RebaseRefusal),
     ConflictRefused(ConflictRefusal),
@@ -467,6 +479,7 @@ impl Error {
             Error::NotFastForward => Some(TypedError::NotFastForward),
             Error::RewordRefused(r) => Some(TypedError::RewordRefused(*r)),
             Error::SplitRefused(r) => Some(TypedError::SplitRefused(*r)),
+            Error::ApplyRefused(r) => Some(TypedError::ApplyRefused(*r)),
             Error::RewriteRefused(r, d) => Some(TypedError::RewriteRefused(*r, d.clone())),
             Error::RebaseRefused(r) => Some(TypedError::RebaseRefused(*r)),
             Error::ConflictRefused(r) => Some(TypedError::ConflictRefused(r.clone())),
@@ -570,6 +583,7 @@ impl Error {
             TypedError::NotFastForward => Error::NotFastForward,
             TypedError::RewordRefused(r) => Error::RewordRefused(r),
             TypedError::SplitRefused(r) => Error::SplitRefused(r),
+            TypedError::ApplyRefused(r) => Error::ApplyRefused(r),
             TypedError::RewriteRefused(r, d) => Error::RewriteRefused(r, d),
             TypedError::RebaseRefused(r) => Error::RebaseRefused(r),
             TypedError::ConflictRefused(r) => Error::ConflictRefused(r),

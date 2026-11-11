@@ -230,6 +230,15 @@ pub struct PatchCreated {
     pub bytes: u64,
 }
 
+/// Why [`crate::GitBackend::apply_commit_to_worktree`] refused before
+/// touching anything. A patch that merely does not apply is an ordinary
+/// error, not one of these.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ApplyRefusal {
+    /// A merge commit has no single set of changes to replay.
+    MergeCommit,
+}
+
 /// What [`crate::GitBackend::patch_apply`] changed.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PatchApplied {

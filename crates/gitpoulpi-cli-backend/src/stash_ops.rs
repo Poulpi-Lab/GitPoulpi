@@ -1,7 +1,7 @@
 use gitpoulpi_core::domain::{Oid, RepoRef, StashId};
 use gitpoulpi_core::Result;
 
-use crate::process::{run, run_in_english};
+use crate::process::{run, run_in_english, run_with_env_and_stdin, run_with_stdin};
 
 /// A freshly pushed stash is always `stash@{0}` - git's stash is a stack
 /// and push always inserts at the top. `None`: git said "No local changes to
@@ -92,6 +92,71 @@ pub fn stash_store(repo: &RepoRef, commit: Oid, message: &str) -> Result<()> {
         &["stash", "store", "-m", message, &commit.to_hex()],
     )?;
     Ok(())
+}
+
+/// A stash commit holding what `commit` changed: its worktree commit has
+/// `commit`'s tree and the parents (base, index) - the base is the first
+/// parent of `commit`, or an empty commit for a root one, so applying the
+/// stash replays exactly that change. Then `stash_store` puts it on top.
+pub fn stash_from_commit(repo: &RepoRef, commit: Oid, message: Option<&str>) -> Result<Oid> {
+    let hex = commit.to_hex();
+    let known = |_| gitpoulpi_core::Error::Backend(format!("{hex} is not a known commit"));
+    let tree = run(
+        &repo.root,
+        &["rev-parse", "--verify", &format!("{hex}^{{tree}}")],
+    )
+    .map_err(known)?
+    .trim()
+    .to_string();
+    let subject = run(&repo.root, &["log", "-1", "--format=%s", &hex])?
+        .trim()
+        .to_string();
+    let short = &hex[..hex.len().min(8)];
+    let message = match message {
+        Some(m) if !m.trim().is_empty() => m.trim().to_string(),
+        _ => format!("restored changes of {short} {subject}")
+            .trim_end()
+            .to_string(),
+    };
+
+    let parents = run(&repo.root, &["rev-list", "--parents", "-n", "1", &hex])?;
+    let base = match parents.split_whitespace().nth(1) {
+        Some(p) => p.to_string(),
+        None => {
+            let empty = run_with_stdin(
+                &repo.root,
+                &["hash-object", "-w", "-t", "tree", "--stdin"],
+                "",
+            )?;
+            commit_tree(repo, empty.trim(), &[], "root of the restored changes")?
+        }
+    };
+    let index = commit_tree(
+        repo,
+        &tree,
+        &[&base],
+        &format!("index on (restored): {short} {subject}"),
+    )?;
+    let work = commit_tree(
+        repo,
+        &tree,
+        &[&base, &index],
+        &format!("On (restored): {message}"),
+    )?;
+    let work_oid = Oid::from_hex(&work)
+        .ok_or_else(|| gitpoulpi_core::Error::Backend(format!("odd commit id {work}")))?;
+    stash_store(repo, work_oid, &message)?;
+    Ok(work_oid)
+}
+
+fn commit_tree(repo: &RepoRef, tree: &str, parents: &[&str], message: &str) -> Result<String> {
+    let mut args = vec!["commit-tree", "--no-gpg-sign", tree];
+    for p in parents {
+        args.push("-p");
+        args.push(p);
+    }
+    let out = run_with_env_and_stdin(&repo.root, &args, &[], message)?;
+    Ok(out.trim().to_string())
 }
 
 /// The paths a stash commit holds changes for, untracked files included.

@@ -929,6 +929,7 @@ impl GitBackend for Git2Backend {
             dest: &Path,
         ) -> Result<PatchCreated>;
         fn patch_apply(&self, repo: &RepoRef, patch: &Path) -> Result<PatchApplied>;
+        fn apply_commit_to_worktree(&self, repo: &RepoRef, commit: Oid) -> Result<PatchApplied>;
         fn merge(&self, repo: &RepoRef, from: &Ref, opts: &MergeOptions) -> Result<MergeOutcome>;
         fn rebase(&self, repo: &RepoRef, onto: &Ref, opts: &RebaseOptions) -> Result<RebaseOutcome>;
         fn rebase_plan(&self, repo: &RepoRef, upstream: Option<Oid>) -> Result<RebasePlanDraft>;
@@ -963,6 +964,12 @@ impl GitBackend for Git2Backend {
         fn stash_apply(&self, repo: &RepoRef, id: StashId) -> Result<()>;
         fn stash_drop(&self, repo: &RepoRef, id: StashId) -> Result<()>;
         fn stash_store(&self, repo: &RepoRef, commit: Oid, message: &str) -> Result<()>;
+        fn stash_from_commit(
+            &self,
+            repo: &RepoRef,
+            commit: Oid,
+            message: Option<&str>,
+        ) -> Result<Oid>;
         fn stash_paths(&self, repo: &RepoRef, commit: Oid) -> Result<Vec<String>>;
         fn remote_add(&self, repo: &RepoRef, name: &str, url: &str) -> Result<()>;
         fn remote_remove(&self, repo: &RepoRef, name: &str) -> Result<()>;

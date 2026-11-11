@@ -365,3 +365,263 @@ pub fn check_reflog_and_lost_commits_in_a_reftable_repository(backend: &dyn GitB
         .unwrap();
     assert_eq!(page.commits[0].oid, tip);
 }
+
+// -- restoring a lost commit's changes -----------------------------------
+
+/// Bytes of `path` as `commit` holds them.
+fn blob_of(repo: &crate::FixtureRepo, commit: Oid, path: &str) -> Vec<u8> {
+    let out = std::process::Command::new("git")
+        .args(["cat-file", "blob", &format!("{}:{path}", commit.to_hex())])
+        .current_dir(repo.root())
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "cat-file {path}");
+    out.stdout
+}
+
+/// A repo whose `main` tip `lost` modified a file, added one, deleted one
+/// and changed a binary one, then moved back to `base`: `lost` is only in
+/// the reflog, as a lost commit is.
+fn lost_change_set() -> (crate::FixtureRepo, Oid, Oid) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("keep.txt", "one\ntwo\nthree\n", "base one")
+        .commit_file("gone.txt", "bye\n", "base two")
+        .commit_bytes("bin.dat", &[0, 1, 2, 3, 0, 255], "base bin")
+        .build();
+    let base = oid(&repo.git(&["rev-parse", "HEAD"]));
+    std::fs::write(repo.root().join("keep.txt"), "one\n2\nthree\nfour\n").unwrap();
+    std::fs::write(repo.root().join("new.txt"), "new file\n").unwrap();
+    std::fs::write(repo.root().join("bin.dat"), [9u8, 0, 0, 1, 200, 7, 0]).unwrap();
+    repo.git(&["rm", "-q", "gone.txt"]);
+    repo.git(&["add", "-A"]);
+    repo.git(&["commit", "-q", "-m", "the lost work"]);
+    let lost = oid(&repo.git(&["rev-parse", "HEAD"]));
+    repo.git(&["reset", "-q", "--hard", &base.to_hex()]);
+    (repo, base, lost)
+}
+
+/// `apply_commit_to_worktree` replays one commit's changes (modify, add,
+/// delete, binary) into the working tree only: the index and HEAD stay.
+pub fn check_apply_commit_to_worktree_changes_the_worktree_only(backend: &dyn GitBackend) {
+    let (repo, base, lost) = lost_change_set();
+    let repo_ref = repo.repo_ref();
+    let applied = backend.apply_commit_to_worktree(&repo_ref, lost).unwrap();
+    let mut files = applied.files.clone();
+    files.sort();
+    assert_eq!(files, ["bin.dat", "gone.txt", "keep.txt", "new.txt"]);
+
+    for path in ["keep.txt", "new.txt", "bin.dat"] {
+        assert_eq!(
+            std::fs::read(repo.root().join(path)).unwrap(),
+            blob_of(&repo, lost, path),
+            "{path}"
+        );
+    }
+    assert!(!repo.root().join("gone.txt").exists());
+    assert_eq!(oid(&repo.git(&["rev-parse", "HEAD"])), base, "HEAD stays");
+    assert_eq!(
+        repo.git(&["diff", "--cached", "--name-only"]).trim(),
+        "",
+        "the index stays"
+    );
+}
+
+/// A root commit applies against the empty tree.
+pub fn check_apply_commit_to_worktree_of_a_root_commit(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("a.txt", "root a\n", "root")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let root = oid(&repo.git(&["rev-parse", "HEAD"]));
+    repo.git(&["checkout", "-q", "--orphan", "elsewhere"]);
+    repo.git(&["rm", "-rfq", "."]);
+    assert!(!repo.root().join("a.txt").exists());
+
+    let applied = backend.apply_commit_to_worktree(&repo_ref, root).unwrap();
+    assert_eq!(applied.files, ["a.txt"]);
+    assert_eq!(
+        std::fs::read(repo.root().join("a.txt")).unwrap(),
+        b"root a\n"
+    );
+}
+
+/// A merge commit has no single set of changes: a typed refusal, nothing
+/// touched.
+pub fn check_apply_commit_to_worktree_refuses_a_merge_commit(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("a.txt", "a\n", "base")
+        .branch("side")
+        .commit_file("main.txt", "m\n", "on main")
+        .checkout("side")
+        .commit_file("side.txt", "s\n", "on side")
+        .checkout("main")
+        .build();
+    let repo_ref = repo.repo_ref();
+    repo.git(&["merge", "-q", "--no-ff", "-m", "merge side", "side"]);
+    let merge = oid(&repo.git(&["rev-parse", "HEAD"]));
+    repo.git(&["reset", "-q", "--hard", "HEAD~1"]);
+
+    match backend.apply_commit_to_worktree(&repo_ref, merge) {
+        Err(gitpoulpi_core::Error::ApplyRefused(
+            gitpoulpi_core::domain::ApplyRefusal::MergeCommit,
+        )) => {}
+        other => panic!("expected the merge refusal, got {other:?}"),
+    }
+    assert!(!repo.root().join("side.txt").exists());
+    assert_eq!(repo.git(&["status", "--porcelain"]).trim(), "");
+}
+
+/// All or nothing: when one file of the commit does not apply, the files
+/// that would have applied are not touched either.
+pub fn check_apply_commit_to_worktree_that_does_not_apply_changes_nothing(
+    backend: &dyn GitBackend,
+) {
+    let (repo, _base, lost) = lost_change_set();
+    let repo_ref = repo.repo_ref();
+    // keep.txt diverges so its hunk no longer matches; the others would apply.
+    std::fs::write(repo.root().join("keep.txt"), "other\ncontent\n").unwrap();
+    let before = repo.git(&["status", "--porcelain"]);
+
+    assert!(backend.apply_commit_to_worktree(&repo_ref, lost).is_err());
+
+    assert_eq!(
+        std::fs::read(repo.root().join("keep.txt")).unwrap(),
+        b"other\ncontent\n"
+    );
+    assert!(!repo.root().join("new.txt").exists(), "nothing was written");
+    assert!(repo.root().join("gone.txt").exists(), "nothing was removed");
+    assert_eq!(repo.git(&["status", "--porcelain"]), before);
+    assert!(backend
+        .apply_commit_to_worktree(&repo_ref, Oid::from_hex(&"1".repeat(40)).unwrap())
+        .is_err());
+}
+
+/// Binary bytes and CRLF text come out byte for byte, with the user's
+/// line-ending conversion off and on (Git for Windows defaults to on).
+pub fn check_apply_commit_to_worktree_keeps_binary_and_crlf_bytes(backend: &dyn GitBackend) {
+    for autocrlf in ["false", "true"] {
+        let repo = TestRepoBuilder::new()
+            .commit_bytes("win.txt", b"a\r\nb\r\nc\r\n", "base crlf")
+            .commit_bytes("img.bin", &[0, 13, 10, 0, 1], "base bin")
+            .build();
+        let repo_ref = repo.repo_ref();
+        let base = oid(&repo.git(&["rev-parse", "HEAD"]));
+        std::fs::write(repo.root().join("win.txt"), b"a\r\nB\r\nc\r\nd\r\n").unwrap();
+        std::fs::write(repo.root().join("img.bin"), [0u8, 13, 10, 0, 2, 3]).unwrap();
+        repo.git(&["add", "-A"]);
+        repo.git(&["commit", "-q", "-m", "edit"]);
+        let lost = oid(&repo.git(&["rev-parse", "HEAD"]));
+        repo.git(&["reset", "-q", "--hard", &base.to_hex()]);
+        repo.git(&["config", "core.autocrlf", autocrlf]);
+
+        backend.apply_commit_to_worktree(&repo_ref, lost).unwrap();
+        assert_eq!(
+            std::fs::read(repo.root().join("img.bin")).unwrap(),
+            [0u8, 13, 10, 0, 2, 3],
+            "autocrlf={autocrlf}"
+        );
+        // Whatever git's own conversion made of the text, adding it back
+        // gives exactly the commit's tree.
+        repo.git(&["add", "-A"]);
+        assert_eq!(
+            repo.git(&["diff", "--cached", "--stat", &lost.to_hex()])
+                .trim(),
+            "",
+            "autocrlf={autocrlf}"
+        );
+    }
+}
+
+/// `stash_from_commit` builds a stash holding exactly the commit's changes:
+/// the same patch as the commit, applicable by the ordinary stash apply, on
+/// top of the stash list, with a given or a default message.
+pub fn check_stash_from_commit_builds_a_stash_of_the_commits_changes(backend: &dyn GitBackend) {
+    let (repo, base, lost) = lost_change_set();
+    let repo_ref = repo.repo_ref();
+    let want_patch = repo.git(&["diff", &format!("{}^", lost.to_hex()), &lost.to_hex()]);
+
+    let stash_commit = backend
+        .stash_from_commit(&repo_ref, lost, Some("rescued"))
+        .unwrap();
+    let list = backend.stashes(&repo_ref).unwrap();
+    assert_eq!(list.len(), 1);
+    assert_eq!(list[0].id, gitpoulpi_core::domain::StashId(0));
+    assert_eq!(list[0].commit, Some(stash_commit));
+    assert!(list[0].message.contains("rescued"), "{}", list[0].message);
+    assert_eq!(oid(&repo.git(&["rev-parse", "HEAD"])), base, "HEAD stays");
+    assert_eq!(
+        repo.git(&["status", "--porcelain"]).trim(),
+        "",
+        "tree stays"
+    );
+
+    assert_eq!(
+        repo.git(&["stash", "show", "-p", "stash@{0}"]),
+        want_patch,
+        "the stash shows the commit's own change"
+    );
+    backend
+        .stash_apply(&repo_ref, gitpoulpi_core::domain::StashId(0))
+        .unwrap();
+    for path in ["keep.txt", "bin.dat"] {
+        assert_eq!(
+            std::fs::read(repo.root().join(path)).unwrap(),
+            blob_of(&repo, lost, path),
+            "{path}"
+        );
+    }
+    assert!(!repo.root().join("gone.txt").exists());
+
+    // A default message names the commit; a second stash goes on top.
+    backend.stash_from_commit(&repo_ref, lost, None).unwrap();
+    let list = backend.stashes(&repo_ref).unwrap();
+    assert_eq!(list.len(), 2);
+    assert!(
+        list[0].message.contains(&lost.to_hex()[..7]),
+        "{}",
+        list[0].message
+    );
+    assert!(backend
+        .stash_from_commit(&repo_ref, Oid::from_hex(&"2".repeat(40)).unwrap(), None)
+        .is_err());
+    assert_eq!(backend.stashes(&repo_ref).unwrap().len(), 2);
+}
+
+/// A root commit stashes against the empty tree, and a merge commit
+/// against its first parent.
+pub fn check_stash_from_commit_handles_root_and_merge_commits(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("a.txt", "a\n", "root")
+        .branch("side")
+        .commit_file("main.txt", "m\n", "on main")
+        .checkout("side")
+        .commit_file("side.txt", "s\n", "on side")
+        .checkout("main")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let root = oid(&repo.git(&["rev-list", "--max-parents=0", "HEAD"]));
+    repo.git(&["merge", "-q", "--no-ff", "-m", "merge side", "side"]);
+    let merge = oid(&repo.git(&["rev-parse", "HEAD"]));
+
+    backend.stash_from_commit(&repo_ref, root, None).unwrap();
+    assert_eq!(
+        repo.git(&["stash", "show", "--name-only", "stash@{0}"])
+            .trim(),
+        "a.txt"
+    );
+    backend.stash_from_commit(&repo_ref, merge, None).unwrap();
+    assert_eq!(
+        repo.git(&["stash", "show", "--name-only", "stash@{0}"])
+            .trim(),
+        repo.git(&[
+            "diff",
+            "--name-only",
+            &format!("{}^1", merge.to_hex()),
+            &merge.to_hex()
+        ])
+        .trim()
+    );
+    repo.git(&["stash", "drop", "-q"]);
+    repo.git(&["stash", "drop", "-q"]);
+    assert!(backend.stashes(&repo_ref).unwrap().is_empty());
+}

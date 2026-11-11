@@ -597,6 +597,16 @@ pub trait GitBackend: Send + Sync {
     /// Atomic: a patch that does not apply cleanly changes nothing.
     fn patch_apply(&self, repo: &RepoRef, patch: &Path) -> Result<PatchApplied>;
 
+    /// Replays the changes `commit` made (its diff against its parent, or
+    /// against the empty tree for a root commit) onto the working tree
+    /// only - never the index, never HEAD. Binary files and line endings
+    /// come out as in the commit.
+    ///
+    /// All or nothing: when any file does not apply cleanly, nothing is
+    /// changed and the error says why. A merge commit is refused with
+    /// [`crate::Error::ApplyRefused`]. Returns the touched paths.
+    fn apply_commit_to_worktree(&self, repo: &RepoRef, commit: Oid) -> Result<PatchApplied>;
+
     fn tag_create(
         &self,
         repo: &RepoRef,
@@ -1040,6 +1050,12 @@ pub trait GitBackend: Send + Sync {
     /// be a stash commit (a merge of the base, the index and, maybe, the
     /// untracked files); anything else is an error and changes nothing.
     fn stash_store(&self, repo: &RepoRef, commit: Oid, message: &str) -> Result<()>;
+    /// Builds a stash holding exactly the changes `commit` made (against
+    /// its first parent, or the empty tree for a root commit) and puts it
+    /// on top of the stash list, as `git stash store` would. The working
+    /// tree, index and HEAD are not touched. `message` defaults to a text
+    /// naming the commit. Returns the stash commit.
+    fn stash_from_commit(&self, repo: &RepoRef, commit: Oid, message: Option<&str>) -> Result<Oid>;
     /// The repo-relative paths the stash commit `commit` holds changes
     /// for, untracked files included, sorted: what applying or popping it
     /// can touch. A read.

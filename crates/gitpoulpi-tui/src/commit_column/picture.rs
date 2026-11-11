@@ -29,7 +29,9 @@ pub(super) const REFS_W: usize = 14;
 pub(super) const CHANGES_W: usize = 12;
 pub(super) const SHA_W: usize = 7;
 /// The least a part the user resized keeps.
-pub(super) const MIN_LANES: usize = graph::COMPACT_W;
+pub(super) fn min_lanes() -> usize {
+    graph::min_width()
+}
 pub(super) const MIN_AUTHOR: usize = 4;
 pub(super) const MIN_DATE: usize = 4;
 pub(super) const MIN_REFS: usize = 6;
@@ -238,7 +240,7 @@ pub(super) fn plan_custom(
     let graph = if !shown[0] || (needed == 0 && custom[0] == 0) {
         0
     } else {
-        pick(custom[0], needed, MIN_LANES)
+        pick(custom[0], needed, min_lanes())
     };
     let author = part(1, AUTHOR_W, MIN_AUTHOR);
     let date = part(2, DATE_W, MIN_DATE);
@@ -279,7 +281,7 @@ pub(super) fn lanes_needed(layout: &LogLayout, offset: usize, shown: usize) -> u
     // The automatic width is never the compact one (`graph::COMPACT_W`):
     // that is the user's to pick, by sizing the part down to its least.
     if widest > 0 {
-        widest.max(graph::COMPACT_W + 1)
+        widest.max(graph::min_width() + 1)
     } else {
         0
     }

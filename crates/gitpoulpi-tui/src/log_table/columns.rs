@@ -97,11 +97,12 @@ impl LogColumn {
     }
 
     /// The least a column can be **dragged** to. The Graph column goes down
-    /// to one commit dot (`graph::COMPACT_W`), where the graph is compact;
+    /// to one commit dot (`graph::min_width`: a lane of two cells, one more with
+    /// avatars in the circles), where the graph is compact;
     /// the automatic layout still keeps [`LogColumn::min_width`] for it.
     pub(crate) fn drag_min_width(self) -> u16 {
         match self {
-            LogColumn::Graph => crate::graph::COMPACT_W as u16,
+            LogColumn::Graph => crate::graph::min_width() as u16,
             other => other.min_width(),
         }
     }
@@ -667,4 +668,26 @@ pub(crate) fn boundary_drag_widths(
             .filter(|(c, _)| *c != LogColumn::Message)
             .collect(),
     )
+}
+
+#[cfg(test)]
+mod avatar_floor_tests {
+    use super::*;
+    use std::collections::{HashMap, HashSet};
+
+    /// With avatars in the Graph column's circles it cannot be dragged, nor a
+    /// saved width applied, below one lane plus the avatar's spill cell.
+    /// Red if `drag_min_width` ignores the avatars flag.
+    #[test]
+    fn the_graph_column_cannot_go_below_the_avatar_floor() {
+        crate::graph::set_avatars_in_graph(false);
+        assert_eq!(LogColumn::Graph.drag_min_width(), 2);
+        crate::graph::set_avatars_in_graph(true);
+        assert_eq!(LogColumn::Graph.drag_min_width(), 3);
+        // A width saved while avatars were off (2 cells) is raised.
+        let saved = HashMap::from([(LogColumn::Graph, 2)]);
+        let widths = LogColumnWidths::for_area_width(120, &HashSet::new(), &saved);
+        assert!(widths.width_of(LogColumn::Graph) >= 3);
+        crate::graph::set_avatars_in_graph(false);
+    }
 }

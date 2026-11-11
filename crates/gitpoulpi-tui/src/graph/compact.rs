@@ -8,6 +8,8 @@
 //! both renderers (characters and the picture) go through the same cells here,
 //! so they cannot disagree about what a compact row is.
 
+use std::cell::Cell;
+
 use ratatui::text::{Line, Span};
 
 use super::connector::node_column;
@@ -19,9 +21,32 @@ use super::raster::RasterRow;
 /// across).
 pub(crate) const COMPACT_W: usize = 2;
 
+// Whether the Graph draws the author pictures in the commit circles
+// (`ui.avatars = "graph"` on a terminal that draws the graph as a picture).
+// A fact like the theme: the column floors are asked from the layout, the
+// drag and the renderers alike, and all must agree. Per thread: the UI thread owns the layout and the
+// drawing, and a test that sets it cannot leak into another.
+thread_local! {
+    static AVATARS_IN_GRAPH: Cell<bool> = const { Cell::new(false) };
+}
+
+/// Called when the setting or the terminal's capability is (re)read.
+pub(crate) fn set_avatars_in_graph(on: bool) {
+    AVATARS_IN_GRAPH.with(|c| c.set(on));
+}
+
+/// The Graph column's least width and the widest compact one. The lane is
+/// two cells ([`COMPACT_W`]); an avatar circle is two cells across and the
+/// graph is shifted right by `avatar_left_pad`, so with avatars in the circles
+/// one more cell is kept for it: a column of one lane, never less, so a
+/// picture is never clipped by the column's own edge.
+pub(crate) fn min_width() -> usize {
+    COMPACT_W + usize::from(AVATARS_IN_GRAPH.with(Cell::get))
+}
+
 /// Whether a Graph column `width` cells wide draws the compact graph.
 pub(crate) fn is_compact(width: usize) -> bool {
-    width <= COMPACT_W
+    width <= min_width()
 }
 
 /// A row's cells reduced to its commit dot, alone in the first cell: no
@@ -57,5 +82,26 @@ pub(crate) fn compact_raster_rows(rows: &mut [RasterRow]) {
     for row in rows {
         row.cells = compact_cells(&row.cells);
         row.ref_connector = false;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Without avatars in the circles the column goes down to the two-cell
+    /// lane; with them one cell more is kept, and a column at that width is
+    /// still the compact one. Red if `min_width` ignores the flag.
+    #[test]
+    fn the_floor_is_one_lane_and_one_cell_more_with_avatars() {
+        set_avatars_in_graph(false);
+        assert_eq!(
+            (min_width(), is_compact(2), is_compact(3)),
+            (2, true, false)
+        );
+        set_avatars_in_graph(true);
+        assert_eq!((min_width(), is_compact(2), is_compact(3)), (3, true, true));
+        assert!(!is_compact(4));
+        set_avatars_in_graph(false);
     }
 }

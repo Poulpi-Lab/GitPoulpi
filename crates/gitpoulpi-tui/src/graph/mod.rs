@@ -36,7 +36,11 @@ mod walk_filter;
 use ratatui::style::Color;
 
 pub(crate) use cache::{LayoutInputs, LogLayout, LogLayoutCache};
-pub(crate) use compact::{compact_line, compact_raster_rows, is_compact, COMPACT_W};
+#[cfg(test)]
+pub(crate) use compact::COMPACT_W;
+pub(crate) use compact::{
+    compact_line, compact_raster_rows, is_compact, min_width, set_avatars_in_graph,
+};
 pub(crate) use connector::{banded_graph_cell, node_column, with_ref_connector};
 pub(crate) use ghost_ref::GhostRef;
 pub(crate) use inline_image::GraphImage;

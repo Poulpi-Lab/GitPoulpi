@@ -207,7 +207,11 @@ fn prefix_hint_lists_ai_keys_only_when_on() {
     assert!(!off.contains("AI-message") && on.contains("i=AI-message w=AI-explain"));
     let nav = prefix_hint(&km, keymap::Ctx::NavPrefix, false);
     assert!(nav.starts_with("Ctrl+N: h=collapse Refs  l=collapse Status  <badge>"));
-    assert!(nav.ends_with("t=select tab  (Esc to cancel)"), "{nav}");
+    assert!(
+        nav.contains("y=theme") && nav.contains("g=language"),
+        "{nav}"
+    );
+    assert!(nav.ends_with("?=help  (Esc to cancel)"), "{nav}");
 }
 
 #[test]

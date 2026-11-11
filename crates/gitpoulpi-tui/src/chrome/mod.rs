@@ -322,20 +322,9 @@ pub(crate) fn prefix_hint(km: &keymap::Keymap, ctx: keymap::Ctx, ai_on: bool) ->
     }
     let mut line = h::lead(km.shown(prefix));
     if ctx == keymap::Ctx::NavPrefix {
-        // `<badge>` sits between the two collapse keys and the rest.
-        line.push_str(&parts.join("  "));
-        line.push_str("  <badge>=");
-        line.push_str(h::FOCUS_SUBPANE.get());
-        for (action, name) in [
-            (A::NavOpenSettings, h::SETTINGS),
-            (A::NavToggleHelp, h::HELP),
-            (A::NavSelectTab, h::SELECT_TAB),
-        ] {
-            let key = km.shown_key(action);
-            if !key.is_empty() {
-                line.push_str(&format!("  {key}={}", name.get()));
-            }
-        }
+        let mut items = nav_hint_items(km);
+        items.extend(Some(nav_help_item(km, false)).filter(|i| !i.is_empty()));
+        line.push_str(&items.join("  "));
         line.push_str("  ");
         line.push_str(h::ESC_CANCEL.get());
     } else {
@@ -344,6 +333,56 @@ pub(crate) fn prefix_hint(km: &keymap::Keymap, ctx: keymap::Ctx, ai_on: bool) ->
         line.push_str(h::ESC_CANCEL.get());
     }
     line
+}
+
+/// Every action of the Ctrl+N mode that is bound, as `key=name`, the most
+/// useful first: the collapse keys, the sub-pane badge, the dialogs (theme,
+/// language, Settings, tabs, Activity, jobs, updates, About), the graph looks,
+/// then the pane resizing keys. The help key is left to [`nav_help_item`].
+pub(crate) fn nav_hint_items(km: &keymap::Keymap) -> Vec<String> {
+    use gitpoulpi_i18n::msg::footer_hint as h;
+    use keymap::Action as A;
+    let items = std::cell::RefCell::new(Vec::new());
+    let push = |action: A, name: &str| {
+        let key = km.shown_key(action);
+        if !key.is_empty() {
+            items.borrow_mut().push(format!("{key}={name}"));
+        }
+    };
+    let push_raw = |item: String| items.borrow_mut().push(item);
+    push(A::NavCollapseLeft, h::COLLAPSE_REFS.get());
+    push(A::NavCollapseRight, h::COLLAPSE_STATUS.get());
+    push_raw(format!("<badge>={}", h::FOCUS_SUBPANE.get()));
+    push(A::NavChangeTheme, h::THEME.get());
+    push(A::NavChangeLanguage, h::LANGUAGE.get());
+    push(A::NavOpenSettings, h::SETTINGS.get());
+    push(A::NavSelectTab, h::SELECT_TAB.get());
+    push(A::NavOpenActivityLog, h::ACTIVITY.get());
+    push(A::NavShowJobs, h::JOBS.get());
+    push(A::NavShowUpdates, h::UPDATES.get());
+    push(A::NavOpenAbout, h::ABOUT.get());
+    push(A::NavChangeGraphColorTheme, h::GRAPH_COLORS.get());
+    push(A::NavToggleGraphRowTints, h::ROW_TINTS.get());
+    push(A::NavOpenGlobalLog, h::GLOBAL_LOG.get());
+    push(A::NavGrowSection, h::RESIZE_SECTION.get());
+    push(A::NavGrowMessage, h::RESIZE_MESSAGE.get());
+    push(A::NavRefsWider, h::RESIZE_REFS.get());
+    push(A::NavStatusWider, h::RESIZE_STATUS.get());
+    items.into_inner()
+}
+
+/// The closing item of the Ctrl+N hint: `?=help`, or with `truncated` the
+/// `?=all keys` that says the line left some out. Empty when help is unbound.
+pub(crate) fn nav_help_item(km: &keymap::Keymap, truncated: bool) -> String {
+    use gitpoulpi_i18n::msg::footer_hint as h;
+    let key = km.shown_key(keymap::Action::NavToggleHelp);
+    if key.is_empty() {
+        String::new()
+    } else if truncated {
+        h::all_keys(key)
+    } else {
+        format!("{key}={}", h::HELP.get())
+    }
 }
 
 /// The cap on a pending vim-style count (`4j`, `10k`, ...) - generous

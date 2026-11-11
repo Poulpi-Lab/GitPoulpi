@@ -126,3 +126,41 @@ fn the_graph_at_its_least_width_is_one_dot_per_row_and_one_cell_more_brings_the_
     );
     term.stop().unwrap();
 }
+
+/// With the author pictures in the commit circles (`ui.avatars = "graph"` on a
+/// terminal that draws the graph as pictures) the circle is two cells across,
+/// so the Graph column cannot be dragged below one lane plus the spill cell:
+/// three cells, not two. Red if the floor ignores the avatars.
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "ConPTY drops the kitty graphics APC from the stream the driver reads"
+)]
+fn the_graph_column_cannot_be_dragged_below_three_cells_with_avatars_in_the_circles() {
+    let repo = fixture();
+    let (mut term, _config) = common::launch(repo.root())
+        .session("pty-graph-compact-avatars")
+        .config(
+            "[ui]\ngraph_renderer = \"image\"\nimage_protocol = \"kitty\"\navatars = \"graph\"\n",
+        )
+        .terminal_image()
+        .env("GITPOULPI_TERMINAL_CELL_PX", "9x21")
+        .size(200, 40)
+        .ready_when("the Log header", |s| {
+            s.contains("merge topic") && header(s, "Graph").is_some()
+        })
+        .mouse_capture()
+        .start();
+    let (gx, row) = header(&snap(&term), "Graph").unwrap();
+    let (mx, _) = header(&snap(&term), "Message").unwrap();
+    assert!(mx - gx > 4, "the Graph column starts wide");
+    // Dragged as far left as the pointer goes: it stops at three cells.
+    term.drag((mx - 1, row), (gx + 1, row)).unwrap();
+    term.wait_for("the narrowest Graph", STEP, |s| {
+        header(s, "Message").is_some_and(|(x, _)| x < mx)
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (mx_now, _) = header(&snap(&term), "Message").unwrap();
+    assert_eq!(mx_now, gx + 3, "{}", term.text());
+    term.stop().unwrap();
+}

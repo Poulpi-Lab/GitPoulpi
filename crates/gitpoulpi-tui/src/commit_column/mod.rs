@@ -248,7 +248,7 @@ impl Part {
     pub(crate) fn min_width(self) -> usize {
         match self {
             Part::Refs => picture::MIN_REFS,
-            Part::Graph => picture::MIN_LANES,
+            Part::Graph => picture::min_lanes(),
             Part::Title => picture::MIN_MESSAGE,
             Part::Author => picture::MIN_AUTHOR,
             Part::Date => picture::MIN_DATE,

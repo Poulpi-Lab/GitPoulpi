@@ -668,7 +668,10 @@ fn a_dialog_over_the_log_keeps_the_avatars_it_does_not_cover() {
         } else {
             buf[(AUTHOR_X, TOP + 8)].diff_option == ratatui::buffer::CellDiffOption::Skip
         };
-        assert!(kept, "kitty={kitty}: the picture outside the dialog is gone");
+        assert!(
+            kept,
+            "kitty={kitty}: the picture outside the dialog is gone"
+        );
     }
 }
 

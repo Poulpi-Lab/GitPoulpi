@@ -88,6 +88,7 @@ pub(super) fn init(
     let avatar_capability = graph_image.capability();
     let commit_graph_image = graph::GraphImage::new(avatar_capability);
     graph_image.set_avatars(avatar::in_graph(avatar_placement, avatar_capability));
+    graph::set_avatars_in_graph(avatar::in_graph(avatar_placement, avatar_capability));
     // The bitmap is decoded once, at the size of the biggest picture drawn
     // from it: the commit detail's square author box (at the terminal's
     // own pixel size) or the graph node's picture box

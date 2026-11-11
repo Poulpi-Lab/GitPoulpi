@@ -392,10 +392,41 @@ pub(in crate::event_loop) fn prefix_hint_rows(
         InputMode::Navigation => keymap::Ctx::NavPrefix,
         _ => return Vec::new(),
     };
-    let mut rows = wrap_hint(
-        &chrome::prefix_hint(&keymap::current(), ctx, ai_on),
-        width.max(1) as usize,
-    );
+    let km = keymap::current();
+    let width = width.max(1) as usize;
+    if ctx == keymap::Ctx::NavPrefix {
+        return nav_hint_rows(&km, width);
+    }
+    let mut rows = wrap_hint(&chrome::prefix_hint(&km, ctx, ai_on), width);
+    rows.truncate(MAX_HINT_ROWS);
+    rows
+}
+
+/// The Ctrl+N hint in at most [`MAX_HINT_ROWS`] rows of `width`: every bound
+/// action while they fit, else the first ones (the most useful come first)
+/// and a closing `?=all keys` where the help key lists the rest. Whole items
+/// only, so nothing is cut mid-word at the right edge.
+pub(in crate::event_loop) fn nav_hint_rows(km: &keymap::Keymap, width: usize) -> Vec<String> {
+    use gitpoulpi_i18n::msg::footer_hint as h;
+    let items = chrome::nav_hint_items(km);
+    let lead = h::lead(km.shown(keymap::Action::GlobalNavPrefix));
+    let build = |n: usize| {
+        let truncated = n < items.len();
+        let mut parts: Vec<String> = items[..n].to_vec();
+        let help = chrome::nav_help_item(km, truncated);
+        if !help.is_empty() {
+            parts.push(help);
+        }
+        parts.push(h::ESC_CANCEL.get().to_string());
+        wrap_hint(&format!("{lead}{}", parts.join("  ")), width)
+    };
+    for n in (0..=items.len()).rev() {
+        let rows = build(n);
+        if rows.len() <= MAX_HINT_ROWS {
+            return rows;
+        }
+    }
+    let mut rows = build(0);
     rows.truncate(MAX_HINT_ROWS);
     rows
 }
@@ -462,7 +493,62 @@ pub(in crate::event_loop) fn footer_hints(
 
 #[cfg(test)]
 mod tests {
-    use super::{footer_hints, wrap_hint};
+    use super::{footer_hints, nav_hint_rows, wrap_hint};
+    use crate::display_width;
+    use crate::keymap::Keymap;
+    use gitpoulpi_i18n::{override_lang, Lang};
+
+    fn assert_fits(rows: &[String], width: usize, what: &str) {
+        assert!(
+            !rows.is_empty() && rows.len() <= super::MAX_HINT_ROWS,
+            "{what}: {rows:?}"
+        );
+        for r in rows {
+            assert!(
+                display_width(r) <= width,
+                "{what}: {r:?} wider than {width}"
+            );
+        }
+    }
+
+    /// The Ctrl+N line names the dialog keys (theme, language, Settings, tab,
+    /// Activity ...) from the keymap, never overflows, and when something
+    /// does not fit ends with the help key's `all keys` hint instead of
+    /// cutting an item. Red if the items fall back to the old four.
+    #[test]
+    fn the_nav_line_lists_the_dialog_keys_and_never_overflows() {
+        let km = Keymap::defaults();
+        let wide = nav_hint_rows(&km, 240).join(" ");
+        for want in [
+            "y=theme",
+            "g=language",
+            ",=settings",
+            "t=select tab",
+            "A=activity",
+            "u=updates",
+            "a=about",
+            "h=collapse Refs",
+            "?=help",
+        ] {
+            assert!(wide.contains(want), "{want} missing: {wide}");
+        }
+        assert!(!wide.contains("all keys"), "everything fits at 240: {wide}");
+        for lang in [Lang::En, Lang::Fr, Lang::De] {
+            let _l = override_lang(lang);
+            for width in [80usize, 60, 40] {
+                let rows = nav_hint_rows(&km, width);
+                assert_fits(&rows, width, &format!("{lang:?} {width}"));
+                let text = rows.join(" ");
+                assert!(text.contains("y="), "{lang:?} {width}: theme key: {text}");
+                if width <= 60 {
+                    assert!(text.contains("?="), "{lang:?} {width}: no help: {text}");
+                }
+            }
+        }
+        let _l = override_lang(Lang::En);
+        let narrow = nav_hint_rows(&km, 40).join(" ");
+        assert!(narrow.contains("?=all keys"), "{narrow}");
+    }
 
     #[test]
     fn a_long_hint_wraps_between_words_and_loses_nothing() {

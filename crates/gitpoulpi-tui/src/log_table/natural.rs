@@ -57,7 +57,7 @@ impl NaturalWidths {
     pub(crate) fn of(&self, col: LogColumn) -> u16 {
         let floor = match col {
             // Wider than the compact picture, so it still draws lanes.
-            LogColumn::Graph => crate::graph::COMPACT_W as u16 + 1,
+            LogColumn::Graph => crate::graph::min_width() as u16 + 1,
             other => other.drag_min_width(),
         };
         self.cells[slot(col)].clamp(floor, MAX_COLUMN_CELLS)

@@ -5081,6 +5081,34 @@ focus_subpane = "focus that sub-pane"
 settings = "settings"
 help = "help"
 select_tab = "select tab"
+# context: Ctrl+N hint, key opens the theme picker
+theme = "theme"
+# context: Ctrl+N hint, key opens the language picker
+language = "language"
+# context: Ctrl+N hint, key opens the graph colors picker
+graph_colors = "graph colors"
+# context: Ctrl+N hint, key toggles the graph row tints
+row_tints = "row tints"
+# context: Ctrl+N hint, key opens the Activity Log
+activity = "activity"
+# context: Ctrl+N hint, key opens the global log
+global_log = "global log"
+# context: Ctrl+N hint, key shows the background jobs
+jobs = "jobs"
+# context: Ctrl+N hint, key shows the updates panel
+updates = "updates"
+# context: Ctrl+N hint, key opens the About dialog
+about = "about"
+# context: Ctrl+N hint, keys grow and shrink the focused section
+resize_section = "resize section"
+# context: Ctrl+N hint, keys grow and shrink the Message column
+resize_message = "resize Message"
+# context: Ctrl+N hint, keys widen and narrow the Refs pane
+resize_refs = "resize Refs"
+# context: Ctrl+N hint, keys widen and narrow the Status pane
+resize_status = "resize Status"
+# context: Ctrl+N hint shown when not every key fits: {key} is the help key, which lists them all
+all_keys = "{key}=all keys"
 esc_cancel = "(Esc to cancel)"
 
 # Refs sidebar: section headers (upper case), filter box, drag banner, solo/hidden title.

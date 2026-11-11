@@ -2007,3 +2007,45 @@ fn the_row_tint_strength_fades_the_band_but_not_the_bar() {
     let d = rasterize(&node_row, &base);
     assert_eq!(alpha_at(&d, d.width - 4, d.height - 1), medium);
 }
+
+// ---- the Graph column's least width with avatars in the circles ----
+
+/// The rightmost bitmap column holds ink (alpha above zero) anywhere.
+fn ink_on_the_right_edge(bmp: &Bitmap) -> bool {
+    (0..bmp.height).any(|y| bmp.rgba(bmp.width - 1, y).is_some_and(|p| p.3 > 0))
+}
+
+/// One lane with a face at the narrowest column the layout allows with
+/// avatars (`graph::min_width`): the circle and its ring sit whole inside
+/// the bitmap. At the bare two-cell lane the circle (about two cells across,
+/// shifted right by the left pad) is cut by the column's right edge, which is
+/// why the floor is one cell more with avatars.
+///
+/// Falsified: `min_width` ignoring the avatars flag (two cells) - ink on the
+/// right edge, red; restored.
+#[test]
+fn the_narrowest_column_with_avatars_shows_the_whole_circle() {
+    crate::graph::set_avatars_in_graph(true);
+    let columns = crate::graph::min_width() as u16;
+    assert_eq!(columns, 3, "a two-cell lane and the avatar's spill cell");
+    let opt = RasterOptions::new(CellSize::FALLBACK, columns).with_avatars(true);
+    let row = RasterRow {
+        cells: vec![node(NodeKind::Commit, Sides::NONE)],
+        selected: false,
+        avatar: Some(face()),
+        ref_connector: false,
+    };
+    let bmp = rasterize(std::slice::from_ref(&row), &opt);
+    assert!(
+        !ink_on_the_right_edge(&bmp),
+        "the circle is cut on the right"
+    );
+    // The circle's center is the face.
+    let cy = CellSize::FALLBACK.height / 2;
+    let cx = super::raster::avatar_left_pad(&opt) + CellSize::FALLBACK.width / 2;
+    assert!(near(shown(&bmp, cx, cy).unwrap(), FACE));
+    // Contrast: a bare two-cell column cuts it.
+    let two = RasterOptions::new(CellSize::FALLBACK, 2).with_avatars(true);
+    assert!(ink_on_the_right_edge(&rasterize(&[row], &two)));
+    crate::graph::set_avatars_in_graph(false);
+}

@@ -645,6 +645,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                     }
                     let in_graph = avatar::in_graph(avatar_placement, avatar_capability);
                     graph_image.set_avatars(in_graph);
+                    graph::set_avatars_in_graph(in_graph);
                     graph_image.set_lane_background(ui_lane_background);
                     graph_image.set_tint_strength(ui_tint_strength);
                     if let (true, Some(nodes)) = (in_graph, solo_nodes.as_ref()) {

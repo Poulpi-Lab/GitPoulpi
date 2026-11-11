@@ -530,7 +530,7 @@ toolbar_align = "Justering av verktygsfältets knappar"
 toolbar_align_help = "Var knapparna sitter längs fältet: Början (standard), Mitten eller Slutet. Början är vänster i en rad och överst i en kolumn; slutet är höger och nederst. Gäller direkt."
 # context: label of the setting that decides whether a dialog the user moved or resized keeps its place
 dialog_geometry = "Kom ihåg dialogrutans position och storlek"
-dialog_geometry_help = "Dialogrutor kan flyttas (dra i titelraden, eller Ctrl+N och sedan m) och ändras i storlek (dra i kanterna och de nedre hörnen). Under den här sessionen (standard): behålls tills GitPoulpi stängs. Sparat på disk: behålls även till nästa start. Aldrig: varje dialogruta öppnas på sin standardplats och i sin standardstorlek. Gäller direkt."
+dialog_geometry_help = "En inställning för alla dialogrutor. Dialogrutor kan flyttas (dra i titelraden, eller Ctrl+N och sedan m); de större fönstren kan också ändras i storlek (dra i kanterna och de nedre hörnen). Varje dialogruta kommer ihåg sin egen plats och storlek. Under den här sessionen (standard): behålls tills GitPoulpi stängs. Sparat på disk: behålls även till nästa start. Aldrig: varje dialogruta öppnas på sin standardplats och i sin standardstorlek. Gäller direkt."
 toolbar_pr_pinned = { git = "Fäst {$pr}-knappen i slutet", local = "Fäst {$pr_abbr}-knappen i slutet" }
 toolbar_pr_pinned_help = { git = "På (standard): {$pr}-knappen sitter längst bort i verktygsfältet (höger, i en kolumn nederst) oavsett justering. Av: den flödar med de andra knapparna och justeras med dem. Gäller direkt.", local = "På (standard): {$pr_abbr}-knappen sitter längst bort i verktygsfältet (höger, i en kolumn nederst) oavsett justering. Av: den flödar med de andra knapparna och justeras med dem. Gäller direkt." }
 statusbar_position = "Statusradens position"
@@ -2487,7 +2487,7 @@ git_prefix_lfs_push_all = "LFS: {$Push} (alla objekt)"
 git_prefix_lfs_prune = "LFS: Rensa lokala objekt"
 composer_insert_issue_ref = "Infoga en ärendereferens"
 palette_configure_shortcut = "Palett: ange genväg för det markerade kommandot"
-palette_arrange = "Popup: Move or Resize the Palette or Picker in Front"
+palette_arrange = "Popup: flytta eller ändra storlek på paletten eller väljaren längst fram"
 global_undo_history = "Öppna ångrahistoriken"
 global_undo_offer = "Återställ grenen till där den blockerade åtgärden lämnade den"
 global_radar = "Öppna Radar"
@@ -4194,7 +4194,7 @@ resize_message = "ändra Message"
 resize_refs = "ändra Refs"
 resize_status = "ändra Status"
 # context: Ctrl+N hint, key arranges (moves, resizes) the open dialog
-arrange = "arrange"
+arrange = "ordna"
 all_keys = "{key}=alla tangenter"
 esc_cancel = "(Esc för att avbryta)"
 

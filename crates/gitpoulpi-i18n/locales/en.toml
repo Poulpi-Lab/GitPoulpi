@@ -741,7 +741,7 @@ toolbar_align = "Toolbar button alignment"
 toolbar_align_help = "Where the toolbar's buttons sit along it: Start (default), Center or End. Start is the left of a row and the top of a column; End is the right and the bottom. Applies at once."
 # context: label of the setting that decides whether a dialog the user moved or resized keeps its place
 dialog_geometry = "Remember dialog position and size"
-dialog_geometry_help = "Dialogs can be moved (drag the title bar, or Ctrl+N then m) and resized (drag the borders and bottom corners). For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
+dialog_geometry_help = "One setting for every dialog. Dialogs can be moved (drag the title bar, or Ctrl+N then m); the larger windows can also be resized (drag the borders and bottom corners). Each dialog remembers its own place and size. For this session (default): kept until GitPoulpi closes. Saved to disk: kept for the next launch too. Never: every dialog opens at its default place and size. Applies at once."
 # context: label of an on/off setting: the pull request button stays at the far end of the toolbar; {$pr} is the pull or merge request term
 toolbar_pr_pinned = "Pin the {$pr} button to the end"
 toolbar_pr_pinned_help = "On (default), the {$pr} button sits at the far end of the toolbar (right, or bottom in a column), whatever the alignment. Off, it flows with the other buttons and is aligned with them. Applies at once."

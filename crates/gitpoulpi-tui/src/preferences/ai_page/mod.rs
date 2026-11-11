@@ -1554,8 +1554,8 @@ mod fields;
 mod prompt_chips;
 mod prompt_vars;
 
-#[cfg(test)]
-mod tests;
-
 /// The editor moves (its size follows the screen).
 const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("settings_ai_editor");
+
+#[cfg(test)]
+mod tests;

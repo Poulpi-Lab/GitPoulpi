@@ -886,6 +886,9 @@ impl Dismiss for OptionsDialog {
     }
 }
 
+/// The options dialog moves.
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("review_options");
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1058,6 +1061,3 @@ mod tests {
         assert!(!dialog.order().contains(&Part::Run), "not focusable");
     }
 }
-
-/// The options dialog moves.
-const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("review_options");

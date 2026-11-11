@@ -424,13 +424,27 @@ See [Pictures](image-view.md) for the mouse in the image view.
 
 ## Moving and resizing dialogs
 
-The Undo history / Reflog / Lost work dialog can be moved and resized:
+Dialogs can be moved, and the larger windows resized:
 
-- **Drag the title bar** to move it (the close cross keeps its click).
-- **Drag the left, right or bottom border**, or a bottom corner (the `◢` grip), to resize it. The dialog stays on screen and never gets smaller than 60 x 16.
+- **Drag the title bar** to move a dialog (the close cross keeps its click).
+- **Drag the left, right or bottom border**, or a bottom corner (the `◢` grip), to resize a window. The dialog stays on screen and never gets smaller than its minimum (60 x 16 for the Undo history, smaller for the others).
 - The drag goes on when the pointer leaves the dialog, and releasing outside never closes it.
-- **Drag the dividers** between its list, its file list and its hunks; double-click one to reset it.
-- The keyboard twins are `Ctrl+N` then `m` (arrows move, `Shift`+arrows resize, `0` resets, `Enter` or `Esc` leave) and `Alt`+arrows for the dividers; the palette has `Dialog: Move or Resize` and `Dialog: Reset Position and Size`.
+- **Drag the dividers** inside the Undo history's Reflog / Lost work view; double-click one to reset it.
+- The keyboard twins are `Ctrl+N` then `m` (arrows move, `Shift`+arrows resize, `0` resets, `Enter` or `Esc` leave) and `Alt`+arrows for the dividers; the palette has `Dialog: Move or Resize` and `Dialog: Reset Position and Size`. They act on the dialog on top.
+- **One setting** (`ui.dialog_geometry`, Settings > Appearance > Layout) covers every dialog: each remembers its own place and size for this session, on disk for the next launch, or never.
+
+| Dialog | Move | Resize |
+|---|---|---|
+| Undo history / Reflog / Lost work, Activity Log, jobs panel, folder picker | yes | yes |
+| About, update panel, security check, predicted conflicts, "What is sent", "Over the AI limit", tag delete, sensitive files, Mermaid copy | yes | no (the size follows the text) |
+| Clone, Init, Worktree, Sparse checkout, Flow and issue-flow dialogs, Pull request, New issue, Workspace form and its AI box, label / milestone pickers | yes | no |
+| Confirmations (every "Are you sure?") | yes | no |
+| Review and Board dialogs: their small dialogs (comment, finish, options, columns, pick) | yes | no |
+| Settings: the long-text editors (templates, hooks, AI prompts), the repository authentication results and confirmation | yes | no |
+| History rewrite: purge, identity and question dialogs, AI helper panes | yes | no |
+| Move-a-file popup of the commit composer, merge notices | yes | no |
+
+Not movable: the full-page screens (Settings, Help, the Review and Board pages, which already fill the window), context menus and dropdowns (they hang off what opened them), the command palette and its pickers (theme, language, tab, workspace search), and tooltips.
 
 The pointer shows a move shape over the title bar and a resize shape over the borders and corners (terminals with `OSC 22`).
 

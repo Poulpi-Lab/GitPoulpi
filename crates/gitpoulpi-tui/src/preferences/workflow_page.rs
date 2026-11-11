@@ -1730,6 +1730,9 @@ impl PreferencesState {
     }
 }
 
+/// The editor moves (its size follows the screen).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("settings_workflow_editor");
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1771,6 +1774,3 @@ mod tests {
         assert_eq!(list_text(&parse_list("x,y")), "x, y");
     }
 }
-
-/// The editor moves (its size follows the screen).
-const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("settings_workflow_editor");

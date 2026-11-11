@@ -293,7 +293,8 @@ pub enum ToolbarAlign {
 
 config_enum! {
 /// Whether a dialog the user moved or resized (drag its title bar or its
-/// edges, or `Ctrl+N m`) keeps that place: `ui.dialog_geometry`.
+/// edges, or `Ctrl+N m`) keeps that place: `ui.dialog_geometry`. One setting
+/// for every dialog; each dialog keeps its own place and size under it.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum DialogGeometry {
     /// Kept while GitPoulpi runs, forgotten at the next launch. The default.

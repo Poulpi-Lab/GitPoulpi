@@ -87,7 +87,7 @@ author_email = "jane@work.example"
 | `ui.graph_lane_background` | `"off"` | `off` または `row_tint`（グラフの背後にレーン色の淡い帯と、その端のバーを描きます）。**アプリ: グラフの行の色付けを切り替え**（`Ctrl+N Shift+T`）で切り替わり、**アプリ: グラフのカラーテーマを変更...**（`Ctrl+N Shift+Y`）で `ui.graph_color_theme` を選べます。 |
 | `ui.graph_row_tint_strength` | `"medium"` | `strong`、`medium`、`subtle`（`row_tint` のときのみ）。 |
 | `ui.toolbar_position` | `"bottom"` | `top`、`bottom`、`left`、`right`。`left` と `right` は縦の列として描画し、80 列未満のウィンドウでは `bottom` に戻ります。 |
-| `ui.dialog_geometry` | `"session"` | `session`、`saved`、`never`：移動またはサイズ変更したダイアログ（タイトルバーか枠をドラッグ、または `Ctrl+N m`）がその位置を保つかどうか。GitPoulpi を閉じるまで（既定）、次回の起動まで保存（データフォルダーの `dialog_geometry.txt`）、または保持しない。 |
+| `ui.dialog_geometry` | `"session"` | `session`、`saved`、`never`：移動またはサイズ変更したダイアログ（タイトルバーか枠をドラッグ、または `Ctrl+N m`）がその位置を保つかどうか。すべてのダイアログに共通の設定で（各ダイアログがそれぞれの位置とサイズを保ちます）、GitPoulpi を閉じるまで（既定）、次回の起動まで保存（すべてのダイアログがデータフォルダーの 1 つの `dialog_geometry.txt` に入ります）、または保持しない（どのダイアログも既定の位置とサイズで開く）。 |
 | `ui.toolbar_align` | `"start"` | `start`、`center`、`end`：ツールバー上でのボタンの位置（行では左・中央・右、列では上・中央・下）。 |
 | `ui.toolbar_pr_pinned` | `true` | プルリクエストのボタンをツールバーの末端に固定します。`false` にすると他のボタンと一緒に並びます。 |
 | `ui.statusbar_position` | `"bottom"` | `top`（リポジトリのタブの上）または `bottom`。 |

@@ -88,7 +88,7 @@ author_email = "jane@work.example"
 | `ui.graph_row_tint_strength` | `"medium"` | `strong`、`medium`、`subtle`（仅配合 `row_tint`）。 |
 | `ui.toolbar_position` | `"bottom"` | `top`、`bottom`、`left`、`right`。`left` 和 `right` 绘制为一列；窗口窄于 80 列时回退为 `bottom`。 |
 | `ui.toolbar_align` | `"start"` | `start`、`center`、`end`：按钮在工具栏上的位置（一行的左、中、右；一列的上、中、下）。 |
-| `ui.dialog_geometry` | `"session"` | `session`、`saved`、`never`：你移动或调整过大小的对话框（拖动标题栏或边框，或按 `Ctrl+N m`）是否保持其位置：保持到 GitPoulpi 关闭（默认）、保存在磁盘上留到下次启动（数据文件夹中的 `dialog_geometry.txt`），或完全不保持。 |
+| `ui.dialog_geometry` | `"session"` | `session`、`saved`、`never`：你移动或调整过大小的对话框（拖动标题栏或边框，或按 `Ctrl+N m`）是否保持其位置。对所有对话框统一生效的一项设置（每个对话框在其下各自保持自己的位置和大小）：保持到 GitPoulpi 关闭（默认）、保存在磁盘上留到下次启动（所有对话框都在数据文件夹中的同一个 `dialog_geometry.txt` 里），或完全不保持（每个对话框都在默认位置以默认大小打开）。 |
 | `ui.toolbar_pr_pinned` | `true` | 拉取请求按钮固定在工具栏的最末端；`false` 则让它与其他按钮一起排列。 |
 | `ui.statusbar_position` | `"bottom"` | `top`（仓库标签页上方）或 `bottom`。 |
 | `ui.tabs_position` | `"top"` | `top`、`bottom`（窗口最后一行，位于状态栏下方）或 `left`（左边缘的一列；窄于 80 列时仍在顶部）。 |

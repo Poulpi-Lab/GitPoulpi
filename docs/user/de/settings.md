@@ -184,23 +184,24 @@ Die Seitenliste hat zwei Gruppen:
 | **Standardordner für Durchsuchen** | Wo Durchsuchen sich öffnet. Leer: der zuletzt verwendete Ordner, sonst Ihr Home-Ordner. |
 | **Speicherort der Repository-Daten** | Wo GitPoulpi seine Daten je Repository ablegt (`session.per_repo_state_dir`): **In .git (Ordner gitpoulpi)** (Standard: In Ihrem Arbeitsverzeichnis erscheint nichts, alle Worktrees teilen sie), **Im Arbeitsverzeichnis (Ordner .gitpoulpi)** (ein Ordner `.gitpoulpi`; nötig, um eine gemeinsame `workflow.toml` einzuchecken) oder **In meinem Benutzerdatenordner (außerhalb des Repositorys)**. Ein von einer älteren Version hinterlassener Ordner `.gitpoulpi` wird beim ersten Bedarf an den neuen Ort verschoben und entfernt, sobald er leer ist; eine Datei, die Git verfolgt (eine eingecheckte `workflow.toml`), wird nie verschoben oder gelöscht und bleibt lesbar. |
 | **Standard-Branch-Name** | Der erste Branch eines mit Init angelegten Repositorys. Leer: git entscheidet. Er benennt keinen bestehenden Branch um. |
-| **Proaktive Konflikterkennung aktivieren** | Standardmäßig an (`general.conflict_detection`). Warnt im Log, wenn ein Merge des aktuellen Branches in den Branch, von dem er abzweigte, Konflikte verursachen würde, bevor Sie es versuchen. Ein Repository kann sie auf seiner Seite **Konfliktvermeidung** für sich ausschalten. Siehe [Merge-Konflikte lösen](merge-conflicts.md#konfliktvermeidung). Wirkt beim Schließen der Einstellungen. |
-| **Standard-Basis-Branches** | Unter dem Schalter, in der Gruppe **Konfliktvermeidung** (der Palettenbefehl **Konflikte: Basis-Branch-Listen bearbeiten...** öffnet sie). Die Liste von Basis-Branch-Mustern, die Repositories verwenden, wenn sie keine eigenen haben: **Integriert (`**`)**, also jeder Branch, oder eine Ihrer benannten Listen (`conflict_prevention.default_list`). Sie gilt für die geöffneten Repositories, wenn die Einstellungen geschlossen werden. **Auf integrierten Standard zurücksetzen** kehrt zu `**` zurück. |
-| **Basis-Branch-Listen** | Ebenfalls in dieser Gruppe: Ihre benannten Listen von Basis-Branch-Mustern (`[conflict_prevention.lists.<name>]`), je ein Block mit seinem **Namen** (beim Umbenennen bleibt sie der Standard, falls sie es war; ein Repository, das dem alten Namen folgte, verwendet die Standardliste, bis Sie sie erneut wählen), seinen **Mustern** (eines pro Zeile, `Enter` oder ein Klick öffnet den Editor, `Ctrl+S` übernimmt sie), **Zum Standard machen** und **Liste löschen** (fragt zuerst und sagt, dass Repositories, die ihr folgen, stattdessen die Standardliste verwenden). Geben Sie unter **Neue Liste** einen Namen ein und drücken Sie `Enter`, um eine anzulegen; sie beginnt mit `**`. Das Bearbeiten einer Liste ändert jedes Repository, das ihr folgt. |
 | **Protokollstufe**, **Protokolldateien aufbewahren**, **Maximale Größe einer Protokolldatei** | Das Anwendungsprotokoll hinter dem Aktivitätsprotokoll: die ausführlichste aufgezeichnete Stufe (`log.level`), wie lange Dateien aufbewahrt werden (eine ganze Zahl und eine Einheit, Tage, Wochen, Monate oder Jahre, in einer Zeile: ein Klick auf die Zahl erlaubt das Tippen, Auf und Ab ändern sie schrittweise, Tab wechselt zur Einheit und Enter öffnet deren Liste; höchstens 1 bis 10 Jahre, Standard 1 Woche, `log.retention_days` und `log.retention_unit`) und die Größe, bei der die Datei eines Tages rotiert wird (eine Zahl und MiB oder GiB, 1 MiB bis 1 GiB, `log.max_file_mb` und `log.max_file_unit`). |
 | **Dauer der Vorgänge anzeigen**, **Erweiterte Protokollierung** | Der Tab Git-Vorgänge des Aktivitätsprotokolls: die Dauer jedes Vorgangs (`log.timings`, standardmäßig an) und auch die Hintergrundarbeit, Aktualisierung und Auto-Fetch (`log.extended`, standardmäßig aus). Siehe [Wenn etwas fehlschlägt](troubleshooting.md#das-aktivitätsprotokoll). |
 | **Rückgängig aktiviert**, **Tiefe des Rückgängig-Verlaufs**, **Änderungen außerhalb von GitPoulpi aufzeichnen** | Die Gruppe **Rückgängig-Verlauf**. Schaltet Rückgängig ein oder aus und legt fest, wie viele Vorgänge es aufbewahrt (Standard 100, `0` bedeutet unbegrenzt). Rückgängig auszuschalten löscht den Rückgängig-Verlauf, nach einer Bestätigung. Die letzte Option erfasst außerdem, was eine Shell oder ein Agent an Branches, Tags, Stashes und HEAD tut. Siehe [Rückgängig und Wiederholen](undo-redo.md). |
 
-#### Starter (Desktop-Integration)
+Der Palettenbefehl **App: Sprache wechseln...** (`Ctrl+N g`) öffnet dieselbe
+Sprachliste. Dort wird die hervorgehobene Sprache live in der Vorschau gezeigt;
+`Enter` behält sie und `Esc` stellt die vorherige wieder her.
 
-Die Gruppe **Starter**, die letzte auf der Seite Allgemein, legt eine Verknüpfung an, die GitPoulpi
+### Starter
+
+Die Seite **Starter** (`gitpoulpi ui show settings launcher`) legt eine Verknüpfung an, die GitPoulpi
 über den Starter des Betriebssystems startet, in dem Terminal Ihrer Wahl.
 
 | Zeile | Was sie tut |
 |---|---|
 | **Terminal für Verknüpfungen** | `ui.launch_terminal`: **Automatisch**, **Systemstandard** oder eines der auf diesem Rechner gefundenen Terminals (dieselbe Erkennung wie bei **Öffnen in**). Automatisch: Windows Terminal unter Windows (sonst WezTerm, Alacritty, die einfache Konsole), `xdg-terminal-exec` unter Linux (Omarchy; sonst das erste gefundene Terminal), Terminal unter macOS, außer iTerm2, Ghostty, WezTerm oder kitty ist installiert. |
 | **Per Doppelklick in diesem Terminal neu öffnen** | Nur Windows (`ui.relaunch_in_terminal`). Ein Doppelklick auf die exe öffnet die Standardkonsole, die Bilder schlecht darstellt: GitPoulpi öffnet sich im gewählten Terminal neu, und das erste Fenster schließt sich. Entfällt, wenn GitPoulpi aus einem Terminal gestartet wurde. |
-| **Geöffnetes Fenster beim Klick anzeigen** | `ui.reuse_window` (standardmäßig an). Ein Klick auf eine GitPoulpi-Verknüpfung (`gitpoulpi launch`) zeigt das Fenster eines bereits geöffneten GitPoulpi, statt ein weiteres zu starten. Ein neues Terminal startet nur, wenn keines geöffnet ist, die Einstellung aus ist oder das Fenster nicht in den Vordergrund kommen kann. Das geht unter Windows, in WezTerm und unter Hyprland; auf anderen Linux-Desktops startet der Klick weiterhin ein neues Fenster. Unter macOS ohne Wirkung (das Dock übernimmt das bereits). Hold **Shift** while clicking (Windows) or use the **New Window** launcher action (Linux) to open another window on purpose; `gitpoulpi launch --new-window` does it from a script. |
+| **Geöffnetes Fenster beim Klick anzeigen** | `ui.reuse_window` (standardmäßig an). Ein Klick auf eine GitPoulpi-Verknüpfung (`gitpoulpi launch`) zeigt das Fenster eines bereits geöffneten GitPoulpi, statt ein weiteres zu starten. Ein neues Terminal startet nur, wenn keines geöffnet ist, die Einstellung aus ist oder das Fenster nicht in den Vordergrund kommen kann. Das geht unter Windows, in WezTerm und unter Hyprland; auf anderen Linux-Desktops startet der Klick weiterhin ein neues Fenster. Unter macOS ohne Wirkung (das Dock übernimmt das bereits). Halten Sie **Umschalt** beim Klick gedrückt (Windows) oder nutzen Sie die Starter-Aktion **Neues Fenster** (Linux), um absichtlich ein weiteres Fenster zu öffnen; `gitpoulpi launch --new-window` erledigt das aus einem Skript. |
 | **Befehlsalias** | `ui.command_alias`: ein Dropdown mit **Keiner** und `gp`, oder tippen Sie einen beliebigen Namen (Buchstaben, Ziffern, `-`, `_`, `.`; keine Leerzeichen oder Pfadtrennzeichen). Die Schaltfläche **Erstellen** in der Zeile lässt diesen Namen GitPoulpi starten (sie wird zu **Entfernen**, sobald der Alias existiert, und entfernt jeden von GitPoulpi angelegten Alias). Eine Warnung unter der Zeile erscheint, wenn der Name in Ihrem PATH bereits etwas anderes ausführt, und unter Windows, wenn PowerShell einen eingebauten Alias dieses Namens hat (`gp` ist dort `Get-ItemProperty` und hat Vorrang vor jeder Datei). Ein Shell-Alias oder eine Shell-Funktion ist von hier aus nicht zu sehen: oh-my-zsh definiert `gp` selbst, und es hat Vorrang vor unserem. |
 | **Alias neuer Tab** | `ui.command_alias_add`: ein zweiter Befehl, zum Beispiel `gpa`, der den aktuellen Ordner als neuen Tab im bereits laufenden GitPoulpi öffnet (`gitpoulpi --add`), statt ein weiteres zu starten; läuft keines, startet er GitPoulpi wie gewohnt, und bei mehreren fragt er, welchem beizutreten ist. Ein Dropdown mit **Keiner**, `gpa` und dem Aliasnamen mit angehängtem `a`, oder tippen Sie einen beliebigen Namen (dieselben Regeln wie oben). Die eine Schaltfläche **Erstellen** legt beide Befehle an, **Entfernen** entfernt jeden von GitPoulpi angelegten Befehl; jeder hat seine eigene Statuszeile. Unter Linux und macOS ist es ein zweizeiliges Skript, unter Windows eine `.cmd`. Siehe die [CLI-Referenz](cli-reference.md#einen-ordner-zum-offenen-fenster-hinzufügen). |
 | **GitPoulpi zum PATH hinzufügen** | Setzt den Ordner, aus dem GitPoulpi läuft, und den Alias-Ordner für neue Terminals in Ihren PATH. Die Schaltfläche der Zeile heißt **Hinzufügen** oder **Entfernen**, und **Entfernen** nimmt genau das wieder heraus, was hinzugefügt wurde. Ordner, die schon im PATH stehen, bleiben unberührt (die Zeile sagt dann **bereits im PATH**). |
@@ -219,9 +220,9 @@ Logofarbe (Über GitPoulpi > Farbe); unter Linux hat jede Farbe ihren eigenen Sy
 
 **Gruppierung in Taskleiste und Dock.** GitPoulpi läuft in einem Terminalfenster, daher zeigt die Taskleiste es normalerweise unter dem Symbol des Terminals, ohne „läuft“-Punkt unter dem angehefteten GitPoulpi-Symbol. Windows: Die Verknüpfungen tragen die AppUserModelID `GitPoulpi.GitPoulpi`, und ein von ihnen gestartetes GitPoulpi gibt seinem Terminalfenster dieselbe ID und sein Symbol (es findet das Fenster, indem es ihm kurz einen eindeutigen Titel gibt, und stellt den Titel danach wieder her), sodass das Fenster unter dem angehefteten GitPoulpi-Symbol erscheint. Ein Terminalfenster mit mehreren Tabs wird als Ganzes behandelt: Alle seine Tabs werden unter dem GitPoulpi-Symbol gruppiert, solange GitPoulpi darin läuft. Früher angelegte Verknüpfungen und Taskleisten-Anheftungen werden von derselben Synchronisierung neu geschrieben; zeigt eine Anheftung noch das Terminal-Symbol, lösen Sie sie und heften Sie sie erneut an. Linux: kitty, foot, Alacritty, WezTerm und Ghostty werden mit der Fensterklasse `gitpoulpi` gestartet, und der `.desktop`-Eintrag nennt sie (`StartupWMClass`), sodass ein Dock das Fenster unter dem Symbol des Starters gruppiert; andere Terminals behalten ihr eigenes Symbol. macOS: Nichts zu tun, das Dock gruppiert nach App.
 
-![Einstellungen > Allgemein, bis zur Gruppe Starter gescrollt: das Terminal für Verknüpfungen und die Zeile des App-Starters](../images/settings-launcher.png)
+![Einstellungen > Starter: das Terminal für Verknüpfungen und die Zeile des App-Starters](../images/settings-launcher.png)
 
-##### Befehlsalias und PATH je nach System
+#### Befehlsalias und PATH je nach System
 
 | System | Alias | PATH |
 |---|---|---|
@@ -233,13 +234,19 @@ Neue Terminals sehen die PATH-Änderung, bereits geöffnete nicht. Keine der bei
 Die Palette hat dieselben Aktionen (**Starter: Verknüpfung erstellen**, **Starter:
 Desktop-Verknüpfung erstellen**, **Starter: Verknüpfungen entfernen**, **Starter: Befehlsalias erstellen**,
 **Starter: Befehlsalias entfernen**, **Starter: Zum PATH hinzufügen**, **Starter: Aus dem PATH entfernen**), und
-Desktop-Verknüpfung erstellen**, **Starter: Verknüpfungen entfernen**), und
 `gitpoulpi desktop shortcut status|install|remove [--where launcher|desktop|startmenu]`
 erledigt es aus einem Skript.
 
-Der Palettenbefehl **App: Sprache wechseln...** (`Ctrl+N g`) öffnet dieselbe
-Sprachliste. Dort wird die hervorgehobene Sprache live in der Vorschau gezeigt;
-`Enter` behält sie und `Esc` stellt die vorherige wieder her.
+### Konfliktvermeidung
+
+Der globale Teil der proaktiven Konflikterkennung (`gitpoulpi ui show settings conflict-prevention-global`); die Seite eines Repositorys ist
+[Repository-spezifisch: Konfliktvermeidung](#repository-spezifisch-konfliktvermeidung). Der Palettenbefehl **Konflikte: Basis-Branch-Listen bearbeiten...** öffnet diese Seite.
+
+| Option | Was sie tut |
+|---|---|
+| **Proaktive Konflikterkennung aktivieren** | Standardmäßig an (`general.conflict_detection`). Warnt im Log, wenn ein Merge des aktuellen Branches in den Branch, von dem er abzweigte, Konflikte verursachen würde, bevor Sie es versuchen. Ein Repository kann sie auf seiner eigenen Seite **Konfliktvermeidung** für sich ausschalten. Siehe [Merge-Konflikte lösen](merge-conflicts.md#konfliktvermeidung). Wirkt beim Schließen der Einstellungen. |
+| **Standard-Basis-Branches** | Unter dem Schalter. Die Liste von Basis-Branch-Mustern, die Repositories verwenden, wenn sie keine eigenen haben: **Integriert (`**`)**, also jeder Branch, oder eine Ihrer benannten Listen (`conflict_prevention.default_list`). Sie gilt für die geöffneten Repositories, wenn die Einstellungen geschlossen werden. **Auf integrierten Standard zurücksetzen** kehrt zu `**` zurück. |
+| **Basis-Branch-Listen** | Ebenfalls auf dieser Seite: Ihre benannten Listen von Basis-Branch-Mustern (`[conflict_prevention.lists.<name>]`), je ein Block mit seinem **Namen** (beim Umbenennen bleibt sie der Standard, falls sie es war; ein Repository, das dem alten Namen folgte, verwendet die Standardliste, bis Sie sie erneut wählen), seinen **Mustern** (eines pro Zeile, `Enter` oder ein Klick öffnet den Editor, `Ctrl+S` übernimmt sie), **Zum Standard machen** und **Liste löschen** (fragt zuerst und sagt, dass Repositories, die ihr folgen, stattdessen die Standardliste verwenden). Geben Sie unter **Neue Liste** einen Namen ein und drücken Sie `Enter`, um eine anzulegen; sie beginnt mit `**`. Das Bearbeiten einer Liste ändert jedes Repository, das ihr folgt. |
 
 ### Synchronisierung
 
@@ -409,6 +416,7 @@ den Server enthalten; siehe [MCP und Agenten](mcp-and-agents.md).
 | **Hintergrund der Graph-Spuren** | **Aus** (transparent) oder **Zeilentönung**: ein schwaches Band in der Spurfarbe hinter der Graph-Spalte, mit einem dünnen Balken an ihrem Rand. |
 | **Stärke der Zeilentönung** | Wie blass das Band der Zeilentönung ist: **Stark**, **Mittel** (Standard) oder **Dezent**. Der Randbalken behält seine volle Farbe. |
 | **Position der Symbolleiste** | `ui.toolbar_position`: Wo die Symbolleiste sitzt: Oben, Unten (Standard), Links oder Rechts. Links und Rechts machen daraus eine Spalte neben den Bereichen; ein Fenster unter 80 Spalten zeichnet sie unten. Wirkt sofort. |
+| **Position und Größe von Dialogen merken** | `ui.dialog_geometry`: **Für diese Sitzung** (Standard), **Auf Festplatte gespeichert** oder **Nie**: ob ein Dialog, den Sie verschoben oder in der Größe geändert haben, seinen Platz behält. Wirkt sofort. |
 | **Ausrichtung der Schaltflächen der Symbolleiste** | `ui.toolbar_align`: Wo die Schaltflächen entlang der Leiste sitzen: Anfang (Standard), Mitte oder Ende. Anfang ist links in einer Zeile und oben in einer Spalte; Ende ist rechts und unten. Wirkt sofort. |
 | **Pull-Request-Schaltfläche ans Ende heften** | `ui.toolbar_pr_pinned`: Ein (Standard): Die Pull-Request-Schaltfläche sitzt am äußersten Ende der Symbolleiste (rechts, in einer Spalte unten), egal wie ausgerichtet wird. Aus: Sie fließt mit den anderen Schaltflächen und wird mit ihnen ausgerichtet. Wirkt sofort. |
 | **Position der Statuszeile** | `ui.statusbar_position`: Wo die Statuszeile (Branch, Zähler, Meldungen, Tastenhinweise) sitzt: Oben, über den Repository-Tabs, oder Unten (Standard). Der Tab Start behält seine eigene Statuszeile unten. Wirkt sofort. |
@@ -718,9 +726,9 @@ Eine Nachricht, mit der das Commit-Formular beginnt (`gitpoulpi ui show settings
 
 - **Auf Konflikte mit dem Basis-Branch prüfen**: standardmäßig an. Wer das Häkchen entfernt, schaltet die
   Erkennung nur für dieses Repository aus; der globale Schalter ist **Proaktive Konflikterkennung aktivieren** auf der
-  Seite Allgemein. Beide müssen an sein.
+  globalen Seite **Konfliktvermeidung**. Beide müssen an sein.
 - **Basis-Branches aus**: woher die Basis-Branches dieses Repositorys kommen. **Standard** folgt dem globalen Standard
-  (das integrierte `**` oder die Liste unter **Standard-Basis-Branches** in Einstellungen > Allgemein); **Liste: <Name>**
+  (das integrierte `**` oder die Liste unter **Standard-Basis-Branches** in Einstellungen > Konfliktvermeidung); **Liste: <Name>**
   folgt einer Ihrer benannten Listen, sodass das Bearbeiten der Liste auch dieses Repository ändert; **Eigene Liste** ist eine Liste
   nur für dieses Repository (die Wahl beginnt mit einer Kopie der geltenden Muster). Eine Repository-Datei, die vor dieser Auswahl
   geschrieben wurde und eigene Muster enthält, gilt als **Eigene Liste**.
@@ -740,7 +748,7 @@ Eine Nachricht, mit der das Commit-Formular beginnt (`gitpoulpi ui show settings
   `#`-Kommentare werden ignoriert; eine Liste nur aus Ausschlüssen bedeutet „jeder Branch außer diesen“. Die Wahl wird in
   `repo-state.toml` gespeichert und beim Schließen der Einstellungen neu gelesen.
 - **Als Liste speichern...**: Geben Sie einen Namen ein und drücken Sie `Enter`; die geltenden Muster werden zu einer benannten
-  Liste (derselben, die Einstellungen > Allgemein bearbeitet), und dieses Repository folgt ihr.
+  Liste (derselben, die Einstellungen > Konfliktvermeidung bearbeitet), und dieses Repository folgt ihr.
 - **Auf Standard zurücksetzen** (fragt zuerst): verwirft die Wahl, die Liste und die eigenen Muster dieses Repositorys; es folgt
   wieder dem Standard.
 - **Basis-Branches des Workflows verwenden** (erscheint, wenn für das Repository ein [Branching-Workflow](branching-workflows.md)

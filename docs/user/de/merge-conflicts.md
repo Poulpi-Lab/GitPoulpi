@@ -174,13 +174,13 @@ Ihre Dateien, der Index und die Refs unberührt bleiben.
   verschwindet, sobald HEAD sich bewegt, und kommt mit der neuen Antwort wieder oder nicht. Ein losgelöster HEAD wird
   nicht geprüft.
 - **Basis-Branch-Listen**: Woher die Basis-Branches eines Repositorys kommen, wählt man auf dessen Seite **Konfliktvermeidung**.
-  **Standard** folgt dem globalen Standard (das integrierte `**`, jeder Branch, bis Sie unter Einstellungen > Allgemein >
+  **Standard** folgt dem globalen Standard (das integrierte `**`, jeder Branch, bis Sie unter Einstellungen >
   Konfliktvermeidung eine andere Liste wählen); **Liste: <Name>** folgt einer Ihrer benannten Listen; **Eigene Liste** ist eine
   Liste nur für dieses Repository. Listen werden geteilt: Wer eine ändert, ändert sie für jedes Repository, das ihr folgt, bei der
   nächsten Prüfung, ohne Neustart. **Als Liste speichern...** macht aus den eigenen Mustern eines Repositorys eine benannte Liste,
   **Auf Standard zurücksetzen** verwirft die Wahl des Repositorys. Wird eine Liste gelöscht, der ein Repository folgt, verwendet es den
   Standard.
-- **Ausschalten**: **Proaktive Konflikterkennung aktivieren** unter Einstellungen > Allgemein, oder für ein einzelnes
+- **Ausschalten**: **Proaktive Konflikterkennung aktivieren** unter Einstellungen > Konfliktvermeidung, oder für ein einzelnes
   Repository auf dessen Seite **Konfliktvermeidung**. In einem Skript gibt `gitpoulpi conflicts check` dieselbe Antwort als
   JSON aus ([CLI-Referenz](cli-reference.md)).
 

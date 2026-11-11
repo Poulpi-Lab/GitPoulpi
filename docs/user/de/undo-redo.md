@@ -56,9 +56,10 @@ Die Aktionen, die Sie rückgängig gemacht haben, stehen **über** der neuesten
 Aktion, unter einem Trenner („rückgängig - Wiederholen bringt sie zurück“),
 abgedunkelt, wobei die, die Wiederholen als Nächste zurückbringt, dem Trenner am
 nächsten steht. Die Auswahl beginnt bei der neuesten Aktion, nicht bei ihnen.
-Die Pfeiltasten bewegen (Überschriften und Trenner werden übersprungen), `Tab`
-wechselt zwischen den drei Ansichten, `Esc` schließt. Für die gewählte Zeile
-gilt:
+Die Pfeiltasten bewegen (Überschriften und Trenner werden übersprungen), `1` / `2` / `3`
+(oder `Ctrl+Tab` / `Ctrl+Shift+Tab`) wechseln zwischen den drei Ansichten, `Esc` schließt.
+`Enter` führt nie eine Aktion aus: Jede Schaltfläche hat ihren eigenen Buchstaben, der in der
+Hinweiszeile unter den Schaltflächen steht. Für die gewählte Zeile gilt:
 
 - **Bis hierher rückgängig** (`u`): macht diese Aktion und jede neuere
   rückgängig, die neueste zuerst, nach einer einzigen Bestätigung, die alle
@@ -106,7 +107,9 @@ git werden wie jedes andere gelesen.
 
 ![Das Reflog von main: jede Position, die main hatte, die neueste zuerst, rechts die Beschreibung der gewählten](../images/reflog.png)
 
-**Im Log zeigen** (`s`), **Branch hier erstellen** (`b`) und **`<branch>` auf diese Position zurücksetzen** (`r`). Das Zurücksetzen
+**Im Log zeigen** (`l`), **Branch hier erstellen** (`b`), **Tag hier erstellen** (`t`),
+**Auf Arbeitsverzeichnis anwenden** (`w`), **Als Stash sichern** (`s`) (die letzten drei
+funktionieren wie unter Verlorene Arbeit unten) und **`<branch>` auf diese Position zurücksetzen** (`r`). Das Zurücksetzen
 lässt sich rückgängig machen. Ist der Branch ausgecheckt und gibt es lokale
 Änderungen, die er nur durch Überschreiben verschieben könnte, fragt ein
 Dropdown, was damit geschehen soll: meine Änderungen behalten, Soft, Mixed oder
@@ -125,8 +128,52 @@ während ein Spinner läuft; die Oberfläche blockiert er nie.
 ![Verlorene Arbeit: die zwei Commits eines gelöschten Branches (über das Reflog gefunden) und unreferenzierte Commits](../images/lost-work.png)
 
 **Branch hier erstellen** (`b`) rettet einen Commit unter einem Namen Ihrer Wahl,
-**Cherry-Pick** (`c`) wendet ihn auf den aktuellen Branch an, **Im Log zeigen**
-(`s`) funktioniert für die noch erreichbaren.
+**Tag hier erstellen** (`t`) heftet ihn mit einem Tag fest (Standardname
+`restored-<kurze ID>`), **Cherry-Pick** (`c`) wendet ihn auf den aktuellen Branch an.
+Ein verlorener Commit steht nicht im Log, deshalb hat diese Ansicht kein „Im Log
+zeigen“ (die Reflog-Ansicht behält es für die noch erreichbaren Commits).
+
+**Änderungen wiederherstellen** bringt zurück, was der Commit geändert hat, ohne es zu
+committen: **Auf Arbeitsverzeichnis anwenden** (`w`) spielt die Änderungen des Commits
+auf die Dateien ein, ganz oder gar nicht (Index und HEAD bleiben; ein Merge-Commit wird
+abgelehnt). Lässt sich nicht sauber anwenden, wird nichts angefasst und der Dialog bietet
+**Als Stash sichern** (`s`) an, das dieselben Änderungen stattdessen als neuen Stash
+festhält; diese Aktion ist auch immer für sich allein verfügbar. Beide sind im Verlauf
+erfasst: `Ctrl+Z` stellt die Dateien wieder her oder verwirft den Stash wieder. Dieselben
+Aktionen sind `gitpoulpi apply-commit <rev>` und `gitpoulpi stash from-commit <rev> [-m M]`,
+und die Reflog-Ansicht hat sie ebenfalls.
+
+### Bereiche, Hunks und das Fenster
+
+Reflog und Verlorene Arbeit zeigen links die Commit-Liste und rechts den Kopf des
+gewählten Commits, **jede Datei, die er geändert hat**, und die Hunks der gewählten Datei
+(nur Hunks, an die Breite des Bereichs umgebrochen). Die Dateiliste ist die des rechten
+Bereichs im Hauptfenster: `Pfad` oder `Baum` (`v`, oder auf den Umschalter klicken), ein
+Ordner klappt mit `Enter`, `Links` oder `Rechts` ein oder aus, ein Klick oder die Pfeile
+wählen eine Datei, und ihre Hunks erscheinen darunter (der Daemon wird außerhalb des
+Oberflächen-Threads gefragt; die letzten Dateien bleiben im Zwischenspeicher). Commit-Liste,
+Dateiliste und Hunks haben je eine Bildlaufleiste, die Sie anklicken und ziehen können.
+
+- `Tab` / `Shift+Tab` gehen durch die Bereiche (Liste, Dateien, Hunks); die Pfeile,
+  `PageUp`, `PageDown`, `Home` und `End` wirken auf den Bereich, der die Tastatur hat
+  (sein Rahmen leuchtet). `Enter` auf einer Datei wechselt zu ihren Hunks.
+- **Trennlinien**: Ziehen Sie die zwischen Liste und rechtem Bereich oder die zwischen
+  Dateien und Hunks; ein Doppelklick auf eine Trennlinie setzt sie zurück. Per Tastatur:
+  `Alt+Links` / `Alt+Rechts`, `Alt+Hoch` / `Alt+Runter`, `Alt+0` setzt beide zurück. Die
+  Palette hat `Reflog / Verlorene Arbeit: Bereichsgrößen zurücksetzen`, `Nächster Bereich`
+  und `Dateiliste als Pfade oder Baum`.
+- `Ctrl+N` zeigt seine Badges über den drei Ansichts-Tabs und den drei Bereichen, wie im
+  Hauptfenster; eine Badge-Taste springt dorthin.
+- **Den Dialog verschieben und in der Größe ändern**: Ziehen Sie die Titelleiste, um ihn
+  zu verschieben, und den linken, rechten oder unteren Rand oder eine untere Ecke (den
+  Griff `◢`), um die Größe zu ändern (nie unter 60 x 16, immer auf dem Bildschirm). Das
+  Schließkreuz behält seinen Klick, und ein Loslassen außerhalb des Dialogs schließt ihn
+  nie. Das Tastatur-Gegenstück ist `Ctrl+N` und dann `m`: Die Pfeile verschieben,
+  `Shift`+Pfeile ändern die Größe, `0` setzt zurück, `Enter` oder `Esc` beenden (der Rahmen
+  sagt es, solange der Modus an ist). Die Palette hat `Dialog: Verschieben/Größe ändern`
+  und `Dialog: Position und Größe zurücksetzen`. Ob der Platz behalten wird, bestimmt
+  `ui.dialog_geometry` (Einstellungen > Darstellung): `session` (Standard),
+  `saved` (beim nächsten Start wiederhergestellt) oder `never`.
 
 ## Über die Befehlspalette
 
@@ -139,8 +186,8 @@ ausgewählte Zeile der Ansicht, die auf dem Bildschirm ist.
 | Ansicht | Palettenzeilen |
 |---|---|
 | Rückgängig-Verlauf | `Rückgängig-Verlauf: Bis hierher rückgängig...`, `Bis hierher wiederholen...`, `Nur diese wiederherstellen...`, `Branch dorthin zurücksetzen, wo er war...`, `Aktualisieren`, `Schließen` |
-| Reflog | `Reflog: Im Log zeigen`, `Branch hier erstellen...`, `Auf diese Position zurücksetzen...`, `Mehr laden`, `Aktualisieren` |
-| Verlorene Arbeit | `Verlorene Arbeit: Im Log zeigen`, `Branch hier erstellen...`, `Cherry-Pick`, `Erneut suchen` |
+| Reflog | `Reflog: Im Log zeigen`, `Branch hier erstellen...`, `Tag hier erstellen...`, `Änderungen auf Arbeitsverzeichnis anwenden`, `Änderungen als Stash sichern`, `Auf diese Position zurücksetzen...`, `Mehr laden`, `Aktualisieren` |
+| Verlorene Arbeit | `Verlorene Arbeit: Branch hier erstellen...`, `Tag hier erstellen...`, `Cherry-Pick`, `Änderungen auf Arbeitsverzeichnis anwenden`, `Änderungen als Stash sichern`, `Erneut suchen` |
 
 Die Zeilen sind (mit Begründung) ausgegraut, solange ihre Ansicht nicht offen ist; die
 drei Öffner `Bearbeiten: Rückgängig-Verlauf...`, `Bearbeiten: Reflog...` und
@@ -160,8 +207,8 @@ Schaltfläche.
 | Branches und Tags | anlegen, löschen, umbenennen, den Upstream setzen oder entfernen, einen Tracking-Branch anlegen, einen Tag anlegen / löschen / annotieren, Fast-Forward, einen Pull Request als Branch auschecken |
 | Wechseln | Checkout eines Branches oder Commits (auch ein losgelöster HEAD) |
 | Verlauf | Merge (Fast-Forward oder Merge-Commit), Rebase (einfach und interaktiv, sobald er abgeschlossen ist), Cherry-Pick, Revert, Reset (soft, mixed und hard), der lokale Teil eines Pulls |
-| Änderungen | stagen und unstagen (Datei, Ordner, Hunk, Zeilen, alles), verwerfen (Datei, Ordner, Hunk, Zeilen, ein Datei-Checkout), einen Patch anwenden, **eine Datei vom Datenträger löschen**, **ignorieren** (Datei, Endung oder Ordner: die Zeile in der von Ihnen gewählten `.gitignore`), **als Binär- oder Textdatei behandeln** (die `.gitattributes`-Zeile) |
-| Stashes | push, apply, pop, drop |
+| Änderungen | stagen und unstagen (Datei, Ordner, Hunk, Zeilen, alles), verwerfen (Datei, Ordner, Hunk, Zeilen, ein Datei-Checkout), einen Patch oder die Änderungen eines Commits anwenden (`apply-commit`), **eine Datei vom Datenträger löschen**, **ignorieren** (Datei, Endung oder Ordner: die Zeile in der von Ihnen gewählten `.gitignore`), **als Binär- oder Textdatei behandeln** (die `.gitattributes`-Zeile) |
+| Stashes | push, apply, pop, drop, die Änderungen eines Commits als Stash sichern (`stash from-commit`) |
 | Remotes und Konfiguration | ein Remote hinzufügen, entfernen, umbenennen, die URL oder Push-URL ändern, Git-LFS-Tracking an- und abschalten |
 | Auf einem Server | **einen Branch oder Tag auf einem Remote löschen** (im Menü des Refs, in der Palette, per `branch delete-remote`, `tag delete-remote`, `tag delete --both` oder durch einen Workflow-Abschluss, der den Remote-Branch löscht): siehe unten |
 
@@ -453,7 +500,9 @@ gitpoulpi lost-commits [--skip N] [--limit N] [--no-deep] [--budget-ms MS]
   eine dieser Positionen; ein ausgecheckter Branch mit nicht committeten
   Änderungen braucht `--mode`. Auch das wird im Journal geführt.
 - `lost-commits` listet Commits, die kein Branch, Tag, Remote oder Stash
-  erreicht.
+  erreicht. Um die Arbeit eines davon ohne Commit zurückzuholen: `apply-commit <rev>`
+  (ins Arbeitsverzeichnis, ganz oder gar nicht) oder `stash from-commit <rev>` (als
+  Stash); beide sind im Verlauf erfasst.
 - Blockiert eine Verschiebung aus einer Shell den neuesten Eintrag, enthält die
   Ablehnung die Reflog-Position, die hält, was der Eintrag erwartet
   (`reason.RefMoved.restore`), zur Übergabe an `reflog-restore`.

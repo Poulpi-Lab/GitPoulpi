@@ -490,6 +490,18 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
             let patch: PathBuf = arg_or_err!(args, "patch", request.id);
             to_json!(backend.patch_apply(&repo, &patch))
         }
+        OperationKind::ApplyCommit => {
+            let commit: Oid = arg_or_err!(args, "commit", request.id);
+            to_json!(backend.apply_commit_to_worktree(&repo, commit))
+        }
+        OperationKind::StashFromCommit => {
+            let commit: Oid = arg_or_err!(args, "commit", request.id);
+            let message: Option<String> = args
+                .get("message")
+                .and_then(|v| serde_json::from_value(v.clone()).ok())
+                .flatten();
+            to_json!(backend.stash_from_commit(&repo, commit, message.as_deref()))
+        }
         OperationKind::TagCreate => {
             let name: String = arg_or_err!(args, "name", request.id);
             let at: Oid = arg_or_err!(args, "at", request.id);

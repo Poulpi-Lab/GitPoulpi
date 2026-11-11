@@ -37,6 +37,7 @@ pub fn handles(request: &Request) -> bool {
     matches!(
         request.command,
         OperationKind::StashPush
+            | OperationKind::StashFromCommit
             | OperationKind::StashPop
             | OperationKind::StashApply
             | OperationKind::StashDrop
@@ -87,6 +88,7 @@ pub fn label(request: &Request) -> Option<String> {
     let name = arg_str(request, "name");
     Some(match request.command {
         OperationKind::StashPush => "Stash changes".to_string(),
+        OperationKind::StashFromCommit => "Save changes as a stash".to_string(),
         OperationKind::StashPop => "Pop stash".to_string(),
         OperationKind::StashApply => "Apply stash".to_string(),
         OperationKind::StashDrop => "Drop stash".to_string(),
@@ -255,6 +257,16 @@ pub fn capture(
                 conflict: None,
             });
         }
+        OperationKind::StashFromCommit => {
+            let before: Vec<StashRecord> = records(backend, repo)?
+                .into_iter()
+                .map(|(_, r)| r)
+                .collect();
+            out.capture = Capture::Stash {
+                before,
+                target: None,
+            };
+        }
         OperationKind::StashPop | OperationKind::StashApply | OperationKind::StashDrop => {
             let id = request
                 .args
@@ -403,7 +415,7 @@ pub fn after(
             let listed =
                 |r: &StashRecord, list: &[StashRecord]| list.iter().any(|x| x.commit == r.commit);
             match request.command {
-                OperationKind::StashPush => {
+                OperationKind::StashPush | OperationKind::StashFromCommit => {
                     let added: Vec<StashRecord> =
                         now.iter().filter(|r| !listed(r, before)).cloned().collect();
                     let [new] = added.as_slice() else {
@@ -411,7 +423,12 @@ pub fn after(
                     };
                     Some(Done {
                         label: Some(format!(
-                            "Stash \"{}\" ({})",
+                            "{} \"{}\" ({})",
+                            if request.command == OperationKind::StashFromCommit {
+                                "Save changes as stash"
+                            } else {
+                                "Stash"
+                            },
                             stash_title(&new.message),
                             short(new.commit)
                         )),

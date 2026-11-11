@@ -940,3 +940,46 @@ async fn treating_a_file_as_binary_is_undone_and_redone_and_the_per_clone_files_
 
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();
+
+#[tokio::test]
+async fn applying_a_lost_commit_is_undone_and_redone() {
+    for (name, backend) in backends() {
+        let repo = FixtureRepoBuilder::new()
+            .unwrap()
+            .commit_file("keep.txt", "keep\n", "first")
+            .unwrap()
+            .build();
+        std::fs::write(repo.root().join("keep.txt"), "keep\nplus\n").unwrap();
+        std::fs::write(repo.root().join("added.txt"), "new\n").unwrap();
+        repo.git(&["add", "-A"]);
+        repo.git(&["commit", "-q", "-m", "lost work"]);
+        let lost = repo.git(&["rev-parse", "HEAD"]);
+        repo.git(&["reset", "-q", "--hard", "HEAD~1"]);
+        let mut rig = Rig::on(backend, repo).await;
+        let clean = rig.state();
+
+        rig.ok(OperationKind::ApplyCommit, json!({ "commit": lost }))
+            .await;
+        assert_eq!(rig.read("keep.txt"), b"keep\nplus\n", "{name}");
+        assert!(rig.path("added.txt").exists(), "{name}");
+        let applied = rig.state();
+
+        let out = rig.undo().await;
+        assert_eq!(out.entry.kind, OperationKind::ApplyCommit, "{name}");
+        assert!(out.entry.label.starts_with("Apply changes of"), "{name}");
+        assert_eq!(rig.state(), clean, "{name}");
+        assert!(!rig.path("added.txt").exists(), "{name}");
+        rig.redo().await;
+        assert_eq!(rig.state(), applied, "{name}");
+
+        // A refused apply (a file edited meanwhile) records nothing.
+        rig.undo().await;
+        std::fs::write(rig.path("keep.txt"), "different\n").unwrap();
+        let _ = rig
+            .call(OperationKind::ApplyCommit, json!({ "commit": lost }))
+            .await;
+        assert_eq!(rig.read("keep.txt"), b"different\n", "{name}");
+        assert!(!rig.path("added.txt").exists(), "{name}");
+        rig.stop().await;
+    }
+}

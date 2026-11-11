@@ -44,6 +44,7 @@ pub fn is_snapshot_op(request: &Request) -> bool {
         | OperationKind::DiscardHunk
         | OperationKind::DiscardLine
         | OperationKind::PatchApply
+        | OperationKind::ApplyCommit
         | OperationKind::DeleteFile
         | OperationKind::ConvertFiles
         | OperationKind::AddToGitignore
@@ -186,6 +187,14 @@ pub fn label(request: &Request) -> Option<String> {
                     .unwrap_or_default()
             ),
             None => "Apply patch".into(),
+        },
+        OperationKind::ApplyCommit => match request
+            .args
+            .get("commit")
+            .and_then(|c| serde_json::from_value::<Oid>(c.clone()).ok())
+        {
+            Some(c) => format!("Apply changes of {}", gitpoulpi_core::domain::short(c)),
+            None => "Apply changes of a commit".into(),
         },
         OperationKind::DeleteFile => {
             let paths = paths_arg(request, "paths");
@@ -484,6 +493,24 @@ pub fn capture(
             Some(p) => backend.patch_files(repo, &PathBuf::from(p))?,
             None => vec![],
         },
+        OperationKind::ApplyCommit => {
+            match request
+                .args
+                .get("commit")
+                .and_then(|c| serde_json::from_value::<Oid>(c.clone()).ok())
+            {
+                Some(commit) => backend
+                    .diff_files(
+                        repo,
+                        gitpoulpi_core::domain::DiffTarget::CommitVsParent(commit),
+                    )?
+                    .files
+                    .iter()
+                    .map(|f| slash(&f.path))
+                    .collect(),
+                None => vec![],
+            }
+        }
         OperationKind::ResolveConflict => resolve_path(request).into_iter().collect(),
         _ => vec![],
     };

@@ -645,3 +645,36 @@ async fn a_stash_push_with_nothing_to_stash_records_no_entry() {
 
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();
+
+#[tokio::test]
+async fn a_stash_from_a_commit_is_undone_by_a_drop_and_redone_by_a_store() {
+    for (name, backend) in backends() {
+        let repo = FixtureRepoBuilder::new()
+            .unwrap()
+            .commit_file("a.txt", "a\n", "first")
+            .unwrap()
+            .build();
+        std::fs::write(repo.root().join("a.txt"), "a\nlost\n").unwrap();
+        repo.git(&["commit", "-q", "-am", "lost work"]);
+        let lost = repo.git(&["rev-parse", "HEAD"]);
+        repo.git(&["reset", "-q", "--hard", "HEAD~1"]);
+        let mut rig = Rig::on(backend, repo).await;
+
+        rig.ok(
+            OperationKind::StashFromCommit,
+            json!({ "commit": lost, "message": "rescued" }),
+        )
+        .await;
+        let stashed = rig.stash_list();
+        assert!(stashed.contains("rescued"), "{name}");
+        assert!(rig.status().is_empty(), "{name}: the tree is untouched");
+
+        let out = rig.undo().await;
+        assert_eq!(out.entry.kind, OperationKind::StashFromCommit, "{name}");
+        assert!(rig.stash_list().is_empty(), "{name}: the stash is gone");
+        let out = rig.redo().await;
+        assert!(out.applied, "{name}");
+        assert_eq!(rig.stash_list(), stashed, "{name}: the very same commit");
+        rig.stop().await;
+    }
+}

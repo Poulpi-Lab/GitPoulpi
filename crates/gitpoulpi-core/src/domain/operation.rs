@@ -121,6 +121,10 @@ pub enum OperationKind {
     /// Apply a patch file to the working tree (see
     /// `GitBackend::patch_apply`).
     PatchApply,
+    /// Replay one commit's changes onto the working tree, all or nothing
+    /// (see `GitBackend::apply_commit_to_worktree`): "Restore changes" of
+    /// a lost commit. Journaled as a file snapshot, like `PatchApply`.
+    ApplyCommit,
     /// Delete files from the working tree; the index is not touched (see
     /// `GitBackend::delete_files`); journaled, so it can be undone.
     DeleteFile,
@@ -260,6 +264,10 @@ pub enum OperationKind {
     StashPop,
     StashApply,
     StashDrop,
+    /// Put a stash holding one commit's changes on the stash list (see
+    /// `GitBackend::stash_from_commit`). Journaled: undo drops it, redo
+    /// stores it again.
+    StashFromCommit,
     /// *Start over* for the pending auto-stash: discard the stash's paths,
     /// undo the operation that stashed, pop the stash at the original commit
     /// (see `gitpoulpi-daemon::autostash_start_over`).
@@ -595,6 +603,7 @@ impl OperationKind {
             | K::Init
             | K::Checkout
             | K::PatchApply
+            | K::ApplyCommit
             | K::RebaseAbort
             | K::Hello
             | K::CredentialGrant
@@ -754,6 +763,7 @@ impl OperationKind {
             // Deletes pins and reflogs and prunes objects: refs and the log
             // change, no working tree file does. Not journaled.
             K::RewritePurge => OpTraits::NONE.scope(ChangeScope::REFS | ChangeScope::LOG),
+            K::StashFromCommit => OpTraits::NONE.scope(ChangeScope::LOG | ChangeScope::STASHES),
             K::StashPush | K::StashDrop => OpTraits::NONE.scope(
                 ChangeScope::INDEX
                     | ChangeScope::WORKTREE
@@ -830,7 +840,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 176] = [
+    pub const ALL: [OperationKind; 178] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -880,6 +890,7 @@ impl OperationKind {
         OperationKind::WorktreeAdd,
         OperationKind::PatchCreate,
         OperationKind::PatchApply,
+        OperationKind::ApplyCommit,
         OperationKind::DeleteFile,
         OperationKind::ConvertFiles,
         OperationKind::AddToGitignore,
@@ -931,6 +942,7 @@ impl OperationKind {
         OperationKind::StashPop,
         OperationKind::StashApply,
         OperationKind::StashDrop,
+        OperationKind::StashFromCommit,
         OperationKind::AutoStashStartOver,
         OperationKind::Fetch,
         OperationKind::FetchAll,

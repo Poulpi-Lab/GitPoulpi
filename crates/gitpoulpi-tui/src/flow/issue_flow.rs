@@ -158,6 +158,8 @@ pub(crate) struct IssueFlowDialog {
     issue: Option<Created>,
     hits: Vec<(Rect, Focus)>,
     edit: FieldEditor<Focus>,
+    /// The close cross on the frame.
+    close: dialog_kit::CloseHit,
 }
 
 fn flow_of(seed: &IssueFlowSeed) -> IssueFlow {
@@ -263,6 +265,7 @@ impl IssueFlowDialog {
             cancel: Arc::new(AtomicBool::new(false)),
             issue: None,
             hits: Vec::new(),
+            close: dialog_kit::CloseHit::default(),
             edit: Default::default(),
             seed,
         };
@@ -882,6 +885,14 @@ impl IssueFlowDialog {
             return IssueFlowOutcome::Stay;
         }
         let hit = dialog_kit::hit_at(&self.hits, mouse.column, mouse.row);
+        if matches!(mouse.kind, MouseEventKind::Moved | MouseEventKind::Drag(_)) {
+            self.close.set_hover(mouse.column, mouse.row);
+        }
+        if matches!(mouse.kind, MouseEventKind::Down(MouseButton::Left))
+            && self.close.hit(mouse.column, mouse.row)
+        {
+            return self.secondary();
+        }
         if !matches!(mouse.kind, MouseEventKind::Down(_)) {
             let handled = match self.field_parts() {
                 (edit, Some((id, field))) => {

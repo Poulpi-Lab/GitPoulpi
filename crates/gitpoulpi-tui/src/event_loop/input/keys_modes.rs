@@ -437,6 +437,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 // The key after `Ctrl+N`: a badge presses its control, anything
                 // else (Esc included) just takes the badges away.
                 form.badges = false;
+                if arrange_after_prefix(cx, key) {
+                    return Ok(Flow::Handled);
+                }
                 if let Some((col, row)) = badge_cell(cx, key) {
                     for kind in [
                         MouseEventKind::Down(MouseButton::Left),
@@ -566,6 +569,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             if key.kind == KeyEventKind::Press && view.badges {
                 // The key after `Ctrl+N`, as for the amend dialog above.
                 view.badges = false;
+                if arrange_after_prefix(cx, key) {
+                    return Ok(Flow::Handled);
+                }
                 if let Some((col, row)) = badge_cell(cx, key) {
                     for kind in [
                         MouseEventKind::Down(MouseButton::Left),
@@ -984,6 +990,22 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
 
 /// The cell a pressed badge stands for, from the list the last paint handed
 /// out (`nav_badge_targets`): `None` for Esc or a character with no badge.
+/// The key after the `Ctrl+N` of a form or page with badges of its own: `m`
+/// starts the arrange mode on the dialog on top (the badges never use `m`).
+fn arrange_after_prefix(cx: &mut CommandCtx<'_>, key: KeyEvent) -> bool {
+    if crate::chrome::navigation_key_action_mods(key.code, key.modifiers)
+        != crate::chrome::NavigationAction::ArrangeDialog
+    {
+        return false;
+    }
+    *cx.last_message = Some(if crate::dialog_kit::frame::arrange_top() {
+        msg::dialog_frame::ARRANGING.get().into()
+    } else {
+        msg::dialog_frame::WHY_NO_DIALOG.get().into()
+    });
+    true
+}
+
 fn badge_cell(cx: &CommandCtx<'_>, key: KeyEvent) -> Option<(u16, u16)> {
     let KeyCode::Char(c) = key.code else {
         return None;

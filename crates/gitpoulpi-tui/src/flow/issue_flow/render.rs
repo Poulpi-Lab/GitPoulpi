@@ -50,8 +50,8 @@ impl IssueFlowDialog {
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {
         self.field_parts();
         self.edit.begin_frame();
-        dialog_kit::panel(buf, rect, &self.title_text());
-        WIN.decorate(buf, rect, None, true);
+        let title = self.title_text();
+        self.close.framed(buf, rect, &title, &WIN, true);
         let mut hits: Vec<(Rect, Focus)> = Vec::new();
         let inner = Rect::new(
             rect.x + 2,

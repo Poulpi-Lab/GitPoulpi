@@ -349,7 +349,9 @@ pub(in crate::event_loop) fn draw_footer(
         );
         spans.push(Span::raw(hint));
         frame.render_clipped(Paragraph::new(Line::from(spans)), footer_area);
-    } else if matches!(input_mode, InputMode::Leader | InputMode::Navigation) {
+    } else if matches!(input_mode, InputMode::Leader | InputMode::Navigation)
+        || form_badges(input_mode)
+    {
         let rows = prefix_hint_rows(input_mode, ai_ui.enabled(), footer_area.width);
         frame.render_clipped(
             Paragraph::new(rows.into_iter().map(Line::from).collect::<Vec<_>>()),
@@ -380,6 +382,32 @@ pub(in crate::event_loop) fn wrap_hint(text: &str, width: usize) -> Vec<String> 
     rows
 }
 
+/// The commit message form or the rewrite page waits for the key after its own
+/// `Ctrl+N` (a badge, or `m` to arrange the dialog).
+fn form_badges(input_mode: &InputMode) -> bool {
+    match input_mode {
+        InputMode::EditingCommitMessage(form) => form.badges && form.badge_ready(),
+        InputMode::Rewrite(view) => view.badges && view.badge_ready(),
+        _ => false,
+    }
+}
+
+/// The hint while [`form_badges`]: only what those two surfaces answer to.
+fn form_badges_hint(km: &keymap::Keymap) -> String {
+    use gitpoulpi_i18n::msg::footer_hint as h;
+    let mut parts = vec![format!("<badge>={}", h::FOCUS_SUBPANE.get())];
+    let key = km.shown_key(keymap::Action::NavArrangeDialog);
+    if !key.is_empty() {
+        parts.push(format!("{key}={}", h::ARRANGE.get()));
+    }
+    parts.push(h::ESC_CANCEL.get().to_string());
+    format!(
+        "{}{}",
+        h::lead(km.shown(keymap::Action::GlobalNavPrefix)),
+        parts.join("  ")
+    )
+}
+
 /// The rows of the Ctrl+G / Ctrl+N hint wrapped to `width`; empty in every
 /// other input mode, where the footer stays one row.
 pub(in crate::event_loop) fn prefix_hint_rows(
@@ -387,6 +415,9 @@ pub(in crate::event_loop) fn prefix_hint_rows(
     ai_on: bool,
     width: u16,
 ) -> Vec<String> {
+    if form_badges(input_mode) {
+        return wrap_hint(&form_badges_hint(&keymap::current()), width.max(1) as usize);
+    }
     let ctx = match input_mode {
         InputMode::Leader => keymap::Ctx::GitPrefix,
         InputMode::Navigation => keymap::Ctx::NavPrefix,

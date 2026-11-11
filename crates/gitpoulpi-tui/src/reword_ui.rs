@@ -925,7 +925,7 @@ impl RewordForm {
             }
     }
 
-    /// Draws the popup centered in `area` and returns its click targets,
+    /// Draws the popup (where the user put it, else centered in `area`) and returns its click targets,
     /// from the same walk that painted them.
     pub(crate) fn render(
         &self,
@@ -936,11 +936,14 @@ impl RewordForm {
         use crate::dialog_kit::{button, button_width, put, text_area, text_input, ButtonState};
         let width = area.width.saturating_sub(4).min(80);
         let height = self.wanted_height().min(area.height);
-        let popup = Rect::new(
-            area.x + area.width.saturating_sub(width) / 2,
-            area.y + area.height.saturating_sub(height) / 3,
-            width,
-            height,
+        let popup = WIN.place(
+            area,
+            Rect::new(
+                area.x + area.width.saturating_sub(width) / 2,
+                area.y + area.height.saturating_sub(height) / 3,
+                width,
+                height,
+            ),
         );
         frame.render_clipped(Clear, popup);
         self.frame.set(popup);
@@ -968,6 +971,12 @@ impl RewordForm {
         ) {
             hits.push((cross, RewordPart::Close));
         }
+        WIN.decorate(
+            frame.buffer_mut(),
+            popup,
+            hits.first().map(|(r, _)| *r),
+            true,
+        );
         let warning_rows: u16 = if self.pushed_to.is_some() { 2 } else { 0 };
         if inner.width < 16 || inner.height < 4 + warning_rows {
             return hits;
@@ -1177,3 +1186,6 @@ pub(crate) fn reword_hit_at(hits: &[(Rect, HitTarget)], col: u16, row: u16) -> O
 #[cfg(test)]
 #[path = "reword_ui_tests.rs"]
 mod tests;
+
+/// The commit message form moves (its size follows its scope).
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("reword");

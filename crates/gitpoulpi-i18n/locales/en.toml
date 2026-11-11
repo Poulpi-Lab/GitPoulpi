@@ -5130,6 +5130,8 @@ resize_message = "resize Message"
 resize_refs = "resize Refs"
 # context: Ctrl+N hint, keys widen and narrow the Status pane
 resize_status = "resize Status"
+# context: Ctrl+N hint, key arranges (moves, resizes) the open dialog
+arrange = "arrange"
 # context: Ctrl+N hint shown when not every key fits: {key} is the help key, which lists them all
 all_keys = "{key}=all keys"
 esc_cancel = "(Esc to cancel)"

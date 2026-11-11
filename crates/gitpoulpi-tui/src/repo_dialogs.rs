@@ -391,19 +391,6 @@ impl RepoDialogs {
         ))));
     }
 
-    /// `Ctrl+N m`: puts the open dialog in the arrange mode (arrows move it,
-    /// Shift+arrows resize it). `false` when the dialog on top cannot be moved
-    /// (or none is open).
-    pub(crate) fn arrange_start(&mut self) -> bool {
-        match self.dialog.as_mut() {
-            Some(RepoDialog::Safety(panel)) => {
-                panel.arrange();
-                true
-            }
-            _ => false,
-        }
-    }
-
     /// The view the Undo history / Reflog / Lost work panel is open on.
     pub(crate) fn safety_tab(&self) -> Option<crate::safety_panel::Tab> {
         match &self.dialog {

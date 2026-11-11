@@ -456,7 +456,7 @@ fn arrange_mode_moves_resizes_and_resets_from_the_keyboard() {
     panel.paint_at(SCREEN);
     let f = panel.frame;
     panel.arrange();
-    assert!(panel.window.arranging());
+    assert!(crate::dialog_kit::frame::is_arranging());
     // The arrange mode takes the keys: `q` is not "close" there.
     assert!(matches!(
         panel.on_key(key(KeyCode::Char('q'))),
@@ -472,7 +472,7 @@ fn arrange_mode_moves_resizes_and_resets_from_the_keyboard() {
     panel.paint_at(SCREEN);
     assert_eq!(panel.frame, f);
     panel.on_key(key(KeyCode::Esc));
-    assert!(!panel.window.arranging());
+    assert!(!crate::dialog_kit::frame::is_arranging());
     assert!(matches!(
         panel.on_key(key(KeyCode::Esc)),
         PanelOutcome::Close
@@ -486,7 +486,7 @@ fn the_palette_rows_arrange_and_reset_the_dialog_and_reset_the_panes() {
     let state = panel.journal_state();
     let f = panel.frame;
     panel.run_command(SafetyCmd::ArrangeDialog, &state);
-    assert!(panel.window.arranging());
+    assert!(crate::dialog_kit::frame::is_arranging());
     panel.on_key(key(KeyCode::Left));
     panel.on_key(key(KeyCode::Enter));
     panel.paint_at(SCREEN);

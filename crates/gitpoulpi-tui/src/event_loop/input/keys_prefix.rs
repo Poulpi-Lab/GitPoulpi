@@ -604,7 +604,7 @@ pub(super) fn navigation(cx: &mut CommandCtx<'_>, key: KeyEvent) -> io::Result<F
         NavigationAction::ShowJobs => crate::jobs_ui::run(crate::jobs_ui::JobsCmd::Show),
         NavigationAction::ShowUpdates => crate::updates::panel::open(),
         NavigationAction::ArrangeDialog => {
-            *cx.last_message = Some(if cx.repo_dialogs.arrange_start() {
+            *cx.last_message = Some(if crate::dialog_kit::frame::arrange_top() {
                 msg::dialog_frame::ARRANGING.get().into()
             } else {
                 msg::dialog_frame::WHY_NO_DIALOG.get().into()

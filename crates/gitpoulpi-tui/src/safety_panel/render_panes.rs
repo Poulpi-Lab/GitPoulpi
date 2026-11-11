@@ -42,7 +42,7 @@ impl SafetyPanel {
     /// The arrange mode (keyboard twin of the frame's mouse gestures).
     pub(crate) fn arrange(&mut self) {
         self.overlay = None;
-        self.window.arrange_start();
+        crate::dialog_kit::frame::arrange_top();
     }
 
     /// The commit the panes show: the list's cursor.

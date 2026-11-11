@@ -120,15 +120,14 @@ impl SafetyPanel {
     /// Paints the dialog where its frame puts it inside `screen` (the user's
     /// move and resize, clamped), then the frame's own marks.
     pub(crate) fn render_in(&mut self, screen: Rect, buf: &mut Buffer) {
-        let rect = self.window.layout(screen);
+        let want = dialog_kit::centered(
+            screen,
+            screen.width.saturating_sub(4).min(super::DEFAULT_SIZE.0),
+            screen.height.saturating_sub(2).min(super::DEFAULT_SIZE.1),
+        );
+        let rect = super::WIN.place(screen, want);
         self.render(rect, buf);
-        let hint = gitpoulpi_i18n::msg::dialog_frame::arrange_hint(dialog_kit::key_name(
-            crate::keymap::chord::Key::Enter,
-        ));
-        self.window.paint(buf, &hint);
-        if self.overlay.is_none() || self.window.dragging() {
-            self.window.register_pointer(self.close.rect());
-        }
+        super::WIN.decorate(buf, rect, self.close.rect(), self.overlay.is_none());
     }
 
     pub(crate) fn render(&mut self, rect: Rect, buf: &mut Buffer) {

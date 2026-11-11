@@ -7,7 +7,7 @@ use super::panes::{Divider, Pane};
 use super::render::Hit;
 use super::{Act, Overlay, PanelOutcome, RowMenu, SafetyPanel, Tab};
 use crate::combo::ComboOutcome;
-use crate::dialog_kit::{self, FrameMouse};
+use crate::dialog_kit;
 
 /// The three scrollable things of the panel, each with its own bar.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -90,7 +90,7 @@ impl SafetyPanel {
             return self.overlay_key(key);
         }
         // The arrange mode (`Ctrl+N m`) takes every key until it is left.
-        if self.window.on_key(key) {
+        if crate::dialog_kit::frame::on_key(key) {
             return PanelOutcome::Stay;
         }
         let state = self.journal_state();
@@ -349,13 +349,7 @@ impl SafetyPanel {
         // resize, and a gesture that started continues wherever the pointer
         // goes (its release is the frame's, so letting go outside never
         // closes). The close cross keeps its click.
-        let on_cross = self.close.hit(col, row);
-        if self
-            .window
-            .on_mouse(mouse, on_cross, self.overlay.is_none())
-            == FrameMouse::Consumed
-        {
-            self.overlay = None;
+        if dialog_kit::frame::on_mouse(mouse) == dialog_kit::frame::FrameMouse::Consumed {
             return PanelOutcome::Stay;
         }
         // A held divider follows the pointer, in or out of the dialog.

@@ -148,6 +148,11 @@ fn apply_update_panel(cx: &mut CommandCtx<'_>, event: crate::updates::panel::Eve
 }
 
 fn handle_key_inner(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> io::Result<Flow> {
+    if key.kind == KeyEventKind::Press {
+        if let Some(flow) = dialog_frame_key(cx, env, key) {
+            return Ok(flow);
+        }
+    }
     // The Activity Log is modal and takes every key.
     // `Ctrl+N` starts the badge prefix over it (`activity_log::nav_targets`);
     // the key after it is read by `keys_prefix::navigation`.
@@ -191,6 +196,35 @@ fn handle_key_inner(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) ->
     keys_normal_nav::handle(cx, env, key)
 }
 
+/// The keyboard twin of the dialogs' move and resize (`dialog_kit::frame`):
+/// the arrange mode takes every key; over a framed dialog that offers no
+/// badges of its own, `Ctrl+N` arms the prefix and `m` starts the mode.
+fn dialog_frame_key(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> Option<Flow> {
+    use crate::dialog_kit::frame;
+    if frame::on_key(key) {
+        return Some(Flow::Handled);
+    }
+    if frame::take_prefix() {
+        let action = crate::chrome::navigation_key_action_mods(key.code, key.modifiers);
+        if action == crate::chrome::NavigationAction::ArrangeDialog {
+            *cx.last_message = Some(gitpoulpi_i18n::msg::dialog_frame::ARRANGING.get().into());
+            frame::arrange_top();
+            return Some(Flow::Handled);
+        }
+        if key.code == KeyCode::Esc {
+            return Some(Flow::Handled);
+        }
+        return None;
+    }
+    let own_badges = (cx.repo_dialogs.is_open() && !cx.repo_dialogs.nav_targets().is_empty())
+        || (crate::activity_log::is_open() && !crate::activity_log::nav_targets().is_empty());
+    if frame::any_live() && !own_badges && env.km.is(Bind::GlobalNavPrefix, &key) {
+        frame::arm_prefix();
+        return Some(Flow::Handled);
+    }
+    None
+}
+
 /// Routes one mouse event. The popups and forms that own the mouse come first,
 /// then the surfaces over the panes (`mouse_prelude`), then the handler for the
 /// kind of event, which resolves what is under the pointer.
@@ -231,6 +265,12 @@ fn handle_mouse_inner(
     forced_hit: &mut Option<HitTarget>,
     ordinary: &mut bool,
 ) -> io::Result<Flow> {
+    // A framed dialog's move / resize gesture (title or border press, the
+    // drag, its release, wherever the pointer is) is the frame's alone.
+    if crate::dialog_kit::frame::on_mouse(mouse) == crate::dialog_kit::frame::FrameMouse::Consumed {
+        *cx.hovered_target = None;
+        return Ok(Flow::Handled);
+    }
     // The Activity Log window, the status line's error and the status bar's
     // Activity button come before anything else; nothing behind them hovers.
     if let crate::activity_log::Routed::Consumed(command) = crate::activity_log::route_mouse(mouse)

@@ -265,6 +265,20 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             cx.repo_dialogs
                 .open_safety(cx.link, crate::safety_panel::Tab::Lost, None);
         }
+        PaletteCommand::Safety(crate::safety_panel::SafetyCmd::ArrangeDialog) => {
+            *cx.last_message = Some(if crate::dialog_kit::frame::arrange_top() {
+                gitpoulpi_i18n::msg::dialog_frame::ARRANGING.get().into()
+            } else {
+                gitpoulpi_i18n::msg::dialog_frame::WHY_NO_DIALOG.get().into()
+            });
+        }
+        PaletteCommand::Safety(crate::safety_panel::SafetyCmd::ResetDialog) => {
+            *cx.last_message = Some(if crate::dialog_kit::frame::reset_top() {
+                gitpoulpi_i18n::msg::dialog_frame::RESET_DONE.get().into()
+            } else {
+                gitpoulpi_i18n::msg::dialog_frame::WHY_NO_DIALOG.get().into()
+            });
+        }
         PaletteCommand::Safety(cmd) => {
             let state = cx.link.journal_state();
             let (effect, why) = cx.repo_dialogs.run_safety(cmd, &state);

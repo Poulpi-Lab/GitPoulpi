@@ -163,6 +163,7 @@ impl WindowState {
         self.sync_fields();
         self.field_editor.begin_frame();
         crate::pointer_map::begin_frame();
+        crate::dialog_kit::frame::begin_frame();
         // What the link is busy with, once it has taken a moment (the
         // spinner animates because the loop redraws on every poll).
         let in_flight_text = self.link.in_flight_text();

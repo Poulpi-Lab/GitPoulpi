@@ -183,7 +183,7 @@ impl SafetyPanel {
             }
             SafetyCmd::ResetDialog => {
                 self.overlay = None;
-                self.window.reset();
+                crate::dialog_kit::frame::reset_top();
                 self.say(
                     gitpoulpi_i18n::msg::dialog_frame::RESET_DONE
                         .get()

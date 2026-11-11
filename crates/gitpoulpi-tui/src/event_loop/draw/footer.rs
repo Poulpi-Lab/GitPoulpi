@@ -301,12 +301,7 @@ pub(in crate::event_loop) fn draw_footer(
         } else {
             segs.push(Span::styled("\u{2022}", dim));
             let km = keymap::current();
-            // Prefer a modified/named chord over the bare `.` default.
-            let menu_key = km
-                .shown_labels(Bind::GlobalContextMenu)
-                .into_iter()
-                .find(|l| l.contains('+'))
-                .unwrap_or_else(|| km.shown(Bind::GlobalContextMenu));
+            let menu_key = menu_hint_keys(&km.shown_labels(Bind::GlobalContextMenu));
             let used: usize = segs.iter().map(|s| display_width(&s.content)).sum();
             let room = (text_area.width as usize).saturating_sub(used);
             segs.push(Span::styled(
@@ -408,6 +403,20 @@ pub(in crate::event_loop) fn prefix_hint_rows(
 /// The idle key hints, most useful first; when the line is too narrow the
 /// least useful ones go, whole, instead of being cut mid-word: the menu
 /// key first, then `q: quit`, then `nav`.
+/// The keys the footer names for the context menu: the modified chord first
+/// (`Shift+F10`), then the single-character ones (`.`), joined by `/`. A
+/// named key such as `Menu` rarely reaches the app, so it is not advertised.
+pub(in crate::event_loop) fn menu_hint_keys(labels: &[String]) -> String {
+    let chords = labels.iter().filter(|l| l.contains('+') && l.len() > 1);
+    let bare = labels.iter().filter(|l| l.chars().count() == 1);
+    let all: Vec<&str> = chords.chain(bare).map(String::as_str).collect();
+    if all.is_empty() {
+        labels.first().cloned().unwrap_or_default()
+    } else {
+        all.join("/")
+    }
+}
+
 pub(in crate::event_loop) fn footer_hints(
     git: &str,
     nav: &str,

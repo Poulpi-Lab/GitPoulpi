@@ -1286,17 +1286,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn the_about_window_moves_and_arranges_but_does_not_resize() {
-        use ratatui::backend::TestBackend;
-        let mut terminal = ratatui::Terminal::new(TestBackend::new(160, 50)).unwrap();
-        open();
-        crate::dialog_kit::frame::testing::check_gestures(false, || {
-            terminal.draw(render).unwrap();
-        });
-        close();
-    }
-
-    #[test]
     fn the_eyes_follow_the_pointer_quadrant() {
         let logo = Rect::new(40, 10, 16, 8);
         let at = |x, y| look_toward(Some((x, y)), logo);
@@ -1417,6 +1406,13 @@ mod render_tests {
         close();
         // Same test again: the window's state is one process-wide static.
         a_popup_over_the_logo_swaps_the_picture_for_half_blocks_and_back();
+        // And the frame: it moves and arranges, and has no resize grip.
+        let mut big = Terminal::new(TestBackend::new(160, 50)).unwrap();
+        open();
+        crate::dialog_kit::frame::testing::check_gestures(false, || {
+            big.draw(render).unwrap();
+        });
+        close();
     }
 
     /// One frame as the event loop runs it: the window, then `over`

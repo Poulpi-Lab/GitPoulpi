@@ -243,7 +243,7 @@ impl SafetyPanel {
         {
             let files = &mut self.panes.files;
             files.view_rows = view_rows;
-            files.clamp(len);
+            files.clamp_selected(len);
             files.offset = files.offset.min(len.saturating_sub(view_rows.max(1)));
         }
         if len == 0 {
@@ -270,7 +270,10 @@ impl SafetyPanel {
         let selected = (files.selected >= files.offset && files.selected < files.offset + view_rows)
             .then_some(files.selected);
         let mut state = RState::default().with_offset(files.offset);
-        state.select(selected);
+        // `select(None)` would reset the offset a scrollbar set.
+        if selected.is_some() {
+            state.select(selected);
+        }
         StatefulWidget::render(
             List::new(items).highlight_style(
                 Style::default()

@@ -923,11 +923,11 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 撤销历史：将分支恢复到原来的位置… | `o` |
 | 撤销历史：刷新 |  |
 | 撤销历史：关闭 | `Esc` |
-| Reflog：在 Log 中显示 | `s` |
+| Reflog：在 Log 中显示 | `l` |
 | Reflog：在此创建分支… | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog：恢复到此位置… | `r` |
 | Reflog：加载更多 | `m` |
 | Reflog：刷新 |  |
@@ -935,7 +935,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Lost Work: Create tag Here... | `t` |
 | 丢失的工作：Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | 丢失的工作：重新扫描 |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

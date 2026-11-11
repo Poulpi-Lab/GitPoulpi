@@ -956,11 +956,11 @@ zastosowania. Klawisze są domyślne.
 | Historia cofania: Przywróć gałąź tam, gdzie była... | `o` |
 | Historia cofania: Odśwież |  |
 | Historia cofania: Zamknij | `Esc` |
-| Reflog: Pokaż w Log | `s` |
+| Reflog: Pokaż w Log | `l` |
 | Reflog: Utwórz gałąź tutaj... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Przywróć do tej pozycji... | `r` |
 | Reflog: Wczytaj więcej | `m` |
 | Reflog: Odśwież |  |
@@ -968,7 +968,7 @@ zastosowania. Klawisze są domyślne.
 | Lost Work: Create tag Here... | `t` |
 | Utracona praca: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Utracona praca: Szukaj ponownie |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

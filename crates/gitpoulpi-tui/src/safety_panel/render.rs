@@ -392,7 +392,7 @@ impl SafetyPanel {
         {
             let list = self.list_mut();
             list.view_rows = view_rows;
-            list.clamp(len);
+            list.clamp_selected(len);
             list.offset = list.offset.min(len.saturating_sub(view_rows.max(1)));
         }
         if len == 0 {
@@ -601,8 +601,8 @@ impl SafetyPanel {
                 pairs.push(("b".into(), m::HINT_BRANCH.get()));
                 pairs.push(("t".into(), m::HINT_TAG.get()));
                 pairs.push(("w".into(), m::HINT_APPLY.get()));
-                pairs.push(("z".into(), m::HINT_STASH.get()));
-                pairs.push(("s".into(), m::HINT_SHOW.get()));
+                pairs.push(("s".into(), m::HINT_STASH.get()));
+                pairs.push(("l".into(), m::HINT_SHOW.get()));
                 pairs.push(("v".into(), m::HINT_TREE.get()));
                 if self.reflog.more {
                     pairs.push(("m".into(), m::BTN_LOAD_MORE.get()));
@@ -613,7 +613,7 @@ impl SafetyPanel {
                 pairs.push(("t".into(), m::HINT_TAG.get()));
                 pairs.push(("c".into(), m::HINT_PICK.get()));
                 pairs.push(("w".into(), m::HINT_APPLY.get()));
-                pairs.push(("z".into(), m::HINT_STASH.get()));
+                pairs.push(("s".into(), m::HINT_STASH.get()));
                 pairs.push(("v".into(), m::HINT_TREE.get()));
             }
         }

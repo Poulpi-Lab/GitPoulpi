@@ -957,11 +957,11 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Undo History: Restore the Branch to Where It Was... | `o` |
 | Undo History: Refresh |  |
 | Undo History: Close | `Esc` |
-| Reflog: Show in Log | `s` |
+| Reflog: Show in Log | `l` |
 | Reflog: Create Branch Here... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Restore to This Position... | `r` |
 | Reflog: Load More | `m` |
 | Reflog: Refresh |  |
@@ -969,7 +969,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Lost Work: Create tag Here... | `t` |
 | Lost Work: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Lost Work: Scan Again |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

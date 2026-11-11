@@ -49,8 +49,10 @@ can be undone (up to 100)").
 The actions you have undone sit **above** the newest action, under a divider
 ("undone - Redo brings them back"), dimmed, with the one Redo brings back next
 nearest the divider. The selection starts on the newest action, not on them.
-The arrow keys move (the headings and the divider are skipped), `Tab` switches
-between the three views, `Esc` closes. For the selected row:
+The arrow keys move (the headings and the divider are skipped), `1` / `2` / `3`
+(or `Ctrl+Tab` / `Ctrl+Shift+Tab`) switch between the three views, `Esc` closes.
+`Enter` never runs an action: every button has its own letter, shown in the hint
+line under the buttons. For the selected row:
 
 - **Undo up to here** (`u`): undoes that action and every newer one, newest
   first, after one confirmation that lists them all. A step the daemon finds
@@ -92,8 +94,8 @@ other.
 
 ![The Reflog of main: every position it has had, newest first, with the selected one described on the right](images/reflog.png)
 
-**Show in Log** (`s`), **Create branch here** (`b`), **Create tag here** (`t`),
-**Apply to working tree** (`w`), **Save as stash** (`z`) (the last three work as
+**Show in Log** (`l`), **Create branch here** (`b`), **Create tag here** (`t`),
+**Apply to working tree** (`w`), **Save as stash** (`s`) (the last three work as
 in Lost work below) and
 **Restore `<branch>` to this position** (`r`). The restore is undoable. When the
 branch is checked out and you have local changes it cannot move without
@@ -121,11 +123,42 @@ it to the current branch. A lost commit is not in the Log, so this view has no
 **Apply to working tree** (`w`) replays the commit's changes onto the files,
 all or nothing (the index and HEAD stay; a merge commit is refused). When it
 cannot apply cleanly, nothing is touched and the dialog offers **Save as stash**
-(`z`), which keeps the same changes as a new stash instead; that action is also
+(`s`), which keeps the same changes as a new stash instead; that action is also
 always available on its own. Both are journaled: `Ctrl+Z` puts the files back,
 or drops the stash again. The same actions are `gitpoulpi apply-commit <rev>`
 and `gitpoulpi stash from-commit <rev> [-m M]`, and the Reflog view has them
 too.
+
+### Panes, hunks and the window
+
+Reflog and Lost work show the commit list on the left and, on the right, the
+selected commit's header, **every file it changed** and the selected file's
+hunks (hunks only, wrapped to the pane). The file list is the one of the main
+window's right pane: `Path` or `Tree` (`v`, or click the toggle), a folder
+folds with `Enter`, `Left` or `Right`, a click or the arrows pick a file and
+its hunks appear below (the daemon is asked off the interface thread; the last
+few files are kept). The commit list, the file list and the hunks each have a
+scrollbar you can press and drag.
+
+- `Tab` / `Shift+Tab` walk the panes (list, files, hunks); the arrows, `PageUp`,
+  `PageDown`, `Home` and `End` act on the pane that has the keyboard (its
+  border is lit). `Enter` on a file moves to its hunks.
+- **Dividers**: drag the one between the list and the right pane, or the one
+  between the files and the hunks; double-click a divider to reset it. The
+  keyboard: `Alt+Left` / `Alt+Right`, `Alt+Up` / `Alt+Down`, `Alt+0` resets both.
+  The palette has `Reflog / Lost Work: Reset Pane Sizes`, `Next Pane` and
+  `Path or Tree File List`.
+- `Ctrl+N` shows its badges over the three view tabs and the three panes, like
+  in the main window; a badge key jumps there.
+- **Move and resize the dialog**: drag the title bar to move it, drag the left,
+  right and bottom borders or a bottom corner (the `◢` grip) to resize it (never
+  below 60 x 16, always on screen). The close cross keeps its click and letting
+  go outside the dialog never closes it. The keyboard twin is `Ctrl+N` then `m`:
+  the arrows move, `Shift`+arrows resize, `0` resets, `Enter` or `Esc` leave (the
+  border says so while it is on). The palette has `Dialog: Move/resize` and
+  `Dialog: Reset position and size`. Whether the place is kept is
+  `ui.dialog_geometry` (Settings > Appearance > Layout): `session` (default),
+  `saved` (restored at the next launch) or `never`.
 
 ## From the command palette
 

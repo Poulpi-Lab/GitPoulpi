@@ -957,11 +957,11 @@ Tuşlar varsayılanlardır.
 | Geri Alma Geçmişi: Dalı Eski Yerine Geri Yükle... | `o` |
 | Geri Alma Geçmişi: Yenile |  |
 | Geri Alma Geçmişi: Kapat | `Esc` |
-| Reflog: Log'da Göster | `s` |
+| Reflog: Log'da Göster | `l` |
 | Reflog: Burada Dal Oluştur... | `b` |
 | Reflog: Create Tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as Stash | `z` |
+| Reflog: Save Changes as Stash | `s` |
 | Reflog: Bu Konuma Geri Yükle... | `r` |
 | Reflog: Daha Fazla Yükle | `m` |
 | Reflog: Yenile |  |
@@ -969,7 +969,7 @@ Tuşlar varsayılanlardır.
 | Lost Work: Create Tag Here... | `t` |
 | Kaybolan Çalışma: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as Stash | `z` |
+| Lost Work: Save Changes as Stash | `s` |
 | Kaybolan Çalışma: Yeniden Tara |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

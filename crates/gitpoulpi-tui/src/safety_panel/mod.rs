@@ -91,7 +91,7 @@ pub(crate) enum Act {
     CreateTag,
     /// `Apply to working tree` (`w`): the commit's changes onto the files.
     ApplyToWorktree,
-    /// `Save as stash` (`z`): the commit's changes kept as a stash.
+    /// `Save as stash` (`s`): the commit's changes kept as a stash.
     SaveAsStash,
     /// Reflog only: fetch the next page of positions.
     LoadMore,
@@ -128,6 +128,14 @@ impl ListState {
     pub(crate) fn clamp(&mut self, len: usize) {
         self.selected = self.selected.min(len.saturating_sub(1));
         self.keep_visible();
+    }
+
+    /// Keeps the cursor inside the list without moving the scroll: what a
+    /// paint does, so a scrollbar drag that left the cursor out of sight
+    /// stays where it put the view (a key or a click scrolls to the cursor,
+    /// `keep_visible`).
+    pub(crate) fn clamp_selected(&mut self, len: usize) {
+        self.selected = self.selected.min(len.saturating_sub(1));
     }
 
     pub(crate) fn keep_visible(&mut self) {

@@ -128,7 +128,7 @@ fn a_discard_says_the_key_that_undoes_it() {
 
 /// A lost commit cannot be shown in the Log, so the view has no such
 /// button. It can be tagged (`t`), its changes applied to the working tree
-/// (`w`) and kept as a stash (`z`), each leaving the repository as the
+/// (`w`) and kept as a stash (`s`), each leaving the repository as the
 /// action says.
 #[test]
 fn a_lost_commit_is_tagged_applied_and_stashed() {

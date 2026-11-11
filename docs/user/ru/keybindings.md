@@ -963,11 +963,11 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | История отмен: восстановить ветку туда, где она была... | `o` |
 | История отмен: обновить |  |
 | История отмен: закрыть | `Esc` |
-| Reflog: показать в Log | `s` |
+| Reflog: показать в Log | `l` |
 | Reflog: создать ветку здесь... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: восстановить на эту позицию... | `r` |
 | Reflog: загрузить ещё | `m` |
 | Reflog: обновить |  |
@@ -975,7 +975,7 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Lost Work: Create tag Here... | `t` |
 | Потерянная работа: cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Потерянная работа: искать заново |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

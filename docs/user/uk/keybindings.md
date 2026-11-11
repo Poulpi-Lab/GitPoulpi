@@ -951,11 +951,11 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Історія скасувань: відновити гілку туди, де вона була... | `o` |
 | Історія скасувань: оновити |  |
 | Історія скасувань: закрити | `Esc` |
-| Reflog: показати в Log | `s` |
+| Reflog: показати в Log | `l` |
 | Reflog: створити гілку тут... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: відновити на цю позицію... | `r` |
 | Reflog: завантажити ще | `m` |
 | Reflog: оновити |  |
@@ -963,7 +963,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Lost Work: Create tag Here... | `t` |
 | Втрачена робота: cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Втрачена робота: сканувати знову |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

@@ -2630,7 +2630,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(
         msg::palette::REFLOG_SHOW_IN_LOG,
-        "s",
+        "l",
         PaletteCommand::Safety(SafetyCmd::ReflogShow),
     ),
     entry(
@@ -2650,7 +2650,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(
         msg::palette::REFLOG_SAVE_AS_STASH,
-        "z",
+        "s",
         PaletteCommand::Safety(SafetyCmd::ReflogStash),
     ),
     entry(
@@ -2690,7 +2690,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     ),
     entry(
         msg::palette::LOST_WORK_SAVE_AS_STASH,
-        "z",
+        "s",
         PaletteCommand::Safety(SafetyCmd::LostStash),
     ),
     entry(

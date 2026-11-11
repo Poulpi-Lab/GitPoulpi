@@ -962,11 +962,11 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Historial de deshacer: Restaurar la rama a donde estaba... | `o` |
 | Historial de deshacer: Actualizar |  |
 | Historial de deshacer: Cerrar | `Esc` |
-| Reflog: Mostrar en el Log | `s` |
+| Reflog: Mostrar en el Log | `l` |
 | Reflog: Crear rama aquí... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Restaurar a esta posición... | `r` |
 | Reflog: Cargar más | `m` |
 | Reflog: Actualizar |  |
@@ -974,7 +974,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Lost Work: Create tag Here... | `t` |
 | Trabajo perdido: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Trabajo perdido: Buscar de nuevo |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

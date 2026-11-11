@@ -332,7 +332,7 @@ impl Panes {
                 .unwrap_or(0);
             self.files.offset = 0;
         }
-        self.files.clamp(len);
+        self.files.clamp_selected(len);
     }
 
     /// The path of the file row under the cursor (`None` on a folder).

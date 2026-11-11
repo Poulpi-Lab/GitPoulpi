@@ -955,11 +955,11 @@ As teclas são as predefinidas.
 | Histórico de desfazer: restaurar a branch para onde estava... | `o` |
 | Histórico de desfazer: atualizar |  |
 | Histórico de desfazer: fechar | `Esc` |
-| Reflog: mostrar no Log | `s` |
+| Reflog: mostrar no Log | `l` |
 | Reflog: criar branch aqui... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: restaurar para esta posição... | `r` |
 | Reflog: carregar mais | `m` |
 | Reflog: atualizar |  |
@@ -967,7 +967,7 @@ As teclas são as predefinidas.
 | Lost Work: Create tag Here... | `t` |
 | Trabalho perdido: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Trabalho perdido: procurar de novo |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

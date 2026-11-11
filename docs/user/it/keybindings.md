@@ -961,11 +961,11 @@ applicano. I tasti sono quelli predefiniti.
 | Cronologia annullamenti: Ripristina il branch dove si trovava... | `o` |
 | Cronologia annullamenti: Aggiorna |  |
 | Cronologia annullamenti: Chiudi | `Esc` |
-| Reflog: Mostra nel Log | `s` |
+| Reflog: Mostra nel Log | `l` |
 | Reflog: Crea branch qui... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Ripristina a questa posizione... | `r` |
 | Reflog: Carica altro | `m` |
 | Reflog: Aggiorna |  |
@@ -973,7 +973,7 @@ applicano. I tasti sono quelli predefiniti.
 | Lost Work: Create tag Here... | `t` |
 | Lavoro perso: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Lavoro perso: Cerca di nuovo |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

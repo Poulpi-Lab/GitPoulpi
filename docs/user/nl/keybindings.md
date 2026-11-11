@@ -961,11 +961,11 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Geschiedenis: De branch herstellen naar waar hij was... | `o` |
 | Geschiedenis: Vernieuwen |  |
 | Geschiedenis: Sluiten | `Esc` |
-| Reflog: Tonen in het Log | `s` |
+| Reflog: Tonen in het Log | `l` |
 | Reflog: Branch hier maken... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Herstellen naar deze positie... | `r` |
 | Reflog: Meer laden | `m` |
 | Reflog: Vernieuwen |  |
@@ -973,7 +973,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Lost Work: Create tag Here... | `t` |
 | Verloren werk: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Verloren werk: Opnieuw zoeken |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

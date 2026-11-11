@@ -416,6 +416,7 @@ the server; see [MCP and agents](mcp-and-agents.md).
 | **Graph lane background** | **Off** (transparent) or **Row tint**: a faint band of the lane color behind the graph column, with a thin bar at its edge. |
 | **Row tint strength** | How faded the Row tint band is: **Strong**, **Medium** (default) or **Subtle**. The edge bar keeps its full color. |
 | **Toolbar position** | `ui.toolbar_position`: **Top**, **Bottom** (default), **Left** or **Right**. Left and Right make a column beside the panes; under 80 columns it is drawn at the bottom. Applies at once. Palette: `Settings: Toolbar position...`. |
+| **Remember dialog position and size** | `ui.dialog_geometry`: **For this session** (default), **Saved to disk** or **Never**: whether a dialog you moved or resized keeps its place. Applies at once. |
 | **Toolbar button alignment** | `ui.toolbar_align`: **Start** (default), **Center** or **End**: where the buttons sit along the toolbar. Applies at once. |
 | **Pin the pull request button to the end** | On by default (`ui.toolbar_pr_pinned`; it reads "merge request" on GitLab). The request button stays at the far end (right, or bottom in a column) whatever the alignment; off, it flows with the other buttons. Applies at once. |
 | **Status line position** | `ui.statusbar_position`: **Top** (above the repository tabs) or **Bottom** (default). The Home tab keeps its own status line at the bottom. Applies at once. |

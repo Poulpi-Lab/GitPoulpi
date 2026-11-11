@@ -351,6 +351,11 @@ fn the_diff_and_the_files_each_have_a_bar_that_can_be_pressed_and_dragged() {
     let col = lay.files.right() - 1;
     panel.on_mouse(down(col, lay.files.bottom() - 3));
     assert!(panel.panes.files.offset > 0, "the files bar jumped");
+    panel.on_mouse(up(col, lay.files.bottom() - 3));
+    let before = panel.panes.files.offset;
+    let shown = buffer_text(&panel.paint_at(SCREEN));
+    assert!(shown.contains("f6") && !shown.contains("+ f00.txt"), "painted after the jump\n{shown}");
+    panel.on_mouse(down(col, lay.files.bottom() - 3));
     let top = panel.panes.files.offset;
     panel.on_mouse(drag(col, lay.files.y + 2));
     assert!(panel.panes.files.offset < top, "and the thumb followed the drag up");
@@ -488,4 +493,19 @@ fn ctrl_n_badges_name_the_view_tabs_and_the_panes_and_a_press_jumps_there() {
     let cell = targets.iter().find(|(_, at)| *at == (tab.x, tab.y)).unwrap().1;
     panel.on_mouse(down(cell.0, cell.1));
     assert_eq!(panel.tab, Tab::History);
+}
+
+#[test]
+fn enter_never_runs_an_action_it_only_navigates_in_the_file_list() {
+    let mut panel = lost_panel();
+    panel.paint_at(SCREEN);
+    assert!(matches!(panel.on_key(key(KeyCode::Enter)), PanelOutcome::Stay));
+    assert!(
+        panel.overlay.is_none() && panel.job.is_none(),
+        "Enter on the commit does nothing"
+    );
+    panel.on_key(key(KeyCode::Tab));
+    panel.on_key(key(KeyCode::Enter));
+    assert!(panel.overlay.is_none() && panel.job.is_none());
+    assert_eq!(panel.panes.focus, Pane::Diff, "Enter on a file goes to its hunks");
 }

@@ -486,13 +486,13 @@ fn lost_work_offers_tag_apply_and_stash_but_no_show_in_log() {
     ] {
         assert!(acts.contains(&act), "{act:?} in {acts:?}");
     }
-    // The letter `s` does nothing in Lost work; it is Show in Log in the Reflog.
-    assert_eq!(act_for_key('s', Tab::Lost), None);
-    assert_eq!(act_for_key('s', Tab::Reflog), Some(Act::ShowInLog));
+    // The letter `l` does nothing in Lost work; it is Show in Log in the Reflog.
+    assert_eq!(act_for_key('l', Tab::Lost), None);
+    assert_eq!(act_for_key('l', Tab::Reflog), Some(Act::ShowInLog));
     for tab in [Tab::Lost, Tab::Reflog] {
         assert_eq!(act_for_key('t', tab), Some(Act::CreateTag));
         assert_eq!(act_for_key('w', tab), Some(Act::ApplyToWorktree));
-        assert_eq!(act_for_key('z', tab), Some(Act::SaveAsStash));
+        assert_eq!(act_for_key('s', tab), Some(Act::SaveAsStash));
     }
 }
 
@@ -527,7 +527,7 @@ fn apply_runs_the_apply_operation_and_save_as_stash_the_stash_one() {
     assert_eq!(sent[0].1["commit"], serde_json::json!(oid_of('c')));
 
     panel.job = None;
-    panel.on_key(key(KeyCode::Char('z')));
+    panel.on_key(key(KeyCode::Char('s')));
     assert!(matches!(panel.job, Some(Job::Stash { .. })));
     let sent = activity.raw.queued();
     assert_eq!(sent[0].0, OperationKind::StashFromCommit);

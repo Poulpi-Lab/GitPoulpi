@@ -959,11 +959,11 @@ Tangenterna är standardvärdena.
 | Ångrahistorik: Återställ grenen till där den var... | `o` |
 | Ångrahistorik: Uppdatera |  |
 | Ångrahistorik: Stäng | `Esc` |
-| Reflog: Visa i Log | `s` |
+| Reflog: Visa i Log | `l` |
 | Reflog: Skapa gren här... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: Återställ till den här positionen... | `r` |
 | Reflog: Ladda fler | `m` |
 | Reflog: Uppdatera |  |
@@ -971,7 +971,7 @@ Tangenterna är standardvärdena.
 | Lost Work: Create tag Here... | `t` |
 | Förlorat arbete: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | Förlorat arbete: Sök igen |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

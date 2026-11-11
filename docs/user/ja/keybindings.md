@@ -923,11 +923,11 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 元に戻す履歴: ブランチを元の位置に復元... | `o` |
 | 元に戻す履歴: 更新 |  |
 | 元に戻す履歴: 閉じる | `Esc` |
-| Reflog: Log で表示 | `s` |
+| Reflog: Log で表示 | `l` |
 | Reflog: ここにブランチを作成... | `b` |
 | Reflog: Create tag Here... | `t` |
 | Reflog: Apply Changes to Working Tree | `w` |
-| Reflog: Save Changes as stash | `z` |
+| Reflog: Save Changes as stash | `s` |
 | Reflog: この位置に復元... | `r` |
 | Reflog: さらに読み込む | `m` |
 | Reflog: 更新 |  |
@@ -935,7 +935,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Lost Work: Create tag Here... | `t` |
 | 失われた作業: Cherry-pick | `c` |
 | Lost Work: Apply Changes to Working Tree | `w` |
-| Lost Work: Save Changes as stash | `z` |
+| Lost Work: Save Changes as stash | `s` |
 | 失われた作業: 再検索 |  |
 | Reflog / Lost Work: Next Pane | `Tab` |
 | Reflog / Lost Work: Path or Tree File List | `v` |

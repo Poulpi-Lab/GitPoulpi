@@ -959,11 +959,11 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Historique d'annulation : Restaurer la branche là où elle était... | `o` |
 | Historique d'annulation : Actualiser |  |
 | Historique d'annulation : Fermer | `Esc` |
-| Reflog : Afficher dans le Log | `s` |
+| Reflog : Afficher dans le Log | `l` |
 | Reflog : Créer une branche ici... | `b` |
 | Reflog : Créer tag ici... | `t` |
 | Reflog : Appliquer les changements à l'arbre de travail | `w` |
-| Reflog : Enregistrer en stash | `z` |
+| Reflog : Enregistrer en stash | `s` |
 | Reflog : Restaurer à cette position... | `r` |
 | Reflog : Charger la suite | `m` |
 | Reflog : Actualiser |  |
@@ -971,7 +971,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Travail perdu : Créer tag ici... | `t` |
 | Travail perdu : Cherry-pick | `c` |
 | Travail perdu : Appliquer les changements à l'arbre de travail | `w` |
-| Travail perdu : Enregistrer en stash | `z` |
+| Travail perdu : Enregistrer en stash | `s` |
 | Travail perdu : Relancer la recherche |  |
 | Reflog / Travail perdu : Volet suivant | `Tab` |
 | Reflog / Travail perdu : Liste des fichiers en chemins ou en arbre | `v` |

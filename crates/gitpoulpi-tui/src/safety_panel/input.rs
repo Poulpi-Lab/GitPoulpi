@@ -25,11 +25,11 @@ pub(super) fn act_for_key(c: char, tab: Tab) -> Option<Act> {
         ('r', Tab::History) => Some(Act::RestoreOnly),
         ('o', Tab::History) => Some(Act::Offer),
         ('r', Tab::Reflog) => Some(Act::RestoreRef),
-        ('s', Tab::Reflog) => Some(Act::ShowInLog),
+        ('l', Tab::Reflog) => Some(Act::ShowInLog),
         ('b', Tab::Reflog | Tab::Lost) => Some(Act::CreateBranch),
         ('t', Tab::Reflog | Tab::Lost) => Some(Act::CreateTag),
         ('w', Tab::Reflog | Tab::Lost) => Some(Act::ApplyToWorktree),
-        ('z', Tab::Reflog | Tab::Lost) => Some(Act::SaveAsStash),
+        ('s', Tab::Reflog | Tab::Lost) => Some(Act::SaveAsStash),
         ('m', Tab::Reflog) => Some(Act::LoadMore),
         ('c', Tab::Lost) => Some(Act::CherryPick),
         _ => None,
@@ -75,13 +75,13 @@ impl SafetyPanel {
             {
                 self.fold_at_cursor(key.code == KeyCode::Right);
             }
+            // Enter never runs an action (each button has its own letter):
+            // on the file list it only navigates, a folder folds and a file
+            // sends the keyboard to its hunks.
             KeyCode::Enter if self.tab != Tab::History && self.panes.focus == Pane::Files => {
                 let row = self.panes.files.selected;
-                self.panes.toggle_folder(row);
-            }
-            KeyCode::Enter => {
-                if let Some(act) = self.actions(&state).first().copied() {
-                    return self.run(act, &state);
+                if !self.panes.toggle_folder(row) {
+                    self.panes.focus = Pane::Diff;
                 }
             }
             KeyCode::Menu | KeyCode::Char('.') => self.open_menu(None, &state),

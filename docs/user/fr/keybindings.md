@@ -456,6 +456,8 @@ Dans `config.toml`, c'est la table `[keybindings.palette]`, nommée d'après la 
 
 La bande d'aide sous la liste indique cette touche (`Alt+K` par défaut). C'est l'action `palette.configure_shortcut` : elle se réaffecte comme les autres.
 
+La palette et les sélecteurs (thème, langue, onglet, recherche d'espace de travail) se déplacent et se redimensionnent comme une boîte de dialogue : faites glisser le bord supérieur, ou appuyez sur `Alt+G` (l'action `palette.arrange` ; la ligne `Dialogue : Déplacer/redimensionner` de la palette fait la même chose). Les flèches la déplacent, `Shift`+flèches la redimensionnent, `0` la réinitialise, `Enter` ou `Esc` quittent le mode et la fenêtre reste ouverte. `ui.dialog_geometry` décide si la position est conservée.
+
 ### Toutes les commandes de la palette
 
 Générée à partir de l'application (un test la garde à jour). Les commandes IA

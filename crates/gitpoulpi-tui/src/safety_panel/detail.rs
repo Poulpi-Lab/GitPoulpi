@@ -35,6 +35,13 @@ impl Detail {
         self.shown.and_then(|oid| self.cache.get(&oid))
     }
 
+    /// Puts a commit's details in the cache, as if the reads had landed.
+    #[cfg(test)]
+    pub(crate) fn fill(&mut self, oid: Oid, loaded: Loaded) {
+        self.cache.insert(oid, loaded);
+        self.shown = Some(oid);
+    }
+
     /// Whether the selected commit is still being read.
     pub(crate) fn loading(&self) -> bool {
         self.node_reply.is_some() || self.files_reply.is_some()

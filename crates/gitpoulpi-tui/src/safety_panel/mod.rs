@@ -31,6 +31,8 @@ mod render;
 mod render_panes;
 mod rows;
 #[cfg(test)]
+mod pane_tests;
+#[cfg(test)]
 mod tests;
 
 use std::time::Instant;

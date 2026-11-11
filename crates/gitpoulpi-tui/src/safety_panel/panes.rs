@@ -86,7 +86,8 @@ pub(crate) struct PaneLayout {
     /// border of the right pane.
     pub(crate) grab_v: Rect,
     /// What a press on the horizontal divider grabs: the file list's bottom
-    /// border and the diff's top border.
+    /// border (the diff's top border stays the diff's, so its pane badge has
+    /// a cell).
     pub(crate) grab_h: Rect,
 }
 
@@ -134,7 +135,7 @@ pub(super) fn layout(
             2,
             boxes_h,
         ),
-        grab_h: Rect::new(side_x, files.bottom().saturating_sub(1), side_w, 2),
+        grab_h: Rect::new(side_x, files.bottom().saturating_sub(1), side_w, 1),
     }
 }
 
@@ -197,6 +198,12 @@ impl DiffPane {
                 }),
             ),
         ));
+    }
+
+    /// Keeps an answer, as if the read had landed.
+    #[cfg(test)]
+    pub(crate) fn keep(&mut self, key: DiffKey, file: FileDiff) {
+        self.kept.push((key, Ok(file)));
     }
 
     /// Whether a read is on its way.
@@ -513,7 +520,7 @@ mod tests {
         assert_eq!(l.files.bottom(), l.diff.y);
         assert_eq!(l.files.x, l.diff.x);
         assert!(l.grab_v.contains((l.files.x - 1, l.files.y).into()));
-        assert!(l.grab_h.contains((l.files.x, l.diff.y).into()));
+        assert!(l.grab_h.contains((l.files.x, l.diff.y - 1).into()));
     }
 
     #[test]

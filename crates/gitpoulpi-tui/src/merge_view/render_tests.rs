@@ -1393,3 +1393,15 @@ fn the_merge_scrollbars_drag_step_and_jump() {
 }
 
 mod cjk;
+
+#[test]
+fn the_confirm_box_close_cross_is_a_hit_and_cancels() {
+    let mut v = fixture();
+    v.run(super::MergeCmd::Reset);
+    let before = v.model.tally();
+    let (_, hits) = draw(&mut v, 110, 30);
+    assert!(has(&hits, MergeHit::PromptClose));
+    v.click(MergeHit::PromptClose, 0, 0);
+    assert!(v.ui.prompt.is_none(), "the cross answers like Esc");
+    assert_eq!(v.model.tally(), before, "nothing was reset");
+}

@@ -234,3 +234,30 @@ impl LabelsPrompt {
 
 /// The dialog moves (its size follows its content).
 const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("board_columns");
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crossterm::event::KeyModifiers;
+
+    /// The columns dialog carries the close cross; a click on it cancels like
+    /// Esc. Falsified by dropping the `close.hit` arm of `on_mouse`.
+    #[test]
+    fn the_close_cross_cancels_the_columns_dialog() {
+        let area = Rect::new(0, 0, 120, 30);
+        let mut prompt = LabelsPrompt::new(&["todo".to_string()], Vec::new());
+        let mut buf = Buffer::empty(area);
+        prompt.render(area, &mut buf);
+        let (c, r) = (0..area.height)
+            .flat_map(|y| (0..area.width).map(move |x| (x, y)))
+            .find(|(x, y)| buf[(*x, *y)].symbol() == "\u{2715}")
+            .expect("the close cross");
+        let out = prompt.on_mouse(MouseEvent {
+            kind: MouseEventKind::Down(MouseButton::Left),
+            column: c,
+            row: r,
+            modifiers: KeyModifiers::NONE,
+        });
+        assert!(matches!(out, PromptOutcome::Cancel));
+    }
+}

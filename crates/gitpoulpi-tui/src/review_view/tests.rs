@@ -2405,3 +2405,55 @@ fn the_submit_and_abandon_confirmations_are_titled_by_their_verb() {
 
 mod api;
 mod review_options;
+
+/// The three small review dialogs carry the shared close cross on their top
+/// border, and a click on it answers like Esc (Cancel / Cancel / No).
+/// Falsified by dropping the `close.hit` arm of each `on_mouse`.
+#[test]
+fn the_small_review_dialogs_close_on_their_cross() {
+    use super::popups::{ComposeBox, ComposeOutcome, ConfirmOutcome, FinishOutcome};
+    let area = Rect::new(0, 0, 120, 40);
+    let down = |c: u16, r: u16| MouseEvent {
+        kind: MouseEventKind::Down(MouseButton::Left),
+        column: c,
+        row: r,
+        modifiers: KeyModifiers::NONE,
+    };
+    let cross_of = |buf: &Buffer| -> (u16, u16) {
+        for y in 0..buf.area.height {
+            for x in 0..buf.area.width {
+                if buf[(x, y)].symbol() == "\u{2715}" {
+                    return (x, y);
+                }
+            }
+        }
+        panic!("no close cross painted");
+    };
+
+    let mut compose = ComposeBox::new(
+        ComposeFor::Conversation,
+        "Comment".into(),
+        "about".into(),
+        String::new(),
+    );
+    let mut buf = Buffer::empty(area);
+    compose.render(area, &mut buf);
+    let (c, r) = cross_of(&buf);
+    assert_eq!(compose.on_mouse(down(c, r)), ComposeOutcome::Cancel);
+
+    let caps = ReviewCapabilities {
+        review: true,
+        ..Default::default()
+    };
+    let mut finish = super::popups::FinishDialog::new(caps, 0, None, &[]);
+    let mut buf = Buffer::empty(area);
+    finish.render(area, &mut buf, ' ');
+    let (c, r) = cross_of(&buf);
+    assert!(matches!(finish.on_mouse(down(c, r)), FinishOutcome::Cancel));
+
+    let mut confirm = super::popups::Confirm::new("Pick", "Sure?".into(), "Yes");
+    let mut buf = Buffer::empty(area);
+    confirm.render(area, &mut buf);
+    let (c, r) = cross_of(&buf);
+    assert_eq!(confirm.on_mouse(down(c, r)), ConfirmOutcome::No);
+}

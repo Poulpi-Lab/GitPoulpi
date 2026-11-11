@@ -293,3 +293,48 @@ fn the_palette_opens_the_move_combo_and_a_new_commit_is_offered() {
     assert_eq!(files_of(&repo, "HEAD~2"), ["a.txt"]);
     assert_eq!(repo.git(&["status", "--porcelain"]), "");
 }
+
+/// The move dialog's close cross closes it like Esc: the review is back and
+/// nothing moved (the commits created afterwards are the proposed ones).
+/// Falsified by dropping the cross hit in `on_move_mouse`.
+#[test]
+fn the_move_dialog_close_cross_closes_it_and_moves_nothing() {
+    let repo = fixture();
+    let (mut term, _c, _t) = open_review(&repo, "pty-compose-move-cross", "");
+    for _ in 0..3 {
+        term.send_keys("Down").unwrap();
+    }
+    term.wait_for("b.txt selected", STEP, |s| {
+        s.contains("Commit 2 \u{b7} 2 files")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("m").unwrap();
+    term.wait_for("the dropdown", STEP, |s| {
+        s.contains("Move file to commit...")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    common::retry_until(
+        &mut term,
+        "the dialog closed by its cross",
+        5,
+        Duration::from_secs(6),
+        |term| {
+            let screen = term.screen();
+            if let Some((_, row)) = screen.find("Move file to commit...") {
+                // The dialog's title row carries its cross.
+                if let Some((c, r)) = screen
+                    .find_all("\u{2715}")
+                    .into_iter()
+                    .find(|(_, r)| *r == row)
+                {
+                    term.click(c, r).unwrap();
+                }
+            }
+        },
+        |s| !s.contains("Move file to commit...") && s.contains("Create 2 commits"),
+    );
+    term.send_keys("C-s").unwrap();
+    wait_for_head_subject(&repo, "fix: bc");
+    assert_eq!(files_of(&repo, "HEAD"), ["b.txt", "c.txt"]);
+    assert_eq!(files_of(&repo, "HEAD~1"), ["a.txt"]);
+}

@@ -306,3 +306,42 @@ fn the_commit_menu_has_one_submenu_per_ref() {
     );
     assert!(menu.contains("Create annotated tag here..."));
 }
+
+/// The confirm prompt's close cross answers like Cancel: the prompt goes and
+/// the branch stays. Falsified by not registering `ConfirmClose` (the click
+/// still cancels through the catch-all, so the falsification drops the
+/// painted cross instead).
+#[test]
+fn the_confirm_prompt_close_cross_cancels_and_the_branch_stays() {
+    let repo = fixture(false);
+    let (mut term, _c) = launch(&repo, "pty-pill-confirm-cross");
+    right_click_pill(&mut term, "older target commit", "to-delete");
+    let menu = term
+        .wait_for("the pill menu", STEP, |s| s.contains("Delete to-delete"))
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (c, r) = menu.find("Delete to-delete").unwrap();
+    term.click(c + 1, r).unwrap();
+    term.wait_for("the confirm prompt", STEP, |s| {
+        s.contains("Delete branch 'to-delete'?")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    let screen = term
+        .wait_for_stable(Duration::from_millis(300), STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    // The prompt's top border carries the cross: the one whose row has the
+    // popup's right corner four cells on.
+    let (cx, cy) = screen
+        .find_all("\u{2715}")
+        .into_iter()
+        .find(|(c, r)| screen.cell(c + 3, *r).is_some_and(|x| x.text == "\u{256e}"))
+        .unwrap_or_else(|| panic!("the prompt's close cross\n{}", term.text()));
+    common::retry_until(
+        &mut term,
+        "the prompt closed by its cross",
+        5,
+        Duration::from_secs(6),
+        |term| term.click(cx, cy).unwrap(),
+        |s| !s.contains("Delete branch 'to-delete'?"),
+    );
+    assert!(branches(&repo).contains("to-delete"));
+}

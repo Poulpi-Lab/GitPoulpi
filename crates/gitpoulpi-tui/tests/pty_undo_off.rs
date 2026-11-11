@@ -156,6 +156,64 @@ fn started_with_undo_off_the_buttons_are_absent_and_ctrl_z_says_why() {
     term.send_keys("C-z").unwrap();
     term.wait_for("the reason", STEP, |s| s.contains("turned off"))
         .unwrap_or_else(|e| panic!("{e}"));
+    let _ = term.stop();
+}
+
+/// No frame from the very first byte may carry the Undo/Redo buttons when the
+/// config has undo off: the toolbar must not be drawn with the default (on)
+/// and corrected once the daemon reports the journal. Reads the raw byte
+/// stream (every frame ever written), not a settled screen.
+#[test]
+fn started_with_undo_off_no_frame_ever_draws_the_buttons() {
+    let repo = fixture();
+    let config = tempfile::tempdir().unwrap();
+    std::fs::write(
+        config.path().join("config.toml"),
+        "[general]\nundo_enabled = false\n",
+    )
+    .unwrap();
+    let term = common::launch(repo.root())
+        .session("pty-undo-off-first-frame")
+        .config_dir(config.path())
+        .size(200, 50)
+        .spawn();
+    term.wait_for("the toolbar", STARTUP, |s| {
+        s.contains("Pull") && s.contains("initial commit")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    // Let the daemon's journal state arrive and a few more frames pass.
+    std::thread::sleep(Duration::from_millis(1500));
+    let raw = String::from_utf8_lossy(&term.raw_output()).into_owned();
+    for needle in [UNDO_BUTTON, REDO_BUTTON, "\u{21B6}", "\u{21B7}"] {
+        assert!(
+            !raw.contains(needle),
+            "{needle:?} was drawn at some point with undo off"
+        );
+    }
+    let _ = term.stop();
+}
+
+#[test]
+fn started_with_undo_off_ctrl_z_and_palette_say_why() {
+    let repo = fixture();
+    let config = tempfile::tempdir().unwrap();
+    std::fs::write(
+        config.path().join("config.toml"),
+        "[general]\nundo_enabled = false\n",
+    )
+    .unwrap();
+    let mut term = common::launch(repo.root())
+        .session("pty-undo-off-config-keys")
+        .config_dir(config.path())
+        .size(200, 50)
+        .spawn();
+    term.wait_for("the toolbar", STARTUP, |s| {
+        s.contains("Pull") && s.contains("initial commit")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("C-z").unwrap();
+    term.wait_for("the reason", STEP, |s| s.contains("turned off"))
+        .unwrap_or_else(|e| panic!("{e}"));
     // The palette does not offer them either.
     term.send_keys("C-p").unwrap();
     term.send_text("undo").unwrap();

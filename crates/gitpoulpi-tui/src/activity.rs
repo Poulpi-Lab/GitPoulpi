@@ -79,6 +79,15 @@ pub struct Activity {
 }
 
 impl Activity {
+    /// The registry with the journal seeded from `general.undo_enabled`
+    /// (see `JournalCell::seeded`).
+    pub(crate) fn with_undo_enabled(undo_enabled: bool) -> Self {
+        Self {
+            journal: crate::undo_ui::JournalCell::seeded(undo_enabled),
+            ..Self::default()
+        }
+    }
+
     pub(crate) fn generation(&self) -> u64 {
         self.generation.load(Ordering::SeqCst)
     }

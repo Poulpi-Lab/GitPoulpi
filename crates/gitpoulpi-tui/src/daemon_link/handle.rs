@@ -403,7 +403,12 @@ pub(crate) fn start_at(session: String, repo: RepoRef, port_file: Option<PathBuf
     let link_log_filter = log_filter.clone();
     let lfs_gate = Arc::new(crate::lfs_ui::LfsGate::default());
     let link_lfs_gate = Arc::clone(&lfs_gate);
-    let activity = Arc::new(crate::activity::Activity::default());
+    // Undo off in the config: the first frames must already leave the
+    // buttons out, not wait for the daemon's first journal report.
+    let undo_enabled = gitpoulpi_config::Settings::resolve_ambient()
+        .map(|s| s.config().general.undo_enabled)
+        .unwrap_or(true);
+    let activity = Arc::new(crate::activity::Activity::with_undo_enabled(undo_enabled));
     let link_activity = Arc::clone(&activity);
     let (failure_tx, failure_rx) = std_mpsc::channel();
     let channels = LinkChannels {

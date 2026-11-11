@@ -61,6 +61,15 @@ pub struct JournalCell {
 }
 
 impl JournalCell {
+    /// A cell whose state before the daemon's first report already says
+    /// whether undo is off (`general.undo_enabled`, read by the TUI at
+    /// startup), so the first frames never draw buttons that vanish.
+    pub(crate) fn seeded(undo_enabled: bool) -> Self {
+        let cell = Self::default();
+        cell.lock().state.disabled = !undo_enabled;
+        cell
+    }
+
     fn lock(&self) -> std::sync::MutexGuard<'_, Inner> {
         self.inner.lock().unwrap_or_else(|e| e.into_inner())
     }

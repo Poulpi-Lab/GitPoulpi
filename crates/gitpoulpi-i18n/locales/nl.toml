@@ -538,15 +538,15 @@ tabs_position_help = "Waar de repositorytabbladen staan: Boven (standaard), Onde
 graph_color_theme = "Kleurthema van de grafiek"
 graph_color_theme_help = "Het baankleurenpalet van de Log-grafiek. Thema volgen gebruikt het palet van het gekozen thema; elke andere keuze overschrijft het, dus elk thema is met elk palet te combineren. Geldt na het sluiten van de instellingen."
 graph_renderer = "Grafiekweergave"
-graph_renderer_help = "auto tekent de grafiek als echte afbeelding op een terminal die dat ondersteunt, en als tekens overal elders - ook binnen tmux of zellij, die de omgeving van de terminal erven maar de afbeelding niet doorgeven, en binnen herdr tenzij de instelling kitty_graphics aan staat. image forceert de afbeelding aan, text forceert hem uit. Vereist een herstart."
+graph_renderer_help = "auto tekent de grafiek als echte afbeelding op een terminal die dat ondersteunt, en als tekens overal elders - ook binnen zellij en screen, die de omgeving van de terminal erven maar de afbeelding niet doorgeven, binnen tmux tenzij de terminal erachter sixel aankan, en binnen herdr tenzij de instelling kitty_graphics aan staat. image forceert de afbeelding aan, text forceert hem uit. Vereist een herstart."
 image_protocol = "Afbeeldingsprotocol"
-image_protocol_help = "Hoe afbeeldingen (de grafiekafbeelding, avatars van auteurs) de terminal bereiken. auto: het Kitty-grafiekprotocol in kitty, Ghostty en een herdr waarvan de config kitty_graphics = true zet; iTerm2 inline-afbeeldingen in WezTerm, iTerm2 en mintty; sixel-afbeeldingen (alleen avatars van auteurs, de grafiek blijft tekens) in Windows Terminal, foot, Konsole en mlterm; elders tekens. kitty, iterm2 of sixel forceert dat protocol (kitty voor een herdr waarvan de config ergens anders staat; sixel voor een terminal die het tekent maar niet wordt herkend); none zet afbeeldingen uit. Vereist een herstart."
+image_protocol_help = "Hoe afbeeldingen (de grafiekafbeelding, avatars van auteurs) de terminal bereiken. auto: het Kitty-grafiekprotocol in kitty, Ghostty en een herdr waarvan de config kitty_graphics = true zet; het Kitty-protocol ook in iTerm2 3.7.7 of nieuwer; iTerm2 inline-afbeeldingen in WezTerm, Rio, mintty en oudere iTerm2; sixel-afbeeldingen (de grafiekkolom en de avatars) in Windows Terminal, foot, Tabby, Konsole, mlterm en in tmux als de terminal erachter sixel aankan; elders tekens. kitty, iterm2 of sixel forceert dat protocol (kitty voor een herdr waarvan de config ergens anders staat; sixel voor een terminal die het tekent maar niet wordt herkend); none zet afbeeldingen uit. Vereist een herstart."
 kitty_keyboard = "Kitty-toetsenbordprotocol"
 kitty_keyboard_help = "auto vraagt de terminal bij het opstarten, binnen ongeveer 100 ms, of hij het kitty-toetsenbordprotocol spreekt, en gebruikt het als dat zo is: toetscombinaties die oude terminals niet kunnen onderscheiden (Control met leestekens, cijfers, Shift of Enter) komen dan als zichzelf aan in plaats van met stuurcodes te botsen. Een terminal die niet antwoordt behoudt de oude toetsen. off raakt de toetsenbordmodus van de terminal nooit aan. Vereist een herstart."
 color_depth = "Kleurdiepte"
 color_depth_help = "auto gebruikt 24-bits kleur, behalve op terminals die dat niet tonen (Apple Terminal, de Linux-console of een 256-kleurenterminal zonder COLORTERM); daar worden kleuren afgebeeld op de dichtstbijzijnde 256 of 16 items. truecolor, 256 en 16 dwingen een diepte af. Werkt direct."
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "Tekstcursor"
+text_cursor_help = "terminal zet de eigen cursor van de terminal op de invoegpositie van het actieve tekstveld, als streepje: de cursorinstellingen van je terminal gelden en het kandidatenvenster van een invoermethode opent bij de invoegpositie. drawn tekent de eigen cursor van GitPoulpi (een blok of een underscore) en houdt de terminalcursor verborgen. Geldt meteen."
 graph_show_stashes = { git = "Stashes in de grafiek tonen", local = "Bergingen in de grafiek tonen" }
 graph_show_stashes_help = { git = "Elke stash krijgt een eigen rij in de Log, op zijn datum: een klein vakje op een baan naast de commit waarop hij is gemaakt, met een stippellijn eraan verbonden. Selecteren toont wat hij wijzigde; rechtsklik (of .) biedt Pop, Apply en Drop. Uit laat stashes alleen in de sectie STASHES staan. Niet getekend tijdens soloën.", local = "Elke berging krijgt een eigen rij in de Log, op zijn datum: een klein vakje op een baan naast de commit waarop hij is gemaakt, met een stippellijn eraan verbonden. Selecteren toont wat hij wijzigde; rechtsklik (of .) biedt Pop, Apply en Drop. Uit laat bergingen alleen in de sectie BERGINGEN staan. Niet getekend tijdens soloën." }
 ref_connector = "Verbinding ref-naar-commit"
@@ -2233,8 +2233,8 @@ commit_column_move_right = "Deel naar rechts verplaatsen"
 commit_column_wider_part = "Deel verbreden"
 commit_column_narrower_part = "Deel versmallen"
 commit_column_reset_widths = "Breedtes van de delen herstellen"
-commit_column_fit = "Kolom aan inhoud aanpassen"
-commit_column_fit_all = "Alle kolommen aan inhoud aanpassen"
+commit_column_fit = "Onderdeel aan inhoud aanpassen"
+commit_column_fit_all = "Alle onderdelen aan inhoud aanpassen"
 log_pick_column = "Kolom kiezen om te verplaatsen of de breedte te wijzigen"
 log_columns_next = "Volgende kolom kiezen"
 log_columns_prev = "Vorige kolom kiezen"
@@ -2895,8 +2895,8 @@ view_column_move_right = "Weergave: {$commit}-kolom: deel naar rechts verplaatse
 view_column_wider_part = "Weergave: {$commit}-kolom: deel verbreden"
 view_column_narrower_part = "Weergave: {$commit}-kolom: deel versmallen"
 view_column_reset_widths = "Weergave: {$commit}-kolom: breedtes van de delen herstellen"
-view_column_fit_part = "Weergave: {$commit}-kolom: Kolom aan inhoud aanpassen"
-view_column_fit_all = "Weergave: {$commit}-kolom: Alle kolommen aan inhoud aanpassen"
+view_column_fit_part = "Weergave: {$commit}-kolom: Onderdeel aan inhoud aanpassen"
+view_column_fit_all = "Weergave: {$commit}-kolom: Alle onderdelen aan inhoud aanpassen"
 view_log_column_pick = "Weergave: Logkolom: Kolom kiezen om te verplaatsen of de breedte te wijzigen"
 view_log_column_next = "Weergave: Logkolom: Volgende kolom kiezen"
 view_log_column_prev = "Weergave: Logkolom: Vorige kolom kiezen"
@@ -3995,8 +3995,8 @@ mouse_gestures_in_2 = { git = "een paneelscheiding of Log-kolomgrens schaalt het
 mouse_gestures_in_3 = { git = "slepen over de tekst van een diff, bestandsweergave, blame of bestandsgeschiedenis selecteert hem, dubbelklik een woord; y of Ctrl+C kopieert hem (alleen bestandstekst, nooit goten); de andere voorkomens van een geselecteerd woord worden getint in de diff en de editor (en gemarkeerd op de liniaal)", local = "slepen over de tekst van een verschil, bestandsweergave, blame of bestandsgeschiedenis selecteert hem, dubbelklik een woord; y of Ctrl+C kopieert hem (alleen bestandstekst, nooit goten); de andere voorkomens van een geselecteerd woord worden getint in het verschil en de editor (en gemarkeerd op de liniaal)" }
 mouse_gestures_in_4 = { git = "scrolt de gefocuste lijst of diff, of die onder de aanwijzer; Shift+wiel (beide spellingen die terminals melden) scrolt een diff/bestandsweergave/blame in plaats daarvan *horizontaal*, zolang regelafbreking uit staat", local = "scrolt de gefocuste lijst of het verschil, of die onder de aanwijzer; Shift+wiel (beide spellingen die terminals melden) scrolt een verschil/bestandsweergave/blame in plaats daarvan *horizontaal*, zolang regelafbreking uit staat" }
 mouse_gestures_in_5 = "opent een contextmenu overal waar er een bestaat (zie de sectie van elk paneel hierboven); het toetsenbordequivalent is altijd {{*global.context_menu}}"
-mouse_gestures_in_6 = "elke actie \"Kopiëren ...\" vraagt de *terminal* om het klembord via OSC 52 - een TUI kan er niet rechtstreeks bij; een terminal die de reeks negeert, kopieert gewoon niet"
-mouse_gestures_in_7 = "schaal-/aanwijzer-/open-handaanwijzingen worden verstuurd via OSC 22 op terminals die dat ondersteunen (kitty, foot, xterm; wisselend elders) - versleepbare scheidingen en kolomgrenzen lichten ook op binnen de eigen buffer van de app, wat helemaal geen terminalmedewerking vereist"
+mouse_gestures_in_6 = "elke actie \"Kopiëren ...\" zet de tekst op het systeemklembord en stuurt hem, waar de terminal er bekend om staat dat hij het honoreert, ook via OSC 52; via SSH of zonder beeldscherm wordt alleen OSC 52 gestuurd, en een terminal die de reeks negeert, kopieert niet"
+mouse_gestures_in_7 = "schaal-/aanwijzer-/open-handaanwijzingen worden verstuurd via OSC 22 op terminals die dat ondersteunen (kitty, Ghostty, foot, mintty; niet in Rio, Alacritty, Windows Terminal of iTerm2) - versleepbare scheidingen en kolomgrenzen lichten ook op binnen de eigen buffer van de app, wat helemaal geen terminalmedewerking vereist"
 git_actions_then_25 = "het LFS-menu openen (de LFS-knop van de werkbalk; de items staan ook in het palet)"
 git_actions_then_26 = "LFS: {$fetch} (objecten van alle refs)"
 git_actions_then_27 = "LFS: de echte inhoud over de verwijzingsbestanden schrijven (offline)"
@@ -5959,7 +5959,7 @@ show_label = "Tonen:"
 show_all = "Alles"
 show_none = "Niets"
 why_level_off = "Niet getoond: het niveau staat op {level}. Verhoog het om deze regels te zien."
-hint_levels = "1-5: niveau tonen of verbergen  a: alles  n: niets"
+hint_levels = "1-5: niveau tonen of verbergen  a: alles  n: niets  Enter: bewerking van de regel  [ ]: mislukkingen"
 palette_show_error = "Activiteitenlogboek: niveau tonen of verbergen: Fout"
 palette_show_warn = "Activiteitenlogboek: niveau tonen of verbergen: Waarschuwing"
 palette_show_info = "Activiteitenlogboek: niveau tonen of verbergen: Info"
@@ -6002,25 +6002,25 @@ palette_scroll_right = "Activiteitenlogboek: Naar rechts scrollen"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "Activiteitenlogboek: lange regels zijwaarts scrollen (ook Shift + wiel, of de horizontale schuifbalk)"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation} mislukt"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "Bewerking: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
 ctx_repository = "Repository: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "Aangevraagd door: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "Bewerkings-id: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "Activiteitenlogboek: Bewerking van deze regel tonen"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "Activiteitenlogboek: Volgende mislukte bewerking"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "Activiteitenlogboek: Vorige mislukte bewerking"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "Selecteer eerst een regel: klik erop, of druk op ] om naar de volgende mislukte bewerking te springen."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "Deze regel hoort niet bij een bewerking."
 
 [git_error]
 summary_host_key = "De SSH-hostsleutel van de remote is nog niet bekend."
@@ -8753,13 +8753,13 @@ namespaces = "Namespaces"
 # context: hint in the empty namespaces field
 namespaces_hint = "bijv. acme, platform (leeg: mijn eigen en alle waarvan ik lid ben)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "Eén item per regel. Een naam komt overeen met die groep of eigenaar en alles eronder (ptm komt overeen met ptm/produits/x, niet met ptmx/y). Laat leeg voor je eigen namespaces en alle waarvan je lid bent."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Elke regel is een reguliere expressie die wordt vergeleken met het volledige repositorypad, zoals je het schrijft (voorbeeld: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "Reguliere expressies"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "Ongeldige expressie: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "Verzoek van een niet-gekloonde repository"
 # context: choice: ask each time

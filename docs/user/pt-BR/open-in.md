@@ -179,6 +179,16 @@ Um arquivo binário (um PDF, um documento do Word, uma planilha, um arquivo comp
 
 O arquivo da árvore de trabalho é entregue ao aplicativo como está. A versão de um commit (ou do índice) é gravada em uma **cópia temporária somente leitura**, com um aviso na linha de status, para que um aplicativo não possa alterar o repositório. Nenhuma das duas altera o repositório: sem entrada no diário, Desfazer não é afetado.
 
+A lista do menu abre ao lado do menu, na altura da linha **Abrir com...**, como um submenu (à esquerda quando não há espaço à direita), tanto pelo mouse quanto pelo teclado. A lista dos editores de imagem (**Editar em...**) aberta a partir de um menu de arquivo faz o mesmo.
+
+### Arquivos Git LFS
+
+O cartão de objeto Git LFS (veja [Git LFS](lfs.md)) traz as mesmas duas ações sob o texto: **Abrir no programa padrão** e **Abrir em**, com as mesmas teclas (`o`, `Shift+O`) e as mesmas linhas da paleta. Elas abrem o arquivo real, nunca o ponteiro: o arquivo da árvore de trabalho como está, ou uma cópia temporária somente leitura do objeto do armazenamento LFS local para a versão de um commit ou do índice. Um objeto que ainda não foi baixado não tem botões no cartão, e a linha de status diz que o conteúdo ainda não foi baixado. A mesma recusa vale para um arquivo da árvore de trabalho que ainda guarda só o ponteiro: **Abrir no programa padrão**, **Abrir em** e **Editar em**, pelo cartão ou por qualquer menu de arquivo, dizem que o conteúdo não foi baixado em vez de abrir o texto do ponteiro (baixe-o com as linhas de pull ou checkout da barra LFS e tente de novo). Abrir é somente leitura: sem entrada no diário, nada a desfazer.
+
+### Navegadores no Windows
+
+Chrome e Edge registram `--single-argument %1`, o que os faz ler tudo depois da opção como um único endereço, aspas incluídas. O GitPoulpi passa o caminho a um programa assim literalmente e sem aspas, como o Windows faz, então um arquivo com espaços no caminho abre em vez de falhar com `http://"c/...`. Todo outro programa recebe o caminho como um argumento comum.
+
 ## Chaves legadas
 
 As antigas chaves `ui.terminal_launch` e `ui.terminal_launch_command` só são lidas

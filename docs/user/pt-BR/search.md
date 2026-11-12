@@ -31,7 +31,7 @@ commits entram assim que ficam prontos.
 
 | Tecla | Faz |
 |---|---|
-| `Cima` / `Baixo`, `Ctrl+P` / `Ctrl+N`, `PageUp` / `PageDown`, `Home` / `End` | Move pelos resultados (os títulos dos grupos são pulados). |
+| `Cima` / `Baixo`, `PageUp` / `PageDown`, `Home` / `End` | Move pelos resultados (os títulos dos grupos são pulados). |
 | `Enter` | Vai até o resultado: a aba do repositório abre (ou é ativada) e então o resultado é mostrado. |
 | `Esc` | Fecha a busca. |
 | `Alt+1` .. `Alt+8` | Liga ou desliga um tipo (as etiquetas acima da lista, na ordem delas). `Alt+0` liga todos. |

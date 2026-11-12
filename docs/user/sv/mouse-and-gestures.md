@@ -290,8 +290,8 @@ grenen.
 - **Klicka på Sökväg eller Träd** för att välja en platt lista eller mappar.
   **Klicka på Fäll ihop alla** eller **Fäll ut alla** för att fälla ihop eller ut
   varje mapp.
-- **Klicka på `[✖]`** till vänster om titeln för att förkasta alla ändringar
-  (frågar först). **Klicka på `[✦]`** till höger för att förklara ändringarna med
+- **Klicka på `✖`** till vänster om titeln för att förkasta alla ändringar
+  (frågar först). **Klicka på `✦`** till höger för att förklara ändringarna med
   AI.
 - **Högerklicka på en fil** för dess meny: stage, förkasta, ignorera, LFS, stasha
   filen, historik, blame, öppna i ett externt program, kopiera sökvägen, skapa en

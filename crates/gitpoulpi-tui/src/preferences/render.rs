@@ -551,8 +551,9 @@ impl PreferencesState {
         }
     }
 
-    /// A `Chips` row: the chips as `[+ text]` buttons, wrapped to the page
-    /// width. Records each chip's cell for the hit rects.
+    /// A `Chips` row: the chips as `+ text` buttons (real buttons, never
+    /// bracketed text), wrapped to the page width. Records each chip's cell
+    /// for the hit rects.
     pub(super) fn chip_lines(
         &self,
         index: usize,
@@ -566,7 +567,7 @@ impl PreferencesState {
         let mut line_no = 0usize;
         let focused = self.ai.chip_focus(labels.len());
         for (chip, label) in labels.iter().enumerate() {
-            let text = format!("[+ {label}]");
+            let text = format!(" + {label} ");
             let w = display_width(&text);
             if used > 2 && used + w > width {
                 lines.push(Line::from(std::mem::take(&mut row)));
@@ -574,11 +575,10 @@ impl PreferencesState {
                 used = 2;
                 line_no += 1;
             }
-            let style = if selected && chip == focused {
-                Style::default().fg(th().ui.text).bg(th().ui.selection)
-            } else {
-                Style::default().fg(th().ui.accent)
-            };
+            let style = crate::dialog_kit::button_style(crate::dialog_kit::ButtonState::Normal {
+                hovered: false,
+                focused: selected && chip == focused,
+            });
             self.chip_cells
                 .borrow_mut()
                 .push((index, chip, line_no, used as u16, w as u16));

@@ -306,8 +306,8 @@ a ref selecionada e a branch atual.
   recolhê-la.
 - **Clique em Caminho ou Árvore** para escolher uma lista plana ou pastas. **Clique
   em Recolher tudo** ou **Expandir tudo** para recolher cada pasta.
-- **Clique em `[✖]`** à esquerda do título para descartar todas as alterações
-  (pergunta antes). **Clique em `[✦]`** à direita para explicar as alterações com a
+- **Clique em `✖`** à esquerda do título para descartar todas as alterações
+  (pergunta antes). **Clique em `✦`** à direita para explicar as alterações com a
   IA.
 - **Clique com o botão direito em um arquivo** para ver o menu: stage, descartar, ignorar, LFS,
   fazer stash do arquivo, histórico, blame, abrir em um programa externo, copiar o

@@ -121,6 +121,8 @@ pub(crate) struct Combo {
     pub(crate) loading: bool,
     open: bool,
     query: String,
+    /// What `Ctrl+Z` / `Ctrl+Y` walk in the search line.
+    history: crate::text_history::QueryHistory,
     /// Highlighted row, in the filtered list (plus the custom row).
     cursor: usize,
     offset: usize,
@@ -157,6 +159,7 @@ impl Combo {
             loading: false,
             open: false,
             query: String::new(),
+            history: Default::default(),
             cursor: 0,
             offset: 0,
             field: Rect::default(),
@@ -360,18 +363,23 @@ impl Combo {
             }
             KeyCode::Tab | KeyCode::BackTab => self.close(),
             KeyCode::Enter => return self.pick_row(self.cursor),
+            // Ctrl+Z / Ctrl+Y walk the search line's edits.
+            _ if self.searchable() && self.history.key(&mut self.query, &key) => {
+                self.cursor = 0;
+                self.offset = 0;
+            }
             KeyCode::Backspace => {
-                self.query.pop();
+                self.history.pop(&mut self.query);
                 self.cursor = 0;
                 self.offset = 0;
             }
             KeyCode::Char('u') if ctrl => {
-                self.query.clear();
+                self.history.wipe(&mut self.query);
                 self.cursor = 0;
                 self.offset = 0;
             }
             KeyCode::Char(c) if !ctrl && self.searchable() => {
-                self.query.push(c);
+                self.history.push(&mut self.query, c);
                 self.cursor = 0;
                 self.offset = 0;
             }
@@ -383,7 +391,8 @@ impl Combo {
     /// Pasted text goes into the search line.
     pub(crate) fn paste(&mut self, text: &str) {
         if self.open && self.searchable() {
-            self.query.extend(text.chars().filter(|c| !c.is_control()));
+            let clean: String = text.chars().filter(|c| !c.is_control()).collect();
+            self.history.paste(&mut self.query, &clean);
             self.cursor = 0;
             self.offset = 0;
         }

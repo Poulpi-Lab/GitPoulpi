@@ -281,7 +281,7 @@ hover or highlight it.
 | Action | In the window | CLI |
 |---|---|---|
 | **Commit message** | Stage changes, press the `✦` right of the Summary field, `Ctrl+G i`, or palette `AI: Generate Commit Message`. Summary and description are filled for you to edit; nothing is committed. | `ai commit-message` (prints), `commit --ai` (commits) |
-| **Explain changes** | The `[✦]` at the top right of the working-changes pane (`Ctrl+G w`: the selected commit, else the working changes), or a commit's menu *Explain changes (AI)*. A popup: arrows scroll, `c` copies, `Esc` closes. | `ai explain [rev] [--wip]` |
+| **Explain changes** | The `✦` at the top right of the working-changes pane (`Ctrl+G w`: the selected commit, else the working changes), or a commit's menu *Explain changes (AI)*. A popup: arrows scroll, `c` copies, `Esc` closes. | `ai explain [rev] [--wip]` |
 | **Stash message** | `Ctrl+G m` opens the stash prompt; `Ctrl+G` inside it asks the model. Palette `AI: Generate Stash Message` does both. | `stash push --ai` |
 | **Pull request title and description** | *Generate title and description* in the Create Pull Request form (the branch's commits and diff are read locally). | |
 | **Merge conflict resolution** | In the merge conflict editor: the `✦ Suggest` toolbar button, a conflict's right-click menu *✦ Suggest resolution (AI)*, `Alt+I`, or palette `AI: Suggest Merge Conflict Resolution`. The suggestion replaces the *current conflict's* region of the Output as one edit (marked edited, one undo step); nothing is saved or staged until you save. | `ai resolve-conflict <path> [--conflict N]` (prints) |

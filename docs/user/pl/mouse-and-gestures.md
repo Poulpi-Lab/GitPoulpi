@@ -286,8 +286,8 @@ bieżącą gałąź...` otwiera menu dla zaznaczonego refa i bieżącej gałęzi
 - **Kliknij tytuł sekcji** (`Pliki unstaged`, `Pliki staged`), by ją zwinąć.
 - **Kliknij Ścieżka lub Drzewo**, by wybrać płaską listę lub foldery. **Kliknij Zwiń
   wszystko** lub **Rozwiń wszystko**, by zwinąć każdy folder.
-- **Kliknij `[✖]`** po lewej stronie tytułu, by odrzucić wszystkie zmiany (pyta
-  najpierw). **Kliknij `[✦]`** po prawej, by wyjaśnić zmiany przez AI.
+- **Kliknij `✖`** po lewej stronie tytułu, by odrzucić wszystkie zmiany (pyta
+  najpierw). **Kliknij `✦`** po prawej, by wyjaśnić zmiany przez AI.
 - **Kliknij plik prawym przyciskiem**, by zobaczyć jego menu: stage, odrzucenie, ignorowanie, LFS, stash
   pliku, historia, blame, otwarcie w zewnętrznym programie, kopiowanie ścieżki,
   utworzenie patcha, edycja, usunięcie. Plik z konfliktem zaczyna się od wierszy

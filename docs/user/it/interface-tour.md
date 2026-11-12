@@ -285,8 +285,8 @@ Il pannello destro segue la selezione nel Log.
 **Modifiche in corso** (la riga WIP è selezionata):
 
 - Un titolo come `4 file modificati su main`. Durante un merge in conflitto
-  aggiunge il numero di file in conflitto. Un `[✖]` rosso a sinistra scarta tutte
-  le modifiche (chiede prima). Quando l'IA è attiva, un `[✦]` a destra spiega le
+  aggiunge il numero di file in conflitto. Un `✖` rosso a sinistra scarta tutte
+  le modifiche (chiede prima). Quando l'IA è attiva, un `✦` a destra spiega le
   modifiche.
 - **Percorso** o **Albero** (un elenco piatto o cartelle, `m`), **Comprimi tutto** e
   **Vedi tutti i file** (`a`).

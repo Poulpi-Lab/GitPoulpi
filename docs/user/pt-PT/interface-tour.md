@@ -280,8 +280,8 @@ O painel direito segue a seleção no Log.
 **Alterações em curso** (a linha WIP está selecionada):
 
 - Um título como `4 alterações de ficheiros em main`. Durante um merge com conflitos acrescenta
-  o número de ficheiros em conflito. Um `[✖]` vermelho à esquerda descarta todas as
-  alterações (pergunta primeiro). Com a IA ativa, um `[✦]` à direita explica as
+  o número de ficheiros em conflito. Um `✖` vermelho à esquerda descarta todas as
+  alterações (pergunta primeiro). Com a IA ativa, um `✦` à direita explica as
   alterações.
 - **Caminho** ou **Árvore** (uma lista plana ou pastas, `m`), **Recolher tudo** e
   **Ver todos os ficheiros** (`a`).

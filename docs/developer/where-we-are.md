@@ -645,6 +645,17 @@ without the fix; keep it that way.
 - The mode is thread-local and starts as `drawn` under `cfg(test)`, so unit snapshots keep the glyph; the PTY harness pins `GITPOULPI_UI_TEXT_CURSOR=drawn` for the same reason (`pty_text_cursor` sets `terminal`). The DECSCUSR bar is restored on every way out (`restore_style`: normal exit, error exit, panic hook, update).
 - Bracketed paste (`term_modes`) is requested on Unix only and released on the same ways out; a PTY test that injects `ESC[200~` itself proves the handlers, not the request (`pty_bracketed_paste` checks the request).
 
+### Buttons are real buttons, never bracketed text
+
+- A clickable control is drawn through the button widget (`dialog_kit::button` / `button_style`: ` label ` padded on the button fill, hover, focus and disabled looks, registered in the pointer map as a hand), never as `[ Edit ]`, `[+ Add]`, `[✖]` or `[ 1 ▾]`. The only brackets left are the checkbox marks `[x]` / `[ ]` (`dialog_kit::checkbox_mark`), which are hand controls like the buttons, and key hints inside a label (`Tree [m]`). `button_audit_tests.rs` scans the source and every catalog for bracketed labels and fails on one; a new surface that draws its own buttons registers each rect with `pointer_map::hand` (a button over a text area otherwise shows the I-beam: the prompt editor's snippet buttons did).
+- A page that keeps its own hit list (the Integrations page) registers it once per frame (`register_pointer`, reversed: the list is first-wins, the map last-wins) and hands the same rects to the `Ctrl+N` badges (`nav_hits`), so a control cannot have a click without a badge. Hit rects that are painted off-screen and windowed (its scroll) are converted before they are registered.
+- A multi-line field with its own scrollbar (the Radar's Namespaces) paints the bar from a `scrollbar::Track` and keeps the track for the mouse (`BarDrag`): arrows step, the thumb drags, the track jumps. A bar drawn by hand cannot be pressed.
+
+### Ctrl+Z / Ctrl+Y belong to a focused text field
+
+- Every field that types through `text_edit::Caret` has an edit history (`text_history.rs`: grouped typing, one entry per paste / cut / kill / snippet, bounded, dropped when the text was replaced from outside). Filter boxes without a caret use `text_history::QueryHistory`. A focused field claims the chords (`Caret::claims`), so the global git undo never fires while a field has the keyboard (`keys_normal.rs`); elsewhere `Ctrl+Z` / `Ctrl+Y` keep their global meaning. The code editor and merge editor keep their own undo.
+- Text changed behind the caret's back (`text.replace_range`, a field assigned from outside) clears the history on the next use; an edit that should stay undoable goes through `Caret::insert` / `replace_range`.
+
 ### Log row arithmetic (the repeat offender)
 
 - Rows go through `log_table/geometry.rs`: `log_top_y`, `log_index_to_row`,

@@ -290,8 +290,8 @@ a aktuální větev.
   sbalení.
 - **Klikněte na Cesta nebo Strom** pro plochý seznam nebo složky. **Klikněte na
   Sbalit vše** nebo **Rozbalit vše** pro sbalení všech složek.
-- **Klikněte na `[✖]`** vlevo od názvu pro zahození všech změn (nejdřív se
-  zeptá). **Klikněte na `[✦]`** vpravo pro vysvětlení změn pomocí AI.
+- **Klikněte na `✖`** vlevo od názvu pro zahození všech změn (nejdřív se
+  zeptá). **Klikněte na `✦`** vpravo pro vysvětlení změn pomocí AI.
 - **Pravým tlačítkem na soubor** otevřete jeho nabídku: stage, zahodit, ignorovat,
   LFS, stash souboru, historie, blame, otevřít v externím programu, kopírovat
   cestu, vytvořit patch, upravit, smazat. Soubor v konfliktu začíná řádky

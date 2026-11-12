@@ -109,7 +109,7 @@ fn wait_editor(term: &Terminal) {
 /// (a torn frame can lack some), and returns that count: on a timeout the
 /// last count is what the assertion reports.
 fn owned_by(term: &Terminal, n: u8, want: usize) -> usize {
-    let field = format!("[ {n} \u{25be}]");
+    let field = format!(" {n} \u{25be} ");
     match term.wait_for(&format!("{want} fields owned by {n}"), STEP, |s| {
         s.find_all(&field).len() == want
     }) {
@@ -128,7 +128,7 @@ fn plan_by_keys(term: &mut Terminal) {
     term.send_keys("Down").unwrap();
     term.send_text("2").unwrap();
     term.wait_for("two changes now in the second commit", STEP, |s| {
-        s.find_all("[ 2 \u{25be}]").len() == 2
+        s.find_all(" 2 \u{25be} ").len() == 2
     })
     .unwrap_or_else(|e| panic!("{e}"));
     name_second(term, "second part");
@@ -218,10 +218,10 @@ fn a_commit_is_split_by_mouse_from_the_palette_through_the_assignment_list() {
     // The third `[1 v]` is the second hunk of a.txt.
     let mut fields = term
         .wait_for("three commit fields", STEP, |s| {
-            s.find_all("[ 1 \u{25be}]").len() >= 3
+            s.find_all(" 1 \u{25be} ").len() >= 3
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()))
-        .find_all("[ 1 \u{25be}]");
+        .find_all(" 1 \u{25be} ");
     fields.sort_by_key(|&(_, r)| r);
     let (c, r) = fields[2];
     term.click(c + 1, r).expect("open the list");
@@ -243,7 +243,7 @@ fn a_commit_is_split_by_mouse_from_the_palette_through_the_assignment_list() {
     assert!(items.len() >= 2, "{items:?}");
     term.click(ic + 1, ir).expect("pick commit 2");
     term.wait_for("one change in the second commit", STEP, |s| {
-        s.find_all("[ 2 \u{25be}]").len() == 1 && !s.contains("Unassigned")
+        s.find_all(" 2 \u{25be} ").len() == 1 && !s.contains("Unassigned")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
@@ -317,7 +317,7 @@ fn an_outside_click_is_swallowed_once_the_plan_is_edited_and_the_cross_closes() 
     term.send_keys("Down").unwrap();
     term.send_text("2").unwrap();
     term.wait_for("one change moved", STEP, |s| {
-        s.find_all("[ 2 \u{25be}]").len() == 1
+        s.find_all(" 2 \u{25be} ").len() == 1
     })
     .unwrap_or_else(|e| panic!("{e}"));
     let (oc, or) = outside(&term);
@@ -326,7 +326,7 @@ fn an_outside_click_is_swallowed_once_the_plan_is_edited_and_the_cross_closes() 
     // check the frame is the same editor.
     term.send_text("1").unwrap();
     term.wait_for("the editor still open, plan reset by hand", STEP, |s| {
-        s.find_all("[ 1 \u{25be}]").len() == 5 && s.contains("Split into 2")
+        s.find_all(" 1 \u{25be} ").len() == 5 && s.contains("Split into 2")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     // Pristine again: the same click now closes.
@@ -340,7 +340,7 @@ fn an_outside_click_is_swallowed_once_the_plan_is_edited_and_the_cross_closes() 
     term.send_text("2").unwrap();
     let screen = term
         .wait_for("one change moved", STEP, |s| {
-            s.find_all("[ 2 \u{25be}]").len() == 1
+            s.find_all(" 2 \u{25be} ").len() == 1
         })
         .unwrap_or_else(|e| panic!("{e}"));
     let top = screen

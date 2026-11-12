@@ -60,13 +60,13 @@ fn the_ssh_section_offers_default_generate_and_custom() {
         "Key title",
         "GitPoulpi gitlab.example.com 20",
         "[x] Add the public key",
-        "[ Generate key ]",
+        " Generate key ",
     ] {
         assert!(screen.contains(want), "missing {want:?}:\n{screen}");
     }
     act(&mut page, &mut h, Item::SshCustom);
     let screen = text(&draw(&mut page, &h, 90, 40, None));
-    for want in ["Private key file", "[ Browse... ]", "[ Use this key ]"] {
+    for want in ["Private key file", " Browse... ", " Use this key "] {
         assert!(screen.contains(want), "missing {want:?}:\n{screen}");
     }
 }
@@ -91,8 +91,8 @@ fn generating_uploads_after_listing_and_shows_the_key_line() {
     for want in [
         "generated key",
         "SHA256:",
-        "[ Remove ]",
-        "[ Delete ]",
+        " Remove ",
+        " Delete ",
         "added to gitlab.example.com",
     ] {
         assert!(screen.contains(want), "missing {want:?}:\n{screen}");

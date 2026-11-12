@@ -57,6 +57,9 @@ impl IntegrationsPage {
     pub(crate) fn owns_pointer(&self) -> bool {
         false
     }
+    pub(crate) fn nav_hits(&self) -> Vec<(ratatui::layout::Rect, (u16, u16))> {
+        Vec::new()
+    }
     pub(crate) fn focus_radar(&mut self, _cfg: &Config) {}
     pub(crate) fn at_top(&self) -> bool {
         false

@@ -111,7 +111,7 @@ impl PreferencesState {
                 .with_help(t::DEFAULT_ENTRY_HELP.get()),
             );
         }
-        // The Restore row is page-level; the list's `[+ Add]` holds the
+        // The Restore row is page-level; the list's `+ Add` button holds the
         // presets and Custom, and the list tab edits the selected entry.
         fields.push(
             Field::button(t::RESTORE.get(), PrefAction::OpenIn(OpenInButton::Restore))

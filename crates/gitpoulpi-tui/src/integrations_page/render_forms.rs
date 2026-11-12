@@ -934,17 +934,34 @@ impl IntegrationsPage {
         focused: bool,
         disabled: bool,
     ) -> u16 {
-        self.control(
+        // A real button: ` text ` on the button fill (the dialogs' look),
+        // never bracketed text. Focus and the pointer brighten the fill; a
+        // disabled one is flat and dim, and still takes the click (it says
+        // why).
+        let label = format!(" {text} ");
+        let w = display_width(&label) as u16;
+        if y >= area.bottom() || x >= area.right() {
+            return w;
+        }
+        let is_focus = focused && self.zone == Zone::Body && current == Some(item);
+        let state = if disabled {
+            crate::dialog_kit::ButtonState::Disabled
+        } else {
+            crate::dialog_kit::ButtonState::Normal {
+                hovered: false,
+                focused: is_focus,
+            }
+        };
+        put(
             frame,
             area,
             x,
             y,
-            format!("[ {text} ]"),
-            item,
-            current,
-            focused,
-            disabled,
-        )
+            vec![Span::styled(label, crate::dialog_kit::button_style(state))],
+        );
+        let rect = Rect::new(x, y, w.min(area.right() - x), 1);
+        self.hits.push((rect, Hit::Item(item), !disabled));
+        w
     }
 
     /// Any clickable label (button, radio, checkbox): drawn, focusable,

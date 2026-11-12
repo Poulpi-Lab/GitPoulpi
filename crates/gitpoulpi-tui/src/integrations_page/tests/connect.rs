@@ -59,8 +59,8 @@ fn connecting_checks_the_token_then_stores_it_and_saves_the_profile() {
     assert!(page.pending.is_none());
     for gone in [
         "Host domain",
-        "[ Connect ]",
-        "[ Cancel ]",
+        " Connect ",
+        " Cancel ",
         "Scopes:",
         "Connecting to",
     ] {
@@ -81,9 +81,9 @@ fn connecting_checks_the_token_then_stores_it_and_saves_the_profile() {
         "Kai G (@kai)",
         "Connected",
         "stored",
-        "[ Edit ]",
-        "[ Disconnect ]",
-        "[ Remove ]",
+        " Edit ",
+        " Disconnect ",
+        " Remove ",
         "SSH",
     ] {
         assert!(screen.contains(want), "missing {want:?}:\n{screen}");

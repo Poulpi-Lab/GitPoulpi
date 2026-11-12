@@ -181,7 +181,7 @@ timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
 | 동작 | 창에서 | CLI |
 |---|---|---|
 | **Commit 메시지** | 변경 사항을 스테이징한 다음 요약 필드 오른쪽의 `✦`를 누르거나 `Ctrl+G i`, 또는 팔레트의 `AI: Commit 메시지 생성`. 요약과 설명이 채워지며 편집할 수 있고, 아무것도 commit되지 않습니다. | `ai commit-message` (출력), `commit --ai` (commit) |
-| **변경 사항 설명** | 작업 변경 사항 창 오른쪽 위의 `[✦]`(`Ctrl+G w`: 선택한 commit, 없으면 작업 변경 사항), 또는 commit 메뉴의 *변경 사항 설명 (AI)*. 팝업에서 화살표로 스크롤하고 `c`로 복사하며 `Esc`로 닫습니다. | `ai explain [rev] [--wip]` |
+| **변경 사항 설명** | 작업 변경 사항 창 오른쪽 위의 `✦`(`Ctrl+G w`: 선택한 commit, 없으면 작업 변경 사항), 또는 commit 메뉴의 *변경 사항 설명 (AI)*. 팝업에서 화살표로 스크롤하고 `c`로 복사하며 `Esc`로 닫습니다. | `ai explain [rev] [--wip]` |
 | **Stash 메시지** | `Ctrl+G m`이 stash 프롬프트를 열고, 그 안에서 `Ctrl+G`가 모델에게 묻습니다. 팔레트의 `AI: Stash 메시지 생성`은 둘 다 수행합니다. | `stash push --ai` |
 | **Pull request 제목과 설명** | Pull Request 만들기 양식의 *제목과 설명 생성*(브랜치의 commit과 diff를 로컬에서 읽습니다). | |
 | **Merge 충돌 해결** | merge 충돌 편집기에서: `✦ 제안` 도구 모음 버튼, 충돌의 오른쪽 클릭 메뉴 *✦ 해결 방법 제안 (AI)*, `Alt+I`, 또는 팔레트의 `AI: Merge 충돌 해결 방법 제안`. 제안은 출력에서 *현재 충돌*의 영역을 하나의 편집으로 대체합니다(편집됨으로 표시, 실행 취소 한 단계). 저장하기 전에는 아무것도 저장되거나 스테이징되지 않습니다. | `ai resolve-conflict <path> [--conflict N]` (출력) |

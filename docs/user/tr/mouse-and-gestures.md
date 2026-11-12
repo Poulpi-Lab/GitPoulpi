@@ -305,8 +305,8 @@ Bırak...` palet komutu, seçili ref ve geçerli dal için menüyü açar.
   Dosyalar`) **tıklayın**.
 - Düz bir liste veya klasörler seçmek için **Yol veya Ağaç'a tıklayın**. Her
   klasörü katlamak için **Tümünü Daralt veya Tümünü Genişlet'e tıklayın**.
-- Tüm değişiklikleri atmak için başlığın solundaki **`[✖]`'e tıklayın** (önce
-  sorar). Değişiklikleri YZ ile açıklamak için sağdaki **`[✦]`'e tıklayın**.
+- Tüm değişiklikleri atmak için başlığın solundaki **`✖`'e tıklayın** (önce
+  sorar). Değişiklikleri YZ ile açıklamak için sağdaki **`✦`'e tıklayın**.
 - Menüsü için **bir dosyaya sağ tıklayın**: stage, at, yok say, LFS, dosyayı
   stash'le, geçmiş, blame, harici bir programda aç, yolu kopyala, yama oluştur,
   düzenle, sil. Çakışmalı bir dosya **... ile çöz** satırlarıyla başlar.

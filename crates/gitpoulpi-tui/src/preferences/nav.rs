@@ -78,6 +78,13 @@ impl PreferencesState {
         // buttons is badged control by control; any other row once, on its
         // first visible line.
         let mut controls: Vec<(u16, u16, Rect, NavPoint)> = Vec::new();
+        // The Integrations page paints its own controls (buttons, checkboxes,
+        // text fields, the Radar block's Namespaces area).
+        if self.current_section() == PrefSection::Integrations {
+            for (r, point) in self.integrations.nav_hits() {
+                controls.push((r.y, r.x, r, point));
+            }
+        }
         let with_cells: std::collections::HashSet<usize> = self
             .chip_rects
             .iter()

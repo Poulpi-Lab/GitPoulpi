@@ -276,7 +276,7 @@ najedete nebo ji zvýrazníte.
 | Akce | V okně | CLI |
 |---|---|---|
 | **Zpráva commitu** | Přidejte změny do indexu, stiskněte `✦` vpravo od pole Souhrn, `Ctrl+G i` nebo příkaz z palety `AI: Vygenerovat zprávu commitu`. Souhrn a popis se vyplní, abyste je mohli upravit; nic se necommituje. | `ai commit-message` (vypíše), `commit --ai` (commituje) |
-| **Vysvětlení změn** | `[✦]` vpravo nahoře v panelu pracovních změn (`Ctrl+G w`: vybraný commit, jinak pracovní změny), nebo položka nabídky commitu *Vysvětlit změny (AI)*. Vyskakovací okno: šipky posouvají, `c` kopíruje, `Esc` zavře. | `ai explain [rev] [--wip]` |
+| **Vysvětlení změn** | `✦` vpravo nahoře v panelu pracovních změn (`Ctrl+G w`: vybraný commit, jinak pracovní změny), nebo položka nabídky commitu *Vysvětlit změny (AI)*. Vyskakovací okno: šipky posouvají, `c` kopíruje, `Esc` zavře. | `ai explain [rev] [--wip]` |
 | **Zpráva stashe** | `Ctrl+G m` otevře výzvu stash; `Ctrl+G` uvnitř ní požádá model. Příkaz z palety `AI: Vygenerovat zprávu stashe` udělá obojí. | `stash push --ai` |
 | **Název a popis pull requestu** | *Vygenerovat název a popis* ve formuláři Vytvořit pull request (commity a diff větve se čtou lokálně). | |
 | **Řešení konfliktů merge** | V editoru konfliktů merge: tlačítko panelu nástrojů `✦ Navrhnout`, nabídka konfliktu pod pravým tlačítkem *✦ Navrhnout řešení (AI)*, `Alt+I` nebo příkaz z palety `AI: Navrhnout řešení konfliktu merge`. Návrh nahradí oblast *aktuálního konfliktu* ve Výstupu jedinou úpravou (označeno jako upravené, jeden krok zpět); nic se neuloží ani nepřidá do indexu, dokud neuložíte. | `ai resolve-conflict <path> [--conflict N]` (vypíše) |

@@ -1,6 +1,7 @@
 use super::*;
 use gitpoulpi_secrets::InMemoryTokens;
 
+mod history;
 mod instructions;
 mod limits;
 mod privacy;

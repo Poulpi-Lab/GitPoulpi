@@ -7,6 +7,7 @@ use ratatui::buffer::Buffer;
 use ratatui::Terminal;
 use std::sync::Mutex;
 
+mod buttons;
 mod connect;
 mod i18n;
 mod input;

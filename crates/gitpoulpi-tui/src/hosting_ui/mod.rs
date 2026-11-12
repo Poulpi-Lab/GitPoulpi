@@ -903,6 +903,8 @@ pub(crate) struct HostingUi {
     /// text so far is `query_draft`, saved when the field is left.
     editing_query: bool,
     query_draft: String,
+    /// What `Ctrl+Z` / `Ctrl+Y` walk in whichever of these boxes has the keyboard.
+    query_history: crate::text_history::QueryHistory,
     /// The Trello lists of the linked board, once asked: `(profile, board)`
     /// and the list names (`None` while they load or when the call failed).
     lists: Option<(String, String, Option<Vec<String>>)>,

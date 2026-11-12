@@ -97,8 +97,9 @@ impl PromptEdit {
             Style::default().fg(th().ui.muted),
         );
         for (i, (text, sentence)) in chips.iter().enumerate() {
-            let shown = format!("[+ {}]", text.get());
-            let w = display_width(&shown) as u16;
+            // A real button (` + text `, never bracketed text).
+            let shown = format!("+ {}", text.get());
+            let w = dialog_kit::button_width(&shown);
             if x > area.x + indent && x + w > area.right() {
                 if y + 1 >= area.y + room {
                     break;
@@ -107,16 +108,18 @@ impl PromptEdit {
                 x = area.x + indent;
             }
             let rect = Rect::new(x, y, w.min(area.right().saturating_sub(x)), 1);
-            let style = if self.chips_focused && i == self.chip.min(chips.len() - 1) {
-                Style::default().fg(th().ui.text).bg(th().ui.selection)
-            } else if self.text.contains(sentence.english()) {
-                Style::default().fg(th().ui.muted)
-            } else if hovered(rect) {
-                crate::theme::plain_button_style(true)
+            // A sentence already in the text is dimmed (the button still
+            // answers: it says so).
+            let state = if self.text.contains(sentence.english()) {
+                dialog_kit::ButtonState::Disabled
             } else {
-                Style::default().fg(th().ui.accent)
+                dialog_kit::ButtonState::Normal {
+                    hovered: hovered(rect),
+                    focused: self.chips_focused && i == self.chip.min(chips.len() - 1),
+                }
             };
-            dialog_kit::put(buf, x, y, &shown, rect.width, style);
+            let drawn = dialog_kit::button(buf, x, y, &shown, state);
+            debug_assert_eq!(drawn.width, w);
             hits.push((rect, i));
             x += w + 1;
         }

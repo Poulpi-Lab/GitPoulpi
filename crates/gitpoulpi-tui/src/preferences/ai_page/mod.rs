@@ -254,6 +254,10 @@ pub(super) struct AiPage {
 pub(super) enum PromptButton {
     Save,
     Cancel,
+    /// Step the text's edit history back (`Ctrl+Z`).
+    Undo,
+    /// Step it forward again (`Ctrl+Y`).
+    Redo,
 }
 
 impl AiPage {
@@ -1278,6 +1282,12 @@ impl PreferencesState {
         }
         match button {
             Some(PromptButton::Save) => self.ai_prompt_save(),
+            Some(PromptButton::Undo) => {
+                edit.undo();
+            }
+            Some(PromptButton::Redo) => {
+                edit.redo();
+            }
             Some(PromptButton::Cancel) if edit.close.cancel_button(&edit.text) == Act::Close => {
                 self.ai_prompt_cancel()
             }
@@ -1464,6 +1474,16 @@ impl PreferencesState {
             let right = inner.right();
             let cancel_x = right.saturating_sub(cancel_w);
             let save_x = cancel_x.saturating_sub(save_w + 1);
+            // Undo and Redo sit left of Save: the buttons for Ctrl+Z / Ctrl+Y.
+            let undo_label = gitpoulpi_i18n::msg::toolbar::UNDO.get();
+            let redo_label = gitpoulpi_i18n::msg::toolbar::REDO.get();
+            let undo_w = dialog_kit::button_width(undo_label);
+            let redo_w = dialog_kit::button_width(redo_label);
+            let redo_x = save_x.saturating_sub(redo_w + 1);
+            let undo_x = redo_x.saturating_sub(undo_w + 1);
+            let (can_undo, can_redo) = edit.field.caret(()).map_or((false, false), |c| {
+                (c.can_undo(&edit.text), c.can_redo(&edit.text))
+            });
             let buf = frame.buffer_mut();
             let at = |x: u16, w: u16| Rect::new(x, y, w, 1);
             let state = |r: Rect, primary: bool| {
@@ -1489,9 +1509,33 @@ impl PreferencesState {
                 cancel_label,
                 state(at(cancel_x, cancel_w), false),
             );
+            let history_state = |r: Rect, on: bool| {
+                if on {
+                    ButtonState::Normal {
+                        hovered: hovered(r),
+                        focused: false,
+                    }
+                } else {
+                    ButtonState::Disabled
+                }
+            };
+            let undo = dialog_kit::button(
+                buf,
+                undo_x,
+                y,
+                undo_label,
+                history_state(at(undo_x, undo_w), can_undo),
+            );
+            let redo = dialog_kit::button(
+                buf,
+                redo_x,
+                y,
+                redo_label,
+                history_state(at(redo_x, redo_w), can_redo),
+            );
             // The Variables dropdown, left of the buttons.
             let vars_w = (crate::display_width(msg::VARIABLES_BUTTON.get()) as u16 + 4)
-                .min(save_x.saturating_sub(inner.x + 1));
+                .min(undo_x.saturating_sub(inner.x + 1));
             let field = Rect::new(inner.x, y, vars_w, 1);
             if hint_y.is_some() && vars_w >= 6 {
                 let h = hovered(field);
@@ -1541,7 +1585,12 @@ impl PreferencesState {
                 };
                 dialog_kit::put(buf, inner.x, hy, &text, inner.width, style);
             }
-            self.ai.prompt_hits = vec![(save, PromptButton::Save), (cancel, PromptButton::Cancel)];
+            self.ai.prompt_hits = vec![
+                (save, PromptButton::Save),
+                (cancel, PromptButton::Cancel),
+                (undo, PromptButton::Undo),
+                (redo, PromptButton::Redo),
+            ];
         }
         if let Some(edit) = self.ai.prompt.as_mut() {
             edit.vars.combo.render_popup(frame.buffer_mut(), area);

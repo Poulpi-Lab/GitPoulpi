@@ -113,6 +113,8 @@ mod avatar;
 mod blame_view;
 pub mod build_features;
 #[cfg(test)]
+mod button_audit_tests;
+#[cfg(test)]
 mod cjk_sweep_tests;
 mod clipboard;
 mod clipboard_route;
@@ -234,6 +236,7 @@ mod terminal_image;
 mod terminology;
 mod text_edit;
 mod text_field;
+mod text_history;
 mod text_select;
 #[cfg(feature = "worktree")]
 mod worktree_dialog;

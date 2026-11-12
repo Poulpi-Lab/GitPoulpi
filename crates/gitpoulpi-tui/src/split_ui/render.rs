@@ -579,7 +579,8 @@ impl SplitForm {
             let owner = self.row_owner(*row);
             // The combo field at the right end, then the gutter at the left.
             let (mark, color) = owner_mark(owner);
-            let field = format!("[{mark:>2} \u{25BE}]");
+            // A real dropdown button (padded, filled), never bracketed text.
+            let field = format!(" {mark:>2} \u{25BE} ");
             let field_w = display_width(&field) as u16;
             let field_rect = Rect::new(rect.right().saturating_sub(field_w + 1), y, field_w, 1);
             let field_hover = hovered == Some(SplitHit::Assign(*row));
@@ -595,11 +596,14 @@ impl SplitForm {
                     } else {
                         color
                     })
-                    .bg(if field_hover {
-                        th().ui.button_hover
-                    } else {
-                        bg
-                    }),
+                    .bg(
+                        crate::dialog_kit::button_style(crate::dialog_kit::ButtonState::Normal {
+                            hovered: field_hover,
+                            focused: false,
+                        })
+                        .bg
+                        .unwrap_or(bg),
+                    ),
             );
             fine.push((field_rect, SplitHit::Assign(*row)));
             if is_cursor {

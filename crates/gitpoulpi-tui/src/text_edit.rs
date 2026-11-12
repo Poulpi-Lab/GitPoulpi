@@ -32,6 +32,7 @@ use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::layout::Rect;
 
 use crate::text_field;
+use crate::text_history::{History, Kind, Snap};
 
 /// The caret and selection of one text field. Offsets are bytes into the
 /// field's text and are clamped (to its length, then down to a char
@@ -51,6 +52,8 @@ pub(crate) struct Caret {
     pub(crate) scroll: Cell<usize>,
     /// First visible line of a multi-line field, likewise.
     pub(crate) top: Cell<usize>,
+    /// What `Ctrl+Z` / `Ctrl+Y` walk (see `text_history`).
+    history: History,
 }
 
 /// What a key did to a field.
@@ -82,6 +85,8 @@ enum Op {
     Cut,
     Backspace,
     Delete,
+    Undo,
+    Redo,
     Move(Motion, bool),
 }
 
@@ -119,6 +124,8 @@ fn decode(key: &KeyEvent, multiline: bool) -> Option<Op> {
         '\u{b}' => Some(Op::KillToLineEnd),
         '\u{3}' => Some(Op::Copy),
         '\u{18}' => Some(Op::Cut),
+        '\u{1a}' => Some(Op::Undo),
+        '\u{19}' => Some(Op::Redo),
         _ => None,
     };
     match key.code {
@@ -130,6 +137,9 @@ fn decode(key: &KeyEvent, multiline: bool) -> Option<Op> {
             'k' => Some(Op::KillToLineEnd),
             'c' => Some(Op::Copy),
             'x' => Some(Op::Cut),
+            'z' if shift => Some(Op::Redo),
+            'z' => Some(Op::Undo),
+            'y' => Some(Op::Redo),
             _ => None,
         },
         KeyCode::Char(_) if alt => None,
@@ -284,6 +294,7 @@ impl Caret {
             anchor: self.anchor.map(to),
             scroll: Cell::new(self.scroll.get()),
             top: Cell::new(self.top.get()),
+            history: History::default(),
         };
         (shown, caret)
     }
@@ -368,10 +379,90 @@ impl Caret {
     /// Types `s` at the caret, replacing the selection if there is one.
     /// This is also the paste path.
     pub(crate) fn insert(&mut self, text: &mut String, s: &str) {
+        let before = self.snap(text);
+        self.insert_raw(text, s);
+        self.record(before, Kind::Block, text);
+    }
+
+    fn insert_raw(&mut self, text: &mut String, s: &str) {
         self.delete_selection(text);
         let at = self.cursor(text);
         text.insert_str(at, s);
         self.cursor = Some(at + s.len());
+    }
+
+    /// Replaces the bytes `range` of `text` by `with` and puts the caret after
+    /// it: one history entry (an autocomplete accepted).
+    pub(crate) fn replace_range(
+        &mut self,
+        text: &mut String,
+        range: std::ops::Range<usize>,
+        with: &str,
+    ) {
+        let before = self.snap(text);
+        let end = range.start + with.len();
+        text.replace_range(range, with);
+        self.cursor = Some(end);
+        self.anchor = None;
+        self.record(before, Kind::Block, text);
+    }
+
+    /// The field as it is now, for the history.
+    fn snap(&self, text: &str) -> Snap {
+        Snap {
+            text: text.to_string(),
+            cursor: self.cursor(text),
+            anchor: self.anchor,
+        }
+    }
+
+    /// Records an edit that took the field from `before` to `text`, when it
+    /// changed anything.
+    fn record(&mut self, before: Snap, kind: Kind, text: &str) {
+        if before.text != text {
+            let cursor = self.cursor(text);
+            self.history.record(before, kind, text, cursor);
+        }
+    }
+
+    fn restore(&mut self, text: &mut String, snap: Snap) {
+        *text = snap.text;
+        self.cursor = Some(snap.cursor);
+        self.anchor = snap.anchor;
+    }
+
+    /// Undoes the last edit of `text`. Whether there was one.
+    pub(crate) fn undo(&mut self, text: &mut String) -> bool {
+        let current = self.snap(text);
+        match self.history.undo(current) {
+            Some(back) => {
+                self.restore(text, back);
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// Redoes the last undone edit of `text`. Whether there was one.
+    pub(crate) fn redo(&mut self, text: &mut String) -> bool {
+        let current = self.snap(text);
+        match self.history.redo(current) {
+            Some(next) => {
+                self.restore(text, next);
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// Whether [`Caret::undo`] would change `text` (the Undo button's state).
+    pub(crate) fn can_undo(&self, text: &str) -> bool {
+        self.history.can_undo(text)
+    }
+
+    /// Whether [`Caret::redo`] would change `text`.
+    pub(crate) fn can_redo(&self, text: &str) -> bool {
+        self.history.can_redo(text)
     }
 
     /// Whether [`Caret::on_key`] would do something with `key` - asked
@@ -391,10 +482,42 @@ impl Caret {
         let Some(op) = decode(key, multiline) else {
             return KeyEdit::Ignored;
         };
+        let kind = match op {
+            Op::Undo | Op::Redo => {
+                let done = if op == Op::Undo {
+                    self.undo(text)
+                } else {
+                    self.redo(text)
+                };
+                return if done {
+                    KeyEdit::Edited
+                } else {
+                    KeyEdit::Moved
+                };
+            }
+            Op::Insert(c) if self.selection(text).is_none() => Kind::Typed(char_class(c)),
+            Op::Backspace if self.selection(text).is_none() => Kind::Backspace,
+            Op::Delete if self.selection(text).is_none() => Kind::Delete,
+            Op::Insert(_)
+            | Op::Backspace
+            | Op::Delete
+            | Op::KillToLineStart
+            | Op::KillToLineEnd
+            | Op::Cut => Kind::Block,
+            _ => return self.apply(text, op),
+        };
+        let before = self.snap(text);
+        let result = self.apply(text, op);
+        self.record(before, kind, text);
+        result
+    }
+
+    fn apply(&mut self, text: &mut String, op: Op) -> KeyEdit {
         let at = self.cursor(text);
         match op {
+            Op::Undo | Op::Redo => KeyEdit::Ignored,
             Op::Insert(c) => {
-                self.insert(text, c.encode_utf8(&mut [0; 4]));
+                self.insert_raw(text, c.encode_utf8(&mut [0; 4]));
                 KeyEdit::Edited
             }
             Op::SelectAll => {
@@ -1164,5 +1287,155 @@ mod tests {
         assert!(!editor.area_mouse((), text, K::ScrollDown, (2, 0), false));
         assert!(editor.area_mouse((), text, K::ScrollUp, (12, 2), false));
         assert_eq!(editor.caret(()).unwrap().top.get(), 0);
+    }
+
+    // ---- the edit history (Ctrl+Z / Ctrl+Y) ----
+
+    fn typed(caret: &mut Caret, text: &mut String, s: &str) {
+        for c in s.chars() {
+            caret.on_key(text, &key(KeyCode::Char(c)), true);
+        }
+    }
+
+    /// Typing groups per word: "hello world" is three entries (hello, the
+    /// space, world), so three Ctrl+Z walk back to nothing.
+    #[test]
+    fn typing_is_undone_a_word_at_a_time_and_redone() {
+        let mut caret = Caret::default();
+        let mut text = String::new();
+        typed(&mut caret, &mut text, "hello world");
+        assert_eq!(caret.on_key(&mut text, &ctrl('z'), true), KeyEdit::Edited);
+        assert_eq!(text, "hello ");
+        caret.on_key(&mut text, &ctrl('z'), true);
+        assert_eq!(text, "hello");
+        caret.on_key(&mut text, &ctrl('z'), true);
+        assert_eq!(text, "");
+        assert_eq!(caret.on_key(&mut text, &ctrl('z'), true), KeyEdit::Moved);
+        // Ctrl+Y and Ctrl+Shift+Z both redo.
+        caret.on_key(&mut text, &ctrl('y'), true);
+        assert_eq!(text, "hello");
+        let shifted = KeyEvent::new(
+            KeyCode::Char('Z'),
+            KeyModifiers::CONTROL | KeyModifiers::SHIFT,
+        );
+        caret.on_key(&mut text, &shifted, true);
+        assert_eq!(text, "hello ");
+        assert_eq!(caret.cursor(&text), 6);
+        // The bare control characters some terminals send.
+        caret.on_key(&mut text, &key(KeyCode::Char('\u{1a}')), true);
+        assert_eq!(text, "hello");
+        caret.on_key(&mut text, &key(KeyCode::Char('\u{19}')), true);
+        assert_eq!(text, "hello ");
+    }
+
+    /// A new edit after an undo forgets the redo branch.
+    #[test]
+    fn a_new_edit_clears_the_redo_branch() {
+        let mut caret = Caret::default();
+        let mut text = String::new();
+        typed(&mut caret, &mut text, "ab");
+        caret.on_key(&mut text, &ctrl('z'), true);
+        assert!(caret.can_redo(&text));
+        typed(&mut caret, &mut text, "x");
+        assert!(!caret.can_redo(&text));
+        assert_eq!(text, "x");
+    }
+
+    #[test]
+    fn a_pause_starts_a_new_entry_and_backspaces_group() {
+        let mut caret = Caret::default();
+        caret.history.set_pause(std::time::Duration::ZERO);
+        let mut text = String::new();
+        typed(&mut caret, &mut text, "abc");
+        assert_eq!(caret.history.len(), 3, "no grouping across pauses");
+        let mut caret = Caret::default();
+        let mut text = "abcdef".to_string();
+        for _ in 0..3 {
+            caret.on_key(&mut text, &key(KeyCode::Backspace), true);
+        }
+        assert_eq!(text, "abc");
+        assert_eq!(caret.history.len(), 1, "backspaces are one entry");
+        caret.on_key(&mut text, &ctrl('z'), true);
+        assert_eq!(text, "abcdef");
+    }
+
+    /// Paste, cut and kill are one entry each and restore caret and selection.
+    #[test]
+    fn paste_cut_and_kill_are_single_entries() {
+        let mut caret = Caret::default();
+        let mut text = "one two".to_string();
+        caret.insert(&mut text, " three four");
+        assert_eq!(text, "one two three four");
+        caret.on_key(&mut text, &ctrl('a'), true);
+        let cut = caret.on_key(&mut text, &ctrl('x'), true);
+        assert!(matches!(cut, KeyEdit::Cut(_)));
+        assert_eq!(text, "");
+        caret.on_key(&mut text, &ctrl('z'), true);
+        assert_eq!(text, "one two three four");
+        assert_eq!(
+            caret.selection(&text),
+            Some((0, text.len())),
+            "the selection comes back with the text"
+        );
+        caret.on_key(&mut text, &ctrl('z'), true);
+        assert_eq!(text, "one two");
+        caret.on_key(&mut text, &ctrl('u'), true);
+        assert_eq!(text, "");
+        caret.on_key(&mut text, &ctrl('z'), true);
+        assert_eq!(text, "one two");
+    }
+
+    #[test]
+    fn the_history_is_bounded() {
+        let mut caret = Caret::default();
+        caret.history.set_pause(std::time::Duration::ZERO);
+        let mut text = String::new();
+        let n = crate::text_history::MAX_ENTRIES;
+        typed(&mut caret, &mut text, &"x".repeat(n + 50));
+        assert_eq!(caret.history.len(), n);
+        // The oldest are gone: the walk back stops short of empty.
+        let mut steps = 0;
+        while caret.undo(&mut text) {
+            steps += 1;
+        }
+        assert_eq!(steps, n);
+        assert_eq!(text.len(), 50);
+    }
+
+    /// A field whose text was replaced from outside has no history: an
+    /// entry would bring back text it no longer holds.
+    #[test]
+    fn the_history_is_cleared_when_the_text_is_replaced_from_outside() {
+        let mut caret = Caret::default();
+        let mut text = String::new();
+        typed(&mut caret, &mut text, "abc");
+        assert!(caret.can_undo(&text));
+        text = "from outside".to_string();
+        assert!(!caret.can_undo(&text));
+        assert_eq!(caret.on_key(&mut text, &ctrl('z'), true), KeyEdit::Moved);
+        assert_eq!(text, "from outside");
+        // New typing starts a fresh history.
+        typed(&mut caret, &mut text, "!");
+        caret.on_key(&mut text, &ctrl('z'), true);
+        assert_eq!(text, "from outside");
+        // The owner's reset drops it too.
+        let mut editor = FieldEditor::<u8>::default();
+        let mut text = String::new();
+        editor.on_key(1, &mut text, &key(KeyCode::Char('q')), false);
+        editor.reset();
+        assert_eq!(
+            editor.on_key(1, &mut text, &ctrl('z'), false),
+            KeyEdit::Moved
+        );
+        assert_eq!(text, "q");
+    }
+
+    /// The editor claims the chords, so a focused field never lets them reach
+    /// the global git undo.
+    #[test]
+    fn a_field_claims_ctrl_z_and_ctrl_y() {
+        let caret = Caret::default();
+        assert!(caret.claims("", &ctrl('z'), false));
+        assert!(caret.claims("", &ctrl('y'), false));
     }
 }

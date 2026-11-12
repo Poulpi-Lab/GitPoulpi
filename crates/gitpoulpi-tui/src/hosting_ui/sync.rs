@@ -69,6 +69,7 @@ impl HostingUi {
             editing: None,
             editing_query: false,
             query_draft: String::new(),
+            query_history: Default::default(),
             lists: None,
             lists_rx: None,
             collapsed: HashSet::from([PrGroup::All]),

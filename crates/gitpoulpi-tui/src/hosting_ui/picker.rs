@@ -393,11 +393,11 @@ impl HostingUi {
         if let Some(p) = self.picker.as_mut() {
             p.combo.paste(&clean);
         } else if self.editing_query {
-            self.query_draft.push_str(&clean);
+            self.query_history.paste(&mut self.query_draft, &clean);
         } else if let Some(list) = self.editing {
             match list {
-                HostingList::Pulls => self.pr_query.push_str(&clean),
-                HostingList::Issues => self.issue_query.push_str(&clean),
+                HostingList::Pulls => self.query_history.paste(&mut self.pr_query, &clean),
+                HostingList::Issues => self.query_history.paste(&mut self.issue_query, &clean),
             }
         }
     }
@@ -645,15 +645,17 @@ impl HostingUi {
             HostingList::Pulls => &mut self.pr_query,
             HostingList::Issues => &mut self.issue_query,
         };
+        let history = &mut self.query_history;
+        if history.key(query, &key) {
+            return true;
+        }
         match key.code {
             KeyCode::Esc | KeyCode::Enter | KeyCode::Tab | KeyCode::BackTab | KeyCode::Down => {
                 self.editing = None;
             }
-            KeyCode::Backspace => {
-                query.pop();
-            }
-            KeyCode::Char('u') if ctrl => query.clear(),
-            KeyCode::Char(c) if !ctrl && !alt => query.push(c),
+            KeyCode::Backspace => history.pop(query),
+            KeyCode::Char('u') if ctrl => history.wipe(query),
+            KeyCode::Char(c) if !ctrl && !alt => history.push(query, c),
             _ => {}
         }
         true
@@ -747,16 +749,17 @@ impl HostingUi {
     fn on_query_key(&mut self, key: KeyEvent) -> bool {
         let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
         let alt = key.modifiers.contains(KeyModifiers::ALT);
+        if self.query_history.key(&mut self.query_draft, &key) {
+            return true;
+        }
         match key.code {
             KeyCode::Esc => self.finish_query_edit(false),
             KeyCode::Enter | KeyCode::Tab | KeyCode::BackTab | KeyCode::Down => {
                 self.finish_query_edit(true)
             }
-            KeyCode::Backspace => {
-                self.query_draft.pop();
-            }
-            KeyCode::Char('u') if ctrl => self.query_draft.clear(),
-            KeyCode::Char(c) if !ctrl && !alt => self.query_draft.push(c),
+            KeyCode::Backspace => self.query_history.pop(&mut self.query_draft),
+            KeyCode::Char('u') if ctrl => self.query_history.wipe(&mut self.query_draft),
+            KeyCode::Char(c) if !ctrl && !alt => self.query_history.push(&mut self.query_draft, c),
             _ => {}
         }
         true

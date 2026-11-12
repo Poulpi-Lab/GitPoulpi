@@ -299,8 +299,8 @@ früher. Der Palettenbefehl `Refs: Ausgewählte Ref auf dem ausgecheckten Branch
   zu falten.
 - **Klicken Sie auf Pfad oder Baum**, um eine flache Liste oder Ordner zu wählen.
   **Klicken Sie auf Alle einklappen** oder **Alle ausklappen**, um jeden Ordner zu falten.
-- **Klicken Sie auf `[✖]`** links vom Titel, um alle Änderungen zu verwerfen (fragt
-  vorher). **Klicken Sie auf `[✦]`** rechts, um die Änderungen mit der KI zu erklären.
+- **Klicken Sie auf `✖`** links vom Titel, um alle Änderungen zu verwerfen (fragt
+  vorher). **Klicken Sie auf `✦`** rechts, um die Änderungen mit der KI zu erklären.
 - **Rechtsklick auf eine Datei** öffnet ihr Menü: stagen, verwerfen, ignorieren, LFS, die
   Datei stashen, Verlauf, Blame, in einem externen Programm öffnen, den Pfad kopieren, einen
   Patch erstellen, bearbeiten, löschen. Eine Datei im Konflikt beginnt mit den Zeilen

@@ -101,7 +101,7 @@ fn wait_editor(term: &Terminal) {
 
 /// How many `[ n v]` assignment fields show the number `n`.
 fn owned_by(term: &Terminal, n: u8) -> usize {
-    term.screen().find_all(&format!("[ {n} \u{25be}]")).len()
+    term.screen().find_all(&format!(" {n} \u{25be} ")).len()
 }
 
 /// Right-click `parser and flag` and click `row` of its menu.
@@ -197,7 +197,7 @@ fn a_useless_answer_still_offers_the_manual_editor_with_the_reason() {
     term.send_keys("Down").unwrap();
     term.send_text("2").unwrap();
     term.wait_for("one change moved by hand", STEP, |s| {
-        s.find_all("[ 2 \u{25be}]").len() == 1
+        s.find_all(" 2 \u{25be} ").len() == 1
     })
     .unwrap_or_else(|e| panic!("{e}"));
 }

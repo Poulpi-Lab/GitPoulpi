@@ -73,7 +73,7 @@ fn the_rows_and_helps_are_french_and_the_chip_sentence_is_not() {
     s.activate();
     let screen = draw(&mut s, 120, 40);
     assert!(
-        screen.contains("Insertion rapide: [+ Répondre en <langue>]"),
+        screen.contains("Insertion rapide:  + Répondre en <langue> "),
         "{screen}"
     );
     s.on_key(key(KeyCode::Tab));

@@ -63,6 +63,8 @@ pub(super) struct Hit {
 #[derive(Debug, Default)]
 pub(super) struct SettingsSearch {
     pub(super) query: String,
+    /// What `Ctrl+Z` / `Ctrl+Y` walk in the search box.
+    history: crate::text_history::QueryHistory,
     pub(super) hits: Vec<Hit>,
     pub(super) selected: usize,
     /// Painted this frame: the popup, and each visible result row with its
@@ -384,16 +386,18 @@ impl PreferencesState {
             KeyCode::Enter => self.jump_to_selected(),
             KeyCode::Tab => search.selected = (search.selected + 1).min(last),
             KeyCode::BackTab => search.selected = search.selected.saturating_sub(1),
+            // Ctrl+Z / Ctrl+Y walk the box's edits.
+            _ if search.history.key(&mut search.query, &key) => self.refresh_search(),
             KeyCode::Backspace => {
-                search.query.pop();
+                search.history.pop(&mut search.query);
                 self.refresh_search();
             }
             KeyCode::Char('u') if ctrl => {
-                search.query.clear();
+                search.history.wipe(&mut search.query);
                 self.refresh_search();
             }
             KeyCode::Char(c) if !ctrl && !key.modifiers.contains(KeyModifiers::ALT) => {
-                search.query.push(c);
+                search.history.push(&mut search.query, c);
                 self.refresh_search();
             }
             _ => {}
@@ -403,9 +407,8 @@ impl PreferencesState {
 
     pub(super) fn search_paste(&mut self, text: &str) {
         if let Some(search) = self.search.as_mut() {
-            search
-                .query
-                .push_str(text.replace(['\r', '\n'], " ").trim_end());
+            let clean = text.replace(['\r', '\n'], " ");
+            search.history.paste(&mut search.query, clean.trim_end());
             self.refresh_search();
         }
     }

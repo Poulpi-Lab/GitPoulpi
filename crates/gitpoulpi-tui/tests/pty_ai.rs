@@ -812,7 +812,7 @@ args = ["-p"]
     })
     .unwrap_or_else(|e| panic!("{e}"));
     let (col, row) = term
-        .wait_for_text("[+ Include issue numbers]", STEP)
+        .wait_for_text("+ Include issue numbers", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 2, row).expect("click the chip");
     term.wait_for("the sentence inserted", STEP, |s| {
@@ -903,7 +903,7 @@ args = ["-p"]
     term.send_keys("Down").unwrap();
     term.send_keys("Enter").unwrap();
     let (col, row) = term
-        .wait_for_text("[+ Include issue numbers]", STEP)
+        .wait_for_text("+ Include issue numbers", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 2, row).expect("click the chip");
     term.send_keys("C-s").unwrap();
@@ -986,14 +986,14 @@ fn the_header_trash_confirms_a_discard_and_the_explain_button_explains() {
 
     let screen = term
         .wait_for("the header with both buttons", STEP, |s| {
-            s.contains("[\u{2716}") && s.contains("[\u{2726}]") && s.contains("file change")
+            s.contains(" \u{2716}") && s.contains(" \u{2726} ") && s.contains("file change")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (tc, tr) = screen.find("[\u{2716}").unwrap();
+    let (tc, tr) = screen.find(" \u{2716}").unwrap();
     let (title_col, title_row) = screen.find("file change").unwrap();
     assert_eq!(tr, title_row, "same header row");
     assert!(tc < title_col, "the trash is left of the title");
-    let (ec, er) = screen.find("[\u{2726}]").unwrap();
+    let (ec, er) = screen.find(" \u{2726} ").unwrap();
     assert_eq!(er, title_row);
     assert!(ec > title_col, "Explain is at the far right");
 

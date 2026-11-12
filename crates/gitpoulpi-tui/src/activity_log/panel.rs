@@ -315,6 +315,8 @@ fn open_with(scope: Scope) {
         s.filter_focus = false;
         s.notice = None;
         s.grab = None;
+        // Not painted yet: a press before the first frame is not "outside".
+        s.window = Rect::new(0, 0, 0, 0);
     });
     OPEN.store(true, Ordering::Relaxed);
     crate::redraw::poke();
@@ -1661,6 +1663,12 @@ pub(crate) fn on_mouse(mouse: MouseEvent) {
 }
 
 fn press(at: ratatui::layout::Position, mouse: MouseEvent) {
+    // Opened by a key in the same batch of input that holds this press: the
+    // window has not been painted yet, so there is no "outside" to judge the
+    // press by (it would close the window it just opened).
+    if with(|s| s.window.is_empty()) {
+        return;
+    }
     // The horizontal bar sits under the list's last line.
     if hbar_press(mouse.column, mouse.row) {
         return;

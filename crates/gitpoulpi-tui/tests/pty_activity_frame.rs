@@ -129,3 +129,155 @@ fn the_activity_window_opened_from_the_status_button_moves_and_resizes() {
     term.send_keys("Escape").unwrap();
     term.stop().unwrap();
 }
+
+/// The window opened by the palette (the Global one too) at a wide terminal:
+/// the right border narrows it, then the title drag moves it (it must not
+/// close it).
+/// A drag the way Windows delivers it: one report per write, with the loop
+/// free to draw between them.
+fn paced(t: &mut xtask::pty::Terminal, from: (u16, u16), to: (u16, u16)) -> xtask::pty::Result<()> {
+    t.press(from.0, from.1)?;
+    std::thread::sleep(Duration::from_millis(60));
+    let (mut c, mut r) = from;
+    while (c, r) != to {
+        c = if c < to.0 {
+            c + 1
+        } else if c > to.0 {
+            c - 1
+        } else {
+            c
+        };
+        r = if r < to.1 {
+            r + 1
+        } else if r > to.1 {
+            r - 1
+        } else {
+            r
+        };
+        t.drag_to(c, r)?;
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    t.release(to.0, to.1)
+}
+
+fn open_by_palette_and_frame(entry: &str, session: &str, home: bool) {
+    open_with_config(entry, session, home, "")
+}
+
+fn open_with_config(entry: &str, session: &str, home: bool, toml: &str) {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit_file("a.txt", "a\n", "frames-commit")
+        .unwrap()
+        .build();
+    let config = tempfile::tempdir().unwrap();
+    if !toml.is_empty() {
+        std::fs::write(config.path().join("config.toml"), toml).unwrap();
+    }
+    let mut term = common::launch(repo.root())
+        .session(session)
+        .config_dir(config.path())
+        .size(142, 45)
+        .no_exit_pause()
+        .ready("frames-commit")
+        .mouse_capture()
+        .spawn();
+    if home {
+        let (hx, hy) = term.screen().find("Radar").expect("the Home tab");
+        term.act_until(
+            "Home in front",
+            ATTEMPT,
+            STEP,
+            |t| t.click(hx, hy),
+            |s| !s.contains("frames-commit"),
+        )
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    }
+    term.send_keys("C-p").unwrap();
+    term.wait_for_text("Command Palette", STEP).unwrap();
+    term.send_text(entry).unwrap();
+    term.wait_for("the entry", STEP, |s| s.contains(entry))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the window", STEP, |s| {
+        s.contains("Git operations") && title_at(s, "Activity Log").is_some() && grip(s).is_some()
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let s = term.screen();
+    let (tc, tr) = title_at(&s, "Activity Log").unwrap();
+    let (gx, gy) = grip(&s).unwrap();
+
+    term.act_until(
+        "the window narrowed by its right border",
+        ATTEMPT,
+        STEP,
+        |t| {
+            if grip(&t.screen()) == Some((gx, gy)) {
+                t.move_to(gx, gy - 5)?;
+                paced(t, (gx, gy - 5), (gx - 30, gy - 5))?;
+            }
+            Ok(())
+        },
+        |s| grip(s) == Some((gx - 30, gy)),
+    )
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (dx, dy) = (4u16, 2u16);
+    term.act_until(
+        "the window moved by its title",
+        ATTEMPT,
+        STEP,
+        |t| {
+            if title_at(&t.screen(), "Activity Log") == Some((tc, tr)) {
+                t.move_to(tc + 1, tr)?;
+                paced(t, (tc + 1, tr), (tc + 1 + dx, tr + dy))?;
+            }
+            Ok(())
+        },
+        |s| {
+            title_at(s, "Activity Log") == Some((tc + dx, tr + dy))
+                && grip(s) == Some((gx - 30 + dx, gy + dy))
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Escape").unwrap();
+    term.stop().unwrap();
+}
+
+#[test]
+fn the_activity_window_opened_by_the_palette_moves_and_narrows() {
+    open_by_palette_and_frame("View: Activity Log", "pty-activity-frame-pal", false);
+}
+
+#[test]
+fn the_global_activity_window_opened_by_the_palette_moves_and_narrows() {
+    open_by_palette_and_frame(
+        "View: Global Activity Log",
+        "pty-activity-frame-glob",
+        false,
+    );
+}
+
+#[test]
+fn the_activity_window_over_home_moves_and_narrows() {
+    open_by_palette_and_frame("View: Activity Log", "pty-activity-frame-home", true);
+}
+
+#[test]
+fn the_activity_window_moves_and_narrows_with_never() {
+    open_with_config(
+        "View: Activity Log",
+        "pty-af-never",
+        false,
+        "[ui]\ndialog_geometry = \"never\"\n",
+    );
+}
+
+#[test]
+fn the_activity_window_moves_and_narrows_with_saved() {
+    open_with_config(
+        "View: Activity Log",
+        "pty-af-saved",
+        false,
+        "[ui]\ndialog_geometry = \"saved\"\n",
+    );
+}

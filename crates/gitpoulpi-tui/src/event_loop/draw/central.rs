@@ -780,9 +780,12 @@ fn draw_central_in(frame: &mut Frame, ctx: &mut CentralDrawCtx<'_>) {
             !diff_state.lfs_raw
                 && gitpoulpi_core::domain::lfs_change(f).is_some_and(|c| c.new.is_some())
         }) {
-            if let Some(hits) =
-                crate::open_with::view::render_diff_card(frame, inner, diff_state, *diff_rendered_len)
-            {
+            if let Some(hits) = crate::open_with::view::render_diff_card(
+                frame,
+                inner,
+                diff_state,
+                *diff_rendered_len,
+            ) {
                 frame_hits.splice(0..0, hits);
             }
         }

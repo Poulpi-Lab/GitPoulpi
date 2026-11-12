@@ -455,7 +455,8 @@ fn the_list_hangs_beside_the_menu_it_was_opened_from() {
                     break;
                 }
                 term.send_keys("Down").unwrap();
-                term.wait_for_stable(Duration::from_millis(80), STEP).unwrap();
+                term.wait_for_stable(Duration::from_millis(80), STEP)
+                    .unwrap();
             }
             assert_ne!(band(&term.screen()), plain, "{}", term.text());
             term.send_keys("Enter").unwrap();

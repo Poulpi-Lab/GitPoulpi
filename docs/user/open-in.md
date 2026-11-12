@@ -174,6 +174,16 @@ A binary file (a PDF, a Word document, a spreadsheet, an archive...) has no text
 
 The working-tree file is handed to the application as it is. A commit's (or the index's) version is written to a **read-only temp copy**, with a notice in the status line, so an application cannot change the repository. Neither changes the repository: no journal entry, Undo is unaffected.
 
+The menu's list opens beside the menu, level with the **Open with...** row, like a submenu (on the left when there is no room on the right), from the mouse and from the keyboard alike.
+
+### Git LFS files
+
+The Git LFS object card (see [Git LFS](lfs.md)) carries the same two actions under its text: **Open in default program** and **Open in**, with the same keys (`o`, `Shift+O`) and palette rows. They open the real file, never the pointer: the working-tree file as it is, or a read-only temp copy of the object from the local LFS store for a commit's or the index's version. An object that is not downloaded yet has no buttons on the card, and the status line says to fetch it first (`git lfs pull`). Opening is read-only: no journal entry, nothing to undo.
+
+### Browsers on Windows
+
+Chrome and Edge register `--single-argument %1`, which makes them read everything after the switch as one address, quotes included. GitPoulpi passes the path to such a program verbatim and unquoted, as Windows does, so a file with spaces in its path opens instead of failing with `http://"c/...`. Every other program gets the path as one ordinary argument.
+
 ## Legacy keys
 
 The old keys `ui.terminal_launch` and `ui.terminal_launch_command` are read only

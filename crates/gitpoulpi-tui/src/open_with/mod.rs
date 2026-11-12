@@ -455,7 +455,9 @@ pub(crate) fn offer(outcome: FileInsightOutcome) -> Option<FileInsightOutcome> {
         BlobBody::Lfs {
             object: Some(b), ..
         } => b,
-        BlobBody::Lfs { object: None, .. } if bytes.size <= crate::live_settings::image_view_max_bytes() => {
+        BlobBody::Lfs { object: None, .. }
+            if bytes.size <= crate::live_settings::image_view_max_bytes() =>
+        {
             set_notice(msg::lfs_missing(&name));
             return None;
         }

@@ -128,13 +128,7 @@ pub(crate) fn anchored_popup(
 /// parent stays visible); with no room on the right it ends at the parent's
 /// left edge; with room on neither side it covers the parent's right part, the
 /// only place left. Always inside `bounds`.
-pub(crate) fn flyout_rect(
-    parent: Rect,
-    row_y: u16,
-    width: u16,
-    height: u16,
-    bounds: Rect,
-) -> Rect {
+pub(crate) fn flyout_rect(parent: Rect, row_y: u16, width: u16, height: u16, bounds: Rect) -> Rect {
     let width = width.min(bounds.width);
     let height = height.min(bounds.height);
     let x = if parent.right().saturating_add(width) <= bounds.right() {

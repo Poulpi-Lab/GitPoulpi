@@ -538,15 +538,15 @@ tabs_position_help = "Dónde van las pestañas de repositorio: Arriba (por defec
 graph_color_theme = "Tema de color del grafo"
 graph_color_theme_help = "La paleta de colores de carriles del grafo del Log. Seguir el tema usa la paleta del tema elegido; cualquier otra entrada la reemplaza, así que se puede combinar cualquier tema con cualquier paleta. Se aplica al cerrar Ajustes."
 graph_renderer = "Renderizador del grafo"
-graph_renderer_help = "auto dibuja el grafo como una imagen real en un terminal que lo admita, y como caracteres en todos los demás - incluso dentro de tmux o zellij, que heredan el entorno del terminal pero no dejan pasar la imagen, y dentro de herdr salvo que su ajuste kitty_graphics esté activado. image fuerza la imagen, text la desactiva. Requiere reiniciar."
+graph_renderer_help = "auto dibuja el grafo como una imagen real en un terminal que lo admita, y como caracteres en todos los demás - incluso dentro de zellij y screen, que heredan el entorno del terminal pero no dejan pasar la imagen, dentro de tmux salvo que el terminal de detrás admita sixel, y dentro de herdr salvo que su ajuste kitty_graphics esté activado. image fuerza la imagen, text la desactiva. Requiere reiniciar."
 image_protocol = "Protocolo de imagen"
-image_protocol_help = "Cómo llegan las imágenes (la imagen del grafo, los avatares de autor) al terminal. auto: el protocolo gráfico de Kitty en kitty, Ghostty y un herdr cuya configuración tenga kitty_graphics = true; imágenes en línea de iTerm2 en WezTerm, iTerm2 y mintty; sixel (solo los avatares) en Windows Terminal, foot, Konsole y mlterm; caracteres en el resto. kitty, iterm2 o sixel fuerza ese protocolo (kitty para un herdr cuya configuración esté en otro sitio); none desactiva las imágenes. Requiere reiniciar."
+image_protocol_help = "Cómo llegan las imágenes (la imagen del grafo, los avatares de autor) al terminal. auto: el protocolo gráfico de Kitty en kitty, Ghostty y un herdr cuya configuración tenga kitty_graphics = true; el protocolo de Kitty también en iTerm2 3.7.7 o posterior; imágenes en línea de iTerm2 en WezTerm, Rio, mintty y versiones anteriores de iTerm2; sixel (la columna del grafo y los avatares) en Windows Terminal, foot, Tabby, Konsole, mlterm y en tmux cuando el terminal de detrás admite sixel; caracteres en el resto. kitty, iterm2 o sixel fuerza ese protocolo (kitty para un herdr cuya configuración esté en otro sitio; sixel para un terminal que lo dibuja pero no se reconoce); none desactiva las imágenes. Requiere reiniciar."
 kitty_keyboard = "Protocolo de teclado de Kitty"
 kitty_keyboard_help = "auto pregunta al terminal, al iniciar y en unos 100 ms, si habla el protocolo de teclado de kitty, y lo usa si es así: los acordes que los terminales antiguos no distinguen (Control con puntuación, dígitos, Shift o Enter) llegan entonces tal cual en vez de chocar con códigos de control. Un terminal que no responde conserva las teclas clásicas. off nunca toca el modo de teclado del terminal. Requiere reiniciar."
 color_depth = "Profundidad de color"
 color_depth_help = "auto usa color de 24 bits, salvo en terminales que no lo muestran (Terminal de Apple, consola de Linux o un terminal de 256 colores sin COLORTERM), donde los colores se ajustan a las 256 o 16 entradas más cercanas. truecolor, 256 y 16 fuerzan una profundidad. Se aplica al instante."
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "Cursor de texto"
+text_cursor_help = "terminal coloca el cursor del propio terminal en el punto de inserción del campo de texto con foco, como una barra: se aplican los ajustes de cursor de tu terminal y la ventana de candidatos de un método de entrada se abre junto al cursor. drawn dibuja el cursor propio de GitPoulpi (un bloque o un guion bajo) y mantiene oculto el del terminal. Se aplica al instante."
 graph_show_stashes = { git = "Mostrar stashes en el grafo", local = "Mostrar guardados rápidos en el grafo" }
 graph_show_stashes_help = { git = "Cada stash tiene su propia fila en el Log, en su fecha: una cajita en un carril junto al commit sobre el que se hizo, unida a él por una línea discontinua. Al seleccionarla muestra lo que cambió; clic derecho (o .) ofrece Pop, Apply y Drop. Off deja los stashes solo en la sección STASHES. No se dibuja en modo solo.", local = "Cada guardado rápido tiene su propia fila en el Log, en su fecha: una cajita en un carril junto a la confirmación en la que se hizo, unida a ella por una línea discontinua. Al seleccionarla muestra lo que cambió; clic derecho (o .) ofrece Pop, Apply y Drop. Off deja los guardados rápidos solo en la sección GUARDADOS RÁPIDOS. No se dibuja en modo solo." }
 ref_connector = { git = "Conector ref-commit", local = "Conector ref-confirmación" }
@@ -3994,8 +3994,8 @@ mouse_gestures_in_2 = { git = "un divisor de panel o el límite de una columna d
 mouse_gestures_in_3 = { git = "arrastrar sobre el texto de un diff, vista de archivo, Blame o Historial del archivo lo selecciona, doble clic una palabra; y o Ctrl+C lo copia (solo texto del archivo, nunca márgenes); las demás apariciones de una palabra seleccionada se tiñen en el diff y el editor (y se marcan en la regla)", local = "arrastrar sobre el texto de unas diferencias, vista de archivo, Blame o Historial del archivo lo selecciona, doble clic una palabra; y o Ctrl+C lo copia (solo texto del archivo, nunca márgenes); las demás apariciones de una palabra seleccionada se tiñen en las diferencias y el editor (y se marcan en la regla)" }
 mouse_gestures_in_4 = { git = "desplaza la lista o el diff con foco/bajo el puntero; Shift+rueda (las dos grafías que informan los terminales) desplaza un diff/vista de archivo/blame *en horizontal*, mientras el ajuste de línea está desactivado", local = "desplaza la lista o las diferencias con foco/bajo el puntero; Shift+rueda (las dos grafías que informan los terminales) desplaza unas diferencias/vista de archivo/blame *en horizontal*, mientras el ajuste de línea está desactivado" }
 mouse_gestures_in_5 = "abre un menú contextual donde exista uno (ver la sección de cada panel arriba); el equivalente de teclado es siempre {{*global.context_menu}}"
-mouse_gestures_in_6 = "toda acción «Copiar ...» pide el portapapeles al *terminal* mediante OSC 52 - una TUI no puede alcanzarlo directamente; un terminal que ignora la secuencia simplemente no copia"
-mouse_gestures_in_7 = "las pistas de redimensión/puntero/mano abierta se envían mediante OSC 22 en terminales que lo admiten (kitty, foot, xterm; desigual en otros) - los divisores arrastrables y límites de columna también se iluminan dentro del propio búfer de la app, que no necesita ninguna cooperación del terminal"
+mouse_gestures_in_6 = "toda acción «Copiar ...» deja el texto en el portapapeles del sistema y, donde se sabe que el terminal lo respeta, lo envía además mediante OSC 52; por SSH o sin pantalla solo se envía OSC 52, y un terminal que ignora la secuencia no copia"
+mouse_gestures_in_7 = "las pistas de redimensión/puntero/mano abierta se envían mediante OSC 22 en terminales que lo admiten (kitty, Ghostty, foot, mintty; no en Rio, Alacritty, Windows Terminal ni iTerm2) - los divisores arrastrables y límites de columna también se iluminan dentro del propio búfer de la app, que no necesita ninguna cooperación del terminal"
 git_actions_then_25 = "abrir el menú LFS (el botón LFS de la barra; sus filas también están en la paleta)"
 git_actions_then_26 = { git = "LFS: {$fetch} de los objetos de todas las referencias", local = "LFS: {$fetch} los objetos de todas las referencias" }
 git_actions_then_27 = "LFS: escribir el contenido real sobre los punteros (sin conexión)"
@@ -4379,7 +4379,7 @@ change_language_title = "Cambiar idioma ({shown}/{total})"
 no_matching_language = "(ningún idioma coincide)"
 change_graph_color_theme_title = "Cambiar tema de color del grafo ({shown}/{total})"
 no_matching_graph_color_theme = "(ningún tema coincide)"
-language_picker_hint = "Up/Down/Ctrl+J/K o PageUp/PageDown para moverse, Enter para aplicar, Esc para cancelar"
+language_picker_hint = "Up/Down/Ctrl+J/K o PageUp/PageDown para moverte, Enter para aplicar, Esc para cancelar"
 rule_file_title_ignore = "Ignorar: ¿en qué archivo añadir? ({shown}/{total})"
 rule_file_title_binary = "Tratar como binario: ¿en qué archivo escribir? ({shown}/{total})"
 rule_file_title_text = "Tratar como texto: ¿en qué archivo escribir? ({shown}/{total})"
@@ -5958,7 +5958,7 @@ show_label = "Mostrar:"
 show_all = "Todo"
 show_none = "Nada"
 why_level_off = "No se muestra: el nivel elegido es {level}. Súbelo para ver estas líneas."
-hint_levels = "1-5: mostrar u ocultar un nivel  a: todo  n: nada"
+hint_levels = "1-5: mostrar u ocultar un nivel  a: todo  n: nada  Enter: operación de la línea  [ ]: fallos"
 palette_show_error = "Registro de actividad: Mostrar u ocultar el nivel Error"
 palette_show_warn = "Registro de actividad: Mostrar u ocultar el nivel Aviso"
 palette_show_info = "Registro de actividad: Mostrar u ocultar el nivel Info"
@@ -6001,25 +6001,25 @@ palette_scroll_right = "Registro de actividad: Desplazar a la derecha"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "Registro de actividad: desplaza las líneas largas hacia los lados (también Shift+rueda o la barra de desplazamiento horizontal)"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation}: error"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "Operación: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
-ctx_repository = "Repository: {repository}"
+ctx_repository = "Repositorio: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "Solicitada por: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "Id de la operación: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "Registro de actividad: Mostrar la operación de esta línea"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "Registro de actividad: Siguiente operación fallida"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "Registro de actividad: Operación fallida anterior"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "Selecciona antes una línea: haz clic en ella o pulsa ] para saltar a la siguiente operación fallida."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "Esta línea no está asociada a ninguna operación."
 
 [git_error]
 summary_host_key = "Aún no se conoce la clave de host SSH del remoto."
@@ -8752,13 +8752,13 @@ namespaces = "Espacios de nombres"
 # context: hint in the empty namespaces field
 namespaces_hint = "p. ej. acme, plataforma (vacío: el mío y todos a los que pertenezco)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "Una entrada por línea. Un nombre coincide con ese grupo o propietario y todo lo que cuelga de él (ptm coincide con ptm/produits/x, no con ptmx/y). Déjalo vacío para usar los tuyos y todos aquellos a los que perteneces."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Cada línea es una expresión regular que se compara con la ruta completa del repositorio, tal como la escribes (ejemplo: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "Expresiones regulares"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "Expresión no válida: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "Solicitud de un repositorio no clonado"
 # context: choice: ask each time

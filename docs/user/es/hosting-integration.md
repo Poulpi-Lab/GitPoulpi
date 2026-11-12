@@ -687,6 +687,11 @@ su tabla `[integrations.radar]` (todos desactivados por defecto; ver la
 - **solicitudes de revisión**: solicitudes abiertas que piden tu revisión;
 - **solicitudes abiertas**: todas las solicitudes abiertas de tu propio espacio de nombres y de cada organización o
   grupo del que eres miembro, o de los espacios de nombres que indiques. Nunca todo el host;
+  los **Espacios de nombres** del perfil (uno por línea en Ajustes > Integraciones > Radar, opcionalmente
+  como expresiones regulares) limitan las tres listas: una línea coincide con la ruta completa de un
+  repositorio cuando es igual a ella o es un prefijo de ruta que termina en `/` (`ptm` conserva
+  `ptm/produits/x`, no `ptmx/y`), y se aplica a las filas que devuelve el host, además de en el servidor
+  donde la búsqueda del host lo permite (los calificadores `user:` / `repo:` de GitHub);
 - **issues asignados**: issues abiertos asignados a ti.
 
 Responden GitHub, GitLab (incluido el autoalojado), Gitea, Forgejo, Azure DevOps (Services
@@ -740,10 +745,11 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Consulta la [referencia de la CLI](cli-reference.md#comandos) para ver todos los comandos. Nunca se acepta
-un token como argumento (`hosting login` imprime `stored: "os"` cuando el almacén de credenciales del
-sistema lo guarda, o `stored: "session"` más `store_error` cuando el almacén lo rechazó y el token
-vive en memoria solo durante esta sesión), y el servidor MCP no ofrece
-`hosting login`, así que un token nunca pasa por un agente.
+un token como argumento, y el servidor MCP no ofrece
+`hosting login`, así que un token nunca pasa por un agente. `hosting login`
+imprime `stored: "os"` cuando el almacén de credenciales del sistema guarda el token, o
+`stored: "session"` más `store_error` cuando el almacén lo rechazó y el token
+vive en memoria solo durante esta sesión.
 
 ## Solución de problemas
 

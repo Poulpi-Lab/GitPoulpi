@@ -25,8 +25,9 @@ La transparencia se dibuja sobre un tablero de ajedrez.
 
 ## Cómo se dibuja
 
-En un terminal con un protocolo de imagen (Kitty y Ghostty, WezTerm e iTerm2, Rio, mintty) la
-imagen es una imagen real. En cualquier otro sitio (Windows Terminal a secas, tmux, un
+En un terminal con un protocolo de imagen (Kitty y Ghostty, WezTerm e iTerm2, Rio, mintty, y los terminales
+sixel Windows Terminal, foot y Tabby) la
+imagen es una imagen real. En cualquier otro sitio (la consola de Windows a secas, zellij, un
 terminal que GitPoulpi no conoce) se dibuja con caracteres de medio bloque coloreados, con la
 mitad de la resolución vertical pero legible en todas partes; **Sin protocolo de imagen** se
 puede fijar en *Solo tarjeta de información*. **Protocolo de imagen** en la página

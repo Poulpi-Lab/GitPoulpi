@@ -415,7 +415,7 @@ envía ...»).
 
 Los terminales con el **protocolo de teclado de kitty** pueden enviar estos
 acordes. Ejemplos: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 y posteriores,
-y tmux o herdr cuando dejan pasar el protocolo. GitPoulpi usa el protocolo por
+y zellij (tmux no responde: consulta [Multiplexores](multiplexers.md#tmux)). GitPoulpi usa el protocolo por
 defecto:
 
 - Al arrancar, GitPoulpi pregunta a el terminal y espera como mucho unos 100 ms
@@ -879,9 +879,9 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Registro de actividad: Elegir el alcance |  |
 | Registro de actividad: Operaciones de git |  |
 | Registro de actividad: Registro de la aplicación |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Registro de actividad: Mostrar la operación de esta línea |  |
+| Registro de actividad: Siguiente operación fallida |  |
+| Registro de actividad: Operación fallida anterior |  |
 | Registro de actividad: Desplazar a la izquierda | `Left` |
 | Registro de actividad: Desplazar a la derecha | `Right` |
 | Registro de actividad: Copiar el último error |  |
@@ -1220,8 +1220,33 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Rehacer**. `Ctrl+Shift+Z` necesita el protocolo de teclado de kitty; `Ctrl+Y` funciona siempre |
 | `.`, `Menu`, `Shift+F10` | Abrir el menú contextual de la fila seleccionada |
 
-`Ctrl+Z` y `Ctrl+Y` no hacen nada mientras un campo de texto tiene el teclado.
-El editor tiene su propio deshacer de texto.
+### Ctrl+Z / Ctrl+Y en un campo de texto
+
+Mientras un campo de texto tiene el teclado, `Ctrl+Z` y `Ctrl+Y` (`Ctrl+Shift+Z`
+también) actúan sobre el texto de ese campo, nunca sobre el repositorio: un campo que
+tiene el teclado siempre gana, así que `Ctrl+Z` en el mensaje de commit no puede
+deshacer un commit. En cualquier otro sitio conservan su significado global (el
+diario de deshacer / rehacer de arriba). Esto vale para todos los campos de texto
+y editores multilínea: el mensaje de commit, los campos y editores de texto de
+Ajustes, los formularios de pull request y de issue, los diálogos de IA y todos
+los cuadros de filtro o de búsqueda.
+
+- **Escribir** se deshace palabra a palabra (una tanda de letras, una de espacios,
+  una de signos de puntuación), y escribir con una pausa de más de un segundo
+  empieza un paso nuevo. Varios retrocesos seguidos son un solo paso. Pegar, cortar,
+  `Ctrl+U` / `Ctrl+K`, insertar un fragmento o aceptar una compleción es un paso cada uno.
+- Deshacer devuelve el texto, el cursor y la selección. Una edición nueva
+  tras deshacer descarta lo que se podía rehacer.
+- Cada campo guarda un historial acotado (los últimos 200 pasos, unos 1 MB de
+  texto), y lo olvida cuando el campo se reemplaza desde fuera (una carpeta elegida
+  en el selector, un formulario recargado) o cuando otro campo toma el teclado.
+- Si no queda nada que deshacer, `Ctrl+Z` no hace nada: nunca pasa al deshacer del
+  repositorio mientras un campo tiene el teclado.
+- El **editor de instrucciones** de los ajustes de IA tiene además los botones
+  **Deshacer** y **Rehacer**, junto a Guardar y Cancelar, desactivados mientras no hay
+  nada a lo que volver.
+- El editor de código y el editor de merge conservan su propio deshacer
+  (`Edición: Deshacer`, `Merge: Deshacer`), que también cubre sus elecciones.
 
 ## Listas emergentes filtrables
 
@@ -1234,19 +1259,21 @@ resaltado:
 
 | Tecla | Acción |
 |---|---|
-| `Up` / `Down` | Mover una fila |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Mover una fila arriba / abajo |
 | `Home` / `End` | Primera / última fila |
 | `PageUp` / `PageDown` | Mover una página visible |
 | `Enter` | Elegir la fila resaltada |
 | `Esc` | Cerrar |
 
 En estos popups, `Home` y `End` mueven la lista, no el cursor del campo de
-filtro. `Ctrl+A` y `Ctrl+E` siguen moviendo el cursor al principio y al final, y
-`Ctrl+K` borra hasta el final del filtro. Ningún par `Ctrl+letra` mueve una lista
-(`Ctrl+N` es el prefijo de navegación, `Ctrl+P` la paleta de comandos), y `j` y
-`k` sin más se escriben en el filtro: aquí solo mueven las flechas, `PageUp` /
-`PageDown` y `Home` / `End`. En las listas sin campo de texto, `j` / `k` son una
-vía más para bajar / subir.
+filtro, y `Ctrl+K` / `Ctrl+J` también mueven la lista, de modo que `Ctrl+K` ya no
+borra hasta el final del filtro (`Ctrl+U` sigue vaciándolo; en un campo de texto
+normal fuera de una lista `Ctrl+K` sigue borrando hasta el final de la línea). `Ctrl+A` y
+`Ctrl+E` siguen moviendo el cursor al principio y al final. `Ctrl+J` / `Ctrl+K` mueven
+también todas las demás listas, con o sin campo de texto (`Ctrl+N` es el prefijo de
+navegación y `Ctrl+P` la paleta de comandos, así que no son teclas de lista). `j` y
+`k` sin más se escriben en el filtro; en las listas sin campo de texto, `j` / `k` son
+una vía más para bajar / subir.
 
 Con el ratón:
 
@@ -1498,7 +1525,8 @@ tarjeta «ha aparecido una rama» se describen en [Flujos de trabajo de ramas](b
 | `Enter` / `l` en una fila de archivo | Abrir el diff del archivo en el centro |
 | `Esc` / `h` | Volver a los commits |
 | `Right` | (commit con más de una ref) Abrir la lista de sus otras refs: `Up` / `Down` mueven, `Enter` hace checkout, `Esc` cierra |
-| `f` | Abrir la barra de búsqueda (consulta [Búsqueda](#búsqueda)) |
+| `f` | Abrir la barra de búsqueda (consulta [Búsqueda](#búsqueda)); nunca fue `/`, así que la búsqueda del Log no cambia |
+| `/` | Dar el foco al campo de filtro de Refs (la misma tecla lo hace cuando el panel Refs tiene el foco); se escribe como carácter cuando un campo de texto tiene el foco |
 | `c` | (con cambios sin commit) Seleccionar la fila WIP y poner el cursor en su campo de mensaje |
 | `Enter` en la fila WIP | Poner el cursor en el campo de mensaje de la fila WIP |
 | `.`, `Menu`, `Shift+F10` | El menú del commit. `Up` / `Down` mueven, `Right` / `l` / `Enter` abren un submenú, `Left` / `h` / `Esc` vuelven |

@@ -63,7 +63,7 @@ chip para distinguirlos.
 Un ámbito de carpeta busca repositorios **a dos niveles de profundidad**: las carpetas que están directamente
 en ella y las carpetas dentro de las que no son repositorios (`~/src/work/app`). Se omiten las carpetas ocultas,
 nunca se entra en un repositorio y se listan como mucho 200. La búsqueda se hace en segundo plano, nunca en el
-hilo que dibuja, y su resultado se conserva hasta que actualizas: el botón Actualizar, `r` o
+hilo que dibuja, y su resultado se conserva hasta que actualizas: el botón Actualizar, `r`, `F5` (la tecla de actualizar de la ventana, reasignable) o
 `Radar: Actualizar` vuelven a buscar en la carpeta (un repositorio clonado desde entonces aparece).
 El host sigue siendo opcional por repositorio: a un repositorio de la carpeta que **no está vinculado** a un host
 nunca se le pregunta. Solo aporta su fila de trabajo en curso, tiene una línea `sin vincular` con **Vincular...**
@@ -213,7 +213,7 @@ siempre tiene una tecla y un equivalente en la paleta.
 | Mostrar u ocultar las solicitudes de repositorios no clonados | `a` | `Radar: Mostrar solicitudes no clonadas` |
 | Mostrar u ocultar los borradores de las filas de toda la cuenta | `d` | `Radar: Mostrar borradores` |
 | Activar las solicitudes de revisión de toda la cuenta de un host | `T` / `Enter` en su línea de aviso / **Activar** | `Radar: Activar las solicitudes de revisión de toda la cuenta...` |
-| Actualizar | `r` | `Radar: Actualizar` |
+| Actualizar | `r`, `F5` | `Radar: Actualizar` |
 | El menú de la fila | `.` | `Radar: Menú de la fila...` |
 | Volver al inicio | `Esc` | `Radar: Volver al inicio` |
 
@@ -277,6 +277,8 @@ la [referencia de configuración](config-reference.md) y la [referencia de la CL
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center y Gerrit; Bitbucket Cloud no tiene un endpoint de toda la cuenta,
 así que sus solicitudes solo aparecen para los repositorios vinculados del ámbito.
 
+Los **Espacios de nombres** del perfil limitan todas sus listas a ciertos repositorios (Ajustes > Integraciones > Radar: un área de texto con una entrada por línea y una casilla **Expresiones regulares**). Una línea coincide con la ruta completa de un repositorio cuando es igual a ella o es un prefijo de ruta que termina en `/`: `ptm` conserva `ptm/produits/x` y descarta `ptmx/y` y `formation/y`. Con la casilla activada, cada línea es una expresión regular que se aplica a la ruta completa tal como la escribes (`^ptm/(produits|infra)/`); una línea no válida se muestra bajo el campo y no se guarda. Vacío significa sin límite.
+
 Cómo se colocan las filas:
 
 - Una fila que el ámbito ya lista (mismo host, proyecto, tipo y número) aparece una sola vez: **gana la fila
@@ -333,7 +335,7 @@ Dos casillas junto al filtro (aparecen cuando se está consultando una lista de 
 Ambas están en las insignias de `Ctrl+N` y en la paleta (`Radar: Mostrar solicitudes no clonadas`, `Radar: Mostrar borradores`).
 
 La respuesta de un perfil se guarda en `radar-account.json` durante **5 minutos**: si vuelves a abrir el Radar en ese
-tiempo, muestra las filas sin consultar al host. **Actualizar** (`r`) siempre consulta. Un host que dijo que fueras más despacio
+tiempo, muestra las filas sin consultar al host. **Actualizar** (`r` o `F5`) siempre consulta: cada repositorio y cada lista de toda la cuenta, sea cual sea la antigüedad de la última respuesta. Un host que dijo que fueras más despacio
 o rechazó el token no se vuelve a consultar en la misma ronda. Se conservan como máximo 300 filas por perfil y tipo,
 y una línea bajo **Repositorios** dice cuántas más había, o por qué no se pudo leer un perfil
 (**Reconectar** abre Ajustes > Integraciones).

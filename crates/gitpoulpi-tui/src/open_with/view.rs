@@ -142,7 +142,7 @@ pub(crate) fn render_card_actions(
     let label = format!(" {} ", msg::DEFAULT_BUTTON.get());
     let default_w = display_width(&label) as u16;
     let x = inner.x + 1;
-    let both = inner.width >= 1 + default_w + 2 + combo_w + 1;
+    let both = inner.width > 1 + default_w + 2 + combo_w;
     if !both && inner.width < combo_w + 2 {
         return None;
     }

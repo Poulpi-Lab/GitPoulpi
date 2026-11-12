@@ -27,6 +27,10 @@ const LONG_RUN: usize = 8;
 /// The text one key event adds to a paste; `None` for a key that cannot be
 /// part of pasted text (a chord, an arrow, `Esc`...).
 fn pasted_char(key: &KeyEvent) -> Option<char> {
+    // The LF of a pasted CRLF is reported as Ctrl+J.
+    if key.code == KeyCode::Char('j') && key.modifiers == KeyModifiers::CONTROL {
+        return Some('\n');
+    }
     if key
         .modifiers
         .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT)
@@ -64,10 +68,18 @@ pub(crate) fn is_release(event: &Event) -> bool {
 pub(crate) fn coalesce(run: &[Event]) -> Option<String> {
     let mut text = String::new();
     let mut presses = 0usize;
+    let mut after_enter = false;
     for event in run {
         match event {
             Event::Key(k) if k.kind == KeyEventKind::Press => {
-                text.push(pasted_char(k)?);
+                let c = pasted_char(k)?;
+                // CR then LF is one line break.
+                let lf_of_crlf = after_enter && k.code == KeyCode::Char('j');
+                after_enter = k.code == KeyCode::Enter;
+                if lf_of_crlf {
+                    continue;
+                }
+                text.push(c);
                 presses += 1;
             }
             e if is_release(e) => {}
@@ -87,7 +99,7 @@ pub(crate) fn coalesce(run: &[Event]) -> Option<String> {
 
 /// How long the next key of a run is awaited. Longer than ConPTY takes to
 /// turn a pasted chunk into key records, far shorter than two keystrokes.
-pub(crate) const GAP: std::time::Duration = std::time::Duration::from_millis(10);
+pub(crate) const GAP: std::time::Duration = std::time::Duration::from_millis(30);
 
 /// The most events one run takes before it is cut (a longer paste arrives as
 /// two).
@@ -160,6 +172,19 @@ mod tests {
         );
         // A trailing newline stays in the text.
         assert_eq!(coalesce(&keys("one\ntwo\n")).as_deref(), Some("one\ntwo\n"));
+    }
+
+    #[test]
+    fn a_pasted_crlf_is_one_line_break() {
+        // WezTerm reports the CR as Enter and the LF as Ctrl+J.
+        let ctrl_j = Event::Key(KeyEvent::new(KeyCode::Char('j'), KeyModifiers::CONTROL));
+        let mut run = keys("first");
+        run.push(press(KeyCode::Enter));
+        run.push(ctrl_j.clone());
+        run.extend(keys("second"));
+        assert_eq!(coalesce(&run).as_deref(), Some("first\nsecond"));
+        // A lone Ctrl+J is a line break too, and is text for a run to start on.
+        assert!(is_text_press(&ctrl_j));
     }
 
     #[test]

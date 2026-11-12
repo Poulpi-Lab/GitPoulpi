@@ -1,4 +1,4 @@
-**English**
+**English** · [Čeština](cs/multiplexers.md) · [Deutsch](de/multiplexers.md) · [Español](es/multiplexers.md) · [Français](fr/multiplexers.md) · [Italiano](it/multiplexers.md) · [日本語](ja/multiplexers.md) · [한국어](ko/multiplexers.md) · [Nederlands](nl/multiplexers.md) · [Polski](pl/multiplexers.md) · [Português (Brasil)](pt-BR/multiplexers.md) · [Português (Portugal)](pt-PT/multiplexers.md) · [Русский](ru/multiplexers.md) · [Svenska](sv/multiplexers.md) · [Türkçe](tr/multiplexers.md) · [Українська](uk/multiplexers.md) · [简体中文](zh-CN/multiplexers.md)
 
 # Multiplexers and panes
 

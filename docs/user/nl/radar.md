@@ -53,7 +53,7 @@ Een mapbereik zoekt repositories **twee niveaus diep**: de mappen die er direct 
 die mappen die zelf geen repository zijn (`~/src/work/app`). Verborgen mappen worden overgeslagen, een
 repository wordt nooit binnengegaan, en er worden hoogstens 200 repositories getoond. De zoektocht loopt op
 de achtergrond, nooit op de draad die tekent, en het resultaat blijft staan tot je ververst: de knop
-Vernieuwen, `r` of `Radar: Vernieuwen` doorzoekt de map opnieuw (een repository die sindsdien is
+Vernieuwen, `r`, `F5` (de verversingstoets van het venster, opnieuw toewijsbaar) of `Radar: Vernieuwen` doorzoekt de map opnieuw (een repository die sindsdien is
 gekloond, verschijnt dan).
 
 Hosting blijft per repository opt-in: een repository in de map die **niet is gekoppeld** aan een host wordt
@@ -177,7 +177,7 @@ toets, of het palet (`Radar: ...`). Een muisactie heeft altijd een toets en een 
 | De aanvragen van niet-gekloonde repositories tonen of verbergen | `a` | `Radar: Niet-gekloonde verzoeken tonen` |
 | Concepten van de accountbrede rijen tonen of verbergen | `d` | `Radar: Concepten tonen` |
 | De accountbrede reviewverzoeken van een host inschakelen | `T` / `Enter` op zijn hintrij / **Inschakelen** | `Radar: Accountbrede reviewverzoeken inschakelen...` |
-| Vernieuwen | `r` | `Radar: Vernieuwen` |
+| Vernieuwen | `r`, `F5` | `Radar: Vernieuwen` |
 | Het rijmenu | `.` | `Radar: Rijmenu...` |
 | Terug naar Start | `Esc` | `Radar: Terug naar Start` |
 
@@ -231,6 +231,8 @@ concepten, namespaces) stel je in met `gitpoulpi hosting integrations radar` of 
 de [configuratienaslag](config-reference.md) en de [CLI-naslag](cli-reference.md). GitHub, GitLab,
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center en Gerrit antwoorden; Bitbucket Cloud heeft geen accountbreed
 eindpunt, dus zijn aanvragen verschijnen alleen voor de gekoppelde repositories van het bereik.
+
+De **Namespaces** van het profiel beperken al zijn lijsten tot bepaalde repositories (Instellingen > Integraties > Radar: een tekstgebied met één item per regel, en een selectievakje **Reguliere expressies**). Een regel komt overeen met het volledige pad van een repository als hij eraan gelijk is of een padvoorvoegsel is dat bij een `/` eindigt: `ptm` houdt `ptm/produits/x` en laat `ptmx/y` en `formation/y` vallen. Met het selectievakje aan is elke regel een reguliere expressie die op het volledige pad wordt uitgevoerd zoals je hem schrijft (`^ptm/(produits|infra)/`); een regel die niet geldig is, wordt onder het veld getoond en niet opgeslagen. Leeg betekent geen limiet.
 
 Hoe de rijen worden geplaatst:
 
@@ -287,7 +289,7 @@ Twee selectievakjes naast het filter (ze verschijnen zodra een accountbrede lijs
 Beide staan op de badges van `Ctrl+N` en in het palet (`Radar: Niet-gekloonde verzoeken tonen`, `Radar: Concepten tonen`).
 
 Het antwoord van een profiel wordt **5 minuten** bewaard in `radar-account.json`: de Radar binnen die
-tijd opnieuw openen toont de rijen zonder de host te vragen. **Vernieuwen** (`r`) vraagt altijd. Een host die zei dat het
+tijd opnieuw openen toont de rijen zonder de host te vragen. **Vernieuwen** (`r` of `F5`) vraagt altijd: elke repository en elke accountbrede lijst, wat de leeftijd van het laatste antwoord ook is. Een host die zei dat het
 rustiger aan moest of het token weigerde, wordt in dezelfde ronde niet opnieuw gevraagd. Er worden hoogstens 300 rijen bewaard per profiel en soort,
 en een regel onder **Repositories** zegt hoeveel er nog meer waren, of waarom een profiel niet kon worden gelezen
 (**Opnieuw verbinden** opent Instellingen > Integraties).

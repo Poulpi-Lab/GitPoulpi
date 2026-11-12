@@ -17,10 +17,10 @@ Naast die bestanden bevat het archief `gitpoulpi-launch`, een klein programma da
 - Een **`git` op je systeem**, vindbaar via je `PATH`. GitPoulpi gebruikt libgit2
   voor de meeste handelingen en jouw `git` voor de rest.
   Versie **2.34 of nieuwer** is nodig. Op macOS werkt de `git` uit Apple's Command Line Tools, en die van Homebrew ook.
-- Een **terminal** met muisondersteuning. kitty, Ghostty, WezTerm en iTerm2 (en ook Windows Terminal en foot, via sixel)
+- Een **terminal** met muisondersteuning. kitty, Ghostty, WezTerm, Rio en iTerm2 (en ook Windows Terminal, foot en Tabby, via sixel)
   tekenen de commit-grafiek als afbeeldingen. Andere terminals (de
-  Windows-console, tmux en de meeste andere) tonen een grafiek van tekens. Zie
-  [Een terminal kiezen](terminals.md).
+  Windows-console, zellij, screen en de meeste andere) tonen een grafiek van tekens. Zie
+  [Een terminal kiezen](terminals.md) en [Multiplexers](multiplexers.md).
 - Een **Nerd Font** of een lettertype met emoji, voor de pictogrammen in de
   werkbalk en de zijbalk.
 - Optioneel: **`git-lfs`** 3.0 of nieuwer, voor Git LFS-repositories. Zonder

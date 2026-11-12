@@ -252,8 +252,8 @@ prefix getoond (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Deel verbreden | `]` |
 | `commit_column` | `narrower_part` | Deel versmallen | `[` |
 | `commit_column` | `reset_widths` | Breedtes van de delen herstellen | `0` |
-| `commit_column` | `fit` | Kolom aan inhoud aanpassen | `=` |
-| `commit_column` | `fit_all` | Alle kolommen aan inhoud aanpassen | `+` |
+| `commit_column` | `fit` | Onderdeel aan inhoud aanpassen | `=` |
+| `commit_column` | `fit_all` | Alle onderdelen aan inhoud aanpassen | `+` |
 | `file_insight` | `blame_card` | Blame: Detailkaart tonen of verbergen | `i` |
 | `file_insight` | `blame_next` | Blame: Volgende hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: Vorige hunk | `p` |
@@ -413,8 +413,8 @@ toets: `Ctrl+Shift+N` komt bijvoorbeeld aan als `Ctrl+N`, `Ctrl+I` als `Tab` en
 terminal stuurt ...").
 
 Terminals met het **kitty-toetsenbordprotocol** kunnen deze toetscombinaties sturen.
-Voorbeelden: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 en nieuwer, en tmux
-of herdr als ze het protocol doorgeven. GitPoulpi gebruikt het protocol
+Voorbeelden: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 en nieuwer, en zellij (tmux
+antwoordt er niet op: zie [Multiplexers](multiplexers.md#tmux)). GitPoulpi gebruikt het protocol
 standaard:
 
 - Bij het opstarten vraagt GitPoulpi het aan de terminal en wacht hoogstens
@@ -878,9 +878,9 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Activiteitenlogboek: Het bereik kiezen |  |
 | Activiteitenlogboek: Git-bewerkingen |  |
 | Activiteitenlogboek: Applicatielogboek |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Activiteitenlogboek: Bewerking van deze regel tonen |  |
+| Activiteitenlogboek: Volgende mislukte bewerking |  |
+| Activiteitenlogboek: Vorige mislukte bewerking |  |
 | Activiteitenlogboek: Naar links scrollen | `Left` |
 | Activiteitenlogboek: Naar rechts scrollen | `Right` |
 | Activiteitenlogboek: Laatste fout kopiëren |  |
@@ -1065,8 +1065,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Weergave: commit-kolom: deel verbreden | `]` |
 | Weergave: commit-kolom: deel versmallen | `[` |
 | Weergave: commit-kolom: breedtes van de delen herstellen | `0` |
-| Weergave: commit-kolom: Kolom aan inhoud aanpassen | `=` |
-| Weergave: commit-kolom: Alle kolommen aan inhoud aanpassen | `+` |
+| Weergave: commit-kolom: Onderdeel aan inhoud aanpassen | `=` |
+| Weergave: commit-kolom: Alle onderdelen aan inhoud aanpassen | `+` |
 | Weergave: commit-kolom: menu van de geselecteerde rij | `.` |
 | Weergave: commit-kolom: kolommen kiezen |  |
 | Weergave: commit-kolom: Ref omschakelen |  |
@@ -1219,8 +1219,32 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Opnieuw doen**. `Ctrl+Shift+Z` heeft het kitty-toetsenbordprotocol nodig; `Ctrl+Y` werkt altijd |
 | `.`, `Menu`, `Shift+F10` | Het contextmenu van de geselecteerde rij openen |
 
-`Ctrl+Z` en `Ctrl+Y` doen niets zolang een tekstveld het toetsenbord heeft. De
-editor heeft zijn eigen tekst-ongedaanmaken.
+### Ctrl+Z / Ctrl+Y in een tekstveld
+
+Zolang een tekstveld het toetsenbord heeft, werken `Ctrl+Z` en `Ctrl+Y` (ook
+`Ctrl+Shift+Z`) op de tekst van dat veld, nooit op de repository: een veld dat het
+toetsenbord heeft wint altijd, dus `Ctrl+Z` in het commitbericht kan geen commit
+ongedaan maken. Overal elders houden ze hun globale betekenis (het journaal voor
+ongedaan maken en opnieuw hierboven). Dit geldt voor elk tekstveld en elke editor met
+meerdere regels: het commitbericht, de velden en teksteditors van Instellingen, de
+formulieren voor pull requests en issues, de AI-dialogen en elk filter- of zoekvak.
+
+- **Typen** wordt woord voor woord ongedaan gemaakt (een reeks letters, een reeks
+  spaties, een reeks leestekens), en typen dat langer dan een seconde pauzeert, begint
+  een nieuwe stap. Meerdere backspaces achter elkaar zijn één stap. Een plakactie, een
+  knipactie, `Ctrl+U` / `Ctrl+K`, een ingevoegd fragment of een geaccepteerde aanvulling
+  is telkens één stap.
+- Een undo brengt de tekst, de cursor en de selectie terug. Een nieuwe bewerking na een
+  undo laat weg wat opnieuw gedaan had kunnen worden.
+- Elk veld houdt een begrensde geschiedenis bij (de laatste 200 stappen, ongeveer 1 MB
+  tekst), en vergeet die als het veld van buitenaf wordt vervangen (een map gekozen in de
+  kiezer, een formulier opnieuw geladen) of een ander veld het toetsenbord neemt.
+- Als er niets meer ongedaan te maken is, doet `Ctrl+Z` niets: het valt nooit door naar het
+  ongedaan maken van de repository zolang een veld het toetsenbord heeft.
+- De **Instructie-editor** van de AI-instellingen heeft ook knoppen **Ongedaan maken** en
+  **Opnieuw**, naast Opslaan en Annuleren, uitgeschakeld zolang er niets is om naar terug of vooruit te stappen.
+- De code-editor en de mergeeditor houden hun eigen undo (`Bewerken: Ongedaan maken`,
+  `Merge: Ongedaan maken`), die ook hun keuzes dekt.
 
 ## Filterbare popuplijsten
 
@@ -1232,18 +1256,19 @@ Deze toetsen verplaatsen de markering:
 
 | Toets | Actie |
 |---|---|
-| `Up` / `Down` | Een rij verplaatsen |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Een rij omhoog / omlaag verplaatsen |
 | `Home` / `End` | Eerste / laatste rij |
 | `PageUp` / `PageDown` | Een zichtbare pagina verplaatsen |
 | `Enter` | De gemarkeerde rij kiezen |
 | `Esc` | Sluiten |
 
 In deze popups verplaatsen `Home` en `End` de lijst, niet de cursor van het
-filterveld. `Ctrl+A` en `Ctrl+E` verplaatsen de cursor nog steeds naar het begin
-en het einde, en `Ctrl+K` wist tot het einde van het filter. Geen enkel
-`Ctrl+letter`-paar verplaatst een lijst (`Ctrl+N` is het navigatieprefix, `Ctrl+P`
-het opdrachtenpalet) en gewone `j` en `k` worden in het filter getypt: alleen de
-pijlen, `PageUp` / `PageDown` en `Home` / `End` verplaatsen hier. In lijsten
+filterveld, en `Ctrl+K` / `Ctrl+J` verplaatsen de lijst ook, dus `Ctrl+K` wist niet
+langer tot het einde van het filter (`Ctrl+U` wist het nog wel; in een gewoon tekstveld
+buiten een lijst blijft `Ctrl+K` tot het einde van de regel wissen). `Ctrl+A` en
+`Ctrl+E` verplaatsen de cursor nog steeds naar het begin en het einde. `Ctrl+J` / `Ctrl+K` verplaatsen elke andere lijst ook, met of zonder
+tekstveld (`Ctrl+N` is het navigatieprefix en `Ctrl+P` het opdrachtenpalet, dus zij zijn
+geen lijsttoetsen). Gewone `j` en `k` worden in het filter getypt; in lijsten
 zonder tekstveld zijn `j` / `k` een extra manier om omlaag / omhoog te gaan.
 
 Met de muis:
@@ -1496,7 +1521,8 @@ en hun dialogen, de wachtkaart en de kaart "er is een branch verschenen" worden 
 | `Enter` / `l` op een bestandsrij | De diff van het bestand in het midden openen |
 | `Esc` / `h` | Terug naar de commits |
 | `Right` | (commit met meer dan één ref) De lijst van zijn andere refs openen: `Up` / `Down` verplaatsen, `Enter` checkt uit, `Esc` sluit |
-| `f` | De zoekbalk openen (zie [Zoeken](#zoeken)) |
+| `f` | De zoekbalk openen (zie [Zoeken](#zoeken)); dit was nooit `/`, dus het zoeken van de Log is ongewijzigd |
+| `/` | Het filterveld van Refs focussen (dezelfde toets doet het als het paneel Refs de focus heeft); als teken getypt als een tekstveld de focus heeft |
 | `c` | (met niet-gecommitte wijzigingen) De WIP-rij selecteren en de cursor in haar berichtveld zetten |
 | `Enter` op de WIP-rij | De cursor in het berichtveld van de WIP-rij zetten |
 | `.`, `Menu`, `Shift+F10` | Het commit-menu. `Up` / `Down` verplaatsen, `Right` / `l` / `Enter` openen een submenu, `Left` / `h` / `Esc` gaan terug |

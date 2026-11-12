@@ -684,6 +684,11 @@ hele host, gekloond of niet, met drie schakelaars in zijn tabel `[integrations.r
 - **reviewverzoeken**: openstaande verzoeken die om jouw review vragen;
 - **openstaande verzoeken**: elk openstaand verzoek van je eigen namespace en van elke org of
   groep waarvan je lid bent, of van de namespaces die je noemt. Nooit de hele host;
+  de **Namespaces** van het profiel (één per regel in Instellingen > Integraties > Radar, desgewenst
+  als reguliere expressies) beperken alle drie de lijsten: een regel komt overeen met het volledige pad
+  van een repository als hij eraan gelijk is of een padvoorvoegsel is bij een `/` (`ptm` houdt
+  `ptm/produits/x`, niet `ptmx/y`), en wordt toegepast op de rijen die de host teruggeeft, plus aan
+  serverzijde waar de zoekopdracht van de host het toelaat (de kwalificaties `user:` / `repo:` van GitHub);
 - **toegewezen issues**: openstaande issues die aan jou zijn toegewezen.
 
 GitHub, GitLab (ook self-managed), Gitea, Forgejo, Azure DevOps (Services
@@ -711,8 +716,8 @@ snelheidslimiet laat alleen dat profiel mislukken. Antwoorden worden vijf minute
 In Instellingen > Integraties heeft een verbonden codehostprofiel een blok **Radar**
 onder zijn SSH-sleutel: één selectievakje per lijst (*Verzoeken die wachten op mijn review*,
 *Elk openstaand verzoek*, *Concepten meenemen*, *Aan mij toegewezen issues*, de laatste
-afwezig voor hosts zonder issues), een veld *Namespaces* (door komma's gescheiden; leeg
-betekent je eigen en alle waarvan je lid bent) en de keuze *Verzoek van een
+afwezig voor hosts zonder issues), een tekstgebied *Namespaces* (één item per regel, met een selectievakje *Reguliere expressies*; leeg
+betekent geen limiet) en de keuze *Verzoek van een
 niet-gekloonde repository*: *Vragen*, *Klonen* of *Reviewen via de API*.
 Alles wordt opgeslagen terwijl je wijzigt. Hosts zonder accountbrede query (Bitbucket
 Cloud) tonen in plaats daarvan één regel die dat zegt. Het opdrachtenpalet bereikt het blok
@@ -737,11 +742,11 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Zie de [CLI-naslag](cli-reference.md#opdrachten) voor elke opdracht. Een token
-wordt nooit als argument geaccepteerd (`hosting login` drukt `stored: "os"` af als de
-credential store van het besturingssysteem het bewaart, of `stored: "session"` plus
-`store_error` als de store het weigerde en het token alleen voor deze sessie in het
-geheugen leeft), en de MCP-server biedt `hosting login` niet
-aan, dus een token gaat nooit door een agent heen.
+wordt nooit als argument geaccepteerd, en de MCP-server biedt `hosting login` niet
+aan, dus een token gaat nooit door een agent heen. `hosting login` drukt
+`stored: "os"` af als de credential store van het besturingssysteem het token bewaart, of
+`stored: "session"` plus `store_error` als de store het weigerde en het token alleen voor
+deze sessie in het geheugen leeft.
 
 ## Probleemoplossing
 

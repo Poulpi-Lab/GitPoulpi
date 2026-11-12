@@ -199,7 +199,8 @@ Zie [Hosting en issuetrackers](hosting-integration.md).
   ref op de commit.
 - **Klik met rechts op een refpil** voor één menu met de acties van de ref en de acties van
   de commit.
-- **Klik met rechts op de kop** om kolommen te tonen of te verbergen: een checklist (`[x]` / `[ ]`) met een ✕ in de titel; klik op een rij of gebruik de pijltoetsen en `Spatie` / `Enter`, en sluit hem met de ✕, `Esc` of een klik ernaast (het palet: `Weergave: Log: Kolommen kiezen om te tonen`). Onder de selectievakjes: `<kolom> aan inhoud aanpassen` (de kolom waarop met rechts is geklikt), `Alle kolommen aan inhoud aanpassen` en `Kolombreedtes herstellen`.
+- **Klik met rechts op de kop** om kolommen te tonen of te verbergen: een checklist (`[x]` / `[ ]`) met een ✕ in de titel; klik op een rij of gebruik de pijltoetsen en `Spatie` / `Enter`, en sluit hem met de ✕, `Esc` of een klik ernaast (het palet: `Weergave: Log: Kolommen kiezen om te tonen`). Onder de selectievakjes: `<kolom> aan inhoud aanpassen` (de kolom waarop met rechts is geklikt), `Alle kolommen aan inhoud aanpassen` en `Kolombreedtes herstellen`. Het toetsenbordequivalent van de rechtsklik: `Shift+C` om een kolom te kiezen, daarna `.` (of `Shift+F10`) opent hetzelfde menu erop.
+- **De kolommen van de Radar** werken hetzelfde: sleep de scheiding na de kolom Repository, `#`, Auteur of Leeftijd om hem te schalen, **dubbelklik erop** om de kolom aan zijn breedste item aan te passen (`C` kiest een kolom, daarna `=`; `+` past elke kolom aan), en **klik met rechts op een kolomtitel** (of `C`, daarna `.`) voor `<kolom> aan inhoud aanpassen` en `Alle kolommen aan inhoud aanpassen`.
 - **Klik op `↑`, `↓` of `✕`** in de zoekbalk om naar de vorige of volgende treffer te gaan,
   of de balk te sluiten.
 - **Klik op `#12`, `ABC-12` of `AB#12`** in een commit-bericht, in het rechterpaneel, om dat
@@ -339,8 +340,9 @@ Elke verwerping vraagt eerst bevestiging.
 - **Wijs een rij aan** voor de tooltip van de Log (het hele bericht, de naam en het e-mailadres van de auteur, de volledige datum, naargelang het deel onder de aanwijzer).
 - **Klik met rechts op een rij** voor haar menu: tonen in de Log, de diff van het bestand in die commit, het bestand bij die commit, de blame ervan, en dan het menu van de Log voor de commit. De menutoets doet hetzelfde met het toetsenbord.
 - **Sleep een grens in de kopregel** (`ui.column_resize`: standaard de scheidingscel van één cel tussen twee delen, gemarkeerd met een gedempte `│` in de kop en als accentlijn over de kolom getekend zolang de aanwijzer erop staat, waarbij slepen vanaf elk punt ervan schaalt; met `header` de eerste letter van de volgende naam, die oplicht zolang de aanwijzer erop staat) om het deel links ervan te schalen: banen, bericht, auteur, datum, refs, wijzigingen of SHA. De cel direct na het laatste deel is de grens van het laatste deel.
+- **Dubbelklik op een grens in de kopregel** om het deel links ervan aan zijn inhoud aan te passen, zoals de grenzen van de Log doen: de breedte die zijn breedste rij helemaal toont, nooit breder dan de kolom (het toetsenbord: klik op een rij of `Ctrl+N` om de kolom de toetsen te geven, `Tab` om het deel te kiezen, dan `=`; `+` past elk deel aan; het palet heeft `Onderdeel aan inhoud aanpassen` en `Alle onderdelen aan inhoud aanpassen`). Het bericht houdt wat de andere delen overlaten.
 - **Sleep een naam van de kopregel** over een andere om het deel daarheen te verplaatsen: hetzelfde spook, dezelfde gedimde bron en accentbalk als bij de kop van de Log, en het deel verplaatst als je loslaat (`Esc` annuleert; `<` / `>` op het toetsenbord, na `Tab`, doen hetzelfde, één plaats per keer).
-- **Rechtsklik op de kopregel** om te kiezen welke delen getoond worden (Ref, Grafiek, Auteur, Datum, Wijzigingen, SHA; Bericht is altijd zichtbaar); de checklist heeft een ✕ in de titel. Het palet heeft `Kolommen kiezen` en een omschakelaar per deel.
+- **Rechtsklik op de kopregel** om te kiezen welke delen getoond worden (Ref, Grafiek, Auteur, Datum, Wijzigingen, SHA; Bericht is altijd zichtbaar); de checklist heeft een ✕ in de titel. Eronder: `<deel> aan inhoud aanpassen` (het deel waarop met rechts is geklikt) en `Alle kolommen aan inhoud aanpassen`. Het palet heeft `Kolommen kiezen` (het menu vanaf het toetsenbord, op het deel dat `Tab` koos) en een omschakelaar per deel.
 - **Shift+wiel** of een horizontaal wiel scrolt de rijen zijwaarts als ze breder zijn dan de kolom.
 - **Sleep de rechterrand** van de kolom om haar te herschalen. **Klik op de strook `›`** (of op de ✕ op de kolom, of **klik op het gekozen segment** van de keuze `Bestand │ Alles` in de balk) om haar terug te halen of te verbergen.
 
@@ -429,13 +431,23 @@ De aanwijzer toont een verplaatsvorm boven de titelbalk en een schaalvorm boven 
 
 Sommige terminals laten GitPoulpi de muisaanwijzer veranderen: een formaataanwijzer boven
 scheidingslijnen, boven een kolomgrens van de Log, de Radar en de commitkolom (ook tijdens het
-slepen ervan), een hand boven klikbare items. Dit werkt in kitty, foot, Ghostty, WezTerm en
-recente xterm (de reeks `OSC 22`). Hij wordt alleen verstuurd als de vorm verandert, nooit in
-tmux, screen, zellij of herdr, en de standaardaanwijzer wordt hersteld als GitPoulpi afsluit.
-In andere terminals verandert de aanwijzer niet. De scheidingslijn of de knop onder de aanwijzer
+slepen ervan), een hand boven klikbare items. Dit werkt in kitty, foot, Ghostty, mintty en een
+WezTerm-build met upstream-PR #8092 (de reeks `OSC 22`). Hij wordt alleen verstuurd als de vorm
+verandert, binnen tmux alleen ingepakt voor de passthrough (`allow-passthrough on`; kitty en foot
+tonen hem, Ghostty niet), en nooit in screen, zellij of herdr. De standaardaanwijzer wordt hersteld
+als GitPoulpi afsluit. In andere terminals (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows
+Terminal, xterm) verandert de aanwijzer niet; zie
+[Een terminal kiezen](terminals.md#vorm-van-de-muisaanwijzer-osc-22). De scheidingslijn of de knop onder de aanwijzer
 licht in elke terminal op.
 
 Hetzelfde soort component geeft overal in de app dezelfde aanwijzer.
+
+- **Knoppen zijn echte knoppen**, in Instellingen (Integraties: Bewerken, Verbinding verbreken,
+  Verwijderen, Bladeren, Wissen, de fragmentknoppen van de instructie-editor...)
+  en in dialogen: gevulde labels met opvulling op een gevulde achtergrond die oplicht onder de
+  aanwijzer, gedimd als ze uitgeschakeld zijn, nooit tekst tussen `[ ]`. De enige haakjes die
+  overblijven zijn de vinkjes `[x]` / `[ ]`, die selectievakjes zijn en de hand krijgen
+  zoals elk ander bedieningselement.
 
 - **De wijzende hand** staat op bedieningselementen: knoppen, selectievakjes en schakelaars,
   keuzelijsten (in Instellingen, de panelen met issues en pull requests, de Radar, dialogen),
@@ -465,6 +477,9 @@ alleen terwijl je een ref draagt.
 
 ## Kopiëren naar het klembord
 
-**Pad kopiëren** en enkele andere kopieeracties sturen de tekst naar de terminal, die haar op
-het klembord zet (OSC 52). Ondersteunt je terminal dit niet, dan wordt er niets gekopieerd. De
-kopieeracties voor geselecteerde tekst gebruiken direct het systeemklembord.
+Kopieeracties zetten de tekst op het systeemklembord van de machine waarop GitPoulpi draait
+en sturen haar, waar de terminal bekend staat als iemand die dat honoreert, ook naar de terminal
+(OSC 52). Via SSH, of zonder beeldscherm, wordt alleen OSC 52 verstuurd: ondersteunt je terminal
+dat niet (iTerm2 tot zijn klembordrechten aan staan, Terminal.app, GNU screen), dan wordt er niets
+gekopieerd en zegt de statusbalk dat de tekst alleen naar de terminal is gestuurd. Zie
+[Een terminal kiezen](terminals.md#klembord-kopieeracties).

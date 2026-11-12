@@ -202,7 +202,7 @@ Het paneel heeft geen titel: de kolomkoppen zeggen wat het is. Tags worden getek
 | Kolom | Toont |
 |---|---|
 | **Ref** | Gekleurde pillen voor de branches en tags op de commit: een laptoppictogram voor lokaal, een wereldbol voor remote, een tagpictogram voor tags, `+N` als meer refs daarheen wijzen. |
-| **Grafiek** | De branchbanen, merges en vertakkingspunten. Getekend als afbeeldingen in kitty, Ghostty, WezTerm en iTerm2 (en ook Windows Terminal en foot, via sixel), en als tekens in andere terminals. De baankleuren komen uit het thema of een palet dat je kiest (zie [Thema's](themes.md)). Op zijn minimale breedte (één commitpunt) is de kolom compact: elke commit op één baan, zonder branch- of mergelijnen. |
+| **Grafiek** | De branchbanen, merges en vertakkingspunten. Getekend als afbeeldingen in kitty, Ghostty, WezTerm, Rio en iTerm2 (en ook Windows Terminal, foot en Tabby, via sixel), en als tekens in andere terminals. De baankleuren komen uit het thema of een palet dat je kiest (zie [Thema's](themes.md)). Op zijn minimale breedte (één commitpunt) is de kolom compact: elke commit op één baan, zonder branch- of mergelijnen. |
 | **Bericht** | De samenvatting van de commit. |
 | **Auteur** | De auteur, met een optionele avatar. |
 | **Datum** | De datum van de auteur, in het formaat dat je kiest. |

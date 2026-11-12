@@ -29,8 +29,8 @@ moet doen. Transparantie wordt over een dambordpatroon getekend.
 ## Hoe het wordt getekend
 
 Op een terminal met een afbeeldingsprotocol (Kitty en Ghostty, WezTerm en
-iTerm2, Rio, mintty) is de afbeelding een echte afbeelding. Overal elders
-(gewone Windows Terminal, tmux, een terminal die GitPoulpi niet kent) wordt ze
+iTerm2, Rio, mintty en de sixel-terminals Windows Terminal, foot en Tabby) is de afbeelding een echte afbeelding. Overal elders
+(de gewone Windows-console, zellij, een terminal die GitPoulpi niet kent) wordt ze
 getekend met gekleurde halfblok-tekens, de helft van de verticale resolutie
 maar overal leesbaar; **Zonder afbeeldingsprotocol** kan worden ingesteld op
 *Alleen infokaart*. **Afbeeldingsprotocol** op de pagina **Log & grafiek** dwingt er

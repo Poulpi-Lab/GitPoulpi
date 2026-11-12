@@ -22,7 +22,14 @@ pub(crate) fn environment() -> Vec<String> {
     ));
     let var = |name: &str| std::env::var(name).ok().filter(|v| !v.is_empty());
     let mut terminal = Vec::new();
-    for name in ["TERM_PROGRAM", "TERM", "COLORTERM", "WT_SESSION"] {
+    for name in [
+        "TERM_PROGRAM",
+        "TERM_PROGRAM_VERSION",
+        "LC_TERMINAL",
+        "TERM",
+        "COLORTERM",
+        "WT_SESSION",
+    ] {
         if let Some(v) = var(name) {
             terminal.push(format!("{name}={v}"));
         }
@@ -31,9 +38,16 @@ pub(crate) fn environment() -> Vec<String> {
         .map(|(w, h)| format!("{w}x{h}"))
         .unwrap_or_else(|_| "unknown size".to_string());
     out.push(format!("terminal: {} ({size})", terminal.join(" ")));
-    let backend = gitpoulpi_config::Settings::resolve_ambient()
+    let settings = gitpoulpi_config::Settings::resolve_ambient().ok();
+    out.extend(super::capabilities::lines(
+        &|name| std::env::var(name).ok(),
+        &|path| std::fs::read_to_string(path).ok(),
+        &super::capabilities::current_facts(settings.as_ref().map(|s| &s.config().ui)),
+    ));
+    let backend = settings
+        .as_ref()
         .map(|s| format!("{:?}", s.config().general.default_backend).to_lowercase())
-        .unwrap_or_else(|_| "unknown".to_string());
+        .unwrap_or_else(|| "unknown".to_string());
     out.push(format!("backend: {backend}"));
     out.push(format!("git: {}", git_version()));
     out

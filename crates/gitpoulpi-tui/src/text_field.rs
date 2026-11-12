@@ -342,6 +342,7 @@ pub(crate) fn edit_lines(
     caret.top.set(p.top);
     let selection = caret.selection(text);
     let cursor = caret.cursor(text);
+    let terminal_caret = focused && crate::text_cursor::is_terminal();
     let mut out = Vec::new();
     for line in p.top..(p.top + rows.max(1)).min(p.lines.len()) {
         let (line_cells, window) = p.window(text, line);
@@ -362,20 +363,32 @@ pub(crate) fn edit_lines(
             used += window.lead;
         }
         for c in &line_cells[window.start..window.end] {
-            let style = if selection.is_some_and(|(a, b)| c.byte >= a && c.byte < b) {
+            let at_caret = focused && c.byte == cursor;
+            let mut style = if selection.is_some_and(|(a, b)| c.byte >= a && c.byte < b) {
                 look.selection()
-            } else if focused && c.byte == cursor {
+            } else if at_caret && !terminal_caret {
                 look.caret_on_char()
             } else {
                 look.text
             };
+            if at_caret && terminal_caret {
+                style = style.add_modifier(crate::text_cursor::MARK);
+                crate::text_cursor::note_marked();
+            }
             push(c.ch.encode_utf8(&mut [0; 4]), style);
             used += c.width;
         }
         let caret_at_end = focused && line == p.caret_line && p.caret_col == line_cells.len();
         if caret_at_end && used < width {
-            push(look.caret_glyph, look.caret);
-            used += display_width(look.caret_glyph);
+            if terminal_caret {
+                // The terminal's cursor sits on this blank cell.
+                push(" ", look.pad.add_modifier(crate::text_cursor::MARK));
+                crate::text_cursor::note_marked();
+                used += 1;
+            } else {
+                push(look.caret_glyph, look.caret);
+                used += display_width(look.caret_glyph);
+            }
         }
         push(&" ".repeat(width.saturating_sub(used)), look.pad);
         out.push(Line::from(spans));
@@ -617,5 +630,103 @@ mod tests {
         // Row 0 of the field is line 2 ("three").
         assert_eq!(offset_at(text, &caret, 8, true, 1, 0), 9);
         assert_eq!(offset_at(text, &caret, 8, true, 7, 1), text.len());
+    }
+
+    /// Draws `lines` into a buffer at (`x`, `y`) like a Paragraph would and
+    /// returns where the terminal cursor would go (`terminal` mode).
+    fn cursor_of(lines: Vec<Line<'static>>, x: u16, y: u16) -> Option<(u16, u16)> {
+        use ratatui::buffer::Buffer;
+        use ratatui::widgets::{Paragraph, Widget};
+        let area = Rect::new(0, 0, 40, 8);
+        let mut buf = Buffer::empty(area);
+        Paragraph::new(lines).render(Rect::new(x, y, 20, 4), &mut buf);
+        crate::text_cursor::take_from_buffer(&mut buf).map(|p| (p.x, p.y))
+    }
+
+    struct Terminal;
+    impl Terminal {
+        fn on() -> Self {
+            crate::text_cursor::install(gitpoulpi_config::TextCursor::Terminal);
+            Terminal
+        }
+    }
+    impl Drop for Terminal {
+        fn drop(&mut self) {
+            crate::text_cursor::install(gitpoulpi_config::TextCursor::Drawn);
+        }
+    }
+
+    #[test]
+    fn terminal_mode_puts_the_cursor_after_the_text_and_draws_no_glyph() {
+        let _t = Terminal::on();
+        let line = edit_line("fix", Some(&Caret::default()), 10, true, look());
+        assert_eq!(flat(&line), "fix       ", "no caret glyph is drawn");
+        assert_eq!(cursor_of(vec![line], 5, 2), Some((8, 2)));
+    }
+
+    #[test]
+    fn terminal_mode_puts_the_cursor_on_the_char_under_a_mid_text_caret() {
+        let _t = Terminal::on();
+        let mut text = "hello".to_string();
+        let mut caret = Caret::default();
+        press(&mut caret, &mut text, KeyCode::Left, KeyModifiers::NONE);
+        press(&mut caret, &mut text, KeyCode::Left, KeyModifiers::NONE);
+        let line = edit_line(&text, Some(&caret), 10, true, look());
+        assert!(
+            line.spans
+                .iter()
+                .all(|s| !s.style.add_modifier.contains(Modifier::REVERSED)),
+            "no reversed block caret"
+        );
+        assert_eq!(cursor_of(vec![line], 1, 1), Some((4, 1)));
+    }
+
+    #[test]
+    fn terminal_mode_follows_the_caret_to_the_scrolled_tail_and_to_a_wide_char() {
+        let _t = Terminal::on();
+        let line = edit_line("abcdefghijklmnop", Some(&Caret::default()), 6, true, look());
+        // "…mnop" then the caret column: the cursor sits on column 5.
+        assert_eq!(cursor_of(vec![line], 0, 0), Some((5, 0)));
+        let mut text = "日本語".to_string();
+        let mut caret = Caret::default();
+        press(&mut caret, &mut text, KeyCode::Left, KeyModifiers::NONE);
+        let line = edit_line(&text, Some(&caret), 12, true, look());
+        assert_eq!(
+            cursor_of(vec![line], 0, 0),
+            Some((4, 0)),
+            "on 語, after 4 columns"
+        );
+    }
+
+    #[test]
+    fn terminal_mode_in_a_multiline_field_is_on_the_caret_line() {
+        let _t = Terminal::on();
+        let lines = edit_lines(
+            "one\ntwo\nthree\nfour",
+            Some(&Caret::default()),
+            8,
+            2,
+            true,
+            look(),
+        );
+        assert_eq!(
+            cursor_of(lines, 3, 3),
+            Some((7, 4)),
+            "after `four`, second row"
+        );
+    }
+
+    #[test]
+    fn terminal_mode_gives_an_unfocused_field_no_cursor() {
+        let _t = Terminal::on();
+        let line = edit_line("fix", None, 10, false, look());
+        assert_eq!(cursor_of(vec![line], 0, 0), None);
+    }
+
+    #[test]
+    fn drawn_mode_keeps_the_glyph_and_asks_for_no_cursor() {
+        let line = edit_line("fix", Some(&Caret::default()), 10, true, look());
+        assert_eq!(flat(&line), "fix_      ");
+        assert_eq!(cursor_of(vec![line], 0, 0), None);
     }
 }

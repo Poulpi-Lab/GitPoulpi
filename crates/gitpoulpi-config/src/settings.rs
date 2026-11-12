@@ -105,6 +105,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ui.image_protocol",
     "ui.kitty_keyboard",
     "ui.color_depth",
+    "ui.text_cursor",
     "ui.graph_show_stashes",
     "ui.ref_connector",
     "ui.log_wip_counts_in_message",

@@ -763,6 +763,11 @@ impl WindowState {
                 // `ui.color_depth`: a reduced-color terminal gets the nearest
                 // 256/16 entries (a no-op at truecolor).
                 crate::color_depth::apply(frame.buffer_mut());
+                // `ui.text_cursor = terminal`: the real cursor goes to the
+                // focused field's caret (and is hidden when there is none).
+                if let Some(at) = crate::text_cursor::take_from_buffer(frame.buffer_mut()) {
+                    frame.set_cursor_position(at);
+                }
                 crate::scrollbar::retain_visible_arrows(frame.buffer_mut());
             })
             .map_err(exit_log::io_context("drawing a frame"))?;
@@ -894,6 +899,17 @@ impl WindowState {
         // avatar): ratatui has overwritten their cells, so free them.
         terminal_image::write_retired(self.terminal.backend_mut())
             .map_err(exit_log::io_context("deleting retired pictures"))?;
+        // The pictures above wrote raw bytes, which move the cursor: put it
+        // back on the caret (the backend skips this when nothing moved it).
+        if let Some(at) = crate::text_cursor::last() {
+            use ratatui::backend::Backend as _;
+            let backend = self.terminal.backend_mut();
+            backend
+                .set_cursor_position(at)
+                .and_then(|()| backend.show_cursor())
+                .map_err(exit_log::io_context("placing the text cursor"))?;
+        }
+        crate::text_cursor::sync_style(self.terminal.backend_mut());
         if synchronized {
             self.terminal
                 .backend_mut()

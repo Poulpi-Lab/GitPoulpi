@@ -35,12 +35,16 @@ pub(super) fn init(
         crate::theme::set_system_is_light(crate::terminal_bg::detect_is_light().unwrap_or(false));
     }
     crate::color_depth::install(settings.config().ui.color_depth);
+    crate::text_cursor::install(settings.config().ui.text_cursor);
     // The kitty keyboard protocol (`ui.kitty_keyboard`): a bounded query,
     // then a push the teardown pops. Before anything reads the keyboard.
     crate::kitty_keyboard::enable(settings.config().ui.kitty_keyboard, &mut stdout);
     if settings.config().ui.mouse_enabled {
         execute!(stdout, EnableMouseCapture)?;
     }
+    // Bracketed paste: a paste arrives as one `Event::Paste`, so its line
+    // breaks never submit and its letters never fire shortcuts.
+    crate::term_modes::enable_bracketed_paste(&mut stdout);
     {
         // Focus loss hides any tooltip (`tooltip.rs`); best-effort.
         let _ = execute!(stdout, crossterm::event::EnableFocusChange);

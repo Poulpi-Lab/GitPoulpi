@@ -212,6 +212,8 @@ mod startup_tab;
 mod status_optimistic;
 mod status_pane;
 mod submodules_ui;
+mod term_modes;
+mod text_cursor;
 mod title_logo;
 mod ui_intent;
 mod ui_viewer;

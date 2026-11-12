@@ -56,7 +56,7 @@ pub use schema::{
     LegacyDiffViewMode, LogColumnsLayout, LogConfig, LogLevel, McpConfig, McpTls, MergeConfig,
     PrTerminology, PrivacyConfig, Profile, PullButtonMode, PushBehavior, ReposConfig,
     ResolvedBases, RetentionUnit, RewriteConfig, SearchConfig, SessionConfig, SidebarSectionsScope,
-    SshConfig, StartupTab, StatusbarPosition, TabDirFollow, TabsPosition, ToolbarAlign,
+    SshConfig, StartupTab, StatusbarPosition, TabDirFollow, TabsPosition, TextCursor, ToolbarAlign,
     ToolbarPosition, UiConfig, UiLanguage, UpdateChannel, UpdateMode, UpdatesConfig,
     BASE_SOURCE_DEFAULT, BASE_SOURCE_LIST, BASE_SOURCE_OWN, DEFAULT_BLAME_WIDTH,
     DEFAULT_COMMITS_PER_LAZY_PAGE, DEFAULT_EDITOR_TAB_SIZE, DEFAULT_HOSTING_REFRESH_MINUTES,

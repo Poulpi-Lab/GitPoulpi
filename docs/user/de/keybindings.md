@@ -430,7 +430,7 @@ vollständige Liste steht [unten](#alle-palettenbefehle).
 |---|---|
 | `Ctrl+P` | Die Palette öffnen |
 | *(tippen)* | Die Liste filtern. Ein exakter Treffer nach dem Präfix `Kategorie: ` kommt zuerst, dann ein Treffer irgendwo in der Bezeichnung, dann ein unscharfer Treffer |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | Die Hervorhebung bewegen (siehe [Filterbare Popup-Listen](#filterbare-popup-listen)) |
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | Die Hervorhebung bewegen (siehe [Filterbare Popup-Listen](#filterbare-popup-listen)) |
 | `Enter` oder ein Doppelklick | Den hervorgehobenen Befehl ausführen |
 | `Esc` | Schließen |
 
@@ -449,7 +449,9 @@ In der `config.toml` ist das die Tabelle `[keybindings.palette]`, benannt nach d
 
 Die Hinweiszeile unter der Liste nennt diese Taste (standardmäßig `Alt+K`). Es ist die Aktion `palette.configure_shortcut` und lässt sich wie jede andere neu belegen.
 
-Die Palette und die Auswahllisten (Theme, Sprache, Tab, Workspace-Suche) lassen sich wie ein Dialog verschieben und in der Größe ändern: Ziehen Sie den oberen Rahmen oder drücken Sie `Alt+G` (die Aktion `palette.arrange`; die Palettenzeile `Dialog: Verschieben/Größe ändern` macht dasselbe). Pfeile verschieben ihn, `Shift`+Pfeile ändern die Größe, `0` stellt ihn zurück, `Enter` oder `Esc` beenden den Modus, und das Popup bleibt offen. `ui.dialog_geometry` legt fest, ob die Position gemerkt wird.
+Die Palette und die Auswahllisten (Theme, Sprache, Tab, Workspace-Suche) lassen sich wie ein Dialog verschieben und in der Größe ändern: Ziehen Sie den oberen Rahmen, drücken Sie `Ctrl+N` und dann `m` (wie über jedem Dialog) oder drücken Sie `Alt+G`. `Alt+G` ist die Aktion `palette.arrange` („Dialog: Vordersten Dialog verschieben/Größe ändern“): ein zusätzlicher Weg, über jedem Dialog und Popup gültig, um den Anordnungsmodus für den vordersten zu starten (die Palettenzeilen `Dialog: Verschieben/Größe ändern` und `Dialog: Position und Größe zurücksetzen` wirken auf die Palette selbst, solange sie offen ist). Pfeile verschieben ihn, `Shift`+Pfeile ändern die Größe, `0` stellt ihn zurück, `Enter` oder `Esc` beenden den Modus, und das Popup bleibt offen. `ui.dialog_geometry` legt fest, ob die Position gemerkt wird.
+
+`Ctrl+N` ist auch hier das Navigationspräfix: Es zeigt ein Badge am Filterfeld, an der ersten Zeile der Liste und am Schließkreuz, und die Taste danach drückt dieses Bedienelement, oder `m` ordnet das Popup an. Es bewegt die Hervorhebung nicht mehr nach unten, und `Ctrl+P` bewegt sie nicht nach oben: Nur die Pfeile, `PageUp` / `PageDown` und `Home` / `End` bewegen eine Liste mit Filterfeld.
 
 ### Alle Palettenbefehle
 
@@ -1186,7 +1188,7 @@ die Standardtasten.
 | Taste | Aktion |
 |---|---|
 | `Tab` / `Shift+Tab` | Den nächsten / vorherigen Bereich fokussieren |
-| `Ctrl+N`, dann ein Badge | Diesen Teil des Fensters fokussieren (siehe [Navigationspräfix](#navigationspräfix-ctrln)) |
+| `Ctrl+N`, dann ein Badge | Diesen Teil des Fensters fokussieren oder das Bedienelement des vordersten Dialogs oder Popups drücken (siehe [Navigationspräfix](#navigationspräfix-ctrln)) |
 | `j` / `k`, `Up` / `Down` | Die Auswahl bewegen, in jedem Bereich |
 | `PageUp` / `PageDown`, `Home` / `End` | Eine Seite weiter; zur ersten / letzten Zeile |
 | eine Zahl, dann `j` / `k` / `Up` / `Down` | Zählpräfix: `4j` bewegt vier Zeilen. Mit `PageUp` / `PageDown` ist die Zahl eine Seitenzahl. Die Statuszeile zeigt die ausstehende Zahl (`4...`). `Esc` oder jede andere Taste löscht sie. |
@@ -1212,15 +1214,19 @@ bewegen die Hervorhebung:
 
 | Taste | Aktion |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Eine Zeile bewegen |
+| `Up` / `Down` | Eine Zeile bewegen |
 | `Home` / `End` | Erste / letzte Zeile |
 | `PageUp` / `PageDown` | Eine sichtbare Seite bewegen |
 | `Enter` | Die hervorgehobene Zeile wählen |
 | `Esc` | Schließen |
 
-In diesen Popups bewegen `Home`, `End` und `Ctrl+K` die Liste, nicht den Cursor des
-Filterfeldes. `Ctrl+A` und `Ctrl+E` setzen den Cursor weiterhin an den Anfang und das Ende.
-Einfaches `j` und `k` wird in den Filter getippt.
+In diesen Popups bewegen `Home` und `End` die Liste, nicht den Cursor des Filterfeldes.
+`Ctrl+A` und `Ctrl+E` setzen den Cursor weiterhin an den Anfang und das Ende, und
+`Ctrl+K` löscht bis zum Ende des Filters. Kein `Ctrl+Buchstabe`-Paar bewegt eine Liste
+(`Ctrl+N` ist das Navigationspräfix, `Ctrl+P` die Befehlspalette), und einfaches `j` und
+`k` wird in den Filter getippt: Hier bewegen nur die Pfeile, `PageUp` / `PageDown` und
+`Home` / `End`. In Listen ohne Textfeld sind `j` / `k` ein zusätzlicher Weg, nach unten /
+oben zu gehen.
 
 Mit der Maus:
 
@@ -1251,7 +1257,7 @@ Einstellungsbildschirm.
 | *(tippen)* | Filter: nur die Abschnitte behalten, die den Text enthalten. `j`, `k` und `q` werden ebenfalls getippt |
 | `Backspace`, `Ctrl+U` | Das letzte Zeichen löschen / den Filter leeren |
 | `Esc` | Den Filter leeren; ist er leer, die Hilfe schließen |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Eine Zeile scrollen |
+| `Up` / `Down` | Eine Zeile scrollen |
 | `PageUp` / `PageDown`, `Home` / `End` | Eine Seite scrollen; nach oben / unten gehen |
 | `Ctrl+D` oder ein Klick auf den Link | Diese Dokumentation auf GitHub im Browser öffnen |
 

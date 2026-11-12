@@ -32,7 +32,7 @@ Commits kommen dazu, sobald sie bereit sind.
 
 | Taste | Wirkung |
 |---|---|
-| `Auf` / `Ab`, `Ctrl+P` / `Ctrl+N`, `Bild auf` / `Bild ab`, `Pos1` / `Ende` | Durch die Ergebnisse bewegen (die Gruppenüberschriften werden übersprungen). |
+| `Auf` / `Ab`, `Bild auf` / `Bild ab`, `Pos1` / `Ende` | Durch die Ergebnisse bewegen (die Gruppenüberschriften werden übersprungen). |
 | `Enter` | Geht zum Ergebnis: Der Tab des Repositorys öffnet sich (oder wird gewechselt), dann wird das Ergebnis angezeigt. |
 | `Esc` | Schließt die Suche. |
 | `Alt+1` .. `Alt+8` | Eine Art ein- oder ausschalten (die Chips über der Liste, in ihrer Reihenfolge). `Alt+0` schaltet alle ein. |

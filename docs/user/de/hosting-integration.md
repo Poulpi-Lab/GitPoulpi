@@ -731,8 +731,10 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Siehe die [CLI-Referenz](cli-reference.md#befehle) für jeden Befehl. Ein Token wird nie als
-Argument akzeptiert, und der MCP-Server bietet `hosting login` nicht an, sodass ein Token
-nie durch einen Agenten läuft.
+Argument akzeptiert (`hosting login` gibt `stored: "os"` aus, wenn der Credential-Speicher
+des Betriebssystems es hält, oder `stored: "session"` mit `store_error`, wenn der Speicher
+es abgelehnt hat und das Token nur für diese Sitzung im Arbeitsspeicher liegt), und der
+MCP-Server bietet `hosting login` nicht an, sodass ein Token nie durch einen Agenten läuft.
 
 ## Fehlerbehebung
 

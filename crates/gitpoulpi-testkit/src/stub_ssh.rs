@@ -143,6 +143,7 @@ impl Default for StubSsh {
 
 #[cfg(test)]
 mod tests {
+    #[cfg_attr(not(unix), allow(unused_imports))]
     use super::*;
 
     /// Many invocations at once, each with its own arguments: every logged

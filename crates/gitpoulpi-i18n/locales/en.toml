@@ -4274,7 +4274,7 @@ no_match_status = "no matching command"
 # context: status line after Alt+K (configure the shortcut) on a palette row that has no keymap action
 no_own_shortcut = "this command has no shortcut of its own to configure"
 # context: the popup's hint line; key names stay as written
-hint = "Up/Down or PageUp/PageDown to move, Enter to run, Esc to cancel"
+hint = "Up/Down/Ctrl+J/K or PageUp/PageDown to move, Enter to run, Esc to cancel"
 # context: grayed reason on the Home tab
 why_needs_repository = "needs an open repository"
 # context: the shortcut column when the command has no key: how to reach it
@@ -5346,10 +5346,10 @@ column_menu_scroll = "Scroll sideways (columns keep their widths)"
 [overlays]
 select_tab_title = "Select Tab ({shown}/{total})"
 no_matching_tab = "(no matching tab)"
-tab_picker_hint = "Up/Down or PageUp/PageDown to move, Alt+Up/Down to reorder, Enter to switch, Esc to cancel"
+tab_picker_hint = "Up/Down/Ctrl+J/K or PageUp/PageDown to move, Alt+Up/Down to reorder, Enter to switch, Esc to cancel"
 change_theme_title = "Change Theme ({shown}/{total})"
 no_matching_theme = "(no matching theme)"
-theme_picker_hint = "Up/Down to preview, Tab or Alt+1-4 to filter, Enter to apply, Esc to cancel"
+theme_picker_hint = "Up/Down/Ctrl+J/K to preview, Tab or Alt+1-4 to filter, Enter to apply, Esc to cancel"
 theme_filter_all = "All"
 theme_filter_dark = "Dark"
 theme_filter_light = "Light"
@@ -5358,7 +5358,7 @@ change_language_title = "Change Language ({shown}/{total})"
 no_matching_language = "(no matching language)"
 change_graph_color_theme_title = "Change Graph Color Theme ({shown}/{total})"
 no_matching_graph_color_theme = "(no matching graph color theme)"
-language_picker_hint = "Up/Down or PageUp/PageDown to move, Enter to apply, Esc to cancel"
+language_picker_hint = "Up/Down/Ctrl+J/K or PageUp/PageDown to move, Enter to apply, Esc to cancel"
 rule_file_title_ignore = "Ignore: add to which file? ({shown}/{total})"
 rule_file_title_binary = "Treat as binary: write to which file? ({shown}/{total})"
 rule_file_title_text = "Treat as text: write to which file? ({shown}/{total})"
@@ -8229,14 +8229,14 @@ kind_stash = "{$Stashes}"
 kind_commit = "{$Commits}"
 kind_pull_request = "{$Prs}"
 kind_issue = "Issues"
-hint = "Up/Down to move, Enter to go there, Esc to close\nAlt+1-8 to toggle kinds, Alt+0 for all. Prefixes: b: t: c: s: w: r: pr: i: #"
+hint = "Up/Down/Ctrl+J/K to move, Enter to go there, Esc to close\nAlt+1-8 to toggle kinds, Alt+0 for all. Prefixes: b: t: c: s: w: r: pr: i: #"
 empty_no_repositories = "No repositories to search. Open a repository or choose a workspace."
 empty_searching = "Searching..."
 empty_nothing_yet = "Type to search"
 empty_no_match = "No matches"
 no_result_selected = "no result selected"
 # context: hint under the workspace search while a pull / merge request is highlighted
-hint_review = "Up/Down to move, Enter to go there, Alt+R to review it, Esc to close\nAlt+1-8 to toggle kinds, Alt+0 for all. Prefixes: b: t: c: s: w: r: pr: i: #"
+hint_review = "Up/Down/Ctrl+J/K to move, Enter to go there, Alt+R to review it, Esc to close\nAlt+1-8 to toggle kinds, Alt+0 for all. Prefixes: b: t: c: s: w: r: pr: i: #"
 # context: status line when Alt+R is pressed on a result that is not a pull / merge request
 not_a_request = "select a request to review it"
 
@@ -9544,7 +9544,7 @@ mode_ask = "Ask each time"
 # context: window title of the list of background jobs (clone, fetch, push...)
 title = "Background jobs"
 # context: key hints under the background jobs list
-hint = "Up/Down: select  c / Del: cancel  Enter: go to repository  Esc: close"
+hint = "Up/Down/Ctrl+J/K: select  c / Del: cancel  Enter: go to repository  Esc: close"
 empty = "No background job is running."
 # context: short name of a background job that clones a repository
 kind_clone = "Clone"

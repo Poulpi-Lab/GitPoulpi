@@ -1044,9 +1044,11 @@ fn scroll_settings_until(
         |t| {
             let s = t.screen();
             if !found(&s) {
-                for _ in 0..2 {
-                    t.scroll(true, 100, s.rows() / 2)?;
-                }
+                // One notch per attempt: under torn frames the predicate sees
+                // the target only on a settled frame, and two notches per
+                // 400 ms scroll it past before one is seen (the page never
+                // scrolls back up).
+                t.scroll(true, 100, s.rows() / 2)?;
             }
             Ok(())
         },

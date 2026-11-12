@@ -78,10 +78,9 @@ fn a_stored_strong_is_more_present_than_the_default_medium() {
 fn picking_subtle_fades_the_band() {
     let repo = fixture();
     let (mut term, config) = launch(&repo, "tint-strength-c", TINT);
-    let loaded = term
-        .wait_for("a tinted node", STEP, |s| band_bg(s).is_some())
-        .unwrap_or_else(|e| panic!("{e}"));
-    let before = band_bg(&loaded).expect("a tinted node");
+    // The settled screen, not the first frame with a tinted node: a torn or
+    // half-painted frame carries a color that is neither before nor after.
+    let before = band_bg(&snap(&term)).expect("a tinted node");
 
     let (gc, gr) = term
         .wait_for_text("\u{2699}", STEP)
@@ -120,7 +119,7 @@ fn picking_subtle_fades_the_band() {
     term.send_keys("Escape").unwrap();
     let screen = term
         .wait_for("the band faded", STEP, |s| {
-            band_bg(s).is_some_and(|c| c != before)
+            band_bg(s).is_some_and(|c| presence(c) < presence(before))
         })
         .unwrap_or_else(|e| panic!("{e}"));
     let after = band_bg(&screen).unwrap();

@@ -182,8 +182,13 @@ pub fn run_if_requested() {
     std::process::exit(0);
 }
 
-/// How long the helper waits for the daemon: git is waiting for it.
-const ASK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(20);
+/// How long the helper waits for the daemon: git is waiting for it. It must
+/// outlast the longest a token command may run (30 s, `token_command::TIMEOUT`
+/// in the daemon, which pins the relation with a test): a helper that gives
+/// up first makes git fail with its generic "terminal prompts disabled" and
+/// cuts a slow command short, instead of the command's own failure reaching
+/// the user.
+pub const ASK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(40);
 
 fn ask_daemon(action: CredentialAction, git: GitRequest) -> Option<CredentialGrantAnswer> {
     let grant = std::env::var(ENV_GRANT).ok().filter(|g| !g.is_empty())?;

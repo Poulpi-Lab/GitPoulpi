@@ -589,7 +589,12 @@ pub(crate) async fn test(
         // git had no credential and the helper never asked the daemon: say so
         // first (the report has no typed error, so the sentence leads its
         // stderr).
-        if let Some(detail) = report.error.as_mut().filter(|_| outcome.unasked) {
+        // A token command that failed or timed out is the reason git had no
+        // credential, not git's "terminal prompts disabled": lead with it,
+        // as a transfer (fetch, push) words it.
+        if let (Some(detail), Some(why)) = (report.error.as_mut(), &outcome.command_failure) {
+            detail.stderr = format!("{why}\n{}", detail.stderr);
+        } else if let Some(detail) = report.error.as_mut().filter(|_| outcome.unasked) {
             if crate::grants::is_no_credential_message(&detail.stderr) {
                 detail.stderr = format!(
                     "{}\n{}",

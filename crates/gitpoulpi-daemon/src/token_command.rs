@@ -433,6 +433,22 @@ pub(crate) fn validate(https: &HttpsAuth) -> Result<(), String> {
     }
 }
 
+#[cfg(test)]
+mod timeout_tests {
+    use super::*;
+
+    /// The helper git runs waits for the daemon, whose token command may take
+    /// `TIMEOUT`: if the helper gave up first, git would fail with its generic
+    /// "terminal prompts disabled" and the command would be cut short.
+    #[test]
+    fn the_helper_waits_longer_than_a_token_command_may_run() {
+        assert!(
+            gitpoulpi_ipc::git_credential::ASK_TIMEOUT > TIMEOUT,
+            "the credential helper's wait must outlast the token command's timeout"
+        );
+    }
+}
+
 #[cfg(all(test, unix))]
 mod tests {
     use super::*;

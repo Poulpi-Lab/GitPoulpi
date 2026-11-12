@@ -577,6 +577,37 @@ async fn a_failing_command_reads_with_a_redacted_stderr() {
     rig.handle.shutdown().await.unwrap();
 }
 
+/// The connection test (`repo-auth test`) is where a person first meets a
+/// token command that fails: its report leads with the command's own failure,
+/// not only git's "terminal prompts disabled".
+#[tokio::test]
+async fn a_failing_command_reads_the_same_in_the_connection_test() {
+    need_tools!();
+    let _turn = exclusive().await;
+    let server = AuthHttpRemote::start_accepting();
+    let repo = repo_on(&server);
+    let scripts = tempfile::tempdir().unwrap();
+    let tool = tool(
+        scripts.path(),
+        "token",
+        &[Step::Stderr("vault is sealed"), Step::Exit(3)],
+    );
+    let mut rig = Rig::new("token-command-test-report", &repo).await;
+    rig.set(token_command(&tool, &[]), true).await.unwrap();
+    let reports = rig
+        .call(OperationKind::RepoAuthTest, json!({ "push": false }))
+        .await
+        .expect("a test is a report, not an error");
+    assert_eq!(reports[0]["ok"], false, "{reports}");
+    let stderr = reports[0]["error"]["stderr"].as_str().unwrap_or_default();
+    assert!(
+        stderr.starts_with("the token command failed (exit 3)")
+            && stderr.contains("vault is sealed"),
+        "{reports}"
+    );
+    rig.handle.shutdown().await.unwrap();
+}
+
 /// The submodule update runs under the same grant: a token command that fails
 /// reads as that there too, not as git's "terminal prompts disabled".
 #[tokio::test]

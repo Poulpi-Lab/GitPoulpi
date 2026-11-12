@@ -744,8 +744,10 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Voir la [référence CLI](cli-reference.md#commandes) pour chaque commande. Un jeton
-n'est jamais accepté en argument, et le serveur MCP ne propose pas `hosting login`,
-si bien qu'un jeton ne passe jamais par un agent.
+n'est jamais accepté en argument (`hosting login` affiche `stored: "os"` quand le
+gestionnaire d'identifiants du système le garde, ou `stored: "session"` avec `store_error`
+quand le gestionnaire l'a refusé et que le jeton ne vit qu'en mémoire pour cette session),
+et le serveur MCP ne propose pas `hosting login`, si bien qu'un jeton ne passe jamais par un agent.
 
 ## Dépannage
 

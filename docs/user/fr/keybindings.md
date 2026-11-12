@@ -436,7 +436,7 @@ sans raccourci. La liste complète est [plus bas](#toutes-les-commandes-de-la-pa
 |---|---|
 | `Ctrl+P` | Ouvrir la palette |
 | *(taper)* | Filtrer la liste. Une correspondance exacte après le préfixe `Catégorie : ` vient d'abord, puis une correspondance n'importe où dans le libellé, puis une correspondance floue |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | Déplacer la surbrillance (voir [Listes de popups filtrables](#listes-de-popups-filtrables)) |
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | Déplacer la surbrillance (voir [Listes de popups filtrables](#listes-de-popups-filtrables)) |
 | `Enter`, ou un double-clic | Lancer la commande en surbrillance |
 | `Esc` | Fermer |
 
@@ -456,7 +456,9 @@ Dans `config.toml`, c'est la table `[keybindings.palette]`, nommée d'après la 
 
 La bande d'aide sous la liste indique cette touche (`Alt+K` par défaut). C'est l'action `palette.configure_shortcut` : elle se réaffecte comme les autres.
 
-La palette et les sélecteurs (thème, langue, onglet, recherche d'espace de travail) se déplacent et se redimensionnent comme une boîte de dialogue : faites glisser le bord supérieur, ou appuyez sur `Alt+G` (l'action `palette.arrange` ; la ligne `Dialogue : Déplacer/redimensionner` de la palette fait la même chose). Les flèches la déplacent, `Shift`+flèches la redimensionnent, `0` la réinitialise, `Enter` ou `Esc` quittent le mode et la fenêtre reste ouverte. `ui.dialog_geometry` décide si la position est conservée.
+La palette et les sélecteurs (thème, langue, onglet, recherche d'espace de travail) se déplacent et se redimensionnent comme une boîte de dialogue : faites glisser le bord supérieur, appuyez sur `Ctrl+N` puis `m` (comme sur toute boîte de dialogue), ou appuyez sur `Alt+G`. `Alt+G` est l'action `palette.arrange` (« Fenêtre : déplacer ou redimensionner la fenêtre au premier plan ») : un moyen de plus, valable sur toute boîte de dialogue et toute fenêtre contextuelle, de lancer le mode de disposition sur celle qui est au premier plan (les lignes `Dialogue : Déplacer/redimensionner` et `Dialogue : Réinitialiser la position et la taille` de la palette agissent sur la palette elle-même quand elle est ouverte). Les flèches la déplacent, `Shift`+flèches la redimensionnent, `0` la réinitialise, `Enter` ou `Esc` quittent le mode et la fenêtre reste ouverte. `ui.dialog_geometry` décide si la position est conservée.
+
+`Ctrl+N` est aussi le préfixe de navigation ici : il affiche un badge sur le champ de filtre, la première ligne de la liste et la croix de fermeture, et la touche suivante actionne ce contrôle, ou `m` lance la disposition de la fenêtre. Il ne descend plus la surbrillance, et `Ctrl+P` ne la remonte pas : seuls les flèches, `PageUp` / `PageDown` et `Home` / `End` déplacent une liste qui a un champ de filtre.
 
 ### Toutes les commandes de la palette
 
@@ -1193,7 +1195,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Touche | Action |
 |---|---|
 | `Tab` / `Shift+Tab` | Cibler le volet suivant / précédent |
-| `Ctrl+N`, puis un badge | Cibler cette partie de la fenêtre (voir [Préfixe de navigation](#préfixe-de-navigation-ctrln)) |
+| `Ctrl+N`, puis un badge | Cibler cette partie de la fenêtre, ou actionner ce contrôle de la boîte de dialogue ou de la fenêtre au premier plan (voir [Préfixe de navigation](#préfixe-de-navigation-ctrln)) |
 | `j` / `k`, `Up` / `Down` | Déplacer la sélection, dans chaque volet |
 | `PageUp` / `PageDown`, `Home` / `End` | Avancer d'une page ; aller à la première / dernière ligne |
 | un nombre, puis `j` / `k` / `Up` / `Down` | Préfixe de nombre : `4j` avance de quatre lignes. Avec `PageUp` / `PageDown`, le nombre est un nombre de pages. La ligne d'état montre le nombre en attente (`4...`). `Esc` ou toute autre touche l'efface. |
@@ -1219,15 +1221,18 @@ Tapez pour filtrer la liste. Ces touches déplacent la surbrillance :
 
 | Touche | Action |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Avancer d'une ligne |
+| `Up` / `Down` | Avancer d'une ligne |
 | `Home` / `End` | Première / dernière ligne |
 | `PageUp` / `PageDown` | Avancer d'une page visible |
 | `Enter` | Choisir la ligne en surbrillance |
 | `Esc` | Fermer |
 
-Dans ces fenêtres, `Home`, `End` et `Ctrl+K` déplacent la liste, pas le curseur du champ de
-filtre. `Ctrl+A` et `Ctrl+E` déplacent toujours le curseur au début et à la fin. Les simples
-`j` et `k` sont tapés dans le filtre.
+Dans ces fenêtres, `Home` et `End` déplacent la liste, pas le curseur du champ de filtre.
+`Ctrl+A` et `Ctrl+E` déplacent toujours le curseur au début et à la fin, et `Ctrl+K` supprime
+jusqu'à la fin du filtre. Aucune paire `Ctrl+lettre` ne déplace une liste (`Ctrl+N` est le
+préfixe de navigation, `Ctrl+P` la palette de commandes), et les simples `j` et `k` sont
+tapés dans le filtre : seuls les flèches, `PageUp` / `PageDown` et `Home` / `End` déplacent ici.
+Dans les listes sans champ de texte, `j` / `k` sont un moyen de plus de descendre / monter.
 
 À la souris :
 
@@ -1258,7 +1263,7 @@ s'ouvre par-dessus tout, l'écran des Paramètres compris.
 | *(taper)* | Filtre : ne garde que les sections qui contiennent le texte. `j`, `k` et `q` sont tapés aussi |
 | `Backspace`, `Ctrl+U` | Supprimer le dernier caractère / effacer le filtre |
 | `Esc` | Effacer le filtre ; s'il est vide, fermer l'aide |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Défiler d'une ligne |
+| `Up` / `Down` | Défiler d'une ligne |
 | `PageUp` / `PageDown`, `Home` / `End` | Défiler d'une page ; aller en haut / en bas |
 | `Ctrl+D`, ou un clic sur le lien | Ouvrir cette documentation sur GitHub dans le navigateur |
 

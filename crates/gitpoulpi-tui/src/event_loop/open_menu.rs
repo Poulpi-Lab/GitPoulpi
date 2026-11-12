@@ -153,6 +153,13 @@ impl OpenMenu {
         )
     }
 
+    /// The menus a left press outside their rows dismisses (and nothing
+    /// else): every right-click menu and the Log's column checklist. The
+    /// overflow menu has its own event path (`overflow_menu_event`).
+    pub(super) fn closes_on_press_outside(&self) -> bool {
+        self.is_context_menu() || self.is_column_menu()
+    }
+
     /// Paints whichever context or overflow menu is open and returns its
     /// rows as hit targets, to go in front of the pane targets: a popup
     /// sits over the panes, and `find_hit_target` takes the first match.

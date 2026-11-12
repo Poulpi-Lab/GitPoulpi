@@ -18,6 +18,30 @@ pub(super) struct Click {
     pub(super) inside_ref_popup: bool,
 }
 
+/// Whether the target is a row of a popup menu (`OpenMenu`): what a press
+/// may hit while one is open without closing it.
+fn is_open_menu_row(hit: Option<&HitTarget>) -> bool {
+    matches!(
+        hit,
+        Some(
+            HitTarget::RefContextMenuItem(_)
+                | HitTarget::LogContextMenuItem(_)
+                | HitTarget::WipContextMenuItem(_)
+                | HitTarget::FileContextMenuItem(_)
+                | HitTarget::FolderContextMenuItem(_)
+                | HitTarget::PaneContextMenuItem(_)
+                | HitTarget::DiffHunkContextMenuItem(_)
+                | HitTarget::HistoryContextMenuItem(_)
+                | HitTarget::ColumnMenuItem(_)
+                | HitTarget::ColumnMenuAction(_)
+                | HitTarget::CommitColumn(
+                    crate::commit_column::ColumnHit::ColumnsMenuItem(_)
+                        | crate::commit_column::ColumnHit::ColumnsMenuClose
+                ),
+        )
+    )
+}
+
 /// A press of the left button: the modal layers first, then the targets the paint
 /// walk registered, then the panes underneath.
 pub(super) fn handle(
@@ -72,6 +96,14 @@ pub(super) fn handle(
         cx.hosting.close_picker();
         return Ok(Flow::Handled);
     }
+    // One rule for every popup menu of `OpenMenu`: a press that is not on one
+    // of its own rows closes it and does nothing else. This runs before every
+    // target the panes and the diff view register (their buttons, lines,
+    // scrollbars...), which would otherwise act with the menu left open.
+    if cx.open_menu.closes_on_press_outside() && !is_open_menu_row(hit.as_ref()) {
+        cx.open_menu.close();
+        return Ok(Flow::Handled);
+    }
     // Any click leaves a search box.
     if !matches!(hit, Some(HitTarget::Hosting(HostingHit::Row(..)))) {
         cx.hosting.editing = None;
@@ -84,11 +116,7 @@ pub(super) fn handle(
     // never on a divider's grab strip.
     if matches!(*cx.input_mode, InputMode::Normal)
         && resize_grab.is_none()
-        && !cx.open_menu.is_ref_menu()
-        && !cx.open_menu.is_log_menu()
-        && !cx.open_menu.is_wip_menu()
-        && !cx.open_menu.is_pane_menu()
-        && !cx.open_menu.is_column_menu()
+        && !cx.open_menu.closes_on_press_outside()
     {
         let pressed = list_bar_regions(cx).into_iter().find_map(|region| {
             let offset = list_bar_offset(cx, region.bar);

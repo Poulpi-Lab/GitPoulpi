@@ -349,3 +349,25 @@ fn one_click_away_closes_the_replacing_menu() {
     wait_closed(&term, Kind::Wip);
     term.stop().unwrap();
 }
+
+/// A left press on a control of the window (here the toolbar's `Search`, a
+/// button the press would otherwise run) closes every context menu and the press
+/// does nothing else.
+#[test]
+fn every_context_menu_closes_on_a_press_on_a_toolbar_button_without_running_it() {
+    let repo = fixture();
+    for kind in Kind::ALL {
+        let (mut term, _c) = launch(&repo, &format!("pty-menus-button-{kind:?}"), 200);
+        open_by_mouse(&mut term, kind);
+        let (c, r) = term
+            .screen()
+            .find("\u{2315} Search")
+            .unwrap_or_else(|| panic!("{kind:?}: the Search button\n{}", term.text()));
+        term.click(c + 3, r).unwrap();
+        term.wait_for(&format!("the {kind:?} menu to close"), STEP, |s| {
+            !s.contains(kind.marker())
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+        term.stop().unwrap();
+    }
+}

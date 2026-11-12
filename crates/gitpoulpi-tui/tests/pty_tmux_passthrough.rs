@@ -249,10 +249,8 @@ fn hover_radar(session: &str, mux: &str) -> Vec<(bool, String)> {
         mux,
     )
     .spawn();
-    term.wait_for("the window", STARTUP, |s| {
-        s.contains("pointer-tmux-commit")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.wait_for("the window", STARTUP, |s| s.contains("pointer-tmux-commit"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.wait_for("the Radar tab", STEP, |s| s.line(1).contains("Radar"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let bar = term.screen().line(1);

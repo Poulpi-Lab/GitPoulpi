@@ -234,10 +234,7 @@ fn has_transparent_pixels(p: &Picture) -> bool {
 #[cfg_attr(windows, ignore = "Rio's alpha blending was only seen on Linux")]
 fn rio_gets_the_transparent_graph_picture_and_mintty_the_opaque_one() {
     let rio = picture_in("rio", "", "off", "9x21", "pic-rio-alpha");
-    assert!(
-        has_transparent_pixels(&rio),
-        "Rio got an opaque picture"
-    );
+    assert!(has_transparent_pixels(&rio), "Rio got an opaque picture");
     let mintty = picture_in("mintty", "", "off", "9x21", "pic-mintty-opaque");
     assert!(
         !has_transparent_pixels(&mintty),

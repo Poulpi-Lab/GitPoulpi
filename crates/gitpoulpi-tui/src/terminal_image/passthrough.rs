@@ -106,7 +106,11 @@ pub(crate) fn wrapping() -> bool {
 
 /// `seq` as it must be written: wrapped when [`wrapping`].
 pub(crate) fn passthrough(seq: String) -> String {
-    if wrapping() { wrap_tmux(&seq) } else { seq }
+    if wrapping() {
+        wrap_tmux(&seq)
+    } else {
+        seq
+    }
 }
 
 /// [`wrap_tmux`] applied to each string of a run of `ST`-terminated strings
@@ -122,7 +126,11 @@ pub(crate) fn wrap_each_string(seq: &str) -> String {
 
 /// [`passthrough`] for a run of strings, see [`wrap_each_string`].
 pub(crate) fn passthrough_each(seq: String) -> String {
-    if wrapping() { wrap_each_string(&seq) } else { seq }
+    if wrapping() {
+        wrap_each_string(&seq)
+    } else {
+        seq
+    }
 }
 
 #[cfg(test)]
@@ -215,7 +223,10 @@ mod tests {
         // The same answer outside tmux, or behind a second multiplexer, is
         // not a verdict about this process.
         assert!(!tmux_client_has_sixel(&with(&[])));
-        assert!(!tmux_client_has_sixel(&with(&[("TMUX", "x"), ("STY", "1")])));
+        assert!(!tmux_client_has_sixel(&with(&[
+            ("TMUX", "x"),
+            ("STY", "1")
+        ])));
     }
 
     #[test]

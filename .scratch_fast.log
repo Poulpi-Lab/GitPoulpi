@@ -1,0 +1,523 @@
+   Compiling simd-adler32 v0.3.10
+   Compiling parking_lot_core v0.9.12
+   Compiling mio v1.2.3
+   Compiling gitpoulpi-config v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-config)
+   Compiling num-bigint-dig v0.8.6
+   Compiling httparse v1.10.1
+   Compiling form_urlencoded v1.2.2
+   Compiling tempfile v3.27.0
+   Compiling gitpoulpi-ipc v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-ipc)
+   Compiling http v1.5.0
+   Compiling base64 v0.23.1
+   Compiling url v2.5.8
+   Compiling miniz_oxide v0.9.1
+   Compiling zopfli v0.8.3
+   Compiling parking_lot v0.12.5
+   Compiling tokio v1.54.1
+   Compiling mlua v0.11.6
+   Compiling flate2 v1.1.10
+   Compiling ureq-proto v0.7.1
+   Compiling zip v9.3.0
+   Compiling ureq v3.5.1
+   Compiling rsa v0.9.10
+   Compiling ssh-key v0.6.7
+   Compiling gitpoulpi-cli-backend v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-cli-backend)
+   Compiling gitpoulpi-hosting v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-hosting)
+   Compiling gitpoulpi-session v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-session)
+   Compiling gitpoulpi-git2-backend v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-git2-backend)
+   Compiling gitpoulpi-daemon v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-daemon)
+   Compiling xtask v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/xtask)
+    Finished `dev` profile [unoptimized] target(s) in 25.35s
+     Running `target/debug/xtask test --no-fail-fast`
+cargo test --workspace --no-fail-fast --lib --bins --test absent_means_default --test account_source --test add --test ai --test ai_limits --test ai_not_built --test ai_review_context --test ai_rewrite_rules --test ai_rewrite_script --test auth --test autostash --test build_custom_script --test catalog --test command_alias --test command_alias_add --test commands --test commit_options --test completions --test concurrent_reads --test config --test conflict_encoding --test conflict_fixture --test conflict_prevention --test conflict_prevention_lists --test conflict_resolution --test conflicts --test conflicts_check --test contract --test count_in_process --test credential_helper_unreachable --test credentials --test daemon --test desktop --test diff --test docs_coverage --test encoding --test failure_detail --test feature_contract --test feature_surfaces --test fixture_builder --test flow --test flow_actions --test flow_issue --test git_vocabulary --test help_catalog --test help_lang --test helper_stderr --test history_ops --test hooks --test hosting_absent --test hosting_checkout_pr --test hosting_issue_create --test hosting_link --test hosting_meta --test hosting_open_refused --test hosting_providers --test hosting_review --test hosting_review_api --test hosting_tools --test http --test install_script --test installers --test isolate --test jobs --test jobs_phases --test launch --test lfs --test lfs_absent --test lfs_fixture --test lfs_missing --test lfs_not_built --test licenses --test lifecycle --test live_update --test log_count --test log_mermaid --test lookup_snapshot --test mailmap --test mcp --test merge_policy --test merge_unstage --test multi_repo --test mutations --test network --test network_auth_env --test no_lfs --test no_mcp --test no_terminal --test outside --test outside_journal --test outside_journal_off --test panicking_op --test privacy --test private_files --test quantity_units --test read_ops --test real_binary --test real_daemons --test refs --test remote_access --test repo_auth --test repo_auth_manager --test repo_auth_unavailable --test reuse_window --test reword_parity --test rewrite --test rewrite_content_perf --test rewrite_external --test rewrite_host --test rewrite_host_protection --test rewrite_paths --test rewrite_rules --test rewrite_script --test rewrite_scripts --test rewrite_undo --test roundtrip --test schema_roundtrip --test session --test shared_transfers --test shell_init --test shutdown_drain --test sparse --test spawn_budget --test spawn_budget_outside --test spawn_budget_rewrite --test split --test split_plan --test split_sign_default --test split_undo --test ssh_key --test stage_guard --test stage_sensitive --test staging --test stuck_states --test submodule --test submodules --test terminal_agent --test theme --test token_command --test trailer_grammar --test trust --test typed_errors --test ui --test ui_viewers --test undo --test undo_depth --test undo_hardening --test undo_history --test undo_journal_stuck --test undo_off --test undo_refs --test undo_remote_delete --test undo_restore --test undo_s6 --test undo_safety_net --test undo_snapshots --test undo_stash_remotes --test uninstall --test update_exit --test update_lock --test version --test workflow_pins --test workspace --test workspace_ai --test worktree_submodule_absent --test worktree_submodule_not_built --no-run --message-format=json
+   Compiling ring v0.17.14
+   Compiling gitpoulpi-cli-backend v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-cli-backend)
+   Compiling gitpoulpi-ipc v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-ipc)
+   Compiling gitpoulpi-i18n v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-i18n)
+   Compiling rustls v0.23.46
+   Compiling rustls-webpki v0.103.16
+   Compiling rcgen v0.13.2
+   Compiling gitpoulpi-git2-backend v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-git2-backend)
+   Compiling gitpoulpi-commands v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-commands)
+   Compiling gitpoulpi-mcp v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-mcp)
+   Compiling gitpoulpi-tui v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-tui)
+   Compiling gitpoulpi-cli v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-cli)
+   Compiling tokio-rustls v0.26.6
+   Compiling ureq v3.5.1
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.12.28
+   Compiling gitpoulpi-hosting v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-hosting)
+   Compiling gitpoulpi-daemon v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-daemon)
+   Compiling gitpoulpi-ai v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-ai)
+   Compiling gitpoulpi-update v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-update)
+   Compiling gitpoulpi-updater v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/crates/gitpoulpi-updater)
+   Compiling xtask v1.0.0-rc.1 (/data/Projects/gitpoulpi/.claude/worktrees/agent-a1ab28a68c4233aee/xtask)
+    Finished `test` profile [unoptimized] target(s) in 2m 04s
+cargo test --workspace --no-fail-fast --doc  (as one job beside the pool)
+running 208 test jobs, 15 at a time
+[  1/208] ok       0.0s  gitpoulpi-ai::rewrite_rules
+[  2/208] ok       0.0s  gitpoulpi-ai::rewrite_script
+[  3/208] ok       0.0s  gitpoulpi-cli (bin gitpoulpi-launch)
+[  4/208] ok       0.0s  gitpoulpi-ai::trust
+[  5/208] ok       0.0s  gitpoulpi-ai::privacy
+[  6/208] ok       0.0s  gitpoulpi-ai::split_plan
+[  7/208] ok       0.0s  gitpoulpi-cli-backend::diff
+[  8/208] ok       0.0s  gitpoulpi-ai (lib)
+[  9/208] ok       0.0s  gitpoulpi-cli-backend::hooks
+[ 10/208] ok       0.0s  gitpoulpi-cli-backend::lfs_not_built
+[ 11/208] ok       0.1s  gitpoulpi-cli-backend::conflicts
+[ 12/208] ok       0.1s  gitpoulpi-cli-backend::credentials
+[ 13/208] ok       0.1s  gitpoulpi-cli-backend::history_ops
+[ 14/208] ok       0.1s  gitpoulpi-cli-backend::mutations
+[ 15/208] ok       0.2s  gitpoulpi-cli (bin gitpoulpi)
+[ 16/208] ok       0.1s  gitpoulpi-cli-backend::read_ops
+[ 17/208] ok       0.1s  gitpoulpi-cli-backend::no_terminal
+[ 18/208] ok       0.1s  gitpoulpi-cli-backend::split_sign_default
+[ 19/208] ok       0.2s  gitpoulpi-cli-backend::network_auth_env
+[ 20/208] ok       0.3s  gitpoulpi-cli-backend::network
+[ 21/208] ok       0.0s  gitpoulpi-cli-backend::worktree_submodule_not_built
+[ 22/208] ok       0.1s  gitpoulpi-cli-backend::staging
+[ 23/208] ok       0.2s  gitpoulpi-cli-backend::ssh_key
+[ 24/208] ok       0.0s  gitpoulpi-cli::ai_not_built
+[ 25/208] ok       0.3s  gitpoulpi-cli::add
+[ 26/208] ok       0.7s  gitpoulpi-cli::flow
+[ 27/208] ok       0.6s  gitpoulpi-cli::ai
+[ 28/208] ok       0.3s  gitpoulpi-cli::ai_rewrite_script
+[ 29/208] ok       0.6s  gitpoulpi-cli::ai_review_context
+[ 30/208] ok       0.4s  gitpoulpi-cli::ai_rewrite_rules
+[ 31/208] ok       0.8s  gitpoulpi-cli::ai_limits
+[ 32/208] ok       0.2s  gitpoulpi-cli::command_alias_add
+[ 33/208] ok       0.3s  gitpoulpi-cli::command_alias
+[ 34/208] ok       1.4s  gitpoulpi-cli::autostash
+[ 35/208] ok       0.4s  gitpoulpi-cli::commit_options
+[ 36/208] ok       0.3s  gitpoulpi-cli::config
+[ 37/208] ok       1.7s  gitpoulpi-cli-backend::lfs
+[ 38/208] ok       0.3s  gitpoulpi-cli::conflicts_check
+[ 39/208] ok       0.2s  gitpoulpi-cli::encoding
+[ 40/208] ok       0.2s  gitpoulpi-cli::failure_detail
+[ 41/208] ok       0.5s  gitpoulpi-cli::desktop
+[ 42/208] ok       2.1s  gitpoulpi-cli-backend (lib)
+[ 43/208] ok       1.1s  gitpoulpi-cli::daemon
+[ 44/208] ok       0.5s  gitpoulpi-cli::hosting_checkout_pr
+[ 45/208] ok       0.2s  gitpoulpi-cli::hosting_issue_create
+[ 46/208] ok       1.7s  gitpoulpi-cli::completions
+[ 47/208] ok       0.2s  gitpoulpi-cli::hosting_open_refused
+[ 48/208] ok       0.6s  gitpoulpi-cli::hosting_link
+[ 49/208] ok       2.0s  gitpoulpi-cli::conflicts
+[ 50/208] ok       0.5s  gitpoulpi-cli::hosting_meta
+[ 51/208] ok       1.6s  gitpoulpi-cli::flow_actions
+[ 52/208] ok       2.0s  gitpoulpi-cli::flow_issue
+[ 53/208] ok       0.2s  gitpoulpi-cli::launch
+[ 54/208] ok       0.2s  gitpoulpi-cli::licenses
+[ 55/208] ok       2.4s  gitpoulpi-cli::help_lang
+[ 56/208] ok       0.3s  gitpoulpi-cli::log_count
+[ 57/208] ok       1.6s  gitpoulpi-cli::hosting_review_api
+[ 58/208] ok       0.5s  gitpoulpi-cli::log_mermaid
+[ 59/208] ok       1.8s  gitpoulpi-cli::hosting_review
+[ 60/208] ok       5.1s  gitpoulpi-daemon::flow
+[ 61/208] ok       0.0s  gitpoulpi-cli::no_lfs
+[ 62/208] ok       0.0s  gitpoulpi-cli::no_mcp
+[ 63/208] ok       0.6s  gitpoulpi-cli::merge_policy
+[ 64/208] ok       1.1s  gitpoulpi-cli::mailmap
+[ 65/208] ok       0.6s  gitpoulpi-cli::outside
+[ 66/208] ok       0.3s  gitpoulpi-cli::privacy
+[ 67/208] ok       2.4s  gitpoulpi-cli::jobs
+[ 68/208] ok       1.1s  gitpoulpi-cli::multi_repo
+[ 69/208] ok       0.8s  gitpoulpi-cli::refs
+[ 70/208] ok       1.7s  gitpoulpi-cli::mcp
+[ 71/208] ok       1.0s  gitpoulpi-cli::rewrite_external
+[ 72/208] ok       1.2s  gitpoulpi-cli::repo_auth
+[ 73/208] ok       0.5s  gitpoulpi-cli::session
+[ 74/208] ok       0.3s  gitpoulpi-cli::shell_init
+[ 75/208] ok       1.0s  gitpoulpi-cli::rewrite_host
+[ 76/208] ok       0.3s  gitpoulpi-cli::stage_sensitive
+[ 77/208] ok       0.5s  gitpoulpi-cli::stuck_states
+[ 78/208] ok       1.5s  gitpoulpi-cli::rewrite_paths
+[ 79/208] ok       1.0s  gitpoulpi-cli::split
+[ 80/208] ok       1.3s  gitpoulpi-cli::submodule
+[ 81/208] ok       5.5s  gitpoulpi-cli::hosting_providers
+[ 82/208] ok       7.8s  gitpoulpi-cli::commands
+[ 83/208] ok       0.1s  gitpoulpi-cli::update_lock
+[ 84/208] ok       0.4s  gitpoulpi-cli::uninstall
+[ 85/208] ok       0.1s  gitpoulpi-cli::version
+[ 86/208] ok       0.9s  gitpoulpi-cli::undo_safety_net
+[ 87/208] ok       1.5s  gitpoulpi-cli::undo_s6
+[ 88/208] ok       0.0s  gitpoulpi-commands::feature_surfaces
+[ 89/208] ok       0.1s  gitpoulpi-commands (lib)
+[ 90/208] ok       0.0s  gitpoulpi-commands::hosting_absent
+[ 91/208] ok       0.0s  gitpoulpi-commands::lfs_absent
+[ 92/208] ok       0.0s  gitpoulpi-commands::worktree_submodule_absent
+[ 93/208] FAIL     0.1s  gitpoulpi-commands::help_catalog
+[ 94/208] ok       9.4s  gitpoulpi-cli-backend::trailer_grammar
+[ 95/208] ok       0.0s  gitpoulpi-config::docs_coverage
+[ 96/208] ok       0.0s  gitpoulpi-config::private_files
+[ 97/208] ok       0.0s  gitpoulpi-config::quantity_units
+[ 98/208] ok       0.0s  gitpoulpi-config::reuse_window
+[ 99/208] ok       0.9s  gitpoulpi-cli::workspace_ai
+[100/208] ok       0.1s  gitpoulpi-config::schema_roundtrip
+[101/208] ok       0.0s  gitpoulpi-daemon (bin gitpoulpi-credential-stub)
+[102/208] ok       2.4s  gitpoulpi-cli::ui
+[103/208] ok       1.1s  gitpoulpi-cli::workspace
+[104/208] ok       0.2s  gitpoulpi-daemon::auth
+[105/208] ok       0.8s  gitpoulpi-config::absent_means_default
+[106/208] ok       0.2s  gitpoulpi-daemon::concurrent_reads
+[107/208] ok       0.6s  gitpoulpi-daemon::account_source
+[108/208] ok       4.9s  gitpoulpi-cli::rewrite
+[109/208] ok       0.4s  gitpoulpi-daemon::conflict_encoding
+[110/208] ok       0.3s  gitpoulpi-daemon::credential_helper_unreachable
+[111/208] ok       0.4s  gitpoulpi-daemon::conflict_prevention_lists
+[112/208] ok       0.7s  gitpoulpi-daemon::conflict_prevention
+[113/208] ok       0.2s  gitpoulpi-daemon::encoding
+[114/208] ok       3.3s  gitpoulpi-cli::undo
+[115/208] ok       0.3s  gitpoulpi-daemon::lifecycle
+[116/208] ok       1.1s  gitpoulpi-daemon::conflict_resolution
+[117/208] ok       0.4s  gitpoulpi-daemon::mailmap
+[118/208] ok       0.3s  gitpoulpi-daemon::merge_unstage
+[119/208] ok       2.3s  gitpoulpi-core (lib)
+[120/208] ok       0.1s  gitpoulpi-daemon::outside_journal_off
+[121/208] ok       0.0s  gitpoulpi-daemon::panicking_op
+[122/208] ok       2.4s  gitpoulpi-daemon (lib)
+[123/208] ok       0.1s  gitpoulpi-daemon::remote_access
+[124/208] ok       0.0s  gitpoulpi-daemon::repo_auth_manager
+[125/208] ok       0.2s  gitpoulpi-daemon::repo_auth_unavailable
+[126/208] ok       0.9s  gitpoulpi-daemon::merge_policy
+[127/208] ok       0.3s  gitpoulpi-daemon::rewrite_host_protection
+[128/208] ok       0.7s  gitpoulpi-daemon::repo_auth
+[129/208] ok       0.1s  gitpoulpi-daemon::rewrite_scripts
+[130/208] ok      13.2s  gitpoulpi-daemon::rewrite_undo
+[131/208] ok       0.1s  gitpoulpi-daemon::sparse
+[132/208] ok       2.2s  gitpoulpi-daemon::live_update
+[133/208] ok       4.2s  gitpoulpi-config (lib)
+[134/208] ok       0.5s  gitpoulpi-daemon::shutdown_drain
+[135/208] ok       0.1s  gitpoulpi-daemon::stage_guard
+[136/208] ok       0.3s  gitpoulpi-daemon::split_undo
+[137/208] ok       1.3s  gitpoulpi-daemon::rewrite_paths
+[138/208] ok       0.2s  gitpoulpi-daemon::typed_errors
+[139/208] ok       0.9s  gitpoulpi-daemon::submodules
+[140/208] ok       0.6s  gitpoulpi-daemon::ui_viewers
+[141/208] ok       0.2s  gitpoulpi-daemon::undo_depth
+[142/208] ok       1.1s  gitpoulpi-daemon::token_command
+[143/208] ok       2.1s  gitpoulpi-daemon::shared_transfers
+[144/208] ok       2.1s  gitpoulpi-daemon::spawn_budget
+[145/208] ok       0.5s  gitpoulpi-daemon::undo_journal_stuck
+[146/208] ok       4.7s  gitpoulpi-daemon::jobs
+[147/208] ok       0.4s  gitpoulpi-daemon::undo_off
+[148/208] ok       1.1s  gitpoulpi-daemon::undo
+[149/208] ok       3.4s  gitpoulpi-daemon::spawn_budget_outside
+[150/208] ok       1.5s  gitpoulpi-daemon::undo_restore
+[151/208] ok       0.0s  gitpoulpi-git2-backend (lib)
+[152/208] ok       2.3s  gitpoulpi-daemon::undo_history
+[153/208] ok       0.2s  gitpoulpi-git2-backend::count_in_process
+[154/208] ok       0.1s  gitpoulpi-git2-backend::reword_parity
+[155/208] ok       0.0s  gitpoulpi-git2-backend::rewrite_content_perf
+[156/208] ok       2.7s  gitpoulpi-daemon::undo_hardening
+[157/208] ok       2.4s  gitpoulpi-daemon::undo_refs
+[158/208] ok       0.7s  gitpoulpi-git2-backend::lfs_missing
+[159/208] ok       0.0s  gitpoulpi-i18n (lib)
+[160/208] ok       2.5s  gitpoulpi-daemon::undo_remote_delete
+[161/208] ok       0.7s  gitpoulpi-git2-backend::spawn_budget
+[162/208] ok      18.3s  gitpoulpi-daemon::autostash
+[163/208] ok       2.6s  gitpoulpi-daemon::undo_snapshots
+[164/208] ok       0.1s  gitpoulpi-log (lib)
+[165/208] ok       0.0s  gitpoulpi-mcp (bin gitpoulpi-mcp)
+[166/208] ok       0.2s  gitpoulpi-ipc (lib)
+[167/208] ok       7.4s  gitpoulpi-daemon::jobs_phases
+[168/208] ok      11.2s  gitpoulpi-cli::theme
+[169/208] ok       1.8s  gitpoulpi-daemon::undo_stash_remotes
+[170/208] ok       0.4s  gitpoulpi-mcp::http
+[171/208] ok       0.0s  gitpoulpi-pty (lib)
+[172/208] ok       1.0s  gitpoulpi-i18n::catalog
+[173/208] ok       0.1s  gitpoulpi-pty::session
+[174/208] ok       0.5s  gitpoulpi-mcp::hosting_tools
+[175/208] ok       0.0s  gitpoulpi-secrets::helper_stderr
+[176/208] ok       6.9s  gitpoulpi-daemon::outside_journal
+[177/208] ok       0.1s  gitpoulpi-session (lib)
+[178/208] ok       0.1s  gitpoulpi-testkit::fixture_builder
+[179/208] ok       0.2s  gitpoulpi-secrets (lib)
+[180/208] ok       0.0s  gitpoulpi-testkit::isolate
+[181/208] ok       0.0s  gitpoulpi-tui (bin gitpoulpi-tui)
+[182/208] ok       0.7s  gitpoulpi-mcp::update_exit
+[183/208] ok       0.2s  gitpoulpi-update (lib)
+[184/208] ok       0.0s  gitpoulpi-updater (bin gitpoulpi-updater)
+[185/208] ok       0.1s  gitpoulpi-updater (lib)
+[186/208] ok       0.0s  gitpoulpi-updater::real_binary
+[187/208] ok       0.7s  gitpoulpi-testkit (lib)
+[188/208] ok       0.0s  xtask (bin xtask)
+[189/208] ok       0.2s  gitpoulpi-updater::real_daemons
+[190/208] ok       0.5s  xtask (lib)
+[191/208] ok       0.0s  xtask::feature_contract
+[192/208] ok       0.0s  xtask::installers
+[193/208] ok       0.0s  xtask::licenses
+[194/208] ok       0.0s  xtask::workflow_pins
+[195/208] ok       1.3s  gitpoulpi-testkit::lfs_fixture
+[196/208] ok       2.2s  gitpoulpi-mcp::roundtrip
+[197/208] ok      21.1s  gitpoulpi-ai::terminal_agent
+[198/208] ok       3.4s  gitpoulpi-testkit::conflict_fixture
+[199/208] ok       7.9s  gitpoulpi-i18n::git_vocabulary
+[200/208] ok      27.6s  doc tests
+[201/208] ok       9.8s  gitpoulpi-mcp (lib)
+[202/208] ok      15.7s  xtask::build_custom_script
+[203/208] ok      18.4s  gitpoulpi-git2-backend::spawn_budget_rewrite
+[204/208] ok      18.7s  gitpoulpi-hosting (lib)
+[205/208] ok      21.2s  gitpoulpi-i18n::lookup_snapshot
+[206/208] ok      42.7s  gitpoulpi-git2-backend::contract
+[207/208] ok      44.1s  gitpoulpi-tui (lib)
+[208/208] ok      89.6s  gitpoulpi-cli::install_script
+
+===== summary =====
+ok      27.6s  doc tests
+ok       0.0s  gitpoulpi-ai (lib)
+ok       0.0s  gitpoulpi-ai::privacy
+ok       0.0s  gitpoulpi-ai::rewrite_rules
+ok       0.0s  gitpoulpi-ai::rewrite_script
+ok       0.0s  gitpoulpi-ai::split_plan
+ok      21.1s  gitpoulpi-ai::terminal_agent
+ok       0.0s  gitpoulpi-ai::trust
+ok       0.2s  gitpoulpi-cli (bin gitpoulpi)
+ok       0.0s  gitpoulpi-cli (bin gitpoulpi-launch)
+ok       2.1s  gitpoulpi-cli-backend (lib)
+ok       0.1s  gitpoulpi-cli-backend::conflicts
+ok       0.1s  gitpoulpi-cli-backend::credentials
+ok       0.0s  gitpoulpi-cli-backend::diff
+ok       0.1s  gitpoulpi-cli-backend::history_ops
+ok       0.0s  gitpoulpi-cli-backend::hooks
+ok       1.7s  gitpoulpi-cli-backend::lfs
+ok       0.0s  gitpoulpi-cli-backend::lfs_not_built
+ok       0.1s  gitpoulpi-cli-backend::mutations
+ok       0.3s  gitpoulpi-cli-backend::network
+ok       0.2s  gitpoulpi-cli-backend::network_auth_env
+ok       0.1s  gitpoulpi-cli-backend::no_terminal
+ok       0.1s  gitpoulpi-cli-backend::read_ops
+ok       0.1s  gitpoulpi-cli-backend::split_sign_default
+ok       0.2s  gitpoulpi-cli-backend::ssh_key
+ok       0.1s  gitpoulpi-cli-backend::staging
+ok       9.4s  gitpoulpi-cli-backend::trailer_grammar
+ok       0.0s  gitpoulpi-cli-backend::worktree_submodule_not_built
+ok       0.3s  gitpoulpi-cli::add
+ok       0.6s  gitpoulpi-cli::ai
+ok       0.8s  gitpoulpi-cli::ai_limits
+ok       0.0s  gitpoulpi-cli::ai_not_built
+ok       0.6s  gitpoulpi-cli::ai_review_context
+ok       0.4s  gitpoulpi-cli::ai_rewrite_rules
+ok       0.3s  gitpoulpi-cli::ai_rewrite_script
+ok       1.4s  gitpoulpi-cli::autostash
+ok       0.3s  gitpoulpi-cli::command_alias
+ok       0.2s  gitpoulpi-cli::command_alias_add
+ok       7.8s  gitpoulpi-cli::commands
+ok       0.4s  gitpoulpi-cli::commit_options
+ok       1.7s  gitpoulpi-cli::completions
+ok       0.3s  gitpoulpi-cli::config
+ok       2.0s  gitpoulpi-cli::conflicts
+ok       0.3s  gitpoulpi-cli::conflicts_check
+ok       1.1s  gitpoulpi-cli::daemon
+ok       0.5s  gitpoulpi-cli::desktop
+ok       0.2s  gitpoulpi-cli::encoding
+ok       0.2s  gitpoulpi-cli::failure_detail
+ok       0.7s  gitpoulpi-cli::flow
+ok       1.6s  gitpoulpi-cli::flow_actions
+ok       2.0s  gitpoulpi-cli::flow_issue
+ok       2.4s  gitpoulpi-cli::help_lang
+ok       0.5s  gitpoulpi-cli::hosting_checkout_pr
+ok       0.2s  gitpoulpi-cli::hosting_issue_create
+ok       0.6s  gitpoulpi-cli::hosting_link
+ok       0.5s  gitpoulpi-cli::hosting_meta
+ok       0.2s  gitpoulpi-cli::hosting_open_refused
+ok       5.5s  gitpoulpi-cli::hosting_providers
+ok       1.8s  gitpoulpi-cli::hosting_review
+ok       1.6s  gitpoulpi-cli::hosting_review_api
+ok      89.6s  gitpoulpi-cli::install_script
+ok       2.4s  gitpoulpi-cli::jobs
+ok       0.2s  gitpoulpi-cli::launch
+ok       0.2s  gitpoulpi-cli::licenses
+ok       0.3s  gitpoulpi-cli::log_count
+ok       0.5s  gitpoulpi-cli::log_mermaid
+ok       1.1s  gitpoulpi-cli::mailmap
+ok       1.7s  gitpoulpi-cli::mcp
+ok       0.6s  gitpoulpi-cli::merge_policy
+ok       1.1s  gitpoulpi-cli::multi_repo
+ok       0.0s  gitpoulpi-cli::no_lfs
+ok       0.0s  gitpoulpi-cli::no_mcp
+ok       0.6s  gitpoulpi-cli::outside
+ok       0.3s  gitpoulpi-cli::privacy
+ok       0.8s  gitpoulpi-cli::refs
+ok       1.2s  gitpoulpi-cli::repo_auth
+ok       4.9s  gitpoulpi-cli::rewrite
+ok       1.0s  gitpoulpi-cli::rewrite_external
+ok       1.0s  gitpoulpi-cli::rewrite_host
+ok       1.5s  gitpoulpi-cli::rewrite_paths
+ok       0.5s  gitpoulpi-cli::session
+ok       0.3s  gitpoulpi-cli::shell_init
+ok       1.0s  gitpoulpi-cli::split
+ok       0.3s  gitpoulpi-cli::stage_sensitive
+ok       0.5s  gitpoulpi-cli::stuck_states
+ok       1.3s  gitpoulpi-cli::submodule
+ok      11.2s  gitpoulpi-cli::theme
+ok       2.4s  gitpoulpi-cli::ui
+ok       3.3s  gitpoulpi-cli::undo
+ok       1.5s  gitpoulpi-cli::undo_s6
+ok       0.9s  gitpoulpi-cli::undo_safety_net
+ok       0.4s  gitpoulpi-cli::uninstall
+ok       0.1s  gitpoulpi-cli::update_lock
+ok       0.1s  gitpoulpi-cli::version
+ok       1.1s  gitpoulpi-cli::workspace
+ok       0.9s  gitpoulpi-cli::workspace_ai
+ok       0.1s  gitpoulpi-commands (lib)
+ok       0.0s  gitpoulpi-commands::feature_surfaces
+FAIL     0.1s  gitpoulpi-commands::help_catalog
+ok       0.0s  gitpoulpi-commands::hosting_absent
+ok       0.0s  gitpoulpi-commands::lfs_absent
+ok       0.0s  gitpoulpi-commands::worktree_submodule_absent
+ok       4.2s  gitpoulpi-config (lib)
+ok       0.8s  gitpoulpi-config::absent_means_default
+ok       0.0s  gitpoulpi-config::docs_coverage
+ok       0.0s  gitpoulpi-config::private_files
+ok       0.0s  gitpoulpi-config::quantity_units
+ok       0.0s  gitpoulpi-config::reuse_window
+ok       0.1s  gitpoulpi-config::schema_roundtrip
+ok       2.3s  gitpoulpi-core (lib)
+ok       0.0s  gitpoulpi-daemon (bin gitpoulpi-credential-stub)
+ok       2.4s  gitpoulpi-daemon (lib)
+ok       0.6s  gitpoulpi-daemon::account_source
+ok       0.2s  gitpoulpi-daemon::auth
+ok      18.3s  gitpoulpi-daemon::autostash
+ok       0.2s  gitpoulpi-daemon::concurrent_reads
+ok       0.4s  gitpoulpi-daemon::conflict_encoding
+ok       0.7s  gitpoulpi-daemon::conflict_prevention
+ok       0.4s  gitpoulpi-daemon::conflict_prevention_lists
+ok       1.1s  gitpoulpi-daemon::conflict_resolution
+ok       0.3s  gitpoulpi-daemon::credential_helper_unreachable
+ok       0.2s  gitpoulpi-daemon::encoding
+ok       5.1s  gitpoulpi-daemon::flow
+ok       4.7s  gitpoulpi-daemon::jobs
+ok       7.4s  gitpoulpi-daemon::jobs_phases
+ok       0.3s  gitpoulpi-daemon::lifecycle
+ok       2.2s  gitpoulpi-daemon::live_update
+ok       0.4s  gitpoulpi-daemon::mailmap
+ok       0.9s  gitpoulpi-daemon::merge_policy
+ok       0.3s  gitpoulpi-daemon::merge_unstage
+ok       6.9s  gitpoulpi-daemon::outside_journal
+ok       0.1s  gitpoulpi-daemon::outside_journal_off
+ok       0.0s  gitpoulpi-daemon::panicking_op
+ok       0.1s  gitpoulpi-daemon::remote_access
+ok       0.7s  gitpoulpi-daemon::repo_auth
+ok       0.0s  gitpoulpi-daemon::repo_auth_manager
+ok       0.2s  gitpoulpi-daemon::repo_auth_unavailable
+ok       0.3s  gitpoulpi-daemon::rewrite_host_protection
+ok       1.3s  gitpoulpi-daemon::rewrite_paths
+ok       0.1s  gitpoulpi-daemon::rewrite_scripts
+ok      13.2s  gitpoulpi-daemon::rewrite_undo
+ok       2.1s  gitpoulpi-daemon::shared_transfers
+ok       0.5s  gitpoulpi-daemon::shutdown_drain
+ok       0.1s  gitpoulpi-daemon::sparse
+ok       2.1s  gitpoulpi-daemon::spawn_budget
+ok       3.4s  gitpoulpi-daemon::spawn_budget_outside
+ok       0.3s  gitpoulpi-daemon::split_undo
+ok       0.1s  gitpoulpi-daemon::stage_guard
+ok       0.9s  gitpoulpi-daemon::submodules
+ok       1.1s  gitpoulpi-daemon::token_command
+ok       0.2s  gitpoulpi-daemon::typed_errors
+ok       0.6s  gitpoulpi-daemon::ui_viewers
+ok       1.1s  gitpoulpi-daemon::undo
+ok       0.2s  gitpoulpi-daemon::undo_depth
+ok       2.7s  gitpoulpi-daemon::undo_hardening
+ok       2.3s  gitpoulpi-daemon::undo_history
+ok       0.5s  gitpoulpi-daemon::undo_journal_stuck
+ok       0.4s  gitpoulpi-daemon::undo_off
+ok       2.4s  gitpoulpi-daemon::undo_refs
+ok       2.5s  gitpoulpi-daemon::undo_remote_delete
+ok       1.5s  gitpoulpi-daemon::undo_restore
+ok       2.6s  gitpoulpi-daemon::undo_snapshots
+ok       1.8s  gitpoulpi-daemon::undo_stash_remotes
+ok       0.0s  gitpoulpi-git2-backend (lib)
+ok      42.7s  gitpoulpi-git2-backend::contract
+ok       0.2s  gitpoulpi-git2-backend::count_in_process
+ok       0.7s  gitpoulpi-git2-backend::lfs_missing
+ok       0.1s  gitpoulpi-git2-backend::reword_parity
+ok       0.0s  gitpoulpi-git2-backend::rewrite_content_perf
+ok       0.7s  gitpoulpi-git2-backend::spawn_budget
+ok      18.4s  gitpoulpi-git2-backend::spawn_budget_rewrite
+ok      18.7s  gitpoulpi-hosting (lib)
+ok       0.0s  gitpoulpi-i18n (lib)
+ok       1.0s  gitpoulpi-i18n::catalog
+ok       7.9s  gitpoulpi-i18n::git_vocabulary
+ok      21.2s  gitpoulpi-i18n::lookup_snapshot
+ok       0.2s  gitpoulpi-ipc (lib)
+ok       0.1s  gitpoulpi-log (lib)
+ok       0.0s  gitpoulpi-mcp (bin gitpoulpi-mcp)
+ok       9.8s  gitpoulpi-mcp (lib)
+ok       0.5s  gitpoulpi-mcp::hosting_tools
+ok       0.4s  gitpoulpi-mcp::http
+ok       2.2s  gitpoulpi-mcp::roundtrip
+ok       0.7s  gitpoulpi-mcp::update_exit
+ok       0.0s  gitpoulpi-pty (lib)
+ok       0.1s  gitpoulpi-pty::session
+ok       0.2s  gitpoulpi-secrets (lib)
+ok       0.0s  gitpoulpi-secrets::helper_stderr
+ok       0.1s  gitpoulpi-session (lib)
+ok       0.7s  gitpoulpi-testkit (lib)
+ok       3.4s  gitpoulpi-testkit::conflict_fixture
+ok       0.1s  gitpoulpi-testkit::fixture_builder
+ok       0.0s  gitpoulpi-testkit::isolate
+ok       1.3s  gitpoulpi-testkit::lfs_fixture
+ok       0.0s  gitpoulpi-tui (bin gitpoulpi-tui)
+ok      44.1s  gitpoulpi-tui (lib)
+ok       0.2s  gitpoulpi-update (lib)
+ok       0.0s  gitpoulpi-updater (bin gitpoulpi-updater)
+ok       0.1s  gitpoulpi-updater (lib)
+ok       0.0s  gitpoulpi-updater::real_binary
+ok       0.2s  gitpoulpi-updater::real_daemons
+ok       0.0s  xtask (bin xtask)
+ok       0.5s  xtask (lib)
+ok      15.7s  xtask::build_custom_script
+ok       0.0s  xtask::feature_contract
+ok       0.0s  xtask::installers
+ok       0.0s  xtask::licenses
+ok       0.0s  xtask::workflow_pins
+
+slowest ten:
+     89.6s  gitpoulpi-cli::install_script
+     44.1s  gitpoulpi-tui (lib)
+     42.7s  gitpoulpi-git2-backend::contract
+     27.6s  doc tests
+     21.2s  gitpoulpi-i18n::lookup_snapshot
+     21.1s  gitpoulpi-ai::terminal_agent
+     18.7s  gitpoulpi-hosting (lib)
+     18.4s  gitpoulpi-git2-backend::spawn_budget_rewrite
+     18.3s  gitpoulpi-daemon::autostash
+     15.7s  xtask::build_custom_script
+
+===== FAILED: gitpoulpi-commands::help_catalog =====
+
+running 3 tests
+test dump_english_source_when_asked ... ok
+test shipped_languages_cover_every_help_key ... FAILED
+test english_reference_matches_the_doc_comments ... FAILED
+
+failures:
+
+---- shipped_languages_cover_every_help_key stdout ----
+
+thread 'shipped_languages_cover_every_help_key' (295351) panicked at crates/gitpoulpi-commands/tests/help_catalog.rs:38:9:
+fr: missing ["remote remove", "remote list"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- english_reference_matches_the_doc_comments stdout ----
+
+thread 'english_reference_matches_the_doc_comments' (295340) panicked at crates/gitpoulpi-commands/tests/help_catalog.rs:64:9:
+assertion `left == right` failed: stale reference for remote remove
+  left: None
+ right: Some("Removes a remote with its remote-tracking branches and tag mirror; a leftover name (`configured: false` in `remote list`: branches, no remote) has its branches and tag mirror deleted instead")
+
+
+failures:
+    english_reference_matches_the_doc_comments
+    shipped_languages_cover_every_help_key
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+208 binaries, 1 failed; wall 217s, sum of binary times 534s
+failed:
+  gitpoulpi-commands::help_catalog
+failures written to target/xtask-test-failures.tsv
+rerun only those: cargo run -p xtask -- test --failed
+exit 1

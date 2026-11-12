@@ -168,6 +168,7 @@ pub(crate) fn family(kind: OperationKind) -> Family {
         | K::Refs
         | K::Stashes
         | K::Remotes
+        | K::LeftoverRemotes
         | K::Worktrees
         | K::Submodules
         | K::Resolve
@@ -541,6 +542,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::Refs
         | K::Stashes
         | K::Remotes
+        | K::LeftoverRemotes
         | K::Worktrees
         | K::Submodules
         | K::Resolve

@@ -2148,6 +2148,10 @@ what_remote_link = "远程链接"
 not_web_url = "{url} 不是网页托管的 URL - 无法生成链接"
 default_now = "{name} 现在是此仓库的默认远程"
 remove_confirm = "移除远程“{name}”？\n其远程跟踪分支也会一并移除；它指向的仓库不会受到影响。"
+leftover_note = "（未配置）"
+remove_leftover = "移除残留分支…"
+add_as_remote = "将 {name} 添加为远程…"
+remove_leftover_confirm = "移除“{name}”的残留分支？\n该名称下没有配置远程；只会移除其远程跟踪分支。撤销可恢复它们。"
 force_confirm_fetch = { git = "强制 {$push} {branch} 到 {remote}？\n会先 {$fetch} {remote}，然后带 lease {$push}：仅 {remote} 上现有的 {$commit} 将被丢弃；该 {$fetch} 之后 {$push} 的内容受到保护。", local = "强制{$push} {branch} 到 {remote}？\n会先{$fetch} {remote}，然后带 lease 推送：仅 {remote} 上现有的{$commit}将被丢弃；该{$fetch}之后推送的内容受到保护。" }
 force_confirm = { git = "强制 {$push} {branch} 到 {remote}？\n带 lease：若 {remote}/{branch} 自上次 {$fetch} 后已移动则会被拒绝。仅 {remote} 上有的 {$commit} 将被丢弃。", local = "强制{$push} {branch} 到 {remote}？\n带 lease：若 {remote}/{branch} 自上次{$fetch}后已移动则会被拒绝。仅 {remote} 上有的{$commit}将被丢弃。" }
 setting_upstream = { git = "正在将 {branch} 的 upstream 设为 {upstream}…", local = "正在将 {branch} 的上游设为 {upstream}…" }

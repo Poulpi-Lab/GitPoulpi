@@ -2150,6 +2150,10 @@ what_remote_link = "länk till remote"
 not_web_url = "{url} är ingen webbadress - inget att länka till"
 default_now = "{name} är nu det här repositoryts standard-remote"
 remove_confirm = "Ta bort remoten '{name}'?\nDess remote-spårande grenar försvinner med den; repositoryt den pekar på rörs inte."
+leftover_note = "(inte konfigurerad)"
+remove_leftover = "Ta bort kvarglömda grenar..."
+add_as_remote = "Lägg till {name} som remote..."
+remove_leftover_confirm = "Ta bort de kvarglömda grenarna för '{name}'?\nIngen remote är konfigurerad under det namnet; bara dess remote-spårande grenar försvinner. Ångra tar tillbaka dem."
 force_confirm_fetch = { git = "Force push {branch} till {remote}?\nGör först fetch från {remote} och pushar sedan med lease: commits som bara {remote} har nu förkastas; allt som pushats efter den fetchen skyddas.", local = "Force push {branch} till {remote}?\nHämtar först {remote} och pushar sedan med lease: incheckningar som bara {remote} har nu förkastas; allt som pushats efter den hämtningen skyddas." }
 force_confirm = { git = "Force push {branch} till {remote}?\nMed lease: avvisas om {remote}/{branch} har flyttats sedan senaste fetch. Commits som bara {remote} har förkastas.", local = "Force push {branch} till {remote}?\nMed lease: avvisas om {remote}/{branch} har flyttats sedan senaste hämtning. Incheckningar som bara {remote} har förkastas." }
 setting_upstream = "ställer in {branch}s upstream till {upstream}..."

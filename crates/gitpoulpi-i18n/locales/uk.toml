@@ -2148,6 +2148,10 @@ what_remote_link = "посилання на remote"
 not_web_url = "{url} не є веб-URL - немає на що посилатися"
 default_now = "{name} тепер типовий remote цього репозиторію"
 remove_confirm = "Видалити remote «{name}»?\nЙого гілки віддаленого відстеження зникнуть разом із ним; репозиторій, на який він вказує, не зачіпається."
+leftover_note = "(не налаштовано)"
+remove_leftover = "Видалити залишені гілки..."
+add_as_remote = "Додати {name} як remote..."
+remove_leftover_confirm = "Видалити залишені гілки «{name}»?\nПід цією назвою remote не налаштовано; зникнуть лише його гілки віддаленого відстеження. Скасування поверне їх."
 force_confirm_fetch = { git = "Force push {branch} на {remote}?\nСпершу fetch {remote}, потім push із lease: commit'и, які є лише на {remote}, буде відкинуто; усе, надіслане після цього fetch, захищено.", local = "Примусово надіслати {branch} на {remote}?\nСпершу буде завантажено {remote}, потім надіслано із lease: коміти, які є лише на {remote}, буде відкинуто; усе, надіслане після цього завантаження, захищено." }
 force_confirm = { git = "Force push {branch} на {remote}?\nІз lease: буде відхилено, якщо {remote}/{branch} змінився після останнього fetch. Commit'и, які є лише на {remote}, буде відкинуто.", local = "Примусово надіслати {branch} на {remote}?\nІз lease: буде відхилено, якщо {remote}/{branch} змінився після останнього завантаження. Коміти, які є лише на {remote}, буде відкинуто." }
 setting_upstream = "призначення upstream для {branch}: {upstream}..."

@@ -90,6 +90,9 @@ pub(crate) fn entry_block(entry: &Entry) -> String {
     lines.extend(environment());
     lines.push(format!("time: {}", gitpoulpi_log::timestamp(entry.ts_ms)));
     lines.push(format!("title: {}", entry.title));
+    if let Some(action) = &entry.action_text {
+        lines.push(format!("action: {action}"));
+    }
     if let Some(ms) = entry.duration_ms {
         lines.push(format!("duration: {ms} ms"));
     }
@@ -118,6 +121,9 @@ pub(crate) fn diagnostics(
         lines.push("latest problem:".to_string());
         lines.push(format!("  time: {}", gitpoulpi_log::timestamp(entry.ts_ms)));
         lines.push(format!("  title: {}", entry.title));
+        if let Some(action) = &entry.action_text {
+            lines.push(format!("  action: {action}"));
+        }
         lines.push(format!("  message: {}", entry.message));
         if let Some(detail) = &entry.detail {
             lines.extend(detail.lines().into_iter().map(|l| format!("  {l}")));
@@ -163,6 +169,21 @@ mod tests {
         assert!(block.contains("Authentication failed"));
         assert!(block.contains("title: Push failed"));
         assert!(!block.contains("hunter2"), "{block}");
+    }
+
+    #[test]
+    fn a_report_names_the_action_that_failed_with_its_arguments() {
+        let mut entry = Entry::new(
+            Severity::Error,
+            "The operation failed".into(),
+            "backend error: no such remote: cm6".into(),
+        );
+        entry.action_text = Some(crate::activity_log::friendly::action_text(
+            &crate::daemon_link::Action::RemoteRemove("cm6".into()),
+        ));
+        let block = entry_block(&entry);
+        assert!(block.contains("title: The operation failed"), "{block}");
+        assert!(block.contains("action: RemoteRemove(\"cm6\")"), "{block}");
     }
 
     #[test]

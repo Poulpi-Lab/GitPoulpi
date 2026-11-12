@@ -37,6 +37,10 @@ pub(crate) struct Entry {
     pub(crate) kind: FailureKind,
     /// The action that failed, to offer a retry.
     pub(crate) retry: Option<Action>,
+    /// The action and its arguments as text (`RemoteRemove("cm6")`), redacted
+    /// and cut short: what the error report says the failure was *of*, since
+    /// a title like "The operation failed" does not.
+    pub(crate) action_text: Option<String>,
     /// Looked at: the Activity Log was opened.
     pub(crate) read: bool,
     /// The repository the operation ran in; the Repository tab lists the
@@ -74,6 +78,7 @@ impl Entry {
             detail: None,
             kind: FailureKind::Other,
             retry: None,
+            action_text: None,
             read: severity == Severity::Info,
             repo: None,
             list_title: None,

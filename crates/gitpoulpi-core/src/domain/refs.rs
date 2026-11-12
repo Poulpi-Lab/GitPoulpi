@@ -82,6 +82,31 @@ pub fn parse_remote_tag_mirror_ref<'a>(
     (!remote.is_empty() && !tag.is_empty()).then_some((remote, tag))
 }
 
+/// The leftover remote namespaces among `refnames` (full ref names), each
+/// with the refs it owns: remote-tracking branches
+/// (`refs/remotes/<name>/...`) and tag-mirror refs
+/// ([`REMOTE_TAG_MIRROR_PREFIX`]`<name>/...`) whose `<name>` is not one of
+/// the `configured` remotes. Resolved with [`split_remote_ref`], so a
+/// configured `grp/sub` keeps `refs/remotes/grp/sub/*` and only the rest of
+/// `grp/` is the leftover `grp`. One function so the backends agree.
+pub fn leftover_remote_refs(
+    refnames: &[String],
+    configured: &[String],
+) -> std::collections::BTreeMap<String, Vec<String>> {
+    let mut out: std::collections::BTreeMap<String, Vec<String>> = Default::default();
+    for refname in refnames {
+        let owner = if let Some(rest) = refname.strip_prefix("refs/remotes/") {
+            split_remote_ref(rest, configured).map(|(remote, _)| remote)
+        } else {
+            parse_remote_tag_mirror_ref(refname, configured).map(|(remote, _)| remote)
+        };
+        if let Some(owner) = owner.filter(|o| !o.is_empty() && !configured.contains(o)) {
+            out.entry(owner).or_default().push(refname.clone());
+        }
+    }
+    out
+}
+
 /// Which remotes a tag is known to exist on - the state that decides
 /// whether a tag renders as "unpushed" and gets a `Push <tag> to
 /// <remote>` entry in its menu.
@@ -252,7 +277,7 @@ pub fn split_remote_ref<'a>(rest: &'a str, remote_names: &[String]) -> Option<(S
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_remote_tag_mirror_ref, split_remote_ref};
+    use super::{leftover_remote_refs, parse_remote_tag_mirror_ref, split_remote_ref};
 
     fn names(v: &[&str]) -> Vec<String> {
         v.iter().map(|s| s.to_string()).collect()
@@ -363,5 +388,23 @@ mod tests {
             Some(("gone".into(), "main"))
         );
         assert_eq!(split_remote_ref("nameless", &names(&["origin"])), None);
+    }
+    #[test]
+    fn leftover_refs_are_grouped_by_unconfigured_namespace() {
+        let refs = names(&[
+            "refs/remotes/cm6/main",
+            "refs/remotes/cm6/sub/main",
+            "refs/remotes/origin/main",
+            "refs/gitpoulpi/remote-tags/cm6/v1",
+            "refs/gitpoulpi/remote-tags/cm6/sub/v2",
+            "refs/heads/main",
+        ]);
+        let got = leftover_remote_refs(&refs, &names(&["origin", "cm6/sub"]));
+        assert_eq!(got.len(), 1);
+        assert_eq!(
+            got["cm6"],
+            names(&["refs/remotes/cm6/main", "refs/gitpoulpi/remote-tags/cm6/v1"])
+        );
+        assert!(leftover_remote_refs(&refs, &names(&["origin", "cm6", "cm6/sub"])).is_empty());
     }
 }

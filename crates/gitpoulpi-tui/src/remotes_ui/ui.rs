@@ -10,6 +10,10 @@ pub(crate) struct RemoteUi {
     /// The remotes as the last refresh reported them (URLs included, for
     /// Edit and Copy link).
     pub(crate) remotes: Vec<Remote>,
+    /// The remote list has been read at least once: before that, an empty
+    /// `remotes` is "not asked yet", not "no remotes", and a remote-tracking
+    /// namespace must not be called a leftover.
+    pub(crate) loaded: bool,
     /// The remote chosen with "Set as default remote", persisted in
     /// `repo-state.toml`.
     pub(crate) chosen_default: Option<String>,
@@ -38,6 +42,7 @@ impl RemoteUi {
     pub(crate) fn load(repo_root: &Path) -> Self {
         Self {
             remotes: Vec::new(),
+            loaded: false,
             chosen_default: load_chosen_default_remote(repo_root),
             ssh_pin: None,
             want_repo_auth: false,
@@ -50,6 +55,11 @@ impl RemoteUi {
             lfs_anchor: (0, 1),
             flow_anchor: (0, 1),
         }
+    }
+
+    /// `name` is a remote-tracking namespace nothing is configured for.
+    pub(crate) fn is_leftover(&self, name: &str) -> bool {
+        self.loaded && !self.remotes.iter().any(|r| r.name == name)
     }
 
     pub(crate) fn names(&self) -> Vec<String> {
@@ -84,12 +94,12 @@ impl RemoteUi {
         row: u16,
     ) {
         let is_default = self.default_remote(refs).as_deref() == Some(name);
-        self.menu = Some(ContextMenu::new(
-            msg::menu_title(name),
-            remote_menu_entries(name, is_default, hidden),
-            col,
-            row,
-        ));
+        let entries = if self.is_leftover(name) {
+            leftover_menu_entries(name, hidden)
+        } else {
+            remote_menu_entries(name, is_default, hidden)
+        };
+        self.menu = Some(ContextMenu::new(msg::menu_title(name), entries, col, row));
     }
 
     pub(crate) fn open_pull_menu(&mut self, col: u16, row: u16) {
@@ -174,16 +184,24 @@ impl RemoteUi {
         refs: &[Ref],
         col: u16,
         row: u16,
+        with_leftovers: bool,
         action: impl Fn(String) -> RemoteUiAction,
     ) -> Option<String> {
         let names = self.names();
-        if names.is_empty() {
+        let leftovers: Vec<String> = if with_leftovers {
+            leftover_names(refs, &names, self.loaded)
+                .into_iter()
+                .collect()
+        } else {
+            Vec::new()
+        };
+        if names.is_empty() && leftovers.is_empty() {
             return Some(msg::NO_REMOTE.get().into());
         }
         let default = self.default_remote(refs);
         self.menu = Some(ContextMenu::new(
             caption,
-            remote_chooser_entries(&names, default.as_deref(), action),
+            remote_chooser_entries(&names, &leftovers, default.as_deref(), action),
             col,
             row,
         ));

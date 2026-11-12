@@ -347,6 +347,9 @@ impl GitBackend for SystemGitBackend {
     fn remotes(&self, repo: &RepoRef) -> Result<Vec<Remote>> {
         remotes::remotes(repo)
     }
+    fn leftover_remotes(&self, repo: &RepoRef) -> Result<Vec<String>> {
+        remotes::leftover_remotes(repo)
+    }
     fn worktrees(&self, repo: &RepoRef) -> Result<Vec<Worktree>> {
         worktrees::worktrees(repo)
     }

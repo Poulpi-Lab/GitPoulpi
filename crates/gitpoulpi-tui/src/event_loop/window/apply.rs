@@ -455,6 +455,7 @@ impl WindowState {
                     );
                 }
                 self.remote_ui.remotes = remotes;
+                self.remote_ui.loaded = true;
                 // Where the avatar worker may ask GitHub which account an
                 // author is: `origin` when it is on github.com, else the
                 // first remote that is (`avatar::github`).

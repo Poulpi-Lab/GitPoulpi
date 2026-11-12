@@ -2149,6 +2149,10 @@ what_remote_link = "uzak depo bağlantısı"
 not_web_url = "{url} web üzerinde barındırılan bir URL değil - bağlantı verilecek bir şey yok"
 default_now = "{name} artık bu deponun varsayılan uzak deposu"
 remove_confirm = "'{name}' uzak deposu kaldırılsın mı?\nUzak izleme dalları da onunla gider; işaret ettiği depoya dokunulmaz."
+leftover_note = "(yapılandırılmamış)"
+remove_leftover = "Artakalan dalları kaldır..."
+add_as_remote = "{name} adını uzak depo olarak ekle..."
+remove_leftover_confirm = "'{name}' için artakalan dallar kaldırılsın mı?\nBu adla yapılandırılmış bir uzak depo yok; yalnızca uzak izleme dalları gider. Geri alma onları geri getirir."
 force_confirm_fetch = { git = "{branch}, {remote} deposuna force push ile gönderilsin mi?\nÖnce {remote} fetch edilir, sonra lease ile gönderilir: yalnızca {remote} içinde olan commit'ler atılır; o fetch'ten sonra gönderilen her şey korunur.", local = "{branch}, {remote} deposuna zorla gönderilsin mi?\nÖnce {remote} getirilir, sonra lease ile gönderilir: yalnızca {remote} içinde olan commit'ler atılır; o getirmeden sonra gönderilen her şey korunur." }
 force_confirm = { git = "{branch}, {remote} deposuna force push ile gönderilsin mi?\nLease ile: {remote}/{branch} son fetch'ten sonra ilerlediyse reddedilir. Yalnızca {remote} içinde olan commit'ler atılır.", local = "{branch}, {remote} deposuna zorla gönderilsin mi?\nLease ile: {remote}/{branch} son getirmeden sonra ilerlediyse reddedilir. Yalnızca {remote} içinde olan commit'ler atılır." }
 setting_upstream = "{branch} upstream'i {upstream} olarak ayarlanıyor..."

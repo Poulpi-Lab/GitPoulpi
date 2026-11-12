@@ -130,6 +130,7 @@ pub(crate) fn report_failure(
     entry.kind = kind;
     entry.detail = error.detail().cloned();
     entry.retry = Some(action.clone());
+    entry.action_text = Some(friendly::action_text(action));
     let typed_repo_auth = friendly::is_repo_auth_error(error);
     entry.auth = friendly::auth_context(
         kind,
@@ -259,6 +260,7 @@ pub(crate) fn report_rejection(
         entry.hint = Some(hint);
     }
     entry.retry = Some(action.clone());
+    entry.action_text = Some(friendly::action_text(action));
     entry.repo = Some(repo.to_path_buf());
     entry.duration_ms = timing::action_finished(action, repo, ms(elapsed), false);
     tracing::warn!(target: "tui", repo = repo_text(repo).as_str(), "{}: {}", entry.title, entry.message);

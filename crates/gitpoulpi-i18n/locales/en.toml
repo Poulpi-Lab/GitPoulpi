@@ -2971,6 +2971,14 @@ not_web_url = "{url} is not a web-hosted URL - nothing to link to"
 default_now = "{name} is now this repository's default remote"
 # context: confirmation question; two lines, the second explains
 remove_confirm = "Remove remote '{name}'?\nIts remote-tracking branches go with it; the repository it points at is not touched."
+# context: muted note after a remote-tracking namespace in the REMOTE section that no remote is configured for (the repository was a fork and is not one any more)
+leftover_note = "(not configured)"
+# context: row of that namespace's menu: deletes its remote-tracking branches (undoable); the name stays unconfigured
+remove_leftover = "Remove leftover branches..."
+# context: row of that namespace's menu: opens the Add remote form with this name filled in; {name} is the name
+add_as_remote = "Add {name} as remote..."
+# context: confirmation question; two lines, the second explains
+remove_leftover_confirm = "Remove the leftover branches of '{name}'?\nNo remote is configured under that name; only its remote-tracking branches go. Undo brings them back."
 # context: confirmation question of a force push after a fetch
 force_confirm_fetch = "Force push {branch} to {remote}?\nFetches {remote} first, then pushes with lease: the commits only {remote} has now are discarded; anything pushed after that fetch is protected."
 force_confirm = "Force push {branch} to {remote}?\nWith lease: refused if {remote}/{branch} moved since the last fetch. Commits only {remote} has are discarded."

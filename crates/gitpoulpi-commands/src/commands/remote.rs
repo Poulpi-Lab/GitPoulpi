@@ -105,12 +105,36 @@ pub(super) async fn remote(session: &mut Session, action: RemoteAction) -> Resul
         }
         RemoteAction::List => {
             let remotes: Vec<Remote> = session.call(OperationKind::Remotes, json!({})).await?;
-            let human = remotes
+            let leftovers: Vec<String> = session
+                .call(OperationKind::LeftoverRemotes, json!({}))
+                .await?;
+            let mut human: Vec<String> = remotes
                 .iter()
                 .map(|r| format!("{}\t{}", r.name, r.fetch_url))
-                .collect::<Vec<_>>()
-                .join("\n");
-            Ok(emitted(to_value(&remotes)?, human))
+                .collect();
+            human.extend(
+                leftovers
+                    .iter()
+                    .map(|n| format!("{n}\t(no remote configured: leftover branches)")),
+            );
+            // A leftover is a remote-tracking namespace nothing configures
+            // (`remote remove <name>` deletes its branches): same shape,
+            // `configured: false`, no addresses.
+            let mut rows = Vec::new();
+            for r in &remotes {
+                let mut row = to_value(r)?;
+                row["configured"] = json!(true);
+                rows.push(row);
+            }
+            for name in &leftovers {
+                rows.push(json!({
+                    "name": name,
+                    "fetch_url": "",
+                    "push_url": null,
+                    "configured": false,
+                }));
+            }
+            Ok(emitted(json!(rows), human.join("\n")))
         }
     }
 }

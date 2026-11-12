@@ -1251,6 +1251,137 @@ pub fn check_remote_remove_forgets_its_tag_mirror(backend: &dyn GitBackend) {
     assert!(backend.remote_remove(&repo_ref, "origin").is_err());
 }
 
+/// A remote-tracking namespace nothing configures any more (the repository
+/// was a fork, the remote went, its branches stayed) is a *leftover*: the
+/// remote list does not have it, `leftover_remotes` names it, and
+/// `remote_remove` cleans it up - its branches and its tag mirror - instead
+/// of failing with "no such remote". A configured remote whose name merely
+/// extends it (`cm6/sub`) keeps its own refs, and the list stays truthful.
+pub fn check_a_leftover_remote_namespace_is_listed_and_removable(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new().with_initial().build();
+    let repo_ref = repo.repo_ref();
+    let head = repo.git(&["rev-parse", "HEAD"]);
+    for name in [
+        "refs/remotes/cm6/main",
+        "refs/remotes/cm6/feat/x",
+        "refs/remotes/cm6/sub/main",
+        "refs/remotes/other/main",
+        "refs/gitpoulpi/remote-tags/cm6/v1",
+        "refs/gitpoulpi/remote-tags/cm6/sub/v2",
+    ] {
+        repo.git(&["update-ref", name, &head]);
+    }
+    backend
+        .remote_add(&repo_ref, "cm6/sub", "https://example.invalid/sub.git")
+        .unwrap();
+    backend
+        .remote_add(&repo_ref, "other", "https://example.invalid/o.git")
+        .unwrap();
+
+    let configured: Vec<String> = backend
+        .remotes(&repo_ref)
+        .unwrap()
+        .into_iter()
+        .map(|r| r.name)
+        .collect();
+    assert!(
+        !configured.iter().any(|n| n == "cm6"),
+        "a namespace without config is not a remote: {configured:?}"
+    );
+    assert_eq!(
+        backend.leftover_remotes(&repo_ref).unwrap(),
+        vec!["cm6".to_string()],
+        "only the unconfigured namespace is a leftover"
+    );
+
+    backend.remote_remove(&repo_ref, "cm6").expect("cleanup");
+
+    let left = repo.git(&[
+        "for-each-ref",
+        "--format=%(refname)",
+        "refs/remotes",
+        "refs/gitpoulpi",
+    ]);
+    let mut left: Vec<&str> = left.lines().collect();
+    left.sort();
+    assert_eq!(
+        left,
+        vec![
+            "refs/gitpoulpi/remote-tags/cm6/sub/v2",
+            "refs/remotes/cm6/sub/main",
+            "refs/remotes/other/main",
+        ],
+        "the leftover's branches and tag mirror went, the configured siblings stayed"
+    );
+    assert!(backend.leftover_remotes(&repo_ref).unwrap().is_empty());
+    let after: Vec<String> = backend
+        .remotes(&repo_ref)
+        .unwrap()
+        .into_iter()
+        .map(|r| r.name)
+        .collect();
+    assert_eq!(after, configured, "the configured remotes are untouched");
+    assert!(
+        backend.remote_remove(&repo_ref, "cm6").is_err(),
+        "nothing left of it: a second remove is an error again"
+    );
+}
+
+/// A remote declared without a fetch `url` (a lone `remote.<name>.pushurl`,
+/// `fetch` or `tagopt` key, what a fork leaves behind when its URL goes)
+/// is the case where libgit2, `git remote -v` and `git remote` once
+/// disagreed, and where "Edit" and "Remove" failed with "no such remote".
+/// Both backends: such a name is not in the remote list (no address to
+/// fetch from), its branches make it a leftover, and edit (which gives it
+/// an address) and remove (which takes its config with it) both work.
+pub fn check_a_remote_without_a_url_can_be_repaired_or_removed(backend: &dyn GitBackend) {
+    for key in ["fetch", "pushurl", "tagopt"] {
+        let build = || {
+            let repo = TestRepoBuilder::new().with_initial().build();
+            let head = repo.git(&["rev-parse", "HEAD"]);
+            repo.git(&["update-ref", "refs/remotes/cm6/main", &head]);
+            let value = match key {
+                "fetch" => "+refs/heads/*:refs/remotes/cm6/*",
+                "pushurl" => "https://example.invalid/p.git",
+                _ => "--no-tags",
+            };
+            repo.git(&["config", &format!("remote.cm6.{key}"), value]);
+            repo
+        };
+
+        let repo = build();
+        let repo_ref = repo.repo_ref();
+        assert!(
+            backend.remotes(&repo_ref).unwrap().is_empty(),
+            "[{key}] no url, no listed remote"
+        );
+        assert_eq!(
+            backend.leftover_remotes(&repo_ref).unwrap(),
+            vec!["cm6".to_string()],
+            "[{key}]"
+        );
+        backend
+            .remote_set_url(&repo_ref, "cm6", "https://example.invalid/u.git")
+            .unwrap_or_else(|e| panic!("[{key}] edit: {e}"));
+        let listed = backend.remotes(&repo_ref).unwrap();
+        assert_eq!(listed.len(), 1, "[{key}] the edit made it a real remote");
+        assert_eq!(listed[0].fetch_url, "https://example.invalid/u.git");
+        assert!(backend.leftover_remotes(&repo_ref).unwrap().is_empty());
+
+        let repo = build();
+        let repo_ref = repo.repo_ref();
+        backend
+            .remote_remove(&repo_ref, "cm6")
+            .unwrap_or_else(|e| panic!("[{key}] remove: {e}"));
+        assert_eq!(repo.git(&["remote"]), "", "[{key}] its config went");
+        assert!(
+            repo.git(&["for-each-ref", "refs/remotes/cm6"]).is_empty(),
+            "[{key}] its branches went"
+        );
+        assert!(backend.leftover_remotes(&repo_ref).unwrap().is_empty());
+    }
+}
+
 /// Adding a remote under a name that is taken is an error, and leaves
 /// the existing remote's URL alone.
 pub fn check_remote_add_refuses_a_taken_name(backend: &dyn GitBackend) {

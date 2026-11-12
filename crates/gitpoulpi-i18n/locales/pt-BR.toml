@@ -2148,6 +2148,10 @@ what_remote_link = "link do remoto"
 not_web_url = "{url} não é uma URL hospedada na web - nada para vincular"
 default_now = "{name} agora é o remoto padrão deste repositório"
 remove_confirm = "Remover o remoto '{name}'?\nAs branches de rastreamento remoto dele vão junto; o repositório para o qual ele aponta não é alterado."
+leftover_note = "(não configurado)"
+remove_leftover = "Remover branches restantes..."
+add_as_remote = "Adicionar {name} como remoto..."
+remove_leftover_confirm = "Remover as branches restantes de '{name}'?\nNão há remoto configurado com esse nome; só vão embora as branches de rastreamento remoto dele. Desfazer as traz de volta."
 force_confirm_fetch = { git = "Force push de {branch} para {remote}?\nFaz fetch de {remote} primeiro e depois push com lease: os commits que só {remote} tem agora são descartados; o que for enviado após esse fetch fica protegido.", local = "Envio forçado de {branch} para {remote}?\nBusca {remote} primeiro e depois envia com lease: os commits que só {remote} tem agora são descartados; o que for enviado após essa busca fica protegido." }
 force_confirm = { git = "Force push de {branch} para {remote}?\nCom lease: recusado se {remote}/{branch} mudou desde o último fetch. Os commits que só {remote} tem são descartados.", local = "Envio forçado de {branch} para {remote}?\nCom lease: recusado se {remote}/{branch} mudou desde a última busca. Os commits que só {remote} tem são descartados." }
 setting_upstream = "definindo o upstream de {branch} como {upstream}..."

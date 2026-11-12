@@ -255,7 +255,7 @@ Il pannello non ha titolo: lo dicono le intestazioni delle colonne. I tag sono d
 | Colonna | Mostra |
 |---|---|
 | **Ref** | Pillole colorate per i branch e i tag del commit: un'icona di laptop per i locali, un globo per i remoti, un'icona di tag per i tag, `+N` quando altri ref puntano lì. |
-| **Grafo** | Le corsie dei branch, i merge e i punti di diramazione. Disegnato come immagini in kitty, Ghostty, WezTerm e iTerm2 (e anche Windows Terminal e foot, tramite sixel), e come caratteri negli altri terminali. I colori delle corsie vengono dal tema o da una tavolozza che scegli (vedi [Temi](themes.md)). Alla sua larghezza minima (un solo punto di commit) la colonna diventa compatta: ogni commit su un'unica corsia, senza linee di branch o di merge. |
+| **Grafo** | Le corsie dei branch, i merge e i punti di diramazione. Disegnato come immagini in kitty, Ghostty, WezTerm, Rio e iTerm2 (e anche Windows Terminal, foot e Tabby, tramite sixel), e come caratteri negli altri terminali. I colori delle corsie vengono dal tema o da una tavolozza che scegli (vedi [Temi](themes.md)). Alla sua larghezza minima (un solo punto di commit) la colonna diventa compatta: ogni commit su un'unica corsia, senza linee di branch o di merge. |
 | **Messaggio** | Il riepilogo del commit. |
 | **Autore** | L'autore, con un avatar facoltativo. |
 | **Data** | La data dell'autore, nel formato che scegli. |

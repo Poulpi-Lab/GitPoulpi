@@ -17,19 +17,40 @@ pub(crate) const SHARED_CONSOLE_ENV: &str = "GITPOULPI_TEST_SHARED_CONSOLE";
 #[cfg_attr(not(windows), allow(dead_code))]
 pub(crate) const RELAUNCHED_ENV: &str = "GITPOULPI_RELAUNCHED";
 
+/// Class of the window a classic console host (`conhost.exe`) draws: what a
+/// double-click from Explorer gets. Any terminal that starts us directly
+/// (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio,
+/// Tabby, Alacritty `-e`) runs us on a pseudo-console instead, whose window
+/// class is `PseudoConsoleWindow`, and we are then also the console's only
+/// process: counting processes alone cannot tell the two apart.
+#[cfg_attr(not(windows), allow(dead_code))]
+pub(crate) const CONSOLE_WINDOW_CLASS: &str = "ConsoleWindowClass";
+
+/// Whether the console window's class (`None`: no window) says that a plain
+/// console host owns it, with no terminal in between.
+#[cfg_attr(not(windows), allow(dead_code))]
+pub(crate) fn owns_console_window(class: Option<&str>) -> bool {
+    class == Some(CONSOLE_WINDOW_CLASS)
+}
+
 /// Whether to relaunch: switched on, not already a relaunch, alone in the
 /// console (`GetConsoleProcessList` says 1: a double-click; started from a
-/// shell it is at least 2), and a real terminal chosen (not the plain console).
+/// shell it is at least 2), the console is a plain console host's own window
+/// (not a terminal's pseudo-console: a terminal that runs us directly is
+/// where the user wants to be), and a real terminal chosen (not the plain
+/// console).
 #[cfg_attr(not(windows), allow(dead_code))]
 pub(crate) fn should_relaunch(
     enabled: bool,
     already_relaunched: bool,
     console_processes: Option<u32>,
+    console_window_class: Option<&str>,
     terminal: Option<&str>,
 ) -> bool {
     enabled
         && !already_relaunched
         && console_processes == Some(1)
+        && owns_console_window(console_window_class)
         && terminal.is_some_and(|t| t != "console")
 }
 
@@ -90,6 +111,25 @@ mod imp {
 
     extern "system" {
         fn GetConsoleProcessList(process_list: *mut u32, process_count: u32) -> u32;
+        fn GetConsoleWindow() -> *mut core::ffi::c_void;
+    }
+    #[link(name = "user32")]
+    extern "system" {
+        fn GetClassNameW(hwnd: *mut core::ffi::c_void, buf: *mut u16, max: i32) -> i32;
+    }
+
+    /// Class name of the console's window; `None` when it has none.
+    pub(crate) fn console_window_class() -> Option<String> {
+        // SAFETY: plain queries; the buffer is valid for the 64 units passed.
+        unsafe {
+            let hwnd = GetConsoleWindow();
+            if hwnd.is_null() {
+                return None;
+            }
+            let mut buf = [0u16; 64];
+            let n = GetClassNameW(hwnd, buf.as_mut_ptr(), buf.len() as i32);
+            (n > 0).then(|| String::from_utf16_lossy(&buf[..n as usize]))
+        }
     }
 
     pub(crate) fn console_processes() -> Option<u32> {
@@ -113,10 +153,12 @@ mod imp {
             .ui;
         let already = std::env::var_os(RELAUNCHED_ENV).is_some();
         // Cheap checks first: the terminal lookup lists `PATH`.
+        let class = console_window_class();
         if !should_relaunch(
             ui.relaunch_in_terminal,
             already,
             console_processes(),
+            class.as_deref(),
             Some("x"),
         ) {
             return false;
@@ -128,7 +170,7 @@ mod imp {
         }
         let env = Env::real();
         let terminal = env.resolve(&ui.launch_terminal);
-        if !should_relaunch(true, false, Some(1), terminal) {
+        if !should_relaunch(true, false, Some(1), class.as_deref(), terminal) {
             return false;
         }
         let Some(id) = terminal else { return false };
@@ -244,44 +286,40 @@ mod tests {
         assert!(!infer_launcher(false, false, None));
     }
 
+    const OWN: Option<&str> = Some(CONSOLE_WINDOW_CLASS);
+    const WT: Option<&str> = Some("windows-terminal");
+
     #[test]
     fn only_a_lone_double_click_with_a_real_terminal_relaunches() {
-        assert!(should_relaunch(
-            true,
-            false,
-            Some(1),
-            Some("windows-terminal")
-        ));
+        assert!(should_relaunch(true, false, Some(1), OWN, WT));
         // Started from a shell: the shell shares the console.
-        assert!(!should_relaunch(
-            true,
-            false,
-            Some(2),
-            Some("windows-terminal")
-        ));
+        assert!(!should_relaunch(true, false, Some(2), OWN, WT));
         // Unknown console state.
-        assert!(!should_relaunch(
-            true,
-            false,
-            None,
-            Some("windows-terminal")
-        ));
+        assert!(!should_relaunch(true, false, None, OWN, WT));
         // The switch is off.
-        assert!(!should_relaunch(
-            false,
-            false,
-            Some(1),
-            Some("windows-terminal")
-        ));
+        assert!(!should_relaunch(false, false, Some(1), OWN, WT));
         // The loop guard.
+        assert!(!should_relaunch(true, true, Some(1), OWN, WT));
+        // The plain console is already where we are; nothing found, stay.
+        assert!(!should_relaunch(true, false, Some(1), OWN, Some("console")));
+        assert!(!should_relaunch(true, false, Some(1), OWN, None));
+    }
+
+    #[test]
+    fn a_terminal_that_runs_us_directly_is_not_relaunched() {
+        // `wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio,
+        // Tabby, Alacritty `-e`: alone in a pseudo-console, no shell around.
         assert!(!should_relaunch(
             true,
-            true,
+            false,
             Some(1),
-            Some("windows-terminal")
+            Some("PseudoConsoleWindow"),
+            WT
         ));
-        // The plain console is already where we are; nothing found, stay.
-        assert!(!should_relaunch(true, false, Some(1), Some("console")));
-        assert!(!should_relaunch(true, false, Some(1), None));
+        // No console window at all: nothing proves a double-click either.
+        assert!(!should_relaunch(true, false, Some(1), None, WT));
+        assert!(owns_console_window(Some("ConsoleWindowClass")));
+        assert!(!owns_console_window(Some("PseudoConsoleWindow")));
+        assert!(!owns_console_window(None));
     }
 }

@@ -6,7 +6,9 @@
 //! `Event::Paste`. Without it a multi-line paste arrives as keystrokes (an
 //! Enter submits, letters fire shortcuts). Written as raw bytes, and on Unix
 //! only: the Windows console input path has no paste brackets, and a
-//! terminal that wrapped a paste there would type the markers.
+//! terminal that wrapped a paste there would type the markers. Windows
+//! recognises a paste by its keys all being queued at once instead
+//! (`paste_burst`).
 
 use std::io::Write;
 

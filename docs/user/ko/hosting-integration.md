@@ -637,7 +637,7 @@ gitpoulpi hosting radar --what review --json
 ```
 
 모든 명령은 [CLI 참조](cli-reference.md#명령)를 참고하세요. 토큰은 인자로
-받지 않으며 MCP 서버는 `hosting login`을 제공하지 않으므로, 토큰이 에이전트를
+받지 않으며(`hosting login`은 OS 자격 증명 저장소가 보관하면 `stored: "os"`를, 저장소가 거부해 토큰이 이번 세션 동안만 메모리에 있으면 `stored: "session"`과 `store_error`를 출력합니다) MCP 서버는 `hosting login`을 제공하지 않으므로, 토큰이 에이전트를
 거치는 일은 없습니다.
 
 ## 문제 해결

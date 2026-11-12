@@ -203,6 +203,11 @@ impl ReviewChoice {
                     None => ChoiceOutcome::Stay,
                 }
             }
+            // A right-click away closes it too, like a left press (and runs
+            // nothing underneath); one inside the dialog does nothing.
+            MouseEventKind::Down(MouseButton::Right) if !self.frame.contains((col, row).into()) => {
+                ChoiceOutcome::Cancel
+            }
             _ => ChoiceOutcome::Stay,
         }
     }

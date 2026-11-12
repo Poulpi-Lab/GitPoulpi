@@ -444,3 +444,55 @@ fn a_request_of_a_host_without_a_review_view_opens_the_browser() {
     let opened = read(&s.config.path().join("opened.log"));
     assert!(opened.contains("311"), "{opened}");
 }
+
+/// Opens the review question over the Radar.
+fn open_question(term: &mut Terminal) {
+    select_request(term);
+    term.send_keys("e").expect("e");
+    term.wait_for("the question", STEP, |s| {
+        s.contains("Review request") && s.contains("Remember for")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+}
+
+/// The cell of the toolbar's Back button.
+fn back_button(screen: &Screen) -> (u16, u16) {
+    let (_, row) = screen
+        .find_all("Refresh")
+        .into_iter()
+        .find(|&(_, r)| screen.line(r).contains("Back"))
+        .unwrap_or_else(|| panic!("the toolbar:\n{}", screen.text()));
+    let line = screen.line(row);
+    let at = line.rfind("Back").unwrap();
+    (line[..at].chars().count() as u16 + 1, row)
+}
+
+/// A left press outside the question closes it and does not run the control
+/// under it (Back would leave the Radar).
+#[test]
+fn the_review_question_closes_on_a_press_outside_without_running_it() {
+    let mut s = setup("pty-radar-review-away-left", GITLAB, LISTS);
+    open_question(&mut s.term);
+    let (c, r) = back_button(&s.term.screen());
+    s.term.click(c, r).unwrap();
+    s.term
+        .wait_for("the question gone, still the Radar", STEP, |s| {
+            !s.contains("Review request") && s.contains(ROW) && s.contains("Not cloned")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+}
+
+/// A right-click outside the question closes it too, and opens no row menu.
+#[test]
+fn the_review_question_closes_on_a_right_click_outside() {
+    let mut s = setup("pty-radar-review-away-right", GITLAB, LISTS);
+    open_question(&mut s.term);
+    // The request's own row: a right-click there would open its menu.
+    let (c, r) = s.term.screen().find(ROW).unwrap();
+    s.term.right_click(c + 2, r).unwrap();
+    s.term
+        .wait_for("the question gone, no row menu", STEP, |s| {
+            !s.contains("Review request") && s.contains(ROW) && !s.contains("Pin to top")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+}

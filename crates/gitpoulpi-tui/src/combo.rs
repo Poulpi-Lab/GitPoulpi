@@ -455,6 +455,14 @@ impl Combo {
                     }
                     return ComboOutcome::Handled;
                 }
+                // A right-click outside the list closes it too, like a left
+                // press; one on a row does nothing.
+                MouseEventKind::Down(MouseButton::Right) => {
+                    if !self.popup.contains(at) {
+                        self.close();
+                    }
+                    return ComboOutcome::Handled;
+                }
                 _ => return ComboOutcome::Handled,
             }
         }

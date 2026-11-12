@@ -35,12 +35,16 @@ pub fn encode_keys(spec: &str) -> Result<String, String> {
 /// every other key as [`encode_keys`] does.
 pub fn encode_keys_win32(spec: &str) -> Result<String, String> {
     const CTRL: u32 = 0x08; // LEFT_CTRL_PRESSED
+    const SHIFT: u32 = 0x10; // SHIFT_PRESSED
     let mut out = String::new();
     for token in spec.split_whitespace() {
         match token {
             "C-j" | "C-J" => out.push_str(&win32_key(0x4A, 0x24, 10, CTRL)),
             "C-Space" => out.push_str(&win32_key(0x20, 0x39, 0, CTRL)),
             "C-," => out.push_str(&win32_key(0xBC, 0x33, 44, CTRL)),
+            // The kitty `CSI 9 ; 5 u` of Ctrl+Tab is dropped by a ConPTY.
+            "C-Tab" => out.push_str(&win32_key(0x09, 0x0F, 9, CTRL)),
+            "C-S-Tab" => out.push_str(&win32_key(0x09, 0x0F, 9, CTRL | SHIFT)),
             "Escape" | "Esc" => out.push_str(&win32_key(0x1B, 0x01, 27, 0)),
             other => out.push_str(&encode_token(other)?),
         }
@@ -54,6 +58,13 @@ fn win32_key(vk: u32, scan: u32, ch: u32, state: u32) -> String {
 }
 
 fn encode_token(token: &str) -> Result<String, String> {
+    // Tab has no C0 byte with Ctrl: the kitty keyboard protocol's `CSI u`
+    // (ConPTY: see `encode_keys_win32`).
+    match token {
+        "C-Tab" => return Ok("\x1b[9;5u".to_string()),
+        "C-S-Tab" => return Ok("\x1b[9;6u".to_string()),
+        _ => {}
+    }
     if let Some(rest) = token.strip_prefix("C-") {
         return control(rest);
     }
@@ -213,6 +224,13 @@ mod tests {
         assert!(encode_keys_win32("C-,")
             .unwrap()
             .starts_with("\x1b[188;51;44;1;8;1_"));
+        assert_eq!(encode_keys("C-Tab C-S-Tab").unwrap(), "\x1b[9;5u\x1b[9;6u");
+        assert!(encode_keys_win32("C-Tab")
+            .unwrap()
+            .starts_with("\x1b[9;15;9;1;8;1_"));
+        assert!(encode_keys_win32("C-S-Tab")
+            .unwrap()
+            .starts_with("\x1b[9;15;9;1;24;1_"));
         // Everything else is the plain encoding.
         assert_eq!(encode_keys_win32("C-g Enter").unwrap(), "\x07\r");
     }

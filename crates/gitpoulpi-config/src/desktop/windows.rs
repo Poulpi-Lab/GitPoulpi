@@ -562,11 +562,14 @@ const NOTIFY_DECL: &str = "Add-Type -Namespace Gp -Name Shell -MemberDefinition 
      [DllImport(\"shell32.dll\", CharSet = CharSet.Unicode, EntryPoint = \"SHChangeNotify\")] public static extern void SHChangeNotifyPath(int e, uint f, string a, IntPtr b);'\n";
 const NOTIFY_ASSOC: &str =
     "[Gp.Shell]::SHChangeNotify(0x08000000, 0, [IntPtr]::Zero, [IntPtr]::Zero)\n";
-/// `SHCNE_UPDATEITEM` and `SHCNF_PATHW` (shlobj_core.h).
+/// `SHCNE_UPDATEITEM`, `SHCNF_PATHW` and `SHCNF_FLUSHNOWAIT` (shlobj_core.h).
 const SHCNE_UPDATEITEM: u32 = 0x0000_2000;
 /// `SHCNE_UPDATEDIR`: the folder of a pinned shortcut changed.
 const SHCNE_UPDATEDIR: u32 = 0x0000_1000;
-const SHCNF_PATHW: u32 = 0x0005;
+/// Path form of the item, plus `SHCNF_FLUSHNOWAIT` (0x3000 = `SHCNF_FLUSH`
+/// 0x1000 | 0x2000): Explorer handles the notification now instead of
+/// queueing it, and the call still returns without waiting for it.
+const SHCNF_PATHW_NOWAIT: u32 = 0x0005 | 0x3000;
 
 /// The PowerShell that notifies the shell of `lnks` (updated items) and, when
 /// `assoc`, that associations (icons) changed. Empty for nothing to say.
@@ -577,7 +580,7 @@ fn notify_script(lnks: &[PathBuf], assoc: bool) -> String {
     let mut s = String::from(NOTIFY_DECL);
     for lnk in lnks {
         s.push_str(&format!(
-            "[Gp.Shell]::SHChangeNotifyPath({SHCNE_UPDATEITEM:#x}, {SHCNF_PATHW:#x}, {lnk}, [IntPtr]::Zero)\n",
+            "[Gp.Shell]::SHChangeNotifyPath({SHCNE_UPDATEITEM:#x}, {SHCNF_PATHW_NOWAIT:#x}, {lnk}, [IntPtr]::Zero)\n",
             lnk = ps_quote(&lnk.to_string_lossy()),
         ));
     }
@@ -586,7 +589,7 @@ fn notify_script(lnks: &[PathBuf], assoc: bool) -> String {
     dirs.dedup();
     for dir in dirs {
         s.push_str(&format!(
-            "[Gp.Shell]::SHChangeNotifyPath({SHCNE_UPDATEDIR:#x}, {SHCNF_PATHW:#x}, {dir}, [IntPtr]::Zero)\n",
+            "[Gp.Shell]::SHChangeNotifyPath({SHCNE_UPDATEDIR:#x}, {SHCNF_PATHW_NOWAIT:#x}, {dir}, [IntPtr]::Zero)\n",
             dir = ps_quote(&dir.to_string_lossy()),
         ));
     }
@@ -961,7 +964,7 @@ mod tests {
         let s = pinned_script(&[lnk], Path::new(r"C:\gp\gitpoulpi-0123456789ab.ico"));
         assert!(s.contains(r"$p.IconLocation = 'C:\gp\gitpoulpi-0123456789ab.ico,0'"));
         assert!(s.contains(
-            r"SHChangeNotifyPath(0x2000, 0x5, 'C:\u\Pins\GitPoulpi.lnk', [IntPtr]::Zero)"
+            r"SHChangeNotifyPath(0x2000, 0x3005, 'C:\u\Pins\GitPoulpi.lnk', [IntPtr]::Zero)"
         ));
         assert!(s.contains("SHChangeNotify(0x08000000"));
         assert!(s.contains("[GpAumid]::Set('C:\\u\\Pins\\GitPoulpi.lnk'"));
@@ -1018,7 +1021,7 @@ mod tests {
         let b = PathBuf::from("C:/u/Pins/B.lnk");
         let s = pinned_script(&[a, b], Path::new("x.ico"));
         assert_eq!(s.matches("try { $p = $sh.CreateShortcut(").count(), 2);
-        assert!(s.contains(r"SHChangeNotifyPath(0x1000, 0x5, 'C:/u/Pins', [IntPtr]::Zero)"));
+        assert!(s.contains(r"SHChangeNotifyPath(0x1000, 0x3005, 'C:/u/Pins', [IntPtr]::Zero)"));
         assert!(s.contains("SHChangeNotify(0x08000000"));
     }
 

@@ -97,15 +97,23 @@ pub fn scroll_h(left: bool, col: u16, row: u16) -> String {
 /// cells; the intermediate reports must be there because a handler that
 /// tracks the pointer sees nothing from a bare press-then-release.
 pub fn drag_sequence(from: (u16, u16), to: (u16, u16)) -> String {
-    let mut sequence = press(Button::Left, from.0, from.1);
+    drag_reports(from, to).concat()
+}
+
+/// [`drag_sequence`] one report at a time (press, motions, release), for a
+/// ConPTY: its console merges mouse-move records the reader has not consumed
+/// yet, so a drag written in one go can arrive as a press and a release with
+/// at most one move, and a handler that tracks the pointer sees a click.
+pub fn drag_reports(from: (u16, u16), to: (u16, u16)) -> Vec<String> {
+    let mut reports = vec![press(Button::Left, from.0, from.1)];
     let steps = from.0.abs_diff(to.0).max(from.1.abs_diff(to.1)).max(1);
     for step in 1..=steps {
         let col = interpolate(from.0, to.0, step, steps);
         let row = interpolate(from.1, to.1, step, steps);
-        sequence.push_str(&drag_motion(Button::Left, col, row));
+        reports.push(drag_motion(Button::Left, col, row));
     }
-    sequence.push_str(&release(Button::Left, to.0, to.1));
-    sequence
+    reports.push(release(Button::Left, to.0, to.1));
+    reports
 }
 
 fn interpolate(from: u16, to: u16, step: u16, steps: u16) -> u16 {

@@ -231,11 +231,11 @@ fn tab_walks_the_panes_and_ctrl_tab_walks_the_views() {
         s.contains("Changes in a.txt") && s.contains("changed-in-doomed")
     });
     // Ctrl+Tab: the next view (Undo history), and back with Shift.
-    rig.term.send_text("\x1b[9;5u").unwrap();
+    rig.term.send_keys("C-Tab").unwrap();
     wait(&mut rig.term, "the Undo history after Ctrl+Tab", |s| {
         s.contains("can be undone") && !s.contains("2 files changed")
     });
-    rig.term.send_text("\x1b[9;6u").unwrap();
+    rig.term.send_keys("C-S-Tab").unwrap();
     wait(&mut rig.term, "Lost work after Ctrl+Shift+Tab", |s| {
         s.contains("2 files changed")
     });

@@ -34,12 +34,11 @@ pub(crate) fn bracketed_paste_requested() -> bool {
     cfg!(unix)
 }
 
-#[cfg(test)]
+#[cfg(all(test, unix))]
 mod tests {
     use super::*;
 
     #[test]
-    #[cfg(unix)]
     fn the_enable_and_disable_sequences_are_the_dec_private_mode_2004() {
         let mut out = Vec::new();
         enable_bracketed_paste(&mut out);

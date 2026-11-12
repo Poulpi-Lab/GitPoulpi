@@ -288,7 +288,7 @@ const BASE: &[OpenInPreset] = &[
     p("kitty-oswindow", "kitty: new OS window (remote control)", "multiplexer", "kitten @ launch --type=os-window --cwd=${cwd}", UNIX, "kitty", "kitten", true),
     p("screen-window", "screen: new window", "multiplexer", "screen -X eval 'chdir ${cwd}' screen", UNIX, "", "screen", false),
     p("cmux-workspace", "cmux: new workspace", "multiplexer", "cmux new-workspace --cwd ${cwd}", UNIX, "cmux", "cmux", false),
-    p("psmux-window", "psmux: new window", "multiplexer", "psmux new-window -c ${cwd}", WINDOWS, "", "psmux", false),
+    p("psmux-window", "psmux: new window", "multiplexer", "psmux new-window -c ${cwd}", WINDOWS, "psmux", "psmux", true),
     // Terminals (a new window running the user's shell in the folder).
     p("xdg-terminal-exec", "Default terminal (xdg-terminal-exec)", "terminal", "xdg-terminal-exec --dir=${cwd}", LINUX, "", "xdg-terminal-exec", true),
     p("kitty", "kitty", "terminal", "kitty --directory ${cwd}", UNIX, "kitty", "kitty", true),
@@ -676,7 +676,9 @@ pub struct Detected {
 /// apart from the outer terminal (herdr inside WezTerm is both).
 ///
 /// `cmux` is recognized by `CMUX_WORKSPACE_ID` / `CMUX_SOCKET_PATH`, a guess
-/// nobody has checked; psmux is not detected (it is assumed to set `TMUX`).
+/// nobody has checked. psmux sets `PSMUX_SESSION` (and `TMUX`, which also
+/// lists it as `tmux`, harmless: the tmux presets are Unix only); read out of
+/// a psmux 3.4.0 pane on Windows, November 2026.
 pub fn detect(
     env: &dyn Fn(&str) -> Option<String>,
     os: Os,
@@ -691,6 +693,9 @@ pub fn detect(
     }
     if set("TMUX") {
         d.multiplexers.push("tmux");
+    }
+    if set("PSMUX_SESSION") {
+        d.multiplexers.push("psmux");
     }
     if set("ZELLIJ") {
         d.multiplexers.push("zellij");
@@ -1023,6 +1028,21 @@ mod tests {
         assert_eq!(d.multiplexers, ["tmux"]);
         assert_eq!(d.terminals, ["kitty"]);
         assert_eq!(d.editors, ["code", "nvim"]);
+        // psmux on Windows: it sets `TMUX` as well, so both are listed, and
+        // its own preset is the one that ranks as "inside".
+        let d = detect(
+            &env_of(&[
+                ("TMUX", "/tmp/psmux-3040/default,63866,0"),
+                ("PSMUX_SESSION", "0"),
+                ("WT_SESSION", "abc"),
+            ]),
+            Os::Windows,
+            &none,
+        );
+        assert_eq!(d.multiplexers, ["tmux", "psmux"]);
+        assert_eq!(d.terminals, ["windows-terminal"]);
+        let psmux = presets().iter().find(|p| p.id == "psmux-window").unwrap();
+        assert_eq!(psmux.host, "psmux");
         // Windows Terminal alone.
         let d = detect(&env_of(&[("WT_SESSION", "abc")]), Os::Windows, &none);
         assert!(d.multiplexers.is_empty());

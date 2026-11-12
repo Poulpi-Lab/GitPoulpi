@@ -227,11 +227,10 @@ fn has_transparent_pixels(p: &Picture) -> bool {
     (0..p.height).any(|y| (0..p.width).any(|x| p.alpha(x, y) == 0))
 }
 
-/// Rio blends a transparent PNG over its cells (seen in a real window), so
+/// Rio blends a transparent PNG over its cells (seen in real windows on Linux and Windows), so
 /// detection hands it the transparent picture; the other iTerm2-protocol
-/// terminals keep an opaque backdrop. Not on Windows, where Rio was not seen.
+/// terminals keep an opaque backdrop.
 #[test]
-#[cfg_attr(windows, ignore = "Rio's alpha blending was only seen on Linux")]
 fn rio_gets_the_transparent_graph_picture_and_mintty_the_opaque_one() {
     let rio = picture_in("rio", "", "off", "9x21", "pic-rio-alpha");
     assert!(has_transparent_pixels(&rio), "Rio got an opaque picture");

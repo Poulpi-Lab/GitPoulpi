@@ -386,9 +386,10 @@ where
 /// told from its own environment (preference is kitty, iTerm2, sixel):
 /// Windows Terminal (`WT_SESSION`; sixel since 1.22), foot (`TERM=foot*`),
 /// Konsole (`KONSOLE_VERSION`), mlterm (`TERM=mlterm*`) and Tabby
-/// (`TERM_PROGRAM=Tabby`; 1.0.238 on Linux answers sixel in its device
-/// attributes and draws a transparent sixel picture, and shows neither kitty
-/// nor iTerm2 images).
+/// (`TERM_PROGRAM=Tabby`, `TABBY_CONFIG_DIRECTORY`; its xterm.js image addon
+/// draws sixel, lists `4` in its DA1 reply and answers `CSI 16 t`: Tabby
+/// 1.0.238 on Linux and Windows draws a transparent sixel picture and shows
+/// neither kitty nor iTerm2 images, November 2026).
 ///
 /// **Not DA1.** The textbook test is parameter 4 in the reply to `CSI c`,
 /// but the reply arrives on stdin and detection here never reads stdin
@@ -402,6 +403,8 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
     set("WT_SESSION")
         || tmux_client_has_sixel(get)
         || set("KONSOLE_VERSION")
+        || set("TABBY_CONFIG_DIRECTORY")
+        || get("TERM_PROGRAM").is_some_and(|p| p.eq_ignore_ascii_case("tabby"))
         || term.starts_with("foot")
         || term.starts_with("mlterm")
         || get("TERM_PROGRAM").is_some_and(|p| p.eq_ignore_ascii_case("tabby"))
@@ -417,10 +420,10 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
 ///   terminal's own background), and its `imgcat` page documents the
 ///   protocol. Confirmed here by a real WezTerm window capture
 ///   (`docs/developer/visual-verification.md`).
-/// - **Rio (0.5.28, Linux): blends.** A transparent PNG sent as `OSC 1337`
-///   over a bright field shows the field through the transparent corners
-///   (raw-sequence probe in a real window, November 2026). Only Linux was
-///   looked at; Windows keeps the opaque backdrop until it is.
+/// - **Rio (0.5.28): blends.** A transparent PNG sent as `OSC 1337` over a
+///   coloured field keeps that colour around the shape, with no lighter
+///   rectangle (raw-sequence probe in a real window on Linux and on Windows,
+///   November 2026).
 /// - **iTerm2 itself, mintty, Bobcat: unverified.** mintty's wiki
 ///   documents the `File=` image controls without any word on alpha
 ///   (only its OSC 11 background images are said to honour it), and this
@@ -438,8 +441,7 @@ pub(super) fn iterm2_for<F: Fn(&str) -> Option<String>>(get: &F) -> Protocol {
 }
 
 /// Whether the terminal named by the environment composites inline PNG
-/// alpha over the cell background. WezTerm, and Rio off Windows, by
-/// verification.
+/// alpha over the cell background. WezTerm and Rio, by verification.
 pub(super) fn blends_png_alpha<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
     (looks_like_wezterm(get) || looks_like_rio(get))
         && !inside_a_multiplexer(get)
@@ -447,9 +449,9 @@ pub(super) fn blends_png_alpha<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
 }
 
 /// Rio sets `TERM_PROGRAM=rio` (and `TERM=rio` when its terminfo is
-/// installed). Only where its alpha blending was seen: not on Windows.
+/// installed).
 pub(super) fn looks_like_rio<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
-    !cfg!(windows) && get("TERM_PROGRAM").is_some_and(|v| v.eq_ignore_ascii_case("rio"))
+    get("TERM_PROGRAM").is_some_and(|v| v.eq_ignore_ascii_case("rio"))
 }
 
 pub(super) fn looks_like_iterm2_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> bool {

@@ -50,7 +50,7 @@ pub(crate) fn wrap_tmux(seq: &str) -> String {
 /// set and nothing else (zellij, screen, herdr) claims the screen. Inside a
 /// tmux inside another multiplexer nothing can be promised, so that stays
 /// text and no pointer.
-pub(super) fn tmux_only<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
+pub(crate) fn tmux_only<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
     let set = |name: &str| get(name).is_some_and(|v| !v.is_empty());
     set("TMUX") && !set("ZELLIJ") && !set("STY") && !inside_herdr(get)
 }

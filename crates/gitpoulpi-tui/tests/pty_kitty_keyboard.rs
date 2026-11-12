@@ -71,10 +71,11 @@ fn wait_for_exit(term: &Terminal) {
     }
 }
 
-/// `ui.kitty_keyboard = "off"`: the terminal is not even asked, and no
-/// enhancement flag is pushed or popped, whatever it would have answered.
+/// `ui.kitty_keyboard = "off"`: no enhancement flag is pushed or popped,
+/// whatever the terminal answered. The merged start-up probe still asks its
+/// one question (device attributes and the name decide pictures), once.
 #[test]
-fn off_never_queries_or_pushes_the_enhancement_flags() {
+fn off_never_pushes_the_enhancement_flags() {
     let repo = fixture();
     let (mut term, _c) = launch(
         repo.root(),
@@ -94,7 +95,7 @@ fn off_never_queries_or_pushes_the_enhancement_flags() {
     let raw = term.raw_output();
     assert_eq!(count(&raw, PUSH), 0, "an enhancement push was written");
     assert_eq!(count(&raw, POP), 0, "an enhancement pop was written");
-    assert_eq!(count(&raw, QUERY), 0, "the terminal was queried anyway");
+    assert_eq!(count(&raw, QUERY), 1, "one merged start-up query, no more");
 }
 
 /// A terminal that answers only the device-attributes query (most of

@@ -30,28 +30,77 @@ pub fn answer_queries(
     kitty: bool,
     background: Option<&str>,
 ) -> Vec<u8> {
+    answer_queries_with(
+        haystack,
+        from,
+        cursor,
+        &Replies {
+            kitty,
+            background,
+            ..Replies::default()
+        },
+    )
+}
+
+/// What the emulated terminal answers beyond the always-answered cursor
+/// position and device attributes.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Replies<'a> {
+    /// Answer the kitty keyboard protocol's flags query.
+    pub kitty: bool,
+    /// The `rgb:rrrr/gggg/bbbb` body to answer an OSC 11 query with.
+    pub background: Option<&'a str>,
+    /// The parameters of the primary device attributes reply, after the
+    /// `?` (`"62;4;22"` is a VT220 with sixel); `None` is `"1;2"`.
+    pub attributes: Option<&'a str>,
+    /// Never answer the device attributes query: a terminal that is silent
+    /// to everything the start-up probe asks (a pipe, a multiplexer that
+    /// swallows it).
+    pub mute_attributes: bool,
+    /// The text of the XTVERSION reply (`"XTerm(388)"`); `None` stays silent,
+    /// as a terminal that does not know the query does.
+    pub version: Option<&'a str>,
+}
+
+/// [`answer_queries`] with every optional answer in one place.
+pub fn answer_queries_with(
+    haystack: &[u8],
+    from: usize,
+    cursor: (u16, u16),
+    replies: &Replies<'_>,
+) -> Vec<u8> {
     /// The OSC 11 background-color query (ST-terminated, as the child sends it).
     const OSC11: &[u8] = b"\x1b]11;?";
     /// The kitty keyboard protocol's flags query; the answer is the
     /// current flags (none pushed yet), sent *before* the device
     /// attributes reply that follows the query as its sentinel.
     const KITTY: &[u8] = b"\x1b[?u";
+    /// XTVERSION: the terminal names itself in a DCS string.
+    const XTVERSION: &[u8] = b"\x1b[>0q";
     /// Cursor position report. The wire protocol is one-based.
-    const DSR: &[u8] = b"[6n";
+    const DSR: &[u8] = b"[6n";
     /// Device attributes. `ESC[?1;2c` is "VT100 with advanced video
     /// option" - the reply a great many emulators give, and enough for
     /// anything that only wants to know someone is home.
-    const DA: &[u8] = b"[c";
+    const DA: &[u8] = b"[c";
 
     let mut reply = Vec::new();
     let mut queries = vec![(DSR, format!("\x1b[{};{}R", cursor.0 + 1, cursor.1 + 1))];
-    if kitty {
+    if replies.kitty {
         queries.push((KITTY, "\x1b[?0u".to_string()));
     }
-    if let Some(rgb) = background {
+    if let Some(rgb) = replies.background {
         queries.push((OSC11, format!("\x1b]11;{rgb}\x1b\\")));
     }
-    queries.push((DA, "\x1b[?1;2c".to_string()));
+    if let Some(name) = replies.version {
+        queries.push((XTVERSION, format!("\x1bP>|{name}\x1b\\")));
+    }
+    if !replies.mute_attributes {
+        queries.push((
+            DA,
+            format!("\x1b[?{}c", replies.attributes.unwrap_or("1;2")),
+        ));
+    }
     for (needle, answer) in queries {
         let mut at = 0;
         while let Some(found) = find(&haystack[at..], needle) {
@@ -153,5 +202,35 @@ mod tests {
         );
         let silent = answer_queries(query, 0, (0, 0), false, None);
         assert_eq!(String::from_utf8(silent).unwrap(), "\x1b[?1;2c");
+    }
+
+    #[test]
+    fn the_attributes_and_the_version_are_answered_when_configured() {
+        let query = b"\x1b[?u\x1b]11;?\x1b\\\x1b[>0q\x1b[c";
+        let replies = Replies {
+            attributes: Some("62;4;22"),
+            version: Some("XTerm(388)"),
+            ..Replies::default()
+        };
+        let reply = answer_queries_with(query, 0, (0, 0), &replies);
+        assert_eq!(
+            String::from_utf8(reply).unwrap(),
+            "\x1bP>|XTerm(388)\x1b\\\x1b[?62;4;22c"
+        );
+    }
+
+    #[test]
+    fn without_configuration_the_version_stays_silent_and_the_attributes_are_plain() {
+        let reply = answer_queries_with(b"\x1b[>0q\x1b[c", 0, (0, 0), &Replies::default());
+        assert_eq!(String::from_utf8(reply).unwrap(), "\x1b[?1;2c");
+    }
+
+    #[test]
+    fn a_muted_terminal_leaves_the_attributes_query_unanswered() {
+        let replies = Replies {
+            mute_attributes: true,
+            ..Replies::default()
+        };
+        assert!(answer_queries_with(b"\x1b[c", 0, (0, 0), &replies).is_empty());
     }
 }

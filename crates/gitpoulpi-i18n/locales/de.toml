@@ -4619,6 +4619,7 @@ what_explanation = "die Erklärung"
 what_selection = "die Auswahl"
 
 copied = "{what} kopiert ({preview})"
+copied_via_terminal = "{what} an die Zwischenablage des Terminals gesendet (OSC 52, nicht bestätigt)"
 copy_failed = "{what} konnte nicht kopiert werden: {error}"
 no_clipboard = "keine Zwischenablage verfügbar: {error}"
 nothing_to_paste = "nichts zum Einfügen: {error}"

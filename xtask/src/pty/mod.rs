@@ -50,7 +50,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use gitpoulpi_pty::{answer_queries, QUERY_CARRY};
+use gitpoulpi_pty::{answer_queries_with, Replies, QUERY_CARRY};
 use portable_pty::{Child, CommandBuilder, MasterPty, PtySize};
 
 pub use mouse::Button;
@@ -170,9 +170,40 @@ pub struct Builder {
     /// The color this terminal reports for an OSC 11 background query,
     /// as the `rgb:rrrr/gggg/bbbb` body (see [`Builder::answer_background`]).
     background: Option<String>,
+    /// The parameters of the device attributes reply
+    /// (see [`Builder::answer_attributes`]).
+    attributes: Option<String>,
+    /// The XTVERSION reply text (see [`Builder::answer_version`]).
+    version: Option<String>,
+    /// See [`Builder::mute_attributes`].
+    mute_attributes: bool,
 }
 
 impl Builder {
+    /// Makes this terminal answer the primary device attributes query with
+    /// `CSI ? <params> c`; `62;4;22` is a terminal that draws sixel. The
+    /// default is `1;2`, a plain VT100.
+    pub fn answer_attributes(mut self, params: &str) -> Self {
+        self.attributes = Some(params.to_string());
+        self
+    }
+
+    /// Makes this terminal never answer the device attributes query, as a
+    /// terminal that hears nothing of the start-up probe: the child has to
+    /// go on by its own deadline. Do not use on Windows, where the console
+    /// host does not start the child until it is answered.
+    pub fn mute_attributes(mut self) -> Self {
+        self.mute_attributes = true;
+        self
+    }
+
+    /// Makes this terminal answer XTVERSION (`CSI > 0 q`) with `name`, as
+    /// `DCS > | name ST`. Off by default: the child must cope with silence.
+    pub fn answer_version(mut self, name: &str) -> Self {
+        self.version = Some(name.to_string());
+        self
+    }
+
     /// Makes this terminal speak the kitty keyboard protocol far enough to
     /// answer the `CSI ? u` flags query (with `CSI ? 0 u`), as kitty,
     /// WezTerm and foot do. Off by default: a plain xterm-like pty
@@ -354,6 +385,9 @@ impl Terminal {
             rows: 40,
             kitty_keyboard: false,
             background: None,
+            attributes: None,
+            version: None,
+            mute_attributes: false,
         }
     }
 
@@ -477,6 +511,9 @@ impl Terminal {
         let tear = tear_delay();
         let kitty = builder.kitty_keyboard;
         let background = builder.background.clone();
+        let attributes = builder.attributes.clone();
+        let version = builder.version.clone();
+        let mute_attributes = builder.mute_attributes;
         let thread_inner = Arc::clone(&inner);
         let thread_writer = Arc::clone(&writer);
         let handle = std::thread::Builder::new()
@@ -519,8 +556,18 @@ impl Terminal {
                             let mut hay = std::mem::take(&mut carry);
                             let from = hay.len();
                             hay.extend_from_slice(&buf[..n]);
-                            let reply =
-                                answer_queries(&hay, from, cursor, kitty, background.as_deref());
+                            let reply = answer_queries_with(
+                                &hay,
+                                from,
+                                cursor,
+                                &Replies {
+                                    kitty,
+                                    background: background.as_deref(),
+                                    attributes: attributes.as_deref(),
+                                    version: version.as_deref(),
+                                    mute_attributes,
+                                },
+                            );
                             if !reply.is_empty() {
                                 if let Ok(mut guard) = thread_writer.lock() {
                                     if let Some(writer) = guard.as_mut() {

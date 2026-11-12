@@ -4618,6 +4618,7 @@ what_explanation = "açıklama"
 what_selection = "seçim"
 
 copied = "{what} kopyalandı ({preview})"
+copied_via_terminal = "{what} terminalin panosuna gönderildi (OSC 52, doğrulanmadı)"
 copy_failed = "{what} kopyalanamadı: {error}"
 no_clipboard = "pano yok: {error}"
 nothing_to_paste = "yapıştırılacak bir şey yok: {error}"

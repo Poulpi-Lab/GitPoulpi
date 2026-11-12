@@ -6,6 +6,7 @@
 
 // i18n-scan: off
 
+use crate::clipboard_route::{plan, Surroundings};
 use crate::terminal_image::detect::RendererChoice;
 use crate::terminal_image::report::{multiplexers_in, protocol_and_reason};
 use gitpoulpi_config::{ImageProtocol, KittyKeyboard, TextCursor};
@@ -69,6 +70,21 @@ where
     out.push(format!("pictures: {protocol} ({why})"));
 
     out.push(format!(
+        "start-up query: {}",
+        match (
+            set(crate::terminal_image::detect::PROBE_VERSION_KEY),
+            set(crate::terminal_image::detect::PROBE_ATTRIBUTES_KEY),
+        ) {
+            (None, None) => "no answer".to_string(),
+            (version, attributes) => format!(
+                "XTVERSION {}, device attributes {}",
+                version.unwrap_or_else(|| "no answer".to_string()),
+                attributes.unwrap_or_else(|| "no answer".to_string()),
+            ),
+        }
+    ));
+
+    out.push(format!(
         "pointer shape (OSC 22): {}",
         if facts.pointer_shapes {
             "sent".to_string()
@@ -90,24 +106,13 @@ where
         }
     ));
 
-    let remote = ["SSH_CONNECTION", "SSH_CLIENT", "SSH_TTY"]
-        .iter()
-        .any(|v| set(v).is_some());
     let memory = set("GITPOULPI_CLIPBOARD").as_deref() == Some("memory");
     out.push(format!(
         "clipboard: {}",
         if memory {
             "in-process memory (GITPOULPI_CLIPBOARD=memory)".to_string()
         } else {
-            format!(
-                "system clipboard of the machine running GitPoulpi (arboard); \"copy path\" \
-                 actions write OSC 52 to the terminal{}",
-                if remote {
-                    "; over SSH the system clipboard is the remote one"
-                } else {
-                    ""
-                }
-            )
+            clipboard_route(&Surroundings::from_env(get))
         }
     ));
 
@@ -126,6 +131,38 @@ where
         }
     ));
     out
+}
+
+/// The clipboard policy for these surroundings, in words
+/// (`clipboard_route` has the rules).
+fn clipboard_route(around: &Surroundings) -> String {
+    let plan = plan(around);
+    let tmux = if around.tmux {
+        " (wrapped for the tmux passthrough, and bare)"
+    } else {
+        ""
+    };
+    if !plan.system {
+        let why = if around.remote {
+            "over SSH the system clipboard would be the remote one"
+        } else {
+            "no display for a system clipboard"
+        };
+        return if plan.osc52 {
+            format!("terminal clipboard through OSC 52{tmux}, not confirmable ({why})")
+        } else {
+            format!("none: {why}, and this terminal cannot carry OSC 52")
+        };
+    }
+    let mut text = "system clipboard of the machine running GitPoulpi (arboard)".to_string();
+    if plan.osc52 {
+        text.push_str(&format!(
+            ", plus OSC 52 to the terminal (known to support it){tmux}"
+        ));
+    } else if plan.osc52_fallback {
+        text.push_str(&format!("; OSC 52 to the terminal if that fails{tmux}"));
+    }
+    text
 }
 
 #[cfg(test)]
@@ -159,7 +196,11 @@ mod tests {
     #[test]
     fn a_plain_kitty_window_reports_every_capability() {
         let text = run(
-            &[("KITTY_WINDOW_ID", "3"), ("TERM", "xterm-kitty")],
+            &[
+                ("KITTY_WINDOW_ID", "3"),
+                ("TERM", "xterm-kitty"),
+                ("DISPLAY", ":0"),
+            ],
             &facts(),
         )
         .join("\n");
@@ -186,7 +227,7 @@ mod tests {
         let text = run(&[("TMUX", "/tmp/t,1,0"), ("TERM_PROGRAM", "WezTerm")], &f).join("\n");
         assert!(text.contains("multiplexer: tmux"), "{text}");
         assert!(
-            text.contains("pictures: none (auto: multiplexer veto (tmux))"),
+            text.contains("pictures: none (auto: multiplexer veto (tmux; its client does not advertise sixel))"),
             "{text}"
         );
         assert!(
@@ -198,10 +239,40 @@ mod tests {
 
     #[test]
     fn ssh_and_the_memory_clipboard_are_named() {
-        let text = run(&[("SSH_CONNECTION", "a b c d")], &facts()).join("\n");
-        assert!(text.contains("over SSH the system clipboard is the remote one"));
+        let text = run(
+            &[("SSH_CONNECTION", "a b c d"), ("TERM", "xterm-256color")],
+            &facts(),
+        )
+        .join("\n");
+        assert!(
+            text.contains("clipboard: terminal clipboard through OSC 52"),
+            "{text}"
+        );
+        assert!(text.contains("over SSH the system clipboard would be the remote one"));
         let text = run(&[("GITPOULPI_CLIPBOARD", "memory")], &facts()).join("\n");
         assert!(text.contains("clipboard: in-process memory"), "{text}");
+    }
+
+    #[test]
+    fn the_probe_answers_and_the_tmux_wrapping_are_reported() {
+        let text = run(&[], &facts()).join("\n");
+        assert!(text.contains("start-up query: no answer"), "{text}");
+        let text = run(
+            &[
+                ("\0probe:xtversion", "kitty(0.35.2)"),
+                ("\0probe:da1", "62;4"),
+                ("SSH_TTY", "/dev/pts/1"),
+                ("TMUX", "x"),
+                ("TERM", "tmux-256color"),
+            ],
+            &facts(),
+        )
+        .join("\n");
+        assert!(
+            text.contains("start-up query: XTVERSION kitty(0.35.2), device attributes 62;4"),
+            "{text}"
+        );
+        assert!(text.contains("wrapped for the tmux passthrough"), "{text}");
     }
 
     #[test]

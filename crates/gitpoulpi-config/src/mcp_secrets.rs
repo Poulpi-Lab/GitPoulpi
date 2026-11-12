@@ -82,11 +82,7 @@ pub fn token_hint(token: &str) -> String {
     format!("{head}...{tail}")
 }
 
-/// The OSC 52 sequence that asks a terminal to set its clipboard to `text`.
-pub fn osc52(text: &str) -> String {
-    let encoded = base64::engine::general_purpose::STANDARD.encode(text);
-    format!("\x1b]52;c;{encoded}\x07")
-}
+pub use crate::osc52::osc52;
 
 /// The SHA-256 fingerprint of the first certificate of a PEM text, as
 /// colon-separated uppercase hex pairs (what a client pins). `None` when the
@@ -157,11 +153,6 @@ mod tests {
         let hint = token_hint("abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG");
         assert_eq!(hint, "abcd...DEFG");
         assert!(!token_hint("short").contains("sh"));
-    }
-
-    #[test]
-    fn osc52_wraps_the_base64_text() {
-        assert_eq!(osc52("abc"), "\x1b]52;c;YWJj\x07");
     }
 
     #[test]

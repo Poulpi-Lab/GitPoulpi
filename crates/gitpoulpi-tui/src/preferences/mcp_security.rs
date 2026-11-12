@@ -175,7 +175,10 @@ impl PreferencesState {
                     return;
                 };
                 self.message = Some(match crate::clipboard::copy_secret_shared(&token) {
-                    Ok(()) => t::TOKEN_COPIED.get().into(),
+                    Ok(crate::clipboard_route::Delivery::Terminal) => {
+                        gitpoulpi_i18n::msg::input::copied_via_terminal(t::TOKEN.get())
+                    }
+                    Ok(_) => t::TOKEN_COPIED.get().into(),
                     Err(why) => why,
                 });
             }

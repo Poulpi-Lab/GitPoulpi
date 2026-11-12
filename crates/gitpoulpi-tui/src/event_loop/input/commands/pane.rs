@@ -4,6 +4,7 @@
 //! here, so none can drift.
 
 use super::CommandCtx;
+use crate::clipboard_route::Delivery;
 use crate::event_loop::*;
 use crate::file_panel::{open_wip_file, WipFileOpen};
 use gitpoulpi_core::domain::{RuleKind, RuleScope, Treat};
@@ -499,11 +500,8 @@ pub(in crate::event_loop) fn editor_blocks<'a>(
     paths.into_iter().find(|p| *p == open).map(|_| open)
 }
 
-fn copy_to_clipboard(text: &str) {
-    use std::io::Write;
-    let mut out = std::io::stdout();
-    let _ = out.write_all(crate::status_pane::osc52_copy(text).as_bytes());
-    let _ = out.flush();
+fn copy_to_clipboard(text: &str) -> crate::clipboard_route::Delivery {
+    crate::clipboard::deliver_shared(text)
 }
 
 fn slash(path: &Path) -> String {
@@ -669,10 +667,15 @@ pub(in crate::event_loop) fn apply_pane_action(
             } else {
                 lines
             };
-            copy_to_clipboard(&lines.join("\n"));
-            *cx.last_message = Some(match lines.as_slice() {
-                [one] => msg::commit_files::copied_path(one),
-                many => msg::pane_menu::copied_paths(many.len() as u64),
+            *cx.last_message = Some(match copy_to_clipboard(&lines.join("\n")) {
+                Delivery::Clipboard => match lines.as_slice() {
+                    [one] => msg::commit_files::copied_path(one),
+                    many => msg::pane_menu::copied_paths(many.len() as u64),
+                },
+                Delivery::Terminal => {
+                    msg::input::copied_via_terminal(msg::rewrite_push::WHAT_PATH.get())
+                }
+                Delivery::Nowhere(why) => msg::input::no_clipboard(why),
             });
         }
         A::IgnoreFiles | A::IgnoreExtensions => open_rule_file_picker_many(

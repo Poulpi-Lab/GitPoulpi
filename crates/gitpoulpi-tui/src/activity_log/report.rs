@@ -40,7 +40,7 @@ pub(crate) fn environment() -> Vec<String> {
     out.push(format!("terminal: {} ({size})", terminal.join(" ")));
     let settings = gitpoulpi_config::Settings::resolve_ambient().ok();
     out.extend(super::capabilities::lines(
-        &|name| std::env::var(name).ok(),
+        &crate::terminal_image::detect::ambient_env,
         &|path| std::fs::read_to_string(path).ok(),
         &super::capabilities::current_facts(settings.as_ref().map(|s| &s.config().ui)),
     ));

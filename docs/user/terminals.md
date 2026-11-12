@@ -28,23 +28,47 @@ GitPoulpi, so it draws characters (see [Multiplexers](#multiplexers)).
   (`OSC 1337`), or **sixel**, in that order of preference. Detection is
   deny-by-default, from `TERM`, `TERM_PROGRAM`, `KITTY_WINDOW_ID`,
   `GHOSTTY_RESOURCES_DIR`, `WEZTERM_EXECUTABLE`, `WT_SESSION`, `KONSOLE_VERSION` and the
-  multiplexer variables, and never reads the keyboard (so it does not ask the terminal
-  for its device attributes either). kitty and Ghostty use the kitty protocol. WezTerm uses
+  multiplexer variables. When the environment names nobody (an xterm started with
+  `-ti vt340`, a VS Code terminal with images on, any terminal reached over SSH, where
+  `TERM_PROGRAM` is not forwarded), the terminal's own answers decide: GitPoulpi asks
+  once at start-up, in a single write and a single read bounded to 100 ms (see "The start-up query" below), and uses the terminal's XTVERSION name
+  (kitty, Ghostty, WezTerm, iTerm2, mintty, foot) or sixel in its device attributes.
+  Inside a multiplexer the answers are ignored: tmux claims sixel whatever sits behind it.
+  kitty and Ghostty use the kitty protocol. WezTerm uses
   the iTerm2 protocol (on purpose) and blends the PNG's transparency. iTerm2, Rio
   and mintty use the iTerm2 protocol with an opaque backdrop. Windows Terminal, foot,
   Konsole and mlterm use **sixel**. With none of them, avatars are the initials badge.
-- **Sixel** is drawn for the **graph column** (lanes, nodes and, with `ui.avatars = "graph"`, the avatars inside the commit circles) and for the **avatars** elsewhere (Log, commit detail, File History, Blame, the image view). A sixel has no alpha, no ids and no scaling, so the picture is exactly `columns x cell width` by `rows x cell height` pixels, drawn only where something is (anti-aliased edges below half opacity are dropped), over blank cells that keep their background; the encoded picture is cached and re-encoded only when the lanes, the scroll position or the zoom change, and it is sent again only when a cell under it was repainted. A sixel has no delete: GitPoulpi writes text over its cells to remove it. Sixel needs the real cell size in pixels: Windows Terminal is asked for it once at start-up and after a zoom (`CSI 16 t`, answered in about 10 ms, never blocking if it stays silent); elsewhere it comes from the terminal's window size, or from `GITPOULPI_TERMINAL_CELL_PX=10x20`. A terminal that draws sixel but is not recognized (a VS Code terminal with `terminal.integrated.enableImages`, an xterm started with `-ti vt340`) needs `ui.image_protocol = "sixel"`. Windows Terminal before 1.22 does not draw sixel; set `ui.image_protocol = "none"` there (the graph then stays characters, as in every terminal without pictures).
+- **Sixel** is drawn for the **graph column** (lanes, nodes and, with `ui.avatars = "graph"`, the avatars inside the commit circles) and for the **avatars** elsewhere (Log, commit detail, File History, Blame, the image view). A sixel has no alpha, no ids and no scaling, so the picture is exactly `columns x cell width` by `rows x cell height` pixels, drawn only where something is (anti-aliased edges below half opacity are dropped), over blank cells that keep their background; the encoded picture is cached and re-encoded only when the lanes, the scroll position or the zoom change, and it is sent again only when a cell under it was repainted. A sixel has no delete: GitPoulpi writes text over its cells to remove it. Sixel needs the real cell size in pixels: Windows Terminal is asked for it once at start-up and after a zoom (`CSI 16 t`, answered in about 10 ms, never blocking if it stays silent); elsewhere it comes from the terminal's window size, or from `GITPOULPI_TERMINAL_CELL_PX=10x20`. A terminal that draws sixel is recognized by its device attributes (a VS Code terminal with `terminal.integrated.enableImages`, an xterm started with `-ti vt340`); one that draws it without saying so needs `ui.image_protocol = "sixel"`. Windows Terminal before 1.22 does not draw sixel; set `ui.image_protocol = "none"` there (the graph then stays characters, as in every terminal without pictures).
 - **True color**: themes are RGB. `ui.color_depth = "auto"` drops to 256 colors on a
   `*-256color` `TERM` without `COLORTERM=truecolor` (and in Terminal.app), and to 16
   colors on the Linux console. kitty, WezTerm and Windows Terminal count as truecolor.
 - **Mouse**: SGR mouse reporting with buttons, drag and motion (hover feedback, drag
   and drop, right-click, double-click).
+- **The start-up query.** Four questions go out in one write: the kitty keyboard flags
+  (`CSI ? u`), the background color (`OSC 11`, only used for `ui.theme = system`), the
+  terminal's name (XTVERSION, `CSI > 0 q`) and its device attributes (`CSI c`, last: every
+  terminal answers it, so it closes the read). The read is one `poll` loop on the
+  controlling terminal with a 100 ms deadline, finished before the keyboard reader
+  starts, so nothing is left running to eat a keystroke. A terminal that answers nothing
+  costs the 100 ms once and everything stays as the environment says. Unix only: on
+  Windows the console reports keys itself and the environment decides. The answers are in
+  the environment report's `start-up query:` line.
 - **Keyboard**: the **kitty keyboard protocol** (disambiguate flag only) is requested at
   start-up with a 100 ms timeout. It makes `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` and
   `Ctrl+Shift+Z` arrive. Without it the legacy keys stay (`Ctrl+Y` redoes, `Alt` variants
   replace some chords). See
   [Keybindings](keybindings.md#keys-the-terminal-cannot-send-and-the-kitty-keyboard-protocol).
-- **Clipboard**: copy actions write `OSC 52`.
+- **Clipboard**: every copy action goes by one policy. Locally, the **system clipboard**
+  of the machine GitPoulpi runs on, plus `OSC 52` to the terminal when the terminal is
+  known to support it (kitty, WezTerm, Ghostty, foot, Alacritty, Windows Terminal, Rio,
+  Tabby, iTerm2); `OSC 52` is also the fallback when the system clipboard fails. **Over
+  SSH, or with no display** (a Linux console, a container), the system clipboard would be
+  the remote one or does not exist, so only `OSC 52` is sent, and inside tmux it is sent
+  wrapped for the passthrough as well as bare. The status line says "copied" only when the
+  system clipboard took the text; what went to the terminal says "sent ... to the terminal
+  clipboard (OSC 52, not confirmed)", because nothing confirms that the terminal obeyed
+  (the Linux console, GNU screen and VTE ignore it). The Activity Log's environment report
+  names the route in its `clipboard:` line.
 - **Mouse pointer shape** (resize pointer over dividers, hand over clickable items):
   `OSC 22`, a bonus where it is implemented.
 - **Text caret**: with `ui.text_cursor = "terminal"` (the default) the terminal's own cursor is
@@ -190,7 +214,7 @@ zellij 0.45 answers the kitty keyboard query, so the full keyboard works there.
 | Picture protocol | Character graph. The avatar becomes the colored initials badge (one letter) whatever `ui.avatar_fallback` says: an identicon squeezed into text cells is unrecognizable. The image diff and File View use colored half-blocks, or an info card. |
 | Truecolor | Colors are mapped to the 256 or 16 color palette (`ui.color_depth`). |
 | Kitty keyboard protocol | Legacy keys; some chords arrive as another key. Settings warns, and you rebind or use the `Alt` variants. |
-| OSC 52 | Copy actions put nothing on the clipboard: select with the mouse (hold `Shift`) and use the terminal's own copy. |
+| OSC 52 | Locally nothing changes (the system clipboard is used). Over SSH or without a display, copy actions put nothing on the clipboard: select with the mouse (hold `Shift`) and use the terminal's own copy. |
 | OSC 22 | The pointer does not change; the divider or button under the mouse still lights up. |
 | Emoji font | Boxes or holes instead of icons; the graph and the text still work. Install a Nerd Font or an emoji font and list it as a fallback. |
 

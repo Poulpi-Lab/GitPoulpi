@@ -544,6 +544,18 @@ pub(super) fn rewrite(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
                 }
                 None => {}
             },
+            // A right-click outside an open dropdown, question or picker
+            // closes it like a left press does, and acts on nothing.
+            MouseEventKind::Down(MouseButton::Right) => {
+                if let Some(
+                    shield @ (RewriteHit::PopupShield
+                    | RewriteHit::QuestionShield
+                    | RewriteHit::IdentPickShield),
+                ) = part
+                {
+                    outcome = view.on_press(shield, mouse.column, mouse.row);
+                }
+            }
             // A held scrollbar thumb follows the pointer, even off the bar.
             MouseEventKind::Drag(MouseButton::Left) => {
                 view.on_rules_ai_bar_mouse(mouse);

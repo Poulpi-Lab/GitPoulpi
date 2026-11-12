@@ -56,9 +56,13 @@ impl WindowState {
                 }
                 match event::read() {
                     // Windows has no paste brackets: text that arrives as a
-                    // run of already-queued keys is a paste (`paste_burst`).
+                    // run of keys with no gap between them is a paste
+                    // (`paste_burst`). ConPTY turns a paste into key records
+                    // a little after the first one is readable, so each next
+                    // key is awaited for `paste_burst::GAP`: no person types
+                    // that fast.
                     Ok(event) if cfg!(windows) => {
-                        let mut ahead = || match event::poll(Duration::ZERO) {
+                        let mut ahead = || match event::poll(crate::paste_burst::GAP) {
                             Ok(true) => event::read().ok(),
                             _ => None,
                         };

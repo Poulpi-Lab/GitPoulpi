@@ -8,8 +8,9 @@
 //! and every letter outside a text field is a shortcut.
 //!
 //! What still tells a paste from typing is that the keys are all **already
-//! queued** when the input drain reads them: a person cannot put three keys,
-//! one of them `Enter`, into the queue between two polls. [`coalesce`] takes
+//! queued** (or arrive within [`GAP`] of each other) when the input drain
+//! reads them: a person cannot put three keys, one of them `Enter`, into the
+//! queue between two polls. [`coalesce`] takes
 //! such a run of already-queued press events and, when it looks like pasted
 //! text, returns it as one [`Event::Paste`] (what a bracketed paste would
 //! have produced). Anything else is handed back untouched, in order.
@@ -83,6 +84,10 @@ pub(crate) fn coalesce(run: &[Event]) -> Option<String> {
     let paste = distinct && ((presses >= 3 && breaks_inside) || presses >= LONG_RUN);
     paste.then_some(text)
 }
+
+/// How long the next key of a run is awaited. Longer than ConPTY takes to
+/// turn a pasted chunk into key records, far shorter than two keystrokes.
+pub(crate) const GAP: std::time::Duration = std::time::Duration::from_millis(10);
 
 /// The most events one run takes before it is cut (a longer paste arrives as
 /// two).

@@ -216,7 +216,8 @@ Zob. [Hosting i trackery zgłoszeń](hosting-integration.md).
   na commicie.
 - **Kliknij plakietkę refa prawym przyciskiem**, by zobaczyć jedno menu z akcjami refa i
   akcjami commita.
-- **Kliknij nagłówek prawym przyciskiem**, by pokazać lub ukryć kolumny: lista kontrolna (`[x]` / `[ ]`) z ✕ w tytule; kliknij wiersz albo użyj strzałek i `Spacji` / `Enter`, potem zamknij ją przez ✕, `Esc` lub kliknięcie poza nią (paleta: `Widok: Log: Wybierz kolumny do pokazania`). Pod polami wyboru: `Dopasuj <kolumna> do zawartości` (kolumna kliknięta prawym przyciskiem), `Dopasuj wszystkie kolumny do zawartości` i `Zresetuj szerokości kolumn`.
+- **Kliknij nagłówek prawym przyciskiem**, by pokazać lub ukryć kolumny: lista kontrolna (`[x]` / `[ ]`) z ✕ w tytule; kliknij wiersz albo użyj strzałek i `Spacji` / `Enter`, potem zamknij ją przez ✕, `Esc` lub kliknięcie poza nią (paleta: `Widok: Log: Wybierz kolumny do pokazania`). Pod polami wyboru: `Dopasuj <kolumna> do zawartości` (kolumna kliknięta prawym przyciskiem), `Dopasuj wszystkie kolumny do zawartości` i `Zresetuj szerokości kolumn`. Klawiaturowy odpowiednik prawego kliknięcia: `Shift+C`, by wybrać kolumnę, potem `.` (lub `Shift+F10`) otwiera to samo menu na niej.
+- **Kolumny Radaru** działają tak samo: przeciągnij separator za kolumną repozytorium, `#`, autora lub wieku, by ustawić jej szerokość, **kliknij go dwukrotnie**, by dopasować kolumnę do jej najszerszego wpisu (`C` wybiera kolumnę, potem `=`; `+` dopasowuje każdą kolumnę), i **kliknij prawym przyciskiem tytuł kolumny** (albo `C`, potem `.`), by dostać `Dopasuj <kolumna> do zawartości` i `Dopasuj wszystkie kolumny do zawartości`.
 - **Kliknij `↑`, `↓` lub `✕`** na pasku wyszukiwania, by przejść do poprzedniego lub następnego
   trafienia albo zamknąć pasek.
 - **Kliknij `#12`, `ABC-12` lub `AB#12`** w opisie commita, w prawym panelu,
@@ -355,8 +356,9 @@ Każde odrzucenie pyta najpierw.
 - **Najedź na wiersz**, by zobaczyć podpowiedź Logu (cały opis, nazwę i e-mail autora, pełną datę, zależnie od części pod wskaźnikiem).
 - **Kliknij wiersz prawym przyciskiem**, by zobaczyć jego menu: pokazanie go w Logu, diff pliku w tym commicie, plik w tym commicie, jego blame, a potem menu Logu dla commita. Klawisz menu robi to samo z klawiatury.
 - **Przeciągnij granicę w nagłówku** (`ui.column_resize`: domyślnie jednokomórkowy separator między dwiema częściami, oznaczony przygaszonym `│` w nagłówku i rysowany jako linia akcentu w dół kolumny, gdy wskaźnik jest na nim, a przeciągnięcie z dowolnego miejsca wzdłuż niego zmienia szerokość; przy `header` pierwsza litera następnej nazwy, świecąca, gdy wskaźnik jest na niej), by ustawić szerokość części po jej lewej: torów, opisu, autora, daty, refów, zmian lub SHA. Komórka tuż za ostatnią częścią jest granicą tej ostatniej części.
+- **Kliknij dwukrotnie granicę w nagłówku**, by dopasować część po jej lewej do jej zawartości, tak jak granice Logu: szerokość, przy której jej najszerszy wiersz jest widoczny w całości, nigdy większa niż kolumna (klawiatura: kliknij wiersz albo `Ctrl+N`, by dać kolumnie klawisze, `Tab`, by wybrać część, potem `=`; `+` dopasowuje każdą część; paleta ma `Dopasuj kolumnę do zawartości` i `Dopasuj wszystkie kolumny do zawartości`). Opis zachowuje to, co zostawią pozostałe części.
 - **Przeciągnij nazwę w nagłówku** nad inną, by przenieść tam część: ten sam duszek, przyciemnione źródło i pasek akcentu co w nagłówku Logu, a część przesuwa się po puszczeniu (`Esc` anuluje; `<` / `>` na klawiaturze, po `Tab`, robią to samo o jedno miejsce naraz).
-- **Kliknij prawym przyciskiem w nagłówku**, by wybrać pokazywane części (Ref, Graf, Autor, Data, Zmiany, SHA; Opis jest zawsze widoczny); lista kontrolna ma ✕ w tytule. Paleta ma `Wybierz kolumny` i przełącznik dla każdej części.
+- **Kliknij prawym przyciskiem w nagłówku**, by wybrać pokazywane części (Ref, Graf, Autor, Data, Zmiany, SHA; Opis jest zawsze widoczny); lista kontrolna ma ✕ w tytule. Pod nią: `Dopasuj <część> do zawartości` (część kliknięta prawym przyciskiem) i `Dopasuj wszystkie kolumny do zawartości`. Paleta ma `Wybierz kolumny` (menu z klawiatury, na części wybranej przez `Tab`) i przełącznik dla każdej części.
 - **Shift+kółko** albo poziome kółko przewija wiersze na boki, gdy są szersze niż kolumna.
 - **Przeciągnij prawą krawędź** kolumny, by zmienić jej szerokość. **Kliknij pasek `›`** (albo ✕ na kolumnie, albo **kliknij wybrany segment** przełącznika `Plik │ Wszystkie` na pasku), by ją przywrócić lub ukryć.
 
@@ -449,14 +451,23 @@ Wskaźnik ma kształt przesuwania nad paskiem tytułu i kształt zmiany rozmiaru
 Niektóre terminale pozwalają GitPoulpi zmienić wskaźnik myszy: wskaźnik zmiany rozmiaru nad
 separatorami, nad granicą kolumny w Logu, Radarze i kolumnie commitów
 (także podczas jej przeciągania), rękę nad klikalnymi elementami. Działa to w kitty,
-foot, Ghostty, WezTerm i nowszym xterm (sekwencja `OSC 22`). Jest wysyłany
-tylko wtedy, gdy kształt się zmienia, nigdy w tmux, screen, zellij ani herdr,
-a domyślny wskaźnik wraca, gdy GitPoulpi się kończy.
-W innych terminalach wskaźnik się nie zmienia. Separator lub przycisk
+foot, Ghostty, mintty i w buildzie WezTerm z upstreamowym PR #8092 (sekwencja
+`OSC 22`). Jest wysyłany tylko wtedy, gdy kształt się zmienia, w tmux tylko
+opakowany dla przekazywania (`allow-passthrough on`; kitty i foot go pokazują,
+Ghostty nie), a nigdy w screen, zellij ani herdr. Domyślny wskaźnik wraca,
+gdy GitPoulpi się kończy. W innych terminalach (Rio, Alacritty, Tabby, iTerm2,
+Terminal.app, Windows Terminal, xterm) wskaźnik się nie zmienia; zob.
+[Wybór terminala](terminals.md#kształt-wskaźnika-myszy-osc-22). Separator lub przycisk
 pod wskaźnikiem podświetla się w każdym terminalu.
 
 Ten sam rodzaj komponentu daje wszędzie w aplikacji ten sam wskaźnik.
 
+- **Przyciski są prawdziwymi przyciskami**, w Ustawieniach (Integracje: Edytuj,
+  Rozłącz, Usuń, Przeglądaj, Usuń, przyciski fragmentów w edytorze instrukcji...)
+  tak jak w oknach dialogowych: etykiety z marginesem na wypełnionym tle, które
+  jaśnieje pod wskaźnikiem, przyciemnione, gdy są wyłączone, nigdy tekst w `[ ]`.
+  Jedyne nawiasy, które zostały, to znaczniki pól wyboru `[x]` / `[ ]`, które są
+  polami wyboru i biorą rękę jak każda inna kontrolka.
 - **Wskazująca ręka** jest na kontrolkach: przyciskach, polach wyboru i
   przełącznikach, polach kombi (w Ustawieniach, panelach zgłoszeń i pull requestów,
   Radarze, oknach dialogowych), kartach i ich krzyżykach, przyciskach `+`,
@@ -490,7 +501,9 @@ dłoń pokazuje się tylko wtedy, gdy niesiesz ref.
 
 ## Kopiowanie do schowka
 
-**Kopiuj ścieżkę** i niektóre inne akcje kopiowania wysyłają tekst do terminala, który
-umieszcza go w schowku (OSC 52). Jeśli twój terminal tego nie obsługuje,
-nic nie zostaje skopiowane. Akcje kopiowania zaznaczonego tekstu używają bezpośrednio
-schowka systemowego.
+Akcje kopiowania umieszczają tekst w schowku systemowym maszyny, na której działa
+GitPoulpi, a tam, gdzie wiadomo, że terminal to respektuje, wysyłają go też do
+terminala (OSC 52). Przez SSH lub bez ekranu wysyłane jest tylko OSC 52: jeśli twój
+terminal go nie obsługuje (iTerm2, dopóki nie włączy się jego uprawnienia do schowka,
+Terminal.app, GNU screen), nic nie zostaje skopiowane, a wiersz stanu mówi, że tekst
+został tylko wysłany do terminala. Zob. [Wybór terminala](terminals.md#schowek-akcje-kopiowania).

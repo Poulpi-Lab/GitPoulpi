@@ -27,8 +27,8 @@ jest w lokalnym magazynie; w przeciwnym razie karta każe najpierw zrobić
 ## Jak jest rysowany
 
 W terminalu z protokołem obrazów (Kitty i Ghostty, WezTerm i iTerm2, Rio,
-mintty) obraz jest prawdziwym obrazem. Gdzie indziej (zwykły Windows Terminal,
-tmux, terminal nieznany GitPoulpi) jest rysowany kolorowymi znakami
+mintty oraz terminale sixel: Windows Terminal, foot i Tabby) obraz jest prawdziwym obrazem. Gdzie indziej (zwykła konsola Windows,
+zellij, terminal nieznany GitPoulpi) jest rysowany kolorowymi znakami
 półbloków: z połową rozdzielczości w pionie, ale czytelnie wszędzie; **Bez
 protokołu obrazów** można ustawić na *Tylko karta informacyjna*. **Protokół
 obrazów** na stronie **Wygląd** wymusza jeden z nich.

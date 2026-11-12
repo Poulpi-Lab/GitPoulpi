@@ -25,8 +25,8 @@ PNG と JPEG は常に対象です。GIF、WebP（最初のフレーム）、BMP
 ## 描画の仕組み
 
 画像プロトコルのあるターミナル（Kitty と Ghostty、WezTerm と iTerm2、
-Rio、mintty）では、画像は本物の画像になります。それ以外（素の Windows Terminal、
-tmux、GitPoulpi が知らないターミナル）では、色付きの半ブロック文字で描画されます。
+Rio、mintty、および sixel 対応の Windows Terminal、foot、Tabby）では、画像は本物の画像になります。それ以外（素の Windows コンソール、
+zellij、GitPoulpi が知らないターミナル）では、色付きの半ブロック文字で描画されます。
 縦の解像度は半分ですが、どこでも読み取れます。**画像プロトコルがない場合**は*情報カードのみ*に設定できます。
 **ログとグラフ**ページの**画像プロトコル**で、特定のプロトコルを強制できます。
 

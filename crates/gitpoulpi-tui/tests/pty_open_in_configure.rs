@@ -5,8 +5,6 @@
 //! Temp config dir, fixture repos and a throwaway `PATH` tail only; nothing
 //! is launched.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::{Duration, Instant};
@@ -33,17 +31,19 @@ fn click_text(term: &mut Terminal, text: &str) {
 /// A `PATH` that is the real one plus many empty directories: every program
 /// not found costs a probe per directory when asked one name at a time.
 fn long_path(junk: &std::path::Path) -> String {
-    let mut dirs: Vec<String> = Vec::new();
-    for i in 0..6000 {
+    // Windows caps the whole environment block at 32 KiB: fewer directories there.
+    let count = if cfg!(windows) { 500 } else { 6000 };
+    let mut dirs: Vec<std::path::PathBuf> =
+        std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()).collect();
+    for i in 0..count {
         let d = junk.join(i.to_string());
         std::fs::create_dir(&d).unwrap();
-        dirs.push(d.display().to_string());
+        dirs.push(d);
     }
-    format!(
-        "{}:{}",
-        std::env::var("PATH").unwrap_or_default(),
-        dirs.join(":")
-    )
+    std::env::join_paths(dirs)
+        .unwrap()
+        .to_string_lossy()
+        .into_owned()
 }
 
 fn start_on_bravo(

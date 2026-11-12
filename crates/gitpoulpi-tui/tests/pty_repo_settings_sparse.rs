@@ -4,7 +4,6 @@
 //! everything back.
 //!
 //! No hard-coded coordinates: every position is found on the screen.
-#![cfg(unix)]
 
 mod common;
 

@@ -14,11 +14,10 @@
 //! - `channel=archive`: `Update and restart` downloads the release, writes
 //!   `job.json` and starts the updater in the same terminal.
 //!
-//! Unix only: the stub is a `/bin/sh` script. The Windows handoff is covered
-//! by the job's unit tests.
+//! The stub is a `/bin/sh` script on unix and a small `.exe` on Windows
+//! (`common::updater_stub`).
 //!
 //! No input is sent after the action under test (the redraw rule).
-#![cfg(unix)]
 
 mod common;
 
@@ -29,7 +28,7 @@ use std::time::Duration;
 
 use gitpoulpi_config::release::{self, InstallChannel, Marker, MARKER_FILE};
 use gitpoulpi_testkit::FixtureRepoBuilder;
-use xtask::dist::{checksum_line, marker_entry, sha256_hex, write_tar_gz, Entry};
+use xtask::dist::{checksum_line, marker_entry, sha256_hex, Entry};
 use xtask::pty::Terminal;
 
 const STEP: Duration = Duration::from_secs(40);
@@ -50,7 +49,7 @@ fn serve(assets: bool) -> u16 {
         })
         .collect();
     entries.push(marker_entry(NEW_VERSION, &target));
-    let bytes = write_tar_gz(&release::package_stem(NEW_VERSION, &target), &entries).unwrap();
+    let bytes = common::release_archive(NEW_VERSION, &target, &entries);
     let sum = checksum_line(&sha256_hex(&bytes), &name).into_bytes();
     let sig = common::release_signer()
         .sign(&name, NEW_VERSION, &bytes)
@@ -115,13 +114,13 @@ fn serve(assets: bool) -> u16 {
 /// naming `channel`.
 fn install_dir(channel: InstallChannel) -> (tempfile::TempDir, PathBuf) {
     let dir = tempfile::tempdir().unwrap();
-    let exe = dir.path().join("gitpoulpi-tui");
+    let exe = dir.path().join(common::exe("gitpoulpi-tui"));
     let built = env!("CARGO_BIN_EXE_gitpoulpi-tui");
     if std::fs::hard_link(built, &exe).is_err() {
         std::fs::copy(built, &exe).unwrap();
     }
     for sibling in ["gitpoulpi", "gitpoulpi-mcp"] {
-        std::fs::write(dir.path().join(sibling), "#!/bin/sh\n").unwrap();
+        std::fs::write(dir.path().join(common::exe(sibling)), "#!/bin/sh\n").unwrap();
     }
     let mut marker = Marker::new(env!("CARGO_PKG_VERSION"), release::host_target());
     marker.channel = Some(channel);
@@ -187,6 +186,11 @@ fn wait_closed(term: &Terminal) {
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
+// apt only exists on Linux: Windows has no apt install channel to show.
+#[cfg_attr(
+    windows,
+    ignore = "the apt install channel and its command are Linux only"
+)]
 #[test]
 fn an_apt_install_shows_its_command_and_the_panel_opens_four_ways_and_closes_two() {
     let port = serve(true);
@@ -290,7 +294,10 @@ fn an_apt_install_shows_its_command_and_the_panel_opens_four_ways_and_closes_two
     assert_eq!(std::fs::read_to_string(dump.path()).unwrap(), APT_COMMAND);
     assert!(!panel_open(term));
     // The install folder is untouched: the app never runs a Show command.
-    assert!(!dir.path().join("gitpoulpi-tui.new").exists());
+    assert!(!dir
+        .path()
+        .join(format!("{}.new", common::exe("gitpoulpi-tui")))
+        .exists());
     run.term.stop().unwrap();
 }
 
@@ -300,20 +307,7 @@ fn update_and_restart_writes_the_job_and_starts_the_updater() {
     let (dir, exe) = install_dir(InstallChannel::Archive);
     // The updater stub: records the job it was started with, then waits.
     let record = tempfile::tempdir().unwrap();
-    let stub = record.path().join("gitpoulpi-updater-stub");
-    std::fs::write(
-        &stub,
-        format!(
-            "#!/bin/sh\ncp \"$3\" '{rec}/job.json'\necho \"$@\" > '{rec}/args.txt'\n\
-             echo UPDATER-STUB-RAN\nsleep 120\n",
-            rec = record.path().display()
-        ),
-    )
-    .unwrap();
-    {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&stub, std::fs::Permissions::from_mode(0o755)).unwrap();
-    }
+    let stub = common::updater_stub(record.path(), record.path(), "UPDATER-STUB-RAN");
     let mut run = launch(
         "pty-update-panel-archive",
         port,
@@ -330,15 +324,15 @@ fn update_and_restart_writes_the_job_and_starts_the_updater() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(!term.screen().contains("Copy command"), "{}", term.text());
     click_text(term, "Update and restart");
-    term.wait_for("the updater runs in this terminal", STEP, |s| {
-        s.contains("UPDATER-STUB-RAN")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::wait_updater_ran(term, record.path(), "UPDATER-STUB-RAN");
 
     // The download was staged beside the old files; the swap is the updater's.
-    assert!(dir.path().join("gitpoulpi-tui.new").exists());
+    assert!(dir
+        .path()
+        .join(format!("{}.new", common::exe("gitpoulpi-tui")))
+        .exists());
     assert_ne!(
-        std::fs::read(dir.path().join("gitpoulpi-tui")).unwrap()[..2],
+        std::fs::read(&exe).unwrap()[..2],
         *b"#!",
         "the TUI never replaces its own files"
     );
@@ -362,7 +356,7 @@ fn update_and_restart_writes_the_job_and_starts_the_updater() {
         Path::new(job["relaunch"]["exe"].as_str().unwrap())
             .file_name()
             .unwrap(),
-        "gitpoulpi-tui"
+        common::exe("gitpoulpi-tui").as_str()
     );
     assert_eq!(
         Path::new(job["config_dir"].as_str().unwrap()),
@@ -370,15 +364,22 @@ fn update_and_restart_writes_the_job_and_starts_the_updater() {
     );
     assert!(job["requester_pid"].as_u64().unwrap() > 0);
     let status = job["status_path"].as_str().unwrap();
-    assert!(status.ends_with("updates/status.json"), "{status}");
+    assert!(
+        status.replace('\\', "/").ends_with("updates/status.json"),
+        "{status}"
+    );
     // The job and the updater copy live in the data folder, not the install folder.
     let updates = run.config.path().join("data").join("updates");
     assert!(updates.join("job.json").is_file());
     assert!(
-        updates.join("bin").join("gitpoulpi-updater").is_file() || {
-            // The override names the file; its copy keeps the updater's name.
-            updates.join("bin").read_dir().unwrap().count() > 0
-        }
+        updates
+            .join("bin")
+            .join(common::exe("gitpoulpi-updater"))
+            .is_file()
+            || {
+                // The override names the file; its copy keeps the updater's name.
+                updates.join("bin").read_dir().unwrap().count() > 0
+            }
     );
     run.term.stop().unwrap();
 }

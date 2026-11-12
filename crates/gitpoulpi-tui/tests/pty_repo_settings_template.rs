@@ -5,7 +5,6 @@
 //! the commit that is made.
 //!
 //! No hard-coded coordinates: every position is found on the screen.
-#![cfg(unix)]
 
 mod common;
 
@@ -121,7 +120,11 @@ fn save_a_template(term: &mut Terminal, repo: &FixtureRepo) {
         // `try_git`: the key is unset until the save lands, and `git config`
         // exits 1 for an unset key (a polling panic, not a failure).
         repo.try_git(&["config", "--local", "commit.template"])
-            .is_some_and(|v| v.trim() == template_file(repo).to_string_lossy())
+            .is_some_and(|v| {
+                // git keeps the path as the app wrote it: compare the slash direction-blind.
+                v.trim().replace('\\', "/")
+                    == template_file(repo).to_string_lossy().replace('\\', "/")
+            })
     });
 }
 

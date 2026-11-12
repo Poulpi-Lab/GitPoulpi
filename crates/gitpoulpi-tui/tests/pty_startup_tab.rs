@@ -5,8 +5,6 @@
 //! Real binary and daemon through a pty; temp config dirs and fixture
 //! repositories only, no network.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::path::Path;

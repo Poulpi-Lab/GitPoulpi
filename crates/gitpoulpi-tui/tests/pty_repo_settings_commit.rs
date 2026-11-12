@@ -8,7 +8,6 @@
 //!   through; the palette twin flips the checkbox.
 //!
 //! No hard-coded coordinates: every position is found on the screen.
-#![cfg(unix)]
 
 mod common;
 
@@ -114,11 +113,9 @@ fn wait_for(term: &Terminal, what: &str, mut ok: impl FnMut() -> bool) {
 }
 
 fn install_failing_pre_commit(repo: &FixtureRepo) {
-    use std::os::unix::fs::PermissionsExt;
     let hook = repo.root().join(".git/hooks/pre-commit");
     std::fs::create_dir_all(hook.parent().unwrap()).unwrap();
-    std::fs::write(&hook, "#!/bin/sh\necho pty-hook-refused >&2\nexit 1\n").unwrap();
-    std::fs::set_permissions(&hook, std::fs::Permissions::from_mode(0o755)).unwrap();
+    common::write_sh_script(&hook, "#!/bin/sh\necho pty-hook-refused >&2\nexit 1\n");
 }
 
 /// The page lists both switches off; ticking "Push on every commit" saves

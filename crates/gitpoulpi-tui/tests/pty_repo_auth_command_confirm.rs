@@ -4,7 +4,6 @@
 //! and Cancel save nothing, and `1` saves - or shows the daemon's own
 //! refusal when this build's daemon does not run commands yet. The private
 //! profile file is read back, not trusted from the screen alone.
-#![cfg(unix)]
 
 mod common;
 
@@ -21,7 +20,7 @@ fn launch(repo: &Path, home: &Path) -> (Terminal, tempfile::TempDir) {
     common::launch(repo)
         .session("pty-repo-auth-confirm")
         .size(200, 60)
-        .env("HOME", home)
+        .scratch_home(home)
         .env("GIT_CONFIG_GLOBAL", "/dev/null")
         .env("GIT_CONFIG_NOSYSTEM", "1")
         .no_exit_pause()

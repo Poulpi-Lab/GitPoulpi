@@ -3,8 +3,6 @@
 //! directories, so nothing here can reach the real `~/.local/bin` or the real
 //! shell startup files.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::Duration;
@@ -66,14 +64,12 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
         .session("command-alias")
         .config_dir(config.path())
         .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
-        .env("HOME", home.path())
-        .env("XDG_DATA_HOME", home.path().join("data"))
-        .env("XDG_CONFIG_HOME", home.path().join("config"))
+        .scratch_home(home.path())
         .size(200, 70)
         .no_exit_pause()
         .ready(MESSAGE)
         .spawn();
-    let link = home.path().join(".local/bin/gp");
+    let link = common::alias_file(home.path(), "gp");
     assert!(std::fs::symlink_metadata(&link).is_err());
 
     palette(&mut term, "command alias", "Launcher: Create Command Alias");
@@ -83,14 +79,23 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
         s.contains("Remove: command alias") && alias_status_is(&s.text(), "created")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let target = std::fs::read_link(&link).expect("the alias is a symlink");
-    assert_eq!(
-        target.file_name().unwrap().to_string_lossy(),
-        "gitpoulpi-tui",
-        "it points at the running TUI: {}",
-        target.display()
-    );
-    assert!(target.exists(), "{}", target.display());
+    #[cfg(unix)]
+    {
+        let target = std::fs::read_link(&link).expect("the alias is a symlink");
+        assert_eq!(
+            target.file_name().unwrap().to_string_lossy(),
+            "gitpoulpi-tui",
+            "it points at the running TUI: {}",
+            target.display()
+        );
+        assert!(target.exists(), "{}", target.display());
+    }
+    #[cfg(windows)]
+    {
+        let text = std::fs::read_to_string(&link).expect("the alias is a .cmd file");
+        assert!(text.contains("REM X-GitPoulpi=1"), "{text}");
+        assert!(text.contains("gitpoulpi-tui"), "it starts the TUI: {text}");
+    }
 
     // The palette selected the Remove button already, so one click runs it;
     // it deletes only what we made.
@@ -124,6 +129,12 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
     let _ = term.stop();
 }
 
+// The PATH half writes the user's PATH in the registry, which a test cannot
+// isolate: it never runs against the real one.
+#[cfg_attr(
+    windows,
+    ignore = "Add to PATH edits the user's PATH in the registry, which a test must not touch"
+)]
 #[test]
 fn pick_the_name_in_the_combobox_then_add_and_remove_gitpoulpi_on_path() {
     let repo = FixtureRepoBuilder::new()

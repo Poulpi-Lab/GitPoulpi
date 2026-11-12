@@ -2,8 +2,6 @@
 //! text beside it): a click on it closes Settings, the Diff view and the
 //! Global search overlay, and Esc still closes each of them.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::Duration;

@@ -157,23 +157,19 @@ fn the_commits_filter_dropdown_closes_on_a_press_outside_without_running_it() {
 }
 
 /// A fake `gpg.program`: git believes the commit was signed.
-#[cfg(unix)]
 fn fake_gpg(dir: &std::path::Path) -> std::path::PathBuf {
-    use std::os::unix::fs::PermissionsExt;
-    let path = dir.join("fake-gpg.sh");
-    std::fs::write(
+    // An extensionless `sh` script: Git for Windows starts it through its own `sh`.
+    let path = dir.join("fake-gpg");
+    common::write_sh_script(
         &path,
         "#!/bin/sh\ncat >/dev/null\necho '[GNUPG:] SIG_CREATED ' >&2\nprintf -- '-----BEGIN PGP SIGNATURE-----\\n\\nZmFrZQ==\\n-----END PGP SIGNATURE-----\\n'\n",
-    )
-    .unwrap();
-    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
+    );
     path
 }
 
 /// The signature question (a modal question of the workbench): a left press
 /// outside it, then a right-click outside it, each closes it without running
 /// anything (no preview appears, Tags stays ticked).
-#[cfg(unix)]
 #[test]
 fn the_signature_question_closes_on_a_press_outside_without_running_anything() {
     let scratch = tempfile::tempdir().unwrap();
@@ -184,7 +180,13 @@ fn the_signature_question_closes_on_a_press_outside_without_running_anything() {
         "-c",
         "user.email=old@example.com",
         "-c",
-        &format!("gpg.program={}", fake_gpg(scratch.path()).display()),
+        &format!(
+            "gpg.program={}",
+            fake_gpg(scratch.path())
+                .display()
+                .to_string()
+                .replace('\\', "/")
+        ),
         "-c",
         "user.signingkey=ABCDEF0123456789",
         "commit",

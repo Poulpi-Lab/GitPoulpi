@@ -6,11 +6,8 @@
 //! The launcher is a fake script recording its arguments: no real terminal or
 //! editor is ever started. Temp config dir and fixture repos only.
 
-#![cfg(unix)]
-
 mod common;
 
-use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::time::Duration;
 
@@ -49,17 +46,12 @@ impl Setup {
         )
         .unwrap();
         let work = tempfile::tempdir().unwrap();
-        let script = work.path().join("fake-launcher.sh");
-        std::fs::write(
-            &script,
-            format!(
-                "#!/bin/sh\necho \"$@\" >> '{}'\n",
-                work.path().join("launches.log").display()
-            ),
-        )
-        .unwrap();
-        std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o755)).unwrap();
-        let fake = script.display();
+        let script = common::fake_recorder(
+            work.path(),
+            "fake-launcher",
+            &work.path().join("launches.log"),
+        );
+        let fake = common::toml_path(&script);
         std::fs::write(
             config.path().join("config.toml"),
             format!(
@@ -79,7 +71,7 @@ impl Setup {
     }
 
     fn launches(&self) -> String {
-        std::fs::read_to_string(self.work.path().join("launches.log")).unwrap_or_default()
+        common::read_log(&self.work.path().join("launches.log"))
     }
 
     /// Waits for the launcher's log to hold a line.

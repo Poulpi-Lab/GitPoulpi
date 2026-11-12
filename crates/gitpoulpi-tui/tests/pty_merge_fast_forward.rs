@@ -3,7 +3,6 @@
 //! dragged onto `dev`. "Merge" makes a real merge commit (first parent the old
 //! `dev`), the menu says so, and "Fast-forward dev to mybranch" stays one
 //! item away. Real binary, real daemon, real `git`.
-#![cfg(unix)]
 
 mod common;
 

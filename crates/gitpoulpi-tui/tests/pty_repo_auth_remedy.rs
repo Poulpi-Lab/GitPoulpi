@@ -7,7 +7,6 @@
 //! Real binary, daemon and system git through a pty (`xtask::pty`); the remote
 //! is a loopback server that asks for credentials, so there is no network. The
 //! home folder and the global git config are temporary: never the developer's.
-#![cfg(unix)]
 
 mod common;
 
@@ -54,7 +53,7 @@ fn launch(rig: &Rig, session: &str) -> (Terminal, tempfile::TempDir) {
     common::launch(rig.repo.root())
         .session(session)
         .size(180, 48)
-        .env("HOME", rig.home.path())
+        .scratch_home(rig.home.path())
         .env("GIT_CONFIG_GLOBAL", rig.home.path().join("gitconfig"))
         .env("GIT_CONFIG_NOSYSTEM", "1")
         .env("GITPOULPI_CLIPBOARD", "memory")

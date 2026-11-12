@@ -1,12 +1,11 @@
-//! Settings > Launcher: the palette's `Launcher: Create Shortcut`
+//! Settings > Launcher (unix: the XDG `.desktop` entry / macOS bundle; Windows: the
+//! Start menu `.lnk`, last test): the palette's `Launcher: Create Shortcut`
 //! writes the `.desktop` entry and its icon into a temp `XDG_DATA_HOME`, the
 //! row then reads "created", and its Remove button deletes both again.
 //!
 //! HOME, XDG_DATA_HOME and XDG_CONFIG_HOME point at a scratch directory, so
 //! nothing here can reach the real launcher entries. No terminal is started:
 //! the entry is only written.
-
-#![cfg(unix)]
 
 mod common;
 
@@ -21,6 +20,8 @@ const MESSAGE: &str = "launcher probe commit";
 /// The launcher row's label: macOS has one place, the Applications folder.
 const PLACE: &str = if cfg!(target_os = "macos") {
     "Applications folder"
+} else if cfg!(windows) {
+    "Start menu"
 } else {
     "App launcher"
 };
@@ -50,7 +51,7 @@ fn click_text(term: &mut Terminal, text: &str) {
 /// The `.desktop` entry is the XDG launcher; macOS writes an app bundle
 /// instead (covered by the next test), and its terminals are not found on
 /// PATH.
-#[cfg(not(target_os = "macos"))]
+#[cfg(all(unix, not(target_os = "macos")))]
 #[test]
 fn changing_the_terminal_in_the_settings_rewrites_a_created_shortcut_by_itself() {
     use std::os::unix::fs::PermissionsExt;
@@ -143,6 +144,7 @@ fn changing_the_terminal_in_the_settings_rewrites_a_created_shortcut_by_itself()
     let _ = term.stop();
 }
 
+#[cfg(unix)]
 #[test]
 fn create_from_the_palette_then_remove_from_the_settings_row() {
     let repo = FixtureRepoBuilder::new()
@@ -249,6 +251,67 @@ fn create_from_the_palette_then_remove_from_the_settings_row() {
     assert!(!entry.exists(), "the entry is gone");
     assert!(!mac || !bundle.exists(), "the whole bundle is gone");
     assert_eq!(our_icons(), 0, "the icon is gone");
+    let _ = term.stop();
+}
+
+/// The Windows launcher: a `GitPoulpi.lnk` in the Start menu (a scratch
+/// `%APPDATA%`), made from the palette and removed from the settings row.
+#[cfg(windows)]
+#[test]
+fn windows_create_from_the_palette_then_remove_from_the_settings_row() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit(MESSAGE)
+        .unwrap()
+        .build();
+    let config = tempfile::tempdir().unwrap();
+    let home = tempfile::tempdir().unwrap();
+    std::fs::write(
+        config.path().join("config.toml"),
+        "[ui]\ngraph_renderer = \"text\"\n",
+    )
+    .unwrap();
+    let mut term = common::launch(repo.root())
+        .session("launcher-shortcut-windows")
+        .config_dir(config.path())
+        .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
+        .scratch_home(home.path())
+        .size(200, 90)
+        .no_exit_pause()
+        .ready(MESSAGE)
+        .spawn();
+    let entry = home
+        .path()
+        .join("appdata/Microsoft/Windows/Start Menu/Programs/GitPoulpi.lnk");
+    assert!(!entry.exists());
+
+    term.send_keys("C-p").unwrap();
+    term.send_text("launcher create").unwrap();
+    term.wait_for("the palette entry", STEP, |s| {
+        s.contains("Launcher: Create Shortcut")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the row reads created", STARTUP, |s| {
+        s.contains(&format!("Remove: {PLACE}")) && launcher_row_is(s, "created")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(entry.is_file(), "the Start menu shortcut was written");
+
+    click_text(&mut term, &format!("Remove: {PLACE}"));
+    common::retry_until(
+        &mut term,
+        "the row reads not created",
+        4,
+        STEP,
+        |t| {
+            if t.screen().contains("This cannot") {
+                common::confirm_removal(t, STEP);
+            }
+        },
+        |s| launcher_row_is(s, "not created"),
+    );
+    assert!(!entry.exists(), "the shortcut is gone");
     let _ = term.stop();
 }
 

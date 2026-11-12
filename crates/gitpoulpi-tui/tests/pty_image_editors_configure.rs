@@ -7,8 +7,6 @@
 //! viewer checkbox off the File View shows the old binary notice again. Until
 //! then only the `ui.image_view` key flipping is checked.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::path::Path;

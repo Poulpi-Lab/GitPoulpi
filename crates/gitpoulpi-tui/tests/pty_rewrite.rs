@@ -285,21 +285,17 @@ fn a_rule_that_needs_a_missing_tool_is_greyed_and_refuses_to_preview() {
 }
 
 /// A fake `gpg.program`: git believes the commit was signed.
-#[cfg(unix)]
 fn fake_gpg(dir: &std::path::Path) -> std::path::PathBuf {
-    use std::os::unix::fs::PermissionsExt;
-    let path = dir.join("fake-gpg.sh");
-    std::fs::write(
+    // An extensionless `sh` script: Git for Windows starts it through its own `sh`.
+    let path = dir.join("fake-gpg");
+    common::write_sh_script(
         &path,
         "#!/bin/sh\ncat >/dev/null\necho '[GNUPG:] SIG_CREATED ' >&2\nprintf -- '-----BEGIN PGP SIGNATURE-----\\n\\nZmFrZQ==\\n-----END PGP SIGNATURE-----\\n'\n",
-    )
-    .unwrap();
-    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
+    );
     path
 }
 
 /// A commit by old@example.com, signed by the fake program.
-#[cfg(unix)]
 fn signed_commit(repo: &FixtureRepo, gpg: &std::path::Path, message: &str) {
     repo.git(&[
         "-c",
@@ -307,7 +303,10 @@ fn signed_commit(repo: &FixtureRepo, gpg: &std::path::Path, message: &str) {
         "-c",
         "user.email=old@example.com",
         "-c",
-        &format!("gpg.program={}", gpg.display()),
+        &format!(
+            "gpg.program={}",
+            gpg.display().to_string().replace('\\', "/")
+        ),
         "-c",
         "user.signingkey=ABCDEF0123456789",
         "commit",
@@ -319,7 +318,6 @@ fn signed_commit(repo: &FixtureRepo, gpg: &std::path::Path, message: &str) {
     ]);
 }
 
-#[cfg(unix)]
 fn signed_fixture(scratch: &std::path::Path) -> FixtureRepo {
     let repo = fixture();
     signed_commit(&repo, &fake_gpg(scratch), "signed tip");
@@ -332,7 +330,6 @@ fn signed_fixture(scratch: &std::path::Path) -> FixtureRepo {
 
 /// Signed commits that change: the daemon refuses to preview until the
 /// choice is made; the question has no default and nothing runs behind it.
-#[cfg(unix)]
 #[test]
 fn the_signature_question_blocks_the_rewrite_until_it_is_answered() {
     let scratch = tempfile::tempdir().unwrap();
@@ -382,7 +379,6 @@ fn the_signature_question_blocks_the_rewrite_until_it_is_answered() {
 
 /// Re-signing needs gpg: with it missing the choice is refused and nothing is
 /// previewed.
-#[cfg(unix)]
 #[test]
 fn choosing_to_re_sign_without_gpg_says_what_is_missing() {
     let scratch = tempfile::tempdir().unwrap();

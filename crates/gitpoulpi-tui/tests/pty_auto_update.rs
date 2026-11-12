@@ -11,10 +11,10 @@
 //! tests assert on the job it was given and that nothing in the install
 //! folder was replaced. The maintainer's real install is never touched.
 //!
-//! Unix only: the scripts need `/bin/sh`. The swap itself is the updater's
-//! (its own tests) and the engine's (`gitpoulpi-update`, against a simulated
+//! The stand-in updater is a `/bin/sh` script on unix and a small `.exe` on
+//! Windows (`common::updater_stub`). The swap itself is the updater's (its
+//! own tests) and the engine's (`gitpoulpi-update`, against a simulated
 //! Windows file system).
-#![cfg(unix)]
 
 mod common;
 
@@ -27,7 +27,7 @@ use std::time::Duration;
 
 use gitpoulpi_config::release::{self, Marker, MARKER_FILE};
 use gitpoulpi_testkit::FixtureRepoBuilder;
-use xtask::dist::{checksum_line, marker_entry, sha256_hex, write_tar_gz, Entry};
+use xtask::dist::{checksum_line, marker_entry, sha256_hex, Entry};
 use xtask::pty::Terminal;
 
 const STEP: Duration = Duration::from_secs(40);
@@ -46,23 +46,9 @@ fn script(text: &str) -> Vec<u8> {
     format!("#!/bin/sh\necho {text}\nsleep 120\n").into_bytes()
 }
 
-/// A recording stand-in for `gitpoulpi-updater`: copies the job it is started
-/// with to `<dir>/job.json`, prints the sentinel and waits.
+/// A recording stand-in for `gitpoulpi-updater` (see `common::updater_stub`).
 fn updater_stub(dir: &Path) -> PathBuf {
-    let stub = dir.join("gitpoulpi-updater-stub");
-    std::fs::write(
-        &stub,
-        format!(
-            "#!/bin/sh\ncp \"$3\" '{rec}/job.json'\necho {SENTINEL}\nsleep 120\n",
-            rec = dir.display()
-        ),
-    )
-    .unwrap();
-    {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&stub, std::fs::Permissions::from_mode(0o755)).unwrap();
-    }
-    stub
+    common::updater_stub(dir, dir, SENTINEL)
 }
 
 fn recorded_job(dir: &Path) -> serde_json::Value {
@@ -80,7 +66,7 @@ fn archive(version: &str, target: &str) -> Vec<u8> {
         })
         .collect();
     entries.push(marker_entry(version, target));
-    write_tar_gz(&release::package_stem(version, target), &entries).unwrap()
+    common::release_archive(version, target, &entries)
 }
 
 /// What the fake release carries wrong, if anything.
@@ -179,13 +165,13 @@ fn serve(fault: Fault) -> FakeHost {
 /// and the marker of version 0.1.0 (this build's).
 fn install_dir(marker: bool) -> (tempfile::TempDir, PathBuf) {
     let dir = tempfile::tempdir().unwrap();
-    let exe = dir.path().join("gitpoulpi-tui");
+    let exe = dir.path().join(common::exe("gitpoulpi-tui"));
     let built = env!("CARGO_BIN_EXE_gitpoulpi-tui");
     if std::fs::hard_link(built, &exe).is_err() {
         std::fs::copy(built, &exe).unwrap();
     }
     for sibling in ["gitpoulpi", "gitpoulpi-mcp"] {
-        std::fs::write(dir.path().join(sibling), script("old sibling")).unwrap();
+        std::fs::write(dir.path().join(common::exe(sibling)), script("old sibling")).unwrap();
     }
     if marker {
         let marker = Marker::new(env!("CARGO_PKG_VERSION"), release::host_target());
@@ -300,28 +286,30 @@ fn update_now_downloads_stages_offers_the_restart_and_the_restart_hands_the_job_
     // The checksum, the signature and the archive were fetched; the files are
     // staged beside the old ones, and the running binary is untouched.
     assert_eq!(host.downloads.load(Ordering::SeqCst), 3);
-    assert!(dir.path().join("gitpoulpi-tui.new").exists());
+    assert!(dir
+        .path()
+        .join(format!("{}.new", common::exe("gitpoulpi-tui")))
+        .exists());
     assert!(dir.path().join(format!("{MARKER_FILE}.new")).exists());
     assert_ne!(
-        std::fs::read(dir.path().join("gitpoulpi-tui")).unwrap()[..2],
+        std::fs::read(&exe).unwrap()[..2],
         *b"#!",
         "nothing is replaced before the user restarts"
     );
     // The user's action: a job is written and the updater is started.
     click_body_text(&mut term, "Restart to update");
-    term.wait_for("the updater runs", STEP, |s| s.contains(SENTINEL))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::wait_updater_ran(&term, record.path(), SENTINEL);
     let job = recorded_job(record.path());
     assert_eq!(job["action"], "apply");
     assert_eq!(job["to_version"], NEW_VERSION);
     assert_eq!(job["from_version"], env!("CARGO_PKG_VERSION"));
     assert_eq!(job["staged"], "in_place");
     // The TUI did not swap anything itself.
-    assert_ne!(
-        std::fs::read(dir.path().join("gitpoulpi-tui")).unwrap()[..2],
-        *b"#!"
-    );
-    assert!(!dir.path().join("gitpoulpi-tui.old").exists());
+    assert_ne!(std::fs::read(&exe).unwrap()[..2], *b"#!");
+    assert!(!dir
+        .path()
+        .join(format!("{}.old", common::exe("gitpoulpi-tui")))
+        .exists());
     term.stop().unwrap();
 }
 
@@ -344,7 +332,10 @@ fn a_checksum_mismatch_is_refused_and_nothing_is_staged() {
         s.contains("checksum does not match")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(!dir.path().join("gitpoulpi-tui.new").exists());
+    assert!(!dir
+        .path()
+        .join(format!("{}.new", common::exe("gitpoulpi-tui")))
+        .exists());
     assert!(!term.screen().contains("Restart to update"));
     term.stop().unwrap();
 }
@@ -371,7 +362,10 @@ fn a_release_without_a_valid_signature_is_refused_and_nothing_is_staged() {
             s.contains("signature")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-        assert!(!dir.path().join("gitpoulpi-tui.new").exists());
+        assert!(!dir
+            .path()
+            .join(format!("{}.new", common::exe("gitpoulpi-tui")))
+            .exists());
         assert!(!term.screen().contains("Restart to update"));
         term.stop().unwrap();
     }
@@ -410,7 +404,10 @@ fn auto_mode_downloads_by_itself_and_waits_for_the_restart() {
         s.contains("Restart to update")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(dir.path().join("gitpoulpi-tui.new").exists());
+    assert!(dir
+        .path()
+        .join(format!("{}.new", common::exe("gitpoulpi-tui")))
+        .exists());
     // Never restarts without the user: still the TUI, not the sentinel.
     std::thread::sleep(Duration::from_secs(2));
     assert!(!term.screen().contains(SENTINEL), "{}", term.text());
@@ -422,12 +419,10 @@ fn revert_hands_a_revert_job_to_the_updater_and_swaps_nothing_itself() {
     let host = serve(Fault::None);
     let (dir, exe) = install_dir(true);
     // As after an update: the previous version's files wait as `.old`.
-    let old = dir.path().join("gitpoulpi-tui.old");
-    std::fs::write(&old, script("previous")).unwrap();
-    {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&old, std::fs::Permissions::from_mode(0o755)).unwrap();
-    }
+    let old = dir
+        .path()
+        .join(format!("{}.old", common::exe("gitpoulpi-tui")));
+    common::write_sh_script(&old, &String::from_utf8(script("previous")).unwrap());
     let previous = Marker::new("0.0.9", release::host_target());
     std::fs::write(
         dir.path().join(format!("{MARKER_FILE}.old")),
@@ -444,8 +439,7 @@ fn revert_hands_a_revert_job_to_the_updater_and_swaps_nothing_itself() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Enter").unwrap();
-    term.wait_for("the updater runs", STEP, |s| s.contains(SENTINEL))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    common::wait_updater_ran(&term, record.path(), SENTINEL);
     let job = recorded_job(record.path());
     assert_eq!(job["action"], "revert");
     assert_eq!(job["to_version"], "0.0.9");

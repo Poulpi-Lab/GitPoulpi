@@ -6,7 +6,6 @@
 //!
 //! No hard-coded coordinates: every position is found on the screen. The
 //! Log pane has no title: the fixture's own commit summary is the anchor.
-#![cfg(unix)]
 
 mod common;
 

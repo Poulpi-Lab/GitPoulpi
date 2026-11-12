@@ -4,8 +4,6 @@
 //! the whole state it expects (a terminal has no frame boundaries) and every
 //! gesture that can land early is retried from the geometry it finds afresh.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::Duration;

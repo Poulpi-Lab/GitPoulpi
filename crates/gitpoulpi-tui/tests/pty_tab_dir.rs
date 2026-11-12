@@ -8,11 +8,8 @@
 //! The terminal is a fake launcher script recording its arguments: no real
 //! terminal is ever started. Temp config dir and fixture repos only.
 
-#![cfg(unix)]
-
 mod common;
 
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
@@ -27,6 +24,7 @@ struct Setup {
     bravo: gitpoulpi_testkit::FixtureRepo,
     config: tempfile::TempDir,
     work: tempfile::TempDir,
+    fake: PathBuf,
 }
 
 impl Setup {
@@ -51,21 +49,14 @@ impl Setup {
         )
         .unwrap();
         let work = tempfile::tempdir().unwrap();
-        let script = work.path().join("fake-term.sh");
-        std::fs::write(
-            &script,
-            format!(
-                "#!/bin/sh\necho \"$@\" >> '{}'\n",
-                work.path().join("launches.log").display()
-            ),
-        )
-        .unwrap();
-        std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let fake =
+            common::fake_recorder(work.path(), "fake-term", &work.path().join("launches.log"));
         Self {
             alpha,
             bravo,
             config,
             work,
+            fake,
         }
     }
 
@@ -76,7 +67,7 @@ impl Setup {
                 "[ui]\ngraph_renderer = \"text\"\ntab_dir_follow = \"{follow}\"\n\
                  terminal_launch = \"custom\"\nterminal_launch_command = \"{fake} --here {{repo}}\"\n\
                  [[ui.open_in]]\nlabel = \"Fake terminal\"\ncommand = \"{fake} --here ${{cwd}}\"\n",
-                fake = self.work.path().join("fake-term.sh").display()
+                fake = common::toml_path(&self.fake)
             ),
         )
         .unwrap();
@@ -87,7 +78,7 @@ impl Setup {
     }
 
     fn launches(&self) -> String {
-        std::fs::read_to_string(self.work.path().join("launches.log")).unwrap_or_default()
+        common::read_log(&self.work.path().join("launches.log"))
     }
 
     fn start(&self, with_cwd_file: bool) -> Terminal {

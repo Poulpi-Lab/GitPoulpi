@@ -3,8 +3,6 @@
 //! the page that draws its own body (Integrations) keeps
 //! its generic rows reachable from the keyboard.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::Duration;

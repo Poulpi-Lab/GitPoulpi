@@ -27,8 +27,8 @@ saklanan bir dosya, nesnesi yerel depodaysa gösterilir; değilse kart önce
 ## Nasıl çizilir
 
 Görsel protokolü olan bir terminalde (Kitty ve Ghostty, WezTerm ve iTerm2, Rio,
-mintty) resim gerçek bir görsel olarak çizilir. Başka her yerde (sade Windows
-Terminal, tmux, GitPoulpi'nin tanımadığı bir terminal) renkli yarım blok
+mintty ve sixel terminalleri Windows Terminal, foot ve Tabby) resim gerçek bir görsel olarak çizilir. Başka her yerde (sade Windows
+konsolu, zellij, GitPoulpi'nin tanımadığı bir terminal) renkli yarım blok
 karakterlerle çizilir; dikey çözünürlüğün yarısıdır ama her yerde okunur;
 **Görsel protokolü yokken** seçeneği *Yalnızca bilgi kartı* olarak ayarlanabilir.
 **Log ve grafik** sayfasındaki **Görüntü protokolü** birini zorlar.

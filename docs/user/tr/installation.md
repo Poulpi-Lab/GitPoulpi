@@ -18,10 +18,10 @@ Bunların yanında arşiv, kısayolların zaten açık bir GitPoulpi penceresini
   geri kalanı için sizin `git`'inizi kullanır.
   **2.34 veya daha yeni** bir sürüm gerekir. macOS'ta Apple'ın Command Line Tools ile gelen
   `git` de, Homebrew'un `git`'i de çalışır.
-- Fare desteği olan bir **terminal**. kitty, Ghostty, WezTerm ve iTerm2 (ve sixel üzerinden Windows Terminal ile foot) commit
-  grafiğini resim olarak çizer. Diğer terminaller (Windows konsolu, tmux ve
+- Fare desteği olan bir **terminal**. kitty, Ghostty, WezTerm, Rio, iTerm2 (ve sixel üzerinden Windows Terminal, foot ile Tabby) commit
+  grafiğini resim olarak çizer. Diğer terminaller (Windows konsolu, zellij, screen ve
   çoğu başkası) karakterlerden oluşan bir grafik gösterir. Bkz.
-  [Terminal seçmek](terminals.md).
+  [Terminal seçmek](terminals.md) ve [Çoklayıcılar](multiplexers.md).
 - Araç çubuğundaki ve kenar çubuğundaki simgeler için bir **Nerd Font** ya da
   emoji içeren bir yazı tipi.
 - İsteğe bağlı: Git LFS depoları için 3.0 veya daha yeni bir **`git-lfs`**. Onsuz

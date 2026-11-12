@@ -91,7 +91,7 @@ author_email = "jane@work.example"
 | Anahtar | Varsayılan | Değerler ve etki |
 |---|---|---|
 | `ui.graph_renderer` | `"auto"` | `auto` (terminalin çizebildiği yerde bir resim, başka yerde karakterler), `image`, `text`. **Yeniden başlatma.** |
-| `ui.image_protocol` | `"auto"` | Resimlerin (graf, avatarlar) terminale nasıl ulaştığı: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = kitty, Ghostty ve `kitty_graphics = true` olan bir herdr'de Kitty protokolü; WezTerm, iTerm2, Rio, mintty'de iTerm2; Windows Terminal, foot, Konsole, mlterm'de sixel (yalnızca avatarlar); tmux, zellij, screen ve bilinmeyen terminallerde hiçbiri. **Yeniden başlatma.** |
+| `ui.image_protocol` | `"auto"` | Resimlerin (graf, avatarlar) terminale nasıl ulaştığı: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = kitty, Ghostty, iTerm2 3.7.7 veya daha yenisi ve `kitty_graphics = true` olan bir herdr'de Kitty protokolü; WezTerm ve Rio'da (saydamlık harmanlanır), daha eski iTerm2'de ve mintty'de (opak arka plan) iTerm2 protokolü; Windows Terminal, foot, Tabby, Konsole, mlterm'de, arkasındaki terminal sixel kabul ediyorsa tmux'ta ve başlangıç yanıtları sixel'i bildiren her terminalde (`-ti vt340` ile başlatılan bir xterm, görselleri açık bir VS Code terminali) sixel (graf sütunu ve avatarlar); zellij, screen ve bilinmeyen terminallerde karakterler. tmux'ta kitty resimleri için burada `kitty` ve `allow-passthrough on` gerekir ([Çoklayıcılar](multiplexers.md)). Terminalin sözde konsolunun resimleri düşürdüğü veya yanlış yere koyduğu yerlerde (Windows'ta WezTerm 20240203, Rio ve mintty) `ui.graph_renderer = "text"` kullanın ([Terminal seçmek](terminals.md#windows)). **Yeniden başlatma.** |
 | `ui.theme` | `"system"` | Renk teması: yerleşik bir slug (`gitpoulpi theme list` hepsini listeler), `<config>/themes/` içindeki bir dosyanın slug'ı ya da `system` (terminalin açık ya da koyu arka planını izler, başlangıçta algılanır; eski `default` değeri aynı anlama gelir). `config set` bilinmeyen adları reddeder. Bkz. [Temalar](themes.md). |
 | `ui.graph_color_theme` | `"theme"` | Şerit paleti: `theme` (temayı izle) ya da herhangi bir şerit paleti adı: `gitpoulpi`, `light`, `material`, `serie` ve diğer temaların paletleri. |
 | `ui.graph_lane_background` | `"off"` | `off` ya da `row_tint` (grafın arkasında şerit renginin soluk bir bandı, ayrıca kenarında bir çubuk). **Uygulama: Grafik Satır Tonunu Aç/Kapat** (`Ctrl+N Shift+T`) bunu çevirir; **Uygulama: Grafik Renk Temasını Değiştir...** (`Ctrl+N Shift+Y`) `ui.graph_color_theme` değerini seçer. |
@@ -120,7 +120,7 @@ author_email = "jane@work.example"
 | `ui.git_terms_english` | `false` | Yalnızca ja, ko ve zh-CN: transkripsiyon yerine İngilizce Git sözcüklerini (stage, unstage, staged, unstaged...) gösterir. `ui.translate_git_terms` `true` iken etkisizdir. **Canlı.** |
 | `ui.mouse_enabled` | `true` | `false` fareyi (ve metin seçimini) terminale bırakır. **Yeniden başlatma.** |
 | `ui.mouse_scroll_lines` | `3` | Tekerlek adımı başına Log satırı, 1 ila 20. **Yeniden başlatma.** |
-| `ui.kitty_keyboard` | `"auto"` | `auto` terminalden kitty klavye protokolünü ister (böylece `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` ulaşır); `off` hiç istemez. **Yeniden başlatma.** |
+| `ui.kitty_keyboard` | `"auto"` | `auto` terminalden kitty klavye protokolünü ister (böylece `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` ulaşır; yalnızca Unix, tmux asla yanıt vermez: bkz. [Çoklayıcılar](multiplexers.md#tmux)); `off` hiç istemez. **Yeniden başlatma.** |
 | `ui.logo_color` | `""` | About penceresindeki logonun renk düzeni, bir slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); boş ya da bilinmeyen, derlemenin varsayılanı (`lavender`) anlamına gelir. Logoya tıkladığınızda ya da About içinde bir renk seçtiğinizde yazılır. |
 
 **Avatarlar** (varsayılan olarak kapalı; açmak yazar e-postalarının SHA-256 özetini
@@ -145,6 +145,7 @@ Gravatar'a gönderir ve bağlı GitHub/GitLab hesabınıza sorar)
 | `ui.mermaid_orientation` | `lr` | O grafiğin yönü: `lr` (soldan sağa) veya `tb` (yukarıdan aşağıya). |
 | `ui.mermaid_fence` | `false` | Kopyalanan Mermaid betiğini bir `mermaid` kod çiti içine alır. |
 | `ui.mermaid_subject_width` | `40` | Commit başlıkları Mermaid kimliklerinde bu kadar karaktere kısaltılır (`subjects`, `full`). |
+| `ui.text_cursor` | `"terminal"` | Odaktaki bir metin alanının imlecinin nerede gösterileceği: `terminal` terminalin kendi imlecini oraya koyar (yanıp sönen bir çubuk; böylece terminalin imleç ayarları ve bir giriş yönteminin aday penceresi onu izler; hiçbir alan klavyeyi almadığında gizlenir ve çıkışta kendi imleç biçiminize geri yüklenir), `drawn` GitPoulpi'nin kendi imleç simgesini çizer ve terminal imlecini gizli tutar. Canlı. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` ya da `16`: kaç renkle çizileceği. `auto`, Apple Terminal (256), Linux konsolu (16) ve `COLORTERM` olmayan `*-256color` terminaller (256) dışında truecolor'dur. Canlı. Bkz. [Temalar](themes.md). |
 | `ui.input_color` | `"theme"` | Metin alanı arka planı: `theme` (temanın kendisi), `gray`, `blue`, `slate`, `dark`, `custom`. |
 | `ui.input_color_custom` | `"#2a2a2a"` | `custom` rengi, `#rrggbb`. |
@@ -184,7 +185,7 @@ ne olursa olsun İngilizce tutar.
 | `ui.launcher_build` | `"current"` | Yalnızca geliştirici modunda (bkz. `general.dev_mode`; yalnızca o zaman Ayarlar > Başlatıcı'da görünür, aksi halde yok sayılır). `"current"`: kısayollar ve komut takma adı onları oluşturan derlemeyi başlatır. `"newest"`: checkout'un `target/dist` ve `target/release` derlemelerinden en son derleneni başlatırlar, her tıklamada karar verilir ve iki derlemeden birini başlatmak onları asla yeniden yazmaz. |
 | `ui.command_alias` | `""` | GitPoulpi'yi bir terminalden başlatan komutun adı, örneğin `gp` (Ayarlar > Başlatıcı, `gitpoulpi alias create`). Boş: yok. Yalnızca harf, rakam, `-`, `_` ve `.`. Bu yalnızca **Oluştur: komut takma adı** düğmesinin kullandığı addır; siz oluşturana kadar hiçbir şey var olmaz. |
 | `ui.command_alias_add` | `""` | `gitpoulpi --add` çalıştıran ikinci komutun adı, örneğin `gpa`: geçerli klasörü zaten çalışan GitPoulpi'de yeni sekme olarak açar (Ayarlar > Başlatıcı, `gitpoulpi alias create gpa --add`). Boş: yok. Ad kuralları aynıdır; **Oluştur** düğmesi onu `ui.command_alias` ile birlikte oluşturur. |
-| `ui.relaunch_in_terminal` | `true` | Yalnızca Windows: exe çift tıklamayla kendi konsolunda başlatıldığında GitPoulpi kendini `ui.launch_terminal` içinde yeniden açar ve çıkar. Kapalı: o konsolda kalır. |
+| `ui.relaunch_in_terminal` | `true` | Yalnızca Windows: exe çift tıklamayla kendi konsolunda başlatıldığında GitPoulpi kendini `ui.launch_terminal` içinde yeniden açar ve çıkar. Exe'yi doğrudan çalıştıran bir terminal (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`) de kendi konsoludur ama klasik bir konsol penceresi değildir: asla yeniden başlatılmaz. Kapalı: o konsolda kalır. |
 | `ui.reuse_window` | `true` | Bir GitPoulpi kısayoluna tıklamak (`gitpoulpi launch`), yenisini başlatmak yerine zaten açık olan GitPoulpi'nin penceresini gösterir. Kapalı: her tıklama yeni bir pencere başlatır. |
 
 **`ui.open_in` komutları** önce argümanlara bölünür (boşluk, `'...'`, `"..."`), ardından
@@ -333,7 +334,8 @@ review_requests = true    # incelememi bekleyen request'ler, her depo
 open_requests = false     # ad alanlarımın her açık request'i
 include_drafts = false    # bu listelerde taslak request'leri tut
 assigned_issues = true    # bana atanan açık issue'lar, her depo
-namespaces = ["acme"]     # açık request'ler için aranacak org / gruplar
+namespaces = ["acme", "ptm/produits"]  # Ayarlar'da satır başına bir giriş; boş = sınır yok
+namespaces_regex = false  # true: her giriş, tam depo yolu üzerinde bir düzenli ifadedir
 review_mode = "ask"       # ask | clone | api
 ```
 
@@ -343,7 +345,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Kendi ad alanınızın ve üye olduğunuz her org veya grubun (ya da `namespaces` değerinin) her açık request'i; asla "token'ın gördüğü her şey" değil |
 | `include_drafts` | `false` | Bu açılmadıkça taslak request'ler bu listelerin dışında bırakılır |
 | `assigned_issues` | `false` | Size atanan açık issue'lar, her depo |
-| `namespaces` | `[]` | `open_requests` için aranacak org / gruplar; boş, kendi ad alanınız artı her üyeliğiniz demektir (GitHub: en fazla 12 aranır, GitLab: 10 grup ve 10 sahip olunan proje, Gitea, Forgejo ve Gerrit: 10; Azure DevOps proje adlarını, Bitbucket Data Center proje anahtarlarını, Gerrit proje yolu öneklerini alır) |
+| `namespaces` | `[]` | Her listenin hangi depoları tuttuğu (incelenecek request'ler, atanan issue'lar, açık request'ler); boş, sınır yok demektir ve `open_requests` o zaman kendi ad alanınızı artı her üyeliğinizi arar (GitHub: en fazla 12 aranır, GitLab: 10 grup ve 10 sahip olunan proje, Gitea, Forgejo ve Gerrit: 10). Bir giriş, deponun tam yoluyla (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`) eşitse veya `/` ile biten bir yol öneğiyse eşleşir: `ptm`, `ptm/produits/x`'i tutar, `ptmx/y`'yi değil; büyük/küçük harf yok sayılır. Ayarlar satır başına bir giriş gösterir; eski bir dosya virgülle ayrılmış tek bir dize (`"ptm, formation"`) tutabilir, o yine yüklenir ve liste olarak geri kaydedilir |
+| `namespaces_regex` | `false` | Her `namespaces` girdisini, tam depo yoluna yazdığınız haliyle uygulanan bir düzenli ifade olarak okur (yani `^ptm/(produits\|infra)/` başa sabitlenir; `^` veya `$` olmadan yolun herhangi bir yerinde eşleşir; büyük/küçük harfi yok saymak için `(?i)` ekleyin). `open_requests` o zaman üyeliklerinizi arar ve ifadeler satırları süzer. Geçersiz bir ifade Ayarlar'da alanın altında gösterilir ve kaydedilmez; elle düzenlenen bir dosyada listeleri bir notla boş bırakır |
 | `review_mode` | `"ask"` | Deposu klonlanmamış bir request'i incelemenin ne yapacağı: `ask`, `clone` (klonla, sonra incele) veya `api` (barındırıcının API'si üzerinden incele) |
 
 Yanıtlar profil başına, `config.toml`'un yanındaki `radar-account.json` içinde beş dakika önbelleğe alınır;

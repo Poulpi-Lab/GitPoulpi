@@ -295,6 +295,8 @@ fn the_newest_of_a_burst_wins_and_the_rest_are_superseded_or_spaced() {
     // A second one right away is spaced by the dwell, not refused.
     rig.wait_for("Help", |t| t.contains("shown by claude-code"));
     rig.term.send_keys("Esc").unwrap();
+    // The quiet time counts from the Esc being handled, not sent (load).
+    rig.wait_for("Help closed", |t| !t.contains("type to filter, "));
     rig.quiet();
     let out = rig.show(UiIntent::ShowPalette {
         query: String::new(),

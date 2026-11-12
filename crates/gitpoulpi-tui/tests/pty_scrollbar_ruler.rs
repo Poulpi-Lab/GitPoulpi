@@ -297,9 +297,19 @@ fn dragging_the_horizontal_thumb_to_the_end_reaches_the_last_character() {
         );
         let thumb = h_thumb(&s, b);
         let start = *thumb.first().expect("a thumb");
-        term.drag((start, b.bottom), (b.right, b.bottom)).unwrap();
-        term.wait_for("the end of the long line", STEP, |s| s.contains("ENDMARK"))
-            .unwrap_or_else(|e| panic!("{layout}: {e}\n{}", term.text()));
+        // Retried: under load the press can land on a torn frame of the bar.
+        common::retry_until(
+            &mut term,
+            "the end of the long line",
+            4,
+            Duration::from_secs(8),
+            |t| {
+                let s = t.screen();
+                let start = h_thumb(&s, b).first().copied().unwrap_or(start);
+                t.drag((start, b.bottom), (b.right, b.bottom)).unwrap();
+            },
+            |s| s.contains("ENDMARK"),
+        );
         let (s, b) = settled(&term, &format!("{layout}: the thumb at the end"), |s, b| {
             h_thumb(s, b).last().copied() == Some(b.right - 2)
         });

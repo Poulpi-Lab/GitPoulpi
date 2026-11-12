@@ -67,6 +67,8 @@ je ze nodig hebt.
     "Afsluiten & cd hier" en de `gitpoulpi shell-init`-wrapper (`gp`)
     voor bash, zsh, fish en PowerShell.
     Welke terminal GitPoulpi het best toont: **[Een terminal kiezen](terminals.md)**.
+    Wat er door tmux, zellij, screen, herdr en terminalpanes heen komt:
+    **[Multiplexers](multiplexers.md)**.
 
 Ook: **[Branchingworkflows](branching-workflows.md)**, de voorinstellingen Git
 Flow, GitHub Flow, GitLab Flow en Trunk-based of je eigen basisbranches,

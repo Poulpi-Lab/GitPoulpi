@@ -142,7 +142,7 @@ on a Mac with a GPU before relying on a macOS cell.
 |---|---|---|---|
 | **kitty** | **works**: kitty protocol (GitPoulpi) | n/a | not measured (needs a GPU) |
 | **Ghostty** | **works**: kitty protocol (GitPoulpi) | n/a | not measured (needs a GPU) |
-| **WezTerm** | **works**: iTerm2 protocol with transparency (GitPoulpi). Placeholders draw squashed, so the kitty protocol is not used | **works**: iTerm2 protocol with transparency, graph and avatars on their rows (official 20240203 and the upstream PR #8092 build). Official 20240203 put the pictures on the wrong rows before GitPoulpi showed the cursor around them, see "The ConPTY limit". In the VM run of the official build the graph picture also sat one cell to the right (the first letter of each Log message hidden); the maintainer's own WezTerm does not show it, cause unknown (version, font or scaling) | not measured (needs a GPU) |
+| **WezTerm** | **works**: iTerm2 protocol with transparency (GitPoulpi). Placeholders draw squashed, so the kitty protocol is not used | **works**: iTerm2 protocol with transparency, graph and avatars on their rows (official 20240203 and the upstream PR #8092 build). Official 20240203 put the pictures on the wrong rows before GitPoulpi showed the cursor around them, see "The ConPTY limit". | not measured (needs a GPU) |
 | **foot** | **works**: sixel with transparency (GitPoulpi) | n/a | n/a |
 | **Rio** | **works**: iTerm2 protocol with transparency (GitPoulpi) | **works**: iTerm2 protocol with transparency, cell-exact at every font size tried (0.5.28; GitPoulpi). Sixel and kitty never arrive (ConPTY drops them), so there is nothing to choose | not measured (needs a GPU) |
 | **Alacritty** | text: **works** (no image support in the terminal) | text: **partial** (no pictures; image diff as blocks) | text: **works** |
@@ -276,9 +276,7 @@ kitty 0.49.2 (macOS 0.50.0 did not start), Ghostty 1.4.0, WezTerm 20260716 on Li
   `config.font = wezterm.font_with_fallback { 'JetBrainsMono Nerd Font', 'Segoe UI Emoji' }`.
   Pictures use the iTerm2 protocol and nothing needs to be set: the last tagged release,
   20240203-110809 (Feb 2024), anchors them on the right rows (rechecked November 2026 with
-  the current GitPoulpi; before the ConPTY fix described below it did not; on a VM the
-  graph picture also sat one cell right of its column, which is not seen on the maintainer's
-  machine). Upstream WezTerm PR #8092 adds pointer shapes.
+  the current GitPoulpi; before the ConPTY fix described below it did not). Upstream WezTerm PR #8092 adds pointer shapes.
 - **Rio** (MSI, needs UAC). Pictures (graph, avatars, image diff) use the iTerm2 protocol
   with transparency and land exactly on their cells: measured on 0.5.28 at its default font
   and at 18 and 22.5 px (cells 8x16, 11x21 and 13x26 pixels, always whole pixels), a 20x10-cell and

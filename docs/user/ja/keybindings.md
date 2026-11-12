@@ -235,6 +235,8 @@ stage_file = "z"
 | `commit_column` | `wider_part` | 欄を広げる | `]` |
 | `commit_column` | `narrower_part` | 欄を狭める | `[` |
 | `commit_column` | `reset_widths` | 各欄の幅をリセット | `0` |
+| `commit_column` | `fit` | 列を内容に合わせる | `=` |
+| `commit_column` | `fit_all` | 全列を内容に合わせる | `+` |
 | `file_insight` | `blame_card` | Blame: 詳細カードを表示 / 非表示 | `i` |
 | `file_insight` | `blame_next` | Blame: 次のハンク | `n` |
 | `file_insight` | `blame_prev` | Blame: 前のハンク | `p` |
@@ -792,6 +794,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Radar: 列を広げる | `]` |
 | Radar: 列を狭める | `[` |
 | Radar: 列の幅をリセット | `0` |
+| Radar: 列を内容に合わせる | `=` |
+| Radar: 全列を内容に合わせる | `+` |
 | Radar: ホームに戻る | `Esc` |
 | Radar: タブを閉じる |  |
 | タブ: 新しいタブ | `Alt+T` |
@@ -1020,6 +1024,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | 表示: Commit列: 欄を広げる | `]` |
 | 表示: Commit列: 欄を狭める | `[` |
 | 表示: Commit列: 各欄の幅をリセット | `0` |
+| 表示: Commit列: 列を内容に合わせる | `=` |
+| 表示: Commit列: 全列を内容に合わせる | `+` |
 | 表示: Commit列: 選択行のメニュー | `.` |
 | 表示: Commit列: 列を選択 |  |
 | 表示: Commit列: Ref を切り替え |  |

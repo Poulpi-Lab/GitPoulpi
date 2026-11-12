@@ -171,6 +171,11 @@ pub(crate) fn render(
         }
         let widths = picture::plan_custom(width, needed, state.widths, state.shown, state.order);
         state.plan = widths;
+        state.natural = natural_widths(
+            nodes.iter().skip(state.offset).take(viewport),
+            paint,
+            needed,
+        );
         content_w = widths.content;
         state.content_w = widths.content;
         state.inner_w = width;
@@ -367,6 +372,53 @@ pub(crate) fn render(
         hits.push((rect, HitTarget::CommitColumn(ColumnHit::Divider)));
     }
     hits
+}
+
+/// What each part needs for the rows in `rows` (by `Part::slot`): the widest
+/// content, never under the part's own header word. The same functions the
+/// row is drawn with, given room for everything.
+fn natural_widths<'a>(
+    rows: impl Iterator<Item = &'a CommitNode>,
+    paint: &ColumnPaint<'_>,
+    lanes: usize,
+) -> [usize; super::PARTS] {
+    let mut out = [0usize; super::PARTS];
+    for part in Part::ORDER {
+        out[part.slot()] = display_width(part.title());
+    }
+    let mut grow = |part: Part, cells: usize| {
+        let at = part.slot();
+        out[at] = out[at].max(cells);
+    };
+    let dim = Style::default();
+    for node in rows {
+        grow(Part::Title, display_width(&node.summary));
+        grow(
+            Part::Author,
+            display_width(&short_author(&node.author_name, usize::MAX / 2)),
+        );
+        grow(
+            Part::Date,
+            display_width(&short_date(node.timestamp, usize::MAX / 2)),
+        );
+        grow(Part::Sha, 7);
+        if let Some(pills) = paint.layout.pills_by_oid.get(&node.id) {
+            let spans =
+                crate::log_pills::ref_pill_spans(pills, usize::MAX / 2, th().ui.accent, None);
+            grow(
+                Part::Refs,
+                spans.iter().map(|s| display_width(&s.content)).sum(),
+            );
+        }
+        let cell =
+            crate::log_table::changes_spans(paint.changes.get(&node.id), usize::MAX / 2, dim);
+        grow(
+            Part::Changes,
+            cell.iter().map(|s| display_width(&s.content)).sum(),
+        );
+    }
+    grow(Part::Graph, lanes);
+    out
 }
 
 /// The header: each part's name over its cells, the separator cell blank (the

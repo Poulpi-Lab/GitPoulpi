@@ -77,7 +77,8 @@ pub(super) fn handle(
     // parts shown (the Log header's way; the palette's `Choose the Columns`
     // and its per-part toggles are the keyboard twins).
     if cx.commit_col.header_contains(col, row) {
-        commands::commit_column::open_columns_menu(cx, Some((col, row)));
+        let part = cx.commit_col.part_at(col);
+        commands::commit_column::open_columns_menu(cx, Some((col, row)), part);
         return Ok(Flow::Handled);
     }
     // A right-click on a row of the commit column (its Graph) opens the

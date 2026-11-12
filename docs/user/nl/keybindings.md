@@ -252,6 +252,8 @@ prefix getoond (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Deel verbreden | `]` |
 | `commit_column` | `narrower_part` | Deel versmallen | `[` |
 | `commit_column` | `reset_widths` | Breedtes van de delen herstellen | `0` |
+| `commit_column` | `fit` | Kolom aan inhoud aanpassen | `=` |
+| `commit_column` | `fit_all` | Alle kolommen aan inhoud aanpassen | `+` |
 | `file_insight` | `blame_card` | Blame: Detailkaart tonen of verbergen | `i` |
 | `file_insight` | `blame_next` | Blame: Volgende hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: Vorige hunk | `p` |
@@ -830,6 +832,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Radar: Kolom verbreden | `]` |
 | Radar: Kolom versmallen | `[` |
 | Radar: Kolombreedtes herstellen | `0` |
+| Radar: Kolom aan inhoud aanpassen | `=` |
+| Radar: Alle kolommen aan inhoud aanpassen | `+` |
 | Radar: Terug naar Start | `Esc` |
 | Radar: Tabblad sluiten |  |
 | Tabblad: Nieuw tabblad | `Alt+T` |
@@ -1058,6 +1062,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Weergave: commit-kolom: deel verbreden | `]` |
 | Weergave: commit-kolom: deel versmallen | `[` |
 | Weergave: commit-kolom: breedtes van de delen herstellen | `0` |
+| Weergave: commit-kolom: Kolom aan inhoud aanpassen | `=` |
+| Weergave: commit-kolom: Alle kolommen aan inhoud aanpassen | `+` |
 | Weergave: commit-kolom: menu van de geselecteerde rij | `.` |
 | Weergave: commit-kolom: kolommen kiezen |  |
 | Weergave: commit-kolom: Ref omschakelen |  |

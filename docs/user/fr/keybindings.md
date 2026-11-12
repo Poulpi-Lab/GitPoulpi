@@ -252,6 +252,8 @@ préfixe (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Élargir la partie | `]` |
 | `commit_column` | `narrower_part` | Rétrécir la partie | `[` |
 | `commit_column` | `reset_widths` | Réinitialiser les largeurs des parties | `0` |
+| `commit_column` | `fit` | Ajuster la colonne à son contenu | `=` |
+| `commit_column` | `fit_all` | Ajuster toutes les colonnes à leur contenu | `+` |
 | `file_insight` | `blame_card` | Blame : Afficher ou masquer la fiche de détail | `i` |
 | `file_insight` | `blame_next` | Blame : Hunk suivant | `n` |
 | `file_insight` | `blame_prev` | Blame : Hunk précédent | `p` |
@@ -828,6 +830,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Radar : Élargir la colonne | `]` |
 | Radar : Réduire la colonne | `[` |
 | Radar : Réinitialiser les colonnes | `0` |
+| Radar : Ajuster la colonne à son contenu | `=` |
+| Radar : Ajuster toutes les colonnes à leur contenu | `+` |
 | Radar : Retour à l'accueil | `Esc` |
 | Radar : Fermer l'onglet |  |
 | Onglet : Nouvel onglet | `Alt+T` |
@@ -1056,6 +1060,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Affichage : Colonne des commits : Élargir la partie | `]` |
 | Affichage : Colonne des commits : Rétrécir la partie | `[` |
 | Affichage : Colonne des commits : Réinitialiser les largeurs des parties | `0` |
+| Affichage : Colonne des commits : Ajuster la colonne à son contenu | `=` |
+| Affichage : Colonne des commits : Ajuster toutes les colonnes à leur contenu | `+` |
 | Affichage : Colonne des commits : Menu de la ligne choisie | `.` |
 | Affichage : Colonne des commits : Choisir les colonnes |  |
 | Affichage : Colonne des commits : Afficher ou masquer Refs |  |

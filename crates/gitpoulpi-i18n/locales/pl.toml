@@ -2227,6 +2227,8 @@ commit_column_move_right = "Przesuń część w prawo"
 commit_column_wider_part = "Poszerz część"
 commit_column_narrower_part = "Zwęź część"
 commit_column_reset_widths = "Zresetuj szerokości części"
+commit_column_fit = "Dopasuj kolumnę do zawartości"
+commit_column_fit_all = "Dopasuj wszystkie kolumny do zawartości"
 log_pick_column = "Wybierz kolumnę do przesunięcia lub zmiany szerokości"
 log_columns_next = "Wybierz następną kolumnę"
 log_columns_prev = "Wybierz poprzednią kolumnę"
@@ -2887,6 +2889,8 @@ view_column_move_right = { git = "Widok: Kolumna commitów: Przesuń część w 
 view_column_wider_part = { git = "Widok: Kolumna commitów: Poszerz część", local = "Widok: Kolumna zatwierdzeń: Poszerz część" }
 view_column_narrower_part = { git = "Widok: Kolumna commitów: Zwęź część", local = "Widok: Kolumna zatwierdzeń: Zwęź część" }
 view_column_reset_widths = { git = "Widok: Kolumna commitów: Zresetuj szerokości części", local = "Widok: Kolumna zatwierdzeń: Zresetuj szerokości części" }
+view_column_fit_part = { git = "Widok: Kolumna commitów: Dopasuj kolumnę do zawartości", local = "Widok: Kolumna zatwierdzeń: Dopasuj kolumnę do zawartości" }
+view_column_fit_all = { git = "Widok: Kolumna commitów: Dopasuj wszystkie kolumny do zawartości", local = "Widok: Kolumna zatwierdzeń: Dopasuj wszystkie kolumny do zawartości" }
 view_log_column_pick = "Widok: Kolumna Logu: Wybierz kolumnę do przesunięcia lub zmiany szerokości"
 view_log_column_next = "Widok: Kolumna Logu: Wybierz następną kolumnę"
 view_log_column_prev = "Widok: Kolumna Logu: Wybierz poprzednią kolumnę"
@@ -3466,6 +3470,8 @@ radar_column_pick = "Radar: Wybierz kolumnę"
 radar_column_wider = "Radar: Poszerz kolumnę"
 radar_column_narrower = "Radar: Zwęź kolumnę"
 radar_column_reset = "Radar: Resetuj szerokości kolumn"
+radar_column_fit = "Radar: Dopasuj kolumnę do zawartości"
+radar_column_fit_all = "Radar: Dopasuj wszystkie kolumny do zawartości"
 why_radar_closed = "najpierw otwórz Radar"
 why_radar_no_row = "najpierw zaznacz element w Radarze"
 hosting_edit_assignees = "Hosting: Edytuj przypisanych..."

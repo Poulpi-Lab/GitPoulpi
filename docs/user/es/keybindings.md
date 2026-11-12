@@ -253,6 +253,8 @@ se muestran con el prefijo (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Ensanchar la parte | `]` |
 | `commit_column` | `narrower_part` | Estrechar la parte | `[` |
 | `commit_column` | `reset_widths` | Restablecer los anchos de las partes | `0` |
+| `commit_column` | `fit` | Ajustar la columna a su contenido | `=` |
+| `commit_column` | `fit_all` | Ajustar todas las columnas a su contenido | `+` |
 | `file_insight` | `blame_card` | Blame: Mostrar u ocultar la tarjeta de detalle | `i` |
 | `file_insight` | `blame_next` | Blame: Hunk siguiente | `n` |
 | `file_insight` | `blame_prev` | Blame: Hunk anterior | `p` |
@@ -831,6 +833,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Radar: Ensanchar columna | `]` |
 | Radar: Estrechar columna | `[` |
 | Radar: Restablecer anchos de columna | `0` |
+| Radar: Ajustar la columna a su contenido | `=` |
+| Radar: Ajustar todas las columnas a su contenido | `+` |
 | Radar: Volver al inicio | `Esc` |
 | Radar: Cerrar pestaña |  |
 | Pestaña: Nueva pestaña | `Alt+T` |
@@ -1059,6 +1063,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Ver: Columna de commits: ensanchar la parte | `]` |
 | Ver: Columna de commits: estrechar la parte | `[` |
 | Ver: Columna de commits: restablecer los anchos de las partes | `0` |
+| Ver: Columna de commits: Ajustar la columna a su contenido | `=` |
+| Ver: Columna de commits: Ajustar todas las columnas a su contenido | `+` |
 | Ver: Columna de commits: menú de la fila seleccionada | `.` |
 | Ver: Columna de commits: elegir las columnas |  |
 | Ver: Columna de commits: alternar Refs |  |

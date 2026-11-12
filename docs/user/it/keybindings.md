@@ -252,6 +252,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `commit_column` | `wider_part` | Allarga la parte | `]` |
 | `commit_column` | `narrower_part` | Restringi la parte | `[` |
 | `commit_column` | `reset_widths` | Reimposta le larghezze delle parti | `0` |
+| `commit_column` | `fit` | Adatta la colonna al contenuto | `=` |
+| `commit_column` | `fit_all` | Adatta tutte le colonne al contenuto | `+` |
 | `file_insight` | `blame_card` | Blame: Mostra o nascondi la scheda | `i` |
 | `file_insight` | `blame_next` | Blame: Hunk successivo | `n` |
 | `file_insight` | `blame_prev` | Blame: Hunk precedente | `p` |
@@ -830,6 +832,8 @@ applicano. I tasti sono quelli predefiniti.
 | Radar: Allarga colonna | `]` |
 | Radar: Restringi colonna | `[` |
 | Radar: Reimposta larghezze colonne | `0` |
+| Radar: Adatta la colonna al contenuto | `=` |
+| Radar: Adatta tutte le colonne al contenuto | `+` |
 | Radar: Torna alla home | `Esc` |
 | Radar: Chiudi scheda |  |
 | Scheda: Nuova scheda | `Alt+T` |
@@ -1058,6 +1062,8 @@ applicano. I tasti sono quelli predefiniti.
 | Vista: Colonna dei commit: allarga la parte | `]` |
 | Vista: Colonna dei commit: restringi la parte | `[` |
 | Vista: Colonna dei commit: reimposta le larghezze delle parti | `0` |
+| Vista: Colonna dei commit: Adatta la colonna al contenuto | `=` |
+| Vista: Colonna dei commit: Adatta tutte le colonne al contenuto | `+` |
 | Vista: Colonna dei commit: menu della riga selezionata | `.` |
 | Vista: Colonna dei commit: scegli le colonne |  |
 | Vista: Colonna dei commit: mostra o nascondi Ref |  |

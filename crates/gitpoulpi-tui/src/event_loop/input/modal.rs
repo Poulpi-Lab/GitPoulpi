@@ -1394,9 +1394,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
             }
         } else if let Some(menu) = cx.open_menu.commit_columns_menu_mut() {
             match menu.on_key(key.code) {
-                MenuOutcome::Run(part) => {
+                MenuOutcome::Run(act) => {
                     cx.open_menu.close_commit_columns_menu();
-                    commands::commit_column::run_columns_menu(cx, part);
+                    commands::commit_column::run_columns_menu(cx, act);
                 }
                 MenuOutcome::Close => cx.open_menu.close_commit_columns_menu(),
                 MenuOutcome::Stay | MenuOutcome::NotHandled => {}

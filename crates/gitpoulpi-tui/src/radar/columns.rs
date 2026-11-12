@@ -111,6 +111,26 @@ pub(crate) fn wrap(text: &str, width: usize) -> Vec<String> {
     lines
 }
 
+impl SizedColumn {
+    pub(super) fn of(cell: Cell) -> Self {
+        match cell {
+            Cell::Num => SizedColumn::Num,
+            Cell::Author => SizedColumn::Author,
+            Cell::Age => SizedColumn::Age,
+            _ => SizedColumn::Repo,
+        }
+    }
+
+    pub(super) fn cell(self) -> Cell {
+        match self {
+            SizedColumn::Repo => Cell::Repo,
+            SizedColumn::Num => Cell::Num,
+            SizedColumn::Author => Cell::Author,
+            SizedColumn::Age => Cell::Age,
+        }
+    }
+}
+
 impl RadarUi {
     fn slot(cell: Cell) -> Option<usize> {
         match cell {
@@ -199,7 +219,80 @@ impl RadarUi {
                 self.save_state();
                 self.say(msg::radar::COLUMN_RESET.get().to_string())
             }
+            ColumnCmd::Fit => self.fit_column(picked.unwrap_or(Cell::Repo)),
+            ColumnCmd::FitAll => self.fit_all_columns(),
         }
+    }
+
+    /// Fits `cell` to its content: the width that shows its widest entry
+    /// whole, within what the column can be (`limit_of`). The twin of
+    /// double-clicking its separator.
+    pub(super) fn fit_column(&mut self, cell: Cell) -> Outcome {
+        let Some(slot) = Self::slot(cell) else {
+            return Outcome::None;
+        };
+        self.col_pick = self.col_pick.map(|_| cell);
+        let shown = self.fit_one(cell, slot);
+        self.save_state();
+        self.say(msg::radar::column_width(
+            Self::column_name(cell),
+            shown as u64,
+        ))
+    }
+
+    /// One column's fit: unsized again when its automatic width already shows
+    /// every entry, else the width of the widest one (within the limit).
+    fn fit_one(&mut self, cell: Cell, slot: usize) -> usize {
+        let content = self.col_content[slot];
+        let shown = if self.col_auto[slot] >= content {
+            self.set_width(cell, None);
+            self.col_auto[slot]
+        } else {
+            let w = content.clamp(MIN_WIDTH, self.limit_of(cell));
+            self.set_width(cell, Some(w));
+            w
+        };
+        self.col_eff[slot] = shown;
+        shown
+    }
+
+    /// Fits every sizable column to its content.
+    pub(super) fn fit_all_columns(&mut self) -> Outcome {
+        for cell in [Cell::Repo, Cell::Num, Cell::Author, Cell::Age] {
+            let Some(slot) = Self::slot(cell) else {
+                continue;
+            };
+            // A column no row has (no `#`, no author) stays out.
+            if self.col_content[slot] == 0 {
+                continue;
+            }
+            self.fit_one(cell, slot);
+        }
+        self.save_state();
+        self.say(msg::log_table::COLUMNS_FITTED_ALL.get().to_string())
+    }
+
+    /// The header menu: fits the column whose title was right-clicked (or the
+    /// picked one, from the keyboard), or all of them.
+    pub(crate) fn open_header_menu(&mut self, cell: Option<Cell>, col: u16, row: u16) {
+        let mut entries: Vec<Entry<Act>> = Vec::new();
+        if let Some(cell) = cell.filter(|c| Self::slot(*c).is_some()) {
+            entries.push(Entry::action(
+                msg::log_draw::column_menu_fit(Self::column_name(cell)),
+                Act::FitColumn(SizedColumn::of(cell)),
+            ));
+        }
+        entries.push(Entry::action(
+            msg::log_draw::COLUMN_MENU_FIT_ALL.get(),
+            Act::FitAllColumns,
+        ));
+        self.close_popups();
+        self.menu = Some(Menu::new(
+            msg::commit_column::COLUMNS_MENU_TITLE.get().to_string(),
+            entries,
+            col,
+            row,
+        ));
     }
 
     /// A key while a column is picked: `[` `]` `0` `Tab`, `Esc`/`Enter` leave.
@@ -211,10 +304,24 @@ impl RadarUi {
         {
             return None;
         }
+        // The header menu's keyboard twin: the picked column's own fit row
+        // and the fit of all of them.
+        if crate::context_menu::is_menu_key(key.code, key.modifiers) {
+            let picked = self.col_pick;
+            let at = self
+                .hits
+                .iter()
+                .find_map(|(r, h)| (picked.is_some() && *h == Hit::Header(picked?)).then_some(*r));
+            let (x, y) = at.map_or((0, 0), |r| (r.x, r.y + 1));
+            self.open_header_menu(picked, x, y);
+            return Some(Outcome::None);
+        }
         Some(match key.code {
             KeyCode::Char('[') => self.column_command(ColumnCmd::Narrower),
             KeyCode::Char(']') => self.column_command(ColumnCmd::Wider),
             KeyCode::Char('0') => self.column_command(ColumnCmd::Reset),
+            KeyCode::Char('=') => self.column_command(ColumnCmd::Fit),
+            KeyCode::Char('+') => self.column_command(ColumnCmd::FitAll),
             KeyCode::Tab | KeyCode::BackTab => self.column_command(ColumnCmd::Pick),
             KeyCode::Esc | KeyCode::Enter => {
                 self.col_pick = None;
@@ -224,16 +331,14 @@ impl RadarUi {
         })
     }
 
-    /// A press on a separator: a double-click fits the column again, else a
+    /// A press on a separator: a double-click fits the column to its content, else a
     /// drag begins.
     pub(super) fn divider_press(&mut self, cell: Cell, x: u16, double: bool) -> Outcome {
         // A mouse drag never leaves the column picked: only the keyboard's
         // column mode (`C`) keeps one lit until Esc.
         if double {
             self.col_drag = None;
-            self.set_width(cell, None);
-            self.save_state();
-            return Outcome::None;
+            return self.fit_column(cell);
         }
         self.col_drag = Some(Drag {
             cell,

@@ -250,6 +250,8 @@ prefiksem (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Poszerz część | `]` |
 | `commit_column` | `narrower_part` | Zwęź część | `[` |
 | `commit_column` | `reset_widths` | Zresetuj szerokości części | `0` |
+| `commit_column` | `fit` | Dopasuj kolumnę do zawartości | `=` |
+| `commit_column` | `fit_all` | Dopasuj wszystkie kolumny do zawartości | `+` |
 | `file_insight` | `blame_card` | Blame: Pokaż lub ukryj kartę szczegółów | `i` |
 | `file_insight` | `blame_next` | Blame: Następny hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: Poprzedni hunk | `p` |
@@ -825,6 +827,8 @@ zastosowania. Klawisze są domyślne.
 | Radar: Poszerz kolumnę | `]` |
 | Radar: Zwęź kolumnę | `[` |
 | Radar: Resetuj szerokości kolumn | `0` |
+| Radar: Dopasuj kolumnę do zawartości | `=` |
+| Radar: Dopasuj wszystkie kolumny do zawartości | `+` |
 | Radar: Wróć do strony głównej | `Esc` |
 | Radar: Zamknij kartę |  |
 | Karta: Nowa karta | `Alt+T` |
@@ -1053,6 +1057,8 @@ zastosowania. Klawisze są domyślne.
 | Widok: Kolumna commitów: Poszerz część | `]` |
 | Widok: Kolumna commitów: Zwęź część | `[` |
 | Widok: Kolumna commitów: Zresetuj szerokości części | `0` |
+| Widok: Kolumna commitów: Dopasuj kolumnę do zawartości | `=` |
+| Widok: Kolumna commitów: Dopasuj wszystkie kolumny do zawartości | `+` |
 | Widok: Kolumna commitów: Menu zaznaczonego wiersza | `.` |
 | Widok: Kolumna commitów: Wybierz kolumny |  |
 | Widok: Kolumna commitów: Przełącz Ref |  |

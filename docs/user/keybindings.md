@@ -249,6 +249,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Widen the Part | `]` |
 | `commit_column` | `narrower_part` | Narrow the Part | `[` |
 | `commit_column` | `reset_widths` | Reset the Part Widths | `0` |
+| `commit_column` | `fit` | Fit the Part to Its Content | `=` |
+| `commit_column` | `fit_all` | Fit All Parts to Content | `+` |
 | `file_insight` | `blame_card` | Blame: Show or Hide the Detail Card | `i` |
 | `file_insight` | `blame_next` | Blame: Next Hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: Previous Hunk | `p` |
@@ -826,6 +828,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Radar: Widen Column | `]` |
 | Radar: Narrow Column | `[` |
 | Radar: Reset Column Widths | `0` |
+| Radar: Fit Column to Its Content | `=` |
+| Radar: Fit All Columns to Content | `+` |
 | Radar: Back to Home | `Esc` |
 | Radar: Close Tab |  |
 | Tab: New Tab | `Alt+T` |
@@ -1054,6 +1058,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | View: Commit Column: Widen the Part | `]` |
 | View: Commit Column: Narrow the Part | `[` |
 | View: Commit Column: Reset the Part Widths | `0` |
+| View: Commit Column: Fit the Part to Its Content | `=` |
+| View: Commit Column: Fit All Parts to Content | `+` |
 | View: Commit Column: Menu of the Selected Row | `.` |
 | View: Commit Column: Choose the Columns |  |
 | View: Commit Column: Toggle Ref |  |

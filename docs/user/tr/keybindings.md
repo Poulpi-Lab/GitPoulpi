@@ -251,6 +251,8 @@ tutar). Bir önekten sonraki tuşlar önekle birlikte gösterilir (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Bölümü genişlet | `]` |
 | `commit_column` | `narrower_part` | Bölümü daralt | `[` |
 | `commit_column` | `reset_widths` | Bölüm genişliklerini sıfırla | `0` |
+| `commit_column` | `fit` | Sütunu İçeriğine Sığdır | `=` |
+| `commit_column` | `fit_all` | Tüm Sütunları İçeriğe Sığdır | `+` |
 | `file_insight` | `blame_card` | Blame: Ayrıntı kartını göster veya gizle | `i` |
 | `file_insight` | `blame_next` | Blame: Sonraki hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: Önceki hunk | `p` |
@@ -826,6 +828,8 @@ Tuşlar varsayılanlardır.
 | Radar: Sütunu Genişlet | `]` |
 | Radar: Sütunu Daralt | `[` |
 | Radar: Sütun Genişliklerini Sıfırla | `0` |
+| Radar: Sütunu İçeriğine Sığdır | `=` |
+| Radar: Tüm Sütunları İçeriğe Sığdır | `+` |
 | Radar: Ana Sayfaya Dön | `Esc` |
 | Radar: Sekmeyi Kapat |  |
 | Sekme: Yeni Sekme | `Alt+T` |
@@ -1054,6 +1058,8 @@ Tuşlar varsayılanlardır.
 | Görünüm: Commit sütunu: bölümü genişlet | `]` |
 | Görünüm: Commit sütunu: bölümü daralt | `[` |
 | Görünüm: Commit sütunu: bölüm genişliklerini sıfırla | `0` |
+| Görünüm: Commit sütunu: Sütunu İçeriğine Sığdır | `=` |
+| Görünüm: Commit sütunu: Tüm Sütunları İçeriğe Sığdır | `+` |
 | Görünüm: Commit sütunu: seçili satırın menüsü | `.` |
 | Görünüm: Commit sütunu: sütunları seç |  |
 | Görünüm: Commit sütunu: Ref sütununu aç/kapat |  |

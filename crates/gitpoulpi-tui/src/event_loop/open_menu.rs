@@ -31,7 +31,7 @@ pub(super) enum OpenMenu {
     DiffHunk(DiffHunkMenu),
     History(HistoryMenu),
     /// The commit column header's parts checklist (`commit_column::Part`).
-    CommitColumns(ContextMenu<crate::commit_column::Part>),
+    CommitColumns(ContextMenu<crate::commit_column::ColumnsAct>),
     Overflow(OverflowMenuState),
     /// The Log header's column show/hide checklist (drawn inline, not a
     /// `ContextMenu`).
@@ -95,7 +95,7 @@ variant_accessors! {
     Pane(PaneMenu): is_pane_menu, pane_menu, pane_menu_mut, take_pane_menu, close_pane_menu;
     DiffHunk(DiffHunkMenu): is_diff_hunk_menu, diff_hunk_menu, diff_hunk_menu_mut, take_diff_hunk_menu, close_diff_hunk_menu;
     History(HistoryMenu): is_history_menu, history_menu, history_menu_mut, take_history_menu, close_history_menu;
-    CommitColumns(ContextMenu<crate::commit_column::Part>): is_commit_columns_menu, commit_columns_menu, commit_columns_menu_mut, take_commit_columns_menu, close_commit_columns_menu;
+    CommitColumns(ContextMenu<crate::commit_column::ColumnsAct>): is_commit_columns_menu, commit_columns_menu, commit_columns_menu_mut, take_commit_columns_menu, close_commit_columns_menu;
     Overflow(OverflowMenuState): is_overflow, overflow, overflow_mut, take_overflow, close_overflow;
 }
 

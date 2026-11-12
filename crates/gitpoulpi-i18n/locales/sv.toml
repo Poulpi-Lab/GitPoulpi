@@ -2230,6 +2230,8 @@ commit_column_move_right = "Flytta delen åt höger"
 commit_column_wider_part = "Bredda delen"
 commit_column_narrower_part = "Smalna av delen"
 commit_column_reset_widths = "Återställ delarnas bredder"
+commit_column_fit = "Anpassa kolumnen efter innehållet"
+commit_column_fit_all = "Anpassa alla kolumner efter innehållet"
 log_pick_column = "Välj en kolumn att flytta eller ändra bredd på"
 log_columns_next = "Välj nästa kolumn"
 log_columns_prev = "Välj föregående kolumn"
@@ -2891,6 +2893,8 @@ view_column_move_right = { git = "Vy: Commit-kolumnen: flytta delen åt höger",
 view_column_wider_part = { git = "Vy: Commit-kolumnen: bredda delen", local = "Vy: Kolumnen med incheckningar: bredda delen" }
 view_column_narrower_part = { git = "Vy: Commit-kolumnen: smalna av delen", local = "Vy: Kolumnen med incheckningar: smalna av delen" }
 view_column_reset_widths = { git = "Vy: Commit-kolumnen: återställ delarnas bredder", local = "Vy: Kolumnen med incheckningar: återställ delarnas bredder" }
+view_column_fit_part = { git = "Vy: Commit-kolumnen: Anpassa kolumnen efter innehållet", local = "Vy: Kolumnen med incheckningar: Anpassa kolumnen efter innehållet" }
+view_column_fit_all = { git = "Vy: Commit-kolumnen: Anpassa alla kolumner efter innehållet", local = "Vy: Kolumnen med incheckningar: Anpassa alla kolumner efter innehållet" }
 view_log_column_pick = "Vy: Log-kolumn: välj en kolumn att flytta eller ändra bredd på"
 view_log_column_next = "Vy: Log-kolumn: välj nästa kolumn"
 view_log_column_prev = "Vy: Log-kolumn: välj föregående kolumn"
@@ -3470,6 +3474,8 @@ radar_column_pick = "Radar: Välj kolumn"
 radar_column_wider = "Radar: Bredda kolumnen"
 radar_column_narrower = "Radar: Smalna av kolumnen"
 radar_column_reset = "Radar: Återställ kolumnbredder"
+radar_column_fit = "Radar: Anpassa kolumnen efter innehållet"
+radar_column_fit_all = "Radar: Anpassa alla kolumner efter innehållet"
 why_radar_closed = "öppna Radar först"
 why_radar_no_row = "markera först ett objekt i Radar"
 hosting_edit_assignees = "Hosting: Redigera tilldelade..."

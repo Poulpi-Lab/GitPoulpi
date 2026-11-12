@@ -1154,6 +1154,12 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
         PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ResetWidths) => {
             Some(A::CommitColumnResetWidths)
         }
+        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Fit) => {
+            Some(A::CommitColumnFit)
+        }
+        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::FitAll) => {
+            Some(A::CommitColumnFitAll)
+        }
         PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Menu) => {
             Some(A::GlobalContextMenu)
         }

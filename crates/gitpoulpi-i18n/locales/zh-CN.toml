@@ -2228,6 +2228,8 @@ commit_column_move_right = "将该栏右移"
 commit_column_wider_part = "加宽该栏"
 commit_column_narrower_part = "收窄该栏"
 commit_column_reset_widths = "重置各栏宽度"
+commit_column_fit = "按内容调整该列宽度"
+commit_column_fit_all = "按内容调整所有列宽度"
 log_pick_column = "选择要移动或调整宽度的列"
 log_columns_next = "选择下一列"
 log_columns_prev = "选择上一列"
@@ -2888,6 +2890,8 @@ view_column_move_right = { git = "视图：{$Commit} 列：将该栏右移", loc
 view_column_wider_part = { git = "视图：{$Commit} 列：加宽该栏", local = "视图：{$Commit}列：加宽该栏" }
 view_column_narrower_part = { git = "视图：{$Commit} 列：收窄该栏", local = "视图：{$Commit}列：收窄该栏" }
 view_column_reset_widths = { git = "视图：{$Commit} 列：重置各栏宽度", local = "视图：{$Commit}列：重置各栏宽度" }
+view_column_fit_part = { git = "视图：{$Commit} 列：按内容调整该列宽度", local = "视图：{$Commit}列：按内容调整该列宽度" }
+view_column_fit_all = { git = "视图：{$Commit} 列：按内容调整所有列宽度", local = "视图：{$Commit}列：按内容调整所有列宽度" }
 view_log_column_pick = "视图：Log 列：选择要移动或调整宽度的列"
 view_log_column_next = "视图：Log 列：选择下一列"
 view_log_column_prev = "视图：Log 列：选择上一列"
@@ -3467,6 +3471,8 @@ radar_column_pick = "Radar：选择列"
 radar_column_wider = "Radar：加宽列"
 radar_column_narrower = "Radar：收窄列"
 radar_column_reset = "Radar：重置列宽"
+radar_column_fit = "Radar：按内容调整该列宽度"
+radar_column_fit_all = "Radar：按内容调整所有列宽度"
 why_radar_closed = "请先打开 Radar"
 why_radar_no_row = "请先在 Radar 中选择一项"
 hosting_edit_assignees = "托管：编辑指派人…"

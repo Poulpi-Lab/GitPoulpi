@@ -31,8 +31,13 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: ColumnCmd) -> bool {
         ColumnCmd::PartWider => resize_part(cx, i32::from(PART_STEP)),
         ColumnCmd::PartNarrower => resize_part(cx, -i32::from(PART_STEP)),
         ColumnCmd::ResetWidths => reset_widths(cx),
+        ColumnCmd::Fit => {
+            let part = cx.commit_col.part;
+            fit_one(cx, part);
+        }
+        ColumnCmd::FitAll => fit_every(cx),
         ColumnCmd::ToggleShown(part) => toggle_shown(cx, part),
-        ColumnCmd::ColumnsMenu => open_columns_menu(cx, None),
+        ColumnCmd::ColumnsMenu => open_columns_menu(cx, None, None),
         ColumnCmd::Menu => open_menu_on_selection(cx, &std::collections::HashSet::new()),
         ColumnCmd::Show(op) => {
             match selected_log_commit(&*cx.log_result, &*cx.log_state, &*cx.log_order) {
@@ -280,6 +285,10 @@ fn move_part(cx: &mut CommandCtx<'_>, side: Side) {
 
 fn say_part(cx: &mut CommandCtx<'_>) {
     let part = cx.commit_col.part;
+    say_part_of(cx, part);
+}
+
+fn say_part_of(cx: &mut CommandCtx<'_>, part: crate::commit_column::Part) {
     let cells = cx.commit_col.part_width(part);
     *cx.last_message = Some(msg::part_width(part.title(), u64::from(cells)));
 }
@@ -293,6 +302,34 @@ fn resize_part(cx: &mut CommandCtx<'_>, delta: i32) {
     cx.commit_col.resize_part(delta);
     save(cx);
     say_part(cx);
+}
+
+/// Fits one part to its content (a double click on its boundary, `=` on the
+/// part the keys size, the header menu's row, the palette) and remembers it.
+/// Says what came of it.
+pub(in crate::event_loop) fn fit_one(cx: &mut CommandCtx<'_>, part: crate::commit_column::Part) {
+    if cx.commit_col.area.width == 0 {
+        *cx.last_message = Some(why_not_shown(cx).into());
+        return;
+    }
+    cx.commit_col.fit_part(part);
+    save(cx);
+    say_part_of(cx, part);
+}
+
+/// Fits every shown part to its content.
+pub(in crate::event_loop) fn fit_every(cx: &mut CommandCtx<'_>) {
+    if cx.commit_col.area.width == 0 {
+        *cx.last_message = Some(why_not_shown(cx).into());
+        return;
+    }
+    cx.commit_col.fit_all();
+    save(cx);
+    *cx.last_message = Some(
+        gitpoulpi_i18n::msg::log_table::COLUMNS_FITTED_ALL
+            .get()
+            .into(),
+    );
 }
 
 fn reset_widths(cx: &mut CommandCtx<'_>) {
@@ -325,17 +362,21 @@ pub(in crate::event_loop) fn toggle_shown(
 pub(in crate::event_loop) fn open_columns_menu(
     cx: &mut CommandCtx<'_>,
     anchor: Option<(u16, u16)>,
+    target: Option<crate::commit_column::Part>,
 ) {
     if cx.commit_col.area.width == 0 {
         *cx.last_message = Some(why_not_shown(cx).into());
         return;
     }
     let (col, row) = anchor.unwrap_or((cx.commit_col.rows_area.x, cx.commit_col.rows_area.y));
+    // The "fit this part" row acts on the part right-clicked, else on the one
+    // the keys size.
+    let target = target.unwrap_or(cx.commit_col.part);
     *cx.focus = Focus::Log;
     *cx.open_menu = OpenMenu::CommitColumns(
         ContextMenu::new(
             msg::COLUMNS_MENU_TITLE.get(),
-            cx.commit_col.columns_menu_entries(),
+            cx.commit_col.columns_menu_entries(Some(target)),
             col,
             row,
         )
@@ -346,9 +387,14 @@ pub(in crate::event_loop) fn open_columns_menu(
 /// A part of the parts menu was chosen.
 pub(in crate::event_loop) fn run_columns_menu(
     cx: &mut CommandCtx<'_>,
-    part: crate::commit_column::Part,
+    act: crate::commit_column::ColumnsAct,
 ) {
-    toggle_shown(cx, part);
+    use crate::commit_column::ColumnsAct;
+    match act {
+        ColumnsAct::Toggle(part) => toggle_shown(cx, part),
+        ColumnsAct::Fit(part) => fit_one(cx, part),
+        ColumnsAct::FitAll => fit_every(cx),
+    }
 }
 
 /// The menu of the commit `commit`, anchored at `(col, row)`: what a
@@ -545,6 +591,8 @@ pub(in crate::event_loop) fn on_key(
         (Bind::CommitColumnWiderPart, ColumnCmd::PartWider),
         (Bind::CommitColumnNarrowerPart, ColumnCmd::PartNarrower),
         (Bind::CommitColumnResetWidths, ColumnCmd::ResetWidths),
+        (Bind::CommitColumnFit, ColumnCmd::Fit),
+        (Bind::CommitColumnFitAll, ColumnCmd::FitAll),
     ] {
         if km.is(bind, &key) {
             run(cx, cmd);

@@ -454,9 +454,14 @@ pub enum RemoteAction {
         #[arg(long)]
         push_url: Option<String>,
     },
+    /// Removes a remote with its remote-tracking branches and tag mirror; a
+    /// leftover name (`configured: false` in `remote list`: branches, no
+    /// remote) has its branches and tag mirror deleted instead.
     Remove {
         name: String,
     },
+    /// Lists the remotes; `configured: false` marks a leftover
+    /// remote-tracking namespace with no remote behind it.
     List,
     Rename {
         old_name: String,

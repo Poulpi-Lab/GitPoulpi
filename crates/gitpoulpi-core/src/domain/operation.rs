@@ -36,6 +36,9 @@ pub enum OperationKind {
     Refs,
     Stashes,
     Remotes,
+    /// The remote-tracking namespaces no remote is configured for (read; see
+    /// `GitBackend::leftover_remotes`).
+    LeftoverRemotes,
     Worktrees,
     /// The repository's submodules and where each stands (see
     /// `GitBackend::submodules`). A read.
@@ -633,6 +636,7 @@ impl OperationKind {
             | K::Refs
             | K::Stashes
             | K::Remotes
+            | K::LeftoverRemotes
             | K::Worktrees
             | K::Submodules
             | K::Resolve
@@ -840,7 +844,7 @@ impl OperationKind {
 
 impl OperationKind {
     /// Every variant, for tests and tools that must visit each one.
-    pub const ALL: [OperationKind; 178] = [
+    pub const ALL: [OperationKind; 179] = [
         OperationKind::Discover,
         OperationKind::Init,
         OperationKind::Status,
@@ -853,6 +857,7 @@ impl OperationKind {
         OperationKind::Refs,
         OperationKind::Stashes,
         OperationKind::Remotes,
+        OperationKind::LeftoverRemotes,
         OperationKind::Worktrees,
         OperationKind::Submodules,
         OperationKind::SubmoduleInit,

@@ -20,6 +20,7 @@ const GOLDEN: &[(OperationKind, &str, &str)] = &[
     (K::Refs, "R", "ALL"),
     (K::Stashes, "R", "ALL"),
     (K::Remotes, "R", "ALL"),
+    (K::LeftoverRemotes, "R", "ALL"),
     (K::Worktrees, "R", "ALL"),
     (K::Submodules, "R", "ALL"),
     (K::SubmoduleInit, "", "ALL"),

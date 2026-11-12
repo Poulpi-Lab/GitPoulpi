@@ -945,6 +945,60 @@ fn remotes_are_added_listed_and_removed() {
     assert!(remotes.is_empty());
 }
 
+/// A repository that was a fork and is not one any more keeps
+/// `refs/remotes/cm6/*`: `remote list` marks it `configured: false` next to
+/// the real remotes, and `remote remove` cleans it up instead of failing
+/// with "no such remote".
+#[test]
+fn a_leftover_remote_namespace_is_listed_unconfigured_and_removable() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("initial")
+        .unwrap()
+        .build();
+    let session = "cli-test-remote-leftover";
+    let head = repo.git(&["rev-parse", "HEAD"]);
+    repo.git(&["update-ref", "refs/remotes/cm6/main", &head]);
+    repo.git(&["update-ref", "refs/remotes/cm6/feat/x", &head]);
+    run_json(
+        repo.root(),
+        session,
+        &["remote", "add", "origin", "https://example.invalid/r.git"],
+    );
+
+    let listed = run_json(repo.root(), session, &["remote", "list"]);
+    let rows = listed.as_array().expect("an array");
+    let flags: Vec<(String, bool)> = rows
+        .iter()
+        .map(|r| {
+            (
+                r["name"].as_str().unwrap().to_string(),
+                r["configured"].as_bool().unwrap(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        flags,
+        vec![("origin".to_string(), true), ("cm6".to_string(), false)]
+    );
+    assert_eq!(rows[0]["fetch_url"], "https://example.invalid/r.git");
+    // Still readable as the plain list it always was.
+    let plain: Vec<Remote> = parse(listed);
+    assert_eq!(plain.len(), 2);
+
+    let removed = run_json(repo.root(), session, &["remote", "remove", "cm6"]);
+    assert_eq!(removed["removed"], "cm6");
+    assert_eq!(repo.git(&["for-each-ref", "refs/remotes/cm6"]), "");
+    let listed = run_json(repo.root(), session, &["remote", "list"]);
+    let names: Vec<&str> = listed
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|r| r["name"].as_str().unwrap())
+        .collect();
+    assert_eq!(names, vec!["origin"]);
+}
+
 /// The remote editing commands the TUI's Edit remote popup relies on,
 /// plus the per-repository default remote, end to end through the
 /// daemon.

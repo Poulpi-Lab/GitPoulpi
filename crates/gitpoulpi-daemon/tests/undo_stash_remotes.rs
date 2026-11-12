@@ -412,6 +412,51 @@ async fn removing_a_remote_is_undone_with_its_tracking_branches_and_upstreams() 
     }
 }
 
+/// The owner's case: refs of a remote that is not configured any more.
+/// Removing the leftover deletes the branches (and the `HEAD` alias, not the
+/// branch it names), undo brings every one back, the alias still an alias.
+#[tokio::test]
+async fn removing_a_leftover_remote_namespace_is_undone_and_redone() {
+    for (name, backend) in backends() {
+        let mut rig = Rig::on(backend, remote_repo()).await;
+        let head = rig.repo.git(&["rev-parse", "HEAD"]);
+        rig.repo
+            .git(&["update-ref", "refs/remotes/cm6/main", &head]);
+        rig.repo.git(&["update-ref", "refs/remotes/cm6/dev", &head]);
+        rig.repo.git(&[
+            "symbolic-ref",
+            "refs/remotes/cm6/HEAD",
+            "refs/remotes/cm6/main",
+        ]);
+        rig.repo
+            .git(&["update-ref", "refs/gitpoulpi/remote-tags/cm6/v1", &head]);
+        let before = remote_state(&rig);
+        assert!(before.1.contains("refs/remotes/cm6/dev"), "{name}");
+
+        rig.ok(OperationKind::RemoteRemove, json!({ "name": "cm6" }))
+            .await;
+        let removed = remote_state(&rig);
+        assert!(!removed.1.contains("cm6"), "{name}: {}", removed.1);
+        assert!(removed.1.contains("refs/remotes/origin/main"), "{name}");
+        assert_eq!(removed.2, before.2, "{name}: origin untouched");
+
+        let out = rig.undo().await;
+        assert_eq!(out.entry.kind, OperationKind::RemoteRemove, "{name}");
+        assert_eq!(out.entry.label, "Remove remote cm6", "{name}");
+        assert_eq!(remote_state(&rig).1, before.1, "{name}: refs back");
+        assert_eq!(
+            rig.repo.git(&["symbolic-ref", "refs/remotes/cm6/HEAD"]),
+            "refs/remotes/cm6/main",
+            "{name}: the alias is an alias again"
+        );
+
+        let out = rig.redo().await;
+        assert!(out.applied, "{name}");
+        assert_eq!(remote_state(&rig), removed, "{name}: redo");
+        rig.stop().await;
+    }
+}
+
 #[tokio::test]
 async fn a_remote_remove_undo_refuses_after_an_outside_change() {
     for (name, backend) in backends() {

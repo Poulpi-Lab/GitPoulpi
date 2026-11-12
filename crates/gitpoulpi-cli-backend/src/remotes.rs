@@ -125,7 +125,9 @@ fn sweep_leftover(repo: &RepoRef, name: &str, configured: &[String]) -> Result<b
     for line in listed.lines() {
         if let Some((refname, oid)) = line.split_once(' ') {
             if owned.iter().any(|r| r == refname) {
-                script.push_str(&format!("delete {refname} {oid}\n"));
+                // `refs/remotes/<r>/HEAD` is a symbolic ref: delete the alias,
+                // not the branch it names.
+                script.push_str(&format!("option no-deref\ndelete {refname} {oid}\n"));
             }
         }
     }

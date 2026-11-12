@@ -163,6 +163,7 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
         }
         OperationKind::Refs => to_json!(backend.refs(&repo)),
         OperationKind::Remotes => to_json!(backend.remotes(&repo)),
+        OperationKind::LeftoverRemotes => to_json!(backend.leftover_remotes(&repo)),
         OperationKind::SshCommand => to_json!(backend.ssh_command(&repo)),
         OperationKind::SparseStatus => to_json!(backend.sparse_checkout_status(&repo)),
         OperationKind::Workflow => crate::workflow::read(backend, &repo),

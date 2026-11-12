@@ -539,15 +539,15 @@ tabs_position_help = "Де розташовані вкладки репозит�
 graph_color_theme = "Колірна тема графа"
 graph_color_theme_help = "Палітра кольорів доріжок графа Log. «Як у темі» бере палітру вибраної теми; будь-який інший пункт замінює її, тож будь-яку тему можна поєднати з будь-якою палітрою. Застосовується під час закриття налаштувань."
 graph_renderer = "Рендерер графа"
-graph_renderer_help = "auto малює граф справжнім зображенням у терміналі, що це підтримує, і символами в решті - зокрема в tmux чи zellij, які успадковують середовище терміналу, але не пропускають зображення, і в herdr, якщо не ввімкнено його kitty_graphics. зображення примусово вмикає картинку, текст вимикає. Потрібен перезапуск."
+graph_renderer_help = "auto малює граф справжнім зображенням у терміналі, що це підтримує, і символами в решті - зокрема в zellij і screen, які успадковують середовище терміналу, але не пропускають зображення, у tmux, якщо термінал за ним не приймає sixel, і в herdr, якщо не ввімкнено його kitty_graphics. image примусово вмикає картинку, text вимикає. Потрібен перезапуск."
 image_protocol = "Протокол зображень"
-image_protocol_help = "Як зображення (граф, аватари авторів) потрапляють у термінал. auto: графічний протокол Kitty у kitty, Ghostty і herdr, у конфігу якого kitty_graphics = true; вбудовані зображення iTerm2 у WezTerm, iTerm2 і mintty; зображення sixel (лише аватари авторів, граф залишається символами) у Windows Terminal, foot, Konsole і mlterm; символи деінде. kitty, iterm2 або sixel примусово задає протокол (kitty для herdr, чий конфіг лежить в іншому місці; sixel для термінала, що його малює, але не розпізнаний); none вимикає зображення. Потрібен перезапуск."
+image_protocol_help = "Як зображення (граф, аватари авторів) потрапляють у термінал. auto: графічний протокол Kitty у kitty, Ghostty і herdr, у конфігу якого kitty_graphics = true; протокол Kitty також в iTerm2 3.7.7 або новішому; вбудовані зображення iTerm2 у WezTerm, Rio, mintty і старішому iTerm2; зображення sixel (стовпець графа й аватари) у Windows Terminal, foot, Tabby, Konsole, mlterm і в tmux, якщо термінал за ним приймає sixel; символи деінде. kitty, iterm2 або sixel примусово задає протокол (kitty для herdr, чий конфіг лежить в іншому місці; sixel для термінала, що його малює, але не розпізнаний); none вимикає зображення. Потрібен перезапуск."
 kitty_keyboard = "Клавіатурний протокол Kitty"
 kitty_keyboard_help = "auto під час запуску й упродовж ~100 мс питає термінал, чи розуміє він клавіатурний протокол kitty, і використовує його, якщо так: комбінації, які старі термінали не розрізняють (Control із розділовими знаками, цифрами, Shift чи Enter), тоді приходять як є, а не збігаються з керівними кодами. Термінал, що не відповів, залишається зі старими клавішами. off ніколи не чіпає клавіатурний режим термінала. Потрібен перезапуск."
 color_depth = "Глибина кольору"
 color_depth_help = "auto використовує 24-бітний колір, крім терміналів, які його не показують (Apple Terminal, консоль Linux або 256-кольоровий термінал без COLORTERM): там кольори зводяться до найближчих із 256 або 16 значень. truecolor, 256 і 16 задають глибину примусово. Застосовується одразу."
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "Текстовий курсор"
+text_cursor_help = "terminal ставить власний курсор термінала на позицію вводу сфокусованого текстового поля у вигляді смужки: діють налаштування курсора вашого термінала, а вікно кандидатів методу введення відкривається біля позиції вводу. drawn малює власний курсор GitPoulpi (блок або підкреслення) і тримає курсор термінала прихованим. Застосовується одразу."
 graph_show_stashes = { git = "Показувати stash'і в графі", local = "Показувати схованки в графі" }
 graph_show_stashes_help = { git = "Кожен stash отримує власний рядок у Log за своєю датою: маленька коробка на доріжці поруч із commit'ом, на якому його створено, з'єднана з ним пунктирною лінією. Вибір показує, що він змінив; праве клацання (або .) пропонує Pop, Apply і Drop. Вимк. залишає stash'і лише в розділі STASHES. Не малюється в режимі solo.", local = "Кожна схованка отримує власний рядок у Log за своєю датою: маленька коробка на доріжці поруч із комітом, на якому її створено, з'єднана з ним пунктирною лінією. Вибір показує, що вона змінила; праве клацання (або .) пропонує «Повернути», «Застосувати» і «Видалити». Вимк. залишає схованки лише в розділі СХОВАНКИ. Не малюється в режимі solo." }
 ref_connector = { git = "З'єднувач ref-commit", local = "З'єднувач ref-коміт" }
@@ -2232,8 +2232,8 @@ commit_column_move_right = "Пересунути частину праворуч
 commit_column_wider_part = "Розширити частину"
 commit_column_narrower_part = "Звузити частину"
 commit_column_reset_widths = "Скинути ширину частин"
-commit_column_fit = "Підігнати стовпець під вміст"
-commit_column_fit_all = "Підігнати всі стовпці під вміст"
+commit_column_fit = "Підігнати частину під вміст"
+commit_column_fit_all = "Підігнати всі частини під вміст"
 log_pick_column = "Вибрати стовпець для пересування або зміни ширини"
 log_columns_next = "Вибрати наступний стовпець"
 log_columns_prev = "Вибрати попередній стовпець"
@@ -2894,8 +2894,8 @@ view_column_move_right = { git = "Вигляд: стовпець commit'ів: п
 view_column_wider_part = { git = "Вигляд: стовпець commit'ів: розширити частину", local = "Вигляд: стовпець комітів: розширити частину" }
 view_column_narrower_part = { git = "Вигляд: стовпець commit'ів: звузити частину", local = "Вигляд: стовпець комітів: звузити частину" }
 view_column_reset_widths = { git = "Вигляд: стовпець commit'ів: скинути ширину частин", local = "Вигляд: стовпець комітів: скинути ширину частин" }
-view_column_fit_part = { git = "Вигляд: стовпець commit'ів: Підігнати стовпець під вміст", local = "Вигляд: стовпець комітів: Підігнати стовпець під вміст" }
-view_column_fit_all = { git = "Вигляд: стовпець commit'ів: Підігнати всі стовпці під вміст", local = "Вигляд: стовпець комітів: Підігнати всі стовпці під вміст" }
+view_column_fit_part = { git = "Вигляд: стовпець commit'ів: підігнати частину під вміст", local = "Вигляд: стовпець комітів: підігнати частину під вміст" }
+view_column_fit_all = { git = "Вигляд: стовпець commit'ів: підігнати всі частини під вміст", local = "Вигляд: стовпець комітів: підігнати всі частини під вміст" }
 view_log_column_pick = "Вигляд: стовпець Log: Вибрати стовпець для пересування або зміни ширини"
 view_log_column_next = "Вигляд: стовпець Log: Вибрати наступний стовпець"
 view_log_column_prev = "Вигляд: стовпець Log: Вибрати попередній стовпець"
@@ -3475,8 +3475,8 @@ radar_column_pick = "Radar: вибрати стовпець"
 radar_column_wider = "Radar: розширити стовпець"
 radar_column_narrower = "Radar: звузити стовпець"
 radar_column_reset = "Radar: скинути ширину стовпців"
-radar_column_fit = "Radar: Підігнати стовпець під вміст"
-radar_column_fit_all = "Radar: Підігнати всі стовпці під вміст"
+radar_column_fit = "Radar: підігнати стовпець під вміст"
+radar_column_fit_all = "Radar: підігнати всі стовпці під вміст"
 why_radar_closed = "спершу відкрийте Radar"
 why_radar_no_row = "спершу виберіть елемент у Radar"
 hosting_edit_assignees = "Хостинг: змінити виконавців..."
@@ -3994,8 +3994,8 @@ mouse_gestures_in_2 = "роздільник панелей чи межа сто�
 mouse_gestures_in_3 = { git = "перетягування по тексту diff, File View, Blame чи Історія файлу виділяє його, подвійне клацання - слово; y або Ctrl+C копіює (лише текст файлу, ніколи жолоби); інші входження вибраного слова підсвічуються в diff і редакторі (і позначаються на лінійці)", local = "перетягування по тексту різниці, File View, Blame чи Історія файлу виділяє його, подвійне клацання - слово; y або Ctrl+C копіює (лише текст файлу, ніколи жолоби); інші входження вибраного слова підсвічуються в різниці й редакторі (і позначаються на лінійці)" }
 mouse_gestures_in_4 = { git = "прокручує список чи diff у фокусі/під вказівником; Shift+колесо (обидва записи, що повідомляють термінали) натомість прокручує diff/перегляд файлу/blame *горизонтально*, поки перенесення слів вимкнено", local = "прокручує список чи різницю у фокусі/під вказівником; Shift+колесо (обидва записи, що повідомляють термінали) натомість прокручує різницю/перегляд файлу/blame *горизонтально*, поки перенесення слів вимкнено" }
 mouse_gestures_in_5 = "відкриває контекстне меню скрізь, де воно є (див. розділ кожної панелі вище); еквівалент із клавіатури завжди {{*global.context_menu}}"
-mouse_gestures_in_6 = "кожна дія «Copy ...» просить *термінал* про буфер обміну через OSC 52 - TUI не може дістатися до нього напряму; термінал, що ігнорує послідовність, просто не копіює"
-mouse_gestures_in_7 = "підказки зміни розміру/вказівника/відкритої долоні надсилаються через OSC 22 на терміналах, що це підтримують (kitty, foot, xterm; нерівно деінде) - перетягувані роздільники й межі стовпців також світяться у власному буфері застосунку, якому взагалі не потрібна співпраця термінала"
+mouse_gestures_in_6 = "кожна дія «Copy ...» кладе текст у системний буфер обміну, а де відомо, що термінал це підтримує, ще й надсилає його через OSC 52; через SSH або без дисплея надсилається лише OSC 52, а термінал, що ігнорує послідовність, не копіює"
+mouse_gestures_in_7 = "підказки зміни розміру/вказівника/відкритої долоні надсилаються через OSC 22 на терміналах, що це підтримують (kitty, Ghostty, foot, mintty; не в Rio, Alacritty, Windows Terminal чи iTerm2) - перетягувані роздільники й межі стовпців також світяться у власному буфері застосунку, якому взагалі не потрібна співпраця термінала"
 git_actions_then_25 = "відкрити меню LFS (кнопка LFS на панелі; її пункти є і в палітрі)"
 git_actions_then_26 = "LFS: {$fetch} об'єктів усіх посилань"
 git_actions_then_27 = "LFS: записати справжній вміст поверх вказівників (офлайн)"
@@ -5963,7 +5963,7 @@ show_label = "Показати:"
 show_all = "Усі"
 show_none = "Жодного"
 why_level_off = "Не показується: вибрано рівень {level}. Підвищте його, щоб побачити ці рядки."
-hint_levels = "1-5: показати або сховати рівень  a: усі  n: жодного"
+hint_levels = "1-5: показати або сховати рівень  a: усі  n: жодного  Enter: операція рядка  [ ]: збої"
 palette_show_error = "Журнал активності: показати або сховати рівень Помилка"
 palette_show_warn = "Журнал активності: показати або сховати рівень Попередження"
 palette_show_info = "Журнал активності: показати або сховати рівень Інфо"
@@ -6006,25 +6006,25 @@ palette_scroll_right = "Журнал активності: прокрутити 
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "Журнал активності: прокручувати довгі рядки вбік (також Shift + колесо або горизонтальна смуга прокрутки)"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation}: збій"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "Операція: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
-ctx_repository = "Repository: {repository}"
+ctx_repository = "Репозиторій: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "Запитав: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "Ідентифікатор операції: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "Журнал активності: показати операцію цього рядка"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "Журнал активності: наступна збійна операція"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "Журнал активності: попередня збійна операція"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "Спершу виберіть рядок: клацніть по ньому або натисніть ], щоб перейти до наступної збійної операції."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "Цей рядок не пов'язаний з операцією."
 
 [git_error]
 summary_host_key = "Ключ SSH-хоста віддаленого репозиторію ще невідомий."
@@ -8757,13 +8757,13 @@ namespaces = "Простори імен"
 # context: hint in the empty namespaces field
 namespaces_hint = "напр. acme, platform (порожньо: мій власний і всі, де я учасник)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "Один запис на рядок. Ім'я збігається з цією групою чи власником і всім, що нижче (ptm збігається з ptm/produits/x, але не з ptmx/y). Залиште порожнім, щоб збігалися ваші власні та всі, де ви учасник."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Кожен рядок - регулярний вираз, що зіставляється з повним шляхом репозиторію так, як ви його пишете (приклад: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "Регулярні вирази"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "Некоректний вираз: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "Запит із репозиторію, який не клоновано"
 # context: choice: ask each time

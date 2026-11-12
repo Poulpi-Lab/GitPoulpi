@@ -91,7 +91,7 @@ author_email = "jane@work.example"
 | Ключ | Типово | Значення та дія |
 |---|---|---|
 | `ui.graph_renderer` | `"auto"` | `auto` (зображення там, де термінал вміє його малювати, інакше символи), `image`, `text`. **Перезапуск.** |
-| `ui.image_protocol` | `"auto"` | Як зображення (граф, аватари) потрапляють до терміналу: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = протокол Kitty в kitty, Ghostty і herdr із `kitty_graphics = true`; iTerm2 у WezTerm, iTerm2, Rio, mintty; sixel (лише аватари) у Windows Terminal, foot, Konsole, mlterm; нічого в tmux, zellij, screen і невідомих терміналах. **Перезапуск.** |
+| `ui.image_protocol` | `"auto"` | Як зображення (граф, аватари) потрапляють до терміналу: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = протокол Kitty в kitty, Ghostty, iTerm2 3.7.7 або новішому і herdr із `kitty_graphics = true`; протокол iTerm2 у WezTerm і Rio (прозорість змішується), старішому iTerm2 і mintty (непрозорий фон); sixel (стовпець графа й аватари) у Windows Terminal, foot, Tabby, Konsole, mlterm, у tmux, якщо термінал за ним приймає sixel, і в будь-якому терміналі, чия відповідь під час запуску називає sixel (xterm, запущений із `-ti vt340`, термінал VS Code зі ввімкненими зображеннями); символи в zellij, screen і невідомих терміналах. У tmux картинки kitty потребують тут `kitty` плюс `allow-passthrough on` ([Мультиплексори](multiplexers.md)). Там, де псевдоконсоль термінала губить або зміщує картинки (WezTerm 20240203, Rio і mintty у Windows), задайте `ui.graph_renderer = "text"` ([Вибір термінала](terminals.md#windows)). **Перезапуск.** |
 | `ui.theme` | `"system"` | Кольорова тема: вбудований slug (`gitpoulpi theme list` показує їх усі), slug файлу в `<config>/themes/` або `system` (залежить від світлого чи темного тла терміналу, яке визначається під час запуску; старе значення `default` означає те саме). `config set` відхиляє невідомі назви. Див. [Теми](themes.md). |
 | `ui.graph_color_theme` | `"theme"` | Палітра доріжок: `theme` (брати з теми) або будь-яка назва палітри доріжок: `gitpoulpi`, `light`, `material`, `serie` та палітри інших тем. |
 | `ui.graph_lane_background` | `"off"` | `off` або `row_tint` (ледь помітна смуга кольору доріжки за графом плюс планка на її краю). **Застосунок: перемкнути підсвітку рядків графа** (`Ctrl+N Shift+T`) перемикає це; **Застосунок: змінити колірну тему графа...** (`Ctrl+N Shift+Y`) вибирає `ui.graph_color_theme`. |
@@ -120,7 +120,7 @@ author_email = "jane@work.example"
 | `ui.git_terms_english` | `false` | Лише ja, ko і zh-CN: показувати англійські слова git (stage, unstage, staged, unstaged...) замість їхньої транскрипції. Не діє, поки `ui.translate_git_terms` має значення `true`. **Наживо.** |
 | `ui.mouse_enabled` | `true` | `false` залишає мишу (і виділення тексту) терміналу. **Перезапуск.** |
 | `ui.mouse_scroll_lines` | `3` | Рядків Log на один крок коліщатка, від 1 до 20. **Перезапуск.** |
-| `ui.kitty_keyboard` | `"auto"` | `auto` просить у терміналу протокол клавіатури kitty (щоб працювали `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N`); `off` ніколи не просить. **Перезапуск.** |
+| `ui.kitty_keyboard` | `"auto"` | `auto` просить у терміналу протокол клавіатури kitty (щоб працювали `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N`; лише Unix, tmux ніколи не відповідає: див. [Мультиплексори](multiplexers.md#tmux)); `off` ніколи не просить. **Перезапуск.** |
 | `ui.logo_color` | `""` | Колірна гама логотипа у вікні «Про GitPoulpi», slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); порожнє або невідоме значення означає типове для збірки (`lavender`). Записується, коли ви клацаєте логотип або вибираєте колір у вікні «Про GitPoulpi». |
 
 **Аватари** (типово вимкнено; увімкнення надсилає Gravatar SHA-256-хеш e-mail авторів
@@ -145,6 +145,7 @@ author_email = "jane@work.example"
 | `ui.mermaid_orientation` | `lr` | Напрямок цього графа: `lr` (зліва направо) або `tb` (зверху вниз). |
 | `ui.mermaid_fence` | `false` | Огорнути скопійований скрипт Mermaid у блок коду `mermaid`. |
 | `ui.mermaid_subject_width` | `40` | Заголовки commit'ів обрізаються до цієї кількості символів в id Mermaid (`subjects`, `full`). |
+| `ui.text_cursor` | `"terminal"` | Де показується курсор сфокусованого текстового поля: `terminal` ставить туди власний курсор термінала (смужка, що блимає, тож налаштування курсора термінала й вікно кандидатів методу введення йдуть за нею; прихований, коли жодне поле не має клавіатури, а при виході відновлюється ваш власний стиль курсора), `drawn` малює власний символ курсора GitPoulpi і тримає курсор термінала прихованим. Застосовується одразу. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` або `16`: скількома кольорами малювати. `auto` - це truecolor, окрім Apple Terminal (256), консолі Linux (16) і терміналів `*-256color` без `COLORTERM` (256). Наживо. Див. [Теми](themes.md). |
 | `ui.input_color` | `"theme"` | Тло текстового поля: `theme` (власне тло теми), `gray`, `blue`, `slate`, `dark`, `custom`. |
 | `ui.input_color_custom` | `"#2a2a2a"` | Колір `custom`, `#rrggbb`. |
@@ -184,7 +185,7 @@ author_email = "jane@work.example"
 | `ui.launcher_build` | `"current"` | Лише в режимі розробника (див. `general.dev_mode`; лише тоді показується в Налаштування > Лаунчер, інакше ігнорується). `"current"`: ярлики й псевдонім команди запускають збірку, яка їх створила. `"newest"`: вони запускають найновішу збірку з `target/dist` і `target/release` клонованого репозиторію, вибрану під час кожного клацання, і запуск будь-якої з них ніколи їх не переписує. |
 | `ui.command_alias` | `""` | Назва команди, що запускає GitPoulpi з терміналу, наприклад `gp` (Налаштування > Лаунчер, `gitpoulpi alias create`). Порожньо: немає. Лише літери, цифри, `-`, `_` і `.`. Це лише ім'я, яке використовує кнопка **Створити псевдонім команди**; доки ви його не створите, нічого не існує. |
 | `ui.command_alias_add` | `""` | Назва другої команди, наприклад `gpa`, що виконує `gitpoulpi --add`: вона відкриває поточну теку новою вкладкою вже запущеного GitPoulpi (Налаштування > Лаунчер, `gitpoulpi alias create gpa --add`). Порожньо: немає. Ті самі правила імені; створюється разом із `ui.command_alias` кнопкою **Створити**. |
-| `ui.relaunch_in_terminal` | `true` | Лише Windows: якщо exe запущено подвійним клацанням у власній консолі, GitPoulpi відкривається знову в `ui.launch_terminal` і завершується. Вимкнено: залишається в цій консолі. |
+| `ui.relaunch_in_terminal` | `true` | Лише Windows: якщо exe запущено подвійним клацанням у власній консолі, GitPoulpi відкривається знову в `ui.launch_terminal` і завершується. Термінал, що запускає exe напряму (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`), - теж власна консоль, але не класичне вікно консолі: його ніколи не перезапускають. Вимкнено: залишається в цій консолі. |
 | `ui.reuse_window` | `true` | Клацання ярлика GitPoulpi (`gitpoulpi launch`) показує вікно вже відкритого GitPoulpi замість запуску ще одного. Вимкнено: кожне клацання запускає нове вікно. |
 
 **Команди `ui.open_in`** спершу розбиваються на аргументи (пробіли, `'...'`, `"..."`), а потім змінні підставляються всередині кожного аргументу, тож папка з пробілами залишається одним аргументом; оболонка не задіяна, якщо тільки команда сама її не запускає (`sh -c '... "$GITPOULPI_CWD"'`). Змінні: `${cwd}` (папка вкладки), `${repo}` (корінь репозиторію), `${name}` (назва папки без шляху), `${branch}` (порожня при відокремленому HEAD), `${web_url}` (вебсторінка віддаленого репозиторію `origin`, коли це проєкт GitHub або GitLab, інакше порожня; пункт, що її використовує, відмовляється запускатися, коли вона порожня), `${env:NAME}` (порожня, якщо не задано). Старе `{repo}` і далі означає `${cwd}`. Будь-яке інше `${...}` - це помилка з його назвою. Приклад:
@@ -335,7 +336,8 @@ review_requests = true    # requests waiting for my review, every repository
 open_requests = false     # every open request of my namespaces
 include_drafts = false    # keep draft requests in these lists
 assigned_issues = true    # open issues assigned to me, every repository
-namespaces = ["acme"]     # orgs / groups to search for open requests
+namespaces = ["acme", "ptm/produits"]  # one entry per line in Settings; empty = no limit
+namespaces_regex = false  # true: each entry is a regular expression over the full repository path
 review_mode = "ask"       # ask | clone | api
 ```
 
@@ -345,7 +347,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Усі відкриті запити вашого власного простору імен і кожної організації чи групи, до якої ви належите (або з `namespaces`), ніколи не «усе, що бачить токен» |
 | `include_drafts` | `false` | Запити-чернетки пропускаються в цих списках, якщо це не ввімкнено |
 | `assigned_issues` | `false` | Відкриті issues, призначені вам, у всіх репозиторіях |
-| `namespaces` | `[]` | Організації / групи, де шукати для `open_requests`; порожньо означає ваш власний простір імен плюс усі членства (GitHub: шукається не більше 12, GitLab: 10 груп і 10 власних проєктів, Gitea, Forgejo і Gerrit: 10; Azure DevOps бере назви проєктів, Bitbucket Data Center - ключі проєктів, Gerrit - префікси шляхів проєктів) |
+| `namespaces` | `[]` | Які репозиторії залишає кожен список (запити на рев'ю, призначені issues, відкриті запити); порожньо означає без обмеження, і тоді `open_requests` шукає ваш власний простір імен плюс усі членства (GitHub: шукається не більше 12, GitLab: 10 груп і 10 власних проєктів, Gitea, Forgejo і Gerrit: 10). Запис збігається з повним шляхом репозиторію (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`), коли дорівнює йому або є префіксом шляху, що закінчується на `/`: `ptm` залишає `ptm/produits/x`, але не `ptmx/y`; регістр ігнорується. Налаштування показують один запис на рядок; старіший файл може містити один рядок через кому (`"ptm, formation"`), який усе ще завантажується й зберігається назад як список |
+| `namespaces_regex` | `false` | Читати кожен запис `namespaces` як регулярний вираз, що зіставляється з повним шляхом репозиторію так, як ви його пишете (тож `^ptm/(produits\|infra)/` прив'язується до початку; без `^` чи `$` він збігається будь-де в шляху; додайте `(?i)`, щоб ігнорувати регістр). `open_requests` тоді шукає ваші членства, а вирази фільтрують рядки. Некоректний вираз показується під полем у Налаштуваннях і не зберігається; у файлі, відредагованому вручну, він залишає списки порожніми з приміткою |
 | `review_mode` | `"ask"` | Що робить рев'ю запиту, чий репозиторій не клоновано: `ask`, `clone` (клонувати, потім рев'ю) або `api` (рев'ю через API хостингу) |
 
 Відповіді кешуються для кожного профілю в `radar-account.json` поруч із

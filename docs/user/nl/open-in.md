@@ -172,6 +172,16 @@ Een binair bestand (een PDF, een Word-document, een spreadsheet, een archief...)
 
 Het bestand uit de werkmap wordt ongewijzigd aan de toepassing doorgegeven. De versie van een commit (of van de index) wordt geschreven naar een **alleen-lezen tijdelijke kopie**, met een melding op de statusbalk, zodat een toepassing de repository niet kan wijzigen. Geen van beide wijzigt de repository: geen journaalregel, Ongedaan maken blijft ongemoeid.
 
+De lijst van het menu opent naast het menu, ter hoogte van de rij **Openen met...**, als een submenu (links als er rechts geen plek is), zowel met de muis als met het toetsenbord. De lijst van beeldeditors (**Bewerken in...**) vanuit een bestandsmenu doet hetzelfde.
+
+### Git LFS-bestanden
+
+De Git LFS-objectkaart (zie [Git LFS](lfs.md)) heeft dezelfde twee acties onder zijn tekst: **Openen in standaardprogramma** en **Openen in**, met dezelfde toetsen (`o`, `Shift+O`) en paletrijen. Ze openen het echte bestand, nooit de pointer: het bestand uit de werkmap zoals het is, of een alleen-lezen tijdelijke kopie van het object uit de lokale LFS-opslag voor de versie van een commit of de index. Een object dat nog niet is gedownload heeft geen knoppen op de kaart, en de statusregel zegt dat de inhoud nog niet is gedownload. Dezelfde weigering geldt voor een bestand in de werkmap dat nog alleen de pointer bevat: **Openen in standaardprogramma**, **Openen in** en **Bewerken in**, vanaf de kaart of een bestandsmenu, zeggen dat de inhoud niet is gedownload in plaats van de pointertekst te openen (download haar met de pull- of checkout-rijen van de LFS-werkbalk en probeer opnieuw). Openen is alleen-lezen: geen journaalregel, niets om ongedaan te maken.
+
+### Browsers onder Windows
+
+Chrome en Edge registreren `--single-argument %1`, waardoor ze alles na de schakelaar als één adres lezen, aanhalingstekens inbegrepen. GitPoulpi geeft het pad aan zo'n programma letterlijk en zonder aanhalingstekens door, zoals Windows doet, zodat een bestand met spaties in het pad opent in plaats van te mislukken met `http://"c/...`. Elk ander programma krijgt het pad als één gewoon argument.
+
 ## Verouderde sleutels
 
 De oude sleutels `ui.terminal_launch` en `ui.terminal_launch_command` worden alleen gelezen

@@ -438,7 +438,7 @@ sneltoets. De volledige lijst staat [hieronder](#elke-opdracht-van-het-palet).
 |---|---|
 | `Ctrl+P` | Het palet openen |
 | *(typen)* | De lijst filteren. Een exacte overeenkomst na de prefix `Categorie: ` komt eerst, dan een overeenkomst ergens in het label, dan een fuzzy overeenkomst |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | De markering verplaatsen (zie [Filterbare popuplijsten](#filterbare-popuplijsten)) |
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | De markering verplaatsen (zie [Filterbare popuplijsten](#filterbare-popuplijsten)) |
 | `Enter`, of een dubbelklik | De gemarkeerde opdracht uitvoeren |
 | `Esc` | Sluiten |
 
@@ -458,7 +458,9 @@ In `config.toml` is dit de tabel `[keybindings.palette]`, genoemd naar de opdrac
 
 De hintbalk onder de lijst noemt deze toets (standaard `Alt+K`). Het is de actie `palette.configure_shortcut`, dus hij is net als elke andere opnieuw toe te wijzen.
 
-Het palet en de kiezers (thema, taal, tab, werkruimtezoeker) verplaatsen en schalen als een dialoog: sleep de bovenrand, of druk op `Alt+G` (de actie `palette.arrange`; de paletrij `Dialoog: Verplaatsen of schalen` doet hetzelfde). Pijlen verplaatsen het, `Shift`+pijlen schalen het, `0` herstelt het, `Enter` of `Esc` verlaat de modus en de popup blijft open. `ui.dialog_geometry` bepaalt of de plaats wordt bewaard.
+Het palet en de kiezers (thema, taal, tab, werkruimtezoeker) verplaatsen en schalen als een dialoog: sleep de bovenrand, druk op `Ctrl+N` en dan `m` (zoals boven elk dialoog), of druk op `Alt+G`. `Alt+G` is de actie `palette.arrange` ("Dialoog: het voorste dialoog verplaatsen of schalen"): een extra manier, geldig boven elk dialoog en elke popup, om de schikmodus te starten voor het dialoog vooraan (de paletrijen `Dialoog: Verplaatsen of schalen` en `Dialoog: Positie en grootte herstellen` werken op het palet zelf zolang het open is). Pijlen verplaatsen het, `Shift`+pijlen schalen het, `0` herstelt het, `Enter` of `Esc` verlaat de modus en de popup blijft open. `ui.dialog_geometry` bepaalt of de plaats wordt bewaard.
+
+`Ctrl+N` is hier ook het navigatieprefix: het toont een badge op het filtervak, de eerste rij van de lijst en het sluitkruis, en de toets erna drukt dat bedieningselement in of `m` schikt de popup. Het verplaatst de markering niet meer omlaag, en `Ctrl+P` verplaatst haar niet omhoog: alleen de pijlen, `PageUp` / `PageDown` en `Home` / `End` verplaatsen een lijst met een filterveld.
 
 ### Elke opdracht van het palet
 
@@ -1195,7 +1197,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Toets | Actie |
 |---|---|
 | `Tab` / `Shift+Tab` | Focus op het volgende / vorige paneel |
-| `Ctrl+N`, dan een badge | Focus op dat deel van het venster (zie [Navigatieprefix](#navigatieprefix-ctrln)) |
+| `Ctrl+N`, dan een badge | Focus op dat deel van het venster, of dat bedieningselement indrukken van het dialoog of de popup vooraan (zie [Navigatieprefix](#navigatieprefix-ctrln)) |
 | `j` / `k`, `Up` / `Down` | De selectie verplaatsen, in elk paneel |
 | `PageUp` / `PageDown`, `Home` / `End` | Een pagina verplaatsen; naar de eerste / laatste rij |
 | een getal, dan `j` / `k` / `Up` / `Down` | Tel-prefix: `4j` verplaatst vier rijen. Met `PageUp` / `PageDown` is het getal een aantal pagina's. De statusbalk toont het openstaande getal (`4...`). `Esc` of een andere toets wist het. Een voorloop-`0` start nooit een getal |
@@ -1221,15 +1223,19 @@ Deze toetsen verplaatsen de markering:
 
 | Toets | Actie |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Een rij verplaatsen |
+| `Up` / `Down` | Een rij verplaatsen |
 | `Home` / `End` | Eerste / laatste rij |
 | `PageUp` / `PageDown` | Een zichtbare pagina verplaatsen |
 | `Enter` | De gemarkeerde rij kiezen |
 | `Esc` | Sluiten |
 
-In deze popups verplaatsen `Home`, `End` en `Ctrl+K` de lijst, niet de cursor van
-het filterveld. `Ctrl+A` en `Ctrl+E` verplaatsen de cursor nog steeds naar het
-begin en het einde. Gewone `j` en `k` worden in het filter getypt.
+In deze popups verplaatsen `Home` en `End` de lijst, niet de cursor van het
+filterveld. `Ctrl+A` en `Ctrl+E` verplaatsen de cursor nog steeds naar het begin
+en het einde, en `Ctrl+K` wist tot het einde van het filter. Geen enkel
+`Ctrl+letter`-paar verplaatst een lijst (`Ctrl+N` is het navigatieprefix, `Ctrl+P`
+het opdrachtenpalet) en gewone `j` en `k` worden in het filter getypt: alleen de
+pijlen, `PageUp` / `PageDown` en `Home` / `End` verplaatsen hier. In lijsten
+zonder tekstveld zijn `j` / `k` een extra manier om omlaag / omhoog te gaan.
 
 Met de muis:
 
@@ -1261,7 +1267,7 @@ boven alles, ook boven het scherm Instellingen.
 | *(typen)* | Filter: alleen de secties bewaren die de tekst bevatten. `j`, `k` en `q` worden ook getypt |
 | `Backspace`, `Ctrl+U` | Het laatste teken verwijderen / het filter wissen |
 | `Esc` | Het filter wissen; als het leeg is, de help sluiten |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Een regel scrollen |
+| `Up` / `Down` | Een regel scrollen |
 | `PageUp` / `PageDown`, `Home` / `End` | Een pagina scrollen; naar boven / onderen |
 | `Ctrl+D`, of een klik op de link | Deze documentatie op GitHub in de browser openen |
 

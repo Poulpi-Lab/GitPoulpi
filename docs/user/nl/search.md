@@ -32,7 +32,7 @@ klaar zijn.
 
 | Toets | Doet |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `PageUp` / `PageDown`, `Home` / `End` | Door de resultaten bewegen (de groepskoppen worden overgeslagen). |
+| `Up` / `Down`, `PageUp` / `PageDown`, `Home` / `End` | Door de resultaten bewegen (de groepskoppen worden overgeslagen). |
 | `Enter` | Gaat naar het resultaat: het tabblad van de repository opent (of wordt geactiveerd), dan wordt het resultaat getoond. |
 | `Esc` | Sluit het zoeken. |
 | `Alt+1` .. `Alt+8` | Een soort aan- of uitzetten (de chips boven de lijst, in hun volgorde). `Alt+0` zet ze allemaal aan. |

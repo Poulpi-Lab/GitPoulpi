@@ -62,6 +62,7 @@ GitPoulpi는 클릭할 수 있는 commit 그래프, 명령 팔레트, 호스팅 
     "종료 후 cd", 그리고 bash, zsh, fish, PowerShell용 `gitpoulpi shell-init`
     래퍼(`gp`).
     GitPoulpi를 가장 잘 보여 주는 터미널: **[터미널 고르기](terminals.md)**.
+    tmux, zellij, screen, herdr, 터미널 창을 통과하는 것: **[멀티플렉서](multiplexers.md)**.
 
 추가: **[브랜치 워크플로](branching-workflows.md)**. Git Flow, GitHub Flow, GitLab Flow,
 Trunk-based 프리셋 또는 직접 정의한 베이스, 브랜치 이름 패턴, 토픽 유형

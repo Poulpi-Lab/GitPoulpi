@@ -12,7 +12,7 @@ PNG와 JPEG는 항상, GIF, WebP(첫 프레임), BMP, ICO/CUR는 빌드에 `imag
 
 ## 그려지는 방식
 
-이미지 프로토콜이 있는 터미널(Kitty와 Ghostty, WezTerm과 iTerm2, Rio, mintty)에서는 그림이 진짜 이미지입니다. 그 밖의 곳(일반 Windows Terminal, tmux, GitPoulpi가 모르는 터미널)에서는 색이 있는 반블록 문자로 그려지며, 세로 해상도는 절반이지만 어디서든 알아볼 수 있습니다. **이미지 프로토콜이 없을 때**를 *정보 카드만*으로 설정할 수 있습니다. **로그 및 그래프** 페이지의 **이미지 프로토콜**로 하나를 강제할 수 있습니다.
+이미지 프로토콜이 있는 터미널(Kitty와 Ghostty, WezTerm과 iTerm2, Rio, mintty, 그리고 sixel 터미널인 Windows Terminal, foot, Tabby)에서는 그림이 진짜 이미지입니다. 그 밖의 곳(일반 Windows 콘솔, zellij, GitPoulpi가 모르는 터미널)에서는 색이 있는 반블록 문자로 그려지며, 세로 해상도는 절반이지만 어디서든 알아볼 수 있습니다. **이미지 프로토콜이 없을 때**를 *정보 카드만*으로 설정할 수 있습니다. **로그 및 그래프** 페이지의 **이미지 프로토콜**로 하나를 강제할 수 있습니다.
 
 ## Diff 보기
 

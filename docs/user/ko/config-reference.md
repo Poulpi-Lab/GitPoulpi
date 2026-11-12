@@ -88,7 +88,7 @@ author_email = "jane@work.example"
 | 키 | 기본값 | 값과 효과 |
 |---|---|---|
 | `ui.graph_renderer` | `"auto"` | `auto`(터미널이 그림을 그릴 수 있으면 그림, 아니면 문자), `image`, `text`. **다시 시작.** |
-| `ui.image_protocol` | `"auto"` | 그림(그래프, 아바타)이 터미널에 전달되는 방식: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = kitty, Ghostty, 그리고 `kitty_graphics = true`인 herdr에서는 Kitty 프로토콜. WezTerm, iTerm2, Rio, mintty에서는 iTerm2. Windows Terminal, foot, Konsole, mlterm에서는 sixel(아바타만). tmux, zellij, screen, 알 수 없는 터미널에서는 none. **다시 시작.** |
+| `ui.image_protocol` | `"auto"` | 그림(그래프, 아바타)이 터미널에 전달되는 방식: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = kitty, Ghostty, iTerm2 3.7.7 이상, 그리고 `kitty_graphics = true`인 herdr에서는 Kitty 프로토콜. WezTerm과 Rio(투명도 혼합), 이전 iTerm2와 mintty(불투명 배경)에서는 iTerm2 프로토콜. Windows Terminal, foot, Tabby, Konsole, mlterm, 뒤의 터미널이 sixel을 지원하는 tmux, 그리고 시작 응답에 sixel이 나오는 모든 터미널(`-ti vt340`으로 시작한 xterm, 이미지를 켠 VS Code 터미널)에서는 sixel(그래프 열과 아바타). zellij, screen, 알 수 없는 터미널에서는 문자. tmux에서 kitty 그림을 쓰려면 여기서 `kitty`를 고르고 `allow-passthrough on`이 필요합니다([멀티플렉서](multiplexers.md)). 터미널의 의사 콘솔이 그림을 버리거나 엉뚱한 곳에 놓는 경우(Windows의 WezTerm 20240203, Rio, mintty)에는 `ui.graph_renderer = "text"`를 쓰세요([터미널 고르기](terminals.md#windows)). **다시 시작.** |
 | `ui.theme` | `"system"` | 색상 테마: 내장 슬러그(`gitpoulpi theme list`가 전체를 나열), `<config>/themes/`에 있는 파일의 슬러그, 또는 `system`(시작할 때 감지한 터미널의 밝거나 어두운 배경을 따름. 예전 값 `default`도 같은 뜻). `config set`은 알 수 없는 이름을 거부합니다. [테마](themes.md)를 참고하세요. |
 | `ui.graph_color_theme` | `"theme"` | 레인 팔레트: `theme`(테마를 따름) 또는 임의의 레인 팔레트 이름: `gitpoulpi`, `light`, `material`, `serie`, 그리고 다른 테마의 팔레트. |
 | `ui.graph_lane_background` | `"off"` | `off` 또는 `row_tint`(그래프 뒤의 옅은 레인 색 띠와 그 가장자리의 막대). **앱: 그래프 행 색조 전환**(`Ctrl+N Shift+T`)이 이를 전환하고, **앱: 그래프 색상 테마 변경...**(`Ctrl+N Shift+Y`)이 `ui.graph_color_theme`을 고릅니다. |
@@ -117,7 +117,7 @@ author_email = "jane@work.example"
 | `ui.git_terms_english` | `false` | ja, ko, zh-CN에만 해당: 음역 대신 영어 git 단어(stage, unstage, staged, unstaged...)를 표시합니다. `ui.translate_git_terms`가 `true`인 동안에는 효과가 없습니다. **실시간.** |
 | `ui.mouse_enabled` | `true` | `false`이면 마우스(및 텍스트 선택)를 터미널에 맡깁니다. **다시 시작.** |
 | `ui.mouse_scroll_lines` | `3` | 휠 한 칸당 Log 행 수, 1~20. **다시 시작.** |
-| `ui.kitty_keyboard` | `"auto"` | `auto`는 터미널에 kitty 키보드 프로토콜을 요청합니다(그러면 `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N`이 도착함). `off`는 요청하지 않습니다. **다시 시작.** |
+| `ui.kitty_keyboard` | `"auto"` | `auto`는 터미널에 kitty 키보드 프로토콜을 요청합니다(그러면 `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N`이 도착함. Unix 전용이며 tmux는 응답하지 않음: [멀티플렉서](multiplexers.md#tmux) 참고). `off`는 요청하지 않습니다. **다시 시작.** |
 | `ui.logo_color` | `""` | 정보 창의 로고 색 구성, 슬러그(`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`). 비어 있거나 알 수 없는 값이면 빌드의 기본값(`lavender`). 정보에서 로고를 클릭하거나 색을 고르면 기록됩니다. |
 
 **아바타**(기본적으로 꺼짐. 켜면 작성자 이메일의 SHA-256 해시를 Gravatar에 보내고 연결된
@@ -142,6 +142,7 @@ GitHub/GitLab 계정에도 질의합니다)
 | `ui.mermaid_orientation` | `lr` | 그 그래프의 방향: `lr`(왼쪽에서 오른쪽) 또는 `tb`(위에서 아래). |
 | `ui.mermaid_fence` | `false` | 복사한 Mermaid 스크립트를 `mermaid` 코드 펜스로 감쌉니다. |
 | `ui.mermaid_subject_width` | `40` | Mermaid id에서 커밋 제목을 이 글자 수로 자릅니다(`subjects`, `full`). |
+| `ui.text_cursor` | `"terminal"` | 포커스된 텍스트 필드의 캐럿이 표시되는 위치: `terminal`은 터미널 자체의 커서를 그 자리에 놓고(깜박이는 막대이므로 터미널의 커서 설정과 입력기의 후보 창이 따라가며, 키보드를 받는 필드가 없으면 숨겨지고 종료할 때 사용자의 커서 모양으로 복원됨), `drawn`은 GitPoulpi 자체의 캐럿 글리프를 그리고 터미널 커서는 숨깁니다. 즉시 적용. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256`, `16`: 그리는 데 쓸 색 수. `auto`는 Apple Terminal(256), Linux 콘솔(16), `COLORTERM`이 없는 `*-256color` 터미널(256)을 제외하면 truecolor입니다. 실시간. [테마](themes.md)를 참고하세요. |
 | `ui.input_color` | `"theme"` | 텍스트 필드 배경: `theme`(테마 자체의 것), `gray`, `blue`, `slate`, `dark`, `custom`. |
 | `ui.input_color_custom` | `"#2a2a2a"` | `custom` 색, `#rrggbb`. |
@@ -178,7 +179,7 @@ commit 상세, 날짜 툴팁, *복사 > 날짜*). 토큰: `YYYY` `YY` `MMMM` `MM
 | `ui.launcher_build` | `"current"` | 개발 모드 전용(`general.dev_mode` 참고. 그때만 설정 > 런처에 표시되며 그 밖에는 무시됨). `"current"`: 바로 가기와 명령 별칭이 자신을 만든 빌드를 시작합니다. `"newest"`: 체크아웃의 `target/dist`와 `target/release` 중 가장 최근에 빌드된 것을 클릭할 때마다 판단해 시작하며, 어느 빌드를 시작해도 바로 가기를 다시 쓰지 않습니다. |
 | `ui.command_alias` | `""` | 터미널에서 GitPoulpi를 시작하는 명령의 이름, 예를 들어 `gp`(설정 > 런처, `gitpoulpi alias create`). 비어 있으면 없음입니다. 영문자, 숫자, `-`, `_`, `.`만 쓸 수 있습니다. **만들기: 명령 별칭** 버튼이 쓰는 이름일 뿐이며 만들기 전에는 아무것도 생기지 않습니다. |
 | `ui.command_alias_add` | `""` | `gitpoulpi --add`를 실행하는 두 번째 명령의 이름, 예를 들어 `gpa`. 현재 폴더를 이미 실행 중인 GitPoulpi의 새 탭으로 엽니다(설정 > 런처, `gitpoulpi alias create gpa --add`). 비어 있으면 없음입니다. 이름 규칙은 같으며, **만들기** 버튼이 `ui.command_alias`와 함께 만듭니다. |
-| `ui.relaunch_in_terminal` | `true` | Windows 전용: exe가 더블 클릭으로 자체 콘솔에서 시작되면 GitPoulpi가 `ui.launch_terminal`에서 다시 열리고 종료합니다. 끄면 그 콘솔에 그대로 있습니다. |
+| `ui.relaunch_in_terminal` | `true` | Windows 전용: exe가 더블 클릭으로 자체 콘솔에서 시작되면 GitPoulpi가 `ui.launch_terminal`에서 다시 열리고 종료합니다. exe를 직접 실행하는 터미널(`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`)도 자체 콘솔이지만 고전적인 콘솔 창이 아니므로 다시 시작되지 않습니다. 끄면 그 콘솔에 그대로 있습니다. |
 | `ui.reuse_window` | `true` | GitPoulpi 바로 가기(`gitpoulpi launch`)를 클릭하면 새로 시작하지 않고 이미 열려 있는 GitPoulpi의 창을 보여 줍니다. 끄면 클릭할 때마다 새 창을 시작합니다. |
 
 **`ui.open_in` 명령**은 먼저 인수로 분할되고(공백, `'...'`, `"..."`), 그다음 각 인수 안에서 변수가 치환되므로 공백이 있는 폴더도 하나의 인수로 유지됩니다. 명령이 셸을 시작하지 않는 한(`sh -c '... "$GITPOULPI_CWD"'`) 셸은 사용되지 않습니다. 변수: `${cwd}`(탭의 폴더), `${repo}`(저장소 루트), `${name}`(폴더의 기본 이름), `${branch}`(detached 상태에서는 비어 있음), `${web_url}`(`origin` 리모트가 GitHub 또는 GitLab 프로젝트이면 그 웹 페이지, 아니면 비어 있음. 이를 사용하는 항목은 비어 있으면 실행을 거부함), `${env:NAME}`(설정되지 않았으면 비어 있음). 예전 `{repo}`는 여전히 `${cwd}`를 뜻합니다. 그 밖의 `${...}`는 그 이름을 알려 주는 오류입니다. 예시:
@@ -320,7 +321,8 @@ review_requests = true    # requests waiting for my review, every repository
 open_requests = false     # every open request of my namespaces
 include_drafts = false    # keep draft requests in these lists
 assigned_issues = true    # open issues assigned to me, every repository
-namespaces = ["acme"]     # orgs / groups to search for open requests
+namespaces = ["acme", "ptm/produits"]  # one entry per line in Settings; empty = no limit
+namespaces_regex = false  # true: each entry is a regular expression over the full repository path
 review_mode = "ask"       # ask | clone | api
 ```
 
@@ -330,7 +332,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | 내 네임스페이스와 내가 속한 각 org 또는 그룹(또는 `namespaces`)의 열린 요청 전부. "토큰이 볼 수 있는 모든 것"은 아닙니다 |
 | `include_drafts` | `false` | 이 값을 켜지 않으면 초안 요청은 이 목록에서 제외됩니다 |
 | `assigned_issues` | `false` | 나에게 할당된 열린 이슈, 모든 저장소 |
-| `namespaces` | `[]` | `open_requests`를 검색할 org / 그룹. 비어 있으면 내 네임스페이스와 소속된 모든 곳(GitHub: 최대 12개 검색, GitLab: 그룹 10개와 소유 프로젝트 10개, Gitea, Forgejo, Gerrit: 10개. Azure DevOps는 프로젝트 이름, Bitbucket Data Center는 프로젝트 키, Gerrit은 프로젝트 경로 접두사를 받습니다) |
+| `namespaces` | `[]` | 모든 목록(리뷰 요청, 할당된 이슈, 열린 요청)이 유지할 저장소. 비어 있으면 제한 없음이며, 이때 `open_requests`는 내 네임스페이스와 소속된 모든 곳을 검색합니다(GitHub: 최대 12개 검색, GitLab: 그룹 10개와 소유 프로젝트 10개, Gitea, Forgejo, Gerrit: 10개). 항목은 저장소의 전체 경로(`group/sub/project`, Azure DevOps는 `Project/repo`, Bitbucket Data Center는 `KEY/repo`)와 같거나 `/`에서 끝나는 경로 접두사이면 일치합니다. `ptm`은 `ptm/produits/x`를 유지하고 `ptmx/y`는 유지하지 않으며 대소문자는 무시합니다. 설정은 한 줄에 항목 하나를 보여 주며, 이전 파일에 쉼표로 구분한 문자열 하나(`"ptm, formation"`)가 있어도 계속 읽히고 목록으로 다시 저장됩니다 |
+| `namespaces_regex` | `false` | 각 `namespaces` 항목을 저장소의 전체 경로에 쓴 그대로 일치시키는 정규 표현식으로 읽습니다(그래서 `^ptm/(produits\|infra)/`는 시작에 고정되고, `^`나 `$`가 없으면 경로 어디서든 일치하며, 대소문자를 무시하려면 `(?i)`를 붙입니다). 이때 `open_requests`는 소속된 모든 곳을 검색하고 표현식이 행을 걸러 냅니다. 잘못된 표현식은 설정의 필드 아래에 표시되고 저장되지 않으며, 직접 편집한 파일에서는 메모와 함께 목록이 비게 됩니다 |
 | `review_mode` | `"ask"` | 클론되지 않은 저장소의 요청을 리뷰할 때의 동작: `ask`, `clone`(클론한 뒤 리뷰) 또는 `api`(호스트 API로 리뷰) |
 
 응답은 프로필별로 `config.toml` 옆의 `radar-account.json`에 5분간 캐시됩니다. 이 파일은 캐시이므로 삭제해도 안전합니다.

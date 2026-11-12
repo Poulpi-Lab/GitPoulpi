@@ -250,7 +250,7 @@ O painel não tem título: os cabeçalhos das colunas dizem o que ele é. Num co
 | Coluna | Mostra |
 |---|---|
 | **Ref** | Pílulas coloridas das branches e tags no commit: um ícone de portátil para local, um globo para remoto, um ícone de etiqueta para tags, `+N` quando mais refs apontam para aí. As tags são desenhadas onde estão, nunca como fantasma. Num commit sem ref, a linha sob o ponteiro mostra uma pílula esbatida com o nome da branch a que pertence; se essa branch foi eliminada, uma pílula riscada mostra o nome lido do commit de merge que a integrou (desative com **Mostrar uma branch fantasma no commit sob o rato** em Definições > Log e grafo). |
-| **Grafo** | As faixas das branches, merges e pontos de ramificação. Desenhado como imagens no kitty, Ghostty, WezTerm e iTerm2 (e também Windows Terminal e foot, através de sixel), e como carateres noutros terminais. As cores das faixas vêm do tema ou de uma paleta que escolher (consulte [Temas](themes.md)). Na sua largura mínima (um ponto de commit), a coluna fica compacta: todos os commits numa só faixa, sem linhas de branch nem de merge. |
+| **Grafo** | As faixas das branches, merges e pontos de ramificação. Desenhado como imagens no kitty, Ghostty, WezTerm, Rio, iTerm2 e nos terminais que desenham imagens sixel (Windows Terminal, foot, Tabby), e como carateres noutros terminais. As cores das faixas vêm do tema ou de uma paleta que escolher (consulte [Temas](themes.md)). Na sua largura mínima (um ponto de commit), a coluna fica compacta: todos os commits numa só faixa, sem linhas de branch nem de merge. |
 | **Mensagem** | O resumo do commit. |
 | **Autor** | O autor, com um avatar opcional. |
 | **Data** | A data do autor, no formato que escolher. |

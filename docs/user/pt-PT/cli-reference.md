@@ -13,7 +13,7 @@ as opções.
 
 | Opção | Efeito |
 |---|---|
-| `--json` | Imprime o resultado em JSON. Os erros também são JSON: `{"error": "..."}` no stdout, código de saída 1. Uma operação do git que falha acrescenta `"detail": {"operation", "command", "exit_code", "stderr"}` (o comando git executado, com os segredos ocultados, o código de saída e o fim do seu stderr; para a biblioteca git integrada `"git2": {"class", "code", "message"}`); as ferramentas MCP devolvem o mesmo objeto. Sem `--json` as linhas vão para o stderr. |
+| `--json` | Imprime o resultado em JSON. Os erros também são JSON: `{"error": "..."}` no stdout, código de saída 1. Uma operação do git que falha acrescenta `"detail": {"operation", "command", "exit_code", "stderr"}` (o comando git executado, com os segredos ocultados, o código de saída e o fim do seu stderr; para a biblioteca git integrada `"git2": {"class", "code", "message"}`), e uma falha que o daemon soube nomear acrescenta `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}` (a operação, um nome legível para ela, os seus principais argumentos com os segredos ocultados, o repositório, quem a pediu, o id do pedido e, num fetch ou push, o número da sua tarefa); as ferramentas MCP devolvem o mesmo objeto. Sem `--json` as linhas vão para o stderr. |
 | `--repo <path>` | O repositório sobre o qual atuar (predefinição: o que envolve a pasta atual, como o git). |
 | `-s, --session <name>` | A sessão (daemon) com que falar. Predefinição: derivada da raiz do repositório, de modo que tudo o que se abre dentro de um repositório partilha um daemon e dois repositórios têm dois. |
 | `--backend git2\|system` | Backend para um daemon que este comando inicia (um que já esteja a correr mantém o seu). |
@@ -167,7 +167,7 @@ e faz pop do stash, seja o que for que `general.auto_stash` diga ([Auto-stash](l
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Faz fetch do remoto predefinido, de um remoto, ou de todos. Cada fetch atualiza também o que cada remoto tem em tags (o `remote` de `tag list`) e poda esse registo mesmo sem `--prune`. `--prune-tags` (Definições: poda automática de tags) elimina também as tags locais que o remoto eliminou: só as que estavam nele, nunca uma que você não enviou; a resposta lista-as como `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; o modo é sempre passado explicitamente ao git. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Não há force simples: só `--force-with-lease`. |
-| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotos. |
+| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotos. `remote list` marca com `configured: false` um namespace de acompanhamento remoto sem remoto por trás; `remote remove` nele apaga as suas branches (anulável). |
 | `remote set-url <name> <url> [--push]`, `remote clear-push-url <name>` | URLs de fetch / push. |
 | `remote default [name]` | Mostra ou escolhe o remoto predefinido do repositório. |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | Clone (os objetos LFS são transferidos, a não ser com `--no-lfs`). `--sparse` faz checkout apenas dessas pastas e dos ficheiros da raiz; o histórico completo é transferido na mesma (veja [Checkout parcial](getting-started.md#checkout-parcial)). |

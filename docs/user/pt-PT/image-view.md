@@ -30,8 +30,8 @@ tabuleiro de xadrez.
 ## Como é desenhada
 
 Num terminal com protocolo de imagem (Kitty e Ghostty, WezTerm e iTerm2, Rio,
-mintty) a imagem é uma imagem a sério. Em qualquer outro (o Windows Terminal
-simples, o tmux, um terminal que o GitPoulpi não conheça) é desenhada com
+mintty, e os terminais sixel Windows Terminal, foot e Tabby) a imagem é uma imagem a sério. Em qualquer outro (a consola simples do Windows,
+o zellij, um terminal que o GitPoulpi não conheça) é desenhada com
 caracteres de meio bloco coloridos, com metade da resolução vertical mas legível
 em todo o lado; **Sem protocolo de imagem** pode ser definido como *Só a ficha
 de informações*. **Protocolo de imagem** na página **Log e grafo** força um.

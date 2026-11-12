@@ -259,8 +259,8 @@ Pravý panel sleduje výběr v Logu.
 **Pracovní změny** (vybraný je řádek WIP):
 
 - Název jako `4 změněné soubory na main`. Při merge s konflikty přidá počet
-  souborů v konfliktu. Červené `[✖]` vlevo zahodí všechny změny (nejdřív se
-  zeptá). Když je AI zapnuté, `[✦]` vpravo změny vysvětlí.
+  souborů v konfliktu. Červené `✖` vlevo zahodí všechny změny (nejdřív se
+  zeptá). Když je AI zapnuté, `✦` vpravo změny vysvětlí.
 - **Cesta** nebo **Strom** (plochý seznam nebo složky, `m`), **Sbalit vše**
   a **Zobrazit všechny soubory** (`a`).
 - **Soubory unstaged** a **Soubory staged**, každé s počtem a tlačítkem

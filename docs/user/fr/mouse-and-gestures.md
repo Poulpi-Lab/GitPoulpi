@@ -289,8 +289,8 @@ sélectionnée et la branche courante.
   replier.
 - **Cliquez sur Chemins ou Arbre** pour choisir une liste plate ou des dossiers.
   **Cliquez sur Tout replier** ou **Tout déplier** pour replier chaque dossier.
-- **Cliquez sur `[✖]`** à gauche du titre pour abandonner toutes les modifications
-  (demande d'abord). **Cliquez sur `[✦]`** à droite pour expliquer les modifications
+- **Cliquez sur `✖`** à gauche du titre pour abandonner toutes les modifications
+  (demande d'abord). **Cliquez sur `✦`** à droite pour expliquer les modifications
   avec l'IA.
 - **Clic droit sur un fichier** pour son menu : stage, abandon, ignorer, LFS, stasher
   le fichier, historique, blame, ouvrir dans un programme externe, copier le chemin,

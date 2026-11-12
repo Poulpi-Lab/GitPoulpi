@@ -1212,8 +1212,31 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Redo**. `Ctrl+Shift+Z` needs the kitty keyboard protocol; `Ctrl+Y` always works |
 | `.`, `Menu`, `Shift+F10` | Open the context menu of the selected row |
 
-`Ctrl+Z` and `Ctrl+Y` do nothing while a text field has the keyboard. The
-editor has its own text undo.
+### Ctrl+Z / Ctrl+Y in a text field
+
+While a text field has the keyboard, `Ctrl+Z` and `Ctrl+Y` (`Ctrl+Shift+Z`
+too) act on that field's text, never on the repository: a field that has the
+keyboard always wins, so `Ctrl+Z` in the commit message cannot undo a commit.
+Everywhere else they keep their global meaning (the undo / redo journal above).
+This holds for every text field and multi-line editor: the commit message, the
+Settings fields and text editors, the pull request and issue forms, the AI
+dialogs and every filter or search box.
+
+- **Typing** is undone a word at a time (a run of letters, a run of spaces, a
+  run of punctuation), and typing that pauses for more than a second starts a
+  new step. Backspaces in a row are one step. A paste, a cut, `Ctrl+U` /
+  `Ctrl+K`, an inserted snippet or a completion accepted is one step each.
+- An undo brings back the text, the caret and the selection. A new edit after
+  an undo drops what could have been redone.
+- Each field keeps a bounded history (the last 200 steps, about 1 MB of text),
+  and forgets it when the field is replaced from outside (a folder chosen in
+  the picker, a form reloaded) or another field takes the keyboard.
+- With nothing left to undo, `Ctrl+Z` does nothing: it never falls through to
+  the repository undo while a field has the keyboard.
+- The **Instructions editor** of the AI settings also has **Undo** and **Redo**
+  buttons, next to Save and Cancel, disabled while there is nothing to step to.
+- The code editor and the merge editor keep their own undo (`Edit: Undo`,
+  `Merge: Undo`), which also covers their picks.
 
 ## Filterable popup lists
 

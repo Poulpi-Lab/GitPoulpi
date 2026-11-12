@@ -277,8 +277,8 @@ O painel da direita acompanha a seleção no Log.
 **Alterações em andamento** (a linha WIP está selecionada):
 
 - Um título como `4 file changes on main`. Durante um merge com conflito ele acrescenta
-  o número de arquivos em conflito. Um `[✖]` vermelho à esquerda descarta todas as
-  alterações (pergunta antes). Quando a IA está ligada, um `[✦]` à direita explica as
+  o número de arquivos em conflito. Um `✖` vermelho à esquerda descarta todas as
+  alterações (pergunta antes). Quando a IA está ligada, um `✦` à direita explica as
   alterações.
 - **Caminho** ou **Árvore** (uma lista plana ou pastas, `m`), **Recolher tudo** e
   **Ver todos os arquivos** (`a`).

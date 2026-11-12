@@ -25,9 +25,9 @@ pub(crate) fn discard_all_label() -> &'static str {
 }
 /// The header's red discard button: a heavy cross (U+2716, text-default, so
 /// it carries the danger color; VS15 asks for the text presentation like
-/// the hide-in-graph eye) in brackets. One column, so the button is 3.
+/// the hide-in-graph eye) on the button fill, padded by a cell each side (no brackets): the button is 3 wide.
 /// (A wastebasket was tried; it does not render in every terminal font.)
-pub(crate) const DISCARD_GLYPH: &str = "[\u{2716}\u{FE0E}]";
+pub(crate) const DISCARD_GLYPH: &str = " \u{2716}\u{FE0E} ";
 
 /// The glyph [`render_status_header_buttons`] paints for the button.
 pub(crate) fn discard_glyph() -> &'static str {
@@ -35,7 +35,7 @@ pub(crate) fn discard_glyph() -> &'static str {
 }
 /// The header's right-hand AI sparkle button (U+2726, same family as the
 /// composer's old Generate label).
-pub(crate) const EXPLAIN_GLYPH: &str = "[\u{2726}]";
+pub(crate) const EXPLAIN_GLYPH: &str = " \u{2726} ";
 /// Empty cells between the pane's own collapse chevron (one cell in from
 /// the border, drawn by `render_pane_collapse_button`) and the discard
 /// button: a click meant for the chevron must not land on Discard All.
@@ -89,13 +89,17 @@ pub(crate) fn render_status_header_buttons(
         discard,
         discard_glyph(),
         HitTarget::StatusDiscardAllButton,
-        Style::default().fg(th().status.danger),
+        Style::default()
+            .fg(th().status.danger)
+            .bg(crate::theme::button_bg(false)),
         hits,
     );
     if ai_enabled && area.width >= 44 {
         let w = display_width(EXPLAIN_GLYPH) as u16;
         let explain = Rect::new(area.right() - 1 - w, area.y, w, 1);
-        let base = Style::default().fg(th().status.ai);
+        let base = Style::default()
+            .fg(th().status.ai)
+            .bg(crate::theme::button_bg(false));
         paint(
             frame,
             explain,

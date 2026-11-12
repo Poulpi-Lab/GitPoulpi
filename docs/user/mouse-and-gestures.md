@@ -298,8 +298,8 @@ Branch...` opens the menu for the selected ref and the current branch.
 - **Click a section title** (`Unstaged Files`, `Staged Files`) to fold it.
 - **Click Path or Tree** to choose a flat list or folders. **Click Collapse
   all** or **Expand all** to fold every folder.
-- **Click `[✖]`** at the left of the title to discard all changes (asks
-  first). **Click `[✦]`** at the right to explain the changes with AI.
+- **Click `✖`** at the left of the title to discard all changes (asks
+  first). **Click `✦`** at the right to explain the changes with AI.
 - **Right-click a file** for its menu: stage, discard, ignore, LFS, stash
   the file, history, blame, open in an external program, copy the path,
   create a patch, edit, delete. A conflicted file starts with the
@@ -472,6 +472,12 @@ under the pointer lights up in every terminal.
 
 The same kind of component gives the same pointer everywhere in the app.
 
+- **Buttons are real buttons**, in Settings (Integrations: Edit, Disconnect,
+  Remove, Browse, Delete, the snippet buttons of the instructions editor...)
+  as in dialogs: padded labels on a filled background that brightens under the
+  pointer, dimmed when disabled, never text in `[ ]`. The only brackets left
+  are the checkbox marks `[x]` / `[ ]`, which are checkboxes and take the hand
+  like any other control.
 - **The pointing hand** is on controls: buttons, checkboxes and toggles,
   comboboxes (in Settings, the issues and pull request panes, the Radar,
   dialogs), tabs and their crosses, the `+` buttons, links and references

@@ -292,8 +292,8 @@ The right pane follows the selection in the Log.
 **Working changes** (the WIP row is selected):
 
 - A title such as `4 file changes on main`. During a conflicted merge it adds
-  the number of conflicted files. A red `[✖]` at the left discards all
-  changes (asks first). When AI is on, a `[✦]` at the right explains the
+  the number of conflicted files. A red `✖` at the left discards all
+  changes (asks first). When AI is on, a `✦` at the right explains the
   changes.
 - **Path** or **Tree** (a flat list or folders, `m`), **Collapse all** and
   **View all files** (`a`).

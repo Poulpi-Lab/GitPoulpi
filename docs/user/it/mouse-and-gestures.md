@@ -303,8 +303,8 @@ il ref selezionato e il branch corrente.
   comprimerla.
 - **Clicca Percorso o Albero** per scegliere un elenco piatto o cartelle. **Clicca
   Comprimi tutto** o **Espandi tutto** per comprimere ogni cartella.
-- **Clicca `[✖]`** a sinistra del titolo per scartare tutte le modifiche (chiede
-  prima). **Clicca `[✦]`** a destra per spiegare le modifiche con l'IA.
+- **Clicca `✖`** a sinistra del titolo per scartare tutte le modifiche (chiede
+  prima). **Clicca `✦`** a destra per spiegare le modifiche con l'IA.
 - **Clic destro su un file** per il suo menu: stage, scarta, ignora, LFS, stash del
   file, cronologia, blame, apri in un programma esterno, copia il percorso, crea
   una patch, modifica, elimina. Un file in conflitto inizia con le righe **Risolvi

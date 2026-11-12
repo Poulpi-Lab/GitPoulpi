@@ -281,7 +281,7 @@ wyróżnisz.
 | Akcja | W oknie | CLI |
 |---|---|---|
 | **Opis commita** | Dodaj zmiany do poczekalni, naciśnij `✦` na prawo od pola Podsumowanie, `Ctrl+G i` albo polecenie palety `AI: Wygeneruj opis commita`. Podsumowanie i opis są wypełniane do edycji; nic nie jest zatwierdzane. | `ai commit-message` (wypisuje), `commit --ai` (zatwierdza) |
-| **Wyjaśnianie zmian** | `[✦]` w prawym górnym rogu panelu zmian roboczych (`Ctrl+G w`: zaznaczony commit, w przeciwnym razie zmiany robocze) albo pozycja menu commita *Wyjaśnij zmiany (AI)*. Okno: strzałki przewijają, `c` kopiuje, `Esc` zamyka. | `ai explain [rev] [--wip]` |
+| **Wyjaśnianie zmian** | `✦` w prawym górnym rogu panelu zmian roboczych (`Ctrl+G w`: zaznaczony commit, w przeciwnym razie zmiany robocze) albo pozycja menu commita *Wyjaśnij zmiany (AI)*. Okno: strzałki przewijają, `c` kopiuje, `Esc` zamyka. | `ai explain [rev] [--wip]` |
 | **Opis stasha** | `Ctrl+G m` otwiera pole opisu stasha; `Ctrl+G` w nim pyta model. Polecenie palety `AI: Wygeneruj opis stasha` robi jedno i drugie. | `stash push --ai` |
 | **Tytuł i opis pull requesta** | *Wygeneruj tytuł i opis* w formularzu tworzenia pull requesta (commity i diff gałęzi są czytane lokalnie). | |
 | **Rozwiązywanie konfliktów merge** | W edytorze konfliktów merge: przycisk paska narzędzi `✦ Zasugeruj`, menu prawego przycisku konfliktu *✦ Zasugeruj rozwiązanie (AI)*, `Alt+I` albo polecenie palety `AI: Zasugeruj rozwiązanie konfliktu merge`. Sugestia zastępuje region *bieżącego konfliktu* w Wyniku jako jedną edycję (oznaczoną jako edytowana, jeden krok cofania); nic nie jest zapisywane ani dodawane do poczekalni, dopóki nie zapiszesz. | `ai resolve-conflict <path> [--conflict N]` (wypisuje) |

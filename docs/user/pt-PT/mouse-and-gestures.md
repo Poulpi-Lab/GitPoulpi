@@ -313,8 +313,8 @@ a ref selecionada e a branch atual.
 - **Clique em Caminho ou Árvore** para escolher uma lista plana ou pastas.
   **Clique em Recolher tudo** ou **Expandir tudo** para recolher todas as
   pastas.
-- **Clique em `[✖]`** à esquerda do título para descartar todas as alterações
-  (pergunta primeiro). **Clique em `[✦]`** à direita para explicar as alterações
+- **Clique em `✖`** à esquerda do título para descartar todas as alterações
+  (pergunta primeiro). **Clique em `✦`** à direita para explicar as alterações
   com IA.
 - **Clique com o botão direito num ficheiro** para ver o seu menu: stage,
   descartar, ignorar, LFS, stash do ficheiro, histórico, blame, abrir num

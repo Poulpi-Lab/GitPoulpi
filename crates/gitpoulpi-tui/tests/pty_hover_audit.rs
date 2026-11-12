@@ -129,7 +129,7 @@ fn a_scrollbar_end_arrow_lights_up_under_the_pointer() {
     term.stop().unwrap();
 }
 
-/// The Discard All button is a heavy cross in brackets (the wastebasket
+/// The Discard All button is a heavy cross button (the wastebasket
 /// did not render in every font), sits two empty cells clear of the pane's
 /// collapse chevron, and lights up under the pointer.
 #[test]
@@ -137,10 +137,10 @@ fn discard_all_is_a_cross_clear_of_the_chevron_and_lights_up() {
     let repo = fixture();
     let (mut term, _config) = launch(repo.root(), "pty-hover-trash");
     let screen = term
-        .wait_for("the header trash", STEP, |s| s.contains("[\u{2716}"))
+        .wait_for("the header trash", STEP, |s| s.contains(" \u{2716}"))
         .unwrap_or_else(|e| panic!("{e}"));
     term.wait_for_mouse_capture(STEP).unwrap();
-    let (col, row) = screen.find("[\u{2716}").unwrap();
+    let (col, row) = screen.find(" \u{2716}").unwrap();
     let (chev, chev_row) = screen.find("\u{203A}").expect("the Status pane's chevron");
     assert_eq!(chev_row, row, "chevron and button share the header row");
     assert!(
@@ -151,6 +151,88 @@ fn discard_all_is_a_cross_clear_of_the_chevron_and_lights_up() {
     term.move_to(col + 1, row).unwrap();
     term.wait_for("the trash filled", STEP, |s| bg(s, col + 1, row) != before)
         .unwrap_or_else(|e| panic!("{e}"));
+    term.stop().unwrap();
+}
+
+/// Every `OSC 22` pointer shape the program asked for, in order ("" is the
+/// reset).
+fn pointer_shapes(term: &Terminal) -> Vec<String> {
+    let raw = String::from_utf8_lossy(&term.raw_output()).to_string();
+    raw.split("\x1b]22;")
+        .skip(1)
+        .map(|s| s.split("\x1b\\").next().unwrap_or("").to_string())
+        .collect()
+}
+
+/// The clickable-control audit: on Settings > Integrations (the Radar block of
+/// a connected profile) every control answers with the pointer of its kind,
+/// the checkboxes (including Regular expressions) and the Ask list the hand,
+/// the Namespaces area the text cursor, and no button is bracketed text.
+#[test]
+fn the_integrations_controls_show_their_pointer_and_no_button_is_bracketed() {
+    const PROFILE: &str = "[[integrations]]\nid = \"work\"\nkind = \"github\"\n\
+        url = \"https://github.com\"\ntoken_ref = \"integration:work\"\nname = \"WorkAccount\"\n\n\
+        [integrations.user]\nlogin = \"kai\"\nname = \"Kai\"\nid = \"7\"\n";
+    let repo = fixture();
+    let (mut term, _config) = common::launch(repo.root())
+        .session("pty-hover-audit-integrations")
+        .config(PROFILE)
+        .size(180, 60)
+        .no_exit_pause()
+        .ready_when("the fixture's log", |s| s.contains("add many"))
+        .start();
+    term.send_keys("C-p").unwrap();
+    term.send_text("Radar Options of a Profile").unwrap();
+    term.wait_for("the palette narrowed", STEP, |s| {
+        s.contains("Command Palette (1/")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Enter").unwrap();
+    let screen = term
+        .wait_for("the Radar block of the profile", STEP, |s| {
+            s.contains("Requests waiting for my review")
+                && s.contains("Regular expressions")
+                && s.contains("e.g. acme, platform")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The marks of checkboxes aside, nothing is bracketed.
+    let bare = screen
+        .text()
+        .replace("[x]", "   ")
+        .replace("[ ]", "   ");
+    assert!(
+        !bare.contains("[ ") && !bare.contains(" ]") && !bare.contains("[+"),
+        "a bracketed button:\n{}",
+        screen.text()
+    );
+    term.wait_for_mouse_capture(STEP).unwrap();
+    let hover = |term: &mut Terminal, what: &str, (col, row): (u16, u16), want: &str| {
+        term.move_to(col, row).unwrap();
+        let deadline = std::time::Instant::now() + STEP;
+        while pointer_shapes(term).last().map(String::as_str) != Some(want)
+            && std::time::Instant::now() < deadline
+        {
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
+        assert_eq!(
+            pointer_shapes(term).last().map(String::as_str),
+            Some(want),
+            "over {what}: {:?}\n{}",
+            pointer_shapes(term),
+            term.text()
+        );
+    };
+    for label in [
+        "Requests waiting for my review",
+        "Include drafts",
+        "Regular expressions",
+    ] {
+        let (c, r) = screen.find(label).unwrap_or_else(|| panic!("no {label}"));
+        // On the label, not only on the mark.
+        hover(&mut term, label, (c + 1, r), "pointer");
+    }
+    let (c, r) = screen.find("e.g. acme, platform").unwrap();
+    hover(&mut term, "the Namespaces area", (c + 1, r), "text");
     term.stop().unwrap();
 }
 

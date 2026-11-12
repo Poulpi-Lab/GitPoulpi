@@ -250,8 +250,8 @@ Der rechte Bereich folgt der Auswahl im Log.
 **Änderungen** (die WIP-Zeile ist ausgewählt):
 
 - Ein Titel wie `4 Dateiänderungen auf main`. Bei einem Merge im Konflikt kommt die
-  Zahl der Dateien im Konflikt hinzu. Ein rotes `[✖]` links verwirft alle
-  Änderungen (fragt vorher nach). Ist die KI an, erklärt ein `[✦]` rechts die
+  Zahl der Dateien im Konflikt hinzu. Ein rotes `✖` links verwirft alle
+  Änderungen (fragt vorher nach). Ist die KI an, erklärt ein `✦` rechts die
   Änderungen.
 - **Pfad** oder **Baum** (eine flache Liste oder Ordner, `m`), **Alle einklappen**
   und **Alle Dateien ansehen** (`a`).

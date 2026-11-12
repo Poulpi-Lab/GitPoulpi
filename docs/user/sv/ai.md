@@ -284,7 +284,7 @@ hovrar eller markerar den.
 | Åtgärd | I fönstret | CLI |
 |---|---|---|
 | **Commit-meddelande** | Stagea ändringar, tryck på `✦` till höger om fältet Sammanfattning, `Ctrl+G i`, eller palettens `AI: Generera commit-meddelande`. Sammanfattning och beskrivning fylls i så att du kan redigera dem; ingenting commitas. | `ai commit-message` (skriver ut), `commit --ai` (commitar) |
-| **Förklara ändringar** | `[✦]` uppe till höger i rutan för lokala ändringar (`Ctrl+G w`: den valda commiten, annars de lokala ändringarna), eller en commits menyval *Förklara ändringar (AI)*. En popup: piltangenter rullar, `c` kopierar, `Esc` stänger. | `ai explain [rev] [--wip]` |
+| **Förklara ändringar** | `✦` uppe till höger i rutan för lokala ändringar (`Ctrl+G w`: den valda commiten, annars de lokala ändringarna), eller en commits menyval *Förklara ändringar (AI)*. En popup: piltangenter rullar, `c` kopierar, `Esc` stänger. | `ai explain [rev] [--wip]` |
 | **Stash-meddelande** | `Ctrl+G m` öppnar stash-prompten; `Ctrl+G` i den frågar modellen. Palettens `AI: Generera stash-meddelande` gör båda. | `stash push --ai` |
 | **Titel och beskrivning av pull request** | *Generera titel och beskrivning* i formuläret Skapa pull request (grenens commits och diff läses lokalt). | |
 | **Lösning av merge-konflikter** | I merge-konfliktredigeraren: verktygsfältsknappen `✦ Föreslå`, en konflikts högerklicksmeny *✦ Föreslå lösning (AI)*, `Alt+I`, eller palettens `AI: Föreslå lösning på merge-konflikt`. Förslaget ersätter den *aktuella konfliktens* område i Resultat som en enda redigering (markerad som redigerad, ett steg i Ångra); ingenting sparas eller stageas förrän du sparar. | `ai resolve-conflict <path> [--conflict N]` (skriver ut) |

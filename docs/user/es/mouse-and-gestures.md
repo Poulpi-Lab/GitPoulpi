@@ -314,8 +314,8 @@ rama actual.
   staged`) para plegarla.
 - **Haz clic en Ruta o Árbol** para elegir una lista plana o carpetas. **Haz clic
   en Contraer todo** o **Expandir todo** para plegar todas las carpetas.
-- **Haz clic en `[✖]`** a la izquierda del título para descartar todos los cambios
-  (pregunta antes). **Haz clic en `[✦]`** a la derecha para explicar los cambios
+- **Haz clic en `✖`** a la izquierda del título para descartar todos los cambios
+  (pregunta antes). **Haz clic en `✦`** a la derecha para explicar los cambios
   con IA.
 - **Clic derecho en un archivo** para ver su menú: stage, descartar, ignorar, LFS,
   stash del archivo, historial, blame, abrir en un programa externo, copiar la

@@ -288,8 +288,8 @@ El panel derecho sigue a la selección del Log.
 **Cambios de trabajo** (la fila WIP está seleccionada):
 
 - Un título como `4 archivos con cambios en main`. Durante un merge con conflictos añade
-  el número de archivos en conflicto. Un `[✖]` rojo a la izquierda descarta todos
-  los cambios (pregunta antes). Cuando la IA está activada, un `[✦]` a la derecha
+  el número de archivos en conflicto. Un `✖` rojo a la izquierda descarta todos
+  los cambios (pregunta antes). Cuando la IA está activada, un `✦` a la derecha
   explica los cambios.
 - **Ruta** o **Árbol** (lista plana o carpetas, `m`), **Contraer todo** y **Ver
   todos los archivos** (`a`).

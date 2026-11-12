@@ -270,8 +270,8 @@ voor de geselecteerde ref en de huidige branch.
   klappen.
 - **Klik op Pad of Boom** om een platte lijst of mappen te kiezen. **Klik op Alles
   inklappen** of **Alles uitklappen** om elke map in of uit te klappen.
-- **Klik op `[✖]`** links van de titel om alle wijzigingen te verwerpen (vraagt eerst).
-  **Klik op `[✦]`** rechts om de wijzigingen met AI uit te leggen.
+- **Klik op `✖`** links van de titel om alle wijzigingen te verwerpen (vraagt eerst).
+  **Klik op `✦`** rechts om de wijzigingen met AI uit te leggen.
 - **Klik met rechts op een bestand** voor zijn menu: stagen, verwerpen, negeren, LFS, het
   bestand stashen, geschiedenis, blame, openen in een extern programma, het pad kopiëren,
   een patch maken, bewerken, verwijderen. Een conflicterend bestand begint met de rijen

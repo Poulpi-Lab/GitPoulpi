@@ -224,9 +224,10 @@ fn use_the_draft_fills_finish_review_and_the_host_gets_the_approval_and_two_comm
             s.contains("AI review draft")
                 && s.contains("Looks good once the two remarks")
                 && s.contains("Use draft...")
+                && s.contains("Approve")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(screen.contains("Approve"), "{}", screen.text());
+    let _ = screen;
     assert!(
         repo_state(&repo).contains("Looks good once the two remarks"),
         "the draft is kept like a pending comment:\n{}",
@@ -239,16 +240,12 @@ fn use_the_draft_fills_finish_review_and_the_host_gets_the_approval_and_two_comm
         .wait_for("Finish review filled", STEP, |s| {
             s.contains("2 pending comments will be sent.")
                 && s.contains("Looks good once the two remarks")
+                && s.text()
+                    .lines()
+                    .any(|l| l.contains("Verdict") && l.contains("Approve"))
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        screen
-            .text()
-            .lines()
-            .any(|l| l.contains("Verdict") && l.contains("Approve")),
-        "{}",
-        screen.text()
-    );
+    let _ = screen;
     assert!(!mock.saw("POST", "/approve"), "nothing sent yet");
 
     term.send_keys("C-s").expect("submit");

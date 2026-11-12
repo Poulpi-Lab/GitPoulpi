@@ -116,7 +116,18 @@ pub(crate) fn open_from_menu(term: &mut Terminal) {
 pub(crate) fn open_files(term: &mut Terminal) {
     term.send_keys("M-2").expect("Alt+2");
     term.wait_for("the diff and its thread", STEP, |s| {
-        s.contains("let moons = Vec::new();") && s.contains("Why a Vec here and not a slice?")
+        let (Some((_, code)), Some((_, thread))) = (
+            s.find("let moons = Vec::new();"),
+            s.find("Why a Vec here and not a slice?"),
+        ) else {
+            return false;
+        };
+        // The whole picture: both files, the thread under its line, the
+        // added lines a test clicks next.
+        thread > code
+            && s.contains("src/planets.rs")
+            && s.contains("docs/moons.md")
+            && s.contains("moons.push(1);")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 }
@@ -132,7 +143,12 @@ fn a_merge_request_is_reviewed_in_the_app_and_the_pending_review_reaches_the_hos
     // verdicts submitted so far.
     let screen = term
         .wait_for("the overview loaded", STEP, |s| {
-            s.contains("Looks promising, one question inline.") && s.contains("approved")
+            s.contains("Looks promising, one question inline.")
+                && s.contains("approved")
+                && s.contains("main \u{2190} feature/moons")
+                && s.contains("Adds the moons column")
+                && s.contains("Conversation (")
+                && s.contains("Finish review")
         })
         .unwrap_or_else(|e| panic!("{e}"));
     for want in [

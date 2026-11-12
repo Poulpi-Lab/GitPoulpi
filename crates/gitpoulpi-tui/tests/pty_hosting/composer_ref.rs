@@ -1,7 +1,10 @@
 use crate::mock::*;
 use crate::support::*;
 use gitpoulpi_testkit::{FixtureRepo, FixtureRepoBuilder};
-use xtask::pty::Terminal;
+use std::time::Duration;
+use xtask::pty::{Screen, Terminal};
+
+use crate::common;
 
 // -- the composer's "Insert issue reference" picker (more-providers S11) --------
 
@@ -69,19 +72,49 @@ fn popup_row(screen: &xtask::pty::Screen, text: &str) -> (u16, u16) {
         .unwrap_or_else(|| panic!("no {text:?}:\n{}", screen.text()))
 }
 
-fn wait_popup(term: &Terminal) -> xtask::pty::Screen {
+/// The popup is up with the branch row above the issue row (one whole
+/// picture, not two strings from two torn frames).
+fn popup_ready(s: &Screen) -> bool {
+    let branch = s.find_all(POPUP_BRANCH_ROW);
+    let issue = s.find_all(POPUP_ISSUE_ROW);
+    match (branch.last(), issue.iter().max_by_key(|(c, _)| *c)) {
+        (Some(&(_, b)), Some(&(_, i))) => b < i,
+        _ => false,
+    }
+}
+
+fn wait_popup(term: &Terminal) -> Screen {
     term.wait_for("the picker with the branch row first", STEP, |s| {
-        s.contains(POPUP_BRANCH_ROW) && s.contains(POPUP_ISSUE_ROW)
+        popup_ready(s)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()))
+}
+
+/// Clicks the `#` button until the picker shows (a click on a torn frame can
+/// be lost).
+fn open_picker(term: &mut Terminal) -> Screen {
+    common::retry_until(
+        term,
+        "the picker with the branch row first",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if screen.contains(POPUP_BRANCH_ROW) {
+                return;
+            }
+            if let Some((col, row)) = screen.find("#\u{25BE}") {
+                t.click(col, row).expect("click the # button");
+            }
+        },
+        popup_ready,
+    )
 }
 
 #[test]
 fn the_hash_button_lists_the_branch_issue_first_and_enter_inserts_it() {
     let (mut term, _config, _repo, _mock) = linked("pty-hosting-composer-ref-button");
-    let (col, row) = term.screen().find("#\u{25BE}").unwrap();
-    term.click(col, row).expect("click the # button");
-    let screen = wait_popup(&term);
+    let screen = open_picker(&mut term);
     let (_, branch_row) = popup_row(&screen, POPUP_BRANCH_ROW);
     let (_, issue_row) = popup_row(&screen, POPUP_ISSUE_ROW);
     assert!(
@@ -137,13 +170,22 @@ fn the_palette_opens_the_picker_and_escape_leaves_the_message_alone() {
 #[test]
 fn a_click_on_a_popup_row_inserts_it_and_does_not_fall_through() {
     let (mut term, config, _repo, _mock) = linked("pty-hosting-composer-ref-click");
-    let (col, row) = term.screen().find("#\u{25BE}").unwrap();
-    term.click(col, row).expect("click the # button");
-    let screen = wait_popup(&term);
-    let (c, r) = popup_row(&screen, POPUP_ISSUE_ROW);
+    open_picker(&mut term);
     // A searchable popup: a double click picks the row.
-    term.double_click(c + 2, r)
-        .expect("double-click the #12 row");
+    common::retry_until(
+        &mut term,
+        "the picker closed by the double click",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if screen.contains(POPUP_BRANCH_ROW) {
+                let (c, r) = popup_row(&screen, POPUP_ISSUE_ROW);
+                t.double_click(c + 2, r).expect("double-click the #12 row");
+            }
+        },
+        |s| !s.contains(POPUP_BRANCH_ROW),
+    );
     term.send_text("go").unwrap();
     term.wait_for("#12 in the Summary, the picker closed", STEP, |s| {
         s.contains("#12 go") && s.find_all(POPUP_ISSUE_ROW).len() == 1

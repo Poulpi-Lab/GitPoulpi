@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::mock::*;
 use crate::support::*;
 
@@ -98,33 +100,45 @@ fn the_pull_request_filter_is_still_there_after_many_presses() {
             "round {round}: the filter row has its arrow: {line:?}\n{}",
             screen.text()
         );
-        let (col, _) = screen.find("PULL REQUESTS").unwrap();
-        term.click(col + 4, filter_row).expect("click the filter");
         let want = labels[round % 3];
-        let opened = term
-            .wait_for("the filter dropdown", STEP, |s| {
-                // The popup: Open / Merged / closed / All on three rows.
-                s.find_all("Merged / closed").into_iter().any(|(_, r)| {
-                    r > filter_row
-                        && s.line(r - 1).contains("Open")
-                        && s.line(r + 1).contains("All")
-                })
+        // The popup: Open / Merged / closed / All on three rows.
+        let popup_open = |s: &xtask::pty::Screen| {
+            s.find_all("Merged / closed").into_iter().any(|(_, r)| {
+                r > filter_row && s.line(r - 1).contains("Open") && s.line(r + 1).contains("All")
             })
-            .unwrap_or_else(|e| panic!("round {round}: {e}"));
-        // Click the choice: the popup row that says exactly `want`.
-        let (pc, pr) = opened
-            .find_all(want)
-            .into_iter()
-            .find(|(_, r)| *r > filter_row)
-            .unwrap_or_else(|| panic!("round {round}: {want} not in the popup\n{}", opened.text()));
-
-        term.click(pc + 2, pr).expect("pick a choice");
-        term.wait_for("the dropdown closed with the choice shown", STEP, |s| {
-            pulls_ready_narrow(s)
-                && !(s.contains("Merged / closed") && s.find_all("Merged / closed").len() >= 2)
-                && s.line(filter_row).contains(want.split(' ').next().unwrap())
-        })
-        .unwrap_or_else(|e| panic!("round {round}: {e}"));
+        };
+        // One loop, not "open, then pick": a torn frame can still show the
+        // last round's popup (its cells are repainted a frame later), so
+        // "the popup is open" can hold on a screen where it is already
+        // closed. Each attempt looks at the screen it finds: a popup is
+        // picked from, anything else gets the filter clicked open. A click
+        // lost to a torn frame is just another attempt.
+        crate::common::retry_until(
+            &mut term,
+            "the dropdown closed with the choice shown",
+            10,
+            Duration::from_secs(4),
+            |t| {
+                let screen = t.screen();
+                if popup_open(&screen) {
+                    // The popup row that says exactly `want`.
+                    if let Some((pc, pr)) = screen
+                        .find_all(want)
+                        .into_iter()
+                        .find(|(_, r)| *r > filter_row)
+                    {
+                        t.click(pc + 2, pr).expect("pick a choice");
+                    }
+                } else if let Some((col, _)) = screen.find("PULL REQUESTS") {
+                    t.click(col + 4, filter_row).expect("click the filter");
+                }
+            },
+            |s| {
+                pulls_ready_narrow(s)
+                    && !(s.contains("Merged / closed") && s.find_all("Merged / closed").len() >= 2)
+                    && s.line(filter_row).contains(want.split(' ').next().unwrap())
+            },
+        );
     }
     assert!(mock.saw("GET", "state=opened"), "{:?}", mock.requests());
     assert!(mock.saw("GET", "state=all"), "{:?}", mock.requests());

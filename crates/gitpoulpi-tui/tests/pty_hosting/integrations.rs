@@ -201,17 +201,14 @@ fn connecting_jira_cloud_without_an_email_asks_for_it() {
     term.send_keys("Tab").unwrap();
     term.send_keys("Tab").unwrap();
     term.send_text("tok").unwrap();
-    let screen = term
-        .wait_for("Connect disabled hint reachable", STEP, |s| {
-            s.contains("[ Connect ]")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen.find("[ Connect ]").unwrap();
-    term.click(c + 2, r).unwrap();
-    term.wait_for("the email error", STEP, |s| {
-        s.contains("Enter your Atlassian account email first.")
+    term.wait_for("Connect disabled hint reachable", STEP, |s| {
+        s.contains("[ Connect ]")
     })
     .unwrap_or_else(|e| panic!("{e}"));
+    // A click on a torn frame can be lost: re-locate and retry.
+    crate::common::click_text_until(&mut term, "[ Connect ]", "the email error", |s| {
+        s.contains("Enter your Atlassian account email first.")
+    });
     assert!(!mock.saw("GET", "/myself"));
     term.stop().unwrap();
 }

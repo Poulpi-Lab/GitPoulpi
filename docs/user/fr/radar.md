@@ -61,7 +61,7 @@ fenêtre. Quand deux dépôts ont le même nom de dossier, le dossier parent est
 Un périmètre de dossier cherche des dépôts **sur deux niveaux** : les dossiers placés directement dedans, et les dossiers
 à l'intérieur de ceux qui ne sont pas eux-mêmes des dépôts (`~/src/work/app`). Les dossiers cachés sont ignorés, on n'entre
 jamais dans un dépôt, et 200 dépôts au plus sont listés. La recherche se fait en arrière-plan, jamais sur le thread qui
-dessine, et son résultat est gardé jusqu'à l'actualisation : le bouton Actualiser, `r` ou `Radar : Actualiser` relance
+dessine, et son résultat est gardé jusqu'à l'actualisation : le bouton Actualiser, `r`, `F5` (la touche d'actualisation de la fenêtre, réassignable) ou `Radar : Actualiser` relance
 la recherche dans le dossier (un dépôt cloné entre-temps apparaît alors).
 
 L'hébergeur reste facultatif pour chaque dépôt : un dépôt du dossier qui n'est **pas lié** à un hébergeur n'est jamais
@@ -209,7 +209,7 @@ a toujours une touche et une jumelle dans la palette.
 | Afficher ou masquer les demandes des dépôts non clonés | `a` | `Radar : Afficher les demandes non clonées` |
 | Afficher ou masquer les brouillons des lignes à l'échelle du compte | `d` | `Radar : Afficher les brouillons` |
 | Activer les demandes de relecture à l'échelle du compte d'un hébergeur | `T` / `Enter` sur sa ligne d'invite / **Activer** | `Radar : Activer les relectures du compte...` |
-| Actualiser | `r` | `Radar : Actualiser` |
+| Actualiser | `r`, `F5` | `Radar : Actualiser` |
 | Le menu de la ligne | `.` | `Radar : Menu de la ligne...` |
 | Retour à l'accueil | `Esc` | `Radar : Retour à l'accueil` |
 
@@ -272,6 +272,8 @@ la [référence de configuration](config-reference.md) et la [référence CLI](c
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center et Gerrit répondent ; Bitbucket Cloud n'a pas de point d'accès
 à l'échelle du compte, donc ses demandes ne s'affichent que pour les dépôts liés du périmètre.
 
+Les **Espaces de noms** du profil limitent toutes ses listes à certains dépôts (Paramètres > Intégrations > Radar : une zone de texte avec une entrée par ligne, et une case **Expressions régulières**). Une ligne correspond au chemin complet d'un dépôt quand elle lui est égale ou en est un préfixe qui s'arrête à un `/` : `ptm` garde `ptm/produits/x` et écarte `ptmx/y` et `formation/y`. Avec la case cochée, chaque ligne est une expression régulière appliquée au chemin complet tel que vous l'écrivez (`^ptm/(produits|infra)/`) ; une ligne invalide s'affiche sous le champ et n'est pas enregistrée. Vide signifie pas de limite.
+
 Comment les lignes sont placées :
 
 - Une ligne que le périmètre liste déjà (même hébergeur, projet, type et numéro) apparaît une seule fois : **la
@@ -327,7 +329,7 @@ Deux cases à côté du filtre (elles apparaissent dès qu'une liste à l'échel
 Les deux sont sur les badges `Ctrl+N` et dans la palette (`Radar : Afficher les demandes non clonées`, `Radar : Afficher les brouillons`).
 
 La réponse d'un profil est gardée dans `radar-account.json` pendant **5 minutes** : rouvrir le Radar dans ce
-délai montre les lignes sans interroger l'hébergeur. **Actualiser** (`r`) interroge toujours. Un hébergeur qui a demandé de ralentir
+délai montre les lignes sans interroger l'hébergeur. **Actualiser** (`r` ou `F5`) interroge toujours : chaque dépôt et chaque liste à l'échelle du compte, quel que soit l'âge de la dernière réponse. Un hébergeur qui a demandé de ralentir
 ou refusé le jeton n'est pas réinterrogé au même tour. Au plus 300 lignes sont gardées par profil et par type,
 et une ligne sous **Dépôts** dit combien d'autres existaient, ou pourquoi un profil n'a pas pu être lu
 (**Reconnecter** ouvre Paramètres > Intégrations).

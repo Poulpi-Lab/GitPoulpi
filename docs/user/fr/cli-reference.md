@@ -13,7 +13,7 @@ donne chaque option.
 
 | Option | Effet |
 |---|---|
-| `--json` | Affiche le résultat en JSON. Les erreurs aussi sont en JSON : `{"error": "..."}` sur stdout, code de sortie 1. Une opération git qui échoue ajoute `"detail": {"operation", "command", "exit_code", "stderr"}` (la commande git exécutée, secrets masqués, son code de sortie et la fin de son stderr ; pour la bibliothèque git intégrée `"git2": {"class", "code", "message"}`) ; les outils MCP renvoient le même objet. Sans `--json`, les lignes vont sur stderr. |
+| `--json` | Affiche le résultat en JSON. Les erreurs aussi sont en JSON : `{"error": "..."}` sur stdout, code de sortie 1. Une opération git qui échoue ajoute `"detail": {"operation", "command", "exit_code", "stderr"}` (la commande git exécutée, secrets masqués, son code de sortie et la fin de son stderr ; pour la bibliothèque git intégrée `"git2": {"class", "code", "message"}`), et un échec que le démon a pu nommer ajoute `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}` (l'opération, son nom lisible, ses principaux arguments avec les secrets masqués, le dépôt, qui l'a demandée, l'identifiant de la requête et, pour un fetch ou un push, son numéro de tâche) ; les outils MCP renvoient le même objet. Sans `--json`, les lignes vont sur stderr. |
 | `--repo <path>` | Le dépôt sur lequel agir (par défaut : celui qui entoure le dossier courant, comme git). |
 | `-s, --session <name>` | La session (le démon) avec laquelle parler. Par défaut : déduite de la racine du dépôt, si bien que tout ce qui est ouvert dans un dépôt partage un démon et que deux dépôts en ont deux. |
 | `--backend git2\|system` | Moteur d'un démon que cette commande démarre (un démon déjà lancé garde le sien). |
@@ -167,7 +167,7 @@ fait un pop du stash, quoi que dise `general.auto_stash` ([Auto-stash](log-and-h
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch du remote par défaut, d'un remote, ou de tous. Chaque fetch rafraîchit aussi ce que chaque remote a comme tags (le `remote` de `tag list`) et élague cette trace même sans `--prune`. `--prune-tags` (Paramètres : Élagage automatique des tags) supprime aussi les tags locaux que le remote a supprimés : seulement ceux qui y étaient, jamais un tag que vous n'avez pas poussé ; la réponse les liste dans `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull ; le mode est toujours passé explicitement à git. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Il n'y a pas de force simple : seulement `--force-with-lease`. |
-| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotes. |
+| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotes. `remote list` marque `configured: false` un espace de noms de suivi qui n'a plus de remote derrière lui ; `remote remove` dessus supprime ses branches (annulable). |
 | `remote set-url <name> <url> [--push]`, `remote clear-push-url <name>` | URL de fetch / de push. |
 | `remote default [name]` | Afficher ou choisir le remote par défaut du dépôt. |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | Cloner (les objets LFS sont téléchargés sauf `--no-lfs`). `--sparse` n'extrait que ces dossiers et les fichiers à la racine ; tout l'historique est quand même téléchargé (voir [Extraction partielle](getting-started.md#extraction-partielle)). |

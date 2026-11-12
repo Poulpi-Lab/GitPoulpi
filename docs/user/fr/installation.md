@@ -17,10 +17,10 @@ GitPoulpi fournit trois exécutables :
 - Un **`git` système** dans votre `PATH`. GitPoulpi utilise libgit2 pour la
   plupart des opérations et votre `git` pour le reste.
   La version **2.34 ou plus récente** est requise. Sous macOS, le `git` des Command Line Tools d'Apple convient, tout comme celui de Homebrew.
-- Un **terminal** avec prise en charge de la souris. kitty, Ghostty, WezTerm et
-  iTerm2 (ainsi que Windows Terminal et foot, via sixel) dessinent le graphe des commits sous forme d'images. Les autres
-  terminaux (la console Windows, tmux et la plupart des autres) affichent
-  un graphe en caractères. Voir [Choisir un terminal](terminals.md).
+- Un **terminal** avec prise en charge de la souris. kitty, Ghostty, WezTerm, Rio et
+  iTerm2 (ainsi que Windows Terminal, foot et Tabby, via sixel) dessinent le graphe des commits sous forme d'images. Les autres
+  terminaux (la console Windows, zellij, screen et la plupart des autres) affichent
+  un graphe en caractères. Voir [Choisir un terminal](terminals.md) et [Multiplexeurs](multiplexers.md).
 - Une **Nerd Font** ou une police avec emoji, pour les icônes de la barre
   d'outils et du panneau latéral.
 - Facultatif : **`git-lfs`** 3.0 ou plus récent, pour les dépôts Git LFS. Sans

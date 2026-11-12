@@ -413,8 +413,8 @@ par exemple, `Ctrl+Shift+N` arrive comme `Ctrl+N`, `Ctrl+I` comme `Tab` et `Ctrl
 ... »).
 
 Les terminaux avec le **protocole clavier kitty** peuvent envoyer ces enchaînements.
-Exemples : kitty, WezTerm, Ghostty, foot, Alacritty 0.13 et plus, et tmux ou herdr quand
-ils laissent passer le protocole. GitPoulpi utilise le protocole par défaut :
+Exemples : kitty, WezTerm, Ghostty, foot, Alacritty 0.13 et plus, et zellij (tmux n'y
+répond pas : voir [Multiplexeurs](multiplexers.md#tmux)). GitPoulpi utilise le protocole par défaut :
 
 - Au démarrage, GitPoulpi interroge le terminal et attend au plus environ 100 ms la
   réponse. Si le terminal ne répond pas, les touches classiques restent.
@@ -1217,8 +1217,33 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Rétablir**. `Ctrl+Shift+Z` demande le protocole clavier kitty ; `Ctrl+Y` marche toujours |
 | `.`, `Menu`, `Shift+F10` | Ouvrir le menu contextuel de la ligne sélectionnée |
 
-`Ctrl+Z` et `Ctrl+Y` ne font rien tant qu'un champ de texte a le clavier. L'éditeur a sa
-propre annulation de texte.
+### Ctrl+Z / Ctrl+Y dans un champ de texte
+
+Tant qu'un champ de texte a le clavier, `Ctrl+Z` et `Ctrl+Y` (`Ctrl+Shift+Z` aussi)
+agissent sur le texte de ce champ, jamais sur le dépôt : un champ qui a le clavier gagne
+toujours, si bien que `Ctrl+Z` dans le message de commit ne peut pas annuler un commit.
+Partout ailleurs, ils gardent leur sens global (le journal d'annulation / rétablissement
+ci-dessus). Cela vaut pour tous les champs de texte et éditeurs multilignes : le message de
+commit, les champs et éditeurs de texte des Paramètres, les formulaires de pull request et
+de ticket, les fenêtres de l'IA et chaque filtre ou zone de recherche.
+
+- **La saisie** s'annule un mot à la fois (une suite de lettres, une suite d'espaces, une
+  suite de ponctuation), et une saisie qui s'interrompt plus d'une seconde commence une
+  nouvelle étape. Des retours arrière à la suite forment une seule étape. Un collage, un
+  couper, `Ctrl+U` / `Ctrl+K`, un modèle inséré ou une complétion acceptée forment chacun
+  une étape.
+- Une annulation rend le texte, le curseur et la sélection. Une nouvelle modification après
+  une annulation abandonne ce qui pouvait être rétabli.
+- Chaque champ garde un historique borné (les 200 dernières étapes, environ 1 Mo de texte),
+  et l'oublie quand le champ est remplacé de l'extérieur (un dossier choisi dans le
+  sélecteur, un formulaire rechargé) ou qu'un autre champ prend le clavier.
+- Quand il n'y a plus rien à annuler, `Ctrl+Z` ne fait rien : il ne retombe jamais sur
+  l'annulation du dépôt tant qu'un champ a le clavier.
+- L'**éditeur d'instructions** des paramètres de l'IA a aussi des boutons **Annuler** et
+  **Rétablir**, à côté d'Enregistrer et Annuler, désactivés tant qu'il n'y a rien à
+  parcourir.
+- L'éditeur de code et l'éditeur de merge gardent leur propre annulation (`Édition : Annuler`,
+  `Merge : Annuler`), qui couvre aussi leurs choix.
 
 ## Listes de popups filtrables
 
@@ -1230,18 +1255,21 @@ Tapez pour filtrer la liste. Ces touches déplacent la surbrillance :
 
 | Touche | Action |
 |---|---|
-| `Up` / `Down` | Avancer d'une ligne |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Monter / descendre d'une ligne |
 | `Home` / `End` | Première / dernière ligne |
 | `PageUp` / `PageDown` | Avancer d'une page visible |
 | `Enter` | Choisir la ligne en surbrillance |
 | `Esc` | Fermer |
 
 Dans ces fenêtres, `Home` et `End` déplacent la liste, pas le curseur du champ de filtre.
-`Ctrl+A` et `Ctrl+E` déplacent toujours le curseur au début et à la fin, et `Ctrl+K` supprime
-jusqu'à la fin du filtre. Aucune paire `Ctrl+lettre` ne déplace une liste (`Ctrl+N` est le
-préfixe de navigation, `Ctrl+P` la palette de commandes), et les simples `j` et `k` sont
-tapés dans le filtre : seuls les flèches, `PageUp` / `PageDown` et `Home` / `End` déplacent ici.
-Dans les listes sans champ de texte, `j` / `k` sont un moyen de plus de descendre / monter.
+`Ctrl+K` / `Ctrl+J` déplacent aussi la liste, si bien que `Ctrl+K` ne supprime plus jusqu'à
+la fin du filtre (`Ctrl+U` l'efface toujours ; dans un champ de texte ordinaire hors d'une
+liste, `Ctrl+K` continue de supprimer jusqu'à la fin de la ligne). `Ctrl+A` et `Ctrl+E`
+déplacent toujours le curseur au début et à la fin. `Ctrl+J` / `Ctrl+K` déplacent aussi
+toutes les autres listes, avec ou sans champ de texte (`Ctrl+N` est le préfixe de
+navigation et `Ctrl+P` la palette de commandes, ce ne sont donc pas des touches de liste).
+Les simples `j` et `k` sont tapés dans le filtre ; dans les listes sans champ de texte,
+`j` / `k` sont un moyen de plus de descendre / monter.
 
 À la souris :
 
@@ -1489,7 +1517,8 @@ carte « une branche est apparue » sont décrites dans les [workflows de bran
 | `Enter` / `l` sur une ligne de fichier | Ouvrir le diff du fichier au centre |
 | `Esc` / `h` | Revenir aux commits |
 | `Right` | (commit avec plus d'une ref) Ouvrir la liste de ses autres refs : `Up` / `Down` déplacent, `Enter` extrait, `Esc` ferme |
-| `f` | Ouvrir la barre de recherche (voir [Recherche](#recherche)) |
+| `f` | Ouvrir la barre de recherche (voir [Recherche](#recherche)) ; ce n'a jamais été `/`, la recherche du Log est donc inchangée |
+| `/` | Mettre le focus sur le champ de filtre des Refs (la même touche le fait quand le volet Refs a le focus) ; tapé comme un caractère quand un champ de texte a le focus |
 | `c` | (avec des modifications non commitées) Sélectionner la ligne WIP et placer le curseur dans son champ de message |
 | `Enter` sur la ligne WIP | Placer le curseur dans le champ de message de la ligne WIP |
 | `.`, `Menu`, `Shift+F10` | Le menu du commit. `Up` / `Down` déplacent, `Right` / `l` / `Enter` ouvrent un sous-menu, `Left` / `h` / `Esc` reviennent |

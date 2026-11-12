@@ -106,6 +106,71 @@ fn an_image_is_written_at_its_anchor_and_what_covers_it_goes_on_top() {
     assert!(out.ends_with("8"), "and restored last: {out:?}");
 }
 
+/// Rio answers no cell-size query behind Windows' ConPTY and its cells are
+/// twice as tall as wide (8x16, 11x21, 13x26 measured): assuming the 9x21
+/// default drew its commit markers 17 % too wide. Falsified: Rio sent to
+/// `FALLBACK` turns this red.
+#[test]
+fn rio_without_a_cell_size_is_assumed_twice_as_tall_as_wide() {
+    let rio = fallback_cell(&env(&[("TERM_PROGRAM", "rio")]));
+    assert_eq!(rio.height, 2 * rio.width);
+    // Everyone else keeps the measured default (WezTerm, the maintainer's).
+    for pairs in [
+        &[("TERM_PROGRAM", "WezTerm")][..],
+        &[("WEZTERM_EXECUTABLE", "C:\\wezterm-gui.exe")][..],
+        &[("TERM_PROGRAM", "mintty")][..],
+        &[][..],
+    ] {
+        assert_eq!(fallback_cell(&env(pairs)), CellSize::FALLBACK, "{pairs:?}");
+    }
+}
+
+const ITERM2_PICTURE: &str = "\x1b]1337;File=inline=1;width=2;height=1:AAAA\x07";
+
+fn pictures_written(sequence: &str, conpty: bool) -> String {
+    let mut out = Vec::new();
+    write_images_conpty(&mut out, &[], &[((4, 2), sequence)], &[], conpty).unwrap();
+    String::from_utf8(out).unwrap()
+}
+
+/// Behind Windows' ConPTY a hidden cursor leaves an `OSC 1337` at the cursor
+/// ConPTY last painted (measured in Rio 0.5.28: the graph and the avatars
+/// on the wrong rows, the screen scrolled). The cursor is shown for the
+/// picture, inside the same write, and hidden again.
+#[test]
+fn behind_conpty_the_cursor_is_visible_while_an_iterm2_picture_is_placed() {
+    let out = pictures_written(ITERM2_PICTURE, true);
+    let show = out.find("\x1b[?25h").expect("the cursor is shown");
+    let place = out.find("[3;5H").expect("moved to the anchor");
+    let picture = out.find("]1337;").expect("the picture");
+    let hide = out.rfind("\x1b[?25l").expect("hidden again");
+    assert!(
+        show < place && place < picture && picture < hide,
+        "wrong order: {out:?}"
+    );
+    assert!(
+        out.ends_with("\x1b[?25l"),
+        "hidden is the rest state: {out:?}"
+    );
+}
+
+#[test]
+fn the_conpty_cursor_toggle_is_only_for_iterm2_pictures_behind_conpty() {
+    // Off ConPTY nothing changes (what every other OS gets).
+    let plain = pictures_written(ITERM2_PICTURE, false);
+    assert!(!plain.contains("?25"), "{plain:?}");
+    // Sixel and kitty never pass ConPTY's OSC passthrough: untouched.
+    for other in ["\x1bPq#0;2;0;0;0~\x1b\\", "\x1b_Ga=T,f=100;AAAA\x1b\\"] {
+        assert!(!pictures_written(other, true).contains("?25"), "{other:?}");
+    }
+    // A write with no picture (a popup's cells, a kitty delete) is untouched.
+    let mut out = Vec::new();
+    write_images_conpty(&mut out, &[], &[], &[], true).unwrap();
+    assert!(!String::from_utf8(out).unwrap().contains("?25"));
+    // The real entry point asks the OS it runs on.
+    assert_eq!(conpty_anchors_pictures(), cfg!(windows));
+}
+
 /// Per terminal: WezTerm and Rio are known to blend PNG alpha (Rio measured
 /// on Linux and Windows); every other iTerm2-protocol terminal keeps the
 /// opaque backdrop.

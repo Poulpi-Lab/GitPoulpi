@@ -157,6 +157,12 @@ impl CellSize {
         height: 21,
     };
 
+    /// Cells twice as tall as wide: what [`fallback_cell`] assumes for Rio.
+    pub(crate) const HALF: CellSize = CellSize {
+        width: 10,
+        height: 20,
+    };
+
     /// Clamps a queried size into something drawable. A terminal answering
     /// `0` - or something absurd - must not make a rasteriser divide by
     /// zero or allocate a gigabyte.
@@ -308,14 +314,34 @@ pub(crate) fn cell_size() -> CellSize {
             );
         }
     }
-    CellSize::FALLBACK
+    fallback_cell(&detect::ambient_env)
+}
+
+/// What to assume when nothing says how big a cell is. Only the aspect ratio
+/// matters (the picture is sized in cells; the bitmap is drawn at twice this
+/// and scaled), and it decides whether a commit marker comes out round.
+///
+/// **Rio** has cells twice as tall as wide, at every font size and display
+/// scale measured on Windows 11 (November 2026: 8x16, 11x21 and 13x26 pixels
+/// at 14, 18 and 22.5 px fonts), and answers no cell-size query there (the
+/// pseudo-console swallows `CSI 16 t`). The default 9x21 is Cascadia Mono as
+/// WezTerm draws it, and made Rio's markers 17 % too wide.
+pub(super) fn fallback_cell<F: Fn(&str) -> Option<String>>(get: &F) -> CellSize {
+    if detect::looks_like_rio(get) {
+        CellSize::HALF
+    } else {
+        CellSize::FALLBACK
+    }
 }
 
 /// Windows + sixel only: asks the terminal for its cell size in pixels
 /// (`CSI 16 t`, bounded, see [`cell_query`]) so [`cell_size`] is right
 /// from now on; `true` when the size changed or became known. Call from
 /// the thread that reads input, never while another reader is active. A
-/// no-op when the size is forced by `GITPOULPI_TERMINAL_CELL_PX`.
+/// no-op when the size is forced by `GITPOULPI_TERMINAL_CELL_PX`. Not asked
+/// for the `OSC 1337` terminals: behind ConPTY the reply never arrives
+/// (Rio, WezTerm, mintty, measured November 2026) and the wait would be
+/// paid at every start.
 pub(crate) fn measure_cell_px(protocol: Protocol) -> bool {
     if protocol != Protocol::Sixel || forced_cell_size().is_some() {
         return false;
@@ -960,8 +986,44 @@ pub(crate) fn write_images_layered<W: std::io::Write>(
     pictures: &[((u16, u16), &str)],
     over: &[(u16, u16, ratatui::buffer::Cell)],
 ) -> std::io::Result<()> {
+    write_images_conpty(out, under, pictures, over, conpty_anchors_pictures())
+}
+
+/// Windows' pseudo-console (ConPTY) **anchors a picture at the cursor of its
+/// last painted frame, and only paints the cursor while it is visible.**
+/// An `OSC 1337` goes through ConPTY at once, ahead of the text it has not
+/// painted yet, and the `CUP` written just before it only reaches the
+/// terminal when ConPTY next paints a *visible* cursor. This TUI keeps the
+/// cursor hidden (ratatui hides it on every frame; a text field shows it),
+/// so every picture landed wherever ConPTY last left the cursor: Rio,
+/// mintty and WezTerm 20240203 drew the graph, the avatars and the image
+/// diff on the wrong rows and scrolled the screen under them. Measured in
+/// Rio 0.5.28 (November 2026): the same bytes with `ESC[?25h` written before
+/// the picture and `ESC[?25l` after it (inside the same write, so nothing
+/// flickers) land exactly on their cells; with the cursor hidden throughout
+/// they land at the stale position. Windows Terminal draws sixel (not
+/// `OSC 1337`) and is untouched, and nothing changes off Windows.
+fn conpty_anchors_pictures() -> bool {
+    cfg!(windows)
+}
+
+/// [`write_images_layered`] with the ConPTY workaround decided by the caller
+/// (`conpty`), so a test can exercise it on any OS.
+pub(crate) fn write_images_conpty<W: std::io::Write>(
+    out: &mut W,
+    under: &[(u16, u16, ratatui::buffer::Cell)],
+    pictures: &[((u16, u16), &str)],
+    over: &[(u16, u16, ratatui::buffer::Cell)],
+    conpty: bool,
+) -> std::io::Result<()> {
     use crossterm::cursor::{MoveTo, RestorePosition, SavePosition};
     use ratatui::backend::Backend;
+    // Only `OSC 1337` is affected (the other protocols never arrive through
+    // ConPTY's passthrough at all).
+    let visible = conpty && pictures.iter().any(|(_, s)| s.starts_with("\x1b]1337;"));
+    if visible {
+        crossterm::queue!(out, crossterm::cursor::Show)?;
+    }
     crossterm::queue!(out, SavePosition)?;
     if !under.is_empty() {
         let under: Vec<_> = without_continuations(under)
@@ -984,6 +1046,11 @@ pub(crate) fn write_images_layered<W: std::io::Write>(
         backend.draw(over.iter().map(|(x, y, cell)| (*x, *y, cell)))?;
     }
     crossterm::queue!(out, RestorePosition)?;
+    if visible {
+        // A text field's caret is shown again by the frame, after the
+        // pictures (`frame.rs`); hidden is the rest state.
+        crossterm::queue!(out, crossterm::cursor::Hide)?;
+    }
     out.flush()
 }
 

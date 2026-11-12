@@ -24,7 +24,7 @@ Multiplexers (tmux, zellij, screen, herdr, psmux, panes) have their own page:
 
 | OS | Best picks, in order | Why |
 |---|---|---|
-| **Windows** | **Windows Terminal**, then **WezTerm** (a build with a recent ConPTY) | Windows Terminal draws the graph and the avatars as sixel pictures, anchored right, and is the launcher's default. Official WezTerm 20240203 draws iTerm2 pictures on the wrong rows (see [Windows](#windows)). |
+| **Windows** | **Windows Terminal**, then **WezTerm** and **Rio** | Windows Terminal draws the graph and the avatars as sixel pictures, anchored right, and is the launcher's default. WezTerm and Rio draw them as iTerm2 pictures, anchored right since the November 2026 ConPTY fix (see [Windows](#windows)). |
 | **Linux** (X11, Wayland, Hyprland, Omarchy) | **kitty**, **Ghostty**, **WezTerm**, **foot**, **Rio** | kitty and Ghostty give pictures, the pointer shapes and the full keyboard. foot draws sixel pictures and has the full keyboard and the pointer shapes. |
 | **macOS** | **iTerm2**, then **kitty** and **Ghostty** | iTerm2 3.7.7 draws pictures through the kitty protocol. Terminal.app works but has neither pictures nor true color. kitty and Ghostty match their Linux behavior (not measured on macOS). |
 
@@ -142,9 +142,9 @@ on a Mac with a GPU before relying on a macOS cell.
 |---|---|---|---|
 | **kitty** | **works**: kitty protocol (GitPoulpi) | n/a | not measured (needs a GPU) |
 | **Ghostty** | **works**: kitty protocol (GitPoulpi) | n/a | not measured (needs a GPU) |
-| **WezTerm** | **works**: iTerm2 protocol with transparency (GitPoulpi). Placeholders draw squashed, so the kitty protocol is not used | official 20240203: **does not work** (OS layer: the old bundled ConPTY puts the pictures on the wrong rows). A build with a newer bundled ConPTY (upstream WezTerm PR #8092): **works** | not measured (needs a GPU) |
+| **WezTerm** | **works**: iTerm2 protocol with transparency (GitPoulpi). Placeholders draw squashed, so the kitty protocol is not used | **works**: iTerm2 protocol with transparency, graph and avatars on their rows (official 20240203 and the upstream PR #8092 build). Official 20240203 put the pictures on the wrong rows before GitPoulpi showed the cursor around them, see "The ConPTY limit". In the VM run of the official build the graph picture also sat one cell to the right (the first letter of each Log message hidden); the maintainer's own WezTerm does not show it, cause unknown (version, font or scaling) | not measured (needs a GPU) |
 | **foot** | **works**: sixel with transparency (GitPoulpi) | n/a | n/a |
-| **Rio** | **works**: iTerm2 protocol with transparency (GitPoulpi) | **does not work** (OS layer: pictures on the wrong rows, stray lines, torn screen after scrolling; ConPTY drops sixel and kitty) | not measured (needs a GPU) |
+| **Rio** | **works**: iTerm2 protocol with transparency (GitPoulpi) | **works**: iTerm2 protocol with transparency, cell-exact at every font size tried (0.5.28; GitPoulpi). Sixel and kitty never arrive (ConPTY drops them), so there is nothing to choose | not measured (needs a GPU) |
 | **Alacritty** | text: **works** (no image support in the terminal) | text: **partial** (no pictures; image diff as blocks) | text: **works** |
 | **Tabby** | **works**: sixel with transparency (probe; GitPoulpi not run in Tabby on Linux) | **works**: sixel, aligned (GitPoulpi) | **works**: sixel, transparency kept (GitPoulpi) |
 | **Warp** | not measured (it needs XWayland and mis-decodes synthetic keystrokes, so nothing could be typed) | **does not work** (terminal: no sixel, iTerm2 or kitty images); GitPoulpi not measured (could not be started from Warp's input box) | not measured (needs a GPU) |
@@ -153,7 +153,7 @@ on a Mac with a GPU before relying on a macOS cell.
 | **Terminal.app** | n/a | n/a | text: **works** (no pictures) |
 | **Windows Terminal** | n/a | **works**: sixel (GitPoulpi, 1.25) | n/a |
 | **conhost** | n/a | text: **partial** (character graph, half-block image diff) | n/a |
-| **mintty** | n/a | **does not work** (OS layer: the graph column stays blank through ConPTY; text and palette are fine) | n/a |
+| **mintty** | n/a | **does not work** (terminal behind ConPTY: no picture is drawn at all, not even a plain `OSC 1337` one placed with the cursor shown; the graph column stays blank; text and palette are fine) | n/a |
 
 ### Mouse pointer shape (OSC 22)
 
@@ -274,17 +274,26 @@ kitty 0.49.2 (macOS 0.50.0 did not start), Ghostty 1.4.0, WezTerm 20260716 on Li
 - **WezTerm.** In `wezterm.lua`, set `config.enable_kitty_keyboard = true` (Linux and
   macOS builds) and a font with emoji fallback, for example
   `config.font = wezterm.font_with_fallback { 'JetBrainsMono Nerd Font', 'Segoe UI Emoji' }`.
-  The last tagged release, 20240203-110809 (Feb 2024), draws iTerm2 pictures on the wrong
-  rows (see "The ConPTY limit" below); nightlies ship newer fixes. Upstream WezTerm PR #8092
-  adds pointer shapes.
-- **Rio** (MSI, needs UAC). Text, palette and copy work; pictures are anchored on the wrong
-  rows (ConPTY) and the screen tears after scrolling. Use
-  `ui.graph_renderer = "text"` there. Rio has no pointer shapes on any OS.
+  Pictures use the iTerm2 protocol and nothing needs to be set: the last tagged release,
+  20240203-110809 (Feb 2024), anchors them on the right rows (rechecked November 2026 with
+  the current GitPoulpi; before the ConPTY fix described below it did not; on a VM the
+  graph picture also sat one cell right of its column, which is not seen on the maintainer's
+  machine). Upstream WezTerm PR #8092 adds pointer shapes.
+- **Rio** (MSI, needs UAC). Pictures (graph, avatars, image diff) use the iTerm2 protocol
+  with transparency and land exactly on their cells: measured on 0.5.28 at its default font
+  and at 18 and 22.5 px (cells 8x16, 11x21 and 13x26 pixels, always whole pixels), a 20x10-cell and
+  a 4x27-cell picture both came out cell-exact. Nothing needs to be set. The pseudo-console
+  swallows the cell-size query, so GitPoulpi assumes Rio's cells are twice as tall as wide
+  (true at all three sizes); with a font of another proportion set
+  `GITPOULPI_TERMINAL_CELL_PX=WxH` (for example `10x24`) to get round commit markers. Rio
+  has no pointer shapes on any OS.
 - **Tabby.** Sixel graph and avatars, copy and paste work. Tabby keeps `Ctrl+Shift+N` and
   `Ctrl+,` for itself.
 - **Alacritty.** Needs OpenGL 3.3. Character graph; copy through `OSC 52` was not on with the default config.
 - **mintty** (Git Bash, MSYS2, Cygwin). Pointer shapes work (mintty's own names). Pictures
-  do not show through ConPTY (the graph column stays blank): set `ui.graph_renderer = "text"`.
+  do not show (the graph column stays blank; mintty 3.8.3 draws no `OSC 1337` picture behind
+  ConPTY even when placed by a plain probe) and it answers no cell-size query there: set
+  `ui.graph_renderer = "text"`.
 - **Warp.** Not measured with GitPoulpi: it could not be started from Warp's input box. The
   terminal has no sixel, iTerm2 or kitty images.
 - **conhost, cmd, a PowerShell window.** Character graph, half-block image diff. By default
@@ -293,14 +302,17 @@ kitty 0.49.2 (macOS 0.50.0 did not start), Ghostty 1.4.0, WezTerm 20260716 on Li
 
 **The ConPTY limit.** Windows runs every terminal's program behind a pseudo-console
 (ConPTY). Windows Terminal and WezTerm builds that bundle a recent one pass the picture
-sequences through; the one inside Windows, and the one bundled with WezTerm 20240203, do
-not. What goes wrong: the DCS (sixel) and APC (kitty graphics) sequences are dropped, so
-sixel and kitty pictures never arrive; and the iTerm2 pictures (`OSC 1337`) arrive but are
-anchored at the wrong rows, drawing the avatar column over the footer and tearing the
-screen. This hits **WezTerm official, Rio and mintty**. GitPoulpi cannot tell the ConPTY
-apart, so it cannot fall back by itself: set `ui.graph_renderer = "text"` in those
-terminals, or use Windows Terminal. For the same reason `CSI 16 t` (cell size) is only
-answered in Windows Terminal, Tabby and mintty.
+sequences through; the one inside Windows (used by Rio and mintty), and the one bundled
+with WezTerm 20240203, do not. What is lost: the DCS (sixel) and APC (kitty graphics)
+sequences are dropped, so only the iTerm2 pictures (`OSC 1337`) arrive, which is why Rio and
+WezTerm use them; `CSI 16 t` (cell size) is only answered in Windows Terminal and Tabby.
+What was fixed: an `OSC 1337` crosses ConPTY at once and lands at the cursor ConPTY last
+painted, and ConPTY paints the cursor only while it is visible. GitPoulpi keeps the cursor
+hidden, so its pictures landed on stale rows (the graph over the footer, a torn screen after
+scrolling). It now shows the cursor around each picture it writes on Windows, inside the same
+write, and hides it again; Rio and WezTerm 20240203 anchor every picture on its cell
+(`pty_conpty_picture_anchor` reads the cursor move behind ConPTY back). Nothing changes
+off Windows or for sixel.
 
 **Windows paste.** See the "Paste" table above: GitPoulpi folds a burst of key presses
 into one paste, so a multi-line paste never submits a prompt in the terminals tested.

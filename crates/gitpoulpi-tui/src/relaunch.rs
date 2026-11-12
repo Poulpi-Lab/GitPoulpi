@@ -301,13 +301,7 @@ mod tests {
         // The loop guard.
         assert!(!should_relaunch(true, true, Some(1), OWN, WT));
         // The plain console is already where we are; nothing found, stay.
-        assert!(!should_relaunch(
-            true,
-            false,
-            Some(1),
-            OWN,
-            Some("console")
-        ));
+        assert!(!should_relaunch(true, false, Some(1), OWN, Some("console")));
         assert!(!should_relaunch(true, false, Some(1), OWN, None));
     }
 

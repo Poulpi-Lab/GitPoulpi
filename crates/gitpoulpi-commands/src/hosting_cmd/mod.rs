@@ -1270,10 +1270,7 @@ mod tests {
         let out = block_on(login(&env, None, "tok")).unwrap();
         assert_eq!(out.json["user"]["login"], "octo");
         assert_eq!(out.json["stored"], "session");
-        assert_eq!(
-            out.json["store_error"],
-            "no credential helper configured"
-        );
+        assert_eq!(out.json["store_error"], "no credential helper configured");
         assert!(out.human.contains("this session only"), "{}", out.human);
     }
 

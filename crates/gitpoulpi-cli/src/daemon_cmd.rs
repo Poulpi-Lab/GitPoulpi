@@ -25,8 +25,15 @@ const PROBE_TIMEOUT: Duration = Duration::from_millis(250);
 /// answer before falling back to a PID kill.
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(5);
 /// How long `daemon start` waits for the detached process to publish its
-/// port file and start accepting connections.
-const START_TIMEOUT: Duration = Duration::from_secs(5);
+/// port file and start accepting connections. Generous: a slow machine (cold
+/// disk, an antivirus scanning the new process) took more than 5 s while the
+/// daemon did come up. A fast start returns at the first poll that sees it.
+const START_TIMEOUT: Duration = Duration::from_secs(20);
+/// How often `daemon start` looks at the discovery file.
+const START_POLL: Duration = Duration::from_millis(100);
+/// The connect timeout of the last look after `START_TIMEOUT`: patient, since
+/// a loaded machine can take longer than `PROBE_TIMEOUT` to accept.
+const FINAL_PROBE_TIMEOUT: Duration = Duration::from_secs(3);
 
 fn backend_flag(backend: DefaultBackend) -> &'static str {
     match backend {
@@ -70,8 +77,12 @@ fn config_paths(json_output: bool) -> ConfigPaths {
 
 /// A TCP connect, not a file check - see `session.rs`'s twin of this.
 async fn is_listening(port: u16) -> bool {
+    is_listening_within(port, PROBE_TIMEOUT).await
+}
+
+async fn is_listening_within(port: u16, timeout: Duration) -> bool {
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
-    tokio::time::timeout(PROBE_TIMEOUT, TcpStream::connect(addr))
+    tokio::time::timeout(timeout, TcpStream::connect(addr))
         .await
         .map(|r| r.is_ok())
         .unwrap_or(false)
@@ -80,9 +91,33 @@ async fn is_listening(port: u16) -> bool {
 /// The port this session's daemon is actually listening on, if its
 /// discovery file names one that is still live.
 async fn live_port(paths: &ConfigPaths, session: &str) -> Option<u16> {
+    live_port_within(paths, session, PROBE_TIMEOUT).await
+}
+
+async fn live_port_within(paths: &ConfigPaths, session: &str, probe: Duration) -> Option<u16> {
     let raw = std::fs::read_to_string(paths.ipc_port_file(session)).ok()?;
     let port: u16 = raw.trim().parse().ok()?;
-    is_listening(port).await.then_some(port)
+    is_listening_within(port, probe).await.then_some(port)
+}
+
+/// Calls `probe` every `interval` until it answers `Some` or `timeout`
+/// passes (the probe always runs at least once). The wait of `daemon start`,
+/// apart from the clock and the discovery file so it can be tested.
+async fn wait_for<T, F, Fut>(timeout: Duration, interval: Duration, mut probe: F) -> Option<T>
+where
+    F: FnMut() -> Fut,
+    Fut: std::future::Future<Output = Option<T>>,
+{
+    let deadline = tokio::time::Instant::now() + timeout;
+    loop {
+        if let Some(found) = probe().await {
+            return Some(found);
+        }
+        if tokio::time::Instant::now() >= deadline {
+            return None;
+        }
+        tokio::time::sleep(interval).await;
+    }
 }
 
 /// The endpoint of `session`'s daemon on `port`, with its token.
@@ -441,19 +476,20 @@ async fn start_one(
     // never will).
     std::mem::drop(child);
 
-    let port_file = paths.ipc_port_file(session);
-    let deadline = tokio::time::Instant::now() + START_TIMEOUT;
-    while tokio::time::Instant::now() < deadline {
-        if let Some(port) = live_port(paths, session).await {
-            return json!({
-                "session": session, "ok": true, "already_running": false,
-                "port": port, "pid": spawned_pid,
-                "detail": format!("{session}: started, listening on 127.0.0.1:{port} (pid {spawned_pid})"),
-            });
-        }
-        tokio::time::sleep(Duration::from_millis(100)).await;
+    let mut found = wait_for(START_TIMEOUT, START_POLL, || live_port(paths, session)).await;
+    if found.is_none() {
+        // The daemon may have come up in the last moments, or accepted too
+        // slowly for the short probes: look once more, patiently, before
+        // reporting a failure.
+        found = live_port_within(paths, session, FINAL_PROBE_TIMEOUT).await;
     }
-    let _ = port_file; // read only through `live_port` above; named for the message below
+    if let Some(port) = found {
+        return json!({
+            "session": session, "ok": true, "already_running": false,
+            "port": port, "pid": spawned_pid,
+            "detail": format!("{session}: started, listening on 127.0.0.1:{port} (pid {spawned_pid})"),
+        });
+    }
     json!({
         "session": session, "ok": false,
         "detail": format!(
@@ -524,5 +560,55 @@ fn detach(cmd: &mut std::process::Command) {
             setsid();
             Ok(())
         });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    /// A daemon that publishes late (after several polls) is still found, and
+    /// the wait stops at the first sighting.
+    #[tokio::test]
+    async fn the_wait_finds_a_daemon_that_publishes_late() {
+        let calls = AtomicUsize::new(0);
+        let found = wait_for(Duration::from_secs(10), Duration::from_millis(5), || {
+            let n = calls.fetch_add(1, Ordering::SeqCst);
+            async move { (n >= 6).then_some(4242_u16) }
+        })
+        .await;
+        assert_eq!(found, Some(4242));
+        assert_eq!(calls.load(Ordering::SeqCst), 7);
+    }
+
+    /// One that never comes up ends the wait at the bound, not before and not
+    /// long after; the probe has run at least once even with no time at all.
+    #[tokio::test]
+    async fn the_wait_is_bounded() {
+        let started = std::time::Instant::now();
+        let found: Option<u16> = wait_for(
+            Duration::from_millis(200),
+            Duration::from_millis(20),
+            || async { None },
+        )
+        .await;
+        assert_eq!(found, None);
+        let took = started.elapsed();
+        assert!(took >= Duration::from_millis(200), "{took:?}");
+        assert!(took < Duration::from_secs(5), "{took:?}");
+
+        let calls = AtomicUsize::new(0);
+        let _: Option<u16> = wait_for(Duration::ZERO, Duration::from_millis(20), || {
+            calls.fetch_add(1, Ordering::SeqCst);
+            async { None }
+        })
+        .await;
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn the_start_wait_is_long_enough_for_a_slow_machine() {
+        assert!(START_TIMEOUT >= Duration::from_secs(20));
     }
 }

@@ -485,7 +485,11 @@ pub(super) async fn login(
     // The store keeps a token it could not persist for this process only:
     // say so rather than "connected" alone.
     let store_error = env.store.session_only_reason(&integration.token_ref);
-    let stored = if store_error.is_some() { "session" } else { "os" };
+    let stored = if store_error.is_some() {
+        "session"
+    } else {
+        "os"
+    };
 
     let human = format!(
         "`{}` connected as @{}{}{}{}",

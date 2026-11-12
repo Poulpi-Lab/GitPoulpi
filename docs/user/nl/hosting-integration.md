@@ -737,7 +737,10 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Zie de [CLI-naslag](cli-reference.md#opdrachten) voor elke opdracht. Een token
-wordt nooit als argument geaccepteerd, en de MCP-server biedt `hosting login` niet
+wordt nooit als argument geaccepteerd (`hosting login` drukt `stored: "os"` af als de
+credential store van het besturingssysteem het bewaart, of `stored: "session"` plus
+`store_error` als de store het weigerde en het token alleen voor deze sessie in het
+geheugen leeft), en de MCP-server biedt `hosting login` niet
 aan, dus een token gaat nooit door een agent heen.
 
 ## Probleemoplossing

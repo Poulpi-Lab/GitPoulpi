@@ -18,7 +18,7 @@ from a primary source.
 | **Linux** (X11, Wayland, Hyprland, Omarchy) | **kitty**, **Ghostty**, **WezTerm**, then **foot** | kitty and Ghostty give pictures and the full keyboard. WezTerm gives pictures too. foot draws the graph and the avatars as sixel pictures, is fast and has the full keyboard. On Omarchy, pick Ghostty or kitty for pictures. |
 | **macOS** | **kitty**, **Ghostty**, **WezTerm**, then **iTerm2** | Same reasoning. Terminal.app works but has neither pictures nor true color. |
 
-On any OS, **tmux, zellij and screen** hide the terminal's picture protocol from
+On any OS, **zellij and screen** (and tmux, except for sixel) hide the terminal's picture protocol from
 GitPoulpi, so it draws characters (see [Multiplexers](#multiplexers)).
 
 ## What GitPoulpi uses
@@ -79,7 +79,7 @@ GitPoulpi, so it draws characters (see [Multiplexers](#multiplexers)).
 | **mintty** (Cygwin, Git Bash) | Windows | iTerm2, opaque backdrop | yes | (unverified; not documented) | (unverified; not documented) | yes |
 | **Windows console** (conhost, cmd, PowerShell window) | Windows | text | recent Windows 10/11 only | not needed: it reports modifiers itself | no | no |
 | **ConEmu** | Windows | text | (unverified) | (unverified) | (unverified) | (unverified) |
-| **tmux, zellij, screen** | all | text, always | needs settings | needs settings | needs settings | no |
+| **tmux, zellij, screen** | all | text; sixel through tmux when the terminal behind it takes sixel (see [Multiplexers](#multiplexers)) | needs settings (zellij: yes) | not in tmux or screen | tmux: with `set-clipboard on`; zellij: yes | tmux: with `allow-passthrough on`; zellij, screen: no |
 
 The "no (not implemented)" cells for OSC 22 come from absence in a project's
 changelog and documentation plus user reports, not from a test; treat them as
@@ -146,26 +146,36 @@ support; the VS Code terminal's support is **(unverified)**.
 ## Multiplexers
 
 GitPoulpi detects tmux, zellij, screen and herdr (`TMUX`, `ZELLIJ`, `STY`, `TERM=screen*`
-or `tmux*`, `HERDR_*`) and draws **characters**, because a multiplexer forwards cells,
-not picture escapes. For the other features, in `~/.tmux.conf`:
+or `tmux*`, `HERDR_*`). What reaches the terminal behind each (checked with raw escape
+sequences, tmux 3.8, zellij 0.45.1, screen 5.0, herdr 0.9.5, November 2026):
+
+| | Pictures | Pointer shape (OSC 22) | OSC 52 |
+|---|---|---|---|
+| **tmux** | sixel is drawn by tmux itself when the terminal behind it takes sixel (foot, WezTerm, Rio): detected, no setting. kitty pictures need `allow-passthrough on` and `ui.image_protocol = "kitty"` (kitty, Ghostty) | yes, with `allow-passthrough on` (GitPoulpi wraps it) | yes, with `set-clipboard on` (off by default: nothing arrives) |
+| **zellij** | text (the kitty protocol is accepted but not its Unicode placeholders; no sixel, no iTerm2) | no | yes |
+| **screen** | text (the payload is printed) | no | no |
+| **herdr** | kitty pictures (detected when `kitty_graphics = true`) | no | yes |
+
+In `~/.tmux.conf`:
 
 ```
 set -g mouse on
 set -as terminal-features ',*:RGB'     # truecolor
-set -g extended-keys on                # full chords (tmux 3.2 or later)
 set -g set-clipboard on                # OSC 52
-set -g allow-passthrough on            # tmux 3.3a or later; only if you force pictures, see below
+set -g allow-passthrough on            # tmux 3.3a or later: pointer shapes, forced kitty pictures
 ```
 
 To force pictures through a multiplexer that forwards them, set `ui.image_protocol` to
-`kitty` or `iterm2`. herdr with `kitty_graphics = true`
+`kitty`. herdr with `kitty_graphics = true`
 inside kitty, Ghostty or WezTerm is detected automatically; see
 [Troubleshooting](troubleshooting.md#the-graph-is-drawn-with-characters-not-as-a-picture-herdr-tmux-other-terminals).
 `GITPOULPI_TERMINAL_IMAGE=off` turns all pictures off.
 
-tmux does not forward the kitty keyboard protocol itself: `extended-keys` makes it
-send modified keys as `CSI u` or `xterm` sequences. zellij 0.41 and later speaks the
-kitty keyboard protocol and forwards OSC 52, per its changelog.
+Keys: tmux does not answer the kitty keyboard query, and `extended-keys` does not bring
+`Ctrl+Enter` or `Ctrl+,` through (measured with tmux 3.8 inside kitty: both arrive as
+plain `Enter` and `,` with `extended-keys` off, on or always). GitPoulpi never asks tmux for
+extended keys, so that setting changes nothing here: use the `Alt` variants inside tmux.
+zellij 0.45 answers the kitty keyboard query, so the full keyboard works there.
 
 ## What degrades, and how
 

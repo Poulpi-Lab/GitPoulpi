@@ -71,6 +71,8 @@ vous en avez besoin.
     « Quitter et cd ici », et le wrapper `gitpoulpi shell-init` (`gp`) pour
     bash, zsh, fish et PowerShell.
     Quel terminal affiche le mieux GitPoulpi : **[Choisir un terminal](terminals.md)**.
+    Ce qui passe dans tmux, zellij, screen, herdr et les panneaux de terminal :
+    **[Multiplexeurs](multiplexers.md)**.
 
 Aussi : **[Workflows de branches](branching-workflows.md)**, les modèles prédéfinis Git Flow, GitHub
 Flow, GitLab Flow et Trunk-based ou vos propres bases, modèles de nom de branche

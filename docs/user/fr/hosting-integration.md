@@ -692,6 +692,11 @@ sa table `[integrations.radar]` (tous désactivés par défaut ; voir la
 - **demandes de relecture** : les demandes ouvertes qui demandent votre relecture ;
 - **demandes ouvertes** : toutes les demandes ouvertes de votre propre espace de noms et de chaque organisation ou
   groupe dont vous êtes membre, ou des espaces de noms que vous nommez. Jamais tout l'hébergeur ;
+  les **Espaces de noms** du profil (un par ligne dans Paramètres > Intégrations > Radar, éventuellement
+  en expressions régulières) limitent les trois listes : une ligne correspond au chemin complet d'un dépôt
+  quand elle lui est égale ou en est un préfixe qui s'arrête à un `/` (`ptm` garde `ptm/produits/x`, pas `ptmx/y`), et
+  s'applique aux lignes renvoyées par l'hébergeur, ainsi que côté serveur là où la recherche de l'hébergeur
+  le permet (les qualificateurs `user:` / `repo:` de GitHub) ;
 - **tickets assignés** : les tickets ouverts qui vous sont assignés.
 
 GitHub, GitLab (auto-hébergé compris), Gitea, Forgejo, Azure DevOps (Services
@@ -718,8 +723,8 @@ limite de débit fait échouer ce profil seulement. Les réponses sont réutilis
 Dans Paramètres > Intégrations, un profil d'hébergeur de code connecté a un bloc **Radar**
 sous sa clé SSH : une case par liste (*Demandes en attente de ma relecture*,
 *Toutes les demandes ouvertes*, *Inclure les brouillons*, *Tickets qui me sont assignés*, cette dernière
-absente pour les hébergeurs sans tickets), un champ *Espaces de noms* (séparés par des virgules ; vide
-signifie le vôtre et tous ceux dont vous êtes membre) et le choix *Demande d'un dépôt non cloné* : *Demander*,
+absente pour les hébergeurs sans tickets), une zone *Espaces de noms* (une entrée par ligne, avec une case *Expressions régulières* ; vide
+signifie pas de limite) et le choix *Demande d'un dépôt non cloné* : *Demander*,
 *Le cloner* ou *Relire via l'API*.
 Tout est enregistré dès que vous le changez. Les hébergeurs sans requête à l'échelle du compte (Bitbucket
 Cloud) montrent à la place une ligne qui le dit. La palette de commandes atteint le bloc
@@ -744,10 +749,11 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Voir la [référence CLI](cli-reference.md#commandes) pour chaque commande. Un jeton
-n'est jamais accepté en argument (`hosting login` affiche `stored: "os"` quand le
-gestionnaire d'identifiants du système le garde, ou `stored: "session"` avec `store_error`
-quand le gestionnaire l'a refusé et que le jeton ne vit qu'en mémoire pour cette session),
-et le serveur MCP ne propose pas `hosting login`, si bien qu'un jeton ne passe jamais par un agent.
+n'est jamais accepté en argument, et le serveur MCP ne propose pas
+`hosting login`, si bien qu'un jeton ne passe jamais par un agent. `hosting login`
+affiche `stored: "os"` quand le gestionnaire d'identifiants du système garde le jeton, ou
+`stored: "session"` avec `store_error` quand le gestionnaire l'a refusé et que le jeton
+ne vit qu'en mémoire pour cette session.
 
 ## Dépannage
 

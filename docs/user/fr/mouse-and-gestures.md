@@ -222,7 +222,8 @@ Voir [Hébergeurs et suivi de tickets](hosting-integration.md).
   ref du commit.
 - **Clic droit sur une pastille de ref** pour un menu avec les actions de la ref et
   celles du commit.
-- **Clic droit sur l'en-tête** pour afficher ou masquer des colonnes : une liste de cases (`[x]` / `[ ]`) avec un ✕ dans son titre ; cliquez sur une ligne ou utilisez les flèches et `Space` / `Enter`, puis fermez avec le ✕, `Échap` ou un clic ailleurs (la palette : `Affichage : Log : Choisir les colonnes à afficher`). Sous les cases : `Ajuster <colonne> à son contenu` (la colonne cliquée), `Ajuster toutes les colonnes à leur contenu` et `Réinitialiser les largeurs des colonnes`.
+- **Clic droit sur l'en-tête** pour afficher ou masquer des colonnes : une liste de cases (`[x]` / `[ ]`) avec un ✕ dans son titre ; cliquez sur une ligne ou utilisez les flèches et `Space` / `Enter`, puis fermez avec le ✕, `Échap` ou un clic ailleurs (la palette : `Affichage : Log : Choisir les colonnes à afficher`). Sous les cases : `Ajuster <colonne> à son contenu` (la colonne cliquée), `Ajuster toutes les colonnes à leur contenu` et `Réinitialiser les largeurs des colonnes`. L'équivalent clavier du clic droit : `Shift+C` pour choisir une colonne, puis `.` (ou `Shift+F10`) ouvre le même menu sur elle.
+- **Les colonnes du Radar** fonctionnent de la même façon : glissez le séparateur après la colonne du dépôt, `#`, de l'auteur ou de l'âge pour la dimensionner, **double-cliquez dessus** pour ajuster la colonne à son entrée la plus large (`C` choisit une colonne, puis `=` ; `+` ajuste toutes les colonnes), et **clic droit sur le titre d'une colonne** (ou `C`, puis `.`) pour `Ajuster <colonne> à son contenu` et `Ajuster toutes les colonnes à leur contenu`.
 - **Cliquez sur `↑`, `↓` ou `✕`** dans la barre de recherche pour aller à la
   correspondance précédente ou suivante, ou pour fermer la barre.
 - **Cliquez sur `#12`, `ABC-12` ou `AB#12`** dans un message de commit, dans le volet
@@ -358,7 +359,8 @@ Chaque abandon demande d'abord confirmation.
 - **Clic droit sur une ligne** pour son menu : l'afficher dans le Log, le diff du commit pour ce fichier, le fichier à ce commit, son blame, puis le menu du Log pour ce commit. La touche menu fait de même au clavier.
 - **Faites glisser un séparateur de l'en-tête** (`ui.column_resize` : par défaut la cellule de séparation d'une cellule entre deux parties, marquée par un `│` estompé dans l'en-tête et tracée en trait d'accent le long de la colonne tant que le pointeur est dessus, un glissement depuis n'importe quel point du trait redimensionnant ; avec `header`, la première lettre du nom suivant, éclairée quand le pointeur est dessus) pour dimensionner la partie à sa gauche : voies, message, auteur, date, refs, modifs ou SHA. La cellule juste après la dernière partie est le séparateur de la dernière partie.
 - **Faites glisser un nom de l'en-tête** sur un autre pour y déplacer la partie : le même fantôme, la même source estompée et la même barre d'accent que l'en-tête du Log, et la partie bouge au relâchement (`Échap` annule ; les touches `<` / `>` du clavier, après `Tab`, font de même, d'une place à la fois).
-- **Clic droit sur l'en-tête** pour choisir les parties affichées (Ref, Graph, Auteur, Date, Modifs, SHA ; Message est toujours affiché) ; la liste de cases a un ✕ dans son titre. La palette a `Choisir les colonnes` et une bascule par partie.
+- **Double-cliquez une bordure de l'en-tête** pour ajuster la partie à sa gauche à son contenu, comme les bordures du Log : la largeur qui montre sa ligne la plus large en entier, jamais plus large que la colonne (au clavier : cliquez une ligne ou `Ctrl+N` pour donner les touches à la colonne, `Tab` pour choisir la partie, puis `=` ; `+` ajuste toutes les parties ; la palette a `Ajuster la colonne à son contenu` et `Ajuster toutes les colonnes à leur contenu`). Le message garde ce que les autres parties laissent.
+- **Clic droit sur l'en-tête** pour choisir les parties affichées (Ref, Graph, Auteur, Date, Modifs, SHA ; Message est toujours affiché) ; la liste de cases a un ✕ dans son titre. Dessous : `Ajuster <partie> à son contenu` (la partie cliquée) et `Ajuster toutes les colonnes à leur contenu`. La palette a `Choisir les colonnes` (le menu au clavier, sur la partie choisie par `Tab`) et une bascule par partie.
 - **Shift+molette** ou une molette horizontale fait défiler les lignes sur le côté quand elles sont plus larges que la colonne.
 - **Faites glisser la bordure droite** de la colonne pour la redimensionner. **Cliquez sur la bande `›`** (ou sur le ✕ de la colonne, ou **cliquez sur le segment sélectionné** du sélecteur `Fichier │ Tout` de la barre) pour la ramener ou la masquer.
 
@@ -451,13 +453,23 @@ Le pointeur prend une forme de déplacement sur la barre de titre et une forme d
 
 Certains terminaux laissent GitPoulpi changer le pointeur de la souris : un pointeur
 de redimensionnement sur les séparateurs, sur une frontière de colonne du Log, du Radar et de la colonne des commits (aussi pendant qu'on la glisse), une main sur les éléments cliquables. Cela
-marche dans kitty, foot, Ghostty, WezTerm et xterm récent (la séquence `OSC 22`). Elle
-n'est envoyée que quand la forme change, jamais dans tmux, screen, zellij ou herdr, et
-le pointeur par défaut est rétabli quand GitPoulpi se ferme. Dans les autres terminaux,
-le pointeur ne change pas. Le séparateur ou le bouton sous le pointeur s'allume dans
-tous les terminaux.
+marche dans kitty, foot, Ghostty, mintty et une version de WezTerm avec la PR amont #8092 (la séquence
+`OSC 22`). Elle n'est envoyée que quand la forme change, dans tmux seulement enveloppée
+pour le passthrough (`allow-passthrough on` ; kitty et foot l'affichent, Ghostty non), et
+jamais dans screen, zellij ou herdr. Le pointeur par défaut est rétabli quand GitPoulpi
+se ferme. Dans les autres terminaux (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows
+Terminal, xterm), le pointeur ne change pas ; voir
+[Choisir un terminal](terminals.md#forme-du-pointeur-de-la-souris-osc-22). Le séparateur
+ou le bouton sous le pointeur s'allume dans tous les terminaux.
 
 Le même type de composant donne le même pointeur partout dans l'application.
+
+- **Les boutons sont de vrais boutons**, dans les Paramètres (Intégrations : Modifier,
+  Déconnecter, Supprimer, Parcourir, Effacer, les boutons de modèles de l'éditeur
+  d'instructions...) comme dans les fenêtres : des libellés avec marge sur un fond plein
+  qui s'éclaircit sous le pointeur, atténués quand ils sont désactivés, jamais un texte
+  entre `[ ]`. Les seuls crochets restants sont les marques de cases `[x]` / `[ ]`, qui
+  sont des cases à cocher et prennent la main comme tout autre contrôle.
 
 - **La main** est sur les contrôles : boutons, cases à cocher et interrupteurs, listes
   déroulantes (dans les Paramètres, les volets des tickets et des pull requests, le
@@ -492,7 +504,10 @@ colonne, et la main ouverte ne s'affiche que pendant que vous portez une ref.
 
 ## Copier dans le presse-papiers
 
-**Copier le chemin** et quelques autres actions de copie envoient le texte au
-terminal, qui le place dans le presse-papiers (OSC 52). Si votre terminal ne le prend
-pas en charge, rien n'est copié. Les actions de copie du texte sélectionné utilisent
-directement le presse-papiers du système.
+Les actions de copie placent le texte dans le presse-papiers du système de la machine où
+tourne GitPoulpi et, là où le terminal est connu pour la respecter, l'envoient aussi au
+terminal (OSC 52). Par SSH, ou sans affichage, seul OSC 52 est envoyé : si votre terminal
+ne le prend pas en charge (iTerm2 tant que sa permission d'accès au presse-papiers n'est pas
+activée, Terminal.app, GNU screen), rien n'est copié et la ligne d'état dit que le texte a
+seulement été envoyé au terminal. Voir
+[Choisir un terminal](terminals.md#presse-papiers-actions-de-copie).

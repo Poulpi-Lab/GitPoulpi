@@ -228,7 +228,7 @@ Le volet n'a pas de titre : les en-têtes de colonnes disent ce qu'il est. Les 
 | Colonne | Affiche |
 |---|---|
 | **Ref** | Des pastilles colorées pour les branches et les tags du commit : une icône d'ordinateur portable pour le local, un globe pour le distant, une icône d'étiquette pour les tags, `+N` quand d'autres refs pointent là. |
-| **Graph** | Les voies des branches, les merges et les points de départ des branches. Dessiné en images dans kitty, Ghostty, WezTerm et iTerm2 (ainsi que Windows Terminal et foot, via sixel), et en caractères dans les autres terminaux. Les couleurs des voies viennent du thème ou d'une palette de votre choix (voir [Thèmes](themes.md)). À sa largeur minimale (un point de commit), la colonne devient compacte : tous les commits sur une seule voie, sans lignes de branche ni de merge. |
+| **Graph** | Les voies des branches, les merges et les points de départ des branches. Dessiné en images dans kitty, Ghostty, WezTerm, Rio et iTerm2 (ainsi que Windows Terminal, foot et Tabby, via sixel), et en caractères dans les autres terminaux. Les couleurs des voies viennent du thème ou d'une palette de votre choix (voir [Thèmes](themes.md)). À sa largeur minimale (un point de commit), la colonne devient compacte : tous les commits sur une seule voie, sans lignes de branche ni de merge. |
 | **Message** | Le résumé du commit. |
 | **Auteur** | L'auteur, avec un avatar facultatif. |
 | **Date** | La date d'auteur, dans le format que vous choisissez. |

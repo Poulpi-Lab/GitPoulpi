@@ -27,8 +27,8 @@ dit de faire d'abord `LFS > Pull`. La transparence est dessinée sur un damier.
 ## Comment c'est dessiné
 
 Sur un terminal avec un protocole d'image (Kitty et Ghostty, WezTerm et iTerm2,
-Rio, mintty), l'image est une vraie image. Ailleurs (Windows Terminal simple,
-tmux, un terminal que GitPoulpi ne connaît pas), elle est dessinée avec des
+Rio, mintty, et les terminaux sixel Windows Terminal, foot et Tabby), l'image est une vraie image. Ailleurs (la console Windows simple,
+zellij, un terminal que GitPoulpi ne connaît pas), elle est dessinée avec des
 caractères demi-blocs colorés, moitié moins de résolution verticale mais
 lisible partout ; **Sans protocole d'image** peut être réglé sur *Fiche
 d'information seule*. **Protocole d'image** dans la page **Journal et graphe** en force

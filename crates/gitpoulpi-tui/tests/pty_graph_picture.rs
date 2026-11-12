@@ -107,6 +107,11 @@ fn decode_last(raw: &[u8]) -> Option<Picture> {
 }
 
 fn picture_with(setting: &str, cell: &str, session: &str) -> Picture {
+    picture_as("WezTerm", setting, cell, session)
+}
+
+/// The picture the program sends when `TERM_PROGRAM` is `program`.
+fn picture_as(program: &str, setting: &str, cell: &str, session: &str) -> Picture {
     let repo = fixture();
     let config = tempfile::tempdir().unwrap();
     std::fs::write(
@@ -122,7 +127,7 @@ fn picture_with(setting: &str, cell: &str, session: &str) -> Picture {
         .size(200, 60)
         .terminal_image()
         .env("GITPOULPI_TERMINAL_CELL_PX", cell)
-        .env("TERM_PROGRAM", "WezTerm")
+        .env("TERM_PROGRAM", program)
         .env("TERM", "xterm-256color")
         .env("HERDR_ENV", "")
         .env("HERDR_PANE_ID", "")
@@ -197,5 +202,20 @@ fn lanes_stay_thin_in_pixels_when_the_cells_are_bigger() {
     assert!(
         zoomed * 4 <= normal * 5,
         "a lane is {normal}px at 9x21 and {zoomed}px at 27x63: it grew with the cell"
+    );
+}
+
+/// Rio blends the PNG's alpha (measured on Rio 0.5.28), so it gets the
+/// transparent picture like WezTerm; mintty keeps the opaque backdrop.
+#[test]
+fn rio_gets_a_transparent_graph_and_mintty_an_opaque_one() {
+    let has_clear = |p: &Picture| (0..p.height).any(|y| (0..p.width).any(|x| p.alpha(x, y) == 0));
+    assert!(
+        has_clear(&picture_as("rio", "off", "9x21", "pic-rio")),
+        "Rio: transparent pixels expected"
+    );
+    assert!(
+        !has_clear(&picture_as("mintty", "off", "9x21", "pic-mintty")),
+        "mintty: the backdrop is opaque"
     );
 }

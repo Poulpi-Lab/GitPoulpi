@@ -75,8 +75,8 @@ fn tab_down_to_the_combobox_shows_it_and_a_key_changes_it() {
         screen.text()
     );
 
-    // Review, Open, Drafts, Issues, Namespaces, then the combobox.
-    for _ in 0..5 {
+    // Review, Open, Drafts, Issues, Namespaces, Regular expressions, then the combobox.
+    for _ in 0..6 {
         term.send_keys("Tab").unwrap();
     }
     let screen = term
@@ -109,7 +109,7 @@ fn tab_down_to_the_combobox_shows_it_and_a_key_changes_it() {
     }
 
     // Back up with Shift+Tab: the top of the block follows the focus.
-    for _ in 0..5 {
+    for _ in 0..6 {
         term.send_keys("BTab").unwrap();
     }
     term.wait_for("the first checkbox in view", STEP, |s| {

@@ -17,10 +17,10 @@
 - **Системный `git`** в вашем `PATH`. GitPoulpi использует libgit2 для большинства
   операций, а ваш `git` для остальных.
   Нужна версия **2.34 или новее**. В macOS подходит `git` из Apple Command Line Tools, а также из Homebrew.
-- **Терминал** с поддержкой мыши. kitty, Ghostty, WezTerm и iTerm2 (а также Windows Terminal и foot через sixel) рисуют граф
-  commit'ов как изображения. Другие терминалы (консоль Windows, tmux и
+- **Терминал** с поддержкой мыши. kitty, Ghostty, WezTerm, Rio и iTerm2 (а также Windows Terminal, foot и Tabby через sixel) рисуют граф
+  commit'ов как изображения. Другие терминалы (консоль Windows, zellij, screen и
   большинство остальных) показывают символьный граф. См.
-  [Выбор терминала](terminals.md).
+  [Выбор терминала](terminals.md) и [Мультиплексоры](multiplexers.md).
 - Шрифт **Nerd Font** или шрифт с эмодзи для значков на панели инструментов и в
   боковой панели.
 - По желанию: **`git-lfs`** 3.0 или новее для репозиториев Git LFS. Без него

@@ -178,7 +178,7 @@ The menu's list opens beside the menu, level with the **Open with...** row, like
 
 ### Git LFS files
 
-The Git LFS object card (see [Git LFS](lfs.md)) carries the same two actions under its text: **Open in default program** and **Open in**, with the same keys (`o`, `Shift+O`) and palette rows. They open the real file, never the pointer: the working-tree file as it is, or a read-only temp copy of the object from the local LFS store for a commit's or the index's version. An object that is not downloaded yet has no buttons on the card, and the status line says to fetch it first (`git lfs pull`). Opening is read-only: no journal entry, nothing to undo.
+The Git LFS object card (see [Git LFS](lfs.md)) carries the same two actions under its text: **Open in default program** and **Open in**, with the same keys (`o`, `Shift+O`) and palette rows. They open the real file, never the pointer: the working-tree file as it is, or a read-only temp copy of the object from the local LFS store for a commit's or the index's version. An object that is not downloaded yet has no buttons on the card, and the status line says the content is not downloaded yet. Opening is read-only: no journal entry, nothing to undo.
 
 ### Browsers on Windows
 

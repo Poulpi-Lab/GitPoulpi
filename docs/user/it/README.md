@@ -71,6 +71,8 @@ di riferimento quando ti servono.
     «Esci e cd qui», e il wrapper `gitpoulpi shell-init` (`gp`) per bash, zsh,
     fish e PowerShell.
     Quale terminale mostra meglio GitPoulpi: **[Scegliere un terminale](terminals.md)**.
+    Cosa passa attraverso tmux, zellij, screen, herdr e i pannelli dei terminali:
+    **[Multiplexer](multiplexers.md)**.
 
 Inoltre: **[Workflow di branching](branching-workflows.md)**, i modelli Git Flow, GitHub Flow, GitLab Flow e
 Trunk-based oppure i tuoi branch base, pattern dei nomi dei branch e tipi di topic (`gitpoulpi flow ...`).

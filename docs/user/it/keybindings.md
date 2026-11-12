@@ -252,8 +252,8 @@ aggiornata). I tasti dopo un prefisso sono mostrati con il prefisso (`Ctrl+G s`)
 | `commit_column` | `wider_part` | Allarga la parte | `]` |
 | `commit_column` | `narrower_part` | Restringi la parte | `[` |
 | `commit_column` | `reset_widths` | Reimposta le larghezze delle parti | `0` |
-| `commit_column` | `fit` | Adatta la colonna al contenuto | `=` |
-| `commit_column` | `fit_all` | Adatta tutte le colonne al contenuto | `+` |
+| `commit_column` | `fit` | Adatta la parte al contenuto | `=` |
+| `commit_column` | `fit_all` | Adatta tutte le parti al contenuto | `+` |
 | `file_insight` | `blame_card` | Blame: Mostra o nascondi la scheda | `i` |
 | `file_insight` | `blame_next` | Blame: Hunk successivo | `n` |
 | `file_insight` | `blame_prev` | Blame: Hunk precedente | `p` |
@@ -414,7 +414,7 @@ questo tipo («questo terminale non invia ...»).
 
 I terminali con il **protocollo tastiera kitty** possono inviare queste
 combinazioni. Esempi: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 e
-successivi, e tmux o herdr quando fanno passare il protocollo. GitPoulpi usa il
+successivi, e zellij (tmux non risponde: vedi [Multiplexer](multiplexers.md#tmux)). GitPoulpi usa il
 protocollo per impostazione predefinita:
 
 - All'avvio, GitPoulpi interroga il terminale e attende la risposta per circa
@@ -878,9 +878,9 @@ applicano. I tasti sono quelli predefiniti.
 | Registro attività: Scegli l'ambito |  |
 | Registro attività: Operazioni git |  |
 | Registro attività: Registro dell'applicazione |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Registro attività: Mostra l'operazione di questa riga |  |
+| Registro attività: Prossima operazione non riuscita |  |
+| Registro attività: Operazione non riuscita precedente |  |
 | Registro attività: Scorri a sinistra | `Left` |
 | Registro attività: Scorri a destra | `Right` |
 | Registro attività: Copia l'ultimo errore |  |
@@ -1065,8 +1065,8 @@ applicano. I tasti sono quelli predefiniti.
 | Vista: Colonna dei commit: allarga la parte | `]` |
 | Vista: Colonna dei commit: restringi la parte | `[` |
 | Vista: Colonna dei commit: reimposta le larghezze delle parti | `0` |
-| Vista: Colonna dei commit: Adatta la colonna al contenuto | `=` |
-| Vista: Colonna dei commit: Adatta tutte le colonne al contenuto | `+` |
+| Vista: Colonna dei commit: Adatta la parte al contenuto | `=` |
+| Vista: Colonna dei commit: Adatta tutte le parti al contenuto | `+` |
 | Vista: Colonna dei commit: menu della riga selezionata | `.` |
 | Vista: Colonna dei commit: scegli le colonne |  |
 | Vista: Colonna dei commit: mostra o nascondi Ref |  |
@@ -1219,8 +1219,31 @@ applicano. I tasti sono quelli predefiniti.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Ripeti**. `Ctrl+Shift+Z` richiede il protocollo tastiera kitty; `Ctrl+Y` funziona sempre |
 | `.`, `Menu`, `Shift+F10` | Apre il menu contestuale della riga selezionata |
 
-`Ctrl+Z` e `Ctrl+Y` non fanno nulla mentre un campo di testo ha la tastiera.
-L'editor ha il proprio annulla per il testo.
+### Ctrl+Z / Ctrl+Y in un campo di testo
+
+Mentre un campo di testo ha la tastiera, `Ctrl+Z` e `Ctrl+Y` (anche `Ctrl+Shift+Z`)
+agiscono sul testo di quel campo, mai sul repository: un campo che ha la
+tastiera vince sempre, quindi `Ctrl+Z` nel messaggio di commit non può annullare un commit.
+Ovunque altrove mantengono il loro significato globale (il registro di annulla / ripeti qui sopra).
+Vale per ogni campo di testo ed editor su più righe: il messaggio di commit, i campi e gli
+editor di testo delle Impostazioni, i moduli delle pull request e delle issue, le finestre
+dell'IA e ogni casella di filtro o di ricerca.
+
+- **La digitazione** si annulla una parola alla volta (una serie di lettere, una serie di
+  spazi, una serie di punteggiatura), e una digitazione che si ferma per più di un secondo inizia
+  un nuovo passo. Più Backspace di fila sono un solo passo. Un incolla, un taglia, `Ctrl+U` /
+  `Ctrl+K`, un frammento inserito o un completamento accettato sono un passo ciascuno.
+- Un annulla riporta indietro il testo, il cursore e la selezione. Una nuova modifica dopo
+  un annulla scarta ciò che si sarebbe potuto ripetere.
+- Ogni campo conserva una cronologia limitata (gli ultimi 200 passi, circa 1 MB di testo),
+  e la dimentica quando il campo viene sostituito dall'esterno (una cartella scelta nel
+  selettore, un modulo ricaricato) o quando un altro campo prende la tastiera.
+- Con nulla più da annullare, `Ctrl+Z` non fa nulla: non ricade mai
+  sull'annulla del repository mentre un campo ha la tastiera.
+- L'**editor delle istruzioni** delle impostazioni dell'IA ha anche i pulsanti **Annulla** e **Ripeti**,
+  accanto a Salva e Annulla, disabilitati quando non c'è nulla a cui tornare.
+- L'editor di codice e l'editor di merge mantengono il proprio annulla (`Modifica: Annulla`,
+  `Merge: Annulla`), che copre anche le loro scelte.
 
 ## Elenchi popup filtrabili
 
@@ -1240,12 +1263,14 @@ l'evidenziazione:
 | `Esc` | Chiude |
 
 In questi popup, `Home` e `End` spostano l'elenco, non il cursore del campo di
-filtro. `Ctrl+A` e `Ctrl+E` spostano comunque il cursore all'inizio e alla fine,
-e `Ctrl+K` cancella fino alla fine del filtro. Nessuna coppia `Ctrl+lettera`
-sposta un elenco (`Ctrl+N` è il prefisso di navigazione, `Ctrl+P` la palette dei
-comandi) e i semplici `j` e `k` vengono digitati nel filtro: qui spostano solo le
-frecce, `PageUp` / `PageDown` e `Home` / `End`. Negli elenchi senza campo di testo,
-`j` / `k` sono un modo in più per scendere / salire.
+filtro, e anche `Ctrl+K` / `Ctrl+J` spostano l'elenco, quindi `Ctrl+K` non cancella più
+fino alla fine del filtro (`Ctrl+U` lo svuota ancora; in un normale campo di testo
+fuori da un elenco `Ctrl+K` continua a cancellare fino alla fine della riga). `Ctrl+A` e
+`Ctrl+E` spostano comunque il cursore all'inizio e alla fine. `Ctrl+J` / `Ctrl+K` spostano
+anche ogni altro elenco, con o senza campo di testo (`Ctrl+N` è il prefisso di
+navigazione e `Ctrl+P` la palette dei comandi, quindi non sono tasti d'elenco). I semplici `j`
+e `k` vengono digitati nel filtro; negli elenchi senza campo di testo, `j` / `k` sono
+un modo in più per scendere / salire.
 
 Con il mouse:
 

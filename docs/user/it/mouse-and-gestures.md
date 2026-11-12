@@ -231,7 +231,8 @@ Vedi [Hosting e issue tracker](hosting-integration.md).
   del commit.
 - **Clic destro su una pillola di ref** per un unico menu con le azioni del ref e
   quelle del commit.
-- **Clic destro sull'intestazione** per mostrare o nascondere le colonne: un elenco di caselle (`[x]` / `[ ]`) con una ✕ nel titolo; clicca una riga o usa le frecce e `Spazio` / `Enter`, poi chiudilo con la ✕, `Esc` o un clic fuori (la palette: `Vista: Log: Scegli le colonne da mostrare`). Sotto le caselle: `Adatta <colonna> al contenuto` (la colonna cliccata), `Adatta tutte le colonne al contenuto` e `Reimposta le larghezze delle colonne`.
+- **Clic destro sull'intestazione** per mostrare o nascondere le colonne: un elenco di caselle (`[x]` / `[ ]`) con una ✕ nel titolo; clicca una riga o usa le frecce e `Spazio` / `Enter`, poi chiudilo con la ✕, `Esc` o un clic fuori (la palette: `Vista: Log: Scegli le colonne da mostrare`). Sotto le caselle: `Adatta <colonna> al contenuto` (la colonna cliccata), `Adatta tutte le colonne al contenuto` e `Reimposta le larghezze delle colonne`. L'equivalente da tastiera del clic destro: `Shift+C` per scegliere una colonna, poi `.` (o `Shift+F10`) apre lo stesso menu su di essa.
+- **Le colonne del Radar** funzionano allo stesso modo: trascina il separatore dopo la colonna del repository, `#`, autore o età per dimensionarla, **fai doppio clic su di esso** per adattare la colonna alla sua voce più larga (`C` sceglie una colonna, poi `=`; `+` adatta ogni colonna), e **clic destro sul titolo di una colonna** (o `C`, poi `.`) per `Adatta <colonna> al contenuto` e `Adatta tutte le colonne al contenuto`.
 - **Clicca `↑`, `↓` o `✕`** nella barra di ricerca per andare al risultato
   precedente o successivo, o per chiudere la barra.
 - **Clicca `#12`, `ABC-12` o `AB#12`** in un messaggio di commit, nel pannello
@@ -372,8 +373,9 @@ Ogni scarto chiede prima.
 - **Passa il mouse su una riga** per il suggerimento del Log (il messaggio intero, nome ed e-mail dell'autore, la data completa, secondo la parte sotto il puntatore).
 - **Clic destro su una riga** per il suo menu: mostrala nel Log, il diff del file in quel commit, il file in quel commit, il suo blame, poi il menu del Log per il commit. Il tasto menu fa lo stesso da tastiera.
 - **Trascina un bordo dell'intestazione** (`ui.column_resize`: per impostazione predefinita la cella di separazione di una cella tra due parti, segnata da un `│` attenuato nell'intestazione e disegnata come linea d'accento lungo la colonna mentre il puntatore ci passa sopra, e un trascinamento da qualsiasi punto della linea ridimensiona; con `header`, la prima lettera del nome successivo, accesa quando il puntatore ci passa sopra) per dimensionare la parte alla sua sinistra: corsie, messaggio, autore, data, ref, modifiche o SHA. La cella subito dopo l'ultima parte è il bordo dell'ultima parte.
+- **Doppio clic su un bordo dell'intestazione** per adattare la parte alla sua sinistra al suo contenuto, come fanno i bordi del Log: la larghezza che mostra intera la sua riga più larga, mai più larga della colonna (da tastiera: clicca una riga o `Ctrl+N` per dare i tasti alla colonna, `Tab` per scegliere la parte, poi `=`; `+` adatta ogni parte; la palette ha `Adatta la parte al contenuto` e `Adatta tutte le parti al contenuto`). Il messaggio tiene ciò che le altre parti lasciano.
 - **Trascina un nome dell'intestazione** su un altro per spostare lì la parte: stesso fantasma, stessa origine attenuata e stessa barra d'accento dell'intestazione del Log, e la parte si sposta al rilascio (`Esc` annulla; i tasti `<` / `>`, dopo `Tab`, fanno lo stesso un posto alla volta).
-- **Clic destro sull'intestazione** per scegliere quali parti mostrare (Ref, Grafo, Autore, Data, Modif., SHA; il messaggio è sempre visibile); l'elenco di caselle ha una ✕ nel titolo. La palette ha `Scegli le colonne` e un comando di attivazione per ogni parte.
+- **Clic destro sull'intestazione** per scegliere quali parti mostrare (Ref, Grafo, Autore, Data, Modif., SHA; il messaggio è sempre visibile); l'elenco di caselle ha una ✕ nel titolo. Sotto: `Adatta <parte> al contenuto` (la parte cliccata) e `Adatta tutte le colonne al contenuto`. La palette ha `Scegli le colonne` (il menu da tastiera, sulla parte scelta con `Tab`) e un comando di attivazione per ogni parte.
 - **Shift+rotellina** o una rotellina orizzontale scorre le righe in orizzontale quando sono più larghe della colonna.
 - **Trascina il bordo destro** della colonna per ridimensionarla. **Clicca la striscia `›`** (o la ✕ sulla colonna, o **clicca il segmento scelto** del selettore `File │ Tutti` della barra) per riportarla o nasconderla.
 
@@ -465,12 +467,22 @@ Il puntatore mostra una forma di spostamento sopra la barra del titolo e una di 
 
 Alcuni terminali permettono a GitPoulpi di cambiare il puntatore del mouse: un
 puntatore di ridimensionamento sopra i divisori, sopra un bordo di colonna del Log, del Radar e della colonna dei commit (anche mentre lo trascini), una mano sopra gli elementi
-cliccabili. Funziona in kitty, foot, Ghostty, WezTerm e xterm recenti (la sequenza `OSC 22`). Viene inviata
-solo quando la forma cambia, mai dentro tmux, screen, zellij o herdr, e il puntatore
-predefinito viene ripristinato all'uscita di GitPoulpi. Negli altri terminali il puntatore non
-cambia. Il divisore o il pulsante sotto il puntatore si illumina in ogni terminale.
+cliccabili. Funziona in kitty, foot, Ghostty, mintty e in una build di WezTerm con la PR a monte #8092 (la sequenza
+`OSC 22`). Viene inviata solo quando la forma cambia, dentro tmux solo avvolta per
+il passthrough (`allow-passthrough on`; kitty e foot la mostrano, Ghostty no), e mai in screen,
+zellij o herdr. Il puntatore predefinito viene ripristinato all'uscita di GitPoulpi.
+Negli altri terminali (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows Terminal, xterm) il puntatore non cambia; vedi
+[Scegliere un terminale](terminals.md#forma-del-puntatore-del-mouse-osc-22). Il divisore o il pulsante
+sotto il puntatore si illumina in ogni terminale.
 
 Lo stesso tipo di componente dà lo stesso puntatore in tutta l'app.
+
+- **I pulsanti sono veri pulsanti**, in Impostazioni (Integrazioni: Modifica, Disconnetti,
+  Rimuovi, Sfoglia, Elimina, i pulsanti dei frammenti dell'editor delle istruzioni...)
+  come nelle finestre di dialogo: etichette con margine su uno sfondo pieno che si schiarisce sotto il
+  puntatore, attenuate quando disabilitate, mai testo tra `[ ]`. Le uniche parentesi rimaste
+  sono i segni delle caselle `[x]` / `[ ]`, che sono caselle di controllo e prendono la mano
+  come ogni altro controllo.
 
 - **La mano che indica** è sui controlli: pulsanti, caselle di controllo e interruttori, caselle combinate (in Impostazioni, nei pannelli delle issue e delle pull request, nel Radar, nelle finestre di dialogo), schede e le loro croci, i pulsanti `+`, link e riferimenti (`#12`, `!45`), intestazioni di gruppo e di cartella con la loro freccia di espansione, pillole dei ref, barre di scorrimento e i pulsanti Attività, job e versione della barra di stato. Una casella di controllo o un pulsante dentro una riga mantiene la mano.
 - **La freccia** è sulle righe. Una riga si illumina per intero quando il puntatore è su di essa (la stessa luce in ogni elenco) e non è di per sé un controllo: le righe dei pannelli Refs, Worktree, Stash e Sottomoduli, il Log e la colonna dei commit (solo una pillola di ref prende la mano), le righe di un diff, i file modificati, gli elementi delle pull request, delle issue e del Radar, e le righe degli elenchi nelle finestre di dialogo e nei pannelli (clone, selettore di cartelle, Workspace, le schede della bacheca, il pannello Job, i selettori di assegnatario, etichetta e milestone, passaggi del rebase, file e commit della revisione, scelte dei menu e delle caselle combinate).
@@ -481,7 +493,9 @@ I puntatori di ridimensionamento restano sui divisori e sui bordi di colonna, e 
 
 ## Copiare negli appunti
 
-**Copia il percorso** e alcune altre azioni di copia inviano il testo al terminale,
-che lo mette negli appunti (OSC 52). Se il tuo terminale non lo supporta, non viene
-copiato nulla. Le azioni di copia per il testo selezionato usano direttamente gli
-appunti di sistema.
+Le azioni di copia mettono il testo negli appunti di sistema della macchina su cui gira GitPoulpi
+e, dove il terminale è noto per rispettarlo, lo inviano anche al terminale
+(OSC 52). Via SSH, o senza display, viene inviato solo OSC 52: se il tuo terminale
+non lo supporta (iTerm2 finché il suo permesso per gli appunti non è attivo, Terminal.app,
+GNU screen), non viene copiato nulla e la riga di stato dice che il testo è stato solo inviato
+al terminale. Vedi [Scegliere un terminale](terminals.md#appunti-azioni-di-copia).

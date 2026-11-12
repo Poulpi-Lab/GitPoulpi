@@ -26,8 +26,8 @@ usare prima `LFS > Pull`. La trasparenza è disegnata su una scacchiera.
 ## Come viene disegnata
 
 In un terminale con un protocollo per le immagini (Kitty e Ghostty, WezTerm e iTerm2,
-Rio, mintty) l'immagine è un'immagine vera. Altrove (Windows Terminal semplice,
-tmux, un terminale che GitPoulpi non conosce) viene disegnata con caratteri colorati a
+Rio, mintty e i terminali sixel Windows Terminal, foot e Tabby) l'immagine è un'immagine vera. Altrove (la semplice console di Windows,
+zellij, un terminale che GitPoulpi non conosce) viene disegnata con caratteri colorati a
 mezzo blocco, con metà della risoluzione verticale ma leggibile ovunque; **Senza protocollo
 immagini** può essere impostato su *Solo scheda informativa*. **Protocollo immagini** nella
 pagina **Log e grafo** ne forza uno.

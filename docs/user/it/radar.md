@@ -65,7 +65,7 @@ nome di cartella, la cartella superiore viene aggiunta al chip per distinguerli.
 Un ambito di cartella cerca i repository **su due livelli**: le cartelle direttamente al suo interno e le cartelle
 dentro quelle che non sono repository a loro volta (`~/src/work/app`). Le cartelle nascoste vengono saltate, un
 repository non viene mai attraversato e ne vengono elencati al massimo 200. La ricerca gira in background, mai
-sul thread che disegna, e il suo risultato resta finché non aggiorni: il pulsante Aggiorna, `r` o
+sul thread che disegna, e il suo risultato resta finché non aggiorni: il pulsante Aggiorna, `r`, `F5` (il tasto di aggiornamento della finestra, riassegnabile) o
 `Radar: Aggiorna` cercano di nuovo nella cartella (un repository clonato nel frattempo compare).
 
 L'hosting resta attivabile repository per repository: un repository della cartella **non collegato** a un host non
@@ -223,7 +223,7 @@ gemello nella palette.
 | Mostra o nascondi le richieste dei repository non clonati | `a` | `Radar: Mostra le richieste non clonate` |
 | Mostra o nascondi le bozze delle righe a livello di account | `d` | `Radar: Mostra le bozze` |
 | Attiva le richieste di revisione a livello di account di un host | `T` / `Enter` sulla sua riga di suggerimento / **Attiva** | `Radar: Attiva le richieste di revisione dell'account...` |
-| Aggiorna | `r` | `Radar: Aggiorna` |
+| Aggiorna | `r`, `F5` | `Radar: Aggiorna` |
 | Il menu della riga | `.` | `Radar: Menu della riga...` |
 | Torna alla Home | `Esc` | `Radar: Torna alla home` |
 
@@ -285,6 +285,8 @@ il [riferimento della configurazione](config-reference.md) e il [riferimento del
 GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket Data Center e Gerrit rispondono; Bitbucket Cloud non ha un endpoint a
 livello di account, quindi le sue richieste compaiono solo per i repository collegati dell'ambito.
 
+I **Namespace** del profilo limitano tutti i suoi elenchi ad alcuni repository (Impostazioni > Integrazioni > Radar: un'area di testo con una voce per riga e una casella **Espressioni regolari**). Una riga corrisponde al percorso completo di un repository quando è uguale o è un prefisso di percorso che termina a un `/`: `ptm` mantiene `ptm/produits/x` e scarta `ptmx/y` e `formation/y`. Con la casella attiva, ogni riga è un'espressione regolare eseguita sul percorso completo così come lo scrivi (`^ptm/(produits|infra)/`); una riga non valida viene mostrata sotto il campo e non viene salvata. Vuoto significa nessun limite.
+
 Come vengono collocate le righe:
 
 - Una riga che l'ambito elenca già (stesso host, progetto, tipo e numero) compare una sola volta: **vince la
@@ -341,7 +343,7 @@ Due caselle accanto al filtro (compaiono quando viene chiesto un elenco a livell
 Entrambe hanno i badge di `Ctrl+N` e sono nella palette (`Radar: Mostra le richieste non clonate`, `Radar: Mostra le bozze`).
 
 La risposta di un profilo viene conservata in `radar-account.json` per **5 minuti**: riaprire il Radar entro quel
-tempo mostra le righe senza interrogare l'host. **Aggiorna** (`r`) interroga sempre. Un host che ha chiesto di rallentare
+tempo mostra le righe senza interrogare l'host. **Aggiorna** (`r` o `F5`) interroga sempre: ogni repository e ogni elenco a livello di account, qualunque sia l'età dell'ultima risposta. Un host che ha chiesto di rallentare
 o ha rifiutato il token non viene interrogato di nuovo nello stesso giro. Al massimo 300 righe sono conservate per profilo e tipo,
 e una riga sotto **Repository** dice quante altre ne esistevano, o perché un profilo non si è potuto leggere
 (**Riconnetti** apre Impostazioni > Integrazioni).

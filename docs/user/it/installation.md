@@ -17,10 +17,10 @@ Accanto a questi, l'archivio contiene `gitpoulpi-launch`, un minuscolo programma
 - Un **`git` di sistema** nel tuo `PATH`. GitPoulpi usa libgit2 per la maggior
   parte delle operazioni e il tuo `git` per il resto.
   Serve la versione **2.34 o successiva**. Su macOS va bene il `git` dei Command Line Tools di Apple, e anche quello di Homebrew.
-- Un **terminale** con supporto del mouse. kitty, Ghostty, WezTerm e iTerm2 (e anche Windows Terminal e foot, tramite sixel)
+- Un **terminale** con supporto del mouse. kitty, Ghostty, WezTerm, Rio, iTerm2 (e anche Windows Terminal, foot e Tabby, tramite sixel)
   disegnano il grafo dei commit come immagini. Gli altri terminali (la
-  console di Windows, tmux e la maggior parte degli altri) mostrano un grafo a
-  caratteri. Vedi [Scegliere un terminale](terminals.md).
+  console di Windows, zellij, screen e la maggior parte degli altri) mostrano un grafo a
+  caratteri. Vedi [Scegliere un terminale](terminals.md) e [Multiplexer](multiplexers.md).
 - Un **Nerd Font** o un font con le emoji, per le icone della barra degli
   strumenti e della barra laterale.
 - Facoltativo: **`git-lfs`** 3.0 o successivo, per i repository Git LFS. Senza,

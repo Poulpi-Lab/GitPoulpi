@@ -694,6 +694,11 @@ disattivati per impostazione predefinita; vedi il
 - **richieste di revisione**: richieste aperte che chiedono la tua revisione;
 - **richieste aperte**: ogni richiesta aperta del tuo namespace e di ogni organizzazione o
   gruppo di cui sei membro, o dei namespace che indichi. Mai l'intero host;
+  i **Namespace** del profilo (uno per riga in Impostazioni > Integrazioni > Radar, facoltativamente
+  come espressioni regolari) limitano tutti e tre gli elenchi: una riga corrisponde al percorso completo
+  di un repository quando è uguale o è un prefisso di percorso a un `/` (`ptm` mantiene `ptm/produits/x`,
+  non `ptmx/y`), ed è applicata alle righe che l'host restituisce, più lato server dove la ricerca
+  dell'host lo permette (i qualificatori `user:` / `repo:` di GitHub);
 - **issue assegnate**: issue aperte assegnate a te.
 
 GitHub, GitLab (anche self-managed), Gitea, Forgejo, Azure DevOps (Services
@@ -747,10 +752,11 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Vedi il [riferimento della CLI](cli-reference.md#comandi) per ogni comando. Un
-token non viene mai accettato come argomento (`hosting login` stampa `stored: "os"` quando
-l'archivio delle credenziali del sistema lo conserva, oppure `stored: "session"` più `store_error`
-quando l'archivio l'ha rifiutato e il token vive in memoria solo per questa sessione), e il server MCP non offre
-`hosting login`, quindi un token non passa mai da un agente.
+token non viene mai accettato come argomento, e il server MCP non offre
+`hosting login`, quindi un token non passa mai da un agente. `hosting login`
+stampa `stored: "os"` quando l'archivio delle credenziali del sistema conserva il token, oppure
+`stored: "session"` più `store_error` quando l'archivio l'ha rifiutato e il token
+vive in memoria solo per questa sessione.
 
 ## Risoluzione dei problemi
 

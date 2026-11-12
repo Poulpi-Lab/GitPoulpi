@@ -151,7 +151,7 @@ sequences, tmux 3.8, zellij 0.45.1, screen 5.0, herdr 0.9.5, November 2026):
 
 | | Pictures | Pointer shape (OSC 22) | OSC 52 |
 |---|---|---|---|
-| **tmux** | sixel is drawn by tmux itself when the terminal behind it takes sixel (foot, WezTerm, Rio): detected, no setting. kitty pictures need `allow-passthrough on` and `ui.image_protocol = "kitty"` (kitty, Ghostty) | yes, with `allow-passthrough on` (GitPoulpi wraps it) | yes, with `set-clipboard on` (off by default: nothing arrives) |
+| **tmux** | sixel is drawn by tmux itself when the terminal behind it takes sixel (foot, WezTerm, Rio): detected, no setting. kitty pictures need `allow-passthrough on` and `ui.image_protocol = "kitty"` (kitty, Ghostty) | with `allow-passthrough on` GitPoulpi wraps it: seen in kitty and foot, not in Ghostty | yes, with `set-clipboard on` (off by default: nothing arrives) |
 | **zellij** | text (the kitty protocol is accepted but not its Unicode placeholders; no sixel, no iTerm2) | no | yes |
 | **screen** | text (the payload is printed) | no | no |
 | **herdr** | kitty pictures (detected when `kitty_graphics = true`) | no | yes |

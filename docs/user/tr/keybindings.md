@@ -874,6 +874,9 @@ Tuşlar varsayılanlardır.
 | Etkinlik Günlüğü: Kapsamı Seç |  |
 | Etkinlik Günlüğü: Git İşlemleri |  |
 | Etkinlik Günlüğü: Uygulama Günlüğü |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Etkinlik Günlüğü: Sola Kaydır | `Left` |
 | Etkinlik Günlüğü: Sağa Kaydır | `Right` |
 | Etkinlik Günlüğü: Son Hatayı Kopyala |  |

@@ -12,7 +12,7 @@ agents](mcp-and-agents.md)). `gitpoulpi <command> --help` has every flag.
 
 | Flag | Effect |
 |---|---|
-| `--json` | Print the result as JSON. Errors are JSON too: `{"error": "..."}` on stdout, exit code 1. A failed git operation adds `"detail": {"operation", "command", "exit_code", "stderr"}` (the git command that ran, redacted, its exit code and the tail of its stderr; for the built-in git library `"git2": {"class", "code", "message"}`); the MCP tools return the same object. Without `--json` the lines go to stderr. |
+| `--json` | Print the result as JSON. Errors are JSON too: `{"error": "..."}` on stdout, exit code 1. A failed git operation adds `"detail": {"operation", "command", "exit_code", "stderr"}` (the git command that ran, redacted, its exit code and the tail of its stderr; for the built-in git library `"git2": {"class", "code", "message"}`), and a failure the daemon could name adds `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}` (the operation, a person's name for it, its main arguments with secrets masked, the repository, who asked, the request's id and, for a fetch or push, its job number); the MCP tools return the same object. Without `--json` the lines go to stderr. |
 | `--repo <path>` | The repository to act on (default: the one around the current directory, like git). |
 | `-s, --session <name>` | The session (daemon) to talk to. Default: derived from the repository root, so everything opened inside one repository shares one daemon and two repositories get two. |
 | `--backend git2\|system` | Backend for a daemon this command starts (a running one keeps its own). |

@@ -880,6 +880,9 @@ herdr, когда они пропускают протокол. GitPoulpi по �
 | Журнал активности: выбрать область |  |
 | Журнал активности: операции git |  |
 | Журнал активности: журнал приложения |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Журнал активности: прокрутить влево | `Left` |
 | Журнал активности: прокрутить вправо | `Right` |
 | Журнал активности: копировать последнюю ошибку |  |

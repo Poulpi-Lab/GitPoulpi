@@ -876,6 +876,9 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Journal d'activité : Choisir le périmètre |  |
 | Journal d'activité : Opérations Git |  |
 | Journal d'activité : Journal de l'application |  |
+| Journal d'activité : Afficher l'opération de cette ligne |  |
+| Journal d'activité : Opération en échec suivante |  |
+| Journal d'activité : Opération en échec précédente |  |
 | Journal d'activité : Défiler à gauche | `Left` |
 | Journal d'activité : Défiler à droite | `Right` |
 | Journal d'activité : Copier la dernière erreur |  |

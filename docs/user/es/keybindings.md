@@ -879,6 +879,9 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Registro de actividad: Elegir el alcance |  |
 | Registro de actividad: Operaciones de git |  |
 | Registro de actividad: Registro de la aplicación |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Registro de actividad: Desplazar a la izquierda | `Left` |
 | Registro de actividad: Desplazar a la derecha | `Right` |
 | Registro de actividad: Copiar el último error |  |

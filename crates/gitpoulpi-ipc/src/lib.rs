@@ -6,6 +6,7 @@ mod events;
 pub mod git_credential;
 pub mod jobs;
 pub mod mailmap;
+pub mod op_context;
 mod protocol;
 pub mod rewrite;
 mod scope;

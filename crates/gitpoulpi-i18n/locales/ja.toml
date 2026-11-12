@@ -6001,6 +6001,26 @@ palette_scroll_left = "アクティビティログ: 左へスクロール"
 palette_scroll_right = "アクティビティログ: 右へスクロール"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "アクティビティログ: 長い行を横にスクロール（Shift + ホイール、または横スクロールバーでも可）"
+# context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
+failed_title = "{operation} failed"
+# context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
+ctx_operation = "Operation: {what}"
+# context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
+ctx_repository = "Repository: {repository}"
+# context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
+ctx_requested_by = "Requested by: {frontend}"
+# context: detail line of an Activity Log entry: the number that identifies the operation in the application log
+ctx_id = "Operation id: {id}"
+# context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
+palette_show_operation = "Activity Log: Show the Operation of This Line"
+# context: command palette entry: selects the next line of the Application tab that names a failed operation
+palette_next_problem = "Activity Log: Next Failed Operation"
+# context: command palette entry: selects the previous line of the Application tab that names a failed operation
+palette_prev_problem = "Activity Log: Previous Failed Operation"
+# context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
+app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+# context: notice in the Activity Log's Application tab when the selected line does not name an operation
+app_no_operation = "This line is not tied to an operation."
 
 [git_error]
 summary_host_key = "リモートの SSH ホスト鍵がまだ登録されていません。"

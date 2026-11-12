@@ -874,6 +874,9 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Activity Log: Choose the Scope |  |
 | Activity Log: Git Operations |  |
 | Activity Log: Application Log |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Activity Log: Scroll Left | `Left` |
 | Activity Log: Scroll Right | `Right` |
 | Activity Log: Copy the Last Error |  |

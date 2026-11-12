@@ -92,6 +92,7 @@ fn main() {
     // Started by git as the credential helper of an account-authenticated
     // transfer (ADR-0010)? Then this is all the process does.
     gitpoulpi_ipc::git_credential::run_if_requested();
+    gitpoulpi_ipc::auth::set_client_name("MCP");
     let args = Args::parse();
     // User-only app directories (best effort, once per start).
     if let Some(paths) = gitpoulpi_config::ConfigPaths::discover() {

@@ -63,6 +63,9 @@ pub(crate) struct Entry {
     pub(crate) workspace: Option<String>,
     /// What the repository's sign-in adds to the buttons of a failure.
     pub(crate) auth: super::friendly::AuthContext,
+    /// What produced it: the operation, its main arguments, the repository,
+    /// the frontend and the operation id. Set on every failure.
+    pub(crate) context: Option<gitpoulpi_core::OpContext>,
 }
 
 impl Entry {
@@ -87,6 +90,7 @@ impl Entry {
             background: false,
             workspace: None,
             auth: super::friendly::AuthContext::default(),
+            context: None,
         }
     }
 
@@ -134,16 +138,30 @@ fn with<R>(f: impl FnOnce(&mut Feed) -> R) -> R {
     FEED.with(|feed| f(&mut feed.borrow_mut()))
 }
 
-/// Adds `entry` and wakes the loop. Returns its id.
+/// An id for an entry that is built before it is pushed (a failure's context
+/// names the entry's id as its operation id): pass the entry with that `id`
+/// set to [`push`].
+pub(crate) fn reserve_id() -> u64 {
+    with(|feed| {
+        feed.next += 1;
+        feed.next
+    })
+}
+
+/// Adds `entry` and wakes the loop. Returns its id (the one it came with, if
+/// it was given one by [`reserve_id`]).
 pub(crate) fn push(mut entry: Entry) -> u64 {
     let id = with(|feed| {
-        feed.next += 1;
-        entry.id = feed.next;
+        if entry.id == 0 {
+            feed.next += 1;
+            entry.id = feed.next;
+        }
+        let id = entry.id;
         if feed.entries.len() >= CAPACITY {
             feed.entries.pop_front();
         }
         feed.entries.push_back(entry);
-        feed.next
+        id
     });
     crate::redraw::poke();
     id
@@ -168,6 +186,33 @@ pub(crate) fn snapshot() -> Vec<Entry> {
 
 pub(crate) fn get(id: u64) -> Option<Entry> {
     with(|feed| feed.entries.iter().find(|e| e.id == id).cloned())
+}
+
+/// How far apart (milliseconds) a log line and the entry of its operation can
+/// be stamped: both are written when the answer arrives.
+const SAME_OPERATION_MS: i64 = 10_000;
+
+/// The entry of the operation a log line tagged `[op #id, frontend]` is about:
+/// same id, label and frontend, stamped within seconds of the line.
+pub(crate) fn find_operation(
+    request: u64,
+    label: &str,
+    frontend: Option<&str>,
+    ts_ms: i64,
+) -> Option<Entry> {
+    with(|feed| {
+        feed.entries
+            .iter()
+            .rev()
+            .find(|e| {
+                e.context.as_ref().is_some_and(|c| {
+                    c.request == request
+                        && c.label == label
+                        && (frontend.is_none() || c.frontend.as_deref() == frontend)
+                }) && (e.ts_ms - ts_ms).abs() <= SAME_OPERATION_MS
+            })
+            .cloned()
+    })
 }
 
 /// Errors not looked at yet: the status bar button's badge.

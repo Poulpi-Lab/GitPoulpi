@@ -878,6 +878,9 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Activiteitenlogboek: Het bereik kiezen |  |
 | Activiteitenlogboek: Git-bewerkingen |  |
 | Activiteitenlogboek: Applicatielogboek |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Activiteitenlogboek: Naar links scrollen | `Left` |
 | Activiteitenlogboek: Naar rechts scrollen | `Right` |
 | Activiteitenlogboek: Laatste fout kopiëren |  |

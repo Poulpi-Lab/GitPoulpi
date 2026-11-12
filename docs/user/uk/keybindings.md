@@ -868,6 +868,9 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також tmu
 | Журнал активності: вибрати область |  |
 | Журнал активності: операції git |  |
 | Журнал активності: журнал застосунку |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Журнал активності: прокрутити ліворуч | `Left` |
 | Журнал активності: прокрутити праворуч | `Right` |
 | Журнал активності: копіювати останню помилку |  |

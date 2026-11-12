@@ -1,0 +1,4 @@
+# `gitpoulpi_ipc::ResponseError` is the wire error every answer carries (message,
+# typed half, facts, operation context); the daemon and its tests return it as
+# an `Err` in many places.
+large-error-threshold = 160

@@ -872,6 +872,9 @@ As teclas são as padrão.
 | Registro de atividade: escolher o escopo |  |
 | Registro de atividade: operações do Git |  |
 | Registro de atividade: registro do aplicativo |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Registro de atividade: rolar para a esquerda | `Left` |
 | Registro de atividade: rolar para a direita | `Right` |
 | Registro de atividade: copiar o último erro |  |

@@ -208,6 +208,7 @@ fn job_error(error: &gitpoulpi_core::Error) -> gitpoulpi_ipc::ResponseError {
         unsupported: false,
         kind: error.typed(),
         detail: None,
+        context: None,
         auth_required: false,
     }
 }
@@ -238,6 +239,7 @@ async fn answer_job_control(
                     unsupported: false,
                     kind: None,
                     detail: None,
+                    context: None,
                     auth_required: false,
                 }),
             },
@@ -367,9 +369,10 @@ async fn handle_connection(
     } = control;
     // Nothing is read or dispatched before the client proved it read the
     // user-only token file: its first request is `Hello` carrying the token.
-    if !gitpoulpi_ipc::auth::authenticate(&mut stream, &token, &info).await {
+    let Some(client) = gitpoulpi_ipc::auth::authenticate_named(&mut stream, &token, &info).await
+    else {
         return;
-    }
+    };
     let mut conn_ui = ConnUi::new(viewers.next_conn());
     let (read_half, mut write_half) = stream.into_split();
     let mut events_rx = events_tx.subscribe();
@@ -384,7 +387,11 @@ async fn handle_connection(
         loop {
             tokio::select! {
                 msg = out_rx.recv() => match msg {
-                    Some(msg) => {
+                    Some(mut msg) => {
+                        // The frontend this connection said it is goes into
+                        // the context of every failure it is answered with,
+                        // and into the log line of that failure.
+                        crate::dispatch::stamp_failure(&mut msg, client.as_deref());
                         if write_message(&mut write_half, &msg).await.is_err() {
                             return;
                         }
@@ -668,6 +675,7 @@ async fn handle_connection(
             }
         };
         if let Some(job) = job {
+            note_job(&mut dispatched.response, job.id());
             job.finish(&dispatched.response.result);
         }
         if is_canceled_response(&dispatched) && command != OperationKind::Clone {
@@ -814,7 +822,7 @@ fn run_admitted(
                     None => Some(lock.lock_owned().await),
                 };
                 let started = std::time::Instant::now();
-                let result = if held.is_some() {
+                let mut result = if held.is_some() {
                     if let Some(job) = &job {
                         job.running();
                     }
@@ -826,6 +834,9 @@ fn run_admitted(
                         &events_tx,
                     ))
                 };
+                if let (Ok(d), Some(job)) = (&mut result, &job) {
+                    note_job(&mut d.response, job.id());
+                }
                 if let Some(job) = job {
                     let outcome: JobResult = match &result {
                         Ok(d) => d.response.result.clone(),
@@ -908,6 +919,16 @@ fn run_admitted(
     });
 }
 
+/// A failed request that became job `id` says so in its context: the number
+/// the Jobs list shows.
+fn note_job(response: &mut Response, id: u64) {
+    if let Err(error) = &mut response.result {
+        if let Some(context) = &mut error.context {
+            context.job = Some(id);
+        }
+    }
+}
+
 /// What the connection loop does after a control request.
 enum Flow {
     Continue,
@@ -949,6 +970,7 @@ async fn handle_control(
                     unsupported: false,
                     kind: None,
                     detail: None,
+                    context: None,
                     auth_required: false,
                 }),
             };

@@ -30,6 +30,7 @@ fn main() {
     // Started by git as the credential helper of an account-authenticated
     // transfer (ADR-0010)? Then this is all the process does.
     gitpoulpi_ipc::git_credential::run_if_requested();
+    gitpoulpi_ipc::auth::set_client_name("CLI");
     let worker = std::thread::Builder::new()
         .name("gitpoulpi-main".into())
         .stack_size(STACK_BYTES)
@@ -216,6 +217,11 @@ fn run_repo_command(cli: cli::Cli, session: String, backend: DefaultBackend) {
             );
         } else {
             eprintln!("gitpoulpi: {err}");
+            if let Some(context) = gitpoulpi_commands::client::error_context_for(&err.to_string()) {
+                for line in context.report_lines() {
+                    eprintln!("  {line}");
+                }
+            }
             if let Some(detail) = gitpoulpi_commands::client::error_detail_for(&err.to_string()) {
                 for line in detail.lines() {
                     eprintln!("  {line}");

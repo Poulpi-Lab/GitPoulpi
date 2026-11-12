@@ -133,7 +133,7 @@ fn a_failed_fetch_is_in_the_status_line_and_the_log_keeps_it_with_details_and_co
     let log = term
         .wait_for("the application log", STEP, |s| {
             s.contains("Level:")
-                && s.contains("Fetch failed:")
+                && s.contains("Fetch all remotes failed [op #")
                 && s.contains("gitpoulpi-tui starting")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -146,7 +146,7 @@ fn a_failed_fetch_is_in_the_status_line_and_the_log_keeps_it_with_details_and_co
         .flatten()
         .map(|e| std::fs::read_to_string(e.path()).unwrap_or_default())
         .collect::<String>();
-    assert!(today.contains("Fetch failed"), "{today}");
+    assert!(today.contains("Fetch all remotes failed"), "{today}");
     assert!(!today.contains(SECRET), "{today}");
 }
 
@@ -168,7 +168,7 @@ fn the_level_box_filters_the_application_log() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Tab").unwrap();
     term.wait_for("both kinds of line at the default level", STEP, |s| {
-        s.contains("gitpoulpi-tui starting") && s.contains("Push failed:")
+        s.contains("gitpoulpi-tui starting") && s.contains("Push failed (")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
@@ -185,7 +185,7 @@ fn the_level_box_filters_the_application_log() {
     let (c, r) = *list.find_all("Warning").last().unwrap();
     term.click(c + 1, r).expect("pick Warning");
     term.wait_for("only warnings and errors", STEP, |s| {
-        s.contains("Push failed:") && !s.contains("gitpoulpi-tui starting")
+        s.contains("Push failed (") && !s.contains("gitpoulpi-tui starting")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 

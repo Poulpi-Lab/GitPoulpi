@@ -412,6 +412,7 @@ fn err(request_id: u64, message: impl Into<String>) -> Response {
             unsupported: false,
             kind: None,
             detail: None,
+            context: None,
             auth_required: false,
         }),
     }

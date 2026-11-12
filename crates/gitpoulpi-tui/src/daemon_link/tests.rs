@@ -546,6 +546,7 @@ async fn a_stage_file_event_refreshes_status_without_log_or_lfs() {
                         unsupported: true,
                         kind: None,
                         detail: None,
+                        context: None,
                         auth_required: false,
                     })
                 }
@@ -700,6 +701,7 @@ async fn a_stage_all_is_sent_at_once_while_a_slow_refresh_is_in_flight() {
                                 unsupported: true,
                                 kind: None,
                                 detail: None,
+                                context: None,
                                 auth_required: false,
                             })
                         }

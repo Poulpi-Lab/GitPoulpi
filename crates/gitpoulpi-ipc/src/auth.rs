@@ -90,12 +90,42 @@ impl Endpoint {
 struct HelloArgs {
     #[serde(default)]
     token: Option<String>,
+    /// Which frontend this connection is (`TUI`, `CLI`, `MCP`): the daemon
+    /// names it in the errors and log lines of this connection's requests.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    client: Option<String>,
+}
+
+static CLIENT_NAME: std::sync::Mutex<Option<&'static str>> = std::sync::Mutex::new(None);
+
+/// Names this process's frontend (`"TUI"`, `"CLI"`, `"MCP"`) for the
+/// connections it opens from now on. The last call wins: `gitpoulpi` with no
+/// subcommand starts as the CLI and becomes the TUI.
+pub fn set_client_name(name: &'static str) {
+    *CLIENT_NAME.lock().unwrap_or_else(|e| e.into_inner()) = Some(name);
+}
+
+fn client_name() -> Option<&'static str> {
+    *CLIENT_NAME.lock().unwrap_or_else(|e| e.into_inner())
+}
+
+/// A client name as the daemon keeps it: a short word, nothing a client could
+/// use to put markup or a second line in a log.
+fn clean_client_name(name: &str) -> Option<String> {
+    let name: String = name
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | ' '))
+        .take(16)
+        .collect();
+    let name = name.trim().to_string();
+    (!name.is_empty()).then_some(name)
 }
 
 /// The first request of a connection.
 pub fn hello_request(token: Option<&Token>) -> Request {
     let args = HelloArgs {
         token: token.map(Token::to_hex),
+        client: client_name().map(str::to_string),
     };
     Request {
         id: HANDSHAKE_REQUEST_ID,
@@ -114,6 +144,7 @@ fn refusal(request_id: u64) -> ServerMessage {
             unsupported: false,
             kind: None,
             detail: None,
+            context: None,
             auth_required: true,
         }),
     })
@@ -141,31 +172,64 @@ pub async fn authenticate_within<S>(
 where
     S: AsyncRead + AsyncWrite + Unpin,
 {
+    authenticate_named_within(stream, token, info, patience)
+        .await
+        .is_some()
+}
+
+/// [`authenticate`] that also returns the frontend name the client gave in its
+/// `Hello` (`Some(None)`: let in, but anonymous; `None`: refused).
+pub async fn authenticate_named<S>(
+    stream: &mut S,
+    token: &Token,
+    info: &DaemonInfo,
+) -> Option<Option<String>>
+where
+    S: AsyncRead + AsyncWrite + Unpin,
+{
+    authenticate_named_within(stream, token, info, AUTH_TIMEOUT).await
+}
+
+async fn authenticate_named_within<S>(
+    stream: &mut S,
+    token: &Token,
+    info: &DaemonInfo,
+    patience: Duration,
+) -> Option<Option<String>>
+where
+    S: AsyncRead + AsyncWrite + Unpin,
+{
     let first = tokio::time::timeout(patience, read_message::<_, Request>(stream)).await;
     let request = match first {
         Ok(Ok(Some(request))) => request,
         // Closed, malformed or too slow: nothing worth answering.
-        Ok(Ok(None)) | Err(_) => return false,
+        Ok(Ok(None)) | Err(_) => return None,
         Ok(Err(_)) => {
             let _ = write_message(stream, &refusal(0)).await;
-            return false;
+            return None;
         }
     };
-    let presented = (request.command == OperationKind::Hello)
+    let hello = (request.command == OperationKind::Hello)
         .then(|| serde_json::from_value::<HelloArgs>(request.args.clone()).ok())
-        .flatten()
+        .flatten();
+    let client = hello
+        .as_ref()
+        .and_then(|args| args.client.as_deref())
+        .and_then(clean_client_name);
+    let presented = hello
         .and_then(|args| args.token)
         .and_then(|hex| Token::from_hex(&hex));
     let accepted = presented.is_some_and(|presented| token.matches(&presented));
     if !accepted {
         let _ = write_message(stream, &refusal(request.id)).await;
-        return false;
+        return None;
     }
     let reply = ServerMessage::Response(Response {
         request_id: request.id,
         result: Ok(serde_json::to_value(info).unwrap_or(serde_json::Value::Null)),
     });
-    write_message(stream, &reply).await.is_ok()
+    write_message(stream, &reply).await.ok()?;
+    Some(client)
 }
 
 /// The client's side: sends `Hello` (with the token when there is one) and
@@ -238,6 +302,24 @@ mod tests {
         let (ok, shaken) = tokio::join!(daemon, handshake(&mut client, Some(&token)));
         assert!(ok);
         shaken.unwrap();
+    }
+
+    #[tokio::test]
+    async fn the_frontend_a_hello_names_is_returned_cleaned() {
+        let token = Token::generate().unwrap();
+        let (mut daemon_end, mut client) = tokio::io::duplex(4096);
+        let mut hello = hello_request(Some(&token));
+        hello.args["client"] = serde_json::json!("CLI\n[op #9]");
+        write_message(&mut client, &hello).await.unwrap();
+        let named = authenticate_named(&mut daemon_end, &token, &info()).await;
+        assert_eq!(named, Some(Some("CLIop 9".to_string())));
+        // An anonymous client is let in all the same.
+        let (mut daemon_end, mut client) = tokio::io::duplex(4096);
+        write_message(&mut client, &hello_request(Some(&token)))
+            .await
+            .unwrap();
+        let named = authenticate_named(&mut daemon_end, &token, &info()).await;
+        assert_eq!(named, Some(None));
     }
 
     #[tokio::test]

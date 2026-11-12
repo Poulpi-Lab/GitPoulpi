@@ -172,7 +172,28 @@ fn tail(stderr: &str) -> String {
     chars[start..].iter().collect()
 }
 
+/// What the application log calls this command: "Token command `prog` in
+/// `folder`". The program's name only: its arguments may hold a secret.
+fn what(command: &TokenCommand) -> String {
+    let program = command
+        .argv
+        .first()
+        .map(|p| {
+            Path::new(p)
+                .file_name()
+                .map_or_else(|| p.clone(), |n| n.to_string_lossy().into_owned())
+        })
+        .unwrap_or_default();
+    let folder = command
+        .cwd
+        .file_name()
+        .map(|n| n.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    gitpoulpi_core::redact(&format!("Token command `{program}` in `{folder}`"))
+}
+
 async fn run(command: &TokenCommand) -> Result<Credential, Error> {
+    let what = what(command);
     let output = match gitpoulpi_cli_backend::run_command(
         &command.argv,
         &command.cwd,
@@ -183,7 +204,7 @@ async fn run(command: &TokenCommand) -> Result<Credential, Error> {
         Ok(output) => output,
         Err(gitpoulpi_cli_backend::CommandRunError::TimedOut) => {
             tracing::warn!(
-                "the token command ran longer than {} s and was killed",
+                "{what} failed: it ran longer than {} s and was killed",
                 command.timeout.as_secs()
             );
             return Err(failed(
@@ -196,17 +217,17 @@ async fn run(command: &TokenCommand) -> Result<Credential, Error> {
         }
         Err(gitpoulpi_cli_backend::CommandRunError::Spawn(why)) => {
             tracing::warn!(
-                "the token command could not start: {}",
+                "{what} failed: it could not start: {}",
                 gitpoulpi_core::redact(&why)
             );
             return Err(failed(None, &why));
         }
     };
     for line in output.stderr.lines().filter(|l| !l.trim().is_empty()) {
-        tracing::info!("token command stderr: {}", gitpoulpi_core::redact(line));
+        tracing::info!("{what} stderr: {}", gitpoulpi_core::redact(line));
     }
     if output.exit_code != Some(0) {
-        tracing::warn!("the token command exited with {:?}", output.exit_code);
+        tracing::warn!("{what} failed: it exited with {:?}", output.exit_code);
         return Err(failed(output.exit_code, &output.stderr));
     }
     let Some(parsed) = parse_output(&output.stdout) else {

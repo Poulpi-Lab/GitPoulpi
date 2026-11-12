@@ -106,6 +106,17 @@ fn activity_lines(entries: &[Entry], expanded: &[u64], width: usize) -> Vec<Line
                 out.push(Line::Text(format!("{indent}{l}"), muted));
             }
         }
+        if let Some(context) = entry
+            .context
+            .as_ref()
+            .filter(|_| entry.severity != Severity::Info)
+        {
+            for l in context_detail(context) {
+                for wrapped in crate::ui_kit::wrap_words(&l, room) {
+                    out.push(Line::Text(format!("{indent}{wrapped}"), muted));
+                }
+            }
+        }
         let raw: Vec<String> = match &entry.detail {
             Some(d) => d.lines(),
             None => entry.message.lines().map(str::to_string).collect(),
@@ -122,6 +133,22 @@ fn activity_lines(entries: &[Entry], expanded: &[u64], width: usize) -> Vec<Line
         out.push(Line::Buttons(i));
     }
     out
+}
+
+/// The detail lines that say what produced a failure: the operation with its
+/// main arguments, the repository, who asked and the operation id.
+fn context_detail(context: &gitpoulpi_core::OpContext) -> Vec<String> {
+    let mut lines = vec![msg::ctx_operation(context.describe())];
+    if let Some(repo) = &context.repo {
+        lines.push(msg::ctx_repository(gitpoulpi_core::redact(repo)));
+    }
+    if let Some(frontend) = &context.frontend {
+        lines.push(msg::ctx_requested_by(frontend));
+    }
+    if context.request > 0 {
+        lines.push(msg::ctx_id(context.request));
+    }
+    lines
 }
 
 /// The window: movable and resizable.
@@ -310,7 +337,7 @@ pub(crate) fn render(frame: &mut Frame) {
 
     let (lines_len, offset) = match tab {
         Tab::Git => paint_activity(buf, &mut hits, list, row_w, page, &over),
-        Tab::Application => paint_app(buf, list, row_w, page),
+        Tab::Application => paint_app(buf, &mut hits, list, row_w, page),
     };
     with(|s| {
         s.window = rect;
@@ -779,6 +806,20 @@ fn header_segments(entry: &Entry, is_open: bool, sc: &Scoping) -> Vec<(String, S
         }
     }
     let muted = Style::default().fg(th().ui.muted);
+    // A failure says what produced it: the main arguments after the title,
+    // who asked and the operation id at the end.
+    let mut args = String::new();
+    if entry.severity != Severity::Info {
+        if let Some(context) = &entry.context {
+            if !context.args.is_empty() {
+                args = format!(" ({})", context.args);
+            }
+            if context.request > 0 {
+                let who = context.frontend.as_deref().unwrap_or("?");
+                rest.push_str(&format!(" [{who} #{}]", context.request));
+            }
+        }
+    }
     vec![
         (format!("{marker} {clock}  "), muted),
         (
@@ -795,6 +836,7 @@ fn header_segments(entry: &Entry, is_open: bool, sc: &Scoping) -> Vec<(String, S
                 .fg(th().ui.text)
                 .add_modifier(Modifier::BOLD),
         ),
+        (args, muted),
         (rest, muted),
     ]
 }
@@ -834,13 +876,22 @@ fn window_cells(text: &str, skip: usize, width: usize) -> String {
     out
 }
 
-fn paint_app(buf: &mut Buffer, list: Rect, row_w: usize, page: usize) -> (usize, usize) {
+fn paint_app(
+    buf: &mut Buffer,
+    hits: &mut Vec<(Rect, Hit)>,
+    list: Rect,
+    row_w: usize,
+    page: usize,
+) -> (usize, usize) {
     let (level, shown, filter) = with(|s| (s.view_level, s.shown, s.filter.clone()));
     let sc = scoping();
     let records = visible_records(&sc, level, &shown, &filter);
     let panel = th().ui.panel;
-    let mut lines: Vec<(String, Style)> = Vec::new();
-    for r in &records {
+    let selected = with(|s| s.app_sel.clone())
+        .and_then(|key| records.iter().position(|r| record_key(r) == key));
+    // Each line with the record it belongs to (a record may wrap onto more).
+    let mut lines: Vec<(String, Style, usize)> = Vec::new();
+    for (index, r) in records.iter().enumerate() {
         let style = Style::default()
             .fg(match r.level {
                 Level::Error => th().status.danger,
@@ -868,9 +919,10 @@ fn paint_app(buf: &mut Buffer, list: Rect, row_w: usize, page: usize) -> (usize,
                 first
             ),
             style,
+            index,
         ));
         for more in parts {
-            lines.push((format!("    {more}"), style));
+            lines.push((format!("    {more}"), style, index));
         }
     }
     if lines.is_empty() {
@@ -896,25 +948,44 @@ fn paint_app(buf: &mut Buffer, list: Rect, row_w: usize, page: usize) -> (usize,
     }
     let longest = lines
         .iter()
-        .map(|(text, _)| display_width(text))
+        .map(|(text, _, _)| display_width(text))
         .max()
         .unwrap_or(0);
     let (offset, hoffset) = with(|s| {
         let max = lines.len().saturating_sub(page);
         s.offset[1] = s.offset[1].min(max);
+        // A key moved the selection: keep its first line in view.
+        if std::mem::take(&mut s.app_follow) {
+            if let Some(sel) = selected {
+                let at = lines.iter().position(|l| l.2 == sel).unwrap_or(0);
+                if at < s.offset[1] {
+                    s.offset[1] = at;
+                } else if at >= s.offset[1] + page {
+                    s.offset[1] = (at + 1).saturating_sub(page).min(max);
+                }
+            }
+        }
         s.longest = longest;
         s.hoffset = s.hoffset.min(longest.saturating_sub(row_w));
         (s.offset[1], s.hoffset)
     });
-    for (row, (text, style)) in lines.iter().skip(offset).take(page).enumerate() {
+    for (row, (text, style, record)) in lines.iter().skip(offset).take(page).enumerate() {
+        let y = list.y + row as u16;
+        let r = Rect::new(list.x, y, row_w as u16, 1);
+        let bg = (Some(*record) == selected).then(|| th().ui.selection);
+        let style = bg.map_or(*style, |bg| style.bg(bg));
+        if bg.is_some() {
+            dialog_kit::fill(buf, r, Style::default().bg(style.bg.unwrap_or(panel)));
+        }
         dialog_kit::put(
             buf,
             list.x,
-            list.y + row as u16,
+            y,
             &window_cells(text, hoffset, row_w),
             row_w as u16,
-            *style,
+            style,
         );
+        hits.push((r, Hit::AppLine(*record)));
     }
     (lines.len(), offset)
 }

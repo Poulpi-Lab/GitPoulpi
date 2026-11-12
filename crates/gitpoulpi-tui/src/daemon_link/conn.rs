@@ -153,10 +153,15 @@ pub(super) async fn call_raw(
         Ok(value) => Ok(value),
         // The typed half first: a diverged push must stay a
         // `PushRejected` all the way to the render loop.
-        Err(e) => Err(match e.kind {
-            Some(kind) => CoreError::from_typed(kind),
-            None => CoreError::from_wire(e.message, e.detail.map(|d| *d)),
-        }),
+        Err(e) => {
+            if let Some(context) = &e.context {
+                super::failed_op::note(context);
+            }
+            Err(match e.kind {
+                Some(kind) => CoreError::from_typed(kind),
+                None => CoreError::from_wire(e.message, e.detail.map(|d| *d)),
+            })
+        }
     }
 }
 

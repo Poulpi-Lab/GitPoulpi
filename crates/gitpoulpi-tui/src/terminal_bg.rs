@@ -12,12 +12,13 @@
 //! and ConPTY (which is why the crate has a Windows path at all) is simply
 //! skipped here.
 
-// Windows never sends the query (see `detect_is_light`): the parsing
-// helpers below only exist on unix, and in tests everywhere.
+// Windows never sends the query (see `detect_is_light`), but the start-up
+// probe's reply parser is compiled everywhere, so the OSC 11 parser is too
+// (unused off unix).
 
 /// Parses `rgb:R/G/B` (1 to 4 hex digits per channel), `rgba:R/G/B/A` or
 /// `#rrggbb` out of an OSC 11 reply, scaled to 8 bits per channel.
-#[cfg(any(unix, test))]
+#[cfg_attr(not(unix), allow(dead_code))]
 pub(crate) fn parse_osc11(bytes: &[u8]) -> Option<(u8, u8, u8)> {
     let text = String::from_utf8_lossy(bytes);
     let start = text.find("\x1b]11;")? + "\x1b]11;".len();
@@ -44,7 +45,7 @@ pub(crate) fn parse_osc11(bytes: &[u8]) -> Option<(u8, u8, u8)> {
 }
 
 /// One hex channel of 1 to 4 digits, scaled to 0..=255.
-#[cfg(any(unix, test))]
+#[cfg_attr(not(unix), allow(dead_code))]
 fn scale(digits: &str) -> Option<u8> {
     if digits.is_empty() || digits.len() > 4 || !digits.bytes().all(|b| b.is_ascii_hexdigit()) {
         return None;

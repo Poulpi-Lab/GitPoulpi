@@ -58,6 +58,8 @@ pub struct Launch {
     attributes: Option<String>,
     /// XTVERSION reply text (see [`Launch::answer_version`]).
     version: Option<String>,
+    /// Never answer the device attributes query (see [`Launch::mute_attributes`]).
+    mute_attributes: bool,
     terminal_image: bool,
     mouse_capture: bool,
     startup: Duration,
@@ -87,6 +89,7 @@ pub fn launch(repo: impl AsRef<Path>) -> Launch {
         background: None,
         attributes: None,
         version: None,
+        mute_attributes: false,
         terminal_image: false,
         mouse_capture: false,
         startup: STARTUP,
@@ -177,6 +180,13 @@ impl Launch {
     /// (`62;4;22` draws sixel); a plain VT100 `1;2` by default.
     pub fn answer_attributes(mut self, params: &str) -> Self {
         self.attributes = Some(params.to_string());
+        self
+    }
+
+    /// Never answers the device attributes query: a terminal deaf to the
+    /// whole start-up probe.
+    pub fn mute_attributes(mut self) -> Self {
+        self.mute_attributes = true;
         self
     }
 
@@ -367,6 +377,9 @@ impl Launch {
         }
         if let Some(name) = &self.version {
             builder = builder.answer_version(name);
+        }
+        if self.mute_attributes {
+            builder = builder.mute_attributes();
         }
         let term = builder.spawn().expect("spawn the TUI in a pty");
         if self.detached {

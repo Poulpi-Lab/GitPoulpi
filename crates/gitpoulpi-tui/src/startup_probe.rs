@@ -195,9 +195,8 @@ pub(crate) fn run() {
 #[cfg(unix)]
 fn probe(budget: Duration) -> Reply {
     use std::fs::OpenOptions;
-    use std::io::{Read, Write};
+    use std::io::Write;
     use std::os::fd::AsRawFd;
-    use std::time::Instant;
 
     let Ok(mut tty) = OpenOptions::new().read(true).write(true).open("/dev/tty") else {
         return Reply::default();
@@ -205,6 +204,15 @@ fn probe(budget: Duration) -> Reply {
     if tty.write_all(QUERY).and_then(|()| tty.flush()).is_err() {
         return Reply::default();
     }
+    read_reply(tty.as_raw_fd(), budget)
+}
+
+/// Reads from `fd` until the sentinel is in or `budget` is spent, and parses
+/// what came. Never blocks past the budget: `poll` with the time left.
+#[cfg(unix)]
+fn read_reply(fd: std::os::fd::RawFd, budget: Duration) -> Reply {
+    use std::time::Instant;
+
     let deadline = Instant::now() + budget;
     let mut seen: Vec<u8> = Vec::new();
     while !is_complete(&seen) {
@@ -213,7 +221,7 @@ fn probe(budget: Duration) -> Reply {
             break;
         }
         let mut pfd = libc::pollfd {
-            fd: tty.as_raw_fd(),
+            fd,
             events: libc::POLLIN,
             revents: 0,
         };
@@ -230,10 +238,12 @@ fn probe(budget: Duration) -> Reply {
             break;
         }
         let mut chunk = [0u8; 256];
-        match tty.read(&mut chunk) {
-            Ok(0) | Err(_) => break,
-            Ok(n) => seen.extend_from_slice(&chunk[..n]),
+        // SAFETY: `chunk` is a valid buffer of the length passed.
+        let n = unsafe { libc::read(fd, chunk.as_mut_ptr().cast(), chunk.len()) };
+        if n <= 0 {
+            break;
         }
+        seen.extend_from_slice(&chunk[..n as usize]);
     }
     parse(&seen)
 }
@@ -327,5 +337,45 @@ mod tests {
     #[test]
     fn before_the_probe_ran_nothing_is_known() {
         assert_eq!(*reply(), Reply::default());
+    }
+
+    #[cfg(unix)]
+    fn pipe() -> (i32, i32) {
+        let mut fds = [0i32; 2];
+        // SAFETY: a valid two-int array.
+        assert_eq!(unsafe { libc::pipe(fds.as_mut_ptr()) }, 0);
+        (fds[0], fds[1])
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_silent_terminal_costs_the_budget_and_not_a_moment_more() {
+        let (read, _write) = pipe();
+        let started = std::time::Instant::now();
+        let reply = read_reply(read, Duration::from_millis(100));
+        let took = started.elapsed();
+        assert_eq!(reply, Reply::default());
+        assert!(
+            took >= Duration::from_millis(90),
+            "returned early: {took:?}"
+        );
+        assert!(took < Duration::from_secs(2), "blocked: {took:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn the_read_stops_at_the_sentinel_without_waiting_for_the_budget() {
+        let (read, write) = pipe();
+        let bytes = b"\x1bP>|foot(1.28.0)\x1b\\\x1b[?62;4c";
+        // SAFETY: a valid fd and buffer.
+        assert_eq!(
+            unsafe { libc::write(write, bytes.as_ptr().cast(), bytes.len()) },
+            bytes.len() as isize
+        );
+        let started = std::time::Instant::now();
+        let reply = read_reply(read, Duration::from_secs(30));
+        assert!(started.elapsed() < Duration::from_secs(5));
+        assert_eq!(reply.version.as_deref(), Some("foot(1.28.0)"));
+        assert!(reply.sixel());
     }
 }

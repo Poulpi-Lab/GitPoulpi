@@ -175,6 +175,8 @@ pub struct Builder {
     attributes: Option<String>,
     /// The XTVERSION reply text (see [`Builder::answer_version`]).
     version: Option<String>,
+    /// See [`Builder::mute_attributes`].
+    mute_attributes: bool,
 }
 
 impl Builder {
@@ -183,6 +185,15 @@ impl Builder {
     /// default is `1;2`, a plain VT100.
     pub fn answer_attributes(mut self, params: &str) -> Self {
         self.attributes = Some(params.to_string());
+        self
+    }
+
+    /// Makes this terminal never answer the device attributes query, as a
+    /// terminal that hears nothing of the start-up probe: the child has to
+    /// go on by its own deadline. Do not use on Windows, where the console
+    /// host does not start the child until it is answered.
+    pub fn mute_attributes(mut self) -> Self {
+        self.mute_attributes = true;
         self
     }
 
@@ -376,6 +387,7 @@ impl Terminal {
             background: None,
             attributes: None,
             version: None,
+            mute_attributes: false,
         }
     }
 
@@ -501,6 +513,7 @@ impl Terminal {
         let background = builder.background.clone();
         let attributes = builder.attributes.clone();
         let version = builder.version.clone();
+        let mute_attributes = builder.mute_attributes;
         let thread_inner = Arc::clone(&inner);
         let thread_writer = Arc::clone(&writer);
         let handle = std::thread::Builder::new()
@@ -552,6 +565,7 @@ impl Terminal {
                                     background: background.as_deref(),
                                     attributes: attributes.as_deref(),
                                     version: version.as_deref(),
+                                    mute_attributes,
                                 },
                             );
                             if !reply.is_empty() {

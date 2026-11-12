@@ -1006,12 +1006,18 @@ touching date patterns).
   multiplexer signal (`HERDR_*`, `TMUX`, `ZELLIJ`, `STY`, `TERM=screen*|tmux*`)
   unless herdr's config enables Kitty graphics; `ui.graph_renderer` /
   `ui.image_protocol` override; `GITPOULPI_TERMINAL_IMAGE=off` wins.
-- Never query the terminal and wait on stdin for the reply (cell size, Kitty
-  `a=q`): it ate the pty suite's keystrokes, and on Windows the reply is not bytes.
+- Never query the terminal and wait on stdin for the reply from a **helper thread** (cell
+  size, Kitty `a=q`): a blocked read cannot be canceled and ate the pty suite's keystrokes,
+  and on Windows the reply is not bytes. The one allowed read is `startup_probe`: a `poll`
+  with a deadline on the calling thread, once, before the event reader exists (Unix only),
+  one write and one read for keyboard flags, OSC 11, XTVERSION and DA1 (the sentinel).
+  Its answers only add a protocol where the environment names nobody (DA1 `4` = sixel,
+  XTVERSION name), never inside a multiplexer (tmux claims sixel in its own DA1).
 - **Sixel** (`terminal_image/sixel.rs`, `Protocol::Sixel`) is detected from the
-  environment only (`WT_SESSION`, `TERM=foot*|mlterm*`, `KONSOLE_VERSION`), after
-  kitty and iTerm2: the DA1 reply (parameter 4) would need a stdin read, see above, so
-  VS Code and xterm opt in with `ui.image_protocol = "sixel"`. It is an `Encoded` that
+  environment (`WT_SESSION`, `TERM=foot*|mlterm*`, `KONSOLE_VERSION`), after
+  kitty and iTerm2, then from the start-up probe's DA1 parameter 4 (VS Code with images,
+  xterm `-ti vt340`); a terminal that draws sixel without saying so opts in with
+  `ui.image_protocol = "sixel"`. It is an `Encoded` that
   `blends()` (transparent pixels, `P2 = 1`): same buffer discipline as `Iterm2Alpha`
   (blank reserved cells, `under` cells rewritten before the picture, `over` after), so
   there is nothing to delete and no id. It must be **exactly** `cols x cell.width` by

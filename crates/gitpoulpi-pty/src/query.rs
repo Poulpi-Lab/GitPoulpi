@@ -53,6 +53,10 @@ pub struct Replies<'a> {
     /// The parameters of the primary device attributes reply, after the
     /// `?` (`"62;4;22"` is a VT220 with sixel); `None` is `"1;2"`.
     pub attributes: Option<&'a str>,
+    /// Never answer the device attributes query: a terminal that is silent
+    /// to everything the start-up probe asks (a pipe, a multiplexer that
+    /// swallows it).
+    pub mute_attributes: bool,
     /// The text of the XTVERSION reply (`"XTerm(388)"`); `None` stays silent,
     /// as a terminal that does not know the query does.
     pub version: Option<&'a str>,
@@ -91,10 +95,12 @@ pub fn answer_queries_with(
     if let Some(name) = replies.version {
         queries.push((XTVERSION, format!("\x1bP>|{name}\x1b\\")));
     }
-    queries.push((
-        DA,
-        format!("\x1b[?{}c", replies.attributes.unwrap_or("1;2")),
-    ));
+    if !replies.mute_attributes {
+        queries.push((
+            DA,
+            format!("\x1b[?{}c", replies.attributes.unwrap_or("1;2")),
+        ));
+    }
     for (needle, answer) in queries {
         let mut at = 0;
         while let Some(found) = find(&haystack[at..], needle) {
@@ -217,5 +223,14 @@ mod tests {
     fn without_configuration_the_version_stays_silent_and_the_attributes_are_plain() {
         let reply = answer_queries_with(b"\x1b[>0q\x1b[c", 0, (0, 0), &Replies::default());
         assert_eq!(String::from_utf8(reply).unwrap(), "\x1b[?1;2c");
+    }
+
+    #[test]
+    fn a_muted_terminal_leaves_the_attributes_query_unanswered() {
+        let replies = Replies {
+            mute_attributes: true,
+            ..Replies::default()
+        };
+        assert!(answer_queries_with(b"\x1b[c", 0, (0, 0), &replies).is_empty());
     }
 }

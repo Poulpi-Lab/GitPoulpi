@@ -1125,6 +1125,21 @@ fn the_window_shows_the_pointing_hand_on_controls_and_the_arrow_on_the_filter() 
 }
 
 #[test]
+fn a_press_before_the_first_frame_does_not_close_the_window() {
+    let _lock = lock();
+    let mut terminal = terminal();
+    // Opened by a key; the press is in the same batch of input, ahead of the
+    // first paint of the window.
+    close();
+    open();
+    click(5, 1);
+    assert!(is_open(), "no frame yet: there is no outside to click");
+    draw(&mut terminal);
+    click(0, 0);
+    assert!(!is_open(), "a press outside the painted window closes it");
+}
+
+#[test]
 fn the_window_moves_resizes_and_arranges() {
     let _lock = lock();
     terminal();

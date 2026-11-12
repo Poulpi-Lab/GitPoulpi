@@ -227,7 +227,8 @@ Siehe [Hosting und Issue-Tracker](hosting-integration.md).
   Ref am Commit.
 - **Rechtsklick auf eine Ref-Pille** öffnet ein Menü mit den Aktionen der Ref und des
   Commits.
-- **Rechtsklick auf die Kopfzeile** blendet Spalten ein oder aus: eine Checkliste (`[x]` / `[ ]`) mit einem ✕ im Titel; klicken Sie auf eine Zeile oder nutzen Sie die Pfeiltasten und `Space` / `Enter`, und schließen Sie sie mit dem ✕, `Esc` oder einem Klick daneben (die Palette: `Ansicht: Log: Anzuzeigende Spalten wählen`). Unter den Kontrollkästchen: `<Spalte> an Inhalt anpassen` (die angeklickte Spalte), `Alle Spalten an Inhalt anpassen` und `Spaltenbreiten zurücksetzen`.
+- **Rechtsklick auf die Kopfzeile** blendet Spalten ein oder aus: eine Checkliste (`[x]` / `[ ]`) mit einem ✕ im Titel; klicken Sie auf eine Zeile oder nutzen Sie die Pfeiltasten und `Space` / `Enter`, und schließen Sie sie mit dem ✕, `Esc` oder einem Klick daneben (die Palette: `Ansicht: Log: Anzuzeigende Spalten wählen`). Unter den Kontrollkästchen: `<Spalte> an Inhalt anpassen` (die angeklickte Spalte), `Alle Spalten an Inhalt anpassen` und `Spaltenbreiten zurücksetzen`. Das Tastaturgegenstück zum Rechtsklick: `Shift+C` wählt eine Spalte, dann öffnet `.` (oder `Shift+F10`) dasselbe Menü darauf.
+- **Die Spalten des Radars** funktionieren genauso: Ziehen Sie den Trenner nach der Repository-, `#`-, Autor- oder Alterspalte, um sie einzustellen, **doppelklicken Sie darauf**, um die Spalte an ihren breitesten Eintrag anzupassen (`C` wählt eine Spalte, dann `=`; `+` passt jede Spalte an), und **klicken Sie mit rechts auf einen Spaltentitel** (oder `C`, dann `.`) für `<Spalte> an Inhalt anpassen` und `Alle Spalten an Inhalt anpassen`.
 - **Klicken Sie auf `↑`, `↓` oder `✕`** in der Suchleiste, um zum vorherigen oder nächsten
   Treffer zu gehen oder die Leiste zu schließen.
 - **Klicken Sie auf `#12`, `ABC-12` oder `AB#12`** in einer Commit-Nachricht im rechten
@@ -370,8 +371,9 @@ Jedes Verwerfen fragt vorher.
 - **Fahren Sie über eine Zeile** für den Tooltip des Logs (die ganze Nachricht, Name und E-Mail des Autors, das volle Datum, je nach dem Teil unter dem Zeiger).
 - **Rechtsklick auf eine Zeile** öffnet ihr Menü: im Log zeigen, der Diff der Datei in diesem Commit, die Datei in diesem Commit, ihr Blame, dann das Menü des Logs für den Commit. Die Menütaste tut dasselbe mit der Tastatur.
 - **Ziehen Sie eine Grenze in der Kopfzeile** (`ui.column_resize`: standardmäßig die Trennzelle zwischen zwei Teilen, in der Kopfzeile durch ein gedämpftes `│` markiert und als Akzentlinie die Spalte entlang gezeichnet, solange der Zeiger darauf steht, wobei ein Ziehen von jeder Stelle daran die Größe ändert; mit `header` der erste Buchstabe des nächsten Namens, hervorgehoben, solange der Zeiger darauf steht), um den Teil links davon einzustellen: Spuren, Nachricht, Autor, Datum, Refs, Änderungen oder SHA. Die Zelle direkt hinter dem letzten Teil ist die Grenze des letzten Teils.
+- **Doppelklick auf eine Grenze der Kopfzeile** passt den Teil links davon an seinen Inhalt an, wie die Grenzen des Logs: die Breite, die seine breiteste Zeile ganz zeigt, nie breiter als die Spalte (per Tastatur: eine Zeile anklicken oder `Ctrl+N`, um der Spalte die Tasten zu geben, mit `Tab` den Teil wählen, dann `=`; `+` passt jeden Teil an; die Palette hat `Spalte an Inhalt anpassen` und `Alle Spalten an Inhalt anpassen`). Die Nachricht behält, was die anderen Teile übrig lassen.
 - **Ziehen Sie einen Namen der Kopfzeile** über einen anderen, um den Teil dorthin zu verschieben: derselbe Schatten, dieselbe abgedunkelte Quelle und derselbe Akzentbalken wie in der Kopfzeile des Logs, und der Teil wandert beim Loslassen (`Esc` bricht ab; `<` / `>` der Tastatur, nach `Tab`, tun dasselbe um jeweils eine Stelle).
-- **Rechtsklick auf die Kopfzeile**, um zu wählen, welche Teile angezeigt werden (Ref, Graph, Autor, Datum, Änder., SHA; die Nachricht ist immer sichtbar). die Checkliste hat ein ✕ im Titel. Die Palette hat `Spalten wählen` und einen Umschalter pro Teil.
+- **Rechtsklick auf die Kopfzeile**, um zu wählen, welche Teile angezeigt werden (Ref, Graph, Autor, Datum, Änder., SHA; die Nachricht ist immer sichtbar). Die Checkliste hat ein ✕ im Titel. Darunter: `<Teil> an Inhalt anpassen` (der angeklickte Teil) und `Alle Spalten an Inhalt anpassen`. Die Palette hat `Spalten wählen` (das Menü per Tastatur, auf dem Teil, den `Tab` gewählt hat) und einen Umschalter pro Teil.
 - **Shift+Mausrad** oder ein horizontales Mausrad scrollt die Zeilen seitlich, wenn sie breiter als die Spalte sind.
 - **Ziehen Sie den rechten Rand** der Spalte, um ihre Breite zu ändern. **Klicken Sie auf den Streifen `›`** (oder das ✕ an der Spalte, oder **klicken Sie auf das gewählte Segment** der Auswahl `Datei │ Alle` der Leiste), um sie zurückzuholen oder auszublenden.
 
@@ -465,14 +467,23 @@ Der Zeiger zeigt eine Verschiebeform über der Titelleiste und eine Größenform
 Manche Terminals lassen GitPoulpi den Mauszeiger ändern: einen Größenänderungszeiger über
 Teilern, über einer Spaltengrenze des Logs, des Radars und der Commit-Spalte (auch beim
 Ziehen), eine Hand über anklickbaren Elementen. Das funktioniert in kitty, foot, Ghostty,
-WezTerm und neueren xterm-Versionen (die Sequenz `OSC 22`). Sie wird nur gesendet, wenn sich
-die Form ändert, nie innerhalb von tmux, screen, zellij oder herdr, und der Standardzeiger
-wird beim Beenden von GitPoulpi wiederhergestellt.
-In anderen Terminals ändert sich der Zeiger nicht. Der Teiler oder die Schaltfläche unter
+mintty und einem WezTerm-Build mit dem Upstream-PR #8092 (die Sequenz `OSC 22`). Sie wird
+nur gesendet, wenn sich die Form ändert, in tmux nur für das Durchreichen verpackt
+(`allow-passthrough on`; kitty und foot zeigen sie, Ghostty nicht) und nie in screen,
+zellij oder herdr. Der Standardzeiger wird beim Beenden von GitPoulpi wiederhergestellt.
+In anderen Terminals (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows Terminal,
+xterm) ändert sich der Zeiger nicht; siehe
+[Ein Terminal wählen](terminals.md#form-des-mauszeigers-osc-22). Der Teiler oder die Schaltfläche unter
 dem Zeiger leuchtet in jedem Terminal auf.
 
 Dieselbe Art von Komponente hat überall in der App denselben Zeiger.
 
+- **Schaltflächen sind echte Schaltflächen**, in den Einstellungen (Integrationen:
+  Bearbeiten, Trennen, Entfernen, Durchsuchen, Löschen, die Snippet-Schaltflächen des
+  Anweisungseditors ...) wie in Dialogen: Beschriftungen mit Innenabstand auf gefülltem
+  Hintergrund, der unter dem Zeiger heller wird, abgedunkelt, wenn deaktiviert, nie Text
+  in `[ ]`. Die einzigen verbleibenden Klammern sind die Kästchen `[x]` / `[ ]`, die
+  Kontrollkästchen sind und wie jedes andere Bedienelement die Hand bekommen.
 - **Die zeigende Hand** steht auf Bedienelementen: Schaltflächen, Kontrollkästchen und
   Schalter, Auswahlfelder (in den Einstellungen, in den Bereichen für Issues und Pull
   Requests, im Radar, in Dialogen), Tabs und ihre Kreuze, die `+`-Schaltflächen, Links und
@@ -505,7 +516,10 @@ erscheint nur, solange Sie eine Ref tragen.
 
 ## In die Zwischenablage kopieren
 
-**Pfad kopieren** und einige andere Kopieraktionen senden den Text an das Terminal, das ihn
-in die Zwischenablage legt (OSC 52). Unterstützt Ihr Terminal das nicht, wird nichts
-kopiert. Die Kopieraktionen für markierten Text nutzen direkt die Zwischenablage des
-Systems.
+Kopieraktionen legen den Text in die System-Zwischenablage des Rechners, auf dem
+GitPoulpi läuft, und senden ihn, wo das Terminal dies bekanntermaßen beachtet, zusätzlich
+an das Terminal (OSC 52). Über SSH oder ohne Display wird nur OSC 52 gesendet: Unterstützt
+Ihr Terminal es nicht (iTerm2, bis seine Berechtigung für die Zwischenablage an ist,
+Terminal.app, GNU screen), wird nichts kopiert, und die Statuszeile sagt, dass der Text nur
+an das Terminal gesendet wurde. Siehe
+[Ein Terminal wählen](terminals.md#zwischenablage-kopieraktionen).

@@ -408,8 +408,8 @@ kommt `Ctrl+Shift+N` als `Ctrl+N` an, `Ctrl+I` als `Tab` und `Ctrl+M` als `Enter
 Einstellungsseite warnt vor einer solchen Belegung („dieses Terminal sendet nicht ...“).
 
 Terminals mit dem **Kitty-Tastaturprotokoll** können diese Tastenfolgen senden. Beispiele:
-kitty, WezTerm, Ghostty, foot, Alacritty ab 0.13 und tmux oder herdr, wenn sie das Protokoll
-durchreichen. GitPoulpi nutzt das Protokoll standardmäßig:
+kitty, WezTerm, Ghostty, foot, Alacritty ab 0.13 und zellij (tmux beantwortet es nicht:
+siehe [Multiplexer](multiplexers.md#tmux)). GitPoulpi nutzt das Protokoll standardmäßig:
 
 - Beim Start fragt GitPoulpi das Terminal und wartet höchstens etwa 100 ms auf die Antwort.
   Antwortet das Terminal nicht, bleiben die klassischen Tasten.
@@ -869,9 +869,9 @@ die Standardtasten.
 | Aktivitätsprotokoll: Bereich wählen |  |
 | Aktivitätsprotokoll: Git-Vorgänge |  |
 | Aktivitätsprotokoll: Anwendungsprotokoll |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Aktivitätsprotokoll: Vorgang dieser Zeile anzeigen |  |
+| Aktivitätsprotokoll: Nächster fehlgeschlagener Vorgang |  |
+| Aktivitätsprotokoll: Vorheriger fehlgeschlagener Vorgang |  |
 | Aktivitätsprotokoll: nach links scrollen | `Left` |
 | Aktivitätsprotokoll: nach rechts scrollen | `Right` |
 | Aktivitätsprotokoll: Letzten Fehler kopieren |  |
@@ -1210,8 +1210,33 @@ die Standardtasten.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Wiederholen**. `Ctrl+Shift+Z` braucht das Kitty-Tastaturprotokoll; `Ctrl+Y` funktioniert immer |
 | `.`, `Menu`, `Shift+F10` | Das Kontextmenü der ausgewählten Zeile öffnen |
 
-`Ctrl+Z` und `Ctrl+Y` tun nichts, solange ein Textfeld die Tastatur hat. Der Editor hat sein
-eigenes Text-Rückgängig.
+### Ctrl+Z / Ctrl+Y in einem Textfeld
+
+Solange ein Textfeld die Tastatur hat, wirken `Ctrl+Z` und `Ctrl+Y` (auch `Ctrl+Shift+Z`)
+auf den Text dieses Feldes, nie auf das Repository: Ein Feld, das die Tastatur hat, gewinnt
+immer, sodass `Ctrl+Z` in der Commit-Nachricht keinen Commit rückgängig machen kann. Überall
+sonst behalten sie ihre globale Bedeutung (das Journal für Rückgängig / Wiederholen oben).
+Das gilt für jedes Textfeld und jeden mehrzeiligen Editor: die Commit-Nachricht, die Felder
+und Texteditoren der Einstellungen, die Formulare für Pull Requests und Issues, die
+KI-Dialoge und jeden Filter und jedes Suchfeld.
+
+- **Tippen** wird wortweise rückgängig gemacht (eine Folge von Buchstaben, eine Folge von
+  Leerzeichen, eine Folge von Satzzeichen), und Tippen, das länger als eine Sekunde pausiert,
+  beginnt einen neuen Schritt. Aufeinanderfolgende Rücktasten sind ein Schritt. Ein Einfügen,
+  ein Ausschneiden, `Ctrl+U` / `Ctrl+K`, ein eingefügtes Snippet oder eine übernommene
+  Vervollständigung ist jeweils ein Schritt.
+- Ein Rückgängig bringt den Text, den Cursor und die Markierung zurück. Eine neue Änderung
+  nach einem Rückgängig verwirft, was sich hätte wiederholen lassen.
+- Jedes Feld behält einen begrenzten Verlauf (die letzten 200 Schritte, etwa 1 MB Text) und
+  vergisst ihn, wenn das Feld von außen ersetzt wird (ein im Auswahldialog gewählter Ordner,
+  ein neu geladenes Formular) oder ein anderes Feld die Tastatur übernimmt.
+- Ist nichts mehr rückgängig zu machen, tut `Ctrl+Z` nichts: Es fällt nie auf das
+  Rückgängig des Repositorys durch, solange ein Feld die Tastatur hat.
+- Der **Anweisungseditor** der KI-Einstellungen hat außerdem Schaltflächen **Rückgängig** und
+  **Wiederholen**, neben Speichern und Abbrechen, deaktiviert, solange es nichts gibt, wohin
+  man schreiten kann.
+- Der Code-Editor und der Merge-Editor behalten ihr eigenes Rückgängig (`Bearbeiten:
+  Rückgängig`, `Merge: Rückgängig`), das auch ihre Auswahlen umfasst.
 
 ## Filterbare Popup-Listen
 
@@ -1223,19 +1248,20 @@ bewegen die Hervorhebung:
 
 | Taste | Aktion |
 |---|---|
-| `Up` / `Down` | Eine Zeile bewegen |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Eine Zeile nach oben / unten bewegen |
 | `Home` / `End` | Erste / letzte Zeile |
 | `PageUp` / `PageDown` | Eine sichtbare Seite bewegen |
 | `Enter` | Die hervorgehobene Zeile wählen |
 | `Esc` | Schließen |
 
-In diesen Popups bewegen `Home` und `End` die Liste, nicht den Cursor des Filterfeldes.
-`Ctrl+A` und `Ctrl+E` setzen den Cursor weiterhin an den Anfang und das Ende, und
-`Ctrl+K` löscht bis zum Ende des Filters. Kein `Ctrl+Buchstabe`-Paar bewegt eine Liste
-(`Ctrl+N` ist das Navigationspräfix, `Ctrl+P` die Befehlspalette), und einfaches `j` und
-`k` wird in den Filter getippt: Hier bewegen nur die Pfeile, `PageUp` / `PageDown` und
-`Home` / `End`. In Listen ohne Textfeld sind `j` / `k` ein zusätzlicher Weg, nach unten /
-oben zu gehen.
+In diesen Popups bewegen `Home` und `End` die Liste, nicht den Cursor des Filterfeldes,
+und auch `Ctrl+K` / `Ctrl+J` bewegen die Liste, sodass `Ctrl+K` nicht mehr bis zum Ende des
+Filters löscht (`Ctrl+U` leert ihn weiterhin; in einem gewöhnlichen Textfeld außerhalb einer
+Liste löscht `Ctrl+K` weiterhin bis zum Zeilenende). `Ctrl+A` und `Ctrl+E` setzen den Cursor
+weiterhin an den Anfang und das Ende. `Ctrl+J` / `Ctrl+K` bewegen jede andere Liste ebenfalls,
+mit oder ohne Textfeld (`Ctrl+N` ist das Navigationspräfix und `Ctrl+P` die Befehlspalette,
+sie sind also keine Listentasten). Einfaches `j` und `k` wird in den Filter getippt; in
+Listen ohne Textfeld sind `j` / `k` ein zusätzlicher Weg, nach unten / oben zu gehen.
 
 Mit der Maus:
 
@@ -1483,7 +1509,8 @@ Dialoge, die Wartekarte und die Karte „Ein Branch ist erschienen“ sind in
 | `Enter` / `l` auf einer Dateizeile | Den Diff der Datei in der Mitte öffnen |
 | `Esc` / `h` | Zurück zu den Commits |
 | `Right` | (Commit mit mehr als einer Ref) Die Liste seiner anderen Refs öffnen: `Up` / `Down` bewegen, `Enter` checkt aus, `Esc` schließt |
-| `f` | Die Suchleiste öffnen (siehe [Suche](#suche)) |
+| `f` | Die Suchleiste öffnen (siehe [Suche](#suche)); das war nie `/`, die Suche des Logs ändert sich also nicht |
+| `/` | Das Filterfeld der Refs fokussieren (dieselbe Taste tut es, wenn der Bereich Refs den Fokus hat); wird als Zeichen getippt, wenn ein Textfeld den Fokus hat |
 | `c` | (mit nicht committeten Änderungen) Die WIP-Zeile auswählen und den Cursor in ihr Nachrichtenfeld setzen |
 | `Enter` auf der WIP-Zeile | Den Cursor in das Nachrichtenfeld der WIP-Zeile setzen |
 | `.`, `Menu`, `Shift+F10` | Das Commit-Menü. `Up` / `Down` bewegen, `Right` / `l` / `Enter` öffnen ein Untermenü, `Left` / `h` / `Esc` gehen zurück |

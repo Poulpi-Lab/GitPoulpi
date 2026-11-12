@@ -62,7 +62,7 @@ Ein Ordner-Umfang sucht Repositories **zwei Ebenen tief**: die Ordner direkt dar
 jenen, die selbst keine Repositories sind (`~/src/work/app`). Versteckte Ordner werden übersprungen, ein
 Repository wird nie betreten, und es werden höchstens 200 Repositories aufgelistet. Die Suche läuft im
 Hintergrund, nie in dem Thread, der zeichnet, und ihr Ergebnis bleibt bis zum Aktualisieren erhalten: Die
-Schaltfläche Aktualisieren, `r` oder `Radar: Aktualisieren` durchsucht den Ordner erneut (ein
+Schaltfläche Aktualisieren, `r`, `F5` (die Aktualisierungstaste des Fensters, umbelegbar) oder `Radar: Aktualisieren` durchsucht den Ordner erneut (ein
 inzwischen geklontes Repository erscheint dann).
 
 Hosting bleibt pro Repository freiwillig: Ein Repository des Ordners, das **nicht mit einem Host
@@ -213,7 +213,7 @@ Mausaktion gibt es eine Taste und einen Palettenzwilling.
 | Die Requests von Repositories ohne Klon zeigen oder ausblenden | `a` | `Radar: Nicht geklonte Anfragen zeigen` |
 | Entwürfe der kontoweiten Zeilen zeigen oder ausblenden | `d` | `Radar: Entwürfe zeigen` |
 | Die kontoweiten Review-Anfragen eines Hosts aktivieren | `T` / `Enter` auf seiner Hinweiszeile / **Aktivieren** | `Radar: Kontoweite Prüfanfragen aktivieren...` |
-| Aktualisieren | `r` | `Radar: Aktualisieren` |
+| Aktualisieren | `r`, `F5` | `Radar: Aktualisieren` |
 | Das Zeilenmenü | `.` | `Radar: Zeilenmenü...` |
 | Zurück zum Home-Tab | `Esc` | `Radar: Zurück zum Home-Tab` |
 
@@ -278,6 +278,8 @@ die [Konfigurationsreferenz](config-reference.md) und die [CLI-Referenz](cli-ref
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center und Gerrit antworten; Bitbucket Cloud hat keinen
 kontoweiten Endpunkt, daher zeigen seine Requests nur die verknüpften Repositories des Umfangs.
 
+Die **Namespaces** des Profils begrenzen alle seine Listen auf bestimmte Repositories (Einstellungen > Integrationen > Radar: ein Textbereich mit einem Eintrag pro Zeile und ein Kontrollkästchen **Reguläre Ausdrücke**). Eine Zeile passt auf den vollständigen Pfad eines Repositorys, wenn sie ihm entspricht oder ein Pfadpräfix ist, das an einem `/` endet: `ptm` behält `ptm/produits/x` und verwirft `ptmx/y` und `formation/y`. Ist das Kontrollkästchen an, ist jede Zeile ein regulärer Ausdruck, der gegen den vollständigen Pfad geprüft wird, so wie Sie ihn schreiben (`^ptm/(produits|infra)/`); eine ungültige Zeile wird unter dem Feld angezeigt und nicht gespeichert. Leer heißt keine Begrenzung.
+
 Wie die Zeilen eingeordnet werden:
 
 - Eine Zeile, die der Umfang schon listet (gleicher Host, Projekt, Art und Nummer), erscheint einmal: **die Zeile des
@@ -334,7 +336,7 @@ Zwei Kästchen neben dem Filter (sie erscheinen, sobald eine kontoweite Liste ab
 Beide stehen bei den Badges von `Ctrl+N` und in der Palette (`Radar: Nicht geklonte Anfragen zeigen`, `Radar: Entwürfe zeigen`).
 
 Die Antwort eines Profils wird **5 Minuten** in `radar-account.json` aufbewahrt: Öffnen Sie das Radar in dieser
-Zeit erneut, zeigt es die Zeilen, ohne den Host zu fragen. **Aktualisieren** (`r`) fragt immer. Ein Host, der sagte,
+Zeit erneut, zeigt es die Zeilen, ohne den Host zu fragen. **Aktualisieren** (`r` oder `F5`) fragt immer: jedes Repository und jede kontoweite Liste, wie alt die letzte Antwort auch ist. Ein Host, der sagte,
 langsamer zu machen, oder den Token ablehnte, wird in derselben Runde nicht erneut gefragt. Höchstens 300 Zeilen bleiben pro Profil und Art
 erhalten, und eine Zeile unter **Repositories** sagt, wie viele weitere es gab oder warum ein Profil nicht gelesen werden konnte
 (**Erneut verbinden** öffnet Einstellungen > Integrationen).

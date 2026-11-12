@@ -69,6 +69,8 @@ springen Sie zu den Referenzseiten, wenn Sie sie brauchen.
     „Beenden und hier cd“, und der Wrapper `gitpoulpi shell-init` (`gp`) für
     bash, zsh, fish und PowerShell.
     Welches Terminal GitPoulpi am besten darstellt: **[Ein Terminal wählen](terminals.md)**.
+    Was durch tmux, zellij, screen, herdr und Terminal-Panes hindurchkommt:
+    **[Multiplexer](multiplexers.md)**.
 
 Außerdem: **[Branching-Workflows](branching-workflows.md)**, die Vorlagen Git Flow,
 GitHub Flow, GitLab Flow und Trunk-based oder Ihre eigenen Basen, Branch-Namensmuster

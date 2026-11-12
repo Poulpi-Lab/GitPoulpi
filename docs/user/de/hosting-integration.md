@@ -705,7 +705,7 @@ Ratenlimit lässt nur dieses Profil scheitern. Antworten werden fünf Minuten wi
 In Einstellungen > Integrationen hat ein verbundenes Code-Host-Profil unter seinem SSH-Schlüssel einen Block **Radar**:
 ein Kästchen pro Liste (*Anfragen, die auf meine Prüfung warten*,
 *Jede offene Anfrage*, *Entwürfe einbeziehen*, *Mir zugewiesene Issues*, Letzteres
-fehlt bei Hosts ohne Issues), ein Feld *Namespaces* (kommagetrennt; leer
+fehlt bei Hosts ohne Issues), ein Feld *Namespaces* (ein Eintrag pro Zeile, auf Wunsch als reguläre Ausdrücke; leer
 heißt Ihr eigener und jeder, in dem Sie Mitglied sind) und die Wahl *Anfrage eines nicht geklonten
 Repositorys*: *Nachfragen*, *Klonen* oder *Über die API prüfen*.
 Alles wird gespeichert, sobald Sie es ändern. Hosts ohne kontoweite Abfrage (Bitbucket
@@ -731,10 +731,11 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Siehe die [CLI-Referenz](cli-reference.md#befehle) für jeden Befehl. Ein Token wird nie als
-Argument akzeptiert (`hosting login` gibt `stored: "os"` aus, wenn der Credential-Speicher
-des Betriebssystems es hält, oder `stored: "session"` mit `store_error`, wenn der Speicher
-es abgelehnt hat und das Token nur für diese Sitzung im Arbeitsspeicher liegt), und der
-MCP-Server bietet `hosting login` nicht an, sodass ein Token nie durch einen Agenten läuft.
+Argument akzeptiert, und der MCP-Server bietet `hosting login` nicht an, sodass ein Token
+nie durch einen Agenten läuft. `hosting login` gibt `stored: "os"` aus, wenn der
+Credential-Speicher des Betriebssystems das Token hält, oder `stored: "session"` mit
+`store_error`, wenn der Speicher es abgelehnt hat und das Token nur für diese Sitzung im
+Arbeitsspeicher liegt.
 
 ## Fehlerbehebung
 

@@ -29,8 +29,8 @@ wird über einem Schachbrett gezeichnet.
 ## Wie gezeichnet wird
 
 In einem Terminal mit Bildprotokoll (Kitty und Ghostty, WezTerm und iTerm2, Rio,
-mintty) ist das Bild ein echtes Bild. Anderswo (einfaches Windows Terminal,
-tmux, ein Terminal, das GitPoulpi nicht kennt) wird es mit farbigen
+mintty und die Sixel-Terminals Windows Terminal, foot und Tabby) ist das Bild ein echtes Bild. Anderswo (die einfache Windows-Konsole,
+zellij, ein Terminal, das GitPoulpi nicht kennt) wird es mit farbigen
 Halbblock-Zeichen gezeichnet, mit halber vertikaler Auflösung, aber überall
 lesbar; **Ohne Bildprotokoll** lässt sich auf *Nur Infokarte* stellen.
 **Bildprotokoll** auf der Seite **Verlauf & Graph** erzwingt eines.

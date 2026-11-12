@@ -581,7 +581,7 @@ pub(super) fn fire() -> ThemeSpec {
 
 /// "Fire Light": the light twin of "Fire", an original GitPoulpi theme. A real orange background, dark ember text, oxblood accent, pale flame selection; the lanes are deep reds, browns, plum, teal and navy so they read on orange.
 pub(super) fn fire_light() -> ThemeSpec {
-    derive(&Pal {
+    let mut spec = derive(&Pal {
         slug: "fire-light",
         name: "Fire Light",
         light: true,
@@ -598,7 +598,12 @@ pub(super) fn fire_light() -> ThemeSpec {
         danger: hex(0x9c0a0a),
         ai: hex(0x7a0a52),
         cyan: hex(0x004f52),
-    })
+    });
+    // The derived light focus is a mix toward white, which reads as a white
+    // box on the orange background: a pale yellow of the warm palette instead
+    // (the text reads on it at well over 4.5).
+    spec.ui.input_focus = col(hex(0xfff2b0));
+    spec
 }
 
 /// "Sunset": an original GitPoulpi theme (no upstream palette). Dusk: deep indigo-purple background, pale peach text, coral accent, plum selection, soft gold-green success, lavender `ai`.

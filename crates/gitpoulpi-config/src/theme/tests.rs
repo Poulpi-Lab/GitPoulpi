@@ -316,6 +316,47 @@ fn fire_light_is_a_light_preset_on_a_real_orange_background() {
     );
 }
 
+/// A focused text box on Fire Light is pale yellow, not the white the other
+/// light themes derive; the other light presets keep their own.
+#[test]
+fn fire_light_focuses_text_boxes_in_pale_yellow() {
+    let Some(spec) = preset("fire-light") else {
+        return;
+    };
+    let (r, g, b) = rgb(&spec, |t| t.ui.input_focus);
+    assert!(
+        r >= 0xf0 && g >= 0xe0 && (0x80..=0xc8).contains(&b),
+        "{r:x}{g:x}{b:x}"
+    );
+    let (tr, tg, tb) = rgb(&spec, |t| t.ui.text);
+    let lum = |(r, g, b): (u8, u8, u8)| {
+        let f = |v: u8| {
+            let v = f64::from(v) / 255.0;
+            if v <= 0.03928 {
+                v / 12.92
+            } else {
+                ((v + 0.055) / 1.055).powf(2.4)
+            }
+        };
+        0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+    };
+    let (a, b2) = (lum((r, g, b)), lum((tr, tg, tb)));
+    assert!((a + 0.05) / (b2 + 0.05) >= 7.0, "contrast with the text");
+    // Another light preset still derives the whitish focus.
+    if let Some(other) = preset("github-light").or_else(|| {
+        presets()
+            .into_iter()
+            .find(|p| p.light && p.slug != "fire-light")
+    }) {
+        let (r, g, b) = rgb(&other, |t| t.ui.input_focus);
+        assert!(
+            !(r >= 0xf0 && g >= 0xe0 && b <= 0xc8 && b >= 0x80 && r > b + 40),
+            "{}",
+            other.slug
+        );
+    }
+}
+
 #[test]
 fn every_preset_palette_is_in_the_lane_registry() {
     let registry = lane_palettes();

@@ -242,6 +242,13 @@ pub(crate) enum RemoteUiAction {
     SetDefaultRemote(String),
     EditRemote(String),
     RemoveRemote(String),
+    /// A leftover namespace's menu row: delete its remote-tracking branches
+    /// (what `RemoveRemote` of an unconfigured name does, asked more
+    /// plainly).
+    RemoveLeftover(String),
+    /// A leftover namespace's menu row: the Add remote form with this name
+    /// filled in.
+    AddAsRemote(String),
     FetchRemote(String),
     AddRemote,
     /// The Pull dropdown's "Fetch All": runs at once.
@@ -372,10 +379,68 @@ pub(crate) fn remote_menu_entries(
     entries
 }
 
+/// The names the REMOTE section shows a root row for that no remote is
+/// configured for: remote-tracking branches whose remote went (the
+/// repository was a fork and is not one any more). Sorted. Empty until the
+/// remote list has been read (`loaded`): before that every remote would look
+/// like one.
+pub(crate) fn leftover_names(
+    refs: &[Ref],
+    configured: &[String],
+    loaded: bool,
+) -> std::collections::BTreeSet<String> {
+    if !loaded {
+        return Default::default();
+    }
+    refs.iter()
+        .filter_map(|r| match &r.kind {
+            RefKind::RemoteBranch { remote, .. } if !configured.contains(remote) => {
+                Some(remote.clone())
+            }
+            _ => None,
+        })
+        .collect()
+}
+
+/// The menu of a leftover namespace: nothing here can fetch, push or edit
+/// an address that does not exist, so it offers the two things that make
+/// sense - drop the branches, or make it a remote again.
+pub(crate) fn leftover_menu_entries(name: &str, hidden: bool) -> Vec<Entry<RemoteUiAction>> {
+    let mut entries = vec![
+        Entry::action(
+            glyph_label("\u{2398}", msg::COPY_NAME.get()),
+            RemoteUiAction::CopyRemoteName(name.to_string()),
+        ),
+        Entry::Separator,
+        Entry::action(
+            glyph_label("\u{270E}", msg::add_as_remote(name)),
+            RemoteUiAction::AddAsRemote(name.to_string()),
+        ),
+        Entry::Separator,
+    ];
+    entries.push(if hidden {
+        Entry::action(
+            glyph_label(hide_in_graph_icon!(), msg::SHOW_REMOTE_IN_GRAPH.get()),
+            RemoteUiAction::ShowRemote(name.to_string()),
+        )
+    } else {
+        Entry::action(
+            glyph_label(hide_in_graph_icon!(), msg::HIDE_REMOTE_IN_GRAPH.get()),
+            RemoteUiAction::HideRemote(name.to_string()),
+        )
+    });
+    entries.push(Entry::danger(
+        glyph_label("\u{2717}", msg::REMOVE_LEFTOVER.get()),
+        RemoteUiAction::RemoveLeftover(name.to_string()),
+    ));
+    entries
+}
+
 /// A menu listing every remote, each row running `action(name)` - the
 /// palette's "which remote?" step for the remote commands.
 pub(crate) fn remote_chooser_entries(
     remotes: &[String],
+    leftovers: &[String],
     default: Option<&str>,
     action: impl Fn(String) -> RemoteUiAction,
 ) -> Vec<Entry<RemoteUiAction>> {
@@ -389,6 +454,12 @@ pub(crate) fn remote_chooser_entries(
             };
             Entry::action(label, action(r.clone()))
         })
+        .chain(leftovers.iter().map(|r| {
+            Entry::action(
+                format!("{r}  {}", msg::LEFTOVER_NOTE.get()),
+                action(r.clone()),
+            )
+        }))
         .collect()
 }
 

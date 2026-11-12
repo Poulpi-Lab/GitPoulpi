@@ -17,12 +17,25 @@ pub(crate) fn run_remote_palette_command(
         match selected_remote.clone() {
             Some(remote) => apply_remote_ui_action(make(remote), ctx),
             None => {
-                if let Some(why) = ctx.ui.open_chooser(caption, refs, col, row, make) {
+                if let Some(why) = ctx.ui.open_chooser(caption, refs, col, row, false, make) {
                     *ctx.last_message = Some(why);
                 }
             }
         }
     };
+    // Edit and Remove also reach a leftover namespace (no remote configured,
+    // branches still there): Edit adds it back, Remove deletes its branches.
+    let on_remote_or_leftover =
+        |make: fn(String) -> RemoteUiAction, caption: &str, ctx: RemoteUiCtx<'_>| {
+            match selected_remote.clone() {
+                Some(remote) => apply_remote_ui_action(make(remote), ctx),
+                None => {
+                    if let Some(why) = ctx.ui.open_chooser(caption, refs, col, row, true, make) {
+                        *ctx.last_message = Some(why);
+                    }
+                }
+            }
+        };
     match command {
         PaletteCommand::Fetch => {
             ctx.link.submit_action(Action::FetchAll);
@@ -73,10 +86,10 @@ pub(crate) fn run_remote_palette_command(
         }
         PaletteCommand::AddRemote => apply_remote_ui_action(RemoteUiAction::AddRemote, ctx),
         PaletteCommand::RemoveRemote => {
-            on_remote(RemoteUiAction::RemoveRemote, msg::REMOVE_WHICH.get(), ctx)
+            on_remote_or_leftover(RemoteUiAction::RemoveRemote, msg::REMOVE_WHICH.get(), ctx)
         }
         PaletteCommand::EditRemote => {
-            on_remote(RemoteUiAction::EditRemote, msg::EDIT_WHICH.get(), ctx)
+            on_remote_or_leftover(RemoteUiAction::EditRemote, msg::EDIT_WHICH.get(), ctx)
         }
         PaletteCommand::SetDefaultRemote => on_remote(
             RemoteUiAction::SetDefaultRemote,
@@ -207,15 +220,37 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
                 ui.form = Some(RemoteForm::edit(remote, ui.names()));
                 None
             }
+            // Nothing to edit, but the branches say it was once a remote:
+            // the form that gives it an address again, never an error.
+            None if leftover_names(refs, &ui.names(), ui.loaded).contains(&name) => {
+                ui.form = Some(RemoteForm::add_named(ui.names(), &name));
+                None
+            }
             None => Some(crate::git_actions::gone(&name)),
         },
+        RemoteUiAction::AddAsRemote(name) => {
+            ui.form = Some(RemoteForm::add_named(ui.names(), &name));
+            None
+        }
+        RemoteUiAction::RemoveLeftover(name) => {
+            *input_mode = InputMode::Confirm {
+                prompt: msg::remove_leftover_confirm(&name),
+                action: ConfirmAction::Destructive(PendingDestructive::RemoveRemote(name)),
+            };
+            None
+        }
         RemoteUiAction::AddRemote => {
             ui.form = Some(RemoteForm::add(ui.names()));
             None
         }
         RemoteUiAction::RemoveRemote(name) => {
+            let leftover = leftover_names(refs, &ui.names(), ui.loaded).contains(&name);
             *input_mode = InputMode::Confirm {
-                prompt: msg::remove_confirm(&name),
+                prompt: if leftover {
+                    msg::remove_leftover_confirm(&name)
+                } else {
+                    msg::remove_confirm(&name)
+                },
                 action: ConfirmAction::Destructive(PendingDestructive::RemoveRemote(name)),
             };
             None

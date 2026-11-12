@@ -2148,6 +2148,10 @@ what_remote_link = "odkaz na remote"
 not_web_url = "{url} není webová URL - není na co odkazovat"
 default_now = "{name} je nyní výchozí remote tohoto repozitáře"
 remove_confirm = "Odebrat remote „{name}“?\nSpolu s ním zmizí jeho sledovací větve; repozitář, na který ukazuje, zůstane beze změny."
+leftover_note = "(nenastaveno)"
+remove_leftover = "Odebrat zbylé větve..."
+add_as_remote = "Přidat {name} jako remote..."
+remove_leftover_confirm = "Odebrat zbylé větve „{name}“?\nPod tímto jménem není nastaven žádný remote; zmizí jen jeho sledovací větve. Zpět je vrátí."
 force_confirm_fetch = { git = "Force push {branch} do {remote}?\nNejdřív fetch {remote}, poté push s lease: commity, které má jen {remote}, se zahodí; vše odeslané po tom fetchi je chráněno.", local = "Vynutit odeslání {branch} do {remote}?\nNejdřív se načte {remote}, poté se odešle s lease: commity, které má jen {remote}, se zahodí; vše odeslané po tomto načtení je chráněno." }
 force_confirm = { git = "Force push {branch} do {remote}?\nS lease: odmítne se, pokud se {remote}/{branch} od posledního fetche posunula. Commity, které má jen {remote}, se zahodí.", local = "Vynutit odeslání {branch} do {remote}?\nS lease: odmítne se, pokud se {remote}/{branch} od posledního načtení posunula. Commity, které má jen {remote}, se zahodí." }
 setting_upstream = "nastavení upstreamu větve {branch} na {upstream}..."

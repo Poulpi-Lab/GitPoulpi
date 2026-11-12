@@ -2152,6 +2152,10 @@ what_remote_link = "lien du distant"
 not_web_url = "{url} n'est pas une URL web - aucun lien possible"
 default_now = "{name} est maintenant le distant par défaut de ce dépôt"
 remove_confirm = "Supprimer le distant « {name} » ?\nSes branches de suivi disparaissent avec lui ; le dépôt qu'il désigne n'est pas touché."
+leftover_note = "(non configuré)"
+remove_leftover = "Supprimer les branches restantes..."
+add_as_remote = "Ajouter {name} comme distant..."
+remove_leftover_confirm = "Supprimer les branches restantes de « {name} » ?\nAucun distant n'est configuré sous ce nom ; seules ses branches de suivi disparaissent. Annuler les rétablit."
 force_confirm_fetch = { git = "Force push de {branch} vers {remote} ?\nFait d'abord un fetch de {remote}, puis pousse avec lease : les {$commits} que seul {remote} possède sont perdus ; tout ce qui est poussé après ce fetch est protégé.", local = "Poussée de force de {branch} vers {remote} ?\nFait d'abord une récupération de {remote}, puis pousse avec lease : les {$commits} que seul {remote} possède sont perdus ; tout ce qui est poussé après cette récupération est protégé." }
 force_confirm = { git = "Force push de {branch} vers {remote} ?\nAvec lease : refusé si {remote}/{branch} a bougé depuis le dernier fetch. Les {$commits} que seul {remote} possède sont perdus.", local = "Poussée de force de {branch} vers {remote} ?\nAvec lease : refusée si {remote}/{branch} a bougé depuis la dernière récupération. Les {$commits} que seul {remote} possède sont perdus." }
 setting_upstream = "définition de l'amont de {branch} sur {upstream}..."

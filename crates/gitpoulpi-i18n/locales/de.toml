@@ -2149,6 +2149,10 @@ what_remote_link = "Link zum Remote"
 not_web_url = "{url} ist keine Web-URL - nichts, worauf verlinkt werden kann"
 default_now = "{name} ist jetzt das Standard-Remote dieses Repositorys"
 remove_confirm = "Remote „{name}“ entfernen?\nSeine Remote-Tracking-Branches verschwinden mit ihm; das Repository, auf das es zeigt, bleibt unberührt."
+leftover_note = "(nicht konfiguriert)"
+remove_leftover = "Übrig gebliebene Branches entfernen..."
+add_as_remote = "{name} als Remote hinzufügen..."
+remove_leftover_confirm = "Übrig gebliebene Branches von „{name}“ entfernen?\nUnter diesem Namen ist kein Remote konfiguriert; nur seine Remote-Tracking-Branches verschwinden. Rückgängig machen holt sie zurück."
 force_confirm_fetch = { git = "Force-Push von {branch} an {remote}?\nFetcht zuerst {remote} und pusht dann mit Lease: Die Commits, die nur {remote} jetzt hat, werden verworfen; alles, was nach diesem Fetch gepusht wurde, ist geschützt.", local = "Erzwungenes Hochladen von {branch} an {remote}?\nRuft zuerst {remote} ab und lädt dann mit Lease hoch: Die Commits, die nur {remote} jetzt hat, werden verworfen; alles, was nach diesem Abruf hochgeladen wurde, ist geschützt." }
 force_confirm = { git = "Force-Push von {branch} an {remote}?\nMit Lease: abgelehnt, wenn sich {remote}/{branch} seit dem letzten Fetch bewegt hat. Commits, die nur {remote} hat, werden verworfen.", local = "Erzwungenes Hochladen von {branch} an {remote}?\nMit Lease: abgelehnt, wenn sich {remote}/{branch} seit dem letzten Abruf bewegt hat. Commits, die nur {remote} hat, werden verworfen." }
 setting_upstream = "Upstream von {branch} wird auf {upstream} gesetzt..."

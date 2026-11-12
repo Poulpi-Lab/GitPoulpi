@@ -2147,6 +2147,10 @@ what_remote_link = "link do zdalnego"
 not_web_url = "{url} nie jest adresem URL w sieci - nie ma do czego linkować"
 default_now = "{name} jest teraz domyślnym zdalnym tego repozytorium"
 remove_confirm = "Usunąć zdalne „{name}”?\nJego gałęzie śledzące zdalne znikają razem z nim; repozytorium, na które wskazuje, nie jest ruszane."
+leftover_note = "(nieskonfigurowane)"
+remove_leftover = "Usuń pozostałe gałęzie..."
+add_as_remote = "Dodaj {name} jako zdalne..."
+remove_leftover_confirm = "Usunąć pozostałe gałęzie „{name}”?\nPod tą nazwą nie skonfigurowano żadnego zdalnego; znikają tylko jego gałęzie śledzące zdalne. Cofnięcie je przywraca."
 force_confirm_fetch = { git = "Force push {branch} do {remote}?\nNajpierw fetch {remote}, potem push z lease: commity, które ma teraz tylko {remote}, zostaną odrzucone; wszystko wypchnięte po tym fetchu jest chronione.", local = "Wymusić wypchnięcie {branch} do {remote}?\nNajpierw pobranie {remote}, potem wypchnięcie z lease: zatwierdzenia, które ma teraz tylko {remote}, zostaną odrzucone; wszystko wypchnięte po tym pobraniu jest chronione." }
 force_confirm = { git = "Force push {branch} do {remote}?\nZ lease: odrzucony, jeśli {remote}/{branch} zmieniło się od ostatniego fetcha. Commity, które ma tylko {remote}, zostaną odrzucone.", local = "Wymusić wypchnięcie {branch} do {remote}?\nZ lease: odrzucone, jeśli {remote}/{branch} zmieniło się od ostatniego pobrania. Zatwierdzenia, które ma tylko {remote}, zostaną odrzucone." }
 setting_upstream = "ustawianie upstreamu {branch} na {upstream}..."

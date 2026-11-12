@@ -22,6 +22,9 @@ pub(in crate::event_loop) struct SidebarDrawCtx<'a> {
     pub(in crate::event_loop) refs_result:
         &'a gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Ref>>,
     pub(in crate::event_loop) remote_names: &'a Vec<String>,
+    /// Remote-tracking namespaces no remote is configured for: their root
+    /// row in the REMOTE section carries a muted note.
+    pub(in crate::event_loop) leftover_remotes: &'a std::collections::BTreeSet<String>,
     pub(in crate::event_loop) sidebar_states: &'a mut SidebarStates,
     pub(in crate::event_loop) solo_refs: &'a std::collections::HashSet<String>,
     pub(in crate::event_loop) submodules_result: &'a Vec<gitpoulpi_core::domain::Submodule>,
@@ -92,6 +95,7 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
     let refs_filter = ctx.refs_filter;
     let refs_result = ctx.refs_result;
     let remote_names = ctx.remote_names;
+    let leftover_remotes = ctx.leftover_remotes;
     let sidebar_states = &mut *ctx.sidebar_states;
     let solo_refs = ctx.solo_refs;
     let submodules_result = ctx.submodules_result;
@@ -557,14 +561,27 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
                             if all_hidden {
                                 style = style.add_modifier(Modifier::DIM);
                             }
-                            ListItem::new(Line::from(vec![
+                            let mut spans = vec![
                                 Span::raw(indent),
                                 Span::raw(" "),
                                 Span::raw(" "),
                                 Span::raw(eye),
                                 Span::raw(" "),
                                 Span::styled(label_text, style),
-                            ]))
+                            ];
+                            if *is_remote_root
+                                && kind == RefRowKind::Remote
+                                && leftover_remotes.contains(path)
+                            {
+                                spans.push(Span::styled(
+                                    format!(
+                                        " {}",
+                                        gitpoulpi_i18n::msg::remotes::LEFTOVER_NOTE.get()
+                                    ),
+                                    Style::default().fg(th().ui.muted),
+                                ));
+                            }
+                            ListItem::new(Line::from(spans))
                         }
                         RefTreeRow::Leaf {
                             full_name,
@@ -919,6 +936,7 @@ mod tests {
                         refs_filter: &filter,
                         refs_result: &refs_result,
                         remote_names: &remote_names,
+                        leftover_remotes: &Default::default(),
                         sidebar_states: &mut states,
                         solo_refs: &solo,
                         submodules_result: &submodules,
@@ -1026,6 +1044,7 @@ mod tests {
                             refs_filter: &filter,
                             refs_result: &refs_result,
                             remote_names: &remote_names,
+                            leftover_remotes: &Default::default(),
                             sidebar_states: &mut states,
                             solo_refs: &solo,
                             submodules_result: &submodules,
@@ -1148,6 +1167,7 @@ mod tests {
                             refs_filter: &filter,
                             refs_result: &refs_result,
                             remote_names: &remote_names,
+                            leftover_remotes: &Default::default(),
                             sidebar_states: &mut states,
                             solo_refs: &solo,
                             submodules_result: &submodules,

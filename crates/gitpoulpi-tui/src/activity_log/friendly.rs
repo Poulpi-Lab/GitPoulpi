@@ -37,6 +37,18 @@ impl Remedy {
     }
 }
 
+/// The failed action and its arguments, for the error report: the variant's
+/// debug text, redacted and cut at a length a chat can take.
+pub(crate) fn action_text(action: &Action) -> String {
+    const MAX: usize = 400;
+    let text = gitpoulpi_core::redact(&format!("{action:?}"));
+    if text.chars().count() <= MAX {
+        return text;
+    }
+    let cut: String = text.chars().take(MAX).collect();
+    format!("{cut}...")
+}
+
 /// "Push failed" for the action that failed.
 pub(crate) fn title_for(action: &Action) -> String {
     let action = match action {

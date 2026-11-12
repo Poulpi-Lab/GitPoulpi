@@ -2140,6 +2140,10 @@ what_remote_link = "ссылка на remote"
 not_web_url = "{url} - не веб-адрес: ссылаться не на что"
 default_now = "{name} теперь remote по умолчанию для этого репозитория"
 remove_confirm = "Удалить remote «{name}»?\nЕго remote-tracking ветки удалятся вместе с ним; репозиторий, на который он указывает, не затрагивается."
+leftover_note = "(не настроен)"
+remove_leftover = "Удалить оставшиеся ветки..."
+add_as_remote = "Добавить {name} как remote..."
+remove_leftover_confirm = "Удалить оставшиеся ветки «{name}»?\nПод этим именем remote не настроен; удалятся только его remote-tracking ветки. Отмена вернёт их."
 force_confirm_fetch = { git = "Force push {branch} в {remote}?\nСначала fetch {remote}, затем push с lease: commit'ы, которые сейчас есть только в {remote}, будут отброшены; всё, отправленное после этого fetch, защищено.", local = "Принудительно отправить {branch} в {remote}?\nСначала загрузка {remote}, затем отправка с lease: коммиты, которые сейчас есть только в {remote}, будут отброшены; всё, отправленное после этой загрузки, защищено." }
 force_confirm = { git = "Force push {branch} в {remote}?\nС lease: отклоняется, если {remote}/{branch} изменилась с последнего fetch. Commit'ы, которые есть только в {remote}, будут отброшены.", local = "Принудительно отправить {branch} в {remote}?\nС lease: отклоняется, если {remote}/{branch} изменилась после последней загрузки. Коммиты, которые есть только в {remote}, будут отброшены." }
 setting_upstream = "установка upstream для {branch}: {upstream}..."

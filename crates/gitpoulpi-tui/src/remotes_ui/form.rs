@@ -123,6 +123,16 @@ impl RemoteForm {
         }
     }
 
+    /// The Add form for a name that already has remote-tracking branches
+    /// (a leftover namespace): the name is filled in and the address is
+    /// what is left to type.
+    pub(crate) fn add_named(taken: Vec<String>, name: &str) -> Self {
+        let mut form = Self::add(taken);
+        form.name = name.to_string();
+        form.focus = RemoteFormPart::FetchUrl;
+        form
+    }
+
     /// The push field starts empty when the remote pushes where it
     /// fetches: empty means "same as fetch", which is what keeps a later
     /// fetch-URL change from leaving a stale push URL behind.

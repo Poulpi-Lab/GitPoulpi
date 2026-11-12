@@ -2149,6 +2149,10 @@ what_remote_link = "リモートへのリンク"
 not_web_url = "{url} は Web ホスティングの URL ではありません - リンク先がありません"
 default_now = "{name} がこのリポジトリの既定のリモートになりました"
 remove_confirm = "リモート '{name}' を削除しますか？\nそのリモート追跡ブランチも一緒に削除されます。指し示す先のリポジトリには影響しません。"
+leftover_note = "(未設定)"
+remove_leftover = "残ったブランチを削除..."
+add_as_remote = "{name} をリモートとして追加..."
+remove_leftover_confirm = "'{name}' の残ったブランチを削除しますか？\nこの名前のリモートは設定されていません。リモート追跡ブランチだけが削除されます。元に戻すと復元されます。"
 force_confirm_fetch = { git = "{branch} を {remote} に強制{$push}しますか？\n先に {remote} を{$fetch}し、リース付きで{$push}します：現在 {remote} にしかない{$commit}は破棄されます。その{$fetch}以降に{$push}されたものは保護されます。", local = "{branch} を {remote} に強制{$push}しますか？\n先に {remote} をフェッチし、リース付きでプッシュします：現在 {remote} にしかない{$commit}は破棄されます。そのフェッチ以降にプッシュされたものは保護されます。" }
 force_confirm = { git = "{branch} を {remote} に強制{$push}しますか？\nリース付き：前回の{$fetch}以降に {remote}/{branch} が更新されていると拒否されます。{remote} にしかない{$commit}は破棄されます。", local = "{branch} を {remote} に強制{$push}しますか？\nリース付き：前回のフェッチ以降に {remote}/{branch} が更新されていると拒否されます。{remote} にしかない{$commit}は破棄されます。" }
 setting_upstream = "{branch} のアップストリームを {upstream} に設定中..."

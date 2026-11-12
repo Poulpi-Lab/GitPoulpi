@@ -2149,6 +2149,10 @@ what_remote_link = "link naar remote"
 not_web_url = "{url} is geen webadres - niets om naar te linken"
 default_now = "{name} is nu de standaardremote van deze repository"
 remove_confirm = "Remote '{name}' verwijderen?\nZijn remote-tracking branches gaan mee; de repository waarnaar hij wijst blijft ongemoeid."
+leftover_note = "(niet ingesteld)"
+remove_leftover = "Overgebleven branches verwijderen..."
+add_as_remote = "{name} als remote toevoegen..."
+remove_leftover_confirm = "De overgebleven branches van '{name}' verwijderen?\nEr is geen remote met die naam geconfigureerd; alleen de remote-tracking branches verdwijnen. Ongedaan maken brengt ze terug."
 force_confirm_fetch = { git = "{branch} force pushen naar {remote}?\nHaalt eerst {remote} op en pusht dan met lease: de commits die alleen {remote} nu heeft worden verworpen; alles wat na die fetch is gepusht is beschermd.", local = "{branch} force pushen naar {remote}?\nHaalt eerst {remote} op en pusht dan met lease: de commits die alleen {remote} nu heeft worden verworpen; alles wat na dat ophalen is gepusht is beschermd." }
 force_confirm = { git = "{branch} force pushen naar {remote}?\nMet lease: geweigerd als {remote}/{branch} is verschoven sinds de laatste fetch. Commits die alleen {remote} heeft worden verworpen.", local = "{branch} force pushen naar {remote}?\nMet lease: geweigerd als {remote}/{branch} is verschoven sinds het laatste ophalen. Commits die alleen {remote} heeft worden verworpen." }
 setting_upstream = "upstream van {branch} instellen op {upstream}..."

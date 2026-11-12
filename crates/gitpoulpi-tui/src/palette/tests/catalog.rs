@@ -204,6 +204,11 @@ fn every_mouse_affordance_maps_to_a_palette_command() {
             R::SetDefaultRemote(_) => PaletteCommand::SetDefaultRemote,
             R::EditRemote(_) => PaletteCommand::EditRemote,
             R::RemoveRemote(_) => PaletteCommand::RemoveRemote,
+            // A leftover namespace (branches, no remote): the palette's
+            // Remove / Edit choosers list it, Remove deletes its branches
+            // and Edit opens the Add form with its name filled in.
+            R::RemoveLeftover(_) => PaletteCommand::RemoveRemote,
+            R::AddAsRemote(_) => PaletteCommand::EditRemote,
             R::FetchRemote(_) => PaletteCommand::FetchRemote,
             R::AddRemote => PaletteCommand::AddRemote,
             R::FetchAllRemotes => PaletteCommand::Fetch,
@@ -234,6 +239,8 @@ fn every_mouse_affordance_maps_to_a_palette_command() {
     let every_remote_row = crate::remote_menu_entries("o", false, false)
         .into_iter()
         .chain(crate::remote_menu_entries("o", false, true))
+        .chain(crate::remotes_ui::leftover_menu_entries("o", false))
+        .chain(crate::remotes_ui::leftover_menu_entries("o", true))
         .chain(crate::pull_mode_entries())
         .chain(crate::remotes_ui::lfs_menu_entries())
         .chain(crate::push_to_entries(&["o".to_string()], None))

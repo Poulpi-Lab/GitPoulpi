@@ -238,6 +238,11 @@ impl WindowState {
                 // Color only: the toolbar row and the selected tab share
                 // `ui.toolbar_bg`.
                 crate::theme::paint_toolbar_bg(frame.buffer_mut(), toolbar_area);
+                let leftover_remotes = crate::remotes_ui::leftover_names(
+                    self.refs_result.as_deref().unwrap_or(&[]),
+                    &self.remote_names,
+                    self.remote_ui.loaded,
+                );
                 draw_sidebar(
                     frame,
                     &mut SidebarDrawCtx {
@@ -258,6 +263,7 @@ impl WindowState {
                         refs_filter: &self.refs_filter,
                         refs_result: &self.refs_result,
                         remote_names: &self.remote_names,
+                        leftover_remotes: &leftover_remotes,
                         sidebar_states: &mut self.sidebar_states,
                         solo_refs: &self.solo_refs,
                         submodules_result: &self.submodules_result,

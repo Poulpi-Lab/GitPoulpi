@@ -429,7 +429,19 @@ pub(crate) async fn answer(request: &CredentialGrantRequest) -> CredentialGrantA
         Next::Done(answer) => return answer,
         Next::Command(command) => command,
     };
-    match crate::token_command::credential(&command).await {
+    // A command that already failed for this grant (one operation) is not run
+    // again: git asks once per process, and a fetch runs two beside each
+    // other, so a failing or hanging command would otherwise cost a second
+    // run. The check is made in the command's turn, after the first run ended.
+    let _turn = crate::token_command::turn().await;
+    if lock()
+        .grants
+        .get(&request.grant)
+        .is_some_and(|e| e.command_failure.is_some())
+    {
+        return CredentialGrantAnswer::default();
+    }
+    match crate::token_command::credential_in_turn(&command).await {
         Ok(given) => {
             let (username, password) = crate::token_command::answer_of(&command, given);
             CredentialGrantAnswer {

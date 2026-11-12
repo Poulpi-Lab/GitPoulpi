@@ -768,3 +768,37 @@ async fn an_unconfirmed_request_cannot_store_a_command() {
         .expect_err("a changed command needs a person");
     rig.handle.shutdown().await.unwrap();
 }
+
+/// A failing token command runs once per operation: git asking the helper
+/// again after a failed `get` (or the daemon retrying) must not run it a
+/// second time (a hanging command would otherwise make a fetch twice as long).
+#[tokio::test]
+async fn a_failing_command_runs_once_per_fetch() {
+    need_tools!();
+    let _turn = exclusive().await;
+    let server = AuthHttpRemote::start_accepting();
+    let repo = repo_on(&server);
+    let scripts = tempfile::tempdir().unwrap();
+    let counter = scripts.path().join("count");
+    let tool = tool(
+        scripts.path(),
+        "token",
+        &[
+            Step::Append(&counter),
+            Step::Stderr("vault is sealed"),
+            Step::Exit(3),
+        ],
+    );
+    let mut rig = Rig::new("token-command-failing-once", &repo).await;
+    rig.set(token_command(&tool, &[]), true).await.unwrap();
+    let error = rig.fetch().await.expect_err("the command failed");
+    assert!(
+        matches!(error.kind, Some(TypedError::TokenCommandFailed { .. })),
+        "{error:?}"
+    );
+    assert_eq!(lines(&counter), 1, "the failing command ran more than once");
+    // The next operation asks again (a failure is not cached).
+    let _ = rig.fetch().await.expect_err("still failing");
+    assert_eq!(lines(&counter), 2);
+    rig.handle.shutdown().await.unwrap();
+}

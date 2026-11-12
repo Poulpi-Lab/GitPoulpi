@@ -271,3 +271,35 @@ fn plain_docker_and_lan_hosts_are_accepted() {
         assert_eq!(normalize_host(typed).as_deref(), Some(want), "{typed:?}");
     }
 }
+
+/// A token the OS credential store refused is held for the session only:
+/// the confirmation says so, with the store's error, instead of a bare
+/// "connected". The fake store never touches the real one.
+#[test]
+fn connecting_says_when_the_token_is_kept_for_this_session_only() {
+    struct SessionOnly(InMemoryTokens);
+    impl TokenStore for SessionOnly {
+        fn store(&self, r: &str, t: &str) -> gitpoulpi_secrets::Result<()> {
+            self.0.store(r, t)
+        }
+        fn load(&self, r: &str) -> gitpoulpi_secrets::Result<Option<String>> {
+            self.0.load(r)
+        }
+        fn delete(&self, r: &str) -> gitpoulpi_secrets::Result<()> {
+            self.0.delete(r)
+        }
+        fn session_only_reason(&self, _: &str) -> Option<String> {
+            Some("no helper".into())
+        }
+    }
+    let mut h = H::new();
+    h.tokens = Arc::new(SessionOnly(InMemoryTokens::default()));
+    let (mut page, _transport) = page_with(gitlab_ok());
+    fill_sm_form(&mut page, &mut h, "gitlab.example.com", "glpat-GOOD");
+    page.activate(Item::Connect, &mut h.env());
+    wait_connected(&mut page, &mut h);
+    let said = h.message.clone().unwrap_or_default();
+    assert!(said.contains("connected to"), "{said}");
+    assert!(said.contains("this session only"), "{said}");
+    assert!(said.contains("no helper"), "{said}");
+}

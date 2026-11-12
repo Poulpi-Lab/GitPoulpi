@@ -2854,6 +2854,8 @@ err_token = "Paste a personal access token first"
 check_ended = "the connection check ended unexpectedly"
 # context: {host} is a host name, {login} an account name
 connected_to = "connected to {host} as @{login}"
+# context: {message} is the "connected to ..." sentence, {error} the credential store's error text
+connected_session_only = "{message} - the token could not be saved in the OS credential store ({error}); it is kept for this session only"
 # context: {id} is a profile's id
 disconnected = "disconnected {id}; the profile is kept"
 token_not_removed = "token not removed: {error}"

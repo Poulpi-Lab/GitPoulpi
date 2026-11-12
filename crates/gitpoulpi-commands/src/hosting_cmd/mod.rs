@@ -208,6 +208,9 @@ impl TokenStore for SharedStore {
     fn delete(&self, token_ref: &str) -> gitpoulpi_secrets::Result<()> {
         self.0.delete(token_ref)
     }
+    fn session_only_reason(&self, token_ref: &str) -> Option<String> {
+        self.0.session_only_reason(token_ref)
+    }
 }
 
 /// Whether this action needs the session's daemon: `clone` (a
@@ -1227,6 +1230,51 @@ mod tests {
         assert!(file.contains("octo"), "user cached: {file}");
         let auth = &f.transport.requests()[0].headers;
         assert!(auth.iter().any(|(_, v)| v.contains("ghp_supersecret")));
+    }
+
+    /// A store that keeps the token for the session only (the OS store
+    /// refused it) is reported as such, with its error; a persisting store
+    /// reports `os`. The fake store never touches the real credential store.
+    #[test]
+    fn login_says_where_the_token_lives() {
+        struct SessionOnly(InMemoryTokens);
+        impl TokenStore for SessionOnly {
+            fn store(&self, r: &str, t: &str) -> gitpoulpi_secrets::Result<()> {
+                self.0.store(r, t)
+            }
+            fn load(&self, r: &str) -> gitpoulpi_secrets::Result<Option<String>> {
+                self.0.load(r)
+            }
+            fn delete(&self, r: &str) -> gitpoulpi_secrets::Result<()> {
+                self.0.delete(r)
+            }
+            fn session_only_reason(&self, _: &str) -> Option<String> {
+                Some("no credential helper configured".into())
+            }
+        }
+        let f = fixture(RecordedTransport::new().on("/user", 200, USER));
+        add(&f.env, "github", None, None);
+        let ok = block_on(login(&f.env, None, "tok")).unwrap();
+        assert_eq!(ok.json["stored"], "os");
+        assert!(ok.json["store_error"].is_null());
+        assert_eq!(ok.json["token_stored"], true);
+
+        let transport = Arc::new(RecordedTransport::new().on("/user", 200, USER));
+        let dir = tempfile::tempdir().unwrap();
+        let env = HostingEnv::new(
+            dir.path().join("config.toml"),
+            Arc::new(SessionOnly(InMemoryTokens::default())),
+            Box::new(move || Ok(transport.clone() as Arc<dyn HttpTransport>)),
+        );
+        add(&env, "github", None, None);
+        let out = block_on(login(&env, None, "tok")).unwrap();
+        assert_eq!(out.json["user"]["login"], "octo");
+        assert_eq!(out.json["stored"], "session");
+        assert_eq!(
+            out.json["store_error"],
+            "no credential helper configured"
+        );
+        assert!(out.human.contains("this session only"), "{}", out.human);
     }
 
     /// Jira Cloud signs in with the email and the token; the email lives

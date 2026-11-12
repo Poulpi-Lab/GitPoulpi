@@ -108,12 +108,25 @@ pub(crate) fn forget_root(root: &Path) {
 
 /// The credential of `command`: the cached one while it is fresh, else the
 /// command's output (and then cached).
+#[cfg(test)]
 pub(crate) async fn credential(command: &TokenCommand) -> Result<Credential, Error> {
-    // One at a time: git can ask twice at once (a fetch and the submodule or
-    // prune step it starts), and a command that prompts a person or spends a
-    // one-time code must not run twice for one transfer.
+    let _one_at_a_time = turn().await;
+    credential_in_turn(command).await
+}
+
+/// The turn to run a token command: one at a time. git can ask twice at once
+/// (a fetch runs the tag-mirror fetch beside its own, a submodule or prune
+/// step starts another), and a command that prompts a person or spends a
+/// one-time code must not run twice for one transfer. A caller that decides
+/// something from what an earlier turn left (a failure) takes the turn first
+/// and then calls [`credential_in_turn`].
+pub(crate) async fn turn() -> tokio::sync::MutexGuard<'static, ()> {
     static RUNNING: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
-    let _one_at_a_time = RUNNING.lock().await;
+    RUNNING.lock().await
+}
+
+/// [`credential`] for a caller that already holds the [`turn`].
+pub(crate) async fn credential_in_turn(command: &TokenCommand) -> Result<Credential, Error> {
     if !command.cache.is_zero() {
         let hit = cache_lock()
             .get(&key_of(command))

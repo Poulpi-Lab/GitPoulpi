@@ -280,6 +280,7 @@ fn a_typed_issue_form_asks_on_esc_and_discard_closes_it() {
 
 /// The screen once it has settled: a torn frame is not a place to locate a
 /// cell or compare colors in.
+#[cfg(feature = "ai")]
 fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
     term.wait_for_stable(
         std::time::Duration::from_millis(300),

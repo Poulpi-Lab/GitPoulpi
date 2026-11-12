@@ -11,7 +11,7 @@ code hosts (GitHub, GitLab, Gitea, Forgejo, Azure DevOps, Bitbucket, Gerrit, in
 the cloud or self-hosted) and issue trackers (Jira, Trello, Linear, YouTrack,
 Redmine, or a folder of Markdown notes), and the same operations as a
 scriptable CLI and an MCP server, so an AI agent can drive it exactly like you
-do. GitPoulpi is inspired by GitKraken, rewritten from scratch in Rust: native binaries, light on disk and in memory, no Electron, no account, no telemetry. It runs in your favorite terminal ([which one?](docs/user/terminals.md)), because some of us live in there.
+do. GitPoulpi is inspired by GitKraken, rewritten from scratch in Rust: native binaries, light on disk and in memory, no Electron, no account, no telemetry. It runs in your favorite terminal ([which one?](docs/user/terminals.md), [inside tmux or zellij?](docs/user/multiplexers.md)), because some of us live in there.
 
 ![GitPoulpi showing the commit graph with branches, tags and a stash, the Refs sidebar on the left, and the working changes with the commit form on the right](docs/user/images/hero.png)
 
@@ -93,9 +93,9 @@ gitpoulpi-tui          # or just: gitpoulpi
   `Ctrl+,` the Settings, `q` quits.
 - Click a commit to see its changes; click the top row of the Log (the working
   changes) to stage files and commit.
-- In a terminal that supports it (kitty, Ghostty, WezTerm, iTerm2, and the sixel
-  terminals Windows Terminal and foot) the graph is drawn as pixels. In others
-  (a plain Windows console, tmux) it falls back to characters automatically.
+- In a terminal that supports it (kitty, Ghostty, WezTerm, Rio, iTerm2, and the sixel
+  terminals Windows Terminal, foot and Tabby) the graph is drawn as pixels. In others
+  (a plain Windows console, zellij, screen) it falls back to characters automatically.
 
 The step-by-step version is in [Getting started](docs/user/getting-started.md),
 and [the interface tour](docs/user/interface-tour.md) names every area of the

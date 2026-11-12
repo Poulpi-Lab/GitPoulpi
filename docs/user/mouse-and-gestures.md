@@ -464,10 +464,13 @@ The pointer shows a move shape over the title bar and a resize shape over the bo
 Some terminals let GitPoulpi change the mouse pointer: a resize pointer over
 dividers, over a column boundary of the Log, the Radar and the commit column
 (also while dragging it), a hand over clickable items. This works in kitty,
-foot, Ghostty, WezTerm and recent xterm (the sequence `OSC 22`). It is sent
-only when the shape changes, never inside tmux, screen, zellij or herdr, and
-the default pointer is restored when GitPoulpi exits.
-In other terminals, the pointer does not change. The divider or the button
+foot, Ghostty, mintty and a WezTerm build with upstream PR #8092 (the sequence
+`OSC 22`). It is sent only when the shape changes, inside tmux only wrapped for
+the passthrough (`allow-passthrough on`; kitty and foot show it, Ghostty does
+not), and never in screen, zellij or herdr. The default pointer is restored
+when GitPoulpi exits. In other terminals (Rio, Alacritty, Tabby, iTerm2,
+Terminal.app, Windows Terminal, xterm), the pointer does not change; see
+[Choosing a terminal](terminals.md#mouse-pointer-shape-osc-22). The divider or the button
 under the pointer lights up in every terminal.
 
 The same kind of component gives the same pointer everywhere in the app.
@@ -510,7 +513,9 @@ shows only while you carry a ref.
 
 ## Copying to the clipboard
 
-**Copy path** and some other copy actions send the text to the terminal, which
-puts it on the clipboard (OSC 52). If your terminal does not support this,
-nothing is copied. The copy actions for selected text use the system
-clipboard directly.
+Copy actions put the text on the system clipboard of the machine GitPoulpi runs
+on and, where the terminal is known to honor it, also send it to the terminal
+(OSC 52). Over SSH, or with no display, only OSC 52 is sent: if your terminal
+does not support it (iTerm2 until its clipboard permission is on, Terminal.app,
+GNU screen), nothing is copied and the status line says the text was only sent
+to the terminal. See [Choosing a terminal](terminals.md#clipboard-copy-actions).

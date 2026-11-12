@@ -26,8 +26,8 @@ shown when its object is in the local store; otherwise the card says to
 ## How it is drawn
 
 On a terminal with an image protocol (Kitty and Ghostty, WezTerm and iTerm2,
-Rio, mintty) the picture is a real image. Anywhere else (plain Windows Terminal,
-tmux, a terminal GitPoulpi does not know) it is drawn with colored half-block
+Rio, mintty, and the sixel terminals Windows Terminal, foot and Tabby) the picture is a real image. Anywhere else (the plain Windows console,
+zellij, a terminal GitPoulpi does not know) it is drawn with colored half-block
 characters, half the vertical resolution but legible everywhere; **Without an
 image protocol** can be set to *Info card only*. **Image protocol** on the
 **Log & graph** page forces one.

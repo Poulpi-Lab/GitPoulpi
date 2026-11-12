@@ -262,7 +262,7 @@ to move the column.
 | Column | Shows |
 |---|---|
 | **Ref** | Colored pills for the branches and tags on the commit: a laptop icon for local, a globe for remote, a tag icon for tags, `+N` when more refs point there. Tags are drawn where they are, never as a ghost. On a commit with no ref, the hovered row shows a faded pill with the name of the branch it belongs to; if that branch was deleted, a struck-through pill shows the name read from the merge commit that merged it (turn it off with **Show a ghost branch on the hovered commit** in Settings > Log & graph). |
-| **Graph** | The branch lanes, merges and branch points. Drawn as pictures in kitty, Ghostty, WezTerm, iTerm2 and the terminals that draw sixel pictures (Windows Terminal, foot), and as characters in other terminals. The lane colors come from the theme or a palette you choose (see [Themes](themes.md)). At its least width (one commit dot) the column is compact: every commit on one lane, no branch or merge lines. |
+| **Graph** | The branch lanes, merges and branch points. Drawn as pictures in kitty, Ghostty, WezTerm, Rio, iTerm2 and the terminals that draw sixel pictures (Windows Terminal, foot, Tabby), and as characters in other terminals. The lane colors come from the theme or a palette you choose (see [Themes](themes.md)). At its least width (one commit dot) the column is compact: every commit on one lane, no branch or merge lines. |
 | **Message** | The commit summary. |
 | **Author** | The author, with an optional avatar. |
 | **Date** | The author date, in the format you choose. |

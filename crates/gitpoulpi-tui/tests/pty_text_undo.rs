@@ -15,6 +15,7 @@ use std::time::{Duration, Instant};
 use gitpoulpi_testkit::FixtureRepoBuilder;
 use xtask::pty::Terminal;
 
+#[cfg(feature = "ai")]
 const STARTUP: Duration = Duration::from_secs(60);
 const STEP: Duration = Duration::from_secs(30);
 

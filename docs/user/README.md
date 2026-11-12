@@ -64,6 +64,8 @@ start at the top, and jump to the reference pages when you need them.
     "Quit and cd here", and the `gitpoulpi shell-init` wrapper (`gp`) for bash,
     zsh, fish and PowerShell.
     Which terminal shows GitPoulpi best: **[Choosing a terminal](terminals.md)**.
+    What passes through tmux, zellij, screen, herdr and terminal panes:
+    **[Multiplexers](multiplexers.md)**.
 
 Also: **[Branching workflows](branching-workflows.md)**, the Git Flow, GitHub
 Flow, GitLab Flow and Trunk-based presets or your own bases, branch name patterns

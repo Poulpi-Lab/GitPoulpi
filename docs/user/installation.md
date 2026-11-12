@@ -18,11 +18,11 @@ Next to them the archive holds `gitpoulpi-launch`, a tiny program the shortcuts 
   operations and your `git` for the rest.
   Version **2.34 or newer** is required. On macOS the `git` from Apple's
   Command Line Tools works, and so does Homebrew's.
-- A **terminal** with mouse support. kitty, Ghostty, WezTerm, iTerm2 and the
-  sixel terminals (Windows Terminal, foot) draw the commit graph as pictures.
-  Other terminals (the plain Windows console, tmux and most others) show a
+- A **terminal** with mouse support. kitty, Ghostty, WezTerm, Rio, iTerm2 and the
+  sixel terminals (Windows Terminal, foot, Tabby) draw the commit graph as pictures.
+  Other terminals (the plain Windows console, zellij, screen and most others) show a
   character graph. See
-  [Choosing a terminal](terminals.md).
+  [Choosing a terminal](terminals.md) and [Multiplexers](multiplexers.md).
 - A **Nerd Font** or a font with emoji, for the icons in the toolbar and the
   sidebar.
 - Optional: **`git-lfs`** 3.0 or newer, for Git LFS repositories. Without it,

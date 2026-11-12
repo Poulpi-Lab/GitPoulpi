@@ -65,9 +65,9 @@ text still work without them.
 
 **The commit graph is made of characters, not pictures.** That is the automatic
 fallback: pictures need a terminal speaking the kitty graphics protocol (kitty,
-Ghostty, herdr with kitty graphics on), the iTerm2 protocol (WezTerm, iTerm2,
-mintty) or sixel (Windows Terminal, foot, Konsole). The plain Windows console, tmux and zellij get characters. See the
-graph section below to force either, and [Choosing a terminal](terminals.md).
+Ghostty, herdr with kitty graphics on), the iTerm2 protocol (WezTerm, Rio,
+mintty) or sixel (Windows Terminal, foot, Tabby, Konsole, and tmux when the terminal behind it takes sixel). The plain Windows console, zellij and screen get characters. See the
+graph section below to force either, [Choosing a terminal](terminals.md) and [Multiplexers](multiplexers.md).
 
 **The mouse does nothing, or selecting text with the mouse does not work.**
 GitPoulpi captures the mouse so that clicks reach it. To select text with the
@@ -212,7 +212,7 @@ The message `Git LFS is not installed. This repository stores large files with G
 
 ## The graph is drawn with characters, not as a picture (herdr, tmux, other terminals)
 
-GitPoulpi draws the Graph column and author avatars as pixels only where it is sure the terminal will show them: iTerm2 inline images in bare WezTerm, iTerm2 and mintty; sixel pictures in Windows Terminal, foot, Konsole and mlterm; the Kitty graphics protocol in kitty, Ghostty, and **herdr when herdr's own config sets `kitty_graphics = true`** (`[terminal]`, or `[experimental]` on older herdr) and herdr runs inside WezTerm, kitty or Ghostty. Everywhere else it draws characters, which is always correct.
+GitPoulpi draws the Graph column and author avatars as pixels only where it is sure the terminal will show them: iTerm2 inline images in bare WezTerm, Rio, mintty and iTerm2 older than 3.7.7; sixel pictures in Windows Terminal, foot, Tabby, Konsole and mlterm (and in tmux when the terminal behind it takes sixel); the Kitty graphics protocol in kitty, Ghostty, iTerm2 3.7.7 or newer and **herdr when herdr's own config sets `kitty_graphics = true`** (`[terminal]`, or `[experimental]` on older herdr) and herdr runs inside WezTerm, kitty or Ghostty. Everywhere else it draws characters, which is always correct.
 
 - In herdr with Kitty graphics on but a config GitPoulpi does not find (or relying on herdr's default), set `ui.image_protocol = "kitty"` (Settings > Log & graph > Image protocol) and restart.
 - In a terminal that shows boxes or garbage where the graph should be, set `ui.image_protocol = "none"` or `ui.graph_renderer = "text"`.
@@ -220,6 +220,10 @@ GitPoulpi draws the Graph column and author avatars as pixels only where it is s
 
 **herdr remote (`herdr --remote <host>`, or `ssh` then `herdr`): the text graph is the default.** Over SSH, GitPoulpi runs on the remote host and can only read the remote's environment and herdr `config.toml`. Whether a Kitty picture appears is decided by the *local* herdr client (its own `kitty_graphics` setting and its own terminal), which GitPoulpi cannot see: when the client does not draw the pictures, the cells stay blank. GitPoulpi therefore draws the text graph whenever it detects herdr over SSH (`SSH_CONNECTION` / `SSH_CLIENT` / `SSH_TTY`). If your local herdr has `kitty_graphics = true` and a terminal that draws Kitty images (kitty, Ghostty), opt in with `ui.graph_renderer = "image"` (or `ui.image_protocol = "kitty"`) on the remote. Pictures are sent inline (`t=d`), which works over any byte stream. If the column is empty, set `ui.graph_renderer = "text"`.
 
-**A lighter rectangle behind the lanes.** The picture is transparent (straight-alpha RGBA PNG) wherever nothing is drawn, so the terminal's background and the selection band show through. Kitty-protocol terminals and **WezTerm** composite that alpha; GitPoulpi then reserves ordinary blank cells under the picture and sends it after them. Every other iTerm2-protocol terminal (iTerm2 itself, Rio, mintty) is not known to blend PNG alpha, so there the picture carries an opaque backdrop in the theme's color, which can show as a rectangle on a terminal whose background differs from it; `ui.graph_renderer = "text"` removes it. With `ui.graph_lane_background = "off"` nothing is painted behind the lanes on the transparent paths.
+**A lighter rectangle behind the lanes.** The picture is transparent (straight-alpha RGBA PNG) wherever nothing is drawn, so the terminal's background and the selection band show through. Kitty-protocol terminals, **WezTerm** and **Rio** composite that alpha; GitPoulpi then reserves ordinary blank cells under the picture and sends it after them. Every other iTerm2-protocol terminal (older iTerm2, mintty) is not known to blend PNG alpha, so there the picture carries an opaque backdrop in the theme's color, which can show as a rectangle on a terminal whose background differs from it; `ui.graph_renderer = "text"` removes it. With `ui.graph_lane_background = "off"` nothing is painted behind the lanes on the transparent paths.
+
+**Windows: the graph column is blank, on the wrong rows, or the screen tears (WezTerm 20240203, Rio, mintty).** The pseudo-console behind those terminals drops or misplaces the picture sequences ([Choosing a terminal](terminals.md#windows)). Set `ui.graph_renderer = "text"`, or use Windows Terminal.
+
+Inside tmux, zellij, screen and herdr see [Multiplexers](multiplexers.md) for what passes and the configuration to add.
 
 See `ui.graph_renderer` and `ui.image_protocol` in the [configuration reference](config-reference.md).

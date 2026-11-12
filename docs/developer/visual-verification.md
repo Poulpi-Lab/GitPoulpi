@@ -76,6 +76,7 @@ Omarchy, Hyprland 0.56.x, `foot`, `grim`, `wtype`, `ydotool`.
 - Wait ~0.8 s after synthetic input before capturing (else the previous frame); if surprising, capture twice.
 - Hover needs a **relative** `ydotool mousemove` (absolute is a warp: no motion event), crossing a cell boundary (approach over ~2 cells, 1 px at a time).
 - `ydotool` socket path must be short (`/tmp/.ydotool_socket`, export `YDOTOOL_SOCKET`); its absolute axis is not layout coordinates (measure with `hyprctl cursorpos`). Pixels → layout: `win.at + pixel_offset / monitor.scale`, scale per monitor.
+- **A private nested compositor** (headless sway with software rendering, a virtual pointer and keyboard) keeps a terminal x multiplexer sweep off the maintainer's compositor entirely; `grim -c` includes the pointer image, which is how a pointer shape (`OSC 22`) is seen. Drive each terminal by the pid you launched, read the terminal's replies from a raw-sequence probe first, GitPoulpi second. Clipboard write-backs (`wl-paste`) need a focused client: a terminal that "copies nothing" in such a setup is a setup limit, not a result.
 
 ### Windows, if you must
 
@@ -84,6 +85,7 @@ PowerShell + Win32 P/Invoke.
 - Identify the window by **process lineage**: your `gitpoulpi-tui.exe` by binary path under your worktree's target dir → parent → `MainWindowHandle`, verified with `GetWindowThreadProcessId`. "Most recent wezterm-gui" has twice captured a sibling's UI. (`--always-new-process` is a `wezterm` flag, not `wezterm-gui`.)
 - `PrintWindow` works on WezTerm's GPU surface on an unlocked session. Capture twice and keep the second (fresh/resized windows can return solid white/black); keep the window modest (110x34 worked where 200x50 came back black).
 - `PostMessage(WM_CHAR)` delivers keys to a non-foreground window.
+- **Pointer shape** (`OSC 22`) is checked with the real OS pointer: `GetCursorInfo` after moving the mouse over a cell, comparing the handle with the system cursors (ARROW, HAND, IBEAM, SIZEWE...). A grid of positions sweeps a whole screen in one run. A raw `printf` of the sequence in the same terminal is the control that tells the terminal's behavior apart from GitPoulpi's.
 - **A locked workstation blocks every capture API** (secure desktop, by design: never work around it). Say so in the report instead of concluding a fix works; a colour defect once shipped because a locked session silently downgraded verification. The pty path is unaffected.
 
 ## Buffer-test caveats

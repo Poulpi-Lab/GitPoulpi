@@ -410,8 +410,8 @@ example, `Ctrl+Shift+N` arrives as `Ctrl+N`, `Ctrl+I` as `Tab` and `Ctrl+M` as
 send ...").
 
 Terminals with the **kitty keyboard protocol** can send these chords. Examples:
-kitty, WezTerm, Ghostty, foot, Alacritty 0.13 and later, and tmux or herdr when
-they pass the protocol through. GitPoulpi uses the protocol by default:
+kitty, WezTerm, Ghostty, foot, Alacritty 0.13 and later, and zellij (tmux does not
+answer it: see [Multiplexers](multiplexers.md#tmux)). GitPoulpi uses the protocol by default:
 
 - At start-up, GitPoulpi asks the terminal and waits at most about 100 ms for
   the answer. If the terminal does not answer, the legacy keys stay.

@@ -84,11 +84,13 @@ impl History {
     }
 
     /// Whether an undo has something to restore for a field holding `text`.
+    #[cfg(any(feature = "ai", test))]
     pub(crate) fn can_undo(&self, text: &str) -> bool {
         !self.undo.is_empty() && self.expected.as_deref() == Some(text)
     }
 
     /// Whether a redo has something to restore for a field holding `text`.
+    #[cfg(any(feature = "ai", test))]
     pub(crate) fn can_redo(&self, text: &str) -> bool {
         !self.redo.is_empty() && self.expected.as_deref() == Some(text)
     }

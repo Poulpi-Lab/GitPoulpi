@@ -393,6 +393,7 @@ impl Caret {
 
     /// Replaces the bytes `range` of `text` by `with` and puts the caret after
     /// it: one history entry (an autocomplete accepted).
+    #[cfg(feature = "ai")]
     pub(crate) fn replace_range(
         &mut self,
         text: &mut String,
@@ -456,11 +457,13 @@ impl Caret {
     }
 
     /// Whether [`Caret::undo`] would change `text` (the Undo button's state).
+    #[cfg(any(feature = "ai", test))]
     pub(crate) fn can_undo(&self, text: &str) -> bool {
         self.history.can_undo(text)
     }
 
     /// Whether [`Caret::redo`] would change `text`.
+    #[cfg(any(feature = "ai", test))]
     pub(crate) fn can_redo(&self, text: &str) -> bool {
         self.history.can_redo(text)
     }

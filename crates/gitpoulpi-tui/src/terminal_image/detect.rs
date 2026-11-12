@@ -1,3 +1,4 @@
+use super::passthrough::{self, tmux_client_has_sixel, tmux_only};
 use super::*;
 
 /// Terminals that implement the iTerm2 inline-image protocol. Matched
@@ -254,9 +255,18 @@ impl From<gitpoulpi_config::GraphRenderer> for RendererChoice {
 /// property that matters: see [`cell_size`].
 pub(crate) fn detect(choice: RendererChoice, wanted: ImageProtocol) -> Capability {
     Capability {
-        protocol: protocol_for(choice, wanted, &|name| std::env::var(name).ok(), &|path| {
-            std::fs::read_to_string(path).ok()
-        }),
+        protocol: protocol_for(
+            choice,
+            wanted,
+            &|name| {
+                if name == passthrough::CLIENT_FEATURES_KEY {
+                    passthrough::query_client_features()
+                } else {
+                    std::env::var(name).ok()
+                }
+            },
+            &|path| std::fs::read_to_string(path).ok(),
+        ),
         cell: cell_size(),
     }
 }
@@ -345,6 +355,15 @@ where
             Protocol::None
         };
     }
+    if tmux_only(get) {
+        // tmux draws sixel itself for a client that takes it; it carries
+        // nothing else (`passthrough` module).
+        return if tmux_client_has_sixel(get) {
+            Protocol::Sixel
+        } else {
+            Protocol::None
+        };
+    }
     if inside_a_multiplexer(get) {
         return Protocol::None;
     }
@@ -355,7 +374,7 @@ where
         return Protocol::Kitty;
     }
     if looks_like_iterm2_terminal(get) {
-        Protocol::Iterm2
+        iterm2_for(get)
     } else if sixel_only_terminal(get) {
         Protocol::Sixel
     } else {
@@ -366,7 +385,10 @@ where
 /// A terminal that draws sixel and neither of the other two protocols,
 /// told from its own environment (preference is kitty, iTerm2, sixel):
 /// Windows Terminal (`WT_SESSION`; sixel since 1.22), foot (`TERM=foot*`),
-/// Konsole (`KONSOLE_VERSION`) and mlterm (`TERM=mlterm*`).
+/// Konsole (`KONSOLE_VERSION`), mlterm (`TERM=mlterm*`) and Tabby
+/// (`TERM_PROGRAM=Tabby`; 1.0.238 on Linux answers sixel in its device
+/// attributes and draws a transparent sixel picture, and shows neither kitty
+/// nor iTerm2 images).
 ///
 /// **Not DA1.** The textbook test is parameter 4 in the reply to `CSI c`,
 /// but the reply arrives on stdin and detection here never reads stdin
@@ -378,9 +400,11 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
     let set = |name: &str| get(name).is_some_and(|v| !v.is_empty());
     let term = get("TERM").unwrap_or_default().to_ascii_lowercase();
     set("WT_SESSION")
+        || tmux_client_has_sixel(get)
         || set("KONSOLE_VERSION")
         || term.starts_with("foot")
         || term.starts_with("mlterm")
+        || get("TERM_PROGRAM").is_some_and(|p| p.eq_ignore_ascii_case("tabby"))
 }
 
 /// The iTerm2 flavour for this terminal: [`Protocol::Iterm2Alpha`] when it
@@ -393,7 +417,11 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
 ///   terminal's own background), and its `imgcat` page documents the
 ///   protocol. Confirmed here by a real WezTerm window capture
 ///   (`docs/developer/visual-verification.md`).
-/// - **iTerm2 itself, Rio, mintty, Bobcat: unverified.** mintty's wiki
+/// - **Rio (0.5.28, Linux): blends.** A transparent PNG sent as `OSC 1337`
+///   over a bright field shows the field through the transparent corners
+///   (raw-sequence probe in a real window, November 2026). Only Linux was
+///   looked at; Windows keeps the opaque backdrop until it is.
+/// - **iTerm2 itself, mintty, Bobcat: unverified.** mintty's wiki
 ///   documents the `File=` image controls without any word on alpha
 ///   (only its OSC 11 background images are said to honour it), and this
 ///   project has not seen the others on a real window, so they keep the
@@ -410,9 +438,18 @@ pub(super) fn iterm2_for<F: Fn(&str) -> Option<String>>(get: &F) -> Protocol {
 }
 
 /// Whether the terminal named by the environment composites inline PNG
-/// alpha over the cell background. Only WezTerm, by verification.
+/// alpha over the cell background. WezTerm, and Rio off Windows, by
+/// verification.
 pub(super) fn blends_png_alpha<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
-    looks_like_wezterm(get) && !inside_a_multiplexer(get) && !inside_herdr(get)
+    (looks_like_wezterm(get) || looks_like_rio(get))
+        && !inside_a_multiplexer(get)
+        && !inside_herdr(get)
+}
+
+/// Rio sets `TERM_PROGRAM=rio` (and `TERM=rio` when its terminfo is
+/// installed). Only where its alpha blending was seen: not on Windows.
+pub(super) fn looks_like_rio<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
+    !cfg!(windows) && get("TERM_PROGRAM").is_some_and(|v| v.eq_ignore_ascii_case("rio"))
 }
 
 pub(super) fn looks_like_iterm2_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> bool {

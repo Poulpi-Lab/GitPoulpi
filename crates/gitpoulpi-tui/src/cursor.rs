@@ -107,14 +107,19 @@ pub(crate) fn emit_cursor_shape<W: Write>(w: &mut W, shape: CursorShape) -> std:
 /// pointer only when this process changed it.
 static SHAPE_SENT: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
-/// Whether `OSC 22` may be written at all: not behind a multiplexer (tmux,
-/// screen, zellij and herdr swallow or print it, and nothing here wraps it
-/// for passthrough) and not on a terminal that has no pointer to change.
+/// Whether `OSC 22` may be written at all: not behind screen, zellij or herdr
+/// (they swallow or print it; zellij 0.45 and screen 5 measured), and not on a
+/// terminal that has no pointer to change. Behind tmux it is written inside a
+/// DCS passthrough (`terminal_image::passthrough`): measured with kitty and
+/// foot, the shape reaches the window with `allow-passthrough on`, and with
+/// the option off tmux drops the wrapper.
 pub(crate) fn pointer_shapes_allowed() -> bool {
     static ALLOWED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ALLOWED.get_or_init(|| {
         let bare = std::env::var("TERM").is_ok_and(|t| matches!(t.as_str(), "linux" | "dumb"));
-        !bare && !crate::terminal_image::inside_multiplexer()
+        !bare
+            && (!crate::terminal_image::inside_multiplexer()
+                || crate::terminal_image::passthrough::wrapping())
     })
 }
 
@@ -164,10 +169,11 @@ pub(crate) fn reset_pointer<W: Write>(w: &mut W) {
 }
 
 fn write_osc<W: Write>(w: &mut W, shape: CursorShape) -> std::io::Result<()> {
-    match shape.css_name() {
-        Some(name) => write!(w, "\u{1b}]22;{name}\u{1b}\\"),
-        None => write!(w, "\u{1b}]22;\u{1b}\\"),
-    }?;
+    let seq = match shape.css_name() {
+        Some(name) => format!("\u{1b}]22;{name}\u{1b}\\"),
+        None => "\u{1b}]22;\u{1b}\\".to_string(),
+    };
+    w.write_all(crate::terminal_image::passthrough::passthrough(seq).as_bytes())?;
     w.flush()
 }
 

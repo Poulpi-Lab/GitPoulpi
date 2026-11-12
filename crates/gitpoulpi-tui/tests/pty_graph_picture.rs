@@ -107,12 +107,30 @@ fn decode_last(raw: &[u8]) -> Option<Picture> {
 }
 
 fn picture_with(setting: &str, cell: &str, session: &str) -> Picture {
+    picture_in(
+        "WezTerm",
+        "image_protocol = \"iterm2\"\n",
+        setting,
+        cell,
+        session,
+    )
+}
+
+/// The Graph picture sent to a terminal that names itself `program`, with
+/// `protocol_line` (a `[ui]` line, or none to leave it to detection).
+fn picture_in(
+    program: &str,
+    protocol_line: &str,
+    setting: &str,
+    cell: &str,
+    session: &str,
+) -> Picture {
     let repo = fixture();
     let config = tempfile::tempdir().unwrap();
     std::fs::write(
         config.path().join("config.toml"),
         format!(
-            "[ui]\ngraph_renderer = \"image\"\nimage_protocol = \"iterm2\"\ngraph_lane_background = \"{setting}\"\n"
+            "[ui]\ngraph_renderer = \"image\"\n{protocol_line}graph_lane_background = \"{setting}\"\n"
         ),
     )
     .unwrap();
@@ -122,8 +140,12 @@ fn picture_with(setting: &str, cell: &str, session: &str) -> Picture {
         .size(200, 60)
         .terminal_image()
         .env("GITPOULPI_TERMINAL_CELL_PX", cell)
-        .env("TERM_PROGRAM", "WezTerm")
+        .env("TERM_PROGRAM", program)
         .env("TERM", "xterm-256color")
+        .env("WEZTERM_EXECUTABLE", "")
+        .env("TMUX", "")
+        .env("ZELLIJ", "")
+        .env("STY", "")
         .env("HERDR_ENV", "")
         .env("HERDR_PANE_ID", "")
         .env("HERDR_SOCKET_PATH", "")
@@ -197,5 +219,25 @@ fn lanes_stay_thin_in_pixels_when_the_cells_are_bigger() {
     assert!(
         zoomed * 4 <= normal * 5,
         "a lane is {normal}px at 9x21 and {zoomed}px at 27x63: it grew with the cell"
+    );
+}
+
+/// Whether any pixel of the picture is see-through (the terminal blends it).
+fn has_transparent_pixels(p: &Picture) -> bool {
+    (0..p.height).any(|y| (0..p.width).any(|x| p.alpha(x, y) == 0))
+}
+
+/// Rio blends a transparent PNG over its cells (seen in a real window), so
+/// detection hands it the transparent picture; the other iTerm2-protocol
+/// terminals keep an opaque backdrop. Not on Windows, where Rio was not seen.
+#[test]
+#[cfg_attr(windows, ignore = "Rio's alpha blending was only seen on Linux")]
+fn rio_gets_the_transparent_graph_picture_and_mintty_the_opaque_one() {
+    let rio = picture_in("rio", "", "off", "9x21", "pic-rio-alpha");
+    assert!(has_transparent_pixels(&rio), "Rio got an opaque picture");
+    let mintty = picture_in("mintty", "", "off", "9x21", "pic-mintty-opaque");
+    assert!(
+        !has_transparent_pixels(&mintty),
+        "mintty got a transparent picture it cannot blend"
     );
 }

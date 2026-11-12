@@ -65,6 +65,10 @@ fn count(haystack: &[u8], needle: &[u8]) -> usize {
 }
 
 fn run(session: &str, protocol_line: &str, term_env: &str) -> Vec<u8> {
+    run_in(session, protocol_line, term_env, "")
+}
+
+fn run_in(session: &str, protocol_line: &str, term_env: &str, program: &str) -> Vec<u8> {
     let repo = FixtureRepoBuilder::new()
         .unwrap()
         .commit("sixel avatar probe")
@@ -86,7 +90,7 @@ fn run(session: &str, protocol_line: &str, term_env: &str) -> Vec<u8> {
         .env("TMUX", "")
         .env("ZELLIJ", "")
         .env("STY", "")
-        .env("TERM_PROGRAM", "")
+        .env("TERM_PROGRAM", program)
         .env("WEZTERM_EXECUTABLE", "")
         .env("KITTY_WINDOW_ID", "")
         .env("GHOSTTY_RESOURCES_DIR", "")
@@ -129,6 +133,18 @@ fn forced_sixel_draws_the_log_and_detail_avatars_as_sixel() {
 fn a_foot_terminal_is_detected_and_gets_sixel_without_any_setting() {
     let raw = run("pty-avatar-sixel-foot", "", "foot");
     assert!(count(&raw, b"\x1bP0;1;0q\"1;1;") >= 2);
+}
+
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "ConPTY drops the sixel DCS from the stream the driver reads"
+)]
+fn a_tabby_terminal_is_detected_and_gets_sixel_without_any_setting() {
+    let raw = run_in("pty-avatar-sixel-tabby", "", "xterm-256color", "Tabby");
+    assert!(count(&raw, b"\x1bP0;1;0q\"1;1;") >= 2);
+    assert_eq!(count(&raw, b"_Ga="), 0);
+    assert_eq!(count(&raw, b"]1337;File="), 0);
 }
 
 #[test]

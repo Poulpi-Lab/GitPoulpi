@@ -155,7 +155,8 @@ fn the_section_menu_collapses_and_expands_every_folder_of_the_section() {
     let repo = tag_fixture();
     let config = tempfile::tempdir().unwrap();
     let mut term = launch_tags(repo.root(), "tree-fold-section", config.path());
-    assert!(all_open(&term.screen()));
+    term.wait_for("every tag folder open", STEP, all_open)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // The header's menu: the two fold rows, then the way on to the checklist.
     let (col, row) = tags_header(&term);
@@ -483,14 +484,21 @@ fn an_unstaged_folder_menu_folds_below_that_folder_only() {
     let mut term = launch_files(repo.root(), "tree-fold-files-below", config.path());
     show_changes(&mut term);
 
-    let (col, row) = term
-        .wait_for_text("\u{25BE} src/", STEP)
+    term.wait_for_text("\u{25BE} src/", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
-    term.right_click(col + 3, row).unwrap();
-    term.wait_for("the folder menu with its fold rows", STEP, |s| {
-        s.contains("Expand all subfolders") && s.contains("Collapse all subfolders")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Retried: under load the right-click can land on a torn frame.
+    common::retry_until(
+        &mut term,
+        "the folder menu with its fold rows",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            if let Some((col, row)) = t.screen().find("\u{25BE} src/") {
+                t.right_click(col + 3, row).unwrap();
+            }
+        },
+        |s| s.contains("Expand all subfolders") && s.contains("Collapse all subfolders"),
+    );
     click_menu_row(&mut term, "Collapse all subfolders");
     term.wait_for("src folded, docs untouched", STEP, |s| {
         s.contains("src/") && !s.contains("x.txt") && !s.contains("y.txt") && s.contains("z.txt")

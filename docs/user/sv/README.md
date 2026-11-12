@@ -65,6 +65,8 @@ läsordning: börja överst och hoppa till referenssidorna när du behöver dem.
     ”Quit and cd here”, och omslaget `gitpoulpi shell-init` (`gp`) för bash,
     zsh, fish och PowerShell.
     Vilken terminal som visar GitPoulpi bäst: **[Välja terminal](terminals.md)**.
+    Vad som går igenom tmux, zellij, screen, herdr och terminalpaneler:
+    **[Multiplexers](multiplexers.md)**.
 
 Också: **[Grenarbetsflöden](branching-workflows.md)**, förinställningarna Git Flow, GitHub
 Flow, GitLab Flow och Trunk-based eller dina egna baser, grennamnsmönster och

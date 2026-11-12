@@ -90,7 +90,7 @@ author_email = "jane@work.example"
 | Nyckel | Standard | Värden och effekt |
 |---|---|---|
 | `ui.graph_renderer` | `"auto"` | `auto` (en bild där terminalen kan rita en, tecken annars), `image`, `text`. **Omstart.** |
-| `ui.image_protocol` | `"auto"` | Hur bilder (graf, avatarer) når terminalen: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = Kitty-protokollet i kitty, Ghostty och en herdr med `kitty_graphics = true`; iTerm2 i WezTerm, iTerm2, Rio, mintty; sixel (bara avatarer) i Windows Terminal, foot, Konsole, mlterm; none i tmux, zellij, screen och okända terminaler. **Omstart.** |
+| `ui.image_protocol` | `"auto"` | Hur bilder (graf, avatarer) når terminalen: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = Kitty-protokollet i kitty, Ghostty, iTerm2 3.7.7 eller nyare och en herdr med `kitty_graphics = true`; iTerm2-protokollet i WezTerm och Rio (transparens blandas), äldre iTerm2 och mintty (ogenomskinlig bakgrund); sixel (grafkolumnen och avatarerna) i Windows Terminal, foot, Tabby, Konsole, mlterm, i tmux när terminalen bakom tar sixel och i varje terminal vars svar vid start nämner sixel (en xterm startad med `-ti vt340`, en VS Code-terminal med bilder på); tecken i zellij, screen och okända terminaler. I tmux kräver kitty-bilder `kitty` här plus `allow-passthrough on` ([Multiplexers](multiplexers.md)). Där terminalens pseudokonsol tappar eller felplacerar bilder (WezTerm 20240203, Rio och mintty på Windows) använd `ui.graph_renderer = "text"` ([Välja terminal](terminals.md#windows)). **Omstart.** |
 | `ui.theme` | `"system"` | Färgtemat: en inbyggd slug (`gitpoulpi theme list` listar alla), sluggen för en fil i `<config>/themes/`, eller `system` (följer terminalens ljusa eller mörka bakgrund, avläst vid start; det gamla värdet `default` betyder detsamma). `config set` avvisar okända namn. Se [Teman](themes.md). |
 | `ui.graph_color_theme` | `"theme"` | Spårpalett: `theme` (följ temat) eller vilket spårpalettnamn som helst: `gitpoulpi`, `light`, `material`, `serie` och de andra temans paletter. |
 | `ui.graph_lane_background` | `"off"` | `off` eller `row_tint` (ett svagt band i spårfärgen bakom grafen, plus en stapel vid dess kant). **App: Växla radfärgning i grafen** (`Ctrl+N Shift+T`) växlar den; **App: Byt färgtema för grafen...** (`Ctrl+N Shift+Y`) väljer `ui.graph_color_theme`. |
@@ -119,7 +119,7 @@ author_email = "jane@work.example"
 | `ui.git_terms_english` | `false` | Bara ja, ko och zh-CN: visa de engelska git-orden (stage, unstage, staged, unstaged...) i stället för deras transkription. Ingen effekt medan `ui.translate_git_terms` är `true`. **Direkt.** |
 | `ui.mouse_enabled` | `true` | `false` lämnar musen (och textmarkering) åt terminalen. **Omstart.** |
 | `ui.mouse_scroll_lines` | `3` | Log-rader per hjulsteg, 1 till 20. **Omstart.** |
-| `ui.kitty_keyboard` | `"auto"` | `auto` frågar terminalen efter kitty-tangentbordsprotokollet (så att `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` kommer fram); `off` frågar aldrig. **Omstart.** |
+| `ui.kitty_keyboard` | `"auto"` | `auto` frågar terminalen efter kitty-tangentbordsprotokollet (så att `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` kommer fram; bara Unix, tmux svarar aldrig: se [Multiplexers](multiplexers.md#tmux)); `off` frågar aldrig. **Omstart.** |
 | `ui.logo_color` | `""` | Logotypens färgsättning i Om-fönstret, en slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); tomt eller okänt betyder byggets standard (`lavender`). Skrivs när du klickar på logotypen eller väljer en färg i Om-fönstret. |
 
 **Avatarer** (av som standard; att slå på dem skickar en SHA-256-hash av författarnas
@@ -144,6 +144,7 @@ e-postadresser till Gravatar, och frågar ditt anslutna GitHub-/GitLab-konto)
 | `ui.mermaid_orientation` | `lr` | Den grafens riktning: `lr` (vänster till höger) eller `tb` (uppifrån och ned). |
 | `ui.mermaid_fence` | `false` | Omge det kopierade Mermaid-skriptet med ett `mermaid`-kodblock. |
 | `ui.mermaid_subject_width` | `40` | Ämnesraderna kortas till så här många tecken i Mermaid-id:n (`subjects`, `full`). |
+| `ui.text_cursor` | `"terminal"` | Var skrivpositionen i ett fokuserat textfält visas: `terminal` placerar terminalens egen markör där (ett blinkande streck, så terminalens markörinställningar och en inmatningsmetods kandidatfönster följer med; dold när inget fält har tangentbordet och återställd till din egen markörstil vid avslut), `drawn` ritar GitPoulpis egen markörglyf och håller terminalmarkören dold. Direkt. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` eller `16`: hur många färger som ritas med. `auto` är truecolor utom i Apple Terminal (256), Linux-konsolen (16) och `*-256color`-terminaler utan `COLORTERM` (256). Direkt. Se [Teman](themes.md). |
 | `ui.input_color` | `"theme"` | Textfältens bakgrund: `theme` (temats egen), `gray`, `blue`, `slate`, `dark`, `custom`. |
 | `ui.input_color_custom` | `"#2a2a2a"` | Färgen `custom`, `#rrggbb`. |
@@ -183,7 +184,7 @@ namnen engelska oavsett språk.
 | `ui.launcher_build` | `"current"` | Bara i utvecklarläge (se `general.dev_mode`; visas i Inställningar > Startare bara då, ignoreras annars). `"current"`: genvägarna och kommandoaliaset startar det bygge som skapade dem. `"newest"`: de startar det senast byggda av `target/dist` och `target/release` i utcheckningen, avgjort vid varje klick, och att starta något av byggena skriver aldrig om dem. |
 | `ui.command_alias` | `""` | Namnet på kommandot som startar GitPoulpi från en terminal, till exempel `gp` (Inställningar > Startare, `gitpoulpi alias create`). Tomt: inget. Bara bokstäver, siffror, `-`, `_` och `.`. Det är bara namnet som knappen **Skapa: kommandoalias** använder; inget finns förrän du skapar det. |
 | `ui.command_alias_add` | `""` | Namnet på det andra kommandot, till exempel `gpa`, som kör `gitpoulpi --add`: det öppnar den aktuella mappen som en ny flik i den GitPoulpi som redan körs (Inställningar > Startare, `gitpoulpi alias create gpa --add`). Tomt: inget. Samma namnregler; skapas tillsammans med `ui.command_alias` av knappen **Skapa**. |
-| `ui.relaunch_in_terminal` | `true` | Endast Windows: när exe-filen startas med dubbelklick i en egen konsol öppnar GitPoulpi sig igen i `ui.launch_terminal` och avslutas. Av: den stannar i den konsolen. |
+| `ui.relaunch_in_terminal` | `true` | Endast Windows: när exe-filen startas med dubbelklick i en egen konsol öppnar GitPoulpi sig igen i `ui.launch_terminal` och avslutas. En terminal som kör exe-filen direkt (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`) är också en egen konsol, men inte ett klassiskt konsolfönster: den startas aldrig om. Av: den stannar i den konsolen. |
 | `ui.reuse_window` | `true` | Ett klick på en GitPoulpi-genväg (`gitpoulpi launch`) visar fönstret för en GitPoulpi som redan är öppen i stället för att starta en till. Av: varje klick startar ett nytt fönster. |
 
 **`ui.open_in`-kommandon** delas först upp i argument (blanksteg, `'...'`, `"..."`), och sedan ersätts variablerna inuti varje argument, så en mapp med mellanslag förblir ett enda argument; inget skal är inblandat om inte kommandot startar ett (`sh -c '... "$GITPOULPI_CWD"'`). Variabler: `${cwd}` (flikens mapp), `${repo}` (repositoryts rot), `${name}` (mappens basnamn), `${branch}` (tom när frånkopplad), `${web_url}` (webbsidan för `origin`-remoten när den är ett GitHub- eller GitLab-projekt, annars tom; en post som använder den vägrar köras när den är tom), `${env:NAME}` (tom när den inte är satt). Det gamla `{repo}` betyder fortfarande `${cwd}`. Varje annan `${...}` är ett fel som namnger den. Exempel:
@@ -334,7 +335,8 @@ review_requests = true    # begäranden som väntar på min granskning, alla rep
 open_requests = false     # alla öppna begäranden i mina namnrymder
 include_drafts = false    # behåll utkast till begäranden i de här listorna
 assigned_issues = true    # öppna ärenden tilldelade mig, alla repositories
-namespaces = ["acme"]     # organisationer / grupper att söka efter öppna begäranden i
+namespaces = ["acme", "ptm/produits"]  # en post per rad i Inställningar; tomt = ingen gräns
+namespaces_regex = false  # true: varje post är ett reguljärt uttryck över hela repositorysökvägen
 review_mode = "ask"       # ask | clone | api
 ```
 
@@ -344,7 +346,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Alla öppna begäranden i din egen namnrymd och i varje organisation eller grupp du tillhör (eller i `namespaces`), aldrig "allt token ser" |
 | `include_drafts` | `false` | Utkast till begäranden lämnas utanför de här listorna om inte detta är på |
 | `assigned_issues` | `false` | Öppna ärenden tilldelade dig, alla repositories |
-| `namespaces` | `[]` | Organisationer / grupper att söka i för `open_requests`; tomt betyder din egen namnrymd plus varje medlemskap (GitHub: högst 12 genomsöks, GitLab: 10 grupper och 10 ägda projekt, Gitea, Forgejo och Gerrit: 10; Azure DevOps tar projektnamn, Bitbucket Data Center projektnycklar, Gerrit prefix för projektsökvägar) |
+| `namespaces` | `[]` | Vilka repositories varje lista behåller (granskningsbegäranden, tilldelade ärenden, öppna begäranden); tomt betyder ingen gräns, och `open_requests` söker då i din egen namnrymd plus varje medlemskap (GitHub: högst 12 genomsöks, GitLab: 10 grupper och 10 ägda projekt, Gitea, Forgejo och Gerrit: 10). En post matchar ett repositorys fulla sökväg (`group/sub/project`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`) när den är lika med den eller är ett sökvägsprefix som slutar vid ett `/`: `ptm` behåller `ptm/produits/x`, inte `ptmx/y`; skiftläge ignoreras. Inställningar visar en post per rad; en äldre fil kan innehålla en kommaseparerad sträng (`"ptm, formation"`), som fortfarande läses in och sparas tillbaka som en lista |
+| `namespaces_regex` | `false` | Läs varje post i `namespaces` som ett reguljärt uttryck som matchas mot hela repositorysökvägen, som du skriver den (så `^ptm/(produits\|infra)/` förankras i början; utan `^` eller `$` matchar det var som helst i sökvägen; lägg till `(?i)` för att ignorera skiftläge). `open_requests` söker då i dina medlemskap och uttrycken filtrerar raderna. Ett ogiltigt uttryck visas under fältet i Inställningar och sparas inte; i en handredigerad fil lämnar det listorna tomma med en notering |
 | `review_mode` | `"ask"` | Vad granskning av en begäran vars repository inte är klonat gör: `ask`, `clone` (klona det, granska sedan) eller `api` (granska via värdens API) |
 
 Svaren cachas per profil i `radar-account.json` bredvid

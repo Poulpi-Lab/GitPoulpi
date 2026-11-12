@@ -55,7 +55,7 @@ läggs den överordnade mappen till i chipet så att du kan skilja dem åt.
 Ett mappomfång letar efter repositories **två nivåer ned**: mapparna direkt i den, och mapparna inuti
 dem som inte själva är repositories (`~/src/work/app`). Dolda mappar hoppas över, ett repository
 öppnas aldrig för att leta vidare, och högst 200 repositories listas. Sökningen körs i bakgrunden, aldrig
-på tråden som ritar, och resultatet behålls tills du uppdaterar: knappen Uppdatera, `r` eller
+på tråden som ritar, och resultatet behålls tills du uppdaterar: knappen Uppdatera, `r`, `F5` (fönstrets uppdateringstangent, kan bindas om) eller
 `Radar: Uppdatera` söker igenom mappen på nytt (ett repository som klonats sedan dess dyker upp).
 
 Hosting är fortfarande valfritt per repository: ett repository i mappen som **inte är länkat** till en
@@ -202,7 +202,7 @@ tangent och en palettmotsvarighet.
 | Visa eller dölj begäranden från repositories som inte är klonade | `a` | `Radar: Visa ej klonade begäranden` |
 | Visa eller dölj utkast bland de kontoövergripande raderna | `d` | `Radar: Visa utkast` |
 | Slå på en värds kontoövergripande granskningsbegäranden | `T` / `Enter` på dess tipsrad / **Slå på** | `Radar: Slå på kontoövergripande granskningsbegäranden...` |
-| Uppdatera | `r` | `Radar: Uppdatera` |
+| Uppdatera | `r`, `F5` | `Radar: Uppdatera` |
 | Radmenyn | `.` | `Radar: Radmeny...` |
 | Tillbaka till Hem | `Esc` | `Radar: Tillbaka till Hem` |
 
@@ -264,6 +264,8 @@ utkast, namnrymder) ställs in med `gitpoulpi hosting integrations radar` eller 
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center och Gerrit svarar; Bitbucket Cloud har ingen kontoövergripande
 slutpunkt, så dess begäranden visas bara för de länkade repositories i omfånget.
 
+Profilens **Namnrymder** begränsar alla dess listor till vissa repositories (Inställningar > Integrationer > Radar: ett textområde med en post per rad och en kryssruta **Reguljära uttryck**). En rad matchar ett repositorys fulla sökväg när den är lika med den eller är ett sökvägsprefix som slutar vid ett `/`: `ptm` behåller `ptm/produits/x` och tar bort `ptmx/y` och `formation/y`. Med kryssrutan på är varje rad ett reguljärt uttryck som körs mot hela sökvägen som du skriver den (`^ptm/(produits|infra)/`); en rad som inte är giltig visas under fältet och sparas inte. Tomt betyder ingen gräns.
+
 Så placeras raderna:
 
 - En rad som omfånget redan listar (samma värd, projekt, slag och nummer) visas en gång: **omfångets
@@ -319,7 +321,7 @@ Två kryssrutor bredvid filtret (de visas när en kontoövergripande lista efter
 Båda finns bland `Ctrl+N`-märkena och i paletten (`Radar: Visa ej klonade begäranden`, `Radar: Visa utkast`).
 
 En profils svar sparas i `radar-account.json` i **5 minuter**: att öppna Radar igen inom den
-tiden visar raderna utan att fråga värden. **Uppdatera** (`r`) frågar alltid. En värd som sa åt oss att sakta ner
+tiden visar raderna utan att fråga värden. **Uppdatera** (`r` eller `F5`) frågar alltid: varje repository och varje kontoövergripande lista, oavsett hur gammalt det senaste svaret är. En värd som sa åt oss att sakta ner
 eller nekade token tillfrågas inte igen i samma runda. Högst 300 rader behålls per profil och slag,
 och en rad under **Repositories** säger hur många fler som fanns, eller varför en profil inte kunde läsas
 (**Anslut igen** öppnar Inställningar > Integrationer).

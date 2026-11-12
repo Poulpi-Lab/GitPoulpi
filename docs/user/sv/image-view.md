@@ -26,7 +26,7 @@ dig göra `LFS > Pull` först. Transparens ritas över ett schackbräde.
 ## Hur den ritas
 
 I en terminal med ett bildprotokoll (Kitty och Ghostty, WezTerm och iTerm2, Rio,
-mintty) är bilden en riktig bild. Överallt annars (vanliga Windows Terminal, tmux,
+mintty och sixel-terminalerna Windows Terminal, foot och Tabby) är bilden en riktig bild. Överallt annars (den vanliga Windows-konsolen, zellij,
 en terminal GitPoulpi inte känner till) ritas den med färgade halvblockstecken,
 halva den vertikala upplösningen men läsbar överallt; **Utan bildprotokoll** kan
 sättas till *Bara infokort*. **Bildprotokoll** på sidan **Log & graf** tvingar fram

@@ -412,8 +412,8 @@ en annan tangent: till exempel kommer `Ctrl+Shift+N` fram som `Ctrl+N`,
 sådan bindning (”den här terminalen skickar inte ...”).
 
 Terminaler med **kitty-tangentbordsprotokollet** kan skicka dessa kombinationer.
-Exempel: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 och senare, samt tmux
-eller herdr när de släpper igenom protokollet. GitPoulpi använder protokollet
+Exempel: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 och senare, samt zellij
+(tmux svarar inte på det: se [Multiplexers](multiplexers.md#tmux)). GitPoulpi använder protokollet
 som standard:
 
 - Vid start frågar GitPoulpi terminalen och väntar högst cirka 100 ms på svaret.
@@ -876,9 +876,9 @@ Tangenterna är standardvärdena.
 | Aktivitetslogg: Välj omfång |  |
 | Aktivitetslogg: Git-åtgärder |  |
 | Aktivitetslogg: Programlogg |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Aktivitetslogg: Visa radens åtgärd |  |
+| Aktivitetslogg: Nästa misslyckade åtgärd |  |
+| Aktivitetslogg: Föregående misslyckade åtgärd |  |
 | Aktivitetslogg: Rulla åt vänster | `Left` |
 | Aktivitetslogg: Rulla åt höger | `Right` |
 | Aktivitetslogg: Kopiera det senaste felet |  |
@@ -1217,8 +1217,31 @@ Tangenterna är standardvärdena.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Gör om**. `Ctrl+Shift+Z` kräver kitty-tangentbordsprotokollet; `Ctrl+Y` fungerar alltid |
 | `.`, `Menu`, `Shift+F10` | Öppna snabbmenyn för den markerade raden |
 
-`Ctrl+Z` och `Ctrl+Y` gör ingenting medan ett textfält har tangentbordet.
-Redigeraren har sin egen textångra.
+### Ctrl+Z / Ctrl+Y i ett textfält
+
+Medan ett textfält har tangentbordet verkar `Ctrl+Z` och `Ctrl+Y` (också `Ctrl+Shift+Z`)
+på det fältets text, aldrig på repositoryt: ett fält som har tangentbordet
+vinner alltid, så `Ctrl+Z` i commit-meddelandet kan inte ångra en commit.
+Överallt annars behåller de sin globala betydelse (ångra- / gör om-journalen ovan).
+Det gäller varje textfält och flerradsredigerare: commit-meddelandet, fälten och
+textredigerarna i Inställningar, formulären för pull requests och ärenden, AI-dialogerna
+och varje filter- eller sökruta.
+
+- **Inmatning** ångras ett ord i taget (en följd bokstäver, en följd mellanslag, en
+  följd skiljetecken), och inmatning som pausar mer än en sekund startar ett
+  nytt steg. Flera backsteg i rad är ett steg. En inklistring, en klippning, `Ctrl+U` /
+  `Ctrl+K`, ett infogat utdrag eller ett godtaget förslag är ett steg var.
+- En ångring ger tillbaka texten, markören och markeringen. En ny ändring efter
+  en ångring släpper det som kunde ha gjorts om.
+- Varje fält behåller en begränsad historik (de senaste 200 stegen, ungefär 1 MB text)
+  och glömmer den när fältet ersätts utifrån (en mapp vald i
+  väljaren, ett formulär som läses in på nytt) eller ett annat fält tar tangentbordet.
+- När inget finns kvar att ångra gör `Ctrl+Z` ingenting: det faller aldrig igenom till
+  repositoryts ångra medan ett fält har tangentbordet.
+- **Instruktionsredigeraren** i AI-inställningarna har också knapparna **Ångra** och **Gör om**,
+  bredvid Spara och Avbryt, nedtonade medan det inte finns något att stega till.
+- Kodredigeraren och merge-redigeraren behåller sin egen ångra (`Redigera: Ångra`,
+  `Merge: Ångra`), som också täcker deras val.
 
 ## Filtrerbara popuplistor
 
@@ -1230,18 +1253,20 @@ tangenter flyttar markeringen:
 
 | Tangent | Åtgärd |
 |---|---|
-| `Up` / `Down` | Flytta en rad |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Flytta en rad upp / ned |
 | `Home` / `End` | Första / sista raden |
 | `PageUp` / `PageDown` | Flytta en synlig sida |
 | `Enter` | Välj den markerade raden |
 | `Esc` | Stäng |
 
 I dessa popuper flyttar `Home` och `End` listan, inte markören i filterfältet.
-`Ctrl+A` och `Ctrl+E` flyttar fortfarande markören till början och slutet, och
-`Ctrl+K` raderar till slutet av filtret. Inget `Ctrl+bokstav`-par flyttar en lista
-(`Ctrl+N` är navigeringsprefixet, `Ctrl+P` kommandopaletten), och vanliga `j` och
-`k` skrivs in i filtret: bara piltangenterna, `PageUp` / `PageDown` och `Home` /
-`End` flyttar här. I listor utan textfält är `j` / `k` ett extra sätt att flytta
+`Ctrl+K` / `Ctrl+J` flyttar också listan, så `Ctrl+K` raderar inte längre
+till slutet av filtret (`Ctrl+U` rensar det fortfarande; i ett vanligt textfält
+utanför en lista raderar `Ctrl+K` fortfarande till slutet av raden). `Ctrl+A` och
+`Ctrl+E` flyttar fortfarande markören till början och slutet. `Ctrl+J` / `Ctrl+K` flyttar
+varje annan lista också, med eller utan textfält (`Ctrl+N` är navigeringsprefixet
+och `Ctrl+P` kommandopaletten, så de är inte listtangenter). Vanliga `j`
+och `k` skrivs in i filtret; i listor utan textfält är `j` / `k` ett extra sätt att flytta
 nedåt / uppåt.
 
 Med musen:
@@ -1488,7 +1513,8 @@ kortet ”en gren dök upp” beskrivs i [grenarbetsflöden](branching-workflows
 | `Enter` / `l` på en filrad | Öppna filens diff i mitten |
 | `Esc` / `h` | Gå tillbaka till commits |
 | `Right` | (commit med mer än en ref) Öppna listan med dess andra refs: `Up` / `Down` flyttar, `Enter` checkar ut, `Esc` stänger |
-| `f` | Öppna sökfältet (se [Sök](#sök)) |
+| `f` | Öppna sökfältet (se [Sök](#sök)); det var aldrig `/`, så Logs sökning är oförändrad |
+| `/` | Fokusera Refs-filtret (samma tangent gör det när Refs-rutan har fokus); skrivs som ett tecken när ett textfält har fokus |
 | `c` | (med ocommittade ändringar) Markera WIP-raden och placera markören i dess meddelandefält |
 | `Enter` på WIP-raden | Placera markören i WIP-radens meddelandefält |
 | `.`, `Menu`, `Shift+F10` | Commitmenyn. `Up` / `Down` flyttar, `Right` / `l` / `Enter` öppnar en undermeny, `Left` / `h` / `Esc` går tillbaka |

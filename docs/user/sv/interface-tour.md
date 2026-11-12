@@ -236,7 +236,7 @@ Panelen har ingen titel: kolumnrubrikerna säger vad den är. På en commit utan
 | Kolumn | Visar |
 |---|---|
 | **Ref** | Färgade pills för grenarna och taggarna på commiten: en laptopikon för lokal, en jordglob för remote, en taggikon för tags, `+N` när fler refs pekar dit. Taggar ritas där de finns, aldrig som spöke. På en commit utan ref visar raden under muspekaren ett bleknat piller med namnet på den gren den tillhör; om den grenen har tagits bort visar ett genomstruket piller namnet som lästs ur den merge-commit som slog ihop den (stäng av det med **Visa en spökgren vid commit under muspekaren** i Inställningar > Log & graf). |
-| **Graf** | Grenspåren, merges och förgreningspunkter. Ritas som bilder i kitty, Ghostty, WezTerm och iTerm2 (och även Windows Terminal och foot, via sixel), och som tecken i andra terminaler. Spårfärgerna kommer från temat eller en palett du väljer (se [Teman](themes.md)). På sin minsta bredd (en enda commitprick) är kolumnen kompakt: varje commit på ett enda spår, inga gren- eller mergelinjer. |
+| **Graf** | Grenspåren, merges och förgreningspunkter. Ritas som bilder i kitty, Ghostty, WezTerm, Rio och iTerm2 (och även Windows Terminal, foot och Tabby, via sixel), och som tecken i andra terminaler. Spårfärgerna kommer från temat eller en palett du väljer (se [Teman](themes.md)). På sin minsta bredd (en enda commitprick) är kolumnen kompakt: varje commit på ett enda spår, inga gren- eller mergelinjer. |
 | **Meddelande** | Commitens sammanfattning. |
 | **Författare** | Författaren, med en valfri avatar. |
 | **Datum** | Författardatumet, i det format du väljer. |

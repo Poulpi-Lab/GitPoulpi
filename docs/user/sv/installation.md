@@ -17,10 +17,10 @@ Bredvid dem innehåller arkivet `gitpoulpi-launch`, ett litet program som genvä
 - Ett **`git` installerat i systemet**, i din `PATH`. GitPoulpi använder libgit2 för de flesta
   operationer och din `git` för resten.
   Version **2.34 eller nyare** krävs. På macOS fungerar `git` från Apples Command Line Tools, och likaså den från Homebrew.
-- En **terminal** med musstöd. kitty, Ghostty, WezTerm och iTerm2 (och även Windows Terminal och foot, via sixel) ritar
-  commit-grafen som bilder. Andra terminaler (Windows-konsolen, tmux och
+- En **terminal** med musstöd. kitty, Ghostty, WezTerm, Rio, iTerm2 (och även Windows Terminal, foot och Tabby, via sixel) ritar
+  commit-grafen som bilder. Andra terminaler (Windows-konsolen, zellij, screen och
   de flesta andra) visar en teckengraf. Se
-  [Välja terminal](terminals.md).
+  [Välja terminal](terminals.md) och [Multiplexers](multiplexers.md).
 - Ett **Nerd Font**-typsnitt eller ett typsnitt med emoji, för ikonerna i verktygsfältet
   och sidopanelen.
 - Valfritt: **`git-lfs`** 3.0 eller nyare, för Git LFS-repositories. Utan det

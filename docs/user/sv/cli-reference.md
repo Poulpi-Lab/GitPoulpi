@@ -12,7 +12,7 @@ agenter](mcp-and-agents.md)). `gitpoulpi <command> --help` visar varje flagga.
 
 | Flagga | Effekt |
 |---|---|
-| `--json` | Skriv ut resultatet som JSON. Fel är också JSON: `{"error": "..."}` på stdout, slutkod 1. En misslyckad git-åtgärd lägger till `"detail": {"operation", "command", "exit_code", "stderr"}` (git-kommandot som kördes med maskerade hemligheter, dess avslutskod och slutet av dess stderr; för det inbyggda git-biblioteket `"git2": {"class", "code", "message"}`); MCP-verktygen returnerar samma objekt. Utan `--json` går raderna till stderr. |
+| `--json` | Skriv ut resultatet som JSON. Fel är också JSON: `{"error": "..."}` på stdout, slutkod 1. En misslyckad git-åtgärd lägger till `"detail": {"operation", "command", "exit_code", "stderr"}` (git-kommandot som kördes med maskerade hemligheter, dess avslutskod och slutet av dess stderr; för det inbyggda git-biblioteket `"git2": {"class", "code", "message"}`), och ett misslyckande som daemonen kunde namnge lägger till `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}` (åtgärden, ett mänskligt namn på den, dess huvudargument med maskerade hemligheter, repositoryt, vem som bad om den, begärans id och, för en fetch eller push, dess jobbnummer); MCP-verktygen returnerar samma objekt. Utan `--json` går raderna till stderr. |
 | `--repo <path>` | Repositoryt att agera på (standard: det som omger den aktuella katalogen, som git). |
 | `-s, --session <name>` | Sessionen (daemonen) att prata med. Standard: härledd från repositoryts rot, så allt som öppnas i ett repository delar en daemon och två repositories får två. |
 | `--backend git2\|system` | Backend för en daemon som det här kommandot startar (en som redan körs behåller sin egen). |
@@ -165,7 +165,7 @@ pop:ar stashen, oavsett vad `general.auto_stash` säger ([Auto-stash](log-and-hi
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetcha standard-remoten, en remote eller alla. Varje fetch uppdaterar också vad varje remote har bland taggar (`tag list`s `remote`), och rensar den uppgiften även utan `--prune`. `--prune-tags` (Inställningar: Auto-prune tags) tar också bort de lokala tags som remoten har tagit bort: bara tags som fanns på den, aldrig en du inte pushat; svaret listar dem som `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; läget skickas alltid uttryckligen till git. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Det finns ingen vanlig force: bara `--force-with-lease`. |
-| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotes. |
+| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotes. `remote list` markerar en remote-spårande namnrymd utan någon remote bakom sig med `configured: false`; `remote remove` på den tar bort dess grenar (kan ångras). |
 | `remote set-url <name> <url> [--push]`, `remote clear-push-url <name>` | Fetch- / push-URL:er. |
 | `remote default [name]` | Visa eller välj repositoryts standard-remote. |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | Klona (LFS-objekt laddas ned om inte `--no-lfs`). `--sparse` checkar bara ut de katalogerna och filerna i roten; hela historiken laddas ändå ner (se [Delvis utcheckning](getting-started.md#delvis-utcheckning)). |

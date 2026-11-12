@@ -545,6 +545,8 @@ kitty_keyboard = "Kitty 키보드 프로토콜"
 kitty_keyboard_help = "auto는 시작할 때 약 100ms 안에 터미널이 kitty 키보드 프로토콜을 지원하는지 묻고, 지원하면 사용합니다: 레거시 터미널이 구분하지 못하는 조합(Control과 문장 부호, 숫자, Shift, Enter)이 제어 코드와 충돌하지 않고 그대로 전달됩니다. 응답하지 않는 터미널은 레거시 키를 유지합니다. off는 터미널의 키보드 모드를 건드리지 않습니다. 재시작이 필요합니다."
 color_depth = "색상 깊이"
 color_depth_help = "auto는 24비트 색상을 사용하되, 이를 표시하지 못하는 터미널(Apple 터미널, Linux 콘솔, COLORTERM이 없는 256색 터미널)에서는 가장 가까운 256색 또는 16색으로 변환합니다. truecolor, 256, 16은 깊이를 강제합니다. 즉시 적용됩니다."
+text_cursor = "Text cursor"
+text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
 graph_show_stashes = "그래프에 {$stash} 표시"
 graph_show_stashes_help = { git = "각 {$stash}가 Log에 날짜 순으로 자기만의 행을 가집니다: 만든 {$commit} 옆 레인의 작은 상자로, 점선으로 {$commit}과 이어집니다. 선택하면 변경 내용이 표시되고, 오른쪽 클릭(또는 .)으로 Pop, Apply, Drop을 쓸 수 있습니다. 꺼짐이면 {$stash}는 {$STASHES} 섹션에만 표시됩니다. 솔로 모드에서는 그려지지 않습니다.", local = "각 {$stash}가 Log에 날짜 순으로 자기만의 행을 가집니다: 만든 {$commit} 옆 레인의 작은 상자로, 점선으로 {$commit}과 이어집니다. 선택하면 변경 내용이 표시되고, 오른쪽 클릭(또는 .)으로 꺼내기, 적용, 삭제를 쓸 수 있습니다. 꺼짐이면 {$stash}는 {$STASHES} 섹션에만 표시됩니다. 솔로 모드에서는 그려지지 않습니다." }
 ref_connector = "Ref-{$commit} 연결선"

@@ -3,6 +3,8 @@
 //! multiplexers the environment names. Pure functions of an environment, like
 //! `detect::protocol_for`, whose precedence they mirror.
 
+// i18n-scan: off
+
 use super::detect::{
     auto_protocol, inside_a_multiplexer, inside_herdr, over_ssh, protocol_for, RendererChoice,
     MULTIPLEXER_TERM_PREFIXES,

@@ -45,6 +45,14 @@ pub trait TokenStore {
     fn has(&self, token_ref: &str) -> bool {
         matches!(self.load(token_ref), Ok(Some(_)))
     }
+
+    /// `Some(why)` when the token under `token_ref` is only held in this
+    /// process's memory because the persistent store refused it (`why` is
+    /// the store's error). `None` for a persisted token, or a store that
+    /// has no such fallback. Never touches the OS store.
+    fn session_only_reason(&self, _token_ref: &str) -> Option<String> {
+        None
+    }
 }
 
 /// The synthetic host a `token_ref` is mapped onto.
@@ -65,10 +73,11 @@ const USERNAME: &str = "gitpoulpi";
 /// Tokens the credential helper could not keep, held for this process
 /// only so a machine with a broken or absent helper still works for the
 /// session. Never persisted.
-fn session() -> &'static std::sync::Mutex<std::collections::BTreeMap<String, String>> {
-    static SESSION: std::sync::OnceLock<
-        std::sync::Mutex<std::collections::BTreeMap<String, String>>,
-    > = std::sync::OnceLock::new();
+/// Each entry is `(token, why the helper refused it)`.
+type SessionMap = std::sync::Mutex<std::collections::BTreeMap<String, (String, String)>>;
+
+fn session() -> &'static SessionMap {
+    static SESSION: std::sync::OnceLock<SessionMap> = std::sync::OnceLock::new();
     SESSION.get_or_init(Default::default)
 }
 
@@ -218,11 +227,11 @@ impl TokenStore for CredentialHelperTokens {
             // The helper cannot keep it (absent, refusing, broken): keep
             // it for this session rather than failing the connection.
             // `is_session_only` lets the UI warn that it will not survive.
-            Err(_) => {
+            Err(e) => {
                 session()
                     .lock()
                     .expect("session map poisoned")
-                    .insert(token_ref.to_string(), token.to_string());
+                    .insert(token_ref.to_string(), (token.to_string(), e.to_string()));
                 Ok(())
             }
         }
@@ -234,9 +243,17 @@ impl TokenStore for CredentialHelperTokens {
             .expect("session map poisoned")
             .get(token_ref)
         {
-            return Ok(Some(t.clone()));
+            return Ok(Some(t.0.clone()));
         }
         self.load_from_helper(token_ref)
+    }
+
+    fn session_only_reason(&self, token_ref: &str) -> Option<String> {
+        session()
+            .lock()
+            .expect("session map poisoned")
+            .get(token_ref)
+            .map(|t| t.1.clone())
     }
 
     fn delete(&self, token_ref: &str) -> Result<()> {
@@ -483,9 +500,16 @@ mod tests {
         assert_eq!(tokens.load(r).unwrap(), None);
         tokens.store(r, "glpat-TEST-session").unwrap();
         assert!(tokens.is_session_only(r));
+        assert!(
+            tokens
+                .session_only_reason(r)
+                .is_some_and(|why| !why.is_empty()),
+            "the refusal is kept for the caller"
+        );
         assert_eq!(tokens.load(r).unwrap(), Some("glpat-TEST-session".into()));
         tokens.delete(r).unwrap();
         assert!(!tokens.is_session_only(r));
+        assert_eq!(tokens.session_only_reason(r), None);
         assert_eq!(tokens.load(r).unwrap(), None);
 
         // A helper that hard-fails.

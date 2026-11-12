@@ -2045,6 +2045,7 @@ err_host = "Введите корректный домен хоста, напр�
 err_token = "Сначала вставьте персональный токен доступа"
 check_ended = "проверка подключения неожиданно завершилась"
 connected_to = "подключено к {host} как @{login}"
+connected_session_only = "{message} - the token could not be saved in the OS credential store ({error}); it is kept for this session only"
 disconnected = "{id} отключён; профиль сохранён"
 token_not_removed = "токен не удалён: {error}"
 removed = "{id} удалён"

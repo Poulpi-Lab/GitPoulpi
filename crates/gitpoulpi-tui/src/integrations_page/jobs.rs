@@ -193,7 +193,16 @@ impl IntegrationsPage {
                 *env.message = Some(if integration.kind.capabilities().local_folder {
                     gitpoulpi_i18n::msg::local_issues::folder_added(&integration.url)
                 } else {
-                    msg::connected_to(integration.host().unwrap_or_default(), &check.user.login)
+                    let connected = msg::connected_to(
+                        integration.host().unwrap_or_default(),
+                        &check.user.login,
+                    );
+                    // Only the process's memory holds a token the OS store
+                    // refused: say so instead of a bare "connected".
+                    match env.tokens.session_only_reason(&integration.token_ref) {
+                        Some(why) => msg::connected_session_only(connected, why),
+                        None => connected,
+                    }
                 });
                 let id = integration.id.clone();
                 match env.config.integrations.iter().position(|i| i.id == id) {

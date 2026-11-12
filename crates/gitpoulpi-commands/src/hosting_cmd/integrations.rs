@@ -482,8 +482,17 @@ pub(super) async fn login(
     }
     env.save_integrations(&integrations)?;
 
+    // The store keeps a token it could not persist for this process only:
+    // say so rather than "connected" alone.
+    let store_error = env.store.session_only_reason(&integration.token_ref);
+    let stored = if store_error.is_some() {
+        "session"
+    } else {
+        "os"
+    };
+
     let human = format!(
-        "`{}` connected as @{}{}{}",
+        "`{}` connected as @{}{}{}{}",
         integration.id,
         check.user.login,
         if check.missing_scopes.is_empty() {
@@ -491,7 +500,14 @@ pub(super) async fn login(
         } else {
             format!(" - token lacks: {}", check.missing_scopes.join(", "))
         },
-        excess_note(&check)
+        excess_note(&check),
+        match &store_error {
+            Some(why) => format!(
+                " - the OS credential store could not keep the token ({why}); \
+                 it is kept for this session only and is gone when the session ends"
+            ),
+            None => " - token stored in the OS credential store".to_string(),
+        }
     );
     Ok(Emitted {
         exit_code: 0,
@@ -505,6 +521,8 @@ pub(super) async fn login(
             "token_flavor": check.token_flavor,
             "recommend_fine_grained": check.recommend_fine_grained,
             "token_stored": true,
+            "stored": stored,
+            "store_error": store_error,
         }),
         human,
     })

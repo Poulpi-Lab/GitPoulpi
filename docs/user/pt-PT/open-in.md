@@ -186,6 +186,16 @@ Um ficheiro binário (um PDF, um documento do Word, uma folha de cálculo, um ar
 
 O ficheiro da árvore de trabalho é entregue à aplicação tal como está. A versão de um commit (ou do índice) é escrita numa **cópia temporária só de leitura**, com um aviso na barra de estado, para que uma aplicação não possa alterar o repositório. Nenhuma das duas altera o repositório: sem entrada no diário, Desfazer não é afetado.
 
+A lista do menu abre ao lado do menu, ao nível da linha **Abrir com...**, como um submenu (à esquerda quando não há espaço à direita), tanto com o rato como com o teclado. A lista dos editores de imagem (**Editar em...**) aberta a partir do menu de um ficheiro faz o mesmo.
+
+### Ficheiros Git LFS
+
+A ficha de objeto Git LFS (consulte [Git LFS](lfs.md)) traz as mesmas duas ações sob o seu texto: **Abrir no programa predefinido** e **Abrir em**, com as mesmas teclas (`o`, `Shift+O`) e linhas da paleta. Abrem o ficheiro real, nunca o ponteiro: o ficheiro da árvore de trabalho tal como está, ou uma cópia temporária só de leitura do objeto do armazém LFS local, para a versão de um commit ou do índice. Um objeto que ainda não foi transferido não tem botões na ficha, e a linha de estado diz que o conteúdo ainda não foi transferido. A mesma recusa aplica-se a um ficheiro da árvore de trabalho que ainda só contém o ponteiro: **Abrir no programa predefinido**, **Abrir em** e **Editar em**, a partir da ficha ou de qualquer menu de ficheiro, dizem que o conteúdo não foi transferido em vez de abrirem o texto do ponteiro (transfira-o com as linhas de pull ou checkout da barra de ferramentas LFS e tente de novo). Abrir é só de leitura: sem entrada no diário, nada a desfazer.
+
+### Navegadores no Windows
+
+O Chrome e o Edge registam `--single-argument %1`, o que os faz ler tudo o que vem depois da opção como um único endereço, aspas incluídas. O GitPoulpi passa o caminho a esse programa tal e qual e sem aspas, como o Windows faz, de modo que um ficheiro com espaços no caminho abre em vez de falhar com `http://"c/...`. Qualquer outro programa recebe o caminho como um argumento normal.
+
 ## Chaves antigas
 
 As chaves antigas `ui.terminal_launch` e `ui.terminal_launch_command` só são

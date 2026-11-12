@@ -432,7 +432,7 @@ sem um atalho. A lista completa está [abaixo](#todos-os-comandos-da-paleta).
 |---|---|
 | `Ctrl+P` | Abrir a paleta |
 | *(escrever)* | Filtrar a lista. Uma correspondência exata a seguir ao prefixo `Categoria: ` vem primeiro, depois uma correspondência em qualquer ponto da etiqueta, e depois uma correspondência aproximada |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | Mover o realce (consulte [Listas de popup filtráveis](#listas-de-popup-filtráveis)) |
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | Mover o realce (consulte [Listas de popup filtráveis](#listas-de-popup-filtráveis)) |
 | `Enter`, ou um clique duplo | Executar o comando realçado |
 | `Esc` | Fechar |
 
@@ -452,7 +452,9 @@ No `config.toml` é a tabela `[keybindings.palette]`, com o nome do comando (`to
 
 A faixa de ajuda abaixo da lista indica esta tecla (`Alt+K` por predefinição). É a ação `palette.configure_shortcut`, por isso pode ser reatribuída como qualquer outra.
 
-A paleta e os seletores (tema, idioma, separador, pesquisa de workspaces) movem-se e redimensionam-se como uma janela: arraste a margem superior, ou prima `Alt+G` (a ação `palette.arrange`; a linha da paleta `Janela: mover ou redimensionar` faz o mesmo). As setas movem-na, `Shift`+setas redimensionam-na, `0` repõe-na, `Enter` ou `Esc` saem do modo e o popup fica aberto. `ui.dialog_geometry` decide se o lugar é mantido.
+A paleta e os seletores (tema, idioma, separador, pesquisa de workspaces) movem-se e redimensionam-se como uma janela: arraste a margem superior, prima `Ctrl+N` e depois `m` (como sobre qualquer janela), ou prima `Alt+G`. `Alt+G` é a ação `palette.arrange` ("Janela: mover ou redimensionar a janela da frente"): uma via extra, válida sobre qualquer janela e popup, para iniciar o modo de arranjo na que está à frente (as linhas da paleta `Janela: mover ou redimensionar` e `Janela: repor posição e tamanho` atuam sobre a própria paleta enquanto ela está aberta). As setas movem-na, `Shift`+setas redimensionam-na, `0` repõe-na, `Enter` ou `Esc` saem do modo e o popup fica aberto. `ui.dialog_geometry` decide se o lugar é mantido.
+
+`Ctrl+N` é também aqui o prefixo de navegação: mostra um selo na caixa de filtro, na primeira linha da lista e na cruz de fechar, e a tecla seguinte prime esse controlo, ou `m` arranja o popup. Já não desce o realce, e `Ctrl+P` não o sobe: só as setas, `PageUp` / `PageDown` e `Home` / `End` movem uma lista com campo de filtro.
 
 ### Todos os comandos da paleta
 
@@ -1189,7 +1191,7 @@ As teclas são as predefinidas.
 | Tecla | Ação |
 |---|---|
 | `Tab` / `Shift+Tab` | Focar o painel seguinte / anterior |
-| `Ctrl+N`, depois um selo | Focar essa parte da janela (consulte [Prefixo de navegação](#prefixo-de-navegação-ctrln)) |
+| `Ctrl+N`, depois um selo | Focar essa parte da janela, ou premir esse controlo da janela ou do popup da frente (consulte [Prefixo de navegação](#prefixo-de-navegação-ctrln)) |
 | `j` / `k`, `Up` / `Down` | Mover a seleção, em todos os painéis |
 | `PageUp` / `PageDown`, `Home` / `End` | Mover uma página; ir para a primeira / última linha |
 | um número, depois `j` / `k` / `Up` / `Down` | Prefixo de contagem: `4j` move quatro linhas. Com `PageUp` / `PageDown`, a contagem é um número de páginas. A barra de estado mostra a contagem pendente (`4...`). `Esc` ou qualquer outra tecla limpa-a. Um `0` inicial nunca começa uma contagem |
@@ -1215,15 +1217,19 @@ movem o realce:
 
 | Tecla | Ação |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Mover uma linha |
+| `Up` / `Down` | Mover uma linha |
 | `Home` / `End` | Primeira / última linha |
 | `PageUp` / `PageDown` | Mover uma página visível |
 | `Enter` | Escolher a linha realçada |
 | `Esc` | Fechar |
 
-Nestes popups, `Home`, `End` e `Ctrl+K` movem a lista, não o cursor do campo
-de filtro. `Ctrl+A` e `Ctrl+E` continuam a mover o cursor para o início e o fim.
-`j` e `k` simples são escritos no filtro.
+Nestes popups, `Home` e `End` movem a lista, não o cursor do campo de filtro.
+`Ctrl+A` e `Ctrl+E` continuam a mover o cursor para o início e o fim, e `Ctrl+K`
+apaga até ao fim do filtro. Nenhum par `Ctrl+letra` move uma lista (`Ctrl+N` é o
+prefixo de navegação, `Ctrl+P` a paleta de comandos), e `j` e `k` simples são
+escritos no filtro: aqui só movem as setas, `PageUp` / `PageDown` e `Home` /
+`End`. Nas listas sem campo de texto, `j` / `k` são uma via extra para descer /
+subir.
 
 Com o rato:
 
@@ -1254,7 +1260,7 @@ tudo, incluindo o ecrã das Definições.
 | *(escrever)* | Filtrar: manter apenas as secções que contêm o texto. `j`, `k` e `q` também são escritos |
 | `Backspace`, `Ctrl+U` | Apagar o último carácter / limpar o filtro |
 | `Esc` | Limpar o filtro; se estiver vazio, fechar a ajuda |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Deslocar uma linha |
+| `Up` / `Down` | Deslocar uma linha |
 | `PageUp` / `PageDown`, `Home` / `End` | Deslocar uma página; ir para o topo / fim |
 | `Ctrl+D`, ou um clique na ligação | Abrir esta documentação no GitHub, no navegador |
 

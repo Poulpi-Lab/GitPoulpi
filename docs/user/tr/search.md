@@ -30,7 +30,7 @@ hazır olur olmaz katılır.
 
 | Tuş | Ne yapar |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `PageUp` / `PageDown`, `Home` / `End` | Sonuçlar arasında gezer (grup başlıkları atlanır). |
+| `Up` / `Down`, `PageUp` / `PageDown`, `Home` / `End` | Sonuçlar arasında gezer (grup başlıkları atlanır). |
 | `Enter` | Sonuca gider: deponun sekmesi açılır (veya ona geçilir), sonra sonuç gösterilir. |
 | `Esc` | Aramayı kapatır. |
 | `Alt+1` .. `Alt+8` | Bir türü açar veya kapatır (listenin üstündeki çipler, kendi sıralarıyla). `Alt+0` hepsini açar. |

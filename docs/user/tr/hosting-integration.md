@@ -730,7 +730,7 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Her komut için [CLI başvurusuna](cli-reference.md#komutlar) bakın. Bir token asla
-argüman olarak kabul edilmez ve MCP sunucusu `hosting login` sunmaz, bu yüzden bir
+argüman olarak kabul edilmez (`hosting login`, token'ı işletim sisteminin kimlik bilgisi deposu tutuyorsa `stored: "os"`, depo reddedip token bu oturum için bellekte duruyorsa `stored: "session"` ve `store_error` yazdırır) ve MCP sunucusu `hosting login` sunmaz, bu yüzden bir
 token asla bir ajanın içinden geçmez.
 
 ## Sorun giderme

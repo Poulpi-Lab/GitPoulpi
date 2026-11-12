@@ -435,7 +435,7 @@ ulaşırsınız. Tam liste [aşağıdadır](#her-palet-komutu).
 |---|---|
 | `Ctrl+P` | Paleti aç |
 | *(yaz)* | Listeyi filtrele. `Kategori: ` önekinden sonraki tam eşleşme önce gelir, sonra etiketin herhangi bir yerindeki eşleşme, sonra bulanık eşleşme |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | Vurguyu taşı (bkz. [Filtrelenebilir açılır listeler](#filtrelenebilir-açılır-listeler)) |
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | Vurguyu taşı (bkz. [Filtrelenebilir açılır listeler](#filtrelenebilir-açılır-listeler)) |
 | `Enter` veya çift tık | Vurgulanan komutu çalıştır |
 | `Esc` | Kapat |
 
@@ -454,7 +454,9 @@ Paletin her satırı bir tuş düğmesiyle (`[k]`) biter ve `Alt+K` vurgulu sat�
 
 Listenin altındaki ipucu çubuğu bu tuşu gösterir (varsayılan `Alt+K`). Bu, `palette.configure_shortcut` eylemidir; diğerleri gibi yeniden atanabilir.
 
-Palet ve seçiciler (tema, dil, sekme, çalışma alanı araması) bir pencere gibi taşınır ve boyutlandırılır: üst kenarlığı sürükleyin ya da `Alt+G` tuşuna basın (`palette.arrange` eylemi; paletteki `Pencere: Taşı veya Boyutlandır` satırı aynı işi yapar). Oklar taşır, `Shift`+oklar boyutlandırır, `0` sıfırlar, `Enter` veya `Esc` kipten çıkar ve açılır pencere açık kalır. Yerin korunup korunmayacağını `ui.dialog_geometry` belirler.
+Palet ve seçiciler (tema, dil, sekme, çalışma alanı araması) bir pencere gibi taşınır ve boyutlandırılır: üst kenarlığı sürükleyin, `Ctrl+N` ardından `m` tuşlarına basın (her pencerede olduğu gibi) ya da `Alt+G` tuşuna basın. `Alt+G`, `palette.arrange` eylemidir ("Pencere: Öndeki Pencereyi Taşı veya Boyutlandır"): her pencerede ve açılır pencerede öndekinin düzenleme kipini başlatan ek bir yoldur (paletteki `Pencere: Taşı veya Boyutlandır` ve `Pencere: Konumu ve Boyutu Sıfırla` satırları palet açıkken paletin kendisi üzerinde çalışır). Oklar taşır, `Shift`+oklar boyutlandırır, `0` sıfırlar, `Enter` veya `Esc` kipten çıkar ve açılır pencere açık kalır. Yerin korunup korunmayacağını `ui.dialog_geometry` belirler.
+
+`Ctrl+N` burada da gezinme önekidir: filtre kutusunda, listenin ilk satırında ve kapatma çarpısında bir rozet gösterir; ardından gelen tuş o denetime basar ya da `m` açılır pencereyi düzenler. Artık vurguyu aşağı taşımaz, `Ctrl+P` de yukarı taşımaz: filtre alanı olan bir listeyi yalnızca oklar, `PageUp` / `PageDown` ve `Home` / `End` taşır.
 
 ### Her palet komutu
 
@@ -1191,7 +1193,7 @@ Tuşlar varsayılanlardır.
 | Tuş | Eylem |
 |---|---|
 | `Tab` / `Shift+Tab` | Sonraki / önceki panele odaklan |
-| `Ctrl+N`, sonra bir rozet | Pencerenin o bölümüne odaklan (bkz. [Gezinme öneki](#gezinme-öneki-ctrln)) |
+| `Ctrl+N`, sonra bir rozet | Pencerenin o bölümüne odaklan ya da öndeki pencerenin veya açılır pencerenin o denetimine bas (bkz. [Gezinme öneki](#gezinme-öneki-ctrln)) |
 | `j` / `k`, `Up` / `Down` | Seçimi taşı, her panelde |
 | `PageUp` / `PageDown`, `Home` / `End` | Bir sayfa taşı; ilk / son satıra git |
 | bir sayı, sonra `j` / `k` / `Up` / `Down` | Sayı öneki: `4j` dört satır taşır. `PageUp` / `PageDown` ile sayı, sayfa sayısıdır. Durum çubuğu bekleyen sayıyı gösterir (`4...`). `Esc` veya başka herhangi bir tuş onu temizler. Baştaki `0` asla bir sayı başlatmaz |
@@ -1216,15 +1218,18 @@ açılır liste (Ayarlar seçenekleri, pull request formu, issue referansı seç
 
 | Tuş | Eylem |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Bir satır taşı |
+| `Up` / `Down` | Bir satır taşı |
 | `Home` / `End` | İlk / son satır |
 | `PageUp` / `PageDown` | Görünen bir sayfa taşı |
 | `Enter` | Vurgulanan satırı seç |
 | `Esc` | Kapat |
 
-Bu açılır pencerelerde `Home`, `End` ve `Ctrl+K` filtre alanının imlecini değil
-listeyi taşır. `Ctrl+A` ve `Ctrl+E` imleci yine başa ve sona taşır. Düz `j` ve
-`k` filtreye yazılır.
+Bu açılır pencerelerde `Home` ve `End` filtre alanının imlecini değil listeyi
+taşır. `Ctrl+A` ve `Ctrl+E` imleci yine başa ve sona taşır, `Ctrl+K` filtreyi
+sonuna kadar siler. Hiçbir `Ctrl+harf` çifti listeyi taşımaz (`Ctrl+N` gezinme
+önekidir, `Ctrl+P` komut paleti), düz `j` ve `k` filtreye yazılır: burada
+yalnızca oklar, `PageUp` / `PageDown` ve `Home` / `End` taşır. Metin alanı
+olmayan listelerde `j` / `k` aşağı / yukarı gitmenin ek bir yoludur.
 
 Fareyle:
 
@@ -1256,7 +1261,7 @@ açar. Uygulamanın her bölümünün tuşlarını ve fare hareketlerini listele
 | *(yaz)* | Filtre: yalnızca metni içeren bölümleri tut. `j`, `k` ve `q` de yazılır |
 | `Backspace`, `Ctrl+U` | Son karakteri sil / filtreyi temizle |
 | `Esc` | Filtreyi temizle; boşsa yardımı kapat |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Bir satır kaydır |
+| `Up` / `Down` | Bir satır kaydır |
 | `PageUp` / `PageDown`, `Home` / `End` | Bir sayfa kaydır; en üste / en alta git |
 | `Ctrl+D` veya bağlantıya tık | Bu belgeleri tarayıcıda GitHub'da aç |
 

@@ -160,6 +160,48 @@ impl IntegrationsPage {
             .area_mouse(Item::RadarNamespaces, &text, kind, (col, vrow), false)
     }
 
+    /// The Namespaces area's scrollbar: a press on an end arrow steps a
+    /// line, a press on the thumb grabs it, a press on the bare track jumps
+    /// the thumb there, a drag moves it (even off the bar). A press also
+    /// puts the keyboard on the area. Whether the bar used the event.
+    pub(super) fn namespaces_bar_mouse(
+        &mut self,
+        kind: MouseEventKind,
+        col: u16,
+        row: u16,
+        env: &mut Env,
+    ) -> bool {
+        let item = Item::RadarNamespaces;
+        let vrow = self.editor_row(row);
+        let held = self.ns_drag.held();
+        let on_screen = self.scroll.window.contains((col, row).into());
+        if !held && !(on_screen && matches!(kind, MouseEventKind::Down(MouseButton::Left))) {
+            return false;
+        }
+        let event = crossterm::event::MouseEvent {
+            kind,
+            column: col,
+            row: vrow,
+            modifiers: KeyModifiers::NONE,
+        };
+        let lines = self.radar_ns.split('\n').count();
+        let top = self.editor.caret(item).map_or(0, |c| c.top.get());
+        let Some(new_top) = self.ns_drag.on_mouse(self.ns_bar, event, lines, top) else {
+            return false;
+        };
+        if matches!(kind, MouseEventKind::Down(_)) {
+            if let Some(at) = self.items(env.config).iter().position(|i| *i == item) {
+                self.item = at;
+                self.zone = Zone::Body;
+            }
+        }
+        let text = self.radar_ns.clone();
+        self.editor
+            .caret_mut(item)
+            .scroll_lines_to(&text, new_top, NS_ROWS as usize);
+        true
+    }
+
     /// Applies `change` to the selected profile's options and saves, only
     /// when something changed.
     fn update_radar(&mut self, env: &mut Env, change: impl FnOnce(&mut IntegrationRadar)) {
@@ -473,6 +515,13 @@ impl IntegrationsPage {
             rows
         };
         let total = self.radar_ns.split('\n').count();
+        let bar = crate::scrollbar::Track::column(
+            Rect::new(rect.right().saturating_sub(1), y, 1, NS_ROWS),
+            total,
+            NS_ROWS as usize,
+            top,
+        );
+        self.ns_bar = bar;
         let buf = frame.buffer_mut();
         for (dy, line) in lines.into_iter().enumerate() {
             let row = y + dy as u16;
@@ -486,29 +535,26 @@ impl IntegrationsPage {
             }
             x += 1;
             for span in line.spans {
-                let (_, nx) =
+                // `set_stringn` returns the next free cell as `(x, y)`.
+                let (nx, _) =
                     buf.set_stringn(x, row, span.content.as_ref(), text_w as usize, span.style);
                 x = nx;
             }
-            // The scrollbar column: a thumb over a track, when lines overflow.
+            // The scrollbar column: end arrows, a thumb over a track, when
+            // lines overflow. `ns_bar` is what a press and a drag act on.
             let bar_x = rect.right().saturating_sub(1);
-            let (glyph, style) = if total > NS_ROWS as usize {
-                let rows = NS_ROWS as usize;
-                let thumb = (rows * rows / total).max(1);
-                let max_top = total - rows;
-                let start = (top.min(max_top) * (rows - thumb))
-                    .checked_div(max_top)
-                    .unwrap_or(0);
-                if dy >= start && dy < start + thumb {
-                    (
+            let muted = Style::default().fg(th().ui.muted).bg(field_bg);
+            let (glyph, style) = match bar {
+                Some(t) => match t.arrow_step(dy as u16) {
+                    Some(-1) => ("\u{2191}", muted),
+                    Some(_) => ("\u{2193}", muted),
+                    None if t.on_thumb(dy as u16) => (
                         "\u{2588}",
                         Style::default().fg(th().scrollbar.thumb).bg(field_bg),
-                    )
-                } else {
-                    ("\u{2502}", Style::default().fg(th().ui.muted).bg(field_bg))
-                }
-            } else {
-                (" ", pad)
+                    ),
+                    None => ("\u{2502}", muted),
+                },
+                None => (" ", pad),
             };
             if let Some(cell) = buf.cell_mut((bar_x, row)) {
                 cell.set_symbol(glyph).set_style(style);

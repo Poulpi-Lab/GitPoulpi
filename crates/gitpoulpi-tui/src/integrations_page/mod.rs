@@ -395,6 +395,10 @@ pub(crate) struct IntegrationsPage {
     /// The Namespaces field's text, and the profile (by id) it belongs to.
     radar_ns: String,
     radar_ns_for: String,
+    /// The Namespaces area's scrollbar as last painted (off-screen rows, like
+    /// the editor's rects) and its thumb grab.
+    ns_bar: Option<crate::scrollbar::Track>,
+    ns_drag: crate::scrollbar::BarDrag,
     /// The "uncloned request" combobox.
     radar_combo: crate::combo::Combo,
     scroll: Scroll,
@@ -435,6 +439,8 @@ impl Default for IntegrationsPage {
             ssh: SshUi::default(),
             radar_ns: String::new(),
             radar_ns_for: String::new(),
+            ns_bar: None,
+            ns_drag: crate::scrollbar::BarDrag::default(),
             radar_combo: radar::new_combo(),
             scroll: Scroll::default(),
             hits: Vec::new(),

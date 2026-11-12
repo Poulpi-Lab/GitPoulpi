@@ -49,7 +49,7 @@ fn a_disconnected_profile_can_be_removed_from_settings_and_stays_removed() {
             let (c, r) = t.wait_for_settled_text("\u{25CB} GitLab", dwell, STEP)?;
             t.click(c + 3, r)
         },
-        |s| s.contains("[ Remove ]") && s.contains("[ Connect ]"),
+        |s| s.contains(" Remove ") && s.contains(" Connect "),
     )
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.act_until(
@@ -57,14 +57,14 @@ fn a_disconnected_profile_can_be_removed_from_settings_and_stays_removed() {
         Duration::from_secs(4),
         STEP,
         |t| {
-            let (c, r) = t.wait_for_settled_text("[ Remove ]", dwell, STEP)?;
+            let (c, r) = t.wait_for_settled_text(" Remove ", dwell, STEP)?;
             t.click(c + 2, r)
         },
         |s| s.contains("Remove profile"),
     )
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let screen = term
-        .wait_for_settled_text("[ Remove ]", dwell, STEP)
+        .wait_for_settled_text(" Remove ", dwell, STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     let (c, r) = screen;
     term.click(c + 2, r).unwrap();
@@ -118,10 +118,10 @@ fn open_form(term: &mut xtask::pty::Terminal, name: &str) {
     term.click(c + 1, r).unwrap();
     let screen = term
         .wait_for("the product's empty view", STEP, |s| {
-            s.contains("[ Connect ]") && s.contains("No ")
+            s.contains(" Connect ") && s.contains("No ")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen.find("[ Connect ]").unwrap();
+    let (c, r) = screen.find(" Connect ").unwrap();
     term.click(c + 2, r).unwrap();
 }
 
@@ -202,11 +202,11 @@ fn connecting_jira_cloud_without_an_email_asks_for_it() {
     term.send_keys("Tab").unwrap();
     term.send_text("tok").unwrap();
     term.wait_for("Connect disabled hint reachable", STEP, |s| {
-        s.contains("[ Connect ]")
+        s.contains(" Connect ")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     // A click on a torn frame can be lost: re-locate and retry.
-    crate::common::click_text_until(&mut term, "[ Connect ]", "the email error", |s| {
+    crate::common::click_text_until(&mut term, " Connect ", "the email error", |s| {
         s.contains("Enter your Atlassian account email first.")
     });
     assert!(!mock.saw("GET", "/myself"));
@@ -229,17 +229,17 @@ fn trello_generate_link_needs_the_api_key_and_esc_saves_nothing() {
     );
     open_form(&mut term, "Trello");
     term.wait_for("the Trello form, link disabled", STEP, |s| {
-        s.contains("[ Get an API key on Trello ]")
-            && s.contains("[ Generate a token (enter the API key first) ]")
+        s.contains(" Get an API key on Trello ")
+            && s.contains(" Generate a token (enter the API key first) ")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_text("abc123key").unwrap();
     let screen = term
         .wait_for("the link enabled", STEP, |s| {
-            s.contains("[ Generate a token on trello.com ]")
+            s.contains(" Generate a token on trello.com ")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen.find("[ Get an API key on Trello ]").unwrap();
+    let (c, r) = screen.find(" Get an API key on Trello ").unwrap();
     term.click(c + 2, r).unwrap();
     let urls = wait_opened(&dir, 1);
     assert!(
@@ -247,7 +247,7 @@ fn trello_generate_link_needs_the_api_key_and_esc_saves_nothing() {
             .any(|u| u.contains("trello.com/power-ups/admin")),
         "{urls:?}"
     );
-    let (c, r) = screen.find("[ Generate a token on trello.com ]").unwrap();
+    let (c, r) = screen.find(" Generate a token on trello.com ").unwrap();
     term.click(c + 2, r).unwrap();
     let urls = wait_opened(&dir, 2);
     assert!(

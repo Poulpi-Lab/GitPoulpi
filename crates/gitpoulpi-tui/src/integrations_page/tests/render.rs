@@ -12,7 +12,7 @@ fn empty_page_lists_types_and_offers_connect() {
         "GitLab Self-Managed",
         "No GitHub profile yet.",
         "+ Add profile",
-        "[ Connect ]",
+        " Connect ",
     ] {
         assert!(screen.contains(want), "missing {want:?}:\n{screen}");
     }
@@ -30,7 +30,7 @@ fn self_managed_form_is_disabled_until_host_and_token_are_set() {
         "Personal access token",
         "Scopes: api, read_user",
         "Generate a token (enter the host first)",
-        "[ Connect ]",
+        " Connect ",
     ] {
         assert!(screen.contains(want), "missing {want:?}:\n{screen}");
     }

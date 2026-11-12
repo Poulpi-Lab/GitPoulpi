@@ -349,6 +349,9 @@ impl IntegrationsPage {
         if self.namespaces_wheel(kind, col, row) {
             return true;
         }
+        if self.namespaces_bar_mouse(kind, col, row, env) {
+            return true;
+        }
         if self.scroll_mouse(kind, col, row) {
             return true;
         }

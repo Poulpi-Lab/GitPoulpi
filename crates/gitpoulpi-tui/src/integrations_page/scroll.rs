@@ -91,7 +91,7 @@ impl IntegrationsPage {
     /// Whether a press/drag/wheel is the page's even outside the body: a
     /// popup is open or the scrollbar thumb is held.
     pub(crate) fn owns_pointer(&self) -> bool {
-        self.combo_open() || self.scroll.drag.held()
+        self.combo_open() || self.scroll.drag.held() || self.ns_drag.held()
     }
 
     /// Scrolls the view by `delta` rows (clamped).

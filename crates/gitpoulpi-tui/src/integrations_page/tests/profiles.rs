@@ -8,14 +8,14 @@ fn reopening_a_connected_profile_shows_the_card_and_edit_prefills_the_token() {
     page.select_kind(GITLAB_SM, &h.config);
     assert_eq!(page.view(&h.config), View::Connected(0));
     let screen = text(&draw(&mut page, &h, 80, 26, None));
-    for want in ["Kai G (@kai)", "Connected", "[ Edit ]", "[ Remove ]", "SSH"] {
+    for want in ["Kai G (@kai)", "Connected", " Edit ", " Remove ", "SSH"] {
         assert!(
             screen.contains(want),
             "missing {want:?}:
 {screen}"
         );
     }
-    for gone in ["Host domain", "[ Connect ]"] {
+    for gone in ["Host domain", " Connect "] {
         assert!(
             !screen.contains(gone),
             "{gone:?} shown:
@@ -27,7 +27,7 @@ fn reopening_a_connected_profile_shows_the_card_and_edit_prefills_the_token() {
     let screen = text(&draw(&mut page, &h, 80, 30, None));
     assert!(screen.contains("Personal access token"), "{screen}");
     assert!(screen.contains("glpat-secret"), "{screen}");
-    assert!(!screen.contains("[ Edit ]"), "{screen}");
+    assert!(!screen.contains(" Edit "), "{screen}");
 }
 
 #[test]
@@ -77,7 +77,7 @@ fn an_unconnected_profile_offers_remove_and_the_removal_survives_a_reload() {
     assert_eq!(page.view(&h.config), View::Form);
     assert!(page.items(&h.config).contains(&Item::Remove));
     let screen = text(&draw(&mut page, &h, 140, 40, None));
-    assert!(screen.contains("[ Remove ]"), "{screen}");
+    assert!(screen.contains(" Remove "), "{screen}");
 
     // Keeping it returns to the form, not to an empty page.
     page.activate(Item::Remove, &mut h.env());

@@ -27,7 +27,7 @@ fn the_empty_page_is_in_french_and_the_term_follows_the_setting() {
             "Hébergement",
             "Aucun profil GitHub pour l'instant.",
             "+ Ajouter un profil",
-            "[ Se connecter ]",
+            " Se connecter ",
             "dépôts, pull requests, tickets, clés SSH",
             "Connectez un compte pour lier des pull requests et des tickets à vos",
         ],
@@ -54,8 +54,8 @@ fn the_connect_form_is_in_french() {
             "collez votre jeton",
             "Portées : api, read_user",
             "Générer un jeton (saisissez d'abord l'hôte)",
-            "[ Se connecter ]",
-            "[ Annuler ]",
+            " Se connecter ",
+            " Annuler ",
         ],
     );
     page.activate(Item::Connect, &mut h.env());
@@ -85,9 +85,9 @@ fn the_connected_card_and_the_ssh_section_are_in_french() {
             "Jeton",
             "enregistré",
             "Auth.",
-            "[ Modifier ]",
-            "[ Déconnecter ]",
-            "[ Supprimer ]",
+            " Modifier ",
+            " Déconnecter ",
+            " Supprimer ",
             "Clé SSH",
             "Clé par défaut",
             "Générer une clé",
@@ -102,7 +102,7 @@ fn the_connected_card_and_the_ssh_section_are_in_french() {
         &[
             "Titre de la clé",
             "[x] Ajouter la clé publique à gitlab.example.com",
-            "[ Générer la clé ]",
+            " Générer la clé ",
         ],
     );
     page.activate(Item::SshCustom, &mut h.env());
@@ -111,8 +111,8 @@ fn the_connected_card_and_the_ssh_section_are_in_french() {
         &screen,
         &[
             "Fichier de clé privée",
-            "[ Parcourir... ]",
-            "[ Utiliser cette clé ]",
+            " Parcourir... ",
+            " Utiliser cette clé ",
         ],
     );
 }
@@ -143,8 +143,8 @@ fn an_attached_key_and_its_deletion_dialog_fit_in_french() {
         &[
             "clé générée",
             "ajoutée à gitlab.example.com (clé 42)",
-            "[ Retirer ]",
-            "[ Supprimer ]",
+            " Retirer ",
+            " Supprimer ",
             "Retirer détache la clé",
         ],
     );
@@ -156,8 +156,8 @@ fn an_attached_key_and_its_deletion_dialog_fit_in_french() {
             "Supprimer cette clé et ses fichiers\u{a0}?",
             "privée",
             "supprimée sur gitlab.example.com. Action irréversible.",
-            "[ Supprimer les fichiers ]",
-            "[ Garder ]",
+            " Supprimer les fichiers ",
+            " Garder ",
         ],
     );
 }
@@ -173,6 +173,6 @@ fn the_remove_profile_question_is_in_french() {
     let screen = french(&mut page, &h);
     expect_all(
         &screen,
-        &["Supprimer le profil", "Son jeton enregistré", "[ Garder ]"],
+        &["Supprimer le profil", "Son jeton enregistré", " Garder "],
     );
 }

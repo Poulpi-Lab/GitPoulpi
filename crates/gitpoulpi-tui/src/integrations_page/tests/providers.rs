@@ -77,9 +77,9 @@ fn trello_has_two_links_and_the_token_one_waits_for_the_key() {
     let mut page = IntegrationsPage::default();
     select(&mut page, &h, IntegrationKind::Trello);
     let screen = text(&draw(&mut page, &h, 100, 36, None));
-    assert!(screen.contains("[ Get an API key on Trello ]"), "{screen}");
+    assert!(screen.contains(" Get an API key on Trello "), "{screen}");
     assert!(
-        screen.contains("[ Generate a token (enter the API key first) ]"),
+        screen.contains(" Generate a token (enter the API key first) "),
         "{screen}"
     );
     assert_eq!(page.token_url(), None);
@@ -91,7 +91,7 @@ fn trello_has_two_links_and_the_token_one_waits_for_the_key() {
     );
     let screen = text(&draw(&mut page, &h, 100, 36, None));
     assert!(
-        screen.contains("[ Generate a token on trello.com ]"),
+        screen.contains(" Generate a token on trello.com "),
         "{screen}"
     );
 }
@@ -208,7 +208,7 @@ fn a_local_markdown_folder_has_a_folder_field_a_browse_button_and_no_token() {
     let mut page = IntegrationsPage::default();
     select(&mut page, &h, IntegrationKind::LocalMarkdown);
     let screen = text(&draw(&mut page, &h, 100, 36, None));
-    for want in ["Notes folder", "[ Browse... ]", "[ Add folder ]"] {
+    for want in ["Notes folder", " Browse... ", " Add folder "] {
         assert!(screen.contains(want), "missing {want:?}:\n{screen}");
     }
     for gone in ["Personal access token", "Generate a token", "Host domain"] {
@@ -241,7 +241,7 @@ fn a_local_markdown_folder_has_a_folder_field_a_browse_button_and_no_token() {
     assert_eq!(page.view(&h.config), View::Connected(0));
     let screen = text(&draw(&mut page, &h, 100, 36, None));
     assert!(
-        screen.contains("docs/issues") && screen.contains("[ Edit ]"),
+        screen.contains("docs/issues") && screen.contains(" Edit "),
         "{screen}"
     );
     assert!(!screen.contains("Disconnect"), "{screen}");

@@ -24,6 +24,7 @@ impl IntegrationsPage {
     ) {
         self.hits.clear();
         self.scroll.bar = None;
+        self.ns_bar = None;
         self.editor.begin_frame();
         self.sync_radar(cfg);
         frame.render_widget(Clear, area);
@@ -66,6 +67,9 @@ impl IntegrationsPage {
             area.height,
         );
         self.render_right(frame_canvas, right, cfg, presence, focused, current);
+        if self.ssh.picker.is_none() {
+            self.register_pointer();
+        }
         // The combobox popup hangs over everything painted so far.
         self.radar_combo.render_popup(frame.buffer_mut(), area);
 
@@ -89,6 +93,50 @@ impl IntegrationsPage {
                 }
             }
         }
+    }
+
+    /// Tells the pointer map what this paint put under the mouse: the hand on
+    /// every button, checkbox, radio and the Add profile button, the I-beam
+    /// on the text fields, the hand on the Namespaces scrollbar. The hit list
+    /// is in click order (first wins), the map in paint order (last wins), so
+    /// it goes in reversed.
+    fn register_pointer(&self) {
+        for (rect, hit, _) in self.hits.iter().rev() {
+            match hit {
+                Hit::Item(item) if item.is_text() => crate::pointer_map::field(*rect),
+                Hit::Item(_) | Hit::AddProfile => crate::pointer_map::hand(*rect),
+                Hit::Type(_) | Hit::Profile(_) => {}
+            }
+        }
+        if let Some(bar) = self.ns_bar {
+            let top = self.scroll.top as i32;
+            let y0 = (i32::from(bar.rect.y) - top).max(i32::from(self.scroll.window.y));
+            let y1 = (i32::from(bar.rect.bottom()) - top).min(i32::from(self.scroll.window.bottom()));
+            if y1 > y0 {
+                crate::pointer_map::hand(Rect::new(bar.rect.x, y0 as u16, 1, (y1 - y0) as u16));
+            }
+        }
+    }
+
+    /// The controls the last paint put on screen, for the `Ctrl+N` badges:
+    /// each with where a click on it lands. Buttons, checkboxes, radios, the
+    /// Add profile button and the text fields (the Namespaces area too), in
+    /// reading order.
+    pub(crate) fn nav_hits(&self) -> Vec<(Rect, (u16, u16))> {
+        if self.ssh.picker.is_some() || self.radar_combo.is_open() {
+            return Vec::new();
+        }
+        let mut out: Vec<(Rect, (u16, u16))> = self
+            .hits
+            .iter()
+            .filter(|(_, hit, _)| matches!(hit, Hit::Item(_) | Hit::AddProfile))
+            .map(|(r, _, _)| {
+                let before = Rect::new(r.x.saturating_sub(1), r.y, r.width + 1, 1);
+                (before, (r.x + 1.min(r.width.saturating_sub(1)), r.y))
+            })
+            .collect();
+        out.sort_by_key(|(r, _)| (r.y, r.x));
+        out
     }
 
     fn render_types(&mut self, frame: &mut Canvas, area: Rect, cfg: &Config, focused: bool) {

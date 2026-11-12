@@ -388,6 +388,7 @@ servern; se [MCP och agenter](mcp-and-agents.md).
 | **Författaravatarer** | **av** (standard, inget nätverk), **graf** (i commit-pricken) eller **författare** (i kolumnen Författare). När det är på skickas en hash av varje författares e-post till Gravatar och till din hostingleverantör. |
 | **Avatarkällor**, **Avatarreserv** | Var bilder slås upp, och i vilken ordning. För författare utan bild: **identicon** (ett genererat mönster) eller **initialer**. |
 | **Inmatningsfärg**, **Egen inmatningsfärg** | Bakgrunden på textfält: **Följ temat** (standard), en fast mörk färg eller din egen `#rrggbb`. |
+| **Textmarkör** | `ui.text_cursor`: **terminal** (standard) placerar terminalens egen markör vid skrivpositionen i det fokuserade textfältet, som ett streck (din terminals markörinställningar gäller, och en inmatningsmetods kandidatfönster öppnas vid skrivpositionen); **drawn** ritar GitPoulpis egen markör och håller terminalmarkören dold. Gäller direkt. Paletten: `Inställningar: Textmarkör...`. |
 | **Färgdjup** | **auto** (standard), **truecolor**, **256** eller **16**. Se [Teman](themes.md). |
 | **Färgtema för grafen** | **Följ temat** (standard: temats egna spårfärger) eller valfri spårpalett. Varje palett visar några av sina färger. Det gäller när Inställningar stängs. Palettkommandot **App: Byt färgtema för grafen...** (`Ctrl+N Shift+Y`) förhandsvisar varje palett live. |
 | **Bakgrund för grafspår** | **Av** (transparent) eller **Radfärg**: ett svagt band av spårfärgen bakom grafkolumnen, med en tunn list i kanten. |

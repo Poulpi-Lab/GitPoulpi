@@ -686,6 +686,11 @@ sin tabell `[integrations.radar]` (alla av som standard; se
 - **granskningsbegäranden**: öppna begäranden som ber om din granskning;
 - **öppna begäranden**: alla öppna begäranden i din egen namnrymd och i varje organisation eller
   grupp du är medlem i, eller i de namnrymder du anger. Aldrig hela värden;
+  profilens **Namnrymder** (en per rad i Inställningar > Integrationer > Radar, valfritt
+  som reguljära uttryck) begränsar alla tre listorna: en rad matchar ett repositorys fulla
+  sökväg när den är lika med den eller är ett sökvägsprefix vid ett `/` (`ptm` behåller
+  `ptm/produits/x`, inte `ptmx/y`), och tillämpas på de rader värden returnerar, plus på
+  serversidan där värdens sökning tillåter det (GitHubs kvalificerare `user:` / `repo:`);
 - **tilldelade ärenden**: öppna ärenden tilldelade dig.
 
 GitHub, GitLab (inklusive egen drift), Gitea, Forgejo, Azure DevOps (Services
@@ -713,7 +718,7 @@ hastighetsgräns får bara den profilen att misslyckas. Svaren återanvänds i f
 I Inställningar > Integrationer har en ansluten kodvärdsprofil ett **Radar**-block
 under sin SSH-nyckel: en kryssruta per lista (*Begäranden som väntar på min granskning*,
 *Alla öppna begäranden*, *Ta med utkast*, *Ärenden tilldelade mig*, den sista
-saknas för värdar utan ärenden), ett fält *Namnrymder* (kommaseparerade; tomt
+saknas för värdar utan ärenden), ett fält *Namnrymder* (en post per rad, med en kryssruta *Reguljära uttryck*; tomt
 betyder ditt eget och alla du tillhör) och valet *Begäran från ett
 repository som inte är klonat*: *Fråga*, *Klona det* eller *Granska via API:et*.
 Allt sparas när du ändrar det. Värdar utan någon kontoövergripande fråga (Bitbucket
@@ -739,8 +744,11 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Se [CLI-referens](cli-reference.md#kommandon) för varje kommando. En token
-godtas aldrig som argument (`hosting login` skriver ut `stored: "os"` när operativsystemets credential store behåller den, eller `stored: "session"` plus `store_error` när lagret avvisade den och token ligger i minnet bara under den här sessionen), och MCP-servern erbjuder inte
-`hosting login`, så en token passerar aldrig via en agent.
+godtas aldrig som argument, och MCP-servern erbjuder inte
+`hosting login`, så en token passerar aldrig via en agent. `hosting login`
+skriver ut `stored: "os"` när operativsystemets credential store behåller token,
+eller `stored: "session"` plus `store_error` när lagret avvisade den och token
+ligger i minnet bara under den här sessionen.
 
 ## Felsökning
 

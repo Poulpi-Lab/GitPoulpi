@@ -540,15 +540,15 @@ tabs_position_help = "Var repositorieflikarna sitter: Överst (standard), Neders
 graph_color_theme = "Färgtema för grafen"
 graph_color_theme_help = "Spårfärgpaletten i Log-grafen. Följ temat använder det valda temats palett; alla andra val åsidosätter den, så vilket tema som helst kan kombineras med vilken palett som helst. Gäller när inställningarna stängs."
 graph_renderer = "Grafritare"
-graph_renderer_help = "auto ritar grafen som en riktig bild i en terminal som stöder det, och som tecken överallt annars - även inuti tmux eller zellij, som ärver terminalens miljö men inte släpper igenom bilden, och inuti herdr om inte dess kitty_graphics-inställning är på. image tvingar bilden på, text tvingar av den. Kräver omstart."
+graph_renderer_help = "auto ritar grafen som en riktig bild i en terminal som stöder det, och som tecken överallt annars - även inuti zellij och screen, som ärver terminalens miljö men inte släpper igenom bilden, inuti tmux om inte terminalen bakom tar sixel, och inuti herdr om inte dess kitty_graphics-inställning är på. image tvingar bilden på, text tvingar av den. Kräver omstart."
 image_protocol = "Bildprotokoll"
-image_protocol_help = "Hur bilder (grafbilden, författaravatarer) når terminalen. auto: Kitty-grafikprotokollet i kitty, Ghostty och en herdr vars konfiguration sätter kitty_graphics = true; iTerm2 inline-bilder i WezTerm, iTerm2 och mintty; sixel-bilder (bara författaravatarer, grafen förblir tecken) i Windows Terminal, foot, Konsole och mlterm; tecken annars. kitty, iterm2 eller sixel tvingar det protokollet (kitty för en herdr vars konfiguration finns någon annanstans; sixel för en terminal som ritar det men inte känns igen); none stänger av bilder. Kräver omstart."
+image_protocol_help = "Hur bilder (grafbilden, författaravatarer) når terminalen. auto: Kitty-grafikprotokollet i kitty, Ghostty och en herdr vars konfiguration sätter kitty_graphics = true; Kitty-protokollet även i iTerm2 3.7.7 eller nyare; iTerm2 inline-bilder i WezTerm, Rio, mintty och äldre iTerm2; sixel-bilder (grafkolumnen och avatarerna) i Windows Terminal, foot, Tabby, Konsole, mlterm och i tmux när terminalen bakom tar sixel; tecken annars. kitty, iterm2 eller sixel tvingar det protokollet (kitty för en herdr vars konfiguration finns någon annanstans; sixel för en terminal som ritar det men inte känns igen); none stänger av bilder. Kräver omstart."
 kitty_keyboard = "Kitty-tangentbordsprotokoll"
 kitty_keyboard_help = "auto frågar terminalen, vid start och inom cirka 100 ms, om den talar kitty-tangentbordsprotokollet, och använder det när den gör det: tangentkombinationer som äldre terminaler inte kan skilja åt (Control med skiljetecken, siffror, Shift eller Enter) kommer då fram som sig själva i stället för att kollidera med styrkoder. En terminal som inte svarar behåller de äldre tangenterna. off rör aldrig terminalens tangentbordsläge. Kräver omstart."
 color_depth = "Färgdjup"
 color_depth_help = "auto använder 24-bitarsfärg, utom i terminaler som inte visar den (Apple Terminal, Linux-konsolen eller en 256-färgsterminal utan COLORTERM), där färgerna mappas till närmaste av 256 eller 16 poster. truecolor, 256 och 16 tvingar ett djup. Gäller direkt."
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "Textmarkör"
+text_cursor_help = "terminal placerar terminalens egen markör vid skrivpositionen i det fokuserade textfältet, som ett streck: terminalens markörinställningar gäller och en inmatningsmetods kandidatfönster öppnas vid skrivpositionen. drawn ritar GitPoulpis egen markör (ett block eller ett understreck) och håller terminalmarkören dold. Gäller direkt."
 graph_show_stashes = "Visa stashes i grafen"
 graph_show_stashes_help = { git = "Varje stash får en egen rad i Log, vid sitt datum: en liten ruta på ett spår bredvid commiten den gjordes på, förbunden med den av en streckad linje. Att markera den visar vad den ändrade; högerklick (eller .) erbjuder Pop, Apply och Drop. Av håller stashes bara i avsnittet STASHES. Ritas inte vid solo.", local = "Varje stash får en egen rad i Log, vid sitt datum: en liten ruta på ett spår bredvid incheckningen den gjordes på, förbunden med den av en streckad linje. Att markera den visar vad den ändrade; högerklick (eller .) erbjuder Pop, Apply och Drop. Av håller stashes bara i avsnittet STASHES. Ritas inte vid solo." }
 ref_connector = { git = "Koppling mellan ref och commit", local = "Koppling mellan ref och incheckning" }
@@ -3997,8 +3997,8 @@ mouse_gestures_in_2 = "en ruteavdelare eller Log-kolumngräns ändrar storlek (f
 mouse_gestures_in_3 = "att dra över texten i en diff, filvy, Blame eller Filhistorik markerar den, dubbelklicka på ett ord; y eller Ctrl+C kopierar den (bara filtext, aldrig marginaler); de andra förekomsterna av ett markerat ord färgas i diffen och redigeraren (och markeras på linjalen)"
 mouse_gestures_in_4 = "rullar den fokuserade/hovrade listan eller diffen; Shift+hjul (båda stavningar terminaler rapporterar) rullar i stället en diff/filvy/blame *i sidled*, medan radbrytning är av"
 mouse_gestures_in_5 = "öppnar en snabbmeny där det finns en (se varje rutas sektion ovan); tangentbordsekvivalenten är alltid {{*global.context_menu}}"
-mouse_gestures_in_6 = "varje ”Kopiera ...”-åtgärd ber *terminalen* om urklippet via OSC 52 - ett TUI når det inte direkt; en terminal som ignorerar sekvensen kopierar helt enkelt inte"
-mouse_gestures_in_7 = "ändra-storlek/pekare/öppen-hand-antydningar skickas via OSC 22 på terminaler som stöder det (kitty, foot, xterm; ojämnt annars) - dragbara avdelare och kolumngränser tänds också inuti appens egen buffert, som inte kräver något terminalsamarbete alls"
+mouse_gestures_in_6 = "varje ”Kopiera ...”-åtgärd lägger texten i systemets urklipp och skickar den, där terminalen är känd för att respektera det, även via OSC 52; över SSH eller utan skärm skickas bara OSC 52, och en terminal som ignorerar sekvensen kopierar inte"
+mouse_gestures_in_7 = "ändra-storlek/pekare/öppen-hand-antydningar skickas via OSC 22 på terminaler som stöder det (kitty, Ghostty, foot, mintty; inte i Rio, Alacritty, Windows Terminal eller iTerm2) - dragbara avdelare och kolumngränser tänds också inuti appens egen buffert, som inte kräver något terminalsamarbete alls"
 git_actions_then_25 = "öppna LFS-menyn (LFS-knappen i verktygsfältet; raderna finns också i paletten)"
 git_actions_then_26 = { git = "LFS: fetch (objekt för alla refs)", local = "LFS: hämta (objekt för alla refs)" }
 git_actions_then_27 = "LFS: skriv det riktiga innehållet över pekarfilerna (offline)"
@@ -5965,7 +5965,7 @@ show_label = "Visa:"
 show_all = "Alla"
 show_none = "Ingen"
 why_level_off = "Visas inte: nivån är satt till {level}. Höj den för att se de här raderna."
-hint_levels = "1-5: visa eller dölj en nivå  a: alla  n: ingen"
+hint_levels = "1-5: visa eller dölj en nivå  a: alla  n: ingen  Enter: radens åtgärd  [ ]: fel"
 palette_show_error = "Aktivitetslogg: visa eller dölj nivå Fel"
 palette_show_warn = "Aktivitetslogg: visa eller dölj nivå Varning"
 palette_show_info = "Aktivitetslogg: visa eller dölj nivå Info"
@@ -6008,25 +6008,25 @@ palette_scroll_right = "Aktivitetslogg: Rulla åt höger"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "Aktivitetslogg: rulla långa rader i sidled (även Shift+hjul eller den vågräta rullningslisten)"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation} misslyckades"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "Åtgärd: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
 ctx_repository = "Repository: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "Begärd av: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "Åtgärds-id: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "Aktivitetslogg: Visa radens åtgärd"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "Aktivitetslogg: Nästa misslyckade åtgärd"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "Aktivitetslogg: Föregående misslyckade åtgärd"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "Markera en rad först: klicka på den eller tryck på ] för att hoppa till nästa misslyckade åtgärd."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "Den här raden hör inte till någon åtgärd."
 
 [git_error]
 summary_host_key = "SSH-värdnyckeln för remoten är ännu inte känd."
@@ -8759,13 +8759,13 @@ namespaces = "Namnrymder"
 # context: hint in the empty namespaces field
 namespaces_hint = "t.ex. acme, plattform (tomt: min egen och alla jag är medlem i)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "En post per rad. Ett namn matchar den gruppen eller ägaren och allt under den (ptm matchar ptm/produits/x, inte ptmx/y). Lämna tomt för att matcha din egen och alla du är medlem i."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Varje rad är ett reguljärt uttryck som matchas mot hela repositorysökvägen, som du skriver den (exempel: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "Reguljära uttryck"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "Ogiltigt uttryck: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "Begäran från ett repository som inte är klonat"
 # context: choice: ask each time

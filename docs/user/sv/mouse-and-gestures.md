@@ -220,7 +220,8 @@ Se [Värdtjänster och ärendehantering](hosting-integration.md).
   på commiten.
 - **Högerklicka på en ref-pill** för en meny med refens åtgärder och commitens
   åtgärder.
-- **Högerklicka på rubriken** för att visa eller dölja kolumner: en checklista (`[x]` / `[ ]`) med ett ✕ i titeln; klicka på en rad eller använd piltangenterna och `Space` / `Enter`, stäng den sedan med ✕, `Esc` eller ett klick utanför (paletten: `Vy: Log: välj vilka kolumner som visas`). Under kryssrutorna: `Anpassa <column> efter innehållet` (kolumnen du högerklickade på), `Anpassa alla kolumner efter innehållet` och `Återställ kolumnbredder`.
+- **Högerklicka på rubriken** för att visa eller dölja kolumner: en checklista (`[x]` / `[ ]`) med ett ✕ i titeln; klicka på en rad eller använd piltangenterna och `Space` / `Enter`, stäng den sedan med ✕, `Esc` eller ett klick utanför (paletten: `Vy: Log: välj vilka kolumner som visas`). Under kryssrutorna: `Anpassa <column> efter innehållet` (kolumnen du högerklickade på), `Anpassa alla kolumner efter innehållet` och `Återställ kolumnbredder`. Tangentbordstvillingen till högerklicket: `Shift+C` för att välja en kolumn, sedan öppnar `.` (eller `Shift+F10`) samma meny på den.
+- **Radarns kolumner** fungerar på samma sätt: dra avgränsaren efter kolumnen för repository, `#`, författare eller ålder för att ändra storlek, **dubbelklicka på den** för att anpassa kolumnen till dess bredaste post (`C` väljer en kolumn, sedan `=`; `+` anpassar alla kolumner), och **högerklicka på en kolumntitel** (eller `C`, sedan `.`) för `Anpassa <column> efter innehållet` och `Anpassa alla kolumner efter innehållet`.
 - **Klicka på `↑`, `↓` eller `✕`** i sökfältet för att gå till föregående eller
   nästa träff, eller för att stänga fältet.
 - **Klicka på `#12`, `ABC-12` eller `AB#12`** i ett commit-meddelande, i högra
@@ -360,8 +361,9 @@ Varje förkastande frågar först.
 - **Peka på en rad** för Logs verktygstips (hela meddelandet, författarens namn och e-post, hela datumet, beroende på delen under pekaren).
 - **Högerklicka på en rad** för dess meny: visa den i Log, commitens diff av filen, filen vid den commiten, dess blame och sedan Logs meny för commiten. Menytangenten gör detsamma från tangentbordet.
 - **Dra en gräns i rubrikraden** (`ui.column_resize`: som standard den enda cellens separator mellan två delar, markerad med ett dämpat `│` i rubriken och ritad som en accentlinje nedåt kolumnen medan pekaren är på den, där en dragning från var som helst längs den ändrar storlek; med `header` första bokstaven i nästa namn, tänd medan pekaren är på den) för att ändra storlek på delen till vänster om den: spår, meddelande, författare, datum, refs, ändringar eller SHA. Cellen direkt efter den sista delen är den sista delens gräns.
+- **Dubbelklicka på en gräns i rubriken** för att anpassa delen till vänster om den efter dess innehåll, som Logs gränser gör: den bredd som visar dess bredaste rad helt, aldrig bredare än kolumnen (tangentbordet: klicka på en rad eller `Ctrl+N` för att ge kolumnen tangenterna, `Tab` för att välja delen, sedan `=`; `+` anpassar alla delar; paletten har `Anpassa kolumnen efter innehållet` och `Anpassa alla kolumner efter innehållet`). Meddelandet behåller det de andra delarna lämnar kvar.
 - **Dra ett namn i rubriken** över ett annat för att flytta delen dit: samma spöke, dämpade källa och accentstapel som Logs rubrik, och delen flyttas när du släpper (`Esc` avbryter; tangentbordets `<` / `>`, efter `Tab`, gör detsamma en plats i taget).
-- **Högerklicka på rubriken** för att välja vilka delar som visas (Ref, Graf, Författare, Datum, Ändringar, SHA; Meddelande visas alltid); checklistan har ett ✕ i titeln. Paletten har `Välj kolumner` och en växling per del.
+- **Högerklicka på rubriken** för att välja vilka delar som visas (Ref, Graf, Författare, Datum, Ändringar, SHA; Meddelande visas alltid); checklistan har ett ✕ i titeln. Under den: `Anpassa <part> efter innehållet` (delen du högerklickade på) och `Anpassa alla kolumner efter innehållet`. Paletten har `Välj kolumner` (menyn från tangentbordet, på delen som `Tab` valde) och en växling per del.
 - **Shift+hjul** eller ett horisontellt hjul rullar raderna i sidled när de är bredare än kolumnen.
 - **Dra i den högra kanten** av kolumnen för att ändra dess bredd. **Klicka på remsan `›`** (eller ✕ på kolumnen, eller **klicka på den valda delen** av fältets väljare `Fil │ Alla`) för att få tillbaka den eller dölja den.
 
@@ -452,14 +454,24 @@ Pekaren visar en flyttform över titelraden och en storleksform över kanterna o
 
 Vissa terminaler låter GitPoulpi ändra muspekaren: en storleksändringspekare över
 avdelare, över en kolumngräns i Log, Radar och commit-kolumnen (också medan du drar
-den), en hand över klickbara objekt. Det fungerar i kitty, foot, Ghostty, WezTerm
-och nya xterm (sekvensen `OSC 22`). Den skickas bara när formen ändras, aldrig
-inuti tmux, screen, zellij eller herdr, och standardpekaren återställs när
-GitPoulpi avslutas. I andra terminaler ändras inte pekaren. Avdelaren eller
+den), en hand över klickbara objekt. Det fungerar i kitty, foot, Ghostty,
+mintty och ett WezTerm-bygge med uppströms PR #8092 (sekvensen `OSC 22`). Den
+skickas bara när formen ändras, inuti tmux bara inpackad för genomsläppet
+(`allow-passthrough on`; kitty och foot visar den, Ghostty inte) och aldrig i
+screen, zellij eller herdr. Standardpekaren återställs när GitPoulpi avslutas.
+I andra terminaler (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows
+Terminal, xterm) ändras inte pekaren; se
+[Välja terminal](terminals.md#muspekarens-form-osc-22). Avdelaren eller
 knappen under pekaren tänds i varje terminal.
 
 Samma sorts komponent ger samma pekare överallt i programmet.
 
+- **Knappar är riktiga knappar**, i Inställningar (Integrationer: Redigera, Koppla från,
+  Ta bort, Bläddra, Radera, snippet-knapparna i instruktionsredigeraren ...)
+  liksom i dialoger: etiketter med utfyllnad på en fylld bakgrund som ljusnar
+  under pekaren, nedtonade när de är avstängda, aldrig text i `[ ]`. De enda
+  hakparenteser som finns kvar är kryssrutornas markeringar `[x]` / `[ ]`, som är
+  kryssrutor och får handen som varje annan kontroll.
 - **Pekande hand** visas på kontroller: knappar, kryssrutor och växlare,
   kombinationsrutor (i Inställningar, ärende- och pull request-panelerna, Radar,
   dialoger), flikar och deras kryss, `+`-knapparna, länkar och referenser
@@ -492,7 +504,10 @@ Storleksändringspekarna ligger kvar över avdelare och kolumngränser, och den
 
 ## Kopiera till urklipp
 
-**Kopiera sökväg** och några andra kopieringsåtgärder skickar texten till
-terminalen, som lägger den i urklipp (OSC 52). Om din terminal inte stöder det
-kopieras ingenting. Kopieringsåtgärderna för markerad text använder systemets
-urklipp direkt.
+Kopieringsåtgärder lägger texten i systemets urklipp på den maskin där GitPoulpi
+körs och skickar den, där terminalen är känd för att respektera det, också till
+terminalen (OSC 52). Över SSH, eller utan skärm, skickas bara OSC 52: om din
+terminal inte stöder det (iTerm2 tills dess urklippsbehörighet är på,
+Terminal.app, GNU screen) kopieras ingenting och statusraden säger att texten
+bara skickades till terminalen. Se
+[Välja terminal](terminals.md#urklipp-kopieringsåtgärder).

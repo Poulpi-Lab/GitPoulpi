@@ -43,6 +43,8 @@ Knappen **Aktivitet** längst till höger i statusraden (ett tal på den räknar
 
   ![Aktivitetsloggen, fliken Git-åtgärder: varje åtgärd med sin tid och längd, en misslyckad fetch i rött](../images/activity-log-repository.png)
 
+- **Vilken åtgärd som gav ett fel.** Varje misslyckande säger vad som gav det, i posten, i Programloggen och i den kopierade rapporten. Åtgärden namnges som en person skulle göra det (`Remove remote`, `Fetch all remotes`, `Hosting request: create pull request`, `Token command`) med sina huvudargument (`remote=cm6`, en gren, en sökväg; aldrig en meddelandetext, och URL:er och tokens maskeras som överallt annars), sedan repositoryt, vem som bad om den (`TUI`, `CLI` eller `MCP`) och åtgärds-id:t, numret som daemonen gav begäran (och dess jobbnummer för en fetch, push eller pull). På fliken Git-åtgärder lyder postens rubrik `Remove remote failed (remote=cm6) - ... [CLI #12]` och dess detaljer börjar med `Åtgärd:`, `Repository:`, `Begärd av:` och `Åtgärds-id:`; en åtgärd utan egen titel får som titel vad den var (`Remove remote failed`). På fliken Program börjar misslyckanderaden med samma ord och en tagg: `Remove remote failed (remote=cm6) [op #12, CLI, repo name]: backend error: no such remote: cm6`. En sådan rad öppnar sin åtgärd: klicka på den, eller markera den och tryck `Enter` (paletten: `Aktivitetslogg: Visa radens åtgärd`). `]` och `[` markerar nästa och föregående misslyckanderad (`Aktivitetslogg: Nästa misslyckade åtgärd` / `Aktivitetslogg: Föregående misslyckade åtgärd`); med en rad markerad flyttar piltangenterna markeringen i stället för att rulla. Posten som öppnas är fönstrets egen när fönstret körde åtgärden; för ett misslyckande i CLI eller hos en agent mot samma session gör fönstret en post av raden. Den kopierade felrapporten har raderna `operation:`, `arguments:`, `repository:`, `requested by:` och `operation id:`, så den kan klistras in för sig. Från ett skript är ett misslyckat kommandos `--json`-fel oförändrat; daemonens svar på en misslyckad begäran bär samma fakta i ett tillagt fält `context`.
+
 - **Långa rader** (båda flikarna): en rubrik eller en detaljrad som är bredare än fönstret kapas aldrig. En vågrät rullningslist visas under listan; rulla i sidled med `Left` / `Right` (kan bindas om som `activity_log.scroll_left` / `activity_log.scroll_right`), `Shift` + hjulet eller ett vågrätt hjul, palettkommandona `Aktivitetslogg: Rulla åt vänster` / `Aktivitetslogg: Rulla åt höger`, eller listen (dra handtaget, eller tryck på banan för att få handtaget under pekaren). `Home` går tillbaka till början, och när du byter flik börjar den andra fliken vid vänsterkanten. Radbruten text (en sammanfattning, en föreslagen åtgärd) förblir radbruten.
 
 - **Omfång** (en rullgardinslista under flikarna, `s` öppnar den, eller palettkommandot `Aktivitetslogg: Välj omfång`): vad båda flikarna handlar om. Raderna är **Det här repositoryt (namn)** (repositoryt för fliken du öppnade loggen från; erbjuds inte från Hem, som inte har något), **Alla repositories**, varje **arbetsyta** och varje repository som fönstret känner till. Från en repositoryflik öppnas loggen på *Det här repositoryt*, från Hem (knappen Aktivitet, `Ctrl+N` och sedan `Shift+A`) på *Alla repositories*; `Ctrl+N` och sedan `Shift+G` och palettkommandot `Visa: Global aktivitetslogg` öppnar alltid på *Alla repositories*, och det gör också ett klick på det röda felet för ett misslyckande vars repository inte är fliken längst fram (en misslyckad kloning, till exempel). Ditt senaste val kommer ihåg under sessionen, separat för de två sätten att öppna den. På fliken Program hör en rad till ett repository när programmet skrev den om ett (en misslyckad push, en åtgärds tid); under *Alla repositories* anger varje sådan rad vems den är (`[namn]`). En rad som inte handlar om något repository alls (uppstart, inställningar, daemonen själv) och en post som inte hör till något (en misslyckad sparning) är **hela appen**: de visas under varje omfång, märkta `[hela appen]` när omfånget är snävare än *Alla repositories*, så ett filter döljer aldrig ett misslyckande. Paletten har också `Aktivitetslogg: Git-åtgärder` och `Aktivitetslogg: Programlogg` för flikarna.
@@ -65,9 +67,9 @@ terminal. Grafen och texten fungerar ändå utan dem.
 
 **Commit-grafen består av tecken, inte bilder.** Det är den automatiska
 reserven: bilder kräver en terminal som talar kittys grafikprotokoll (kitty,
-Ghostty, herdr med kitty-grafik på) eller iTerm2-protokollet (WezTerm, iTerm2,
-mintty) eller sixel (Windows Terminal, foot, Konsole). Windows-konsolen, tmux och zellij får tecken. Se avsnittet om
-grafen nedan för att tvinga fram det ena eller andra, och [Välja terminal](terminals.md).
+Ghostty, herdr med kitty-grafik på) eller iTerm2-protokollet (WezTerm, Rio,
+mintty) eller sixel (Windows Terminal, foot, Tabby, Konsole, och tmux när terminalen bakom tar sixel). Windows-konsolen, zellij och screen får tecken. Se avsnittet om
+grafen nedan för att tvinga fram det ena eller andra, [Välja terminal](terminals.md) och [Multiplexers](multiplexers.md).
 
 **Musen gör ingenting, eller det går inte att markera text med musen.**
 GitPoulpi fångar musen så att klicken når det. För att markera text med själva
@@ -244,11 +246,10 @@ dölja LFS för GitPoulpi utan att röra gits eget beteende, stäng av
 ## Grafen ritas med tecken, inte som en bild (herdr, tmux, andra terminaler)
 
 GitPoulpi ritar kolumnen Graf och författaravatarer som pixlar bara där det är
-säkert att terminalen visar dem: iTerm2-inlinebilder i ren WezTerm, iTerm2 och
-mintty; Kitty-grafikprotokollet i kitty, Ghostty och **herdr när herdrs egen
+säkert att terminalen visar dem: iTerm2-inlinebilder i ren WezTerm, Rio, mintty och iTerm2 äldre än 3.7.7; Kitty-grafikprotokollet i kitty, Ghostty, iTerm2 3.7.7 eller nyare och **herdr när herdrs egen
 konfiguration sätter `kitty_graphics = true`** (`[terminal]`, eller
 `[experimental]` på äldre herdr) och herdr körs inuti WezTerm, kitty eller
-Ghostty. Sixel-bilder används i Windows Terminal, foot, Konsole och mlterm. Överallt annars ritar det tecken, vilket alltid är korrekt.
+Ghostty. Sixel-bilder används i Windows Terminal, foot, Tabby, Konsole och mlterm (och i tmux när terminalen bakom tar sixel). Överallt annars ritar det tecken, vilket alltid är korrekt.
 
 - I herdr med Kitty-grafik på men en konfiguration som GitPoulpi inte hittar (eller
   som förlitar sig på herdrs standard), sätt `ui.image_protocol = "kitty"`
@@ -271,14 +272,18 @@ som helst. Om kolumnen är tom, sätt `ui.graph_renderer = "text"`.
 
 **En ljusare rektangel bakom spåren.** Bilden är genomskinlig (RGBA-PNG med rak
 alfa) överallt där inget ritas, så terminalens bakgrund och markeringsbandet
-syns igenom. Terminaler med Kitty-protokollet och **WezTerm** komponerar den
+syns igenom. Terminaler med Kitty-protokollet, **WezTerm** och **Rio** komponerar den
 alfan; GitPoulpi reserverar då vanliga tomma celler under bilden och skickar den
-efter dem. Varje annan terminal med iTerm2-protokollet (iTerm2 själv, Rio, mintty)
+efter dem. Varje annan terminal med iTerm2-protokollet (äldre iTerm2, mintty)
 är inte känd för att blanda PNG-alfa, så där har bilden en ogenomskinlig
 bakgrund i temats färg, vilket kan synas som en rektangel i en terminal vars
 bakgrund skiljer sig från den; `ui.graph_renderer = "text"` tar bort den. Med
 `ui.graph_lane_background = "off"` målas inget bakom spåren på de genomskinliga
 vägarna.
+
+**Windows: grafkolumnen är tom, ligger på fel rader, eller skärmen rivs (WezTerm 20240203, Rio, mintty).** Pseudokonsolen bakom de terminalerna tappar eller felplacerar bildsekvenserna ([Välja terminal](terminals.md#windows)). Sätt `ui.graph_renderer = "text"`, eller använd Windows Terminal.
+
+I tmux, zellij, screen och herdr, se [Multiplexers](multiplexers.md) för vad som släpps igenom och konfigurationen att lägga till.
 
 Se `ui.graph_renderer` och `ui.image_protocol` i
 [konfigurationsreferensen](config-reference.md).

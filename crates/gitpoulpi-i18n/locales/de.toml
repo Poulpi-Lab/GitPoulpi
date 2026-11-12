@@ -539,15 +539,15 @@ tabs_position_help = "Wo die Repository-Tabs sitzen: Oben (Standard), Unten oder
 graph_color_theme = "Farbschema des Graphen"
 graph_color_theme_help = "Die Spurfarbenpalette des Log-Graphen. „Design folgen“ nimmt die Palette des gewählten Designs; jeder andere Eintrag überschreibt sie, so lässt sich jedes Design mit jeder Palette kombinieren. Wirkt beim Schließen der Einstellungen."
 graph_renderer = "Graph-Darstellung"
-graph_renderer_help = "auto zeichnet den Graphen als echtes Bild in einem Terminal, das dies unterstützt, und überall sonst als Zeichen - auch in tmux oder zellij, die die Umgebung des Terminals erben, das Bild aber nicht durchreichen, und in herdr, solange dessen Einstellung kitty_graphics nicht an ist. image erzwingt das Bild, text schaltet es aus. Erfordert einen Neustart."
+graph_renderer_help = "auto zeichnet den Graphen als echtes Bild in einem Terminal, das dies unterstützt, und überall sonst als Zeichen - auch in zellij und screen, die die Umgebung des Terminals erben, das Bild aber nicht durchreichen, in tmux, solange das Terminal dahinter kein Sixel kann, und in herdr, solange dessen Einstellung kitty_graphics nicht an ist. image erzwingt das Bild, text schaltet es aus. Erfordert einen Neustart."
 image_protocol = "Bildprotokoll"
-image_protocol_help = "Wie Bilder (das Graph-Bild, Autoren-Avatare) das Terminal erreichen. auto: das Kitty-Grafikprotokoll in kitty, Ghostty und einem herdr, dessen Konfiguration kitty_graphics = true setzt; iTerm2-Inline-Bilder in WezTerm, iTerm2 und mintty; Sixel nur für die Avatare in Windows Terminal, foot, Konsole und mlterm; sonst Zeichen. kitty, iterm2 oder sixel erzwingt dieses Protokoll (kitty für ein herdr, dessen Konfiguration woanders liegt); none schaltet Bilder aus. Erfordert einen Neustart."
+image_protocol_help = "Wie Bilder (das Graph-Bild, Autoren-Avatare) das Terminal erreichen. auto: das Kitty-Grafikprotokoll in kitty, Ghostty und einem herdr, dessen Konfiguration kitty_graphics = true setzt; das Kitty-Protokoll auch in iTerm2 ab 3.7.7; iTerm2-Inline-Bilder in WezTerm, Rio, mintty und älteren iTerm2-Versionen; Sixel-Bilder (die Graph-Spalte und die Avatare) in Windows Terminal, foot, Tabby, Konsole, mlterm und in tmux, wenn das Terminal dahinter Sixel kann; sonst Zeichen. kitty, iterm2 oder sixel erzwingt dieses Protokoll (kitty für ein herdr, dessen Konfiguration woanders liegt; sixel für ein Terminal, das es darstellt, aber nicht erkannt wird); none schaltet Bilder aus. Erfordert einen Neustart."
 kitty_keyboard = "Kitty-Tastaturprotokoll"
 kitty_keyboard_help = "auto fragt beim Start innerhalb von etwa 100 ms das Terminal, ob es das Kitty-Tastaturprotokoll beherrscht, und nutzt es dann: Tastenkombinationen, die alte Terminals nicht unterscheiden können (Ctrl mit Satzzeichen, Ziffern, Shift oder Enter), kommen dann so an, wie sie sind, statt mit Steuercodes zu kollidieren. Ein Terminal, das nicht antwortet, behält die alten Tasten. off berührt den Tastaturmodus des Terminals nie. Erfordert einen Neustart."
 color_depth = "Farbtiefe"
 color_depth_help = "auto nutzt 24-Bit-Farben, außer auf Terminals, die sie nicht darstellen (Apple Terminal, Linux-Konsole oder ein 256-Farben-Terminal ohne COLORTERM); dort werden die Farben auf die nächsten 256 oder 16 Einträge abgebildet. truecolor, 256 und 16 erzwingen eine Tiefe. Wirkt sofort."
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "Textcursor"
+text_cursor_help = "terminal setzt den eigenen Cursor des Terminals an die Einfügemarke des fokussierten Textfelds, als Balken: die Cursor-Einstellungen Ihres Terminals gelten, und das Kandidatenfenster einer Eingabemethode öffnet sich an der Einfügemarke. drawn zeichnet die eigene Einfügemarke von GitPoulpi (einen Block oder einen Unterstrich) und hält den Terminalcursor verborgen. Wirkt sofort."
 graph_show_stashes = { git = "Stashes im Graph anzeigen", local = "Zwischenspeicher im Graph anzeigen" }
 graph_show_stashes_help = { git = "Jeder Stash erhält im Log eine eigene Zeile an seinem Datum: ein kleines Kästchen auf einer Spur neben dem Commit, auf dem er entstand, durch eine gestrichelte Linie verbunden. Die Auswahl zeigt, was er geändert hat; Rechtsklick (oder .) bietet Pop, Apply und Drop. Aus hält Stashes nur im Abschnitt STASHES. Wird beim Solo nicht gezeichnet.", local = "Jeder Zwischenspeicher erhält im Log eine eigene Zeile an seinem Datum: ein kleines Kästchen auf einer Spur neben dem Commit, auf dem er entstand, durch eine gestrichelte Linie verbunden. Die Auswahl zeigt, was er geändert hat; Rechtsklick (oder .) bietet Wiederherstellen, Anwenden und Verwerfen. Aus hält Zwischenspeicher nur im Abschnitt ZWISCHENSPEICHER. Wird beim Solo nicht gezeichnet." }
 ref_connector = "Verbinder von Ref zu Commit"
@@ -3996,8 +3996,8 @@ mouse_gestures_in_2 = { git = "ein Bereichstrenner oder eine Log-Spaltengrenze �
 mouse_gestures_in_3 = { git = "Ziehen über den Text eines Diffs, der Dateiansicht, von Blame oder Dateiverlauf wählt ihn aus, Doppelklick ein Wort; y oder Ctrl+C kopiert ihn (nur Dateitext, nie Spalten); die anderen Vorkommen eines ausgewählten Worts werden im Diff und im Editor getönt (und auf dem Lineal markiert)", local = "Ziehen über den Text der Unterschiede, der Dateiansicht, von Blame oder Dateiverlauf wählt ihn aus, Doppelklick ein Wort; y oder Ctrl+C kopiert ihn (nur Dateitext, nie Spalten); die anderen Vorkommen eines ausgewählten Worts werden in den Unterschieden und im Editor getönt (und auf dem Lineal markiert)" }
 mouse_gestures_in_4 = { git = "scrollt die fokussierte/überfahrene Liste oder den Diff; Shift+Mausrad (beide Schreibweisen, die Terminals melden) scrollt einen Diff/eine Dateiansicht/Blame stattdessen *horizontal*, solange der Zeilenumbruch aus ist", local = "scrollt die fokussierte/überfahrene Liste oder die Unterschiede; Shift+Mausrad (beide Schreibweisen, die Terminals melden) scrollt stattdessen die Unterschiede / eine Dateiansicht / Blame *horizontal*, solange der Zeilenumbruch aus ist" }
 mouse_gestures_in_5 = "öffnet ein Kontextmenü, wo immer eines existiert (siehe den Abschnitt jedes Bereichs oben); das Tastaturäquivalent ist immer {{*global.context_menu}}"
-mouse_gestures_in_6 = "jede Aktion „Kopieren ...“ bittet das *Terminal* per OSC 52 um die Zwischenablage - eine TUI kann sie nicht direkt erreichen; ein Terminal, das die Sequenz ignoriert, kopiert einfach nicht"
-mouse_gestures_in_7 = "Hinweise zu Größe/Zeiger/offener Hand werden per OSC 22 auf Terminals gesendet, die es unterstützen (kitty, foot, xterm; anderswo uneinheitlich) - ziehbare Trenner und Spaltengrenzen leuchten auch im eigenen Puffer der App auf, was gar keine Mitwirkung des Terminals braucht"
+mouse_gestures_in_6 = "jede Aktion „Kopieren ...“ legt den Text in die System-Zwischenablage und sendet ihn, wo das Terminal dies bekanntermaßen beachtet, zusätzlich per OSC 52; über SSH oder ohne Display wird nur OSC 52 gesendet, und ein Terminal, das die Sequenz ignoriert, kopiert nicht"
+mouse_gestures_in_7 = "Hinweise zu Größe/Zeiger/offener Hand werden per OSC 22 auf Terminals gesendet, die es unterstützen (kitty, Ghostty, foot, mintty; nicht in Rio, Alacritty, Windows Terminal oder iTerm2) - ziehbare Trenner und Spaltengrenzen leuchten auch im eigenen Puffer der App auf, was gar keine Mitwirkung des Terminals braucht"
 git_actions_then_25 = "das LFS-Menü öffnen (die LFS-Schaltfläche der Symbolleiste; seine Zeilen stehen auch in der Palette)"
 git_actions_then_26 = "LFS: {$fetch} der Objekte aller Refs"
 git_actions_then_27 = "LFS: den echten Inhalt über die Zeigerdateien schreiben (offline)"
@@ -5965,7 +5965,7 @@ show_label = "Anzeigen:"
 show_all = "Alle"
 show_none = "Keine"
 why_level_off = "Nicht angezeigt: Die Stufe ist auf {level} gesetzt. Erhöhen Sie sie, um diese Zeilen zu sehen."
-hint_levels = "1-5: Stufe ein- oder ausblenden  a: alle  n: keine"
+hint_levels = "1-5: Stufe ein- oder ausblenden  a: alle  n: keine  Enter: Vorgang der Zeile  [ ]: Fehlschläge"
 palette_show_error = "Aktivitätsprotokoll: Stufe ein- oder ausblenden: Fehler"
 palette_show_warn = "Aktivitätsprotokoll: Stufe ein- oder ausblenden: Warnung"
 palette_show_info = "Aktivitätsprotokoll: Stufe ein- oder ausblenden: Info"
@@ -6008,25 +6008,25 @@ palette_scroll_right = "Aktivitätsprotokoll: nach rechts scrollen"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "Aktivitätsprotokoll: lange Zeilen seitlich scrollen (auch Shift + Mausrad oder die horizontale Bildlaufleiste)"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation} fehlgeschlagen"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "Vorgang: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
 ctx_repository = "Repository: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "Angefordert von: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "Vorgangs-ID: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "Aktivitätsprotokoll: Vorgang dieser Zeile anzeigen"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "Aktivitätsprotokoll: Nächster fehlgeschlagener Vorgang"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "Aktivitätsprotokoll: Vorheriger fehlgeschlagener Vorgang"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "Wählen Sie zuerst eine Zeile: anklicken oder mit ] zum nächsten fehlgeschlagenen Vorgang springen."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "Diese Zeile gehört zu keinem Vorgang."
 
 [git_error]
 summary_host_key = "Der SSH-Hostschlüssel des Remotes ist noch nicht bekannt."
@@ -8756,13 +8756,13 @@ namespaces = "Namespaces"
 # context: hint in the empty namespaces field
 namespaces_hint = "z. B. acme, platform (leer: meiner und alle, in denen ich Mitglied bin)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "Ein Eintrag pro Zeile. Ein Name passt auf diese Gruppe oder diesen Eigentümer und alles darunter (ptm passt auf ptm/produits/x, nicht auf ptmx/y). Leer lassen, um die eigenen und alle zu erfassen, in denen Sie Mitglied sind."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Jede Zeile ist ein regulärer Ausdruck, der gegen den vollständigen Repository-Pfad geprüft wird, so wie Sie ihn schreiben (Beispiel: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "Reguläre Ausdrücke"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "Ungültiger Ausdruck: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "Anfrage eines nicht geklonten Repositorys"
 # context: choice: ask each time

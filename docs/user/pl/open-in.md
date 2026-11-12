@@ -173,6 +173,16 @@ Plik binarny (PDF, dokument Word, arkusz kalkulacyjny, archiwum...) nie ma tekst
 
 Plik z drzewa roboczego jest przekazywany aplikacji bez zmian. Wersja z commita (lub z indeksu) jest zapisywana w **tymczasowej kopii tylko do odczytu**, z komunikatem na pasku stanu, aby aplikacja nie mogła zmienić repozytorium. Żadne z nich nie zmienia repozytorium: brak wpisu w dzienniku, Cofnij pozostaje nietknięte.
 
+Lista menu otwiera się obok menu, na wysokości wiersza **Otwórz za pomocą...**, jak podmenu (po lewej, gdy po prawej brak miejsca), zarówno z myszy, jak i z klawiatury. Lista edytorów obrazów (**Edytuj w...**) otwierana z menu pliku robi to samo.
+
+### Pliki Git LFS
+
+Karta obiektu Git LFS (zob. [Git LFS](lfs.md)) niesie pod swoim tekstem te same dwie akcje: **Otwórz w domyślnym** i **Otwórz w**, z tymi samymi klawiszami (`o`, `Shift+O`) i wierszami palety. Otwierają prawdziwy plik, nigdy wskaźnik: plik z drzewa roboczego bez zmian albo tymczasową kopię tylko do odczytu obiektu z lokalnego magazynu LFS dla wersji z commita lub z indeksu. Obiekt, który nie został jeszcze pobrany, nie ma przycisków na karcie, a pasek stanu mówi, że zawartość nie jest jeszcze pobrana. To samo odrzucenie dotyczy pliku z drzewa roboczego, który nadal zawiera tylko wskaźnik: **Otwórz w domyślnym**, **Otwórz w** i **Edytuj w**, z karty lub z dowolnego menu pliku, mówią, że zawartość nie jest pobrana, zamiast otwierać tekst wskaźnika (pobierz ją wierszami pull lub checkout paska LFS i spróbuj ponownie). Otwieranie jest tylko do odczytu: brak wpisu w dzienniku, nie ma czego cofać.
+
+### Przeglądarki w Windows
+
+Chrome i Edge rejestrują `--single-argument %1`, przez co czytają wszystko po przełączniku jako jeden adres, razem z cudzysłowami. GitPoulpi przekazuje ścieżkę takiemu programowi dosłownie i bez cudzysłowów, tak jak robi to Windows, więc plik ze spacjami w ścieżce się otwiera, zamiast kończyć się błędem `http://"c/...`. Każdy inny program dostaje ścieżkę jako jeden zwykły argument.
+
 ## Starsze klucze
 
 Stare klucze `ui.terminal_launch` i `ui.terminal_launch_command` są czytane tylko

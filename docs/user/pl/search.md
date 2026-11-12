@@ -30,7 +30,7 @@ razu, a commity dołączają, gdy tylko będą gotowe.
 
 | Klawisz | Działanie |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `PageUp` / `PageDown`, `Home` / `End` | Przesuwa po wynikach (nagłówki grup są pomijane). |
+| `Up` / `Down`, `PageUp` / `PageDown`, `Home` / `End` | Przesuwa po wynikach (nagłówki grup są pomijane). |
 | `Enter` | Przechodzi do wyniku: karta repozytorium się otwiera (albo jest przełączana), potem wynik jest pokazany. |
 | `Esc` | Zamyka wyszukiwanie. |
 | `Alt+1` .. `Alt+8` | Włącza lub wyłącza rodzaj (znaczniki nad listą, w ich kolejności). `Alt+0` włącza wszystkie. |

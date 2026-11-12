@@ -159,9 +159,9 @@ fn ctrl_k_ctrl_u_and_ctrl_a_edit_a_single_line_field() {
 
     // Ctrl+U from the end: the whole line goes; typing starts afresh.
     term.send_keys("C-u").expect("kill to the start");
-    term.send_text("abc").expect("type after the kill");
+    term.send_text("xyz").expect("type after the kill");
     term.wait_for("only the new text left", STEP, |s| {
-        s.contains("abc_") && !s.contains("hello")
+        s.contains("xyz_") && !s.contains("hello")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
@@ -169,7 +169,7 @@ fn ctrl_k_ctrl_u_and_ctrl_a_edit_a_single_line_field() {
     term.send_keys("C-a").expect("select all");
     term.send_text("Z").expect("type over the selection");
     term.wait_for("the selection replaced by the key", STEP, |s| {
-        s.contains("Z_") && !s.contains("abc")
+        s.contains("Z_") && !s.contains("xyz")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 }

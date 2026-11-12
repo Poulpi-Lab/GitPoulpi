@@ -39,11 +39,13 @@ fn contains(haystack: &[u8], needle: &[u8]) -> bool {
     haystack.windows(needle.len()).any(|w| w == needle)
 }
 
-/// Opens the Log's find bar and types `abc`.
+/// Opens the Log's find bar and types `xyz`. Not `abc`: the title bar shows the
+/// build's commit hash, which is hex and so can contain `abc`, and `find` would
+/// locate that instead of the query.
 fn type_into_the_find_bar(term: &mut Terminal) {
     term.send_keys("f").unwrap();
-    term.send_text("abc").unwrap();
-    term.wait_for("the typed query", STEP, |s| s.contains("abc"))
+    term.send_text("xyz").unwrap();
+    term.wait_for("the typed query", STEP, |s| s.contains("xyz"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
@@ -76,8 +78,8 @@ fn terminal_mode_shows_the_real_cursor_at_the_caret_as_a_bar_and_hides_it_elsewh
         "the bar style (DECSCUSR 5) was never sent"
     );
     type_into_the_find_bar(&mut term);
-    let (col, row) = term.screen().find("abc").expect("the typed query");
-    wait_cursor(&term, "a focused find bar: shown just after `abc`", |c| {
+    let (col, row) = term.screen().find("xyz").expect("the typed query");
+    wait_cursor(&term, "a focused find bar: shown just after `xyz`", |c| {
         c == (col + 3, row, true)
     });
     // Leaving the field hides it again.
@@ -107,7 +109,7 @@ fn terminal_mode_draws_no_caret_glyph_of_its_own() {
     let repo = fixture();
     let (mut term, _c) = launch(&repo, "pty-textcursor-noglyph", "terminal");
     type_into_the_find_bar(&mut term);
-    let (col, row) = term.screen().find("abc").expect("the typed query");
+    let (col, row) = term.screen().find("xyz").expect("the typed query");
     let after = term
         .screen()
         .cell(col + 3, row)
@@ -125,7 +127,7 @@ fn drawn_mode_keeps_the_cursor_hidden_and_paints_its_own_caret() {
     let repo = fixture();
     let (mut term, _c) = launch(&repo, "pty-textcursor-drawn", "drawn");
     type_into_the_find_bar(&mut term);
-    let (col, row) = term.screen().find("abc").expect("the typed query");
+    let (col, row) = term.screen().find("xyz").expect("the typed query");
     term.wait_for("the drawn caret after the query", STEP, |s| {
         s.cell(col + 3, row)
             .is_some_and(|c| c.display() == "\u{2588}")

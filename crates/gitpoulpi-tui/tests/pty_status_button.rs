@@ -96,7 +96,17 @@ fn a_modified_file_wears_a_pencil_and_hovering_a_long_name_shows_the_whole_butto
                 || !s.contains("Stage file")
         },
     );
-    assert_eq!(git(repo.root(), &["diff", "--cached", "--name-only"]), LONG);
+    // The index, not the screen: the button can leave the screen (hover
+    // gone, torn frame) before the stage lands.
+    let deadline = std::time::Instant::now() + Duration::from_secs(30);
+    while git(repo.root(), &["diff", "--cached", "--name-only"]) != LONG {
+        assert!(
+            std::time::Instant::now() < deadline,
+            "the file was never staged:\n{}",
+            term.text()
+        );
+        std::thread::sleep(Duration::from_millis(100));
+    }
     term.stop().unwrap();
 }
 

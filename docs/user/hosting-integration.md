@@ -705,6 +705,11 @@ its `[integrations.radar]` table (all off by default; see the
 - **review requests**: open requests that ask for your review;
 - **open requests**: every open request of your own namespace and of each org or
   group you are a member of, or of the namespaces you name. Never the whole host;
+  the **Namespaces** of the profile (one per line in Settings > Integrations > Radar, optionally
+  as regular expressions) limit all three lists: a line matches a repository's full path when it
+  equals it or is a path prefix at a `/` (`ptm` keeps `ptm/produits/x`, not `ptmx/y`), and is
+  applied to the rows the host returns, plus server side where the host's search allows it
+  (GitHub's `user:` / `repo:` qualifiers);
 - **assigned issues**: open issues assigned to you.
 
 GitHub, GitLab (including self-managed), Gitea, Forgejo, Azure DevOps (Services

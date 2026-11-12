@@ -56,6 +56,7 @@ fn query_for(integration: &Integration, what: Option<RadarWhat>, drafts: bool) -
         assigned_issues,
         include_drafts: drafts || radar.include_drafts,
         namespaces: radar.namespaces,
+        namespaces_regex: radar.namespaces_regex,
         limit: 0,
     }
 }
@@ -265,6 +266,7 @@ fn radar_json(radar: &IntegrationRadar) -> Value {
         "include_drafts": radar.include_drafts,
         "assigned_issues": radar.assigned_issues,
         "namespaces": radar.namespaces,
+        "namespaces_regex": radar.namespaces_regex,
         "review_mode": radar.review_mode.as_str(),
     })
 }

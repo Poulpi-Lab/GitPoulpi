@@ -1440,6 +1440,7 @@ dependencies = [
  "gitpoulpi-testkit",
  "minisign-verify",
  "rand_core 0.6.4",
+ "regex",
  "reqwest",
  "rustls",
  "rustls-native-certs",

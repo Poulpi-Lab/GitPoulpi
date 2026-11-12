@@ -23,16 +23,23 @@ fn has_issues(kind: IntegrationKind) -> bool {
     !matches!(kind.family(), ApiFamily::Bitbucket | ApiFamily::Gerrit)
 }
 
-/// The names typed in the Namespaces field: comma separated, trimmed,
-/// empty ones and repeats dropped.
-pub(super) fn parse_namespaces(text: &str) -> Vec<String> {
-    let mut out: Vec<String> = Vec::new();
-    for name in text.split(',').map(str::trim).filter(|n| !n.is_empty()) {
-        if !out.iter().any(|o| o == name) {
-            out.push(name.to_string());
-        }
+/// Visible rows of the Namespaces text area.
+const NS_ROWS: u16 = 4;
+
+/// The entries typed in the Namespaces area: one per line (in plain mode a
+/// comma also separates, the old single-line form), trimmed, empty ones and
+/// repeats dropped.
+pub(super) fn parse_namespaces(text: &str, regex: bool) -> Vec<String> {
+    gitpoulpi_config::parse_namespace_text(text, regex)
+}
+
+/// The first invalid expression of the typed lines, when the area is in
+/// regex mode: `"<line>: <why>"`.
+fn regex_error(text: &str, regex: bool) -> Option<String> {
+    if !regex {
+        return None;
     }
-    out
+    gitpoulpi_hosting::account::first_regex_error(&parse_namespaces(text, true))
 }
 
 fn mode_label(mode: RemoteReviewMode) -> &'static str {
@@ -57,7 +64,7 @@ impl IntegrationsPage {
         if has_issues(e.kind) {
             items.push(Item::RadarIssues);
         }
-        items.extend([Item::RadarNamespaces, Item::RadarMode]);
+        items.extend([Item::RadarNamespaces, Item::RadarRegex, Item::RadarMode]);
         items
     }
 
@@ -82,7 +89,7 @@ impl IntegrationsPage {
             .find(|i| i.id == id)
             .map(|i| i.radar_options().namespaces)
             .unwrap_or_default();
-        self.radar_ns = names.join(", ");
+        self.radar_ns = names.join("\n");
         self.radar_ns_for = id;
         self.radar_combo.close();
     }
@@ -95,8 +102,62 @@ impl IntegrationsPage {
         if self.radar_ns_for != id {
             return;
         }
-        let names = parse_namespaces(&self.radar_ns);
+        let regex = self
+            .selected_profile(env.config)
+            .is_some_and(|i| env.config.integrations[i].radar_options().namespaces_regex);
+        // An invalid expression is shown under the area and not saved: the
+        // last good list stays in force.
+        if regex_error(&self.radar_ns, regex).is_some() {
+            return;
+        }
+        let names = parse_namespaces(&self.radar_ns, regex);
         self.update_radar(env, |r| r.namespaces = names);
+    }
+
+    /// A key in the Namespaces area. Returns whether it was used; Up on the
+    /// first line and Down on the last are not, so they leave the area.
+    pub(super) fn namespaces_key(&mut self, key: &KeyEvent, env: &mut Env) -> bool {
+        let item = Item::RadarNamespaces;
+        let text = &mut self.radar_ns;
+        if key.code == KeyCode::Enter && key.modifiers.is_empty() {
+            self.editor.caret_mut(item).insert(text, "\n");
+            return true;
+        }
+        let cursor = self.editor.caret_mut(item).cursor(text);
+        let first = !text[..cursor].contains('\n');
+        let last = !text[cursor..].contains('\n');
+        let leaves = match key.code {
+            KeyCode::Up => first && !key.modifiers.contains(KeyModifiers::SHIFT),
+            KeyCode::Down => last && !key.modifiers.contains(KeyModifiers::SHIFT),
+            _ => false,
+        };
+        if leaves || !self.editor.claims(item, text, key, true) {
+            return false;
+        }
+        if let crate::text_edit::KeyEdit::Copy(s) | crate::text_edit::KeyEdit::Cut(s) =
+            self.editor.on_key(item, text, key, true)
+        {
+            *env.message = Some(crate::clipboard::copy_shared(
+                gitpoulpi_i18n::msg::input::WHAT_SELECTION.get(),
+                &s,
+            ));
+        }
+        self.error = None;
+        true
+    }
+
+    /// Wheel over the Namespaces area scrolls its lines when they overflow.
+    pub(super) fn namespaces_wheel(&mut self, kind: MouseEventKind, col: u16, row: u16) -> bool {
+        let lines = self.radar_ns.split('\n').count();
+        if lines <= NS_ROWS as usize
+            || !matches!(kind, MouseEventKind::ScrollUp | MouseEventKind::ScrollDown)
+        {
+            return false;
+        }
+        let text = self.radar_ns.clone();
+        let vrow = self.editor_row(row);
+        self.editor
+            .area_mouse(Item::RadarNamespaces, &text, kind, (col, vrow), false)
     }
 
     /// Applies `change` to the selected profile's options and saves, only
@@ -122,12 +183,31 @@ impl IntegrationsPage {
             Item::RadarDrafts => self.update_radar(env, |r| r.include_drafts ^= true),
             Item::RadarIssues => self.update_radar(env, |r| r.assigned_issues ^= true),
             Item::RadarNamespaces => self.step(1, env.config),
+            Item::RadarRegex => self.toggle_regex(env),
             Item::RadarMode => {
                 self.fill_combo(env.config);
                 self.radar_combo.open();
             }
             _ => {}
         }
+    }
+
+    /// Flips "Regular expressions". Turning it on with a line that is not a
+    /// valid expression is refused, with the reason in the status line.
+    fn toggle_regex(&mut self, env: &mut Env) {
+        let Some(i) = self.selected_profile(env.config) else {
+            return;
+        };
+        let on = !env.config.integrations[i].radar_options().namespaces_regex;
+        if let Some(why) = regex_error(&self.radar_ns, on) {
+            *env.message = Some(rmsg::regex_invalid(&why));
+            return;
+        }
+        let names = parse_namespaces(&self.radar_ns, on);
+        self.update_radar(env, |r| {
+            r.namespaces_regex = on;
+            r.namespaces = names;
+        });
     }
 
     fn fill_combo(&mut self, cfg: &Config) {
@@ -258,17 +338,51 @@ impl IntegrationsPage {
         y += 1;
         put(frame, body, body.x, y, label(rmsg::NAMESPACES.get()));
         y += 1;
-        let wide = body.width.saturating_sub(2).clamp(8, 80);
-        self.text_field(
+        let help = if options.namespaces_regex {
+            rmsg::NAMESPACES_REGEX_HELP.get()
+        } else {
+            rmsg::NAMESPACES_HELP.get()
+        };
+        y += put_wrapped(
             frame,
             body,
             body.x,
             y,
-            wide,
-            Item::RadarNamespaces,
+            help,
+            Style::default().fg(th().ui.muted),
+            3,
+        );
+        let wide = body.width.saturating_sub(2).clamp(8, 80);
+        self.namespaces_area(frame, body, y, wide, current, focused);
+        y += NS_ROWS;
+        if let Some(why) = regex_error(&self.radar_ns, options.namespaces_regex) {
+            put(
+                frame,
+                body,
+                body.x,
+                y,
+                vec![Span::styled(
+                    fit(&rmsg::regex_invalid(&why), body.width as usize),
+                    Style::default().fg(th().status.danger),
+                )],
+            );
+        }
+        y += 1;
+        let mark = if options.namespaces_regex {
+            "[x]"
+        } else {
+            "[ ]"
+        };
+        self.control(
+            frame,
+            body,
+            body.x,
+            y,
+            format!("{mark} {}", rmsg::REGEX.get()),
+            Item::RadarRegex,
             current,
             focused,
-            rmsg::NAMESPACES_HINT.get(),
+            false,
         );
         y += 2;
         put(frame, body, body.x, y, label(rmsg::REVIEW_MODE.get()));
@@ -285,6 +399,137 @@ impl IntegrationsPage {
             self.scroll.radar_field = Some(rect);
             self.hits.push((rect, Hit::Item(Item::RadarMode), true));
         }
+    }
+
+    /// The Namespaces text area: `NS_ROWS` lines, one entry each, with a
+    /// scrollbar on the right when the lines do not fit.
+    fn namespaces_area(
+        &mut self,
+        frame: &mut Canvas,
+        body: Rect,
+        y: u16,
+        width: u16,
+        current: Option<Item>,
+        focused: bool,
+    ) {
+        let item = Item::RadarNamespaces;
+        let is_focus = focused && self.zone == Zone::Body && current == Some(item);
+        let field_bg = crate::input_bg(is_focus, false);
+        let width = width.min(body.right().saturating_sub(body.x));
+        let rect = Rect::new(body.x, y, width, NS_ROWS);
+        let text_w = width.saturating_sub(3).max(1);
+        let mut top = 0;
+        let lines = if self.radar_ns.is_empty() && !is_focus {
+            // The empty area shows what to type.
+            let hint = fit(rmsg::NAMESPACES_HINT.get(), text_w as usize);
+            let mut rows = vec![Line::from(Span::styled(
+                format!("{hint:<w$}", w = text_w as usize),
+                Style::default().fg(th().ui.muted).bg(field_bg),
+            ))];
+            let blank = " ".repeat(text_w as usize);
+            rows.resize(
+                NS_ROWS as usize,
+                Line::from(Span::styled(blank, Style::default().bg(field_bg))),
+            );
+            rows
+        } else {
+            // Not focused: the first lines show (the caret at the start).
+            let caret = match self.editor.caret(item).cloned() {
+                Some(caret) => caret,
+                None => {
+                    let mut caret = crate::text_edit::Caret::default();
+                    caret.set_cursor(&self.radar_ns, 0, false);
+                    caret
+                }
+            };
+            let look = crate::text_field::EditLook::new(
+                Style::default()
+                    .fg(if is_focus {
+                        th().status.warning
+                    } else {
+                        th().ui.text
+                    })
+                    .bg(field_bg),
+                "\u{2588}",
+            );
+            let mut rows = crate::text_field::edit_lines(
+                &self.radar_ns,
+                Some(&caret),
+                text_w as usize,
+                NS_ROWS as usize,
+                is_focus,
+                look,
+            );
+            if let Some(real) = self.editor.caret(item) {
+                real.scroll.set(caret.scroll.get());
+                real.top.set(caret.top.get());
+            }
+            top = caret.top.get();
+            let blank = " ".repeat(text_w as usize);
+            rows.resize(
+                NS_ROWS as usize,
+                Line::from(Span::styled(blank, Style::default().bg(field_bg))),
+            );
+            rows
+        };
+        let total = self.radar_ns.split('\n').count();
+        let buf = frame.buffer_mut();
+        for (dy, line) in lines.into_iter().enumerate() {
+            let row = y + dy as u16;
+            if row >= body.bottom() {
+                break;
+            }
+            let mut x = body.x;
+            let pad = Style::default().bg(field_bg);
+            if let Some(cell) = buf.cell_mut((x, row)) {
+                cell.set_symbol(" ").set_style(pad);
+            }
+            x += 1;
+            for span in line.spans {
+                let (_, nx) =
+                    buf.set_stringn(x, row, span.content.as_ref(), text_w as usize, span.style);
+                x = nx;
+            }
+            // The scrollbar column: a thumb over a track, when lines overflow.
+            let bar_x = rect.right().saturating_sub(1);
+            let (glyph, style) = if total > NS_ROWS as usize {
+                let rows = NS_ROWS as usize;
+                let thumb = (rows * rows / total).max(1);
+                let max_top = total - rows;
+                let start = (top.min(max_top) * (rows - thumb))
+                    .checked_div(max_top)
+                    .unwrap_or(0);
+                if dy >= start && dy < start + thumb {
+                    (
+                        "\u{2588}",
+                        Style::default().fg(th().scrollbar.thumb).bg(field_bg),
+                    )
+                } else {
+                    ("\u{2502}", Style::default().fg(th().ui.muted).bg(field_bg))
+                }
+            } else {
+                (" ", pad)
+            };
+            if let Some(cell) = buf.cell_mut((bar_x, row)) {
+                cell.set_symbol(glyph).set_style(style);
+            }
+            for fill in (x.max(body.x + 1 + text_w))..bar_x {
+                if let Some(cell) = buf.cell_mut((fill, row)) {
+                    cell.set_symbol(" ").set_style(pad);
+                }
+            }
+        }
+        self.editor.drawn(
+            item,
+            Rect::new(
+                rect.x + 1,
+                y,
+                text_w,
+                NS_ROWS.min(body.bottom().saturating_sub(y)),
+            ),
+            true,
+        );
+        self.hits.push((rect, Hit::Item(item), !is_focus));
     }
 
     fn fill_combo_from(&mut self, mode: RemoteReviewMode) {

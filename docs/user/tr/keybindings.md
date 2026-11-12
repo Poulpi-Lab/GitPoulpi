@@ -798,7 +798,7 @@ Tuşlar varsayılanlardır.
 | Çalışma Alanı: Sekmeyi Çalışma Alanına Ekle |  |
 | Çalışma Alanı: Sekmeyi Çalışma Alanından Çıkar |  |
 | Radar: Aç | `Alt+R` |
-| Radar: Yenile | `r` |
+| Radar: Yenile | `F5` |
 | Radar: Ara | `/` |
 | Radar: Tarayıcıda Aç | `o` |
 | Radar: Depoyu Aç | `Enter` |

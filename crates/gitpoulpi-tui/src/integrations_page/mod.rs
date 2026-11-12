@@ -133,6 +133,8 @@ pub(crate) enum Item {
     RadarDrafts,
     RadarIssues,
     RadarNamespaces,
+    /// The "Regular expressions" checkbox under the Namespaces area.
+    RadarRegex,
     RadarMode,
 }
 

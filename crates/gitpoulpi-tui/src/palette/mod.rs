@@ -1107,6 +1107,7 @@ pub(crate) fn command_action(entry: &PaletteEntry) -> Option<crate::keymap::Acti
             _ => None,
         },
         PaletteCommand::Radar(crate::radar::RadarCommand::Open) => Some(A::GlobalRadar),
+        PaletteCommand::Radar(crate::radar::RadarCommand::Refresh) => Some(A::GlobalRefreshAll),
         PaletteCommand::TabDir(crate::tab_dir::TabDirButton::Terminal) => Some(A::TabOpenInPopup),
         PaletteCommand::TabOpenInDefault => Some(A::TabOpenInDefault),
         PaletteCommand::AgentBack => Some(A::NavAgentBack),

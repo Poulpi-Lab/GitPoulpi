@@ -175,6 +175,27 @@ async fn organizations(client: &GitHubClient) -> Result<Vec<String>> {
     Ok(rows.into_iter().map(|o| o.login).collect())
 }
 
+/// The search qualifiers that scope a global query (review requests,
+/// assigned issues) to the plain namespaces, server side: an owner
+/// (`user:`, which covers organizations too) or one repository (`repo:`).
+/// Repeated qualifiers of a kind are alternatives. Empty in regex mode and
+/// when no namespace is set; `finish` filters the rows either way.
+fn scope_qualifiers(query: &AccountQuery) -> String {
+    query
+        .search_namespaces()
+        .iter()
+        .map(|ns| ns.trim().trim_matches('/'))
+        .filter(|ns| !ns.is_empty() && !ns.contains(char::is_whitespace))
+        .map(|ns| {
+            if ns.contains('/') {
+                format!(" repo:{ns}")
+            } else {
+                format!(" user:{ns}")
+            }
+        })
+        .collect()
+}
+
 pub(crate) async fn fetch(client: &GitHubClient, query: &AccountQuery) -> Result<AccountItems> {
     let me = client.login().await?;
     let mut out = Collector::default();
@@ -186,7 +207,10 @@ pub(crate) async fn fetch(client: &GitHubClient, query: &AccountQuery) -> Result
     };
 
     if query.review_requests {
-        let q = format!("is:pr is:open archived:false{drafts} review-requested:@me");
+        let q = format!(
+            "is:pr is:open archived:false{drafts} review-requested:@me{}",
+            scope_qualifiers(query)
+        );
         match search(client, &q, max_rows, "searching review requests on GitHub").await {
             Ok(rows) => rows
                 .into_iter()
@@ -198,15 +222,17 @@ pub(crate) async fn fetch(client: &GitHubClient, query: &AccountQuery) -> Result
 
     if query.open_requests {
         let mut spaces: Vec<String> = Vec::new();
-        if query.namespaces.is_empty() {
+        if query.search_namespaces().is_empty() {
             spaces.push(format!("user:{me}"));
             match organizations(client).await {
                 Ok(orgs) => spaces.extend(orgs.into_iter().map(|o| format!("org:{o}"))),
                 Err(e) => out.failed("organizations", e)?,
             }
         } else {
-            for ns in &query.namespaces {
-                let kind = if ns.eq_ignore_ascii_case(&me) {
+            for ns in query.search_namespaces() {
+                let kind = if ns.contains('/') {
+                    "repo"
+                } else if ns.eq_ignore_ascii_case(&me) {
                     "user"
                 } else {
                     "org"
@@ -242,8 +268,11 @@ pub(crate) async fn fetch(client: &GitHubClient, query: &AccountQuery) -> Result
     }
 
     if query.assigned_issues {
-        let q = "is:issue is:open archived:false assignee:@me";
-        match search(client, q, max_rows, "searching assigned issues on GitHub").await {
+        let q = format!(
+            "is:issue is:open archived:false assignee:@me{}",
+            scope_qualifiers(query)
+        );
+        match search(client, &q, max_rows, "searching assigned issues on GitHub").await {
             Ok(rows) => rows
                 .into_iter()
                 .filter_map(|r| r.into_issue(client))

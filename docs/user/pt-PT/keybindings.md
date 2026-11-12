@@ -796,7 +796,7 @@ As teclas são as predefinidas.
 | Área de trabalho: adicionar o separador à área de trabalho |  |
 | Área de trabalho: remover o separador da área de trabalho |  |
 | Radar: abrir | `Alt+R` |
-| Radar: atualizar | `r` |
+| Radar: atualizar | `F5` |
 | Radar: pesquisar | `/` |
 | Radar: abrir no navegador | `o` |
 | Radar: abrir repositório | `Enter` |

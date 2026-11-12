@@ -56,7 +56,7 @@ so you can tell them apart.
 A folder scope looks for repositories **two levels deep**: the folders directly in it, and the folders inside
 those that are not repositories themselves (`~/src/work/app`). Hidden folders are skipped, a repository is
 never entered, and at most 200 repositories are listed. The search runs in the background, never on the
-thread that draws, and its result is kept until you refresh: the Refresh button, `r` or `Radar: Refresh`
+thread that draws, and its result is kept until you refresh: the Refresh button, `r`, `F5` (the window's refresh key, rebindable) or `Radar: Refresh`
 searches the folder again (a repository cloned since then shows up).
 
 Hosting stays opt-in per repository: a repository of the folder that is **not linked** to a host is never
@@ -199,7 +199,7 @@ palette (`Radar: ...`). A mouse action always has a key and a palette twin.
 | Show or hide the requests of repositories that are not cloned | `a` | `Radar: Show Not-Cloned Requests` |
 | Show or hide drafts of the account-wide rows | `d` | `Radar: Show Drafts` |
 | Turn on a host's account-wide review requests | `T` / `Enter` on its hint row / **Turn on** | `Radar: Turn On Account-Wide Review Requests...` |
-| Refresh | `r` | `Radar: Refresh` |
+| Refresh | `r`, `F5` | `Radar: Refresh` |
 | The row menu | `.` | `Radar: Row Menu...` |
 | Back to Home | `Esc` | `Radar: Back to Home` |
 
@@ -251,6 +251,8 @@ drafts, namespaces) are set with `gitpoulpi hosting integrations radar` or in th
 the [config reference](config-reference.md) and the [CLI reference](cli-reference.md). GitHub, GitLab,
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center and Gerrit answer; Bitbucket Cloud has no account-wide
 endpoint, so its requests show only for the linked repositories of the scope.
+
+The profile's **Namespaces** limit all of its lists to some repositories (Settings > Integrations > Radar: a text area with one entry per line, and a **Regular expressions** checkbox). A line matches a repository's full path when it equals it or is a path prefix ending at a `/`: `ptm` keeps `ptm/produits/x` and drops `ptmx/y` and `formation/y`. With the checkbox on, each line is a regular expression run against the full path as you write it (`^ptm/(produits|infra)/`); a line that is not valid is shown under the field and not saved. Empty means no limit.
 
 How the rows are placed:
 
@@ -307,7 +309,7 @@ Two checkboxes next to the filter (they appear once an account-wide list is bein
 Both are on `Ctrl+N` badges and in the palette (`Radar: Show Not-Cloned Requests`, `Radar: Show Drafts`).
 
 A profile's answer is kept in `radar-account.json` for **5 minutes**: opening the Radar again within that
-time shows the rows without asking the host. **Refresh** (`r`) always asks. A host that said to slow down
+time shows the rows without asking the host. **Refresh** (`r` or `F5`) always asks: every repository and every account-wide list, whatever the age of the last answer. A host that said to slow down
 or refused the token is not asked again in the same round. At most 300 rows are kept per profile and kind,
 and a line under **Repositories** says how many more existed, or why a profile could not be read
 (**Reconnect** opens Settings > Integrations).

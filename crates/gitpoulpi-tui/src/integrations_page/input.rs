@@ -31,6 +31,7 @@ impl IntegrationsPage {
             | Item::RadarDrafts
             | Item::RadarIssues
             | Item::RadarNamespaces
+            | Item::RadarRegex
             | Item::RadarMode => self.activate_radar(item, env),
             Item::Host | Item::Org | Item::Account | Item::Token => self.step(1, env.config),
             Item::StrictPin => self.strict = !self.strict,
@@ -119,13 +120,18 @@ impl IntegrationsPage {
             if item == Item::Token && copies {
                 return Nav::Stay; // a token is never copied or cut
             }
-            let text = field_mut!(self, item);
-            if let Some((_, copied)) = self.editor.dialog_key(item, text, key) {
-                if copied.is_some() {
-                    *env.message = copied;
-                }
-                self.error = None;
+            if item == Item::RadarNamespaces && self.namespaces_key(key, env) {
                 return Nav::Stay;
+            }
+            let text = field_mut!(self, item);
+            if item != Item::RadarNamespaces {
+                if let Some((_, copied)) = self.editor.dialog_key(item, text, key) {
+                    if copied.is_some() {
+                        *env.message = copied;
+                    }
+                    self.error = None;
+                    return Nav::Stay;
+                }
             }
         }
         let typing = self.text_focused(env.config);
@@ -286,6 +292,17 @@ impl IntegrationsPage {
             return false;
         }
         let item = self.current_item(cfg).unwrap_or(Item::Host);
+        if item == Item::RadarNamespaces {
+            // The area keeps the pasted lines.
+            let lines = text.replace("\r\n", "\n").replace('\r', "\n");
+            let clean: String = lines
+                .chars()
+                .filter(|c| *c == '\n' || !c.is_control())
+                .collect();
+            let field = field_mut!(self, item);
+            self.editor.caret_mut(item).insert(field, &clean);
+            return true;
+        }
         let clean: String = text.chars().filter(|c| !c.is_control()).collect();
         let field = field_mut!(self, item);
         self.editor.caret_mut(item).insert(field, clean.trim());
@@ -327,6 +344,9 @@ impl IntegrationsPage {
             };
             let outcome = picker.on_mouse(event, false);
             self.picker_outcome(outcome);
+            return true;
+        }
+        if self.namespaces_wheel(kind, col, row) {
             return true;
         }
         if self.scroll_mouse(kind, col, row) {

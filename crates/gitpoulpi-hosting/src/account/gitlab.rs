@@ -216,7 +216,7 @@ pub(crate) async fn fetch(client: &GitLabClient, query: &AccountQuery) -> Result
         let tail = format!("state=opened&order_by=updated_at&sort=desc&non_archived=true{draft}");
         let mut group_urls: Vec<String> = Vec::new();
         let mut project_urls: Vec<String> = Vec::new();
-        if query.namespaces.is_empty() {
+        if query.search_namespaces().is_empty() {
             let groups = format!("{api}/groups?min_access_level=10&top_level_only=true");
             for id in first_ids(client, &mut out, &groups, MAX_GROUPS, "groups").await? {
                 group_urls.push(format!(
@@ -230,7 +230,7 @@ pub(crate) async fn fetch(client: &GitLabClient, query: &AccountQuery) -> Result
                 project_urls.push(format!("{api}/projects/{id}/merge_requests?{tail}"));
             }
         } else {
-            for ns in &query.namespaces {
+            for ns in query.search_namespaces() {
                 if ns.eq_ignore_ascii_case(&me) {
                     let owned = format!(
                         "{api}/projects?owned=true&simple=true&archived=false&order_by=last_activity_at&sort=desc"

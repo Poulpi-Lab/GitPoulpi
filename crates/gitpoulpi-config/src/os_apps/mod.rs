@@ -118,6 +118,35 @@ pub fn quote_arg(arg: &str) -> String {
     out
 }
 
+/// The switch of Chromium browsers (Chrome, Edge) whose registered command is
+/// `chrome.exe --single-argument %1`: everything after it is ONE verbatim
+/// argument, quotes included.
+const SINGLE_ARGUMENT: &str = "--single-argument";
+
+/// The command line after the program for a command that reads its tail
+/// verbatim (`--single-argument`), with `${file}` replaced by `file` as it is:
+/// a standard argument vector would wrap a path with spaces in quotes, and the
+/// browser would take the quote for the first character of the address
+/// (`http://"c/...`). `None` for any other command, which is run with
+/// ordinary arguments. Pure: the Windows spawn passes the answer to `raw_arg`.
+pub fn verbatim_tail(command: &str, file: &str) -> Option<String> {
+    let words = crate::launch::split_argv(command).ok()?;
+    if !words.iter().skip(1).any(|w| w == SINGLE_ARGUMENT) {
+        return None;
+    }
+    let text = command.trim_start();
+    let end = if let Some(rest) = text.strip_prefix('"') {
+        rest.find('"').map(|i| i + 2)?
+    } else {
+        text.find(char::is_whitespace).unwrap_or(text.len())
+    };
+    let tail = text[end..]
+        .trim()
+        .replace("\"${file}\"", "${file}")
+        .replace("${file}", file);
+    Some(tail)
+}
+
 /// The normalized name of the program a command runs: the file name without
 /// directory, `.exe` or a trailing version (`gimp-2.10` -> `gimp`). A
 /// `flatpak run <id>` is identified by its id.
@@ -265,5 +294,35 @@ mod tests {
         assert_eq!(found.apps.len(), 1);
         assert!(found.apps[0].default);
         assert_eq!(found.apps[0].command, "open ${file}");
+    }
+
+    #[test]
+    fn a_single_argument_tail_is_verbatim_and_unquoted() {
+        let file = r"C:\Users\Jo Doe\a b.html";
+        for command in [
+            r#""C:\Program Files\Google\Chrome\Application\chrome.exe" --single-argument ${file}"#,
+            r#""C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --single-argument ${file}"#,
+            r#"msedge.exe --single-argument "${file}""#,
+        ] {
+            assert_eq!(
+                verbatim_tail(command, file).as_deref(),
+                Some(format!("--single-argument {file}").as_str()),
+                "{command}"
+            );
+        }
+    }
+
+    #[test]
+    fn other_commands_keep_ordinary_arguments() {
+        for command in [
+            r#""C:\Program Files\Mozilla Firefox\firefox.exe" -osint -url "${file}""#,
+            r#""C:\Adobe\Acrobat.exe" "${file}""#,
+            "notepad.exe ${file}",
+            r#""C:\x\viewer.exe" --kiosk ${file}"#,
+            "x.exe",
+            "--single-argument ${file}",
+        ] {
+            assert_eq!(verbatim_tail(command, r"C:\a b\c.txt"), None, "{command}");
+        }
     }
 }

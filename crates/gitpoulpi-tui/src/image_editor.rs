@@ -156,6 +156,8 @@ const UNKNOWN_VARIABLE_PREFIX: &str = "unknown variable "; // i18n-english
 struct Prepared {
     label: String,
     argv: Vec<String>,
+    /// The verbatim tail for a program that parses its own command line.
+    raw_args: Option<String>,
     dir: PathBuf,
     info: RepoInfo,
 }
@@ -191,9 +193,11 @@ fn prepare(entries: &[OpenInEntry], index: usize, file: &Path) -> Result<Prepare
         Some(var) => msg::open_in_run::unknown_variable(&label, var),
         None => msg::open_in_run::bad_command(&label, e),
     })?;
+    let raw_args = os_apps::verbatim_tail(&entry.command, &file_text);
     Ok(Prepared {
         label,
         argv,
+        raw_args,
         dir,
         info,
     })
@@ -232,6 +236,7 @@ pub(crate) fn run_list(
                 label: &run.label,
                 program: &run.argv[0],
                 args: &run.argv[1..],
+                raw_args: run.raw_args.as_deref(),
                 cwd: &run.dir,
                 info: &run.info,
             },

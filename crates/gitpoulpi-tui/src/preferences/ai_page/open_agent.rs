@@ -110,6 +110,7 @@ pub(super) fn open_agent(profile: &AiProfile, repo_root: &Path) -> Result<String
         label: &label,
         program: &program,
         args: &args,
+        raw_args: None,
         cwd: &folder,
         info: &crate::tab_dir::launch_repo_info(&folder),
     };

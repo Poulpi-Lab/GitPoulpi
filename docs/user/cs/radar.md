@@ -54,7 +54,7 @@ Mají-li dva repozitáře stejný název složky, přidá se k čipu nadřazená
 Rozsah podle složky hledá repozitáře **do hloubky dvou úrovní**: složky přímo v ní a složky uvnitř
 těch, které samy repozitáři nejsou (`~/src/work/app`). Skryté složky se přeskakují, do repozitáře se nikdy
 nevstupuje a vypíše se nejvýše 200 repozitářů. Hledání běží na pozadí, nikdy ve vlákně, které kreslí, a jeho
-výsledek se drží do obnovení: tlačítko Obnovit, `r` nebo `Radar: Obnovit` prohledá složku znovu
+výsledek se drží do obnovení: tlačítko Obnovit, `r`, `F5` (obnovovací klávesa okna, předefinovatelná) nebo `Radar: Obnovit` prohledá složku znovu
 (repozitář naklonovaný od té doby se objeví).
 
 Hosting zůstává dobrovolný pro každý repozitář: repozitář ze složky, který **není propojený** s hostitelem,
@@ -199,7 +199,7 @@ klávesu a dvojče v paletě.
 | Zobrazit nebo skrýt žádosti nenaklonovaných repozitářů | `a` | `Radar: Zobrazit nenaklonované žádosti` |
 | Zobrazit nebo skrýt koncepty řádků za celý účet | `d` | `Radar: Zobrazit koncepty` |
 | Zapnout žádosti o kontrolu za celý účet u hostitele | `T` / `Enter` na jeho řádku s nápovědou / **Zapnout** | `Radar: Zapnout žádosti o kontrolu za celý účet...` |
-| Obnovit | `r` | `Radar: Obnovit` |
+| Obnovit | `r`, `F5` | `Radar: Obnovit` |
 | Nabídka řádku | `.` | `Radar: Nabídka řádku...` |
 | Zpět na Domů | `Esc` | `Radar: Zpět na úvod` |
 
@@ -259,6 +259,8 @@ koncepty, jmenné prostory) se nastavují příkazem `gitpoulpi hosting integrat
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center a Gerrit; Bitbucket Cloud nemá koncový bod pro celý účet,
 takže se jeho žádosti ukazují jen pro propojené repozitáře rozsahu.
 
+**Jmenné prostory** profilu omezují všechny jeho seznamy na některé repozitáře (Nastavení > Integrace > Radar: textová oblast s jednou položkou na řádek a zaškrtávátko **Regulární výrazy**). Řádek odpovídá celé cestě repozitáře, když se jí rovná nebo je její předponou končící na `/`: `ptm` ponechá `ptm/produits/x` a vyřadí `ptmx/y` i `formation/y`. Se zapnutým zaškrtávátkem je každý řádek regulární výraz spuštěný nad celou cestou tak, jak ho zapíšete (`^ptm/(produits|infra)/`); neplatný řádek se ukáže pod polem a neuloží se. Prázdné znamená bez omezení.
+
 Jak se řádky řadí:
 
 - Řádek, který rozsah už uvádí (stejný hostitel, projekt, druh a číslo), se objeví jednou: **vyhrává řádek
@@ -315,7 +317,7 @@ Dvě zaškrtávací políčka vedle filtru (objeví se, jakmile se ptáme na sez
 Obě jsou na označení `Ctrl+N` a v paletě (`Radar: Zobrazit nenaklonované žádosti`, `Radar: Zobrazit koncepty`).
 
 Odpověď profilu se uchovává v `radar-account.json` **5 minut**: když Radar otevřete znovu v této
-době, ukáže řádky, aniž by se ptal hostitele. **Obnovit** (`r`) se ptá vždy. Hostitel, který řekl, ať zpomalíme,
+době, ukáže řádky, aniž by se ptal hostitele. **Obnovit** (`r` nebo `F5`) se ptá vždy: každého repozitáře i každého seznamu celého účtu, ať je poslední odpověď jakkoli stará. Hostitel, který řekl, ať zpomalíme,
 nebo odmítl token, se ve stejném kole znovu nedotazuje. Pro každý profil a druh se uchová nejvýše 300 řádků
 a řádek pod **Repozitáře** říká, kolik jich bylo dalších, nebo proč se profil nepodařilo přečíst
 (**Znovu připojit** otevře Nastavení > Integrace).

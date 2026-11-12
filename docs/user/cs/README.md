@@ -68,6 +68,8 @@ budete potřebovat.
     „Konec a cd sem“ a obálka `gitpoulpi shell-init` (`gp`) pro bash, zsh,
     fish a PowerShell.
     Který terminál GitPoulpi zobrazí nejlépe: **[Výběr terminálu](terminals.md)**.
+    Co projde přes tmux, zellij, screen, herdr a panely terminálu:
+    **[Multiplexery](multiplexers.md)**.
 
 Také: **[Workflow větvení](branching-workflows.md)**, předvolby Git Flow, GitHub
 Flow, GitLab Flow a Trunk-based nebo vlastní základní větve, vzory názvů větví

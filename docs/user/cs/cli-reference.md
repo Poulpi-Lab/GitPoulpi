@@ -13,7 +13,7 @@ přepínače.
 
 | Přepínač | Účinek |
 |---|---|
-| `--json` | Vypíše výsledek jako JSON. Chyby jsou také JSON: `{"error": "..."}` na stdout, návratový kód 1. Neúspěšná operace gitu přidá `"detail": {"operation", "command", "exit_code", "stderr"}` (spuštěný příkaz git se zamaskovanými tajnostmi, jeho návratový kód a konec jeho stderr; u vestavěné knihovny gitu `"git2": {"class", "code", "message"}`); nástroje MCP vrací stejný objekt. Bez `--json` jdou řádky na stderr. |
+| `--json` | Vypíše výsledek jako JSON. Chyby jsou také JSON: `{"error": "..."}` na stdout, návratový kód 1. Neúspěšná operace gitu přidá `"detail": {"operation", "command", "exit_code", "stderr"}` (spuštěný příkaz git se zamaskovanými tajnostmi, jeho návratový kód a konec jeho stderr; u vestavěné knihovny gitu `"git2": {"class", "code", "message"}`) a selhání, které daemon uměl pojmenovat, přidá `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}` (operace, její lidský název, hlavní argumenty se zamaskovanými tajnostmi, repozitář, kdo o ni požádal, id požadavku a u fetch nebo push číslo jeho úlohy); nástroje MCP vrací stejný objekt. Bez `--json` jdou řádky na stderr. |
 | `--repo <path>` | Repozitář, nad kterým se pracuje (výchozí: ten, v němž leží aktuální složka, jako u gitu). |
 | `-s, --session <name>` | Relace (daemon), se kterou se komunikuje. Výchozí: odvozená z kořene repozitáře, takže vše otevřené uvnitř jednoho repozitáře sdílí jednoho daemona a dva repozitáře mají dva. |
 | `--backend git2\|system` | Backend pro daemona, kterého tento příkaz spustí (již běžící si ponechává svůj). |
@@ -165,7 +165,7 @@ stash vrátí, bez ohledu na `general.auto_stash` ([Auto-stash](log-and-history.
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch výchozího remote, jednoho remote, nebo všech. Každý fetch také obnoví, co má který remote z tagů (`remote` v `tag list`), a tento záznam vyčistí i bez `--prune`. `--prune-tags` (Nastavení: Automaticky mazat tagy) smaže také lokální tagy, které remote smazal: jen tagy, které na něm byly, nikdy ne ten, který jste neodeslali; odpověď je vypíše jako `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; režim se gitu vždy předává výslovně. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Prostý force neexistuje: pouze `--force-with-lease`. |
-| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remote. |
+| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remote. `remote list` označí jmenný prostor sledovacích větví, za nímž žádný remote nestojí, jako `configured: false`; `remote remove` na něm smaže jeho větve (lze vrátit zpět). |
 | `remote set-url <name> <url> [--push]`, `remote clear-push-url <name>` | URL pro fetch / push. |
 | `remote default [name]` | Zobrazí nebo zvolí výchozí remote repozitáře. |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | Clone (objekty LFS se stahují, pokud není `--no-lfs`). `--sparse` provede checkout jen těchto adresářů a souborů v kořeni; celá historie se přesto stáhne (viz [Částečný checkout](getting-started.md#částečný-checkout)). |

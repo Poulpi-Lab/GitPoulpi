@@ -219,7 +219,8 @@ Viz [Hostingové služby a issue trackery](hosting-integration.md).
   pro každý ref na commitu.
 - **Pravým tlačítkem na pilulku ref** otevřete jednu nabídku s akcemi ref
   a akcemi commitu.
-- **Pravým tlačítkem na záhlaví** zobrazíte nebo skryjete sloupce: zaškrtávací seznam (`[x]` / `[ ]`) s ✕ v titulku; klikněte na řádek nebo použijte šipky a `Mezerník` / `Enter`, pak ho zavřete ✕, `Esc` nebo kliknutím mimo (paleta: `Zobrazení: Log: Vybrat zobrazené sloupce`). Pod zaškrtávátky: `Přizpůsobit <sloupec> obsahu` (sloupec, na který jste klikli pravým), `Přizpůsobit všechny sloupce obsahu` a `Obnovit šířky sloupců`.
+- **Pravým tlačítkem na záhlaví** zobrazíte nebo skryjete sloupce: zaškrtávací seznam (`[x]` / `[ ]`) s ✕ v titulku; klikněte na řádek nebo použijte šipky a `Mezerník` / `Enter`, pak ho zavřete ✕, `Esc` nebo kliknutím mimo (paleta: `Zobrazení: Log: Vybrat zobrazené sloupce`). Pod zaškrtávátky: `Přizpůsobit <sloupec> obsahu` (sloupec, na který jste klikli pravým), `Přizpůsobit všechny sloupce obsahu` a `Obnovit šířky sloupců`. Klávesnicový protějšek pravého kliku: `Shift+C` vybere sloupec, pak `.` (nebo `Shift+F10`) otevře stejnou nabídku na něm.
+- **Sloupce Radaru** fungují stejně: táhněte oddělovač za sloupcem repozitáře, `#`, autora nebo stáří pro změnu šířky, **dvojklikem na něj** sloupec přizpůsobíte jeho nejširší položce (`C` vybere sloupec, pak `=`; `+` přizpůsobí všechny sloupce) a **pravým tlačítkem na název sloupce** (nebo `C`, pak `.`) otevřete `Přizpůsobit <sloupec> obsahu` a `Přizpůsobit všechny sloupce obsahu`.
 - **Klikněte na `↑`, `↓` nebo `✕`** ve vyhledávací liště pro přechod na
   předchozí nebo další shodu, nebo pro zavření lišty.
 - **Klikněte na `#12`, `ABC-12` nebo `AB#12`** ve zprávě commitu v pravém panelu
@@ -358,8 +359,9 @@ Každé zahození se nejdřív zeptá.
 - **Najeďte na řádek** pro tooltip Logu (celá zpráva, jméno a e-mail autora, úplné datum, podle části pod ukazatelem).
 - **Pravým tlačítkem na řádek** otevřete jeho nabídku: zobrazit ho v Logu, diff souboru v tom commitu, soubor v tom commitu, jeho blame, pak nabídku Logu pro ten commit. Klávesa nabídky dělá totéž z klávesnice.
 - **Táhněte hranici v záhlaví** (`ui.column_resize`: ve výchozím stavu jednobuňkový oddělovač mezi dvěma částmi, v záhlaví označený tlumeným `│` a při najetí ukazatele vykreslený jako akcentní čára přes celý sloupec, tažení odkudkoli z ní mění šířku; s `header` první písmeno dalšího názvu, rozsvícené, když je na něm ukazatel) pro změnu šířky části vlevo od ní: dráhy, zpráva, autor, datum, refs, změny nebo SHA. Buňka hned za poslední částí je hranicí poslední části.
+- **Dvojklik na hranici v záhlaví** přizpůsobí část vlevo od ní jejímu obsahu, stejně jako hranice Logu: šířka, která celý ukáže nejširší řádek, nikdy širší než sloupec (z klávesnice: klikněte na řádek nebo `Ctrl+N`, aby sloupec dostal klávesy, `Tab` vybere část, pak `=`; `+` přizpůsobí všechny části; paleta má `Přizpůsobit sloupec obsahu` a `Přizpůsobit všechny sloupce obsahu`). Zpráva si ponechá, co zbude ostatním částem.
 - **Táhněte název v záhlaví** přes jiný pro přesun části na jeho místo: stejný duch, ztlumený zdroj a akcentní proužek jako v záhlaví Logu a část se přesune při pustění (`Esc` to zruší; `<` / `>` na klávesnici, po `Tab`, totéž o jedno místo).
-- **Klikněte pravým tlačítkem na záhlaví** a vyberte, které části se zobrazí (Ref, Graf, Autor, Datum, Změny, SHA; Zpráva je vždy zobrazena); zaškrtávací seznam má ✕ v titulku. Paleta má `vybrat sloupce` a přepínač pro každou část.
+- **Klikněte pravým tlačítkem na záhlaví** a vyberte, které části se zobrazí (Ref, Graf, Autor, Datum, Změny, SHA; Zpráva je vždy zobrazena); zaškrtávací seznam má ✕ v titulku. Pod ním: `Přizpůsobit <část> obsahu` (část, na kterou jste klikli pravým) a `Přizpůsobit všechny sloupce obsahu`. Paleta má `vybrat sloupce` (nabídka z klávesnice, na části vybrané `Tab`) a přepínač pro každou část.
 - **Shift+kolečko** nebo vodorovné kolečko posouvá řádky do stran, když jsou širší než sloupec.
 - **Táhněte pravý okraj** sloupce pro změnu jeho šířky. **Klikněte na proužek `›`** (nebo na ✕ na sloupci, nebo **na vybraný segment** přepínače `Historie │ Vše` v liště) pro jeho vrácení nebo skrytí.
 
@@ -450,13 +452,22 @@ Ukazatel ukazuje tvar přesunu nad záhlavím a tvar změny velikosti nad okraji
 Některé terminály nechají GitPoulpi měnit ukazatel myši: ukazatel změny
 velikosti nad děliči, nad hranicí sloupce v Logu, v Radaru a ve sloupci commitů
 (i při jejím tažení), ručičku nad položkami, na které lze kliknout. Funguje to
-v kitty, foot, Ghostty, WezTerm a novějším xterm (sekvence `OSC 22`). Posílá se
-jen při změně tvaru, nikdy uvnitř tmux, screen, zellij nebo herdr, a při ukončení
-GitPoulpi se obnoví výchozí ukazatel. V jiných terminálech se ukazatel nemění.
+v kitty, foot, Ghostty, mintty a sestavení WezTerm s upstream PR #8092 (sekvence
+`OSC 22`). Posílá se jen při změně tvaru, uvnitř tmux jen zabalená pro průchod
+(`allow-passthrough on`; kitty a foot ji ukážou, Ghostty ne) a nikdy v screen,
+zellij nebo herdr. Při ukončení GitPoulpi se obnoví výchozí ukazatel. V jiných
+terminálech (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows Terminal, xterm)
+se ukazatel nemění; viz [Výběr terminálu](terminals.md#tvar-ukazatele-myši-osc-22).
 Dělič nebo tlačítko pod ukazatelem se rozsvítí v každém terminálu.
 
 Stejný druh komponenty dává všude v aplikaci stejný ukazatel.
 
+- **Tlačítka jsou skutečná tlačítka**, v Nastavení (Integrace: Upravit, Odpojit,
+  Odebrat, Procházet, Smazat, tlačítka úryvků v editoru instrukcí...) stejně jako
+  v dialozích: odsazené popisky na vyplněném pozadí, které se pod ukazatelem
+  zesvětlí, při zakázání ztlumené, nikdy text v `[ ]`. Jediné zbylé závorky jsou
+  značky zaškrtávátek `[x]` / `[ ]`, což jsou zaškrtávátka a berou si ruku jako
+  každý jiný ovládací prvek.
 - **Ukazující ruka** je na ovládacích prvcích: tlačítka, zaškrtávací políčka a
   přepínače, comboboxy (v Nastavení, v panelech issues a pull requestů, v Radaru,
   v dialozích), karty a jejich křížky, tlačítka `+`, odkazy a reference (`#12`,
@@ -487,6 +498,9 @@ se ukáže jen při přenášení refu.
 
 ## Kopírování do schránky
 
-**Kopírovat cestu** a některé další akce kopírování pošlou text terminálu, který
-ho vloží do schránky (OSC 52). Pokud to váš terminál nepodporuje, nic se
-nezkopíruje. Akce kopírování vybraného textu používají přímo systémovou schránku.
+Akce kopírování vloží text do systémové schránky počítače, na kterém GitPoulpi
+běží, a tam, kde terminál tuto funkci prokazatelně respektuje, ho pošlou i
+terminálu (OSC 52). Přes SSH nebo bez displeje se posílá jen OSC 52: pokud ho váš
+terminál nepodporuje (iTerm2, dokud není zapnuto oprávnění ke schránce,
+Terminal.app, GNU screen), nic se nezkopíruje a stavový řádek řekne, že text byl
+jen odeslán terminálu. Viz [Výběr terminálu](terminals.md#schránka-akce-kopírování).

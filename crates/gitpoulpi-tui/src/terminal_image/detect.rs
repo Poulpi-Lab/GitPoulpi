@@ -355,7 +355,7 @@ where
         return Protocol::Kitty;
     }
     if looks_like_iterm2_terminal(get) {
-        Protocol::Iterm2
+        iterm2_for(get)
     } else if sixel_only_terminal(get) {
         Protocol::Sixel
     } else {
@@ -366,7 +366,10 @@ where
 /// A terminal that draws sixel and neither of the other two protocols,
 /// told from its own environment (preference is kitty, iTerm2, sixel):
 /// Windows Terminal (`WT_SESSION`; sixel since 1.22), foot (`TERM=foot*`),
-/// Konsole (`KONSOLE_VERSION`) and mlterm (`TERM=mlterm*`).
+/// Konsole (`KONSOLE_VERSION`), mlterm (`TERM=mlterm*`) and Tabby
+/// (`TERM_PROGRAM=Tabby`, `TABBY_CONFIG_DIRECTORY`; its xterm.js image addon
+/// draws sixel, answers `CSI 16 t` and lists `4` in its DA1 reply: Tabby
+/// 1.0.238 on Windows, November 2026).
 ///
 /// **Not DA1.** The textbook test is parameter 4 in the reply to `CSI c`,
 /// but the reply arrives on stdin and detection here never reads stdin
@@ -379,6 +382,8 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
     let term = get("TERM").unwrap_or_default().to_ascii_lowercase();
     set("WT_SESSION")
         || set("KONSOLE_VERSION")
+        || set("TABBY_CONFIG_DIRECTORY")
+        || get("TERM_PROGRAM").is_some_and(|p| p.eq_ignore_ascii_case("tabby"))
         || term.starts_with("foot")
         || term.starts_with("mlterm")
 }
@@ -393,7 +398,10 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
 ///   terminal's own background), and its `imgcat` page documents the
 ///   protocol. Confirmed here by a real WezTerm window capture
 ///   (`docs/developer/visual-verification.md`).
-/// - **iTerm2 itself, Rio, mintty, Bobcat: unverified.** mintty's wiki
+/// - **Rio: blends.** Measured on Rio 0.5.28 on Windows (November 2026): a
+///   transparent PNG sent as `OSC 1337` over a coloured background keeps that
+///   colour around the shape, with no lighter rectangle.
+/// - **iTerm2 itself, mintty, Bobcat: unverified.** mintty's wiki
 ///   documents the `File=` image controls without any word on alpha
 ///   (only its OSC 11 background images are said to honour it), and this
 ///   project has not seen the others on a real window, so they keep the
@@ -410,9 +418,15 @@ pub(super) fn iterm2_for<F: Fn(&str) -> Option<String>>(get: &F) -> Protocol {
 }
 
 /// Whether the terminal named by the environment composites inline PNG
-/// alpha over the cell background. Only WezTerm, by verification.
+/// alpha over the cell background. WezTerm and Rio, by verification.
 pub(super) fn blends_png_alpha<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
-    looks_like_wezterm(get) && !inside_a_multiplexer(get) && !inside_herdr(get)
+    (looks_like_wezterm(get) || looks_like_rio(get))
+        && !inside_a_multiplexer(get)
+        && !inside_herdr(get)
+}
+
+pub(super) fn looks_like_rio<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
+    get("TERM_PROGRAM").is_some_and(|v| v.eq_ignore_ascii_case("rio"))
 }
 
 pub(super) fn looks_like_iterm2_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> bool {

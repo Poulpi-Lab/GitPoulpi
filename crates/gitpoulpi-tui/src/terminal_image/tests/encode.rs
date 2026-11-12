@@ -106,11 +106,15 @@ fn an_image_is_written_at_its_anchor_and_what_covers_it_goes_on_top() {
     assert!(out.ends_with("8"), "and restored last: {out:?}");
 }
 
-/// Per terminal: only WezTerm is known to blend PNG alpha; every other
-/// iTerm2-protocol terminal keeps the opaque backdrop.
+/// Per terminal: only WezTerm and Rio are known to blend PNG alpha; every
+/// other iTerm2-protocol terminal keeps the opaque backdrop.
 #[test]
-fn only_wezterm_gets_the_transparent_iterm2_picture() {
-    for program in ["iTerm.app", "mintty", "rio", "Bobcat"] {
+fn only_wezterm_and_rio_get_the_transparent_iterm2_picture() {
+    assert_eq!(
+        protocol_for(RendererChoice::Auto, &env(&[("TERM_PROGRAM", "rio")])),
+        Protocol::Iterm2Alpha
+    );
+    for program in ["iTerm.app", "mintty", "Bobcat"] {
         assert_eq!(
             protocol_for(RendererChoice::Auto, &env(&[("TERM_PROGRAM", program)])),
             Protocol::Iterm2,

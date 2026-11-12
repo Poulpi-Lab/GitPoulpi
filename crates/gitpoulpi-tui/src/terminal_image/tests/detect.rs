@@ -139,6 +139,55 @@ fn sixel_only_terminals_are_recognised_from_their_environment() {
 }
 
 #[test]
+fn tabby_draws_sixel_and_is_told_from_its_own_variables() {
+    // Read out of a Tabby 1.0.238 tab on Windows.
+    for pairs in [
+        vec![("TERM_PROGRAM", "Tabby"), ("TERM", "xterm-256color")],
+        vec![(
+            "TABBY_CONFIG_DIRECTORY",
+            r"C:\Users\u\AppData\Roaming\tabby",
+        )],
+    ] {
+        assert_eq!(
+            protocol_for(RendererChoice::Auto, &env(&pairs)),
+            Protocol::Sixel,
+            "{pairs:?}"
+        );
+    }
+    // Tabby's variables inherited into a tmux pane: a multiplexer owns the screen.
+    let tmux = [
+        ("TERM_PROGRAM", "Tabby"),
+        ("TMUX", "/tmp/tmux-1000/default,1,0"),
+    ];
+    assert_eq!(
+        protocol_for(RendererChoice::Auto, &env(&tmux)),
+        Protocol::None
+    );
+}
+
+#[test]
+fn rio_gets_the_iterm2_protocol_with_alpha_and_not_inside_a_multiplexer() {
+    let rio = [("TERM_PROGRAM", "rio"), ("TERM_PROGRAM_VERSION", "0.5.28")];
+    assert_eq!(
+        protocol_for(RendererChoice::Auto, &env(&rio)),
+        Protocol::Iterm2Alpha
+    );
+    let tmux = [
+        ("TERM_PROGRAM", "rio"),
+        ("TMUX", "/tmp/tmux-1000/default,1,0"),
+    ];
+    assert_eq!(
+        protocol_for(RendererChoice::Auto, &env(&tmux)),
+        Protocol::None
+    );
+    // mintty keeps the opaque backdrop: its alpha handling is not verified.
+    assert_eq!(
+        protocol_for(RendererChoice::Auto, &env(&[("TERM_PROGRAM", "mintty")])),
+        Protocol::Iterm2
+    );
+}
+
+#[test]
 fn sixel_comes_after_kitty_and_iterm2_in_the_preference() {
     // WezTerm inside Windows Terminal's variables: iTerm2 wins.
     let mut wez = WEZTERM.to_vec();

@@ -160,6 +160,32 @@ fn paced(t: &mut xtask::pty::Terminal, from: (u16, u16), to: (u16, u16)) -> xtas
     t.release(to.0, to.1)
 }
 
+/// The window's title and grip once two reads 150 ms apart agree: a torn
+/// frame (a half-drawn screen) must not pin the coordinates the drags start from.
+fn settled_frame(term: &xtask::pty::Terminal) -> ((u16, u16), (u16, u16)) {
+    let read = |t: &xtask::pty::Terminal| {
+        let s = t.screen();
+        title_at(&s, "Activity Log").zip(grip(&s))
+    };
+    let deadline = std::time::Instant::now() + STEP;
+    let mut last = read(term);
+    loop {
+        std::thread::sleep(Duration::from_millis(150));
+        let now = read(term);
+        if let (Some(a), Some(b)) = (last, now) {
+            if a == b {
+                return a;
+            }
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "the window never settled\n{}",
+            term.text()
+        );
+        last = now;
+    }
+}
+
 fn open_by_palette_and_frame(entry: &str, session: &str, home: bool) {
     open_with_config(entry, session, home, "")
 }
@@ -203,9 +229,7 @@ fn open_with_config(entry: &str, session: &str, home: bool, toml: &str) {
         s.contains("Git operations") && title_at(s, "Activity Log").is_some() && grip(s).is_some()
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let s = term.screen();
-    let (tc, tr) = title_at(&s, "Activity Log").unwrap();
-    let (gx, gy) = grip(&s).unwrap();
+    let ((tc, tr), (gx, gy)) = settled_frame(&term);
 
     term.act_until(
         "the window narrowed by its right border",

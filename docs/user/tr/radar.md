@@ -53,7 +53,7 @@ edebilmeniz için çipe üst klasör eklenir.
 Bir klasör kapsamı depoları **iki düzey derinlikte** arar: doğrudan içindeki klasörleri ve kendileri depo olmayan
 klasörlerin içindekileri (`~/src/work/app`). Gizli klasörler atlanır, bir deponun içine asla girilmez ve en fazla
 200 depo listelenir. Arama arka planda çalışır, asla çizimi yapan iş parçacığında değil ve sonucu siz
-yenileyene kadar tutulur: Yenile düğmesi, `r` veya `Radar: Yenile` klasörü yeniden arar (o zamandan beri
+yenileyene kadar tutulur: Yenile düğmesi, `r`, `F5` (pencerenin yenileme tuşu, yeniden atanabilir) veya `Radar: Yenile` klasörü yeniden arar (o zamandan beri
 klonlanmış bir depo görünür).
 
 Barındırıcı erişimi depo başına isteğe bağlı kalır: klasördeki bir barındırıcıya **bağlı olmayan** depoya hiçbir
@@ -197,7 +197,7 @@ tuşu ve bir palet karşılığı vardır.
 | Klonlanmamış depoların request'lerini göster veya gizle | `a` | `Radar: Klonlanmamış İstekleri Göster` |
 | Hesap geneli satırların taslaklarını göster veya gizle | `d` | `Radar: Taslakları Göster` |
 | Bir barındırıcının hesap geneli inceleme isteklerini etkinleştir | `T` / satırındaki ipucunda `Enter` / **Etkinleştir** | `Radar: Hesap Geneli İnceleme İsteklerini Etkinleştir...` |
-| Yenile | `r` | `Radar: Yenile` |
+| Yenile | `r`, `F5` | `Radar: Yenile` |
 | Satır menüsü | `.` | `Radar: Satır Menüsü...` |
 | Ana sekmeye dön | `Esc` | `Radar: Ana Sayfaya Dön` |
 
@@ -259,6 +259,8 @@ taslaklar, ad alanları) `gitpoulpi hosting integrations radar` ile ya da profil
 Forgejo, Azure DevOps, Bitbucket Data Center ve Gerrit yanıt verir; Bitbucket Cloud'un hesap geneli uç noktası
 yoktur, bu yüzden request'leri yalnızca kapsamın bağlı depoları için görünür.
 
+Profilin **Ad alanları** tüm listelerini bazı depolarla sınırlar (Ayarlar > Entegrasyonlar > Radar: satır başına bir giriş olan bir metin alanı ve bir **Düzenli ifadeler** onay kutusu). Bir satır, deponun tam yoluyla eşitse veya `/` ile biten bir yol öneğiyse eşleşir: `ptm`, `ptm/produits/x`'i tutar, `ptmx/y` ile `formation/y`'yi dışarıda bırakır. Onay kutusu açıkken her satır, tam yola yazdığınız haliyle uygulanan bir düzenli ifadedir (`^ptm/(produits|infra)/`); geçerli olmayan bir satır alanın altında gösterilir ve kaydedilmez. Boş, sınır yok demektir.
+
 Satırların nasıl yerleştirildiği:
 
 - Kapsamın zaten listelediği bir satır (aynı barındırıcı, proje, tür ve numara) bir kez görünür: **kapsamın
@@ -313,7 +315,7 @@ Filtrenin yanındaki iki onay kutusu (bir hesap geneli liste sorulmaya başlayı
 İkisi de `Ctrl+N` rozetlerinde ve paletteydir (`Radar: Klonlanmamış İstekleri Göster`, `Radar: Taslakları Göster`).
 
 Bir profilin yanıtı `radar-account.json` içinde **5 dakika** tutulur: Radar'ı bu süre içinde yeniden açmak,
-barındırıcıya sormadan satırları gösterir. **Yenile** (`r`) her zaman sorar. Yavaşlamayı söyleyen ya da token'ı
+barındırıcıya sormadan satırları gösterir. **Yenile** (`r` veya `F5`) her zaman sorar: son yanıtın yaşı ne olursa olsun her depoyu ve her hesap geneli listeyi. Yavaşlamayı söyleyen ya da token'ı
 reddeden bir barındırıcıya aynı turda yeniden sorulmaz. Profil ve tür başına en fazla 300 satır tutulur;
 **Depolar** altındaki bir satır kaç tane daha olduğunu ya da bir profilin neden okunamadığını söyler
 (**Yeniden bağlan** Ayarlar > Entegrasyonlar'ı açar).

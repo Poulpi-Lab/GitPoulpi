@@ -705,8 +705,8 @@ hız sınırı yalnızca o profili başarısız kılar. Yanıtlar beş dakika ye
 
 Ayarlar > Entegrasyonlar'da bağlı bir kod barındırıcısı profilinin SSH anahtarının altında bir **Radar** bloğu vardır:
 her liste için bir onay kutusu (*İncelememi bekleyen istekler*, *Açık her istek*, *Taslakları dahil et*, *Bana atanan Issue'lar*,
-sonuncusu issue'su olmayan barındırıcılarda yoktur), bir *Ad alanları* alanı (virgülle ayrılır; boş,
-kendi ve üyesi olduğunuz her ad alanı demektir) ve *Klonlanmamış bir depodan gelen istek* seçimi: *Sor*, *Klonla* veya *API üzerinden incele*.
+sonuncusu issue'su olmayan barındırıcılarda yoktur), bir *Ad alanları* alanı (satır başına bir giriş; boş,
+kendi ve üyesi olduğunuz her ad alanı demektir; isteğe bağlı olarak *Düzenli ifadeler*) ve *Klonlanmamış bir depodan gelen istek* seçimi: *Sor*, *Klonla* veya *API üzerinden incele*.
 Her şey değiştirdikçe kaydedilir. Hesap geneli sorgusu olmayan barındırıcılar (Bitbucket
 Cloud) bunun yerine bunu söyleyen tek bir satır gösterir. Komut paleti bloğa
 *Ayarlar: Bir profilin Radar seçenekleri...* ile ulaşır ve Ayarlar araması her
@@ -730,8 +730,8 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Her komut için [CLI başvurusuna](cli-reference.md#komutlar) bakın. Bir token asla
-argüman olarak kabul edilmez (`hosting login`, token'ı işletim sisteminin kimlik bilgisi deposu tutuyorsa `stored: "os"`, depo reddedip token bu oturum için bellekte duruyorsa `stored: "session"` ve `store_error` yazdırır) ve MCP sunucusu `hosting login` sunmaz, bu yüzden bir
-token asla bir ajanın içinden geçmez.
+argüman olarak kabul edilmez ve MCP sunucusu `hosting login` sunmaz, bu yüzden bir
+token asla bir ajanın içinden geçmez. `hosting login`, token'ı işletim sisteminin kimlik bilgisi deposu tutuyorsa `stored: "os"`, depo reddedip token bu oturum için bellekte duruyorsa `stored: "session"` ve `store_error` yazdırır.
 
 ## Sorun giderme
 

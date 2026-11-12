@@ -12,7 +12,7 @@ ajanlar](mcp-and-agents.md)). `gitpoulpi <command> --help` her bayrağı listele
 
 | Bayrak | Etki |
 |---|---|
-| `--json` | Sonucu JSON olarak yazdırır. Hatalar da JSON'dur: standart çıktıda `{"error": "..."}`, çıkış kodu 1. Başarısız olan bir Git işlemi `"detail": {"operation", "command", "exit_code", "stderr"}` ekler (çalışan Git komutu, gizli bilgileri maskelenmiş olarak, çıkış kodu ve stderr çıktısının son kısmı; yerleşik Git kitaplığı için `"git2": {"class", "code", "message"}`); MCP araçları aynı nesneyi döndürür. `--json` olmadan satırlar stderr'e gider. |
+| `--json` | Sonucu JSON olarak yazdırır. Hatalar da JSON'dur: standart çıktıda `{"error": "..."}`, çıkış kodu 1. Başarısız olan bir Git işlemi `"detail": {"operation", "command", "exit_code", "stderr"}` ekler (çalışan Git komutu, gizli bilgileri maskelenmiş olarak, çıkış kodu ve stderr çıktısının son kısmı; yerleşik Git kitaplığı için `"git2": {"class", "code", "message"}`) ve daemon'ın adlandırabildiği bir başarısızlık `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}` ekler (işlem, bir kişinin ona verdiği ad, gizli bilgileri maskelenmiş ana argümanları, depo, isteyen, isteğin kimliği ve fetch veya push için iş numarası); MCP araçları aynı nesneyi döndürür. `--json` olmadan satırlar stderr'e gider. |
 | `--repo <path>` | Üzerinde işlem yapılacak depo (varsayılan: Git gibi, geçerli klasörü çevreleyen depo). |
 | `-s, --session <name>` | Konuşulacak oturum (daemon). Varsayılan: depo kökünden türetilir; böylece bir depo içinde açılan her şey tek bir daemon'ı paylaşır ve iki depo iki daemon alır. |
 | `--backend git2\|system` | Bu komutun başlattığı bir daemon için arka uç (çalışan bir daemon kendisininkini korur). |
@@ -166,7 +166,7 @@ ve stash'i pop eder; `general.auto_stash` ne derse desin ([Otomatik stash](log-a
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Varsayılan uzak depoyu, birini ya da hepsini fetch et. Her fetch ayrıca her uzak deponun tag'lerde sahip olduklarını (`tag list`'in `remote` değeri) yeniler ve bu kaydı `--prune` olmadan da temizler. `--prune-tags` (Ayarlar: Tag'ler otomatik temizleme) uzak deponun sildiği yerel tag'leri de siler: yalnızca onda bulunmuş tag'leri, asla push etmediğiniz birini değil; yanıt bunları `pruned_tags` olarak listeler (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; kip her zaman Git'e açıkça iletilir. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Düz force yoktur: yalnızca `--force-with-lease`. |
-| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Uzak depolar. |
+| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Uzak depolar. `remote list`, arkasında uzak depo olmayan bir uzak izleme ad alanını `configured: false` ile işaretler; `remote remove` onun dallarını siler (geri alınabilir). |
 | `remote set-url <name> <url> [--push]`, `remote clear-push-url <name>` | Fetch / push URL'leri. |
 | `remote default [name]` | Deponun varsayılan uzak deposunu göster veya seç. |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | Clone (`--no-lfs` verilmedikçe LFS nesneleri indirilir). `--sparse` yalnızca bu klasörleri ve kökteki dosyaları checkout eder; tüm geçmiş yine de indirilir (bkz. [Kısmi checkout](getting-started.md#kısmi-checkout)). |

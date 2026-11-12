@@ -412,8 +412,8 @@ olarak gelir. Ayarlar sayfası böyle bir atama için uyarır ("bu terminal ...
 göndermez").
 
 **Kitty klavye protokolü** olan terminaller bu tuş birleşimlerini gönderebilir.
-Örnekler: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 ve sonrası ile protokolü
-ileten tmux veya herdr. GitPoulpi protokolü varsayılan olarak kullanır:
+Örnekler: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 ve sonrası ile zellij (tmux
+yanıt vermez: bkz. [Çoklayıcılar](multiplexers.md#tmux)). GitPoulpi protokolü varsayılan olarak kullanır:
 
 - Başlangıçta GitPoulpi terminale sorar ve yanıt için en fazla yaklaşık 100 ms
   bekler. Terminal yanıt vermezse eski tuşlar kalır.
@@ -874,9 +874,9 @@ Tuşlar varsayılanlardır.
 | Etkinlik Günlüğü: Kapsamı Seç |  |
 | Etkinlik Günlüğü: Git İşlemleri |  |
 | Etkinlik Günlüğü: Uygulama Günlüğü |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Etkinlik Günlüğü: Bu Satırın İşlemini Göster |  |
+| Etkinlik Günlüğü: Sonraki Başarısız İşlem |  |
+| Etkinlik Günlüğü: Önceki Başarısız İşlem |  |
 | Etkinlik Günlüğü: Sola Kaydır | `Left` |
 | Etkinlik Günlüğü: Sağa Kaydır | `Right` |
 | Etkinlik Günlüğü: Son Hatayı Kopyala |  |
@@ -1215,8 +1215,32 @@ Tuşlar varsayılanlardır.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Yinele**. `Ctrl+Shift+Z` kitty klavye protokolü ister; `Ctrl+Y` her zaman çalışır |
 | `.`, `Menu`, `Shift+F10` | Seçili satırın bağlam menüsünü aç |
 
-Bir metin alanı klavyeyi tutarken `Ctrl+Z` ve `Ctrl+Y` hiçbir şey yapmaz.
-Düzenleyicinin kendi metin geri alması vardır.
+### Bir metin alanında Ctrl+Z / Ctrl+Y
+
+Bir metin alanı klavyeyi tutarken `Ctrl+Z` ve `Ctrl+Y` (`Ctrl+Shift+Z` de) o alanın
+metni üzerinde işler, depo üzerinde asla: klavyeyi tutan alan her zaman kazanır; bu
+yüzden commit mesajındaki `Ctrl+Z` bir commit'i geri alamaz. Başka her yerde küresel
+anlamlarını korurlar (yukarıdaki geri al / yinele günlüğü). Bu her metin alanı ve çok
+satırlı düzenleyici için geçerlidir: commit mesajı, Ayarlar alanları ve metin
+düzenleyicileri, pull request ve issue formları, YZ iletişim kutuları ve her filtre veya
+arama kutusu.
+
+- **Yazma** bir sözcük bir sözcük geri alınır (bir harf dizisi, bir boşluk dizisi, bir
+  noktalama dizisi) ve bir saniyeden uzun duraklayan yazma yeni bir adım başlatır.
+  Art arda Backspace'ler tek adımdır. Bir yapıştırma, bir kesme, `Ctrl+U` / `Ctrl+K`,
+  eklenen bir kod parçası ya da kabul edilen bir tamamlama birer adımdır.
+- Bir geri alma metni, imleci ve seçimi geri getirir. Geri almadan sonraki yeni bir
+  düzenleme, yinelenebilecek olanı düşürür.
+- Her alan sınırlı bir geçmiş tutar (son 200 adım, yaklaşık 1 MB metin) ve alan dışarıdan
+  değiştirildiğinde (seçicide seçilen bir klasör, yeniden yüklenen bir form) ya da başka
+  bir alan klavyeyi aldığında onu unutur.
+- Geri alınacak bir şey kalmadığında `Ctrl+Z` hiçbir şey yapmaz: bir alan klavyeyi
+  tutarken depo geri almasına asla düşmez.
+- YZ ayarlarının **Yönergeler düzenleyicisinde** ayrıca Kaydet ve İptal'in yanında,
+  gidilecek bir adım olmadığında devre dışı kalan **Geri al** ve **Yinele** düğmeleri
+  vardır.
+- Kod düzenleyicisi ve merge düzenleyicisi kendi geri almalarını korur (`Düzenle: Geri Al`,
+  `Merge: Geri Al`); bu, seçimlerini de kapsar.
 
 ## Filtrelenebilir açılır listeler
 
@@ -1227,18 +1251,20 @@ açılır liste (Ayarlar seçenekleri, pull request formu, issue referansı seç
 
 | Tuş | Eylem |
 |---|---|
-| `Up` / `Down` | Bir satır taşı |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Bir satır yukarı / aşağı taşı |
 | `Home` / `End` | İlk / son satır |
 | `PageUp` / `PageDown` | Görünen bir sayfa taşı |
 | `Enter` | Vurgulanan satırı seç |
 | `Esc` | Kapat |
 
 Bu açılır pencerelerde `Home` ve `End` filtre alanının imlecini değil listeyi
-taşır. `Ctrl+A` ve `Ctrl+E` imleci yine başa ve sona taşır, `Ctrl+K` filtreyi
-sonuna kadar siler. Hiçbir `Ctrl+harf` çifti listeyi taşımaz (`Ctrl+N` gezinme
-önekidir, `Ctrl+P` komut paleti), düz `j` ve `k` filtreye yazılır: burada
-yalnızca oklar, `PageUp` / `PageDown` ve `Home` / `End` taşır. Metin alanı
-olmayan listelerde `j` / `k` aşağı / yukarı gitmenin ek bir yoludur.
+taşır; `Ctrl+K` / `Ctrl+J` de listeyi taşır, bu yüzden `Ctrl+K` artık filtreyi
+sonuna kadar silmez (`Ctrl+U` hâlâ temizler; bir listenin dışındaki sıradan bir metin
+alanında `Ctrl+K` satır sonuna kadar silmeyi sürdürür). `Ctrl+A` ve `Ctrl+E` imleci yine
+başa ve sona taşır. `Ctrl+J` / `Ctrl+K` diğer her listeyi de taşır, metin alanıyla
+veya onsuz (`Ctrl+N` gezinme önekidir ve `Ctrl+P` komut paletidir, bu yüzden liste
+tuşu değildirler). Düz `j` ve `k` filtreye yazılır; metin alanı olmayan listelerde
+`j` / `k` aşağı / yukarı gitmenin ek bir yoludur.
 
 Fareyle:
 
@@ -1486,7 +1512,8 @@ oluşturduğu dalı devral*) ve iletişim kutuları, bekleme kartı ve "bir dal 
 | Bir dosya satırında `Enter` / `l` | Dosyanın diff'ini ortada aç |
 | `Esc` / `h` | Commit'lere geri dön |
 | `Right` | (birden fazla ref'i olan commit) Diğer ref'lerinin listesini aç: `Up` / `Down` taşır, `Enter` checkout eder, `Esc` kapatır |
-| `f` | Arama çubuğunu aç (bkz. [Arama](#arama)) |
+| `f` | Arama çubuğunu aç (bkz. [Arama](#arama)); bu hiçbir zaman `/` değildi, bu yüzden Log'un araması değişmedi |
+| `/` | Refs filtre alanına odaklan (Refs paneli odaktayken aynı tuş bunu yapar); bir metin alanı odaktayken karakter olarak yazılır |
 | `c` | (commit'lenmemiş değişiklik varken) WIP satırını seç ve imleci mesaj alanına koy |
 | WIP satırında `Enter` | İmleci WIP satırının mesaj alanına koy |
 | `.`, `Menu`, `Shift+F10` | Commit menüsü. `Up` / `Down` taşır, `Right` / `l` / `Enter` bir alt menü açar, `Left` / `h` / `Esc` geri döner |

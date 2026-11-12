@@ -244,7 +244,7 @@ Panelin başlığı yoktur: sütun başlıkları ne olduğunu söyler. Ref'i olm
 | Sütun | Gösterdiği |
 |---|---|
 | **Ref** | Commit üzerindeki dal ve tag'ler için renkli haplar: yerel için bir dizüstü simgesi, uzak için bir küre, tag'ler için bir etiket simgesi, oraya daha fazla ref işaret ettiğinde `+N`. Tag'ler bulundukları yerde çizilir, asla hayalet olarak değil. Ref'i olmayan bir commit'te, üzerine gelinen satır ait olduğu dalın adını taşıyan soluk bir hap gösterir; o dal silinmişse, onu merge eden merge commit'inden okunan adı taşıyan üstü çizili bir hap gösterilir (Ayarlar > Log ve grafik içindeki **Üzerine gelinen Commit için soluk bir dal göster** ile kapatın). |
-| **Grafik** | Dal şeritleri, merge'ler ve dal noktaları. kitty, Ghostty, WezTerm ve iTerm2 (ve sixel üzerinden Windows Terminal ile foot)'de resim olarak, diğer terminallerde karakterlerle çizilir. Şerit renkleri temadan veya seçtiğiniz bir paletten gelir (bkz. [Temalar](themes.md)). En az genişlikte (tek commit noktası) sütun kompakttır: her commit tek bir şeritte, dal veya merge çizgisi olmadan. |
+| **Grafik** | Dal şeritleri, merge'ler ve dal noktaları. kitty, Ghostty, WezTerm, Rio ve iTerm2 (ve sixel üzerinden Windows Terminal, foot ile Tabby)'de resim olarak, diğer terminallerde karakterlerle çizilir. Şerit renkleri temadan veya seçtiğiniz bir paletten gelir (bkz. [Temalar](themes.md)). En az genişlikte (tek commit noktası) sütun kompakttır: her commit tek bir şeritte, dal veya merge çizgisi olmadan. |
 | **Mesaj** | Commit özeti. |
 | **Yazar** | Yazar, isteğe bağlı bir avatarla. |
 | **Tarih** | Yazar tarihi, seçtiğiniz biçimde. |

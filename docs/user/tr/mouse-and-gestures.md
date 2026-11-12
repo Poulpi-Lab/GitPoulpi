@@ -234,7 +234,8 @@ Bkz. [Barındırma hizmetleri ve issue takipçileri](hosting-integration.md).
   için bir alt menüsü vardır.
 - Ref'in eylemlerini ve commit'in eylemlerini içeren tek bir menü için **bir ref
   hapına sağ tıklayın**.
-- Sütunları göstermek veya gizlemek için **başlığa sağ tıklayın**: başlığında ✕ bulunan bir onay listesi (`[x]` / `[ ]`); bir satıra tıklayın ya da oklarla `Space` / `Enter` kullanın, sonra ✕, `Esc` ya da dışarı bir tıklamayla kapatın (palet: `Görünüm: Log: Gösterilecek sütunları seç`). Onay kutularının altında: `<column> sütununu içeriğine sığdır` (sağ tıklanan sütun), `Tüm sütunları içeriğe sığdır` ve `Sütun genişliklerini sıfırla`.
+- Sütunları göstermek veya gizlemek için **başlığa sağ tıklayın**: başlığında ✕ bulunan bir onay listesi (`[x]` / `[ ]`); bir satıra tıklayın ya da oklarla `Space` / `Enter` kullanın, sonra ✕, `Esc` ya da dışarı bir tıklamayla kapatın (palet: `Görünüm: Log: Gösterilecek sütunları seç`). Onay kutularının altında: `<column> sütununu içeriğine sığdır` (sağ tıklanan sütun), `Tüm sütunları içeriğe sığdır` ve `Sütun genişliklerini sıfırla`. Sağ tıklamanın klavye karşılığı: bir sütunu seçmek için `Shift+C`, sonra `.` (veya `Shift+F10`) aynı menüyü onun üzerinde açar.
+- **Radar'ın sütunları** aynı şekilde çalışır: boyutlandırmak için depo, `#`, yazar veya yaş sütunundan sonraki ayırıcıyı sürükleyin, sütunu en geniş girdisine sığdırmak için ona **çift tıklayın** (`C` bir sütun seçer, sonra `=`; `+` her sütunu sığdırır) ve `<column> sütununu içeriğine sığdır` ile `Tüm sütunları içeriğe sığdır` için **bir sütun başlığına sağ tıklayın** (veya `C`, sonra `.`).
 - Önceki veya sonraki eşleşmeye gitmek ya da çubuğu kapatmak için arama
   çubuğundaki **`↑`, `↓` veya `✕`'e tıklayın**.
 - O issue'yu veya pull request'i tarayıcıda açmak için sağ paneldeki bir commit
@@ -371,8 +372,9 @@ Her atma önce sorar.
 - Log'un ipucu için **bir satırın üzerine gelin** (işaretçinin altındaki kısma göre mesajın tamamı, yazarın adı ve e-postası, tam tarih).
 - Menüsü için **bir satıra sağ tıklayın**: Log'da göster, dosyanın o commit'teki diff'i, dosyanın o commit'teki hali, blame'i, ardından commit için Log'un menüsü. Menü tuşu aynısını klavyeden yapar.
 - Soldaki bölümü (şeritler, mesaj, yazar, tarih, ref'ler, değişim veya SHA) boyutlandırmak için **başlıktaki bir sınırı sürükleyin** (`ui.column_resize`: varsayılan olarak iki bölüm arasındaki bir hücrelik ayırıcı, başlıkta soluk bir `│` ile işaretlenir ve imleç üzerindeyken sütun boyunca vurgu çizgisi olarak çizilir, boyunca herhangi bir yerden sürüklemek yeniden boyutlandırır; `header` ile sonraki adın ilk harfi, işaretçi üzerindeyken aydınlanır). Son bölümün hemen ardındaki hücre onun sınırıdır.
+- Soldaki bölümü içeriğine sığdırmak için **başlıktaki bir sınıra çift tıklayın**, tıpkı Log'un sınırlarında olduğu gibi: en geniş satırını bütün olarak gösteren genişlik, sütundan asla geniş değil (klavyede: sütuna tuşları vermek için bir satıra tıklayın veya `Ctrl+N`, bölümü seçmek için `Tab`, sonra `=`; `+` her bölümü sığdırır; palette `Bölümü İçeriğine Sığdır` ve `Tüm Bölümleri İçeriğe Sığdır` vardır). Mesaj, diğer bölümlerin bıraktığını korur.
 - Bir bölümü oraya taşımak için **başlıktaki bir adı başka bir adın üzerine sürükleyin**: Log başlığındakiyle aynı hayalet, soluk kaynak ve vurgu çubuğu; bölüm bıraktığınızda taşınır (`Esc` iptal eder; klavyede `Tab` sonra `<` / `>` aynı şeyi bir yer birer yer yapar).
-- Hangi bölümlerin gösterileceğini seçmek için **başlığa sağ tıklayın** (Ref, Grafik, Yazar, Tarih, Değişim, SHA; Mesaj her zaman gösterilir); onay listesinin başlığında ✕ vardır. Palette `Sütunları seç` ve bölüm başına bir aç/kapat vardır.
+- Hangi bölümlerin gösterileceğini seçmek için **başlığa sağ tıklayın** (Ref, Grafik, Yazar, Tarih, Değişim, SHA; Mesaj her zaman gösterilir); onay listesinin başlığında ✕ vardır. Altında: `<part> bölümünü içeriğine sığdır` (sağ tıklanan bölüm) ve `Tüm sütunları içeriğe sığdır`. Palette `Sütunları seç` (menü klavyeden, `Tab` ile seçilen bölümde) ve bölüm başına bir aç/kapat vardır.
 - Satırlar sütundan genişse **Shift+tekerlek** ya da yatay tekerlek onları yana kaydırır.
 - Sütunu yeniden boyutlandırmak için **sağ kenarını sürükleyin**. Geri getirmek ya da gizlemek için **`›` şeridine tıklayın** (ya da sütundaki ✕'e, ya da çubuğun `Geçmiş │ Tümü` seçicisinin **seçili parçasına tıklayın**).
 
@@ -463,11 +465,11 @@ Taşınamayanlar: tam sayfa ekranlar (Ayarlar, Yardım, zaten pencereyi dolduran
 
 Bazı terminaller GitPoulpi'nin fare imlecini değiştirmesine izin verir:
 ayırıcıların üzerinde bir yeniden boyutlandırma imleci, tıklanabilir öğelerin
-üzerinde bir el. Log'un, Radar'ın ve commit sütununun bir sütun sınırının üzerinde de (sürüklerken de) bir yeniden boyutlandırma imleci vardır. Bu kitty, foot, Ghostty, WezTerm ve yeni xterm'de çalışır (`OSC 22` dizisi). Yalnızca şekil değiştiğinde gönderilir, tmux, screen, zellij veya herdr içinde asla gönderilmez ve GitPoulpi'den çıkarken varsayılan imleç geri yüklenir.
-Diğer terminallerde imleç değişmez. İmlecin altındaki ayırıcı veya düğme her terminalde aydınlanır.
+üzerinde bir el. Log'un, Radar'ın ve commit sütununun bir sütun sınırının üzerinde de (sürüklerken de) bir yeniden boyutlandırma imleci vardır. Bu kitty, foot, Ghostty, mintty ve upstream PR #8092'li bir WezTerm derlemesinde çalışır (`OSC 22` dizisi). Yalnızca şekil değiştiğinde gönderilir, tmux içinde yalnızca geçiş (passthrough) için sarılarak (`allow-passthrough on`; kitty ve foot gösterir, Ghostty göstermez), screen, zellij veya herdr içinde asla gönderilmez. GitPoulpi'den çıkarken varsayılan imleç geri yüklenir. Diğer terminallerde (Rio, Alacritty, Tabby, iTerm2, Terminal.app, Windows Terminal, xterm) imleç değişmez; bkz. [Terminal seçmek](terminals.md#fare-işaretçisi-şekli-osc-22). İmlecin altındaki ayırıcı veya düğme her terminalde aydınlanır.
 
 Aynı türden bir bileşen uygulamanın her yerinde aynı imleci verir.
 
+- **Düğmeler gerçek düğmelerdir**: Ayarlar'da (Entegrasyonlar: Düzenle, Bağlantıyı kes, Kaldır, Gözat, Sil, yönergeler düzenleyicisinin parça düğmeleri...) ve iletişim kutularında: dolu bir arka plan üzerinde dolgulu etiketler, imleç üzerindeyken parlar, devre dışıyken soluklaşır, asla `[ ]` içinde metin değildir. Kalan tek köşeli parantezler `[x]` / `[ ]` onay kutusu işaretleridir; onlar birer onay kutusudur ve her denetim gibi eli alır.
 - **İşaret eden el** denetimlerin üzerindedir: düğmeler, onay kutuları ve anahtarlar, açılır listeler (Ayarlar'da, issue ve pull request panellerinde, Radar'da, iletişim kutularında), sekmeler ve çarpıları, `+` düğmeleri, bağlantılar ve referanslar (`#12`, `!45`), genişletme oklu grup ve klasör başlıkları, ref hapları, kaydırma çubukları ve durum çubuğunun Etkinlik, işler ve sürüm düğmeleri. Bir satırın içindeki onay kutusu ya da düğme eli korur.
 - **Ok** satırlardadır. Bir satır, imleç üzerindeyken bütün olarak aydınlanır (her listede aynı ışık) ve kendi başına bir denetim değildir: Refs, Worktree'ler, Stash'ler ve Alt modüller panellerinin satırları, Log ve commit sütunu (yalnızca bir ref hapı eli alır), bir diff'in satırları, değişen dosyalar, pull request, issue ve Radar öğeleri ile iletişim kutularındaki ve panellerdeki listelerin satırları (klonlama, klasör seçici, Çalışma alanları, panonun kartları, İşler paneli, atanan, etiket ve kilometre taşı seçicileri, rebase adımları, inceleme dosyaları ve commit'leri, menü ve açılır liste seçenekleri).
 - **Metin imleci (I-beam)** giriş kutularındadır, kutunun tamamı üzerinde: arama kutuları (genel arama, Ayarlar, komut paleti, Ana sayfa), filtreler (Refs, dosyalar, Radar, Etkinlik günlüğü, issue panelinin araması), Ayarlar'ın metin, sayı ve alan satırları (düzenlerken de), iletişim kutularının alanları, inceleme yorum kutuları, commit besteleyici, dosya düzenleyicinin metni ve merge düzenleyicinin düzenlenebilir sonucu (salt okunur panelleri oku korur). Commit ayrıntılarında mesaj ve açıklama düzenlenebilir olduğundan I-beam onlarda görünür ve bloğun tamamı hafifçe aydınlanır.
@@ -477,7 +479,7 @@ Yeniden boyutlandırma imleçleri ayırıcıların ve sütun sınırlarının ü
 
 ## Panoya kopyalama
 
-**Yolu kopyala** ve diğer bazı kopyalama eylemleri metni terminale gönderir;
-terminal de onu panoya koyar (OSC 52). Terminaliniz bunu desteklemiyorsa hiçbir
-şey kopyalanmaz. Seçili metin için kopyalama eylemleri sistem panosunu doğrudan
-kullanır.
+Kopyalama eylemleri metni GitPoulpi'nin çalıştığı makinenin sistem panosuna koyar ve terminalin desteklediği bilinen yerlerde ayrıca terminale de gönderir
+(OSC 52). SSH üzerinden veya ekran yokken yalnızca OSC 52 gönderilir: terminaliniz
+bunu desteklemiyorsa (iTerm2, pano izni açılana kadar; Terminal.app, GNU screen)
+hiçbir şey kopyalanmaz ve durum çubuğu metnin yalnızca terminale gönderildiğini söyler. Bkz. [Terminal seçmek](terminals.md#pano-kopyalama-eylemleri).

@@ -69,6 +69,8 @@ başvuru sayfalarına atlayın.
     "Çık ve cd yap" ve bash, zsh, fish ve PowerShell için `gitpoulpi shell-init`
     sarmalayıcısı (`gp`).
     GitPoulpi'yi en iyi hangi terminal gösterir: **[Terminal seçmek](terminals.md)**.
+    tmux, zellij, screen, herdr ve terminal panellerinden nelerin geçtiği:
+    **[Çoklayıcılar](multiplexers.md)**.
 
 Ayrıca: **[Dal iş akışları](branching-workflows.md)**, Git Flow, GitHub Flow, GitLab
 Flow ve Trunk-based hazır şablonları veya kendi temel dallarınız, dal adı desenleri

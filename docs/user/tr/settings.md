@@ -389,6 +389,7 @@ görünür; bkz. [MCP ve ajanlar](mcp-and-agents.md).
 | **Yazar avatarları** | **kapalı** (varsayılan, ağ yok), **grafik** (commit noktasında) ya da **yazar** (Yazar sütununda). Açıkken her yazar e-postasının bir özeti Gravatar'a ve barındırma sağlayıcınıza gönderilir. |
 | **Avatar kaynakları**, **Avatar yedeği** | Resimlerin nerede ve hangi sırayla aranacağı. Resmi olmayan yazarlar için: **identicon** (üretilmiş bir desen) ya da **baş harfler**. |
 | **Girdi rengi**, **Özel girdi rengi** | Metin alanlarının arka planı: **Temayı izle** (varsayılan), sabit bir koyu renk ya da kendi `#rrggbb` değeriniz. |
+| **Metin imleci** | `ui.text_cursor`: **terminal** (varsayılan) terminalin kendi imlecini odaktaki metin alanının düzenleme noktasına çubuk olarak koyar (terminalinizin imleç ayarları geçerli olur ve bir giriş yönteminin aday penceresi o noktada açılır); **drawn** GitPoulpi'nin kendi imlecini çizer ve terminal imlecini gizli tutar. Hemen uygulanır. Palet: `Ayarlar: Metin imleci...`. |
 | **Renk derinliği** | **auto** (varsayılan), **truecolor**, **256** ya da **16**. Bkz. [Temalar](themes.md). |
 | **Grafik renk teması** | **Temayı izle** (varsayılan: temanın kendi şerit renkleri) ya da herhangi bir şerit paleti. Her palet renklerinden birkaçını gösterir. Ayarlar kapandığında uygulanır. **Uygulama: Grafik Renk Temasını Değiştir...** palet komutu (`Ctrl+N Shift+Y`) her paleti canlı önizler. |
 | **Grafik şerit arka planı** | **Kapalı** (saydam) ya da **Satır tonu**: grafik sütununun arkasında şerit renginin soluk bir bandı ve kenarında ince bir çubuk. |

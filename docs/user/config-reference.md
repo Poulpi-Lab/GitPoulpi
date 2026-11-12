@@ -89,7 +89,7 @@ author_email = "jane@work.example"
 | Key | Default | Values and effect |
 |---|---|---|
 | `ui.graph_renderer` | `"auto"` | `auto` (a picture where the terminal can draw one, characters elsewhere), `image`, `text`. **Restart.** |
-| `ui.image_protocol` | `"auto"` | How pictures (graph, avatars) reach the terminal: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = Kitty protocol in kitty, Ghostty and a herdr with `kitty_graphics = true`; iTerm2 in WezTerm, iTerm2, Rio, mintty; sixel (avatars only) in Windows Terminal, foot, Konsole, mlterm; none in tmux, zellij, screen and unknown terminals. **Restart.** |
+| `ui.image_protocol` | `"auto"` | How pictures (graph, avatars) reach the terminal: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = Kitty protocol in kitty, Ghostty and a herdr with `kitty_graphics = true`; iTerm2 in WezTerm, iTerm2, Rio, mintty; sixel (the graph column and avatars) in Windows Terminal, foot, Konsole, mlterm; none in tmux, zellij, screen and unknown terminals. **Restart.** |
 | `ui.theme` | `"system"` | The color theme: a built-in slug (`gitpoulpi theme list` lists them all), the slug of a file in `<config>/themes/`, or `system` (follows the terminal's light or dark background, detected at start-up; the old value `default` means the same). `config set` rejects unknown names. See [Themes](themes.md). |
 | `ui.graph_color_theme` | `"theme"` | Lane palette: `theme` (follow the theme) or any lane palette name: `gitpoulpi`, `light`, `material`, `serie`, and the palettes of the other themes. |
 | `ui.graph_lane_background` | `"off"` | `off` or `row_tint` (a faint band of the lane color behind the graph, plus a bar at its edge). **App: Toggle Graph Row Tints** (`Ctrl+N Shift+T`) flips it; **App: Change Graph Color Theme...** (`Ctrl+N Shift+Y`) picks `ui.graph_color_theme`. |
@@ -143,6 +143,7 @@ emails to Gravatar, and asks your connected GitHub/GitLab account)
 | `ui.mermaid_orientation` | `lr` | Direction of that graph: `lr` (left to right) or `tb` (top to bottom). |
 | `ui.mermaid_fence` | `false` | Wrap the copied Mermaid script in a `mermaid` code fence. |
 | `ui.mermaid_subject_width` | `40` | Commit subjects are cut to this many characters in the Mermaid ids (`subjects`, `full`). |
+| `ui.text_cursor` | `"terminal"` | Where the caret of a focused text field is shown: `terminal` puts the terminal's own cursor there (a blinking bar, so the terminal's cursor settings and an input method's candidate window follow it; hidden when no field has the keyboard and restored to your own cursor style on exit), `drawn` paints GitPoulpi's own caret glyph and keeps the terminal cursor hidden. Live. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` or `16`: how many colors to draw with. `auto` is truecolor except on Apple Terminal (256), the Linux console (16) and `*-256color` terminals without `COLORTERM` (256). Live. See [Themes](themes.md). |
 | `ui.input_color` | `"theme"` | Text-field background: `theme` (the theme's own), `gray`, `blue`, `slate`, `dark`, `custom`. |
 | `ui.input_color_custom` | `"#2a2a2a"` | The `custom` color, `#rrggbb`. |

@@ -814,7 +814,13 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         }
         // The Radar, when it shows over the list, owns every key.
         if manager.radar.is_open() {
-            let outcome = manager.radar.on_key(key);
+            // The window's refresh key (F5 by default, rebindable) reloads
+            // every Radar source, like `r` and the palette's Radar: Refresh.
+            let outcome = if km.is(Bind::GlobalRefreshAll, &key) {
+                manager.radar.command(crate::radar::RadarCommand::Refresh)
+            } else {
+                manager.radar.on_key(key)
+            };
             commands::apply_radar_outcome(cx, outcome);
             return Ok(Flow::Handled);
         }

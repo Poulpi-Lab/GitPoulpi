@@ -116,7 +116,119 @@ fn a_click_toggles_the_checkbox_it_hits() {
 }
 
 #[test]
-fn namespaces_are_typed_comma_separated_and_saved_as_a_list() {
+fn namespaces_are_typed_one_per_line_and_saved_as_a_list() {
+    let mut h = H::new();
+    let mut page = radar_page(&mut h, IntegrationKind::GitlabSelfManaged).unwrap();
+    page.focus_radar(&h.config);
+    for _ in 0..4 {
+        key(&mut page, &mut h, KeyCode::Down);
+    }
+    assert_eq!(page.current_item(&h.config), Some(Item::RadarNamespaces));
+    type_str(&mut page, &mut h, "ptm");
+    key(&mut page, &mut h, KeyCode::Enter);
+    type_str(&mut page, &mut h, "formation/docs");
+    assert_eq!(
+        saved(&h).integrations[0].radar_options().namespaces,
+        vec!["ptm".to_string(), "formation/docs".to_string()]
+    );
+    // Both lines are on screen, one per row.
+    let screen = text(&draw(&mut page, &h, 100, 60, None));
+    assert!(screen.contains("ptm"), "{screen}");
+    assert!(screen.contains("formation/docs"), "{screen}");
+    // Up on the second line moves inside the area; on the first it leaves it.
+    key(&mut page, &mut h, KeyCode::Up);
+    assert_eq!(page.current_item(&h.config), Some(Item::RadarNamespaces));
+    key(&mut page, &mut h, KeyCode::Up);
+    assert_eq!(page.current_item(&h.config), Some(Item::RadarIssues));
+}
+
+#[test]
+fn the_regular_expressions_checkbox_saves_and_an_invalid_line_is_shown_not_saved() {
+    let mut h = H::new();
+    let mut page = radar_page(&mut h, IntegrationKind::GitlabSelfManaged).unwrap();
+    page.focus_radar(&h.config);
+    for _ in 0..4 {
+        key(&mut page, &mut h, KeyCode::Down);
+    }
+    type_str(&mut page, &mut h, "^ptm/");
+    key(&mut page, &mut h, KeyCode::Tab);
+    assert_eq!(page.current_item(&h.config), Some(Item::RadarRegex));
+    key(&mut page, &mut h, KeyCode::Char(' '));
+    let radar = saved(&h).integrations[0].radar_options();
+    assert!(radar.namespaces_regex);
+    assert_eq!(radar.namespaces, vec!["^ptm/".to_string()]);
+    let screen = text(&draw(&mut page, &h, 100, 60, None));
+    assert!(screen.contains("[x] Regular expressions"), "{screen}");
+
+    // Back into the area: an unclosed group is reported and not saved.
+    key(&mut page, &mut h, KeyCode::BackTab);
+    assert_eq!(page.current_item(&h.config), Some(Item::RadarNamespaces));
+    type_str(&mut page, &mut h, "(oops");
+    let screen = text(&draw(&mut page, &h, 100, 60, None));
+    assert!(
+        screen.contains("Invalid expression: ^ptm/(oops"),
+        "{screen}"
+    );
+    assert_eq!(
+        saved(&h).integrations[0].radar_options().namespaces,
+        vec!["^ptm/".to_string()],
+        "the last good list stays"
+    );
+    // Fixing it saves again.
+    type_str(&mut page, &mut h, ")");
+    assert_eq!(
+        saved(&h).integrations[0].radar_options().namespaces,
+        vec!["^ptm/(oops)".to_string()]
+    );
+}
+
+#[test]
+fn turning_regular_expressions_on_over_an_invalid_line_is_refused() {
+    let mut h = H::new();
+    let mut page = radar_page(&mut h, IntegrationKind::GitlabSelfManaged).unwrap();
+    page.focus_radar(&h.config);
+    for _ in 0..4 {
+        key(&mut page, &mut h, KeyCode::Down);
+    }
+    type_str(&mut page, &mut h, "a(b");
+    key(&mut page, &mut h, KeyCode::Tab);
+    key(&mut page, &mut h, KeyCode::Char(' '));
+    assert!(!saved(&h).integrations[0].radar_options().namespaces_regex);
+}
+
+#[test]
+fn an_old_comma_line_in_the_file_shows_as_lines_and_saves_as_a_list() {
+    let mut h = H::new();
+    let mut page = radar_page(&mut h, IntegrationKind::GitlabSelfManaged).unwrap();
+    h.config.integrations[0].radar = Some(gitpoulpi_config::IntegrationRadar {
+        namespaces: gitpoulpi_config::parse_namespace_text("ptm, formation", false),
+        ..Default::default()
+    });
+    let screen = text(&draw(&mut page, &h, 100, 60, None));
+    let rows: Vec<&str> = screen.lines().collect();
+    let at = |needle: &str| rows.iter().position(|l| l.contains(needle));
+    assert!(at("ptm").is_some() && at("formation").is_some(), "{screen}");
+    assert_ne!(at("ptm"), at("formation"), "one entry per row:\n{screen}");
+}
+
+#[test]
+fn the_namespaces_area_has_a_scrollbar_when_the_lines_overflow() {
+    let mut h = H::new();
+    let mut page = radar_page(&mut h, IntegrationKind::GitlabSelfManaged).unwrap();
+    h.config.integrations[0].radar = Some(gitpoulpi_config::IntegrationRadar {
+        namespaces: (1..=9).map(|n| format!("group{n}")).collect(),
+        ..Default::default()
+    });
+    let screen = text(&draw(&mut page, &h, 100, 60, None));
+    assert!(screen.contains('\u{2588}'), "a thumb:\n{screen}");
+    assert!(
+        screen.contains("group1") && !screen.contains("group9"),
+        "{screen}"
+    );
+}
+
+#[test]
+fn namespaces_typed_comma_separated_still_save_as_a_list() {
     let mut h = H::new();
     let mut page = radar_page(&mut h, IntegrationKind::GitlabSelfManaged).unwrap();
     page.focus_radar(&h.config);
@@ -140,7 +252,7 @@ fn the_combobox_picks_what_to_do_with_an_uncloned_request() {
     let mut h = H::new();
     let mut page = radar_page(&mut h, IntegrationKind::GitlabSelfManaged).unwrap();
     page.focus_radar(&h.config);
-    for _ in 0..5 {
+    for _ in 0..6 {
         key(&mut page, &mut h, KeyCode::Down);
     }
     assert_eq!(page.current_item(&h.config), Some(Item::RadarMode));
@@ -204,5 +316,5 @@ fn the_card_shows_the_saved_namespaces() {
         ..Default::default()
     });
     let screen = text(&draw(&mut page, &h, 100, 60, None));
-    assert!(screen.contains("one, two"), "{screen}");
+    assert!(screen.contains("one") && screen.contains("two"), "{screen}");
 }

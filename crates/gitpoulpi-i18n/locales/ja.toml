@@ -8724,6 +8724,14 @@ assigned_issues = "自分に割り当てられた課題"
 namespaces = "名前空間"
 # context: hint in the empty namespaces field
 namespaces_hint = "例: acme, platform（空: 自分と所属するすべて）"
+# context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
+namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+# context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
+namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+# context: checkbox under the Namespaces field: read each line as a regular expression
+regex = "Regular expressions"
+# context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
+regex_invalid = "Invalid expression: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "クローンしていないリポジトリのリクエスト"
 # context: choice: ask each time

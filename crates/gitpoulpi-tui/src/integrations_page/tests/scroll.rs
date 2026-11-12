@@ -79,7 +79,7 @@ fn tabbing_down_to_the_combobox_brings_it_into_view() {
         "the combobox starts below the fold"
     );
     page.focus_radar(&h.config);
-    for _ in 0..5 {
+    for _ in 0..6 {
         key(&mut page, &mut h, KeyCode::Tab);
         draw(&mut page, &h, 100, SHORT, None);
         let current = page.current_item(&h.config).unwrap();
@@ -93,7 +93,7 @@ fn tabbing_down_to_the_combobox_brings_it_into_view() {
         "{screen}"
     );
     // Back up: shift+tab follows too.
-    for _ in 0..5 {
+    for _ in 0..6 {
         key(&mut page, &mut h, KeyCode::BackTab);
         draw(&mut page, &h, 100, SHORT, None);
         let current = page.current_item(&h.config).unwrap();
@@ -221,7 +221,7 @@ fn the_popup_opens_next_to_its_field_when_scrolled_and_takes_hover_and_wheel() {
     let mut h = H::new();
     let mut page = page(&mut h);
     page.focus_radar(&h.config);
-    for _ in 0..5 {
+    for _ in 0..6 {
         key(&mut page, &mut h, KeyCode::Tab);
         draw(&mut page, &h, 100, SHORT, None);
     }

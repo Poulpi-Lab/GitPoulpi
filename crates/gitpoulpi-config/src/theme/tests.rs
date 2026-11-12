@@ -350,7 +350,7 @@ fn fire_light_focuses_text_boxes_in_pale_yellow() {
     }) {
         let (r, g, b) = rgb(&other, |t| t.ui.input_focus);
         assert!(
-            !(r >= 0xf0 && g >= 0xe0 && b <= 0xc8 && b >= 0x80 && r > b + 40),
+            !(r >= 0xf0 && g >= 0xe0 && (0x80..=0xc8).contains(&b) && r > b + 40),
             "{}",
             other.slug
         );

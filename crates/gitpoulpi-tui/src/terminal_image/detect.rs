@@ -374,7 +374,7 @@ where
         return Protocol::Kitty;
     }
     if looks_like_iterm2_terminal(get) {
-        Protocol::Iterm2
+        iterm2_for(get)
     } else if sixel_only_terminal(get) {
         Protocol::Sixel
     } else {
@@ -413,7 +413,11 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
 ///   terminal's own background), and its `imgcat` page documents the
 ///   protocol. Confirmed here by a real WezTerm window capture
 ///   (`docs/developer/visual-verification.md`).
-/// - **iTerm2 itself, Rio, mintty, Bobcat: unverified.** mintty's wiki
+/// - **Rio (0.5.28, Linux): blends.** A transparent PNG sent as `OSC 1337`
+///   over a bright field shows the field through the transparent corners
+///   (raw-sequence probe in a real window, November 2026). Only Linux was
+///   looked at; Windows keeps the opaque backdrop until it is.
+/// - **iTerm2 itself, mintty, Bobcat: unverified.** mintty's wiki
 ///   documents the `File=` image controls without any word on alpha
 ///   (only its OSC 11 background images are said to honour it), and this
 ///   project has not seen the others on a real window, so they keep the
@@ -430,9 +434,18 @@ pub(super) fn iterm2_for<F: Fn(&str) -> Option<String>>(get: &F) -> Protocol {
 }
 
 /// Whether the terminal named by the environment composites inline PNG
-/// alpha over the cell background. Only WezTerm, by verification.
+/// alpha over the cell background. WezTerm, and Rio off Windows, by
+/// verification.
 pub(super) fn blends_png_alpha<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
-    looks_like_wezterm(get) && !inside_a_multiplexer(get) && !inside_herdr(get)
+    (looks_like_wezterm(get) || looks_like_rio(get))
+        && !inside_a_multiplexer(get)
+        && !inside_herdr(get)
+}
+
+/// Rio sets `TERM_PROGRAM=rio` (and `TERM=rio` when its terminfo is
+/// installed). Only where its alpha blending was seen: not on Windows.
+pub(super) fn looks_like_rio<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
+    !cfg!(windows) && get("TERM_PROGRAM").is_some_and(|v| v.eq_ignore_ascii_case("rio"))
 }
 
 pub(super) fn looks_like_iterm2_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> bool {

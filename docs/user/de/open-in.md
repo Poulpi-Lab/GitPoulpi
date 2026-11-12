@@ -183,6 +183,16 @@ Eine Binärdatei (ein PDF, ein Word-Dokument, eine Tabelle, ein Archiv ...) hat 
 
 Die Datei des Arbeitsverzeichnisses wird der Anwendung unverändert übergeben. Die Version eines Commits (oder des Index) wird in eine **schreibgeschützte temporäre Kopie** geschrieben, mit einem Hinweis in der Statuszeile, damit eine Anwendung das Repository nicht ändern kann. Beides ändert das Repository nicht: kein Journal-Eintrag, Rückgängig bleibt unberührt.
 
+Die Liste des Menüs öffnet sich neben dem Menü, auf einer Höhe mit der Zeile **Öffnen mit...**, wie ein Untermenü (links, wenn rechts kein Platz ist), mit der Maus wie mit der Tastatur. Die Liste der Bildeditoren (**Bearbeiten in...**), aus einem Dateimenü geöffnet, verhält sich ebenso.
+
+### Git-LFS-Dateien
+
+Die Git-LFS-Objektkarte (siehe [Git LFS](lfs.md)) trägt unter ihrem Text dieselben zwei Aktionen: **Im Standardprogramm öffnen** und **Öffnen in**, mit denselben Tasten (`o`, `Shift+O`) und Palettenzeilen. Sie öffnen die echte Datei, nie den Zeiger: die Datei des Arbeitsverzeichnisses unverändert, oder eine schreibgeschützte temporäre Kopie des Objekts aus dem lokalen LFS-Speicher für die Version eines Commits oder des Index. Ein Objekt, das noch nicht heruntergeladen ist, hat keine Schaltflächen auf der Karte, und die Statuszeile sagt, dass der Inhalt noch nicht heruntergeladen ist. Dieselbe Ablehnung gilt für eine Datei des Arbeitsverzeichnisses, die nur den Zeiger enthält: **Im Standardprogramm öffnen**, **Öffnen in** und **Bearbeiten in**, von der Karte oder aus jedem Dateimenü, sagen, dass der Inhalt nicht heruntergeladen ist, statt den Zeigertext zu öffnen (laden Sie ihn mit den Zeilen Pull oder Checkout der LFS-Werkzeugleiste herunter und versuchen Sie es dann erneut). Das Öffnen ist schreibgeschützt: kein Journal-Eintrag, nichts rückgängig zu machen.
+
+### Browser unter Windows
+
+Chrome und Edge registrieren `--single-argument %1`, wodurch sie alles nach dem Schalter als eine einzige Adresse lesen, Anführungszeichen eingeschlossen. GitPoulpi übergibt den Pfad an ein solches Programm wörtlich und ohne Anführungszeichen, wie es Windows tut, sodass eine Datei mit Leerzeichen im Pfad geöffnet wird, statt mit `http://"c/...` zu scheitern. Jedes andere Programm erhält den Pfad als ein gewöhnliches Argument.
+
 ## Alte Schlüssel
 
 Die alten Schlüssel `ui.terminal_launch` und `ui.terminal_launch_command` werden

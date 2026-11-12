@@ -6,8 +6,6 @@
 //! the whole state it expects (a terminal has no frame boundaries) and every
 //! gesture that can land early is retried from the geometry it finds afresh.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::Duration;
@@ -223,7 +221,11 @@ fn resizing_the_settings_editor_grows_its_text_area() {
     }
     let count = |s: &Screen| s.text().lines().filter(|l| l.contains("row")).count();
     // From the top: the area shows as many rows of the text as it is tall.
-    term.send_keys(&"Up ".repeat(75)).unwrap();
+    // One write per key: a ConPTY can split a long run of arrow sequences
+    // and the lone Escape that results opens the discard question.
+    for _ in 0..75 {
+        term.send_keys("Up").unwrap();
+    }
     wait(&mut term, "the first rows of the text shown", |s| {
         s.contains("row00") && s.contains("row05") && count(s) > 5
     });

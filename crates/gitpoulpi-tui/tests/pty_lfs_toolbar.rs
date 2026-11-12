@@ -1,5 +1,5 @@
 //! The toolbar's `LFS ▾` button and the pull/push LFS pre-flight, end to
-//! end through a pty (unix only: the fake program is a shell script).
+//! end through a pty (the fake program is a shell script, which Git for Windows runs too).
 //!
 //! These tests need no real `git-lfs`: a stand-in `git-lfs` script on the
 //! `PATH` answers `version`, writes what `git lfs install --local` writes
@@ -8,11 +8,9 @@
 //! git-lfs*, which is the part that is GitPoulpi's.
 //!
 //! No hard-coded coordinates: every position is found on the screen.
-#![cfg(unix)]
 
 mod common;
 
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
@@ -20,24 +18,6 @@ use gitpoulpi_testkit::{FixtureRepo, FixtureRepoBuilder};
 use xtask::pty::Terminal;
 
 const STEP: Duration = Duration::from_secs(60);
-
-const SCRIPT: &str = r#"#!/bin/sh
-echo "$@" >> "$FAKE_LFS_LOG"
-case "$1" in
-  version) echo "git-lfs/3.5.1 (GitHub; linux amd64; go 1.21.0)" ;;
-  install)
-    git config --local filter.lfs.clean "git-lfs clean -- %f"
-    git config --local filter.lfs.smudge "git-lfs smudge -- %f"
-    git config --local filter.lfs.process "git-lfs filter-process"
-    git config --local filter.lfs.required true
-    hooks="$(git rev-parse --git-path hooks)"
-    mkdir -p "$hooks"
-    printf '#!/bin/sh\n# stand-in for the git lfs pre-push hook\nexit 0\n' > "$hooks/pre-push"
-    chmod +x "$hooks/pre-push"
-    ;;
-esac
-exit 0
-"#;
 
 /// The stand-in program: its directory (put first on `PATH`) and its log.
 struct FakeLfs {
@@ -49,9 +29,7 @@ struct FakeLfs {
 impl FakeLfs {
     fn new() -> Self {
         let dir = tempfile::tempdir().unwrap();
-        let script = dir.path().join("git-lfs");
-        std::fs::write(&script, SCRIPT).unwrap();
-        std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o755)).unwrap();
+        common::fake_git_lfs(dir.path());
         let log = dir.path().join("calls.log");
         std::fs::write(&log, "").unwrap();
         Self {
@@ -62,8 +40,7 @@ impl FakeLfs {
     }
 
     fn calls(&self) -> Vec<String> {
-        std::fs::read_to_string(&self.log)
-            .unwrap_or_default()
+        common::read_log(&self.log)
             .lines()
             .map(str::to_string)
             .collect()
@@ -132,11 +109,7 @@ fn launch(
     fake: &FakeLfs,
     config: &str,
 ) -> (Terminal, tempfile::TempDir) {
-    let path = format!(
-        "{}:{}",
-        fake.bin.display(),
-        std::env::var("PATH").unwrap_or_default()
-    );
+    let path = common::path_with_first(&fake.bin);
     common::launch(repo)
         .session(session)
         .config(config)
@@ -203,6 +176,10 @@ fn click_row(term: &mut Terminal, label: &str) {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
+#[cfg_attr(
+    windows,
+    ignore = "the fake git-lfs on PATH never runs: Git for Windows puts its own mingw64\\bin, with the real git-lfs.exe, ahead of PATH"
+)]
 #[test]
 fn the_dropdown_runs_each_of_its_five_rows_by_mouse() {
     let repo = lfs_repo();
@@ -247,6 +224,10 @@ fn the_dropdown_runs_each_of_its_five_rows_by_mouse() {
 
 /// Keyboard: `Ctrl+G l` opens the dropdown, the arrows move and Enter
 /// picks; Esc closes it without running anything.
+#[cfg_attr(
+    windows,
+    ignore = "the fake git-lfs on PATH never runs: Git for Windows puts its own mingw64\\bin, with the real git-lfs.exe, ahead of PATH"
+)]
 #[test]
 fn the_dropdown_opens_and_picks_from_the_keyboard() {
     let repo = lfs_repo();
@@ -284,6 +265,10 @@ fn the_dropdown_opens_and_picks_from_the_keyboard() {
 
 /// Palette: `LFS: Open Menu` opens the dropdown, and the two commands that
 /// have no older twin run on their own.
+#[cfg_attr(
+    windows,
+    ignore = "the fake git-lfs on PATH never runs: Git for Windows puts its own mingw64\\bin, with the real git-lfs.exe, ahead of PATH"
+)]
 #[test]
 fn the_palette_reaches_the_menu_and_the_new_commands() {
     let repo = lfs_repo();
@@ -328,6 +313,10 @@ fn the_palette_reaches_the_menu_and_the_new_commands() {
 }
 
 /// Hover: the button lights up under the pointer and shows its tooltip.
+#[cfg_attr(
+    windows,
+    ignore = "the fake git-lfs on PATH never runs: Git for Windows puts its own mingw64\\bin, with the real git-lfs.exe, ahead of PATH"
+)]
 #[test]
 fn the_button_highlights_and_explains_itself_on_hover() {
     let repo = lfs_repo();
@@ -355,6 +344,10 @@ fn the_button_highlights_and_explains_itself_on_hover() {
 }
 
 /// With Git LFS turned off the button is not on the toolbar at all.
+#[cfg_attr(
+    windows,
+    ignore = "the fake git-lfs on PATH never runs: Git for Windows puts its own mingw64\\bin, with the real git-lfs.exe, ahead of PATH"
+)]
 #[test]
 fn the_button_is_absent_when_lfs_is_turned_off() {
     let repo = lfs_repo();
@@ -381,6 +374,10 @@ fn the_button_is_absent_when_lfs_is_turned_off() {
 /// Push pre-flight: a repository that uses LFS but has no `pre-push` hook
 /// gets one (`git lfs install --local`) before the push, and the status
 /// line says so. Without the hook the push would upload no LFS objects.
+#[cfg_attr(
+    windows,
+    ignore = "the fake git-lfs on PATH never runs: Git for Windows puts its own mingw64\\bin, with the real git-lfs.exe, ahead of PATH"
+)]
 #[test]
 fn a_push_installs_the_missing_lfs_hook_first_and_says_so() {
     let repo = lfs_repo();
@@ -414,6 +411,10 @@ fn a_push_installs_the_missing_lfs_hook_first_and_says_so() {
 }
 
 /// Pull pre-flight: missing smudge filter, same repair before the pull.
+#[cfg_attr(
+    windows,
+    ignore = "the fake git-lfs on PATH never runs: Git for Windows puts its own mingw64\\bin, with the real git-lfs.exe, ahead of PATH"
+)]
 #[test]
 fn a_pull_installs_the_missing_lfs_filters_first() {
     let repo = lfs_repo();
@@ -438,6 +439,10 @@ fn a_pull_installs_the_missing_lfs_filters_first() {
 
 /// `git.lfs_autofix_filters = false` turns the pre-flight off: the push
 /// goes through exactly as before and nothing is installed.
+#[cfg_attr(
+    windows,
+    ignore = "the fake git-lfs on PATH never runs: Git for Windows puts its own mingw64\\bin, with the real git-lfs.exe, ahead of PATH"
+)]
 #[test]
 fn the_preflight_can_be_turned_off() {
     let repo = lfs_repo();

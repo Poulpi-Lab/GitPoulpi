@@ -3,7 +3,6 @@
 //! hands its own), and a click on the bottom arrow scrolls the page instead
 //! of reaching the status bar's Activity button underneath (which opened the
 //! Activity Log).
-#![cfg(unix)]
 
 mod common;
 

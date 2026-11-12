@@ -2,7 +2,6 @@
 //! app's text editor: a click places the caret, a drag selects, a double-click
 //! selects a word, Shift+click extends - and the keyboard then edits the
 //! selection. No hard-coded coordinates: positions are found on the screen.
-#![cfg(unix)]
 
 mod common;
 

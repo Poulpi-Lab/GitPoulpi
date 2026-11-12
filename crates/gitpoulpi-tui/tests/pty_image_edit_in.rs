@@ -11,11 +11,8 @@
 //! * the palette: "Image: Edit in default" runs the default, "Image: Edit
 //!   in..." opens the list, "Configure..." opens Settings.
 
-#![cfg(unix)]
-
 mod common;
 
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
@@ -34,44 +31,30 @@ fn png(color: [u8; 4]) -> Vec<u8> {
 
 struct Work {
     dir: tempfile::TempDir,
+    ok: std::path::PathBuf,
+    fail: std::path::PathBuf,
 }
 
 impl Work {
     fn new() -> Self {
         let dir = tempfile::tempdir().unwrap();
-        let script = |name: &str, body: &str| {
-            let path = dir.path().join(name);
-            std::fs::write(&path, body).unwrap();
-            std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
-        };
-        script(
-            "ok.sh",
-            &format!(
-                "#!/bin/sh\necho \"$@\" >> '{}'\n",
-                dir.path().join("launches.log").display()
-            ),
-        );
-        script(
-            "fail.sh",
-            "#!/bin/sh\necho boom-from-the-editor >&2\nexit 2\n",
-        );
-        Self { dir }
+        let ok = common::fake_recorder(dir.path(), "ok", &dir.path().join("launches.log"));
+        let fail = common::fake_failing(dir.path(), "fail", "boom-from-the-editor", 2);
+        Self { dir, ok, fail }
     }
 
     fn config(&self) -> String {
-        let ok = self.dir.path().join("ok.sh");
-        let fail = self.dir.path().join("fail.sh");
         format!(
             "[ui]\ngraph_renderer = \"text\"\nimage_editor_default = \"Fake editor\"\n\
              [[ui.image_editors]]\nlabel = \"Fake editor\"\ncommand = \"{} --edit ${{file}}\"\n\
              [[ui.image_editors]]\nlabel = \"Failing editor\"\ncommand = \"{} ${{file}}\"\n",
-            ok.display(),
-            fail.display()
+            common::toml_path(&self.ok),
+            common::toml_path(&self.fail)
         )
     }
 
     fn launches(&self) -> String {
-        std::fs::read_to_string(self.dir.path().join("launches.log")).unwrap_or_default()
+        common::read_log(&self.dir.path().join("launches.log"))
     }
 
     /// Waits for the log to hold a line, and returns the file the editor got.
@@ -83,7 +66,12 @@ impl Work {
         }
         let log = self.launches();
         let line = log.lines().next().unwrap();
-        PathBuf::from(line.strip_prefix("--edit ").unwrap_or(line).trim())
+        PathBuf::from(
+            line.strip_prefix("--edit ")
+                .unwrap_or(line)
+                .trim()
+                .trim_matches('"'),
+        )
     }
 }
 

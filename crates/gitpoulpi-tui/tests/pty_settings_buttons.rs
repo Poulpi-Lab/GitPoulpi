@@ -2,8 +2,6 @@
 //! button runs by a click and by Enter, and a destructive button asks first
 //! (Cancel changes nothing). HOME and the config dir are scratch directories.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::Duration;
@@ -31,9 +29,7 @@ fn open_settings(page: &str, session: &str) -> (Terminal, tempfile::TempDir, tem
         .session(session)
         .config_dir(config.path())
         .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
-        .env("HOME", home.path())
-        .env("XDG_DATA_HOME", home.path().join("data"))
-        .env("XDG_CONFIG_HOME", home.path().join("config"))
+        .scratch_home(home.path())
         .size(200, 70)
         .no_exit_pause()
         .ready(MESSAGE)
@@ -82,7 +78,7 @@ fn settled_create(term: &Terminal) -> (u16, u16) {
 fn clicking_the_alias_create_button_creates_it() {
     let (mut term, _config, home) = open_settings("Launcher", "settings-buttons-click");
     scroll_to(&mut term, "Create: command alias");
-    let link = home.path().join(".local/bin/gp");
+    let link = common::alias_file(home.path(), "gp");
     // A click that raced a late scroll hits nothing, so press again, located
     // afresh, until the link exists (it is only pressed again while absent).
     let deadline = std::time::Instant::now() + xtask::pty::scaled(STEP);
@@ -107,7 +103,7 @@ fn clicking_the_alias_create_button_creates_it() {
 fn enter_on_the_selected_alias_create_row_presses_its_button() {
     let (mut term, _config, home) = open_settings("Launcher", "settings-buttons-enter");
     scroll_to(&mut term, "Create: command alias");
-    let link = home.path().join(".local/bin/gp");
+    let link = common::alias_file(home.path(), "gp");
     // A click left of the button (the empty label column) only selects the
     // row, then Enter presses the button. A click lost to a torn frame
     // selects nothing and Enter then does nothing: try again, located afresh.

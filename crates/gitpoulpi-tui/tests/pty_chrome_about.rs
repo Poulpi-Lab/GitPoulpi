@@ -5,8 +5,6 @@
 //! Temp config dir and fixture repo only: the identity is written into the
 //! fixture's own `.git/config`.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::Duration;

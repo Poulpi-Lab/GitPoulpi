@@ -11,7 +11,6 @@ pub mod script_fixture;
 pub mod signing;
 mod slow_remote;
 pub mod spawn_budget;
-#[cfg(unix)]
 mod stub_ssh;
 pub mod terminal_agent;
 mod test_builder;
@@ -22,7 +21,6 @@ pub use fixture::{allow_file_submodules, png_bytes, FixtureRepo, FixtureRepoBuil
 pub use isolate::isolate_process_env;
 pub use slow_remote::SlowRemote;
 pub use spawn_budget::SpawnBudget;
-#[cfg(unix)]
 pub use stub_ssh::StubSsh;
 pub use test_builder::TestRepoBuilder;
 

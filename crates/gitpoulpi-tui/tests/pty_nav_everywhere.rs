@@ -5,8 +5,6 @@
 //! "down", and `Alt+G` arranges whatever dialog is in front. Every wait
 //! describes the whole state it expects (a terminal has no frame boundaries).
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::Duration;

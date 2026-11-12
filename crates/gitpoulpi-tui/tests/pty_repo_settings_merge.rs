@@ -5,7 +5,6 @@
 //! the setting the same menu row makes the merge commit.
 //!
 //! No hard-coded coordinates: every position is found on the screen.
-#![cfg(unix)]
 
 mod common;
 

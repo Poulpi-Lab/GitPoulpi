@@ -3,8 +3,6 @@
 //! it behind the confirmation; `config.toml` follows every step. Temp config dir only; the
 //! entries are never run.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::path::Path;

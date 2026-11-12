@@ -5,8 +5,6 @@
 //!
 //! Real binary through a pty; temp config dirs and fixture repositories only.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::path::{Path, PathBuf};
@@ -89,7 +87,14 @@ fn a_leftover_port_file_of_a_dead_process_is_replaced() {
     let file = port_file(config.path(), session);
     std::fs::create_dir_all(file.parent().unwrap()).unwrap();
 
-    let mut child = std::process::Command::new("true").spawn().unwrap();
+    let mut child = if cfg!(windows) {
+        std::process::Command::new("cmd")
+            .args(["/C", "exit 0"])
+            .spawn()
+            .unwrap()
+    } else {
+        std::process::Command::new("true").spawn().unwrap()
+    };
     let dead = child.id();
     child.wait().unwrap();
     std::fs::write(&file, "1").unwrap();

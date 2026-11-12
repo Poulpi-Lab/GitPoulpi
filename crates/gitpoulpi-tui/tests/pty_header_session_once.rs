@@ -3,8 +3,6 @@
 //! path and the "Open in" menu are separated by " - ", and the menu's click
 //! area follows the paint. Temp config dir and fixture repos only.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::Duration;

@@ -10,11 +10,10 @@
 //!
 //! The program is called `ssh` on purpose: git recognises the *variant* by
 //! the command's base name, and an unknown name makes it probe with `-G`.
-//! Unix only: it is a `sh` script (the precedent is
-//! `gitpoulpi-cli-backend`'s `ssh_key` test).
-#![cfg(unix)]
+//! It is a `sh` script (the precedent is `gitpoulpi-cli-backend`'s `ssh_key`
+//! test); on Windows git runs `core.sshCommand` through Git for Windows' `sh`,
+//! which starts it.
 
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
 use gitpoulpi_core::repo_config::sh_quote_path;
@@ -75,7 +74,11 @@ exec sh -c "$last"
              rmdir {lock_q}\n{body}"
         );
         std::fs::write(&program, script).expect("write the stub ssh");
-        std::fs::set_permissions(&program, std::fs::Permissions::from_mode(0o755)).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&program, std::fs::Permissions::from_mode(0o755)).unwrap();
+        }
         Self {
             _dir: dir,
             program,
@@ -100,7 +103,9 @@ exec sh -c "$last"
 
     /// A URL that reaches the repository at `path` through this stub.
     pub fn url_for(path: &Path) -> String {
-        format!("ssh://git@stub.invalid{}", path.display())
+        let path = path.display().to_string().replace('\\', "/");
+        let slash = if path.starts_with('/') { "" } else { "/" };
+        format!("ssh://git@stub.invalid{slash}{path}")
     }
 
     /// Every invocation so far, each as its argument list.
@@ -142,6 +147,7 @@ mod tests {
 
     /// Many invocations at once, each with its own arguments: every logged
     /// call is exactly one invocation's argument list, none torn or mixed.
+    #[cfg(unix)] // runs the script itself; on Windows only git's `sh` can start it
     #[test]
     fn concurrent_invocations_are_logged_intact() {
         let stub = StubSsh::new();

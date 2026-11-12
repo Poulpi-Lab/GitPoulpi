@@ -167,6 +167,21 @@ impl Launch {
         self
     }
 
+    /// Points the user-level folders the app writes shortcuts, aliases and
+    /// launchers into at `home`, through the variables each OS reads: unix
+    /// `HOME` and `XDG_*`, Windows `USERPROFILE`, `APPDATA` and `LOCALAPPDATA`.
+    pub fn scratch_home(self, home: &Path) -> Self {
+        if cfg!(windows) {
+            self.env("USERPROFILE", home)
+                .env("APPDATA", home.join("appdata"))
+                .env("LOCALAPPDATA", home.join("localappdata"))
+        } else {
+            self.env("HOME", home)
+                .env("XDG_DATA_HOME", home.join("data"))
+                .env("XDG_CONFIG_HOME", home.join("config"))
+        }
+    }
+
     /// Leaves `GITPOULPI_TERMINAL_IMAGE` unset, for tests of the image graph.
     pub fn terminal_image(mut self) -> Self {
         self.terminal_image = true;
@@ -339,6 +354,236 @@ impl Launch {
                 .unwrap_or_else(|e| panic!("{e}"));
         }
         term
+    }
+}
+
+/// Where the command alias `name` lands under [`Launch::scratch_home`]: a
+/// symlink in `~/.local/bin` on unix, `<name>.cmd` in
+/// `%LOCALAPPDATA%\Programs\GitPoulpi\bin` on Windows.
+pub fn alias_file(home: &Path, name: &str) -> PathBuf {
+    if cfg!(windows) {
+        home.join(format!("localappdata/Programs/GitPoulpi/bin/{name}.cmd"))
+    } else {
+        home.join(".local/bin").join(name)
+    }
+}
+
+/// A fake program `name` in `dir`: an executable `/bin/sh` script running
+/// `unix_body` on unix, `name.cmd` running `windows_body` (a batch file) on
+/// Windows. Returns the path to run (the `.cmd` one on Windows).
+pub fn fake_program(dir: &Path, name: &str, unix_body: &str, windows_body: &str) -> PathBuf {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let path = dir.join(name);
+        std::fs::write(&path, format!("#!/bin/sh\n{unix_body}\n")).expect("write the fake");
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755))
+            .expect("make the fake executable");
+        let _ = windows_body;
+        path
+    }
+    #[cfg(windows)]
+    {
+        let path = dir.join(format!("{name}.cmd"));
+        std::fs::write(&path, format!("@echo off\r\n{windows_body}\r\n")).expect("write the fake");
+        let _ = unix_body;
+        path
+    }
+}
+
+/// Writes `content` (a `#!/bin/sh` script) to `path`, executable on unix.
+/// For programs only `git` runs (a `git-<name>` command, a hook): Git for
+/// Windows starts a script through its own `sh`, so one file serves both OSes.
+pub fn write_sh_script(path: &Path, content: &str) {
+    std::fs::write(path, content).expect("write the script");
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755))
+            .expect("make the script executable");
+    }
+}
+
+/// `dir` in front of the current `PATH`, joined with the OS separator.
+pub fn path_with_first(dir: &Path) -> OsString {
+    let mut dirs = vec![dir.to_path_buf()];
+    dirs.extend(std::env::split_paths(
+        &std::env::var_os("PATH").unwrap_or_default(),
+    ));
+    std::env::join_paths(dirs).expect("a PATH without a separator inside an entry")
+}
+
+/// `name` as the file an install of this platform holds (`.exe` on Windows).
+pub fn exe(name: &str) -> String {
+    gitpoulpi_config::release::exe_name(name, &gitpoulpi_config::release::host_target())
+}
+
+/// The release archive of this platform, built from `entries`: `.zip` on
+/// Windows, `.tar.gz` elsewhere (what `release::archive_name` names).
+pub fn release_archive(version: &str, target: &str, entries: &[xtask::dist::Entry]) -> Vec<u8> {
+    let stem = gitpoulpi_config::release::package_stem(version, target);
+    if gitpoulpi_config::release::is_windows(target) {
+        xtask::dist::write_zip(&stem, entries).unwrap()
+    } else {
+        xtask::dist::write_tar_gz(&stem, entries).unwrap()
+    }
+}
+
+/// A recording stand-in for `gitpoulpi-updater`: when started with
+/// `run --job <file>` it copies the job to `<rec>/job.json`, writes its
+/// arguments to `<rec>/args.txt` and waits. On unix a `/bin/sh` script (the
+/// app `exec`s it in the pty, so it also prints `sentinel`); on Windows a
+/// real `.exe` built with `rustc` (the app copies the stub to
+/// `gitpoulpi-updater.exe`, which a `.cmd` cannot be, and starts it in a new
+/// console, so [`wait_updater_ran`] reads the files instead).
+pub fn updater_stub(dir: &Path, rec: &Path, sentinel: &str) -> PathBuf {
+    #[cfg(unix)]
+    {
+        fake_program(
+            dir,
+            "gitpoulpi-updater-stub",
+            &format!(
+                "cp \"$3\" '{rec}/job.json'\necho \"$@\" > '{rec}/args.txt'\n\
+                 echo {sentinel}\nsleep 120",
+                rec = rec.display()
+            ),
+            "",
+        )
+    }
+    #[cfg(windows)]
+    {
+        let _ = sentinel;
+        let rec = rec.to_string_lossy().replace('\\', "/");
+        let source = format!(
+            "fn main() {{\n\
+             let args: Vec<String> = std::env::args().skip(1).collect();\n\
+             std::fs::write(\"{rec}/args.txt\", args.join(\" \")).unwrap();\n\
+             std::fs::copy(&args[2], \"{rec}/job.json\").unwrap();\n\
+             std::thread::sleep(std::time::Duration::from_secs(8));\n}}\n"
+        );
+        build_rust_exe(dir, "gitpoulpi-updater-stub", &source)
+    }
+}
+
+/// Builds `source` (a Rust program) with `rustc` into `<dir>/<name>.exe`: the
+/// fake a Windows test needs when the program under test starts a real
+/// executable (a `.cmd` or a script cannot stand in for one).
+pub fn build_rust_exe(dir: &Path, name: &str, source: &str) -> PathBuf {
+    let src = dir.join(format!("{name}.rs"));
+    std::fs::write(&src, source).unwrap();
+    let exe = dir.join(format!("{name}.exe"));
+    let out = Command::new("rustc")
+        .args(["--edition", "2021", "-o"])
+        .arg(&exe)
+        .arg(&src)
+        .output()
+        .expect("rustc, to build a stand-in program");
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    exe
+}
+
+const FAKE_LFS_SH: &str = r#"#!/bin/sh
+echo "$@" >> "$FAKE_LFS_LOG"
+case "$1" in
+  version) echo "git-lfs/3.5.1 (GitHub; linux amd64; go 1.21.0)" ;;
+  install)
+    git config --local filter.lfs.clean "git-lfs clean -- %f"
+    git config --local filter.lfs.smudge "git-lfs smudge -- %f"
+    git config --local filter.lfs.process "git-lfs filter-process"
+    git config --local filter.lfs.required true
+    hooks="$(git rev-parse --git-path hooks)"
+    mkdir -p "$hooks"
+    printf '#!/bin/sh\n# stand-in for the git lfs pre-push hook\nexit 0\n' > "$hooks/pre-push"
+    chmod +x "$hooks/pre-push"
+    ;;
+esac
+exit 0
+"#;
+
+/// A stand-in `git-lfs` script in `dir` (put `dir` first on `PATH`): answers
+/// `version`, does what `install --local` does and appends every call to
+/// `$FAKE_LFS_LOG`. On Windows it never wins: Git for Windows puts its own
+/// `mingw64\bin` (and the real `git-lfs.exe`) ahead of `PATH`, so the LFS
+/// tests are ignored there.
+pub fn fake_git_lfs(dir: &Path) -> PathBuf {
+    let path = dir.join("git-lfs");
+    write_sh_script(&path, FAKE_LFS_SH);
+    path
+}
+
+/// Waits until [`updater_stub`] in `rec` has run (see there).
+pub fn wait_updater_ran(term: &Terminal, rec: &Path, sentinel: &str) {
+    #[cfg(unix)]
+    {
+        let _ = rec;
+        term.wait_for("the updater runs", Duration::from_secs(40), |s| {
+            s.contains(sentinel)
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    }
+    #[cfg(windows)]
+    {
+        let _ = sentinel;
+        let deadline = std::time::Instant::now() + Duration::from_secs(40);
+        while !rec.join("job.json").is_file() {
+            assert!(
+                std::time::Instant::now() < deadline,
+                "the updater never ran\n{}",
+                term.text()
+            );
+            std::thread::sleep(Duration::from_millis(100));
+        }
+        // The stub copies the job last of its two writes' pair; let it finish.
+        std::thread::sleep(Duration::from_millis(300));
+    }
+}
+
+/// A fake program that appends its arguments, one line per run, to `log`
+/// (read it back with [`read_log`]).
+pub fn fake_recorder(dir: &Path, name: &str, log: &Path) -> PathBuf {
+    fake_program(
+        dir,
+        name,
+        &format!("echo \"$@\" >> '{}'", log.display()),
+        &format!(">> \"{}\" echo %*", log.display()),
+    )
+}
+
+/// A fake program that prints `message` to stderr and exits with `code`.
+pub fn fake_failing(dir: &Path, name: &str, message: &str, code: i32) -> PathBuf {
+    fake_program(
+        dir,
+        name,
+        &format!("echo {message} >&2\nexit {code}"),
+        &format!("echo {message} 1>&2\r\nexit /b {code}"),
+    )
+}
+
+/// `text` as the inside of a TOML basic string (`"..."`): backslashes (Windows
+/// paths) and quotes escaped.
+pub fn toml_escape(text: impl AsRef<str>) -> String {
+    text.as_ref().replace('\\', "\\\\").replace('"', "\\\"")
+}
+
+/// A path as the inside of a TOML basic string.
+pub fn toml_path(path: &Path) -> String {
+    toml_escape(path.to_string_lossy())
+}
+
+/// The text of a log a fake wrote, with Windows line endings normalised and
+/// empty when it does not exist yet.
+pub fn read_log(path: &Path) -> String {
+    let text = std::fs::read_to_string(path)
+        .unwrap_or_default()
+        .replace("\r\n", "\n");
+    // A fake still writing its line has not ended it: that line is not there yet.
+    match text.rfind('\n') {
+        Some(end) => text[..=end].to_string(),
+        None => String::new(),
     }
 }
 

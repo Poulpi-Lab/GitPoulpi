@@ -8,7 +8,6 @@
 //! Nothing is located by a hard-coded coordinate. The home folder, the
 //! global git config naming the stub and the config directory are all
 //! temporary: never the developer's own.
-#![cfg(unix)]
 
 mod common;
 
@@ -78,7 +77,7 @@ fn launch(rig: &Rig, session: &str) -> (Terminal, tempfile::TempDir) {
     common::launch(rig.repo.root())
         .session(session)
         .size(200, 90)
-        .env("HOME", rig.home.path())
+        .scratch_home(rig.home.path())
         .env("GIT_CONFIG_GLOBAL", &rig.gitconfig)
         .env("GIT_CONFIG_NOSYSTEM", "1")
         .no_exit_pause()
@@ -198,7 +197,9 @@ fn a_picked_key_is_saved_and_the_connection_test_names_the_accepted_key() {
         |s| s.contains("Saved. This repository now signs in as chosen."),
     );
     let deadline = Instant::now() + STEP;
-    while !profile_file(config.path()).contains(&key_text) {
+    // The profile keeps the path with forward slashes on Windows.
+    let slashed = |t: &str| t.replace("\\\\", "/").replace('\\', "/");
+    while !slashed(&profile_file(config.path())).contains(&slashed(&key_text)) {
         assert!(
             Instant::now() < deadline,
             "the profile never reached the private file: {}",
@@ -229,7 +230,10 @@ fn a_picked_key_is_saved_and_the_connection_test_names_the_accepted_key() {
         },
     );
     assert!(
-        rig.stub.identity_files().contains(&key_text),
+        rig.stub
+            .identity_files()
+            .iter()
+            .any(|f| slashed(f) == slashed(&key_text)),
         "ssh was run with the chosen key: {:?}",
         rig.stub.identity_files()
     );
@@ -247,7 +251,7 @@ fn the_results_scrollbar_drags_and_the_cross_closes_the_panel() {
     let (mut term, _config) = common::launch(rig.repo.root())
         .session("pty-repo-auth-results")
         .size(120, 30)
-        .env("HOME", rig.home.path())
+        .scratch_home(rig.home.path())
         .env("GIT_CONFIG_GLOBAL", &rig.gitconfig)
         .env("GIT_CONFIG_NOSYSTEM", "1")
         .no_exit_pause()

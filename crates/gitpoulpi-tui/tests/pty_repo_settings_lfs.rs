@@ -1,5 +1,5 @@
 //! Settings > Repository > LFS and the toolbar's `LFS` button, through a pty
-//! (unix only: the fake program is a shell script).
+//! (the fake program is a shell script, which Git for Windows runs too).
 //!
 //! Like `pty_lfs_toolbar.rs`, no real `git-lfs` is needed: a stand-in script on
 //! the `PATH` answers `version` and writes what `git lfs install --local`
@@ -9,11 +9,9 @@
 //! button appears and the page reports the repository as initialized.
 //!
 //! No hard-coded coordinates: every position is found on the screen.
-#![cfg(unix)]
 
 mod common;
 
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
@@ -21,24 +19,6 @@ use gitpoulpi_testkit::FixtureRepoBuilder;
 use xtask::pty::Terminal;
 
 const STEP: Duration = Duration::from_secs(60);
-
-const SCRIPT: &str = r#"#!/bin/sh
-echo "$@" >> "$FAKE_LFS_LOG"
-case "$1" in
-  version) echo "git-lfs/3.5.1 (GitHub; linux amd64; go 1.21.0)" ;;
-  install)
-    git config --local filter.lfs.clean "git-lfs clean -- %f"
-    git config --local filter.lfs.smudge "git-lfs smudge -- %f"
-    git config --local filter.lfs.process "git-lfs filter-process"
-    git config --local filter.lfs.required true
-    hooks="$(git rev-parse --git-path hooks)"
-    mkdir -p "$hooks"
-    printf '#!/bin/sh\n# stand-in for the git lfs pre-push hook\nexit 0\n' > "$hooks/pre-push"
-    chmod +x "$hooks/pre-push"
-    ;;
-esac
-exit 0
-"#;
 
 struct FakeLfs {
     _dir: tempfile::TempDir,
@@ -49,9 +29,7 @@ struct FakeLfs {
 impl FakeLfs {
     fn new() -> Self {
         let dir = tempfile::tempdir().unwrap();
-        let script = dir.path().join("git-lfs");
-        std::fs::write(&script, SCRIPT).unwrap();
-        std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o755)).unwrap();
+        common::fake_git_lfs(dir.path());
         let log = dir.path().join("calls.log");
         std::fs::write(&log, "").unwrap();
         Self {
@@ -62,8 +40,7 @@ impl FakeLfs {
     }
 
     fn calls(&self) -> Vec<String> {
-        std::fs::read_to_string(&self.log)
-            .unwrap_or_default()
+        common::read_log(&self.log)
             .lines()
             .map(str::to_string)
             .collect()
@@ -83,11 +60,7 @@ impl FakeLfs {
 }
 
 fn launch(repo: &Path, fake: &FakeLfs) -> Terminal {
-    let path = format!(
-        "{}:{}",
-        fake.bin.display(),
-        std::env::var("PATH").unwrap_or_default()
-    );
+    let path = common::path_with_first(&fake.bin);
     let (term, _config) = common::launch(repo)
         .session("pty-repo-settings-lfs")
         .config("")
@@ -120,6 +93,10 @@ fn click_text(term: &mut Terminal, text: &str) {
     term.click(col + 1, row).unwrap();
 }
 
+#[cfg_attr(
+    windows,
+    ignore = "the fake git-lfs on PATH never runs: Git for Windows puts its own mingw64\\bin, with the real git-lfs.exe, ahead of PATH"
+)]
 #[test]
 fn a_plain_repo_has_no_lfs_button_until_the_page_initializes_it() {
     let repo = FixtureRepoBuilder::new()

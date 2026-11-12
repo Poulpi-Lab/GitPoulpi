@@ -4,9 +4,6 @@
 //! second terminal is started. When the window cannot raise itself, or the
 //! setting is off, the terminal command runs as before.
 
-#![cfg(unix)]
-
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
@@ -26,11 +23,39 @@ fn fixture() -> FixtureRepo {
         .build()
 }
 
-fn script(dir: &Path, name: &str, body: &str) -> PathBuf {
-    let path = dir.join(name);
-    std::fs::write(&path, format!("#!/bin/sh\n{body}\n")).unwrap();
-    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
-    path
+/// A fake program: a `/bin/sh` script on unix, a `.cmd` batch file on Windows.
+fn script(dir: &Path, name: &str, unix_body: &str, windows_body: &str) -> PathBuf {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let path = dir.join(format!("{name}.sh"));
+        std::fs::write(&path, format!("#!/bin/sh\n{unix_body}\n")).unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let _ = windows_body;
+        path
+    }
+    #[cfg(windows)]
+    {
+        let path = dir.join(format!("{name}.cmd"));
+        std::fs::write(&path, format!("@echo off\r\n{windows_body}\r\n")).unwrap();
+        let _ = unix_body;
+        path
+    }
+}
+
+/// A fake that creates the file it is given as its first argument.
+fn toucher(dir: &Path) -> PathBuf {
+    script(dir, "terminal", "touch \"$1\"", "type nul > \"%~1\"")
+}
+
+/// A fake that creates `file`.
+fn toucher_of(dir: &Path, name: &str, file: &Path) -> PathBuf {
+    script(
+        dir,
+        name,
+        &format!("touch '{}'", file.display()),
+        &format!("type nul > \"{}\"", file.display()),
+    )
 }
 
 fn exists_soon(file: &Path) -> bool {
@@ -106,12 +131,8 @@ fn a_second_launch_shows_the_open_window_and_starts_nothing() {
     let repo = fixture();
     let config = tempfile::tempdir().unwrap();
     let raised = config.path().join("raised");
-    let hook = script(
-        config.path(),
-        "hook.sh",
-        &format!("touch '{}'", raised.display()),
-    );
-    let terminal = script(config.path(), "terminal.sh", "touch \"$1\"");
+    let hook = toucher_of(config.path(), "hook", &raised);
+    let terminal = toucher(config.path());
     let _tui = open_window(config.path(), repo.root(), &hook);
 
     let started = config.path().join("started");
@@ -127,8 +148,8 @@ fn a_second_launch_shows_the_open_window_and_starts_nothing() {
 fn a_window_that_cannot_raise_itself_leaves_the_click_to_start_a_new_one() {
     let repo = fixture();
     let config = tempfile::tempdir().unwrap();
-    let hook = script(config.path(), "hook.sh", "exit 1");
-    let terminal = script(config.path(), "terminal.sh", "touch \"$1\"");
+    let hook = script(config.path(), "hook", "exit 1", "exit /b 1");
+    let terminal = toucher(config.path());
     let _tui = open_window(config.path(), repo.root(), &hook);
 
     let started = config.path().join("started");
@@ -148,12 +169,8 @@ fn with_reuse_off_the_click_starts_a_new_window_even_though_one_is_open() {
     )
     .unwrap();
     let raised = config.path().join("raised");
-    let hook = script(
-        config.path(),
-        "hook.sh",
-        &format!("touch '{}'", raised.display()),
-    );
-    let terminal = script(config.path(), "terminal.sh", "touch \"$1\"");
+    let hook = toucher_of(config.path(), "hook", &raised);
+    let terminal = toucher(config.path());
     let _tui = open_window(config.path(), repo.root(), &hook);
 
     let started = config.path().join("started");

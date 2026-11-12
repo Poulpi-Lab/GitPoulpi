@@ -362,34 +362,29 @@ fn a_binary_that_is_not_an_image_keeps_the_notice() {
 
 /// A fake editor script that appends its argument to a log, and the config
 /// that lists it (no real editor is ever started).
-#[cfg(unix)]
 fn fake_editor() -> (tempfile::TempDir, String) {
-    use std::os::unix::fs::PermissionsExt;
     let dir = tempfile::tempdir().unwrap();
-    let script = dir.path().join("ok.sh");
-    let log = dir.path().join("launches.log");
-    std::fs::write(
-        &script,
-        format!("#!/bin/sh\necho \"$@\" >> '{}'\n", log.display()),
-    )
-    .unwrap();
-    std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o755)).unwrap();
+    let script = common::fake_recorder(dir.path(), "ok", &dir.path().join("launches.log"));
     let config = format!(
         "[ui]\ndiff_layout = \"split\"\nimage_editor_default = \"Fake editor\"\n\
          [[ui.image_editors]]\nlabel = \"Fake editor\"\ncommand = \"{} --edit ${{file}}\"\n",
-        script.display()
+        common::toml_path(&script)
     );
     (dir, config)
 }
 
-#[cfg(unix)]
 fn launched(dir: &tempfile::TempDir, nth: usize) -> std::path::PathBuf {
     let log = dir.path().join("launches.log");
     let deadline = std::time::Instant::now() + STEP;
     loop {
-        let text = std::fs::read_to_string(&log).unwrap_or_default();
+        let text = common::read_log(&log);
         if let Some(line) = text.lines().nth(nth) {
-            return std::path::PathBuf::from(line.strip_prefix("--edit ").unwrap_or(line).trim());
+            return std::path::PathBuf::from(
+                line.strip_prefix("--edit ")
+                    .unwrap_or(line)
+                    .trim()
+                    .trim_matches('"'),
+            );
         }
         assert!(std::time::Instant::now() < deadline, "the editor never ran");
         std::thread::sleep(Duration::from_millis(50));
@@ -399,7 +394,6 @@ fn launched(dir: &tempfile::TempDir, nth: usize) -> std::path::PathBuf {
 /// A commit's picture diff: "Edit in" hands over a read-only copy of the side
 /// shown - the after (blue) in a split, the before (red) once the inline view
 /// is flipped to it.
-#[cfg(unix)]
 #[test]
 fn edit_in_on_a_commit_diff_hands_over_the_side_shown_as_a_copy() {
     let (dir, config) = fake_editor();
@@ -439,12 +433,14 @@ fn edit_in_on_a_commit_diff_hands_over_the_side_shown_as_a_copy() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("o").unwrap();
     let got = launched(&dir, 1);
-    assert_eq!(std::fs::read(&got).unwrap(), solid(4, 4, RED));
+    assert_eq!(
+        std::fs::read(&got).unwrap_or_else(|e| panic!("{e}: {got:?}")),
+        solid(4, 4, RED)
+    );
     term.stop().unwrap();
 }
 
 /// An unstaged picture diff: the after side is the working-tree file itself.
-#[cfg(unix)]
 #[test]
 fn edit_in_on_an_unstaged_diff_edits_the_working_tree_file() {
     let (dir, config) = fake_editor();

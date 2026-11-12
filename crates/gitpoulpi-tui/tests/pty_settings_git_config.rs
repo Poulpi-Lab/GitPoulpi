@@ -4,8 +4,6 @@
 //! to say "coming" carry no such note any more. Fixture repo and temp config
 //! dir only.
 
-#![cfg(unix)]
-
 mod common;
 
 use std::time::{Duration, Instant};

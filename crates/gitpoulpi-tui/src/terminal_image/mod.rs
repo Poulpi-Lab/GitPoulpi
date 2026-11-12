@@ -119,6 +119,7 @@ use gitpoulpi_config::ImageProtocol;
 
 mod cell_query;
 mod detect;
+pub(crate) mod passthrough;
 
 /// Whether a terminal multiplexer (tmux, screen, zellij, herdr) sits between
 /// this process and the terminal: what does not pass through it (an image,
@@ -823,7 +824,7 @@ impl Hide {
 /// Sends a [`Hide`]: the Kitty deletes, then the cells again.
 pub(crate) fn write_hide<W: std::io::Write>(out: &mut W, hide: &Hide) -> std::io::Result<()> {
     for id in &hide.kitty_ids {
-        out.write_all(kitty::delete_command(*id).as_bytes())?;
+        out.write_all(passthrough::passthrough(kitty::delete_command(*id)).as_bytes())?;
     }
     write_images_layered(out, &[], &[], &hide.cells)
 }

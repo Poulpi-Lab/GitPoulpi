@@ -1,3 +1,4 @@
+use super::passthrough::{self, tmux_client_has_sixel, tmux_only};
 use super::*;
 
 /// Terminals that implement the iTerm2 inline-image protocol. Matched
@@ -254,9 +255,18 @@ impl From<gitpoulpi_config::GraphRenderer> for RendererChoice {
 /// property that matters: see [`cell_size`].
 pub(crate) fn detect(choice: RendererChoice, wanted: ImageProtocol) -> Capability {
     Capability {
-        protocol: protocol_for(choice, wanted, &|name| std::env::var(name).ok(), &|path| {
-            std::fs::read_to_string(path).ok()
-        }),
+        protocol: protocol_for(
+            choice,
+            wanted,
+            &|name| {
+                if name == passthrough::CLIENT_FEATURES_KEY {
+                    passthrough::query_client_features()
+                } else {
+                    std::env::var(name).ok()
+                }
+            },
+            &|path| std::fs::read_to_string(path).ok(),
+        ),
         cell: cell_size(),
     }
 }
@@ -345,6 +355,15 @@ where
             Protocol::None
         };
     }
+    if tmux_only(get) {
+        // tmux draws sixel itself for a client that takes it; it carries
+        // nothing else (`passthrough` module).
+        return if tmux_client_has_sixel(get) {
+            Protocol::Sixel
+        } else {
+            Protocol::None
+        };
+    }
     if inside_a_multiplexer(get) {
         return Protocol::None;
     }
@@ -378,6 +397,7 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
     let set = |name: &str| get(name).is_some_and(|v| !v.is_empty());
     let term = get("TERM").unwrap_or_default().to_ascii_lowercase();
     set("WT_SESSION")
+        || tmux_client_has_sixel(get)
         || set("KONSOLE_VERSION")
         || term.starts_with("foot")
         || term.starts_with("mlterm")

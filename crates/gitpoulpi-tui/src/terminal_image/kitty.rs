@@ -445,7 +445,7 @@ pub(crate) fn write_retired<W: std::io::Write>(out: &mut W) -> std::io::Result<(
         return Ok(());
     }
     for id in retired {
-        out.write_all(delete_command(id).as_bytes())?;
+        out.write_all(super::passthrough::passthrough(delete_command(id)).as_bytes())?;
     }
     out.flush()
 }
@@ -465,7 +465,7 @@ pub(crate) fn release_all<W: std::io::Write>(out: &mut W) -> std::io::Result<()>
         return Ok(());
     }
     for id in ids {
-        out.write_all(delete_command(id).as_bytes())?;
+        out.write_all(super::passthrough::passthrough(delete_command(id)).as_bytes())?;
     }
     out.flush()
 }
@@ -573,7 +573,7 @@ impl KittyImage {
         let id = allocate();
         KittyImage {
             id,
-            upload: upload_command(id, png, cols, rows),
+            upload: super::passthrough::passthrough_each(upload_command(id, png, cols, rows)),
             sent_on: StdCell::new(None),
         }
     }

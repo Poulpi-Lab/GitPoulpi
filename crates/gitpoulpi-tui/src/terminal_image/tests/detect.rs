@@ -205,3 +205,84 @@ fn an_unknown_terminal_stays_text_and_the_setting_forces_sixel() {
         Protocol::Sixel
     );
 }
+
+/// tmux 3.8 inside foot 1.28, as measured: `TERM` is tmux's, `TERM_PROGRAM`
+/// is `tmux`, and the client's feature list names sixel.
+const TMUX_IN_FOOT: [(&str, &str); 3] = [
+    ("TMUX", "/tmp/tmux-1000/default,1234,0"),
+    ("TERM", "tmux-256color"),
+    ("TERM_PROGRAM", "tmux"),
+];
+
+const FOOT_CLIENT_FEATURES: &str = "256,bpaste,clipboard,RGB,sixel,sync,title";
+const KITTY_CLIENT_FEATURES: &str = "bpaste,clipboard,RGB,sync,title";
+
+/// `pairs` plus tmux's answer to "what does your client support".
+fn with_client_features<'a>(
+    pairs: &'a [(&'a str, &'a str)],
+    features: Option<&'a str>,
+) -> impl Fn(&str) -> Option<String> + 'a {
+    move |name: &str| {
+        if name == super::super::passthrough::CLIENT_FEATURES_KEY {
+            return features.map(str::to_string);
+        }
+        pairs
+            .iter()
+            .find(|(k, _)| *k == name)
+            .map(|(_, v)| (*v).to_string())
+    }
+}
+
+#[test]
+fn tmux_in_a_sixel_terminal_gets_sixel_and_nothing_else_does() {
+    let get = with_client_features(&TMUX_IN_FOOT, Some(FOOT_CLIENT_FEATURES));
+    assert_eq!(protocol_for(RendererChoice::Auto, &get), Protocol::Sixel);
+    // Asked for pictures explicitly: the same answer.
+    assert_eq!(protocol_for(RendererChoice::Image, &get), Protocol::Sixel);
+}
+
+#[test]
+fn tmux_in_a_terminal_without_sixel_stays_text() {
+    let get = with_client_features(&TMUX_IN_FOOT, Some(KITTY_CLIENT_FEATURES));
+    assert_eq!(protocol_for(RendererChoice::Auto, &get), Protocol::None);
+    // tmux not answering (not installed, hung, no client) is a "no", too.
+    let silent = with_client_features(&TMUX_IN_FOOT, None);
+    assert_eq!(protocol_for(RendererChoice::Auto, &silent), Protocol::None);
+}
+
+#[test]
+fn a_sixel_client_behind_a_second_multiplexer_is_still_text() {
+    for extra in [("ZELLIJ", "0"), ("STY", "1.pts-0.host"), ("HERDR_ENV", "1")] {
+        let mut pairs = TMUX_IN_FOOT.to_vec();
+        pairs.push(extra);
+        let get = with_client_features(&pairs, Some(FOOT_CLIENT_FEATURES));
+        assert_eq!(
+            protocol_for(RendererChoice::Auto, &get),
+            Protocol::None,
+            "{}",
+            extra.0
+        );
+    }
+}
+
+#[test]
+fn the_client_features_of_tmux_are_not_asked_outside_tmux() {
+    // A foot that is not inside tmux keeps its own verdict (`TERM=foot`),
+    // whatever a stray answer says.
+    let pairs = [("TERM", "foot")];
+    let get = with_client_features(&pairs, Some(KITTY_CLIENT_FEATURES));
+    assert_eq!(protocol_for(RendererChoice::Auto, &get), Protocol::Sixel);
+}
+
+/// Forced pictures in tmux inside kitty: the Kitty protocol, which is now
+/// written inside a passthrough instead of bare (a bare APC was dropped and
+/// the graph column stayed blank).
+#[test]
+fn forcing_pictures_in_tmux_inside_kitty_picks_the_kitty_protocol() {
+    let mut pairs = TMUX_IN_FOOT.to_vec();
+    pairs.extend([("KITTY_WINDOW_ID", "1")]);
+    let get = with_client_features(&pairs, Some(KITTY_CLIENT_FEATURES));
+    assert_eq!(protocol_for(RendererChoice::Image, &get), Protocol::Kitty);
+    // Auto stays conservative: it does not know `allow-passthrough`.
+    assert_eq!(protocol_for(RendererChoice::Auto, &get), Protocol::None);
+}

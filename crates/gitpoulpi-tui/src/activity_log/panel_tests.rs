@@ -1134,3 +1134,168 @@ fn the_window_moves_resizes_and_arranges() {
     });
     close();
 }
+
+fn remove_remote_context(request: u64, frontend: &str) -> gitpoulpi_core::OpContext {
+    gitpoulpi_core::OpContext {
+        operation: "RemoteRemove".into(),
+        label: "Remove remote".into(),
+        args: "remote=cm6".into(),
+        repo: Some("/work/alpha".into()),
+        frontend: Some(frontend.into()),
+        request,
+        job: None,
+    }
+}
+
+fn first_app_line() -> Rect {
+    with(|s| {
+        s.hits
+            .iter()
+            .find(|(_, h)| matches!(h, Hit::AppLine(_)))
+            .map(|(r, _)| *r)
+    })
+    .expect("a line painted")
+}
+
+#[test]
+fn a_failure_names_its_operation_arguments_repository_and_id() {
+    let _lock = lock();
+    let mut entry = feed::Entry::new(
+        Severity::Error,
+        "Remove remote failed".into(),
+        "backend error: no such remote: cm6".into(),
+    );
+    entry.context = Some(remove_remote_context(12, "TUI"));
+    feed::push(entry);
+    let mut terminal = terminal();
+    let screen = draw(&mut terminal);
+    assert!(
+        screen.contains("Remove remote failed (remote=cm6)"),
+        "{screen}"
+    );
+    assert!(screen.contains("[TUI #12]"), "{screen}");
+    key(KeyCode::Enter);
+    let screen = draw(&mut terminal);
+    for line in [
+        "Operation: Remove remote (remote=cm6)",
+        "Repository: /work/alpha",
+        "Requested by: TUI",
+        "Operation id: 12",
+    ] {
+        assert!(screen.contains(line), "{line}\n{screen}");
+    }
+    close();
+}
+
+#[test]
+fn a_failure_line_of_another_frontend_opens_an_entry_made_from_it() {
+    let _lock = lock();
+    let line = remove_remote_context(5, "CLI").failure_line("backend error: no such remote: cm6");
+    let mut failure = record(Level::Warn, &line);
+    failure.ts_ms = gitpoulpi_log::now_ms();
+    show_only(vec![record(Level::Info, "an ordinary line"), failure]);
+    let mut terminal = terminal();
+    key(KeyCode::Tab);
+    let screen = draw(&mut terminal);
+    assert!(
+        screen.contains("Remove remote failed (remote=cm6) [op #5, CLI, repo alpha]"),
+        "the line names the operation, its argument, the frontend and the id\n{screen}"
+    );
+    // Enter with no line selected says what to do.
+    key(KeyCode::Enter);
+    assert_eq!(
+        with(|s| s.notice.clone()).as_deref(),
+        Some(msg::APP_SELECT_FIRST.get())
+    );
+    // `]` selects the failure line, Enter opens its operation.
+    key(KeyCode::Char(']'));
+    draw(&mut terminal);
+    key(KeyCode::Enter);
+    let screen = draw(&mut terminal);
+    assert_eq!(with(|s| s.tab), Tab::Git, "{screen}");
+    for line in [
+        "Remove remote failed (remote=cm6)",
+        "Operation: Remove remote (remote=cm6)",
+        "Requested by: CLI",
+        "Operation id: 5",
+        "no such remote: cm6",
+    ] {
+        assert!(screen.contains(line), "{line}\n{screen}");
+    }
+    // Asking again finds the same entry: no second one.
+    key(KeyCode::Tab);
+    key(KeyCode::Char(']'));
+    key(KeyCode::Enter);
+    draw(&mut terminal);
+    assert_eq!(
+        feed::snapshot()
+            .iter()
+            .filter(|e| e.context.as_ref().is_some_and(|c| c.request == 5))
+            .count(),
+        1
+    );
+    unfreeze();
+    close();
+}
+
+#[test]
+fn a_failure_this_window_ran_opens_its_own_entry_by_click_and_by_palette_command() {
+    let _lock = lock();
+    let mut entry = feed::Entry::new(
+        Severity::Error,
+        "Remove remote failed".into(),
+        "backend error: no such remote: cm6".into(),
+    );
+    entry.context = Some(remove_remote_context(9, "TUI"));
+    let id = feed::push(entry);
+    let line = remove_remote_context(9, "TUI").failure_line("backend error: no such remote: cm6");
+    let mut failure = record(Level::Warn, &line);
+    failure.ts_ms = gitpoulpi_log::now_ms();
+    show_only(vec![failure]);
+    let mut terminal = terminal();
+    key(KeyCode::Tab);
+    draw(&mut terminal);
+    // A click on the line opens the entry the window already has.
+    let at = first_app_line();
+    click(at.x + 2, at.y);
+    draw(&mut terminal);
+    assert_eq!(with(|s| s.tab), Tab::Git);
+    assert!(with(|s| s.expanded.contains(&id)), "its own entry opens");
+    assert_eq!(
+        feed::snapshot()
+            .iter()
+            .filter(|e| e.context.as_ref().is_some_and(|c| c.request == 9))
+            .count(),
+        1,
+        "no entry was made from the line"
+    );
+    // The palette commands do the same from the window's Application tab.
+    key(KeyCode::Tab);
+    draw(&mut terminal);
+    with(|s| s.expanded.clear());
+    level_cmd_open(LevelCmd::NextProblem);
+    level_cmd_open(LevelCmd::ShowOperation);
+    assert_eq!(with(|s| s.tab), Tab::Git);
+    assert!(with(|s| s.expanded.contains(&id)));
+    unfreeze();
+    close();
+}
+
+#[test]
+fn a_line_that_names_no_operation_says_so_instead_of_jumping() {
+    let _lock = lock();
+    show_only(vec![record(Level::Warn, "something happened")]);
+    let mut terminal = terminal();
+    key(KeyCode::Tab);
+    draw(&mut terminal);
+    let at = first_app_line();
+    click(at.x + 2, at.y);
+    key(KeyCode::Enter);
+    assert_eq!(with(|s| s.tab), Tab::Application);
+    assert_eq!(
+        with(|s| s.notice.clone()).as_deref(),
+        Some(msg::APP_NO_OPERATION.get())
+    );
+    unfreeze();
+    close();
+}

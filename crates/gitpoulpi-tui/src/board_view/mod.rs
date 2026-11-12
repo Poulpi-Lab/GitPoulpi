@@ -499,8 +499,10 @@ impl BoardView {
                 }
                 Ok(Err(why)) => {
                     self.load_rx = None;
-                    crate::activity_log::report_problem(
+                    crate::activity_log::report_problem_as(
                         crate::activity_log::ProblemSource::Hosting,
+                        "Hosting request: load board issues",
+                        "",
                         &why,
                     );
                     self.load_err = Some(why);
@@ -623,8 +625,10 @@ impl BoardView {
                 }
                 Err(why) => {
                     // The card snaps back: its column is its own again.
-                    crate::activity_log::report_problem(
+                    crate::activity_log::report_problem_as(
                         crate::activity_log::ProblemSource::Hosting,
+                        "Hosting request: move issue",
+                        "",
                         &why,
                     );
                     self.message = Some(msg::move_failed(&m.caption, &why));

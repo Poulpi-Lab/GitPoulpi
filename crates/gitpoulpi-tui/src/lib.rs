@@ -464,6 +464,8 @@ pub struct RunOptions {
 
 /// [`run`] with the command-line options.
 pub fn run_with(session: &str, options: RunOptions) -> io::Result<()> {
+    // Every request this process sends says it comes from the window.
+    gitpoulpi_ipc::auth::set_client_name("TUI");
     // User-only app directories (best effort, once per start).
     if let Some(paths) = gitpoulpi_config::ConfigPaths::discover() {
         gitpoulpi_config::secure_fs::harden_app_dirs(&paths);

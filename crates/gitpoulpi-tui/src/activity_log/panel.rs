@@ -89,6 +89,9 @@ enum Hit {
     CopyDiagnostics,
     CopyAll,
     OpenFolder,
+    /// A line of the Application tab (its index in the shown records):
+    /// selects it, and shows the operation it names.
+    AppLine(usize),
     /// The "Clear log" button (Application tab): opens the confirmation.
     ClearLog,
     /// The confirmation's buttons.
@@ -113,6 +116,13 @@ pub(crate) enum LevelCmd {
     Clear,
     /// Opens the confirmation that clears the application log files.
     ClearLog,
+    /// From the selected line of the Application tab, opens the Git
+    /// operations entry of the operation that produced it.
+    ShowOperation,
+    /// Selects the next line (further down) that names a failed operation.
+    NextProblem,
+    /// Selects the previous line (further up) that names a failed operation.
+    PrevProblem,
     /// Opens the Scope box's list.
     Scope,
     /// Shows the Git operations tab.
@@ -149,6 +159,11 @@ struct State {
     active_repo: Option<std::path::PathBuf>,
     /// Keep the selection in view at the next paint (a key moved it).
     follow: bool,
+    /// The selected line of the Application tab, by what identifies a record
+    /// (its stamp and first line): it stays on the line while new ones arrive.
+    app_sel: Option<(i64, String)>,
+    /// Keep that line in view at the next paint.
+    app_follow: bool,
     grab: Option<i32>,
     level: Option<Combo>,
     view_level: Level,
@@ -196,6 +211,8 @@ static STATE: Mutex<State> = Mutex::new(State {
     longest: 0,
     active_repo: None,
     follow: false,
+    app_sel: None,
+    app_follow: false,
     grab: None,
     level: None,
     view_level: Level::Info,
@@ -288,6 +305,7 @@ fn open_with(scope: Scope) {
         s.tab = Tab::Git;
         s.scope = scope;
         s.selected = 0;
+        s.app_sel = None;
         s.offset = [0, 0];
         s.hoffset = 0;
         s.scope_combo = None;
@@ -789,9 +807,15 @@ pub(super) fn level_cmd(cmd: LevelCmd) {
         | LevelCmd::GitTab
         | LevelCmd::AppTab
         | LevelCmd::ScrollLeft
-        | LevelCmd::ScrollRight => {}
+        | LevelCmd::ScrollRight
+        | LevelCmd::ShowOperation
+        | LevelCmd::NextProblem
+        | LevelCmd::PrevProblem => {}
     });
     match cmd {
+        LevelCmd::ShowOperation => show_operation(),
+        LevelCmd::NextProblem => select_problem(1),
+        LevelCmd::PrevProblem => select_problem(-1),
         LevelCmd::Scope => open_scope_box(),
         LevelCmd::GitTab => switch_tab(Tab::Git),
         LevelCmd::AppTab => switch_tab(Tab::Application),
@@ -805,15 +829,25 @@ pub(super) fn level_cmd(cmd: LevelCmd) {
 /// level commands (the Git operations tab or the Scope box for theirs), and
 /// applies.
 pub(crate) fn level_cmd_open(cmd: LevelCmd) {
-    // Scrolling keeps the window as it is (reopening goes back to the left
-    // edge and the first entry).
-    if !(matches!(cmd, LevelCmd::ScrollLeft | LevelCmd::ScrollRight) && is_open()) {
+    // Scrolling and the line commands keep the window as it is (reopening goes
+    // back to the left edge, the first entry and no selected line).
+    let keeps = matches!(
+        cmd,
+        LevelCmd::ScrollLeft
+            | LevelCmd::ScrollRight
+            | LevelCmd::ShowOperation
+            | LevelCmd::NextProblem
+            | LevelCmd::PrevProblem
+    );
+    let was_open = is_open();
+    if !(keeps && was_open) {
         open();
     }
-    if !matches!(
+    let on_tab = matches!(
         cmd,
         LevelCmd::Scope | LevelCmd::GitTab | LevelCmd::ScrollLeft | LevelCmd::ScrollRight
-    ) {
+    ) || (keeps && was_open);
+    if !on_tab {
         with(|s| s.tab = Tab::Application);
         start_refresher();
     }
@@ -1250,8 +1284,21 @@ fn activity_key(key: KeyEvent, page: isize) {
 
 fn app_key(key: KeyEvent, page: isize) {
     match key.code {
-        KeyCode::Up | KeyCode::Char('k') => scroll(-1),
-        KeyCode::Down | KeyCode::Char('j') => scroll(1),
+        // With a line selected the arrows move the selection; without one
+        // they scroll.
+        KeyCode::Up | KeyCode::Char('k') => {
+            if !step_selection(-1) {
+                scroll(-1);
+            }
+        }
+        KeyCode::Down | KeyCode::Char('j') => {
+            if !step_selection(1) {
+                scroll(1);
+            }
+        }
+        KeyCode::Enter => show_operation(),
+        KeyCode::Char(']') => select_problem(1),
+        KeyCode::Char('[') => select_problem(-1),
         KeyCode::PageUp => scroll(-page),
         KeyCode::PageDown => scroll(page),
         // Home goes back to the start of the lines: the top and the left edge.
@@ -1288,6 +1335,159 @@ fn scroll(delta: isize) {
     with(|s| {
         let i = tab_index(s.tab);
         s.offset[i] = s.offset[i].saturating_add_signed(delta);
+    });
+}
+
+// ---- the operation behind a line of the Application tab ----
+
+/// What identifies a record while the list moves under it.
+pub(super) fn record_key(r: &Record) -> (i64, String) {
+    (
+        r.ts_ms,
+        r.message.lines().next().unwrap_or("").chars().take(80).collect(),
+    )
+}
+
+/// The records the Application tab shows now, newest first.
+fn shown_records() -> Vec<Record> {
+    let (level, shown, filter) = with(|s| (s.view_level, s.shown, s.filter.clone()));
+    visible_records(&scoping(), level, &shown, &filter)
+}
+
+/// Whether the line names a failed operation (the daemon's and the window's
+/// failure lines end with its tag).
+fn is_problem(r: &Record) -> bool {
+    gitpoulpi_core::op_context::parse_failure_line(&r.message).is_some()
+}
+
+/// Moves the selected line by `delta`; `false` when no line is selected.
+fn step_selection(delta: isize) -> bool {
+    let records = shown_records();
+    let Some(current) = with(|s| s.app_sel.clone())
+        .and_then(|key| records.iter().position(|r| record_key(r) == key))
+    else {
+        return false;
+    };
+    let last = records.len().saturating_sub(1) as isize;
+    let next = (current as isize + delta).clamp(0, last) as usize;
+    with(|s| {
+        s.app_sel = Some(record_key(&records[next]));
+        s.app_follow = true;
+    });
+    true
+}
+
+/// Selects the next (`1`) or previous (`-1`) line that names a failed
+/// operation, from the selected line or, with none, from the top of the view.
+fn select_problem(direction: isize) {
+    let records = shown_records();
+    let start = with(|s| s.app_sel.clone())
+        .and_then(|key| records.iter().position(|r| record_key(r) == key))
+        .map(|i| i as isize);
+    let from = start.unwrap_or(if direction > 0 { -1 } else { records.len() as isize });
+    let mut at = from + direction;
+    while at >= 0 && (at as usize) < records.len() {
+        if is_problem(&records[at as usize]) {
+            let key = record_key(&records[at as usize]);
+            with(|s| {
+                s.app_sel = Some(key);
+                s.app_follow = true;
+                s.notice = None;
+            });
+            return;
+        }
+        at += direction;
+    }
+}
+
+/// A click on a line of the Application tab: selects it, and when it names an
+/// operation opens that operation's entry.
+fn click_app_line(index: usize) {
+    let records = shown_records();
+    let Some(record) = records.get(index) else {
+        return;
+    };
+    with(|s| s.app_sel = Some(record_key(record)));
+    if is_problem(record) {
+        show_operation();
+    }
+}
+
+/// Opens the Git operations entry of the operation the selected line names.
+/// The entry is the window's own when this window ran the operation; a failure
+/// another frontend ran (the CLI, an agent) has none, so one is made from the
+/// line: its label, arguments, message and the facts the tag carries.
+fn show_operation() {
+    let records = shown_records();
+    let selected = with(|s| s.app_sel.clone())
+        .and_then(|key| records.into_iter().find(|r| record_key(r) == key));
+    let Some(record) = selected else {
+        with(|s| s.notice = Some(msg::APP_SELECT_FIRST.get().to_string()));
+        return;
+    };
+    let Some(parsed) = gitpoulpi_core::op_context::parse_failure_line(&record.message) else {
+        with(|s| s.notice = Some(msg::APP_NO_OPERATION.get().to_string()));
+        return;
+    };
+    let id = match feed::find_operation(
+        parsed.tag.request,
+        &parsed.label,
+        parsed.tag.frontend.as_deref(),
+        record.ts_ms,
+    ) {
+        Some(entry) => entry.id,
+        None => feed::push(entry_from_line(&record, &parsed)),
+    };
+    show_entry(id);
+}
+
+/// An entry for a failure the log tells about and this window did not run.
+fn entry_from_line(
+    record: &Record,
+    parsed: &gitpoulpi_core::op_context::ParsedFailure,
+) -> Entry {
+    let kind = gitpoulpi_core::FailureKind::classify(&parsed.message);
+    let mut entry = Entry::new(
+        Severity::Error,
+        msg::failed_title(&parsed.label),
+        parsed.message.clone(),
+    );
+    entry.ts_ms = record.ts_ms;
+    entry.read = true;
+    entry.kind = kind;
+    if let Some((summary, hint)) = super::friendly::wording(kind, &parsed.message) {
+        entry.summary = Some(summary);
+        entry.hint = Some(hint);
+    }
+    entry.repo = record.repo.as_ref().map(std::path::PathBuf::from);
+    entry.context = Some(gitpoulpi_core::OpContext {
+        operation: parsed.label.clone(),
+        label: parsed.label.clone(),
+        args: parsed.args.clone(),
+        repo: record.repo.clone(),
+        frontend: parsed.tag.frontend.clone(),
+        request: parsed.tag.request,
+        job: None,
+    });
+    entry
+}
+
+/// Shows entry `id` on the Git operations tab, selected and open (the scope
+/// widens to everything when it hides the entry).
+fn show_entry(id: u64) {
+    switch_tab(Tab::Git);
+    if !entries().iter().any(|e| e.id == id) {
+        with(|s| s.scope = Scope::All);
+    }
+    let index = entries().iter().position(|e| e.id == id);
+    with(|s| {
+        if let Some(i) = index {
+            s.selected = i;
+            s.follow = true;
+        }
+        if !s.expanded.contains(&id) {
+            s.expanded.push(id);
+        }
     });
 }
 
@@ -1499,6 +1699,7 @@ fn press(at: ratatui::layout::Position, mouse: MouseEvent) {
                 toggle_expanded(entry.id);
             }
         }
+        Some(Hit::AppLine(i)) => click_app_line(i),
         Some(Hit::CopyEntry(i)) => copy_entry(i),
         Some(Hit::Remedy(i, nth)) => run_remedy(i, nth),
         Some(Hit::CopyDiagnostics) => copy_diagnostics(),

@@ -38,6 +38,12 @@ pub struct ResponseError {
     /// `gitpoulpi_core::Error::from_wire`. Optional on the wire like `kind`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub detail: Option<Box<gitpoulpi_core::ErrorDetail>>,
+    /// Which operation failed: its label and key, main arguments (redacted),
+    /// repository, the frontend that asked and the request's id. Set for an
+    /// error that came out of an operation (`dispatch::failed`); an older
+    /// daemon never sets it and an older client ignores it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<gitpoulpi_core::OpContext>,
     /// The daemon refused the connection because it did not start with a
     /// `Hello` carrying the session's token (see [`crate::auth`]). Optional
     /// on the wire: an older client ignores it and prints `message`.

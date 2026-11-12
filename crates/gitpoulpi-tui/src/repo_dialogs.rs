@@ -2059,8 +2059,10 @@ impl RepoDialogs {
                         effects.push(DialogEffect::Message(message));
                     }
                     Err(e) => {
-                        crate::activity_log::report_problem(
+                        crate::activity_log::report_problem_as(
                             crate::activity_log::ProblemSource::Hosting,
+                            "Hosting request: create pull request",
+                            "",
                             &e,
                         );
                         if let Some(RepoDialog::PullRequest { form }) = self.dialog.as_mut() {
@@ -2098,8 +2100,10 @@ impl RepoDialogs {
                         )));
                     }
                     Err(e) => {
-                        crate::activity_log::report_problem(
+                        crate::activity_log::report_problem_as(
                             crate::activity_log::ProblemSource::Hosting,
+                            "Hosting request: create issue",
+                            "",
                             &e,
                         );
                         if let Some(RepoDialog::Issue { form }) = self.dialog.as_mut() {

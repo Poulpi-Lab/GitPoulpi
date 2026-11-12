@@ -48,6 +48,8 @@ pub(crate) use panel::{
 pub(crate) use panel::{last_error_command, last_error_has_remedy};
 #[cfg(feature = "hosting")]
 pub(crate) use problem::remember_kind;
+#[cfg_attr(not(feature = "hosting"), allow(unused_imports))]
+pub(crate) use problem::report_as as report_problem_as;
 pub(crate) use problem::{
     report as report_problem, report_and_clear as report_problem_clear,
     report_in as report_problem_in, Source as ProblemSource,
@@ -91,6 +93,7 @@ pub(crate) fn copy_last_error() -> Option<Command> {
 
 use crate::daemon_link::Action;
 use feed::{Entry, Severity};
+use gitpoulpi_i18n::msg::activity_log as msg;
 
 /// Whether the error is a failure worth a card (and the badge), as opposed
 /// to a refusal the status line already words (nothing to undo, a dialog
@@ -115,18 +118,28 @@ pub(crate) fn report_failure(
     error: &CoreError,
     repo: &std::path::Path,
     elapsed: std::time::Duration,
+    context: gitpoulpi_core::OpContext,
 ) {
     let kind = friendly::kind_of(error);
     let failure = is_failure(error);
+    let id = feed::reserve_id();
+    let context = complete_context(context, repo, id);
+    let mut title = friendly::title_for(action);
+    // An operation with no title of its own is named by what it was.
+    if title == gitpoulpi_i18n::msg::git_error::TITLE_OTHER.get() {
+        title = msg::failed_title(&context.label);
+    }
     let mut entry = Entry::new(
         if failure {
             Severity::Error
         } else {
             Severity::Warning
         },
-        friendly::title_for(action),
+        title,
         gitpoulpi_core::redact(&error.to_string()),
     );
+    entry.id = id;
+    entry.context = Some(context.clone());
     entry.kind = kind;
     entry.detail = error.detail().cloned();
     entry.retry = Some(action.clone());
@@ -169,7 +182,7 @@ pub(crate) fn report_failure(
     entry.repo = Some(repo.to_path_buf());
     entry.duration_ms = timing::action_finished(action, repo, ms(elapsed), false);
     let repo_text = repo_text(repo);
-    tracing::warn!(target: "tui", repo = repo_text.as_str(), "{}: {}", entry.title, entry.message);
+    tracing::warn!(target: "tui", repo = repo_text.as_str(), "{}", context.failure_line(&entry.message));
     if let Some(detail) = &entry.detail {
         tracing::debug!(target: "tui", repo = repo_text.as_str(), "{}", detail.lines().join(" | "));
     }
@@ -235,6 +248,27 @@ pub(crate) fn repo_text(repo: &std::path::Path) -> String {
     }
 }
 
+/// What this window adds to the context of a failure: the repository it ran
+/// in and "TUI" as the asker when the daemon did not say, and an operation id
+/// (the entry's own) when the failure did not come from a request.
+pub(crate) fn complete_context(
+    mut context: gitpoulpi_core::OpContext,
+    repo: &std::path::Path,
+    entry_id: u64,
+) -> gitpoulpi_core::OpContext {
+    if context.repo.is_none() {
+        let text = repo_text(repo);
+        context.repo = (!text.is_empty()).then_some(text);
+    }
+    if context.frontend.is_none() {
+        context.frontend = Some("TUI".to_string());
+    }
+    if context.request == 0 {
+        context.request = entry_id;
+    }
+    context
+}
+
 fn ms(elapsed: std::time::Duration) -> u64 {
     u64::try_from(elapsed.as_millis()).unwrap_or(u64::MAX)
 }
@@ -261,7 +295,11 @@ pub(crate) fn report_rejection(
     entry.retry = Some(action.clone());
     entry.repo = Some(repo.to_path_buf());
     entry.duration_ms = timing::action_finished(action, repo, ms(elapsed), false);
-    tracing::warn!(target: "tui", repo = repo_text(repo).as_str(), "{}: {}", entry.title, entry.message);
+    let id = feed::reserve_id();
+    entry.id = id;
+    let context = complete_context(action.op_context(), repo, id);
+    tracing::warn!(target: "tui", repo = repo_text(repo).as_str(), "{}", context.failure_line(&entry.message));
+    entry.context = Some(context);
     feed::push(entry);
 }
 

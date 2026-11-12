@@ -90,6 +90,7 @@ pub(crate) fn entry_block(entry: &Entry) -> String {
     lines.extend(environment());
     lines.push(format!("time: {}", gitpoulpi_log::timestamp(entry.ts_ms)));
     lines.push(format!("title: {}", entry.title));
+    lines.extend(context_lines(entry));
     if let Some(ms) = entry.duration_ms {
         lines.push(format!("duration: {ms} ms"));
     }
@@ -101,6 +102,26 @@ pub(crate) fn entry_block(entry: &Entry) -> String {
         lines.extend(detail.lines());
     }
     redacted(lines.join("\n"))
+}
+
+/// What produced the entry: "operation:", "arguments:", "repository:",
+/// "requested by:", "operation id:". An entry with no context (a plain status
+/// message) still names its repository.
+pub(crate) fn context_lines(entry: &Entry) -> Vec<String> {
+    let Some(context) = &entry.context else {
+        return entry
+            .repo
+            .as_deref()
+            .map(|repo| vec![format!("repository: {}", repo.display())])
+            .unwrap_or_default();
+    };
+    let mut lines = context.report_lines();
+    if context.repo.is_none() {
+        if let Some(repo) = &entry.repo {
+            lines.push(format!("repository: {}", repo.display()));
+        }
+    }
+    lines
 }
 
 /// The "Copy diagnostics" block: the environment, the latest failure and the
@@ -118,6 +139,7 @@ pub(crate) fn diagnostics(
         lines.push("latest problem:".to_string());
         lines.push(format!("  time: {}", gitpoulpi_log::timestamp(entry.ts_ms)));
         lines.push(format!("  title: {}", entry.title));
+        lines.extend(context_lines(entry).into_iter().map(|l| format!("  {l}")));
         lines.push(format!("  message: {}", entry.message));
         if let Some(detail) = &entry.detail {
             lines.extend(detail.lines().into_iter().map(|l| format!("  {l}")));
@@ -163,6 +185,36 @@ mod tests {
         assert!(block.contains("Authentication failed"));
         assert!(block.contains("title: Push failed"));
         assert!(!block.contains("hunter2"), "{block}");
+    }
+
+    #[test]
+    fn an_entry_block_names_the_operation_and_the_repository() {
+        let mut entry = Entry::new(
+            Severity::Error,
+            "Remove remote failed".into(),
+            "backend error: no such remote: cm6".into(),
+        );
+        let mut context = gitpoulpi_ipc::op_context::context_of(
+            gitpoulpi_core::domain::OperationKind::RemoteRemove,
+            &serde_json::json!({ "name": "cm6" }),
+            Some("/data/Projects/demo"),
+            12,
+        );
+        context.frontend = Some("TUI".into());
+        entry.context = Some(context);
+        let block = entry_block(&entry);
+        assert!(
+            block.contains("operation: Remove remote (RemoteRemove)"),
+            "{block}"
+        );
+        assert!(block.contains("arguments: remote=cm6"), "{block}");
+        assert!(block.contains("repository: /data/Projects/demo"), "{block}");
+        assert!(block.contains("requested by: TUI"), "{block}");
+        assert!(block.contains("operation id: 12"), "{block}");
+        // An entry with no context still says where it happened.
+        let mut plain = Entry::new(Severity::Info, "Saved".into(), "ok".into());
+        plain.repo = Some("/data/Projects/demo".into());
+        assert!(entry_block(&plain).contains("repository: /data/Projects/demo"));
     }
 
     #[test]

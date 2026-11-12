@@ -122,12 +122,21 @@ pub(crate) fn ok(request_id: u64, value: Value, mutated: bool) -> Dispatched {
 /// The answer for a request whose operation panicked: an error, so the
 /// client is never left waiting for a response that will not come.
 pub(crate) fn panicked(request_id: u64, command: OperationKind) -> Response {
-    err(
+    let mut response = err(
         request_id,
         format!("internal error: the daemon's {command:?} operation panicked"),
         false,
     )
-    .response
+    .response;
+    if let Err(error) = &mut response.result {
+        error.context = Some(gitpoulpi_ipc::op_context::context_of(
+            command,
+            &Value::Null,
+            None,
+            request_id,
+        ));
+    }
+    response
 }
 
 pub(crate) fn err(request_id: u64, message: String, unsupported: bool) -> Dispatched {
@@ -154,8 +163,10 @@ pub(crate) type Failure = (
 );
 
 /// The answer for `request` whose backend call failed. The detail is named
-/// after the operation the user asked for, and the failure goes to the
-/// application log (the Activity Log's second tab).
+/// after the operation the user asked for, and the answer carries the
+/// operation's context (label, main arguments, repository, request id). The
+/// connection adds the frontend and logs the failure when it sends the
+/// answer ([`stamp_failure`]).
 pub(crate) fn failed(
     request: &Request,
     message: String,
@@ -163,32 +174,66 @@ pub(crate) fn failed(
     detail: Option<gitpoulpi_core::ErrorDetail>,
 ) -> Dispatched {
     let operation = format!("{:?}", request.command);
-    let detail = detail.map(|d| d.with_operation(operation.clone()));
-    // A poll failing the same way is one line, not one per poll.
+    let detail = detail.map(|d| d.with_operation(operation));
     let repo = request.repo.as_ref().map(|r| r.0.as_str());
-    if let Some(held_back) =
-        failure_log::global().observe(&operation, repo, &message, std::time::Instant::now())
-    {
-        let redacted = gitpoulpi_core::redact(&message);
-        if held_back == 0 {
-            tracing::warn!(target: "daemon", repo = repo.unwrap_or(""), "{operation} failed: {redacted}");
-        } else {
-            tracing::warn!(
-                target: "daemon",
-                repo = repo.unwrap_or(""),
-                "{operation} failed: {redacted} (repeated {held_back} more times since the last line)"
-            );
-        }
+    let context = gitpoulpi_ipc::op_context::context_of(
+        request.command,
+        &request.args,
+        repo,
+        request.id,
+    );
+    let mut dispatched = err_full(request.id, message, false, kind, detail);
+    if let Err(error) = &mut dispatched.response.result {
+        error.context = Some(context);
     }
-    if let Some(d) = &detail {
+    dispatched
+}
+
+/// Called by a connection's writer for every message it sends: a failure
+/// that carries a context gets the frontend of the connection and one line in
+/// the application log (the Activity Log's second tab), which names the
+/// operation, its main arguments, the repository, the frontend and the
+/// request's id.
+pub(crate) fn stamp_failure(message: &mut gitpoulpi_ipc::ServerMessage, frontend: Option<&str>) {
+    let gitpoulpi_ipc::ServerMessage::Response(response) = message else {
+        return;
+    };
+    let Err(error) = &mut response.result else {
+        return;
+    };
+    let Some(context) = &mut error.context else {
+        return;
+    };
+    if context.frontend.is_none() {
+        context.frontend = frontend.map(str::to_string);
+    }
+    let repo = context.repo.clone().unwrap_or_default();
+    // A poll failing the same way is one line, not one per poll.
+    let key = format!("{} {}", context.operation, context.args);
+    let Some(held_back) = failure_log::global().observe(
+        &key,
+        Some(repo.as_str()).filter(|r| !r.is_empty()),
+        &error.message,
+        std::time::Instant::now(),
+    ) else {
+        return;
+    };
+    let mut line = context.failure_line(&error.message);
+    if held_back > 0 {
+        line.push_str(&format!(
+            " (repeated {held_back} more times since the last line)"
+        ));
+    }
+    tracing::warn!(target: "daemon", repo = repo.as_str(), "{line}");
+    if let Some(d) = &error.detail {
         tracing::debug!(
             target: "daemon",
-            repo = repo.unwrap_or(""),
-            "{operation} detail: {}",
+            repo = repo.as_str(),
+            "{} detail: {}",
+            context.label,
             d.lines().join(" | ")
         );
     }
-    err_full(request.id, message, false, kind, detail)
 }
 
 pub(crate) fn err_full(
@@ -206,6 +251,7 @@ pub(crate) fn err_full(
                 unsupported,
                 kind,
                 detail: detail.map(Box::new),
+                context: None,
                 auth_required: false,
             }),
         },

@@ -283,6 +283,7 @@ pub(crate) fn canceled_error(job: u64) -> ResponseError {
         unsupported: false,
         kind: error.typed(),
         detail: None,
+        context: None,
         auth_required: false,
     }
 }
@@ -792,6 +793,7 @@ impl Drop for JobHandle {
                 unsupported: false,
                 kind: None,
                 detail: None,
+                context: None,
                 auth_required: false,
             }));
         }
@@ -877,6 +879,7 @@ pub(crate) async fn wait_done(mut done: watch::Receiver<Option<JobResult>>) -> J
             unsupported: false,
             kind: None,
             detail: None,
+            context: None,
             auth_required: false,
         }),
     }

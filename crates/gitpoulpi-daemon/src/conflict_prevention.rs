@@ -518,6 +518,7 @@ pub fn spawn_debounced(
             unsupported: false,
             kind: None,
             detail: None,
+            context: None,
             auth_required: false,
         });
         let _ = out_tx

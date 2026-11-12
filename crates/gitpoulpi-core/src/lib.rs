@@ -6,6 +6,7 @@ pub mod failure;
 pub mod fuzzy;
 pub mod guard;
 pub mod journal;
+pub mod op_context;
 pub mod licenses;
 pub mod paths;
 pub mod privacy;
@@ -16,4 +17,5 @@ pub mod workflow;
 
 pub use backend::GitBackend;
 pub use error::{Error, NotCancellableReason, Result, TypedError, BUILD_FEATURES};
+pub use op_context::{OpContext, OpTag};
 pub use failure::{redact, redact_register_secret, ErrorDetail, FailureKind, Git2Detail};

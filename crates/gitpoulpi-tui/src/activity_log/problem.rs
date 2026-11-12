@@ -44,6 +44,19 @@ impl Source {
         .to_string()
     }
 
+    /// What the operation is called in the entry's context and the report
+    /// (English, like the rest of the report).
+    fn label(self) -> &'static str {
+        match self {
+            Source::Clone => "Clone",
+            Source::Create => "Create repository",
+            Source::Hosting => "Hosting request",
+            Source::Tool => "External program",
+            Source::Ai => "AI request",
+            Source::Save => "Save file",
+        }
+    }
+
     fn wording(self) -> (String, String) {
         let (summary, hint) = match self {
             Source::Clone => (f::SUMMARY_CLONE, f::HINT_CLONE),
@@ -86,17 +99,30 @@ fn remembered(text: &str) -> Option<FailureKind> {
 /// `message` is what the status line used to say; it is redacted here and
 /// stays the entry's details.
 pub(crate) fn report(source: Source, message: &str) {
-    push_report(source, message, None);
+    push_report(source, message, None, None);
+}
+
+/// [`report`] that says which call failed: `label` ("Hosting request: list
+/// merge requests") and its main `args` ("host=github.com"), shown with the
+/// entry, in the application log line and in the error report.
+pub(crate) fn report_as(source: Source, label: &str, args: &str, message: &str) {
+    let context = gitpoulpi_core::OpContext::named(label, args);
+    push_report(source, message, None, Some(context));
 }
 
 /// [`report`] for a failure that has a place on disk but no open tab (a
 /// clone's destination): the Global Activity Log lists it under that
 /// repository. Returns the entry's id.
 pub(crate) fn report_in(source: Source, message: &str, repo: &std::path::Path) -> u64 {
-    push_report(source, message, Some(repo))
+    push_report(source, message, Some(repo), None)
 }
 
-fn push_report(source: Source, message: &str, repo: Option<&std::path::Path>) -> u64 {
+fn push_report(
+    source: Source,
+    message: &str,
+    repo: Option<&std::path::Path>,
+    context: Option<gitpoulpi_core::OpContext>,
+) -> u64 {
     let kind = remembered(message).unwrap_or_else(|| match source {
         Source::Clone | Source::Hosting => FailureKind::classify(message),
         _ => FailureKind::Other,
@@ -111,7 +137,15 @@ fn push_report(source: Source, message: &str, repo: Option<&std::path::Path>) ->
     entry.hint = Some(hint);
     entry.repo = repo.map(std::path::Path::to_path_buf);
     let repo_text = repo.map(super::repo_text).unwrap_or_default();
-    tracing::warn!(target: "tui", repo = repo_text.as_str(), "{}: {}", entry.title, entry.message);
+    let id = feed::reserve_id();
+    entry.id = id;
+    let context = super::complete_context(
+        context.unwrap_or_else(|| gitpoulpi_core::OpContext::named(source.label(), "")),
+        repo.unwrap_or(std::path::Path::new(crate::tabs::NO_REPOSITORY)),
+        id,
+    );
+    tracing::warn!(target: "tui", repo = repo_text.as_str(), "{}", context.failure_line(&entry.message));
+    entry.context = Some(context);
     super::report::warm_up();
     let id = feed::push(entry);
     super::status_error::arm(id, line, None);
@@ -169,6 +203,30 @@ mod tests {
         remember_kind("the host said no", FailureKind::AuthFailed);
         report(Source::Hosting, "the host said no");
         assert_eq!(newest().kind, FailureKind::AuthFailed);
+    }
+
+    #[test]
+    fn a_failure_names_the_call_that_failed_and_its_arguments() {
+        let _lock = lock();
+        report_as(
+            Source::Hosting,
+            "Hosting request: list merge requests",
+            "host=gitlab.example.test",
+            "the host said no",
+        );
+        let context = newest().context.expect("a context");
+        assert_eq!(context.label, "Hosting request: list merge requests");
+        assert_eq!(context.args, "host=gitlab.example.test");
+        assert_eq!(context.frontend.as_deref(), Some("TUI"));
+        assert!(context.request > 0);
+    }
+
+    #[test]
+    fn a_failure_with_no_call_named_is_known_by_its_source() {
+        let _lock = lock();
+        report(Source::Tool, "could not start `nope`");
+        let context = newest().context.expect("a context");
+        assert_eq!(context.label, "External program");
     }
 
     #[test]

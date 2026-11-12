@@ -23,14 +23,14 @@ pub(super) async fn run_action(
         tokio::time::sleep(Duration::from_millis(ms)).await;
     }
     let original = action.clone();
-    let result = dispatch(
+    let (result, failed_op) = super::failed_op::capture(dispatch(
         conn,
         action,
         action_error_tx,
         action_message_tx,
         push_rejected_tx,
         activity,
-    )
+    ))
     .await;
     match result {
         Err(CoreError::PushRejected(rejection)) => {
@@ -69,7 +69,14 @@ pub(super) async fn run_action(
             false
         }
         Err(e) => {
-            crate::activity_log::report_failure(&original, &e, &conn.repo.root, started.elapsed());
+            let context = failed_op.unwrap_or_else(|| original.op_context());
+            crate::activity_log::report_failure(
+                &original,
+                &e,
+                &conn.repo.root,
+                started.elapsed(),
+                context,
+            );
             let _ = action_error_tx.send_notify(error_text::error_text(&e));
             false
         }

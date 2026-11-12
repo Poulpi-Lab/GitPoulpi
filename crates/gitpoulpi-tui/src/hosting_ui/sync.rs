@@ -296,8 +296,10 @@ impl HostingUi {
                 let names = match answer {
                     Ok(options) => Some(options.lists.into_iter().map(|c| c.label).collect()),
                     Err(why) => {
-                        crate::activity_log::report_problem(
+                        crate::activity_log::report_problem_as(
                             crate::activity_log::ProblemSource::Hosting,
+                            "Hosting request: list board columns",
+                            "",
                             &why,
                         );
                         None
@@ -315,8 +317,10 @@ impl HostingUi {
                 match answer.result {
                     Ok(list) => ProjectsState::Ready(list),
                     Err(why) => {
-                        crate::activity_log::report_problem(
+                        crate::activity_log::report_problem_as(
                             crate::activity_log::ProblemSource::Hosting,
+                            "Hosting request: list projects",
+                            &format!("profile={}", answer.profile_id),
                             &why,
                         );
                         ProjectsState::Failed(why)

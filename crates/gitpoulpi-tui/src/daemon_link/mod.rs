@@ -53,6 +53,7 @@ mod action;
 mod conn;
 mod convert_summary;
 pub(crate) mod error_text;
+mod failed_op;
 mod file_insight;
 mod handle;
 mod link_loop;

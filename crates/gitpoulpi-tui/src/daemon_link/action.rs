@@ -708,6 +708,29 @@ impl Action {
         })
     }
 
+    /// What this action is, for an error that reached the window without the
+    /// daemon's own account of the operation (the link was lost, an older
+    /// daemon): the operation it sends, or the action's own name.
+    pub(crate) fn op_context(&self) -> gitpoulpi_core::OpContext {
+        match self {
+            Action::AutoStashed(inner) | Action::AllowSensitive(inner) => inner.op_context(),
+            _ => match self.request() {
+                Some((kind, args)) => gitpoulpi_ipc::op_context::context_of(kind, &args, None, 0),
+                None => {
+                    let debug = format!("{self:?}");
+                    let name: String = debug
+                        .chars()
+                        .take_while(|c| c.is_ascii_alphanumeric())
+                        .collect();
+                    gitpoulpi_core::OpContext::named(
+                        gitpoulpi_core::op_context::words_of_key(&name),
+                        "",
+                    )
+                }
+            },
+        }
+    }
+
     /// For an action that destroys something and is journaled, the status
     /// line after it succeeded: "Discard done - Ctrl+Z to undo", with the
     /// key as the user has it bound.

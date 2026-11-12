@@ -115,6 +115,7 @@ pub mod build_features;
 #[cfg(test)]
 mod cjk_sweep_tests;
 mod clipboard;
+mod clipboard_route;
 mod clone_dialog;
 mod clone_task;
 mod color_depth;
@@ -208,6 +209,7 @@ mod sidebar_layout;
 #[cfg(test)]
 mod source_scan;
 mod sparse_dialog;
+mod startup_probe;
 mod startup_tab;
 mod status_optimistic;
 mod status_pane;
@@ -396,8 +398,8 @@ use refs_tree::{ref_display_rows, CollapsedFolders, RefRowKind, RefTreeRow};
 use scrollbar::ScrollBar;
 use status_pane::{
     all_folders, build_tree_rows, discard_confirmation_prompt, entry_status, file_context_entries,
-    osc52_copy, section_paths, status_marker, unstaged_paths_under, FileContextAction,
-    FileListMode, FolderContextAction, StatusSection, TreeRow,
+    section_paths, status_marker, unstaged_paths_under, FileContextAction, FileListMode,
+    FolderContextAction, StatusSection, TreeRow,
 };
 use worktree_dialog::WorktreeSeed;
 

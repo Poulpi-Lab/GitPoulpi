@@ -5622,6 +5622,8 @@ what_selection = "the selection"
 
 # context: clipboard sentences; {what} names the copied thing, {preview} echoes it
 copied = "copied {what} ({preview})"
+# context: status line when a copy could only be sent to the terminal (OSC 52), which may or may not reach a clipboard; {what} names the copied thing
+copied_via_terminal = "sent {what} to the terminal clipboard (OSC 52, not confirmed)"
 copy_failed = "could not copy {what}: {error}"
 no_clipboard = "no clipboard available: {error}"
 nothing_to_paste = "nothing to paste: {error}"

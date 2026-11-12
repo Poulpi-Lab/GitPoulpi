@@ -4626,6 +4626,7 @@ what_explanation = "l'explication"
 what_selection = "la sélection"
 
 copied = "copié : {what} ({preview})"
+copied_via_terminal = "{what} envoyé au presse-papiers du terminal (OSC 52, non confirmé)"
 copy_failed = "impossible de copier {what} : {error}"
 no_clipboard = "aucun presse-papiers disponible : {error}"
 nothing_to_paste = "rien à coller : {error}"

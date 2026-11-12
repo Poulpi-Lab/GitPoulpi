@@ -9,6 +9,7 @@ pub mod launch;
 pub mod mcp_secrets;
 pub mod open_in;
 pub mod os_apps;
+pub mod osc52;
 mod paths;
 pub mod policy;
 pub mod release;

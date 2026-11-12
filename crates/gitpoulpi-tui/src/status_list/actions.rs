@@ -1,4 +1,5 @@
 use super::*;
+use crate::clipboard_route::Delivery;
 use gitpoulpi_core::domain::{rule_pattern, RuleKind, RuleScope, Treat};
 use gitpoulpi_i18n::msg::status_list as msg;
 
@@ -276,14 +277,15 @@ pub(crate) fn apply_file_context_action(
             });
         }
         FileContextAction::CopyPath => {
-            // OSC 52 goes to the terminal, so it has to be written to the
-            // same stdout ratatui draws on.
-            let seq = osc52_copy(&path.to_string_lossy());
-            use std::io::Write;
-            let mut out = io::stdout();
-            let _ = out.write_all(seq.as_bytes());
-            let _ = out.flush();
-            *last_message = Some(msg::copied_clipboard(path.display()));
+            *last_message = Some(
+                match crate::clipboard::deliver_shared(&path.to_string_lossy()) {
+                    Delivery::Clipboard => msg::copied_clipboard(path.display()),
+                    Delivery::Terminal => {
+                        gitpoulpi_i18n::msg::input::copied_via_terminal(path.display())
+                    }
+                    Delivery::Nowhere(why) => gitpoulpi_i18n::msg::input::no_clipboard(why),
+                },
+            );
         }
         // The menu already names the file, so unlike the palette's
         // version these two never have to go looking for a target.

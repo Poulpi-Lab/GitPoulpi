@@ -4617,6 +4617,7 @@ what_explanation = "пояснення"
 what_selection = "виділене"
 
 copied = "скопійовано {what} ({preview})"
+copied_via_terminal = "{what}: надіслано до буфера обміну термінала (OSC 52, без підтвердження)"
 copy_failed = "не вдалося скопіювати {what}: {error}"
 no_clipboard = "буфер обміну недоступний: {error}"
 nothing_to_paste = "нічого вставляти: {error}"

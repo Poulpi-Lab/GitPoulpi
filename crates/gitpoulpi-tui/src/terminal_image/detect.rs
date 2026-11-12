@@ -248,6 +248,49 @@ impl From<gitpoulpi_config::GraphRenderer> for RendererChoice {
     }
 }
 
+/// The environment as detection sees it: the process environment plus the
+/// synthetic keys answered by start-up queries. The Activity Log report uses
+/// this same lookup so it can never disagree with the decision made for
+/// rendering.
+pub(crate) fn ambient_env(name: &str) -> Option<String> {
+    match name {
+        passthrough::CLIENT_FEATURES_KEY => passthrough::query_client_features(),
+        PROBE_VERSION_KEY => crate::startup_probe::reply().version.clone(),
+        PROBE_ATTRIBUTES_KEY => crate::startup_probe::reply().attributes_text(),
+        _ => std::env::var(name).ok(),
+    }
+}
+
+/// The synthetic "variables" that carry what the start-up probe heard
+/// (`startup_probe`): the XTVERSION text and the device attributes parameters
+/// (`62;4;22`). Like [`passthrough::CLIENT_FEATURES_KEY`], they keep
+/// detection a pure function of its environment: tests answer them from a
+/// table.
+pub(crate) const PROBE_VERSION_KEY: &str = "\0probe:xtversion";
+pub(crate) const PROBE_ATTRIBUTES_KEY: &str = "\0probe:da1";
+
+/// What the terminal's own answers say about pictures, for a terminal the
+/// environment could not name: its XTVERSION name first (kitty, Ghostty,
+/// WezTerm, iTerm2, mintty, foot), then parameter `4` of its device
+/// attributes (sixel: xterm started with `-ti vt340`, a VS Code terminal with
+/// images on, a sixel-capable terminal reached over SSH).
+///
+/// Only ever called past the multiplexer checks: tmux answers device
+/// attributes with a sixel claim whatever sits behind it, so inside any
+/// multiplexer these answers are not about the terminal that draws.
+pub(super) fn probe_protocol<F: Fn(&str) -> Option<String>>(get: &F) -> Protocol {
+    if let Some(protocol) =
+        get(PROBE_VERSION_KEY).and_then(|v| crate::startup_probe::protocol_for_version(&v))
+    {
+        return protocol;
+    }
+    if get(PROBE_ATTRIBUTES_KEY).is_some_and(|a| a.split(';').any(|p| p == "4")) {
+        Protocol::Sixel
+    } else {
+        Protocol::None
+    }
+}
+
 /// Detects what the terminal can do.
 ///
 /// Cheap and side-effect free - it reads environment variables and, at
@@ -255,18 +298,9 @@ impl From<gitpoulpi_config::GraphRenderer> for RendererChoice {
 /// property that matters: see [`cell_size`].
 pub(crate) fn detect(choice: RendererChoice, wanted: ImageProtocol) -> Capability {
     Capability {
-        protocol: protocol_for(
-            choice,
-            wanted,
-            &|name| {
-                if name == passthrough::CLIENT_FEATURES_KEY {
-                    passthrough::query_client_features()
-                } else {
-                    std::env::var(name).ok()
-                }
-            },
-            &|path| std::fs::read_to_string(path).ok(),
-        ),
+        protocol: protocol_for(choice, wanted, &ambient_env, &|path| {
+            std::fs::read_to_string(path).ok()
+        }),
         cell: cell_size(),
     }
 }
@@ -342,6 +376,8 @@ where
 /// - WezTerm, iTerm2 - it speaks both, and iTerm2 is the proven one;
 /// - kitty and Ghostty, Kitty;
 /// - the other iTerm2 terminals, iTerm2;
+/// - then what the terminal said to the start-up probe: its XTVERSION name,
+///   or sixel in its device attributes ([`probe_protocol`]);
 /// - anything else, text.
 pub(super) fn auto_protocol<F, R>(get: &F, read: &R) -> Protocol
 where
@@ -378,7 +414,9 @@ where
     } else if sixel_only_terminal(get) {
         Protocol::Sixel
     } else {
-        Protocol::None
+        // The environment names nobody: ask what the terminal said at
+        // start-up (`startup_probe`).
+        probe_protocol(get)
     }
 }
 
@@ -390,12 +428,11 @@ where
 /// attributes and draws a transparent sixel picture, and shows neither kitty
 /// nor iTerm2 images).
 ///
-/// **Not DA1.** The textbook test is parameter 4 in the reply to `CSI c`,
-/// but the reply arrives on stdin and detection here never reads stdin
-/// (see [`cell_size`]: a blocked read cannot be canceled and eats
-/// keystrokes). So the VS Code terminal (`terminal.integrated.enableImages`
-/// is off by default) and a sixel-enabled xterm stay text under `auto`;
-/// `ui.image_protocol = "sixel"` opts in.
+/// **Not DA1 here.** Parameter 4 in the reply to `CSI c` is the textbook
+/// test, but this function reads the environment only; a terminal it does not
+/// name (a sixel-enabled xterm, a VS Code terminal with
+/// `terminal.integrated.enableImages` on) is caught afterwards by
+/// [`probe_protocol`], from the answers of the start-up probe.
 pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
     let set = |name: &str| get(name).is_some_and(|v| !v.is_empty());
     let term = get("TERM").unwrap_or_default().to_ascii_lowercase();

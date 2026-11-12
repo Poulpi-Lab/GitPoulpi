@@ -16,6 +16,13 @@
 //! On Windows and macOS none of this applies: the OS copies the bytes into
 //! a system-owned buffer and the value outlives the process.
 //!
+//! # Where a copy goes
+//!
+//! The system clipboard, the terminal's (OSC 52), or both, by the policy in
+//! [`crate::clipboard_route`]: over SSH or with no display only the terminal
+//! is asked, and the sentence then says "sent ... to the terminal clipboard"
+//! instead of "copied", because nothing confirms it arrived.
+//!
 //! # Failure is a status-line message, never a panic
 //!
 //! Headless CI, a bare tty with no X11/Wayland display, or a Wayland
@@ -35,6 +42,7 @@
 //! A pty test reads the copied text back whole through `GITPOULPI_CLIPBOARD_DUMP`
 //! (a file path that receives every in-memory copy).
 
+use crate::clipboard_route::{deliver as route_deliver, Delivery, Surroundings};
 use gitpoulpi_i18n::msg;
 
 /// Set to `memory` to keep copies in-process instead of on the system
@@ -50,8 +58,12 @@ enum Backend {
     Memory(String),
 }
 
+fn memory_backend() -> bool {
+    cfg!(test) || std::env::var(BACKEND_ENV).is_ok_and(|v| v == "memory")
+}
+
 fn open_backend() -> Result<Backend, String> {
-    if cfg!(test) || std::env::var(BACKEND_ENV).is_ok_and(|v| v == "memory") {
+    if memory_backend() {
         return Ok(Backend::Memory(String::new()));
     }
     arboard::Clipboard::new()
@@ -74,38 +86,52 @@ impl Clipboard {
         Self { inner: None }
     }
 
-    /// Puts `value` on the system clipboard and returns the sentence to show
-    /// in the status line, whether it worked or not.
-    ///
-    /// `what` names the thing in the user's own words ("short SHA", "author
-    /// email") so the confirmation says what was copied without echoing a
-    /// commit message into a one-line status bar.
-    pub(crate) fn copy(&mut self, what: &str, value: &str) -> String {
-        let handle = self.inner.get_or_insert_with(open_backend);
-        let set = match handle {
+    /// Copies `value` by the policy in [`crate::clipboard_route`] and says
+    /// where it went. Nothing here blocks: the system write is arboard's
+    /// non-waiting `set_text`, the terminal write is one `write_all`.
+    pub(crate) fn deliver(&mut self, value: &str) -> Delivery {
+        if memory_backend() {
+            // Tests and the pty harness: a private buffer, never the real
+            // clipboard and never an escape sequence on the screen.
+            let handle = self
+                .inner
+                .get_or_insert_with(|| Ok(Backend::Memory(String::new())));
+            if let Ok(Backend::Memory(buffer)) = handle {
+                *buffer = value.to_string();
+            }
+            // Test hook: the PTY tests cannot read an in-memory buffer
+            // of another process, so each copy is also written here.
+            if let Ok(path) = std::env::var(DUMP_ENV) {
+                let _ = std::fs::write(path, value);
+            }
+            return Delivery::Clipboard;
+        }
+        let around = Surroundings::from_env(&|name| std::env::var(name).ok());
+        let inner = &mut self.inner;
+        let system = || match inner.get_or_insert_with(open_backend) {
             Ok(Backend::System(clipboard)) => clipboard
                 .set_text(value.to_string())
                 .map_err(|e| e.to_string()),
-            Ok(Backend::Memory(buffer)) => {
-                *buffer = value.to_string();
-                // Test hook: the PTY tests cannot read an in-memory buffer
-                // of another process, so each copy is also written here.
-                if let Ok(path) = std::env::var(DUMP_ENV) {
-                    let _ = std::fs::write(path, value);
-                }
-                Ok(())
-            }
-            Err(why) => return msg::input::no_clipboard(why),
+            Ok(Backend::Memory(_)) => Ok(()),
+            // Not cached as a dead handle on a failed `set_text`: a
+            // transient failure (another app holding the Windows
+            // clipboard open) must not disable Copy for the session; but
+            // an open that failed is retried next time too.
+            Err(why) => Err(why.clone()),
         };
-        match set {
-            Ok(()) => msg::input::copied(what, preview(value)),
-            Err(e) => {
-                // Do not cache this as a dead handle: a transient
-                // failure (another app holding the Windows clipboard
-                // open) must not disable Copy for the rest of the
-                // session.
-                msg::input::copy_failed(what, e)
-            }
+        // OSC 52 goes to the terminal, the same stdout ratatui draws on.
+        route_deliver(&around, value, system, &mut std::io::stdout())
+    }
+
+    /// [`Clipboard::deliver`] and the sentence for the status line: `what`
+    /// names the thing in the user's own words ("short SHA", "author email")
+    /// so the confirmation says what was copied without echoing a commit
+    /// message into a one-line status bar.
+    pub(crate) fn copy(&mut self, what: &str, value: &str) -> String {
+        match self.deliver(value) {
+            Delivery::Clipboard => msg::input::copied(what, preview(value)),
+            Delivery::Terminal => msg::input::copied_via_terminal(what),
+            Delivery::Nowhere(why) => msg::input::copy_failed(what, why),
         }
     }
 
@@ -113,20 +139,10 @@ impl Clipboard {
     /// that must not be echoed into the status line. `Err` is the sentence
     /// to show.
     #[cfg(feature = "mcp")]
-    pub(crate) fn copy_secret(&mut self, value: &str) -> Result<(), String> {
-        let handle = self.inner.get_or_insert_with(open_backend);
-        match handle {
-            Ok(Backend::System(clipboard)) => clipboard
-                .set_text(value.to_string())
-                .map_err(|e| msg::input::copy_failed("token", e.to_string())),
-            Ok(Backend::Memory(buffer)) => {
-                *buffer = value.to_string();
-                if let Ok(path) = std::env::var(DUMP_ENV) {
-                    let _ = std::fs::write(path, value);
-                }
-                Ok(())
-            }
-            Err(why) => Err(msg::input::no_clipboard(why)),
+    pub(crate) fn copy_secret(&mut self, value: &str) -> Result<Delivery, String> {
+        match self.deliver(value) {
+            Delivery::Nowhere(why) => Err(msg::input::copy_failed("token", why)),
+            done => Ok(done),
         }
     }
 
@@ -155,6 +171,12 @@ thread_local! {
     static SHARED: std::cell::RefCell<Clipboard> = std::cell::RefCell::new(Clipboard::new());
 }
 
+/// [`Clipboard::deliver`] through the thread's long-lived shared handle, for
+/// the callers that word the sentence themselves.
+pub(crate) fn deliver_shared(value: &str) -> Delivery {
+    SHARED.with(|clipboard| clipboard.borrow_mut().deliver(value))
+}
+
 /// [`Clipboard::copy`] through the thread's long-lived shared handle.
 pub(crate) fn copy_shared(what: &str, value: &str) -> String {
     SHARED.with(|clipboard| clipboard.borrow_mut().copy(what, value))
@@ -162,7 +184,7 @@ pub(crate) fn copy_shared(what: &str, value: &str) -> String {
 
 /// [`Clipboard::copy_secret`] through the thread's long-lived shared handle.
 #[cfg(feature = "mcp")]
-pub(crate) fn copy_secret_shared(value: &str) -> Result<(), String> {
+pub(crate) fn copy_secret_shared(value: &str) -> Result<Delivery, String> {
     SHARED.with(|clipboard| clipboard.borrow_mut().copy_secret(value))
 }
 

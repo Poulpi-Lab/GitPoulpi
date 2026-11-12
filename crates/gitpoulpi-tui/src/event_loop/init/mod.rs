@@ -27,16 +27,20 @@ pub(super) fn init(
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
+    // The one start-up question to the terminal (`startup_probe`): keyboard
+    // protocol, background color, XTVERSION and device attributes in a single
+    // write and a single read bounded to ~100 ms, its reply fully read.
+    // Before anything that reads input; the three users below take their
+    // answers from it.
+    crate::startup_probe::run();
     // `ui.theme = system`: the terminal's own background decides Light or
-    // Dark (OSC 11, then COLORFGBG, then Dark), once, bounded to ~100 ms,
-    // its reply fully read. Before the keyboard probe and anything that
-    // reads input.
+    // Dark (OSC 11, then COLORFGBG, then Dark).
     if settings.config().ui.theme_slug() == gitpoulpi_config::THEME_SYSTEM {
         crate::theme::set_system_is_light(crate::terminal_bg::detect_is_light().unwrap_or(false));
     }
     crate::color_depth::install(settings.config().ui.color_depth);
     crate::text_cursor::install(settings.config().ui.text_cursor);
-    // The kitty keyboard protocol (`ui.kitty_keyboard`): a bounded query,
+    // The kitty keyboard protocol (`ui.kitty_keyboard`): the probe's answer,
     // then a push the teardown pops. Before anything reads the keyboard.
     crate::kitty_keyboard::enable(settings.config().ui.kitty_keyboard, &mut stdout);
     if settings.config().ui.mouse_enabled {

@@ -16,6 +16,6 @@ mod query;
 mod rep;
 mod session;
 
-pub use query::{answer_queries, QUERY_CARRY};
+pub use query::{answer_queries, answer_queries_with, Replies, QUERY_CARRY};
 pub use rep::RepExpander;
 pub use session::{PtySession, SpawnOptions};

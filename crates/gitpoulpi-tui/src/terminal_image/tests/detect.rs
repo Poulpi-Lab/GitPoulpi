@@ -287,3 +287,88 @@ fn forcing_pictures_in_tmux_inside_kitty_picks_the_kitty_protocol() {
     // Auto stays conservative: it does not know `allow-passthrough`.
     assert_eq!(protocol_for(RendererChoice::Auto, &get), Protocol::None);
 }
+
+/// `pairs` plus what the start-up probe heard (XTVERSION text, device
+/// attributes parameters).
+fn with_probe<'a>(
+    pairs: &'a [(&'a str, &'a str)],
+    version: Option<&'a str>,
+    attributes: Option<&'a str>,
+) -> impl Fn(&str) -> Option<String> + 'a {
+    move |name: &str| match name {
+        super::super::detect::PROBE_VERSION_KEY => version.map(str::to_string),
+        super::super::detect::PROBE_ATTRIBUTES_KEY => attributes.map(str::to_string),
+        _ => pairs
+            .iter()
+            .find(|(k, _)| *k == name)
+            .map(|(_, v)| (*v).to_string()),
+    }
+}
+
+const XTERM_ENV: [(&str, &str); 1] = [("TERM", "xterm-256color")];
+
+#[test]
+fn an_unnamed_terminal_that_reports_sixel_gets_sixel() {
+    // xterm started with `-ti vt340`, a VS Code terminal with images on.
+    let get = with_probe(&XTERM_ENV, None, Some("63;4;22"));
+    assert_eq!(protocol_for(RendererChoice::Auto, &get), Protocol::Sixel);
+}
+
+#[test]
+fn an_unnamed_terminal_without_sixel_stays_text() {
+    let plain = with_probe(&XTERM_ENV, None, Some("1;2"));
+    assert_eq!(protocol_for(RendererChoice::Auto, &plain), Protocol::None);
+    let silent = with_probe(&XTERM_ENV, None, None);
+    assert_eq!(protocol_for(RendererChoice::Auto, &silent), Protocol::None);
+}
+
+#[test]
+fn a_terminal_reached_over_ssh_is_recognized_by_its_name() {
+    // `TERM_PROGRAM` is not forwarded by ssh: only XTVERSION is left.
+    let pairs = [("TERM", "xterm-256color"), ("SSH_CONNECTION", "a 1 b 22")];
+    let kitty = with_probe(&pairs, Some("kitty(0.35.2)"), Some("62;c"));
+    assert_eq!(protocol_for(RendererChoice::Auto, &kitty), Protocol::Kitty);
+    let wezterm = with_probe(&pairs, Some("WezTerm 20240203-110809"), Some("1;2"));
+    assert_eq!(
+        protocol_for(RendererChoice::Auto, &wezterm),
+        Protocol::Iterm2
+    );
+    // A name that says nothing about pictures leaves the attributes to decide.
+    let xterm = with_probe(&pairs, Some("XTerm(388)"), Some("64;4"));
+    assert_eq!(protocol_for(RendererChoice::Auto, &xterm), Protocol::Sixel);
+}
+
+#[test]
+fn the_probe_never_overrides_a_multiplexer_veto() {
+    // tmux claims sixel in its own attributes reply whatever the client is.
+    for extra in [
+        ("TMUX", "/tmp/tmux-1000/default,1,0"),
+        ("ZELLIJ", "0"),
+        ("STY", "1.pts-0.host"),
+        ("HERDR_ENV", "1"),
+    ] {
+        let mut pairs = XTERM_ENV.to_vec();
+        pairs.push(extra);
+        let get = with_probe(&pairs, Some("kitty(0.35.2)"), Some("1;2;4"));
+        assert_eq!(
+            protocol_for(RendererChoice::Auto, &get),
+            Protocol::None,
+            "{}",
+            extra.0
+        );
+    }
+}
+
+#[test]
+fn the_environment_wins_over_the_probe() {
+    // A kitty window keeps the Kitty protocol whatever the attributes say.
+    let pairs = [("KITTY_WINDOW_ID", "1"), ("TERM", "xterm-kitty")];
+    let get = with_probe(&pairs, Some("foot(1.28)"), Some("1;2;4"));
+    assert_eq!(protocol_for(RendererChoice::Auto, &get), Protocol::Kitty);
+}
+
+#[test]
+fn text_stays_text_when_the_user_says_so() {
+    let get = with_probe(&XTERM_ENV, None, Some("63;4;22"));
+    assert_eq!(protocol_for(RendererChoice::Text, &get), Protocol::None);
+}

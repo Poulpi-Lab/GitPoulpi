@@ -4,6 +4,7 @@
 //! insight).
 
 use super::*;
+use crate::clipboard_route::Delivery;
 use crate::diff_view::DiffCopy;
 use gitpoulpi_i18n::msg::diff_actions as msg;
 
@@ -810,17 +811,18 @@ pub(crate) fn apply_diff_hunk_context_action(
             };
             open_insight_request(diff_insight_request(state, kind, refs), link, file_insight);
         }
-        // OSC 52 goes to the terminal, so it is written to the same stdout
-        // ratatui draws on, as `FileContextAction::CopyPath` does.
         DiffHunkContextAction::CopyPath => {
-            let seq = osc52_copy(&state.path.to_string_lossy());
-            use std::io::Write;
-            let mut out = std::io::stdout();
-            let _ = out.write_all(seq.as_bytes());
-            let _ = out.flush();
-            *last_message = Some(gitpoulpi_i18n::msg::status_list::copied_clipboard(
-                state.path.display(),
-            ));
+            *last_message = Some(
+                match crate::clipboard::deliver_shared(&state.path.to_string_lossy()) {
+                    Delivery::Clipboard => {
+                        gitpoulpi_i18n::msg::status_list::copied_clipboard(state.path.display())
+                    }
+                    Delivery::Terminal => {
+                        gitpoulpi_i18n::msg::input::copied_via_terminal(state.path.display())
+                    }
+                    Delivery::Nowhere(why) => gitpoulpi_i18n::msg::input::no_clipboard(why),
+                },
+            );
         }
         // Answered by `apply_diff_stage_at` above.
         DiffHunkContextAction::ToggleStage

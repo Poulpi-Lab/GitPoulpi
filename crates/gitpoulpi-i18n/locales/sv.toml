@@ -4619,6 +4619,7 @@ what_explanation = "förklaringen"
 what_selection = "markeringen"
 
 copied = "kopierade {what} ({preview})"
+copied_via_terminal = "{what} skickad till terminalens urklipp (OSC 52, ej bekräftad)"
 copy_failed = "kunde inte kopiera {what}: {error}"
 no_clipboard = "inget urklipp tillgängligt: {error}"
 nothing_to_paste = "inget att klistra in: {error}"

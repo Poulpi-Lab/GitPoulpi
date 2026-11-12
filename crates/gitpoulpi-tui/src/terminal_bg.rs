@@ -1,28 +1,16 @@
 //! Terminal background detection for `ui.theme = system`, once at start-up.
 //!
-//! Asks with OSC 11 (`ESC ] 11 ; ? ST`) followed by the primary device
-//! attributes query as a sentinel: every terminal answers the latter, so a
-//! terminal that does not know OSC 11 costs no wait and the reply (if any)
-//! is fully read, never left for the event loop. A hard deadline
-//! ([`PROBE_BUDGET`]) bounds a terminal that answers neither. Unix only
-//! (it reads `/dev/tty`); on Windows, or without an answer, `COLORFGBG`,
-//! then Dark. Re-detection while running is not done.
+//! The question (OSC 11, `ESC ] 11 ; ? ST`) is one of the merged start-up
+//! probe's (`startup_probe`: one write, one bounded read, the device
+//! attributes reply as the sentinel), so a terminal that does not know OSC 11
+//! costs no wait and the reply (if any) is fully read, never left for the
+//! event loop. Unix only (it reads `/dev/tty`); on Windows, or without an
+//! answer, `COLORFGBG`, then Dark. Re-detection while running is not done.
 //!
 //! A hand-written reader rather than the `terminal-colorsaurus` crate: the
-//! kitty keyboard probe already needed the same bounded `/dev/tty` read,
-//! a dependency would add a second implementation of it, and ConPTY (which
-//! is why the crate has a Windows path at all) is simply skipped here.
-
-#[cfg(unix)]
-use std::time::Duration;
-
-/// How long start-up may wait for the terminal's answer, in total.
-#[cfg(unix)]
-pub(crate) const PROBE_BUDGET: Duration = Duration::from_millis(100);
-
-/// OSC 11 background query (ST-terminated), then the DA sentinel.
-#[cfg(unix)]
-const QUERY: &[u8] = b"\x1b]11;?\x1b\\\x1b[c";
+//! probe needs the same bounded `/dev/tty` read for more than the color,
+//! and ConPTY (which is why the crate has a Windows path at all) is simply
+//! skipped here.
 
 // Windows never sends the query (see `detect_is_light`): the parsing
 // helpers below only exist on unix, and in tests everywhere.
@@ -82,84 +70,12 @@ pub(crate) fn colorfgbg_is_light(value: &str) -> Option<bool> {
 /// Light or dark, from what the terminal says; `None` when unknown.
 pub(crate) fn detect_is_light() -> Option<bool> {
     #[cfg(unix)]
-    if let Some(rgb) = probe(PROBE_BUDGET) {
+    if let Some(rgb) = crate::startup_probe::reply().background {
         return Some(is_light(rgb));
     }
     std::env::var("COLORFGBG")
         .ok()
         .and_then(|v| colorfgbg_is_light(&v))
-}
-
-/// Whether the bytes read so far contain the DA reply (`ESC [ ? ... c`).
-#[cfg(unix)]
-fn has_attributes_reply(bytes: &[u8]) -> bool {
-    let mut i = 0;
-    while i + 2 < bytes.len() {
-        if bytes[i] == 0x1b && bytes[i + 1] == b'[' && bytes[i + 2] == b'?' {
-            let mut j = i + 3;
-            while j < bytes.len() && (bytes[j].is_ascii_digit() || bytes[j] == b';') {
-                j += 1;
-            }
-            if bytes.get(j) == Some(&b'c') {
-                return true;
-            }
-            i = j;
-        } else {
-            i += 1;
-        }
-    }
-    false
-}
-
-/// Asks the controlling terminal; `None` on silence, an error or a bad reply.
-/// Must run in raw mode, before anything else reads the keyboard.
-#[cfg(unix)]
-pub(crate) fn probe(budget: Duration) -> Option<(u8, u8, u8)> {
-    use std::fs::OpenOptions;
-    use std::io::{Read, Write};
-    use std::os::fd::AsRawFd;
-    use std::time::Instant;
-
-    let mut tty = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .open("/dev/tty")
-        .ok()?;
-    tty.write_all(QUERY).and_then(|()| tty.flush()).ok()?;
-    let deadline = Instant::now() + budget;
-    let mut seen: Vec<u8> = Vec::new();
-    // The sentinel closes the read: the color reply, when there is one,
-    // precedes it. A terminal that never sends the sentinel is bounded by
-    // the deadline, and whatever it said by then is still parsed.
-    while !has_attributes_reply(&seen) {
-        let left = deadline.saturating_duration_since(Instant::now());
-        if left.is_zero() {
-            break;
-        }
-        let mut pfd = libc::pollfd {
-            fd: tty.as_raw_fd(),
-            events: libc::POLLIN,
-            revents: 0,
-        };
-        let ms = left.as_millis().clamp(1, i32::MAX as u128) as i32;
-        // SAFETY: one valid pollfd, count 1.
-        let ready = unsafe { libc::poll(&mut pfd, 1, ms) };
-        if ready < 0 {
-            if std::io::Error::last_os_error().kind() == std::io::ErrorKind::Interrupted {
-                continue;
-            }
-            break;
-        }
-        if ready == 0 {
-            break;
-        }
-        let mut chunk = [0u8; 128];
-        match tty.read(&mut chunk) {
-            Ok(0) | Err(_) => break,
-            Ok(n) => seen.extend_from_slice(&chunk[..n]),
-        }
-    }
-    parse_osc11(&seen)
 }
 
 #[cfg(test)]
@@ -214,13 +130,5 @@ mod tests {
         assert_eq!(colorfgbg_is_light("7;8"), Some(false));
         assert_eq!(colorfgbg_is_light("garbage"), None);
         assert_eq!(colorfgbg_is_light(""), None);
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn the_sentinel_is_recognized() {
-        assert!(has_attributes_reply(b"\x1b]11;rgb:0/0/0\x07\x1b[?1;2c"));
-        assert!(!has_attributes_reply(b"\x1b]11;rgb:0/0/0\x07"));
-        assert!(!has_attributes_reply(b"\x1b[?1;2"));
     }
 }

@@ -54,6 +54,10 @@ pub struct Launch {
     extra_args: Vec<OsString>,
     kitty_answers: bool,
     background: Option<String>,
+    /// Device attributes reply parameters (see [`Launch::answer_attributes`]).
+    attributes: Option<String>,
+    /// XTVERSION reply text (see [`Launch::answer_version`]).
+    version: Option<String>,
     terminal_image: bool,
     mouse_capture: bool,
     startup: Duration,
@@ -81,6 +85,8 @@ pub fn launch(repo: impl AsRef<Path>) -> Launch {
         extra_args: Vec::new(),
         kitty_answers: false,
         background: None,
+        attributes: None,
+        version: None,
         terminal_image: false,
         mouse_capture: false,
         startup: STARTUP,
@@ -164,6 +170,19 @@ impl Launch {
     /// as most terminals do; silent by default.
     pub fn answer_background(mut self, rgb: &str) -> Self {
         self.background = Some(rgb.to_string());
+        self
+    }
+
+    /// Answers the primary device attributes query with `CSI ? <params> c`
+    /// (`62;4;22` draws sixel); a plain VT100 `1;2` by default.
+    pub fn answer_attributes(mut self, params: &str) -> Self {
+        self.attributes = Some(params.to_string());
+        self
+    }
+
+    /// Answers XTVERSION with `name`; silent by default.
+    pub fn answer_version(mut self, name: &str) -> Self {
+        self.version = Some(name.to_string());
         self
     }
 
@@ -342,6 +361,12 @@ impl Launch {
         }
         if let Some(rgb) = &self.background {
             builder = builder.answer_background(rgb);
+        }
+        if let Some(params) = &self.attributes {
+            builder = builder.answer_attributes(params);
+        }
+        if let Some(name) = &self.version {
+            builder = builder.answer_version(name);
         }
         let term = builder.spawn().expect("spawn the TUI in a pty");
         if self.detached {

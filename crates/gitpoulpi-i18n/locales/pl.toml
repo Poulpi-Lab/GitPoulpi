@@ -4616,6 +4616,7 @@ what_explanation = "wyjaśnienie"
 what_selection = "zaznaczenie"
 
 copied = "skopiowano {what} ({preview})"
+copied_via_terminal = "{what}: wysłano do schowka terminala (OSC 52, bez potwierdzenia)"
 copy_failed = "nie można skopiować {what}: {error}"
 no_clipboard = "schowek niedostępny: {error}"
 nothing_to_paste = "nie ma czego wkleić: {error}"

@@ -7,8 +7,9 @@
 
 use super::detect::{
     auto_protocol, inside_a_multiplexer, inside_herdr, over_ssh, protocol_for, RendererChoice,
-    MULTIPLEXER_TERM_PREFIXES,
+    MULTIPLEXER_TERM_PREFIXES, PROBE_ATTRIBUTES_KEY, PROBE_VERSION_KEY,
 };
+use super::passthrough::tmux_only;
 use super::Protocol;
 use gitpoulpi_config::ImageProtocol;
 
@@ -60,6 +61,15 @@ where
     (protocol, reason(choice, wanted, get, read))
 }
 
+/// The same environment without what the start-up probe heard, to tell a
+/// verdict the environment gave from one the terminal's answers gave.
+fn without_probe<F: Fn(&str) -> Option<String>>(get: &F) -> impl Fn(&str) -> Option<String> + '_ {
+    move |name| match name {
+        PROBE_VERSION_KEY | PROBE_ATTRIBUTES_KEY => None,
+        _ => get(name),
+    }
+}
+
 fn reason<F, R>(choice: RendererChoice, wanted: ImageProtocol, get: &F, read: &R) -> String
 where
     F: Fn(&str) -> Option<String>,
@@ -92,6 +102,10 @@ where
                     "auto: herdr without kitty_graphics, or an outer terminal that does not draw it"
                         .to_string()
                 }
+            } else if tmux_only(get) && chosen == Protocol::Sixel {
+                "auto: tmux client advertises sixel".to_string()
+            } else if tmux_only(get) {
+                "auto: multiplexer veto (tmux; its client does not advertise sixel)".to_string()
             } else if inside_a_multiplexer(get) {
                 format!(
                     "auto: multiplexer veto ({})",
@@ -99,6 +113,15 @@ where
                 )
             } else if chosen == Protocol::None {
                 "auto: terminal not recognized (deny by default)".to_string()
+            } else if auto_protocol(&without_probe(get), read) == Protocol::None {
+                match get(PROBE_VERSION_KEY)
+                    .filter(|v| crate::startup_probe::protocol_for_version(v).is_some())
+                {
+                    Some(version) => format!("auto: the terminal named itself ({version})"),
+                    None => {
+                        "auto: the terminal reported sixel in its device attributes".to_string()
+                    }
+                }
             } else {
                 "auto: recognized from the terminal's environment".to_string()
             }
@@ -142,6 +165,81 @@ mod tests {
         assert_eq!(p, "none");
         assert!(why.contains("veto") && why.contains("tmux"), "{why}");
         assert_eq!(multiplexers_in(&get), vec!["tmux"]);
+    }
+
+    fn tmux_env<'a>(client: &'a str) -> impl Fn(&str) -> Option<String> + 'a {
+        move |k| match k {
+            super::super::passthrough::CLIENT_FEATURES_KEY => Some(client.to_string()),
+            "TMUX" => Some("/tmp/x".to_string()),
+            "TERM" => Some("tmux-256color".to_string()),
+            _ => None,
+        }
+    }
+
+    #[test]
+    fn tmux_with_a_sixel_client_says_so_not_veto() {
+        let (p, why) = protocol_and_reason(
+            RendererChoice::Auto,
+            ImageProtocol::Auto,
+            &tmux_env("RGB,sixel"),
+            &nothing,
+        );
+        assert_eq!(p, "sixel");
+        assert_eq!(why, "auto: tmux client advertises sixel");
+    }
+
+    #[test]
+    fn tmux_without_a_sixel_client_names_the_veto() {
+        let (p, why) = protocol_and_reason(
+            RendererChoice::Auto,
+            ImageProtocol::Auto,
+            &tmux_env("RGB"),
+            &nothing,
+        );
+        assert_eq!(p, "none");
+        assert!(
+            why.contains("veto") && why.contains("does not advertise"),
+            "{why}"
+        );
+    }
+
+    fn probed<'a>(
+        version: Option<&'a str>,
+        attributes: Option<&'a str>,
+    ) -> impl Fn(&str) -> Option<String> + 'a {
+        move |k| match k {
+            PROBE_VERSION_KEY => version.map(str::to_string),
+            PROBE_ATTRIBUTES_KEY => attributes.map(str::to_string),
+            "TERM" => Some("xterm-256color".to_string()),
+            _ => None,
+        }
+    }
+
+    #[test]
+    fn a_sixel_attribute_is_named_as_the_reason() {
+        let (p, why) = protocol_and_reason(
+            RendererChoice::Auto,
+            ImageProtocol::Auto,
+            &probed(None, Some("63;4;22")),
+            &nothing,
+        );
+        assert_eq!(p, "sixel");
+        assert!(why.contains("device attributes"), "{why}");
+    }
+
+    #[test]
+    fn a_name_from_xtversion_is_named_as_the_reason() {
+        let (p, why) = protocol_and_reason(
+            RendererChoice::Auto,
+            ImageProtocol::Auto,
+            &probed(Some("kitty(0.35.2)"), Some("62;c")),
+            &nothing,
+        );
+        assert_eq!(p, "kitty");
+        assert!(
+            why.contains("named itself") && why.contains("kitty(0.35.2)"),
+            "{why}"
+        );
     }
 
     #[test]

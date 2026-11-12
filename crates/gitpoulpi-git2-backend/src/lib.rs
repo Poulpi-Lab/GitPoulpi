@@ -748,9 +748,15 @@ impl GitBackend for Git2Backend {
             .await
     }
     fn remote_set_url(&self, repo: &RepoRef, name: &str, url: &str) -> Result<()> {
+        if !mutate::remote_has_url(repo, name)? {
+            return self.fallback.remote_set_url(repo, name, url);
+        }
         mutate::remote_set_url(repo, name, url)
     }
     fn remote_set_push_url(&self, repo: &RepoRef, name: &str, url: Option<&str>) -> Result<()> {
+        if !mutate::remote_has_url(repo, name)? {
+            return self.fallback.remote_set_push_url(repo, name, url);
+        }
         mutate::remote_set_push_url(repo, name, url)
     }
     fn ssh_command(&self, repo: &RepoRef) -> Result<Option<String>> {
@@ -973,6 +979,7 @@ impl GitBackend for Git2Backend {
         fn stash_paths(&self, repo: &RepoRef, commit: Oid) -> Result<Vec<String>>;
         fn remote_add(&self, repo: &RepoRef, name: &str, url: &str) -> Result<()>;
         fn remote_remove(&self, repo: &RepoRef, name: &str) -> Result<()>;
+        fn leftover_remotes(&self, repo: &RepoRef) -> Result<Vec<String>>;
         /// Forwarded: a rename also has to move the remote-tag mirror, and
         /// the mirror has exactly one writer (see `tag_push`).
         fn remote_rename(&self, repo: &RepoRef, old_name: &str, new_name: &str) -> Result<()>;

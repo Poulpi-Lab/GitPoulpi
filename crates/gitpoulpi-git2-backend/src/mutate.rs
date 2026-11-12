@@ -301,6 +301,18 @@ pub fn fast_forward(
     })
 }
 
+/// Whether libgit2 sees `name` as a remote with a fetch address - the
+/// only kind it edits. A name git declares without one (a lone `pushurl`,
+/// `fetch` or `tagopt` key) goes to system git instead.
+pub fn remote_has_url(repo: &RepoRef, name: &str) -> Result<bool> {
+    let git_repo = open(repo)?;
+    let has = git_repo
+        .find_remote(name)
+        .map(|r| r.url().is_ok_and(|u| !u.is_empty()))
+        .unwrap_or(false);
+    Ok(has)
+}
+
 /// `remote.<name>.url`. libgit2 would happily write config for a remote
 /// that does not exist, so its existence is checked first.
 pub fn remote_set_url(repo: &RepoRef, name: &str, url: &str) -> Result<()> {

@@ -377,6 +377,8 @@ macro_rules! for_each_contract_check {
             check_repo_config_reads_and_writes_the_commit_template,
             check_remote_rename_carries_branches_upstreams_and_tag_mirror,
             check_remote_remove_forgets_its_tag_mirror,
+            check_a_leftover_remote_namespace_is_listed_and_removable,
+            check_a_remote_without_a_url_can_be_repaired_or_removed,
             check_remote_add_refuses_a_taken_name,
             check_option_lookalike_and_helper_urls_are_refused,
             check_branch_set_upstream_sets_and_unsets,

@@ -87,7 +87,7 @@ pub use reflog::{
     reflog_refname, LostCommit, LostCommitOptions, LostCommitsPage, LostSource, ReflogEntry,
     ReflogPage, ReflogPosition, ZERO_OID,
 };
-pub use refs::split_remote_ref;
+pub use refs::{leftover_remote_refs, split_remote_ref};
 pub use refs::{
     parse_remote_tag_mirror_ref, remote_tag_mirror_ref, Ref, RefKind, RefVisibility, TagSync,
     TagWhere, REMOTE_TAG_MIRROR_PREFIX,

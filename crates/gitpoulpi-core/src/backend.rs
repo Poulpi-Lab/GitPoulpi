@@ -319,6 +319,15 @@ pub trait GitBackend: Send + Sync {
     fn patch_files(&self, repo: &RepoRef, patch: &Path) -> Result<Vec<String>>;
     fn stashes(&self, repo: &RepoRef) -> Result<Vec<Stash>>;
     fn remotes(&self, repo: &RepoRef) -> Result<Vec<Remote>>;
+    /// The remote-tracking namespaces no remote is configured for: refs
+    /// under `refs/remotes/<name>/` (or a tag mirror under
+    /// [`crate::domain::REMOTE_TAG_MIRROR_PREFIX`]) whose `<name>` is not in
+    /// [`GitBackend::remotes`] - what a repository keeps after its remote
+    /// went (a fork that is not one any more). Names split like
+    /// [`crate::domain::split_remote_ref`] does (a configured `grp/sub`
+    /// owns its refs; the rest of `grp/` is the leftover `grp`), sorted.
+    /// [`GitBackend::remote_remove`] on such a name deletes those refs.
+    fn leftover_remotes(&self, repo: &RepoRef) -> Result<Vec<String>>;
     /// Every worktree of `repo`, main one first (see [`Worktree`]).
     fn worktrees(&self, repo: &RepoRef) -> Result<Vec<Worktree>>;
     /// Every submodule `.gitmodules` declares, sorted by path, with its
@@ -1199,6 +1208,11 @@ pub trait GitBackend: Send + Sync {
         Ok(repo)
     }
     fn remote_add(&self, repo: &RepoRef, name: &str, url: &str) -> Result<()>;
+    /// Removes a remote (`git remote remove`) together with its remote-tracking
+    /// branches and its tag mirror. On a *leftover* name (see
+    /// [`GitBackend::leftover_remotes`]) there is no config to remove, so it
+    /// deletes just those refs, never a configured sibling's (`<name>/sub`);
+    /// a name that is neither is "no such remote".
     fn remote_remove(&self, repo: &RepoRef, name: &str) -> Result<()>;
     /// Renames a remote (`git remote rename`): its config section, its
     /// remote-tracking branches, every local branch's upstream that named

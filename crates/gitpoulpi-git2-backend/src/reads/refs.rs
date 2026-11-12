@@ -187,7 +187,17 @@ pub fn remotes(repo: &RepoRef) -> Result<Vec<Remote>> {
     let mut out = Vec::new();
     for name in names.iter().flatten().flatten() {
         let remote = git_repo.find_remote(name).map_err(map_err)?;
-        let fetch_url = remote.url().unwrap_or_default().to_string();
+        // A name with no fetch address (only a `pushurl`) is declared but is
+        // not a remote `git remote -v` lists either: both backends list
+        // only the ones with an address.
+        let Some(fetch_url) = remote
+            .url()
+            .ok()
+            .filter(|u| !u.is_empty())
+            .map(str::to_string)
+        else {
+            continue;
+        };
         let push_url = Some(
             remote
                 .pushurl()

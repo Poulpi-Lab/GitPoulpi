@@ -105,6 +105,8 @@ pub(crate) enum HitTarget {
     /// The "Open in" button of a binary file in the Diff view and the File
     /// View (`open_with::view`), from the rect its paint produced.
     OpenWith,
+    /// "Open in default program" on a Git LFS object card (`open_with::view`).
+    OpenWithDefault,
     /// The primary ref pill rendered in a Log row's Ref column - a
     /// double-click checks it out exactly like a Refs-sidebar row does.
     LogRefPill {
@@ -558,6 +560,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::TabDir(_)
             | HitTarget::OpenInPopup
             | HitTarget::OpenWith
+            | HitTarget::OpenWithDefault
             | HitTarget::LogRefPill { .. }
             | HitTarget::RefsSectionHeader(_)
             | HitTarget::StopSoloing

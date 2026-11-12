@@ -5579,6 +5579,10 @@ gone = "{name} finns inte längre i arbetskatalogen"
 reading = "läser {name} för att öppna en kopia..."
 read_failed = "kunde inte läsa {name}: {why}"
 too_large = "{name} är för stor för att lämnas över som kopia ({size})"
+# context: button on the Git LFS object card (Diff view, File View) beside the Open in list; opens the real file, never the pointer. Width budget: 26 cells
+default_button = "Open in default program"
+# context: status message; {name} is an LFS file whose real content is not in the local LFS store, so there is nothing to open yet
+lfs_missing = "{name} is an LFS file whose content is not downloaded yet, so there is nothing to open"
 
 # Settings > Integrations, the per-kind fields (integrations_page/*): Azure DevOps, Bitbucket, Jira, Trello.
 [integrations_page]

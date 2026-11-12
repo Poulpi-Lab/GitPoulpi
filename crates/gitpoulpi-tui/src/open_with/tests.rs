@@ -288,6 +288,79 @@ fn the_popup_lists_the_default_first_and_marked_and_says_when_it_is_looking_or_e
     );
 }
 
+/// The list opened by a context-menu row is drawn beside that menu, on the
+/// row's line, and not at the screen's corner.
+#[test]
+fn the_list_opened_from_a_menu_row_hangs_beside_the_menu() {
+    let _t = turn();
+    install_fake();
+    popup::close();
+    let name = "flyout-case.fakebin";
+    wait_ready(name);
+    let parent = Rect::new(20, 4, 24, 9);
+    popup::open_for_test(subject(name), Some((parent, 7)));
+    let mut terminal = Terminal::new(TestBackend::new(100, 30)).unwrap();
+    let mut rect = Rect::default();
+    terminal
+        .draw(|frame| {
+            let mut hits = Vec::new();
+            popup::render_popup(frame, None, &mut hits);
+            rect = hits
+                .iter()
+                .find(|(_, t)| *t == HitTarget::OpenInPopup)
+                .map(|(r, _)| *r)
+                .unwrap();
+        })
+        .unwrap();
+    assert_eq!((rect.x, rect.y), (parent.right(), 7), "{rect:?}");
+    popup::close();
+}
+
+/// The LFS card's actions: the default-program button and the list button sit
+/// on the row under the card, both registered; nothing without an app.
+#[test]
+fn the_lfs_card_gets_both_buttons_under_it_and_nothing_without_an_app() {
+    let _t = turn();
+    install_fake();
+    let name = "card-case.fakebin";
+    wait_ready(name);
+    let mut terminal = Terminal::new(TestBackend::new(100, 10)).unwrap();
+    let mut hits = None;
+    view::begin_frame();
+    terminal
+        .draw(|frame| {
+            hits = view::render_card_actions(frame, Rect::new(0, 0, 100, 10), &subject(name), 5);
+        })
+        .unwrap();
+    let hits = hits.expect("the OS knows two apps");
+    assert_eq!(hits.len(), 2);
+    assert_eq!(hits[0].1, HitTarget::OpenWithDefault);
+    assert_eq!(hits[1].1, HitTarget::OpenWith);
+    assert!(hits.iter().all(|(r, _)| r.y == 5), "{hits:?}");
+    let row: String = (0..100)
+        .map(|x| terminal.backend().buffer()[(x, 5)].symbol().to_string())
+        .collect();
+    assert!(row.contains("Open in default program"), "{row}");
+    assert!(
+        hits[0].0.right() <= hits[1].0.x,
+        "the buttons do not overlap: {hits:?}"
+    );
+    // What the keys and the palette act on.
+    assert!(view::shown().is_some());
+    // A row outside the view, or a file the OS has no app for: nothing drawn.
+    view::begin_frame();
+    let none = "card-none.fakeunknown";
+    wait_ready(none);
+    terminal
+        .draw(|frame| {
+            let inner = Rect::new(0, 0, 100, 10);
+            assert!(view::render_card_actions(frame, inner, &subject(name), 10).is_none());
+            assert!(view::render_card_actions(frame, inner, &subject(none), 5).is_none());
+        })
+        .unwrap();
+    assert!(view::shown().is_none());
+}
+
 #[test]
 fn a_commit_version_is_handed_over_as_a_read_only_copy_and_a_failed_launch_is_reported() {
     let _t = turn();

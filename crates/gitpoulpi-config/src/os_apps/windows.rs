@@ -75,7 +75,7 @@ pub fn expand_percent_vars(text: &str, env: &dyn Fn(&str) -> Option<String>) -> 
     out
 }
 
-/// A `shell\open\command` as an argv template: `%1`, `%L`, `%l` and `%*`
+/// A `shell\open\command` as an argv template: `%1`, `%L`, `%l`, `%V` and `%*`
 /// become `${file}`, the other positional codes go, `%VAR%` is expanded, and a
 /// command with no file code gets the file as its last (quoted) argument.
 pub fn command_template(command: &str, env: &dyn Fn(&str) -> Option<String>) -> Option<String> {
@@ -88,7 +88,7 @@ pub fn command_template(command: &str, env: &dyn Fn(&str) -> Option<String>) -> 
             continue;
         }
         match chars.peek().copied() {
-            Some('1' | 'L' | 'l' | '*') => {
+            Some('1' | 'L' | 'l' | 'V' | 'v' | '*') => {
                 chars.next();
                 out.push_str("${file}");
             }
@@ -471,6 +471,80 @@ mod tests {
         );
         assert_eq!(t(""), None);
         assert_eq!(t(r#""unterminated %1"#), None);
+    }
+
+    /// The argv the launcher builds for `command` on `file`, and the verbatim
+    /// tail a Windows spawn uses instead when there is one.
+    fn run_of(command: &str, file: &str) -> (Vec<String>, Option<String>) {
+        let template = command_template(command, &env).unwrap();
+        let vars = crate::image_editors::ImageVars {
+            file,
+            dir: "",
+            name: "",
+            repo: "",
+        };
+        (
+            crate::image_editors::expand(&template, &vars, &|_| None).unwrap(),
+            crate::os_apps::verbatim_tail(&template, file),
+        )
+    }
+
+    #[test]
+    fn real_world_commands_run_with_the_path_as_one_correct_argument() {
+        let file = r"C:\Users\Jo Doe\My Docs\page.html";
+        let s = |v: &[&str]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>();
+
+        // Chrome and Edge read the rest of the line as the address: raw,
+        // never quoted (the quote used to become `http://"c/...`).
+        let (argv, raw) = run_of(
+            r#""C:\Program Files\Google\Chrome\Application\chrome.exe" --single-argument %1"#,
+            file,
+        );
+        assert_eq!(
+            argv,
+            s(&[
+                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                "--single-argument",
+                file
+            ])
+        );
+        assert_eq!(raw, Some(format!("--single-argument {file}")));
+        let (_, raw) = run_of(
+            r#""C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --single-argument %1"#,
+            file,
+        );
+        assert_eq!(raw, Some(format!("--single-argument {file}")));
+        // A quoted form of the same switch is unquoted too.
+        let (_, raw) = run_of(r#"msedge.exe --single-argument "%1""#, file);
+        assert_eq!(raw, Some(format!("--single-argument {file}")));
+
+        // Firefox: its own quotes, ordinary arguments.
+        let (argv, raw) = run_of(
+            r#""C:\Program Files\Mozilla Firefox\firefox.exe" -osint -url "%1""#,
+            file,
+        );
+        assert_eq!(
+            argv,
+            s(&[
+                r"C:\Program Files\Mozilla Firefox\firefox.exe",
+                "-osint",
+                "-url",
+                file
+            ])
+        );
+        assert_eq!(raw, None);
+
+        // Acrobat, Notepad, %V and a command with no placeholder.
+        let (argv, raw) = run_of(r#""C:\Adobe\Acrobat.exe" "%1""#, file);
+        assert_eq!(argv, s(&[r"C:\Adobe\Acrobat.exe", file]));
+        assert_eq!(raw, None);
+        let (argv, _) = run_of("notepad.exe %1", file);
+        assert_eq!(argv, s(&["notepad.exe", file]));
+        let (argv, _) = run_of(r#""C:\v\view.exe" /open %V"#, file);
+        assert_eq!(argv, s(&[r"C:\v\view.exe", "/open", file]));
+        let (argv, raw) = run_of(r"C:\Tools\view.exe", file);
+        assert_eq!(argv, s(&[r"C:\Tools\view.exe", file]));
+        assert_eq!(raw, None);
     }
 
     #[test]

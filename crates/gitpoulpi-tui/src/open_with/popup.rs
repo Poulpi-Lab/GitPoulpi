@@ -39,6 +39,9 @@ struct Open {
     subject: Subject,
     /// The lookup was still running when the list was built.
     waiting: bool,
+    /// The menu and the row of it that opened the list: it hangs beside them
+    /// like a submenu. `None` from the button, a key or the palette.
+    parent: Option<(Rect, u16)>,
 }
 
 static POPUP: Mutex<Option<Open>> = Mutex::new(None);
@@ -120,14 +123,39 @@ fn build(found: Option<&Found>) -> Combo {
     combo
 }
 
-/// Opens the popup on `subject`.
+/// Forgets the button's place; the next paint that draws one sets it again.
+/// Called at the start of every frame, so a list opened by a key or the
+/// palette while no button is shown never hangs from a stale rect.
+pub(crate) fn forget_anchor() {
+    if let Ok(mut a) = ANCHOR.lock() {
+        *a = None;
+    }
+}
+
+/// Opens the popup on `subject`, hanging from the button.
 pub(crate) fn open(subject: Subject) {
+    open_at(subject, None);
+}
+
+/// Opens the popup as the continuation of the context-menu row that was just
+/// activated (mouse or keyboard): beside that menu, clamped to the screen.
+pub(crate) fn open_from_menu(subject: Subject) {
+    open_at(subject, crate::context_menu::activated_row());
+}
+
+#[cfg(test)]
+pub(super) fn open_for_test(subject: Subject, parent: Option<(Rect, u16)>) {
+    open_at(subject, parent);
+}
+
+fn open_at(subject: Subject, parent: Option<(Rect, u16)>) {
     let found = answer(&subject.name());
     let combo = build(found.as_deref());
     if let Ok(mut p) = POPUP.lock() {
         *p = Some(Open {
             combo,
             waiting: found.is_none(),
+            parent,
             subject,
         });
     }
@@ -207,6 +235,7 @@ pub(crate) fn render_popup(
         .filter(|a| a.right() <= bounds.right() && a.bottom() <= bounds.bottom())
         .unwrap_or_else(corner);
     combo.set_anchor(anchor);
+    combo.set_flyout(open.parent);
     combo.set_hover(hovered_row);
     combo.render_popup(frame.buffer_mut(), bounds);
     let mut front: Vec<(Rect, HitTarget)> = combo

@@ -238,6 +238,30 @@ pub(crate) enum MenuOutcome<A> {
     NotHandled,
 }
 
+/// Where the last painted menu was and which of its rows was activated, so a
+/// list opened by that row (the "Open with" programs) can hang beside it like a
+/// submenu. The menu closes the moment its action runs; this outlives it.
+static PAINTED: std::sync::Mutex<Option<Painted>> = std::sync::Mutex::new(None);
+
+#[derive(Debug, Clone, Copy)]
+struct Painted {
+    popup: Rect,
+    /// Rows scrolled out of view above the first drawn one.
+    offset: usize,
+    /// The screen row last activated.
+    row: usize,
+}
+
+/// The menu the last frame painted and the row of it that was activated:
+/// `(the menu's rect, the screen y of that row)`. `None` before any menu was
+/// painted. Read it when the activated row's action runs; it is the parent a
+/// flyout list hangs off ([`crate::ui_kit::flyout_rect`]).
+pub(crate) fn activated_row() -> Option<(Rect, u16)> {
+    let p = (*PAINTED.lock().ok()?)?;
+    let y = p.popup.y + 1 + p.row.saturating_sub(p.offset) as u16;
+    Some((p.popup, y.min(p.popup.bottom().saturating_sub(2))))
+}
+
 /// An open context menu: its rows, where the user is inside them, and
 /// where on screen it was opened.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -525,6 +549,11 @@ impl<A: Clone> Menu<A> {
     /// Runs the row the *mouse* clicked or the *keyboard* selected. Both
     /// paths land here, which is what keeps them from disagreeing.
     pub(crate) fn activate(&mut self, row: usize) -> MenuOutcome<A> {
+        if let Ok(mut p) = PAINTED.lock() {
+            if let Some(p) = p.as_mut() {
+                p.row = row;
+            }
+        }
         if self.has_back() && row == 0 {
             self.go_back();
             return MenuOutcome::Stay;
@@ -714,6 +743,13 @@ impl<A: Clone> Menu<A> {
         let visible = popup.height.saturating_sub(2) as usize;
         let (offset, bar) =
             scroll::frame(self.id.0, &self.path, rows, visible, self.selected, popup);
+        if let Ok(mut p) = PAINTED.lock() {
+            *p = Some(Painted {
+                popup,
+                offset,
+                row: self.selected,
+            });
+        }
         let lines: Vec<Line> = lines.into_iter().skip(offset).take(visible).collect();
         frame.render_clipped(
             Paragraph::new(lines).block(

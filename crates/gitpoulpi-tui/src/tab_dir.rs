@@ -262,6 +262,7 @@ pub(crate) fn open_terminal(path: &Path) -> Result<String, String> {
         label: &label,
         program: &program,
         args: &args,
+        raw_args: None,
         cwd: path,
         info: &launch_repo_info(path),
     };
@@ -610,6 +611,9 @@ pub(crate) struct Launch<'a> {
     pub(crate) label: &'a str,
     pub(crate) program: &'a str,
     pub(crate) args: &'a [String],
+    /// The command line after the program, passed verbatim on Windows when a
+    /// program parses it itself (`--single-argument`); `args` otherwise.
+    pub(crate) raw_args: Option<&'a str>,
     pub(crate) cwd: &'a Path,
     pub(crate) info: &'a RepoInfo,
 }
@@ -687,9 +691,18 @@ pub(crate) fn start(launch: &Launch, report: fn(String)) -> Result<(), String> {
     )
     .ok_or_else(|| msg::open_in_run::program_not_found(launch.label, launch.program))?;
     let mut command = Command::new(&resolved);
+    command.current_dir(launch.cwd);
+    match launch.raw_args {
+        #[cfg(windows)]
+        Some(raw) => {
+            use std::os::windows::process::CommandExt;
+            command.raw_arg(raw);
+        }
+        _ => {
+            command.args(launch.args);
+        }
+    }
     command
-        .args(launch.args)
-        .current_dir(launch.cwd)
         .env("GITPOULPI_CWD", launch.cwd)
         .env("GITPOULPI_REPO", &launch.info.repo)
         .env("GITPOULPI_BRANCH", &launch.info.branch);
@@ -854,6 +867,7 @@ fn run_open_in_with(index: usize, path: &Path, report: fn(String)) -> Result<Str
             label: &run.label,
             program: &run.argv[0],
             args: &run.argv[1..],
+            raw_args: None,
             cwd: path,
             info: &run.info,
         },

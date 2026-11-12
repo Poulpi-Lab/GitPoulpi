@@ -800,7 +800,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Espace de travail : Ajouter l'onglet à l'espace de travail |  |
 | Espace de travail : Retirer l'onglet de l'espace de travail |  |
 | Radar : Ouvrir | `Alt+R` |
-| Radar : Actualiser | `r` |
+| Radar : Actualiser | `F5` |
 | Radar : Rechercher | `/` |
 | Radar : Ouvrir dans le navigateur | `o` |
 | Radar : Ouvrir le dépôt | `Enter` |

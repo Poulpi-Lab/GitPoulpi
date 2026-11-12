@@ -798,7 +798,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Workspace: Add Tab to Workspace |  |
 | Workspace: Remove Tab from Workspace |  |
 | Radar: Open | `Alt+R` |
-| Radar: Refresh | `r` |
+| Radar: Refresh | `F5` |
 | Radar: Search | `/` |
 | Radar: Open in Browser | `o` |
 | Radar: Open Repository | `Enter` |

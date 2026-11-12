@@ -803,7 +803,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Espacio de trabajo: Añadir la pestaña al espacio de trabajo |  |
 | Espacio de trabajo: Quitar la pestaña del espacio de trabajo |  |
 | Radar: Abrir | `Alt+R` |
-| Radar: Actualizar | `r` |
+| Radar: Actualizar | `F5` |
 | Radar: Buscar | `/` |
 | Radar: Abrir en el navegador | `o` |
 | Radar: Abrir repositorio | `Enter` |

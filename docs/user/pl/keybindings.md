@@ -797,7 +797,7 @@ zastosowania. Klawisze są domyślne.
 | Obszar roboczy: Dodaj kartę do obszaru roboczego |  |
 | Obszar roboczy: Usuń kartę z obszaru roboczego |  |
 | Radar: Otwórz | `Alt+R` |
-| Radar: Odśwież | `r` |
+| Radar: Odśwież | `F5` |
 | Radar: Szukaj | `/` |
 | Radar: Otwórz w przeglądarce | `o` |
 | Radar: Otwórz repozytorium | `Enter` |

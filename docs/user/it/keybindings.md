@@ -802,7 +802,7 @@ applicano. I tasti sono quelli predefiniti.
 | Area di lavoro: Aggiungi la scheda all'area di lavoro |  |
 | Area di lavoro: Rimuovi la scheda dall'area di lavoro |  |
 | Radar: Apri | `Alt+R` |
-| Radar: Aggiorna | `r` |
+| Radar: Aggiorna | `F5` |
 | Radar: Cerca | `/` |
 | Radar: Apri nel browser | `o` |
 | Radar: Apri repository | `Enter` |

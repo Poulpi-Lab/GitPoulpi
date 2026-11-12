@@ -798,7 +798,7 @@ Klávesy jsou výchozí.
 | Pracovní prostor: Přidat kartu do pracovního prostoru |  |
 | Pracovní prostor: Odebrat kartu z pracovního prostoru |  |
 | Radar: Otevřít | `Alt+R` |
-| Radar: Obnovit | `r` |
+| Radar: Obnovit | `F5` |
 | Radar: Hledat | `/` |
 | Radar: Otevřít v prohlížeči | `o` |
 | Radar: Otevřít repozitář | `Enter` |

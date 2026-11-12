@@ -496,11 +496,9 @@ impl IntegrationsPage {
                 let rows = NS_ROWS as usize;
                 let thumb = (rows * rows / total).max(1);
                 let max_top = total - rows;
-                let start = if max_top == 0 {
-                    0
-                } else {
-                    top.min(max_top) * (rows - thumb) / max_top
-                };
+                let start = (top.min(max_top) * (rows - thumb))
+                    .checked_div(max_top)
+                    .unwrap_or(0);
                 if dy >= start && dy < start + thumb {
                     (
                         "\u{2588}",

@@ -143,6 +143,11 @@ fn the_profile_settings_decide_what_is_listed_without_what() {
     assert_eq!(shown["changed"], false);
     assert_eq!(shown["radar"]["review_mode"], "api");
 
+    // The namespaces limit every list: `team` keeps the mock's issue.
+    cli.json(
+        here(),
+        &["hosting", "integrations", "radar", "lab", "--namespace", "team"],
+    );
     let listed = cli.json(here(), &["hosting", "radar"]);
     let profile = &listed["profiles"][0];
     assert_eq!(profile["issues"][0]["project"], "team/tool");

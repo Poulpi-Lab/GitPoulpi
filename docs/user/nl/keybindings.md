@@ -802,7 +802,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Werkruimte: Tabblad aan werkruimte toevoegen |  |
 | Werkruimte: Tabblad uit werkruimte verwijderen |  |
 | Radar: Openen | `Alt+R` |
-| Radar: Vernieuwen | `r` |
+| Radar: Vernieuwen | `F5` |
 | Radar: Zoeken | `/` |
 | Radar: Openen in browser | `o` |
 | Radar: Repository openen | `Enter` |

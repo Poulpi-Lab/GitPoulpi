@@ -796,7 +796,7 @@ As teclas são as padrão.
 | Espaço de trabalho: adicionar a aba ao espaço de trabalho |  |
 | Espaço de trabalho: remover a aba do espaço de trabalho |  |
 | Radar: abrir | `Alt+R` |
-| Radar: atualizar | `r` |
+| Radar: atualizar | `F5` |
 | Radar: buscar | `/` |
 | Radar: abrir no navegador | `o` |
 | Radar: abrir repositório | `Enter` |

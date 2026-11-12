@@ -793,7 +793,7 @@ die Standardtasten.
 | Workspace: Tab zum Workspace hinzufügen |  |
 | Workspace: Tab aus dem Workspace entfernen |  |
 | Radar: Öffnen | `Alt+R` |
-| Radar: Aktualisieren | `r` |
+| Radar: Aktualisieren | `F5` |
 | Radar: Suchen | `/` |
 | Radar: Im Browser öffnen | `o` |
 | Radar: Repository öffnen | `Enter` |

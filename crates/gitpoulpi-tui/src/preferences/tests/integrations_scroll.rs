@@ -68,7 +68,7 @@ fn an_open_popup_takes_the_pointer_even_outside_the_page() {
     let mut state = connected_state(dir.path());
     screen(&mut state);
     // Tab to the combobox and open it.
-    for _ in 0..5 {
+    for _ in 0..6 {
         state.on_key(crossterm::event::KeyEvent::new(
             crossterm::event::KeyCode::Tab,
             crossterm::event::KeyModifiers::NONE,

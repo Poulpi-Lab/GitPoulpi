@@ -800,7 +800,7 @@ Tangenterna är standardvärdena.
 | Arbetsyta: Lägg till fliken i arbetsytan |  |
 | Arbetsyta: Ta bort fliken från arbetsytan |  |
 | Radar: Öppna | `Alt+R` |
-| Radar: Uppdatera | `r` |
+| Radar: Uppdatera | `F5` |
 | Radar: Sök | `/` |
 | Radar: Öppna i webbläsaren | `o` |
 | Radar: Öppna repository | `Enter` |

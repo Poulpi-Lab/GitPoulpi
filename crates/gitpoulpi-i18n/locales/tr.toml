@@ -539,15 +539,15 @@ tabs_position_help = "Depo sekmelerinin yeri: Üst (varsayılan), Alt veya Sol, 
 graph_color_theme = "Grafik renk teması"
 graph_color_theme_help = "Log grafiğinin şerit renk paleti. Temayı izle, seçilen temanın paletini kullanır; diğer her seçenek onu geçersiz kılar, böylece her tema her paletle birleştirilebilir. Ayarlar kapanınca uygulanır."
 graph_renderer = "Grafik çizici"
-graph_renderer_help = "auto grafiği, destekleyen bir terminalde gerçek görüntü olarak, her yerde başka karakterlerle çizer - terminalin ortamını devralan ama görüntüyü geçirmeyen tmux veya zellij içinde ve kitty_graphics ayarı açık olmadıkça herdr içinde de. image resmi zorla açar, text zorla kapatır. Yeniden başlatma gerekir."
+graph_renderer_help = "auto grafiği, destekleyen bir terminalde gerçek görüntü olarak, başka her yerde karakterlerle çizer - terminalin ortamını devralan ama görüntüyü geçirmeyen zellij ve screen içinde, arkasındaki terminal sixel kabul etmedikçe tmux içinde ve kitty_graphics ayarı açık olmadıkça herdr içinde de. image resmi zorla açar, text zorla kapatır. Yeniden başlatma gerekir."
 image_protocol = "Görüntü protokolü"
-image_protocol_help = "Resimlerin (grafik görüntüsü, yazar avatarları) terminale nasıl ulaştığı. auto: kitty, Ghostty ve yapılandırmasında kitty_graphics = true olan herdr içinde Kitty grafik protokolü; WezTerm, iTerm2 ve mintty içinde iTerm2 satır içi görüntüler; Windows Terminal, foot, Konsole ve mlterm içinde sixel resimler (yalnızca yazar avatarları, grafik karakter olarak kalır); başka yerlerde karakterler. kitty, iterm2 veya sixel o protokolü zorlar (yapılandırması başka yerde olan herdr için kitty; sixel çizen ama tanınmayan bir terminal için sixel); none resimleri kapatır. Yeniden başlatma gerekir."
+image_protocol_help = "Resimlerin (grafik görüntüsü, yazar avatarları) terminale nasıl ulaştığı. auto: kitty, Ghostty ve yapılandırmasında kitty_graphics = true olan herdr içinde Kitty grafik protokolü; iTerm2 3.7.7 ve üstünde de Kitty protokolü; WezTerm, Rio, mintty ve daha eski iTerm2 içinde iTerm2 satır içi görüntüler; Windows Terminal, foot, Tabby, Konsole, mlterm içinde ve arkasındaki terminal sixel kabul ediyorsa tmux içinde sixel resimler (grafik sütunu ve avatarlar); başka yerlerde karakterler. kitty, iterm2 veya sixel o protokolü zorlar (yapılandırması başka yerde olan herdr için kitty; sixel çizen ama tanınmayan bir terminal için sixel); none resimleri kapatır. Yeniden başlatma gerekir."
 kitty_keyboard = "Kitty klavye protokolü"
 kitty_keyboard_help = "auto başlangıçta ve yaklaşık 100 ms içinde terminale kitty klavye protokolünü konuşup konuşmadığını sorar ve konuşuyorsa kullanır: eski terminallerin ayırt edemediği tuş birleşimleri (noktalama, rakam, Shift veya Enter ile Control) o zaman kontrol kodlarıyla çakışmak yerine kendileri olarak gelir. Yanıt vermeyen terminal eski tuşlarını korur. off terminalin klavye kipine hiç dokunmaz. Yeniden başlatma gerekir."
 color_depth = "Renk derinliği"
 color_depth_help = "auto 24 bit renk kullanır; bunu göstermeyen terminallerde (Apple Terminal, Linux konsolu veya COLORTERM bildirmeyen 256 renkli bir terminal) renkler en yakın 256 veya 16 girişe eşlenir. truecolor, 256 ve 16 bir derinliği zorlar. Hemen uygulanır."
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "Metin imleci"
+text_cursor_help = "terminal, terminalin kendi imlecini odaktaki metin alanının düzenleme noktasına çubuk olarak koyar: terminalinizin imleç ayarları geçerli olur ve bir giriş yönteminin aday penceresi o noktada açılır. drawn GitPoulpi'nin kendi imlecini (blok veya alt çizgi) çizer ve terminal imlecini gizli tutar. Hemen uygulanır."
 graph_show_stashes = { git = "Grafikte stash'leri göster", local = "Grafikte saklamaları göster" }
 graph_show_stashes_help = { git = "Her stash Log'da tarihinde kendi satırını alır: yapıldığı commit'in yanındaki bir şeritte küçük bir kutu, ona kesikli çizgiyle bağlı. Seçince neyi değiştirdiğini gösterir; sağ tık (veya .) Pop, Apply ve Drop sunar. Kapalıyken stash'ler yalnızca {$STASHES} bölümünde kalır. Solo modunda çizilmez.", local = "Her saklama Log'da tarihinde kendi satırını alır: yapıldığı commit'in yanındaki bir şeritte küçük bir kutu, ona kesikli çizgiyle bağlı. Seçince neyi değiştirdiğini gösterir; sağ tık (veya .) Pop, Apply ve Drop sunar. Kapalıyken saklamalar yalnızca {$STASHES} bölümünde kalır. Solo modunda çizilmez." }
 ref_connector = "Ref-commit bağlayıcısı"
@@ -3995,8 +3995,8 @@ mouse_gestures_in_2 = { git = "bir panel ayırıcı veya Log sütun sınırı on
 mouse_gestures_in_3 = { git = "bir diff, Dosya Görünümü, Blame veya Dosya Geçmişi metninin üzerinde sürüklemek onu seçer, çift tık bir sözcüğü; y veya Ctrl+C kopyalar (yalnızca dosya metni, asla oluklar); seçili bir sözcüğün diğer geçişleri diff'te ve düzenleyicide renklenir (ve cetvelde işaretlenir)", local = "bir fark, Dosya Görünümü, Blame veya Dosya Geçmişi metninin üzerinde sürüklemek onu seçer, çift tık bir sözcüğü; y veya Ctrl+C kopyalar (yalnızca dosya metni, asla oluklar); seçili bir sözcüğün diğer geçişleri farkta ve düzenleyicide renklenir (ve cetvelde işaretlenir)" }
 mouse_gestures_in_4 = { git = "odaktaki/üzerine gelinen listeyi veya diff'i kaydırır; Shift+tekerlek (terminallerin bildirdiği iki yazım da) sözcük kaydırma kapalıyken bir diff/dosya görünümü/blame'i bunun yerine *yatay* kaydırır", local = "odaktaki/üzerine gelinen listeyi veya farkı kaydırır; Shift+tekerlek (terminallerin bildirdiği iki yazım da) sözcük kaydırma kapalıyken bir fark/dosya görünümü/blame'i bunun yerine *yatay* kaydırır" }
 mouse_gestures_in_5 = "varsa her yerde bir bağlam menüsü açar (her panelin yukarıdaki bölümüne bakın); klavye karşılığı her zaman {{*global.context_menu}}"
-mouse_gestures_in_6 = "her \"Kopyala ...\" eylemi panoyu *terminalden* OSC 52 ile ister - bir TUI ona doğrudan ulaşamaz; diziyi yok sayan bir terminal kopyalamaz"
-mouse_gestures_in_7 = "yeniden boyutlandırma/işaretçi/açık el ipuçları destekleyen terminallerde OSC 22 ile gönderilir (kitty, foot, xterm; başka yerde düzensiz) - sürüklenebilir ayırıcılar ve sütun sınırları uygulamanın kendi tamponunda da yanar, bunun için terminal desteği gerekmez"
+mouse_gestures_in_6 = "her \"Kopyala ...\" eylemi metni sistem panosuna koyar ve terminalin desteklediği bilinen yerlerde ayrıca OSC 52 ile de gönderir; SSH üzerinden veya ekran yokken yalnızca OSC 52 gönderilir ve diziyi yok sayan bir terminal kopyalamaz"
+mouse_gestures_in_7 = "yeniden boyutlandırma/işaretçi/açık el ipuçları destekleyen terminallerde OSC 22 ile gönderilir (kitty, Ghostty, foot, mintty; Rio, Alacritty, Windows Terminal ve iTerm2'de gönderilmez) - sürüklenebilir ayırıcılar ve sütun sınırları uygulamanın kendi tamponunda da yanar, bunun için terminal desteği gerekmez"
 git_actions_then_25 = "LFS menüsünü aç (araç çubuğundaki LFS düğmesi; satırları palette de var)"
 git_actions_then_26 = "LFS: {$fetch} (tüm ref'lerin nesneleri)"
 git_actions_then_27 = "LFS: işaretçi dosyaların üzerine gerçek içeriği yaz (çevrimdışı)"
@@ -5964,7 +5964,7 @@ show_label = "Göster:"
 show_all = "Tümü"
 show_none = "Hiçbiri"
 why_level_off = "Gösterilmiyor: düzey {level} olarak ayarlı. Bu satırları görmek için düzeyi yükseltin."
-hint_levels = "1-5: bir düzeyi göster veya gizle  a: tümü  n: hiçbiri"
+hint_levels = "1-5: bir düzeyi göster veya gizle  a: tümü  n: hiçbiri  Enter: satırın işlemi  [ ]: başarısız işlemler"
 palette_show_error = "Etkinlik Günlüğü: Hata Düzeyini Göster veya Gizle"
 palette_show_warn = "Etkinlik Günlüğü: Uyarı Düzeyini Göster veya Gizle"
 palette_show_info = "Etkinlik Günlüğü: Bilgi Düzeyini Göster veya Gizle"
@@ -6007,25 +6007,25 @@ palette_scroll_right = "Etkinlik Günlüğü: Sağa Kaydır"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "Etkinlik Günlüğü: uzun satırları yana kaydır (ayrıca Shift + tekerlek veya yatay kaydırma çubuğu)"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation} başarısız oldu"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "İşlem: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
-ctx_repository = "Repository: {repository}"
+ctx_repository = "Depo: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "İsteyen: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "İşlem kimliği: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "Etkinlik Günlüğü: Bu Satırın İşlemini Göster"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "Etkinlik Günlüğü: Sonraki Başarısız İşlem"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "Etkinlik Günlüğü: Önceki Başarısız İşlem"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "Önce bir satır seçin: tıklayın veya sonraki başarısız işleme geçmek için ] tuşuna basın."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "Bu satır bir işlemle ilişkili değil."
 
 [git_error]
 summary_host_key = "Uzak deponun SSH ana makine anahtarı henüz bilinmiyor."
@@ -8758,13 +8758,13 @@ namespaces = "Ad alanları"
 # context: hint in the empty namespaces field
 namespaces_hint = "örn. acme, platform (boş: kendi alanım ve üye olduğum tümü)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "Her satıra bir giriş. Bir ad, o grubu veya sahibi ve altındaki her şeyi eşler (ptm, ptm/produits/x ile eşleşir, ptmx/y ile değil). Boş bırakırsanız kendi alanlarınız ve üye olduğunuz tümü eşlenir."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Her satır, tam depo yoluyla yazdığınız haliyle eşlenen bir düzenli ifadedir (örnek: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "Düzenli ifadeler"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "Geçersiz ifade: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "Klonlanmamış bir depodan gelen istek"
 # context: choice: ask each time

@@ -531,8 +531,14 @@ pub fn daemon_call(
                 command,
                 args: serde_json::to_value(args).unwrap(),
             })
-            .await
-            .expect("call");
+            .await;
+        // A shutdown may close the connection before its reply is written.
+        let response = match response {
+            Err(_) if command == gitpoulpi_core::domain::OperationKind::Shutdown => {
+                return serde_json::json!({ "closed": true });
+            }
+            r => r.expect("call"),
+        };
         match response.result {
             Ok(v) => v,
             Err(e) => serde_json::json!({ "error": e.message }),

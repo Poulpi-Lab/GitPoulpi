@@ -27,8 +27,11 @@ const LONG_RUN: usize = 8;
 /// The text one key event adds to a paste; `None` for a key that cannot be
 /// part of pasted text (a chord, an arrow, `Esc`...).
 fn pasted_char(key: &KeyEvent) -> Option<char> {
-    // The LF of a pasted CRLF is reported as Ctrl+J.
-    if key.code == KeyCode::Char('j') && key.modifiers == KeyModifiers::CONTROL {
+    // The LF of a pasted CRLF is reported as Ctrl+J, or as Ctrl+Enter (the
+    // console's virtual key for LF is Return with Ctrl held).
+    if matches!(key.code, KeyCode::Char('j') | KeyCode::Enter)
+        && key.modifiers == KeyModifiers::CONTROL
+    {
         return Some('\n');
     }
     if key
@@ -74,8 +77,9 @@ pub(crate) fn coalesce(run: &[Event]) -> Option<String> {
             Event::Key(k) if k.kind == KeyEventKind::Press => {
                 let c = pasted_char(k)?;
                 // CR then LF is one line break.
-                let lf_of_crlf = after_enter && k.code == KeyCode::Char('j');
-                after_enter = k.code == KeyCode::Enter;
+                let ctrl = k.modifiers == KeyModifiers::CONTROL;
+                let lf_of_crlf = after_enter && ctrl;
+                after_enter = k.code == KeyCode::Enter && !ctrl;
                 if lf_of_crlf {
                     continue;
                 }
@@ -185,6 +189,13 @@ mod tests {
         assert_eq!(coalesce(&run).as_deref(), Some("first\nsecond"));
         // A lone Ctrl+J is a line break too, and is text for a run to start on.
         assert!(is_text_press(&ctrl_j));
+        // The same LF as Ctrl+Enter.
+        let ctrl_enter = Event::Key(KeyEvent::new(KeyCode::Enter, KeyModifiers::CONTROL));
+        let mut run = keys("first");
+        run.push(press(KeyCode::Enter));
+        run.push(ctrl_enter);
+        run.extend(keys("second"));
+        assert_eq!(coalesce(&run).as_deref(), Some("first\nsecond"));
     }
 
     #[test]

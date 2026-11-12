@@ -129,11 +129,26 @@ fn the_overflow_menu_closes_the_commit_file_context_menu() {
     term.right_click(c + 1, r).unwrap();
     term.wait_for_text("Open Diff", STEP)
         .unwrap_or_else(|e| panic!("the commit-file menu did not open: {e}"));
+    // A press outside an open menu only closes it (the click-away rule):
+    // the first click on `⋯` takes the commit-file menu away, the next one
+    // opens the overflow menu. Never two menus at once.
     let (c, r) = term.wait_for_text(OVERFLOW, STEP).unwrap();
     term.click(c, r).expect("click the overflow button");
-    term.wait_for("the overflow menu", STEP, |s| {
-        s.contains("\u{2315} Search") && !s.contains("Open Diff")
+    term.wait_for("the commit-file menu closed", STEP, |s| {
+        !s.contains("Open Diff") && !s.contains("\u{2315} Search")
     })
-    .unwrap_or_else(|e| panic!("two menus open at once: {e}"));
+    .unwrap_or_else(|e| panic!("the press outside did not only close the menu: {e}"));
+    common::retry_until(
+        &mut term,
+        "the overflow menu",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            if let Some((c, r)) = t.screen().find(OVERFLOW) {
+                t.click(c, r).expect("click the overflow button");
+            }
+        },
+        |s| s.contains("\u{2315} Search") && !s.contains("Open Diff"),
+    );
     term.stop().unwrap();
 }

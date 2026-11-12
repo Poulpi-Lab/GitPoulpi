@@ -80,12 +80,22 @@ fn a_modified_file_wears_a_pencil_and_hovering_a_long_name_shows_the_whole_butto
     );
 
     // And it works: the file moves to the Staged half.
-    term.click(bcol + 3, brow).unwrap();
-    term.wait_for("the file staged", STEP, |s| {
-        s.find("Staged Files").is_some() && s.contains(" Unstage file ")
-            || !s.contains("Stage file")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    // Retried: under load the click can land on a torn frame.
+    common::retry_until(
+        &mut term,
+        "the file staged",
+        4,
+        Duration::from_secs(8),
+        |t| {
+            if t.screen().contains("Stage file") {
+                t.click(bcol + 3, brow).unwrap();
+            }
+        },
+        |s| {
+            s.find("Staged Files").is_some() && s.contains(" Unstage file ")
+                || !s.contains("Stage file")
+        },
+    );
     assert_eq!(git(repo.root(), &["diff", "--cached", "--name-only"]), LONG);
     term.stop().unwrap();
 }

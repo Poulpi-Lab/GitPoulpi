@@ -33,6 +33,7 @@ pub(crate) fn begin_frame() {
     if let Ok(mut s) = SHOWN.lock() {
         *s = None;
     }
+    popup::forget_anchor();
 }
 
 /// The file the last frame offered "Open in" for, if it did.

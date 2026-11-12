@@ -224,7 +224,7 @@ pub(crate) fn apply_file_context_action(
         FileContextAction::EditImageIn => crate::image_view::edit_in::open(
             crate::image_view::edit_in::Target::File(absolute.clone()),
         ),
-        FileContextAction::OpenWith => crate::open_with::popup::open(crate::open_with::Subject {
+        FileContextAction::OpenWith => crate::open_with::popup::open_from_menu(crate::open_with::Subject {
             path: path.to_path_buf(),
             source: if section == StatusSection::Staged {
                 crate::open_with::Source::Index

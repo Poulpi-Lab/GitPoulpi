@@ -123,6 +123,31 @@ pub(crate) fn anchored_popup(
     Rect::new(x.max(frame_area.x), y.max(frame_area.y), width, height)
 }
 
+/// Where a list opened by a menu row goes: a continuation of that row, like a
+/// submenu. It starts at the parent's right edge on the row's own line (the
+/// parent stays visible); with no room on the right it ends at the parent's
+/// left edge; with room on neither side it covers the parent's right part, the
+/// only place left. Always inside `bounds`.
+pub(crate) fn flyout_rect(
+    parent: Rect,
+    row_y: u16,
+    width: u16,
+    height: u16,
+    bounds: Rect,
+) -> Rect {
+    let width = width.min(bounds.width);
+    let height = height.min(bounds.height);
+    let x = if parent.right().saturating_add(width) <= bounds.right() {
+        parent.right()
+    } else if parent.x >= bounds.x.saturating_add(width) {
+        parent.x - width
+    } else {
+        bounds.right().saturating_sub(width)
+    };
+    let y = row_y.min(bounds.bottom().saturating_sub(height));
+    Rect::new(x.max(bounds.x), y.max(bounds.y), width, height)
+}
+
 pub(crate) fn move_selection(state: &mut ListState, len: usize, delta: i32) {
     state.select(move_index(state.selected(), len, delta));
 }
@@ -644,6 +669,35 @@ pub(crate) fn render_centered_message(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_flyout_hangs_beside_its_parent_row_and_stays_on_screen() {
+        let bounds = Rect::new(0, 0, 100, 30);
+        let parent = Rect::new(10, 5, 20, 12);
+        // Room on the right: it starts at the parent's right edge, on the row.
+        assert_eq!(
+            flyout_rect(parent, 8, 25, 6, bounds),
+            Rect::new(30, 8, 25, 6)
+        );
+        // No room on the right: it ends at the parent's left edge.
+        let right = Rect::new(70, 5, 25, 12);
+        assert_eq!(
+            flyout_rect(right, 8, 25, 6, bounds),
+            Rect::new(45, 8, 25, 6)
+        );
+        // Taller than the room below the row: lifted to fit.
+        assert_eq!(
+            flyout_rect(parent, 28, 25, 10, bounds),
+            Rect::new(30, 20, 25, 10)
+        );
+        // Room on neither side: clamped inside the screen, never off it.
+        let narrow = Rect::new(0, 0, 60, 30);
+        let wide = Rect::new(5, 5, 50, 10);
+        let r = flyout_rect(wide, 6, 40, 4, narrow);
+        assert!(r.right() <= narrow.right() && r.x >= narrow.x, "{r:?}");
+        // Never at the origin for a parent that is not there.
+        assert_ne!(flyout_rect(parent, 8, 25, 6, bounds).x, 0);
+    }
 
     #[test]
     fn follow_flags_start_true_and_clear_per_slot() {

@@ -125,6 +125,9 @@ pub(crate) struct Combo {
     cursor: usize,
     offset: usize,
     field: Rect,
+    /// Hang the popup beside this menu rect, on this row, instead of below
+    /// the field ([`crate::ui_kit::flyout_rect`]).
+    flyout: Option<(Rect, u16)>,
     popup: Rect,
     items: Vec<(Rect, usize)>,
     hover: Option<usize>,
@@ -157,6 +160,7 @@ impl Combo {
             cursor: 0,
             offset: 0,
             field: Rect::default(),
+            flyout: None,
             popup: Rect::default(),
             items: Vec::new(),
             hover: None,
@@ -541,6 +545,11 @@ impl Combo {
 
     /// Where the popup hangs from, for an owner that paints the field
     /// itself (the sidebar's rows).
+    /// Hangs the popup beside `parent` (a menu's rect) on screen row `row_y`.
+    pub(crate) fn set_flyout(&mut self, parent: Option<(Rect, u16)>) {
+        self.flyout = parent;
+    }
+
     pub(crate) fn set_anchor(&mut self, field: Rect) {
         self.field = field;
     }
@@ -641,6 +650,14 @@ impl Combo {
         };
         let height = height.min(bounds.height);
         let y = y.min(bounds.bottom().saturating_sub(height)).max(bounds.y);
+        let (x, y, height) = match self.flyout {
+            Some((parent, row_y)) => {
+                let h = want.min(bounds.height);
+                let r = crate::ui_kit::flyout_rect(parent, row_y, width, h, bounds);
+                (r.x, r.y, h)
+            }
+            None => (x, y, height),
+        };
         let rows = (height.saturating_sub(overhead) as usize).max(1);
         // The window follows the highlight only when the popup's height
         // changed under it; a wheel/scrollbar scroll must not be undone.

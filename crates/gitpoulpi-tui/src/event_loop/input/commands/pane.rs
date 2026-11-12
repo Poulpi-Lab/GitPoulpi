@@ -645,7 +645,7 @@ pub(in crate::event_loop) fn apply_pane_action(
                 crate::image_view::edit_in::open(crate::image_view::edit_in::Target::File(absolute))
             }
         },
-        A::OpenWith => crate::open_with::popup::open(crate::open_with::Subject {
+        A::OpenWith => crate::open_with::popup::open_from_menu(crate::open_with::Subject {
             path: first,
             source: match target.commit {
                 Some(commit) => crate::open_with::Source::Commit(commit),

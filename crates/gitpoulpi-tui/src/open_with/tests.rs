@@ -288,6 +288,34 @@ fn the_popup_lists_the_default_first_and_marked_and_says_when_it_is_looking_or_e
     );
 }
 
+/// The list opened by a context-menu row is drawn beside that menu, on the
+/// row's line, and not at the screen's corner.
+#[test]
+fn the_list_opened_from_a_menu_row_hangs_beside_the_menu() {
+    let _t = turn();
+    install_fake();
+    popup::close();
+    let name = "flyout-case.fakebin";
+    wait_ready(name);
+    let parent = Rect::new(20, 4, 24, 9);
+    popup::open_for_test(subject(name), Some((parent, 7)));
+    let mut terminal = Terminal::new(TestBackend::new(100, 30)).unwrap();
+    let mut rect = Rect::default();
+    terminal
+        .draw(|frame| {
+            let mut hits = Vec::new();
+            popup::render_popup(frame, None, &mut hits);
+            rect = hits
+                .iter()
+                .find(|(_, t)| *t == HitTarget::OpenInPopup)
+                .map(|(r, _)| *r)
+                .unwrap();
+        })
+        .unwrap();
+    assert_eq!((rect.x, rect.y), (parent.right(), 7), "{rect:?}");
+    popup::close();
+}
+
 #[test]
 fn a_commit_version_is_handed_over_as_a_read_only_copy_and_a_failed_launch_is_reported() {
     let _t = turn();

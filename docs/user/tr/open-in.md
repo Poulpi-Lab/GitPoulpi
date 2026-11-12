@@ -179,6 +179,16 @@ Ayarlar araması bu sayfayı da bulur.
 
 Çalışma ağacındaki dosya uygulamaya olduğu gibi verilir. Bir commit'in (veya indeksin) sürümü, durum çubuğunda bir bildirimle birlikte **salt okunur geçici bir kopyaya** yazılır; böylece bir uygulama depoyu değiştiremez. İkisi de depoyu değiştirmez: günlük kaydı yok, Geri Al etkilenmez.
 
+Menünün listesi, bir alt menü gibi **Birlikte aç...** satırıyla aynı hizada menünün yanında açılır (sağda yer yoksa solda), hem fareden hem klavyeden. Bir dosya menüsünden açılan resim düzenleyicileri listesi (**Şununla düzenle...**) de aynısını yapar.
+
+### Git LFS dosyaları
+
+Git LFS nesne kartı (bkz. [Git LFS](lfs.md)) metninin altında aynı iki eylemi taşır: **Varsayılan programda aç** ve **Şununla aç**; tuşlar (`o`, `Shift+O`) ve palet satırları aynıdır. Gerçek dosyayı açarlar, işaretçiyi asla: çalışma ağacındaki dosyayı olduğu gibi ya da bir commit'in veya indeksin sürümü için yerel LFS deposundaki nesnenin salt okunur geçici bir kopyasını. Henüz indirilmemiş bir nesnenin kartında düğme yoktur ve durum satırı içeriğin henüz indirilmediğini söyler. Hâlâ yalnızca işaretçiyi tutan bir çalışma ağacı dosyası için de aynı ret geçerlidir: karttan ya da herhangi bir dosya menüsünden **Varsayılan programda aç**, **Şununla aç** ve **Şununla düzenle**, işaretçi metnini açmak yerine içeriğin indirilmediğini söyler (LFS araç çubuğunun pull veya checkout satırlarıyla indirin, sonra yeniden deneyin). Açmak salt okunurdur: günlük kaydı yok, geri alınacak bir şey yok.
+
+### Windows'ta tarayıcılar
+
+Chrome ve Edge `--single-argument %1` kaydeder; bu, anahtardan sonraki her şeyi tırnaklar dahil tek bir adres olarak okumalarına yol açar. GitPoulpi yolu böyle bir programa, Windows'un yaptığı gibi, olduğu gibi ve tırnaksız verir; böylece yolunda boşluk olan bir dosya `http://"c/...` hatasıyla başarısız olmak yerine açılır. Diğer tüm programlar yolu tek bir sıradan argüman olarak alır.
+
 ## Eski anahtarlar
 
 Eski `ui.terminal_launch` ve `ui.terminal_launch_command` anahtarları yalnızca

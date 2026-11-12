@@ -162,6 +162,14 @@ impl Terminal {
     /// click. One report per cell crossed, because a terminal reports
     /// position in cells.
     pub fn drag(&mut self, from: (u16, u16), to: (u16, u16)) -> Result<()> {
+        if cfg!(windows) {
+            // One report per write, paced: see `mouse::drag_reports`.
+            for report in mouse::drag_reports(from, to) {
+                self.write_once(&report)?;
+                std::thread::sleep(Duration::from_millis(25));
+            }
+            return Ok(());
+        }
         self.write_once(&mouse::drag_sequence(from, to))
     }
 

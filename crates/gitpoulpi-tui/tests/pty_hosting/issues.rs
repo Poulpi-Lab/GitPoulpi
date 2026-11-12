@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::common;
 use crate::mock::*;
 use crate::support::*;
 
@@ -206,37 +207,57 @@ fn provider_semantics(title: &str, key: &str, session: &str) {
     assert_eq!(repo_state(&repo), "", "nothing was written");
 
     // The dropdown proposes the remote's provider and repository.
-    let (col, header) = section_rows(&term.screen(), title).expect("the section header");
+    let (_, header) = section_rows(&term.screen(), title).expect("the section header");
     let provider_row = header + 1;
-    term.click(col + 4, provider_row)
-        .expect("open the provider");
-    let opened = term
-        .wait_for("the proposals", STEP, |s| {
-            s.find_all("origin")
-                .iter()
-                .any(|&(_, r)| r > provider_row && s.line(r).contains("g/p"))
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
+    let proposals = |s: &xtask::pty::Screen| {
+        s.find_all("origin")
+            .iter()
+            .any(|&(_, r)| r > provider_row && s.line(r).contains("g/p"))
+    };
+    // A click on a torn frame can be lost: retry until the dropdown shows.
+    let opened = common::retry_until(
+        &mut term,
+        "the proposals",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if proposals(&screen) {
+                return;
+            }
+            if let Some((col, _)) = section_rows(&screen, title) {
+                t.click(col + 4, provider_row).expect("open the provider");
+            }
+        },
+        proposals,
+    );
     assert_eq!(
         host_list_requests(&mock),
         0,
         "listing the proposals fetches nothing"
     );
     assert_eq!(repo_state(&repo), "", "listing the proposals links nothing");
-    let (pc, pr) = opened
-        .find_all("origin")
-        .into_iter()
-        .find(|&(_, r)| r > provider_row && opened.line(r).contains("g/p"))
-        .unwrap();
-    term.click(pc, pr).expect("pick the proposal");
-    let deadline = std::time::Instant::now() + STEP;
-    while !repo_state(&repo).contains(&format!("[{key}]")) {
-        assert!(
-            std::time::Instant::now() < deadline,
-            "the pick never persisted"
-        );
-        std::thread::sleep(Duration::from_millis(100));
-    }
+    let _ = opened;
+    common::retry_until(
+        &mut term,
+        "the pick persisted",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            if repo_state(&repo).contains(&format!("[{key}]")) {
+                return;
+            }
+            let screen = t.screen();
+            if let Some((pc, pr)) = screen
+                .find_all("origin")
+                .into_iter()
+                .find(|&(_, r)| r > provider_row && screen.line(r).contains("g/p"))
+            {
+                t.click(pc, pr).expect("pick the proposal");
+            }
+        },
+        |_| repo_state(&repo).contains(&format!("[{key}]")),
+    );
     let state = repo_state(&repo);
     assert!(
         state.contains("integration = \"corp\"") && state.contains("project = \"g/p\""),
@@ -272,15 +293,24 @@ fn provider_semantics(title: &str, key: &str, session: &str) {
     assert!(repo_state(&repo).contains(&format!("[{key}]")));
 
     // Unlink: the first row of the dropdown.
-    let (col, header) = section_rows(&term.screen(), title).expect("the section header");
-    let provider_row = header + 1;
-    term.click(col + 4, provider_row)
-        .expect("open the provider");
-    let opened = term
-        .wait_for("the unlink row", STEP, |s| s.contains("None (unlink"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (nc, nr) = opened.find("None (unlink").unwrap();
-    term.click(nc + 2, nr).expect("pick None");
+    common::retry_until(
+        &mut term,
+        "the unlink persisted",
+        8,
+        Duration::from_secs(5),
+        |t| {
+            if !repo_state(&repo).contains(&format!("[{key}]")) {
+                return;
+            }
+            let screen = t.screen();
+            if let Some((nc, nr)) = screen.find("None (unlink") {
+                t.click(nc + 2, nr).expect("pick None");
+            } else if let Some((col, header)) = section_rows(&screen, title) {
+                t.click(col + 4, header + 1).expect("open the provider");
+            }
+        },
+        |_| !repo_state(&repo).contains(&format!("[{key}]")),
+    );
     let deadline = std::time::Instant::now() + STEP;
     while repo_state(&repo).contains(&format!("[{key}]")) {
         assert!(

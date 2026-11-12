@@ -5,14 +5,26 @@
 //! keyboard twins work. The host is the loopback mock; nothing leaves
 //! 127.0.0.1.
 
-use xtask::pty::Terminal;
+use std::time::Duration;
+
+use xtask::pty::{Screen, Terminal};
+
+use crate::common;
 
 use crate::mock::*;
 use crate::support::*;
 
 /// Opens the Create Pull Request form from the section's `+` and presses
 /// Create; the mock answers the POST with `status`.
-fn create_and_fail(session: &str, status: u16) -> (Terminal, tempfile::TempDir, Mock) {
+fn create_and_fail(
+    session: &str,
+    status: u16,
+) -> (
+    Terminal,
+    tempfile::TempDir,
+    Mock,
+    gitpoulpi_testkit::FixtureRepo,
+) {
     let mock = start_mock();
     POST_FAILS.lock().unwrap().push((mock.port, status));
     let repo = fixture(mock.port);
@@ -26,23 +38,53 @@ fn create_and_fail(session: &str, status: u16) -> (Terminal, tempfile::TempDir, 
     let screen = term
         .wait_for("the PULL REQUESTS section", STARTUP, pulls_ready)
         .unwrap_or_else(|e| panic!("{e}"));
-    let (_, header_row) = screen.find("PULL REQUESTS (2)").unwrap();
-    let header = screen.line(header_row);
-    let plus_cell = header[..header.find(" + ").expect("the + button")]
-        .chars()
-        .count() as u16
-        + 1;
-    term.click(plus_cell, header_row).expect("click the +");
-    term.wait_for("the Create Pull Request form", STEP, |s| {
+    let _ = screen;
+    let form = |s: &Screen| {
         s.contains("Create Pull Request") && s.contains("From repo") && s.contains("Description")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
-    let (col, row) = term.wait_for_text("Create Pull Request", STEP).unwrap();
+    };
+    // A click on the `+` can be lost to a torn frame: re-locate and retry.
+    common::retry_until(
+        &mut term,
+        "the Create Pull Request form",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if form(&screen) {
+                return;
+            }
+            if let Some((_, header_row)) = screen.find("PULL REQUESTS (2)") {
+                let header = screen.line(header_row);
+                if let Some(at) = header.find(" + ") {
+                    let plus_cell = header[..at].chars().count() as u16 + 1;
+                    t.click(plus_cell, header_row).expect("click the +");
+                }
+            }
+        },
+        form,
+    );
     // The title and the button share a label: the button is the last one.
-    let all = term.screen().find_all("Create Pull Request");
-    let (bc, br) = *all.last().unwrap_or(&(col, row));
-    term.click(bc + 2, br).expect("click Create");
-    (term, config, mock)
+    // Nothing is clicked once the host has answered, so a slow first click is
+    // never repeated.
+    common::retry_until(
+        &mut term,
+        "the failed create in the status line",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if screen.contains("error: Hosting request failed") {
+                return;
+            }
+            if let Some(&(bc, br)) = screen.find_all("Create Pull Request").last() {
+                t.click(bc + 2, br).expect("click Create");
+            }
+        },
+        |s| s.contains("error: Hosting request failed"),
+    );
+    // The repository goes back to the caller: dropping it deletes its
+    // directory under the running app.
+    (term, config, mock, repo)
 }
 
 /// The error line is in the status line while the form is still open; then
@@ -90,7 +132,7 @@ fn palette(term: &mut Terminal, query: &str, entry: &str) {
 
 #[test]
 fn a_host_that_refuses_the_token_offers_open_integrations_on_the_entry() {
-    let (mut term, _config, mock) = create_and_fail("pty-hosting-card-401", 401);
+    let (mut term, _config, mock, _repo) = create_and_fail("pty-hosting-card-401", 401);
     wait_for_error_and_close_form(&mut term, "The remote refused the credentials.");
     assert!(
         term.screen().contains("Activity (1)"),
@@ -119,7 +161,7 @@ fn a_host_that_refuses_the_token_offers_open_integrations_on_the_entry() {
 
 #[test]
 fn the_palette_runs_the_suggested_action_of_a_refused_token() {
-    let (mut term, _config, _mock) = create_and_fail("pty-hosting-card-401-twin", 401);
+    let (mut term, _config, _mock, _repo) = create_and_fail("pty-hosting-card-401-twin", 401);
     wait_for_error_and_close_form(&mut term, "The remote refused the credentials.");
     // Copy by its twin.
     palette(
@@ -145,7 +187,7 @@ fn the_palette_runs_the_suggested_action_of_a_refused_token() {
 
 #[test]
 fn a_host_that_breaks_is_worded_in_plain_words_and_has_no_remedy() {
-    let (mut term, _config, _mock) = create_and_fail("pty-hosting-card-500", 500);
+    let (mut term, _config, _mock, _repo) = create_and_fail("pty-hosting-card-500", 500);
     wait_for_error_and_close_form(&mut term, "The hosting service reported a problem.");
     open_entry(&mut term);
     let entry = term

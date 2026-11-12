@@ -134,23 +134,38 @@ fn the_palette_twin_lists_the_issues_and_escape_leaves_the_picker_without_sendin
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").expect("run it");
     // The twin asks which item first.
-    let screen = term
-        .wait_for("the item list", STEP, |s| {
-            s.contains("Choose a request or an issue") && s.contains("Orbit chart flicke")
-        })
+    // The chooser's row: the copy right under its title (the sidebar lists
+    // the same issue further down, and a click there is a click away).
+    let chooser_row = |s: &xtask::pty::Screen| {
+        let (_, title) = s.find("Choose a request or an issue")?;
+        s.find_all("Orbit chart flicke")
+            .into_iter()
+            .find(|&(_, r)| r > title && r <= title + 4)
+    };
+    term.wait_for("the item list", STEP, |s| chooser_row(s).is_some())
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen.find("Orbit chart flicke").unwrap();
-    term.click(c + 1, r).expect("choose the issue");
-    let screen = term
-        .wait_for("the people picker", STEP, |s| {
-            s.contains("Edit assignees") && s.contains("lena") && s.contains("Lena Hart")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        screen.contains("AL") || screen.contains("LH"),
-        "{}",
-        screen.text()
+    // A click on a torn frame can be lost: retry until the picker shows.
+    let screen = crate::common::retry_until(
+        &mut term,
+        "the people picker",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if screen.contains("Choose a request or an issue") {
+                if let Some((c, r)) = chooser_row(&screen) {
+                    t.click(c + 1, r).expect("choose the issue");
+                }
+            }
+        },
+        |s| {
+            s.contains("Edit assignees")
+                && s.contains("lena")
+                && s.contains("Lena Hart")
+                && (s.contains("AL") || s.contains("LH"))
+        },
     );
+    let _ = screen;
     // Filter, then leave: nothing is sent.
     term.send_text("tom").expect("filter");
     term.wait_for("filtered", STEP, |s| {

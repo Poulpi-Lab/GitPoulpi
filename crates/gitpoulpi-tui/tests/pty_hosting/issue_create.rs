@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::common;
 use crate::mock::*;
 use crate::support::*;
 
@@ -32,11 +33,19 @@ fn the_issues_plus_creates_an_issue_through_the_host_and_refreshes_the_section()
     .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
     // The tooltip grows leftwards from the same corner: the old glyph's
     // cell is still inside the button.
-    term.click(plus, row).expect("click the +");
-    term.wait_for("the New issue form", STEP, |s| {
-        s.contains("New issue") && s.contains("Labels: none")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    // A click on a torn frame can be lost: retry until the form shows.
+    common::retry_until(
+        &mut term,
+        "the New issue form",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            if !t.screen().contains("Labels: none") {
+                t.click(plus, row).expect("click the +");
+            }
+        },
+        |s| s.contains("New issue") && s.contains("Labels: none"),
+    );
     assert!(term.screen().contains("g/p"), "{}", term.screen().text());
 
     term.send_text("Parser crashes").unwrap();
@@ -50,23 +59,49 @@ fn the_issues_plus_creates_an_issue_through_the_host_and_refreshes_the_section()
     .unwrap_or_else(|e| panic!("{e}"));
 
     // GitLab: the labels come from the project's own, in the picker.
-    let (lc, lr) = term.wait_for_text("Labels: none", STEP).unwrap();
-    term.click(lc + 2, lr).expect("open the label picker");
-    let screen = term
-        .wait_for("the label picker", STEP, |s| {
-            s.contains("Edit labels") && s.contains("Broken") && s.contains("ui")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
-    let (bc, br) = screen.find("bug").unwrap();
-    term.click(bc + 1, br).expect("check bug");
-    let (uc, ur) = screen
-        .find_all("ui")
-        .into_iter()
-        .find(|(_, r)| *r > br)
-        .expect("the ui row");
-    term.click(uc + 1, ur).expect("check ui");
-    term.wait_for("two checked", STEP, |s| s.contains("2 selected"))
-        .unwrap_or_else(|e| panic!("{e}"));
+    common::retry_until(
+        &mut term,
+        "the label picker",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if screen.contains("Edit labels") {
+                return;
+            }
+            if let Some((lc, lr)) = screen.find("Labels: none") {
+                t.click(lc + 2, lr).expect("open the label picker");
+            }
+        },
+        |s| s.contains("Edit labels") && s.contains("Broken") && s.contains("ui"),
+    );
+    // Each check is retried until its count shows (a click on a torn frame
+    // can be lost); nothing is clicked once the count holds.
+    for (row_text, count) in [("bug", "1 selected"), ("ui", "2 selected")] {
+        common::retry_until(
+            &mut term,
+            count,
+            6,
+            Duration::from_secs(5),
+            |t| {
+                let screen = t.screen();
+                if screen.contains(count) {
+                    return;
+                }
+                let Some((_, picker)) = screen.find("Edit labels") else {
+                    return;
+                };
+                if let Some((c, r)) = screen
+                    .find_all(row_text)
+                    .into_iter()
+                    .find(|(_, r)| *r > picker)
+                {
+                    t.click(c + 1, r).expect("check the label");
+                }
+            },
+            |s| s.contains(count),
+        );
+    }
     term.send_keys("Enter").expect("apply");
     term.wait_for("the chip shows the choice", STEP, |s| {
         s.contains("Labels: bug +1") && !s.contains("Edit labels")
@@ -75,16 +110,22 @@ fn the_issues_plus_creates_an_issue_through_the_host_and_refreshes_the_section()
 
     let before = host_list_requests(&mock);
     // The Create button, by mouse (the last "Create issue" on screen).
-    let screen = term.screen();
-    let (bc, br) = *screen
-        .find_all("Create issue")
-        .last()
-        .expect("the Create issue button");
-    term.click(bc + 2, br).expect("click Create issue");
-    term.wait_for("the form closed with the result", STEP, |s| {
-        !s.contains("Labels: none") && s.contains("created issue #13")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    common::retry_until(
+        &mut term,
+        "the form closed with the result",
+        6,
+        Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if !screen.contains("Labels: bug +1") {
+                return;
+            }
+            if let Some(&(bc, br)) = screen.find_all("Create issue").last() {
+                t.click(bc + 2, br).expect("click Create issue");
+            }
+        },
+        |s| !s.contains("Labels: none") && s.contains("created issue #13"),
+    );
 
     let post = mock
         .requests()

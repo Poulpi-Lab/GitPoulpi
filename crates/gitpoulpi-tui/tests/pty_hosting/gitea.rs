@@ -64,6 +64,7 @@ fn a_gitea_project_lists_requests_and_issues_with_its_chip_and_metadata_menu() {
             s.contains("Greet by name")
                 && s.contains("WIP: rework the")
                 && s.contains("Crash on empty name")
+                && s.contains("GT #12")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
     assert!(screen.contains("GT #12"), "the chip:\n{}", screen.text());
@@ -82,15 +83,18 @@ fn a_gitea_project_lists_requests_and_issues_with_its_chip_and_metadata_menu() {
     );
 
     // The row menu of a request offers the metadata entries.
-    let (c, r) = screen.find("Greet by name").unwrap();
-    term.right_click(c + 2, r).expect("the row menu");
-    term.wait_for("the metadata entries", STEP, |s| {
-        s.contains("Edit assignees...")
-            && s.contains("Edit reviewers...")
-            && s.contains("Edit labels...")
-            && s.contains("Set milestone...")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    let _ = screen;
+    crate::common::right_click_text_until(
+        &mut term,
+        "Greet by name",
+        "the metadata entries",
+        |s| {
+            s.contains("Edit assignees...")
+                && s.contains("Edit reviewers...")
+                && s.contains("Edit labels...")
+                && s.contains("Set milestone...")
+        },
+    );
     term.stop().ok();
 }
 

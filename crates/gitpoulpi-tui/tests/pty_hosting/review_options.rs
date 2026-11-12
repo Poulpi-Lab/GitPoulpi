@@ -167,15 +167,14 @@ fn saved_defaults_prefill_the_next_dialog_and_a_missing_extra_file_is_said() {
     // Opened again, the dialog starts from the saved values.
     term.send_keys("s").unwrap();
     let screen = term
-        .wait_for("the options again", STEP, |s| s.contains("Review options"))
-        .unwrap_or_else(|e| panic!("{e}"));
-    assert!(
-        screen.contains("[ ] CLAUDE.md")
-            && screen.contains("[x] AGENTS.md")
-            && screen.contains("docs/NOPE.md"),
-        "{}",
-        screen.text()
-    );
+        .wait_for("the options again, from the saved values", STEP, |s| {
+            s.contains("Review options")
+                && s.contains("[ ] CLAUDE.md")
+                && s.contains("[x] AGENTS.md")
+                && s.contains("docs/NOPE.md")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let _ = screen;
     term.send_keys("Escape").unwrap();
     term.wait_for("the dialog closed", STEP, |s| {
         !s.contains("Review options") && s.contains("Review !58")
@@ -234,10 +233,12 @@ fn browse_picks_the_extra_file_and_its_text_reaches_the_prompt() {
     term.send_keys("Enter").unwrap();
     let screen = term
         .wait_for("the picker closed with the file in the field", STEP, |s| {
-            !s.contains("Choose the extra file") && s.contains("EXTRA_RULES.md")
+            !s.contains("Choose the extra file")
+                && s.contains("EXTRA_RULES.md")
+                && s.contains("Review options")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(screen.contains("Review options"), "{}", screen.text());
+    let _ = screen;
     term.send_keys("Enter").unwrap();
     term.wait_for("the model was asked", STEP, |_| agent_calls(&agent) == 1)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

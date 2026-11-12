@@ -104,14 +104,10 @@ fn a_change_is_reviewed_at_a_patch_set_and_the_vote_reaches_gerrit() {
     // The patch-set combobox starts on the newest patch set.
     let screen = term
         .wait_for("the patch-set combobox", STEP, |s| {
-            s.contains("Patch set 2 (latest)")
+            s.contains("Patch set 2 (latest)") && s.contains("main \u{2190} refs/changes/07/7/2")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
-    assert!(
-        screen.contains("main \u{2190} refs/changes/07/7/2"),
-        "{}",
-        screen.text()
-    );
+    let _ = screen;
 
     // Files at patch set 2 list both files; the code of planets.rs carries
     // Gerrit's thread under its line.
@@ -418,14 +414,10 @@ fn submit_and_abandon_ask_first_and_reach_the_server_only_when_confirmed() {
     term.send_keys("U").expect("submit");
     let screen2 = term
         .wait_for("the confirmation", STEP, |s| {
-            s.contains("Submit #7 on the server?")
+            s.contains("Submit #7 on the server?") && s.contains("cannot undo it")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
-    assert!(
-        screen2.contains("cannot undo it"),
-        "it says it is not undoable:\n{}",
-        screen2.text()
-    );
+    let _ = screen2;
     term.send_keys("Escape").expect("decline");
     term.wait_for("the question gone", STEP, |s| {
         !s.contains("Submit #7 on the server?")
@@ -450,10 +442,8 @@ fn submit_and_abandon_ask_first_and_reach_the_server_only_when_confirmed() {
     // (Located now, once the header has settled after the submit: the
     // buttons shift when the change's state does, and the screen read at the
     // start of the test is stale by then.)
-    let (c, r) = term
-        .wait_for_settled_text("Abandon", std::time::Duration::from_millis(150), STEP)
+    term.wait_for_settled_text("Abandon", std::time::Duration::from_millis(150), STEP)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
-    term.click(c + 1, r).expect("click Abandon");
     // The confirm button is part of the wait: it is drawn with the dialog,
     // not necessarily in the frame that has the question's title.
     let confirm_below = |s: &xtask::pty::Screen| {
@@ -463,14 +453,39 @@ fn submit_and_abandon_ask_first_and_reach_the_server_only_when_confirmed() {
             .filter(|(_, row)| *row > question)
             .max_by_key(|(_, row)| *row)
     };
-    let asked = term
-        .wait_for("the confirmation and its button", STEP, |s| {
-            confirm_below(s).is_some()
-        })
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.screen().text()));
+    // A click on a torn frame can be lost: re-locate and retry until asked.
+    crate::common::retry_until(
+        &mut term,
+        "the confirmation and its button",
+        6,
+        std::time::Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if screen.contains("Abandon #7 on the server?") {
+                return;
+            }
+            if let Some((c, r)) = screen.find("Abandon") {
+                t.click(c + 1, r).expect("click Abandon");
+            }
+        },
+        |s| confirm_below(s).is_some(),
+    );
     assert_eq!(posts_to(&mock, "/abandon"), 0);
-    let (yc, yr) = confirm_below(&asked).expect("the confirm button");
-    term.click(yc + 1, yr).expect("confirm the abandon");
+    crate::common::retry_until(
+        &mut term,
+        "the abandon sent",
+        6,
+        std::time::Duration::from_secs(5),
+        |t| {
+            if posts_to(&mock, "/abandon") == 1 {
+                return;
+            }
+            if let Some((yc, yr)) = confirm_below(&t.screen()) {
+                t.click(yc + 1, yr).expect("confirm the abandon");
+            }
+        },
+        |_| posts_to(&mock, "/abandon") == 1,
+    );
     wait_until("the server got the abandon", || {
         posts_to(&mock, "/abandon") == 1
     });

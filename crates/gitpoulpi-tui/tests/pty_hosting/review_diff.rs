@@ -134,19 +134,39 @@ fn the_review_diff_has_split_the_whole_file_whitespace_the_ruler_and_comments_in
     });
 
     // A comment on a line, in Split: pending, under the line, in its half.
-    let screen = term.screen();
-    let (c, r) = screen.find("moons.push(1);").unwrap();
-    term.click(c + 2, r).expect("the second added line");
-    term.send_keys("c").expect("comment");
-    term.wait_for("the comment box", STEP, |s| {
-        s.contains("Comment on code") && s.contains("src/planets.rs:13")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    // A click on a torn frame can be lost: retry until the box shows.
+    crate::common::retry_until(
+        &mut term,
+        "the comment box",
+        6,
+        std::time::Duration::from_secs(5),
+        |t| {
+            let screen = t.screen();
+            if screen.contains("Comment on code") {
+                return;
+            }
+            if let Some((c, r)) = screen.find("moons.push(1);") {
+                t.click(c + 2, r).expect("the second added line");
+                t.send_keys("c").expect("comment");
+            }
+        },
+        |s| s.contains("Comment on code") && s.contains("src/planets.rs:13"),
+    );
     term.send_text("needs a doc comment").unwrap();
     term.send_keys("C-s").expect("keep it");
     let screen = term
         .wait_for("the pending comment under its line", STEP, |s| {
-            s.contains("1 pending comment") && s.contains("Pending - line 13")
+            let (Some((_, pending)), Some((_, code))) =
+                (s.find("Pending - line 13"), s.find("moons.push(1);"))
+            else {
+                return false;
+            };
+            s.contains("1 pending comment")
+                && pending > code
+                && s.contains("needs a doc comment")
+                && s.find_all("\u{25cf}")
+                    .iter()
+                    .any(|(col, _)| *col > s.cols() / 2)
         })
         .unwrap_or_else(|e| panic!("{e}"));
     let (pending_col, pending_row) = screen.find("Pending - line 13").unwrap();
@@ -155,11 +175,6 @@ fn the_review_diff_has_split_the_whole_file_whitespace_the_ruler_and_comments_in
     assert!(
         pending_col + 3 >= moons_col,
         "in the half of its side:\n{}",
-        screen.text()
-    );
-    assert!(
-        screen.contains("needs a doc comment"),
-        "its text:\n{}",
         screen.text()
     );
     assert!(

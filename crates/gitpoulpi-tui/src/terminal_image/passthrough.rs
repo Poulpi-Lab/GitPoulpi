@@ -72,8 +72,16 @@ pub(super) fn features_include_sixel(features: &str) -> bool {
 /// column becomes a solid rectangle with the lanes drawn on it (real
 /// window, tmux 3.8 and also without tmux, November 2026). Terminals that
 /// keep the pixels unset (Tabby 1.0.238, foot, WezTerm) are fine.
+///
+/// iTerm2 is told two ways, because tmux learns the client's type from a
+/// terminal reply that can still be on its way when this runs at start-up
+/// (the features, from the first reply, then already say `sixel` and the type
+/// is empty): `client_termtype`, and the `LC_TERMINAL=iTerm2` /
+/// `ITERM_SESSION_ID` iTerm2 puts in the environment of what it starts, which
+/// the tmux server and its panes keep.
 pub(super) fn tmux_client_has_sixel<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
     tmux_only(get)
+        && !iterm2_environment(get)
         && get(CLIENT_FEATURES_KEY).is_some_and(|answer| {
             let (features, termtype) = answer.split_once('|').unwrap_or((answer.as_str(), ""));
             features_include_sixel(features) && !paints_unset_sixel_pixels(termtype)
@@ -87,6 +95,12 @@ fn paints_unset_sixel_pixels(termtype: &str) -> bool {
         .trim_start()
         .to_ascii_lowercase()
         .starts_with("iterm2")
+}
+
+/// The variables iTerm2 sets for everything it starts.
+fn iterm2_environment<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
+    get("LC_TERMINAL").is_some_and(|v| v.eq_ignore_ascii_case("iTerm2"))
+        || get("ITERM_SESSION_ID").is_some_and(|v| !v.is_empty())
 }
 
 /// Asks tmux for its client's terminal features and type. `None` when `tmux`
@@ -278,6 +292,32 @@ mod tests {
         // Without the termtype (older tmux, tests) the features decide.
         assert!(tmux_client_has_sixel(&answered("RGB,sixel")));
         assert!(!tmux_client_has_sixel(&answered("RGB,title|foot(1.28.0)")));
+    }
+
+    /// tmux learns the client's type from a reply that can arrive after the
+    /// features: the type is empty, the environment still names iTerm2.
+    #[test]
+    fn iterm2_is_also_told_from_the_environment_tmux_keeps() {
+        let answered = |env: &'static [(&'static str, &'static str)]| {
+            move |name: &str| match name {
+                CLIENT_FEATURES_KEY => Some("RGB,sixel|".to_string()),
+                "TMUX" => Some("x".to_string()),
+                _ => env
+                    .iter()
+                    .find(|(k, _)| *k == name)
+                    .map(|(_, v)| (*v).to_string()),
+            }
+        };
+        assert!(!tmux_client_has_sixel(&answered(&[(
+            "LC_TERMINAL",
+            "iTerm2"
+        )])));
+        assert!(!tmux_client_has_sixel(&answered(&[(
+            "ITERM_SESSION_ID",
+            "w0t0p0:ABC"
+        )])));
+        assert!(tmux_client_has_sixel(&answered(&[])));
+        assert!(tmux_client_has_sixel(&answered(&[("LC_TERMINAL", "foot")])));
     }
 
     #[test]

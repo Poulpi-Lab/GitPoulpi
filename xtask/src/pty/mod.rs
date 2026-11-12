@@ -395,7 +395,13 @@ impl Terminal {
         // either: the TUI paints another gear under kitty/Ghostty, and the
         // tests find the standard one. A test about a terminal sets its own
         // variables with `.env(..)` (applied below).
-        for name in ["KITTY_WINDOW_ID", "GHOSTTY_RESOURCES_DIR", "TERM_PROGRAM"] {
+        for name in [
+            "KITTY_WINDOW_ID",
+            "GHOSTTY_RESOURCES_DIR",
+            "TERM_PROGRAM",
+            "LC_TERMINAL",
+            "ITERM_SESSION_ID",
+        ] {
             cmd.env_remove(name);
         }
         // Nor a multiplexer the developer runs them in: the TUI sends no

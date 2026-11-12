@@ -2057,7 +2057,7 @@ err_host = "Saisissez un domaine d'hôte valide, p. ex. gitlab.example.com"
 err_token = "Collez d'abord un jeton d'accès personnel"
 check_ended = "la vérification de la connexion s'est arrêtée de façon inattendue"
 connected_to = "connecté à {host} en tant que @{login}"
-connected_session_only = "{message} - the token could not be saved in the OS credential store ({error}); it is kept for this session only"
+connected_session_only = "{message} - le jeton n'a pas pu être enregistré dans le gestionnaire d'identifiants du système ({error}) ; il n'est conservé que pour cette session"
 disconnected = "{id} déconnecté ; le profil est conservé"
 token_not_removed = "jeton non supprimé : {error}"
 removed = "{id} supprimé"
@@ -5592,9 +5592,9 @@ reading = "lecture de {name} pour ouvrir une copie..."
 read_failed = "impossible de lire {name} : {why}"
 too_large = "{name} est trop gros pour être transmis en copie ({size})"
 # context: button on the Git LFS object card (Diff view, File View) beside the Open in list; opens the real file, never the pointer. Width budget: 26 cells
-default_button = "Open in default program"
+default_button = "Ouvrir par défaut"
 # context: status message; {name} is an LFS file whose real content is not in the local LFS store, so there is nothing to open yet
-lfs_missing = "{name} is an LFS file whose content is not downloaded yet, so there is nothing to open"
+lfs_missing = "{name} est un fichier LFS dont le contenu n'est pas encore téléchargé : il n'y a rien à ouvrir"
 
 # Settings > Integrations, the per-kind fields (integrations_page/*): Azure DevOps, Bitbucket, Jira, Trello.
 [integrations_page]

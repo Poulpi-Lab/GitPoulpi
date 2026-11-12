@@ -12,7 +12,7 @@
 
 | Прапорець | Дія |
 |---|---|
-| `--json` | Вивести результат у JSON. Помилки теж у JSON: `{"error": "..."}` у stdout, код завершення 1. Невдала операція git додає `"detail": {"operation", "command", "exit_code", "stderr"}` (виконану команду git із замаскованими секретами, її код завершення та кінець її stderr; для вбудованої бібліотеки git `"git2": {"class", "code", "message"}`); інструменти MCP повертають той самий об'єкт. Без `--json` рядки йдуть у stderr. |
+| `--json` | Вивести результат у JSON. Помилки теж у JSON: `{"error": "..."}` у stdout, код завершення 1. Невдала операція git додає `"detail": {"operation", "command", "exit_code", "stderr"}` (виконану команду git із замаскованими секретами, її код завершення та кінець її stderr; для вбудованої бібліотеки git `"git2": {"class", "code", "message"}`), а збій, який демон зміг назвати, додає `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}` (операція, її назва для людини, її основні аргументи із замаскованими секретами, репозиторій, хто запитав, id запиту і, для fetch чи push, номер його завдання); інструменти MCP повертають той самий об'єкт. Без `--json` рядки йдуть у stderr. |
 | `--repo <path>` | Репозиторій, з яким працювати (типово той, що містить поточну папку, як у git). |
 | `-s, --session <name>` | Сесія (демон), з якою працювати. Типово виводиться з кореня репозиторію, тож усе, що відкрито в одному репозиторії, ділить один демон, а два репозиторії мають два. |
 | `--backend git2\|system` | Бекенд для демона, який запускає ця команда (демон, що вже працює, залишає свій). |
@@ -165,7 +165,7 @@ Hunk'и та рядки нумеруються так, як їх нумерує 
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch типового віддаленого, одного або всіх. Кожен fetch також оновлює відомості про tag'и кожного remote (`remote` у `tag list`) і чистить цей запис навіть без `--prune`. `--prune-tags` (Налаштування: Автоочищення tag'ів) видаляє ще й локальні tag'и, які видалив remote: лише ті, що були на ньому, і ніколи не той, якого ви не надсилали; відповідь перелічує їх як `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; режим завжди явно передається git. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Простого force немає: лише `--force-with-lease`. |
-| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Віддалені репозиторії. |
+| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Віддалені репозиторії. `remote list` позначає простір імен віддаленого відстеження без remote за ним як `configured: false`; `remote remove` для нього видаляє його гілки (можна скасувати). |
 | `remote set-url <name> <url> [--push]`, `remote clear-push-url <name>` | URL для fetch / push. |
 | `remote default [name]` | Показати або вибрати типовий віддалений репозиторій. |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | Клонування (об'єкти LFS завантажуються, якщо не вказано `--no-lfs`). `--sparse` робить checkout лише цих каталогів і файлів у корені; уся історія все одно завантажується (див. [Розріджений checkout](getting-started.md#розріджений-checkout)). |

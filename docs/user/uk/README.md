@@ -70,6 +70,8 @@ GitPoulpi - це клієнт Git для термінала з графом comm
     «Вийти й cd сюди» та обгортка `gitpoulpi shell-init` (`gp`) для bash,
     zsh, fish і PowerShell.
     Який термінал найкраще показує GitPoulpi: **[Вибір термінала](terminals.md)**.
+    Що проходить через tmux, zellij, screen, herdr і панелі терміналів:
+    **[Мультиплексори](multiplexers.md)**.
 
 Також: **[Робочі процеси гілок](branching-workflows.md)**: шаблони Git Flow, GitHub
 Flow, GitLab Flow і Trunk-based або ваші власні базові гілки, шаблони назв гілок і

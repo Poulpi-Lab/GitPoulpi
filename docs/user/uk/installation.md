@@ -17,10 +17,10 @@ GitPoulpi має три виконувані файли:
 - **Системний `git`** у вашому `PATH`. GitPoulpi використовує libgit2 для
   більшості операцій, а ваш `git` - для решти.
   Потрібна версія **2.34 або новіша**. У macOS підходить `git` з Apple Command Line Tools, а також з Homebrew.
-- **Термінал** з підтримкою миші. kitty, Ghostty, WezTerm і iTerm2 (а також Windows Terminal і foot через sixel) малюють граф
-  commit'ів як зображення. Інші термінали (консоль Windows, tmux і
+- **Термінал** з підтримкою миші. kitty, Ghostty, WezTerm, Rio і iTerm2 (а також Windows Terminal, foot і Tabby через sixel) малюють граф
+  commit'ів як зображення. Інші термінали (консоль Windows, zellij, screen і
   більшість решти) показують символьний граф. Див.
-  [Вибір термінала](terminals.md).
+  [Вибір термінала](terminals.md) і [Мультиплексори](multiplexers.md).
 - **Nerd Font** або шрифт з емодзі для значків на панелі інструментів і в
   бічній панелі.
 - За бажання: **`git-lfs`** 3.0 чи новіший для репозиторіїв Git LFS. Без нього

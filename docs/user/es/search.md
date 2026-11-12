@@ -32,7 +32,7 @@ están listos.
 
 | Tecla | Hace |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `PageUp` / `PageDown`, `Home` / `End` | Moverte por los resultados (los encabezados de grupo se saltan). |
+| `Up` / `Down`, `PageUp` / `PageDown`, `Home` / `End` | Moverte por los resultados (los encabezados de grupo se saltan). |
 | `Enter` | Va al resultado: se abre la pestaña del repositorio (o se cambia a ella) y luego se muestra el resultado. |
 | `Esc` | Cierra la búsqueda. |
 | `Alt+1` .. `Alt+8` | Activa o desactiva un tipo (los chips sobre la lista, en su orden). `Alt+0` los activa todos. |

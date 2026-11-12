@@ -174,6 +174,16 @@ Un archivo binario (un PDF, un documento de Word, una hoja de cálculo, un archi
 
 El archivo del árbol de trabajo se entrega a la aplicación tal cual. La versión de un commit (o del índice) se escribe en una **copia temporal de solo lectura**, con un aviso en la barra de estado, para que una aplicación no pueda cambiar el repositorio. Ninguna de las dos cambia el repositorio: sin entrada en el diario, Deshacer no se ve afectado.
 
+La lista del menú se abre junto al menú, a la altura de la fila **Abrir con...**, como un submenú (a la izquierda cuando no hay sitio a la derecha), tanto con el ratón como con el teclado. La lista de editores de imagen (**Editar en...**) abierta desde un menú de archivo hace lo mismo.
+
+### Archivos Git LFS
+
+La tarjeta de objeto Git LFS (consulta [Git LFS](lfs.md)) lleva bajo su texto las mismas dos acciones: **Abrir en predeterminado** y **Abrir en**, con las mismas teclas (`o`, `Shift+O`) y filas de la paleta. Abren el archivo real, nunca el puntero: el archivo del árbol de trabajo tal cual, o una copia temporal de solo lectura del objeto del almacén LFS local para la versión de un commit o del índice. Un objeto que aún no está descargado no tiene botones en la tarjeta, y la línea de estado dice que el contenido aún no está descargado. La misma negativa se aplica a un archivo del árbol de trabajo que todavía contiene solo el puntero: **Abrir en predeterminado**, **Abrir en** y **Editar en**, desde la tarjeta o desde cualquier menú de archivo, dicen que el contenido no está descargado en lugar de abrir el texto del puntero (descárgalo con las filas de pull o checkout de la barra LFS y vuelve a intentarlo). Abrir es de solo lectura: sin entrada en el diario, nada que deshacer.
+
+### Navegadores en Windows
+
+Chrome y Edge registran `--single-argument %1`, lo que les hace leer todo lo que sigue al parámetro como una sola dirección, comillas incluidas. GitPoulpi pasa la ruta a un programa así tal cual y sin comillas, como hace Windows, de modo que un archivo con espacios en su ruta se abre en lugar de fallar con `http://"c/...`. Cualquier otro programa recibe la ruta como un argumento normal.
+
 ## Claves heredadas
 
 Las claves antiguas `ui.terminal_launch` y `ui.terminal_launch_command` solo se leen mientras

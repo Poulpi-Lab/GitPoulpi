@@ -187,6 +187,47 @@ fn start_then_status_reports_listening_and_stop_reports_not_listening() {
     assert!(gone, "daemon still reported listening after stop");
 }
 
+/// A caller that captures `daemon start`'s output through a pipe (a script's
+/// `$(...)`, an agent's subprocess) must see the output end when the command
+/// exits: the detached daemon must not keep the pipe's write end open (on
+/// Windows it inherited it).
+#[test]
+fn start_output_captured_through_a_pipe_ends_when_the_command_exits() {
+    use std::io::Read;
+    use std::process::Stdio;
+
+    let config = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    let session = "daemon-start-pipe-test";
+    let _cleanup = StopOnDrop {
+        config: config.path().to_path_buf(),
+        cwd: cwd.path().to_path_buf(),
+        session: session.to_string(),
+    };
+    let mut child = Command::new(env!("CARGO_BIN_EXE_gitpoulpi"))
+        .env("GITPOULPI_CONFIG_DIR", config.path())
+        .current_dir(cwd.path())
+        .args(["-s", session, "daemon", "start", "--json"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut stdout = child.stdout.take().unwrap();
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let mut text = String::new();
+        let _ = stdout.read_to_string(&mut text);
+        let _ = tx.send(text);
+    });
+    let text = rx.recv_timeout(CLI_TIMEOUT).unwrap_or_else(|_| {
+        let _ = child.kill();
+        panic!("the output of `daemon start` never ended: the daemon holds the pipe open")
+    });
+    let _ = child.wait();
+    let started: Value = serde_json::from_str(&text).unwrap_or_else(|e| panic!("{e}: {text}"));
+    assert_eq!(started["ok"], Value::Bool(true), "{started}");
+}
+
 #[test]
 fn stop_all_stops_every_session_with_a_daemon_running() {
     let config = tempfile::tempdir().unwrap();

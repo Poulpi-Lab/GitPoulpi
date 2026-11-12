@@ -423,6 +423,7 @@ async fn start_one(
         .stdout(Stdio::null())
         .stderr(Stdio::null());
     detach(&mut cmd);
+    keep_std_handles_from_the_child();
 
     let child = match cmd.spawn() {
         Ok(child) => child,
@@ -473,6 +474,38 @@ fn detach(cmd: &mut std::process::Command) {
     const CREATE_NEW_PROCESS_GROUP: u32 = 0x0000_0200;
     cmd.creation_flags(DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP);
 }
+
+/// Windows: `CreateProcess` hands the child every inheritable handle of this
+/// process, whatever `Stdio` says for its own standard handles. When the
+/// caller captured this command's output through a pipe (a script's `$(...)`,
+/// an agent's subprocess), the pipe's write end is one of them: the daemon
+/// would keep it open for its whole life and the caller would wait for the
+/// end of the output forever. This process only prints its result and exits,
+/// so its own standard handles are made non-inheritable before the spawn.
+#[cfg(windows)]
+fn keep_std_handles_from_the_child() {
+    #[link(name = "kernel32")]
+    extern "system" {
+        fn GetStdHandle(which: u32) -> isize;
+        fn SetHandleInformation(handle: isize, mask: u32, flags: u32) -> i32;
+    }
+    const HANDLE_FLAG_INHERIT: u32 = 1;
+    // STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE: -10, -11, -12.
+    for which in [-10_i32, -11, -12] {
+        // SAFETY: plain kernel32 calls on this process's own standard
+        // handles; an invalid or null handle makes them fail, which is
+        // ignored (nothing to protect then).
+        unsafe {
+            let handle = GetStdHandle(which as u32);
+            if handle != 0 && handle != -1 {
+                SetHandleInformation(handle, HANDLE_FLAG_INHERIT, 0);
+            }
+        }
+    }
+}
+
+#[cfg(not(windows))]
+fn keep_std_handles_from_the_child() {}
 
 #[cfg(unix)]
 fn detach(cmd: &mut std::process::Command) {

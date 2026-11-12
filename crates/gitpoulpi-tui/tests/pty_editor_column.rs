@@ -78,13 +78,23 @@ fn edit_d(term: &mut Terminal) {
 }
 
 /// Column of the right panel's left border, on its "Commit details" row.
+/// Read from a frame that shows it whole (a torn frame can miss the title or
+/// the border).
 fn panel_left(term: &Terminal) -> u16 {
-    let (c, r) = term.screen().find("Commit details").unwrap();
-    let line: Vec<char> = term.screen().line(r).chars().collect();
-    (0..c as usize)
-        .rev()
-        .find(|&i| line[i] == '\u{256d}')
-        .unwrap() as u16
+    fn left_of(s: &xtask::pty::Screen) -> Option<u16> {
+        let (c, r) = s.find("Commit details")?;
+        let line: Vec<char> = s.line(r).chars().collect();
+        (0..c as usize)
+            .rev()
+            .find(|&i| line.get(i) == Some(&'\u{256d}'))
+            .map(|i| i as u16)
+    }
+    let screen = term
+        .wait_for("the right panel's left border", STEP, |s| {
+            left_of(s).is_some()
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    left_of(&screen).unwrap()
 }
 
 /// Every `OSC 22` pointer shape the program asked for, in order ("" is the

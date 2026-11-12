@@ -175,6 +175,16 @@ En binärfil (en PDF, ett Word-dokument, ett kalkylblad, ett arkiv...) har ingen
 
 Filen i arbetskatalogen lämnas till appen som den är. En commits (eller indexets) version skrivs till en **skrivskyddad tillfällig kopia**, med en notis i statusraden, så att en app inte kan ändra repositoryt. Ingen av dem ändrar repositoryt: ingen journalpost, Ångra påverkas inte.
 
+Menyns lista öppnas bredvid menyn, i höjd med raden **Öppna med...**, som en undermeny (till vänster när det inte finns plats till höger), både med musen och från tangentbordet. Listan över bildredigerare (**Redigera i...**) som öppnas från en filmeny gör likadant.
+
+### Git LFS-filer
+
+Kortet för Git LFS-objekt (se [Git LFS](lfs.md)) har samma två åtgärder under sin text: **Öppna i standardprogram** och **Öppna i**, med samma tangenter (`o`, `Shift+O`) och paletträder. De öppnar den riktiga filen, aldrig pekaren: filen i arbetskatalogen som den är, eller en skrivskyddad tillfällig kopia av objektet från det lokala LFS-lagret för en commits eller indexets version. Ett objekt som inte är nedladdat än har inga knappar på kortet, och statusraden säger att innehållet inte är nedladdat än. Samma vägran gäller en fil i arbetskatalogen som fortfarande bara innehåller pekaren: **Öppna i standardprogram**, **Öppna i** och **Redigera i**, från kortet eller vilken filmeny som helst, säger att innehållet inte är nedladdat i stället för att öppna pekartexten (ladda ned det med LFS-verktygsradens pull- eller checkout-rader och försök igen). Att öppna är skrivskyddat: ingen journalpost, inget att ångra.
+
+### Webbläsare i Windows
+
+Chrome och Edge registrerar `--single-argument %1`, vilket gör att de läser allt efter växeln som en enda adress, citattecken inklusive. GitPoulpi skickar sökvägen till ett sådant program ordagrant och utan citattecken, som Windows gör, så en fil med blanksteg i sökvägen öppnas i stället för att misslyckas med `http://"c/...`. Alla andra program får sökvägen som ett vanligt argument.
+
 ## Äldre nycklar
 
 De gamla nycklarna `ui.terminal_launch` och `ui.terminal_launch_command` läses

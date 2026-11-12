@@ -31,7 +31,7 @@ typerna finns direkt och commits ansluter så fort de är klara.
 
 | Tangent | Gör |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `PageUp` / `PageDown`, `Home` / `End` | Flyttar genom resultaten (grupprubrikerna hoppas över). |
+| `Up` / `Down`, `PageUp` / `PageDown`, `Home` / `End` | Flyttar genom resultaten (grupprubrikerna hoppas över). |
 | `Enter` | Går till resultatet: repositoryts flik öppnas (eller växlas till), sedan visas resultatet. |
 | `Esc` | Stänger sökningen. |
 | `Alt+1` .. `Alt+8` | Slår en typ på eller av (chipen ovanför listan, i deras ordning). `Alt+0` slår på alla. |

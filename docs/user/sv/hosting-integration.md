@@ -739,7 +739,7 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Se [CLI-referens](cli-reference.md#kommandon) för varje kommando. En token
-godtas aldrig som argument, och MCP-servern erbjuder inte
+godtas aldrig som argument (`hosting login` skriver ut `stored: "os"` när operativsystemets credential store behåller den, eller `stored: "session"` plus `store_error` när lagret avvisade den och token ligger i minnet bara under den här sessionen), och MCP-servern erbjuder inte
 `hosting login`, så en token passerar aldrig via en agent.
 
 ## Felsökning

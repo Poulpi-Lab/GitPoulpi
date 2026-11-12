@@ -437,7 +437,7 @@ Hela listan finns [nedan](#varje-palettkommando).
 |---|---|
 | `Ctrl+P` | Öppna paletten |
 | *(skriv)* | Filtrera listan. En exakt träff efter prefixet `Kategori: ` kommer först, sedan en träff var som helst i etiketten, sedan en suddig träff |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | Flytta markeringen (se [Filtrerbara popuplistor](#filtrerbara-popuplistor)) |
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | Flytta markeringen (se [Filtrerbara popuplistor](#filtrerbara-popuplistor)) |
 | `Enter`, eller ett dubbelklick | Kör det markerade kommandot |
 | `Esc` | Stäng |
 
@@ -456,7 +456,9 @@ I `config.toml` är det tabellen `[keybindings.palette]`, uppkallad efter komman
 
 Hjälpraden under listan anger den här tangenten (`Alt+K` som standard). Det är åtgärden `palette.configure_shortcut`, så den kan ändras som alla andra.
 
-Paletten och väljarna (tema, språk, flik, arbetsytesökning) flyttas och ändrar storlek som en dialogruta: dra i den övre kanten, eller tryck `Alt+G` (åtgärden `palette.arrange`; paletträden `Dialogruta: Flytta/ändra storlek` gör detsamma). Piltangenterna flyttar, `Shift`+pilar ändrar storlek, `0` återställer, `Enter` eller `Esc` lämnar läget och popupen förblir öppen. `ui.dialog_geometry` avgör om platsen behålls.
+Paletten och väljarna (tema, språk, flik, arbetsytesökning) flyttas och ändrar storlek som en dialogruta: dra i den övre kanten, tryck `Ctrl+N` och sedan `m` (som över varje dialogruta), eller tryck `Alt+G`. `Alt+G` är åtgärden `palette.arrange` ("Dialogruta: flytta eller ändra storlek på dialogrutan längst fram"): ett extra sätt, giltigt över varje dialogruta och popup, att starta arrangeringsläget för den som ligger längst fram (paletträderna `Dialogruta: Flytta/ändra storlek` och `Dialogruta: Återställ position och storlek` verkar på paletten själv medan den är öppen). Piltangenterna flyttar, `Shift`+pilar ändrar storlek, `0` återställer, `Enter` eller `Esc` lämnar läget och popupen förblir öppen. `ui.dialog_geometry` avgör om platsen behålls.
+
+`Ctrl+N` är navigeringsprefixet här också: det visar ett märke på filterrutan, listans första rad och stängningskorset, och tangenten efter det trycker på den kontrollen eller `m` arrangerar popupen. Det flyttar inte längre markeringen nedåt, och `Ctrl+P` flyttar den inte uppåt: bara piltangenterna, `PageUp` / `PageDown` och `Home` / `End` flyttar en lista med filterfält.
 
 ### Varje palettkommando
 
@@ -1193,7 +1195,7 @@ Tangenterna är standardvärdena.
 | Tangent | Åtgärd |
 |---|---|
 | `Tab` / `Shift+Tab` | Fokusera nästa / föregående ruta |
-| `Ctrl+N`, sedan ett märke | Fokusera den delen av fönstret (se [Navigeringsprefix](#navigeringsprefix-ctrln)) |
+| `Ctrl+N`, sedan ett märke | Fokusera den delen av fönstret, eller tryck på den kontrollen i dialogrutan eller popupen längst fram (se [Navigeringsprefix](#navigeringsprefix-ctrln)) |
 | `j` / `k`, `Up` / `Down` | Flytta markeringen, i varje ruta |
 | `PageUp` / `PageDown`, `Home` / `End` | Flytta en sida; gå till första / sista raden |
 | ett tal, sedan `j` / `k` / `Up` / `Down` | Räknarprefix: `4j` flyttar fyra rader. Med `PageUp` / `PageDown` är räknaren ett antal sidor. Statusraden visar den väntande räknaren (`4...`). `Esc` eller vilken annan tangent som helst rensar den. En inledande `0` startar aldrig en räknare |
@@ -1219,15 +1221,19 @@ tangenter flyttar markeringen:
 
 | Tangent | Åtgärd |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Flytta en rad |
+| `Up` / `Down` | Flytta en rad |
 | `Home` / `End` | Första / sista raden |
 | `PageUp` / `PageDown` | Flytta en synlig sida |
 | `Enter` | Välj den markerade raden |
 | `Esc` | Stäng |
 
-I dessa popuper flyttar `Home`, `End` och `Ctrl+K` listan, inte markören i
-filterfältet. `Ctrl+A` och `Ctrl+E` flyttar fortfarande markören till början och
-slutet. Vanliga `j` och `k` skrivs in i filtret.
+I dessa popuper flyttar `Home` och `End` listan, inte markören i filterfältet.
+`Ctrl+A` och `Ctrl+E` flyttar fortfarande markören till början och slutet, och
+`Ctrl+K` raderar till slutet av filtret. Inget `Ctrl+bokstav`-par flyttar en lista
+(`Ctrl+N` är navigeringsprefixet, `Ctrl+P` kommandopaletten), och vanliga `j` och
+`k` skrivs in i filtret: bara piltangenterna, `PageUp` / `PageDown` och `Home` /
+`End` flyttar här. I listor utan textfält är `j` / `k` ett extra sätt att flytta
+nedåt / uppåt.
 
 Med musen:
 
@@ -1258,7 +1264,7 @@ allt, även skärmen Inställningar.
 | *(skriv)* | Filter: behåll bara de avsnitt som innehåller texten. `j`, `k` och `q` skrivs också in |
 | `Backspace`, `Ctrl+U` | Radera sista tecknet / rensa filtret |
 | `Esc` | Rensa filtret; om det är tomt, stäng hjälpen |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Rulla en rad |
+| `Up` / `Down` | Rulla en rad |
 | `PageUp` / `PageDown`, `Home` / `End` | Rulla en sida; gå till början / slutet |
 | `Ctrl+D`, eller ett klick på länken | Öppna den här dokumentationen på GitHub i webbläsaren |
 

@@ -30,6 +30,7 @@ GitPoulpi 是一个终端 Git 客户端，拥有可点击的 commit 图、命令
 15. **[打开方式](open-in.md)**：标题栏中的列表，可在终端、多路复用器、编辑器或文件管理器中打开活动标签页的文件夹。
 16. **[跟随活动标签页的文件夹](following-the-tab-folder.md)**：“退出并 cd 到此”，以及适用于 bash、zsh、fish 和 PowerShell 的 `gitpoulpi shell-init` 包装函数（`gp`）。
     哪个终端最适合 GitPoulpi：**[选择终端](terminals.md)**。
+    哪些内容能穿过 tmux、zellij、screen、herdr 和终端窗格：**[多路复用器](multiplexers.md)**。
 
 另见：**[分支工作流](branching-workflows.md)**，Git Flow、GitHub Flow、GitLab Flow 和 Trunk-based 预设，或你自己的基础分支、分支名称模式和主题类型（`gitpoulpi flow ...`）。
 

@@ -8,7 +8,7 @@
 
 | 标志 | 作用 |
 |---|---|
-| `--json` | 以 JSON 打印结果。错误也是 JSON：stdout 上的 `{"error": "..."}`，退出码为 1。 失败的 git 操作会多出 `"detail": {"operation", "command", "exit_code", "stderr"}`（运行的 git 命令（已隐去机密信息）、它的退出码和 stderr 的末尾部分；对于内置 git 库则是 `"git2": {"class", "code", "message"}`）；MCP 工具返回同样的对象。不带 `--json` 时这些行输出到 stderr。 |
+| `--json` | 以 JSON 打印结果。错误也是 JSON：stdout 上的 `{"error": "..."}`，退出码为 1。 失败的 git 操作会多出 `"detail": {"operation", "command", "exit_code", "stderr"}`（运行的 git 命令（已隐去机密信息）、它的退出码和 stderr 的末尾部分；对于内置 git 库则是 `"git2": {"class", "code", "message"}`），守护进程能指出名称的失败还会多出 `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}`（操作、面向用户的名称、隐去机密信息的主要参数、仓库、请求方、请求的 id，对于 fetch 或 push 还有其作业编号）；MCP 工具返回同样的对象。不带 `--json` 时这些行输出到 stderr。 |
 | `--repo <path>` | 要操作的仓库（默认：当前目录所在的仓库，与 git 相同）。 |
 | `-s, --session <name>` | 要通信的会话（守护进程）。默认：由仓库根目录推导，因此在同一个仓库内打开的所有内容共用一个守护进程，两个仓库则有两个。 |
 | `--backend git2\|system` | 本命令所启动的守护进程使用的后端（已在运行的守护进程保持自己的后端）。 |
@@ -139,7 +139,7 @@
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch 默认远程、某个远程或全部远程。每次 fetch 还会刷新每个远程上的 tag 记录（`tag list` 的 `remote`），即使没有 `--prune` 也会清理这份记录。`--prune-tags`（设置：自动清理 tags）还会删除远程已经删除的本地 tag：只涉及曾存在于远程的 tag，绝不会动你没有 push 过的；输出会把它们列为 `pruned_tags`（git 2.41+）。 |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull；模式总是明确传给 git。 |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push。没有单纯的 force：只有 `--force-with-lease`。 |
-| `remote list`、`remote add <name> <url> [--push-url U]`、`remote remove <name>`、`remote rename <old> <new>` | 远程。 |
+| `remote list`、`remote add <name> <url> [--push-url U]`、`remote remove <name>`、`remote rename <old> <new>` | 远程。`remote list` 会把没有对应远程的远程跟踪命名空间标为 `configured: false`；对它执行 `remote remove` 会删除其分支（可撤销）。 |
 | `remote set-url <name> <url> [--push]`、`remote clear-push-url <name>` | Fetch / push URL。 |
 | `remote default [name]` | 显示或选择仓库的默认远程。 |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | 克隆（除非加 `--no-lfs`，否则会下载 LFS 对象）。`--sparse` 只检出这些目录和根目录下的文件，完整历史仍会下载（参见[稀疏检出](getting-started.md#稀疏检出)）。 |

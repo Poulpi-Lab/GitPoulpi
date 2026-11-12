@@ -81,7 +81,7 @@ author_email = "jane@work.example"
 | 键 | 默认值 | 取值与作用 |
 |---|---|---|
 | `ui.graph_renderer` | `"auto"` | `auto`（终端能绘制图片时用图片，否则用字符）、`image`、`text`。**重启。** |
-| `ui.image_protocol` | `"auto"` | 图片（图、头像）如何传送到终端：`auto`、`kitty`、`iterm2`、`sixel`、`none`。`auto` = 在 kitty、Ghostty 以及设置了 `kitty_graphics = true` 的 herdr 中使用 Kitty 协议；在 WezTerm、iTerm2、Rio、mintty 中使用 iTerm2 协议；在 Windows Terminal、foot、Konsole、mlterm 中使用 sixel（仅头像）；在 tmux、zellij、screen 和未知终端中不使用。**重启。** |
+| `ui.image_protocol` | `"auto"` | 图片（图、头像）如何传送到终端：`auto`、`kitty`、`iterm2`、`sixel`、`none`。`auto` = 在 kitty、Ghostty、iTerm2 3.7.7 及更高版本以及设置了 `kitty_graphics = true` 的 herdr 中使用 Kitty 协议；在 WezTerm 和 Rio（透明度混合）、旧版 iTerm2 和 mintty（不透明背景）中使用 iTerm2 协议；在 Windows Terminal、foot、Tabby、Konsole、mlterm、背后的终端支持 sixel 的 tmux，以及启动应答中声明支持 sixel 的任何终端（以 `-ti vt340` 启动的 xterm、开启图像的 VS Code 终端）中使用 sixel（图所在的列和头像）；在 zellij、screen 和未知终端中使用字符。在 tmux 中，kitty 图片需要此处设为 `kitty`，并配合 `allow-passthrough on`（[多路复用器](multiplexers.md)）。当终端的伪控制台丢弃或错放图片时（Windows 上的 WezTerm 20240203、Rio 和 mintty），请使用 `ui.graph_renderer = "text"`（[选择终端](terminals.md#windows)）。**重启。** |
 | `ui.theme` | `"system"` | 配色主题：内置的 slug（`gitpoulpi theme list` 会列出全部）、`<config>/themes/` 中某个文件的 slug，或 `system`（跟随终端的浅色或深色背景，在启动时检测；旧值 `default` 含义相同）。`config set` 会拒绝未知的名称。参见[主题](themes.md)。 |
 | `ui.graph_color_theme` | `"theme"` | 车道调色板：`theme`（跟随主题）或任意车道调色板名称：`gitpoulpi`、`light`、`material`、`serie`，以及其他主题的调色板。 |
 | `ui.graph_lane_background` | `"off"` | `off` 或 `row_tint`（图后方有一条淡淡的车道颜色带，边缘还有一道竖条）。**应用：切换图行着色**（`Ctrl+N Shift+T`）可切换它；**应用：更改图配色主题…**（`Ctrl+N Shift+Y`）可选择 `ui.graph_color_theme`。 |
@@ -110,7 +110,7 @@ author_email = "jane@work.example"
 | `ui.git_terms_english` | `false` | 仅限 ja、ko 和 zh-CN：显示英文的 git 词汇（stage、unstage、staged、unstaged……），而不是它们的音译或翻译。`ui.translate_git_terms` 为 `true` 时无效。**即时生效。** |
 | `ui.mouse_enabled` | `true` | `false` 会把鼠标（以及文本选择）留给终端。**重启。** |
 | `ui.mouse_scroll_lines` | `3` | 滚轮每格滚动的 Log 行数，1 到 20。**重启。** |
-| `ui.kitty_keyboard` | `"auto"` | `auto` 会向终端请求 kitty 键盘协议（这样 `Ctrl+,`、`Ctrl+Enter`、`Ctrl+Shift+N` 才能送达）；`off` 从不请求。**重启。** |
+| `ui.kitty_keyboard` | `"auto"` | `auto` 会向终端请求 kitty 键盘协议（这样 `Ctrl+,`、`Ctrl+Enter`、`Ctrl+Shift+N` 才能送达；仅限 Unix，tmux 从不应答：见[多路复用器](multiplexers.md#tmux)）；`off` 从不请求。**重启。** |
 | `ui.logo_color` | `""` | “关于”窗口中徽标的配色方案，一个 slug（`violet`、`orange`、`teal`、`ocean`、`magenta`、`candy`、`coral`、`green`、`cyan`、`indigo`、`lavender`、`sun`、`mint`、`slate`）；留空或未知表示使用构建的默认值（`lavender`）。在你点击徽标或在“关于”中选择颜色时写入。 |
 
 **头像**（默认关闭；开启后会把作者邮箱的 SHA-256 哈希发送给 Gravatar，并向你已连接的 GitHub/GitLab 账号查询）
@@ -134,6 +134,7 @@ author_email = "jane@work.example"
 | `ui.mermaid_orientation` | `lr` | 该图的方向：`lr`（从左到右）或 `tb`（从上到下）。 |
 | `ui.mermaid_fence` | `false` | 用 `mermaid` 代码围栏包住所复制的 Mermaid 脚本。 |
 | `ui.mermaid_subject_width` | `40` | Mermaid id 中的 commit 标题会截断到这么多个字符（`subjects`、`full`）。 |
+| `ui.text_cursor` | `"terminal"` | 获得焦点的文本框的插入符显示在哪里：`terminal` 把终端自身的光标放在那里（闪烁的竖线，因此终端的光标设置和输入法的候选窗口会跟随它；没有文本框拥有键盘时隐藏，退出时恢复为你自己的光标样式），`drawn` 绘制 GitPoulpi 自己的插入符字形并保持终端光标隐藏。实时生效。 |
 | `ui.color_depth` | `"auto"` | `auto`、`truecolor`、`256` 或 `16`：使用多少种颜色绘制。`auto` 为 truecolor，但 Apple Terminal（256）、Linux 控制台（16）以及没有 `COLORTERM` 的 `*-256color` 终端（256）除外。即时生效。参见[主题](themes.md)。 |
 | `ui.input_color` | `"theme"` | 文本框背景：`theme`（主题自带的）、`gray`、`blue`、`slate`、`dark`、`custom`。 |
 | `ui.input_color_custom` | `"#2a2a2a"` | `custom` 颜色，`#rrggbb`。 |
@@ -163,7 +164,7 @@ author_email = "jane@work.example"
 | `ui.launcher_build` | `"current"` | 仅限开发模式（见 `general.dev_mode`；只有这时才在设置 > 启动器中显示，否则会被忽略）。`"current"`：快捷方式和命令别名启动创建它们的那个构建。`"newest"`：它们启动检出目录中 `target/dist` 和 `target/release` 里最近构建的那一个，每次点击时决定，并且启动任何一个构建都不会改写它们。 |
 | `ui.command_alias` | `""` | 在终端中启动 GitPoulpi 的命令名称，例如 `gp`（设置 > 启动器，`gitpoulpi alias create`）。留空：无。只能使用字母、数字、`-`、`_` 和 `.`。它只是 **创建：命令别名** 按钮所用的名称；在你创建之前什么都不存在。 |
 | `ui.command_alias_add` | `""` | 第二个命令的名称，例如 `gpa`，它运行 `gitpoulpi --add`：把当前文件夹作为新标签页在已运行的 GitPoulpi 中打开（设置 > 启动器，`gitpoulpi alias create gpa --add`）。留空：无。名称规则相同；由 **创建** 按钮与 `ui.command_alias` 一起创建。 |
-| `ui.relaunch_in_terminal` | `true` | 仅限 Windows：当 exe 通过双击在自己的控制台中启动时，GitPoulpi 会在 `ui.launch_terminal` 中重新打开并退出。关闭：留在该控制台中。 |
+| `ui.relaunch_in_terminal` | `true` | 仅限 Windows：当 exe 通过双击在自己的控制台中启动时，GitPoulpi 会在 `ui.launch_terminal` 中重新打开并退出。直接运行 exe 的终端（`wezterm-gui start -- gitpoulpi.exe`、`wt.exe gitpoulpi.exe`、Rio、Tabby、Alacritty `-e`）同样是自己的控制台，但不是传统的控制台窗口：它们绝不会被重新启动。关闭：留在该控制台中。 |
 | `ui.reuse_window` | `true` | 点击 GitPoulpi 快捷方式（`gitpoulpi launch`）时，显示已打开的 GitPoulpi 的窗口，而不是再启动一个。 关闭：每次点击都会启动新窗口。 |
 
 **`ui.open_in` 命令**会先被拆分为参数（空白、`'...'`、`"..."`），然后在每个参数内部替换变量，因此带空格的文件夹仍然是一个参数；除非命令自己启动了 shell（`sh -c '... "$GITPOULPI_CWD"'`），否则不涉及 shell。变量：`${cwd}`（标签页的文件夹）、`${repo}`（仓库根目录）、`${name}`（文件夹的基本名称）、`${branch}`（分离 HEAD 时为空）、`${web_url}`（`origin` 远程的网页，当它是 GitHub 或 GitLab 项目时；否则为空；使用它的条目在其为空时会拒绝运行）、`${env:NAME}`（未设置时为空）。旧的 `{repo}` 仍表示 `${cwd}`。任何其他 `${...}` 都是错误，并会指出其名称。示例：
@@ -282,7 +283,8 @@ review_requests = true    # requests waiting for my review, every repository
 open_requests = false     # every open request of my namespaces
 include_drafts = false    # keep draft requests in these lists
 assigned_issues = true    # open issues assigned to me, every repository
-namespaces = ["acme"]     # orgs / groups to search for open requests
+namespaces = ["acme", "ptm/produits"]  # one entry per line in Settings; empty = no limit
+namespaces_regex = false  # true: each entry is a regular expression over the full repository path
 review_mode = "ask"       # ask | clone | api
 ```
 
@@ -292,7 +294,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | 你自己的命名空间以及你所属的每个组织或群组（或 `namespaces`）中所有未关闭的请求，绝不是“令牌能看到的一切” |
 | `include_drafts` | `false` | 除非开启，否则这些列表不含草稿请求 |
 | `assigned_issues` | `false` | 指派给你的未关闭议题，所有仓库 |
-| `namespaces` | `[]` | 为 `open_requests` 搜索的组织 / 群组；留空表示你自己的命名空间加上你所属的每一个（GitHub：最多搜索 12 个；GitLab：10 个群组和 10 个自己的项目；Gitea、Forgejo 和 Gerrit：10 个；Azure DevOps 填项目名，Bitbucket Data Center 填项目键，Gerrit 填项目路径前缀） |
+| `namespaces` | `[]` | 每个列表（评审请求、指派的议题、未关闭的请求）保留哪些仓库；留空表示不限制，此时 `open_requests` 会搜索你自己的命名空间加上你所属的每一个（GitHub：最多搜索 12 个；GitLab：10 个群组和 10 个自己的项目；Gitea、Forgejo 和 Gerrit：10 个）。条目与仓库的完整路径（`group/sub/project`，Azure DevOps 为 `Project/repo`，Bitbucket Data Center 为 `KEY/repo`）相等，或是以 `/` 结尾的路径前缀时即匹配：`ptm` 保留 `ptm/produits/x`，不保留 `ptmx/y`；忽略大小写。设置中每行显示一个条目；旧文件可能是一个逗号分隔的字符串（`"ptm, formation"`），仍可加载，并会以列表形式存回 |
+| `namespaces_regex` | `false` | 把每个 `namespaces` 条目当作正则表达式，按你输入的原样匹配完整的仓库路径（因此 `^ptm/(produits\|infra)/` 锚定在开头；没有 `^` 或 `$` 时匹配路径中的任意位置；加上 `(?i)` 可忽略大小写）。此时 `open_requests` 会搜索你的所属范围，由这些表达式筛选行。无效的表达式会显示在设置中该字段下方且不会保存；在手工编辑的文件中，它会让列表为空并附一条说明 |
 | `review_mode` | `"ask"` | 评审仓库未克隆的请求时怎么做：`ask`、`clone`（先克隆，再评审）或 `api`（通过托管平台的 API 评审） |
 
 答复按配置缓存在 `config.toml` 旁边的 `radar-account.json` 中，保留五分钟；该文件只是缓存，可以放心删除。

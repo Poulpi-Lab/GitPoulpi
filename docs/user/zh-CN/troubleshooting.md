@@ -43,6 +43,8 @@
 - **长行**（两个标签页）：比窗口更宽的标题行或详情行绝不会被截断。列表下方会出现一条水平滚动条；用 `Left` / `Right`（可重新绑定为 `activity_log.scroll_left` / `activity_log.scroll_right`）、`Shift` + 滚轮或水平滚轮、命令面板的 `活动日志：向左滚动` / `活动日志：向右滚动`，或滚动条（拖动滑块，或按一下滑道让滑块移到指针下方）横向滚动。`Home` 回到开头，切换标签页时另一个标签页从左边缘开始。换行的文本（摘要、建议的操作）保持换行。
 ![活动日志的“Git 操作”标签页：每个操作的时间和耗时，失败的 fetch 以红色显示](../images/activity-log-repository.png)
 
+- **是哪个操作产生了错误。** 每次失败都会说明是什么产生了它，在条目中、在应用程序日志中和复制的报告中都是如此。操作按人的叫法命名（`Remove remote`、`Fetch all remotes`、`Hosting request: create pull request`、`Token command`），带上它的主要参数（`remote=cm6`、一个分支、一个路径；绝不包含消息正文，URL 和令牌像其他地方一样被隐去），然后是仓库、请求方（`TUI`、`CLI` 或 `MCP`）和操作 id，即守护进程给该请求的编号（fetch、push 或 pull 还有其作业编号）。在“Git 操作”标签页中，条目的标题形如 `Remove remote failed (remote=cm6) - ... [CLI #12]`，其详情以 `操作：`、`仓库：`、`请求来源：` 和 `操作 ID：` 开头；没有自己标题的操作，其标题就是它本身的名称（`Remove remote failed`）。在“应用程序”标签页中，失败行以同样的词语开头并带一个标记：`Remove remote failed (remote=cm6) [op #12, CLI, repo name]: backend error: no such remote: cm6`。这样的行可以打开它的操作：点击它，或选中它再按 `Enter`（命令面板的 `活动日志：显示此行对应的操作`）。`]` 和 `[` 选择下一条和上一条失败行（`活动日志：下一个失败的操作` / `活动日志：上一个失败的操作`）；选中某一行后，方向键移动选中项而不是滚动。打开的条目在由窗口自己执行该操作时就是窗口自己的；对于 CLI 或代理针对同一会话造成的失败，窗口会根据该行生成一个条目。复制的错误报告包含 `operation:`、`arguments:`、`repository:`、`requested by:` 和 `operation id:` 这几行（报告始终为英文），因此可以单独粘贴。在脚本中，失败命令的 `--json` 错误保持不变；守护进程对失败请求的应答在新增的 `context` 字段中带有同样的信息。
+
 - **范围**（标签页下方的下拉列表，按 `s` 打开，或用命令面板的 `活动日志：选择范围`）：两个标签页所针对的对象。各行是**此仓库（名称）**（你打开日志时所在标签页的仓库；从主页打开时没有这一项，因为主页没有仓库）、**所有仓库**、每个**工作空间**，以及窗口所知的每个仓库。从仓库标签页打开时，日志停在*此仓库*上；从主页（“活动”按钮、`Ctrl+N` 再按 `Shift+A`）打开时停在*所有仓库*上；`Ctrl+N` 再按 `Shift+G` 和命令面板的 `视图：全局活动日志` 总是停在*所有仓库*上，点击仓库不是当前标签页的失败的红色错误也一样（例如失败的克隆）。你上一次的选择会在本次会话中保留，两种打开方式各自独立。在“应用程序”标签页上，如果程序写某行日志时是针对某个仓库的（失败的 push、某个操作的耗时），这一行就属于该仓库；在*所有仓库*下，每个这样的行都会标明属于谁（`[name]`）。完全不属于任何仓库的行（启动、设置、守护进程自身）和不属于任何仓库的条目（失败的保存）是**应用级**的：它们在每个范围下都会显示，在范围比*所有仓库*更窄时标为 `[app-wide]`，所以筛选绝不会把失败藏起来。命令面板里也有 `活动日志：Git 操作` 和 `活动日志：应用日志`，用于切换标签页。
 
 - **复制诊断信息**（两个标签页上都有的按钮、`d`，始终是整份日志，不受范围影响；以及命令面板的 `视图：复制诊断信息`）会复制版本、系统、终端和后端、最近一次失败及其详情，以及所选级别下的最后 200 行日志：出问题时交给 AI 的内容块。
@@ -60,7 +62,7 @@
 **工具栏和侧栏显示方框或问号，而不是图标。**
 请在终端中使用 Nerd Font 或任何覆盖 emoji 的字体。没有它们，图和文字仍然可以正常工作。
 
-**commit 图由字符组成，而不是图片。** 这是自动回退：图片需要终端支持 kitty 图形协议（kitty、Ghostty、开启了 kitty 图形的 herdr）或 iTerm2 协议（WezTerm、iTerm2、mintty），或 sixel（Windows Terminal、foot、Konsole）。Windows 控制台、tmux 和 zellij 使用字符。想强制使用其中任何一种，请参见下面的图章节。
+**commit 图由字符组成，而不是图片。** 这是自动回退：图片需要终端支持 kitty 图形协议（kitty、Ghostty、开启了 kitty 图形的 herdr）或 iTerm2 协议（WezTerm、Rio、mintty），或 sixel（Windows Terminal、foot、Tabby、Konsole，以及背后的终端支持 sixel 的 tmux）。Windows 控制台、zellij 和 screen 使用字符。想强制使用其中任何一种，请参见下面的图章节、[选择终端](terminals.md)和[多路复用器](multiplexers.md)。
 
 **鼠标没有反应，或者无法用鼠标选择文本。**
 GitPoulpi 会捕获鼠标，以便点击能到达它。要用终端自身选择文本，请在拖动时按住 `Shift`（在大多数终端中）。你也可以在 diff 内选择（拖动，然后按 `y`）。要关闭鼠标捕获，请使用 *设置 > 键盘与鼠标 > 启用鼠标*（需要重启）。键盘可以使用每一条命令。
@@ -134,7 +136,7 @@ GitPoulpi 的网络操作使用你的 `git` 自己的凭据助手和 ssh-agent�
 
 ## 图由字符绘制，而不是图片（herdr、tmux、其他终端）
 
-只有在确定终端会显示像素时，GitPoulpi 才会把图列和作者头像绘制为像素：裸 WezTerm、iTerm2 和 mintty 中的 iTerm2 内联图像；kitty、Ghostty 中的 Kitty 图形协议，以及**当 herdr 自己的配置设置了 `kitty_graphics = true`**（`[terminal]`，旧版 herdr 中为 `[experimental]`）且 herdr 运行在 WezTerm、kitty 或 Ghostty 内时的 herdr。Windows Terminal、foot、Konsole 和 mlterm 使用 sixel 图片。其他任何地方都绘制字符，这始终是正确的。
+只有在确定终端会显示像素时，GitPoulpi 才会把图列和作者头像绘制为像素：裸 WezTerm、Rio、mintty 和 3.7.7 之前的 iTerm2 中的 iTerm2 内联图像；kitty、Ghostty、iTerm2 3.7.7 及更高版本中的 Kitty 图形协议，以及**当 herdr 自己的配置设置了 `kitty_graphics = true`**（`[terminal]`，旧版 herdr 中为 `[experimental]`）且 herdr 运行在 WezTerm、kitty 或 Ghostty 内时的 herdr。Windows Terminal、foot、Tabby、Konsole 和 mlterm（以及背后的终端支持 sixel 的 tmux）使用 sixel 图片。其他任何地方都绘制字符，这始终是正确的。
 
 - 在开启了 Kitty 图形、但配置是 GitPoulpi 找不到的 herdr 中（或依赖 herdr 的默认值），请设置 `ui.image_protocol = "kitty"`（设置 > 日志与图 > 图像协议）并重启。
 - 在图的位置显示方框或乱码的终端中，请设置 `ui.image_protocol = "none"` 或 `ui.graph_renderer = "text"`。
@@ -142,6 +144,10 @@ GitPoulpi 的网络操作使用你的 `git` 自己的凭据助手和 ssh-agent�
 
 **herdr 远程（`herdr --remote <host>`，或 `ssh` 然后 `herdr`）：默认使用文本图。** 通过 SSH 时，GitPoulpi 运行在远程主机上，只能读取远程的环境和 herdr 的 `config.toml`。是否出现 Kitty 图片由*本地* herdr 客户端（它自己的 `kitty_graphics` 设置和它自己的终端）决定，GitPoulpi 看不到这些：当客户端不绘制图片时，这些单元格会保持空白。因此只要检测到通过 SSH 运行的 herdr（`SSH_CONNECTION` / `SSH_CLIENT` / `SSH_TTY`），GitPoulpi 就会绘制文本图。如果你本地的 herdr 设置了 `kitty_graphics = true`，并且终端能绘制 Kitty 图像（kitty、Ghostty），请在远程上用 `ui.graph_renderer = "image"`（或 `ui.image_protocol = "kitty"`）选择启用。图片以内联方式发送（`t=d`），适用于任何字节流。如果该列是空的，请设置 `ui.graph_renderer = "text"`。
 
-**泳道后面出现较浅的矩形。** 凡是没有绘制任何内容的地方，图片都是透明的（非预乘 alpha 的 RGBA PNG），因此终端的背景和选择带会透出来。Kitty 协议终端和 **WezTerm** 会合成该 alpha；此时 GitPoulpi 会在图片下方保留普通的空白单元格，并在它们之后发送图片。其他所有 iTerm2 协议终端（iTerm2 本身、Rio、mintty）不确定能否混合 PNG alpha，所以在那里图片带有一个主题颜色的不透明背景，在背景与其不同的终端上可能显示为一个矩形；`ui.graph_renderer = "text"` 可以去掉它。设置 `ui.graph_lane_background = "off"` 后，在透明路径上泳道后面不会绘制任何东西。
+**泳道后面出现较浅的矩形。** 凡是没有绘制任何内容的地方，图片都是透明的（非预乘 alpha 的 RGBA PNG），因此终端的背景和选择带会透出来。Kitty 协议终端、**WezTerm** 和 **Rio** 会合成该 alpha；此时 GitPoulpi 会在图片下方保留普通的空白单元格，并在它们之后发送图片。其他所有 iTerm2 协议终端（旧版 iTerm2、mintty）不确定能否混合 PNG alpha，所以在那里图片带有一个主题颜色的不透明背景，在背景与其不同的终端上可能显示为一个矩形；`ui.graph_renderer = "text"` 可以去掉它。设置 `ui.graph_lane_background = "off"` 后，在透明路径上泳道后面不会绘制任何东西。
+
+**Windows：图列是空白的、画在错误的行上，或屏幕撕裂（WezTerm 20240203、Rio、mintty）。** 这些终端背后的伪控制台会丢弃或错放图片序列（[选择终端](terminals.md#windows)）。请设置 `ui.graph_renderer = "text"`，或改用 Windows Terminal。
+
+在 tmux、zellij、screen 和 herdr 内，哪些内容能通过以及需要添加哪些配置，参见[多路复用器](multiplexers.md)。
 
 参见[配置参考](config-reference.md)中的 `ui.graph_renderer` 和 `ui.image_protocol`。

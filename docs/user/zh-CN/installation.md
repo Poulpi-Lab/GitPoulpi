@@ -16,7 +16,7 @@ GitPoulpi 有三个可执行文件：
 
 - `PATH` 中有**系统 `git`**。GitPoulpi 的大多数操作使用 libgit2，其余使用你的 `git`。
   需要 **2.34 或更高版本**。在 macOS 上，Apple Command Line Tools 自带的 `git` 和 Homebrew 的 `git` 都可以使用。
-- 支持鼠标的**终端**。kitty、Ghostty、WezTerm 和 iTerm2，以及通过 sixel 的 Windows Terminal 和 foot，会把 commit 图绘制为图片。其他终端（Windows 控制台、tmux 以及大多数其他终端）显示字符图。参见[选择终端](terminals.md)。
+- 支持鼠标的**终端**。kitty、Ghostty、WezTerm、Rio 和 iTerm2，以及通过 sixel 的 Windows Terminal、foot 和 Tabby，会把 commit 图绘制为图片。其他终端（Windows 控制台、zellij、screen 以及大多数其他终端）显示字符图。参见[选择终端](terminals.md)和[多路复用器](multiplexers.md)。
 - **Nerd Font** 或带 emoji 的字体，用于工具栏和侧边栏中的图标。
 - 可选：**`git-lfs`** 3.0 或更高版本，用于 Git LFS 仓库。没有它时，LFS 文件会显示为小的指针文件，GitPoulpi 会告诉你原因。安装方法见 [Git LFS](lfs.md)。
 - 可选：**credential helper**（Git Credential Manager、libsecret、`pass`、Keychain），用于保存托管平台令牌和 AI API 密钥。参见[托管平台与议题跟踪器](hosting-integration.md)。

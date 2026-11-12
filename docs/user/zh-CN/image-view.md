@@ -12,7 +12,7 @@ PNG 和 JPEG 始终支持；当构建包含 `image-view` 时还支持 GIF、WebP
 
 ## 如何绘制
 
-在支持图像协议的终端上（Kitty 和 Ghostty、WezTerm 和 iTerm2、Rio、mintty），图片是真正的图像。在其他地方（普通的 Windows Terminal、tmux、GitPoulpi 不认识的终端），则用带颜色的半块字符绘制，垂直分辨率减半，但处处可辨；**无图像协议时**可以设为*仅信息卡*。**日志与图**页面上的**图像协议**可强制指定一种。
+在支持图像协议的终端上（Kitty 和 Ghostty、WezTerm 和 iTerm2、Rio、mintty，以及 sixel 终端 Windows Terminal、foot 和 Tabby），图片是真正的图像。在其他地方（普通的 Windows 控制台、zellij、GitPoulpi 不认识的终端），则用带颜色的半块字符绘制，垂直分辨率减半，但处处可辨；**无图像协议时**可以设为*仅信息卡*。**日志与图**页面上的**图像协议**可强制指定一种。
 
 ## Diff 视图
 

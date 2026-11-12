@@ -433,7 +433,7 @@ skrótu. Pełna lista jest [niżej](#każde-polecenie-palety).
 |---|---|
 | `Ctrl+P` | Otwiera paletę |
 | *(wpisywanie)* | Filtruje listę. Najpierw dokładne dopasowanie po prefiksie `Kategoria: `, potem dopasowanie gdziekolwiek w etykiecie, potem dopasowanie rozmyte |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | Przesuwają podświetlenie (zob. [Filtrowalne listy w oknach](#filtrowalne-listy-w-oknach)) |
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | Przesuwają podświetlenie (zob. [Filtrowalne listy w oknach](#filtrowalne-listy-w-oknach)) |
 | `Enter` albo dwukrotne kliknięcie | Uruchamia podświetlone polecenie |
 | `Esc` | Zamyka |
 
@@ -453,7 +453,9 @@ W `config.toml` jest to tabela `[keybindings.palette]`, nazwana od polecenia (`t
 
 Pasek podpowiedzi pod listą podaje ten klawisz (domyślnie `Alt+K`). To akcja `palette.configure_shortcut`, więc można ją przypisać na nowo jak każdą inną.
 
-Paleta i selektory (motywu, języka, kart, wyszukiwania w obszarze roboczym) przesuwają się i zmieniają rozmiar jak okno dialogowe: przeciągnij górną krawędź albo naciśnij `Alt+G` (akcja `palette.arrange`; wiersz palety `Okno: Przesuń lub zmień rozmiar` robi to samo). Strzałki przesuwają, `Shift`+strzałki zmieniają rozmiar, `0` przywraca, `Enter` lub `Esc` kończą tryb, a okno zostaje otwarte. To, czy miejsce jest zapamiętywane, rozstrzyga `ui.dialog_geometry`.
+Paleta i selektory (motywu, języka, kart, wyszukiwania w obszarze roboczym) przesuwają się i zmieniają rozmiar jak okno dialogowe: przeciągnij górną krawędź, naciśnij `Ctrl+N`, potem `m` (jak nad każdym oknem) albo naciśnij `Alt+G`. `Alt+G` to akcja `palette.arrange` („Okno: Przesuń lub zmień rozmiar okna na wierzchu”): dodatkowy sposób, działający nad każdym oknem i okienkiem, by włączyć tryb ustawiania dla tego, które jest na wierzchu (wiersze palety `Okno: Przesuń lub zmień rozmiar` i `Okno: Przywróć położenie i rozmiar` działają na samą paletę, dopóki jest otwarta). Strzałki przesuwają, `Shift`+strzałki zmieniają rozmiar, `0` przywraca, `Enter` lub `Esc` kończą tryb, a okno zostaje otwarte. To, czy miejsce jest zapamiętywane, rozstrzyga `ui.dialog_geometry`.
+
+`Ctrl+N` jest tu również prefiksem nawigacji: pokazuje plakietki na polu filtra, pierwszym wierszu listy i krzyżyku zamknięcia, a klawisz po nim naciska tę kontrolkę albo `m` ustawia okienko. Nie przesuwa już podświetlenia w dół, a `Ctrl+P` nie przesuwa go w górę: listę z polem filtra przesuwają tylko strzałki, `PageUp` / `PageDown` i `Home` / `End`.
 
 ### Każde polecenie palety
 
@@ -1190,7 +1192,7 @@ zastosowania. Klawisze są domyślne.
 | Klawisz | Działanie |
 |---|---|
 | `Tab` / `Shift+Tab` | Fokus na następny / poprzedni panel |
-| `Ctrl+N`, potem plakietka | Fokus na tej części okna (zob. [Prefiks nawigacji](#prefiks-nawigacji-ctrln)) |
+| `Ctrl+N`, potem plakietka | Fokus na tej części okna albo naciśnięcie tej kontrolki okna lub okienka na wierzchu (zob. [Prefiks nawigacji](#prefiks-nawigacji-ctrln)) |
 | `j` / `k`, `Up` / `Down` | Przesuwają zaznaczenie, w każdym panelu |
 | `PageUp` / `PageDown`, `Home` / `End` | Przesuwają o stronę; skaczą do pierwszego / ostatniego wiersza |
 | liczba, potem `j` / `k` / `Up` / `Down` | Prefiks licznika: `4j` przesuwa o cztery wiersze. Z `PageUp` / `PageDown` licznik oznacza liczbę stron. Pasek stanu pokazuje oczekujący licznik (`4…`). `Esc` lub inny klawisz go czyści. Początkowe `0` nigdy nie zaczyna licznika |
@@ -1216,15 +1218,18 @@ filtrować listę. Te klawisze przesuwają podświetlenie:
 
 | Klawisz | Działanie |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Przesuwają o jeden wiersz |
+| `Up` / `Down` | Przesuwają o jeden wiersz |
 | `Home` / `End` | Pierwszy / ostatni wiersz |
 | `PageUp` / `PageDown` | Przesuwają o jedną widoczną stronę |
 | `Enter` | Wybiera podświetlony wiersz |
 | `Esc` | Zamyka |
 
-W tych oknach `Home`, `End` i `Ctrl+K` przesuwają listę, a nie kursor pola
-filtra. `Ctrl+A` i `Ctrl+E` nadal przesuwają kursor na początek i na koniec.
-Zwykłe `j` i `k` są wpisywane do filtra.
+W tych oknach `Home` i `End` przesuwają listę, a nie kursor pola filtra.
+`Ctrl+A` i `Ctrl+E` nadal przesuwają kursor na początek i na koniec, a `Ctrl+K`
+usuwa do końca filtra. Żadna para `Ctrl+litera` nie przesuwa listy (`Ctrl+N` to
+prefiks nawigacji, `Ctrl+P` paleta poleceń), a zwykłe `j` i `k` są wpisywane do
+filtra: przesuwają tu tylko strzałki, `PageUp` / `PageDown` i `Home` / `End`. Na
+listach bez pola tekstowego `j` / `k` to dodatkowy sposób ruchu w dół / w górę.
 
 Z myszą:
 
@@ -1257,7 +1262,7 @@ wszystkim, także nad ekranem Ustawień.
 | *(wpisywanie)* | Filtr: zostają tylko sekcje zawierające tekst. `j`, `k` i `q` też są wpisywane |
 | `Backspace`, `Ctrl+U` | Usuwa ostatni znak / czyści filtr |
 | `Esc` | Czyści filtr; jeśli jest pusty, zamyka pomoc |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Przewijają o jedną linię |
+| `Up` / `Down` | Przewijają o jedną linię |
 | `PageUp` / `PageDown`, `Home` / `End` | Przewijają o stronę; skaczą na górę / na dół |
 | `Ctrl+D` albo kliknięcie linku | Otwiera tę dokumentację na GitHubie w przeglądarce |
 

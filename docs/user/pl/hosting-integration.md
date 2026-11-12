@@ -736,8 +736,10 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Wszystkie polecenia opisuje [Opis CLI](cli-reference.md#polecenia). Token nigdy nie
-jest przyjmowany jako argument, a serwer MCP nie oferuje `hosting login`, więc
-token nigdy nie przechodzi przez agenta.
+jest przyjmowany jako argument (`hosting login` wypisuje `stored: "os"`, gdy trzyma go
+systemowy magazyn poświadczeń, albo `stored: "session"` i `store_error`, gdy magazyn
+odmówił, a token żyje w pamięci tylko na czas tej sesji), a serwer MCP nie oferuje
+`hosting login`, więc token nigdy nie przechodzi przez agenta.
 
 ## Rozwiązywanie problemów
 

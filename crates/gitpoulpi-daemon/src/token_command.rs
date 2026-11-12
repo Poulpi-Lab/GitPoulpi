@@ -108,7 +108,7 @@ pub(crate) fn forget_root(root: &Path) {
 
 /// The credential of `command`: the cached one while it is fresh, else the
 /// command's output (and then cached).
-#[cfg(test)]
+#[cfg(all(test, unix))]
 pub(crate) async fn credential(command: &TokenCommand) -> Result<Credential, Error> {
     let _one_at_a_time = turn().await;
     credential_in_turn(command).await

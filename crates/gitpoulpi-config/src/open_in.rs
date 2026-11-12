@@ -288,7 +288,7 @@ const BASE: &[OpenInPreset] = &[
     p("kitty-oswindow", "kitty: new OS window (remote control)", "multiplexer", "kitten @ launch --type=os-window --cwd=${cwd}", UNIX, "kitty", "kitten", true),
     p("screen-window", "screen: new window", "multiplexer", "screen -X eval 'chdir ${cwd}' screen", UNIX, "", "screen", false),
     p("cmux-workspace", "cmux: new workspace", "multiplexer", "cmux new-workspace --cwd ${cwd}", UNIX, "cmux", "cmux", false),
-    p("psmux-window", "psmux: new window", "multiplexer", "psmux new-window -c ${cwd}", WINDOWS, "psmux", "psmux", false),
+    p("psmux-window", "psmux: new window", "multiplexer", "psmux new-window -c ${cwd}", WINDOWS, "psmux", "psmux", true),
     // Terminals (a new window running the user's shell in the folder).
     p("xdg-terminal-exec", "Default terminal (xdg-terminal-exec)", "terminal", "xdg-terminal-exec --dir=${cwd}", LINUX, "", "xdg-terminal-exec", true),
     p("kitty", "kitty", "terminal", "kitty --directory ${cwd}", UNIX, "kitty", "kitty", true),

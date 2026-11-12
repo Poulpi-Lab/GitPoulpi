@@ -120,18 +120,23 @@ fn the_palette_takes_the_list_keys() {
     assert_eq!(selected_offset(&s), Some(0), "{}", s.text());
     let first = list_text(&s, 0);
 
-    term.send_keys("C-j").unwrap();
-    term.wait_for("Ctrl+J moved down", STEP, |s| selected_offset(s) == Some(1))
+    // Lists move with the arrows; no Ctrl+letter pair moves them (Ctrl+N is
+    // the badge prefix everywhere).
+    term.send_keys("Down").unwrap();
+    term.wait_for("Down moved down", STEP, |s| selected_offset(s) == Some(1))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    term.send_keys("C-k").unwrap();
-    term.wait_for("Ctrl+K moved up", STEP, |s| selected_offset(s) == Some(0))
+    term.send_keys("Up").unwrap();
+    term.wait_for("Up moved up", STEP, |s| selected_offset(s) == Some(0))
         .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("C-n").unwrap();
-    term.wait_for("Ctrl+N", STEP, |s| selected_offset(s) == Some(1))
-        .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("C-p").unwrap();
-    term.wait_for("Ctrl+P", STEP, |s| selected_offset(s) == Some(0))
-        .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("C-j").unwrap();
+    std::thread::sleep(Duration::from_millis(400));
+    let _ = term.wait_for_stable(Duration::from_millis(200), STEP);
+    assert_eq!(
+        selected_offset(&term.screen()),
+        Some(0),
+        "Ctrl+J no longer moves the list:\n{}",
+        term.text()
+    );
 
     // A page down moves by the visible rows; the window follows.
     term.send_keys("PageDown").unwrap();
@@ -367,13 +372,13 @@ fn the_help_has_a_filter_field_the_list_keys_a_scrollbar_and_a_docs_link() {
     assert!(s.contains("User docs on GitHub"), "{}", s.text());
     assert!(s.contains("docs/user/keybindings.md"), "{}", s.text());
     let first = help_text(&s);
-    term.send_keys("C-j").unwrap();
-    term.send_keys("C-j").unwrap();
-    term.wait_for("Ctrl+J scrolled", STEP, |s| help_text(s) != first)
+    term.send_keys("Down").unwrap();
+    term.send_keys("Down").unwrap();
+    term.wait_for("Down scrolled", STEP, |s| help_text(s) != first)
         .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("C-k").unwrap();
-    term.send_keys("C-k").unwrap();
-    term.wait_for("Ctrl+K scrolled back", STEP, |s| help_text(s) == first)
+    term.send_keys("Up").unwrap();
+    term.send_keys("Up").unwrap();
+    term.wait_for("Up scrolled back", STEP, |s| help_text(s) == first)
         .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("PageDown").unwrap();
     term.wait_for("PgDn", STEP, |s| help_text(s) != first)

@@ -106,8 +106,9 @@ pub(super) fn over_ssh<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
 
 /// A terminal that implements the Kitty graphics protocol *and* its
 /// Unicode placeholders, identified by the variables it sets itself:
-/// kitty (`KITTY_WINDOW_ID`, `TERM=xterm-kitty`) and Ghostty
-/// (`TERM_PROGRAM=ghostty`, `GHOSTTY_RESOURCES_DIR`, `TERM=xterm-ghostty`).
+/// kitty (`KITTY_WINDOW_ID`, `TERM=xterm-kitty`), Ghostty
+/// (`TERM_PROGRAM=ghostty`, `GHOSTTY_RESOURCES_DIR`, `TERM=xterm-ghostty`)
+/// and iTerm2 3.7.7 or newer ([`iterm2_draws_kitty`]).
 pub(super) fn speaks_kitty_natively<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
     let set = |name: &str| get(name).is_some_and(|v| !v.is_empty());
     if set("KITTY_WINDOW_ID") || set("GHOSTTY_RESOURCES_DIR") {
@@ -115,7 +116,50 @@ pub(super) fn speaks_kitty_natively<F: Fn(&str) -> Option<String>>(get: &F) -> b
     }
     let term = get("TERM").unwrap_or_default().to_ascii_lowercase();
     let program = get("TERM_PROGRAM").unwrap_or_default().to_ascii_lowercase();
-    term == "xterm-kitty" || term == "xterm-ghostty" || program.contains("ghostty")
+    term == "xterm-kitty"
+        || term == "xterm-ghostty"
+        || program.contains("ghostty")
+        || iterm2_draws_kitty(get)
+}
+
+/// The first iTerm2 release whose Kitty protocol draws what GitPoulpi
+/// sends, Unicode placeholders included: 3.7.7, the newest checked
+/// (November 2026, macOS 15). iTerm2 3.6.x answers the keyboard query but
+/// is documented without placeholders, so nothing older than the checked
+/// release is trusted.
+const ITERM2_KITTY_MIN: (u32, u32, u32) = (3, 7, 7);
+
+/// iTerm2 `TERM_PROGRAM=iTerm.app` at [`ITERM2_KITTY_MIN`] or newer.
+///
+/// **Why the Kitty protocol and not iTerm2's own.** On 3.7.7 every
+/// `OSC 1337 ; File=` image - GitPoulpi's form, `imgcat`'s, with or without
+/// `name=`, whichever size and cursor parameters - opens a modal "Allow
+/// Terminal-Initiated Display?" dialog that blocks the window until it is
+/// answered, and the Graph column is empty behind it (tried in a real
+/// window, November 2026; "Remember my choice" silences it for good). The
+/// same pictures sent as Kitty graphics with Unicode placeholders draw
+/// identically - avatars, image diff, File View - with no dialog.
+///
+/// The version comes from `TERM_PROGRAM_VERSION`; missing or unreadable
+/// keeps the iTerm2 protocol, which every iTerm2 since 3.0 draws.
+pub(super) fn iterm2_draws_kitty<F: Fn(&str) -> Option<String>>(get: &F) -> bool {
+    get("TERM_PROGRAM").is_some_and(|p| p.eq_ignore_ascii_case("iTerm.app"))
+        && get("TERM_PROGRAM_VERSION")
+            .and_then(|v| parse_version(&v))
+            .is_some_and(|v| v >= ITERM2_KITTY_MIN)
+}
+
+/// `major.minor.patch` from the front of a version string; a pre-release
+/// suffix (`3.7.7beta2`) is ignored and a missing patch counts as zero.
+pub(super) fn parse_version(text: &str) -> Option<(u32, u32, u32)> {
+    let mut parts = text.trim().split('.').map(|part| {
+        let digits: String = part.chars().take_while(char::is_ascii_digit).collect();
+        digits.parse::<u32>().ok()
+    });
+    let major = parts.next()??;
+    let minor = parts.next()??;
+    let patch = parts.next().flatten().unwrap_or(0);
+    Some((major, minor, patch))
 }
 
 /// Whether the terminal *around* herdr draws the Kitty images herdr
@@ -340,8 +384,8 @@ where
 ///   terminal around herdr draws it; text otherwise;
 /// - inside any other multiplexer, text;
 /// - WezTerm, iTerm2 - it speaks both, and iTerm2 is the proven one;
-/// - kitty and Ghostty, Kitty;
-/// - the other iTerm2 terminals, iTerm2;
+/// - kitty, Ghostty and iTerm2 3.7.7+, Kitty;
+/// - the other iTerm2 terminals (and older iTerm2), iTerm2;
 /// - anything else, text.
 pub(super) fn auto_protocol<F, R>(get: &F, read: &R) -> Protocol
 where
@@ -421,7 +465,14 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
 ///   over a bright field shows the field through the transparent corners
 ///   (raw-sequence probe in a real window, November 2026). Only Linux was
 ///   looked at; Windows keeps the opaque backdrop until it is.
-/// - **iTerm2 itself, mintty, Bobcat: unverified.** mintty's wiki
+/// - **iTerm2 (3.7.7, macOS): does not blend over the cell colour.** A
+///   transparent PNG over a blue band shows the window's own background
+///   through the corners, not the band (real window, November 2026), so a
+///   picture over a themed cell would carry a wrong-coloured rectangle:
+///   the opaque backdrop stays. iTerm2 3.7.7+ takes the Kitty protocol
+///   anyway ([`iterm2_draws_kitty`]); this matters for older versions and
+///   `ui.image_protocol = "iterm2"`.
+/// - **mintty, Bobcat: unverified.** mintty's wiki
 ///   documents the `File=` image controls without any word on alpha
 ///   (only its OSC 11 background images are said to honour it), and this
 ///   project has not seen the others on a real window, so they keep the

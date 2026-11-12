@@ -29,9 +29,10 @@ GitPoulpi, so it draws characters (see [Multiplexers](#multiplexers)).
   deny-by-default, from `TERM`, `TERM_PROGRAM`, `KITTY_WINDOW_ID`,
   `GHOSTTY_RESOURCES_DIR`, `WEZTERM_EXECUTABLE`, `WT_SESSION`, `KONSOLE_VERSION` and the
   multiplexer variables, and never reads the keyboard (so it does not ask the terminal
-  for its device attributes either). kitty and Ghostty use the kitty protocol. WezTerm uses
-  the iTerm2 protocol (on purpose) and blends the PNG's transparency. iTerm2, Rio
-  and mintty use the iTerm2 protocol with an opaque backdrop. Windows Terminal, foot,
+  for its device attributes either). kitty, Ghostty and iTerm2 3.7.7 or newer use the kitty
+  protocol. WezTerm uses the iTerm2 protocol (on purpose) and blends the PNG's transparency.
+  Rio, mintty and older iTerm2 use the iTerm2 protocol (Rio with transparency, the others
+  with an opaque backdrop). Windows Terminal, foot,
   Konsole and mlterm use **sixel**. With none of them, avatars are the initials badge.
 - **Sixel** is drawn for the **graph column** (lanes, nodes and, with `ui.avatars = "graph"`, the avatars inside the commit circles) and for the **avatars** elsewhere (Log, commit detail, File History, Blame, the image view). A sixel has no alpha, no ids and no scaling, so the picture is exactly `columns x cell width` by `rows x cell height` pixels, drawn only where something is (anti-aliased edges below half opacity are dropped), over blank cells that keep their background; the encoded picture is cached and re-encoded only when the lanes, the scroll position or the zoom change, and it is sent again only when a cell under it was repainted. A sixel has no delete: GitPoulpi writes text over its cells to remove it. Sixel needs the real cell size in pixels: Windows Terminal is asked for it once at start-up and after a zoom (`CSI 16 t`, answered in about 10 ms, never blocking if it stays silent); elsewhere it comes from the terminal's window size, or from `GITPOULPI_TERMINAL_CELL_PX=10x20`. A terminal that draws sixel but is not recognized (a VS Code terminal with `terminal.integrated.enableImages`, an xterm started with `-ti vt340`) needs `ui.image_protocol = "sixel"`. Windows Terminal before 1.22 does not draw sixel; set `ui.image_protocol = "none"` there (the graph then stays characters, as in every terminal without pictures).
 - **True color**: themes are RGB. `ui.color_depth = "auto"` drops to 256 colors on a
@@ -76,7 +77,7 @@ GitPoulpi, so it draws characters (see [Multiplexers](#multiplexers)).
 | **Alacritty** (0.17) | all | text (no image support upstream) | yes | yes, since 0.13 | yes (write; paste off by default) | no (not implemented) |
 | **Konsole** | Linux | sixel (graph and avatars) | yes | being added in 2026 (merge request !1188); release (unverified) | write-only, merged mid-2024 | (unverified) |
 | **GNOME Terminal, Ptyxis** (VTE) | Linux | text | yes | no (not in a released VTE) | no (VTE ignores it) | no |
-| **iTerm2** (3.7) | macOS | iTerm2, opaque backdrop | yes | yes, since 3.6.9 (check Profiles > Keys) | off by default: enable "Applications in terminal may access clipboard" | (unverified) |
+| **iTerm2** (3.7.7) | macOS | kitty (3.7.7 and newer; older versions iTerm2 inline images, opaque backdrop) | yes | yes, since 3.6.9 (check Profiles > Keys) | off by default: enable "Applications in terminal may access clipboard" | (unverified) |
 | **Terminal.app** | macOS | text | no (256 colors) | no | (unverified) | (unverified) |
 | **Windows Terminal** (1.25) | Windows | sixel (graph and avatars) | yes | yes, stable since 1.25 (Oct 2026); Preview from 1.25 (Mar 2026) | yes (write; only while focused) | no (not implemented) |
 | **Rio** | Windows, Linux, macOS | iTerm2, opaque backdrop (it also speaks kitty graphics) | yes | yes (on by default) | yes | no (not implemented) |
@@ -135,8 +136,12 @@ differs per terminal and font, which is why GitPoulpi avoids VS16 glyphs (see
 ### macOS
 
 - **kitty, Ghostty, WezTerm**: as on Linux.
-- **iTerm2.** Pictures with an opaque backdrop (a visible rectangle if your background
-  differs from the theme's; `ui.graph_renderer = "text"` removes it). Enable
+- **iTerm2.** From 3.7.7 pictures use the kitty protocol: iTerm2 3.7.7 asks "Allow
+  Terminal-Initiated Display?" (a modal dialog that blocks the window) for every
+  `OSC 1337` inline image until you tick "Remember my choice", and draws the kitty
+  protocol, placeholders included, without asking (checked November 2026). Older
+  versions get the inline images with an opaque backdrop (a visible rectangle if your
+  background differs from the theme's; `ui.graph_renderer = "text"` removes it). Enable
   *Settings > General > Selection > Applications in terminal may access clipboard* for
   copy, and *Profiles > Keys > Left Option key: Esc+* for the `Alt` chords.
 - **Terminal.app.** 256 colors only: GitPoulpi picks `ui.color_depth = 256` itself and

@@ -1488,7 +1488,8 @@ workflow). The host-driven rows (*New <Type> issue*, *Pick up a host-made branch
 | `Enter` / `l` on a file row | Open the file's diff in the center |
 | `Esc` / `h` | Go back to the commits |
 | `Right` | (commit with more than one ref) Open the list of its other refs: `Up` / `Down` move, `Enter` checks out, `Esc` closes |
-| `f` | Open the search bar (see [Search](#search)) |
+| `f` | Open the search bar (see [Search](#search)); this was never `/`, so the Log's search is unchanged |
+| `/` | Focus the Refs filter field (the same key does it when the Refs pane has the focus); typed as a character when a text field has the focus |
 | `c` | (with uncommitted changes) Select the WIP row and put the caret in its message field |
 | `Enter` on the WIP row | Put the caret in the WIP row's message field |
 | `.`, `Menu`, `Shift+F10` | The commit menu. `Up` / `Down` move, `Right` / `l` / `Enter` open a submenu, `Left` / `h` / `Esc` go back |

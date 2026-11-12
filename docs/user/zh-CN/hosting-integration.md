@@ -447,7 +447,7 @@ gitpoulpi hosting pr-edit 12 --add-reviewer ann --add-label bug --milestone v1.0
 gitpoulpi hosting radar --what review --json
 ```
 
-每个命令参见 [CLI 参考](cli-reference.md#命令)。令牌绝不会被当作参数接受，而且 MCP 服务器不提供 `hosting login`，所以令牌绝不会经过代理。
+每个命令参见 [CLI 参考](cli-reference.md#命令)。令牌绝不会被当作参数接受（操作系统凭据存储保存了它时，`hosting login` 会输出 `stored: "os"`；存储拒绝了它、令牌只在内存中保留到本次会话结束时，则输出 `stored: "session"` 加上 `store_error`），而且 MCP 服务器不提供 `hosting login`，所以令牌绝不会经过代理。
 
 ## 故障排除
 

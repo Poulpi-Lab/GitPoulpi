@@ -167,7 +167,7 @@
 | 命令 | 作用 |
 |---|---|
 | `hosting integrations list`（别名 `hosting list`）、`hosting integrations add --kind K [--url U] [--org O] [--account A] [--path P] [--id I] [--name N]`、`hosting integrations remove <id>`、`hosting integrations test` | 配置。类型（kind）：`github`、`github_enterprise`、`gitlab`、`gitlab_self_managed`、`azure_devops`（需要 `--org` 或 `--url https://dev.azure.com/<org>`）、`azure_devops_server`（需要 `--url`）、`bitbucket`（`--account` = Atlassian 邮箱，可选）、`jira_cloud`（需要 `--url` 和 `--account` = 邮箱）、`jira_data_center`（需要 `--url`）、`trello`（`--account` = API 密钥，必填）、`gitea`（需要 `--url`）、`forgejo`（`--url` 默认为 `https://codeberg.org`）、`linear`（没有 `--url`：用 `https://linear.app`，或用 `https://linear.app/<workspace>` 来关联 commit 引用）、`youtrack`（需要 `--url`，Cloud 或 Server）、`redmine`（需要 `--url`；令牌是 REST API 密钥）、`gerrit`（需要 `--url` 和 `--account` = 用户名；令牌是 HTTP 密码）、`local_markdown`（`--path` = 笔记文件夹，相对于每个仓库或为绝对路径；没有令牌）。`list` 显示 `account`、`org` 和 `category`，绝不显示令牌。 |
-| `hosting login --token-stdin`、`hosting logout` | 存储（先验证）或忘记令牌。`echo $TOKEN \| gitpoulpi hosting login --id corp --token-stdin`。 |
+| `hosting login --token-stdin`、`hosting logout` | 存储（先验证）或忘记令牌。`echo $TOKEN \| gitpoulpi hosting login --id corp --token-stdin`。`login` 还会说明令牌存放在哪里：`stored` 为 `os`（操作系统凭据存储）或 `session`（存储拒绝了它，因此只在内存中保留到本次会话结束；`store_error` 是存储的错误信息，否则为 `null`）。 |
 | `hosting link pulls\|issues [--id I [--project P] [--filter F] \| --clear]` | 把此仓库的 PR 或议题列表关联到提供商的某个项目（在关联之前不会获取任何内容）。`P` 为 `owner/name`（GitHub）、`group/sub/proj`（GitLab）、`Project/Repo`（Azure pull request）或 `Project`（Azure 工作项）、`workspace/slug`（Bitbucket）、形如 `ABC` 的项目键（Jira 和 YouTrack 议题）、形如 `bench` 的项目标识符（Redmine 议题）、形如 `ENG` 的团队键（Linear 议题）、看板短链接（Trello 议题）。`--filter`（仅议题）用提供商的语法缩小列表：Jira JQL 子句（`component = UI`）、Azure WIQL 条件、YouTrack 查询（`Type: Bug`）、Trello 列表名（`Doing,Review`）；Linear 没有。Bitbucket 没有议题（请改为关联 Jira）；Jira、Trello 和 Redmine 没有 pull request。 |
 | `hosting use [--id I \| --clear]` | 为此仓库固定一个配置。 |
 | `hosting prs [--state open\|closed\|all] [--mine] [--review-requested]`、`hosting pr-for-branch [branch]` | Pull / merge request（标签在 GitHub、Gitea、Forgejo 和 Bitbucket 上为 `#12`，在 GitLab 和 Azure 上为 `!12`）。 |
@@ -222,7 +222,7 @@
 | `refs hide <names>...`、`refs show <names>...`、`refs solo <names>...`（均可带 `--clear`） | Log 的 ref 过滤器：隐藏、重新显示、只显示这些（在已打开的窗口中实时生效）。被隐藏的引用也会退出遍历：只有它们能到达的 commit 会从 Log 中消失（已检出的 commit 始终保留）。 |
 | `refs hide --remote <name>...`、`refs show --remote <name>...` | 整体隐藏或显示远程：它的每个分支，包括之后获取的。（隐藏时）名称必须是该仓库的某个远程。`show` 还会取消被逐个隐藏的该远程分支；`--clear` 也会清空已隐藏的远程。 |
 | `session list`、`session new <name>`、`session rename <old> <new>`、`session delete <name>` | 命名会话（其守护进程运行时，重命名 / 删除会被拒绝）。 |
-| `daemon run`、`daemon start`、`daemon stop [--all]`、`daemon restart`、`daemon status` | 会话的后台进程（别名 `server`）。没有运行中的守护进程时，每条命令会在自己的生命周期内启动一个嵌入式守护进程。 |
+| `daemon run`、`daemon start`、`daemon stop [--all]`、`daemon restart`、`daemon status` | 会话的后台进程（别名 `server`）。没有运行中的守护进程时，每条命令会在自己的生命周期内启动一个嵌入式守护进程。`daemon start` 最多等待 20 秒，让新的守护进程发布其端口（然后再查看一次才报告失败），以适应较慢的机器。 |
 | `config path`、`config get <key>`、`config set <key> <value>` | 设置（[配置参考](config-reference.md)）。`config set ui.theme` 和 `ui.graph_color_theme` 会对照注册表检查名称。 |
 | `licenses` | 程序内置的第三方许可证声明和致谢（即“关于 > 许可证”的文字）。只读；无需守护进程。 |
 | `theme list`、`theme export <slug>` | 配色主题：JSON 列表（slug、label、source、light、lane palette）以及输出到 stdout 的完整主题文件（[主题](themes.md)）。只读；无需守护进程。 |

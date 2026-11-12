@@ -56,6 +56,7 @@ graph_renderer = "auto"
 image_protocol = "auto"
 kitty_keyboard = "auto"
 color_depth = "auto"
+text_cursor = "terminal"
 graph_show_stashes = true
 ref_connector = true
 log_wip_counts_in_message = true

@@ -118,7 +118,8 @@ use ratatui::widgets::Widget;
 use gitpoulpi_config::ImageProtocol;
 
 mod cell_query;
-mod detect;
+pub(super) mod detect;
+pub(crate) mod report;
 
 /// Whether a terminal multiplexer (tmux, screen, zellij, herdr) sits between
 /// this process and the terminal: what does not pass through it (an image,

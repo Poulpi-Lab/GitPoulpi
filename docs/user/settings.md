@@ -413,6 +413,7 @@ the server; see [MCP and agents](mcp-and-agents.md).
 | **Author avatars** | **off** (default, no network), **graph** (in the commit dot) or **author** (in the Author column). When on, a hash of each author email is sent to Gravatar and to your hosting provider. |
 | **Avatar sources**, **Avatar fallback** | Where pictures are looked up, and in what order. For authors with no picture: **identicon** (a generated pattern) or **initials**. |
 | **Input color**, **Custom input color** | The background of text fields: **Follow theme** (default), a fixed dark color, or your own `#rrggbb`. |
+| **Text cursor** | `ui.text_cursor`: **terminal** (default) puts the terminal's own cursor at the caret of the focused text field, as a bar (your terminal's cursor settings apply, and an input method's candidate window opens at the caret); **drawn** paints GitPoulpi's own caret and keeps the terminal cursor hidden. Applies at once. Palette: `Settings: Text cursor...`. |
 | **Color depth** | **auto** (default), **truecolor**, **256** or **16**. See [Themes](themes.md). |
 | **Graph color theme** | **Follow theme** (default: the theme's own lane colors) or any lane palette. Each palette shows a few of its colors. It applies when the Settings close. The palette command **App: Change Graph Color Theme...** (`Ctrl+N Shift+Y`) previews each palette live. |
 | **Graph lane background** | **Off** (transparent) or **Row tint**: a faint band of the lane color behind the graph column, with a thin bar at its edge. |

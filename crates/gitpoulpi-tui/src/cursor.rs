@@ -110,7 +110,7 @@ static SHAPE_SENT: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool
 /// Whether `OSC 22` may be written at all: not behind a multiplexer (tmux,
 /// screen, zellij and herdr swallow or print it, and nothing here wraps it
 /// for passthrough) and not on a terminal that has no pointer to change.
-fn pointer_shapes_allowed() -> bool {
+pub(crate) fn pointer_shapes_allowed() -> bool {
     static ALLOWED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ALLOWED.get_or_init(|| {
         let bare = std::env::var("TERM").is_ok_and(|t| matches!(t.as_str(), "linux" | "dumb"));

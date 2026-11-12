@@ -52,6 +52,8 @@ pub(crate) fn install_panic_hook() {
         // it was pushed on (the alternate one).
         crate::kitty_keyboard::disable(&mut out);
         crate::cursor::reset_pointer(&mut out);
+        crate::text_cursor::restore_style(&mut out);
+        crate::term_modes::disable_bracketed_paste(&mut out);
         let _ = execute!(
             out,
             DisableMouseCapture,
@@ -358,6 +360,7 @@ pub(crate) fn apply_live_settings(
             install_input_color(&config.ui.input_color, &config.ui.input_color_custom);
             install_theme_from_config(config.ui.theme_slug());
             crate::color_depth::install(config.ui.color_depth);
+            crate::text_cursor::install(config.ui.text_cursor);
             lfs_ui::install_default(config.git.lfs_enabled);
             live_settings::install_delete_orig_after_merge(
                 config.general.delete_orig_files_after_merge,

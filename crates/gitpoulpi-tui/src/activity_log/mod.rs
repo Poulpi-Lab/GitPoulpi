@@ -19,6 +19,7 @@
 //! command line, exit code, stderr tail, or libgit2's class and code); the
 //! file side of the log is the `gitpoulpi-log` crate.
 
+mod capabilities;
 mod feed;
 pub(crate) mod friendly;
 pub(crate) mod identity;

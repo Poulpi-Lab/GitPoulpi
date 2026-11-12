@@ -49,8 +49,8 @@ use gitpoulpi_config::{
     ComposerFiles, Config, ConfigPaths, DefaultBackend, DialogGeometry, DiffLayout,
     GraphLaneBackground, GraphRenderer, GraphRowTintStrength, ImageProtocol, KittyKeyboard,
     Profile, PullButtonMode, PushBehavior, StatusbarPosition, TabDirFollow, TabsPosition,
-    ToolbarAlign, ToolbarPosition, UiLanguage, MAX_MOUSE_SCROLL_LINES, MIN_COMMITS_PER_LAZY_PAGE,
-    MIN_INITIAL_COMMITS_IN_GRAPH, MIN_MOUSE_SCROLL_LINES,
+    TextCursor, ToolbarAlign, ToolbarPosition, UiLanguage, MAX_MOUSE_SCROLL_LINES,
+    MIN_COMMITS_PER_LAZY_PAGE, MIN_INITIAL_COMMITS_IN_GRAPH, MIN_MOUSE_SCROLL_LINES,
 };
 use gitpoulpi_core::domain::MergeFastForward;
 use gitpoulpi_secrets::{CredentialHelperTokens, TokenStore};

@@ -65,7 +65,7 @@ pub(crate) fn install(setting: ColorDepth) {
     ACTIVE.store(depth as u8, Ordering::Relaxed);
 }
 
-fn active() -> Depth {
+pub(crate) fn active() -> Depth {
     match ACTIVE.load(Ordering::Relaxed) {
         1 => Depth::X256,
         2 => Depth::X16,

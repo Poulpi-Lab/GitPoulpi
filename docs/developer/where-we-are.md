@@ -638,6 +638,13 @@ without the fix; keep it that way.
 - Discovery files are written user-only through `discovery::publish` (token first, then the port) and removed through `discovery::remove_files`; a hand-written `std::fs::write` of a port file leaves a daemon nobody can authenticate to.
 - Local state goes through `gitpoulpi_config::secure_fs` (`create_private_dir_all`, `write_private`: atomic, created `0600`, never a `chmod` after the write). Never set a process-wide `umask` for this: it would also change the modes of checked-out files.
 
+### The text caret (`ui.text_cursor`)
+
+- Every editable field is drawn by `text_field::edit_lines`; never paint a caret by hand. With `terminal` (the default) the field draws no caret glyph and tags the caret's cell with `text_cursor::MARK`; the finished frame is scanned once (`take_from_buffer`, in the draw closure) and the terminal's real cursor goes there. A painter outside `text_field` (the code editor, the merge editor) takes its caret style from `text_cursor::caret_modifier()`.
+- The cursor is placed from the finished buffer on purpose: a field only knows its own rows and columns, and a cell an overlay painted over loses its tag, so a field under a dialog never gets the cursor. Raw writes after the draw (pictures) move the cursor; the frame puts it back from `text_cursor::last()`.
+- The mode is thread-local and starts as `drawn` under `cfg(test)`, so unit snapshots keep the glyph; the PTY harness pins `GITPOULPI_UI_TEXT_CURSOR=drawn` for the same reason (`pty_text_cursor` sets `terminal`). The DECSCUSR bar is restored on every way out (`restore_style`: normal exit, error exit, panic hook, update).
+- Bracketed paste (`term_modes`) is requested on Unix only and released on the same ways out; a PTY test that injects `ESC[200~` itself proves the handlers, not the request (`pty_bracketed_paste` checks the request).
+
 ### Log row arithmetic (the repeat offender)
 
 - Rows go through `log_table/geometry.rs`: `log_top_y`, `log_index_to_row`,

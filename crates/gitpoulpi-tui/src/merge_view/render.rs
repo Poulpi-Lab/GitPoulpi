@@ -1277,7 +1277,10 @@ impl MergeView {
                         let cx = rect.x + gutter + caret_col as u16;
                         if buf.area.contains((cx, y).into()) {
                             let cell = &mut buf[(cx, y)];
-                            cell.set_style(cell.style().add_modifier(Modifier::REVERSED));
+                            cell.set_style(
+                                cell.style()
+                                    .add_modifier(crate::text_cursor::caret_modifier()),
+                            );
                         }
                     }
                     hits.push((Rect::new(rect.x, y, rect.width, 1), hit));

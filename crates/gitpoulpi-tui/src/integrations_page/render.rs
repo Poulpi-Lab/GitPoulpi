@@ -111,7 +111,8 @@ impl IntegrationsPage {
         if let Some(bar) = self.ns_bar {
             let top = self.scroll.top as i32;
             let y0 = (i32::from(bar.rect.y) - top).max(i32::from(self.scroll.window.y));
-            let y1 = (i32::from(bar.rect.bottom()) - top).min(i32::from(self.scroll.window.bottom()));
+            let y1 =
+                (i32::from(bar.rect.bottom()) - top).min(i32::from(self.scroll.window.bottom()));
             if y1 > y0 {
                 crate::pointer_map::hand(Rect::new(bar.rect.x, y0 as u16, 1, (y1 - y0) as u16));
             }

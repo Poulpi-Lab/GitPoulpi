@@ -64,7 +64,10 @@ fn the_snippet_buttons_are_real_buttons_with_the_hand_pointer() {
         .find(|l| l.contains("Save") && l.contains("Cancel"))
         .expect("the button row");
     assert!(!footer.contains('['), "{footer}");
-    assert!(footer.contains("Undo") && footer.contains("Redo"), "{footer}");
+    assert!(
+        footer.contains("Undo") && footer.contains("Redo"),
+        "{footer}"
+    );
 }
 
 /// Ctrl+Z / Ctrl+Y and the two buttons walk the edits; the buttons are

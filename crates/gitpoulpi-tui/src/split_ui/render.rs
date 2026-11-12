@@ -596,14 +596,14 @@ impl SplitForm {
                     } else {
                         color
                     })
-                    .bg(crate::dialog_kit::button_style(
-                        crate::dialog_kit::ButtonState::Normal {
+                    .bg(
+                        crate::dialog_kit::button_style(crate::dialog_kit::ButtonState::Normal {
                             hovered: field_hover,
                             focused: false,
-                        },
-                    )
-                    .bg
-                    .unwrap_or(bg)),
+                        })
+                        .bg
+                        .unwrap_or(bg),
+                    ),
             );
             fine.push((field_rect, SplitHit::Assign(*row)));
             if is_cursor {

@@ -113,6 +113,8 @@ mod avatar;
 mod blame_view;
 pub mod build_features;
 #[cfg(test)]
+mod button_audit_tests;
+#[cfg(test)]
 mod cjk_sweep_tests;
 mod clipboard;
 mod clipboard_route;
@@ -202,8 +204,6 @@ mod scroll_marks;
 mod scrollbar;
 #[cfg(test)]
 mod scrollbar_guard_tests;
-#[cfg(test)]
-mod button_audit_tests;
 mod scrollbar_repeat;
 mod sections_scope;
 mod session_store;

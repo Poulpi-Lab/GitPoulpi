@@ -196,10 +196,7 @@ fn the_integrations_controls_show_their_pointer_and_no_button_is_bracketed() {
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The marks of checkboxes aside, nothing is bracketed.
-    let bare = screen
-        .text()
-        .replace("[x]", "   ")
-        .replace("[ ]", "   ");
+    let bare = screen.text().replace("[x]", "   ").replace("[ ]", "   ");
     assert!(
         !bare.contains("[ ") && !bare.contains(" ]") && !bare.contains("[+"),
         "a bracketed button:\n{}",

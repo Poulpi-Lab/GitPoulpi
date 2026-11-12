@@ -1481,12 +1481,9 @@ impl PreferencesState {
             let redo_w = dialog_kit::button_width(redo_label);
             let redo_x = save_x.saturating_sub(redo_w + 1);
             let undo_x = redo_x.saturating_sub(undo_w + 1);
-            let (can_undo, can_redo) = edit
-                .field
-                .caret(())
-                .map_or((false, false), |c| {
-                    (c.can_undo(&edit.text), c.can_redo(&edit.text))
-                });
+            let (can_undo, can_redo) = edit.field.caret(()).map_or((false, false), |c| {
+                (c.can_undo(&edit.text), c.can_redo(&edit.text))
+            });
             let buf = frame.buffer_mut();
             let at = |x: u16, w: u16| Rect::new(x, y, w, 1);
             let state = |r: Rect, primary: bool| {

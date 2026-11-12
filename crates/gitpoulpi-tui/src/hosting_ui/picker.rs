@@ -759,9 +759,7 @@ impl HostingUi {
             }
             KeyCode::Backspace => self.query_history.pop(&mut self.query_draft),
             KeyCode::Char('u') if ctrl => self.query_history.wipe(&mut self.query_draft),
-            KeyCode::Char(c) if !ctrl && !alt => {
-                self.query_history.push(&mut self.query_draft, c)
-            }
+            KeyCode::Char(c) if !ctrl && !alt => self.query_history.push(&mut self.query_draft, c),
             _ => {}
         }
         true

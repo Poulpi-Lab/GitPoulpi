@@ -86,11 +86,7 @@ fn ctrl_n_badges_the_radar_block_including_the_regular_expressions_checkbox() {
             .collect::<Vec<_>>()
             .join("\n")
     };
-    let badged_rows: Vec<u16> = state
-        .nav_targets()
-        .iter()
-        .map(|(rect, _)| rect.y)
-        .collect();
+    let badged_rows: Vec<u16> = state.nav_targets().iter().map(|(rect, _)| rect.y).collect();
     for label in [
         "Requests waiting for my review",
         "e.g. acme, platform",
@@ -111,11 +107,17 @@ fn ctrl_n_badges_the_radar_block_including_the_regular_expressions_checkbox() {
         .iter()
         .find(|(rect, _)| rect.y == row)
         .unwrap();
-    assert!(!state.config.integrations[0]
-        .radar_options()
-        .namespaces_regex);
+    assert!(
+        !state.config.integrations[0]
+            .radar_options()
+            .namespaces_regex
+    );
     state.nav_press(point);
-    assert!(state.config.integrations[0].radar_options().namespaces_regex);
+    assert!(
+        state.config.integrations[0]
+            .radar_options()
+            .namespaces_regex
+    );
 }
 
 #[test]

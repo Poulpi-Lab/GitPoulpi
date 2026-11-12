@@ -489,7 +489,11 @@ impl Caret {
                 } else {
                     self.redo(text)
                 };
-                return if done { KeyEdit::Edited } else { KeyEdit::Moved };
+                return if done {
+                    KeyEdit::Edited
+                } else {
+                    KeyEdit::Moved
+                };
             }
             Op::Insert(c) if self.selection(text).is_none() => Kind::Typed(char_class(c)),
             Op::Backspace if self.selection(text).is_none() => Kind::Backspace,

@@ -538,15 +538,15 @@ tabs_position_help = "Kde jsou karty repozitářů: Nahoře (výchozí), Dole ne
 graph_color_theme = "Barevný motiv grafu"
 graph_color_theme_help = "Paleta barev drah grafu v Logu. „Podle motivu“ použije paletu zvoleného motivu; jakákoli jiná položka ji přepíše, takže lze spojit libovolný motiv s libovolnou paletou. Platí po zavření předvoleb."
 graph_renderer = "Vykreslování grafu"
-graph_renderer_help = "auto kreslí graf jako skutečný obrázek v terminálu, který to umí, a jinde znaky - i uvnitř tmux nebo zellij, které dědí prostředí terminálu, ale obrázek nepropouštějí, a uvnitř herdr, pokud není zapnuto jeho kitty_graphics. obrázek vynutí obrázek, text ho zakáže. Vyžaduje restart."
+graph_renderer_help = "auto kreslí graf jako skutečný obrázek v terminálu, který to umí, a jinde znaky - i uvnitř zellij a screen, které dědí prostředí terminálu, ale obrázek nepropouštějí, uvnitř tmux, pokud terminál za ním neumí sixel, a uvnitř herdr, pokud není zapnuto jeho kitty_graphics. obrázek vynutí obrázek, text ho zakáže. Vyžaduje restart."
 image_protocol = "Protokol obrázků"
-image_protocol_help = "Jak se obrázky (obrázek grafu, avatary autorů) dostanou do terminálu. auto: protokol Kitty graphics v kitty, Ghostty a herdr, jehož konfigurace nastavuje kitty_graphics = true; vložené obrázky iTerm2 ve WezTerm, iTerm2 a mintty; obrázky sixel (jen avatary autorů, graf zůstává ze znaků) ve Windows Terminal, foot, Konsole a mlterm; jinde znaky. kitty, iterm2 nebo sixel vynutí protokol (kitty pro herdr s konfigurací jinde; sixel pro terminál, který sixel kreslí, ale nepozná se); none obrázky vypne. Vyžaduje restart."
+image_protocol_help = "Jak se obrázky (obrázek grafu, avatary autorů) dostanou do terminálu. auto: protokol Kitty graphics v kitty, Ghostty a herdr, jehož konfigurace nastavuje kitty_graphics = true; protokol Kitty také v iTerm2 3.7.7 a novějším; vložené obrázky iTerm2 ve WezTerm, Rio, mintty a starším iTerm2; obrázky sixel (sloupec grafu i avatary) ve Windows Terminal, foot, Tabby, Konsole, mlterm a v tmux, pokud terminál za ním umí sixel; jinde znaky. kitty, iterm2 nebo sixel vynutí protokol (kitty pro herdr s konfigurací jinde; sixel pro terminál, který sixel kreslí, ale nepozná se); none obrázky vypne. Vyžaduje restart."
 kitty_keyboard = "Klávesnicový protokol Kitty"
 kitty_keyboard_help = "auto se při startu do asi 100 ms zeptá terminálu, zda umí klávesnicový protokol kitty, a pokud ano, použije ho: akordy, které starší terminály nerozliší (Control s interpunkcí, číslicemi, Shiftem nebo Enterem), pak dorazí samy za sebe místo kolize s řídicími kódy. Terminál, který neodpoví, zůstane u starých kláves. off se klávesnicového režimu terminálu nikdy nedotkne. Vyžaduje restart."
 color_depth = "Barevná hloubka"
 color_depth_help = "auto používá 24bitové barvy, kromě terminálů, které je nezobrazují (Apple Terminal, konzole Linuxu nebo 256barevný terminál bez COLORTERM), kde se barvy převedou na nejbližší z 256 nebo 16 položek. truecolor, 256 a 16 hloubku vynutí. Platí okamžitě."
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "Textový kurzor"
+text_cursor_help = "terminal umístí vlastní kurzor terminálu na místo vkládání v aktivním textovém poli, jako svislou čárku: platí nastavení kurzoru vašeho terminálu a okno s návrhy metody zadávání se otevře u kurzoru. drawn vykreslí vlastní kurzor GitPoulpi (blok nebo podtržítko) a kurzor terminálu nechá skrytý. Platí okamžitě."
 graph_show_stashes = { git = "Zobrazit stashe v grafu", local = "Zobrazit odložené změny v grafu" }
 graph_show_stashes_help = { git = "Každý stash dostane v Logu vlastní řádek v čase svého vzniku: malý box na dráze vedle commitu, na kterém vznikl, spojený s ním čárkovanou čárou. Výběr ukáže, co změnil; pravé tlačítko (nebo .) nabídne Pop, Apply a Drop. Vypnuto nechá stashe jen v sekci STASHES. Při solo se nekreslí.", local = "Každé odložení dostane v Logu vlastní řádek v čase svého vzniku: malý box na dráze vedle commitu, na kterém vzniklo, spojený s ním čárkovanou čárou. Výběr ukáže, co změnilo; pravé tlačítko (nebo .) nabídne Obnovit, Použít a Zahodit. Vypnuto nechá odložené změny jen v sekci ODLOŽENÉ ZMĚNY. Při solo se nekreslí." }
 ref_connector = "Spojnice ref–commit"
@@ -3994,8 +3994,8 @@ mouse_gestures_in_2 = "dělič panelu nebo hranice sloupce Logu mění velikost 
 mouse_gestures_in_3 = { git = "tažení přes text diffu, pohledu na soubor, Blame nebo Historie souboru ho vybere, dvojklik slovo; y nebo Ctrl+C ho zkopíruje (jen text souboru, nikdy sloupce); ostatní výskyty vybraného slova jsou v diffu a editoru podbarveny (a označeny na pravítku)", local = "tažení přes text rozdílu, pohledu na soubor, Blame nebo Historie souboru ho vybere, dvojklik slovo; y nebo Ctrl+C ho zkopíruje (jen text souboru, nikdy sloupce); ostatní výskyty vybraného slova jsou v rozdílu a editoru podbarveny (a označeny na pravítku)" }
 mouse_gestures_in_4 = { git = "posouvá zaostřený/označený seznam nebo diff; Shift+kolečko (obě podoby, které terminály hlásí) posouvá diff/pohled na soubor/blame místo toho *vodorovně*, dokud je zalamování vypnuto", local = "posouvá zaostřený/označený seznam nebo rozdíl; Shift+kolečko (obě podoby, které terminály hlásí) posouvá rozdíl/pohled na soubor/blame místo toho *vodorovně*, dokud je zalamování vypnuto" }
 mouse_gestures_in_5 = "otevře kontextovou nabídku, kdekoli existuje (viz sekci každého panelu výše); klávesový ekvivalent je vždy {{*global.context_menu}}"
-mouse_gestures_in_6 = "každá akce „Kopírovat ...“ žádá o schránku *terminál* přes OSC 52 - TUI se k ní nedostane přímo; terminál, který sekvenci ignoruje, prostě nezkopíruje"
-mouse_gestures_in_7 = "náznaky změny velikosti/ukazatele/otevřené ruky se posílají přes OSC 22 v terminálech, které to podporují (kitty, foot, xterm; jinde nestejně) - tažitelné děliče a hranice sloupců se rozsvítí i ve vlastním bufferu aplikace, což spolupráci terminálu nepotřebuje vůbec"
+mouse_gestures_in_6 = "každá akce „Kopírovat ...“ vloží text do systémové schránky a tam, kde terminál tuto funkci prokazatelně respektuje, ho pošle i přes OSC 52; přes SSH nebo bez displeje se posílá jen OSC 52 a terminál, který sekvenci ignoruje, nezkopíruje"
+mouse_gestures_in_7 = "náznaky změny velikosti/ukazatele/otevřené ruky se posílají přes OSC 22 v terminálech, které to podporují (kitty, Ghostty, foot, mintty; ne v Rio, Alacritty, Windows Terminal ani iTerm2) - tažitelné děliče a hranice sloupců se rozsvítí i ve vlastním bufferu aplikace, což spolupráci terminálu nepotřebuje vůbec"
 git_actions_then_25 = "otevřít nabídku LFS (tlačítko LFS na liště; její položky jsou i v paletě)"
 git_actions_then_26 = { git = "LFS: fetch objektů všech refů", local = "LFS: načte objekty všech refů" }
 git_actions_then_27 = "LFS: zapsat skutečný obsah přes ukazatele (offline)"
@@ -5958,7 +5958,7 @@ show_label = "Zobrazit:"
 show_all = "Vše"
 show_none = "Nic"
 why_level_off = "Nezobrazeno: zvolená úroveň je {level}. Zvyšte ji, aby se tyto řádky zobrazily."
-hint_levels = "1-5: zobrazit nebo skrýt úroveň  a: vše  n: nic"
+hint_levels = "1-5: zobrazit nebo skrýt úroveň  a: vše  n: nic  Enter: operace řádku  [ ]: selhání"
 palette_show_error = "Protokol aktivity: zobrazit nebo skrýt úroveň Chyba"
 palette_show_warn = "Protokol aktivity: zobrazit nebo skrýt úroveň Varování"
 palette_show_info = "Protokol aktivity: zobrazit nebo skrýt úroveň Info"
@@ -6001,25 +6001,25 @@ palette_scroll_right = "Protokol aktivity: Posunout doprava"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "Protokol aktivity: posun dlouhých řádků do stran (také Shift + kolečko nebo vodorovný posuvník)"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation}: selhalo"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "Operace: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
-ctx_repository = "Repository: {repository}"
+ctx_repository = "Repozitář: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "Vyžádal: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "ID operace: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "Protokol aktivity: Zobrazit operaci tohoto řádku"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "Protokol aktivity: Další selhaná operace"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "Protokol aktivity: Předchozí selhaná operace"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "Nejdřív vyberte řádek: klikněte na něj, nebo stiskem ] přeskočte na další selhanou operaci."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "Tento řádek se neváže k žádné operaci."
 
 [git_error]
 summary_host_key = "Hostitelský klíč SSH tohoto remote zatím není znám."
@@ -8749,13 +8749,13 @@ namespaces = "Jmenné prostory"
 # context: hint in the empty namespaces field
 namespaces_hint = "např. acme, platforma (prázdné: můj vlastní a všechny, jejichž jsem členem)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "Jedna položka na řádek. Název odpovídá dané skupině či vlastníkovi i všemu pod nimi (ptm odpovídá ptm/produits/x, ne ptmx/y). Prázdné: můj vlastní a všechny, jejichž jsem členem."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Každý řádek je regulární výraz porovnávaný s celou cestou repozitáře tak, jak ji zapisujete (příklad: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "Regulární výrazy"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "Neplatný výraz: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "Žádost z nenaklonovaného repozitáře"
 # context: choice: ask each time

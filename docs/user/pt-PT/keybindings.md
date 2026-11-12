@@ -410,8 +410,8 @@ exemplo, `Ctrl+Shift+N` chega como `Ctrl+N`, `Ctrl+I` como `Tab` e `Ctrl+M` como
 ...").
 
 Os terminais com o **protocolo de teclado do kitty** conseguem enviar estes acordes. Exemplos:
-kitty, WezTerm, Ghostty, foot, Alacritty 0.13 e posterior, e tmux ou herdr quando
-deixam passar o protocolo. O GitPoulpi usa o protocolo por predefinição:
+kitty, WezTerm, Ghostty, foot, Alacritty 0.13 e posterior, e zellij (o tmux não
+responde: veja [Multiplexadores](multiplexers.md#tmux)). O GitPoulpi usa o protocolo por predefinição:
 
 - No arranque, o GitPoulpi pergunta ao terminal e espera no máximo cerca de 100 ms pela
   resposta. Se o terminal não responder, as teclas legadas mantêm-se.
@@ -872,9 +872,9 @@ As teclas são as predefinidas.
 | Registo de atividade: escolher o âmbito |  |
 | Registo de atividade: operações Git |  |
 | Registo de atividade: registo da aplicação |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Registo de atividade: mostrar a operação desta linha |  |
+| Registo de atividade: operação falhada seguinte |  |
+| Registo de atividade: operação falhada anterior |  |
 | Registo de atividade: deslocar para a esquerda | `Left` |
 | Registo de atividade: deslocar para a direita | `Right` |
 | Registo de atividade: copiar o último erro |  |
@@ -1213,8 +1213,34 @@ As teclas são as predefinidas.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Refazer**. `Ctrl+Shift+Z` precisa do protocolo de teclado do kitty; `Ctrl+Y` funciona sempre |
 | `.`, `Menu`, `Shift+F10` | Abrir o menu de contexto da linha selecionada |
 
-`Ctrl+Z` e `Ctrl+Y` não fazem nada enquanto um campo de texto tem o teclado. O
-editor tem o seu próprio desfazer de texto.
+### Ctrl+Z / Ctrl+Y num campo de texto
+
+Enquanto um campo de texto tem o teclado, `Ctrl+Z` e `Ctrl+Y` (também
+`Ctrl+Shift+Z`) atuam sobre o texto desse campo, nunca sobre o repositório: um campo
+que tem o teclado ganha sempre, pelo que `Ctrl+Z` na mensagem de commit não consegue
+desfazer um commit. Em todos os outros sítios mantêm o seu significado global (o
+registo de desfazer / refazer acima). Isto vale para todos os campos de texto e
+editores de várias linhas: a mensagem de commit, os campos e editores de texto das
+Definições, os formulários de pull request e de issue, as janelas de IA e todas as
+caixas de filtro ou de pesquisa.
+
+- **Escrever** desfaz-se palavra a palavra (uma sequência de letras, uma de espaços,
+  uma de pontuação), e escrever com uma pausa de mais de um segundo começa um novo
+  passo. Vários retrocessos seguidos são um só passo. Uma colagem, um recorte,
+  `Ctrl+U` / `Ctrl+K`, um excerto inserido ou uma conclusão aceite é um passo cada.
+- Um desfazer repõe o texto, o cursor e a seleção. Uma nova edição depois de um
+  desfazer descarta o que se poderia refazer.
+- Cada campo mantém um histórico limitado (os últimos 200 passos, cerca de 1 MB de
+  texto), e esquece-o quando o campo é substituído a partir de fora (uma pasta
+  escolhida no seletor, um formulário recarregado) ou quando outro campo fica com o
+  teclado.
+- Sem nada para desfazer, `Ctrl+Z` não faz nada: nunca passa para o desfazer do
+  repositório enquanto um campo tem o teclado.
+- O **editor de instruções** das definições de IA tem também botões **Anular** e
+  **Refazer**, junto a Guardar e Cancelar, desativados enquanto não há nada a que
+  passar.
+- O editor de código e o editor de merge mantêm o seu próprio desfazer (`Edit: Undo`,
+  `Merge: Undo`), que cobre também as suas escolhas.
 
 ## Listas de popup filtráveis
 
@@ -1226,19 +1252,20 @@ movem o realce:
 
 | Tecla | Ação |
 |---|---|
-| `Up` / `Down` | Mover uma linha |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Mover uma linha para cima / para baixo |
 | `Home` / `End` | Primeira / última linha |
 | `PageUp` / `PageDown` | Mover uma página visível |
 | `Enter` | Escolher a linha realçada |
 | `Esc` | Fechar |
 
-Nestes popups, `Home` e `End` movem a lista, não o cursor do campo de filtro.
-`Ctrl+A` e `Ctrl+E` continuam a mover o cursor para o início e o fim, e `Ctrl+K`
-apaga até ao fim do filtro. Nenhum par `Ctrl+letra` move uma lista (`Ctrl+N` é o
-prefixo de navegação, `Ctrl+P` a paleta de comandos), e `j` e `k` simples são
-escritos no filtro: aqui só movem as setas, `PageUp` / `PageDown` e `Home` /
-`End`. Nas listas sem campo de texto, `j` / `k` são uma via extra para descer /
-subir.
+Nestes popups, `Home` e `End` movem a lista, não o cursor do campo de filtro, e
+`Ctrl+K` / `Ctrl+J` movem também a lista, pelo que `Ctrl+K` já não apaga até ao fim do
+filtro (`Ctrl+U` continua a limpá-lo; num campo de texto vulgar fora de uma lista
+`Ctrl+K` continua a apagar até ao fim da linha). `Ctrl+A` e `Ctrl+E` continuam a mover o
+cursor para o início e o fim. `Ctrl+J` / `Ctrl+K` movem também todas as outras listas,
+com ou sem campo de texto (`Ctrl+N` é o prefixo de navegação e `Ctrl+P` a paleta de
+comandos, pelo que não são teclas de lista). `j` e `k` simples são escritos no filtro;
+nas listas sem campo de texto, `j` / `k` são uma via extra para descer / subir.
 
 Com o rato:
 
@@ -1487,7 +1514,8 @@ de espera e o cartão «apareceu uma branch» estão descritos em [fluxos de tra
 | `Enter` / `l` numa linha de ficheiro | Abrir o diff do ficheiro no centro |
 | `Esc` / `h` | Voltar aos commits |
 | `Right` | (commit com mais de uma ref) Abrir a lista das suas outras refs: `Up` / `Down` movem, `Enter` faz checkout, `Esc` fecha |
-| `f` | Abrir a barra de pesquisa (consulte [Pesquisa](#pesquisa)) |
+| `f` | Abrir a barra de pesquisa (consulte [Pesquisa](#pesquisa)); nunca foi `/`, pelo que a pesquisa do Log não muda |
+| `/` | Pôr o foco no campo de filtro das Refs (a mesma tecla faz o mesmo quando o painel Refs tem o foco); escrita como caráter quando um campo de texto tem o foco |
 | `c` | (com alterações por commitar) Selecionar a linha WIP e pôr o cursor no seu campo de mensagem |
 | `Enter` na linha WIP | Pôr o cursor no campo de mensagem da linha WIP |
 | `.`, `Menu`, `Shift+F10` | O menu do commit. `Up` / `Down` movem, `Right` / `l` / `Enter` abrem um submenu, `Left` / `h` / `Esc` voltam atrás |

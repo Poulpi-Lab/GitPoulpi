@@ -56,7 +56,7 @@ distinguir.
 Um âmbito de pasta procura repositórios **a dois níveis de profundidade**: as pastas que estão diretamente nele e as pastas dentro
 daquelas que não são, elas próprias, repositórios (`~/src/work/app`). As pastas ocultas são ignoradas, nunca se entra num
 repositório e são listados no máximo 200. A pesquisa corre em segundo plano, nunca na thread que desenha, e o resultado
-mantém-se até atualizar: o botão Atualizar, `r` ou `Radar: atualizar` voltam a pesquisar a pasta (um repositório clonado
+mantém-se até atualizar: o botão Atualizar, `r`, `F5` (a tecla de atualização da janela, reatribuível) ou `Radar: atualizar` voltam a pesquisar a pasta (um repositório clonado
 entretanto aparece).
 
 O alojamento continua a ser opcional por repositório: um repositório da pasta que **não está ligado** a um alojamento nunca é
@@ -204,7 +204,7 @@ tem sempre uma tecla e um equivalente na paleta.
 | Mostrar ou ocultar os pedidos de repositórios não clonados | `a` | `Radar: mostrar pedidos não clonados` |
 | Mostrar ou ocultar os rascunhos das linhas de toda a conta | `d` | `Radar: mostrar rascunhos` |
 | Ligar os pedidos de revisão de toda a conta de um host | `T` / `Enter` na sua linha de sugestão / **Ativar** | `Radar: ativar os pedidos de revisão da conta...` |
-| Atualizar | `r` | `Radar: atualizar` |
+| Atualizar | `r`, `F5` | `Radar: atualizar` |
 | O menu da linha | `.` | `Radar: menu da linha...` |
 | Voltar ao início | `Esc` | `Radar: voltar ao início` |
 
@@ -265,6 +265,8 @@ a [referência de configuração](config-reference.md) e a [referência da CLI](
 o Gitea, o Forgejo, o Azure DevOps, o Bitbucket Data Center e o Gerrit; o Bitbucket Cloud não tem endpoint de toda a conta,
 por isso os seus pedidos só aparecem para os repositórios ligados do âmbito.
 
+Os **Namespaces** do perfil limitam todas as suas listas a alguns repositórios (Definições > Integrações > Radar: uma área de texto com uma entrada por linha e uma caixa **Expressões regulares**). Uma linha corresponde ao caminho completo de um repositório quando é igual a ele ou é um prefixo de caminho que termina numa `/`: `ptm` mantém `ptm/produits/x` e descarta `ptmx/y` e `formation/y`. Com a caixa ligada, cada linha é uma expressão regular aplicada ao caminho completo tal como a escreve (`^ptm/(produits|infra)/`); uma linha que não seja válida aparece sob o campo e não é guardada. Vazio significa sem limite.
+
 Como as linhas são colocadas:
 
 - Uma linha que o âmbito já lista (mesmo host, projeto, tipo e número) aparece uma só vez: **ganha a linha do
@@ -321,7 +323,7 @@ Duas caixas ao lado do filtro (aparecem quando uma lista de toda a conta está a
 Ambas estão nos emblemas do `Ctrl+N` e na paleta (`Radar: mostrar pedidos não clonados`, `Radar: mostrar rascunhos`).
 
 A resposta de um perfil é guardada em `radar-account.json` durante **5 minutos**: voltar a abrir o Radar dentro desse
-tempo mostra as linhas sem perguntar ao host. **Atualizar** (`r`) pergunta sempre. Um host que pediu para abrandar
+tempo mostra as linhas sem perguntar ao host. **Atualizar** (`r` ou `F5`) pergunta sempre: todos os repositórios e todas as listas de toda a conta, seja qual for a idade da última resposta. Um host que pediu para abrandar
 ou recusou o token não volta a ser consultado na mesma ronda. No máximo 300 linhas são mantidas por perfil e tipo,
 e uma linha sob **Repositórios** diz quantas mais existiam, ou porque é que um perfil não pôde ser lido
 (**Religar** abre Definições > Integrações).

@@ -150,12 +150,12 @@ fn the_page_has_no_chip_rows_and_the_editor_has_them_above_the_text() {
     select(&mut state, "Custom instructions");
     let page = draw(&mut state, 120, 40);
     assert!(!page.contains("Quick insert"), "{page}");
-    assert!(!page.contains("[+ "), "{page}");
+    assert!(!page.contains("+ Respond in"), "{page}");
     assert!(state.fields().iter().all(|f| f.label != "Quick insert"));
     state.activate();
     let screen = draw(&mut state, 120, 40);
     assert!(
-        screen.contains("Quick insert: [+ Respond in <language>]"),
+        screen.contains("Quick insert:  + Respond in <language> "),
         "{screen}"
     );
     let chip_row = screen
@@ -180,7 +180,7 @@ fn the_page_has_no_chip_rows_and_the_editor_has_them_above_the_text() {
         .skip(rect.x as usize)
         .collect();
     assert!(
-        painted.starts_with("[+ Keep responses concise]"),
+        painted.starts_with(" + Keep responses concise "),
         "{painted}"
     );
     state.on_mouse(MouseEventKind::Down(MouseButton::Left), rect.x + 2, rect.y);

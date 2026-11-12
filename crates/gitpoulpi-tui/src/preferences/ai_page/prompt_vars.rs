@@ -149,11 +149,25 @@ impl PromptEdit {
             cursor
         };
         let full = format!("${{{name}}}");
-        self.text.replace_range(c.start..end, &full);
+        // One history entry, so Ctrl+Z takes the completion back whole.
         self.field
             .caret_mut(())
-            .set_cursor(&self.text, c.start + full.len(), false);
+            .replace_range(&mut self.text, c.start..end, &full);
         self.vars.ac_cursor = 0;
+    }
+
+    /// `Ctrl+Z` and the Undo button: the text's previous state.
+    pub(super) fn undo(&mut self) -> bool {
+        let done = self.field.caret_mut(()).undo(&mut self.text);
+        self.after_edit();
+        done
+    }
+
+    /// `Ctrl+Y` and the Redo button.
+    pub(super) fn redo(&mut self) -> bool {
+        let done = self.field.caret_mut(()).redo(&mut self.text);
+        self.after_edit();
+        done
     }
 
     /// Unknown `${names}` in the text (for the warning line).

@@ -278,7 +278,7 @@ fn the_quick_insert_row_is_in_the_editor_above_the_text_and_a_click_inserts_at_t
     let (mut term, config, _repo) = open_editor("pty-ai-prompt-chips-click");
     let screen = settled(&term);
     assert!(
-        screen.contains("Quick insert: [+ Respond in <language>]"),
+        screen.contains("Quick insert:  + Respond in <language> "),
         "{}",
         screen.text()
     );
@@ -290,7 +290,7 @@ fn the_quick_insert_row_is_in_the_editor_above_the_text_and_a_click_inserts_at_t
     assert!(chips_row < text_row, "chips {chips_row}, text {text_row}");
     term.send_keys("Left").unwrap();
     let (c, r) = settled(&term)
-        .find_all("[+ Keep responses concise]")
+        .find_all("+ Keep responses concise")
         .into_iter()
         .next()
         .expect("the second chip");
@@ -346,7 +346,7 @@ fn the_settings_page_has_no_quick_insert_row() {
     let screen = settled(&term);
     assert!(screen.contains("Custom instructions"), "{}", screen.text());
     assert!(!screen.contains("Quick insert"), "{}", screen.text());
-    assert!(!screen.contains("[+ "), "{}", screen.text());
+    assert!(!screen.contains("+ Respond in"), "{}", screen.text());
 }
 
 /// A click in the text places the caret there: typing goes in at the

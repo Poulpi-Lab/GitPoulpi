@@ -812,7 +812,7 @@ args = ["-p"]
     })
     .unwrap_or_else(|e| panic!("{e}"));
     let (col, row) = term
-        .wait_for_text("[+ Include issue numbers]", STEP)
+        .wait_for_text("+ Include issue numbers", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 2, row).expect("click the chip");
     term.wait_for("the sentence inserted", STEP, |s| {
@@ -903,7 +903,7 @@ args = ["-p"]
     term.send_keys("Down").unwrap();
     term.send_keys("Enter").unwrap();
     let (col, row) = term
-        .wait_for_text("[+ Include issue numbers]", STEP)
+        .wait_for_text("+ Include issue numbers", STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     term.click(col + 2, row).expect("click the chip");
     term.send_keys("C-s").unwrap();

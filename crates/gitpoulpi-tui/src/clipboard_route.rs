@@ -156,8 +156,8 @@ pub(crate) fn deliver(
     } else {
         Delivery::Nowhere(match system_result {
             Some(Err(why)) => why,
-            _ if s.remote => "over SSH and this terminal cannot carry OSC 52".to_string(),
-            _ => "no display, and this terminal cannot carry OSC 52".to_string(),
+            _ if s.remote => "over SSH and this terminal cannot carry OSC 52".to_string(), // i18n-english
+            _ => "no display, and this terminal cannot carry OSC 52".to_string(), // i18n-english
         })
     }
 }

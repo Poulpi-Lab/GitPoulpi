@@ -189,7 +189,8 @@ fn ctrl_z_undoes_and_ctrl_y_redoes_without_suspending_the_app() {
     rig.term.stop().unwrap();
 }
 
-/// Ctrl+Z in the commit message box types nothing and undoes nothing.
+/// Ctrl+Z in the commit message box undoes the typing (Ctrl+Y brings it
+/// back) and never the repository's last commit.
 #[test]
 fn ctrl_z_in_the_commit_message_field_does_not_undo_a_commit() {
     let repo = fixture();
@@ -205,7 +206,13 @@ fn ctrl_z_in_the_commit_message_field_does_not_undo_a_commit() {
     rig.term.send_text("draft").unwrap();
     rig.term.send_keys("C-z").unwrap();
     rig.term
-        .wait_for("the draft still there", STEP, |s| s.contains("draft"))
+        .wait_for("the typing undone in the field", STEP, |s| {
+            !s.contains("draft") && s.contains("b.txt")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", rig.term.text()));
+    rig.term.send_keys("C-y").unwrap();
+    rig.term
+        .wait_for("the draft back by Ctrl+Y", STEP, |s| s.contains("draft"))
         .unwrap_or_else(|e| panic!("{e}"));
     std::thread::sleep(Duration::from_millis(500));
     assert_eq!(

@@ -64,7 +64,7 @@ fn a_disconnected_profile_can_be_removed_from_settings_and_stays_removed() {
     )
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let screen = term
-        .wait_for_settled_text(" Remove ", dwell, STEP)
+        .wait_for_settled_text(" Remove  ", dwell, STEP)
         .unwrap_or_else(|e| panic!("{e}"));
     let (c, r) = screen;
     term.click(c + 2, r).unwrap();
@@ -121,7 +121,12 @@ fn open_form(term: &mut xtask::pty::Terminal, name: &str) {
             s.contains(" Connect ") && s.contains("No ")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let (c, r) = screen.find(" Connect ").unwrap();
+    // The button, not a sentence that starts with "Connect an account ..."
+    let (c, r) = screen
+        .find_all(" Connect ")
+        .into_iter()
+        .max_by_key(|&(_, r)| r)
+        .unwrap();
     term.click(c + 2, r).unwrap();
 }
 

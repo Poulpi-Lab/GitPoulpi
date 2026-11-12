@@ -747,7 +747,9 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Vedi il [riferimento della CLI](cli-reference.md#comandi) per ogni comando. Un
-token non viene mai accettato come argomento, e il server MCP non offre
+token non viene mai accettato come argomento (`hosting login` stampa `stored: "os"` quando
+l'archivio delle credenziali del sistema lo conserva, oppure `stored: "session"` più `store_error`
+quando l'archivio l'ha rifiutato e il token vive in memoria solo per questa sessione), e il server MCP non offre
 `hosting login`, quindi un token non passa mai da un agente.
 
 ## Risoluzione dei problemi

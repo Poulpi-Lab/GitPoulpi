@@ -438,7 +438,7 @@ scorciatoia. L'elenco completo è [qui sotto](#tutti-i-comandi-della-palette).
 |---|---|
 | `Ctrl+P` | Apre la palette |
 | *(scrivi)* | Filtra l'elenco. Una corrispondenza esatta dopo il prefisso `Categoria: ` viene per prima, poi una corrispondenza in qualsiasi punto dell'etichetta, poi una corrispondenza fuzzy |
-| `Su` / `Giù`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | Spostano l'evidenziazione (vedi [Elenchi popup filtrabili](#elenchi-popup-filtrabili)) |
+| `Su` / `Giù`, `Home` / `End`, `PageUp` / `PageDown` | Spostano l'evidenziazione (vedi [Elenchi popup filtrabili](#elenchi-popup-filtrabili)) |
 | `Enter`, o un doppio clic | Esegue il comando evidenziato |
 | `Esc` | Chiude |
 
@@ -458,7 +458,9 @@ In `config.toml` è la tabella `[keybindings.palette]`, con il nome del comando 
 
 La riga di aiuto sotto l'elenco indica questo tasto (`Alt+K` di default). È l'azione `palette.configure_shortcut`, quindi si riassegna come le altre.
 
-La palette e i selettori (tema, lingua, schede, ricerca nei workspace) si spostano e ridimensionano come un dialogo: trascina il bordo superiore, oppure premi `Alt+G` (l'azione `palette.arrange`; la riga della palette `Finestra: Sposta o ridimensiona` fa lo stesso). Le frecce lo spostano, `Maiusc`+frecce lo ridimensionano, `0` lo reimposta, `Invio` o `Esc` escono dalla modalità e il popup resta aperto. `ui.dialog_geometry` decide se la posizione viene conservata.
+La palette e i selettori (tema, lingua, schede, ricerca nei workspace) si spostano e ridimensionano come un dialogo: trascina il bordo superiore, premi `Ctrl+N` poi `m` (come su ogni dialogo), oppure premi `Alt+G`. `Alt+G` è l'azione `palette.arrange` ("Finestra: Sposta o ridimensiona la finestra in primo piano"): un modo in più, valido su ogni dialogo e popup, per avviare la modalità di disposizione su quello in primo piano (le righe della palette `Finestra: Sposta o ridimensiona` e `Finestra: Reimposta posizione e dimensione` agiscono sulla palette stessa mentre è aperta). Le frecce lo spostano, `Maiusc`+frecce lo ridimensionano, `0` lo reimposta, `Invio` o `Esc` escono dalla modalità e il popup resta aperto. `ui.dialog_geometry` decide se la posizione viene conservata.
+
+`Ctrl+N` è il prefisso di navigazione anche qui: mostra un badge sulla casella del filtro, sulla prima riga dell'elenco e sulla croce di chiusura, e il tasto che segue preme quel controllo oppure `m` dispone il popup. Non sposta più l'evidenziazione verso il basso, e `Ctrl+P` non la sposta verso l'alto: solo le frecce, `PageUp` / `PageDown` e `Home` / `End` spostano un elenco con un campo di filtro.
 
 ### Tutti i comandi della palette
 
@@ -1195,7 +1197,7 @@ applicano. I tasti sono quelli predefiniti.
 | Tasto | Azione |
 |---|---|
 | `Tab` / `Shift+Tab` | Porta il focus sul pannello successivo / precedente |
-| `Ctrl+N`, poi un badge | Porta il focus su quella parte della finestra (vedi [Prefisso di navigazione](#prefisso-di-navigazione-ctrln)) |
+| `Ctrl+N`, poi un badge | Porta il focus su quella parte della finestra, oppure preme quel controllo del dialogo o del popup in primo piano (vedi [Prefisso di navigazione](#prefisso-di-navigazione-ctrln)) |
 | `j` / `k`, `Su` / `Giù` | Spostano la selezione, in ogni pannello |
 | `PageUp` / `PageDown`, `Home` / `End` | Si spostano di una pagina; vanno alla prima / ultima riga |
 | un numero, poi `j` / `k` / `Su` / `Giù` | Prefisso di conteggio: `4j` si sposta di quattro righe. Con `PageUp` / `PageDown` il conteggio è un numero di pagine. La barra di stato mostra il conteggio in sospeso (`4...`). `Esc` o qualsiasi altro tasto lo azzera. Uno `0` iniziale non avvia mai un conteggio |
@@ -1222,15 +1224,19 @@ l'evidenziazione:
 
 | Tasto | Azione |
 |---|---|
-| `Su` / `Giù`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Spostano di una riga |
+| `Su` / `Giù` | Spostano di una riga |
 | `Home` / `End` | Prima / ultima riga |
 | `PageUp` / `PageDown` | Spostano di una pagina visibile |
 | `Enter` | Sceglie la riga evidenziata |
 | `Esc` | Chiude |
 
-In questi popup, `Home`, `End` e `Ctrl+K` spostano l'elenco, non il cursore del
-campo di filtro. `Ctrl+A` e `Ctrl+E` spostano comunque il cursore all'inizio e
-alla fine. I semplici `j` e `k` vengono digitati nel filtro.
+In questi popup, `Home` e `End` spostano l'elenco, non il cursore del campo di
+filtro. `Ctrl+A` e `Ctrl+E` spostano comunque il cursore all'inizio e alla fine,
+e `Ctrl+K` cancella fino alla fine del filtro. Nessuna coppia `Ctrl+lettera`
+sposta un elenco (`Ctrl+N` è il prefisso di navigazione, `Ctrl+P` la palette dei
+comandi) e i semplici `j` e `k` vengono digitati nel filtro: qui spostano solo le
+frecce, `PageUp` / `PageDown` e `Home` / `End`. Negli elenchi senza campo di testo,
+`j` / `k` sono un modo in più per scendere / salire.
 
 Con il mouse:
 
@@ -1262,7 +1268,7 @@ apre sopra qualsiasi cosa, schermata Impostazioni compresa.
 | *(scrivi)* | Filtra: tiene solo le sezioni che contengono il testo. Anche `j`, `k` e `q` vengono digitati |
 | `Backspace`, `Ctrl+U` | Cancellano l'ultimo carattere / azzerano il filtro |
 | `Esc` | Azzera il filtro; se è vuoto, chiude l'aiuto |
-| `Su` / `Giù`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Scorrono di una riga |
+| `Su` / `Giù` | Scorrono di una riga |
 | `PageUp` / `PageDown`, `Home` / `End` | Scorrono di una pagina; vanno in cima / in fondo |
 | `Ctrl+D`, o un clic sul link | Apre questa documentazione su GitHub nel browser |
 

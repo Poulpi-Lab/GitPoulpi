@@ -119,6 +119,7 @@ pub(crate) mod edit_in {
         false
     }
     pub(crate) fn open(_target: Target) {}
+    pub(crate) fn open_from_menu(_target: Target) {}
     pub(crate) fn request_when_ready() {}
     pub(crate) fn on_key(_key: KeyEvent) -> Option<Pick> {
         None

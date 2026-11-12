@@ -194,6 +194,57 @@ fn a_working_tree_picture_is_edited_in_place_from_the_file_menu() {
     term.stop().unwrap();
 }
 
+/// The Edit in list opened from a menu row hangs beside that menu (never in
+/// the screen's corner), from a mouse click and from the keyboard alike.
+#[test]
+fn the_edit_in_list_hangs_beside_the_menu_it_was_opened_from() {
+    for keyboard in [false, true] {
+        let work = Work::new();
+        let repo = repo(true);
+        let session = format!("pty-image-edit-flyout-{keyboard}");
+        let (mut term, _config) = launch(repo.root(), &session, &work);
+        let (col, row) = term.wait_for_text("\u{25CC}", STEP).unwrap();
+        term.click(col, row).unwrap();
+        term.wait_for_text("\u{270E} pic.png", STEP)
+            .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+        common::right_click_text_until(&mut term, "\u{270E} pic.png", "the file menu", |s| {
+            s.contains("Edit in...")
+        });
+        let screen = term.screen();
+        let (menu_col, menu_row) = screen.find("Edit in...").unwrap();
+        if keyboard {
+            let band = |s: &xtask::pty::Screen| s.cell(menu_col + 1, menu_row).unwrap().bg;
+            let plain = band(&screen);
+            for _ in 0..30 {
+                if band(&term.screen()) != plain {
+                    break;
+                }
+                term.send_keys("Down").unwrap();
+                term.wait_for_stable(Duration::from_millis(80), STEP)
+                    .unwrap();
+            }
+            assert_ne!(band(&term.screen()), plain, "{}", term.text());
+            term.send_keys("Enter").unwrap();
+        } else {
+            term.click(menu_col + 1, menu_row).unwrap();
+        }
+        wait_popup(&term);
+        let screen = term.screen();
+        let (list_col, list_row) = screen.find("Fake editor").unwrap();
+        assert!(
+            // The menu may sit against the right edge, so the list goes to
+            // its left; either way on the activated row's line, not at the
+            // screen's top right corner.
+            (list_col > menu_col + "Edit in...".len() as u16 || list_col + 14 <= menu_col)
+                && (menu_row..=menu_row + 2).contains(&list_row),
+            "keyboard={keyboard}: menu at ({menu_col},{menu_row}), list at ({list_col},{list_row})\n{}",
+            term.text()
+        );
+        term.send_keys("Escape").unwrap();
+        term.stop().unwrap();
+    }
+}
+
 /// A committed picture in the File View: the header button lists the editors;
 /// the editor gets a read-only temp copy holding the blob, and the status line
 /// says so. Clicking away closes the list and reaches nothing under it.

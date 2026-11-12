@@ -221,7 +221,7 @@ pub(crate) fn apply_file_context_action(
         ),
         // The image editors list on the working-tree file; the editor saves in
         // place and the status refresh picks the change up.
-        FileContextAction::EditImageIn => crate::image_view::edit_in::open(
+        FileContextAction::EditImageIn => crate::image_view::edit_in::open_from_menu(
             crate::image_view::edit_in::Target::File(absolute.clone()),
         ),
         FileContextAction::OpenWith => {

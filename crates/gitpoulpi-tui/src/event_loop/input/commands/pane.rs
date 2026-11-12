@@ -642,7 +642,9 @@ pub(in crate::event_loop) fn apply_pane_action(
                 crate::image_view::edit_in::request_when_ready();
             }
             None => {
-                crate::image_view::edit_in::open(crate::image_view::edit_in::Target::File(absolute))
+                crate::image_view::edit_in::open_from_menu(
+                    crate::image_view::edit_in::Target::File(absolute),
+                )
             }
         },
         A::OpenWith => crate::open_with::popup::open_from_menu(crate::open_with::Subject {

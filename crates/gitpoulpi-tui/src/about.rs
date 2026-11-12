@@ -765,10 +765,12 @@ fn frame_state() -> (usize, f32, bool, f32) {
 }
 
 /// Which way the octopus looks at a pointer at `pointer` (a cell), seen from
-/// the logo `logo`: one of the eight directions, or (0, 0) when the pointer is
-/// unknown or on / right next to the logo. Cells are about twice as tall as
-/// wide, so vertical distances count double; an axis only counts when it is
-/// at least half of the other one (eight 45-degree-ish sectors).
+/// its eyes, which sit in the logo `logo` at `logo_colors::EYES` (the middle
+/// of the pair, as fractions of the logo's width and height): left of the
+/// eyes' column it looks left, right of it right, above their row up, below
+/// it down, and straight ahead on them (the cell or two the eyes cover). The
+/// two axes are independent, so a pointer up and to the left is (-1, -1).
+/// `(0, 0)` when the pointer is unknown.
 fn look_toward(pointer: Option<(u16, u16)>, logo: Rect) -> logo_colors::Look {
     let Some((px, py)) = pointer else {
         return (0, 0);
@@ -776,26 +778,15 @@ fn look_toward(pointer: Option<(u16, u16)>, logo: Rect) -> logo_colors::Look {
     if logo.width == 0 || logo.height == 0 {
         return (0, 0);
     }
-    let near = Rect::new(
-        logo.x.saturating_sub(2),
-        logo.y.saturating_sub(1),
-        logo.width + 4,
-        logo.height + 2,
-    );
-    if near.contains((px, py).into()) {
-        return (0, 0);
-    }
-    let dx = i32::from(px) * 2 + 1 - (i32::from(logo.x) * 2 + i32::from(logo.width));
-    let dy = (i32::from(py) * 2 + 1 - (i32::from(logo.y) * 2 + i32::from(logo.height))) * 2;
-    let (ax, ay) = (dx.abs(), dy.abs());
-    let step = |d: i32, own: i32, other: i32| {
-        if own * 2 >= other {
-            d.signum() as i8
-        } else {
-            0
-        }
-    };
-    (step(dx, ax, ay), step(dy, ay, ax))
+    // Everything in half cells: a cell's middle is `2 * n + 1`.
+    let (fx, fy) = logo_colors::EYES;
+    let ex = i32::from(logo.x) * 2 + (f32::from(logo.width) * 2.0 * fx).round() as i32;
+    let ey = i32::from(logo.y) * 2 + (f32::from(logo.height) * 2.0 * fy).round() as i32;
+    let step = |d: i32| if d.abs() <= 1 { 0 } else { d.signum() as i8 };
+    (
+        step(i32::from(px) * 2 + 1 - ex),
+        step(i32::from(py) * 2 + 1 - ey),
+    )
 }
 
 /// The window moves (its size follows its text).
@@ -1285,19 +1276,27 @@ mod build_crates;
 mod tests {
     use super::*;
 
+    /// The reference is the eyes (half-way across the logo, 6/16 down), not
+    /// the logo's edge: a pointer just beside the eyes, still over the logo,
+    /// already looks that way.
     #[test]
-    fn the_eyes_follow_the_pointer_quadrant() {
+    fn the_eyes_follow_the_pointer_from_their_own_position() {
+        // A 16 x 8 logo at (40, 10): the eyes' cell columns are 47 / 48 and
+        // their rows 12 / 13.
         let logo = Rect::new(40, 10, 16, 8);
         let at = |x, y| look_toward(Some((x, y)), logo);
+        assert_eq!(at(47, 12), (0, 0), "on the eyes");
+        assert_eq!(at(48, 13), (0, 0), "on the eyes");
+        assert_eq!(at(44, 12), (-1, 0), "left of the eyes, over the logo");
+        assert_eq!(at(52, 12), (1, 0), "right of the eyes, over the logo");
+        assert_eq!(at(47, 10), (0, -1), "above the eyes, over the logo");
+        assert_eq!(at(47, 16), (0, 1), "below the eyes, over the logo");
         assert_eq!(at(5, 2), (-1, -1), "top left");
         assert_eq!(at(80, 2), (1, -1), "top right");
         assert_eq!(at(5, 40), (-1, 1), "bottom left");
         assert_eq!(at(80, 36), (1, 1), "bottom right");
-        assert_eq!(at(5, 14), (-1, 0), "left");
-        assert_eq!(at(120, 14), (1, 0), "right");
-        assert_eq!(at(48, 1), (0, -1), "above");
-        assert_eq!(at(48, 45), (0, 1), "below");
-        assert_eq!(at(48, 14), (0, 0), "on the logo");
+        assert_eq!(at(5, 12), (-1, 0), "far left, on the eyes' row");
+        assert_eq!(at(120, 13), (1, 0), "far right, on the eyes' row");
         assert_eq!(look_toward(None, logo), (0, 0), "no pointer yet");
     }
 

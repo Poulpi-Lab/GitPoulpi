@@ -61,6 +61,11 @@ static POPUP: Mutex<Option<Combo>> = Mutex::new(None);
 static TARGET: Mutex<Option<Target>> = Mutex::new(None);
 /// Where the popup hangs from: the button as painted last.
 static ANCHOR: Mutex<Option<Rect>> = Mutex::new(None);
+/// The context-menu row that opened the list: it hangs beside it like a
+/// submenu. `None` from the button, a key or the palette.
+static PARENT: Mutex<Option<(Rect, u16)>> = Mutex::new(None);
+/// The menu row of a request waiting for its picture ([`request_when_ready`]).
+static PENDING_PARENT: Mutex<Option<(Rect, u16)>> = Mutex::new(None);
 static LAST_USED: AtomicUsize = AtomicUsize::new(NONE);
 /// A menu asked for the list as soon as its picture is loaded.
 static PENDING: Mutex<Option<Instant>> = Mutex::new(None);
@@ -147,12 +152,27 @@ fn options(labels: &[String], default: usize, waiting: bool) -> Vec<ComboOption>
 /// default).
 pub(crate) fn open(target: Target) {
     let name = name_of(&target);
-    open_for(target, name);
+    open_with_parent(target, name, None);
+}
+
+/// [`open`] as the continuation of the context-menu row just activated (mouse
+/// or keyboard): beside that menu, clamped to the screen.
+pub(crate) fn open_from_menu(target: Target) {
+    let name = name_of(&target);
+    open_with_parent(target, name, crate::context_menu::activated_row());
 }
 
 /// [`open`] for a picture whose file name the caller knows (the pane opens it
 /// from inside its own paint, with its state borrowed).
 pub(super) fn open_for(target: Target, name: String) {
+    let parent = PENDING_PARENT.lock().ok().and_then(|mut p| p.take());
+    open_with_parent(target, name, parent);
+}
+
+fn open_with_parent(target: Target, name: String, parent: Option<(Rect, u16)>) {
+    if let Ok(mut p) = PARENT.lock() {
+        *p = parent;
+    }
     let waiting = !name.is_empty() && crate::open_with::ready(&name).is_none();
     let labels = crate::image_editor::entries_for(&name);
     let default = crate::image_editor::default_index_for(&name);
@@ -178,6 +198,9 @@ pub(super) fn open_for(target: Target, name: String) {
 /// A context menu asked for the list on the picture it is about to open: the
 /// pane opens it once that picture is ready.
 pub(crate) fn request_when_ready() {
+    if let Ok(mut p) = PENDING_PARENT.lock() {
+        *p = crate::context_menu::activated_row();
+    }
     if let Ok(mut p) = PENDING.lock() {
         *p = Some(Instant::now());
     }
@@ -281,6 +304,7 @@ pub(crate) fn render_popup(
         }
     }
     combo.set_anchor(anchor);
+    combo.set_flyout(PARENT.lock().ok().and_then(|p| *p));
     combo.set_hover(hovered_row);
     combo.render_popup(frame.buffer_mut(), bounds);
     let mut front: Vec<(Rect, HitTarget)> = combo
@@ -298,7 +322,10 @@ pub(crate) fn render_popup(
 /// The file the current target stands for, and a notice when it is a copy.
 fn resolve(target: &Target, repo_root: &Path) -> Result<(PathBuf, Option<String>), String> {
     match target {
-        Target::File(path) => Ok((path.clone(), None)),
+        Target::File(path) => match crate::open_with::pointer_notice(path) {
+            Some(notice) => Err(notice),
+            None => Ok((path.clone(), None)),
+        },
         // The Diff view's pictures when it shows them, else the File View's.
         Target::Pane if super::split::active() => super::split::edit_file(repo_root),
         Target::Pane => super::pane::edit_file(repo_root),

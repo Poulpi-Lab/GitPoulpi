@@ -174,11 +174,11 @@ A binary file (a PDF, a Word document, a spreadsheet, an archive...) has no text
 
 The working-tree file is handed to the application as it is. A commit's (or the index's) version is written to a **read-only temp copy**, with a notice in the status line, so an application cannot change the repository. Neither changes the repository: no journal entry, Undo is unaffected.
 
-The menu's list opens beside the menu, level with the **Open with...** row, like a submenu (on the left when there is no room on the right), from the mouse and from the keyboard alike.
+The menu's list opens beside the menu, level with the **Open with...** row, like a submenu (on the left when there is no room on the right), from the mouse and from the keyboard alike. The picture editors list (**Edit in...**) opened from a file menu does the same.
 
 ### Git LFS files
 
-The Git LFS object card (see [Git LFS](lfs.md)) carries the same two actions under its text: **Open in default program** and **Open in**, with the same keys (`o`, `Shift+O`) and palette rows. They open the real file, never the pointer: the working-tree file as it is, or a read-only temp copy of the object from the local LFS store for a commit's or the index's version. An object that is not downloaded yet has no buttons on the card, and the status line says the content is not downloaded yet. Opening is read-only: no journal entry, nothing to undo.
+The Git LFS object card (see [Git LFS](lfs.md)) carries the same two actions under its text: **Open in default program** and **Open in**, with the same keys (`o`, `Shift+O`) and palette rows. They open the real file, never the pointer: the working-tree file as it is, or a read-only temp copy of the object from the local LFS store for a commit's or the index's version. An object that is not downloaded yet has no buttons on the card, and the status line says the content is not downloaded yet. The same refusal applies to a working-tree file that still holds only the pointer: **Open in default program**, **Open in** and **Edit in**, from the card or any file menu, say the content is not downloaded instead of opening the pointer text (download it with the LFS toolbar's pull or checkout rows, then retry). Opening is read-only: no journal entry, nothing to undo.
 
 ### Browsers on Windows
 

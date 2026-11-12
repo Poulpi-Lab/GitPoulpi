@@ -234,6 +234,7 @@ mod terminal_image;
 mod terminology;
 mod text_edit;
 mod text_field;
+mod text_history;
 mod text_select;
 #[cfg(feature = "worktree")]
 mod worktree_dialog;

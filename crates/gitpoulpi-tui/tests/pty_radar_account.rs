@@ -270,3 +270,35 @@ fn unticking_not_cloned_by_mouse_with_a_far_row_selected_does_not_crash() {
     );
     assert!(!s.term.exited(), "the TUI is still running");
 }
+
+/// How many times the host was asked for the review-requested list.
+fn review_asks(mock: &MockHost) -> usize {
+    mock.requests()
+        .iter()
+        .filter(|r| r.target.contains("search/issues") && r.target.contains("review-requested"))
+        .count()
+}
+
+/// F5 is the window's refresh key: in the Radar it asks every source again,
+/// the account-wide list included although its answer is young (the cache
+/// would otherwise serve it for five minutes).
+#[test]
+fn f5_in_the_radar_asks_the_host_again() {
+    let mut s = setup(
+        "pty-radar-account-f5",
+        "\n[integrations.radar]\nreview_requests = true\n",
+    );
+    open_radar(&mut s.term);
+    s.term
+        .wait_for("the account rows", STARTUP, rows_ready)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let before = review_asks(&s._mock);
+    assert!(before >= 1, "the first round asked the host");
+    s.term.send_keys("F5").expect("F5");
+    let mock = &s._mock;
+    s.term
+        .wait_for("the list asked again", STEP, |screen| {
+            review_asks(mock) > before && screen.contains("Harden the token build")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+}

@@ -2052,7 +2052,7 @@ err_host = "Wpisz poprawną domenę hosta, np. gitlab.example.com"
 err_token = "Najpierw wklej osobisty token dostępu"
 check_ended = "sprawdzanie połączenia zakończyło się nieoczekiwanie"
 connected_to = "połączono z {host} jako @{login}"
-connected_session_only = "{message} - the token could not be saved in the OS credential store ({error}); it is kept for this session only"
+connected_session_only = "{message} - nie udało się zapisać tokenu w systemowym magazynie poświadczeń ({error}); token jest przechowywany tylko na czas tej sesji"
 disconnected = "rozłączono {id}; profil zachowany"
 token_not_removed = "nie usunięto tokenu: {error}"
 removed = "usunięto {id}"
@@ -2485,7 +2485,7 @@ git_prefix_lfs_push_all = { git = "LFS: Push wszystkich obiektów", local = "LFS
 git_prefix_lfs_prune = "LFS: Wyczyść lokalne obiekty"
 composer_insert_issue_ref = "Wstaw odwołanie do zgłoszenia"
 palette_configure_shortcut = "Paleta: ustaw skrót zaznaczonego polecenia"
-palette_arrange = "Okno podręczne: przesuń lub zmień rozmiar palety albo selektora na wierzchu"
+palette_arrange = "Okno: Przesuń lub zmień rozmiar okna na wierzchu"
 global_undo_history = "Otwórz historię cofania"
 global_undo_offer = "Przywróć gałąź tam, gdzie zostawiła ją zablokowana akcja"
 global_radar = "Otwórz Radar"
@@ -5578,9 +5578,9 @@ reading = "odczyt {name}, aby otworzyć kopię..."
 read_failed = "nie można odczytać {name}: {why}"
 too_large = "{name} jest zbyt duży, aby przekazać kopię ({size})"
 # context: button on the Git LFS object card (Diff view, File View) beside the Open in list; opens the real file, never the pointer. Width budget: 26 cells
-default_button = "Open in default program"
+default_button = "Otwórz w domyślnym"
 # context: status message; {name} is an LFS file whose real content is not in the local LFS store, so there is nothing to open yet
-lfs_missing = "{name} is an LFS file whose content is not downloaded yet, so there is nothing to open"
+lfs_missing = "{name} to plik LFS, którego zawartość nie została jeszcze pobrana, więc nie ma czego otworzyć"
 
 # Settings > Integrations, the per-kind fields (integrations_page/*): Azure DevOps, Bitbucket, Jira, Trello.
 [integrations_page]

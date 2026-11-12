@@ -163,8 +163,43 @@ pub(crate) fn reset_pointer<W: Write>(w: &mut W) {
     }
 }
 
+/// mintty reads `OSC 22` too, but only its own list of Windows cursor names
+/// (`hand`, `ibeam`, `sizewe`, ...); a CSS name such as `pointer` falls back to
+/// the arrow there (measured on mintty 3.8.3, November 2026, and in its
+/// `set_cursor_style`). It has no open hand for a carried ref: the move cross
+/// is the nearest.
+fn mintty_name(shape: CursorShape) -> Option<&'static str> {
+    match shape {
+        CursorShape::Default => None,
+        CursorShape::Pointer => Some("hand"),
+        CursorShape::ColResize => Some("sizewe"),
+        CursorShape::RowResize => Some("sizens"),
+        CursorShape::Grab | CursorShape::Move => Some("sizeall"),
+        CursorShape::NwseResize => Some("sizenwse"),
+        CursorShape::NeswResize => Some("sizenesw"),
+        CursorShape::Text => Some("ibeam"),
+    }
+}
+
+/// Whether the terminal is mintty, told from its own `TERM_PROGRAM`.
+fn is_mintty() -> bool {
+    static MINTTY: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *MINTTY.get_or_init(|| {
+        std::env::var("TERM_PROGRAM").is_ok_and(|p| p.eq_ignore_ascii_case("mintty"))
+    })
+}
+
 fn write_osc<W: Write>(w: &mut W, shape: CursorShape) -> std::io::Result<()> {
-    match shape.css_name() {
+    write_osc_for(w, shape, is_mintty())
+}
+
+fn write_osc_for<W: Write>(w: &mut W, shape: CursorShape, mintty: bool) -> std::io::Result<()> {
+    let name = if mintty {
+        mintty_name(shape)
+    } else {
+        shape.css_name()
+    };
+    match name {
         Some(name) => write!(w, "\u{1b}]22;{name}\u{1b}\\"),
         None => write!(w, "\u{1b}]22;\u{1b}\\"),
     }?;
@@ -222,6 +257,32 @@ mod tests {
         let mut last = CursorShape::Default;
         assert!(emit_on_change(&mut quiet, &mut last, CursorShape::ColResize, false).unwrap());
         assert!(quiet.is_empty());
+    }
+
+    /// mintty drops CSS names (they read as the arrow there), so it gets its
+    /// own Windows cursor names; every other terminal keeps the CSS ones.
+    #[test]
+    fn mintty_gets_its_own_cursor_names_and_others_keep_css() {
+        let mut m = Vec::new();
+        write_osc_for(&mut m, CursorShape::Pointer, true).unwrap();
+        assert_eq!(m, b"\x1b]22;hand\x1b\\");
+        let mut m = Vec::new();
+        write_osc_for(&mut m, CursorShape::Default, true).unwrap();
+        assert_eq!(m, b"\x1b]22;\x1b\\");
+        let mut o = Vec::new();
+        write_osc_for(&mut o, CursorShape::Pointer, false).unwrap();
+        assert_eq!(o, b"\x1b]22;pointer\x1b\\");
+        for shape in [
+            CursorShape::ColResize,
+            CursorShape::RowResize,
+            CursorShape::Grab,
+            CursorShape::Move,
+            CursorShape::NwseResize,
+            CursorShape::NeswResize,
+            CursorShape::Text,
+        ] {
+            assert!(mintty_name(shape).is_some());
+        }
     }
 
     #[test]

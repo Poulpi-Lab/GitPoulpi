@@ -863,6 +863,15 @@ pub(in crate::event_loop) fn draw_overlay_menus(
     }
     crate::jobs_ui::render_panel(frame);
     crate::updates::panel::render(frame);
+    // `Ctrl+N` over a framed dialog or popup that badges nothing of its own:
+    // a badge on each of its controls, painted over everything.
+    if crate::dialog_kit::frame::armed() {
+        let pairs: Vec<(Rect, FocusTarget)> = crate::dialog_kit::frame::top_badges()
+            .into_iter()
+            .map(|(rect, (col, row))| (rect, FocusTarget::Dialog(col, row)))
+            .collect();
+        *ctx.nav_badge_targets = badge_pairs(frame, &pairs);
+    }
     *ctx.help_popup_inner_height = help_popup_inner_height;
     *ctx.help_scroll = help_scroll;
     *ctx.ref_popup_rect = ref_popup_rect;

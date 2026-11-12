@@ -272,6 +272,7 @@ pub(crate) fn render_command_palette(
     // the width).
     let cross = crate::chrome::paint_popup_cross(frame.buffer_mut(), popup);
     WIN.decorate(frame.buffer_mut(), popup, cross, true);
+    crate::dialog_kit::frame::offer_list_popup(input_area, list_area);
 }
 
 #[cfg(test)]

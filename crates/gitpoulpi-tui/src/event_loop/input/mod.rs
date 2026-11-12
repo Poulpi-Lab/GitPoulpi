@@ -196,28 +196,58 @@ fn handle_key_inner(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) ->
     keys_normal_nav::handle(cx, env, key)
 }
 
-/// The keyboard twin of the dialogs' move and resize (`dialog_kit::frame`):
-/// the arrange mode takes every key; over a framed dialog that offers no
-/// badges of its own, `Ctrl+N` arms the prefix and `m` starts the mode.
+/// The keyboard twin of the dialogs' move and resize (`dialog_kit::frame`) and
+/// the `Ctrl+N` badges of every framed dialog and popup that offers none of
+/// its own: `Ctrl+N` shows a badge on each control (`frame::top_badges`), the
+/// key after it presses that control (a left click on it), `m` starts the
+/// arrange mode and anything else cancels. `Alt+G` (`palette.arrange`)
+/// arranges the dialog in front directly, on every one of them.
 fn dialog_frame_key(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> Option<Flow> {
+    use crate::chrome::NavigationAction;
     use crate::dialog_kit::frame;
     if frame::on_key(key) {
         return Some(Flow::Handled);
     }
-    // The palette and the pickers take `Ctrl+N` as "down": their own key.
-    if frame::top_is_popup() && env.km.is(Bind::PaletteArrange, &key) {
+    if frame::any_live() && env.km.is(Bind::PaletteArrange, &key) && frame::arrange_top() {
         *cx.last_message = Some(gitpoulpi_i18n::msg::dialog_frame::ARRANGING.get().into());
-        frame::arrange_top();
         return Some(Flow::Handled);
     }
-    if frame::take_prefix() {
-        let action = crate::chrome::navigation_key_action_mods(key.code, key.modifiers);
-        if action == crate::chrome::NavigationAction::ArrangeDialog {
-            *cx.last_message = Some(gitpoulpi_i18n::msg::dialog_frame::ARRANGING.get().into());
-            frame::arrange_top();
-            return Some(Flow::Handled);
+    if frame::armed() {
+        frame::disarm();
+        match crate::chrome::navigation_key_action_mods(key.code, key.modifiers) {
+            NavigationAction::ArrangeDialog => {
+                *cx.last_message = Some(gitpoulpi_i18n::msg::dialog_frame::ARRANGING.get().into());
+                frame::arrange_top();
+            }
+            NavigationAction::FocusByBadge(c) => {
+                let cell = cx
+                    .nav_badge_targets
+                    .iter()
+                    .find_map(|(badge, target)| match target {
+                        FocusTarget::Dialog(col, row) if *badge == c => Some((*col, *row)),
+                        _ => None,
+                    });
+                match cell {
+                    Some((column, row)) => frame::inject_click(column, row),
+                    None => {
+                        *cx.last_message =
+                            Some(gitpoulpi_i18n::msg::input::NAVIGATION_CANCELED.get().into())
+                    }
+                }
+            }
+            _ => *cx.last_message = Some(gitpoulpi_i18n::msg::input::CANCELED.get().into()),
         }
-        if key.code == KeyCode::Esc {
+        return Some(Flow::Handled);
+    }
+    if !env.km.is(Bind::GlobalNavPrefix, &key) || !frame::any_live() {
+        return None;
+    }
+    // The palette and the pickers have no other use for the key: `Ctrl+N`
+    // badges them like any dialog. Their mode is not Normal while they live
+    // (the registry still names a closed one until the next paint).
+    if frame::top_is_popup() {
+        if !matches!(*cx.input_mode, InputMode::Normal) || *cx.show_help {
+            frame::arm_prefix();
             return Some(Flow::Handled);
         }
         return None;
@@ -229,21 +259,13 @@ fn dialog_frame_key(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) ->
     // page while they badge their controls (a flag on the form, read in
     // `keys_modes`, where `m` starts the arrange mode too). A dialog the
     // rewrite page opened (a question, purge, the AI dialogs...) badges
-    // nothing, so there `Ctrl+N` is the frame's prefix.
+    // nothing of its own, so there the frame's badges are `Ctrl+N`.
     let plain_mode = match &*cx.input_mode {
         InputMode::Normal | InputMode::Confirm { .. } | InputMode::Guide(_) => true,
         InputMode::Rewrite(view) => !view.badge_ready(),
         _ => false,
     };
-    // A popup of the list family never lives in these modes: the registry
-    // still names it until the next paint after it closed.
-    if frame::any_live()
-        && !frame::top_is_popup()
-        && plain_mode
-        && !own_badges
-        && !frame::top_is("review_choice")
-        && env.km.is(Bind::GlobalNavPrefix, &key)
-    {
+    if plain_mode && !own_badges && !frame::top_is("review_choice") {
         frame::arm_prefix();
         return Some(Flow::Handled);
     }

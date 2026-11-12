@@ -170,5 +170,6 @@ pub(crate) fn render(
     );
     let cross = crate::chrome::paint_popup_cross(frame.buffer_mut(), popup);
     win.decorate(frame.buffer_mut(), popup, cross, true);
+    crate::dialog_kit::frame::offer_list_popup(input_area, list_area);
     popup_rects
 }

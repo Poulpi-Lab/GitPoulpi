@@ -992,11 +992,16 @@ mod tests {
         let bounds = Rect::new(0, 0, 40, 30);
         let (mut c, _buf) = open_long(100, bounds);
         let ctrl = |ch: char| KeyEvent::new(KeyCode::Char(ch), KeyModifiers::CONTROL);
-        c.on_key(ctrl('j'));
-        c.on_key(ctrl('n'));
+        c.on_key(key(KeyCode::Down));
+        c.on_key(key(KeyCode::Down));
         assert_eq!(c.cursor, 2);
-        c.on_key(ctrl('k'));
-        c.on_key(ctrl('p'));
+        // No `Ctrl+letter` pair moves a list.
+        for ch in ['n', 'p', 'j'] {
+            c.on_key(ctrl(ch));
+        }
+        assert_eq!(c.cursor, 2);
+        c.on_key(key(KeyCode::Up));
+        c.on_key(key(KeyCode::Up));
         assert_eq!(c.cursor, 0);
         c.on_key(key(KeyCode::End));
         assert_eq!(c.cursor, 99);

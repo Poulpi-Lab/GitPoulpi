@@ -136,7 +136,7 @@ fn tab_cells(width: usize) -> Vec<(usize, String)> {
 /// Paints the popup. `scroll` is clamped to the content and `inner_height`
 /// receives the visible body rows (the `PgUp`/`PgDn` step).
 pub(crate) fn render(frame: &mut Frame, filter: &str, scroll: &mut u16, inner_height: &mut u16) {
-    let popup = centered_rect(70, 80, frame.area());
+    let popup = WIN.place(frame.area(), centered_rect(70, 80, frame.area()));
     frame.render_clipped(Clear, popup);
     let [input_area, tabs_area, body_area, hint_area] = Layout::vertical([
         Constraint::Length(3),
@@ -280,7 +280,16 @@ pub(crate) fn render(frame: &mut Frame, filter: &str, scroll: &mut u16, inner_he
     });
     let cross = crate::chrome::close_cross::paint(frame.buffer_mut(), input_area, over_cross);
     RECTS.set(Some(Rects { popup, link, cross }));
+    // Movable and resizable like the other popups; `Ctrl+N` badges the filter
+    // box, the tabs, the first body row and the docs link.
+    WIN.decorate(frame.buffer_mut(), popup, cross, true);
+    crate::dialog_kit::frame::offer_list_popup(input_area, body_area);
+    crate::dialog_kit::frame::offer(&TAB_RECTS.with_borrow(Clone::clone));
+    crate::dialog_kit::frame::offer(&[link]);
 }
+
+/// The help overlay moves and resizes: the body takes the rows.
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("help", 40, 10);
 
 /// Forgets the rects once the popup is closed (a stale one is a click on a
 /// popup that is no longer there).

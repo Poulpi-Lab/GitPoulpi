@@ -3,7 +3,9 @@
 //! command palette, the tab / theme / language pickers), the scroll window,
 //! the scrollbar and the click semantics ([`View`]).
 //!
-//! Keys: `Up`/`Down`, `Ctrl+P`/`Ctrl+N` and `Ctrl+K`/`Ctrl+J` move one row;
+//! Keys: `Up`/`Down` move one row (never a `Ctrl+letter` pair: `Ctrl+N` is the
+//! navigation prefix and `Ctrl+P` the command palette everywhere, and a filter
+//! field owns the letters, `Ctrl+K` included);
 //! `Home`/`End` jump to the first/last row; `PageUp`/`PageDown` move one
 //! visible page. These win over the filter field's own caret keys (`Home`,
 //! `End`, `Ctrl+K` kill-to-end): the filter is a short query, and the list is
@@ -29,15 +31,12 @@ pub(crate) fn nav(key: &KeyEvent, selected: usize, len: usize, page: usize) -> O
     if key.kind == KeyEventKind::Release {
         return None;
     }
-    let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
     let alt = key.modifiers.contains(KeyModifiers::ALT);
     let last = len.saturating_sub(1);
     let page = page.saturating_sub(1).max(1);
     let to = match key.code {
         KeyCode::Up if !alt => selected.saturating_sub(1),
         KeyCode::Down if !alt => selected + 1,
-        KeyCode::Char('p' | 'k') if ctrl && !alt => selected.saturating_sub(1),
-        KeyCode::Char('n' | 'j') if ctrl && !alt => selected + 1,
         KeyCode::Home if !alt => 0,
         KeyCode::End if !alt => last,
         KeyCode::PageUp if !alt => selected.saturating_sub(page),
@@ -268,11 +267,13 @@ mod tests {
         let none = KeyModifiers::NONE;
         let ctrl = KeyModifiers::CONTROL;
         assert_eq!(nav(&k(KeyCode::Down, none), 2, 10, 5), Some(3));
-        assert_eq!(nav(&k(KeyCode::Char('n'), ctrl), 2, 10, 5), Some(3));
-        assert_eq!(nav(&k(KeyCode::Char('j'), ctrl), 2, 10, 5), Some(3));
+        // No `Ctrl+letter` pair moves a list: `Ctrl+N` / `Ctrl+P` are the
+        // navigation prefix and the palette, the letters belong to the filter.
+        assert_eq!(nav(&k(KeyCode::Char('n'), ctrl), 2, 10, 5), None);
+        assert_eq!(nav(&k(KeyCode::Char('p'), ctrl), 2, 10, 5), None);
+        assert_eq!(nav(&k(KeyCode::Char('j'), ctrl), 2, 10, 5), None);
         assert_eq!(nav(&k(KeyCode::Up, none), 2, 10, 5), Some(1));
-        assert_eq!(nav(&k(KeyCode::Char('p'), ctrl), 2, 10, 5), Some(1));
-        assert_eq!(nav(&k(KeyCode::Char('k'), ctrl), 2, 10, 5), Some(1));
+        assert_eq!(nav(&k(KeyCode::Char('k'), ctrl), 2, 10, 5), None);
         assert_eq!(nav(&k(KeyCode::Home, none), 7, 10, 5), Some(0));
         assert_eq!(nav(&k(KeyCode::End, none), 2, 10, 5), Some(9));
         assert_eq!(nav(&k(KeyCode::PageDown, none), 2, 10, 5), Some(6));

@@ -23,8 +23,6 @@ const FIXED_KEYS: &[&str] = &[
     "Ctrl+Home/End",
     "Ctrl+Left",
     "Ctrl+Right",
-    // List navigation in the palette / tab picker.
-    "Ctrl+P/Ctrl+N",
     // Mouse chords and focus cycling.
     "Ctrl+click",
     "Shift+click",

@@ -131,6 +131,29 @@ pub(crate) fn over(
     }
 }
 
+/// How many rects are registered so far: a surface notes it as it starts to
+/// paint, and [`controls_since`] then names what it registered itself.
+pub(crate) fn mark() -> usize {
+    with(|m| m.len())
+}
+
+/// The controls (hands and fields) registered since `mark` that lie inside
+/// `area` and are not covered by anything painted after them.
+pub(crate) fn controls_since(mark: usize, area: Rect) -> Vec<Rect> {
+    with(|m| {
+        let top = |p: Position| m.iter().rev().find(|(r, _)| r.contains(p)).map(|(_, k)| *k);
+        m.iter()
+            .skip(mark)
+            .filter(|(r, k)| {
+                matches!(k, Kind::Hand | Kind::Field)
+                    && area.intersection(*r) == *r
+                    && top(Position::new(r.x, r.y)) == Some(*k)
+            })
+            .map(|(r, _)| *r)
+            .collect()
+    })
+}
+
 /// What the topmost registered rect at the point is, if any.
 pub(crate) fn at(col: u16, row: u16) -> Option<Kind> {
     let p = Position::new(col, row);

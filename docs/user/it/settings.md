@@ -240,17 +240,6 @@ collegamento sul desktop**, **Launcher: Rimuovi collegamenti**, **Launcher: Crea
 status|install|remove [--where launcher|desktop|startmenu]` fa lo
 stesso da uno script.
 
-### Prevenzione dei conflitti
-
-La parte globale del rilevamento proattivo dei conflitti (`gitpoulpi ui show settings conflict-prevention-global`); la pagina propria di un repository è
-[Specifico del repository: Prevenzione dei conflitti](#specifico-del-repository-prevenzione-dei-conflitti). La voce di palette **Conflitti: Modifica le liste dei branch base...** apre questa pagina.
-
-| Opzione | Cosa fa |
-|---|---|
-| **Attiva il rilevamento proattivo dei conflitti** | Attivo di base (`general.conflict_detection`). Avvisa nel Log quando il merge del branch corrente nel branch da cui è partito andrebbe in conflitto, prima che tu lo provi. Un repository può disattivarlo per sé nella sua pagina **Prevenzione dei conflitti**. Vedi [Risolvere i conflitti di merge](merge-conflicts.md#prevenzione-dei-conflitti). Si applica alla chiusura delle Impostazioni. |
-| **Branch base predefiniti** | Sotto l'interruttore. La lista di pattern dei branch base che i repository usano quando non ne hanno una propria: **Predefinita (`**`)**, cioè ogni branch, oppure una delle tue liste con nome (`conflict_prevention.default_list`). Si applica ai repository aperti alla chiusura delle Impostazioni. **Ripristina il valore predefinito** torna a `**`. |
-| **Liste dei branch base** | Anch'esse in questa pagina: le tue liste con nome di pattern dei branch base (`[conflict_prevention.lists.<nome>]`), un blocco ciascuna con il suo **Nome** (rinominare una lista la mantiene come predefinita, se lo era; un repository che seguiva il vecchio nome usa la lista predefinita finché non scegli di nuovo la lista rinominata), i suoi **Pattern** (uno per riga, `Enter` o un clic apre l'editor, `Ctrl+S` lo conserva), **Rendi predefinita** ed **Elimina lista** (chiede prima, e avverte che i repository che la seguono useranno invece la lista predefinita). Scrivi un nome in **Nuova lista** e premi `Enter` per aggiungerne una; parte con `**`. Modificare una lista cambia ogni repository che la segue. |
-
 ### Sincronizzazione
 
 Come GitPoulpi tiene allineato un repository ai suoi remoti, e cosa fa nel
@@ -430,6 +419,38 @@ build che includono il server; vedi [MCP e agenti](mcp-and-agents.md).
 
 ![Il menu Tema colori del grafo: Segui il tema, poi ogni tavolozza di corsie con alcuni suoi colori](../images/settings-log-graph-lanes.png)
 
+### Tastiera e mouse
+
+![La pagina Tastiera e mouse: ogni azione per contesto con i suoi tasti, una casella di ricerca e dei filtri](../images/settings-keyboard.png)
+
+**Impostazioni > Tastiera e mouse** ha due schede (clic, oppure `Alt+Left` / `Alt+Right`).
+**Generali** contiene il protocollo della tastiera e le impostazioni del mouse; **Scorciatoie da tastiera**
+elenca ogni scorciatoia per contesto, con una casella di ricerca (`/`) e dei filtri. Su una riga:
+
+| Tasto | Azione |
+|---|---|
+| `Enter` o doppio clic | Cattura un nuovo tasto. Conflitti e avvisi del terminale compaiono mentre lo premi. |
+| `a` | Aggiunge un tasto alternativo. |
+| `u` | Disassegna l'azione. |
+| `r` | Riporta la riga al suo valore predefinito. |
+| `R` | Reimposta ogni scorciatoia, dopo una conferma. |
+| `c` o un clic sul `!` della riga | Mostra l'azione con tutte le azioni con cui il suo tasto va in conflitto; `Esc` le mostra di nuovo tutte. Un tasto in conflitto con quello di un'altra azione è rosso, un avviso sul solo tasto (il terminale non può inviarlo) arancione. |
+
+Usala per risolvere i conflitti con tmux, AutoHotkey, herdr o il tuo terminale. Le
+stesse impostazioni stanno nella tabella `[keybindings]` di `config.toml`; vedi il
+[riferimento della configurazione](config-reference.md#keybindings) e
+[Scorciatoie da tastiera](keybindings.md).
+
+![La pagina Tastiera e mouse dopo aver premuto c su Quit: il tasto q è rosso sia su Quit sia su Stage or Unstage the Selected Row, le due azioni in conflitto](../images/settings-keyboard-conflicts.png)
+
+Tre opzioni si trovano nella scheda **Generali**.
+
+| Opzione | Cosa fa |
+|---|---|
+| **Protocollo tastiera Kitty** | **auto** chiede al terminale il protocollo tastiera di kitty, così arrivano `Ctrl+,`, `Ctrl+Enter` e `Ctrl+Shift+N`. **off** non lo chiede mai; usalo se un terminale si comporta male. Richiede un riavvio. |
+| **Mouse attivo** | Disattivato lascia il mouse e la selezione del testo al tuo terminale. Richiede un riavvio. |
+| **Righe della rotella del mouse** | Di quante righe si sposta uno scatto della rotella nel Log. Richiede un riavvio. |
+
 ### Log e grafo
 
 Come viene disegnato il grafo dei commit e quanti commit carica il Log. I colori
@@ -519,37 +540,16 @@ i valori rilevati** reimposta l'elenco. Finché non lo modifichi,
 l'elenco contiene gli editor installati su questa macchina e l'app predefinita del
 sistema. Ogni modifica si applica subito.
 
-### Tastiera e mouse
+### Prevenzione dei conflitti
 
-![La pagina Tastiera e mouse: ogni azione per contesto con i suoi tasti, una casella di ricerca e dei filtri](../images/settings-keyboard.png)
-
-**Impostazioni > Tastiera e mouse** ha due schede (clic, oppure `Alt+Left` / `Alt+Right`).
-**Generali** contiene il protocollo della tastiera e le impostazioni del mouse; **Scorciatoie da tastiera**
-elenca ogni scorciatoia per contesto, con una casella di ricerca (`/`) e dei filtri. Su una riga:
-
-| Tasto | Azione |
-|---|---|
-| `Enter` o doppio clic | Cattura un nuovo tasto. Conflitti e avvisi del terminale compaiono mentre lo premi. |
-| `a` | Aggiunge un tasto alternativo. |
-| `u` | Disassegna l'azione. |
-| `r` | Riporta la riga al suo valore predefinito. |
-| `R` | Reimposta ogni scorciatoia, dopo una conferma. |
-| `c` o un clic sul `!` della riga | Mostra l'azione con tutte le azioni con cui il suo tasto va in conflitto; `Esc` le mostra di nuovo tutte. Un tasto in conflitto con quello di un'altra azione è rosso, un avviso sul solo tasto (il terminale non può inviarlo) arancione. |
-
-Usala per risolvere i conflitti con tmux, AutoHotkey, herdr o il tuo terminale. Le
-stesse impostazioni stanno nella tabella `[keybindings]` di `config.toml`; vedi il
-[riferimento della configurazione](config-reference.md#keybindings) e
-[Scorciatoie da tastiera](keybindings.md).
-
-![La pagina Tastiera e mouse dopo aver premuto c su Quit: il tasto q è rosso sia su Quit sia su Stage or Unstage the Selected Row, le due azioni in conflitto](../images/settings-keyboard-conflicts.png)
-
-Tre opzioni si trovano nella scheda **Generali**.
+La parte globale del rilevamento proattivo dei conflitti (`gitpoulpi ui show settings conflict-prevention-global`); la pagina propria di un repository è
+[Specifico del repository: Prevenzione dei conflitti](#specifico-del-repository-prevenzione-dei-conflitti). La voce di palette **Conflitti: Modifica le liste dei branch base...** apre questa pagina.
 
 | Opzione | Cosa fa |
 |---|---|
-| **Protocollo tastiera Kitty** | **auto** chiede al terminale il protocollo tastiera di kitty, così arrivano `Ctrl+,`, `Ctrl+Enter` e `Ctrl+Shift+N`. **off** non lo chiede mai; usalo se un terminale si comporta male. Richiede un riavvio. |
-| **Mouse attivo** | Disattivato lascia il mouse e la selezione del testo al tuo terminale. Richiede un riavvio. |
-| **Righe della rotella del mouse** | Di quante righe si sposta uno scatto della rotella nel Log. Richiede un riavvio. |
+| **Attiva il rilevamento proattivo dei conflitti** | Attivo di base (`general.conflict_detection`). Avvisa nel Log quando il merge del branch corrente nel branch da cui è partito andrebbe in conflitto, prima che tu lo provi. Un repository può disattivarlo per sé nella sua pagina **Prevenzione dei conflitti**. Vedi [Risolvere i conflitti di merge](merge-conflicts.md#prevenzione-dei-conflitti). Si applica alla chiusura delle Impostazioni. |
+| **Branch base predefiniti** | Sotto l'interruttore. La lista di pattern dei branch base che i repository usano quando non ne hanno una propria: **Predefinita (`**`)**, cioè ogni branch, oppure una delle tue liste con nome (`conflict_prevention.default_list`). Si applica ai repository aperti alla chiusura delle Impostazioni. **Ripristina il valore predefinito** torna a `**`. |
+| **Liste dei branch base** | Anch'esse in questa pagina: le tue liste con nome di pattern dei branch base (`[conflict_prevention.lists.<nome>]`), un blocco ciascuna con il suo **Nome** (rinominare una lista la mantiene come predefinita, se lo era; un repository che seguiva il vecchio nome usa la lista predefinita finché non scegli di nuovo la lista rinominata), i suoi **Pattern** (uno per riga, `Enter` o un clic apre l'editor, `Ctrl+S` lo conserva), **Rendi predefinita** ed **Elimina lista** (chiede prima, e avverte che i repository che la seguono useranno invece la lista predefinita). Scrivi un nome in **Nuova lista** e premi `Enter` per aggiungerne una; parte con `**`. Modificare una lista cambia ogni repository che la segue. |
 
 ### Specifico del repository: Git e codifica
 

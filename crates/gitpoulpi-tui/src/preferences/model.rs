@@ -12,7 +12,6 @@ use gitpoulpi_i18n::msg::{settings_general, settings_open_in, settings_screen as
 pub(crate) enum PrefSection {
     General,
     Launcher,
-    ConflictGlobal,
     Sync,
     Profiles,
     Ssh,
@@ -20,11 +19,12 @@ pub(crate) enum PrefSection {
     Ai,
     AgentsMcp,
     Appearance,
+    Keybindings,
     LogGraph,
     DiffEditor,
     OpenIn,
     Images,
-    Keybindings,
+    ConflictGlobal,
     GitAndEncoding,
     RepoAi,
     Workflow,
@@ -55,7 +55,6 @@ impl PrefSection {
     pub(crate) const ALL: &'static [PrefSection] = &[
         PrefSection::General,
         PrefSection::Launcher,
-        PrefSection::ConflictGlobal,
         PrefSection::Sync,
         PrefSection::Profiles,
         PrefSection::Ssh,
@@ -63,11 +62,14 @@ impl PrefSection {
         PrefSection::Ai,
         PrefSection::AgentsMcp,
         PrefSection::Appearance,
+        // Right after the first core pages: it is read by everyone.
+        PrefSection::Keybindings,
         PrefSection::LogGraph,
         PrefSection::DiffEditor,
         PrefSection::OpenIn,
         PrefSection::Images,
-        PrefSection::Keybindings,
+        // Last of the global pages: it is specific.
+        PrefSection::ConflictGlobal,
         PrefSection::GitAndEncoding,
         PrefSection::RepoAuth,
         PrefSection::RepoAi,
@@ -684,6 +686,22 @@ mod build_tests {
         assert!(PrefSection::ALL
             .iter()
             .all(|s| s.is_built() || !cfg!(feature = "full")));
+    }
+
+    /// Keyboard & mouse sits right after Appearance; the global Conflict
+    /// prevention page (specific) closes the global group, just before the
+    /// repository-specific ones.
+    #[test]
+    fn the_global_pages_are_in_the_owners_order() {
+        let at = |p: PrefSection| PrefSection::ALL.iter().position(|s| *s == p).unwrap();
+        assert_eq!(
+            at(PrefSection::Keybindings),
+            at(PrefSection::Appearance) + 1
+        );
+        assert_eq!(
+            at(PrefSection::ConflictGlobal) + 1,
+            at(PrefSection::GitAndEncoding)
+        );
     }
 
     #[test]

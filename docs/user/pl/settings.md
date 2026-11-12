@@ -229,17 +229,6 @@ Paleta ma te same akcje (**Uruchamianie: Utwórz skrót**, **Uruchamianie: Utwó
 **Uruchamianie: Dodaj do PATH**, **Uruchamianie: Usuń z PATH**), a `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` robi to samo ze skryptu.
 
-### Zapobieganie konfliktom
-
-Globalna część proaktywnego wykrywania konfliktów (`gitpoulpi ui show settings conflict-prevention-global`); strona jednego repozytorium to
-[Ustawienia repozytorium: Zapobieganie konfliktom](#ustawienia-repozytorium-zapobieganie-konfliktom). Otwiera ją polecenie palety **Konflikty: Edytuj listy gałęzi bazowych...**.
-
-| Opcja | Co robi |
-|---|---|
-| **Włącz proaktywne wykrywanie konfliktów** | Domyślnie włączone (`general.conflict_detection`). Ostrzega w Log, że merge bieżącej gałęzi do gałęzi, z której powstała, spowodowałby konflikt, zanim go spróbujesz. Repozytorium może to wyłączyć dla siebie na jego własnej stronie **Zapobieganie konfliktom**. Zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md#zapobieganie-konfliktom). Działa po zamknięciu Ustawień. |
-| **Domyślne gałęzie bazowe** | Pod przełącznikiem. Lista wzorców gałęzi bazowych, której używają repozytoria bez własnej: **Wbudowana (`**`)**, czyli każda gałąź, albo jedna z twoich nazwanych list (`conflict_prevention.default_list`). Działa w otwartych repozytoriach po zamknięciu Ustawień. **Przywróć wbudowaną wartość domyślną** wraca do `**`. |
-| **Listy gałęzi bazowych** | Także na tej stronie: twoje nazwane listy wzorców gałęzi bazowych (`[conflict_prevention.lists.<name>]`), po jednym bloku na listę, z jej **Nazwą** (zmiana nazwy zachowuje status domyślnej, jeśli go miała; repozytorium, które śledziło starą nazwę, używa listy domyślnej, dopóki ponownie jej nie wybierzesz), jej **Wzorcami** (jeden w wierszu, `Enter` lub kliknięcie otwiera edytor, `Ctrl+S` go zachowuje), **Ustaw jako domyślną** i **Usuń listę** (najpierw pyta i mówi, że repozytoria, które z niej korzystają, użyją zamiast niej listy domyślnej). Wpisz nazwę w **Nowa lista** i naciśnij `Enter`, aby dodać listę; zaczyna się od `**`. Edycja listy zmienia każde repozytorium, które z niej korzysta. |
-
 ### Synchronizacja
 
 Jak GitPoulpi utrzymuje repozytorium w zgodzie ze zdalnymi repozytoriami i co w tym czasie
@@ -419,6 +408,38 @@ punkt końcowy HTTP. Wiersze MCP są widoczne tylko w kompilacjach zawierającyc
 
 ![Lista Motyw kolorów grafu: Zgodnie z motywem, a potem każda paleta ścieżek z kilkoma jej kolorami](../images/settings-log-graph-lanes.png)
 
+### Klawiatura i mysz
+
+![Strona Klawiatura i mysz: każda akcja według kontekstu z jej klawiszami, pole wyszukiwania i filtry](../images/settings-keyboard.png)
+
+**Ustawienia > Klawiatura i mysz** ma dwie karty (kliknięcie albo `Alt+Left` / `Alt+Right`).
+**Ogólne** zawiera protokół klawiatury i ustawienia myszy; **Skróty klawiszowe**
+wylicza każdy skrót według kontekstu, z polem wyszukiwania (`/`) i filtrami. W wierszu:
+
+| Klawisz | Akcja |
+|---|---|
+| `Enter` lub podwójne kliknięcie | Przechwytuje nowy klawisz. Konflikty i ostrzeżenia terminala pokazują się podczas naciskania. |
+| `a` | Dodaje klawisz alternatywny. |
+| `u` | Odpina akcję. |
+| `r` | Przywraca wiersz do domyślnego. |
+| `R` | Resetuje wszystkie skróty, po potwierdzeniu. |
+| `c` lub kliknięcie `!` w wierszu | Pokazuje akcję ze wszystkimi akcjami, z którymi koliduje jej klawisz; `Esc` znów pokazuje wszystko. Klawisz kolidujący z klawiszem innej akcji jest czerwony, ostrzeżenie dotyczące samego klawisza (terminal nie może go wysłać) pomarańczowe. |
+
+Użyj tego do rozwiązywania kolizji z tmux, AutoHotkey, herdr lub terminalem.
+Te same ustawienia znajdują się w tabeli `[keybindings]` pliku `config.toml`;
+zob. [Opis konfiguracji](config-reference.md#keybindings) i
+[Skróty klawiszowe](keybindings.md).
+
+![Strona Klawiatura i mysz po naciśnięciu c na Zakończ: klawisz q jest czerwony przy Zakończ i przy Stage lub unstage zaznaczony wiersz, dwóch kolidujących akcjach](../images/settings-keyboard-conflicts.png)
+
+Trzy opcje są na karcie **Ogólne**.
+
+| Opcja | Działanie |
+|---|---|
+| **Protokół klawiatury Kitty** | **auto** prosi terminal o protokół klawiatury kitty, dzięki czemu docierają `Ctrl+,`, `Ctrl+Enter` i `Ctrl+Shift+N`. **off** nigdy nie prosi; użyj, jeśli terminal źle działa. Wymaga restartu. |
+| **Mysz włączona** | Wyłączone zostawia mysz i zaznaczanie tekstu terminalowi. Wymaga restartu. |
+| **Linie kółka myszy** | O ile wierszy w Logu przesuwa jeden krok kółka. Wymaga restartu. |
+
 ### Log i graf
 
 Jak rysowany jest graf commitów i ile commitów wczytuje Log. Kolory grafu są na
@@ -507,37 +528,16 @@ ustawienia** resetuje listę. Dopóki jej nie zmienisz,
 lista zawiera edytory zainstalowane na tym komputerze i domyślną aplikację
 systemu. Każda zmiana działa od razu.
 
-### Klawiatura i mysz
+### Zapobieganie konfliktom
 
-![Strona Klawiatura i mysz: każda akcja według kontekstu z jej klawiszami, pole wyszukiwania i filtry](../images/settings-keyboard.png)
+Globalna część proaktywnego wykrywania konfliktów (`gitpoulpi ui show settings conflict-prevention-global`); strona jednego repozytorium to
+[Ustawienia repozytorium: Zapobieganie konfliktom](#ustawienia-repozytorium-zapobieganie-konfliktom). Otwiera ją polecenie palety **Konflikty: Edytuj listy gałęzi bazowych...**.
 
-**Ustawienia > Klawiatura i mysz** ma dwie karty (kliknięcie albo `Alt+Left` / `Alt+Right`).
-**Ogólne** zawiera protokół klawiatury i ustawienia myszy; **Skróty klawiszowe**
-wylicza każdy skrót według kontekstu, z polem wyszukiwania (`/`) i filtrami. W wierszu:
-
-| Klawisz | Akcja |
+| Opcja | Co robi |
 |---|---|
-| `Enter` lub podwójne kliknięcie | Przechwytuje nowy klawisz. Konflikty i ostrzeżenia terminala pokazują się podczas naciskania. |
-| `a` | Dodaje klawisz alternatywny. |
-| `u` | Odpina akcję. |
-| `r` | Przywraca wiersz do domyślnego. |
-| `R` | Resetuje wszystkie skróty, po potwierdzeniu. |
-| `c` lub kliknięcie `!` w wierszu | Pokazuje akcję ze wszystkimi akcjami, z którymi koliduje jej klawisz; `Esc` znów pokazuje wszystko. Klawisz kolidujący z klawiszem innej akcji jest czerwony, ostrzeżenie dotyczące samego klawisza (terminal nie może go wysłać) pomarańczowe. |
-
-Użyj tego do rozwiązywania kolizji z tmux, AutoHotkey, herdr lub terminalem.
-Te same ustawienia znajdują się w tabeli `[keybindings]` pliku `config.toml`;
-zob. [Opis konfiguracji](config-reference.md#keybindings) i
-[Skróty klawiszowe](keybindings.md).
-
-![Strona Klawiatura i mysz po naciśnięciu c na Zakończ: klawisz q jest czerwony przy Zakończ i przy Stage lub unstage zaznaczony wiersz, dwóch kolidujących akcjach](../images/settings-keyboard-conflicts.png)
-
-Trzy opcje są na karcie **Ogólne**.
-
-| Opcja | Działanie |
-|---|---|
-| **Protokół klawiatury Kitty** | **auto** prosi terminal o protokół klawiatury kitty, dzięki czemu docierają `Ctrl+,`, `Ctrl+Enter` i `Ctrl+Shift+N`. **off** nigdy nie prosi; użyj, jeśli terminal źle działa. Wymaga restartu. |
-| **Mysz włączona** | Wyłączone zostawia mysz i zaznaczanie tekstu terminalowi. Wymaga restartu. |
-| **Linie kółka myszy** | O ile wierszy w Logu przesuwa jeden krok kółka. Wymaga restartu. |
+| **Włącz proaktywne wykrywanie konfliktów** | Domyślnie włączone (`general.conflict_detection`). Ostrzega w Log, że merge bieżącej gałęzi do gałęzi, z której powstała, spowodowałby konflikt, zanim go spróbujesz. Repozytorium może to wyłączyć dla siebie na jego własnej stronie **Zapobieganie konfliktom**. Zob. [Rozwiązywanie konfliktów merge](merge-conflicts.md#zapobieganie-konfliktom). Działa po zamknięciu Ustawień. |
+| **Domyślne gałęzie bazowe** | Pod przełącznikiem. Lista wzorców gałęzi bazowych, której używają repozytoria bez własnej: **Wbudowana (`**`)**, czyli każda gałąź, albo jedna z twoich nazwanych list (`conflict_prevention.default_list`). Działa w otwartych repozytoriach po zamknięciu Ustawień. **Przywróć wbudowaną wartość domyślną** wraca do `**`. |
+| **Listy gałęzi bazowych** | Także na tej stronie: twoje nazwane listy wzorców gałęzi bazowych (`[conflict_prevention.lists.<name>]`), po jednym bloku na listę, z jej **Nazwą** (zmiana nazwy zachowuje status domyślnej, jeśli go miała; repozytorium, które śledziło starą nazwę, używa listy domyślnej, dopóki ponownie jej nie wybierzesz), jej **Wzorcami** (jeden w wierszu, `Enter` lub kliknięcie otwiera edytor, `Ctrl+S` go zachowuje), **Ustaw jako domyślną** i **Usuń listę** (najpierw pyta i mówi, że repozytoria, które z niej korzystają, użyją zamiast niej listy domyślnej). Wpisz nazwę w **Nowa lista** i naciśnij `Enter`, aby dodać listę; zaczyna się od `**`. Edycja listy zmienia każde repozytorium, które z niej korzysta. |
 
 ### Ustawienia repozytorium: Git i kodowanie
 

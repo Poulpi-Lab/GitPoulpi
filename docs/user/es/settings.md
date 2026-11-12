@@ -233,17 +233,6 @@ acceso directo del escritorio**, **Lanzador: Quitar accesos directos**, **Lanzad
 status|install|remove [--where launcher|desktop|startmenu]` lo
 hace desde un script.
 
-### Prevención de conflictos
-
-La parte global de la detección proactiva de conflictos (`gitpoulpi ui show settings conflict-prevention-global`); la página de cada repositorio es
-[Ajustes del repositorio: Prevención de conflictos](#ajustes-del-repositorio-prevención-de-conflictos). El comando de la paleta **Conflictos: Editar listas de ramas base...** abre esta página.
-
-| Opción | Qué hace |
-|---|---|
-| **Activar la detección proactiva de conflictos** | Activada por defecto (`general.conflict_detection`). Avisa en el Log cuando hacer merge de la rama actual en la rama de la que partió daría conflictos, antes de que lo intentes. Un repositorio puede desactivarla para sí mismo en su propia página **Prevención de conflictos**. Consulta [Resolver conflictos de merge](merge-conflicts.md#prevención-de-conflictos). Se aplica al cerrar Ajustes. |
-| **Ramas base predeterminadas** | Bajo el interruptor. La lista de patrones de ramas base que usan los repositorios que no tienen una propia: **Integrada (`**`)**, que son todas las ramas, o una de tus listas con nombre (`conflict_prevention.default_list`). Se aplica a los repositorios abiertos al cerrar Ajustes. **Volver a la lista integrada** regresa a `**`. |
-| **Listas de ramas base** | También en esta página: tus listas con nombre de patrones de ramas base (`[conflict_prevention.lists.<name>]`), un bloque cada una con su **Nombre** (renombrar la mantiene como predeterminada si lo era; un repositorio que seguía el nombre anterior usa la lista predeterminada hasta que vuelvas a elegir la renombrada), sus **Patrones** (uno por línea, `Enter` o un clic abre el editor, `Ctrl+S` lo conserva), **Hacer predeterminada** y **Eliminar lista** (pregunta antes, y avisa de que los repositorios que la siguen usarán la lista predeterminada). Escribe un nombre en **Nueva lista** y pulsa `Enter` para añadir una; empieza con `**`. Editar una lista cambia todos los repositorios que la siguen. |
-
 ### Sincronización
 
 Cómo mantiene GitPoulpi un repositorio al día con sus remotos, y qué hace con tus
@@ -423,6 +412,38 @@ las compilaciones que incluyen el servidor; consulta [MCP y agentes](mcp-and-age
 
 ![El combo Tema de color del grafo: Seguir el tema y luego todas las paletas de carriles con algunos de sus colores](../images/settings-log-graph-lanes.png)
 
+### Teclado y ratón
+
+![La página Teclado y ratón: cada acción por contexto con sus teclas, un cuadro de búsqueda y filtros](../images/settings-keyboard.png)
+
+**Ajustes > Teclado y ratón** tiene dos pestañas (clic, o `Alt+Left` / `Alt+Right`).
+**General** contiene el protocolo de teclado y los ajustes del ratón; **Atajos de teclado**
+lista todos los atajos por contexto, con un cuadro de búsqueda (`/`) y filtros. En una fila:
+
+| Tecla | Acción |
+|---|---|
+| `Enter` o doble clic | Captura una tecla nueva. Los conflictos y los avisos del terminal se muestran mientras la pulsas. |
+| `a` | Añade una tecla alternativa. |
+| `u` | Desvincula la acción. |
+| `r` | Restablece la fila a su valor por defecto. |
+| `R` | Restablece todos los atajos, tras una confirmación. |
+| `c` o un clic en el `!` de la fila | Muestra la acción con todas las acciones con las que choca su tecla; `Esc` vuelve a mostrarlas todas. Una tecla que choca con la de otra acción sale en rojo, un aviso solo sobre la tecla (el terminal no puede enviarla) en naranja. |
+
+Úsala para resolver choques con tmux, AutoHotkey, herdr o tu terminal. Los mismos
+ajustes están en la tabla `[keybindings]` de `config.toml`; consulta la
+[referencia de configuración](config-reference.md#keybindings) y
+[Atajos de teclado](keybindings.md).
+
+![La página Teclado y ratón tras pulsar c sobre Quit: la tecla q aparece en rojo en Quit y en Stage or Unstage the Selected Row, las dos acciones que chocan](../images/settings-keyboard-conflicts.png)
+
+Hay tres opciones en la pestaña **General**.
+
+| Opción | Qué hace |
+|---|---|
+| **Protocolo de teclado de Kitty** | **auto** pide al terminal el protocolo de teclado de kitty, de modo que llegan `Ctrl+,`, `Ctrl+Enter` y `Ctrl+Shift+N`. **off** nunca lo pide; úsalo si un terminal se porta mal. Requiere reiniciar. |
+| **Ratón activado** | Desactivado deja el ratón y la selección de texto a tu terminal. Requiere reiniciar. |
+| **Líneas de la rueda del ratón** | Cuántas filas mueve un paso de rueda en el Log. Requiere reiniciar. |
+
 ### Historial y grafo
 
 Cómo se dibuja el grafo de commits y cuántos commits carga el Log. Los colores
@@ -516,37 +537,16 @@ lista. Hasta que la edites, la lista contiene los editores instalados en
 esta máquina y la aplicación predeterminada del sistema. Cada cambio se aplica al
 instante.
 
-### Teclado y ratón
+### Prevención de conflictos
 
-![La página Teclado y ratón: cada acción por contexto con sus teclas, un cuadro de búsqueda y filtros](../images/settings-keyboard.png)
-
-**Ajustes > Teclado y ratón** tiene dos pestañas (clic, o `Alt+Left` / `Alt+Right`).
-**General** contiene el protocolo de teclado y los ajustes del ratón; **Atajos de teclado**
-lista todos los atajos por contexto, con un cuadro de búsqueda (`/`) y filtros. En una fila:
-
-| Tecla | Acción |
-|---|---|
-| `Enter` o doble clic | Captura una tecla nueva. Los conflictos y los avisos del terminal se muestran mientras la pulsas. |
-| `a` | Añade una tecla alternativa. |
-| `u` | Desvincula la acción. |
-| `r` | Restablece la fila a su valor por defecto. |
-| `R` | Restablece todos los atajos, tras una confirmación. |
-| `c` o un clic en el `!` de la fila | Muestra la acción con todas las acciones con las que choca su tecla; `Esc` vuelve a mostrarlas todas. Una tecla que choca con la de otra acción sale en rojo, un aviso solo sobre la tecla (el terminal no puede enviarla) en naranja. |
-
-Úsala para resolver choques con tmux, AutoHotkey, herdr o tu terminal. Los mismos
-ajustes están en la tabla `[keybindings]` de `config.toml`; consulta la
-[referencia de configuración](config-reference.md#keybindings) y
-[Atajos de teclado](keybindings.md).
-
-![La página Teclado y ratón tras pulsar c sobre Quit: la tecla q aparece en rojo en Quit y en Stage or Unstage the Selected Row, las dos acciones que chocan](../images/settings-keyboard-conflicts.png)
-
-Hay tres opciones en la pestaña **General**.
+La parte global de la detección proactiva de conflictos (`gitpoulpi ui show settings conflict-prevention-global`); la página de cada repositorio es
+[Ajustes del repositorio: Prevención de conflictos](#ajustes-del-repositorio-prevención-de-conflictos). El comando de la paleta **Conflictos: Editar listas de ramas base...** abre esta página.
 
 | Opción | Qué hace |
 |---|---|
-| **Protocolo de teclado de Kitty** | **auto** pide al terminal el protocolo de teclado de kitty, de modo que llegan `Ctrl+,`, `Ctrl+Enter` y `Ctrl+Shift+N`. **off** nunca lo pide; úsalo si un terminal se porta mal. Requiere reiniciar. |
-| **Ratón activado** | Desactivado deja el ratón y la selección de texto a tu terminal. Requiere reiniciar. |
-| **Líneas de la rueda del ratón** | Cuántas filas mueve un paso de rueda en el Log. Requiere reiniciar. |
+| **Activar la detección proactiva de conflictos** | Activada por defecto (`general.conflict_detection`). Avisa en el Log cuando hacer merge de la rama actual en la rama de la que partió daría conflictos, antes de que lo intentes. Un repositorio puede desactivarla para sí mismo en su propia página **Prevención de conflictos**. Consulta [Resolver conflictos de merge](merge-conflicts.md#prevención-de-conflictos). Se aplica al cerrar Ajustes. |
+| **Ramas base predeterminadas** | Bajo el interruptor. La lista de patrones de ramas base que usan los repositorios que no tienen una propia: **Integrada (`**`)**, que son todas las ramas, o una de tus listas con nombre (`conflict_prevention.default_list`). Se aplica a los repositorios abiertos al cerrar Ajustes. **Volver a la lista integrada** regresa a `**`. |
+| **Listas de ramas base** | También en esta página: tus listas con nombre de patrones de ramas base (`[conflict_prevention.lists.<name>]`), un bloque cada una con su **Nombre** (renombrar la mantiene como predeterminada si lo era; un repositorio que seguía el nombre anterior usa la lista predeterminada hasta que vuelvas a elegir la renombrada), sus **Patrones** (uno por línea, `Enter` o un clic abre el editor, `Ctrl+S` lo conserva), **Hacer predeterminada** y **Eliminar lista** (pregunta antes, y avisa de que los repositorios que la siguen usarán la lista predeterminada). Escribe un nombre en **Nueva lista** y pulsa `Enter` para añadir una; empieza con `**`. Editar una lista cambia todos los repositorios que la siguen. |
 
 ### Ajustes del repositorio: Git y codificación
 

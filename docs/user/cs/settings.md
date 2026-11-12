@@ -224,17 +224,6 @@ Paleta nabízí stejné akce (**Spouštěč: Vytvořit zástupce**, **Spouště�
 **Spouštěč: Odebrat zástupce**, **Spouštěč: Vytvořit alias příkazu**, **Spouštěč: Odebrat alias příkazu**, **Spouštěč: Přidat do PATH**, **Spouštěč: Odebrat z PATH**) a `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` totéž udělá ze skriptu.
 
-### Prevence konfliktů
-
-Globální část proaktivní detekce konfliktů (`gitpoulpi ui show settings conflict-prevention-global`); vlastní stránka repozitáře je
-[Nastavení repozitáře: Prevence konfliktů](#nastavení-repozitáře-prevence-konfliktů). Příkaz z palety **Konflikty: Upravit seznamy základních větví...** otevře tuto stránku.
-
-| Volba | Co dělá |
-|---|---|
-| **Zapnout proaktivní detekci konfliktů** | Ve výchozím stavu zapnuto (`general.conflict_detection`). Upozorní v Logu, když by merge aktuální větve do větve, ze které vznikla, skončil konfliktem, ještě než to zkusíte. Repozitář ji může pro sebe vypnout na své vlastní stránce **Prevence konfliktů**. Viz [Řešení konfliktů při slučování](merge-conflicts.md#prevence-konfliktů). Projeví se po zavření Nastavení. |
-| **Výchozí základní větve** | Pod přepínačem. Seznam vzorů základních větví, který repozitáře používají, když nemají vlastní: **Vestavěný (`**`)**, tedy každá větev, nebo jeden z vašich pojmenovaných seznamů (`conflict_prevention.default_list`). Platí pro otevřené repozitáře po zavření Nastavení. **Obnovit vestavěný výchozí** vrátí `**`. |
-| **Seznamy základních větví** | Také na této stránce: vaše pojmenované seznamy vzorů základních větví (`[conflict_prevention.lists.<name>]`), každý jako blok s **Názvem** (přejmenováním seznam zůstane výchozím, pokud jím byl; repozitář, který sledoval starý název, používá výchozí seznam, dokud znovu nevyberete přejmenovaný seznam), **Vzory** (jeden na řádek, `Enter` nebo kliknutí otevře editor, `Ctrl+S` ho ponechá), **Nastavit jako výchozí** a **Smazat seznam** (nejprve se zeptá a řekne, že repozitáře, které ho sledují, budou místo něj používat výchozí seznam). Zadejte název do **Nový seznam** a stiskněte `Enter`; seznam začíná vzorem `**`. Úprava seznamu změní každý repozitář, který ho sleduje. |
-
 ### Synchronizace
 
 Jak GitPoulpi udržuje repozitář v souladu s remote repozitáři a co si mezitím
@@ -412,6 +401,38 @@ obsahují; viz [MCP a agenti](mcp-and-agents.md).
 
 ![Rozbalený seznam Barevný motiv grafu: Podle motivu, poté každá paleta drah s několika svými barvami](../images/settings-log-graph-lanes.png)
 
+### Klávesnice a myš
+
+![Stránka Klávesnice a myš: každá akce podle kontextu s jejími klávesami, vyhledávací pole a filtry](../images/settings-keyboard.png)
+
+**Nastavení > Klávesnice a myš** má dvě karty (klikněte, nebo `Alt+Left` / `Alt+Right`).
+**Obecné** obsahuje klávesnicový protokol a nastavení myši; **Klávesové zkratky**
+uvádí každou zkratku podle kontextu s vyhledávacím polem (`/`) a filtry. Na řádku:
+
+| Klávesa | Akce |
+|---|---|
+| `Enter` nebo dvojklik | Zachytí novou klávesu. Konflikty a upozornění terminálu se zobrazují během stisku. |
+| `a` | Přidá alternativní klávesu. |
+| `u` | Zruší vazbu akce. |
+| `r` | Vrátí řádek na výchozí hodnotu. |
+| `R` | Vrátí všechny zkratky na výchozí hodnoty po potvrzení. |
+| `c` nebo klik na `!` řádku | Zobrazí akci se všemi akcemi, se kterými její klávesa koliduje; `Esc` znovu zobrazí vše. Klávesa kolidující s jinou akcí je červená, varování jen ke klávese (terminál ji neumí poslat) oranžové. |
+
+Použijte ji k vyřešení kolizí s tmux, AutoHotkey, herdr nebo vaším terminálem.
+Stejná nastavení jsou v tabulce `[keybindings]` souboru `config.toml`; viz
+[referenční příručka konfigurace](config-reference.md#keybindings) a
+[Klávesové zkratky](keybindings.md).
+
+![Stránka Klávesnice a myš po stisku c na řádku Quit: klávesa q je červená u Quit i u Stage or Unstage the Selected Row, dvou akcí, které se střetávají](../images/settings-keyboard-conflicts.png)
+
+Tři volby jsou na kartě **Obecné**.
+
+| Volba | Co dělá |
+|---|---|
+| **Klávesnicový protokol Kitty** | **auto** požádá terminál o klávesnicový protokol kitty, takže dorazí `Ctrl+,`, `Ctrl+Enter` a `Ctrl+Shift+N`. **off** nepožádá nikdy; použijte, pokud se terminál chová nesprávně. Vyžaduje restart. |
+| **Myš zapnuta** | Vypnuto ponechá myš a výběr textu vašemu terminálu. Vyžaduje restart. |
+| **Řádků na kolečko myši** | O kolik řádků se v Logu posune jeden krok kolečka. Vyžaduje restart. |
+
 ### Log a graf
 
 Jak se vykresluje graf commitů a kolik commitů Log načítá. Barvy grafu jsou na
@@ -500,37 +521,16 @@ seznam vrátí. Dokud ho neupravíte, obsahuje seznam
 editory nainstalované v tomto počítači a výchozí aplikaci systému. Každá změna se
 projeví okamžitě.
 
-### Klávesnice a myš
+### Prevence konfliktů
 
-![Stránka Klávesnice a myš: každá akce podle kontextu s jejími klávesami, vyhledávací pole a filtry](../images/settings-keyboard.png)
-
-**Nastavení > Klávesnice a myš** má dvě karty (klikněte, nebo `Alt+Left` / `Alt+Right`).
-**Obecné** obsahuje klávesnicový protokol a nastavení myši; **Klávesové zkratky**
-uvádí každou zkratku podle kontextu s vyhledávacím polem (`/`) a filtry. Na řádku:
-
-| Klávesa | Akce |
-|---|---|
-| `Enter` nebo dvojklik | Zachytí novou klávesu. Konflikty a upozornění terminálu se zobrazují během stisku. |
-| `a` | Přidá alternativní klávesu. |
-| `u` | Zruší vazbu akce. |
-| `r` | Vrátí řádek na výchozí hodnotu. |
-| `R` | Vrátí všechny zkratky na výchozí hodnoty po potvrzení. |
-| `c` nebo klik na `!` řádku | Zobrazí akci se všemi akcemi, se kterými její klávesa koliduje; `Esc` znovu zobrazí vše. Klávesa kolidující s jinou akcí je červená, varování jen ke klávese (terminál ji neumí poslat) oranžové. |
-
-Použijte ji k vyřešení kolizí s tmux, AutoHotkey, herdr nebo vaším terminálem.
-Stejná nastavení jsou v tabulce `[keybindings]` souboru `config.toml`; viz
-[referenční příručka konfigurace](config-reference.md#keybindings) a
-[Klávesové zkratky](keybindings.md).
-
-![Stránka Klávesnice a myš po stisku c na řádku Quit: klávesa q je červená u Quit i u Stage or Unstage the Selected Row, dvou akcí, které se střetávají](../images/settings-keyboard-conflicts.png)
-
-Tři volby jsou na kartě **Obecné**.
+Globální část proaktivní detekce konfliktů (`gitpoulpi ui show settings conflict-prevention-global`); vlastní stránka repozitáře je
+[Nastavení repozitáře: Prevence konfliktů](#nastavení-repozitáře-prevence-konfliktů). Příkaz z palety **Konflikty: Upravit seznamy základních větví...** otevře tuto stránku.
 
 | Volba | Co dělá |
 |---|---|
-| **Klávesnicový protokol Kitty** | **auto** požádá terminál o klávesnicový protokol kitty, takže dorazí `Ctrl+,`, `Ctrl+Enter` a `Ctrl+Shift+N`. **off** nepožádá nikdy; použijte, pokud se terminál chová nesprávně. Vyžaduje restart. |
-| **Myš zapnuta** | Vypnuto ponechá myš a výběr textu vašemu terminálu. Vyžaduje restart. |
-| **Řádků na kolečko myši** | O kolik řádků se v Logu posune jeden krok kolečka. Vyžaduje restart. |
+| **Zapnout proaktivní detekci konfliktů** | Ve výchozím stavu zapnuto (`general.conflict_detection`). Upozorní v Logu, když by merge aktuální větve do větve, ze které vznikla, skončil konfliktem, ještě než to zkusíte. Repozitář ji může pro sebe vypnout na své vlastní stránce **Prevence konfliktů**. Viz [Řešení konfliktů při slučování](merge-conflicts.md#prevence-konfliktů). Projeví se po zavření Nastavení. |
+| **Výchozí základní větve** | Pod přepínačem. Seznam vzorů základních větví, který repozitáře používají, když nemají vlastní: **Vestavěný (`**`)**, tedy každá větev, nebo jeden z vašich pojmenovaných seznamů (`conflict_prevention.default_list`). Platí pro otevřené repozitáře po zavření Nastavení. **Obnovit vestavěný výchozí** vrátí `**`. |
+| **Seznamy základních větví** | Také na této stránce: vaše pojmenované seznamy vzorů základních větví (`[conflict_prevention.lists.<name>]`), každý jako blok s **Názvem** (přejmenováním seznam zůstane výchozím, pokud jím byl; repozitář, který sledoval starý název, používá výchozí seznam, dokud znovu nevyberete přejmenovaný seznam), **Vzory** (jeden na řádek, `Enter` nebo kliknutí otevře editor, `Ctrl+S` ho ponechá), **Nastavit jako výchozí** a **Smazat seznam** (nejprve se zeptá a řekne, že repozitáře, které ho sledují, budou místo něj používat výchozí seznam). Zadejte název do **Nový seznam** a stiskněte `Enter`; seznam začíná vzorem `**`. Úprava seznamu změní každý repozitář, který ho sleduje. |
 
 ### Nastavení repozitáře: Git a kódování
 

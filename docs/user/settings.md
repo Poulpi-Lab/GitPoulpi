@@ -236,19 +236,6 @@ New terminals see the PATH change, not the ones already open. Neither action is 
 The palette has the same actions (**Launcher: Create Shortcut**, **Launcher: Create Desktop Shortcut**, **Launcher: Remove Shortcuts**, **Launcher: Create Command Alias**, **Launcher: Remove Command Alias**, **Launcher: Add to PATH**, **Launcher: Remove from PATH**), and `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` does it from a script.
 
-### Conflict prevention
-
-The global part of proactive conflict detection (`gitpoulpi ui show settings conflict-prevention-global`); a repository's own page is
-[Repo-specific: Conflict prevention](#repo-specific-conflict-prevention). The palette's **Conflicts: Edit Base Branch Lists...** opens this page.
-
-| Option | What it does |
-|---|---|
-| **Enable proactive conflict detection** | On by default (`general.conflict_detection`). Warns on the Log when merging the current branch into the branch it started from would conflict, before you try. A repository can turn it off for itself on its own **Conflict prevention** page. See [Resolving merge conflicts](merge-conflicts.md#conflict-prevention). Applies when Settings closes. |
-| **Default base branches** | Under the switch. The list of base branch patterns that repositories use when they have none of their own: **Built-in (`**`)**, which is every branch, or one of your named lists (`conflict_prevention.default_list`). It applies to the open repositories when Settings closes. **Reset to built-in default** goes back to `**`. |
-| **Base branch lists** | Also on this page: your named lists of base branch patterns (`[conflict_prevention.lists.<name>]`), one block each with its **Name** (renaming keeps it as the default if it was; a repository that followed the old name uses the default list until you pick the renamed list again), its **Patterns** (one per line, `Enter` or a click opens the editor, `Ctrl+S` keeps it), **Make default** and **Delete list** (it asks first, and says that repositories following it use the default list instead). Type a name in **New list** and press `Enter` to add one; it starts with `**`. Editing a list changes every repository that follows it. |
-
-![Settings > Conflict prevention: the global switch and the default base branches](images/settings-conflict-prevention.png)
-
 ### Synchronization
 
 How GitPoulpi keeps a repository in step with its remotes, and what it does with
@@ -429,6 +416,38 @@ the server; see [MCP and agents](mcp-and-agents.md).
 
 ![The Graph color theme combo: Follow theme, then every lane palette with a few of its colors](images/settings-log-graph-lanes.png)
 
+### Keyboard & mouse
+
+![The Keyboard & mouse page: every action by context with its keys, a search box and filters](images/settings-keyboard.png)
+
+**Settings > Keyboard & mouse** has two tabs (click, or `Alt+Left` / `Alt+Right`).
+**General** holds the keyboard protocol and the mouse settings; **Keybindings**
+lists every shortcut by context, with a search box (`/`) and filters. On a row:
+
+| Key | Action |
+|---|---|
+| `Enter` or double-click | Captures a new key. Conflicts and terminal warnings show while you press it. |
+| `a` | Adds an alternative key. |
+| `u` | Unbinds the action. |
+| `r` | Resets the row to its default. |
+| `R` | Resets every shortcut, after a confirmation. |
+| `c` or a click on the row's `!` | Lists the action with every action its key clashes with; `Esc` shows them all again. A key that clashes with another action's is red, a warning about the key alone (a terminal that cannot send it) orange. |
+
+Use it to resolve clashes with tmux, AutoHotkey, herdr or your terminal. The
+same settings live in the `[keybindings]` table of `config.toml`; see the
+[configuration reference](config-reference.md#keybindings) and
+[Keybindings](keybindings.md).
+
+![The Keyboard & mouse page after pressing c on Quit: the key q is red on both Quit and Stage or Unstage the Selected Row, the two actions that clash](images/settings-keyboard-conflicts.png)
+
+Three options are on the **General** tab.
+
+| Option | What it does |
+|---|---|
+| **Kitty keyboard protocol** | **auto** asks the terminal for the kitty keyboard protocol, so `Ctrl+,`, `Ctrl+Enter` and `Ctrl+Shift+N` arrive. **off** never asks; use it if a terminal misbehaves. Needs a restart. |
+| **Mouse enabled** | Off leaves the mouse and text selection to your terminal. Needs a restart. |
+| **Mouse wheel lines** | How many rows one wheel step moves in the Log. Needs a restart. |
+
 ### Log & graph
 
 How the commit graph is drawn and how many commits the Log loads. The graph
@@ -517,37 +536,18 @@ chips `${file}` `${dir}` `${name}` `${repo}` and **Test with a sample image**;
 resets the list. Until you edit it, the list holds the editors installed on
 this machine and the system's default app. Every change applies at once.
 
-### Keyboard & mouse
+### Conflict prevention
 
-![The Keyboard & mouse page: every action by context with its keys, a search box and filters](images/settings-keyboard.png)
-
-**Settings > Keyboard & mouse** has two tabs (click, or `Alt+Left` / `Alt+Right`).
-**General** holds the keyboard protocol and the mouse settings; **Keybindings**
-lists every shortcut by context, with a search box (`/`) and filters. On a row:
-
-| Key | Action |
-|---|---|
-| `Enter` or double-click | Captures a new key. Conflicts and terminal warnings show while you press it. |
-| `a` | Adds an alternative key. |
-| `u` | Unbinds the action. |
-| `r` | Resets the row to its default. |
-| `R` | Resets every shortcut, after a confirmation. |
-| `c` or a click on the row's `!` | Lists the action with every action its key clashes with; `Esc` shows them all again. A key that clashes with another action's is red, a warning about the key alone (a terminal that cannot send it) orange. |
-
-Use it to resolve clashes with tmux, AutoHotkey, herdr or your terminal. The
-same settings live in the `[keybindings]` table of `config.toml`; see the
-[configuration reference](config-reference.md#keybindings) and
-[Keybindings](keybindings.md).
-
-![The Keyboard & mouse page after pressing c on Quit: the key q is red on both Quit and Stage or Unstage the Selected Row, the two actions that clash](images/settings-keyboard-conflicts.png)
-
-Three options are on the **General** tab.
+The global part of proactive conflict detection (`gitpoulpi ui show settings conflict-prevention-global`); a repository's own page is
+[Repo-specific: Conflict prevention](#repo-specific-conflict-prevention). The palette's **Conflicts: Edit Base Branch Lists...** opens this page.
 
 | Option | What it does |
 |---|---|
-| **Kitty keyboard protocol** | **auto** asks the terminal for the kitty keyboard protocol, so `Ctrl+,`, `Ctrl+Enter` and `Ctrl+Shift+N` arrive. **off** never asks; use it if a terminal misbehaves. Needs a restart. |
-| **Mouse enabled** | Off leaves the mouse and text selection to your terminal. Needs a restart. |
-| **Mouse wheel lines** | How many rows one wheel step moves in the Log. Needs a restart. |
+| **Enable proactive conflict detection** | On by default (`general.conflict_detection`). Warns on the Log when merging the current branch into the branch it started from would conflict, before you try. A repository can turn it off for itself on its own **Conflict prevention** page. See [Resolving merge conflicts](merge-conflicts.md#conflict-prevention). Applies when Settings closes. |
+| **Default base branches** | Under the switch. The list of base branch patterns that repositories use when they have none of their own: **Built-in (`**`)**, which is every branch, or one of your named lists (`conflict_prevention.default_list`). It applies to the open repositories when Settings closes. **Reset to built-in default** goes back to `**`. |
+| **Base branch lists** | Also on this page: your named lists of base branch patterns (`[conflict_prevention.lists.<name>]`), one block each with its **Name** (renaming keeps it as the default if it was; a repository that followed the old name uses the default list until you pick the renamed list again), its **Patterns** (one per line, `Enter` or a click opens the editor, `Ctrl+S` keeps it), **Make default** and **Delete list** (it asks first, and says that repositories following it use the default list instead). Type a name in **New list** and press `Enter` to add one; it starts with `**`. Editing a list changes every repository that follows it. |
+
+![Settings > Conflict prevention: the global switch and the default base branches](images/settings-conflict-prevention.png)
 
 ### Repo-specific: Git & encoding
 

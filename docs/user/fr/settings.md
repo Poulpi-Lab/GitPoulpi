@@ -231,17 +231,6 @@ le raccourci du bureau**, **Lanceur : Supprimer les raccourcis**, **Lanceur : 
 status|install|remove [--where launcher|desktop|startmenu]` fait de
 même depuis un script.
 
-### Prévention des conflits
-
-La partie globale de la détection proactive des conflits (`gitpoulpi ui show settings conflict-prevention-global`) ; la page propre à un dépôt est
-[Propre au dépôt : Prévention des conflits](#propre-au-dépôt--prévention-des-conflits). La commande de palette **Conflits : Modifier les listes de branches de base...** ouvre cette page.
-
-| Option | Ce qu'elle fait |
-|---|---|
-| **Activer la détection proactive des conflits** | Activée par défaut (`general.conflict_detection`). Avertit sur le Log quand fusionner la branche courante dans la branche dont elle est partie provoquerait un conflit, avant même que vous essayiez. Un dépôt peut la désactiver pour lui-même sur sa propre page **Prévention des conflits**. Voir [Résoudre les conflits de merge](merge-conflicts.md#prévention-des-conflits). S'applique à la fermeture des Paramètres. |
-| **Branches de base par défaut** | Sous l'option. La liste de motifs de branches de base qu'utilisent les dépôts qui n'ont pas la leur : **Intégrée (`**`)**, c'est-à-dire toutes les branches, ou l'une de vos listes nommées (`conflict_prevention.default_list`). S'applique aux dépôts ouverts à la fermeture des Paramètres. **Revenir à la valeur intégrée** revient à `**`. |
-| **Listes de branches de base** | Aussi sur cette page : vos listes nommées de motifs de branches de base (`[conflict_prevention.lists.<nom>]`), un bloc chacune avec son **Nom** (renommer la conserve par défaut si elle l'était ; un dépôt qui suivait l'ancien nom utilise la liste par défaut tant que vous ne la choisissez pas à nouveau), ses **Motifs** (un par ligne, `Enter` ou un clic ouvre l'éditeur, `Ctrl+S` le garde), **Définir par défaut** et **Supprimer la liste** (il demande d'abord, et précise que les dépôts qui la suivent utiliseront la liste par défaut). Saisissez un nom dans **Nouvelle liste** et appuyez sur `Enter` pour en ajouter une ; elle commence par `**`. Modifier une liste change chaque dépôt qui la suit. |
-
 ### Synchronisation
 
 Comment GitPoulpi garde un dépôt aligné avec ses remotes, et ce qu'il fait de vos
@@ -420,6 +409,38 @@ que dans les builds qui incluent le serveur ; voir [MCP et agents](mcp-and-agen
 
 ![La liste Thème de couleurs du graphe : Suivre le thème, puis chaque palette de voies avec quelques-unes de ses couleurs](../images/settings-log-graph-lanes.png)
 
+### Clavier et souris
+
+![La page Clavier et souris : chaque action par contexte avec ses touches, une zone de recherche et des filtres](../images/settings-keyboard.png)
+
+**Paramètres > Clavier et souris** a deux onglets (clic, ou `Alt+Left` / `Alt+Right`).
+**Général** contient le protocole clavier et les réglages de la souris ; **Raccourcis clavier**
+liste chaque raccourci par contexte, avec une zone de recherche (`/`) et des filtres. Sur une ligne :
+
+| Touche | Action |
+|---|---|
+| `Enter` ou double-clic | Capture une nouvelle touche. Les conflits et les avertissements du terminal s'affichent pendant que vous appuyez. |
+| `a` | Ajoute une touche alternative. |
+| `u` | Dissocie l'action. |
+| `r` | Remet la ligne à sa valeur par défaut. |
+| `R` | Remet tous les raccourcis à zéro, après confirmation. |
+| `c` ou un clic sur le `!` de la ligne | Affiche l'action avec toutes celles dont la touche entre en conflit avec la sienne ; `Esc` réaffiche tout. Une touche en conflit avec celle d'une autre action est en rouge, un avertissement sur la touche seule (le terminal ne peut pas l'envoyer) en orange. |
+
+Servez-vous-en pour résoudre les conflits avec tmux, AutoHotkey, herdr ou votre
+terminal. Les mêmes paramètres vivent dans la table `[keybindings]` de
+`config.toml` ; voir la [référence de configuration](config-reference.md#keybindings) et
+[Raccourcis clavier](keybindings.md).
+
+![La page Clavier et souris après c sur Quit : la touche q est en rouge sur Quit et sur Stage or Unstage the Selected Row, les deux actions en conflit](../images/settings-keyboard-conflicts.png)
+
+Trois options se trouvent sur l'onglet **Général**.
+
+| Option | Ce qu'elle fait |
+|---|---|
+| **Protocole clavier kitty** | **auto** demande au terminal le protocole clavier kitty, de sorte que `Ctrl+,`, `Ctrl+Enter` et `Ctrl+Shift+N` arrivent. **off** ne demande jamais ; utilisez-le si un terminal se comporte mal. Demande un redémarrage. |
+| **Souris activée** | Désactivé laisse la souris et la sélection de texte à votre terminal. Demande un redémarrage. |
+| **Lignes par cran de molette** | Combien de lignes un cran de molette déplace dans le Log. Demande un redémarrage. |
+
 ### Journal et graphe
 
 Comment le graphe de commits est dessiné et combien de commits le Log charge. Les
@@ -508,37 +529,16 @@ d'exemple** ; **+ Ajouter ▾** propose les préréglages et **Entrée personna
 valeurs détectées** réinitialise la liste. Tant que vous ne la modifiez pas, la liste contient les éditeurs installés sur cette machine et l'application par défaut
 du système. Chaque changement s'applique aussitôt.
 
-### Clavier et souris
+### Prévention des conflits
 
-![La page Clavier et souris : chaque action par contexte avec ses touches, une zone de recherche et des filtres](../images/settings-keyboard.png)
-
-**Paramètres > Clavier et souris** a deux onglets (clic, ou `Alt+Left` / `Alt+Right`).
-**Général** contient le protocole clavier et les réglages de la souris ; **Raccourcis clavier**
-liste chaque raccourci par contexte, avec une zone de recherche (`/`) et des filtres. Sur une ligne :
-
-| Touche | Action |
-|---|---|
-| `Enter` ou double-clic | Capture une nouvelle touche. Les conflits et les avertissements du terminal s'affichent pendant que vous appuyez. |
-| `a` | Ajoute une touche alternative. |
-| `u` | Dissocie l'action. |
-| `r` | Remet la ligne à sa valeur par défaut. |
-| `R` | Remet tous les raccourcis à zéro, après confirmation. |
-| `c` ou un clic sur le `!` de la ligne | Affiche l'action avec toutes celles dont la touche entre en conflit avec la sienne ; `Esc` réaffiche tout. Une touche en conflit avec celle d'une autre action est en rouge, un avertissement sur la touche seule (le terminal ne peut pas l'envoyer) en orange. |
-
-Servez-vous-en pour résoudre les conflits avec tmux, AutoHotkey, herdr ou votre
-terminal. Les mêmes paramètres vivent dans la table `[keybindings]` de
-`config.toml` ; voir la [référence de configuration](config-reference.md#keybindings) et
-[Raccourcis clavier](keybindings.md).
-
-![La page Clavier et souris après c sur Quit : la touche q est en rouge sur Quit et sur Stage or Unstage the Selected Row, les deux actions en conflit](../images/settings-keyboard-conflicts.png)
-
-Trois options se trouvent sur l'onglet **Général**.
+La partie globale de la détection proactive des conflits (`gitpoulpi ui show settings conflict-prevention-global`) ; la page propre à un dépôt est
+[Propre au dépôt : Prévention des conflits](#propre-au-dépôt--prévention-des-conflits). La commande de palette **Conflits : Modifier les listes de branches de base...** ouvre cette page.
 
 | Option | Ce qu'elle fait |
 |---|---|
-| **Protocole clavier kitty** | **auto** demande au terminal le protocole clavier kitty, de sorte que `Ctrl+,`, `Ctrl+Enter` et `Ctrl+Shift+N` arrivent. **off** ne demande jamais ; utilisez-le si un terminal se comporte mal. Demande un redémarrage. |
-| **Souris activée** | Désactivé laisse la souris et la sélection de texte à votre terminal. Demande un redémarrage. |
-| **Lignes par cran de molette** | Combien de lignes un cran de molette déplace dans le Log. Demande un redémarrage. |
+| **Activer la détection proactive des conflits** | Activée par défaut (`general.conflict_detection`). Avertit sur le Log quand fusionner la branche courante dans la branche dont elle est partie provoquerait un conflit, avant même que vous essayiez. Un dépôt peut la désactiver pour lui-même sur sa propre page **Prévention des conflits**. Voir [Résoudre les conflits de merge](merge-conflicts.md#prévention-des-conflits). S'applique à la fermeture des Paramètres. |
+| **Branches de base par défaut** | Sous l'option. La liste de motifs de branches de base qu'utilisent les dépôts qui n'ont pas la leur : **Intégrée (`**`)**, c'est-à-dire toutes les branches, ou l'une de vos listes nommées (`conflict_prevention.default_list`). S'applique aux dépôts ouverts à la fermeture des Paramètres. **Revenir à la valeur intégrée** revient à `**`. |
+| **Listes de branches de base** | Aussi sur cette page : vos listes nommées de motifs de branches de base (`[conflict_prevention.lists.<nom>]`), un bloc chacune avec son **Nom** (renommer la conserve par défaut si elle l'était ; un dépôt qui suivait l'ancien nom utilise la liste par défaut tant que vous ne la choisissez pas à nouveau), ses **Motifs** (un par ligne, `Enter` ou un clic ouvre l'éditeur, `Ctrl+S` le garde), **Définir par défaut** et **Supprimer la liste** (il demande d'abord, et précise que les dépôts qui la suivent utiliseront la liste par défaut). Saisissez un nom dans **Nouvelle liste** et appuyez sur `Enter` pour en ajouter une ; elle commence par `**`. Modifier une liste change chaque dépôt qui la suit. |
 
 ### Propre au dépôt : Git et encodage
 

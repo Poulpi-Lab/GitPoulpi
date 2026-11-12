@@ -33,6 +33,9 @@ impl WindowState {
             // if the pointer had made it.
             let mut event = if let Some(click) = crate::dialog_kit::frame::take_injected() {
                 Event::Mouse(click)
+            } else if let Some(queued) = self.queued_events.pop_front() {
+                // Read ahead by the paste check below.
+                queued
             } else {
                 let timeout = poll_timeout(first_poll, self.animating());
                 first_poll = false;
@@ -52,6 +55,17 @@ impl WindowState {
                     break;
                 }
                 match event::read() {
+                    // Windows has no paste brackets: text that arrives as a
+                    // run of already-queued keys is a paste (`paste_burst`).
+                    Ok(event) if cfg!(windows) => {
+                        let mut ahead = || match event::poll(Duration::ZERO) {
+                            Ok(true) => event::read().ok(),
+                            _ => None,
+                        };
+                        let (now, after) = crate::paste_burst::take(event, &mut ahead);
+                        self.queued_events.extend(after);
+                        now
+                    }
                     Ok(event) => event,
                     Err(err) => {
                         exit_log::tolerate_input_error(err, &mut self.input_errors)

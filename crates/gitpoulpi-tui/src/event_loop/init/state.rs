@@ -113,6 +113,9 @@ pub(in crate::event_loop) struct WindowState {
     pub(in crate::event_loop) commit_files_visible_rows: usize,
     pub(in crate::event_loop) commit_file_focus: bool,
     pub(in crate::event_loop) pending_count: Option<u32>,
+    /// Events read ahead while telling a paste from typing (`paste_burst`),
+    /// handled before the next read.
+    pub(in crate::event_loop) queued_events: std::collections::VecDeque<crossterm::event::Event>,
     pub(in crate::event_loop) status_list_mode: FileListMode,
     pub(in crate::event_loop) commit_list_mode: FileListMode,
     pub(in crate::event_loop) collapsed_status_folders: HashSet<PathBuf>,

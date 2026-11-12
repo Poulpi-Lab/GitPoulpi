@@ -184,6 +184,7 @@ mod minimap;
 mod new_file;
 mod palette;
 mod pane_menu;
+mod paste_burst;
 mod pointer_map;
 mod popup_list;
 mod preferences;

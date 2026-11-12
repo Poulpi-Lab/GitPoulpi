@@ -644,6 +644,7 @@ pub(super) fn init(
         // pending", not zero; `0` alone never starts one (`count_digit_value`
         // in `chrome.rs`).
         pending_count: None,
+        queued_events: std::collections::VecDeque::new(),
         // --- third pane, presentation state ---
         // The Path/Tree toggle is per-mode: which layout suits the working
         // tree isn't necessarily what suits one commit's handful of files.

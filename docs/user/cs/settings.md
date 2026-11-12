@@ -386,6 +386,7 @@ obsahují; viz [MCP a agenti](mcp-and-agents.md).
 | **Avatary autorů** | **vypnuto** (výchozí, bez sítě), **graf** (v tečce commitu) nebo **autor** (ve sloupci Autor). Když je zapnuto, hash e-mailu každého autora se odesílá službě Gravatar a vašemu poskytovateli hostingu. |
 | **Zdroje avatarů**, **Náhradní avatar** | Kde se obrázky hledají a v jakém pořadí. Pro autory bez obrázku: **identicon** (vygenerovaný vzor) nebo **iniciály**. |
 | **Barva vstupů**, **Vlastní barva vstupů** | Pozadí textových polí: **Podle motivu** (výchozí), pevná tmavá barva, nebo vaše vlastní `#rrggbb`. |
+| **Textový kurzor** | `ui.text_cursor`: **terminal** (výchozí) umístí vlastní kurzor terminálu na místo vkládání v aktivním textovém poli, jako svislou čárku (platí nastavení kurzoru vašeho terminálu a okno s návrhy metody zadávání se otevře u kurzoru); **drawn** vykreslí vlastní kurzor GitPoulpi a kurzor terminálu nechá skrytý. Platí okamžitě. Paleta: `Nastavení: Textový kurzor...`. |
 | **Barevná hloubka** | **auto** (výchozí), **truecolor**, **256** nebo **16**. Viz [Motivy](themes.md). |
 | **Barevný motiv grafu** | **Podle motivu** (výchozí: vlastní barvy drah motivu) nebo libovolná paleta drah. Každá paleta ukazuje několik svých barev. Použije se po zavření Nastavení. Příkaz z palety **Aplikace: Změnit barevný motiv grafu...** (`Ctrl+N Shift+Y`) ukazuje každou paletu živě. |
 | **Pozadí drah grafu** | **Vypnuto** (průhledné) nebo **Podbarvení řádku**: slabý pruh barvy dráhy za sloupcem grafu s tenkou lištou na okraji. |

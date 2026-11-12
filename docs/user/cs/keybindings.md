@@ -411,8 +411,8 @@ Starší terminál neumí poslat některé kombinace: `Ctrl+,`, `Ctrl+Shift+N`,
 neposílá ...“).
 
 Terminály s **klávesnicovým protokolem kitty** tyto kombinace poslat umějí.
-Příklady: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 a novější a tmux nebo
-herdr, když protokol propouštějí. GitPoulpi protokol používá ve výchozím stavu:
+Příklady: kitty, WezTerm, Ghostty, foot, Alacritty 0.13 a novější a zellij (tmux
+na dotaz neodpovídá: viz [Multiplexery](multiplexers.md#tmux)). GitPoulpi protokol používá ve výchozím stavu:
 
 - Při startu se GitPoulpi zeptá terminálu a čeká na odpověď nejvýše asi 100 ms.
   Pokud terminál neodpoví, zůstanou starší klávesy.
@@ -874,9 +874,9 @@ Klávesy jsou výchozí.
 | Protokol aktivity: Zvolit rozsah |  |
 | Protokol aktivity: Operace gitu |  |
 | Protokol aktivity: Protokol aplikace |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Protokol aktivity: Zobrazit operaci tohoto řádku |  |
+| Protokol aktivity: Další selhaná operace |  |
+| Protokol aktivity: Předchozí selhaná operace |  |
 | Protokol aktivity: Posunout doleva | `Left` |
 | Protokol aktivity: Posunout doprava | `Right` |
 | Protokol aktivity: Kopírovat poslední chybu |  |
@@ -1215,8 +1215,31 @@ Klávesy jsou výchozí.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Znovu**. `Ctrl+Shift+Z` potřebuje klávesnicový protokol kitty; `Ctrl+Y` funguje vždy |
 | `.`, `Menu`, `Shift+F10` | Otevřít kontextovou nabídku vybraného řádku |
 
-`Ctrl+Z` a `Ctrl+Y` nedělají nic, dokud má klávesnici textové pole. Editor má
-vlastní vrácení textu.
+### Ctrl+Z / Ctrl+Y v textovém poli
+
+Dokud má klávesnici textové pole, `Ctrl+Z` a `Ctrl+Y` (také `Ctrl+Shift+Z`)
+působí na text tohoto pole, nikdy na repozitář: pole, které má klávesnici, vždy
+vyhrává, takže `Ctrl+Z` ve zprávě commitu nemůže vrátit commit. Jinde si
+zachovávají globální význam (žurnál zpět / znovu výše). Platí to pro každé
+textové pole a víceřádkový editor: zprávu commitu, pole a textové editory
+Nastavení, formuláře pull requestů a issues, dialogy AI a každé pole filtru
+nebo hledání.
+
+- **Psaní** se vrací po slovech (série písmen, série mezer, série interpunkce)
+  a psaní, které se na déle než vteřinu odmlčí, začne nový krok. Několik
+  Backspace za sebou je jeden krok. Vložení, vyjmutí, `Ctrl+U` / `Ctrl+K`,
+  vložený úryvek nebo přijaté doplnění je vždy jeden krok.
+- Vrácení obnoví text, kurzor i výběr. Nová úprava po vrácení zahodí to, co šlo
+  zopakovat.
+- Každé pole drží omezenou historii (posledních 200 kroků, asi 1 MB textu) a
+  zapomene ji, když je pole zvenčí nahrazeno (složka vybraná ve výběru,
+  znovu načtený formulář) nebo klávesnici převezme jiné pole.
+- Když není co vracet, `Ctrl+Z` nedělá nic: nikdy nepropadne do vrácení
+  repozitáře, dokud má klávesnici pole.
+- **Editor instrukcí** v nastavení AI má také tlačítka **Zpět** a **Znovu** vedle
+  Uložit a Zrušit, zakázaná, dokud není kam krokovat.
+- Editor kódu a editor sloučení mají vlastní vrácení (`Úpravy: Zpět`,
+  `Sloučení: Zpět`), které zahrnuje i jejich volby.
 
 ## Filtrovatelné vyskakovací seznamy
 
@@ -1228,18 +1251,20 @@ Tyto klávesy posouvají zvýraznění:
 
 | Klávesa | Akce |
 |---|---|
-| `Up` / `Down` | Posun o jeden řádek |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Posun o jeden řádek nahoru / dolů |
 | `Home` / `End` | První / poslední řádek |
 | `PageUp` / `PageDown` | Posun o jednu viditelnou stránku |
 | `Enter` | Zvolit zvýrazněný řádek |
 | `Esc` | Zavřít |
 
 V těchto oknech `Home` a `End` posouvají seznam, ne kurzor pole filtru.
-`Ctrl+A` a `Ctrl+E` stále přesunou kurzor na začátek a na konec a `Ctrl+K`
-smaže filtr od kurzoru do konce. Žádná dvojice `Ctrl+písmeno` seznam neposouvá
-(`Ctrl+N` je předpona navigace, `Ctrl+P` paleta příkazů) a prosté `j` a `k` se
-píší do filtru: posouvají jen šipky, `PageUp` / `PageDown` a `Home` / `End`.
-V seznamech bez textového pole jsou `j` / `k` další způsob posunu dolů / nahoru.
+`Ctrl+K` / `Ctrl+J` seznam posouvají také, takže `Ctrl+K` už nemaže filtr do
+konce (`Ctrl+U` ho stále vymaže; v běžném textovém poli mimo seznam `Ctrl+K`
+dál maže do konce řádku). `Ctrl+A` a `Ctrl+E` stále přesunou kurzor na začátek
+a na konec. `Ctrl+J` / `Ctrl+K` posouvají i každý další seznam, s textovým
+polem i bez něj (`Ctrl+N` je předpona navigace a `Ctrl+P` paleta příkazů, takže
+klávesami seznamu nejsou). Prosté `j` a `k` se píší do filtru; v seznamech bez
+textového pole jsou `j` / `k` další způsob posunu dolů / nahoru.
 
 Myší:
 
@@ -1486,7 +1511,8 @@ workflow). Řádky řízené hostitelem (*Nové issue: <typ>*, *Převzít větev
 | `Enter` / `l` na řádku souboru | Otevřít diff souboru uprostřed |
 | `Esc` / `h` | Vrátit se na commity |
 | `Right` | (commit s více než jedním refem) Otevřít seznam jeho dalších refs: `Up` / `Down` se pohybují, `Enter` provede checkout, `Esc` zavře |
-| `f` | Otevřít lištu hledání (viz [Hledání](#hledání)) |
+| `f` | Otevřít lištu hledání (viz [Hledání](#hledání)); nikdy to nebylo `/`, takže hledání v Logu se nemění |
+| `/` | Přejít do pole filtru Refs (totéž dělá ta klávesa, když má fokus panel Refs); píše se jako znak, když má fokus textové pole |
 | `c` | (s necommitnutými změnami) Vybrat řádek WIP a dát kurzor do jeho pole zprávy |
 | `Enter` na řádku WIP | Dát kurzor do pole zprávy řádku WIP |
 | `.`, `Menu`, `Shift+F10` | Nabídka commitu. `Up` / `Down` se pohybují, `Right` / `l` / `Enter` otevřou podnabídku, `Left` / `h` / `Esc` se vrátí |

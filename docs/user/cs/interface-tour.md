@@ -229,7 +229,7 @@ Panel nemá titulek: říkají to záhlaví sloupců. Tagy se kreslí tam, kde j
 | Sloupec | Zobrazuje |
 |---|---|
 | **Ref** | Barevné pilulky větví a tagů na commitu: ikona notebooku pro lokální, zeměkoule pro remote, ikona tagu pro tagy, `+N`, když tam míří další refs. |
-| **Graf** | Dráhy větví, merge a místa odbočení. V kitty, Ghostty, WezTerm a iTerm2 (a také Windows Terminal a foot přes sixel) se kreslí jako obrázky, v ostatních terminálech jako znaky. Barvy drah pocházejí z motivu nebo z palety, kterou zvolíte (viz [Motivy](themes.md)). Při nejmenší šířce (jedna tečka commitu) je sloupec kompaktní: všechny commity na jedné dráze, bez čar větví a merge. |
+| **Graf** | Dráhy větví, merge a místa odbočení. V kitty, Ghostty, WezTerm, Rio a iTerm2 (a také Windows Terminal, foot a Tabby přes sixel) se kreslí jako obrázky, v ostatních terminálech jako znaky. Barvy drah pocházejí z motivu nebo z palety, kterou zvolíte (viz [Motivy](themes.md)). Při nejmenší šířce (jedna tečka commitu) je sloupec kompaktní: všechny commity na jedné dráze, bez čar větví a merge. |
 | **Zpráva** | Souhrn commitu. |
 | **Autor** | Autor, volitelně s avatarem. |
 | **Datum** | Datum autora ve zvoleném formátu. |

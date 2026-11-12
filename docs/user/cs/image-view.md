@@ -27,8 +27,8 @@ karta řekne, abyste nejdřív spustili `LFS > Pull`. Průhlednost se kreslí p�
 ## Jak se kreslí
 
 V terminálu s protokolem obrázků (Kitty a Ghostty, WezTerm a iTerm2, Rio,
-mintty) je obrázek skutečný obrázek. Jinde (obyčejný Windows Terminal, tmux,
-terminál, který GitPoulpi nezná) se kreslí barevnými znaky půlbloků, s poloviční
+mintty a terminály se sixel Windows Terminal, foot a Tabby) je obrázek skutečný obrázek. Jinde (obyčejná konzole Windows,
+zellij, terminál, který GitPoulpi nezná) se kreslí barevnými znaky půlbloků, s poloviční
 svislou rozlišovací schopností, ale čitelně všude; **Bez protokolu obrázků** lze
 nastavit na *Jen informační karta*. **Protokol obrázků** na stránce **Log a graf**
 vynutí jeden z nich.

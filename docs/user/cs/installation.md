@@ -17,10 +17,10 @@ Vedle nich archiv obsahuje `gitpoulpi-launch`, drobný program, který zástupci
 - **Systémový `git`** v `PATH`. GitPoulpi používá libgit2 pro většinu operací
   a váš `git` pro zbytek.
   Je potřeba verze **2.34 nebo novější**. Na macOS funguje `git` z Apple Command Line Tools i ten z Homebrew.
-- **Terminál** s podporou myši. kitty, Ghostty, WezTerm a iTerm2 (a také Windows Terminal a foot přes sixel) kreslí graf
-  commitů jako obrázky. Ostatní terminály (konzole Windows, tmux a
+- **Terminál** s podporou myši. kitty, Ghostty, WezTerm, Rio, iTerm2 (a také Windows Terminal, foot a Tabby přes sixel) kreslí graf
+  commitů jako obrázky. Ostatní terminály (konzole Windows, zellij, screen a
   většina dalších) zobrazí znakový graf. Viz
-  [Výběr terminálu](terminals.md).
+  [Výběr terminálu](terminals.md) a [Multiplexery](multiplexers.md).
 - **Nerd Font** nebo písmo s emoji, pro ikony na panelu nástrojů a v
   postranním panelu.
 - Volitelně: **`git-lfs`** 3.0 nebo novější, pro repozitáře s Git LFS. Bez něj

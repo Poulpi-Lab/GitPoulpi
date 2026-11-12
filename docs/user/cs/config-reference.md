@@ -90,7 +90,7 @@ author_email = "jane@work.example"
 | Klíč | Výchozí | Hodnoty a účinek |
 |---|---|---|
 | `ui.graph_renderer` | `"auto"` | `auto` (obrázek tam, kde ho terminál umí nakreslit, jinak znaky), `image`, `text`. **Restart.** |
-| `ui.image_protocol` | `"auto"` | Jak se obrázky (graf, avatary) dostanou do terminálu: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = protokol Kitty v kitty, Ghostty a v herdr s `kitty_graphics = true`; iTerm2 ve WezTerm, iTerm2, Rio, mintty; sixel (jen avatary) ve Windows Terminal, foot, Konsole, mlterm; žádný v tmux, zellij, screen a neznámých terminálech. **Restart.** |
+| `ui.image_protocol` | `"auto"` | Jak se obrázky (graf, avatary) dostanou do terminálu: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = protokol Kitty v kitty, Ghostty, iTerm2 3.7.7 a novějším a v herdr s `kitty_graphics = true`; protokol iTerm2 ve WezTerm a Rio (průhlednost se míchá), starším iTerm2 a mintty (neprůhledné pozadí); sixel (sloupec grafu i avatary) ve Windows Terminal, foot, Tabby, Konsole, mlterm, v tmux, když terminál za ním sixel umí, a v každém terminálu, jehož odpověď při startu sixel uvádí (xterm spuštěný s `-ti vt340`, terminál VS Code se zapnutými obrázky); znaky v zellij, screen a neznámých terminálech. V tmux vyžadují obrázky kitty zde `kitty` plus `allow-passthrough on` ([Multiplexery](multiplexers.md)). Kde pseudokonzole terminálu obrázky zahazuje nebo špatně umisťuje (WezTerm 20240203, Rio a mintty ve Windows), použijte `ui.graph_renderer = "text"` ([Výběr terminálu](terminals.md#windows)). **Restart.** |
 | `ui.theme` | `"system"` | Barevný motiv: vestavěný slug (`gitpoulpi theme list` vypíše všechny), slug souboru v `<config>/themes/`, nebo `system` (řídí se světlým či tmavým pozadím terminálu zjištěným při spuštění; stará hodnota `default` znamená totéž). `config set` odmítne neznámé názvy. Viz [Motivy](themes.md). |
 | `ui.graph_color_theme` | `"theme"` | Paleta drah: `theme` (podle motivu) nebo libovolný název palety drah: `gitpoulpi`, `light`, `material`, `serie` a palety ostatních motivů. |
 | `ui.graph_lane_background` | `"off"` | `off` nebo `row_tint` (slabý pruh barvy dráhy za grafem a lišta na jeho okraji). **Aplikace: Přepnout zbarvení řádků grafu** (`Ctrl+N Shift+T`) ho přepíná; **Aplikace: Změnit barevný motiv grafu...** (`Ctrl+N Shift+Y`) volí `ui.graph_color_theme`. |
@@ -119,7 +119,7 @@ author_email = "jane@work.example"
 | `ui.git_terms_english` | `false` | Jen ja, ko a zh-CN: zobrazí anglická slova gitu (stage, unstage, staged, unstaged...) místo jejich přepisu. Nemá účinek, dokud je `ui.translate_git_terms` `true`. **Živě.** |
 | `ui.mouse_enabled` | `true` | `false` ponechá myš (a výběr textu) terminálu. **Restart.** |
 | `ui.mouse_scroll_lines` | `3` | Řádků Logu na jedno cvaknutí kolečka, 1 až 20. **Restart.** |
-| `ui.kitty_keyboard` | `"auto"` | `auto` požádá terminál o klávesnicový protokol kitty (takže dorazí `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N`); `off` nepožádá nikdy. **Restart.** |
+| `ui.kitty_keyboard` | `"auto"` | `auto` požádá terminál o klávesnicový protokol kitty (takže dorazí `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N`; jen Unix, tmux neodpovídá nikdy: viz [Multiplexery](multiplexers.md#tmux)); `off` nepožádá nikdy. **Restart.** |
 | `ui.logo_color` | `""` | Barevné provedení loga v okně O aplikaci, slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); prázdné nebo neznámé znamená výchozí hodnotu sestavení (`lavender`). Zapisuje se kliknutím na logo nebo výběrem barvy v O aplikaci. |
 
 **Avatary** (ve výchozím stavu vypnuty; jejich zapnutí odešle hash SHA-256
@@ -145,6 +145,7 @@ GitHub/GitLab)
 | `ui.mermaid_orientation` | `lr` | Směr tohoto grafu: `lr` (zleva doprava) nebo `tb` (shora dolů). |
 | `ui.mermaid_fence` | `false` | Obalit zkopírovaný skript Mermaid blokem kódu `mermaid`. |
 | `ui.mermaid_subject_width` | `40` | Předměty commitů se v id Mermaid zkrátí na tolik znaků (`subjects`, `full`). |
+| `ui.text_cursor` | `"terminal"` | Kde se ukazuje kurzor aktivního textového pole: `terminal` tam umístí vlastní kurzor terminálu (blikající svislou čárku, takže se jím řídí nastavení kurzoru terminálu i okno s návrhy metody zadávání; skrytý, když klávesnici nemá žádné pole, a při ukončení obnovený na váš vlastní styl kurzoru), `drawn` vykreslí vlastní znak kurzoru GitPoulpi a kurzor terminálu nechá skrytý. Okamžitě. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` nebo `16`: kolika barvami se kreslí. `auto` je truecolor, kromě Apple Terminal (256), konzole Linuxu (16) a terminálů `*-256color` bez `COLORTERM` (256). Živě. Viz [Motivy](themes.md). |
 | `ui.input_color` | `"theme"` | Pozadí textových polí: `theme` (vlastní z motivu), `gray`, `blue`, `slate`, `dark`, `custom`. |
 | `ui.input_color_custom` | `"#2a2a2a"` | Barva `custom`, `#rrggbb`. |
@@ -184,7 +185,7 @@ výchozí, nebo `"english"`) ponechá názvy anglicky bez ohledu na jazyk.
 | `ui.launcher_build` | `"current"` | Jen v režimu vývojáře (viz `general.dev_mode`; jen tehdy se zobrazí v Nastavení > Spouštěč, jinak se ignoruje). `"current"`: zástupci a alias příkazu spouštějí sestavení, které je vytvořilo. `"newest"`: spouštějí naposledy sestavené z `target/dist` a `target/release` v klonu, rozhoduje se při každém kliknutí, a spuštění kteréhokoli sestavení je nikdy nepřepíše. |
 | `ui.command_alias` | `""` | Název příkazu, kterým se GitPoulpi spouští z terminálu, například `gp` (Nastavení > Spouštěč, `gitpoulpi alias create`). Prázdné: žádný. Jen písmena, číslice, `-`, `_` a `.`. Je to jen název, který používá tlačítko **Vytvořit: alias příkazu**; dokud ho nevytvoříte, nic neexistuje. |
 | `ui.command_alias_add` | `""` | Název druhého příkazu, například `gpa`, který spouští `gitpoulpi --add`: otevře aktuální složku jako novou kartu již spuštěného GitPoulpi (Nastavení > Spouštěč, `gitpoulpi alias create gpa --add`). Prázdné: žádný. Stejná pravidla pro název; tlačítko **Vytvořit** ho vytvoří spolu s `ui.command_alias`. |
-| `ui.relaunch_in_terminal` | `true` | Jen Windows: když se exe spustí dvojklikem ve vlastní konzoli, GitPoulpi se znovu otevře v `ui.launch_terminal` a skončí. Vypnuto: zůstane v té konzoli. |
+| `ui.relaunch_in_terminal` | `true` | Jen Windows: když se exe spustí dvojklikem ve vlastní konzoli, GitPoulpi se znovu otevře v `ui.launch_terminal` a skončí. Terminál, který exe spouští přímo (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`), je také vlastní konzole, ale ne klasické okno konzole: nikdy se znovu nespouští. Vypnuto: zůstane v té konzoli. |
 | `ui.reuse_window` | `true` | Kliknutí na zástupce GitPoulpi (`gitpoulpi launch`) zobrazí okno už otevřeného GitPoulpi místo spuštění dalšího. Vypnuto: každé kliknutí spustí nové okno. |
 
 **Příkazy `ui.open_in`** se nejprve rozdělí na argumenty (mezery, `'...'`, `"..."`), pak se uvnitř každého argumentu dosadí proměnné, takže složka s mezerami zůstane jedním argumentem; žádný shell se nepoužívá, pokud ho příkaz sám nespustí (`sh -c '... "$GITPOULPI_CWD"'`). Proměnné: `${cwd}` (složka karty), `${repo}` (kořen repozitáře), `${name}` (základní název složky), `${branch}` (prázdné při odpojeném HEAD), `${web_url}` (webová stránka remote `origin`, je-li to projekt na GitHubu nebo GitLabu, jinak prázdné; položka, která ji používá, se při prázdné hodnotě odmítne spustit), `${env:NAME}` (prázdné, není-li nastaveno). Staré `{repo}` stále znamená `${cwd}`. Jakékoli jiné `${...}` je chyba s jeho názvem. Příklad:
@@ -333,7 +334,8 @@ review_requests = true    # žádosti čekající na mou kontrolu, každý repoz
 open_requests = false     # každá otevřená žádost mých jmenných prostorů
 include_drafts = false    # ponechat koncepty žádostí v těchto seznamech
 assigned_issues = true    # otevřené issues přiřazené mně, každý repozitář
-namespaces = ["acme"]     # organizace / skupiny, v nichž hledat otevřené žádosti
+namespaces = ["acme", "ptm/produits"]  # jedna položka na řádek v Nastavení; prázdné = bez omezení
+namespaces_regex = false  # true: každá položka je regulární výraz nad celou cestou repozitáře
 review_mode = "ask"       # ask | clone | api
 ```
 
@@ -343,7 +345,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Každá otevřená žádost vašeho vlastního jmenného prostoru a každé organizace nebo skupiny, jejímž jste členem (nebo `namespaces`), nikdy „vše, co token vidí“ |
 | `include_drafts` | `false` | Koncepty žádostí jsou z těchto seznamů vynechány, pokud to není zapnuto |
 | `assigned_issues` | `false` | Otevřené issues přiřazené vám, každý repozitář |
-| `namespaces` | `[]` | Organizace / skupiny, v nichž hledat `open_requests`; prázdné znamená váš vlastní jmenný prostor plus každé členství (GitHub: prohledá se nejvýše 12, GitLab: 10 skupin a 10 vlastních projektů, Gitea, Forgejo a Gerrit: 10; Azure DevOps bere názvy projektů, Bitbucket Data Center klíče projektů, Gerrit předpony cest projektů) |
+| `namespaces` | `[]` | Které repozitáře si každý seznam ponechá (žádosti ke kontrole, přiřazené issues, otevřené žádosti); prázdné znamená bez omezení a `open_requests` pak prohledá váš vlastní jmenný prostor plus každé členství (GitHub: prohledá se nejvýše 12, GitLab: 10 skupin a 10 vlastních projektů, Gitea, Forgejo a Gerrit: 10). Položka odpovídá celé cestě repozitáře (`skupina/podskupina/projekt`, Azure DevOps `Project/repo`, Bitbucket Data Center `KEY/repo`), když se jí rovná nebo je její předponou končící na `/`: `ptm` ponechá `ptm/produits/x`, ne `ptmx/y`; velikost písmen se ignoruje. Nastavení ukazuje jednu položku na řádek; starší soubor může držet jeden řetězec oddělený čárkami (`"ptm, formation"`), který se stále načte a uloží zpět jako seznam |
+| `namespaces_regex` | `false` | Číst každou položku `namespaces` jako regulární výraz porovnávaný s celou cestou repozitáře tak, jak ji zapisujete (takže `^ptm/(produits\|infra)/` kotví na začátku; bez `^` nebo `$` odpovídá kdekoli v cestě; `(?i)` přidáte pro ignorování velikosti písmen). `open_requests` pak prohledá vaše členství a výrazy filtrují řádky. Neplatný výraz se ukáže pod polem v Nastavení a neuloží se; v ručně upraveném souboru nechá seznamy prázdné s poznámkou |
 | `review_mode` | `"ask"` | Co udělá kontrola žádosti, jejíž repozitář není naklonovaný: `ask`, `clone` (naklonovat, pak zkontrolovat) nebo `api` (zkontrolovat přes API hostitele) |
 
 Odpovědi se pro každý profil na pět minut ukládají do mezipaměti `radar-account.json` vedle

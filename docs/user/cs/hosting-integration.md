@@ -676,6 +676,11 @@ tabulce `[integrations.radar]` (všechny ve výchozím stavu vypnuté; viz
 - **žádosti o kontrolu**: otevřené žádosti, které žádají o vaši kontrolu;
 - **otevřené žádosti**: každá otevřená žádost vašeho vlastního jmenného prostoru a každé organizace nebo
   skupiny, jejímž jste členem, nebo jmenných prostorů, které uvedete. Nikdy ne celý hostitel;
+  **Jmenné prostory** profilu (jeden na řádek v Nastavení > Integrace > Radar, volitelně
+  jako regulární výrazy) omezují všechny tři seznamy: řádek odpovídá celé cestě repozitáře,
+  když se jí rovná nebo je její předponou na hranici `/` (`ptm` ponechá `ptm/produits/x`, ne
+  `ptmx/y`), a uplatňuje se na řádky, které hostitel vrátí, a také na straně serveru, kde to
+  vyhledávání hostitele dovolí (kvalifikátory GitHubu `user:` / `repo:`);
 - **přiřazené issues**: otevřené issues přiřazené vám.
 
 Odpovídají GitHub, GitLab (včetně self-managed), Gitea, Forgejo, Azure DevOps (Services
@@ -729,10 +734,10 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Každý příkaz najdete v [referenční příručce CLI](cli-reference.md#příkazy).
-Token se nikdy nepřijímá jako argument (`hosting login` vypíše `stored: "os"`, když ho drží
-systémové úložiště přihlašovacích údajů, nebo `stored: "session"` plus `store_error`, když ho
-úložiště odmítlo a token žije jen v paměti pro tuto relaci) a server MCP `hosting login` nenabízí,
-takže token nikdy neprochází agentem.
+Token se nikdy nepřijímá jako argument a server MCP `hosting login` nenabízí,
+takže token nikdy neprochází agentem. `hosting login` vypíše `stored: "os"`, když
+token drží systémové úložiště přihlašovacích údajů, nebo `stored: "session"` plus
+`store_error`, když ho úložiště odmítlo a token žije jen v paměti pro tuto relaci.
 
 ## Řešení potíží
 

@@ -174,6 +174,16 @@ Un file binario (un PDF, un documento Word, un foglio di calcolo, un archivio...
 
 Il file della directory di lavoro è consegnato all'applicazione così com'è. La versione di un commit (o dell'indice) è scritta in una **copia temporanea di sola lettura**, con un avviso nella barra di stato, così un'applicazione non può modificare il repository. Nessuna delle due modifica il repository: nessuna voce nel giornale, Annulla non è coinvolto.
 
+L'elenco del menu si apre accanto al menu, all'altezza della riga **Apri con...**, come un sottomenu (a sinistra quando a destra non c'è spazio), sia dal mouse sia dalla tastiera. Lo stesso fa l'elenco degli editor di immagini (**Modifica in...**) aperto dal menu di un file.
+
+### File Git LFS
+
+La scheda dell'oggetto Git LFS (vedi [Git LFS](lfs.md)) porta le stesse due azioni sotto il suo testo: **Apri in predefinito** e **Apri in**, con gli stessi tasti (`o`, `Maiusc+O`) e le stesse righe della palette. Aprono il file vero, mai il puntatore: il file della directory di lavoro così com'è, oppure una copia temporanea di sola lettura dell'oggetto dall'archivio LFS locale per la versione di un commit o dell'indice. Un oggetto non ancora scaricato non ha pulsanti sulla scheda, e la barra di stato dice che il contenuto non è ancora scaricato. Lo stesso rifiuto vale per un file della directory di lavoro che contiene ancora solo il puntatore: **Apri in predefinito**, **Apri in** e **Modifica in**, dalla scheda o da qualsiasi menu di un file, dicono che il contenuto non è scaricato invece di aprire il testo del puntatore (scaricalo con le righe pull o checkout della barra LFS, poi riprova). L'apertura è in sola lettura: nessuna voce nel giornale, niente da annullare.
+
+### Browser su Windows
+
+Chrome e Edge registrano `--single-argument %1`, che li fa leggere tutto ciò che segue l'opzione come un unico indirizzo, virgolette comprese. GitPoulpi passa il percorso a un programma di questo tipo così com'è e senza virgolette, come fa Windows, quindi un file con spazi nel percorso si apre invece di fallire con `http://"c/...`. Ogni altro programma riceve il percorso come un normale argomento.
+
 ## Chiavi obsolete
 
 Le vecchie chiavi `ui.terminal_launch` e `ui.terminal_launch_command` vengono lette solo

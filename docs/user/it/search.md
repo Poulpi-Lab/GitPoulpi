@@ -31,7 +31,7 @@ subito e i commit si aggiungono appena sono pronti.
 
 | Tasto | Fa |
 |---|---|
-| `Su` / `Giù`, `Ctrl+P` / `Ctrl+N`, `PgUp` / `PgDn`, `Home` / `End` | Si sposta tra i risultati (le intestazioni dei gruppi vengono saltate). |
+| `Su` / `Giù`, `PgUp` / `PgDn`, `Home` / `End` | Si sposta tra i risultati (le intestazioni dei gruppi vengono saltate). |
 | `Enter` | Va al risultato: la scheda del repository si apre (o viene attivata), poi il risultato viene mostrato. |
 | `Esc` | Chiude la ricerca. |
 | `Alt+1` .. `Alt+8` | Attiva o disattiva un tipo (i chip sopra l'elenco, nel loro ordine). `Alt+0` li attiva tutti. |

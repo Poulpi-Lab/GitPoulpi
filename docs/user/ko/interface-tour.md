@@ -184,7 +184,7 @@ commit마다 한 행이며 최신 commit이 맨 위에 옵니다. 머리글을 �
 | 열 | 표시 내용 |
 |---|---|
 | **Ref** | commit에 있는 브랜치와 tag의 색 필: 로컬은 노트북 아이콘, 리모트는 지구본, tag는 tag 아이콘, 더 많은 ref가 가리키면 `+N`. |
-| **그래프** | 브랜치 레인, merge, 브랜치 분기점. kitty, Ghostty, WezTerm, iTerm2, sixel을 쓰는 Windows Terminal과 foot에서는 그림으로, 다른 터미널에서는 문자로 그려집니다. 레인 색은 테마 또는 직접 고른 팔레트에서 옵니다([테마](themes.md) 참고). 가장 좁은 너비(commit 점 하나)에서는 열이 간결해집니다. 모든 commit이 한 레인에 놓이고 브랜치 선도 merge 선도 없습니다. |
+| **그래프** | 브랜치 레인, merge, 브랜치 분기점. kitty, Ghostty, WezTerm, Rio, iTerm2, sixel을 쓰는 Windows Terminal, foot, Tabby에서는 그림으로, 다른 터미널에서는 문자로 그려집니다. 레인 색은 테마 또는 직접 고른 팔레트에서 옵니다([테마](themes.md) 참고). 가장 좁은 너비(commit 점 하나)에서는 열이 간결해집니다. 모든 commit이 한 레인에 놓이고 브랜치 선도 merge 선도 없습니다. |
 | **메시지** | commit 요약. |
 | **작성자** | 작성자와 선택 사항인 아바타. |
 | **날짜** | 선택한 형식의 작성 날짜. |

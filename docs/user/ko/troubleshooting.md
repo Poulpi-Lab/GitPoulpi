@@ -41,6 +41,8 @@
 - **Git 작업**(창이 열리는 탭): 작업이 최신부터 나오며, 각각 실행된 시각과 걸린 시간이 붙습니다(`Push - 123 ms`): 저장소 열기, commit 그래프 불러오기, fetch, pull, push, commit, checkout, merge, rebase, stash, clone. 실패, 상태 메시지, 실패한 클론, 워크스페이스의 Fetch all도 여기에 나열됩니다. `Enter`나 클릭으로 하나를 열고(이유, 다음 단계, 명령, 종료 코드, 출력), `c`나 복사 버튼으로 복사하며, `r`이나 그 버튼은 제안된 단계를 실행합니다. `Tab`(또는 `p`)으로 애플리케이션 탭으로 전환하고, `Left`/`Right`로 긴 줄을 옆으로 스크롤합니다.
 ![활동 로그의 Git 작업 탭: 각 작업의 시각과 걸린 시간, 실패한 fetch는 빨간색](../images/activity-log-repository.png)
 
+- **어떤 동작이 오류를 일으켰는지.** 모든 실패는 항목, 애플리케이션 로그, 복사한 보고서에서 무엇이 일으켰는지 알려 줍니다. 작업은 사람이 부르는 이름(`Remove remote`, `Fetch all remotes`, `Hosting request: create pull request`, `Token command`)과 주요 인수(`remote=cm6`, 브랜치, 경로. 메시지 본문은 절대 아니며 URL과 토큰은 다른 곳처럼 가려짐)로 표시되고, 이어서 저장소, 요청한 쪽(`TUI`, `CLI`, `MCP`), 작업 id(데몬이 요청에 준 번호이며 fetch, push, pull이면 작업 번호도)가 나옵니다. Git 작업 탭에서 항목의 머리글은 `Remove remote 실패 (remote=cm6) - ... [CLI #12]`처럼 읽히고 세부 정보는 `작업:`, `저장소:`, `요청자:`, `작업 ID:`로 시작합니다. 자체 제목이 없는 작업은 그것이 무엇이었는지로 제목이 붙습니다(`Remove remote 실패`). 애플리케이션 탭에서 실패 줄은 같은 말과 태그로 시작합니다. `Remove remote 실패 (remote=cm6) [op #12, CLI, repo name]: backend error: no such remote: cm6`. 이런 줄은 그 작업을 엽니다: 클릭하거나, 선택하고 `Enter`를 누릅니다(팔레트의 `활동 로그: 이 줄의 작업 표시`). `]`와 `[`는 다음과 이전 실패 줄을 선택하며(`활동 로그: 다음 실패한 작업` / `활동 로그: 이전 실패한 작업`), 줄을 선택한 상태에서는 화살표 키가 스크롤하는 대신 선택을 옮깁니다. 열리는 항목은 창이 그 작업을 실행했다면 창 자체의 것이고, 같은 세션에 대한 CLI나 에이전트의 실패라면 창이 그 줄로 항목을 만듭니다. 복사한 오류 보고서에는 `operation:`, `arguments:`, `repository:`, `requested by:`, `operation id:` 줄이 있어 그것만 붙여 넣을 수 있습니다. 스크립트에서는 실패한 명령의 `--json` 오류는 그대로이고, 실패한 요청에 대한 데몬의 응답이 같은 사실을 추가된 `context` 필드에 담습니다.
+
 - **긴 줄**(두 탭 모두): 창보다 넓은 머리글이나 세부 줄은 잘리지 않습니다. 목록 아래에 가로 스크롤바가 나타나며, `Left` / `Right`(`activity_log.scroll_left` / `activity_log.scroll_right`로 다시 지정 가능), `Shift` + 휠 또는 가로 휠, 팔레트의 `활동 로그: 왼쪽으로 스크롤` / `활동 로그: 오른쪽으로 스크롤`, 또는 스크롤바(썸을 끌거나, 트랙을 눌러 썸을 포인터 밑으로 가져옴)로 옆으로 스크롤합니다. `Home`은 처음으로 돌아가며, 탭을 바꾸면 다른 탭은 왼쪽 가장자리에서 시작합니다. 줄바꿈된 텍스트(요약, 제안된 작업)는 줄바꿈된 채로 남습니다.
 
 - **범위**(탭 아래의 드롭다운. `s`로 열거나 팔레트의 `활동 로그: 범위 선택`): 두 탭이 다루는 대상입니다. 항목은 **이 저장소 (이름)**(로그를 연 탭의 저장소. 저장소가 없는 Home에서는 나오지 않음), **모든 저장소**, 각 **워크스페이스**, 창이 아는 각 저장소입니다. 저장소 탭에서는 *이 저장소*로, Home(활동 버튼, `Ctrl+N` 다음 `Shift+A`)에서는 *모든 저장소*로 열립니다. `Ctrl+N` 다음 `Shift+G`와 팔레트의 `보기: 전체 활동 로그`는 항상 *모든 저장소*로 열리고, 앞에 있는 탭의 저장소가 아닌 실패(예: 실패한 클론)의 빨간 오류를 클릭했을 때도 그렇습니다. 마지막 선택은 세션 동안 기억되며 두 가지 여는 방법마다 따로 기억됩니다. 애플리케이션 탭에서는 프로그램이 어떤 저장소에 대해 쓴 줄(실패한 push, 작업의 소요 시간)이 그 저장소에 속하며, *모든 저장소*에서는 그런 줄마다 누구의 것인지 나옵니다(`[이름]`). 어떤 저장소와도 관계없는 줄(시작, 설정, 데몬 자체)과 어느 저장소에도 속하지 않는 항목(실패한 저장)은 **앱 전체**입니다. 모든 범위에서 표시되며, 범위가 *모든 저장소*보다 좁을 때는 `[앱 전체]`로 표시되므로 필터가 실패를 숨기는 일은 없습니다. 팔레트에는 탭용으로 `활동 로그: Git 작업`과 `활동 로그: 애플리케이션 로그`도 있습니다.
@@ -60,7 +62,7 @@
 **도구 모음과 사이드바에 아이콘 대신 네모나 물음표가 표시됩니다.**
 터미널에서 Nerd Font 또는 이모지를 지원하는 글꼴을 사용하세요. 아이콘이 없어도 그래프와 텍스트는 동작합니다.
 
-**commit 그래프가 그림이 아니라 문자로 그려집니다.** 자동 대체 동작입니다. 그림은 kitty 그래픽 프로토콜(kitty, Ghostty, kitty 그래픽을 켠 herdr) 또는 iTerm2 프로토콜(WezTerm, iTerm2, mintty), 또는 sixel(Windows Terminal, foot, Konsole)을 쓰는 터미널이 필요합니다. Windows 콘솔, tmux, zellij에서는 문자로 그려집니다. 어느 쪽이든 강제로 지정하는 방법은 아래 그래프 섹션과 [터미널 고르기](terminals.md)를 참고하세요.
+**commit 그래프가 그림이 아니라 문자로 그려집니다.** 자동 대체 동작입니다. 그림은 kitty 그래픽 프로토콜(kitty, Ghostty, kitty 그래픽을 켠 herdr) 또는 iTerm2 프로토콜(WezTerm, Rio, mintty), 또는 sixel(Windows Terminal, foot, Tabby, Konsole, 그리고 뒤의 터미널이 sixel을 지원하는 tmux)을 쓰는 터미널이 필요합니다. Windows 콘솔, zellij, screen에서는 문자로 그려집니다. 어느 쪽이든 강제로 지정하는 방법은 아래 그래프 섹션, [터미널 고르기](terminals.md), [멀티플렉서](multiplexers.md)를 참고하세요.
 
 **마우스가 반응하지 않거나 마우스로 텍스트를 선택할 수 없습니다.**
 GitPoulpi는 클릭이 전달되도록 마우스를 캡처합니다. 터미널 자체로 텍스트를 선택하려면 드래그하는 동안 `Shift`를 누르고 있으세요(대부분의 터미널). diff 안에서 선택할 수도 있습니다(드래그한 뒤 `y`). 마우스 캡처를 끄려면 *설정 > 키보드 및 마우스 > 마우스 사용*을 사용하세요(재시작 필요). 키보드로 모든 명령에 접근할 수 있습니다.
@@ -142,7 +144,7 @@ GitPoulpi는 네트워크 작업에 `git` 자체의 자격 증명 도우미와 s
 
 ## 그래프가 그림이 아니라 문자로 그려짐 (herdr, tmux, 기타 터미널)
 
-GitPoulpi는 터미널이 표시할 것이 확실한 경우에만 그래프 열과 작성자 아바타를 픽셀로 그립니다. iTerm2 인라인 이미지는 순수한 WezTerm, iTerm2, mintty에서, Kitty 그래픽 프로토콜은 kitty, Ghostty, 그리고 **herdr 자체 설정에서 `kitty_graphics = true`로 지정하고**(`[terminal]`, 오래된 herdr에서는 `[experimental]`) herdr가 WezTerm, kitty, Ghostty 안에서 실행되는 경우에 사용합니다. sixel 그림은 Windows Terminal, foot, Konsole, mlterm에서 사용됩니다. 그 밖의 모든 곳에서는 문자로 그리며, 이는 항상 올바릅니다.
+GitPoulpi는 터미널이 표시할 것이 확실한 경우에만 그래프 열과 작성자 아바타를 픽셀로 그립니다. iTerm2 인라인 이미지는 순수한 WezTerm, Rio, mintty, 그리고 3.7.7보다 오래된 iTerm2에서, Kitty 그래픽 프로토콜은 kitty, Ghostty, iTerm2 3.7.7 이상, 그리고 **herdr 자체 설정에서 `kitty_graphics = true`로 지정하고**(`[terminal]`, 오래된 herdr에서는 `[experimental]`) herdr가 WezTerm, kitty, Ghostty 안에서 실행되는 경우에 사용합니다. sixel 그림은 Windows Terminal, foot, Tabby, Konsole, mlterm(그리고 뒤의 터미널이 sixel을 지원하는 tmux)에서 사용됩니다. 그 밖의 모든 곳에서는 문자로 그리며, 이는 항상 올바릅니다.
 
 - Kitty 그래픽을 켠 herdr인데 GitPoulpi가 그 설정을 찾지 못하는 경우(또는 herdr 기본값에 의존하는 경우)에는 `ui.image_protocol = "kitty"`로 설정하고(설정 > 로그 및 그래프 > 이미지 프로토콜) 재시작하세요.
 - 그래프 자리에 네모나 깨진 문자가 표시되는 터미널에서는 `ui.image_protocol = "none"` 또는 `ui.graph_renderer = "text"`로 설정하세요.
@@ -150,6 +152,10 @@ GitPoulpi는 터미널이 표시할 것이 확실한 경우에만 그래프 열�
 
 **herdr 원격(`herdr --remote <host>`, 또는 `ssh` 후 `herdr`): 텍스트 그래프가 기본값입니다.** SSH에서는 GitPoulpi가 원격 호스트에서 실행되므로 원격의 환경과 herdr `config.toml`만 읽을 수 있습니다. Kitty 그림이 표시되는지는 GitPoulpi가 볼 수 없는 *로컬* herdr 클라이언트(자체 `kitty_graphics` 설정과 자체 터미널)가 결정합니다. 클라이언트가 그림을 그리지 않으면 셀이 빈 채로 남습니다. 그래서 GitPoulpi는 SSH 너머의 herdr를 감지하면(`SSH_CONNECTION` / `SSH_CLIENT` / `SSH_TTY`) 텍스트 그래프를 그립니다. 로컬 herdr에 `kitty_graphics = true`가 있고 Kitty 이미지를 그리는 터미널(kitty, Ghostty)을 쓴다면, 원격에서 `ui.graph_renderer = "image"`(또는 `ui.image_protocol = "kitty"`)로 선택하세요. 그림은 인라인(`t=d`)으로 전송되므로 어떤 바이트 스트림에서도 동작합니다. 열이 비어 있으면 `ui.graph_renderer = "text"`로 설정하세요.
 
-**레인 뒤의 밝은 사각형.** 그림은 아무것도 그려지지 않은 곳이 투명합니다(straight-alpha RGBA PNG). 그래서 터미널의 배경과 선택 띠가 비쳐 보입니다. Kitty 프로토콜 터미널과 **WezTerm**은 그 알파를 합성하며, 이때 GitPoulpi는 그림 아래에 일반 빈 셀을 확보하고 그 뒤에 그림을 보냅니다. 그 밖의 모든 iTerm2 프로토콜 터미널(iTerm2 자체, Rio, mintty)은 PNG 알파를 합성하는지 알려져 있지 않으므로, 그림에 테마 색의 불투명한 배경이 들어 있어 배경색이 다른 터미널에서는 사각형으로 보일 수 있습니다. `ui.graph_renderer = "text"`로 없앨 수 있습니다. `ui.graph_lane_background = "off"`이면 투명 경로에서 레인 뒤에 아무것도 칠하지 않습니다.
+**레인 뒤의 밝은 사각형.** 그림은 아무것도 그려지지 않은 곳이 투명합니다(straight-alpha RGBA PNG). 그래서 터미널의 배경과 선택 띠가 비쳐 보입니다. Kitty 프로토콜 터미널, **WezTerm**, **Rio**는 그 알파를 합성하며, 이때 GitPoulpi는 그림 아래에 일반 빈 셀을 확보하고 그 뒤에 그림을 보냅니다. 그 밖의 모든 iTerm2 프로토콜 터미널(이전 iTerm2, mintty)은 PNG 알파를 합성하는지 알려져 있지 않으므로, 그림에 테마 색의 불투명한 배경이 들어 있어 배경색이 다른 터미널에서는 사각형으로 보일 수 있습니다. `ui.graph_renderer = "text"`로 없앨 수 있습니다. `ui.graph_lane_background = "off"`이면 투명 경로에서 레인 뒤에 아무것도 칠하지 않습니다.
+
+**Windows: 그래프 열이 비어 있거나, 엉뚱한 행에 있거나, 화면이 찢어집니다(WezTerm 20240203, Rio, mintty).** 이 터미널들 뒤의 의사 콘솔이 그림 시퀀스를 버리거나 엉뚱한 곳에 놓습니다([터미널 고르기](terminals.md#windows)). `ui.graph_renderer = "text"`로 설정하거나 Windows Terminal을 쓰세요.
+
+tmux, zellij, screen, herdr 안에서 무엇이 통과하는지와 추가할 설정은 [멀티플렉서](multiplexers.md)를 참고하세요.
 
 [설정 참조](config-reference.md)의 `ui.graph_renderer`와 `ui.image_protocol`을 참고하세요.

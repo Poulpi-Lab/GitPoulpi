@@ -8,7 +8,7 @@
 
 | 플래그 | 효과 |
 |---|---|
-| `--json` | 결과를 JSON으로 출력합니다. 오류도 JSON입니다. stdout에 `{"error": "..."}`를 출력하고 종료 코드는 1입니다. 실패한 git 작업에는 `"detail": {"operation", "command", "exit_code", "stderr"}`가 추가됩니다(실행된 git 명령(비밀 정보는 가려짐), 종료 코드, stderr의 끝부분. 내장 git 라이브러리는 `"git2": {"class", "code", "message"}`). MCP 도구도 같은 객체를 반환합니다. `--json` 없이는 이 줄들이 stderr로 나갑니다. |
+| `--json` | 결과를 JSON으로 출력합니다. 오류도 JSON입니다. stdout에 `{"error": "..."}`를 출력하고 종료 코드는 1입니다. 실패한 git 작업에는 `"detail": {"operation", "command", "exit_code", "stderr"}`가 추가됩니다(실행된 git 명령(비밀 정보는 가려짐), 종료 코드, stderr의 끝부분. 내장 git 라이브러리는 `"git2": {"class", "code", "message"}`). 데몬이 이름을 붙일 수 있었던 실패에는 `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}`가 추가됩니다(작업, 사람이 부르는 이름, 비밀 정보를 가린 주요 인수, 저장소, 요청한 쪽, 요청 id, 그리고 fetch나 push라면 작업 번호). MCP 도구도 같은 객체를 반환합니다. `--json` 없이는 이 줄들이 stderr로 나갑니다. |
 | `--repo <path>` | 대상 저장소(기본값: git처럼 현재 디렉터리를 둘러싼 저장소). |
 | `-s, --session <name>` | 통신할 세션(데몬). 기본값: 저장소 루트에서 도출되므로, 한 저장소 안에서 연 모든 것이 하나의 데몬을 공유하고 저장소 두 개는 데몬 두 개를 갖습니다. |
 | `--backend git2\|system` | 이 명령이 시작하는 데몬의 백엔드(이미 실행 중인 데몬은 자기 백엔드를 유지합니다). |
@@ -139,7 +139,7 @@
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | 기본 리모트, 리모트 하나 또는 모든 리모트를 fetch합니다. 모든 fetch는 각 리모트가 가진 tag(`tag list`의 `remote`) 기록도 갱신하며, `--prune`이 없어도 그 기록은 정리합니다. `--prune-tags`(설정: tag 자동 정리)는 리모트가 삭제한 로컬 tag도 삭제합니다. 리모트에 있었던 tag만 대상이며 push한 적 없는 tag는 절대 삭제하지 않고, 삭제한 것은 응답의 `pruned_tags`에 나열됩니다 (git 2.41 이상). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull. 모드는 항상 git에 명시적으로 전달됩니다. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. 단순 force는 없고 `--force-with-lease`만 있습니다. |
-| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | 리모트. |
+| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | 리모트. `remote list`는 뒤에 리모트가 없는 리모트 추적 네임스페이스를 `configured: false`로 표시하며, 그 네임스페이스에 `remote remove`를 쓰면 그 브랜치를 삭제합니다(실행 취소 가능). |
 | `remote set-url <name> <url> [--push]`, `remote clear-push-url <name>` | Fetch / push URL. |
 | `remote default [name]` | 저장소의 기본 리모트를 표시하거나 선택합니다. |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | 클론합니다(`--no-lfs`가 없으면 LFS 객체도 내려받습니다). `--sparse`는 그 디렉터리와 루트의 파일만 체크아웃하며, 전체 기록은 그래도 내려받습니다([스파스 체크아웃](getting-started.md#스파스-체크아웃) 참고). |

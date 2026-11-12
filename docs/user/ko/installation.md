@@ -17,10 +17,10 @@ GitPoulpi에는 실행 파일이 세 개 있습니다:
 - `PATH`에 있는 **시스템 `git`**. GitPoulpi는 대부분의 작업에 libgit2를, 나머지에는
   사용 중인 `git`을 사용합니다.
   버전 **2.34 이상**이 필요합니다. macOS에서는 Apple Command Line Tools의 `git`도, Homebrew의 `git`도 사용할 수 있습니다.
-- 마우스를 지원하는 **터미널**. kitty, Ghostty, WezTerm, iTerm2, sixel을 쓰는 Windows Terminal과 foot은 commit
-  그래프를 그림으로 그립니다. 그 밖의 터미널(Windows 콘솔, tmux 및 대부분의
-  다른 터미널)은 문자 그래프를 표시합니다. [터미널 고르기](terminals.md)를
-  참고하세요.
+- 마우스를 지원하는 **터미널**. kitty, Ghostty, WezTerm, Rio, iTerm2, sixel을 쓰는 Windows Terminal, foot, Tabby는
+  commit 그래프를 그림으로 그립니다. 그 밖의 터미널(Windows 콘솔, zellij, screen 및 대부분의
+  다른 터미널)은 문자 그래프를 표시합니다. [터미널 고르기](terminals.md)와
+  [멀티플렉서](multiplexers.md)를 참고하세요.
 - 도구 모음와 사이드바의 아이콘을 위한 **Nerd Font** 또는 이모지가 있는 글꼴.
 - 선택: Git LFS 저장소를 위한 **`git-lfs`** 3.0 이상. 없으면 LFS 파일이 작은 포인터
   파일로 표시되고 GitPoulpi가 그 이유를 알려 줍니다. 설치 방법은

@@ -538,15 +538,15 @@ tabs_position_help = "저장소 탭의 위치: 위(기본값), 아래, 왼쪽. �
 graph_color_theme = "그래프 색상 테마"
 graph_color_theme_help = "Log 그래프의 레인 색상 팔레트입니다. 테마 따르기는 선택한 테마의 팔레트를 사용하고, 다른 항목은 이를 덮어쓰므로 어떤 테마든 어떤 팔레트와도 조합할 수 있습니다. 설정을 닫을 때 적용됩니다."
 graph_renderer = "그래프 렌더러"
-graph_renderer_help = "auto는 지원하는 터미널에서는 그래프를 실제 이미지로, 그 외에는 문자로 그립니다 - 터미널의 환경을 상속하지만 이미지를 전달하지 않는 tmux, zellij 안에서와, kitty_graphics 설정이 켜져 있지 않은 herdr 안에서도 문자로 그립니다. image는 이미지를 강제로 켜고, text는 강제로 끕니다. 재시작이 필요합니다."
+graph_renderer_help = "auto는 지원하는 터미널에서는 그래프를 실제 이미지로, 그 외에는 문자로 그립니다 - 터미널의 환경을 상속하지만 이미지를 전달하지 않는 zellij, screen 안에서, 뒤의 터미널이 sixel을 지원하지 않는 tmux 안에서, kitty_graphics 설정이 켜져 있지 않은 herdr 안에서도 문자로 그립니다. image는 이미지를 강제로 켜고, text는 강제로 끕니다. 재시작이 필요합니다."
 image_protocol = "이미지 프로토콜"
-image_protocol_help = "그림(그래프 이미지, 작성자 아바타)을 터미널에 전달하는 방식입니다. auto: kitty, Ghostty, 설정에 kitty_graphics = true가 있는 herdr에서는 Kitty 그래픽 프로토콜, WezTerm, iTerm2, mintty에서는 iTerm2 인라인 이미지, Windows Terminal, foot, Konsole, mlterm에서는 sixel 그림(작성자 아바타만, 그래프는 문자 그대로), 그 외에는 문자. kitty, iterm2 또는 sixel은 해당 프로토콜을 강제합니다 (설정이 다른 곳에 있는 herdr에는 kitty, sixel을 그리지만 인식되지 않는 터미널에는 sixel). none은 그림을 끕니다. 재시작이 필요합니다."
+image_protocol_help = "그림(그래프 이미지, 작성자 아바타)을 터미널에 전달하는 방식입니다. auto: kitty, Ghostty, 설정에 kitty_graphics = true가 있는 herdr, iTerm2 3.7.7 이상에서는 Kitty 그래픽 프로토콜, WezTerm, Rio, mintty, 이전 버전의 iTerm2에서는 iTerm2 인라인 이미지, Windows Terminal, foot, Tabby, Konsole, mlterm, 그리고 뒤의 터미널이 sixel을 지원하는 tmux에서는 sixel 그림(그래프 열과 아바타), 그 외에는 문자. kitty, iterm2 또는 sixel은 해당 프로토콜을 강제합니다 (설정이 다른 곳에 있는 herdr에는 kitty, 그리지만 인식되지 않는 터미널에는 sixel). none은 그림을 끕니다. 재시작이 필요합니다."
 kitty_keyboard = "Kitty 키보드 프로토콜"
 kitty_keyboard_help = "auto는 시작할 때 약 100ms 안에 터미널이 kitty 키보드 프로토콜을 지원하는지 묻고, 지원하면 사용합니다: 레거시 터미널이 구분하지 못하는 조합(Control과 문장 부호, 숫자, Shift, Enter)이 제어 코드와 충돌하지 않고 그대로 전달됩니다. 응답하지 않는 터미널은 레거시 키를 유지합니다. off는 터미널의 키보드 모드를 건드리지 않습니다. 재시작이 필요합니다."
 color_depth = "색상 깊이"
 color_depth_help = "auto는 24비트 색상을 사용하되, 이를 표시하지 못하는 터미널(Apple 터미널, Linux 콘솔, COLORTERM이 없는 256색 터미널)에서는 가장 가까운 256색 또는 16색으로 변환합니다. truecolor, 256, 16은 깊이를 강제합니다. 즉시 적용됩니다."
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "텍스트 커서"
+text_cursor_help = "terminal은 포커스된 텍스트 필드의 캐럿 위치에 터미널 자체의 커서를 막대 모양으로 놓습니다: 터미널의 커서 설정이 적용되고 입력기의 후보 창이 캐럿에서 열립니다. drawn은 GitPoulpi 자체의 캐럿(블록 또는 밑줄)을 그리고 터미널 커서는 숨깁니다. 즉시 적용됩니다."
 graph_show_stashes = "그래프에 {$stash} 표시"
 graph_show_stashes_help = { git = "각 {$stash}가 Log에 날짜 순으로 자기만의 행을 가집니다: 만든 {$commit} 옆 레인의 작은 상자로, 점선으로 {$commit}과 이어집니다. 선택하면 변경 내용이 표시되고, 오른쪽 클릭(또는 .)으로 Pop, Apply, Drop을 쓸 수 있습니다. 꺼짐이면 {$stash}는 {$STASHES} 섹션에만 표시됩니다. 솔로 모드에서는 그려지지 않습니다.", local = "각 {$stash}가 Log에 날짜 순으로 자기만의 행을 가집니다: 만든 {$commit} 옆 레인의 작은 상자로, 점선으로 {$commit}과 이어집니다. 선택하면 변경 내용이 표시되고, 오른쪽 클릭(또는 .)으로 꺼내기, 적용, 삭제를 쓸 수 있습니다. 꺼짐이면 {$stash}는 {$STASHES} 섹션에만 표시됩니다. 솔로 모드에서는 그려지지 않습니다." }
 ref_connector = "Ref-{$commit} 연결선"
@@ -3988,8 +3988,8 @@ mouse_gestures_in_2 = "창 구분선이나 Log 열 경계는 크기 조절 (최�
 mouse_gestures_in_3 = "{$diff}, 파일 보기, Blame, 파일 기록의 텍스트 위를 드래그하면 선택, 단어는 더블 클릭. y 또는 Ctrl+C로 복사 (파일 텍스트만, 여백 제외). 선택한 단어의 다른 출현은 {$diff}와 편집기에서 색이 입혀지고 (눈금자에 표시됨)"
 mouse_gestures_in_4 = "포커스되었거나 마우스가 올라간 목록 또는 {$diff}를 스크롤. Shift+휠 (터미널이 보고하는 두 표기 모두)은 자동 줄바꿈이 꺼져 있을 때 {$diff}/파일 보기/blame을 대신 *가로*로 스크롤"
 mouse_gestures_in_5 = "컨텍스트 메뉴가 있는 곳 어디서나 엽니다 (위의 각 창 섹션 참조). 키보드 대응 키는 항상 {{*global.context_menu}}"
-mouse_gestures_in_6 = "모든 \"복사 ...\" 동작은 OSC 52로 *터미널*에 클립보드를 요청합니다 - TUI는 직접 접근할 수 없습니다. 이 시퀀스를 무시하는 터미널은 복사하지 않습니다"
-mouse_gestures_in_7 = "크기 조절/포인터/열린 손 힌트는 이를 지원하는 터미널 (kitty, foot, xterm. 그 외에는 들쭉날쭉)에 OSC 22로 전송됩니다 - 드래그할 수 있는 구분선과 열 경계는 앱 자체 버퍼 안에서도 강조되며 터미널의 협조가 전혀 필요하지 않습니다"
+mouse_gestures_in_6 = "모든 \"복사 ...\" 동작은 텍스트를 시스템 클립보드에 넣고, 터미널이 이를 지원하는 것으로 알려진 경우에는 OSC 52로도 보냅니다. SSH를 통하거나 디스플레이가 없으면 OSC 52만 보내며, 이 시퀀스를 무시하는 터미널은 복사하지 않습니다"
+mouse_gestures_in_7 = "크기 조절/포인터/열린 손 힌트는 이를 지원하는 터미널 (kitty, Ghostty, foot, mintty. Rio, Alacritty, Windows Terminal, iTerm2에서는 안 됨)에 OSC 22로 전송됩니다 - 드래그할 수 있는 구분선과 열 경계는 앱 자체 버퍼 안에서도 강조되며 터미널의 협조가 전혀 필요하지 않습니다"
 merge_conflict_editor_31 = "현재 충돌의 선택 해제 (미해결로 되돌림) / 파일 전체를 원래 충돌 상태로 초기화 (출력에 입력한 내용이 있으면 먼저 확인, 실행 취소로 되돌릴 수 있음). 도구 모음에 초기화 버튼이 있습니다"
 merge_conflict_editor_32 = "이웃 창(A, Base, B, 출력)으로 이동하며 같은 충돌에 머뭅니다"
 merge_conflict_editor_33 = "같은 충돌에서 창으로 바로 이동. 탐색 접두사 다음 1 / 2 / 3 도 됩니다"
@@ -5957,7 +5957,7 @@ show_label = "표시:"
 show_all = "모두"
 show_none = "없음"
 why_level_off = "표시되지 않음: 수준이 {level}(으)로 설정되어 있습니다. 이 줄을 보려면 수준을 높이세요."
-hint_levels = "1-5: 수준 표시 전환  a: 모두  n: 없음"
+hint_levels = "1-5: 수준 표시 전환  a: 모두  n: 없음  Enter: 해당 줄의 작업  [ ]: 실패"
 palette_show_error = "활동 로그: 오류 수준 표시/숨기기"
 palette_show_warn = "활동 로그: 경고 수준 표시/숨기기"
 palette_show_info = "활동 로그: 정보 수준 표시/숨기기"
@@ -6000,25 +6000,25 @@ palette_scroll_right = "활동 로그: 오른쪽으로 스크롤"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "활동 로그: 긴 줄을 옆으로 스크롤 (Shift + 휠 또는 가로 스크롤바도 가능)"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation} 실패"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "작업: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
-ctx_repository = "Repository: {repository}"
+ctx_repository = "저장소: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "요청자: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "작업 ID: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "활동 로그: 이 줄의 작업 표시"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "활동 로그: 다음 실패한 작업"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "활동 로그: 이전 실패한 작업"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "먼저 줄을 선택하세요: 클릭하거나 ]를 눌러 다음 실패한 작업으로 이동합니다."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "이 줄은 작업과 연결되어 있지 않습니다."
 
 [git_error]
 summary_host_key = "리모트의 SSH 호스트 키를 아직 알 수 없습니다."
@@ -8749,13 +8749,13 @@ namespaces = "네임스페이스"
 # context: hint in the empty namespaces field
 namespaces_hint = "예: acme, platform (비워 두면: 내 것과 소속된 모든 것)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "한 줄에 항목 하나. 이름은 해당 그룹 또는 소유자와 그 아래 모든 것과 일치합니다 (ptm은 ptm/produits/x와 일치하고 ptmx/y와는 일치하지 않음). 비워 두면 내 것과 소속된 모든 것과 일치합니다."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "각 줄은 저장소 경로 전체에 대해 쓴 그대로 일치시키는 정규 표현식입니다 (예: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "정규 표현식"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "잘못된 표현식: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "클론하지 않은 저장소의 요청"
 # context: choice: ask each time

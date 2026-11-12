@@ -1225,19 +1225,21 @@ move the highlight:
 
 | Key | Action |
 |---|---|
-| `Up` / `Down` | Move one row |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Move one row up / down |
 | `Home` / `End` | First / last row |
 | `PageUp` / `PageDown` | Move one visible page |
 | `Enter` | Choose the highlighted row |
 | `Esc` | Close |
 
 In these popups, `Home` and `End` move the list, not the caret of the filter
-field. `Ctrl+A` and `Ctrl+E` still move the caret to the start and end, and
-`Ctrl+K` deletes to the end of the filter. No `Ctrl+letter` pair moves a list
-(`Ctrl+N` is the navigation prefix, `Ctrl+P` the command palette), and plain `j`
-and `k` are typed into the filter: only the arrows, `PageUp` / `PageDown` and
-`Home` / `End` move here. In lists without a text field, `j` / `k` are an extra
-way to move down / up.
+field, and `Ctrl+K` / `Ctrl+J` move the list too, so `Ctrl+K` no longer deletes
+to the end of the filter (`Ctrl+U` still clears it; in an ordinary text field
+outside a list `Ctrl+K` keeps deleting to the end of the line). `Ctrl+A` and
+`Ctrl+E` still move the caret to the start and end. `Ctrl+J` / `Ctrl+K` move
+every other list too, with or without a text field (`Ctrl+N` is the navigation
+prefix and `Ctrl+P` the command palette, so they are not list keys). Plain `j`
+and `k` are typed into the filter; in lists without a text field, `j` / `k` are
+an extra way to move down / up.
 
 With the mouse:
 

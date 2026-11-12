@@ -432,7 +432,7 @@ without a shortcut. The full list is [below](#every-palette-command).
 |---|---|
 | `Ctrl+P` | Open the palette |
 | *(type)* | Filter the list. An exact match after the `Category: ` prefix comes first, then a match anywhere in the label, then a fuzzy match |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | Move the highlight (see [Filterable popup lists](#filterable-popup-lists)) |
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | Move the highlight (see [Filterable popup lists](#filterable-popup-lists)) |
 | `Enter`, or a double-click | Run the highlighted command |
 | `Esc` | Close |
 
@@ -452,7 +452,9 @@ In `config.toml` these are the `[keybindings.palette]` table, named after the co
 
 The hint band under the list names this key (`Alt+K` by default). It is the action `palette.configure_shortcut`, so it can be rebound like any other.
 
-The palette and the pickers (theme, language, tab, workspace search) move and resize like a dialog: drag the top border, or press `Alt+G` (the action `palette.arrange`; the palette row `Dialog: Move or Resize` does the same). Arrows move it, `Shift`+arrows resize it, `0` resets it, `Enter` or `Esc` leave the mode and the popup stays open. `ui.dialog_geometry` decides whether the place is kept.
+The palette and the pickers (theme, language, tab, workspace search) move and resize like a dialog: drag the top border, press `Ctrl+N` then `m` (as over every dialog), or press `Alt+G`. `Alt+G` is the action `palette.arrange` ("Dialog: Move or Resize the Dialog in Front"): an extra way, valid over every dialog and popup, to start the arrange mode on the one in front (the palette rows `Dialog: Move or Resize` and `Dialog: Reset Position and Size` act on the palette itself while it is open). Arrows move it, `Shift`+arrows resize it, `0` resets it, `Enter` or `Esc` leave the mode and the popup stays open. `ui.dialog_geometry` decides whether the place is kept.
+
+`Ctrl+N` is the navigation prefix here too: it shows a badge on the filter box, the first row of the list and the close cross, and the key after it presses that control or `m` arranges the popup. It no longer moves the highlight down, and `Ctrl+P` does not move it up: only the arrows, `PageUp` / `PageDown` and `Home` / `End` move a list that has a filter field.
 
 ### Every palette command
 
@@ -1191,7 +1193,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Key | Action |
 |---|---|
 | `Tab` / `Shift+Tab` | Focus the next / previous pane |
-| `Ctrl+N`, then a badge | Focus that part of the window (see [Navigation prefix](#navigation-prefix-ctrln)) |
+| `Ctrl+N`, then a badge | Focus that part of the window, or press that control of the dialog or popup in front (see [Navigation prefix](#navigation-prefix-ctrln)) |
 | `j` / `k`, `Up` / `Down` | Move the selection, in every pane |
 | `PageUp` / `PageDown`, `Home` / `End` | Move one page; go to the first / last row |
 | a number, then `j` / `k` / `Up` / `Down` | Count prefix: `4j` moves four rows. With `PageUp` / `PageDown`, the count is a number of pages. The status line shows the pending count (`4…`). `Esc` or any other key clears it. A leading `0` never starts a count |
@@ -1217,15 +1219,19 @@ move the highlight:
 
 | Key | Action |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Move one row |
+| `Up` / `Down` | Move one row |
 | `Home` / `End` | First / last row |
 | `PageUp` / `PageDown` | Move one visible page |
 | `Enter` | Choose the highlighted row |
 | `Esc` | Close |
 
-In these popups, `Home`, `End` and `Ctrl+K` move the list, not the caret of the
-filter field. `Ctrl+A` and `Ctrl+E` still move the caret to the start and end.
-Plain `j` and `k` are typed into the filter.
+In these popups, `Home` and `End` move the list, not the caret of the filter
+field. `Ctrl+A` and `Ctrl+E` still move the caret to the start and end, and
+`Ctrl+K` deletes to the end of the filter. No `Ctrl+letter` pair moves a list
+(`Ctrl+N` is the navigation prefix, `Ctrl+P` the command palette), and plain `j`
+and `k` are typed into the filter: only the arrows, `PageUp` / `PageDown` and
+`Home` / `End` move here. In lists without a text field, `j` / `k` are an extra
+way to move down / up.
 
 With the mouse:
 
@@ -1256,7 +1262,7 @@ anything, the Settings screen included.
 | *(type)* | Filter: keep only the sections that contain the text. `j`, `k` and `q` are typed too |
 | `Backspace`, `Ctrl+U` | Delete the last character / clear the filter |
 | `Esc` | Clear the filter; if it is empty, close the help |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Scroll one line |
+| `Up` / `Down` | Scroll one line |
 | `PageUp` / `PageDown`, `Home` / `End` | Scroll one page; go to the top / bottom |
 | `Ctrl+D`, or a click on the link | Open this documentation on GitHub in the browser |
 

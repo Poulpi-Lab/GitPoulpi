@@ -668,7 +668,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                         }
                     }
                 }
-                // Navigation is `popup_list::nav` (arrows, Ctrl+N/P/J/K, Home/End,
+                // Navigation is `popup_list::nav` (arrows, Home/End,
                 // PgUp/PgDn), above, never plain j/k: this is a text field, and the
                 // catalogue is full of commands you can't type without those letters
                 // ("hunk", "blame", "stash pop").
@@ -738,7 +738,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         // The tab picker: typing narrows the
         // list (through the shared `MainField`/`field_editor`
         // machinery, same as the command palette's own draft),
-        // Up/Down or Ctrl+P/Ctrl+N move the selection, Enter
+        // Up/Down move the selection, Enter
         // switches to the selected (*filtered*) tab, Esc
         // closes with nothing done.
         InputMode::TabPicker { draft, selected } => {

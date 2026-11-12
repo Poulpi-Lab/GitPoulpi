@@ -29,29 +29,35 @@ impl WindowState {
         self.repeat_held_arrow(palette_ctx, unpushed_tags)?;
         let mut first_poll = true;
         loop {
-            let timeout = poll_timeout(first_poll, self.animating());
-            first_poll = false;
-            // A failed console read is skipped rather than fatal, up to
-            // `MAX_CONSECUTIVE_INPUT_ERRORS` in a row: on Windows every mouse event
-            // re-queries the console screen buffer, and one transient failure there
-            // must not end the session.
-            let ready = match event::poll(timeout) {
-                Ok(ready) => ready,
-                Err(err) => {
-                    exit_log::tolerate_input_error(err, &mut self.input_errors)
-                        .map_err(exit_log::io_context("waiting for terminal input"))?;
+            // A press on a `Ctrl+N` badge asked for a click: it is read here as
+            // if the pointer had made it.
+            let mut event = if let Some(click) = crate::dialog_kit::frame::take_injected() {
+                Event::Mouse(click)
+            } else {
+                let timeout = poll_timeout(first_poll, self.animating());
+                first_poll = false;
+                // A failed console read is skipped rather than fatal, up to
+                // `MAX_CONSECUTIVE_INPUT_ERRORS` in a row: on Windows every mouse event
+                // re-queries the console screen buffer, and one transient failure there
+                // must not end the session.
+                let ready = match event::poll(timeout) {
+                    Ok(ready) => ready,
+                    Err(err) => {
+                        exit_log::tolerate_input_error(err, &mut self.input_errors)
+                            .map_err(exit_log::io_context("waiting for terminal input"))?;
+                        break;
+                    }
+                };
+                if !ready {
                     break;
                 }
-            };
-            if !ready {
-                break;
-            }
-            let mut event = match event::read() {
-                Ok(event) => event,
-                Err(err) => {
-                    exit_log::tolerate_input_error(err, &mut self.input_errors)
-                        .map_err(exit_log::io_context("reading terminal input"))?;
-                    continue;
+                match event::read() {
+                    Ok(event) => event,
+                    Err(err) => {
+                        exit_log::tolerate_input_error(err, &mut self.input_errors)
+                            .map_err(exit_log::io_context("reading terminal input"))?;
+                        continue;
+                    }
                 }
             };
             self.input_errors = 0;

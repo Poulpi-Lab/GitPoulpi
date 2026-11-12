@@ -30,7 +30,7 @@ and the commits join as soon as they are ready.
 
 | Key | Does |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `PageUp` / `PageDown`, `Home` / `End` | Move through the results (the group headings are skipped). |
+| `Up` / `Down`, `PageUp` / `PageDown`, `Home` / `End` | Move through the results (the group headings are skipped). |
 | `Enter` | Goes to the result: the repository's tab opens (or is switched to), then the result is shown. |
 | `Esc` | Closes the search. |
 | `Alt+1` .. `Alt+8` | Switch a kind on or off (the chips above the list, in their order). `Alt+0` turns them all on. |

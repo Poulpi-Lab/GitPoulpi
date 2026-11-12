@@ -130,6 +130,10 @@ struct Live {
     /// False while a popup of the dialog is up (a new drag does not start).
     enabled: bool,
     screen: Rect,
+    /// The controls the `Ctrl+N` badges stand for (the close cross, every
+    /// button, checkbox and field the paint registered, plus what the dialog
+    /// [`offer`]ed), as the rects they were painted in.
+    controls: Vec<Rect>,
 }
 
 // -- the state, process-wide -------------------------------------------------
@@ -142,11 +146,17 @@ struct Store {
     /// The saved file has been read (once per process).
     loaded: bool,
     screens: HashMap<&'static str, Rect>,
+    /// How many pointer rects were registered when a dialog started to paint:
+    /// the controls it registered after that are its own.
+    marks: HashMap<&'static str, usize>,
     live: Vec<Live>,
     drag: Option<Drag>,
     arrange: Option<&'static str>,
-    /// `Ctrl+N` was pressed over a framed dialog: `m` is the next key.
+    /// `Ctrl+N` was pressed over a framed dialog: its badges are up.
     armed: bool,
+    /// Clicks a badge asked for, read by the input drain as if the pointer
+    /// had made them (so a surface that owns the mouse sees the real thing).
+    injected: std::collections::VecDeque<MouseEvent>,
 }
 
 #[cfg(not(test))]
@@ -280,6 +290,7 @@ impl Win {
         let mode = crate::live_settings::dialog_geometry();
         let kept = with_store(|s| {
             s.screens.insert(self.id, screen);
+            s.marks.insert(self.id, pointer_map::mark());
             if mode == DialogGeometry::Saved {
                 load_saved(s);
             }
@@ -314,6 +325,9 @@ impl Win {
     ) {
         let (arranging, drag, screen) = with_store(|s| {
             let screen = s.screens.get(self.id).copied().unwrap_or(buf.area);
+            let mark = s.marks.get(self.id).copied().unwrap_or(0);
+            let mut controls = pointer_map::controls_since(mark, rect);
+            controls.extend(close);
             s.live.retain(|l| l.id != self.id);
             s.live.push(Live {
                 id: self.id,
@@ -322,6 +336,7 @@ impl Win {
                 min: self.min,
                 enabled,
                 screen,
+                controls,
             });
             (
                 s.arrange == Some(self.id),
@@ -372,6 +387,48 @@ pub(crate) fn any_live() -> bool {
     with_store(|s| !s.live.is_empty())
 }
 
+/// A dialog's own extra controls for the `Ctrl+N` badges (the palette's filter
+/// box and first row, say), registered on the dialog on top right after its
+/// [`Win::decorate`].
+pub(crate) fn offer(rects: &[Rect]) {
+    with_store(|s| {
+        if let Some(l) = s.live.last_mut() {
+            l.controls.extend(rects.iter().copied());
+        }
+    });
+}
+
+/// The two controls every filterable-list popup has, offered for the badges:
+/// the filter box and the list (a press selects its first visible row).
+pub(crate) fn offer_list_popup(input_area: Rect, list_area: Rect) {
+    offer(&[
+        Rect::new(
+            input_area.x + 1,
+            input_area.y + 1,
+            input_area.width.saturating_sub(2),
+            1,
+        ),
+        Rect::new(
+            list_area.x + 1,
+            list_area.y,
+            list_area.width.saturating_sub(2),
+            1,
+        ),
+    ]);
+}
+
+/// What `Ctrl+N` badges on the dialog on top: `(badge rect, cell a press
+/// clicks)` for each control, in reading order.
+pub(crate) fn top_badges() -> Vec<(Rect, (u16, u16))> {
+    let controls = with_store(|s| s.live.last().map(|l| l.controls.clone())).unwrap_or_default();
+    // A badge is three cells wide and starts on the cell before its control.
+    super::nav_cells(
+        controls
+            .into_iter()
+            .map(|r| Rect::new(r.x, r.y, r.width.max(2), 1)),
+    )
+}
+
 /// The id of the dialog on top.
 pub(crate) fn top_id() -> Option<&'static str> {
     with_store(|s| s.live.last().map(|l| l.id))
@@ -380,7 +437,8 @@ pub(crate) fn top_id() -> Option<&'static str> {
 /// The popups of the filterable-list family (the command palette, the tab,
 /// theme and language pickers, the workspace search): they take their own
 /// keys, so `Ctrl+N m` is not theirs; `palette.arrange` is.
-const POPUPS: [&str; 5] = [
+const POPUPS: [&str; 6] = [
+    "help",
     "palette",
     "tab_picker",
     "picker_theme",
@@ -442,14 +500,43 @@ pub(crate) fn reset_top() -> bool {
     })
 }
 
-/// `Ctrl+N` over a framed dialog without badges of its own: `m` is next.
+/// `Ctrl+N` over a framed dialog without badges of its own: its controls get
+/// badges (`top_badges`) and `m` arranges.
 pub(crate) fn arm_prefix() {
     with_store(|s| s.armed = true);
 }
 
-/// Whether the prefix was armed (and disarms it).
-pub(crate) fn take_prefix() -> bool {
-    with_store(|s| std::mem::take(&mut s.armed))
+/// A press on a badge: a left click on `(col, row)`, queued for the input
+/// drain ([`take_injected`]).
+pub(crate) fn inject_click(col: u16, row: u16) {
+    with_store(|s| {
+        for kind in [
+            MouseEventKind::Down(MouseButton::Left),
+            MouseEventKind::Up(MouseButton::Left),
+        ] {
+            s.injected.push_back(MouseEvent {
+                kind,
+                column: col,
+                row,
+                modifiers: KeyModifiers::NONE,
+            });
+        }
+    });
+}
+
+/// The next click a badge asked for.
+pub(crate) fn take_injected() -> Option<MouseEvent> {
+    with_store(|s| s.injected.pop_front())
+}
+
+/// `Ctrl+N` was pressed over a framed dialog and its badges are up.
+pub(crate) fn armed() -> bool {
+    with_store(|s| s.armed)
+}
+
+/// Takes the badges away without any other effect.
+pub(crate) fn disarm() {
+    with_store(|s| s.armed = false);
 }
 
 fn grip_at(l: &Live, col: u16, row: u16) -> Option<Grip> {
@@ -852,6 +939,39 @@ mod tests {
         let close = Rect::new(r.right().saturating_sub(4), r.y, 3, 1);
         win.decorate(&mut buf, r, Some(close), true);
         r
+    }
+
+    /// The `Ctrl+N` badges of a dialog: its close cross, the controls it
+    /// registered while painting (and nothing painted before it started, nor
+    /// anything outside it), and what it offered, in reading order.
+    #[test]
+    fn the_badges_stand_on_the_dialogs_own_controls() {
+        fresh();
+        pointer_map::begin_frame();
+        // Painted before the dialog (the window under it): not its control.
+        pointer_map::hand(Rect::new(30, 10, 6, 1));
+        let r = SMALL.place(SCREEN, want());
+        let inside = Rect::new(r.x + 3, r.y + 5, 8, 1);
+        pointer_map::hand(inside);
+        pointer_map::field(Rect::new(r.x + 3, r.y + 3, 20, 1));
+        pointer_map::hand(Rect::new(0, 0, 4, 1)); // outside the dialog
+        let mut buf = Buffer::empty(SCREEN);
+        let close = Rect::new(r.right().saturating_sub(4), r.y, 3, 1);
+        SMALL.decorate(&mut buf, r, Some(close), true);
+        offer(&[Rect::new(r.x + 3, r.y + 8, 5, 1)]);
+        let cells: Vec<(u16, u16)> = top_badges().into_iter().map(|(_, c)| c).collect();
+        assert_eq!(
+            cells,
+            vec![
+                (close.x, close.y),
+                (r.x + 3, r.y + 3),
+                (r.x + 3, r.y + 5),
+                (r.x + 3, r.y + 8),
+            ]
+        );
+        // A badge is three cells wide and starts on the cell before its control.
+        let (badge, _) = top_badges()[1];
+        assert_eq!((badge.x, badge.width), (r.x + 2, 21));
     }
 
     fn fresh() {

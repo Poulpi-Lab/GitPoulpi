@@ -156,10 +156,13 @@ pub(in crate::event_loop) fn draw_footer(
         InputMode::SearchingLog(_) => f::search_hint("\u{2193}", "\u{2191}"),
         InputMode::Normal => String::new(),
     };
-    let home_mode_hint = matches!(input_mode, InputMode::Navigation | InputMode::Leader)
-        .then(|| footer_text.clone());
+    let home_mode_hint = if crate::dialog_kit::frame::armed() {
+        Some(form_badges_hint(&keymap::current()))
+    } else {
+        matches!(input_mode, InputMode::Navigation | InputMode::Leader).then(|| footer_text.clone())
+    };
 
-    if let InputMode::Normal = &input_mode {
+    if matches!(input_mode, InputMode::Normal) && !crate::dialog_kit::frame::armed() {
         // gh-dash-style breadcrumb: dim icon+dot-separated status
         // segments, with any hint/error (bright) tacked on last.
         // The Activity button takes the right end of the line when there is room.
@@ -382,9 +385,12 @@ pub(in crate::event_loop) fn wrap_hint(text: &str, width: usize) -> Vec<String> 
     rows
 }
 
-/// The commit message form or the rewrite page waits for the key after its own
-/// `Ctrl+N` (a badge, or `m` to arrange the dialog).
+/// The commit message form, the rewrite page or any framed dialog or popup
+/// waits for the key after its `Ctrl+N` (a badge, or `m` to arrange the dialog).
 fn form_badges(input_mode: &InputMode) -> bool {
+    if crate::dialog_kit::frame::armed() {
+        return true;
+    }
     match input_mode {
         InputMode::EditingCommitMessage(form) => form.badges && form.badge_ready(),
         InputMode::Rewrite(view) => view.badges && view.badge_ready(),

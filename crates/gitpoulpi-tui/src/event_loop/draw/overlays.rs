@@ -545,6 +545,7 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         );
         let cross = crate::chrome::paint_popup_cross(frame.buffer_mut(), popup);
         TAB_PICKER_WIN.decorate(frame.buffer_mut(), popup, cross, true);
+        crate::dialog_kit::frame::offer_list_popup(input_area, list_area);
     }
 
     if !settings_open {

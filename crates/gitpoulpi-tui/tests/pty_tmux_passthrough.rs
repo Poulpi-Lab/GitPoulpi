@@ -183,6 +183,26 @@ fn tmux_in_a_terminal_without_sixel_stays_text() {
     assert_eq!(count(&raw, b"_Ga="), 0);
 }
 
+/// iTerm2 advertises sixel to tmux but paints the pixels a sixel leaves unset
+/// with an opaque colour (the Graph column became a solid rectangle in a real
+/// window), so tmux in iTerm2 stays text.
+///
+/// Falsified: dropped the `client_termtype` test in
+/// `tmux_client_has_sixel` (sixel pictures were sent and this went red);
+/// restored.
+#[test]
+fn tmux_in_iterm2_stays_text_although_its_client_advertises_sixel() {
+    let raw = run_picture(
+        "pty-tmux-iterm2",
+        "",
+        "256,bpaste,clipboard,hyperlinks,RGB,sixel,sync,title|iTerm2 3.7.7",
+        "tmux",
+    );
+    assert_eq!(count(&raw, SIXEL), 0, "a sixel picture was sent to iTerm2");
+    assert_eq!(count(&raw, b"_Ga="), 0);
+    assert_eq!(count(&raw, b"]1337;File="), 0);
+}
+
 #[test]
 fn forced_kitty_in_tmux_is_written_inside_a_passthrough() {
     let raw = run_picture(

@@ -459,3 +459,127 @@ fn herdr_remote_with_explicit_image_choice_gets_kitty_not_iterm2() {
         Protocol::None
     );
 }
+
+/// A real iTerm2 3.7.7 window on macOS 15 (`TERM_PROGRAM`, its version, a
+/// `TERM` without a multiplexer prefix).
+fn iterm2(version: &str) -> Vec<(&'static str, String)> {
+    vec![
+        ("TERM_PROGRAM", "iTerm.app".to_string()),
+        ("TERM_PROGRAM_VERSION", version.to_string()),
+        ("TERM", "xterm-256color".to_string()),
+        ("LC_TERMINAL", "iTerm2".to_string()),
+    ]
+}
+
+fn borrowed<'a>(pairs: &'a [(&'static str, String)]) -> Vec<(&'a str, &'a str)> {
+    pairs.iter().map(|(k, v)| (*k, v.as_str())).collect()
+}
+
+fn auto_owned(pairs: &[(&'static str, String)], config: Option<&str>) -> Protocol {
+    auto(&borrowed(pairs), config)
+}
+
+/// Falsified: dropped `iterm2_draws_kitty` from `speaks_kitty_natively`
+/// (iTerm2 went back to the OSC 1337 picture and its permission dialog, and
+/// this went red); restored.
+#[test]
+fn iterm2_3_7_7_and_newer_get_the_kitty_protocol() {
+    for version in [
+        "3.7.7",
+        "3.7.8",
+        "3.7.20260216",
+        "3.8.0",
+        "4.0.1",
+        "3.7.7beta1",
+    ] {
+        assert_eq!(
+            auto_owned(&iterm2(version), None),
+            Protocol::Kitty,
+            "{version}"
+        );
+    }
+}
+
+/// Older or unreadable versions keep the iTerm2 protocol: 3.6.x answers
+/// the keyboard query but has no Unicode placeholders, and an unknown
+/// version is not trusted with a protocol that paints nothing when it
+/// loses.
+#[test]
+fn older_or_unreadable_iterm2_keeps_the_iterm2_protocol() {
+    for version in [
+        "3.7.6", "3.6.9", "3.5.11", "2.9.0", "", "nightly", "3", "3.x.7",
+    ] {
+        assert_eq!(
+            auto_owned(&iterm2(version), None),
+            Protocol::Iterm2,
+            "{version:?}"
+        );
+    }
+    let mut no_version = iterm2("3.7.7");
+    no_version.retain(|(k, _)| *k != "TERM_PROGRAM_VERSION");
+    assert_eq!(auto_owned(&no_version, None), Protocol::Iterm2);
+}
+
+#[test]
+fn iterm2_asked_for_its_own_protocol_still_gets_it() {
+    let pairs = iterm2("3.7.7");
+    assert_eq!(
+        verdict(
+            RendererChoice::Auto,
+            ImageProtocol::Iterm2,
+            &borrowed(&pairs),
+            None
+        ),
+        Protocol::Iterm2
+    );
+    // Pictures forced on without naming a protocol: the same pick as auto.
+    assert_eq!(
+        verdict(
+            RendererChoice::Image,
+            ImageProtocol::Auto,
+            &borrowed(&pairs),
+            None
+        ),
+        Protocol::Kitty
+    );
+}
+
+/// The multiplexer veto still comes first: tmux inside iTerm2 carries no
+/// Kitty graphics (sixel only, when its client features say so).
+#[test]
+fn iterm2_3_7_7_inside_a_multiplexer_keeps_the_veto() {
+    for (name, value) in [
+        ("TMUX", "/tmp/tmux-501/default,1,0"),
+        ("STY", "1.gp"),
+        ("ZELLIJ", "0"),
+    ] {
+        let mut pairs = iterm2("3.7.7");
+        pairs.push((name, value.to_string()));
+        assert_eq!(auto_owned(&pairs, None), Protocol::None, "{name}");
+    }
+}
+
+/// herdr inside iTerm2 3.7.7 re-emits Kitty graphics when its config says
+/// so (seen drawing placeholders and direct images there), and stays text
+/// otherwise.
+#[test]
+fn herdr_inside_iterm2_3_7_7_follows_its_kitty_switch() {
+    let mut pairs = iterm2("3.7.7");
+    pairs.extend([
+        ("HERDR_ENV", "1".to_string()),
+        ("HERDR_PANE_ID", "p1".to_string()),
+        ("HOME", "/Users/me".to_string()),
+    ]);
+    assert_eq!(auto_owned(&pairs, Some(HERDR_KITTY_ON)), Protocol::Kitty);
+    assert_eq!(auto_owned(&pairs, None), Protocol::None);
+}
+
+#[test]
+fn version_strings_are_read_from_the_front() {
+    assert_eq!(parse_version("3.7.7"), Some((3, 7, 7)));
+    assert_eq!(parse_version(" 3.7.7beta2 "), Some((3, 7, 7)));
+    assert_eq!(parse_version("3.7"), Some((3, 7, 0)));
+    assert_eq!(parse_version("3"), None);
+    assert_eq!(parse_version(""), None);
+    assert_eq!(parse_version("v3.7.7"), None);
+}

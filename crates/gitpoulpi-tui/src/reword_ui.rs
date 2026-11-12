@@ -1188,4 +1188,4 @@ pub(crate) fn reword_hit_at(hits: &[(Rect, HitTarget)], col: u16, row: u16) -> O
 mod tests;
 
 /// The commit message form moves (its size follows its scope).
-const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::movable("reword");
+const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("reword", 50, 12);

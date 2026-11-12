@@ -537,11 +537,11 @@ fn the_amend_dialog_paints_labels_prefilled_fields_and_a_hit_for_each() {
 }
 
 #[test]
-fn the_form_moves_and_arranges_but_does_not_resize() {
+fn the_form_moves_resizes_and_arranges() {
     use ratatui::backend::TestBackend;
     use ratatui::Terminal;
     let form = RewordForm::new(oid(1), "summary\n\nbody", None);
-    crate::dialog_kit::frame::testing::check_gestures(false, || {
+    crate::dialog_kit::frame::testing::check_gestures(true, || {
         let mut terminal = Terminal::new(TestBackend::new(160, 50)).unwrap();
         terminal
             .draw(|frame| drop(form.render(frame, frame.area(), None)))

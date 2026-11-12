@@ -378,7 +378,7 @@ pub(crate) const HELP_TEXT: &[HelpEntry] = &[
         msg::help_text::COMMIT_COLUMN_1,
     ),
     Item(
-        keys!("{commit_column.next_part} / {commit_column.wider_part} / {commit_column.narrower_part} / {commit_column.reset_widths}"),
+        keys!("{commit_column.next_part} / {commit_column.wider_part} / {commit_column.narrower_part} / {commit_column.reset_widths} / {commit_column.fit} / {commit_column.fit_all}"),
         msg::help_text::COMMIT_COLUMN_2,
     ),
     Item(keys!(""), msg::help_text::COMMIT_COLUMN_3),

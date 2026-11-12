@@ -1020,10 +1020,14 @@ mod tests {
         c.on_key(key(KeyCode::Down));
         c.on_key(key(KeyCode::Down));
         assert_eq!(c.cursor, 2);
-        // No `Ctrl+letter` pair moves a list.
-        for ch in ['n', 'p', 'j'] {
+        // Only `Ctrl+J` / `Ctrl+K` move a list besides the arrows.
+        for ch in ['n', 'p'] {
             c.on_key(ctrl(ch));
         }
+        assert_eq!(c.cursor, 2);
+        c.on_key(ctrl('j'));
+        assert_eq!(c.cursor, 3);
+        c.on_key(ctrl('k'));
         assert_eq!(c.cursor, 2);
         c.on_key(key(KeyCode::Up));
         c.on_key(key(KeyCode::Up));

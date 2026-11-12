@@ -13,7 +13,7 @@ podaje wszystkie flagi.
 
 | Flaga | Działanie |
 |---|---|
-| `--json` | Wypisuje wynik jako JSON. Błędy też są JSON: `{"error": "..."}` na stdout, kod wyjścia 1. Nieudana operacja git dodaje `"detail": {"operation", "command", "exit_code", "stderr"}` (uruchomione polecenie git z zamaskowanymi sekretami, jego kod wyjścia i koniec jego stderr; dla wbudowanej biblioteki git `"git2": {"class", "code", "message"}`); narzędzia MCP zwracają ten sam obiekt. Bez `--json` wiersze idą na stderr. |
+| `--json` | Wypisuje wynik jako JSON. Błędy też są JSON: `{"error": "..."}` na stdout, kod wyjścia 1. Nieudana operacja git dodaje `"detail": {"operation", "command", "exit_code", "stderr"}` (uruchomione polecenie git z zamaskowanymi sekretami, jego kod wyjścia i koniec jego stderr; dla wbudowanej biblioteki git `"git2": {"class", "code", "message"}`), a błąd, który demon umiał nazwać, dodaje `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}` (operacja, jej nazwa dla człowieka, jej główne argumenty z zamaskowanymi sekretami, repozytorium, kto o nią poprosił, identyfikator żądania i, dla fetch lub push, numer jego zadania); narzędzia MCP zwracają ten sam obiekt. Bez `--json` wiersze idą na stderr. |
 | `--repo <path>` | Repozytorium, na którym działać (domyślnie: to wokół bieżącego katalogu, jak w git). |
 | `-s, --session <name>` | Sesja (demon), z którą rozmawiać. Domyślnie: wyprowadzona z katalogu głównego repozytorium, więc wszystko otwarte w jednym repozytorium dzieli jednego demona, a dwa repozytoria dostają dwa. |
 | `--backend git2\|system` | Backend dla demona uruchamianego przez to polecenie (działający zachowuje własny). |
@@ -166,7 +166,7 @@ i przywraca stash, niezależnie od `general.auto_stash` ([Auto-stash](log-and-hi
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch domyślnego zdalnego repozytorium, jednego zdalnego lub wszystkich. Każdy fetch odświeża też to, co ma każde zdalne w tagach (`remote` z `tag list`), i czyści ten zapis nawet bez `--prune`. `--prune-tags` (Ustawienia: Auto-prune tagów) usuwa też lokalne tagi, które zdalne usunęło: tylko te, które na nim były, nigdy taki, którego nie wypchnięto; odpowiedź wymienia je jako `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; tryb jest zawsze jawnie przekazywany gitowi. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Nie ma zwykłego force: tylko `--force-with-lease`. |
-| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Zdalne repozytoria. |
+| `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Zdalne repozytoria. `remote list` oznacza przestrzeń nazw gałęzi śledzących zdalne, za którą nie stoi żadne zdalne repozytorium, jako `configured: false`; `remote remove` na niej usuwa jej gałęzie (z możliwością cofnięcia). |
 | `remote set-url <name> <url> [--push]`, `remote clear-push-url <name>` | Adresy URL do fetch / push. |
 | `remote default [name]` | Pokazuje lub wybiera domyślne zdalne repozytorium. |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | Clone (obiekty LFS są pobierane, chyba że `--no-lfs`). `--sparse` wykonuje checkout tylko tych katalogów i plików w katalogu głównym; cała historia i tak jest pobierana (zob. [Częściowy checkout](getting-started.md#częściowy-checkout)). |

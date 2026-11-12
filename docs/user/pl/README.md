@@ -69,6 +69,8 @@ przechodź wtedy, gdy będą potrzebne.
     „Zakończ i cd tutaj” oraz wrapper `gitpoulpi shell-init` (`gp`) dla bash,
     zsh, fish i PowerShell.
     Który terminal pokazuje GitPoulpi najlepiej: **[Wybór terminala](terminals.md)**.
+    Co przechodzi przez tmux, zellij, screen, herdr i panele terminala:
+    **[Multipleksery](multiplexers.md)**.
 
 Także: **[Przepływy pracy z gałęziami](branching-workflows.md)**, gotowe szablony
 Git Flow, GitHub Flow, GitLab Flow i Trunk-based albo własne bazy, wzorce nazw

@@ -411,8 +411,8 @@ a `Ctrl+M` jako `Enter`. Strona Ustawień ostrzega o takim przypisaniu („ten
 terminal nie wysyła ...”).
 
 Terminale z **protokołem klawiatury kitty** potrafią wysłać te skróty. Przykłady:
-kitty, WezTerm, Ghostty, foot, Alacritty 0.13 i nowszy oraz tmux lub herdr, gdy
-przepuszczają protokół. GitPoulpi domyślnie używa tego protokołu:
+kitty, WezTerm, Ghostty, foot, Alacritty 0.13 i nowszy oraz zellij (tmux nie
+odpowiada: zob. [Multipleksery](multiplexers.md#tmux)). GitPoulpi domyślnie używa tego protokołu:
 
 - Przy starcie GitPoulpi pyta terminal i czeka na odpowiedź co najwyżej około
   100 ms. Jeśli terminal nie odpowie, zostają klawisze starszego trybu.
@@ -873,9 +873,9 @@ zastosowania. Klawisze są domyślne.
 | Dziennik aktywności: Wybierz zakres |  |
 | Dziennik aktywności: Operacje git |  |
 | Dziennik aktywności: Dziennik aplikacji |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Dziennik aktywności: Pokaż operację tego wiersza |  |
+| Dziennik aktywności: Następna nieudana operacja |  |
+| Dziennik aktywności: Poprzednia nieudana operacja |  |
 | Dziennik aktywności: Przewiń w lewo | `Left` |
 | Dziennik aktywności: Przewiń w prawo | `Right` |
 | Dziennik aktywności: Kopiuj ostatni błąd |  |
@@ -1214,8 +1214,31 @@ zastosowania. Klawisze są domyślne.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Ponów**. `Ctrl+Shift+Z` wymaga protokołu klawiatury kitty; `Ctrl+Y` działa zawsze |
 | `.`, `Menu`, `Shift+F10` | Otwiera menu kontekstowe zaznaczonego wiersza |
 
-`Ctrl+Z` i `Ctrl+Y` nic nie robią, gdy klawiaturę ma pole tekstowe. Edytor ma
-własne cofanie tekstu.
+### Ctrl+Z / Ctrl+Y w polu tekstowym
+
+Gdy klawiaturę ma pole tekstowe, `Ctrl+Z` i `Ctrl+Y` (także `Ctrl+Shift+Z`)
+działają na tekst tego pola, nigdy na repozytorium: pole, które ma klawiaturę,
+zawsze wygrywa, więc `Ctrl+Z` w opisie commita nie może cofnąć commita.
+Wszędzie indziej zachowują swoje globalne znaczenie (dziennik cofania i ponawiania
+powyżej). Dotyczy to każdego pola tekstowego i edytora wielowierszowego: opisu
+commita, pól i edytorów tekstu w Ustawieniach, formularzy pull requestów i
+zgłoszeń, okien AI oraz każdego pola filtra i wyszukiwania.
+
+- **Pisanie** jest cofane po jednym słowie (ciąg liter, ciąg spacji, ciąg znaków
+  interpunkcyjnych), a pisanie przerwane na dłużej niż sekundę zaczyna nowy
+  krok. Kolejne Backspace to jeden krok. Wklejenie, wycięcie, `Ctrl+U` /
+  `Ctrl+K`, wstawiony fragment i przyjęte uzupełnienie to po jednym kroku.
+- Cofnięcie przywraca tekst, kursor i zaznaczenie. Nowa edycja po cofnięciu
+  odrzuca to, co dało się ponowić.
+- Każde pole trzyma ograniczoną historię (ostatnie 200 kroków, około 1 MB
+  tekstu) i zapomina ją, gdy pole zostanie podmienione z zewnątrz (folder wybrany
+  w selektorze, przeładowany formularz) albo klawiaturę przejmie inne pole.
+- Gdy nie ma już czego cofać, `Ctrl+Z` nic nie robi: nigdy nie przechodzi do
+  cofania w repozytorium, gdy pole ma klawiaturę.
+- **Edytor instrukcji** w ustawieniach AI ma też przyciski **Cofnij** i **Ponów**,
+  obok Zapisz i Anuluj, wyłączone, gdy nie ma do czego się cofnąć.
+- Edytor kodu i edytor merge zachowują własne cofanie (`Edit: Undo`,
+  `Merge: Undo`), które obejmuje też ich wybory.
 
 ## Filtrowalne listy w oknach
 
@@ -1227,18 +1250,20 @@ filtrować listę. Te klawisze przesuwają podświetlenie:
 
 | Klawisz | Działanie |
 |---|---|
-| `Up` / `Down` | Przesuwają o jeden wiersz |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Przesuwają o jeden wiersz w górę / w dół |
 | `Home` / `End` | Pierwszy / ostatni wiersz |
 | `PageUp` / `PageDown` | Przesuwają o jedną widoczną stronę |
 | `Enter` | Wybiera podświetlony wiersz |
 | `Esc` | Zamyka |
 
-W tych oknach `Home` i `End` przesuwają listę, a nie kursor pola filtra.
-`Ctrl+A` i `Ctrl+E` nadal przesuwają kursor na początek i na koniec, a `Ctrl+K`
-usuwa do końca filtra. Żadna para `Ctrl+litera` nie przesuwa listy (`Ctrl+N` to
-prefiks nawigacji, `Ctrl+P` paleta poleceń), a zwykłe `j` i `k` są wpisywane do
-filtra: przesuwają tu tylko strzałki, `PageUp` / `PageDown` i `Home` / `End`. Na
-listach bez pola tekstowego `j` / `k` to dodatkowy sposób ruchu w dół / w górę.
+W tych oknach `Home` i `End` przesuwają listę, a nie kursor pola filtra, i
+`Ctrl+K` / `Ctrl+J` też przesuwają listę, więc `Ctrl+K` nie usuwa już do końca
+filtra (`Ctrl+U` nadal go czyści; w zwykłym polu tekstowym poza listą `Ctrl+K`
+nadal usuwa do końca wiersza). `Ctrl+A` i `Ctrl+E` nadal przesuwają kursor na
+początek i na koniec. `Ctrl+J` / `Ctrl+K` przesuwają też każdą inną listę, z polem
+tekstowym lub bez (`Ctrl+N` to prefiks nawigacji, a `Ctrl+P` paleta poleceń, więc
+nie są klawiszami list). Zwykłe `j` i `k` są wpisywane do filtra; na listach bez
+pola tekstowego `j` / `k` to dodatkowy sposób ruchu w dół / w górę.
 
 Z myszą:
 
@@ -1489,7 +1514,8 @@ i ich okna, karta oczekiwania i karta „pojawiła się gałąź” są opisane 
 | `Enter` / `l` na wierszu pliku | Otwiera diff pliku pośrodku |
 | `Esc` / `h` | Wraca do commitów |
 | `Right` | (commit z więcej niż jednym refem) Otwiera listę jego pozostałych refów: `Up` / `Down` przesuwają, `Enter` robi checkout, `Esc` zamyka |
-| `f` | Otwiera pasek wyszukiwania (zob. [Wyszukiwanie](#wyszukiwanie)) |
+| `f` | Otwiera pasek wyszukiwania (zob. [Wyszukiwanie](#wyszukiwanie)); to nigdy nie było `/`, więc wyszukiwanie w Logu się nie zmienia |
+| `/` | Przenosi fokus na pole filtra Refs (ten sam klawisz działa, gdy fokus ma panel Refs); wpisywany jako znak, gdy fokus ma pole tekstowe |
 | `c` | (przy niezatwierdzonych zmianach) Zaznacza wiersz WIP i ustawia kursor w jego polu opisu |
 | `Enter` na wierszu WIP | Ustawia kursor w polu opisu wiersza WIP |
 | `.`, `Menu`, `Shift+F10` | Menu commita. `Up` / `Down` przesuwają, `Right` / `l` / `Enter` otwierają podmenu, `Left` / `h` / `Esc` wracają |

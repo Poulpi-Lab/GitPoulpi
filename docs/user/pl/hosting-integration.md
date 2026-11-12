@@ -683,6 +683,11 @@ swojej tabeli `[integrations.radar]` (wszystkie domyślnie wyłączone; zob.
 - **żądania do przeglądu**: otwarte żądania, które proszą o twój przegląd;
 - **otwarte żądania**: każde otwarte żądanie twojej własnej przestrzeni nazw i każdej organizacji lub
   grupy, do której należysz, albo przestrzeni nazw, które podasz. Nigdy cały host;
+  **Przestrzenie nazw** profilu (po jednej w wierszu w Ustawienia > Integracje > Radar, opcjonalnie
+  jako wyrażenia regularne) ograniczają wszystkie trzy listy: wiersz pasuje do pełnej ścieżki
+  repozytorium, gdy jest jej równy albo jest jej prefiksem kończącym się na `/` (`ptm` zachowuje
+  `ptm/produits/x`, nie `ptmx/y`), i jest stosowany do wierszy zwracanych przez host, a także po
+  stronie serwera, gdy wyszukiwanie hosta na to pozwala (kwalifikatory `user:` / `repo:` GitHuba);
 - **przypisane zgłoszenia**: otwarte zgłoszenia przypisane do ciebie.
 
 Odpowiadają GitHub, GitLab (także własny serwer), Gitea, Forgejo, Azure DevOps (Services
@@ -710,7 +715,7 @@ limit zapytań kończy błędem tylko ten profil. Odpowiedzi są używane ponown
 W Ustawienia > Integracje połączony profil hosta kodu ma blok **Radar**
 pod swoim kluczem SSH: jedno pole wyboru na listę (*Żądania czekające na mój przegląd*,
 *Każde otwarte żądanie*, *Uwzględnij szkice*, *Zgłoszenia przypisane do mnie*, ostatnie
-nieobecne dla hostów bez zgłoszeń), pole *Przestrzenie nazw* (rozdzielane przecinkami; puste
+nieobecne dla hostów bez zgłoszeń), pole *Przestrzenie nazw* (jeden wpis na wiersz, opcjonalnie jako *Wyrażenia regularne*; puste
 oznacza twoją własną i każdą, do której należysz) oraz wybór *Żądanie z
 repozytorium, które nie jest sklonowane*: *Zapytaj*, *Sklonuj* lub *Przejrzyj przez API*.
 Wszystko jest zapisywane w trakcie zmiany. Hosty bez zapytania obejmującego całe konto (Bitbucket
@@ -736,10 +741,11 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Wszystkie polecenia opisuje [Opis CLI](cli-reference.md#polecenia). Token nigdy nie
-jest przyjmowany jako argument (`hosting login` wypisuje `stored: "os"`, gdy trzyma go
-systemowy magazyn poświadczeń, albo `stored: "session"` i `store_error`, gdy magazyn
-odmówił, a token żyje w pamięci tylko na czas tej sesji), a serwer MCP nie oferuje
-`hosting login`, więc token nigdy nie przechodzi przez agenta.
+jest przyjmowany jako argument, a serwer MCP nie oferuje
+`hosting login`, więc token nigdy nie przechodzi przez agenta. `hosting login`
+wypisuje `stored: "os"`, gdy token trzyma systemowy magazyn poświadczeń, albo
+`stored: "session"` i `store_error`, gdy magazyn odmówił, a token żyje w pamięci
+tylko na czas tej sesji.
 
 ## Rozwiązywanie problemów
 

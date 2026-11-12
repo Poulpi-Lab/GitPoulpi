@@ -228,7 +228,7 @@ Panel nie ma tytułu: mówią o tym nagłówki kolumn. Przy commicie bez refa na
 | Kolumna | Pokazuje |
 |---|---|
 | **Ref** | Kolorowe plakietki gałęzi i tagów na commicie: ikona laptopa dla lokalnych, kula ziemska dla zdalnych, ikona tagu dla tagów, `+N`, gdy wskazuje tam więcej refów. |
-| **Graf** | Ścieżki gałęzi, merge i miejsca rozgałęzień. Rysowany jako obrazy w kitty, Ghostty, WezTerm i iTerm2 (oraz Windows Terminal i foot przez sixel), a w innych terminalach jako znaki. Kolory ścieżek pochodzą z motywu lub z wybranej palety (zob. [Motywy](themes.md)). Przy najmniejszej szerokości (jedna kropka commita) kolumna jest zwarta: każdy commit na jednym torze, bez linii gałęzi i merge. |
+| **Graf** | Ścieżki gałęzi, merge i miejsca rozgałęzień. Rysowany jako obrazy w kitty, Ghostty, WezTerm, Rio, iTerm2 (oraz Windows Terminal, foot i Tabby przez sixel), a w innych terminalach jako znaki. Kolory ścieżek pochodzą z motywu lub z wybranej palety (zob. [Motywy](themes.md)). Przy najmniejszej szerokości (jedna kropka commita) kolumna jest zwarta: każdy commit na jednym torze, bez linii gałęzi i merge. |
 | **Opis** | Podsumowanie commita. |
 | **Autor** | Autor, z opcjonalnym awatarem. |
 | **Data** | Data autora, w wybranym formacie. |

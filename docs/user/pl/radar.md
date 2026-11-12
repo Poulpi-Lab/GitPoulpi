@@ -54,7 +54,7 @@ do znacznika dodawany jest folder nadrzędny, aby dało się je odróżnić.
 Zakres folderu szuka repozytoriów **na dwóch poziomach**: w folderach bezpośrednio w nim i w folderach wewnątrz
 tych, które same nie są repozytoriami (`~/src/work/app`). Foldery ukryte są pomijane, do repozytorium się nie
 wchodzi, a na liście jest najwyżej 200 repozytoriów. Szukanie działa w tle, nigdy w wątku, który rysuje ekran,
-a jego wynik zostaje do odświeżenia: przycisk Odśwież, `r` lub `Radar: Odśwież` przeszukuje folder od nowa
+a jego wynik zostaje do odświeżenia: przycisk Odśwież, `r`, `F5` (klawisz odświeżania okna, do zmiany) lub `Radar: Odśwież` przeszukuje folder od nowa
 (repozytorium sklonowane od tamtej pory pojawi się na liście).
 
 Hosting pozostaje opcjonalny dla każdego repozytorium: repozytorium z folderu, które **nie jest powiązane**
@@ -198,7 +198,7 @@ w palecie.
 | Pokaż lub ukryj żądania z niesklonowanych repozytoriów | `a` | `Radar: Pokaż niesklonowane żądania` |
 | Pokaż lub ukryj szkice w wierszach obejmujących całe konto | `d` | `Radar: Pokaż szkice` |
 | Włącz żądania do przeglądu z całego konta hosta | `T` / `Enter` na jego wierszu podpowiedzi / **Włącz** | `Radar: Włącz żądania do przeglądu z całego konta...` |
-| Odśwież | `r` | `Radar: Odśwież` |
+| Odśwież | `r`, `F5` | `Radar: Odśwież` |
 | Menu wiersza | `.` | `Radar: Menu wiersza...` |
 | Wróć do Home | `Esc` | `Radar: Wróć do strony głównej` |
 
@@ -254,6 +254,8 @@ szkice, przestrzenie nazw) ustawia się przez `gitpoulpi hosting integrations ra
 [opis konfiguracji](config-reference.md) i [opis CLI](cli-reference.md). Odpowiadają GitHub, GitLab,
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center i Gerrit; Bitbucket Cloud nie ma punktu końcowego dla całego
 konta, więc jego requesty pokazują się tylko dla powiązanych repozytoriów zakresu.
+
+**Przestrzenie nazw** profilu ograniczają wszystkie jego listy do wybranych repozytoriów (Ustawienia > Integracje > Radar: pole tekstowe z jednym wpisem w wierszu i pole wyboru **Wyrażenia regularne**). Wiersz pasuje do pełnej ścieżki repozytorium, gdy jest jej równy albo jest jej prefiksem kończącym się na `/`: `ptm` zachowuje `ptm/produits/x`, a odrzuca `ptmx/y` i `formation/y`. Przy włączonym polu każdy wiersz jest wyrażeniem regularnym uruchamianym na pełnej ścieżce, tak jak ją zapisujesz (`^ptm/(produits|infra)/`); wiersz nieprawidłowy jest pokazany pod polem i nie jest zapisywany. Puste oznacza brak limitu.
 
 Jak wiersze są umieszczane:
 
@@ -311,7 +313,7 @@ Dwa pola wyboru obok filtra (pojawiają się, gdy pytana jest lista obejmująca 
 Oba są na plakietkach `Ctrl+N` i w palecie (`Radar: Pokaż niesklonowane żądania`, `Radar: Pokaż szkice`).
 
 Odpowiedź profilu jest trzymana w `radar-account.json` przez **5 minut**: ponowne otwarcie Radaru w tym
-czasie pokazuje wiersze bez pytania hosta. **Odśwież** (`r`) zawsze pyta. Host, który kazał zwolnić
+czasie pokazuje wiersze bez pytania hosta. **Odśwież** (`r` lub `F5`) zawsze pyta: każde repozytorium i każdą listę z całego konta, bez względu na wiek ostatniej odpowiedzi. Host, który kazał zwolnić
 albo odrzucił token, nie jest pytany ponownie w tej samej rundzie. Na profil i rodzaj zachowuje się najwyżej 300 wierszy,
 a linia pod **Repozytoria** mówi, ile więcej istniało, albo dlaczego nie dało się odczytać profilu
 (**Połącz ponownie** otwiera Ustawienia > Integracje).

@@ -616,6 +616,23 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         }
         return Ok(None);
     }
+    // The LFS card's "Open in default program": the key `o`'s twin.
+    if matches!(*cx.central_view, CentralView::Diff | CentralView::File)
+        && mouse.kind == MouseEventKind::Down(MouseButton::Left)
+        && matches!(
+            find_hit_target(&*cx.hit_targets, col, row),
+            Some(HitTarget::OpenWithDefault)
+        )
+    {
+        if let Some(subject) = crate::open_with::view::shown() {
+            *cx.last_message = Some(crate::open_with::popup::run_default(
+                &subject,
+                cx.repo_root,
+                cx.link,
+            ));
+        }
+        return Ok(None);
+    }
 
     // A picture in the File View: the header's zoom buttons, the wheel, a pan
     // drag and the scrollbars are the image pane's; nothing of it reaches the

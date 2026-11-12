@@ -66,6 +66,9 @@ fn hover_style_for(target: &HitTarget) -> HoverKind {
         HitTarget::OpenWith => Required(
             "open_with::view::render -> popup::render_button hovered, buffer-tested in open_with/tests.rs",
         ),
+        HitTarget::OpenWithDefault => Required(
+            "open_with::view::render_card_actions -> input_bg(hovered), buffer-tested in open_with/tests.rs",
+        ),
         HitTarget::OpenInPopup => NotApplicable(
             "the popup's frame: a shield so nothing behind it hovers, no action of its own",
         ),
@@ -403,6 +406,7 @@ fn sample_hit_targets() -> Vec<HitTarget> {
         HitTarget::OpenInItem(0),
         HitTarget::OpenInPopup,
         HitTarget::OpenWith,
+        HitTarget::OpenWithDefault,
         HitTarget::LogRefPill {
             name: "main".into(),
             kind: RefRowKind::Local,

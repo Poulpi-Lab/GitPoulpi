@@ -774,6 +774,18 @@ fn draw_central_in(frame: &mut Frame, ctx: &mut CentralDrawCtx<'_>) {
         );
         *diff_rows = std::rc::Rc::clone(&rendered.rows);
         frame.render_clipped(Paragraph::new(visible), inner);
+        // A Git LFS object card: "Open in default program" and the "Open in"
+        // list under it, for the file's real content.
+        if open_file.is_some_and(|f| {
+            !diff_state.lfs_raw
+                && gitpoulpi_core::domain::lfs_change(f).is_some_and(|c| c.new.is_some())
+        }) {
+            if let Some(hits) =
+                crate::open_with::view::render_diff_card(frame, inner, diff_state, *diff_rendered_len)
+            {
+                frame_hits.splice(0..0, hits);
+            }
+        }
         // The text selection, over the rows.
         diff_view::paint_text_selection(frame.buffer_mut(), inner, &rendered, diff_state);
         *diff_render = Some(std::rc::Rc::clone(&rendered));

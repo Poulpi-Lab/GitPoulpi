@@ -426,6 +426,56 @@ fn the_file_context_menus_offer_open_with() {
     term.stop().unwrap();
 }
 
+/// The program list opened from a menu row is a continuation of that menu:
+/// drawn to its right on the row's line (never at the screen's corner), from
+/// a mouse click and from the keyboard alike.
+#[test]
+fn the_list_hangs_beside_the_menu_it_was_opened_from() {
+    for keyboard in [false, true] {
+        let desktop = Desktop::new();
+        let repo = repo(true);
+        let session = format!("pty-open-with-flyout-{keyboard}");
+        let (mut term, _config) = launch(repo.root(), &session, &desktop, "");
+        let (col, row) = term.wait_for_text("\u{25CC}", STEP).unwrap();
+        term.click(col, row).unwrap();
+        term.wait_for_text("\u{270E} doc.gpdoc", STEP)
+            .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+        common::right_click_text_until(&mut term, "\u{270E} doc.gpdoc", "the file menu", |s| {
+            s.contains("Open with...")
+        });
+        let screen = term.screen();
+        let (menu_col, menu_row) = screen.find("Open with...").unwrap();
+        if keyboard {
+            // Step down until the entry's row carries the selection band
+            // (separators and greyed rows are skipped by the menu).
+            let band = |s: &xtask::pty::Screen| s.cell(menu_col + 1, menu_row).unwrap().bg;
+            let plain = band(&screen);
+            for _ in 0..30 {
+                if band(&term.screen()) != plain {
+                    break;
+                }
+                term.send_keys("Down").unwrap();
+                term.wait_for_stable(Duration::from_millis(80), STEP).unwrap();
+            }
+            assert_ne!(band(&term.screen()), plain, "{}", term.text());
+            term.send_keys("Enter").unwrap();
+        } else {
+            term.click(menu_col + 1, menu_row).unwrap();
+        }
+        wait_list(&term);
+        let screen = term.screen();
+        let (list_col, list_row) = screen.find("Zeta Viewer").unwrap();
+        // Beside the menu, to its right, on or below the activated row.
+        assert!(
+            list_col > menu_col + "Open with...".len() as u16 && list_row >= menu_row,
+            "keyboard={keyboard}: menu at ({menu_col},{menu_row}), list at ({list_col},{list_row})\n{}",
+            term.text()
+        );
+        term.send_keys("Escape").unwrap();
+        term.stop().unwrap();
+    }
+}
+
 fn repo_clean() -> gitpoulpi_testkit::FixtureRepo {
     repo(false)
 }

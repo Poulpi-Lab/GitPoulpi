@@ -177,6 +177,16 @@ Binární soubor (PDF, dokument Wordu, tabulka, archiv...) nemá text, který by
 
 Soubor z pracovního stromu se aplikaci předá tak, jak je. Verze z commitu (nebo z indexu) se zapíše do **dočasné kopie jen pro čtení** s oznámením ve stavovém řádku, aby aplikace nemohla změnit repozitář. Ani jedno repozitář nemění: žádný záznam v žurnálu, Zpět zůstává beze změny.
 
+Seznam nabídky se otevře vedle nabídky, v úrovni řádku **Otevřít pomocí...**, jako podnabídka (vlevo, když vpravo není místo), myší i z klávesnice. Seznam editorů obrázků (**Upravit v...**) otevřený z nabídky souboru dělá totéž.
+
+### Soubory Git LFS
+
+Karta objektu Git LFS (viz [Git LFS](lfs.md)) nese pod textem tytéž dvě akce: **Otevřít výchozím programem** a **Otevřít v**, se stejnými klávesami (`o`, `Shift+O`) i řádky palety. Otevřou skutečný soubor, nikdy ukazatel: soubor z pracovního stromu tak, jak je, nebo dočasnou kopii objektu z lokálního úložiště LFS jen pro čtení u verze z commitu či z indexu. Objekt, který ještě není stažen, nemá na kartě žádná tlačítka a stavový řádek říká, že obsah ještě není stažen. Totéž odmítnutí platí pro soubor v pracovním stromu, který stále drží jen ukazatel: **Otevřít výchozím programem**, **Otevřít v** a **Upravit v**, z karty nebo z kterékoli nabídky souboru, řeknou, že obsah není stažen, místo aby otevřely text ukazatele (stáhněte ho řádky pull nebo checkout na panelu nástrojů LFS a zkuste to znovu). Otevírání je jen pro čtení: žádný záznam v žurnálu, není co vracet.
+
+### Prohlížeče ve Windows
+
+Chrome a Edge registrují `--single-argument %1`, takže vše za přepínačem čtou jako jednu adresu, včetně uvozovek. GitPoulpi předá cestu takovému programu doslovně a bez uvozovek, jako Windows, takže se soubor s mezerami v cestě otevře, místo aby selhal s `http://"c/...`. Každý jiný program dostane cestu jako jeden běžný argument.
+
 ## Starší klíče
 
 Staré klíče `ui.terminal_launch` a `ui.terminal_launch_command` se čtou jen

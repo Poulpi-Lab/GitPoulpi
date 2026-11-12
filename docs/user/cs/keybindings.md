@@ -434,7 +434,7 @@ seznam je [níže](#všechny-příkazy-palety).
 |---|---|
 | `Ctrl+P` | Otevřít paletu |
 | *(psaní)* | Filtrovat seznam. Nejdřív přijde přesná shoda za předponou `Kategorie: `, poté shoda kdekoli v popisku, poté přibližná shoda |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J`, `Home` / `End`, `PageUp` / `PageDown` | Posunout zvýraznění (viz [Filtrovatelné vyskakovací seznamy](#filtrovatelné-vyskakovací-seznamy)) |
+| `Up` / `Down`, `Home` / `End`, `PageUp` / `PageDown` | Posunout zvýraznění (viz [Filtrovatelné vyskakovací seznamy](#filtrovatelné-vyskakovací-seznamy)) |
 | `Enter`, nebo dvojklik | Spustit zvýrazněný příkaz |
 | `Esc` | Zavřít |
 
@@ -454,7 +454,9 @@ V `config.toml` jde o tabulku `[keybindings.palette]` pojmenovanou podle příka
 
 Řádek nápovědy pod seznamem uvádí tuto klávesu (výchozí `Alt+K`). Je to akce `palette.configure_shortcut`, takže ji lze přeřadit jako kteroukoli jinou.
 
-Paleta a výběry (motiv, jazyk, karta, hledání pracovního prostoru) se přesouvají a mění velikost jako dialog: táhněte za horní okraj, nebo stiskněte `Alt+G` (akce `palette.arrange`; totéž dělá řádek palety `Dialog: Přesunout nebo změnit velikost`). Šipky okno přesouvají, `Shift`+šipky mění velikost, `0` ho vrátí zpět, `Enter` nebo `Esc` režim opustí a vyskakovací okno zůstane otevřené. O tom, zda si místo zapamatuje, rozhoduje `ui.dialog_geometry`.
+Paleta a výběry (motiv, jazyk, karta, hledání pracovního prostoru) se přesouvají a mění velikost jako dialog: táhněte za horní okraj, stiskněte `Ctrl+N` a pak `m` (jako nad každým dialogem), nebo stiskněte `Alt+G`. `Alt+G` je akce `palette.arrange` („Dialog: Přesunout nebo změnit velikost dialogu v popředí“): další způsob, platný nad každým dialogem a vyskakovacím oknem, jak zahájit režim uspořádání u okna v popředí (řádky palety `Dialog: Přesunout nebo změnit velikost` a `Dialog: Obnovit pozici a velikost` působí na samotnou paletu, dokud je otevřená). Šipky okno přesouvají, `Shift`+šipky mění velikost, `0` ho vrátí zpět, `Enter` nebo `Esc` režim opustí a vyskakovací okno zůstane otevřené. O tom, zda si místo zapamatuje, rozhoduje `ui.dialog_geometry`.
+
+`Ctrl+N` je i zde předpona navigace: zobrazí odznak na poli filtru, prvním řádku seznamu a zavíracím křížku a klávesa po ní stiskne daný ovládací prvek, nebo `m` uspořádá vyskakovací okno. Už nepřesouvá zvýraznění dolů a `Ctrl+P` ho nepřesouvá nahoru: seznam s polem filtru posouvají jen šipky, `PageUp` / `PageDown` a `Home` / `End`.
 
 ### Všechny příkazy palety
 
@@ -1191,7 +1193,7 @@ Klávesy jsou výchozí.
 | Klávesa | Akce |
 |---|---|
 | `Tab` / `Shift+Tab` | Zaostřit další / předchozí panel |
-| `Ctrl+N`, poté odznak | Zaostřit tuto část okna (viz [Předpona navigace](#předpona-navigace-ctrln)) |
+| `Ctrl+N`, poté odznak | Zaostřit tuto část okna nebo stisknout tento ovládací prvek dialogu či vyskakovacího okna v popředí (viz [Předpona navigace](#předpona-navigace-ctrln)) |
 | `j` / `k`, `Up` / `Down` | Posunout výběr, v každém panelu |
 | `PageUp` / `PageDown`, `Home` / `End` | Posun o stránku; skok na první / poslední řádek |
 | číslo, poté `j` / `k` / `Up` / `Down` | Předpona počtu: `4j` posune o čtyři řádky. S `PageUp` / `PageDown` je počet počtem stránek. Stavový řádek ukazuje čekající počet (`4…`). `Esc` nebo jakákoli jiná klávesa jej zruší. Počáteční `0` počet nikdy nezačíná |
@@ -1217,15 +1219,18 @@ Tyto klávesy posouvají zvýraznění:
 
 | Klávesa | Akce |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Posun o jeden řádek |
+| `Up` / `Down` | Posun o jeden řádek |
 | `Home` / `End` | První / poslední řádek |
 | `PageUp` / `PageDown` | Posun o jednu viditelnou stránku |
 | `Enter` | Zvolit zvýrazněný řádek |
 | `Esc` | Zavřít |
 
-V těchto oknech `Home`, `End` a `Ctrl+K` posouvají seznam, ne kurzor pole
-filtru. `Ctrl+A` a `Ctrl+E` stále přesunou kurzor na začátek a na konec. Prosté
-`j` a `k` se píší do filtru.
+V těchto oknech `Home` a `End` posouvají seznam, ne kurzor pole filtru.
+`Ctrl+A` a `Ctrl+E` stále přesunou kurzor na začátek a na konec a `Ctrl+K`
+smaže filtr od kurzoru do konce. Žádná dvojice `Ctrl+písmeno` seznam neposouvá
+(`Ctrl+N` je předpona navigace, `Ctrl+P` paleta příkazů) a prosté `j` a `k` se
+píší do filtru: posouvají jen šipky, `PageUp` / `PageDown` a `Home` / `End`.
+V seznamech bez textového pole jsou `j` / `k` další způsob posunu dolů / nahoru.
 
 Myší:
 
@@ -1256,7 +1261,7 @@ obrazovky Nastavení.
 | *(psaní)* | Filtr: ponechá jen sekce, které obsahují text. `j`, `k` a `q` se také píší |
 | `Backspace`, `Ctrl+U` | Smazat poslední znak / vymazat filtr |
 | `Esc` | Vymazat filtr; je-li prázdný, zavřít nápovědu |
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `Ctrl+K` / `Ctrl+J` | Posun o jeden řádek |
+| `Up` / `Down` | Posun o jeden řádek |
 | `PageUp` / `PageDown`, `Home` / `End` | Posun o stránku; skok na začátek / konec |
 | `Ctrl+D`, nebo klik na odkaz | Otevřít tuto dokumentaci na GitHubu v prohlížeči |
 

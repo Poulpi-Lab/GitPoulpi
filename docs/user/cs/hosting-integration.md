@@ -729,7 +729,9 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Každý příkaz najdete v [referenční příručce CLI](cli-reference.md#příkazy).
-Token se nikdy nepřijímá jako argument a server MCP `hosting login` nenabízí,
+Token se nikdy nepřijímá jako argument (`hosting login` vypíše `stored: "os"`, když ho drží
+systémové úložiště přihlašovacích údajů, nebo `stored: "session"` plus `store_error`, když ho
+úložiště odmítlo a token žije jen v paměti pro tuto relaci) a server MCP `hosting login` nenabízí,
 takže token nikdy neprochází agentem.
 
 ## Řešení potíží

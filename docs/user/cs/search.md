@@ -31,7 +31,7 @@ přidají, jakmile jsou hotové.
 
 | Klávesa | Co dělá |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `PageUp` / `PageDown`, `Home` / `End` | Pohyb po výsledcích (nadpisy skupin se přeskakují). |
+| `Up` / `Down`, `PageUp` / `PageDown`, `Home` / `End` | Pohyb po výsledcích (nadpisy skupin se přeskakují). |
 | `Enter` | Přejde na výsledek: karta repozitáře se otevře (nebo se na ni přepne) a výsledek se ukáže. |
 | `Esc` | Zavře hledání. |
 | `Alt+1` .. `Alt+8` | Zapne nebo vypne druh (čipy nad seznamem, v jejich pořadí). `Alt+0` zapne všechny. |

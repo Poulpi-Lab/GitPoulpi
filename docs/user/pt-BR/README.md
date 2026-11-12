@@ -71,6 +71,8 @@ e pule para as páginas de referência quando precisar delas.
     “Sair e cd aqui”, e a função `gitpoulpi shell-init` (`gp`) para bash, zsh,
     fish e PowerShell.
     Qual terminal mostra melhor o GitPoulpi: **[Escolhendo um terminal](terminals.md)**.
+    O que passa pelo tmux, zellij, screen, herdr e painéis de terminal:
+    **[Multiplexadores](multiplexers.md)**.
 
 Também: **[Fluxos de trabalho de branches](branching-workflows.md)**, os modelos
 Git Flow, GitHub Flow, GitLab Flow e Trunk-based ou as suas próprias bases,

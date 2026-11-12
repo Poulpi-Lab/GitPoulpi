@@ -410,8 +410,8 @@ exemplo, `Ctrl+Shift+N` chega como `Ctrl+N`, `Ctrl+I` como `Tab` e `Ctrl+M` como
 envia ...”).
 
 Terminais com o **protocolo de teclado do kitty** conseguem enviar esses acordes. Exemplos:
-kitty, WezTerm, Ghostty, foot, Alacritty 0.13 e posteriores, e tmux ou herdr quando
-repassam o protocolo. O GitPoulpi usa o protocolo por padrão:
+kitty, WezTerm, Ghostty, foot, Alacritty 0.13 e posteriores, e zellij (o tmux não
+responde a ele: veja [Multiplexadores](multiplexers.md#tmux)). O GitPoulpi usa o protocolo por padrão:
 
 - Na inicialização, o GitPoulpi consulta o terminal e espera no máximo cerca de 100 ms pela
   resposta. Se o terminal não responder, as teclas legadas permanecem.
@@ -872,9 +872,9 @@ As teclas são as padrão.
 | Registro de atividade: escolher o escopo |  |
 | Registro de atividade: operações do Git |  |
 | Registro de atividade: registro do aplicativo |  |
-| Activity Log: Show the Operation of This Line |  |
-| Activity Log: Next Failed Operation |  |
-| Activity Log: Previous Failed Operation |  |
+| Registro de atividade: mostrar a operação desta linha |  |
+| Registro de atividade: próxima operação com falha |  |
+| Registro de atividade: operação com falha anterior |  |
 | Registro de atividade: rolar para a esquerda | `Left` |
 | Registro de atividade: rolar para a direita | `Right` |
 | Registro de atividade: copiar o último erro |  |
@@ -1213,8 +1213,31 @@ As teclas são as padrão.
 | `Ctrl+Y`, `Ctrl+Shift+Z` | **Refaz**. `Ctrl+Shift+Z` precisa do protocolo de teclado do kitty; `Ctrl+Y` sempre funciona |
 | `.`, `Menu`, `Shift+F10` | Abrem o menu de contexto da linha selecionada |
 
-`Ctrl+Z` e `Ctrl+Y` não fazem nada enquanto um campo de texto está com o teclado. O
-editor tem seu próprio desfazer de texto.
+### Ctrl+Z / Ctrl+Y em um campo de texto
+
+Enquanto um campo de texto está com o teclado, `Ctrl+Z` e `Ctrl+Y` (`Ctrl+Shift+Z`
+também) agem sobre o texto desse campo, nunca sobre o repositório: um campo que tem o
+teclado sempre vence, então `Ctrl+Z` na mensagem de commit não consegue desfazer um commit.
+Em todo o resto eles mantêm o significado global (o diário de desfazer / refazer acima).
+Vale para todo campo de texto e editor de várias linhas: a mensagem de commit, os campos e
+editores de texto das Configurações, os formulários de pull request e de issue, os diálogos
+de IA e toda caixa de filtro ou de busca.
+
+- **Digitar** é desfeito uma palavra por vez (uma sequência de letras, de espaços, de
+  pontuação), e uma digitação que pausa por mais de um segundo começa um novo passo.
+  Backspaces seguidos são um passo. Uma colagem, um recortar, `Ctrl+U` / `Ctrl+K`, um trecho
+  inserido ou um preenchimento aceito é um passo cada.
+- Um desfazer traz de volta o texto, o cursor e a seleção. Uma nova edição depois de um
+  desfazer descarta o que poderia ser refeito.
+- Cada campo guarda um histórico limitado (os últimos 200 passos, cerca de 1 MB de texto), e
+  o esquece quando o campo é substituído de fora (uma pasta escolhida no seletor, um
+  formulário recarregado) ou outro campo recebe o teclado.
+- Sem nada para desfazer, `Ctrl+Z` não faz nada: nunca cai no desfazer do repositório
+  enquanto um campo tem o teclado.
+- O **editor de instruções** das Configurações de IA também tem botões **Desfazer** e
+  **Refazer**, ao lado de Salvar e Cancelar, desativados enquanto não há para onde ir.
+- O editor de código e o editor de merge mantêm o próprio desfazer (`Edit: Undo`,
+  `Merge: Undo`), que também cobre as escolhas deles.
 
 ## Listas de popup filtráveis
 
@@ -1233,11 +1256,13 @@ movem o destaque:
 | `Esc` | Fecha |
 
 Nestes popups, `Home` e `End` movem a lista, não o cursor do campo de
-filtro. `Ctrl+A` e `Ctrl+E` ainda movem o cursor para o início e o fim, e
-`Ctrl+K` apaga até o fim do filtro. Nenhum par `Ctrl+letra` move uma lista
-(`Ctrl+N` é o prefixo de navegação, `Ctrl+P` a paleta de comandos), e `j` e `k`
-simples são digitados no filtro: aqui só as setas, `PageUp` / `PageDown` e
-`Home` / `End` movem. Em listas sem campo de texto, `j` / `k` são um jeito
+filtro. `Ctrl+K` / `Ctrl+J` também movem a lista, então `Ctrl+K` não apaga mais
+até o fim do filtro (`Ctrl+U` ainda o limpa; em um campo de texto comum
+fora de uma lista, `Ctrl+K` continua apagando até o fim da linha). `Ctrl+A` e
+`Ctrl+E` ainda movem o cursor para o início e o fim. `Ctrl+J` / `Ctrl+K` movem
+também toda outra lista, com ou sem campo de texto (`Ctrl+N` é o prefixo de navegação e
+`Ctrl+P` a paleta de comandos, então não são teclas de lista). `j` e `k`
+simples são digitados no filtro; em listas sem campo de texto, `j` / `k` são um jeito
 extra de descer / subir.
 
 Com o mouse:

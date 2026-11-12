@@ -690,6 +690,11 @@ sua tabela `[integrations.radar]` (todas desativadas por padrão; veja a
 - **solicitações de revisão**: solicitações abertas que pedem a sua revisão;
 - **solicitações abertas**: todas as solicitações abertas do seu próprio namespace e de cada org ou
   grupo de que você é membro, ou dos namespaces que você indicar. Nunca o host inteiro;
+  os **Namespaces** do perfil (um por linha em Configurações > Integrações > Radar, opcionalmente
+  como expressões regulares) limitam as três listas: uma linha corresponde ao caminho completo de um
+  repositório quando é igual a ele ou é um prefixo de caminho em um `/` (`ptm` mantém `ptm/produits/x`,
+  não `ptmx/y`), e é aplicada às linhas que o host devolve, mais no servidor onde a busca do host
+  permite (os qualificadores `user:` / `repo:` do GitHub);
 - **issues atribuídas**: issues abertas atribuídas a você.
 
 GitHub, GitLab (inclusive auto-hospedado), Gitea, Forgejo, Azure DevOps (Services
@@ -717,7 +722,7 @@ limite de requisições faz falhar só aquele perfil. As respostas são reaprove
 Em Configurações > Integrações, um perfil de host de código conectado tem um bloco **Radar**
 sob a sua chave SSH: uma caixa por lista (*Solicitações aguardando minha revisão*,
 *Todas as solicitações abertas*, *Incluir rascunhos*, *Issues atribuídas a mim*, a última
-ausente nos hosts sem issues), um campo *Namespaces* (separados por vírgula; vazio
+ausente nos hosts sem issues), um campo *Namespaces* (um por linha, com a caixa *Expressões regulares*; vazio
 significa o seu e todos aos quais você pertence) e a escolha *Solicitação de um
 repositório não clonado*: *Perguntar*, *Clonar* ou *Revisar pela API*.
 Tudo é salvo à medida que você altera. Os hosts sem consulta de toda a conta (Bitbucket
@@ -743,8 +748,11 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Veja a [referência da CLI](cli-reference.md#comandos) para todos os comandos. Um token
-nunca é aceito como argumento (`hosting login` imprime `stored: "os"` quando o repositório de credenciais do sistema o guarda, ou `stored: "session"` mais `store_error` quando o repositório o recusou e o token fica na memória só desta sessão), e o servidor MCP não oferece
-`hosting login`, então um token nunca passa por um agente.
+nunca é aceito como argumento, e o servidor MCP não oferece
+`hosting login`, então um token nunca passa por um agente. O `hosting login`
+imprime `stored: "os"` quando o repositório de credenciais do sistema guarda o token, ou
+`stored: "session"` mais `store_error` quando o repositório o recusou e o token
+fica na memória só desta sessão.
 
 ## Solução de problemas
 

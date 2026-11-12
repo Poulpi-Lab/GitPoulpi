@@ -28,9 +28,9 @@ objeto dele está no armazenamento local; caso contrário, a ficha diz para faze
 
 ## Como é desenhada
 
-Em um terminal com protocolo de imagem (Kitty e Ghostty, WezTerm e iTerm2, Rio,
-mintty) a imagem é uma imagem de verdade. Em qualquer outro lugar (Windows
-Terminal simples, tmux, um terminal que o GitPoulpi não conhece) ela é desenhada
+Em um terminal com protocolo de imagem (Kitty e Ghostty, WezTerm e iTerm2,
+Rio, mintty, e os terminais sixel Windows Terminal, foot e Tabby) a imagem é uma imagem de verdade. Em qualquer outro lugar (o
+console simples do Windows, zellij, um terminal que o GitPoulpi não conhece) ela é desenhada
 com caracteres de meio bloco coloridos, com metade da resolução vertical mas
 legível em todo lugar; **Sem protocolo de imagem** pode ser definido como *Só a
 ficha de informações*. **Protocolo de imagem** na página **Log e grafo** força um.

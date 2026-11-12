@@ -57,7 +57,7 @@ que você os distinga.
 Um escopo de pasta procura repositórios **em dois níveis**: as pastas diretamente nela e as pastas dentro
 daquelas que não são repositórios (`~/src/work/app`). Pastas ocultas são ignoradas, um repositório nunca é
 entrado e no máximo 200 repositórios são listados. A busca roda em segundo plano, nunca na thread que
-desenha, e o resultado é mantido até você atualizar: o botão Atualizar, `r` ou `Radar: atualizar`
+desenha, e o resultado é mantido até você atualizar: o botão Atualizar, `r`, `F5` (a tecla de atualizar da janela, reatribuível) ou `Radar: atualizar`
 procura na pasta de novo (um repositório clonado desde então aparece).
 
 A hospedagem continua opcional por repositório: um repositório da pasta que **não está vinculado** a um host
@@ -199,7 +199,7 @@ tecla ou a paleta (`Radar: ...`). Uma ação do mouse sempre tem uma tecla e um 
 | Mostrar ou ocultar as solicitações de repositórios não clonados | `a` | `Radar: exibir solicitações não clonadas` |
 | Mostrar ou ocultar os rascunhos das linhas de toda a conta | `d` | `Radar: exibir rascunhos` |
 | Ativar as solicitações de revisão de toda a conta de um host | `T` / `Enter` na linha de aviso dele / **Ativar** | `Radar: ativar as solicitações de revisão da conta...` |
-| Atualizar | `r` | `Radar: atualizar` |
+| Atualizar | `r`, `F5` | `Radar: atualizar` |
 | O menu da linha | `.` | `Radar: menu da linha...` |
 | Voltar ao Início | `Esc` | `Radar: voltar ao início` |
 
@@ -253,6 +253,8 @@ rascunhos, namespaces) são definidas com `gitpoulpi hosting integrations radar`
 a [referência de configuração](config-reference.md) e a [referência da CLI](cli-reference.md). GitHub, GitLab,
 Gitea, Forgejo, Azure DevOps, Bitbucket Data Center e Gerrit respondem; o Bitbucket Cloud não tem endpoint de
 toda a conta, então suas solicitações aparecem só para os repositórios vinculados do escopo.
+
+Os **Namespaces** do perfil limitam todas as suas listas a alguns repositórios (Configurações > Integrações > Radar: uma área de texto com uma entrada por linha e uma caixa **Expressões regulares**). Uma linha corresponde ao caminho completo de um repositório quando é igual a ele ou é um prefixo de caminho que termina em `/`: `ptm` mantém `ptm/produits/x` e descarta `ptmx/y` e `formation/y`. Com a caixa marcada, cada linha é uma expressão regular aplicada ao caminho completo como você a escreve (`^ptm/(produits|infra)/`); uma linha inválida aparece sob o campo e não é salva. Vazio significa sem limite.
 
 Como as linhas são colocadas:
 
@@ -309,7 +311,7 @@ em `radar.toml`:
 Ambas estão nas marcas de `Ctrl+N` e na paleta (`Radar: exibir solicitações não clonadas`, `Radar: exibir rascunhos`).
 
 A resposta de um perfil é guardada em `radar-account.json` por **5 minutos**: abrir o Radar de novo nesse
-intervalo mostra as linhas sem consultar o host. **Atualizar** (`r`) sempre consulta. Um host que pediu para ir mais
+intervalo mostra as linhas sem consultar o host. **Atualizar** (`r` ou `F5`) sempre consulta: cada repositório e cada lista da conta, seja qual for a idade da última resposta. Um host que pediu para ir mais
 devagar ou recusou o token não é consultado de novo na mesma rodada. No máximo 300 linhas são mantidas por perfil e tipo,
 e uma linha sob **Repositórios** diz quantas mais existiam, ou por que um perfil não pôde ser lido
 (**Reconectar** abre Configurações > Integrações).

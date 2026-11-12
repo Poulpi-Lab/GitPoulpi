@@ -92,7 +92,7 @@ author_email = "jane@work.example"
 | Chave | Padrão | Valores e efeito |
 |---|---|---|
 | `ui.graph_renderer` | `"auto"` | `auto` (uma imagem onde o terminal pode desenhar uma, caracteres nos demais), `image`, `text`. **Reiniciar.** |
-| `ui.image_protocol` | `"auto"` | Como as imagens (grafo, avatares) chegam ao terminal: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = protocolo Kitty no kitty, no Ghostty e em um herdr com `kitty_graphics = true`; iTerm2 no WezTerm, iTerm2, Rio, mintty; sixel (só avatares) no Windows Terminal, foot, Konsole, mlterm; nenhum no tmux, zellij, screen e terminais desconhecidos. **Reiniciar.** |
+| `ui.image_protocol` | `"auto"` | Como as imagens (grafo, avatares) chegam ao terminal: `auto`, `kitty`, `iterm2`, `sixel`, `none`. `auto` = protocolo Kitty no kitty, no Ghostty, no iTerm2 3.7.7 ou mais recente e em um herdr com `kitty_graphics = true`; o protocolo do iTerm2 no WezTerm e no Rio (transparência misturada), no iTerm2 mais antigo e no mintty (fundo opaco); sixel (a coluna do grafo e os avatares) no Windows Terminal, foot, Tabby, Konsole, mlterm, no tmux quando o terminal por trás dele aceita sixel e em qualquer terminal cujas respostas na inicialização citem sixel (um xterm iniciado com `-ti vt340`, um terminal do VS Code com imagens ativadas); caracteres no zellij, no screen e em terminais desconhecidos. No tmux, as imagens do kitty exigem `kitty` aqui mais `allow-passthrough on` ([Multiplexadores](multiplexers.md)). Onde o pseudoconsole do terminal descarta ou desloca as imagens (WezTerm 20240203, Rio e mintty no Windows), use `ui.graph_renderer = "text"` ([Escolhendo um terminal](terminals.md#windows)). **Reiniciar.** |
 | `ui.theme` | `"system"` | O tema de cores: um slug embutido (`gitpoulpi theme list` lista todos), o slug de um arquivo em `<config>/themes/`, ou `system` (segue o fundo claro ou escuro do terminal, detectado na inicialização; o valor antigo `default` significa o mesmo). `config set` rejeita nomes desconhecidos. Veja [Temas](themes.md). |
 | `ui.graph_color_theme` | `"theme"` | Paleta das faixas: `theme` (segue o tema) ou qualquer nome de paleta de faixas: `gitpoulpi`, `light`, `material`, `serie`, e as paletas dos outros temas. |
 | `ui.graph_lane_background` | `"off"` | `off` ou `row_tint` (uma faixa tênue da cor da faixa atrás do grafo, mais uma barra na borda dele). **App: alternar tom das linhas do grafo** (`Ctrl+N Shift+T`) a alterna; **App: mudar tema de cores do grafo...** (`Ctrl+N Shift+Y`) escolhe `ui.graph_color_theme`. |
@@ -121,7 +121,7 @@ author_email = "jane@work.example"
 | `ui.git_terms_english` | `false` | Só ja, ko e zh-CN: mostra as palavras git em inglês (stage, unstage, staged, unstaged...) em vez da transcrição. Sem efeito enquanto `ui.translate_git_terms` for `true`. **Ao vivo.** |
 | `ui.mouse_enabled` | `true` | `false` deixa o mouse (e a seleção de texto) para o terminal. **Reiniciar.** |
 | `ui.mouse_scroll_lines` | `3` | Linhas do Log por clique da roda, de 1 a 20. **Reiniciar.** |
-| `ui.kitty_keyboard` | `"auto"` | `auto` pede ao terminal o protocolo de teclado do kitty (para que `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` cheguem); `off` nunca pede. **Reiniciar.** |
+| `ui.kitty_keyboard` | `"auto"` | `auto` pede ao terminal o protocolo de teclado do kitty (para que `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` cheguem; só em Unix, o tmux nunca responde: veja [Multiplexadores](multiplexers.md#tmux)); `off` nunca pede. **Reiniciar.** |
 | `ui.logo_color` | `""` | Combinação de cores do logo na janela Sobre, um slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); vazio ou desconhecido significa o padrão da compilação (`lavender`). Gravada quando você clica no logo ou escolhe uma cor em Sobre. |
 
 **Avatares** (desativados por padrão; ativá-los envia um hash SHA-256 dos e-mails
@@ -146,6 +146,7 @@ dos autores ao Gravatar, e consulta a sua conta conectada do GitHub/GitLab)
 | `ui.mermaid_orientation` | `lr` | Direção desse grafo: `lr` (da esquerda para a direita) ou `tb` (de cima para baixo). |
 | `ui.mermaid_fence` | `false` | Envolve o script do Mermaid copiado em um bloco de código `mermaid`. |
 | `ui.mermaid_subject_width` | `40` | Os assuntos dos commits são cortados neste número de caracteres nos ids do Mermaid (`subjects`, `full`). |
+| `ui.text_cursor` | `"terminal"` | Onde o ponto de inserção de um campo de texto em foco aparece: `terminal` coloca ali o cursor do próprio terminal (uma barra piscante, então as configurações de cursor do terminal e a janela de candidatos de um método de entrada o acompanham; oculto quando nenhum campo tem o teclado e restaurado ao seu estilo de cursor ao sair), `drawn` desenha o glifo de cursor do próprio GitPoulpi e mantém o cursor do terminal oculto. Ao vivo. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` ou `16`: com quantas cores desenhar. `auto` é truecolor, exceto no Apple Terminal (256), no console do Linux (16) e em terminais `*-256color` sem `COLORTERM` (256). Ao vivo. Veja [Temas](themes.md). |
 | `ui.input_color` | `"theme"` | Fundo dos campos de texto: `theme` (o do próprio tema), `gray`, `blue`, `slate`, `dark`, `custom`. |
 | `ui.input_color_custom` | `"#2a2a2a"` | A cor `custom`, `#rrggbb`. |
@@ -186,7 +187,7 @@ os nomes em inglês seja qual for o idioma.
 | `ui.launcher_build` | `"current"` | Só no modo de desenvolvimento (veja `general.dev_mode`; só então aparece em Configurações > Lançador, e é ignorado nos outros casos). `"current"`: os atalhos e o alias de comando iniciam a compilação que os criou. `"newest"`: eles iniciam a compilação mais recente entre `target/dist` e `target/release` do checkout, decidida a cada clique, e iniciar qualquer uma das duas nunca os regrava. |
 | `ui.command_alias` | `""` | O nome do comando que inicia o GitPoulpi em um terminal, por exemplo `gp` (Configurações > Lançador, `gitpoulpi alias create`). Vazio: nenhum. Só letras, dígitos, `-`, `_` e `.`. É só o nome que o botão **Criar: alias de comando** usa; nada existe até você o criar. |
 | `ui.command_alias_add` | `""` | O nome do segundo comando, por exemplo `gpa`, que executa `gitpoulpi --add`: ele abre a pasta atual em uma nova aba do GitPoulpi que já está aberto (Configurações > Lançador, `gitpoulpi alias create gpa --add`). Vazio: nenhum. Mesmas regras de nome; criado junto com `ui.command_alias` pelo botão **Criar**. |
-| `ui.relaunch_in_terminal` | `true` | Somente Windows: quando o exe é iniciado com clique duplo em um console próprio, o GitPoulpi se reabre em `ui.launch_terminal` e encerra. Desativado: ele fica nesse console. |
+| `ui.relaunch_in_terminal` | `true` | Somente Windows: quando o exe é iniciado com clique duplo em um console próprio, o GitPoulpi se reabre em `ui.launch_terminal` e encerra. Um terminal que executa o exe diretamente (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`) também é um console próprio, mas não uma janela de console clássica: ele nunca é relançado. Desativado: ele fica nesse console. |
 | `ui.reuse_window` | `true` | Um clique em um atalho do GitPoulpi (`gitpoulpi launch`) mostra a janela de um GitPoulpi que já está aberto, em vez de iniciar outro. Desativado: cada clique inicia uma nova janela. |
 
 Os **comandos de `ui.open_in`** são divididos primeiro em argumentos (espaço em
@@ -361,7 +362,8 @@ review_requests = true    # solicitações aguardando a minha revisão, todos os
 open_requests = false     # todas as solicitações abertas dos meus namespaces
 include_drafts = false    # manter solicitações em rascunho nestas listas
 assigned_issues = true    # issues abertas atribuídas a mim, todos os repositórios
-namespaces = ["acme"]     # orgs / grupos onde pesquisar solicitações abertas
+namespaces = ["acme", "ptm/produits"]  # uma entrada por linha nas Configurações; vazio = sem limite
+namespaces_regex = false  # true: cada entrada é uma expressão regular sobre o caminho completo do repositório
 review_mode = "ask"       # ask | clone | api
 ```
 
@@ -371,7 +373,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | Todas as solicitações abertas do seu próprio namespace e de cada org ou grupo de que você é membro (ou de `namespaces`), nunca "tudo o que o token enxerga" |
 | `include_drafts` | `false` | As solicitações em rascunho ficam fora destas listas, a menos que isto esteja ativado |
 | `assigned_issues` | `false` | Issues abertas atribuídas a você, todos os repositórios |
-| `namespaces` | `[]` | Orgs / grupos onde pesquisar `open_requests`; vazio significa o seu próprio namespace mais todas as participações (GitHub: no máximo 12 são pesquisados, GitLab: 10 grupos e 10 projetos próprios, Gitea, Forgejo e Gerrit: 10; o Azure DevOps usa nomes de projeto, o Bitbucket Data Center chaves de projeto, o Gerrit prefixos de caminho de projeto) |
+| `namespaces` | `[]` | Quais repositórios cada lista mantém (solicitações de revisão, issues atribuídas, solicitações abertas); vazio significa sem limite, e `open_requests` então pesquisa o seu próprio namespace mais todas as participações (GitHub: no máximo 12 são pesquisados, GitLab: 10 grupos e 10 projetos próprios, Gitea, Forgejo e Gerrit: 10). Uma entrada corresponde ao caminho completo de um repositório (`group/sub/project`, no Azure DevOps `Project/repo`, no Bitbucket Data Center `KEY/repo`) quando é igual a ele ou é um prefixo de caminho que termina em `/`: `ptm` mantém `ptm/produits/x`, não `ptmx/y`; maiúsculas e minúsculas são ignoradas. As Configurações mostram uma entrada por linha; um arquivo antigo pode ter uma só string separada por vírgulas (`"ptm, formation"`), que ainda carrega e é salva de volta como lista |
+| `namespaces_regex` | `false` | Lê cada entrada de `namespaces` como uma expressão regular comparada com o caminho completo do repositório, como você a escreve (então `^ptm/(produits\|infra)/` ancora no início; sem `^` ou `$` ela corresponde em qualquer ponto do caminho; acrescente `(?i)` para ignorar maiúsculas e minúsculas). `open_requests` então pesquisa as suas participações e as expressões filtram as linhas. Uma expressão inválida aparece sob o campo nas Configurações e não é salva; em um arquivo editado à mão ela deixa as listas vazias com uma nota |
 | `review_mode` | `"ask"` | O que faz revisar uma solicitação cujo repositório não está clonado: `ask`, `clone` (clonar e depois revisar) ou `api` (revisar pela API do host) |
 
 As respostas ficam em cache por perfil em `radar-account.json`, ao lado do

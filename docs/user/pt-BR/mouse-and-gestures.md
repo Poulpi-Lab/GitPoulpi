@@ -232,7 +232,8 @@ Veja [Integrações de hospedagem e de rastreadores de issues](hosting-integrati
   ref do commit.
 - **Clique com o botão direito em uma pílula de ref** para um único menu com as ações da ref e as
   ações do commit.
-- **Clique com o botão direito no cabeçalho** para mostrar ou ocultar colunas: uma lista de verificação (`[x]` / `[ ]`) com um ✕ no título; clique em uma linha ou use as setas e `Space` / `Enter`, depois feche com o ✕, `Esc` ou um clique fora (a paleta: `Exibir: Log: escolher as colunas a mostrar`). Abaixo das caixas: `Ajustar <coluna> ao conteúdo` (a coluna clicada com o botão direito), `Ajustar todas as colunas ao conteúdo` e `Redefinir as larguras das colunas`.
+- **Clique com o botão direito no cabeçalho** para mostrar ou ocultar colunas: uma lista de verificação (`[x]` / `[ ]`) com um ✕ no título; clique em uma linha ou use as setas e `Space` / `Enter`, depois feche com o ✕, `Esc` ou um clique fora (a paleta: `Exibir: Log: escolher as colunas a mostrar`). Abaixo das caixas: `Ajustar <coluna> ao conteúdo` (a coluna clicada com o botão direito), `Ajustar todas as colunas ao conteúdo` e `Redefinir as larguras das colunas`. O equivalente no teclado do clique direito: `Shift+C` para escolher uma coluna e depois `.` (ou `Shift+F10`) abre o mesmo menu nela.
+- **As colunas do Radar** funcionam do mesmo jeito: arraste o separador depois da coluna de repositório, `#`, autor ou idade para dimensioná-la, **dê um clique duplo nele** para ajustar a coluna à sua entrada mais larga (`C` escolhe uma coluna, depois `=`; `+` ajusta todas as colunas), e **clique com o botão direito no título de uma coluna** (ou `C`, depois `.`) para `Ajustar <coluna> ao conteúdo` e `Ajustar todas as colunas ao conteúdo`.
 - **Clique em `↑`, `↓` ou `✕`** na barra de busca para ir à correspondência anterior
   ou seguinte, ou para fechar a barra.
 - **Clique em `#12`, `ABC-12` ou `AB#12`** em uma mensagem de commit, no painel da
@@ -375,8 +376,9 @@ Todo descarte pergunta antes.
 - **Passe o mouse sobre uma linha** para a dica do Log (a mensagem inteira, o nome e o e-mail do autor, a data completa, conforme a parte sob o ponteiro).
 - **Clique com o botão direito em uma linha** para o menu dela: mostrar no Log, o diff do arquivo nesse commit, o arquivo nesse commit, o blame dele e depois o menu do Log para o commit. A tecla de menu faz o mesmo pelo teclado.
 - **Arraste um limite do cabeçalho** (`ui.column_resize`: por padrão a célula separadora de uma célula entre duas partes, marcada por um `│` esmaecido no cabeçalho e desenhada como uma linha de destaque ao longo da coluna enquanto o ponteiro está sobre ela, e um arrasto a partir de qualquer ponto dela redimensiona; com `header`, a primeira letra do nome seguinte, iluminada enquanto o ponteiro está sobre ela) para dimensionar a parte à esquerda dele: faixas, mensagem, autor, data, refs, alterações ou SHA. A célula logo depois da última parte é o limite da última parte.
+- **Dê um clique duplo em um limite do cabeçalho** para ajustar a parte à esquerda dele ao seu conteúdo, como fazem os limites do Log: a largura que mostra a sua linha mais larga inteira, nunca maior que a coluna (pelo teclado: clique em uma linha ou `Ctrl+N` para dar as teclas à coluna, `Tab` para escolher a parte, depois `=`; `+` ajusta todas as partes; a paleta tem `Ajustar a coluna ao conteúdo` e `Ajustar todas as colunas ao conteúdo`). A mensagem fica com o que as outras partes deixam.
 - **Arraste um nome do cabeçalho** sobre outro para mover a parte até lá: o mesmo fantasma, a origem esmaecida e a barra de destaque do cabeçalho do Log, e a parte se move ao soltar (`Esc` cancela; `<` / `>` do teclado, após `Tab`, fazem o mesmo, um lugar por vez).
-- **Clique com o botão direito no cabeçalho** para escolher quais partes são exibidas (Ref, Grafo, Autor, Data, Alterações, SHA; a Mensagem está sempre visível). A paleta tem `Escolher as colunas` e uma alternância por parte.
+- **Clique com o botão direito no cabeçalho** para escolher quais partes são exibidas (Ref, Grafo, Autor, Data, Alterações, SHA; a Mensagem está sempre visível); a lista tem um ✕ no título. Abaixo dela: `Ajustar <parte> ao conteúdo` (a parte clicada com o botão direito) e `Ajustar todas as colunas ao conteúdo`. A paleta tem `Escolher as colunas` (o menu pelo teclado, na parte que `Tab` escolheu) e uma alternância por parte.
 - **Shift+roda** ou uma roda horizontal rola as linhas para os lados quando elas são mais largas que a coluna.
 - **Arraste a borda direita** da coluna para redimensioná-la. **Clique na tira `›`** (ou no ✕ da coluna, ou **clique no segmento selecionado** do seletor `Histórico │ Todos` da barra) para trazê-la de volta ou ocultá-la.
 
@@ -467,13 +469,22 @@ O ponteiro mostra uma forma de mover sobre a barra de título e uma forma de red
 
 Alguns terminais deixam o GitPoulpi mudar o ponteiro do mouse: um ponteiro de
 redimensionamento sobre os divisores, sobre uma borda de coluna do Log, do Radar e da coluna de commits (também ao arrastá-la), uma mão sobre itens clicáveis. Isso funciona
-no kitty, foot, Ghostty, WezTerm e xterm recente (a sequência `OSC 22`). Ela é enviada
-só quando a forma muda, nunca dentro do tmux, screen, zellij ou herdr, e o
-ponteiro padrão é restaurado quando o GitPoulpi sai. Em outros terminais, o ponteiro não muda. O divisor ou o
-botão sob o ponteiro se acende em todos os terminais.
+no kitty, foot, Ghostty, mintty e em uma versão do WezTerm com o PR upstream #8092 (a sequência
+`OSC 22`). Ela é enviada só quando a forma muda, dentro do tmux só embrulhada para a
+passagem direta (`allow-passthrough on`; kitty e foot a mostram, Ghostty não), e nunca no screen,
+zellij ou herdr. O ponteiro padrão é restaurado quando o GitPoulpi sai. Em outros terminais (Rio,
+Alacritty, Tabby, iTerm2, Terminal.app, Windows Terminal, xterm), o ponteiro não muda; veja
+[Escolhendo um terminal](terminals.md#formato-do-ponteiro-do-mouse-osc-22). O divisor ou o botão
+sob o ponteiro se acende em todos os terminais.
 
 O mesmo tipo de componente dá o mesmo ponteiro em todo o aplicativo.
 
+- **Os botões são botões de verdade**, nas Configurações (Integrações: Editar,
+  Desconectar, Remover, Procurar, Excluir, os botões de trecho do editor de instruções...)
+  como nos diálogos: rótulos com margem sobre um fundo preenchido que clareia sob o
+  ponteiro, esmaecidos quando desativados, nunca texto entre `[ ]`. Os únicos colchetes que
+  restam são as marcas das caixas de seleção `[x]` / `[ ]`, que são caixas de seleção e
+  levam a mão como qualquer outro controle.
 - **A mão que aponta** fica nos controles: botões, caixas de seleção e interruptores,
   caixas combinadas (nas Configurações, nos painéis de issues e pull requests, no Radar,
   nos diálogos), abas e suas cruzes, os botões `+`, links e referências
@@ -506,7 +517,9 @@ aparece só enquanto você carrega uma ref.
 
 ## Copiando para a área de transferência
 
-**Copiar caminho** e algumas outras ações de copiar enviam o texto ao terminal, que o
-coloca na área de transferência (OSC 52). Se o seu terminal não suporta isso, nada
-é copiado. As ações de copiar para texto selecionado usam diretamente a área de
-transferência do sistema.
+As ações de copiar colocam o texto na área de transferência do sistema da máquina em que o
+GitPoulpi roda e, onde o terminal é conhecido por respeitá-lo, também o enviam ao terminal
+(OSC 52). Por SSH, ou sem tela, só o OSC 52 é enviado: se o seu terminal não o suporta
+(iTerm2 até a permissão de área de transferência dele ser ativada, Terminal.app, GNU screen),
+nada é copiado e a linha de status diz que o texto só foi enviado ao terminal. Veja
+[Escolhendo um terminal](terminals.md#área-de-transferência-ações-de-copiar).

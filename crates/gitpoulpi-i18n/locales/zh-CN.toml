@@ -538,15 +538,15 @@ tabs_position_help = "仓库标签页的位置：顶部（默认）、底部或�
 graph_color_theme = "图配色主题"
 graph_color_theme_help = "Log 图的泳道调色板。“跟随主题”使用所选主题的调色板；其他任何条目都会覆盖它，因此任意主题可与任意调色板组合。关闭设置时生效。"
 graph_renderer = "图渲染器"
-graph_renderer_help = "auto 在支持的终端上将图绘制为真实图像，其他情况下用字符绘制 - 包括 tmux 或 zellij 内部（它们继承了终端的环境变量但不会透传图像），以及 herdr 内部（除非开启其 kitty_graphics 设置）。image 强制使用图像，text 强制不使用。需重启。"
+graph_renderer_help = "auto 在支持的终端上将图绘制为真实图像，其他情况下用字符绘制 - 包括 zellij 和 screen 内部（它们继承了终端的环境变量但不会透传图像）、tmux 内部（除非其后的终端支持 sixel），以及 herdr 内部（除非开启其 kitty_graphics 设置）。image 强制使用图像，text 强制不使用。需重启。"
 image_protocol = "图像协议"
-image_protocol_help = "图片（图的图像、作者头像）传送到终端的方式。auto：kitty、Ghostty 以及配置中设置了 kitty_graphics = true 的 herdr 中使用 Kitty 图形协议；WezTerm、iTerm2 和 mintty 中使用 iTerm2 内嵌图像；Windows Terminal、foot、Konsole 和 mlterm 中使用 sixel 图片（仅用于作者头像，图仍用字符）；其他情况使用字符。kitty、iterm2 或 sixel 强制使用该协议（kitty 适用于配置位于别处的 herdr；sixel 适用于能绘制 sixel 但未被识别的终端）；none 关闭图片。需重启。"
+image_protocol_help = "图片（图的图像、作者头像）传送到终端的方式。auto：kitty、Ghostty 以及配置中设置了 kitty_graphics = true 的 herdr 中使用 Kitty 图形协议；iTerm2 3.7.7 及更高版本中同样使用 Kitty 协议；WezTerm、Rio、mintty 和旧版 iTerm2 中使用 iTerm2 内嵌图像；Windows Terminal、foot、Tabby、Konsole、mlterm，以及背后的终端支持 sixel 的 tmux 中使用 sixel 图片（图所在的列和头像）；其他情况使用字符。kitty、iterm2 或 sixel 强制使用该协议（kitty 适用于配置位于别处的 herdr；sixel 适用于能绘制 sixel 但未被识别的终端）；none 关闭图片。需重启。"
 kitty_keyboard = "Kitty 键盘协议"
 kitty_keyboard_help = "auto 会在启动时询问终端（约 100 毫秒内）是否支持 kitty 键盘协议，支持就使用：传统终端无法区分的组合键（Control 加标点、数字、Shift 或 Enter）将按其本来面目送达，而不是与控制码冲突。不应答的终端保持传统按键。off 绝不改动终端的键盘模式。需重启。"
 color_depth = "色深"
 color_depth_help = "auto 使用 24 位色，但在不支持的终端（Apple 终端、Linux 控制台，或未声明 COLORTERM 的 256 色终端）上，会把颜色映射到最接近的 256 色或 16 色。truecolor、256 和 16 强制指定色深。立即生效。"
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "文本光标"
+text_cursor_help = "terminal 把终端自身的光标放在获得焦点的文本框的插入点处，呈竖线：终端的光标设置会生效，输入法的候选窗口也会在插入点处打开。drawn 绘制 GitPoulpi 自己的插入符（方块或下划线），并保持终端光标隐藏。立即生效。"
 graph_show_stashes = { git = "在图中显示 {$stash}", local = "在图中显示{$stash}" }
 graph_show_stashes_help = { git = "每个 {$stash} 在 Log 中按其日期占一行：在其所基于的 {$commit} 旁边的泳道上画一个小方框，并用虚线与之相连。选中它可查看改动内容；右键（或按 .）可 Pop、Apply 和 Drop。关闭则只在 {$STASHES} 区域中显示 {$stash}。单独显示（solo）时不绘制。", local = "每个{$stash}在 Log 中按其日期占一行：在其所基于的{$commit}旁边的泳道上画一个小方框，并用虚线与之相连。选中它可查看改动内容；右键（或按 .）可弹出、应用或丢弃。关闭则只在{$STASHES}区域中显示{$stash}。单独显示（solo）时不绘制。" }
 ref_connector = { git = "引用到 {$commit} 的连线", local = "引用到提交的连线" }
@@ -3990,8 +3990,8 @@ mouse_gestures_in_2 = "拖动窗格分隔线或 Log 列边界可调整大小（�
 mouse_gestures_in_3 = { git = "在 {$diff}、文件视图、Blame 或文件历史的文本上拖动可选中它，双击选中一个词；y 或 Ctrl+C 复制（仅限文件文本，不含侧栏）；所选词的其他出现位置会在 {$diff} 和编辑器中着色（并在标尺上标记）", local = "在{$diff}、文件视图、追溯或文件历史的文本上拖动可选中它，双击选中一个词；y 或 Ctrl+C 复制（仅限文件文本，不含侧栏）；所选词的其他出现位置会在{$diff}和编辑器中着色（并在标尺上标记）" }
 mouse_gestures_in_4 = { git = "滚动聚焦/悬停的列表或 {$diff}；Shift+滚轮（终端报告的两种写法）会在自动换行关闭时改为*横向*滚动 {$diff}/文件视图/blame", local = "滚动聚焦/悬停的列表或{$diff}；Shift+滚轮（终端报告的两种写法）会在自动换行关闭时改为*横向*滚动{$diff}/文件视图/blame" }
 mouse_gestures_in_5 = "在有菜单的位置打开上下文菜单（见上面各窗格的分区）；键盘上的对应操作始终是 {{*global.context_menu}}"
-mouse_gestures_in_6 = "每个“复制…”操作都通过 OSC 52 请*终端*处理剪贴板 - TUI 无法直接访问它；忽略该序列的终端就是不复制"
-mouse_gestures_in_7 = "在支持的终端（kitty、foot、xterm；其他终端表现不一）上通过 OSC 22 发送调整大小/指针/张开手掌的提示 - 可拖动的分隔线和列边界也会在应用自己的缓冲区内高亮，这完全不需要终端配合"
+mouse_gestures_in_6 = "每个“复制…”操作都会把文本放入系统剪贴板，并在已知终端会响应时同时通过 OSC 52 发送；通过 SSH 或没有显示器时只发送 OSC 52，忽略该序列的终端就不会复制"
+mouse_gestures_in_7 = "在支持的终端（kitty、Ghostty、foot、mintty；Rio、Alacritty、Windows Terminal 和 iTerm2 不支持）上通过 OSC 22 发送调整大小/指针/张开手掌的提示 - 可拖动的分隔线和列边界也会在应用自己的缓冲区内高亮，这完全不需要终端配合"
 merge_conflict_editor_31 = "取消当前冲突的选择（恢复为未解决）/ 将整个文件重置为原始冲突（若已在输出中输入会先确认；可用撤销恢复）；工具栏有重置按钮"
 merge_conflict_editor_32 = "移动到相邻窗格（A、基础、B、输出），停在同一个冲突上"
 merge_conflict_editor_33 = "直接跳到某个窗格的同一冲突；导航前缀后按 1 / 2 / 3 也可以"
@@ -5961,7 +5961,7 @@ show_label = "显示："
 show_all = "全部"
 show_none = "无"
 why_level_off = "未显示：当前级别为{level}。提高级别即可看到这些行。"
-hint_levels = "1-5：显示或隐藏级别  a：全部  n：无"
+hint_levels = "1-5：显示或隐藏级别  a：全部  n：无  Enter：该行对应的操作  [ ]：失败项"
 palette_show_error = "活动日志：显示或隐藏“错误”级别"
 palette_show_warn = "活动日志：显示或隐藏“警告”级别"
 palette_show_info = "活动日志：显示或隐藏“信息”级别"
@@ -6004,25 +6004,25 @@ palette_scroll_right = "活动日志：向右滚动"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "活动日志：横向滚动长行（也可用 Shift + 滚轮或水平滚动条）"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation} 失败"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "操作：{what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
-ctx_repository = "Repository: {repository}"
+ctx_repository = "仓库：{repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "请求来源：{frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "操作 ID：{id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "活动日志：显示此行对应的操作"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "活动日志：下一个失败的操作"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "活动日志：上一个失败的操作"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "请先选择一行：点击它，或按 ] 跳到下一个失败的操作。"
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "此行与任何操作无关。"
 
 [git_error]
 summary_host_key = "尚不认识该远程的 SSH 主机密钥。"
@@ -8755,13 +8755,13 @@ namespaces = "命名空间"
 # context: hint in the empty namespaces field
 namespaces_hint = "例如 acme, platform（留空：我自己的以及我所属的全部）"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "每行一项。名称匹配该组或所有者及其下的全部内容（ptm 匹配 ptm/produits/x，不匹配 ptmx/y）。留空则匹配你自己的以及你所属的全部。"
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "每行是一个正则表达式，匹配完整的仓库路径，按你输入的原样匹配（例如：^ptm/(produits|infra)/）。"
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "正则表达式"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "表达式无效：{error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "未克隆仓库的请求"
 # context: choice: ask each time

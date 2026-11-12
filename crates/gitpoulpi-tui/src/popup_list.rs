@@ -3,13 +3,15 @@
 //! command palette, the tab / theme / language pickers), the scroll window,
 //! the scrollbar and the click semantics ([`View`]).
 //!
-//! Keys: `Up`/`Down` move one row (never a `Ctrl+letter` pair: `Ctrl+N` is the
-//! navigation prefix and `Ctrl+P` the command palette everywhere, and a filter
-//! field owns the letters, `Ctrl+K` included);
+//! Keys: `Up`/`Down` move one row, and so do `Ctrl+J` / `Ctrl+K` (the only
+//! `Ctrl+letter` pair that moves a list: `Ctrl+N` is the navigation prefix and
+//! `Ctrl+P` the command palette everywhere);
 //! `Home`/`End` jump to the first/last row; `PageUp`/`PageDown` move one
 //! visible page. These win over the filter field's own caret keys (`Home`,
 //! `End`, `Ctrl+K` kill-to-end): the filter is a short query, and the list is
-//! what those keys are for in a popup. `Ctrl+A`/`Ctrl+E` stay caret keys.
+//! what those keys are for in a popup (`Ctrl+U` still clears it). `Ctrl+A` /
+//! `Ctrl+E` stay caret keys. Outside a list, in an ordinary text field,
+//! `Ctrl+K` keeps killing to the end of the line.
 //!
 //! Mouse: the wheel scrolls the window without moving the highlight, a single
 //! click selects, a second click on the same row (double click) validates, and
@@ -34,9 +36,12 @@ pub(crate) fn nav(key: &KeyEvent, selected: usize, len: usize, page: usize) -> O
     let alt = key.modifiers.contains(KeyModifiers::ALT);
     let last = len.saturating_sub(1);
     let page = page.saturating_sub(1).max(1);
+    let ctrl_only = key.modifiers == KeyModifiers::CONTROL;
     let to = match key.code {
         KeyCode::Up if !alt => selected.saturating_sub(1),
         KeyCode::Down if !alt => selected + 1,
+        KeyCode::Char('k' | 'K') if ctrl_only => selected.saturating_sub(1),
+        KeyCode::Char('j' | 'J') if ctrl_only => selected + 1,
         KeyCode::Home if !alt => 0,
         KeyCode::End if !alt => last,
         KeyCode::PageUp if !alt => selected.saturating_sub(page),
@@ -267,13 +272,17 @@ mod tests {
         let none = KeyModifiers::NONE;
         let ctrl = KeyModifiers::CONTROL;
         assert_eq!(nav(&k(KeyCode::Down, none), 2, 10, 5), Some(3));
-        // No `Ctrl+letter` pair moves a list: `Ctrl+N` / `Ctrl+P` are the
-        // navigation prefix and the palette, the letters belong to the filter.
+        // Only `Ctrl+J` / `Ctrl+K` move a list besides the arrows: `Ctrl+N` /
+        // `Ctrl+P` are the navigation prefix and the palette.
         assert_eq!(nav(&k(KeyCode::Char('n'), ctrl), 2, 10, 5), None);
         assert_eq!(nav(&k(KeyCode::Char('p'), ctrl), 2, 10, 5), None);
-        assert_eq!(nav(&k(KeyCode::Char('j'), ctrl), 2, 10, 5), None);
+        assert_eq!(nav(&k(KeyCode::Char('j'), ctrl), 2, 10, 5), Some(3));
         assert_eq!(nav(&k(KeyCode::Up, none), 2, 10, 5), Some(1));
-        assert_eq!(nav(&k(KeyCode::Char('k'), ctrl), 2, 10, 5), None);
+        assert_eq!(nav(&k(KeyCode::Char('k'), ctrl), 2, 10, 5), Some(1));
+        assert_eq!(
+            nav(&k(KeyCode::Char('k'), ctrl | KeyModifiers::ALT), 2, 10, 5),
+            None
+        );
         assert_eq!(nav(&k(KeyCode::Home, none), 7, 10, 5), Some(0));
         assert_eq!(nav(&k(KeyCode::End, none), 2, 10, 5), Some(9));
         assert_eq!(nav(&k(KeyCode::PageDown, none), 2, 10, 5), Some(6));

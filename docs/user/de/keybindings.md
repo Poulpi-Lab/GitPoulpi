@@ -248,6 +248,8 @@ einem Präfix werden mit dem Präfix gezeigt (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Teil verbreitern | `]` |
 | `commit_column` | `narrower_part` | Teil verschmälern | `[` |
 | `commit_column` | `reset_widths` | Teilbreiten zurücksetzen | `0` |
+| `commit_column` | `fit` | Spalte an Inhalt anpassen | `=` |
+| `commit_column` | `fit_all` | Alle Spalten an Inhalt anpassen | `+` |
 | `file_insight` | `blame_card` | Blame: Detailkarte ein- oder ausblenden | `i` |
 | `file_insight` | `blame_next` | Blame: Nächster Hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: Vorheriger Hunk | `p` |
@@ -821,6 +823,8 @@ die Standardtasten.
 | Radar: Spalte verbreitern | `]` |
 | Radar: Spalte verschmälern | `[` |
 | Radar: Spaltenbreiten zurücksetzen | `0` |
+| Radar: Spalte an Inhalt anpassen | `=` |
+| Radar: Alle Spalten an Inhalt anpassen | `+` |
 | Radar: Zurück zum Home-Tab | `Esc` |
 | Radar: Tab schließen |  |
 | Tab: Neuer Tab | `Alt+T` |
@@ -1049,6 +1053,8 @@ die Standardtasten.
 | Ansicht: Commit-Spalte: Teil verbreitern | `]` |
 | Ansicht: Commit-Spalte: Teil verschmälern | `[` |
 | Ansicht: Commit-Spalte: Teilbreiten zurücksetzen | `0` |
+| Ansicht: Commit-Spalte: Spalte an Inhalt anpassen | `=` |
+| Ansicht: Commit-Spalte: Alle Spalten an Inhalt anpassen | `+` |
 | Ansicht: Commit-Spalte: Menü der gewählten Zeile | `.` |
 | Ansicht: Commit-Spalte: Spalten wählen |  |
 | Ansicht: Commit-Spalte: Refs umschalten |  |

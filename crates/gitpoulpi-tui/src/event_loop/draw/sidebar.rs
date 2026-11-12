@@ -748,6 +748,9 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
             sidebar_states.follow(section),
             sidebar_visible,
         );
+        // The rows the list really has after the folders are folded: the
+        // scrollbar measures these, never the section's ref count in the title.
+        let visible_len = items.len();
         frame.render_stateful_clipped(
             List::new(items)
                 .block(
@@ -787,10 +790,11 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         }
         // A scrollbar over the
         // section's own right border, rendering-only (see the
-        // Log's own site for why). `total` is this section's own
-        // row count, not the soloed/total pair the title shows.
+        // Log's own site for why). `visible_len` is this section's own
+        // row count after the folders are folded (`total` is the count of
+        // refs, the title's).
         if let Some(track) =
-            scrollbar::Track::vertical(area, total, sidebar_states.state(section).offset())
+            scrollbar::Track::vertical(area, visible_len, sidebar_states.state(section).offset())
         {
             scrollbar::render(frame, track, true, false);
         }

@@ -545,6 +545,18 @@ impl RadarUi {
             .map_or(0, |w| w.max(display_width(msg::radar::COLUMN_AGE.get())));
         let age_w = super::columns::age_width(age_content, self.state.columns.age);
         self.col_eff = [chip_w, author_w, if label_w > 0 { num_w } else { 0 }, age_w];
+        self.col_auto = [
+            super::columns::repo_width(content, None, body.width).0,
+            super::columns::author_width(author_content, None),
+            super::columns::num_width(label_w, status_w, None),
+            super::columns::age_width(age_content, None),
+        ];
+        self.col_content = [
+            content,
+            author_content,
+            super::columns::num_width(label_w, status_w, None),
+            age_content,
+        ];
         let widths = Widths {
             chip: chip_w,
             label: label_w,
@@ -575,6 +587,20 @@ impl RadarUi {
             self.hits.push((*rect, Hit::Divider(*cell)));
         }
         self.paint_header(buf, header_y, &geo);
+        // The titles of the sizable columns: a right-click opens the fit
+        // menu. After the separators, which keep their cells.
+        let titles = [
+            Some((Cell::Repo, geo.repo_x, geo.chip_w)),
+            geo.label_x.map(|x| (Cell::Num, x, geo.num_w)),
+            geo.author.map(|(x, w)| (Cell::Author, x, w)),
+            geo.age.map(|(x, w)| (Cell::Age, x, w)),
+        ];
+        for (cell, x, w) in titles.into_iter().flatten() {
+            if w > 0 {
+                self.hits
+                    .push((Rect::new(x, header_y, w as u16, 1), Hit::Header(cell)));
+            }
+        }
         let rows = self.rows.clone();
         for (offset, row) in rows.iter().enumerate().skip(self.scroll).take(height) {
             let y = top + (offset - self.scroll) as u16;

@@ -57,7 +57,7 @@ use labels::{
 use model::{Board, BoardInput, Group, Heading, Item, ItemKind, Row, View, Who, WipFacts};
 use pending::Pending;
 use scope::{ScopeChoice, ScopeRepo, BROWSE_FOLDER, CLONE_FOLDER, OPEN_TABS};
-pub(crate) use vocab::{Act, ColumnCmd, Outcome, RadarCommand, ReviewRequest, Spot};
+pub(crate) use vocab::{Act, ColumnCmd, Outcome, RadarCommand, ReviewRequest, SizedColumn, Spot};
 use worker::{FsPrepare, Msg, RadarWorker, RepoAnswer, Setup};
 
 /// Where a click landed. Row indices index the view's rows.
@@ -88,6 +88,9 @@ pub(crate) enum Hit {
     Snooze,
     /// The separator that sizes a column (drag it, double-click to fit).
     Divider(Cell),
+    /// A sizable column's title in the header: a right-click opens the menu
+    /// that fits the columns.
+    Header(Cell),
     /// A cell whose text is cut: hovering it shows the full text.
     Cut(usize, Cell),
 }
@@ -378,6 +381,11 @@ pub(crate) struct RadarUi {
     /// The last paint's repository / author widths and the repository
     /// column's limit.
     col_eff: [usize; 4],
+    /// What each sizable column needs to show every row whole (same slots as
+    /// `col_eff`), measured by the last paint: what a fit reads.
+    col_content: [usize; 4],
+    /// What each sizable column measures when the user has not sized it.
+    col_auto: [usize; 4],
     repo_max: usize,
     message: Option<String>,
     /// The `Ctrl+N` prefix hint, set each frame by the event loop.
@@ -479,6 +487,8 @@ impl RadarUi {
             col_pick: None,
             col_drag: None,
             col_eff: [0; 4],
+            col_content: [0; 4],
+            col_auto: [0; 4],
             repo_max: columns::MAX_WIDTH,
             message: None,
             mode_hint: None,
@@ -911,6 +921,12 @@ impl RadarUi {
     /// button and a palette command all arrive at.
     pub(crate) fn run(&mut self, act: Act) -> Outcome {
         self.message = None;
+        // The header menu's rows act on the columns, not on a row.
+        match act {
+            Act::FitColumn(col) => return self.fit_column(col.cell()),
+            Act::FitAllColumns => return self.fit_all_columns(),
+            _ => {}
+        }
         // A note's own actions.
         if let Some(Row::Note(i)) = self.rows.get(self.selected) {
             let Some(note) = self.notes.get(*i).cloned() else {
@@ -1045,7 +1061,9 @@ impl RadarUi {
                 }
             }
             Act::Review | Act::ReviewApi | Act::CloneReview => self.review(item, act),
-            Act::Link | Act::Reconnect | Act::TurnOn => Outcome::None,
+            Act::Link | Act::Reconnect | Act::TurnOn | Act::FitColumn(_) | Act::FitAllColumns => {
+                Outcome::None
+            }
         }
     }
 

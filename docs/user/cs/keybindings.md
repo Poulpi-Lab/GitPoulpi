@@ -250,6 +250,8 @@ předponou (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Rozšířit část | `]` |
 | `commit_column` | `narrower_part` | Zúžit část | `[` |
 | `commit_column` | `reset_widths` | Obnovit šířky částí | `0` |
+| `commit_column` | `fit` | Přizpůsobit sloupec obsahu | `=` |
+| `commit_column` | `fit_all` | Přizpůsobit všechny sloupce obsahu | `+` |
 | `file_insight` | `blame_card` | Blame: Zobrazit nebo skrýt kartu s detaily | `i` |
 | `file_insight` | `blame_next` | Blame: Další hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: Předchozí hunk | `p` |
@@ -826,6 +828,8 @@ Klávesy jsou výchozí.
 | Radar: Rozšířit sloupec | `]` |
 | Radar: Zúžit sloupec | `[` |
 | Radar: Obnovit šířky sloupců | `0` |
+| Radar: Přizpůsobit sloupec obsahu | `=` |
+| Radar: Přizpůsobit všechny sloupce obsahu | `+` |
 | Radar: Zpět na úvod | `Esc` |
 | Radar: Zavřít kartu |  |
 | Karta: Nová karta | `Alt+T` |
@@ -1054,6 +1058,8 @@ Klávesy jsou výchozí.
 | Zobrazení: Sloupec commitů: rozšířit část | `]` |
 | Zobrazení: Sloupec commitů: zúžit část | `[` |
 | Zobrazení: Sloupec commitů: obnovit šířky částí | `0` |
+| Zobrazení: Sloupec commitů: Přizpůsobit sloupec obsahu | `=` |
+| Zobrazení: Sloupec commitů: Přizpůsobit všechny sloupce obsahu | `+` |
 | Zobrazení: Sloupec commitů: nabídka vybraného řádku | `.` |
 | Zobrazení: Sloupec commitů: vybrat sloupce |  |
 | Zobrazení: Sloupec commitů: přepnout Ref |  |

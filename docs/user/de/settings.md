@@ -237,17 +237,6 @@ Desktop-Verknüpfung erstellen**, **Starter: Verknüpfungen entfernen**, **Start
 `gitpoulpi desktop shortcut status|install|remove [--where launcher|desktop|startmenu]`
 erledigt es aus einem Skript.
 
-### Konfliktvermeidung
-
-Der globale Teil der proaktiven Konflikterkennung (`gitpoulpi ui show settings conflict-prevention-global`); die Seite eines Repositorys ist
-[Repository-spezifisch: Konfliktvermeidung](#repository-spezifisch-konfliktvermeidung). Der Palettenbefehl **Konflikte: Basis-Branch-Listen bearbeiten...** öffnet diese Seite.
-
-| Option | Was sie tut |
-|---|---|
-| **Proaktive Konflikterkennung aktivieren** | Standardmäßig an (`general.conflict_detection`). Warnt im Log, wenn ein Merge des aktuellen Branches in den Branch, von dem er abzweigte, Konflikte verursachen würde, bevor Sie es versuchen. Ein Repository kann sie auf seiner eigenen Seite **Konfliktvermeidung** für sich ausschalten. Siehe [Merge-Konflikte lösen](merge-conflicts.md#konfliktvermeidung). Wirkt beim Schließen der Einstellungen. |
-| **Standard-Basis-Branches** | Unter dem Schalter. Die Liste von Basis-Branch-Mustern, die Repositories verwenden, wenn sie keine eigenen haben: **Integriert (`**`)**, also jeder Branch, oder eine Ihrer benannten Listen (`conflict_prevention.default_list`). Sie gilt für die geöffneten Repositories, wenn die Einstellungen geschlossen werden. **Auf integrierten Standard zurücksetzen** kehrt zu `**` zurück. |
-| **Basis-Branch-Listen** | Ebenfalls auf dieser Seite: Ihre benannten Listen von Basis-Branch-Mustern (`[conflict_prevention.lists.<name>]`), je ein Block mit seinem **Namen** (beim Umbenennen bleibt sie der Standard, falls sie es war; ein Repository, das dem alten Namen folgte, verwendet die Standardliste, bis Sie sie erneut wählen), seinen **Mustern** (eines pro Zeile, `Enter` oder ein Klick öffnet den Editor, `Ctrl+S` übernimmt sie), **Zum Standard machen** und **Liste löschen** (fragt zuerst und sagt, dass Repositories, die ihr folgen, stattdessen die Standardliste verwenden). Geben Sie unter **Neue Liste** einen Namen ein und drücken Sie `Enter`, um eine anzulegen; sie beginnt mit `**`. Das Bearbeiten einer Liste ändert jedes Repository, das ihr folgt. |
-
 ### Synchronisierung
 
 Wie GitPoulpi ein Repository mit seinen Remotes abgleicht und was es währenddessen
@@ -426,6 +415,38 @@ den Server enthalten; siehe [MCP und Agenten](mcp-and-agents.md).
 
 ![Die Dropdownliste Farbschema des Graphen: Design folgen, dann jede Spurpalette mit einigen ihrer Farben](../images/settings-log-graph-lanes.png)
 
+### Tastatur & Maus
+
+![Die Seite Tastatur & Maus: jede Aktion nach Kontext mit ihren Tasten, ein Suchfeld und Filter](../images/settings-keyboard.png)
+
+**Einstellungen > Tastatur & Maus** hat zwei Tabs (Klick oder `Alt+Left` / `Alt+Right`).
+**Allgemein** enthält das Tastaturprotokoll und die Mauseinstellungen; **Tastenbelegung**
+listet jedes Tastenkürzel nach Kontext, mit einem Suchfeld (`/`) und Filtern. In einer Zeile:
+
+| Taste | Aktion |
+|---|---|
+| `Enter` oder Doppelklick | Erfasst eine neue Taste. Konflikte und Terminal-Warnungen erscheinen, während Sie drücken. |
+| `a` | Fügt eine alternative Taste hinzu. |
+| `u` | Hebt die Zuordnung der Aktion auf. |
+| `r` | Setzt die Zeile auf ihren Standard zurück. |
+| `R` | Setzt jedes Tastenkürzel zurück, nach einer Bestätigung. |
+| `c` oder ein Klick auf das `!` der Zeile | Zeigt die Aktion mit allen Aktionen, mit denen ihre Taste kollidiert; `Esc` zeigt wieder alle. Eine Taste, die mit einer anderen Aktion kollidiert, ist rot, eine Warnung nur zur Taste (das Terminal kann sie nicht senden) orange. |
+
+Nutzen Sie sie, um Kollisionen mit tmux, AutoHotkey, herdr oder Ihrem Terminal zu
+lösen. Dieselben Einstellungen stehen in der Tabelle `[keybindings]` der
+`config.toml`; siehe die [Konfigurationsreferenz](config-reference.md#keybindings) und
+[Tastenkürzel](keybindings.md).
+
+![Die Seite Tastatur & Maus nach c auf Quit: die Taste q ist bei Quit und bei Stage or Unstage the Selected Row rot, den beiden kollidierenden Aktionen](../images/settings-keyboard-conflicts.png)
+
+Drei Optionen stehen auf dem Tab **Allgemein**.
+
+| Option | Was sie tut |
+|---|---|
+| **Kitty-Tastaturprotokoll** | **auto** fragt das Terminal nach dem Kitty-Tastaturprotokoll, sodass `Ctrl+,`, `Ctrl+Enter` und `Ctrl+Shift+N` ankommen. **off** fragt nie; nutzen Sie es, wenn ein Terminal sich schlecht verhält. Braucht einen Neustart. |
+| **Maus aktiviert** | Aus überlässt Maus und Textauswahl Ihrem Terminal. Braucht einen Neustart. |
+| **Zeilen pro Mausrad-Raste** | Wie viele Zeilen eine Mausrad-Raste im Log bewegt. Braucht einen Neustart. |
+
 ### Verlauf & Graph
 
 Wie der Commit-Graph gezeichnet wird und wie viele Commits das Log lädt. Die
@@ -516,37 +537,16 @@ Standardwerte wiederherstellen** setzt die Liste zurück. Bis Sie sie bearbeiten
 enthält die Liste die auf diesem Rechner installierten Editoren und die Standard-App
 des Systems. Jede Änderung gilt sofort.
 
-### Tastatur & Maus
+### Konfliktvermeidung
 
-![Die Seite Tastatur & Maus: jede Aktion nach Kontext mit ihren Tasten, ein Suchfeld und Filter](../images/settings-keyboard.png)
-
-**Einstellungen > Tastatur & Maus** hat zwei Tabs (Klick oder `Alt+Left` / `Alt+Right`).
-**Allgemein** enthält das Tastaturprotokoll und die Mauseinstellungen; **Tastenbelegung**
-listet jedes Tastenkürzel nach Kontext, mit einem Suchfeld (`/`) und Filtern. In einer Zeile:
-
-| Taste | Aktion |
-|---|---|
-| `Enter` oder Doppelklick | Erfasst eine neue Taste. Konflikte und Terminal-Warnungen erscheinen, während Sie drücken. |
-| `a` | Fügt eine alternative Taste hinzu. |
-| `u` | Hebt die Zuordnung der Aktion auf. |
-| `r` | Setzt die Zeile auf ihren Standard zurück. |
-| `R` | Setzt jedes Tastenkürzel zurück, nach einer Bestätigung. |
-| `c` oder ein Klick auf das `!` der Zeile | Zeigt die Aktion mit allen Aktionen, mit denen ihre Taste kollidiert; `Esc` zeigt wieder alle. Eine Taste, die mit einer anderen Aktion kollidiert, ist rot, eine Warnung nur zur Taste (das Terminal kann sie nicht senden) orange. |
-
-Nutzen Sie sie, um Kollisionen mit tmux, AutoHotkey, herdr oder Ihrem Terminal zu
-lösen. Dieselben Einstellungen stehen in der Tabelle `[keybindings]` der
-`config.toml`; siehe die [Konfigurationsreferenz](config-reference.md#keybindings) und
-[Tastenkürzel](keybindings.md).
-
-![Die Seite Tastatur & Maus nach c auf Quit: die Taste q ist bei Quit und bei Stage or Unstage the Selected Row rot, den beiden kollidierenden Aktionen](../images/settings-keyboard-conflicts.png)
-
-Drei Optionen stehen auf dem Tab **Allgemein**.
+Der globale Teil der proaktiven Konflikterkennung (`gitpoulpi ui show settings conflict-prevention-global`); die Seite eines Repositorys ist
+[Repository-spezifisch: Konfliktvermeidung](#repository-spezifisch-konfliktvermeidung). Der Palettenbefehl **Konflikte: Basis-Branch-Listen bearbeiten...** öffnet diese Seite.
 
 | Option | Was sie tut |
 |---|---|
-| **Kitty-Tastaturprotokoll** | **auto** fragt das Terminal nach dem Kitty-Tastaturprotokoll, sodass `Ctrl+,`, `Ctrl+Enter` und `Ctrl+Shift+N` ankommen. **off** fragt nie; nutzen Sie es, wenn ein Terminal sich schlecht verhält. Braucht einen Neustart. |
-| **Maus aktiviert** | Aus überlässt Maus und Textauswahl Ihrem Terminal. Braucht einen Neustart. |
-| **Zeilen pro Mausrad-Raste** | Wie viele Zeilen eine Mausrad-Raste im Log bewegt. Braucht einen Neustart. |
+| **Proaktive Konflikterkennung aktivieren** | Standardmäßig an (`general.conflict_detection`). Warnt im Log, wenn ein Merge des aktuellen Branches in den Branch, von dem er abzweigte, Konflikte verursachen würde, bevor Sie es versuchen. Ein Repository kann sie auf seiner eigenen Seite **Konfliktvermeidung** für sich ausschalten. Siehe [Merge-Konflikte lösen](merge-conflicts.md#konfliktvermeidung). Wirkt beim Schließen der Einstellungen. |
+| **Standard-Basis-Branches** | Unter dem Schalter. Die Liste von Basis-Branch-Mustern, die Repositories verwenden, wenn sie keine eigenen haben: **Integriert (`**`)**, also jeder Branch, oder eine Ihrer benannten Listen (`conflict_prevention.default_list`). Sie gilt für die geöffneten Repositories, wenn die Einstellungen geschlossen werden. **Auf integrierten Standard zurücksetzen** kehrt zu `**` zurück. |
+| **Basis-Branch-Listen** | Ebenfalls auf dieser Seite: Ihre benannten Listen von Basis-Branch-Mustern (`[conflict_prevention.lists.<name>]`), je ein Block mit seinem **Namen** (beim Umbenennen bleibt sie der Standard, falls sie es war; ein Repository, das dem alten Namen folgte, verwendet die Standardliste, bis Sie sie erneut wählen), seinen **Mustern** (eines pro Zeile, `Enter` oder ein Klick öffnet den Editor, `Ctrl+S` übernimmt sie), **Zum Standard machen** und **Liste löschen** (fragt zuerst und sagt, dass Repositories, die ihr folgen, stattdessen die Standardliste verwenden). Geben Sie unter **Neue Liste** einen Namen ein und drücken Sie `Enter`, um eine anzulegen; sie beginnt mit `**`. Das Bearbeiten einer Liste ändert jedes Repository, das ihr folgt. |
 
 ### Repository-spezifisch: Git & Kodierung
 

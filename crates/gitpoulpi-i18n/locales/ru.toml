@@ -2220,6 +2220,8 @@ commit_column_move_right = "Сдвинуть часть вправо"
 commit_column_wider_part = "Расширить часть"
 commit_column_narrower_part = "Сузить часть"
 commit_column_reset_widths = "Сбросить ширину частей"
+commit_column_fit = "Подогнать колонку под содержимое"
+commit_column_fit_all = "Подогнать все колонки под содержимое"
 log_pick_column = "Выбрать колонку для сдвига или изменения ширины"
 log_columns_next = "Выбрать следующую колонку"
 log_columns_prev = "Выбрать предыдущую колонку"
@@ -2881,6 +2883,8 @@ view_column_move_right = { git = "Вид: колонка commit'ов: сдвин
 view_column_wider_part = { git = "Вид: колонка commit'ов: расширить часть", local = "Вид: колонка коммитов: расширить часть" }
 view_column_narrower_part = { git = "Вид: колонка commit'ов: сузить часть", local = "Вид: колонка коммитов: сузить часть" }
 view_column_reset_widths = { git = "Вид: колонка commit'ов: сбросить ширину частей", local = "Вид: колонка коммитов: сбросить ширину частей" }
+view_column_fit_part = { git = "Вид: колонка commit'ов: Подогнать колонку под содержимое", local = "Вид: колонка коммитов: Подогнать колонку под содержимое" }
+view_column_fit_all = { git = "Вид: колонка commit'ов: Подогнать все колонки под содержимое", local = "Вид: колонка коммитов: Подогнать все колонки под содержимое" }
 view_log_column_pick = "Вид: колонка Log: выбрать колонку для сдвига или изменения ширины"
 view_log_column_next = "Вид: колонка Log: выбрать следующую колонку"
 view_log_column_prev = "Вид: колонка Log: выбрать предыдущую колонку"
@@ -3460,6 +3464,8 @@ radar_column_pick = "Radar: выбрать колонку"
 radar_column_wider = "Radar: расширить колонку"
 radar_column_narrower = "Radar: сузить колонку"
 radar_column_reset = "Radar: сбросить ширину колонок"
+radar_column_fit = "Radar: Подогнать колонку под содержимое"
+radar_column_fit_all = "Radar: Подогнать все колонки под содержимое"
 why_radar_closed = "сначала откройте Radar"
 why_radar_no_row = "сначала выберите элемент в Radar"
 hosting_edit_assignees = "Хостинг: изменить исполнителей..."

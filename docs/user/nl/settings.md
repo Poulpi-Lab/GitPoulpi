@@ -224,17 +224,6 @@ Bureaublad-snelkoppeling maken**, **Starter: Snelkoppelingen verwijderen**, **St
 `gitpoulpi desktop shortcut status|install|remove [--where launcher|desktop|startmenu]`
 doet het vanuit een script.
 
-### Conflictpreventie
-
-Het globale deel van de proactieve conflictdetectie (`gitpoulpi ui show settings conflict-prevention-global`); de eigen pagina van een repository is
-[Repositoryspecifiek: Conflictpreventie](#repositoryspecifiek-conflictpreventie). **Conflicten: Lijsten met basisbranches bewerken...** in het palet opent deze pagina.
-
-| Optie | Wat ze doet |
-|---|---|
-| **Proactieve conflictdetectie inschakelen** | Standaard aan (`general.conflict_detection`). Waarschuwt in de Log als het mergen van de huidige branch in de branch waarvan hij is gestart zou conflicteren, voordat je het probeert. Een repository kan dit voor zichzelf uitschakelen op zijn eigen pagina **Conflictpreventie**. Zie [Merge-conflicten oplossen](merge-conflicts.md#conflictpreventie). Geldt zodra Instellingen sluit. |
-| **Standaard basisbranches** | Onder de schakelaar. De lijst met patronen van basisbranches die repositories gebruiken als ze er geen eigen hebben: **Ingebouwd (`**`)**, dat is elke branch, of een van je lijsten met een naam (`conflict_prevention.default_list`). Geldt voor de geopende repositories zodra Instellingen sluit. **Terug naar ingebouwde standaard** gaat terug naar `**`. |
-| **Lijsten met basisbranches** | Ook op deze pagina: je lijsten met een naam met patronen van basisbranches (`[conflict_prevention.lists.<naam>]`), elk een blok met zijn **Naam** (hernoemen laat hem de standaard blijven als hij dat was; een repository die de oude naam volgde, gebruikt de standaardlijst tot je hem opnieuw kiest), zijn **Patronen** (één per regel, `Enter` of een klik opent de editor, `Ctrl+S` bewaart), **Als standaard instellen** en **Lijst verwijderen** (vraagt eerst, en zegt dat repositories die hem volgen in plaats daarvan de standaardlijst gebruiken). Typ een naam bij **Nieuwe lijst** en druk op `Enter` om er een toe te voegen; hij begint met `**`. Een lijst bewerken wijzigt elke repository die hem volgt. |
-
 ### Synchronisatie
 
 Hoe GitPoulpi een repository gelijk houdt met zijn remotes, en wat het ondertussen met je
@@ -411,6 +400,37 @@ de server bevatten; zie [MCP en agents](mcp-and-agents.md).
 
 ![De keuzelijst Kleurthema van de grafiek: Thema volgen, daarna elk baanpalet met enkele van zijn kleuren](../images/settings-log-graph-lanes.png)
 
+### Toetsenbord & muis
+
+![De pagina Toetsenbord & muis: elke actie per context met zijn toetsen, een zoekvak en filters](../images/settings-keyboard.png)
+
+**Instellingen > Toetsenbord & muis** heeft twee tabbladen (klik, of `Alt+Left` / `Alt+Right`).
+**Algemeen** bevat het toetsenbordprotocol en de muisinstellingen; **Sneltoetsen**
+toont elke sneltoets per context, met een zoekvak (`/`) en filters. Op een rij:
+
+| Toets | Actie |
+|---|---|
+| `Enter` of dubbelklik | Legt een nieuwe toets vast. Conflicten en terminalwaarschuwingen verschijnen terwijl je drukt. |
+| `a` | Voegt een alternatieve toets toe. |
+| `u` | Maakt de binding van de actie los. |
+| `r` | Zet de rij terug naar haar standaard. |
+| `R` | Zet elke sneltoets terug, na een bevestiging. |
+| `c` of een klik op de `!` van de rij | Toont de actie met alle acties waarmee haar toets botst; `Esc` toont weer alles. Een toets die botst met die van een andere actie is rood, een waarschuwing over alleen de toets (de terminal kan hem niet sturen) oranje. |
+
+Gebruik dit om botsingen met tmux, AutoHotkey, herdr of je terminal op te lossen. Dezelfde
+instellingen staan in de tabel `[keybindings]` van `config.toml`; zie de
+[configuratiereferentie](config-reference.md#keybindings) en [Sneltoetsen](keybindings.md).
+
+![De pagina Toetsenbord & muis na c op Quit: de toets q is rood bij Quit en bij Stage or Unstage the Selected Row, de twee acties die botsen](../images/settings-keyboard-conflicts.png)
+
+Drie opties staan op het tabblad **Algemeen**.
+
+| Optie | Wat ze doet |
+|---|---|
+| **Kitty-toetsenbordprotocol** | **auto** vraagt de terminal om het kitty-toetsenbordprotocol, zodat `Ctrl+,`, `Ctrl+Enter` en `Ctrl+Shift+N` aankomen. **off** vraagt nooit; gebruik het als een terminal zich misdraagt. Vereist een herstart. |
+| **Muis ingeschakeld** | Uit laat de muis en het selecteren van tekst aan je terminal. Vereist een herstart. |
+| **Regels per muiswielstap** | Hoeveel rijen één wielstap in de Log verplaatst. Vereist een herstart. |
+
 ### Log & grafiek
 
 Hoe de commit-grafiek wordt getekend en hoeveel commits de Log laadt. De grafiekkleuren staan
@@ -497,36 +517,16 @@ per editor een **Naam**, een **Opdracht**, de variabele-chips `${file}` `${dir}`
 **Eigen**, en **Gedetecteerde standaardwaarden herstellen** zet de lijst terug. Tot je haar bewerkt bevat de lijst de editors die op deze machine zijn
 geïnstalleerd en de standaardapp van het systeem. Elke wijziging geldt meteen.
 
-### Toetsenbord & muis
+### Conflictpreventie
 
-![De pagina Toetsenbord & muis: elke actie per context met zijn toetsen, een zoekvak en filters](../images/settings-keyboard.png)
-
-**Instellingen > Toetsenbord & muis** heeft twee tabbladen (klik, of `Alt+Left` / `Alt+Right`).
-**Algemeen** bevat het toetsenbordprotocol en de muisinstellingen; **Sneltoetsen**
-toont elke sneltoets per context, met een zoekvak (`/`) en filters. Op een rij:
-
-| Toets | Actie |
-|---|---|
-| `Enter` of dubbelklik | Legt een nieuwe toets vast. Conflicten en terminalwaarschuwingen verschijnen terwijl je drukt. |
-| `a` | Voegt een alternatieve toets toe. |
-| `u` | Maakt de binding van de actie los. |
-| `r` | Zet de rij terug naar haar standaard. |
-| `R` | Zet elke sneltoets terug, na een bevestiging. |
-| `c` of een klik op de `!` van de rij | Toont de actie met alle acties waarmee haar toets botst; `Esc` toont weer alles. Een toets die botst met die van een andere actie is rood, een waarschuwing over alleen de toets (de terminal kan hem niet sturen) oranje. |
-
-Gebruik dit om botsingen met tmux, AutoHotkey, herdr of je terminal op te lossen. Dezelfde
-instellingen staan in de tabel `[keybindings]` van `config.toml`; zie de
-[configuratiereferentie](config-reference.md#keybindings) en [Sneltoetsen](keybindings.md).
-
-![De pagina Toetsenbord & muis na c op Quit: de toets q is rood bij Quit en bij Stage or Unstage the Selected Row, de twee acties die botsen](../images/settings-keyboard-conflicts.png)
-
-Drie opties staan op het tabblad **Algemeen**.
+Het globale deel van de proactieve conflictdetectie (`gitpoulpi ui show settings conflict-prevention-global`); de eigen pagina van een repository is
+[Repositoryspecifiek: Conflictpreventie](#repositoryspecifiek-conflictpreventie). **Conflicten: Lijsten met basisbranches bewerken...** in het palet opent deze pagina.
 
 | Optie | Wat ze doet |
 |---|---|
-| **Kitty-toetsenbordprotocol** | **auto** vraagt de terminal om het kitty-toetsenbordprotocol, zodat `Ctrl+,`, `Ctrl+Enter` en `Ctrl+Shift+N` aankomen. **off** vraagt nooit; gebruik het als een terminal zich misdraagt. Vereist een herstart. |
-| **Muis ingeschakeld** | Uit laat de muis en het selecteren van tekst aan je terminal. Vereist een herstart. |
-| **Regels per muiswielstap** | Hoeveel rijen één wielstap in de Log verplaatst. Vereist een herstart. |
+| **Proactieve conflictdetectie inschakelen** | Standaard aan (`general.conflict_detection`). Waarschuwt in de Log als het mergen van de huidige branch in de branch waarvan hij is gestart zou conflicteren, voordat je het probeert. Een repository kan dit voor zichzelf uitschakelen op zijn eigen pagina **Conflictpreventie**. Zie [Merge-conflicten oplossen](merge-conflicts.md#conflictpreventie). Geldt zodra Instellingen sluit. |
+| **Standaard basisbranches** | Onder de schakelaar. De lijst met patronen van basisbranches die repositories gebruiken als ze er geen eigen hebben: **Ingebouwd (`**`)**, dat is elke branch, of een van je lijsten met een naam (`conflict_prevention.default_list`). Geldt voor de geopende repositories zodra Instellingen sluit. **Terug naar ingebouwde standaard** gaat terug naar `**`. |
+| **Lijsten met basisbranches** | Ook op deze pagina: je lijsten met een naam met patronen van basisbranches (`[conflict_prevention.lists.<naam>]`), elk een blok met zijn **Naam** (hernoemen laat hem de standaard blijven als hij dat was; een repository die de oude naam volgde, gebruikt de standaardlijst tot je hem opnieuw kiest), zijn **Patronen** (één per regel, `Enter` of een klik opent de editor, `Ctrl+S` bewaart), **Als standaard instellen** en **Lijst verwijderen** (vraagt eerst, en zegt dat repositories die hem volgen in plaats daarvan de standaardlijst gebruiken). Typ een naam bij **Nieuwe lijst** en druk op `Enter` om er een toe te voegen; hij begint met `**`. Een lijst bewerken wijzigt elke repository die hem volgt. |
 
 ### Repositoryspecifiek: Git & codering
 

@@ -135,7 +135,7 @@ fn the_scanner_flags_what_it_should() {
 #[test]
 fn palette_shortcuts_follow_the_keymap() {
     let defaults = crate::palette::default_shortcut_actions();
-    let fixed = ["Ctrl+F", "Ctrl+C", "Shift+Tab"];
+    let fixed = ["Ctrl+F", "Ctrl+C", "Shift+Tab", "+"];
     for e in crate::palette::PALETTE_COMMANDS
         .iter()
         .filter(|e| crate::build_features::offered(e.requires))

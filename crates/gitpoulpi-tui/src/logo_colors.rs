@@ -115,6 +115,11 @@ fn leg_shift(row: usize, col: usize, wiggle: f32) -> isize {
 /// (0, 0) is the sprite's own (bottom-right) one.
 pub(crate) type Look = (i8, i8);
 
+/// The middle of the pair of eyes, as fractions of the sprite's width and
+/// height: the eyes are the 2x2 boxes at columns 4-5 and 10-11, rows 5-6 of
+/// the 16 x 16 grid.
+pub(crate) const EYES: (f32, f32) = (8.0 / 16.0, 6.0 / 16.0);
+
 /// The sprite grid with its pupils moved to `look`.
 fn grid_looking(look: Look) -> Vec<Vec<char>> {
     let mut rows: Vec<Vec<char>> = table().grid.iter().map(|r| r.chars().collect()).collect();

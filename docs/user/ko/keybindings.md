@@ -247,6 +247,8 @@ stage_file = "z"
 | `commit_column` | `wider_part` | 부분 넓히기 | `]` |
 | `commit_column` | `narrower_part` | 부분 좁히기 | `[` |
 | `commit_column` | `reset_widths` | 부분 너비 초기화 | `0` |
+| `commit_column` | `fit` | 열을 내용에 맞추기 | `=` |
+| `commit_column` | `fit_all` | 모든 열을 내용에 맞추기 | `+` |
 | `file_insight` | `blame_card` | Blame: 상세 카드 표시 또는 숨기기 | `i` |
 | `file_insight` | `blame_next` | Blame: 다음 Hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: 이전 Hunk | `p` |
@@ -819,6 +821,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Radar: 열 넓히기 | `]` |
 | Radar: 열 좁히기 | `[` |
 | Radar: 열 너비 초기화 | `0` |
+| Radar: 열을 내용에 맞추기 | `=` |
+| Radar: 모든 열을 내용에 맞추기 | `+` |
 | Radar: 홈으로 돌아가기 | `Esc` |
 | Radar: 탭 닫기 |  |
 | 탭: 새 탭 | `Alt+T` |
@@ -1047,6 +1051,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 보기: Commit 열: 부분 넓히기 | `]` |
 | 보기: Commit 열: 부분 좁히기 | `[` |
 | 보기: Commit 열: 부분 너비 초기화 | `0` |
+| 보기: Commit 열: 열을 내용에 맞추기 | `=` |
+| 보기: Commit 열: 모든 열을 내용에 맞추기 | `+` |
 | 보기: Commit 열: 선택한 행의 메뉴 | `.` |
 | 보기: Commit 열: 표시할 열 선택 |  |
 | 보기: Commit 열: Ref 열 표시 전환 |  |

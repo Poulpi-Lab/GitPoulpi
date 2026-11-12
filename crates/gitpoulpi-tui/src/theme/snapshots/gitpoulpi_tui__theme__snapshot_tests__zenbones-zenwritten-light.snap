@@ -12,14 +12,14 @@ expression: "dump(&theme, &buf)"
 07 |│Settings                   │   interface. Moving through    │ @@ -10,3 +10,3 @@|
 08 |│  General                  │   the list previews each       │    10    10  fn main() {|
 09 |│  Launcher                 │   theme; Enter keeps it, Esc   │    11       -    let x = 1;|
-10 |│  Conflict prevention      │   goes back. System follows    │          11 +    ╭a1b2c3d────────────────────────────╮|
-11 |│  Synchronization          │   the terminal's light or dark │    12    12  }   │⊕ Cherry-pick onto main    Ctrl+G y│|
-12 |│  Profiles                 │   background, detected once at │                  │↺ Revert commit...         Ctrl+G v│|
-13 |│  SSH & credentials        │   start-up (Dark when it       │                  │← Reset main to this commit ›      │|
-14 |│  Integrations             │   cannot be told). Your own    │                  │✎ Edit commit message...   Ctrl+G e│|
-15 |│  AI                       │   theme files in the config    │                  │✐ Amend...                 Ctrl+G E│|
-16 |│  Agents & MCP             │   folder's themes/ directory   │                  │◑ Split commit...                  │|
-17 |│  Appearance               │   are listed last.             │                  │◈ Interactively rebase from here...│|
+10 |│  Synchronization          │   goes back. System follows    │          11 +    ╭a1b2c3d────────────────────────────╮|
+11 |│  Profiles                 │   the terminal's light or dark │    12    12  }   │⊕ Cherry-pick onto main    Ctrl+G y│|
+12 |│  SSH & credentials        │   background, detected once at │                  │↺ Revert commit...         Ctrl+G v│|
+13 |│  Integrations             │   start-up (Dark when it       │                  │← Reset main to this commit ›      │|
+14 |│  AI                       │   cannot be told). Your own    │                  │✎ Edit commit message...   Ctrl+G e│|
+15 |│  Agents & MCP             │   theme files in the config    │                  │✐ Amend...                 Ctrl+G E│|
+16 |│  Appearance               │   folder's themes/ directory   │                  │◑ Split commit...                  │|
+17 |│  Keyboard & mouse         │   are listed last.             │                  │◈ Interactively rebase from here...│|
 18 |│  Log & graph              │                                │                  │↻ Rewrite history ›                │|
 19 |│  Diff & editor            │ Colors                         │                  │───────────────────────────────────│|
 20 |│  Open in                  │                                │                  │↳ Create branch here...            │|
@@ -234,7 +234,7 @@ expression: "dump(&theme, &buf)"
 15 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+merge.current_region+editor.current_line+chrome.dropdown_bg
 15 117-119 -/ui.bg+ui.blend_bg
 16 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
-16 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
+16 001-026 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg+chrome.toolbar_fg/ui.selection+minimap.view
 16 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
 16 030-057 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
 16 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track
@@ -245,7 +245,7 @@ expression: "dump(&theme, &buf)"
 16 116-116 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/ui.panel+ui.tooltip_bg+ui.popup_bg+merge.current_region+editor.current_line+chrome.dropdown_bg
 16 117-119 -/ui.bg+ui.blend_bg
 17 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+merge.ours+chrome.action_edit+chrome.action_reset/-
-17 001-026 ui.statusbar_fg+ui.text+ui.header_fg+scrollbar.marks_cursor+merge.text+editor.text+editor.find_hit_fg+chrome.toolbar_fg/ui.selection+minimap.view
+17 001-026 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
 17 028-028 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
 17 030-047 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/-
 17 060-060 graph.wip+graph.stash+ui.muted+ui.border+minimap.ink+merge.base+chrome.toolbar_disabled_fg/scrollbar.track

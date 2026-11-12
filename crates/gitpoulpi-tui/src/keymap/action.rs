@@ -582,6 +582,8 @@ actions! {
     CommitColumnWiderPart => (CommitColumn, "commit_column.wider_part", COMMIT_COLUMN_WIDER_PART, ["]"]),
     CommitColumnNarrowerPart => (CommitColumn, "commit_column.narrower_part", COMMIT_COLUMN_NARROWER_PART, ["["]),
     CommitColumnResetWidths => (CommitColumn, "commit_column.reset_widths", COMMIT_COLUMN_RESET_WIDTHS, ["0"]),
+    CommitColumnFit => (CommitColumn, "commit_column.fit", COMMIT_COLUMN_FIT, ["="]),
+    CommitColumnFitAll => (CommitColumn, "commit_column.fit_all", COMMIT_COLUMN_FIT_ALL, ["+"]),
     FileInsightBlameCard => (FileInsight, "file_insight.blame_card", FILE_INSIGHT_BLAME_CARD, ["i"]),
     FileInsightBlameNext => (FileInsight, "file_insight.blame_next", FILE_INSIGHT_BLAME_NEXT, ["n"]),
     FileInsightBlamePrev => (FileInsight, "file_insight.blame_prev", FILE_INSIGHT_BLAME_PREV, ["p"]),

@@ -430,6 +430,11 @@ pub(crate) enum ColumnCmd {
     PartNarrower,
     /// Every part back to its automatic width.
     ResetWidths,
+    /// Fits the part the keyboard sizes to its content (the twin of
+    /// double-clicking its boundary).
+    Fit,
+    /// Fits every shown part to its content.
+    FitAll,
     /// Shows or hides one part of the rows (the header menu's twin).
     ToggleShown(Part),
     /// The header's right-click menu: which parts are shown.
@@ -438,6 +443,17 @@ pub(crate) enum ColumnCmd {
     Menu,
     /// One of the menu's rows on the selected commit.
     Show(crate::log_menu::ColumnOp),
+}
+
+/// What a row of the header's menu does.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ColumnsAct {
+    /// Shows or hides the part.
+    Toggle(Part),
+    /// Fits the part to its content.
+    Fit(Part),
+    /// Fits every shown part to its content.
+    FitAll,
 }
 
 /// The way a part moves in the header.
@@ -504,6 +520,13 @@ pub(crate) struct CommitColumn {
     pub(crate) inner_w: usize,
     /// The part the keyboard sizes.
     pub(crate) part: Part,
+    /// What each part needs to show the rows the last paint drew whole, by
+    /// `Part::slot` (the header's own word included): what a fit reads.
+    pub(crate) natural: [usize; PARTS],
+    /// The press that armed a boundary drag pinned the message's width too
+    /// (it was automatic): a double click on that boundary, the fit, gives it
+    /// back.
+    press_pinned_title: bool,
     /// The boundary being dragged.
     pub(crate) dragging_part: Option<Boundary>,
     /// Where each part was painted this frame: its screen columns
@@ -559,6 +582,8 @@ impl CommitColumn {
             content_w: 0,
             inner_w: 0,
             part: Part::Graph,
+            natural: [0; PARTS],
+            press_pinned_title: false,
             dragging_part: None,
             parts: Vec::new(),
             boundaries: Vec::new(),
@@ -751,16 +776,22 @@ impl CommitColumn {
     }
 
     /// The rows of the header's parts menu: one per part, a box and the
-    /// Log's own column word; the message is listed, not selectable.
-    pub(crate) fn columns_menu_entries(&self) -> Vec<crate::context_menu::Entry<Part>> {
+    /// Log's own column word; the message is listed, not selectable. Then
+    /// the fits: the part the menu was opened on (`target`, when there is
+    /// one) and all of them.
+    pub(crate) fn columns_menu_entries(
+        &self,
+        target: Option<Part>,
+    ) -> Vec<crate::context_menu::Entry<ColumnsAct>> {
         use crate::context_menu::Entry;
-        Part::ORDER
+        use crate::keymap::Action;
+        let mut rows: Vec<Entry<ColumnsAct>> = Part::ORDER
             .iter()
             .map(|&part| {
                 let glyph = crate::dialog_kit::checkbox_mark(self.is_shown(part));
                 let label = crate::context_menu::glyph_label(glyph, part.title());
                 if part.hideable() {
-                    Entry::action(label, part)
+                    Entry::action(label, ColumnsAct::Toggle(part))
                 } else {
                     Entry::disabled(
                         label,
@@ -770,7 +801,25 @@ impl CommitColumn {
                     )
                 }
             })
-            .collect()
+            .collect();
+        rows.push(Entry::Separator);
+        if let Some(part) = target.filter(|p| self.is_shown(*p)) {
+            rows.push(
+                Entry::action(
+                    gitpoulpi_i18n::msg::log_draw::column_menu_fit(part.title()),
+                    ColumnsAct::Fit(part),
+                )
+                .with_key(Action::CommitColumnFit),
+            );
+        }
+        rows.push(
+            Entry::action(
+                gitpoulpi_i18n::msg::log_draw::COLUMN_MENU_FIT_ALL.get(),
+                ColumnsAct::FitAll,
+            )
+            .with_key(Action::CommitColumnFitAll),
+        );
+        rows
     }
 
     /// Whether `(col, row)` is on the painted header row.
@@ -848,6 +897,13 @@ impl CommitColumn {
     /// share. A part with a width of its own is left alone, so it is safe to
     /// call before every resize.
     pub(crate) fn pin_widths(&mut self) {
+        self.pin_widths_except_title(false);
+    }
+
+    /// [`Self::pin_widths`], the message left automatic when `flexible`: it
+    /// keeps what the other parts leave, so a part fitted wider takes its
+    /// cells from the message instead of pushing the row past the pane.
+    fn pin_widths_except_title(&mut self, flexible: bool) {
         let p = self.plan;
         let cells = |w: usize| u16::try_from(w).unwrap_or(MAX_PART_COLS);
         let now = |part: Part| match part {
@@ -861,6 +917,9 @@ impl CommitColumn {
         };
         for part in Part::ORDER {
             let slot = part.slot();
+            if flexible && part == Part::Title {
+                continue;
+            }
             if self.shown[slot] && self.widths[slot] == 0 {
                 self.widths[slot] = cells(now(part));
             }
@@ -954,6 +1013,66 @@ impl CommitColumn {
         }
         self.widths[slot] =
             (now + delta).clamp(part.min_width() as i32, i32::from(MAX_PART_COLS)) as u16;
+    }
+
+    /// A press on a boundary: fixes every part where it is (so that moving one
+    /// boundary moves nothing else) and arms the drag.
+    pub(crate) fn grab_boundary(&mut self, boundary: Boundary) {
+        self.press_pinned_title = self.widths[Part::Title.slot()] == 0;
+        self.pin_widths();
+        self.dragging_part = Some(boundary);
+    }
+
+    /// The second press of a double click on `boundary`: the drag the first
+    /// press armed is dropped and the message is automatic again if that press
+    /// was what pinned it, so the fit gives the part the cells and the message
+    /// keeps what is left.
+    pub(crate) fn release_for_fit(&mut self) {
+        self.dragging_part = None;
+        if std::mem::take(&mut self.press_pinned_title) {
+            self.widths[Part::Title.slot()] = 0;
+        }
+    }
+
+    /// The width that shows `part`'s widest painted content whole: never under
+    /// its least, never over the pane (a part wider than the pane could not be
+    /// read at all) nor `MAX_PART_COLS`.
+    pub(crate) fn natural_width(&self, part: Part) -> u16 {
+        let least = part.min_width();
+        let room = self.inner_w.max(least);
+        let wanted = self.natural[part.slot()].max(least).min(room);
+        u16::try_from(wanted)
+            .unwrap_or(MAX_PART_COLS)
+            .min(MAX_PART_COLS)
+    }
+
+    /// Fits `part` to its content (the twin of double-clicking its boundary).
+    /// The other parts keep the width they have. Returns the cells it got.
+    pub(crate) fn fit_part(&mut self, part: Part) -> u16 {
+        self.pin_widths_except_title(part != Part::Title);
+        let w = self.natural_width(part);
+        self.widths[part.slot()] = w;
+        w
+    }
+
+    /// Fits every shown part to its content.
+    pub(crate) fn fit_all(&mut self) {
+        self.pin_widths();
+        for part in Part::ORDER {
+            if self.shown[part.slot()] {
+                self.widths[part.slot()] = self.natural_width(part);
+            }
+        }
+        // The message takes what the others leave when that already shows it
+        // whole (the row then fits the pane): automatic again.
+        let others: usize = Part::ORDER
+            .iter()
+            .filter(|p| **p != Part::Title && self.shown[p.slot()])
+            .map(|p| usize::from(self.widths[p.slot()]) + 1)
+            .sum();
+        if self.inner_w.saturating_sub(others) >= self.natural[Part::Title.slot()] {
+            self.widths[Part::Title.slot()] = 0;
+        }
     }
 
     /// Every part back to its automatic width, and the rows back at the left.

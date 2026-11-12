@@ -24,6 +24,10 @@ pub(crate) fn act_label(act: Act) -> &'static str {
         Act::ReviewApi => msg::radar::CHOICE_API.get(),
         Act::CloneReview => msg::radar::CHOICE_CLONE.get(),
         Act::TurnOn => msg::radar::ACT_TURN_ON.get(),
+        Act::FitAllColumns => msg::log_draw::COLUMN_MENU_FIT_ALL.get(),
+        // The menu row names the column (`column_menu_fit`); this is only the
+        // fallback.
+        Act::FitColumn(_) => msg::log_draw::COLUMN_MENU_FIT_ALL.get(),
     }
 }
 

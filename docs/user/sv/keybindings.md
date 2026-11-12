@@ -251,6 +251,8 @@ Varje tangent du kan binda om, med id:t som används i
 | `commit_column` | `wider_part` | Bredda delen | `]` |
 | `commit_column` | `narrower_part` | Smalna av delen | `[` |
 | `commit_column` | `reset_widths` | Återställ delarnas bredder | `0` |
+| `commit_column` | `fit` | Anpassa kolumnen efter innehållet | `=` |
+| `commit_column` | `fit_all` | Anpassa alla kolumner efter innehållet | `+` |
 | `file_insight` | `blame_card` | Blame: Visa eller dölj detaljkortet | `i` |
 | `file_insight` | `blame_next` | Blame: Nästa hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: Föregående hunk | `p` |
@@ -828,6 +830,8 @@ Tangenterna är standardvärdena.
 | Radar: Bredda kolumnen | `]` |
 | Radar: Smalna av kolumnen | `[` |
 | Radar: Återställ kolumnbredder | `0` |
+| Radar: Anpassa kolumnen efter innehållet | `=` |
+| Radar: Anpassa alla kolumner efter innehållet | `+` |
 | Radar: Tillbaka till Hem | `Esc` |
 | Radar: Stäng fliken |  |
 | Flik: Ny flik | `Alt+T` |
@@ -1056,6 +1060,8 @@ Tangenterna är standardvärdena.
 | Vy: Commit-kolumnen: bredda delen | `]` |
 | Vy: Commit-kolumnen: smalna av delen | `[` |
 | Vy: Commit-kolumnen: återställ delarnas bredder | `0` |
+| Vy: Commit-kolumnen: Anpassa kolumnen efter innehållet | `=` |
+| Vy: Commit-kolumnen: Anpassa alla kolumner efter innehållet | `+` |
 | Vy: Commit-kolumnen: meny för den valda raden | `.` |
 | Vy: Commit-kolumnen: välj kolumner |  |
 | Vy: Commit-kolumnen: växla Ref |  |

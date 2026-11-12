@@ -199,9 +199,9 @@ pub(super) fn handle(
             .commit_columns_menu_mut()
             .map(|menu| menu.activate(idx));
         match outcome {
-            Some(MenuOutcome::Run(part)) => {
+            Some(MenuOutcome::Run(act)) => {
                 cx.open_menu.close_commit_columns_menu();
-                commands::commit_column::run_columns_menu(cx, part);
+                commands::commit_column::run_columns_menu(cx, act);
             }
             Some(MenuOutcome::Close) => cx.open_menu.close_commit_columns_menu(),
             _ => {}
@@ -570,10 +570,20 @@ pub(super) fn handle(
     } else if matches!(resize_grab, Some(ResizeGrab::CommitColumn)) {
         cx.commit_col.dragging = true;
     } else if let Some(ResizeGrab::CommitColumnPart(boundary)) = resize_grab {
-        // The first grab fixes every part at the width it has, so that
-        // moving one boundary moves nothing else.
-        cx.commit_col.pin_widths();
-        cx.commit_col.dragging_part = Some(boundary);
+        let now = Instant::now();
+        let double = cx.last_click.is_some_and(|(t, lc, lr)| {
+            now.duration_since(t) < DOUBLE_CLICK_WINDOW && lc == col && lr == row
+        });
+        if double {
+            // The Log's rule: a second press on the same grip fits the part
+            // to its content and starts no drag.
+            cx.commit_col.release_for_fit();
+            *cx.last_click = None;
+            commands::commit_column::fit_one(cx, boundary);
+        } else {
+            *cx.last_click = Some((now, col, row));
+            cx.commit_col.grab_boundary(boundary);
+        }
     } else if matches!(resize_grab, Some(ResizeGrab::HistorySplit)) {
         if let Some(h) = cx.history.as_mut() {
             h.dragging_split = true;

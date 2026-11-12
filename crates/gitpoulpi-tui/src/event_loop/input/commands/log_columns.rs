@@ -257,5 +257,11 @@ pub(in crate::event_loop) fn on_key(
         *cx.log_col_pick = None;
         return true;
     }
+    // The header's right-click menu, from the keyboard: opens on the picked
+    // column (its "fit" row acts on it).
+    if crate::context_menu::is_menu_key(key.code, key.modifiers) {
+        run(cx, LogColumnCmd::Chooser);
+        return true;
+    }
     false
 }

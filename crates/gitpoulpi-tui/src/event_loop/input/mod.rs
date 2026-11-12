@@ -188,12 +188,41 @@ fn handle_key_inner(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) ->
     if !matches!(*cx.input_mode, InputMode::Normal) {
         return keys_modes::handle(cx, env, key);
     }
+    // `Ctrl+J` / `Ctrl+K` move every list like the arrows do (the popups' own
+    // lists read them in `popup_list::nav`). Here, in the main window, they
+    // are the arrows unless a text field has the keyboard: `Ctrl+K` there
+    // keeps killing to the end of the line.
+    let key = ctrl_list_key(cx, key);
     if keys_normal::handle(cx, env, key)? == Flow::Handled
         || keys_normal_lists::handle(cx, env, key)? == Flow::Handled
     {
         return Ok(Flow::Handled);
     }
     keys_normal_nav::handle(cx, env, key)
+}
+
+/// `Ctrl+J` / `Ctrl+K` as `Down` / `Up` when no text field of the main window
+/// has the keyboard.
+fn ctrl_list_key(cx: &CommandCtx<'_>, key: KeyEvent) -> KeyEvent {
+    if key.modifiers != KeyModifiers::CONTROL
+        || MainField::active(
+            &InputMode::Normal,
+            *cx.composer_focus,
+            *cx.commit_filter_focus,
+        )
+        .is_some()
+    {
+        return key;
+    }
+    match key.code {
+        KeyCode::Char('j' | 'J') => {
+            KeyEvent::new_with_kind(KeyCode::Down, KeyModifiers::NONE, key.kind)
+        }
+        KeyCode::Char('k' | 'K') => {
+            KeyEvent::new_with_kind(KeyCode::Up, KeyModifiers::NONE, key.kind)
+        }
+        _ => key,
+    }
 }
 
 /// The keyboard twin of the dialogs' move and resize (`dialog_kit::frame`) and

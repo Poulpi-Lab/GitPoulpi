@@ -680,3 +680,98 @@ fn dragging_the_separator_down_leaves_a_one_cell_repository_column() {
     });
     quit(s.term);
 }
+
+/// A double click on the repository separator fits the column to its widest
+/// chip (the name is whole again), like the Log's boundaries; the keyboard
+/// twin is `C` then `=`, and the header's menu has the same rows.
+///
+/// Falsified: with `divider_press`'s double-click branch doing nothing the
+/// name stays cut (red at "the whole name").
+#[test]
+fn a_double_click_on_the_repository_separator_fits_the_column() {
+    let mut s = setup(
+        "pty-radar-cols-fit-double",
+        &format!("[columns]\nrepo = {NARROW}\n"),
+    );
+    let name = name_of(&s.a);
+    let screen = open_radar(&mut s.term);
+    assert_eq!(rows_with(&screen, &name), 0, "{}", screen.text());
+    let (x, row) = chip_cell(&screen);
+    s.term.double_click(x + NARROW, row).unwrap();
+    s.term
+        .wait_for("the whole name", STEP, |s| rows_with(s, &name) >= 1)
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    quit(s.term);
+}
+
+#[test]
+fn the_fit_key_fits_the_picked_radar_column() {
+    let mut s = setup(
+        "pty-radar-cols-fit-key",
+        &format!("[columns]\nrepo = {NARROW}\n"),
+    );
+    let name = name_of(&s.a);
+    let screen = open_radar(&mut s.term);
+    assert_eq!(rows_with(&screen, &name), 0, "{}", screen.text());
+    s.term.send_text("C").unwrap();
+    s.term
+        .wait_for("the column picked", STEP, |s| {
+            s.contains("Repository column (8 cells)")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    s.term.send_text("=").unwrap();
+    s.term
+        .wait_for("the whole name", STEP, |s| rows_with(s, &name) >= 1)
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    quit(s.term);
+}
+
+/// Right-click on a column title opens the menu with the column's own fit
+/// and "Fit all columns"; its keyboard twin is `C` then `.`. Both rows fit.
+#[test]
+fn the_radar_header_menu_fits_this_column_and_all_columns() {
+    let mut s = setup(
+        "pty-radar-cols-fit-menu",
+        &format!("[columns]\nrepo = {NARROW}\n"),
+    );
+    let name = name_of(&s.a);
+    let screen = open_radar(&mut s.term);
+    assert_eq!(rows_with(&screen, &name), 0, "{}", screen.text());
+    let screen = settled(&s.term);
+    let row = header_row(&screen);
+    let x = header_x(&screen, "Repo").expect("the Repository title");
+    s.term.right_click(x, row).unwrap();
+    s.term
+        .wait_for("the fit rows", STEP, |s| {
+            s.contains("Fit Repository to content") && s.contains("Fit all columns to content")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    let (c, r) = s.term.screen().find("Fit Repository to content").unwrap();
+    s.term.click(c + 2, r).unwrap();
+    s.term
+        .wait_for("the whole name", STEP, |s| {
+            rows_with(s, &name) >= 1 && !s.contains("Fit Repository to content")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+
+    // Narrow again by key, then the keyboard route: pick, menu key, Fit all.
+    s.term.send_text("C").unwrap();
+    for _ in 0..8 {
+        s.term.send_text("[").unwrap();
+    }
+    s.term
+        .wait_for("narrow again", STEP, |s| rows_with(s, &name) == 0)
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    s.term.send_text(".").unwrap();
+    s.term
+        .wait_for("the menu", STEP, |s| {
+            s.contains("Fit all columns to content")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    let (c, r) = s.term.screen().find("Fit all columns to content").unwrap();
+    s.term.click(c + 2, r).unwrap();
+    s.term
+        .wait_for("every column fitted", STEP, |s| rows_with(s, &name) >= 1)
+        .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
+    quit(s.term);
+}

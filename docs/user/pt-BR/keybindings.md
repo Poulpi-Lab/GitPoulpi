@@ -249,6 +249,8 @@ As teclas depois de um prefixo aparecem com o prefixo (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Alargar a parte | `]` |
 | `commit_column` | `narrower_part` | Estreitar a parte | `[` |
 | `commit_column` | `reset_widths` | Redefinir as larguras das partes | `0` |
+| `commit_column` | `fit` | Ajustar a coluna ao conteúdo | `=` |
+| `commit_column` | `fit_all` | Ajustar todas as colunas ao conteúdo | `+` |
 | `file_insight` | `blame_card` | Blame: mostrar ou ocultar o cartão de detalhes | `i` |
 | `file_insight` | `blame_next` | Blame: próximo hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: hunk anterior | `p` |
@@ -824,6 +826,8 @@ As teclas são as padrão.
 | Radar: alargar coluna | `]` |
 | Radar: estreitar coluna | `[` |
 | Radar: redefinir larguras das colunas | `0` |
+| Radar: Ajustar a coluna ao conteúdo | `=` |
+| Radar: Ajustar todas as colunas ao conteúdo | `+` |
 | Radar: voltar ao início | `Esc` |
 | Radar: fechar aba |  |
 | Aba: nova aba | `Alt+T` |
@@ -1052,6 +1056,8 @@ As teclas são as padrão.
 | Exibir: coluna de commits: alargar a parte | `]` |
 | Exibir: coluna de commits: estreitar a parte | `[` |
 | Exibir: coluna de commits: redefinir as larguras das partes | `0` |
+| Exibir: coluna de commits: Ajustar a coluna ao conteúdo | `=` |
+| Exibir: coluna de commits: Ajustar todas as colunas ao conteúdo | `+` |
 | Exibir: coluna de commits: menu da linha selecionada | `.` |
 | Exibir: coluna de commits: escolher as colunas |  |
 | Exibir: coluna de commits: alternar Ref |  |

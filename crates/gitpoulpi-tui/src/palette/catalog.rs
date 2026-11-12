@@ -1894,6 +1894,18 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     )
     .requires(crate::build_features::Feature::Radar),
     entry(
+        msg::palette::RADAR_COLUMN_FIT,
+        "=",
+        PaletteCommand::Radar(RadarCommand::Column(crate::radar::ColumnCmd::Fit)),
+    )
+    .requires(crate::build_features::Feature::Radar),
+    entry(
+        msg::palette::RADAR_COLUMN_FIT_ALL,
+        "+",
+        PaletteCommand::Radar(RadarCommand::Column(crate::radar::ColumnCmd::FitAll)),
+    )
+    .requires(crate::build_features::Feature::Radar),
+    entry(
         msg::palette::RADAR_BACK,
         "Esc",
         PaletteCommand::Radar(RadarCommand::Back),
@@ -3098,6 +3110,16 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         msg::palette::VIEW_COLUMN_RESET_WIDTHS,
         "",
         PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ResetWidths),
+    ),
+    entry(
+        msg::palette::VIEW_COLUMN_FIT_PART,
+        "",
+        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Fit),
+    ),
+    entry(
+        msg::palette::VIEW_COLUMN_FIT_ALL,
+        "",
+        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::FitAll),
     ),
     entry(
         msg::palette::VIEW_COLUMN_MENU,

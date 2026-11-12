@@ -120,8 +120,9 @@ fn the_palette_takes_the_list_keys() {
     assert_eq!(selected_offset(&s), Some(0), "{}", s.text());
     let first = list_text(&s, 0);
 
-    // Lists move with the arrows; no Ctrl+letter pair moves them (Ctrl+N is
-    // the badge prefix everywhere).
+    // Lists move with the arrows and with Ctrl+J / Ctrl+K (never Ctrl+N /
+    // Ctrl+P: Ctrl+N is the badge prefix everywhere). The filter's own
+    // Ctrl+K (kill to end) gives way to the list.
     term.send_keys("Down").unwrap();
     term.wait_for("Down moved down", STEP, |s| selected_offset(s) == Some(1))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
@@ -129,14 +130,11 @@ fn the_palette_takes_the_list_keys() {
     term.wait_for("Up moved up", STEP, |s| selected_offset(s) == Some(0))
         .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("C-j").unwrap();
-    std::thread::sleep(Duration::from_millis(400));
-    let _ = term.wait_for_stable(Duration::from_millis(200), STEP);
-    assert_eq!(
-        selected_offset(&term.screen()),
-        Some(0),
-        "Ctrl+J no longer moves the list:\n{}",
-        term.text()
-    );
+    term.wait_for("Ctrl+J moved down", STEP, |s| selected_offset(s) == Some(1))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("C-k").unwrap();
+    term.wait_for("Ctrl+K moved up", STEP, |s| selected_offset(s) == Some(0))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
     // A page down moves by the visible rows; the window follows.
     term.send_keys("PageDown").unwrap();
@@ -508,4 +506,46 @@ fn a_press_on_the_palette_track_jumps_the_thumb_and_keeps_dragging() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.release(right, top + 1).unwrap();
     term.stop().unwrap();
+}
+
+/// `Ctrl+J` / `Ctrl+K` move the Log's selection like the arrows (a list with
+/// no text field). The commit detail shows the selected commit's summary, so
+/// a summary on the screen twice is the selected one.
+///
+/// (The Log's key match reads the character, so it took `Ctrl+J` / `Ctrl+K`
+/// as `j` / `k` before; `ctrl_list_key` makes it a rule for every list that
+/// checks the modifiers.)
+#[test]
+fn ctrl_j_and_ctrl_k_move_the_main_log() {
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .commit("older ctrl list commit")
+        .unwrap()
+        .commit("newer ctrl list commit")
+        .unwrap()
+        .build();
+    let (mut term, _config) = common::launch(repo.root())
+        .session("pty-ctrl-jk-log")
+        .size(200, 50)
+        .ready("newer ctrl list commit")
+        .mouse_capture()
+        .start();
+    let (c, r) = term.wait_for_text("newer ctrl list commit", STEP).unwrap();
+    term.click(c + 1, r).unwrap();
+    term.wait_for("the newer commit selected", STEP, |s| {
+        s.find_all("newer ctrl list commit").len() >= 2
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("C-j").unwrap();
+    term.wait_for("the older commit selected", STEP, |s| {
+        s.find_all("older ctrl list commit").len() >= 2
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("C-k").unwrap();
+    term.wait_for("the newer commit selected again", STEP, |s| {
+        s.find_all("newer ctrl list commit").len() >= 2
+            && s.find_all("older ctrl list commit").len() < 2
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let _ = term.stop();
 }

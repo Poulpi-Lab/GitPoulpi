@@ -527,6 +527,10 @@ impl RadarUi {
             MouseEventKind::ScrollUp => self.scroll_by(-3),
             MouseEventKind::Down(MouseButton::Left) => self.click(hit, double, mouse),
             MouseEventKind::Down(MouseButton::Right) => {
+                if let Some(Hit::Header(cell)) = hit {
+                    self.open_header_menu(Some(cell), col, row + 1);
+                    return Outcome::None;
+                }
                 if let Some(
                     Hit::Row(i) | Hit::Star(i) | Hit::Menu(i) | Hit::NoteAction(i) | Hit::TurnOn(i),
                 ) = hit

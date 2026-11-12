@@ -229,17 +229,6 @@ oluştur**, **Başlatıcı: kısayolları kaldır**, **Başlatıcı: komut takma
 **Başlatıcı: komut takma adını kaldır**, **Başlatıcı: PATH'e ekle**, **Başlatıcı: PATH'ten kaldır**); bir betikten `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` aynısını yapar.
 
-### Çakışma önleme
-
-Proaktif çakışma algılamanın genel kısmı (`gitpoulpi ui show settings conflict-prevention-global`); bir deponun kendi sayfası
-[Depoya Özel: Çakışma önleme](#depoya-özel-çakışma-önleme)'dir. Paletteki **Çakışmalar: Temel Dal Listelerini Düzenle...** bu sayfayı açar.
-
-| Seçenek | Ne yapar |
-|---|---|
-| **Proaktif çakışma algılamayı etkinleştir** | Varsayılan olarak açıktır (`general.conflict_detection`). Geçerli dalı ayrıldığı dala merge etmek çakışacaksa, siz denemeden önce Log'da uyarır. Bir depo bunu kendi **Çakışma önleme** sayfasında kendisi için kapatabilir. Bkz. [Merge çakışmalarını çözmek](merge-conflicts.md#çakışma-önleme). Ayarlar kapanınca uygulanır. |
-| **Varsayılan temel dallar** | Anahtarın altında. Kendi listesi olmayan depoların kullandığı temel dal desenleri listesi: her dal demek olan **Yerleşik (`**`)** ya da adlandırılmış listelerinizden biri (`conflict_prevention.default_list`). Ayarlar kapanınca açık depolara uygulanır. **Yerleşik varsayılana sıfırla** `**` değerine döner. |
-| **Temel dal listeleri** | Yine bu sayfada: adlandırılmış temel dal desenleri listeleriniz (`[conflict_prevention.lists.<ad>]`); her biri bir blok ve içinde **Ad** (yeniden adlandırmak, varsayılansa varsayılan olarak kalmasını sağlar; eski adı izleyen bir depo, listeyi yeniden seçene kadar varsayılan listeyi kullanır), **Desenler** (satır başına bir tane, `Enter` veya tıklama düzenleyiciyi açar, `Ctrl+S` korur), **Varsayılan yap** ve **Listeyi sil** (önce sorar ve onu izleyen depoların bunun yerine varsayılan listeyi kullanacağını söyler). Eklemek için **Yeni liste** alanına bir ad yazıp `Enter`'a basın; `**` ile başlar. Bir listeyi düzenlemek, onu izleyen her depoyu değiştirir. |
-
 ### Eşitleme
 
 GitPoulpi'nin bir depoyu uzak depolarıyla nasıl uyumlu tuttuğu ve bu sırada yerel
@@ -415,6 +404,38 @@ görünür; bkz. [MCP ve ajanlar](mcp-and-agents.md).
 
 ![Grafik renk teması açılır listesi: Temayı izle, ardından her şerit paleti ve renklerinden birkaçı](../images/settings-log-graph-lanes.png)
 
+### Klavye ve fare
+
+![Klavye ve fare sayfası: bağlama göre her eylem ve tuşları, bir arama kutusu ve filtreler](../images/settings-keyboard.png)
+
+**Ayarlar > Klavye ve fare** iki sekmeden oluşur (tıklayın ya da `Alt+Left` / `Alt+Right`).
+**Genel** klavye protokolünü ve fare ayarlarını içerir; **Tuş atamaları** her kısayolu
+bağlama göre, bir arama kutusu (`/`) ve filtrelerle listeler. Bir satırda:
+
+| Tuş | Eylem |
+|---|---|
+| `Enter` ya da çift tıklama | Yeni bir tuş yakalar. Siz basarken çakışmalar ve terminal uyarıları görünür. |
+| `a` | Alternatif bir tuş ekler. |
+| `u` | Eylemin atamasını kaldırır. |
+| `r` | Satırı varsayılanına sıfırlar. |
+| `R` | Bir onaydan sonra her kısayolu sıfırlar. |
+| `c` ya da satırın `!` işaretine tıklama | Eylemi, tuşunun çakıştığı tüm eylemlerle birlikte gösterir; `Esc` hepsini yeniden gösterir. Başka bir eylemin tuşuyla çakışan tuş kırmızı, yalnızca tuşla ilgili bir uyarı (terminal onu gönderemiyor) turuncudur. |
+
+Bunu tmux, AutoHotkey, herdr ya da terminalinizle olan çakışmaları gidermek için kullanın.
+Aynı ayarlar `config.toml` dosyasının `[keybindings]` tablosunda bulunur; bkz.
+[yapılandırma başvurusu](config-reference.md#keybindings) ve
+[Klavye kısayolları](keybindings.md).
+
+![Quit üzerinde c'ye basıldıktan sonra Klavye ve fare sayfası: q tuşu, çakışan iki eylemde, Quit ve Stage or Unstage the Selected Row'da kırmızı](../images/settings-keyboard-conflicts.png)
+
+Üç seçenek **Genel** sekmesindedir.
+
+| Seçenek | Ne yapar |
+|---|---|
+| **Kitty klavye protokolü** | **auto**, terminalden kitty klavye protokolünü ister, böylece `Ctrl+,`, `Ctrl+Enter` ve `Ctrl+Shift+N` ulaşır. **off** hiç istemez; bir terminal sorun çıkarırsa kullanın. Yeniden başlatma gerekir. |
+| **Fare açık** | Kapalıyken fare ve metin seçimi terminalinize kalır. Yeniden başlatma gerekir. |
+| **Fare tekerleği satırları** | Tekerleğin bir adımının Log'da kaç satır kaydırdığı. Yeniden başlatma gerekir. |
+
 ### Log ve grafik
 
 Commit grafiğinin nasıl çizildiği ve Log'un kaç commit yüklediği. Grafik renkleri
@@ -502,37 +523,16 @@ düzenleyici başına bir **Etiket**, bir **Komut**, değişken
 sıfırlar. Siz düzenleyene kadar liste, bu makinede kurulu düzenleyicileri ve sistemin
 varsayılan uygulamasını içerir. Her değişiklik hemen uygulanır.
 
-### Klavye ve fare
+### Çakışma önleme
 
-![Klavye ve fare sayfası: bağlama göre her eylem ve tuşları, bir arama kutusu ve filtreler](../images/settings-keyboard.png)
-
-**Ayarlar > Klavye ve fare** iki sekmeden oluşur (tıklayın ya da `Alt+Left` / `Alt+Right`).
-**Genel** klavye protokolünü ve fare ayarlarını içerir; **Tuş atamaları** her kısayolu
-bağlama göre, bir arama kutusu (`/`) ve filtrelerle listeler. Bir satırda:
-
-| Tuş | Eylem |
-|---|---|
-| `Enter` ya da çift tıklama | Yeni bir tuş yakalar. Siz basarken çakışmalar ve terminal uyarıları görünür. |
-| `a` | Alternatif bir tuş ekler. |
-| `u` | Eylemin atamasını kaldırır. |
-| `r` | Satırı varsayılanına sıfırlar. |
-| `R` | Bir onaydan sonra her kısayolu sıfırlar. |
-| `c` ya da satırın `!` işaretine tıklama | Eylemi, tuşunun çakıştığı tüm eylemlerle birlikte gösterir; `Esc` hepsini yeniden gösterir. Başka bir eylemin tuşuyla çakışan tuş kırmızı, yalnızca tuşla ilgili bir uyarı (terminal onu gönderemiyor) turuncudur. |
-
-Bunu tmux, AutoHotkey, herdr ya da terminalinizle olan çakışmaları gidermek için kullanın.
-Aynı ayarlar `config.toml` dosyasının `[keybindings]` tablosunda bulunur; bkz.
-[yapılandırma başvurusu](config-reference.md#keybindings) ve
-[Klavye kısayolları](keybindings.md).
-
-![Quit üzerinde c'ye basıldıktan sonra Klavye ve fare sayfası: q tuşu, çakışan iki eylemde, Quit ve Stage or Unstage the Selected Row'da kırmızı](../images/settings-keyboard-conflicts.png)
-
-Üç seçenek **Genel** sekmesindedir.
+Proaktif çakışma algılamanın genel kısmı (`gitpoulpi ui show settings conflict-prevention-global`); bir deponun kendi sayfası
+[Depoya Özel: Çakışma önleme](#depoya-özel-çakışma-önleme)'dir. Paletteki **Çakışmalar: Temel Dal Listelerini Düzenle...** bu sayfayı açar.
 
 | Seçenek | Ne yapar |
 |---|---|
-| **Kitty klavye protokolü** | **auto**, terminalden kitty klavye protokolünü ister, böylece `Ctrl+,`, `Ctrl+Enter` ve `Ctrl+Shift+N` ulaşır. **off** hiç istemez; bir terminal sorun çıkarırsa kullanın. Yeniden başlatma gerekir. |
-| **Fare açık** | Kapalıyken fare ve metin seçimi terminalinize kalır. Yeniden başlatma gerekir. |
-| **Fare tekerleği satırları** | Tekerleğin bir adımının Log'da kaç satır kaydırdığı. Yeniden başlatma gerekir. |
+| **Proaktif çakışma algılamayı etkinleştir** | Varsayılan olarak açıktır (`general.conflict_detection`). Geçerli dalı ayrıldığı dala merge etmek çakışacaksa, siz denemeden önce Log'da uyarır. Bir depo bunu kendi **Çakışma önleme** sayfasında kendisi için kapatabilir. Bkz. [Merge çakışmalarını çözmek](merge-conflicts.md#çakışma-önleme). Ayarlar kapanınca uygulanır. |
+| **Varsayılan temel dallar** | Anahtarın altında. Kendi listesi olmayan depoların kullandığı temel dal desenleri listesi: her dal demek olan **Yerleşik (`**`)** ya da adlandırılmış listelerinizden biri (`conflict_prevention.default_list`). Ayarlar kapanınca açık depolara uygulanır. **Yerleşik varsayılana sıfırla** `**` değerine döner. |
+| **Temel dal listeleri** | Yine bu sayfada: adlandırılmış temel dal desenleri listeleriniz (`[conflict_prevention.lists.<ad>]`); her biri bir blok ve içinde **Ad** (yeniden adlandırmak, varsayılansa varsayılan olarak kalmasını sağlar; eski adı izleyen bir depo, listeyi yeniden seçene kadar varsayılan listeyi kullanır), **Desenler** (satır başına bir tane, `Enter` veya tıklama düzenleyiciyi açar, `Ctrl+S` korur), **Varsayılan yap** ve **Listeyi sil** (önce sorar ve onu izleyen depoların bunun yerine varsayılan listeyi kullanacağını söyler). Eklemek için **Yeni liste** alanına bir ad yazıp `Enter`'a basın; `**` ile başlar. Bir listeyi düzenlemek, onu izleyen her depoyu değiştirir. |
 
 ### Depoya Özel: Git ve Kodlama
 

@@ -226,7 +226,8 @@ See [Hosting and issue trackers](hosting-integration.md).
   on the commit.
 - **Right-click a ref pill** for one menu with the ref's actions and the
   commit's actions.
-- **Right-click the header** to show or hide columns: a checklist (`[x]` / `[ ]`) with a ✕ in its title; click a row or use the arrows and `Space` / `Enter`, then close it with the ✕, `Esc` or a click away (the palette: `View: Log: Choose the Columns to Show`). Below the checkboxes: `Fit <column> to content` (the column right-clicked), `Fit all columns to content` and `Reset column widths`.
+- **Right-click the header** to show or hide columns: a checklist (`[x]` / `[ ]`) with a ✕ in its title; click a row or use the arrows and `Space` / `Enter`, then close it with the ✕, `Esc` or a click away (the palette: `View: Log: Choose the Columns to Show`). Below the checkboxes: `Fit <column> to content` (the column right-clicked), `Fit all columns to content` and `Reset column widths`. The keyboard twin of the right-click: `Shift+C` to pick a column, then `.` (or `Shift+F10`) opens the same menu on it.
+- **The Radar's columns** work the same way: drag the separator after the repository, `#`, author or age column to size it, **double-click it** to fit the column to its widest entry (`C` picks a column, then `=`; `+` fits every column), and **right-click a column title** (or `C`, then `.`) for `Fit <column> to content` and `Fit all columns to content`.
 - **Click `↑`, `↓` or `✕`** in the search bar to go to the previous or next
   match, or to close the bar.
 - **Click `#12`, `ABC-12` or `AB#12`** in a commit message, in the right pane,
@@ -368,8 +369,9 @@ Every discard asks first.
 - **Hover a row** for the Log's tooltip (the whole message, the author's name and email, the full date, by the part under the pointer).
 - **Right-click a row** for its menu: show it in the Log, the commit's diff of the file, the file at that commit, its blame, then the Log's menu for the commit. The menu key does the same from the keyboard.
 - **Drag a boundary of the header** (`ui.column_resize`: by default the one-cell separator between two parts, marked by a muted `│` in the header and drawn as an accent line down the column while the pointer is on it, a drag from anywhere along it resizing; with `header`, the first letter of the next name, lit while the pointer is on it) to size the part on its left: lanes, message, author, date, refs, changes or SHA. The cell right after the last part is the boundary of the last part.
+- **Double-click a boundary of the header** to fit the part on its left to its content, as the Log's boundaries do: the width that shows its widest row whole, never wider than the column (the keyboard: click a row or `Ctrl+N` to give the column the keys, `Tab` to pick the part, then `=`; `+` fits every part; the palette has `Fit the Part to Its Content` and `Fit All Parts to Content`). The message keeps what the other parts leave.
 - **Drag a name of the header** over another to move the part there: the same ghost, dimmed source and accent bar as the Log's header, and the part moves on release (`Esc` cancels; the keyboard's `<` / `>`, after `Tab`, do the same one place at a time).
-- **Right-click the header** to choose which parts are shown (Ref, Graph, Author, Date, Changes, SHA; Message is always shown); the checklist has a ✕ in its title. The palette has `Choose the Columns` and a toggle per part.
+- **Right-click the header** to choose which parts are shown (Ref, Graph, Author, Date, Changes, SHA; Message is always shown); the checklist has a ✕ in its title. Below it: `Fit <part> to content` (the part right-clicked) and `Fit all columns to content`. The palette has `Choose the Columns` (the menu from the keyboard, on the part `Tab` picked) and a toggle per part.
 - **Shift+wheel** or a horizontal wheel scrolls the rows sideways when they are wider than the column.
 - **Drag the right border** of the column to resize it. **Click the `›` strip** (or the ✕ on the column, or **click the selected segment** of the bar's `File │ All` selector) to bring it back or hide it.
 

@@ -249,6 +249,8 @@ Keys after a prefix are shown with the prefix (`Ctrl+G s`).
 | `commit_column` | `wider_part` | Widen the Part | `]` |
 | `commit_column` | `narrower_part` | Narrow the Part | `[` |
 | `commit_column` | `reset_widths` | Reset the Part Widths | `0` |
+| `commit_column` | `fit` | Fit the Part to Its Content | `=` |
+| `commit_column` | `fit_all` | Fit All Parts to Content | `+` |
 | `file_insight` | `blame_card` | Blame: Show or Hide the Detail Card | `i` |
 | `file_insight` | `blame_next` | Blame: Next Hunk | `n` |
 | `file_insight` | `blame_prev` | Blame: Previous Hunk | `p` |
@@ -826,6 +828,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Radar: Widen Column | `]` |
 | Radar: Narrow Column | `[` |
 | Radar: Reset Column Widths | `0` |
+| Radar: Fit Column to Its Content | `=` |
+| Radar: Fit All Columns to Content | `+` |
 | Radar: Back to Home | `Esc` |
 | Radar: Close Tab |  |
 | Tab: New Tab | `Alt+T` |
@@ -1054,6 +1058,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | View: Commit Column: Widen the Part | `]` |
 | View: Commit Column: Narrow the Part | `[` |
 | View: Commit Column: Reset the Part Widths | `0` |
+| View: Commit Column: Fit the Part to Its Content | `=` |
+| View: Commit Column: Fit All Parts to Content | `+` |
 | View: Commit Column: Menu of the Selected Row | `.` |
 | View: Commit Column: Choose the Columns |  |
 | View: Commit Column: Toggle Ref |  |
@@ -1219,19 +1225,21 @@ move the highlight:
 
 | Key | Action |
 |---|---|
-| `Up` / `Down` | Move one row |
+| `Up` / `Down`, `Ctrl+K` / `Ctrl+J` | Move one row up / down |
 | `Home` / `End` | First / last row |
 | `PageUp` / `PageDown` | Move one visible page |
 | `Enter` | Choose the highlighted row |
 | `Esc` | Close |
 
 In these popups, `Home` and `End` move the list, not the caret of the filter
-field. `Ctrl+A` and `Ctrl+E` still move the caret to the start and end, and
-`Ctrl+K` deletes to the end of the filter. No `Ctrl+letter` pair moves a list
-(`Ctrl+N` is the navigation prefix, `Ctrl+P` the command palette), and plain `j`
-and `k` are typed into the filter: only the arrows, `PageUp` / `PageDown` and
-`Home` / `End` move here. In lists without a text field, `j` / `k` are an extra
-way to move down / up.
+field, and `Ctrl+K` / `Ctrl+J` move the list too, so `Ctrl+K` no longer deletes
+to the end of the filter (`Ctrl+U` still clears it; in an ordinary text field
+outside a list `Ctrl+K` keeps deleting to the end of the line). `Ctrl+A` and
+`Ctrl+E` still move the caret to the start and end. `Ctrl+J` / `Ctrl+K` move
+every other list too, with or without a text field (`Ctrl+N` is the navigation
+prefix and `Ctrl+P` the command palette, so they are not list keys). Plain `j`
+and `k` are typed into the filter; in lists without a text field, `j` / `k` are
+an extra way to move down / up.
 
 With the mouse:
 
@@ -1480,7 +1488,8 @@ workflow). The host-driven rows (*New <Type> issue*, *Pick up a host-made branch
 | `Enter` / `l` on a file row | Open the file's diff in the center |
 | `Esc` / `h` | Go back to the commits |
 | `Right` | (commit with more than one ref) Open the list of its other refs: `Up` / `Down` move, `Enter` checks out, `Esc` closes |
-| `f` | Open the search bar (see [Search](#search)) |
+| `f` | Open the search bar (see [Search](#search)); this was never `/`, so the Log's search is unchanged |
+| `/` | Focus the Refs filter field (the same key does it when the Refs pane has the focus); typed as a character when a text field has the focus |
 | `c` | (with uncommitted changes) Select the WIP row and put the caret in its message field |
 | `Enter` on the WIP row | Put the caret in the WIP row's message field |
 | `.`, `Menu`, `Shift+F10` | The commit menu. `Up` / `Down` move, `Right` / `l` / `Enter` open a submenu, `Left` / `h` / `Esc` go back |

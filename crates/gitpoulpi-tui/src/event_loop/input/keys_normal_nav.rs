@@ -80,6 +80,19 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         _ if *cx.focus == Focus::Refs && km.is(Bind::RefsFilter, &key) => {
             *cx.input_mode = InputMode::FilteringRefs(cx.refs_filter.clone());
         }
+        // `/` in the Log (no text field has the keyboard, the changed files
+        // are not the focus): the Refs filter, as `/` is when the Refs pane
+        // has the focus. The Log's own search stays on `f` (`Ctrl+F` too).
+        _ if *cx.focus == Focus::Log
+            && !*cx.commit_file_focus
+            && cx.composer_focus.is_none()
+            && !*cx.commit_filter_focus
+            && km.is(Bind::RefsFilter, &key) =>
+        {
+            *cx.left_pane_collapsed = false;
+            *cx.focus = Focus::Refs;
+            *cx.input_mode = InputMode::FilteringRefs(cx.refs_filter.clone());
+        }
         KeyCode::Esc if *cx.focus == Focus::Refs && !cx.refs_filter.is_empty() => {
             cx.refs_filter.clear();
         }

@@ -2228,6 +2228,8 @@ commit_column_move_right = "Пересунути частину праворуч
 commit_column_wider_part = "Розширити частину"
 commit_column_narrower_part = "Звузити частину"
 commit_column_reset_widths = "Скинути ширину частин"
+commit_column_fit = "Підігнати стовпець під вміст"
+commit_column_fit_all = "Підігнати всі стовпці під вміст"
 log_pick_column = "Вибрати стовпець для пересування або зміни ширини"
 log_columns_next = "Вибрати наступний стовпець"
 log_columns_prev = "Вибрати попередній стовпець"
@@ -2888,6 +2890,8 @@ view_column_move_right = { git = "Вигляд: стовпець commit'ів: п
 view_column_wider_part = { git = "Вигляд: стовпець commit'ів: розширити частину", local = "Вигляд: стовпець комітів: розширити частину" }
 view_column_narrower_part = { git = "Вигляд: стовпець commit'ів: звузити частину", local = "Вигляд: стовпець комітів: звузити частину" }
 view_column_reset_widths = { git = "Вигляд: стовпець commit'ів: скинути ширину частин", local = "Вигляд: стовпець комітів: скинути ширину частин" }
+view_column_fit_part = { git = "Вигляд: стовпець commit'ів: Підігнати стовпець під вміст", local = "Вигляд: стовпець комітів: Підігнати стовпець під вміст" }
+view_column_fit_all = { git = "Вигляд: стовпець commit'ів: Підігнати всі стовпці під вміст", local = "Вигляд: стовпець комітів: Підігнати всі стовпці під вміст" }
 view_log_column_pick = "Вигляд: стовпець Log: Вибрати стовпець для пересування або зміни ширини"
 view_log_column_next = "Вигляд: стовпець Log: Вибрати наступний стовпець"
 view_log_column_prev = "Вигляд: стовпець Log: Вибрати попередній стовпець"
@@ -3467,6 +3471,8 @@ radar_column_pick = "Radar: вибрати стовпець"
 radar_column_wider = "Radar: розширити стовпець"
 radar_column_narrower = "Radar: звузити стовпець"
 radar_column_reset = "Radar: скинути ширину стовпців"
+radar_column_fit = "Radar: Підігнати стовпець під вміст"
+radar_column_fit_all = "Radar: Підігнати всі стовпці під вміст"
 why_radar_closed = "спершу відкрийте Radar"
 why_radar_no_row = "спершу виберіть елемент у Radar"
 hosting_edit_assignees = "Хостинг: змінити виконавців..."

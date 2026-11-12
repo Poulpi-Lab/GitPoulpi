@@ -227,17 +227,6 @@ skrivbordsgenväg**, **Startare: Ta bort genvägar**, **Startare: Skapa kommando
 `gitpoulpi desktop shortcut status|install|remove [--where launcher|desktop|startmenu]`
 gör det från ett skript.
 
-### Konfliktförebyggande
-
-Den globala delen av proaktiv konfliktdetektering (`gitpoulpi ui show settings conflict-prevention-global`); ett repositorys egen sida är
-[Repo-specifikt: Konfliktförebyggande](#repo-specifikt-konfliktförebyggande). Paletten **Konflikter: Redigera listor över basgrenar...** öppnar den här sidan.
-
-| Alternativ | Vad det gör |
-|---|---|
-| **Aktivera proaktiv konfliktdetektering** | På som standard (`general.conflict_detection`). Varnar i Log när en merge av den aktuella grenen i grenen den startade från skulle ge konflikter, innan du försöker. Ett repository kan stänga av den för sig själv på sin egen sida **Konfliktförebyggande**. Se [Lösa merge-konflikter](merge-conflicts.md#konfliktförebyggande). Gäller när Inställningar stängs. |
-| **Standardlista för basgrenar** | Under reglaget. Listan med mönster för basgrenar som repositories använder när de saknar en egen: **Inbyggd (`**`)**, alltså varje gren, eller en av dina namngivna listor (`conflict_prevention.default_list`). Den gäller öppna repositories när Inställningar stängs. **Återställ till inbyggd standard** går tillbaka till `**`. |
-| **Listor över basgrenar** | Också på den här sidan: dina namngivna listor med mönster för basgrenar (`[conflict_prevention.lists.<namn>]`), ett block var med sitt **Namn** (att byta namn behåller den som standard om den var det; ett repository som följde det gamla namnet använder standardlistan tills du väljer den igen), sina **Mönster** (ett per rad, `Enter` eller ett klick öppnar redigeraren, `Ctrl+S` behåller den), **Gör till standard** och **Ta bort listan** (den frågar först, och säger att repositories som följer den använder standardlistan i stället). Skriv ett namn i **Ny lista** och tryck `Enter` för att lägga till en; den börjar med `**`. Att redigera en lista ändrar varje repository som följer den. |
-
 ### Synkronisering
 
 Hur GitPoulpi håller ett repository i takt med sina remotes, och vad det gör med
@@ -414,6 +403,38 @@ servern; se [MCP och agenter](mcp-and-agents.md).
 
 ![Kombinationsrutan Färgtema för grafen: Följ temat, sedan varje spårpalett med några av sina färger](../images/settings-log-graph-lanes.png)
 
+### Tangentbord & mus
+
+![Sidan Tangentbord & mus: varje åtgärd per kontext med sina tangenter, en sökruta och filter](../images/settings-keyboard.png)
+
+**Inställningar > Tangentbord & mus** har två flikar (klicka, eller `Alt+Left` / `Alt+Right`).
+**Allmänt** innehåller tangentbordsprotokollet och musinställningarna; **Tangentbindningar**
+listar varje kortkommando per kontext, med en sökruta (`/`) och filter. På en rad:
+
+| Tangent | Åtgärd |
+|---|---|
+| `Enter` eller dubbelklick | Fångar upp en ny tangent. Konflikter och terminalvarningar visas medan du trycker. |
+| `a` | Lägger till en alternativ tangent. |
+| `u` | Tar bort bindningen för åtgärden. |
+| `r` | Återställer raden till sitt standardvärde. |
+| `R` | Återställer varje kortkommando, efter en bekräftelse. |
+| `c` eller ett klick på radens `!` | Visar åtgärden med alla åtgärder som dess tangent krockar med; `Esc` visar alla igen. En tangent som krockar med en annan åtgärds är röd, en varning om bara tangenten (terminalen kan inte skicka den) orange. |
+
+Använd den för att lösa krockar med tmux, AutoHotkey, herdr eller din terminal.
+Samma inställningar finns i tabellen `[keybindings]` i `config.toml`; se
+[konfigurationsreferensen](config-reference.md#keybindings) och
+[Kortkommandon](keybindings.md).
+
+![Sidan Tangentbord & mus efter c på Quit: tangenten q är röd på både Quit och Stage or Unstage the Selected Row, de två åtgärder som krockar](../images/settings-keyboard-conflicts.png)
+
+Tre alternativ finns på fliken **Allmänt**.
+
+| Alternativ | Vad det gör |
+|---|---|
+| **Kitty-tangentbordsprotokoll** | **auto** ber terminalen om kitty-tangentbordsprotokollet, så att `Ctrl+,`, `Ctrl+Enter` och `Ctrl+Shift+N` kommer fram. **off** ber aldrig; använd det om en terminal beter sig fel. Kräver omstart. |
+| **Mus aktiverad** | Av lämnar musen och textmarkeringen åt din terminal. Kräver omstart. |
+| **Rader per musskroll** | Hur många rader ett hjulsteg flyttar i Log. Kräver omstart. |
+
 ### Log & graf
 
 Hur commit-grafen ritas och hur många commits Log läser in. Grafens färger
@@ -504,37 +525,16 @@ exempelbild**; **+ Lägg till ▾** erbjuder förinställningar och **Egen**, oc
 innehåller listan redigerarna som är installerade på den här datorn och systemets
 standardapp. Varje ändring gäller direkt.
 
-### Tangentbord & mus
+### Konfliktförebyggande
 
-![Sidan Tangentbord & mus: varje åtgärd per kontext med sina tangenter, en sökruta och filter](../images/settings-keyboard.png)
-
-**Inställningar > Tangentbord & mus** har två flikar (klicka, eller `Alt+Left` / `Alt+Right`).
-**Allmänt** innehåller tangentbordsprotokollet och musinställningarna; **Tangentbindningar**
-listar varje kortkommando per kontext, med en sökruta (`/`) och filter. På en rad:
-
-| Tangent | Åtgärd |
-|---|---|
-| `Enter` eller dubbelklick | Fångar upp en ny tangent. Konflikter och terminalvarningar visas medan du trycker. |
-| `a` | Lägger till en alternativ tangent. |
-| `u` | Tar bort bindningen för åtgärden. |
-| `r` | Återställer raden till sitt standardvärde. |
-| `R` | Återställer varje kortkommando, efter en bekräftelse. |
-| `c` eller ett klick på radens `!` | Visar åtgärden med alla åtgärder som dess tangent krockar med; `Esc` visar alla igen. En tangent som krockar med en annan åtgärds är röd, en varning om bara tangenten (terminalen kan inte skicka den) orange. |
-
-Använd den för att lösa krockar med tmux, AutoHotkey, herdr eller din terminal.
-Samma inställningar finns i tabellen `[keybindings]` i `config.toml`; se
-[konfigurationsreferensen](config-reference.md#keybindings) och
-[Kortkommandon](keybindings.md).
-
-![Sidan Tangentbord & mus efter c på Quit: tangenten q är röd på både Quit och Stage or Unstage the Selected Row, de två åtgärder som krockar](../images/settings-keyboard-conflicts.png)
-
-Tre alternativ finns på fliken **Allmänt**.
+Den globala delen av proaktiv konfliktdetektering (`gitpoulpi ui show settings conflict-prevention-global`); ett repositorys egen sida är
+[Repo-specifikt: Konfliktförebyggande](#repo-specifikt-konfliktförebyggande). Paletten **Konflikter: Redigera listor över basgrenar...** öppnar den här sidan.
 
 | Alternativ | Vad det gör |
 |---|---|
-| **Kitty-tangentbordsprotokoll** | **auto** ber terminalen om kitty-tangentbordsprotokollet, så att `Ctrl+,`, `Ctrl+Enter` och `Ctrl+Shift+N` kommer fram. **off** ber aldrig; använd det om en terminal beter sig fel. Kräver omstart. |
-| **Mus aktiverad** | Av lämnar musen och textmarkeringen åt din terminal. Kräver omstart. |
-| **Rader per musskroll** | Hur många rader ett hjulsteg flyttar i Log. Kräver omstart. |
+| **Aktivera proaktiv konfliktdetektering** | På som standard (`general.conflict_detection`). Varnar i Log när en merge av den aktuella grenen i grenen den startade från skulle ge konflikter, innan du försöker. Ett repository kan stänga av den för sig själv på sin egen sida **Konfliktförebyggande**. Se [Lösa merge-konflikter](merge-conflicts.md#konfliktförebyggande). Gäller när Inställningar stängs. |
+| **Standardlista för basgrenar** | Under reglaget. Listan med mönster för basgrenar som repositories använder när de saknar en egen: **Inbyggd (`**`)**, alltså varje gren, eller en av dina namngivna listor (`conflict_prevention.default_list`). Den gäller öppna repositories när Inställningar stängs. **Återställ till inbyggd standard** går tillbaka till `**`. |
+| **Listor över basgrenar** | Också på den här sidan: dina namngivna listor med mönster för basgrenar (`[conflict_prevention.lists.<namn>]`), ett block var med sitt **Namn** (att byta namn behåller den som standard om den var det; ett repository som följde det gamla namnet använder standardlistan tills du väljer den igen), sina **Mönster** (ett per rad, `Enter` eller ett klick öppnar redigeraren, `Ctrl+S` behåller den), **Gör till standard** och **Ta bort listan** (den frågar först, och säger att repositories som följer den använder standardlistan i stället). Skriv ett namn i **Ny lista** och tryck `Enter` för att lägga till en; den börjar med `**`. Att redigera en lista ändrar varje repository som följer den. |
 
 ### Repo-specifikt: Git & kodning
 

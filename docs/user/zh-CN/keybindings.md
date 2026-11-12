@@ -235,6 +235,8 @@ stage_file = "z"
 | `commit_column` | `wider_part` | 加宽该栏 | `]` |
 | `commit_column` | `narrower_part` | 收窄该栏 | `[` |
 | `commit_column` | `reset_widths` | 重置各栏宽度 | `0` |
+| `commit_column` | `fit` | 按内容调整该列宽度 | `=` |
+| `commit_column` | `fit_all` | 按内容调整所有列宽度 | `+` |
 | `file_insight` | `blame_card` | Blame：显示或隐藏详情卡片 | `i` |
 | `file_insight` | `blame_next` | Blame：下一个 hunk | `n` |
 | `file_insight` | `blame_prev` | Blame：上一个 hunk | `p` |
@@ -792,6 +794,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Radar：加宽列 | `]` |
 | Radar：收窄列 | `[` |
 | Radar：重置列宽 | `0` |
+| Radar：按内容调整该列宽度 | `=` |
+| Radar：按内容调整所有列宽度 | `+` |
 | Radar：返回主页 | `Esc` |
 | Radar：关闭标签页 |  |
 | 标签页：新标签页 | `Alt+T` |
@@ -1020,6 +1024,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 视图：Commit 列：加宽该栏 | `]` |
 | 视图：Commit 列：收窄该栏 | `[` |
 | 视图：Commit 列：重置各栏宽度 | `0` |
+| 视图：Commit 列：按内容调整该列宽度 | `=` |
+| 视图：Commit 列：按内容调整所有列宽度 | `+` |
 | 视图：Commit 列：所选行的菜单 | `.` |
 | 视图：Commit 列：选择显示的列 |  |
 | 视图：Commit 列：切换引用列 |  |

@@ -7,6 +7,16 @@ use std::path::PathBuf;
 
 use super::pending::Pending;
 
+/// The columns of the Radar's list that can be sized (`radar::Cell`'s sizable
+/// ones; this file cannot name that type, the stub build has none).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum SizedColumn {
+    Repo,
+    Num,
+    Author,
+    Age,
+}
+
 /// What a row's menu, a key or a palette command asks for.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Act {
@@ -39,6 +49,10 @@ pub(crate) enum Act {
     /// Turns on the account-wide review requests of a code host (the hint
     /// row's `[Turn on]`).
     TurnOn,
+    /// Fits one sizable column to its content (the header menu's row).
+    FitColumn(SizedColumn),
+    /// Fits every sizable column to its content.
+    FitAllColumns,
 }
 
 /// A palette command of the Radar (each is also a key or a click).
@@ -73,6 +87,10 @@ pub(crate) enum ColumnCmd {
     Narrower,
     /// Every column back to its automatic width.
     Reset,
+    /// Fits the picked column to its content (the repository's when none is).
+    Fit,
+    /// Fits every sizable column to its content.
+    FitAll,
 }
 
 /// A part of the Radar that `Ctrl+N` badges can reach (the badge

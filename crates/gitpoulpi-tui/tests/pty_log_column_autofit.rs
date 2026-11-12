@@ -278,3 +278,50 @@ fn snap(term: &xtask::pty::Terminal) -> xtask::pty::Screen {
     )
     .unwrap_or_else(|e| panic!("{e}"))
 }
+
+/// The header menu's "Fit all columns to content" row, clicked, fits every
+/// column; its keyboard twin is `.` (or Shift+F10) while a column is picked,
+/// which opens the same menu on that column.
+///
+/// Falsified: with `run_chooser_row` ignoring `ChooserRow::FitAll` the name
+/// stays cut (red at "the menu fits every column"); with the `.` branch of
+/// `log_columns::on_key` removed no menu opens (red at "the keyboard menu").
+#[test]
+fn the_header_menu_fits_all_columns_by_click_and_the_menu_key_opens_it() {
+    let repo = fixture();
+    let (mut term, _config) = launch(&repo, "autofit-menu-all");
+    assert!(!full_author(&snap(&term)));
+    let (x, row) = header(&snap(&term), "Author").unwrap();
+    term.right_click(x + 1, row).unwrap();
+    term.wait_for("the fit rows", STEP, |s| {
+        s.contains("Fit all columns to content")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (c, r) = snap(&term).find("Fit all columns to content").unwrap();
+    term.click(c + 2, r).unwrap();
+    term.wait_for("the menu fits every column", STEP, |s| {
+        full_author(s) && !s.contains("Fit all columns to content")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+
+    // Back to automatic, pick Author, open the menu from the keyboard.
+    term.send_keys("C Tab Tab Tab").unwrap();
+    term.wait_for("Author picked", STEP, |s| {
+        s.contains("Author column picked")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_text("0").unwrap();
+    term.wait_for("cut again", STEP, |s| !full_author(s))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_text(".").unwrap();
+    term.wait_for("the keyboard menu", STEP, |s| {
+        s.contains("Fit Author to content") && s.contains("Fit all columns to content")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Up Up Up").unwrap();
+    ms(200);
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the keyboard menu fits the column", STEP, full_author)
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    quit(term);
+}

@@ -69,6 +69,8 @@ GitPoulpi - Git-клиент для терминала с интерактивн
     «Выйти и cd сюда» и обёртка `gitpoulpi shell-init` (`gp`) для bash, zsh,
     fish и PowerShell.
     Какой терминал лучше всего показывает GitPoulpi: **[Выбор терминала](terminals.md)**.
+    Что проходит через tmux, zellij, screen, herdr и панели терминалов:
+    **[Мультиплексоры](multiplexers.md)**.
 
 Также: **[Рабочие процессы ветвления](branching-workflows.md)** - шаблоны Git Flow, GitHub Flow, GitLab Flow и
 Trunk-based или собственные базовые ветки, шаблоны имён веток и типы веток (`gitpoulpi flow ...`).

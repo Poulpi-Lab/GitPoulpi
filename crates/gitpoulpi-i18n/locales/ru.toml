@@ -540,15 +540,15 @@ tabs_position_help = "Где находятся вкладки репозито�
 graph_color_theme = "Цветовая тема графа"
 graph_color_theme_help = "Палитра цветов полос графа в Log. «Как в теме» берёт палитру выбранной темы; любой другой пункт заменяет её, поэтому любую тему можно сочетать с любой палитрой. Применяется при закрытии настроек."
 graph_renderer = "Отрисовка графа"
-graph_renderer_help = "auto рисует граф настоящим изображением в терминале, который это умеет, и символами везде в остальных случаях - в том числе внутри tmux или zellij, которые наследуют окружение терминала, но не пропускают изображения, и внутри herdr, если не включён его kitty_graphics. изображение принудительно включает картинку, текст - выключает. Нужен перезапуск."
+graph_renderer_help = "auto рисует граф настоящим изображением в терминале, который это умеет, и символами везде в остальных случаях - в том числе внутри zellij и screen, которые наследуют окружение терминала, но не пропускают изображения, внутри tmux, если терминал за ним не понимает sixel, и внутри herdr, если не включён его kitty_graphics. image принудительно включает картинку, text - выключает. Нужен перезапуск."
 image_protocol = "Протокол изображений"
-image_protocol_help = "Как картинки (изображение графа, аватары авторов) попадают в терминал. auto: протокол графики Kitty в kitty, Ghostty и herdr с kitty_graphics = true; встроенные изображения iTerm2 в WezTerm, iTerm2 и mintty; картинки sixel (только аватары авторов, граф остаётся символами) в Windows Terminal, foot, Konsole и mlterm; в остальных случаях символы. kitty, iterm2 или sixel принудительно включает протокол (kitty для herdr, чей конфиг лежит в другом месте; sixel для терминала, который его рисует, но не распознан); none отключает картинки. Нужен перезапуск."
+image_protocol_help = "Как картинки (изображение графа, аватары авторов) попадают в терминал. auto: протокол графики Kitty в kitty, Ghostty и herdr с kitty_graphics = true, а также в iTerm2 3.7.7 и новее; встроенные изображения iTerm2 в WezTerm, Rio, mintty и более старых версиях iTerm2; картинки sixel (колонка графа и аватары) в Windows Terminal, foot, Tabby, Konsole, mlterm и в tmux, если терминал за ним понимает sixel; в остальных случаях символы. kitty, iterm2 или sixel принудительно включает протокол (kitty для herdr, чей конфиг лежит в другом месте; sixel для терминала, который его рисует, но не распознан); none отключает картинки. Нужен перезапуск."
 kitty_keyboard = "Клавиатурный протокол Kitty"
 kitty_keyboard_help = "auto при запуске и примерно за 100 мс спрашивает терминал, знает ли он клавиатурный протокол kitty, и использует его: сочетания, которые старые терминалы не различают (Control с пунктуацией, цифрами, Shift или Enter), приходят как есть, а не сливаются с управляющими кодами. Терминал, который не отвечает, остаётся на старых клавишах. off никогда не трогает клавиатурный режим терминала. Нужен перезапуск."
 color_depth = "Глубина цвета"
 color_depth_help = "auto использует 24-битный цвет, кроме терминалов, которые его не показывают (Apple Terminal, консоль Linux или 256-цветный терминал без COLORTERM): там цвета приводятся к ближайшим из 256 или 16 значений. truecolor, 256 и 16 задают глубину принудительно. Применяется сразу."
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "Текстовый курсор"
+text_cursor_help = "terminal ставит собственный курсор терминала в позицию ввода сфокусированного текстового поля в виде вертикальной черты: действуют настройки курсора вашего терминала, а окно кандидатов метода ввода открывается у курсора. drawn рисует собственный курсор GitPoulpi (блок или подчёркивание), а курсор терминала остаётся скрытым. Применяется сразу."
 graph_show_stashes = { git = "Показывать stash'и в графе", local = "Показывать стэши в графе" }
 graph_show_stashes_help = { git = "Каждый stash получает отдельную строку в Log по своей дате: маленький прямоугольник на полосе рядом с commit'ом, на котором он создан, соединённый с ним штриховой линией. Выбор показывает, что он менял; правый щелчок (или .) предлагает Pop, Apply и Drop. Выкл. оставляет stash'и только в разделе STASHES. Не рисуется в режиме solo.", local = "Каждый стэш получает отдельную строку в Log по своей дате: маленький прямоугольник на полосе рядом с коммитом, на котором он создан, соединённый с ним штриховой линией. Выбор показывает, что он менял; правый щелчок (или .) предлагает «Достать», «Применить» и «Удалить». Выкл. оставляет стэши только в разделе СТЭШИ. Не рисуется в режиме solo." }
 ref_connector = { git = "Соединитель ссылки с commit'ом", local = "Соединитель ссылки с коммитом" }
@@ -2224,8 +2224,8 @@ commit_column_move_right = "Сдвинуть часть вправо"
 commit_column_wider_part = "Расширить часть"
 commit_column_narrower_part = "Сузить часть"
 commit_column_reset_widths = "Сбросить ширину частей"
-commit_column_fit = "Подогнать колонку под содержимое"
-commit_column_fit_all = "Подогнать все колонки под содержимое"
+commit_column_fit = "Подогнать часть под содержимое"
+commit_column_fit_all = "Подогнать все части под содержимое"
 log_pick_column = "Выбрать колонку для сдвига или изменения ширины"
 log_columns_next = "Выбрать следующую колонку"
 log_columns_prev = "Выбрать предыдущую колонку"
@@ -2887,8 +2887,8 @@ view_column_move_right = { git = "Вид: колонка commit'ов: сдвин
 view_column_wider_part = { git = "Вид: колонка commit'ов: расширить часть", local = "Вид: колонка коммитов: расширить часть" }
 view_column_narrower_part = { git = "Вид: колонка commit'ов: сузить часть", local = "Вид: колонка коммитов: сузить часть" }
 view_column_reset_widths = { git = "Вид: колонка commit'ов: сбросить ширину частей", local = "Вид: колонка коммитов: сбросить ширину частей" }
-view_column_fit_part = { git = "Вид: колонка commit'ов: Подогнать колонку под содержимое", local = "Вид: колонка коммитов: Подогнать колонку под содержимое" }
-view_column_fit_all = { git = "Вид: колонка commit'ов: Подогнать все колонки под содержимое", local = "Вид: колонка коммитов: Подогнать все колонки под содержимое" }
+view_column_fit_part = { git = "Вид: колонка commit'ов: подогнать часть под содержимое", local = "Вид: колонка коммитов: подогнать часть под содержимое" }
+view_column_fit_all = { git = "Вид: колонка commit'ов: подогнать все части под содержимое", local = "Вид: колонка коммитов: подогнать все части под содержимое" }
 view_log_column_pick = "Вид: колонка Log: выбрать колонку для сдвига или изменения ширины"
 view_log_column_next = "Вид: колонка Log: выбрать следующую колонку"
 view_log_column_prev = "Вид: колонка Log: выбрать предыдущую колонку"
@@ -3468,8 +3468,8 @@ radar_column_pick = "Radar: выбрать колонку"
 radar_column_wider = "Radar: расширить колонку"
 radar_column_narrower = "Radar: сузить колонку"
 radar_column_reset = "Radar: сбросить ширину колонок"
-radar_column_fit = "Radar: Подогнать колонку под содержимое"
-radar_column_fit_all = "Radar: Подогнать все колонки под содержимое"
+radar_column_fit = "Radar: подогнать колонку под содержимое"
+radar_column_fit_all = "Radar: подогнать все колонки под содержимое"
 why_radar_closed = "сначала откройте Radar"
 why_radar_no_row = "сначала выберите элемент в Radar"
 hosting_edit_assignees = "Хостинг: изменить исполнителей..."
@@ -3988,8 +3988,8 @@ mouse_gestures_in_2 = { git = "разделитель панелей или гр
 mouse_gestures_in_3 = { git = "перетаскивание по тексту diff, File View, Blame или «История файла» выделяет его, двойной щелчок - слово; y или Ctrl+C копирует (только текст файла, никогда поля); другие вхождения выделенного слова подсвечиваются в diff и редакторе (и отмечаются на линейке)", local = "перетаскивание по тексту различий, File View, Blame или «История файла» выделяет его, двойной щелчок - слово; y или Ctrl+C копирует (только текст файла, никогда поля); другие вхождения выделенного слова подсвечиваются в различиях и редакторе (и отмечаются на линейке)" }
 mouse_gestures_in_4 = { git = "прокручивает список или diff в фокусе/под указателем; Shift+колесо (оба варианта, о которых сообщают терминалы) вместо этого прокручивает diff/файл/blame *по горизонтали*, пока перенос строк выключен", local = "прокручивает список или различия в фокусе/под указателем; Shift+колесо (оба варианта, о которых сообщают терминалы) вместо этого прокручивает различия/файл/blame *по горизонтали*, пока перенос строк выключен" }
 mouse_gestures_in_5 = "открывает контекстное меню везде, где оно есть (см. раздел каждой панели выше); эквивалент на клавиатуре - всегда {{*global.context_menu}}"
-mouse_gestures_in_6 = "каждое действие «Копировать ...» просит у *терминала* буфер обмена через OSC 52 - TUI не может достучаться до него напрямую; терминал, игнорирующий последовательность, просто не копирует"
-mouse_gestures_in_7 = "подсказки изменения размера/указателя/открытой руки отправляются через OSC 22 в терминалах, которые его поддерживают (kitty, foot, xterm; в других по-разному) - перетаскиваемые разделители и границы колонок также подсвечиваются в собственном буфере приложения, которому содействие терминала вообще не нужно"
+mouse_gestures_in_6 = "каждое действие «Копировать ...» помещает текст в системный буфер обмена и, если известно, что терминал это поддерживает, дополнительно отправляет его через OSC 52; по SSH или без дисплея отправляется только OSC 52, а терминал, игнорирующий последовательность, не копирует"
+mouse_gestures_in_7 = "подсказки изменения размера/указателя/открытой руки отправляются через OSC 22 в терминалах, которые его поддерживают (kitty, Ghostty, foot, mintty; не в Rio, Alacritty, Windows Terminal и iTerm2) - перетаскиваемые разделители и границы колонок также подсвечиваются в собственном буфере приложения, которому содействие терминала вообще не нужно"
 git_actions_then_25 = "открыть меню LFS (кнопка LFS на панели; её пункты есть и в палитре)"
 git_actions_then_26 = { git = "LFS: fetch объектов всех ссылок", local = "LFS: загрузить объекты всех ссылок" }
 git_actions_then_27 = "LFS: записать настоящее содержимое поверх указателей (офлайн)"
@@ -5955,7 +5955,7 @@ show_label = "Показать:"
 show_all = "Все"
 show_none = "Ничего"
 why_level_off = "Не показывается: выбран уровень {level}. Повысьте его, чтобы увидеть эти строки."
-hint_levels = "1-5: показать или скрыть уровень  a: все  n: ничего"
+hint_levels = "1-5: показать или скрыть уровень  a: все  n: ничего  Enter: операция строки  [ ]: сбои"
 palette_show_error = "Журнал активности: показать или скрыть уровень Ошибка"
 palette_show_warn = "Журнал активности: показать или скрыть уровень Предупреждение"
 palette_show_info = "Журнал активности: показать или скрыть уровень Инфо"
@@ -5998,25 +5998,25 @@ palette_scroll_right = "Журнал активности: прокрутить 
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "Журнал активности: прокрутка длинных строк вбок (также Shift + колесо или горизонтальная полоса прокрутки)"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation}: сбой"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "Операция: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
-ctx_repository = "Repository: {repository}"
+ctx_repository = "Репозиторий: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "Запросил: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "Идентификатор операции: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "Журнал активности: показать операцию этой строки"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "Журнал активности: следующая неудачная операция"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "Журнал активности: предыдущая неудачная операция"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "Сначала выберите строку: щёлкните по ней или нажмите ], чтобы перейти к следующей неудачной операции."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "Эта строка не связана с операцией."
 
 [git_error]
 summary_host_key = "Ключ SSH-хоста этого remote пока неизвестен."
@@ -8760,13 +8760,13 @@ namespaces = "Пространства имён"
 # context: hint in the empty namespaces field
 namespaces_hint = "напр. acme, platform (пусто: моё и все, где я состою)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "По одной записи в строке. Имя соответствует этой группе или владельцу и всему, что ниже (ptm соответствует ptm/produits/x, но не ptmx/y). Пусто: свои и все, к которым вы принадлежите."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "Каждая строка - регулярное выражение, которое сопоставляется с полным путём репозитория в том виде, как вы его пишете (пример: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "Регулярные выражения"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "Недопустимое выражение: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "Запрос из репозитория, который не клонирован"
 # context: choice: ask each time

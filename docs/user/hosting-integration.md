@@ -737,8 +737,10 @@ rate limit fails that profile only. Answers are reused for five minutes
 In Settings > Integrations, a connected code-host profile has a **Radar** block
 under its SSH key: one checkbox per list (*Requests waiting for my review*,
 *Every open request*, *Include drafts*, *Issues assigned to me*, the last one
-absent for hosts without issues), a *Namespaces* field (comma separated; empty
-means your own and every one you belong to) and the choice *Request of a
+absent for hosts without issues), a *Namespaces* field (one entry per line, a name matching
+that group or owner and everything below it, or a regular expression per line
+with *Regular expressions* ticked; empty means your own and every one you belong
+to) and the choice *Request of a
 repository that is not cloned*: *Ask*, *Clone it* or *Review through the API*.
 Everything is saved as you change it. Hosts with no account-wide query (Bitbucket
 Cloud) show one line saying so instead. The command palette reaches the block

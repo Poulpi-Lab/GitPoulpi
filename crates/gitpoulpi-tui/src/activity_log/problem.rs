@@ -105,6 +105,7 @@ pub(crate) fn report(source: Source, message: &str) {
 /// [`report`] that says which call failed: `label` ("Hosting request: list
 /// merge requests") and its main `args` ("host=github.com"), shown with the
 /// entry, in the application log line and in the error report.
+#[cfg_attr(not(feature = "hosting"), allow(dead_code))]
 pub(crate) fn report_as(source: Source, label: &str, args: &str, message: &str) {
     let context = gitpoulpi_core::OpContext::named(label, args);
     push_report(source, message, None, Some(context));

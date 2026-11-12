@@ -504,3 +504,27 @@ fn the_working_tree_file_is_launched_in_place_and_a_missing_one_is_reported() {
     assert!(asked.iter().all(|r| r.path == commit.path && !r.worktree));
     *AWAITING.lock().unwrap() = None;
 }
+
+/// A working-tree file that is still a Git LFS pointer (never downloaded) is
+/// refused with the "not downloaded" notice instead of opening the pointer
+/// text; the same name holding real content launches.
+#[test]
+fn an_undownloaded_lfs_pointer_in_the_working_tree_is_refused() {
+    let _t = turn();
+    let dir = tempfile::tempdir().unwrap();
+    let pointer = format!(
+        "version https://git-lfs.github.com/spec/v1\noid sha256:{}\nsize 12345\n",
+        "a".repeat(64)
+    );
+    std::fs::create_dir(dir.path().join("docs")).unwrap();
+    std::fs::write(dir.path().join("docs/big.fakebin"), &pointer).unwrap();
+    std::fs::write(dir.path().join("docs/real.fakebin"), b"not a pointer").unwrap();
+    let ask = |_: FileInsightRequest| {};
+    let apps = vec![app("X", "true ${file}", true)];
+    let said = run_with(&apps, 0, &subject("big.fakebin"), dir.path(), &ask);
+    assert_eq!(said, msg::lfs_missing("big.fakebin"));
+    let said = run_with(&apps, 0, &subject("real.fakebin"), dir.path(), &ask);
+    assert_ne!(said, msg::lfs_missing("real.fakebin"));
+    assert!(pointer_notice(&dir.path().join("docs/big.fakebin")).is_some());
+    assert!(pointer_notice(&dir.path().join("docs/real.fakebin")).is_none());
+}

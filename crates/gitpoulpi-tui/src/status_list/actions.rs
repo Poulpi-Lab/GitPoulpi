@@ -214,11 +214,14 @@ pub(crate) fn apply_file_context_action(
             msg::opened_editor(path.display()),
             crate::external_tools::open_in_editor(&tools.editor, &absolute),
         ),
-        FileContextAction::OpenInDefault => report(
-            last_message,
-            msg::opened_default(path.display()),
-            crate::external_tools::open_default(&absolute),
-        ),
+        FileContextAction::OpenInDefault => match crate::open_with::pointer_notice(&absolute) {
+            Some(notice) => *last_message = Some(notice),
+            None => report(
+                last_message,
+                msg::opened_default(path.display()),
+                crate::external_tools::open_default(&absolute),
+            ),
+        },
         // The image editors list on the working-tree file; the editor saves in
         // place and the status refresh picks the change up.
         FileContextAction::EditImageIn => crate::image_view::edit_in::open_from_menu(

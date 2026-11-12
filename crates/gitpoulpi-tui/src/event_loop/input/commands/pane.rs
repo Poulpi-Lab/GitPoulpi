@@ -592,11 +592,14 @@ pub(in crate::event_loop) fn apply_pane_action(
             msg::status_list::opened_editor(first.display()),
             crate::external_tools::open_in_editor(&tools.editor, &absolute),
         ),
-        A::OpenInDefault => report(
-            &mut *cx.last_message,
-            msg::status_list::opened_default(first.display()),
-            crate::external_tools::open_default(&absolute),
-        ),
+        A::OpenInDefault => match crate::open_with::pointer_notice(&absolute) {
+            Some(notice) => *cx.last_message = Some(notice),
+            None => report(
+                &mut *cx.last_message,
+                msg::status_list::opened_default(first.display()),
+                crate::external_tools::open_default(&absolute),
+            ),
+        },
         A::ShowInFolder => report(
             &mut *cx.last_message,
             msg::status_list::showing_explorer(first.display()),

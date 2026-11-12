@@ -322,7 +322,10 @@ pub(crate) fn render_popup(
 /// The file the current target stands for, and a notice when it is a copy.
 fn resolve(target: &Target, repo_root: &Path) -> Result<(PathBuf, Option<String>), String> {
     match target {
-        Target::File(path) => Ok((path.clone(), None)),
+        Target::File(path) => match crate::open_with::pointer_notice(path) {
+            Some(notice) => Err(notice),
+            None => Ok((path.clone(), None)),
+        },
         // The Diff view's pictures when it shows them, else the File View's.
         Target::Pane if super::split::active() => super::split::edit_file(repo_root),
         Target::Pane => super::pane::edit_file(repo_root),

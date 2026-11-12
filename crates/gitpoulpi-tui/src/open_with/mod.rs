@@ -385,6 +385,9 @@ fn run_with(
             if !file.exists() {
                 return msg::gone(&name);
             }
+            if is_lfs_pointer(&file) {
+                return msg::lfs_missing(&name);
+            }
             return report(launch(apps, index, &file));
         }
         Source::Index => (DiffContentSide::Index, Oid([0u8; 20])),
@@ -407,6 +410,35 @@ fn run_with(
     }
     ask(request);
     msg::reading(&name)
+}
+
+/// Whether `file` is a Git LFS pointer: a working-tree file whose content was
+/// never downloaded holds only that small text, and a program handed it would
+/// show the pointer. Reads at most one pointer's worth of bytes.
+pub(crate) fn is_lfs_pointer(file: &Path) -> bool {
+    use std::io::Read;
+    let Ok(f) = std::fs::File::open(file) else {
+        return false;
+    };
+    let mut head = Vec::new();
+    let limit = gitpoulpi_core::domain::LFS_POINTER_MAX_BYTES as u64 + 1;
+    if f.take(limit).read_to_end(&mut head).is_err() {
+        return false;
+    }
+    head.len() <= gitpoulpi_core::domain::LFS_POINTER_MAX_BYTES
+        && gitpoulpi_core::domain::LfsPointer::parse(&head).is_some()
+}
+
+/// The refusal for opening `file` in a program when it is an undownloaded LFS
+/// pointer; `None` when it is real content.
+pub(crate) fn pointer_notice(file: &Path) -> Option<String> {
+    is_lfs_pointer(file).then(|| {
+        msg::lfs_missing(
+            file.file_name()
+                .map(|n| n.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+        )
+    })
 }
 
 fn launch(apps: &[OsApp], index: usize, file: &Path) -> Result<String, String> {

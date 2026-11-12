@@ -459,7 +459,7 @@ gitpoulpi hosting pr-edit 12 --add-reviewer ann --add-label bug --milestone v1.0
 gitpoulpi hosting radar --what review --json
 ```
 
-すべてのコマンドは [CLI リファレンス](cli-reference.md#コマンド)を参照してください。トークンを引数として受け付けることはなく、MCP サーバーは `hosting login` を提供しないため、トークンがエージェントを通ることはありません。
+すべてのコマンドは [CLI リファレンス](cli-reference.md#コマンド)を参照してください。トークンを引数として受け付けることはなく（`hosting login` は、OS の資格情報ストアが保持するときは `stored: "os"` を、ストアが拒否してトークンがこのセッションの間だけメモリにあるときは `stored: "session"` と `store_error` を表示します）、MCP サーバーは `hosting login` を提供しないため、トークンがエージェントを通ることはありません。
 
 ## トラブルシューティング
 

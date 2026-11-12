@@ -2054,6 +2054,7 @@ err_host = "有効なホストドメインを入力してください（例：gi
 err_token = "先にパーソナルアクセストークンを貼り付けてください"
 check_ended = "接続の確認が予期せず終了しました"
 connected_to = "{host} に @{login} として接続しました"
+connected_session_only = "{message} - the token could not be saved in the OS credential store ({error}); it is kept for this session only"
 disconnected = "{id} を切断しました。プロファイルは残しています"
 token_not_removed = "トークンを削除できませんでした：{error}"
 removed = "{id} を削除しました"

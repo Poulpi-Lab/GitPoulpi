@@ -2045,7 +2045,7 @@ err_host = "Введите корректный домен хоста, напр�
 err_token = "Сначала вставьте персональный токен доступа"
 check_ended = "проверка подключения неожиданно завершилась"
 connected_to = "подключено к {host} как @{login}"
-connected_session_only = "{message} - the token could not be saved in the OS credential store ({error}); it is kept for this session only"
+connected_session_only = "{message} - токен не удалось сохранить в системном хранилище учётных данных ({error}); он хранится только на время этого сеанса"
 disconnected = "{id} отключён; профиль сохранён"
 token_not_removed = "токен не удалён: {error}"
 removed = "{id} удалён"
@@ -2478,7 +2478,7 @@ git_prefix_lfs_push_all = { git = "LFS: push всех объектов", local =
 git_prefix_lfs_prune = "LFS: очистить локальные объекты"
 composer_insert_issue_ref = "Вставить ссылку на задачу"
 palette_configure_shortcut = "Палитра: задать сочетание для выделенной команды"
-palette_arrange = "Всплывающее окно: переместить палитру или выбор или изменить их размер"
+palette_arrange = "Диалог: переместить передний диалог или изменить его размер"
 global_undo_history = "Открыть историю отмен"
 global_undo_offer = "Восстановить ветку туда, где её оставило заблокированное действие"
 global_radar = "Открыть Radar"
@@ -5571,9 +5571,9 @@ reading = "чтение {name} для открытия копии..."
 read_failed = "не удалось прочитать {name}: {why}"
 too_large = "{name} слишком велик, чтобы передать копию ({size})"
 # context: button on the Git LFS object card (Diff view, File View) beside the Open in list; opens the real file, never the pointer. Width budget: 26 cells
-default_button = "Open in default program"
+default_button = "В программе по умолчанию"
 # context: status message; {name} is an LFS file whose real content is not in the local LFS store, so there is nothing to open yet
-lfs_missing = "{name} is an LFS file whose content is not downloaded yet, so there is nothing to open"
+lfs_missing = "{name} - файл LFS, содержимое которого ещё не загружено, поэтому открывать пока нечего"
 
 # Settings > Integrations, the per-kind fields (integrations_page/*): Azure DevOps, Bitbucket, Jira, Trello.
 [integrations_page]

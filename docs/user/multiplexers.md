@@ -75,7 +75,7 @@ set -g set-clipboard on                # OSC 52
 set -g allow-passthrough on            # tmux 3.3a or later: pointer shapes, forced kitty pictures
 ```
 
-**tmux inside WSL.** Not measured (WSL was not installed for the pass). It is the Linux
+**tmux inside WSL.** Not measured. It is the Linux
 build, so expect the same as above with Windows Terminal as the outer terminal.
 
 ## zellij

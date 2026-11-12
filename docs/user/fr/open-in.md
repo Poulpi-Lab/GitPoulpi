@@ -182,6 +182,16 @@ Un fichier binaire (un PDF, un document Word, un tableur, une archive...) n'a pa
 
 Le fichier de l'arbre de travail est transmis tel quel à l'application. La version d'un commit (ou de l'index) est écrite dans une **copie temporaire en lecture seule**, avec un message dans la ligne d'état, pour qu'une application ne puisse pas modifier le dépôt. Aucun des deux ne modifie le dépôt : pas d'entrée de journal, l'Annulation n'est pas concernée.
 
+La liste du menu s'ouvre à côté du menu, au niveau de la ligne **Ouvrir avec...**, comme un sous-menu (à gauche quand il n'y a pas de place à droite), à la souris comme au clavier. La liste des éditeurs d'images (**Modifier dans...**) ouverte depuis un menu de fichier fait de même.
+
+### Fichiers Git LFS
+
+La carte d'objet Git LFS (voir [Git LFS](lfs.md)) porte les deux mêmes actions sous son texte : **Ouvrir par défaut** et **Ouvrir dans**, avec les mêmes touches (`o`, `Shift+O`) et les mêmes lignes de palette. Elles ouvrent le vrai fichier, jamais le pointeur : le fichier de l'arbre de travail tel quel, ou une copie temporaire en lecture seule de l'objet pris dans le stockage LFS local pour la version d'un commit ou de l'index. Un objet pas encore téléchargé n'a pas de boutons sur la carte, et la ligne d'état dit que le contenu n'est pas encore téléchargé. Le même refus s'applique à un fichier de l'arbre de travail qui ne contient encore que le pointeur : **Ouvrir par défaut**, **Ouvrir dans** et **Modifier dans**, depuis la carte ou n'importe quel menu de fichier, disent que le contenu n'est pas téléchargé au lieu d'ouvrir le texte du pointeur (téléchargez-le avec les lignes de récupération ou de checkout de la barre d'outils LFS, puis réessayez). L'ouverture est en lecture seule : pas d'entrée de journal, rien à annuler.
+
+### Navigateurs sous Windows
+
+Chrome et Edge enregistrent `--single-argument %1`, ce qui leur fait lire tout ce qui suit l'option comme une seule adresse, guillemets compris. GitPoulpi transmet le chemin à un tel programme tel quel et sans guillemets, comme le fait Windows : un fichier dont le chemin contient des espaces s'ouvre donc au lieu d'échouer avec `http://"c/...`. Tout autre programme reçoit le chemin comme un argument ordinaire.
+
 ## Anciennes clés
 
 Les anciennes clés `ui.terminal_launch` et `ui.terminal_launch_command` ne sont

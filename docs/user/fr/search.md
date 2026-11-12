@@ -32,7 +32,7 @@ commits arrivent dès qu'ils sont prêts.
 
 | Touche | Effet |
 |---|---|
-| `Up` / `Down`, `Ctrl+P` / `Ctrl+N`, `PageUp` / `PageDown`, `Home` / `End` | Parcourir les résultats (les titres de groupe sont sautés). |
+| `Up` / `Down`, `PageUp` / `PageDown`, `Home` / `End` | Parcourir les résultats (les titres de groupe sont sautés). |
 | `Enter` | Va au résultat : l'onglet du dépôt s'ouvre (ou est activé), puis le résultat est affiché. |
 | `Esc` | Ferme la recherche. |
 | `Alt+1` .. `Alt+8` | Active ou désactive un type (les pastilles au-dessus de la liste, dans leur ordre). `Alt+0` les active tous. |

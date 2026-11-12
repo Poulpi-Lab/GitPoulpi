@@ -545,6 +545,8 @@ kitty_keyboard = "Kitty 键盘协议"
 kitty_keyboard_help = "auto 会在启动时询问终端（约 100 毫秒内）是否支持 kitty 键盘协议，支持就使用：传统终端无法区分的组合键（Control 加标点、数字、Shift 或 Enter）将按其本来面目送达，而不是与控制码冲突。不应答的终端保持传统按键。off 绝不改动终端的键盘模式。需重启。"
 color_depth = "色深"
 color_depth_help = "auto 使用 24 位色，但在不支持的终端（Apple 终端、Linux 控制台，或未声明 COLORTERM 的 256 色终端）上，会把颜色映射到最接近的 256 色或 16 色。truecolor、256 和 16 强制指定色深。立即生效。"
+text_cursor = "Text cursor"
+text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
 graph_show_stashes = { git = "在图中显示 {$stash}", local = "在图中显示{$stash}" }
 graph_show_stashes_help = { git = "每个 {$stash} 在 Log 中按其日期占一行：在其所基于的 {$commit} 旁边的泳道上画一个小方框，并用虚线与之相连。选中它可查看改动内容；右键（或按 .）可 Pop、Apply 和 Drop。关闭则只在 {$STASHES} 区域中显示 {$stash}。单独显示（solo）时不绘制。", local = "每个{$stash}在 Log 中按其日期占一行：在其所基于的{$commit}旁边的泳道上画一个小方框，并用虚线与之相连。选中它可查看改动内容；右键（或按 .）可弹出、应用或丢弃。关闭则只在{$STASHES}区域中显示{$stash}。单独显示（solo）时不绘制。" }
 ref_connector = { git = "引用到 {$commit} 的连线", local = "引用到提交的连线" }

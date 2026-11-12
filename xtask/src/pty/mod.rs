@@ -597,6 +597,20 @@ impl Terminal {
         self.lock().parser.screen().mouse_protocol_mode() != vt100::MouseProtocolMode::None
     }
 
+    /// The terminal's cursor as the child left it: `(col, row, visible)`,
+    /// zero-based. Where the text caret shows when `ui.text_cursor = terminal`.
+    pub fn cursor(&self) -> (u16, u16, bool) {
+        let inner = self.lock();
+        let screen = inner.parser.screen();
+        let (row, col) = screen.cursor_position();
+        (col, row, !screen.hide_cursor())
+    }
+
+    /// True while the child has bracketed paste (`CSI ? 2004 h`) on.
+    pub fn bracketed_paste_enabled(&self) -> bool {
+        self.lock().parser.screen().bracketed_paste()
+    }
+
     /// True once the child has switched to the alternate screen.
     pub fn alternate_screen(&self) -> bool {
         self.lock().parser.screen().alternate_screen()

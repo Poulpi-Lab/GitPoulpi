@@ -338,6 +338,8 @@ impl WindowState {
             .map_err(exit_log::io_context("deleting the pictures"))?;
         crate::kitty_keyboard::disable(self.terminal.backend_mut());
         crate::cursor::reset_pointer(self.terminal.backend_mut());
+        crate::text_cursor::restore_style(self.terminal.backend_mut());
+        crate::term_modes::disable_bracketed_paste(self.terminal.backend_mut());
         disable_raw_mode().map_err(exit_log::io_context("leaving raw mode"))?;
         execute!(
             self.terminal.backend_mut(),

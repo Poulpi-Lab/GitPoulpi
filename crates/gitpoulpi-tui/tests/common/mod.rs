@@ -294,6 +294,10 @@ impl Launch {
             // The once-a-day update check asks a release server: only the
             // tests about it (`pty_update_check`) turn it back on.
             .env("GITPOULPI_UPDATES_MODE", "off")
+            // The drawn caret is what most tests read off the screen; the
+            // ones about the terminal's own cursor (`pty_text_cursor`)
+            // override it with `.env(..)`.
+            .env("GITPOULPI_UI_TEXT_CURSOR", "drawn")
             // `ui.theme = system` falls back to COLORFGBG when the terminal
             // is silent: pin it, so a developer's own light terminal does
             // not repaint every test's expectations.

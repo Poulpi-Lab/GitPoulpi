@@ -274,6 +274,8 @@ pub(crate) fn restore_terminal() {
     // First: the keyboard mode stack belongs to the alternate screen.
     crate::kitty_keyboard::disable(&mut out);
     crate::cursor::reset_pointer(&mut out);
+    crate::text_cursor::restore_style(&mut out);
+    crate::term_modes::disable_bracketed_paste(&mut out);
     let _ = crossterm::execute!(
         out,
         crossterm::event::DisableMouseCapture,

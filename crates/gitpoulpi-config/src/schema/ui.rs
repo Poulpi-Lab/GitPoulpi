@@ -74,6 +74,25 @@ pub enum KittyKeyboard {
 }
 
 config_enum! {
+/// Where the text caret of a focused text field is shown
+/// (`ui.text_cursor`).
+///
+/// `terminal` puts the terminal's own cursor at the caret (a bar, so the
+/// terminal's cursor settings and the input method's candidate window follow
+/// it) and hides it everywhere else; GitPoulpi draws no caret of its own.
+/// `drawn` is GitPoulpi's own caret glyph (a block or an underscore) with the
+/// terminal cursor hidden.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum TextCursor {
+    /// The terminal's real cursor at the caret.
+    #[default]
+    Terminal => "terminal",
+    /// A caret drawn with characters.
+    Drawn => "drawn",
+}
+}
+
+config_enum! {
 /// How many colors the terminal is drawn with (`ui.color_depth`).
 ///
 /// Themes are truecolor (`#rrggbb`). `auto` keeps truecolor except on
@@ -572,6 +591,9 @@ pub struct UiConfig {
     /// Live: how many colors to draw with. See [`ColorDepth`]; `auto` is
     /// the default.
     pub color_depth: ColorDepth,
+    /// Live: where the text caret is shown. See [`TextCursor`]; `terminal`
+    /// is the default.
+    pub text_cursor: TextCursor,
     /// Live: the Log draws each stash as a row of its own -
     /// a small box on a lane beside the commit it was made on, joined
     /// to it by a dashed line. **On by default.** Off, stashes are only in
@@ -1151,6 +1173,7 @@ impl Default for UiConfig {
             image_protocol: ImageProtocol::default(),
             kitty_keyboard: KittyKeyboard::default(),
             color_depth: ColorDepth::default(),
+            text_cursor: TextCursor::default(),
             graph_show_stashes: true,
             ref_connector: true,
             log_wip_counts_in_message: true,

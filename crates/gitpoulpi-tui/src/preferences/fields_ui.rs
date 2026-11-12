@@ -307,6 +307,18 @@ impl PreferencesState {
             )
             .with_help(msg::settings_ui::COLOR_DEPTH_HELP.get()),
             Field::global(
+                msg::settings_ui::TEXT_CURSOR.get(),
+                "ui.text_cursor",
+                Control::Choice {
+                    options: TextCursor::ALL.iter().map(|k| k.as_str().into()).collect(),
+                    index: TextCursor::ALL
+                        .iter()
+                        .position(|k| *k == ui.text_cursor)
+                        .unwrap_or(0),
+                },
+            )
+            .with_help(msg::settings_ui::TEXT_CURSOR_HELP.get()),
+            Field::global(
                 msg::settings_ui::KITTY_KEYBOARD.get(),
                 "ui.kitty_keyboard",
                 Control::Choice {

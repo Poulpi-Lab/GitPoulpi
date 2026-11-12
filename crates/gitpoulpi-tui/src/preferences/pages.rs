@@ -121,6 +121,7 @@ pub(super) const APPEARANCE: &[Row] = &[
     Key("ui.input_color"),
     Key("ui.input_color_custom"),
     Key("ui.color_depth"),
+    Key("ui.text_cursor"),
     Key("ui.graph_color_theme"),
     Key("ui.graph_lane_background"),
     Key("ui.graph_row_tint_strength"),

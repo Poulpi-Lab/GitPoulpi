@@ -267,7 +267,7 @@ impl Editor {
                     .fg(th().ui.text_selection_fg);
             }
             if abs == caret {
-                style = style.add_modifier(Modifier::REVERSED);
+                style = style.add_modifier(crate::text_cursor::caret_modifier());
             }
             let style = base(style);
             let visible = (col + w).min(right) - col.max(self.left);
@@ -293,7 +293,7 @@ impl Editor {
                     base(
                         Style::default()
                             .fg(th().editor.text)
-                            .add_modifier(Modifier::REVERSED),
+                            .add_modifier(crate::text_cursor::caret_modifier()),
                     ),
                 );
                 used += 1;

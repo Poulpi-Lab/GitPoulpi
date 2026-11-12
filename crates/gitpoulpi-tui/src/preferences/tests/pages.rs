@@ -117,6 +117,7 @@ fn each_setting_is_on_the_page_the_owner_chose() {
                 "ui.input_color",
                 "ui.input_color_custom",
                 "ui.color_depth",
+                "ui.text_cursor",
                 "ui.graph_color_theme",
                 "ui.graph_lane_background",
                 "ui.graph_row_tint_strength",

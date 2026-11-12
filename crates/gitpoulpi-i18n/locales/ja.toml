@@ -545,6 +545,8 @@ kitty_keyboard = "Kitty キーボードプロトコル"
 kitty_keyboard_help = "auto は、起動時に約 100 ms 以内でターミナルが kitty キーボードプロトコルに対応しているかを問い合わせ、対応していれば使用します。従来のターミナルでは区別できないキーの組み合わせ（Control と記号、数字、Shift、Enter）が、制御コードと衝突せずそのまま届きます。応答しないターミナルでは従来のキーのままです。off はターミナルのキーボードモードに一切触れません。再起動が必要です。"
 color_depth = "色深度"
 color_depth_help = "auto は 24 ビットカラーを使いますが、表示できないターミナル（Apple のターミナル、Linux コンソール、COLORTERM を持たない 256 色ターミナル）では、最も近い 256 色または 16 色に変換します。truecolor、256、16 は深度を強制します。すぐに反映されます。"
+text_cursor = "Text cursor"
+text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
 graph_show_stashes = { git = "グラフに{$stash}を表示", local = "グラフにスタッシュを表示" }
 graph_show_stashes_help = { git = "各{$stash}がログに日付順で専用の行を持ち、作成元の{$commit}の隣のレーンに小さな四角として描かれ、破線で結ばれます。選択すると変更内容が表示され、右クリック（または .）で Pop、Apply、Drop を選べます。オフの場合、{$stash}は{$STASHES}セクションにのみ表示されます。ソロ表示中は描画されません。", local = "各スタッシュがログに日付順で専用の行を持ち、作成元のコミットの隣のレーンに小さな四角として描かれ、破線で結ばれます。選択すると変更内容が表示され、右クリック（または .）で 復元、適用、破棄 を選べます。オフの場合、スタッシュは{$STASHES}セクションにのみ表示されます。ソロ表示中は描画されません。" }
 ref_connector = { git = "参照と{$commit}の接続線", local = "参照とコミットの接続線" }

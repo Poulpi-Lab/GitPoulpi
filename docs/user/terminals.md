@@ -47,8 +47,14 @@ GitPoulpi, so it draws characters (see [Multiplexers](#multiplexers)).
 - **Clipboard**: copy actions write `OSC 52`.
 - **Mouse pointer shape** (resize pointer over dividers, hand over clickable items):
   `OSC 22`, a bonus where it is implemented.
+- **Text caret**: with `ui.text_cursor = "terminal"` (the default) the terminal's own cursor is
+  put at the caret of the focused text field, as a blinking bar (`DECSCUSR`), and hidden
+  elsewhere; your own cursor style comes back on exit. `drawn` paints GitPoulpi's own caret instead.
 - **Focus events** are enabled (tooltips close when the window loses focus).
-  GitPoulpi does not request bracketed paste, OSC 8 hyperlinks or undercurl.
+  **Bracketed paste** is requested at start-up and released on every way out (Unix; the Windows
+  console input path has no paste brackets), so a multi-line paste arrives as one paste: its
+  line breaks never submit a field and its letters never fire shortcuts.
+  GitPoulpi does not request OSC 8 hyperlinks or undercurl.
   On the picture path only, each frame is wrapped in a synchronized update
   (mode 2026, ignored by terminals that do not know it) so a picture never flashes
   over a popup.

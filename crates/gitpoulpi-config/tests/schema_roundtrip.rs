@@ -81,6 +81,7 @@ fn every_enum_value_round_trips_through_toml_under_its_as_str_name() {
         GraphRenderer,
         KittyKeyboard,
         ColorDepth,
+        TextCursor,
         TabDirFollow,
         LauncherBuild,
         ImageProtocol,
@@ -117,6 +118,7 @@ fn the_all_lists_have_the_pinned_lengths() {
     assert_eq!(GraphRenderer::ALL.len(), 3);
     assert_eq!(KittyKeyboard::ALL.len(), 2);
     assert_eq!(ColorDepth::ALL.len(), 4);
+    assert_eq!(TextCursor::ALL.len(), 2);
     assert_eq!(TabDirFollow::ALL.len(), 2);
     assert_eq!(ImageProtocol::ALL.len(), 5);
     assert_eq!(GraphLaneBackground::ALL.len(), 2);

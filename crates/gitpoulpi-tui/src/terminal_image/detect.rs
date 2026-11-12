@@ -385,7 +385,10 @@ where
 /// A terminal that draws sixel and neither of the other two protocols,
 /// told from its own environment (preference is kitty, iTerm2, sixel):
 /// Windows Terminal (`WT_SESSION`; sixel since 1.22), foot (`TERM=foot*`),
-/// Konsole (`KONSOLE_VERSION`) and mlterm (`TERM=mlterm*`).
+/// Konsole (`KONSOLE_VERSION`), mlterm (`TERM=mlterm*`) and Tabby
+/// (`TERM_PROGRAM=Tabby`; 1.0.238 on Linux answers sixel in its device
+/// attributes and draws a transparent sixel picture, and shows neither kitty
+/// nor iTerm2 images).
 ///
 /// **Not DA1.** The textbook test is parameter 4 in the reply to `CSI c`,
 /// but the reply arrives on stdin and detection here never reads stdin
@@ -401,6 +404,7 @@ pub(super) fn sixel_only_terminal<F: Fn(&str) -> Option<String>>(get: &F) -> boo
         || set("KONSOLE_VERSION")
         || term.starts_with("foot")
         || term.starts_with("mlterm")
+        || get("TERM_PROGRAM").is_some_and(|p| p.eq_ignore_ascii_case("tabby"))
 }
 
 /// The iTerm2 flavour for this terminal: [`Protocol::Iterm2Alpha`] when it

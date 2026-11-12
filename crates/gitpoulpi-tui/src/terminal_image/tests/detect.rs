@@ -129,6 +129,7 @@ fn sixel_only_terminals_are_recognised_from_their_environment() {
         vec![("TERM", "foot-extra")],
         vec![("TERM", "xterm-256color"), ("KONSOLE_VERSION", "240800")],
         vec![("TERM", "mlterm")],
+        vec![("TERM", "xterm-256color"), ("TERM_PROGRAM", "Tabby")],
     ] {
         assert_eq!(
             protocol_for(RendererChoice::Auto, &env(&pairs)),

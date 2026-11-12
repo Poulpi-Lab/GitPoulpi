@@ -10888,7 +10888,7 @@ namespaces = "Namespaces"
 # context: hint in the empty namespaces field
 namespaces_hint = "e.g. acme, platform (empty: my own and every one I belong to)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Leave empty to match your own and every one you belong to."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
 namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
 # context: checkbox under the Namespaces field: read each line as a regular expression

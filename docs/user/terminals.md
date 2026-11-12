@@ -132,9 +132,8 @@ only; Windows Terminal, conhost and mintty are Windows only (mintty also under C
 MSYS2).
 
 **Not measured on macOS: kitty, Ghostty, WezTerm, Rio and Warp.** They need a GPU
-(Metal or OpenGL 3.3) and could not start in the macOS pass: each printed its own start-up
-error. Their Linux results are the reference for what the same program does; rerun them
-on a Mac with a GPU before relying on a macOS cell.
+(Metal or OpenGL 3.3). Their Linux results are the reference for what the same program does;
+rerun them on a Mac with a GPU before relying on a macOS cell.
 
 ### Pictures: which protocol GitPoulpi picks, and does it show
 
@@ -212,9 +211,9 @@ fallback. Every GitPoulpi copy test that used the system clipboard worked.
 | Terminal | Linux | Windows | macOS |
 |---|---|---|---|
 | **kitty** | **works** | n/a | not measured (needs a GPU) |
-| **Ghostty** | **works** (seen behind tmux, zellij, herdr); bare: not measured (a clipboard write needs keyboard focus, which the test setup did not give it) | n/a | not measured (needs a GPU) |
+| **Ghostty** | **works** (seen behind tmux, zellij, herdr); bare: not measured (a clipboard write needs keyboard focus, which the test did not give it) | n/a | not measured (needs a GPU) |
 | **WezTerm** | **works** | **works** | not measured (needs a GPU) |
-| **foot** | not measured (a write needs keyboard focus, which the test setup did not give it) | n/a | n/a |
+| **foot** | not measured (a write needs keyboard focus, which the test did not give it) | n/a | n/a |
 | **Rio** | not measured (same reason) | **works** | not measured (needs a GPU) |
 | **Alacritty** | not measured (same reason) | **does not work** (clipboard unchanged with the default config; not investigated) | **works** |
 | **Tabby** | **works** | **works** | **works** |

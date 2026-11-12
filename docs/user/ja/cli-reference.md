@@ -8,7 +8,7 @@
 
 | フラグ | 効果 |
 |---|---|
-| `--json` | 結果を JSON で出力します。エラーも JSON です：標準出力に `{"error": "..."}` が出力され、終了コードは 1 です。 失敗した git 操作には `"detail": {"operation", "command", "exit_code", "stderr"}` が加わります（実行された git コマンド（秘密情報はマスク済み）、その終了コード、stderr の末尾。内蔵の git ライブラリの場合は `"git2": {"class", "code", "message"}`）。MCP ツールも同じオブジェクトを返します。`--json` なしでは、これらの行は stderr に出力されます。 |
+| `--json` | 結果を JSON で出力します。エラーも JSON です：標準出力に `{"error": "..."}` が出力され、終了コードは 1 です。 失敗した git 操作には `"detail": {"operation", "command", "exit_code", "stderr"}` が加わります（実行された git コマンド（秘密情報はマスク済み）、その終了コード、stderr の末尾。内蔵の git ライブラリの場合は `"git2": {"class", "code", "message"}`）。さらに、デーモンが名前を付けられた失敗には `"context": {"operation", "label", "args", "repo", "frontend", "request", "job"}` が加わります（操作、人が呼ぶ名前、秘密情報をマスクした主な引数、リポジトリ、要求元、リクエストの ID、fetch または push ではそのジョブ番号）。MCP ツールも同じオブジェクトを返します。`--json` なしでは、これらの行は stderr に出力されます。 |
 | `--repo <path>` | 操作対象のリポジトリ（既定：git と同様に、カレントディレクトリを含むリポジトリ）。 |
 | `-s, --session <name>` | 通信先のセッション（デーモン）。既定：リポジトリのルートから決まるため、1 つのリポジトリ内で開いたものはすべて 1 つのデーモンを共有し、2 つのリポジトリには 2 つのデーモンが対応します。 |
 | `--backend git2\|system` | このコマンドが起動するデーモンのバックエンド（すでに動いているデーモンは自分のものを維持します）。 |
@@ -139,7 +139,7 @@
 | `fetch [--remote R \| --all] [--prune] [--prune-tags]` | 既定のリモート、1 つのリモート、またはすべてを fetch します。fetch のたびに、各リモートが持つ tag の記録（`tag list` の `remote`）も更新され、`--prune` がなくてもその記録は prune されます。`--prune-tags`（設定：tag の自動プルーン）は、リモートで削除された tag もローカルから削除します。対象はリモートにあった tag だけで、push していない tag は削除しません。削除した tag は `pruned_tags` に一覧されます（git 2.41 以降）。 |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | pull します。モードは常に git に明示的に渡されます。 |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | push します。単純な force はありません：`--force-with-lease` のみです。 |
-| `remote list`、`remote add <name> <url> [--push-url U]`、`remote remove <name>`、`remote rename <old> <new>` | リモート。 |
+| `remote list`、`remote add <name> <url> [--push-url U]`、`remote remove <name>`、`remote rename <old> <new>` | リモート。`remote list` は、背後にリモートがないリモート追跡の名前空間を `configured: false` として示します。それに `remote remove` を実行すると、そのブランチが削除されます（元に戻せます）。 |
 | `remote set-url <name> <url> [--push]`、`remote clear-push-url <name>` | fetch／push 用の URL。 |
 | `remote default [name]` | リポジトリの既定のリモートを表示、または選択します。 |
 | `clone <url> [--dest D] [--branch B] [--origin O] [--depth N] [--recurse-submodules] [--sparse DIR...] [--no-lfs]` | クローンします（`--no-lfs` を付けない限り LFS オブジェクトもダウンロードします）。`--sparse` はそのディレクトリとルート直下のファイルだけをチェックアウトします。履歴全体はそれでもダウンロードされます（[スパースチェックアウト](getting-started.md#スパースチェックアウト)を参照）。 |

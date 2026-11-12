@@ -60,6 +60,8 @@ GitPoulpi は、クリックできる commit グラフ、コマンドパレッ�
     「終了して cd」と、bash、zsh、fish、PowerShell 用の
     `gitpoulpi shell-init` ラッパー（`gp`）。
     GitPoulpi を最もよく表示できるターミナル：**[ターミナルの選び方](terminals.md)**。
+    tmux、zellij、screen、herdr、ターミナルのペインを通るもの：
+    **[マルチプレクサ](multiplexers.md)**。
 
 そのほか：**[ブランチワークフロー](branching-workflows.md)**。Git Flow、GitHub Flow、GitLab Flow、
 トランクベースのプリセット、または独自のベースブランチ、ブランチ名のパターン、トピックの種類

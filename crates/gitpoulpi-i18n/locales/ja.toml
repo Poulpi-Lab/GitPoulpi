@@ -538,15 +538,15 @@ tabs_position_help = "リポジトリのタブの位置：上（既定）、下�
 graph_color_theme = "グラフのカラーテーマ"
 graph_color_theme_help = "ログのグラフのレーン配色です。「テーマに従う」は選んだテーマのパレットを使い、それ以外の項目はそれを上書きするため、任意のテーマと任意のパレットを組み合わせられます。設定を閉じたときに反映されます。"
 graph_renderer = "グラフの描画方式"
-graph_renderer_help = "auto は、対応するターミナルではグラフを実際の画像として、それ以外では文字で描画します - ターミナルの環境を引き継ぐが画像を通さない tmux や zellij の中、および kitty_graphics 設定がオンでない herdr の中も文字になります。image は画像を強制し、text は強制的にオフにします。再起動が必要です。"
+graph_renderer_help = "auto は、対応するターミナルではグラフを実際の画像として、それ以外では文字で描画します - ターミナルの環境を引き継ぐが画像を通さない zellij や screen の中、背後のターミナルが sixel に対応していない tmux の中、および kitty_graphics 設定がオンでない herdr の中も文字になります。image は画像を強制し、text は強制的にオフにします。再起動が必要です。"
 image_protocol = "画像プロトコル"
-image_protocol_help = "画像（グラフ画像、作成者のアバター）をターミナルへ送る方法です。auto：kitty、Ghostty、および設定で kitty_graphics = true にした herdr では Kitty グラフィックスプロトコル、WezTerm、iTerm2、mintty では iTerm2 インライン画像、Windows Terminal、foot、Konsole、mlterm では sixel 画像（作成者のアバターのみ。グラフは文字のまま）、それ以外では文字。kitty、iterm2、sixel でそのプロトコルを強制します（設定が別の場所にある herdr には kitty、sixel を描画できるのに認識されないターミナルには sixel）。none で画像をオフにします。再起動が必要です。"
+image_protocol_help = "画像（グラフ画像、作成者のアバター）をターミナルへ送る方法です。auto：kitty、Ghostty、および設定で kitty_graphics = true にした herdr では Kitty グラフィックスプロトコル（iTerm2 3.7.7 以降でも Kitty プロトコル）、WezTerm、Rio、mintty、古い iTerm2 では iTerm2 インライン画像、Windows Terminal、foot、Tabby、Konsole、mlterm、および背後のターミナルが sixel に対応している tmux では sixel 画像（グラフ列とアバター）、それ以外では文字。kitty、iterm2、sixel でそのプロトコルを強制します（設定が別の場所にある herdr には kitty、sixel を描画できるのに認識されないターミナルには sixel）。none で画像をオフにします。再起動が必要です。"
 kitty_keyboard = "Kitty キーボードプロトコル"
 kitty_keyboard_help = "auto は、起動時に約 100 ms 以内でターミナルが kitty キーボードプロトコルに対応しているかを問い合わせ、対応していれば使用します。従来のターミナルでは区別できないキーの組み合わせ（Control と記号、数字、Shift、Enter）が、制御コードと衝突せずそのまま届きます。応答しないターミナルでは従来のキーのままです。off はターミナルのキーボードモードに一切触れません。再起動が必要です。"
 color_depth = "色深度"
 color_depth_help = "auto は 24 ビットカラーを使いますが、表示できないターミナル（Apple のターミナル、Linux コンソール、COLORTERM を持たない 256 色ターミナル）では、最も近い 256 色または 16 色に変換します。truecolor、256、16 は深度を強制します。すぐに反映されます。"
-text_cursor = "Text cursor"
-text_cursor_help = "terminal puts the terminal's own cursor at the caret of the focused text field, as a bar: your terminal's cursor settings apply and an input method's candidate window opens at the caret. drawn paints GitPoulpi's own caret (a block or an underscore) and keeps the terminal cursor hidden. Applies at once."
+text_cursor = "テキストカーソル"
+text_cursor_help = "terminal は、フォーカス中のテキスト欄のキャレット位置にターミナル自身のカーソルをバー形状で置きます。ターミナルのカーソル設定が反映され、入力メソッドの候補ウィンドウもキャレットの位置に開きます。drawn は GitPoulpi 独自のキャレット（ブロックまたはアンダースコア）を描画し、ターミナルのカーソルは非表示のままにします。すぐに反映されます。"
 graph_show_stashes = { git = "グラフに{$stash}を表示", local = "グラフにスタッシュを表示" }
 graph_show_stashes_help = { git = "各{$stash}がログに日付順で専用の行を持ち、作成元の{$commit}の隣のレーンに小さな四角として描かれ、破線で結ばれます。選択すると変更内容が表示され、右クリック（または .）で Pop、Apply、Drop を選べます。オフの場合、{$stash}は{$STASHES}セクションにのみ表示されます。ソロ表示中は描画されません。", local = "各スタッシュがログに日付順で専用の行を持ち、作成元のコミットの隣のレーンに小さな四角として描かれ、破線で結ばれます。選択すると変更内容が表示され、右クリック（または .）で 復元、適用、破棄 を選べます。オフの場合、スタッシュは{$STASHES}セクションにのみ表示されます。ソロ表示中は描画されません。" }
 ref_connector = { git = "参照と{$commit}の接続線", local = "参照とコミットの接続線" }
@@ -3990,8 +3990,8 @@ mouse_gestures_in_2 = { git = "ペインの区切りやログの列の境界で�
 mouse_gestures_in_3 = { git = "{$diff}、ファイルビュー、Blame、ファイル履歴のテキストをドラッグすると選択され、ダブルクリックで単語を選択します。y または Ctrl+C でコピー（ファイルのテキストのみで、余白は含みません）。選択した単語の他の出現箇所は、{$diff}とエディターで色が付き、ルーラーにも印が付きます", local = "差分、ファイルビュー、Blame、ファイル履歴のテキストをドラッグすると選択され、ダブルクリックで単語を選択します。y または Ctrl+C でコピー（ファイルのテキストのみで、余白は含みません）。選択した単語の他の出現箇所は、差分とエディターで色が付き、ルーラーにも印が付きます" }
 mouse_gestures_in_4 = { git = "フォーカス中/ホバー中の一覧や{$diff}をスクロールします。Shift+ホイール（ターミナルが報告する 2 通りの表記のどちらも）は、折り返しがオフの間、{$diff}/ファイルビュー/Blame を代わりに*横*にスクロールします", local = "フォーカス中/ホバー中の一覧や差分をスクロールします。Shift+ホイール（ターミナルが報告する 2 通りの表記のどちらも）は、折り返しがオフの間、差分/ファイルビュー/Blame を代わりに*横*にスクロールします" }
 mouse_gestures_in_5 = "コンテキストメニューが存在する場所で開きます（各ペインのセクションを参照）。キーボードでの操作は常に {{*global.context_menu}} です"
-mouse_gestures_in_6 = "すべての「コピー...」操作は、OSC 52 を通じて*ターミナル*にクリップボードを要求します - TUI は直接クリップボードにアクセスできません。このシーケンスを無視するターミナルでは、コピーされません"
-mouse_gestures_in_7 = "サイズ変更/ポインター/開いた手のヒントは、対応するターミナル（kitty、foot、xterm。ほかは不揃い）に OSC 22 で送られます - ドラッグできる区切りや列の境界は、アプリ自身のバッファ内でも強調されるため、ターミナル側の協力はまったく不要です"
+mouse_gestures_in_6 = "すべての「コピー...」操作は、テキストをシステムのクリップボードに入れ、ターミナルが対応していると分かっている場合は OSC 52 でも送ります。SSH 経由やディスプレイがない環境では OSC 52 のみが送られ、このシーケンスを無視するターミナルではコピーされません"
+mouse_gestures_in_7 = "サイズ変更/ポインター/開いた手のヒントは、対応するターミナル（kitty、Ghostty、foot、mintty。Rio、Alacritty、Windows Terminal、iTerm2 では非対応）に OSC 22 で送られます - ドラッグできる区切りや列の境界は、アプリ自身のバッファ内でも強調されるため、ターミナル側の協力はまったく不要です"
 merge_conflict_editor_31 = "現在の競合の選択を解除（未解決に戻す）/ ファイル全体を元の競合状態にリセット（出力に入力済みなら先に確認。元に戻す操作で戻せます）。ツールバーにリセットボタンがあります"
 merge_conflict_editor_32 = "隣のペイン（A、ベース、B、出力）へ移動し、同じ競合に着地します"
 merge_conflict_editor_33 = "同じ競合のままペインへ直接移動。ナビゲーションプレフィックスのあと 1 / 2 / 3 でも可能です"
@@ -5959,7 +5959,7 @@ show_label = "表示："
 show_all = "すべて"
 show_none = "なし"
 why_level_off = "非表示：レベルが{level}に設定されています。これらの行を見るにはレベルを上げてください。"
-hint_levels = "1-5：レベルの表示切り替え  a：すべて  n：なし"
+hint_levels = "1-5：レベルの表示切り替え  a：すべて  n：なし  Enter：その行の操作  [ ]：失敗"
 palette_show_error = "アクティビティログ: 「エラー」レベルの表示/非表示を切り替え"
 palette_show_warn = "アクティビティログ: 「警告」レベルの表示/非表示を切り替え"
 palette_show_info = "アクティビティログ: 「情報」レベルの表示/非表示を切り替え"
@@ -6002,25 +6002,25 @@ palette_scroll_right = "アクティビティログ: 右へスクロール"
 # context: help line: sideways scrolling of the Activity Log, keys are shown before it
 help_scroll = "アクティビティログ: 長い行を横にスクロール（Shift + ホイール、または横スクロールバーでも可）"
 # context: title of an Activity Log entry for a failed operation that has no title of its own; {operation} is what the operation is called, such as "Remove remote"
-failed_title = "{operation} failed"
+failed_title = "{operation}に失敗しました"
 # context: detail line of an Activity Log entry: the operation that failed with its main arguments, such as "Remove remote (remote=origin)"; keep the operation text as it is
-ctx_operation = "Operation: {what}"
+ctx_operation = "操作: {what}"
 # context: detail line of an Activity Log entry: the repository the operation ran in; {repository} is its path
-ctx_repository = "Repository: {repository}"
+ctx_repository = "リポジトリ: {repository}"
 # context: detail line of an Activity Log entry: which program asked for the operation (TUI, CLI or MCP); {frontend} is that name
-ctx_requested_by = "Requested by: {frontend}"
+ctx_requested_by = "要求元: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
-ctx_id = "Operation id: {id}"
+ctx_id = "操作 ID: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "アクティビティログ: この行の操作を表示"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "アクティビティログ: 次の失敗した操作"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "アクティビティログ: 前の失敗した操作"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
-app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
+app_select_first = "先に行を選択してください。クリックするか、] で次の失敗した操作へ移動します。"
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation
-app_no_operation = "This line is not tied to an operation."
+app_no_operation = "この行は操作に紐づいていません。"
 
 [git_error]
 summary_host_key = "リモートの SSH ホスト鍵がまだ登録されていません。"
@@ -8755,13 +8755,13 @@ namespaces = "名前空間"
 # context: hint in the empty namespaces field
 namespaces_hint = "例: acme, platform（空: 自分と所属するすべて）"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
-namespaces_help = "One entry per line. A name matches that group or owner and everything below it (ptm matches ptm/produits/x, not ptmx/y). Empty: my own and every one I belong to."
+namespaces_help = "1 行に 1 項目。名前は、そのグループまたは所有者と、その配下すべてに一致します（ptm は ptm/produits/x に一致し、ptmx/y には一致しません）。空欄にすると、自分自身と所属するすべてに一致します。"
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is
-namespaces_regex_help = "Each line is a regular expression matched against the full repository path, as you write it (example: ^ptm/(produits|infra)/)."
+namespaces_regex_help = "各行は、リポジトリのパス全体（表示どおりの形）に対して照合される正規表現です（例: ^ptm/(produits|infra)/）。"
 # context: checkbox under the Namespaces field: read each line as a regular expression
-regex = "Regular expressions"
+regex = "正規表現"
 # context: error line under the Namespaces field when a line is not a valid regular expression; {error} is the line and the reason
-regex_invalid = "Invalid expression: {error}"
+regex_invalid = "無効な式です: {error}"
 # context: combobox label: what to do when a Radar request belongs to a repository that is not cloned
 review_mode = "クローンしていないリポジトリのリクエスト"
 # context: choice: ask each time

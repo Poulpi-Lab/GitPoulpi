@@ -81,7 +81,7 @@ author_email = "jane@work.example"
 | キー | 既定値 | 値と効果 |
 |---|---|---|
 | `ui.graph_renderer` | `"auto"` | `auto`（ターミナルが描画できる場合は画像、そうでなければ文字）、`image`、`text`。**再起動が必要。** |
-| `ui.image_protocol` | `"auto"` | 画像（グラフ、アバター）をターミナルへ送る方法：`auto`、`kitty`、`iterm2`、`sixel`、`none`。`auto` は、kitty、Ghostty、および `kitty_graphics = true` の herdr では Kitty プロトコル、WezTerm、iTerm2、Rio、mintty では iTerm2、Windows Terminal、foot、Konsole、mlterm では sixel（アバターのみ）、tmux、zellij、screen と未知のターミナルでは none になります。**再起動が必要。** |
+| `ui.image_protocol` | `"auto"` | 画像（グラフ、アバター）をターミナルへ送る方法：`auto`、`kitty`、`iterm2`、`sixel`、`none`。`auto` は、kitty、Ghostty、iTerm2 3.7.7 以降、および `kitty_graphics = true` の herdr では Kitty プロトコル、WezTerm と Rio（透明を合成）、古い iTerm2 と mintty（不透明な背景）では iTerm2 プロトコル、Windows Terminal、foot、Tabby、Konsole、mlterm、背後のターミナルが sixel に対応している tmux、および起動時の応答が sixel を示すすべてのターミナル（`-ti vt340` で起動した xterm、画像をオンにした VS Code のターミナル）では sixel（グラフ列とアバター）、zellij、screen と未知のターミナルでは文字になります。tmux で kitty の画像を使うには、ここを `kitty` にして `allow-passthrough on` も必要です（[マルチプレクサ](multiplexers.md)）。ターミナルの疑似コンソールが画像を落としたり位置をずらしたりする環境（Windows 上の WezTerm 20240203、Rio、mintty）では `ui.graph_renderer = "text"` を使ってください（[ターミナルの選び方](terminals.md#windows)）。**再起動が必要。** |
 | `ui.theme` | `"system"` | 配色テーマです。組み込みのスラッグ（`gitpoulpi theme list` で一覧表示）、`<config>/themes/` 内のファイルのスラッグ、または `system`（起動時に検出したターミナルの明るい／暗い背景に従います。古い値 `default` も同じ意味です）。`config set` は未知の名前を拒否します。[テーマ](themes.md)を参照してください。 |
 | `ui.graph_color_theme` | `"theme"` | レーンのパレット：`theme`（テーマに従う）または任意のレーンパレット名：`gitpoulpi`、`light`、`material`、`serie`、および他のテーマのパレット。 |
 | `ui.graph_lane_background` | `"off"` | `off` または `row_tint`（グラフの背後にレーン色の淡い帯と、その端のバーを描きます）。**アプリ: グラフの行の色付けを切り替え**（`Ctrl+N Shift+T`）で切り替わり、**アプリ: グラフのカラーテーマを変更...**（`Ctrl+N Shift+Y`）で `ui.graph_color_theme` を選べます。 |
@@ -110,7 +110,8 @@ author_email = "jane@work.example"
 | `ui.git_terms_english` | `false` | ja、ko、zh-CN のみ：git 用語（stage、unstage、staged、unstaged...）を音訳ではなく英語で表示します。`ui.translate_git_terms` が `true` の間は効果がありません。**即時反映。** |
 | `ui.mouse_enabled` | `true` | `false` にすると、マウス（とテキスト選択）をターミナルに任せます。**再起動が必要。** |
 | `ui.mouse_scroll_lines` | `3` | ホイール 1 ノッチあたりのログの行数（1〜20）。**再起動が必要。** |
-| `ui.kitty_keyboard` | `"auto"` | `auto` はターミナルに kitty キーボードプロトコルを要求します（`Ctrl+,`、`Ctrl+Enter`、`Ctrl+Shift+N` が届くようになります）。`off` は要求しません。**再起動が必要。** |
+| `ui.kitty_keyboard` | `"auto"` | `auto` はターミナルに kitty キーボードプロトコルを要求します（`Ctrl+,`、`Ctrl+Enter`、`Ctrl+Shift+N` が届くようになります。Unix のみ。tmux は応答しません：[マルチプレクサ](multiplexers.md#tmux)を参照）。`off` は要求しません。**再起動が必要。** |
+| `ui.text_cursor` | `"terminal"` | テキスト欄のキャレットをどこに表示するか：`terminal` はターミナル自身のカーソルをそこに置きます（点滅するバーなので、ターミナルのカーソル設定と入力メソッドの候補ウィンドウが追従します。どの欄にもキーボードがないときは非表示になり、終了時にあなたのカーソル形状に戻ります）。`drawn` は GitPoulpi 独自のキャレットの字形を描画し、ターミナルのカーソルは非表示のままにします。即時反映。 |
 | `ui.logo_color` | `""` | 「GitPoulpi について」ウィンドウのロゴの配色で、スラッグ（`violet`、`orange`、`teal`、`ocean`、`magenta`、`candy`、`coral`、`green`、`cyan`、`indigo`、`lavender`、`sun`、`mint`、`slate`）で指定します。空または未知の値はビルドの既定（`lavender`）になります。ロゴをクリックするか、「GitPoulpi について」ウィンドウで色を選ぶと書き込まれます。 |
 
 **アバター**（既定ではオフです。オンにすると、作者のメールアドレスの SHA-256 ハッシュが Gravatar に送られ、接続済みの GitHub / GitLab アカウントにも問い合わせます）
@@ -163,7 +164,7 @@ diff の中で切り替えたトグルはここにすぐ保存され、その後
 | `ui.launcher_build` | `"current"` | 開発モードのときだけ有効です（`general.dev_mode` を参照。そのときだけ設定 > ランチャーに表示され、それ以外は無視されます）。`"current"`：ショートカットとコマンドエイリアスは、それらを作成したビルドを起動します。`"newest"`：ソースの `target/dist` と `target/release` のうち最も新しくビルドされたものを、クリックのたびに判定して起動します。どちらのビルドを起動しても、ショートカットは書き換えられません。 |
 | `ui.command_alias` | `""` | ターミナルから GitPoulpi を起動するコマンドの名前です（例：`gp`。設定 > ランチャー、`gitpoulpi alias create`）。空：なし。英数字と `-`、`_`、`.` のみ。**作成：コマンドのエイリアス**ボタンが使う名前にすぎず、作成するまで何も存在しません。 |
 | `ui.command_alias_add` | `""` | `gitpoulpi --add` を実行する 2つ目のコマンドの名前です（例：`gpa`）。すでに起動中の GitPoulpi に、現在のフォルダーを新しいタブとして開きます（設定 > ランチャー、`gitpoulpi alias create gpa --add`）。空：なし。名前の規則は同じで、**作成**ボタンで `ui.command_alias` と一緒に作られます。 |
-| `ui.relaunch_in_terminal` | `true` | Windows のみ：exe がダブルクリックで専用のコンソールに起動された場合、GitPoulpi は `ui.launch_terminal` で開き直して終了します。オフの場合はそのコンソールにとどまります。 |
+| `ui.relaunch_in_terminal` | `true` | Windows のみ：exe がダブルクリックで専用のコンソールに起動された場合、GitPoulpi は `ui.launch_terminal` で開き直して終了します。exe を直接実行するターミナル（`wezterm-gui start -- gitpoulpi.exe`、`wt.exe gitpoulpi.exe`、Rio、Tabby、Alacritty の `-e`）も専用のコンソールですが、従来のコンソールウィンドウではないため、開き直されることはありません。オフの場合はそのコンソールにとどまります。 |
 | `ui.reuse_window` | `true` | GitPoulpi のショートカット（`gitpoulpi launch`）をクリックすると、新しく起動せず、すでに開いている GitPoulpi のウィンドウを表示します。 オフ：クリックのたびに新しいウィンドウを起動します。 |
 
 **`ui.open_in` のコマンド**は、まず引数に分割され（空白、`'...'`、`"..."`）、その後で各引数の中で変数が置き換えられるため、空白を含むフォルダーも 1 つの引数のままです。コマンド自身がシェルを起動しない限り（`sh -c '... "$GITPOULPI_CWD"'`）、シェルは介しません。変数：`${cwd}`（タブのフォルダー）、`${repo}`（リポジトリのルート）、`${name}`（フォルダー名）、`${branch}`（detached のときは空）、`${web_url}`（`origin` リモートが GitHub または GitLab のプロジェクトであればその Web ページ、そうでなければ空。これを使うエントリは、空の場合は実行を拒否します）、`${env:NAME}`（未設定なら空）。古い `{repo}` は今も `${cwd}` を意味します。それ以外の `${...}` はその名前を挙げたエラーになります。例：
@@ -283,7 +284,8 @@ review_requests = true    # requests waiting for my review, every repository
 open_requests = false     # every open request of my namespaces
 include_drafts = false    # keep draft requests in these lists
 assigned_issues = true    # open issues assigned to me, every repository
-namespaces = ["acme"]     # orgs / groups to search for open requests
+namespaces = ["acme", "ptm/produits"]  # one entry per line in Settings; empty = no limit
+namespaces_regex = false  # true: each entry is a regular expression over the full repository path
 review_mode = "ask"       # ask | clone | api
 ```
 
@@ -293,7 +295,8 @@ review_mode = "ask"       # ask | clone | api
 | `open_requests` | `false` | 自分の名前空間と、所属する各組織／グループ（または `namespaces`）の未完了のリクエストすべて。「トークンから見えるすべて」ではありません |
 | `include_drafts` | `false` | これをオンにしない限り、ドラフトのリクエストはこれらの一覧から除外されます |
 | `assigned_issues` | `false` | 自分に割り当てられた未完了の Issue（すべてのリポジトリ） |
-| `namespaces` | `[]` | `open_requests` で検索する組織／グループ。空なら自分の名前空間と所属するすべて（GitHub：最大 12 件を検索、GitLab：10 グループと自分が所有する 10 プロジェクト、Gitea、Forgejo、Gerrit：10 件。Azure DevOps はプロジェクト名、Bitbucket Data Center はプロジェクトキー、Gerrit はプロジェクトパスのプレフィックスを指定） |
+| `namespaces` | `[]` | 各一覧（レビュー依頼、割り当てられた Issue、未完了のリクエスト）に残すリポジトリ。空なら制限なしで、`open_requests` は自分の名前空間と所属するすべてを検索します（GitHub：最大 12 件を検索、GitLab：10 グループと自分が所有する 10 プロジェクト、Gitea、Forgejo、Gerrit：10 件）。項目は、リポジトリの完全なパス（`group/sub/project`、Azure DevOps は `Project/repo`、Bitbucket Data Center は `KEY/repo`）と等しいか、`/` で終わるパスのプレフィックスのときに一致します：`ptm` は `ptm/produits/x` を残し、`ptmx/y` は残しません。大文字小文字は区別しません。設定では 1 行に 1 項目で表示されます。古いファイルではカンマ区切りの 1 つの文字列（`"ptm, formation"`）のことがあり、これも読み込めて、リストとして保存し直されます |
+| `namespaces_regex` | `false` | 各 `namespaces` の項目を、リポジトリの完全なパスに対して（表示どおりの形で）照合される正規表現として読みます（`^ptm/(produits\|infra)/` は先頭に固定され、`^` や `$` がなければパスのどこにでも一致し、大文字小文字を無視するには `(?i)` を付けます）。この場合 `open_requests` は所属先を検索し、正規表現が行を絞り込みます。無効な式は設定のフィールドの下に表示されて保存されません。手で編集したファイルでは、一覧が空になって注記が出ます |
 | `review_mode` | `"ask"` | リポジトリをクローンしていないリクエストをレビューするときの動作：`ask`、`clone`（クローンしてからレビュー）、`api`（ホストの API 経由でレビュー） |
 
 回答はプロファイルごとに、`config.toml` の隣の `radar-account.json` に 5 分間キャッシュされます。このファイルはキャッシュなので、

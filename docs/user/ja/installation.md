@@ -17,10 +17,10 @@ GitPoulpi には 3 つの実行ファイルがあります。
 - `PATH` 上の**システムの `git`**。GitPoulpi はほとんどの操作に libgit2 を使い、
   残りにはシステムの `git` を使います。
   バージョン **2.34 以降**が必要です。macOS では Apple の Command Line Tools に含まれる `git` でも Homebrew の `git` でも動作します。
-- マウスに対応した**ターミナル**。kitty、Ghostty、WezTerm、iTerm2、sixel 対応の Windows Terminal と foot は
+- マウスに対応した**ターミナル**。kitty、Ghostty、WezTerm、Rio、iTerm2、sixel 対応の Windows Terminal、foot、Tabby は
   commit グラフを画像として描画します。その他のターミナル（Windows コンソール、
-  tmux、ほかのほとんど）では文字のグラフが表示されます。
-  [ターミナルの選び方](terminals.md)を参照してください。
+  zellij、screen、ほかのほとんど）では文字のグラフが表示されます。
+  [ターミナルの選び方](terminals.md)と[マルチプレクサ](multiplexers.md)を参照してください。
 - ツールバーとサイドバーのアイコン用に、**Nerd Font** または絵文字を含むフォント。
 - 任意：Git LFS リポジトリ用の **`git-lfs`** 3.0 以降。ない場合、
   LFS ファイルは小さなポインターファイルとして表示され、GitPoulpi がその理由を伝えます。

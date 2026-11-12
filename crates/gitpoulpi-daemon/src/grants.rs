@@ -283,6 +283,9 @@ pub(crate) struct Outcome {
     pub token_refused: bool,
     /// A grant is live and the helper never asked about it.
     pub unasked: bool,
+    /// Why the grant's token command gave no token (its failure, as the
+    /// person reads it), if it failed.
+    pub command_failure: Option<String>,
 }
 
 /// [`Outcome`] of the newest live grant of the repository at `root`.
@@ -299,6 +302,9 @@ pub(crate) fn take_outcome(root: &Path) -> Outcome {
                 accepted: entry.accepted.then(|| entry.credential.identity.clone()),
                 token_refused: entry.token_refused,
                 unasked: !entry.asked,
+                command_failure: entry.command_failure.take().map(|(exit, stderr_tail)| {
+                    gitpoulpi_core::Error::TokenCommandFailed { exit, stderr_tail }.to_string()
+                }),
             };
             entry.accepted = false;
             entry.token_refused = false;
@@ -528,7 +534,8 @@ mod tests {
             Outcome {
                 accepted: Some("account work".into()),
                 token_refused: false,
-                unasked: false
+                unasked: false,
+                ..Outcome::default()
             }
         );
         // Nothing asked since: the helper has not reached the daemon.
@@ -547,7 +554,8 @@ mod tests {
             Outcome {
                 accepted: None,
                 token_refused: true,
-                unasked: false
+                unasked: false,
+                ..Outcome::default()
             }
         );
     }

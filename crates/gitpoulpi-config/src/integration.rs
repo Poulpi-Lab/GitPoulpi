@@ -553,10 +553,68 @@ pub struct IntegrationRadar {
     /// Orgs / groups / workspaces / Azure projects / Gerrit project
     /// prefixes; empty means the account's own namespace plus every one it
     /// is a member of.
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    ///
+    /// One entry per line of the Settings field. An old file may hold one
+    /// comma-separated string instead of a list; both load.
+    #[serde(
+        default,
+        deserialize_with = "de_namespaces",
+        skip_serializing_if = "Vec::is_empty"
+    )]
     pub namespaces: Vec<String>,
+    /// Read each `namespaces` entry as a regular expression matched against
+    /// the full repository path, instead of a path prefix.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub namespaces_regex: bool,
     #[serde(default)]
     pub review_mode: RemoteReviewMode,
+}
+
+fn is_false(v: &bool) -> bool {
+    !*v
+}
+
+/// Namespace entries: trimmed, empty ones dropped, repeats dropped.
+pub fn clean_namespaces<I, S>(entries: I) -> Vec<String>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<str>,
+{
+    let mut out: Vec<String> = Vec::new();
+    for entry in entries {
+        let entry = entry.as_ref().trim();
+        if !entry.is_empty() && !out.iter().any(|o| o == entry) {
+            out.push(entry.to_string());
+        }
+    }
+    out
+}
+
+/// The text of the Namespaces field: one entry per line. In plain mode the
+/// old single-line form (`acme, tools`) is still read, commas separate
+/// entries; in regex mode a comma belongs to the expression.
+pub fn parse_namespace_text(text: &str, regex: bool) -> Vec<String> {
+    if regex {
+        clean_namespaces(text.lines())
+    } else {
+        clean_namespaces(text.split(['\n', ',']))
+    }
+}
+
+fn de_namespaces<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum Form {
+        One(String),
+        Many(Vec<String>),
+    }
+    Ok(match Form::deserialize(deserializer)? {
+        Form::One(text) => parse_namespace_text(&text, false),
+        Form::Many(list) => clean_namespaces(list),
+    })
 }
 
 impl IntegrationRadar {
@@ -1263,6 +1321,47 @@ token_ref = "integration:corp"
             Some(RemoteReviewMode::Api)
         );
         assert_eq!(RemoteReviewMode::parse("nope"), None);
+    }
+
+    #[test]
+    fn namespaces_read_the_old_comma_string_and_save_as_a_list() {
+        let head = "id = \"x\"\nkind = \"github\"\nurl = \"u\"\ntoken_ref = \"t\"\n[radar]\n";
+        let load = |body: &str| {
+            toml::from_str::<Integration>(&format!("{head}{body}"))
+                .unwrap()
+                .radar_options()
+        };
+        assert_eq!(
+            load("namespaces = \"ptm, formation\"\n").namespaces,
+            ["ptm", "formation"]
+        );
+        assert_eq!(load("namespaces = \"ptm\"\n").namespaces, ["ptm"]);
+        assert_eq!(
+            load("namespaces = [\"a\", \" b \", \"a\", \"\"]\n").namespaces,
+            ["a", "b"]
+        );
+        assert!(!load("namespaces = [\"a\"]\n").namespaces_regex);
+        assert!(load("namespaces = [\"a\"]\nnamespaces_regex = true\n").namespaces_regex);
+        let mut i = Integration::new("gh", IntegrationKind::Github, "https://github.com");
+        i.radar = Some(load("namespaces = \"ptm, formation\"\n"));
+        let raw = toml::to_string(&i).unwrap();
+        assert!(
+            raw.contains("namespaces = [\"ptm\", \"formation\"]"),
+            "{raw}"
+        );
+        assert!(!raw.contains("namespaces_regex"), "{raw}");
+    }
+
+    #[test]
+    fn namespace_text_is_lines_and_commas_only_in_plain_mode() {
+        assert_eq!(
+            parse_namespace_text("a\n b ,c\n\na", false),
+            ["a", "b", "c"]
+        );
+        assert_eq!(
+            parse_namespace_text("^a{1,2}/\n  x  ", true),
+            ["^a{1,2}/", "x"]
+        );
     }
 
     #[test]

@@ -77,7 +77,7 @@ pub(crate) async fn fetch(client: &GerritClient, query: &AccountQuery) -> Result
     }
 
     if query.open_requests {
-        let mut spaces: Vec<String> = query.namespaces.clone();
+        let mut spaces: Vec<String> = query.search_namespaces().to_vec();
         if spaces.len() > MAX_NAMESPACES {
             out.note(format!(
                 "only the first {MAX_NAMESPACES} of {} namespaces were searched",

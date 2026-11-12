@@ -212,14 +212,14 @@ pub(crate) async fn fetch(client: &GiteaClient, query: &AccountQuery) -> Result<
 
     if query.open_requests {
         let mut spaces: Vec<String> = Vec::new();
-        if query.namespaces.is_empty() {
+        if query.search_namespaces().is_empty() {
             spaces.push(me.clone());
             match organizations(client).await {
                 Ok(orgs) => spaces.extend(orgs),
                 Err(e) => out.failed("organizations", e)?,
             }
         } else {
-            spaces = query.namespaces.clone();
+            spaces = query.search_namespaces().to_vec();
         }
         if spaces.len() > MAX_NAMESPACES {
             out.note(format!(

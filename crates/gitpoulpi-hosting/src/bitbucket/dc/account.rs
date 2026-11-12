@@ -108,12 +108,8 @@ pub(crate) async fn fetch(
             match client.dashboard(role, "", max_rows).await {
                 Ok(rows) => {
                     for pull in rows {
-                        let key = &pull.to_ref.repository.project.key;
-                        let wanted = query.namespaces.is_empty()
-                            || query.namespaces.iter().any(|n| n.eq_ignore_ascii_case(key));
-                        if wanted {
-                            out.add_pr(client.account_pr(pull, false));
-                        }
+                        // The namespaces filter runs on every row in `finish`.
+                        out.add_pr(client.account_pr(pull, false));
                     }
                 }
                 Err(e) => out.failed(&format!("open pull requests ({role})"), e)?,

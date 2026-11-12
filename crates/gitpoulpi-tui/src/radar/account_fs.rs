@@ -26,6 +26,7 @@ pub(crate) fn query_of(integration: &Integration) -> AccountQuery {
         assigned_issues: radar.assigned_issues,
         include_drafts: true,
         namespaces: radar.namespaces,
+        namespaces_regex: radar.namespaces_regex,
         limit: 0,
     }
 }

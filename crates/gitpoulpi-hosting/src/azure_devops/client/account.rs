@@ -238,17 +238,13 @@ pub(crate) async fn fetch(
         if query.open_requests {
             let criteria = "searchCriteria.status=active";
             match client
-                .org_pulls(criteria, max_rows, &query.namespaces, &mut out)
+                .org_pulls(criteria, max_rows, query.search_namespaces(), &mut out)
                 .await
             {
                 Ok(rows) => {
                     for pull in rows {
-                        let name = pull.repository.project.name.to_lowercase();
-                        let wanted = query.namespaces.is_empty()
-                            || query.namespaces.iter().any(|n| n.to_lowercase() == name);
-                        if wanted {
-                            out.add_pr(client.account_pr(pull, me.as_deref())?);
-                        }
+                        // The namespaces filter runs on every row in `finish`.
+                        out.add_pr(client.account_pr(pull, me.as_deref())?);
                     }
                 }
                 Err(e) => out.failed("open pull requests", e)?,

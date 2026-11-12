@@ -42,8 +42,11 @@ pub(crate) mod gitea;
 pub(crate) mod github;
 #[cfg(feature = "gitlab")]
 pub(crate) mod gitlab;
+mod namespace;
 #[cfg(all(test, feature = "github", feature = "gitlab", feature = "gitea"))]
 mod tests;
+#[cfg(all(test, feature = "github", feature = "gitlab", feature = "gitea"))]
+mod tests_namespaces;
 #[cfg(all(
     test,
     feature = "github",
@@ -58,6 +61,7 @@ mod tests_wave2;
 pub use cache::{
     cache_path, AccountCache, CachedAccount, ACCOUNT_CACHE_FILE, ACCOUNT_TTL, ACCOUNT_TTL_SECS,
 };
+pub use namespace::{compile as compile_namespace_regex, first_regex_error, NamespaceFilter};
 
 /// Rows kept per kind (requests, issues) when the query names no limit.
 pub const DEFAULT_LIMIT: usize = 300;
@@ -76,6 +80,10 @@ pub struct AccountQuery {
     /// Orgs / groups to search for `open_requests`; empty = my own namespace
     /// plus every one I am a member of.
     pub namespaces: Vec<String>,
+    /// Read each namespace line as a regular expression over the full
+    /// repository path instead of a path prefix.
+    #[serde(default)]
+    pub namespaces_regex: bool,
     /// Rows kept per kind; 0 = [`DEFAULT_LIMIT`].
     pub limit: usize,
 }
@@ -90,6 +98,17 @@ impl AccountQuery {
         }
     }
 
+    /// The namespaces a host's own queries can be scoped to: the plain lines,
+    /// none in regex mode (a pattern is not a group name; the filter on the
+    /// results does the work).
+    pub fn search_namespaces(&self) -> &[String] {
+        if self.namespaces_regex {
+            &[]
+        } else {
+            &self.namespaces
+        }
+    }
+
     /// Whether the query asks for nothing at all.
     pub fn is_empty(&self) -> bool {
         !(self.review_requests || self.open_requests || self.assigned_issues)
@@ -101,12 +120,13 @@ impl AccountQuery {
         let mut spaces: Vec<String> = self.namespaces.iter().map(|n| n.to_lowercase()).collect();
         spaces.sort();
         let text = format!(
-            "r{}o{}i{}d{}l{}|{}",
+            "r{}o{}i{}d{}l{}x{}|{}",
             self.review_requests as u8,
             self.open_requests as u8,
             self.assigned_issues as u8,
             self.include_drafts as u8,
             self.row_limit(),
+            self.namespaces_regex as u8,
             spaces.join(",")
         );
         let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
@@ -254,6 +274,21 @@ impl Collector {
 
     pub(crate) fn finish(mut self, query: &AccountQuery) -> AccountItems {
         let limit = query.row_limit();
+        // The namespaces apply to every list: the host's review and issue
+        // queries are global, so the filter runs here on the project path.
+        match NamespaceFilter::new(&query.namespaces, query.namespaces_regex) {
+            Ok(filter) if filter.is_empty() => {}
+            Ok(filter) => {
+                self.prs.retain(|p| filter.matches(&p.project));
+                self.issues.retain(|i| filter.matches(&i.project));
+            }
+            Err(why) => {
+                self.prs.clear();
+                self.issues.clear();
+                self.notes
+                    .push(format!("invalid namespace expression {why}"));
+            }
+        }
         if !query.include_drafts {
             self.prs.retain(|p| p.pr.state != PullRequestState::Draft);
         }

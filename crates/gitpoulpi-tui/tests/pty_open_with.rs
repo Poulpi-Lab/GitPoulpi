@@ -450,20 +450,42 @@ fn the_list_hangs_beside_the_menu_it_was_opened_from() {
             // (separators and greyed rows are skipped by the menu).
             let band = |s: &xtask::pty::Screen| s.cell(menu_col + 1, menu_row).unwrap().bg;
             let plain = band(&screen);
+            // One Down at a time, each waited until the band moved (a fixed
+            // pause lets presses pile up and skip past the row under load).
+            let column = |s: &xtask::pty::Screen| -> Vec<_> {
+                (menu_row.saturating_sub(20)..menu_row + 20)
+                    .map(|r| s.cell(menu_col + 1, r).map(|c| c.bg))
+                    .collect()
+            };
             for _ in 0..30 {
                 if band(&term.screen()) != plain {
                     break;
                 }
+                let before = column(&term.screen());
                 term.send_keys("Down").unwrap();
-                term.wait_for_stable(Duration::from_millis(80), STEP)
-                    .unwrap();
+                let _ = term.wait_for("the selection moved", Duration::from_secs(5), |s| {
+                    column(s) != before
+                });
+                let _ = term.wait_for_stable(Duration::from_millis(80), STEP);
             }
             assert_ne!(band(&term.screen()), plain, "{}", term.text());
             term.send_keys("Enter").unwrap();
+            wait_list(&term);
         } else {
-            term.click(menu_col + 1, menu_row).unwrap();
+            // Retried: under load the click can land on a torn frame.
+            common::retry_until(
+                &mut term,
+                "the Open in list",
+                4,
+                Duration::from_secs(8),
+                |t| {
+                    if t.screen().contains("Open with...") {
+                        t.click(menu_col + 1, menu_row).unwrap();
+                    }
+                },
+                |s| s.contains("Zeta Viewer") && s.contains("Alpha Reader"),
+            );
         }
-        wait_list(&term);
         let screen = term.screen();
         let (list_col, list_row) = screen.find("Zeta Viewer").unwrap();
         // Beside the menu, to its right, on or below the activated row.

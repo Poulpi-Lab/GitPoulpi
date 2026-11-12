@@ -6025,11 +6025,11 @@ ctx_requested_by = "Requested by: {frontend}"
 # context: detail line of an Activity Log entry: the number that identifies the operation in the application log
 ctx_id = "Operation id: {id}"
 # context: command palette entry: from a line of the Activity Log's Application tab, shows the entry of the operation that produced it
-palette_show_operation = "Activity Log: Show the Operation of This Line"
+palette_show_operation = "Journal d'activité : Afficher l'opération de cette ligne"
 # context: command palette entry: selects the next line of the Application tab that names a failed operation
-palette_next_problem = "Activity Log: Next Failed Operation"
+palette_next_problem = "Journal d'activité : Opération en échec suivante"
 # context: command palette entry: selects the previous line of the Application tab that names a failed operation
-palette_prev_problem = "Activity Log: Previous Failed Operation"
+palette_prev_problem = "Journal d'activité : Opération en échec précédente"
 # context: notice in the Activity Log's Application tab when Enter is pressed with no line selected
 app_select_first = "Select a line first: click it, or press ] to jump to the next failed operation."
 # context: notice in the Activity Log's Application tab when the selected line does not name an operation

@@ -878,6 +878,9 @@ applicano. I tasti sono quelli predefiniti.
 | Registro attività: Scegli l'ambito |  |
 | Registro attività: Operazioni git |  |
 | Registro attività: Registro dell'applicazione |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Registro attività: Scorri a sinistra | `Left` |
 | Registro attività: Scorri a destra | `Right` |
 | Registro attività: Copia l'ultimo errore |  |

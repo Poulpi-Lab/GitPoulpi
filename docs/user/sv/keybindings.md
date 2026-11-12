@@ -876,6 +876,9 @@ Tangenterna är standardvärdena.
 | Aktivitetslogg: Välj omfång |  |
 | Aktivitetslogg: Git-åtgärder |  |
 | Aktivitetslogg: Programlogg |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Aktivitetslogg: Rulla åt vänster | `Left` |
 | Aktivitetslogg: Rulla åt höger | `Right` |
 | Aktivitetslogg: Kopiera det senaste felet |  |

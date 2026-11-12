@@ -298,7 +298,7 @@ impl HostingUi {
                     Err(why) => {
                         crate::activity_log::report_problem_as(
                             crate::activity_log::ProblemSource::Hosting,
-                            "Hosting request: list board columns",
+                            "Hosting request: list board columns", // i18n-english
                             "",
                             &why,
                         );
@@ -319,7 +319,7 @@ impl HostingUi {
                     Err(why) => {
                         crate::activity_log::report_problem_as(
                             crate::activity_log::ProblemSource::Hosting,
-                            "Hosting request: list projects",
+                            "Hosting request: list projects", // i18n-english
                             &format!("profile={}", answer.profile_id),
                             &why,
                         );

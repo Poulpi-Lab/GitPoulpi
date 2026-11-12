@@ -192,7 +192,7 @@ fn opened_from_a_repository_tab_it_is_scoped_to_that_repository_and_the_box_swit
     let screen = s
         .term
         .wait_for("the application log, scoped", STEP, |x| {
-            x.contains("Level:") && x.contains("Push failed:") && x.contains("[app-wide]")
+            x.contains("Level:") && x.contains("Push failed (") && x.contains("[app-wide]")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
     assert!(scope_says(&screen, &this), "{}", screen.text());
@@ -319,7 +319,7 @@ fn the_application_tab_is_filtered_by_the_scope() {
     s.term
         .wait_for("both repositories' lines", STEP, move |x| {
             x.contains("Level:")
-                && x.contains(&format!("[{name}] Push failed:"))
+                && x.contains(&format!("[{name}] Push failed ("))
                 && x.contains("[elsewhere-gone] Clone failed")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", s.term.text()));
@@ -342,7 +342,7 @@ fn the_application_tab_is_filtered_by_the_scope() {
         .term
         .wait_for("only the repository's lines", STEP, move |x| {
             scope_says(x, &name)
-                && x.contains("Push failed:")
+                && x.contains("Push failed (")
                 && !x.contains("Clone failed")
                 && x.contains("[app-wide]")
         })

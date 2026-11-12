@@ -869,6 +869,9 @@ die Standardtasten.
 | Aktivitätsprotokoll: Bereich wählen |  |
 | Aktivitätsprotokoll: Git-Vorgänge |  |
 | Aktivitätsprotokoll: Anwendungsprotokoll |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Aktivitätsprotokoll: nach links scrollen | `Left` |
 | Aktivitätsprotokoll: nach rechts scrollen | `Right` |
 | Aktivitätsprotokoll: Letzten Fehler kopieren |  |

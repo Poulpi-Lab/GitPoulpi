@@ -867,6 +867,9 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 활동 로그: 범위 선택 |  |
 | 활동 로그: Git 작업 |  |
 | 활동 로그: 애플리케이션 로그 |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | 활동 로그: 왼쪽으로 스크롤 | `Left` |
 | 활동 로그: 오른쪽으로 스크롤 | `Right` |
 | 활동 로그: 마지막 오류 복사 |  |

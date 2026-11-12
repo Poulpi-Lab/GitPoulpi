@@ -43,7 +43,7 @@ pub struct ResponseError {
     /// error that came out of an operation (`dispatch::failed`); an older
     /// daemon never sets it and an older client ignores it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub context: Option<gitpoulpi_core::OpContext>,
+    pub context: Option<Box<gitpoulpi_core::OpContext>>,
     /// The daemon refused the connection because it did not start with a
     /// `Hello` carrying the session's token (see [`crate::auth`]). Optional
     /// on the wire: an older client ignores it and prints `message`.

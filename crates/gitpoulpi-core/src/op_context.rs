@@ -190,7 +190,10 @@ pub fn parse_failure_line(message: &str) -> Option<ParsedFailure> {
     let after = &first[at + 1..];
     let close = after.find(']')?;
     let text = after[close + 1..].strip_prefix(": ")?;
-    let (label, args) = match head.strip_suffix(')').and_then(|h| h.split_once(" failed (")) {
+    let (label, args) = match head
+        .strip_suffix(')')
+        .and_then(|h| h.split_once(" failed ("))
+    {
         Some((label, args)) => (label, args),
         None => (head.strip_suffix(" failed")?, ""),
     };
@@ -278,6 +281,14 @@ pub fn operation_label(kind: OperationKind) -> String {
         _ => return words_of_key(&format!("{kind:?}")),
     };
     named.to_string()
+}
+
+/// The operation a label names ([`operation_label`]'s inverse): a log line
+/// carries the label, and the report wants the key.
+pub fn operation_of_label(label: &str) -> Option<OperationKind> {
+    OperationKind::ALL
+        .into_iter()
+        .find(|kind| operation_label(*kind) == label)
 }
 
 /// "RewriteScanSecrets" as "Rewrite scan secrets".
@@ -386,9 +397,12 @@ mod tests {
     }
 
     #[test]
-    fn every_operation_has_a_label() {
+    fn every_operation_has_a_label_of_its_own_that_names_it_back() {
         for kind in OperationKind::ALL {
-            assert!(!operation_label(kind).is_empty(), "{kind:?}");
+            let label = operation_label(kind);
+            assert!(!label.is_empty(), "{kind:?}");
+            assert_eq!(operation_of_label(&label), Some(kind), "{label}");
         }
+        assert_eq!(operation_of_label("Not an operation"), None);
     }
 }

@@ -874,6 +874,9 @@ Klávesy jsou výchozí.
 | Protokol aktivity: Zvolit rozsah |  |
 | Protokol aktivity: Operace gitu |  |
 | Protokol aktivity: Protokol aplikace |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Protokol aktivity: Posunout doleva | `Left` |
 | Protokol aktivity: Posunout doprava | `Right` |
 | Protokol aktivity: Kopírovat poslední chybu |  |

@@ -840,6 +840,9 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 活动日志：选择范围 |  |
 | 活动日志：Git 操作 |  |
 | 活动日志：应用日志 |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | 活动日志：向左滚动 | `Left` |
 | 活动日志：向右滚动 | `Right` |
 | 活动日志：复制最近的错误 |  |

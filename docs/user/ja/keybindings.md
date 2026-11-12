@@ -840,6 +840,9 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | アクティビティログ: 対象範囲を選択 |  |
 | アクティビティログ: Git 操作 |  |
 | アクティビティログ: アプリケーションログ |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | アクティビティログ: 左へスクロール | `Left` |
 | アクティビティログ: 右へスクロール | `Right` |
 | アクティビティログ: 直前のエラーをコピー |  |

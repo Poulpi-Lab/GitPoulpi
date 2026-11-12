@@ -106,7 +106,10 @@ fn activity_lines(entries: &[Entry], expanded: &[u64], width: usize) -> Vec<Line
                 out.push(Line::Text(format!("{indent}{l}"), muted));
             }
         }
-        if let Some(context) = entry.context.as_ref().filter(|_| entry.severity != Severity::Info)
+        if let Some(context) = entry
+            .context
+            .as_ref()
+            .filter(|_| entry.severity != Severity::Info)
         {
             for l in context_detail(context) {
                 for wrapped in crate::ui_kit::wrap_words(&l, room) {

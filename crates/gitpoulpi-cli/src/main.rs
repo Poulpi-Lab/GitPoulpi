@@ -217,6 +217,11 @@ fn run_repo_command(cli: cli::Cli, session: String, backend: DefaultBackend) {
             );
         } else {
             eprintln!("gitpoulpi: {err}");
+            if let Some(context) = gitpoulpi_commands::client::error_context_for(&err.to_string()) {
+                for line in context.report_lines() {
+                    eprintln!("  {line}");
+                }
+            }
             if let Some(detail) = gitpoulpi_commands::client::error_detail_for(&err.to_string()) {
                 for line in detail.lines() {
                     eprintln!("  {line}");

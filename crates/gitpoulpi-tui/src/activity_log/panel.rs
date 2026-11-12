@@ -1344,7 +1344,13 @@ fn scroll(delta: isize) {
 pub(super) fn record_key(r: &Record) -> (i64, String) {
     (
         r.ts_ms,
-        r.message.lines().next().unwrap_or("").chars().take(80).collect(),
+        r.message
+            .lines()
+            .next()
+            .unwrap_or("")
+            .chars()
+            .take(80)
+            .collect(),
     )
 }
 
@@ -1384,7 +1390,11 @@ fn select_problem(direction: isize) {
     let start = with(|s| s.app_sel.clone())
         .and_then(|key| records.iter().position(|r| record_key(r) == key))
         .map(|i| i as isize);
-    let from = start.unwrap_or(if direction > 0 { -1 } else { records.len() as isize });
+    let from = start.unwrap_or(if direction > 0 {
+        -1
+    } else {
+        records.len() as isize
+    });
     let mut at = from + direction;
     while at >= 0 && (at as usize) < records.len() {
         if is_problem(&records[at as usize]) {
@@ -1442,10 +1452,7 @@ fn show_operation() {
 }
 
 /// An entry for a failure the log tells about and this window did not run.
-fn entry_from_line(
-    record: &Record,
-    parsed: &gitpoulpi_core::op_context::ParsedFailure,
-) -> Entry {
+fn entry_from_line(record: &Record, parsed: &gitpoulpi_core::op_context::ParsedFailure) -> Entry {
     let kind = gitpoulpi_core::FailureKind::classify(&parsed.message);
     let mut entry = Entry::new(
         Severity::Error,
@@ -1461,7 +1468,8 @@ fn entry_from_line(
     }
     entry.repo = record.repo.as_ref().map(std::path::PathBuf::from);
     entry.context = Some(gitpoulpi_core::OpContext {
-        operation: parsed.label.clone(),
+        operation: gitpoulpi_core::op_context::operation_of_label(&parsed.label)
+            .map_or_else(|| parsed.label.clone(), |kind| format!("{kind:?}")),
         label: parsed.label.clone(),
         args: parsed.args.clone(),
         repo: record.repo.clone(),

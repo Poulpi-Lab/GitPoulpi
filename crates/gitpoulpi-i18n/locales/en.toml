@@ -7361,7 +7361,7 @@ show_none = "None"
 # context: shown when a grayed level checkbox is hovered or pressed; {level} is the level box's current choice
 why_level_off = "Not shown: the Level box is set to {level}. Raise it to see these lines."
 # context: key hints for the level checkboxes, shown under the Application log
-hint_levels = "1-5: show or hide a level  a: all  n: none"
+hint_levels = "1-5: show or hide a level  a: all  n: none  Enter: operation of the line  [ ]: failures"
 # context: command palette entry: toggle the display of one log level
 palette_show_error = "Activity Log: Show or Hide Level Error"
 # context: command palette entry: toggle the display of one log level
@@ -7409,7 +7409,7 @@ git_empty = "No operations yet. The operations of the chosen scope are listed he
 # context: key hints under the Git operations tab; keep the key names
 hint_git = "Up/Down: select  Left/Right: scroll  Enter: details  c: copy  r: suggested action  d: diagnostics  s: scope  Tab: application  Esc: close"
 # context: key hints under the Application tab; keep the key names
-hint_application = "Arrows: scroll  Enter: operation  [ ]: failures  l: level  /: filter  c: copy all  o: folder  x: clear  d: diagnostics  s: scope  g: git  Esc: close"
+hint_application = "Arrows: scroll  l: level  /: filter  c: copy all  o: folder  x: clear  d: diagnostics  s: scope  g: git  Esc: close"
 # context: command palette entry: opens the Activity Log's Scope box
 palette_scope = "Activity Log: Choose the Scope"
 # context: command palette entry: shows the Activity Log's Git operations tab

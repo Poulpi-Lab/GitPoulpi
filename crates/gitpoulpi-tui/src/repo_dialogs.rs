@@ -2061,7 +2061,7 @@ impl RepoDialogs {
                     Err(e) => {
                         crate::activity_log::report_problem_as(
                             crate::activity_log::ProblemSource::Hosting,
-                            "Hosting request: create pull request",
+                            "Hosting request: create pull request", // i18n-english
                             "",
                             &e,
                         );
@@ -2102,7 +2102,7 @@ impl RepoDialogs {
                     Err(e) => {
                         crate::activity_log::report_problem_as(
                             crate::activity_log::ProblemSource::Hosting,
-                            "Hosting request: create issue",
+                            "Hosting request: create issue", // i18n-english
                             "",
                             &e,
                         );

@@ -129,12 +129,12 @@ pub(crate) fn panicked(request_id: u64, command: OperationKind) -> Response {
     )
     .response;
     if let Err(error) = &mut response.result {
-        error.context = Some(gitpoulpi_ipc::op_context::context_of(
+        error.context = Some(Box::new(gitpoulpi_ipc::op_context::context_of(
             command,
             &Value::Null,
             None,
             request_id,
-        ));
+        )));
     }
     response
 }
@@ -176,15 +176,11 @@ pub(crate) fn failed(
     let operation = format!("{:?}", request.command);
     let detail = detail.map(|d| d.with_operation(operation));
     let repo = request.repo.as_ref().map(|r| r.0.as_str());
-    let context = gitpoulpi_ipc::op_context::context_of(
-        request.command,
-        &request.args,
-        repo,
-        request.id,
-    );
+    let context =
+        gitpoulpi_ipc::op_context::context_of(request.command, &request.args, repo, request.id);
     let mut dispatched = err_full(request.id, message, false, kind, detail);
     if let Err(error) = &mut dispatched.response.result {
-        error.context = Some(context);
+        error.context = Some(Box::new(context));
     }
     dispatched
 }

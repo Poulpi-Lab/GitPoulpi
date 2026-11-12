@@ -40,6 +40,31 @@ pub fn error_detail_for(message: &str) -> Option<gitpoulpi_core::ErrorDetail> {
         .map(|(_, d)| d.clone())
 }
 
+/// The operation context of the last few failed calls, by message (see
+/// [`DETAILS`]): which operation, its main arguments, the repository and the
+/// request's id.
+static CONTEXTS: std::sync::Mutex<Vec<(String, gitpoulpi_core::OpContext)>> =
+    std::sync::Mutex::new(Vec::new());
+
+fn remember_context(message: &str, context: gitpoulpi_core::OpContext) {
+    let mut all = CONTEXTS.lock().unwrap_or_else(|e| e.into_inner());
+    all.retain(|(m, _)| m != message);
+    all.push((message.to_string(), context));
+    if all.len() > 16 {
+        all.remove(0);
+    }
+}
+
+/// The operation a failure whose message is `message` (or which `message`
+/// wraps) came from, when the daemon said.
+pub fn error_context_for(message: &str) -> Option<gitpoulpi_core::OpContext> {
+    let all = CONTEXTS.lock().unwrap_or_else(|e| e.into_inner());
+    all.iter()
+        .rev()
+        .find(|(m, _)| message.contains(m.as_str()))
+        .map(|(_, c)| c.clone())
+}
+
 /// A connected client plus the repo every request targets.
 ///
 /// `repo` is `None` only outside a repository, which is legitimate for
@@ -220,6 +245,9 @@ impl Session {
         self.send(command, args, repo).await?.map_err(|e| {
             if let Some(detail) = e.detail {
                 remember_detail(&e.message, *detail);
+            }
+            if let Some(context) = e.context {
+                remember_context(&e.message, *context);
             }
             e.message
         })

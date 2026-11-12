@@ -158,8 +158,8 @@ pub(super) async fn call_raw(
                 super::failed_op::note(context);
             }
             Err(match e.kind {
-            Some(kind) => CoreError::from_typed(kind),
-            None => CoreError::from_wire(e.message, e.detail.map(|d| *d)),
+                Some(kind) => CoreError::from_typed(kind),
+                None => CoreError::from_wire(e.message, e.detail.map(|d| *d)),
             })
         }
     }

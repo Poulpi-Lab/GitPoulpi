@@ -48,12 +48,12 @@ impl Source {
     /// (English, like the rest of the report).
     fn label(self) -> &'static str {
         match self {
-            Source::Clone => "Clone",
-            Source::Create => "Create repository",
-            Source::Hosting => "Hosting request",
-            Source::Tool => "External program",
+            Source::Clone => "Clone",              // i18n-english
+            Source::Create => "Create repository", // i18n-english
+            Source::Hosting => "Hosting request",  // i18n-english
+            Source::Tool => "External program",    // i18n-english
             Source::Ai => "AI request",
-            Source::Save => "Save file",
+            Source::Save => "Save file", // i18n-english
         }
     }
 

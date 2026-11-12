@@ -319,7 +319,7 @@ fn a_long_application_line_scrolls_by_key_track_press_and_drag() {
     term.send_keys("Tab").unwrap();
     let screen = term
         .wait_for("the long line, cut at the edge", STEP, |s| {
-            s.contains("Level:") && s.contains("Push failed:") && s.contains("\u{2192}")
+            s.contains("Level:") && s.contains("Push failed (") && s.contains("\u{2192}")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 
@@ -332,7 +332,7 @@ fn a_long_application_line_scrolls_by_key_track_press_and_drag() {
         .collect::<String>();
     let line = text
         .lines()
-        .find(|l| l.contains("Push failed:"))
+        .find(|l| l.contains("Push failed ("))
         .expect("the failure is in the log");
     let end: String = line
         .trim_end()

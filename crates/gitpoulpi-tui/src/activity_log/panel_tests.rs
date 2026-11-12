@@ -1222,6 +1222,12 @@ fn a_failure_line_of_another_frontend_opens_an_entry_made_from_it() {
     ] {
         assert!(screen.contains(line), "{line}\n{screen}");
     }
+    // The report of the made entry names the operation by its key too.
+    let made = feed::snapshot()
+        .into_iter()
+        .find(|e| e.context.as_ref().is_some_and(|c| c.request == 5))
+        .expect("the entry made from the line");
+    assert!(super::report::entry_block(&made).contains("operation: Remove remote (RemoteRemove)"));
     // Asking again finds the same entry: no second one.
     key(KeyCode::Tab);
     key(KeyCode::Char(']'));

@@ -501,7 +501,7 @@ impl BoardView {
                     self.load_rx = None;
                     crate::activity_log::report_problem_as(
                         crate::activity_log::ProblemSource::Hosting,
-                        "Hosting request: load board issues",
+                        "Hosting request: load board issues", // i18n-english
                         "",
                         &why,
                     );
@@ -627,7 +627,7 @@ impl BoardView {
                     // The card snaps back: its column is its own again.
                     crate::activity_log::report_problem_as(
                         crate::activity_log::ProblemSource::Hosting,
-                        "Hosting request: move issue",
+                        "Hosting request: move issue", // i18n-english
                         "",
                         &why,
                     );

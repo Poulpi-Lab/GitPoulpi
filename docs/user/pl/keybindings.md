@@ -873,6 +873,9 @@ zastosowania. Klawisze są domyślne.
 | Dziennik aktywności: Wybierz zakres |  |
 | Dziennik aktywności: Operacje git |  |
 | Dziennik aktywności: Dziennik aplikacji |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Dziennik aktywności: Przewiń w lewo | `Left` |
 | Dziennik aktywności: Przewiń w prawo | `Right` |
 | Dziennik aktywności: Kopiuj ostatni błąd |  |

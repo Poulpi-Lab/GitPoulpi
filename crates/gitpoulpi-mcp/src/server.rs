@@ -276,7 +276,17 @@ fn refusal(message: String) -> CallToolResult {
     // A backend failure also carries what ran and what the tool printed, so
     // an agent can explain it instead of repeating "failed".
     let detail = gitpoulpi_commands::client::error_detail_for(&message);
+    let context = gitpoulpi_commands::client::error_context_for(&message);
     let mut text = message.clone();
+    if let Some(context) = &context {
+        for line in context.report_lines() {
+            text.push_str(
+                "
+  ",
+            );
+            text.push_str(&line);
+        }
+    }
     if let Some(detail) = &detail {
         for line in detail.lines() {
             text.push_str("\n  ");
@@ -287,6 +297,9 @@ fn refusal(message: String) -> CallToolResult {
     let mut structured = json!({ "error": message });
     if let Some(detail) = detail {
         structured["detail"] = serde_json::to_value(detail).unwrap_or_default();
+    }
+    if let Some(context) = context {
+        structured["context"] = serde_json::to_value(context).unwrap_or_default();
     }
     result.structured_content = Some(structured);
     result

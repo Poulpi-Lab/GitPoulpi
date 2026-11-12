@@ -172,11 +172,16 @@ pub fn error_value(message: &str) -> serde_json::Value {
 
 /// The whole `--json` failure object: `{"error": <error_value>}` plus, when the
 /// daemon sent the facts of a backend failure, `"detail"` (operation, the
-/// redacted command line, exit code, stderr tail, libgit2 class/code).
+/// redacted command line, exit code, stderr tail, libgit2 class/code), and
+/// `"context"` (the operation, its main arguments, the repository, who asked
+/// and the request's id) when the daemon said which operation failed.
 pub fn error_object(message: &str) -> serde_json::Value {
     let mut object = serde_json::json!({ "error": error_value(message) });
     if let Some(detail) = crate::client::error_detail_for(message) {
         object["detail"] = serde_json::to_value(detail).unwrap_or_default();
+    }
+    if let Some(context) = crate::client::error_context_for(message) {
+        object["context"] = serde_json::to_value(context).unwrap_or_default();
     }
     object
 }

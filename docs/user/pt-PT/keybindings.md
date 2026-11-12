@@ -872,6 +872,9 @@ As teclas são as predefinidas.
 | Registo de atividade: escolher o âmbito |  |
 | Registo de atividade: operações Git |  |
 | Registo de atividade: registo da aplicação |  |
+| Activity Log: Show the Operation of This Line |  |
+| Activity Log: Next Failed Operation |  |
+| Activity Log: Previous Failed Operation |  |
 | Registo de atividade: deslocar para a esquerda | `Left` |
 | Registo de atividade: deslocar para a direita | `Right` |
 | Registo de atividade: copiar o último erro |  |

@@ -740,7 +740,9 @@ gitpoulpi hosting radar --what review --json
 ```
 
 Consulta la [referencia de la CLI](cli-reference.md#comandos) para ver todos los comandos. Nunca se acepta
-un token como argumento, y el servidor MCP no ofrece
+un token como argumento (`hosting login` imprime `stored: "os"` cuando el almacén de credenciales del
+sistema lo guarda, o `stored: "session"` más `store_error` cuando el almacén lo rechazó y el token
+vive en memoria solo durante esta sesión), y el servidor MCP no ofrece
 `hosting login`, así que un token nunca pasa por un agente.
 
 ## Solución de problemas

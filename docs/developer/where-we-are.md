@@ -624,6 +624,23 @@ without the fix; keep it that way.
   turn it into an archive install. See "The updater owns the swap" in
   `docs/architecture/session-and-state.md`.
 
+### Address bar: PATH beats App Paths in ShellExecute
+
+- Typing `gp` or `gitpoulpi` in File Explorer's address bar goes through
+  ShellExecute, which looks at the current folder and `PATH` first and only
+  then at `HKCU\...\App Paths`. So with the bin folder on `PATH` the alias
+  `.cmd` runs (a console flashes), and App Paths (the console-less
+  `gitpoulpi-launch.exe`) answers only where `PATH` has no such program.
+  Both routes must keep the folder: the shim exports `GITPOULPI_CMDCMDLINE`
+  and `relaunch::explorer_start` recognises `cmd.exe /c` with exactly two
+  processes on the console (an interactive prompt has no `/c`, PowerShell makes
+  three); the launcher path reads the working folder itself. Do not test the
+  window class for the shim case: Windows Terminal as the default terminal
+  hosts that cmd in a pseudo-console and the folder must still be kept. The
+  variable is read and removed first thing in `main` (`explorer_folder`), and
+  the terminal relaunch gets the folder as `--repo`, which beats the
+  "Last tab" setting.
+
 ### Slow first launch (macOS)
 
 - On macOS the first launch of a new executable (and of the developer-tools

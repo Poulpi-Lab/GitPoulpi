@@ -43,6 +43,7 @@ fn machine(root: &Path, path_var: &str) -> Machine {
         alias,
         path,
         user: Arc::new(Memory(Mutex::new(UserPathValues::default()))),
+        registry: Arc::new(gitpoulpi_config::desktop::registry::MemoryRegistry::new()),
     }
 }
 
@@ -357,4 +358,22 @@ fn the_palette_route_selects_the_acted_on_button_so_the_page_scrolls_to_it() {
     );
     assert!(st.kept_in_view.is_none(), "the keep-in-view rule must run");
     assert!(st.flash.is_some());
+}
+
+#[test]
+fn an_old_windows_shim_is_rewritten_by_the_read() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut m = machine(dir.path(), "");
+    m.alias.os = Os::Windows;
+    m.alias.exe = PathBuf::from("C:/GP/gitpoulpi-tui.exe");
+    std::fs::create_dir_all(&m.alias.bin_dir).unwrap();
+    let old = "@echo off\r\nREM X-GitPoulpi=1\r\n\"C:/GP/gitpoulpi-tui.exe\" %*\r\n";
+    let file = m.alias.bin_dir.join("gp.cmd");
+    std::fs::write(&file, old).unwrap();
+    assert_eq!(alias::status(&m.alias, "gp").state, alias::State::Outdated);
+    crate::preferences::launcher_alias::sync_shims(&m);
+    assert_eq!(alias::status(&m.alias, "gp").state, alias::State::Installed);
+    assert!(std::fs::read_to_string(&file)
+        .unwrap()
+        .contains("GITPOULPI_CMDCMDLINE"));
 }

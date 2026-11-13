@@ -22,10 +22,18 @@
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
+use super::folder_menu::windows::{app_path_is_ours, app_path_ops, app_path_remove};
+use super::registry::Registry;
 use crate::open_in::Os;
 
 /// Second line of every `.cmd` shim we write.
 pub const CMD_MARKER: &str = "REM X-GitPoulpi=1";
+
+/// The variable every `.cmd` shim exports: the command line of the `cmd.exe`
+/// that runs it. Explorer's address bar runs a `.cmd` as `cmd.exe /c "..."`,
+/// an interactive prompt has no `/c`, which is how the program tells them
+/// apart (`gitpoulpi-tui`'s `relaunch::explorer_start`).
+pub const CMDLINE_ENV: &str = "GITPOULPI_CMDCMDLINE";
 
 /// Second line of the `/bin/sh` shim of the add variant on Linux and macOS.
 pub const UNIX_MARKER: &str = "# X-GitPoulpi=1";
@@ -241,7 +249,7 @@ pub fn cmd_shim_text_for(exe: &Path, kind: Kind) -> String {
         Kind::Add => " --add",
     };
     format!(
-        "@echo off\r\n{CMD_MARKER}\r\n\"{}\"{flag} %*\r\n",
+        "@echo off\r\n{CMD_MARKER}\r\nset \"{CMDLINE_ENV}=%CMDCMDLINE%\"\r\n\"{}\"{flag} %*\r\n",
         exe.display().to_string().replace('"', "")
     )
 }
@@ -356,6 +364,19 @@ fn resolve_on_path(env: &Env, name: &str) -> Option<PathBuf> {
         .find(|p| p.is_file() || p.is_symlink())
 }
 
+/// Windows: a shim of ours whose text is not what this version writes (an
+/// older one lacks the `GITPOULPI_CMDCMDLINE` line) is `Outdated`. Other
+/// systems have no text to compare.
+fn shim_text_current(env: &Env, path: &Path) -> bool {
+    if env.os != Os::Windows {
+        return true;
+    }
+    std::fs::read_to_string(path)
+        .ok()
+        .and_then(|t| shim_parts(&t).map(|(exe, kind)| t == cmd_shim_text_for(&exe, kind)))
+        .unwrap_or(true)
+}
+
 pub fn status(env: &Env, name: &str) -> Status {
     status_kind(env, name, Kind::Open)
 }
@@ -368,7 +389,11 @@ pub fn status_kind(env: &Env, name: &str, kind: Kind) -> Status {
         State::NotInstalled
     } else {
         match ours(env, &path) {
-            Some((target, k)) if k == kind && env.is_current(&target) => State::Installed,
+            Some((target, k))
+                if k == kind && env.is_current(&target) && shim_text_current(env, &path) =>
+            {
+                State::Installed
+            }
             Some(_) => State::Outdated,
             None => State::Foreign,
         }
@@ -447,6 +472,62 @@ pub fn remove(env: &Env, name: &str) -> Result<bool, String> {
     Ok(true)
 }
 
+/// The App Paths program name for the alias `name`: `gp.exe`.
+pub fn app_path_name(name: &str) -> String {
+    format!("{name}.exe")
+}
+
+/// [`create_kind`], and on Windows for the Open alias also App Paths
+/// `<name>.exe` pointing at the console-less launcher beside the exe, so that
+/// typing the alias in the File Explorer address bar finds it even where the
+/// bin directory is not on `PATH`. No launcher beside the exe: no key, no
+/// error. A key of that name that is not ours is left alone.
+pub fn create_with_app_path(
+    env: &Env,
+    registry: &dyn Registry,
+    name: &str,
+    kind: Kind,
+) -> Result<PathBuf, String> {
+    create_with_app_path_in(env, registry, name, kind, &|p| p.is_file())
+}
+
+fn create_with_app_path_in(
+    env: &Env,
+    registry: &dyn Registry,
+    name: &str,
+    kind: Kind,
+    exists: &dyn Fn(&Path) -> bool,
+) -> Result<PathBuf, String> {
+    let path = create_kind(env, name, kind)?;
+    if env.os == Os::Windows && kind == Kind::Open {
+        let key = app_path_name(name);
+        let ours = app_path_is_ours(registry, &key)?;
+        if let (Some(helper), true) = (
+            super::terminals::folder_helper(env.os, &env.wanted_exe(), exists),
+            ours != Some(false),
+        ) {
+            registry.apply(&app_path_ops(&key, &helper))?;
+        }
+    }
+    Ok(path)
+}
+
+/// [`remove`], and on Windows the App Paths key of that name when it is ours.
+pub fn remove_with_app_path(
+    env: &Env,
+    registry: &dyn Registry,
+    name: &str,
+) -> Result<bool, String> {
+    let removed = remove(env, name)?;
+    if removed && env.os == Os::Windows {
+        let key = app_path_name(name);
+        if app_path_is_ours(registry, &key)? == Some(true) {
+            registry.apply(&[app_path_remove(&key)])?;
+        }
+    }
+    Ok(removed)
+}
+
 /// Every alias of ours in the bin directory, by name.
 pub fn list(env: &Env) -> Vec<(String, State)> {
     list_kinds(env)
@@ -469,7 +550,7 @@ pub fn list_kinds(env: &Env) -> Vec<(String, Kind, State)> {
                 _ => file,
             };
             let (target, kind) = ours(env, &e.path())?;
-            let state = if env.is_current(&target) {
+            let state = if env.is_current(&target) && shim_text_current(env, &e.path()) {
                 State::Installed
             } else {
                 State::Outdated
@@ -484,6 +565,7 @@ pub fn list_kinds(env: &Env) -> Vec<(String, Kind, State)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::desktop::folder_menu::windows::app_path_key;
 
     fn env(root: &Path, os: Os) -> Env {
         Env {
@@ -765,5 +847,95 @@ mod tests {
             ..from_dist
         };
         assert_eq!(status(&plain, "gp").state, State::Outdated);
+    }
+
+    #[test]
+    fn the_windows_shim_exports_the_cmd_command_line_and_keeps_args_last() {
+        let exe = Path::new("C:/GP/gitpoulpi-tui.exe");
+        for (kind, flag) in [(Kind::Open, ""), (Kind::Add, " --add")] {
+            let text = cmd_shim_text_for(exe, kind);
+            assert_eq!(
+                text,
+                format!(
+                    "@echo off\r\nREM X-GitPoulpi=1\r\nset \"GITPOULPI_CMDCMDLINE=%CMDCMDLINE%\"\r\n\"C:/GP/gitpoulpi-tui.exe\"{flag} %*\r\n"
+                )
+            );
+            assert_eq!(shim_parts(&text), Some((exe.to_path_buf(), kind)));
+        }
+    }
+
+    #[test]
+    fn an_old_shim_reads_outdated_and_create_rewrites_it() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut e = env(tmp.path(), Os::Windows);
+        e.exe = PathBuf::from("C:/GP/gitpoulpi-tui.exe");
+        std::fs::create_dir_all(&e.bin_dir).unwrap();
+        let old = "@echo off\r\nREM X-GitPoulpi=1\r\n\"C:/GP/gitpoulpi-tui.exe\" %*\r\n";
+        std::fs::write(e.bin_dir.join("gp.cmd"), old).unwrap();
+        assert_eq!(status(&e, "gp").state, State::Outdated);
+        assert_eq!(
+            list_kinds(&e),
+            [("gp".to_string(), Kind::Open, State::Outdated)]
+        );
+        create(&e, "gp").unwrap();
+        assert_eq!(status(&e, "gp").state, State::Installed);
+    }
+
+    fn windows_env_with_helper(root: &Path) -> (Env, PathBuf) {
+        let mut e = env(root, Os::Windows);
+        e.exe = PathBuf::from("C:/GP/gitpoulpi-tui.exe");
+        (e, PathBuf::from("C:/GP/gitpoulpi-launch.exe"))
+    }
+
+    #[test]
+    fn app_paths_follow_the_open_alias() {
+        use crate::desktop::registry::MemoryRegistry;
+        let tmp = tempfile::tempdir().unwrap();
+        let (e, helper) = windows_env_with_helper(tmp.path());
+        let reg = MemoryRegistry::new();
+        let has = |p: &Path| p == helper;
+        create_with_app_path_in(&e, &reg, "gp", Kind::Open, &has).unwrap();
+        let key = app_path_key("gp.exe");
+        let dump = reg.dump();
+        assert!(
+            dump.iter().any(|(k, n, v)| k.eq_ignore_ascii_case(&key)
+                && n.is_empty()
+                && v.ends_with("gitpoulpi-launch.exe")),
+            "{dump:?}"
+        );
+        assert_eq!(app_path_is_ours(&reg, "gp.exe").unwrap(), Some(true));
+        // The add variant has no App Paths key.
+        create_with_app_path_in(&e, &reg, "gpa", Kind::Add, &has).unwrap();
+        assert_eq!(app_path_is_ours(&reg, "gpa.exe").unwrap(), None);
+        // Remove deletes the key with the shim.
+        assert!(remove_with_app_path(&e, &reg, "gp").unwrap());
+        assert_eq!(app_path_is_ours(&reg, "gp.exe").unwrap(), None);
+    }
+
+    #[test]
+    fn app_paths_skip_without_a_launcher_and_spare_a_foreign_key() {
+        use crate::desktop::registry::{MemoryRegistry, RegOp};
+        let tmp = tempfile::tempdir().unwrap();
+        let (e, helper) = windows_env_with_helper(tmp.path());
+        let reg = MemoryRegistry::new();
+        create_with_app_path_in(&e, &reg, "gp", Kind::Open, &|_| false).unwrap();
+        assert!(reg.dump().is_empty(), "no launcher: no key");
+        // A key that is not ours stays as it is, on create and on remove.
+        let key = app_path_key("gp.exe");
+        reg.apply(&[RegOp::Set {
+            key: key.clone(),
+            name: String::new(),
+            value: "D:/other.exe".into(),
+        }])
+        .unwrap();
+        create_with_app_path_in(&e, &reg, "gp", Kind::Open, &|p| p == helper).unwrap();
+        assert_eq!(app_path_is_ours(&reg, "gp.exe").unwrap(), Some(false));
+        assert!(remove_with_app_path(&e, &reg, "gp").unwrap());
+        assert_eq!(app_path_is_ours(&reg, "gp.exe").unwrap(), Some(false));
+        // Other systems never touch the registry.
+        let lin = env(tmp.path(), Os::Linux);
+        let reg2 = MemoryRegistry::new();
+        let _ = create_with_app_path_in(&lin, &reg2, "gp", Kind::Open, &|_| true);
+        assert!(reg2.dump().is_empty());
     }
 }

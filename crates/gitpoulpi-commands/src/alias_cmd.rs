@@ -16,6 +16,8 @@ use crate::repo_cmd::Emitted;
 struct Machine {
     alias: alias::Env,
     path: user_path::Env,
+    /// Windows: App Paths `<alias>.exe` (a file in tests).
+    registry: gitpoulpi_config::desktop::registry::SharedRegistry,
 }
 
 fn machine() -> Result<Machine, String> {
@@ -26,7 +28,11 @@ fn machine() -> Result<Machine, String> {
     let mut alias = alias::Env::discover(os, &env, &home, &exe);
     alias.newest = gitpoulpi_config::dev_mode::launcher_newest_on_disk(&exe);
     let path = user_path::Env::discover(os, &env, &home, &alias);
-    Ok(Machine { alias, path })
+    Ok(Machine {
+        alias,
+        path,
+        registry: gitpoulpi_config::desktop::registry::from_env(),
+    })
 }
 
 /// `ui.command_alias` and `ui.command_alias_add`.
@@ -111,7 +117,7 @@ pub fn alias(action: AliasAction) -> Result<Emitted, String> {
                 .map_err(|e: NameError| format!("{}: {name:?}", e.describe()))?;
             let kind = if add { Kind::Add } else { Kind::Open };
             let before = alias_json(&m, &name, kind);
-            let path = alias::create_kind(&m.alias, &name, kind)?;
+            let path = alias::create_with_app_path(&m.alias, &*m.registry, &name, kind)?;
             Ok(emitted(
                 json!({
                     "created": name,
@@ -131,14 +137,14 @@ pub fn alias(action: AliasAction) -> Result<Emitted, String> {
         }
         AliasAction::Remove { name } => {
             let removed: Vec<String> = match name {
-                Some(name) => alias::remove(&m.alias, &name)?
+                Some(name) => alias::remove_with_app_path(&m.alias, &*m.registry, &name)?
                     .then_some(name)
                     .into_iter()
                     .collect(),
                 None => {
                     let mut gone = Vec::new();
                     for (name, _) in alias::list(&m.alias) {
-                        if alias::remove(&m.alias, &name)? {
+                        if alias::remove_with_app_path(&m.alias, &*m.registry, &name)? {
                             gone.push(name);
                         }
                     }

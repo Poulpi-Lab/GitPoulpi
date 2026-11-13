@@ -469,6 +469,24 @@ pub struct RunOptions {
     pub launcher: bool,
 }
 
+/// Windows: the folder File Explorer's address bar started this program in
+/// (typing `gitpoulpi` or the alias there), when this is such a start and the
+/// user gave no argument; `None` everywhere else. Call it first thing in
+/// `main`, before any argument handling: it also clears the shim's
+/// `GITPOULPI_CMDCMDLINE` so that no child inherits it. The caller opens the
+/// folder like `--repo <folder>` (or `--add <folder>` with
+/// `ui.reuse_window`), and the terminal relaunch carries it along.
+pub fn explorer_folder() -> Option<std::path::PathBuf> {
+    #[cfg(windows)]
+    {
+        relaunch::explorer_folder()
+    }
+    #[cfg(not(windows))]
+    {
+        None
+    }
+}
+
 /// [`run`] with the command-line options.
 pub fn run_with(session: &str, options: RunOptions) -> io::Result<()> {
     // Every request this process sends says it comes from the window.
@@ -490,7 +508,7 @@ pub fn run_with(session: &str, options: RunOptions) -> io::Result<()> {
     };
     // Windows double-click: reopen in the terminal `ui.launch_terminal` names.
     #[cfg(windows)]
-    if relaunch::try_relaunch() {
+    if relaunch::try_relaunch(options.repo.as_deref()) {
         return Ok(());
     }
     tab_dir::set_cwd_file(options.cwd_file);

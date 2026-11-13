@@ -229,12 +229,21 @@ shortcut that does not exist yet) and **Remove**.
 | System | Alias | PATH |
 |---|---|---|
 | Linux, macOS | A symbolic link `~/.local/bin/<name>` to `gitpoulpi-tui`. A link cannot hold a marker, so it counts as ours when its target is a file called `gitpoulpi-tui`; a regular file, or a link to anything else, is **not ours** and is never replaced or removed. | A block between `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` and `# <<< GitPoulpi PATH <<<` in `~/.bashrc` and `~/.zshrc` (whichever exist; `~/.zshrc` on macOS, `~/.bashrc` otherwise when neither does), and `~/.config/fish/conf.d/gitpoulpi-path.fish` when fish is configured. Remove deletes the block (or the fish file) and nothing else. |
-| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`, a two-line shim holding `REM X-GitPoulpi=1`. | The user PATH in `HKCU\Environment`, written through PowerShell, then a `WM_SETTINGCHANGE` broadcast so new programs see it. The value `GitPoulpiPathAdded` records what was added, and Remove takes out only that. |
+| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`, a short shim holding `REM X-GitPoulpi=1` (it also exports `GITPOULPI_CMDCMDLINE`, how an address-bar start is recognised). Shims follow by themselves: one written by an older version is rewritten when Settings reads the alias. | The user PATH in `HKCU\Environment`, written through PowerShell, then a `WM_SETTINGCHANGE` broadcast so new programs see it. The value `GitPoulpiPathAdded` records what was added, and Remove takes out only that. |
 
 New terminals see the PATH change, not the ones already open. Neither action is journaled: there is no Undo for them, **Remove** is the way back.
 
 The palette has the same actions (**Launcher: Create Shortcut**, **Launcher: Create Desktop Shortcut**, **Launcher: Remove Shortcuts**, **Launcher: Create Command Alias**, **Launcher: Remove Command Alias**, **Launcher: Add to PATH**, **Launcher: Remove from PATH**), and `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` does it from a script.
+
+#### Typing in the File Explorer address bar (Windows)
+
+Type the alias (`gp`) or `gitpoulpi` in the address bar of a File Explorer window and press Enter: GitPoulpi opens in the terminal chosen in **Terminal for shortcuts**, on the folder the window shows, without opening the **Last tab**. With **Show the open window on click** on and a GitPoulpi already open, the folder becomes a new tab of that window instead.
+
+- **`gp` (the command alias).** Once the alias exists, creating it also registers `gp.exe` under `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`, pointing at `gitpoulpi-launch.exe`, and Remove deletes that key (only when it is ours). When the folder with the alias is on your PATH (**Add GitPoulpi to PATH**), Windows runs the `.cmd` shim first and a console window may flash for a moment before GitPoulpi appears. Shims written by an older version are rewritten by themselves when Settings reads the alias (they gain the line that tells GitPoulpi it was started from Explorer).
+- **`gitpoulpi`.** Works with the **File manager menu** installed: Install also registers `gitpoulpi.exe` under App Paths. Without it, `gitpoulpi` is found only when GitPoulpi's folder is on your PATH, and then the console may flash as above.
+
+Linux and macOS have no equivalent: their file managers' location bars do not run programs. Use the **File manager menu** entry or the command alias in a terminal.
 
 #### File manager menu (Open in GitPoulpi)
 

@@ -152,11 +152,21 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 let mut next_ref_name_mode: Option<InputMode> = None;
                 // Inline branch/tag naming: a refused name keeps
                 // the box open with the reason on its row.
-                let refused = inline_target(op, cx.refs_result.as_deref().ok().and_then(head_oid))
-                    .and_then(|(kind, _)| {
-                        validate_new_ref(kind, value, cx.refs_result.as_deref().unwrap_or(&[]))
-                            .err()
-                    });
+                let refused = {
+                    let refs = cx.refs_result.as_deref().unwrap_or(&[]);
+                    match op {
+                        // Keeping the name is not an error: it closes below.
+                        RefNameOp::RenameBranch { name: old, .. } if name == *old => None,
+                        RefNameOp::RenameBranch { name: old, .. } => validate_new_ref(
+                            InlineRefKind::Branch,
+                            value,
+                            &refs_without_branch(refs, old),
+                        )
+                        .err(),
+                        _ => inline_target(op, refs)
+                            .and_then(|(kind, _)| validate_new_ref(kind, value, refs).err()),
+                    }
+                };
                 if let Some(why) = refused {
                     *cx.ref_name_error = Some(why);
                 } else if name.is_empty()
@@ -301,7 +311,9 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                                 &at.to_hex()[..SHORT_SHA_LEN],
                             ));
                         }
-                        RefNameOp::RenameBranch(old_name) => {
+                        // The same name closes the box and changes nothing.
+                        RefNameOp::RenameBranch { name: old_name, .. } if name == *old_name => {}
+                        RefNameOp::RenameBranch { name: old_name, .. } => {
                             cx.link.submit_action(Action::BranchRename {
                                 old_name: old_name.clone(),
                                 new_name: name.clone(),

@@ -60,6 +60,8 @@ pub(in crate::event_loop) fn draw_footer(
     let mut ref_name_hint = String::new();
     let footer_text = match &input_mode {
         InputMode::FilteringRefs(draft) => f::filter_refs(draft),
+        // Named inline, or in the name box (`ref_name_box.rs`): never here.
+        InputMode::ComposingRefName { op, .. } if is_inline_name(op) => String::new(),
         InputMode::ComposingRefName { op, value } => {
             let label = match op {
                 RefNameOp::NewBranch => f::NEW_BRANCH_NAME.get().to_string(),
@@ -70,7 +72,7 @@ pub(in crate::event_loop) fn draw_footer(
                     f::new_annotated_tag_at(&at.to_hex()[..SHORT_SHA_LEN])
                 }
                 RefNameOp::AnnotatedTagMessage { name, .. } => f::tag_message(name),
-                RefNameOp::RenameBranch(old) => f::rename_to(old),
+                RefNameOp::RenameBranch { name: old, .. } => f::rename_to(old),
                 RefNameOp::AnnotateTag(tag) => f::tag_message(tag),
                 RefNameOp::SetUpstream(branch) => f::set_upstream(branch),
                 RefNameOp::LfsTrack => f::LFS_TRACK.get().to_string(),

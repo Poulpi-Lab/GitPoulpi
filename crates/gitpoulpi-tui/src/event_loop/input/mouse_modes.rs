@@ -310,6 +310,31 @@ pub(in crate::event_loop) fn popup_list_mouse(
     ListMouse::Swallow
 }
 
+/// A left press on the name box's Cancel, confirm or cross is the key it
+/// stands for (Esc, Enter, Esc), sent into the prompt's own key arm so the
+/// submit code exists once. `None` for every other event.
+pub(super) fn ref_name_box(
+    cx: &mut CommandCtx<'_>,
+    env: &super::KeyEnv<'_>,
+    mouse: MouseEvent,
+) -> Option<io::Result<Flow>> {
+    if mouse.kind != MouseEventKind::Down(MouseButton::Left) {
+        return None;
+    }
+    let Some(HitTarget::RefNameBox(part)) =
+        find_hit_target(&*cx.hit_targets, mouse.column, mouse.row)
+    else {
+        return None;
+    };
+    let code = match part {
+        RefNamePart::Confirm => KeyCode::Enter,
+        RefNamePart::Cancel | RefNamePart::Close => KeyCode::Esc,
+    };
+    *cx.hovered_target = None;
+    let key = KeyEvent::new(code, KeyModifiers::NONE);
+    Some(super::keys_modes::handle(cx, env, key).map(|_| Flow::Handled))
+}
+
 /// The Edit commit message popup is modal: a left click lands on it or is
 /// swallowed, and every other mouse event is swallowed outright, so nothing
 /// underneath moves while it is open.

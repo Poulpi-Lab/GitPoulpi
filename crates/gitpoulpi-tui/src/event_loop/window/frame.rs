@@ -139,13 +139,26 @@ impl WindowState {
         // selects it), so the box is never typed into off screen.
         let inline_ref: Option<(InlineRefKind, Oid)> = match &self.input_mode {
             InputMode::ComposingRefName { op, .. } => {
-                inline_target(op, self.refs_result.as_deref().ok().and_then(head_oid))
+                inline_target(op, self.refs_result.as_deref().unwrap_or(&[]))
             }
             _ => None,
         };
+        // A palette rename (`Auto`) takes whichever spot is already on
+        // screen; it never scrolls the Log to its tip.
+        let reveals = !matches!(
+            &self.input_mode,
+            InputMode::ComposingRefName {
+                op: RefNameOp::RenameBranch {
+                    spot: RenameSpot::Auto,
+                    ..
+                },
+                ..
+            }
+        );
         match inline_ref {
             Some((_, at)) if !self.ref_name_revealed => {
-                if self.solo_refs.is_empty()
+                if reveals
+                    && self.solo_refs.is_empty()
                     && self.central_view == CentralView::Log
                     && select_log_commit(&self.log_result, &self.log_order, &mut self.log_state, at)
                 {
@@ -154,13 +167,17 @@ impl WindowState {
                 self.ref_name_revealed = true;
             }
             Some(_) => {}
-            None => {
-                self.ref_name_revealed = false;
-                self.ref_name_error = None;
-            }
+            None => self.ref_name_revealed = false,
         }
+        // The prompts named inline (or in the name box) keep their error
+        // for as long as the mode lasts; every other prompt has none.
+        if !matches!(&self.input_mode, InputMode::ComposingRefName { op, .. } if is_inline_name(op))
+        {
+            self.ref_name_error = None;
+            self.ref_name_slot.reset();
+        }
+        let mut name_slot = self.ref_name_slot;
         let mut inline_ref_row: Option<u16> = None;
-        let mut inline_ref_drawn = false;
         self.sync_fields();
         self.field_editor.begin_frame();
         crate::pointer_map::begin_frame();
@@ -281,6 +298,8 @@ impl WindowState {
                         sidebar_layout_avail: &mut self.sidebar_layout_avail,
                         sidebar_layout_specs: &mut self.sidebar_layout_specs,
                         sidebar_section_areas: &mut self.sidebar_section_areas,
+                        ref_name_error: &self.ref_name_error,
+                        name_slot: &mut name_slot,
                     },
                 );
                 crate::theme::paint_side_bg(frame.buffer_mut(), self.refs_area);
@@ -446,7 +465,7 @@ impl WindowState {
                         visible_commit_ids: &mut self.visible_commit_ids,
                         log_search_bar_area: &mut self.log_search_bar_area,
                         inline_ref_row: &mut inline_ref_row,
-                        inline_ref_drawn: &mut inline_ref_drawn,
+                        name_slot: &mut name_slot,
                         commit_lane_colors: &mut commit_lane_colors,
                     },
                 );
@@ -586,7 +605,7 @@ impl WindowState {
                         field_editor: &self.field_editor,
                         footer_area,
                         in_flight_text: &in_flight_text,
-                        inline_ref_drawn,
+                        inline_ref_drawn: name_slot.drawn(),
                         input_mode: &self.input_mode,
                         last_message: &self.last_message,
                         commit_total,
@@ -648,6 +667,8 @@ impl WindowState {
                         right_pane_collapsed: self.right_pane_collapsed,
                         right_panel: self.right_panel,
                         sidebar_section_areas: &self.sidebar_section_areas,
+                        ref_name_error: &self.ref_name_error,
+                        name_slot: &mut name_slot,
                         status_area: self.status_area,
                         status_section_areas: &self.status_section_areas,
                         tab_bar_area,
@@ -778,6 +799,8 @@ impl WindowState {
                 crate::scrollbar::retain_visible_arrows(frame.buffer_mut());
             })
             .map_err(exit_log::io_context("drawing a frame"))?;
+        name_slot.end_frame();
+        self.ref_name_slot = name_slot;
         let agent_diff = super::agent_look::diff_state_json(
             self.central_view,
             &self.diff_view_state,

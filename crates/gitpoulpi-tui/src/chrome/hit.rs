@@ -331,6 +331,8 @@ pub(crate) enum HitTarget {
     ConfirmButton(bool),
     /// The close cross of that popup: closes like Cancel.
     ConfirmClose,
+    /// A button or the close cross of the name box (`ref_name_box.rs`).
+    RefNameBox(crate::ref_name_box::RefNamePart),
     /// The chevron on the Refs or Status pane's top border that collapses
     /// it, handing its width to the Log pane in the middle - "collapse au
     /// besoin les panes de gauche et de droite pour laisser la place au
@@ -579,6 +581,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::ColumnMenuClose
             | HitTarget::ConfirmButton(_)
             | HitTarget::ConfirmClose
+            | HitTarget::RefNameBox(_)
             | HitTarget::FileListModeButton(_)
             | HitTarget::CommitSortButton
             | HitTarget::CommitIdLine

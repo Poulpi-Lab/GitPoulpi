@@ -57,7 +57,7 @@ pub(in crate::event_loop) struct LogDrawCtx<'a> {
     pub(in crate::event_loop) visible_commit_ids: &'a mut Vec<Oid>,
     pub(in crate::event_loop) log_search_bar_area: &'a mut Option<Rect>,
     pub(in crate::event_loop) inline_ref_row: &'a mut Option<u16>,
-    pub(in crate::event_loop) inline_ref_drawn: &'a mut bool,
+    pub(in crate::event_loop) name_slot: &'a mut NameSlot,
     pub(in crate::event_loop) commit_lane_colors: &'a mut std::collections::HashMap<Oid, Color>,
     /// Filled by this paint: what each column needs to show its content.
     pub(in crate::event_loop) log_natural: &'a mut NaturalWidths,
@@ -114,7 +114,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
     let visible_commit_ids = &mut *ctx.visible_commit_ids;
     let log_search_bar_area = &mut *ctx.log_search_bar_area;
     let inline_ref_row = &mut *ctx.inline_ref_row;
-    let inline_ref_drawn = &mut *ctx.inline_ref_drawn;
+    let name_slot = &mut *ctx.name_slot;
     let commit_lane_colors = &mut *ctx.commit_lane_colors;
     let log_natural = &mut *ctx.log_natural;
     *log_natural = NaturalWidths::new();
@@ -558,21 +558,23 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
             }
         }
 
-        // The inline branch/tag name box, over the Ref cell of the
-        // target commit's row (over its pills, if it has any). If the
-        // row is off screen or the Ref column is hidden/too narrow,
-        // nothing is drawn and the status-bar field takes over.
+        // The inline name box (new branch/tag, a rename from the pill), over
+        // the Ref cell of the target commit's row (over its pills, if it has
+        // any). If the row is off screen or the Ref column is hidden/too
+        // narrow, or another spot already holds the field, nothing is drawn
+        // here and the next spot takes over (`ref_name_box.rs`).
         if let (Some((kind, _)), Some(row), InputMode::ComposingRefName { value, .. }) =
             (inline_ref, *inline_ref_row, input_mode)
         {
-            // A Ref column cut by the viewport counts as too narrow: the
-            // status-bar field takes over.
+            // A Ref column cut by the viewport counts as too narrow.
             let ref_whole: Vec<(LogColumn, u16, u16)> = log_offsets
                 .iter()
                 .copied()
                 .filter(|(c, _, _)| *c != LogColumn::Ref || log_geo.fully_visible(*c))
                 .collect();
-            if let Some(box_rect) = inline_box_rect(&ref_whole, row) {
+            if let Some(box_rect) =
+                inline_box_rect(&ref_whole, row).filter(|_| name_slot.may_draw(NameSpot::Log))
+            {
                 let text_rect = render_inline_box(
                     frame,
                     box_rect,
@@ -583,7 +585,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
                     ref_name_error.as_deref(),
                 );
                 field_editor.drawn(MainField::RefName, text_rect, false);
-                *inline_ref_drawn = true;
+                name_slot.mark(NameSpot::Log);
             }
         }
 

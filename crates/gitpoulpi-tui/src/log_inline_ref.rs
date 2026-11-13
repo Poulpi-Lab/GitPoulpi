@@ -38,19 +38,34 @@ impl InlineRefKind {
     }
 }
 
-/// The kind and the commit an in-progress name belongs to, or `None` for
-/// the prompts that are not "a new ref on a commit" (rename, annotate,
-/// upstream), which keep the status-bar field. `NewBranch`/`NewTag` sit on
-/// HEAD's commit, the same commit `Action::BranchCreate` will use.
-pub(crate) fn inline_target(op: &RefNameOp, head: Option<Oid>) -> Option<(InlineRefKind, Oid)> {
+/// The kind and the commit an in-progress name belongs to in the Log, or
+/// `None` for the prompts that are not "a name on a commit's row" (the
+/// Refs-row rename, create file, annotate, upstream...). `NewBranch`/`NewTag`
+/// sit on HEAD's commit, the same commit `Action::BranchCreate` will use; a
+/// rename from the pill (or the palette, as a second choice) sits on the
+/// branch's tip.
+pub(crate) fn inline_target(
+    op: &RefNameOp,
+    refs: &[gitpoulpi_core::domain::Ref],
+) -> Option<(InlineRefKind, Oid)> {
     match op {
         RefNameOp::NewBranchAt(at) => Some((InlineRefKind::Branch, *at)),
         RefNameOp::NewTagAt(at) | RefNameOp::NewAnnotatedTagAt(at) => {
             Some((InlineRefKind::Tag, *at))
         }
-        RefNameOp::NewBranch => head.map(|h| (InlineRefKind::Branch, h)),
-        RefNameOp::NewTag => head.map(|h| (InlineRefKind::Tag, h)),
-        RefNameOp::RenameBranch(_)
+        RefNameOp::NewBranch => head_oid(refs).map(|h| (InlineRefKind::Branch, h)),
+        RefNameOp::NewTag => head_oid(refs).map(|h| (InlineRefKind::Tag, h)),
+        RefNameOp::RenameBranch {
+            name,
+            spot: RenameSpot::Pill | RenameSpot::Auto,
+        } => refs
+            .iter()
+            .find(|r| matches!(&r.kind, RefKind::LocalBranch { name: n } if n == name))
+            .map(|r| (InlineRefKind::Branch, r.target)),
+        RefNameOp::RenameBranch {
+            spot: RenameSpot::Refs,
+            ..
+        }
         | RefNameOp::AnnotateTag(_)
         | RefNameOp::AnnotatedTagMessage { .. }
         | RefNameOp::SetUpstream(_)
@@ -60,6 +75,18 @@ pub(crate) fn inline_target(op: &RefNameOp, head: Option<Oid>) -> Option<(Inline
         | RefNameOp::LfsTrack
         | RefNameOp::LfsUntrack => None,
     }
+}
+
+/// The refs a rename must not collide with: every ref but the branch being
+/// renamed (so `a` may become `a2`, and `a/b` may take `a`'s place).
+pub(crate) fn refs_without_branch(
+    refs: &[gitpoulpi_core::domain::Ref],
+    old: &str,
+) -> Vec<gitpoulpi_core::domain::Ref> {
+    refs.iter()
+        .filter(|r| !matches!(&r.kind, RefKind::LocalBranch { name } if name == old))
+        .cloned()
+        .collect()
 }
 
 /// `git check-ref-format`'s rules, as far as a short human message goes.
@@ -166,8 +193,20 @@ fn box_bg() -> Color {
 /// otherwise the draft through the shared field drawing, so caret and
 /// selection behave as in every other field. `width` includes the one
 /// blank column kept on the left.
+#[cfg(test)]
 pub(crate) fn box_line(
     kind: InlineRefKind,
+    value: &str,
+    caret: Option<&crate::text_edit::Caret>,
+    width: usize,
+    error: bool,
+) -> Line<'static> {
+    name_line(kind.placeholder(), value, caret, width, error)
+}
+
+/// [`box_line`] with any placeholder (the new-file box names a file).
+pub(crate) fn name_line(
+    placeholder: &str,
     value: &str,
     caret: Option<&crate::text_edit::Caret>,
     width: usize,
@@ -183,7 +222,7 @@ pub(crate) fn box_line(
     let mut spans = vec![Span::styled(" ", base)];
     let inner = width.saturating_sub(1);
     if value.is_empty() {
-        let hint = truncate_with_ellipsis(kind.placeholder(), inner.saturating_sub(1));
+        let hint = truncate_with_ellipsis(placeholder, inner.saturating_sub(1));
         let hint_w = display_width(&hint);
         spans.push(Span::styled("\u{2588}", caret_style));
         spans.push(Span::styled(
@@ -224,10 +263,31 @@ pub(crate) fn render_inline_box(
     caret: Option<&crate::text_edit::Caret>,
     error: Option<&str>,
 ) -> Rect {
+    render_name_box(
+        frame,
+        box_rect,
+        error_rect,
+        kind.placeholder(),
+        value,
+        caret,
+        error,
+    )
+}
+
+/// [`render_inline_box`] with any placeholder.
+pub(crate) fn render_name_box(
+    frame: &mut Frame,
+    box_rect: Rect,
+    error_rect: Option<Rect>,
+    placeholder: &str,
+    value: &str,
+    caret: Option<&crate::text_edit::Caret>,
+    error: Option<&str>,
+) -> Rect {
     frame.render_widget(Clear, box_rect);
     frame.render_widget(
-        Paragraph::new(box_line(
-            kind,
+        Paragraph::new(name_line(
+            placeholder,
             value,
             caret,
             usize::from(box_rect.width),
@@ -301,19 +361,41 @@ mod tests {
 
     #[test]
     fn inline_target_covers_the_commit_bound_prompts_only() {
+        let mut head = local_branch_at("main", oid(2));
+        head.is_head = true;
+        let refs = vec![head, local_branch_at("feat", oid(5))];
         assert_eq!(
-            inline_target(&RefNameOp::NewBranchAt(oid(3)), None),
+            inline_target(&RefNameOp::NewBranchAt(oid(3)), &[]),
             Some((InlineRefKind::Branch, oid(3)))
         );
         assert_eq!(
-            inline_target(&RefNameOp::NewTag, Some(oid(2))),
+            inline_target(&RefNameOp::NewTag, &refs),
             Some((InlineRefKind::Tag, oid(2)))
         );
-        assert_eq!(inline_target(&RefNameOp::NewTag, None), None);
+        assert_eq!(inline_target(&RefNameOp::NewTag, &[]), None);
+        // A rename sits on the Refs row, or on the branch's tip in the Log.
+        let rename = |spot| RefNameOp::RenameBranch {
+            name: "feat".into(),
+            spot,
+        };
+        assert_eq!(inline_target(&rename(RenameSpot::Refs), &refs), None);
         assert_eq!(
-            inline_target(&RefNameOp::RenameBranch("a".into()), Some(oid(2))),
-            None
+            inline_target(&rename(RenameSpot::Pill), &refs),
+            Some((InlineRefKind::Branch, oid(5)))
         );
+        assert_eq!(
+            inline_target(&rename(RenameSpot::Auto), &refs),
+            Some((InlineRefKind::Branch, oid(5)))
+        );
+    }
+
+    #[test]
+    fn a_rename_may_reuse_its_own_name_and_its_folder_slot() {
+        let refs = vec![local_branch_at("a", oid(1)), local_branch_at("b", oid(1))];
+        let others = refs_without_branch(&refs, "a");
+        assert_eq!(others.len(), 1);
+        assert!(validate_new_ref(InlineRefKind::Branch, "a/x", &others).is_ok());
+        assert!(validate_new_ref(InlineRefKind::Branch, "b", &others).is_err());
     }
 
     #[test]

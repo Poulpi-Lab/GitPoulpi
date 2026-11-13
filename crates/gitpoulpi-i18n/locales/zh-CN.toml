@@ -1018,6 +1018,24 @@ name_spaces = "名称不能包含空格"
 name_bad_char = "名称不能包含“{c}”"
 name_part_dot = "名称的每一段不能以“.”开头"
 name_part_lock = "名称的每一段不能以“.lock”结尾"
+# context: title of the name box (naming with no inline spot); keep {sha} and {$tag}
+box_new_branch = "新分支名"
+box_new_tag = { git = "新 {$tag} 名", local = "新{$tag}名" }
+box_new_branch_at = "在 {sha} 处新建分支"
+box_new_tag_at = { git = "在 {sha} 处新建 {$tag}", local = "在 {sha} 处新建{$tag}" }
+box_new_annotated_tag_at = { git = "在 {sha} 处新建附注 {$tag}", local = "在 {sha} 处新建附注{$tag}" }
+# context: title of the rename box; {old} is the branch name
+box_rename = "Rename {old}"
+# context: confirm button of the rename box
+rename_button = "Rename"
+# context: placeholder of the inline new-file box in the Status list; keep it short
+placeholder_file = "file name, e.g. notes.md"
+# context: title of the new-file box; {folder} is a path
+box_new_file = "New file in {folder}/"
+# context: title of the new-file box for the repository root
+box_new_file_root = "New file"
+# context: confirm button of the name box and the new-file box
+create_button = "Create"
 
 [menu_pill]
 checkout = { git = "Checkout", local = "检出" }

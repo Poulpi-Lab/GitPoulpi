@@ -871,6 +871,7 @@ pub(super) fn init(
         // for every prompt that is not an inline ref box.
         new_file_error: None,
         ref_name_revealed: false,
+        ref_name_slot: NameSlot::default(),
         last_message,
         refs_filter: String::new(),
         collapsed_ref_sections,

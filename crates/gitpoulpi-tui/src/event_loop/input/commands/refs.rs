@@ -275,7 +275,10 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
         PaletteCommand::RenameSelectedBranch => {
             if let Some(n) = sel_ref {
                 *cx.input_mode = InputMode::ComposingRefName {
-                    op: RefNameOp::RenameBranch(n.clone()),
+                    op: RefNameOp::RenameBranch {
+                        name: n.clone(),
+                        spot: RenameSpot::Auto,
+                    },
                     value: n,
                 };
             }

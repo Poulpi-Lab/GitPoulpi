@@ -1386,6 +1386,24 @@ name_spaces = "a name can't contain spaces"
 name_bad_char = "a name can't contain '{c}'"
 name_part_dot = "a name part can't start with '.'"
 name_part_lock = "a name part can't end with '.lock'"
+# context: title of the name box (naming with no inline spot); keep {sha} and {$tag}
+box_new_branch = "New branch name"
+box_new_tag = "New {$tag} name"
+box_new_branch_at = "New branch at {sha}"
+box_new_tag_at = "New {$tag} at {sha}"
+box_new_annotated_tag_at = "New annotated {$tag} at {sha}"
+# context: title of the rename box; {old} is the branch name
+box_rename = "Rename {old}"
+# context: confirm button of the rename box
+rename_button = "Rename"
+# context: placeholder of the inline new-file box in the Status list; keep it short
+placeholder_file = "file name, e.g. notes.md"
+# context: title of the new-file box; {folder} is a path
+box_new_file = "New file in {folder}/"
+# context: title of the new-file box for the repository root
+box_new_file_root = "New file"
+# context: confirm button of the name box and the new-file box
+create_button = "Create"
 
 [menu_pill]
 # context: ref-pill menu submenu: check out the ref or the commit

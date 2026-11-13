@@ -206,7 +206,10 @@ pub(crate) fn apply_ref_context_action(
         },
         RefContextAction::RenameBranch => {
             *input_mode = InputMode::ComposingRefName {
-                op: RefNameOp::RenameBranch(full_name.clone()),
+                op: RefNameOp::RenameBranch {
+                    name: full_name.clone(),
+                    spot: RenameSpot::Refs,
+                },
                 value: full_name.clone(),
             };
         }

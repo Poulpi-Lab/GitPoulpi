@@ -188,6 +188,9 @@ fn hover_style_for(target: &HitTarget) -> HoverKind {
         HitTarget::ConfirmButton(_) => {
             Required("event_loop.rs lighten() on the filled band (item 15)")
         }
+        HitTarget::RefNameBox(_) => Required(
+            "ref_name_box::paint_name_box - dialog_kit::button with the hovered state, close_cross::paint for the cross",
+        ),
         HitTarget::CollapsePane(_) | HitTarget::RestorePane(_) => {
             Required("render_pane_collapse_button / render_collapsed_pane_strip, this file")
         }
@@ -495,6 +498,7 @@ fn sample_hit_targets() -> Vec<HitTarget> {
         HitTarget::ViewAllFilesCheckbox,
         HitTarget::ConfirmButton(true),
         HitTarget::ConfirmClose,
+        HitTarget::RefNameBox(crate::ref_name_box::RefNamePart::Confirm),
         HitTarget::CollapsePane(PaneSide::Refs),
         HitTarget::RestorePane(PaneSide::Refs),
         HitTarget::CloseApp,

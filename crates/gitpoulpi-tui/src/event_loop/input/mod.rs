@@ -390,6 +390,12 @@ fn handle_mouse_inner(
         }
         return Ok(Flow::Handled);
     }
+    // The name box's buttons and cross; a press anywhere else falls through.
+    if matches!(&*cx.input_mode, InputMode::ComposingRefName { op, .. } if is_inline_name(op)) {
+        if let Some(flow) = mouse_modes::ref_name_box(cx, env, mouse) {
+            return flow;
+        }
+    }
     match &*cx.input_mode {
         InputMode::EditingCommitMessage(_) => {
             return mouse_modes::editing_commit_message(cx, mouse)

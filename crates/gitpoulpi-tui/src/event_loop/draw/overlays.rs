@@ -35,6 +35,9 @@ pub(in crate::event_loop) struct OverlaysDrawCtx<'a> {
     pub(in crate::event_loop) settings_open: bool,
     pub(in crate::event_loop) palette_popup: &'a mut Option<PalettePopup>,
     pub(in crate::event_loop) rebase_state: &'a Option<gitpoulpi_core::domain::RebaseState>,
+    /// The refusal shown inside the name box, and who holds the name field.
+    pub(in crate::event_loop) ref_name_error: &'a Option<String>,
+    pub(in crate::event_loop) name_slot: &'a mut NameSlot,
     pub(in crate::event_loop) operation_state: &'a Option<gitpoulpi_core::domain::OperationState>,
     pub(in crate::event_loop) conflict_count: usize,
     pub(in crate::event_loop) index_lock: &'a Option<gitpoulpi_core::domain::IndexLock>,
@@ -90,6 +93,8 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
     let settings_open = ctx.settings_open;
     let palette_popup = &mut *ctx.palette_popup;
     let rebase_state = ctx.rebase_state;
+    let ref_name_error = ctx.ref_name_error;
+    let name_slot = &mut *ctx.name_slot;
     let operation_state = ctx.operation_state;
     let conflict_count = ctx.conflict_count;
     let index_lock = ctx.index_lock;
@@ -562,6 +567,33 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
 
     if !settings_open {
         draw_picker_popups(frame, input_mode, field_editor, tab_picker_popup);
+    }
+
+    // The name box: where a name is typed when no inline spot (the Log's Ref
+    // cell, the Refs row, the Status list) could draw it this frame.
+    if let InputMode::ComposingRefName { op, value } = &input_mode {
+        if is_inline_name(op) && name_slot.may_draw(NameSpot::Box) {
+            let hovered_part = match &hovered_target {
+                Some(HitTarget::RefNameBox(part)) => Some(*part),
+                _ => None,
+            };
+            let front: Vec<(Rect, HitTarget)> = crate::ref_name_box::paint_name_box(
+                frame,
+                frame.area(),
+                op,
+                value,
+                ref_name_error.as_deref(),
+                field_editor,
+                hovered_part,
+            )
+            .into_iter()
+            .map(|(rect, part)| (rect, HitTarget::RefNameBox(part)))
+            .collect();
+            if !front.is_empty() {
+                name_slot.mark(NameSpot::Box);
+                frame_hits.splice(0..0, front);
+            }
+        }
     }
 
     // A real modal for a pending destructive action: a bordered box with the

@@ -1020,6 +1020,24 @@ name_spaces = "имя не может содержать пробелы"
 name_bad_char = "имя не может содержать «{c}»"
 name_part_dot = "часть имени не может начинаться с «.»"
 name_part_lock = "часть имени не может заканчиваться на «.lock»"
+# context: title of the name box (naming with no inline spot); keep {sha} and {$tag}
+box_new_branch = "Имя новой ветки"
+box_new_tag = { git = "Имя нового tag'а", local = "Имя нового тега" }
+box_new_branch_at = "Новая ветка в {sha}"
+box_new_tag_at = "Новый {$tag} в {sha}"
+box_new_annotated_tag_at = "Новый аннотированный {$tag} в {sha}"
+# context: title of the rename box; {old} is the branch name
+box_rename = "Rename {old}"
+# context: confirm button of the rename box
+rename_button = "Rename"
+# context: placeholder of the inline new-file box in the Status list; keep it short
+placeholder_file = "file name, e.g. notes.md"
+# context: title of the new-file box; {folder} is a path
+box_new_file = "New file in {folder}/"
+# context: title of the new-file box for the repository root
+box_new_file_root = "New file"
+# context: confirm button of the name box and the new-file box
+create_button = "Create"
 
 [menu_pill]
 checkout = { git = "Checkout", local = "Checkout" }

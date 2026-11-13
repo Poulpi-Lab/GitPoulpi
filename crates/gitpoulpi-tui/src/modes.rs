@@ -315,6 +315,18 @@ impl ConfirmAction {
     }
 }
 
+/// Where a branch rename's box is drawn, before the name box takes over.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RenameSpot {
+    /// Over the branch's LOCAL row in the Refs sidebar.
+    Refs,
+    /// In the Ref column of the branch tip's Log row.
+    Pill,
+    /// The palette: the Refs row if the sidebar draws it, else the pill if
+    /// the Log draws it, else the name box.
+    Auto,
+}
+
 /// What a `ComposingRefName` input's Enter should do with the typed name.
 pub(crate) enum RefNameOp {
     NewBranch,
@@ -334,7 +346,12 @@ pub(crate) enum RefNameOp {
         at: Oid,
         name: String,
     },
-    RenameBranch(String),
+    /// Rename `name` in place: `spot` says where the box is drawn
+    /// (`RenameSpot`).
+    RenameBranch {
+        name: String,
+        spot: RenameSpot,
+    },
     /// Type the message for `Annotate <tag>...`. Reuses the ref-name
     /// prompt rather than adding a second one-line-input mode: the
     /// widget, its key handling and its width arithmetic are already

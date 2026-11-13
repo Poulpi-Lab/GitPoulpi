@@ -1018,6 +1018,24 @@ name_spaces = "이름에는 공백을 포함할 수 없습니다"
 name_bad_char = "이름에는 '{c}'를 포함할 수 없습니다"
 name_part_dot = "이름의 각 부분은 '.'로 시작할 수 없습니다"
 name_part_lock = "이름의 각 부분은 '.lock'으로 끝날 수 없습니다"
+# context: title of the name box (naming with no inline spot); keep {sha} and {$tag}
+box_new_branch = "새 브랜치 이름"
+box_new_tag = "새 {$tag} 이름"
+box_new_branch_at = "{sha}에 새 브랜치"
+box_new_tag_at = "{sha}에 새 {$tag}"
+box_new_annotated_tag_at = "{sha}에 새 주석 {$tag}"
+# context: title of the rename box; {old} is the branch name
+box_rename = "Rename {old}"
+# context: confirm button of the rename box
+rename_button = "Rename"
+# context: placeholder of the inline new-file box in the Status list; keep it short
+placeholder_file = "file name, e.g. notes.md"
+# context: title of the new-file box; {folder} is a path
+box_new_file = "New file in {folder}/"
+# context: title of the new-file box for the repository root
+box_new_file_root = "New file"
+# context: confirm button of the name box and the new-file box
+create_button = "Create"
 
 [menu_pill]
 checkout = "체크아웃"

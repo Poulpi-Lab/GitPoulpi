@@ -1023,6 +1023,24 @@ name_spaces = "un nom ne peut pas contenir d'espaces"
 name_bad_char = "un nom ne peut pas contenir « {c} »"
 name_part_dot = "une partie du nom ne peut pas commencer par « . »"
 name_part_lock = "une partie du nom ne peut pas finir par « .lock »"
+# context: title of the name box (naming with no inline spot); keep {sha} and {$tag}
+box_new_branch = "Nom de la nouvelle branche"
+box_new_tag = { git = "Nom du nouveau {$tag}", local = "Nom de la nouvelle {$tag}" }
+box_new_branch_at = "Nouvelle branche sur {sha}"
+box_new_tag_at = { git = "Nouveau {$tag} sur {sha}", local = "Nouvelle {$tag} sur {sha}" }
+box_new_annotated_tag_at = { git = "Nouveau {$tag} annoté sur {sha}", local = "Nouvelle {$tag} annotée sur {sha}" }
+# context: title of the rename box; {old} is the branch name
+box_rename = "Renommer {old}"
+# context: confirm button of the rename box
+rename_button = "Renommer"
+# context: placeholder of the inline new-file box in the Status list; keep it short
+placeholder_file = "nom du fichier, ex. notes.md"
+# context: title of the new-file box; {folder} is a path
+box_new_file = "Nouveau fichier dans {folder}/"
+# context: title of the new-file box for the repository root
+box_new_file_root = "Nouveau fichier"
+# context: confirm button of the name box and the new-file box
+create_button = "Créer"
 
 [menu_pill]
 checkout = { git = "Checkout", local = "Basculer sur" }

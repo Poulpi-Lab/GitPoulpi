@@ -43,6 +43,9 @@ pub(in crate::event_loop) struct SidebarDrawCtx<'a> {
     pub(in crate::event_loop) sidebar_layout_avail: &'a mut u16,
     pub(in crate::event_loop) sidebar_layout_specs: &'a mut Vec<sidebar_layout::SectionSpec>,
     pub(in crate::event_loop) sidebar_section_areas: &'a mut Vec<(SidebarSection, Rect)>,
+    /// The refusal of a branch rename, and who holds the name field.
+    pub(in crate::event_loop) ref_name_error: &'a Option<String>,
+    pub(in crate::event_loop) name_slot: &'a mut NameSlot,
 }
 
 // Ref rows built by the paint loop (test counter: must track the
@@ -111,6 +114,8 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
     let sidebar_layout_avail = &mut *ctx.sidebar_layout_avail;
     let sidebar_layout_specs = &mut *ctx.sidebar_layout_specs;
     let sidebar_section_areas = &mut *ctx.sidebar_section_areas;
+    let ref_name_error = ctx.ref_name_error;
+    let name_slot = &mut *ctx.name_slot;
     let empty_refs_for_head = Vec::new();
     let checked_out = checked_out_branch_name(refs_result.as_ref().unwrap_or(&empty_refs_for_head));
     let empty_groups = RefsGroups::default();
@@ -815,6 +820,52 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         {
             scrollbar::render(frame, track, true, false);
         }
+        // A branch rename from the Refs row (or the palette): the name box
+        // over the branch's own row, from its label to the row's end, with
+        // the refusal on the row below (above on the last visible row).
+        if let (
+            Some(RefRowKind::Local),
+            true,
+            InputMode::ComposingRefName {
+                op:
+                    RefNameOp::RenameBranch {
+                        name: renaming,
+                        spot: RenameSpot::Refs | RenameSpot::Auto,
+                    },
+                value,
+            },
+        ) = (kind_opt, expanded, input_mode)
+        {
+            let offset = sidebar_render_state.offset();
+            let leaf = rows.iter().position(|row| {
+                matches!(row, RefTreeRow::Leaf { full_name, .. } if full_name == renaming)
+            });
+            if let Some(index) = leaf.filter(|i| {
+                name_slot.may_draw(NameSpot::Refs) && *i >= offset && *i < offset + sidebar_visible
+            }) {
+                // indent, checkmark, space, eye, space: the label's column.
+                let x = area.x + 1 + rows[index].depth() as u16 * 2 + 4;
+                let y = area.y + 1 + (index - offset) as u16;
+                let end = area.x + area.width.saturating_sub(1);
+                if end >= x + 8 {
+                    let below = index + 1 < offset + sidebar_visible;
+                    let error_y = if below { y + 1 } else { y.saturating_sub(1) };
+                    let error_rect = (below || index > offset)
+                        .then(|| Rect::new(area.x + 1, error_y, end - area.x - 1, 1));
+                    let text_rect = render_name_box(
+                        frame,
+                        Rect::new(x, y, end - x, 1),
+                        error_rect,
+                        InlineRefKind::Branch.placeholder(),
+                        value,
+                        field_editor.caret(MainField::RefName),
+                        ref_name_error.as_deref(),
+                    );
+                    field_editor.drawn(MainField::RefName, text_rect, false);
+                    name_slot.mark(NameSpot::Refs);
+                }
+            }
+        }
         // The REMOTE header's `+` (Add remote), as in most Git clients. On the
         // header's right end, only when it cannot cover the title
         // (the shared-header rule), and registered *before* the
@@ -957,6 +1008,8 @@ mod tests {
                         sidebar_layout_avail: &mut avail,
                         sidebar_layout_specs: &mut specs,
                         sidebar_section_areas: &mut areas,
+                        ref_name_error: &None,
+                        name_slot: &mut NameSlot::default(),
                     },
                 );
             })
@@ -1065,6 +1118,8 @@ mod tests {
                             sidebar_layout_avail: &mut avail,
                             sidebar_layout_specs: &mut specs,
                             sidebar_section_areas: &mut areas,
+                            ref_name_error: &None,
+                            name_slot: &mut NameSlot::default(),
                         },
                     );
                 })
@@ -1188,6 +1243,8 @@ mod tests {
                             sidebar_layout_avail: &mut avail,
                             sidebar_layout_specs: &mut specs,
                             sidebar_section_areas: &mut areas,
+                            ref_name_error: &None,
+                            name_slot: &mut NameSlot::default(),
                         },
                     );
                 })

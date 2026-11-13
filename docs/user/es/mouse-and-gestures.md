@@ -379,7 +379,7 @@ Consulta [Stage y commit](staging-and-committing.md).
 - **Haz clic en el minimapa** para mover la vista a esa línea. Mantén pulsado el
   botón y muévete para desplazar.
 
-Cada descarte pregunta antes.
+Cada descarte pregunta antes. Cuando un descarte elimina archivos sin seguimiento, las carpetas que quedan completamente vacías se van con ellos (nunca una que aún contiene un archivo con seguimiento, ignorado u oculto, ni una que ya estaba vacía); Deshacer devuelve los archivos con sus carpetas.
 
 ### Blame e historial del archivo
 

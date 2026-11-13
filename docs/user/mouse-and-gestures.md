@@ -142,6 +142,7 @@ GitPoulpi remembers every size. See
   and on the one under the pointer) to close it. **Drag a tab** sideways to
   reorder it. **Right-click a tab** for the tab menu.
 - **Middle-click a tab** to close it, like its `x`.
+- **Click `‹` or `›`** at the ends of the tabs (shown when they do not all fit) to scroll the row by one tab; hold the button to keep scrolling, or use the wheel over the row. Dragging a tab onto an arrow scrolls the row too. The row also scrolls by itself to show the current tab whenever it changes.
 - **Click the `+`** after the last tab for a menu: New tab (`Alt+T`) and, while their tabs are closed, Radar and Workspaces (`Alt+J`).
 - **Click the house icon** for the Home tab.
 - **Click the Radar or Workspaces tab** to open it; its `x`, a middle click or `Ctrl+W` closes it. **Click the workspace chip** (`Alt+W`) to switch workspace.

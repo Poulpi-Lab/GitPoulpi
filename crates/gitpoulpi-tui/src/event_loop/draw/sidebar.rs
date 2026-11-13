@@ -837,9 +837,9 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         ) = (kind_opt, expanded, input_mode)
         {
             let offset = sidebar_render_state.offset();
-            let leaf = rows.iter().position(|row| {
-                matches!(row, RefTreeRow::Leaf { full_name, .. } if full_name == renaming)
-            });
+            let leaf = rows.iter().position(
+                |row| matches!(row, RefTreeRow::Leaf { full_name, .. } if full_name == renaming),
+            );
             if let Some(index) = leaf.filter(|i| {
                 name_slot.may_draw(NameSpot::Refs) && *i >= offset && *i < offset + sidebar_visible
             }) {

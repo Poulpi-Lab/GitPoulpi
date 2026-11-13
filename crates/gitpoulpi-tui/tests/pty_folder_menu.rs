@@ -90,6 +90,17 @@ fn open_folder_menu_on(term: &mut Terminal, folder: &str) {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }
 
+/// What a new file's name is asked with while it is empty (the inline box).
+const NAME_HINT: &str = "file name, e.g. notes.md";
+
+/// The status line and everything under the panes: the last three rows.
+fn status_line(s: &xtask::pty::Screen) -> String {
+    (s.rows() - 3..s.rows())
+        .map(|r| s.line(r))
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
 fn click_row(term: &mut Terminal, label: &str) {
     let screen = term
         .wait_for(&format!("a menu row '{label}'"), STEP, |s| {
@@ -264,15 +275,32 @@ fn right_click_on_the_empty_area_offers_create_file_and_creates_a_nested_file() 
     )
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     click_row(&mut term, "Create file");
-    term.wait_for("the name prompt", STEP, |s| s.contains("New file name"))
+    // The name is asked in the list itself, never in the status line.
+    let screen = term
+        .wait_for("the inline name box", STEP, |s| s.contains(NAME_HINT))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !status_line(&screen).contains("file name"),
+        "the prompt is in the status line: {:?}",
+        status_line(&screen)
+    );
+    assert!(!screen.contains("Cancel"), "the name box took over");
 
-    // A refused name keeps the prompt open and says why.
-    term.send_text("bad*name.txt").unwrap();
+    // A refused name keeps the box open and says why, under it.
+    term.send_text("zq9xbad*name.txt").unwrap();
     term.send_keys("Enter").unwrap();
-    term.wait_for("the refusal", STEP, |s| s.contains("is not allowed"))
+    let screen = term
+        .wait_for("the refusal", STEP, |s| s.contains("is not allowed"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    for _ in 0..12 {
+    assert!(
+        !status_line(&screen).contains("zq9x") && !status_line(&screen).contains("is not allowed"),
+        "the name or its refusal reached the status line: {:?}",
+        status_line(&screen)
+    );
+    let (_, typed) = screen.find("zq9xbad").unwrap();
+    let (_, refusal) = screen.find("is not allowed").unwrap();
+    assert_eq!(refusal, typed + 1, "the refusal is not on the next row");
+    for _ in 0..16 {
         term.send_keys("Backspace").unwrap();
     }
     term.send_text("notes/new.md").unwrap();
@@ -295,16 +323,34 @@ fn create_a_file_in_this_folder_creates_it_inside_the_folder_and_refuses_an_exis
     let (mut term, _config) = launch(repo.root(), "pty-foldermenu-create", "");
     open_folder_menu_on(&mut term, "alpha");
     click_row(&mut term, "Create a file in this folder");
-    term.wait_for("the prompt naming the folder", STEP, |s| {
-        s.contains("New file name in alpha/")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // The box sits right under the `alpha/` row, one level in.
+    let screen = term
+        .wait_for("the box under the folder", STEP, |s| s.contains(NAME_HINT))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let (folder_col, folder_row) = screen.find("\u{25BE} alpha/").unwrap();
+    let (hint_col, hint_row) = screen.find(NAME_HINT).unwrap();
+    assert_eq!(hint_row, folder_row + 1, "the box is not under alpha/");
+    assert!(hint_col > folder_col, "the box is not indented");
+    assert!(
+        !status_line(&screen).contains("file name"),
+        "the prompt is in the status line"
+    );
     term.send_text("a.txt").unwrap();
     term.send_keys("Enter").unwrap();
-    term.wait_for("the existing file refused", STEP, |s| {
-        s.contains("already exists")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let screen = term
+        .wait_for("the existing file refused", STEP, |s| {
+            s.contains("already exists")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !status_line(&screen).contains("already exists"),
+        "the refusal reached the status line"
+    );
+    let (_, typed) = screen
+        .find("a.txt\u{2588}")
+        .unwrap_or_else(|| panic!("the typed name is not on screen:\n{}", term.text()));
+    let (_, refusal) = screen.find("already exists").unwrap();
+    assert_eq!(refusal, typed + 1, "the refusal is not on the next row");
     for _ in 0..5 {
         term.send_keys("Backspace").unwrap();
     }
@@ -328,9 +374,82 @@ fn the_palette_creates_a_file_too() {
     term.send_keys("C-p").unwrap();
     term.send_text("Working Changes: Create File").unwrap();
     term.send_keys("Enter").unwrap();
-    term.wait_for("the name prompt", STEP, |s| s.contains("New file name"))
+    let screen = term
+        .wait_for("the inline name box", STEP, |s| s.contains(NAME_HINT))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !status_line(&screen).contains("file name"),
+        "the prompt is in the status line"
+    );
+    assert!(!screen.contains("Cancel"), "the name box took over");
+    term.send_text("zq9x").unwrap();
+    let screen = term
+        .wait_for("the typed name", STEP, |s| s.contains("zq9x"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !status_line(&screen).contains("zq9x"),
+        "the name was echoed in the status line"
+    );
+    for _ in 0..4 {
+        term.send_keys("Backspace").unwrap();
+    }
     term.send_text("top.txt").unwrap();
     term.send_keys("Enter").unwrap();
     wait_until("top.txt to exist", || repo.root().join("top.txt").is_file());
+}
+
+/// With a commit's detail on the right, the palette's Create File first
+/// brings the working changes on screen, then asks in their list.
+#[test]
+fn create_file_from_a_commit_view_switches_to_the_working_changes() {
+    let repo = fixture();
+    let (mut term, _config) = launch(repo.root(), "pty-foldermenu-switch", "");
+    // Select a commit: its detail is on the right, not the working changes.
+    let (col, row) = term.wait_for_text("add b", STEP).unwrap();
+    term.click(col, row).unwrap();
+    term.wait_for("the commit detail", STEP, |s| {
+        s.contains("Changed files") && !s.contains("Unstaged")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("C-p").unwrap();
+    term.send_text("Working Changes: Create File").unwrap();
+    term.send_keys("Enter").unwrap();
+    let screen = term
+        .wait_for("the working changes with the inline name box", STEP, |s| {
+            s.contains(NAME_HINT) && s.contains("Unstaged")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(!status_line(&screen).contains("file name"));
+    assert!(!screen.contains("Cancel"), "the name box took over");
+}
+
+/// When the list cannot show the box (View all files replaces the two
+/// sub-panes) the name box takes over: framed, with buttons, nothing typed
+/// in the status line.
+#[test]
+fn create_file_falls_back_to_the_name_box_when_the_list_is_not_drawn() {
+    let repo = fixture();
+    let (mut term, _config) = launch(repo.root(), "pty-foldermenu-box", "");
+    show_changes(&mut term);
+    let (col, row) = term
+        .wait_for_text("View all files", STEP)
+        .unwrap_or_else(|e| panic!("{e}"));
+    term.click(col, row).unwrap();
+    term.wait_for("the whole tree listed", STEP, |s| !s.contains("Unstaged"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("C-p").unwrap();
+    term.send_text("Working Changes: Create File").unwrap();
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the name box", STEP, |s| {
+        s.contains("New file") && s.contains(NAME_HINT) && s.contains("Cancel")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_text("zq9x").unwrap();
+    let screen = term
+        .wait_for("the typed name", STEP, |s| s.contains("zq9x"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(!status_line(&screen).contains("zq9x"));
+    term.send_keys("Esc").unwrap();
+    term.wait_for("the box closed", STEP, |s| !s.contains("zq9x"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
 }

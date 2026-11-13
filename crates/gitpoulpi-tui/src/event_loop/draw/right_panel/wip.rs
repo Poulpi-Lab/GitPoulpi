@@ -31,6 +31,9 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
     let status_states = &mut *ctx.status_states;
     let view_all_files = ctx.view_all_files;
     let wip_all = &mut *ctx.wip_all;
+    let input_mode = ctx.input_mode;
+    let ref_name_error = ctx.ref_name_error;
+    let name_slot = &mut *ctx.name_slot;
     // `Unstaged Files` and `Staged Files` are two real sub-panes (own border,
     // chevron+count title and scroll), shaped like the Refs sidebar's sections.
     let status_border_style = if focus == Focus::Status {
@@ -339,6 +342,26 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
         {
             scrollbar::render(frame, track, true, false);
         }
+        // A file being named: the box over the row under its folder.
+        if section == StatusSection::Unstaged {
+            if let InputMode::ComposingRefName {
+                op: RefNameOp::CreateFile(folder),
+                value,
+            } = input_mode
+            {
+                paint_new_file_box(
+                    frame,
+                    list_area,
+                    lines,
+                    status_states.state(section).offset(),
+                    folder,
+                    value,
+                    field_editor,
+                    ref_name_error.as_deref(),
+                    name_slot,
+                );
+            }
+        }
     }
 
     render_commit_composer(
@@ -371,4 +394,91 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
         },
         field_editor,
     );
+}
+
+/// The new-file name box of the Status list (`ref_name_box.rs`): over the row
+/// just below the target folder's own row, one level deeper; when the folder
+/// has no row (the root, a folder with no changes, a flat list) over the
+/// first row, behind a muted `folder/` prefix. Nothing is drawn when the row
+/// is not on screen or another spot already holds the field: the name box
+/// takes over.
+#[allow(clippy::too_many_arguments)]
+fn paint_new_file_box(
+    frame: &mut Frame,
+    list_area: Rect,
+    lines: &[StatusPaneLine],
+    offset: usize,
+    folder: &std::path::Path,
+    value: &str,
+    field_editor: &crate::text_edit::FieldEditor<MainField>,
+    error: Option<&str>,
+    name_slot: &mut NameSlot,
+) {
+    if !name_slot.may_draw(NameSpot::Status) {
+        return;
+    }
+    let folder_row = (!folder.as_os_str().is_empty())
+        .then(|| {
+            lines.iter().position(|l| {
+                matches!(l, StatusPaneLine::Folder { path, collapsed: false, .. } if path == folder)
+            })
+        })
+        .flatten();
+    let (index, indent, prefix) = match folder_row {
+        Some(i) => {
+            let depth = match &lines[i] {
+                StatusPaneLine::Folder { depth, .. } | StatusPaneLine::File { depth, .. } => *depth,
+            };
+            (i + 1, 2 * (depth + 1) + 2, String::new())
+        }
+        None if folder.as_os_str().is_empty() => (0, 2, String::new()),
+        None => (
+            0,
+            2,
+            format!("{}/", folder.to_string_lossy().replace('\\', "/")),
+        ),
+    };
+    let visible = usize::from(list_area.height);
+    if index < offset || index >= offset + visible {
+        return;
+    }
+    let y = list_area.y + (index - offset) as u16;
+    let x = list_area.x + indent as u16;
+    let prefix_w = if prefix.is_empty() {
+        0
+    } else {
+        display_width(&prefix) as u16 + 1
+    };
+    let right = list_area.right();
+    if right < x + prefix_w + 8 {
+        return;
+    }
+    if !prefix.is_empty() {
+        frame.render_widget(Clear, Rect::new(x, y, prefix_w, 1));
+        frame.render_widget(
+            Paragraph::new(Span::styled(
+                format!(" {prefix}"),
+                Style::default()
+                    .fg(th().ui.muted)
+                    .bg(crate::input_focus_bg()),
+            )),
+            Rect::new(x, y, prefix_w, 1),
+        );
+    }
+    let below = index + 1 < offset + visible;
+    let error_rect = (below || index > offset).then(|| {
+        let ey = if below { y + 1 } else { y - 1 };
+        Rect::new(list_area.x, ey, list_area.width, 1)
+    });
+    let text_rect = render_name_box(
+        frame,
+        Rect::new(x + prefix_w, y, right - x - prefix_w, 1),
+        error_rect,
+        crate::ref_name_box::box_placeholder(&RefNameOp::CreateFile(folder.to_path_buf())),
+        value,
+        field_editor.caret(MainField::RefName),
+        error,
+    );
+    field_editor.drawn(MainField::RefName, text_rect, false);
+    name_slot.mark(NameSpot::Status);
 }

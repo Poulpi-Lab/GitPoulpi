@@ -217,10 +217,8 @@ fn the_palette_rename_falls_back_to_the_pill_when_refs_is_collapsed() {
     term.wait_for_text("Toggle Refs Pane Collapsed", STEP)
         .unwrap();
     term.send_keys("Enter").unwrap();
-    term.wait_for("the sidebar gone", STEP, |s| {
-        !s.contains("LOCAL")
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.wait_for("the sidebar gone", STEP, |s| !s.contains("LOCAL"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("C-p").unwrap();
     term.wait_for_text("Command Palette", STEP).unwrap();
     term.send_text("Rename Selected Branch").unwrap();

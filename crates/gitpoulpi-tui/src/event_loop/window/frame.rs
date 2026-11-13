@@ -167,7 +167,36 @@ impl WindowState {
                 self.ref_name_revealed = true;
             }
             Some(_) => {}
+            // A new file keeps its own first-frame flag below.
+            None if matches!(
+                &self.input_mode,
+                InputMode::ComposingRefName {
+                    op: RefNameOp::CreateFile(_),
+                    ..
+                }
+            ) => {}
             None => self.ref_name_revealed = false,
+        }
+        // A new file is named in the Status list: on the first frame the
+        // list is brought on screen (the working changes, not a commit's
+        // detail) and the folder it goes in is opened.
+        if let InputMode::ComposingRefName {
+            op: RefNameOp::CreateFile(folder),
+            ..
+        } = &self.input_mode
+        {
+            if !self.ref_name_revealed {
+                self.right_panel = RightPanel::Status;
+                self.right_pane_collapsed = false;
+                if !folder.as_os_str().is_empty() {
+                    self.collapsed_status_folders
+                        .remove(&crate::status_list::fold_key(
+                            StatusSection::Unstaged,
+                            folder,
+                        ));
+                }
+                self.ref_name_revealed = true;
+            }
         }
         // The prompts named inline (or in the name box) keep their error
         // for as long as the mode lasts; every other prompt has none.
@@ -175,6 +204,7 @@ impl WindowState {
         {
             self.ref_name_error = None;
             self.ref_name_slot.reset();
+            self.ref_name_revealed = false;
         }
         let mut name_slot = self.ref_name_slot;
         let mut inline_ref_row: Option<u16> = None;
@@ -594,6 +624,9 @@ impl WindowState {
                         compare: &self.compare,
                         wip_all: &mut self.wip_all,
                         file_sel: &self.file_sel,
+                        input_mode: &self.input_mode,
+                        ref_name_error: &self.ref_name_error,
+                        name_slot: &mut name_slot,
                     },
                 );
 

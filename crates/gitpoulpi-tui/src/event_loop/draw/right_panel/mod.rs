@@ -82,6 +82,11 @@ pub(in crate::event_loop) struct RightPanelDrawCtx<'a> {
     pub(in crate::event_loop) wip_all: &'a mut WipAllFiles,
     /// The files multi-selected in the lists, to paint highlighted.
     pub(in crate::event_loop) file_sel: &'a FileSelection,
+    /// A new file being named inline (`ref_name_box.rs`): the mode, its
+    /// refusal, and who holds the name field.
+    pub(in crate::event_loop) input_mode: &'a InputMode,
+    pub(in crate::event_loop) ref_name_error: &'a Option<String>,
+    pub(in crate::event_loop) name_slot: &'a mut NameSlot,
 }
 
 pub(in crate::event_loop) fn draw_right_panel(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {

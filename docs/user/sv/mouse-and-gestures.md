@@ -134,6 +134,7 @@ GitPoulpi kommer ihåg varje storlek. Se
   aktiva fliken och på fliken under pekaren) för att stänga den. **Dra en flik** åt
   sidan för att ändra ordningen. **Högerklicka på en flik** för flikmenyn.
 - **Mittenklicka på en flik** för att stänga den, som dess `x`.
+- **Klicka på `‹` eller `›`** i ändarna av flikarna (visas när de inte ryms) för att rulla raden en flik; håll knappen nere för att fortsätta rulla, eller använd hjulet över raden. Om du drar en flik till en pil rullar raden också. Raden rullar även av sig själv för att visa den aktiva fliken varje gång den byts.
 - **Klicka på `+`** efter den sista fliken för en meny: Ny flik (`Alt+T`) och, medan deras flikar är stängda, Radar och Arbetsytor (`Alt+J`).
 - **Klicka på husikonen** för fliken Hem.
 - **Klicka på fliken Radar eller Arbetsytor** för att öppna den; dess `x`, ett mittenklick eller `Ctrl+W` stänger den. **Klicka på arbetsytechipet** (`Alt+W`) för att byta arbetsyta.

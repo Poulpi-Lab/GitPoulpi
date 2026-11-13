@@ -151,6 +151,7 @@ GitPoulpi recuerda cada tamaño. Consulta
   pestaña** hacia un lado para reordenarla. **Haz clic derecho en una pestaña** para
   ver el menú de la pestaña.
 - **Haz clic central en una pestaña** para cerrarla, como su `x`.
+- **Haz clic en `‹` o `›`** en los extremos de las pestañas (se muestran cuando no caben todas) para desplazar la fila una pestaña; mantén pulsado el botón para seguir desplazando, o usa la rueda sobre la fila. Arrastrar una pestaña sobre una flecha también desplaza la fila. La fila además se desplaza sola para mostrar la pestaña actual cada vez que cambia.
 - **Haz clic en el `+`** después de la última pestaña para abrir un menú: Nueva pestaña (`Alt+T`) y, mientras sus pestañas están cerradas, Radar y Espacios de trabajo (`Alt+J`).
 - **Haz clic en el icono de la casa** para ir a la pestaña Inicio.
 - **Haz clic en la pestaña Radar o Espacios de trabajo** para abrirla; su `x`, un clic central o `Ctrl+W` la cierran. **Haz clic en el chip del espacio de trabajo** (`Alt+W`) para cambiar de espacio de trabajo.

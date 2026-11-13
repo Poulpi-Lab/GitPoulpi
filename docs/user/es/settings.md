@@ -223,7 +223,7 @@ Actualizar; solo **Crear** (para un acceso directo que aún no existe) y **Quita
 | Sistema | Alias | PATH |
 |---|---|---|
 | Linux, macOS | Un enlace simbólico `~/.local/bin/<nombre>` a `gitpoulpi-tui`. Un enlace no puede llevar una marca, así que cuenta como nuestro cuando su destino es un archivo llamado `gitpoulpi-tui`; un archivo normal, o un enlace a cualquier otra cosa, **no es nuestro** y nunca se reemplaza ni se quita. | Un bloque entre `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` y `# <<< GitPoulpi PATH <<<` en `~/.bashrc` y `~/.zshrc` (los que existan; `~/.zshrc` en macOS y `~/.bashrc` en el resto si no existe ninguno), y `~/.config/fish/conf.d/gitpoulpi-path.fish` cuando fish está configurado. Quitar borra el bloque (o el archivo de fish) y nada más. |
-| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<nombre>.cmd`, un script de dos líneas que lleva `REM X-GitPoulpi=1`. | El PATH de usuario en `HKCU\Environment`, escrito mediante PowerShell, seguido de un aviso `WM_SETTINGCHANGE` para que los programas nuevos lo vean. El valor `GitPoulpiPathAdded` anota lo que se añadió, y Quitar solo quita eso. |
+| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<nombre>.cmd`, un script corto que lleva `REM X-GitPoulpi=1` (también exporta `GITPOULPI_CMDCMDLINE`, con lo que se reconoce un arranque desde la barra de direcciones). | El PATH de usuario en `HKCU\Environment`, escrito mediante PowerShell, seguido de un aviso `WM_SETTINGCHANGE` para que los programas nuevos lo vean. El valor `GitPoulpiPathAdded` anota lo que se añadió, y Quitar solo quita eso. |
 
 Los terminales nuevos ven el cambio del PATH; los que ya estaban abiertos, no. Ninguna de las dos acciones queda en el historial de deshacer: no hay Deshacer para ellas, **Quitar** es la vuelta atrás.
 
@@ -232,6 +232,31 @@ acceso directo del escritorio**, **Lanzador: Quitar accesos directos**, **Lanzad
 **Lanzador: Quitar alias del comando**, **Lanzador: Añadir al PATH**, **Lanzador: Quitar del PATH**), y `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` lo
 hace desde un script.
+
+#### Escribir en la barra de direcciones del Explorador de archivos (Windows)
+
+Escribe el alias (`gp`) o `gitpoulpi` en la barra de direcciones de una ventana del Explorador de archivos y pulsa Enter: GitPoulpi se abre en el terminal elegido en **Terminal de los accesos directos**, sobre la carpeta que muestra la ventana, sin abrir la **Última pestaña**. Con **Mostrar la ventana abierta al hacer clic** activado y un GitPoulpi ya abierto, la carpeta pasa a ser una pestaña nueva de esa ventana.
+
+- **`gp` (el alias del comando).** Una vez que existe el alias, crearlo también registra `gp.exe` en `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`, apuntando a `gitpoulpi-launch.exe`, y Quitar borra esa clave (solo cuando es nuestra). Cuando la carpeta del alias está en tu PATH (**Añadir GitPoulpi al PATH**), Windows ejecuta antes el script `.cmd` y puede parpadear un instante una ventana de consola antes de que aparezca GitPoulpi. Un script escrito por una versión anterior se reescribe solo cuando Ajustes lee el alias.
+- **`gitpoulpi`.** Funciona con el **Menú del administrador de archivos** instalado: Instalar también registra `gitpoulpi.exe` en App Paths. Sin él, `gitpoulpi` solo se encuentra cuando la carpeta de GitPoulpi está en tu PATH, y entonces la consola puede parpadear como arriba.
+
+Linux y macOS no tienen nada equivalente: las barras de ubicación de sus administradores de archivos no ejecutan programas. Usa la entrada del **Menú del administrador de archivos** o el alias del comando en un terminal.
+
+#### Menú del administrador de archivos (Abrir en GitPoulpi)
+
+Bajo los accesos directos, las filas del **Menú del administrador de archivos** añaden **Abrir en GitPoulpi** al menú contextual de las carpetas. Hay una fila de estado por administrador de archivos (en Linux, una por cada administrador encontrado aquí y por cada uno que aún conserve la entrada; una fila **Detectados** enumera lo encontrado), y luego los botones **Instalar** y **Quitar**. **Instalar** escribe la entrada para cada administrador de archivos encontrado; **Quitar** pregunta antes y luego quita exactamente lo que escribió Instalar, esté o no instalado todavía ese administrador.
+
+La entrada ejecuta `gitpoulpi launch --folder <carpeta>` (en Windows, `gitpoulpi-launch.exe --folder`, sin consola), y ese comando decide al hacer clic: con **Mostrar la ventana abierta al hacer clic** activado y una ventana de GitPoulpi abierta, una carpeta dentro de un repositorio pasa a ser una pestaña nueva de la ventana usada más recientemente, que pasa al primer plano; si no, el terminal elegido en **Terminal de los accesos directos** inicia GitPoulpi sobre esa carpeta. Por eso cambiar de terminal nunca deja una entrada desactualizada; un exe movido o un color de logo nuevo sí, y GitPoulpi reescribe solo sus propias entradas (sin crear nunca una), como los accesos directos. La entrada necesita el ayudante de arranque junto a GitPoulpi (`gitpoulpi`, o `gitpoulpi-launch.exe` en Windows); sin él la fila lo dice y los botones quedan desactivados.
+
+| Sistema | Qué escribe Instalar |
+|---|---|
+| Windows | Claves por usuario, sin administrador: `HKCU\Software\Classes\Directory\shell\GitPoulpi`, `Directory\Background\shell\GitPoulpi` y `Drive\shell\GitPoulpi`, cada una con una subclave `command`, de modo que la entrada aparece en una carpeta, en el fondo de una carpeta abierta y en una unidad. Cada clave lleva un valor `X-GitPoulpi`; una clave sin él **no es nuestra** y nunca se toca. También registra `gitpoulpi.exe` en `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`, apuntando a `gitpoulpi-launch.exe`. En Windows 11 la entrada está solo en el menú clásico: **Mostrar más opciones**, Shift+F10 o Shift+clic derecho (el nuevo menú de primer nivel solo muestra aplicaciones empaquetadas). Quitar borra nuestras claves y luego las claves padre que creó Instalar, solo si quedan vacías. |
+| Linux | Solo para los administradores de archivos que haya en el PATH. GNOME Files y Caja: un script con el nombre de la entrada en `~/.local/share/nautilus/scripts` o `~/.config/caja/scripts` (en el submenú **Scripts**). Dolphin: `~/.local/share/kio/servicemenus/gitpoulpi-open.desktop`, ejecutable (KDE Frameworks 6 ignora un menú de servicio de usuario que no lo sea; KDE Frameworks 5 anterior a 5.85 no es compatible). Nemo: dos acciones en `~/.local/share/nemo/actions` (una carpeta seleccionada, el fondo). Thunar: una acción fusionada en `~/.config/Thunar/uca.xml`; tus propias acciones se conservan, y Quitar devuelve el archivo byte a byte (o lo borra si lo creó Instalar). PCManFM y PCManFM-Qt: `~/.local/share/file-manager/actions/gitpoulpi-open.desktop`. El icono va a `~/.local/share/icons/hicolor/256x256/apps/gitpoulpi-folder.png` y se va con la última entrada. Se respetan `XDG_DATA_HOME` y `XDG_CONFIG_HOME`. La entrada aparece en una carpeta seleccionada y, donde el administrador de archivos lo ofrece, en el fondo de la carpeta. |
+| macOS | Una Acción rápida, `~/Library/Services/Open in GitPoulpi.workflow`: clic derecho en una carpeta en Finder y luego **Acciones rápidas**. Solo carpetas seleccionadas (Finder no tiene menú para el fondo de la carpeta). La primera vez puede que haya que activarla en Ajustes del Sistema > Teclado > Funciones rápidas de teclado > Servicios. |
+
+Cada archivo y cada clave que escribe GitPoulpi lleva la marca `X-GitPoulpi=1` (una línea `# X-GitPoulpi=1` en un script), y Quitar borra solo los marcados. Estas acciones cambian tu sistema, no un repositorio: Deshacer no las cubre, **Quitar** es la vuelta atrás. Las barras de ubicación de los administradores de archivos no ejecutan programas en Linux y macOS, así que allí no hay nada que escribir; un terminal tiene el alias del comando.
+
+La paleta tiene **Lanzador: Instalar menú Abrir en GitPoulpi** y **Lanzador: Quitar menú Abrir en GitPoulpi**, y `gitpoulpi desktop folder-menu status|install|remove` lo hace desde un script.
 
 ### Sincronización
 

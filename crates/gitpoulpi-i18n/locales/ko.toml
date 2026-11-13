@@ -4477,6 +4477,8 @@ no_other_refs = "이 {$commit}에는 표시할 다른 ref가 없습니다"
 file_list_loading = "이 {$commit}의 파일 목록을 아직 불러오는 중입니다"
 no_repo_tab = "열린 저장소 탭이 없습니다"
 commit_now_ai_running = "AI 메시지를 아직 작성 중입니다 - 기다리거나 Esc로 취소하세요"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "일치하는 탭이 없습니다"
 no_matching_theme = "일치하는 테마가 없습니다"
 no_matching_language = "일치하는 언어가 없습니다"

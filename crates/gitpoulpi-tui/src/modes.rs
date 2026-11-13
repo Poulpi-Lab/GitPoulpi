@@ -9,9 +9,6 @@ use super::*;
 /// keyboard owns the window's single caret and selection.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum MainField {
-    /// `InputMode::ComposingCommitMessage` - the footer's one-line
-    /// commit prompt (`Ctrl+G c`).
-    CommitPrompt,
     RefsFilter,
     LogFind,
     RefName,
@@ -40,7 +37,6 @@ impl MainField {
         commit_filter_focus: bool,
     ) -> Option<MainField> {
         match input_mode {
-            InputMode::ComposingCommitMessage(_) => Some(MainField::CommitPrompt),
             InputMode::FilteringRefs(_) => Some(MainField::RefsFilter),
             InputMode::SearchingLog(_) => Some(MainField::LogFind),
             InputMode::ComposingRefName { .. } => Some(MainField::RefName),
@@ -122,8 +118,7 @@ impl MainField {
         commit_files_filter: &'a mut String,
     ) -> Option<&'a mut String> {
         match (self, input_mode) {
-            (MainField::CommitPrompt, InputMode::ComposingCommitMessage(s))
-            | (MainField::RefsFilter, InputMode::FilteringRefs(s))
+            (MainField::RefsFilter, InputMode::FilteringRefs(s))
             | (MainField::RefName, InputMode::ComposingRefName { value: s, .. })
             | (MainField::Palette, InputMode::CommandPalette { draft: s, .. })
             | (MainField::TabPicker, InputMode::TabPicker { draft: s, .. }) => Some(s),
@@ -150,7 +145,6 @@ impl MainField {
 /// event loop).
 pub(crate) enum InputMode {
     Normal,
-    ComposingCommitMessage(String),
     FilteringRefs(String),
     /// The Log's find bar is open and owns the keyboard. Holding the
     /// `LogSearch` *inside* the mode rather than in a parallel `Option` means

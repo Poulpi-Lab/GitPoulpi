@@ -59,10 +59,6 @@ pub(in crate::event_loop) fn draw_footer(
     let mut footer_prompt: Option<(MainField, &str, &str)> = None;
     let mut ref_name_hint = String::new();
     let footer_text = match &input_mode {
-        InputMode::ComposingCommitMessage(msg) => {
-            footer_prompt = Some((MainField::CommitPrompt, msg, f::COMMIT_HINT.get()));
-            f::COMMIT_LABEL.get().to_string()
-        }
         InputMode::FilteringRefs(draft) => f::filter_refs(draft),
         InputMode::ComposingRefName { op, value } => {
             let label = match op {

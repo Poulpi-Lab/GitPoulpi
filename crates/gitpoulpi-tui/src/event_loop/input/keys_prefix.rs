@@ -11,8 +11,10 @@ pub(super) fn leader(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
     let km = env.km;
     *cx.input_mode = InputMode::Normal;
     match km.action_in(keymap::Ctx::GitPrefix, &key) {
+        // `Ctrl+G c`: the same command as `Ctrl+G Enter` and the palette's
+        // two commit entries.
         Some(Bind::GitCompose) => {
-            *cx.input_mode = InputMode::ComposingCommitMessage(String::new());
+            commands::run_command(cx, PaletteCommand::Commit);
         }
         // `Ctrl+G C`: AI proposes a split of the working
         // changes into commits (an interactive review).

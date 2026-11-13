@@ -4479,6 +4479,8 @@ no_other_refs = "deze commit heeft geen andere refs om te tonen"
 file_list_loading = "de bestandslijst van deze commit wordt nog geladen"
 no_repo_tab = "er is geen repositorytabblad geopend"
 commit_now_ai_running = "een AI-bericht wordt nog geschreven - wacht erop, of Esc breekt het af"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "geen passend tabblad"
 no_matching_theme = "geen passend thema"
 no_matching_language = "geen passende taal"

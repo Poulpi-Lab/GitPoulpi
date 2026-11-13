@@ -257,9 +257,12 @@ pub(in crate::event_loop) fn submit_composer(cx: &mut CommandCtx<'_>) {
     }
 }
 
-/// `Ctrl+G Enter`: the Commit button from anywhere. Same readiness check as
-/// the button; when it is not ready the reason is the status message and
-/// the keyboard goes to the composer's summary, like `c` in the Status pane.
+/// `Ctrl+G c`, `Ctrl+G Enter` and their palette entries: the Commit button
+/// from anywhere. Same readiness check, hooks, confirmations and journal as
+/// the button. When the button would not be ready, nothing is typed in the
+/// status line: the keyboard goes to the commit message field of the right
+/// pane (revealed if hidden or collapsed), and the status line names the
+/// shortcut that commits from there (or says what is missing).
 pub(in crate::event_loop) fn commit_now(cx: &mut CommandCtx<'_>) {
     if cx.management.is_some() {
         *cx.last_message = Some(msg::input::NO_REPO_TAB.get().into());
@@ -290,12 +293,47 @@ pub(in crate::event_loop) fn commit_now(cx: &mut CommandCtx<'_>) {
     ) {
         Ok(()) => submit_composer(cx),
         Err(reason) => {
-            *cx.last_message = Some(reason.get().to_string());
-            *cx.right_panel = RightPanel::Status;
-            *cx.focus = Focus::Status;
-            *cx.composer_focus = Some(ComposerField::Summary);
+            // Missing staged files is said as is; a missing message is
+            // the usual case, and the hint tells how to finish it.
+            *cx.last_message = Some(if reason == msg::composer::NEED_STAGED {
+                reason.get().to_string()
+            } else {
+                commit_hint()
+            });
+            focus_commit_message(cx);
         }
     }
+}
+
+/// The status-line hint after the keyboard moved into the commit message
+/// field: the shortcut that commits, as currently bound.
+fn commit_hint() -> String {
+    msg::input::commit_now_hint(
+        keymap::current()
+            .shown_labels(keymap::Action::ComposerCommit)
+            .into_iter()
+            .next()
+            .unwrap_or_default(),
+    )
+}
+
+/// Puts the caret in the commit message field of the right pane, revealing
+/// the pane when it is hidden or collapsed.
+pub(in crate::event_loop) fn focus_commit_message(cx: &mut CommandCtx<'_>) {
+    *cx.right_panel = RightPanel::Status;
+    *cx.right_pane_collapsed = false;
+    *cx.focus = Focus::Status;
+    *cx.composer_focus = Some(ComposerField::Summary);
+}
+
+/// Concluding a merge whose result equals HEAD (no working-tree row): the
+/// message field takes git's own merge message, ready to edit.
+pub(in crate::event_loop) fn focus_merge_message(cx: &mut CommandCtx<'_>, message: String) {
+    if cx.commit_summary.trim().is_empty() {
+        *cx.commit_summary = message;
+    }
+    focus_commit_message(cx);
+    *cx.last_message = Some(commit_hint());
 }
 
 /// AI commit message: refuses (with a status line) when AI is off or

@@ -4481,6 +4481,8 @@ no_other_refs = { git = "den här commiten har inga andra refs att visa", local 
 file_list_loading = { git = "den här commitens fillista laddas fortfarande", local = "den här incheckningens fillista laddas fortfarande" }
 no_repo_tab = "ingen repositoryflik är öppen"
 commit_now_ai_running = "ett AI-meddelande skrivs fortfarande - vänta på det, eller avbryt med Esc"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "ingen matchande flik"
 no_matching_theme = "inget matchande tema"
 no_matching_language = "inget matchande språk"

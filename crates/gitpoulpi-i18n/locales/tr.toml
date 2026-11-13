@@ -4479,6 +4479,8 @@ no_other_refs = "bu commit'in gösterilecek başka ref'i yok"
 file_list_loading = "bu commit'in dosya listesi hâlâ yükleniyor"
 no_repo_tab = "açık depo sekmesi yok"
 commit_now_ai_running = "bir YZ mesajı hâlâ yazılıyor - bekleyin ya da Esc ile iptal edin"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "eşleşen sekme yok"
 no_matching_theme = "eşleşen tema yok"
 no_matching_language = "eşleşen dil yok"

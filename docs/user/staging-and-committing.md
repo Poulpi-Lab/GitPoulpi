@@ -167,15 +167,17 @@ other.
   without running the repository's `pre-commit` and `commit-msg` hooks. It is
   per commit; **Settings > Repo-specific settings > Commit** makes it start
   checked. Shown when the row has room.
-- `Ctrl+G c` or `c` in the Status pane moves the caret to the form. `Esc`
-  leaves it.
-- `Ctrl+G Enter` (**Git: Commit Staged Changes Now** in the palette) is the
-  commit button from anywhere: it commits the staged changes with the form's
-  message, honoring **Amend previous commit** and **Skip hooks**, without
-  moving the focus. With nothing staged, or no summary, it says so and puts the
-  caret in the summary instead. While an AI request is still running it
-  commits nothing and says so (`Esc` cancels the request). `Ctrl+Z` takes
-  the commit back like any other.
+- `c` in the Status pane moves the caret to the form. `Esc` leaves it.
+- `Ctrl+G c` and `Ctrl+G Enter` (**Git: Commit...** and **Git: Commit Staged
+  Changes Now** in the palette) are one command, the commit button from
+  anywhere. With a summary in the form and something staged it commits right
+  away, honoring **Amend previous commit** and **Skip hooks**, without
+  moving the focus. Otherwise it commits nothing: it moves the caret into the
+  form's summary (showing the pane if it was hidden or collapsed) and the
+  status line says which shortcut commits (`Ctrl+Enter` by default). With
+  nothing staged it says so. Nothing is typed in the status line. While an AI
+  request is still running it commits nothing and says so (`Esc` cancels the
+  request). `Ctrl+Z` takes the commit back like any other.
 - Per repository, [Settings](settings.md#repo-specific-commit) can **push after
   each commit**, start the form with a **commit template** (and remove its
   `#` comments from the message) and make a merge **squash**: the form then

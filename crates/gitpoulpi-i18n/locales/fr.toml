@@ -4487,6 +4487,8 @@ no_other_refs = { git = "ce commit n'a pas d'autres refs à afficher", local = "
 file_list_loading = { git = "la liste des fichiers de ce commit se charge encore", local = "la liste des fichiers de cette validation se charge encore" }
 no_repo_tab = "aucun onglet de dépôt n'est ouvert"
 commit_now_ai_running = "un message IA est encore en cours de rédaction - attendez-le, ou Échap l'annule"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = { git = "saisissez le message, puis appuyez sur {key} pour faire le commit", local = "saisissez le message, puis appuyez sur {key} pour valider" }
 no_matching_tab = "aucun onglet correspondant"
 no_matching_theme = "aucun thème correspondant"
 no_matching_language = "aucune langue correspondante"

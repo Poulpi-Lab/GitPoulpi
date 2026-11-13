@@ -1,7 +1,7 @@
 //! Web addresses in the Commit Details pane's message (a bot's
 //! `[flate2](https://...)` link): GitPoulpi owns the click. It asks first,
-//! showing the whole address (the text is untrusted), then opens it; Esc and
-//! Cancel open nothing. The palette's `Commit Details: Open Link in
+//! showing the whole address (the text is untrusted), then opens it; Esc, the
+//! close cross and Cancel open nothing. The palette's `Commit Details: Open Link in
 //! Message...` is the keyboard twin. The browser is never launched:
 //! `GITPOULPI_OPEN_LOG` appends the target to a file instead.
 
@@ -78,6 +78,19 @@ fn a_click_on_an_address_asks_then_opens_it_and_cancel_opens_nothing() {
     );
     // Esc is Cancel.
     term.send_keys("Escape").unwrap();
+    term.wait_for_text_to_go("Open this link?", STEP).unwrap();
+    assert!(opened(log.path()).is_empty(), "{:?}", opened(log.path()));
+    // The cross on the title row cancels too.
+    click_address(&mut term, FLATE);
+    term.wait_for_text("Open this link?", STEP).unwrap();
+    let screen = term.screen();
+    let (_, title_row) = screen.find("Open this link?").expect("the title");
+    let (col, row) = screen
+        .find_all("\u{2715}")
+        .into_iter()
+        .find(|(_, r)| *r == title_row)
+        .unwrap_or_else(|| panic!("a close cross on the title row\n{}", term.text()));
+    term.click(col, row).unwrap();
     term.wait_for_text_to_go("Open this link?", STEP).unwrap();
     assert!(opened(log.path()).is_empty(), "{:?}", opened(log.path()));
     // Again, and a click on the Open button.

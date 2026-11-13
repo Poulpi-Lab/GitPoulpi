@@ -30,8 +30,10 @@ enum Choice {
     Cancel,
 }
 
-/// Cells of the address per dialog line.
-const CHUNK: usize = 56;
+/// Cells of the address per dialog line when the screen is wide enough (the
+/// box is drawn this wide plus its frame); a longer address goes on in the
+/// next lines (`Confirm` breaks it, never cuts it).
+const URL_COLUMNS: u16 = 56;
 
 struct Open {
     urls: Vec<String>,
@@ -89,10 +91,8 @@ fn build(urls: Vec<String>, at: usize) -> Open {
     let url = &urls[at];
     let mut body = String::from(m::BODY.get());
     body.push_str("\n\n");
-    for chunk in chunks(url) {
-        body.push_str(&chunk);
-        body.push('\n');
-    }
+    body.push_str(url);
+    body.push('\n');
     if urls.len() > 1 {
         body.push('\n');
         body.push_str(&m::position((at + 1) as u64, urls.len() as u64));
@@ -116,33 +116,13 @@ fn build(urls: Vec<String>, at: usize) -> Open {
     let confirm = Confirm::new(m::TITLE.get(), body, buttons, Choice::Cancel)
         .with_primary(Choice::Open)
         .keep_breaks()
-        .min_width(CHUNK as u16 + 4);
+        .min_width(URL_COLUMNS + 4);
     Open {
         urls,
         at,
         confirm,
         keys,
     }
-}
-
-/// The address cut into lines of at most [`CHUNK`] cells, never shortened.
-fn chunks(url: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut line = String::new();
-    let mut width = 0;
-    for ch in url.chars() {
-        let w = crate::display_width(&ch.to_string());
-        if width + w > CHUNK {
-            out.push(std::mem::take(&mut line));
-            width = 0;
-        }
-        line.push(ch);
-        width += w;
-    }
-    if !line.is_empty() {
-        out.push(line);
-    }
-    out
 }
 
 fn settle(slot: &mut Option<Open>, event: ConfirmEvent<Choice>) {
@@ -223,13 +203,33 @@ pub(crate) fn render(frame: &mut Frame) {
 mod tests {
     use super::*;
 
+    /// The body text of the dialog painted `width` columns wide, its lines
+    /// joined without the frame.
+    fn painted_body(url: &str, width: u16) -> String {
+        let mut open = build(vec![url.to_string()], 0);
+        let area = Rect::new(0, 0, width, 40);
+        let mut buf = ratatui::buffer::Buffer::empty(area);
+        open.confirm.render(&mut buf, area);
+        (0..area.height)
+            .map(|y| {
+                (0..area.width)
+                    .map(|x| buf[(x, y)].symbol().to_string())
+                    .collect::<String>()
+                    .trim_matches(|c: char| c.is_whitespace() || "│|".contains(c))
+                    .to_string()
+            })
+            .collect()
+    }
+
     #[test]
-    fn the_whole_address_is_kept_across_the_lines() {
-        let url = format!("https://a.test/{}", "x".repeat(130));
-        let lines = chunks(&url);
-        assert!(lines.len() > 2);
-        assert!(lines.iter().all(|l| crate::display_width(l) <= CHUNK));
-        assert_eq!(lines.concat(), url);
+    fn the_whole_address_is_shown_however_narrow_the_screen() {
+        let url = format!("https://a.test/{}/end", "x".repeat(130));
+        for width in [160, 70, 40] {
+            assert!(
+                painted_body(&url, width).contains(&url),
+                "{width} columns: the address is cut"
+            );
+        }
     }
 
     #[test]

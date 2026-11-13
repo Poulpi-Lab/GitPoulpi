@@ -302,6 +302,12 @@ impl<C: Copy + PartialEq> Confirm<C> {
         } else {
             crate::ui_kit::wrap_words(&self.body, inner_w)
         };
+        // A word wider than the box (a long web address) is broken over
+        // lines rather than cut at the frame: the whole text stays readable.
+        let lines: Vec<String> = lines
+            .into_iter()
+            .flat_map(|line| hard_break(&line, inner_w))
+            .collect();
         let want_h = lines.len() as u16 + 4;
         let panel_rect = CONFIRM_WIN.place(bounds, centered(bounds, want_w, want_h));
         self.panel = panel_rect;
@@ -340,6 +346,30 @@ impl<C: Copy + PartialEq> Confirm<C> {
         }
         out
     }
+}
+
+/// `line` cut into pieces of at most `width` cells (`line` itself when it
+/// fits), never shortened.
+fn hard_break(line: &str, width: usize) -> Vec<String> {
+    if crate::display_width(line) <= width {
+        return vec![line.to_string()];
+    }
+    let mut out = Vec::new();
+    let mut piece = String::new();
+    let mut piece_w = 0;
+    for ch in line.chars() {
+        let w = crate::display_width(ch.encode_utf8(&mut [0; 4]));
+        if piece_w + w > width && !piece.is_empty() {
+            out.push(std::mem::take(&mut piece));
+            piece_w = 0;
+        }
+        piece.push(ch);
+        piece_w += w;
+    }
+    if !piece.is_empty() {
+        out.push(piece);
+    }
+    out
 }
 
 #[cfg(test)]

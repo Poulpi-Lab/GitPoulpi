@@ -95,7 +95,7 @@ gitpoulpi-i18n.workspace = true
 clap.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
-rmcp = { version = "2.2.0", features = ["server", "transport-io", "transport-streamable-http-server"] }
+rmcp = { version = "3.9.0", features = ["server", "transport-io", "transport-streamable-http-server"] }
 hyper-util = { version = "0.1", features = ["tokio", "server", "http1", "service"] }
 tokio-util = "0.7"
 rcgen = { version = "0.13", default-features = false, features = ["ring", "pem"] }

@@ -84,7 +84,7 @@ pub async fn serve(
         GitPoulpiServer::connect(session, backend, cfg).await?,
     ));
     let mut config = StreamableHttpServerConfig::default()
-        .with_stateful_mode(false)
+        .with_legacy_session_mode(false)
         .with_json_response(true)
         .with_cancellation_token(shutdown.child_token());
     if allow_remote {

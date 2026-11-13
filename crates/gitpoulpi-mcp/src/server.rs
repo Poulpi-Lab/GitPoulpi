@@ -9,8 +9,8 @@ use std::sync::Arc;
 
 use gitpoulpi_config::{DefaultBackend, McpConfig};
 use rmcp::model::{
-    CallToolRequestParams, CallToolResult, ContentBlock, ErrorData as McpError, ListToolsResult,
-    PaginatedRequestParams, ServerCapabilities, ServerInfo, Tool, ToolAnnotations,
+    CallToolRequestParams, CallToolResponse, CallToolResult, ContentBlock, ErrorData as McpError, ListToolsResult,
+    PaginatedRequestParams, ServerCapabilities, ServerConfig, Tool, ToolAnnotations,
 };
 use rmcp::service::{NotificationContext, RequestContext, RoleServer};
 use rmcp::ServerHandler;
@@ -312,7 +312,7 @@ fn refusal(message: String) -> CallToolResult {
 pub struct SharedServer(pub Arc<GitPoulpiServer>);
 
 impl ServerHandler for SharedServer {
-    fn get_info(&self) -> ServerInfo {
+    fn get_info(&self) -> ServerConfig {
         self.0.get_info()
     }
 
@@ -332,14 +332,14 @@ impl ServerHandler for SharedServer {
         &self,
         request: CallToolRequestParams,
         context: RequestContext<RoleServer>,
-    ) -> impl Future<Output = Result<CallToolResult, McpError>> + Send + '_ {
+    ) -> impl Future<Output = Result<CallToolResponse, McpError>> + Send + '_ {
         self.0.call_tool(request, context)
     }
 }
 
 impl ServerHandler for GitPoulpiServer {
-    fn get_info(&self) -> ServerInfo {
-        let mut info = ServerInfo::default();
+    fn get_info(&self) -> ServerConfig {
+        let mut info = ServerConfig::default();
         info.capabilities = ServerCapabilities::builder().enable_tools().build();
         // `Implementation::from_build_env()`'s `env!("CARGO_CRATE_NAME")`
         // resolves inside `rmcp`'s own source, not ours, so it would
@@ -384,12 +384,13 @@ impl ServerHandler for GitPoulpiServer {
         &self,
         request: CallToolRequestParams,
         context: RequestContext<RoleServer>,
-    ) -> impl Future<Output = Result<CallToolResult, McpError>> + Send + '_ {
+    ) -> impl Future<Output = Result<CallToolResponse, McpError>> + Send + '_ {
         let client = context
             .peer
             .peer_info()
             .map(|info| info.client_info.name.clone());
-        self.handle_call(request, client)
+        let call = self.handle_call(request, client);
+        async move { call.await.map(CallToolResponse::from) }
     }
 
     fn on_initialized(

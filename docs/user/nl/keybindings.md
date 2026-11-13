@@ -1560,6 +1560,22 @@ interactieve rebase.
 op de rij van de commit. `Enter` maakt de ref. `Esc` annuleert. Een ongeldige of
 bestaande naam wordt rood getoond en het vak blijft open.
 
+Is die rij niet in beeld (een diff is open, het Log staat solo, de Ref-kolom is
+verborgen), dan wordt de naam in plaats daarvan getypt in een klein kader met een
+sluitkruis en de knoppen **Annuleren** en **Maken**. Een branch hernoemen doe je
+direct over zijn rij in het Refs-paneel, of in de Ref-cel van zijn Log-rij; een
+bestand maken doe je in de lijst met werkwijzigingen, onder de map. Overal gelden
+dezelfde toetsen: `Enter` bevestigt, `Esc` annuleert.
+
+In de statusregel wordt nooit getypt. Invoer die meer ruimte nodig heeft, is een
+dialoog met echte knoppen: het stash-bericht, het bericht van een geannoteerde tag
+(`Ctrl+Enter` of `Ctrl+S` past toe, `Enter` voegt een regel toe), Upstream
+instellen (een doorzoekbare lijst met remote branches, plus een knop **Upstream
+wissen**) en de Git LFS-patronen om te volgen en niet meer te volgen. Een
+getal- of tekstinstelling die je in het palet kiest, opent Instellingen op die
+rij, klaar om te bewerken, en het Refs-filter (`/`) wordt getypt in het vak boven
+in het Refs-paneel.
+
 ### Een commit-bericht bewerken
 
 **Commit-bericht bewerken...** in het commit-menu, `Ctrl+G e`, of
@@ -1750,7 +1766,7 @@ keuzelijst (pijltjes of wiel, typ om te filteren, `Enter` om te kiezen, `Esc` om
 | `x` | Alle wijzigingen verwerpen (vraagt eerst) |
 | `c` | De commit-composer openen |
 | `Enter` | De gestagede wijzigingen nu committen, met het bericht van het formulier, vanaf elke plek (zie [Stagen en committen](staging-and-committing.md#de-commit-schrijven)) |
-| `m` | Alle wijzigingen stashen met een bericht (leeg mag). Met AI aan schrijft `Ctrl+G` in deze prompt het bericht |
+| `m` | Alle wijzigingen stashen met een bericht, getypt in een kleine dialoog (leeg mag). Met AI aan schrijft de knop **AI-bericht** (`Ctrl+G` in de dialoog) het bericht |
 | `Shift+T` | Alle wijzigingen stashen (untracked bestanden inbegrepen), zonder bericht |
 | `o` | Een stash poppen: de stash-rij die in de Log is geselecteerd, of anders de laatste stash |
 | `p` | Pull, zoals de knop Pull is ingesteld (`git.pull_mode`) |

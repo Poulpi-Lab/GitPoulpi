@@ -166,14 +166,16 @@ na řádku pracovních změn v Logu: psaní do jednoho se zobrazí i v druhém.
   bez spuštění hooků `pre-commit` a `commit-msg` repozitáře. Platí pro jeden commit;
   **Nastavení > Nastavení repozitáře > Commit** ho nastaví jako ve výchozím stavu zaškrtnuté. Zobrazuje se,
   když je na řádku místo.
-- `Ctrl+G c` nebo `c` v panelu Stav přesune kurzor do formuláře. `Esc` ho
-  opustí.
-- `Ctrl+G Enter` (**Git: Hned commitnout změny ze stage** v paletě) je tlačítko
-  commitu odkudkoli: commitne změny ze stage se zprávou z formuláře, s ohledem na
-  **Amend předchozího commitu** a **Přeskočit hooky**, a nepřesune fokus. Když ve
-  stage nic není nebo chybí souhrn, řekne to a místo toho dá kurzor do souhrnu.
-  Dokud AI ještě píše zprávu, necommitne nic a řekne to ve stavovém řádku (`Esc`
-  požadavek na AI zruší). `Ctrl+Z` commit vrátí jako každý jiný.
+- `c` v panelu Stav přesune kurzor do formuláře. `Esc` ho opustí.
+- `Ctrl+G c` a `Ctrl+G Enter` (**Git: Commit...** a **Git: Hned commitnout změny
+  ze stage** v paletě) jsou jeden příkaz, tlačítko commitu odkudkoli. Když je ve
+  formuláři souhrn a ve stage něco leží, commitne hned, s ohledem na **Amend
+  předchozího commitu** a **Přeskočit hooky**, a nepřesune fokus. Jinak nic
+  necommitne: přesune kurzor do souhrnu formuláře (a zobrazí panel, byl-li
+  skrytý nebo sbalený) a stavový řádek řekne, která zkratka commituje (ve
+  výchozím stavu `Ctrl+Enter`). Když ve stage nic není, řekne to. Do stavového
+  řádku se nic nepíše. Dokud AI ještě píše zprávu, necommitne nic a řekne to
+  (`Esc` požadavek na AI zruší). `Ctrl+Z` commit vrátí jako každý jiný.
 - Pro každý repozitář lze v [Nastavení](settings.md#nastavení-repozitáře-commit) zapnout **push po každém
   commitu**, začínat formulář **šablonou commitu** (a odstraňovat z jeho zprávy
   komentáře `#`) a nechat merge dělat **squash**: formulář se pak

@@ -262,7 +262,7 @@ počne s vašimi místními změnami.
 |---|---|
 | **Interval Auto-Fetch** | V tomto intervalu načítá všechny remote na pozadí, číslo a jednotka (minuty nebo hodiny) na jednom řádku. Výchozí 5 minut, maximum 60 minut (1 hodina), `0` funkci vypne. `general.auto_fetch_interval_minutes` zůstává v minutách; `general.auto_fetch_interval_unit` si jen pamatuje, jak se zobrazuje. Vyžaduje restart. |
 | **Fetch při otevření karty** | Při otevření karty repozitáře spustí na pozadí Fetch všech remote. Ve výchozím stavu zapnuto. Repozitář načtený během posledních 60 sekund se znovu nenačítá. |
-| **Auto-Prune** | Fetch také odstraní remote-tracking větve, které na remote už neexistují. Ve výchozím stavu vypnuto. |
+| **Auto-Prune** | Fetch také odstraní remote-tracking větve, které na remote už neexistují. Ve výchozím stavu zapnuto, takže větev smazaná na serveru (například na GitLabu) zmizí ze sekce REMOTE po dalším fetchi. Nelze vrátit zpět: odstraněná větev se vrátí při dalším fetchi, pokud se na remote znovu objeví. |
 | **Automaticky mazat tagy** | Fetch také smaže lokální tagy, které na remote smazali. Týká se jen tagů, které na remote byly: tag, který jste nikdy neodeslali (push), zůstane. Ve výchozím stavu vypnuto, stejně jako v gitu. Vyžaduje git 2.41 nebo novější. CLI: `gitpoulpi fetch --prune-tags`; konfigurační klíč `general.auto_prune_tags`. Viz [Větve, tagy a postranní panel Refs](log-and-history.md#větve-tagy-a-postranní-panel-refs). |
 | **Udržovat submoduly aktuální** | Po checkoutu nebo pull aktualizuje submoduly na commity, které repozitář eviduje. Viz [Submoduly](submodules.md). |
 | **Po merge mazat soubory „.orig“** | Po dokončení merge smaže záložní soubory `*.orig`. Ve výchozím stavu vypnuto. |

@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = "Výchozí 5. 0 úplně vypne načítání na
 fetch_on_tab_open = { git = "Fetch při otevření karty", local = "Načíst při otevření karty" }
 fetch_on_tab_open_help = { git = "Fetch All na pozadí; přeskočí se, pokud proběhl v poslední minutě.", local = "Načíst vše na pozadí; přeskočí se, pokud proběhlo v poslední minutě." }
 auto_prune = "Auto-Prune"
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = "Odstraní vzdálené sledovací větve, které už na remote neexistují, při každém {$fetch}i: automatický {$fetch} na pozadí a tlačítka {$Fetch} a {$Fetch} All na panelu nástrojů (ne však kontrola lease v dialogu rozcházejícího se {$push}e). Ve výchozím stavu zapnuto, takže větev smazaná na serveru zmizí ze sekce REMOTE po dalším {$fetch}i. Vypněte to, pokud chcete, aby zastaralé vzdálené sledovací větve zůstaly v seznamu."
 keep_submodules_up_to_date = "Udržovat submoduly aktuální"
 default_branch_name = "Výchozí název větve"
 default_branch_name_help = "Použije se při inicializaci nebo klonování repozitáře."
@@ -4479,7 +4479,7 @@ file_list_loading = "seznam souborů tohoto commitu se ještě načítá"
 no_repo_tab = "není otevřena žádná karta repozitáře"
 commit_now_ai_running = "AI ještě píše zprávu - počkejte, nebo ji zrušte klávesou Esc"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "napište zprávu a stiskněte {key} pro {$commit}"
 no_matching_tab = "žádná odpovídající karta"
 no_matching_theme = "žádný odpovídající motiv"
 no_matching_language = "žádný odpovídající jazyk"

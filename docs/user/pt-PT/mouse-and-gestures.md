@@ -147,6 +147,7 @@ O GitPoulpi memoriza todos os tamanhos. Veja
   ativo e no que está sob o ponteiro) para o fechar. **Arraste um separador** para o lado para
   o reordenar. **Clique com o botão direito num separador** para ver o menu do separador.
 - **Clique com o botão do meio num separador** para o fechar, como o seu `x`.
+- **Clique em `‹` ou `›`** nas pontas dos separadores (aparecem quando não cabem todos) para deslocar a linha de um separador; mantenha o botão premido para continuar a deslocar, ou use a roda sobre a linha. Arrastar um separador para uma seta também desloca a linha. A linha desloca-se também sozinha para mostrar o separador atual sempre que ele muda.
 - **Clique no `+`** a seguir ao último separador para um menu: Novo separador (`Alt+T`) e, enquanto os respetivos separadores estão fechados, Radar e Áreas de trabalho (`Alt+J`).
 - **Clique no ícone da casa** para o separador Início.
 - **Clique no separador Radar ou Áreas de trabalho** para o abrir; o seu `x`, um clique com o botão do meio ou `Ctrl+W` fecham-no. **Clique na etiqueta da área de trabalho** (`Alt+W`) para mudar de área de trabalho.

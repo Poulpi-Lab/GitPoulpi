@@ -105,7 +105,7 @@ numera.
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Faz stage de um arquivo, pasta, tudo, um hunk ou algumas linhas. Um stage de arquivo, pasta ou `--all` que adicionaria um arquivo sensível (uma chave privada, um `.env`, um token reconhecido: `[privacy]` na [referência de configuração](config-reference.md#privacy-arquivos-sensíveis)) é recusado com código de saída 2 e `{error: "sensitive_files", files: [{path, reason}]}` (uma regra e uma prévia mascarada, nunca um valor); nada recebe stage. `--allow-sensitive` faz o stage mesmo assim. |
 | `unstage` (mesmas opções) | O inverso. |
-| `discard --file F [--hunk N [--lines a,b]]` | Descarta alterações unstaged (um arquivo inteiro: toda alteração, arquivo untracked excluído). Pode ser desfeito. |
+| `discard --file F [--hunk N [--lines a,b]]` | Descarta alterações unstaged (um arquivo inteiro: toda alteração, arquivo untracked excluído, e as pastas que isso deixa vazias). Pode ser desfeito. |
 | `rm-file <paths>...` | Exclui arquivos da árvore de trabalho. Pode ser desfeito. |
 | `ignore <pattern> [--file <.gitignore>]` | Acrescenta um padrão a um `.gitignore` (ou a `.git/info/exclude` com `--file .git/info/exclude`). Pode ser desfeito, exceto em `.git/info/exclude`. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Reescreve a codificação, as quebras de linha ou a indentação de arquivos da árvore de trabalho. Arquivos binários, ausentes ou não codificáveis são ignorados e informados. Uma única entrada de desfazer para todo o lote. |
@@ -165,7 +165,7 @@ e faz pop do stash, seja qual for o valor de `general.auto_stash` ([Auto-stash](
 
 | Comando | O que faz |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch do remoto padrão, de um remoto, ou de todos. Todo fetch também atualiza o que cada remoto tem em tags (o `remote` de `tag list`) e poda esse registro mesmo sem `--prune`. `--prune-tags` (Configurações: Auto-prune de tags) também exclui as tags locais que o remoto excluiu: só as que estavam nele, nunca uma que você não enviou; a resposta as lista como `pruned_tags` (git 2.41+). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch do remoto padrão, de um remoto, ou de todos. As branches de rastreamento remoto que o remoto excluiu são podadas, a menos que `general.auto_prune` seja false; `--prune` força isso. Todo fetch também atualiza o que cada remoto tem em tags (o `remote` de `tag list`) e poda esse registro mesmo sem `--prune`. `--prune-tags` (Configurações: Auto-prune de tags) também exclui as tags locais que o remoto excluiu: só as que estavam nele, nunca uma que você não enviou; a resposta as lista como `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; o modo é sempre passado explicitamente ao git. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Não existe force simples: só `--force-with-lease`. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotos. `remote list` marca com `configured: false` um namespace de rastreamento remoto sem remoto por trás; `remote remove` nele exclui as branches dele (dá para desfazer). |

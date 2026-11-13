@@ -681,8 +681,11 @@ de, klonlanmış olsun olmasın, listeleyebilir:
 - **inceleme istekleri**: incelemenizi isteyen açık request'ler;
 - **açık request'ler**: kendi ad alanınızın ve üyesi olduğunuz her org veya grubun ya da adlandırdığınız ad alanlarının
   her açık request'i. Asla tüm barındırıcı değil;
-  profilin *Ad alanları* alanı (Ayarlar > Entegrasyonlar > Radar'da satır başına bir giriş, isteğe bağlı olarak düzenli ifade)
-  üç listeyi de sınırlar;
+  profilin **Ad alanları** alanı (Ayarlar > Entegrasyonlar > Radar'da satır başına bir giriş, isteğe bağlı olarak
+  düzenli ifade) üç listeyi de sınırlar: bir satır, bir deponun tam yoluna eşit olduğunda ya da bir `/` sınırında
+  yol öneki olduğunda eşleşir (`ptm`, `ptm/produits/x`'i tutar, `ptmx/y`'yi tutmaz) ve barındırıcının döndürdüğü
+  satırlara uygulanır, barındırıcının araması izin veriyorsa ayrıca sunucu tarafında da (GitHub'ın `user:` /
+  `repo:` niteleyicileri);
 - **atanan issue'lar**: size atanan açık issue'lar.
 
 GitHub, GitLab (kendi barındırdığınız dahil), Gitea, Forgejo, Azure DevOps (Services

@@ -510,7 +510,7 @@ Klávesy jsou výchozí.
 | Detaily commitu: Obnovit velikost zprávy |  |
 | Detaily commitu: Posunout zprávu dolů |  |
 | Detaily commitu: Posunout zprávu nahoru |  |
-| Commit Details: Open Link in Message... |  |
+| Detaily commitu: Otevřít odkaz ve zprávě... |  |
 | Soubory: Přepnout řazení souborů commitu (A-Z / Z-A) |  |
 | Refs: Checkout vybraného refu | `dvojklik` |
 | Refs: Kopírovat název refu |  |
@@ -1194,8 +1194,8 @@ Klávesy jsou výchozí.
 | Spouštěč: Odebrat alias příkazu |  |
 | Spouštěč: Přidat do PATH |  |
 | Spouštěč: Odebrat z PATH |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| Spouštěč: Nainstalovat nabídku Otevřít v GitPoulpi |  |
+| Spouštěč: Odebrat nabídku Otevřít v GitPoulpi |  |
 | Aplikace: Změnit barevný motiv grafu... | `Ctrl+N Y` |
 | Aplikace: Přepnout zbarvení řádků grafu | `Ctrl+N T` |
 <!-- palette:end -->

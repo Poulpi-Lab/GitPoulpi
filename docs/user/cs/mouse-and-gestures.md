@@ -133,6 +133,7 @@ GitPoulpi si pamatuje každou velikost. Viz
   na aktivní kartě a na kartě pod ukazatelem) pro zavření. **Přetáhněte kartu**
   do strany a změníte její pořadí. **Pravým tlačítkem na kartu** otevřete nabídku karty.
 - **Prostřední tlačítko na kartě** ji zavře, jako její `x`.
+- **Kliknutí na `‹` nebo `›`** na koncích karet (zobrazí se, když se nevejdou všechny) posune řádek o jednu kartu; podržením tlačítka posouváte dál, nebo použijte kolečko nad řádkem. Přetažení karty na šipku řádek také posouvá. Řádek se také sám posune, aby ukázal aktuální kartu, kdykoli se změní.
 - **Klikněte na `+`** za poslední kartou pro nabídku: Nová karta (`Alt+T`) a, dokud jsou jejich karty zavřené, Radar a Pracovní prostory (`Alt+J`).
 - **Klikněte na ikonu domu** pro kartu Domů.
 - **Klikněte na kartu Radar nebo Pracovní prostory** pro její otevření; zavře ji její `x`, prostřední tlačítko nebo `Ctrl+W`. **Klikněte na čip pracovního prostoru** (`Alt+W`) pro přepnutí pracovního prostoru.

@@ -172,12 +172,37 @@
 | 시스템 | 별칭 | PATH |
 |---|---|---|
 | Linux, macOS | `~/.local/bin/<name>`에서 `gitpoulpi-tui`로 가는 심볼릭 링크. 링크에는 표시를 넣을 수 없으므로 대상이 `gitpoulpi-tui`라는 파일일 때만 GitPoulpi의 것으로 봅니다. 일반 파일이나 다른 것을 가리키는 링크는 **GitPoulpi의 것이 아니며** 교체하거나 제거하지 않습니다. | `~/.bashrc`와 `~/.zshrc`(있는 것. 둘 다 없으면 macOS는 `~/.zshrc`, 그 외에는 `~/.bashrc`)의 `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>`와 `# <<< GitPoulpi PATH <<<` 사이의 블록, 그리고 fish를 설정했다면 `~/.config/fish/conf.d/gitpoulpi-path.fish`. 제거하면 그 블록(또는 fish 파일)만 삭제합니다. |
-| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`. `REM X-GitPoulpi=1`이 든 두 줄짜리 shim입니다. | `HKCU\Environment`의 사용자 PATH. PowerShell로 쓰고 `WM_SETTINGCHANGE`를 브로드캐스트해 새 프로그램이 볼 수 있게 합니다. 값 `GitPoulpiPathAdded`가 추가한 것을 기록하며 제거는 그것만 제거합니다. |
+| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`. `REM X-GitPoulpi=1`이 든 짧은 shim입니다(주소 표시줄 시작을 알아보는 `GITPOULPI_CMDCMDLINE`도 내보냅니다). | `HKCU\Environment`의 사용자 PATH. PowerShell로 쓰고 `WM_SETTINGCHANGE`를 브로드캐스트해 새 프로그램이 볼 수 있게 합니다. 값 `GitPoulpiPathAdded`가 추가한 것을 기록하며 제거는 그것만 제거합니다. |
 
 새 터미널에는 PATH 변경이 적용되고, 이미 열려 있는 터미널에는 적용되지 않습니다. 두 동작 모두 실행 취소
 기록에 들어가지 않습니다. 실행 취소가 없으며 되돌리는 방법은 **제거**입니다.
 팔레트에도 같은 동작이 있습니다(**런처: 바로 가기 만들기**, **런처: 바탕 화면 바로 가기 만들기**, **런처: 바로 가기 제거**, **런처: 명령 별칭 만들기**, **런처: 명령 별칭 제거**, **런처: PATH에 추가**, **런처: PATH에서 제거**). 스크립트에서는 `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]`로 같은 작업을 합니다.
+
+#### 파일 탐색기 주소 표시줄에 입력하기 (Windows)
+
+파일 탐색기 창의 주소 표시줄에 별칭(`gp`) 또는 `gitpoulpi`를 입력하고 Enter를 누르면, GitPoulpi가 **바로 가기용 터미널**에서 선택한 터미널로 그 창에 표시된 폴더에서 열리며 **마지막 탭**은 열지 않습니다. **클릭 시 열려 있는 창 표시**가 켜져 있고 GitPoulpi가 이미 열려 있으면, 그 폴더가 해당 창의 새 탭이 됩니다.
+
+- **`gp`(명령 별칭).** 별칭이 있으면 별칭을 만들 때 `gp.exe`도 `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`에 등록되어 `gitpoulpi-launch.exe`를 가리키며, 제거하면 그 키를 삭제합니다(GitPoulpi가 만든 경우에만). 별칭이 있는 폴더가 PATH에 있으면(**GitPoulpi를 PATH에 추가**) Windows가 `.cmd` shim을 먼저 실행하므로 GitPoulpi가 나타나기 전에 콘솔 창이 잠깐 깜박일 수 있습니다. 이전 버전이 쓴 shim은 설정이 별칭을 읽을 때 자동으로 다시 쓰입니다.
+- **`gitpoulpi`.** **파일 관리자 메뉴**를 설치하면 동작합니다. 설치할 때 `gitpoulpi.exe`도 App Paths에 등록됩니다. 설치하지 않으면 GitPoulpi가 있는 폴더가 PATH에 있을 때만 `gitpoulpi`를 찾을 수 있고, 그때도 위처럼 콘솔이 깜박일 수 있습니다.
+
+Linux와 macOS에는 대응하는 기능이 없습니다. 파일 관리자의 위치 표시줄은 프로그램을 실행하지 않기 때문입니다. **파일 관리자 메뉴** 항목이나 터미널의 명령 별칭을 쓰세요.
+
+#### 파일 관리자 메뉴 (GitPoulpi에서 열기)
+
+바로 가기 아래의 **파일 관리자 메뉴** 행은 폴더의 오른쪽 클릭 메뉴에 **GitPoulpi에서 열기**를 추가합니다. 파일 관리자마다 상태 행이 하나씩 있고(Linux에서는 여기서 발견된 파일 관리자와 항목이 남아 있는 파일 관리자마다 하나씩이며, **감지됨** 행에 발견된 것이 나열됩니다), 그 아래에 **설치**와 **제거** 버튼이 있습니다. **설치**는 발견된 모든 파일 관리자에 항목을 쓰고, **제거**는 먼저 묻고 나서 그 파일 관리자가 아직 설치되어 있든 아니든 설치가 쓴 것만 제거합니다.
+
+항목은 `gitpoulpi launch --folder <folder>`를 실행하며(Windows에서는 콘솔 없는 `gitpoulpi-launch.exe --folder`), 클릭했을 때 이 명령이 결정합니다. **클릭 시 열려 있는 창 표시**가 켜져 있고 GitPoulpi 창이 열려 있으면 저장소 안의 폴더가 가장 최근에 사용한 창의 새 탭이 되고 그 창이 앞으로 나옵니다. 그렇지 않으면 **바로 가기용 터미널**에서 선택한 터미널이 그 폴더에서 GitPoulpi를 시작합니다. 그래서 터미널을 바꿔도 항목이 오래된 상태가 되지 않습니다. exe가 이동하거나 로고 색이 바뀌면 오래된 상태가 되며, GitPoulpi는 바로 가기처럼 자신의 항목을 자동으로 다시 씁니다(새로 만들지는 않음). 항목에는 GitPoulpi 옆의 실행 도우미(`gitpoulpi`, Windows에서는 `gitpoulpi-launch.exe`)가 필요합니다. 없으면 행에 그렇게 표시되고 버튼은 꺼집니다.
+
+| 시스템 | 설치가 쓰는 것 |
+|---|---|
+| Windows | 사용자별 키이며 관리자 권한이 필요 없습니다. `HKCU\Software\Classes\Directory\shell\GitPoulpi`, `Directory\Background\shell\GitPoulpi`, `Drive\shell\GitPoulpi`에 각각 `command` 하위 키가 있어, 폴더, 열린 폴더의 배경, 드라이브에 항목이 표시됩니다. 각 키에는 `X-GitPoulpi` 값이 있으며, 이것이 없는 키는 **GitPoulpi의 것이 아니므로** 절대 건드리지 않습니다. 또한 `gitpoulpi.exe`를 `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`에 등록하여 `gitpoulpi-launch.exe`를 가리키게 합니다. Windows 11에서는 항목이 클래식 메뉴에만 있습니다. **추가 옵션 표시**, Shift+F10 또는 Shift+오른쪽 클릭입니다(새 최상위 메뉴에는 패키지 앱만 나열됩니다). 제거는 GitPoulpi의 키를 삭제한 뒤, 설치가 만든 상위 키가 비어 있을 때만 그것도 삭제합니다. |
+| Linux | PATH에서 발견된 파일 관리자에 대해서만 씁니다. GNOME Files와 Caja: 항목 이름을 딴 스크립트를 `~/.local/share/nautilus/scripts` 또는 `~/.config/caja/scripts`에 둡니다(**Scripts** 하위 메뉴). Dolphin: 실행 권한이 있는 `~/.local/share/kio/servicemenus/gitpoulpi-open.desktop`(KDE Frameworks 6은 실행 권한이 없는 사용자 서비스 메뉴를 무시하며, 5.85 이전의 KDE Frameworks 5는 지원하지 않습니다). Nemo: `~/.local/share/nemo/actions`의 동작 두 개(선택한 폴더, 배경). Thunar: `~/.config/Thunar/uca.xml`에 병합되는 동작 하나이며, 직접 만든 동작은 그대로 남고 제거하면 파일이 바이트 단위로 원래대로 돌아갑니다(설치가 파일을 만들었다면 삭제). PCManFM과 PCManFM-Qt: `~/.local/share/file-manager/actions/gitpoulpi-open.desktop`. 아이콘은 `~/.local/share/icons/hicolor/256x256/apps/gitpoulpi-folder.png`에 놓이며 마지막 항목과 함께 사라집니다. `XDG_DATA_HOME`과 `XDG_CONFIG_HOME`을 따릅니다. 항목은 선택한 폴더에 표시되고, 파일 관리자가 지원하면 폴더 배경에도 표시됩니다. |
+| macOS | 빠른 동작 `~/Library/Services/Open in GitPoulpi.workflow`: Finder에서 폴더를 오른쪽 클릭한 뒤 **빠른 동작**을 선택합니다. 선택한 폴더만 해당합니다(Finder에는 폴더 배경용 메뉴가 없습니다). 처음에는 시스템 설정 > 키보드 > 키보드 단축키 > 서비스에서 켜야 할 수 있습니다. |
+
+GitPoulpi가 쓰는 모든 파일과 키에는 `X-GitPoulpi=1` 표시(스크립트에서는 `# X-GitPoulpi=1` 줄)가 있으며, 제거는 표시된 것만 삭제합니다. 이 동작들은 저장소가 아니라 시스템을 바꿉니다. 실행 취소가 적용되지 않으며 되돌리는 방법은 **제거**입니다. Linux와 macOS에서는 파일 관리자의 위치 표시줄이 프로그램을 실행하지 않으므로 거기에 입력할 것은 없고, 터미널에는 명령 별칭이 있습니다.
+
+팔레트에는 **런처: 'GitPoulpi에서 열기' 메뉴 설치**와 **런처: 'GitPoulpi에서 열기' 메뉴 제거**가 있으며, 스크립트에서는 `gitpoulpi desktop folder-menu status|install|remove`로 같은 작업을 합니다.
 
 
 ### 동기화

@@ -202,7 +202,7 @@ gitpoulpi-tui
 
 ## 제거
 
-`gitpoulpi uninstall`(두 설치 프로그램이 실행하는 것)은 GitPoulpi가 만든 명령 별칭, PATH 항목, 바로 가기를 제거한 뒤 릴리스 설치라면 프로그램 파일도 제거합니다. `.gitpoulpi-dist` 표시가 없는 빌드(cargo 빌드)에서는 거부하며 `--keep-files`는 프로그램 파일을 남겨 둡니다. MCP 에이전트는 사용할 수 없습니다. 설치 프로그램 없이 설치했다면 실행 파일 세 개를 삭제하세요. GitPoulpi는 다음 파일도 보관합니다:
+`gitpoulpi uninstall`(두 설치 프로그램이 실행하는 것)은 GitPoulpi가 만든 명령 별칭, PATH 항목, 바로 가기, 파일 관리자 메뉴 항목(Windows에서는 App Paths 키 포함)을 제거한 뒤 릴리스 설치라면 프로그램 파일도 제거합니다. `.gitpoulpi-dist` 표시가 없는 빌드(cargo 빌드)에서는 거부하며 `--keep-files`는 프로그램 파일을 남겨 둡니다. MCP 에이전트는 사용할 수 없습니다. 설치 프로그램 없이 설치했다면 실행 파일 세 개를 삭제하세요. GitPoulpi는 다음 파일도 보관합니다:
 
 | 항목 | 위치 |
 |---|---|

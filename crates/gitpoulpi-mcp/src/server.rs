@@ -9,8 +9,9 @@ use std::sync::Arc;
 
 use gitpoulpi_config::{DefaultBackend, McpConfig};
 use rmcp::model::{
-    CallToolRequestParams, CallToolResponse, CallToolResult, ContentBlock, ErrorData as McpError, ListToolsResult,
-    PaginatedRequestParams, ServerCapabilities, ServerConfig, Tool, ToolAnnotations,
+    CallToolRequestParams, CallToolResponse, CallToolResult, ContentBlock, ErrorData as McpError,
+    ListToolsResult, PaginatedRequestParams, ServerCapabilities, ServerConfig, Tool,
+    ToolAnnotations,
 };
 use rmcp::service::{NotificationContext, RequestContext, RoleServer};
 use rmcp::ServerHandler;

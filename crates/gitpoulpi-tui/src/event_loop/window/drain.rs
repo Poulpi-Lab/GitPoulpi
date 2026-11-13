@@ -147,6 +147,7 @@ impl WindowState {
                     self.input_mode,
                     InputMode::Confirm { .. }
                         | InputMode::EditingCommitMessage(_)
+                        | InputMode::Prompt(_)
                         | InputMode::InteractiveRebase(_)
                         | InputMode::ComposeCommits(_)
                         | InputMode::SplitCommit(_)
@@ -332,6 +333,11 @@ impl WindowState {
                 {
                     if let InputMode::EditingCommitMessage(form) = &mut self.input_mode {
                         form.on_paste(&text);
+                    }
+                }
+                Event::Paste(text) if matches!(self.input_mode, InputMode::Prompt(_)) => {
+                    if let InputMode::Prompt(dialog) = &mut self.input_mode {
+                        dialog.on_paste(&text);
                     }
                 }
                 Event::Paste(text)

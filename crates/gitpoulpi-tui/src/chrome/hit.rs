@@ -22,6 +22,8 @@ pub(crate) enum HitTarget {
     RemoteForm(RemoteFormHit),
     /// The text area or a button of the Edit commit message popup.
     RewordForm(RewordPart),
+    /// The field or a button of a prompt dialog (`prompt_dialog/`).
+    Prompt(crate::prompt_dialog::PromptPart),
     /// The `+` on the REMOTE section's header: Add remote.
     AddRemoteButton,
     /// The Status pane's "Git LFS is not installed" banner: opens the
@@ -515,6 +517,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::ComposeForm(crate::compose_ui::ComposePart::Editing(p))
             | HitTarget::SplitForm(crate::split_ui::SplitHit::Edit(p)),
         ) if p.is_field() => return CursorShape::Text,
+        Some(HitTarget::Prompt(p)) if p.is_field() => return CursorShape::Text,
         Some(HitTarget::RemoteForm(crate::remotes_ui::RemoteFormHit::Part(
             crate::remotes_ui::RemoteFormPart::Name
             | crate::remotes_ui::RemoteFormPart::FetchUrl
@@ -543,6 +546,7 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::ToolbarDropdown(_)
             | HitTarget::RemoteForm(_)
             | HitTarget::RewordForm(_)
+            | HitTarget::Prompt(_)
             | HitTarget::AddRemoteButton
             | HitTarget::LfsInstallLink
             | HitTarget::Gear

@@ -50,10 +50,9 @@ pub(super) fn leader(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         }
         // `Ctrl+G m`: stash with a message (prompt).
         Some(Bind::GitStashMessage) => {
-            *cx.input_mode = InputMode::ComposingRefName {
-                op: RefNameOp::StashMessage,
-                value: String::new(),
-            };
+            *cx.input_mode = InputMode::Prompt(Box::new(
+                crate::prompt_dialog::PromptDialog::stash(cx.ai_ui.enabled()),
+            ));
         }
         // `Ctrl+G i`: AI writes the commit message.
         // Silent when AI is off, like its button.

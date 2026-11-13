@@ -345,10 +345,9 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
         }
         PaletteCommand::AnnotateSelectedTag => {
             if let Some(n) = sel_ref {
-                *cx.input_mode = InputMode::ComposingRefName {
-                    op: RefNameOp::AnnotateTag(n),
-                    value: String::new(),
-                };
+                *cx.input_mode = InputMode::Prompt(Box::new(
+                    crate::prompt_dialog::PromptDialog::annotate_tag(&n),
+                ));
             }
         }
         // The one repository-wide tag

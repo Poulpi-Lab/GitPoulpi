@@ -221,6 +221,11 @@ impl WindowState {
     fn proposal_dialog_open(&self, dialog: Dialog) -> bool {
         match (dialog, &self.input_mode) {
             (Dialog::Reword(oid), InputMode::EditingCommitMessage(form)) => form.commit == oid,
+            // An annotated tag's message step is a dialog.
+            (Dialog::Tag(oid), InputMode::Prompt(dialog)) => matches!(
+                &dialog.kind,
+                crate::prompt_dialog::PromptKind::TagMessage { at, .. } if *at == oid
+            ),
             (Dialog::Split(oid), mode) => {
                 self.pending_split_proposal
                     .as_ref()

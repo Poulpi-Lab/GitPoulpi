@@ -5294,6 +5294,30 @@ confirm_hint = "pour confirmer, appuyez sur Réécrire quand même (ou de nouvea
 keys_hint = "Tab suivant · {key} mettre à jour"
 discard_hint = "Abandonner vos modifications ? Esc une seconde fois pour abandonner, toute autre touche pour continuer la saisie."
 
+[prompt_dialog]
+# context: title of the stash dialog; stash is the git verb (stash the working changes)
+stash_title = { git = "Stash des modifications", local = "Remiser les modifications" }
+# context: placeholder of the stash message field; an empty message is allowed
+stash_placeholder = "message (facultatif)"
+# context: the primary button of the stash dialog; stash is the git verb
+stash_button = "{$Stash}"
+# context: AI button of the stash dialog (the key that does the same follows it); the AI writes the stash message
+ai_message_button = "Message IA"
+# context: shown in the stash message field while the AI is writing it
+ai_writing = "rédaction..."
+# context: title of the dialog that annotates an existing tag; {name} is the tag
+tag_annotate_title = { git = "Annoter le tag {name}", local = "Annoter l'étiquette {name}" }
+# context: title of the dialog that creates an annotated tag; {name} is the new tag, {sha} the short hash of the commit it points at
+tag_new_title = { git = "Nouveau tag annoté {name} sur {sha}", local = "Nouvelle étiquette annotée {name} sur {sha}" }
+# context: placeholder of the tag message field (several lines allowed)
+tag_placeholder = "message"
+# context: the primary button of the dialog that annotates an existing tag
+tag_annotate_button = "Annoter"
+# context: the primary button of the dialog that creates an annotated tag
+tag_create_button = { git = "Créer le tag", local = "Créer l'étiquette" }
+# context: hint under the multi-line message field of the tag dialog; {key} is the key that applies
+keys_hint = "Entrée : nouvelle ligne, {key} : valider, Échap : annuler"
+
 [composer]
 need_staged = { git = "Stagez des modifications à commiter", local = "Indexez des modifications à valider" }
 need_summary = "Saisissez un résumé de {$commit}"

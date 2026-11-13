@@ -6475,6 +6475,30 @@ keys_hint = "Tab next · {key} update"
 # context: status line of the Reword popup after Esc when the message was edited; Esc is the key
 discard_hint = "Discard your changes? Esc again discards, any other key keeps editing."
 
+[prompt_dialog]
+# context: title of the stash dialog; stash is the git verb (stash the working changes)
+stash_title = "{$Stash} changes"
+# context: placeholder of the stash message field; an empty message is allowed
+stash_placeholder = "message (optional)"
+# context: the primary button of the stash dialog; stash is the git verb
+stash_button = "{$Stash}"
+# context: AI button of the stash dialog (the key that does the same follows it); the AI writes the stash message
+ai_message_button = "AI message"
+# context: shown in the stash message field while the AI is writing it
+ai_writing = "writing..."
+# context: title of the dialog that annotates an existing tag; {name} is the tag
+tag_annotate_title = "Annotate {$tag} {name}"
+# context: title of the dialog that creates an annotated tag; {name} is the new tag, {sha} the short hash of the commit it points at
+tag_new_title = "New annotated {$tag} {name} at {sha}"
+# context: placeholder of the tag message field (several lines allowed)
+tag_placeholder = "message"
+# context: the primary button of the dialog that annotates an existing tag
+tag_annotate_button = "Annotate"
+# context: the primary button of the dialog that creates an annotated tag
+tag_create_button = "Create {$tag}"
+# context: hint under the multi-line message field of the tag dialog; {key} is the key that applies
+keys_hint = "Enter: new line, {key}: apply, Esc: cancel"
+
 [composer]
 need_staged = "Stage changes to commit"
 need_summary = "Enter a commit summary"

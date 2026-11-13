@@ -14,6 +14,8 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
     let palette_ctx = env.palette_ctx;
     match &mut *cx.input_mode {
         InputMode::Guide(_) => commands::guide_key(cx, key),
+        // A prompt dialog owns every key while open (`prompt_dialog/`).
+        InputMode::Prompt(_) => super::prompt_host::key(cx, env, key)?,
         InputMode::FilteringRefs(draft) => match key.code {
             _ if MainField::RefsFilter.claims(&*cx.field_editor, draft, &key) => {
                 edit_main_field(
@@ -270,19 +272,16 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                             ));
                         }
                         RefNameOp::NewAnnotatedTagAt(at) => {
-                            // An agent's tag proposal pre-fills the message.
+                            // Step two is a dialog; an agent's tag proposal
+                            // pre-fills its message.
                             let message =
                                 crate::ui_intent::proposal::tag_message(*at).unwrap_or_default();
-                            if !message.is_empty() {
-                                cx.field_editor.reset();
-                            }
-                            next_ref_name_mode = Some(InputMode::ComposingRefName {
-                                op: RefNameOp::AnnotatedTagMessage {
-                                    at: *at,
-                                    name: name.clone(),
-                                },
-                                value: message,
-                            });
+                            cx.field_editor.reset();
+                            next_ref_name_mode = Some(InputMode::Prompt(Box::new(
+                                crate::prompt_dialog::PromptDialog::tag_message(
+                                    *at, &name, &message,
+                                ),
+                            )));
                         }
                         // `name` is the message here, as for
                         // `AnnotateTag`.
@@ -973,7 +972,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
 /// out (`nav_badge_targets`): `None` for Esc or a character with no badge.
 /// The key after the `Ctrl+N` of a form or page with badges of its own: `m`
 /// starts the arrange mode on the dialog on top (the badges never use `m`).
-fn arrange_after_prefix(cx: &mut CommandCtx<'_>, key: KeyEvent) -> bool {
+pub(super) fn arrange_after_prefix(cx: &mut CommandCtx<'_>, key: KeyEvent) -> bool {
     if crate::chrome::navigation_key_action_mods(key.code, key.modifiers)
         != crate::chrome::NavigationAction::ArrangeDialog
     {
@@ -987,7 +986,7 @@ fn arrange_after_prefix(cx: &mut CommandCtx<'_>, key: KeyEvent) -> bool {
     true
 }
 
-fn badge_cell(cx: &CommandCtx<'_>, key: KeyEvent) -> Option<(u16, u16)> {
+pub(super) fn badge_cell(cx: &CommandCtx<'_>, key: KeyEvent) -> Option<(u16, u16)> {
     let KeyCode::Char(c) = key.code else {
         return None;
     };

@@ -308,6 +308,7 @@ mod pane_split;
 mod picker_view;
 mod pill_menu;
 mod profile_bar;
+mod prompt_dialog;
 #[cfg_attr(not(feature = "hosting"), path = "pull_request_stub.rs")]
 mod pull_request;
 #[cfg_attr(

@@ -229,6 +229,10 @@ impl WindowState {
             view.ai_enabled = self.ai_ui.enabled();
             view.ai_busy = self.ai_ui.running_conflict();
         }
+        // A prompt dialog's ✦ button follows AI on / off and the running state.
+        if let InputMode::Prompt(dialog) = &mut self.input_mode {
+            dialog.sync_ai(self.ai_ui.enabled(), self.ai_ui.running());
+        }
         if let Some(outcome) = self.ai_ui.poll() {
             // A failed job is a card (the status line is cleared below).
             if let AiOutcome::Done(_, Err(why)) = &outcome {
@@ -337,22 +341,14 @@ impl WindowState {
                     );
                 }
                 AiOutcome::Done(_, Ok(AiAnswer::StashMessage(text))) => {
-                    if let InputMode::ComposingRefName {
-                        op: RefNameOp::StashMessage,
-                        value,
-                    } = &mut self.input_mode
-                    {
-                        *value = text.replace(['\r', '\n'], " ");
-                        self.field_editor.caret_mut(MainField::RefName).set_cursor(
-                            value,
-                            value.len(),
-                            false,
-                        );
-                        self.last_message = Some(
-                            gitpoulpi_i18n::msg::window::AI_WROTE_STASH
-                                .get()
-                                .to_string(),
-                        );
+                    if let InputMode::Prompt(dialog) = &mut self.input_mode {
+                        if dialog.fill_from_ai(&text) {
+                            self.last_message = Some(
+                                gitpoulpi_i18n::msg::window::AI_WROTE_STASH
+                                    .get()
+                                    .to_string(),
+                            );
+                        }
                     }
                 }
                 AiOutcome::Done(_, Ok(AiAnswer::Split { source, plan })) => {

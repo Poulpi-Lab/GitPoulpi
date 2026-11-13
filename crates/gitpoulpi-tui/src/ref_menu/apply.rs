@@ -484,10 +484,9 @@ pub(crate) fn apply_ref_context_action(
             ));
         }
         RefContextAction::AnnotateTag => {
-            *input_mode = InputMode::ComposingRefName {
-                op: RefNameOp::AnnotateTag(full_name.clone()),
-                value: String::new(),
-            };
+            *input_mode = InputMode::Prompt(Box::new(
+                crate::prompt_dialog::PromptDialog::annotate_tag(&full_name),
+            ));
         }
         RefContextAction::PushAllUnpushedTags => {
             let refs = refs_result.as_deref().unwrap_or(&[]);

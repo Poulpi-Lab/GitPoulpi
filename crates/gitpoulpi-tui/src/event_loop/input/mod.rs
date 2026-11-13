@@ -42,6 +42,7 @@ mod mouse_moved;
 mod mouse_prelude;
 mod mouse_right;
 mod mouse_scroll;
+mod prompt_host;
 #[cfg(test)]
 mod msg_tests;
 mod pointer;
@@ -395,6 +396,7 @@ fn handle_mouse_inner(
             return mouse_modes::editing_commit_message(cx, mouse)
         }
         InputMode::Guide(_) => return mouse_modes::guide(cx, mouse),
+        InputMode::Prompt(_) => return prompt_host::mouse(cx, mouse),
         InputMode::ComposeCommits(_) => return mouse_modes::composer_review(cx, mouse),
         InputMode::SplitCommit(_) => return mouse_modes::split_commit(cx, mouse),
         InputMode::Rewrite(_) => return mouse_modes::rewrite(cx, mouse),

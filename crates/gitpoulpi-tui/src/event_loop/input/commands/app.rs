@@ -539,22 +539,22 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             super::start_ai(cx, AiRequest::Compose);
         }
         PaletteCommand::StashPushWithMessage => {
-            *cx.input_mode = InputMode::ComposingRefName {
-                op: RefNameOp::StashMessage,
-                value: String::new(),
-            };
+            *cx.input_mode = InputMode::Prompt(Box::new(
+                crate::prompt_dialog::PromptDialog::stash(cx.ai_ui.enabled()),
+            ));
         }
+        // The command itself is the explicit action: it opens the dialog and
+        // starts the request, which shows "writing..." in the field.
         PaletteCommand::AiGenerateStashMessage => {
-            *cx.input_mode = InputMode::ComposingRefName {
-                op: RefNameOp::StashMessage,
-                value: String::new(),
-            };
+            let mut dialog = crate::prompt_dialog::PromptDialog::stash(cx.ai_ui.enabled());
             cx.ai_ui.start_into(
                 cx.session,
                 cx.repo,
                 AiRequest::StashMessage,
                 &mut *cx.last_message,
             );
+            dialog.ai_running = cx.ai_ui.running();
+            *cx.input_mode = InputMode::Prompt(Box::new(dialog));
         }
         PaletteCommand::AiGenerateCommitMessage => {
             generate_commit_message(cx);

@@ -983,3 +983,44 @@ async fn applying_a_lost_commit_is_undone_and_redone() {
         rig.stop().await;
     }
 }
+
+#[tokio::test]
+async fn a_discard_that_empties_new_folders_is_undone_with_them_and_redone_without() {
+    for (name, backend) in backends() {
+        let repo = FixtureRepoBuilder::new()
+            .unwrap()
+            .commit_file("keep/tracked.txt", "t\n", "first")
+            .unwrap()
+            .build();
+        std::fs::create_dir_all(repo.root().join("a/b")).unwrap();
+        std::fs::write(repo.root().join("a/b/c.txt"), "new\n").unwrap();
+        std::fs::create_dir_all(repo.root().join("keep/n")).unwrap();
+        std::fs::write(repo.root().join("keep/n/d.txt"), "new\n").unwrap();
+        std::fs::create_dir_all(repo.root().join("empty")).unwrap();
+        let mut rig = Rig::on(backend, repo).await;
+
+        rig.discard(&["a/b/c.txt", "keep/n/d.txt"]).await;
+        assert!(!rig.path("a").exists(), "{name}: the new folders go");
+        assert!(!rig.path("keep/n").exists(), "{name}");
+        assert!(rig.path("keep").is_dir(), "{name}: a tracked folder stays");
+        assert!(
+            rig.path("empty").is_dir(),
+            "{name}: an old empty folder stays"
+        );
+
+        let out = rig.undo().await;
+        assert!(out.applied, "{name}");
+        assert_eq!(rig.read("a/b/c.txt"), b"new\n", "{name}: undo recreates");
+        assert_eq!(rig.read("keep/n/d.txt"), b"new\n", "{name}");
+
+        let out = rig.redo().await;
+        assert!(out.applied, "{name}");
+        assert!(!rig.path("a").exists(), "{name}: redo removes them again");
+        assert!(!rig.path("keep/n").exists(), "{name}");
+        assert!(
+            rig.path("keep").is_dir() && rig.path("empty").is_dir(),
+            "{name}"
+        );
+        rig.stop().await;
+    }
+}

@@ -209,10 +209,12 @@ pub fn snapshot_restore(repo: &RepoRef, snapshot: Oid, paths: &[String]) -> Resu
 
     // Working tree: drop what is there and the snapshot lacks, write the rest.
     let current = walk(repo, &paths);
+    let mut removed: Vec<String> = Vec::new();
     for path in current.keys() {
         if !want_worktree.contains_key(path) {
             remove_any(&repo.root.join(path))
                 .map_err(|e| Error::Backend(format!("cannot remove {path}: {e}")))?;
+            removed.push(path.clone());
         }
     }
     for (path, file) in &want_worktree {
@@ -266,5 +268,14 @@ pub fn snapshot_restore(repo: &RepoRef, snapshot: Oid, paths: &[String]) -> Resu
     for (path, file) in &want_index {
         index.add(&entry(path.clone(), file)?).map_err(map_err)?;
     }
-    index.write().map_err(map_err)
+    index.write().map_err(map_err)?;
+    // Folders the removed files leave empty go too (redo of a discard of
+    // new files in new folders); one that still holds anything stays.
+    gitpoulpi_cli_backend::prune_empty_parents(&repo.root, &removed, &|dir| {
+        let prefix = format!("{dir}/");
+        index
+            .iter()
+            .any(|e| String::from_utf8_lossy(&e.path).starts_with(&prefix))
+    });
+    Ok(())
 }

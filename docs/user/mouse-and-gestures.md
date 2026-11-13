@@ -354,7 +354,7 @@ See [Staging and committing](staging-and-committing.md).
 - **Click the minimap** to move the view to that line. Hold the button down
   and move to scroll.
 
-Every discard asks first.
+Every discard asks first. When a discard deletes untracked files, the folders that become completely empty go with them (never one that still holds a tracked, ignored or hidden file, or one that was already empty); Undo brings the files back with their folders.
 
 ### Blame and File History
 

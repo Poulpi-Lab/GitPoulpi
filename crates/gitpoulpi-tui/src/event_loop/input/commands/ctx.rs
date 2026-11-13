@@ -45,7 +45,7 @@ pub(in crate::event_loop) struct CommandCtx<'a> {
     pub(in crate::event_loop) commit_message_user_rows: &'a mut u16,
     pub(in crate::event_loop) commit_meta_area: &'a mut Rect,
     pub(in crate::event_loop) commit_paths_cache: &'a mut Vec<PathBuf>,
-    pub(in crate::event_loop) commit_ref_urls: &'a mut Vec<String>,
+    pub(in crate::event_loop) commit_ref_urls: &'a mut Vec<(String, bool)>,
     pub(in crate::event_loop) commit_sort_desc: &'a mut bool,
     pub(in crate::event_loop) commit_summary: &'a mut String,
     pub(in crate::event_loop) compose_move_requested: &'a mut bool,

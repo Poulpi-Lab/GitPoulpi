@@ -58,6 +58,13 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         return Ok(Flow::Handled);
     }
 
+    // "Open this link?" (an address of a commit message): the same.
+    if key.kind == KeyEventKind::Press && crate::link_confirm::is_open() {
+        crate::link_confirm::on_key(key);
+        take_link_result(cx);
+        return Ok(Flow::Handled);
+    }
+
     let km = env.km;
     // The integration security check owns the keyboard above everything: it
     // answers a change that was refused before anything was sent.
@@ -1438,4 +1445,12 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
     }
 
     Ok(Flow::Continue)
+}
+
+/// What "Open this link?" just did (opened, or the browser's refusal) goes to
+/// the status line.
+pub(super) fn take_link_result(cx: &mut CommandCtx<'_>) {
+    if let Some(message) = crate::link_confirm::take_result() {
+        *cx.last_message = Some(message);
+    }
 }

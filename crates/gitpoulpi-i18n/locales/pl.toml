@@ -3001,6 +3001,7 @@ commit_details_shrink_message = { git = "Szczegóły commita: Pomniejsz opis", l
 commit_details_reset_message_size = { git = "Szczegóły commita: Resetuj rozmiar opisu", local = "Szczegóły zatwierdzenia: Resetuj rozmiar opisu" }
 commit_details_scroll_message_down = { git = "Szczegóły commita: Przewiń opis w dół", local = "Szczegóły zatwierdzenia: Przewiń opis w dół" }
 commit_details_scroll_message_up = { git = "Szczegóły commita: Przewiń opis w górę", local = "Szczegóły zatwierdzenia: Przewiń opis w górę" }
+commit_details_open_link = "Commit Details: Open Link in Message..."
 files_toggle_commit_file_sort_a_z_z_a = { git = "Pliki: Przełącz sortowanie plików commita (A-Z / Z-A)", local = "Pliki: Przełącz sortowanie plików zatwierdzenia (A-Z / Z-A)" }
 refs_checkout_selected_ref = "Refs: Checkout zaznaczonego refu"
 refs_copy_ref_name = "Refs: Kopiuj nazwę refu"
@@ -9361,3 +9362,23 @@ arranging = "Ustawianie okna: strzałki przesuwają, Shift+strzałki zmieniają 
 # context: status line after the dialog went back to its default place and size
 reset_done = "okno wróciło na domyślne miejsce i do domyślnego rozmiaru"
 why_no_dialog = "nie ma otwartego okna, które można ustawiać"
+
+[link_confirm]
+# context: title of the dialog that asks before a web address from a commit message opens in the browser
+title = "Open this link?"
+# context: first paragraph of that dialog; the address follows it on the next lines
+body = "This address comes from text in a commit message. Check it before you open it in your browser:"
+# context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
+position = "Link {n} of {total}"
+# context: button that opens the address in the browser
+open = "Open"
+# context: button that shows the next address of the message
+next = "Next"
+# context: key of the Open button, one letter (shown as "Open (O)")
+key_open = "o"
+# context: key of the Next button, one letter
+key_next = "n"
+# context: key of the Cancel button of that dialog, one letter
+key_cancel = "c"
+# context: status line; the message in view holds no web address to open
+none = "no link in this message"

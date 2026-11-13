@@ -96,6 +96,7 @@ pub(in crate::event_loop) fn run_command(cx: &mut CommandCtx<'_>, cmd: PaletteCo
         | PaletteCommand::ResetCommitMessageSize
         | PaletteCommand::ScrollCommitMessageDown
         | PaletteCommand::ScrollCommitMessageUp
+        | PaletteCommand::OpenMessageLink
         | PaletteCommand::ToggleCommitFileSort
         | PaletteCommand::GrowRefsSection
         | PaletteCommand::ShrinkRefsSection

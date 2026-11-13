@@ -3002,6 +3002,7 @@ commit_details_shrink_message = "Detaily commitu: Zmenšit zprávu"
 commit_details_reset_message_size = "Detaily commitu: Obnovit velikost zprávy"
 commit_details_scroll_message_down = "Detaily commitu: Posunout zprávu dolů"
 commit_details_scroll_message_up = "Detaily commitu: Posunout zprávu nahoru"
+commit_details_open_link = "Commit Details: Open Link in Message..."
 files_toggle_commit_file_sort_a_z_z_a = "Soubory: Přepnout řazení souborů commitu (A-Z / Z-A)"
 refs_checkout_selected_ref = "Refs: Checkout vybraného refu"
 refs_copy_ref_name = "Refs: Kopírovat název refu"
@@ -9485,3 +9486,23 @@ arranging = "Uspořádání dialogu: šipky přesouvají, Shift+šipky mění ve
 # context: status line after the dialog went back to its default place and size
 reset_done = "dialog je zpět na výchozím místě a ve výchozí velikosti"
 why_no_dialog = "není otevřený žádný dialog, který lze uspořádat"
+
+[link_confirm]
+# context: title of the dialog that asks before a web address from a commit message opens in the browser
+title = "Open this link?"
+# context: first paragraph of that dialog; the address follows it on the next lines
+body = "This address comes from text in a commit message. Check it before you open it in your browser:"
+# context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
+position = "Link {n} of {total}"
+# context: button that opens the address in the browser
+open = "Open"
+# context: button that shows the next address of the message
+next = "Next"
+# context: key of the Open button, one letter (shown as "Open (O)")
+key_open = "o"
+# context: key of the Next button, one letter
+key_next = "n"
+# context: key of the Cancel button of that dialog, one letter
+key_cancel = "c"
+# context: status line; the message in view holds no web address to open
+none = "no link in this message"

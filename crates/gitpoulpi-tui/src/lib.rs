@@ -285,6 +285,7 @@ mod issue_ref_picker;
 #[cfg_attr(not(feature = "hosting"), path = "issue_tokens_stub.rs")]
 mod issue_tokens;
 mod language_picker;
+mod link_confirm;
 mod log_inline_ref;
 mod log_menu;
 mod log_multiselect;
@@ -293,6 +294,7 @@ mod log_table;
 mod markdown_lite;
 #[cfg_attr(not(feature = "mermaid"), path = "mermaid_popup_stub.rs")]
 mod mermaid_popup;
+mod message_links;
 #[cfg(feature = "hosting")]
 mod meta_picker;
 mod modes;

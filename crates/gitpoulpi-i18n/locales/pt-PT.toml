@@ -3002,6 +3002,7 @@ commit_details_shrink_message = "Detalhes do commit: diminuir a mensagem"
 commit_details_reset_message_size = "Detalhes do commit: repor o tamanho da mensagem"
 commit_details_scroll_message_down = "Detalhes do commit: deslocar a mensagem para baixo"
 commit_details_scroll_message_up = "Detalhes do commit: deslocar a mensagem para cima"
+commit_details_open_link = "Commit Details: Open Link in Message..."
 files_toggle_commit_file_sort_a_z_z_a = "Ficheiros: alternar a ordem dos ficheiros do commit (A-Z / Z-A)"
 refs_checkout_selected_ref = "Refs: checkout da ref selecionada"
 refs_copy_ref_name = "Refs: copiar nome da ref"
@@ -9484,3 +9485,23 @@ arranging = "A arranjar a janela: setas movem, Shift+setas redimensionam, 0 rep�
 # context: status line after the dialog went back to its default place and size
 reset_done = "janela de volta ao lugar e tamanho predefinidos"
 why_no_dialog = "não há nenhuma janela que se possa arranjar aberta"
+
+[link_confirm]
+# context: title of the dialog that asks before a web address from a commit message opens in the browser
+title = "Open this link?"
+# context: first paragraph of that dialog; the address follows it on the next lines
+body = "This address comes from text in a commit message. Check it before you open it in your browser:"
+# context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
+position = "Link {n} of {total}"
+# context: button that opens the address in the browser
+open = "Open"
+# context: button that shows the next address of the message
+next = "Next"
+# context: key of the Open button, one letter (shown as "Open (O)")
+key_open = "o"
+# context: key of the Next button, one letter
+key_next = "n"
+# context: key of the Cancel button of that dialog, one letter
+key_cancel = "c"
+# context: status line; the message in view holds no web address to open
+none = "no link in this message"

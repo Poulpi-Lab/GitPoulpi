@@ -223,6 +223,11 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::ScrollCommitMessageUp,
     ),
     entry(
+        msg::palette::COMMIT_DETAILS_OPEN_LINK,
+        "",
+        PaletteCommand::OpenMessageLink,
+    ),
+    entry(
         msg::palette::FILES_TOGGLE_COMMIT_FILE_SORT_A_Z_Z_A,
         "",
         PaletteCommand::ToggleCommitFileSort,

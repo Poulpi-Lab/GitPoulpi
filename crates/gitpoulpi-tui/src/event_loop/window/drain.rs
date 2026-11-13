@@ -136,6 +136,7 @@ impl WindowState {
                 && !self.ai_ui.popup_open()
                 && !crate::ai_sent_dialog::is_open()
                 && !crate::ai_limit_dialog::is_open()
+                && !crate::link_confirm::is_open()
                 && !crate::stage_guard_dialog::is_open()
                 && !crate::activity_log::is_open()
                 && !crate::trust_dialog::is_open()
@@ -282,6 +283,7 @@ impl WindowState {
                 Event::Paste(_)
                     if crate::ai_sent_dialog::is_open()
                         || crate::ai_limit_dialog::is_open()
+                        || crate::link_confirm::is_open()
                         || crate::stage_guard_dialog::is_open() => {}
                 // A pasted token goes into Preferences' Integrations form.
                 Event::Paste(text) if self.preferences.is_some() => {

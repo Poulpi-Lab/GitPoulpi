@@ -31,6 +31,7 @@ impl WindowState {
             || crate::conflict_popup::is_open()
             || crate::ai_sent_dialog::is_open()
             || crate::ai_limit_dialog::is_open()
+            || crate::link_confirm::is_open()
     }
 
     /// Polls the status bar's total and asks for a new count when the refs

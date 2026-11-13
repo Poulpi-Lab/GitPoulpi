@@ -1037,6 +1037,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::ResetCommitMessageSize
         | C::ScrollCommitMessageDown
         | C::ScrollCommitMessageUp
+        | C::OpenMessageLink
         | C::ToggleCommitFileSort
         | C::StageAll
         | C::DiscardAllChanges

@@ -204,6 +204,16 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         super::commands::open_limit_setting(cx);
         return Ok(None);
     }
+    // "Open this link?" is modal the same way.
+    if crate::link_confirm::is_open() {
+        *cx.hovered_target = None;
+        *cx.hovered_tab_index = None;
+        *cx.hovered_close_tab = None;
+        *cx.hovered_status_row = None;
+        crate::link_confirm::on_mouse(mouse);
+        super::modal::take_link_result(cx);
+        return Ok(None);
+    }
     if tab_bar_drag(cx, mouse) {
         return Ok(None);
     }

@@ -23,6 +23,10 @@ pub(crate) struct Link {
     /// What a human types (`#12`, `!4`, `ABC-12`).
     pub(crate) reference: String,
     pub(crate) url: String,
+    /// An address typed in the message itself (untrusted text): clicking it
+    /// asks first (`link_confirm`). Issue references resolve against the
+    /// linked source and open at once.
+    pub(crate) confirm: bool,
 }
 
 impl Link {
@@ -32,6 +36,7 @@ impl Link {
             end: found.end,
             reference: found.reference,
             url: found.url?,
+            confirm: false,
         })
     }
 }

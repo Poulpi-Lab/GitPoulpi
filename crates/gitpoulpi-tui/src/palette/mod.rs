@@ -129,6 +129,9 @@ pub(crate) enum PaletteCommand {
     ResetCommitMessageSize,
     ScrollCommitMessageDown,
     ScrollCommitMessageUp,
+    /// `Commit Details: Open Link in Message...`: the keyboard twin of a click
+    /// on a web address of the message (asks first, `link_confirm`).
+    OpenMessageLink,
     ToggleCommitFileSort,
 
     // -- Refs ------------------------------------------------------

@@ -251,6 +251,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
         || crate::stage_guard_dialog::is_open()
         || crate::ai_sent_dialog::is_open()
         || crate::ai_limit_dialog::is_open()
+        || crate::link_confirm::is_open()
         || crate::conflict_popup::is_open()
         || crate::mermaid_popup::is_open()
         || crate::profile_bar::is_open()
@@ -849,6 +850,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
     // "Over the AI limit": asked before the request is built, so before
     // "What is sent".
     crate::ai_limit_dialog::render(frame);
+    crate::link_confirm::render(frame);
     crate::about::render(frame);
     // The integration security check, over everything but the notifications.
     crate::trust_dialog::render(frame);

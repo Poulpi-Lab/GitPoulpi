@@ -861,7 +861,10 @@ pub(super) fn third_pane_controls(
                 commands::compare_goto_card(cx, i);
             }
             HitTarget::CommitReference(i) => {
-                if let Some(url) = cx.commit_ref_urls.get(i) {
+                if let Some((url, true)) = cx.commit_ref_urls.get(i) {
+                    // Text of the message: ask before opening it.
+                    crate::link_confirm::ask(vec![url.clone()]);
+                } else if let Some((url, _)) = cx.commit_ref_urls.get(i) {
                     *cx.last_message = Some(match crate::repo_menu::open_url(url) {
                         Ok(()) => msg::input::opened_in_browser(url),
                         Err(err) => crate::activity_log::report_problem_clear(

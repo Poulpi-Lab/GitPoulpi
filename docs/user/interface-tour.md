@@ -314,6 +314,18 @@ On a short window the message gives way first (down to one row), then the list.
 The working changes view keeps its **Path** / **Tree** / **View all files**
 row at the top of the file lists, above the Unstaged and Staged lists.
 
+**Links in a message.** A web address typed in the message (`https://...`, or
+the target of a markdown `[text](https://...)`) is underlined, shows the hand
+pointer and, on a click, asks **Open this link?** with the whole address
+before anything opens: the text of a message is untrusted. **Open** (`O`)
+launches the browser, **Cancel** (`C`, `Esc`, the cross) does nothing. Only
+`http` and `https` addresses are offered. The keyboard twin is the palette
+command `Commit Details: Open Link in Message...`, which asks about the first
+address of the message and cycles through the others with **Next** (`N`).
+Some terminals draw their own underline on an address under the pointer and
+open it themselves on a modified click (often Shift+click); that is the
+terminal's feature, not GitPoulpi's.
+
 Every file list has menus on files, folders and the empty part, and several files can be selected at once (**Ctrl+click**, **Shift+click**); see [Staging and committing](staging-and-committing.md).
 
 ## The center pane when a file is open

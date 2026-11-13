@@ -41,7 +41,7 @@ pub(in crate::event_loop) struct RightPanelDrawCtx<'a> {
     pub(in crate::event_loop) commit_message_user_rows: u16,
     pub(in crate::event_loop) commit_meta_area: &'a mut Rect,
     pub(in crate::event_loop) commit_paths_cache: &'a mut Vec<PathBuf>,
-    pub(in crate::event_loop) commit_ref_urls: &'a mut Vec<String>,
+    pub(in crate::event_loop) commit_ref_urls: &'a mut Vec<(String, bool)>,
     pub(in crate::event_loop) commit_sort_desc: bool,
     pub(in crate::event_loop) commit_summary: &'a String,
     pub(in crate::event_loop) composer_focus: Option<ComposerField>,

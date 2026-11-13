@@ -140,10 +140,22 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
             },
         )
     });
-    let message_lines: Vec<(String, bool)> = match compare {
+    let wrapped_rows: Vec<(String, bool, bool)> = match compare {
         Some(_) => Vec::new(),
-        None => message_display_lines(message_source, message_width),
+        None => crate::commit_detail::message_display_rows(message_source, message_width),
     };
+    let message_lines: Vec<(String, bool)> = wrapped_rows
+        .iter()
+        .map(|(text, summary, _)| (text.clone(), *summary))
+        .collect();
+    // The web addresses of the message, per display row (an address wider
+    // than the pane is found whole), and all of them for the keyboard twin.
+    let link_rows: Vec<(&str, bool)> = wrapped_rows
+        .iter()
+        .map(|(text, _, cont)| (text.as_str(), *cont))
+        .collect();
+    let row_urls = crate::message_links::row_links(&link_rows);
+    crate::link_confirm::set_message_urls(crate::message_links::all_urls(&link_rows));
     let message_line_count = card_rows
         .as_ref()
         .map_or(message_lines.len(), |rows| rows.len());
@@ -291,7 +303,12 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
                 } else {
                     Style::default().fg(th().ui.text)
                 };
-                let tokens = crate::issue_tokens::links(text, &token_bases);
+                let tokens = crate::message_links::merge(
+                    crate::issue_tokens::links(text, &token_bases),
+                    row_urls
+                        .get(commit_message_scroll + row_index)
+                        .map_or(&[][..], |v| v.as_slice()),
+                );
                 let chars: Vec<char> = text.chars().collect();
                 // Which links the pointer is on: they take the hover style.
                 let mut hot: Vec<bool> = Vec::with_capacity(tokens.len());
@@ -310,7 +327,7 @@ pub(super) fn draw_commit_detail(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<
                         ));
                         is_hot = *hovered_target
                             == Some(HitTarget::CommitReference(commit_ref_urls.len()));
-                        commit_ref_urls.push(token.url.clone());
+                        commit_ref_urls.push((token.url.clone(), token.confirm));
                     }
                     hot.push(is_hot);
                 }

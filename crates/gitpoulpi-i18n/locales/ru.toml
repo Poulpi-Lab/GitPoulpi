@@ -2995,6 +2995,7 @@ commit_details_shrink_message = { git = "Детали commit'а: уменьши�
 commit_details_reset_message_size = { git = "Детали commit'а: сбросить размер сообщения", local = "Детали коммита: сбросить размер сообщения" }
 commit_details_scroll_message_down = { git = "Детали commit'а: прокрутить сообщение вниз", local = "Детали коммита: прокрутить сообщение вниз" }
 commit_details_scroll_message_up = { git = "Детали commit'а: прокрутить сообщение вверх", local = "Детали коммита: прокрутить сообщение вверх" }
+commit_details_open_link = "Commit Details: Open Link in Message..."
 files_toggle_commit_file_sort_a_z_z_a = { git = "Файлы: порядок сортировки файлов commit'а (А-Я / Я-А)", local = "Файлы: порядок сортировки файлов коммита (А-Я / Я-А)" }
 refs_checkout_selected_ref = "Refs: checkout выбранной ссылки"
 refs_copy_ref_name = "Refs: копировать имя ссылки"
@@ -9496,3 +9497,23 @@ arranging = "Расположение диалога: стрелки двига�
 # context: status line after the dialog went back to its default place and size
 reset_done = "диалог вернулся на стандартное место и в стандартный размер"
 why_no_dialog = "нет открытого диалога, который можно расположить"
+
+[link_confirm]
+# context: title of the dialog that asks before a web address from a commit message opens in the browser
+title = "Open this link?"
+# context: first paragraph of that dialog; the address follows it on the next lines
+body = "This address comes from text in a commit message. Check it before you open it in your browser:"
+# context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
+position = "Link {n} of {total}"
+# context: button that opens the address in the browser
+open = "Open"
+# context: button that shows the next address of the message
+next = "Next"
+# context: key of the Open button, one letter (shown as "Open (O)")
+key_open = "o"
+# context: key of the Next button, one letter
+key_next = "n"
+# context: key of the Cancel button of that dialog, one letter
+key_cancel = "c"
+# context: status line; the message in view holds no web address to open
+none = "no link in this message"

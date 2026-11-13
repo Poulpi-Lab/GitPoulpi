@@ -510,6 +510,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Commit Details: Reset Message Size |  |
 | Commit Details: Scroll Message Down |  |
 | Commit Details: Scroll Message Up |  |
+| Commit Details: Open Link in Message... |  |
 | Files: Toggle Commit File Sort (A-Z / Z-A) |  |
 | Refs: Check Out Selected Ref | `double-click` |
 | Refs: Copy Ref Name |  |

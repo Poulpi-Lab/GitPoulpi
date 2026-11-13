@@ -159,7 +159,7 @@ pub(in crate::event_loop) struct WindowState {
     pub(in crate::event_loop) commit_file_rows: Vec<TreeRow>,
     pub(in crate::event_loop) commit_paths_cache: Vec<PathBuf>,
     pub(in crate::event_loop) commit_message_scroll: usize,
-    pub(in crate::event_loop) commit_ref_urls: Vec<String>,
+    pub(in crate::event_loop) commit_ref_urls: Vec<(String, bool)>,
     pub(in crate::event_loop) commit_message_for: Option<Oid>,
     pub(in crate::event_loop) commit_message_user_rows: u16,
     pub(in crate::event_loop) commit_message_area: Rect,

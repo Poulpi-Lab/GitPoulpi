@@ -177,6 +177,8 @@ pub(crate) struct Confirm<C: Copy + PartialEq> {
     /// A line break in the body ends the line (a list, paragraphs) instead
     /// of flowing into the text.
     keep_breaks: bool,
+    /// The narrowest the box is drawn (a body that carries an address).
+    min_width: u16,
 }
 
 impl<C: Copy + PartialEq> Confirm<C> {
@@ -200,7 +202,14 @@ impl<C: Copy + PartialEq> Confirm<C> {
             close: CloseHit::default(),
             hits: Vec::new(),
             keep_breaks: false,
+            min_width: 44,
         }
+    }
+
+    /// Draws the box at least `width` cells wide (when the screen allows).
+    pub(crate) fn min_width(mut self, width: u16) -> Self {
+        self.min_width = width;
+        self
     }
 
     /// Keeps the body's line breaks (each line is still wrapped to the box).
@@ -275,7 +284,7 @@ impl<C: Copy + PartialEq> Confirm<C> {
             + 2 * self.buttons.len().saturating_sub(1) as u16;
         let want_w = (crate::display_width(&self.title) as u16 + 8)
             .max(buttons_w + 4)
-            .max(44)
+            .max(self.min_width)
             .min(bounds.width);
         let inner_w = want_w.saturating_sub(4).max(1) as usize;
         let lines: Vec<String> = if self.keep_breaks {

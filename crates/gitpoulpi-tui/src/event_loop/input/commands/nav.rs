@@ -103,6 +103,11 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::ResetCommitMessageSize => resize_commit_message(cx, Resize::Reset),
         PaletteCommand::ScrollCommitMessageDown => scroll_commit_message(cx, 3),
         PaletteCommand::ScrollCommitMessageUp => scroll_commit_message(cx, -3),
+        PaletteCommand::OpenMessageLink => {
+            if !crate::link_confirm::ask_message_links() {
+                *cx.last_message = Some(gitpoulpi_i18n::msg::link_confirm::NONE.get().into());
+            }
+        }
         PaletteCommand::ToggleCommitFileSort => toggle_commit_sort(cx),
         PaletteCommand::GrowRefsSection => resize_sidebar_section(cx, Resize::By(1)),
         PaletteCommand::ShrinkRefsSection => resize_sidebar_section(cx, Resize::By(-1)),

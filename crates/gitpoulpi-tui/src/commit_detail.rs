@@ -164,11 +164,20 @@ pub(crate) fn files_list_body(files_area: Rect) -> Rect {
 /// words kept whole, a word longer than the width broken. Blank source
 /// lines survive (paragraph breaks in a commit body).
 pub(crate) fn wrap_text(text: &str, width: usize) -> Vec<String> {
+    wrap_marked(text, width)
+        .into_iter()
+        .map(|(line, _)| line)
+        .collect()
+}
+
+/// [`wrap_text`] with, per line, whether a word broken at the line's end
+/// goes on in the next one (an address wider than the pane).
+pub(crate) fn wrap_marked(text: &str, width: usize) -> Vec<(String, bool)> {
     let width = width.max(1);
-    let mut out = Vec::new();
+    let mut out: Vec<(String, bool)> = Vec::new();
     for source in text.lines() {
         if source.trim().is_empty() {
-            out.push(String::new());
+            out.push((String::new(), false));
             continue;
         }
         let mut line = String::new();
@@ -179,7 +188,7 @@ pub(crate) fn wrap_text(text: &str, width: usize) -> Vec<String> {
             // Break a word that cannot fit on a line of its own.
             while word_w > width {
                 if line_w > 0 {
-                    out.push(std::mem::take(&mut line));
+                    out.push((std::mem::take(&mut line), false));
                     line_w = 0;
                 }
                 let mut head = String::new();
@@ -194,7 +203,7 @@ pub(crate) fn wrap_text(text: &str, width: usize) -> Vec<String> {
                         rest.push(ch);
                     }
                 }
-                out.push(head);
+                out.push((head, true));
                 word = rest;
                 word_w = display_width(&word);
             }
@@ -206,12 +215,12 @@ pub(crate) fn wrap_text(text: &str, width: usize) -> Vec<String> {
                 line.push_str(&word);
                 line_w += 1 + word_w;
             } else {
-                out.push(std::mem::take(&mut line));
+                out.push((std::mem::take(&mut line), false));
                 line = word;
                 line_w = word_w;
             }
         }
-        out.push(line);
+        out.push((line, false));
     }
     out
 }
@@ -219,19 +228,33 @@ pub(crate) fn wrap_text(text: &str, width: usize) -> Vec<String> {
 /// A commit message as the right panel's message block shows it: the
 /// summary (first line) wrapped and flagged, a blank line, then the
 /// description wrapped. `(text, is_summary)` per display line.
+#[cfg(test)]
 pub(crate) fn message_display_lines(message: &str, width: usize) -> Vec<(String, bool)> {
+    message_display_rows(message, width)
+        .into_iter()
+        .map(|(text, summary, _)| (text, summary))
+        .collect()
+}
+
+/// [`message_display_lines`] with the "word goes on in the next line" flag
+/// of [`wrap_marked`]: `(text, is_summary, continues)`.
+pub(crate) fn message_display_rows(message: &str, width: usize) -> Vec<(String, bool, bool)> {
     let message = message.trim_end();
     let (summary, body) = match message.split_once('\n') {
         Some((s, b)) => (s.trim(), b.trim_matches('\n')),
         None => (message.trim(), ""),
     };
-    let mut lines: Vec<(String, bool)> = wrap_text(summary, width)
+    let mut lines: Vec<(String, bool, bool)> = wrap_marked(summary, width)
         .into_iter()
-        .map(|l| (l, true))
+        .map(|(l, c)| (l, true, c))
         .collect();
     if !body.trim().is_empty() {
-        lines.push((String::new(), false));
-        lines.extend(wrap_text(body, width).into_iter().map(|l| (l, false)));
+        lines.push((String::new(), false, false));
+        lines.extend(
+            wrap_marked(body, width)
+                .into_iter()
+                .map(|(l, c)| (l, false, c)),
+        );
     }
     lines
 }

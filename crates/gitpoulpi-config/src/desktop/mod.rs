@@ -17,6 +17,7 @@ pub mod icons;
 mod linux;
 mod macos;
 pub mod path;
+pub mod registry;
 pub mod terminals;
 mod windows;
 

@@ -708,8 +708,9 @@ rate limit selže jen u daného profilu. Odpovědi se znovu používají pět mi
 V Nastavení > Integrace má připojený profil hostitele kódu blok **Radar**
 pod svým klíčem SSH: jedno zaškrtávací políčko pro každý seznam (*Žádosti čekající na mou kontrolu*,
 *Každá otevřená žádost*, *Zahrnout koncepty*, *Problémy přiřazené mně*, poslední
-chybí u hostitelů bez issues), pole *Jmenné prostory* (odděleno čárkami; prázdné
-znamená váš vlastní a všechny, jejichž jste členem) a volba *Žádost z nenaklonovaného
+chybí u hostitelů bez issues), pole *Jmenné prostory* (jeden záznam na řádek: název shodující se s touto
+skupinou nebo vlastníkem a vším pod ním, nebo regulární výraz na řádek se zaškrtnutým
+*Regulární výrazy*; prázdné znamená váš vlastní a všechny, jejichž jste členem) a volba *Žádost z nenaklonovaného
 repozitáře*: *Zeptat se*, *Naklonovat* nebo *Zkontrolovat přes API*.
 Vše se ukládá, jakmile to změníte. Hostitelé bez dotazu na celý účet (Bitbucket
 Cloud) místo toho ukazují jeden řádek, který to říká. Paleta příkazů blok najde

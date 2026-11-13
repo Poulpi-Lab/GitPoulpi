@@ -167,15 +167,17 @@ drugim.
   bez uruchamiania hooków `pre-commit` i `commit-msg` repozytorium. Dotyczy jednego commita;
   **Ustawienia > Ustawienia repozytorium > Commit** sprawia, że opcja jest domyślnie
   zaznaczona. Pokazywana, gdy wiersz ma miejsce.
-- `Ctrl+G c` lub `c` w panelu Status przenosi kursor do formularza. `Esc`
-  go opuszcza.
-- `Ctrl+G Enter` (**Git: Zrób commit zmian ze stage od razu** w palecie) to
-  przycisk commita dostępny z dowolnego miejsca: robi commit zmian ze stage z opisem
-  z formularza, z uwzględnieniem **Popraw poprzedni commit** i **Pomiń hooki**, bez
-  przenoszenia fokusu. Gdy nic nie jest w stage albo brakuje podsumowania, mówi o tym
-  i zamiast tego ustawia kursor w podsumowaniu. Gdy zapytanie AI jeszcze trwa, nie
-  tworzy żadnego commita i mówi o tym (`Esc` anuluje zapytanie). `Ctrl+Z` cofa ten
-  commit jak każdy inny.
+- `c` w panelu Status przenosi kursor do formularza. `Esc` go opuszcza.
+- `Ctrl+G c` i `Ctrl+G Enter` (**Git: Commit...** i **Git: Zrób commit zmian ze
+  stage od razu** w palecie) to jedno polecenie, przycisk commita dostępny z
+  dowolnego miejsca. Gdy formularz ma podsumowanie i coś jest w stage, robi commit
+  od razu, z uwzględnieniem **Popraw poprzedni commit** i **Pomiń hooki**, bez
+  przenoszenia fokusu. W przeciwnym razie niczego nie zatwierdza: przenosi kursor
+  do podsumowania formularza (pokazując panel, jeśli był ukryty lub zwinięty), a
+  linia stanu podaje, jaki skrót robi commit (domyślnie `Ctrl+Enter`). Gdy nic nie
+  jest w stage, mówi o tym. W linii stanu nic się nie wpisuje. Gdy zapytanie AI
+  jeszcze trwa, nie tworzy żadnego commita i mówi o tym (`Esc` anuluje zapytanie).
+  `Ctrl+Z` cofa ten commit jak każdy inny.
 - Dla repozytorium [Ustawienia](settings.md#ustawienia-repozytorium-commit) mogą **robić push po
   każdym commicie**, zaczynać formularz od **szablonu commita** (i usuwać z opisu jego
   komentarze `#`) oraz sprawiać, że merge jest **squash**: formularz otwiera się wtedy

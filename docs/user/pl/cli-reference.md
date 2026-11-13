@@ -103,7 +103,7 @@ Hunki i linie są numerowane tak, jak numeruje je `gitpoulpi --json diff`.
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Dodaje do poczekalni plik, folder, wszystko, hunk lub kilka linii. Dodanie pliku, folderu lub `--all`, które dodałoby plik wrażliwy (klucz prywatny, `.env`, rozpoznany token: `[privacy]` w [opisie konfiguracji](config-reference.md#privacy-wrażliwe-pliki)), jest odrzucane z kodem wyjścia 2 i `{error: "sensitive_files", files: [{path, reason}]}` (reguła i zamaskowany podgląd, nigdy wartość); nic nie trafia do poczekalni. `--allow-sensitive` dodaje je mimo to. |
 | `unstage` (te same flagi) | Odwrotność. |
-| `discard --file F [--hunk N [--lines a,b]]` | Odrzuca zmiany poza poczekalnią (cały plik: każda zmiana, plik nieśledzony zostaje usunięty). Można cofnąć. |
+| `discard --file F [--hunk N [--lines a,b]]` | Odrzuca zmiany poza poczekalnią (cały plik: każda zmiana, plik nieśledzony zostaje usunięty, razem z folderami, które w ten sposób zostają puste). Można cofnąć. |
 | `rm-file <paths>...` | Usuwa pliki z katalogu roboczego. Można cofnąć. |
 | `ignore <pattern> [--file <.gitignore>]` | Dopisuje wzorzec do `.gitignore`. Można cofnąć. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Przepisuje kodowanie, zakończenia linii lub wcięcia plików z drzewa roboczego. Pliki binarne, brakujące i niemożliwe do zakodowania są pomijane i zgłaszane. Jeden wpis cofania dla całej partii. |
@@ -163,7 +163,7 @@ i przywraca stash, niezależnie od `general.auto_stash` ([Auto-stash](log-and-hi
 
 | Polecenie | Działanie |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch domyślnego zdalnego repozytorium, jednego zdalnego lub wszystkich. Każdy fetch odświeża też to, co ma każde zdalne w tagach (`remote` z `tag list`), i czyści ten zapis nawet bez `--prune`. `--prune-tags` (Ustawienia: Auto-prune tagów) usuwa też lokalne tagi, które zdalne usunęło: tylko te, które na nim były, nigdy taki, którego nie wypchnięto; odpowiedź wymienia je jako `pruned_tags` (git 2.41+). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch domyślnego zdalnego repozytorium, jednego zdalnego lub wszystkich. Gałęzie śledzące zdalne, które zdalne usunęło, są czyszczone, chyba że `general.auto_prune` jest false; `--prune` to wymusza. Każdy fetch odświeża też to, co ma każde zdalne w tagach (`remote` z `tag list`), i czyści ten zapis nawet bez `--prune`. `--prune-tags` (Ustawienia: Auto-prune tagów) usuwa też lokalne tagi, które zdalne usunęło: tylko te, które na nim były, nigdy taki, którego nie wypchnięto; odpowiedź wymienia je jako `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; tryb jest zawsze jawnie przekazywany gitowi. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Nie ma zwykłego force: tylko `--force-with-lease`. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Zdalne repozytoria. `remote list` oznacza przestrzeń nazw gałęzi śledzących zdalne, za którą nie stoi żadne zdalne repozytorium, jako `configured: false`; `remote remove` na niej usuwa jej gałęzie (z możliwością cofnięcia). |

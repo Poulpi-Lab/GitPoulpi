@@ -345,7 +345,7 @@ Zob. [Stage i commity](staging-and-committing.md).
 - **Kliknij minimapę**, by przenieść widok do tej linii. Przytrzymaj przycisk
   i poruszaj, by przewijać.
 
-Każde odrzucenie pyta najpierw.
+Każde odrzucenie pyta najpierw. Gdy odrzucenie usuwa pliki nieśledzone, razem z nimi znikają foldery, które zostają zupełnie puste (nigdy taki, który wciąż zawiera plik śledzony, ignorowany lub ukryty, ani taki, który był pusty już wcześniej); Cofnij przywraca pliki razem z ich folderami.
 
 ### Blame i historia pliku
 

@@ -131,11 +131,13 @@ fn the_palette_opens_over_settings_greys_what_leaves_it_and_closes_back() {
         s.contains("Change Theme") && s.contains("Settings - Tab")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    // A command that acts on the panes behind Settings is refused.
+    // A command that acts on the panes behind Settings is refused. (Plain
+    // "toggle word wrap" also lists the "Settings: Toggle Word wrap" row,
+    // which edits the open page and ranks first, so name the Diff command.)
     for _ in 0.."change theme".len() {
         term.send_keys("Backspace").unwrap();
     }
-    term.send_text("toggle word wrap").unwrap();
+    term.send_text("diff: toggle word wrap").unwrap();
     term.wait_for("the reason", STEP, |s| s.contains("close Settings first"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Escape").unwrap();

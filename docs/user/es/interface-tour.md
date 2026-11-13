@@ -90,6 +90,18 @@ abierto. La `x` que cierra una pestaña solo se muestra en la pestaña activa y 
 que está bajo el puntero. La fila de pestañas solo lleva pestañas (el botón de la
 [búsqueda global](search.md) está en la barra de título).
 
+Cuando las pestañas de repositorio no caben, la fila se desplaza en lugar de encogerlas:
+las pestañas quedan entre dos botones de flecha, `‹` a la izquierda y `›` a la derecha.
+Una flecha se atenúa cuando no hay ninguna pestaña oculta de ese lado. Haz clic en una flecha
+para mostrar una pestaña más de ese lado (mantenla pulsada para seguir desplazando), o usa la
+rueda sobre la fila (arriba o a la izquierda muestra las pestañas anteriores). Cada vez que
+cambia la pestaña actual (cambias de pestaña con el teclado, con el selector de pestañas o con
+la paleta, abres o cierras una pestaña, o cambias el tamaño de la ventana), la fila se desplaza
+lo justo para mostrarla entera. Si hay sitio, un botón `…` tras la flecha derecha abre el
+selector de pestañas. Arrastrar una pestaña sobre una flecha desplaza la fila mientras la
+mantienes ahí, así que puedes soltarla más allá de las pestañas visibles. `Ctrl+N` pone una
+insignia en cada flecha activa.
+
 **Ajustes > Apariencia > Posición de la barra de pestañas** mueve esta fila al final de la ventana (bajo la barra de estado) o la convierte en una columna en el borde izquierdo: una pestaña por fila, primero Inicio, luego el chip del espacio de trabajo, el Radar, la pestaña Espacios de trabajo, las pestañas (un nombre largo acaba en `…`) y el `+`. Cuando hay más pestañas que filas, una fila `…` indica cuántas quedan ocultas arriba (`▲`) y abajo (`▼`) y abre la lista de pestañas; la rueda desplaza la columna. Junto a una barra de herramientas en columna, las pestañas quedan en el exterior. Una ventana de menos de 80 columnas mantiene las pestañas arriba. Los clics, la cruz de cierre, el clic central, el menú del clic derecho, arrastrar para reordenar y el teclado funcionan igual en cada posición.
 
 - El **+** justo después de la última pestaña abre un pequeño menú: **Nueva
@@ -310,6 +322,16 @@ clic en un archivo para abrir su diff. En una ventana baja cede primero el mensa
 (hasta una fila) y luego la lista. La vista de cambios de trabajo mantiene su fila
 **Ruta** / **Árbol** / **Ver todos los archivos** arriba de las listas de archivos,
 sobre las listas Unstaged y Staged.
+
+**Enlaces en un mensaje.** Una dirección web escrita en el mensaje (`https://...`, o el destino de un
+`[texto](https://...)` de markdown) aparece subrayada, muestra el puntero de mano y, al hacer clic,
+pregunta **¿Abrir este enlace?** con la dirección completa antes de abrir nada: el texto de un mensaje
+no es de fiar. **Abrir** (`A`) inicia el navegador; **Cancelar** (`C`, `Esc`, la cruz) no hace nada.
+Solo se ofrecen direcciones `http` y `https`. El equivalente de teclado es el comando de la paleta
+`Detalles del commit: Abrir enlace del mensaje...`, que pregunta por la primera dirección del mensaje
+y recorre las demás con **Siguiente** (`S`). Algunos terminales dibujan su propio subrayado sobre una
+dirección bajo el puntero y la abren ellos mismos con un clic con modificador (a menudo Shift+clic);
+esa función es del terminal, no de GitPoulpi.
 
 Cada lista de archivos tiene menús en archivos, carpetas y la parte vacía, y se pueden seleccionar varios archivos a la vez (**Ctrl+clic**, **Shift+clic**); consulta [Stage y commit](staging-and-committing.md).
 

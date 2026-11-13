@@ -1562,6 +1562,23 @@ chiedono il nome in una casella di testo sulla riga del commit. `Enter` crea il
 ref. `Esc` annulla. Un nome non valido o già esistente è mostrato in rosso, e la
 casella resta aperta.
 
+Quando quella riga non è sullo schermo (un diff è aperto, il Log è isolato, la
+colonna Ref è nascosta), il nome si scrive invece in una piccola casella con
+cornice, con una croce di chiusura e i pulsanti **Annulla** e **Crea**.
+Rinominare un branch si fa sulla sua riga nel pannello Refs, o nella cella Ref
+della sua riga del Log; creare un file si fa nell'elenco Modifiche in corso,
+sotto la cartella. Valgono ovunque gli stessi tasti: `Enter` conferma, `Esc`
+annulla.
+
+Nulla viene mai scritto nella riga di stato. Le richieste che hanno bisogno di
+più spazio sono finestre con veri pulsanti: il messaggio di stash, il messaggio
+di un tag annotato (`Ctrl+Enter` o `Ctrl+S` applica, `Enter` aggiunge una riga),
+Imposta l'upstream (un elenco ricercabile di branch remoti, più un pulsante
+Rimuovi upstream) e i pattern di Git LFS da tracciare o non tracciare.
+Un'impostazione numerica o di testo scelta dalla palette apre le Impostazioni su
+quella riga, pronta da modificare, e il filtro dei Refs (`/`) si scrive nella
+casella in alto nel pannello Refs.
+
 ### Modificare il messaggio di un commit
 
 **Modifica il messaggio del commit...** nel menu del commit, `Ctrl+G e`, o il
@@ -1754,7 +1771,7 @@ Dettagli in [Stage e commit](staging-and-committing.md).
 | `x` | Scarta tutte le modifiche (chiede prima) |
 | `c` | Apre il compositore di commit |
 | `Enter` | Esegue subito il commit delle modifiche in stage, con il messaggio del modulo, da qualsiasi punto (vedi [Stage e commit](staging-and-committing.md#scrivere-il-commit)) |
-| `m` | Stash di tutte le modifiche con un messaggio (vuoto è ammesso). Con l'IA attiva, `Ctrl+G` in questa richiesta scrive il messaggio |
+| `m` | Stash di tutte le modifiche con un messaggio, scritto in una piccola finestra (vuoto è ammesso). Con l'IA attiva, il suo pulsante IA (`Ctrl+G` nella finestra) scrive il messaggio |
 | `Shift+T` | Stash di tutte le modifiche (file non tracciati inclusi), senza messaggio |
 | `o` | Pop di uno stash: la riga dello stash selezionata nel Log, altrimenti l'ultimo stash |
 | `p` | Pull, nel modo in cui è impostato il pulsante Pull (`git.pull_mode`) |

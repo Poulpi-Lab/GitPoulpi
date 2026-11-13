@@ -183,6 +183,8 @@
 - **`gp`（命令别名）。** 别名存在之后，创建别名时还会在 `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` 下注册 `gp.exe`，指向 `gitpoulpi-launch.exe`；移除时会删除该键（仅当它是我们创建的）。当别名所在的文件夹在你的 PATH 中（**将 GitPoulpi 添加到 PATH**）时，Windows 会先运行 `.cmd` 小脚本，GitPoulpi 出现之前控制台窗口可能闪现一下。旧版本写入的小脚本会在设置读取别名时自动重写。
 - **`gitpoulpi`。** 需要已安装 **文件管理器菜单**：安装时还会在 App Paths 下注册 `gitpoulpi.exe`。没有它时，只有 GitPoulpi 的文件夹在你的 PATH 中才能找到 `gitpoulpi`，此时控制台同样可能闪现。
 
+文件资源管理器沿用你登录 Windows 时的 PATH：之后添加到 PATH 的文件夹，要注销再重新登录后才会在那里生效。在此之前只能找到 App Paths 中的条目，而 Windows 找不到的名称会作为网址在浏览器中打开。
+
 Linux 和 macOS 没有对应功能：它们的文件管理器的位置栏不会运行程序。请使用 **文件管理器菜单** 项，或在终端中使用命令别名。
 
 #### 文件管理器菜单（在 GitPoulpi 中打开）
@@ -195,7 +197,7 @@ Linux 和 macOS 没有对应功能：它们的文件管理器的位置栏不会�
 |---|---|
 | Windows | 按用户的键，无需管理员权限：`HKCU\Software\Classes\Directory\shell\GitPoulpi`、`Directory\Background\shell\GitPoulpi` 和 `Drive\shell\GitPoulpi`，各带一个 `command` 子键，因此该菜单项会出现在文件夹上、已打开文件夹的空白处和驱动器上。每个键都带有 `X-GitPoulpi` 值；没有它的键**不是我们的**，绝不会被改动。还会在 `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` 下注册 `gitpoulpi.exe`，指向 `gitpoulpi-launch.exe`。在 Windows 11 上，该菜单项只出现在经典菜单中：**显示更多选项**、Shift+F10 或 Shift+右键（新的顶层菜单只列出打包应用）。移除会删除我们的键，然后仅当安装创建的父键变空时才删除它们。 |
 | Linux | 仅针对在 PATH 中找到的文件管理器。GNOME Files 和 Caja：在 `~/.local/share/nautilus/scripts` 或 `~/.config/caja/scripts` 中放一个以该菜单项命名的脚本（位于 **Scripts** 子菜单中）。Dolphin：`~/.local/share/kio/servicemenus/gitpoulpi-open.desktop`，带可执行权限（KDE Frameworks 6 会忽略没有可执行权限的用户服务菜单；不支持 5.85 之前的 KDE Frameworks 5）。Nemo：`~/.local/share/nemo/actions` 中的两个动作（选中的文件夹、背景）。Thunar：合并进 `~/.config/Thunar/uca.xml` 的一个动作；你自己的动作会保留，移除时文件会逐字节还原（如果是安装创建的则删除）。PCManFM 和 PCManFM-Qt：`~/.local/share/file-manager/actions/gitpoulpi-open.desktop`。图标写到 `~/.local/share/icons/hicolor/256x256/apps/gitpoulpi-folder.png`，随最后一个菜单项一起移除。遵循 `XDG_DATA_HOME` 和 `XDG_CONFIG_HOME`。该菜单项出现在选中的文件夹上，文件管理器提供的话也出现在文件夹空白处。 |
-| macOS | 一个快速操作 `~/Library/Services/Open in GitPoulpi.workflow`：在访达中右键点击文件夹，然后选择 **快速操作**。仅限选中的文件夹（访达没有文件夹空白处的菜单）。第一次可能需要在“系统设置 > 键盘 > 键盘快捷键 > 服务”中启用。 |
+| macOS | 一个快速操作 `~/Library/Services/Open in GitPoulpi.workflow`：在访达中右键点击文件夹，然后选择 **快速操作**。仅限选中的文件夹（访达没有文件夹空白处的菜单）。第一次点击时，macOS 会询问该工作流服务是否可以控制你的终端（自动化提示，例如“WorkflowServiceRunner.xpc”想要控制“……”）：请选择允许。如果没有看到该项，请在“系统设置 > 键盘 > 键盘快捷键 > 服务”中启用。 |
 
 GitPoulpi 写入的每个文件和键都带有 `X-GitPoulpi=1` 标记（脚本中是一行 `# X-GitPoulpi=1`），移除只会删除带标记的。这些操作改动的是你的系统，不是某个仓库：撤销不涵盖它们，**移除** 就是退回的办法。Linux 和 macOS 上文件管理器的位置栏不会运行程序，所以那里没有可输入的内容；终端里有命令别名。
 

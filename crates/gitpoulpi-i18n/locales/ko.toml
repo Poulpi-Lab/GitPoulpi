@@ -1025,17 +1025,17 @@ box_new_branch_at = "{sha}에 새 브랜치"
 box_new_tag_at = "{sha}에 새 {$tag}"
 box_new_annotated_tag_at = "{sha}에 새 주석 {$tag}"
 # context: title of the rename box; {old} is the branch name
-box_rename = "Rename {old}"
+box_rename = "{old} 이름 변경"
 # context: confirm button of the rename box
-rename_button = "Rename"
+rename_button = "이름 변경"
 # context: placeholder of the inline new-file box in the Status list; keep it short
-placeholder_file = "file name, e.g. notes.md"
+placeholder_file = "파일 이름, 예: notes.md"
 # context: title of the new-file box; {folder} is a path
-box_new_file = "New file in {folder}/"
+box_new_file = "{folder}/에 새 파일"
 # context: title of the new-file box for the repository root
-box_new_file_root = "New file"
+box_new_file_root = "새 파일"
 # context: confirm button of the name box and the new-file box
-create_button = "Create"
+create_button = "만들기"
 
 [menu_pill]
 checkout = "체크아웃"
@@ -4317,7 +4317,7 @@ counter = "{current} / {total}"
 [footer]
 commit_label = "{$Commit} 메시지: "
 commit_hint = { git = "  (Enter: commit, Esc: 취소)", local = "  (Enter: 커밋, Esc: 취소)" }
-filter_refs_hint = "Enter: apply, Esc: cancel"
+filter_refs_hint = "Enter: 적용, Esc: 취소"
 confirm_hint = "  (Enter: 확인, Esc: 취소)"
 search_hint = "검색: Enter/{down} 다음, Shift+Enter/{up} 이전, Esc 닫기"
 commit_count = { one = "{$commit} {n}개", other = "{$commit} {n}개" }
@@ -5276,53 +5276,53 @@ discard_hint = "변경 사항을 버리시겠습니까? Esc를 다시 누르면 
 
 [prompt_dialog]
 # context: title of the stash dialog; stash is the git verb (stash the working changes)
-stash_title = "{$Stash} changes"
+stash_title = "변경 사항 {$Stash}"
 # context: placeholder of the stash message field; an empty message is allowed
-stash_placeholder = "message (optional)"
+stash_placeholder = "메시지 (선택)"
 # context: the primary button of the stash dialog; stash is the git verb
 stash_button = "{$Stash}"
 # context: AI button of the stash dialog (the key that does the same follows it); the AI writes the stash message
-ai_message_button = "AI message"
+ai_message_button = "AI 메시지"
 # context: shown in the stash message field while the AI is writing it
-ai_writing = "writing..."
+ai_writing = "작성 중..."
 # context: title of the dialog that annotates an existing tag; {name} is the tag
-tag_annotate_title = "Annotate {$tag} {name}"
+tag_annotate_title = "{$tag} {name}에 주석 달기"
 # context: title of the dialog that creates an annotated tag; {name} is the new tag, {sha} the short hash of the commit it points at
-tag_new_title = "New annotated {$tag} {name} at {sha}"
+tag_new_title = "{sha}에 새 주석 {$tag} {name}"
 # context: placeholder of the tag message field (several lines allowed)
-tag_placeholder = "message"
+tag_placeholder = "메시지"
 # context: the primary button of the dialog that annotates an existing tag
-tag_annotate_button = "Annotate"
+tag_annotate_button = "주석 달기"
 # context: the primary button of the dialog that creates an annotated tag
-tag_create_button = "Create {$tag}"
+tag_create_button = "{$tag} 만들기"
 # context: hint under the multi-line message field of the tag dialog; {key} is the key that applies
-keys_hint = "Enter: new line, {key}: apply, Esc: cancel"
+keys_hint = "Enter: 새 줄, {key}: 적용, Esc: 취소"
 # context: title of the dialog that sets the upstream (the remote branch it tracks) of a local branch; {branch} is the local branch
-upstream_title = "Set upstream of {branch}"
+upstream_title = "{branch}의 업스트림 설정"
 # context: placeholder of the remote branch list of that dialog while nothing is chosen
-upstream_placeholder = "Select a remote branch..."
+upstream_placeholder = "리모트 브랜치 선택..."
 # context: the primary button of the set upstream dialog
-set_button = "Set"
+set_button = "설정"
 # context: button of the set upstream dialog that removes the branch's upstream (only shown when it has one)
-unset_button = "Unset upstream"
+unset_button = "업스트림 해제"
 # context: inline error in the set upstream dialog when the typed value starts with a name that is not a remote; {remote} is that name
-unknown_remote = "No remote named '{remote}'"
+unknown_remote = "'{remote}'(이)라는 리모트가 없습니다"
 # context: inline error in the set upstream dialog when Set is pressed with nothing chosen
-upstream_none = "Choose a remote branch first."
+upstream_none = "먼저 리모트 브랜치를 선택하세요."
 # context: title of the dialog that routes file patterns through Git LFS
-lfs_track_title = "Track with Git LFS"
+lfs_track_title = "Git LFS로 추적"
 # context: placeholder of the Git LFS track field; several patterns are separated by spaces
-lfs_track_placeholder = "patterns, e.g. *.psd assets/big.bin"
+lfs_track_placeholder = "패턴, 예: *.psd assets/big.bin"
 # context: the primary button of the Git LFS track dialog
-track_button = "Track"
+track_button = "추적"
 # context: title of the dialog that stops routing a pattern through Git LFS
-lfs_untrack_title = "Stop tracking with Git LFS"
+lfs_untrack_title = "Git LFS 추적 중단"
 # context: placeholder of the list of tracked Git LFS patterns while nothing is chosen
-lfs_untrack_placeholder = "Select a pattern..."
+lfs_untrack_placeholder = "패턴 선택..."
 # context: the primary button of the Git LFS untrack dialog
-untrack_button = "Untrack"
+untrack_button = "추적 중단"
 # context: inline error in the Git LFS track and untrack dialogs when no pattern was given
-pattern_empty = "Enter at least one pattern."
+pattern_empty = "패턴을 하나 이상 입력하세요."
 
 [composer]
 need_staged = { git = "{$commit}할 변경 사항을 {$stage}하세요", local = "{$commit}할 변경 사항을 스테이징하세요" }

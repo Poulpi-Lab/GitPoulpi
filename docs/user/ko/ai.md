@@ -182,7 +182,7 @@ timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
 |---|---|---|
 | **Commit 메시지** | 변경 사항을 스테이징한 다음 요약 필드 오른쪽의 `✦`를 누르거나 `Ctrl+G i`, 또는 팔레트의 `AI: Commit 메시지 생성`. 요약과 설명이 채워지며 편집할 수 있고, 아무것도 commit되지 않습니다. | `ai commit-message` (출력), `commit --ai` (commit) |
 | **변경 사항 설명** | 작업 변경 사항 창 오른쪽 위의 `✦`(`Ctrl+G w`: 선택한 commit, 없으면 작업 변경 사항), 또는 commit 메뉴의 *변경 사항 설명 (AI)*. 팝업에서 화살표로 스크롤하고 `c`로 복사하며 `Esc`로 닫습니다. | `ai explain [rev] [--wip]` |
-| **Stash 메시지** | `Ctrl+G m`이 stash 프롬프트를 열고, 그 안에서 `Ctrl+G`가 모델에게 묻습니다. 팔레트의 `AI: Stash 메시지 생성`은 둘 다 수행합니다. | `stash push --ai` |
+| **Stash 메시지** | `Ctrl+G m`이 stash 대화상자를 열고, **AI 메시지** 버튼(대화상자 안에서 `Ctrl+G`)이 모델에게 묻습니다. 팔레트의 `AI: Stash 메시지 생성`은 둘 다 수행합니다. | `stash push --ai` |
 | **Pull request 제목과 설명** | Pull Request 만들기 양식의 *제목과 설명 생성*(브랜치의 commit과 diff를 로컬에서 읽습니다). | |
 | **Merge 충돌 해결** | merge 충돌 편집기에서: `✦ 제안` 도구 모음 버튼, 충돌의 오른쪽 클릭 메뉴 *✦ 해결 방법 제안 (AI)*, `Alt+I`, 또는 팔레트의 `AI: Merge 충돌 해결 방법 제안`. 제안은 출력에서 *현재 충돌*의 영역을 하나의 편집으로 대체합니다(편집됨으로 표시, 실행 취소 한 단계). 저장하기 전에는 아무것도 저장되거나 스테이징되지 않습니다. | `ai resolve-conflict <path> [--conflict N]` (출력) |
 | **코드 리뷰** | [pull 또는 merge request 리뷰](review.md#-ai-리뷰-초안)에서: `✦ 리뷰 초안 작성...` 버튼, `s`, 또는 팔레트의 `리뷰: ✦ 리뷰 초안 작성...`(리뷰 옵션이 열리고 `Enter`로 실행). 모델이 요청의 diff, 설명, 기존 댓글(그리고 기본적으로 프로젝트의 `CLAUDE.md`와 `AGENTS.md`: [리뷰 컨텍스트](#리뷰-컨텍스트) 참고)을 읽고 댓글을 제안하며, 각 제안을 수락, 편집 또는 무시합니다. 리뷰를 제출하기 전에는 호스트로 아무것도 전송되지 않습니다. | `hosting review suggest <n>` (JSON 출력, 아무것도 게시하지 않음), `ai review-context` (기본값) |

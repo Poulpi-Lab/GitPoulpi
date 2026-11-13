@@ -142,6 +142,7 @@ O GitPoulpi lembra de todos os tamanhos. Veja
   e na aba sob o ponteiro) para fechá-la. **Arraste uma aba** para o lado para
   reordená-la. **Clique com o botão direito em uma aba** para ver o menu da aba.
 - **Clique com o botão do meio em uma aba** para fechá-la, como o `x` dela.
+- **Clique em `‹` ou `›`** nas pontas das abas (mostrados quando elas não cabem todas) para rolar a linha uma aba; mantenha o botão pressionado para continuar rolando, ou use a roda sobre a linha. Arrastar uma aba sobre uma seta também rola a linha. A linha também rola sozinha para mostrar a aba atual sempre que ela muda.
 - **Clique no `+`** depois da última aba para abrir um menu: Nova aba (`Alt+T`) e, enquanto as abas deles estão fechadas, Radar e Espaços de trabalho (`Alt+J`).
 - **Clique no ícone da casa** para a aba Início.
 - **Clique na aba Radar ou Espaços de trabalho** para abri-la; o `x` dela, um clique com o botão do meio ou `Ctrl+W` a fecha. **Clique na etiqueta do espaço de trabalho** (`Alt+W`) para trocar de espaço de trabalho.

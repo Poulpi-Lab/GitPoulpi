@@ -83,6 +83,16 @@ uma aba por repositório aberto. O `x` que fecha uma aba só aparece na aba ativ
 aba sob o ponteiro. A linha de abas só tem abas (o botão da
 [busca global](search.md) fica na barra de título).
 
+Quando as abas dos repositórios não cabem, a linha rola em vez de encolhê-las: as abas ficam
+entre dois botões de seta, `‹` à esquerda e `›` à direita. Uma seta fica esmaecida quando
+nenhuma aba está oculta daquele lado. Clique em uma seta para mostrar mais uma aba daquele
+lado (mantenha pressionado para continuar rolando), ou use a roda sobre a linha (para cima ou
+para a esquerda mostra as abas anteriores). Sempre que a aba atual muda (você troca de aba pelo
+teclado, pelo seletor de abas ou pela paleta, abre ou fecha uma aba, ou redimensiona a janela),
+a linha rola o suficiente para mostrá-la inteira. Havendo espaço, um botão `…` depois da seta
+direita abre o seletor de abas. Arrastar uma aba sobre uma seta rola a linha enquanto você a
+mantém ali, para soltá-la depois das abas visíveis. `Ctrl+N` coloca um distintivo em cada seta ativa.
+
 **Configurações > Aparência > Posição da barra de abas** move esta linha para o fim da janela (abaixo da linha de status) ou a transforma em uma coluna na borda esquerda: uma aba por linha, primeiro Início, depois a etiqueta do espaço de trabalho, o Radar, a aba Espaços de trabalho, as abas (um nome longo termina em `…`) e o `+`. Quando há mais abas que linhas, uma linha `…` mostra quantas estão ocultas acima (`▲`) e abaixo (`▼`) e abre a lista de abas; a roda rola a coluna. Ao lado de uma barra de ferramentas em coluna, as abas ficam por fora. Uma janela com menos de 80 colunas mantém as abas no topo. Cliques, a cruz de fechar, clique do meio, o menu do clique direito, arrastar para reordenar e o teclado funcionam igual em qualquer posição.
 
 - O **+** logo depois da última aba abre um pequeno menu: **Nova aba** (`Alt+T`, paleta
@@ -298,6 +308,16 @@ da lista, que é a única parte que rola. Clique em um arquivo para abrir seu di
 Em uma janela baixa, a mensagem cede espaço primeiro (até uma linha), depois a lista.
 A visão das alterações em andamento mantém a sua linha **Caminho** / **Árvore** / **Ver todos os arquivos**
 no topo das listas de arquivos, acima das listas Unstaged e Staged.
+
+**Links em uma mensagem.** Um endereço da web digitado na mensagem (`https://...`, ou o destino
+de um `[texto](https://...)` em markdown) aparece sublinhado, mostra o ponteiro de mão e, ao
+clicar, pergunta **Abrir este link?** com o endereço inteiro antes de abrir qualquer coisa: o
+texto de uma mensagem não é confiável. **Abrir** (`A`) inicia o navegador, **Cancelar** (`C`,
+`Esc`, a cruz) não faz nada. Só endereços `http` e `https` são oferecidos. O equivalente no
+teclado é o comando da paleta `Detalhes do commit: abrir link na mensagem...`, que pergunta
+sobre o primeiro endereço da mensagem e passa pelos outros com **Próximo** (`P`). Alguns
+terminais sublinham por conta própria um endereço sob o ponteiro e o abrem sozinhos com um
+clique com modificador (geralmente Shift+clique); isso é um recurso do terminal, não do GitPoulpi.
 
 Cada lista de arquivos tem menus em arquivos, pastas e na parte vazia, e vários arquivos podem ser selecionados de uma vez (**Ctrl+clique**, **Shift+clique**); veja [Stage e commit](staging-and-committing.md).
 

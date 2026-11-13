@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = "Padrão 5. 0 desativa totalmente o fetch em 
 fetch_on_tab_open = { git = "Fetch ao abrir uma aba", local = "Buscar ao abrir uma aba" }
 fetch_on_tab_open_help = { git = "Fetch All em segundo plano; ignorado se houve fetch no último minuto.", local = "Buscar tudo em segundo plano; ignorado se houve busca no último minuto." }
 auto_prune = { git = "Auto-prune", local = "Poda automática" }
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = { git = "Remove as branches de rastreamento remoto que não existem mais no remoto sempre que você faz fetch: o auto-fetch em segundo plano, o Fetch e o Fetch All (não a verificação de lease do diálogo de push divergente). Ativado por padrão, então uma branch excluída no servidor some da seção REMOTE após o próximo fetch. Desative para manter listadas as branches de rastreamento remoto obsoletas.", local = "Remove as branches de rastreamento remoto que não existem mais no remoto sempre que você faz uma busca: a busca automática em segundo plano, o Buscar e o Buscar tudo (não a verificação de lease do diálogo de envio divergente). Ativado por padrão, então uma branch excluída no servidor some da seção REMOTE após a próxima busca. Desative para manter listadas as branches de rastreamento remoto obsoletas." }
 keep_submodules_up_to_date = "Manter submódulos atualizados"
 default_branch_name = "Nome da branch padrão"
 default_branch_name_help = "Usado ao inicializar ou clonar um repositório."
@@ -4479,7 +4479,7 @@ file_list_loading = "a lista de arquivos deste commit ainda está carregando"
 no_repo_tab = "nenhuma aba de repositório aberta"
 commit_now_ai_running = "uma mensagem da IA ainda está sendo escrita - aguarde ou cancele com Esc"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "digite a mensagem e pressione {key} para fazer {$commit}"
 no_matching_tab = "nenhuma aba correspondente"
 no_matching_theme = "nenhum tema correspondente"
 no_matching_language = "nenhum idioma correspondente"

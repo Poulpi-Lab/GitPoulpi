@@ -365,7 +365,7 @@ Veja [Stage e commit](staging-and-committing.md).
 - **Clique no minimapa** para mover a vista até aquela linha. Mantenha o botão
   pressionado e mova para rolar.
 
-Todo descarte pergunta antes.
+Todo descarte pergunta antes. Quando um descarte exclui arquivos untracked, as pastas que ficam completamente vazias vão junto (nunca uma que ainda guarde um arquivo rastreado, ignorado ou oculto, nem uma que já estava vazia); Desfazer traz os arquivos de volta com as pastas.
 
 ### Blame e histórico do arquivo
 

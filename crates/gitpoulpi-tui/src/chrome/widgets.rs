@@ -444,10 +444,11 @@ pub(crate) fn render_about_button(
             frame.buffer_mut(),
             Rect::new(x, y, 2, 1),
             crate::about::way_index(),
+            hovered.then(|| plain_button_style(true).bg).flatten(),
         )
     {
-        // The picture takes the emoji's two cells; the blank after it keeps
-        // the hover highlight.
+        // The picture takes the emoji's two cells (and paints the hover
+        // background under itself); the blank after it keeps the highlight.
         frame.render_clipped(
             Paragraph::new(Span::styled(" ", plain_button_style(hovered))),
             Rect::new(x + 2, y, 1, 1),

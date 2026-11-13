@@ -572,3 +572,31 @@ fn the_search_button_drops_its_label_then_gives_way_before_the_gear() {
         .iter()
         .all(|(_, t)| *t != HitTarget::GlobalSearchButton));
 }
+
+/// Emoji fallback (no picture protocol): the whole "octopus + blank" label
+/// carries the hover background, like every other title bar button.
+#[test]
+fn the_about_button_emoji_label_is_filled_on_hover_across_all_its_cells() {
+    let width = display_width(ABOUT_LABEL) as u16;
+    for hovered in [false, true] {
+        let mut terminal = ratatui::Terminal::new(ratatui::backend::TestBackend::new(12, 1)).unwrap();
+        terminal
+            .draw(|frame| {
+                let mut hits = Vec::new();
+                render_about_button(frame, 1, 0, hovered, &mut hits);
+            })
+            .unwrap();
+        let buf = terminal.backend().buffer();
+        let hover_bg = plain_button_style(true).bg;
+        // Cell 2 is the emoji's continuation: ratatui leaves it blank and the
+        // terminal paints the glyph's two columns with the first cell's bg.
+        for x in (1..1 + width).filter(|&x| x != 2) {
+            let bg = buf[(x, 0)].style().bg;
+            if hovered {
+                assert_eq!(bg, hover_bg, "cell {x} on hover");
+            } else {
+                assert_ne!(bg, hover_bg, "cell {x} at rest");
+            }
+        }
+    }
+}

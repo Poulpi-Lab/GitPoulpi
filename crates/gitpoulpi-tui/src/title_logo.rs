@@ -12,16 +12,19 @@ use std::cell::RefCell;
 
 use ratatui::buffer::{Buffer, Cell};
 use ratatui::layout::Rect;
+use ratatui::style::{Color, Style};
 
 use crate::avatar::DetailAvatarImage;
 use crate::logo_colors;
 use crate::terminal_image::{Bitmap, Capability, CellSize};
 
+type SpriteKey = (usize, u32, Option<(u8, u8, u8)>);
+
 struct State {
     image: DetailAvatarImage,
     cell: CellSize,
-    /// The sprite for `(way, px)`, built once.
-    sprite: Option<((usize, u32), Bitmap)>,
+    /// The sprite for `(way, px, backdrop)`, built once.
+    sprite: Option<(SpriteKey, Bitmap)>,
     /// The reserved cells as `render` left them: anything different in
     /// `finish_frame` means a popup or page was drawn over the picture.
     expected: Option<(Rect, Vec<Cell>)>,
@@ -53,7 +56,16 @@ fn sprite_px(cell: CellSize) -> u32 {
 
 /// Reserves `area` (2x1 cells) for the octopus of colorway `way`. `false`
 /// when this terminal cannot draw it: nothing was touched, paint the emoji.
-pub(crate) fn render(buf: &mut Buffer, area: Rect, way: usize) -> bool {
+///
+/// `hover` is the hover background of the button, `None` at rest. Image
+/// protocols do not reliably show the cell background through transparent
+/// pixels (sixel and iTerm paint them opaque or default), so when hovered the
+/// color is baked under the sprite and the reserved cells get it too. A
+/// non-RGB color (indexed, reset) cannot be baked: the sprite stays
+/// transparent and only the cell background carries it. The backdrop is part
+/// of the sprite key, so a steady frame writes nothing and hover in/out
+/// re-sends once.
+pub(crate) fn render(buf: &mut Buffer, area: Rect, way: usize, hover: Option<Color>) -> bool {
     STATE.with(|s| {
         let mut s = s.borrow_mut();
         let Some(state) = s.as_mut() else {
@@ -63,18 +75,39 @@ pub(crate) fn render(buf: &mut Buffer, area: Rect, way: usize) -> bool {
             return false;
         }
         let px = sprite_px(state.cell);
-        if state.sprite.as_ref().map(|(k, _)| *k) != Some((way, px)) {
+        let backdrop = hover.and_then(crate::theme::rgb_of);
+        let key = (way, px, backdrop);
+        if state.sprite.as_ref().map(|(k, _)| *k) != Some(key) {
             let ways = logo_colors::ways();
-            let sprite = logo_colors::sprite_bitmap(&ways[way.min(ways.len() - 1)], px);
-            state.sprite = Some(((way, px), sprite));
+            let mut sprite = logo_colors::sprite_bitmap(&ways[way.min(ways.len() - 1)], px);
+            if let Some(bg) = backdrop {
+                under_backdrop(&mut sprite, bg);
+            }
+            state.sprite = Some((key, sprite));
         }
         let Some((_, sprite)) = &state.sprite else {
             return false;
         };
         let drew = state.image.render(buf, area, sprite);
+        if drew {
+            if let Some(bg) = hover {
+                buf.set_style(area, Style::default().bg(bg));
+            }
+        }
         state.expected = drew.then(|| (area, cells_of(buf, area)));
         drew
     })
+}
+
+/// Fills every fully transparent pixel with `bg`.
+fn under_backdrop(sprite: &mut Bitmap, bg: (u8, u8, u8)) {
+    for y in 0..sprite.height {
+        for x in 0..sprite.width {
+            if matches!(sprite.rgba(x, y), Some((_, _, _, 0))) {
+                sprite.set_pixel(x, y, bg);
+            }
+        }
+    }
 }
 
 fn cells_of(buf: &Buffer, area: Rect) -> Vec<Cell> {
@@ -135,8 +168,18 @@ mod tests {
     /// One whole frame as the event loop runs it: reserve, optionally a
     /// popup over `popup`, `finish_frame`, `write_pending`, then the model.
     fn frame(vt: &mut Vt, prev: &mut Buffer, way: usize, popup: Option<Rect>) -> (bool, String) {
+        frame_hover(vt, prev, way, popup, None)
+    }
+
+    fn frame_hover(
+        vt: &mut Vt,
+        prev: &mut Buffer,
+        way: usize,
+        popup: Option<Rect>,
+        hover: Option<Color>,
+    ) -> (bool, String) {
         let mut buf = Buffer::empty(SCREEN);
-        let drew = render(&mut buf, LOGO, way);
+        let drew = render(&mut buf, LOGO, way, hover);
         if let Some(p) = popup {
             Clear.render(p, &mut buf);
             Paragraph::new("x").render(p, &mut buf);
@@ -159,11 +202,11 @@ mod tests {
         ] {
             init(capability(protocol));
             let mut buf = Buffer::empty(SCREEN);
-            assert_eq!(render(&mut buf, LOGO, 0), expect, "{protocol:?}");
+            assert_eq!(render(&mut buf, LOGO, 0, None), expect, "{protocol:?}");
         }
         // Never initialized: no picture either.
         STATE.with(|s| *s.borrow_mut() = None);
-        assert!(!render(&mut Buffer::empty(SCREEN), LOGO, 0));
+        assert!(!render(&mut Buffer::empty(SCREEN), LOGO, 0, None));
     }
 
     #[test]
@@ -205,5 +248,45 @@ mod tests {
         assert!(recolored.contains("]1337;File="));
         let (_, steady) = frame(&mut vt, &mut prev, 1, None);
         assert_eq!(steady, "");
+    }
+
+    #[test]
+    fn hover_bakes_the_background_under_the_sprite_and_resends_once() {
+        init(capability(Protocol::Iterm2Alpha));
+        let hover = Color::Rgb(10, 20, 30);
+        let mut vt = Vt::new(SCREEN);
+        let mut prev = Buffer::empty(SCREEN);
+        let (_, rest) = frame(&mut vt, &mut prev, 0, None);
+        assert!(rest.contains("]1337;File="));
+        let (_, steady) = frame(&mut vt, &mut prev, 0, None);
+        assert_eq!(steady, "");
+        // Hover in: re-sent once, steady hover writes nothing.
+        let (_, entered) = frame_hover(&mut vt, &mut prev, 0, None, Some(hover));
+        assert!(entered.contains("]1337;File="), "{entered:?}");
+        let (_, held) = frame_hover(&mut vt, &mut prev, 0, None, Some(hover));
+        assert_eq!(held, "");
+        // The reserved cells carry the hover bg too.
+        let mut buf = Buffer::empty(SCREEN);
+        assert!(render(&mut buf, LOGO, 0, Some(hover)));
+        for x in LOGO.left()..LOGO.right() {
+            assert_eq!(buf[(x, 0)].bg, hover);
+        }
+        // Hover out: re-sent once more.
+        let (_, left) = frame(&mut vt, &mut prev, 0, None);
+        assert!(left.contains("]1337;File="));
+        // Bitmaps: transparent at rest, backdrop when hovered.
+        let ways = logo_colors::ways();
+        let mut sprite = logo_colors::sprite_bitmap(&ways[0], 16);
+        let transparent = |b: &Bitmap| {
+            (0..b.height)
+                .flat_map(|y| (0..b.width).map(move |x| (x, y)))
+                .filter(|&(x, y)| matches!(b.rgba(x, y), Some((_, _, _, 0))))
+                .count()
+        };
+        let empty = transparent(&sprite);
+        assert!(empty > 0, "the sprite has empty pixels at rest");
+        under_backdrop(&mut sprite, (10, 20, 30));
+        assert_eq!(transparent(&sprite), 0);
+        assert_eq!(sprite.rgba(0, 0), Some((10, 20, 30, 255)));
     }
 }

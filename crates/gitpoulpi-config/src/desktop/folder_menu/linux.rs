@@ -325,6 +325,22 @@ pub(super) fn write_icon(env: &Env) {
     }
 }
 
+/// Rewrites the icon when an entry of ours is left and the picture differs
+/// from the one wanted (another logo color). `true`: written.
+pub(super) fn sync_icon(env: &Env) -> bool {
+    let Some(png) = &env.icon_png else {
+        return false;
+    };
+    let ours = Manager::for_os(env.os)
+        .iter()
+        .any(|&m| matches!(state(env, "", m), State::Installed | State::Outdated));
+    if !ours || std::fs::read(icon_path(env)).ok().as_ref() == Some(png) {
+        return false;
+    }
+    write_icon(env);
+    true
+}
+
 /// Deletes the icon once no entry of ours is left.
 pub(super) fn remove_icon_if_unused(env: &Env) {
     let left = Manager::for_os(env.os)
@@ -543,6 +559,26 @@ mod tests {
         assert!(folder_menu::all_installed(&folder_menu::status(
             &moved, LABEL
         )));
+    }
+
+    #[test]
+    fn sync_follows_a_new_logo_color_and_never_writes_the_icon_with_no_entry() {
+        let tmp = tempfile::tempdir().unwrap();
+        let e = env(tmp.path(), &["dolphin"]);
+        assert!(folder_menu::sync(&e, LABEL).unwrap().is_empty());
+        assert!(!icon_path(&e).exists(), "nothing of ours: no icon");
+        folder_menu::install(&e, LABEL).unwrap();
+        assert!(folder_menu::sync(&e, LABEL).unwrap().is_empty());
+        let recolored = Env {
+            icon_png: Some(vec![9, 9]),
+            ..e.clone()
+        };
+        assert_eq!(
+            folder_menu::sync(&recolored, LABEL).unwrap(),
+            vec![Manager::Dolphin]
+        );
+        assert_eq!(std::fs::read(icon_path(&e)).unwrap(), vec![9, 9]);
+        assert!(folder_menu::sync(&recolored, LABEL).unwrap().is_empty());
     }
 
     #[test]

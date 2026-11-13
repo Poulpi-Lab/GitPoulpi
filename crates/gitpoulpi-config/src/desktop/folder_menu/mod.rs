@@ -288,8 +288,15 @@ pub fn sync(env: &Env, label: &str) -> Result<Vec<Manager>, String> {
             done.push(m);
         }
     }
-    if env.os == Os::Linux && !done.is_empty() {
-        linux::write_icon(env);
+    if env.os == Os::Linux && linux::sync_icon(env) && done.is_empty() {
+        // Only the picture changed (another logo color): report it as a
+        // change of every entry that names it.
+        done.extend(
+            Manager::for_os(env.os)
+                .iter()
+                .copied()
+                .filter(|&m| state_of(env, label, m).is_ok_and(|s| s == State::Installed)),
+        );
     }
     Ok(done)
 }

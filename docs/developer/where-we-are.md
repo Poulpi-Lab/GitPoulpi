@@ -495,6 +495,10 @@ and a scratch repository.
 - Windows, WezTerm: open the Command Palette (`Ctrl+P`) with the list scrolling; every row that has a key button ends in `[k]` (a plain button), no bar mark, and nothing from behind the popup shows next to the scrollbar. Scroll and filter to repaint.
 - macOS: `~/Applications/GitPoulpi.app` opens in Terminal.app, iTerm2, WezTerm, kitty, Ghostty (written from Apple's layout; untested).
 - Linux: the `.desktop` entry shows in the launcher (Omarchy: `omarchy-launch-walker`), icon in the user's logo colour.
+**File manager menu, Open in GitPoulpi (`docs/user/settings.md#file-manager-menu-open-in-gitpoulpi`; writers unit-tested against temp dirs and a memory registry, the Linux Install/Remove PTY-tested with fake file managers, no real file manager or registry ever used)**
+- Windows 10 and 11: Settings > Launcher > File manager menu > Install; right-click a folder, the background of an open folder and a drive (Windows 11: Show more options / Shift+F10): **Open in GitPoulpi** with the octopus icon opens that folder (a new tab of the open window when one is open and Show the open window on click is on, else the chosen terminal on it). A drive root (`C:\`) opens the drive, not `C:"`. Remove: the entries are gone and `HKCU\Software\Classes\Directory\shell` is left only if it held other verbs.
+- Linux: Dolphin (KF6), Nemo, Thunar, GNOME Files and Caja: the entry on a selected folder and, where the file manager has one, on the background (GNOME Files and Caja: under Scripts); it opens the folder. Thunar with your own custom actions: they survive Install and Remove unchanged.
+- macOS: the Quick Action appears under right-click > Quick Actions on a folder in Finder (after enabling it in System Settings > Keyboard > Keyboard Shortcuts > Services if needed) and opens the folder. If it never registers, ship the macOS row as coming soon (the `.wflow` format is undocumented).
 **Sparse checkout (Windows never run by the author)**
 - Clone with Sparse checkout ticked on Windows: `git clone --sparse` then `sparse-checkout set --cone` with `/`-separated directories; the footer `sparse` badge; the palette dialog's Apply / Disable on a real big repository (time to check out, in-flight text on the status line); a directory holding uncommitted changes must be refused (or kept) by git and the answer shown, never lost.
 **From the 2026-10-08 resume entry (priority)**
@@ -1227,6 +1231,10 @@ touching date patterns).
   `GCM_INTERACTIVE=Never`); the user's real remote credentials may prompt.
 - A git spawn costs ~1.5 s on the a Windows machine: contract checks that
   build several fixtures take tens of seconds there. Slow is not a hang.
+
+### Folder arguments from Explorer: the `"C:\"` trap
+
+- Explorer substitutes `"%V"` with the folder in quotes, and on a drive root that is `"C:\"`: argv parsing reads `\"` as an escaped quote, so the program receives `C:"`. Every `--folder` value goes through `terminals::normalize_folder_arg` (strips a trailing `"`, gives a bare `C:` its `\`) in `launch::split_launch_args`, which parses the arguments of `gitpoulpi-launch.exe`, the program the Explorer verbs run. A new Windows entry point that takes a folder from Explorer must do the same.
 
 ### PTY, ConPTY and Windows
 

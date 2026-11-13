@@ -426,6 +426,9 @@ pub fn run(args: &[String], json: bool, quiet: bool, new_window: bool) -> i32 {
     outcome.exit_code()
 }
 
+/// Builds the terminal command for a folder (`None`: a plain launcher start).
+pub type BuildCommand = dyn Fn(Option<&std::path::Path>) -> Result<Vec<String>, String>;
+
 /// The entry point of `gitpoulpi launch --folder DIR` and of
 /// `gitpoulpi-launch` with a folder (or, with `folder: None`, started by
 /// Explorer's address bar with no folder to open: a plain launcher start).
@@ -435,7 +438,7 @@ pub fn run_folder(
     json: bool,
     quiet: bool,
     new_window: bool,
-    build: &dyn Fn(Option<&std::path::Path>) -> Result<Vec<String>, String>,
+    build: &BuildCommand,
 ) -> i32 {
     let new_window = shift_held() || new_window;
     let this_exe = std::env::current_exe().unwrap_or_default();

@@ -510,7 +510,7 @@ Tuşlar varsayılanlardır.
 | Commit Ayrıntıları: Mesaj Boyutunu Sıfırla |  |
 | Commit Ayrıntıları: Mesajı Aşağı Kaydır |  |
 | Commit Ayrıntıları: Mesajı Yukarı Kaydır |  |
-| Commit Details: Open Link in Message... |  |
+| Commit Ayrıntıları: Mesajdaki Bağlantıyı Aç... |  |
 | Dosyalar: Commit Dosya Sırasını Değiştir (A-Z / Z-A) |  |
 | Refs: Seçili Ref'te Checkout | `çift tık` |
 | Refs: Ref Adını Kopyala |  |
@@ -1194,8 +1194,8 @@ Tuşlar varsayılanlardır.
 | Başlatıcı: Komut Takma Adını Kaldır |  |
 | Başlatıcı: PATH'e Ekle |  |
 | Başlatıcı: PATH'ten Kaldır |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| Başlatıcı: GitPoulpi'de Aç Menüsünü Kur |  |
+| Başlatıcı: GitPoulpi'de Aç Menüsünü Kaldır |  |
 | Uygulama: Grafik Renk Temasını Değiştir... | `Ctrl+N Y` |
 | Uygulama: Grafik Satır Tonunu Aç/Kapat | `Ctrl+N T` |
 <!-- palette:end -->

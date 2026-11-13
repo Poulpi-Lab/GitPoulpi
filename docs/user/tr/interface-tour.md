@@ -85,6 +85,18 @@ gibi kapanır) gelir. Sonra açık her depo için bir sekme gelir. Bir sekmeyi k
 yalnızca etkin sekmede ve imlecin altındaki sekmede görünür. Sekme satırında yalnızca
 sekmeler vardır ([genel arama](search.md) düğmesi başlık çubuğundadır).
 
+Depo sekmeleri sığmadığında satır küçülmek yerine kayar: sekmeler iki ok düğmesi
+arasında durur, solda `‹` ve sağda `›`. Bir yanında gizli sekme yoksa o yöndeki ok
+soluk görünür. O yanda bir sekme daha göstermek için oka tıklayın (kaydırmayı
+sürdürmek için basılı tutun) ya da satırın üzerinde tekerleği kullanın (yukarı veya
+sola, önceki sekmeleri gösterir). Geçerli sekme değiştiğinde (klavyeden, sekme
+seçiciden veya paletten sekme değiştirdiğinizde, bir sekme açtığınızda veya
+kapattığınızda ya da pencereyi yeniden boyutlandırdığınızda) satır, onu bütünüyle
+göstermeye yetecek kadar kayar. Yer varsa sağ okun ardındaki bir `…` düğmesi sekme
+seçiciyi açar. Bir sekmeyi oka sürüklemek, orada tuttuğunuz sürece satırı kaydırır;
+böylece onu ekrandaki sekmelerin ötesine bırakabilirsiniz. `Ctrl+N`, etkin her oka bir
+rozet koyar.
+
 **Ayarlar > Görünüm > Sekme çubuğu konumu** bu satırı pencerenin altına (durum çubuğunun altına) taşır ya da sol kenarda bir sütuna çevirir: satır başına bir sekme, önce Ana Sayfa, sonra çalışma alanı rozeti, Radar, Çalışma alanları sekmesi, sekmeler (uzun bir ad `…` ile biter) ve `+`. Sekmeler satırlardan çoksa, bir `…` satırı yukarıda (`▲`) ve aşağıda (`▼`) kaç sekmenin gizli olduğunu gösterir ve sekme listesini açar; tekerlek sütunu kaydırır. Sütun biçimindeki bir araç çubuğunun yanında sekmeler en dışta kalır. 80 sütundan dar bir pencere sekmeleri üstte tutar. Tıklamalar, kapatma çarpısı, orta tıklama, sağ tık menüsü, sıralamak için sürükleme ve klavye her konumda aynı çalışır.
 
 - Son sekmenin hemen ardındaki **+** küçük bir menü açar: **Yeni sekme** (`Alt+T`, palette
@@ -296,6 +308,17 @@ bunlar listenin üstünde sabit durur ve yalnızca liste kayar. Diff'ini açmak 
 dosyaya tıklayın. Kısa bir pencerede önce mesaj (bir satıra kadar), sonra liste yer
 bırakır. Çalışma değişiklikleri görünümü **Yol** / **Ağaç** / **Tüm dosyaları göster**
 satırını dosya listelerinin en üstünde, Unstaged ve Staged listelerinin üstünde tutar.
+
+**Mesajdaki bağlantılar.** Mesaja yazılmış bir web adresi (`https://...` veya bir
+markdown `[metin](https://...)` bağlantısının hedefi) altı çizili görünür, el
+imleci gösterir ve tıklandığında, hiçbir şey açılmadan önce adresin tamamıyla
+birlikte **Bu bağlantı açılsın mı?** diye sorar: mesaj metni güvenilir değildir.
+**Aç** (`A`) tarayıcıyı başlatır, **İptal** (`P`, `Esc`, çarpı) hiçbir şey yapmaz.
+Yalnızca `http` ve `https` adresleri sunulur. Klavye karşılığı, mesajın ilk adresini
+soran ve diğerlerini **Sonraki** (`S`) ile dolaşan `Commit Ayrıntıları: Mesajdaki
+Bağlantıyı Aç...` palet komutudur. Bazı terminaller imlecin altındaki bir adrese kendi
+altçizgisini çizer ve değiştirici tuşlu bir tıklamada (çoğunlukla Shift+tık) onu
+kendileri açar; bu terminalin özelliğidir, GitPoulpi'nin değil.
 
 Her dosya listesinin dosyalar, klasörler ve boş kısım için menüleri vardır ve
 birden çok dosya aynı anda seçilebilir (**Ctrl+tık**, **Shift+tık**); bkz.

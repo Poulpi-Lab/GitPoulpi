@@ -207,7 +207,8 @@ gitpoulpi-tui
 ## Kaldırma
 
 `gitpoulpi uninstall` (iki yükleyicinin de çalıştırdığı komut), GitPoulpi'nin oluşturduğu
-komut takma adlarını, PATH girdilerini ve kısayolları, ardından bir sürüm kurulumunun program
+komut takma adlarını, PATH girdilerini, kısayolları ve dosya yöneticisi menü girdilerini
+(Windows'ta App Paths anahtarıyla birlikte), ardından bir sürüm kurulumunun program
 dosyalarını kaldırır; `.gitpoulpi-dist` işareti olmayan bir derlemede (bir cargo derlemesi)
 reddeder ve `--keep-files` program dosyalarını bırakır. MCP ajanlarına sunulmaz. Yükleyici
 kullanmadıysanız üç çalıştırılabilir dosyayı silin. GitPoulpi ayrıca şu dosyaları tutar:

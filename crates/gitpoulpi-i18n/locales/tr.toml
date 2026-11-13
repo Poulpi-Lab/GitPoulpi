@@ -8755,8 +8755,8 @@ include_drafts = "Taslakları dahil et"
 assigned_issues = "Bana atanan Issue'lar"
 # context: field label: orgs, groups or workspaces the account-wide lists are limited to
 namespaces = "Ad alanları"
-# context: hint in the empty namespaces field
-namespaces_hint = "örn. acme, platform (boş: kendi alanım ve üye olduğum tümü)"
+# context: hint in the empty Namespaces text area (one entry per line)
+namespaces_hint = "Her satıra bir tane, örn. acme (boş: kendi alanım ve üye olduğum tümü)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
 namespaces_help = "Her satıra bir giriş. Bir ad, o grubu veya sahibi ve altındaki her şeyi eşler (ptm, ptm/produits/x ile eşleşir, ptmx/y ile değil). Boş bırakırsanız kendi alanlarınız ve üye olduğunuz tümü eşlenir."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is

@@ -125,6 +125,8 @@ pub(in crate::event_loop) fn draw_footer(
         InputMode::Guide(_) => String::new(),
         // The popup names its own keys.
         InputMode::EditingCommitMessage(_) => String::new(),
+        // The dialog names its own keys on its buttons.
+        InputMode::Prompt(_) => String::new(),
         InputMode::InteractiveRebase(_) => String::new(),
         InputMode::ComposeCommits(_) => String::new(),
         InputMode::SplitCommit(_) => String::new(),
@@ -384,6 +386,7 @@ fn form_badges(input_mode: &InputMode) -> bool {
     }
     match input_mode {
         InputMode::EditingCommitMessage(form) => form.badges && form.badge_ready(),
+        InputMode::Prompt(dialog) => dialog.badges && dialog.badge_ready(),
         InputMode::Rewrite(view) => view.badges && view.badge_ready(),
         _ => false,
     }

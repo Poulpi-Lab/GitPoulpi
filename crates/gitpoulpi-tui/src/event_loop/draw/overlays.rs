@@ -718,6 +718,20 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
         frame_hits.splice(0..0, front);
     }
 
+    // A prompt dialog (stash message, tag message...), same pattern.
+    if let InputMode::Prompt(dialog) = &input_mode {
+        let hovered_part = match &hovered_target {
+            Some(HitTarget::Prompt(part)) => Some(*part),
+            _ => None,
+        };
+        let front: Vec<(Rect, HitTarget)> = dialog
+            .render(frame, frame.area(), hovered_part)
+            .into_iter()
+            .map(|(rect, part)| (rect, HitTarget::Prompt(part)))
+            .collect();
+        frame_hits.splice(0..0, front);
+    }
+
     // The interactive rebase / cherry-pick popup, same pattern.
     // It takes over the whole central column (the Log's area),
     // a full view, not a small popup; the message

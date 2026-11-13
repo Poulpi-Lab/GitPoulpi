@@ -5296,6 +5296,56 @@ confirm_hint = "pulsa Reescribir igualmente (o {key} otra vez) para confirmar; E
 keys_hint = "Tab siguiente · {key} actualizar"
 discard_hint = "¿Descartar los cambios? Esc otra vez los descarta; cualquier otra tecla sigue editando."
 
+[prompt_dialog]
+# context: title of the stash dialog; stash is the git verb (stash the working changes)
+stash_title = "{$Stash} changes"
+# context: placeholder of the stash message field; an empty message is allowed
+stash_placeholder = "message (optional)"
+# context: the primary button of the stash dialog; stash is the git verb
+stash_button = "{$Stash}"
+# context: AI button of the stash dialog (the key that does the same follows it); the AI writes the stash message
+ai_message_button = "AI message"
+# context: shown in the stash message field while the AI is writing it
+ai_writing = "writing..."
+# context: title of the dialog that annotates an existing tag; {name} is the tag
+tag_annotate_title = "Annotate {$tag} {name}"
+# context: title of the dialog that creates an annotated tag; {name} is the new tag, {sha} the short hash of the commit it points at
+tag_new_title = "New annotated {$tag} {name} at {sha}"
+# context: placeholder of the tag message field (several lines allowed)
+tag_placeholder = "message"
+# context: the primary button of the dialog that annotates an existing tag
+tag_annotate_button = "Annotate"
+# context: the primary button of the dialog that creates an annotated tag
+tag_create_button = "Create {$tag}"
+# context: hint under the multi-line message field of the tag dialog; {key} is the key that applies
+keys_hint = "Enter: new line, {key}: apply, Esc: cancel"
+# context: title of the dialog that sets the upstream (the remote branch it tracks) of a local branch; {branch} is the local branch
+upstream_title = "Set upstream of {branch}"
+# context: placeholder of the remote branch list of that dialog while nothing is chosen
+upstream_placeholder = "Select a remote branch..."
+# context: the primary button of the set upstream dialog
+set_button = "Set"
+# context: button of the set upstream dialog that removes the branch's upstream (only shown when it has one)
+unset_button = "Unset upstream"
+# context: inline error in the set upstream dialog when the typed value starts with a name that is not a remote; {remote} is that name
+unknown_remote = "No remote named '{remote}'"
+# context: inline error in the set upstream dialog when Set is pressed with nothing chosen
+upstream_none = "Choose a remote branch first."
+# context: title of the dialog that routes file patterns through Git LFS
+lfs_track_title = "Track with Git LFS"
+# context: placeholder of the Git LFS track field; several patterns are separated by spaces
+lfs_track_placeholder = "patterns, e.g. *.psd assets/big.bin"
+# context: the primary button of the Git LFS track dialog
+track_button = "Track"
+# context: title of the dialog that stops routing a pattern through Git LFS
+lfs_untrack_title = "Stop tracking with Git LFS"
+# context: placeholder of the list of tracked Git LFS patterns while nothing is chosen
+lfs_untrack_placeholder = "Select a pattern..."
+# context: the primary button of the Git LFS untrack dialog
+untrack_button = "Untrack"
+# context: inline error in the Git LFS track and untrack dialogs when no pattern was given
+pattern_empty = "Enter at least one pattern."
+
 [composer]
 need_staged = { git = "Stage de cambios para hacer commit", local = "Prepara cambios para confirmar" }
 need_summary = { git = "Escribe un resumen del commit", local = "Escribe un resumen de la confirmación" }

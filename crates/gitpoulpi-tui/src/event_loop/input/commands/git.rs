@@ -714,16 +714,20 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
             *cx.last_message = Some(msg::input::LFS_SETTING_UP.get().into());
         }
         PaletteCommand::LfsTrackPattern => {
-            *cx.input_mode = InputMode::ComposingRefName {
-                op: RefNameOp::LfsTrack,
-                value: String::new(),
-            };
+            *cx.input_mode =
+                InputMode::Prompt(Box::new(crate::prompt_dialog::PromptDialog::lfs_track()));
         }
+        // The tracked patterns are offered in a list (a typed one is allowed).
         PaletteCommand::LfsUntrackPattern => {
-            *cx.input_mode = InputMode::ComposingRefName {
-                op: RefNameOp::LfsUntrack,
-                value: String::new(),
-            };
+            let tracked: Vec<String> = cx
+                .lfs
+                .status
+                .as_ref()
+                .map(|s| s.patterns.iter().map(|p| p.pattern.clone()).collect())
+                .unwrap_or_default();
+            *cx.input_mode = InputMode::Prompt(Box::new(
+                crate::prompt_dialog::PromptDialog::lfs_untrack(&tracked),
+            ));
         }
         PaletteCommand::LfsPrune => {
             cx.link.submit_action(Action::LfsPrune);

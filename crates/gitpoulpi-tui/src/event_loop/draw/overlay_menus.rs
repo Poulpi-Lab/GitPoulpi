@@ -241,6 +241,7 @@ pub(in crate::event_loop) fn draw_overlay_menus(
         // other tooltip while it is open (`mouse_moved`).
         || remote_ui.form.is_some()
         || matches!(input_mode, InputMode::EditingCommitMessage(_))
+        || matches!(input_mode, InputMode::Prompt(_))
         || matches!(input_mode, InputMode::InteractiveRebase(_))
         || matches!(input_mode, InputMode::ComposeCommits(_))
         || matches!(input_mode, InputMode::SplitCommit(_))
@@ -730,6 +731,16 @@ pub(in crate::event_loop) fn draw_overlay_menus(
                     })
                     .collect();
                 Some(crate::reword_ui::RewordForm::nav_targets(&hits))
+            }
+            InputMode::Prompt(dialog) if dialog.badges && dialog.badge_ready() => {
+                let hits: Vec<_> = frame_hits
+                    .iter()
+                    .filter_map(|(r, t)| match t {
+                        HitTarget::Prompt(part) => Some((*r, *part)),
+                        _ => None,
+                    })
+                    .collect();
+                Some(crate::prompt_dialog::PromptDialog::nav_targets(&hits))
             }
             InputMode::Rewrite(view) if view.badges && view.badge_ready() => {
                 let hits: Vec<_> = frame_hits

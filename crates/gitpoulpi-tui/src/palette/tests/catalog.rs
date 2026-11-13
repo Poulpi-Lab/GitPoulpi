@@ -218,7 +218,6 @@ fn every_mouse_affordance_maps_to_a_palette_command() {
             // Checked against the generated `Flow: Start <Type>...` rows by
             // `flow::tests::every_menu_row_has_a_palette_twin`.
             R::Flow(_) => return None,
-            R::SetUpstream { .. } | R::TypeUpstream { .. } => PaletteCommand::SetUpstream,
             R::PullThenPush { .. } => PaletteCommand::PullWithMode(PullButtonMode::Merge),
             R::ForcePush { .. } => PaletteCommand::ForcePushWithLease,
             R::HideRemote(_) => PaletteCommand::HideRemoteInGraph,
@@ -244,12 +243,6 @@ fn every_mouse_affordance_maps_to_a_palette_command() {
         .chain(crate::pull_mode_entries())
         .chain(crate::remotes_ui::lfs_menu_entries())
         .chain(crate::push_to_entries(&["o".to_string()], None))
-        .chain(crate::upstream_entries(
-            "b",
-            &[],
-            &["o".to_string()],
-            Some("o/b"),
-        ))
         .chain(crate::diverged_entries(&rejection));
     for e in every_remote_row {
         if let crate::context_menu::Entry::Action { action, .. } = e {

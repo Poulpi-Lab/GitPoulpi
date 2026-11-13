@@ -287,7 +287,8 @@ fn a_branch_proposal_opens_the_box_and_enter_creates_it() {
 }
 
 #[test]
-fn an_annotated_tag_proposal_prefills_both_steps_and_an_edit_is_reported() {
+fn an_annotated_tag_proposal_prefills_the_name_box_and_the_message_dialog_and_an_edit_is_reported()
+{
     let mut rig = launch("pty-ui-propose-tag", fixture(), "second commit");
     let head = rig.head();
     proposed(
@@ -306,11 +307,20 @@ fn an_annotated_tag_proposal_prefills_both_steps_and_an_edit_is_reported() {
     });
     std::thread::sleep(Duration::from_millis(700));
     rig.term.send_keys("Enter").unwrap();
-    rig.wait_for("the message step pre-filled", |t| {
-        t.contains("Message for tag v1.0") && t.contains("first release")
-    });
+    // The message step is a dialog now, pre-filled with the proposed message.
+    let step = rig
+        .term
+        .wait_for("the message dialog pre-filled", STEP, |s| {
+            s.contains("New annotated tag v1.0 at") && s.contains("first release")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(
+        !step.line(step.rows() - 1).contains("first release"),
+        "the message is not echoed in the status line"
+    );
     rig.term.send_text("!").unwrap();
-    rig.term.send_keys("Enter").unwrap();
+    // Enter breaks the line in the message area; the apply chord submits.
+    rig.term.send_keys("C-s").unwrap();
     rig.wait_status("p-t1", ProposalStatus::AcceptedEdited);
     let deadline = std::time::Instant::now() + STEP;
     loop {

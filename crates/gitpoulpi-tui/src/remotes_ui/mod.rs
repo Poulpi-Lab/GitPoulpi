@@ -263,14 +263,6 @@ pub(crate) enum RemoteUiAction {
     Flow(crate::flow::FlowCmd),
     /// Push the checked-out branch to this remote, once.
     PushTo(String),
-    SetUpstream {
-        branch: String,
-        upstream: Option<String>,
-    },
-    /// Open a prompt to type the upstream by hand.
-    TypeUpstream {
-        branch: String,
-    },
     /// The diverged-push dialog's three answers.
     PullThenPush {
         remote: String,
@@ -463,17 +455,6 @@ pub(crate) fn remote_chooser_entries(
         .collect()
 }
 
-/// The radio mark a dropdown row carries. U+25C9 / U+25CB: both already
-/// drawn elsewhere in this UI (solo, graph nodes), so their width in the
-/// user's font is known.
-fn radio(on: bool) -> &'static str {
-    if on {
-        "\u{25C9}"
-    } else {
-        "\u{25CB}"
-    }
-}
-
 /// The dropdown's wording of a pull mode (the conventional wording, translated).
 pub(crate) fn pull_mode_label(mode: PullButtonMode) -> M {
     match mode {
@@ -549,70 +530,6 @@ pub(crate) fn push_to_entries(
             Entry::action(label, RemoteUiAction::PushTo(r.clone()))
         })
         .collect()
-}
-
-/// How many remote branches one remote's submenu lists. The menu does
-/// not scroll, so a remote with hundreds of branches would run off the
-/// screen; the rest are reachable through "Type a remote branch...".
-const UPSTREAM_MENU_LIMIT: usize = 20;
-
-/// "Set upstream of <branch>": one submenu per remote listing its
-/// branches (the same-named one first), a way to type one, and "Unset"
-/// when there is an upstream to remove.
-pub(crate) fn upstream_entries(
-    branch: &str,
-    refs: &[Ref],
-    remotes: &[String],
-    current: Option<&str>,
-) -> Vec<Entry<RemoteUiAction>> {
-    let mut entries = Vec::new();
-    for remote in remotes {
-        let mut names: Vec<&str> = refs
-            .iter()
-            .filter_map(|r| match &r.kind {
-                RefKind::RemoteBranch { remote: rm, name } if rm == remote && name != "HEAD" => {
-                    Some(name.as_str())
-                }
-                _ => None,
-            })
-            .collect();
-        names.sort_by_key(|n| (*n != branch, n.to_string()));
-        let items: Vec<Entry<RemoteUiAction>> = names
-            .into_iter()
-            .take(UPSTREAM_MENU_LIMIT)
-            .map(|n| {
-                let full = format!("{remote}/{n}");
-                let label = format!("{} {full}", radio(current == Some(full.as_str())));
-                Entry::action(
-                    label,
-                    RemoteUiAction::SetUpstream {
-                        branch: branch.to_string(),
-                        upstream: Some(full),
-                    },
-                )
-            })
-            .collect();
-        if !items.is_empty() {
-            entries.push(Entry::submenu(remote.clone(), items));
-        }
-    }
-    entries.push(Entry::Separator);
-    entries.push(Entry::action(
-        glyph_label("\u{270E}", msg::TYPE_REMOTE_BRANCH.get()),
-        RemoteUiAction::TypeUpstream {
-            branch: branch.to_string(),
-        },
-    ));
-    if current.is_some() {
-        entries.push(Entry::action(
-            glyph_label("\u{2717}", msg::UNSET_UPSTREAM.get()),
-            RemoteUiAction::SetUpstream {
-                branch: branch.to_string(),
-                upstream: None,
-            },
-        ));
-    }
-    entries
 }
 
 /// The dialog a push rejected as non-fast-forward opens:

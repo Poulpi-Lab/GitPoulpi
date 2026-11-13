@@ -227,6 +227,10 @@ pub(crate) enum InputMode {
     /// first, or an AI input is over its limit. Owns keys and mouse while
     /// open; Esc, the cross and an outside click cancel.
     Guide(Box<crate::guide_dialog::GuideDialog>),
+    /// A question that used to be typed in the status line (stash message,
+    /// tag message, ...): a small dialog (`prompt_dialog/`) that owns the
+    /// keyboard and the mouse while open, like `EditingCommitMessage`.
+    Prompt(Box<crate::prompt_dialog::PromptDialog>),
 }
 
 /// What the confirm modal carries out if the user says yes.
@@ -342,6 +346,7 @@ pub(crate) enum RefNameOp {
     /// moves on to `AnnotatedTagMessage`.
     NewAnnotatedTagAt(Oid),
     /// Step two: the message (reusing this prompt, like `AnnotateTag`).
+    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
     AnnotatedTagMessage {
         at: Oid,
         name: String,
@@ -357,18 +362,23 @@ pub(crate) enum RefNameOp {
     /// widget, its key handling and its width arithmetic are already
     /// solved there, and a second copy is a second place to get
     /// `field_window` wrong.
+    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
     AnnotateTag(String),
     /// Type the upstream of this branch by hand (`origin/feature`) --
     /// the Set upstream menu's way out when the branch is not listed.
+    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
     SetUpstream(String),
     /// Type a pattern (`*.psd`) to route through Git LFS.
+    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
     LfsTrack,
     /// Type a pattern to stop routing through Git LFS.
+    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
     LfsUntrack,
     /// Type the (optional) message of a stash - `Ctrl+G m`, the palette's
     /// `Stash With Message...`. Unlike every other op an empty answer is
     /// fine (it stashes with git's own default message), and with AI on
     /// `Ctrl+G` inside the prompt asks the model to write one.
+    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
     StashMessage,
     /// Type the name (with its extension) of a new empty file, relative to
     /// this folder (empty = the repository root): `Create File` and a

@@ -208,7 +208,7 @@ Weiter geht es mit [Erste Schritte](getting-started.md).
 ## Deinstallation
 
 `gitpoulpi uninstall` (das führen beide Installationsprogramme aus) entfernt die von GitPoulpi angelegten
-Befehlsaliasse, PATH-Einträge und Verknüpfungen und danach die Programmdateien einer Release-Installation; bei einem Build
+Befehlsaliasse, PATH-Einträge, Verknüpfungen und die Menüeinträge des Dateimanagers (unter Windows samt App-Paths-Schlüssel) und danach die Programmdateien einer Release-Installation; bei einem Build
 ohne die Markierung `.gitpoulpi-dist` (ein cargo-Build) lehnt es ab, und `--keep-files` lässt die Programmdateien stehen.
 Für MCP-Agenten ist es nicht verfügbar. Ohne Installationsprogramm löschen Sie die drei Programme. GitPoulpi legt außerdem
 diese Dateien an:

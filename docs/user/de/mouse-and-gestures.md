@@ -136,6 +136,7 @@ GitPoulpi merkt sich jede Größe. Siehe
   einen Tab** zur Seite, um seine Reihenfolge zu ändern. **Rechtsklick auf einen Tab** öffnet
   das Tab-Menü.
 - **Mittelklick auf einen Tab** schließt ihn, wie sein `x`.
+- **Klicken Sie auf `‹` oder `›`** an den Enden der Tabs (sichtbar, wenn nicht alle passen), um die Zeile um einen Tab zu scrollen; halten Sie die Taste gedrückt, um weiterzuscrollen, oder nutzen Sie das Mausrad über der Zeile. Auch das Ziehen eines Tabs auf einen Pfeil scrollt die Zeile. Die Zeile scrollt außerdem von selbst, um den aktuellen Tab zu zeigen, sobald er wechselt.
 - **Klicken Sie auf das `+`** hinter dem letzten Tab für ein Menü: Neuer Tab (`Alt+T`) und, solange ihre Tabs geschlossen sind, Radar und Workspaces (`Alt+J`).
 - **Klicken Sie auf das Haus-Symbol** für den Home-Tab.
 - **Klicken Sie auf den Tab Radar oder Workspaces**, um ihn zu öffnen; sein `x`, ein Mittelklick oder `Ctrl+W` schließt ihn. **Klicken Sie auf den Workspace-Chip** (`Alt+W`), um den Workspace zu wechseln.

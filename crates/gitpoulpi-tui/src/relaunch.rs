@@ -423,7 +423,8 @@ mod tests {
     #[test]
     fn explorer_start_table() {
         // (no_args, processes, class, cmdline, expected)
-        let cases: [(bool, Option<u32>, Option<&str>, Option<&str>, bool); 13] = [
+        type Case<'a> = (bool, Option<u32>, Option<&'a str>, Option<&'a str>, bool);
+        let cases: [Case; 13] = [
             // The exe typed in the address bar: alone in a plain console.
             (true, Some(1), OWN, None, true),
             // A terminal's pseudo-console running the exe directly.

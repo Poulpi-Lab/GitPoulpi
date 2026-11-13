@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = "기본값 5. 0이면 백그라운드 {$fetch
 fetch_on_tab_open = "탭 열 때 {$fetch}"
 fetch_on_tab_open_help = { git = "백그라운드에서 Fetch All을 실행합니다. 최근 1분 안에 {$fetch}했다면 건너뜁니다.", local = "백그라운드에서 모두 페치를 실행합니다. 최근 1분 안에 {$fetch}했다면 건너뜁니다." }
 auto_prune = "자동 정리"
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = { git = "리모트에 더 이상 없는 원격 추적 브랜치를 {$fetch}할 때마다 제거합니다. 대상은 백그라운드 자동 {$fetch}와 도구 모음의 Fetch, Fetch All이며, 갈라진 {$push} 대화상자의 lease 확인은 제외합니다. 기본값은 켜짐이라서 서버에서 삭제된 브랜치는 다음 {$fetch} 뒤 REMOTE 섹션에서 사라집니다. 오래된 원격 추적 브랜치를 목록에 남기려면 끄세요.", local = "리모트에 더 이상 없는 원격 추적 브랜치를 {$fetch}할 때마다 제거합니다. 대상은 백그라운드 자동 {$fetch}와 도구 모음의 페치, 모두 페치이며, 갈라진 {$push} 대화상자의 lease 확인은 제외합니다. 기본값은 켜짐이라서 서버에서 삭제된 브랜치는 다음 {$fetch} 뒤 REMOTE 섹션에서 사라집니다. 오래된 원격 추적 브랜치를 목록에 남기려면 끄세요." }
 keep_submodules_up_to_date = "서브모듈 최신 상태 유지"
 default_branch_name = "기본 브랜치 이름"
 default_branch_name_help = "저장소를 초기화하거나 클론할 때 사용합니다."
@@ -4478,7 +4478,7 @@ file_list_loading = "이 {$commit}의 파일 목록을 아직 불러오는 중�
 no_repo_tab = "열린 저장소 탭이 없습니다"
 commit_now_ai_running = "AI 메시지를 아직 작성 중입니다 - 기다리거나 Esc로 취소하세요"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "메시지를 입력한 다음 {key}을(를) 눌러 {$commit}하세요"
 no_matching_tab = "일치하는 탭이 없습니다"
 no_matching_theme = "일치하는 테마가 없습니다"
 no_matching_language = "일치하는 언어가 없습니다"

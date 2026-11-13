@@ -205,7 +205,7 @@ Depois siga os [Primeiros passos](getting-started.md).
 ## Desinstalar
 
 `gitpoulpi uninstall` (o que ambos os instaladores executam) remove os alias de comando,
-as entradas do PATH e os atalhos que o GitPoulpi criou e, numa instalação a partir de uma versão,
+as entradas do PATH, os atalhos e as entradas do menu do gestor de ficheiros (com a chave App Paths no Windows) que o GitPoulpi criou e, numa instalação a partir de uma versão,
 os ficheiros do programa; recusa-se a correr numa compilação sem o marcador `.gitpoulpi-dist`
 (uma compilação com cargo), e `--keep-files` deixa os ficheiros do programa. Não está
 disponível para os agentes MCP. Sem instalador, apague os três executáveis.

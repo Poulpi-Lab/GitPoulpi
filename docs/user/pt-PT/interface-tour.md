@@ -83,6 +83,17 @@ um separador por repositório aberto. O `x` que fecha um separador só aparece n
 e no que está sob o ponteiro. A linha de separadores só contém separadores (o botão da
 [pesquisa global](search.md) está na barra de título).
 
+Quando os separadores de repositório não cabem, a linha desloca-se em vez de os encolher:
+os separadores ficam entre dois botões de seta, `‹` à esquerda e `›` à direita.
+Uma seta fica esbatida quando não há nenhum separador oculto desse lado. Clique numa seta
+para mostrar mais um separador desse lado (mantenha-a premida para continuar a deslocar) ou use a roda sobre a
+linha (para cima ou para a esquerda mostra os separadores anteriores). Sempre que o separador atual muda
+(muda de separador pelo teclado, pelo seletor de separadores ou pela paleta, abre ou fecha um
+separador, ou redimensiona a janela), a linha desloca-se apenas o suficiente para o mostrar inteiro.
+Havendo espaço, um botão `…` depois da seta direita abre o seletor de separadores. Arrastar um
+separador para uma seta desloca a linha enquanto o mantiver ali, para o poder largar
+depois dos separadores visíveis. `Ctrl+N` põe um distintivo em cada seta ativa.
+
 **Definições > Aspeto > Posição da barra de separadores** move esta linha para o fim da janela (abaixo da barra de estado) ou transforma-a numa coluna na margem esquerda: um separador por linha, primeiro Início, depois a etiqueta da área de trabalho, o Radar, o separador Áreas de trabalho, os separadores (um nome longo termina em `…`) e o `+`. Quando há mais separadores do que linhas, uma linha `…` mostra quantos estão ocultos acima (`▲`) e abaixo (`▼`) e abre a lista de separadores; a roda desloca a coluna. Junto a uma barra de ferramentas em coluna, os separadores ficam por fora. Uma janela com menos de 80 colunas mantém os separadores no topo. Cliques, a cruz de fecho, clique do meio, o menu do clique direito, arrastar para reordenar e o teclado funcionam da mesma forma em qualquer posição.
 
 - O **+** logo a seguir ao último separador abre um pequeno menu: **Novo separador** (`Alt+T`,
@@ -301,6 +312,16 @@ cima da lista, que é a única parte que se desloca. Clique num ficheiro para ab
 Numa janela baixa, a mensagem cede primeiro (até uma linha) e depois a lista.
 A vista das alterações em curso mantém a sua linha **Caminho** / **Árvore** / **Ver todos os
 ficheiros** no topo das listas de ficheiros, por cima das listas Unstaged e Staged.
+
+**Ligações numa mensagem.** Um endereço web escrito na mensagem (`https://...`, ou
+o destino de um `[texto](https://...)` em markdown) fica sublinhado, mostra o ponteiro de mão e, ao clicar,
+pergunta **Abrir esta ligação?** com o endereço completo antes de abrir seja o que for: o texto de uma
+mensagem não é de confiança. **Abrir** (`A`) inicia o navegador, **Cancelar** (`C`, `Esc`, a cruz) não faz
+nada. Só se oferecem endereços `http` e `https`. O equivalente no teclado é o comando da paleta
+`Detalhes do commit: abrir ligação na mensagem...`, que pergunta pelo primeiro endereço da mensagem
+e percorre os outros com **Seguinte** (`S`). Alguns terminais desenham o seu próprio sublinhado num
+endereço sob o ponteiro e abrem-no sozinhos com um clique com modificador (muitas vezes Shift+clique);
+isso é uma funcionalidade do terminal, não do GitPoulpi.
 
 Cada lista de ficheiros tem menus em ficheiros, pastas e na parte vazia, e vários ficheiros podem ser selecionados de uma vez (**Ctrl+clique**, **Shift+clique**); veja [Stage e commit](staging-and-committing.md).
 

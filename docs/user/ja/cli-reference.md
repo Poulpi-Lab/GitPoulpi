@@ -77,7 +77,7 @@
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | ファイル、フォルダー、すべて、ハンク、または一部の行をステージします。機密ファイル（秘密鍵、`.env`、認識されたトークン。[設定リファレンス](config-reference.md)の `[privacy]`：[機密ファイル](config-reference.md#privacy機密ファイル)）を追加することになるファイル、フォルダー、`--all` のステージは、終了コード 2 と `{error: "sensitive_files", files: [{path, reason}]}`（ルールとマスクしたプレビュー。値は含みません）で拒否され、何もステージされません。`--allow-sensitive` を付けると、それでもステージします。 |
 | `unstage`（同じフラグ） | その逆です。 |
-| `discard --file F [--hunk N [--lines a,b]]` | 未ステージの変更を破棄します（ファイル全体：すべての変更が対象で、未追跡ファイルは削除されます）。元に戻せます。 |
+| `discard --file F [--hunk N [--lines a,b]]` | 未ステージの変更を破棄します（ファイル全体：すべての変更が対象で、未追跡ファイルは削除され、それで空になるフォルダーも削除されます）。元に戻せます。 |
 | `rm-file <paths>...` | 作業ツリーからファイルを削除します。元に戻せます。 |
 | `ignore <pattern> [--file <.gitignore>]` | `.gitignore` にパターンを追記します（`--file .git/info/exclude` を付けると `.git/info/exclude` に追記します）。元に戻せます。ただし `.git/info/exclude` への追記は元に戻せません。 |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | 作業ツリー内のファイルの文字コード、改行コード、またはインデントを書き換えます。バイナリ、存在しない、エンコードできないファイルはスキップされ、報告されます。一括での取り消しエントリは 1 つです。 |
@@ -136,7 +136,7 @@
 
 | コマンド | 内容 |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | 既定のリモート、1 つのリモート、またはすべてを fetch します。fetch のたびに、各リモートが持つ tag の記録（`tag list` の `remote`）も更新され、`--prune` がなくてもその記録は prune されます。`--prune-tags`（設定：tag の自動プルーン）は、リモートで削除された tag もローカルから削除します。対象はリモートにあった tag だけで、push していない tag は削除しません。削除した tag は `pruned_tags` に一覧されます（git 2.41 以降）。 |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | 既定のリモート、1 つのリモート、またはすべてを fetch します。設定 `general.auto_prune` が false でない限り、リモートで削除されたリモート追跡ブランチは prune されます。`--prune` を付けると必ず prune します。fetch のたびに、各リモートが持つ tag の記録（`tag list` の `remote`）も更新され、`--prune` がなくてもその記録は prune されます。`--prune-tags`（設定：tag の自動プルーン）は、リモートで削除された tag もローカルから削除します。対象はリモートにあった tag だけで、push していない tag は削除しません。削除した tag は `pruned_tags` に一覧されます（git 2.41 以降）。 |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | pull します。モードは常に git に明示的に渡されます。 |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | push します。単純な force はありません：`--force-with-lease` のみです。 |
 | `remote list`、`remote add <name> <url> [--push-url U]`、`remote remove <name>`、`remote rename <old> <new>` | リモート。`remote list` は、背後にリモートがないリモート追跡の名前空間を `configured: false` として示します。それに `remote remove` を実行すると、そのブランチが削除されます（元に戻せます）。 |

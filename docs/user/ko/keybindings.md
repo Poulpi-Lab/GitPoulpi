@@ -503,7 +503,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Commit 상세: 메시지 크기 초기화 |  |
 | Commit 상세: 메시지 아래로 스크롤 |  |
 | Commit 상세: 메시지 위로 스크롤 |  |
-| Commit Details: Open Link in Message... |  |
+| Commit 상세: 메시지의 링크 열기... |  |
 | 파일: Commit 파일 정렬 전환 (A-Z / Z-A) |  |
 | Refs: 선택한 Ref 체크아웃 | `더블 클릭` |
 | Refs: Ref 이름 복사 |  |
@@ -1187,8 +1187,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 런처: 명령 별칭 제거 |  |
 | 런처: PATH에 추가 |  |
 | 런처: PATH에서 제거 |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| 런처: 'GitPoulpi에서 열기' 메뉴 설치 |  |
+| 런처: 'GitPoulpi에서 열기' 메뉴 제거 |  |
 | 앱: 그래프 색상 테마 변경... | `Ctrl+N Y` |
 | 앱: 그래프 행 색조 전환 | `Ctrl+N T` |
 <!-- palette:end -->

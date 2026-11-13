@@ -168,15 +168,16 @@ num aparece no outro.
   sem executar os hooks `pre-commit` e `commit-msg` do repositório. Vale por commit;
   **Definições > Definições do repositório > Commit** faz com que comece
   assinalado. Aparece quando a linha tem espaço.
-- `Ctrl+G c` ou `c` no painel Status leva o cursor para o formulário. `Esc`
-  sai dele.
-- `Ctrl+G Enter` (**Git: fazer commit das alterações em stage agora** na paleta) é o
-  botão de commit a partir de qualquer lugar: faz commit das alterações em stage com a
-  mensagem do formulário, respeitando **Amend do commit anterior** e **Ignorar hooks**,
-  sem mover o foco. Sem nada em stage, ou sem resumo, di-lo e põe o cursor no resumo.
-  Enquanto uma mensagem de IA ainda está a ser escrita, não faz commit de nada e uma
-  mensagem na barra de estado di-lo (`Esc` cancela o pedido de IA). `Ctrl+Z` desfaz o
-  commit como qualquer outro.
+- `c` no painel Status leva o cursor para o formulário. `Esc` sai dele.
+- `Ctrl+G c` e `Ctrl+G Enter` (**Git: fazer commit...** e **Git: fazer commit das
+  alterações em stage agora** na paleta) são um só comando, o botão de commit a partir
+  de qualquer lugar. Com um resumo no formulário e algo em stage, faz commit logo,
+  respeitando **Amend do commit anterior** e **Ignorar hooks**, sem mover o foco. Caso
+  contrário não faz commit de nada: leva o cursor para o resumo do formulário (mostrando
+  o painel se estava oculto ou recolhido) e a barra de estado diz que atalho faz commit
+  (`Ctrl+Enter` por predefinição). Sem nada em stage, di-lo. Nada é escrito na barra de
+  estado. Enquanto um pedido de IA ainda está a decorrer, não faz commit de nada e di-lo
+  (`Esc` cancela o pedido). `Ctrl+Z` desfaz o commit como qualquer outro.
 - Por repositório, as [Definições](settings.md#específico-do-repositório-commit) podem fazer **push após
   cada commit**, iniciar o formulário com um **modelo de commit** (e remover os seus
   comentários `#` da mensagem) e fazer um merge **squash**: o formulário

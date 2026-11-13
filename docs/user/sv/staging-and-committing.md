@@ -167,15 +167,17 @@ fältet på raden med lokala ändringar i Log: det du skriver i det ena syns i d
   utan att köra repositoryts hooks `pre-commit` och `commit-msg`. Det gäller en
   enskild commit; **Inställningar > Repo-specifika inställningar > Commit** gör att det är
   ikryssat från början. Visas när raden har plats.
-- `Ctrl+G c` eller `c` i Status-rutan flyttar markören till formuläret. `Esc`
-  lämnar det.
-- `Ctrl+G Enter` (**Git: Commita stagade ändringar nu** i paletten) är
-  commit-knappen varifrån som helst: den committar de stagade ändringarna med
-  formulärets meddelande, tar hänsyn till **Amend föregående commit** och
-  **Hoppa över hooks**, och flyttar inte fokus. Om inget är stagat, eller om
-  sammanfattningen saknas, säger den det och sätter markören i sammanfattningen
-  i stället. Medan en AI-förfrågan fortfarande pågår committar den ingenting och
-  säger det (`Esc` avbryter förfrågan). `Ctrl+Z` tar tillbaka commiten som
+- `c` i Status-rutan flyttar markören till formuläret. `Esc` lämnar det.
+- `Ctrl+G c` och `Ctrl+G Enter` (**Git: Commit...** och **Git: Commita stagade
+  ändringar nu** i paletten) är ett och samma kommando, commit-knappen varifrån
+  som helst. Med en sammanfattning i formuläret och något stagat committar det
+  direkt, tar hänsyn till **Amend föregående commit** och **Hoppa över hooks**,
+  och flyttar inte fokus. Annars committar det ingenting: det flyttar markören
+  till formulärets sammanfattning (och visar rutan om den var dold eller
+  hopfälld) och statusraden säger vilken genväg som committar (som standard
+  `Ctrl+Enter`). Om inget är stagat säger det så. Inget skrivs på statusraden.
+  Medan en AI-förfrågan fortfarande pågår committar det ingenting och säger det
+  (`Esc` avbryter förfrågan). `Ctrl+Z` tar tillbaka commiten som
   vilken annan som helst.
 - Per repository kan [Inställningar](settings.md#repo-specifikt-commit) **pusha efter
   varje commit**, låta formuläret börja med en **commit-mall** (och ta bort dess

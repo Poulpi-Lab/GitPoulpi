@@ -719,8 +719,9 @@ límite de peticiones hace fallar solo a ese perfil. Las respuestas se reutiliza
 En Ajustes > Integraciones, un perfil de host de código conectado tiene un bloque **Radar**
 bajo su clave SSH: una casilla por lista (*Solicitudes pendientes de mi revisión*,
 *Todas las solicitudes abiertas*, *Incluir borradores*, *Issues asignados a mí*, esta última
-ausente en los hosts sin issues), un campo *Espacios de nombres* (separados por comas; vacío
-significa el tuyo y todos a los que perteneces) y la elección *Solicitud de un
+ausente en los hosts sin issues), un campo *Espacios de nombres* (una entrada por línea: un nombre que
+coincide con ese grupo o propietario y todo lo que hay debajo, o una expresión regular por línea con
+*Expresiones regulares* marcado; vacío significa el tuyo y todos a los que perteneces) y la elección *Solicitud de un
 repositorio no clonado*: *Preguntar*, *Clonarlo* o *Revisar mediante la API*.
 Todo se guarda al cambiarlo. Los hosts sin consulta de toda la cuenta (Bitbucket
 Cloud) muestran en su lugar una línea que lo dice. La paleta de comandos llega al bloque

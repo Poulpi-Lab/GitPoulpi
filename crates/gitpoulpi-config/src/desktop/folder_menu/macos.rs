@@ -1,8 +1,11 @@
 //! macOS: a Finder Quick Action, a `.workflow` bundle in `~/Library/Services`
 //! holding a "Run Shell Script" action that gets the selected folders as
 //! arguments. Finder has no entry for a folder's background, only for the
-//! selected folders (right-click > Quick Actions). The first use may need
-//! enabling in System Settings > Keyboard > Keyboard Shortcuts > Services.
+//! selected folders (right-click > Quick Actions). Finder only lists the
+//! bundle there once the `pbs` preferences carry its presentation modes (what
+//! Automator writes on save), so `install` registers them; without that the
+//! bundle shows only under Services. The first use may need enabling in System
+//! Settings > Keyboard > Keyboard Shortcuts > Services.
 //!
 //! This is the one piece built from an undocumented file format; it lives in
 //! its own file so it can be switched off alone (`coming(...)` on the page).

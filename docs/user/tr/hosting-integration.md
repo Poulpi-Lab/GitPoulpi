@@ -681,6 +681,8 @@ de, klonlanmış olsun olmasın, listeleyebilir:
 - **inceleme istekleri**: incelemenizi isteyen açık request'ler;
 - **açık request'ler**: kendi ad alanınızın ve üyesi olduğunuz her org veya grubun ya da adlandırdığınız ad alanlarının
   her açık request'i. Asla tüm barındırıcı değil;
+  profilin *Ad alanları* alanı (Ayarlar > Entegrasyonlar > Radar'da satır başına bir giriş, isteğe bağlı olarak düzenli ifade)
+  üç listeyi de sınırlar;
 - **atanan issue'lar**: size atanan açık issue'lar.
 
 GitHub, GitLab (kendi barındırdığınız dahil), Gitea, Forgejo, Azure DevOps (Services
@@ -705,8 +707,8 @@ hız sınırı yalnızca o profili başarısız kılar. Yanıtlar beş dakika ye
 
 Ayarlar > Entegrasyonlar'da bağlı bir kod barındırıcısı profilinin SSH anahtarının altında bir **Radar** bloğu vardır:
 her liste için bir onay kutusu (*İncelememi bekleyen istekler*, *Açık her istek*, *Taslakları dahil et*, *Bana atanan Issue'lar*,
-sonuncusu issue'su olmayan barındırıcılarda yoktur), bir *Ad alanları* alanı (satır başına bir giriş; boş,
-kendi ve üyesi olduğunuz her ad alanı demektir; isteğe bağlı olarak *Düzenli ifadeler*) ve *Klonlanmamış bir depodan gelen istek* seçimi: *Sor*, *Klonla* veya *API üzerinden incele*.
+sonuncusu issue'su olmayan barındırıcılarda yoktur), bir *Ad alanları* alanı (satır başına bir giriş: o grubu veya sahibi ve altındaki her şeyi eşleyen bir ad ya da
+*Düzenli ifadeler* işaretliyse satır başına bir düzenli ifade; boş, kendi ve üyesi olduğunuz her ad alanı demektir) ve *Klonlanmamış bir depodan gelen istek* seçimi: *Sor*, *Klonla* veya *API üzerinden incele*.
 Her şey değiştirdikçe kaydedilir. Hesap geneli sorgusu olmayan barındırıcılar (Bitbucket
 Cloud) bunun yerine bunu söyleyen tek bir satır gösterir. Komut paleti bloğa
 *Ayarlar: Bir profilin Radar seçenekleri...* ile ulaşır ve Ayarlar araması her

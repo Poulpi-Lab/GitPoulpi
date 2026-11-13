@@ -28,6 +28,8 @@ pub(crate) struct Machine {
     pub alias: alias::Env,
     pub path: user_path::Env,
     pub user: Arc<dyn UserPath + Send + Sync>,
+    /// Windows: App Paths `<alias>.exe` (memory in tests).
+    pub registry: gitpoulpi_config::desktop::registry::SharedRegistry,
 }
 
 impl Machine {
@@ -45,6 +47,7 @@ impl Machine {
             alias,
             path,
             user: Arc::new(user_path::Registry),
+            registry: gitpoulpi_config::desktop::registry::from_env(),
         }
     }
 }
@@ -131,7 +134,22 @@ impl ToolsState {
     }
 }
 
+/// Windows: our shims written by an older version are rewritten by
+/// themselves ("Shims follow by themselves"), the way the shortcuts are.
+/// Best effort: a shim that cannot be rewritten stays `Outdated`.
+pub(super) fn sync_shims(machine: &Machine) {
+    if machine.alias.os != Os::Windows {
+        return;
+    }
+    for (name, kind, state) in alias::list_kinds(&machine.alias) {
+        if state == alias::State::Outdated {
+            let _ = alias::create_with_app_path(&machine.alias, &*machine.registry, &name, kind);
+        }
+    }
+}
+
 fn read(machine: &Machine, name: &str, name_add: &str) -> Snapshot {
+    sync_shims(machine);
     let valid = alias::validate_name(name).is_ok();
     let valid_add = alias::validate_name(name_add).is_ok();
     Snapshot {
@@ -149,7 +167,7 @@ fn run(machine: &Machine, op: Op) -> Done {
         Op::AliasCreate(names) => {
             let mut made = Vec::new();
             for (name, kind) in names {
-                match alias::create_kind(&machine.alias, &name, kind) {
+                match alias::create_with_app_path(&machine.alias, &*machine.registry, &name, kind) {
                     Ok(_) => made.push(name),
                     Err(e) => return Done::Failed(e),
                 }
@@ -159,7 +177,7 @@ fn run(machine: &Machine, op: Op) -> Done {
         Op::AliasRemove => {
             let mut removed = Vec::new();
             for (name, _) in alias::list(&machine.alias) {
-                match alias::remove(&machine.alias, &name) {
+                match alias::remove_with_app_path(&machine.alias, &*machine.registry, &name) {
                     Ok(true) => removed.push(name),
                     Ok(false) => {}
                     Err(e) => return Done::Failed(e),

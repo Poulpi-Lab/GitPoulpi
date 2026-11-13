@@ -33,9 +33,53 @@ pub(crate) fn owns_console_window(class: Option<&str>) -> bool {
     class == Some(CONSOLE_WINDOW_CLASS)
 }
 
+/// Whether this start comes from the File Explorer address bar (or a Run
+/// dialog): no argument was given and either
+/// - the exe itself was started (typing `gitpoulpi.exe`; alone in a plain
+///   console host's own window, like a double-click), or
+/// - an alias shim was (`gp`): Explorer runs a `.cmd` as `cmd.exe /c "..."`,
+///   so the console holds exactly cmd and us, and the `cmd.exe` command line
+///   the shim exported (`GITPOULPI_CMDCMDLINE`) has ` /c `. An interactive
+///   prompt has no `/c`, and PowerShell -> cmd -> us makes three processes.
+///   The window class is not asked here: Windows Terminal as the default
+///   terminal hosts that cmd in a pseudo-console, and the folder must still
+///   be kept (only the relaunch, [`should_relaunch`], needs a plain console).
+#[cfg_attr(not(windows), allow(dead_code))]
+pub(crate) fn explorer_start(
+    no_args: bool,
+    console_processes: Option<u32>,
+    console_window_class: Option<&str>,
+    shim_cmdline: Option<&str>,
+) -> bool {
+    if !no_args {
+        return false;
+    }
+    match console_processes {
+        Some(1) => owns_console_window(console_window_class),
+        Some(2) => shim_cmdline.is_some_and(|c| c.to_ascii_lowercase().contains(" /c ")),
+        _ => false,
+    }
+}
+
+/// `--repo <folder>` appended to the original arguments, unless they already
+/// name a repository (`--repo X` or `--repo=X`).
+#[cfg_attr(not(windows), allow(dead_code))]
+pub(crate) fn with_repo(original: &[String], repo: Option<&std::path::Path>) -> Vec<String> {
+    let mut out = original.to_vec();
+    let has = original
+        .iter()
+        .any(|a| a == "--repo" || a.starts_with("--repo="));
+    if let (Some(repo), false) = (repo, has) {
+        out.push("--repo".to_string());
+        out.push(repo.display().to_string());
+    }
+    out
+}
+
 /// Whether to relaunch: switched on, not already a relaunch, alone in the
 /// console (`GetConsoleProcessList` says 1: a double-click; started from a
-/// shell it is at least 2), the console is a plain console host's own window
+/// shell it is at least 2) or an address-bar start (`explorer`, see
+/// [`explorer_start`]), the console is a plain console host's own window
 /// (not a terminal's pseudo-console: a terminal that runs us directly is
 /// where the user wants to be), and a real terminal chosen (not the plain
 /// console).
@@ -44,12 +88,13 @@ pub(crate) fn should_relaunch(
     enabled: bool,
     already_relaunched: bool,
     console_processes: Option<u32>,
+    explorer: bool,
     console_window_class: Option<&str>,
     terminal: Option<&str>,
 ) -> bool {
     enabled
         && !already_relaunched
-        && console_processes == Some(1)
+        && (console_processes == Some(1) || explorer)
         && owns_console_window(console_window_class)
         && terminal.is_some_and(|t| t != "console")
 }
@@ -106,6 +151,7 @@ pub(crate) fn infer_launcher(flag: bool, relaunched: bool, console_processes: Op
 mod imp {
     use super::*;
     use crate::launcher::Env;
+    use gitpoulpi_config::desktop::alias::CMDLINE_ENV;
     use gitpoulpi_config::desktop::terminals;
     use gitpoulpi_config::open_in::Os;
 
@@ -145,8 +191,47 @@ mod imp {
         (n > 0).then_some(n)
     }
 
-    /// Starts GitPoulpi in the configured terminal; `true`: the caller must exit.
-    pub(crate) fn try_relaunch() -> bool {
+    /// Set by [`explorer_folder`]: this start came from the address bar.
+    static EXPLORER: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+    /// The folder an address-bar start was made in, when this is one (see
+    /// [`explorer_start`]). Reads `GITPOULPI_CMDCMDLINE` and removes it, so it
+    /// never reaches the children (the VCS, the editor, a relaunched terminal).
+    pub(crate) fn explorer_folder() -> Option<std::path::PathBuf> {
+        let cmdline = std::env::var(CMDLINE_ENV).ok();
+        std::env::remove_var(CMDLINE_ENV);
+        let no_args = std::env::args_os().len() <= 1;
+        if !no_args {
+            return None;
+        }
+        let class = console_window_class();
+        if !explorer_start(
+            no_args,
+            console_processes(),
+            class.as_deref(),
+            cmdline.as_deref(),
+        ) {
+            return None;
+        }
+        EXPLORER.store(true, std::sync::atomic::Ordering::Relaxed);
+        let cwd = std::env::current_dir().ok()?;
+        let exe = std::env::current_exe().ok();
+        let home = gitpoulpi_config::home_dir();
+        let windir = std::env::var_os("WINDIR").map(std::path::PathBuf::from);
+        terminals::address_bar_folder(
+            Os::Windows,
+            &cwd,
+            exe.as_deref().and_then(std::path::Path::parent),
+            home.as_deref(),
+            windir.as_deref(),
+            &|p| p.is_dir(),
+        )
+    }
+
+    /// Starts GitPoulpi in the configured terminal, opening `repo` (the
+    /// address bar's folder) there; `true`: the caller must exit.
+    pub(crate) fn try_relaunch(repo: Option<&std::path::Path>) -> bool {
+        let explorer = EXPLORER.load(std::sync::atomic::Ordering::Relaxed);
         let ui = gitpoulpi_config::ConfigPaths::discover()
             .and_then(|p| gitpoulpi_config::Config::load(&p.config_file()).ok())
             .unwrap_or_default()
@@ -158,6 +243,7 @@ mod imp {
             ui.relaunch_in_terminal,
             already,
             console_processes(),
+            explorer,
             class.as_deref(),
             Some("x"),
         ) {
@@ -170,7 +256,7 @@ mod imp {
         }
         let env = Env::real();
         let terminal = env.resolve(&ui.launch_terminal);
-        if !should_relaunch(true, false, Some(1), class.as_deref(), terminal) {
+        if !should_relaunch(true, false, Some(1), explorer, class.as_deref(), terminal) {
             return false;
         }
         let Some(id) = terminal else { return false };
@@ -181,7 +267,7 @@ mod imp {
             return false;
         }
         let exe = env.exe.to_string_lossy().to_string();
-        let original: Vec<String> = std::env::args().skip(1).collect();
+        let original = with_repo(&std::env::args().skip(1).collect::<Vec<_>>(), repo);
         let Some(argv) = relaunch_argv(Os::Windows, id, &exe, &original) else {
             return false;
         };
@@ -192,13 +278,14 @@ mod imp {
         std::process::Command::new(program)
             .args(&argv[1..])
             .env(RELAUNCHED_ENV, "1")
+            .env_remove(CMDLINE_ENV)
             .spawn()
             .is_ok()
     }
 }
 
 #[cfg(windows)]
-pub(crate) use imp::{console_processes, try_relaunch};
+pub(crate) use imp::{console_processes, explorer_folder, try_relaunch};
 
 #[cfg(test)]
 mod tests {
@@ -291,18 +378,132 @@ mod tests {
 
     #[test]
     fn only_a_lone_double_click_with_a_real_terminal_relaunches() {
-        assert!(should_relaunch(true, false, Some(1), OWN, WT));
+        assert!(should_relaunch(true, false, Some(1), false, OWN, WT));
         // Started from a shell: the shell shares the console.
-        assert!(!should_relaunch(true, false, Some(2), OWN, WT));
+        assert!(!should_relaunch(true, false, Some(2), false, OWN, WT));
         // Unknown console state.
-        assert!(!should_relaunch(true, false, None, OWN, WT));
+        assert!(!should_relaunch(true, false, None, false, OWN, WT));
         // The switch is off.
-        assert!(!should_relaunch(false, false, Some(1), OWN, WT));
+        assert!(!should_relaunch(false, false, Some(1), false, OWN, WT));
         // The loop guard.
-        assert!(!should_relaunch(true, true, Some(1), OWN, WT));
+        assert!(!should_relaunch(true, true, Some(1), false, OWN, WT));
         // The plain console is already where we are; nothing found, stay.
-        assert!(!should_relaunch(true, false, Some(1), OWN, Some("console")));
-        assert!(!should_relaunch(true, false, Some(1), OWN, None));
+        assert!(!should_relaunch(
+            true,
+            false,
+            Some(1),
+            false,
+            OWN,
+            Some("console")
+        ));
+        assert!(!should_relaunch(true, false, Some(1), false, OWN, None));
+    }
+
+    #[test]
+    fn an_address_bar_start_relaunches_even_with_a_shim_around() {
+        // Explorer ran `cmd /c gp.cmd`: two processes, but nothing typed it.
+        assert!(should_relaunch(true, false, Some(2), true, OWN, WT));
+        // The class and the guards still apply.
+        assert!(!should_relaunch(true, false, Some(2), true, None, WT));
+        assert!(!should_relaunch(
+            true,
+            false,
+            Some(2),
+            true,
+            Some("PseudoConsoleWindow"),
+            WT
+        ));
+        assert!(!should_relaunch(true, true, Some(2), true, OWN, WT));
+        assert!(!should_relaunch(false, false, Some(2), true, OWN, WT));
+        assert!(!should_relaunch(true, false, Some(2), true, OWN, None));
+    }
+
+    const EXPLORER_CMD: &str = r#"C:\Windows\system32\cmd.exe /c ""C:\GP\bin\gp.cmd" ""#;
+
+    #[test]
+    fn explorer_start_table() {
+        // (no_args, processes, class, cmdline, expected)
+        let cases: [(bool, Option<u32>, Option<&str>, Option<&str>, bool); 13] = [
+            // The exe typed in the address bar: alone in a plain console.
+            (true, Some(1), OWN, None, true),
+            // A terminal's pseudo-console running the exe directly.
+            (true, Some(1), Some("PseudoConsoleWindow"), None, false),
+            (true, Some(1), None, None, false),
+            // The shim run by Explorer: cmd /c, cmd + us.
+            (true, Some(2), OWN, Some(EXPLORER_CMD), true),
+            // Same under a default terminal that hosts it in a pseudo-console.
+            (
+                true,
+                Some(2),
+                Some("PseudoConsoleWindow"),
+                Some(EXPLORER_CMD),
+                true,
+            ),
+            (true, Some(2), OWN, Some(&EXPLORER_CMD.to_uppercase()), true),
+            // An interactive cmd typed `gp`: no /c in its command line.
+            (
+                true,
+                Some(2),
+                OWN,
+                Some(r"C:\Windows\system32\cmd.exe"),
+                false,
+            ),
+            (true, Some(2), OWN, None, false),
+            // PowerShell -> cmd -> us.
+            (true, Some(3), OWN, Some(EXPLORER_CMD), false),
+            (true, None, OWN, Some(EXPLORER_CMD), false),
+            // Any argument: not an address-bar start.
+            (false, Some(1), OWN, None, false),
+            (false, Some(2), OWN, Some(EXPLORER_CMD), false),
+            (false, Some(2), None, Some(EXPLORER_CMD), false),
+        ];
+        for (no_args, n, class, cmdline, want) in cases {
+            assert_eq!(
+                explorer_start(no_args, n, class, cmdline),
+                want,
+                "{no_args} {n:?} {class:?} {cmdline:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_folder_is_added_to_the_relaunch_arguments_once() {
+        let folder = std::path::Path::new(r"D:\work\repo");
+        assert_eq!(
+            with_repo(&[], Some(folder)),
+            args(&["--repo", r"D:\work\repo"])
+        );
+        assert_eq!(
+            with_repo(&args(&["-s", "w"]), Some(folder)),
+            args(&["-s", "w", "--repo", r"D:\work\repo"])
+        );
+        // The user's own repository wins.
+        assert_eq!(
+            with_repo(&args(&["--repo", "X"]), Some(folder)),
+            args(&["--repo", "X"])
+        );
+        assert_eq!(
+            with_repo(&args(&["--repo=X"]), Some(folder)),
+            args(&["--repo=X"])
+        );
+        assert_eq!(with_repo(&args(&["-a"]), None), args(&["-a"]));
+        // It ends up behind the terminal's own words and the launcher flag.
+        assert_eq!(
+            relaunch_argv(
+                Os::Windows,
+                "windows-terminal",
+                r"C:\gp.exe",
+                &with_repo(&[], Some(folder))
+            )
+            .unwrap(),
+            args(&[
+                "wt.exe",
+                r"C:\gp.exe",
+                "--launcher",
+                "--repo",
+                r"D:\work\repo"
+            ])
+        );
     }
 
     #[test]
@@ -313,11 +514,12 @@ mod tests {
             true,
             false,
             Some(1),
+            false,
             Some("PseudoConsoleWindow"),
             WT
         ));
         // No console window at all: nothing proves a double-click either.
-        assert!(!should_relaunch(true, false, Some(1), None, WT));
+        assert!(!should_relaunch(true, false, Some(1), false, None, WT));
         assert!(owns_console_window(Some("ConsoleWindowClass")));
         assert!(!owns_console_window(Some("PseudoConsoleWindow")));
         assert!(!owns_console_window(None));

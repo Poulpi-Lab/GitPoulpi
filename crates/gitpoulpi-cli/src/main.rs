@@ -70,9 +70,23 @@ fn real_main() {
             }
             let mut repo = cli.repo.as_ref().map(std::path::PathBuf::from);
             let mut session = session;
+            let mut add = cli.add.clone();
+            // Typed in File Explorer's address bar (Windows, no argument): the
+            // folder shown there, opened as `--repo`, or as `--add` to reuse
+            // the open window.
+            if let Some(folder) = gitpoulpi_tui::explorer_folder() {
+                let reuse = gitpoulpi_config::Settings::resolve_ambient()
+                    .map_or(true, |s| s.config().ui.reuse_window);
+                let text = folder.to_string_lossy().into_owned();
+                if reuse {
+                    add = Some(Some(text.clone()));
+                }
+                repo = Some(folder);
+                session = resolve_session(cli.session.as_deref(), Some(&text));
+            }
             // `--add`: a tab in the GitPoulpi that is already open, else a
             // normal start on that folder.
-            if let Some(path) = cli.add.clone() {
+            if let Some(path) = add {
                 let path = path
                     .or_else(|| cli.repo.clone())
                     .map(std::path::PathBuf::from);

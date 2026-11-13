@@ -60,15 +60,32 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
         "[ui]\ngraph_renderer = \"text\"\ncommand_alias = \"gp\"\n",
     )
     .unwrap();
-    let mut term = common::launch(repo.root())
+    let builder = common::launch(repo.root())
         .session("command-alias")
         .config_dir(config.path())
         .env("GITPOULPI_DESKTOP_NO_HOOKS", "1")
         .scratch_home(home.path())
         .size(200, 70)
-        .no_exit_pause()
-        .ready(MESSAGE)
-        .spawn();
+        .no_exit_pause();
+    // Windows: the alias also owns App Paths `gp.exe`, written when the
+    // launcher sits beside the exe. The registry is a file, never the real one.
+    #[cfg(windows)]
+    let install = tempfile::tempdir().unwrap();
+    #[cfg(windows)]
+    let registry = home.path().join("reg.txt");
+    #[cfg(windows)]
+    let builder = {
+        let built = std::path::Path::new(env!("CARGO_BIN_EXE_gitpoulpi-tui"));
+        let exe = install.path().join(built.file_name().unwrap());
+        if std::fs::hard_link(built, &exe).is_err() {
+            std::fs::copy(built, &exe).unwrap();
+        }
+        std::fs::write(install.path().join("gitpoulpi-launch.exe"), "dummy").unwrap();
+        builder
+            .binary(&exe)
+            .env("GITPOULPI_TEST_REGISTRY_FILE", &registry)
+    };
+    let mut term = builder.ready(MESSAGE).spawn();
     let link = common::alias_file(home.path(), "gp");
     assert!(std::fs::symlink_metadata(&link).is_err());
 
@@ -95,6 +112,15 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
         let text = std::fs::read_to_string(&link).expect("the alias is a .cmd file");
         assert!(text.contains("REM X-GitPoulpi=1"), "{text}");
         assert!(text.contains("gitpoulpi-tui"), "it starts the TUI: {text}");
+        assert!(
+            text.contains("set \"GITPOULPI_CMDCMDLINE=%CMDCMDLINE%\""),
+            "the shim exports the cmd command line: {text}"
+        );
+        let reg = std::fs::read_to_string(&registry).expect("the registry file");
+        assert!(
+            reg.contains("App Paths\\gp.exe\t"),
+            "App Paths gp.exe comes with the alias:\n{reg}"
+        );
     }
 
     // The palette selected the Remove button already, so one click runs it;
@@ -125,6 +151,14 @@ fn create_gp_from_the_palette_then_remove_it_from_the_row() {
             common::confirm_removal(&mut term, STEP);
         }
         std::thread::sleep(Duration::from_millis(500));
+    }
+    #[cfg(windows)]
+    {
+        let reg = std::fs::read_to_string(&registry).unwrap_or_default();
+        assert!(
+            !reg.contains("App Paths\\gp.exe\t"),
+            "Remove deletes App Paths gp.exe:\n{reg}"
+        );
     }
     let _ = term.stop();
 }

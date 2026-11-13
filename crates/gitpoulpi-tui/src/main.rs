@@ -29,7 +29,15 @@ fn main() -> std::io::Result<()> {
         }
     };
     let no_raise = take_flag(&mut args, "--no-raise");
-    let add = take_add(&mut args);
+    let mut add = take_add(&mut args);
+    // Typed in File Explorer's address bar (Windows, no argument): the folder
+    // shown there, opened as `--repo`, or as `--add` to reuse the open window.
+    if let Some(folder) = gitpoulpi_tui::explorer_folder() {
+        if reuse_window() {
+            add = Some(Some(folder.clone()));
+        }
+        repo = Some(folder);
+    }
     let parsed = parse_session_arg(args.iter().map(String::as_str));
     // `gp -a`: a tab in the GitPoulpi that is already open, else start here.
     if let (Some(path), Ok(SessionArg::Named(_) | SessionArg::Default)) = (&add, &parsed) {
@@ -81,6 +89,11 @@ fn main() -> std::io::Result<()> {
             launcher,
         },
     )
+}
+
+/// `ui.reuse_window` from the resolved config; on when it cannot be read.
+fn reuse_window() -> bool {
+    gitpoulpi_config::Settings::resolve_ambient().map_or(true, |s| s.config().ui.reuse_window)
 }
 
 // i18n-scan: off

@@ -69,6 +69,17 @@ následuje jedna karta pro každý otevřený repozitář. Křížek `x`, který
 jen na aktivní kartě a na kartě pod ukazatelem. Řádek karet nese jen karty
 (tlačítko [globálního hledání](search.md) je v záhlaví okna).
 
+Když se karty repozitářů nevejdou, řádek se posouvá místo zmenšování karet:
+karty leží mezi dvěma tlačítky se šipkami, `‹` vlevo a `›` vpravo.
+Šipka je ztlumená, když na její straně není skrytá žádná karta. Kliknutím na šipku
+ukážete na té straně o jednu kartu víc (podržením tlačítka posouváte dál), nebo
+použijte kolečko nad řádkem (nahoru nebo doleva ukáže dřívější karty). Kdykoli se
+změní aktuální karta (přepnete karty z klávesnice, z výběru karet nebo z palety,
+otevřete či zavřete kartu nebo změníte velikost okna), řádek se posune právě tolik,
+aby ji ukázal celou. Je-li místo, tlačítko `…` za pravou šipkou otevře výběr karet.
+Přetažení karty na šipku posouvá řádek, dokud ji tam držíte, takže ji můžete pustit
+za karty viditelné na obrazovce. `Ctrl+N` dá na každou živou šipku odznak.
+
 **Nastavení > Vzhled > Umístění lišty karet** přesune tento řádek na konec okna (pod stavový řádek) nebo z něj udělá sloupec u levého okraje: jedna karta na řádek, nejdřív Domů, pak čip pracovního prostoru, Radar, karta Pracovní prostory, karty (dlouhý název končí `…`) a `+`. Když je karet víc než řádků, řádek `…` ukáže, kolik jich je skryto nahoře (`▲`) a dole (`▼`), a otevře seznam karet; kolečko sloupec posouvá. Vedle panelu nástrojů jako sloupce zůstávají karty nejvíc vně. Okno užší než 80 sloupců drží karty nahoře. Kliknutí, křížek zavření, prostřední tlačítko, nabídka pravého tlačítka, přetažení pro změnu pořadí i klávesnice fungují na každé pozici stejně.
 
 - **+** hned za poslední kartou otevře malou nabídku: **Nová karta** (`Alt+T`,
@@ -278,6 +289,16 @@ soubory** a pole **Filtr souborů**, pevně nad seznamem, který se jako jediný
 Kliknutím na soubor otevřete jeho diff. V nízkém okně ustoupí nejdřív zpráva (až na
 jeden řádek), pak seznam. Zobrazení pracovních změn má řádek **Cesta** / **Strom** /
 **Zobrazit všechny soubory** nahoře u seznamů souborů, nad seznamy Unstaged a Staged.
+
+**Odkazy ve zprávě.** Webová adresa napsaná ve zprávě (`https://...` nebo cíl
+markdownového `[text](https://...)`) je podtržená, ukazatel se změní na ruku a
+kliknutí se zeptá **Otevřít tento odkaz?** s celou adresou, než se cokoli otevře:
+text zprávy není důvěryhodný. **Otevřít** (`O`) spustí prohlížeč, **Zrušit**
+(`Z`, `Esc`, křížek) neudělá nic. Nabízejí se jen adresy `http` a `https`.
+Klávesovou obdobou je příkaz palety `Detaily commitu: Otevřít odkaz ve zprávě...`,
+který se zeptá na první adresu zprávy a ostatní prochází tlačítkem **Další** (`D`).
+Některé terminály samy podtrhnou adresu pod ukazatelem a otevřou ji při kliknutí s
+modifikátorem (často Shift+klik); to je funkce terminálu, ne GitPoulpi.
 
 Každý seznam souborů má nabídky pro soubory, složky a prázdnou část a více souborů lze vybrat najednou (**Ctrl+klik**, **Shift+klik**); viz [Stagování a commitování](staging-and-committing.md).
 

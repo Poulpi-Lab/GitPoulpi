@@ -216,13 +216,38 @@ barva vlastní název ikony, takže spouštěč, který ikony ukládá do mezipa
 | Systém | Alias | PATH |
 |---|---|---|
 | Linux, macOS | Symbolický odkaz `~/.local/bin/<name>` na `gitpoulpi-tui`. Odkaz nemůže nést značku, takže se počítá za náš, když jeho cíl je soubor jménem `gitpoulpi-tui`; běžný soubor nebo odkaz na cokoli jiného **není náš** a nikdy se nenahradí ani neodebere. | Blok mezi `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` a `# <<< GitPoulpi PATH <<<` v `~/.bashrc` a `~/.zshrc` (kterékoli existují; `~/.zshrc` v macOS, jinak `~/.bashrc`, když neexistuje ani jeden) a `~/.config/fish/conf.d/gitpoulpi-path.fish`, je-li fish nastaven. Odebrání smaže blok (nebo soubor fish) a nic víc. |
-| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`, dvouřádkový zástupný skript s řádkem `REM X-GitPoulpi=1`. | Uživatelská PATH v `HKCU\Environment`, zapsaná přes PowerShell, potom oznámení `WM_SETTINGCHANGE`, aby ji nové programy viděly. Hodnota `GitPoulpiPathAdded` eviduje, co se přidalo, a Odebrat vyjme jen to. |
+| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`, krátký zástupný skript s řádkem `REM X-GitPoulpi=1` (nastavuje také `GITPOULPI_CMDCMDLINE`, podle čeho se pozná spuštění z adresního řádku). | Uživatelská PATH v `HKCU\Environment`, zapsaná přes PowerShell, potom oznámení `WM_SETTINGCHANGE`, aby ji nové programy viděly. Hodnota `GitPoulpiPathAdded` eviduje, co se přidalo, a Odebrat vyjme jen to. |
 
 Změnu PATH vidí nové terminály, ne ty, které už jsou otevřené. Žádná z obou akcí se nezapisuje do historie vrácení: Zpět pro ně není, cestou zpět je **Odebrat**.
 
 Paleta nabízí stejné akce (**Spouštěč: Vytvořit zástupce**, **Spouštěč: Vytvořit zástupce na ploše**,
 **Spouštěč: Odebrat zástupce**, **Spouštěč: Vytvořit alias příkazu**, **Spouštěč: Odebrat alias příkazu**, **Spouštěč: Přidat do PATH**, **Spouštěč: Odebrat z PATH**) a `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` totéž udělá ze skriptu.
+
+#### Psaní do adresního řádku Průzkumníka souborů (Windows)
+
+Napište alias (`gp`) nebo `gitpoulpi` do adresního řádku okna Průzkumníka souborů a stiskněte Enter: GitPoulpi se otevře v terminálu zvoleném v **Terminál pro zástupce**, ve složce, kterou okno zobrazuje, bez otevření **Poslední karta**. Je-li zapnuto **Při kliknutí zobrazit otevřené okno** a GitPoulpi už běží, stane se z této složky místo toho nová karta onoho okna.
+
+- **`gp` (alias příkazu).** Jakmile alias existuje, jeho vytvoření také zaregistruje `gp.exe` v `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` s odkazem na `gitpoulpi-launch.exe` a Odebrat tento klíč smaže (jen když je náš). Když je složka s aliasem v PATH (**Přidat GitPoulpi do PATH**), Windows spustí nejdřív zástupný skript `.cmd` a před zobrazením GitPoulpi může na okamžik blikat okno konzole. Skript zapsaný starší verzí se přepíše automaticky, když Nastavení alias čtou.
+- **`gitpoulpi`.** Funguje s nainstalovanou **Nabídka správce souborů**: Nainstalovat také zaregistruje `gitpoulpi.exe` v App Paths. Bez ní se `gitpoulpi` najde jen tehdy, když je složka GitPoulpi v PATH, a konzole pak může blikat jako výše.
+
+Linux a macOS nic podobného nemají: adresní řádky jejich správců souborů programy nespouštějí. Použijte položku **Nabídka správce souborů** nebo alias příkazu v terminálu.
+
+#### Nabídka správce souborů (Otevřít v GitPoulpi)
+
+Pod zástupci přidávají řádky **Nabídka správce souborů** položku **Otevřít v GitPoulpi** do nabídky složek po kliknutí pravým tlačítkem. Každý správce souborů má jeden stavový řádek (v Linuxu jeden pro každého zde nalezeného správce a pro každého, který položku ještě drží; řádek **Nalezeno** vypíše, co se našlo), pak tlačítka **Nainstalovat** a **Odebrat**. **Nainstalovat** zapíše položku pro každého nalezeného správce souborů; **Odebrat** se nejdřív zeptá a pak vyjme přesně to, co Nainstalovat zapsalo, ať je ten správce souborů ještě nainstalován, nebo ne.
+
+Položka spouští `gitpoulpi launch --folder <složka>` (ve Windows `gitpoulpi-launch.exe --folder` bez konzole) a až při kliknutí ten příkaz rozhodne: je-li zapnuto **Při kliknutí zobrazit otevřené okno** a okno GitPoulpi běží, stane se složka uvnitř repozitáře novou kartou naposledy použitého okna, které se přesune do popředí; jinak GitPoulpi ve složce spustí terminál zvolený v **Terminál pro zástupce**. Změna terminálu proto položku nikdy nezastará; přesunutý exe nebo nová barva loga ano a GitPoulpi své položky přepíše automaticky (nikdy žádnou nevytvoří), stejně jako zástupce. Položka potřebuje pomocný spouštěč vedle GitPoulpi (`gitpoulpi`, ve Windows `gitpoulpi-launch.exe`); bez něj to řádek řekne a tlačítka zůstanou vypnutá.
+
+| Systém | Co Nainstalovat zapíše |
+|---|---|
+| Windows | Klíče pro jednoho uživatele, bez práv správce: `HKCU\Software\Classes\Directory\shell\GitPoulpi`, `Directory\Background\shell\GitPoulpi` a `Drive\shell\GitPoulpi`, každý s podklíčem `command`, takže se položka ukáže na složce, na pozadí otevřené složky i na jednotce. Každý klíč nese hodnotu `X-GitPoulpi`; klíč bez ní **není náš** a nikdy se ho nedotkne. Také zaregistruje `gitpoulpi.exe` v `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` s odkazem na `gitpoulpi-launch.exe`. Ve Windows 11 je položka jen v klasické nabídce: **Zobrazit další možnosti**, Shift+F10 nebo Shift+pravé tlačítko (nová nabídka nejvyšší úrovně uvádí jen zabalené aplikace). Odebrat smaže naše klíče a potom nadřazené klíče, které vytvořilo Nainstalovat, jen když zůstaly prázdné. |
+| Linux | Jen pro správce souborů nalezené v PATH. GNOME Files a Caja: skript pojmenovaný podle položky v `~/.local/share/nautilus/scripts` nebo `~/.config/caja/scripts` (v podnabídce **Skripty**). Dolphin: `~/.local/share/kio/servicemenus/gitpoulpi-open.desktop`, spustitelný (KDE Frameworks 6 uživatelskou servisní nabídku, která není spustitelná, ignoruje; KDE Frameworks 5 před 5.85 se nepodporuje). Nemo: dvě akce v `~/.local/share/nemo/actions` (vybraná složka, pozadí). Thunar: jedna akce sloučená do `~/.config/Thunar/uca.xml`; vaše vlastní akce zůstanou a Odebrat vrátí soubor bajt po bajtu (nebo ho smaže, pokud ho vytvořilo Nainstalovat). PCManFM a PCManFM-Qt: `~/.local/share/file-manager/actions/gitpoulpi-open.desktop`. Ikona jde do `~/.local/share/icons/hicolor/256x256/apps/gitpoulpi-folder.png` a odchází s poslední položkou. `XDG_DATA_HOME` a `XDG_CONFIG_HOME` se respektují. Položka se ukáže na vybrané složce a na pozadí složky tam, kde to správce souborů nabízí. |
+| macOS | Rychlá akce `~/Library/Services/Open in GitPoulpi.workflow`: klikněte pravým tlačítkem na složku ve Finderu, potom **Rychlé akce**. Jen vybrané složky (Finder nemá nabídku pro pozadí složky). Poprvé může být nutné ji zapnout v Nastavení systému > Klávesnice > Klávesové zkratky > Služby. |
+
+Každý soubor a klíč, který GitPoulpi zapíše, nese značku `X-GitPoulpi=1` (ve skriptu řádek `# X-GitPoulpi=1`) a Odebrat maže jen označené. Tyto akce mění váš systém, ne repozitář: Zpět je nepokrývá, cestou zpět je **Odebrat**. Adresní řádky správců souborů v Linuxu a macOS programy nespouštějí, takže tam není co psát; terminál má alias příkazu.
+
+Paleta má **Spouštěč: Nainstalovat nabídku Otevřít v GitPoulpi** a **Spouštěč: Odebrat nabídku Otevřít v GitPoulpi** a `gitpoulpi desktop folder-menu status|install|remove` totéž udělá ze skriptu.
 
 ### Synchronizace
 

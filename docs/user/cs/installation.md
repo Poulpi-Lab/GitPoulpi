@@ -205,7 +205,8 @@ pokračujte podle [První kroky](getting-started.md).
 ## Odinstalace
 
 `gitpoulpi uninstall` (to spouští oba instalátory) odebere aliasy příkazu,
-záznamy v PATH a zástupce, které GitPoulpi vytvořil, a potom soubory programu
+záznamy v PATH, zástupce a položky nabídky správce souborů (ve Windows s jejich
+klíčem App Paths), které GitPoulpi vytvořil, a potom soubory programu
 instalace z vydání; odmítne sestavení bez značky `.gitpoulpi-dist`
 (sestavení přes cargo) a `--keep-files` soubory programu ponechá. Agentům MCP
 není k dispozici. Bez instalátoru smažte tři spustitelné soubory.

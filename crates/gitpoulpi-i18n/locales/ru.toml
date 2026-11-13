@@ -1027,17 +1027,17 @@ box_new_branch_at = "Новая ветка в {sha}"
 box_new_tag_at = "Новый {$tag} в {sha}"
 box_new_annotated_tag_at = "Новый аннотированный {$tag} в {sha}"
 # context: title of the rename box; {old} is the branch name
-box_rename = "Rename {old}"
+box_rename = "Переименовать {old}"
 # context: confirm button of the rename box
-rename_button = "Rename"
+rename_button = "Переименовать"
 # context: placeholder of the inline new-file box in the Status list; keep it short
-placeholder_file = "file name, e.g. notes.md"
+placeholder_file = "имя файла, напр. notes.md"
 # context: title of the new-file box; {folder} is a path
-box_new_file = "New file in {folder}/"
+box_new_file = "Новый файл в {folder}/"
 # context: title of the new-file box for the repository root
-box_new_file_root = "New file"
+box_new_file_root = "Новый файл"
 # context: confirm button of the name box and the new-file box
-create_button = "Create"
+create_button = "Создать"
 
 [menu_pill]
 checkout = { git = "Checkout", local = "Checkout" }
@@ -4312,7 +4312,7 @@ counter = "{current} из {total}"
 [footer]
 commit_label = { git = "Сообщение commit'а: ", local = "Сообщение коммита: " }
 commit_hint = { git = "  (Enter: commit, Esc: отмена)", local = "  (Enter: коммит, Esc: отмена)" }
-filter_refs_hint = "Enter: apply, Esc: cancel"
+filter_refs_hint = "Enter: применить, Esc: отмена"
 confirm_hint = "  (Enter: подтвердить, Esc: отмена)"
 search_hint = "Поиск: Enter/{down} далее, Shift+Enter/{up} назад, Esc закрыть"
 commit_count = { one = "{n} {$commit}", few = { git = "{n} {$commits}", local = "{n} коммита" }, many = { git = "{n} {$commits}", local = "{n} коммитов" }, other = { git = "{n} {$commits}", local = "{n} коммита" } }
@@ -5273,53 +5273,53 @@ discard_hint = "Отбросить изменения? Ещё раз Esc - от�
 
 [prompt_dialog]
 # context: title of the stash dialog; stash is the git verb (stash the working changes)
-stash_title = "{$Stash} changes"
+stash_title = "{$Stash} изменений"
 # context: placeholder of the stash message field; an empty message is allowed
-stash_placeholder = "message (optional)"
+stash_placeholder = "сообщение (необязательно)"
 # context: the primary button of the stash dialog; stash is the git verb
 stash_button = "{$Stash}"
 # context: AI button of the stash dialog (the key that does the same follows it); the AI writes the stash message
-ai_message_button = "AI message"
+ai_message_button = "Сообщение от ИИ"
 # context: shown in the stash message field while the AI is writing it
-ai_writing = "writing..."
+ai_writing = "пишу..."
 # context: title of the dialog that annotates an existing tag; {name} is the tag
-tag_annotate_title = "Annotate {$tag} {name}"
+tag_annotate_title = "Аннотировать {$tag} {name}"
 # context: title of the dialog that creates an annotated tag; {name} is the new tag, {sha} the short hash of the commit it points at
-tag_new_title = "New annotated {$tag} {name} at {sha}"
+tag_new_title = "Новый аннотированный {$tag} {name} в {sha}"
 # context: placeholder of the tag message field (several lines allowed)
-tag_placeholder = "message"
+tag_placeholder = "сообщение"
 # context: the primary button of the dialog that annotates an existing tag
-tag_annotate_button = "Annotate"
+tag_annotate_button = "Аннотировать"
 # context: the primary button of the dialog that creates an annotated tag
-tag_create_button = "Create {$tag}"
+tag_create_button = "Создать {$tag}"
 # context: hint under the multi-line message field of the tag dialog; {key} is the key that applies
-keys_hint = "Enter: new line, {key}: apply, Esc: cancel"
+keys_hint = "Enter: новая строка, {key}: применить, Esc: отмена"
 # context: title of the dialog that sets the upstream (the remote branch it tracks) of a local branch; {branch} is the local branch
-upstream_title = "Set upstream of {branch}"
+upstream_title = "Задать upstream для {branch}"
 # context: placeholder of the remote branch list of that dialog while nothing is chosen
-upstream_placeholder = "Select a remote branch..."
+upstream_placeholder = "Выберите удалённую ветку..."
 # context: the primary button of the set upstream dialog
-set_button = "Set"
+set_button = "Задать"
 # context: button of the set upstream dialog that removes the branch's upstream (only shown when it has one)
-unset_button = "Unset upstream"
+unset_button = "Сбросить upstream"
 # context: inline error in the set upstream dialog when the typed value starts with a name that is not a remote; {remote} is that name
-unknown_remote = "No remote named '{remote}'"
+unknown_remote = "Нет remote'а «{remote}»"
 # context: inline error in the set upstream dialog when Set is pressed with nothing chosen
-upstream_none = "Choose a remote branch first."
+upstream_none = "Сначала выберите удалённую ветку."
 # context: title of the dialog that routes file patterns through Git LFS
-lfs_track_title = "Track with Git LFS"
+lfs_track_title = "Отслеживать через Git LFS"
 # context: placeholder of the Git LFS track field; several patterns are separated by spaces
-lfs_track_placeholder = "patterns, e.g. *.psd assets/big.bin"
+lfs_track_placeholder = "шаблоны, напр. *.psd assets/big.bin"
 # context: the primary button of the Git LFS track dialog
-track_button = "Track"
+track_button = "Отслеживать"
 # context: title of the dialog that stops routing a pattern through Git LFS
-lfs_untrack_title = "Stop tracking with Git LFS"
+lfs_untrack_title = "Прекратить отслеживание через Git LFS"
 # context: placeholder of the list of tracked Git LFS patterns while nothing is chosen
-lfs_untrack_placeholder = "Select a pattern..."
+lfs_untrack_placeholder = "Выберите шаблон..."
 # context: the primary button of the Git LFS untrack dialog
-untrack_button = "Untrack"
+untrack_button = "Не отслеживать"
 # context: inline error in the Git LFS track and untrack dialogs when no pattern was given
-pattern_empty = "Enter at least one pattern."
+pattern_empty = "Введите хотя бы один шаблон."
 
 [composer]
 need_staged = { git = "Сделайте stage изменений, чтобы сделать commit", local = "Добавьте изменения в индекс" }

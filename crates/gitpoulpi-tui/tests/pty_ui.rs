@@ -699,6 +699,48 @@ fn c_in_the_log_edits_the_wip_message_without_the_mouse() {
     .unwrap_or_else(|e| panic!("{e}"));
 }
 
+/// The palette's "Navigation: Focus Refs Filter" opens a collapsed Refs pane, so
+/// the box being typed in is on screen, and the text never reaches the
+/// status line. Red without the fix: the pane stayed collapsed and the draft
+/// was visible only in the footer.
+#[test]
+fn the_palette_refs_filter_opens_a_collapsed_pane_and_types_in_its_box() {
+    let repo = fixture();
+    let (mut term, _config) = launch(repo.root(), "pty-palette-refs-filter");
+    term.wait_for("the Refs sidebar", STEP, |s| s.contains("LOCAL"))
+        .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("C-p").unwrap();
+    term.send_text("toggle refs pane").unwrap();
+    term.wait_for("the collapse row", STEP, |s| {
+        s.contains("Toggle Refs Pane Collapsed")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the Refs pane collapsed", STEP, |s| !s.contains("LOCAL"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("C-p").unwrap();
+    term.send_text("navigation: focus refs filter").unwrap();
+    term.wait_for("the filter row", STEP, |s| {
+        s.contains("Navigation: Focus Refs Filter")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the pane open again", STEP, |s| s.contains("LOCAL"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_text("zq9x").unwrap();
+    let screen = term
+        .wait_for("the draft in the sidebar box", STEP, |s| {
+            s.contains(" / zq9x_")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !common::status_line_text(&screen).contains("zq9x"),
+        "the draft reached the status line: {}",
+        term.text()
+    );
+    term.send_keys("Esc").unwrap();
+}
+
 /// `Ctrl+N` then a sub-pane's badge focuses it. The Refs filter field is
 /// always the first badge target, so its badge is `1`.
 #[test]
@@ -725,9 +767,9 @@ fn ctrl_n_then_a_badge_focuses_that_subpane() {
     // Badge `1` is the Refs filter field.
     term.send_keys("1").expect("press badge 1");
     term.wait_for(
-        "the Refs filter field focused (its footer prompt is up)",
+        "the Refs filter field focused (its footer shows only the hint)",
         STEP,
-        |s| s.contains("Filter refs:"),
+        |s| common::status_line_text(s).contains("Esc: cancel"),
     )
     .unwrap_or_else(|e| panic!("{e}"));
 
@@ -890,7 +932,7 @@ fn a_digit_typed_in_the_refs_filter_goes_into_the_filter_not_a_count() {
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("1").expect("badge 1: the Refs filter");
     term.wait_for("the Refs filter field focused", STEP, |s| {
-        s.contains("Filter refs:")
+        common::status_line_text(s).contains("Esc: cancel")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
@@ -898,7 +940,11 @@ fn a_digit_typed_in_the_refs_filter_goes_into_the_filter_not_a_count() {
     term.wait_for(
         "the digits landed in the filter draft, not swallowed as a count",
         STEP,
-        |s| s.contains("Filter refs: 42_") && !s.contains("42\u{2026}"),
+        |s| {
+            s.contains(" / 42_")
+                && !s.contains("42\u{2026}")
+                && !common::status_line_text(s).contains("42")
+        },
     )
     .unwrap_or_else(|e| panic!("{e}"));
 
@@ -925,13 +971,13 @@ fn clicking_outside_the_refs_filter_releases_it_and_keeps_the_draft() {
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("1").expect("badge 1: the Refs filter");
     term.wait_for("the Refs filter field focused", STEP, |s| {
-        s.contains("Filter refs:")
+        common::status_line_text(s).contains("Esc: cancel")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
     term.send_text("abc").expect("type into the filter");
     term.wait_for("the draft on screen with its caret", STEP, |s| {
-        s.contains("Filter refs: abc_")
+        s.contains(" / abc_") && !common::status_line_text(s).contains("abc")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
@@ -941,12 +987,16 @@ fn clicking_outside_the_refs_filter_releases_it_and_keeps_the_draft() {
         .wait_for(
             "the filter field released, its draft applied and kept",
             STEP,
-            |s| !s.contains("Filter refs:") && s.contains("abc") && !s.contains("abc_"),
+            |s| {
+                !common::status_line_text(s).contains("Esc: cancel")
+                    && s.contains("abc")
+                    && !s.contains("abc_")
+            },
         )
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
-        !screen.text().contains("Filter refs:"),
-        "the footer's editing prompt must be gone, not just off-predicate"
+        !common::status_line_text(&screen).contains("Esc: cancel"),
+        "the footer's editing hint must be gone, not just off-predicate"
     );
 
     // `j` now moves the Log selection instead of typing into the filter.
@@ -955,7 +1005,7 @@ fn clicking_outside_the_refs_filter_releases_it_and_keeps_the_draft() {
     term.wait_for(
         "j moved the Log selection rather than editing the filter",
         STEP,
-        |s| !s.contains("Filter refs:") && !s.contains("abcj"),
+        |s| !common::status_line_text(s).contains("Esc: cancel") && !s.contains("abcj"),
     )
     .unwrap_or_else(|e| panic!("{e}"));
 }

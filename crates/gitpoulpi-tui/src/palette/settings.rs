@@ -3,8 +3,8 @@
 //! Generated from the field model (`preferences::palette_settings`), never
 //! listed by hand. One row per setting, by what it is:
 //! - a toggle: `Settings: Toggle <label>`, runs at once;
-//! - a number or text: `Settings: <label>...`, a prompt prefilled with the
-//!   value, refused like the page refuses it;
+//! - a number or text: `Settings: <label>...`, the Settings page opens on the row with
+//!   it being edited, refused like the page refuses it;
 //! - a choice: `Settings: <label>...` narrows the palette to its choices
 //!   (`Settings: <label>: <choice>` rows, the current one marked);
 //! - anything that needs its page: `Settings: <label>...` opens Settings on it.
@@ -23,7 +23,7 @@ use std::sync::Mutex;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum SettingOp {
     Toggle(u16),
-    /// A prompt over a number or text.
+    /// Edits a number or text on the Settings page.
     Edit(u16),
     /// Narrows the palette to the setting's choices.
     Sub(u16),
@@ -231,10 +231,11 @@ pub(crate) fn value_text(op: SettingOp) -> String {
 pub(crate) enum Outcome {
     /// Done (or refused): say so in the status line.
     Message(String),
-    /// Ask for a value: the prompt's label, setting and starting text.
-    Prompt { row: u16, text: String },
-    /// Open Settings on this key.
+    /// Open Settings on this key (a page row only).
     OpenPage(&'static str),
+    /// Open Settings on this key with the row already being edited: the
+    /// page's own field, validation and messages, never a footer prompt.
+    EditOnPage(&'static str),
 }
 
 fn not_editable(current: &Current) -> Option<String> {
@@ -256,29 +257,9 @@ pub(crate) fn run(op: SettingOp) -> Outcome {
     match op {
         SettingOp::Toggle(_) => done(ps::apply(row.key, Edit::Toggle)),
         SettingOp::Choose(_, o) => done(ps::apply(row.key, Edit::Choose(o as usize))),
-        SettingOp::Edit(r) => Outcome::Prompt {
-            row: r,
-            text: current.map(|c| c.text).unwrap_or_default(),
-        },
+        SettingOp::Edit(_) => Outcome::EditOnPage(row.key),
         SettingOp::Page(_) => Outcome::OpenPage(row.key),
         // The palette itself narrows to the choices (its Enter arm).
         SettingOp::Sub(_) => Outcome::Message(String::new()),
     }
-}
-
-/// The prompt's answer: `Ok` is the page's confirmation, `Err` why it was refused.
-pub(crate) fn submit(row: u16, text: &str) -> Result<String, String> {
-    let Some(row) = model().rows.get(row as usize) else {
-        return Err(String::new());
-    };
-    ps::apply(row.key, Edit::Text(text.to_string()))
-}
-
-/// The label of the prompt for `row`, with the refusal in brackets.
-pub(crate) fn prompt_label(row: u16) -> String {
-    model()
-        .rows
-        .get(row as usize)
-        .map(|r| r.label.clone())
-        .unwrap_or_default()
 }

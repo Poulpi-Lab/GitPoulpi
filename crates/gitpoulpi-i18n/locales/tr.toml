@@ -4303,6 +4303,7 @@ counter = "{current} / {total}"
 commit_label = "{$Commit} mesajı: "
 commit_hint = { git = "  (Enter: commit, Esc: iptal)", local = "  (Enter: commit, Esc: iptal)" }
 filter_refs = "Ref filtrele: {draft}_  (Enter: uygula, Esc: iptal)"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "Yeni dal adı"
 new_tag_name = "Yeni {$tag} adı"
 new_branch_at = "{sha} üzerinde yeni dal"

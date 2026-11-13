@@ -4302,6 +4302,7 @@ counter = "{current} з {total}"
 commit_label = { git = "Повідомлення commit'у: ", local = "Повідомлення коміту: " }
 commit_hint = { git = "  (Enter: commit, Esc: скасувати)", local = "  (Enter: коміт, Esc: скасувати)" }
 filter_refs = "Фільтр refs: {draft}_  (Enter: застосувати, Esc: скасувати)"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "Назва нової гілки"
 new_tag_name = { git = "Назва нового tag'а", local = "Назва нового тегу" }
 new_branch_at = "Нова гілка на {sha}"

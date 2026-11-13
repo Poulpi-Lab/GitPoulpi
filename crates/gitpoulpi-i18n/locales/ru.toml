@@ -4296,6 +4296,7 @@ counter = "{current} из {total}"
 commit_label = { git = "Сообщение commit'а: ", local = "Сообщение коммита: " }
 commit_hint = { git = "  (Enter: commit, Esc: отмена)", local = "  (Enter: коммит, Esc: отмена)" }
 filter_refs = "Фильтр ссылок: {draft}_  (Enter: применить, Esc: отмена)"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "Имя новой ветки"
 new_tag_name = { git = "Имя нового tag'а", local = "Имя нового тега" }
 new_branch_at = "Новая ветка в {sha}"

@@ -4310,6 +4310,7 @@ counter = "{current} sur {total}"
 commit_label = "Message de {$commit} : "
 commit_hint = { git = "  (Enter : commit, Esc : annuler)", local = "  (Enter : valider, Esc : annuler)" }
 filter_refs = "Filtrer les refs : {draft}_  (Enter : appliquer, Esc : annuler)"
+filter_refs_hint = "Entrée : appliquer, Échap : annuler"
 new_branch_name = "Nom de la nouvelle branche"
 new_tag_name = { git = "Nom du nouveau {$tag}", local = "Nom de la nouvelle {$tag}" }
 new_branch_at = "Nouvelle branche sur {sha}"

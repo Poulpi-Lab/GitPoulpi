@@ -145,10 +145,11 @@ fn a_choice_setting_opens_its_sub_list() {
     term.stop().unwrap();
 }
 
-/// A number opens a prompt prefilled with its value; a refused value keeps
-/// the prompt open with the reason, an accepted one is written.
+/// A number opens Settings on that row, being edited and prefilled: nothing
+/// is typed in the status line, a refused value stays on the page, an
+/// accepted one is written.
 #[test]
-fn a_number_setting_goes_through_the_prompt_and_refuses_bad_values() {
+fn a_number_setting_is_edited_on_the_settings_page_and_refuses_bad_values() {
     let repo = fixture();
     let (mut term, config) = launch(
         repo.root(),
@@ -161,32 +162,44 @@ fn a_number_setting_goes_through_the_prompt_and_refuses_bad_values() {
         "Settings: Mouse wheel lines...",
     );
     term.send_keys("Enter").unwrap();
-    term.wait_for("the prompt prefilled with 3", STEP, |s| {
-        s.text()
-            .lines()
-            .any(|l| l.contains("Settings: Mouse wheel lines: 3"))
-    })
-    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    // Not a number.
+    // The row on the page, in edit state with its value prefilled.
+    let screen = term
+        .wait_for("Settings open on the row being edited", STEP, |s| {
+            s.contains("Settings - Tab")
+                && s.text()
+                    .lines()
+                    .any(|l| l.contains("Mouse wheel lines") && l.contains("3\u{2588}"))
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !common::status_line_text(&screen).contains("Mouse wheel lines"),
+        "no footer prompt: {}",
+        term.text()
+    );
+    // Not a number: refused on the page, the file untouched.
     term.send_keys("BSpace").unwrap();
-    term.send_text("abc").unwrap();
+    term.send_text("zq9x").unwrap();
+    let screen = term
+        .wait_for("the typed text on the row", STEP, |s| s.contains("zq9x"))
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !common::status_line_text(&screen).contains("zq9x"),
+        "the typed text reached the status line: {}",
+        term.text()
+    );
     term.send_keys("Enter").unwrap();
-    term.wait_for("the refusal in the prompt", STEP, |s| {
-        s.text()
-            .lines()
-            .any(|l| l.contains("Settings: Mouse wheel lines [") && l.contains("abc"))
+    term.wait_for("still editing after the refusal", STEP, |s| {
+        s.contains("zq9x")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // Outside the range.
-    for _ in 0..3 {
+    for _ in 0..4 {
         term.send_keys("BSpace").unwrap();
     }
     term.send_text("9999").unwrap();
     term.send_keys("Enter").unwrap();
-    term.wait_for("the refusal for the range", STEP, |s| {
-        s.text()
-            .lines()
-            .any(|l| l.contains("Settings: Mouse wheel lines [") && l.contains("9999"))
+    term.wait_for("the range refusal kept the row open", STEP, |s| {
+        s.contains("9999")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(

@@ -4305,6 +4305,7 @@ counter = "{current} av {total}"
 commit_label = { git = "{$Commit}-meddelande: ", local = "Incheckningsmeddelande: " }
 commit_hint = { git = "  (Enter: commit, Esc: avbryt)", local = "  (Enter: checka in, Esc: avbryt)" }
 filter_refs = "Filtrera refs: {draft}_  (Enter: tillämpa, Esc: avbryt)"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "Nytt grennamn"
 new_tag_name = { git = "Nytt {$tag}-namn", local = "Nytt taggnamn" }
 new_branch_at = "Ny gren vid {sha}"

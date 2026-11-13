@@ -54,12 +54,11 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         // above: a collapsed pane has nothing
         // to focus, so land on the center.
         PaletteCommand::FocusRefsFilter => {
-            if *cx.left_pane_collapsed {
-                *cx.focus = Focus::Log;
-            } else {
-                *cx.focus = Focus::Refs;
-                *cx.input_mode = InputMode::FilteringRefs(cx.refs_filter.clone());
-            }
+            // The box lives in the sidebar: a collapsed pane would hide what
+            // is typed, so it opens.
+            *cx.left_pane_collapsed = false;
+            *cx.focus = Focus::Refs;
+            *cx.input_mode = InputMode::FilteringRefs(cx.refs_filter.clone());
         }
         PaletteCommand::FocusRefsSection(section) => {
             if *cx.left_pane_collapsed || !cx.visible_sidebar.contains(&section) {

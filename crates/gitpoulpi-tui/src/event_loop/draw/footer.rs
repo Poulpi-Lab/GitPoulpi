@@ -59,7 +59,7 @@ pub(in crate::event_loop) fn draw_footer(
     let mut footer_prompt: Option<(MainField, &str, &str)> = None;
     let mut ref_name_hint = String::new();
     let footer_text = match &input_mode {
-        InputMode::FilteringRefs(draft) => f::filter_refs(draft),
+        InputMode::FilteringRefs(_) => f::FILTER_REFS_HINT.get().to_string(),
         InputMode::ComposingRefName { op, value } => {
             let label = match op {
                 RefNameOp::NewBranch => f::NEW_BRANCH_NAME.get().to_string(),
@@ -76,13 +76,6 @@ pub(in crate::event_loop) fn draw_footer(
                 RefNameOp::LfsTrack => f::LFS_TRACK.get().to_string(),
                 RefNameOp::LfsUntrack => f::LFS_UNTRACK.get().to_string(),
                 RefNameOp::StashMessage => f::STASH_MESSAGE.get().to_string(),
-                RefNameOp::Setting(row) => {
-                    let label = palette::setting_prompt_label(*row);
-                    match &new_file_error {
-                        Some(why) => f::setting_value_error(&label, why),
-                        None => f::setting_value(&label),
-                    }
-                }
                 RefNameOp::CreateFile(folder) => {
                     let place = if folder.as_os_str().is_empty() {
                         String::new()

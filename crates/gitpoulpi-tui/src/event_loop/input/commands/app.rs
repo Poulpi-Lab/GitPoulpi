@@ -373,11 +373,16 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
         PaletteCommand::ToggleHelp => *cx.show_help = !*cx.show_help,
         PaletteCommand::Setting(op) => match palette::run_setting(op) {
             palette::SettingOutcome::Message(message) => *cx.last_message = Some(message),
-            palette::SettingOutcome::Prompt { row, text, .. } => {
-                *cx.input_mode = InputMode::ComposingRefName {
-                    op: RefNameOp::Setting(row),
-                    value: text,
-                };
+            palette::SettingOutcome::EditOnPage(key) => {
+                // Settings already open (the palette over it): reuse it.
+                let mut state = cx
+                    .preferences
+                    .take()
+                    .unwrap_or_else(|| PreferencesState::open(cx.repo_root));
+                if let Err(why) = state.edit_setting(key) {
+                    *cx.last_message = Some(why);
+                }
+                *cx.preferences = Some(state);
             }
             palette::SettingOutcome::OpenPage(key) => {
                 let mut state = PreferencesState::open(cx.repo_root);

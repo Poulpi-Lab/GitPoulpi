@@ -518,6 +518,8 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
             }
         }
         PaletteCommand::FilterRefs => {
+            // The box is in the sidebar: a collapsed pane would hide it.
+            *cx.left_pane_collapsed = false;
             *cx.focus = Focus::Refs;
             *cx.input_mode = InputMode::FilteringRefs(cx.refs_filter.clone());
         }

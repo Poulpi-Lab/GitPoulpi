@@ -56,7 +56,6 @@ pub(crate) fn inline_target(op: &RefNameOp, head: Option<Oid>) -> Option<(Inline
         | RefNameOp::SetUpstream(_)
         | RefNameOp::StashMessage
         | RefNameOp::CreateFile(_)
-        | RefNameOp::Setting(_)
         | RefNameOp::LfsTrack
         | RefNameOp::LfsUntrack => None,
     }

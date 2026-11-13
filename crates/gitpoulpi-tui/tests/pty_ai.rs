@@ -342,42 +342,82 @@ fn with_ai_off_the_commit_menu_has_no_ai_row() {
     assert!(!menu.contains("(AI)"), "no AI row while AI is off");
 }
 
-/// Stash with a message: `Ctrl+G m` opens the prompt (no AI needed); with
-/// AI on, `Ctrl+G` inside it fills the message from the agent.
+/// The status line: the last screen row. Nothing a prompt asks for is typed there.
+fn status_row(s: &xtask::pty::Screen) -> String {
+    s.line(s.rows() - 1)
+}
+
+/// Stash with a message: `Ctrl+G m` opens the dialog (no AI needed); with AI
+/// on it has a ✦ button, and `Ctrl+G` inside it fills the message from the agent.
 #[test]
-fn the_stash_prompt_takes_a_typed_message_and_an_ai_one() {
+fn the_stash_dialog_takes_a_typed_message_and_an_ai_one() {
     // Typed, AI off.
     let repo = fixture();
     let (mut term, _config) = launch(&repo, "pty-stash-typed", None);
     term.send_keys("C-g").unwrap();
     term.send_keys("m").unwrap();
-    term.wait_for("the stash prompt, with no AI hint", STEP, |s| {
-        s.contains("Stash message (optional)") && !s.contains("AI message")
+    term.wait_for("the stash dialog, with no AI button", STEP, |s| {
+        s.contains("Stash changes") && s.contains("message (optional)") && !s.contains("AI message")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_text("my typed stash").unwrap();
+    let shown = term
+        .wait_for("the typed message in the dialog", STEP, |s| {
+            s.contains("my typed stash")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(
+        !status_row(&shown).contains("my typed stash"),
+        "the message is not echoed in the status line: {}",
+        status_row(&shown)
+    );
     term.send_keys("Enter").unwrap();
     wait_for_stash(&repo, "my typed stash");
 
-    // AI on: Ctrl+G inside the prompt.
+    // AI on: the ✦ button, and its key inside the dialog.
     let repo = fixture();
     let tools = tempfile::tempdir().unwrap();
     let agent = write_fake_agent(tools.path(), &["WIP: second line"]);
     let (mut term, _config) = launch(&repo, "pty-stash-ai", ai_config(&agent));
     term.send_keys("C-g").unwrap();
     term.send_keys("m").unwrap();
-    term.wait_for("the stash prompt with the AI hint", STEP, |s| {
-        s.contains("Stash message (optional)") && s.contains("AI message")
+    term.wait_for("the stash dialog with its AI button", STEP, |s| {
+        s.contains("Stash changes") && s.contains("\u{2726} AI message")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("C-g").unwrap();
-    term.wait_for("the prompt filled by the agent", STEP, |s| {
-        s.contains("WIP: second line")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
+    let filled = term
+        .wait_for("the dialog filled by the agent", STEP, |s| {
+            s.contains("WIP: second line")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(!status_row(&filled).contains("WIP: second line"));
     assert_eq!(agent_calls(&agent), 1);
     term.send_keys("Enter").unwrap();
     wait_for_stash(&repo, "WIP: second line");
+}
+
+/// Clicking the ✦ button asks the agent too.
+#[test]
+fn the_stash_dialog_ai_button_is_clickable() {
+    let repo = fixture();
+    let tools = tempfile::tempdir().unwrap();
+    let agent = write_fake_agent(tools.path(), &["WIP: clicked"]);
+    let (mut term, _config) = launch(&repo, "pty-stash-ai-click", ai_config(&agent));
+    term.send_keys("C-g").unwrap();
+    term.send_keys("m").unwrap();
+    let s = term
+        .wait_for("the stash dialog with its AI button", STEP, |s| {
+            s.contains("Stash changes") && s.contains("\u{2726} AI message")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    let (col, row) = s.find("AI message").unwrap();
+    term.click(col + 1, row).unwrap();
+    term.wait_for("the agent's message in the field", STEP, |s| {
+        s.contains("WIP: clicked")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(agent_calls(&agent), 1);
 }
 
 fn wait_for_stash(repo: &FixtureRepo, message: &str) {

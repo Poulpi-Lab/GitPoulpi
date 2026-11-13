@@ -1025,17 +1025,17 @@ box_new_branch_at = "Nova branch em {sha}"
 box_new_tag_at = "Nova {$tag} em {sha}"
 box_new_annotated_tag_at = "Nova {$tag} anotada em {sha}"
 # context: title of the rename box; {old} is the branch name
-box_rename = "Rename {old}"
+box_rename = "Renomear {old}"
 # context: confirm button of the rename box
-rename_button = "Rename"
+rename_button = "Renomear"
 # context: placeholder of the inline new-file box in the Status list; keep it short
-placeholder_file = "file name, e.g. notes.md"
+placeholder_file = "nome do arquivo, ex.: notes.md"
 # context: title of the new-file box; {folder} is a path
-box_new_file = "New file in {folder}/"
+box_new_file = "Novo arquivo em {folder}/"
 # context: title of the new-file box for the repository root
-box_new_file_root = "New file"
+box_new_file_root = "Novo arquivo"
 # context: confirm button of the name box and the new-file box
-create_button = "Create"
+create_button = "Criar"
 
 [menu_pill]
 checkout = "Checkout"
@@ -4318,7 +4318,7 @@ counter = "{current} de {total}"
 [footer]
 commit_label = "Mensagem de {$commit}: "
 commit_hint = "  (Enter: commit, Esc: cancelar)"
-filter_refs_hint = "Enter: apply, Esc: cancel"
+filter_refs_hint = "Enter: aplicar, Esc: cancelar"
 confirm_hint = "  (Enter: confirmar, Esc: cancelar)"
 search_hint = "Busca: Enter/{down} próximo, Shift+Enter/{up} anterior, Esc fecha"
 commit_count = { one = "{n} {$commit}", other = "{n} {$commits}" }
@@ -5277,53 +5277,53 @@ discard_hint = "Descartar suas alterações? Esc de novo descarta; qualquer outr
 
 [prompt_dialog]
 # context: title of the stash dialog; stash is the git verb (stash the working changes)
-stash_title = "{$Stash} changes"
+stash_title = "{$Stash} das alterações"
 # context: placeholder of the stash message field; an empty message is allowed
-stash_placeholder = "message (optional)"
+stash_placeholder = "mensagem (opcional)"
 # context: the primary button of the stash dialog; stash is the git verb
 stash_button = "{$Stash}"
 # context: AI button of the stash dialog (the key that does the same follows it); the AI writes the stash message
-ai_message_button = "AI message"
+ai_message_button = "Mensagem da IA"
 # context: shown in the stash message field while the AI is writing it
-ai_writing = "writing..."
+ai_writing = "escrevendo..."
 # context: title of the dialog that annotates an existing tag; {name} is the tag
-tag_annotate_title = "Annotate {$tag} {name}"
+tag_annotate_title = "Anotar {$tag} {name}"
 # context: title of the dialog that creates an annotated tag; {name} is the new tag, {sha} the short hash of the commit it points at
-tag_new_title = "New annotated {$tag} {name} at {sha}"
+tag_new_title = "Nova {$tag} anotada {name} em {sha}"
 # context: placeholder of the tag message field (several lines allowed)
-tag_placeholder = "message"
+tag_placeholder = "mensagem"
 # context: the primary button of the dialog that annotates an existing tag
-tag_annotate_button = "Annotate"
+tag_annotate_button = "Anotar"
 # context: the primary button of the dialog that creates an annotated tag
-tag_create_button = "Create {$tag}"
+tag_create_button = "Criar {$tag}"
 # context: hint under the multi-line message field of the tag dialog; {key} is the key that applies
-keys_hint = "Enter: new line, {key}: apply, Esc: cancel"
+keys_hint = "Enter: nova linha, {key}: aplicar, Esc: cancelar"
 # context: title of the dialog that sets the upstream (the remote branch it tracks) of a local branch; {branch} is the local branch
-upstream_title = "Set upstream of {branch}"
+upstream_title = "Definir upstream de {branch}"
 # context: placeholder of the remote branch list of that dialog while nothing is chosen
-upstream_placeholder = "Select a remote branch..."
+upstream_placeholder = "Selecione uma branch remota..."
 # context: the primary button of the set upstream dialog
-set_button = "Set"
+set_button = "Definir"
 # context: button of the set upstream dialog that removes the branch's upstream (only shown when it has one)
-unset_button = "Unset upstream"
+unset_button = "Remover upstream"
 # context: inline error in the set upstream dialog when the typed value starts with a name that is not a remote; {remote} is that name
-unknown_remote = "No remote named '{remote}'"
+unknown_remote = "Não há remoto chamado '{remote}'"
 # context: inline error in the set upstream dialog when Set is pressed with nothing chosen
-upstream_none = "Choose a remote branch first."
+upstream_none = "Escolha uma branch remota primeiro."
 # context: title of the dialog that routes file patterns through Git LFS
-lfs_track_title = "Track with Git LFS"
+lfs_track_title = "Rastrear com Git LFS"
 # context: placeholder of the Git LFS track field; several patterns are separated by spaces
-lfs_track_placeholder = "patterns, e.g. *.psd assets/big.bin"
+lfs_track_placeholder = "padrões, ex.: *.psd assets/big.bin"
 # context: the primary button of the Git LFS track dialog
-track_button = "Track"
+track_button = "Rastrear"
 # context: title of the dialog that stops routing a pattern through Git LFS
-lfs_untrack_title = "Stop tracking with Git LFS"
+lfs_untrack_title = "Parar de rastrear com Git LFS"
 # context: placeholder of the list of tracked Git LFS patterns while nothing is chosen
-lfs_untrack_placeholder = "Select a pattern..."
+lfs_untrack_placeholder = "Selecione um padrão..."
 # context: the primary button of the Git LFS untrack dialog
-untrack_button = "Untrack"
+untrack_button = "Remover"
 # context: inline error in the Git LFS track and untrack dialogs when no pattern was given
-pattern_empty = "Enter at least one pattern."
+pattern_empty = "Informe pelo menos um padrão."
 
 [composer]
 need_staged = { git = "Faça stage das alterações para o commit", local = "Prepare alterações para o commit" }

@@ -4478,6 +4478,8 @@ no_other_refs = "tento commit nemá žádné další refs k zobrazení"
 file_list_loading = "seznam souborů tohoto commitu se ještě načítá"
 no_repo_tab = "není otevřena žádná karta repozitáře"
 commit_now_ai_running = "AI ještě píše zprávu - počkejte, nebo ji zrušte klávesou Esc"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "žádná odpovídající karta"
 no_matching_theme = "žádný odpovídající motiv"
 no_matching_language = "žádný odpovídající jazyk"

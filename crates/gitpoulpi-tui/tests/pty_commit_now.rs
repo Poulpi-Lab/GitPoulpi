@@ -89,7 +89,7 @@ fn chord(term: &mut Terminal) {
 fn type_summary(term: &mut Terminal, summary: &str) {
     chord(term);
     term.wait_for("the composer's Summary asked for", STEP, |s| {
-        s.contains("Enter a commit summary")
+        s.contains("press Ctrl+Enter to commit")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_text(summary).unwrap();
@@ -150,7 +150,7 @@ fn the_chord_commits_the_staged_changes_from_the_log_and_is_undoable() {
     // The reason alone is not new: the first chord's message is still in
     // the status line. Only this chord moves the right pane to the Status.
     term.wait_for("the empty summary reported, Status shown", STEP, |s| {
-        s.contains("Enter a commit summary") && s.contains("Staged Files")
+        s.contains("press Ctrl+Enter to commit") && s.contains("Staged Files")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(subject(&repo), "initial commit", "no second commit");
@@ -167,7 +167,7 @@ fn an_empty_summary_commits_nothing_and_focuses_the_summary() {
     focus_the_log(&mut term);
     chord(&mut term);
     term.wait_for("the reason, with the Summary focused", STEP, |s| {
-        s.contains("Enter a commit summary")
+        s.contains("press Ctrl+Enter to commit")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_text("typed here").unwrap();
@@ -215,5 +215,76 @@ fn the_palette_entry_commits_the_staged_changes() {
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Enter").unwrap();
     wait_for_subject(&repo, "from the palette");
+    term.stop().unwrap();
+}
+
+fn chord_c(term: &mut Terminal) {
+    term.send_keys("C-g").unwrap();
+    term.send_keys("c").unwrap();
+}
+
+/// `Ctrl+G c` with a message already in the message field and a file staged
+/// commits at once, like the Commit button, and clears the field.
+#[test]
+fn ctrl_g_c_commits_when_the_message_field_holds_a_message() {
+    let repo = fixture(true);
+    let (mut term, _cfg) = start(&repo, "pty-commit-c-commits");
+    type_summary(&mut term, "from ctrl g c");
+    focus_the_log(&mut term);
+    assert_eq!(subject(&repo), "initial commit", "nothing committed yet");
+    chord_c(&mut term);
+    wait_for_subject(&repo, "from ctrl g c");
+    assert_eq!(
+        repo.git(&["show", "--name-only", "--format=", "HEAD"])
+            .trim(),
+        "b.txt"
+    );
+    // The field was cleared as after a button commit: with another file
+    // staged, the chord finds no message and asks for one instead of
+    // committing a second time.
+    std::fs::write(repo.root().join("d.txt"), "dee\n").unwrap();
+    repo.git(&["add", "d.txt"]);
+    term.wait_for("the new staged file counted in the WIP row", STEP, |s| {
+        s.text()
+            .lines()
+            .any(|l| l.contains("WIP") && l.contains("+ 2"))
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    chord_c(&mut term);
+    term.wait_for("the hint: the field is empty again", STEP, |s| {
+        s.contains("press Ctrl+Enter to commit")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert_eq!(repo.git(&["rev-list", "--count", "HEAD"]).trim(), "2");
+    term.stop().unwrap();
+}
+
+/// `Ctrl+G c` with an empty message field: no status-line prompt, the
+/// keyboard is in the message field (typing lands there), the status line
+/// says `Ctrl+Enter` commits, and `Ctrl+Enter` does.
+#[test]
+fn ctrl_g_c_with_an_empty_field_focuses_it_and_ctrl_enter_commits() {
+    let repo = fixture(true);
+    let (mut term, _cfg) = start(&repo, "pty-commit-c-focus");
+    focus_the_log(&mut term);
+    chord_c(&mut term);
+    let screen = term
+        .wait_for("the hint naming the commit shortcut", STEP, |s| {
+            s.contains("press Ctrl+Enter to commit")
+        })
+        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert!(
+        !screen.contains("Commit message: "),
+        "no status-line prompt:\n{}",
+        screen.text()
+    );
+    term.send_text("typed in the field").unwrap();
+    term.wait_for("the text in the message field", STEP, |s| {
+        s.contains("typed in the field") && s.contains("Staged Files")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    assert_eq!(subject(&repo), "initial commit");
+    term.send_keys("C-j").unwrap();
+    wait_for_subject(&repo, "typed in the field");
     term.stop().unwrap();
 }

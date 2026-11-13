@@ -4478,6 +4478,8 @@ no_other_refs = { git = "este commit no tiene otras refs que mostrar", local = "
 file_list_loading = { git = "la lista de archivos de este commit aún se está cargando", local = "la lista de archivos de esta confirmación aún se está cargando" }
 no_repo_tab = "no hay ninguna pestaña de repositorio abierta"
 commit_now_ai_running = "la IA aún está escribiendo un mensaje - espera a que termine, o Esc lo cancela"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "ninguna pestaña coincide"
 no_matching_theme = "ningún tema coincide"
 no_matching_language = "ningún idioma coincide"

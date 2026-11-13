@@ -12,44 +12,8 @@ use gitpoulpi_i18n::msg;
 pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -> io::Result<Flow> {
     let km = env.km;
     let palette_ctx = env.palette_ctx;
-    // The commit prompt's Enter with files still in conflict: git would
-    // refuse, so the guiding dialog opens instead.
-    if key.code == KeyCode::Enter
-        && matches!(&*cx.input_mode, InputMode::ComposingCommitMessage(_))
-        && commands::block_on_conflicts(cx, crate::guide_dialog::Blocked::Commit)
-    {
-        return Ok(Flow::Handled);
-    }
     match &mut *cx.input_mode {
         InputMode::Guide(_) => commands::guide_key(cx, key),
-        InputMode::ComposingCommitMessage(msg) => match key.code {
-            _ if MainField::CommitPrompt.claims(&*cx.field_editor, msg, &key) => {
-                edit_main_field(
-                    &mut *cx.field_editor,
-                    MainField::CommitPrompt,
-                    msg,
-                    &key,
-                    &mut *cx.clipboard,
-                    &mut *cx.last_message,
-                );
-            }
-            KeyCode::Enter => {
-                if !msg.trim().is_empty() {
-                    cx.link.submit_action(Action::Commit {
-                        message: cx.commit_settings.prepared(msg),
-                        amend: false,
-                        no_verify: *cx.commit_skip_hooks,
-                        push: cx.commit_settings.push_after_commit,
-                    });
-                    *cx.last_message = Some(msg::input::committing(&msg));
-                } else {
-                    *cx.last_message = Some(msg::input::COMMIT_MESSAGE_EMPTY.get().into());
-                }
-                *cx.input_mode = InputMode::Normal;
-            }
-            KeyCode::Esc => *cx.input_mode = InputMode::Normal,
-            _ => {}
-        },
         InputMode::FilteringRefs(draft) => match key.code {
             _ if MainField::RefsFilter.claims(&*cx.field_editor, draft, &key) => {
                 edit_main_field(

@@ -4479,6 +4479,8 @@ no_other_refs = { git = "この{$commit}にはほかに表示する参照があ�
 file_list_loading = { git = "この{$commit}のファイル一覧はまだ読み込み中です", local = "この{$commit}のファイル一覧はまだ読み込み中です" }
 no_repo_tab = "開いているリポジトリのタブはありません"
 commit_now_ai_running = "AI がまだメッセージを作成中です。完了を待つか、Esc で中止してください"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "一致するタブがありません"
 no_matching_theme = "一致するテーマがありません"
 no_matching_language = "一致する言語がありません"

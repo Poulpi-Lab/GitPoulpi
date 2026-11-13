@@ -4480,6 +4480,8 @@ no_other_refs = { git = "此 {$commit} 没有其他可显示的引用", local = 
 file_list_loading = { git = "此 {$commit} 的文件列表仍在加载", local = "此{$commit}的文件列表仍在加载" }
 no_repo_tab = "没有打开的仓库标签页"
 commit_now_ai_running = "AI 仍在撰写消息：请稍候，或按 Esc 取消"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "没有匹配的标签页"
 no_matching_theme = "没有匹配的主题"
 no_matching_language = "没有匹配的语言"

@@ -118,10 +118,9 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                 &mut *cx.last_message,
             );
         }
-        PaletteCommand::CommitNow => commit_now(cx),
-        PaletteCommand::Commit => {
-            *cx.input_mode = InputMode::ComposingCommitMessage(String::new());
-        }
+        // `Ctrl+G c` and `Ctrl+G Enter` are one command: commit when the
+        // message field holds a message, else take the keyboard there.
+        PaletteCommand::CommitNow | PaletteCommand::Commit => commit_now(cx),
         // Everything the per-frame guard needs
         // for the field to keep the keyboard:
         // the WIP row selected, the Log focused
@@ -136,7 +135,8 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
             // A merge whose result equals HEAD has no WIP row (nothing is
             // changed), yet can still be concluded: the one-line prompt
             // takes the merge commit's message.
-            *cx.input_mode = InputMode::ComposingCommitMessage(merge_message(cx.operation_state));
+            let message = merge_message(cx.operation_state);
+            focus_merge_message(cx, message);
         }
         PaletteCommand::EditWipMessage
             if !has_wip_row(&*cx.status_result)

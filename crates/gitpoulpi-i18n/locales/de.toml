@@ -4480,6 +4480,8 @@ no_other_refs = "dieser Commit hat keine weiteren Refs zum Anzeigen"
 file_list_loading = "die Dateiliste dieses Commits lädt noch"
 no_repo_tab = "kein Repository-Tab ist geöffnet"
 commit_now_ai_running = "eine KI-Nachricht wird noch geschrieben - warten Sie, oder brechen Sie sie mit Esc ab"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "kein passender Tab"
 no_matching_theme = "kein passendes Design"
 no_matching_language = "keine passende Sprache"

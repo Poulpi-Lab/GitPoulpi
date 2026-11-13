@@ -655,9 +655,8 @@ pub(super) fn init(
         collapsed_commit_folders: restored_folds.commit_set(),
         commit_files_filter: String::new(),
         // The commit composer at the bottom of the working-changes pane:
-        // summary + description + amend, as one box. Kept
-        // separate from `InputMode::ComposingCommitMessage` (the older
-        // footer-line composer reached by `Ctrl+G c`), which still works.
+        // summary + description + amend, as one box; `Ctrl+G c` and every
+        // other commit entry lead here (no status-line prompt).
         commit_summary: String::new(),
         commit_description: String::new(),
         commit_amend: false,

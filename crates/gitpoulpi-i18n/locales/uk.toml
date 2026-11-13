@@ -4478,6 +4478,8 @@ no_other_refs = { git = "у цього commit'у немає інших ref дл�
 file_list_loading = { git = "список файлів цього commit'у ще завантажується", local = "список файлів цього коміту ще завантажується" }
 no_repo_tab = "жодної вкладки репозиторію не відкрито"
 commit_now_ai_running = "ШІ ще пише повідомлення - зачекайте або скасуйте через Esc"
+# context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
+commit_now_hint = "type the message, then press {key} to {$commit}"
 no_matching_tab = "немає відповідної вкладки"
 no_matching_theme = "немає відповідної теми"
 no_matching_language = "немає відповідної мови"

@@ -8746,8 +8746,8 @@ include_drafts = "Zahrnout koncepty"
 assigned_issues = "Problémy přiřazené mně"
 # context: field label: orgs, groups or workspaces the account-wide lists are limited to
 namespaces = "Jmenné prostory"
-# context: hint in the empty namespaces field
-namespaces_hint = "např. acme, platforma (prázdné: můj vlastní a všechny, jejichž jsem členem)"
+# context: hint in the empty Namespaces text area (one entry per line)
+namespaces_hint = "Jedna na řádek, např. acme (prázdné: můj vlastní a všechny, jejichž jsem členem)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
 namespaces_help = "Jedna položka na řádek. Název odpovídá dané skupině či vlastníkovi i všemu pod nimi (ptm odpovídá ptm/produits/x, ne ptmx/y). Prázdné: můj vlastní a všechny, jejichž jsem členem."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is

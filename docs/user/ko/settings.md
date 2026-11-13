@@ -217,7 +217,7 @@ GitPoulpi가 저장소를 리모트와 맞춰 유지하는 방법과, 그동안 
 |---|---|
 | **자동 fetch 간격** | 이 간격으로 백그라운드에서 모든 리모트를 fetch합니다. 숫자와 단위(분 또는 시간)를 한 줄에 표시합니다. 기본값 5분, 최대 60분(1시간), `0`이면 꺼짐. `general.auto_fetch_interval_minutes`는 분 단위로 유지되고, `general.auto_fetch_interval_unit`은 표시 방식만 기록합니다. 재시작이 필요합니다. |
 | **탭 열 때 fetch** | 저장소 탭이 열릴 때 백그라운드에서 Fetch All을 실행합니다. 기본값은 켜짐. 최근 60초 안에 fetch한 저장소는 다시 fetch하지 않습니다. |
-| **자동 정리** | fetch가 리모트에 더 이상 없는 리모트 추적 브랜치도 제거합니다. 기본값은 꺼짐. |
+| **자동 정리** | fetch가 리모트에 더 이상 없는 리모트 추적 브랜치도 제거합니다. 기본값은 켜짐이라서 서버(예: GitLab)에서 삭제된 브랜치는 다음 fetch 뒤 REMOTE 섹션에서 사라집니다. 실행 취소할 수 없습니다. 정리된 브랜치는 리모트에 다시 나타나면 다음 fetch에서 돌아옵니다. |
 | **tag 자동 정리** | fetch가 리모트에서 삭제된 로컬 tag도 함께 삭제합니다. 리모트에 있었던 tag만 대상이므로 push한 적 없는 tag는 그대로 남습니다. git과 같이 기본값은 꺼짐. git 2.41 이상이 필요합니다. CLI: `gitpoulpi fetch --prune-tags`, 설정 키는 `general.auto_prune_tags`. 자세한 내용은 [브랜치, tag, Refs 사이드바](log-and-history.md#브랜치-tag-refs-사이드바)를 참고하세요. |
 | **서브모듈 최신 상태 유지** | checkout이나 pull 뒤에 서브모듈을 저장소가 기록한 commit으로 업데이트합니다. [서브모듈](submodules.md)을 참고하세요. |
 | **merge 후 ".orig" 파일 삭제** | merge가 끝난 뒤 `*.orig` 백업 파일을 삭제합니다. 기본값은 꺼짐. |

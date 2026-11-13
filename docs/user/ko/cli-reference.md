@@ -77,7 +77,7 @@
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | 파일, 폴더, 전체, hunk 또는 일부 줄을 스테이징합니다. 민감한 파일(개인 키, `.env`, 인식된 토큰: [설정 참조](config-reference.md#privacy-민감한-파일)의 `[privacy]`)을 추가하게 될 파일, 폴더 또는 `--all` 스테이징은 종료 코드 2와 `{error: "sensitive_files", files: [{path, reason}]}`(규칙과 가려진 미리 보기이며 값은 절대 표시하지 않음)와 함께 거부되고 아무것도 스테이징되지 않습니다. `--allow-sensitive`는 그래도 스테이징합니다. |
 | `unstage` (같은 플래그) | 그 반대. |
-| `discard --file F [--hunk N [--lines a,b]]` | 스테이징되지 않은 변경 사항을 버립니다(파일 전체: 모든 변경, 추적되지 않는 파일은 삭제). 실행 취소 가능. |
+| `discard --file F [--hunk N [--lines a,b]]` | 스테이징되지 않은 변경 사항을 버립니다(파일 전체: 모든 변경, 추적되지 않는 파일은 삭제하고, 그 결과 비게 되는 폴더도 삭제). 실행 취소 가능. |
 | `rm-file <paths>...` | 작업 트리에서 파일을 삭제합니다. 실행 취소 가능. |
 | `ignore <pattern> [--file <.gitignore>]` | `.gitignore`에 패턴을 추가합니다(`--file .git/info/exclude`를 쓰면 `.git/info/exclude`에). `.git/info/exclude`를 제외하고 실행 취소 가능. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | 작업 트리에 있는 파일의 인코딩, 줄 끝 또는 들여쓰기를 다시 씁니다. 바이너리, 없는 파일, 인코딩할 수 없는 파일은 건너뛰고 보고합니다. 일괄 처리 전체가 실행 취소 항목 하나입니다. |
@@ -136,7 +136,7 @@
 
 | 명령 | 동작 |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | 기본 리모트, 리모트 하나 또는 모든 리모트를 fetch합니다. 모든 fetch는 각 리모트가 가진 tag(`tag list`의 `remote`) 기록도 갱신하며, `--prune`이 없어도 그 기록은 정리합니다. `--prune-tags`(설정: tag 자동 정리)는 리모트가 삭제한 로컬 tag도 삭제합니다. 리모트에 있었던 tag만 대상이며 push한 적 없는 tag는 절대 삭제하지 않고, 삭제한 것은 응답의 `pruned_tags`에 나열됩니다 (git 2.41 이상). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | 기본 리모트, 리모트 하나 또는 모든 리모트를 fetch합니다. 리모트가 삭제한 리모트 추적 브랜치는 `general.auto_prune`이 false가 아닌 한 정리되며, `--prune`은 이를 강제합니다. 모든 fetch는 각 리모트가 가진 tag(`tag list`의 `remote`) 기록도 갱신하며, `--prune`이 없어도 그 기록은 정리합니다. `--prune-tags`(설정: tag 자동 정리)는 리모트가 삭제한 로컬 tag도 삭제합니다. 리모트에 있었던 tag만 대상이며 push한 적 없는 tag는 절대 삭제하지 않고, 삭제한 것은 응답의 `pruned_tags`에 나열됩니다 (git 2.41 이상). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull. 모드는 항상 git에 명시적으로 전달됩니다. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. 단순 force는 없고 `--force-with-lease`만 있습니다. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | 리모트. `remote list`는 뒤에 리모트가 없는 리모트 추적 네임스페이스를 `configured: false`로 표시하며, 그 네임스페이스에 `remote remove`를 쓰면 그 브랜치를 삭제합니다(실행 취소 가능). |

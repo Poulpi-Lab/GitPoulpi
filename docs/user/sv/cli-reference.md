@@ -102,7 +102,7 @@ Hunks och rader numreras så som `gitpoulpi --json diff` numrerar dem.
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Stagea en fil, mapp, allt, en hunk eller några rader. En stage av en fil, mapp eller `--all` som skulle lägga till en känslig fil (en privat nyckel, en `.env`, en igenkänd token: `[privacy]` i [konfigurationsreferensen](config-reference.md#privacy-känsliga-filer)) nekas med slutkod 2 och `{error: "sensitive_files", files: [{path, reason}]}` (en regel och en maskerad förhandsvisning, aldrig ett värde); ingenting stageas. `--allow-sensitive` stagear dem ändå. |
 | `unstage` (samma flaggor) | Det omvända. |
-| `discard --file F [--hunk N [--lines a,b]]` | Förkasta unstageade ändringar (en hel fil: varje ändring, ospårad fil tas bort). Går att ångra. |
+| `discard --file F [--hunk N [--lines a,b]]` | Förkasta unstageade ändringar (en hel fil: varje ändring, ospårad fil tas bort, samt de mappar som det lämnar tomma). Går att ångra. |
 | `rm-file <paths>...` | Ta bort filer från arbetskatalogen. Går att ångra. |
 | `ignore <pattern> [--file <.gitignore>]` | Lägg till ett mönster i en `.gitignore` (eller `.git/info/exclude` med `--file .git/info/exclude`). Går att ångra, utom i `.git/info/exclude`. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Skriver om teckenkodning, radslut eller indrag för filer i arbetskatalogen. Binära, saknade och okodbara filer hoppas över och rapporteras. En enda post i journalen för Ångra för hela omgången. |
@@ -162,7 +162,7 @@ pop:ar stashen, oavsett vad `general.auto_stash` säger ([Auto-stash](log-and-hi
 
 | Kommando | Vad det gör |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetcha standard-remoten, en remote eller alla. Varje fetch uppdaterar också vad varje remote har bland taggar (`tag list`s `remote`), och rensar den uppgiften även utan `--prune`. `--prune-tags` (Inställningar: Auto-prune tags) tar också bort de lokala tags som remoten har tagit bort: bara tags som fanns på den, aldrig en du inte pushat; svaret listar dem som `pruned_tags` (git 2.41+). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetcha standard-remoten, en remote eller alla. Remote-spårande grenar som remoten har tagit bort rensas om inte `general.auto_prune` är false; `--prune` tvingar fram det. Varje fetch uppdaterar också vad varje remote har bland taggar (`tag list`s `remote`), och rensar den uppgiften även utan `--prune`. `--prune-tags` (Inställningar: Auto-prune tags) tar också bort de lokala tags som remoten har tagit bort: bara tags som fanns på den, aldrig en du inte pushat; svaret listar dem som `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; läget skickas alltid uttryckligen till git. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Det finns ingen vanlig force: bara `--force-with-lease`. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotes. `remote list` markerar en remote-spårande namnrymd utan någon remote bakom sig med `configured: false`; `remote remove` på den tar bort dess grenar (kan ångras). |

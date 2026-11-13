@@ -265,7 +265,7 @@ dina lokala ändringar under tiden.
 |---|---|
 | **Intervall för automatisk fetch** | Fetchar varje remote i bakgrunden med det här intervallet, ett tal och en enhet (minuter eller timmar) på en rad. Standard 5 minuter, högst 60 minuter (1 timme), `0` stänger av det. `general.auto_fetch_interval_minutes` förblir i minuter; `general.auto_fetch_interval_unit` noterar bara hur det visas. Kräver omstart. |
 | **Fetch när en flik öppnas** | Kör Fetch All i bakgrunden när en repositoryflik öppnas. På som standard. Ett repository som fetchats under de senaste 60 sekunderna fetchas inte igen. |
-| **Auto-prune** | Fetch tar också bort remote-spårande grenar som inte längre finns på remoten. Av som standard. |
+| **Auto-prune** | Fetch tar också bort remote-spårande grenar som inte längre finns på remoten. På som standard, så en gren som har tagits bort på servern (till exempel på GitLab) försvinner från avsnittet REMOTE efter nästa fetch. Går inte att ångra: en rensad gren kommer tillbaka vid nästa fetch om den dyker upp på remoten igen. |
 | **Auto-prune tags** | Fetch tar också bort lokala tags som remoten har tagit bort. Bara tags som fanns på remoten berörs: en tag du aldrig har publicerat (push) behålls. Av som standard, precis som i git. Kräver git 2.41 eller senare. CLI: `gitpoulpi fetch --prune-tags`; konfigurationsnyckel `general.auto_prune_tags`. Se [Grenar, tags och Refs-sidofältet](log-and-history.md#grenar-tags-och-refs-sidofältet). |
 | **Håll submoduler uppdaterade** | Efter en checkout eller en pull uppdateras submodulerna till de commits repositoryt registrerar. Se [Submoduler](submodules.md). |
 | **Ta bort ”.orig”-filer efter merge** | När en merge är klar tas säkerhetskopiorna `*.orig` bort. Av som standard. |

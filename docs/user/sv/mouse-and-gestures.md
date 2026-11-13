@@ -350,7 +350,7 @@ Se [Stage och commit](staging-and-committing.md).
 - **Klicka på minikartan** för att flytta vyn till den raden. Håll knappen nedtryckt
   och flytta för att rulla.
 
-Varje förkastande frågar först.
+Varje förkastande frågar först. När ett förkastande tar bort ospårade filer försvinner också de mappar som blir helt tomma (aldrig en som fortfarande innehåller en spårad, ignorerad eller dold fil, eller en som redan var tom); Ångra tar tillbaka filerna med sina mappar.
 
 ### Blame och filhistorik
 

@@ -272,7 +272,7 @@ auto_fetch_interval_minutes_help = { git = "Standard 5. 0 stänger av fetch i ba
 fetch_on_tab_open = { git = "Fetch när en flik öppnas", local = "Hämta när en flik öppnas" }
 fetch_on_tab_open_help = { git = "Fetch All i bakgrunden; hoppas över om en fetch gjordes den senaste minuten.", local = "Hämta alla i bakgrunden; hoppas över om en hämtning gjordes den senaste minuten." }
 auto_prune = "Auto-prune"
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = { git = "Tar bort remote-spårande grenar som inte längre finns på remoten varje gång du gör en {$fetch}: automatisk {$fetch} i bakgrunden, Fetch och Fetch All (inte lease-kontrollen i den divergerade push-dialogen). På som standard, så en gren som har tagits bort på servern försvinner från avsnittet REMOTE efter nästa {$fetch}. Slå av det för att behålla föråldrade remote-spårande grenar i listan.", local = "Tar bort remote-spårande grenar som inte längre finns på remoten varje gång du hämtar: automatisk hämtning i bakgrunden, Hämta och Hämta alla (inte lease-kontrollen i den divergerade push-dialogen). På som standard, så en gren som har tagits bort på servern försvinner från avsnittet REMOTE efter nästa hämtning. Slå av det för att behålla föråldrade remote-spårande grenar i listan." }
 keep_submodules_up_to_date = "Håll submoduler uppdaterade"
 default_branch_name = "Standardnamn på gren"
 default_branch_name_help = "Används när ett repository initieras eller klonas."
@@ -4482,7 +4482,7 @@ file_list_loading = { git = "den här commitens fillista laddas fortfarande", lo
 no_repo_tab = "ingen repositoryflik är öppen"
 commit_now_ai_running = "ett AI-meddelande skrivs fortfarande - vänta på det, eller avbryt med Esc"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "skriv meddelandet och tryck sedan på {key} för att skapa en {$commit}"
 no_matching_tab = "ingen matchande flik"
 no_matching_theme = "inget matchande tema"
 no_matching_language = "inget matchande språk"

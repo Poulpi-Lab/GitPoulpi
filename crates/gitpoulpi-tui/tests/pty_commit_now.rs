@@ -250,10 +250,21 @@ fn ctrl_g_c_commits_when_the_message_field_holds_a_message() {
             .any(|l| l.contains("WIP") && l.contains("+ 2"))
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    chord_c(&mut term);
-    term.wait_for("the hint: the field is empty again", STEP, |s| {
-        s.contains("press Ctrl+Enter to commit")
-    })
+    // The hint lives in the status line, which the next refresh ends once
+    // it has shown a while: the file watcher's second event for `git add`
+    // can land after the chord and wipe it, so the chord is repeated (with
+    // an empty field it only focuses the field and cannot commit) until
+    // the hint is on screen.
+    term.act_until(
+        "the hint: the field is empty again",
+        Duration::from_secs(3),
+        STEP,
+        |t| {
+            chord_c(t);
+            Ok(())
+        },
+        |s| s.contains("press Ctrl+Enter to commit"),
+    )
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(repo.git(&["rev-list", "--count", "HEAD"]).trim(), "2");
     term.stop().unwrap();

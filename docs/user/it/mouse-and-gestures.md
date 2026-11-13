@@ -146,6 +146,7 @@ GitPoulpi ricorda ogni dimensione. Vedi
   attiva e su quella sotto il puntatore) per chiuderla. **Trascina una scheda** di lato per
   riordinarla. **Clic destro su una scheda** per il menu della scheda.
 - **Clic con il tasto centrale su una scheda** per chiuderla, come la sua `x`.
+- **Clicca `‹` o `›`** alle estremità delle schede (compaiono quando non ci stanno tutte) per far scorrere la riga di una scheda; tieni premuto il pulsante per continuare a scorrere, oppure usa la rotella sulla riga. Anche trascinare una scheda su una freccia fa scorrere la riga. La riga scorre da sola per mostrare la scheda attiva ogni volta che cambia.
 - **Clicca il `+`** dopo l'ultima scheda per un menu: Nuova scheda (`Alt+T`) e, finché le loro schede sono chiuse, Radar e Aree di lavoro (`Alt+J`).
 - **Clicca l'icona della casa** per la scheda Home.
 - **Clicca la scheda Radar o Aree di lavoro** per aprirla; la sua `x`, un clic centrale o `Ctrl+W` la chiude. **Clicca il chip dell'area di lavoro** (`Alt+W`) per cambiare area di lavoro.

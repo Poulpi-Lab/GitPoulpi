@@ -3002,7 +3002,7 @@ commit_details_shrink_message = "Dettagli commit: Riduci il messaggio"
 commit_details_reset_message_size = "Dettagli commit: Reimposta la dimensione del messaggio"
 commit_details_scroll_message_down = "Dettagli commit: Scorri il messaggio in giù"
 commit_details_scroll_message_up = "Dettagli commit: Scorri il messaggio in su"
-commit_details_open_link = "{$Commit} Details: Open Link in Message..."
+commit_details_open_link = "Dettagli {$commit}: Apri collegamento nel messaggio..."
 files_toggle_commit_file_sort_a_z_z_a = "File: Inverti l'ordine dei file del commit (A-Z / Z-A)"
 refs_checkout_selected_ref = { git = "Refs: Checkout del ref selezionato", local = "Refs: Passa al ref selezionato" }
 refs_copy_ref_name = "Refs: Copia il nome del ref"
@@ -4164,8 +4164,8 @@ quit_cd = "Esci, lasciando la shell nella cartella di questa scheda (richiede il
 repo_management = "Gestione repository: apri, clona o crea un repository"
 insert_issue_ref = "Inserisci un riferimento a una issue"
 tab_overflow = "Tutte le schede"
-tab_scroll_left = "Scroll the tabs left"
-tab_scroll_right = "Scroll the tabs right"
+tab_scroll_left = "Scorri le schede a sinistra"
+tab_scroll_right = "Scorri le schede a destra"
 
 [footer_hint]
 lead = "{key}: "
@@ -5779,22 +5779,22 @@ palette_alias_create = "Launcher: Crea alias del comando"
 palette_alias_remove = "Launcher: Rimuovi alias del comando"
 palette_path_add = "Launcher: Aggiungi al PATH"
 palette_path_remove = "Launcher: Rimuovi dal PATH"
-folder_menu_heading = "File manager menu"
-folder_menu_status = "Open in GitPoulpi"
-folder_menu_label = "Open in GitPoulpi"
-folder_menu_detected = "Detected"
-folder_menu_none_detected = "no supported file manager found"
-folder_menu_install = "Install"
-folder_menu_remove = "Remove"
-folder_menu_needs_helper = "needs the gitpoulpi launcher next to GitPoulpi"
-folder_menu_help_windows = "Adds Open in GitPoulpi to the right-click menu of folders, folder backgrounds and drives (your user only, no admin), and lets you type gitpoulpi in the File Explorer address bar. On Windows 11 it is under Show more options (Shift+F10)."
-folder_menu_help_linux = "Adds Open in GitPoulpi to the right-click menu of folders in the file managers found here. Only the files GitPoulpi wrote are removed; your own Thunar actions stay."
-folder_menu_help_macos = "Adds an Open in GitPoulpi Quick Action for folders in Finder (right-click > Quick Actions). Finder has no menu for the folder background."
-done_folder_menu_installed = "Installed Open in GitPoulpi: {managers}"
-done_folder_menu_removed = "Removed Open in GitPoulpi: {managers}"
-done_folder_menu_nothing = "No Open in GitPoulpi menu to remove"
-palette_folder_menu_install = "Launcher: Install Open in GitPoulpi Menu"
-palette_folder_menu_remove = "Launcher: Remove Open in GitPoulpi Menu"
+folder_menu_heading = "Menu del file manager"
+folder_menu_status = "Apri in GitPoulpi"
+folder_menu_label = "Apri in GitPoulpi"
+folder_menu_detected = "Rilevato"
+folder_menu_none_detected = "nessun file manager supportato trovato"
+folder_menu_install = "Installa"
+folder_menu_remove = "Rimuovi"
+folder_menu_needs_helper = "richiede il launcher gitpoulpi accanto a GitPoulpi"
+folder_menu_help_windows = "Aggiunge Apri in GitPoulpi al menu del clic destro di cartelle, sfondi delle cartelle e unità (solo per il tuo utente, senza diritti di amministratore) e permette di scrivere gitpoulpi nella barra degli indirizzi di Esplora file. In Windows 11 si trova sotto Mostra altre opzioni (Maiusc+F10)."
+folder_menu_help_linux = "Aggiunge Apri in GitPoulpi al menu del clic destro delle cartelle nei file manager trovati qui. Vengono rimossi solo i file scritti da GitPoulpi; le tue azioni di Thunar restano."
+folder_menu_help_macos = "Aggiunge un'Azione rapida Apri in GitPoulpi per le cartelle nel Finder (clic destro > Azioni rapide). Il Finder non ha un menu per lo sfondo della cartella."
+done_folder_menu_installed = "Apri in GitPoulpi installato: {managers}"
+done_folder_menu_removed = "Apri in GitPoulpi rimosso: {managers}"
+done_folder_menu_nothing = "Nessun menu Apri in GitPoulpi da rimuovere"
+palette_folder_menu_install = "Launcher: Installa il menu Apri in GitPoulpi"
+palette_folder_menu_remove = "Launcher: Rimuovi il menu Apri in GitPoulpi"
 
 [sparse]
 palette = "Repository: Checkout parziale..."
@@ -9381,20 +9381,20 @@ why_no_dialog = "nessuna finestra disponibile da disporre è aperta"
 
 [link_confirm]
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
-title = "Open this link?"
+title = "Aprire questo collegamento?"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
+body = "Questo indirizzo proviene dal testo di un messaggio di {$commit}. Controllalo prima di aprirlo nel browser:"
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
-position = "Link {n} of {total}"
+position = "Collegamento {n} di {total}"
 # context: button that opens the address in the browser
-open = "Open"
+open = "Apri"
 # context: button that shows the next address of the message
-next = "Next"
+next = "Avanti"
 # context: key of the Open button, one letter (shown as "Open (O)")
-key_open = "o"
+key_open = "a"
 # context: key of the Next button, one letter
-key_next = "n"
+key_next = "v"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "n"
 # context: status line; the message in view holds no web address to open
-none = "no link in this message"
+none = "nessun collegamento in questo messaggio"

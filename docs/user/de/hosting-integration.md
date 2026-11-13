@@ -678,6 +678,11 @@ ganzen Host betrifft, geklont oder nicht, mit drei Schaltern in seiner Tabelle `
 - **review requests**: offene Requests, die um Ihr Review bitten;
 - **open requests**: jeder offene Request Ihres eigenen Namespace und jeder Organisation oder
   Gruppe, in der Sie Mitglied sind, oder der Namespaces, die Sie nennen. Nie der ganze Host;
+  die **Namespaces** des Profils (einer pro Zeile in Einstellungen > Integrationen > Radar, auf Wunsch
+  als reguläre Ausdrücke) begrenzen alle drei Listen: Eine Zeile passt auf den vollständigen Pfad eines
+  Repositorys, wenn sie ihm gleicht oder ein Pfadpräfix an einem `/` ist (`ptm` behält `ptm/produits/x`,
+  nicht `ptmx/y`); sie wird auf die vom Host gelieferten Zeilen angewendet, zusätzlich serverseitig,
+  wo die Suche des Hosts es erlaubt (GitHubs Qualifizierer `user:` / `repo:`);
 - **assigned issues**: offene Issues, die Ihnen zugewiesen sind.
 
 GitHub, GitLab (auch selbst gehostet), Gitea, Forgejo, Azure DevOps (Services
@@ -705,7 +710,8 @@ Ratenlimit lässt nur dieses Profil scheitern. Antworten werden fünf Minuten wi
 In Einstellungen > Integrationen hat ein verbundenes Code-Host-Profil unter seinem SSH-Schlüssel einen Block **Radar**:
 ein Kästchen pro Liste (*Anfragen, die auf meine Prüfung warten*,
 *Jede offene Anfrage*, *Entwürfe einbeziehen*, *Mir zugewiesene Issues*, Letzteres
-fehlt bei Hosts ohne Issues), ein Feld *Namespaces* (ein Eintrag pro Zeile, auf Wunsch als reguläre Ausdrücke; leer
+fehlt bei Hosts ohne Issues), ein Feld *Namespaces* (ein Eintrag pro Zeile: ein Name, der auf diese Gruppe oder diesen Besitzer und
+alles darunter passt, oder ein regulärer Ausdruck pro Zeile, wenn *Reguläre Ausdrücke* angehakt ist; leer
 heißt Ihr eigener und jeder, in dem Sie Mitglied sind) und die Wahl *Anfrage eines nicht geklonten
 Repositorys*: *Nachfragen*, *Klonen* oder *Über die API prüfen*.
 Alles wird gespeichert, sobald Sie es ändern. Hosts ohne kontoweite Abfrage (Bitbucket

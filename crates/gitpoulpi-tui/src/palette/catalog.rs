@@ -3731,6 +3731,16 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::LauncherPathRemove,
     ),
     entry(
+        msg::launcher::PALETTE_FOLDER_MENU_INSTALL,
+        "",
+        PaletteCommand::LauncherFolderMenuInstall,
+    ),
+    entry(
+        msg::launcher::PALETTE_FOLDER_MENU_REMOVE,
+        "",
+        PaletteCommand::LauncherFolderMenuRemove,
+    ),
+    entry(
         msg::palette::APP_CHANGE_GRAPH_COLOR_THEME,
         "",
         PaletteCommand::ChangeGraphColorTheme,

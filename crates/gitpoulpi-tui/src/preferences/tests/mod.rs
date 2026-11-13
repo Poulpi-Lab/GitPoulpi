@@ -18,6 +18,7 @@ mod input;
 mod integrations_scroll;
 mod launcher;
 mod launcher_alias;
+mod launcher_folder_menu;
 mod list_editor;
 mod list_page;
 mod live;

@@ -715,6 +715,10 @@ pub(crate) enum PaletteCommand {
     LauncherPathAdd,
     /// Removes what GitPoulpi added to the user PATH.
     LauncherPathRemove,
+    /// Adds "Open in GitPoulpi" to the file manager's right-click menu.
+    LauncherFolderMenuInstall,
+    /// Removes the "Open in GitPoulpi" menu entries GitPoulpi wrote.
+    LauncherFolderMenuRemove,
     /// Opens the graph color theme picker (`ui.graph_color_theme`).
     ChangeGraphColorTheme,
     /// Flips `ui.graph_lane_background` between `off` and `row_tint`.

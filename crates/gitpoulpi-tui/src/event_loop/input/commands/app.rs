@@ -475,6 +475,12 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand) -> bool {
             *cx.last_message = state.take_message();
             *cx.preferences = Some(state);
         }
+        PaletteCommand::LauncherFolderMenuInstall | PaletteCommand::LauncherFolderMenuRemove => {
+            let mut state = PreferencesState::open(cx.repo_root);
+            state.folder_menu_command(cmd == PaletteCommand::LauncherFolderMenuRemove);
+            *cx.last_message = state.take_message();
+            *cx.preferences = Some(state);
+        }
         PaletteCommand::ChangeGraphColorTheme => {
             *cx.input_mode = InputMode::LanguagePicker(Box::new(
                 crate::language_picker::LanguagePicker::open_graph_color_theme(),

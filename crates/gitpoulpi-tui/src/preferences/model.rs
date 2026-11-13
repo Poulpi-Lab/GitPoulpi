@@ -447,6 +447,8 @@ pub(super) enum PrefAction {
     Launcher(super::launcher_page::LauncherButton),
     /// A button of General's command alias and PATH rows.
     Tools(super::launcher_alias::ToolsButton),
+    /// A button of the File manager menu rows.
+    FolderMenu(super::launcher_folder_menu::FolderMenuButton),
     /// A button of the Workflow page.
     Workflow(WfButton),
     /// A button of the access token row on Agents & MCP.

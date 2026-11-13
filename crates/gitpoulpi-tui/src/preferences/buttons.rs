@@ -23,6 +23,7 @@ pub(super) fn is_destructive(action: PrefAction) -> bool {
         PrefAction::ForgetCredentials => true,
         PrefAction::Launcher(L::Remove(_)) => true,
         PrefAction::Tools(T::AliasRemove | T::PathRemove) => true,
+        PrefAction::FolderMenu(super::launcher_folder_menu::FolderMenuButton::Remove) => true,
         PrefAction::RepoPage(RpButton::Disable) => true,
         PrefAction::RepoPage(RpButton::ConflictListDelete(_) | RpButton::ConflictResetRepo) => true,
         #[cfg(feature = "mcp")]

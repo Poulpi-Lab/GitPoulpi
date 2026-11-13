@@ -360,7 +360,7 @@ Siehe [Staging und Committen](staging-and-committing.md).
 - **Klicken Sie auf die Minimap**, um die Ansicht zu dieser Zeile zu bewegen. Halten Sie die
   Taste gedrückt und bewegen Sie, um zu scrollen.
 
-Jedes Verwerfen fragt vorher.
+Jedes Verwerfen fragt vorher. Löscht ein Verwerfen nicht verfolgte Dateien, verschwinden auch die Ordner, die dadurch ganz leer werden (nie einer, der noch eine verfolgte, ignorierte oder versteckte Datei enthält, oder der schon vorher leer war); Rückgängig bringt die Dateien samt ihren Ordnern zurück.
 
 ### Blame und Dateiverlauf
 

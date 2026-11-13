@@ -170,11 +170,36 @@
 | 系统 | 别名 | PATH |
 |---|---|---|
 | Linux、macOS | 一个符号链接 `~/.local/bin/<name>`，指向 `gitpoulpi-tui`。链接里无法放标记，所以当它的目标是名为 `gitpoulpi-tui` 的文件时才算我们创建的；普通文件，或指向其他任何东西的链接，**不是我们的**，绝不会被替换或移除。 | 在 `~/.bashrc` 和 `~/.zshrc`（存在哪个写哪个；两者都没有时，macOS 写 `~/.zshrc`，其他系统写 `~/.bashrc`）中写入位于 `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` 与 `# <<< GitPoulpi PATH <<<` 之间的代码块；已配置 fish 时还会写 `~/.config/fish/conf.d/gitpoulpi-path.fish`。移除时只删除该代码块（或 fish 文件），不碰其他内容。 |
-| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`，一个两行的小脚本，里面有 `REM X-GitPoulpi=1`。 | `HKCU\Environment` 中的用户 PATH，通过 PowerShell 写入，随后广播 `WM_SETTINGCHANGE`，让新程序能看到。值 `GitPoulpiPathAdded` 记录了添加的内容，移除时只取走它。 |
+| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<name>.cmd`，一个简短的小脚本，里面有 `REM X-GitPoulpi=1`（它还会导出 `GITPOULPI_CMDCMDLINE`，用来识别从地址栏启动）。 | `HKCU\Environment` 中的用户 PATH，通过 PowerShell 写入，随后广播 `WM_SETTINGCHANGE`，让新程序能看到。值 `GitPoulpiPathAdded` 记录了添加的内容，移除时只取走它。 |
 
 新打开的终端能看到 PATH 的变化，已经打开的看不到。这两个操作都不记入撤销日志：没有对应的撤销，**移除** 就是退回的办法。
 
 命令面板中也有相同的操作（**启动器：创建快捷方式**、**启动器：创建桌面快捷方式**、**启动器：移除快捷方式**、**启动器：创建命令别名**、**启动器：移除命令别名**、**启动器：添加到 PATH**、**启动器：从 PATH 中移除**），在脚本中可以用 `gitpoulpi desktop shortcut status|install|remove [--where launcher|desktop|startmenu]` 完成同样的操作。
+
+#### 在文件资源管理器地址栏中输入（Windows）
+
+在文件资源管理器窗口的地址栏中输入别名（`gp`）或 `gitpoulpi`，然后按 Enter：GitPoulpi 会在 **快捷方式使用的终端** 所选的终端中打开，位于该窗口显示的文件夹，不会打开 **上次的标签页**。**点击时显示已打开的窗口** 开启且已有 GitPoulpi 在运行时，该文件夹会改为成为那个窗口的一个新标签页。
+
+- **`gp`（命令别名）。** 别名存在之后，创建别名时还会在 `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` 下注册 `gp.exe`，指向 `gitpoulpi-launch.exe`；移除时会删除该键（仅当它是我们创建的）。当别名所在的文件夹在你的 PATH 中（**将 GitPoulpi 添加到 PATH**）时，Windows 会先运行 `.cmd` 小脚本，GitPoulpi 出现之前控制台窗口可能闪现一下。旧版本写入的小脚本会在设置读取别名时自动重写。
+- **`gitpoulpi`。** 需要已安装 **文件管理器菜单**：安装时还会在 App Paths 下注册 `gitpoulpi.exe`。没有它时，只有 GitPoulpi 的文件夹在你的 PATH 中才能找到 `gitpoulpi`，此时控制台同样可能闪现。
+
+Linux 和 macOS 没有对应功能：它们的文件管理器的位置栏不会运行程序。请使用 **文件管理器菜单** 项，或在终端中使用命令别名。
+
+#### 文件管理器菜单（在 GitPoulpi 中打开）
+
+在快捷方式下方，**文件管理器菜单** 各行会在文件夹的右键菜单中添加 **在 GitPoulpi 中打开**。每个文件管理器一个状态行（在 Linux 上，此处找到的每个文件管理器各一行，仍保留该菜单项的文件管理器也有；**已检测到** 一行列出找到的内容），然后是 **安装** 和 **移除** 按钮。**安装** 会为找到的每个文件管理器写入该菜单项；**移除** 会先询问，然后取走安装所写入的全部内容，无论该文件管理器是否仍已安装。
+
+该菜单项运行 `gitpoulpi launch --folder <文件夹>`（在 Windows 上是无控制台的 `gitpoulpi-launch.exe --folder`），由这条命令在点击时决定怎么做：**点击时显示已打开的窗口** 开启且有 GitPoulpi 窗口打开时，仓库内的文件夹会成为最近使用的窗口的一个新标签页，该窗口会被置前；否则在 **快捷方式使用的终端** 所选的终端中于该文件夹启动 GitPoulpi。因此更换终端不会让菜单项变成已过期；exe 被移动或徽标换了颜色则会，而 GitPoulpi 会自动重写它自己创建的菜单项（不会新建），与快捷方式相同。该菜单项需要 GitPoulpi 旁边有启动程序（`gitpoulpi`，Windows 上是 `gitpoulpi-launch.exe`）；没有它时，该行会这样说明，按钮保持不可用。
+
+| 系统 | 安装写入的内容 |
+|---|---|
+| Windows | 按用户的键，无需管理员权限：`HKCU\Software\Classes\Directory\shell\GitPoulpi`、`Directory\Background\shell\GitPoulpi` 和 `Drive\shell\GitPoulpi`，各带一个 `command` 子键，因此该菜单项会出现在文件夹上、已打开文件夹的空白处和驱动器上。每个键都带有 `X-GitPoulpi` 值；没有它的键**不是我们的**，绝不会被改动。还会在 `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` 下注册 `gitpoulpi.exe`，指向 `gitpoulpi-launch.exe`。在 Windows 11 上，该菜单项只出现在经典菜单中：**显示更多选项**、Shift+F10 或 Shift+右键（新的顶层菜单只列出打包应用）。移除会删除我们的键，然后仅当安装创建的父键变空时才删除它们。 |
+| Linux | 仅针对在 PATH 中找到的文件管理器。GNOME Files 和 Caja：在 `~/.local/share/nautilus/scripts` 或 `~/.config/caja/scripts` 中放一个以该菜单项命名的脚本（位于 **Scripts** 子菜单中）。Dolphin：`~/.local/share/kio/servicemenus/gitpoulpi-open.desktop`，带可执行权限（KDE Frameworks 6 会忽略没有可执行权限的用户服务菜单；不支持 5.85 之前的 KDE Frameworks 5）。Nemo：`~/.local/share/nemo/actions` 中的两个动作（选中的文件夹、背景）。Thunar：合并进 `~/.config/Thunar/uca.xml` 的一个动作；你自己的动作会保留，移除时文件会逐字节还原（如果是安装创建的则删除）。PCManFM 和 PCManFM-Qt：`~/.local/share/file-manager/actions/gitpoulpi-open.desktop`。图标写到 `~/.local/share/icons/hicolor/256x256/apps/gitpoulpi-folder.png`，随最后一个菜单项一起移除。遵循 `XDG_DATA_HOME` 和 `XDG_CONFIG_HOME`。该菜单项出现在选中的文件夹上，文件管理器提供的话也出现在文件夹空白处。 |
+| macOS | 一个快速操作 `~/Library/Services/Open in GitPoulpi.workflow`：在访达中右键点击文件夹，然后选择 **快速操作**。仅限选中的文件夹（访达没有文件夹空白处的菜单）。第一次可能需要在“系统设置 > 键盘 > 键盘快捷键 > 服务”中启用。 |
+
+GitPoulpi 写入的每个文件和键都带有 `X-GitPoulpi=1` 标记（脚本中是一行 `# X-GitPoulpi=1`），移除只会删除带标记的。这些操作改动的是你的系统，不是某个仓库：撤销不涵盖它们，**移除** 就是退回的办法。Linux 和 macOS 上文件管理器的位置栏不会运行程序，所以那里没有可输入的内容；终端里有命令别名。
+
+命令面板中有 **启动器：安装“在 GitPoulpi 中打开”菜单** 和 **启动器：移除“在 GitPoulpi 中打开”菜单**，在脚本中可以用 `gitpoulpi desktop folder-menu status|install|remove` 完成。
 
 ### 同步
 

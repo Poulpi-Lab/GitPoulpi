@@ -3000,7 +3000,7 @@ commit_details_shrink_message = { git = "{$Commit} 详情：缩小消息区", lo
 commit_details_reset_message_size = { git = "{$Commit} 详情：重置消息区大小", local = "{$Commit}详情：重置消息区大小" }
 commit_details_scroll_message_down = { git = "{$Commit} 详情：消息向下滚动", local = "{$Commit}详情：消息向下滚动" }
 commit_details_scroll_message_up = { git = "{$Commit} 详情：消息向上滚动", local = "{$Commit}详情：消息向上滚动" }
-commit_details_open_link = "{$Commit} Details: Open Link in Message..."
+commit_details_open_link = { git = "{$Commit} 详情：打开消息中的链接…", local = "{$Commit}详情：打开消息中的链接…" }
 files_toggle_commit_file_sort_a_z_z_a = { git = "文件：切换 {$commit} 文件排序（A-Z / Z-A）", local = "文件：切换提交文件排序（A-Z / Z-A）" }
 refs_checkout_selected_ref = "引用：检出所选引用"
 refs_copy_ref_name = "引用：复制引用名称"
@@ -4165,8 +4165,8 @@ quit_cd = "退出，并让你的 shell 停留在此标签页的文件夹（需�
 repo_management = "仓库管理：打开、克隆或创建仓库"
 insert_issue_ref = "插入议题引用"
 tab_overflow = "所有标签页"
-tab_scroll_left = "Scroll the tabs left"
-tab_scroll_right = "Scroll the tabs right"
+tab_scroll_left = "向左滚动标签页"
+tab_scroll_right = "向右滚动标签页"
 
 [footer_hint]
 lead = "{key}："
@@ -5782,22 +5782,22 @@ palette_alias_create = "启动器：创建命令别名"
 palette_alias_remove = "启动器：移除命令别名"
 palette_path_add = "启动器：添加到 PATH"
 palette_path_remove = "启动器：从 PATH 中移除"
-folder_menu_heading = "File manager menu"
-folder_menu_status = "Open in GitPoulpi"
-folder_menu_label = "Open in GitPoulpi"
-folder_menu_detected = "Detected"
-folder_menu_none_detected = "no supported file manager found"
-folder_menu_install = "Install"
-folder_menu_remove = "Remove"
-folder_menu_needs_helper = "needs the gitpoulpi launcher next to GitPoulpi"
-folder_menu_help_windows = "Adds Open in GitPoulpi to the right-click menu of folders, folder backgrounds and drives (your user only, no admin), and lets you type gitpoulpi in the File Explorer address bar. On Windows 11 it is under Show more options (Shift+F10)."
-folder_menu_help_linux = "Adds Open in GitPoulpi to the right-click menu of folders in the file managers found here. Only the files GitPoulpi wrote are removed; your own Thunar actions stay."
-folder_menu_help_macos = "Adds an Open in GitPoulpi Quick Action for folders in Finder (right-click > Quick Actions). Finder has no menu for the folder background."
-done_folder_menu_installed = "Installed Open in GitPoulpi: {managers}"
-done_folder_menu_removed = "Removed Open in GitPoulpi: {managers}"
-done_folder_menu_nothing = "No Open in GitPoulpi menu to remove"
-palette_folder_menu_install = "Launcher: Install Open in GitPoulpi Menu"
-palette_folder_menu_remove = "Launcher: Remove Open in GitPoulpi Menu"
+folder_menu_heading = "文件管理器菜单"
+folder_menu_status = "在 GitPoulpi 中打开"
+folder_menu_label = "在 GitPoulpi 中打开"
+folder_menu_detected = "已检测到"
+folder_menu_none_detected = "未找到受支持的文件管理器"
+folder_menu_install = "安装"
+folder_menu_remove = "移除"
+folder_menu_needs_helper = "需要 GitPoulpi 旁边有 gitpoulpi 启动程序"
+folder_menu_help_windows = "在文件夹、文件夹空白处和驱动器的右键菜单中添加“在 GitPoulpi 中打开”（仅当前用户，无需管理员权限），并允许你在文件资源管理器的地址栏中输入 gitpoulpi。在 Windows 11 中，它位于“显示更多选项”（Shift+F10）下。"
+folder_menu_help_linux = "在此处找到的文件管理器中，为文件夹的右键菜单添加“在 GitPoulpi 中打开”。只会移除 GitPoulpi 写入的文件；你自己的 Thunar 自定义操作会保留。"
+folder_menu_help_macos = "在访达中为文件夹添加“在 GitPoulpi 中打开”快速操作（右键 > 快速操作）。访达没有文件夹空白处的菜单。"
+done_folder_menu_installed = "已安装“在 GitPoulpi 中打开”：{managers}"
+done_folder_menu_removed = "已移除“在 GitPoulpi 中打开”：{managers}"
+done_folder_menu_nothing = "没有可移除的“在 GitPoulpi 中打开”菜单"
+palette_folder_menu_install = "启动器：安装“在 GitPoulpi 中打开”菜单"
+palette_folder_menu_remove = "启动器：移除“在 GitPoulpi 中打开”菜单"
 
 [sparse]
 palette = "仓库：稀疏检出…"
@@ -9384,15 +9384,15 @@ why_no_dialog = "没有可调整的对话框"
 
 [link_confirm]
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
-title = "Open this link?"
+title = "打开此链接？"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
+body = "此地址来自 {$commit} 消息中的文本。请在浏览器中打开前先核对："
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
-position = "Link {n} of {total}"
+position = "链接 {n} / {total}"
 # context: button that opens the address in the browser
-open = "Open"
+open = "打开"
 # context: button that shows the next address of the message
-next = "Next"
+next = "下一个"
 # context: key of the Open button, one letter (shown as "Open (O)")
 key_open = "o"
 # context: key of the Next button, one letter
@@ -9400,4 +9400,4 @@ key_next = "n"
 # context: key of the Cancel button of that dialog, one letter
 key_cancel = "c"
 # context: status line; the message in view holds no web address to open
-none = "no link in this message"
+none = "此消息中没有链接"

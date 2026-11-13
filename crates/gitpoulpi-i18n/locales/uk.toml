@@ -8754,8 +8754,8 @@ include_drafts = "Включати чернетки"
 assigned_issues = "Issues, призначені мені"
 # context: field label: orgs, groups or workspaces the account-wide lists are limited to
 namespaces = "Простори імен"
-# context: hint in the empty namespaces field
-namespaces_hint = "напр. acme, platform (порожньо: мій власний і всі, де я учасник)"
+# context: hint in the empty Namespaces text area (one entry per line)
+namespaces_hint = "Один на рядок, напр. acme (порожньо: мої власні та всі, де я учасник)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
 namespaces_help = "Один запис на рядок. Ім'я збігається з цією групою чи власником і всім, що нижче (ptm збігається з ptm/produits/x, але не з ptmx/y). Залиште порожнім, щоб збігалися ваші власні та всі, де ви учасник."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is

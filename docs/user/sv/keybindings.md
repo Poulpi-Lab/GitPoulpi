@@ -1551,6 +1551,21 @@ commits på `<gren>`...**. Det öppnar samma vy som en interaktiv rebase.
 commitens rad. `Enter` skapar refen. `Esc` avbryter. Ett ogiltigt eller redan
 befintligt namn visas i rött, och rutan förblir öppen.
 
+När den raden inte syns (en diff är öppen, Log visas solo, kolumnen Ref är
+dold) skrivs namnet i stället i en liten ram med ett stängkryss och knapparna
+**Avbryt** och **Skapa**. Att byta namn på en gren skrivs över dess rad i
+Refs-rutan, eller i Ref-cellen på dess rad i Log; en ny fil skrivs i listan
+Ändringar i arbetskatalogen, under mappen. Samma tangenter gäller överallt:
+`Enter` bekräftar, `Esc` avbryter.
+
+Inget skrivs någonsin i statusraden. De uppmaningar som behöver mer plats är
+dialoger med riktiga knappar: stash-meddelandet, meddelandet för en annoterad
+tag (`Ctrl+Enter` eller `Ctrl+S` tillämpar, `Enter` lägger till en rad), Ange
+upstream (en sökbar lista med remote-grenar, plus en knapp för att ta bort) och
+Git LFS-mönstren för att spåra och sluta spåra. En tal- eller textinställning
+vald från paletten öppnar Inställningar på just den raden, redo att redigeras,
+och Refs-filtret (`/`) skrivs i rutan överst i Refs-rutan.
+
 ### Redigera ett commit-meddelande
 
 **Redigera commit-meddelande...** i commitmenyn, `Ctrl+G e` eller palettens
@@ -1740,7 +1755,7 @@ samma menyer: *Redigerare: Ändra teckenkodning*, *Redigerare: Öppna igen med t
 | `x` | Förkasta alla ändringar (frågar först) |
 | `c` | Öppna commit-composern |
 | `Enter` | Commita de stagade ändringarna nu, med formulärets meddelande, varifrån som helst (se [Stage och commit](staging-and-committing.md#skriva-commiten)) |
-| `m` | Stasha alla ändringar med ett meddelande (tomt är tillåtet). Med AI på skriver `Ctrl+G` i den prompten meddelandet |
+| `m` | Stasha alla ändringar med ett meddelande som skrivs i en liten dialog (tomt är tillåtet). Med AI på skriver dess AI-knapp (`Ctrl+G` i dialogen) meddelandet |
 | `Shift+T` | Stasha alla ändringar (ospårade filer inkluderade), utan meddelande |
 | `o` | Pop en stash: stash-raden som är markerad i Log, annars den senaste stashen |
 | `p` | Pull, så som knappen Pull är inställd (`git.pull_mode`) |

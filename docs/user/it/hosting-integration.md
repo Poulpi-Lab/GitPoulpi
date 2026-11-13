@@ -726,8 +726,9 @@ rate limit fa fallire solo quel profilo. Le risposte vengono riusate per cinque 
 In Impostazioni > Integrazioni, un profilo di host di codice connesso ha un blocco **Radar**
 sotto la sua chiave SSH: una casella per ogni elenco (*Richieste in attesa della mia revisione*,
 *Ogni richiesta aperta*, *Includi le bozze*, *Issue assegnate a me*, l'ultima
-assente per gli host senza issue), un campo *Namespace* (separati da virgole; vuoto
-significa il tuo e tutti quelli di cui fai parte) e la scelta *Richiesta di un
+assente per gli host senza issue), un campo *Namespace* (una voce per riga: un nome che corrisponde a
+quel gruppo o proprietario e a tutto ciò che sta sotto, oppure un'espressione regolare per riga con
+*Espressioni regolari* attivo; vuoto significa il tuo e tutti quelli di cui fai parte) e la scelta *Richiesta di un
 repository non clonato*: *Chiedi*, *Clonalo* o *Rivedi tramite l'API*.
 Tutto viene salvato man mano che cambi. Gli host senza query a livello di account (Bitbucket
 Cloud) mostrano invece una riga che lo dice. La palette dei comandi raggiunge il blocco

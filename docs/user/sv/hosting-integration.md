@@ -718,7 +718,8 @@ hastighetsgräns får bara den profilen att misslyckas. Svaren återanvänds i f
 I Inställningar > Integrationer har en ansluten kodvärdsprofil ett **Radar**-block
 under sin SSH-nyckel: en kryssruta per lista (*Begäranden som väntar på min granskning*,
 *Alla öppna begäranden*, *Ta med utkast*, *Ärenden tilldelade mig*, den sista
-saknas för värdar utan ärenden), ett fält *Namnrymder* (en post per rad, med en kryssruta *Reguljära uttryck*; tomt
+saknas för värdar utan ärenden), ett fält *Namnrymder* (en post per rad: ett namn som matchar den gruppen eller ägaren och
+allt under den, eller ett reguljärt uttryck per rad när *Reguljära uttryck* är ikryssad; tomt
 betyder ditt eget och alla du tillhör) och valet *Begäran från ett
 repository som inte är klonat*: *Fråga*, *Klona det* eller *Granska via API:et*.
 Allt sparas när du ändrar det. Värdar utan någon kontoövergripande fråga (Bitbucket

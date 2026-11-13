@@ -371,7 +371,7 @@ jobs:
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the winget update was not submitted"
       # The App installation covers the fork Poulpi-Lab/winget-pkgs. komac needs the package to exist in
       # winget-pkgs already (the first version is submitted by hand), then it opens one pull request per release.
-      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         if: env.HAS == 'true'
         id: app
         with:
@@ -404,7 +404,7 @@ jobs:
       - name: Notice when the bot credentials are missing
         if: env.HAS != 'true'
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the Scoop bucket was not updated"
-      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         if: env.HAS == 'true'
         id: app
         with:
@@ -458,7 +458,7 @@ jobs:
       - name: Notice when the bot credentials are missing
         if: env.HAS != 'true'
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY or POULPI_BOT_APP_ID is not set, the Homebrew tap was not updated"
-      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         if: env.HAS == 'true'
         id: app
         with:
@@ -579,7 +579,7 @@ jobs:
       - name: Notice when a secret is missing
         if: env.HAS != 'true'
         run: echo "::notice::POULPI_BOT_PRIVATE_KEY, POULPI_BOT_APP_ID or APT_GPG_PRIVATE_KEY is not set, the apt repository was not updated"
-      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         if: env.HAS == 'true'
         id: app
         with:

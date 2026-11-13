@@ -722,8 +722,9 @@ limite de requisições faz falhar só aquele perfil. As respostas são reaprove
 Em Configurações > Integrações, um perfil de host de código conectado tem um bloco **Radar**
 sob a sua chave SSH: uma caixa por lista (*Solicitações aguardando minha revisão*,
 *Todas as solicitações abertas*, *Incluir rascunhos*, *Issues atribuídas a mim*, a última
-ausente nos hosts sem issues), um campo *Namespaces* (um por linha, com a caixa *Expressões regulares*; vazio
-significa o seu e todos aos quais você pertence) e a escolha *Solicitação de um
+ausente nos hosts sem issues), um campo *Namespaces* (uma entrada por linha: um nome que corresponde a esse grupo ou
+proprietário e a tudo abaixo dele, ou uma expressão regular por linha com a caixa
+*Expressões regulares* marcada; vazio significa o seu e todos aos quais você pertence) e a escolha *Solicitação de um
 repositório não clonado*: *Perguntar*, *Clonar* ou *Revisar pela API*.
 Tudo é salvo à medida que você altera. Os hosts sem consulta de toda a conta (Bitbucket
 Cloud) mostram uma linha dizendo isso no lugar. A paleta de comandos chega ao bloco

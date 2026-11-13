@@ -213,7 +213,7 @@ GitPoulpi 如何让仓库与其远程保持同步，以及在此期间如何处�
 |---|---|
 | **自动 Fetch 间隔** | 按此间隔在后台 fetch 每个远程，在同一行里是一个数字加一个单位（分钟或小时）。默认 5 分钟，最大 60 分钟（1 小时），`0` 表示关闭。`general.auto_fetch_interval_minutes` 始终以分钟为单位；`general.auto_fetch_interval_unit` 只记录它的显示方式。需要重启。 |
 | **打开标签页时 Fetch** | 打开仓库标签页时在后台运行“全部 Fetch”。默认开启。最近 60 秒内已 fetch 过的仓库不会再次 fetch。 |
-| **自动 Prune** | Fetch 同时会移除远程上已不存在的远程跟踪分支。默认关闭。 |
+| **自动 Prune** | Fetch 同时会移除远程上已不存在的远程跟踪分支。默认开启，因此在服务器上删除的分支（例如在 GitLab 上）会在下一次 fetch 后从“远程”部分消失。不可撤销：已清理的分支如果在远程重新出现，会在下一次 fetch 时回来。 |
 | **自动清理 tag** | Fetch 同时会删除远程已经删除的本地 tag。只处理曾经存在于远程的 tag：你从未 push 过的 tag 会保留。默认关闭，与 git 一致。需要 git 2.41 或更高版本。CLI：`gitpoulpi fetch --prune-tags`；配置键 `general.auto_prune_tags`。参见 [分支、tag 和 引用侧栏](log-and-history.md#分支tag-和-引用侧栏)。 |
 | **保持子模块最新** | 在 checkout 或 pull 之后，把子模块更新到仓库所记录的 commit。参见[子模块](submodules.md)。 |
 | **merge 后删除“.orig”文件** | merge 完成后，删除 `*.orig` 备份文件。默认关闭。 |

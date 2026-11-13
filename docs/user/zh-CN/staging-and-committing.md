@@ -110,8 +110,8 @@ commit 表单位于右侧窗格底部，它的 **摘要** 同时也是 Log 中�
 - **Commit N 个文件的更改**（绿色按钮）或 `Ctrl+Enter` commit staged 的更改。如果没有任何内容 staged，按钮会这样提示，并且什么也不做。
 - **修订上一个 commit**（`Shift+A`）把 staged 的更改和新的消息并入上一次 commit。已经 push 过的 commit 之后需要 force push（with lease）。
 - **跳过钩子**（`Shift+H`，或命令面板的 **Commit：切换“跳过钩子”**）会在 commit 时不运行仓库的 `pre-commit` 和 `commit-msg` 钩子。它是每次 commit 单独的选择；**设置 > 仓库专属设置 > Commit** 可让它默认勾选。这只适用于工作区更改：编辑时在右侧窗格选择某个 commit 的文件，会离开编辑器（先询问是否保存）并显示该 commit 中此文件的 diff，编辑器没有的 commit 列也会随之回来。空间足够时才显示。
-- `Ctrl+G c`，或在状态窗格中按 `c`，会把光标移到表单。`Esc` 离开。
-- `Ctrl+G Enter`（命令面板中的 **Git：立即 Commit staged 的更改**）就是在任何位置都能按下的 commit 按钮：它用表单中的消息 commit staged 的更改，遵循 **修订上一个 commit** 和 **跳过钩子** 的设置，并且不移动焦点。如果没有任何内容 staged，或没有摘要，它会说明原因，并把光标放到摘要中。AI 消息仍在撰写时，它不会 commit 任何内容，而是在状态栏中显示一条消息（`Esc` 取消 AI 请求）。`Ctrl+Z` 可以像撤回其他 commit 一样撤回它。
+- 在状态窗格中按 `c` 会把光标移到表单。`Esc` 离开。
+- `Ctrl+G c` 和 `Ctrl+G Enter`（命令面板中的 **Git：Commit…** 与 **Git：立即 Commit staged 的更改**）是同一个命令，即在任何位置都能按下的 commit 按钮。表单中有摘要且有内容已 staged 时，它会立即 commit，遵循 **修订上一个 commit** 和 **跳过钩子** 的设置，并且不移动焦点。否则它不会 commit 任何内容：它会把光标移到表单的摘要中（窗格被隐藏或折叠时会先显示出来），状态栏会提示用哪个快捷键来 commit（默认是 `Ctrl+Enter`）。没有任何内容 staged 时，它会说明这一点。状态栏中不会输入任何内容。AI 请求仍在运行时，它不会 commit 任何内容，并会说明这一点（`Esc` 取消请求）。`Ctrl+Z` 可以像撤回其他 commit 一样撤回它。
 - 按仓库，[设置](settings.md#仓库专属commit)可以让你 **每次 commit 时 push**、让表单以 **消息模板** 开头（并把其中的 `#` 注释从消息里去掉），以及让 merge 改为 **squash**：此时表单会带着 git 的 squash 消息打开。
 - 链接了托管集成时，在表单中按 `Alt+R` 会插入一个议题引用；参见[托管平台与议题跟踪器](hosting-integration.md)。
 

@@ -1192,6 +1192,8 @@ As teclas são as predefinidas.
 | Lançador: remover alias de comando |  |
 | Lançador: adicionar ao PATH |  |
 | Lançador: remover do PATH |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | Aplicação: mudar tema de cores do grafo... | `Ctrl+N Y` |
 | Aplicação: alternar tom das linhas do grafo | `Ctrl+N T` |
 <!-- palette:end -->

@@ -228,7 +228,10 @@ impl PreferencesState {
             || self.launcher.rx.is_some()
             || self.launcher.pending.is_some()
             || self.tools.busy()
-            || (self.launcher.snapshot.is_none() && !self.tools.has_read())
+            || self.folder_menu.busy()
+            || (self.launcher.snapshot.is_none()
+                && !self.tools.has_read()
+                && !self.folder_menu.has_read())
         {
             return;
         }

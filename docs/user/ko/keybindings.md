@@ -1187,6 +1187,8 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | 런처: 명령 별칭 제거 |  |
 | 런처: PATH에 추가 |  |
 | 런처: PATH에서 제거 |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | 앱: 그래프 색상 테마 변경... | `Ctrl+N Y` |
 | 앱: 그래프 행 색조 전환 | `Ctrl+N T` |
 <!-- palette:end -->

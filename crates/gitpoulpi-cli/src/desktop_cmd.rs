@@ -1,12 +1,61 @@
 //! `gitpoulpi desktop shortcut status|install|remove`: the scriptable twin of
 //! Settings > Launcher (`gitpoulpi_tui::desktop_shortcuts`).
 
-use gitpoulpi_commands::cli::{DesktopAction, ShortcutAction};
+use gitpoulpi_commands::cli::{DesktopAction, FolderMenuAction, ShortcutAction};
 use serde_json::json;
 
 pub fn run(action: DesktopAction, json_output: bool) {
-    let DesktopAction::Shortcut { action } = action;
     let result = match action {
+        DesktopAction::Shortcut { action } => shortcut(action),
+        DesktopAction::FolderMenu { action } => folder_menu(action),
+    };
+    finish(result, json_output);
+}
+
+type Answer = Result<(serde_json::Value, String), String>;
+
+fn folder_menu(action: FolderMenuAction) -> Answer {
+    use gitpoulpi_tui::desktop_shortcuts as ds;
+    match action {
+        FolderMenuAction::Status => {
+            let r = ds::folder_menu_status();
+            let value = json!({
+                "os": ds::os_name(),
+                "entries": r.entries.iter().map(|e| json!({
+                    "manager": e.manager,
+                    "detected": e.detected,
+                    "state": e.state,
+                })).collect::<Vec<_>>(),
+                "unavailable": r.unavailable,
+                "error": r.error,
+            });
+            let mut lines: Vec<String> = r
+                .entries
+                .iter()
+                .map(|e| {
+                    format!(
+                        "{}: {}{}",
+                        e.name,
+                        e.state,
+                        if e.detected { "" } else { " (not found)" }
+                    )
+                })
+                .collect();
+            if r.unavailable {
+                lines.push("the gitpoulpi launcher is missing next to GitPoulpi".into());
+            }
+            if let Some(e) = r.error {
+                lines.push(e);
+            }
+            Ok((value, lines.join("\n")))
+        }
+        FolderMenuAction::Install => ds::folder_menu_install().map(done),
+        FolderMenuAction::Remove => ds::folder_menu_remove().map(done),
+    }
+}
+
+fn shortcut(action: ShortcutAction) -> Answer {
+    match action {
         ShortcutAction::Status => {
             let report = gitpoulpi_tui::desktop_shortcuts::status();
             let value = json!({
@@ -37,7 +86,10 @@ pub fn run(action: DesktopAction, json_output: bool) {
         ShortcutAction::Remove { place } => {
             gitpoulpi_tui::desktop_shortcuts::remove(place.as_deref()).map(done)
         }
-    };
+    }
+}
+
+fn finish(result: Answer, json_output: bool) {
     match result {
         Ok((value, human)) => {
             if json_output {

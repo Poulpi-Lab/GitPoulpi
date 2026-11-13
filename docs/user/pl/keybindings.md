@@ -1193,6 +1193,8 @@ zastosowania. Klawisze są domyślne.
 | Uruchamianie: Usuń alias polecenia |  |
 | Uruchamianie: Dodaj do PATH |  |
 | Uruchamianie: Usuń z PATH |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | Aplikacja: Zmień motyw kolorów grafu... | `Ctrl+N Y` |
 | Aplikacja: Przełącz zabarwienie wierszy grafu | `Ctrl+N T` |
 <!-- palette:end -->

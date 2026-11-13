@@ -81,6 +81,7 @@ mod images_page;
 mod input;
 mod keybindings_page;
 mod launcher_alias;
+mod launcher_folder_menu;
 mod launcher_page;
 pub(crate) mod list_editor;
 mod list_page;
@@ -222,6 +223,8 @@ pub(crate) struct PreferencesState {
     launcher: launcher_page::LauncherState,
     /// The command alias and PATH rows under it, read on a thread.
     tools: launcher_alias::ToolsState,
+    /// The File manager menu rows under the shortcuts, read on a thread.
+    folder_menu: launcher_folder_menu::FolderMenuState,
     /// The MCP endpoint's access token rows (`mcp_security`).
     #[cfg(feature = "mcp")]
     mcp_sec: mcp_security::McpSecurityState,
@@ -488,6 +491,7 @@ impl PreferencesState {
         state.restore_view();
         state.launcher_start(None);
         state.tools_start(None);
+        state.folder_menu_start(None);
         state
     }
 
@@ -551,6 +555,7 @@ impl PreferencesState {
             image_index: 0,
             launcher: Default::default(),
             tools: Default::default(),
+            folder_menu: Default::default(),
             #[cfg(feature = "mcp")]
             mcp_sec: mcp_security::McpSecurityState::read(),
             image_detected: std::cell::OnceCell::new(),
@@ -698,6 +703,7 @@ impl PreferencesState {
         self.poll_integrations();
         self.poll_launcher();
         self.poll_tools();
+        self.poll_folder_menu();
         let Some(rx) = &self.token_presence_rx else {
             return;
         };

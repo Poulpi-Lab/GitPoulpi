@@ -1194,6 +1194,8 @@ Tuşlar varsayılanlardır.
 | Başlatıcı: Komut Takma Adını Kaldır |  |
 | Başlatıcı: PATH'e Ekle |  |
 | Başlatıcı: PATH'ten Kaldır |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | Uygulama: Grafik Renk Temasını Değiştir... | `Ctrl+N Y` |
 | Uygulama: Grafik Satır Tonunu Aç/Kapat | `Ctrl+N T` |
 <!-- palette:end -->

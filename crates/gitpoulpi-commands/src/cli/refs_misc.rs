@@ -658,6 +658,26 @@ pub enum DesktopAction {
         #[command(subcommand)]
         action: ShortcutAction,
     },
+    /// The "Open in GitPoulpi" entry of the file manager's right-click menu:
+    /// File Explorer (Windows), GNOME Files, Dolphin, Nemo, Thunar, Caja and
+    /// PCManFM (Linux), Finder (macOS).
+    FolderMenu {
+        #[command(subcommand)]
+        action: FolderMenuAction,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum FolderMenuAction {
+    /// Shows each file manager of this system: whether it is found and
+    /// whether the entry is not_installed, installed, outdated or foreign (a
+    /// file that is not GitPoulpi's).
+    Status,
+    /// Adds the entry to every file manager found here (a foreign file is
+    /// never overwritten).
+    Install,
+    /// Removes exactly what Install wrote, from every file manager.
+    Remove,
 }
 
 #[derive(Debug, Subcommand)]

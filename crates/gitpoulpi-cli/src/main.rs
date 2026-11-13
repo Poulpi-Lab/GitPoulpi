@@ -133,7 +133,19 @@ fn real_main() {
         Some(Commands::Desktop { action }) => desktop_cmd::run(action, cli.json),
         Some(Commands::Launch {
             new_window,
+            folder: Some(folder),
+            ..
+        }) => std::process::exit(gitpoulpi_commands::launch::run_folder(
+            Some(&folder),
+            cli.json,
+            false,
+            new_window,
+            &gitpoulpi_tui::desktop_shortcuts::start_command,
+        )),
+        Some(Commands::Launch {
+            new_window,
             command,
+            ..
         }) => std::process::exit(gitpoulpi_commands::launch::run(
             &command, cli.json, false, new_window,
         )),

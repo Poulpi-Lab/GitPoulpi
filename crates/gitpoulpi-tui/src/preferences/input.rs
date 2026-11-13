@@ -618,6 +618,7 @@ impl PreferencesState {
             PrefAction::ImageEditor(button) => self.images_button(button),
             PrefAction::Launcher(button) => self.launcher_button(button),
             PrefAction::Tools(button) => self.tools_button(button),
+            PrefAction::FolderMenu(button) => self.folder_menu_button(button),
             #[cfg(feature = "mcp")]
             PrefAction::McpSecurity(button) => self.mcp_button(button),
             PrefAction::Workflow(button) => self.wf_button(button),

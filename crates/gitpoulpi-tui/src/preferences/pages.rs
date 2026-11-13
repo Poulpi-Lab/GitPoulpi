@@ -298,6 +298,7 @@ impl PreferencesState {
             .map_or(fields.len(), |i| i + 1);
         fields.splice(alias_at..alias_at, self.tools_action_rows());
         fields.extend(self.launcher_action_rows());
+        fields.extend(self.folder_menu_rows());
         fields
     }
 

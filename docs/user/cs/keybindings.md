@@ -1194,6 +1194,8 @@ Klávesy jsou výchozí.
 | Spouštěč: Odebrat alias příkazu |  |
 | Spouštěč: Přidat do PATH |  |
 | Spouštěč: Odebrat z PATH |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | Aplikace: Změnit barevný motiv grafu... | `Ctrl+N Y` |
 | Aplikace: Přepnout zbarvení řádků grafu | `Ctrl+N T` |
 <!-- palette:end -->

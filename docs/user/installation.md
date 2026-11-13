@@ -208,7 +208,8 @@ follow [Getting started](getting-started.md).
 ## Uninstall
 
 `gitpoulpi uninstall` (what both installers run) removes the command aliases,
-the PATH entries and the shortcuts GitPoulpi made, then the program files of a
+the PATH entries, the shortcuts and the file manager menu entries (with their
+App Paths key on Windows) GitPoulpi made, then the program files of a
 release install; it refuses on a build without the `.gitpoulpi-dist` marker
 (a cargo build), and `--keep-files` leaves the program files. It is not
 available to MCP agents. Without an installer, delete the three executables.

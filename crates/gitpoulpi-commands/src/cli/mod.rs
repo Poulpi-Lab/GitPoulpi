@@ -41,10 +41,11 @@ pub use refs_misc::SubmoduleAction;
 #[cfg(feature = "worktree")]
 pub use refs_misc::WorktreeAction;
 pub use refs_misc::{
-    AliasAction, AutoStashAction, BranchAction, ConfigAction, DaemonAction, DesktopAction, OnOff,
-    PatchAction, PathAction, PullModeArg, ReflogModeArg, RefsAction, RemoteAction, RepoAction,
-    RepoConfigAction, ResetModeArg, ReviewFlags, RunInRepoArg, SessionAction, ShortcutAction,
-    SparseAction, SshCommandAction, StashAction, TagAction, ThemeAction,
+    AliasAction, AutoStashAction, BranchAction, ConfigAction, DaemonAction, DesktopAction,
+    FolderMenuAction, OnOff, PatchAction, PathAction, PullModeArg, ReflogModeArg, RefsAction,
+    RemoteAction, RepoAction, RepoConfigAction, ResetModeArg, ReviewFlags, RunInRepoArg,
+    SessionAction, ShortcutAction, SparseAction, SshCommandAction, StashAction, TagAction,
+    ThemeAction,
 };
 pub use repo_auth::RepoAuthAction;
 #[cfg(feature = "history-rewrite")]
@@ -1090,6 +1091,13 @@ pub enum Commands {
         /// Start a new window even when one is open.
         #[arg(long)]
         new_window: bool,
+        /// Open this folder: with `ui.reuse_window` on and a window open, the
+        /// repository that holds it becomes a tab of the most recently
+        /// focused window (no question asked); otherwise GitPoulpi starts in
+        /// the chosen terminal on that folder. What the file manager's
+        /// "Open in GitPoulpi" entry runs.
+        #[arg(long, value_name = "DIR", conflicts_with = "command")]
+        folder: Option<std::path::PathBuf>,
         /// The command to start when there is no window to show, after `--`.
         #[arg(
             trailing_var_arg = true,

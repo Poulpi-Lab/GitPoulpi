@@ -1200,6 +1200,8 @@ stage_file = "z"
 | Лаунчер: удалить псевдоним команды |  |
 | Лаунчер: добавить в PATH |  |
 | Лаунчер: убрать из PATH |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | Приложение: сменить цветовую тему графа... | `Ctrl+N Y` |
 | Приложение: переключить подсветку строк графа | `Ctrl+N T` |
 <!-- palette:end -->

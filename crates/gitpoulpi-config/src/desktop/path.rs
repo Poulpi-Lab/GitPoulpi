@@ -305,30 +305,6 @@ pub trait UserPath {
 /// `HKCU\Environment` through PowerShell.
 pub struct Registry;
 
-fn run_powershell(script: &str, envs: &[(&str, &str)]) -> Result<String, String> {
-    let mut cmd = std::process::Command::new("powershell.exe");
-    cmd.args([
-        "-NoProfile",
-        "-NonInteractive",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-EncodedCommand",
-        &super::windows::encode_command(script),
-    ]);
-    cmd.envs(envs.iter().copied());
-    #[cfg(windows)]
-    {
-        use std::os::windows::process::CommandExt;
-        cmd.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
-    }
-    let out = cmd.output().map_err(|e| format!("PowerShell: {e}"))?;
-    if out.status.success() {
-        Ok(String::from_utf8_lossy(&out.stdout).into_owned())
-    } else {
-        Err(String::from_utf8_lossy(&out.stderr).trim().to_string())
-    }
-}
-
 const READ_SCRIPT: &str = "$k=[Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment');\
 $p=$k.GetValue('Path','',[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames);\
 $a=$k.GetValue('GitPoulpiPathAdded',$null);\
@@ -357,11 +333,11 @@ pub fn parse_registry_read(out: &str) -> UserPathValues {
 
 impl UserPath for Registry {
     fn read(&self) -> Result<UserPathValues, String> {
-        run_powershell(READ_SCRIPT, &[]).map(|o| parse_registry_read(&o))
+        super::registry::run_powershell(READ_SCRIPT, &[]).map(|o| parse_registry_read(&o))
     }
 
     fn write(&self, path: &str, added: Option<&str>) -> Result<(), String> {
-        run_powershell(
+        super::registry::run_powershell(
             WRITE_SCRIPT,
             &[("GP_NEW_PATH", path), ("GP_ADDED", added.unwrap_or(""))],
         )

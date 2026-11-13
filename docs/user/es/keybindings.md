@@ -1199,6 +1199,8 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Lanzador: Quitar alias del comando |  |
 | Lanzador: Añadir al PATH |  |
 | Lanzador: Quitar del PATH |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | App: Cambiar tema de color del grafo... | `Ctrl+N Y` |
 | App: Alternar tinte de filas del grafo | `Ctrl+N T` |
 <!-- palette:end -->

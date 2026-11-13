@@ -1198,6 +1198,8 @@ applicano. I tasti sono quelli predefiniti.
 | Launcher: Rimuovi alias del comando |  |
 | Launcher: Aggiungi al PATH |  |
 | Launcher: Rimuovi dal PATH |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | App: Cambia tema colori del grafo... | `Ctrl+N Y` |
 | App: Attiva/disattiva tinta righe del grafo | `Ctrl+N T` |
 <!-- palette:end -->

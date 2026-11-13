@@ -2995,7 +2995,7 @@ commit_details_shrink_message = { git = "Детали commit'а: уменьши�
 commit_details_reset_message_size = { git = "Детали commit'а: сбросить размер сообщения", local = "Детали коммита: сбросить размер сообщения" }
 commit_details_scroll_message_down = { git = "Детали commit'а: прокрутить сообщение вниз", local = "Детали коммита: прокрутить сообщение вниз" }
 commit_details_scroll_message_up = { git = "Детали commit'а: прокрутить сообщение вверх", local = "Детали коммита: прокрутить сообщение вверх" }
-commit_details_open_link = "{$Commit} Details: Open Link in Message..."
+commit_details_open_link = { git = "Детали commit'а: открыть ссылку из сообщения...", local = "Детали коммита: открыть ссылку из сообщения..." }
 files_toggle_commit_file_sort_a_z_z_a = { git = "Файлы: порядок сортировки файлов commit'а (А-Я / Я-А)", local = "Файлы: порядок сортировки файлов коммита (А-Я / Я-А)" }
 refs_checkout_selected_ref = "Refs: checkout выбранной ссылки"
 refs_copy_ref_name = "Refs: копировать имя ссылки"
@@ -4158,8 +4158,8 @@ quit_cd = "Выйти, оставив оболочку в папке этой в
 repo_management = "Управление репозиториями: открыть, клонировать или создать репозиторий"
 insert_issue_ref = "Вставить ссылку на задачу"
 tab_overflow = "Все вкладки"
-tab_scroll_left = "Scroll the tabs left"
-tab_scroll_right = "Scroll the tabs right"
+tab_scroll_left = "Прокрутить вкладки влево"
+tab_scroll_right = "Прокрутить вкладки вправо"
 
 [footer_hint]
 lead = "{key}: "
@@ -5776,22 +5776,22 @@ palette_alias_create = "Лаунчер: создать псевдоним ком
 palette_alias_remove = "Лаунчер: удалить псевдоним команды"
 palette_path_add = "Лаунчер: добавить в PATH"
 palette_path_remove = "Лаунчер: убрать из PATH"
-folder_menu_heading = "File manager menu"
-folder_menu_status = "Open in GitPoulpi"
-folder_menu_label = "Open in GitPoulpi"
-folder_menu_detected = "Detected"
-folder_menu_none_detected = "no supported file manager found"
-folder_menu_install = "Install"
-folder_menu_remove = "Remove"
-folder_menu_needs_helper = "needs the gitpoulpi launcher next to GitPoulpi"
-folder_menu_help_windows = "Adds Open in GitPoulpi to the right-click menu of folders, folder backgrounds and drives (your user only, no admin), and lets you type gitpoulpi in the File Explorer address bar. On Windows 11 it is under Show more options (Shift+F10)."
-folder_menu_help_linux = "Adds Open in GitPoulpi to the right-click menu of folders in the file managers found here. Only the files GitPoulpi wrote are removed; your own Thunar actions stay."
-folder_menu_help_macos = "Adds an Open in GitPoulpi Quick Action for folders in Finder (right-click > Quick Actions). Finder has no menu for the folder background."
-done_folder_menu_installed = "Installed Open in GitPoulpi: {managers}"
-done_folder_menu_removed = "Removed Open in GitPoulpi: {managers}"
-done_folder_menu_nothing = "No Open in GitPoulpi menu to remove"
-palette_folder_menu_install = "Launcher: Install Open in GitPoulpi Menu"
-palette_folder_menu_remove = "Launcher: Remove Open in GitPoulpi Menu"
+folder_menu_heading = "Меню файлового менеджера"
+folder_menu_status = "Открыть в GitPoulpi"
+folder_menu_label = "Открыть в GitPoulpi"
+folder_menu_detected = "Обнаружено"
+folder_menu_none_detected = "поддерживаемый файловый менеджер не найден"
+folder_menu_install = "Установить"
+folder_menu_remove = "Удалить"
+folder_menu_needs_helper = "рядом с GitPoulpi нужен лаунчер gitpoulpi"
+folder_menu_help_windows = "Добавляет «Открыть в GitPoulpi» в контекстное меню папок, фона папок и дисков (только для вашего пользователя, права администратора не нужны) и позволяет ввести gitpoulpi в адресной строке Проводника. В Windows 11 пункт находится в разделе «Показать дополнительные параметры» (Shift+F10)."
+folder_menu_help_linux = "Добавляет «Открыть в GitPoulpi» в контекстное меню папок в найденных здесь файловых менеджерах. Удаляются только файлы, созданные GitPoulpi; ваши собственные действия Thunar остаются."
+folder_menu_help_macos = "Добавляет быстрое действие «Открыть в GitPoulpi» для папок в Finder (правый клик > «Быстрые действия»). В Finder нет меню для фона папки."
+done_folder_menu_installed = "Установлено «Открыть в GitPoulpi»: {managers}"
+done_folder_menu_removed = "Удалено «Открыть в GitPoulpi»: {managers}"
+done_folder_menu_nothing = "Нет меню «Открыть в GitPoulpi» для удаления"
+palette_folder_menu_install = "Лаунчер: установить меню «Открыть в GitPoulpi»"
+palette_folder_menu_remove = "Лаунчер: удалить меню «Открыть в GitPoulpi»"
 
 [sparse]
 palette = "Репозиторий: Частичный checkout..."
@@ -9518,20 +9518,20 @@ why_no_dialog = "нет открытого диалога, который мож
 
 [link_confirm]
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
-title = "Open this link?"
+title = "Открыть эту ссылку?"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
+body = { git = "Этот адрес взят из текста сообщения commit'а. Проверьте его, прежде чем открывать в браузере:", local = "Этот адрес взят из текста сообщения коммита. Проверьте его, прежде чем открывать в браузере:" }
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
-position = "Link {n} of {total}"
+position = "Ссылка {n} из {total}"
 # context: button that opens the address in the browser
-open = "Open"
+open = "Открыть"
 # context: button that shows the next address of the message
-next = "Next"
+next = "Далее"
 # context: key of the Open button, one letter (shown as "Open (O)")
-key_open = "o"
+key_open = "о"
 # context: key of the Next button, one letter
-key_next = "n"
+key_next = "д"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "м"
 # context: status line; the message in view holds no web address to open
-none = "no link in this message"
+none = "в этом сообщении нет ссылок"

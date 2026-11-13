@@ -718,8 +718,9 @@ limite de pedidos faz falhar apenas esse perfil. As respostas são reutilizadas 
 Em Definições > Integrações, um perfil de code host ligado tem um bloco **Radar**
 sob a sua chave SSH: uma caixa por lista (*Pedidos à espera da minha revisão*,
 *Todos os pedidos abertos*, *Incluir rascunhos*, *Issues atribuídas a mim*, a última
-ausente nos hosts sem issues), um campo *Namespaces* (um por linha, com a caixa *Expressões regulares*; vazio
-significa o seu e todos a que pertence) e a escolha *Pedido de um
+ausente nos hosts sem issues), um campo *Namespaces* (uma entrada por linha: um nome que corresponde a esse
+grupo ou titular e a tudo o que está abaixo, ou uma expressão regular por linha com
+*Expressões regulares* marcada; vazio significa o seu e todos a que pertence) e a escolha *Pedido de um
 repositório não clonado*: *Perguntar*, *Cloná-lo* ou *Rever através da API*.
 Tudo é guardado à medida que altera. Os hosts sem consulta de toda a conta (Bitbucket
 Cloud) mostram em vez disso uma linha a dizê-lo. A paleta de comandos chega ao bloco

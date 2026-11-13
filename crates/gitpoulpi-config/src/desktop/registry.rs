@@ -208,7 +208,9 @@ fn apply_tree(tree: &mut Tree, ops: &[RegOp]) -> Result<(), String> {
                     path.push_str(part);
                     tree.entry(path.clone()).or_default();
                 }
-                tree.entry(n).or_default().insert(name.clone(), value.clone());
+                tree.entry(n)
+                    .or_default()
+                    .insert(name.clone(), value.clone());
             }
             RegOp::DeleteTree(k) => {
                 let n = norm(k);

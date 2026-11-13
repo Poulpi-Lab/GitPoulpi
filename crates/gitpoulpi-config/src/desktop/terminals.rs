@@ -281,8 +281,285 @@ pub fn argv(os: Os, id: &str, exe: &str) -> Option<Vec<String>> {
     }
 }
 
+/// `argv` for opening `folder`: the same command ending in
+/// `exe --launcher --repo <folder>`. `None` for an unknown terminal.
+///
+/// - Windows `console`: the exe itself.
+/// - `windows-terminal`: `wt` reads `;` as a command separator, so it is
+///   escaped as `\;` in the folder word.
+/// - macOS Terminal and iTerm2 are driven through `osascript` (the command is
+///   shell-quoted, then escaped for an AppleScript string); WezTerm, kitty
+///   and Ghostty use the `open -na ... --args` forms of the app launcher.
+pub fn folder_argv(os: Os, id: &str, exe: &str, folder: &str) -> Option<Vec<String>> {
+    let tail = |mut v: Vec<String>| {
+        v.push("--repo".to_string());
+        v.push(folder.to_string());
+        v
+    };
+    let words = |parts: &[&str]| -> Vec<String> {
+        parts
+            .iter()
+            .map(|p| (*p).to_string())
+            .chain([exe.to_string(), LAUNCHER_FLAG.to_string()])
+            .collect()
+    };
+    match (os, id) {
+        (Os::Windows, "console") => Some(tail(words(&[]))),
+        (Os::Windows, "windows-terminal") => {
+            let mut v = argv(os, id, exe)?;
+            v.push("--repo".to_string());
+            v.push(folder.replace(';', "\\;"));
+            Some(v)
+        }
+        (Os::Linux | Os::Windows, _) => argv(os, id, exe).map(tail),
+        (Os::Macos, "apple-terminal") => {
+            let esc = mac_script_arg(exe, folder);
+            Some(vec![
+                "osascript".to_string(),
+                "-e".to_string(),
+                format!("tell application \"Terminal\" to do script \"{esc}\""),
+                "-e".to_string(),
+                "tell application \"Terminal\" to activate".to_string(),
+            ])
+        }
+        (Os::Macos, "iterm") => {
+            let esc = mac_script_arg(exe, folder);
+            Some(vec![
+                "osascript".to_string(),
+                "-e".to_string(),
+                format!(
+                    "tell application \"iTerm\" to create window with default profile command \"{esc}\""
+                ),
+            ])
+        }
+        (Os::Macos, "wezterm") => Some(tail(words(&[
+            "/usr/bin/open",
+            "-na",
+            "WezTerm",
+            "--args",
+            "start",
+            "--",
+        ]))),
+        (Os::Macos, "kitty") => Some(tail(words(&["/usr/bin/open", "-na", "kitty", "--args"]))),
+        (Os::Macos, "ghostty") => Some(tail(words(&[
+            "/usr/bin/open",
+            "-na",
+            "Ghostty",
+            "--args",
+            "-e",
+        ]))),
+        (Os::Macos, _) => None,
+    }
+}
+
+/// The shell command for macOS, quoted for a shell and then escaped for an
+/// AppleScript string literal.
+fn mac_script_arg(exe: &str, folder: &str) -> String {
+    let cmd = format!(
+        "{} {} --repo {}",
+        super::sh_quote(exe),
+        LAUNCHER_FLAG,
+        super::sh_quote(folder)
+    );
+    cmd.replace('\\', "\\\\").replace('"', "\\\"")
+}
+
+/// The program a file-manager entry runs (`<helper> [launch] --folder DIR`):
+/// the console-less `gitpoulpi-launch.exe` beside the exe on Windows;
+/// `gitpoulpi` itself, or the one beside the exe, on Linux and macOS.
+pub fn folder_helper(
+    os: Os,
+    exe: &std::path::Path,
+    exists: &dyn Fn(&std::path::Path) -> bool,
+) -> Option<std::path::PathBuf> {
+    match os {
+        Os::Windows => launch_helper(os, exe, exists),
+        Os::Linux | Os::Macos => launch_helper(Os::Linux, exe, exists),
+    }
+}
+
+/// A `--folder` value as the shell handed it over. Explorer's `"%V"` on a
+/// drive root is `"C:\"`, and argv parsing reads `\"` as an escaped quote, so
+/// the program receives `C:"`: the quote goes and a bare drive gets its `\`.
+pub fn normalize_folder_arg(s: &str) -> std::path::PathBuf {
+    let t = s.strip_suffix('"').unwrap_or(s);
+    let b = t.as_bytes();
+    if b.len() == 2 && b[0].is_ascii_alphabetic() && b[1] == b':' {
+        return std::path::PathBuf::from(format!("{t}\\"));
+    }
+    std::path::PathBuf::from(t)
+}
+
+fn folded(os: Os, p: &std::path::Path) -> String {
+    let s = p.to_string_lossy();
+    let t = s.trim_end_matches(['/', '\\']);
+    if os == Os::Windows {
+        t.replace('/', "\\").to_lowercase()
+    } else {
+        t.to_string()
+    }
+}
+
+/// The folder an address-bar start means (Explorer starts the program in the
+/// folder it shows): `cwd`, unless it is not a directory, is the install
+/// folder or the home folder (where a Run dialog starts), or is inside the
+/// Windows folder (where a program started without a context lands).
+pub fn address_bar_folder(
+    os: Os,
+    cwd: &std::path::Path,
+    exe_dir: Option<&std::path::Path>,
+    home: Option<&std::path::Path>,
+    windir: Option<&std::path::Path>,
+    is_dir: &dyn Fn(&std::path::Path) -> bool,
+) -> Option<std::path::PathBuf> {
+    if !is_dir(cwd) {
+        return None;
+    }
+    let c = folded(os, cwd);
+    let sep = if os == Os::Windows { '\\' } else { '/' };
+    for p in [exe_dir, home].into_iter().flatten() {
+        if folded(os, p) == c {
+            return None;
+        }
+    }
+    if let Some(w) = windir {
+        let w = folded(os, w);
+        if c == w || c.starts_with(&format!("{w}{sep}")) {
+            return None;
+        }
+    }
+    Some(cwd.to_path_buf())
+}
+
 #[cfg(test)]
 mod tests {
+    use std::path::{Path, PathBuf};
+
+    #[test]
+    fn folder_argv_ends_in_the_repo_for_every_terminal() {
+        for (os, id) in [
+            (Os::Linux, "kitty"),
+            (Os::Linux, "xdg-terminal-exec"),
+            (Os::Linux, "gnome-terminal"),
+            (Os::Linux, "ghostty"),
+            (Os::Windows, "windows-terminal"),
+            (Os::Windows, "wezterm"),
+            (Os::Windows, "alacritty"),
+            (Os::Windows, "console"),
+        ] {
+            let v = folder_argv(os, id, "/x/gp", "/work/dir").unwrap();
+            let n = v.len();
+            assert_eq!(
+                v[n - 4..],
+                ["/x/gp", "--launcher", "--repo", "/work/dir"],
+                "{id}"
+            );
+        }
+        assert_eq!(
+            folder_argv(Os::Windows, "console", "gp.exe", "D:\\a").unwrap(),
+            ["gp.exe", "--launcher", "--repo", "D:\\a"]
+        );
+        assert!(folder_argv(Os::Linux, "nope", "x", "y").is_none());
+    }
+
+    #[test]
+    fn windows_terminal_gets_the_semicolon_escaped() {
+        let v = folder_argv(Os::Windows, "windows-terminal", "gp.exe", "C:\\a;b").unwrap();
+        assert_eq!(v.last().unwrap(), "C:\\a\\;b");
+        let v = folder_argv(Os::Windows, "wezterm", "gp.exe", "C:\\a;b").unwrap();
+        assert_eq!(v.last().unwrap(), "C:\\a;b");
+    }
+
+    #[test]
+    fn macos_terminal_and_iterm_go_through_escaped_applescript() {
+        let v = folder_argv(Os::Macos, "apple-terminal", "/App's/gp", "/a \"b\"").unwrap();
+        assert_eq!(v[0], "osascript");
+        assert!(v[2].starts_with("tell application \"Terminal\" to do script \""));
+        assert!(v[2].contains("--repo '/a \\\"b\\\"'"), "{}", v[2]);
+        assert!(v[2].contains("'/App'\\\\''s/gp'"), "{}", v[2]);
+        assert_eq!(v[4], "tell application \"Terminal\" to activate");
+        let v = folder_argv(Os::Macos, "iterm", "/gp", "/d").unwrap();
+        assert!(v[2].contains("create window with default profile command"));
+        let v = folder_argv(Os::Macos, "kitty", "/gp", "/d").unwrap();
+        assert_eq!(
+            v,
+            [
+                "/usr/bin/open",
+                "-na",
+                "kitty",
+                "--args",
+                "/gp",
+                "--launcher",
+                "--repo",
+                "/d"
+            ]
+        );
+    }
+
+    #[test]
+    fn the_folder_helper_is_the_launch_exe_on_windows_and_the_cli_elsewhere() {
+        let yes = |_: &Path| true;
+        assert_eq!(
+            folder_helper(Os::Windows, Path::new("/g/gitpoulpi.exe"), &yes),
+            Some(PathBuf::from("/g/gitpoulpi-launch.exe"))
+        );
+        assert_eq!(
+            folder_helper(Os::Macos, Path::new("/a/gitpoulpi-tui"), &yes),
+            Some(PathBuf::from("/a/gitpoulpi"))
+        );
+        assert_eq!(
+            folder_helper(Os::Linux, Path::new("/a/gitpoulpi-tui"), &|_| false),
+            None
+        );
+    }
+
+    #[test]
+    fn a_drive_root_argument_loses_the_stray_quote_and_regains_its_backslash() {
+        assert_eq!(normalize_folder_arg("C:\""), PathBuf::from("C:\\"));
+        assert_eq!(normalize_folder_arg("C:"), PathBuf::from("C:\\"));
+        assert_eq!(normalize_folder_arg("C:\\a b"), PathBuf::from("C:\\a b"));
+        assert_eq!(normalize_folder_arg("/x/y"), PathBuf::from("/x/y"));
+    }
+
+    #[test]
+    fn the_address_bar_folder_skips_install_home_windows_and_non_directories() {
+        let dir = |_: &Path| true;
+        let win = |cwd: &str| {
+            address_bar_folder(
+                Os::Windows,
+                Path::new(cwd),
+                Some(Path::new("C:\\Tools\\GitPoulpi")),
+                Some(Path::new("C:\\Users\\Me")),
+                Some(Path::new("C:\\Windows")),
+                &dir,
+            )
+        };
+        assert_eq!(win("D:\\Work\\repo"), Some(PathBuf::from("D:\\Work\\repo")));
+        assert_eq!(win("c:\\tools\\gitpoulpi\\"), None);
+        assert_eq!(win("C:\\USERS\\me"), None);
+        assert_eq!(win("c:\\windows\\SYSTEM32"), None);
+        assert_eq!(win("C:\\Windows"), None);
+        assert_eq!(
+            win("C:\\WindowsApps"),
+            Some(PathBuf::from("C:\\WindowsApps"))
+        );
+        assert_eq!(
+            address_bar_folder(Os::Linux, Path::new("/x"), None, None, None, &|_| false),
+            None
+        );
+        assert_eq!(
+            address_bar_folder(
+                Os::Linux,
+                Path::new("/Home"),
+                None,
+                Some(Path::new("/home")),
+                None,
+                &dir
+            ),
+            Some(PathBuf::from("/Home"))
+        );
+    }
+
     use super::*;
 
     #[test]

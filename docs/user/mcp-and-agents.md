@@ -496,6 +496,9 @@ Not exposed as tools:
 | `gitpoulpi desktop shortcut status` | launcher shortcuts are the user's desktop, not a repository; they need the TUI's icon renderer |
 | `gitpoulpi desktop shortcut install` | writes files into the user's launcher, Start menu and Desktop |
 | `gitpoulpi desktop shortcut remove` | deletes files from the user's launcher, Start menu and Desktop |
+| `gitpoulpi desktop folder-menu status` | the file manager menu is the user's desktop, not a repository |
+| `gitpoulpi desktop folder-menu install` | writes entries into the user's file manager menus and registry |
+| `gitpoulpi desktop folder-menu remove` | deletes entries from the user's file manager menus and registry |
 | `gitpoulpi alias create` | writes a command into the user's PATH; an agent never changes the user's shell |
 | `gitpoulpi alias remove` | deletes a command from the user's PATH; an agent never changes the user's shell |
 | `gitpoulpi path add` | edits the user's shell rc files or Windows user PATH |

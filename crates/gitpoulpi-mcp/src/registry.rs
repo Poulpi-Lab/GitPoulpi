@@ -82,6 +82,18 @@ pub const EXCLUDED: &[(&[&str], &str)] = &[
         "deletes files from the user's launcher, Start menu and Desktop",
     ),
     (
+        &["desktop", "folder-menu", "status"],
+        "the file manager menu is the user's desktop, not a repository",
+    ),
+    (
+        &["desktop", "folder-menu", "install"],
+        "writes entries into the user's file manager menus and registry",
+    ),
+    (
+        &["desktop", "folder-menu", "remove"],
+        "deletes entries from the user's file manager menus and registry",
+    ),
+    (
         &["alias", "create"],
         "writes a command into the user's PATH; an agent never changes the user's shell",
     ),

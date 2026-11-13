@@ -47,10 +47,13 @@ fn a_merge_that_equals_head_is_concluded_from_the_banner() {
 
     let (c, r) = term.wait_for_text("Commit merge", STEP).unwrap();
     term.click(c + 2, r).unwrap();
-    // The one-line prompt opens with the merge message; Enter commits.
-    term.wait_for("the commit prompt", STEP, |s| s.contains("Merge feature"))
-        .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    term.send_keys("Enter").unwrap();
+    // The commit message field takes the keyboard, pre-filled with git's
+    // merge message (no text editing in the status line); Ctrl+Enter commits.
+    term.wait_for("the message field, pre-filled", STEP, |s| {
+        s.contains("Merge feature into main") && s.contains("press Ctrl+Enter to commit")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("C-j").unwrap();
     term.wait_for("the merge concluded", STEP, |s| {
         !s.contains("Merge in progress")
     })

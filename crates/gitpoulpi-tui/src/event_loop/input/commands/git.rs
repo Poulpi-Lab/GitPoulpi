@@ -133,7 +133,7 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                 ) =>
         {
             // A merge whose result equals HEAD has no WIP row (nothing is
-            // changed), yet can still be concluded: the one-line prompt
+            // changed), yet can still be concluded: the message field
             // takes the merge commit's message.
             let message = merge_message(cx.operation_state);
             focus_merge_message(cx, message);

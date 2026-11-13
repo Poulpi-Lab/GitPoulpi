@@ -372,14 +372,15 @@ fn clicking_a_preferences_checkbox_ticks_it_with_no_keystroke_anywhere() {
     term.click(gear_col, gear_row).expect("write the click");
 
     // One predicate for the opened state: title, sidebar, and the row in its
-    // known-off start position (`general.auto_prune` defaults to `false`).
+    // known-ticked start position (`general.auto_prune` defaults to `true`;
+    // the click must untick it).
     term.wait_for("the Preferences screen open", STEP, |s| {
         s.contains("Repo-specific settings")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     common::settings_page(&mut term, "Synchronization");
-    term.wait_for("Auto-prune unticked", STEP, |s| {
-        checkbox_is_ticked(s, "Auto-prune", false)
+    term.wait_for("Auto-prune ticked at start", STEP, |s| {
+        checkbox_is_ticked(s, "Auto-prune", true)
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
@@ -389,8 +390,8 @@ fn clicking_a_preferences_checkbox_ticks_it_with_no_keystroke_anywhere() {
     term.click(label_col + 1, label_row)
         .expect("write the click");
 
-    term.wait_for("Auto-prune ticked by the click alone", STEP, |s| {
-        checkbox_is_ticked(s, "Auto-prune", true)
+    term.wait_for("Auto-prune unticked by the click alone", STEP, |s| {
+        checkbox_is_ticked(s, "Auto-prune", false)
     })
     .unwrap_or_else(|e| panic!("{e}"));
 }

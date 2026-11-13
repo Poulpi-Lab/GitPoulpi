@@ -1550,6 +1550,21 @@ položky nabídek **Vytvořit větev zde...** / **Vytvořit tag zde...** se zept
 název v textovém poli na řádku commitu. `Enter` vytvoří ref. `Esc` zruší.
 Neplatný nebo existující název se ukáže červeně a pole zůstane otevřené.
 
+Když tento řádek není na obrazovce (je otevřený diff, Log je samostatně
+zvětšený, sloupec Ref je skrytý), název se místo toho píše do malého rámečku se
+zavíracím křížkem a tlačítky **Zrušit** a **Vytvořit**. Přejmenování větve se
+píše přímo přes její řádek v panelu Refs nebo v buňce Ref jejího řádku v Logu;
+nový soubor se píše v seznamu Změny v pracovním stromu, pod složkou. Všude platí
+stejné klávesy: `Enter` potvrdí, `Esc` zruší.
+
+Do stavového řádku se nikdy nepíše. Výzvy, které potřebují víc místa, jsou
+dialogy se skutečnými tlačítky: zpráva stashe, zpráva anotovaného tagu
+(`Ctrl+Enter` nebo `Ctrl+S` použije, `Enter` přidá řádek), Nastavit upstream
+(prohledávatelný seznam vzdálených větví a tlačítko Zrušit upstream) a vzory
+Git LFS pro sledování a přestání sledování. Číselné nebo textové nastavení
+vybrané z palety otevře Nastavení na daném řádku, připravené k úpravě, a filtr
+Refs (`/`) se píše do pole nahoře v panelu Refs.
+
 ### Úprava zprávy commitu
 
 **Upravit zprávu commitu...** v nabídce commitu, `Ctrl+G e` nebo
@@ -1739,7 +1754,7 @@ nabídky: *Editor: Změnit kódování*, *Editor: Znovu otevřít s kódováním
 | `x` | Zahodit všechny změny (nejdřív se zeptá) |
 | `c` | Otevřít commit composer |
 | `Enter` | Hned commitnout změny ze stage se zprávou z formuláře, odkudkoli (viz [Stagování a commitování](staging-and-committing.md#psaní-commitu)) |
-| `m` | Stash všech změn se zprávou (prázdná je povolena). Se zapnutou AI napíše zprávu `Ctrl+G` v tomto promptu |
+| `m` | Stash všech změn se zprávou psanou v malém dialogu (prázdná je povolena). Se zapnutou AI zprávu napíše jeho tlačítko AI (`Ctrl+G` v dialogu) |
 | `Shift+T` | Stash všech změn (včetně nesledovaných souborů), bez zprávy |
 | `o` | Pop stashe: řádek stashe vybraný v Logu, jinak nejnovější stash |
 | `p` | Pull, tak jak je nastaveno tlačítko Pull (`git.pull_mode`) |

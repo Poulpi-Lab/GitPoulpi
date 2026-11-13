@@ -1025,17 +1025,17 @@ box_new_branch_at = "Nová větev na {sha}"
 box_new_tag_at = { git = "Nový {$tag} na {sha}", local = "Nová značka na {sha}" }
 box_new_annotated_tag_at = { git = "Nový anotovaný {$tag} na {sha}", local = "Nová anotovaná značka na {sha}" }
 # context: title of the rename box; {old} is the branch name
-box_rename = "Rename {old}"
+box_rename = "Přejmenovat {old}"
 # context: confirm button of the rename box
-rename_button = "Rename"
+rename_button = "Přejmenovat"
 # context: placeholder of the inline new-file box in the Status list; keep it short
-placeholder_file = "file name, e.g. notes.md"
+placeholder_file = "název souboru, např. notes.md"
 # context: title of the new-file box; {folder} is a path
-box_new_file = "New file in {folder}/"
+box_new_file = "Nový soubor v {folder}/"
 # context: title of the new-file box for the repository root
-box_new_file_root = "New file"
+box_new_file_root = "Nový soubor"
 # context: confirm button of the name box and the new-file box
-create_button = "Create"
+create_button = "Vytvořit"
 
 [menu_pill]
 checkout = { git = "Checkout", local = "Checkout" }
@@ -4318,7 +4318,7 @@ counter = "{current} z {total}"
 [footer]
 commit_label = "Zpráva commitu: "
 commit_hint = { git = "  (Enter: commit, Esc: zrušit)", local = "  (Enter: commit, Esc: zrušit)" }
-filter_refs_hint = "Enter: apply, Esc: cancel"
+filter_refs_hint = "Enter: použít, Esc: zrušit"
 confirm_hint = "  (Enter: potvrdit, Esc: zrušit)"
 search_hint = "Hledat: Enter/{down} další, Shift+Enter/{up} předchozí, Esc zavřít"
 commit_count = { one = "{n} commit", few = "{n} commity", other = "{n} commitů" }
@@ -5277,53 +5277,53 @@ discard_hint = "Zahodit vaše změny? Další Esc je zahodí, jakákoli jiná kl
 
 [prompt_dialog]
 # context: title of the stash dialog; stash is the git verb (stash the working changes)
-stash_title = "{$Stash} changes"
+stash_title = { git = "{$Stash} změn", local = "Odložit změny" }
 # context: placeholder of the stash message field; an empty message is allowed
-stash_placeholder = "message (optional)"
+stash_placeholder = "zpráva (volitelná)"
 # context: the primary button of the stash dialog; stash is the git verb
 stash_button = "{$Stash}"
 # context: AI button of the stash dialog (the key that does the same follows it); the AI writes the stash message
-ai_message_button = "AI message"
+ai_message_button = "Zpráva od AI"
 # context: shown in the stash message field while the AI is writing it
-ai_writing = "writing..."
+ai_writing = "píšu..."
 # context: title of the dialog that annotates an existing tag; {name} is the tag
-tag_annotate_title = "Annotate {$tag} {name}"
+tag_annotate_title = { git = "Anotovat {$tag} {name}", local = "Anotovat značku {name}" }
 # context: title of the dialog that creates an annotated tag; {name} is the new tag, {sha} the short hash of the commit it points at
-tag_new_title = "New annotated {$tag} {name} at {sha}"
+tag_new_title = { git = "Nový anotovaný {$tag} {name} na {sha}", local = "Nová anotovaná značka {name} na {sha}" }
 # context: placeholder of the tag message field (several lines allowed)
-tag_placeholder = "message"
+tag_placeholder = "zpráva"
 # context: the primary button of the dialog that annotates an existing tag
-tag_annotate_button = "Annotate"
+tag_annotate_button = "Anotovat"
 # context: the primary button of the dialog that creates an annotated tag
-tag_create_button = "Create {$tag}"
+tag_create_button = { git = "Vytvořit {$tag}", local = "Vytvořit značku" }
 # context: hint under the multi-line message field of the tag dialog; {key} is the key that applies
-keys_hint = "Enter: new line, {key}: apply, Esc: cancel"
+keys_hint = "Enter: nový řádek, {key}: použít, Esc: zrušit"
 # context: title of the dialog that sets the upstream (the remote branch it tracks) of a local branch; {branch} is the local branch
-upstream_title = "Set upstream of {branch}"
+upstream_title = "Nastavit upstream větve {branch}"
 # context: placeholder of the remote branch list of that dialog while nothing is chosen
-upstream_placeholder = "Select a remote branch..."
+upstream_placeholder = "Vyberte vzdálenou větev..."
 # context: the primary button of the set upstream dialog
-set_button = "Set"
+set_button = "Nastavit"
 # context: button of the set upstream dialog that removes the branch's upstream (only shown when it has one)
-unset_button = "Unset upstream"
+unset_button = "Zrušit upstream"
 # context: inline error in the set upstream dialog when the typed value starts with a name that is not a remote; {remote} is that name
-unknown_remote = "No remote named '{remote}'"
+unknown_remote = "Žádný remote s názvem „{remote}“"
 # context: inline error in the set upstream dialog when Set is pressed with nothing chosen
-upstream_none = "Choose a remote branch first."
+upstream_none = "Nejprve vyberte vzdálenou větev."
 # context: title of the dialog that routes file patterns through Git LFS
-lfs_track_title = "Track with Git LFS"
+lfs_track_title = "Sledovat přes Git LFS"
 # context: placeholder of the Git LFS track field; several patterns are separated by spaces
-lfs_track_placeholder = "patterns, e.g. *.psd assets/big.bin"
+lfs_track_placeholder = "vzory, např. *.psd assets/big.bin"
 # context: the primary button of the Git LFS track dialog
-track_button = "Track"
+track_button = "Sledovat"
 # context: title of the dialog that stops routing a pattern through Git LFS
-lfs_untrack_title = "Stop tracking with Git LFS"
+lfs_untrack_title = "Přestat sledovat přes Git LFS"
 # context: placeholder of the list of tracked Git LFS patterns while nothing is chosen
-lfs_untrack_placeholder = "Select a pattern..."
+lfs_untrack_placeholder = "Vyberte vzor..."
 # context: the primary button of the Git LFS untrack dialog
-untrack_button = "Untrack"
+untrack_button = "Nesledovat"
 # context: inline error in the Git LFS track and untrack dialogs when no pattern was given
-pattern_empty = "Enter at least one pattern."
+pattern_empty = "Zadejte alespoň jeden vzor."
 
 [composer]
 need_staged = { git = "Stage změny, ať můžete commitnout", local = "Přidejte změny do indexu" }

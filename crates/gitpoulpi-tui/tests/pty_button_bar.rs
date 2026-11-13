@@ -97,8 +97,8 @@ fn the_overflow_menu_is_driven_by_the_keyboard_too() {
     // Redo outrank them and stay on the bar).
     term.send_keys("Enter").unwrap();
     // The window is narrow here, so the Ref column is squeezed away and the
-    // prompt falls back to the status-bar field ("New tag name"); wide
-    // enough, it is the inline box ("enter tag name").
+    // prompt falls back to the name box (titled "New tag name"); wide
+    // enough, it is the inline box. Both show "enter tag name" while empty.
     term.wait_for("the new-tag prompt", STEP, |s| {
         s.contains("New tag name") || s.contains("enter tag name")
     })

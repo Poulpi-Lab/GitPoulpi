@@ -13,6 +13,7 @@
 //! the UI thread: Windows spawns PowerShell, every OS does file I/O.
 
 pub mod alias;
+pub mod folder_menu;
 pub mod icons;
 mod linux;
 mod macos;

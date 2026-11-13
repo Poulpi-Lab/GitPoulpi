@@ -1548,6 +1548,21 @@ Einträge **Branch hier erstellen...** / **Tag hier erstellen...** der Menüs fr
 in einem Textfeld in der Zeile des Commits ab. `Enter` legt die Ref an. `Esc` bricht ab. Ein
 ungültiger oder vorhandener Name wird rot angezeigt, und das Feld bleibt offen.
 
+Ist diese Zeile nicht sichtbar (ein Diff ist offen, das Log ist solo, die Ref-Spalte ist
+ausgeblendet), wird der Name stattdessen in einem kleinen Rahmen mit Schließkreuz und den
+Schaltflächen **Abbrechen** und **Erstellen** getippt. Das Umbenennen eines Branches geschieht
+direkt über seiner Zeile im Refs-Bereich oder in der Ref-Zelle seiner Log-Zeile; eine Datei wird
+in der Liste der Arbeitsänderungen unter dem Ordner angelegt. Überall gelten dieselben Tasten:
+`Enter` bestätigt, `Esc` bricht ab.
+
+In der Statuszeile wird nie getippt. Eingaben, die mehr Platz brauchen, sind Dialoge mit echten
+Schaltflächen: die Stash-Nachricht, die Nachricht eines annotierten Tags (`Ctrl+Enter` oder
+`Ctrl+S` wendet an, `Enter` fügt eine Zeile ein), Upstream festlegen (eine durchsuchbare Liste
+der Remote-Branches samt Schaltfläche zum Entfernen) und die Git-LFS-Muster zum Verfolgen und
+Beenden der Verfolgung. Eine Zahlen- oder Texteinstellung, die in der Palette gewählt wird,
+öffnet die Einstellungen an dieser Zeile, bereit zum Bearbeiten, und der Refs-Filter (`/`)
+wird in das Feld oben im Refs-Bereich getippt.
+
 ### Eine Commit-Nachricht bearbeiten
 
 **Commit-Nachricht bearbeiten...** im Commit-Menü, `Ctrl+G e` oder der Palettenbefehl
@@ -1737,7 +1752,7 @@ Einzelheiten in [Staging und Committen](staging-and-committing.md).
 | `x` | Alle Änderungen verwerfen (fragt vorher) |
 | `c` | Den Commit-Composer öffnen |
 | `Enter` | Die staged Änderungen sofort mit der Nachricht des Formulars committen, von überall (siehe [Staging und Committen](staging-and-committing.md#den-commit-schreiben)) |
-| `m` | Alle Änderungen mit einer Nachricht stashen (leer ist erlaubt). Bei eingeschalteter KI schreibt `Ctrl+G` in dieser Eingabe die Nachricht |
+| `m` | Alle Änderungen mit einer Nachricht stashen, getippt in einem kleinen Dialog (leer ist erlaubt). Bei eingeschalteter KI schreibt seine Schaltfläche **KI-Nachricht** (`Ctrl+G` im Dialog) die Nachricht |
 | `Shift+T` | Alle Änderungen stashen (nicht verfolgte Dateien eingeschlossen), ohne Nachricht |
 | `o` | Einen Stash poppen: die im Log ausgewählte Stash-Zeile, sonst den letzten Stash |
 | `p` | Pull, so wie die Pull-Schaltfläche eingestellt ist (`git.pull_mode`) |

@@ -378,7 +378,7 @@ Veja [Stage e commit](staging-and-committing.md).
 - **Clique no minimapa** para mover a vista para essa linha. Mantenha o botão
   premido e mova para deslocar.
 
-Todo o descartar pergunta primeiro.
+Todo o descartar pergunta primeiro. Quando um descartar elimina ficheiros não acompanhados, as pastas que ficam completamente vazias saem com eles (nunca uma que ainda tenha um ficheiro acompanhado, ignorado ou oculto, nem uma que já estava vazia); Anular devolve os ficheiros com as suas pastas.
 
 ### Blame e histórico do ficheiro
 

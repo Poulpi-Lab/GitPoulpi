@@ -348,7 +348,7 @@ Viz [Stagování a commitování](staging-and-committing.md).
 - **Klikněte na minimapu** pro přesun zobrazení na daný řádek. Podržte tlačítko
   a pohybem posouvejte.
 
-Každé zahození se nejdřív zeptá.
+Každé zahození se nejdřív zeptá. Když zahození smaže nesledované soubory, odstraní se s nimi i složky, které se tím úplně vyprázdní (nikdy složka, která stále drží sledovaný, ignorovaný nebo skrytý soubor, ani složka, která byla prázdná už předtím); Zpět vrátí soubory i s jejich složkami.
 
 ### Blame a historie souboru
 

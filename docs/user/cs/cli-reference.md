@@ -102,7 +102,7 @@ Hunky a řádky se číslují tak, jak je číslují `gitpoulpi --json diff`.
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Přidá do indexu soubor, složku, vše, hunk nebo některé řádky. Stage souboru, složky nebo `--all`, který by přidal citlivý soubor (soukromý klíč, `.env`, rozpoznaný token: `[privacy]` v [referenci konfigurace](config-reference.md#privacy-citlivé-soubory)), se odmítne s kódem ukončení 2 a `{error: "sensitive_files", files: [{path, reason}]}` (pravidlo a maskovaný náhled, nikdy hodnota); nic se nepřidá. `--allow-sensitive` je přesto přidá. |
 | `unstage` (stejné přepínače) | Opak. |
-| `discard --file F [--hunk N [--lines a,b]]` | Zahodí změny mimo index (celý soubor: každou změnu, nesledovaný soubor se smaže). Lze vrátit zpět. |
+| `discard --file F [--hunk N [--lines a,b]]` | Zahodí změny mimo index (celý soubor: každou změnu, nesledovaný soubor se smaže i složky, které tím zůstanou prázdné). Lze vrátit zpět. |
 | `rm-file <paths>...` | Smaže soubory z pracovního stromu. Lze vrátit zpět. |
 | `ignore <pattern> [--file <.gitignore>]` | Připojí vzor do `.gitignore` (nebo do `.git/info/exclude` pomocí `--file .git/info/exclude`). Lze vrátit zpět, kromě `.git/info/exclude`. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Přepíše kódování, konce řádků nebo odsazení souborů v pracovním stromu. Binární, chybějící a nekódovatelné soubory se přeskočí a nahlásí. Jedna položka vrácení pro celou dávku. |
@@ -162,7 +162,7 @@ stash vrátí, bez ohledu na `general.auto_stash` ([Auto-stash](log-and-history.
 
 | Příkaz | Co dělá |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch výchozího remote, jednoho remote, nebo všech. Každý fetch také obnoví, co má který remote z tagů (`remote` v `tag list`), a tento záznam vyčistí i bez `--prune`. `--prune-tags` (Nastavení: Automaticky mazat tagy) smaže také lokální tagy, které remote smazal: jen tagy, které na něm byly, nikdy ne ten, který jste neodeslali; odpověď je vypíše jako `pruned_tags` (git 2.41+). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch výchozího remote, jednoho remote, nebo všech. Remote-tracking větve, které remote smazal, se odstraní, pokud není `general.auto_prune` false; `--prune` to vynutí. Každý fetch také obnoví, co má který remote z tagů (`remote` v `tag list`), a tento záznam vyčistí i bez `--prune`. `--prune-tags` (Nastavení: Automaticky mazat tagy) smaže také lokální tagy, které remote smazal: jen tagy, které na něm byly, nikdy ne ten, který jste neodeslali; odpověď je vypíše jako `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; režim se gitu vždy předává výslovně. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Prostý force neexistuje: pouze `--force-with-lease`. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remote. `remote list` označí jmenný prostor sledovacích větví, za nímž žádný remote nestojí, jako `configured: false`; `remote remove` na něm smaže jeho větve (lze vrátit zpět). |

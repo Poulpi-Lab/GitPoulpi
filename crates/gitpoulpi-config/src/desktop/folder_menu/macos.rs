@@ -216,7 +216,7 @@ pub(super) fn install(env: &Env, label: &str) -> Result<(), String> {
         wflow(&script(helper)).as_bytes(),
         false,
     )?;
-    refresh(env);
+    refresh(env, Some(label));
     Ok(())
 }
 
@@ -227,20 +227,58 @@ pub(super) fn remove(env: &Env) -> Result<bool, String> {
         std::fs::remove_dir_all(p).map_err(|e| format!("{}: {e}", p.display()))?;
     }
     if !mine.is_empty() {
-        refresh(env);
+        refresh(env, None);
     }
     Ok(!mine.is_empty())
 }
 
-/// Tells the services database about the change (best effort).
-fn refresh(env: &Env) {
-    if env.refresh_hooks {
-        let _ = std::process::Command::new("/System/Library/CoreServices/pbs")
-            .arg("-update")
+/// The `defaults` key and value that make Finder list the service under
+/// right-click > Quick Actions. Automator writes this entry into the `pbs`
+/// preferences when it saves a Quick Action; a bundle dropped into
+/// `~/Library/Services` without it only reaches the Services submenu. The
+/// presentation modes must be booleans, hence the XML fragment.
+pub fn presentation_entry(label: &str) -> (String, String) {
+    let escaped = label.replace('\\', "\\\\").replace('"', "\\\"");
+    let key = format!("\"(null) - {escaped} - runWorkflowAsService\"");
+    let value = "<dict><key>presentation_modes</key><dict>\
+                 <key>ContextMenu</key><true/>\
+                 <key>FinderPreview</key><true/>\
+                 <key>ServicesMenu</key><true/>\
+                 <key>TouchBar</key><true/>\
+                 </dict></dict>"
+        .to_string();
+    (key, value)
+}
+
+/// Tells the services database about the change (best effort). `label` is the
+/// entry just installed: its Quick Actions presentation is registered; removal
+/// leaves the (harmless, Automator leaves them too) preference entry behind.
+fn refresh(env: &Env, label: Option<&str>) {
+    if !env.refresh_hooks {
+        return;
+    }
+    let quiet = |mut c: std::process::Command| {
+        let _ = c
             .stdout(std::process::Stdio::null())
             .stderr(std::process::Stdio::null())
             .status();
+    };
+    if let Some(label) = label {
+        let (key, value) = presentation_entry(label);
+        let mut c = std::process::Command::new("/usr/bin/defaults");
+        c.args([
+            "write",
+            "pbs",
+            "NSServicesStatus",
+            "-dict-add",
+            &key,
+            &value,
+        ]);
+        quiet(c);
     }
+    let mut c = std::process::Command::new("/System/Library/CoreServices/pbs");
+    c.arg("-update");
+    quiet(c);
 }
 
 #[cfg(test)]
@@ -295,6 +333,14 @@ mod tests {
         ] {
             assert!(w.contains(needle), "{needle}");
         }
+    }
+
+    #[test]
+    fn the_quick_actions_registration_is_a_boolean_dict_keyed_by_the_label() {
+        let (key, value) = presentation_entry("Open \"x\"");
+        assert_eq!(key, r#""(null) - Open \"x\" - runWorkflowAsService""#);
+        assert!(value.contains("<key>ContextMenu</key><true/>"));
+        assert!(!value.contains("<integer>"));
     }
 
     #[test]

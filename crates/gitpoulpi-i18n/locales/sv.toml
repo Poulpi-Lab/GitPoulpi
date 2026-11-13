@@ -8756,8 +8756,8 @@ include_drafts = "Ta med utkast"
 assigned_issues = "Ärenden tilldelade mig"
 # context: field label: orgs, groups or workspaces the account-wide lists are limited to
 namespaces = "Namnrymder"
-# context: hint in the empty namespaces field
-namespaces_hint = "t.ex. acme, plattform (tomt: min egen och alla jag är medlem i)"
+# context: hint in the empty Namespaces text area (one entry per line)
+namespaces_hint = "En per rad, t.ex. acme (tomt: min egen och alla jag är medlem i)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
 namespaces_help = "En post per rad. Ett namn matchar den gruppen eller ägaren och allt under den (ptm matchar ptm/produits/x, inte ptmx/y). Lämna tomt för att matcha din egen och alla du är medlem i."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is

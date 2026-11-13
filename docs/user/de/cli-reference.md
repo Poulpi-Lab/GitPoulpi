@@ -104,7 +104,7 @@ nummeriert.
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Eine Datei, einen Ordner, alles, einen Hunk oder einige Zeilen stagen. Ein Staging von Datei, Ordner oder `--all`, das eine sensible Datei hinzufügen würde (ein privater Schlüssel, eine `.env`, ein erkanntes Token: `[privacy]` in der [Konfigurationsreferenz](config-reference.md#privacy-sensible-dateien)), wird mit Exit-Code 2 und `{error: "sensitive_files", files: [{path, reason}]}` abgelehnt (eine Regel und eine maskierte Vorschau, nie ein Wert); nichts wird gestagt. `--allow-sensitive` stagt sie trotzdem. |
 | `unstage` (dieselben Optionen) | Das Gegenteil. |
-| `discard --file F [--hunk N [--lines a,b]]` | Ungestagte Änderungen wegwerfen (eine ganze Datei: jede Änderung, nicht verfolgte Datei gelöscht). Rückgängig zu machen. |
+| `discard --file F [--hunk N [--lines a,b]]` | Ungestagte Änderungen wegwerfen (eine ganze Datei: jede Änderung, nicht verfolgte Datei gelöscht, samt den Ordnern, die dadurch leer werden). Rückgängig zu machen. |
 | `rm-file <paths>...` | Dateien aus dem Arbeitsverzeichnis löschen. Rückgängig zu machen. |
 | `ignore <pattern> [--file <.gitignore>]` | Ein Muster an eine `.gitignore` anhängen (oder an `.git/info/exclude` mit `--file .git/info/exclude`). Rückgängig zu machen, außer in `.git/info/exclude`. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Schreibt Kodierung, Zeilenenden oder Einrückung von Dateien im Arbeitsverzeichnis um. Binäre, fehlende und nicht kodierbare Dateien werden übersprungen und gemeldet. Ein einziger Rückgängig-Eintrag für den ganzen Stapel. |
@@ -164,7 +164,7 @@ poppt den Stash, unabhängig von `general.auto_stash` ([Auto-Stash](log-and-hist
 
 | Befehl | Was er tut |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Das Standard-Remote, ein Remote oder alle fetchen. Jeder Fetch aktualisiert auch, was jedes Remote an Tags hat (das `remote` von `tag list`), und bereinigt diese Aufzeichnung auch ohne `--prune`. `--prune-tags` (Einstellungen: Auto-Prune Tags) löscht außerdem die lokalen Tags, die das Remote gelöscht hat: nur Tags, die dort lagen, nie einen, den Sie nicht gepusht haben; die Antwort listet sie als `pruned_tags` (git 2.41+). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Das Standard-Remote, ein Remote oder alle fetchen. Remote-Tracking-Branches, die das Remote gelöscht hat, werden bereinigt, außer `general.auto_prune` ist false; `--prune` erzwingt es. Jeder Fetch aktualisiert auch, was jedes Remote an Tags hat (das `remote` von `tag list`), und bereinigt diese Aufzeichnung auch ohne `--prune`. `--prune-tags` (Einstellungen: Auto-Prune Tags) löscht außerdem die lokalen Tags, die das Remote gelöscht hat: nur Tags, die dort lagen, nie einen, den Sie nicht gepusht haben; die Antwort listet sie als `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; der Modus wird git immer ausdrücklich übergeben. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Es gibt kein einfaches Force: nur `--force-with-lease`. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotes. `remote list` markiert einen Remote-Tracking-Namespace ohne Remote dahinter mit `configured: false`; `remote remove` darauf löscht seine Branches (rückgängig zu machen). |

@@ -271,7 +271,7 @@ auto_fetch_interval_minutes_help = "Standard 5. 0 schaltet das Abrufen im Hinter
 fetch_on_tab_open = { git = "Fetch beim Öffnen eines Tabs", local = "Abruf beim Öffnen eines Tabs" }
 fetch_on_tab_open_help = { git = "Fetch All im Hintergrund; übersprungen, wenn in der letzten Minute schon abgerufen wurde.", local = "Alle abrufen im Hintergrund; übersprungen, wenn in der letzten Minute schon abgerufen wurde." }
 auto_prune = "Auto-Prune"
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = "Entfernt bei jedem {$fetch_noun} Remote-Tracking-Branches, die auf dem Remote nicht mehr existieren: Auto-{$fetch} im Hintergrund sowie die {$fetch}-Schaltflächen der Symbolleiste (nicht die Lease-Prüfung des Dialogs für abweichenden {$push_noun}). Standardmäßig an, sodass ein auf dem Server gelöschter Branch nach dem nächsten {$fetch_noun} aus dem Abschnitt REMOTE verschwindet. Schalten Sie es aus, damit veraltete Remote-Tracking-Branches aufgelistet bleiben."
 keep_submodules_up_to_date = "Submodule aktuell halten"
 default_branch_name = "Standard-Branch-Name"
 default_branch_name_help = "Wird beim Initialisieren oder Klonen eines Repositorys verwendet."
@@ -4481,7 +4481,7 @@ file_list_loading = "die Dateiliste dieses Commits lädt noch"
 no_repo_tab = "kein Repository-Tab ist geöffnet"
 commit_now_ai_running = "eine KI-Nachricht wird noch geschrieben - warten Sie, oder brechen Sie sie mit Esc ab"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "Nachricht eingeben, dann {key} für {$commit} drücken"
 no_matching_tab = "kein passender Tab"
 no_matching_theme = "kein passendes Design"
 no_matching_language = "keine passende Sprache"

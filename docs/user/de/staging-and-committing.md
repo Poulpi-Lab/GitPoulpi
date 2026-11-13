@@ -168,15 +168,17 @@ erscheint im anderen.
   ohne die Hooks `pre-commit` und `commit-msg` des Repositorys auszuführen. Es gilt je Commit; unter
   **Einstellungen > Repository-spezifische Einstellungen > Commit** ist es vorab angehakt. Wird gezeigt, wenn die
   Zeile Platz hat.
-- `Ctrl+G c` oder `c` im Status-Bereich setzt den Cursor ins Formular. `Esc` verlässt
-  es.
-- `Ctrl+G Enter` (**Git: Staged Änderungen jetzt committen** in der Palette) ist die
-  Commit-Schaltfläche von überall: Es committet die staged Änderungen mit der Nachricht des
-  Formulars, beachtet **Vorherigen Commit ändern** und **Hooks überspringen** und lässt den
-  Fokus, wo er ist. Ist nichts gestagt oder fehlt die Zusammenfassung, sagt es das und setzt
-  stattdessen den Cursor in die Zusammenfassung. Solange noch eine KI-Anfrage läuft,
-  committet es nichts und meldet das in der Statuszeile (`Esc` bricht die Anfrage ab).
-  `Ctrl+Z` nimmt den Commit wie jeden anderen zurück.
+- `c` im Status-Bereich setzt den Cursor ins Formular. `Esc` verlässt es.
+- `Ctrl+G c` und `Ctrl+G Enter` (**Git: Commit...** und **Git: Staged Änderungen jetzt
+  committen** in der Palette) sind ein und derselbe Befehl, die Commit-Schaltfläche von überall.
+  Mit einer Zusammenfassung im Formular und gestagten Änderungen committet er sofort, beachtet
+  **Vorherigen Commit ändern** und **Hooks überspringen** und lässt den Fokus, wo er ist.
+  Andernfalls committet er nichts: Er setzt den Cursor in die Zusammenfassung des Formulars
+  (und zeigt den Bereich, wenn er ausgeblendet oder eingeklappt war), und die Statuszeile nennt
+  die Tastenkombination, die committet (standardmäßig `Ctrl+Enter`). Ist nichts gestagt, sagt
+  er das. In der Statuszeile wird nichts getippt. Solange noch eine KI-Anfrage läuft, committet
+  er nichts und meldet das (`Esc` bricht die Anfrage ab). `Ctrl+Z` nimmt den Commit wie jeden
+  anderen zurück.
 - Je Repository können die [Einstellungen](settings.md#repository-spezifisch-commit) **nach jedem Commit pushen**, das
   Formular mit einer **Commit-Vorlage** beginnen lassen (und deren `#`-Kommentare aus der Nachricht entfernen) und einen
   Merge zum **Squash** machen: Das Formular öffnet sich dann mit der Squash-Nachricht von Git.

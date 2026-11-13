@@ -267,7 +267,7 @@ robi z lokalnymi zmianami.
 |---|---|
 | **Interwał auto-fetch** | Pobiera wszystkie zdalne repozytoria w tle co taki czas, liczba i jednostka (minuty lub godziny) w jednym wierszu. Domyślnie 5 minut, maksimum 60 minut (1 godzina), `0` wyłącza. `general.auto_fetch_interval_minutes` zostaje w minutach; `general.auto_fetch_interval_unit` tylko zapamiętuje sposób wyświetlania. Wymaga restartu. |
 | **Fetch po otwarciu karty** | Uruchamia w tle fetch wszystkich zdalnych, gdy otwiera się karta repozytorium. Domyślnie włączone. Repozytorium pobrane w ciągu ostatnich 60 sekund nie jest pobierane ponownie. |
-| **Auto-prune** | Fetch usuwa też gałęzie śledzące zdalne, które nie istnieją już na zdalnym repozytorium. Domyślnie wyłączone. |
+| **Auto-prune** | Fetch usuwa też gałęzie śledzące zdalne, które nie istnieją już na zdalnym repozytorium. Domyślnie włączone, więc gałąź usunięta na serwerze (na przykład na GitLabie) znika z sekcji REMOTE po następnym fetchu. Nie można tego cofnąć: wyczyszczona gałąź wraca przy następnym fetchu, jeśli znów pojawi się na zdalnym. |
 | **Auto-prune tagów** | Fetch usuwa też lokalne tagi, które zniknęły ze zdalnego repozytorium. Dotyczy tylko tagów, które tam były: tag, którego nigdy nie wypchnięto (push), zostaje. Domyślnie wyłączone, tak jak w samym git. Wymaga git 2.41 lub nowszego. CLI: `gitpoulpi fetch --prune-tags`; klucz konfiguracji `general.auto_prune_tags`. Zobacz [Gałęzie, tagi i panel Refs](log-and-history.md#gałęzie-tagi-i-panel-refs). |
 | **Aktualizuj submoduły** | Po checkout lub pull aktualizuje submoduły do commitów zapisanych w repozytorium. Zob. [Submoduły](submodules.md). |
 | **Usuń pliki „.orig” po merge** | Po zakończeniu merge usuwa pliki kopii zapasowych `*.orig`. Domyślnie wyłączone. |

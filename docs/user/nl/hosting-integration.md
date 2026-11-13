@@ -716,8 +716,9 @@ snelheidslimiet laat alleen dat profiel mislukken. Antwoorden worden vijf minute
 In Instellingen > Integraties heeft een verbonden codehostprofiel een blok **Radar**
 onder zijn SSH-sleutel: één selectievakje per lijst (*Verzoeken die wachten op mijn review*,
 *Elk openstaand verzoek*, *Concepten meenemen*, *Aan mij toegewezen issues*, de laatste
-afwezig voor hosts zonder issues), een tekstgebied *Namespaces* (één item per regel, met een selectievakje *Reguliere expressies*; leeg
-betekent geen limiet) en de keuze *Verzoek van een
+afwezig voor hosts zonder issues), een tekstgebied *Namespaces* (één item per regel: een naam die overeenkomt met die groep of eigenaar en alles
+daaronder, of een reguliere expressie per regel als *Reguliere expressies* is aangevinkt; leeg betekent
+jouw eigen namespace en elke waartoe je behoort) en de keuze *Verzoek van een
 niet-gekloonde repository*: *Vragen*, *Klonen* of *Reviewen via de API*.
 Alles wordt opgeslagen terwijl je wijzigt. Hosts zonder accountbrede query (Bitbucket
 Cloud) tonen in plaats daarvan één regel die dat zegt. Het opdrachtenpalet bereikt het blok

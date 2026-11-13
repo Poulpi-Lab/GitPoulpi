@@ -504,7 +504,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Деталі commit'у: скинути розмір повідомлення |  |
 | Деталі commit'у: прокрутити повідомлення вниз |  |
 | Деталі commit'у: прокрутити повідомлення вгору |  |
-| Commit Details: Open Link in Message... |  |
+| Деталі commit'у: відкрити посилання з повідомлення... |  |
 | Файли: сортування файлів commit'у (А-Я / Я-А) |  |
 | Refs: checkout вибраного ref | `подвійне клацання` |
 | Refs: копіювати назву ref |  |
@@ -1188,8 +1188,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Лаунчер: видалити псевдонім команди |  |
 | Лаунчер: додати до PATH |  |
 | Лаунчер: прибрати з PATH |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| Лаунчер: установити меню «Відкрити в GitPoulpi» |  |
+| Лаунчер: видалити меню «Відкрити в GitPoulpi» |  |
 | Застосунок: змінити колірну тему графа... | `Ctrl+N Y` |
 | Застосунок: перемкнути підсвітку рядків графа | `Ctrl+N T` |
 <!-- palette:end -->

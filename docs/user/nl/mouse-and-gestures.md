@@ -117,6 +117,7 @@ GitPoulpi onthoudt elke grootte. Zie
   tabblad en op het tabblad onder de aanwijzer) om het te sluiten. **Sleep een tabblad** opzij
   om de volgorde te wijzigen. **Klik met rechts op een tabblad** voor het tabbladmenu.
 - **Middenklik op een tabblad** om het te sluiten, zoals zijn `x`.
+- **Klik op `‹` of `›`** aan de uiteinden van de tabbladen (zichtbaar als ze niet allemaal passen) om de rij één tabblad te scrollen; houd de knop ingedrukt om te blijven scrollen, of gebruik het wiel boven de rij. Een tabblad op een pijl slepen scrolt de rij ook. De rij scrolt ook vanzelf om het huidige tabblad te tonen zodra het verandert.
 - **Klik op de `+`** na het laatste tabblad voor een menu: Nieuw tabblad (`Alt+T`) en, zolang hun tabbladen gesloten zijn, Radar en Werkruimtes (`Alt+J`).
 - **Klik op het huispictogram** voor het tabblad Start.
 - **Klik op het tabblad Radar of Werkruimtes** om het te openen; zijn `x`, een middenklik of `Ctrl+W` sluit het. **Klik op de werkruimtechip** (`Alt+W`) om van werkruimte te wisselen.

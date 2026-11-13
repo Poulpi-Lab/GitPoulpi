@@ -208,7 +208,8 @@ daarna [Aan de slag](getting-started.md).
 ## Verwijderen
 
 `gitpoulpi uninstall` (wat beide installatieprogramma's uitvoeren) verwijdert de
-opdrachtaliassen, de PATH-items en de snelkoppelingen die GitPoulpi heeft gemaakt, en
+opdrachtaliassen, de PATH-items, de snelkoppelingen en de items van het bestandsbeheermenu (met hun
+App Paths-sleutel op Windows) die GitPoulpi heeft gemaakt, en
 daarna de programmabestanden van een releaseinstallatie; het weigert op een build zonder
 het bestand `.gitpoulpi-dist` (een cargo-build), en `--keep-files` laat de
 programmabestanden staan. Het is niet beschikbaar voor MCP-agents. Zonder

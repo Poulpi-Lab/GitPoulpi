@@ -3003,7 +3003,7 @@ commit_details_shrink_message = { git = "Commit-details: Bericht verkleinen", lo
 commit_details_reset_message_size = { git = "Commit-details: Berichtgrootte resetten", local = "Commitdetails: Berichtgrootte resetten" }
 commit_details_scroll_message_down = { git = "Commit-details: Bericht omlaag scrollen", local = "Commitdetails: Bericht omlaag scrollen" }
 commit_details_scroll_message_up = { git = "Commit-details: Bericht omhoog scrollen", local = "Commitdetails: Bericht omhoog scrollen" }
-commit_details_open_link = "{$Commit} Details: Open Link in Message..."
+commit_details_open_link = { git = "{$Commit}-details: Link in bericht openen...", local = "{$Commit}details: Link in bericht openen..." }
 files_toggle_commit_file_sort_a_z_z_a = { git = "Bestanden: Sortering commit-bestanden omschakelen (A-Z / Z-A)", local = "Bestanden: Sortering commitbestanden omschakelen (A-Z / Z-A)" }
 refs_checkout_selected_ref = "Refs: Geselecteerde ref uitchecken"
 refs_copy_ref_name = "Refs: Refnaam kopiëren"
@@ -4165,8 +4165,8 @@ quit_cd = "Afsluiten en je shell in de map van dit tabblad achterlaten (vereist 
 repo_management = "Repositorybeheer: een repository openen, klonen of maken"
 insert_issue_ref = "Een issue-verwijzing invoegen"
 tab_overflow = "Alle tabbladen"
-tab_scroll_left = "Scroll the tabs left"
-tab_scroll_right = "Scroll the tabs right"
+tab_scroll_left = "Tabbladen naar links scrollen"
+tab_scroll_right = "Tabbladen naar rechts scrollen"
 
 [footer_hint]
 lead = "{key}: "
@@ -5780,22 +5780,22 @@ palette_alias_create = "Starter: Opdrachtalias maken"
 palette_alias_remove = "Starter: Opdrachtalias verwijderen"
 palette_path_add = "Starter: Toevoegen aan PATH"
 palette_path_remove = "Starter: Verwijderen uit PATH"
-folder_menu_heading = "File manager menu"
-folder_menu_status = "Open in GitPoulpi"
-folder_menu_label = "Open in GitPoulpi"
-folder_menu_detected = "Detected"
-folder_menu_none_detected = "no supported file manager found"
-folder_menu_install = "Install"
-folder_menu_remove = "Remove"
-folder_menu_needs_helper = "needs the gitpoulpi launcher next to GitPoulpi"
-folder_menu_help_windows = "Adds Open in GitPoulpi to the right-click menu of folders, folder backgrounds and drives (your user only, no admin), and lets you type gitpoulpi in the File Explorer address bar. On Windows 11 it is under Show more options (Shift+F10)."
-folder_menu_help_linux = "Adds Open in GitPoulpi to the right-click menu of folders in the file managers found here. Only the files GitPoulpi wrote are removed; your own Thunar actions stay."
-folder_menu_help_macos = "Adds an Open in GitPoulpi Quick Action for folders in Finder (right-click > Quick Actions). Finder has no menu for the folder background."
-done_folder_menu_installed = "Installed Open in GitPoulpi: {managers}"
-done_folder_menu_removed = "Removed Open in GitPoulpi: {managers}"
-done_folder_menu_nothing = "No Open in GitPoulpi menu to remove"
-palette_folder_menu_install = "Launcher: Install Open in GitPoulpi Menu"
-palette_folder_menu_remove = "Launcher: Remove Open in GitPoulpi Menu"
+folder_menu_heading = "Bestandsbeheermenu"
+folder_menu_status = "Openen in GitPoulpi"
+folder_menu_label = "Openen in GitPoulpi"
+folder_menu_detected = "Gevonden"
+folder_menu_none_detected = "geen ondersteunde bestandsbeheerder gevonden"
+folder_menu_install = "Installeren"
+folder_menu_remove = "Verwijderen"
+folder_menu_needs_helper = "vereist de gitpoulpi-starter naast GitPoulpi"
+folder_menu_help_windows = "Voegt Openen in GitPoulpi toe aan het rechtsklikmenu van mappen, mapachtergronden en schijven (alleen voor jouw gebruiker, geen beheerdersrechten nodig) en laat je gitpoulpi typen in de adresbalk van Verkenner. In Windows 11 staat het onder Meer opties weergeven (Shift+F10)."
+folder_menu_help_linux = "Voegt Openen in GitPoulpi toe aan het rechtsklikmenu van mappen in de hier gevonden bestandsbeheerders. Alleen de bestanden die GitPoulpi schreef worden verwijderd; je eigen Thunar-acties blijven staan."
+folder_menu_help_macos = "Voegt een Snelle actie Openen in GitPoulpi toe voor mappen in Finder (rechtsklik > Snelle acties). Finder heeft geen menu voor de achtergrond van een map."
+done_folder_menu_installed = "Openen in GitPoulpi geïnstalleerd: {managers}"
+done_folder_menu_removed = "Openen in GitPoulpi verwijderd: {managers}"
+done_folder_menu_nothing = "Geen menu Openen in GitPoulpi om te verwijderen"
+palette_folder_menu_install = "Starter: Menu Openen in GitPoulpi installeren"
+palette_folder_menu_remove = "Starter: Menu Openen in GitPoulpi verwijderen"
 
 [sparse]
 palette = "Repository: Gedeeltelijke checkout..."
@@ -9382,20 +9382,20 @@ why_no_dialog = "er is geen dialoog open dat kan worden geschikt"
 
 [link_confirm]
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
-title = "Open this link?"
+title = "Deze link openen?"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
+body = "Dit adres komt uit tekst in het bericht van een {$commit}. Controleer het voordat je het in je browser opent:"
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
-position = "Link {n} of {total}"
+position = "Link {n} van {total}"
 # context: button that opens the address in the browser
-open = "Open"
+open = "Openen"
 # context: button that shows the next address of the message
-next = "Next"
+next = "Volgende"
 # context: key of the Open button, one letter (shown as "Open (O)")
 key_open = "o"
 # context: key of the Next button, one letter
-key_next = "n"
+key_next = "v"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "a"
 # context: status line; the message in view holds no web address to open
-none = "no link in this message"
+none = "geen link in dit bericht"

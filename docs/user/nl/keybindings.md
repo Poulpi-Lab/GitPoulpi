@@ -514,7 +514,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Commit-details: Berichtgrootte resetten |  |
 | Commit-details: Bericht omlaag scrollen |  |
 | Commit-details: Bericht omhoog scrollen |  |
-| Commit Details: Open Link in Message... |  |
+| Commit-details: Link in bericht openen... |  |
 | Bestanden: Sortering commit-bestanden omschakelen (A-Z / Z-A) |  |
 | Refs: Geselecteerde ref uitchecken | `dubbelklik` |
 | Refs: Refnaam kopiëren |  |
@@ -1198,8 +1198,8 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Starter: Opdrachtalias verwijderen |  |
 | Starter: Toevoegen aan PATH |  |
 | Starter: Verwijderen uit PATH |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| Starter: Menu Openen in GitPoulpi installeren |  |
+| Starter: Menu Openen in GitPoulpi verwijderen |  |
 | App: Kleurthema van de grafiek wijzigen... | `Ctrl+N Y` |
 | App: Rijkleuring van de grafiek omschakelen | `Ctrl+N T` |
 <!-- palette:end -->

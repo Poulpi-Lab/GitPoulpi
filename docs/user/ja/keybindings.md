@@ -476,7 +476,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Commit詳細: メッセージのサイズをリセット |  |
 | Commit詳細: メッセージを下へスクロール |  |
 | Commit詳細: メッセージを上へスクロール |  |
-| Commit Details: Open Link in Message... |  |
+| Commit詳細: メッセージ内のリンクを開く... |  |
 | ファイル: Commitのファイル並び順を切り替え（A-Z / Z-A） |  |
 | Refs: 選択中の参照をチェックアウト | `ダブルクリック` |
 | Refs: 参照名をコピー |  |
@@ -1160,8 +1160,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ランチャー: コマンドのエイリアスを削除 |  |
 | ランチャー: PATH に追加 |  |
 | ランチャー: PATH から削除 |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| ランチャー: 「GitPoulpi で開く」メニューをインストール |  |
+| ランチャー: 「GitPoulpi で開く」メニューを削除 |  |
 | アプリ: グラフのカラーテーマを変更... | `Ctrl+N Y` |
 | アプリ: グラフの行の色付けを切り替え | `Ctrl+N T` |
 <!-- palette:end -->

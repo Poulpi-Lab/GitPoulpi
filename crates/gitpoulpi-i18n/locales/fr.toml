@@ -5808,8 +5808,8 @@ folder_menu_help_macos = "Adds an Open in GitPoulpi Quick Action for folders in 
 done_folder_menu_installed = "Installed Open in GitPoulpi: {managers}"
 done_folder_menu_removed = "Removed Open in GitPoulpi: {managers}"
 done_folder_menu_nothing = "No Open in GitPoulpi menu to remove"
-palette_folder_menu_install = "Launcher: Install Open in GitPoulpi Menu"
-palette_folder_menu_remove = "Launcher: Remove Open in GitPoulpi Menu"
+palette_folder_menu_install = "Lanceur : Installer le menu Ouvrir dans GitPoulpi"
+palette_folder_menu_remove = "Lanceur : Supprimer le menu Ouvrir dans GitPoulpi"
 
 [sparse]
 palette = "Dépôt : Extraction partielle..."

@@ -1188,6 +1188,8 @@ die Standardtasten.
 | Starter: Befehlsalias entfernen |  |
 | Starter: Zum PATH hinzufügen |  |
 | Starter: Aus dem PATH entfernen |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | App: Farbschema des Graphen wechseln... | `Ctrl+N Y` |
 | App: Zeilenfärbung des Graphen umschalten | `Ctrl+N T` |
 <!-- palette:end -->

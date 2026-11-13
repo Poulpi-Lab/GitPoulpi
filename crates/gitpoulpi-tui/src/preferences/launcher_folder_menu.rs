@@ -68,6 +68,11 @@ impl FolderMenuState {
         self.rx.is_some() || self.pending.is_some()
     }
 
+    /// The machine was read at least once.
+    pub(super) fn has_read(&self) -> bool {
+        self.snapshot.is_some()
+    }
+
     #[cfg(test)]
     pub(super) fn is_idle(&self) -> bool {
         !self.busy()

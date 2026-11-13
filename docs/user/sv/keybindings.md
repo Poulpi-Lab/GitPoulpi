@@ -1195,6 +1195,8 @@ Tangenterna är standardvärdena.
 | Startare: Ta bort kommandoalias |  |
 | Startare: Lägg till i PATH |  |
 | Startare: Ta bort från PATH |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | App: Byt färgtema för grafen... | `Ctrl+N Y` |
 | App: Växla radfärgning i grafen | `Ctrl+N T` |
 <!-- palette:end -->

@@ -1195,6 +1195,8 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Lanceur : Supprimer l'alias de commande |  |
 | Lanceur : Ajouter au PATH |  |
 | Lanceur : Retirer du PATH |  |
+| Lanceur : Installer le menu Ouvrir dans GitPoulpi |  |
+| Lanceur : Supprimer le menu Ouvrir dans GitPoulpi |  |
 | Application : Changer le thème de couleurs du graphe... | `Ctrl+N Y` |
 | Application : Basculer la teinte de ligne du graphe | `Ctrl+N T` |
 <!-- palette:end -->

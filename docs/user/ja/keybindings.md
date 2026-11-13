@@ -1159,6 +1159,8 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | ランチャー: コマンドのエイリアスを削除 |  |
 | ランチャー: PATH に追加 |  |
 | ランチャー: PATH から削除 |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | アプリ: グラフのカラーテーマを変更... | `Ctrl+N Y` |
 | アプリ: グラフの行の色付けを切り替え | `Ctrl+N T` |
 <!-- palette:end -->

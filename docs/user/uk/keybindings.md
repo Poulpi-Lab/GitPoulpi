@@ -1187,6 +1187,8 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Лаунчер: видалити псевдонім команди |  |
 | Лаунчер: додати до PATH |  |
 | Лаунчер: прибрати з PATH |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | Застосунок: змінити колірну тему графа... | `Ctrl+N Y` |
 | Застосунок: перемкнути підсвітку рядків графа | `Ctrl+N T` |
 <!-- palette:end -->

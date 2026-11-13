@@ -1159,6 +1159,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 启动器：移除命令别名 |  |
 | 启动器：添加到 PATH |  |
 | 启动器：从 PATH 中移除 |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | 应用：更改图配色主题… | `Ctrl+N Y` |
 | 应用：切换图行着色 | `Ctrl+N T` |
 <!-- palette:end -->

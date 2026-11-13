@@ -1193,6 +1193,8 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Launcher: Remove Command Alias |  |
 | Launcher: Add to PATH |  |
 | Launcher: Remove from PATH |  |
+| Launcher: Install Open in GitPoulpi Menu |  |
+| Launcher: Remove Open in GitPoulpi Menu |  |
 | App: Change Graph Color Theme... | `Ctrl+N Y` |
 | App: Toggle Graph Row Tints | `Ctrl+N T` |
 <!-- palette:end -->

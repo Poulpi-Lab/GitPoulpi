@@ -147,6 +147,7 @@ GitPoulpi her boyutu hatırlar. Bkz.
   tıklayın** (etkin sekmede ve imlecin altındaki sekmede görünür). Sırasını
   değiştirmek için bir **sekmeyi yana sürükleyin**. Sekme menüsü için **sekmeye sağ tıklayın**.
 - Bir sekmeyi kapatmak için **orta tıklayın**, `x`'i gibi.
+- Sekmeler sığmadığında uçlarında görünen **`‹` veya `›` düğmesine tıklayın**: satır bir sekme kayar; kaydırmayı sürdürmek için düğmeyi basılı tutun ya da satırın üzerinde tekerleği kullanın. Bir sekmeyi oka sürüklemek de satırı kaydırır. Satır, geçerli sekme her değiştiğinde onu göstermek için kendiliğinden de kayar.
 - Son sekmenin ardından **`+`'ya tıklayın**: bir menü açılır, Yeni sekme (`Alt+T`) ve sekmeleri kapalıyken Radar ile Çalışma alanları (`Alt+J`).
 - Ana sekme için **ev simgesine tıklayın**.
 - Açmak için **Radar veya Çalışma alanları sekmesine tıklayın**; `x`'i, orta tık ya da `Ctrl+W` onu kapatır. Çalışma alanını değiştirmek için **çalışma alanı rozetine tıklayın** (`Alt+W`).

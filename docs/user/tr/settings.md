@@ -219,7 +219,7 @@ olmayan bir kısayol için) ve **Kaldır** vardır.
 | Sistem | Takma ad | PATH |
 |---|---|---|
 | Linux, macOS | `~/.local/bin/<ad>` yolunda `gitpoulpi-tui` programına bir sembolik bağlantı. Bir bağlantı işaret taşıyamaz; bu yüzden hedefi `gitpoulpi-tui` adlı bir dosyaysa bize ait sayılır. Sıradan bir dosya ya da başka bir şeye giden bir bağlantı **bize ait değildir** ve asla değiştirilmez veya kaldırılmaz. | `~/.bashrc` ve `~/.zshrc` içinde (hangisi varsa; ikisi de yoksa macOS'ta `~/.zshrc`, başka yerlerde `~/.bashrc`) `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` ile `# <<< GitPoulpi PATH <<<` arasındaki bir blok; fish yapılandırılmışsa ayrıca `~/.config/fish/conf.d/gitpoulpi-path.fish`. Kaldır yalnızca bloğu (veya fish dosyasını) siler. |
-| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<ad>.cmd`, `REM X-GitPoulpi=1` içeren iki satırlık bir ara betik. | `HKCU\Environment` içindeki kullanıcı PATH'i; PowerShell ile yazılır, sonra yeni programların görmesi için bir `WM_SETTINGCHANGE` yayını yapılır. `GitPoulpiPathAdded` değeri eklenenleri kaydeder ve Kaldır yalnızca onu çıkarır. |
+| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<ad>.cmd`, `REM X-GitPoulpi=1` içeren kısa bir ara betik (ayrıca adres çubuğundan başlatmanın tanınmasını sağlayan `GITPOULPI_CMDCMDLINE` değişkenini dışa aktarır). | `HKCU\Environment` içindeki kullanıcı PATH'i; PowerShell ile yazılır, sonra yeni programların görmesi için bir `WM_SETTINGCHANGE` yayını yapılır. `GitPoulpiPathAdded` değeri eklenenleri kaydeder ve Kaldır yalnızca onu çıkarır. |
 
 Yeni terminaller PATH değişikliğini görür, zaten açık olanlar görmez. İki eylem de geri alma
 geçmişine yazılmaz: bunlar için Geri Al yoktur, geri dönüş yolu **Kaldır**'dır.
@@ -228,6 +228,31 @@ Palette aynı eylemler vardır (**Başlatıcı: kısayol oluştur**, **Başlatı
 oluştur**, **Başlatıcı: kısayolları kaldır**, **Başlatıcı: komut takma adı oluştur**,
 **Başlatıcı: komut takma adını kaldır**, **Başlatıcı: PATH'e ekle**, **Başlatıcı: PATH'ten kaldır**); bir betikten `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` aynısını yapar.
+
+#### Dosya Gezgini adres çubuğuna yazmak (Windows)
+
+Bir Dosya Gezgini penceresinin adres çubuğuna takma adı (`gp`) veya `gitpoulpi` yazıp Enter'a basın: GitPoulpi, **Kısayollar için terminal** ayarındaki terminalde, pencerenin gösterdiği klasörde açılır ve **Son sekme**'yi açmaz. **Tıklamada açık pencereyi göster** açıkken ve bir GitPoulpi zaten açıksa, klasör bunun yerine o pencerenin yeni bir sekmesi olur.
+
+- **`gp` (komut takma adı).** Takma ad oluşturulunca `gp.exe` de `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` altına, `gitpoulpi-launch.exe` dosyasını gösterecek şekilde kaydedilir; Kaldır bu anahtarı siler (yalnızca bize aitse). Takma adın klasörü PATH'inizdeyse (**GitPoulpi'yi PATH'e ekle**), Windows önce `.cmd` ara betiğini çalıştırır ve GitPoulpi görünmeden önce bir konsol penceresi kısa süre yanıp sönebilir. Eski bir sürümün yazdığı ara betik, Ayarlar takma adı okuduğunda otomatik olarak yeniden yazılır.
+- **`gitpoulpi`.** **Dosya yöneticisi menüsü** kuruluyken çalışır: Kur, `gitpoulpi.exe` dosyasını da App Paths altına kaydeder. Menü yoksa `gitpoulpi` yalnızca GitPoulpi'nin klasörü PATH'teyse bulunur; o zaman konsol yukarıdaki gibi yanıp sönebilir.
+
+Linux ve macOS'ta karşılığı yoktur: dosya yöneticilerinin konum çubukları program çalıştırmaz. **Dosya yöneticisi menüsü** girdisini veya bir terminaldeki komut takma adını kullanın.
+
+#### Dosya yöneticisi menüsü (GitPoulpi'de aç)
+
+Kısayolların altındaki **Dosya yöneticisi menüsü** satırları, klasörlerin sağ tık menüsüne **GitPoulpi'de aç** girdisini ekler. Her dosya yöneticisi için bir durum satırı vardır (Linux'ta burada bulunan her dosya yöneticisi için ve girdiyi hâlâ tutan her biri için; bulunanları bir **Algılanan** satırı listeler), ardından **Kur** ve **Kaldır** düğmeleri gelir. **Kur**, bulunan her dosya yöneticisi için girdiyi yazar; **Kaldır** önce sorar, sonra o dosya yöneticisi hâlâ kurulu olsun olmasın Kur'un yazdığının tamamını kaldırır.
+
+Girdi `gitpoulpi launch --folder <klasör>` komutunu çalıştırır (Windows'ta konsolsuz `gitpoulpi-launch.exe --folder`); tıklandığında ne yapılacağına bu komut karar verir: **Tıklamada açık pencereyi göster** açıkken ve bir GitPoulpi penceresi açıkken, bir deponun içindeki klasör en son kullanılan pencerenin yeni bir sekmesi olur ve pencere öne gelir; aksi halde **Kısayollar için terminal** ayarındaki terminal GitPoulpi'yi o klasörde başlatır. Bu yüzden terminali değiştirmek girdiyi hiçbir zaman güncel dışı bırakmaz; taşınmış bir exe veya yeni bir logo rengi bırakır ve GitPoulpi kendi girdilerini kısayollar gibi otomatik olarak yeniden yazar (hiçbir zaman yenisini oluşturmaz). Girdi, GitPoulpi'nin yanında başlatıcı yardımcısını (`gitpoulpi` veya Windows'ta `gitpoulpi-launch.exe`) gerektirir; yoksa satır bunu söyler ve düğmeler kapalı kalır.
+
+| Sistem | Kur ne yazar |
+|---|---|
+| Windows | Kullanıcı başına anahtarlar, yönetici hakkı gerekmez: `HKCU\Software\Classes\Directory\shell\GitPoulpi`, `Directory\Background\shell\GitPoulpi` ve `Drive\shell\GitPoulpi`; her birinde bir `command` alt anahtarı vardır, böylece girdi bir klasörde, açık bir klasörün arka planında ve bir sürücüde görünür. Her anahtar bir `X-GitPoulpi` değeri taşır; bu değeri olmayan bir anahtar **bize ait değildir** ve ona dokunulmaz. Ayrıca `gitpoulpi.exe` dosyasını, `gitpoulpi-launch.exe` dosyasını gösterecek şekilde `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` altına kaydeder. Windows 11'de girdi yalnızca klasik menüdedir: **Daha fazla seçenek göster**, Shift+F10 veya Shift+sağ tık (yeni üst düzey menü yalnızca paketlenmiş uygulamaları listeler). Kaldır kendi anahtarlarımızı siler, ardından Kur'un oluşturduğu üst anahtarları, yalnızca boş kaldılarsa. |
+| Linux | Yalnızca PATH'te bulunan dosya yöneticileri için. GNOME Dosyalar ve Caja: `~/.local/share/nautilus/scripts` veya `~/.config/caja/scripts` içinde girdinin adını taşıyan bir betik (**Betikler** alt menüsünde). Dolphin: `~/.local/share/kio/servicemenus/gitpoulpi-open.desktop`, çalıştırılabilir (KDE Frameworks 6, çalıştırılabilir olmayan kullanıcı servis menüsünü yok sayar; 5.85 öncesi KDE Frameworks 5 desteklenmez). Nemo: `~/.local/share/nemo/actions` içinde iki eylem (seçili bir klasör, arka plan). Thunar: `~/.config/Thunar/uca.xml` içine birleştirilen tek bir eylem; kendi eylemleriniz kalır ve Kaldır dosyayı bayt bayt geri verir (Kur oluşturduysa siler). PCManFM ve PCManFM-Qt: `~/.local/share/file-manager/actions/gitpoulpi-open.desktop`. Simge `~/.local/share/icons/hicolor/256x256/apps/gitpoulpi-folder.png` yoluna gider ve son girdiyle birlikte kalkar. `XDG_DATA_HOME` ve `XDG_CONFIG_HOME` dikkate alınır. Girdi seçili bir klasörde ve dosya yöneticisinin sunduğu yerlerde klasör arka planında görünür. |
+| macOS | Bir Hızlı İşlem, `~/Library/Services/Open in GitPoulpi.workflow`: Finder'da bir klasöre sağ tıklayın, sonra **Hızlı İşlemler**. Yalnızca seçili klasörler (Finder'da klasör arka planı için menü yoktur). İlk seferde Sistem Ayarları > Klavye > Klavye Kısayolları > Hizmetler altında açılması gerekebilir. |
+
+GitPoulpi'nin yazdığı her dosya ve anahtar `X-GitPoulpi=1` işaretini taşır (bir betikte `# X-GitPoulpi=1` satırı) ve Kaldır yalnızca işaretli olanları siler. Bu eylemler bir depoyu değil sisteminizi değiştirir: Geri Al bunları kapsamaz, geri dönüş yolu **Kaldır**'dır. Linux ve macOS'ta dosya yöneticilerinin konum çubukları program çalıştırmaz, orada yazılacak bir şey yoktur; bir terminalde komut takma adı vardır.
+
+Palette **Başlatıcı: GitPoulpi'de Aç Menüsünü Kur** ve **Başlatıcı: GitPoulpi'de Aç Menüsünü Kaldır** vardır; bir betikten `gitpoulpi desktop folder-menu status|install|remove` aynısını yapar.
 
 ### Eşitleme
 

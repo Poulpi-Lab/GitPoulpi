@@ -8752,8 +8752,8 @@ include_drafts = "ドラフトを含める"
 assigned_issues = "自分に割り当てられた課題"
 # context: field label: orgs, groups or workspaces the account-wide lists are limited to
 namespaces = "名前空間"
-# context: hint in the empty namespaces field
-namespaces_hint = "例: acme, platform（空: 自分と所属するすべて）"
+# context: hint in the empty Namespaces text area (one entry per line)
+namespaces_hint = "1 行に 1 項目、例: acme（空欄: 自分と所属するすべて）"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
 namespaces_help = "1 行に 1 項目。名前は、そのグループまたは所有者と、その配下すべてに一致します（ptm は ptm/produits/x に一致し、ptmx/y には一致しません）。空欄にすると、自分自身と所属するすべてに一致します。"
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is

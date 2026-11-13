@@ -723,8 +723,10 @@ limite de débit fait échouer ce profil seulement. Les réponses sont réutilis
 Dans Paramètres > Intégrations, un profil d'hébergeur de code connecté a un bloc **Radar**
 sous sa clé SSH : une case par liste (*Demandes en attente de ma relecture*,
 *Toutes les demandes ouvertes*, *Inclure les brouillons*, *Tickets qui me sont assignés*, cette dernière
-absente pour les hébergeurs sans tickets), une zone *Espaces de noms* (une entrée par ligne, avec une case *Expressions régulières* ; vide
-signifie pas de limite) et le choix *Demande d'un dépôt non cloné* : *Demander*,
+absente pour les hébergeurs sans tickets), une zone *Espaces de noms* (une entrée par ligne : un nom qui correspond à ce groupe ou
+propriétaire et à tout ce qu'il contient, ou une expression régulière par ligne quand
+*Expressions régulières* est cochée ; vide signifie le vôtre et tous ceux dont vous êtes
+membre) et le choix *Demande d'un dépôt non cloné* : *Demander*,
 *Le cloner* ou *Relire via l'API*.
 Tout est enregistré dès que vous le changez. Les hébergeurs sans requête à l'échelle du compte (Bitbucket
 Cloud) montrent à la place une ligne qui le dit. La palette de commandes atteint le bloc

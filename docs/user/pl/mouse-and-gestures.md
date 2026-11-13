@@ -133,6 +133,7 @@ GitPoulpi zapamiętuje każdy rozmiar. Zob.
   i na karcie pod wskaźnikiem), by ją zamknąć. **Przeciągnij kartę** w bok, aby zmienić jej
   kolejność. **Kliknij kartę prawym przyciskiem**, by zobaczyć menu karty.
 - **Kliknij kartę środkowym przyciskiem**, by ją zamknąć, tak jak jej `x`.
+- **Kliknij `‹` lub `›`** na końcach kart (widoczne, gdy się nie mieszczą), by przewinąć rząd o jedną kartę; przytrzymaj przycisk, by przewijać dalej, albo użyj kółka nad rzędem. Przeciągnięcie karty na strzałkę też przewija rząd. Rząd sam się też przewija, by pokazać bieżącą kartę, gdy tylko się zmieni.
 - **Kliknij `+`** za ostatnią kartą, by otworzyć menu: Nowa karta (`Alt+T`) oraz, gdy ich karty są zamknięte, Radar i Obszary robocze (`Alt+J`).
 - **Kliknij ikonę domu**, by przejść do karty Home.
 - **Kliknij kartę Radar lub Obszary robocze**, by ją otworzyć; jej `x`, kliknięcie środkowym przyciskiem albo `Ctrl+W` ją zamyka. **Kliknij plakietkę obszaru roboczego** (`Alt+W`), by przełączyć obszar roboczy.

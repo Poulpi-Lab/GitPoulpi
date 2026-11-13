@@ -3001,7 +3001,7 @@ commit_details_shrink_message = { git = "Szczegóły commita: Pomniejsz opis", l
 commit_details_reset_message_size = { git = "Szczegóły commita: Resetuj rozmiar opisu", local = "Szczegóły zatwierdzenia: Resetuj rozmiar opisu" }
 commit_details_scroll_message_down = { git = "Szczegóły commita: Przewiń opis w dół", local = "Szczegóły zatwierdzenia: Przewiń opis w dół" }
 commit_details_scroll_message_up = { git = "Szczegóły commita: Przewiń opis w górę", local = "Szczegóły zatwierdzenia: Przewiń opis w górę" }
-commit_details_open_link = "{$Commit} Details: Open Link in Message..."
+commit_details_open_link = { git = "Szczegóły commita: Otwórz link w opisie...", local = "Szczegóły zatwierdzenia: Otwórz link w opisie..." }
 files_toggle_commit_file_sort_a_z_z_a = { git = "Pliki: Przełącz sortowanie plików commita (A-Z / Z-A)", local = "Pliki: Przełącz sortowanie plików zatwierdzenia (A-Z / Z-A)" }
 refs_checkout_selected_ref = "Refs: Checkout zaznaczonego refu"
 refs_copy_ref_name = "Refs: Kopiuj nazwę refu"
@@ -4163,8 +4163,8 @@ quit_cd = "Zakończ, zostawiając powłokę w folderze tej karty (wymaga wrapper
 repo_management = "Zarządzanie repozytoriami: otwórz, sklonuj lub utwórz repozytorium"
 insert_issue_ref = "Wstaw odwołanie do zgłoszenia"
 tab_overflow = "Wszystkie karty"
-tab_scroll_left = "Scroll the tabs left"
-tab_scroll_right = "Scroll the tabs right"
+tab_scroll_left = "Przewiń karty w lewo"
+tab_scroll_right = "Przewiń karty w prawo"
 
 [footer_hint]
 lead = "{key}: "
@@ -5783,22 +5783,22 @@ palette_alias_create = "Uruchamianie: Utwórz alias polecenia"
 palette_alias_remove = "Uruchamianie: Usuń alias polecenia"
 palette_path_add = "Uruchamianie: Dodaj do PATH"
 palette_path_remove = "Uruchamianie: Usuń z PATH"
-folder_menu_heading = "File manager menu"
-folder_menu_status = "Open in GitPoulpi"
-folder_menu_label = "Open in GitPoulpi"
-folder_menu_detected = "Detected"
-folder_menu_none_detected = "no supported file manager found"
-folder_menu_install = "Install"
-folder_menu_remove = "Remove"
-folder_menu_needs_helper = "needs the gitpoulpi launcher next to GitPoulpi"
-folder_menu_help_windows = "Adds Open in GitPoulpi to the right-click menu of folders, folder backgrounds and drives (your user only, no admin), and lets you type gitpoulpi in the File Explorer address bar. On Windows 11 it is under Show more options (Shift+F10)."
-folder_menu_help_linux = "Adds Open in GitPoulpi to the right-click menu of folders in the file managers found here. Only the files GitPoulpi wrote are removed; your own Thunar actions stay."
-folder_menu_help_macos = "Adds an Open in GitPoulpi Quick Action for folders in Finder (right-click > Quick Actions). Finder has no menu for the folder background."
-done_folder_menu_installed = "Installed Open in GitPoulpi: {managers}"
-done_folder_menu_removed = "Removed Open in GitPoulpi: {managers}"
-done_folder_menu_nothing = "No Open in GitPoulpi menu to remove"
-palette_folder_menu_install = "Launcher: Install Open in GitPoulpi Menu"
-palette_folder_menu_remove = "Launcher: Remove Open in GitPoulpi Menu"
+folder_menu_heading = "Menu menedżera plików"
+folder_menu_status = "Otwórz w GitPoulpi"
+folder_menu_label = "Otwórz w GitPoulpi"
+folder_menu_detected = "Wykryto"
+folder_menu_none_detected = "nie znaleziono obsługiwanego menedżera plików"
+folder_menu_install = "Zainstaluj"
+folder_menu_remove = "Usuń"
+folder_menu_needs_helper = "wymaga programu gitpoulpi obok GitPoulpi"
+folder_menu_help_windows = "Dodaje Otwórz w GitPoulpi do menu prawego przycisku folderów, teł folderów i dysków (tylko dla twojego użytkownika, bez uprawnień administratora) i pozwala wpisać gitpoulpi w pasku adresu Eksploratora plików. W Windows 11 jest pod Pokaż więcej opcji (Shift+F10)."
+folder_menu_help_linux = "Dodaje Otwórz w GitPoulpi do menu prawego przycisku folderów w znalezionych tu menedżerach plików. Usuwane są tylko pliki zapisane przez GitPoulpi; twoje własne akcje Thunara zostają."
+folder_menu_help_macos = "Dodaje szybką czynność Otwórz w GitPoulpi dla folderów w Finderze (prawy przycisk > Szybkie czynności). Finder nie ma menu dla tła folderu."
+done_folder_menu_installed = "Zainstalowano Otwórz w GitPoulpi: {managers}"
+done_folder_menu_removed = "Usunięto Otwórz w GitPoulpi: {managers}"
+done_folder_menu_nothing = "Nie ma menu Otwórz w GitPoulpi do usunięcia"
+palette_folder_menu_install = "Uruchamianie: Zainstaluj menu Otwórz w GitPoulpi"
+palette_folder_menu_remove = "Uruchamianie: Usuń menu Otwórz w GitPoulpi"
 
 [sparse]
 palette = "Repozytorium: Częściowy checkout..."
@@ -9383,20 +9383,20 @@ why_no_dialog = "nie ma otwartego okna, które można ustawiać"
 
 [link_confirm]
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
-title = "Open this link?"
+title = "Otworzyć ten link?"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
+body = { git = "Ten adres pochodzi z tekstu w opisie commita. Sprawdź go, zanim otworzysz go w przeglądarce:", local = "Ten adres pochodzi z tekstu w opisie zatwierdzenia. Sprawdź go, zanim otworzysz go w przeglądarce:" }
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
-position = "Link {n} of {total}"
+position = "Link {n} z {total}"
 # context: button that opens the address in the browser
-open = "Open"
+open = "Otwórz"
 # context: button that shows the next address of the message
-next = "Next"
+next = "Dalej"
 # context: key of the Open button, one letter (shown as "Open (O)")
 key_open = "o"
 # context: key of the Next button, one letter
-key_next = "n"
+key_next = "d"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "a"
 # context: status line; the message in view holds no web address to open
-none = "no link in this message"
+none = "brak linku w tym opisie"

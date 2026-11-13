@@ -220,7 +220,7 @@ O programie, klawisz `c`); w Linuksie każdy kolor ma własną nazwę ikony, wi�
 | System | Alias | PATH |
 |---|---|---|
 | Linux, macOS | Dowiązanie symboliczne `~/.local/bin/<nazwa>` do `gitpoulpi-tui`. Dowiązanie nie może zawierać znacznika, więc uznaje się je za nasze, gdy jego celem jest plik o nazwie `gitpoulpi-tui`; zwykły plik albo dowiązanie do czegokolwiek innego **nie jest nasze** i nigdy nie jest zastępowane ani usuwane. | Blok między `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` a `# <<< GitPoulpi PATH <<<` w `~/.bashrc` i `~/.zshrc` (w tych, które istnieją; `~/.zshrc` w macOS, w przeciwnym razie `~/.bashrc`, gdy nie ma żadnego) oraz `~/.config/fish/conf.d/gitpoulpi-path.fish`, gdy skonfigurowano fish. Usuń kasuje blok (lub plik fish) i nic więcej. |
-| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<nazwa>.cmd`, dwuwierszowy skrót zawierający `REM X-GitPoulpi=1`. | PATH użytkownika w `HKCU\Environment`, zapisany przez PowerShell, a potem rozgłoszenie `WM_SETTINGCHANGE`, by nowe programy go widziały. Wartość `GitPoulpiPathAdded` zapisuje, co dodano, a Usuń zabiera tylko to. |
+| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<nazwa>.cmd`, krótki skrót zawierający `REM X-GitPoulpi=1` (eksportuje też `GITPOULPI_CMDCMDLINE`, po czym rozpoznaje się start z paska adresu). | PATH użytkownika w `HKCU\Environment`, zapisany przez PowerShell, a potem rozgłoszenie `WM_SETTINGCHANGE`, by nowe programy go widziały. Wartość `GitPoulpiPathAdded` zapisuje, co dodano, a Usuń zabiera tylko to. |
 
 Nowe terminale widzą zmianę PATH, otwarte już nie. Żadna z tych akcji nie trafia do historii cofania: nie ma dla nich Cofnij, drogą powrotną jest **Usuń**.
 
@@ -228,6 +228,31 @@ Paleta ma te same akcje (**Uruchamianie: Utwórz skrót**, **Uruchamianie: Utwó
 **Uruchamianie: Usuń skróty**, **Uruchamianie: Utwórz alias polecenia**, **Uruchamianie: Usuń alias polecenia**,
 **Uruchamianie: Dodaj do PATH**, **Uruchamianie: Usuń z PATH**), a `gitpoulpi desktop shortcut
 status|install|remove [--where launcher|desktop|startmenu]` robi to samo ze skryptu.
+
+#### Wpisanie w pasku adresu Eksploratora plików (Windows)
+
+Wpisz alias (`gp`) albo `gitpoulpi` w pasku adresu okna Eksploratora plików i naciśnij Enter: GitPoulpi otwiera się w terminalu wybranym w **Terminal dla skrótów**, na folderze pokazanym w oknie, bez otwierania **Ostatniej karty**. Gdy **Pokaż otwarte okno po kliknięciu** jest włączone i GitPoulpi już działa, folder staje się nową kartą tego okna.
+
+- **`gp` (alias polecenia).** Gdy alias istnieje, jego utworzenie rejestruje też `gp.exe` w `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`, wskazujące na `gitpoulpi-launch.exe`, a Usuń kasuje ten klucz (tylko gdy jest nasz). Gdy folder z aliasem jest w PATH (**Dodaj GitPoulpi do PATH**), Windows uruchamia najpierw skrót `.cmd` i okno konsoli może na chwilę mignąć, zanim pojawi się GitPoulpi. Skrót zapisany przez starszą wersję jest automatycznie zapisywany od nowa, gdy Ustawienia odczytają alias.
+- **`gitpoulpi`.** Działa, gdy zainstalowano **Menu menedżera plików**: Zainstaluj rejestruje też `gitpoulpi.exe` w App Paths. Bez tego `gitpoulpi` jest znajdowany tylko wtedy, gdy folder GitPoulpi jest w PATH, a wtedy konsola może mignąć jak wyżej.
+
+Linux i macOS nie mają odpowiednika: paski lokalizacji ich menedżerów plików nie uruchamiają programów. Użyj wpisu **Menu menedżera plików** albo aliasu polecenia w terminalu.
+
+#### Menu menedżera plików (Otwórz w GitPoulpi)
+
+Pod skrótami wiersze **Menu menedżera plików** dodają **Otwórz w GitPoulpi** do menu prawego przycisku folderów. Jeden wiersz stanu na każdy menedżer plików (w Linuksie: po jednym dla każdego znalezionego tu menedżera i dla każdego, który wciąż ma wpis; wiersz **Wykryto** wylicza znalezione), potem przyciski **Zainstaluj** i **Usuń**. **Zainstaluj** zapisuje wpis dla każdego znalezionego menedżera plików; **Usuń** najpierw pyta, potem usuwa dokładnie to, co zapisało Zainstaluj, niezależnie od tego, czy ten menedżer plików jest jeszcze zainstalowany.
+
+Wpis uruchamia `gitpoulpi launch --folder <folder>` (w Windows `gitpoulpi-launch.exe --folder` bez konsoli), a to polecenie decyduje w chwili kliknięcia: gdy **Pokaż otwarte okno po kliknięciu** jest włączone i okno GitPoulpi jest otwarte, folder wewnątrz repozytorium staje się nową kartą ostatnio używanego okna, które wychodzi na wierzch; w przeciwnym razie terminal wybrany w **Terminal dla skrótów** uruchamia GitPoulpi na tym folderze. Zmiana terminala nigdy więc nie czyni wpisu nieaktualnym; nieaktualny czyni go przeniesiony plik exe albo nowy kolor logo, a GitPoulpi sam zapisuje swoje wpisy od nowa (nigdy żadnego nie tworząc), tak jak skróty. Wpis wymaga programu startowego obok GitPoulpi (`gitpoulpi`, w Windows `gitpoulpi-launch.exe`); bez niego wiersz to mówi, a przyciski są wyłączone.
+
+| System | Co zapisuje Zainstaluj |
+|---|---|
+| Windows | Klucze użytkownika, bez administratora: `HKCU\Software\Classes\Directory\shell\GitPoulpi`, `Directory\Background\shell\GitPoulpi` i `Drive\shell\GitPoulpi`, każdy z podkluczem `command`, więc wpis widać na folderze, na tle otwartego folderu i na dysku. Każdy klucz ma wartość `X-GitPoulpi`; klucz bez niej **nie jest nasz** i nigdy nie jest ruszany. Rejestruje też `gitpoulpi.exe` w `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`, wskazujące na `gitpoulpi-launch.exe`. W Windows 11 wpis jest tylko w klasycznym menu: **Pokaż więcej opcji**, Shift+F10 albo Shift+prawy przycisk (nowe menu najwyższego poziomu wymienia tylko aplikacje pakietowe). Usuń kasuje nasze klucze, potem klucze nadrzędne utworzone przez Zainstaluj, tylko gdy zostały puste. |
+| Linux | Tylko dla menedżerów plików znalezionych w PATH. GNOME Files i Caja: skrypt nazwany jak wpis w `~/.local/share/nautilus/scripts` lub `~/.config/caja/scripts` (w podmenu **Skrypty**). Dolphin: `~/.local/share/kio/servicemenus/gitpoulpi-open.desktop`, wykonywalny (KDE Frameworks 6 ignoruje menu usług użytkownika, które takie nie jest; KDE Frameworks 5 przed 5.85 nie jest obsługiwane). Nemo: dwie akcje w `~/.local/share/nemo/actions` (zaznaczony folder, tło). Thunar: jedna akcja dołączona do `~/.config/Thunar/uca.xml`; twoje własne akcje zostają, a Usuń oddaje plik bajt w bajt (albo kasuje go, jeśli utworzył go Zainstaluj). PCManFM i PCManFM-Qt: `~/.local/share/file-manager/actions/gitpoulpi-open.desktop`. Ikona trafia do `~/.local/share/icons/hicolor/256x256/apps/gitpoulpi-folder.png` i znika z ostatnim wpisem. `XDG_DATA_HOME` i `XDG_CONFIG_HOME` są respektowane. Wpis pokazuje się na zaznaczonym folderze oraz na tle folderu, gdzie menedżer plików to oferuje. |
+| macOS | Szybka czynność, `~/Library/Services/Open in GitPoulpi.workflow`: kliknij folder w Finderze prawym przyciskiem, potem **Szybkie czynności**. Tylko zaznaczone foldery (Finder nie ma menu dla tła folderu). Za pierwszym razem może wymagać włączenia w Ustawienia systemowe > Klawiatura > Skróty klawiszowe > Usługi. |
+
+Każdy plik i klucz zapisany przez GitPoulpi ma znacznik `X-GitPoulpi=1` (wiersz `# X-GitPoulpi=1` w skrypcie), a Usuń kasuje tylko oznaczone. Te akcje zmieniają system, nie repozytorium: Cofnij ich nie obejmuje, drogą powrotną jest **Usuń**. Paski lokalizacji menedżerów plików nie uruchamiają programów w Linuksie i macOS, więc nie ma tam czego wpisywać; w terminalu jest alias polecenia.
+
+Paleta ma **Uruchamianie: Zainstaluj menu Otwórz w GitPoulpi** i **Uruchamianie: Usuń menu Otwórz w GitPoulpi**, a `gitpoulpi desktop folder-menu status|install|remove` robi to ze skryptu.
 
 ### Synchronizacja
 

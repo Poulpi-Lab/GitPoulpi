@@ -205,7 +205,8 @@ do [Pierwszych kroków](getting-started.md).
 ## Odinstalowanie
 
 `gitpoulpi uninstall` (to uruchamiają oba instalatory) usuwa aliasy poleceń,
-wpisy w PATH i skróty utworzone przez GitPoulpi, a potem pliki programu
+wpisy w PATH, skróty i wpisy menu menedżera plików (w Windows razem z kluczem
+App Paths) utworzone przez GitPoulpi, a potem pliki programu
 instalacji z wydania; odmawia dla kompilacji bez znacznika `.gitpoulpi-dist`
 (kompilacja przez cargo), a `--keep-files` zostawia pliki programu. Nie jest
 dostępne dla agentów MCP. Bez instalatora usuń trzy pliki wykonywalne.

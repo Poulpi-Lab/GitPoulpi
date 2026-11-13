@@ -63,6 +63,19 @@ jedna karta na każde otwarte repozytorium. Krzyżyk `x` zamykający kartę wida
 aktywnej karcie i na karcie pod wskaźnikiem. Rząd kart zawiera tylko karty (przycisk
 [wyszukiwania globalnego](search.md) jest na pasku tytułu).
 
+Gdy karty repozytoriów się nie mieszczą, rząd się przewija zamiast je zmniejszać:
+karty leżą między dwoma przyciskami ze strzałkami, `‹` z lewej i `›` z prawej.
+Strzałka jest przygaszona, gdy po jej stronie nie ma ukrytej karty. Kliknij
+strzałkę, by pokazać jeszcze jedną kartę z tej strony (przytrzymaj ją, by
+przewijać dalej), albo użyj kółka nad rzędem (w górę lub w lewo pokazuje
+wcześniejsze karty). Gdy tylko zmieni się bieżąca karta (przełączasz karty z
+klawiatury, przez selektor kart lub paletę, otwierasz albo zamykasz kartę, albo
+zmieniasz rozmiar okna), rząd przewija się akurat tyle, by pokazać ją w całości.
+Gdy jest miejsce, przycisk `…` za prawą strzałką otwiera selektor kart.
+Przeciągnięcie karty na strzałkę przewija rząd, dopóki ją tam trzymasz, więc
+możesz upuścić kartę za tymi widocznymi na ekranie. `Ctrl+N` pokazuje plakietkę
+przy każdej aktywnej strzałce.
+
 **Ustawienia > Wygląd > Położenie paska kart** przenosi ten wiersz na dół okna (pod pasek stanu) albo zamienia go w kolumnę przy lewej krawędzi: jedna karta w wierszu, najpierw Start, potem znacznik obszaru roboczego, Radar, karta Obszary robocze, karty (długa nazwa kończy się `…`) i `+`. Gdy kart jest więcej niż wierszy, wiersz `…` pokazuje, ile ukrytych jest powyżej (`▲`) i poniżej (`▼`), i otwiera listę kart; kółko przewija kolumnę. Obok paska narzędzi w kolumnie karty zostają na zewnątrz. Okno węższe niż 80 kolumn trzyma karty u góry. Kliknięcia, krzyżyk zamykania, środkowy przycisk, menu prawego przycisku, przeciąganie do zmiany kolejności i klawiatura działają tak samo w każdym położeniu.
 
 - **+** tuż za ostatnią kartą otwiera małe menu: **Nowa karta** (`Alt+T`,
@@ -279,6 +292,18 @@ przytwierdzonych nad listą, która jako jedyna się przewija. Kliknij plik, aby
 otworzyć jego diff. W niskim oknie najpierw ustępuje opis (do jednego wiersza),
 potem lista. Widok zmian roboczych zachowuje rząd **Ścieżka** / **Drzewo** /
 **Wszystkie pliki** na górze list plików, nad listami unstaged i staged.
+
+**Linki w opisie.** Adres internetowy wpisany w opisie (`https://...` albo cel
+markdownowego `[tekst](https://...)`) jest podkreślony, pokazuje wskaźnik w
+kształcie dłoni, a po kliknięciu pyta **Otworzyć ten link?** z całym adresem,
+zanim cokolwiek się otworzy: tekst opisu nie jest zaufany. **Otwórz** (`O`)
+uruchamia przeglądarkę, **Anuluj** (`A`, `Esc`, krzyżyk) nic nie robi.
+Proponowane są tylko adresy `http` i `https`. Odpowiednik z klawiatury to
+polecenie palety `Szczegóły commita: Otwórz link w opisie...`, które pyta o
+pierwszy adres z opisu, a pozostałe przechodzi przyciskiem **Dalej** (`D`).
+Niektóre terminale same podkreślają adres pod wskaźnikiem i otwierają go po
+kliknięciu z modyfikatorem (często Shift+klik); to funkcja terminala, nie
+GitPoulpi.
 
 Każda lista plików ma menu dla plików, folderów i pustego miejsca, a wiele plików można zaznaczyć naraz (**Ctrl+klik**, **Shift+klik**); zob. [Stage i commity](staging-and-committing.md).
 

@@ -33,6 +33,10 @@ pub fn info_plist(label: &str) -> String {
          \t<key>NSServices</key>\n\
          \t<array>\n\
          \t\t<dict>\n\
+         \t\t\t<key>NSBackgroundColorName</key>\n\
+         \t\t\t<string>background</string>\n\
+         \t\t\t<key>NSIconName</key>\n\
+         \t\t\t<string>NSActionTemplate</string>\n\
          \t\t\t<key>NSMenuItem</key>\n\
          \t\t\t<dict>\n\
          \t\t\t\t<key>default</key>\n\
@@ -118,10 +122,21 @@ pub fn wflow(script: &str) -> String {
          \t<key>connectors</key>\n\t<dict/>\n\
          \t<key>workflowMetaData</key>\n\
          \t<dict>\n\
+         \t\t<key>applicationBundleID</key>\n\t\t<string>com.apple.finder</string>\n\
+         \t\t<key>applicationBundleIDsByPath</key>\n\t\t<dict>\n\t\t\t<key>/System/Library/CoreServices/Finder.app</key>\n\t\t\t<string>com.apple.finder</string>\n\t\t</dict>\n\
+         \t\t<key>applicationPath</key>\n\t\t<string>/System/Library/CoreServices/Finder.app</string>\n\
+         \t\t<key>applicationPaths</key>\n\t\t<array>\n\t\t\t<string>/System/Library/CoreServices/Finder.app</string>\n\t\t</array>\n\
+         \t\t<key>inputTypeIdentifier</key>\n\t\t<string>com.apple.Automator.fileSystemObject.folder</string>\n\
+         \t\t<key>outputTypeIdentifier</key>\n\t\t<string>com.apple.Automator.nothing</string>\n\
+         \t\t<key>presentationMode</key>\n\t\t<integer>15</integer>\n\
+         \t\t<key>processesInput</key>\n\t\t<integer>0</integer>\n\
          \t\t<key>serviceApplicationBundleID</key>\n\t\t<string>com.apple.finder</string>\n\
+         \t\t<key>serviceApplicationPath</key>\n\t\t<string>/System/Library/CoreServices/Finder.app</string>\n\
          \t\t<key>serviceInputTypeIdentifier</key>\n\t\t<string>com.apple.Automator.fileSystemObject.folder</string>\n\
          \t\t<key>serviceOutputTypeIdentifier</key>\n\t\t<string>com.apple.Automator.nothing</string>\n\
          \t\t<key>serviceProcessesInput</key>\n\t\t<integer>0</integer>\n\
+         \t\t<key>systemImageName</key>\n\t\t<string>NSActionTemplate</string>\n\
+         \t\t<key>useAutomaticInputType</key>\n\t\t<integer>0</integer>\n\
          \t\t<key>workflowTypeIdentifier</key>\n\t\t<string>com.apple.Automator.servicesMenu</string>\n\
          \t</dict>\n\
          </dict>\n</plist>\n"
@@ -260,6 +275,8 @@ mod tests {
             "runWorkflowAsService",
             "com.apple.finder",
             "<key>X-GitPoulpi=1</key>",
+            "NSIconName",
+            "NSBackgroundColorName",
             "Open &amp; Go",
         ] {
             assert!(p.contains(needle), "{needle}");
@@ -270,6 +287,9 @@ mod tests {
             "RunShellScriptAction",
             "com.apple.Automator.servicesMenu",
             "com.apple.Automator.fileSystemObject.folder",
+            "<key>presentationMode</key>",
+            "<key>applicationBundleIDsByPath</key>",
+            "<key>serviceApplicationPath</key>",
             "for f in &quot;$@&quot;; do",
             "launch --folder &quot;$f&quot;; done",
         ] {

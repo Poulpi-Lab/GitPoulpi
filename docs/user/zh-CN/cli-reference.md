@@ -77,7 +77,7 @@
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | stage 一个文件、文件夹、全部内容、一个 hunk 或若干行。如果某次文件、文件夹或 `--all` 的 stage 会加入敏感文件（私钥、`.env`、可识别的令牌：见[配置参考](config-reference.md#privacy敏感文件)中的 `[privacy]`），就会被拒绝，退出码为 2，并输出 `{error: "sensitive_files", files: [{path, reason}]}`（一条规则和遮蔽后的预览，绝不输出值）；不会 stage 任何内容。`--allow-sensitive` 会仍然 stage 它们。 |
 | `unstage`（相同的标志） | 相反的操作。 |
-| `discard --file F [--hunk N [--lines a,b]]` | 丢弃 unstaged 的更改（整个文件：所有更改，未跟踪的文件会被删除）。可撤销。 |
+| `discard --file F [--hunk N [--lines a,b]]` | 丢弃 unstaged 的更改（整个文件：所有更改，未跟踪的文件会被删除，并删除因此变空的文件夹）。可撤销。 |
 | `rm-file <paths>...` | 从工作区中删除文件。可撤销。 |
 | `ignore <pattern> [--file <.gitignore>]` | 向某个 `.gitignore` 追加一个模式（用 `--file .git/info/exclude` 则追加到 `.git/info/exclude`）。可撤销，写入 `.git/info/exclude` 除外。 |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | 重写工作区中文件的编码、行尾或缩进。二进制、缺失和无法编码的文件会被跳过并报告。整批操作只生成一个撤销条目。 |
@@ -136,7 +136,7 @@
 
 | 命令 | 作用 |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch 默认远程、某个远程或全部远程。每次 fetch 还会刷新每个远程上的 tag 记录（`tag list` 的 `remote`），即使没有 `--prune` 也会清理这份记录。`--prune-tags`（设置：自动清理 tags）还会删除远程已经删除的本地 tag：只涉及曾存在于远程的 tag，绝不会动你没有 push 过的；输出会把它们列为 `pruned_tags`（git 2.41+）。 |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch 默认远程、某个远程或全部远程。除非 `general.auto_prune` 为 false，否则远程已删除的远程跟踪分支会被清理；`--prune` 会强制清理。每次 fetch 还会刷新每个远程上的 tag 记录（`tag list` 的 `remote`），即使没有 `--prune` 也会清理这份记录。`--prune-tags`（设置：自动清理 tags）还会删除远程已经删除的本地 tag：只涉及曾存在于远程的 tag，绝不会动你没有 push 过的；输出会把它们列为 `pruned_tags`（git 2.41+）。 |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull；模式总是明确传给 git。 |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push。没有单纯的 force：只有 `--force-with-lease`。 |
 | `remote list`、`remote add <name> <url> [--push-url U]`、`remote remove <name>`、`remote rename <old> <new>` | 远程。`remote list` 会把没有对应远程的远程跟踪命名空间标为 `configured: false`；对它执行 `remote remove` 会删除其分支（可撤销）。 |

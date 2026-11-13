@@ -631,7 +631,10 @@ without the fix; keep it that way.
   then at `HKCU\...\App Paths`. So with the bin folder on `PATH` the alias
   `.cmd` runs (a console flashes), and App Paths (the console-less
   `gitpoulpi-launch.exe`) answers only where `PATH` has no such program.
-  Both routes must keep the folder: the shim exports `GITPOULPI_CMDCMDLINE`
+  Explorer's own `PATH` is the one from sign-in: right after `path add` the bin
+  folder is not on it, so only App Paths answers, and with no App Paths key the
+  typed name goes to the browser as `http://gp/` (seen on a Windows 11 hand run;
+  with the key, no console window appeared). Both routes must keep the folder: the shim exports `GITPOULPI_CMDCMDLINE`
   and `relaunch::explorer_start` recognises `cmd.exe /c` with exactly two
   processes on the console (an interactive prompt has no `/c`, PowerShell makes
   three); the launcher path reads the working folder itself. Do not test the

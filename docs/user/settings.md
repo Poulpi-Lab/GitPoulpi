@@ -243,6 +243,8 @@ Type the alias (`gp`) or `gitpoulpi` in the address bar of a File Explorer windo
 - **`gp` (the command alias).** Once the alias exists, creating it also registers `gp.exe` under `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`, pointing at `gitpoulpi-launch.exe`, and Remove deletes that key (only when it is ours). When the folder with the alias is on your PATH (**Add GitPoulpi to PATH**), Windows runs the `.cmd` shim first and a console window may flash for a moment before GitPoulpi appears. A shim written by an older version is rewritten automatically when Settings reads the alias.
 - **`gitpoulpi`.** Works with the **File manager menu** installed: Install also registers `gitpoulpi.exe` under App Paths. Without it, `gitpoulpi` is found only when GitPoulpi's folder is on your PATH, and then the console may flash as above.
 
+File Explorer keeps the PATH it had when you signed in: a folder added to PATH later is seen there only after you sign out and in again. Until then only the App Paths entries answer, and a name Windows cannot find is opened as a web address in your browser.
+
 Linux and macOS have no equivalent: their file managers' location bars do not run programs. Use the **File manager menu** entry or the command alias in a terminal.
 
 #### File manager menu (Open in GitPoulpi)

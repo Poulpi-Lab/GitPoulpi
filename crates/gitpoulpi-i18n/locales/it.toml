@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = { git = "Predefinito 5. 0 disattiva del tutto
 fetch_on_tab_open = { git = "Fetch all'apertura di una scheda", local = "Recupero all'apertura di una scheda" }
 fetch_on_tab_open_help = { git = "Fetch All in background; saltato se il fetch è avvenuto nell'ultimo minuto.", local = "Recupera tutto in background; saltato se il recupero è avvenuto nell'ultimo minuto." }
 auto_prune = "Prune automatico"
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = { git = "Rimuove i branch di tracciamento remoto che non esistono più sul remoto a ogni {$fetch}: auto-{$fetch} in background, {$Fetch} e {$Fetch} All. Il controllo del lease del dialogo di {$push} divergente non ne fa parte. Attivo per impostazione predefinita: un branch eliminato sul server sparisce dalla sezione REMOTE dopo il {$fetch} successivo; disattiva l'opzione per tenere elencati i branch di tracciamento obsoleti.", local = "Rimuove i branch di tracciamento remoto che non esistono più sul remoto a ogni recupero: recupero automatico in background, Recupera e Recupera tutto. Il controllo del lease del dialogo di invio divergente non ne fa parte. Attivo per impostazione predefinita: un branch eliminato sul server sparisce dalla sezione REMOTE dopo il recupero successivo; disattiva l'opzione per tenere elencati i branch di tracciamento obsoleti." }
 keep_submodules_up_to_date = "Mantieni aggiornati i sottomoduli"
 default_branch_name = "Nome del branch predefinito"
 default_branch_name_help = "Usato quando si inizializza o si clona un repository."
@@ -4479,7 +4479,7 @@ file_list_loading = "l'elenco dei file di questo commit è ancora in caricamento
 no_repo_tab = "nessuna scheda di repository è aperta"
 commit_now_ai_running = "l'IA sta ancora scrivendo un messaggio - attendi, oppure Esc lo annulla"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "scrivi il messaggio, poi premi {key} per fare il {$commit}"
 no_matching_tab = "nessuna scheda corrispondente"
 no_matching_theme = "nessun tema corrispondente"
 no_matching_language = "nessuna lingua corrispondente"

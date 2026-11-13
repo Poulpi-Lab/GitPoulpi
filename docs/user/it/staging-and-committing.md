@@ -170,13 +170,14 @@ nell'altro.
   fa il commit senza eseguire gli hook `pre-commit` e `commit-msg` del repository. Vale per un
   singolo commit; **Impostazioni > Impostazioni specifiche del repository > Commit** lo fa partire
   selezionato. Compare quando la riga ha spazio.
-- `Ctrl+G c` o `c` nel pannello Stato porta il cursore nel modulo. `Esc`
-  lo lascia.
-- `Ctrl+G Enter` (**Git: Esegui ora il commit delle modifiche in stage** nella palette) è il
-  pulsante di commit da qualsiasi punto: fa il commit delle modifiche in stage con il messaggio
-  del modulo, rispettando **Modifica il commit precedente** e **Salta gli hook**, senza spostare
-  il focus. Se non c'è nulla in stage, o manca il riepilogo, lo dice e porta invece il cursore
-  nel riepilogo. Finché una richiesta all'IA è ancora in corso non fa nessun commit e lo dice
+- `c` nel pannello Stato porta il cursore nel modulo. `Esc` lo lascia.
+- `Ctrl+G c` e `Ctrl+G Enter` (**Git: Commit...** e **Git: Esegui ora il commit delle modifiche
+  in stage** nella palette) sono un solo comando, il pulsante di commit da qualsiasi punto. Con un
+  riepilogo nel modulo e qualcosa in stage fa subito il commit, rispettando **Modifica il commit
+  precedente** e **Salta gli hook**, senza spostare il focus. Altrimenti non fa nessun commit:
+  porta il cursore nel riepilogo del modulo (mostrando il pannello se era nascosto o compresso) e
+  la riga di stato indica quale scorciatoia fa il commit (`Ctrl+Enter` di base). Se non c'è nulla
+  in stage lo dice. Nella riga di stato non si scrive nulla. Finché una richiesta all'IA è ancora in corso non fa nessun commit e lo dice
   (`Esc` annulla la richiesta). `Ctrl+Z` annulla il commit
   come qualsiasi altro.
 - Per ogni repository, le [Impostazioni](settings.md#specifico-del-repository-commit) possono

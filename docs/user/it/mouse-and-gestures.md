@@ -362,7 +362,7 @@ Vedi [Stage e commit](staging-and-committing.md).
 - **Clicca la minimappa** per portare la vista su quella riga. Tieni premuto il
   pulsante e muovi per scorrere.
 
-Ogni scarto chiede prima.
+Ogni scarto chiede prima. Quando uno scarto elimina file non tracciati, vanno via con loro anche le cartelle che restano completamente vuote (mai una che contiene ancora un file tracciato, ignorato o nascosto, né una che era già vuota); Annulla riporta i file con le loro cartelle.
 
 ### Blame e cronologia del file
 

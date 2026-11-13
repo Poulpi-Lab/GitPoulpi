@@ -248,10 +248,15 @@ pub(crate) fn sync_shortcuts(env: &Env, setting: &str, logo: &str) -> bool {
         // was pinned with, whatever state the Start menu entry is in.
         changed |= desktop::sync_pinned(&env.dirs, &req);
     }
+    // The file-manager entries that are ours follow the exe too (and the
+    // icon); a missing one is never created.
+    let label = gitpoulpi_i18n::msg::launcher::FOLDER_MENU_LABEL.get();
+    changed |= desktop::folder_menu::sync(&folder_menu_env(env, Some(logo)), label)
+        .is_ok_and(|done| !done.is_empty());
     refresh_icons(env, setting, logo) || changed
 }
 
-fn terminal_exe(env: &Env, terminal: &str) -> Option<PathBuf> {
+pub(crate) fn terminal_exe(env: &Env, terminal: &str) -> Option<PathBuf> {
     let program = terminals::find(env.os, terminal)?.probe;
     (!program.is_empty() && !program.starts_with("app:"))
         .then(|| (env.which)(program))
@@ -274,6 +279,25 @@ fn request<'a>(
         icons,
         refresh_icon_cache: env.refresh_icon_cache,
     }
+}
+
+/// The folder-menu machine (`gitpoulpi_config::desktop::folder_menu`) for
+/// `env`: the same exe, `PATH` probe and hook switch, the real registry (or the
+/// test file), and the icon in colorway `logo` when one is given (Install
+/// needs it, a status read does not). Blocking: it reads the disk.
+pub(crate) fn folder_menu_env(env: &Env, logo: Option<&str>) -> desktop::folder_menu::Env {
+    let home = gitpoulpi_config::home_dir().unwrap_or_default();
+    let mut fe = desktop::folder_menu::Env::discover(
+        env.os,
+        &|k| std::env::var(k).ok(),
+        &home,
+        &env.exe,
+        env.has.clone(),
+        desktop::registry::from_env(),
+    );
+    fe.icon_png = logo.and_then(|l| icon_set(l).largest().map(<[u8]>::to_vec));
+    fe.refresh_hooks = env.refresh_icon_cache;
+    fe
 }
 
 /// Runs `op`. Blocking.

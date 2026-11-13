@@ -2,7 +2,7 @@
 //! `gitpoulpi desktop shortcut status|install|remove`. Same code as the
 //! screen (`launcher`), run on the calling thread: a CLI has no frame to keep.
 
-use gitpoulpi_config::desktop::{Place, State};
+use gitpoulpi_config::desktop::{folder_menu, terminals, Place, State};
 use gitpoulpi_config::open_in::Os;
 
 use crate::launcher::{self, Done, Env, Op};
@@ -128,6 +128,115 @@ fn apply(
         out.push(describe(&launcher::run(env, terminal, logo, op))?);
     }
     Ok(out)
+}
+
+/// The terminal command that opens `folder` (or only GitPoulpi, with `None`),
+/// built when a file-manager entry is clicked from `ui.launch_terminal`, so
+/// changing the terminal never leaves an entry outdated. `gitpoulpi launch
+/// --folder` and `gitpoulpi-launch` run it when no open window takes the
+/// folder as a tab. Blocking (lists `PATH`).
+pub fn start_command(folder: Option<&std::path::Path>) -> Result<Vec<String>, String> {
+    let (setting, _) = settings();
+    start_command_with(&Env::real(), &setting, folder)
+}
+
+/// The program the terminal runs: `gitpoulpi` itself, which with no
+/// subcommand starts the TUI (on Windows `gitpoulpi.exe` beside the
+/// console-less `gitpoulpi-launch.exe` that is running).
+fn terminal_program(env: &Env) -> std::path::PathBuf {
+    if env.os == Os::Windows {
+        env.exe.with_file_name("gitpoulpi.exe")
+    } else {
+        env.exe.clone()
+    }
+}
+
+fn start_command_with(
+    env: &Env,
+    setting: &str,
+    folder: Option<&std::path::Path>,
+) -> Result<Vec<String>, String> {
+    const NO_TERMINAL: &str = "no terminal to start GitPoulpi in"; // i18n-english
+    let terminal = env.resolve(setting).ok_or(NO_TERMINAL)?;
+    let exe = terminal_program(env).to_string_lossy().into_owned();
+    let mut argv = match folder {
+        Some(f) => terminals::folder_argv(env.os, terminal, &exe, &f.to_string_lossy()),
+        None if env.os == Os::Windows && terminal == "console" => {
+            Some(vec![exe.clone(), terminals::LAUNCHER_FLAG.to_string()])
+        }
+        None => terminals::argv(env.os, terminal, &exe),
+    }
+    .ok_or(NO_TERMINAL)?;
+    if env.os == Os::Windows && terminal != "console" {
+        if let Some(found) = launcher::terminal_exe(env, terminal) {
+            argv[0] = found.to_string_lossy().into_owned();
+        }
+    }
+    Ok(argv)
+}
+
+/// One file manager's state, for `gitpoulpi desktop folder-menu status`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FolderMenuEntry {
+    pub manager: &'static str,
+    pub name: &'static str,
+    pub detected: bool,
+    /// `not_installed`, `installed`, `outdated` or `foreign`.
+    pub state: &'static str,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FolderMenuReport {
+    pub entries: Vec<FolderMenuEntry>,
+    /// The launcher program is missing next to GitPoulpi.
+    pub unavailable: bool,
+    pub error: Option<String>,
+}
+
+/// The label the CLI writes: English, like all CLI text.
+const CLI_LABEL: &str = "Open in GitPoulpi"; // i18n-english
+
+fn cli_env(with_icon: bool) -> folder_menu::Env {
+    let (_, logo) = settings();
+    launcher::folder_menu_env(&Env::real(), with_icon.then_some(logo.as_str()))
+}
+
+pub fn folder_menu_status() -> FolderMenuReport {
+    let s = folder_menu::status(&cli_env(false), CLI_LABEL);
+    FolderMenuReport {
+        entries: s
+            .entries
+            .iter()
+            .map(|e| FolderMenuEntry {
+                manager: e.manager.as_str(),
+                name: e.manager.name(),
+                detected: e.detected,
+                state: state_name(e.state),
+            })
+            .collect(),
+        unavailable: s.unavailable.is_some(),
+        error: s.error,
+    }
+}
+
+fn managers_lines(verb: &str, done: &[folder_menu::Manager]) -> Vec<String> {
+    if done.is_empty() {
+        vec![format!("nothing to {verb}")] // i18n-english
+    } else {
+        done.iter()
+            .map(|m| format!("{verb}: {}", m.as_str())) // i18n-english
+            .collect()
+    }
+}
+
+pub fn folder_menu_install() -> Result<Vec<String>, String> {
+    let done = folder_menu::install(&cli_env(true), CLI_LABEL)?;
+    Ok(managers_lines("installed", &done))
+}
+
+pub fn folder_menu_remove() -> Result<Vec<String>, String> {
+    let done = folder_menu::remove(&cli_env(false))?;
+    Ok(managers_lines("removed", &done))
 }
 
 /// The OS this build runs on, for `status` output.

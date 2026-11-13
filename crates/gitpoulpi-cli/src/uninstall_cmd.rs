@@ -71,6 +71,15 @@ fn uninstall(keep_files: bool) -> Result<Value, String> {
         }
     };
 
+    // The file-manager menu entries (and the App Paths key of the folder menu).
+    let folder_menu = match gitpoulpi_tui::desktop_shortcuts::folder_menu_remove() {
+        Ok(lines) => lines,
+        Err(e) => {
+            warnings.push(format!("folder menu: {e}"));
+            Vec::new()
+        }
+    };
+
     let (files_removed, files_failed, dir_removed) = if keep_files {
         (Vec::new(), Vec::new(), false)
     } else {
@@ -81,6 +90,7 @@ fn uninstall(keep_files: bool) -> Result<Value, String> {
         "aliases_removed": aliases,
         "path_changed": path,
         "shortcuts": shortcuts,
+        "folder_menu": folder_menu,
         "kept_files": keep_files,
         "files_removed": files_removed,
         "files_failed": files_failed,

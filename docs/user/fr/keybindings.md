@@ -1556,6 +1556,21 @@ entrées **Créer une branche ici...** / **Créer un tag ici...** des menus dema
 dans une zone de texte sur la ligne du commit. `Enter` crée la ref. `Esc` annule. Un nom
 invalide ou existant s'affiche en rouge, et la zone reste ouverte.
 
+Quand cette ligne n'est pas à l'écran (un diff est ouvert, le Log est isolé, la colonne Ref
+est masquée), le nom se saisit à la place dans une petite boîte encadrée, avec une croix de
+fermeture et les boutons **Annuler** et **Créer**. Renommer une branche se fait directement
+sur sa ligne dans le volet Refs, ou dans la cellule Ref de sa ligne du Log ; créer un fichier
+se fait dans la liste des modifications, sous le dossier. Les mêmes touches valent partout :
+`Enter` valide, `Esc` annule.
+
+Rien n'est jamais saisi dans la ligne d'état. Les invites qui demandent plus de place sont
+des fenêtres avec de vrais boutons : le message de stash, le message d'un tag annoté
+(`Ctrl+Enter` ou `Ctrl+S` valide, `Enter` ajoute une ligne), Définir l'amont (une liste
+filtrable de branches distantes, avec un bouton Retirer l'amont) et les motifs Git LFS à
+suivre ou à ne plus suivre. Un réglage numérique ou texte choisi dans la palette ouvre les
+Paramètres sur sa ligne, prêt à modifier, et le filtre des Refs (`/`) se saisit dans la zone
+en haut du volet Refs.
+
 ### Modifier un message de commit
 
 **Modifier le message du commit...** dans le menu du commit, `Ctrl+G e`, ou la commande de
@@ -1745,7 +1760,7 @@ menus : *Éditeur : Changer l'encodage*, *Éditeur : Rouvrir avec l'encodage*
 | `x` | Abandonner toutes les modifications (demande d'abord) |
 | `c` | Ouvrir le compositeur de commits |
 | `Enter` | Commiter tout de suite les modifications stagées, avec le message du formulaire, d'où que vous soyez (voir [Stage et commit](staging-and-committing.md#écrire-le-commit)) |
-| `m` | Stasher toutes les modifications avec un message (vide autorisé). Avec l'IA activée, `Ctrl+G` dans cette saisie écrit le message |
+| `m` | Stasher toutes les modifications avec un message, saisi dans une petite fenêtre (vide autorisé). Avec l'IA activée, son bouton IA (`Ctrl+G` dans la fenêtre) écrit le message |
 | `Shift+T` | Stasher toutes les modifications (fichiers non suivis compris), sans message |
 | `o` | Pop d'un stash : la ligne de stash sélectionnée dans le Log, sinon le dernier stash |
 | `p` | Pull, comme le bouton Pull est réglé (`git.pull_mode`) |

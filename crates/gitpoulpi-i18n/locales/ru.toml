@@ -271,7 +271,7 @@ auto_fetch_interval_minutes_help = "По умолчанию 5. 0 полност�
 fetch_on_tab_open = { git = "Делать fetch при открытии вкладки", local = "Загружать при открытии вкладки" }
 fetch_on_tab_open_help = { git = "Fetch All в фоне; пропускается, если fetch уже был в последнюю минуту.", local = "Загрузка со всех remote в фоне; пропускается, если загрузка уже была в последнюю минуту." }
 auto_prune = "Автоочистка (prune)"
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = { git = "Убирает remote-tracking ветки, которых больше нет на remote, при каждом {$fetch}, кроме проверки lease в диалоге расходящегося {$push}: при фоновом auto-{$fetch} и при {$Fetch} / {$Fetch} All на панели инструментов. По умолчанию включено, поэтому ветка, удалённая на сервере, исчезает из раздела REMOTE после следующего {$fetch}; отключите, чтобы устаревшие remote-tracking ветки оставались в списке.", local = "Убирает удалённые ветки, которых больше нет на remote, при каждой загрузке, кроме проверки lease в диалоге расходящейся отправки: при фоновой автозагрузке и при «Загрузить» / «Загрузить всё» на панели инструментов. По умолчанию включено, поэтому ветка, удалённая на сервере, исчезает из раздела REMOTE после следующей загрузки; отключите, чтобы устаревшие удалённые ветки оставались в списке." }
 keep_submodules_up_to_date = "Обновлять подмодули"
 default_branch_name = "Имя ветки по умолчанию"
 default_branch_name_help = "Используется при инициализации или клонировании репозитория."
@@ -4474,7 +4474,7 @@ file_list_loading = { git = "список файлов этого commit'а ещ
 no_repo_tab = "нет открытой вкладки репозитория"
 commit_now_ai_running = "ИИ ещё пишет сообщение - дождитесь или отмените клавишей Esc"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "введите сообщение, затем нажмите {key}, чтобы сделать {$commit}"
 no_matching_tab = "нет подходящей вкладки"
 no_matching_theme = "нет подходящей темы"
 no_matching_language = "нет подходящего языка"

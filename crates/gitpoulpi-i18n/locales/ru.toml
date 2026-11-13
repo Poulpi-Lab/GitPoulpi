@@ -8757,8 +8757,8 @@ include_drafts = "Включать черновики"
 assigned_issues = "Задачи, назначенные мне"
 # context: field label: orgs, groups or workspaces the account-wide lists are limited to
 namespaces = "Пространства имён"
-# context: hint in the empty namespaces field
-namespaces_hint = "напр. acme, platform (пусто: моё и все, где я состою)"
+# context: hint in the empty Namespaces text area (one entry per line)
+namespaces_hint = "По одной в строке, напр. acme (пусто: свои и все, к которым вы принадлежите)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
 namespaces_help = "По одной записи в строке. Имя соответствует этой группе или владельцу и всему, что ниже (ptm соответствует ptm/produits/x, но не ptmx/y). Пусто: свои и все, к которым вы принадлежите."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is

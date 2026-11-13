@@ -157,24 +157,22 @@ impl RemoteUi {
         None
     }
 
-    pub(crate) fn open_upstream_menu(
-        &mut self,
+    /// Opens the Set upstream dialog for `branch`: the remote branches in a
+    /// searchable list, a typed `remote/branch` checked against the configured
+    /// remotes, and `Unset upstream` when there is one.
+    pub(crate) fn open_upstream_prompt(
+        &self,
         branch: &HeadBranch,
         refs: &[Ref],
-        col: u16,
-        row: u16,
+        input_mode: &mut InputMode,
     ) {
-        self.menu = Some(ContextMenu::new(
-            msg::upstream_title(&branch.name),
-            upstream_entries(
+        *input_mode =
+            InputMode::Prompt(Box::new(crate::prompt_dialog::PromptDialog::set_upstream(
                 &branch.name,
+                branch.upstream.as_deref(),
                 refs,
                 &self.names(),
-                branch.upstream.as_deref(),
-            ),
-            col,
-            row,
-        ));
+            )));
     }
 
     /// A menu of every remote, each row running `action(name)`.

@@ -80,7 +80,7 @@ pub(crate) fn run_remote_palette_command(
                 .and_then(|b| local_branch(refs, &b))
                 .or_else(|| head_branch(refs));
             match branch {
-                Some(branch) => ctx.ui.open_upstream_menu(&branch, refs, col, row),
+                Some(branch) => ctx.ui.open_upstream_prompt(&branch, refs, ctx.input_mode),
                 None => *ctx.last_message = Some(msg::SELECT_LOCAL_BRANCH.get().into()),
             }
         }
@@ -279,25 +279,6 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
             }
             None => Some(msg::DETACHED_PUSH.get().into()),
         },
-        RemoteUiAction::SetUpstream { branch, upstream } => {
-            let said = match &upstream {
-                Some(up) => msg::setting_upstream(&branch, up),
-                None => msg::unsetting_upstream(&branch),
-            };
-            link.submit_action(Action::BranchSetUpstream { branch, upstream });
-            Some(said)
-        }
-        RemoteUiAction::TypeUpstream { branch } => {
-            let prefill = ui
-                .default_remote(refs)
-                .map(|r| format!("{r}/{branch}"))
-                .unwrap_or_default();
-            *input_mode = InputMode::ComposingRefName {
-                op: RefNameOp::SetUpstream(branch),
-                value: prefill,
-            };
-            None
-        }
         RemoteUiAction::PullThenPush { remote, branch } => {
             link.submit_action(Action::PullThenPush {
                 remote: remote.clone(),

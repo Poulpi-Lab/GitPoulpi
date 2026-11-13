@@ -42,10 +42,10 @@ mod mouse_moved;
 mod mouse_prelude;
 mod mouse_right;
 mod mouse_scroll;
-mod prompt_host;
 #[cfg(test)]
 mod msg_tests;
 mod pointer;
+mod prompt_host;
 
 use crate::event_loop::*;
 use commands::CommandCtx;

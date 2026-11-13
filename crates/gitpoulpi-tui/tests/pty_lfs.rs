@@ -195,8 +195,8 @@ fn a_repo_needing_lfs_without_the_program_shows_a_banner_and_nothing_crashes() {
     finish(term);
 }
 
-/// The palette's `LFS: Track Pattern...` asks for a pattern in the footer
-/// prompt (no mouse needed), and `git lfs track` then leaves
+/// The palette's `LFS: Track Pattern...` asks for a pattern in a dialog (no
+/// mouse needed, nothing typed in the status line), and `git lfs track` then leaves
 /// `.gitattributes` as a visible, unstaged change.
 #[test]
 fn the_palette_tracks_a_pattern_and_gitattributes_shows_up_unstaged() {
@@ -231,12 +231,21 @@ fn the_palette_tracks_a_pattern_and_gitattributes_shows_up_unstaged() {
     )
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").unwrap();
-    term.wait_for("the pattern prompt", STEP, |s| {
-        s.contains("Track with LFS (pattern") && !s.contains("Command Palette")
+    term.wait_for("the pattern dialog", STEP, |s| {
+        s.contains("Track with Git LFS") && !s.contains("Command Palette")
     })
     .unwrap_or_else(|e| panic!("{e}"));
 
     term.send_text("*.psd").unwrap();
+    let typed = term
+        .wait_for("the pattern in the dialog", STEP, |s| {
+            s.contains("Track with Git LFS") && s.contains("*.psd")
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert!(
+        !typed.line(typed.rows() - 1).contains("*.psd"),
+        "nothing is typed in the status line"
+    );
     term.send_keys("Enter").unwrap();
     term.wait_for(".gitattributes listed as an unstaged change", STEP, |s| {
         s.contains(".gitattributes") && s.contains("Unstaged Files")
@@ -248,6 +257,68 @@ fn the_palette_tracks_a_pattern_and_gitattributes_shows_up_unstaged() {
         repo.git(&["diff", "--cached", "--name-only"]).is_empty(),
         ".gitattributes is left unstaged"
     );
+    finish(term);
+}
+
+/// `LFS: Untrack Pattern...` lists the tracked patterns in the dialog; picking
+/// one and confirming removes its line from `.gitattributes`.
+#[test]
+fn the_palette_untracks_a_pattern_picked_from_the_list() {
+    require_git_lfs!("the_palette_untracks_a_pattern_picked_from_the_list");
+    let repo = FixtureRepoBuilder::new()
+        .unwrap()
+        .with_lfs()
+        .unwrap()
+        .lfs_track("*.psd")
+        .unwrap()
+        .commit_lfs_file("big.psd", &vec![1u8; 500], "add big")
+        .unwrap()
+        .write_worktree("big.psd", &vec![2u8; 4000])
+        .unwrap()
+        .build();
+    let config = tempfile::tempdir().unwrap();
+    let mut term = launch(repo.root(), "pty-lfs-untrack", config.path(), &[]);
+    select_the_working_changes(&mut term);
+    // The tracked patterns come from the LFS read: it has landed once the
+    // changed LFS file wears its tag.
+    term.wait_for("the LFS file tagged", STEP, |s| s.contains("big.psd LFS"))
+        .unwrap_or_else(|e| panic!("{e}"));
+
+    term.send_keys("C-p").expect("open the palette");
+    term.send_text("LFS: Untrack Pattern").unwrap();
+    term.wait_for("the untrack command", STEP, |s| {
+        s.contains("LFS: Untrack Pattern...")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Enter").unwrap();
+    // The list opens with the dialog and offers the tracked pattern.
+    term.wait_for("the untrack dialog listing *.psd", STEP, |s| {
+        s.contains("Stop tracking with Git LFS")
+            && !s.contains("Command Palette")
+            && s.contains("\u{2315} type to search")
+            && !s.contains("no match")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    // Enter picks the highlighted pattern, a second Enter confirms.
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the pattern chosen, the list closed", STEP, |s| {
+        s.contains("Untrack") && !s.contains("type to search")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Enter").unwrap();
+    let deadline = std::time::Instant::now() + STEP;
+    loop {
+        let attributes =
+            std::fs::read_to_string(repo.root().join(".gitattributes")).unwrap_or_default();
+        if !attributes.contains("*.psd") {
+            break;
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "*.psd is still tracked: {attributes}"
+        );
+        std::thread::sleep(Duration::from_millis(200));
+    }
     finish(term);
 }
 

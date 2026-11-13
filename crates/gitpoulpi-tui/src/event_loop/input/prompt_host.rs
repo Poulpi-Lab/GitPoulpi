@@ -4,8 +4,8 @@
 use super::commands::{CommandCtx, Flow};
 use super::KeyEnv;
 use crate::event_loop::*;
-use crossterm::event::MouseEvent;
 use crate::prompt_dialog::{prompt_hit_at, PromptOutcome};
+use crossterm::event::MouseEvent;
 
 /// A key while the dialog is open. `Ctrl+N` badges its controls and the key
 /// after it presses one, as in the reword popup.
@@ -69,8 +69,7 @@ fn settle(cx: &mut CommandCtx<'_>, outcome: PromptOutcome) {
         PromptOutcome::Stay => {}
         PromptOutcome::Close => {
             // Closing while the model still writes stops its request.
-            if matches!(&*cx.input_mode, InputMode::Prompt(d) if d.ai_running)
-                && cx.ai_ui.running()
+            if matches!(&*cx.input_mode, InputMode::Prompt(d) if d.ai_running) && cx.ai_ui.running()
             {
                 cx.ai_ui.cancel();
             }

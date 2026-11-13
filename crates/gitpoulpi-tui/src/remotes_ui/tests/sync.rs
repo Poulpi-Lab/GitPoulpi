@@ -140,43 +140,6 @@ fn the_pull_dropdown_runs_its_items_and_marks_none() {
 }
 
 #[test]
-fn the_upstream_menu_offers_each_remotes_branches_same_name_first() {
-    let refs = vec![
-        remote_branch_at("origin", "alpha", oid(1)),
-        remote_branch_at("origin", "feature", oid(2)),
-        remote_branch_at("fork", "feature", oid(3)),
-    ];
-    let remotes = vec!["origin".to_string(), "fork".to_string()];
-    let entries = upstream_entries("feature", &refs, &remotes, Some("origin/feature"));
-    let Entry::Submenu { label, items } = &entries[0] else {
-        panic!("{entries:?}")
-    };
-    assert_eq!(label, "origin");
-    assert!(matches!(
-        &items[0],
-        Entry::Action { action: RemoteUiAction::SetUpstream { upstream: Some(u), .. }, .. }
-            if u == "origin/feature"
-    ));
-    assert!(
-        entries.iter().any(|e| matches!(
-            e,
-            Entry::Action {
-                action: RemoteUiAction::SetUpstream { upstream: None, .. },
-                ..
-            }
-        )),
-        "a branch with an upstream can unset it"
-    );
-    assert!(entries.iter().any(|e| matches!(
-        e,
-        Entry::Action {
-            action: RemoteUiAction::TypeUpstream { .. },
-            ..
-        }
-    )));
-}
-
-#[test]
 fn the_diverged_dialog_offers_pull_force_with_lease_and_cancel() {
     let rejection = PushRejection {
         remote: "origin".into(),

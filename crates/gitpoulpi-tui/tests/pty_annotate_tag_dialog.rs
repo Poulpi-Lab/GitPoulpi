@@ -53,10 +53,7 @@ fn wait_tag_message(repo: &FixtureRepo, tag: &str, needle: &str) {
         if shown.contains(needle) {
             return;
         }
-        assert!(
-            std::time::Instant::now() < deadline,
-            "tag {tag}: {shown:?}"
-        );
+        assert!(std::time::Instant::now() < deadline, "tag {tag}: {shown:?}");
         std::thread::sleep(Duration::from_millis(200));
     }
 }

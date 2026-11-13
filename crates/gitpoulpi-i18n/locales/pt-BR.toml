@@ -5300,6 +5300,32 @@ tag_annotate_button = "Annotate"
 tag_create_button = "Create {$tag}"
 # context: hint under the multi-line message field of the tag dialog; {key} is the key that applies
 keys_hint = "Enter: new line, {key}: apply, Esc: cancel"
+# context: title of the dialog that sets the upstream (the remote branch it tracks) of a local branch; {branch} is the local branch
+upstream_title = "Set upstream of {branch}"
+# context: placeholder of the remote branch list of that dialog while nothing is chosen
+upstream_placeholder = "Select a remote branch..."
+# context: the primary button of the set upstream dialog
+set_button = "Set"
+# context: button of the set upstream dialog that removes the branch's upstream (only shown when it has one)
+unset_button = "Unset upstream"
+# context: inline error in the set upstream dialog when the typed value starts with a name that is not a remote; {remote} is that name
+unknown_remote = "No remote named '{remote}'"
+# context: inline error in the set upstream dialog when Set is pressed with nothing chosen
+upstream_none = "Choose a remote branch first."
+# context: title of the dialog that routes file patterns through Git LFS
+lfs_track_title = "Track with Git LFS"
+# context: placeholder of the Git LFS track field; several patterns are separated by spaces
+lfs_track_placeholder = "patterns, e.g. *.psd assets/big.bin"
+# context: the primary button of the Git LFS track dialog
+track_button = "Track"
+# context: title of the dialog that stops routing a pattern through Git LFS
+lfs_untrack_title = "Stop tracking with Git LFS"
+# context: placeholder of the list of tracked Git LFS patterns while nothing is chosen
+lfs_untrack_placeholder = "Select a pattern..."
+# context: the primary button of the Git LFS untrack dialog
+untrack_button = "Untrack"
+# context: inline error in the Git LFS track and untrack dialogs when no pattern was given
+pattern_empty = "Enter at least one pattern."
 
 [composer]
 need_staged = { git = "Faça stage das alterações para o commit", local = "Prepare alterações para o commit" }

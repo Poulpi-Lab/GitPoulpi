@@ -20,12 +20,16 @@ mod tests;
 
 use std::cell::{Cell, RefCell};
 
+use crate::combo::{Combo, ComboOutcome};
+
 use crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKind};
 
 use super::*;
 use crate::dialog_kit::{self, CloseHit, DiscardGuard, Dismiss, DismissAction, DismissKind, Guard};
 use crate::keymap::Action as Bind;
 use gitpoulpi_i18n::msg::input as msg_input;
+use gitpoulpi_i18n::msg::prompt_dialog as msg;
+use gitpoulpi_i18n::msg::remotes as msg_remotes;
 
 /// The dialog's focusable parts, in Tab order.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,6 +61,16 @@ pub(crate) enum PromptKind {
     TagMessage { at: Oid, name: String },
     /// `Annotate <tag>...` on an existing tag.
     AnnotateTag { tag: String },
+    /// `Set upstream`: pick a remote branch (or type `remote/branch`) for `branch`.
+    /// `remotes` are the configured remote names a typed value is checked against.
+    SetUpstream {
+        branch: String,
+        remotes: Vec<String>,
+    },
+    /// `LFS: Track Pattern...`: space-separated patterns.
+    LfsTrack,
+    /// `LFS: Untrack Pattern...`: pick one of the tracked patterns (or type one).
+    LfsUntrack,
 }
 
 /// What a key or click in the dialog asks of the host.
@@ -79,6 +93,12 @@ pub(crate) struct PromptDialog {
     submit_label: String,
     multiline: bool,
     text: String,
+    /// The field is a searchable list (with custom text allowed) instead of
+    /// a text box: Set upstream and Untrack. It paints and routes through
+    /// `&self` like the rest of the dialog, hence the `RefCell`.
+    combo: Option<RefCell<Combo>>,
+    /// A second button next to Cancel (`Unset upstream`).
+    unset: Option<String>,
     /// What the field held when the dialog opened: only a change to it is
     /// "typed" work.
     baseline: String,
@@ -143,6 +163,8 @@ impl PromptDialog {
             submit_label,
             multiline,
             text: text.to_string(),
+            combo: None,
+            unset: None,
             baseline: text.to_string(),
             editor: Default::default(),
             focus: PromptPart::Field,
@@ -220,7 +242,20 @@ impl PromptDialog {
     }
 
     fn extras(&self) -> u8 {
-        0
+        u8::from(self.unset.is_some())
+    }
+
+    /// The list is open and owns the keyboard and the pointer.
+    fn combo_open(&self) -> bool {
+        self.combo.as_ref().is_some_and(|c| c.borrow().is_open())
+    }
+
+    /// What the field holds: the chosen list entry, or the typed text.
+    fn value(&self) -> Option<String> {
+        match &self.combo {
+            Some(combo) => combo.borrow().selected().map(str::to_string),
+            None => Some(self.text.trim().to_string()).filter(|t| !t.is_empty()),
+        }
     }
 
     /// Tab order: the field, the AI button, the extras, Cancel, the primary.
@@ -244,7 +279,7 @@ impl PromptDialog {
 
     /// Typed work that closing would lose.
     fn dirty(&self) -> bool {
-        self.text.trim() != self.baseline.trim()
+        self.combo.is_none() && self.text.trim() != self.baseline.trim()
     }
 
     fn rule(&self) -> Rule {
@@ -320,7 +355,98 @@ impl PromptDialog {
                 let said = msg_input::creating_annotated_tag_at(&name, Self::short(at));
                 PromptOutcome::Submit(vec![Action::TagCreateAnnotated { name, at, message }], said)
             }
+            PromptKind::SetUpstream { branch, remotes } => {
+                let Some(upstream) = self.value() else {
+                    self.error = Some(msg::UPSTREAM_NONE.get().into());
+                    return PromptOutcome::Stay;
+                };
+                if let Some(why) = self.upstream_problem(&upstream, &remotes) {
+                    self.error = Some(why);
+                    return PromptOutcome::Stay;
+                }
+                let said = msg_remotes::setting_upstream(&branch, &upstream);
+                let upstream = Some(upstream);
+                PromptOutcome::Submit(vec![Action::BranchSetUpstream { branch, upstream }], said)
+            }
+            PromptKind::LfsTrack => {
+                let patterns = patterns_of(&message);
+                if patterns.is_empty() {
+                    self.error = Some(msg::PATTERN_EMPTY.get().into());
+                    return PromptOutcome::Stay;
+                }
+                let said = msg_input::lfs_tracking(patterns.join(" "));
+                PromptOutcome::Submit(
+                    vec![Action::LfsTrack {
+                        patterns,
+                        opts: gitpoulpi_core::domain::LfsTrackOptions::default(),
+                    }],
+                    said,
+                )
+            }
+            PromptKind::LfsUntrack => {
+                let patterns = self.value().map(|v| patterns_of(&v)).unwrap_or_default();
+                if patterns.is_empty() {
+                    self.error = Some(msg::PATTERN_EMPTY.get().into());
+                    return PromptOutcome::Stay;
+                }
+                let said = msg_input::lfs_untracking(patterns.join(" "));
+                PromptOutcome::Submit(vec![Action::LfsUntrack(patterns)], said)
+            }
         }
+    }
+
+    /// Why a typed upstream cannot be used: it must be `known-remote/branch`
+    /// (a listed entry always is).
+    fn upstream_problem(&self, upstream: &str, remotes: &[String]) -> Option<String> {
+        let known = remotes.iter().any(|r| {
+            upstream
+                .strip_prefix(r.as_str())
+                .and_then(|rest| rest.strip_prefix('/'))
+                .is_some_and(|branch| !branch.is_empty())
+        });
+        (!known).then(|| msg::unknown_remote(upstream.split('/').next().unwrap_or(upstream)))
+    }
+
+    /// The `Unset upstream` button: drops the branch's upstream.
+    fn unset_upstream(&mut self) -> PromptOutcome {
+        let PromptKind::SetUpstream { branch, .. } = self.kind.clone() else {
+            return PromptOutcome::Stay;
+        };
+        let said = msg_remotes::unsetting_upstream(&branch);
+        PromptOutcome::Submit(
+            vec![Action::BranchSetUpstream {
+                branch,
+                upstream: None,
+            }],
+            said,
+        )
+    }
+
+    /// What the list answered. A pick moves the keyboard to the primary
+    /// button (a second Enter confirms); a typed value is checked first.
+    fn combo_outcome(&mut self, outcome: ComboOutcome) -> PromptOutcome {
+        match outcome {
+            ComboOutcome::Picked(_) => {}
+            ComboOutcome::Custom(value) => {
+                let problem = match &self.kind {
+                    PromptKind::SetUpstream { remotes, .. } => {
+                        self.upstream_problem(&value, remotes)
+                    }
+                    _ => None,
+                };
+                if let Some(why) = problem {
+                    if let Some(combo) = &self.combo {
+                        combo.borrow_mut().select(None);
+                    }
+                    self.error = Some(why);
+                    return PromptOutcome::Stay;
+                }
+            }
+            ComboOutcome::Handled | ComboOutcome::Ignored => return PromptOutcome::Stay,
+        }
+        self.error = None;
+        self.set_focus(PromptPart::Submit);
+        PromptOutcome::Stay
     }
 
     fn start_ai(&mut self) -> PromptOutcome {
@@ -347,7 +473,7 @@ impl PromptDialog {
                 self.set_focus(part);
                 self.try_submit()
             }
-            PromptPart::Extra(_) => PromptOutcome::Stay,
+            PromptPart::Extra(_) => self.unset_upstream(),
         }
     }
 
@@ -360,6 +486,11 @@ impl PromptDialog {
     pub(crate) fn on_key(&mut self, key: KeyEvent) -> PromptOutcome {
         if let Some(v) = self.guard.get_mut().key(key) {
             return self.verdict(v);
+        }
+        // An open list is modal: it takes every key, Esc closing it first.
+        if self.combo_open() {
+            let outcome = self.combo.as_ref().map(|c| c.borrow_mut().on_key(key));
+            return outcome.map_or(PromptOutcome::Stay, |o| self.combo_outcome(o));
         }
         let km = crate::keymap::current();
         if key.code == KeyCode::Esc {
@@ -384,7 +515,8 @@ impl PromptDialog {
                 self.step_focus(-1);
                 return PromptOutcome::Stay;
             }
-            KeyCode::Enter => {
+            // On a list field Enter opens the list (below); elsewhere it presses.
+            KeyCode::Enter if !(self.focus.is_field() && self.combo.is_some()) => {
                 return match self.focus {
                     PromptPart::Field if self.multiline => {
                         let mut text = std::mem::take(&mut self.text);
@@ -400,6 +532,29 @@ impl PromptDialog {
                 };
             }
             _ => {}
+        }
+        if let Some(combo) = &self.combo {
+            // The list field: Enter, Space and Down open it; typing opens it
+            // and starts the search.
+            if self.focus.is_field() {
+                let typed = matches!(key.code, KeyCode::Char(c) if c != ' ')
+                    && !key.modifiers.contains(KeyModifiers::CONTROL);
+                if typed {
+                    combo.borrow_mut().open();
+                }
+                let outcome = combo.borrow_mut().on_key(key);
+                if outcome != ComboOutcome::Ignored {
+                    return self.combo_outcome(outcome);
+                }
+            }
+            if !self.focus.is_field() {
+                match key.code {
+                    KeyCode::Left | KeyCode::Up => self.step_focus(-1),
+                    KeyCode::Right | KeyCode::Down => self.step_focus(1),
+                    _ => {}
+                }
+            }
+            return PromptOutcome::Stay;
         }
         if !self.focus.is_field() {
             match key.code {
@@ -444,6 +599,14 @@ impl PromptDialog {
         if self.ai_running || !self.badge_ready() {
             return;
         }
+        if let Some(combo) = &self.combo {
+            let mut combo = combo.borrow_mut();
+            if !combo.is_open() {
+                combo.open();
+            }
+            combo.paste(text);
+            return;
+        }
         let unix = text.replace("\r\n", "\n").replace('\r', "\n");
         let clean: String = if self.multiline {
             unix.chars()
@@ -467,7 +630,7 @@ impl PromptDialog {
     /// Whether `Ctrl+N` may badge the controls: not while the discard question
     /// owns the keyboard.
     pub(crate) fn badge_ready(&self) -> bool {
-        !self.guard.borrow().is_open()
+        !self.guard.borrow().is_open() && !self.combo_open()
     }
 
     /// What `Ctrl+N` badges: every control the last paint registered.
@@ -494,13 +657,14 @@ impl PromptDialog {
     /// A mouse event for the dialog: the discard question first, then the
     /// cross and the click outside, the area's scrollbar, the field, and the
     /// buttons (`hit` is the control under the pointer, from the paint walk).
-    pub(crate) fn on_mouse(
-        &mut self,
-        mouse: MouseEvent,
-        hit: Option<PromptPart>,
-    ) -> PromptOutcome {
+    pub(crate) fn on_mouse(&mut self, mouse: MouseEvent, hit: Option<PromptPart>) -> PromptOutcome {
         if let Some(v) = self.guard.get_mut().mouse(mouse) {
             return self.verdict(v);
+        }
+        // An open list is modal: it picks, scrolls, or a click away closes it.
+        if self.combo_open() {
+            let outcome = self.combo.as_ref().map(|c| c.borrow_mut().on_mouse(mouse));
+            return outcome.map_or(PromptOutcome::Stay, |o| self.combo_outcome(o));
         }
         match mouse.kind {
             MouseEventKind::ScrollDown => {
@@ -544,6 +708,11 @@ impl PromptDialog {
         }
         if mouse.kind == MouseEventKind::Down(MouseButton::Left) {
             match hit {
+                Some(PromptPart::Field) if self.combo.is_some() => {
+                    self.set_focus(PromptPart::Field);
+                    let outcome = self.combo.as_ref().map(|c| c.borrow_mut().on_mouse(mouse));
+                    return outcome.map_or(PromptOutcome::Stay, |o| self.combo_outcome(o));
+                }
                 Some(PromptPart::Field) if !self.ai_running => {
                     self.set_focus(PromptPart::Field);
                     self.editor.mouse_down(
@@ -572,4 +741,9 @@ pub(crate) fn prompt_hit_at(
         crate::chrome::HitTarget::Prompt(part) if rect.contains((col, row).into()) => Some(*part),
         _ => None,
     })
+}
+
+/// The patterns of a typed or chosen value, split on whitespace as `git lfs track` takes them.
+fn patterns_of(value: &str) -> Vec<String> {
+    value.split_whitespace().map(str::to_string).collect()
 }

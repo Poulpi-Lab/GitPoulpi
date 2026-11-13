@@ -349,10 +349,13 @@ pub(crate) enum RefNameOp {
     AnnotateTag(String),
     /// Type the upstream of this branch by hand (`origin/feature`) --
     /// the Set upstream menu's way out when the branch is not listed.
+    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
     SetUpstream(String),
     /// Type a pattern (`*.psd`) to route through Git LFS.
+    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
     LfsTrack,
     /// Type a pattern to stop routing through Git LFS.
+    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
     LfsUntrack,
     /// Type the (optional) message of a stash - `Ctrl+G m`, the palette's
     /// `Stash With Message...`. Unlike every other op an empty answer is

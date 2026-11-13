@@ -287,7 +287,8 @@ fn a_branch_proposal_opens_the_box_and_enter_creates_it() {
 }
 
 #[test]
-fn an_annotated_tag_proposal_prefills_the_name_box_and_the_message_dialog_and_an_edit_is_reported() {
+fn an_annotated_tag_proposal_prefills_the_name_box_and_the_message_dialog_and_an_edit_is_reported()
+{
     let mut rig = launch("pty-ui-propose-tag", fixture(), "second commit");
     let head = rig.head();
     proposed(

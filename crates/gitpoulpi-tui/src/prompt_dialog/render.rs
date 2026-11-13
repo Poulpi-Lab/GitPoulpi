@@ -36,7 +36,10 @@ impl PromptDialog {
         area: Rect,
         hovered: Option<PromptPart>,
     ) -> Vec<(Rect, PromptPart)> {
-        let width = area.width.saturating_sub(4).min(if self.multiline { 72 } else { 60 });
+        let width = area
+            .width
+            .saturating_sub(4)
+            .min(if self.multiline { 72 } else { 60 });
         let height = self.wanted_height().min(area.height);
         let win = self.win();
         let popup = win.place(
@@ -101,6 +104,13 @@ impl PromptDialog {
                 field.width.saturating_sub(1),
                 Style::default().fg(th().status.ai).bg(bg),
             );
+        } else if let Some(combo) = &self.combo {
+            combo.borrow_mut().render_field(
+                buf,
+                field,
+                focused,
+                hovered == Some(PromptPart::Field),
+            );
         } else if self.multiline {
             let bar = text_area(
                 buf,
@@ -161,16 +171,16 @@ impl PromptDialog {
         );
         hits.push((cancel, PromptPart::Cancel));
         x += cancel.width + 1;
-        let submit = button(
-            buf,
-            x,
-            by,
-            &self.submit_label,
+        // A list prompt's primary button is flat until something is chosen.
+        let submit_state = if self.combo.is_some() && self.value().is_none() {
+            ButtonState::Disabled
+        } else {
             ButtonState::Primary {
                 hovered: hovered == Some(PromptPart::Submit),
                 focused: self.focus == PromptPart::Submit,
-            },
-        );
+            }
+        };
+        let submit = button(buf, x, by, &self.submit_label, submit_state);
         hits.push((submit, PromptPart::Submit));
         if self.ai {
             let label = format!(
@@ -201,6 +211,24 @@ impl PromptDialog {
                 hits.push((rect, PromptPart::Ai));
             }
         }
+        if let Some(label) = &self.unset {
+            let rect = button(
+                buf,
+                inner.x,
+                by,
+                label,
+                ButtonState::Normal {
+                    hovered: hovered == Some(PromptPart::Extra(0)),
+                    focused: self.focus == PromptPart::Extra(0),
+                },
+            );
+            hits.push((rect, PromptPart::Extra(0)));
+        }
+        // The open list over everything else, then the discard question.
+        if let Some(combo) = &self.combo {
+            let area = buf.area;
+            combo.borrow_mut().render_popup(buf, area);
+        }
         guard.render(buf);
         hits
     }
@@ -230,9 +258,10 @@ fn proposed_by_text(client: &str) -> String {
 /// The "✦ Proposed by ..." tail of the title keeps the AI purple.
 fn paint_proposed(buf: &mut Buffer, popup: Rect, suffix: &str) {
     let spark = crate::theme::AI_SPARK;
-    let Some(start) = (popup.x..popup.right())
-        .find(|col| buf.cell((*col, popup.y)).is_some_and(|c| c.symbol() == spark))
-    else {
+    let Some(start) = (popup.x..popup.right()).find(|col| {
+        buf.cell((*col, popup.y))
+            .is_some_and(|c| c.symbol() == spark)
+    }) else {
         return;
     };
     let width = display_width(suffix) as u16;

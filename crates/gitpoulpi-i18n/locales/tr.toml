@@ -271,7 +271,7 @@ auto_fetch_interval_minutes_help = "Varsayılan 5. 0 arka planda fetch'i tamamen
 fetch_on_tab_open = { git = "Sekme açılınca fetch et", local = "Sekme açılınca getir" }
 fetch_on_tab_open_help = { git = "Arka planda Fetch All; son dakikada fetch edildiyse atlanır.", local = "Arka planda Tümünü Getir; son dakikada getirildiyse atlanır." }
 auto_prune = "Otomatik Prune"
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = { git = "Uzakta artık bulunmayan uzak izleme dallarını fetch sırasında kaldırır: arka plandaki otomatik fetch, araç çubuğundaki Fetch ve Fetch All (diverged push iletişim kutusunun lease denetimi hariç). Varsayılan olarak açıktır; sunucuda silinen bir dal bir sonraki fetch'ten sonra REMOTE bölümünden kaybolur. Eski uzak izleme dallarının listede kalmasını istiyorsanız kapatın.", local = "Uzakta artık bulunmayan uzak izleme dallarını getirme sırasında kaldırır: arka plandaki otomatik getirme, araç çubuğundaki Getir ve Tümünü Getir (ayrışmış dalı gönderme iletişim kutusunun lease denetimi hariç). Varsayılan olarak açıktır; sunucuda silinen bir dal bir sonraki getirmeden sonra REMOTE bölümünden kaybolur. Eski uzak izleme dallarının listede kalmasını istiyorsanız kapatın." }
 keep_submodules_up_to_date = "Alt modülleri güncel tut"
 default_branch_name = "Varsayılan Dal Adı"
 default_branch_name_help = "Depo başlatılırken veya klonlanırken kullanılır."
@@ -4480,7 +4480,7 @@ file_list_loading = "bu commit'in dosya listesi hâlâ yükleniyor"
 no_repo_tab = "açık depo sekmesi yok"
 commit_now_ai_running = "bir YZ mesajı hâlâ yazılıyor - bekleyin ya da Esc ile iptal edin"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "mesajı yazın, ardından {$commit} için {key} tuşuna basın"
 no_matching_tab = "eşleşen sekme yok"
 no_matching_theme = "eşleşen tema yok"
 no_matching_language = "eşleşen dil yok"

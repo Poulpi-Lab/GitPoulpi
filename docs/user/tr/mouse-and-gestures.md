@@ -361,7 +361,7 @@ Bkz. [Stage'leme ve commit'leme](staging-and-committing.md).
 - Görünümü o satıra taşımak için **mini haritaya tıklayın**. Düğmeyi basılı
   tutup hareket ettirerek kaydırın.
 
-Her atma önce sorar.
+Her atma önce sorar. Bir atma izlenmeyen dosyaları sildiğinde, tamamen boş kalan klasörler de onlarla birlikte gider (hâlâ izlenen, yok sayılan ya da gizli bir dosya barındıran veya zaten boş olan klasör asla silinmez); Geri Al dosyaları klasörleriyle birlikte geri getirir.
 
 ### Blame ve dosya geçmişi
 

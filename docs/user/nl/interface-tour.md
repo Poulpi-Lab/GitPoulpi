@@ -50,6 +50,18 @@ komt één tabblad per geopende repository. De `x` waarmee je een tabblad sluit,
 op het actieve tabblad en op het tabblad onder de aanwijzer. De tabbalk bevat alleen
 tabbladen (de knop voor het [globale zoeken](search.md) staat in de titelbalk).
 
+Als de tabbladen van de repository niet passen, scrolt de rij in plaats van de tabbladen
+te laten krimpen: de tabbladen staan tussen twee pijlknoppen, `‹` links en `›` rechts.
+Een pijl is gedimd als er aan die kant geen tabblad verborgen is. Klik op een pijl om
+één tabblad meer aan die kant te tonen (houd hem ingedrukt om te blijven scrollen), of
+gebruik het wiel boven de rij (omhoog of naar links toont de eerdere tabbladen). Telkens
+als het huidige tabblad verandert (je wisselt van tabblad met het toetsenbord, de
+tabbladkiezer of het palet, opent of sluit een tabblad, of verandert de venstergrootte),
+scrolt de rij precies genoeg om het helemaal te tonen. Is er ruimte voor, dan opent een
+knop `…` na de rechterpijl de tabbladkiezer. Een tabblad op een pijl slepen scrolt de
+rij zolang je het daar houdt, zodat je het voorbij de zichtbare tabbladen kunt neerzetten.
+`Ctrl+N` zet een badge op elke actieve pijl.
+
 **Instellingen > Weergave > Positie van de tabbalk** verplaatst deze rij naar de onderkant van het venster (onder de statusbalk) of maakt er een kolom van aan de linkerrand: een tabblad per rij, eerst Start, dan de werkruimtechip, de Radar, het tabblad Werkruimtes, de tabbladen (een lange naam eindigt op `…`) en de `+`. Zijn er meer tabbladen dan rijen, dan toont een `…`-rij hoeveel er boven (`▲`) en onder (`▼`) verborgen zijn en opent de tabbladenlijst; het wiel scrolt de kolom. Naast een werkbalk als kolom blijven de tabbladen aan de buitenkant. Een venster smaller dan 80 kolommen houdt de tabbladen bovenaan. Klikken, het sluitkruisje, middelklik, het rechtermuisknopmenu, slepen om te herordenen en het toetsenbord werken op elke positie hetzelfde.
 
 - De **+** direct na het laatste tabblad opent een klein menu: **Nieuw tabblad** (`Alt+T`,
@@ -252,6 +264,17 @@ filteren**, vast boven de lijst, die als enige scrolt. Klik op een bestand om zi
 openen. In een laag venster krimpt eerst het bericht (tot één rij), dan de lijst. De weergave
 van de lokale wijzigingen houdt haar rij **Pad** / **Boom** / **Alle bestanden tonen**
 bovenaan de bestandslijsten, boven de lijsten Unstaged en Staged.
+
+**Links in een bericht.** Een webadres in het bericht (`https://...`, of het doel van een
+markdown-link `[tekst](https://...)`) is onderstreept, toont de handaanwijzer en vraagt bij een klik
+**Deze link openen?** met het hele adres voordat er iets opent: de tekst van een bericht
+is niet te vertrouwen. **Openen** (`O`) start de browser, **Annuleren** (`A`, `Esc`, het kruisje) doet niets. Alleen
+`http`- en `https`-adressen worden aangeboden. Het toetsenbordequivalent is het palet-commando
+`Commitdetails: Link in bericht openen...`, dat naar het eerste adres van het bericht
+vraagt en met **Volgende** (`V`) langs de andere gaat.
+Sommige terminals tekenen zelf een onderstreping onder een adres onder de aanwijzer en
+openen het zelf bij een klik met een toets erbij (vaak Shift+klik); dat is een functie van
+de terminal, niet van GitPoulpi.
 
 Elke bestandslijst heeft menu's voor bestanden, mappen en het lege deel, en meerdere bestanden kunnen tegelijk worden geselecteerd (**Ctrl+klik**, **Shift+klik**); zie [Stagen en committen](staging-and-committing.md).
 

@@ -184,6 +184,8 @@ PATH の変更が見えるのは新しいターミナルで、すでに開いて
 - **`gp`（コマンドのエイリアス）。** エイリアスを作成すると、`gp.exe` も `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` に登録され（`gitpoulpi-launch.exe` を指します）、削除するとそのキーも削除されます（GitPoulpi のものである場合のみ）。エイリアスのフォルダーが PATH に含まれている場合（**GitPoulpi を PATH に追加**）、Windows は先に `.cmd` のシムを実行するため、GitPoulpi が表示されるまでの間、コンソールウィンドウが一瞬表示されることがあります。古いバージョンが書き込んだシムは、設定がエイリアスを読み込んだときに自動的に書き換えられます。
 - **`gitpoulpi`。** **ファイルマネージャーのメニュー**をインストールしていれば使えます。インストールすると `gitpoulpi.exe` も App Paths に登録されます。インストールしていない場合、`gitpoulpi` が見つかるのは GitPoulpi のフォルダーが PATH に含まれているときだけで、その場合も上と同様にコンソールが一瞬表示されることがあります。
 
+ファイルエクスプローラーは、Windows にサインインした時点の PATH を保持します。あとから PATH に追加したフォルダーは、いったんサインアウトして再度サインインしてからでないと認識されません。それまでは App Paths のエントリだけが見つかり、Windows が見つけられない名前はウェブアドレスとしてブラウザーで開かれます。
+
 Linux と macOS には同等の機能はありません。ファイルマネージャーのアドレス欄ではプログラムを実行できないためです。**ファイルマネージャーのメニュー**のエントリか、ターミナルでコマンドのエイリアスを使ってください。
 
 #### ファイルマネージャーのメニュー（GitPoulpi で開く）
@@ -196,7 +198,7 @@ Linux と macOS には同等の機能はありません。ファイルマネー�
 |---|---|
 | Windows | ユーザーごとのキーで、管理者権限は不要：`HKCU\Software\Classes\Directory\shell\GitPoulpi`、`Directory\Background\shell\GitPoulpi`、`Drive\shell\GitPoulpi`。それぞれに `command` サブキーがあり、フォルダー、開いているフォルダーの背景、ドライブに表示されます。各キーには `X-GitPoulpi` の値があり、これがないキーは**自分のものではない**扱いで、触れません。また `gitpoulpi.exe` を `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths` に登録します（`gitpoulpi-launch.exe` を指します）。Windows 11 では、エントリは従来のメニューにのみ表示されます：**その他のオプションを確認**、Shift+F10、または Shift+右クリック（新しいトップレベルのメニューに並ぶのはパッケージ化されたアプリだけです）。削除は GitPoulpi のキーを削除し、続けて、インストールが作成した親キーを、空になっている場合に限って削除します。 |
 | Linux | PATH 上で見つかったファイルマネージャーのみ。GNOME Files と Caja：エントリと同じ名前のスクリプトを `~/.local/share/nautilus/scripts` または `~/.config/caja/scripts` に置きます（**スクリプト**サブメニューに表示）。Dolphin：`~/.local/share/kio/servicemenus/gitpoulpi-open.desktop`（実行可能にします。KDE Frameworks 6 は実行可能でないユーザーのサービスメニューを無視します。5.85 より前の KDE Frameworks 5 は非対応です）。Nemo：`~/.local/share/nemo/actions` に 2 つのアクション（選択したフォルダー用と背景用）。Thunar：`~/.config/Thunar/uca.xml` にマージされる 1 つのアクション。ご自身のアクションはそのまま残り、削除するとファイルはバイト単位で元に戻ります（インストールが作成したファイルなら削除されます）。PCManFM と PCManFM-Qt：`~/.local/share/file-manager/actions/gitpoulpi-open.desktop`。アイコンは `~/.local/share/icons/hicolor/256x256/apps/gitpoulpi-folder.png` に置かれ、最後のエントリと一緒に削除されます。`XDG_DATA_HOME` と `XDG_CONFIG_HOME` が反映されます。エントリは選択したフォルダーに表示され、ファイルマネージャーが対応していればフォルダーの背景にも表示されます。 |
-| macOS | クイックアクション `~/Library/Services/Open in GitPoulpi.workflow`：Finder でフォルダーを右クリックし、**クイックアクション**を選びます。選択したフォルダーのみ（Finder にはフォルダーの背景用のメニューがありません）。初回は、システム設定 > キーボード > キーボードショートカット > サービス でオンにする必要がある場合があります。 |
+| macOS | クイックアクション `~/Library/Services/Open in GitPoulpi.workflow`：Finder でフォルダーを右クリックし、**クイックアクション**を選びます。選択したフォルダーのみ（Finder にはフォルダーの背景用のメニューがありません）。初回クリック時に、ワークフローサービスがターミナルを操作してよいか macOS が確認してきます（オートメーションの確認。例：「WorkflowServiceRunner.xpc が ... の制御を求めています」）。許可してください。エントリが表示されない場合は、システム設定 > キーボード > キーボードショートカット > サービス でオンにします。 |
 
 GitPoulpi が書き込むすべてのファイルとキーには `X-GitPoulpi=1` のマーカーが付き（スクリプトでは `# X-GitPoulpi=1` の行）、削除はマーカーのあるものだけを削除します。これらの操作が変更するのはリポジトリではなくシステムなので、元に戻す機能の対象ではありません。戻すには**削除**を使います。Linux と macOS ではファイルマネージャーのアドレス欄がプログラムを実行しないため、そこに入力するものはありません。ターミナルにはコマンドのエイリアスがあります。
 

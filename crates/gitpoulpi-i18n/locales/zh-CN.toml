@@ -8752,8 +8752,8 @@ include_drafts = "包含草稿"
 assigned_issues = "指派给我的议题"
 # context: field label: orgs, groups or workspaces the account-wide lists are limited to
 namespaces = "命名空间"
-# context: hint in the empty namespaces field
-namespaces_hint = "例如 acme, platform（留空：我自己的以及我所属的全部）"
+# context: hint in the empty Namespaces text area (one entry per line)
+namespaces_hint = "每行一项，例如 acme（留空：我自己的以及我所属的全部）"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
 namespaces_help = "每行一项。名称匹配该组或所有者及其下的全部内容（ptm 匹配 ptm/produits/x，不匹配 ptmx/y）。留空则匹配你自己的以及你所属的全部。"
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is

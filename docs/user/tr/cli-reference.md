@@ -103,7 +103,7 @@ numaralandırdığı gibi numaralandırılır.
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Bir dosyayı, klasörü, her şeyi, bir hunk'ı veya bazı satırları stage'le. Hassas bir dosya (bir özel anahtar, bir `.env`, tanınan bir token: [yapılandırma başvurusunda](config-reference.md#privacy-hassas-dosyalar) `[privacy]`) ekleyecek bir dosya, klasör veya `--all` stage'i çıkış kodu 2 ve `{error: "sensitive_files", files: [{path, reason}]}` ile reddedilir (bir kural ve maskeli bir önizleme, asla bir değer); hiçbir şey stage'lenmez. `--allow-sensitive` yine de stage'ler. |
 | `unstage` (aynı bayraklar) | Tersi. |
-| `discard --file F [--hunk N [--lines a,b]]` | Stage'lenmemiş değişiklikleri at (tüm dosya: her değişiklik, izlenmeyen dosya silinir). Geri alınabilir. |
+| `discard --file F [--hunk N [--lines a,b]]` | Stage'lenmemiş değişiklikleri at (tüm dosya: her değişiklik, izlenmeyen dosya silinir ve boş kalan klasörler de). Geri alınabilir. |
 | `rm-file <paths>...` | Dosyaları çalışma ağacından sil. Geri alınabilir. |
 | `ignore <pattern> [--file <.gitignore>]` | Bir `.gitignore` dosyasına (ya da `--file .git/info/exclude` ile `.git/info/exclude` dosyasına) desen ekle. `.git/info/exclude` dışında geri alınabilir. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Çalışma ağacındaki dosyaların kodlamasını, satır sonlarını veya girintisini yeniden yazar. İkili, eksik ve kodlanamayan dosyalar atlanır ve bildirilir. Tüm toplu iş için tek bir geri alma girdisi. |
@@ -163,7 +163,7 @@ ve stash'i pop eder; `general.auto_stash` ne derse desin ([Otomatik stash](log-a
 
 | Komut | Ne yapar |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Varsayılan uzak depoyu, birini ya da hepsini fetch et. Her fetch ayrıca her uzak deponun tag'lerde sahip olduklarını (`tag list`'in `remote` değeri) yeniler ve bu kaydı `--prune` olmadan da temizler. `--prune-tags` (Ayarlar: Tag'ler otomatik temizleme) uzak deponun sildiği yerel tag'leri de siler: yalnızca onda bulunmuş tag'leri, asla push etmediğiniz birini değil; yanıt bunları `pruned_tags` olarak listeler (git 2.41+). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Varsayılan uzak depoyu, birini ya da hepsini fetch et. Uzak deponun sildiği uzak izleme dalları, `general.auto_prune` false değilse temizlenir; `--prune` bunu zorlar. Her fetch ayrıca her uzak deponun tag'lerde sahip olduklarını (`tag list`'in `remote` değeri) yeniler ve bu kaydı `--prune` olmadan da temizler. `--prune-tags` (Ayarlar: Tag'ler otomatik temizleme) uzak deponun sildiği yerel tag'leri de siler: yalnızca onda bulunmuş tag'leri, asla push etmediğiniz birini değil; yanıt bunları `pruned_tags` olarak listeler (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; kip her zaman Git'e açıkça iletilir. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Düz force yoktur: yalnızca `--force-with-lease`. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Uzak depolar. `remote list`, arkasında uzak depo olmayan bir uzak izleme ad alanını `configured: false` ile işaretler; `remote remove` onun dallarını siler (geri alınabilir). |

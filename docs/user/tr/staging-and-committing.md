@@ -167,14 +167,17 @@ değişiklikleri satırındaki alandır: ikisinden birine yazmak diğerinde gör
   depodaki `pre-commit` ve `commit-msg` hook'larını çalıştırmadan commit yapar.
   Yalnızca o commit için geçerlidir; **Ayarlar > Depoya özel ayarlar > Commit**
   bunu varsayılan olarak işaretli başlatır. Satırda yer varsa gösterilir.
-- `Ctrl+G c` veya Durum panelinde `c` imleci forma taşır. `Esc` formdan çıkarır.
-- `Ctrl+G Enter` (palette **Git: Stage'lenen Değişiklikleri Şimdi Commit Et**) her yerden
-  çalışan commit düğmesidir: stage'lenmiş değişiklikleri formdaki mesajla, **Önceki
-  commit'i amend et** ve **Hook'ları atla** seçeneklerine uyarak, odağı taşımadan
-  commit'ler. Hiçbir şey stage'lenmemişse ya da özet yoksa bunu söyler ve imleci özete
-  koyar. Bir YZ mesajı hâlâ yazılıyorsa hiçbir şey commit'lemez ve durum çubuğunda
-  bir mesaj gösterir (`Esc` YZ isteğini iptal eder). `Ctrl+Z` commit'i diğerleri gibi
-  geri alır.
+- Durum panelinde `c` imleci forma taşır. `Esc` formdan çıkarır.
+- `Ctrl+G c` ve `Ctrl+G Enter` (palette **Git: Commit...** ve **Git: Stage'lenen
+  Değişiklikleri Şimdi Commit Et**) tek bir komuttur: her yerden çalışan commit
+  düğmesi. Formda bir özet varsa ve bir şey stage'lenmişse hemen commit'ler;
+  **Önceki commit'i amend et** ve **Hook'ları atla** seçeneklerine uyar, odağı
+  taşımaz. Aksi halde hiçbir şey commit'lemez: imleci formun özetine taşır (panel
+  gizliyse ya da daraltılmışsa gösterir) ve durum çubuğu hangi kısayolun commit
+  ettiğini söyler (varsayılan olarak `Ctrl+Enter`). Hiçbir şey stage'lenmemişse bunu
+  söyler. Durum çubuğuna hiçbir şey yazılmaz. Bir YZ mesajı hâlâ yazılıyorsa hiçbir
+  şey commit'lemez ve bunu söyler (`Esc` YZ isteğini iptal eder). `Ctrl+Z` commit'i
+  diğerleri gibi geri alır.
 - Depo başına [Ayarlar](settings.md#depoya-özel-commit), **her commit sonrası push**
   edebilir, formu bir **commit şablonuyla** başlatabilir (şablondaki `#` yorumlarını
   mesajdan da çıkarır) ve bir merge'ü **squash** yapabilir: form bu durumda git'in

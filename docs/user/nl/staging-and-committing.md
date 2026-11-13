@@ -167,15 +167,16 @@ andere.
   zonder de hooks `pre-commit` en `commit-msg` van de repository uit te voeren. Het geldt per commit;
   met **Instellingen > Repositoryspecifieke instellingen > Commit** staat het standaard aangevinkt. Getoond
   als de rij ruimte heeft.
-- `Ctrl+G c` of `c` in het paneel Status zet de cursor in het formulier. `Esc`
-  verlaat het.
-- `Ctrl+G Enter` (**Git: Gestagede wijzigingen nu committen** in het palet) is de
-  commit-knop vanaf elke plek: het commit de gestagede wijzigingen met het bericht van het
-  formulier, houdt rekening met **Vorige commit amenden** en **Hooks overslaan**, en
-  verplaatst de focus niet. Zonder gestagede wijzigingen of zonder samenvatting zegt het
-  dat en zet het in plaats daarvan de cursor in de samenvatting. Zolang er nog een
-  AI-verzoek loopt, commit het niets en meldt het dat (`Esc` annuleert het verzoek). `Ctrl+Z`
-  draait de commit terug zoals elke andere.
+- `c` in het paneel Status zet de cursor in het formulier. `Esc` verlaat het.
+- `Ctrl+G c` en `Ctrl+G Enter` (**Git: Commit...** en **Git: Gestagede wijzigingen nu
+  committen** in het palet) zijn één opdracht: de commit-knop vanaf elke plek. Met een
+  samenvatting in het formulier en iets gestaged commit het meteen, houdt rekening met
+  **Vorige commit amenden** en **Hooks overslaan**, en verplaatst de focus niet. Anders commit
+  het niets: het zet de cursor in de samenvatting van het formulier (en toont het paneel als
+  het verborgen of ingeklapt was) en de statusregel zegt welke sneltoets commit (standaard
+  `Ctrl+Enter`). Zonder gestagede wijzigingen zegt het dat. In de statusregel wordt niets
+  getypt. Zolang er nog een AI-verzoek loopt, commit het niets en meldt het dat (`Esc`
+  annuleert het verzoek). `Ctrl+Z` draait de commit terug zoals elke andere.
 - Per repository kan [Instellingen](settings.md#repositoryspecifiek-commit) **pushen na elke
   commit**, het formulier met een **commitsjabloon** laten beginnen (en de `#`-opmerkingen
   eruit halen) en een merge laten **squashen**: het formulier opent dan met het squashbericht

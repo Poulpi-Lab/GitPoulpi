@@ -329,7 +329,7 @@ Zie [Stagen en committen](staging-and-committing.md).
 - **Klik op de minimap** om het zicht naar die regel te verplaatsen. Houd de knop ingedrukt
   en beweeg om te scrollen.
 
-Elke verwerping vraagt eerst bevestiging.
+Elke verwerping vraagt eerst bevestiging. Als een verwerping niet-gevolgde bestanden verwijdert, verdwijnen de mappen die daardoor helemaal leeg worden mee (nooit een map die nog een gevolgd, genegeerd of verborgen bestand bevat, of die al leeg was); Ongedaan maken brengt de bestanden terug met hun mappen.
 
 ### Blame en bestandsgeschiedenis
 

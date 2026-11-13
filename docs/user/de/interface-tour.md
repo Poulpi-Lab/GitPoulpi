@@ -61,6 +61,8 @@ folgt ein Tab pro geöffnetem Repository. Das `x`, das einen Tab schließt, ersc
 aktiven Tab und auf dem Tab unter dem Mauszeiger. Die Tab-Leiste trägt nur Tabs (die
 Schaltfläche der [globalen Suche](search.md) steht in der Titelleiste).
 
+Passen die Repository-Tabs nicht in die Zeile, scrollt sie, statt sie zu verkleinern: Die Tabs sitzen zwischen zwei Pfeiltasten, `‹` links und `›` rechts. Ein Pfeil ist abgedunkelt, wenn auf seiner Seite kein Tab verborgen ist. Klicken Sie auf einen Pfeil, um einen weiteren Tab auf dieser Seite zu zeigen (gedrückt halten scrollt weiter), oder nutzen Sie das Mausrad über der Zeile (nach oben oder links zeigt die früheren Tabs). Sobald der aktuelle Tab wechselt (Sie wechseln per Tastatur, über die Tab-Auswahl oder die Palette, öffnen oder schließen einen Tab oder ändern die Fenstergröße), scrollt die Zeile gerade so weit, dass er ganz zu sehen ist. Ist Platz dafür, öffnet eine `…`-Schaltfläche hinter dem rechten Pfeil die Tab-Auswahl. Ziehen Sie einen Tab auf einen Pfeil, scrollt die Zeile, solange Sie ihn dort halten, sodass Sie ihn hinter den sichtbaren Tabs ablegen können. `Ctrl+N` setzt ein Kennzeichen auf jeden aktiven Pfeil.
+
 **Einstellungen > Darstellung > Position der Tab-Leiste** verlegt diese Zeile an den unteren Fensterrand (unter die Statuszeile) oder macht daraus eine Spalte am linken Rand: ein Tab pro Zeile, zuerst Home, dann der Workspace-Chip, das Radar, der Tab Workspaces, die Tabs (ein langer Name endet auf `…`) und das `+`. Gibt es mehr Tabs als Zeilen, zeigt eine `…`-Zeile, wie viele oben (`▲`) und unten (`▼`) verborgen sind, und öffnet die Tab-Liste; das Mausrad scrollt die Spalte. Neben einer Symbolleiste als Spalte bleiben die Tabs ganz außen. Ein Fenster unter 80 Spalten behält die Tabs oben. Klicks, das Schließkreuz, Mittelklick, das Rechtsklick-Menü, Ziehen zum Umordnen und die Tastatur funktionieren an jeder Position gleich.
 
 - Das **+** direkt hinter dem letzten Tab öffnet ein kleines Menü: **Neuer Tab** (`Alt+T`,
@@ -272,6 +274,8 @@ dem Schalter für die Sortierung, **Pfad** / **Baum**, **Alle Dateien ansehen** 
 Datei, um ihren Diff zu öffnen. In einem niedrigen Fenster gibt zuerst die Nachricht Platz ab (bis
 auf eine Zeile), dann die Liste. Die Ansicht der Änderungen behält ihre Zeile **Pfad** / **Baum** /
 **Alle Dateien ansehen** oben über den Dateilisten, über den Listen Unstaged und Staged.
+
+**Links in einer Nachricht.** Eine in die Nachricht geschriebene Webadresse (`https://...` oder das Ziel eines Markdown-Links `[Text](https://...)`) ist unterstrichen, zeigt den Hand-Zeiger und fragt bei einem Klick mit der ganzen Adresse **Diesen Link öffnen?**, bevor irgendetwas geöffnet wird: Der Text einer Nachricht ist nicht vertrauenswürdig. **Öffnen** (`F`) startet den Browser, **Abbrechen** (`B`, `Esc`, das Kreuz) tut nichts. Angeboten werden nur `http`- und `https`-Adressen. Das Tastatur-Gegenstück ist der Palettenbefehl `Commit-Details: Link in Nachricht öffnen...`, der nach der ersten Adresse der Nachricht fragt und mit **Weiter** (`W`) durch die weiteren geht. Manche Terminals zeichnen selbst einen Unterstrich unter eine Adresse unter dem Zeiger und öffnen sie bei einem Klick mit Zusatztaste (oft Umschalt+Klick) von sich aus; das ist eine Funktion des Terminals, nicht von GitPoulpi.
 
 Jede Dateiliste hat Menüs für Dateien, Ordner und den leeren Teil, und mehrere Dateien lassen sich gleichzeitig auswählen (**Ctrl+Klick**, **Shift+Klick**); siehe [Staging und Committen](staging-and-committing.md).
 

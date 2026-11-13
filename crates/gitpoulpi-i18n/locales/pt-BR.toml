@@ -3002,7 +3002,7 @@ commit_details_shrink_message = "Detalhes do commit: diminuir a mensagem"
 commit_details_reset_message_size = "Detalhes do commit: redefinir o tamanho da mensagem"
 commit_details_scroll_message_down = "Detalhes do commit: rolar a mensagem para baixo"
 commit_details_scroll_message_up = "Detalhes do commit: rolar a mensagem para cima"
-commit_details_open_link = "Commit Details: Open Link in Message..."
+commit_details_open_link = "{$Commit} Details: Open Link in Message..."
 files_toggle_commit_file_sort_a_z_z_a = "Arquivos: alternar a ordem dos arquivos do commit (A-Z / Z-A)"
 refs_checkout_selected_ref = "Refs: checkout da ref selecionada"
 refs_copy_ref_name = "Refs: copiar nome da ref"
@@ -9364,7 +9364,7 @@ why_no_dialog = "nenhum diálogo que possa ser organizado está aberto"
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
 title = "Open this link?"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a commit message. Check it before you open it in your browser:"
+body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
 position = "Link {n} of {total}"
 # context: button that opens the address in the browser

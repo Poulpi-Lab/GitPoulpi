@@ -505,6 +505,7 @@ die Standardtasten.
 | Commit-Details: Nachrichtengröße zurücksetzen |  |
 | Commit-Details: Nachricht nach unten scrollen |  |
 | Commit-Details: Nachricht nach oben scrollen |  |
+| Commit Details: Open Link in Message... |  |
 | Dateien: Sortierung der Commit-Dateien umschalten (A-Z / Z-A) |  |
 | Refs: Ausgewählte Ref auschecken | `Doppelklick` |
 | Refs: Ref-Namen kopieren |  |

@@ -510,6 +510,7 @@ Klávesy jsou výchozí.
 | Detaily commitu: Obnovit velikost zprávy |  |
 | Detaily commitu: Posunout zprávu dolů |  |
 | Detaily commitu: Posunout zprávu nahoru |  |
+| Commit Details: Open Link in Message... |  |
 | Soubory: Přepnout řazení souborů commitu (A-Z / Z-A) |  |
 | Refs: Checkout vybraného refu | `dvojklik` |
 | Refs: Kopírovat název refu |  |

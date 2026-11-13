@@ -3003,7 +3003,7 @@ commit_details_shrink_message = { git = "Commit-details: Bericht verkleinen", lo
 commit_details_reset_message_size = { git = "Commit-details: Berichtgrootte resetten", local = "Commitdetails: Berichtgrootte resetten" }
 commit_details_scroll_message_down = { git = "Commit-details: Bericht omlaag scrollen", local = "Commitdetails: Bericht omlaag scrollen" }
 commit_details_scroll_message_up = { git = "Commit-details: Bericht omhoog scrollen", local = "Commitdetails: Bericht omhoog scrollen" }
-commit_details_open_link = "Commit Details: Open Link in Message..."
+commit_details_open_link = "{$Commit} Details: Open Link in Message..."
 files_toggle_commit_file_sort_a_z_z_a = { git = "Bestanden: Sortering commit-bestanden omschakelen (A-Z / Z-A)", local = "Bestanden: Sortering commitbestanden omschakelen (A-Z / Z-A)" }
 refs_checkout_selected_ref = "Refs: Geselecteerde ref uitchecken"
 refs_copy_ref_name = "Refs: Refnaam kopiëren"
@@ -9366,7 +9366,7 @@ why_no_dialog = "er is geen dialoog open dat kan worden geschikt"
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
 title = "Open this link?"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a commit message. Check it before you open it in your browser:"
+body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
 position = "Link {n} of {total}"
 # context: button that opens the address in the browser

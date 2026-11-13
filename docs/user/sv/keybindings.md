@@ -512,6 +512,7 @@ Tangenterna är standardvärdena.
 | Commit-detaljer: Återställ meddelandets storlek |  |
 | Commit-detaljer: Rulla meddelandet ned |  |
 | Commit-detaljer: Rulla meddelandet upp |  |
+| Commit Details: Open Link in Message... |  |
 | Filer: Växla sortering av commit-filer (A-Ö / Ö-A) |  |
 | Refs: Checka ut vald ref | `dubbelklick` |
 | Refs: Kopiera refnamn |  |

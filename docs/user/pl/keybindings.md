@@ -509,6 +509,7 @@ zastosowania. Klawisze są domyślne.
 | Szczegóły commita: Resetuj rozmiar opisu |  |
 | Szczegóły commita: Przewiń opis w dół |  |
 | Szczegóły commita: Przewiń opis w górę |  |
+| Commit Details: Open Link in Message... |  |
 | Pliki: Przełącz sortowanie plików commita (A-Z / Z-A) |  |
 | Refs: Checkout zaznaczonego refu | `dwuklik` |
 | Refs: Kopiuj nazwę refu |  |

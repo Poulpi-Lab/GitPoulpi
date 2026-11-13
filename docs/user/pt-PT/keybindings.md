@@ -508,6 +508,7 @@ As teclas são as predefinidas.
 | Detalhes do commit: repor o tamanho da mensagem |  |
 | Detalhes do commit: deslocar a mensagem para baixo |  |
 | Detalhes do commit: deslocar a mensagem para cima |  |
+| Commit Details: Open Link in Message... |  |
 | Ficheiros: alternar a ordem dos ficheiros do commit (A-Z / Z-A) |  |
 | Refs: checkout da ref selecionada | `clique duplo` |
 | Refs: copiar nome da ref |  |

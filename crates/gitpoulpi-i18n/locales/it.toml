@@ -3002,7 +3002,7 @@ commit_details_shrink_message = "Dettagli commit: Riduci il messaggio"
 commit_details_reset_message_size = "Dettagli commit: Reimposta la dimensione del messaggio"
 commit_details_scroll_message_down = "Dettagli commit: Scorri il messaggio in giù"
 commit_details_scroll_message_up = "Dettagli commit: Scorri il messaggio in su"
-commit_details_open_link = "Commit Details: Open Link in Message..."
+commit_details_open_link = "{$Commit} Details: Open Link in Message..."
 files_toggle_commit_file_sort_a_z_z_a = "File: Inverti l'ordine dei file del commit (A-Z / Z-A)"
 refs_checkout_selected_ref = { git = "Refs: Checkout del ref selezionato", local = "Refs: Passa al ref selezionato" }
 refs_copy_ref_name = "Refs: Copia il nome del ref"
@@ -9365,7 +9365,7 @@ why_no_dialog = "nessuna finestra disponibile da disporre è aperta"
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
 title = "Open this link?"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a commit message. Check it before you open it in your browser:"
+body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
 position = "Link {n} of {total}"
 # context: button that opens the address in the browser

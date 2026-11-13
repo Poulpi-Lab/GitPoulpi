@@ -476,6 +476,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Commit 详情：重置消息区大小 |  |
 | Commit 详情：消息向下滚动 |  |
 | Commit 详情：消息向上滚动 |  |
+| Commit Details: Open Link in Message... |  |
 | 文件：切换 commit 文件排序（A-Z / Z-A） |  |
 | 引用：检出所选引用 | `双击` |
 | 引用：复制引用名称 |  |

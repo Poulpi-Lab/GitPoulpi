@@ -514,6 +514,7 @@ applicano. I tasti sono quelli predefiniti.
 | Dettagli commit: Reimposta la dimensione del messaggio |  |
 | Dettagli commit: Scorri il messaggio in giù |  |
 | Dettagli commit: Scorri il messaggio in su |  |
+| Commit Details: Open Link in Message... |  |
 | File: Inverti l'ordine dei file del commit (A-Z / Z-A) |  |
 | Refs: Checkout del ref selezionato | `doppio clic` |
 | Refs: Copia il nome del ref |  |

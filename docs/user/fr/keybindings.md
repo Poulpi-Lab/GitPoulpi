@@ -512,6 +512,7 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Détails du commit : Réinitialiser la taille du message |  |
 | Détails du commit : Faire défiler le message vers le bas |  |
 | Détails du commit : Faire défiler le message vers le haut |  |
+| Détails du commit : Ouvrir un lien du message... |  |
 | Fichiers : Inverser le tri des fichiers du commit (A-Z / Z-A) |  |
 | Refs : Basculer sur la ref sélectionnée | `double-clic` |
 | Refs : Copier le nom de la ref |  |

@@ -3003,7 +3003,7 @@ commit_details_shrink_message = "Commit Ayrıntıları: Mesajı Küçült"
 commit_details_reset_message_size = "Commit Ayrıntıları: Mesaj Boyutunu Sıfırla"
 commit_details_scroll_message_down = "Commit Ayrıntıları: Mesajı Aşağı Kaydır"
 commit_details_scroll_message_up = "Commit Ayrıntıları: Mesajı Yukarı Kaydır"
-commit_details_open_link = "Commit Details: Open Link in Message..."
+commit_details_open_link = "{$Commit} Details: Open Link in Message..."
 files_toggle_commit_file_sort_a_z_z_a = "Dosyalar: Commit Dosya Sırasını Değiştir (A-Z / Z-A)"
 refs_checkout_selected_ref = "Refs: Seçili Ref'te Checkout"
 refs_copy_ref_name = "Refs: Ref Adını Kopyala"
@@ -9371,7 +9371,7 @@ why_no_dialog = "düzenlenebilecek açık pencere yok"
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
 title = "Open this link?"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a commit message. Check it before you open it in your browser:"
+body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
 position = "Link {n} of {total}"
 # context: button that opens the address in the browser

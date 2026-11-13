@@ -504,6 +504,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Деталі commit'у: скинути розмір повідомлення |  |
 | Деталі commit'у: прокрутити повідомлення вниз |  |
 | Деталі commit'у: прокрутити повідомлення вгору |  |
+| Commit Details: Open Link in Message... |  |
 | Файли: сортування файлів commit'у (А-Я / Я-А) |  |
 | Refs: checkout вибраного ref | `подвійне клацання` |
 | Refs: копіювати назву ref |  |

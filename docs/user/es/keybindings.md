@@ -515,6 +515,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Detalles del commit: Restablecer el tamaño del mensaje |  |
 | Detalles del commit: Desplazar el mensaje hacia abajo |  |
 | Detalles del commit: Desplazar el mensaje hacia arriba |  |
+| Commit Details: Open Link in Message... |  |
 | Archivos: Alternar el orden de archivos del commit (A-Z / Z-A) |  |
 | Refs: Checkout de la ref seleccionada | `doble clic` |
 | Refs: Copiar nombre de la ref |  |

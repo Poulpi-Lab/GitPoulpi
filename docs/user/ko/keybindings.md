@@ -503,6 +503,7 @@ Windows 콘솔은 수정 키를 직접 보고하므로 프로토콜이 필요하
 | Commit 상세: 메시지 크기 초기화 |  |
 | Commit 상세: 메시지 아래로 스크롤 |  |
 | Commit 상세: 메시지 위로 스크롤 |  |
+| Commit Details: Open Link in Message... |  |
 | 파일: Commit 파일 정렬 전환 (A-Z / Z-A) |  |
 | Refs: 선택한 Ref 체크아웃 | `더블 클릭` |
 | Refs: Ref 이름 복사 |  |

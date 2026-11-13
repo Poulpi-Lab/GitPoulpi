@@ -510,6 +510,7 @@ Tuşlar varsayılanlardır.
 | Commit Ayrıntıları: Mesaj Boyutunu Sıfırla |  |
 | Commit Ayrıntıları: Mesajı Aşağı Kaydır |  |
 | Commit Ayrıntıları: Mesajı Yukarı Kaydır |  |
+| Commit Details: Open Link in Message... |  |
 | Dosyalar: Commit Dosya Sırasını Değiştir (A-Z / Z-A) |  |
 | Refs: Seçili Ref'te Checkout | `çift tık` |
 | Refs: Ref Adını Kopyala |  |

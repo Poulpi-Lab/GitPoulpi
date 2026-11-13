@@ -514,6 +514,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Commit-details: Berichtgrootte resetten |  |
 | Commit-details: Bericht omlaag scrollen |  |
 | Commit-details: Bericht omhoog scrollen |  |
+| Commit Details: Open Link in Message... |  |
 | Bestanden: Sortering commit-bestanden omschakelen (A-Z / Z-A) |  |
 | Refs: Geselecteerde ref uitchecken | `dubbelklik` |
 | Refs: Refnaam kopiëren |  |

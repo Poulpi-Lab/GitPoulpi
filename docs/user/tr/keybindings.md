@@ -1550,6 +1550,22 @@ menülerdeki **Burada dal oluştur...** / **Burada tag oluştur...** adı commit
 satırındaki bir metin kutusunda ister. `Enter` ref'i oluşturur. `Esc` iptal eder.
 Geçersiz veya var olan bir ad kırmızıyla gösterilir ve kutu açık kalır.
 
+Bu satır ekranda değilse (bir diff açık, Log tek başına gösteriliyor, Ref
+sütunu gizli), ad bunun yerine kapatma çarpısı, **İptal** ve **Oluştur**
+düğmeleri olan küçük çerçeveli bir kutuya yazılır. Bir dalın adını
+değiştirmek Refs panelindeki satırının üzerine ya da Log satırının Ref
+hücresine yazılarak yapılır; dosya oluşturmak Çalışma değişiklikleri
+listesinde, klasörün altında yazılır. Her yerde aynı tuşlar geçerlidir:
+`Enter` onaylar, `Esc` iptal eder.
+
+Durum çubuğuna hiçbir zaman bir şey yazılmaz. Daha fazla yer isteyen
+istemler gerçek düğmeleri olan iletişim kutularıdır: stash mesajı, açıklamalı
+bir tag'in mesajı (`Ctrl+Enter` veya `Ctrl+S` uygular, `Enter` satır ekler),
+upstream ayarlama (uzak dalların aranabilir bir listesi ve bir Upstream'i
+kaldır düğmesi) ve Git LFS izleme ile izlemeyi bırakma desenleri. Paletten
+seçilen bir sayı veya metin ayarı, Ayarlar'ı o satırda, düzenlemeye hazır
+açar; Refs filtresi (`/`) ise Refs panelinin üstündeki kutuya yazılır.
+
 ### Commit mesajını düzenleme
 
 Commit menüsündeki **Commit mesajını düzenle...**, `Ctrl+G e` veya paletin
@@ -1740,7 +1756,7 @@ aynı menüleri açar: *Düzenleyici: Kodlamayı Değiştir*, *Düzenleyici: Kod
 | `x` | Tüm değişiklikleri at (önce sorar) |
 | `c` | Commit composer'ı aç |
 | `Enter` | Stage'lenmiş değişiklikleri formdaki mesajla hemen commit et, her yerden (bkz. [Stage'leme ve commit'leme](staging-and-committing.md#commiti-yazma)) |
-| `m` | Tüm değişiklikleri bir mesajla stash'le (boş olabilir). YZ açıkken bu istemde `Ctrl+G` mesajı yazar |
+| `m` | Tüm değişiklikleri bir mesajla stash'le, küçük bir iletişim kutusuna yazılır (boş olabilir). YZ açıkken YZ düğmesi (iletişim kutusunda `Ctrl+G`) mesajı yazar |
 | `Shift+T` | Tüm değişiklikleri (izlenmeyen dosyalar dahil) mesajsız stash'le |
 | `o` | Bir stash'i pop et: Log'da seçili stash satırı, yoksa en son stash |
 | `p` | Pull, Pull düğmesinin ayarlandığı biçimde (`git.pull_mode`) |

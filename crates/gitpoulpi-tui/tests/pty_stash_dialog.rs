@@ -145,3 +145,39 @@ fn the_cross_cancel_and_esc_close_without_stashing() {
     .unwrap_or_else(|e| panic!("{e}"));
     assert!(stash_list(&repo).trim().is_empty(), "nothing was stashed");
 }
+
+/// The one-character badge drawn on the left edge of the control `label`.
+fn badge_before(screen: &Screen, label: &str) -> Option<char> {
+    let (col, row) = screen.find(label)?;
+    let line: Vec<char> = screen.line(row).chars().collect();
+    let col = usize::from(col).min(line.len());
+    (col.saturating_sub(7)..col).rev().find_map(|i| {
+        (i + 2 < line.len()
+            && line[i] == ' '
+            && line[i + 2] == ' '
+            && line[i + 1].is_ascii_alphanumeric())
+        .then(|| line[i + 1])
+    })
+}
+
+/// `Ctrl+N` badges the dialog's controls; pressing a badge presses the control.
+#[test]
+fn ctrl_n_badges_the_controls_and_a_badge_presses_cancel() {
+    let repo = fixture();
+    let mut term = launch(&repo, "pty-stash-dialog-badges");
+    open_dialog(&mut term);
+    term.send_keys("C-n").unwrap();
+    term.wait_for(
+        "a badge on Cancel (it hides the first letters)",
+        STEP,
+        |s| badge_before(s, "ncel").is_some(),
+    )
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let badge = badge_before(&term.screen(), "ncel").unwrap();
+    term.send_text(&badge.to_string()).unwrap();
+    term.wait_for("the dialog closed by its Cancel badge", STEP, |s| {
+        !s.contains("Stash changes")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert!(stash_list(&repo).trim().is_empty());
+}

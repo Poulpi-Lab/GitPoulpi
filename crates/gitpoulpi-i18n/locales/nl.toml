@@ -8750,8 +8750,8 @@ include_drafts = "Concepten meenemen"
 assigned_issues = "Aan mij toegewezen issues"
 # context: field label: orgs, groups or workspaces the account-wide lists are limited to
 namespaces = "Namespaces"
-# context: hint in the empty namespaces field
-namespaces_hint = "bijv. acme, platform (leeg: mijn eigen en alle waarvan ik lid ben)"
+# context: hint in the empty Namespaces text area (one entry per line)
+namespaces_hint = "Eén per regel, bijv. acme (leeg: je eigen en alle waarvan je lid bent)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
 namespaces_help = "Eén item per regel. Een naam komt overeen met die groep of eigenaar en alles eronder (ptm komt overeen met ptm/produits/x, niet met ptmx/y). Laat leeg voor je eigen namespaces en alle waarvan je lid bent."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is

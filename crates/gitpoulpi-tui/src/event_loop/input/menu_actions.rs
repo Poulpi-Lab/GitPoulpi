@@ -129,13 +129,12 @@ pub(in crate::event_loop) fn run_log_menu_action(
     cx: &mut CommandCtx<'_>,
     action: LogContextAction,
     commit: Oid,
-    anchor: (u16, u16),
 ) {
     match action {
         // Renamed where the pill is: the box opens in the tip's Log row.
         LogContextAction::Ref(RefContextAction::RenameBranch, index) => {
             if let Some((_, name)) = cx.log_menu_refs.get(index as usize).cloned() {
-                *cx.input_mode = InputMode::ComposingRefName {
+                *cx.input_mode = InputMode::InlineName {
                     op: RefNameOp::RenameBranch {
                         name: name.clone(),
                         spot: RenameSpot::Pill,
@@ -167,7 +166,6 @@ pub(in crate::event_loop) fn run_log_menu_action(
                         last_message: &mut *cx.last_message,
                         remotes: &*cx.remote_names,
                         remote_ui: &mut *cx.remote_ui,
-                        anchor,
                         worktrees: cx.worktrees_result.as_deref().unwrap_or(&[]),
                         worktree_seed: &mut *cx.worktree_seed,
                         pull_request_seed: &mut *cx.pull_request_seed,

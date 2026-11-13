@@ -5,7 +5,7 @@
 //! ref that already exists) is reported on the same row, with the box
 //! still open.
 //!
-//! The typing itself is still `InputMode::ComposingRefName` -- same field,
+//! The typing itself is still `InputMode::InlineName` -- same field,
 //! same caret, same keys as before -- so the palette, the toolbar, the
 //! `Ctrl+G b`/`t` chords and the commit context menu all reach it without
 //! a second mode. What this module adds is the pure half: which commit the
@@ -66,13 +66,7 @@ pub(crate) fn inline_target(
             spot: RenameSpot::Refs,
             ..
         }
-        | RefNameOp::AnnotateTag(_)
-        | RefNameOp::AnnotatedTagMessage { .. }
-        | RefNameOp::SetUpstream(_)
-        | RefNameOp::StashMessage
-        | RefNameOp::CreateFile(_)
-        | RefNameOp::LfsTrack
-        | RefNameOp::LfsUntrack => None,
+        | RefNameOp::CreateFile(_) => None,
     }
 }
 

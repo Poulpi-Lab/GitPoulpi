@@ -243,7 +243,7 @@ fn the_palette_tracks_a_pattern_and_gitattributes_shows_up_unstaged() {
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
-        !typed.line(typed.rows() - 1).contains("*.psd"),
+        !common::status_line_text(&typed).contains("*.psd"),
         "nothing is typed in the status line"
     );
     term.send_keys("Enter").unwrap();

@@ -212,13 +212,13 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
             );
         }
         PaletteCommand::NewBranch => {
-            *cx.input_mode = InputMode::ComposingRefName {
+            *cx.input_mode = InputMode::InlineName {
                 op: RefNameOp::NewBranch,
                 value: String::new(),
             };
         }
         PaletteCommand::NewTag => {
-            *cx.input_mode = InputMode::ComposingRefName {
+            *cx.input_mode = InputMode::InlineName {
                 op: RefNameOp::NewTag,
                 value: String::new(),
             };

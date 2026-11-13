@@ -138,7 +138,7 @@ impl WindowState {
         // first frame of the prompt brings that commit into view (and
         // selects it), so the box is never typed into off screen.
         let inline_ref: Option<(InlineRefKind, Oid)> = match &self.input_mode {
-            InputMode::ComposingRefName { op, .. } => {
+            InputMode::InlineName { op, .. } => {
                 inline_target(op, self.refs_result.as_deref().unwrap_or(&[]))
             }
             _ => None,
@@ -147,7 +147,7 @@ impl WindowState {
         // screen; it never scrolls the Log to its tip.
         let reveals = !matches!(
             &self.input_mode,
-            InputMode::ComposingRefName {
+            InputMode::InlineName {
                 op: RefNameOp::RenameBranch {
                     spot: RenameSpot::Auto,
                     ..
@@ -170,7 +170,7 @@ impl WindowState {
             // A new file keeps its own first-frame flag below.
             None if matches!(
                 &self.input_mode,
-                InputMode::ComposingRefName {
+                InputMode::InlineName {
                     op: RefNameOp::CreateFile(_),
                     ..
                 }
@@ -180,7 +180,7 @@ impl WindowState {
         // A new file is named in the Status list: on the first frame the
         // list is brought on screen (the working changes, not a commit's
         // detail) and the folder it goes in is opened.
-        if let InputMode::ComposingRefName {
+        if let InputMode::InlineName {
             op: RefNameOp::CreateFile(folder),
             ..
         } = &self.input_mode
@@ -200,8 +200,7 @@ impl WindowState {
         }
         // The prompts named inline (or in the name box) keep their error
         // for as long as the mode lasts; every other prompt has none.
-        if !matches!(&self.input_mode, InputMode::ComposingRefName { op, .. } if is_inline_name(op))
-        {
+        if !matches!(&self.input_mode, InputMode::InlineName { .. }) {
             self.ref_name_error = None;
             self.ref_name_slot.reset();
             self.ref_name_revealed = false;
@@ -635,15 +634,12 @@ impl WindowState {
                     frame,
                     &mut FooterDrawCtx {
                         ai_ui: &self.ai_ui,
-                        field_editor: &self.field_editor,
                         footer_area,
                         in_flight_text: &in_flight_text,
-                        inline_ref_drawn: name_slot.drawn(),
                         input_mode: &self.input_mode,
                         last_message: &self.last_message,
                         commit_total,
                         log_result: &self.log_result,
-                        new_file_error: &self.new_file_error,
                         pending_count: self.pending_count,
                         ref_drag: &self.ref_drag,
                         refs_result: &self.refs_result,

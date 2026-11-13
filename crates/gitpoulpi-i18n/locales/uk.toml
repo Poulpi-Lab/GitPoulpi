@@ -2120,7 +2120,6 @@ pull_ff_only = { git = "Pull (лише fast-forward)", local = "Отримати
 pull_rebase = { git = "Pull (rebase)", local = "Отримати (з перебазуванням)" }
 push_to_title = { git = "Push {branch} на", local = "Надіслати {branch} на" }
 upstream_title = "Upstream для {branch}"
-type_remote_branch = "Введіть віддалену гілку..."
 unset_upstream = "Скинути upstream"
 diverged_title = "Гілка {remote}/{branch} розійшлася з локальною"
 pull_then_push = { git = "Pull (merge), потім push", local = "Отримати (зі злиттям), потім надіслати" }
@@ -4319,24 +4318,7 @@ counter = "{current} з {total}"
 [footer]
 commit_label = { git = "Повідомлення commit'у: ", local = "Повідомлення коміту: " }
 commit_hint = { git = "  (Enter: commit, Esc: скасувати)", local = "  (Enter: коміт, Esc: скасувати)" }
-filter_refs = "Фільтр refs: {draft}_  (Enter: застосувати, Esc: скасувати)"
 filter_refs_hint = "Enter: apply, Esc: cancel"
-new_branch_name = "Назва нової гілки"
-new_tag_name = { git = "Назва нового tag'а", local = "Назва нового тегу" }
-new_branch_at = "Нова гілка на {sha}"
-new_tag_at = "Новий {$tag} на {sha}"
-new_annotated_tag_at = "Новий анотований {$tag} на {sha}"
-tag_message = { git = "Повідомлення для tag'а {name}", local = "Повідомлення для тегу {name}" }
-rename_to = "Перейменувати {old} на"
-set_upstream = "Upstream для {branch} (remote/гілка)"
-lfs_track = "Відстежувати через LFS (шаблон, напр. *.psd чи assets/big.bin)"
-lfs_untrack = "Припинити відстеження через LFS (шаблон)"
-stash_message = { git = "Повідомлення stash'у (необов'язково)", local = "Повідомлення схованки (необов'язково)" }
-new_file_in = " у {folder}/"
-new_file_error = "Новий файл{place} [{why}]"
-new_file_name = "Назва нового файлу{place} (з розширенням)"
-stash_hint_ai = "  (Enter: {$stash}, {key}: {star} повідомлення від ШІ, Esc: скасувати)"
-stash_hint = "  (Enter: {$stash}, Esc: скасувати)"
 confirm_hint = "  (Enter: підтвердити, Esc: скасувати)"
 search_hint = "Пошук: Enter/{down} далі, Shift+Enter/{up} назад, Esc закрити"
 commit_count = { one = "{n} {$commit}", few = "{n} {$commits}", many = { git = "{n} {$commits}", local = "{n} комітів" }, other = "{n} {$commits}" }
@@ -4353,8 +4335,6 @@ hint_nav = "{key}: навіг."
 hint_commands = "{key}: команди"
 hint_menu = "{key}: меню"
 hint_quit = "q: вийти"
-setting_value = "Налаштування: {label}"
-setting_value_error = "Налаштування: {label} [{why}]"
 
 [central]
 loading = "(завантаження...)"
@@ -4577,7 +4557,6 @@ creating_tag_at = { git = "створення tag {name} на {sha}...", local =
 creating_annotated_tag_at = { git = "створення анотованого tag {tag} на {sha}...", local = "створення анотованого тега {tag} на {sha}..." }
 renaming = "перейменування {old} на {name}..."
 annotating_tag = { git = "анотування tag {tag}...", local = "анотування тега {tag}..." }
-setting_upstream = "призначення upstream для {branch}: {name}..."
 committing = { git = "commit: {message}", local = "створення коміту: {message}" }
 created = "створено {path}"
 delete_tag = "Видалити {$tag} «{name}»?"

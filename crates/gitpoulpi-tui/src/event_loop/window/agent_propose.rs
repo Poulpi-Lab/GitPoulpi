@@ -208,7 +208,7 @@ impl WindowState {
         self.central_view = CentralView::Log;
         select_log_commit(&self.log_result, &self.log_order, &mut self.log_state, at);
         self.ref_name_error = None;
-        self.input_mode = InputMode::ComposingRefName {
+        self.input_mode = InputMode::InlineName {
             op,
             value: name.to_string(),
         };
@@ -237,14 +237,13 @@ impl WindowState {
             (Dialog::CommitMessage, _) => {
                 !self.commit_summary.trim().is_empty() || !self.commit_description.trim().is_empty()
             }
-            (Dialog::Branch(oid), InputMode::ComposingRefName { op, .. }) => {
+            (Dialog::Branch(oid), InputMode::InlineName { op, .. }) => {
                 matches!(op, RefNameOp::NewBranchAt(at) if *at == oid)
             }
-            (Dialog::Tag(oid), InputMode::ComposingRefName { op, .. }) => matches!(
+            (Dialog::Tag(oid), InputMode::InlineName { op, .. }) => matches!(
                 op,
                 RefNameOp::NewTagAt(at)
-                    | RefNameOp::NewAnnotatedTagAt(at)
-                    | RefNameOp::AnnotatedTagMessage { at, .. } if *at == oid
+                    | RefNameOp::NewAnnotatedTagAt(at) if *at == oid
             ),
             _ => false,
         }

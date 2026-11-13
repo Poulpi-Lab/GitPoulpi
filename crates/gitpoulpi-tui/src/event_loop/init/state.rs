@@ -265,7 +265,6 @@ pub(in crate::event_loop) struct WindowState {
     pub(in crate::event_loop) last_click: Option<(Instant, u16, u16)>,
     pub(in crate::event_loop) input_mode: InputMode,
     pub(in crate::event_loop) ref_name_error: Option<String>,
-    pub(in crate::event_loop) new_file_error: Option<String>,
     pub(in crate::event_loop) ref_name_revealed: bool,
     /// Which painter holds the name field (inline spot or the name box), kept
     /// until the prompt ends so the field never jumps (`ref_name_box.rs`).

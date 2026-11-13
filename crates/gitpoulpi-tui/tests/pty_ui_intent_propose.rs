@@ -315,7 +315,7 @@ fn an_annotated_tag_proposal_prefills_the_name_box_and_the_message_dialog_and_an
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
-        !step.line(step.rows() - 1).contains("first release"),
+        !common::status_line_text(&step).contains("first release"),
         "the message is not echoed in the status line"
     );
     rig.term.send_text("!").unwrap();

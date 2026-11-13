@@ -10,7 +10,7 @@ mod common;
 use std::time::Duration;
 
 use gitpoulpi_testkit::{FixtureRepo, FixtureRepoBuilder};
-use xtask::pty::{Screen, Terminal};
+use xtask::pty::Terminal;
 
 const STEP: Duration = Duration::from_secs(30);
 const SENTINEL: &str = "zq9x";
@@ -43,14 +43,6 @@ fn launch_in_a_diff(repo: &FixtureRepo, session: &str) -> Terminal {
     // The temp config dir lives as long as the terminal does.
     std::mem::forget(_config);
     term
-}
-
-/// The status line and everything under the panes: the last three rows.
-fn status_line(s: &Screen) -> String {
-    (s.rows() - 3..s.rows())
-        .map(|r| s.line(r))
-        .collect::<Vec<_>>()
-        .join("\n")
 }
 
 fn open_branch_box(term: &mut Terminal) {
@@ -86,9 +78,10 @@ fn a_new_branch_from_a_diff_is_named_in_the_box_and_created() {
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        !status_line(&screen).contains(SENTINEL) && !status_line(&screen).contains("spaces"),
+        !common::status_line_text(&screen).contains(SENTINEL)
+            && !common::status_line_text(&screen).contains("spaces"),
         "the typed name or its refusal reached the status line: {:?}",
-        status_line(&screen)
+        common::status_line_text(&screen)
     );
     let (_, box_row) = screen.find("can't contain spaces").unwrap();
     let (_, typed_row) = screen.find(SENTINEL).unwrap();
@@ -161,7 +154,7 @@ fn a_new_tag_from_a_diff_is_named_in_the_box_and_the_button_creates_it() {
     let screen = term
         .wait_for("the typed tag", STEP, |s| s.contains("v-box"))
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(!status_line(&screen).contains("v-box"));
+    assert!(!common::status_line_text(&screen).contains("v-box"));
     let (c, r) = screen.find("Create").unwrap();
     term.click(c + 1, r).unwrap();
     for _ in 0..300 {

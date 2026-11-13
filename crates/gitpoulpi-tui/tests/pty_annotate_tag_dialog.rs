@@ -14,7 +14,7 @@ mod common;
 use std::time::Duration;
 
 use gitpoulpi_testkit::{FixtureRepo, FixtureRepoBuilder};
-use xtask::pty::{Screen, Terminal};
+use xtask::pty::Terminal;
 
 const STEP: Duration = Duration::from_secs(30);
 
@@ -39,10 +39,6 @@ fn launch(repo: &FixtureRepo, session: &str) -> Terminal {
         .start();
     std::mem::forget(config);
     term
-}
-
-fn status_row(s: &Screen) -> String {
-    s.line(s.rows() - 1)
 }
 
 /// Waits for `git tag -l -n2 <tag>` to show `needle`.
@@ -99,9 +95,9 @@ fn a_new_annotated_tag_asks_its_name_inline_then_its_message_in_a_dialog() {
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
-        !status_row(&typed).contains("zq9x"),
+        !common::status_line_text(&typed).contains("zq9x"),
         "nothing is typed in the status line: {}",
-        status_row(&typed)
+        common::status_line_text(&typed)
     );
     term.send_keys("C-s").unwrap();
     wait_tag_message(&repo, "v7", "second line");

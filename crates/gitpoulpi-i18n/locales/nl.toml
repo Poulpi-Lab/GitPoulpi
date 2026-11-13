@@ -2121,7 +2121,6 @@ pull_ff_only = { git = "Pull (alleen fast-forward)", local = "Pull (alleen fast-
 pull_rebase = { git = "Pull (rebase)", local = "Pull (rebase)" }
 push_to_title = { git = "{branch} pushen naar", local = "{branch} pushen naar" }
 upstream_title = "Upstream van {branch}"
-type_remote_branch = "Typ een remote branch..."
 unset_upstream = "Upstream wissen"
 diverged_title = "{remote}/{branch} is uiteengelopen"
 pull_then_push = { git = "Pull (merge), dan push", local = "Pull (samenvoeging), dan push" }
@@ -4320,24 +4319,7 @@ counter = "{current} van {total}"
 [footer]
 commit_label = "{$Commit}-bericht: "
 commit_hint = { git = "  (Enter: commit, Esc: annuleren)", local = "  (Enter: commit, Esc: annuleren)" }
-filter_refs = "Refs filteren: {draft}_  (Enter: toepassen, Esc: annuleren)"
 filter_refs_hint = "Enter: apply, Esc: cancel"
-new_branch_name = "Naam van nieuwe branch"
-new_tag_name = { git = "Naam van nieuwe {$tag}", local = "Naam van nieuw {$tag}" }
-new_branch_at = "Nieuwe branch op {sha}"
-new_tag_at = { git = "Nieuwe {$tag} op {sha}", local = "Nieuw {$tag} op {sha}" }
-new_annotated_tag_at = { git = "Nieuwe geannoteerde {$tag} op {sha}", local = "Nieuw geannoteerd {$tag} op {sha}" }
-tag_message = "Bericht voor {$tag} {name}"
-rename_to = "{old} hernoemen naar"
-set_upstream = "Upstream van {branch} (remote/branch)"
-lfs_track = "Volgen met LFS (patroon, bijv. *.psd of assets/big.bin)"
-lfs_untrack = "Niet meer volgen met LFS (patroon)"
-stash_message = { git = "{$Stash}-bericht (optioneel)", local = "Bergingsbericht (optioneel)" }
-new_file_in = " in {folder}/"
-new_file_error = "Nieuw bestand{place} [{why}]"
-new_file_name = "Naam van nieuw bestand{place} (met extensie)"
-stash_hint_ai = "  (Enter: {$stash}, {key}: {star} AI-bericht, Esc: annuleren)"
-stash_hint = "  (Enter: {$stash}, Esc: annuleren)"
 confirm_hint = "  (Enter: bevestigen, Esc: annuleren)"
 search_hint = "Zoeken: Enter/{down} volgende, Shift+Enter/{up} vorige, Esc sluiten"
 commit_count = { one = "{n} {$commit}", other = "{n} {$commits}" }
@@ -4354,8 +4336,6 @@ hint_nav = "{key}: navigatie"
 hint_commands = "{key}: opdrachten"
 hint_menu = "{key}: menu"
 hint_quit = "q: afsluiten"
-setting_value = "Instellingen: {label}"
-setting_value_error = "Instellingen: {label} [{why}]"
 
 [central]
 loading = "(laden...)"
@@ -4577,7 +4557,6 @@ creating_tag_at = "{$tag} {name} maken op {sha}..."
 creating_annotated_tag_at = { git = "geannoteerde {$tag} {tag} maken op {sha}...", local = "geannoteerd {$tag} {tag} maken op {sha}..." }
 renaming = "{old} hernoemen naar {name}..."
 annotating_tag = "{$tag} {tag} annoteren..."
-setting_upstream = "upstream van {branch} instellen op {name}..."
 committing = "committen: {message}"
 created = "{path} gemaakt"
 delete_tag = "{$Tag} '{name}' verwijderen?"

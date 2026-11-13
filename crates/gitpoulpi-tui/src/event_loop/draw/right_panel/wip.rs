@@ -344,7 +344,7 @@ pub(super) fn draw_wip(frame: &mut Frame, ctx: &mut RightPanelDrawCtx<'_>) {
         }
         // A file being named: the box over the row under its folder.
         if section == StatusSection::Unstaged {
-            if let InputMode::ComposingRefName {
+            if let InputMode::InlineName {
                 op: RefNameOp::CreateFile(folder),
                 value,
             } = input_mode

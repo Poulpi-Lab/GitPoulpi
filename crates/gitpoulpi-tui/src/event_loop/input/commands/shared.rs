@@ -721,7 +721,7 @@ pub(in crate::event_loop) fn apply_hosting_effect(cx: &mut CommandCtx<'_>, effec
             }
         }
         HostingEffect::NewBranch(name) => {
-            *cx.input_mode = InputMode::ComposingRefName {
+            *cx.input_mode = InputMode::InlineName {
                 op: RefNameOp::NewBranch,
                 value: name,
             };

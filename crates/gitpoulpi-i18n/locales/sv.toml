@@ -2122,7 +2122,6 @@ pull_ff_only = { git = "Pull (bara fast-forward)", local = "Pull (bara fast-forw
 pull_rebase = { git = "Pull (rebase)", local = "Pull (rebase)" }
 push_to_title = { git = "Push {branch} till", local = "Push {branch} till" }
 upstream_title = "Upstream för {branch}"
-type_remote_branch = "Skriv en remote-gren..."
 unset_upstream = "Ta bort upstream"
 diverged_title = "{remote}/{branch} har divergerat"
 pull_then_push = { git = "Pull (merge), sedan push", local = "Pull (sammanslagning), sedan push" }
@@ -4322,24 +4321,7 @@ counter = "{current} av {total}"
 [footer]
 commit_label = { git = "{$Commit}-meddelande: ", local = "Incheckningsmeddelande: " }
 commit_hint = { git = "  (Enter: commit, Esc: avbryt)", local = "  (Enter: checka in, Esc: avbryt)" }
-filter_refs = "Filtrera refs: {draft}_  (Enter: tillämpa, Esc: avbryt)"
 filter_refs_hint = "Enter: apply, Esc: cancel"
-new_branch_name = "Nytt grennamn"
-new_tag_name = { git = "Nytt {$tag}-namn", local = "Nytt taggnamn" }
-new_branch_at = "Ny gren vid {sha}"
-new_tag_at = "Ny {$tag} vid {sha}"
-new_annotated_tag_at = "Ny annoterad {$tag} vid {sha}"
-tag_message = "Meddelande för {$tag} {name}"
-rename_to = "Byt namn på {old} till"
-set_upstream = "Upstream för {branch} (remote/gren)"
-lfs_track = "Spåra med LFS (mönster, t.ex. *.psd eller assets/big.bin)"
-lfs_untrack = "Sluta spåra med LFS (mönster)"
-stash_message = "{$Stash}-meddelande (valfritt)"
-new_file_in = " i {folder}/"
-new_file_error = "Ny fil{place} [{why}]"
-new_file_name = "Ny fils namn{place} (med filändelse)"
-stash_hint_ai = "  (Enter: {$stash}, {key}: {star} AI-meddelande, Esc: avbryt)"
-stash_hint = "  (Enter: {$stash}, Esc: avbryt)"
 confirm_hint = "  (Enter: bekräfta, Esc: avbryt)"
 search_hint = "Sök: Enter/{down} nästa, Shift+Enter/{up} föregående, Esc stäng"
 commit_count = { one = "{n} {$commit}", other = "{n} {$commits}" }
@@ -4356,8 +4338,6 @@ hint_nav = "{key}: nav"
 hint_commands = "{key}: kommandon"
 hint_menu = "{key}: meny"
 hint_quit = "q: avsluta"
-setting_value = "Inställningar: {label}"
-setting_value_error = "Inställningar: {label} [{why}]"
 
 [central]
 loading = "(laddar...)"
@@ -4579,7 +4559,6 @@ creating_tag_at = "skapar {$tag} {name} vid {sha}..."
 creating_annotated_tag_at = "skapar annoterad {$tag} {tag} vid {sha}..."
 renaming = "döper om {old} till {name}..."
 annotating_tag = "annoterar {$tag} {tag}..."
-setting_upstream = "ställer in {branch}s upstream till {name}..."
 committing = { git = "committar: {message}", local = "checkar in: {message}" }
 created = "skapade {path}"
 delete_tag = "Ta bort {$tag} '{name}'?"

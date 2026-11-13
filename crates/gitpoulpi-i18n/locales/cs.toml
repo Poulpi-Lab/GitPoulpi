@@ -2120,7 +2120,6 @@ pull_ff_only = { git = "Pull (jen fast-forward)", local = "Stáhnout (jen fast-f
 pull_rebase = { git = "Pull (rebase)", local = "Stáhnout (rebase)" }
 push_to_title = { git = "Push {branch} do", local = "Odeslat {branch} do" }
 upstream_title = "Upstream větve {branch}"
-type_remote_branch = "Zadat vzdálenou větev..."
 unset_upstream = "Zrušit upstream"
 diverged_title = "{remote}/{branch} se rozešla"
 pull_then_push = { git = "Pull (merge), poté push", local = "Stáhnout (sloučit), poté odeslat" }
@@ -4319,24 +4318,7 @@ counter = "{current} z {total}"
 [footer]
 commit_label = "Zpráva commitu: "
 commit_hint = { git = "  (Enter: commit, Esc: zrušit)", local = "  (Enter: commit, Esc: zrušit)" }
-filter_refs = "Filtr refs: {draft}_  (Enter: použít, Esc: zrušit)"
 filter_refs_hint = "Enter: apply, Esc: cancel"
-new_branch_name = "Název nové větve"
-new_tag_name = { git = "Název nového tagu", local = "Název nové značky" }
-new_branch_at = "Nová větev na {sha}"
-new_tag_at = { git = "Nový {$tag} na {sha}", local = "Nová značka na {sha}" }
-new_annotated_tag_at = { git = "Nový anotovaný {$tag} na {sha}", local = "Nová anotovaná značka na {sha}" }
-tag_message = { git = "Zpráva pro {$tag} {name}", local = "Zpráva pro značku {name}" }
-rename_to = "Přejmenovat {old} na"
-set_upstream = "Upstream větve {branch} (remote/větev)"
-lfs_track = "Sledovat přes LFS (vzor, např. *.psd nebo assets/big.bin)"
-lfs_untrack = "Přestat sledovat přes LFS (vzor)"
-stash_message = { git = "Zpráva stashe (nepovinná)", local = "Zpráva odložených změn (nepovinná)" }
-new_file_in = " v {folder}/"
-new_file_error = "Nový soubor{place} [{why}]"
-new_file_name = "Název nového souboru{place} (s příponou)"
-stash_hint_ai = "  (Enter: {$stash}, {key}: {star} zpráva od AI, Esc: zrušit)"
-stash_hint = "  (Enter: {$stash}, Esc: zrušit)"
 confirm_hint = "  (Enter: potvrdit, Esc: zrušit)"
 search_hint = "Hledat: Enter/{down} další, Shift+Enter/{up} předchozí, Esc zavřít"
 commit_count = { one = "{n} commit", few = "{n} commity", other = "{n} commitů" }
@@ -4353,8 +4335,6 @@ hint_nav = "{key}: navig."
 hint_commands = "{key}: příkazy"
 hint_menu = "{key}: nabídka"
 hint_quit = "q: konec"
-setting_value = "Nastavení: {label}"
-setting_value_error = "Nastavení: {label} [{why}]"
 
 [central]
 loading = "(načítání...)"
@@ -4576,7 +4556,6 @@ creating_tag_at = { git = "vytváření {$tag}u {name} na {sha}...", local = "vy
 creating_annotated_tag_at = { git = "vytváření anotovaného {$tag}u {tag} na {sha}...", local = "vytváření anotované značky {tag} na {sha}..." }
 renaming = "přejmenování {old} na {name}..."
 annotating_tag = { git = "anotování {$tag}u {tag}...", local = "anotování značky {tag}..." }
-setting_upstream = "nastavení upstreamu větve {branch} na {name}..."
 committing = "vytváření commitu: {message}"
 created = "vytvořeno {path}"
 delete_tag = { git = "Smazat {$tag} „{name}“?", local = "Smazat značku „{name}“?" }

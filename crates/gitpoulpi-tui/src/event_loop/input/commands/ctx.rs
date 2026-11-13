@@ -138,7 +138,6 @@ pub(in crate::event_loop) struct CommandCtx<'a> {
     pub(in crate::event_loop) management: &'a mut Option<repo_manager::RepoManager>,
     pub(in crate::event_loop) management_panel: &'a mut Option<(Rect, repo_manager::ManagerRender)>,
     pub(in crate::event_loop) nav_badge_targets: &'a mut Vec<(char, FocusTarget)>,
-    pub(in crate::event_loop) new_file_error: &'a mut Option<String>,
     pub(in crate::event_loop) open_menu: &'a mut OpenMenu,
     pub(in crate::event_loop) overflow_slots: &'a mut OverflowSlots,
     pub(in crate::event_loop) panes_area: &'a mut Rect,

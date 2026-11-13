@@ -866,10 +866,6 @@ pub(super) fn init(
         // shown on the box's row while the typed name is refused, and whether
         // the target commit was already scrolled into view for this prompt.
         ref_name_error: None,
-        // Why the Create File prompt refused the typed name. Apart from
-        // `ref_name_error`, which the per-frame inline-ref bookkeeping resets
-        // for every prompt that is not an inline ref box.
-        new_file_error: None,
         ref_name_revealed: false,
         ref_name_slot: NameSlot::default(),
         last_message,

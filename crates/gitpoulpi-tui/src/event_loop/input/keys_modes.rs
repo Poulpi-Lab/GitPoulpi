@@ -105,38 +105,12 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 }
             }
         }
-        InputMode::ComposingRefName { op, value } => match key.code {
-            // With AI on, `Ctrl+G` in the stash prompt asks the
-            // model for the message (the palette's `AI:
-            // Generate Stash Message` is the same).
-            _ if km.is(Bind::PromptAiStashMessage, &key)
-                && matches!(op, RefNameOp::StashMessage)
-                && cx.ai_ui.enabled() =>
-            {
-                cx.ai_ui.start_into(
-                    cx.session,
-                    cx.repo,
-                    AiRequest::StashMessage,
-                    &mut *cx.last_message,
-                );
-            }
-            // The one prompt whose empty answer is fine.
-            KeyCode::Enter if matches!(op, RefNameOp::StashMessage) => {
-                let message = value.trim().to_string();
-                if message.is_empty() {
-                    cx.link.submit_action(Action::StashPush);
-                } else {
-                    cx.link.submit_action(Action::StashPushWith { message });
-                }
-                *cx.last_message = Some(msg::input::STASHING.get().into());
-                *cx.input_mode = InputMode::Normal;
-            }
+        InputMode::InlineName { op, value } => match key.code {
             // A box an agent's proposal just opened: an Enter already on its way must
             // not confirm it.
             KeyCode::Enter if crate::ui_intent::proposal::guards_enter() => {}
             _ if MainField::RefName.claims(&*cx.field_editor, value, &key) => {
                 *cx.ref_name_error = None;
-                *cx.new_file_error = None;
                 edit_main_field(
                     &mut *cx.field_editor,
                     MainField::RefName,
@@ -203,7 +177,6 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                                     // the check below) and shows
                                     // the reason in its label.
                                     *cx.ref_name_error = Some(why.clone());
-                                    *cx.new_file_error = Some(why);
                                 }
                             }
                         }
@@ -281,23 +254,6 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                                 ),
                             )));
                         }
-                        // `name` is the message here, as for
-                        // `AnnotateTag`.
-                        RefNameOp::AnnotatedTagMessage { at, name: tag } => {
-                            crate::ui_intent::proposal::confirmed(
-                                crate::ui_intent::proposal::Dialog::Tag(*at),
-                                &format!("{tag}\n\n{name}"),
-                            );
-                            cx.link.submit_action(Action::TagCreateAnnotated {
-                                name: tag.clone(),
-                                at: *at,
-                                message: name.clone(),
-                            });
-                            *cx.last_message = Some(msg::input::creating_annotated_tag_at(
-                                &tag,
-                                &at.to_hex()[..SHORT_SHA_LEN],
-                            ));
-                        }
                         // The same name closes the box and changes nothing.
                         RefNameOp::RenameBranch { name: old_name, .. } if name == *old_name => {}
                         RefNameOp::RenameBranch { name: old_name, .. } => {
@@ -307,60 +263,13 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                             });
                             *cx.last_message = Some(msg::input::renaming(&old_name, &name));
                         }
-                        // `name` here is the *message*, not a
-                        // ref name -- this op reuses the
-                        // one-line prompt, not its meaning.
-                        // An empty message is refused rather
-                        // than sent: git would reject it and
-                        // the error would read as a bug.
-                        RefNameOp::AnnotateTag(tag) => {
-                            if name.trim().is_empty() {
-                                *cx.last_message =
-                                    Some(msg::input::ANNOTATED_TAG_NEEDS_MESSAGE.get().into());
-                            } else {
-                                cx.link.submit_action(Action::TagAnnotate {
-                                    name: tag.clone(),
-                                    message: name.clone(),
-                                });
-                                *cx.last_message = Some(msg::input::annotating_tag(&tag));
-                            }
-                        }
-                        // `StashMessage` is handled by the arm above (it must accept an empty
-                        // message).
-                        RefNameOp::StashMessage => {}
-                        RefNameOp::SetUpstream(branch) => {
-                            cx.link.submit_action(Action::BranchSetUpstream {
-                                branch: branch.clone(),
-                                upstream: Some(name.clone()),
-                            });
-                            *cx.last_message = Some(msg::input::setting_upstream(&branch, &name));
-                        }
-                        // Several patterns may be typed, separated
-                        // by spaces (`*.psd *.ai`).
-                        RefNameOp::LfsTrack => {
-                            let patterns: Vec<String> =
-                                name.split_whitespace().map(str::to_string).collect();
-                            cx.link.submit_action(Action::LfsTrack {
-                                patterns,
-                                opts: gitpoulpi_core::domain::LfsTrackOptions::default(),
-                            });
-                            *cx.last_message = Some(msg::input::lfs_tracking(&name));
-                        }
-                        RefNameOp::LfsUntrack => {
-                            cx.link.submit_action(Action::LfsUntrack(
-                                name.split_whitespace().map(str::to_string).collect(),
-                            ));
-                            *cx.last_message = Some(msg::input::lfs_untracking(&name));
-                        }
                     }
                 }
                 if cx.ref_name_error.is_none() {
-                    *cx.new_file_error = None;
                     *cx.input_mode = next_ref_name_mode.take().unwrap_or(InputMode::Normal);
                 }
             }
             KeyCode::Esc => {
-                *cx.new_file_error = None;
                 if cx.ai_ui.running() {
                     cx.ai_ui.cancel();
                 }

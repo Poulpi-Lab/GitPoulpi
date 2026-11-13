@@ -45,10 +45,6 @@ fn launch(repo: &FixtureRepo, session: &str) -> Terminal {
     term
 }
 
-fn status_row(s: &Screen) -> String {
-    s.line(s.rows() - 1)
-}
-
 fn upstream(repo: &FixtureRepo) -> String {
     repo.git(&[
         "for-each-ref",
@@ -101,7 +97,7 @@ fn the_list_filters_picks_and_the_set_button_applies() {
     let none = term
         .wait_for("the typed filter", STEP, |s| s.contains("zq9x"))
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(!status_row(&none).contains("zq9x"));
+    assert!(!common::status_line_text(&none).contains("zq9x"));
     for _ in 0..4 {
         term.send_keys("BSpace").unwrap();
     }

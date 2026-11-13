@@ -1,6 +1,6 @@
 //! Where a name is typed: inline, or in a small framed box.
 //!
-//! The names that `InputMode::ComposingRefName` collects for a new branch,
+//! The names that `InputMode::InlineName` collects for a new branch,
 //! a new tag, a branch rename and a new file are never typed in the status
 //! line. Each has a spot where the thing being named already is: the Log's
 //! Ref cell, the sidebar's LOCAL row, the Status list. When no such spot
@@ -59,10 +59,6 @@ impl NameSlot {
         self.drawn = Some(spot);
     }
 
-    pub(crate) fn drawn(&self) -> bool {
-        self.drawn.is_some()
-    }
-
     /// After a frame: where the field drew is where it stays.
     pub(crate) fn end_frame(&mut self) {
         if let Some(spot) = self.drawn.take() {
@@ -82,20 +78,6 @@ pub(crate) enum RefNamePart {
     Confirm,
     Cancel,
     Close,
-}
-
-/// Whether `op` is named inline (or in the box) rather than in the footer.
-pub(crate) fn is_inline_name(op: &RefNameOp) -> bool {
-    matches!(
-        op,
-        RefNameOp::NewBranch
-            | RefNameOp::NewTag
-            | RefNameOp::NewBranchAt(_)
-            | RefNameOp::NewTagAt(_)
-            | RefNameOp::NewAnnotatedTagAt(_)
-            | RefNameOp::RenameBranch { .. }
-            | RefNameOp::CreateFile(_)
-    )
 }
 
 fn sha(at: &Oid) -> String {
@@ -119,7 +101,6 @@ pub(crate) fn box_title(op: &RefNameOp) -> String {
             msg::BOX_NEW_FILE_ROOT.get().to_string()
         }
         RefNameOp::CreateFile(folder) => msg::box_new_file(folder_text(folder)),
-        _ => String::new(),
     }
 }
 
@@ -267,7 +248,6 @@ mod tests {
         assert!(slot.may_draw(NameSpot::Refs) && slot.may_draw(NameSpot::Log));
         slot.mark(NameSpot::Refs);
         assert!(!slot.may_draw(NameSpot::Log) && !slot.may_draw(NameSpot::Box));
-        assert!(slot.drawn());
     }
 
     #[test]

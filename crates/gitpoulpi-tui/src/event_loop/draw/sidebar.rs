@@ -826,7 +826,7 @@ pub(in crate::event_loop) fn draw_sidebar(frame: &mut Frame, ctx: &mut SidebarDr
         if let (
             Some(RefRowKind::Local),
             true,
-            InputMode::ComposingRefName {
+            InputMode::InlineName {
                 op:
                     RefNameOp::RenameBranch {
                         name: renaming,

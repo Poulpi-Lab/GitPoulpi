@@ -39,16 +39,6 @@ fn launch(repo: &FixtureRepo, session: &str) -> (Terminal, tempfile::TempDir) {
         .start()
 }
 
-/// The status line and everything under the panes: the screen's last three
-/// rows (the footer sits above the window's bottom border, and the toolbar
-/// can sit just above it).
-fn status_line(s: &Screen) -> String {
-    (s.rows() - 3..s.rows())
-        .map(|r| s.line(r))
-        .collect::<Vec<_>>()
-        .join("\n")
-}
-
 /// The sidebar row of `name` (its leftmost occurrence, left of the Log).
 fn sidebar_cell(s: &Screen, name: &str) -> (u16, u16) {
     s.find_all(name)
@@ -116,9 +106,9 @@ fn renaming_from_the_refs_row_types_over_that_row_and_renames() {
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        !status_line(&screen).contains(SENTINEL),
+        !common::status_line_text(&screen).contains(SENTINEL),
         "the name was echoed in the status line: {:?}",
-        status_line(&screen)
+        common::status_line_text(&screen)
     );
     term.send_keys("Enter").unwrap();
     for _ in 0..300 {
@@ -155,7 +145,7 @@ fn an_existing_name_is_refused_on_the_row_below_and_the_box_stays() {
         screen.line(row)
     );
     assert!(
-        !status_line(&screen).contains("a branch named"),
+        !common::status_line_text(&screen).contains("a branch named"),
         "the refusal reached the status line"
     );
     assert!(branches(&repo).contains("hello"));
@@ -188,7 +178,7 @@ fn renaming_from_the_pill_types_in_the_log_row() {
         screen.line(row)
     );
     assert!(
-        !status_line(&screen).contains(SENTINEL),
+        !common::status_line_text(&screen).contains(SENTINEL),
         "the name was echoed in the status line"
     );
     term.send_keys("Enter").unwrap();
@@ -233,7 +223,7 @@ fn the_palette_rename_falls_back_to_the_pill_when_refs_is_collapsed() {
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
-        !status_line(&screen).contains(SENTINEL),
+        !common::status_line_text(&screen).contains(SENTINEL),
         "the name was echoed in the status line"
     );
     term.send_keys("Esc").unwrap();

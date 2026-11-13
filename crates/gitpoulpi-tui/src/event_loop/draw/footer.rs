@@ -5,16 +5,13 @@ use gitpoulpi_i18n::msg::footer as f;
 
 pub(in crate::event_loop) struct FooterDrawCtx<'a> {
     pub(in crate::event_loop) ai_ui: &'a AiUi,
-    pub(in crate::event_loop) field_editor: &'a crate::text_edit::FieldEditor<MainField>,
     pub(in crate::event_loop) commit_total: graph::TotalShown,
     pub(in crate::event_loop) footer_area: Rect,
     pub(in crate::event_loop) in_flight_text: &'a Option<String>,
-    pub(in crate::event_loop) inline_ref_drawn: bool,
     pub(in crate::event_loop) input_mode: &'a InputMode,
     pub(in crate::event_loop) last_message: &'a Option<String>,
     pub(in crate::event_loop) log_result:
         &'a gitpoulpi_core::Result<gitpoulpi_core::domain::CommitGraph>,
-    pub(in crate::event_loop) new_file_error: &'a Option<String>,
     pub(in crate::event_loop) pending_count: Option<u32>,
     pub(in crate::event_loop) ref_drag: &'a Option<RefDrag>,
     pub(in crate::event_loop) refs_result:
@@ -36,14 +33,11 @@ pub(in crate::event_loop) fn draw_footer(
     crate::jobs_ui::clear_indicator();
     crate::activity_log::status_error::begin_frame();
     let ai_ui = ctx.ai_ui;
-    let field_editor = ctx.field_editor;
     let footer_area = ctx.footer_area;
     let in_flight_text = ctx.in_flight_text;
-    let inline_ref_drawn = ctx.inline_ref_drawn;
     let input_mode = ctx.input_mode;
     let last_message = ctx.last_message;
     let log_result = ctx.log_result;
-    let new_file_error = ctx.new_file_error;
     let pending_count = ctx.pending_count;
     let ref_drag = ctx.ref_drag;
     let refs_result = ctx.refs_result;
@@ -53,63 +47,11 @@ pub(in crate::event_loop) fn draw_footer(
     let status_result = ctx.status_result;
     let empty_refs_for_head = Vec::new();
     let checked_out = checked_out_branch_name(refs_result.as_ref().unwrap_or(&empty_refs_for_head));
-    // The footer's own one-line prompts are text fields too:
-    // `footer_text` is then just the label, and
-    // the field and its key hint are drawn after it below.
-    let mut footer_prompt: Option<(MainField, &str, &str)> = None;
-    let mut ref_name_hint = String::new();
     let footer_text = match &input_mode {
         InputMode::FilteringRefs(_) => f::FILTER_REFS_HINT.get().to_string(),
         // Named inline, or in the name box (`ref_name_box.rs`): never here.
-        InputMode::ComposingRefName { op, .. } if is_inline_name(op) => String::new(),
-        InputMode::ComposingRefName { op, value } => {
-            let label = match op {
-                RefNameOp::NewBranch => f::NEW_BRANCH_NAME.get().to_string(),
-                RefNameOp::NewTag => f::NEW_TAG_NAME.get().to_string(),
-                RefNameOp::NewBranchAt(at) => f::new_branch_at(&at.to_hex()[..SHORT_SHA_LEN]),
-                RefNameOp::NewTagAt(at) => f::new_tag_at(&at.to_hex()[..SHORT_SHA_LEN]),
-                RefNameOp::NewAnnotatedTagAt(at) => {
-                    f::new_annotated_tag_at(&at.to_hex()[..SHORT_SHA_LEN])
-                }
-                RefNameOp::AnnotatedTagMessage { name, .. } => f::tag_message(name),
-                RefNameOp::RenameBranch { name: old, .. } => f::rename_to(old),
-                RefNameOp::AnnotateTag(tag) => f::tag_message(tag),
-                RefNameOp::SetUpstream(branch) => f::set_upstream(branch),
-                RefNameOp::LfsTrack => f::LFS_TRACK.get().to_string(),
-                RefNameOp::LfsUntrack => f::LFS_UNTRACK.get().to_string(),
-                RefNameOp::StashMessage => f::STASH_MESSAGE.get().to_string(),
-                RefNameOp::CreateFile(folder) => {
-                    let place = if folder.as_os_str().is_empty() {
-                        String::new()
-                    } else {
-                        f::new_file_in(folder.to_string_lossy().replace('\\', "/"))
-                    };
-                    match &new_file_error {
-                        Some(why) => f::new_file_error(&place, why),
-                        None => f::new_file_name(&place),
-                    }
-                }
-            };
-            ref_name_hint.push_str(
-                &if matches!(op, RefNameOp::StashMessage) && ai_ui.enabled() {
-                    f::stash_hint_ai(
-                        keymap::current().shown(Bind::PromptAiStashMessage),
-                        "\u{2726}",
-                    )
-                } else if matches!(op, RefNameOp::StashMessage) {
-                    f::STASH_HINT.get().to_string()
-                } else {
-                    f::CONFIRM_HINT.get().to_string()
-                },
-            );
-            if inline_ref_drawn {
-                // The box is on the commit's row; nothing here.
-                String::new()
-            } else {
-                footer_prompt = Some((MainField::RefName, value, ref_name_hint.as_str()));
-                format!("{label}: ")
-            }
-        }
+        // The name is typed inline or in the name box; the footer only names the keys.
+        InputMode::InlineName { .. } => f::CONFIRM_HINT.get().to_string(),
         InputMode::Leader => {
             chrome::prefix_hint(&keymap::current(), keymap::Ctx::GitPrefix, ai_ui.enabled())
         }
@@ -321,30 +263,6 @@ pub(in crate::event_loop) fn draw_footer(
                 footer_area.x,
             );
         }
-    } else if let Some((id, value, hint)) = footer_prompt {
-        let label_w = display_width(&footer_text) as u16;
-        let room = footer_area
-            .width
-            .saturating_sub(label_w + display_width(hint) as u16);
-        let field_w = room.min(display_width(value) as u16 + 1);
-        field_editor.drawn(
-            id,
-            Rect::new(footer_area.x + label_w, footer_area.y, field_w, 1),
-            false,
-        );
-        let mut spans = vec![Span::raw(footer_text)];
-        spans.extend(
-            text_field::edit_line(
-                value,
-                field_editor.caret(id),
-                field_w as usize,
-                true,
-                text_field::EditLook::new(Style::default().bg(crate::input_focus_bg()), "_"),
-            )
-            .spans,
-        );
-        spans.push(Span::raw(hint));
-        frame.render_clipped(Paragraph::new(Line::from(spans)), footer_area);
     } else if matches!(input_mode, InputMode::Leader | InputMode::Navigation)
         || form_badges(input_mode)
     {

@@ -1287,13 +1287,8 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
         if let Some((_, menu)) = cx.open_menu.log_menu_mut() {
             match menu.on_key(key.code) {
                 MenuOutcome::Run(action) => {
-                    if let Some((commit, taken)) = cx.open_menu.take_log_menu() {
-                        super::menu_actions::run_log_menu_action(
-                            cx,
-                            action,
-                            commit,
-                            (taken.anchor_col, taken.anchor_row),
-                        );
+                    if let Some((commit, _)) = cx.open_menu.take_log_menu() {
+                        super::menu_actions::run_log_menu_action(cx, action, commit);
                     }
                 }
                 MenuOutcome::Close => cx.open_menu.close_log_menu(),
@@ -1317,7 +1312,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                     commands::apply_ref_fold_action(cx, action);
                 }
                 MenuOutcome::Run(action) => {
-                    if let Some((section, full_name, taken)) = cx.open_menu.take_ref_menu() {
+                    if let Some((section, full_name, _)) = cx.open_menu.take_ref_menu() {
                         apply_ref_context_action(
                             action,
                             section,
@@ -1339,7 +1334,6 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                                 last_message: &mut *cx.last_message,
                                 remotes: &*cx.remote_names,
                                 remote_ui: &mut *cx.remote_ui,
-                                anchor: (taken.anchor_col, taken.anchor_row),
                                 worktrees: cx.worktrees_result.as_deref().unwrap_or(&[]),
                                 worktree_seed: &mut *cx.worktree_seed,
                                 pull_request_seed: &mut *cx.pull_request_seed,

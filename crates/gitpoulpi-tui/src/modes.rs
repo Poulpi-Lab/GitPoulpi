@@ -39,7 +39,7 @@ impl MainField {
         match input_mode {
             InputMode::FilteringRefs(_) => Some(MainField::RefsFilter),
             InputMode::SearchingLog(_) => Some(MainField::LogFind),
-            InputMode::ComposingRefName { .. } => Some(MainField::RefName),
+            InputMode::InlineName { .. } => Some(MainField::RefName),
             InputMode::CommandPalette { .. } => Some(MainField::Palette),
             InputMode::TabPicker { .. } => Some(MainField::TabPicker),
             InputMode::ThemePicker(_) => Some(MainField::ThemePicker),
@@ -119,7 +119,7 @@ impl MainField {
     ) -> Option<&'a mut String> {
         match (self, input_mode) {
             (MainField::RefsFilter, InputMode::FilteringRefs(s))
-            | (MainField::RefName, InputMode::ComposingRefName { value: s, .. })
+            | (MainField::RefName, InputMode::InlineName { value: s, .. })
             | (MainField::Palette, InputMode::CommandPalette { draft: s, .. })
             | (MainField::TabPicker, InputMode::TabPicker { draft: s, .. }) => Some(s),
             (MainField::ThemePicker, InputMode::ThemePicker(picker)) => Some(&mut picker.draft),
@@ -159,9 +159,11 @@ pub(crate) enum InputMode {
     /// open), `,` opens settings and `?` toggles help. `Esc` or any other key
     /// cancels back to `Normal`; unlike `Leader`, nothing stays pending.
     Navigation,
-    /// Typing a new branch name, a new tag name, or a branch's new name
-    /// (rename) - see `RefNameOp` for which and what happens on Enter.
-    ComposingRefName {
+    /// Typing a new branch or tag name, a branch's new name (rename) or a new
+    /// file name - see `RefNameOp` for which and what happens on Enter. The
+    /// name is typed in place (a Log row, a Refs row, the Status list) or in
+    /// the small name box (`ref_name_box.rs`), never drawn in the footer.
+    InlineName {
         op: RefNameOp,
         value: String,
     },
@@ -331,7 +333,7 @@ pub(crate) enum RenameSpot {
     Auto,
 }
 
-/// What a `ComposingRefName` input's Enter should do with the typed name.
+/// What a `InlineName` input's Enter should do with the typed name.
 pub(crate) enum RefNameOp {
     NewBranch,
     NewTag,
@@ -342,44 +344,14 @@ pub(crate) enum RefNameOp {
     /// field, its editing, Esc and Enter all behave as they already do.
     NewBranchAt(Oid),
     NewTagAt(Oid),
-    /// `Create annotated tag here...`, step one: the tag's name. Enter
-    /// moves on to `AnnotatedTagMessage`.
+    /// `Create annotated tag here...`, step one: the tag's name.
     NewAnnotatedTagAt(Oid),
-    /// Step two: the message (reusing this prompt, like `AnnotateTag`).
-    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
-    AnnotatedTagMessage {
-        at: Oid,
-        name: String,
-    },
     /// Rename `name` in place: `spot` says where the box is drawn
     /// (`RenameSpot`).
     RenameBranch {
         name: String,
         spot: RenameSpot,
     },
-    /// Type the message for `Annotate <tag>...`. Reuses the ref-name
-    /// prompt rather than adding a second one-line-input mode: the
-    /// widget, its key handling and its width arithmetic are already
-    /// solved there, and a second copy is a second place to get
-    /// `field_window` wrong.
-    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
-    AnnotateTag(String),
-    /// Type the upstream of this branch by hand (`origin/feature`) --
-    /// the Set upstream menu's way out when the branch is not listed.
-    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
-    SetUpstream(String),
-    /// Type a pattern (`*.psd`) to route through Git LFS.
-    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
-    LfsTrack,
-    /// Type a pattern to stop routing through Git LFS.
-    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
-    LfsUntrack,
-    /// Type the (optional) message of a stash - `Ctrl+G m`, the palette's
-    /// `Stash With Message...`. Unlike every other op an empty answer is
-    /// fine (it stashes with git's own default message), and with AI on
-    /// `Ctrl+G` inside the prompt asks the model to write one.
-    #[allow(dead_code)] // the prompt dialog asks now; removed by the footer cleanup
-    StashMessage,
     /// Type the name (with its extension) of a new empty file, relative to
     /// this folder (empty = the repository root): `Create File` and a
     /// folder's `Create a file in this folder`. See `new_file.rs`.

@@ -2119,7 +2119,6 @@ pull_ff_only = { git = "Pull (tylko fast-forward)", local = "Ściągnij (tylko f
 pull_rebase = { git = "Pull (rebase)", local = "Ściągnij (rebase)" }
 push_to_title = { git = "Push {branch} do", local = "Wypchnij {branch} do" }
 upstream_title = "Upstream gałęzi {branch}"
-type_remote_branch = "Wpisz gałąź zdalną..."
 unset_upstream = "Usuń upstream"
 diverged_title = "{remote}/{branch} rozeszło się"
 pull_then_push = { git = "Pull (merge), potem push", local = "Ściągnij (scalenie), potem wypchnij" }
@@ -4318,24 +4317,7 @@ counter = "{current} z {total}"
 [footer]
 commit_label = { git = "Opis commita: ", local = "Opis zatwierdzenia: " }
 commit_hint = { git = "  (Enter: commit, Esc: anuluj)", local = "  (Enter: zatwierdź, Esc: anuluj)" }
-filter_refs = "Filtruj refy: {draft}_  (Enter: zastosuj, Esc: anuluj)"
 filter_refs_hint = "Enter: apply, Esc: cancel"
-new_branch_name = "Nazwa nowej gałęzi"
-new_tag_name = { git = "Nazwa nowego tagu", local = "Nazwa nowego znacznika" }
-new_branch_at = "Nowa gałąź w {sha}"
-new_tag_at = "Nowy {$tag} w {sha}"
-new_annotated_tag_at = "Nowy opisany {$tag} w {sha}"
-tag_message = { git = "Opis tagu {name}", local = "Opis znacznika {name}" }
-rename_to = "Zmień nazwę {old} na"
-set_upstream = "Upstream gałęzi {branch} (remote/branch)"
-lfs_track = "Śledź przez LFS (wzorzec, np. *.psd lub assets/big.bin)"
-lfs_untrack = "Przestań śledzić przez LFS (wzorzec)"
-stash_message = { git = "Opis stasha (opcjonalnie)", local = "Opis schowka (opcjonalnie)" }
-new_file_in = " w {folder}/"
-new_file_error = "Nowy plik{place} [{why}]"
-new_file_name = "Nazwa nowego pliku{place} (z rozszerzeniem)"
-stash_hint_ai = { git = "  (Enter: stash, {key}: {star} opis AI, Esc: anuluj)", local = "  (Enter: schowaj, {key}: {star} opis AI, Esc: anuluj)" }
-stash_hint = { git = "  (Enter: stash, Esc: anuluj)", local = "  (Enter: schowaj, Esc: anuluj)" }
 confirm_hint = "  (Enter: potwierdź, Esc: anuluj)"
 search_hint = "Szukaj: Enter/{down} dalej, Shift+Enter/{up} wstecz, Esc zamknij"
 commit_count = { one = { git = "{n} commit", local = "{n} zatwierdzenie" }, few = { git = "{n} commity", local = "{n} zatwierdzenia" }, many = { git = "{n} commitów", local = "{n} zatwierdzeń" }, other = { git = "{n} commita", local = "{n} zatwierdzenia" } }
@@ -4352,8 +4334,6 @@ hint_nav = "{key}: nawig."
 hint_commands = "{key}: polecenia"
 hint_menu = "{key}: menu"
 hint_quit = "q: zakończ"
-setting_value = "Ustawienia: {label}"
-setting_value_error = "Ustawienia: {label} [{why}]"
 
 [central]
 loading = "(wczytywanie...)"
@@ -4576,7 +4556,6 @@ creating_tag_at = { git = "tworzenie tagu {name} w {sha}...", local = "tworzenie
 creating_annotated_tag_at = { git = "tworzenie opisanego tagu {tag} w {sha}...", local = "tworzenie opisanego znacznika {tag} w {sha}..." }
 renaming = "zmiana nazwy {old} na {name}..."
 annotating_tag = { git = "opisywanie tagu {tag}...", local = "opisywanie znacznika {tag}..." }
-setting_upstream = "ustawianie upstreamu {branch} na {name}..."
 committing = "zatwierdzanie: {message}"
 created = "utworzono {path}"
 delete_tag = "Usunąć {$tag} „{name}”?"

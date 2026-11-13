@@ -153,6 +153,8 @@ mod fold_mark;
 mod fold_state;
 mod folder_listing;
 mod folder_picker;
+#[cfg(test)]
+mod footer_guard_tests;
 mod graph;
 mod guide_dialog;
 mod help_guide;

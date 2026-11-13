@@ -1553,6 +1553,21 @@ menus' **Create branch here...** / **Create tag here...** ask for the name in
 a text box on the commit's row. `Enter` creates the ref. `Esc` cancels. An
 invalid or existing name is shown in red, and the box stays open.
 
+When that row is not on screen (a diff is open, the Log is soloed, the Ref
+column is hidden), the name is typed in a small framed box with a close
+cross, **Cancel** and **Create** buttons instead. Renaming a branch is typed
+over its row in the Refs pane, or in the Ref cell of its Log row; creating a
+file is typed in the Working changes list, under the folder. The same keys
+apply everywhere: `Enter` confirms, `Esc` cancels.
+
+Nothing is ever typed in the status line. The prompts that need more room
+are dialogs with real buttons: the stash message, the message of an
+annotated tag (`Ctrl+Enter` or `Ctrl+S` applies, `Enter` adds a line), Set
+upstream (a searchable list of remote branches, plus an Unset button) and
+the Git LFS track and untrack patterns. A number or text setting chosen
+from the palette opens Settings on that row, ready to edit, and the Refs
+filter (`/`) types into the box at the top of the Refs pane.
+
 ### Editing a commit message
 
 **Edit commit message...** in the commit menu, `Ctrl+G e`, or the palette's
@@ -1749,7 +1764,7 @@ in [Staging and committing](staging-and-committing.md).
 | `x` | Discard all changes (asks first) |
 | `c` | Open the commit composer |
 | `Enter` | Commit the staged changes now, with the form's message, from anywhere (see [Staging and committing](staging-and-committing.md#writing-the-commit)) |
-| `m` | Stash all changes with a message (empty is allowed). With AI on, `Ctrl+G` in this prompt writes the message |
+| `m` | Stash all changes with a message, typed in a small dialog (empty is allowed). With AI on, its AI button (`Ctrl+G` in the dialog) writes the message |
 | `Shift+T` | Stash all changes (untracked files included), without a message |
 | `o` | Pop a stash: the stash row selected in the Log, or else the latest stash |
 | `p` | Pull, the way the Pull button is set (`git.pull_mode`) |

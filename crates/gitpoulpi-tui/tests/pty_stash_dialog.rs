@@ -42,10 +42,6 @@ fn launch(repo: &FixtureRepo, session: &str) -> Terminal {
     term
 }
 
-fn status_row(s: &Screen) -> String {
-    s.line(s.rows() - 1)
-}
-
 fn open_dialog(term: &mut Terminal) -> Screen {
     term.send_keys("C-g").unwrap();
     term.send_keys("m").unwrap();
@@ -81,9 +77,9 @@ fn a_typed_message_lives_in_the_dialog_and_enter_stashes_with_it() {
         .wait_for("the message in the dialog", STEP, |s| s.contains(SENTINEL))
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
-        !status_row(&typed).contains("zq9x"),
+        !common::status_line_text(&typed).contains("zq9x"),
         "nothing is typed in the status line: {}",
-        status_row(&typed)
+        common::status_line_text(&typed)
     );
     term.send_keys("Enter").unwrap();
     wait_for_stash(&repo, SENTINEL);

@@ -2120,7 +2120,6 @@ pull_ff_only = { git = "Pull (solo fast-forward)", local = "Traer (solo avance r
 pull_rebase = { git = "Pull (rebase)", local = "Traer (reaplicando)" }
 push_to_title = { git = "Push de {branch} a", local = "Enviar {branch} a" }
 upstream_title = "Upstream de {branch}"
-type_remote_branch = "Escribe una rama remota..."
 unset_upstream = "Quitar el upstream"
 diverged_title = "{remote}/{branch} ha divergido"
 pull_then_push = { git = "Pull (merge) y luego push", local = "Traer (fusionando) y luego enviar" }
@@ -4319,24 +4318,7 @@ counter = "{current} de {total}"
 [footer]
 commit_label = "Mensaje de {$commit}: "
 commit_hint = { git = "  (Enter: commit, Esc: cancelar)", local = "  (Enter: confirmar, Esc: cancelar)" }
-filter_refs = "Filtrar refs: {draft}_  (Enter: aplicar, Esc: cancelar)"
 filter_refs_hint = "Enter: apply, Esc: cancel"
-new_branch_name = "Nombre de la rama nueva"
-new_tag_name = { git = "Nombre del {$tag} nuevo", local = "Nombre de la {$tag} nueva" }
-new_branch_at = "Rama nueva en {sha}"
-new_tag_at = { git = "{$Tag} nuevo en {sha}", local = "{$Tag} nueva en {sha}" }
-new_annotated_tag_at = { git = "{$Tag} anotado nuevo en {sha}", local = "{$Tag} anotada nueva en {sha}" }
-tag_message = { git = "Mensaje del {$tag} {name}", local = "Mensaje de la {$tag} {name}" }
-rename_to = "Renombrar {old} a"
-set_upstream = "Upstream de {branch} (remoto/rama)"
-lfs_track = "Seguir con LFS (patrón, p. ej. *.psd o assets/big.bin)"
-lfs_untrack = "Dejar de seguir con LFS (patrón)"
-stash_message = "Mensaje del {$stash} (opcional)"
-new_file_in = " en {folder}/"
-new_file_error = "Archivo nuevo{place} [{why}]"
-new_file_name = "Nombre del archivo nuevo{place} (con su extensión)"
-stash_hint_ai = "  (Enter: {$stash}, {key}: {star} mensaje de IA, Esc: cancelar)"
-stash_hint = "  (Enter: {$stash}, Esc: cancelar)"
 confirm_hint = "  (Enter: confirmar, Esc: cancelar)"
 search_hint = "Buscar: Enter/{down} siguiente, Shift+Enter/{up} anterior, Esc cerrar"
 commit_count = { one = "{n} {$commit}", other = "{n} {$commits}" }
@@ -4353,8 +4335,6 @@ hint_nav = "{key}: nav."
 hint_commands = "{key}: comandos"
 hint_menu = "{key}: menú"
 hint_quit = "q: salir"
-setting_value = "Ajustes: {label}"
-setting_value_error = "Ajustes: {label} [{why}]"
 
 [central]
 loading = "(cargando...)"
@@ -4576,7 +4556,6 @@ creating_tag_at = { git = "creando el {$tag} {name} en {sha}...", local = "crean
 creating_annotated_tag_at = { git = "creando el {$tag} anotado {tag} en {sha}...", local = "creando la {$tag} anotada {tag} en {sha}..." }
 renaming = "renombrando {old} a {name}..."
 annotating_tag = { git = "anotando el {$tag} {tag}...", local = "anotando la {$tag} {tag}..." }
-setting_upstream = "fijando el upstream de {branch} a {name}..."
 committing = "confirmando: {message}"
 created = "{path} creado"
 delete_tag = { git = "¿Eliminar el {$tag} «{name}»?", local = "¿Eliminar la {$tag} «{name}»?" }

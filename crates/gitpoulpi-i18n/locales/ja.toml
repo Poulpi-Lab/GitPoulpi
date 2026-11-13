@@ -2121,7 +2121,6 @@ pull_ff_only = { git = "{$Pull}（早送りのみ）", local = "{$Pull}（早送
 pull_rebase = { git = "{$Pull}（{$rebase}）", local = "{$Pull}（{$rebase}）" }
 push_to_title = { git = "{branch} の{$push}先", local = "{branch} の{$push}先" }
 upstream_title = "{branch} のアップストリーム"
-type_remote_branch = "リモートブランチを入力..."
 unset_upstream = "アップストリームを解除"
 diverged_title = "{remote}/{branch} が分岐しています"
 pull_then_push = { git = "{$Pull}（{$merge}）してから{$push}", local = "{$Pull}（{$merge}）してから{$push}" }
@@ -4320,24 +4319,7 @@ counter = "{current} / {total}"
 [footer]
 commit_label = { git = "{$Commit}メッセージ：", local = "{$Commit}メッセージ：" }
 commit_hint = { git = "  （Enter：{$commit}、Esc：キャンセル）", local = "  （Enter：{$commit}、Esc：キャンセル）" }
-filter_refs = "参照を絞り込み：{draft}_  （Enter：適用、Esc：キャンセル）"
 filter_refs_hint = "Enter: apply, Esc: cancel"
-new_branch_name = "新しいブランチ名"
-new_tag_name = { git = "新しい{$tag}名", local = "新しい{$tag}名" }
-new_branch_at = "{sha} に新規ブランチ"
-new_tag_at = { git = "{sha} に新規{$tag}", local = "{sha} に新規{$tag}" }
-new_annotated_tag_at = { git = "{sha} に新規の注釈付き{$tag}", local = "{sha} に新規の注釈付き{$tag}" }
-tag_message = "{$tag} {name} のメッセージ"
-rename_to = "{old} の新しい名前"
-set_upstream = "{branch} のアップストリーム（remote/branch）"
-lfs_track = "LFS で追跡（パターン。例：*.psd または assets/big.bin）"
-lfs_untrack = "LFS の追跡を解除（パターン）"
-stash_message = { git = "{$Stash}メッセージ（任意）", local = "{$Stash}メッセージ（任意）" }
-new_file_in = "（{folder}/ 内）"
-new_file_error = "新しいファイル{place} [{why}]"
-new_file_name = "新しいファイル名{place}（拡張子付き）"
-stash_hint_ai = "  （Enter：{$stash}、{key}：{star} AI メッセージ、Esc：キャンセル）"
-stash_hint = "  （Enter：{$stash}、Esc：キャンセル）"
 confirm_hint = "  （Enter：確定、Esc：キャンセル）"
 search_hint = "検索：Enter/{down} 次へ、Shift+Enter/{up} 前へ、Esc 閉じる"
 commit_count = { one = "{n} {$commit}", other = "{n} {$commits}" }
@@ -4354,8 +4336,6 @@ hint_nav = "{key}：ナビ"
 hint_commands = "{key}：コマンド"
 hint_menu = "{key}：メニュー"
 hint_quit = "q：終了"
-setting_value = "設定：{label}"
-setting_value_error = "設定：{label} [{why}]"
 
 [central]
 loading = "（読み込み中...）"
@@ -4577,7 +4557,6 @@ creating_tag_at = { git = "{sha} に{$tag} {name} を作成中...", local = "{sh
 creating_annotated_tag_at = "{sha} に注釈付き{$tag} {tag} を作成中..."
 renaming = "{old} を {name} に名前変更中..."
 annotating_tag = "{$tag} {tag} に注釈を付けています..."
-setting_upstream = "{branch} のアップストリームを {name} に設定中..."
 committing = "{$commit}中：{message}"
 created = "{path} を作成しました"
 delete_tag = "{$tag} '{name}' を削除しますか？"

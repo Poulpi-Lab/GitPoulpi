@@ -39,7 +39,7 @@ pub(super) fn handle(
                 commands::apply_ref_fold_action(cx, action);
             }
             Some(MenuOutcome::Run(action)) => {
-                if let Some((section, full_name, taken)) = cx.open_menu.take_ref_menu() {
+                if let Some((section, full_name, _)) = cx.open_menu.take_ref_menu() {
                     apply_ref_context_action(
                         action,
                         section,
@@ -61,7 +61,6 @@ pub(super) fn handle(
                             last_message: &mut *cx.last_message,
                             remotes: &*cx.remote_names,
                             remote_ui: &mut *cx.remote_ui,
-                            anchor: (taken.anchor_col, taken.anchor_row),
                             worktrees: cx.worktrees_result.as_deref().unwrap_or(&[]),
                             worktree_seed: &mut *cx.worktree_seed,
                             pull_request_seed: &mut *cx.pull_request_seed,
@@ -92,13 +91,8 @@ pub(super) fn handle(
             .map(|(_, menu)| menu.activate(idx));
         match outcome {
             Some(MenuOutcome::Run(action)) => {
-                if let Some((commit, taken)) = cx.open_menu.take_log_menu() {
-                    menu_actions::run_log_menu_action(
-                        cx,
-                        action,
-                        commit,
-                        (taken.anchor_col, taken.anchor_row),
-                    );
+                if let Some((commit, _)) = cx.open_menu.take_log_menu() {
+                    menu_actions::run_log_menu_action(cx, action, commit);
                 }
             }
             Some(MenuOutcome::Close) => cx.open_menu.close_log_menu(),

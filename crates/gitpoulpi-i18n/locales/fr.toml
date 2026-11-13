@@ -2124,7 +2124,6 @@ pull_ff_only = { git = "Pull (fast-forward seul)", local = "Tirer (avance rapide
 pull_rebase = { git = "Pull (rebase)", local = "Tirer (rebasage)" }
 push_to_title = { git = "Push de {branch} vers", local = "Pousser {branch} vers" }
 upstream_title = "Amont de {branch}"
-type_remote_branch = "Saisir une branche distante..."
 unset_upstream = "Retirer l'amont"
 diverged_title = "{remote}/{branch} a divergé"
 pull_then_push = { git = "Pull (merge), puis push", local = "Tirer (fusion), puis pousser" }
@@ -4327,24 +4326,7 @@ counter = "{current} sur {total}"
 [footer]
 commit_label = "Message de {$commit} : "
 commit_hint = { git = "  (Enter : commit, Esc : annuler)", local = "  (Enter : valider, Esc : annuler)" }
-filter_refs = "Filtrer les refs : {draft}_  (Enter : appliquer, Esc : annuler)"
 filter_refs_hint = "Entrée : appliquer, Échap : annuler"
-new_branch_name = "Nom de la nouvelle branche"
-new_tag_name = { git = "Nom du nouveau {$tag}", local = "Nom de la nouvelle {$tag}" }
-new_branch_at = "Nouvelle branche sur {sha}"
-new_tag_at = { git = "Nouveau {$tag} sur {sha}", local = "Nouvelle {$tag} sur {sha}" }
-new_annotated_tag_at = { git = "Nouveau {$tag} annoté sur {sha}", local = "Nouvelle {$tag} annotée sur {sha}" }
-tag_message = { git = "Message du {$tag} {name}", local = "Message de l'{$tag} {name}" }
-rename_to = "Renommer {old} en"
-set_upstream = "Amont de {branch} (distant/branche)"
-lfs_track = "Suivre avec LFS (motif, p. ex. *.psd ou assets/big.bin)"
-lfs_untrack = "Ne plus suivre avec LFS (motif)"
-stash_message = { git = "Message du {$stash} (facultatif)", local = "Message de la {$stash} (facultatif)" }
-new_file_in = " dans {folder}/"
-new_file_error = "Nouveau fichier{place} [{why}]"
-new_file_name = "Nom du nouveau fichier{place} (avec son extension)"
-stash_hint_ai = "  (Enter : {$stash}, {key} : {star} message IA, Esc : annuler)"
-stash_hint = { git = "  (Enter : stash, Esc : annuler)", local = "  (Enter : remiser, Esc : annuler)" }
 confirm_hint = "  (Enter : confirmer, Esc : annuler)"
 search_hint = "Recherche : Enter/{down} suivant, Shift+Enter/{up} précédent, Esc ferme"
 commit_count = { one = "{n} {$commit}", other = "{n} {$commits}" }
@@ -4361,8 +4343,6 @@ hint_nav = "{key} : nav"
 hint_commands = "{key} : commandes"
 hint_menu = "{key} : menu"
 hint_quit = "q : quitter"
-setting_value = "Paramètres : {label}"
-setting_value_error = "Paramètres : {label} [{why}]"
 
 [central]
 loading = "(chargement...)"
@@ -4586,7 +4566,6 @@ creating_tag_at = { git = "création du tag {name} sur {sha}...", local = "créa
 creating_annotated_tag_at = { git = "création du tag annoté {tag} sur {sha}...", local = "création de l'étiquette annotée {tag} sur {sha}..." }
 renaming = "renommage de {old} en {name}..."
 annotating_tag = { git = "annotation du tag {tag}...", local = "annotation de l'étiquette {tag}..." }
-setting_upstream = "définition de l'amont de {branch} sur {name}..."
 committing = { git = "commit : {message}", local = "validation : {message}" }
 created = "{path} créé"
 delete_tag = { git = "Supprimer le tag « {name} » ?", local = "Supprimer l'étiquette « {name} » ?" }

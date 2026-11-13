@@ -342,11 +342,6 @@ fn with_ai_off_the_commit_menu_has_no_ai_row() {
     assert!(!menu.contains("(AI)"), "no AI row while AI is off");
 }
 
-/// The status line: the last screen row. Nothing a prompt asks for is typed there.
-fn status_row(s: &xtask::pty::Screen) -> String {
-    s.line(s.rows() - 1)
-}
-
 /// Stash with a message: `Ctrl+G m` opens the dialog (no AI needed); with AI
 /// on it has a ✦ button, and `Ctrl+G` inside it fills the message from the agent.
 #[test]
@@ -367,9 +362,9 @@ fn the_stash_dialog_takes_a_typed_message_and_an_ai_one() {
         })
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(
-        !status_row(&shown).contains("my typed stash"),
+        !common::status_line_text(&shown).contains("my typed stash"),
         "the message is not echoed in the status line: {}",
-        status_row(&shown)
+        common::status_line_text(&shown)
     );
     term.send_keys("Enter").unwrap();
     wait_for_stash(&repo, "my typed stash");
@@ -391,7 +386,7 @@ fn the_stash_dialog_takes_a_typed_message_and_an_ai_one() {
             s.contains("WIP: second line")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    assert!(!status_row(&filled).contains("WIP: second line"));
+    assert!(!common::status_line_text(&filled).contains("WIP: second line"));
     assert_eq!(agent_calls(&agent), 1);
     term.send_keys("Enter").unwrap();
     wait_for_stash(&repo, "WIP: second line");

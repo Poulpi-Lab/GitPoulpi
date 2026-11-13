@@ -2935,7 +2935,6 @@ pull_rebase = { git = "Pull (rebase)", local = "Pull (rebase)" }
 # context: title of the push-to menu; {branch} is a branch name
 push_to_title = { git = "Push {branch} to", local = "Push {branch} to" }
 upstream_title = "Upstream of {branch}"
-type_remote_branch = "Type a remote branch..."
 unset_upstream = "Unset upstream"
 # context: title of the dialog after a rejected push
 diverged_title = "{remote}/{branch} has diverged"
@@ -5284,26 +5283,7 @@ counter = "{current} of {total}"
 # context: footer text while typing a commit message
 commit_label = "{$Commit} message: "
 commit_hint = { git = "  (Enter: commit, Esc: cancel)", local = "  (Enter: commit, Esc: cancel)" }
-filter_refs = "Filter refs: {draft}_  (Enter: apply, Esc: cancel)"
 filter_refs_hint = "Enter: apply, Esc: cancel"
-new_branch_name = "New branch name"
-new_tag_name = "New {$tag} name"
-new_branch_at = "New branch at {sha}"
-new_tag_at = "New {$tag} at {sha}"
-new_annotated_tag_at = "New annotated {$tag} at {sha}"
-tag_message = "Message for {$tag} {name}"
-rename_to = "Rename {old} to"
-set_upstream = "Upstream of {branch} (remote/branch)"
-lfs_track = "Track with LFS (pattern, e.g. *.psd or assets/big.bin)"
-lfs_untrack = "Stop tracking with LFS (pattern)"
-stash_message = "{$Stash} message (optional)"
-# context: appended to the new-file prompt, {folder} is a path
-new_file_in = " in {folder}/"
-new_file_error = "New file{place} [{why}]"
-new_file_name = "New file name{place} (with its extension)"
-# context: prompt hint; {key} is the AI chord, {star} the AI glyph
-stash_hint_ai = "  (Enter: {$stash}, {key}: {star} AI message, Esc: cancel)"
-stash_hint = "  (Enter: {$stash}, Esc: cancel)"
 confirm_hint = "  (Enter: confirm, Esc: cancel)"
 # context: footer while the Log find bar is open; {down} and {up} are arrow glyphs
 search_hint = "Search: Enter/{down} next, Shift+Enter/{up} previous, Esc close"
@@ -5324,8 +5304,6 @@ hint_commands = "{key}: commands"
 hint_menu = "{key}: menu"
 hint_quit = "q: quit"
 
-setting_value = "Settings: {label}"
-setting_value_error = "Settings: {label} [{why}]"
 
 # Central diff view title and notices.
 [central]
@@ -5579,7 +5557,6 @@ creating_tag_at = "creating {$tag} {name} at {sha}..."
 creating_annotated_tag_at = "creating annotated {$tag} {tag} at {sha}..."
 renaming = "renaming {old} to {name}..."
 annotating_tag = "annotating {$tag} {tag}..."
-setting_upstream = "setting {branch}'s upstream to {name}..."
 # context: {message} is the commit message just sent
 committing = "committing: {message}"
 # context: {path} is the new file's path relative to the repository

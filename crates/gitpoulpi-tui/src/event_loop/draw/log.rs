@@ -563,7 +563,7 @@ pub(in crate::event_loop) fn draw_log(frame: &mut Frame, ctx: &mut LogDrawCtx<'_
         // any). If the row is off screen or the Ref column is hidden/too
         // narrow, or another spot already holds the field, nothing is drawn
         // here and the next spot takes over (`ref_name_box.rs`).
-        if let (Some((kind, _)), Some(row), InputMode::ComposingRefName { value, .. }) =
+        if let (Some((kind, _)), Some(row), InputMode::InlineName { value, .. }) =
             (inline_ref, *inline_ref_row, input_mode)
         {
             // A Ref column cut by the viewport counts as too narrow.

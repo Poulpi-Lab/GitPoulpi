@@ -571,8 +571,8 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
 
     // The name box: where a name is typed when no inline spot (the Log's Ref
     // cell, the Refs row, the Status list) could draw it this frame.
-    if let InputMode::ComposingRefName { op, value } = &input_mode {
-        if is_inline_name(op) && name_slot.may_draw(NameSpot::Box) {
+    if let InputMode::InlineName { op, value } = &input_mode {
+        if name_slot.may_draw(NameSpot::Box) {
             let hovered_part = match &hovered_target {
                 Some(HitTarget::RefNameBox(part)) => Some(*part),
                 _ => None,

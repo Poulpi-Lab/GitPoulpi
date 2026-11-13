@@ -2120,7 +2120,6 @@ pull_ff_only = { git = "{$Pull}（仅 fast-forward）", local = "拉取（仅快
 pull_rebase = { git = "{$Pull}（{$rebase}）", local = "拉取（变基）" }
 push_to_title = { git = "将 {branch} {$push} 到", local = "将 {branch} 推送到" }
 upstream_title = { git = "{branch} 的 upstream", local = "{branch} 的上游" }
-type_remote_branch = "输入远程分支…"
 unset_upstream = { git = "取消设置 upstream", local = "取消设置上游" }
 diverged_title = "{remote}/{branch} 已分叉"
 pull_then_push = { git = "先 {$Pull}（{$merge}），再 {$push}", local = "先拉取（合并），再推送" }
@@ -4321,24 +4320,7 @@ counter = "第 {current} / {total} 个"
 [footer]
 commit_label = { git = "{$Commit} 消息：", local = "{$Commit}消息：" }
 commit_hint = { git = "  （Enter：{$commit}，Esc：取消）", local = "  （Enter：提交，Esc：取消）" }
-filter_refs = "筛选引用：{draft}_  （Enter：应用，Esc：取消）"
 filter_refs_hint = "Enter: apply, Esc: cancel"
-new_branch_name = "新分支名"
-new_tag_name = { git = "新 {$tag} 名", local = "新{$tag}名" }
-new_branch_at = "在 {sha} 处新建分支"
-new_tag_at = { git = "在 {sha} 处新建 {$tag}", local = "在 {sha} 处新建{$tag}" }
-new_annotated_tag_at = { git = "在 {sha} 处新建附注 {$tag}", local = "在 {sha} 处新建附注{$tag}" }
-tag_message = "{$Tag} {name} 的消息"
-rename_to = "将 {old} 重命名为"
-set_upstream = { git = "{branch} 的 upstream（remote/branch）", local = "{branch} 的上游（remote/branch）" }
-lfs_track = "用 LFS 跟踪（模式，如 *.psd 或 assets/big.bin）"
-lfs_untrack = "停止用 LFS 跟踪（模式）"
-stash_message = { git = "{$Stash} 消息（可选）", local = "{$Stash}消息（可选）" }
-new_file_in = " 于 {folder}/"
-new_file_error = "新文件{place} [{why}]"
-new_file_name = "新文件名{place}（含扩展名）"
-stash_hint_ai = "  （Enter：{$stash}，{key}：{star} AI 消息，Esc：取消）"
-stash_hint = "  （Enter：{$stash}，Esc：取消）"
 confirm_hint = "  （Enter：确认，Esc：取消）"
 search_hint = "搜索：Enter/{down} 下一个，Shift+Enter/{up} 上一个，Esc 关闭"
 commit_count = { one = { git = "{n} 个 {$commit}", local = "{n} 个{$commit}" }, other = { git = "{n} 个 {$commit}", local = "{n} 个{$commit}" } }
@@ -4355,8 +4337,6 @@ hint_nav = "{key}：导航"
 hint_commands = "{key}：命令"
 hint_menu = "{key}：菜单"
 hint_quit = "q：退出"
-setting_value = "设置：{label}"
-setting_value_error = "设置：{label} [{why}]"
 
 [central]
 loading = "（加载中…）"
@@ -4578,7 +4558,6 @@ creating_tag_at = { git = "正在 {sha} 处创建 {$tag} {name}…", local = "�
 creating_annotated_tag_at = { git = "正在 {sha} 处创建附注 {$tag} {tag}…", local = "正在 {sha} 处创建附注{$tag} {tag}…" }
 renaming = "正在将 {old} 重命名为 {name}…"
 annotating_tag = { git = "正在为 {$tag} {tag} 添加注释…", local = "正在为{$tag} {tag} 添加注释…" }
-setting_upstream = { git = "正在将 {branch} 的 upstream 设为 {name}…", local = "正在将 {branch} 的上游设为 {name}…" }
 committing = { git = "正在 {$commit}：{message}", local = "正在{$commit}：{message}" }
 created = "已创建 {path}"
 delete_tag = { git = "删除 {$tag}“{name}”？", local = "删除{$tag}“{name}”？" }

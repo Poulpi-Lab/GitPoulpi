@@ -76,7 +76,6 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                         last_message: &mut *cx.last_message,
                         remotes: &*cx.remote_names,
                         remote_ui: &mut *cx.remote_ui,
-                        anchor: (0, 1),
                         worktrees: cx.worktrees_result.as_deref().unwrap_or(&[]),
                         worktree_seed: &mut *cx.worktree_seed,
                         pull_request_seed: &mut *cx.pull_request_seed,
@@ -274,7 +273,7 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
         }
         PaletteCommand::RenameSelectedBranch => {
             if let Some(n) = sel_ref {
-                *cx.input_mode = InputMode::ComposingRefName {
+                *cx.input_mode = InputMode::InlineName {
                     op: RefNameOp::RenameBranch {
                         name: n.clone(),
                         spot: RenameSpot::Auto,

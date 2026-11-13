@@ -1078,18 +1078,32 @@ pub fn confirm_removal(term: &mut Terminal, timeout: Duration) {
     term.click(col + 1, row).expect("click the confirm button");
 }
 
-/// The status line: the last screen row that is not the window's bottom
-/// border (the frame draws a box line under it). A prompt must never echo
-/// what the user types there.
+/// The chrome rows that sit outside every pane and box: the status line, and
+/// (in whatever order the layout puts them) the tab bar and the toolbar.
+///
+/// The status line is first or last under the window frame, above or below
+/// the toolbar and the tab bar, so no fixed row is right in every layout. What
+/// the three bands share is that each is one plain line of text between the
+/// frame's side borders: no pane border, popup or box is drawn on that row. A
+/// row with a box-drawing character between its first and last cell is
+/// therefore never one of them. Typed text can only land here through the
+/// status line (the tab bar and the toolbar never echo input), so an assertion
+/// that a sentinel is absent from this text is not vacuous in any layout.
+/// Empty when no such row is on screen (a full-window page such as Settings
+/// has no status line); `pty_status_line_never_types` proves on real screens
+/// that every layout's status line is found, so an empty result is not a
+/// silent miss.
 pub fn status_line_text(screen: &Screen) -> String {
-    for row in (0..screen.rows()).rev() {
+    const BOX: &str = "\u{2502}\u{256d}\u{256e}\u{2570}\u{256f}\u{2500}\u{250c}\u{2510}\u{2514}\u{2518}\u{251c}\u{2524}\u{252c}\u{2534}\u{253c}";
+    let mut rows = Vec::new();
+    for row in 1..screen.rows().saturating_sub(1) {
         let line = screen.line(row);
-        let is_border = line
-            .chars()
-            .all(|c| c.is_whitespace() || "\u{2514}\u{2500}\u{2518}\u{2570}\u{256f}".contains(c));
-        if !is_border {
-            return line;
+        let cells: Vec<char> = line.trim_end().chars().collect();
+        let framed = cells.first() == Some(&'\u{2502}') && cells.last() == Some(&'\u{2502}');
+        if framed && cells.len() > 2 && !cells[1..cells.len() - 1].iter().any(|c| BOX.contains(*c))
+        {
+            rows.push(line);
         }
     }
-    String::new()
+    rows.join("\n")
 }

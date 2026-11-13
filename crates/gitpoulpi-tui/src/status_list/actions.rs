@@ -354,7 +354,7 @@ pub(crate) fn open_empty_area_menu(
 
 /// Opens the name prompt of "Create File" in `folder` (empty = the repo root).
 pub(crate) fn start_create_file(folder: &std::path::Path, input_mode: &mut InputMode) {
-    *input_mode = InputMode::ComposingRefName {
+    *input_mode = InputMode::InlineName {
         op: RefNameOp::CreateFile(folder.to_path_buf()),
         value: String::new(),
     };

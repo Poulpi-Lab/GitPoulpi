@@ -170,7 +170,6 @@ impl WindowState {
             management: &mut self.management,
             management_panel: &mut self.management_panel,
             nav_badge_targets: &mut self.nav_badge_targets,
-            new_file_error: &mut self.new_file_error,
             open_menu: &mut self.open_menu,
             overflow_slots: &mut self.overflow_slots,
             panes_area: &mut self.panes_area,

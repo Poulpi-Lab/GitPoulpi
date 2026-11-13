@@ -71,13 +71,13 @@ pub(crate) fn apply_log_context_action(
             *last_message = Some(msg::checking_out(short));
         }
         LogContextAction::CreateBranchHere => {
-            *input_mode = InputMode::ComposingRefName {
+            *input_mode = InputMode::InlineName {
                 op: RefNameOp::NewBranchAt(commit),
                 value: String::new(),
             };
         }
         LogContextAction::CreateTagHere => {
-            *input_mode = InputMode::ComposingRefName {
+            *input_mode = InputMode::InlineName {
                 op: RefNameOp::NewTagAt(commit),
                 value: String::new(),
             };
@@ -161,7 +161,7 @@ pub(crate) fn apply_log_context_action(
             }
         }
         LogContextAction::CreateAnnotatedTagHere => {
-            *input_mode = InputMode::ComposingRefName {
+            *input_mode = InputMode::InlineName {
                 op: RefNameOp::NewAnnotatedTagAt(commit),
                 value: String::new(),
             };

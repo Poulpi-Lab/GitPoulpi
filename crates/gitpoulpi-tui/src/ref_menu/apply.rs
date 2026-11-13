@@ -30,10 +30,6 @@ pub(crate) struct RefActionCtx<'a> {
     /// Remotes, the default remote and the remote menus, for the
     /// branch rows' Push / Pull / Fetch / Set upstream and the tag rows.
     pub(crate) remote_ui: &'a mut RemoteUi,
-    /// Where the menu was, for a follow-up menu. Set upstream is a dialog now,
-    /// so nothing reads it; the cleanup that follows removes it.
-    #[allow(dead_code)]
-    pub(crate) anchor: (u16, u16),
     /// Every worktree, for Create worktree to know whether the branch is
     /// already checked out somewhere (git would refuse it again).
     pub(crate) worktrees: &'a [gitpoulpi_core::domain::Worktree],
@@ -84,7 +80,6 @@ pub(crate) fn apply_ref_context_action(
         last_message,
         remotes,
         remote_ui,
-        anchor: _,
         worktrees,
         worktree_seed,
         pull_request_seed,
@@ -207,7 +202,7 @@ pub(crate) fn apply_ref_context_action(
             None => *last_message = Some(NO_SUCH_LOCAL_BRANCH.get().into()),
         },
         RefContextAction::RenameBranch => {
-            *input_mode = InputMode::ComposingRefName {
+            *input_mode = InputMode::InlineName {
                 op: RefNameOp::RenameBranch {
                     name: full_name.clone(),
                     spot: RenameSpot::Refs,

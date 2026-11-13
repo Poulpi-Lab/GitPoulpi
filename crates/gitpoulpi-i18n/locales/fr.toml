@@ -4168,6 +4168,8 @@ quit_cd = "Quitter en laissant le shell dans le dossier de cet onglet (nécessit
 repo_management = "Gestion des dépôts : ouvrir, cloner ou créer un dépôt"
 insert_issue_ref = "Insérer une référence de ticket"
 tab_overflow = "Tous les onglets"
+tab_scroll_left = "Faire défiler les onglets vers la gauche"
+tab_scroll_right = "Faire défiler les onglets vers la droite"
 
 # Indications de pied de page pendant un préfixe Ctrl+G (git) ou de navigation.
 [footer_hint]

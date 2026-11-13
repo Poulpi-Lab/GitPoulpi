@@ -532,6 +532,10 @@ pub(crate) enum FocusTarget {
     /// A control of the Activity Log, the same way
     /// (`activity_log::nav_press`).
     Activity(u16, u16),
+    /// A scroll arrow of the tab bar (`true`: the right one), while it is
+    /// enabled. An action badge: pressing it scrolls the bar by one tab,
+    /// as a click on the arrow does.
+    TabScroll(bool),
 }
 
 /// Badge characters, in the order they're handed out: `1`-`9` first, then

@@ -4162,6 +4162,8 @@ quit_cd = "Zakończ, zostawiając powłokę w folderze tej karty (wymaga wrapper
 repo_management = "Zarządzanie repozytoriami: otwórz, sklonuj lub utwórz repozytorium"
 insert_issue_ref = "Wstaw odwołanie do zgłoszenia"
 tab_overflow = "Wszystkie karty"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}: "

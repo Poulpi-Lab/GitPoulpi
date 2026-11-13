@@ -5091,6 +5091,8 @@ repo_management = "Repository Management: open, clone or create a repository"
 insert_issue_ref = "Insert an issue reference"
 # context: tooltip of the ... button that appears when not every tab fits; it opens the tab list
 tab_overflow = "All tabs"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 # Footer hints shown while the Ctrl+G (git) or navigation prefix is pending:
 # `key=name` pairs, names kept short. Key names are never translated.

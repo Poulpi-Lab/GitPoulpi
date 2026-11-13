@@ -4165,6 +4165,8 @@ quit_cd = "Beenden und Ihre Shell im Ordner dieses Tabs lassen (braucht den Shel
 repo_management = "Repository-Verwaltung: ein Repository öffnen, klonen oder erstellen"
 insert_issue_ref = "Issue-Referenz einfügen"
 tab_overflow = "Alle Tabs"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}: "

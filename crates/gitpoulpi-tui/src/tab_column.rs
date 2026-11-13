@@ -208,6 +208,9 @@ pub(crate) fn tab_column(area: Rect, a: ColumnArgs<'_>) -> Column {
         workspaces_close: None,
         notes: None,
         notes_close: None,
+        scroll_left: None,
+        scroll_right: None,
+        offset: 0,
     };
     let mut y = area.y;
     let row = |y: u16| Rect::new(area.x, y, area.width, 1);

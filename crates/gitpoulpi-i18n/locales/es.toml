@@ -4163,6 +4163,8 @@ quit_cd = "Salir, dejando tu shell en la carpeta de esta pestaña (necesita el w
 repo_management = "Gestión de repositorios: abrir, clonar o crear un repositorio"
 insert_issue_ref = "Insertar una referencia a un issue"
 tab_overflow = "Todas las pestañas"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}: "

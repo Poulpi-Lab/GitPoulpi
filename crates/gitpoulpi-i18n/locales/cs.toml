@@ -4163,6 +4163,8 @@ quit_cd = "Ukončit a nechat shell ve složce této karty (vyžaduje obal shellu
 repo_management = "Správa repozitářů: otevřít, naklonovat nebo vytvořit repozitář"
 insert_issue_ref = "Vložit odkaz na issue"
 tab_overflow = "Všechny karty"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}: "

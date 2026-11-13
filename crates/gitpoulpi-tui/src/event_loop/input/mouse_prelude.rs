@@ -135,20 +135,44 @@ fn tab_bar_drag(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> bool {
                     .map(|h| h.tab);
             }
             if drag.started {
+                let vertical = crate::tab_column::area().is_some();
+                if !vertical {
+                    // Carried onto a scroll arrow, the bar scrolls (and keeps
+                    // scrolling while the tab rests there: `tab_scroll`).
+                    crate::tab_scroll::drag_over(col, row, std::time::Instant::now());
+                }
+                // The source tab may have scrolled in or out of view.
+                drag.source_rect = cx
+                    .tab_hits
+                    .iter()
+                    .find(|h| h.index == drag.from)
+                    .map(|h| h.tab);
                 update_bar_target(
                     drag,
+                    &*cx.tab_hits,
+                    cx.repo_tabs.len(),
+                    (col, row),
+                    vertical,
+                );
+            }
+            true
+        }
+        MouseEventKind::Up(MouseButton::Left) => {
+            crate::tab_scroll::drag_end();
+            let Some(mut drag) = cx.tab_drag.take() else {
+                return true;
+            };
+            // The bar may have scrolled under a pointer that did not move:
+            // the drop lands where the last painted frame says it is.
+            if drag.started {
+                update_bar_target(
+                    &mut drag,
                     &*cx.tab_hits,
                     cx.repo_tabs.len(),
                     (col, row),
                     crate::tab_column::area().is_some(),
                 );
             }
-            true
-        }
-        MouseEventKind::Up(MouseButton::Left) => {
-            let Some(drag) = cx.tab_drag.take() else {
-                return true;
-            };
             if !drag.started {
                 if let Some(message) = apply_switcher_action(
                     repo_switcher::SwitcherAction::Focus(drag.from),
@@ -1021,6 +1045,18 @@ pub(super) fn prelude(cx: &mut CommandCtx<'_>, mouse: MouseEvent) -> io::Result<
         if let (Some(delta), Some(area)) = (delta, crate::tab_column::area()) {
             if area.contains((col, row).into()) {
                 crate::tab_column::scroll_by(delta);
+                return Ok(None);
+            }
+        }
+        // Over the horizontal bar (which has no other wheel action), the
+        // wheel scrolls its tabs: up or left shows the earlier ones.
+        let sideways = match mouse.kind {
+            MouseEventKind::ScrollUp | MouseEventKind::ScrollLeft => Some(-1),
+            MouseEventKind::ScrollDown | MouseEventKind::ScrollRight => Some(1),
+            _ => None,
+        };
+        if let Some(delta) = sideways {
+            if crate::tab_scroll::wheel(col, row, delta) {
                 return Ok(None);
             }
         }

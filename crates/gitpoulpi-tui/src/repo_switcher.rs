@@ -118,6 +118,28 @@ pub struct NewTabSlot {
     /// The Release notes tab after the Radar; `Some` only while it is
     /// open (it is transient, like the New tab, and always the selected one).
     pub notes: Option<NotesSlot>,
+    /// Where the scrolled window of repository tabs starts (`tab_scroll`).
+    pub scroll: BarScroll,
+}
+
+/// The horizontal scroll of the repository tabs, as one draw sees it.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct BarScroll {
+    /// The first visible tab asked for (clamped by the draw).
+    pub offset: usize,
+    /// A tab to bring fully into view with the least movement.
+    pub follow: Option<usize>,
+    pub left_hovered: bool,
+    pub right_hovered: bool,
+}
+
+/// One arrow button of the scrolled bar.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ScrollArrow {
+    pub rect: Rect,
+    /// There are tabs hidden on its side; a dimmed arrow is inert and not
+    /// registered.
+    pub enabled: bool,
 }
 
 /// The Release notes tab: right after Home (and the Radar), closable.
@@ -183,6 +205,12 @@ pub struct TabBar {
     pub notes: Option<Rect>,
     /// The Release notes tab's `x`; `None` exactly when `notes` is.
     pub notes_close: Option<Rect>,
+    /// The scroll arrows at both ends of the repository tabs; `None` when
+    /// every tab fits (or the bar is too narrow for them).
+    pub scroll_left: Option<ScrollArrow>,
+    pub scroll_right: Option<ScrollArrow>,
+    /// The first visible repository tab the draw settled on.
+    pub offset: usize,
 }
 
 /// The tab bar's spans, plus where each tab landed. One function produces
@@ -412,53 +440,89 @@ pub fn tab_bar_with(
     };
     let limit = area.x + area.width - reserve;
 
-    // When the tabs overflow, the `...` button needs its own room: the tabs
-    // give way to it, as they do to the `+`.
-    let all_w: u16 = tabs
+    // When the tabs overflow, they scroll: a window of them between two
+    // arrow buttons (`tab_scroll`), then the `...` button (the tab picker)
+    // when there is room for it too. The `...` gives way first, then the
+    // arrows; the remaining tabs are still reachable by keyboard and through
+    // the tab picker, so the bar scrolls rather than shrinking every label
+    // into illegibility.
+    let widths: Vec<u16> = tabs
         .iter()
         .map(|t| crate::ui_kit::display_width(&format!(" {} x ", t.name)) as u16)
-        .sum();
-    let tab_limit = if x + all_w > limit && limit >= x + OVERFLOW_BUTTON_W {
-        limit - OVERFLOW_BUTTON_W
+        .collect();
+    let all_w: u32 = widths.iter().map(|w| u32::from(*w)).sum();
+    let room = limit.saturating_sub(x);
+    let overflow = all_w > u32::from(room);
+    let arrow_w = crate::tab_scroll::ARROW_W;
+    let arrows = overflow && room >= 2 * arrow_w + 4;
+    let with_more = arrows && room >= 2 * arrow_w + OVERFLOW_BUTTON_W + 8;
+    let strip_w =
+        room - if arrows { 2 * arrow_w } else { 0 } - if with_more { OVERFLOW_BUTTON_W } else { 0 };
+    let offset = if overflow {
+        crate::tab_scroll::window_start(
+            &widths,
+            strip_w,
+            new_tab.scroll.offset,
+            new_tab.scroll.follow,
+        )
     } else {
-        limit
+        0
     };
-    let mut more = None;
-    for (index, tab) in tabs.iter().enumerate() {
+    let arrow_style = |enabled: bool, hovered: bool| {
+        if enabled {
+            Style::default()
+                .fg(if hovered {
+                    th().ui.text
+                } else {
+                    th().ui.accent
+                })
+                .bg(if hovered {
+                    th().ui.selection
+                } else {
+                    th().ui.hover
+                })
+        } else {
+            crate::dialog_kit::button_style(crate::dialog_kit::ButtonState::Disabled)
+        }
+    };
+    let mut scroll_left = None;
+    if arrows {
+        let enabled = offset > 0;
+        spans.push(Span::styled(
+            crate::tab_scroll::LEFT_BUTTON,
+            arrow_style(enabled, new_tab.scroll.left_hovered),
+        ));
+        scroll_left = Some(ScrollArrow {
+            rect: Rect::new(x, area.y, arrow_w, 1),
+            enabled,
+        });
+        x += arrow_w;
+    }
+    let strip_end = x + strip_w;
+    let mut end = offset;
+    for (index, tab) in tabs.iter().enumerate().skip(offset) {
         let is_active = Some(index) == active;
-        let label = format!(" {} ", tab.name);
         // Every tab carries its own close button, including the active
         // one: a bar where you have to focus a tab before you can close
         // it takes two clicks for every close.
         let close = "x ";
-        let total =
+        let mut label = format!(" {} ", tab.name);
+        let mut total =
             (crate::ui_kit::display_width(&label) + crate::ui_kit::display_width(close)) as u16;
-        if x + total > tab_limit {
-            // Out of room. The remaining tabs are still reachable by
-            // keyboard and through the overlay, so the bar truncates
-            // rather than shrinking every label into illegibility.
-            // A real button (it opens the tab picker): padded like the `+`,
-            // drawn only when its three cells fit before the reserve.
-            if x + OVERFLOW_BUTTON_W <= limit {
-                let style = Style::default()
-                    .fg(if new_tab.more_hovered {
-                        th().ui.text
-                    } else {
-                        th().ui.accent
-                    })
-                    .bg(if new_tab.more_hovered {
-                        th().ui.selection
-                    } else {
-                        th().ui.hover
-                    });
-                spans.push(Span::styled(OVERFLOW_BUTTON, style));
-                more = Some(Rect::new(x, area.y, OVERFLOW_BUTTON_W, 1));
-                x += OVERFLOW_BUTTON_W;
-            } else {
-                spans.push(Span::styled("\u{2026}", Style::default().fg(th().ui.muted)));
-                x += 1;
+        if x + total > strip_end {
+            // The first tab of the window wider than the whole strip: its
+            // name is cut rather than the bar showing no tab at all.
+            let cells = strip_end.saturating_sub(x);
+            if index != offset || cells < 6 {
+                if !arrows && cells >= 1 {
+                    spans.push(Span::styled("\u{2026}", Style::default().fg(th().ui.muted)));
+                    x += 1;
+                }
+                break;
             }
-            break;
+            label = format!(" {} ", crate::fit(&tab.name, usize::from(cells - 4)));
+            total =
+                (crate::ui_kit::display_width(&label) + crate::ui_kit::display_width(close)) as u16;
         }
 
         // The same selection treatment and palette as every other list:
@@ -498,6 +562,44 @@ pub fn tab_bar_with(
             },
         });
         x += total;
+        end = index + 1;
+    }
+    let mut scroll_right = None;
+    let mut more = None;
+    if arrows {
+        // The right arrow stays at the strip's end, so it does not move
+        // while the window scrolls.
+        if x < strip_end {
+            spans.push(Span::raw(" ".repeat(usize::from(strip_end - x))));
+            x = strip_end;
+        }
+        let enabled = end < tabs.len();
+        spans.push(Span::styled(
+            crate::tab_scroll::RIGHT_BUTTON,
+            arrow_style(enabled, new_tab.scroll.right_hovered),
+        ));
+        scroll_right = Some(ScrollArrow {
+            rect: Rect::new(x, area.y, arrow_w, 1),
+            enabled,
+        });
+        x += arrow_w;
+    }
+    if with_more {
+        // A real button (it opens the tab picker): padded like the `+`.
+        let style = Style::default()
+            .fg(if new_tab.more_hovered {
+                th().ui.text
+            } else {
+                th().ui.accent
+            })
+            .bg(if new_tab.more_hovered {
+                th().ui.selection
+            } else {
+                th().ui.hover
+            });
+        spans.push(Span::styled(OVERFLOW_BUTTON, style));
+        more = Some(Rect::new(x, area.y, OVERFLOW_BUTTON_W, 1));
+        x += OVERFLOW_BUTTON_W;
     }
 
     if tabs.is_empty() && !new_tab.open {
@@ -559,6 +661,9 @@ pub fn tab_bar_with(
         workspaces_close,
         notes,
         notes_close,
+        scroll_left,
+        scroll_right,
+        offset,
     }
 }
 
@@ -1110,21 +1215,123 @@ mod tests {
         }
     }
 
-    /// Overflowing tabs leave a drawn, registered `...` button between the
-    /// last tab that fit and the `+`; a bar where everything fits has none.
+    /// Overflowing tabs leave a drawn, registered `...` button after the
+    /// right scroll arrow and before the `+`; a bar where everything fits
+    /// has none.
     #[test]
     fn overflowing_tabs_end_in_a_registered_ellipsis_button() {
-        let area = Rect::new(0, 0, 20, 1);
-        let bar = tab_bar(&tabs(), 0, area, false);
+        let area = Rect::new(0, 0, 40, 1);
+        let bar = tab_bar(&many(8), 0, area, false);
         let more = bar.more.expect("the ... button");
         let buf = drawn(&bar, area);
         assert_eq!(buf[(more.x + 1, more.y)].symbol(), "\u{2026}");
         for hit in &bar.hits {
             assert!(hit.tab.x + hit.tab.width <= more.x, "{hit:?} {more:?}");
         }
+        assert!(bar.scroll_right.unwrap().rect.right() <= more.x);
         assert!(more.x + more.width <= bar.plus.unwrap().x);
         let wide = tab_bar(&tabs(), 0, bar_area(), false);
         assert!(wide.more.is_none());
+        // Short of room, the `...` gives way first and the arrows stay.
+        let short = tab_bar(&tabs(), 0, Rect::new(0, 0, 20, 1), false);
+        assert!(short.more.is_none() && short.scroll_right.is_some());
+    }
+
+    fn many(n: usize) -> Vec<RepoTab> {
+        (0..n)
+            .map(|i| RepoTab {
+                path: PathBuf::from(format!("/repos/repo{i}")),
+                name: format!("repo{i}"),
+                branch: None,
+            })
+            .collect()
+    }
+
+    fn scrolled(tabs: &[RepoTab], active: usize, width: u16, scroll: BarScroll) -> (TabBar, Rect) {
+        let area = Rect::new(0, 0, width, 1);
+        let slot = NewTabSlot {
+            scroll,
+            ..NewTabSlot::default()
+        };
+        (
+            tab_bar_with(tabs, Some(active), area, false, false, None, None, slot),
+            area,
+        )
+    }
+
+    /// Tabs that do not fit sit between two arrow buttons: at the start the
+    /// left one is dimmed and inert, the right one live, and the glyphs are
+    /// painted on the rects the walk returned.
+    #[test]
+    fn overflowing_tabs_scroll_between_two_arrows() {
+        let (bar, area) = scrolled(&many(8), 0, 50, BarScroll::default());
+        let left = bar.scroll_left.expect("a left arrow");
+        let right = bar.scroll_right.expect("a right arrow");
+        assert!(!left.enabled && right.enabled);
+        let buf = drawn(&bar, area);
+        assert_eq!(
+            buf[(left.rect.x + 1, 0)].symbol(),
+            crate::tab_scroll::LEFT_GLYPH
+        );
+        assert_eq!(
+            buf[(right.rect.x + 1, 0)].symbol(),
+            crate::tab_scroll::RIGHT_GLYPH
+        );
+        assert_eq!(buf[(left.rect.x + 1, 0)].fg, th().ui.disabled, "dimmed");
+        assert_ne!(buf[(right.rect.x + 1, 0)].fg, th().ui.disabled);
+        assert_eq!(bar.hits[0].index, 0);
+        for hit in &bar.hits {
+            assert!(hit.tab.x >= left.rect.right() && hit.tab.right() <= right.rect.x);
+        }
+        let row = row_text(&buf, area);
+        assert!(row.contains("repo0") && !row.contains("repo7"), "{row}");
+        // Everything fits: no arrows at all.
+        let (wide, _) = scrolled(&tabs(), 0, 80, BarScroll::default());
+        assert!(wide.scroll_left.is_none() && wide.scroll_right.is_none());
+    }
+
+    /// Following the last tab brings it just into view at the right end of
+    /// the strip; the left arrow comes alive and the right one is dimmed.
+    #[test]
+    fn following_the_last_tab_shows_it_whole() {
+        let tabs = many(8);
+        let follow = BarScroll {
+            follow: Some(7),
+            ..BarScroll::default()
+        };
+        let (bar, area) = scrolled(&tabs, 7, 50, follow);
+        let last = bar.hits.last().expect("tabs drawn");
+        assert_eq!(last.index, 7);
+        let right = bar.scroll_right.unwrap();
+        assert!(last.tab.right() <= right.rect.x);
+        assert!(bar.scroll_left.unwrap().enabled && !right.enabled);
+        let row = row_text(&drawn(&bar, area), area);
+        assert!(row.contains("repo7 x"), "{row}");
+        // A tab already in view does not move the window.
+        let (same, _) = scrolled(
+            &tabs,
+            bar.hits[1].index,
+            50,
+            BarScroll {
+                offset: bar.offset,
+                follow: Some(bar.hits[1].index),
+                ..BarScroll::default()
+            },
+        );
+        assert_eq!(same.offset, bar.offset);
+        // Following the first tab again scrolls back to it.
+        let (back, _) = scrolled(
+            &tabs,
+            0,
+            50,
+            BarScroll {
+                offset: bar.offset,
+                follow: Some(0),
+                ..BarScroll::default()
+            },
+        );
+        assert_eq!(back.offset, 0);
+        assert_eq!(back.hits[0].index, 0);
     }
 
     /// No room: not drawn, not registered.
@@ -1151,6 +1358,7 @@ mod tests {
             radar: None,
             workspaces: None,
             notes: None,
+            scroll: BarScroll::default(),
         };
         let bar = tab_bar_with(&tabs(), None, area, false, true, None, None, slot);
         assert_eq!(bar.hits.len(), tabs().len() + 1);

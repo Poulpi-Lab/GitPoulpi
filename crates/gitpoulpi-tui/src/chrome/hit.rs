@@ -75,6 +75,11 @@ pub(crate) enum HitTarget {
     NewTabButton,
     /// The `...` after the last tab that fit: opens the tab picker.
     TabOverflow,
+    /// The tab bar's left scroll arrow (only while tabs are hidden on its
+    /// left): shows one more tab on that side (`tab_scroll`).
+    TabScrollLeft,
+    /// The tab bar's right scroll arrow.
+    TabScrollRight,
     /// The Radar's pinned tab, right after Home (`Alt+R`, the palette's
     /// `Radar: Open`). Registered from the tab bar's paint walk.
     RadarTab,
@@ -550,6 +555,8 @@ pub(crate) fn desired_cursor_shape(
             | HitTarget::OpenRepositoryButton
             | HitTarget::NewTabButton
             | HitTarget::TabOverflow
+            | HitTarget::TabScrollLeft
+            | HitTarget::TabScrollRight
             | HitTarget::RadarTab
             | HitTarget::RadarClose
             | HitTarget::WorkspacesTab

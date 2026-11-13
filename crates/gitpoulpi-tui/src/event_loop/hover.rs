@@ -135,6 +135,14 @@ impl Hover<'_> {
         matches!(self.0, Some(HitTarget::TabOverflow))
     }
 
+    pub(super) fn tab_scroll_left(self) -> bool {
+        matches!(self.0, Some(HitTarget::TabScrollLeft))
+    }
+
+    pub(super) fn tab_scroll_right(self) -> bool {
+        matches!(self.0, Some(HitTarget::TabScrollRight))
+    }
+
     pub(super) fn pane_collapse(self) -> Option<PaneSide> {
         match self.0 {
             Some(HitTarget::CollapsePane(side)) => Some(*side),

@@ -451,6 +451,11 @@ pub(super) fn handle(
     } else if let Some(HitTarget::TabOverflow) = &hit {
         // The same call `t` and `Repository: Select Tab...` make.
         commands::run_command(cx, PaletteCommand::SelectTab);
+    } else if let Some(HitTarget::TabScrollLeft) = &hit {
+        // One tab per press; a held press repeats (`scrollbar_repeat`).
+        crate::tab_scroll::scroll_by(-1);
+    } else if let Some(HitTarget::TabScrollRight) = &hit {
+        crate::tab_scroll::scroll_by(1);
     } else if let Some(HitTarget::RadarClose) = &hit {
         close_radar_tab(&mut tab_ctx!(cx));
     } else if let Some(HitTarget::WorkspacesClose) = &hit {

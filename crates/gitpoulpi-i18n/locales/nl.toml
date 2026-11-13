@@ -4164,6 +4164,8 @@ quit_cd = "Afsluiten en je shell in de map van dit tabblad achterlaten (vereist 
 repo_management = "Repositorybeheer: een repository openen, klonen of maken"
 insert_issue_ref = "Een issue-verwijzing invoegen"
 tab_overflow = "Alle tabbladen"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}: "

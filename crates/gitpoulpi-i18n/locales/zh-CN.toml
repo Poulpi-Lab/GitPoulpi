@@ -4164,6 +4164,8 @@ quit_cd = "退出，并让你的 shell 停留在此标签页的文件夹（需�
 repo_management = "仓库管理：打开、克隆或创建仓库"
 insert_issue_ref = "插入议题引用"
 tab_overflow = "所有标签页"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}："

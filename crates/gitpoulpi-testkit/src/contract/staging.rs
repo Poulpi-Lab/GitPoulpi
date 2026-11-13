@@ -778,3 +778,102 @@ pub fn check_commit_runs_hooks_unless_no_verify(backend: &dyn GitBackend) {
 /// Needs a `sh` hook: run on Unix only.
 #[cfg(not(unix))]
 pub fn check_commit_runs_hooks_unless_no_verify(_backend: &dyn GitBackend) {}
+
+/// `discard` deletes the folders that deleting untracked files left empty,
+/// walking up and stopping at the first one that still holds anything: a
+/// fresh `a/b/` goes whole; a folder that also holds a tracked file keeps
+/// it (only the new sub-folder goes); an ignored or hidden file keeps its
+/// folder; a folder that was already empty and held no discarded file is
+/// left alone.
+pub fn check_discard_removes_the_folders_it_leaves_empty(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file(".gitignore", "*.log\n", "ignore logs")
+        .commit_file("t/tracked.txt", "t\n", "tracked in t")
+        .write_worktree("a/b/c.txt", b"new\n")
+        .write_worktree("t/n/d.txt", b"new\n")
+        .write_worktree("i/j/k.txt", b"new\n")
+        .write_worktree("i/keep.log", b"ignored\n")
+        .write_worktree("h/g/k.txt", b"new\n")
+        .write_worktree("h/.hidden", b"hidden\n")
+        .build();
+    let repo_ref = repo.repo_ref();
+    std::fs::create_dir_all(repo.root().join("e/empty")).unwrap();
+
+    backend
+        .discard(
+            &repo_ref,
+            &[
+                "a/b/c.txt".to_string(),
+                "t/n/d.txt".to_string(),
+                "i/j/k.txt".to_string(),
+                "h/g/k.txt".to_string(),
+            ],
+        )
+        .unwrap();
+
+    let there = |p: &str| repo.root().join(p).exists();
+    assert!(!there("a"), "a/ and a/b/ held only the discarded file");
+    assert!(
+        there("t/tracked.txt") && !there("t/n"),
+        "t/ keeps a tracked file"
+    );
+    assert!(
+        !there("i/j") && there("i/keep.log"),
+        "an ignored file keeps i/"
+    );
+    assert!(
+        !there("h/g") && there("h/.hidden"),
+        "a hidden file keeps h/"
+    );
+    assert!(there("e/empty"), "a folder empty before the discard stays");
+    assert!(there(".git"));
+}
+
+/// A folder the index still tracks files in is never removed, even when it
+/// is empty on disk.
+pub fn check_discard_keeps_folders_with_tracked_files_missing_on_disk(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .commit_file("t/gone.txt", "g\n", "tracked in t")
+        .write_worktree("t/new.txt", b"new\n")
+        .build();
+    let repo_ref = repo.repo_ref();
+    std::fs::remove_file(repo.root().join("t/gone.txt")).unwrap();
+
+    backend
+        .discard(&repo_ref, &["t/new.txt".to_string()])
+        .unwrap();
+
+    assert!(
+        repo.root().join("t").is_dir(),
+        "t/ still holds a tracked file in the index, so it stays"
+    );
+}
+
+/// `snapshot_restore` back to a state without the files (the redo of a
+/// discard) removes the folders that leaves empty; restoring the state with
+/// them (the undo) recreates the folders.
+pub fn check_snapshot_restore_removes_and_recreates_the_folders(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .write_worktree("a/b/c.txt", b"new\n")
+        .build();
+    let repo_ref = repo.repo_ref();
+    let paths = vec!["a/b/c.txt".to_string()];
+    let with = backend.snapshot_create(&repo_ref, &paths).unwrap();
+    backend.discard(&repo_ref, &paths).unwrap();
+    assert!(!repo.root().join("a").exists());
+    let without = backend.snapshot_create(&repo_ref, &paths).unwrap();
+
+    backend
+        .snapshot_restore(&repo_ref, with.tree, &paths)
+        .unwrap();
+    assert_eq!(
+        std::fs::read_to_string(repo.root().join("a/b/c.txt")).unwrap(),
+        "new\n",
+        "undo recreates the folders and the file"
+    );
+    backend
+        .snapshot_restore(&repo_ref, without.tree, &paths)
+        .unwrap();
+    assert!(!repo.root().join("a").exists(), "redo removes them again");
+}

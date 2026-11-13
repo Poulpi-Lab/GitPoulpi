@@ -71,15 +71,22 @@ pub fn discard(repo: &RepoRef, paths: &[String]) -> Result<()> {
     }
 
     let tracked: HashSet<&str> = tracked.iter().map(String::as_str).collect();
+    let mut removed: Vec<String> = Vec::new();
     for path in paths {
         let norm = path.replace('\\', "/");
         if tracked.contains(norm.as_str()) {
             continue;
         }
         let full = repo.root.join(path);
-        if full.is_file() || full.is_symlink() {
-            let _ = std::fs::remove_file(&full);
+        if (full.is_file() || full.is_symlink()) && std::fs::remove_file(&full).is_ok() {
+            removed.push(norm);
         }
     }
+    // Folders the deleted files leave empty go too (never one that still
+    // holds anything, tracked or not).
+    crate::prune::prune_empty_parents(&repo.root, &removed, &|dir| {
+        let spec = format!(":(literal){dir}");
+        run_z_fields(&repo.root, &["ls-files", "-z", "--", &spec]).map_or(true, |f| !f.is_empty())
+    });
     Ok(())
 }

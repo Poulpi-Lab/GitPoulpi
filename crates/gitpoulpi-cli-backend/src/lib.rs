@@ -45,6 +45,7 @@ mod patch;
 mod patch_file;
 mod predict;
 mod process;
+mod prune;
 mod rebase_interactive;
 mod reflog_ops;
 mod refs;
@@ -124,6 +125,7 @@ pub use process::{
 pub use conflicts::{document_from_stages, git_dir};
 /// Process-wide spawn counter (see `process`), the perf guard's currency.
 pub use process::total_spawn_count;
+pub use prune::prune_empty_parents;
 pub use snapshot_ops::{
     normalize_all as snapshot_normalize_all, remove_any as snapshot_remove_any,
     walk as snapshot_walk, write_file as snapshot_write_file, MODE_LINK,

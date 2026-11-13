@@ -444,10 +444,12 @@ pub fn snapshot_restore(repo: &RepoRef, snapshot: Oid, paths: &[String]) -> Resu
 
     // Working tree: drop what is there and the snapshot lacks, write the rest.
     let current = walk(repo, &paths);
+    let mut removed: Vec<String> = Vec::new();
     for path in current.keys() {
         if !want_worktree.contains_key(path) {
             remove_any(&repo.root.join(path))
                 .map_err(|e| Error::Backend(format!("cannot remove {path}: {e}")))?;
+            removed.push(path.clone());
         }
     }
     for (path, file) in &want_worktree {
@@ -493,6 +495,13 @@ pub fn snapshot_restore(repo: &RepoRef, snapshot: Oid, paths: &[String]) -> Resu
     if !input.is_empty() {
         run_with_stdin(&repo.root, &["update-index", "-z", "--index-info"], &input)?;
     }
+    // Folders the removed files leave empty go too (redo of a discard of
+    // new files in new folders); one that still holds anything stays.
+    crate::prune::prune_empty_parents(&repo.root, &removed, &|dir| {
+        let spec = format!(":(literal){dir}");
+        crate::process::run_z_fields(&repo.root, &["ls-files", "-z", "--", &spec])
+            .map_or(true, |f| !f.is_empty())
+    });
     Ok(())
 }
 

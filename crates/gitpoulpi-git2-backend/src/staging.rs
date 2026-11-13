@@ -232,13 +232,23 @@ pub fn discard(repo: &RepoRef, paths: &[String]) -> Result<()> {
         git.checkout_index(Some(&mut index), Some(&mut cb))
             .map_err(map_err)?;
     }
+    let mut removed: Vec<String> = Vec::new();
     for (rel, full) in &remove {
         let _ = index.remove_path(Path::new(rel));
-        if full.is_file() || full.is_symlink() {
-            let _ = std::fs::remove_file(full);
+        if (full.is_file() || full.is_symlink()) && std::fs::remove_file(full).is_ok() {
+            removed.push(rel.clone());
         }
     }
-    index.write().map_err(map_err)
+    index.write().map_err(map_err)?;
+    // Folders the deleted files leave empty go too (never one that still
+    // holds anything, tracked or not).
+    gitpoulpi_cli_backend::prune_empty_parents(&repo.root, &removed, &|dir| {
+        let prefix = format!("{dir}/");
+        index
+            .iter()
+            .any(|e| String::from_utf8_lossy(&e.path).starts_with(&prefix))
+    });
+    Ok(())
 }
 
 /// The pathspecs an unstage of `spec` may reset. An unmerged path has no

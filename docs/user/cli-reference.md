@@ -103,7 +103,7 @@ Hunks and lines are numbered as `gitpoulpi --json diff` numbers them.
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Stage a file, folder, everything, a hunk or some lines. A file, folder or `--all` stage that would add a sensitive file (a private key, a `.env`, a recognized token: `[privacy]` in the [config reference](config-reference.md#privacy-sensitive-files)) is refused with exit code 2 and `{error: "sensitive_files", files: [{path, reason}]}` (a rule and a masked preview, never a value); nothing is staged. `--allow-sensitive` stages them anyway. |
 | `unstage` (same flags) | The reverse. |
-| `discard --file F [--hunk N [--lines a,b]]` | Throw away unstaged changes (a whole file: every change, untracked file deleted). Undoable. |
+| `discard --file F [--hunk N [--lines a,b]]` | Throw away unstaged changes (a whole file: every change, untracked file deleted, and the folders that leaves empty). Undoable. |
 | `rm-file <paths>...` | Delete files from the working tree. Undoable. |
 | `ignore <pattern> [--file <.gitignore>]` | Append a pattern to a `.gitignore` (or `.git/info/exclude` with `--file .git/info/exclude`). Undoable, except in `.git/info/exclude`. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Rewrite the encoding, line endings or indentation of files in the working tree. Binary, missing and unencodable files are skipped and reported. One undo entry for the whole batch. |

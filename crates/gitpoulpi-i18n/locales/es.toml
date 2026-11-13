@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = "Por defecto 5. 0 desactiva por completo la o
 fetch_on_tab_open = { git = "Fetch al abrir una pestaña", local = "Obtener al abrir una pestaña" }
 fetch_on_tab_open_help = { git = "Fetch All en segundo plano; se omite si ya se hizo en el último minuto.", local = "Obtener todo en segundo plano; se omite si ya se hizo en el último minuto." }
 auto_prune = { git = "Auto-prune", local = "Poda automática" }
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = { git = "Elimina las ramas de seguimiento remoto que ya no existen en el remoto en cada {$fetch_noun}: el auto-{$fetch_noun} en segundo plano y el {$fetch_noun} manual, también el de todos los remotos (no la comprobación de lease del diálogo de push divergente). Activado por defecto, así que una rama borrada en el servidor desaparece de la sección REMOTE tras el siguiente {$fetch_noun}. Desactívalo para seguir viendo las ramas de seguimiento remoto obsoletas.", local = "Elimina las ramas de seguimiento remoto que ya no existen en el remoto en cada {$fetch_noun}: la obtención automática en segundo plano y la obtención manual, también la de todos los remotos (no la comprobación de lease del diálogo de envío divergente). Activado por defecto, así que una rama borrada en el servidor desaparece de la sección REMOTE tras la siguiente {$fetch_noun}. Desactívalo para seguir viendo las ramas de seguimiento remoto obsoletas." }
 keep_submodules_up_to_date = "Mantener los submódulos al día"
 default_branch_name = "Nombre de rama por defecto"
 default_branch_name_help = "Se usa al inicializar o clonar un repositorio."
@@ -4479,7 +4479,7 @@ file_list_loading = { git = "la lista de archivos de este commit aún se está c
 no_repo_tab = "no hay ninguna pestaña de repositorio abierta"
 commit_now_ai_running = "la IA aún está escribiendo un mensaje - espera a que termine, o Esc lo cancela"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "escribe el mensaje y pulsa {key} para hacer {$commit}"
 no_matching_tab = "ninguna pestaña coincide"
 no_matching_theme = "ningún tema coincide"
 no_matching_language = "ningún idioma coincide"

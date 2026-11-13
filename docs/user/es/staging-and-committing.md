@@ -164,13 +164,16 @@ la fila de cambios de trabajo del Log: lo que escribas en uno aparece en el otro
   sin ejecutar los hooks `pre-commit` y `commit-msg` del repositorio. Vale para un solo
   commit; **Ajustes > Ajustes del repositorio > Commit** hace que empiece marcada. Se muestra
   cuando la fila tiene sitio.
-- `Ctrl+G c` o `c` en el panel Estado lleva el cursor al formulario. `Esc` sale de él.
-- `Ctrl+G Enter` (**Git: Hacer commit ya de los cambios en stage** en la paleta) es el botón de
-  commit desde cualquier sitio: hace commit de los cambios en stage con el mensaje del
-  formulario, respetando **Modificar el commit anterior** y **Omitir hooks**, sin mover el
-  foco. Si no hay nada en stage, o falta el resumen, lo dice y lleva el cursor al resumen.
-  Mientras la IA aún está escribiendo un mensaje, no hace commit de nada y lo dice (`Esc`
-  cancela la petición). `Ctrl+Z` deshace el commit como cualquier otro.
+- `c` en el panel Estado lleva el cursor al formulario. `Esc` sale de él.
+- `Ctrl+G c` y `Ctrl+G Enter` (**Git: Commit...** y **Git: Hacer commit ya de los cambios en stage**
+  en la paleta) son un solo comando, el botón de commit desde cualquier sitio. Con un resumen
+  en el formulario y algo en stage, hace commit enseguida, respetando **Modificar el commit
+  anterior** y **Omitir hooks**, sin mover el foco. Si no, no hace commit de nada: lleva el
+  cursor al resumen del formulario (mostrando el panel si estaba oculto o plegado) y la línea
+  de estado dice qué atajo hace commit (`Ctrl+Enter` por defecto). Si no hay nada en stage, lo
+  dice. No se escribe nada en la línea de estado. Mientras la IA aún está escribiendo un
+  mensaje, no hace commit de nada y lo dice (`Esc` cancela la petición). `Ctrl+Z` deshace el
+  commit como cualquier otro.
 - Por repositorio, los [Ajustes](settings.md#ajustes-del-repositorio-commit) pueden **hacer push
   tras cada commit**, empezar el formulario con una **plantilla de commit** (y quitar sus
   comentarios `#` del mensaje) y hacer que un merge sea **squash**: el formulario se abre

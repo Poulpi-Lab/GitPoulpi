@@ -103,7 +103,7 @@ Los hunks y las líneas se numeran como los numera `gitpoulpi --json diff`.
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Hace stage de un archivo, una carpeta, todo, un hunk o algunas líneas. Un stage de archivo, carpeta o `--all` que añadiría un archivo sensible (una clave privada, un `.env`, un token reconocido: `[privacy]` en la [referencia de configuración](config-reference.md#privacy-archivos-sensibles)) se rechaza con código de salida 2 y `{error: "sensitive_files", files: [{path, reason}]}` (una regla y una vista previa enmascarada, nunca un valor); no se hace stage de nada. `--allow-sensitive` hace stage de ellos de todos modos. |
 | `unstage` (mismas opciones) | Lo contrario. |
-| `discard --file F [--hunk N [--lines a,b]]` | Descarta cambios unstaged (un archivo entero: todos los cambios, el archivo sin seguimiento se elimina). Se puede deshacer. |
+| `discard --file F [--hunk N [--lines a,b]]` | Descarta cambios unstaged (un archivo entero: todos los cambios, el archivo sin seguimiento se elimina, y las carpetas que eso deja vacías). Se puede deshacer. |
 | `rm-file <paths>...` | Elimina archivos del árbol de trabajo. Se puede deshacer. |
 | `ignore <pattern> [--file <.gitignore>]` | Añade un patrón a un `.gitignore` (o a `.git/info/exclude` con `--file .git/info/exclude`). Se puede deshacer, salvo en `.git/info/exclude`. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Reescribe la codificación, los finales de línea o la sangría de archivos del árbol de trabajo. Los archivos binarios, ausentes o no codificables se omiten y se informan. Una sola entrada de deshacer para todo el lote. |
@@ -163,7 +163,7 @@ del stash, diga lo que diga `general.auto_stash` ([Auto-stash](log-and-history.m
 
 | Comando | Qué hace |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch del remoto por defecto, de un remoto o de todos. Cada fetch actualiza también qué tags tiene cada remoto (el `remote` de `tag list`) y poda ese registro aunque no se pase `--prune`. `--prune-tags` (Ajustes: Auto-prune de tags) elimina además los tags locales que el remoto eliminó: solo los que estaban en él, nunca uno que no enviaste; la respuesta los lista como `pruned_tags` (git 2.41+). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch del remoto por defecto, de un remoto o de todos. Las ramas de seguimiento remoto que el remoto eliminó se podan salvo que `general.auto_prune` sea false; `--prune` lo fuerza. Cada fetch actualiza también qué tags tiene cada remoto (el `remote` de `tag list`) y poda ese registro aunque no se pase `--prune`. `--prune-tags` (Ajustes: Auto-prune de tags) elimina además los tags locales que el remoto eliminó: solo los que estaban en él, nunca uno que no enviaste; la respuesta los lista como `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; el modo siempre se pasa a git de forma explícita. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. No existe el force a secas: solo `--force-with-lease`. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotos. `remote list` marca con `configured: false` un espacio de nombres de seguimiento remoto sin ningún remoto detrás; `remote remove` sobre él elimina sus ramas (se puede deshacer). |

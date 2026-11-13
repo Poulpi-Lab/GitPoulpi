@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = "既定は 5。0 でバックグラウンド�
 fetch_on_tab_open = { git = "タブを開いたときに{$fetch}", local = "タブを開いたときにフェッチ" }
 fetch_on_tab_open_help = { git = "バックグラウンドですべて{$fetch}します。直近 1 分以内に{$fetch}済みの場合は行いません。", local = "バックグラウンドですべてフェッチします。直近 1 分以内にフェッチ済みの場合は行いません。" }
 auto_prune = "自動プルーン"
-auto_prune_help = { git = "分岐した{$push}のダイアログのリースチェックを除くすべての{$fetch}で、リモートにもう存在しないリモート追跡ブランチを削除します。対象はバックグラウンドの自動{$fetch}と、ツールバーの{$fetch}およびすべて{$fetch}です。既定ではオフで、オンにするまで古いリモート追跡ブランチは一覧に残ります。", local = "分岐したプッシュのダイアログのリースチェックを除くすべてのフェッチで、リモートにもう存在しないリモート追跡ブランチを削除します。対象はバックグラウンドの自動フェッチと、ツールバーのフェッチおよびすべてフェッチです。既定ではオフで、オンにするまで古いリモート追跡ブランチは一覧に残ります。" }
+auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
 keep_submodules_up_to_date = "サブモジュールを最新に保つ"
 default_branch_name = "既定のブランチ名"
 default_branch_name_help = "リポジトリの初期化またはクローン時に使用します。"

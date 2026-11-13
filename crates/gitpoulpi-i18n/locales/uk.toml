@@ -271,7 +271,7 @@ auto_fetch_interval_minutes_help = "Типово 5. 0 повністю вими�
 fetch_on_tab_open = { git = "Робити fetch при відкритті вкладки", local = "Завантажувати при відкритті вкладки" }
 fetch_on_tab_open_help = { git = "Fetch All у фоні; пропускається, якщо завантажувалось за останню хвилину.", local = "Завантаження всіх remote у фоні; пропускається, якщо завантажувалось за останню хвилину." }
 auto_prune = "Автоочищення"
-auto_prune_help = { git = "Видаляє віддалені гілки, яких більше немає на remote, під час кожного fetch, крім перевірки lease у діалозі розбіжного push: фонового auto-fetch та кнопок Fetch і Fetch All на панелі інструментів. Типово вимкнено, тож застарілі віддалені гілки залишаються в списку, доки ви не ввімкнете це.", local = "Видаляє віддалені гілки, яких більше немає у віддаленому репозиторії, під час кожного завантаження, крім перевірки lease у діалозі розбіжного надсилання: фонового автозавантаження та кнопок завантаження на панелі інструментів. Типово вимкнено, тож застарілі віддалені гілки залишаються в списку, доки ви не ввімкнете це." }
+auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
 keep_submodules_up_to_date = "Тримати підмодулі актуальними"
 default_branch_name = "Типова назва гілки"
 default_branch_name_help = "Використовується під час ініціалізації або клонування репозиторію."

@@ -271,7 +271,7 @@ auto_fetch_interval_minutes_help = "Varsayılan 5. 0 arka planda fetch'i tamamen
 fetch_on_tab_open = { git = "Sekme açılınca fetch et", local = "Sekme açılınca getir" }
 fetch_on_tab_open_help = { git = "Arka planda Fetch All; son dakikada fetch edildiyse atlanır.", local = "Arka planda Tümünü Getir; son dakikada getirildiyse atlanır." }
 auto_prune = "Otomatik Prune"
-auto_prune_help = { git = "Uzakta artık bulunmayan uzak izleme dallarını her fetch sırasında kaldırır; diverged push iletişim kutusunun lease denetimindeki fetch buna dahil değildir. Kapsam: arka plandaki otomatik fetch, araç çubuğundaki Fetch ve Fetch All. Varsayılan kapalıdır; yani eski uzak izleme dalları siz açana kadar listede kalır.", local = "Uzakta artık bulunmayan uzak izleme dallarını her getirme sırasında kaldırır; ayrışmış dalı gönderme iletişim kutusunun lease denetimindeki getirme buna dahil değildir. Kapsam: arka plandaki otomatik getirme, araç çubuğundaki Getir ve Tümünü Getir. Varsayılan kapalıdır; yani eski uzak izleme dalları siz açana kadar listede kalır." }
+auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
 keep_submodules_up_to_date = "Alt modülleri güncel tut"
 default_branch_name = "Varsayılan Dal Adı"
 default_branch_name_help = "Depo başlatılırken veya klonlanırken kullanılır."

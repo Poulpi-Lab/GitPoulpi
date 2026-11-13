@@ -1536,6 +1536,49 @@ pub fn check_fetch_all_reaches_every_remote_and_prunes(backend: &dyn GitBackend)
     );
 }
 
+/// A fetch of one remote keeps a remote-tracking branch whose branch was
+/// deleted on the server unless `prune` is set, and then drops exactly that
+/// one (the others stay). Both backends must agree.
+pub fn check_fetch_prunes_a_branch_deleted_on_the_remote_only_when_asked(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new()
+        .with_initial()
+        .with_origin()
+        .push("main")
+        .push("main:gone")
+        .push("main:kept")
+        .build();
+    let repo_ref = repo.repo_ref();
+    repo.git_in_remote(&["branch", "-D", "gone"]);
+
+    let has = |name: &str| {
+        backend.refs(&repo_ref).unwrap().iter().any(|r| {
+            matches!(&r.kind, RefKind::RemoteBranch { remote, name: n }
+                if remote == "origin" && n == name)
+        })
+    };
+    assert!(has("gone"), "fixture: the tracking ref exists");
+
+    block_on(backend.fetch(&repo_ref, "origin", &FetchOptions::default())).expect("fetch");
+    assert!(has("gone"), "without prune the stale ref stays");
+
+    block_on(backend.fetch(
+        &repo_ref,
+        "origin",
+        &FetchOptions {
+            prune: true,
+            ..Default::default()
+        },
+    ))
+    .expect("fetch --prune");
+    assert!(!has("gone"), "prune drops the deleted branch's ref");
+    assert!(has("kept") && has("main"), "other refs stay");
+    assert_eq!(
+        repo.git(&["for-each-ref", "refs/remotes/origin/gone"])
+            .trim(),
+        ""
+    );
+}
+
 /// A pull request's head lives in a ref a normal fetch never brings
 /// (`refs/pull/<n>/head`, possibly a fork's commits). Fetching it as a
 /// branch creates a local branch tracking it, and a second fetch after the

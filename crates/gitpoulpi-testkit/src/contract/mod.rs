@@ -383,6 +383,7 @@ macro_rules! for_each_contract_check {
             check_option_lookalike_and_helper_urls_are_refused,
             check_branch_set_upstream_sets_and_unsets,
             check_fetch_all_reaches_every_remote_and_prunes,
+            check_fetch_prunes_a_branch_deleted_on_the_remote_only_when_asked,
             check_a_helpers_credential_reaches_the_remote_and_the_repositorys_own_helpers_do_not_run,
             check_two_repositories_with_different_auth_do_not_cross,
             check_no_network_auth_entry_means_unchanged_behaviour,

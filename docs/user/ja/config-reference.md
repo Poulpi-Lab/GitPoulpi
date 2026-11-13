@@ -40,7 +40,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.auto_fetch_interval_minutes` | `5` | N 分ごとにバックグラウンドで Fetch All を実行します（0〜60）。`0` はオフです。**再起動が必要。** |
 | `general.auto_fetch_interval_unit` | `"auto"` | 設定が間隔を表示する単位：`minutes`、`hours`、`auto`。表示専用で、間隔は常に `auto_fetch_interval_minutes` 分です。`auto`（およびこのキーのない設定）は、分数を割り切れる最大の単位を選びます（60 は「1 時間」、45 は「45 分」）。合わない単位は無視されます。設定は両方のキーを書き込みます。古い GitPoulpi は単位を無視し、分数を読みます。 |
 | `general.fetch_on_tab_open` | `true` | タブを開くときに Fetch All を実行します（GitPoulpi がそのリポジトリを 60 秒以内に fetch していた場合はスキップ）。 |
-| `general.auto_prune` | `false` | fetch 時に、すでに存在しないリモート追跡ブランチも prune します。 |
+| `general.auto_prune` | `true` | fetch 時に、すでに存在しないリモート追跡ブランチも prune します。 |
 | `general.auto_prune_tags` | `false` | fetch 時に、リモートで削除された tag もローカルから削除します（対象はリモートにあった tag だけで、push していない tag は残ります）。Git 2.41 以降。 |
 | `general.hosting_refresh_minutes` | `5` | pull request / Issue の一覧とツールバーのチップの更新間隔です（0〜120）。`0` は要求時とイベント時のみです。 |
 | `general.hosting_refresh_unit` | `"auto"` | 設定が更新間隔を表示する単位：`minutes`、`hours`、`auto`。`general.auto_fetch_interval_unit` と同じように読まれます。表示専用です。 |

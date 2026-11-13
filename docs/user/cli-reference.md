@@ -163,7 +163,7 @@ the stash, whatever `general.auto_stash` says ([Auto-stash](log-and-history.md#a
 
 | Command | What it does |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch the default remote, one remote, or all. Every fetch also refreshes what each remote has in tags (`tag list`'s `remote`), and prunes that record even without `--prune`. `--prune-tags` (Settings: Auto-prune tags) also deletes the local tags the remote deleted: only tags that were on it, never one you did not push; the answer lists them as `pruned_tags` (git 2.41+). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | Fetch the default remote, one remote, or all. Remote-tracking branches the remote deleted are pruned unless `general.auto_prune` is false; `--prune` forces it. Every fetch also refreshes what each remote has in tags (`tag list`'s `remote`), and prunes that record even without `--prune`. `--prune-tags` (Settings: Auto-prune tags) also deletes the local tags the remote deleted: only tags that were on it, never one you did not push; the answer lists them as `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; the mode is always passed to git explicitly. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. There is no plain force: only `--force-with-lease`. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotes. `remote list` marks a remote-tracking namespace with no remote behind it `configured: false`; `remote remove` on it deletes its branches (undoable). |

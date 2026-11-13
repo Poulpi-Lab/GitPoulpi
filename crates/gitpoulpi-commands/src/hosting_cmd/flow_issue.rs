@@ -316,7 +316,7 @@ async fn pick_up_branch(
         session
             .call::<FetchOutcome>(
                 OperationKind::Fetch,
-                json!({ "remote": remote_name, "opts": FetchOptions::default() }),
+                json!({ "remote": remote_name, "opts": FetchOptions { prune: crate::commands::config_auto_prune(), ..FetchOptions::default() } }),
             )
             .await?;
     }

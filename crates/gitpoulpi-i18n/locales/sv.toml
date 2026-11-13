@@ -272,7 +272,7 @@ auto_fetch_interval_minutes_help = { git = "Standard 5. 0 stänger av fetch i ba
 fetch_on_tab_open = { git = "Fetch när en flik öppnas", local = "Hämta när en flik öppnas" }
 fetch_on_tab_open_help = { git = "Fetch All i bakgrunden; hoppas över om en fetch gjordes den senaste minuten.", local = "Hämta alla i bakgrunden; hoppas över om en hämtning gjordes den senaste minuten." }
 auto_prune = "Auto-prune"
-auto_prune_help = { git = "Tar bort remote-spårande grenar som inte längre finns på remoten vid varje fetch utom lease-kontrollen i den divergerade push-dialogen: automatisk fetch i bakgrunden och verktygsfältets Fetch och Fetch All. Av som standard, så föråldrade remote-spårande grenar ligger kvar i listan tills du slår på detta.", local = "Tar bort remote-spårande grenar som inte längre finns på remoten vid varje hämtning utom lease-kontrollen i den divergerade push-dialogen: automatisk hämtning i bakgrunden och verktygsfältets Hämta och Hämta alla. Av som standard, så föråldrade remote-spårande grenar ligger kvar i listan tills du slår på detta." }
+auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
 keep_submodules_up_to_date = "Håll submoduler uppdaterade"
 default_branch_name = "Standardnamn på gren"
 default_branch_name_help = "Används när ett repository initieras eller klonas."

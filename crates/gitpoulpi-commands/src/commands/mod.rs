@@ -1301,7 +1301,12 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
             prune,
             prune_tags,
         } => {
-            let opts = FetchOptions { prune, prune_tags };
+            // The flag only turns pruning on; `general.auto_prune` (on by default)
+            // decides otherwise, the same setting the TUI's fetches follow.
+            let opts = FetchOptions {
+                prune: prune || config_auto_prune(),
+                prune_tags,
+            };
             let (outcome, from): (FetchOutcome, String) = if all {
                 let outcome = session
                     .call(OperationKind::FetchAll, json!({ "opts": opts }))
@@ -1636,6 +1641,15 @@ pub(super) fn with_autostash(mut args: serde_json::Value, autostash: bool) -> se
         args["autostash"] = json!("always");
     }
     args
+}
+
+/// `general.auto_prune` from the ambient config (on when it cannot be read):
+/// the CLI's fetches follow the same setting the TUI does, so a branch deleted
+/// on the server does not linger in `branch list --remote`.
+pub(crate) fn config_auto_prune() -> bool {
+    gitpoulpi_config::Settings::resolve_ambient()
+        .map(|s| s.config().general.auto_prune)
+        .unwrap_or(true)
 }
 
 #[cfg(test)]

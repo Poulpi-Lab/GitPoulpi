@@ -44,9 +44,12 @@ fn toggling_a_global_setting_reaches_the_file_and_the_reloaded_config() {
         .unwrap();
     state.activate();
 
-    assert!(state.config.general.auto_prune);
+    assert!(
+        !state.config.general.auto_prune,
+        "on by default, so the toggle turns it off"
+    );
     let raw = std::fs::read_to_string(dir.path().join("config.toml")).unwrap();
-    assert!(raw.contains("auto_prune = true"), "{raw}");
+    assert!(raw.contains("auto_prune = false"), "{raw}");
 }
 
 /// `general.active_profile`'s round trip: picking a profile republishes

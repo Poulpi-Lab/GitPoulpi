@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = { git = "默认 5。0 表示完全禁用后�
 fetch_on_tab_open = { git = "打开标签页时 {$Fetch}", local = "打开标签页时{$Fetch}" }
 fetch_on_tab_open_help = { git = "在后台执行全部 {$Fetch}；若最近一分钟内已 {$fetch} 过则跳过。", local = "在后台执行全部{$Fetch}；若最近一分钟内已获取过则跳过。" }
 auto_prune = { git = "自动 Prune", local = "自动清理" }
-auto_prune_help = { git = "每次 {$fetch} 都会移除远程上已不存在的远程跟踪分支，“分叉 {$push}”对话框自身的租约检查除外：后台自动 {$fetch}，以及工具栏的 {$Fetch} 和全部 {$Fetch}。默认关闭，因此过期的远程跟踪分支会一直列出，直到你开启此设置。", local = "每次{$fetch}都会移除远程上已不存在的远程跟踪分支，“分叉推送”对话框自身的租约检查除外：后台自动{$fetch}，以及工具栏的{$Fetch}和全部{$Fetch}。默认关闭，因此过期的远程跟踪分支会一直列出，直到你开启此设置。" }
+auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
 keep_submodules_up_to_date = "保持子模块最新"
 default_branch_name = "默认分支名"
 default_branch_name_help = "初始化或克隆仓库时使用。"

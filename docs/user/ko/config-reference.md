@@ -46,7 +46,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.auto_fetch_interval_minutes` | `5` | N분마다 백그라운드 Fetch All, 0~60. `0` = 끔. **다시 시작.** |
 | `general.auto_fetch_interval_unit` | `"auto"` | 설정이 간격을 표시하는 단위: `minutes`, `hours`, `auto`. 표시 전용이며 간격은 항상 `auto_fetch_interval_minutes`분입니다. `auto`(와 이 키가 없는 설정)는 분을 나누어떨어지게 하는 가장 큰 단위를 고릅니다 (60은 "1시간", 45는 "45분"). 맞지 않는 단위는 무시됩니다. 설정은 두 키를 모두 쓰며, 이전 GitPoulpi는 단위를 무시하고 분만 읽습니다. |
 | `general.fetch_on_tab_open` | `true` | 탭이 열릴 때 Fetch All(GitPoulpi가 60초 이내에 그 저장소를 fetch했다면 건너뜀). |
-| `general.auto_prune` | `false` | fetch가 사라진 remote-tracking 브랜치도 정리(prune)합니다. |
+| `general.auto_prune` | `true` | fetch가 사라진 remote-tracking 브랜치도 정리(prune)합니다. |
 | `general.auto_prune_tags` | `false` | fetch가 리모트에서 삭제된 로컬 tag도 삭제합니다 (리모트에 있었던 tag만 대상이며, push한 적 없는 tag는 유지). Git 2.41 이상. |
 | `general.hosting_refresh_minutes` | `5` | pull request / 이슈 목록과 도구 모음 칩의 새로 고침 주기, 0~120. `0` = 요청 시와 이벤트 때만. |
 | `general.hosting_refresh_unit` | `"auto"` | 설정이 새로 고침 주기를 표시하는 단위: `minutes`, `hours`, `auto`이며 `general.auto_fetch_interval_unit`처럼 읽습니다. 표시 전용입니다. |

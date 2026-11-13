@@ -269,7 +269,7 @@ modifications locales entre-temps.
 |---|---|
 | **Intervalle d'auto-fetch** | Fait un fetch de chaque remote en arrière-plan à cet intervalle, un nombre et une unité (minutes ou heures) sur une ligne. Défaut 5 minutes, maximum 60 minutes (1 heure), `0` le désactive. `general.auto_fetch_interval_minutes` reste en minutes ; `general.auto_fetch_interval_unit` ne garde que la façon de l'afficher. Demande un redémarrage. |
 | **Fetch à l'ouverture d'un onglet** | Lance Fetch All en arrière-plan à l'ouverture d'un onglet de dépôt. Activé par défaut. Un dépôt dont le fetch date de moins de 60 secondes n'est pas refetché. |
-| **Auto-prune** | Les fetchs suppriment aussi les branches de suivi distant qui n'existent plus sur le remote. Désactivé par défaut. |
+| **Auto-prune** | Les fetchs suppriment aussi les branches de suivi distant qui n'existent plus sur le remote. Activé par défaut. Non annulable : une branche élaguée revient au prochain fetch si elle réapparaît sur le remote. |
 | **Élagage automatique des tags** | Les fetchs suppriment aussi les tags locaux que le distant a supprimés. Seuls les tags qui étaient sur le distant sont concernés : un tag jamais envoyé (push) est conservé. Désactivé par défaut, comme git. Demande git 2.41 ou plus récent. CLI : `gitpoulpi fetch --prune-tags` ; clé de configuration `general.auto_prune_tags`. Voir [Branches, tags et le panneau Refs](log-and-history.md#branches-tags-et-le-panneau-refs). |
 | **Garder les sous-modules à jour** | Après un checkout ou un pull, met à jour les sous-modules aux commits que le dépôt enregistre. Voir [Sous-modules](submodules.md). |
 | **Supprimer les fichiers « .orig » après un merge** | Une fois un merge terminé, supprime les fichiers de sauvegarde `*.orig`. Désactivé par défaut. |

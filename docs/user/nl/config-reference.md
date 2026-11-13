@@ -47,7 +47,7 @@ andere geldt meteen (of bij de volgende vernieuwing, fetch of het sluiten van In
 | `general.auto_fetch_interval_minutes` | `5` | Fetch All op de achtergrond elke N minuten, 0 tot 60; `0` = uit. **Herstart.** |
 | `general.auto_fetch_interval_unit` | `"auto"` | De eenheid waarin Instellingen het interval toont: `minutes`, `hours` of `auto`. Alleen weergave: het interval is altijd `auto_fetch_interval_minutes` minuten. `auto` (en een config zonder de sleutel) kiest de grootste eenheid die de minuten gelijk deelt (60 leest als "1 uur", 45 als "45 minuten"); een eenheid die niet past, wordt genegeerd. Instellingen schrijft beide sleutels; een oudere GitPoulpi negeert de eenheid en leest nog steeds de minuten. |
 | `general.fetch_on_tab_open` | `true` | Fetch All als een tabblad opent (overgeslagen als GitPoulpi die repository minder dan 60 s geleden heeft gefetcht). |
-| `general.auto_prune` | `false` | Fetches ruimen (prune) ook remote-tracking branches op die niet meer bestaan. |
+| `general.auto_prune` | `true` | Fetches ruimen (prune) ook remote-tracking branches op die niet meer bestaan. |
 | `general.auto_prune_tags` | `false` | Een fetch verwijdert ook de lokale tags die de remote heeft verwijderd (alleen tags die erop stonden; een tag die je nooit hebt gepusht, blijft). Git 2.41+. |
 | `general.hosting_refresh_minutes` | `5` | Vernieuwing van de lijsten met pull requests / issues en de chip in de werkbalk, 0 tot 120; `0` = alleen op verzoek en bij gebeurtenissen. |
 | `general.hosting_refresh_unit` | `"auto"` | De eenheid waarin Instellingen de vernieuwing toont: `minutes`, `hours` of `auto`, gelezen zoals `general.auto_fetch_interval_unit`. Alleen weergave. |

@@ -40,7 +40,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.auto_fetch_interval_minutes` | `5` | 每 N 分钟在后台 Fetch All，范围 0 到 60；`0` = 关闭。**重启。** |
 | `general.auto_fetch_interval_unit` | `"auto"` | 设置中显示该间隔所用的单位：`minutes`、`hours` 或 `auto`。仅影响显示：间隔始终是 `auto_fetch_interval_minutes` 分钟。`auto`（以及没有这个键的配置）会选出能整除分钟数的最大单位（60 显示为“1 小时”，45 显示为“45 分钟”）；不合适的单位会被忽略。设置会同时写入两个键；旧版 GitPoulpi 会忽略单位，仍然读取分钟数。 |
 | `general.fetch_on_tab_open` | `true` | 打开标签页时 Fetch All（如果 GitPoulpi 在不到 60 秒前刚 fetch 过该仓库，则跳过）。 |
-| `general.auto_prune` | `false` | fetch 时也会 prune 已不存在的远程跟踪分支。 |
+| `general.auto_prune` | `true` | fetch 时也会 prune 已不存在的远程跟踪分支。 |
 | `general.auto_prune_tags` | `false` | fetch 时也会删除远程已经删除的本地 tag（只涉及曾存在于远程的 tag；你从未 push 过的 tag 会保留）。需要 Git 2.41+。 |
 | `general.hosting_refresh_minutes` | `5` | pull request / 议题列表和工具栏标签的刷新间隔，范围 0 到 120；`0` = 仅按需刷新以及在事件发生时刷新。 |
 | `general.hosting_refresh_unit` | `"auto"` | 设置中显示该刷新间隔所用的单位：`minutes`、`hours` 或 `auto`，读取方式与 `general.auto_fetch_interval_unit` 相同。仅影响显示。 |

@@ -46,7 +46,7 @@ applies at once (or at the next refresh, fetch or Settings close).
 | `general.auto_fetch_interval_minutes` | `5` | Background Fetch All every N minutes, 0 to 60; `0` = off. **Restart.** |
 | `general.auto_fetch_interval_unit` | `"auto"` | The unit Settings shows the interval in: `minutes`, `hours` or `auto`. Display only: the interval is always `auto_fetch_interval_minutes` minutes. `auto` (and a config without the key) picks the largest unit that divides the minutes evenly (60 reads "1 hour", 45 "45 minutes"); a unit that does not fit is ignored. Settings writes both keys; an older GitPoulpi ignores the unit and still reads the minutes. |
 | `general.fetch_on_tab_open` | `true` | Fetch All when a tab opens (skipped if GitPoulpi fetched that repository less than 60 s ago). |
-| `general.auto_prune` | `false` | Fetches also prune remote-tracking branches that are gone. |
+| `general.auto_prune` | `true` | Fetches also prune remote-tracking branches that are gone. Not undoable: a pruned ref comes back on the next fetch if the branch reappears. Set `false` to keep them. |
 | `general.auto_prune_tags` | `false` | A fetch also deletes the local tags the remote has deleted (only tags that were on it; a tag you never pushed is kept). Git 2.41+. |
 | `general.hosting_refresh_minutes` | `5` | Refresh of the pull request / issue lists and the toolbar chip, 0 to 120; `0` = only on demand and on events. |
 | `general.hosting_refresh_unit` | `"auto"` | The unit Settings shows the refresh in: `minutes`, `hours` or `auto`, read like `general.auto_fetch_interval_unit`. Display only. |

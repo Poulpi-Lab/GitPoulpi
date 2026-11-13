@@ -47,7 +47,7 @@ I tabellerna betyder **Omstart** att värdet läses vid start; allt annat gälle
 | `general.auto_fetch_interval_minutes` | `5` | Fetch All i bakgrunden var N:e minut, 0 till 60; `0` = av. **Omstart.** |
 | `general.auto_fetch_interval_unit` | `"auto"` | Enheten som Inställningar visar intervallet i: `minutes`, `hours` eller `auto`. Bara visning: intervallet är alltid `auto_fetch_interval_minutes` minuter. `auto` (och en konfiguration utan nyckeln) väljer den största enhet som delar minuterna jämnt (60 visas som ”1 timme”, 45 som ”45 minuter”); en enhet som inte passar ignoreras. Inställningar skriver båda nycklarna; en äldre GitPoulpi ignorerar enheten och läser fortfarande minuterna. |
 | `general.fetch_on_tab_open` | `true` | Fetch All när en flik öppnas (hoppas över om GitPoulpi hämtade det repositoryt för mindre än 60 s sedan). |
-| `general.auto_prune` | `false` | Fetch rensar också remote-spårande grenar som inte längre finns. |
+| `general.auto_prune` | `true` | Fetch rensar också remote-spårande grenar som inte längre finns. |
 | `general.auto_prune_tags` | `false` | Ett fetch tar också bort de lokala taggar som remoten har tagit bort (bara taggar som fanns på den; en tagg du aldrig pushat behålls). Git 2.41+. |
 | `general.hosting_refresh_minutes` | `5` | Uppdatering av listorna med pull requests / ärenden och verktygsfältets chip, 0 till 120; `0` = bara på begäran och vid händelser. |
 | `general.hosting_refresh_unit` | `"auto"` | Enheten som Inställningar visar uppdateringen i: `minutes`, `hours` eller `auto`, läst som `general.auto_fetch_interval_unit`. Bara visning. |

@@ -47,7 +47,7 @@ projeví okamžitě (nebo při dalším obnovení, fetch či zavření Nastaven�
 | `general.auto_fetch_interval_minutes` | `5` | Fetch všech remote na pozadí každých N minut, 0 až 60; `0` = vypnuto. **Restart.** |
 | `general.auto_fetch_interval_unit` | `"auto"` | Jednotka, v níž Nastavení ukazuje interval: `minutes`, `hours` nebo `auto`. Jen zobrazení: interval je vždy `auto_fetch_interval_minutes` minut. `auto` (a konfigurace bez tohoto klíče) vybere největší jednotku, která minuty dělí beze zbytku (60 se čte „1 hodina“, 45 „45 minut“); jednotka, která nesedí, se ignoruje. Nastavení zapisuje oba klíče; starší GitPoulpi jednotku ignoruje a minuty čte dál. |
 | `general.fetch_on_tab_open` | `true` | Fetch všech remote při otevření karty (přeskočí se, pokud GitPoulpi tento repozitář načetl před méně než 60 s). |
-| `general.auto_prune` | `false` | Fetch také odstraní remote-tracking větve, které zmizely. |
+| `general.auto_prune` | `true` | Fetch také odstraní remote-tracking větve, které zmizely. |
 | `general.auto_prune_tags` | `false` | Fetch také smaže lokální tagy, které remote smazal (jen tagy, které na něm byly; tag, který jste nikdy neodeslali, zůstane). Git 2.41+. |
 | `general.hosting_refresh_minutes` | `5` | Obnovení seznamů pull requestů / issues a čipu na panelu nástrojů, 0 až 120; `0` = jen na požádání a při událostech. |
 | `general.hosting_refresh_unit` | `"auto"` | Jednotka, v níž Nastavení ukazuje obnovení: `minutes`, `hours` nebo `auto`, čte se jako `general.auto_fetch_interval_unit`. Jen zobrazení. |

@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = "Výchozí 5. 0 úplně vypne načítání na
 fetch_on_tab_open = { git = "Fetch při otevření karty", local = "Načíst při otevření karty" }
 fetch_on_tab_open_help = { git = "Fetch All na pozadí; přeskočí se, pokud proběhl v poslední minutě.", local = "Načíst vše na pozadí; přeskočí se, pokud proběhlo v poslední minutě." }
 auto_prune = "Auto-Prune"
-auto_prune_help = { git = "Odstraní vzdálené sledovací větve, které už na remote neexistují, při každém fetchi kromě kontroly lease v dialogu rozcházejícího se pushe: auto-fetch na pozadí a Fetch / Fetch All na panelu nástrojů. Ve výchozím stavu vypnuto, takže zastaralé vzdálené sledovací větve zůstávají v seznamu, dokud to nezapnete.", local = "Odstraní vzdálené sledovací větve, které už na remote neexistují, při každém načtení kromě kontroly lease v dialogu rozcházejícího se odeslání: automatické načítání na pozadí a Načíst / Načíst vše na panelu nástrojů. Ve výchozím stavu vypnuto, takže zastaralé vzdálené sledovací větve zůstávají v seznamu, dokud to nezapnete." }
+auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
 keep_submodules_up_to_date = "Udržovat submoduly aktuální"
 default_branch_name = "Výchozí název větve"
 default_branch_name_help = "Použije se při inicializaci nebo klonování repozitáře."

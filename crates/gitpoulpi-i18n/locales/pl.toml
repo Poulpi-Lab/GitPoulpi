@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = "Domyślnie 5. 0 całkowicie wyłącza pobier
 fetch_on_tab_open = { git = "Fetch po otwarciu karty", local = "Pobierz po otwarciu karty" }
 fetch_on_tab_open_help = { git = "Fetch All w tle; pomijany, jeśli fetch był w ciągu ostatniej minuty.", local = "Pobierz wszystkie w tle; pomijane, jeśli pobrano w ciągu ostatniej minuty." }
 auto_prune = "Auto-prune"
-auto_prune_help = { git = "Usuwa gałęzie zdalne, które nie istnieją już na zdalnym repozytorium, przy każdym fetchu poza własnym sprawdzeniem lease w oknie push po rozbieżności: auto-fetch w tle oraz Fetch i Fetch All na pasku narzędzi. Domyślnie wyłączone, więc nieaktualne gałęzie zdalne pozostają na liście, dopóki tego nie włączysz.", local = "Usuwa gałęzie zdalne, które nie istnieją już na zdalnym repozytorium, przy każdym pobraniu poza własnym sprawdzeniem lease w oknie wypchnięcia po rozbieżności: automatyczne pobieranie w tle oraz Pobierz i Pobierz wszystkie na pasku narzędzi. Domyślnie wyłączone, więc nieaktualne gałęzie zdalne pozostają na liście, dopóki tego nie włączysz." }
+auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
 keep_submodules_up_to_date = "Aktualizuj submoduły"
 default_branch_name = "Domyślna nazwa gałęzi"
 default_branch_name_help = "Używana przy inicjowaniu lub klonowaniu repozytorium."

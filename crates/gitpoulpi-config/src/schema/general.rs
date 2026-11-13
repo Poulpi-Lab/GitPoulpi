@@ -265,7 +265,7 @@ impl Default for GeneralConfig {
             fetch_on_tab_open: true,
             hosting_refresh_minutes: DEFAULT_HOSTING_REFRESH_MINUTES,
             hosting_refresh_unit: DisplayUnit::default(),
-            auto_prune: false,
+            auto_prune: true,
             auto_prune_tags: false,
             keep_submodules_up_to_date: false,
             default_branch_name: "main".into(),

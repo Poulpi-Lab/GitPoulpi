@@ -48,7 +48,7 @@ gitpoulpi config set general.auto_stash always # checked against the schema, the
 | `general.auto_fetch_interval_minutes` | `5` | Фоновий Fetch All кожні N хвилин, від 0 до 60; `0` = вимкнено. **Перезапуск.** |
 | `general.auto_fetch_interval_unit` | `"auto"` | Одиниця, в якій Налаштування показують інтервал: `minutes`, `hours` або `auto`. Лише для показу: інтервал завжди дорівнює `auto_fetch_interval_minutes` хвилин. `auto` (і конфіг без цього ключа) вибирає найбільшу одиницю, що ділить хвилини націло (60 читається як «1 година», 45 - «45 хвилин»); непридатна одиниця ігнорується. Налаштування пишуть обидва ключі; старіший GitPoulpi ігнорує одиницю й усе одно читає хвилини. |
 | `general.fetch_on_tab_open` | `true` | Fetch All під час відкриття вкладки (пропускається, якщо GitPoulpi робив fetch цього репозиторію менш ніж 60 с тому). |
-| `general.auto_prune` | `false` | Fetch'і також чистять віддалені гілки відстеження, яких уже немає. |
+| `general.auto_prune` | `true` | Fetch'і також чистять віддалені гілки відстеження, яких уже немає. |
 | `general.auto_prune_tags` | `false` | Fetch також видаляє локальні tag'и, які видалив remote (лише ті, що були на ньому; tag, якого ви ніколи не надсилали, лишається). Git 2.41+. |
 | `general.hosting_refresh_minutes` | `5` | Оновлення списків pull request'ів / issue та чипа на панелі інструментів, від 0 до 120; `0` = лише на вимогу й за подіями. |
 | `general.hosting_refresh_unit` | `"auto"` | Одиниця, в якій Налаштування показують оновлення: `minutes`, `hours` або `auto`, читається так само, як `general.auto_fetch_interval_unit`. Лише для показу. |

@@ -187,8 +187,9 @@ pub(crate) fn install_language(ui: &gitpoulpi_config::UiConfig) {
 /// `Fetch`/`FetchAll` handlers can read it without a `Config`. It governs
 /// whether those fetches (background auto-fetch and the toolbar's Fetch
 /// included) pass `--prune`; the diverged-push dialog's lease-check fetch
-/// never prunes, on purpose.
-static AUTO_PRUNE: AtomicBool = AtomicBool::new(false);
+/// never prunes, on purpose. On by default (like the config); pruning is not
+/// undoable, but the refs come back on the next fetch if the branch returns.
+static AUTO_PRUNE: AtomicBool = AtomicBool::new(true);
 
 /// Serializes the tests that touch the process-wide `AUTO_PRUNE`: the Settings
 /// toggle test flips it, and the `Fetch` wire golden expects it off.

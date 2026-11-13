@@ -48,7 +48,7 @@ Ayarlar kapandığında).
 | `general.auto_fetch_interval_minutes` | `5` | Her N dakikada bir arka planda Fetch All, 0 ila 60; `0` = kapalı. **Yeniden başlatma.** |
 | `general.auto_fetch_interval_unit` | `"auto"` | Ayarlar'ın aralığı hangi birimle gösterdiği: `minutes`, `hours` veya `auto`. Yalnızca görüntüleme içindir: aralık her zaman `auto_fetch_interval_minutes` dakikadır. `auto` (ve bu anahtarı içermeyen bir yapılandırma), dakikayı tam bölen en büyük birimi seçer (60 "1 saat", 45 "45 dakika" okunur); uymayan bir birim yok sayılır. Ayarlar iki anahtarı da yazar; daha eski bir GitPoulpi birimi yok sayar ve dakikayı yine okur. |
 | `general.fetch_on_tab_open` | `true` | Bir sekme açıldığında Fetch All (GitPoulpi o depoyu 60 saniyeden kısa süre önce fetch ettiyse atlanır). |
-| `general.auto_prune` | `false` | Fetch'ler artık bulunmayan uzak izleme dallarını da prune eder. |
+| `general.auto_prune` | `true` | Fetch'ler artık bulunmayan uzak izleme dallarını da prune eder. |
 | `general.auto_prune_tags` | `false` | Bir fetch, uzak deponun sildiği yerel tag'leri de siler (yalnızca onda bulunmuş tag'ler; hiç push etmediğiniz bir tag korunur). Git 2.41+. |
 | `general.hosting_refresh_minutes` | `5` | Pull request / issue listelerinin ve araç çubuğu çipinin yenilenmesi, 0 ila 120; `0` = yalnızca isteğe bağlı ve olaylarda. |
 | `general.hosting_refresh_unit` | `"auto"` | Ayarlar'ın yenilemeyi hangi birimle gösterdiği: `minutes`, `hours` veya `auto`; `general.auto_fetch_interval_unit` gibi okunur. Yalnızca görüntüleme içindir. |

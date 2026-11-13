@@ -48,7 +48,7 @@ Ustawień).
 | `general.auto_fetch_interval_minutes` | `5` | Fetch wszystkich zdalnych w tle co N minut, od 0 do 60; `0` = wyłączone. **Restart.** |
 | `general.auto_fetch_interval_unit` | `"auto"` | Jednostka, w której Ustawienia pokazują interwał: `minutes`, `hours` albo `auto`. Tylko wyświetlanie: interwał to zawsze `auto_fetch_interval_minutes` minut. `auto` (i konfiguracja bez tego klucza) wybiera największą jednostkę, która dzieli minuty bez reszty (60 czyta się „1 godzina”, 45 „45 minut”); jednostka, która nie pasuje, jest ignorowana. Ustawienia zapisują oba klucze; starszy GitPoulpi ignoruje jednostkę i nadal czyta minuty. |
 | `general.fetch_on_tab_open` | `true` | Fetch wszystkich zdalnych po otwarciu karty (pomijany, jeśli GitPoulpi pobrał to repozytorium mniej niż 60 s temu). |
-| `general.auto_prune` | `false` | Fetch usuwa też gałęzie śledzące zdalnych repozytoriów, których już nie ma. |
+| `general.auto_prune` | `true` | Fetch usuwa też gałęzie śledzące zdalnych repozytoriów, których już nie ma. |
 | `general.auto_prune_tags` | `false` | Fetch usuwa też lokalne tagi, które zniknęły ze zdalnego repozytorium (tylko te, które na nim były; tag, którego nigdy nie wypchnięto, zostaje). Git 2.41+. |
 | `general.hosting_refresh_minutes` | `5` | Odświeżanie list pull requestów / zgłoszeń i znacznika na pasku narzędzi, od 0 do 120; `0` = tylko na żądanie i przy zdarzeniach. |
 | `general.hosting_refresh_unit` | `"auto"` | Jednostka, w której Ustawienia pokazują odświeżanie: `minutes`, `hours` albo `auto`, czytana tak jak `general.auto_fetch_interval_unit`. Tylko wyświetlanie. |

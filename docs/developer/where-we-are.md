@@ -242,7 +242,7 @@ not closed since:
   (config file, `GITPOULPI_*`, `--backend`).
 - **Force push is only ever `--force-with-lease`**, in the backend, the CLI and
   the TUI. A diverged push offers Pull (merge) then push / Force push (with
-  lease) / Cancel. Fetch is every remote, pruned when `general.auto_prune` is on.
+  lease) / Cancel. Fetch is every remote, pruned unless `general.auto_prune` is turned off (it is on by default).
 - **The default remote is per repository** (`repo-state.toml`), unset = HEAD's
   upstream remote, then `origin`, then the only remote
   (`gitpoulpi_session::resolve_default_remote`).

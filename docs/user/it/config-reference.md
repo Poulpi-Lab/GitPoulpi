@@ -48,7 +48,7 @@ Impostazioni).
 | `general.auto_fetch_interval_minutes` | `5` | Fetch All in background ogni N minuti, da 0 a 60; `0` = disattivato. **Riavvio.** |
 | `general.auto_fetch_interval_unit` | `"auto"` | L'unità in cui le Impostazioni mostrano l'intervallo: `minutes`, `hours` o `auto`. Solo visualizzazione: l'intervallo è sempre `auto_fetch_interval_minutes` minuti. `auto` (e una configurazione senza la chiave) sceglie l'unità più grande che divide esattamente i minuti (60 si legge «1 ora», 45 «45 minuti»); un'unità che non va bene viene ignorata. Le Impostazioni scrivono entrambe le chiavi; un GitPoulpi più vecchio ignora l'unità e legge ancora i minuti. |
 | `general.fetch_on_tab_open` | `true` | Fetch All all'apertura di una scheda (saltato se GitPoulpi ha fatto il fetch di quel repository meno di 60 s prima). |
-| `general.auto_prune` | `false` | I fetch eseguono anche il prune dei branch di tracciamento remoto scomparsi. |
+| `general.auto_prune` | `true` | I fetch eseguono anche il prune dei branch di tracciamento remoto scomparsi. |
 | `general.auto_prune_tags` | `false` | Un fetch elimina anche i tag locali che il remote ha eliminato (solo i tag che erano su di esso; un tag che non hai mai inviato resta). Git 2.41+. |
 | `general.hosting_refresh_minutes` | `5` | Aggiornamento degli elenchi di pull request / issue e del chip della barra degli strumenti, da 0 a 120; `0` = solo su richiesta e su eventi. |
 | `general.hosting_refresh_unit` | `"auto"` | L'unità in cui le Impostazioni mostrano l'aggiornamento: `minutes`, `hours` o `auto`, letta come `general.auto_fetch_interval_unit`. Solo visualizzazione. |

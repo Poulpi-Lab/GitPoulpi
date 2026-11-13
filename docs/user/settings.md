@@ -274,7 +274,7 @@ your local changes meanwhile.
 |---|---|
 | **Auto-fetch interval** | Fetches every remote in the background at this interval, a number and a unit (minutes or hours) on one line. Default 5 minutes, maximum 60 minutes (1 hour), `0` turns it off. `general.auto_fetch_interval_minutes` stays in minutes; `general.auto_fetch_interval_unit` only records how it is shown. Needs a restart. |
 | **Fetch when a tab opens** | Runs Fetch All in the background when a repository tab opens. On by default. A repository fetched in the last 60 seconds is not fetched again. |
-| **Auto-prune** | Fetches also remove remote-tracking branches that no longer exist on the remote. Off by default. |
+| **Auto-prune** | Fetches also remove remote-tracking branches that no longer exist on the remote. On by default, so a branch deleted on the server (for example on GitLab) leaves the REMOTE section after the next fetch. Not undoable: a pruned branch comes back on the next fetch if it reappears on the remote. |
 | **Auto-prune tags** | Fetches also delete local tags that the remote has deleted. Only tags that had been on the remote are touched: a tag you never pushed is kept. Off by default, like git. Needs git 2.41 or newer. CLI: `gitpoulpi fetch --prune-tags`; config key `general.auto_prune_tags`. See [Branches, tags and the Refs sidebar](log-and-history.md#branches-tags-and-the-refs-sidebar). |
 | **Keep submodules up to date** | After a checkout or a pull, updates the submodules to the commits the repository records. See [Submodules](submodules.md). |
 | **Delete ".orig" files after merging** | After a merge completes, deletes the `*.orig` backup files. Off by default. |

@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = "Padrão 5. 0 desativa totalmente o fetch em 
 fetch_on_tab_open = { git = "Fetch ao abrir uma aba", local = "Buscar ao abrir uma aba" }
 fetch_on_tab_open_help = { git = "Fetch All em segundo plano; ignorado se houve fetch no último minuto.", local = "Buscar tudo em segundo plano; ignorado se houve busca no último minuto." }
 auto_prune = { git = "Auto-prune", local = "Poda automática" }
-auto_prune_help = { git = "Remove as branches de rastreamento remoto que não existem mais no remoto em todo fetch, exceto na verificação de lease do diálogo de push divergente: o auto-fetch em segundo plano e o Fetch e o Fetch All da barra de ferramentas. Desativado por padrão, então as branches de rastreamento remoto obsoletas continuam listadas até você ativar isto.", local = "Remove as branches de rastreamento remoto que não existem mais no remoto em toda busca, exceto na verificação de lease do diálogo de envio divergente: a busca automática em segundo plano e o Buscar e o Buscar tudo da barra de ferramentas. Desativado por padrão, então as branches de rastreamento remoto obsoletas continuam listadas até você ativar isto." }
+auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
 keep_submodules_up_to_date = "Manter submódulos atualizados"
 default_branch_name = "Nome da branch padrão"
 default_branch_name_help = "Usado ao inicializar ou clonar um repositório."

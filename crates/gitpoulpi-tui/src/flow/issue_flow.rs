@@ -962,12 +962,12 @@ impl PickUp for DaemonPickUp {
             parent.map(str::to_string),
         );
         std::thread::spawn(move || {
-            use gitpoulpi_core::domain::{FetchOptions, FetchOutcome, OperationKind};
+            use gitpoulpi_core::domain::{FetchOutcome, OperationKind};
             use gitpoulpi_core::workflow::{FlowOutcome, FlowStatus};
             let result = (|| {
                 let fetch = requester.call::<FetchOutcome>(
                     OperationKind::Fetch,
-                    serde_json::json!({ "remote": remote, "opts": FetchOptions::default() }),
+                    serde_json::json!({ "remote": remote, "opts": crate::live_settings::fetch_options() }),
                 );
                 wait_reply(&fetch)?;
                 let run = requester.call::<FlowOutcome>(

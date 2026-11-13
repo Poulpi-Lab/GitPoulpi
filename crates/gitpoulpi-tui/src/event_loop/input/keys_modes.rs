@@ -169,9 +169,7 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                 };
                 if let Some(why) = refused {
                     *cx.ref_name_error = Some(why);
-                } else if name.is_empty()
-                    && !matches!(op, RefNameOp::CreateFile(_) | RefNameOp::Setting(_))
-                {
+                } else if name.is_empty() && !matches!(op, RefNameOp::CreateFile(_)) {
                     *cx.last_message = Some(msg::input::NAME_EMPTY.get().into());
                 } else {
                     match op {
@@ -207,16 +205,6 @@ pub(super) fn handle(cx: &mut CommandCtx<'_>, env: &KeyEnv<'_>, key: KeyEvent) -
                                 }
                             }
                         }
-                        // The page's own validation: a refused value keeps the
-                        // prompt open with the reason in its label.
-                        RefNameOp::Setting(row) => match palette::submit_setting(*row, &name) {
-                            Ok(message) => *cx.last_message = Some(message),
-                            Err(why) => {
-                                *cx.ref_name_error = Some(why.clone());
-                                *cx.new_file_error = Some(why.clone());
-                                *cx.last_message = Some(why);
-                            }
-                        },
                         RefNameOp::NewBranch => {
                             match cx.refs_result.as_ref().ok().and_then(|refs| head_oid(refs)) {
                                 Some(at) => {

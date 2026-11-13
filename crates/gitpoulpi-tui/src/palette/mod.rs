@@ -1328,8 +1328,7 @@ pub(crate) use flow::entries as flow_entries;
 pub(crate) use jobs::entries as jobs_entries;
 pub(crate) use matching::{palette_matches, score};
 pub(crate) use settings::{
-    listed_count as settings_listed_count, prompt_label as setting_prompt_label,
-    run as run_setting, sub_query as setting_sub_query, submit as submit_setting,
+    listed_count as settings_listed_count, run as run_setting, sub_query as setting_sub_query,
     Outcome as SettingOutcome,
 };
 

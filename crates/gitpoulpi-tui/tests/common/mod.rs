@@ -1077,3 +1077,19 @@ pub fn confirm_removal(term: &mut Terminal, timeout: Duration) {
     }
     term.click(col + 1, row).expect("click the confirm button");
 }
+
+/// The status line: the last screen row that is not the window's bottom
+/// border (the frame draws a box line under it). A prompt must never echo
+/// what the user types there.
+pub fn status_line_text(screen: &Screen) -> String {
+    for row in (0..screen.rows()).rev() {
+        let line = screen.line(row);
+        let is_border = line
+            .chars()
+            .all(|c| c.is_whitespace() || "\u{2514}\u{2500}\u{2518}\u{2570}\u{256f}".contains(c));
+        if !is_border {
+            return line;
+        }
+    }
+    String::new()
+}

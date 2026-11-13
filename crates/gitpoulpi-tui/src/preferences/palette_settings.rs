@@ -54,6 +54,7 @@ pub(crate) struct Current {
 pub(crate) enum Edit {
     Toggle,
     Choose(usize),
+    #[cfg_attr(not(test), allow(dead_code))]
     Text(String),
 }
 
@@ -208,5 +209,18 @@ impl PreferencesState {
     /// Opens the page on the setting `key` (selected and flashed).
     pub(crate) fn show_setting(&mut self, key: &str) -> Result<(), String> {
         self.show_page(None, Some(key))
+    }
+}
+
+impl PreferencesState {
+    /// Opens the page on `key` with its row already being edited (a number
+    /// or text field with its value, a quantity's stepper): what a
+    /// `Settings: <label>...` palette row does, so the typing happens in the
+    /// page's own field and never in the status line.
+    pub(crate) fn edit_setting(&mut self, key: &str) -> Result<(), String> {
+        self.show_page(None, Some(key))?;
+        self.focus = PrefFocus::Fields;
+        self.activate();
+        Ok(())
     }
 }

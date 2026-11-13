@@ -4321,6 +4321,7 @@ counter = "{current} van {total}"
 commit_label = "{$Commit}-bericht: "
 commit_hint = { git = "  (Enter: commit, Esc: annuleren)", local = "  (Enter: commit, Esc: annuleren)" }
 filter_refs = "Refs filteren: {draft}_  (Enter: toepassen, Esc: annuleren)"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "Naam van nieuwe branch"
 new_tag_name = { git = "Naam van nieuwe {$tag}", local = "Naam van nieuw {$tag}" }
 new_branch_at = "Nieuwe branch op {sha}"

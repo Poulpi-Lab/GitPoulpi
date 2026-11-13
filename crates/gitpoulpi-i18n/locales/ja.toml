@@ -4321,6 +4321,7 @@ counter = "{current} / {total}"
 commit_label = { git = "{$Commit}メッセージ：", local = "{$Commit}メッセージ：" }
 commit_hint = { git = "  （Enter：{$commit}、Esc：キャンセル）", local = "  （Enter：{$commit}、Esc：キャンセル）" }
 filter_refs = "参照を絞り込み：{draft}_  （Enter：適用、Esc：キャンセル）"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "新しいブランチ名"
 new_tag_name = { git = "新しい{$tag}名", local = "新しい{$tag}名" }
 new_branch_at = "{sha} に新規ブランチ"

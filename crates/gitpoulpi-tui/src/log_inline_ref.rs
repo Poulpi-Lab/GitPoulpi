@@ -71,7 +71,6 @@ pub(crate) fn inline_target(
         | RefNameOp::SetUpstream(_)
         | RefNameOp::StashMessage
         | RefNameOp::CreateFile(_)
-        | RefNameOp::Setting(_)
         | RefNameOp::LfsTrack
         | RefNameOp::LfsUntrack => None,
     }

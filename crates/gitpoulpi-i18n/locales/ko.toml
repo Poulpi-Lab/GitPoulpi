@@ -4319,6 +4319,7 @@ counter = "{current} / {total}"
 commit_label = "{$Commit} 메시지: "
 commit_hint = { git = "  (Enter: commit, Esc: 취소)", local = "  (Enter: 커밋, Esc: 취소)" }
 filter_refs = "Refs 필터: {draft}_  (Enter: 적용, Esc: 취소)"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "새 브랜치 이름"
 new_tag_name = "새 {$tag} 이름"
 new_branch_at = "{sha}에 새 브랜치"

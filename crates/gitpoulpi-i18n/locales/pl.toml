@@ -4319,6 +4319,7 @@ counter = "{current} z {total}"
 commit_label = { git = "Opis commita: ", local = "Opis zatwierdzenia: " }
 commit_hint = { git = "  (Enter: commit, Esc: anuluj)", local = "  (Enter: zatwierdź, Esc: anuluj)" }
 filter_refs = "Filtruj refy: {draft}_  (Enter: zastosuj, Esc: anuluj)"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "Nazwa nowej gałęzi"
 new_tag_name = { git = "Nazwa nowego tagu", local = "Nazwa nowego znacznika" }
 new_branch_at = "Nowa gałąź w {sha}"

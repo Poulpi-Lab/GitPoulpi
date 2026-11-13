@@ -312,6 +312,7 @@ impl PaletteCommand {
                 | C::AboutLicenses
                 | C::TrustReview
                 | C::ToggleHelp
+                | C::Setting(..)
         )
     }
 }

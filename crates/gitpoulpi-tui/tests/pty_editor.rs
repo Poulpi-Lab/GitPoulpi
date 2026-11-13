@@ -156,7 +156,7 @@ fn the_editor_gets_a_ctrl_n_badge() {
     // collapsing by hand, with the mouse chevron: the Editor owns every plain
     // key while open.
     term.wait_for("the Refs pane already auto-collapsed", STEP, |s| {
-        !s.contains("Filter refs") && !s.contains("LOCAL")
+        !s.contains("to filter)") && !s.contains("LOCAL")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (lc, lr) = term

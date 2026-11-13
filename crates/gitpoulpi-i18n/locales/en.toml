@@ -5285,6 +5285,7 @@ counter = "{current} of {total}"
 commit_label = "{$Commit} message: "
 commit_hint = { git = "  (Enter: commit, Esc: cancel)", local = "  (Enter: commit, Esc: cancel)" }
 filter_refs = "Filter refs: {draft}_  (Enter: apply, Esc: cancel)"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "New branch name"
 new_tag_name = "New {$tag} name"
 new_branch_at = "New branch at {sha}"

@@ -374,10 +374,6 @@ pub(crate) enum RefNameOp {
     /// this folder (empty = the repository root): `Create File` and a
     /// folder's `Create a file in this folder`. See `new_file.rs`.
     CreateFile(std::path::PathBuf),
-    /// Type a number or text for a `Settings: <label>...` palette row (the
-    /// index is the setting's row in `palette::settings`). Enter applies it
-    /// like the Settings page; a refused value keeps the prompt open.
-    Setting(u16),
 }
 
 /// A destructive `Action` gated behind `InputMode::Confirm`.

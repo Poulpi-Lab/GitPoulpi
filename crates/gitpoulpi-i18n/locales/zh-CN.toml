@@ -4322,6 +4322,7 @@ counter = "第 {current} / {total} 个"
 commit_label = { git = "{$Commit} 消息：", local = "{$Commit}消息：" }
 commit_hint = { git = "  （Enter：{$commit}，Esc：取消）", local = "  （Enter：提交，Esc：取消）" }
 filter_refs = "筛选引用：{draft}_  （Enter：应用，Esc：取消）"
+filter_refs_hint = "Enter: apply, Esc: cancel"
 new_branch_name = "新分支名"
 new_tag_name = { git = "新 {$tag} 名", local = "新{$tag}名" }
 new_branch_at = "在 {sha} 处新建分支"

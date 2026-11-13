@@ -271,7 +271,7 @@ auto_fetch_interval_minutes_help = "Типово 5. 0 повністю вими�
 fetch_on_tab_open = { git = "Робити fetch при відкритті вкладки", local = "Завантажувати при відкритті вкладки" }
 fetch_on_tab_open_help = { git = "Fetch All у фоні; пропускається, якщо завантажувалось за останню хвилину.", local = "Завантаження всіх remote у фоні; пропускається, якщо завантажувалось за останню хвилину." }
 auto_prune = "Автоочищення"
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = { git = "Під час кожного {$fetch} видаляє віддалені гілки стеження, яких більше немає на remote: фоновий auto-fetch, {$Fetch} і Fetch All на панелі інструментів (але не перевірка lease у діалозі розбіжного {$push}). Типово ввімкнено, тож гілка, видалена на сервері, зникає з розділу REMOTE після наступного {$fetch}. Вимкніть, щоб застарілі віддалені гілки стеження лишалися в списку.", local = "Під час кожного {$fetch} видаляє віддалені гілки стеження, яких більше немає у віддаленому репозиторії: фонове автозавантаження, кнопки завантаження на панелі інструментів (але не перевірка lease у діалозі розбіжного {$push}). Типово ввімкнено, тож гілка, видалена на сервері, зникає з розділу REMOTE після наступного {$fetch}. Вимкніть, щоб застарілі віддалені гілки стеження лишалися в списку." }
 keep_submodules_up_to_date = "Тримати підмодулі актуальними"
 default_branch_name = "Типова назва гілки"
 default_branch_name_help = "Використовується під час ініціалізації або клонування репозиторію."
@@ -4479,7 +4479,7 @@ file_list_loading = { git = "список файлів цього commit'у ще
 no_repo_tab = "жодної вкладки репозиторію не відкрито"
 commit_now_ai_running = "ШІ ще пише повідомлення - зачекайте або скасуйте через Esc"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "введіть повідомлення, потім натисніть {key}, щоб зробити {$commit}"
 no_matching_tab = "немає відповідної вкладки"
 no_matching_theme = "немає відповідної теми"
 no_matching_language = "немає відповідної мови"

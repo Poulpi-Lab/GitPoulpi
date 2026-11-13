@@ -715,8 +715,9 @@ limit zapytań kończy błędem tylko ten profil. Odpowiedzi są używane ponown
 W Ustawienia > Integracje połączony profil hosta kodu ma blok **Radar**
 pod swoim kluczem SSH: jedno pole wyboru na listę (*Żądania czekające na mój przegląd*,
 *Każde otwarte żądanie*, *Uwzględnij szkice*, *Zgłoszenia przypisane do mnie*, ostatnie
-nieobecne dla hostów bez zgłoszeń), pole *Przestrzenie nazw* (jeden wpis na wiersz, opcjonalnie jako *Wyrażenia regularne*; puste
-oznacza twoją własną i każdą, do której należysz) oraz wybór *Żądanie z
+nieobecne dla hostów bez zgłoszeń), pole *Przestrzenie nazw* (jeden wpis na wiersz: nazwa pasująca do tej grupy lub właściciela i wszystkiego pod nią,
+albo wyrażenie regularne w wierszu przy zaznaczonym *Wyrażenia regularne*; puste oznacza twoją własną
+i każdą, do której należysz) oraz wybór *Żądanie z
 repozytorium, które nie jest sklonowane*: *Zapytaj*, *Sklonuj* lub *Przejrzyj przez API*.
 Wszystko jest zapisywane w trakcie zmiany. Hosty bez zapytania obejmującego całe konto (Bitbucket
 Cloud) pokazują zamiast tego jedną linię z tą informacją. Paleta poleceń dociera do bloku

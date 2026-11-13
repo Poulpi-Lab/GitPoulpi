@@ -1554,6 +1554,21 @@ w polu tekstowym w wierszu commita. `Enter` tworzy ref. `Esc` anuluje.
 Nieprawidłowa lub istniejąca nazwa jest pokazana na czerwono, a pole zostaje
 otwarte.
 
+Gdy tego wiersza nie widać (otwarty diff, Log w trybie solo, ukryta kolumna
+Ref), nazwę wpisuje się w małej ramce z krzyżykiem zamykającym oraz
+przyciskami **Anuluj** i **Utwórz**. Nazwę zmienianej gałęzi wpisuje się
+w jej wierszu w panelu Refów albo w komórce Ref jej wiersza w Logu; nazwę
+nowego pliku wpisuje się na liście Zmian roboczych, pod folderem. Wszędzie
+obowiązują te same klawisze: `Enter` zatwierdza, `Esc` anuluje.
+
+Nic nie jest wpisywane w pasku stanu. Monity wymagające więcej miejsca są
+oknami z prawdziwymi przyciskami: opis stasha, opis opisanego tagu
+(`Ctrl+Enter` lub `Ctrl+S` zatwierdza, `Enter` dodaje wiersz), Ustaw upstream
+(przeszukiwalna lista gałęzi zdalnych i przycisk Usuń upstream) oraz wzorce
+śledzenia i zatrzymania śledzenia w Git LFS. Ustawienie liczbowe lub tekstowe
+wybrane z palety otwiera Ustawienia na swoim wierszu, gotowe do edycji,
+a filtr Refów (`/`) wpisuje się w pole u góry panelu Refów.
+
 ### Edycja opisu commita
 
 **Edytuj opis commita...** w menu commita, `Ctrl+G e` albo polecenie palety
@@ -1743,7 +1758,7 @@ menu: *Edytor: Zmień kodowanie*, *Edytor: Otwórz ponownie z kodowaniem*, *Edyt
 | `x` | Odrzuca wszystkie zmiany (najpierw pyta) |
 | `c` | Otwiera kompozytor commita |
 | `Enter` | Od razu robi commit zmian ze stage, z opisem z formularza, z dowolnego miejsca (zob. [Stage i commity](staging-and-committing.md#pisanie-commita)) |
-| `m` | Stash wszystkich zmian z opisem (pusty jest dozwolony). Przy włączonym AI `Ctrl+G` w tym polu pisze opis |
+| `m` | Stash wszystkich zmian z opisem wpisywanym w małym oknie (pusty jest dozwolony). Przy włączonym AI jego przycisk Opis AI (`Ctrl+G` w oknie) pisze opis |
 | `Shift+T` | Stash wszystkich zmian (łącznie z nieśledzonymi plikami), bez opisu |
 | `o` | Pop stasha: wiersza stasha zaznaczonego w Log, a w przeciwnym razie najnowszego |
 | `p` | Pull, tak jak ustawiono przycisk Pull (`git.pull_mode`) |

@@ -192,7 +192,7 @@ fn the_integrations_controls_show_their_pointer_and_no_button_is_bracketed() {
         .wait_for("the Radar block of the profile", STEP, |s| {
             s.contains("Requests waiting for my review")
                 && s.contains("Regular expressions")
-                && s.contains("e.g. acme, platform")
+                && s.contains("One per line, e.g. acme")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // The marks of checkboxes aside, nothing is bracketed.
@@ -228,7 +228,7 @@ fn the_integrations_controls_show_their_pointer_and_no_button_is_bracketed() {
         // On the label, not only on the mark.
         hover(&mut term, label, (c + 1, r), "pointer");
     }
-    let (c, r) = screen.find("e.g. acme, platform").unwrap();
+    let (c, r) = screen.find("One per line, e.g. acme").unwrap();
     hover(&mut term, "the Namespaces area", (c + 1, r), "text");
     term.stop().unwrap();
 }

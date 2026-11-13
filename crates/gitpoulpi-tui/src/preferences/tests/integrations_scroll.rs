@@ -89,7 +89,7 @@ fn ctrl_n_badges_the_radar_block_including_the_regular_expressions_checkbox() {
     let badged_rows: Vec<u16> = state.nav_targets().iter().map(|(rect, _)| rect.y).collect();
     for label in [
         "Requests waiting for my review",
-        "e.g. acme, platform",
+        "One per line, e.g. acme",
         "Regular expressions",
     ] {
         let row = text

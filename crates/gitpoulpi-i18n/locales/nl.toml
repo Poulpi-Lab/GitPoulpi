@@ -270,7 +270,7 @@ auto_fetch_interval_minutes_help = "Standaard 5. 0 schakelt ophalen op de achter
 fetch_on_tab_open = { git = "Fetch bij het openen van een tabblad", local = "Ophalen bij het openen van een tabblad" }
 fetch_on_tab_open_help = { git = "Fetch All op de achtergrond; overgeslagen als er in de laatste minuut is opgehaald.", local = "Alles ophalen op de achtergrond; overgeslagen als er in de laatste minuut is opgehaald." }
 auto_prune = "Automatisch opschonen"
-auto_prune_help = "Removes remote-tracking branches that no longer exist on the remote during every fetch except the lease check of the diverged-push dialog: background auto-fetch and the toolbar's Fetch and Fetch All. On by default, so a branch deleted on the server disappears from the REMOTE section after the next fetch; turn it off to keep stale remote-tracking branches listed."
+auto_prune_help = { git = "Verwijdert bij elke fetch remote-tracking branches die niet meer op de remote bestaan, behalve bij de lease-controle van het dialoogvenster voor uiteengelopen pushes: auto-fetch op de achtergrond en Fetch en Fetch All van de werkbalk. Standaard aan, dus een branch die op de server is verwijderd, verdwijnt na de volgende fetch uit de sectie REMOTE; zet het uit om verouderde remote-tracking branches te blijven tonen.", local = "Verwijdert bij elke ophaalactie remote-tracking branches die niet meer op de remote bestaan, behalve bij de lease-controle van het dialoogvenster voor uiteengelopen pushes: automatisch ophalen op de achtergrond en Ophalen en Alles ophalen van de werkbalk. Standaard aan, dus een branch die op de server is verwijderd, verdwijnt na de volgende ophaalactie uit de sectie REMOTE; zet het uit om verouderde remote-tracking branches te blijven tonen." }
 keep_submodules_up_to_date = "Submodules up-to-date houden"
 default_branch_name = "Standaardnaam van branch"
 default_branch_name_help = "Gebruikt bij het initialiseren of klonen van een repository."
@@ -4480,7 +4480,7 @@ file_list_loading = "de bestandslijst van deze commit wordt nog geladen"
 no_repo_tab = "er is geen repositorytabblad geopend"
 commit_now_ai_running = "een AI-bericht wordt nog geschreven - wacht erop, of Esc breekt het af"
 # context: status line after the commit chord moved the keyboard into the commit message field; {key} is the shortcut that commits
-commit_now_hint = "type the message, then press {key} to {$commit}"
+commit_now_hint = "typ het bericht en druk op {key} om de {$commit} te maken"
 no_matching_tab = "geen passend tabblad"
 no_matching_theme = "geen passend thema"
 no_matching_language = "geen passende taal"

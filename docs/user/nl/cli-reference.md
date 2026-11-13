@@ -102,7 +102,7 @@ Hunks en regels worden genummerd zoals `gitpoulpi --json diff` ze nummert.
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Een bestand, map, alles, een hunk of enkele regels stagen. Een stage van een bestand, map of `--all` die een gevoelig bestand zou toevoegen (een privésleutel, een `.env`, een herkend token: `[privacy]` in de [configuratiereferentie](config-reference.md#privacy-gevoelige-bestanden)) wordt geweigerd met afsluitcode 2 en `{error: "sensitive_files", files: [{path, reason}]}` (een regel en een gemaskeerd voorbeeld, nooit een waarde); er wordt niets gestaged. `--allow-sensitive` staget ze toch. |
 | `unstage` (dezelfde vlaggen) | Het omgekeerde. |
-| `discard --file F [--hunk N [--lines a,b]]` | Unstaged wijzigingen verwerpen (een heel bestand: elke wijziging, een niet-gevolgd bestand wordt verwijderd). Ongedaan te maken. |
+| `discard --file F [--hunk N [--lines a,b]]` | Unstaged wijzigingen verwerpen (een heel bestand: elke wijziging, een niet-gevolgd bestand wordt verwijderd, en de mappen die daardoor leeg raken). Ongedaan te maken. |
 | `rm-file <paths>...` | Bestanden uit de werkmap verwijderen. Ongedaan te maken. |
 | `ignore <pattern> [--file <.gitignore>]` | Een patroon aan een `.gitignore` toevoegen (of aan `.git/info/exclude` met `--file .git/info/exclude`). Ongedaan te maken, behalve in `.git/info/exclude`. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Herschrijft de codering, regeleinden of inspringing van bestanden in de werkmap. Binaire, ontbrekende en niet te coderen bestanden worden overgeslagen en gemeld. Eén item in het ongedaanmaakjournaal voor de hele reeks. |
@@ -162,7 +162,7 @@ doet een pop van de stash, wat `general.auto_stash` ook zegt ([Auto-stash](log-a
 
 | Opdracht | Wat het doet |
 |---|---|
-| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | De standaardremote, één remote of alle ophalen. Elke fetch ververst ook wat elke remote aan tags heeft (het `remote` van `tag list`) en schoont dat overzicht op, ook zonder `--prune`. `--prune-tags` (Instellingen: Tags automatisch opschonen) verwijdert ook de lokale tags die de remote heeft verwijderd: alleen tags die erop stonden, nooit een tag die je niet hebt gepusht; het antwoord somt ze op als `pruned_tags` (git 2.41+). |
+| `fetch [--remote R \| --all] [--prune] [--prune-tags]` | De standaardremote, één remote of alle ophalen. Remote-tracking branches die de remote heeft verwijderd, worden opgeschoond tenzij `general.auto_prune` false is; `--prune` dwingt dat af. Elke fetch ververst ook wat elke remote aan tags heeft (het `remote` van `tag list`) en schoont dat overzicht op, ook zonder `--prune`. `--prune-tags` (Instellingen: Tags automatisch opschonen) verwijdert ook de lokale tags die de remote heeft verwijderd: alleen tags die erop stonden, nooit een tag die je niet hebt gepusht; het antwoord somt ze op als `pruned_tags` (git 2.41+). |
 | `pull [--remote R] [--mode merge\|ff-only\|rebase] [--autostash]` | Pull; de modus wordt altijd expliciet aan git doorgegeven. |
 | `push [--remote R] [--branch B] [-u] [--force-with-lease]` | Push. Er is geen gewone force: alleen `--force-with-lease`. |
 | `remote list`, `remote add <name> <url> [--push-url U]`, `remote remove <name>`, `remote rename <old> <new>` | Remotes. `remote list` markeert een remote-tracking namespace zonder remote erachter met `configured: false`; `remote remove` erop verwijdert zijn branches (ongedaan te maken). |

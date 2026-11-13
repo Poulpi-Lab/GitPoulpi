@@ -218,7 +218,7 @@ Ikonen är bläckfisken i din logotypfärg (Om GitPoulpi > färg); på Linux har
 | System | Alias | PATH |
 |---|---|---|
 | Linux, macOS | En symbolisk länk `~/.local/bin/<namn>` till `gitpoulpi-tui`. En länk kan inte bära en markering, så den räknas som vår när dess mål är en fil som heter `gitpoulpi-tui`; en vanlig fil, eller en länk till något annat, är **inte vår** och ersätts eller tas aldrig bort. | Ett block mellan `# >>> GitPoulpi PATH (X-GitPoulpi=1) >>>` och `# <<< GitPoulpi PATH <<<` i `~/.bashrc` och `~/.zshrc` (de som finns; `~/.zshrc` i macOS, annars `~/.bashrc` när ingen av dem finns), och `~/.config/fish/conf.d/gitpoulpi-path.fish` när fish är konfigurerat. Ta bort raderar blocket (eller fish-filen) och inget annat. |
-| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<namn>.cmd`, ett skal på två rader som innehåller `REM X-GitPoulpi=1`. | Användarens PATH i `HKCU\Environment`, skriven via PowerShell, följd av ett `WM_SETTINGCHANGE`-meddelande så att nya program ser den. Värdet `GitPoulpiPathAdded` registrerar vad som lades till, och Ta bort tar bara bort det. |
+| Windows | `%LOCALAPPDATA%\Programs\GitPoulpi\bin\<namn>.cmd`, ett kort skal som innehåller `REM X-GitPoulpi=1` (det exporterar också `GITPOULPI_CMDCMDLINE`, som gör att en start från adressfältet känns igen). | Användarens PATH i `HKCU\Environment`, skriven via PowerShell, följd av ett `WM_SETTINGCHANGE`-meddelande så att nya program ser den. Värdet `GitPoulpiPathAdded` registrerar vad som lades till, och Ta bort tar bara bort det. |
 
 Nya terminaler ser ändringen av PATH, inte de som redan är öppna. Ingen av åtgärderna journalförs: det finns inget Ångra för dem, **Ta bort** är vägen tillbaka.
 
@@ -226,6 +226,31 @@ Paletten har samma åtgärder (**Startare: Skapa genväg**, **Startare: Skapa
 skrivbordsgenväg**, **Startare: Ta bort genvägar**, **Startare: Skapa kommandoalias**, **Startare: Ta bort kommandoalias**, **Startare: Lägg till i PATH**, **Startare: Ta bort från PATH**), och
 `gitpoulpi desktop shortcut status|install|remove [--where launcher|desktop|startmenu]`
 gör det från ett skript.
+
+#### Skriva i adressfältet i Utforskaren (Windows)
+
+Skriv aliaset (`gp`) eller `gitpoulpi` i adressfältet i ett Utforskaren-fönster och tryck Enter: GitPoulpi öppnas i terminalen som valts i **Terminal för genvägar**, på mappen som fönstret visar, utan att öppna **Senaste fliken**. Med **Visa det öppna fönstret vid klick** på och en GitPoulpi redan öppen blir mappen i stället en ny flik i det fönstret.
+
+- **`gp` (kommandoaliaset).** När aliaset finns registrerar skapandet också `gp.exe` under `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`, som pekar på `gitpoulpi-launch.exe`, och Ta bort raderar den nyckeln (bara när den är vår). När mappen med aliaset finns i din PATH (**Lägg till GitPoulpi i PATH**) kör Windows `.cmd`-skalet först, och ett konsolfönster kan blinka till en kort stund innan GitPoulpi visas. Ett skal som skrivits av en äldre version skrivs om automatiskt när Inställningar läser aliaset.
+- **`gitpoulpi`.** Fungerar när **Filhanterarmeny** är installerad: Installera registrerar också `gitpoulpi.exe` under App Paths. Utan den hittas `gitpoulpi` bara när GitPoulpis mapp finns i din PATH, och då kan konsolen blinka till som ovan.
+
+Linux och macOS har inget motsvarande: filhanterarnas platsfält kör inga program. Använd posten i **Filhanterarmeny** eller kommandoaliaset i en terminal.
+
+#### Filhanterarmeny (Öppna i GitPoulpi)
+
+Under genvägarna lägger raderna för **Filhanterarmeny** till **Öppna i GitPoulpi** i högerklicksmenyn för mappar. En statusrad per filhanterare (i Linux en för varje filhanterare som hittas här och för varje som fortfarande har posten; en rad **Hittades** listar vad som hittades), sedan knapparna **Installera** och **Ta bort**. **Installera** skriver posten för varje filhanterare som hittas; **Ta bort** frågar först och tar sedan bort exakt det som Installera skrev, oavsett om filhanteraren fortfarande är installerad.
+
+Posten kör `gitpoulpi launch --folder <mapp>` (i Windows `gitpoulpi-launch.exe --folder`, utan konsol), och det kommandot avgör vid klicket: med **Visa det öppna fönstret vid klick** på och ett GitPoulpi-fönster öppet blir en mapp i ett repository en ny flik i det senast använda fönstret, som kommer fram; annars startar terminalen som valts i **Terminal för genvägar** GitPoulpi på mappen. Att byta terminal gör därför aldrig en post föråldrad; en flyttad exe eller en ny logotypfärg gör det, och GitPoulpi skriver om sina egna poster automatiskt (utan att någonsin skapa en), som genvägarna. Posten kräver startprogrammet bredvid GitPoulpi (`gitpoulpi`, eller `gitpoulpi-launch.exe` i Windows); utan det säger raden det och knapparna är av.
+
+| System | Vad Installera skriver |
+|---|---|
+| Windows | Nycklar per användare, utan administratör: `HKCU\Software\Classes\Directory\shell\GitPoulpi`, `Directory\Background\shell\GitPoulpi` och `Drive\shell\GitPoulpi`, var och en med en undernyckel `command`, så att posten visas på en mapp, på bakgrunden av en öppen mapp och på en enhet. Varje nyckel bär ett värde `X-GitPoulpi`; en nyckel utan det är **inte vår** och rörs aldrig. Den registrerar också `gitpoulpi.exe` under `HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths`, som pekar på `gitpoulpi-launch.exe`. I Windows 11 finns posten bara i den klassiska menyn: **Visa fler alternativ**, Shift+F10 eller Shift+högerklick (den nya menyn på toppnivå listar bara paketerade appar). Ta bort raderar våra nycklar och sedan överordnade nycklar som Installera skapade, bara när de är tomma. |
+| Linux | Bara för filhanterarna som hittas i PATH. GNOME Files och Caja: ett skript uppkallat efter posten i `~/.local/share/nautilus/scripts` eller `~/.config/caja/scripts` (i undermenyn **Skript**). Dolphin: `~/.local/share/kio/servicemenus/gitpoulpi-open.desktop`, körbar (KDE Frameworks 6 ignorerar en användarservicemeny som inte är det; KDE Frameworks 5 före 5.85 stöds inte). Nemo: två åtgärder i `~/.local/share/nemo/actions` (en markerad mapp, bakgrunden). Thunar: en åtgärd som slås ihop med `~/.config/Thunar/uca.xml`; dina egna åtgärder ligger kvar, och Ta bort ger tillbaka filen byte för byte (eller raderar den om Installera skapade den). PCManFM och PCManFM-Qt: `~/.local/share/file-manager/actions/gitpoulpi-open.desktop`. Ikonen hamnar i `~/.local/share/icons/hicolor/256x256/apps/gitpoulpi-folder.png` och försvinner med den sista posten. `XDG_DATA_HOME` och `XDG_CONFIG_HOME` följs. Posten visas på en markerad mapp, och på mappbakgrunden där filhanteraren erbjuder det. |
+| macOS | En Snabbåtgärd, `~/Library/Services/Open in GitPoulpi.workflow`: högerklicka på en mapp i Finder och välj sedan **Snabbåtgärder**. Bara markerade mappar (Finder har ingen meny för mappbakgrunden). Första gången kan den behöva slås på i Systeminställningar > Tangentbord > Kortkommandon > Tjänster. |
+
+Varje fil och nyckel som GitPoulpi skriver bär markeringen `X-GitPoulpi=1` (en rad `# X-GitPoulpi=1` i ett skript), och Ta bort raderar bara markerade. De här åtgärderna ändrar ditt system, inte ett repository: Ångra täcker dem inte, **Ta bort** är vägen tillbaka. Filhanterarnas platsfält kör inga program i Linux och macOS, så där finns inget att skriva; i en terminal finns kommandoaliaset.
+
+Paletten har **Startare: Installera menyn Öppna i GitPoulpi** och **Startare: Ta bort menyn Öppna i GitPoulpi**, och `gitpoulpi desktop folder-menu status|install|remove` gör det från ett skript.
 
 ### Synkronisering
 

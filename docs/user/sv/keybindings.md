@@ -512,7 +512,7 @@ Tangenterna är standardvärdena.
 | Commit-detaljer: Återställ meddelandets storlek |  |
 | Commit-detaljer: Rulla meddelandet ned |  |
 | Commit-detaljer: Rulla meddelandet upp |  |
-| Commit Details: Open Link in Message... |  |
+| Commit-detaljer: Öppna länk i meddelandet... |  |
 | Filer: Växla sortering av commit-filer (A-Ö / Ö-A) |  |
 | Refs: Checka ut vald ref | `dubbelklick` |
 | Refs: Kopiera refnamn |  |
@@ -1196,8 +1196,8 @@ Tangenterna är standardvärdena.
 | Startare: Ta bort kommandoalias |  |
 | Startare: Lägg till i PATH |  |
 | Startare: Ta bort från PATH |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| Startare: Installera menyn Öppna i GitPoulpi |  |
+| Startare: Ta bort menyn Öppna i GitPoulpi |  |
 | App: Byt färgtema för grafen... | `Ctrl+N Y` |
 | App: Växla radfärgning i grafen | `Ctrl+N T` |
 <!-- palette:end -->

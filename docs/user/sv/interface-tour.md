@@ -81,6 +81,18 @@ helst). Sedan kommer en flik per öppet repository. Krysset `x` som stänger en
 flik visas bara på den aktiva fliken och på fliken under pekaren. Flikraden
 bär bara flikar (knappen för den [globala sökningen](search.md) sitter i titelraden).
 
+När repositoryflikarna inte ryms rullar raden i stället för att krympa dem:
+flikarna sitter mellan två pilknappar, `‹` till vänster och `›` till höger.
+En pil är dämpad när ingen flik är dold på dess sida. Klicka på en pil för att visa
+en flik till på den sidan (håll nere för att fortsätta rulla), eller använd hjulet över
+raden (uppåt eller åt vänster visar de tidigare flikarna). Varje gång den aktiva fliken
+byts (du växlar flik från tangentbordet, flikväljaren eller paletten, öppnar eller
+stänger en flik, eller ändrar fönstrets storlek) rullar raden precis så mycket att
+fliken syns helt. När det finns plats öppnar en `…`-knapp efter högerpilen
+flikväljaren. Om du drar en flik till en pil rullar raden så länge du håller den där,
+så att du kan släppa den bortom flikarna som syns. `Ctrl+N` sätter en bricka på varje
+aktiv pil.
+
 **Inställningar > Utseende > Flikradens position** flyttar den här raden till fönstrets nederkant (under statusraden) eller gör den till en kolumn vid vänsterkanten: en flik per rad, först Hem, sedan arbetsytechipet, Radarn, fliken Arbetsytor, flikarna (ett långt namn slutar med `…`) och `+`. När flikarna är fler än raderna visar en `…`-rad hur många som är dolda ovanför (`▲`) och nedanför (`▼`) och öppnar fliklistan; hjulet rullar kolumnen. Bredvid ett verktygsfält som kolumn ligger flikarna ytterst. Ett fönster smalare än 80 kolumner behåller flikarna överst. Klick, stängningskorset, mittenklick, högerklicksmenyn, dra för att ändra ordning och tangentbordet fungerar likadant på varje position.
 
 - **+** direkt efter den sista fliken öppnar en liten meny: **Ny flik** (`Alt+T`,
@@ -288,6 +300,17 @@ Klicka på en fil för att öppna dess diff. I ett lågt fönster viker meddelan
 undan först (ned till en rad), sedan listan. Vyn för lokala ändringar behåller
 sin rad **Sökväg** / **Träd** / **Visa alla filer** överst i fillistorna,
 ovanför listorna Unstaged och Staged.
+
+**Länkar i ett meddelande.** En webbadress som skrivits i meddelandet (`https://...`,
+eller målet i en markdown-länk `[text](https://...)`) är understruken, visar handpekaren
+och frågar vid ett klick **Öppna den här länken?** med hela adressen innan något
+öppnas: texten i ett meddelande är inte betrodd. **Öppna** (`P`) startar webbläsaren,
+**Avbryt** (`A`, `Esc`, krysset) gör ingenting. Bara `http`- och `https`-adresser
+erbjuds. Tangentbordsmotsvarigheten är palettkommandot `Commit-detaljer: Öppna länk i
+meddelandet...`, som frågar om meddelandets första adress och går vidare till de
+andra med **Nästa** (`N`). Vissa terminaler ritar en egen understrykning under en
+adress under pekaren och öppnar den själva vid ett klick med modifierartangent
+(ofta Shift+klick); det är terminalens funktion, inte GitPoulpis.
 
 Varje fillista har menyer för filer, mappar och den tomma delen, och flera filer kan markeras samtidigt (**Ctrl+klick**, **Shift+klick**); se [Stage och commit](staging-and-committing.md).
 

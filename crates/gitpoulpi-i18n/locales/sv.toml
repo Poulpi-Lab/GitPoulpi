@@ -3005,7 +3005,7 @@ commit_details_shrink_message = { git = "Commit-detaljer: Förminska meddelandet
 commit_details_reset_message_size = { git = "Commit-detaljer: Återställ meddelandets storlek", local = "Incheckningsdetaljer: Återställ meddelandets storlek" }
 commit_details_scroll_message_down = { git = "Commit-detaljer: Rulla meddelandet ned", local = "Incheckningsdetaljer: Rulla meddelandet ned" }
 commit_details_scroll_message_up = { git = "Commit-detaljer: Rulla meddelandet upp", local = "Incheckningsdetaljer: Rulla meddelandet upp" }
-commit_details_open_link = "{$Commit} Details: Open Link in Message..."
+commit_details_open_link = { git = "Commit-detaljer: Öppna länk i meddelandet...", local = "Incheckningsdetaljer: Öppna länk i meddelandet..." }
 files_toggle_commit_file_sort_a_z_z_a = { git = "Filer: Växla sortering av commit-filer (A-Ö / Ö-A)", local = "Filer: Växla sortering av incheckningsfiler (A-Ö / Ö-A)" }
 refs_checkout_selected_ref = "Refs: Checka ut vald ref"
 refs_copy_ref_name = "Refs: Kopiera refnamn"
@@ -4167,8 +4167,8 @@ quit_cd = "Avsluta och lämna ditt skal i den här flikens mapp (kräver skaloms
 repo_management = "Repositoryhantering: öppna, klona eller skapa ett repository"
 insert_issue_ref = "Infoga en ärendereferens"
 tab_overflow = "Alla flikar"
-tab_scroll_left = "Scroll the tabs left"
-tab_scroll_right = "Scroll the tabs right"
+tab_scroll_left = "Rulla flikarna åt vänster"
+tab_scroll_right = "Rulla flikarna åt höger"
 
 [footer_hint]
 lead = "{key}: "
@@ -5786,22 +5786,22 @@ palette_alias_create = "Startare: Skapa kommandoalias"
 palette_alias_remove = "Startare: Ta bort kommandoalias"
 palette_path_add = "Startare: Lägg till i PATH"
 palette_path_remove = "Startare: Ta bort från PATH"
-folder_menu_heading = "File manager menu"
-folder_menu_status = "Open in GitPoulpi"
-folder_menu_label = "Open in GitPoulpi"
-folder_menu_detected = "Detected"
-folder_menu_none_detected = "no supported file manager found"
-folder_menu_install = "Install"
-folder_menu_remove = "Remove"
-folder_menu_needs_helper = "needs the gitpoulpi launcher next to GitPoulpi"
-folder_menu_help_windows = "Adds Open in GitPoulpi to the right-click menu of folders, folder backgrounds and drives (your user only, no admin), and lets you type gitpoulpi in the File Explorer address bar. On Windows 11 it is under Show more options (Shift+F10)."
-folder_menu_help_linux = "Adds Open in GitPoulpi to the right-click menu of folders in the file managers found here. Only the files GitPoulpi wrote are removed; your own Thunar actions stay."
-folder_menu_help_macos = "Adds an Open in GitPoulpi Quick Action for folders in Finder (right-click > Quick Actions). Finder has no menu for the folder background."
-done_folder_menu_installed = "Installed Open in GitPoulpi: {managers}"
-done_folder_menu_removed = "Removed Open in GitPoulpi: {managers}"
-done_folder_menu_nothing = "No Open in GitPoulpi menu to remove"
-palette_folder_menu_install = "Launcher: Install Open in GitPoulpi Menu"
-palette_folder_menu_remove = "Launcher: Remove Open in GitPoulpi Menu"
+folder_menu_heading = "Filhanterarmeny"
+folder_menu_status = "Öppna i GitPoulpi"
+folder_menu_label = "Öppna i GitPoulpi"
+folder_menu_detected = "Hittades"
+folder_menu_none_detected = "ingen filhanterare som stöds hittades"
+folder_menu_install = "Installera"
+folder_menu_remove = "Ta bort"
+folder_menu_needs_helper = "kräver startprogrammet gitpoulpi bredvid GitPoulpi"
+folder_menu_help_windows = "Lägger till Öppna i GitPoulpi i högerklicksmenyn för mappar, mappbakgrunder och enheter (bara för din användare, inga administratörsrättigheter behövs) och låter dig skriva gitpoulpi i adressfältet i Utforskaren. I Windows 11 finns den under Visa fler alternativ (Shift+F10)."
+folder_menu_help_linux = "Lägger till Öppna i GitPoulpi i högerklicksmenyn för mappar i de filhanterare som hittas här. Bara de filer GitPoulpi skrev tas bort; dina egna Thunar-åtgärder ligger kvar."
+folder_menu_help_macos = "Lägger till en Snabbåtgärd Öppna i GitPoulpi för mappar i Finder (högerklicka > Snabbåtgärder). Finder har ingen meny för mappbakgrunden."
+done_folder_menu_installed = "Installerade Öppna i GitPoulpi: {managers}"
+done_folder_menu_removed = "Tog bort Öppna i GitPoulpi: {managers}"
+done_folder_menu_nothing = "Ingen Öppna i GitPoulpi-meny att ta bort"
+palette_folder_menu_install = "Startare: Installera menyn Öppna i GitPoulpi"
+palette_folder_menu_remove = "Startare: Ta bort menyn Öppna i GitPoulpi"
 
 [sparse]
 palette = "Repository: Delvis utcheckning..."
@@ -9388,20 +9388,20 @@ why_no_dialog = "ingen dialogruta som kan ordnas är öppen"
 
 [link_confirm]
 # context: title of the dialog that asks before a web address from a commit message opens in the browser
-title = "Open this link?"
+title = "Öppna den här länken?"
 # context: first paragraph of that dialog; the address follows it on the next lines
-body = "This address comes from text in a {$commit} message. Check it before you open it in your browser:"
+body = "Adressen kommer från text i ett {$commit}-meddelande. Kontrollera den innan du öppnar den i webbläsaren:"
 # context: line of that dialog when the message holds several addresses; {n} is the shown one, {total} how many there are
-position = "Link {n} of {total}"
+position = "Länk {n} av {total}"
 # context: button that opens the address in the browser
-open = "Open"
+open = "Öppna"
 # context: button that shows the next address of the message
-next = "Next"
+next = "Nästa"
 # context: key of the Open button, one letter (shown as "Open (O)")
-key_open = "o"
+key_open = "p"
 # context: key of the Next button, one letter
 key_next = "n"
 # context: key of the Cancel button of that dialog, one letter
-key_cancel = "c"
+key_cancel = "a"
 # context: status line; the message in view holds no web address to open
-none = "no link in this message"
+none = "ingen länk i det här meddelandet"

@@ -205,7 +205,8 @@ gitpoulpi-tui
 ## Avinstallera
 
 `gitpoulpi uninstall` (det som båda installationsprogrammen kör) tar bort kommandoaliasen,
-PATH-posterna och genvägarna som GitPoulpi har skapat, och sedan programfilerna i en
+PATH-posterna, genvägarna och filhanterarmenyns poster (med deras App Paths-nyckel i
+Windows) som GitPoulpi har skapat, och sedan programfilerna i en
 releaseinstallation; det vägrar köra på ett bygge utan markeringen `.gitpoulpi-dist`
 (ett cargo-bygge), och `--keep-files` lämnar programfilerna. Det är inte
 tillgängligt för MCP-agenter. Utan ett installationsprogram, ta bort de tre körbara filerna.

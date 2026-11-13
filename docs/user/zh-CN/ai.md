@@ -155,7 +155,7 @@ timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
 |---|---|---|
 | **Commit 消息** | stage 更改，按摘要字段右侧的 `✦`、`Ctrl+G i`，或命令面板 `AI：生成 Commit 消息`。摘要和描述会被填好供你编辑；不会 commit 任何内容。 | `ai commit-message`（打印），`commit --ai`（commit） |
 | **解释更改** | 工作区更改窗格右上角的 `✦`（`Ctrl+G w`：已选中的 commit，否则为工作区更改），或 commit 菜单中的 *解释更改（AI）*。弹出窗口：方向键滚动，`c` 复制，`Esc` 关闭。 | `ai explain [rev] [--wip]` |
-| **Stash 消息** | `Ctrl+G m` 打开 stash 提示；在其中按 `Ctrl+G` 会询问模型。命令面板 `AI：生成 Stash 消息` 两者兼做。 | `stash push --ai` |
+| **Stash 消息** | `Ctrl+G m` 打开 stash 对话框；其 AI 按钮（对话框中的 `Ctrl+G`）会询问模型。命令面板 `AI：生成 Stash 消息` 两者兼做。 | `stash push --ai` |
 | **Pull request 标题和描述** | 创建 pull request 表单中的 *生成标题和描述*（分支的 commit 和 diff 在本地读取）。 | |
 | **Merge 冲突解决** | 在 merge 冲突编辑器中：`✦ 建议` 工具栏按钮、冲突的右键菜单 *✦ 建议解决方案（AI）*、`Alt+I`，或命令面板 `AI：建议 merge 冲突解决方案`。建议会作为一次编辑替换输出中 *当前冲突* 的区域（标记为已编辑，占一个撤销步骤）；在你保存之前不会保存或 stage 任何内容。 | `ai resolve-conflict <path> [--conflict N]`（打印） |
 | **代码评审** | 在 [pull 或 merge request 的评审](review.md#-ai-评审草稿)中：`✦ 起草评审…` 按钮、`s`，或命令面板 `评审：✦ 起草评审…`（它会打开评审选项，`Enter` 运行）。模型读取请求的 diff、描述和已有评论（默认还有项目的 `CLAUDE.md` 和 `AGENTS.md`：见[评审上下文](#评审上下文)）并提出评论；你逐条接受、编辑或忽略。在你提交评审之前，不会有任何内容发送到平台。 | `hosting review suggest <n>`（输出 JSON，不发布任何内容），`ai review-context`（默认值） |

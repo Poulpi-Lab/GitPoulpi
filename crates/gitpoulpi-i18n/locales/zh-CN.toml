@@ -1025,17 +1025,17 @@ box_new_branch_at = "在 {sha} 处新建分支"
 box_new_tag_at = { git = "在 {sha} 处新建 {$tag}", local = "在 {sha} 处新建{$tag}" }
 box_new_annotated_tag_at = { git = "在 {sha} 处新建附注 {$tag}", local = "在 {sha} 处新建附注{$tag}" }
 # context: title of the rename box; {old} is the branch name
-box_rename = "Rename {old}"
+box_rename = "重命名 {old}"
 # context: confirm button of the rename box
-rename_button = "Rename"
+rename_button = "重命名"
 # context: placeholder of the inline new-file box in the Status list; keep it short
-placeholder_file = "file name, e.g. notes.md"
+placeholder_file = "文件名，如 notes.md"
 # context: title of the new-file box; {folder} is a path
-box_new_file = "New file in {folder}/"
+box_new_file = "在 {folder}/ 中新建文件"
 # context: title of the new-file box for the repository root
-box_new_file_root = "New file"
+box_new_file_root = "新建文件"
 # context: confirm button of the name box and the new-file box
-create_button = "Create"
+create_button = "创建"
 
 [menu_pill]
 checkout = { git = "Checkout", local = "检出" }
@@ -4320,7 +4320,7 @@ counter = "第 {current} / {total} 个"
 [footer]
 commit_label = { git = "{$Commit} 消息：", local = "{$Commit}消息：" }
 commit_hint = { git = "  （Enter：{$commit}，Esc：取消）", local = "  （Enter：提交，Esc：取消）" }
-filter_refs_hint = "Enter: apply, Esc: cancel"
+filter_refs_hint = "Enter：应用，Esc：取消"
 confirm_hint = "  （Enter：确认，Esc：取消）"
 search_hint = "搜索：Enter/{down} 下一个，Shift+Enter/{up} 上一个，Esc 关闭"
 commit_count = { one = { git = "{n} 个 {$commit}", local = "{n} 个{$commit}" }, other = { git = "{n} 个 {$commit}", local = "{n} 个{$commit}" } }
@@ -5279,53 +5279,53 @@ discard_hint = "要丢弃所做的更改吗？再按一次 Esc 即丢弃，按�
 
 [prompt_dialog]
 # context: title of the stash dialog; stash is the git verb (stash the working changes)
-stash_title = "{$Stash} changes"
+stash_title = { git = "{$Stash} 更改", local = "{$Stash}更改" }
 # context: placeholder of the stash message field; an empty message is allowed
-stash_placeholder = "message (optional)"
+stash_placeholder = "消息（可选）"
 # context: the primary button of the stash dialog; stash is the git verb
 stash_button = "{$Stash}"
 # context: AI button of the stash dialog (the key that does the same follows it); the AI writes the stash message
-ai_message_button = "AI message"
+ai_message_button = "AI 消息"
 # context: shown in the stash message field while the AI is writing it
-ai_writing = "writing..."
+ai_writing = "正在撰写…"
 # context: title of the dialog that annotates an existing tag; {name} is the tag
-tag_annotate_title = "Annotate {$tag} {name}"
+tag_annotate_title = { git = "为 {$tag} {name} 添加附注", local = "为{$tag} {name} 添加附注" }
 # context: title of the dialog that creates an annotated tag; {name} is the new tag, {sha} the short hash of the commit it points at
-tag_new_title = "New annotated {$tag} {name} at {sha}"
+tag_new_title = { git = "在 {sha} 处新建附注 {$tag} {name}", local = "在 {sha} 处新建附注{$tag} {name}" }
 # context: placeholder of the tag message field (several lines allowed)
-tag_placeholder = "message"
+tag_placeholder = "消息"
 # context: the primary button of the dialog that annotates an existing tag
-tag_annotate_button = "Annotate"
+tag_annotate_button = "添加附注"
 # context: the primary button of the dialog that creates an annotated tag
-tag_create_button = "Create {$tag}"
+tag_create_button = { git = "创建 {$tag}", local = "创建{$tag}" }
 # context: hint under the multi-line message field of the tag dialog; {key} is the key that applies
-keys_hint = "Enter: new line, {key}: apply, Esc: cancel"
+keys_hint = "Enter：换行，{key}：应用，Esc：取消"
 # context: title of the dialog that sets the upstream (the remote branch it tracks) of a local branch; {branch} is the local branch
-upstream_title = "Set upstream of {branch}"
+upstream_title = { git = "设置 {branch} 的 upstream", local = "设置 {branch} 的上游" }
 # context: placeholder of the remote branch list of that dialog while nothing is chosen
-upstream_placeholder = "Select a remote branch..."
+upstream_placeholder = "选择一个远程分支…"
 # context: the primary button of the set upstream dialog
-set_button = "Set"
+set_button = "设置"
 # context: button of the set upstream dialog that removes the branch's upstream (only shown when it has one)
-unset_button = "Unset upstream"
+unset_button = { git = "取消设置 upstream", local = "取消设置上游" }
 # context: inline error in the set upstream dialog when the typed value starts with a name that is not a remote; {remote} is that name
-unknown_remote = "No remote named '{remote}'"
+unknown_remote = "没有名为“{remote}”的远程"
 # context: inline error in the set upstream dialog when Set is pressed with nothing chosen
-upstream_none = "Choose a remote branch first."
+upstream_none = "请先选择一个远程分支。"
 # context: title of the dialog that routes file patterns through Git LFS
-lfs_track_title = "Track with Git LFS"
+lfs_track_title = "用 Git LFS 跟踪"
 # context: placeholder of the Git LFS track field; several patterns are separated by spaces
-lfs_track_placeholder = "patterns, e.g. *.psd assets/big.bin"
+lfs_track_placeholder = "模式，如 *.psd assets/big.bin"
 # context: the primary button of the Git LFS track dialog
-track_button = "Track"
+track_button = "跟踪"
 # context: title of the dialog that stops routing a pattern through Git LFS
-lfs_untrack_title = "Stop tracking with Git LFS"
+lfs_untrack_title = "停止用 Git LFS 跟踪"
 # context: placeholder of the list of tracked Git LFS patterns while nothing is chosen
-lfs_untrack_placeholder = "Select a pattern..."
+lfs_untrack_placeholder = "选择一个模式…"
 # context: the primary button of the Git LFS untrack dialog
-untrack_button = "Untrack"
+untrack_button = "取消跟踪"
 # context: inline error in the Git LFS track and untrack dialogs when no pattern was given
-pattern_empty = "Enter at least one pattern."
+pattern_empty = "请至少输入一个模式。"
 
 [composer]
 need_staged = { git = "请先 {$stage} 要 {$commit} 的更改", local = "请先暂存要{$commit}的更改" }

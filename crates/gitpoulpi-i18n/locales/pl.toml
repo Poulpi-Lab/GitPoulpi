@@ -8751,8 +8751,8 @@ include_drafts = "Uwzględnij szkice"
 assigned_issues = "Zgłoszenia przypisane do mnie"
 # context: field label: orgs, groups or workspaces the account-wide lists are limited to
 namespaces = "Przestrzenie nazw"
-# context: hint in the empty namespaces field
-namespaces_hint = "np. acme, platforma (puste: moja i wszystkie, do których należę)"
+# context: hint in the empty Namespaces text area (one entry per line)
+namespaces_hint = "Jeden na wiersz, np. acme (puste: moje własne i wszystkie, do których należę)"
 # context: help under the Namespaces field of a code host profile (Settings > Integrations > Radar); one entry per line
 namespaces_help = "Jeden wpis na wiersz. Nazwa pasuje do tej grupy lub właściciela i wszystkiego pod nią (ptm pasuje do ptm/produits/x, nie do ptmx/y). Puste: moje własne i wszystkie, do których należę."
 # context: help under the Namespaces field when Regular expressions is ticked; keep the example as is

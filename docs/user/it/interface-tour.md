@@ -88,6 +88,8 @@ una scheda per ogni repository aperto. La `x` che chiude una scheda compare solo
 scheda attiva e su quella sotto il puntatore. La barra delle schede contiene solo schede
 (il pulsante della [ricerca globale](search.md) è nella barra del titolo).
 
+Quando le schede dei repository non ci stanno, la riga scorre invece di restringerle: le schede stanno tra due pulsanti a freccia, `‹` a sinistra e `›` a destra. Una freccia è attenuata quando da quel lato non c'è nessuna scheda nascosta. Clicca una freccia per mostrare una scheda in più da quel lato (tienila premuta per continuare a scorrere), oppure usa la rotella sulla riga (su o a sinistra mostra le schede precedenti). Ogni volta che la scheda attiva cambia (cambi scheda dalla tastiera, dal selettore di schede o dalla palette, apri o chiudi una scheda, o ridimensioni la finestra), la riga scorre quanto basta per mostrarla intera. Se c'è spazio, un pulsante `…` dopo la freccia destra apre il selettore di schede. Trascinare una scheda su una freccia fa scorrere la riga finché la tieni lì, così puoi rilasciarla oltre le schede visibili. `Ctrl+N` mette un badge su ogni freccia attiva.
+
 **Impostazioni > Aspetto > Posizione della barra delle schede** sposta questa riga in fondo alla finestra (sotto la barra di stato) o ne fa una colonna al bordo sinistro: una scheda per riga, prima Home, poi il chip dell'area di lavoro, il Radar, la scheda Aree di lavoro, le schede (un nome lungo finisce con `…`) e il `+`. Quando le schede superano le righe, una riga `…` mostra quante sono nascoste sopra (`▲`) e sotto (`▼`) e apre l'elenco delle schede; la rotella scorre la colonna. Accanto a una barra degli strumenti in colonna, le schede restano all'esterno. Una finestra sotto le 80 colonne tiene le schede in alto. Clic, croce di chiusura, clic centrale, menu del clic destro, trascinamento per riordinare e tastiera funzionano allo stesso modo in ogni posizione.
 
 - Il **+** subito dopo l'ultima scheda apre un piccolo menu: **Nuova scheda** (`Alt+T`,
@@ -308,6 +310,8 @@ scorre. Clicca un file per aprirne il diff. In una finestra bassa cede prima il
 messaggio (fino a una riga), poi l'elenco. La vista delle modifiche in corso tiene la
 sua riga **Percorso** / **Albero** / **Vedi tutti i file** in cima agli elenchi dei
 file, sopra gli elenchi File non in stage e File in stage.
+
+**Collegamenti in un messaggio.** Un indirizzo web scritto nel messaggio (`https://...`, o la destinazione di un `[testo](https://...)` markdown) è sottolineato, mostra il puntatore a mano e, al clic, chiede **Aprire questo collegamento?** mostrando l'indirizzo intero prima di aprire qualsiasi cosa: il testo di un messaggio non è fidato. **Apri** (`A`) avvia il browser, **Annulla** (`N`, `Esc`, la croce) non fa nulla. Vengono proposti solo indirizzi `http` e `https`. Il gemello da tastiera è il comando della palette `Dettagli commit: Apri collegamento nel messaggio...`, che chiede del primo indirizzo del messaggio e passa agli altri con **Avanti** (`V`). Alcuni terminali disegnano una propria sottolineatura su un indirizzo sotto il puntatore e lo aprono da soli con un clic con modificatore (spesso Shift+clic): è una funzione del terminale, non di GitPoulpi.
 
 Ogni lista di file ha menu su file, cartelle e parte vuota, e si possono selezionare più file insieme (**Ctrl+clic**, **Shift+clic**); vedi [Stage e commit](staging-and-committing.md).
 

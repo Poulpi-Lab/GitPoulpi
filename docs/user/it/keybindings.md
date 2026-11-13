@@ -514,7 +514,7 @@ applicano. I tasti sono quelli predefiniti.
 | Dettagli commit: Reimposta la dimensione del messaggio |  |
 | Dettagli commit: Scorri il messaggio in giù |  |
 | Dettagli commit: Scorri il messaggio in su |  |
-| Commit Details: Open Link in Message... |  |
+| Dettagli commit: Apri collegamento nel messaggio... |  |
 | File: Inverti l'ordine dei file del commit (A-Z / Z-A) |  |
 | Refs: Checkout del ref selezionato | `doppio clic` |
 | Refs: Copia il nome del ref |  |
@@ -1198,8 +1198,8 @@ applicano. I tasti sono quelli predefiniti.
 | Launcher: Rimuovi alias del comando |  |
 | Launcher: Aggiungi al PATH |  |
 | Launcher: Rimuovi dal PATH |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| Launcher: Installa il menu Apri in GitPoulpi |  |
+| Launcher: Rimuovi il menu Apri in GitPoulpi |  |
 | App: Cambia tema colori del grafo... | `Ctrl+N Y` |
 | App: Attiva/disattiva tinta righe del grafo | `Ctrl+N T` |
 <!-- palette:end -->

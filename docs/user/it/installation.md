@@ -84,7 +84,7 @@ Le caselle: collegamento nel menu Start, collegamento sul Desktop, aggiunta al P
 
 L'installer copia gli eseguibili (compreso `gitpoulpi-updater`, il piccolo programma che scambia i file durante un aggiornamento) e il marcatore `.gitpoulpi-dist`. Il marcatore registra come è stato installato GitPoulpi (`inno-user` o `inno-machine`), ed è ciò che il pannello degli aggiornamenti mostra come **Installato con**. Eseguire di nuovo il setup mantiene le tue scelte (ambito, collegamenti, alias).
 
-Si disinstalla da Impostazioni di Windows > App: esegue `gitpoulpi uninstall` (alias, voci del PATH, collegamenti) ed elimina i file, compresi gli avanzi `.old` dell'aggiornamento. Le tue impostazioni e i tuoi repository restano.
+Si disinstalla da Impostazioni di Windows > App: esegue `gitpoulpi uninstall` (alias, voci del PATH, collegamenti, voci del menu del file manager) ed elimina i file, compresi gli avanzi `.old` dell'aggiornamento. Le tue impostazioni e i tuoi repository restano.
 
 ### Linux e macOS: `install.sh`
 

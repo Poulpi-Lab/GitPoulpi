@@ -175,7 +175,7 @@ gitpoulpi-tui
 
 ## 卸载
 
-`gitpoulpi uninstall`（两个安装程序都会运行它）会移除 GitPoulpi 创建的命令别名、PATH 条目和快捷方式，然后移除发布版安装的程序文件；在没有 `.gitpoulpi-dist` 标记的构建（cargo 构建）上它会拒绝执行，`--keep-files` 则保留程序文件。MCP 代理无法使用它。不用安装程序时，直接删除这三个可执行文件即可。GitPoulpi 还会保留以下文件：
+`gitpoulpi uninstall`（两个安装程序都会运行它）会移除 GitPoulpi 创建的命令别名、PATH 条目、快捷方式和文件管理器菜单项（Windows 上还有它们的 App Paths 键），然后移除发布版安装的程序文件；在没有 `.gitpoulpi-dist` 标记的构建（cargo 构建）上它会拒绝执行，`--keep-files` 则保留程序文件。MCP 代理无法使用它。不用安装程序时，直接删除这三个可执行文件即可。GitPoulpi 还会保留以下文件：
 
 | 内容 | 位置 |
 |---|---|

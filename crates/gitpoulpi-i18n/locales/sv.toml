@@ -4167,6 +4167,8 @@ quit_cd = "Avsluta och lämna ditt skal i den här flikens mapp (kräver skaloms
 repo_management = "Repositoryhantering: öppna, klona eller skapa ett repository"
 insert_issue_ref = "Infoga en ärendereferens"
 tab_overflow = "Alla flikar"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}: "

@@ -340,6 +340,7 @@ mod stuck_banner;
 mod tab_column;
 mod tab_dir;
 mod tab_drag;
+mod tab_scroll;
 mod tabs;
 mod tag_delete_dialog;
 mod tag_where_ui;

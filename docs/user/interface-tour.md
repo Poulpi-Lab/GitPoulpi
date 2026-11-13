@@ -91,6 +91,17 @@ comes one tab per open repository. The `x` that closes a tab shows only on the t
 you are on and on the one under the pointer. The tab row only
 carries tabs (the [global search](search.md) button is in the title bar).
 
+When the repository tabs do not fit, the row scrolls instead of shrinking them:
+the tabs sit between two arrow buttons, `‹` at the left and `›` at the right.
+An arrow is dimmed when no tab is hidden on its side. Click an arrow to show one
+more tab on that side (hold it down to keep scrolling), or use the wheel over the
+row (up or left shows the earlier tabs). Whenever the current tab changes (you
+switch tabs from the keyboard, the tab picker or the palette, open or close a
+tab, or resize the window), the row scrolls just enough to show it whole. With
+room for it, a `…` button after the right arrow opens the tab picker. Dragging a
+tab onto an arrow scrolls the row while you hold it there, so you can drop it
+past the tabs on screen. `Ctrl+N` puts a badge on each live arrow.
+
 **Settings > Appearance > Tab bar position** moves this row to the bottom of the window (below the status line) or turns it into a column at the left edge: one tab per row, Home first, then the workspace chip, the Radar, the Workspaces tab, the tabs (a long name ends in `…`), and the `+`. When the tabs outnumber the rows, a `…` row shows how many are hidden above (`▲`) and below (`▼`) and opens the tab list; the wheel scrolls the column. Next to a column toolbar the tabs stay outermost. A window under 80 columns keeps the tabs on top. Clicks, the close cross, middle click, the right-click menu, dragging to reorder and the keyboard work the same in every position.
 
 - The **+** right after the last tab opens a small menu: **New tab** (`Alt+T`,

@@ -4163,6 +4163,8 @@ quit_cd = "종료하고 셸을 이 탭의 폴더에 둠 (셸 래퍼 필요)"
 repo_management = "저장소 관리: 저장소 열기, 클론 또는 만들기"
 insert_issue_ref = "이슈 참조 삽입"
 tab_overflow = "모든 탭"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}: "

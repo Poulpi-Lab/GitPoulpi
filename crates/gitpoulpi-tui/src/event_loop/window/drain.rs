@@ -27,6 +27,7 @@ impl WindowState {
         // another key arrives (clicks on the tab bar and Preferences looked inert).
         self.should_quit = false;
         self.repeat_held_arrow(palette_ctx, unpushed_tags)?;
+        self.scroll_dragged_tab();
         let mut first_poll = true;
         loop {
             // A press on a `Ctrl+N` badge asked for a click: it is read here as
@@ -422,6 +423,40 @@ impl WindowState {
             Event::Key(k) if k.kind == KeyEventKind::Press => self.arrow_repeat.stop(),
             Event::FocusLost | Event::Resize(..) => self.arrow_repeat.stop(),
             _ => {}
+        }
+    }
+
+    /// A tab dragged onto one of the bar's scroll arrows and held there keeps
+    /// the bar scrolling (`tab_scroll::drag_due`); any other way the drag
+    /// ended drops the hold.
+    fn scroll_dragged_tab(&mut self) {
+        let dragging = self
+            .tab_drag
+            .as_ref()
+            .is_some_and(|d| d.started && d.origin_kind == crate::tab_drag::DragFrom::Bar);
+        if !dragging || crate::tab_column::area().is_some() {
+            crate::tab_scroll::drag_end();
+            return;
+        }
+        // The marker and the dimmed source follow the last painted frame,
+        // which a scroll step changed under a pointer that did not move.
+        if let Some(drag) = self.tab_drag.as_mut() {
+            drag.source_rect = self
+                .tab_hits
+                .iter()
+                .find(|h| h.index == drag.from)
+                .map(|h| h.tab);
+            let at = drag.at;
+            crate::tab_drag::update_bar_target(
+                drag,
+                &self.tab_hits,
+                self.repo_tabs.len(),
+                at,
+                false,
+            );
+        }
+        if crate::tab_scroll::drag_due(std::time::Instant::now()) {
+            self.redraw.input_handled = true;
         }
     }
 

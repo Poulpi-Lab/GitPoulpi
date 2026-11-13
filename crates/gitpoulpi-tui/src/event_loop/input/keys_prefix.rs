@@ -580,6 +580,10 @@ pub(super) fn navigation(cx: &mut CommandCtx<'_>, key: KeyEvent) -> io::Result<F
                         }
                     }
                 }
+                // The tab bar's scroll arrow: one tab, as its click does.
+                Some(FocusTarget::TabScroll(right)) => {
+                    crate::tab_scroll::scroll_by(if right { 1 } else { -1 });
+                }
                 // Answered above, before the window's own targets.
                 Some(FocusTarget::Dialog(..) | FocusTarget::Activity(..)) => {}
                 // No sub-pane wears this badge right now (mistyped, or the badges shifted

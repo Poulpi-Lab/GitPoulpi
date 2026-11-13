@@ -293,7 +293,20 @@ pub(in crate::event_loop) fn draw_chrome(
             None => tab_row,
         }
     };
+    // The horizontal bar's scroll: the active tab is brought into view when
+    // it, the number of tabs or the bar's width changed (`tab_scroll`).
+    let (scroll_offset, scroll_follow) = crate::tab_scroll::scroll_for_draw(
+        (!column && management.is_none()).then_some(active_tab),
+        repo_tabs.len(),
+        tabs_area.width,
+    );
     let slot = repo_switcher::NewTabSlot {
+        scroll: repo_switcher::BarScroll {
+            offset: scroll_offset,
+            follow: scroll_follow,
+            left_hovered: hover(hovered_target).tab_scroll_left(),
+            right_hovered: hover(hovered_target).tab_scroll_right(),
+        },
         open: management.as_ref().is_some_and(|m| m.new_tab),
         plus_hovered: hover(hovered_target).new_tab(),
         more_hovered: hover(hovered_target).tab_overflow(),
@@ -409,6 +422,23 @@ pub(in crate::event_loop) fn draw_chrome(
     }
     if let Some(more) = bar.more {
         frame_hits.push((more, HitTarget::TabOverflow));
+    }
+    // The scroll arrows: registered (and auto-repeating while held) only
+    // while there are tabs to show on their side.
+    let live = |a: Option<repo_switcher::ScrollArrow>| a.filter(|a| a.enabled).map(|a| a.rect);
+    let (left, right) = (live(bar.scroll_left), live(bar.scroll_right));
+    if let Some(rect) = left {
+        frame_hits.push((rect, HitTarget::TabScrollLeft));
+        crate::scrollbar::note_repeat_button(rect, crate::tab_scroll::LEFT_GLYPH);
+    }
+    if let Some(rect) = right {
+        frame_hits.push((rect, HitTarget::TabScrollRight));
+        crate::scrollbar::note_repeat_button(rect, crate::tab_scroll::RIGHT_GLYPH);
+    }
+    if !column {
+        crate::tab_scroll::store(bar.offset, Some(tabs_area), left, right);
+    } else {
+        crate::tab_scroll::store(0, None, None, None);
     }
     if let Some(chip) = bar.chip {
         frame_hits.push((chip, HitTarget::WorkspaceChip));

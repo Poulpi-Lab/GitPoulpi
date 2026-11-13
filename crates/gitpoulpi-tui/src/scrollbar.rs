@@ -362,14 +362,35 @@ thread_local! {
         const { std::cell::RefCell::new(Vec::new()) };
 }
 
+thread_local! {
+    /// Arrow buttons outside a scrollbar that repeat like its end arrows
+    /// while held (the tab bar's scroll arrows): each button's rect and the
+    /// glyph painted in its middle cell (cleared by [`begin_frame`]).
+    static REPEAT_BUTTONS: std::cell::RefCell<Vec<(ratatui::layout::Rect, &'static str)>> =
+        const { std::cell::RefCell::new(Vec::new()) };
+}
+
 /// Forgets last frame's arrow cells; called as a frame starts.
 pub(crate) fn begin_frame() {
     ARROW_CELLS.with(|c| c.borrow_mut().clear());
+    REPEAT_BUTTONS.with(|c| c.borrow_mut().clear());
 }
 
-/// Whether a scrollbar end arrow was painted at this cell.
+/// Registers an arrow button (painted this frame, `glyph` in its middle
+/// cell) whose held press auto-repeats like a scrollbar arrow.
+pub(crate) fn note_repeat_button(rect: ratatui::layout::Rect, glyph: &'static str) {
+    REPEAT_BUTTONS.with(|c| c.borrow_mut().push((rect, glyph)));
+}
+
+/// Whether a scrollbar end arrow (or a repeating arrow button) was painted
+/// at this cell.
 pub(crate) fn is_arrow_cell(col: u16, row: u16) -> bool {
     ARROW_CELLS.with(|c| c.borrow().contains(&(col, row)))
+        || REPEAT_BUTTONS.with(|c| {
+            c.borrow()
+                .iter()
+                .any(|(rect, _)| rect.contains((col, row).into()))
+        })
 }
 
 /// Keeps only the arrow cells still showing an arrow once the whole frame
@@ -384,6 +405,12 @@ pub(crate) fn retain_visible_arrows(buf: &ratatui::buffer::Buffer) {
                     "\u{2191}" | "\u{2193}" | "\u{2190}" | "\u{2192}"
                 )
             })
+        })
+    });
+    REPEAT_BUTTONS.with(|c| {
+        c.borrow_mut().retain(|(rect, glyph)| {
+            buf.cell((rect.x + rect.width / 2, rect.y))
+                .is_some_and(|cell| cell.symbol() == *glyph)
         })
     });
 }

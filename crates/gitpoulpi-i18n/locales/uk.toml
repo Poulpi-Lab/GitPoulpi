@@ -4164,6 +4164,8 @@ quit_cd = "Вийти, залишивши оболонку в папці ціє�
 repo_management = "Керування репозиторіями: відкрити, клонувати чи створити репозиторій"
 insert_issue_ref = "Вставити посилання на issue"
 tab_overflow = "Усі вкладки"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}: "

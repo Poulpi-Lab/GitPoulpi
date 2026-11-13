@@ -44,6 +44,12 @@ fn hover_style_for(target: &HitTarget) -> HoverKind {
         HitTarget::OpenRepositoryButton => Required("repo_switcher::tab_bar_with folder_hovered"),
         HitTarget::NewTabButton => Required("repo_switcher::tab_bar_with new_tab.plus_hovered"),
         HitTarget::TabOverflow => Required("repo_switcher::tab_bar_with new_tab.more_hovered"),
+        HitTarget::TabScrollLeft => {
+            Required("repo_switcher::tab_bar_with new_tab.scroll.left_hovered")
+        }
+        HitTarget::TabScrollRight => {
+            Required("repo_switcher::tab_bar_with new_tab.scroll.right_hovered")
+        }
         HitTarget::RadarTab => Required("repo_switcher::tab_bar_with new_tab.radar.hovered"),
         HitTarget::RadarClose => {
             Required("repo_switcher::tab_bar_with new_tab.radar.close_hovered")
@@ -345,6 +351,8 @@ fn every_toolbar_button_and_dropdown_has_a_tooltip() {
         HitTarget::OpenRepositoryButton,
         HitTarget::NewTabButton,
         HitTarget::TabOverflow,
+        HitTarget::TabScrollLeft,
+        HitTarget::TabScrollRight,
         HitTarget::RadarTab,
         HitTarget::RadarClose,
         HitTarget::NotesTab,
@@ -395,6 +403,8 @@ fn sample_hit_targets() -> Vec<HitTarget> {
         HitTarget::OpenRepositoryButton,
         HitTarget::NewTabButton,
         HitTarget::TabOverflow,
+        HitTarget::TabScrollLeft,
+        HitTarget::TabScrollRight,
         HitTarget::RadarTab,
         HitTarget::RadarClose,
         HitTarget::WorkspacesTab,

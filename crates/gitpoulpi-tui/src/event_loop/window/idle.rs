@@ -121,6 +121,7 @@ impl WindowState {
             self.next_fetch_deadline(),
             self.hosting.next_due(),
             self.arrow_repeat.next_deadline(),
+            crate::tab_scroll::drag_deadline(),
             self.reveal.next_deadline(),
             match &self.input_mode {
                 InputMode::WorkspaceSearch(s) => s.next_deadline(),

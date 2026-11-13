@@ -378,6 +378,18 @@ pub(in crate::event_loop) fn draw_overlays(frame: &mut Frame, ctx: &mut Overlays
                 pairs.push((rect, FocusTarget::Radar(spot)));
             }
         }
+        // The tab bar's enabled scroll arrows, from this frame's hit list.
+        // The badge is drawn one cell in, so the area starts on the gap
+        // before the arrow and the badge covers the arrow exactly.
+        for (rect, target) in frame_hits.iter() {
+            let right = match target {
+                HitTarget::TabScrollLeft => false,
+                HitTarget::TabScrollRight => true,
+                _ => continue,
+            };
+            let area = Rect::new(rect.x.saturating_sub(1), rect.y, rect.width + 1, 1);
+            pairs.push((area, FocusTarget::TabScroll(right)));
+        }
         let targets: Vec<FocusTarget> = pairs.iter().map(|(_, t)| *t).collect();
         let assigned = assign_navigation_badges(&targets);
         let badge_panes: Vec<(Rect, char)> = pairs

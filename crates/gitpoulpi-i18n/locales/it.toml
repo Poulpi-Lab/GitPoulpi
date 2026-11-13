@@ -4164,6 +4164,8 @@ quit_cd = "Esci, lasciando la shell nella cartella di questa scheda (richiede il
 repo_management = "Gestione repository: apri, clona o crea un repository"
 insert_issue_ref = "Inserisci un riferimento a una issue"
 tab_overflow = "Tutte le schede"
+tab_scroll_left = "Scroll the tabs left"
+tab_scroll_right = "Scroll the tabs right"
 
 [footer_hint]
 lead = "{key}: "

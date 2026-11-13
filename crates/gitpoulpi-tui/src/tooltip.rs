@@ -123,6 +123,8 @@ pub(crate) fn hint_for(target: &crate::chrome::HitTarget) -> Option<&'static str
         }
         H::NewTabButton => Some(msg::tooltip::NEW_TAB.get()),
         H::TabOverflow => Some(msg::tooltip::TAB_OVERFLOW.get()),
+        H::TabScrollLeft => Some(msg::tooltip::TAB_SCROLL_LEFT.get()),
+        H::TabScrollRight => Some(msg::tooltip::TAB_SCROLL_RIGHT.get()),
         H::RadarTab => Some(msg::tooltip::RADAR_TAB.get()),
         H::RadarClose => Some(msg::tooltip::RADAR_CLOSE.get()),
         H::NotesTab | H::NotesClose => Some(gitpoulpi_i18n::msg::updates::TAB_CLOSE_TIP.get()),

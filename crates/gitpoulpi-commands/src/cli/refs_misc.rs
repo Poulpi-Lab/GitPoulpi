@@ -676,7 +676,7 @@ pub enum FolderMenuAction {
     /// Adds the entry to every file manager found here (a foreign file is
     /// never overwritten).
     Install,
-    /// Removes exactly what Install wrote, from every file manager.
+    /// Removes exactly what `install` wrote, from every file manager.
     Remove,
 }
 

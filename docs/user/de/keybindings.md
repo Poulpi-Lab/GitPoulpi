@@ -505,7 +505,7 @@ die Standardtasten.
 | Commit-Details: Nachrichtengröße zurücksetzen |  |
 | Commit-Details: Nachricht nach unten scrollen |  |
 | Commit-Details: Nachricht nach oben scrollen |  |
-| Commit Details: Open Link in Message... |  |
+| Commit-Details: Link in Nachricht öffnen... |  |
 | Dateien: Sortierung der Commit-Dateien umschalten (A-Z / Z-A) |  |
 | Refs: Ausgewählte Ref auschecken | `Doppelklick` |
 | Refs: Ref-Namen kopieren |  |
@@ -1189,8 +1189,8 @@ die Standardtasten.
 | Starter: Befehlsalias entfernen |  |
 | Starter: Zum PATH hinzufügen |  |
 | Starter: Aus dem PATH entfernen |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| Starter: Menü „In GitPoulpi öffnen“ installieren |  |
+| Starter: Menü „In GitPoulpi öffnen“ entfernen |  |
 | App: Farbschema des Graphen wechseln... | `Ctrl+N Y` |
 | App: Zeilenfärbung des Graphen umschalten | `Ctrl+N T` |
 <!-- palette:end -->

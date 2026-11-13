@@ -579,7 +579,8 @@ fn the_search_button_drops_its_label_then_gives_way_before_the_gear() {
 fn the_about_button_emoji_label_is_filled_on_hover_across_all_its_cells() {
     let width = display_width(ABOUT_LABEL) as u16;
     for hovered in [false, true] {
-        let mut terminal = ratatui::Terminal::new(ratatui::backend::TestBackend::new(12, 1)).unwrap();
+        let mut terminal =
+            ratatui::Terminal::new(ratatui::backend::TestBackend::new(12, 1)).unwrap();
         terminal
             .draw(|frame| {
                 let mut hits = Vec::new();

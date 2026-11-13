@@ -68,6 +68,19 @@ ouvert. Le `x` qui ferme un onglet n'apparaît que sur l'onglet actif et sur cel
 sous le pointeur. La ligne d'onglets ne porte que des onglets (le bouton de
 [recherche globale](search.md) est dans la barre de titre).
 
+Quand les onglets des dépôts ne tiennent pas, la ligne défile au lieu de les
+rétrécir : les onglets sont entre deux boutons fléchés, `‹` à gauche et `›` à droite.
+Une flèche est grisée quand aucun onglet n'est caché de son côté. Cliquez sur une
+flèche pour montrer un onglet de plus de ce côté (maintenez-la pour continuer à
+faire défiler), ou utilisez la molette sur la ligne (vers le haut ou la gauche pour
+les onglets précédents). Chaque fois que l'onglet actif change (vous changez d'onglet
+au clavier, par le sélecteur d'onglets ou la palette, ouvrez ou fermez un onglet,
+ou redimensionnez la fenêtre), la ligne défile juste assez pour le montrer en entier.
+Si la place le permet, un bouton `…` après la flèche droite ouvre le sélecteur
+d'onglets. Faire glisser un onglet sur une flèche fait défiler la ligne tant que vous
+y restez, pour le déposer au-delà des onglets visibles. `Ctrl+N` affiche un badge sur
+chaque flèche active.
+
 **Paramètres > Apparence > Position de la barre d'onglets** déplace cette ligne en bas de la fenêtre (sous la ligne d'état) ou en fait une colonne au bord gauche : un onglet par ligne, Accueil d'abord, puis la pastille d'espace de travail, le Radar, l'onglet Espaces de travail, les onglets (un nom long finit par `…`) et le `+`. Quand les onglets dépassent les lignes, une ligne `…` indique combien sont cachés au-dessus (`▲`) et en dessous (`▼`) et ouvre la liste des onglets ; la molette fait défiler la colonne. À côté d'une barre d'outils en colonne, les onglets restent à l'extérieur. Une fenêtre de moins de 80 colonnes garde les onglets en haut. Clics, croix de fermeture, clic du milieu, menu du clic droit, glisser pour réordonner et clavier marchent de la même façon à chaque position.
 
 - Le **+** juste après le dernier onglet ouvre un petit menu : **Nouvel onglet**
@@ -283,6 +296,18 @@ Sur une fenêtre basse, le message cède d'abord (jusqu'à une ligne), puis la l
 La vue des modifications en cours garde sa ligne **Chemins** / **Arbre** /
 **Tous les fichiers** en haut des listes de fichiers, au-dessus des listes
 Non indexés et Indexés.
+
+**Liens dans un message.** Une adresse web saisie dans le message (`https://...`, ou la
+cible d'un `[texte](https://...)` markdown) est soulignée, affiche le pointeur en main
+et, au clic, demande **Ouvrir ce lien ?** avec l'adresse entière avant que
+quoi que ce soit s'ouvre : le texte d'un message n'est pas fiable. **Ouvrir** (`O`)
+lance le navigateur, **Annuler** (`A`, `Esc`, la croix) ne fait rien. Seules les adresses
+`http` et `https` sont proposées. L'équivalent clavier est la commande de palette
+`Détails du commit : Ouvrir un lien du message...`, qui interroge sur la première
+adresse du message et passe aux suivantes avec **Suivant** (`S`).
+Certains terminaux soulignent eux-mêmes une adresse sous le pointeur et l'ouvrent
+d'un clic avec modificateur (souvent Shift+clic) ; c'est une fonction du
+terminal, pas de GitPoulpi.
 
 Chaque liste de fichiers a des menus sur les fichiers, les dossiers et la partie vide, et plusieurs fichiers peuvent être sélectionnés à la fois (**Ctrl+clic**, **Shift+clic**) ; voir [Stage et commit](staging-and-committing.md).
 

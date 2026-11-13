@@ -211,7 +211,8 @@ fait. Suivez ensuite [Premiers pas](getting-started.md).
 ## Désinstaller
 
 `gitpoulpi uninstall` (ce que lancent les deux installateurs) supprime les alias
-de commande, les entrées du PATH et les raccourcis créés par GitPoulpi, puis les
+de commande, les entrées du PATH, les raccourcis et les entrées du menu du gestionnaire
+de fichiers (avec leur clé App Paths sous Windows) créés par GitPoulpi, puis les
 fichiers du programme d'une installation depuis une version publiée ; il refuse
 de s'exécuter sur un build sans le marqueur `.gitpoulpi-dist` (un build cargo), et
 `--keep-files` laisse les fichiers du programme. Il est indisponible pour les

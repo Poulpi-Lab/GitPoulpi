@@ -133,6 +133,7 @@ GitPoulpi mémorise chaque taille. Voir
   actif et sur celui qui est sous le pointeur) pour le fermer. **Faites glisser un onglet**
   sur le côté pour le réordonner. **Clic droit sur un onglet** pour le menu de l'onglet.
 - **Clic du milieu sur un onglet** pour le fermer, comme son `x`.
+- **Cliquez sur `‹` ou `›`** aux extrémités des onglets (affichés quand ils ne tiennent pas tous) pour faire défiler la ligne d'un onglet ; maintenez le bouton pour continuer, ou utilisez la molette sur la ligne. Faire glisser un onglet sur une flèche fait aussi défiler la ligne. La ligne défile aussi toute seule pour montrer l'onglet actif chaque fois qu'il change.
 - **Cliquez sur le `+`** après le dernier onglet pour un menu : Nouvel onglet (`Alt+T`) et, tant que leurs onglets sont fermés, Radar et Espaces de travail (`Alt+J`).
 - **Cliquez sur l'icône de maison** pour l'onglet Accueil.
 - **Cliquez sur l'onglet Radar ou Espaces de travail** pour l'ouvrir ; son `x`, un clic du milieu ou `Ctrl+W` le ferme. **Cliquez sur la pastille d'espace de travail** (`Alt+W`) pour changer d'espace de travail.

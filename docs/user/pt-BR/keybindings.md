@@ -508,7 +508,7 @@ As teclas são as padrão.
 | Detalhes do commit: redefinir o tamanho da mensagem |  |
 | Detalhes do commit: rolar a mensagem para baixo |  |
 | Detalhes do commit: rolar a mensagem para cima |  |
-| Commit Details: Open Link in Message... |  |
+| Detalhes do commit: abrir link na mensagem... |  |
 | Arquivos: alternar a ordem dos arquivos do commit (A-Z / Z-A) |  |
 | Refs: checkout da ref selecionada | `clique duplo` |
 | Refs: copiar nome da ref |  |
@@ -1192,8 +1192,8 @@ As teclas são as padrão.
 | Lançador: remover alias de comando |  |
 | Lançador: adicionar ao PATH |  |
 | Lançador: remover do PATH |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| Lançador: instalar o menu Abrir no GitPoulpi |  |
+| Lançador: remover o menu Abrir no GitPoulpi |  |
 | App: mudar tema de cores do grafo... | `Ctrl+N Y` |
 | App: alternar tom das linhas do grafo | `Ctrl+N T` |
 <!-- palette:end -->

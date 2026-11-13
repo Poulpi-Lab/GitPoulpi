@@ -476,7 +476,7 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Commit 详情：重置消息区大小 |  |
 | Commit 详情：消息向下滚动 |  |
 | Commit 详情：消息向上滚动 |  |
-| Commit Details: Open Link in Message... |  |
+| Commit 详情：打开消息中的链接… |  |
 | 文件：切换 commit 文件排序（A-Z / Z-A） |  |
 | 引用：检出所选引用 | `双击` |
 | 引用：复制引用名称 |  |
@@ -1160,8 +1160,8 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | 启动器：移除命令别名 |  |
 | 启动器：添加到 PATH |  |
 | 启动器：从 PATH 中移除 |  |
-| Launcher: Install Open in GitPoulpi Menu |  |
-| Launcher: Remove Open in GitPoulpi Menu |  |
+| 启动器：安装“在 GitPoulpi 中打开”菜单 |  |
+| 启动器：移除“在 GitPoulpi 中打开”菜单 |  |
 | 应用：更改图配色主题… | `Ctrl+N Y` |
 | 应用：切换图行着色 | `Ctrl+N T` |
 <!-- palette:end -->

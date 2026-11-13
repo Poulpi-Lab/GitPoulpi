@@ -170,15 +170,16 @@ l'autre.
 - **Ignorer les hooks** (`Shift+H`, ou **Commit : Basculer Ignorer les hooks** dans la palette) commite
   sans exécuter les hooks `pre-commit` et `commit-msg` du dépôt. Le choix vaut pour un seul commit ;
   **Paramètres > Paramètres du dépôt > Commit** permet de la cocher au départ. Affichée quand la ligne a la place.
-- `Ctrl+G c` ou `c` dans le volet Status place le curseur dans le formulaire. `Esc`
-  le quitte.
-- `Ctrl+G Enter` (**Git : Commiter le stage maintenant** dans la
-  palette) est le bouton de commit depuis n'importe où : il commite les
-  modifications stagées avec le message du formulaire, en respectant
-  **Amender le commit précédent** et **Ignorer les hooks**, sans déplacer le
-  focus. Sans rien de stagé, ou sans résumé, il le dit et place le curseur dans
-  le résumé.
-  Tant qu'une requête IA est en cours, il ne commite rien et le signale
+- `c` dans le volet Status place le curseur dans le formulaire. `Esc` le quitte.
+- `Ctrl+G c` et `Ctrl+G Enter` (**Git : Commiter...** et **Git : Commiter le stage
+  maintenant** dans la palette) forment une seule commande, le bouton de commit
+  depuis n'importe où. Avec un résumé dans le formulaire et quelque chose de stagé,
+  elle commite aussitôt, en respectant **Amender le commit précédent** et
+  **Ignorer les hooks**, sans déplacer le focus. Sinon elle ne commite rien : elle
+  place le curseur dans le résumé du formulaire (en affichant le volet s'il était
+  masqué ou replié) et la ligne d'état indique quel raccourci commite (`Ctrl+Enter`
+  par défaut). Sans rien de stagé, elle le dit. Rien ne se saisit dans la ligne
+  d'état. Tant qu'une requête IA est en cours, elle ne commite rien et le signale
   (`Esc` annule la requête). `Ctrl+Z` annule le commit comme n'importe quel autre.
 - Par dépôt, les [Paramètres](settings.md#propre-au-dépôt-commit) peuvent **pousser après chaque commit**, faire
   démarrer le formulaire avec un **modèle de commit** (et retirer ses commentaires `#` du message) et rendre un merge

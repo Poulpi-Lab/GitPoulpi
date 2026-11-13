@@ -104,7 +104,7 @@ sha court). Les hunks et les lignes sont numérotés comme les numérote
 |---|---|
 | `stage --file F \| --folder D \| --all [--hunk N [--lines a,b]] [--allow-sensitive]` | Stager un fichier, un dossier, tout, un hunk ou quelques lignes. Un stage de fichier, de dossier ou de `--all` qui ajouterait un fichier sensible (une clé privée, un `.env`, un jeton reconnu : `[privacy]` dans la [référence de configuration](config-reference.md#privacy-fichiers-sensibles)) est refusé avec le code de sortie 2 et `{error: "sensitive_files", files: [{path, reason}]}` (une règle et un aperçu masqué, jamais une valeur) ; rien n'est stagé. `--allow-sensitive` les stage quand même. |
 | `unstage` (mêmes options) | L'inverse. |
-| `discard --file F [--hunk N [--lines a,b]]` | Jeter les modifications non stagées (un fichier entier : chaque modification, fichier non suivi supprimé). Annulable. |
+| `discard --file F [--hunk N [--lines a,b]]` | Jeter les modifications non stagées (un fichier entier : chaque modification, fichier non suivi supprimé, ainsi que les dossiers qu'il laisse vides). Annulable. |
 | `rm-file <paths>...` | Supprimer des fichiers de l'arbre de travail. Annulable. |
 | `ignore <pattern> [--file <.gitignore>]` | Ajouter un motif à un `.gitignore` (ou à `.git/info/exclude` avec `--file .git/info/exclude`). Annulable, sauf dans `.git/info/exclude`. |
 | `convert <paths>... (--encoding <name> \| --eol lf\|crlf\|cr \| --indent spaces:<n>\|tabs:<n>)` | Réécrire l'encodage, les fins de ligne ou l'indentation de fichiers de l'arbre de travail. Les fichiers binaires, absents ou non encodables sont ignorés et signalés. Une seule entrée d'annulation pour tout le lot. |

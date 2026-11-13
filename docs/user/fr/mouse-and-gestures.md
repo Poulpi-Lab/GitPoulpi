@@ -347,7 +347,7 @@ Voir [Stage et commit](staging-and-committing.md).
 - **Cliquez sur la minimap** pour déplacer la vue à cette ligne. Maintenez le bouton
   enfoncé et déplacez pour défiler.
 
-Chaque abandon demande d'abord confirmation.
+Chaque abandon demande d'abord confirmation. Quand un abandon supprime des fichiers non suivis, les dossiers qui deviennent entièrement vides disparaissent avec eux (jamais un dossier qui contient encore un fichier suivi, ignoré ou caché, ni un dossier déjà vide) ; Annuler restitue les fichiers avec leurs dossiers.
 
 ### Blame et historique du fichier
 

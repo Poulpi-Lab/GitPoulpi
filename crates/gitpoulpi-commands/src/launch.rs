@@ -141,6 +141,38 @@ pub fn split_new_window(args: &[String]) -> (bool, &[String]) {
     }
 }
 
+/// What `gitpoulpi-launch` was asked to do.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LaunchArgs {
+    /// `-- <command>...`: raise a window or run the command.
+    Command(Vec<String>),
+    /// `--folder DIR`: open the folder.
+    Folder(std::path::PathBuf),
+    /// No arguments (Explorer's address bar): open the working folder.
+    Nothing,
+}
+
+/// For `gitpoulpi-launch`, which has no argument parser: `--new-window`, then
+/// `--folder DIR` / `--folder=DIR`, or `[--] <command>...`, or nothing. The
+/// folder goes through `normalize_folder_arg` (Explorer's `"%V"` on a drive
+/// root arrives as `C:"`).
+pub fn split_launch_args(args: &[String]) -> (bool, LaunchArgs) {
+    let (new_window, rest) = split_new_window(args);
+    let normalize = gitpoulpi_config::desktop::terminals::normalize_folder_arg;
+    let parsed = match rest.split_first() {
+        None => LaunchArgs::Nothing,
+        Some((first, tail)) if first == "--folder" => match tail.first() {
+            Some(dir) => LaunchArgs::Folder(normalize(dir)),
+            None => LaunchArgs::Nothing,
+        },
+        Some((first, _)) if first.starts_with("--folder=") => {
+            LaunchArgs::Folder(normalize(&first["--folder=".len()..]))
+        }
+        _ => LaunchArgs::Command(command_of(rest)),
+    };
+    (new_window, parsed)
+}
+
 /// `ui.reuse_window` from the resolved config; on, when it cannot be read.
 fn reuse_window_setting(config: Option<&gitpoulpi_config::Config>) -> bool {
     config.is_none_or(|c| c.ui.reuse_window)
@@ -226,15 +258,25 @@ pub fn spawn_detached(command: &[String]) -> Result<(), String> {
 /// What happened, for the JSON line and the exit code.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Outcome {
-    Raised { session: String, viewer: String },
-    Started { reason: StartReason },
+    Raised {
+        session: String,
+        viewer: String,
+    },
+    /// `--folder`: the folder's repository was opened as a tab of an open window.
+    Joined {
+        session: String,
+        repo: String,
+    },
+    Started {
+        reason: StartReason,
+    },
     Failed(String),
 }
 
 impl Outcome {
     pub fn exit_code(&self) -> i32 {
         match self {
-            Outcome::Raised { .. } | Outcome::Started { .. } => 0,
+            Outcome::Raised { .. } | Outcome::Joined { .. } | Outcome::Started { .. } => 0,
             Outcome::Failed(_) => 1,
         }
     }
@@ -243,6 +285,9 @@ impl Outcome {
         match self {
             Outcome::Raised { session, viewer } => {
                 json!({ "action": "raised", "session": session, "viewer": viewer })
+            }
+            Outcome::Joined { session, repo } => {
+                json!({ "action": "joined", "session": session, "repo": repo })
             }
             Outcome::Started { reason } => {
                 json!({ "action": "started", "reason": reason.as_str(), "command": command })
@@ -281,6 +326,70 @@ pub async fn launch(command: &[String], reuse: bool, new_window: bool) -> Outcom
     start(command, reason.unwrap_or(StartReason::NoWindow))
 }
 
+/// Which session gets a folder: the one whose window gained focus last (a
+/// click never asks which of several to use). Ties keep the first.
+pub fn pick_candidate(candidates: &[gitpoulpi_daemon::join::Candidate]) -> Option<usize> {
+    let mut best: Option<(usize, i64)> = None;
+    for (i, c) in candidates.iter().enumerate() {
+        let focus = c
+            .viewers
+            .iter()
+            .map(|v| v.last_focus_at.unwrap_or(0))
+            .max()
+            .unwrap_or(0);
+        if best.is_none_or(|(_, b)| focus > b) {
+            best = Some((i, focus));
+        }
+    }
+    best.map(|(i, _)| i)
+}
+
+/// A folder entry of a file manager (`launch --folder DIR`): when `reuse` and a
+/// window is open and the folder is inside a repository, that repository
+/// becomes a tab of the most recently focused window, which is raised, with no
+/// question asked. Otherwise (or when that fails) `start_command` runs: the
+/// terminal command, built at click time, that opens the folder.
+pub async fn launch_folder(
+    folder: &std::path::Path,
+    reuse: bool,
+    new_window: bool,
+    start_command: &[String],
+) -> Outcome {
+    if reuse && !new_window {
+        let found = gitpoulpi_daemon::join::scan_sessions_within(None, PROBE_TIMEOUT).await;
+        let candidates = gitpoulpi_daemon::join::candidates(found);
+        if let (Some(i), Ok(repo)) = (
+            pick_candidate(&candidates),
+            gitpoulpi_daemon::join::resolve_repo(Some(folder)),
+        ) {
+            if let Ok(joined) =
+                gitpoulpi_daemon::join::join_session(&candidates[i], &repo, true).await
+            {
+                use gitpoulpi_ipc::ui::UiOutcome;
+                if matches!(
+                    joined.outcome,
+                    UiOutcome::Applied { .. }
+                        | UiOutcome::Partial { .. }
+                        | UiOutcome::Deferred { .. }
+                ) {
+                    return Outcome::Joined {
+                        session: joined.session,
+                        repo: gitpoulpi_daemon::join::repo_name(&joined.repo),
+                    };
+                }
+            }
+        }
+    }
+    let reason = if new_window {
+        StartReason::NewWindow
+    } else if !reuse {
+        StartReason::Disabled
+    } else {
+        StartReason::NoWindow
+    };
+    start(start_command, reason)
+}
+
 fn start(command: &[String], reason: StartReason) -> Outcome {
     match spawn_detached(command) {
         Ok(()) => Outcome::Started { reason },
@@ -317,6 +426,57 @@ pub fn run(args: &[String], json: bool, quiet: bool, new_window: bool) -> i32 {
     outcome.exit_code()
 }
 
+/// The entry point of `gitpoulpi launch --folder DIR` and of
+/// `gitpoulpi-launch` with a folder (or, with `folder: None`, started by
+/// Explorer's address bar with no folder to open: a plain launcher start).
+/// `build` makes the terminal command at click time (`None`: no folder).
+pub fn run_folder(
+    folder: Option<&std::path::Path>,
+    json: bool,
+    quiet: bool,
+    new_window: bool,
+    build: &dyn Fn(Option<&std::path::Path>) -> Result<Vec<String>, String>,
+) -> i32 {
+    let new_window = shift_held() || new_window;
+    let this_exe = std::env::current_exe().unwrap_or_default();
+    let config = resolved_config();
+    let folder = folder.map(|f| {
+        if f.is_absolute() {
+            f.to_path_buf()
+        } else {
+            std::env::current_dir()
+                .map(|c| c.join(f))
+                .unwrap_or_else(|_| f.to_path_buf())
+        }
+    });
+    let command = match build(folder.as_deref()) {
+        Ok(c) => command_for_click(config.as_ref(), &this_exe, c),
+        Err(e) => {
+            report(&Outcome::Failed(e), &[], json, quiet);
+            return 1;
+        }
+    };
+    let runtime = match tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+    {
+        Ok(rt) => rt,
+        Err(e) => {
+            report(&Outcome::Failed(e.to_string()), &command, json, quiet);
+            return 1;
+        }
+    };
+    let reuse = reuse_window_setting(config.as_ref());
+    let outcome = runtime.block_on(async {
+        match &folder {
+            Some(f) => launch_folder(f, reuse, new_window, &command).await,
+            None => launch(&command, reuse, new_window).await,
+        }
+    });
+    report(&outcome, &command, json, quiet);
+    outcome.exit_code()
+}
+
 fn report(outcome: &Outcome, command: &[String], json: bool, quiet: bool) {
     if quiet {
         return;
@@ -327,6 +487,9 @@ fn report(outcome: &Outcome, command: &[String], json: bool, quiet: bool) {
     }
     match outcome {
         Outcome::Raised { session, .. } => println!("showed the open window (session {session})"),
+        Outcome::Joined { session, repo } => {
+            println!("opened {repo} as a tab of the open window (session {session})")
+        }
         Outcome::Started { reason } => println!("started a new window ({})", reason.as_str()),
         Outcome::Failed(message) => eprintln!("gitpoulpi launch: {message}"),
     }
@@ -504,5 +667,89 @@ mod tests {
         assert!(spawn_detached(&[]).is_err());
         let missing = vec!["/nonexistent/gitpoulpi-test-program".to_string()];
         assert!(spawn_detached(&missing).is_err());
+    }
+
+    #[test]
+    fn launch_args_split_into_folder_command_or_nothing() {
+        let words = |a: &[&str]| a.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        assert_eq!(
+            split_launch_args(&words(&["--new-window", "--folder", "/a/b"])),
+            (true, LaunchArgs::Folder("/a/b".into()))
+        );
+        assert_eq!(
+            split_launch_args(&words(&["--folder=/a b"])),
+            (false, LaunchArgs::Folder("/a b".into()))
+        );
+        // Explorer's drive root.
+        assert_eq!(
+            split_launch_args(&words(&["--folder", "C:\""])),
+            (false, LaunchArgs::Folder("C:\\".into()))
+        );
+        assert_eq!(split_launch_args(&[]), (false, LaunchArgs::Nothing));
+        assert_eq!(
+            split_launch_args(&words(&["--new-window"])),
+            (true, LaunchArgs::Nothing)
+        );
+        assert_eq!(
+            split_launch_args(&words(&["--", "wt.exe", "--folder", "x"])),
+            (
+                false,
+                LaunchArgs::Command(words(&["wt.exe", "--folder", "x"]))
+            )
+        );
+    }
+
+    fn candidate(session: &str, focus: &[Option<i64>]) -> gitpoulpi_daemon::join::Candidate {
+        gitpoulpi_daemon::join::Candidate {
+            session: session.into(),
+            port: 1,
+            token: None,
+            viewers: focus
+                .iter()
+                .map(|f| window(session, "v", *f).viewer)
+                .collect(),
+        }
+    }
+
+    #[test]
+    fn a_folder_goes_to_the_session_focused_last() {
+        let all = [
+            candidate("a", &[Some(100), Some(50)]),
+            candidate("b", &[Some(300)]),
+            candidate("c", &[None]),
+        ];
+        assert_eq!(pick_candidate(&all), Some(1));
+        let ties = [candidate("a", &[None]), candidate("b", &[None])];
+        assert_eq!(pick_candidate(&ties), Some(0));
+        assert_eq!(pick_candidate(&[]), None);
+    }
+
+    #[test]
+    fn a_joined_folder_reports_json_and_exits_zero() {
+        let o = Outcome::Joined {
+            session: "s".into(),
+            repo: "proj".into(),
+        };
+        assert_eq!(
+            o.to_json(&[]),
+            json!({"action": "joined", "session": "s", "repo": "proj"})
+        );
+        assert_eq!(o.exit_code(), 0);
+    }
+
+    #[test]
+    fn a_folder_with_reuse_off_starts_the_command() {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        let missing = vec!["/nonexistent/gitpoulpi-test-program".to_string()];
+        let out = rt.block_on(launch_folder(
+            std::path::Path::new("/tmp"),
+            false,
+            false,
+            &missing,
+        ));
+        assert!(matches!(out, Outcome::Failed(_)), "{out:?}");
     }
 }

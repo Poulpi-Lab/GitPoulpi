@@ -35,7 +35,7 @@ A repository can also give every new branch the same extra targets: **Settings >
   - `Push to <remote> only`, one per remote of the branch
   - `Push to selected remotes...`: always there, for any branch, even one with a single remote
   - `Remotes of <branch>...`
-- The branch's right-click menu and the palette (`Git: Push to All Targets`, `Git: Push to One Remote...`, `Git: Push to Selected Remotes...`) offer the same actions with the same names.
+- The branch's right-click menu and the palette (`Git: Push to All Targets`, `Git: Push to Remote...`, `Git: Push to Selected Remotes...`) offer the same actions with the same names.
 
 **Push to selected remotes...** opens a list of every remote of the repository, ticked with the branch's upstream and targets. It is for this push only; tick **Remember for this branch** to store the choice as the branch's push targets.
 

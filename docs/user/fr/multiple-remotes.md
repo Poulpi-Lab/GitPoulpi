@@ -35,7 +35,7 @@ Un dépôt peut aussi donner les mêmes cibles supplémentaires à chaque nouvel
   - `Push vers <distant> seulement`, un par distant de la branche
   - `Push vers des distants choisis...` : toujours présent, pour toute branche, même avec un seul distant
   - `Distants de <branche>...`
-- Le menu du clic droit de la branche et la palette (`Git : Push vers toutes les cibles`, `Git : Push vers un seul distant...`, `Git : Push vers des distants choisis...`) proposent les mêmes actions sous les mêmes noms.
+- Le menu du clic droit de la branche et la palette (`Git : Push vers toutes les cibles`, `Git : Push vers un distant...`, `Git : Push vers des distants choisis...`) proposent les mêmes actions sous les mêmes noms.
 
 **Push vers des distants choisis...** ouvre la liste de tous les distants du dépôt, cochés d'après l'amont et les cibles de la branche. Elle ne vaut que pour ce push ; cochez **Mémoriser pour cette branche** pour enregistrer le choix comme cibles de push de la branche.
 

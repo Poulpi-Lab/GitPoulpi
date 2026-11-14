@@ -176,7 +176,9 @@ e clique em um botão ou caixa de seleção para usá-lo.
 
 - **Clique** em uma linha para selecioná-la. **Clique duplo** em uma branch local ou
   uma tag para fazer checkout dela. **Clique duplo** em um worktree ou submódulo
-  para abri-lo em uma aba.
+  para abri-lo em uma aba. O **+** no cabeçalho WORKTREES cria um worktree; clique com
+  o botão direito em um worktree para Abrir em uma nova aba, Abrir em, Mesclar e Remover
+  ([Worktrees](worktrees.md)).
 - **Passe o mouse** sobre uma linha para mostrar o ícone à esquerda dela. **Clique**
   nele para ocultar a ref no Log, ou para mostrá-la de novo. Enquanto o **Solo**
   está ativado, o mesmo lugar faz solo da ref. Em uma linha de pasta, o ícone age em

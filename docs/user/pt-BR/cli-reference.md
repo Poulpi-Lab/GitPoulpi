@@ -156,6 +156,8 @@ numera.
 | `tag fetch <name> [--remote R]` | Faz fetch de uma tag de um remoto (por padrão, o que a tem), por exemplo uma tag com `where: remote`. Nunca sobrescreve uma tag local em outro commit. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags em um remoto (sem nomes: toda tag que nenhum remoto tem). Excluir uma em um remoto pode ser desfeito (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Worktrees vinculados. |
+| `worktree changes <path>` | As alterações pendentes de um worktree (`path`, `untracked`); vazio quando está limpo. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Remove um worktree vinculado. Um com alterações pendentes é recusado, a menos que haja `--force` (elas se perdem), `--commit-message` (faz commit delas na branch dele antes) ou `--stash-message` (faz stash delas, inclusive as não rastreadas, antes). `--delete-branch` também exclui a branch dele (registrado no diário). A remoção em si não pode ser desfeita. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submódulos ([Submódulos](submodules.md)). |
 
 `--autostash` faz stash das alterações locais que bloqueiam a operação, executa-a

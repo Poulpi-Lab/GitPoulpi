@@ -102,6 +102,12 @@ pub struct RepoPreferences {
     /// The named list (`[conflict_prevention.lists.<name>]`) this repository
     /// follows when `conflict_base_source` is `list`.
     pub conflict_base_list: Option<String>,
+    /// Git page: remotes a new branch also pushes to, besides its upstream
+    /// ("Extra push targets for new branches"). Copied into the branch's own
+    /// `gitpoulpi-push-to` keys when it first gets an upstream; the branch
+    /// keys stay the only thing a push reads.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub default_push_targets: Vec<String>,
     /// The commit identity profile (`[[profiles]]` id) this repository uses;
     /// `None` inherits `general.active_profile`. Chosen from the toolbar's
     /// profile combobox, so it is never mirrored into the Settings screen.
@@ -946,6 +952,21 @@ stash_message = \"builtin:stash_message\"
             Some(expected)
         );
         assert!(reloaded.preferences.ai_presets.is_empty());
+    }
+
+    #[test]
+    fn default_push_targets_round_trip_and_an_empty_list_is_not_written() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("repo-state.toml");
+        let mut state = RepoState::default();
+        state.save(&path).unwrap();
+        assert!(!std::fs::read_to_string(&path)
+            .unwrap()
+            .contains("default_push_targets"));
+        state.preferences.default_push_targets = vec!["gitlab".into(), "backup".into()];
+        state.save(&path).unwrap();
+        let back = RepoState::load(&path).unwrap();
+        assert_eq!(back.preferences.default_push_targets, ["gitlab", "backup"]);
     }
 
     #[test]

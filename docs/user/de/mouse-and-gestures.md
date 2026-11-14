@@ -171,7 +171,9 @@ benutzen.
 
 - **Klicken** Sie auf eine Zeile, um sie auszuwählen. **Doppelklicken** Sie auf einen
   lokalen Branch oder Tag, um ihn auszuchecken. **Doppelklicken** Sie auf einen Worktree
-  oder ein Submodul, um es in einem Tab zu öffnen.
+  oder ein Submodul, um es in einem Tab zu öffnen. Das **+** in der Überschrift von
+  WORKTREES erstellt einen Worktree; Rechtsklick auf einen Worktree bietet In neuem Tab
+  öffnen, Öffnen in, Merge und Entfernen ([Worktrees](worktrees.md)).
 - **Fahren Sie über** eine Zeile, um das Symbol links davon zu zeigen. **Klicken Sie**
   darauf, um die Ref im Log auszublenden oder wieder zu zeigen. Ist **Solo** an, stellt
   dieselbe Stelle die Ref solo. In einer Ordnerzeile wirkt das Symbol auf jede Ref im

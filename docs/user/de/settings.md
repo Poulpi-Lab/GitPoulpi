@@ -529,7 +529,9 @@ Bearbeitet die Liste der Schaltfläche **Öffnen in** in der Titelleiste. Der Ta
 **Allgemein** enthält die Schaltflächen **Beenden & cd** für Ordner, den **Standardeintrag**
 und **Erkannte Standardwerte wiederherstellen**. Der Tab **Einträge** ist eine
 [Liste](#listen) (je eine Bezeichnung und ein Befehl): **+ Hinzufügen ▾** bietet die Voreinstellungen und **Eigenen** an, und der Standardeintrag ist mit `★`
-markiert. Zu den Feldern des ausgewählten Eintrags gehört eine Schaltfläche **Testen**.
+markiert. Zu den Feldern des ausgewählten Eintrags gehören **Kann einen Worktree öffnen** (standardmäßig angehakt:
+der Eintrag wird im Menü „Öffnen in“ einer Worktree-Zeile angeboten, siehe
+[Worktrees](worktrees.md)) und eine Schaltfläche **Testen**.
 Siehe [Öffnen in](open-in.md).
 
 Die erste Zeile, **Dem Ordner des aktiven Tabs folgen**, hat zwei Werte:

@@ -155,6 +155,8 @@ nummeriert.
 | `tag fetch <name> [--remote R]` | Fetcht einen Tag von einem Remote (standardmäßig dem, das ihn hat), z. B. einen Tag mit `where: remote`. Überschreibt nie einen lokalen Tag an einem anderen Commit. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags auf einem Remote (ohne Namen: jeder Tag, den kein Remote hat). Das Löschen eines Tags auf einem Remote ist rückgängig zu machen (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Verknüpfte Worktrees. |
+| `worktree changes <path>` | Die nicht committeten Änderungen eines Worktrees (`path`, `untracked`); leer, wenn er sauber ist. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Entfernt einen verknüpften Worktree. Einer mit nicht committeten Änderungen wird abgelehnt, außer mit `--force` (sie gehen verloren), `--commit-message` (sie zuerst auf seinem Branch committen) oder `--stash-message` (sie zuerst stashen, ungetrackte eingeschlossen). `--delete-branch` löscht zusätzlich seinen Branch (im Journal). Das Entfernen selbst lässt sich nicht rückgängig machen. Siehe [Worktrees](worktrees.md). |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submodule ([Submodule](submodules.md)). |
 
 `--autostash` stasht lokale Änderungen, die die Operation blockieren, führt sie aus und

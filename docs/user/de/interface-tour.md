@@ -189,8 +189,10 @@ den Rand zwischen zwei Abschnitten, um sie in der Größe zu ändern.
   `fix/`). Ein Häkchen zeigt den ausgecheckten Branch. Die Ordner lassen sich in
   den Einstellungen abschalten.
 - **REMOTE**: jedes Remote, mit seinen Branches darunter.
-- **WORKTREES**: verknüpfte Worktrees, falls es welche gibt. Doppelklick auf einen
-  öffnet ihn in einem eigenen Tab.
+- **WORKTREES**: verknüpfte Worktrees, falls es welche gibt (oder wenn Sie den
+  Abschnitt eingeblendet haben). Das **+** in der Überschrift erstellt einen;
+  Doppelklick auf einen Worktree öffnet ihn in einem eigenen Tab, Rechtsklick
+  bietet Öffnen in, Merge und Entfernen. Siehe [Worktrees](worktrees.md).
 - **STASHES**: Ihre Stashes. Rechtsklick auf einen für **Pop**, **Anwenden** und
   **Drop**.
 - **TAGS**: Ihre Tags, wie Branches in Ordnern an `/` (`releases/`, `backups/`). Ein Pfeil bedeutet, dass der Tag auch auf dem Remote liegt.

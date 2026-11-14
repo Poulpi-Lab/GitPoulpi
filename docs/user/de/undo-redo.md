@@ -277,7 +277,10 @@ löscht, ist als Ganzes rückgängig zu machen.
   bewegt Branches und behält seinen eigenen Zustand; das Abbrechen ist selbst
   der Weg zurück). Das Abbrechen eines **Merges, Cherry-Picks oder Reverts**
   *wird* aufgezeichnet, siehe oben.
-- **Einen Worktree anlegen**, **eine Patch-Datei erzeugen**, Klonen, Init,
+- **Einen Worktree anlegen**, **einen Worktree entfernen** (was vorher gesichert
+  wurde, bleibt: der Commit, der Stash; der dabei gelöschte Branch steht im
+  Journal, daher bringt Rückgängig den Branch zurück, nicht den Ordner),
+  **eine Patch-Datei erzeugen**, Klonen, Init,
   Hosting-Aktionen (Pull Requests, Issues) und KI-Aufrufe: Sie gehören nicht zum
   Verlauf des Repositorys.
 - **Eine neue leere Datei anlegen** aus dem Dateimenü, das automatische Entfernen

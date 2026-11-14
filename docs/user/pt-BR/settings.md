@@ -528,7 +528,9 @@ Edita a lista do botão **Abrir em** na barra de título. A aba **Geral** conté
 botões de pasta **Sair e cd**, a **Entrada padrão** e **Restaurar padrões detectados**.
 A aba **Entradas** é uma [lista](#listas) (um rótulo e um comando cada): **+ Adicionar ▾**
 oferece as predefinições e **Personalizada**, e a entrada padrão é marcada com `★`.
-Os campos da entrada selecionada incluem um botão **Testar**. Veja [Abrir em](open-in.md).
+Os campos da entrada selecionada incluem **Pode abrir um worktree** (marcado por padrão: a
+entrada aparece no menu Abrir em de uma linha de worktree, veja [Worktrees](worktrees.md)) e
+um botão **Testar**. Veja [Abrir em](open-in.md).
 
 A primeira linha, **Seguir a pasta da aba ativa**, tem dois valores:
 

@@ -1238,12 +1238,10 @@ ref_field = "引用"
 ref_hint = "选择一个分支"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
 commit_choice = { git = "{$commit} {label}（{id}）", local = "{$commit} {label}（{id}）" }
-branch_exists = "分支 {b} 已存在：请在“引用”中选择它，或换一个名称"
 is_a_file = "{path} 是文件，不是文件夹"
 title = { git = "从 {label} 创建 worktree", local = "从 {label} 创建工作树" }
 folder = "文件夹"
 folder_hint = "一个新的或空的文件夹"
-new_branch = "新分支"
 branch_hint_checkout = "留空 = 在那里检出 {b}"
 branch_hint_required = "必填：该分支已被检出"
 branch_hint_detached = "留空 = detached HEAD"
@@ -1256,6 +1254,22 @@ choose_folder = { git = "请选择 worktree 的文件夹", local = "请选择工
 not_absolute = "文件夹必须是完整路径（可用“浏览”选择）"
 not_empty = "{path} 不为空"
 already_checked_out = "{label} 已被检出 - 请指定一个新分支名"
+branch_field = "Worktree branch"
+hint_new_branch = "new branch from {r}"
+hint_existing_branch = "checks out this existing branch"
+ref_unused = "not used: the existing branch is checked out as it is"
+name_after_branch = "Name after branch"
+regenerate = "Regenerate"
+ai_button = "Name with AI"
+ai_describe = "Describe the feature, bug or task"
+ai_describe_hint = "e.g. fix the crash when the config file is empty"
+ai_run = "Name it"
+ai_stop = "Stop"
+ai_hide = "Hide"
+ai_working = "asking the AI..."
+ai_need_text = "describe the work first"
+ai_failed = "AI: {why}"
+need_branch = "type or pick a branch first"
 
 [repo_dialogs]
 # context: status line after opening the provider's web form
@@ -2931,6 +2945,10 @@ env_no_color = "输出中不含颜色码"
 env_permissions = "代理无需询问即可执行的范围"
 env_timeout = "代理自身的请求超时（毫秒）"
 env_offline = "启动时不发起网络调用"
+title_worktree_name = "Worktree names"
+profile_help_worktree_name = "The profile GitPoulpi will use to name a new worktree and its branch from a description."
+repo_profile_help_worktree_name = "The profile used in this repository to name a new worktree and its branch."
+action_worktree_name = "Worktree name"
 
 [palette]
 sidebar_show_worktrees = { git = "左侧窗格：显示 worktree 分区", local = "左侧窗格：显示工作树分区" }

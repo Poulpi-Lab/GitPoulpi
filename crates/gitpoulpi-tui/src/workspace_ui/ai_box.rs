@@ -36,6 +36,7 @@ pub(crate) fn action_label(action: AiAction) -> &'static str {
         AiAction::SplitCommit => a::ACTION_SPLIT_COMMIT,
         AiAction::RewriteScript => gitpoulpi_i18n::msg::rewrite_ai::ACTION,
         AiAction::RewriteRules => gitpoulpi_i18n::msg::rewrite_rules_ai::ACTION,
+        AiAction::WorktreeName => a::ACTION_WORKTREE_NAME,
     }
     .get()
 }

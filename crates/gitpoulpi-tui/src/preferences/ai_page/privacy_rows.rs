@@ -30,9 +30,13 @@ impl PrivacyRow {
 }
 
 /// The actions whose request the generic dialog shows. The two history-rewrite
-/// dialogs show their own "What is sent" before they ask.
+/// dialogs show their own "What is sent" before they ask; the worktree naming
+/// sends only the description typed in its dialog and branch names.
 pub(in crate::preferences) fn previewed(action: AiAction) -> bool {
-    !matches!(action, AiAction::RewriteScript | AiAction::RewriteRules)
+    !matches!(
+        action,
+        AiAction::RewriteScript | AiAction::RewriteRules | AiAction::WorktreeName
+    )
 }
 
 impl PreferencesState {

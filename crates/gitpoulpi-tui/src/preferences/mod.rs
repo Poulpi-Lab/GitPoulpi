@@ -107,11 +107,16 @@ mod workflow_page;
 use ai_page::AiPage;
 
 /// Whether this build has the feature an AI action's Settings block belongs
-/// to: the two history rewrite actions are the History workbench's.
+/// to: the two history rewrite actions are the History workbench's, the
+/// worktree name is the worktrees'.
 #[cfg_attr(not(feature = "ai"), allow(dead_code))]
 pub(crate) fn ai_action_built(action: gitpoulpi_config::AiAction) -> bool {
     use gitpoulpi_config::AiAction as A;
-    !matches!(action, A::RewriteScript | A::RewriteRules) || crate::build_features::HISTORY_REWRITE
+    match action {
+        A::RewriteScript | A::RewriteRules => crate::build_features::HISTORY_REWRITE,
+        A::WorktreeName => crate::build_features::WORKTREE,
+        _ => true,
+    }
 }
 pub(crate) use sub_tabs::SubTab;
 

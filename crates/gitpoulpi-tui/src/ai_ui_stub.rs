@@ -74,6 +74,17 @@ pub(crate) enum AiRequest {
         description: String,
         context: crate::rewrite_view::RulesCtx,
     },
+    WorktreeName {
+        description: String,
+        branches: Vec<String>,
+    },
+}
+
+/// Stands in for the real naming answer.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct AiNames {
+    pub(crate) name: String,
+    pub(crate) branch: String,
 }
 
 /// Stands in for `gitpoulpi_ai::assist::RewriteScriptOutcome`.
@@ -136,6 +147,7 @@ pub(crate) enum AiAnswer {
     },
     RewriteScript(Box<RewriteScriptOutcome>),
     RewriteRules(Box<crate::rewrite_view::RulesProposal>),
+    WorktreeName(AiNames),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -168,6 +180,10 @@ impl AiUi {
     }
 
     pub(crate) fn running_pull_request(&self) -> bool {
+        false
+    }
+
+    pub(crate) fn running_worktree_name(&self) -> bool {
         false
     }
 

@@ -1699,15 +1699,12 @@ ref_field = "Ref"
 ref_hint = "choose a branch"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
 commit_choice = { git = "commit {label} ({id})", local = "commit {label} ({id})" }
-branch_exists = "the branch {b} already exists: pick it in Ref or choose another name"
 is_a_file = "{path} is a file, not a folder"
 # context: dialog title; {label} is the branch or commit the worktree starts from. A worktree is a second checked-out copy of the repository
 title = { git = "Create worktree from {label}", local = "Create worktree from {label}" }
 # context: field label: the folder of the new worktree
 folder = "Folder"
 folder_hint = "a new or empty folder"
-# context: field label: the new branch to create in the worktree
-new_branch = "New branch"
 # context: placeholder; {b} is a branch name
 branch_hint_checkout = "empty = check {b} out there"
 branch_hint_required = "required: the branch is already checked out"
@@ -1730,6 +1727,36 @@ not_empty = "{path} is not empty"
 already_checked_out = "{label} is already checked out - name a new branch"
 
 # Status messages and errors of the repository dialogs' owner (repo_dialogs.rs).
+# context: field label: the branch the worktree is on, either a new one (typed) or an existing one to check out
+branch_field = "Worktree branch"
+# context: hint under the branch field; {r} is the branch or commit the new branch starts from
+hint_new_branch = "new branch from {r}"
+# context: hint under the branch field: the name is a branch that already exists
+hint_existing_branch = "checks out this existing branch"
+# context: shown in place of the Ref choice when an existing branch is chosen
+ref_unused = "not used: the existing branch is checked out as it is"
+# context: button: sets the worktree name from the branch name
+name_after_branch = "Name after branch"
+# context: button: draws a new random name for the worktree and its new branch
+regenerate = "Regenerate"
+# context: button: opens the box where the user describes the work so the AI names the worktree and branch
+ai_button = "Name with AI"
+# context: label of the text box the AI names the worktree from
+ai_describe = "Describe the feature, bug or task"
+# context: placeholder of that text box
+ai_describe_hint = "e.g. fix the crash when the config file is empty"
+# context: button: asks the AI for the names
+ai_run = "Name it"
+# context: button: stops the AI request that is running
+ai_stop = "Stop"
+# context: button: closes the AI box
+ai_hide = "Hide"
+# context: status while the AI request runs
+ai_working = "asking the AI..."
+ai_need_text = "describe the work first"
+# context: inline error; {why} is the reason
+ai_failed = "AI: {why}"
+need_branch = "type or pick a branch first"
 [repo_dialogs]
 # context: status line after opening the provider's web form
 web_form_opened = "opened the {provider} form in your browser"
@@ -3798,6 +3825,11 @@ env_offline = "No network calls at startup"
 # Command palette: command labels are "Category: Action" in Title Case, the grayed "why not"
 # reasons, the popup frame. Labels keep the category prefix; the palette matches both the
 # translated and the English text.
+# context: settings block title: the AI naming a new worktree and its branch
+title_worktree_name = "Worktree names"
+profile_help_worktree_name = "The profile GitPoulpi will use to name a new worktree and its branch from a description."
+repo_profile_help_worktree_name = "The profile used in this repository to name a new worktree and its branch."
+action_worktree_name = "Worktree name"
 [palette]
 sidebar_show_worktrees = "Sidebar: Show Worktrees Section"
 refs_open_worktree_in = "Refs: Open Worktree In..."

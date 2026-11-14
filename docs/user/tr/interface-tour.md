@@ -223,8 +223,10 @@ sürükleyerek boyutlarını değiştirin.
   Bir onay işareti checkout yapılmış dalı gösterir. Klasörleri Ayarlar'dan
   kapatabilirsiniz.
 - **UZAK**: her uzak depo ve altındaki dalları.
-- **WORKTREE'LER**: varsa bağlı worktree'ler. Birine çift tıklayarak kendi
-  sekmesinde açın.
+- **WORKTREE'LER**: varsa bağlı worktree'ler (veya bölümü gösterdiyseniz).
+  Başlığındaki **+** bir tane oluşturur; bir worktree'ye çift tıklayarak kendi
+  sekmesinde açın, sağ tıklayarak Şurada aç, Merge ve Kaldır seçeneklerine
+  ulaşın. Bkz. [Worktree'ler](worktrees.md).
 - **STASH'LER**: stash'leriniz. Birine sağ tıklayarak **Pop**, **Apply** ve
   **Drop** seçeneklerine ulaşın.
 - **TAG'LER**: tag'leriniz; dallar gibi `/` ile bölünen klasörler içinde (`releases/`, `backups/`). Bir ok, tag'in uzak depoda da olduğunu gösterir.

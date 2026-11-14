@@ -72,6 +72,8 @@ başvuru sayfalarına atlayın.
     tmux, zellij, screen, herdr ve terminal panellerinden nelerin geçtiği:
     **[Çoklayıcılar](multiplexers.md)**.
 
+Ayrıca: **[Worktree'ler](worktrees.md)**: bağlı worktree'leri oluşturma, açma, merge etme ve kaldırma.
+
 Ayrıca: **[Bir dal için birden çok uzak depo](multiple-remotes.md)**: push hedefleri ve pull kaynakları,
 Uzak depolar penceresi, tüm uzak depolara veya seçililere Push, ilerleyen bir uzak depoyu çözme, çakışmadan sonra
 Devam, CLI ve düz git takma adı.

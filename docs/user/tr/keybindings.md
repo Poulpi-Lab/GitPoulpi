@@ -486,7 +486,7 @@ Tuşlar varsayılanlardır.
 | Sol panel: Yerel Dallar Bölümünü Göster/Gizle |  |
 | Sol panel: Uzak Depolar Bölümünü Göster/Gizle |  |
 | Sol panel: Worktree'ler Bölümünü Göster/Gizle |  |
-| Sidebar: Show Worktrees Section |  |
+| Sol panel: Worktree'ler Bölümünü Göster |  |
 | Sol panel: Stash'ler Bölümünü Göster/Gizle |  |
 | Sol panel: Tag'ler Bölümünü Göster/Gizle |  |
 | Sol panel: Pull Request'ler Bölümünü Göster/Gizle |  |
@@ -530,12 +530,12 @@ Tuşlar varsayılanlardır.
 | Refs: Seçili Dalın Reflog'u... |  |
 | Refs: Seçili Daldan Pull Request Başlat... |  |
 | Refs: Worktree'yi Sekmede Aç | `Enter / çift tık` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: Worktree'yi Şurada Aç... |  |
+| Refs: Worktree Dalını Başka Dala Merge Et... |  |
+| Refs: Worktree'yi Kaldır... |  |
+| Refs: Worktree Oluştur... | `+` |
+| Refs: Geçerli Daldan Worktree Oluştur |  |
+| Refs: Dal Seçerek Worktree Oluştur |  |
 | Refs: Alt Modül Güncelle (Seçili) |  |
 | Refs: Alt Modül Başlat (Seçili) |  |
 | Refs: Alt Modülü Sekmede Aç | `Enter / çift tık` |

@@ -12,23 +12,29 @@ worktree 是仓库的第二份检出副本：另一个文件夹，位于另一�
 
 WORKTREE 标题上的 **+**（键盘：在该分区中按 `+`；命令面板：**引用：创建 worktree…**）会打开一个菜单：
 
-- **从当前分支**：该分支已在主文件夹中检出，因此对话框会建议在它之上创建一个新分支（`<branch>-wt`）。
-- **从所选 commit**：在 Log 中选中某个 commit 之前是灰色的。除非你指定新分支，否则 worktree 会在那里以 detached 状态开始。
-- **选择分支…**：对话框打开时停在它的 **引用** 列表上。
+- **从当前分支**：该分支已在主文件夹中检出，因此对话框会建议在它之上创建一个新分支（`worktree-<id>`）。
+- **从所选 commit**：在 Log 中选中某个 commit 之前是灰色的。对话框会建议从那里开始的新分支 `worktree-<id>`；清空分支字段则得到 detached 的 worktree。
+- **选择分支…**：对话框打开时停在它的 **worktree 分支** 列表上，用来打开一个已存在的分支。
 
 命令面板里有同样的三项（**引用：从当前分支创建 worktree**、**Git：在所选 commit 处创建 worktree…**、**引用：选择分支创建 worktree**）。旧的入口仍然可用：分支、tag 或 commit 菜单中的 **从 … 创建 worktree…**。
 
-对话框会给出所有建议，你可以修改：
+对话框会给出所有建议，你可以修改。**名称** 和新分支一开始都是 `worktree-<id>`，其中 `<id>` 是 8 位随机十六进制数（两者相同），因此两个 worktree 不会冲突。
 
 | 字段 | 含义 |
 |---|---|
-| **名称** | 文件夹名由它生成。根据分支或短 id 给出建议。 |
+| **名称** | 文件夹名由它生成。**按分支命名**（`Alt+N`）会把它设为 `worktree-<branch>`：斜杠变成 `-`，且不会重复该词（`worktree-foo` 和 `feature/worktree-x` 保持原样，`feature/login` 得到 `worktree-feature-login`）。 |
 | **文件夹** | 仓库的同级文件夹，`<repository>-<name>`。在你于“文件夹”中输入之前，它会跟随“名称”；**浏览…** 用来选择位置。 |
-| **引用** | worktree 的起点分支或 commit（一个列表；输入即可搜索）。更改它会给出新的名称建议。 |
-| **新分支** | 留空表示在那里检出“引用”所指的分支（对 commit 则是 detached）。当该分支已被检出时必填。 |
+| **引用** | *新* 分支的起点：一个分支或 commit（一个列表；输入即可搜索）。选中已有分支时不使用它，并会如此提示。 |
+| **worktree 分支** | 一个字段，两种含义，字段下方会说明。不是本地分支的名称会从“引用”创建新分支（**从 main 新建分支**）。未在别处检出的本地分支（在列表中选取，或输入其名称）会原样在那里检出（**检出此分支**）。列表的第一行或空字段表示检出“引用”所指的分支（对 commit 则是 detached）；若该分支已被检出，则会被拒绝。 |
+| **重新生成** | `Alt+R`。重新抽取一个 `<id>`，用它替换名称和分支，但你自己输入的内容（你写的名称或分支）和已有分支（绝不替换）除外。来自 **按分支命名** 或 AI 的名称视为已生成。 |
+| **用 AI 命名** | 仅在 AI 开启时可用（见下文）。 |
 | **将新 worktree 作为标签页打开** | 默认开启。 |
 
-非空的文件夹、无效的名称或已存在的分支，会在对话框自己的那一行中报告，同时 **创建** 保持灰色。
+非空的文件夹、无效的名称、git 不接受的分支名，或已被另一个 worktree 占用的分支，会在对话框自己的那一行中报告，同时 **创建** 保持灰色。
+
+### 用 AI 命名
+
+开启 [AI](ai.md) 后，**用 AI 命名**（`Alt+A`）会在对话框内打开一个框：*描述功能、缺陷或任务*。**命名** 会请模型给出一个简短的 worktree 名称，以及遵循仓库自身分支命名习惯的分支名（`feature/`、`fix/`、小写短横线风格）。它们会填入名称（形如 `worktree-<name>`）和分支字段，仍可编辑；若分支名已存在，会加上 `-2` 后缀，这样回答绝不会悄悄检出某个已有分支。框中会显示忙碌状态，**停止**（或 `Esc`）可取消，失败会显示在对话框内。只发送你的描述和本地分支名称。
 
 ## 行菜单
 
@@ -58,4 +64,4 @@ WORKTREE 标题上的 **+**（键盘：在该分区中按 `+`；命令面板：*
 
 ## 来自脚本或代理
 
-`gitpoulpi worktree changes <path>` 列出某个 worktree 的未提交更改。`gitpoulpi worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` 用来移除它；对应的 MCP 工具是 `worktree_changes` 和 `worktree_remove`。参见 [CLI 参考](cli-reference.md)。
+`gitpoulpi worktree changes <path>` 列出某个 worktree 的未提交更改。`gitpoulpi worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` 用来移除它；对应的 MCP 工具是 `worktree_changes` 和 `worktree_remove`。`gitpoulpi ai worktree-name --describe "<task>"` 会输出 AI 为任务建议的 worktree 名称和分支名称（`{ name, worktree, branch }`），不创建任何内容；对应的 MCP 工具是 `ai_worktree_name`。参见 [CLI 参考](cli-reference.md)。

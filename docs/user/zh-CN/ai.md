@@ -160,6 +160,7 @@ timeout_secs = 180                  # 0 or absent: 120 headless, 180 terminal
 | **Merge 冲突解决** | 在 merge 冲突编辑器中：`✦ 建议` 工具栏按钮、冲突的右键菜单 *✦ 建议解决方案（AI）*、`Alt+I`，或命令面板 `AI：建议 merge 冲突解决方案`。建议会作为一次编辑替换输出中 *当前冲突* 的区域（标记为已编辑，占一个撤销步骤）；在你保存之前不会保存或 stage 任何内容。 | `ai resolve-conflict <path> [--conflict N]`（打印） |
 | **代码评审** | 在 [pull 或 merge request 的评审](review.md#-ai-评审草稿)中：`✦ 起草评审…` 按钮、`s`，或命令面板 `评审：✦ 起草评审…`（它会打开评审选项，`Enter` 运行）。模型读取请求的 diff、描述和已有评论（默认还有项目的 `CLAUDE.md` 和 `AGENTS.md`：见[评审上下文](#评审上下文)）并提出评论；你逐条接受、编辑或忽略。在你提交评审之前，不会有任何内容发送到平台。 | `hosting review suggest <n>`（输出 JSON，不发布任何内容），`ai review-context`（默认值） |
 | **拆分 commit** | commit 的菜单 *拆分 commit（AI）…*，或命令面板 `AI：拆分所选 Commit…`。拆分编辑器会带着模型给出的分组打开；见下文。 | `ai split-plan <rev>`（打印） |
+| **Worktree 名称** | 在[创建 worktree 对话框](worktrees.md#用-ai-命名)中：**✦ 用 AI 命名** 按钮或 `Alt+A` 会打开一个框，你在其中描述功能、缺陷或任务；模型按仓库自身的分支命名习惯为 worktree 及其分支命名，两者都会填入对话框的字段供你编辑。只发送你的描述和本地分支名称，因此没有“发送的内容”对话框。 | `ai worktree-name --describe "<task>"`（打印） |
 | **历史重写脚本** | 在[历史重写工作台](history-rewrite.md#用-ai-编写脚本)中：脚本编辑器的 `✦ 用 AI 编写…` 按钮，或命令面板 `重写：用 AI 编写脚本…`。对话框会如实显示将要发送的内容；脚本会带着标记出现在编辑器里，绝不会替你运行或应用。 | `ai rewrite-script "<instruction>" [--sample N]`（打印） |
 | **历史重写规则** | 在[历史重写工作台](history-rewrite.md#用-ai-创建规则)中：`✦ 用 AI 创建规则…` 按钮、`Alt+I`，或命令面板 `重写：用 AI 创建规则…`。一个多行对话框会如实显示将要发送的内容；规则和设置会填入工作台，不会替你预览或应用任何内容。 | `ai rewrite-rules "<description>" [--context]`（打印） |
 | **Commit 撰写器** | WIP 行菜单中的 *撰写 commit（AI）...*、`Ctrl+G C`，命令面板 `AI：根据工作区更改撰写 Commit…` | |

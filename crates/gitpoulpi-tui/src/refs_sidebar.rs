@@ -2127,6 +2127,30 @@ mod tests {
     }
 
     #[test]
+    fn worktrees_stay_hidden_without_linked_ones_until_shown_on_purpose() {
+        let none = HashSet::new();
+        assert!(!visible_sections_with(0, 0, (false, false), 0, &none)
+            .contains(&SidebarSection::Worktrees));
+        let mut shown = HashSet::new();
+        set_worktrees_shown(&mut shown, 0, true);
+        assert!(visible_sections_with(0, 0, (false, false), 0, &shown)
+            .contains(&SidebarSection::Worktrees));
+        // The mark survives the file: stored as `worktrees_empty`.
+        assert_eq!(hidden_to_names(&shown), vec!["worktrees_empty"]);
+        assert_eq!(hidden_from_names(&["worktrees_empty".to_string()]), shown);
+        // With linked worktrees the plain rule applies and the mark is inert.
+        assert!(visible_sections_with(1, 0, (false, false), 0, &shown)
+            .contains(&SidebarSection::Worktrees));
+        let mut hidden = HashSet::new();
+        set_worktrees_shown(&mut hidden, 1, false);
+        assert!(!visible_sections_with(1, 0, (false, false), 0, &hidden)
+            .contains(&SidebarSection::Worktrees));
+        // Hiding it again where it is empty drops the mark.
+        set_worktrees_shown(&mut shown, 0, false);
+        assert!(shown.is_empty());
+    }
+
+    #[test]
     fn the_last_shown_section_cannot_be_hidden() {
         let available = [SidebarSection::Local, SidebarSection::Remote];
         let none = HashSet::new();

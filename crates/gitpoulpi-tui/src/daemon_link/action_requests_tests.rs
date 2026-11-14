@@ -368,6 +368,23 @@ fn every_action() -> Vec<Action> {
                 new_branch: Some(s("new")),
             },
         },
+        Action::WorktreeRemove {
+            path: path("../wt"),
+            opts: gitpoulpi_core::domain::WorktreeRemoveOptions {
+                force: false,
+                commit: Some(gitpoulpi_core::domain::WorktreeCommit {
+                    message: s("save"),
+                    branch: None,
+                }),
+                stash: None,
+            },
+            delete_branch: Some(s("topic")),
+        },
+        Action::WorktreeMerge {
+            worktree: path("../main"),
+            from: a_ref(),
+            then_remove: Some((path("../wt"), Some(s("topic")))),
+        },
         Action::PatchCreate {
             source: PatchSource::Commits(vec![oid(1), oid(2)]),
             dest: path("out.patch"),
@@ -456,6 +473,12 @@ fn answer(command: OperationKind) -> serde_json::Value {
             "branch": null,
             "is_main": false,
             "is_locked": false,
+        }),
+        OperationKind::ConflictEntries => json!([]),
+        OperationKind::WorktreeRemove => json!({
+            "path": "../wt",
+            "commit": Oid([2; 20]),
+            "stashed": false,
         }),
         OperationKind::PatchCreate => json!({ "path": "out.patch", "commits": 2, "bytes": 10 }),
         OperationKind::PatchApply => json!({ "files": ["a.txt"] }),

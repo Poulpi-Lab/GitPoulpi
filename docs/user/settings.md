@@ -529,7 +529,9 @@ Edits the list of the **Open in** button in the title bar. The **General** tab
 holds the **Quit & cd** folder buttons, the **Default entry** and **Restore detected
 defaults**. The **Entries** tab is a [list](#lists) (a label and a command each):
 **+ Add ▾** offers the presets and **Custom**, and the default entry is marked `★`.
-The fields of the selected entry include a **Test** button. See
+The fields of the selected entry include **Can open a worktree** (ticked by
+default: the entry is offered in the Open in menu of a worktree row, see
+[Worktrees](worktrees.md)) and a **Test** button. See
 [Open in](open-in.md).
 
 The first row, **Follow the active tab's folder**, has two values:

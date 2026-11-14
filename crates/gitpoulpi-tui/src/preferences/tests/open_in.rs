@@ -285,3 +285,22 @@ fn search_finds_the_open_in_page() {
         Target::Global("ui.open_in_default")
     );
 }
+
+#[test]
+fn can_open_a_worktree_is_checked_by_default_and_persists_when_cleared() {
+    let _s = serial();
+    let dir = tempfile::tempdir().unwrap();
+    let mut st = open_in_state(dir.path());
+    let at = row(&st, Target::OpenIn(OpenInTarget::Worktree));
+    let field = &st.fields()[at];
+    assert!(matches!(field.control, Control::Toggle(true)), "checked by default");
+    assert_eq!(field.label, "Can open a worktree");
+    st.commit_bool(&Target::OpenIn(OpenInTarget::Worktree), false);
+    let first = &saved(dir.path()).ui.open_in.unwrap()[0];
+    assert_eq!(first.worktree, Some(false));
+    assert!(!first.can_open_worktree());
+    let at = row(&st, Target::OpenIn(OpenInTarget::Worktree));
+    assert!(matches!(st.fields()[at].control, Control::Toggle(false)));
+    st.commit_bool(&Target::OpenIn(OpenInTarget::Worktree), true);
+    assert!(saved(dir.path()).ui.open_in.unwrap()[0].can_open_worktree());
+}

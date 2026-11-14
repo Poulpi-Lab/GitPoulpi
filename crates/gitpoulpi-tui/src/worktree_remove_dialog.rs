@@ -797,7 +797,10 @@ impl WorktreeRemoveDialog {
                     Some(b) => msg::clean_text(self.wt.path.display(), b),
                     None => msg::clean_text_detached(self.wt.path.display()),
                 };
-                y += dialog_kit::put(buf, inner.x, y, &line, inner.width, text).height;
+                for part in crate::ui_kit::wrap_words(&line, inner.width as usize) {
+                    dialog_kit::put(buf, inner.x, y, &part, inner.width, text);
+                    y += 1;
+                }
                 y += 1;
                 if let Some(error) = &self.load_error {
                     dialog_kit::put(
@@ -825,14 +828,17 @@ impl WorktreeRemoveDialog {
             }
             Stage::Force => {
                 let line = msg::force_text(self.changes.len() as u64, self.wt.path.display());
-                dialog_kit::put(
-                    buf,
-                    inner.x,
-                    y,
-                    &line,
-                    inner.width,
-                    Style::default().fg(th().status.danger).bg(th().ui.panel),
-                );
+                for part in crate::ui_kit::wrap_words(&line, inner.width as usize) {
+                    dialog_kit::put(
+                        buf,
+                        inner.x,
+                        y,
+                        &part,
+                        inner.width,
+                        Style::default().fg(th().status.danger).bg(th().ui.panel),
+                    );
+                    y += 1;
+                }
             }
             Stage::Merge => {
                 let own = self.wt.branch.clone().unwrap_or_default();
@@ -1230,4 +1236,199 @@ pub(crate) fn ask(request: Request) {
 pub(crate) fn take_request() -> Option<Request> {
     let mut held = REQUESTS.lock().ok()?;
     (!held.is_empty()).then(|| held.remove(0))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::daemon_link::RawQueue;
+    use gitpoulpi_core::domain::RefVisibility;
+
+    fn branch(name: &str, byte: u8) -> Ref {
+        Ref {
+            kind: RefKind::LocalBranch { name: name.into() },
+            target: Oid([byte; 20]),
+            visibility: RefVisibility::Shown,
+            is_head: name == "main",
+            upstream: None,
+            tag_sync: None,
+            multi_remote: None,
+        }
+    }
+
+    fn worktrees() -> Vec<Worktree> {
+        vec![
+            Worktree {
+                path: PathBuf::from("/r"),
+                branch: Some("main".into()),
+                is_main: true,
+                is_locked: false,
+            },
+            Worktree {
+                path: PathBuf::from("/wt-feature"),
+                branch: Some("feature".into()),
+                is_main: false,
+                is_locked: false,
+            },
+        ]
+    }
+
+    fn dialog(mode: Mode, linked: usize) -> WorktreeRemoveDialog {
+        let queue = RawQueue::default();
+        let all = worktrees();
+        WorktreeRemoveDialog::new(
+            Seed {
+                worktree: all[linked].clone(),
+                worktrees: all,
+                refs: vec![branch("main", 1), branch("feature", 2), branch("other", 3)],
+                mode,
+            },
+            &queue.requester(),
+        )
+    }
+
+    fn key(code: KeyCode) -> KeyEvent {
+        KeyEvent::new(code, KeyModifiers::NONE)
+    }
+
+    #[test]
+    fn a_dirty_worktree_never_removes_without_a_choice_and_force_is_asked_twice() {
+        let mut d = dialog(Mode::Remove, 1);
+        d.changes = vec![
+            WorktreeChange {
+                path: "a.txt".into(),
+                untracked: false,
+            },
+            WorktreeChange {
+                path: "b.txt".into(),
+                untracked: true,
+            },
+        ];
+        d.stage = Stage::Dirty;
+        // Commit needs a message.
+        assert_eq!(d.activate(Focus::CommitRemove), RemoveOutcome::Stay);
+        assert!(d.message.is_some());
+        // Remove anyway: a second stage, nothing is sent yet.
+        assert_eq!(d.activate(Focus::RemoveAnyway), RemoveOutcome::Stay);
+        assert_eq!(d.stage, Stage::Force);
+        // Esc goes back, not out.
+        assert_eq!(d.on_key(key(KeyCode::Esc)), RemoveOutcome::Stay);
+        assert_eq!(d.stage, Stage::Dirty);
+        d.activate(Focus::RemoveAnyway);
+        match d.activate(Focus::ForceYes) {
+            RemoveOutcome::Remove { opts, .. } => assert!(opts.force),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn commit_and_stash_ask_for_what_they_need() {
+        let mut d = dialog(Mode::Remove, 1);
+        d.stage = Stage::Dirty;
+        d.commit_msg = "  save it ".into();
+        match d.activate(Focus::CommitRemove) {
+            RemoveOutcome::Remove {
+                opts, delete_branch, ..
+            } => {
+                let commit = opts.commit.unwrap();
+                assert_eq!(commit.message, "save it");
+                assert_eq!(commit.branch, None);
+                assert!(!opts.force && opts.stash.is_none());
+                assert_eq!(delete_branch, None, "a fresh commit is never merged");
+            }
+            other => panic!("{other:?}"),
+        }
+        match d.activate(Focus::StashRemove) {
+            RemoveOutcome::Remove { opts, .. } => {
+                assert_eq!(opts.stash.as_deref(), Some("WIP on wt-feature"));
+            }
+            other => panic!("{other:?}"),
+        }
+        // A detached worktree must name a branch for the commit.
+        d.wt.branch = None;
+        assert_eq!(d.activate(Focus::CommitRemove), RemoveOutcome::Stay);
+        d.new_branch = "rescue".into();
+        match d.activate(Focus::CommitRemove) {
+            RemoveOutcome::Remove { opts, .. } => {
+                assert_eq!(opts.commit.unwrap().branch.as_deref(), Some("rescue"));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn the_branch_goes_only_when_it_is_known_to_be_merged_and_ticked() {
+        let mut d = dialog(Mode::Remove, 1);
+        d.stage = Stage::Clean;
+        match d.activate(Focus::Remove) {
+            RemoveOutcome::Remove { delete_branch, .. } => assert_eq!(delete_branch, None),
+            other => panic!("{other:?}"),
+        }
+        d.merged_into = Some("main".into());
+        d.delete_branch = true;
+        match d.activate(Focus::Remove) {
+            RemoveOutcome::Remove { delete_branch, .. } => {
+                assert_eq!(delete_branch.as_deref(), Some("feature"))
+            }
+            other => panic!("{other:?}"),
+        }
+        d.activate(Focus::DeleteBranch);
+        match d.activate(Focus::Remove) {
+            RemoveOutcome::Remove { delete_branch, .. } => assert_eq!(delete_branch, None),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn merge_defaults_to_the_main_worktrees_branch_and_runs_where_it_is_checked_out() {
+        let mut d = dialog(Mode::Merge, 1);
+        assert_eq!(d.targets, vec!["main".to_string(), "other".to_string()]);
+        assert_eq!(d.targets[d.target], "main");
+        match d.activate(Focus::RunMerge) {
+            RemoveOutcome::Merge {
+                into,
+                from,
+                then_remove,
+            } => {
+                assert_eq!(into, PathBuf::from("/r"));
+                assert_eq!(from.target, Oid([2; 20]));
+                assert_eq!(then_remove, None);
+            }
+            other => panic!("{other:?}"),
+        }
+        // `other` is checked out nowhere: refused with the reason.
+        d.target = 1;
+        assert_eq!(d.activate(Focus::RunMerge), RemoveOutcome::Stay);
+        assert!(d.message.as_deref().unwrap().contains("not checked out"));
+        // A detached worktree has nothing to merge.
+        d.wt.branch = None;
+        assert!(d.merge_plan().unwrap_err().contains("detached"));
+    }
+
+    #[test]
+    fn it_renders_every_stage_inside_its_frame_with_real_buttons() {
+        let area = Rect::new(0, 0, 120, 40);
+        for (stage, needle) in [
+            (Stage::Loading, "Checking the worktree"),
+            (Stage::Clean, "Remove"),
+            (Stage::Dirty, "Stash and remove"),
+            (Stage::Force, "Discard changes and remove"),
+            (Stage::Merge, "Merge feature into:"),
+        ] {
+            let mut d = dialog(Mode::Remove, 1);
+            d.changes = vec![WorktreeChange {
+                path: "a.txt".into(),
+                untracked: true,
+            }];
+            d.stage = stage;
+            let mut buf = Buffer::empty(area);
+            d.render(rect(area), &mut buf);
+            let text = dialog_kit::buffer_text(&buf);
+            assert!(text.contains(needle), "{stage:?}:\n{text}");
+            assert!(text.contains("Cancel") || stage == Stage::Force, "{stage:?}");
+            for (r, _) in &d.hits {
+                assert!(r.right() <= rect(area).right(), "{stage:?}: {r:?} spills out");
+            }
+        }
+    }
 }

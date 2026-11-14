@@ -174,7 +174,8 @@ check box to use it.
 
 - **Click** a row to select it. **Double-click** a local branch or a tag to
   check it out. **Double-click** a worktree or a submodule to open it in a
-  tab.
+  tab. The **+** on the WORKTREES header creates a worktree; right-click a
+  worktree for Open in a new tab, Open in, Merge and Remove ([Worktrees](worktrees.md)).
 - **Hover** a row to show the icon at its left. **Click** it to hide the ref
   in the Log, or to show it again. While **Solo** is on, the same place solos
   the ref. On a folder row, the icon acts on every ref in the folder.

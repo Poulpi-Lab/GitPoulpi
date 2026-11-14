@@ -253,7 +253,9 @@ finish that also deletes the remote branch is undoable as a whole.
 - **Aborting a rebase**: undo is not offered for it (a rebase moves branches
   and keeps its own state; the abort is itself the way back). Aborting a
   **merge, cherry-pick or revert** *is* recorded, see above.
-- **Creating a worktree**, **creating a patch file**, clone, init, hosting
+- **Creating a worktree**, **removing a worktree** (what it saved first stays:
+  the commit, the stash; the branch deleted along with it is journaled, so
+  Undo brings the branch back, not the folder), **creating a patch file**, clone, init, hosting
   actions (pull requests, issues) and AI calls: they are not part of the
   repository's history.
 - **Creating a new empty file** from the file menu, the automatic removal of

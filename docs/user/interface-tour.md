@@ -235,8 +235,10 @@ between two sections to resize them.
   check mark shows the checked-out branch. You can turn the folders off in
   Settings.
 - **REMOTE**: each remote, with its branches under it.
-- **WORKTREES**: linked worktrees, when there are any. Double-click one to
-  open it in its own tab.
+- **WORKTREES**: linked worktrees, when there are any (or when you showed the
+  section). The **+** on its header creates one; double-click a worktree to open
+  it in its own tab, right-click it for Open in, Merge and Remove. See
+  [Worktrees](worktrees.md).
 - **STASHES**: your stashes. Right-click one for **Pop**, **Apply** and
   **Drop**.
 - **TAGS**: your tags, in folders split on `/` like branches (`releases/`, `backups/`). An arrow means the tag is also on the remote.

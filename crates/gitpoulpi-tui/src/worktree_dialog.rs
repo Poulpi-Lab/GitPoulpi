@@ -1072,4 +1072,137 @@ mod tests {
             );
         }
     }
+
+    fn type_into(dialog: &mut WorktreeDialog, focus: WtFocus, text: &str) {
+        dialog.focus = focus;
+        for c in text.chars() {
+            dialog.on_key(key(KeyCode::Char(c)));
+        }
+    }
+
+    fn two_branches() -> Vec<BranchChoice> {
+        vec![
+            BranchChoice {
+                name: "main".into(),
+                busy: true,
+            },
+            BranchChoice {
+                name: "other".into(),
+                busy: false,
+            },
+        ]
+    }
+
+    #[test]
+    fn the_folder_follows_the_name_until_the_folder_is_edited() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().join("repo");
+        let mut dialog = WorktreeDialog::with_choices(
+            seed(WorktreeStart::Branch("other".into()), "other", false),
+            &root,
+            two_branches(),
+            false,
+        );
+        assert_eq!(dialog.name, "other");
+        assert_eq!(PathBuf::from(&dialog.path), tmp.path().join("repo-other"));
+        // Typing in Name re-proposes the Folder.
+        type_into(&mut dialog, WtFocus::Name, "-2");
+        assert_eq!(dialog.name, "other-2");
+        assert_eq!(PathBuf::from(&dialog.path), tmp.path().join("repo-other-2"));
+        // Editing the Folder by hand stops the sync for good.
+        type_into(&mut dialog, WtFocus::Path, "x");
+        let edited = dialog.path.clone();
+        assert!(edited.ends_with("repo-other-2x"), "{edited}");
+        type_into(&mut dialog, WtFocus::Name, "y");
+        assert_eq!(dialog.path, edited, "the Folder was edited: Name no longer moves it");
+    }
+
+    #[test]
+    fn changing_the_ref_re_proposes_the_name_and_checks_the_busy_branch() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().join("repo");
+        let mut dialog = WorktreeDialog::with_choices(
+            seed(WorktreeStart::Branch("main".into()), "main", true),
+            &root,
+            two_branches(),
+            false,
+        );
+        assert!(dialog.plan().unwrap_err().contains("name a new branch"));
+        dialog.pick_ref("b:other");
+        assert_eq!(dialog.start, WorktreeStart::Branch("other".into()));
+        assert_eq!(dialog.name, "other");
+        assert_eq!(PathBuf::from(&dialog.path), tmp.path().join("repo-other"));
+        let (path, opts) = dialog.plan().unwrap();
+        assert_eq!(path, tmp.path().join("repo-other"));
+        assert_eq!(opts.start, WorktreeStart::Branch("other".into()));
+        assert_eq!(opts.new_branch, None);
+        // A hand-typed Name is not replaced by the next ref.
+        type_into(&mut dialog, WtFocus::Name, "!");
+        dialog.pick_ref("b:main");
+        assert_eq!(dialog.name, "other!");
+    }
+
+    #[test]
+    fn the_commit_the_dialog_was_opened_on_is_a_choice_and_gets_a_short_name() {
+        let tmp = tempfile::tempdir().unwrap();
+        let oid = Oid::from_hex(&"c".repeat(40)).unwrap();
+        let dialog = WorktreeDialog::with_choices(
+            seed(WorktreeStart::Commit(oid), "ccccccc", false),
+            &tmp.path().join("repo"),
+            two_branches(),
+            false,
+        );
+        assert_eq!(dialog.name, "ccccccc");
+        assert!(dialog
+            .combo
+            .options
+            .iter()
+            .any(|o| o.value == format!("c:{}", oid.to_hex())));
+        let (_, opts) = dialog.plan().unwrap();
+        assert_eq!(opts.start, WorktreeStart::Commit(oid));
+        assert_eq!(opts.new_branch, None, "detached unless a branch is named");
+    }
+
+    #[test]
+    fn the_seed_for_the_current_branch_proposes_a_free_new_branch() {
+        use gitpoulpi_core::domain::{Ref, RefKind};
+        let branch = |name: &str, head: bool| Ref {
+            kind: RefKind::LocalBranch { name: name.into() },
+            target: Oid([1; 20]),
+            visibility: Default::default(),
+            is_head: head,
+            upstream: None,
+            tag_sync: None,
+            multi_remote: None,
+        };
+        let refs = vec![branch("main", true), branch("main-wt", false)];
+        let seed = seed_from_head(&refs, &[]).unwrap();
+        assert_eq!(seed.start, WorktreeStart::Branch("main".into()));
+        assert_eq!(seed.new_branch, "main-wt2", "the first proposal was taken");
+        assert!(seed.branch_busy);
+        assert_eq!(seed_to_choose(&refs, &[]).unwrap().new_branch, "");
+    }
+
+    #[test]
+    fn validation_says_why_inline() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut dialog = WorktreeDialog::with_choices(
+            seed(WorktreeStart::Branch("other".into()), "other", false),
+            &tmp.path().join("repo"),
+            two_branches(),
+            false,
+        );
+        dialog.name = "a/b".into();
+        assert!(dialog.plan().unwrap_err().contains("slashes"));
+        dialog.name = String::new();
+        assert!(dialog.plan().unwrap_err().contains("name"));
+        dialog.name = "ok".into();
+        dialog.new_branch = "main".into();
+        assert!(dialog.plan().unwrap_err().contains("already exists"));
+        let file = tmp.path().join("file");
+        std::fs::write(&file, "x").unwrap();
+        dialog.new_branch.clear();
+        dialog.path = file.display().to_string();
+        assert!(dialog.plan().unwrap_err().contains("is a file"));
+    }
 }

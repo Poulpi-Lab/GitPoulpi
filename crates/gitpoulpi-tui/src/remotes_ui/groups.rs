@@ -195,9 +195,7 @@ impl RemoteUi {
     /// when every row is a plain push. Returns the status line.
     pub(crate) fn push_all(&self, branch: &str, refs: &[Ref]) -> String {
         let remotes = branch_group(refs, branch).map_or_else(
-            || {
-                self.default_remote(refs).unwrap_or_default()
-            },
+            || self.default_remote(refs).unwrap_or_default(),
             |g| g.push_names(),
         );
         crate::push_group_ui::PushGroupUi::open_push_all(&self.repo_root, branch);
@@ -323,7 +321,10 @@ mod tests {
         let l = labels(&many);
         assert!(l[0].contains("to all (origin, gitlab, backup)"), "{l:?}");
         for r in ["origin", "gitlab", "backup"] {
-            assert!(l.iter().any(|x| x.contains(&format!("to {r} only"))), "{l:?}");
+            assert!(
+                l.iter().any(|x| x.contains(&format!("to {r} only"))),
+                "{l:?}"
+            );
         }
         assert!(l.iter().any(|x| x.contains("selected remotes")), "{l:?}");
     }
@@ -332,10 +333,16 @@ mod tests {
     fn the_pull_menu_offers_the_group_only_with_sources() {
         let g = group();
         let l = labels(&pull_menu_entries(Some("feature"), Some(&g)));
-        assert!(l[0].contains("all sources (origin + gitlab + mirror)"), "{l:?}");
+        assert!(
+            l[0].contains("all sources (origin + gitlab + mirror)"),
+            "{l:?}"
+        );
         assert!(l.iter().any(|x| x.contains("from mirror only")), "{l:?}");
         let plain = labels(&pull_menu_entries(Some("main"), None));
-        assert!(!plain.iter().any(|x| x.contains("all sources")), "{plain:?}");
+        assert!(
+            !plain.iter().any(|x| x.contains("all sources")),
+            "{plain:?}"
+        );
         assert!(!plain.iter().any(|x| x.contains("from ")), "{plain:?}");
         // Targets but no sources: no group pull, still one-off rows.
         let targets_only = BranchGroup::from_states(&[

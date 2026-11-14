@@ -660,7 +660,10 @@ fn only_plain_rows_run_unattended() {
         ),
         planned(
             "gitlab",
-            RemoteRelation::Diverged { ahead: 1, behind: 1 },
+            RemoteRelation::Diverged {
+                ahead: 1,
+                behind: 1,
+            },
             A::MergeFrom,
             &[A::MergeFrom, A::Skip],
         ),
@@ -691,7 +694,10 @@ fn only_plain_rows_run_unattended() {
         ),
         planned(
             "gitlab",
-            RemoteRelation::Diverged { ahead: 1, behind: 1 },
+            RemoteRelation::Diverged {
+                ahead: 1,
+                behind: 1,
+            },
             A::MergeFrom,
             &[A::MergeFrom, A::RebaseOnto, A::Skip],
         ),

@@ -218,7 +218,6 @@ fn the_branch_context_menu_has_the_same_rows_as_the_toolbar() {
     }
 }
 
-
 #[test]
 fn the_palette_continue_abort_and_retry_are_grayed_out_without_a_waiting_group() {
     let repo = fixture(true);

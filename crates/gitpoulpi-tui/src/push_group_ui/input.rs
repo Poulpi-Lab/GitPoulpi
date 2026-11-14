@@ -165,7 +165,9 @@ impl Core {
                         }
                     }
                     KeyCode::Char('f' | 'F') if !ctrl => return self.press(Btn::FetchAgain),
-                    KeyCode::Char('t' | 'T') if !ctrl && p.mode == GroupMode::Push => p.tags = !p.tags,
+                    KeyCode::Char('t' | 'T') if !ctrl && p.mode == GroupMode::Push => {
+                        p.tags = !p.tags
+                    }
                     KeyCode::Char(d @ '1'..='9') if !ctrl => {
                         let i = d as usize - '1' as usize;
                         if i < n {

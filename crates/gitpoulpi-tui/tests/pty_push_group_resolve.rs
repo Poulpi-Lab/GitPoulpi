@@ -142,7 +142,7 @@ fn a_diverged_remote_merges_stops_on_the_conflict_and_continue_finishes_the_push
     // Continue is always on the strip (owner decision), greyed and inert
     // until the conflict is concluded.
     let (cc, cr) = strip_button(&paused, "Continue");
-    let grey = paused.cell(cc + 1, cr).unwrap().bg.clone();
+    let grey = paused.cell(cc + 1, cr).unwrap().bg;
     let abort = strip_button(&paused, "Abort group");
     assert_ne!(
         paused.cell(abort.0 + 1, abort.1).unwrap().bg,

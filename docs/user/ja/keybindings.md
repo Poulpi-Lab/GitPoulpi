@@ -614,16 +614,16 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Git: Pullのオプション... |  |
 | Git: Push | `Ctrl+G P` |
 | Git: リモートへPush... |  |
-| Git: Push to Selected Remotes... |  |
-| Git: Push to All Targets |  |
-| Git: Pull from All Sources |  |
-| Git: Pull from One Remote... |  |
-| Git: Show Grouped Push |  |
-| Git: Continue Grouped Push |  |
-| Git: Abort Grouped Push |  |
-| Git: Retry Failed Pushes |  |
+| Git: 選択したリモートにPush... |  |
+| Git: すべてのPush先にPush |  |
+| Git: すべてのソースからPull |  |
+| Git: 1つのリモートからPull... |  |
+| Git: グループPushを表示 |  |
+| Git: グループPushを続行 |  |
+| Git: グループPushを中止 |  |
+| Git: 失敗したPushを再試行 |  |
 | Git: 強制Push（リース付き）... |  |
-| Git: Remotes of Branch... |  |
+| Git: ブランチのリモート... |  |
 | リモート: リモートを追加... |  |
 | リモート: リモートを削除... |  |
 | リモート: リモートを編集... |  |

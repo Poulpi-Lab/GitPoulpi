@@ -238,6 +238,7 @@ merge 競合エディター（[merge の競合を解決する](merge-conflicts.m
 |---|---|---|
 | `git.pull_mode` | `"merge"` | Pull（ボタン、`Ctrl+G p`、`Git: Pull`）の動作：`merge`（可能なら fast-forward）、`ff_only`、`rebase`。常に git に明示的に渡されます。古い `fetch_all` は `merge` として読まれます。 |
 | `git.push_behavior` | `"direct"` | `direct` は既定のリモートへ push し、`ask` は先にリモートのメニューを表示します。 |
+| `git.push_group_preflight` | `true` | ブランチを複数のリモートに push する前に、まずすべての push 先を調べます（`ls-remote`、差がある場合のみそのリモートの fetch）。後ろのリモートの問題が、最初の push の前に分かります。 |
 | `git.merge_fast_forward` | `"never"` | 自分で開始した merge（ブランチメニュー、ドラッグ＆ドロップ、パレット、`gitpoulpi merge`）が、fast-forward できるブランチをどう扱うか：`never` は常に merge commit を作り（`--no-ff`）、`allowed` は可能なら fast-forward し（git の既定で、`merge.ff` が効きます）、`only` は fast-forward するか拒否します。リポジトリ自身の選択（設定 > Merge オプション、`repo-state.toml` の `merge_fast_forward`）が優先され、CLI の `--ff`、`--no-ff`、`--ff-only` はその両方に優先します。即時に反映されます。 |
 | `git.default_encoding` | `"utf-8"` | 有効な UTF-8 **ではない**テキスト（ファイルの内容、blame、diff、`encoding` ヘッダーのない commit メッセージ）のエンコーディングです。任意の WHATWG ラベルを指定できます（`windows-1252`、`shift_jis` など）。表示のみで、ステージ時に再エンコードすることはありません。リポジトリごとに上書きできます。 |
 | `git.lfs_enabled` | `true` | Git LFS を表示して操作します。リポジトリごとに上書きできます。[Git LFS](lfs.md)を参照してください。 |

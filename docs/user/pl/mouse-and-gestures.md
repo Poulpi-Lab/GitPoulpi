@@ -165,7 +165,8 @@ pole wyboru, by z nich skorzystać.
 
 - **Kliknij** wiersz, by go zaznaczyć. **Kliknij dwukrotnie** lokalną gałąź lub tag, by zrobić
   checkout. **Kliknij dwukrotnie** worktree lub submoduł, by otworzyć go w
-  karcie.
+  karcie. Przycisk **+** w nagłówku WORKTREES tworzy worktree; kliknij worktree prawym
+  przyciskiem, by zobaczyć Otwórz w nowej karcie, Otwórz w, Merge i Usuń ([Worktree](worktrees.md)).
 - **Najedź** na wiersz, by pokazać ikonę po jego lewej stronie. **Kliknij** ją, by ukryć ref
   w Logu lub pokazać go ponownie. Gdy **Solo** jest włączone, to samo miejsce włącza solo
   dla refa. W wierszu folderu ikona działa na każdy ref w folderze.

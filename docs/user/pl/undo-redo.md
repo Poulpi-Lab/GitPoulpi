@@ -261,7 +261,9 @@ usuwa też gałąź zdalną, można cofnąć w całości.
 - **Przerwania rebase**: nie oferuje się dla niego cofania (rebase przesuwa gałęzie
   i ma własny stan; samo przerwanie jest drogą powrotną). Przerwanie
   **merge, cherry-pick lub revert** *jest* zapisywane, patrz wyżej.
-- **Tworzenia worktree**, **tworzenia pliku patcha**, clone, init, akcji
+- **Tworzenia worktree**, **usuwania worktree** (to, co zapisano wcześniej,
+  zostaje: commit, stash; usunięta razem z nim gałąź jest zapisana w dzienniku,
+  więc Cofnij przywraca gałąź, nie folder), **tworzenia pliku patcha**, clone, init, akcji
   hostingu (pull requesty, zgłoszenia) i wywołań AI: nie należą do historii
   repozytorium.
 - **Utworzenia nowego pustego pliku** z menu pliku, automatycznego usuwania

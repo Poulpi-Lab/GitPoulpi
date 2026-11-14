@@ -485,7 +485,7 @@ zastosowania. Klawisze są domyślne.
 | Panel boczny: Pokaż/ukryj gałęzie lokalne |  |
 | Panel boczny: Pokaż/ukryj zdalne |  |
 | Panel boczny: Pokaż/ukryj worktree |  |
-| Sidebar: Show Worktrees Section |  |
+| Panel boczny: Pokaż sekcję worktree |  |
 | Panel boczny: Pokaż/ukryj Stashe |  |
 | Panel boczny: Pokaż/ukryj Tagi |  |
 | Panel boczny: Pokaż/ukryj Pull requesty |  |
@@ -529,12 +529,12 @@ zastosowania. Klawisze są domyślne.
 | Refs: Reflog zaznaczonej gałęzi... |  |
 | Refs: Rozpocznij pull request z zaznaczonej gałęzi... |  |
 | Refs: Otwórz worktree w karcie | `Enter / dwuklik` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: Otwórz worktree w... |  |
+| Refs: Merge gałęzi worktree do... |  |
+| Refs: Usuń worktree... |  |
+| Refs: Utwórz worktree... | `+` |
+| Refs: Utwórz worktree z bieżącej gałęzi |  |
+| Refs: Utwórz worktree z wybranej gałęzi |  |
 | Refs: Aktualizuj submoduł (zaznaczony) |  |
 | Refs: Inicjuj submoduł (zaznaczony) |  |
 | Refs: Otwórz submoduł w karcie | `Enter / dwuklik` |

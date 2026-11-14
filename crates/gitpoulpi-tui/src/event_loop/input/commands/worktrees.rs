@@ -15,12 +15,10 @@ mod stub {
 
     pub(in crate::event_loop) fn open_plus_menu(_cx: &mut CommandCtx<'_>, _col: u16, _row: u16) {}
 
-    pub(in crate::event_loop) fn open_row_menu(_cx: &mut CommandCtx<'_>) {}
-
     pub(in crate::event_loop) fn run(_cx: &mut CommandCtx<'_>, _cmd: PaletteCommand) -> bool {
         false
     }
 }
 #[cfg(not(feature = "worktree"))]
 #[allow(unused_imports)]
-pub(in crate::event_loop) use stub::{open_plus_menu, open_row_menu, run};
+pub(in crate::event_loop) use stub::{open_plus_menu, run};

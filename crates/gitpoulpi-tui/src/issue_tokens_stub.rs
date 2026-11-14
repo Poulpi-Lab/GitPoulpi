@@ -12,6 +12,8 @@ pub(crate) struct Link {
     pub(crate) end: usize,
     pub(crate) reference: String,
     pub(crate) url: String,
+    /// Same field as the full build so shared callers compile.
+    pub(crate) confirm: bool,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]

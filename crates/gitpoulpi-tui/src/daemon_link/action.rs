@@ -503,6 +503,8 @@ pub enum Action {
     /// (the path of the merged branch's own worktree and whether to delete
     /// its branch too), that worktree is removed once the merge landed
     /// without conflicts.
+    #[cfg_attr(not(feature = "worktree"), allow(dead_code))]
+    // only the worktree dialogs build it
     WorktreeMerge {
         worktree: PathBuf,
         from: Box<Ref>,

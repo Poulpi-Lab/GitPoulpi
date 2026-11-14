@@ -96,18 +96,30 @@ pub(crate) enum RefContextAction {
     CreateWorktree,
     /// A WORKTREES row (`full_name` is the worktree's folder): open it as a
     /// tab, like a double click.
+    #[cfg_attr(not(feature = "worktree"), allow(dead_code))]
+    // only the worktree menus build it
     WorktreeOpenTab,
     /// Run the `n`th "Open in" entry on the worktree's folder.
+    #[cfg_attr(not(feature = "worktree"), allow(dead_code))]
+    // only the worktree menus build it
     WorktreeOpenWith(u16),
     /// Merge the worktree's branch into another branch (a picker).
+    #[cfg_attr(not(feature = "worktree"), allow(dead_code))]
+    // only the worktree menus build it
     WorktreeMerge,
     /// Remove the worktree (a confirmation that also offers to save its
     /// changes).
+    #[cfg_attr(not(feature = "worktree"), allow(dead_code))]
+    // only the worktree menus build it
     WorktreeRemove,
     /// The WORKTREES header's `+` menu: a worktree on the current branch,
     /// on the Log's selected commit, or on a branch chosen in the dialog.
+    #[cfg_attr(not(feature = "worktree"), allow(dead_code))]
+    // only the worktree menus build it
     WorktreeNewHead,
+    #[cfg_attr(not(feature = "worktree"), allow(dead_code))] // only the worktree menus build it
     WorktreeNewCommit,
+    #[cfg_attr(not(feature = "worktree"), allow(dead_code))] // only the worktree menus build it
     WorktreeNewChoose,
     /// Open the Reflog view on this local branch: where it was before.
     Reflog,

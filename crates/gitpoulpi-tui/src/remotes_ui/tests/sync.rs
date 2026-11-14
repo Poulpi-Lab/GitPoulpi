@@ -46,7 +46,8 @@ fn the_pull_button_does_what_its_mode_says() {
             .0,
         Action::Pull(PullOptions {
             mode: PullMode::Rebase,
-            remote: None
+            remote: None,
+            ..PullOptions::default()
         })
     );
     assert_eq!(
@@ -55,7 +56,8 @@ fn the_pull_button_does_what_its_mode_says() {
             .0,
         Action::Pull(PullOptions {
             mode: PullMode::FastForwardOnly,
-            remote: Some("fork".into())
+            remote: Some("fork".into()),
+            ..PullOptions::default()
         }),
         "no upstream: the same-named branch of the default remote"
     );

@@ -1348,6 +1348,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
                     PullModeArg::Rebase => PullMode::Rebase,
                 },
                 remote,
+                ..PullOptions::default()
             };
             let outcome: PullOutcome = session
                 .call(
@@ -1378,6 +1379,7 @@ async fn dispatch(session: &mut Session, command: Commands) -> Result<Emitted, S
                 force_with_lease,
                 set_upstream,
                 branch,
+                ..PushOptions::default()
             };
             let outcome: PushOutcome = session
                 .call(

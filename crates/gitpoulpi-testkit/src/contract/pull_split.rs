@@ -47,7 +47,14 @@ fn build(shape: Shape, mode: PullMode) -> (FixtureRepo, PullOptions) {
         Shape::UpToDate | Shape::NoUpstream => {}
     }
     let remote = matches!(shape, Shape::ExplicitRemote).then(|| "origin".to_string());
-    (repo, PullOptions { mode, remote })
+    (
+        repo,
+        PullOptions {
+            mode,
+            remote,
+            ..PullOptions::default()
+        },
+    )
 }
 
 /// What a pull left behind, without anything that differs between two

@@ -369,6 +369,13 @@ pub trait GitBackend: Send + Sync {
     /// parent by n".
     fn ahead_behind(&self, repo: &RepoRef, tip: Oid, base: Oid) -> Result<(u32, u32)>;
 
+    /// Like [`Self::ahead_behind`] but patch-equivalent commits do not
+    /// count (`rev-list --cherry-pick --left-right --count local...remote`):
+    /// `(local_unmatched, remote_unmatched)`. A remote that only holds
+    /// older copies of rebased local commits reads `(n, 0)` here while
+    /// `ahead_behind` says it diverged. A read.
+    fn cherry_counts(&self, repo: &RepoRef, local: Oid, remote: Oid) -> Result<(u32, u32)>;
+
     /// The paths a merge of `theirs` into `ours` would leave conflicted,
     /// sorted and without duplicates, computed **without touching the work
     /// tree, the index, HEAD or any ref** (proactive conflict detection).

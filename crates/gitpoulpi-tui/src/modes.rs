@@ -538,6 +538,7 @@ impl PendingDestructive {
                     force_with_lease: true,
                     set_upstream: false,
                     branch: Some(branch),
+                    ..Default::default()
                 },
             },
         }

@@ -3,7 +3,7 @@ use std::path::Path;
 use gitpoulpi_core::domain::REMOTE_TAG_MIRROR_PREFIX;
 use gitpoulpi_core::domain::{
     CloneOptions, ClonePhase, CloneProgress, CloneProgressSink, FetchOptions, FetchOutcome,
-    PullMode, PullOptions, PullOutcome, PushOptions, PushOutcome, PushRejectReason, PushRejection,
+    PullMode, PullOptions, PullOutcome, PushLease, PushOptions, PushOutcome, PushRejection,
     RepoRef,
 };
 #[cfg(feature = "lfs")]
@@ -347,7 +347,10 @@ pub async fn pull(repo: &RepoRef, opts: &PullOptions) -> Result<PullOutcome> {
     let mut args: Vec<String> = vec!["pull".into()];
     args.extend(pull_mode_args(opts.mode).iter().map(|a| a.to_string()));
     if let Some(remote) = &opts.remote {
-        let branch = current_branch(repo).await?;
+        let branch = match &opts.remote_branch {
+            Some(b) => b.clone(),
+            None => current_branch(repo).await?,
+        };
         args.push(remote.clone());
         args.push(branch);
     }
@@ -372,7 +375,10 @@ async fn pull_source(repo: &RepoRef, opts: &PullOptions) -> Result<Option<PullSo
         gitpoulpi_core::guard::check_remote_arg("remote", remote)?;
     }
     if let Some(remote) = &opts.remote {
-        let branch = current_branch(repo).await?;
+        let branch = match &opts.remote_branch {
+            Some(b) => b.clone(),
+            None => current_branch(repo).await?,
+        };
         return Ok(Some(PullSource {
             remote: remote.clone(),
             tracking: Some(format!("refs/remotes/{remote}/{branch}")),
@@ -574,16 +580,32 @@ pub async fn push(repo: &RepoRef, remote: &str, opts: &PushOptions) -> Result<Pu
     if opts.set_upstream {
         args.push("--set-upstream".to_string());
     }
-    if opts.force_with_lease {
-        args.push("--force-with-lease".to_string());
+    let dst = opts.remote_branch.clone().unwrap_or_else(|| branch.clone());
+    if let Some(dst) = &opts.remote_branch {
+        gitpoulpi_core::guard::check_remote_arg("remote branch", dst)?;
+    }
+    let lease = opts
+        .lease
+        .or(opts.force_with_lease.then_some(PushLease::Tracking));
+    match lease {
+        None => {}
+        Some(PushLease::Tracking) => args.push("--force-with-lease".to_string()),
+        Some(PushLease::Expect(oid)) => {
+            args.push(format!(
+                "--force-with-lease=refs/heads/{dst}:{}",
+                oid.to_hex()
+            ));
+        }
+        Some(PushLease::Absent) => args.push(format!("--force-with-lease=refs/heads/{dst}:")),
     }
     args.push(remote.to_string());
-    args.push(format!("refs/heads/{branch}:refs/heads/{branch}"));
+    args.push(format!("refs/heads/{branch}:refs/heads/{dst}"));
     let args_ref: Vec<&str> = args.iter().map(String::as_str).collect();
     let output = run_full_async(&repo.root, &args_ref).await?;
 
     if !output.success {
-        if let Some(reason) = rejection_reason(&output.stdout) {
+        if let Some(reason) = crate::history::push::rejection_reason(&output.stdout, &output.stderr)
+        {
             let detail =
                 match crate::process::failed_with(&args_ref, output.exit_code, &output.stderr) {
                     Error::Git { detail, .. } => Some(detail),
@@ -658,32 +680,6 @@ pub async fn push_for_review(
     Ok(PushOutcome {
         pushed_refs: vec![target],
     })
-}
-
-/// The actionable rejection in `git push --porcelain` output, if any.
-///
-/// Only rejections the user can do something about are typed: the
-/// remote moved on (`fetch first` when we do not even have its tip,
-/// `non-fast-forward` when we do) or a lease protected it
-/// (`stale info`). A hook refusing the push (`[remote rejected]`) stays
-/// an ordinary error carrying git's message.
-pub(crate) fn rejection_reason(porcelain: &str) -> Option<PushRejectReason> {
-    porcelain
-        .lines()
-        .filter(|line| line.starts_with('!'))
-        .find_map(|line| {
-            let summary = line.rsplit('\t').next()?;
-            if !summary.starts_with("[rejected]") {
-                return None;
-            }
-            if summary.contains("(stale info)") {
-                Some(PushRejectReason::StaleLease)
-            } else if summary.contains("(non-fast-forward)") || summary.contains("(fetch first)") {
-                Some(PushRejectReason::NonFastForward)
-            } else {
-                None
-            }
-        })
 }
 
 /// `git clone`'s argument list, in the one place that builds it, so the
@@ -986,6 +982,7 @@ pub fn remote_add(repo: &RepoRef, name: &str, url: &str) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use gitpoulpi_core::domain::PushRejectReason;
 
     /// The three rejections that are the user's to resolve are typed;
     /// a hook refusing the push (`[remote rejected]`) and a success are
@@ -996,24 +993,39 @@ mod tests {
             format!("To ../origin.git\n!\trefs/heads/main:refs/heads/main\t{summary}\nDone\n")
         };
         assert_eq!(
-            rejection_reason(&line("[rejected] (non-fast-forward)")),
+            crate::history::push::rejection_reason(&line("[rejected] (non-fast-forward)"), ""),
             Some(PushRejectReason::NonFastForward)
         );
         assert_eq!(
-            rejection_reason(&line("[rejected] (fetch first)")),
+            crate::history::push::rejection_reason(&line("[rejected] (fetch first)"), ""),
             Some(PushRejectReason::NonFastForward)
         );
         assert_eq!(
-            rejection_reason(&line("[rejected] (stale info)")),
+            crate::history::push::rejection_reason(&line("[rejected] (stale info)"), ""),
             Some(PushRejectReason::StaleLease)
         );
         assert_eq!(
-            rejection_reason(&line("[remote rejected] (pre-receive hook declined)")),
-            None
+            crate::history::push::rejection_reason(
+                &line("[remote rejected] (pre-receive hook declined)"),
+                ""
+            ),
+            Some(PushRejectReason::RemoteRefused)
         );
         assert_eq!(
-            rejection_reason("To ../o.git\n \trefs/heads/main:refs/heads/main\t1a2b..3c4d\nDone\n"),
+            crate::history::push::rejection_reason(
+                "To ../o.git\n \trefs/heads/main:refs/heads/main\t1a2b..3c4d\nDone\n",
+                ""
+            ),
             None
+        );
+    }
+
+    #[test]
+    fn a_protected_branch_refusal_is_typed_from_the_hosts_words() {
+        let porcelain = "!\trefs/heads/main:refs/heads/main\t[remote rejected] (protected branch hook declined)\n";
+        assert_eq!(
+            crate::history::push::rejection_reason(porcelain, ""),
+            Some(PushRejectReason::ProtectedByHost)
         );
     }
 

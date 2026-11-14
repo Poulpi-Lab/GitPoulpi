@@ -225,6 +225,12 @@ impl RemoteUi {
                 msg::diverged_message(&rejection.remote, &rejection.branch)
             }
             PushRejectReason::StaleLease => msg::stale_lease(&rejection.remote, &rejection.branch),
+            // English until the catalogs get words for it.
+            PushRejectReason::ProtectedByHost
+            | PushRejectReason::RemoteRefused
+            | PushRejectReason::Unknown => {
+                gitpoulpi_core::Error::PushRejected(rejection.clone()).to_string()
+            }
         }
     }
 }

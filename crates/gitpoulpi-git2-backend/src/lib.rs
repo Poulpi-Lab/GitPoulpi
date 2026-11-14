@@ -325,6 +325,10 @@ impl GitBackend for Git2Backend {
     fn ahead_behind(&self, repo: &RepoRef, tip: Oid, base: Oid) -> Result<(u32, u32)> {
         reads::ahead_behind(repo, tip, base)
     }
+    // libgit2 has no patch-id: the system git answers.
+    fn cherry_counts(&self, repo: &RepoRef, local: Oid, remote: Oid) -> Result<(u32, u32)> {
+        self.fallback.cherry_counts(repo, local, remote)
+    }
     fn predict_merge_conflicts(
         &self,
         repo: &RepoRef,

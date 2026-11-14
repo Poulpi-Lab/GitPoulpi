@@ -533,7 +533,9 @@ Edita a lista do botão **Abrir em** da barra de título. O separador **Geral** 
 os botões **Sair e cd aqui** da pasta, a **Entrada predefinida** e **Repor predefinições
 detetadas**. O separador **Entradas** é uma [lista](#listas) (uma etiqueta e um comando
 cada): **+ Adicionar ▾** oferece as predefinições e **Personalizada**, e a entrada
-predefinida está marcada com `★`. Os campos da entrada selecionada incluem um botão
+predefinida está marcada com `★`. Os campos da entrada selecionada incluem
+**Pode abrir um worktree** (marcado por predefinição: a entrada é oferecida no
+menu Abrir em de uma linha de worktree, veja [Worktrees](worktrees.md)) e um botão
 **Testar**. Veja [Abrir em](open-in.md).
 
 A primeira linha, **Seguir a pasta do separador ativo**, tem dois valores:

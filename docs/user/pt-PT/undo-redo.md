@@ -265,7 +265,9 @@ também elimina a branch remota é desfazível como um todo.
 - **Abortar um rebase**: o desfazer não é oferecido para ele (um rebase move
   branches e mantém o seu próprio estado; o abortar é em si o caminho de volta).
   Abortar um **merge, cherry-pick ou revert** *é* registado, veja acima.
-- **Criar um worktree**, **criar um ficheiro de patch**, clone, init, ações de
+- **Criar um worktree**, **remover um worktree** (o que guardou antes fica: o
+  commit, o stash; a branch eliminada com ele fica no diário, por isso Desfazer
+  repõe a branch, não a pasta), **criar um ficheiro de patch**, clone, init, ações de
   alojamento (pull requests, issues) e chamadas de IA: não fazem parte do
   histórico do repositório.
 - **Criar um novo ficheiro vazio** a partir do menu de ficheiro, a remoção

@@ -224,8 +224,10 @@ entre duas secções para as redimensionar.
   visto mostra a branch em checkout. Pode desligar as pastas nas
   Definições.
 - **REMOTO**: cada remoto, com as suas branches por baixo.
-- **WORKTREES**: worktrees ligados, quando existem. Faça clique duplo num para
-  o abrir no seu próprio separador.
+- **WORKTREES**: worktrees ligados, quando existem (ou quando mostrou a
+  secção). O **+** no seu cabeçalho cria um; faça clique duplo num worktree para
+  o abrir no seu próprio separador, clique direito para Abrir em, Merge e
+  Remover. Veja [Worktrees](worktrees.md).
 - **STASHES**: os seus stashes. Clique com o botão direito num para **Pop**, **Apply** e
   **Drop**.
 - **TAGS**: as suas tags, em pastas separadas por `/` como as branches (`releases/`, `backups/`). Uma seta significa que a tag está também no remoto.

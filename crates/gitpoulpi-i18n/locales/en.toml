@@ -11980,8 +11980,6 @@ title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {
 strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
 strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
-# context: tooltip of the grayed Continue button of the strip: the conflicts are not concluded yet
-strip_continue_blocked = "Resolve and conclude the conflicts first."
 [multi_remote]
 state_new = "new"
 state_gone = "gone"

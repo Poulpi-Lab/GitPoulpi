@@ -47,7 +47,7 @@ pub(crate) fn run_remote_palette_command(
         }
         PaletteCommand::ChoosePullButtonAction => {
             let (c, r) = ctx.ui.pull_anchor();
-            ctx.ui.open_pull_menu(c, r);
+            ctx.ui.open_pull_menu(refs, c, r);
         }
         PaletteCommand::LfsMenu => {
             let (c, r) = ctx.ui.lfs_anchor();
@@ -57,6 +57,36 @@ pub(crate) fn run_remote_palette_command(
         PaletteCommand::PushToRemote => {
             *ctx.last_message = ctx.ui.open_push_menu(refs, col, row);
         }
+        PaletteCommand::PushToAllTargets => match head_branch(refs) {
+            Some(head) => *ctx.last_message = Some(ctx.ui.push_all(&head.name, refs)),
+            None => *ctx.last_message = Some(msg::DETACHED_PUSH.get().into()),
+        },
+        PaletteCommand::PullFromAllSources => match head_branch(refs) {
+            Some(head) => *ctx.last_message = Some(ctx.ui.pull_all(&head.name, refs)),
+            None => *ctx.last_message = Some(msg::DETACHED_PULL.get().into()),
+        },
+        PaletteCommand::PullFromOneRemote => match head_branch(refs) {
+            Some(head) => {
+                let group = branch_group(refs, &head.name);
+                let local = head.name.clone();
+                if let Some(why) = ctx.ui.open_chooser(
+                    msg::PULL_TITLE.get(),
+                    refs,
+                    col,
+                    row,
+                    false,
+                    move |remote| RemoteUiAction::PullOne {
+                        remote_branch: group
+                            .as_ref()
+                            .map_or_else(|| local.clone(), |g| g.branch_on(&remote, &local)),
+                        remote,
+                    },
+                ) {
+                    *ctx.last_message = Some(why);
+                }
+            }
+            None => *ctx.last_message = Some(msg::DETACHED_PULL.get().into()),
+        },
         PaletteCommand::ForcePushWithLease => {
             let head = head_branch(refs);
             let remote = head.as_ref().and_then(|h| {
@@ -283,6 +313,29 @@ pub(crate) fn apply_remote_ui_action(action: RemoteUiAction, ctx: RemoteUiCtx<'_
             }
             None => Some(msg::DETACHED_PUSH.get().into()),
         },
+        RemoteUiAction::PushAll { branch } => Some(ui.push_all(&branch, refs)),
+        RemoteUiAction::PushOne {
+            branch,
+            remote,
+            remote_branch,
+        } => Some(ui.push_one(&branch, &remote, &remote_branch, refs, link)),
+        RemoteUiAction::PushSelected { branch } => {
+            ui.push_selected(&branch);
+            None
+        }
+        RemoteUiAction::RemotesOf { branch } => match local_branch(refs, &branch) {
+            Some(b) => {
+                let requester = link.activity_handle().raw.requester();
+                ui.open_upstream_prompt(&b, refs, &requester, input_mode);
+                None
+            }
+            None => Some(crate::git_actions::gone(&branch)),
+        },
+        RemoteUiAction::PullAll { branch } => Some(ui.pull_all(&branch, refs)),
+        RemoteUiAction::PullOne {
+            remote,
+            remote_branch,
+        } => Some(ui.pull_one(&remote, &remote_branch, link)),
         RemoteUiAction::PullThenPush { remote, branch } => {
             link.submit_action(Action::PullThenPush {
                 remote: remote.clone(),

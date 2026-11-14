@@ -82,6 +82,7 @@ pub(crate) fn render(
             label,
             danger: *b == RebaseBannerButton::Abort,
             hovered: hovered == Some(*b),
+            disabled: false,
         })
         .collect();
     crate::operation_banner::paint_strip(frame, area, &[banner_text(state)], &strip)

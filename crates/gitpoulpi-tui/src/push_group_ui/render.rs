@@ -102,6 +102,9 @@ impl Core {
 fn title(dlg: &Dlg, run: Option<&RunState>) -> String {
     match &dlg.step {
         Step::Select(_) => msg::title_select(&dlg.branch),
+        Step::Plan(p) if p.ready() && p.mode == gitpoulpi_core::domain::GroupMode::Pull => {
+            msg::title_pull_plan(p.rows.len() as u64, &dlg.branch)
+        }
         Step::Plan(p) if p.ready() => msg::title_plan(p.rows.len() as u64, &dlg.branch),
         Step::Plan(_) => msg::title_run(&dlg.branch),
         Step::Run => msg::title_run(run.map_or(dlg.branch.as_str(), |r| r.branch.as_str())),
@@ -492,19 +495,22 @@ fn paint_plan(
     }
     // Tags, the summary and the warnings.
     let mut ty = list_bottom + 1;
-    let rect = checkbox(
-        buf,
-        inner.x,
-        ty,
-        inner.width,
-        msg::TAGS.get(),
-        p.tags,
-        CheckState::Enabled {
-            hovered: hover == Some(Part::Tags),
-            focused: false,
-        },
-    );
-    hits.insert(0, (rect, Part::Tags));
+    // Tags go with a push only.
+    if p.mode == gitpoulpi_core::domain::GroupMode::Push {
+        let rect = checkbox(
+            buf,
+            inner.x,
+            ty,
+            inner.width,
+            msg::TAGS.get(),
+            p.tags,
+            CheckState::Enabled {
+                hovered: hover == Some(Part::Tags),
+                focused: false,
+            },
+        );
+        hits.insert(0, (rect, Part::Tags));
+    }
     ty += 1;
     put(
         buf,

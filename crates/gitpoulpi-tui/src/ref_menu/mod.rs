@@ -74,6 +74,13 @@ pub(crate) enum RefContextAction {
     /// Push this local branch - to its upstream's remote, else the
     /// default remote, setting the upstream on a first push.
     PushBranch,
+    /// Push this branch to the `n`th remote of its group, once.
+    PushToTarget(u8),
+    /// Pull the `n`th remote of the branch's group into it, once. Offered
+    /// only for the checked-out branch.
+    PullFromTarget(u8),
+    /// The one-off dialog that ticks the remotes of this push.
+    PushToSelected,
     /// Pull into this branch. Offered only for the checked-out one:
     /// a pull integrates into HEAD.
     PullBranch,
@@ -563,13 +570,51 @@ pub(crate) fn ref_menu_entries(
                     .with_key(crate::keymap::Action::GitPull),
                 );
             }
+            // A branch with extra targets pushes to all of them, like the
+            // toolbar's Push button; "Push to <r> only" rows follow.
+            let push_group = ctx.group.as_ref().filter(|g| g.extra_push);
             entries.push(
                 Entry::action(
-                    glyph_label("\u{21E7}", msg::push_branch(full_name)),
+                    glyph_label(
+                        "\u{21E7}",
+                        match push_group {
+                            Some(g) => gitpoulpi_i18n::msg::remotes::push_to_all(g.push_names()),
+                            None => msg::push_branch(full_name),
+                        },
+                    ),
                     RefContextAction::PushBranch,
                 )
                 .with_key(crate::keymap::Action::GitPush),
             );
+            if let Some(g) = push_group {
+                for (i, (remote, _)) in g.push.iter().enumerate() {
+                    entries.push(Entry::action(
+                        glyph_label(
+                            "\u{21E7}",
+                            gitpoulpi_i18n::msg::remotes::push_to_only(remote),
+                        ),
+                        RefContextAction::PushToTarget(i as u8),
+                    ));
+                }
+            }
+            entries.push(Entry::action(
+                glyph_label(
+                    "\u{21E7}",
+                    gitpoulpi_i18n::msg::remotes::PUSH_TO_SELECTED.get(),
+                ),
+                RefContextAction::PushToSelected,
+            ));
+            if let (true, Some(g)) = (is_current, ctx.group.as_ref()) {
+                for (i, (remote, _)) in g.pull_one.iter().enumerate() {
+                    entries.push(Entry::action(
+                        glyph_label(
+                            "\u{21E9}",
+                            gitpoulpi_i18n::msg::remotes::pull_from_only(remote),
+                        ),
+                        RefContextAction::PullFromTarget(i as u8),
+                    ));
+                }
+            }
             let pr_label = glyph_label("\u{21F1}", msg::start_pr(full_name));
             if crate::build_features::HOSTING {
                 entries.push(match &ctx.pr_reason {

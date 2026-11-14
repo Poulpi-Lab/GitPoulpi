@@ -97,6 +97,7 @@ fn paint(
                 StuckBannerButton::AmAbort | StuckBannerButton::RemoveLock
             ),
             hovered: hovered == Some(*b),
+            disabled: false,
         })
         .collect();
     crate::operation_banner::paint_strip(frame, area, &[text], &strip)

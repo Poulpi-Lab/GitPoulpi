@@ -167,6 +167,7 @@ pub(crate) fn render(
         label: t::BADGE_BUTTON.get(),
         danger: false,
         hovered,
+        disabled: false,
     }];
     paint_strip(frame, area, &[text(prediction)], &strip)
         .into_iter()

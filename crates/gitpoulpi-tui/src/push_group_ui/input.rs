@@ -6,7 +6,7 @@
 use crossterm::event::{
     KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseButton, MouseEvent, MouseEventKind,
 };
-use gitpoulpi_core::domain::{GroupAction, OperationKind};
+use gitpoulpi_core::domain::{GroupAction, GroupMode, OperationKind};
 use gitpoulpi_i18n::msg::push_group as msg;
 
 use super::model::{action_from_key, Btn, Part, Phase};
@@ -165,7 +165,7 @@ impl Core {
                         }
                     }
                     KeyCode::Char('f' | 'F') if !ctrl => return self.press(Btn::FetchAgain),
-                    KeyCode::Char('t' | 'T') if !ctrl => p.tags = !p.tags,
+                    KeyCode::Char('t' | 'T') if !ctrl && p.mode == GroupMode::Push => p.tags = !p.tags,
                     KeyCode::Char(d @ '1'..='9') if !ctrl => {
                         let i = d as usize - '1' as usize;
                         if i < n {
@@ -241,7 +241,7 @@ impl Core {
                 }
                 let targets = s.targets();
                 let remember = s.remember.then(|| s.remember_action(&branch)).flatten();
-                let plan = self.ask_plan(&requester, &branch, Some(targets));
+                let plan = self.ask_plan(&requester, &branch, Some(targets), GroupMode::Push);
                 if let Some(d) = self.dlg.as_mut() {
                     d.step = Step::Plan(plan);
                     d.btn_focus = None;
@@ -257,7 +257,8 @@ impl Core {
                 };
                 let targets = p.targets.clone();
                 let tags = p.tags;
-                let mut plan = self.ask_plan(&requester, &branch, targets);
+                let mode = p.mode;
+                let mut plan = self.ask_plan(&requester, &branch, targets, mode);
                 plan.tags = tags;
                 if let Some(d) = self.dlg.as_mut() {
                     d.step = Step::Plan(plan);

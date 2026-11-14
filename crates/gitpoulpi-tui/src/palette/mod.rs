@@ -317,6 +317,21 @@ pub(crate) enum PaletteCommand {
     /// The one-off grouped push: pick the remotes, see the plan, run
     /// (`push_group_ui`).
     PushToSelectedRemotes,
+    /// Push to the upstream and every extra push target (the Push button's
+    /// answer on a branch with targets).
+    PushToAllTargets,
+    /// Pull the upstream and every extra pull source.
+    PullFromAllSources,
+    /// Pull from one remote, once: a chooser of the remotes.
+    PullFromOneRemote,
+    /// Reopen the progress window of the last grouped push.
+    ShowGroupedPush,
+    /// The paused strip's Continue.
+    ContinueGroupedPush,
+    /// The paused strip's Abort group.
+    AbortGroupedPush,
+    /// The progress window's Retry failed.
+    RetryFailedPushes,
     /// Choose, type or unset the upstream of the selected local branch,
     /// else of the checked-out one.
     SetUpstream,

@@ -615,6 +615,13 @@ Windows 控制台自己会报告修饰键，不需要该协议。
 | Git：Push | `Ctrl+G P` |
 | Git：Push 到远程… |  |
 | Git: Push to Selected Remotes... |  |
+| Git: Push to All Targets |  |
+| Git: Pull from All Sources |  |
+| Git: Pull from One Remote... |  |
+| Git: Show Grouped Push |  |
+| Git: Continue Grouped Push |  |
+| Git: Abort Grouped Push |  |
+| Git: Retry Failed Pushes |  |
 | Git：强制 Push（带 lease）… |  |
 | Git: Remotes of Branch... |  |
 | 远程：添加远程… |  |

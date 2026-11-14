@@ -3657,19 +3657,19 @@ view_log_scroll_left = "Affichage : Log : Faire défiler les colonnes vers la 
 view_log_scroll_right = "Affichage : Log : Faire défiler les colonnes vers la droite"
 view_log_columns_layout = "Affichage : Log : Activer ou désactiver le défilement latéral des colonnes"
 # context: palette command: push to the upstream and every extra push target
-git_push_to_all_targets = "Git : {$Push} vers toutes les cibles"
+git_push_to_all_targets = "Git : {$Push} vers toutes les cibles"
 # context: palette command: pull the upstream and every extra pull source
-git_pull_from_all_sources = "Git : {$Pull} depuis toutes les sources"
+git_pull_from_all_sources = "Git : {$Pull} depuis toutes les sources"
 # context: palette command: opens a list of remotes, pulls from the chosen one once
-git_pull_from_one_remote = "Git : {$Pull} depuis un seul distant..."
+git_pull_from_one_remote = "Git : {$Pull} depuis un seul distant..."
 # context: palette command: reopens the progress window of the last push to several remotes
-git_show_grouped_push = "Git : Afficher le {$Push} groupé"
+git_show_grouped_push = "Git : Afficher le {$Push} groupé"
 # context: palette command: goes on with the push to several remotes that paused on conflicts
-git_continue_grouped_push = "Git : Continuer le {$Push} groupé"
+git_continue_grouped_push = "Git : Continuer le {$Push} groupé"
 # context: palette command: abandons the push to several remotes that paused on conflicts
-git_abort_grouped_push = "Git : Abandonner le {$Push} groupé"
+git_abort_grouped_push = "Git : Abandonner le {$Push} groupé"
 # context: palette command: tries again the remotes that failed in the last push to several remotes
-git_retry_failed_pushes = "Git : Relancer les envois échoués"
+git_retry_failed_pushes = "Git : Relancer les envois échoués"
 # context: palette: why a command is grayed out
 why_no_grouped_push = "aucun {$push} groupé à afficher"
 # context: palette: why a command is grayed out
@@ -9736,8 +9736,6 @@ title_pull_plan = { one = "{$Pull} de {n} distant dans {branch}", other = "{$Pul
 strip_waiting_pull = "{$Pull} groupé en pause ({remote}) : résolvez et concluez, puis Continuer."
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
 strip_ready_pull = "{$Pull} groupé en pause ({remote}) : résolu. Continuer le {$pull}."
-# context: tooltip of the grayed Continue button of the strip: the conflicts are not concluded yet
-strip_continue_blocked = "Résolvez et concluez d'abord les conflits."
 [multi_remote]
 state_new = "nouveau"
 state_gone = "absent"

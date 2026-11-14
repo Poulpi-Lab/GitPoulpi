@@ -307,7 +307,8 @@ pub(super) fn handle(
         }
         Some(HitTarget::ToolbarDropdown(_)) => {
             let (c, r) = cx.remote_ui.pull_anchor();
-            cx.remote_ui.open_pull_menu(c, r);
+            cx.remote_ui
+                .open_pull_menu(cx.refs_result.as_deref().unwrap_or(&[]), c, r);
             return Ok(Flow::Handled);
         }
         Some(HitTarget::RefRemotesBadge(branch)) => {

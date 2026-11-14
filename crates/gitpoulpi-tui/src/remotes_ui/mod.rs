@@ -263,6 +263,34 @@ pub(crate) enum RemoteUiAction {
     Flow(crate::flow::FlowCmd),
     /// Push the checked-out branch to this remote, once.
     PushTo(String),
+    /// Push `branch` to its upstream and every extra push target (the
+    /// plan, run at once when every row is a plain push).
+    PushAll {
+        branch: String,
+    },
+    /// Push `branch` to one remote only, under `remote_branch` there.
+    PushOne {
+        branch: String,
+        remote: String,
+        remote_branch: String,
+    },
+    /// The one-off dialog that ticks the remotes of this push.
+    PushSelected {
+        branch: String,
+    },
+    /// The branch's Remotes dialog.
+    RemotesOf {
+        branch: String,
+    },
+    /// Pull the checked-out `branch` from its upstream and every source.
+    PullAll {
+        branch: String,
+    },
+    /// Pull one remote's branch into the checked-out branch, once.
+    PullOne {
+        remote: String,
+        remote_branch: String,
+    },
     /// The diverged-push dialog's three answers.
     PullThenPush {
         remote: String,
@@ -669,10 +697,12 @@ pub(crate) fn push_plan(
 
 mod apply;
 mod form;
+mod groups;
 mod ui;
 
 pub(crate) use apply::*;
 pub(crate) use form::*;
+pub(crate) use groups::*;
 pub(crate) use ui::*;
 
 #[cfg(test)]

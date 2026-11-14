@@ -651,6 +651,13 @@ quand elles ne s'appliquent pas. Les touches sont celles par défaut.
 | Git : Push | `Ctrl+G P` |
 | Git : Push vers un distant... |  |
 | Git : Push vers des distants choisis... |  |
+| Git : Push vers toutes les cibles |  |
+| Git : Pull depuis toutes les sources |  |
+| Git : Pull depuis un seul distant... |  |
+| Git : Afficher le Push groupé |  |
+| Git : Continuer le Push groupé |  |
+| Git : Abandonner le Push groupé |  |
+| Git : Relancer les envois échoués |  |
 | Git : Push forcé (avec lease)... |  |
 | Git : Remotes de la branche... |  |
 | Distant : Ajouter un distant... |  |

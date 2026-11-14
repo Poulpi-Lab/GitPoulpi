@@ -615,6 +615,13 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Git: Push | `Ctrl+G P` |
 | Git: リモートへPush... |  |
 | Git: Push to Selected Remotes... |  |
+| Git: Push to All Targets |  |
+| Git: Pull from All Sources |  |
+| Git: Pull from One Remote... |  |
+| Git: Show Grouped Push |  |
+| Git: Continue Grouped Push |  |
+| Git: Abort Grouped Push |  |
+| Git: Retry Failed Pushes |  |
 | Git: 強制Push（リース付き）... |  |
 | Git: Remotes of Branch... |  |
 | リモート: リモートを追加... |  |

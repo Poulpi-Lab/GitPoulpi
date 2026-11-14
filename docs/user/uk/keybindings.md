@@ -643,6 +643,13 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Git: Push | `Ctrl+G P` |
 | Git: Push на remote... |  |
 | Git: Push to Selected Remotes... |  |
+| Git: Push to All Targets |  |
+| Git: Pull from All Sources |  |
+| Git: Pull from One Remote... |  |
+| Git: Show Grouped Push |  |
+| Git: Continue Grouped Push |  |
+| Git: Abort Grouped Push |  |
+| Git: Retry Failed Pushes |  |
 | Git: force push (із lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: додати remote... |  |

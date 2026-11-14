@@ -331,6 +331,32 @@ pub(crate) fn apply_ref_context_action(
                 None => *last_message = Some(NO_SUCH_LOCAL_BRANCH.get().into()),
             }
         }
+        RefContextAction::PushToSelected => remote_ui.push_selected(&full_name),
+        RefContextAction::PushToTarget(i) => {
+            let refs = refs_result.as_deref().unwrap_or(&[]);
+            let target = remotes_ui::branch_group(refs, &full_name)
+                .and_then(|g| g.push.get(usize::from(i)).cloned());
+            *last_message = Some(match target {
+                Some((remote, dest)) => remote_ui.push_one(&full_name, &remote, &dest, refs, link),
+                None => NO_SUCH_LOCAL_BRANCH.get().to_string(),
+            });
+        }
+        RefContextAction::PullFromTarget(i) => {
+            let refs = refs_result.as_deref().unwrap_or(&[]);
+            let target = remotes_ui::branch_group(refs, &full_name)
+                .and_then(|g| g.pull_one.get(usize::from(i)).cloned());
+            *last_message = Some(match target {
+                Some((remote, dest)) => remote_ui.pull_one(&remote, &dest, link),
+                None => NO_SUCH_LOCAL_BRANCH.get().to_string(),
+            });
+        }
+        RefContextAction::PushBranch
+            if remotes_ui::branch_group(refs_result.as_deref().unwrap_or(&[]), &full_name)
+                .is_some_and(|g| g.extra_push) =>
+        {
+            let refs = refs_result.as_deref().unwrap_or(&[]);
+            *last_message = Some(remote_ui.push_all(&full_name, refs));
+        }
         RefContextAction::PushBranch => {
             let refs = refs_result.as_deref().unwrap_or(&[]);
             *last_message = Some(match remotes_ui::local_branch(refs, &full_name) {

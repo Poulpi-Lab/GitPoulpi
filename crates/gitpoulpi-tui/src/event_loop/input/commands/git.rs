@@ -177,6 +177,31 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                 }
             }
         }
+        // The grouped push's keyboard twins of the progress window and the
+        // paused strip: the same effects the buttons send.
+        PaletteCommand::ShowGroupedPush => {
+            if !crate::push_group_ui::PushGroupUi::open_progress() {
+                *cx.last_message = Some(msg::palette::WHY_NO_GROUPED_PUSH.get().into());
+            }
+        }
+        PaletteCommand::ContinueGroupedPush => {
+            let effect = crate::push_group_ui::strip_click(
+                cx.repo_root,
+                crate::push_group_ui::StripButton::Continue,
+            );
+            crate::push_group_ui::apply(effect, cx.link, &mut *cx.input_mode);
+        }
+        PaletteCommand::AbortGroupedPush => {
+            let effect = crate::push_group_ui::strip_click(
+                cx.repo_root,
+                crate::push_group_ui::StripButton::Abort,
+            );
+            crate::push_group_ui::apply(effect, cx.link, &mut *cx.input_mode);
+        }
+        PaletteCommand::RetryFailedPushes => {
+            let effect = crate::push_group_ui::retry_effect();
+            crate::push_group_ui::apply(effect, cx.link, &mut *cx.input_mode);
+        }
         // Every sync and remote command, in
         // one place (`remotes_ui.rs`), so the
         // palette cannot drift from the
@@ -188,6 +213,9 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
         | PaletteCommand::LfsMenu
         | PaletteCommand::Push
         | PaletteCommand::PushToRemote
+        | PaletteCommand::PushToAllTargets
+        | PaletteCommand::PullFromAllSources
+        | PaletteCommand::PullFromOneRemote
         | PaletteCommand::ForcePushWithLease
         | PaletteCommand::SetUpstream
         | PaletteCommand::AddRemote

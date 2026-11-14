@@ -653,6 +653,13 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Git: Push | `Ctrl+G P` |
 | Git: Pushen naar remote... |  |
 | Git: Push to Selected Remotes... |  |
+| Git: Push to All Targets |  |
+| Git: Pull from All Sources |  |
+| Git: Pull from One Remote... |  |
+| Git: Show Grouped Push |  |
+| Git: Continue Grouped Push |  |
+| Git: Abort Grouped Push |  |
+| Git: Retry Failed Pushes |  |
 | Git: Force push (met lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Remote toevoegen... |  |

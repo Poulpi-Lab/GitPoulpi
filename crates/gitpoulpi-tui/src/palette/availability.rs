@@ -148,6 +148,9 @@ pub(crate) struct PaletteContext {
     pub(crate) current_tab_index: usize,
     /// The repository has at least one remote.
     pub(crate) has_remotes: bool,
+    /// The grouped push or pull of this repository: a run to show, one
+    /// paused on conflicts, its Continue on, something to retry.
+    pub(crate) group: crate::push_group_ui::GroupState,
     /// The window is the Repository Management tab.
     pub(crate) in_repository_management: bool,
     /// ...and its selection is on a repository row (not a header).
@@ -722,6 +725,9 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::PushToRemote
         | C::ForcePushWithLease
         | C::PushToSelectedRemotes
+        | C::PushToAllTargets
+        | C::PullFromAllSources
+        | C::PullFromOneRemote
         | C::SetUpstream
         | C::PushAllUnpushedTags
         | C::RemoveRemote
@@ -732,6 +738,19 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::FetchRemote
         | C::RemoteActions => (!ctx.has_remotes)
             .then_some(msg::palette::WHY_THIS_REPOSITORY_HAS_NO_REMOTE_ADD_ONE_FIRST.get()),
+
+        C::ShowGroupedPush => (!ctx.group.run).then_some(msg::palette::WHY_NO_GROUPED_PUSH.get()),
+        C::ContinueGroupedPush => {
+            if !ctx.group.paused {
+                Some(msg::palette::WHY_GROUP_NOT_PAUSED.get())
+            } else if !ctx.group.ready {
+                Some(msg::palette::WHY_GROUP_NOT_READY.get())
+            } else {
+                None
+            }
+        }
+        C::AbortGroupedPush => (!ctx.group.paused).then_some(msg::palette::WHY_GROUP_NOT_PAUSED.get()),
+        C::RetryFailedPushes => (!ctx.group.retry).then_some(msg::palette::WHY_NOTHING_TO_RETRY.get()),
 
         C::StageHunk | C::StageLines => {
             if !ctx.in_diff_view {

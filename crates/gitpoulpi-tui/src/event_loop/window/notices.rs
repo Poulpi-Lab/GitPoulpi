@@ -196,6 +196,29 @@ impl WindowState {
             });
         }
         while let Ok(rejection) = self.link.push_rejected_rx.try_recv() {
+            // A branch with extra targets answers a refused push in the push
+            // group dialog (every remote at once, one decision each); the
+            // single-remote menu stays for a branch without targets.
+            let grouped = matches!(
+                rejection.reason,
+                gitpoulpi_core::domain::PushRejectReason::NonFastForward
+                    | gitpoulpi_core::domain::PushRejectReason::StaleLease
+            ) && self.refs_result.as_ref().ok().is_some_and(|refs| {
+                crate::remotes_ui::branch_group(refs, &rejection.branch)
+                    .is_some_and(|g| g.extra_push)
+            });
+            if grouped {
+                crate::push_group_ui::PushGroupUi::open_plan(
+                    &self.repo.root,
+                    &rejection.branch,
+                    None,
+                );
+                self.last_message = Some(gitpoulpi_i18n::msg::remotes::diverged_title(
+                    &rejection.remote,
+                    &rejection.branch,
+                ));
+                continue;
+            }
             let (col, row) = self.remote_ui.push_anchor();
             self.last_message = Some(self.remote_ui.on_push_rejected(&rejection, col, row));
         }

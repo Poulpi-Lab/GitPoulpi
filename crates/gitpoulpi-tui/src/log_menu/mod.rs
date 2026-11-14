@@ -251,6 +251,9 @@ pub(crate) struct MenuContext {
     /// The merge fast-forward policy in force (labels the Merge row of a
     /// branch's menu).
     pub(crate) merge_ff: gitpoulpi_core::domain::MergeFastForward,
+    /// For a local branch's menu: its extra push targets and pull sources
+    /// (`None` for a branch with only its upstream: today's rows).
+    pub(crate) group: Option<crate::remotes_ui::BranchGroup>,
 }
 
 /// Whether moving one branch onto another commit would be a
@@ -370,6 +373,9 @@ impl MenuContext {
         let mut ctx = Self::from_refs(refs);
         if let (Ok(all), Some(kind)) = (refs.as_ref(), section.ref_kind()) {
             (ctx.local_twin, ctx.remote_twin) = branch_twins(all, kind, name);
+            if kind == RefRowKind::Local {
+                ctx.group = crate::remotes_ui::branch_group(all, name);
+            }
         }
         let (Ok(all), Ok(graph), Some(kind)) = (refs.as_ref(), log.as_ref(), section.ref_kind())
         else {
@@ -405,6 +411,7 @@ impl MenuContext {
             local_twin: None,
             remote_twin: None,
             merge_ff: gitpoulpi_core::domain::MergeFastForward::default(),
+            group: None,
         }
     }
 

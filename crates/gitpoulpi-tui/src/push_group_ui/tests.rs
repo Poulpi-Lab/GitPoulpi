@@ -483,6 +483,7 @@ fn the_strip_paints_one_row_with_its_buttons() {
             remote: "gitlab".into(),
             ready: true,
             prefer_rebase: false,
+            mode: GroupMode::Push,
         });
     });
     let mut terminal = Terminal::new(TestBackend::new(120, 3)).unwrap();
@@ -499,15 +500,30 @@ fn the_strip_paints_one_row_with_its_buttons() {
         "{text}"
     );
     assert_eq!(hits.len(), 2);
-    // Not ready: Continue is gone.
+    // Not ready: Continue stays (owner decision) but greyed, and a press does
+    // nothing.
     with(|c| c.paused.as_mut().unwrap().ready = false);
     terminal
         .draw(|f| {
             hits = render_strip(f, Rect::new(0, 0, 120, 1), Path::new("/repo"), None);
         })
         .unwrap();
-    assert_eq!(hits.len(), 1);
-    assert_eq!(hits[0].1, StripButton::Abort);
+    assert_eq!(hits.len(), 2);
+    assert_eq!(hits[0].1, StripButton::Continue);
+    assert_eq!(hits[1].1, StripButton::Abort);
+    let cell = |hit: Rect| terminal.backend().buffer()[(hit.x + 1, hit.y)].style();
+    let disabled = dialog_kit::button_style(dialog_kit::ButtonState::Disabled);
+    assert_eq!(cell(hits[0].0).bg, disabled.bg, "Continue is greyed");
+    assert_ne!(cell(hits[1].0).bg, disabled.bg, "Abort stays live");
+    assert!(matches!(
+        strip_click(Path::new("/repo"), StripButton::Continue),
+        Effect::None
+    ));
+    with(|c| c.paused.as_mut().unwrap().ready = true);
+    assert!(matches!(
+        strip_click(Path::new("/repo"), StripButton::Continue),
+        Effect::Submit(_)
+    ));
 }
 
 #[test]

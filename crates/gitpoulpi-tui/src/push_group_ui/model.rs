@@ -329,6 +329,13 @@ pub(crate) struct PlanView {
     pub scroll: Scroll,
     /// `git.pull_mode` is rebase (read when the plan was asked).
     pub prefer_rebase: bool,
+    pub mode: GroupMode,
+    /// The Push button (and the Pull button with sources) asked for this
+    /// plan: it runs by itself when every row is unattended, else the
+    /// dialog stays to decide.
+    pub auto_run: bool,
+    /// `git.pull_mode` is fast-forward only (a pull group never merges).
+    pub ff_only: bool,
 }
 
 impl PlanView {
@@ -347,6 +354,9 @@ impl PlanView {
             cursor: 0,
             scroll: Scroll::default(),
             prefer_rebase,
+            mode: GroupMode::Push,
+            auto_run: false,
+            ff_only: false,
         }
     }
 
@@ -362,6 +372,9 @@ impl PlanView {
             cursor: 0,
             scroll: Scroll::default(),
             prefer_rebase,
+            mode: plan.mode,
+            auto_run: false,
+            ff_only: false,
         };
         view.fill(plan);
         view
@@ -391,6 +404,30 @@ impl PlanView {
 
     pub fn ready(&self) -> bool {
         self.reply.is_none() && self.error.is_none() && !self.rows.is_empty()
+    }
+
+    /// Whether every row's default is one that needs no decision: a plain
+    /// push (or the twin of an earlier row, skipped); for a pull, a
+    /// fast-forward, a merge or rebase (never with `ff_only`) or nothing.
+    /// The same rule as the CLI's `default_is_unattended`.
+    pub fn unattended(&self) -> bool {
+        self.ready()
+            && self.rows.iter().all(|r| {
+                if r.t.error.is_some() || r.t.missing {
+                    return false;
+                }
+                match self.mode {
+                    GroupMode::Push => {
+                        r.chosen == GroupAction::Push
+                            || (r.chosen == GroupAction::Skip && r.t.same_url_as.is_some())
+                    }
+                    GroupMode::Pull => match r.chosen {
+                        GroupAction::MergeFrom | GroupAction::RebaseOnto => !self.ff_only,
+                        GroupAction::FastForwardFrom | GroupAction::Skip => true,
+                        _ => false,
+                    },
+                }
+            })
     }
 
     pub fn skip_problems(&mut self) {
@@ -450,7 +487,7 @@ impl PlanView {
             .iter()
             .filter(|r| r.chosen != GroupAction::Skip)
             .count();
-        if sends > 0 {
+        if sends > 0 && self.mode == GroupMode::Push {
             steps.push(msg::step_push(sends as u64));
         }
         if steps.is_empty() {
@@ -463,7 +500,7 @@ impl PlanView {
     pub fn request(&self, branch: &str) -> RemoteGroupRunRequest {
         RemoteGroupRunRequest {
             branch: branch.to_string(),
-            mode: GroupMode::Push,
+            mode: self.mode,
             targets: self
                 .rows
                 .iter()

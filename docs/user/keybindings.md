@@ -649,6 +649,13 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Git: Push | `Ctrl+G P` |
 | Git: Push to Remote... |  |
 | Git: Push to Selected Remotes... |  |
+| Git: Push to All Targets |  |
+| Git: Pull from All Sources |  |
+| Git: Pull from One Remote... |  |
+| Git: Show Grouped Push |  |
+| Git: Continue Grouped Push |  |
+| Git: Abort Grouped Push |  |
+| Git: Retry Failed Pushes |  |
 | Git: Force Push (with lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Add Remote... |  |

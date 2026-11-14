@@ -653,6 +653,13 @@ applicano. I tasti sono quelli predefiniti.
 | Git: Push | `Ctrl+G P` |
 | Git: Push verso un remoto... |  |
 | Git: Push to Selected Remotes... |  |
+| Git: Push to All Targets |  |
+| Git: Pull from All Sources |  |
+| Git: Pull from One Remote... |  |
+| Git: Show Grouped Push |  |
+| Git: Continue Grouped Push |  |
+| Git: Abort Grouped Push |  |
+| Git: Retry Failed Pushes |  |
 | Git: Force push (con lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remoto: Aggiungi remoto... |  |

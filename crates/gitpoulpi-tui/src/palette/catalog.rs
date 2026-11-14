@@ -978,6 +978,41 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::PushToSelectedRemotes,
     ),
     entry(
+        msg::palette::GIT_PUSH_TO_ALL_TARGETS,
+        "",
+        PaletteCommand::PushToAllTargets,
+    ),
+    entry(
+        msg::palette::GIT_PULL_FROM_ALL_SOURCES,
+        "",
+        PaletteCommand::PullFromAllSources,
+    ),
+    entry(
+        msg::palette::GIT_PULL_FROM_ONE_REMOTE,
+        "",
+        PaletteCommand::PullFromOneRemote,
+    ),
+    entry(
+        msg::palette::GIT_SHOW_GROUPED_PUSH,
+        "",
+        PaletteCommand::ShowGroupedPush,
+    ),
+    entry(
+        msg::palette::GIT_CONTINUE_GROUPED_PUSH,
+        "",
+        PaletteCommand::ContinueGroupedPush,
+    ),
+    entry(
+        msg::palette::GIT_ABORT_GROUPED_PUSH,
+        "",
+        PaletteCommand::AbortGroupedPush,
+    ),
+    entry(
+        msg::palette::GIT_RETRY_FAILED_PUSHES,
+        "",
+        PaletteCommand::RetryFailedPushes,
+    ),
+    entry(
         msg::palette::GIT_FORCE_PUSH_WITH_LEASE,
         "",
         PaletteCommand::ForcePushWithLease,

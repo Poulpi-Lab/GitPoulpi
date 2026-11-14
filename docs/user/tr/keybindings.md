@@ -649,6 +649,13 @@ Tuşlar varsayılanlardır.
 | Git: Push | `Ctrl+G P` |
 | Git: Uzak Depoya Push Et... |  |
 | Git: Push to Selected Remotes... |  |
+| Git: Push to All Targets |  |
+| Git: Pull from All Sources |  |
+| Git: Pull from One Remote... |  |
+| Git: Show Grouped Push |  |
+| Git: Continue Grouped Push |  |
+| Git: Abort Grouped Push |  |
+| Git: Retry Failed Pushes |  |
 | Git: Force Push (lease ile)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Uzak Depo Ekle... |  |

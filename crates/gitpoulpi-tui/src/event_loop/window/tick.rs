@@ -489,6 +489,7 @@ impl WindowState {
                 .as_ref()
                 .map(|h| h.name.as_str()),
         );
+        crate::push_group_ui::drain(&self.link);
         if self.link.take_pending_auto_stash_changed() {
             self.pending_auto_stash = crate::autostash_banner::load(&self.repo.root);
         }
@@ -784,6 +785,7 @@ impl WindowState {
                     .as_ref()
                     .is_some_and(|m| m.radar.row_selected()),
                 has_remotes: !self.remote_names.is_empty(),
+                group: crate::push_group_ui::group_state(&self.repo.root),
                 lfs_enabled: self.lfs.enabled,
                 lfs_program_ok: self.lfs.unavailable_reason().is_none(),
                 in_refs_pane: self.focus == Focus::Refs,

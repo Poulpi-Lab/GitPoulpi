@@ -644,6 +644,13 @@ die Standardtasten.
 | Git: Push | `Ctrl+G P` |
 | Git: Push an Remote... |  |
 | Git: Push to Selected Remotes... |  |
+| Git: Push to All Targets |  |
+| Git: Pull from All Sources |  |
+| Git: Pull from One Remote... |  |
+| Git: Show Grouped Push |  |
+| Git: Continue Grouped Push |  |
+| Git: Abort Grouped Push |  |
+| Git: Retry Failed Pushes |  |
 | Git: Force-Push (mit Lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Remote hinzufügen... |  |

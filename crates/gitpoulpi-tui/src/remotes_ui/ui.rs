@@ -31,7 +31,7 @@ pub(crate) struct RemoteUi {
     /// changes are in the way (`general.auto_stash = ask`), while its
     /// dialog is open: what "Stash changes and continue" resends.
     pub(super) pending_autostash: Option<Action>,
-    repo_root: PathBuf,
+    pub(super) repo_root: PathBuf,
     push_anchor: (u16, u16),
     pull_anchor: (u16, u16),
     lfs_anchor: (u16, u16),
@@ -102,10 +102,12 @@ impl RemoteUi {
         self.menu = Some(ContextMenu::new(msg::menu_title(name), entries, col, row));
     }
 
-    pub(crate) fn open_pull_menu(&mut self, col: u16, row: u16) {
+    pub(crate) fn open_pull_menu(&mut self, refs: &[Ref], col: u16, row: u16) {
+        let head = head_branch(refs);
+        let group = head.as_ref().and_then(|h| branch_group(refs, &h.name));
         self.menu = Some(ContextMenu::new(
             msg::PULL_TITLE.get(),
-            pull_mode_entries(),
+            pull_menu_entries(head.as_ref().map(|h| h.name.as_str()), group.as_ref()),
             col,
             row,
         ));
@@ -141,7 +143,8 @@ impl RemoteUi {
             return Some(msg::NO_REMOTE_ADD.get().into());
         }
         let default = self.default_remote(refs);
-        let mut entries = push_to_entries(&names, default.as_deref());
+        let group = branch_group(refs, &head.name);
+        let mut entries = push_menu_entries(&head.name, group.as_ref(), &names, default.as_deref());
         // Who the push signs in as, when the repository's profile is not
         // all default: a row that opens the page that chose it.
         if let Some(line) = crate::activity_log::identity::line_for(&self.repo_root) {
@@ -248,6 +251,12 @@ impl RemoteUi {
     /// whatever the button's dropdown says. Returns the status line.
     pub(crate) fn run_pull_button(&self, refs: &[Ref], link: &DaemonLink) -> String {
         let (mode, _) = sync_settings();
+        // A branch with pull sources pulls them all, in the same mode.
+        if let Some(head) = head_branch(refs) {
+            if branch_group(refs, &head.name).is_some_and(|g| !g.pull_sources.is_empty()) {
+                return self.pull_all(&head.name, refs);
+            }
+        }
         self.run_pull_mode(mode, refs, link)
     }
 
@@ -273,6 +282,21 @@ impl RemoteUi {
     /// says to ask (or there is no default to push to).
     pub(crate) fn run_push_button(&mut self, refs: &[Ref], link: &DaemonLink) -> Option<String> {
         let (_, behavior) = sync_settings();
+        // A branch with extra targets pushes to all of them (or asks, with
+        // `git.push_behavior = ask`).
+        if let Some(head) = head_branch(refs) {
+            if !self.remotes.is_empty()
+                && branch_group(refs, &head.name).is_some_and(|g| g.extra_push)
+            {
+                return match behavior {
+                    PushBehavior::Direct => Some(self.push_all(&head.name, refs)),
+                    _ => {
+                        let (col, row) = self.push_anchor;
+                        self.open_push_menu(refs, col, row)
+                    }
+                };
+            }
+        }
         let default = self.default_remote(refs);
         match push_plan(
             behavior,

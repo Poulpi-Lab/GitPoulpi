@@ -2,13 +2,15 @@
 //! conflicts of one remote. The second banner of the Log's borders, drawn by
 //! the one strip painter (`operation_banner::paint_strip`).
 //!
-//! Continue shows only when the daemon says the resolution is concluded
-//! (`PendingGroup::ready_to_continue`) and is always pressed by hand: nothing
-//! continues on its own. Abort group aborts the merge or rebase the group
+//! Continue is always there (owner decision): greyed while the daemon says
+//! the resolution is not concluded (`PendingGroup::ready_to_continue`), and
+//! always pressed by hand: nothing continues on its own. The strip's words
+//! say what is missing. Abort group aborts the merge or rebase the group
 //! started and drops the saved run (pushes already done stay).
 
 use std::path::Path;
 
+use gitpoulpi_core::domain::GroupMode;
 use gitpoulpi_i18n::msg::push_group as msg;
 use ratatui::layout::Rect;
 use ratatui::Frame;
@@ -36,10 +38,11 @@ pub(crate) fn text(root: &Path) -> Option<(String, bool)> {
     with(|c| {
         c.paused.as_ref().filter(|p| p.root == root).map(|p| {
             (
-                if p.ready {
-                    msg::strip_ready(&p.remote)
-                } else {
-                    msg::strip_waiting(&p.remote)
+                match (p.mode, p.ready) {
+                    (GroupMode::Push, true) => msg::strip_ready(&p.remote),
+                    (GroupMode::Push, false) => msg::strip_waiting(&p.remote),
+                    (GroupMode::Pull, true) => msg::strip_ready_pull(&p.remote),
+                    (GroupMode::Pull, false) => msg::strip_waiting_pull(&p.remote),
                 },
                 p.ready,
             )
@@ -57,17 +60,17 @@ pub(crate) fn render(
     let Some((text, ready)) = text(root) else {
         return Vec::new();
     };
-    let mut list: Vec<(StripButton, &str)> = Vec::new();
-    if ready {
-        list.push((StripButton::Continue, msg::STRIP_CONTINUE.get()));
-    }
-    list.push((StripButton::Abort, msg::STRIP_ABORT.get()));
+    let list: [(StripButton, &str); 2] = [
+        (StripButton::Continue, msg::STRIP_CONTINUE.get()),
+        (StripButton::Abort, msg::STRIP_ABORT.get()),
+    ];
     let buttons: Vec<Button<'_>> = list
         .iter()
         .map(|(b, label)| Button {
             label,
             danger: *b == StripButton::Abort,
             hovered: hovered == Some(*b),
+            disabled: *b == StripButton::Continue && !ready,
         })
         .collect();
     paint_strip(frame, area, &[text], &buttons)

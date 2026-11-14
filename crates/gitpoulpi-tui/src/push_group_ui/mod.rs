@@ -89,6 +89,7 @@ pub(super) struct Paused {
     pub remote: String,
     pub ready: bool,
     pub prefer_rebase: bool,
+    pub mode: GroupMode,
 }
 
 #[derive(Default)]
@@ -96,6 +97,9 @@ pub(super) struct Core {
     pub dlg: Option<Dlg>,
     pub run: Option<RunState>,
     pub paused: Option<Paused>,
+    /// Actions an unattended run wants sent: drained by the window each
+    /// frame (`drain`), since the paint that notices the plan has no link.
+    outbox: Vec<Action>,
     pub requester: Option<Requester>,
     status: Option<crate::daemon_link::Reply<RemoteGroupStatus>>,
     last_poll: Option<Instant>,
@@ -152,22 +156,46 @@ impl PushGroupUi {
 
     /// The plan step for `branch` (`None` targets: the configured primary
     /// plus push targets).
-    // Entered by the Push / Pull menus (a later slice); tested here.
-    #[allow(dead_code)]
     pub(crate) fn open_plan(root: &Path, branch: &str, targets: Option<Vec<TargetRef>>) {
         with(|c| {
             let Some(requester) = c.requester.clone() else {
                 return;
             };
-            let plan = c.ask_plan(&requester, branch, targets.clone());
+            let plan = c.ask_plan(&requester, branch, targets.clone(), GroupMode::Push);
+            c.open(root, branch, Step::Plan(plan));
+        });
+    }
+
+    /// The Push button on a branch with extra targets: the plan for all of
+    /// them, run at once when every row is a plain push, else left open to
+    /// decide.
+    pub(crate) fn open_push_all(root: &Path, branch: &str) {
+        with(|c| {
+            let Some(requester) = c.requester.clone() else {
+                return;
+            };
+            let mut plan = c.ask_plan(&requester, branch, None, GroupMode::Push);
+            plan.auto_run = true;
+            c.open(root, branch, Step::Plan(plan));
+        });
+    }
+
+    /// The Pull button on a branch with extra pull sources: the same, for
+    /// the pull of the primary and every source (the pull mode of
+    /// `git.pull_mode`).
+    pub(crate) fn open_pull_all(root: &Path, branch: &str) {
+        with(|c| {
+            let Some(requester) = c.requester.clone() else {
+                return;
+            };
+            let mut plan = c.ask_plan(&requester, branch, None, GroupMode::Pull);
+            plan.auto_run = true;
             c.open(root, branch, Step::Plan(plan));
         });
     }
 
     /// Reopens the progress view of the last run (closed or still going).
     /// `false` when there is none.
-    // Entered by the jobs indicator and a palette command (a later slice).
-    #[allow(dead_code)]
     pub(crate) fn open_progress() -> bool {
         with(|c| c.open_progress())
     }
@@ -209,13 +237,14 @@ impl Core {
         requester: &Requester,
         branch: &str,
         targets: Option<Vec<TargetRef>>,
+        mode: GroupMode,
     ) -> PlanView {
         let prefer = prefer_rebase();
         let request = RemoteGroupPlanRequest {
             branch: branch.to_string(),
-            mode: GroupMode::Push,
+            mode,
             targets: targets.clone(),
-            preflight: true,
+            preflight: crate::remotes_ui::push_group_preflight(),
             prefer_rebase: prefer,
             refused: Vec::new(),
         };
@@ -223,7 +252,11 @@ impl Core {
             OperationKind::RemoteGroupPlan,
             serde_json::to_value(&request).unwrap_or_default(),
         );
-        PlanView::loading(reply, targets, prefer)
+        let mut view = PlanView::loading(reply, targets, prefer);
+        view.mode = mode;
+        view.ff_only =
+            crate::remotes_ui::sync_settings().0 == gitpoulpi_config::PullButtonMode::FfOnly;
+        view
     }
 
     /// Switches to the progress view of a freshly built run.
@@ -251,12 +284,79 @@ impl Core {
             }
             Step::Run => {}
         }
+        // The Push (or Pull) button asked for this plan: when nothing needs
+        // a decision it runs, else the dialog stays for the decisions.
+        let unattended = match self.dlg.as_mut().map(|d| &mut d.step) {
+            Some(Step::Plan(p)) if p.auto_run && p.ready() => {
+                p.auto_run = false;
+                p.unattended()
+            }
+            _ => false,
+        };
+        if unattended {
+            if let Effect::Submit(actions) = self.press(model::Btn::Run) {
+                self.outbox.extend(actions);
+            }
+        }
     }
 }
 
 // ---------------------------------------------------------------------
 // Fed by the link
 // ---------------------------------------------------------------------
+
+/// Sends what an unattended run decided (`Core::poll`), from the window's
+/// frame, which has the link.
+pub(crate) fn drain(link: &DaemonLink) {
+    let actions = with(|c| std::mem::take(&mut c.outbox));
+    for action in actions {
+        link.submit_action(action);
+    }
+}
+
+/// What the palette needs to know about the saved or last grouped run of
+/// `root`: whether there is a run to show, one paused on conflicts, whether
+/// its Continue is on, and whether some target can be retried.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub(crate) struct GroupState {
+    pub run: bool,
+    pub paused: bool,
+    pub ready: bool,
+    pub retry: bool,
+}
+
+pub(crate) fn group_state(root: &Path) -> GroupState {
+    CORE.lock().ok().map_or_else(GroupState::default, |c| {
+        let Some(c) = c.as_ref() else {
+            return GroupState::default();
+        };
+        let paused = c.paused.as_ref().filter(|p| p.root == root);
+        GroupState {
+            run: c.run.is_some(),
+            paused: paused.is_some(),
+            ready: paused.is_some_and(|p| p.ready),
+            retry: c
+                .run
+                .as_ref()
+                .is_some_and(|r| !r.going() && r.has_retryable()),
+        }
+    })
+}
+
+/// `Git: Retry Failed Pushes`: the progress view's Retry button.
+pub(crate) fn retry_effect() -> Effect {
+    with(|c| {
+        let Some(run) = c.run.as_mut().filter(|r| !r.going() && r.has_retryable()) else {
+            return Effect::None;
+        };
+        let run_id = run.run_id.clone();
+        run.phase = Phase::Going;
+        Effect::Submit(vec![Action::RemoteGroupRetry {
+            expect_run_id: run_id,
+            prefer_rebase: prefer_rebase(),
+        }])
+    })
+}
 
 /// The link's requester, set once at connect (and by tests).
 pub(crate) fn set_requester(requester: Requester) {
@@ -381,6 +481,7 @@ pub(crate) fn on_outcome(root: &Path, outcome: &RemoteGroupOutcome) {
                     remote,
                     ready: false,
                     prefer_rebase: prefer_rebase(),
+                    mode: outcome.mode,
                 });
                 // The ordinary merge / rebase banner and conflict pages take
                 // over; the strip carries the group.
@@ -477,6 +578,7 @@ pub(crate) fn tick(root: &Path, head_branch: Option<&str>) {
                                 .unwrap_or_default(),
                             ready: p.ready_to_continue,
                             prefer_rebase: prefer_rebase(),
+                            mode: p.mode,
                         };
                         if c.paused.as_ref() != Some(&paused) {
                             c.paused = Some(paused);

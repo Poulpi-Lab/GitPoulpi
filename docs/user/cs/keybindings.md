@@ -649,6 +649,13 @@ Klávesy jsou výchozí.
 | Git: Push | `Ctrl+G P` |
 | Git: Push do remote... |  |
 | Git: Push to Selected Remotes... |  |
+| Git: Push to All Targets |  |
+| Git: Pull from All Sources |  |
+| Git: Pull from One Remote... |  |
+| Git: Show Grouped Push |  |
+| Git: Continue Grouped Push |  |
+| Git: Abort Grouped Push |  |
+| Git: Retry Failed Pushes |  |
 | Git: Force push (s lease)... |  |
 | Git: Remotes of Branch... |  |
 | Remote: Přidat remote... |  |

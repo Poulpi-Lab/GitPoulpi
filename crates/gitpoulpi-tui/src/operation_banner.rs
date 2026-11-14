@@ -128,6 +128,9 @@ pub(crate) struct StripButton<'a> {
     /// Destructive (Abort): the red fill.
     pub danger: bool,
     pub hovered: bool,
+    /// Greyed and inert (the paused group's Continue until the conflicts
+    /// are concluded): the disabled look of `dialog_kit`, never a hover.
+    pub disabled: bool,
 }
 
 /// The room the banner's words keep before a button is dropped to make some.
@@ -186,7 +189,9 @@ pub(crate) fn paint_strip(
     for (i, b) in shown.iter().enumerate() {
         let label = format!(" {} ", b.label);
         let w = display_width(&label) as u16;
-        let style = if b.hovered {
+        let style = if b.disabled {
+            crate::dialog_kit::button_style(crate::dialog_kit::ButtonState::Disabled)
+        } else if b.hovered {
             crate::theme::plain_button_style(true)
         } else {
             Style::default().fg(th().ui.on_button).bg(if b.danger {
@@ -230,6 +235,7 @@ pub(crate) fn render(
             label,
             danger: *b == OperationBannerButton::Abort,
             hovered: hovered == Some(*b),
+            disabled: false,
         })
         .collect();
     paint_strip(frame, area, &banner_texts(state, conflicts), &strip)

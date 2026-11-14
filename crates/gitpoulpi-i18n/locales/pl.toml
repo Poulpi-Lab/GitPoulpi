@@ -633,11 +633,11 @@ inherited = "(dziedziczone)"
 lfs_not_checked = "(jeszcze nie sprawdzono)"
 lfs_autofix_filters = { git = "Instaluj filtry LFS przed pull i push", local = "Instaluj filtry LFS przed ściąganiem i wypychaniem" }
 lfs_autofix_filters_help = { git = "Przed pull lub push w repozytorium używającym Git LFS uruchamia `git lfs install --local`, jeśli brakuje jego filtrów LFS lub hooków (tylko własna konfiguracja repozytorium, nigdy globalna), aby transfer obsłużył duże pliki. Pasek stanu o tym informuje. Wymaga git-lfs.", local = "Przed ściąganiem lub wypychaniem w repozytorium używającym Git LFS uruchamia `git lfs install --local`, jeśli brakuje jego filtrów LFS lub hooków (tylko własna konfiguracja repozytorium, nigdy globalna), aby transfer obsłużył duże pliki. Pasek stanu o tym informuje. Wymaga git-lfs." }
-push_group_preflight = "Check every remote before a {$push}"
-push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
-default_push_targets = "Extra {$push} targets for new branches"
-default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
-default_push_targets_none = "(no remote configured)"
+push_group_preflight = { git = "Sprawdź każde zdalne przed pushem", local = "Sprawdź każde zdalne przed wypchnięciem" }
+push_group_preflight_help = { git = "Przed pushem gałęzi, która ma dodatkowe cele push, najpierw sprawdzane jest każde zdalne (szybkie zapytanie, a pobranie z danego zdalnego tylko wtedy, gdy się różni), więc problem na trzecim zdalnym widać, zanim ruszy pierwszy push. Wyłączone: push do kolejnych zdalnych po kolei i raport, co się stało.", local = "Przed wypchnięciem gałęzi, która ma dodatkowe cele wypychania, najpierw sprawdzane jest każde zdalne (szybkie zapytanie, a pobranie z danego zdalnego tylko wtedy, gdy się różni), więc problem na trzecim zdalnym widać, zanim ruszy pierwsze wypchnięcie. Wyłączone: wypchnięcie do kolejnych zdalnych po kolei i raport, co się stało." }
+default_push_targets = { git = "Dodatkowe cele push dla nowych gałęzi", local = "Dodatkowe cele wypychania dla nowych gałęzi" }
+default_push_targets_help = { git = "Tylko to repozytorium. Zaznacz zdalne, do których nowa gałąź robi też push, poza swoim upstreamem. Trafiają do gałęzi, gdy po raz pierwszy dostaje upstream (pierwszy push, który go ustawia, albo gałąź utworzona z gałęzi zdalnej). Istniejące gałęzie się nie zmieniają: zmień je w oknie Zdalne gałęzi.", local = "Tylko to repozytorium. Zaznacz zdalne, do których nowa gałąź wypycha też, poza swoim upstreamem. Trafiają do gałęzi, gdy po raz pierwszy dostaje upstream (pierwsze wypchnięcie, które go ustawia, albo gałąź utworzona z gałęzi zdalnej). Istniejące gałęzie się nie zmieniają: zmień je w oknie Zdalne gałęzi." }
+default_push_targets_none = "(brak skonfigurowanego zdalnego)"
 
 [settings_screen]
 title = "Ustawienia - Tab: sekcje/ustawienia │ Enter: zmień"
@@ -883,7 +883,7 @@ push_branch = "{$Push} {name}"
 start_pr = "Rozpocznij {$pr} z {name}..."
 fetch = "{$Fetch}"
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
-remotes_of = "Remotes of {name}..."
+remotes_of = "Zdalne gałęzi {name}..."
 rename = "Zmień nazwę {name}..."
 delete = "Usuń {name}..."
 delete_both = "Usuń {first} i {second}..."
@@ -2206,23 +2206,23 @@ host_not_recognized = "nie rozpoznano hosta zdalnego"
 link_branch = "link do gałęzi"
 link_commit = { git = "link do commita", local = "link do zatwierdzenia" }
 # context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
-push_to_all = "{$Push} to all ({remotes})"
+push_to_all = "{$Push} do wszystkich ({remotes})"
 # context: menu row: push the branch to one remote only; {remote} is that remote
-push_to_only = "{$Push} to {remote} only"
+push_to_only = "{$Push} tylko do {remote}"
 # context: menu row: opens the dialog where the remotes of this one push are ticked
-push_to_selected = "{$Push} to selected remotes..."
+push_to_selected = "{$Push} do wybranych zdalnych..."
 # context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
-remotes_of = "Remotes of {branch}..."
+remotes_of = "Zdalne gałęzi {branch}..."
 # context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
-pull_from_all = "{$Pull} from all sources ({remotes})"
+pull_from_all = "{$Pull} ze wszystkich źródeł ({remotes})"
 # context: menu row: pull from one remote only, once; {remote} is that remote
-pull_from_only = "{$Pull} from {remote} only"
+pull_from_only = "{$Pull} tylko z {remote}"
 # context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
-pushing_to_all = { git = "pushing {branch} to {remotes}...", local = "pushing {branch} to {remotes}..." }
+pushing_to_all = { git = "push {branch} do {remotes}...", local = "wypychanie {branch} do {remotes}..." }
 # context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
-pulling_from_all = { git = "pulling {branch} from {remotes}...", local = "pulling {branch} from {remotes}..." }
+pulling_from_all = { git = "pull {branch} z {remotes}...", local = "ściąganie {branch} z {remotes}..." }
 # context: status line: the branch has no remote to pull from; {branch} is the branch
-no_pull_remote = "{branch} has no remote to {$pull} from"
+no_pull_remote = { git = "{branch} nie ma zdalnego, z którego można zrobić pull", local = "{branch} nie ma zdalnego, z którego można ściągnąć" }
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -2553,7 +2553,7 @@ log_columns_fit_all = "Dopasuj wszystkie kolumny do zawartości"
 log_scroll_left = "Przewiń kolumny w lewo"
 log_scroll_right = "Przewiń kolumny w prawo"
 log_columns_layout = "Przewijanie w poziomie lub dopasowanie do panelu"
-refs_remotes = "Branch: Edit its Remotes"
+refs_remotes = "Gałąź: edytuj jej zdalne"
 
 
 [keymap_ctx]
@@ -3143,8 +3143,8 @@ git_pull_options = { git = "Git: Opcje pull...", local = "Git: Opcje ściągania
 git_push = "Git: {$Push}"
 git_push_to_remote = { git = "Git: Push do zdalnego...", local = "Git: Wypchnij do zdalnego..." }
 git_force_push_with_lease = { git = "Git: Force push (z lease)...", local = "Git: Wymuś wypchnięcie (z lease)..." }
-git_remotes_of_branch = "Git: Remotes of Branch..."
-git_push_to_selected_remotes = "Git: {$Push} to Selected Remotes..."
+git_remotes_of_branch = "Git: Zdalne gałęzi..."
+git_push_to_selected_remotes = "Git: {$Push} do wybranych zdalnych..."
 remote_add_remote = "Zdalne: Dodaj zdalne..."
 remote_remove_remote = "Zdalne: Usuń zdalne..."
 remote_edit_remote = "Zdalne: Edytuj zdalne..."
@@ -3652,27 +3652,27 @@ view_log_scroll_left = "Widok: Log: Przewiń kolumny w lewo"
 view_log_scroll_right = "Widok: Log: Przewiń kolumny w prawo"
 view_log_columns_layout = "Widok: Log: Przełącz przewijanie kolumn w poziomie"
 # context: palette command: push to the upstream and every extra push target
-git_push_to_all_targets = "Git: {$Push} to All Targets"
+git_push_to_all_targets = "Git: {$Push} do wszystkich celów"
 # context: palette command: pull the upstream and every extra pull source
-git_pull_from_all_sources = "Git: {$Pull} from All Sources"
+git_pull_from_all_sources = "Git: {$Pull} ze wszystkich źródeł"
 # context: palette command: opens a list of remotes, pulls from the chosen one once
-git_pull_from_one_remote = "Git: {$Pull} from One Remote..."
+git_pull_from_one_remote = "Git: {$Pull} z jednego zdalnego..."
 # context: palette command: reopens the progress window of the last push to several remotes
-git_show_grouped_push = "Git: Show Grouped {$Push}"
+git_show_grouped_push = { git = "Git: Pokaż grupowy push", local = "Git: Pokaż grupowe wypchnięcie" }
 # context: palette command: goes on with the push to several remotes that paused on conflicts
-git_continue_grouped_push = "Git: Continue Grouped {$Push}"
+git_continue_grouped_push = { git = "Git: Kontynuuj grupowy push", local = "Git: Kontynuuj grupowe wypchnięcie" }
 # context: palette command: abandons the push to several remotes that paused on conflicts
-git_abort_grouped_push = "Git: Abort Grouped {$Push}"
+git_abort_grouped_push = { git = "Git: Przerwij grupowy push", local = "Git: Przerwij grupowe wypchnięcie" }
 # context: palette command: tries again the remotes that failed in the last push to several remotes
-git_retry_failed_pushes = "Git: Retry Failed Pushes"
+git_retry_failed_pushes = { git = "Git: Ponów nieudane pushe", local = "Git: Ponów nieudane wypchnięcia" }
 # context: palette: why a command is grayed out
-why_no_grouped_push = "there is no grouped {$push} to show"
+why_no_grouped_push = { git = "nie ma grupowego pusha do pokazania", local = "nie ma grupowego wypchnięcia do pokazania" }
 # context: palette: why a command is grayed out
-why_group_not_paused = "no grouped {$push} is waiting on conflicts"
+why_group_not_paused = { git = "żaden grupowy push nie czeka na konflikty", local = "żadne grupowe wypchnięcie nie czeka na konflikty" }
 # context: palette: why Continue is grayed out
-why_group_not_ready = "resolve and conclude the conflicts first"
+why_group_not_ready = "najpierw rozwiąż i zakończ konflikty"
 # context: palette: why a command is grayed out
-why_nothing_to_retry = "no remote failed in the last grouped {$push}"
+why_nothing_to_retry = { git = "żadne zdalne nie zawiodło w ostatnim grupowym pushu", local = "żadne zdalne nie zawiodło w ostatnim grupowym wypchnięciu" }
 
 [help_section]
 rewrite = "Przepisywanie historii"
@@ -4082,7 +4082,7 @@ rewrite_9 = "otwiera kartę Rozmiar i analizuje historię: największe pliki i f
 rewrite_host_howto = { git = "wyjaśnia, jak przepchnąć przepisaną historię przez gałąź chronioną przez hosta: zdjąć ochronę, zrobić push pod nową nazwą albo utworzyć repozytorium od nowa; niczego nie robi za ciebie", local = "wyjaśnia, jak przepchnąć przepisaną historię przez gałąź chronioną przez hosta: zdjąć ochronę, wypchnąć pod nową nazwą albo utworzyć repozytorium od nowa; niczego nie robi za ciebie" }
 rewrite_ai_rules = "tworzy z AI reguły przepisania na podstawie twojego opisu (niczego nie podgląda ani nie stosuje)"
 log_columns_2 = "przewijaj kolumny Logu w poziomie, gdy zachowują swoje szerokości (układ Przewijaj w poziomie, wybierany w oknie wyboru kolumn, w Ustawieniach lub klawiszem s przy wybranej kolumnie); w układzie dopasowanym każda kolumna mieści się w panelu"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = { git = "edytuje zdalne wybranej gałęzi lokalnej (jej upstream i dodatkowe cele push): klawiaturowy odpowiednik kliknięcia plakietki zdalnych w jej wierszu", local = "edytuje zdalne wybranej gałęzi lokalnej (jej upstream i dodatkowe cele wypychania): klawiaturowy odpowiednik kliknięcia plakietki zdalnych w jej wierszu" }
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} lub prawy przycisk"
@@ -5516,7 +5516,7 @@ no_longer = "{path} nie jest już submodułem"
 [combo]
 type_to_search = "pisz, by szukać"
 # context: placeholder of the search line of a dropdown that also accepts typed text
-type_to_use_own = "type your own value"
+type_to_use_own = "wpisz własną wartość"
 loading = "wczytywanie..."
 no_match = "brak trafień"
 use_value = "Użyj „{value}”"
@@ -5844,11 +5844,11 @@ palette_create_desktop = "Uruchamianie: Utwórz skrót na pulpicie"
 palette_remove = "Uruchamianie: Usuń skróty"
 icons_updated = "skróty programów uruchamiających zaktualizowane"
 alias = "Alias polecenia"
-alias_help = "Krótkie polecenie uruchamiające GitPoulpi z terminala, na przykład gp. Dozwolone są tylko litery, cyfry, - _ i . Alias lub funkcja powłoki o tej samej nazwie ma pierwszeństwo i nie widać jej stąd (oh-my-zsh samo definiuje gp)."
+alias_help = "Krótkie polecenie uruchamiające GitPoulpi z terminala, na przykład gp. Wpisz dowolną nazwę na liście, by użyć własnej. Dozwolone są tylko litery, cyfry, - _ i . Alias lub funkcja powłoki o tej samej nazwie ma pierwszeństwo i nie widać jej stąd (oh-my-zsh samo definiuje gp)."
 alias_none = "Brak"
 alias_status = "Stan aliasu"
 alias_add = "Alias nowej karty"
-alias_add_help = "Drugie krótkie polecenie, na przykład gpa, które otwiera bieżący folder jako nową kartę w już uruchomionym GitPoulpi (gitpoulpi --add), zamiast uruchamiać kolejny. Gdy żadne nie działa, uruchamia GitPoulpi jak zwykle. Przycisk Utwórz tworzy je razem z aliasem polecenia powyżej. Te same zasady nazw."
+alias_add_help = "Drugie krótkie polecenie, na przykład gpa, które otwiera bieżący folder jako nową kartę w już uruchomionym GitPoulpi (gitpoulpi --add), zamiast uruchamiać kolejny. Gdy żadne nie działa, uruchamia GitPoulpi jak zwykle. Przycisk Utwórz tworzy je razem z aliasem polecenia powyżej. Wpisz dowolną nazwę na liście, by użyć własnej. Te same zasady nazw."
 alias_add_status = "Stan (nowa karta)"
 alias_set_name = "wpisz nazwę powyżej"
 alias_bad_space = "nazwa zawiera spację"
@@ -6503,7 +6503,7 @@ branch_rename = "Zmień nazwę gałęzi {old} na {new}"
 upstream_set = "Ustaw upstream gałęzi {branch} na {upstream}"
 upstream_unset = "Usuń upstream gałęzi {branch}"
 # context: undo history row: the push targets and pull sources of a branch were changed; {branch} is the local branch
-remotes_set = "Set remotes of {branch}"
+remotes_set = "Ustaw zdalne gałęzi {branch}"
 config_set = "Ustaw {key} na {value}"
 config_unset = "Usuń ustawienie {key}"
 sparse_set = "Ustaw sparse checkout"
@@ -9506,229 +9506,229 @@ none = "brak linku w tym opisie"
 
 [branch_remotes]
 # context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
-title = "Remotes of {branch}"
+title = "Zdalne gałęzi {branch}"
 # context: label before the list that picks the upstream (the remote branch the local branch tracks)
 upstream_label = "Upstream"
 # context: table heading: a configured remote's name
-col_remote = "Remote"
+col_remote = "Zdalne"
 # context: table heading: the branch's name on that remote
-col_branch = "Branch"
+col_branch = "Gałąź"
 # context: table heading over a checkbox: the branch is also pushed to that remote
 col_push = "{$Push}"
 # context: table heading over a checkbox: a pull also takes the new commits of that remote
-col_pull = "{$Pull} too"
+col_pull = "{$Pull} też"
 # context: table heading: how the local branch stands against that remote (ahead, behind, in sync)
-col_state = "State"
+col_state = "Stan"
 # context: cell in the Pull too column of the upstream's own row: the upstream is always pulled
 pull_upstream = "upstream"
 # context: state cell: the remote's copy and the local branch are the same commit
-state_in_sync = "in sync"
+state_in_sync = "zgodne"
 # context: state cell: the remote has no copy of the branch yet
-state_new = "new"
+state_new = "nowa"
 # context: state cell: the remote's copy shares no history with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "niepowiązane"
 # context: state cell of a remote that is not used by the branch
 state_none = "-"
 # context: row of a remote the branch still mentions but the repository no longer has
-gone = "remote gone"
+gone = "zdalne usunięte"
 # context: button on a gone row: forget that remote for this branch
-remove_button = "Remove"
+remove_button = "Usuń"
 # context: warning under the table; {first} and {second} are two remote names with the same address
-same_url = "{first} and {second} {$push} to the same URL."
+same_url = { git = "{first} i {second} mają ten sam URL push.", local = "{first} i {second} mają ten sam URL wypychania." }
 # context: button: changes the branch name used on the selected remote
-rename_button = "Rename on remote..."
+rename_button = "Zmień nazwę na zdalnym..."
 # context: button: the branch tracks no upstream any more
-unset_button = "Unset upstream"
+unset_button = "Usuń upstream"
 # context: primary button of the dialog
-apply_button = "Apply"
+apply_button = "Zastosuj"
 # context: shown while the dialog reads the branch's remotes
-loading = "Reading the remotes..."
+loading = "Odczyt zdalnych..."
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
-rename_title = "Branch name on {remote}"
+rename_title = "Nazwa gałęzi na {remote}"
 # context: placeholder of that dialog's field
-rename_placeholder = "Branch name on the remote"
+rename_placeholder = "Nazwa gałęzi na zdalnym"
 # context: primary button of that dialog
-rename_set = "Set"
+rename_set = "Ustaw"
 # context: inline error of that dialog when the field is empty
-rename_empty = "Type a branch name."
+rename_empty = "Wpisz nazwę gałęzi."
 # context: inline error when Rename is used on the upstream's own row
-rename_upstream_row = "The upstream's branch name is chosen in the list above."
+rename_upstream_row = "Nazwę gałęzi upstreamu wybiera się na liście powyżej."
 # context: inline error when Rename is used with nothing to rename
-rename_no_row = "Select a remote's row first."
+rename_no_row = "Najpierw zaznacz wiersz zdalnego."
 # context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
-keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
+keys_hint = "Space {$Push}, p {$Pull} też, r Zmień nazwę, Del Usuń, Enter Zastosuj"
 # context: status line while the change is sent; {branch} is the local branch
-applying = "setting the remotes of {branch}..."
+applying = "ustawianie zdalnych gałęzi {branch}..."
 # context: status line once the daemon applied the change; {branch} is the local branch
-remotes_set = "remotes of {branch} updated"
+remotes_set = "zaktualizowano zdalne gałęzi {branch}"
 
 [push_group]
 # context: title of the dialog that asks which remotes to push a branch to (one push only); {branch} is the local branch
-title_select = "{$Push} {branch} to selected remotes"
+title_select = "{$Push} {branch} do wybranych zdalnych"
 # context: title of the dialog that shows how a branch stands against each remote before a grouped push; {n} is the number of remotes, {branch} the local branch
-title_plan = { one = "{$Push} {branch} to {n} remote", other = "{$Push} {branch} to {n} remotes" }
+title_plan = { one = "{$Push} {branch} do {n} zdalnego", few = "{$Push} {branch} do {n} zdalnych", many = "{$Push} {branch} do {n} zdalnych", other = "{$Push} {branch} do {n} zdalnego" }
 # context: title of the dialog while a grouped push runs or after it ended; {branch} is the local branch
 title_run = "{$Push} {branch}"
 # context: line under the title; {branch} is the local branch, {sha} the short id of its tip
-local_at = "Local {branch} at {sha}"
+local_at = "Lokalna gałąź {branch} w {sha}"
 # context: help line over the list of remotes to push to
-select_hint = "Pick the remotes this {$push} goes to. Nothing is saved unless you tick Remember."
+select_hint = { git = "Wybierz zdalne, do których trafi ten push. Nic się nie zapisuje, dopóki nie zaznaczysz Zapamiętaj.", local = "Wybierz zdalne, do których trafi to wypchnięcie. Nic się nie zapisuje, dopóki nie zaznaczysz Zapamiętaj." }
 # context: checkbox: store the picked remotes as the branch's push targets
-remember = "Remember for this branch"
+remember = "Zapamiętaj dla tej gałęzi"
 # context: shown under the list when no remote is ticked
-select_none = "Tick at least one remote."
+select_none = "Zaznacz co najmniej jedno zdalne."
 # context: shown while the daemon asks the remotes about the branch
-loading = "Asking the remotes..."
+loading = "Pytanie zdalnych..."
 # context: table heading: the remote's name
-col_remote = "Remote"
+col_remote = "Zdalne"
 # context: table heading: how the local branch stands against the remote
-col_state = "State"
+col_state = "Stan"
 # context: table heading: what the run does with that remote
-col_action = "Action"
+col_action = "Akcja"
 # context: state of a remote that already has the same commit
-state_up_to_date = "up to date"
+state_up_to_date = "aktualne"
 # context: state of a remote that only misses local commits
-state_ready = "ready"
+state_ready = "gotowe"
 # context: state of a remote that has no copy of the branch yet
-state_new = "new"
+state_new = "nowa"
 # context: state of a remote that has commits the local branch lacks
-state_behind = "behind"
+state_behind = "w tyle"
 # context: state of a remote whose history and the local branch's both moved
-state_diverged = "diverged"
+state_diverged = "rozbieżne"
 # context: state of a remote whose commits are older copies of rebased or amended local commits
-state_rewritten = "rewritten"
+state_rewritten = "przepisane"
 # context: state of a remote whose history shares nothing with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "niepowiązane"
 # context: state of a remote whose host refused the branch earlier (protected branch)
-state_refused = "refused"
+state_refused = "odrzucone"
 # context: state of a remote that could not be asked
-state_unreachable = "not reachable"
+state_unreachable = "niedostępne"
 # context: state of a remote that is no longer configured
-state_missing = "gone"
+state_missing = "usunięte"
 # context: note on a remote that points at the same repository as an earlier row; {other} is that earlier remote
-same_as = "same repository as {other}"
+same_as = "to samo repozytorium co {other}"
 # context: action: send the local commits to the remote
 action_push = "{$Push}"
 # context: action: move the local branch forward to the remote's commit; {remote} is the remote
-action_fast_forward = "Fast-forward from {remote}"
+action_fast_forward = "Fast-forward z {remote}"
 # context: action: combine the remote's commits into the local branch, then send; {remote} is the remote
-action_merge = "{$Merge} from {remote}"
+action_merge = "{$Merge} z {remote}"
 # context: action: replay the local commits on top of the remote's, then send; {remote} is the remote
-action_rebase = "{$Rebase} onto {remote}"
+action_rebase = "{$Rebase} na {remote}"
 # context: action: overwrite the remote's branch, refused if it moved since the plan
-action_force = "Force {$push} (lease)"
+action_force = "Wymuś {$push_noun} (lease)"
 # context: action: leave this remote out
-action_skip = "Skip"
+action_skip = "Pomiń"
 # context: line under a row whose merge would conflict; {n} is the number of files, {files} their names
-conflicts = { one = "{$merge} would conflict in {n} file: {files}", other = "{$merge} would conflict in {n} files: {files}" }
+conflicts = { one = "{$merge} da konflikt w {n} pliku: {files}", few = "{$merge} da konflikt w {n} plikach: {files}", many = "{$merge} da konflikt w {n} plikach: {files}", other = "{$merge} da konflikt w {n} pliku: {files}" }
 # context: checkbox: also send the tags that no remote has yet
-tags = "Also {$push} the {$tags} not sent yet"
+tags = "{$Push} też {$tags}, których jeszcze nie wysłano"
 # context: summary line under the table; {steps} is the list of steps
-then_line = "Then: {steps}."
+then_line = "Potem: {steps}."
 # context: summary line when every row is skipped or already up to date
-then_nothing = "Then: nothing to do."
+then_nothing = "Potem: nic do zrobienia."
 # context: separator between steps in the summary line
 then_join = ", "
 # context: step of the summary line; {remote} is the remote
-step_fast_forward = "fast-forward from {remote}"
+step_fast_forward = "fast-forward z {remote}"
 # context: step of the summary line; {remote} is the remote
 step_merge = "{$merge} {remote}"
 # context: step of the summary line; {remote} is the remote
-step_rebase = "{$rebase} onto {remote}"
+step_rebase = "{$rebase} na {remote}"
 # context: step of the summary line; {n} is the number of remotes
-step_push = { one = "{$push} to {n} remote", other = "{$push} to {n} remotes" }
+step_push = { one = "{$push} do {n} zdalnego", few = "{$push} do {n} zdalnych", many = "{$push} do {n} zdalnych", other = "{$push} do {n} zdalnego" }
 # context: warning under the summary when a row force-pushes; {n} is the number of commits that disappear, {remote} the remote
-force_note = { one = "Force {$push} replaces {n} {$commit} on {remote}.", other = "Force {$push} replaces {n} {$commits} on {remote}." }
+force_note = { one = { git = "Force push zastępuje {n} commit na {remote}.", local = "Wymuszone wypchnięcie zastępuje {n} zatwierdzenie na {remote}." }, few = { git = "Force push zastępuje {n} commity na {remote}.", local = "Wymuszone wypchnięcie zastępuje {n} zatwierdzenia na {remote}." }, many = { git = "Force push zastępuje {n} commitów na {remote}.", local = "Wymuszone wypchnięcie zastępuje {n} zatwierdzeń na {remote}." }, other = { git = "Force push zastępuje {n} commita na {remote}.", local = "Wymuszone wypchnięcie zastępuje {n} zatwierdzenia na {remote}." } }
 # context: warning under the summary when rows rebase while other remotes already hold the local commits; {remotes} are those remotes
-rebase_warn = "A {$rebase} rewrites the local {$commits}: {remotes} will then need a force {$push}."
+rebase_warn = { git = "{$rebase} przepisze lokalne {$commits}: {remotes} będą potem wymagać force push.", local = "{$rebase} przepisze lokalne {$commits}: {remotes} będą potem wymagać wymuszonego wypchnięcia." }
 # context: confirmation question before a force push; {n} is the number of remote commits replaced, {branch} the branch, {remotes} the remote names
-force_confirm = { one = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commit} on the remote is replaced. Not undoable.", other = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commits} on the remotes are replaced. Not undoable." }
+force_confirm = { one = { git = "Force push {branch} do {remotes}?\nZ lease: {n} commit na zdalnym zostanie zastąpiony. Nie do cofnięcia.", local = "Wymusić wypchnięcie {branch} do {remotes}?\nZ lease: {n} zatwierdzenie na zdalnym zostanie zastąpione. Nie do cofnięcia." }, few = { git = "Force push {branch} do {remotes}?\nZ lease: {n} commity na zdalnych zostaną zastąpione. Nie do cofnięcia.", local = "Wymusić wypchnięcie {branch} do {remotes}?\nZ lease: {n} zatwierdzenia na zdalnych zostaną zastąpione. Nie do cofnięcia." }, many = { git = "Force push {branch} do {remotes}?\nZ lease: {n} commitów na zdalnych zostanie zastąpionych. Nie do cofnięcia.", local = "Wymusić wypchnięcie {branch} do {remotes}?\nZ lease: {n} zatwierdzeń na zdalnych zostanie zastąpionych. Nie do cofnięcia." }, other = { git = "Force push {branch} do {remotes}?\nZ lease: {n} commita na zdalnych zostanie zastąpione. Nie do cofnięcia.", local = "Wymusić wypchnięcie {branch} do {remotes}?\nZ lease: {n} zatwierdzenia na zdalnych zostanie zastąpione. Nie do cofnięcia." } }
 # context: button: ask the remotes again
-btn_fetch_again = "{$Fetch} again"
+btn_fetch_again = "{$Fetch} ponownie"
 # context: button: set every row that has a problem to Skip
-btn_skip_problems = "Skip problems"
+btn_skip_problems = "Pomiń problemy"
 # context: button: close the dialog without running
-btn_cancel = "Cancel"
+btn_cancel = "Anuluj"
 # context: button: run the grouped push
-btn_run = "Run"
+btn_run = "Uruchom"
 # context: button: go to the next step
-btn_next = "Next"
+btn_next = "Dalej"
 # context: button: close the dialog (the run goes on)
-btn_close = "Close"
+btn_close = "Zamknij"
 # context: button: try the failed remotes again
-btn_retry = "Retry failed"
+btn_retry = "Ponów nieudane"
 # context: progress row: the remote took the commits
-run_pushed = "sent"
+run_pushed = "wysłano"
 # context: progress row: the remote got a new branch
-run_created = "created"
+run_created = "utworzono"
 # context: progress row: nothing to send
-run_up_to_date = "up to date"
+run_up_to_date = "aktualne"
 # context: progress row: the local branch moved forward
-run_fast_forwarded = "fast-forwarded"
+run_fast_forwarded = "fast-forward"
 # context: progress row: the remote's commits were combined into the local branch with a new commit
-run_merged = "combined"
+run_merged = "połączono"
 # context: progress row: the local commits were replayed on the remote's
-run_rebased = "replayed"
+run_rebased = "odtworzono"
 # context: progress row: the remote's commits were taken in
-run_integrated = "taken in"
+run_integrated = "przejęto"
 # context: progress row: left out
-run_skipped = "skipped"
+run_skipped = "pominięto"
 # context: progress row: the remote's commits are being combined with the local branch
-run_merging = "combining"
+run_merging = "łączenie"
 # context: progress row: sending in progress
-run_pushing = "sending"
+run_pushing = "wysyłanie"
 # context: progress row: not started yet
-run_waiting = "waiting"
+run_waiting = "czeka"
 # context: progress row: failed; {why} is the reason
-run_failed = "failed: {why}"
+run_failed = "błąd: {why}"
 # context: progress row: the remote refused; {why} is the reason
-run_rejected = "refused: {why}"
+run_rejected = "odrzucono: {why}"
 # context: progress row: the run was canceled while this remote was in flight
-run_unknown = "unknown (canceled)"
+run_unknown = "nieznane (anulowano)"
 # context: progress row: the remote is not configured
-run_missing = "remote missing"
+run_missing = "brak zdalnego"
 # context: line under the progress rows while the run is going
-run_going = "Closing this window does not stop the run."
+run_going = "Zamknięcie tego okna nie zatrzymuje operacji."
 # context: line under the progress rows when the run ended well
-run_done = "Done."
+run_done = "Gotowe."
 # context: line under the progress rows when some remotes failed
-run_problems = "Some remotes failed. Retry them, or close."
+run_problems = "Niektóre zdalne zawiodły. Ponów je albo zamknij."
 # context: key hints of the selection step
-hint_select = "Up/Down move  Space tick  m remember  Enter next  Esc close"
+hint_select = "Up/Down ruch  Space zaznacz  m zapamiętaj  Enter dalej  Esc zamknij"
 # context: key hints of the plan step
-hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t {$tags}  f again  Ctrl+Enter run  Esc close"
+hint_plan = "Up/Down wiersz  Left/Right akcja  Enter lista  s pomiń  t {$tags}  f ponownie  Ctrl+Enter uruchom  Esc zamknij"
 # context: key hints of the progress step
-hint_run = "Esc close  r retry failed"
+hint_run = "Esc zamknij  r ponów nieudane"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting = "Grouped {$push} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting = { git = "Grupowy push wstrzymany ({remote}): rozwiąż i zakończ, potem Kontynuuj.", local = "Grupowe wypchnięcie wstrzymane ({remote}): rozwiąż i zakończ, potem Kontynuuj." }
 # context: text of the strip when the conflicts are resolved and the run can go on; {remote} is that remote
-strip_ready = "Grouped {$push} paused ({remote}): resolved. Continue to {$push}."
+strip_ready = { git = "Grupowy push wstrzymany ({remote}): rozwiązano. Kontynuuj push.", local = "Grupowe wypchnięcie wstrzymane ({remote}): rozwiązano. Kontynuuj wypchnięcie." }
 # context: strip button: go on with the grouped push
-strip_continue = "Continue"
+strip_continue = "Kontynuuj"
 # context: strip button: abort the merge or rebase of the grouped push and drop it
-strip_abort = "Abort group"
+strip_abort = "Przerwij grupę"
 # context: status line after the grouped push was aborted
-aborted = "Grouped {$push} aborted."
+aborted = { git = "Grupowy push przerwany.", local = "Grupowe wypchnięcie przerwane." }
 # context: status line while a grouped push runs
-running = "Grouped {$push}..."
+running = { git = "Grupowy push...", local = "Grupowe wypchnięcie..." }
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
-abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+abort_confirm = { git = "Przerwać grupowy push gałęzi {branch} (zatrzymany na {remote})?\nTrwająca operacja ({$merge} lub {$rebase}) zostanie odrzucona. To, co już wysłano, zostaje.", local = "Przerwać grupowe wypchnięcie gałęzi {branch} (zatrzymane na {remote})?\nTrwająca operacja ({$merge} lub {$rebase}) zostanie odrzucona. To, co już wysłano, zostaje." }
 # context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
-title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {branch} from {n} remotes" }
+title_pull_plan = { one = "{$Pull} {branch} z {n} zdalnego", few = "{$Pull} {branch} z {n} zdalnych", many = "{$Pull} {branch} z {n} zdalnych", other = "{$Pull} {branch} z {n} zdalnego" }
 # context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting_pull = { git = "Grupowy pull wstrzymany ({remote}): rozwiąż i zakończ, potem Kontynuuj.", local = "Grupowe ściągnięcie wstrzymane ({remote}): rozwiąż i zakończ, potem Kontynuuj." }
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
-strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
+strip_ready_pull = { git = "Grupowy pull wstrzymany ({remote}): rozwiązano. Kontynuuj pull.", local = "Grupowe ściągnięcie wstrzymane ({remote}): rozwiązano. Kontynuuj ściąganie." }
 [multi_remote]
-state_new = "new"
-state_gone = "gone"
-state_unrelated = "unrelated"
-tip_title = "Remotes of {branch}"
-tip_in_sync = "{remote}: in sync"
-tip_ahead = "{remote}: {n} ahead"
-tip_behind = "{remote}: {n} behind"
-tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
-tip_new = "{remote}: no copy of this branch yet"
-tip_unrelated = "{remote}: no common history"
-tip_gone = "{remote}: no longer configured"
-tip_open_hint = "Click to edit the remotes of this branch"
+state_new = "nowa"
+state_gone = "usunięte"
+state_unrelated = "niepowiązane"
+tip_title = "Zdalne gałęzi {branch}"
+tip_in_sync = "{remote}: zgodne"
+tip_ahead = "{remote}: {n} do przodu"
+tip_behind = "{remote}: {n} w tyle"
+tip_diverged = "{remote}: rozbieżne ({ahead} do przodu, {behind} w tyle)"
+tip_new = "{remote}: brak kopii tej gałęzi"
+tip_unrelated = "{remote}: brak wspólnej historii"
+tip_gone = "{remote}: już nieskonfigurowane"
+tip_open_hint = "Kliknij, by edytować zdalne tej gałęzi"

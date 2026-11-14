@@ -220,6 +220,7 @@ pub const LIVE_KEYS: &[&str] = &[
     "ai.sent_preview.split_commit",
     "ai.sent_preview.rewrite_script",
     "ai.sent_preview.rewrite_rules",
+    "ai.sent_preview.worktree_name",
     "privacy.sensitive_patterns",
     "privacy.staging_guard",
     "ai.actions.commit_message.profile",

@@ -141,4 +141,7 @@ pub use undo::{
     JournalListing, JournalState, ListedEntry, PathHash, RefScope, RefSnapshot, RefUpdate,
     RemoteRefMoved, Snapshot, UndoOutcome, UndoRefusal, UNDO_DISABLED_MESSAGE, UNDO_PIN_PREFIX,
 };
-pub use worktree::Worktree;
+pub use worktree::{
+    is_generated_worktree_name, worktree_generated_name, worktree_id, worktree_name_after_branch,
+    worktree_safe, Worktree,
+};

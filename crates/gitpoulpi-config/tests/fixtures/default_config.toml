@@ -211,6 +211,10 @@ instructions = ""
 profile = ""
 instructions = ""
 
+[ai.actions.worktree_name]
+profile = ""
+instructions = ""
+
 [ai.review]
 run_in_repository = "profile"
 include_claude_md = true
@@ -241,6 +245,7 @@ rewrite_rules = true
 rewrite_script = true
 split_commit = true
 stash_message = true
+worktree_name = true
 
 [session]
 per_repo_state_dir = "in_git_dir"

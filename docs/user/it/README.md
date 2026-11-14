@@ -74,7 +74,11 @@ di riferimento quando ti servono.
     Cosa passa attraverso tmux, zellij, screen, herdr e i pannelli dei terminali:
     **[Multiplexer](multiplexers.md)**.
 
-Inoltre: **[Workflow di branching](branching-workflows.md)**, i modelli Git Flow, GitHub Flow, GitLab Flow e
+Inoltre: **[Più remoti per un branch](multiple-remotes.md)**: destinatari di push e origini di
+pull, il dialogo Remoti, Push su tutti i remoti o su remoti scelti, risolvere un remoto che si è
+mosso, Continua dopo un conflitto, la CLI e un alias di git semplice.
+
+**[Workflow di branching](branching-workflows.md)**, i modelli Git Flow, GitHub Flow, GitLab Flow e
 Trunk-based oppure i tuoi branch base, pattern dei nomi dei branch e tipi di topic (`gitpoulpi flow ...`).
 
 **[Riscrittura della cronologia](history-rewrite.md)**: il pannello di riscrittura

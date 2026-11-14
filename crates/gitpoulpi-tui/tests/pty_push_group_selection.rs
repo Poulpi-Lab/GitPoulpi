@@ -124,11 +124,7 @@ fn unticking_a_remote_pushes_to_the_others_only_and_changes_no_config() {
                 && !s.contains("Asking the remotes")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    assert!(
-        !plan.contains("Then: push to 3 remotes"),
-        "{}",
-        plan.text()
-    );
+    assert!(!plan.contains("Then: push to 3 remotes"), "{}", plan.text());
     let (c, r) = button(&plan, "Run");
     term.click(c + 1, r).unwrap();
     term.wait_for("Done", STEP, |s| s.contains("Done."))

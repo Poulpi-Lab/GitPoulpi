@@ -188,6 +188,9 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
 - `hosting_task/` (worker), `hosting_ui/` (sidebar sections, chip, menus),
   `pull_request/`, `issue_form.rs`, `issue_ref_picker.rs`, `issue_tokens.rs`,
   `remote_links.rs`, `remotes_ui/`, `git_actions.rs`.
+- `push_group_ui/` (grouped push: selection, plan and progress dialog, and the
+  paused strip; entries `PushGroupUi::open_selection/open_plan/open_progress`,
+  design notes in `session-and-state.md`, "The push group dialog").
 - `ai_ui.rs`, `lfs_ui.rs`, `ui_intent/` + `ui_viewer.rs` (MCP view control),
   `external_tools.rs`, `new_file.rs`.
 - Benches (`#[ignore]`d): `commit_files_bench.rs`, `open_time_bench.rs`.

@@ -25,12 +25,10 @@ pub(crate) enum StripButton {
 
 /// Whether a paused group of the repository at `root` wants the strip.
 pub(crate) fn visible(root: &Path) -> bool {
-    super::CORE
-        .lock()
-        .ok()
-        .is_some_and(|c| c.as_ref().is_some_and(|c| {
-            c.paused.as_ref().is_some_and(|p| p.root == root)
-        }))
+    super::CORE.lock().ok().is_some_and(|c| {
+        c.as_ref()
+            .is_some_and(|c| c.paused.as_ref().is_some_and(|p| p.root == root))
+    })
 }
 
 /// The words of the strip and whether Continue is on.

@@ -48,7 +48,8 @@ impl Core {
         dlg.frame = outer;
         dlg.hits.clear();
         let title = title(dlg, run.as_ref());
-        let popup_open = matches!(&dlg.step, Step::Plan(p) if p.rows.iter().any(|r| r.combo.is_open()));
+        let popup_open =
+            matches!(&dlg.step, Step::Plan(p) if p.rows.iter().any(|r| r.combo.is_open()));
         let buf = frame.buffer_mut();
         dlg.close.framed(buf, outer, &title, &WIN, !popup_open);
         let inner = Rect::new(
@@ -464,7 +465,10 @@ fn paint_plan(
                 buf,
                 x_remote + 1,
                 yy + 1,
-                &truncate_with_ellipsis(&line, (inner.x + width).saturating_sub(x_remote + 1) as usize),
+                &truncate_with_ellipsis(
+                    &line,
+                    (inner.x + width).saturating_sub(x_remote + 1) as usize,
+                ),
                 (inner.x + width).saturating_sub(x_remote + 1),
                 Style::default().fg(th().status.warning).bg(bg),
             );
@@ -517,7 +521,10 @@ fn paint_plan(
             buf,
             inner.x,
             ty,
-            &truncate_with_ellipsis(&msg::force_note(u64::from(count), remote), inner.width as usize),
+            &truncate_with_ellipsis(
+                &msg::force_note(u64::from(count), remote),
+                inner.width as usize,
+            ),
             inner.width,
             warn.add_modifier(Modifier::BOLD),
         );
@@ -540,12 +547,7 @@ fn paint_plan(
 // Step 3
 // ---------------------------------------------------------------------
 
-fn paint_run(
-    buf: &mut Buffer,
-    inner: Rect,
-    run: Option<&RunState>,
-    hits: &mut Vec<(Rect, Part)>,
-) {
+fn paint_run(buf: &mut Buffer, inner: Rect, run: Option<&RunState>, hits: &mut Vec<(Rect, Part)>) {
     let Some(run) = run else {
         return;
     };
@@ -557,10 +559,21 @@ fn paint_run(
         .unwrap_or(6)
         .min(NAME_MAX) as u16;
     let mut y = inner.y;
-    for row in run.rows.iter().take(inner.height.saturating_sub(6) as usize) {
+    for row in run
+        .rows
+        .iter()
+        .take(inner.height.saturating_sub(6) as usize)
+    {
         let (glyph, text, t) = run_row_text(row);
         let c = tone(t);
-        put(buf, inner.x + 1, y, glyph, 1, Style::default().fg(c).bg(th().ui.panel));
+        put(
+            buf,
+            inner.x + 1,
+            y,
+            glyph,
+            1,
+            Style::default().fg(c).bg(th().ui.panel),
+        );
         put(
             buf,
             inner.x + 3,

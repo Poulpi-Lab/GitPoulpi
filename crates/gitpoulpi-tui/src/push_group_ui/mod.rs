@@ -49,7 +49,9 @@ use crate::modes::{ConfirmAction, InputMode, PendingDestructive};
 
 use model::{Part, Phase, PlanView, RunRow, RunState, Select};
 
-pub(crate) use strip::{click as strip_click, render as render_strip, visible as strip_visible, StripButton};
+pub(crate) use strip::{
+    click as strip_click, render as render_strip, visible as strip_visible, StripButton,
+};
 
 const WIN: dialog_kit::Win = dialog_kit::Win::movable("push_group");
 
@@ -266,7 +268,10 @@ pub(crate) fn on_started(root: &Path, request: &RemoteGroupRunRequest) {
     with(|c| {
         let fresh = request.resume.is_none() && !request.retry;
         if fresh {
-            if c.run.as_ref().is_none_or(|r| &r.request != request || !r.going()) {
+            if c.run
+                .as_ref()
+                .is_none_or(|r| &r.request != request || !r.going())
+            {
                 c.begin_run(request);
             }
             return;
@@ -502,8 +507,7 @@ pub(crate) fn tick(root: &Path, head_branch: Option<&str>) {
             }
             _ => None,
         };
-        let due = c.paused.is_none()
-            || c.last_poll.is_none_or(|t| t.elapsed() >= POLL_EVERY);
+        let due = c.paused.is_none() || c.last_poll.is_none_or(|t| t.elapsed() >= POLL_EVERY);
         if let (Some(branch), true, true) = (branch, due, c.status.is_none()) {
             c.last_poll = Some(Instant::now());
             c.status = Some(requester.call(

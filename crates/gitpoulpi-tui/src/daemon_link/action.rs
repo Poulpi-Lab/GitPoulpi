@@ -467,7 +467,9 @@ pub enum Action {
         prefer_rebase: bool,
     },
     /// Abort the merge or rebase the saved grouped run started and drop it.
-    RemoteGroupAbort { expect_run_id: Option<String> },
+    RemoteGroupAbort {
+        expect_run_id: Option<String>,
+    },
     /// Run the saved grouped run's failed targets again.
     RemoteGroupRetry {
         expect_run_id: Option<String>,

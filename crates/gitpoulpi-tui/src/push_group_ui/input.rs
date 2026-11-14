@@ -17,7 +17,10 @@ use crate::modes::PendingDestructive;
 
 /// The buttons of the open step, in the order they are painted: the label,
 /// whether it is the primary one and whether it can be pressed.
-pub(super) fn buttons(dlg: &Dlg, run: Option<&super::model::RunState>) -> Vec<(Btn, String, bool, bool)> {
+pub(super) fn buttons(
+    dlg: &Dlg,
+    run: Option<&super::model::RunState>,
+) -> Vec<(Btn, String, bool, bool)> {
     let label = |m: gitpoulpi_i18n::M| m.get().to_string();
     match &dlg.step {
         Step::Select(s) => vec![
@@ -108,7 +111,9 @@ impl Core {
         match &mut dlg.step {
             Step::Select(s) => {
                 let n = s.rows.len();
-                if let Some(to) = crate::popup_list::nav(&key, s.cursor, n, s.scroll.viewport.get().max(1)) {
+                if let Some(to) =
+                    crate::popup_list::nav(&key, s.cursor, n, s.scroll.viewport.get().max(1))
+                {
                     s.cursor = to;
                     return Effect::None;
                 }
@@ -132,7 +137,9 @@ impl Core {
             }
             Step::Plan(p) => {
                 let n = p.rows.len();
-                if let Some(to) = crate::popup_list::nav(&key, p.cursor, n, p.scroll.viewport.get().max(1)) {
+                if let Some(to) =
+                    crate::popup_list::nav(&key, p.cursor, n, p.scroll.viewport.get().max(1))
+                {
                     p.cursor = to;
                     return Effect::None;
                 }
@@ -171,7 +178,10 @@ impl Core {
             }
             Step::Run => {
                 if matches!(key.code, KeyCode::Char('r' | 'R'))
-                    && self.run.as_ref().is_some_and(|r| !r.going() && r.has_retryable())
+                    && self
+                        .run
+                        .as_ref()
+                        .is_some_and(|r| !r.going() && r.has_retryable())
                 {
                     return self.press(Btn::Retry);
                 }
@@ -274,11 +284,7 @@ impl Core {
                     return Effect::Submit(vec![Action::RemoteGroupRun(Box::new(request))]);
                 }
                 let total: u32 = force.iter().map(|(_, n)| *n).sum();
-                let remotes = force
-                    .iter()
-                    .map(|(r, _)| *r)
-                    .collect::<Vec<_>>()
-                    .join(", ");
+                let remotes = force.iter().map(|(r, _)| *r).collect::<Vec<_>>().join(", ");
                 Effect::Confirm {
                     prompt: msg::force_confirm(u64::from(total), &branch, remotes),
                     pending: PendingDestructive::GroupForcePush {
@@ -342,7 +348,11 @@ impl Core {
         }
         match mouse.kind {
             MouseEventKind::ScrollUp | MouseEventKind::ScrollDown => {
-                let delta = if mouse.kind == MouseEventKind::ScrollUp { -1 } else { 1 };
+                let delta = if mouse.kind == MouseEventKind::ScrollUp {
+                    -1
+                } else {
+                    1
+                };
                 if let Some(scroll) = scroll.filter(|_| dlg.frame.contains(at)) {
                     let view = scroll.viewport.get().max(1);
                     let max = len.saturating_sub(view);
@@ -405,4 +415,3 @@ impl Core {
         Effect::None
     }
 }
-

@@ -169,10 +169,9 @@ pub(super) fn run(cx: &mut CommandCtx<'_>, cmd: PaletteCommand, sel_ref: &Option
                 .ok()
                 .and_then(|refs| crate::remotes_ui::head_branch(refs))
             {
-                Some(head) => crate::push_group_ui::PushGroupUi::open_selection(
-                    cx.repo_root,
-                    &head.name,
-                ),
+                Some(head) => {
+                    crate::push_group_ui::PushGroupUi::open_selection(cx.repo_root, &head.name)
+                }
                 None => {
                     *cx.last_message = Some(msg::remotes::DETACHED_PUSH.get().into());
                 }

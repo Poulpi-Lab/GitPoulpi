@@ -76,7 +76,12 @@ fn strip_button(screen: &Screen, label: &str) -> (u16, u16) {
     };
     (0..screen.cols().saturating_sub(wanted.len() as u16))
         .rev()
-        .find(|x| wanted.iter().enumerate().all(|(i, w)| at(x + i as u16) == *w))
+        .find(|x| {
+            wanted
+                .iter()
+                .enumerate()
+                .all(|(i, w)| at(x + i as u16) == *w)
+        })
         .map(|x| (x, row))
         .unwrap_or_else(|| panic!("no {label} on the strip:\n{}", screen.text()))
 }
@@ -172,7 +177,13 @@ fn a_diverged_remote_merges_stops_on_the_conflict_and_continue_finishes_the_push
             }
             s.contains("Done.")
         })
-        .unwrap_or_else(|e| panic!("{e}\n{}\nstatus lines seen: {:#?}", term.text(), seen.borrow()));
+        .unwrap_or_else(|e| {
+            panic!(
+                "{e}\n{}\nstatus lines seen: {:#?}",
+                term.text(),
+                seen.borrow()
+            )
+        });
     assert!(!done.contains("Grouped push paused"), "{}", done.text());
     let merged = repo.git(&["rev-parse", "HEAD"]).trim().to_string();
     assert_eq!(
@@ -183,7 +194,8 @@ fn a_diverged_remote_merges_stops_on_the_conflict_and_continue_finishes_the_push
         "HEAD is the merge commit"
     );
     assert_eq!(
-        repo.git_in_remote(&["rev-parse", "refs/heads/feature"]).trim(),
+        repo.git_in_remote(&["rev-parse", "refs/heads/feature"])
+            .trim(),
         merged
     );
     for name in ["gitlab", "backup"] {

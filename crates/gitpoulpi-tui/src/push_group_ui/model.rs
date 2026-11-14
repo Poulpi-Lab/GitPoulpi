@@ -246,7 +246,13 @@ impl PlanRow {
         (integrates && !self.t.conflicts.is_empty()).then(|| {
             msg::conflicts(
                 self.t.conflicts.len() as u64,
-                self.t.conflicts.iter().take(3).cloned().collect::<Vec<_>>().join(", "),
+                self.t
+                    .conflicts
+                    .iter()
+                    .take(3)
+                    .cloned()
+                    .collect::<Vec<_>>()
+                    .join(", "),
             )
         })
     }

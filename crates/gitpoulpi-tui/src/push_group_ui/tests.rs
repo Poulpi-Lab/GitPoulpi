@@ -65,7 +65,14 @@ fn three_ready() -> RemoteGroupPlan {
     plan_of(
         ["origin", "gitlab", "backup"]
             .into_iter()
-            .map(|r| planned(r, RemoteRelation::LocalAhead(2), A::Push, &[A::Push, A::Skip]))
+            .map(|r| {
+                planned(
+                    r,
+                    RemoteRelation::LocalAhead(2),
+                    A::Push,
+                    &[A::Push, A::Skip],
+                )
+            })
             .collect(),
     )
 }
@@ -136,13 +143,21 @@ fn a_diverged_remote_defaults_to_merge_and_shows_the_conflict_line() {
     );
     gitlab.conflicts = vec!["src/a.rs".into()];
     open_plan_with(plan_of(vec![
-        planned("origin", RemoteRelation::LocalAhead(2), A::Push, &[A::Push, A::Skip]),
+        planned(
+            "origin",
+            RemoteRelation::LocalAhead(2),
+            A::Push,
+            &[A::Push, A::Skip],
+        ),
         gitlab,
     ]));
     let text = screen();
     assert!(text.contains("diverged"), "{text}");
     assert!(text.contains("Merge from gitlab"), "{text}");
-    assert!(text.contains("merge would conflict in 1 file: src/a.rs"), "{text}");
+    assert!(
+        text.contains("merge would conflict in 1 file: src/a.rs"),
+        "{text}"
+    );
     assert!(
         text.contains("Then: merge gitlab, push to 2 remotes."),
         "{text}"
@@ -186,7 +201,10 @@ fn a_force_push_asks_naming_the_remote_and_the_commit_count_and_runs_nothing() {
     mirror.behind = 4;
     open_plan_with(plan_of(vec![mirror]));
     let text = screen();
-    assert!(text.contains("you rebased") || text.contains("rewritten"), "{text}");
+    assert!(
+        text.contains("you rebased") || text.contains("rewritten"),
+        "{text}"
+    );
     match on_key(ctrl(KeyCode::Enter)) {
         Effect::Confirm { prompt, pending } => {
             assert!(prompt.contains("mirror"), "{prompt}");
@@ -210,7 +228,12 @@ fn skip_problems_sets_aside_diverged_and_unreachable_rows() {
     let mut down = planned("down", RemoteRelation::Absent, A::Skip, &[A::Skip]);
     down.error = Some("no route".into());
     open_plan_with(plan_of(vec![
-        planned("origin", RemoteRelation::LocalAhead(1), A::Push, &[A::Push, A::Skip]),
+        planned(
+            "origin",
+            RemoteRelation::LocalAhead(1),
+            A::Push,
+            &[A::Push, A::Skip],
+        ),
         planned(
             "gitlab",
             RemoteRelation::Diverged {
@@ -238,7 +261,12 @@ fn skip_problems_sets_aside_diverged_and_unreachable_rows() {
 #[test]
 fn rebasing_while_another_remote_holds_the_commits_warns_of_a_force_push() {
     let _s = serial();
-    let mut up = planned("origin", RemoteRelation::UpToDate, A::Push, &[A::Push, A::Skip]);
+    let mut up = planned(
+        "origin",
+        RemoteRelation::UpToDate,
+        A::Push,
+        &[A::Push, A::Skip],
+    );
     up.local_unmatched = Some(0);
     open_plan_with(plan_of(vec![
         up,
@@ -304,7 +332,10 @@ fn the_selection_pre_ticks_the_upstream_and_the_push_targets() {
     let _s = serial();
     let queue = RawQueue::default();
     set_requester(queue.requester());
-    let s = select_with(&[("origin", true), ("gitlab", true), ("backup", false)], Some("origin"));
+    let s = select_with(
+        &[("origin", true), ("gitlab", true), ("backup", false)],
+        Some("origin"),
+    );
     with(|c| c.open(Path::new("/repo"), "feature", Step::Select(s)));
     let text = screen();
     assert!(text.contains("[x] origin"), "{text}");
@@ -336,7 +367,10 @@ fn remember_writes_the_ticked_remotes_as_the_branchs_push_targets() {
     let _s = serial();
     let queue = RawQueue::default();
     set_requester(queue.requester());
-    let s = select_with(&[("origin", true), ("gitlab", true), ("backup", false)], Some("origin"));
+    let s = select_with(
+        &[("origin", true), ("gitlab", true), ("backup", false)],
+        Some("origin"),
+    );
     with(|c| c.open(Path::new("/repo"), "feature", Step::Select(s)));
     on_key(key(KeyCode::Down));
     on_key(key(KeyCode::Down));
@@ -366,7 +400,10 @@ fn progress_follows_the_events_and_a_conflict_pauses_behind_the_strip() {
     on_progress("run-1", "origin", TargetStatus::Pushed { created: false });
     on_progress("run-1", "gitlab", TargetStatus::Integrating);
     let text = screen();
-    assert!(text.contains("\u{2713} origin") || text.contains("origin"), "{text}");
+    assert!(
+        text.contains("\u{2713} origin") || text.contains("origin"),
+        "{text}"
+    );
     assert!(text.contains("sent"), "{text}");
     assert!(text.contains("combining"), "{text}");
     assert!(text.contains("waiting"), "{text}");
@@ -457,7 +494,10 @@ fn the_strip_paints_one_row_with_its_buttons() {
         .unwrap();
     let text = dialog_kit::buffer_text(terminal.backend().buffer());
     assert!(text.contains("Grouped push paused (gitlab)"), "{text}");
-    assert!(text.contains("Continue") && text.contains("Abort group"), "{text}");
+    assert!(
+        text.contains("Continue") && text.contains("Abort group"),
+        "{text}"
+    );
     assert_eq!(hits.len(), 2);
     // Not ready: Continue is gone.
     with(|c| c.paused.as_mut().unwrap().ready = false);
@@ -483,12 +523,7 @@ fn a_click_on_the_run_button_and_on_a_combo_row_work_from_the_paint() {
             .find(|(_, p)| *p == Part::Button(model::Btn::Run))
             .unwrap()
             .0;
-        let combo = d
-            .hits
-            .iter()
-            .find(|(_, p)| *p == Part::Combo(1))
-            .unwrap()
-            .0;
+        let combo = d.hits.iter().find(|(_, p)| *p == Part::Combo(1)).unwrap().0;
         (run, combo)
     });
     let click = |r: Rect| MouseEvent {

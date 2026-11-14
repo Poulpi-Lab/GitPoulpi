@@ -313,9 +313,9 @@ mod picker_view;
 mod pill_menu;
 mod profile_bar;
 mod prompt_dialog;
-mod push_group_ui;
 #[cfg_attr(not(feature = "hosting"), path = "pull_request_stub.rs")]
 mod pull_request;
+mod push_group_ui;
 #[cfg_attr(
     not(all(feature = "radar", feature = "hosting")),
     path = "radar_stub.rs"

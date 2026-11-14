@@ -1117,10 +1117,7 @@ fn the_push_group_dialog_holds_its_layout_in_every_language() {
                 !text.contains("{$") && !text.contains("{branch}") && !text.contains("{n}"),
                 "{what}\n{text}"
             );
-            assert!(
-                text.contains('\u{256D}'),
-                "{what}: the dialog drew\n{text}"
-            );
+            assert!(text.contains('\u{256D}'), "{what}: the dialog drew\n{text}");
         }
     });
     crate::push_group_ui::reset_for_tests();

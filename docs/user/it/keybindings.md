@@ -490,7 +490,7 @@ applicano. I tasti sono quelli predefiniti.
 | Barra laterale: Mostra o nascondi i branch locali |  |
 | Barra laterale: Mostra o nascondi i remoti |  |
 | Barra laterale: Mostra o nascondi i worktree |  |
-| Sidebar: Show Worktrees Section |  |
+| Barra laterale: Mostra la sezione Worktrees |  |
 | Barra laterale: Mostra o nascondi Stash |  |
 | Barra laterale: Mostra o nascondi Tag |  |
 | Barra laterale: Mostra o nascondi Pull request |  |
@@ -534,12 +534,12 @@ applicano. I tasti sono quelli predefiniti.
 | Refs: Reflog del branch selezionato... |  |
 | Refs: Avvia una pull request dal branch selezionato... |  |
 | Refs: Apri il worktree in una scheda | `Enter / doppio clic` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: Apri il worktree in... |  |
+| Refs: Merge del branch del worktree in... |  |
+| Refs: Rimuovi il worktree... |  |
+| Refs: Crea un worktree... | `+` |
+| Refs: Crea un worktree dal branch corrente |  |
+| Refs: Crea un worktree scegliendo un branch |  |
 | Refs: Aggiorna il sottomodulo (selezionato) |  |
 | Refs: Inizializza il sottomodulo (selezionato) |  |
 | Refs: Apri il sottomodulo in una scheda | `Enter / doppio clic` |

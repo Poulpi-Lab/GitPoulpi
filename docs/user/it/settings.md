@@ -533,8 +533,9 @@ Modifica l'elenco del pulsante **Apri in** nella barra del titolo. La scheda
 **Generali** contiene i pulsanti per cartella **Esci e cd**, la **Voce predefinita** e
 **Ripristina i valori rilevati**. La scheda **Voci** è un [elenco](#elenchi) (ognuna con
 un'etichetta e un comando): **+ Aggiungi ▾** offre le preimpostazioni e **Personalizzata**,
-e la voce predefinita è segnata con `★`. I campi della voce selezionata comprendono un
-pulsante **Prova**. Vedi [Apri in](open-in.md).
+e la voce predefinita è segnata con `★`. I campi della voce selezionata comprendono **Può aprire un worktree** (spuntata per
+impostazione predefinita: la voce è offerta nel menu Apri in di una riga di worktree,
+vedi [Worktrees](worktrees.md)) e un pulsante **Prova**. Vedi [Apri in](open-in.md).
 
 La prima riga, **Segui la cartella della scheda attiva**, ha due valori:
 

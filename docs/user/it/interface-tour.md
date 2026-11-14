@@ -220,8 +220,10 @@ Trascina il bordo tra due sezioni per ridimensionarle.
   segno di spunta indica il branch attivo. Puoi disattivare le cartelle nelle
   Impostazioni.
 - **REMOTI**: ogni remoto, con i suoi branch sotto.
-- **WORKTREES**: i worktree collegati, quando ce ne sono. Doppio clic su uno per
-  aprirlo in una scheda propria.
+- **WORKTREES**: i worktree collegati, quando ce ne sono (o quando hai mostrato la
+  sezione). Il **+** sulla sua intestazione ne crea uno; doppio clic su un worktree
+  per aprirlo in una scheda propria, clic destro per Apri in, Merge e Rimuovi. Vedi
+  [Worktrees](worktrees.md).
 - **STASH**: i tuoi stash. Clic destro su uno per **Pop**, **Applica** ed
   **Elimina**.
 - **TAG**: i tuoi tag, in cartelle divise sul carattere `/` come i branch (`releases/`, `backups/`). Una freccia indica che il tag è anche sul remoto.

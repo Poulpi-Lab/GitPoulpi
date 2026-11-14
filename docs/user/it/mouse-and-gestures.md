@@ -176,7 +176,9 @@ pulsante o una casella di controllo per usarli.
 
 - **Clic** su una riga per selezionarla. **Doppio clic** su un branch locale o su un
   tag per fare il checkout. **Doppio clic** su un worktree o un sottomodulo per
-  aprirlo in una scheda.
+  aprirlo in una scheda. Il **+** sull'intestazione WORKTREES crea un worktree; clic
+  destro su un worktree per Apri in una nuova scheda, Apri in, Merge e Rimuovi
+  ([Worktrees](worktrees.md)).
 - **Passa il mouse** su una riga per mostrare l'icona alla sua sinistra. **Cliccala**
   per nascondere il ref nel Log, o per mostrarlo di nuovo. Mentre **Solo** è
   attivo, lo stesso punto mette il ref in solo. Su una riga di cartella, l'icona

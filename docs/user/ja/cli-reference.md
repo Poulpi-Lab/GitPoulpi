@@ -128,6 +128,8 @@
 | `tag fetch <name> [--remote R]` | リモートから tag を 1 つ取得します（既定は、その tag を持つリモート）。たとえば `where: remote` の tag に使います。別の commit を指すローカルの tag は上書きしません。 |
 | `tag push [names...] [--remote R]`、`tag delete-remote <name> [--remote R]` | リモートの tag（名前なし：どのリモートにもない tag をすべて）。リモートでの削除は元に戻せます（`undo --yes`）。 |
 | `worktree list`、`worktree add <path> <start> [-b BRANCH]` | リンクされた worktree。 |
+| `worktree changes <path>` | worktree の未 commit の変更（`path`、`untracked`）。変更がなければ空です。 |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | リンクされた worktree を削除します。未 commit の変更がある worktree は、`--force`（変更は失われます）、`--commit-message`（先にそのブランチに commit します）、`--stash-message`（先に未追跡を含めて stash します）のいずれかがない限り拒否されます。`--delete-branch` はそのブランチも削除します（ジャーナルに記録されます）。削除そのものは undo できません。 |
 | `submodule list`、`submodule init [paths]`、`submodule update [paths] [--init] [--recursive]` | サブモジュール（[サブモジュール](submodules.md)）。 |
 
 `--autostash` は、操作を妨げるローカルの変更を stash し、操作を実行してから、stash を pop します。`general.auto_stash` の設定には関係ありません（[自動 stash](log-and-history.md#自動-stash)）。

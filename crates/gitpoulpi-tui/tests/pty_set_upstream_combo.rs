@@ -76,8 +76,15 @@ fn open_dialog(term: &mut Terminal) -> Screen {
     })
     .unwrap_or_else(|e| panic!("{e}"));
     term.send_keys("Enter").unwrap();
-    term.wait_for("the Set upstream dialog", STEP, |s| {
-        s.contains("Set upstream of feature") && !s.contains("Command Palette")
+    // The whole state: the dialog with its list open, and no palette left
+    // (a frame torn between the palette and the dialog fails this and is
+    // polled again, instead of being returned half-painted).
+    term.wait_for("the Set upstream dialog with its list open", STEP, |s| {
+        s.contains("Set upstream of feature")
+            && s.contains("origin/feature")
+            && s.contains("origin/main")
+            && !s.contains("Command Palette")
+            && !s.contains("Enter to run")
     })
     .unwrap_or_else(|e| panic!("{e}"))
 }
@@ -141,7 +148,9 @@ fn unset_upstream_is_a_button_and_esc_closes_the_list_then_the_dialog() {
     // Esc: the list first (the Unset button shows again), the dialog stays...
     term.send_keys("Escape").unwrap();
     term.wait_for("the list closed, the dialog open", STEP, |s| {
-        s.contains("Unset upstream") && !s.contains("origin/feature")
+        s.contains("Set upstream of feature")
+            && s.contains("Unset upstream")
+            && !s.contains("origin/feature")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // ...then the dialog itself.
@@ -155,7 +164,11 @@ fn unset_upstream_is_a_button_and_esc_closes_the_list_then_the_dialog() {
     open_dialog(&mut term);
     term.send_keys("Escape").unwrap();
     let screen = term
-        .wait_for("the list closed", STEP, |s| !s.contains("origin/feature"))
+        .wait_for("the list closed, the Unset button back", STEP, |s| {
+            s.contains("Set upstream of feature")
+                && s.contains("Unset upstream")
+                && !s.contains("origin/feature")
+        })
         .unwrap_or_else(|e| panic!("{e}"));
     let (col, row) = screen.find("Unset upstream").unwrap();
     term.click(col + 1, row).unwrap();

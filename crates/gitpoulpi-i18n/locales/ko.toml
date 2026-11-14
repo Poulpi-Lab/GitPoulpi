@@ -633,11 +633,11 @@ inherited = "(상속됨)"
 lfs_not_checked = "(아직 확인 안 함)"
 lfs_autofix_filters = "{$pull}·{$push} 전에 LFS 필터 설치"
 lfs_autofix_filters_help = "Git LFS를 쓰는 저장소에서 {$pull}이나 {$push}를 하기 전에 LFS 필터나 훅이 없으면 `git lfs install --local`을 실행합니다(그 저장소 자체 설정만, 전역 설정은 건드리지 않음). 큰 파일이 제대로 전송됩니다. 실행하면 상태 표시줄에 표시합니다. git-lfs가 필요합니다."
-push_group_preflight = "Check every remote before a {$push}"
-push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
-default_push_targets = "Extra {$push} targets for new branches"
-default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
-default_push_targets_none = "(no remote configured)"
+push_group_preflight = "{$push} 전에 모든 리모트 확인"
+push_group_preflight_help = "추가 {$push} 대상이 있는 브랜치를 {$push}하기 전에 모든 리모트를 먼저 살펴봅니다(빠른 조회이며, 해당 리모트와 다를 때만 내려받습니다). 그래서 세 번째 리모트의 문제가 첫 {$push}가 시작되기 전에 드러납니다. 끄면 리모트마다 차례로 {$push}하고 결과를 알려 줍니다."
+default_push_targets = "새 브랜치의 추가 {$push} 대상"
+default_push_targets_help = "이 저장소에만 적용됩니다. 새 브랜치가 업스트림 외에 함께 {$push}할 리모트를 체크하세요. 브랜치가 처음 업스트림을 갖게 될 때(업스트림을 설정하는 첫 {$push} 또는 리모트 브랜치에서 만든 브랜치) 브랜치에 복사됩니다. 이미 있는 브랜치는 바뀌지 않으며, 해당 브랜치의 리모트 대화상자에서 바꾸세요."
+default_push_targets_none = "(설정된 리모트 없음)"
 
 [settings_screen]
 title = "설정 - Tab: 섹션/설정 │ Enter: 변경"
@@ -883,7 +883,7 @@ push_branch = "{$Push} {name}"
 start_pr = "{name}에서 {$pr} 시작..."
 fetch = "{$Fetch}"
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
-remotes_of = "Remotes of {name}..."
+remotes_of = "{name}의 리모트..."
 rename = "{name} 이름 변경..."
 delete = "{name} 삭제..."
 delete_both = "{first} 및 {second} 삭제..."
@@ -2206,23 +2206,23 @@ host_not_recognized = "리모트 호스트를 인식하지 못했습니다"
 link_branch = "브랜치 링크"
 link_commit = "{$commit} 링크"
 # context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
-push_to_all = "{$Push} to all ({remotes})"
+push_to_all = "모두 {$Push} ({remotes})"
 # context: menu row: push the branch to one remote only; {remote} is that remote
-push_to_only = "{$Push} to {remote} only"
+push_to_only = "{remote}에만 {$Push}"
 # context: menu row: opens the dialog where the remotes of this one push are ticked
-push_to_selected = "{$Push} to selected remotes..."
+push_to_selected = "선택한 리모트로 {$Push}..."
 # context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
-remotes_of = "Remotes of {branch}..."
+remotes_of = "{branch}의 리모트..."
 # context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
-pull_from_all = "{$Pull} from all sources ({remotes})"
+pull_from_all = "모든 소스에서 {$Pull} ({remotes})"
 # context: menu row: pull from one remote only, once; {remote} is that remote
-pull_from_only = "{$Pull} from {remote} only"
+pull_from_only = "{remote}에서만 {$Pull}"
 # context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
-pushing_to_all = { git = "pushing {branch} to {remotes}...", local = "pushing {branch} to {remotes}..." }
+pushing_to_all = { git = "{branch}을(를) {remotes}(으)로 push하는 중...", local = "{branch}을(를) {remotes}(으)로 푸시하는 중..." }
 # context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
-pulling_from_all = { git = "pulling {branch} from {remotes}...", local = "pulling {branch} from {remotes}..." }
+pulling_from_all = { git = "{remotes}에서 {branch}을(를) pull하는 중...", local = "{remotes}에서 {branch}을(를) 풀하는 중..." }
 # context: status line: the branch has no remote to pull from; {branch} is the branch
-no_pull_remote = "{branch} has no remote to {$pull} from"
+no_pull_remote = "{branch}에는 {$pull}할 리모트가 없습니다"
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -2553,7 +2553,7 @@ log_columns_fit_all = "모든 열을 내용에 맞추기"
 log_scroll_left = "열을 왼쪽으로 스크롤"
 log_scroll_right = "열을 오른쪽으로 스크롤"
 log_columns_layout = "옆으로 스크롤 / 창에 맞춤"
-refs_remotes = "Branch: Edit its Remotes"
+refs_remotes = "브랜치: 리모트 편집"
 
 
 [keymap_ctx]
@@ -3141,8 +3141,8 @@ git_pull_options = "Git: {$Pull} 옵션..."
 git_push = "Git: {$Push}"
 git_push_to_remote = "Git: 리모트로 {$Push}..."
 git_force_push_with_lease = "Git: 강제 {$Push} (lease 사용)..."
-git_remotes_of_branch = "Git: Remotes of Branch..."
-git_push_to_selected_remotes = "Git: {$Push} to Selected Remotes..."
+git_remotes_of_branch = "Git: 브랜치의 리모트..."
+git_push_to_selected_remotes = "Git: 선택한 리모트로 {$Push}..."
 remote_add_remote = "리모트: 리모트 추가..."
 remote_remove_remote = "리모트: 리모트 제거..."
 remote_edit_remote = "리모트: 리모트 편집..."
@@ -3652,27 +3652,27 @@ view_log_scroll_left = "보기: Log: 열을 왼쪽으로 스크롤"
 view_log_scroll_right = "보기: Log: 열을 오른쪽으로 스크롤"
 view_log_columns_layout = "보기: Log: 열 옆으로 스크롤 전환"
 # context: palette command: push to the upstream and every extra push target
-git_push_to_all_targets = "Git: {$Push} to All Targets"
+git_push_to_all_targets = "Git: 모든 대상으로 {$Push}"
 # context: palette command: pull the upstream and every extra pull source
-git_pull_from_all_sources = "Git: {$Pull} from All Sources"
+git_pull_from_all_sources = "Git: 모든 소스에서 {$Pull}"
 # context: palette command: opens a list of remotes, pulls from the chosen one once
-git_pull_from_one_remote = "Git: {$Pull} from One Remote..."
+git_pull_from_one_remote = "Git: 리모트 하나에서 {$Pull}..."
 # context: palette command: reopens the progress window of the last push to several remotes
-git_show_grouped_push = "Git: Show Grouped {$Push}"
+git_show_grouped_push = "Git: 그룹 {$Push} 보기"
 # context: palette command: goes on with the push to several remotes that paused on conflicts
-git_continue_grouped_push = "Git: Continue Grouped {$Push}"
+git_continue_grouped_push = "Git: 그룹 {$Push} 계속"
 # context: palette command: abandons the push to several remotes that paused on conflicts
-git_abort_grouped_push = "Git: Abort Grouped {$Push}"
+git_abort_grouped_push = "Git: 그룹 {$Push} 중단"
 # context: palette command: tries again the remotes that failed in the last push to several remotes
-git_retry_failed_pushes = "Git: Retry Failed Pushes"
+git_retry_failed_pushes = "Git: 실패한 {$Push} 재시도"
 # context: palette: why a command is grayed out
-why_no_grouped_push = "there is no grouped {$push} to show"
+why_no_grouped_push = "표시할 그룹 {$push}가 없습니다"
 # context: palette: why a command is grayed out
-why_group_not_paused = "no grouped {$push} is waiting on conflicts"
+why_group_not_paused = "충돌 때문에 대기 중인 그룹 {$push}가 없습니다"
 # context: palette: why Continue is grayed out
-why_group_not_ready = "resolve and conclude the conflicts first"
+why_group_not_ready = "먼저 충돌을 해결하고 마무리하세요"
 # context: palette: why a command is grayed out
-why_nothing_to_retry = "no remote failed in the last grouped {$push}"
+why_nothing_to_retry = "마지막 그룹 {$push}에서 실패한 리모트가 없습니다"
 
 [help_section]
 rewrite = "기록 다시 쓰기"
@@ -4082,7 +4082,7 @@ rewrite_9 = "크기 탭을 열고 기록을 분석합니다: 가장 큰 파일�
 rewrite_host_howto = "호스트가 보호하는 브랜치에서 다시 쓴 기록을 통과시키는 방법을 설명합니다: 보호 해제, 새 이름으로 {$push}, 저장소 다시 만들기 중 하나이며 대신 실행해 주지는 않습니다"
 rewrite_ai_rules = "설명을 바탕으로 AI가 다시 쓰기 규칙을 만듦 (미리보기도 적용도 하지 않음)"
 log_columns_2 = "열이 너비를 유지할 때 Log의 열을 옆으로 스크롤합니다(열 선택기나 설정에서, 또는 열을 고른 상태에서 s로 고르는 옆으로 스크롤 배치). 창에 맞춤 배치에서는 모든 열이 창에 맞춰집니다"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "선택한 로컬 브랜치의 리모트(업스트림과 추가 {$push} 대상)를 편집합니다: 행의 리모트 배지를 클릭하는 것과 같은 키보드 동작"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} 또는 오른쪽 클릭"
@@ -5511,7 +5511,7 @@ no_longer = "{path}은(는) 더 이상 서브모듈이 아닙니다"
 [combo]
 type_to_search = "입력하여 검색"
 # context: placeholder of the search line of a dropdown that also accepts typed text
-type_to_use_own = "type your own value"
+type_to_use_own = "직접 값을 입력하세요"
 loading = "불러오는 중..."
 no_match = "일치 항목 없음"
 use_value = "\"{value}\" 사용"
@@ -5839,11 +5839,11 @@ palette_create_desktop = "런처: 바탕 화면 바로 가기 만들기"
 palette_remove = "런처: 바로 가기 제거"
 icons_updated = "런처 바로 가기를 업데이트했습니다"
 alias = "명령 별칭"
-alias_help = "터미널에서 GitPoulpi를 시작하는 짧은 명령입니다(예: gp). 영문자, 숫자, - _ . 만 쓸 수 있습니다. 같은 이름의 셸 별칭이나 함수가 있으면 그쪽이 우선하며 여기서는 확인할 수 없습니다 (oh-my-zsh는 gp를 직접 정의합니다)."
+alias_help = "터미널에서 GitPoulpi를 시작하는 짧은 명령입니다(예: gp). 목록에 원하는 이름을 직접 입력해 쓸 수 있습니다. 영문자, 숫자, - _ . 만 쓸 수 있습니다. 같은 이름의 셸 별칭이나 함수가 있으면 그쪽이 우선하며 여기서는 확인할 수 없습니다 (oh-my-zsh는 gp를 직접 정의합니다)."
 alias_none = "없음"
 alias_status = "별칭 상태"
 alias_add = "새 탭 별칭"
-alias_add_help = "두 번째 짧은 명령입니다(예: gpa). 새 GitPoulpi를 시작하는 대신, 이미 실행 중인 GitPoulpi에 현재 폴더를 새 탭으로 엽니다(gitpoulpi --add). 실행 중인 것이 없으면 평소처럼 GitPoulpi를 시작합니다. 만들기를 누르면 위의 명령 별칭과 함께 만들어집니다. 이름 규칙은 같습니다."
+alias_add_help = "두 번째 짧은 명령입니다(예: gpa). 새 GitPoulpi를 시작하는 대신, 이미 실행 중인 GitPoulpi에 현재 폴더를 새 탭으로 엽니다(gitpoulpi --add). 실행 중인 것이 없으면 평소처럼 GitPoulpi를 시작합니다. 만들기를 누르면 위의 명령 별칭과 함께 만들어집니다. 목록에 원하는 이름을 직접 입력해 쓸 수 있습니다. 이름 규칙은 같습니다."
 alias_add_status = "새 탭 별칭 상태"
 alias_set_name = "위에 이름을 입력하세요"
 alias_bad_space = "이름에 공백이 있습니다"
@@ -6498,7 +6498,7 @@ branch_rename = "브랜치 이름 변경: {old} → {new}"
 upstream_set = "{branch}의 업스트림 설정: {upstream}"
 upstream_unset = "{branch}의 업스트림 해제"
 # context: undo history row: the push targets and pull sources of a branch were changed; {branch} is the local branch
-remotes_set = "Set remotes of {branch}"
+remotes_set = "{branch}의 리모트 설정"
 config_set = "{key} 설정: {value}"
 config_unset = "{key} 설정 해제"
 sparse_set = "스파스 체크아웃 설정"
@@ -9630,229 +9630,229 @@ none = "이 메시지에는 링크가 없습니다"
 
 [branch_remotes]
 # context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
-title = "Remotes of {branch}"
+title = "{branch}의 리모트"
 # context: label before the list that picks the upstream (the remote branch the local branch tracks)
-upstream_label = "Upstream"
+upstream_label = "업스트림"
 # context: table heading: a configured remote's name
-col_remote = "Remote"
+col_remote = "리모트"
 # context: table heading: the branch's name on that remote
-col_branch = "Branch"
+col_branch = "브랜치"
 # context: table heading over a checkbox: the branch is also pushed to that remote
 col_push = "{$Push}"
 # context: table heading over a checkbox: a pull also takes the new commits of that remote
-col_pull = "{$Pull} too"
+col_pull = "함께 {$Pull}"
 # context: table heading: how the local branch stands against that remote (ahead, behind, in sync)
-col_state = "State"
+col_state = "상태"
 # context: cell in the Pull too column of the upstream's own row: the upstream is always pulled
-pull_upstream = "upstream"
+pull_upstream = "업스트림"
 # context: state cell: the remote's copy and the local branch are the same commit
-state_in_sync = "in sync"
+state_in_sync = "동기화됨"
 # context: state cell: the remote has no copy of the branch yet
-state_new = "new"
+state_new = "새로 만듦"
 # context: state cell: the remote's copy shares no history with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "무관함"
 # context: state cell of a remote that is not used by the branch
 state_none = "-"
 # context: row of a remote the branch still mentions but the repository no longer has
-gone = "remote gone"
+gone = "리모트 없음"
 # context: button on a gone row: forget that remote for this branch
-remove_button = "Remove"
+remove_button = "제거"
 # context: warning under the table; {first} and {second} are two remote names with the same address
-same_url = "{first} and {second} {$push} to the same URL."
+same_url = "{first}와(과) {second}은(는) 같은 URL로 {$push}합니다."
 # context: button: changes the branch name used on the selected remote
-rename_button = "Rename on remote..."
+rename_button = "리모트 이름 변경..."
 # context: button: the branch tracks no upstream any more
-unset_button = "Unset upstream"
+unset_button = "업스트림 해제"
 # context: primary button of the dialog
-apply_button = "Apply"
+apply_button = "적용"
 # context: shown while the dialog reads the branch's remotes
-loading = "Reading the remotes..."
+loading = "리모트를 읽는 중..."
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
-rename_title = "Branch name on {remote}"
+rename_title = "{remote}의 브랜치 이름"
 # context: placeholder of that dialog's field
-rename_placeholder = "Branch name on the remote"
+rename_placeholder = "리모트의 브랜치 이름"
 # context: primary button of that dialog
-rename_set = "Set"
+rename_set = "설정"
 # context: inline error of that dialog when the field is empty
-rename_empty = "Type a branch name."
+rename_empty = "브랜치 이름을 입력하세요."
 # context: inline error when Rename is used on the upstream's own row
-rename_upstream_row = "The upstream's branch name is chosen in the list above."
+rename_upstream_row = "업스트림의 브랜치 이름은 위의 목록에서 고릅니다."
 # context: inline error when Rename is used with nothing to rename
-rename_no_row = "Select a remote's row first."
+rename_no_row = "먼저 리모트 행을 선택하세요."
 # context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
-keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
+keys_hint = "Space {$Push}, p 함께 {$Pull}, r 이름 변경, Del 제거, Enter 적용"
 # context: status line while the change is sent; {branch} is the local branch
-applying = "setting the remotes of {branch}..."
+applying = "{branch}의 리모트를 설정하는 중..."
 # context: status line once the daemon applied the change; {branch} is the local branch
-remotes_set = "remotes of {branch} updated"
+remotes_set = "{branch}의 리모트를 갱신했습니다"
 
 [push_group]
 # context: title of the dialog that asks which remotes to push a branch to (one push only); {branch} is the local branch
-title_select = "{$Push} {branch} to selected remotes"
+title_select = "{branch}을(를) 선택한 리모트로 {$Push}"
 # context: title of the dialog that shows how a branch stands against each remote before a grouped push; {n} is the number of remotes, {branch} the local branch
-title_plan = { one = "{$Push} {branch} to {n} remote", other = "{$Push} {branch} to {n} remotes" }
+title_plan = { one = "{branch}을(를) 리모트 {n}개로 {$Push}", other = "{branch}을(를) 리모트 {n}개로 {$Push}" }
 # context: title of the dialog while a grouped push runs or after it ended; {branch} is the local branch
 title_run = "{$Push} {branch}"
 # context: line under the title; {branch} is the local branch, {sha} the short id of its tip
-local_at = "Local {branch} at {sha}"
+local_at = "로컬 {branch}: {sha}"
 # context: help line over the list of remotes to push to
-select_hint = "Pick the remotes this {$push} goes to. Nothing is saved unless you tick Remember."
+select_hint = "이번 {$push}를 보낼 리모트를 고르세요. 기억을 체크하지 않으면 아무것도 저장되지 않습니다."
 # context: checkbox: store the picked remotes as the branch's push targets
-remember = "Remember for this branch"
+remember = "이 브랜치에 기억"
 # context: shown under the list when no remote is ticked
-select_none = "Tick at least one remote."
+select_none = "리모트를 하나 이상 체크하세요."
 # context: shown while the daemon asks the remotes about the branch
-loading = "Asking the remotes..."
+loading = "리모트에 묻는 중..."
 # context: table heading: the remote's name
-col_remote = "Remote"
+col_remote = "리모트"
 # context: table heading: how the local branch stands against the remote
-col_state = "State"
+col_state = "상태"
 # context: table heading: what the run does with that remote
-col_action = "Action"
+col_action = "동작"
 # context: state of a remote that already has the same commit
-state_up_to_date = "up to date"
+state_up_to_date = "최신"
 # context: state of a remote that only misses local commits
-state_ready = "ready"
+state_ready = "준비됨"
 # context: state of a remote that has no copy of the branch yet
-state_new = "new"
+state_new = "새로 만듦"
 # context: state of a remote that has commits the local branch lacks
-state_behind = "behind"
+state_behind = "뒤처짐"
 # context: state of a remote whose history and the local branch's both moved
-state_diverged = "diverged"
+state_diverged = "갈라짐"
 # context: state of a remote whose commits are older copies of rebased or amended local commits
-state_rewritten = "rewritten"
+state_rewritten = "다시 쓰임"
 # context: state of a remote whose history shares nothing with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "무관함"
 # context: state of a remote whose host refused the branch earlier (protected branch)
-state_refused = "refused"
+state_refused = "거부됨"
 # context: state of a remote that could not be asked
-state_unreachable = "not reachable"
+state_unreachable = "연결 불가"
 # context: state of a remote that is no longer configured
-state_missing = "gone"
+state_missing = "없음"
 # context: note on a remote that points at the same repository as an earlier row; {other} is that earlier remote
-same_as = "same repository as {other}"
+same_as = "{other}와(과) 같은 저장소"
 # context: action: send the local commits to the remote
 action_push = "{$Push}"
 # context: action: move the local branch forward to the remote's commit; {remote} is the remote
-action_fast_forward = "Fast-forward from {remote}"
+action_fast_forward = "{remote}에서 fast-forward"
 # context: action: combine the remote's commits into the local branch, then send; {remote} is the remote
-action_merge = "{$Merge} from {remote}"
+action_merge = "{remote}에서 {$Merge}"
 # context: action: replay the local commits on top of the remote's, then send; {remote} is the remote
-action_rebase = "{$Rebase} onto {remote}"
+action_rebase = "{remote} 위로 {$Rebase}"
 # context: action: overwrite the remote's branch, refused if it moved since the plan
-action_force = "Force {$push} (lease)"
+action_force = "강제 {$push} (lease)"
 # context: action: leave this remote out
-action_skip = "Skip"
+action_skip = "건너뛰기"
 # context: line under a row whose merge would conflict; {n} is the number of files, {files} their names
-conflicts = { one = "{$merge} would conflict in {n} file: {files}", other = "{$merge} would conflict in {n} files: {files}" }
+conflicts = { one = "{$merge} 시 파일 {n}개에서 충돌: {files}", other = "{$merge} 시 파일 {n}개에서 충돌: {files}" }
 # context: checkbox: also send the tags that no remote has yet
-tags = "Also {$push} the {$tags} not sent yet"
+tags = "아직 보내지 않은 {$tags}도 {$push}"
 # context: summary line under the table; {steps} is the list of steps
-then_line = "Then: {steps}."
+then_line = "이후: {steps}."
 # context: summary line when every row is skipped or already up to date
-then_nothing = "Then: nothing to do."
+then_nothing = "이후: 할 일 없음."
 # context: separator between steps in the summary line
 then_join = ", "
 # context: step of the summary line; {remote} is the remote
-step_fast_forward = "fast-forward from {remote}"
+step_fast_forward = "{remote}에서 fast-forward"
 # context: step of the summary line; {remote} is the remote
-step_merge = "{$merge} {remote}"
+step_merge = "{remote} {$merge}"
 # context: step of the summary line; {remote} is the remote
-step_rebase = "{$rebase} onto {remote}"
+step_rebase = "{remote} 위로 {$rebase}"
 # context: step of the summary line; {n} is the number of remotes
-step_push = { one = "{$push} to {n} remote", other = "{$push} to {n} remotes" }
+step_push = { one = "리모트 {n}개로 {$push}", other = "리모트 {n}개로 {$push}" }
 # context: warning under the summary when a row force-pushes; {n} is the number of commits that disappear, {remote} the remote
-force_note = { one = "Force {$push} replaces {n} {$commit} on {remote}.", other = "Force {$push} replaces {n} {$commits} on {remote}." }
+force_note = { one = "강제 {$push}는 {remote}의 {$commit} {n}개를 대체합니다.", other = "강제 {$push}는 {remote}의 {$commits} {n}개를 대체합니다." }
 # context: warning under the summary when rows rebase while other remotes already hold the local commits; {remotes} are those remotes
-rebase_warn = "A {$rebase} rewrites the local {$commits}: {remotes} will then need a force {$push}."
+rebase_warn = "{$rebase}는 로컬 {$commits}를 다시 쓰므로 {remotes}에는 이후 강제 {$push}가 필요합니다."
 # context: confirmation question before a force push; {n} is the number of remote commits replaced, {branch} the branch, {remotes} the remote names
-force_confirm = { one = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commit} on the remote is replaced. Not undoable.", other = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commits} on the remotes are replaced. Not undoable." }
+force_confirm = { one = "{branch}을(를) {remotes}(으)로 강제 {$push}할까요?\nlease 사용: 리모트의 {$commit} {n}개가 대체됩니다. 되돌릴 수 없습니다.", other = "{branch}을(를) {remotes}(으)로 강제 {$push}할까요?\nlease 사용: 리모트의 {$commits} {n}개가 대체됩니다. 되돌릴 수 없습니다." }
 # context: button: ask the remotes again
-btn_fetch_again = "{$Fetch} again"
+btn_fetch_again = "다시 {$Fetch}"
 # context: button: set every row that has a problem to Skip
-btn_skip_problems = "Skip problems"
+btn_skip_problems = "문제 건너뛰기"
 # context: button: close the dialog without running
-btn_cancel = "Cancel"
+btn_cancel = "취소"
 # context: button: run the grouped push
-btn_run = "Run"
+btn_run = "실행"
 # context: button: go to the next step
-btn_next = "Next"
+btn_next = "다음"
 # context: button: close the dialog (the run goes on)
-btn_close = "Close"
+btn_close = "닫기"
 # context: button: try the failed remotes again
-btn_retry = "Retry failed"
+btn_retry = "실패 재시도"
 # context: progress row: the remote took the commits
-run_pushed = "sent"
+run_pushed = "전송됨"
 # context: progress row: the remote got a new branch
-run_created = "created"
+run_created = "생성됨"
 # context: progress row: nothing to send
-run_up_to_date = "up to date"
+run_up_to_date = "최신"
 # context: progress row: the local branch moved forward
-run_fast_forwarded = "fast-forwarded"
+run_fast_forwarded = "fast-forward됨"
 # context: progress row: the remote's commits were combined into the local branch with a new commit
-run_merged = "combined"
+run_merged = "결합됨"
 # context: progress row: the local commits were replayed on the remote's
-run_rebased = "replayed"
+run_rebased = "재배치됨"
 # context: progress row: the remote's commits were taken in
-run_integrated = "taken in"
+run_integrated = "반영됨"
 # context: progress row: left out
-run_skipped = "skipped"
+run_skipped = "건너뜀"
 # context: progress row: the remote's commits are being combined with the local branch
-run_merging = "combining"
+run_merging = "결합 중"
 # context: progress row: sending in progress
-run_pushing = "sending"
+run_pushing = "전송 중"
 # context: progress row: not started yet
-run_waiting = "waiting"
+run_waiting = "대기 중"
 # context: progress row: failed; {why} is the reason
-run_failed = "failed: {why}"
+run_failed = "실패: {why}"
 # context: progress row: the remote refused; {why} is the reason
-run_rejected = "refused: {why}"
+run_rejected = "거부됨: {why}"
 # context: progress row: the run was canceled while this remote was in flight
-run_unknown = "unknown (canceled)"
+run_unknown = "알 수 없음 (취소됨)"
 # context: progress row: the remote is not configured
-run_missing = "remote missing"
+run_missing = "리모트 없음"
 # context: line under the progress rows while the run is going
-run_going = "Closing this window does not stop the run."
+run_going = "이 창을 닫아도 실행은 멈추지 않습니다."
 # context: line under the progress rows when the run ended well
-run_done = "Done."
+run_done = "완료."
 # context: line under the progress rows when some remotes failed
-run_problems = "Some remotes failed. Retry them, or close."
+run_problems = "일부 리모트가 실패했습니다. 재시도하거나 닫으세요."
 # context: key hints of the selection step
-hint_select = "Up/Down move  Space tick  m remember  Enter next  Esc close"
+hint_select = "Up/Down 이동  Space 체크  m 기억  Enter 다음  Esc 닫기"
 # context: key hints of the plan step
-hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t {$tags}  f again  Ctrl+Enter run  Esc close"
+hint_plan = "Up/Down 행  Left/Right 동작  Enter 목록  s 건너뛰기  t {$tags}  f 다시  Ctrl+Enter 실행  Esc 닫기"
 # context: key hints of the progress step
-hint_run = "Esc close  r retry failed"
+hint_run = "Esc 닫기  r 실패 재시도"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting = "Grouped {$push} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting = "그룹 {$push} 일시 중지 ({remote}): 해결하고 마무리한 뒤 계속하세요."
 # context: text of the strip when the conflicts are resolved and the run can go on; {remote} is that remote
-strip_ready = "Grouped {$push} paused ({remote}): resolved. Continue to {$push}."
+strip_ready = "그룹 {$push} 일시 중지 ({remote}): 해결됨. 계속해서 {$push}하세요."
 # context: strip button: go on with the grouped push
-strip_continue = "Continue"
+strip_continue = "계속"
 # context: strip button: abort the merge or rebase of the grouped push and drop it
-strip_abort = "Abort group"
+strip_abort = "그룹 중단"
 # context: status line after the grouped push was aborted
-aborted = "Grouped {$push} aborted."
+aborted = "그룹 {$push}를 중단했습니다."
 # context: status line while a grouped push runs
-running = "Grouped {$push}..."
+running = "그룹 {$push}..."
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
-abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+abort_confirm = "{branch}의 그룹 {$push}를 중단할까요({remote}에서 멈춤)?\n진행 중인 {$merge} 또는 {$rebase}는 버려집니다. 이미 보낸 것은 그대로 남습니다."
 # context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
-title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {branch} from {n} remotes" }
+title_pull_plan = { one = "{branch}을(를) 리모트 {n}개에서 {$Pull}", other = "{branch}을(를) 리모트 {n}개에서 {$Pull}" }
 # context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting_pull = "그룹 {$pull} 일시 중지 ({remote}): 해결하고 마무리한 뒤 계속하세요."
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
-strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
+strip_ready_pull = "그룹 {$pull} 일시 중지 ({remote}): 해결됨. 계속해서 {$pull}하세요."
 [multi_remote]
-state_new = "new"
-state_gone = "gone"
-state_unrelated = "unrelated"
-tip_title = "Remotes of {branch}"
-tip_in_sync = "{remote}: in sync"
-tip_ahead = "{remote}: {n} ahead"
-tip_behind = "{remote}: {n} behind"
-tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
-tip_new = "{remote}: no copy of this branch yet"
-tip_unrelated = "{remote}: no common history"
-tip_gone = "{remote}: no longer configured"
-tip_open_hint = "Click to edit the remotes of this branch"
+state_new = "새로 만듦"
+state_gone = "없음"
+state_unrelated = "무관함"
+tip_title = "{branch}의 리모트"
+tip_in_sync = "{remote}: 동기화됨"
+tip_ahead = "{remote}: {n}개 앞섬"
+tip_behind = "{remote}: {n}개 뒤처짐"
+tip_diverged = "{remote}: 갈라짐 ({ahead}개 앞섬, {behind}개 뒤처짐)"
+tip_new = "{remote}: 이 브랜치의 사본이 아직 없음"
+tip_unrelated = "{remote}: 공통 기록 없음"
+tip_gone = "{remote}: 더 이상 설정되어 있지 않음"
+tip_open_hint = "클릭하여 이 브랜치의 리모트 편집"

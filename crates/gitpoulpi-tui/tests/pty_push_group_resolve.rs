@@ -5,6 +5,10 @@
 //! and concluded with plain git, Continue (never automatic) turns up, and
 //! pressing it finishes the push: every bare remote ends with the merge commit.
 //!
+//! The merge banner (arriving with the repository's status) and the strip share
+//! the Log's borders and move each other, so the tests wait for both before
+//! they read any button position.
+//!
 //! Falsified: with the daemon-side `ready_to_continue` never true, or the strip
 //! click not submitting `RemoteGroupContinue`, the last waits time out.
 
@@ -126,7 +130,9 @@ fn a_diverged_remote_merges_stops_on_the_conflict_and_continue_finishes_the_push
     // The dialog gives way to the strip; the merge banner is the ordinary one.
     let paused = term
         .wait_for("the paused strip", STEP, |s| {
-            s.contains("Grouped push paused (gitlab)") && !s.contains("Push feature to")
+            s.contains("Grouped push paused (gitlab)")
+                && !s.contains("Push feature to")
+                && s.contains("Merge in progress")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert!(
@@ -184,7 +190,9 @@ fn a_diverged_remote_merges_stops_on_the_conflict_and_continue_finishes_the_push
     repo.git(&["-c", "core.editor=true", "commit", "--no-edit"]);
     let ready = term
         .wait_for("Continue turned on", STEP, |s| {
-            s.contains("Grouped push paused (gitlab)") && s.contains("Continue to push")
+            s.contains("Grouped push paused (gitlab)")
+                && s.contains("Continue to push")
+                && !s.contains("Merge in progress")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // Still nothing pushed: Continue is a button.
@@ -273,18 +281,26 @@ fn abort_group_asks_first_then_drops_the_merge_and_the_strip() {
     term.click(c + 1, r).unwrap();
     let paused = term
         .wait_for("the paused strip", STEP, |s| {
-            s.contains("Grouped push paused (gitlab)")
+            s.contains("Grouped push paused (gitlab)") && s.contains("Merge in progress")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     let (c, r) = strip_button(&paused, "Abort group");
     term.click(c + 1, r).unwrap();
     let ask = term
         .wait_for("the confirmation", STEP, |s| {
-            s.contains("Abort the grouped push of feature")
+            // The whole dialog: a torn frame can show its words before its buttons.
+            s.contains("Abort the grouped push of feature") && s.contains("Cancel")
         })
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    // The confirm's own Abort group button is the lowest one.
-    let (c, r) = button(&ask, "Abort group");
+    // The confirm's own Abort group button: the one on Cancel's row. (Not the
+    // lowest one: the strip stays visible, and sits on the Log's bottom border
+    // once the merge banner has taken the top one.)
+    let (_, cancel_row) = button(&ask, "Cancel");
+    let (c, r) = ask
+        .find_all("Abort group")
+        .into_iter()
+        .find(|(_, row)| *row == cancel_row)
+        .unwrap_or_else(|| panic!("no Abort group on the dialog row:\n{}", ask.text()));
     term.click(c + 1, r).unwrap();
     term.wait_for("the strip gone", STEP, |s| {
         !s.contains("Grouped push paused") && !s.contains("Abort the grouped push")

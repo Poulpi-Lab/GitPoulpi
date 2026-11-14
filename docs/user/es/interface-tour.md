@@ -233,8 +233,10 @@ el borde entre dos secciones para cambiar su tamaño.
 - **LOCALES**: tus ramas, en carpetas divididas por `/` (`feature/`, `fix/`). Una
   marca indica la rama con checkout. Puedes desactivar las carpetas en los Ajustes.
 - **REMOTAS**: cada remoto, con sus ramas debajo.
-- **WORKTREES**: los worktrees vinculados, cuando los hay. Haz doble clic en uno
-  para abrirlo en su propia pestaña.
+- **WORKTREES**: los worktrees vinculados, cuando los hay (o cuando mostraste la
+  sección). El **+** de su encabezado crea uno; haz doble clic en un worktree
+  para abrirlo en su propia pestaña, o clic derecho para Abrir en, Merge y
+  Eliminar. Consulta [Worktrees](worktrees.md).
 - **STASHES**: tus stashes. Haz clic derecho en uno para ver **Pop**, **Aplicar** y
   **Drop**.
 - **TAGS**: tus tags, en carpetas separadas por `/` como las ramas (`releases/`, `backups/`). Una flecha indica que el tag también está en el remoto.

@@ -491,7 +491,7 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Panel izquierdo: Mostrar u ocultar ramas locales |  |
 | Panel izquierdo: Mostrar u ocultar remotos |  |
 | Panel izquierdo: Mostrar u ocultar worktrees |  |
-| Sidebar: Show Worktrees Section |  |
+| Panel izquierdo: Mostrar la sección Worktrees |  |
 | Panel izquierdo: Mostrar u ocultar stashes |  |
 | Panel izquierdo: Mostrar u ocultar tags |  |
 | Panel izquierdo: Mostrar u ocultar pull requests |  |
@@ -535,12 +535,12 @@ motivo, cuando no se aplican. Las teclas son las de por defecto.
 | Refs: Reflog de la rama seleccionada... |  |
 | Refs: Iniciar pull request desde la rama seleccionada... |  |
 | Refs: Abrir worktree en una pestaña | `Enter / doble clic` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: Abrir worktree en... |  |
+| Refs: Merge de la rama del worktree en... |  |
+| Refs: Eliminar worktree... |  |
+| Refs: Crear worktree... | `+` |
+| Refs: Crear worktree desde la rama actual |  |
+| Refs: Crear worktree eligiendo una rama |  |
 | Refs: Actualizar submódulo (seleccionado) |  |
 | Refs: Inicializar submódulo (seleccionado) |  |
 | Refs: Abrir submódulo en una pestaña | `Enter / doble clic` |

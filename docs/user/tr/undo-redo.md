@@ -258,7 +258,9 @@ iş akışı bitirmesi bütün olarak geri alınabilir.
   hareket ettirir ve kendi durumunu tutar; iptal etmek zaten geri dönüş yoludur).
   Bir **merge, cherry-pick veya revert**'i iptal etmek ise yukarıda anlatıldığı
   gibi kaydedilir.
-- **Bir worktree oluşturmak**, **bir yama dosyası oluşturmak**, clone, init,
+- **Bir worktree oluşturmak**, **bir worktree'yi kaldırmak** (önce kaydedilen
+  şey kalır: commit, stash; onunla birlikte silinen dal günlüğe yazılır, yani Geri Al
+  klasörü değil dalı geri getirir), **bir yama dosyası oluşturmak**, clone, init,
   barındırma eylemleri (pull request'ler, issue'lar) ve YZ çağrıları: bunlar
   deponun geçmişinin parçası değildir.
 - Dosya menüsünden **yeni boş bir dosya oluşturmak**, bir merge sonrasında

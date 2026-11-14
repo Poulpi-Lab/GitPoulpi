@@ -154,6 +154,8 @@ numaralandırdığı gibi numaralandırılır.
 | `tag fetch <name> [--remote R]` | Bir uzak depodan (varsayılan olarak onu tutan) tek bir tag'i fetch eder, örneğin `where: remote` olan bir tag. Başka bir commit'teki yerel tag'in üzerine asla yazmaz. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Bir uzak depodaki tag'ler (ad yoksa: hiçbir uzak deponun sahip olmadığı her tag). Birini bir uzak depoda silmek geri alınabilir (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Bağlı worktree'ler. |
+| `worktree changes <path>` | Bir worktree'nin commit edilmemiş değişiklikleri (`path`, `untracked`); temizse boş. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Bağlı bir worktree'yi kaldırır. Commit edilmemiş değişiklikleri olan biri, `--force` (değişiklikler kaybolur), `--commit-message` (önce onları kendi dalına commit et) veya `--stash-message` (önce onları, izlenmeyenler dahil, stash'e al) verilmedikçe reddedilir. `--delete-branch` dalını da siler (günlüğe yazılır). Kaldırmanın kendisi geri alınamaz. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Alt modüller ([Alt modüller](submodules.md)). |
 
 `--autostash`, işlemi engelleyen yerel değişiklikleri stash'ler, işlemi çalıştırır

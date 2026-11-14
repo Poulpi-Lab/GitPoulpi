@@ -517,8 +517,9 @@ Commit grafiğinin nasıl çizildiği ve Log'un kaç commit yüklediği. Grafik 
 Başlık çubuğundaki **Şurada aç** düğmesinin listesini düzenler. **Genel** sekmesi **Çık ve cd yap**
 klasör düğmelerini, **Varsayılan girişi** ve **Algılanan varsayılanları geri yükle** düğmesini içerir.
 **Girdiler** sekmesi (her biri bir etiket ve bir komut) bir [liste](#listeler)dir: **+ Ekle ▾** hazır ayarları ve **Özel**'i
-sunar, varsayılan giriş `★` ile işaretlenir. Seçili girişin alanları arasında bir **Dene**
-düğmesi vardır. Bkz. [Şurada aç](open-in.md).
+sunar, varsayılan giriş `★` ile işaretlenir. Seçili girişin alanları arasında **Worktree'yi açabilir**
+(varsayılan olarak işaretli: giriş, bir worktree satırının Şurada aç menüsünde sunulur,
+bkz. [Worktree'ler](worktrees.md)) ve bir **Dene** düğmesi vardır. Bkz. [Şurada aç](open-in.md).
 
 İlk satır, **Etkin sekmenin klasörünü izle**, iki değer alır:
 

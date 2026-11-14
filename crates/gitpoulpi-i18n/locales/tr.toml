@@ -424,8 +424,8 @@ list_title = "Profiller"
 duplicate_name = "{name} (kopya)"
 
 [settings_open_in]
-worktree = "Can open a worktree"
-worktree_help = "Offer this entry in the Open in menu of a worktree (right-click a row of the WORKTREES section). It runs with the worktree's folder as ${{cwd}}. Every entry is checked by default: untick the ones that make no sense on a folder."
+worktree = "Worktree'yi açabilir"
+worktree_help = "Bu girişi bir worktree'nin “Şurada aç” menüsünde sunar (WORKTREE'LER bölümünün bir satırına sağ tıklayın). Worktree'nin klasörüyle, ${{cwd}} olarak çalışır. Her giriş varsayılan olarak işaretlidir: bir klasörde anlamsız olanların işaretini kaldırın."
 list_title = "Girdiler"
 detecting = "Yüklü uygulamalar algılanıyor..."
 section_title = "Şurada aç"
@@ -1228,19 +1228,19 @@ bad_branch = "{name} geçerli bir dal adı değil"
 
 [worktree]
 # context: field label: the name of the new worktree, the folder name is built from it
-name = "Name"
+name = "Ad"
 # context: placeholder
-name_hint = "the folder is named after it"
-need_name = "give the worktree a name"
-bad_name = "the name cannot contain slashes (the Folder field takes a path)"
+name_hint = "klasör bu adı alır"
+need_name = "worktree'ye bir ad verin"
+bad_name = "ad eğik çizgi içeremez (Klasör alanı bir yol alır)"
 # context: field label: the branch or commit the worktree starts from
 ref_field = "Ref"
 # context: placeholder
-ref_hint = "choose a branch"
+ref_hint = "bir dal seçin"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
-commit_choice = { git = "commit {label} ({id})", local = "commit {label} ({id})" }
-branch_exists = "the branch {b} already exists: pick it in Ref or choose another name"
-is_a_file = "{path} is a file, not a folder"
+commit_choice = { git = "{$commit} {label} ({id})", local = "{$commit} {label} ({id})" }
+branch_exists = "{b} dalı zaten var: Ref'ten seçin veya başka bir ad verin"
+is_a_file = "{path} bir dosya, klasör değil"
 title = { git = "{label} üzerinden worktree oluştur", local = "{label} üzerinden worktree oluştur" }
 folder = "Klasör"
 folder_hint = "yeni veya boş bir klasör"
@@ -2934,14 +2934,14 @@ env_timeout = "Ajanın istek başına kendi zaman aşımı (ms)"
 env_offline = "Başlangıçta ağ çağrısı yok"
 
 [palette]
-sidebar_show_worktrees = "Sidebar: Show Worktrees Section"
-refs_open_worktree_in = "Refs: Open Worktree In..."
-refs_merge_worktree_branch_into = { git = "Refs: Merge Worktree Branch Into...", local = "Refs: Merge Worktree Branch Into..." }
-refs_remove_worktree = { git = "Refs: Remove Worktree...", local = "Refs: Remove Worktree..." }
+sidebar_show_worktrees = "Sol panel: Worktree'ler Bölümünü Göster"
+refs_open_worktree_in = "Refs: Worktree'yi Şurada Aç..."
+refs_merge_worktree_branch_into = { git = "Refs: Worktree Dalını Başka Dala Merge Et...", local = "Refs: Worktree Dalını Başka Dala Birleştir..." }
+refs_remove_worktree = { git = "Refs: Worktree'yi Kaldır...", local = "Refs: Worktree'yi Kaldır..." }
 # context: opens the + menu of the WORKTREES section
-refs_create_worktree = { git = "Refs: Create Worktree...", local = "Refs: Create Worktree..." }
-refs_create_worktree_from_current_branch = { git = "Refs: Create Worktree from Current Branch", local = "Refs: Create Worktree from Current Branch" }
-refs_create_worktree_choosing_a_branch = { git = "Refs: Create Worktree Choosing a Branch", local = "Refs: Create Worktree Choosing a Branch" }
+refs_create_worktree = { git = "Refs: Worktree Oluştur...", local = "Refs: Worktree Oluştur..." }
+refs_create_worktree_from_current_branch = { git = "Refs: Geçerli Daldan Worktree Oluştur", local = "Refs: Geçerli Daldan Worktree Oluştur" }
+refs_create_worktree_choosing_a_branch = { git = "Refs: Dal Seçerek Worktree Oluştur", local = "Refs: Dal Seçerek Worktree Oluştur" }
 # context: palette command; shows or hides the commit list column left of the diff, File View, Blame and Editor
 view_toggle_commit_column = "Görünüm: Commit sütununu aç/kapat"
 view_column_off = "Görünüm: Commit sütunu: gizle"
@@ -5002,11 +5002,11 @@ desc_rebasing_step = { git = "{branch}, {onto} üstüne rebase ediliyor · adım
 
 [link]
 # context: {path} is the folder of the removed worktree
-worktree_removed = "removed worktree {path}"
-worktree_removed_branch_deleted = "removed worktree {path} and deleted branch {branch} (Undo brings the branch back)"
-worktree_removed_branch_kept = "removed worktree {path}; branch {branch} was kept: {why}"
-worktree_stashed = { git = "changes stashed", local = "changes stashed" }
-worktree_committed = { git = "changes committed as {id}", local = "changes committed as {id}" }
+worktree_removed = "{path} worktree'si kaldırıldı"
+worktree_removed_branch_deleted = "{path} worktree'si kaldırıldı ve {branch} dalı silindi (Geri Al dalı geri getirir)"
+worktree_removed_branch_kept = "{path} worktree'si kaldırıldı; {branch} dalı korundu: {why}"
+worktree_stashed = { git = "değişiklikler {$stash} içine alındı", local = "değişiklikler {$stash} içine alındı" }
+worktree_committed = { git = "değişiklikler {$commit} olarak kaydedildi: {id}", local = "değişiklikler {$commit} olarak kaydedildi: {id}" }
 amend_done = "{id} değiştirildi, şimdi {now} (önceki uç {previous}: Geri Al onu geri getirir)"
 act_staging_file = { git = "{name} stage'leniyor...", local = "{name} hazırlanıyor..." }
 act_unstaging_file = { git = "{name} unstage'leniyor...", local = "{name} hazırlıktan çıkarılıyor..." }
@@ -9770,89 +9770,89 @@ tip_open_hint = "Bu dalın uzak depolarını düzenlemek için tıklayın"
 
 [worktree_manage]
 # context: hover label of the + on the WORKTREES header
-plus_tip = { git = "Create worktree", local = "Create worktree" }
+plus_tip = { git = "Worktree oluştur", local = "Worktree oluştur" }
 # context: title of the menu the + opens
-plus_title = { git = "New worktree", local = "New worktree" }
+plus_title = { git = "Yeni worktree", local = "Yeni worktree" }
 # context: menu row: create a worktree
-plus_head = "From the current branch"
+plus_head = "Geçerli daldan"
 # context: menu row: create a worktree
-plus_commit = "From the selected commit"
+plus_commit = "Seçili {$commit} üzerinden"
 # context: menu row: create a worktree on a branch picked in the dialog
-plus_choose = "Choose a branch..."
-select_a_commit = { git = "Select a commit in the Log first", local = "Select a commit in the Log first" }
-select_a_worktree = { git = "Select a worktree in the Refs pane first", local = "Select a worktree in the Refs pane first" }
-main_cannot_be_removed = { git = "The main worktree cannot be removed", local = "The main worktree cannot be removed" }
-no_head = "This repository has no commit yet"
+plus_choose = "Dal seç..."
+select_a_commit = { git = "Önce Log'da bir {$commit} seçin", local = "Önce Log'da bir {$commit} seçin" }
+select_a_worktree = { git = "Önce Refs panelinde bir worktree seçin", local = "Önce Refs panelinde bir worktree seçin" }
+main_cannot_be_removed = { git = "Ana worktree kaldırılamaz", local = "Ana worktree kaldırılamaz" }
+no_head = "Bu depoda henüz {$commit} yok"
 # context: hint line of the empty WORKTREES section
-empty_hint = { git = "No worktree yet: + to create one", local = "No worktree yet: + to create one" }
+empty_hint = { git = "Henüz worktree yok: oluşturmak için +", local = "Henüz worktree yok: oluşturmak için +" }
 # context: context menu row of a worktree
-menu_open_tab = "Open in a new tab"
+menu_open_tab = "Yeni sekmede aç"
 # context: submenu of a worktree row: the Open in entries
-menu_open_in = "Open in"
-menu_open_in_none = "Open in (no entry yet)"
-menu_open_in_none_why = "No Open in entry is marked Can open a worktree: Settings > Open in"
-menu_merge = { git = "Merge {branch} into...", local = "Merge {branch} into..." }
-menu_remove = { git = "Remove worktree...", local = "Remove worktree..." }
-not_listed = { git = "{path} is not a worktree of this repository any more", local = "{path} is not a worktree of this repository any more" }
-removing = { git = "removing worktree {path}...", local = "removing worktree {path}..." }
-merging = { git = "merging {branch}...", local = "merging {branch}..." }
+menu_open_in = "Şurada aç"
+menu_open_in_none = "Şurada aç (henüz giriş yok)"
+menu_open_in_none_why = "Hiçbir “Şurada aç” girişi “Worktree'yi açabilir” olarak işaretli değil: Ayarlar > Şurada aç"
+menu_merge = { git = "{branch} dalını şuraya merge et...", local = "{branch} dalını şuraya birleştir..." }
+menu_remove = { git = "Worktree'yi kaldır...", local = "Worktree'yi kaldır..." }
+not_listed = { git = "{path} artık bu deponun bir worktree'si değil", local = "{path} artık bu deponun bir worktree'si değil" }
+removing = { git = "{path} worktree'si kaldırılıyor...", local = "{path} worktree'si kaldırılıyor..." }
+merging = { git = "{branch} merge ediliyor...", local = "{branch} birleştiriliyor..." }
 # context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository
-remove_title = { git = "Remove worktree {name}", local = "Remove worktree {name}" }
+remove_title = { git = "{name} worktree'sini kaldır", local = "{name} worktree'sini kaldır" }
 # context: dialog title; {branch} is a branch name
-merge_title = { git = "Merge {branch} into another branch", local = "Merge {branch} into another branch" }
-loading = "Checking the worktree..."
-clean_text = "Remove {path}? Its folder is deleted. The branch {branch} stays."
-clean_text_detached = "Remove {path}? Its folder is deleted. It is on a detached HEAD, so no branch is affected."
+merge_title = { git = "{branch} dalını başka bir dala merge et", local = "{branch} dalını başka bir dala birleştir" }
+loading = "Worktree denetleniyor..."
+clean_text = "{path} kaldırılsın mı? Klasörü silinir. {branch} dalı kalır."
+clean_text_detached = "{path} kaldırılsın mı? Klasörü silinir. Ayrık HEAD üzerinde olduğundan hiçbir dal etkilenmez."
 # context: plural: {n} changes of the worktree at {path}
-dirty_count = { one = "{n} uncommitted change in {path}", other = "{n} uncommitted changes in {path}" }
+dirty_count = { one = "{path} içinde {n} kaydedilmemiş değişiklik", other = "{path} içinde {n} kaydedilmemiş değişiklik" }
 # context: plural: {n} changes that would be lost
-force_text = { one = "Remove {path} and discard its {n} uncommitted change? This cannot be undone.", other = "Remove {path} and discard its {n} uncommitted changes? This cannot be undone." }
+force_text = { one = "{path} kaldırılsın ve {n} kaydedilmemiş değişikliği atılsın mı? Bu geri alınamaz.", other = "{path} kaldırılsın ve {n} kaydedilmemiş değişikliği atılsın mı? Bu geri alınamaz." }
 # context: field label
-commit_field = "Commit message"
+commit_field = "{$Commit} mesajı"
 # context: placeholder
-commit_hint = "describe the changes"
+commit_hint = "değişiklikleri anlatın"
 # context: field label
-stash_field = "Stash message"
-stash_note = "The stash is shared with the main repository: pop it there later."
+stash_field = "{$Stash} mesajı"
+stash_note = "{$Stash} ana depoyla paylaşılır: sonra orada geri yükleyin."
 # context: field label: the branch to create for the commit
-branch_field = "Branch"
+branch_field = "Dal"
 # context: placeholder
-branch_hint = "HEAD is detached: name a branch for the commit"
-need_message = "write a commit message"
-need_branch = "name a branch for the commit (HEAD is detached)"
-delete_branch = "Also delete branch {branch} (merged into {into})"
-branch_not_merged = "Branch {branch} is not merged: it stays."
+branch_hint = "HEAD ayrık: {$commit} için bir dal adı verin"
+need_message = "bir {$commit} mesajı yazın"
+need_branch = "{$commit} için bir dal adı verin (HEAD ayrık)"
+delete_branch = { git = "{branch} dalını da sil ({into} dalına merge edilmiş)", local = "{branch} dalını da sil ({into} dalına birleştirilmiş)" }
+branch_not_merged = { git = "{branch} dalı merge edilmemiş: kalır.", local = "{branch} dalı birleştirilmemiş: kalır." }
 # context: button
-commit_remove = { git = "Commit and remove", local = "Commit and remove" }
+commit_remove = { git = "{$Commit} ve kaldır", local = "{$Commit} ve kaldır" }
 # context: button
-stash_remove = { git = "Stash and remove", local = "Stash and remove" }
+stash_remove = { git = "{$Stash} ve kaldır", local = "{$Stash} ve kaldır" }
 # context: button: open the worktree in a tab to commit its changes there
-open_to_commit = "Open to commit"
+open_to_commit = "{$Commit} için aç"
 # context: button: discards the changes
-remove_anyway = "Remove anyway"
+remove_anyway = "Yine de kaldır"
 # context: button
-remove = "Remove"
+remove = "Kaldır"
 # context: button
-cancel = "Cancel"
+cancel = "İptal"
 # context: button
-back = "Back"
+back = "Geri"
 # context: button
-force_yes = "Discard changes and remove"
+force_yes = "Değişiklikleri at ve kaldır"
 # context: button
-merge_then_remove = { git = "Merge into... then remove", local = "Merge into... then remove" }
+merge_then_remove = { git = "Merge et... sonra kaldır", local = "Birleştir... sonra kaldır" }
 # context: button
-merge_run = { git = "Merge", local = "Merge" }
+merge_run = { git = "Merge et", local = "Birleştir" }
 # context: button
-merge_remove_run = { git = "Merge and remove", local = "Merge and remove" }
-merge_pick = "Merge {branch} into:"
-merge_checked_out = "{target} is checked out in {path}: the merge runs there."
-merge_not_checked_out = "{target} is not checked out in any worktree: check it out first."
-merge_gone = "the branch {branch} no longer exists"
-merge_none = "There is no other local branch to merge into."
-detached_no_merge = "a detached worktree has no branch to merge"
+merge_remove_run = { git = "Merge et ve kaldır", local = "Birleştir ve kaldır" }
+merge_pick = { git = "{branch} dalını şuraya merge et:", local = "{branch} dalını şuraya birleştir:" }
+merge_checked_out = { git = "{target} {path} içinde checkout edilmiş: {$merge} orada çalışır.", local = "{target} {path} içinde checkout edilmiş: {$merge} orada çalışır." }
+merge_not_checked_out = "{target} hiçbir worktree'de checkout edilmemiş: önce checkout edin."
+merge_gone = "{branch} dalı artık yok"
+merge_none = "{$Merge} için başka yerel dal yok."
+detached_no_merge = "ayrık bir worktree'nin {$merge} yapılacak dalı yok"
 # context: default stash message; {name} is the worktree folder
-stash_default = "WIP on {name}"
+stash_default = "{name} üzerinde WIP"
 # context: key hint
-hint_next = "next"
+hint_next = "sonraki"
 # context: key hint
-hint_default = "run"
+hint_default = "çalıştır"

@@ -180,7 +180,9 @@ bir düğmeye veya onay kutusuna tıklayın.
 
 - Bir satırı seçmek için **tıklayın**. Bir yerel dalda veya bir tag'de checkout
   yapmak için **çift tıklayın**. Bir worktree'yi veya alt modülü bir sekmede
-  açmak için ona **çift tıklayın**.
+  açmak için ona **çift tıklayın**. WORKTREE'LER başlığındaki **+** bir worktree
+  oluşturur; bir worktree'ye sağ tıklayarak Yeni sekmede aç, Şurada aç, Merge ve
+  Kaldır seçeneklerine ulaşın ([Worktree'ler](worktrees.md)).
 - Soldaki simgeyi göstermek için bir satırın **üzerine gelin**. Ref'i Log'da
   gizlemek veya yeniden göstermek için ona **tıklayın**. **Solo** açıkken aynı
   yer ref'i solo yapar. Bir klasör satırında simge, klasördeki her ref'e etki eder.

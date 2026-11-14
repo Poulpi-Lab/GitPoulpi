@@ -333,7 +333,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.enabled` | `false` | 总开关。关闭时，任何地方都不会显示 AI 内容，也不会发送任何内容。 |
 | `ai.default_profile` | `"default"` | 操作未指定配置时所使用的配置 id。 |
 | `ai.global_instructions` | `""` | 添加到每个操作提示词中的文本。可以使用 `${repo}`、`${uilang}` 等（参见 [AI > 提示词变量](ai.md#提示词变量)）；按操作的指令和仓库指令同理。 |
-| `ai.actions.<action>.profile` | `""` | 某个操作使用的配置；留空 = 默认配置。操作：`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`。工作空间（`workspaces.toml`，`[workspace.ai_instructions]` 和 `[workspace.ai_overrides.<action>]`）和仓库都可以追加或替换这些指令：见 [AI 辅助](ai.md#指令)。 |
+| `ai.actions.<action>.profile` | `""` | 某个操作使用的配置；留空 = 默认配置。操作：`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`。工作空间（`workspaces.toml`，`[workspace.ai_instructions]` 和 `[workspace.ai_overrides.<action>]`）和仓库都可以追加或替换这些指令：见 [AI 辅助](ai.md#指令)。 |
 | `ai.actions.<action>.instructions` | `""` | 仅为该操作添加的文本。 |
 | `ai.review.run_in_repository` | `"profile"` | `profile`、`yes` 或 `no`：代码评审草稿的本地代理本次运行是否在仓库内工作，覆盖 AI 配置的 `workdir`。仓库可以设置自己的值（`gitpoulpi ai review-context --repo`）。见 [AI > 评审上下文](ai.md#评审上下文)。 |
 | `ai.review.include_claude_md` | `true` | 将仓库的 `CLAUDE.md` 提供给代码评审草稿（根目录，在请求所针对的分支上读取；在 8 KB 处截断）。 |
@@ -348,7 +348,7 @@ review_mode = "ask"       # ask | clone | api
 | `ai.limits.review_threads_bytes` | `6000` | 已存在的评审评论列表（提供给模型，免得它重复）最多可有的字节数。超过时，*发送截断版本* 会截断该列表。范围相同。 |
 | `ai.limits.review_context_file_bytes` | `8192` | 提供给代码评审的单个项目上下文文件（`CLAUDE.md`、`AGENTS.md`、额外文件）最多可有的字节数。超过时，*发送截断版本* 会缩短该文件并附上说明。范围相同。 |
 | `ai.limits.review_context_bytes` | `16384` | 所有上下文文件合计最多可有的字节数。超过时，*发送截断版本* 会缩短越过限制的那个文件，并省略其后的文件。范围相同。 |
-| `ai.sent_preview.<action>` | `true` | 每个操作一个键（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`）：在请求发出之前显示“发送的内容”。对话框中的“不再为……显示”会写入 `false`；设置 > AI > *发送前显示所发内容…* 会把它们重新打开。 |
+| `ai.sent_preview.<action>` | `true` | 每个操作一个键（`commit_message`、`explain_changes`、`stash_message`、`pull_request_description`、`commit_composer`、`conflict_resolve`、`code_review`、`split_commit`、`rewrite_script`、`rewrite_rules`、`worktree_name`）：在请求发出之前显示“发送的内容”。对话框中的“不再为……显示”会写入 `false`；设置 > AI > *发送前显示所发内容…* 会把它们重新打开。`worktree_name` 会被接受，但同样没有效果：它只发送你在“创建 worktree”对话框中输入的内容和本地分支名称。 |
 
 仓库自己的 `[preferences.ai_review]` 表（在其 `repo-state.toml` 中；未克隆仓库的条目在 `remote-reviews.toml` 中）接受相同的键，全部可选，另加 `no_extra_file = true`：此仓库不使用额外文件，不论 `ai.review.extra_file` 是什么。未设置的键、未设置的 `extra_file` 和缺失的 `no_extra_file` 都继承全局值；把 `extra_file` 设为某个文件会清除该开关，反之亦然。
 
@@ -501,7 +501,7 @@ stage_file = "z"
 | `hosting_integration` | 固定在此处的 `[[integrations]]` 配置 | `gitpoulpi hosting use --id` |
 | `pulls_source`, `issues_source` | PR / 议题列表所读取的提供方项目，形式为 `{ integration, project, filter }`。`filter` 是可选的：提供方原生的附加子句（Jira JQL 片段、Azure WIQL 条件、Trello 列表名称），以 AND 方式附加到列表查询上；GitHub 和 GitLab 会忽略它。 | 侧栏分区，`gitpoulpi hosting link` |
 | `ref_visibility` | 隐藏 / 单独显示的引用 | 引用侧栏，`gitpoulpi refs hide\|show\|solo` |
-| `hidden_remotes` | 被整体从图中隐藏的远程（每个分支，包括之后获取的） | 远程的眼睛图标和菜单，`gitpoulpi refs hide --remote` |
+| `hidden_remotes` | 被整体从图中隐藏的远程（每个分支，包括之后获取的） | 远程的 ⊙ 标记和菜单，`gitpoulpi refs hide --remote` |
 | `folds`, `collapsed_*_ref_folders` | 折叠的侧栏分区以及分支和 tag 文件夹。`[folds]` 还包含 `status_folders`（unstaged / staged 文件树中折叠的文件夹）和 `commit_folders`（某个 commit 已更改文件树中折叠的文件夹，对每个 commit 都相同），各自最多 500 个路径，超出时先丢弃最旧的 | 侧栏、文件树 |
 | `pending_auto_stash` | GitPoulpi 创建但尚未放回的 stash | 由守护进程写入；参见[自动 stash](log-and-history.md#自动-stash) |
 

@@ -1254,22 +1254,22 @@ choose_folder = { git = "请选择 worktree 的文件夹", local = "请选择工
 not_absolute = "文件夹必须是完整路径（可用“浏览”选择）"
 not_empty = "{path} 不为空"
 already_checked_out = "{label} 已被检出 - 请指定一个新分支名"
-branch_field = "Worktree branch"
-hint_new_branch = "new branch from {r}"
-hint_existing_branch = "checks out this branch"
-ref_unused = "not used: the existing branch is checked out as it is"
-name_after_branch = "Name after branch"
-regenerate = "Regenerate"
-ai_button = "Name with AI"
-ai_describe = "Describe the feature, bug or task"
-ai_describe_hint = "e.g. fix the crash when the config file is empty"
-ai_run = "Name it"
-ai_stop = "Stop"
-ai_hide = "Hide"
-ai_working = "asking the AI..."
-ai_need_text = "describe the work first"
-ai_failed = "AI: {why}"
-need_branch = "type or pick a branch first"
+branch_field = { git = "worktree 分支", local = "工作树分支" }
+hint_new_branch = "从 {r} 新建分支"
+hint_existing_branch = "检出此分支"
+ref_unused = "未使用：已有分支将原样检出"
+name_after_branch = "按分支命名"
+regenerate = "重新生成"
+ai_button = "用 AI 命名"
+ai_describe = "描述功能、缺陷或任务"
+ai_describe_hint = "例如：修复配置文件为空时的崩溃"
+ai_run = "命名"
+ai_stop = "停止"
+ai_hide = "隐藏"
+ai_working = "正在询问 AI……"
+ai_need_text = "请先描述工作内容"
+ai_failed = "AI：{why}"
+need_branch = "请先输入或选择一个分支"
 
 [repo_dialogs]
 # context: status line after opening the provider's web form
@@ -2945,10 +2945,10 @@ env_no_color = "输出中不含颜色码"
 env_permissions = "代理无需询问即可执行的范围"
 env_timeout = "代理自身的请求超时（毫秒）"
 env_offline = "启动时不发起网络调用"
-title_worktree_name = "Worktree names"
-profile_help_worktree_name = "The profile GitPoulpi will use to name a new worktree and its branch from a description."
-repo_profile_help_worktree_name = "The profile used in this repository to name a new worktree and its branch."
-action_worktree_name = "Worktree name"
+title_worktree_name = { git = "worktree 名称", local = "工作树名称" }
+profile_help_worktree_name = { git = "GitPoulpi 根据描述为新 worktree 及其分支命名时使用的配置。", local = "GitPoulpi 根据描述为新工作树及其分支命名时使用的配置。" }
+repo_profile_help_worktree_name = { git = "此仓库中为新 worktree 及其分支命名时使用的配置。", local = "此仓库中为新工作树及其分支命名时使用的配置。" }
+action_worktree_name = { git = "worktree 名称", local = "工作树名称" }
 
 [palette]
 sidebar_show_worktrees = { git = "左侧窗格：显示 worktree 分区", local = "左侧窗格：显示工作树分区" }
@@ -3860,7 +3860,7 @@ refs_pane_13 = "展开/折叠活动分区，或层级视图中所选的文件夹
 refs_pane_14 = "切换活动分区"
 refs_pane_15 = "按名称筛选（Enter 应用，Esc 取消）"
 refs_pane_16 = "切换本地/远程的分支层级视图（按名称中的 `/` 分文件夹）- 会持久保存（`ui.ref_tree`）"
-refs_pane_17 = "鼠标：悬停在预留的左侧边栏上可显示“在图中隐藏”的眼睛图标（单独显示时为单独显示圆圈）；文件夹/远程名称行的边栏一次隐藏/单独显示其下所有引用。点击标题中的“停止单独显示”/“全部显示”按钮可清除整个集合"
+refs_pane_17 = "鼠标：悬停在预留的左侧边栏上可显示“在图中隐藏”标记 ⊙（单独显示时为单独显示圆圈）；文件夹/远程名称行的边栏一次隐藏/单独显示其下所有引用。点击标题中的“停止单独显示”/“全部显示”按钮可清除整个集合"
 refs_pane_18 = "在 Log 中定位所选引用：滚动到它所指的位置并让该行闪烁，选择保持不变"
 refs_pane_19 = "将所选引用标记为拖放来源，再放到另一个引用上：与拖动相同的菜单（{$merge}、{$rebase}、{$push}等）；Esc 清除标记"
 status_pane_working_1 = "移动；越过一个子窗格的末端会进入另一个（折叠或为空的会被跳过）"

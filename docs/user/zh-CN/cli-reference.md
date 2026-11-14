@@ -215,6 +215,7 @@
 | `ai commit-message` | 打印 AI 为 staged 更改（没有 stage 内容时为全部更改）提议的消息；不 commit 任何内容。 |
 | `ai explain [rev] [--wip]` | 解释一个 commit（默认为 `HEAD`）或工作区更改。 |
 | `ai split-plan <rev>` | 输出 AI 为拆分某个 commit 建议的计划，形如 `{commit, parts, applied: false}`，其中 `parts` 就是 `split-commit --plan` 接受的内容。不会应用任何内容。需要 `ai.enabled = true`。 |
+| `ai worktree-name --describe <text>` | 输出 AI 为某项任务建议的 worktree 名称和分支名称，形如 `{name, worktree, branch}`：`name` 是小写 slug，`worktree` 是“创建 worktree”对话框填入的名称（`worktree-<name>`，该词不会重复），`branch` 遵循仓库自身的分支命名习惯（有效的 git 引用，最多 60 个字符；不符合的回答会报错）。不会创建任何内容：请把它们传给 `worktree add`。只发送描述和本地分支名称。需要 `ai.enabled = true`。 |
 | `ai rewrite-script <instruction> [--sample N]` | 根据你的指令，输出 AI 为历史重写编写的 Lua 脚本，形如 `{script, check, retried, sample, applied: false}`，其中 `check` 是 `rewrite script check` 对它的判断（脚本无法编译时会再向模型请求一次；仍然不行则退出码为 2）。只发送指令；加 `--sample` 时还会发送最新 `N` 个 commit（最多 50 个）的作者、日期和标题；绝不发送文件内容。不会运行任何东西。需要 `ai.enabled = true`。 |
 | `ai rewrite-rules <description> [--context]` | 根据你的描述，输出 AI 为历史重写提出的规则和设置，形如 `{recipe, problems, notes, retried, context, applied: false}`：`recipe` 是 `rewrite preview --recipe-json` 读取的内容，`problems` 列出被排除的条目及原因（只要有就退出码为 2；有效的规则会保留）。只发送描述；加 `--context` 时还会发送当前分支、分支和 tag 名称以及最近 200 个 commit 的作者；绝不发送文件内容。不预览也不应用任何内容。需要 `ai.enabled = true`。 |
 | `ai resolve-conflict <path> [--conflict N]` | 打印 AI 为有冲突文件的某一个冲突建议的解决方案（`N` 从 1 开始，文件只有一个冲突时可省略）。只打印：不会写入或 stage 任何内容（`conflicts resolve` 用于应用结果）。 |

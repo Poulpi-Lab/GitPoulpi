@@ -278,6 +278,8 @@ const TOOLS: &[(&str, &str, bool)] = &[
     ("workspace_set_profile", "write", false),
     ("workspace_show", "read", false),
     ("worktree_add", "write", false),
+    ("worktree_changes", "read", false),
+    ("worktree_remove", "destructive", false),
     ("worktree_list", "read", false),
 ];
 

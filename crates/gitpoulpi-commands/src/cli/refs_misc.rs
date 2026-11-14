@@ -188,6 +188,34 @@ pub enum WorktreeAction {
         #[arg(long, short = 'b')]
         branch: Option<String>,
     },
+    /// The uncommitted changes of the worktree at `<path>` (tracked and
+    /// untracked, not ignored); an empty list means it is clean.
+    Changes { path: String },
+    /// Remove the linked worktree at `<path>`. A worktree with uncommitted
+    /// changes is refused unless `--force` (they are lost), `--commit-message`
+    /// (commit every change on its branch first; a detached worktree also
+    /// needs `--commit-branch`) or `--stash-message` (stash every change,
+    /// untracked included, first; the stash is shared by all worktrees).
+    /// `--delete-branch` also deletes its branch (journaled: undo brings the
+    /// branch back; the folder stays gone). The removal itself is not undoable.
+    Remove {
+        path: String,
+        /// Remove even with uncommitted changes; they are lost.
+        #[arg(long)]
+        force: bool,
+        /// Commit every change with this message before removing.
+        #[arg(long)]
+        commit_message: Option<String>,
+        /// The branch to create for that commit when the worktree is detached.
+        #[arg(long)]
+        commit_branch: Option<String>,
+        /// Stash every change with this message before removing.
+        #[arg(long)]
+        stash_message: Option<String>,
+        /// Also delete the worktree's branch after removing it.
+        #[arg(long)]
+        delete_branch: bool,
+    },
 }
 
 #[cfg(feature = "submodule")]

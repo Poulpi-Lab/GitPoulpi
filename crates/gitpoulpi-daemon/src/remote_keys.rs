@@ -67,8 +67,7 @@ fn state_of(
     refs: &[Ref],
     local: gitpoulpi_core::domain::Oid,
     target: &TargetRef,
-    role: TargetRole,
-    pull: bool,
+    (role, pull): (TargetRole, bool),
     known: &[String],
 ) -> RemoteTargetState {
     let tracking = refs.iter().find(|r| match &r.kind {
@@ -119,8 +118,7 @@ fn states(
             refs,
             local,
             p,
-            TargetRole::Primary,
-            false,
+            (TargetRole::Primary, false),
             known,
         ));
     }
@@ -132,8 +130,7 @@ fn states(
             refs,
             local,
             t,
-            TargetRole::PushTo,
-            pull,
+            (TargetRole::PushTo, pull),
             known,
         ));
     }
@@ -145,8 +142,7 @@ fn states(
                 refs,
                 local,
                 t,
-                TargetRole::PullFrom,
-                true,
+                (TargetRole::PullFrom, true),
                 known,
             ));
         }

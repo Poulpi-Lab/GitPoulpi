@@ -121,7 +121,7 @@ seu menu. As entradas mais úteis:
 | Merge, Rebase sobre | Faz merge desta ref na branch em checkout, ou rebase da branch em checkout sobre ela |
 | Fast-forward `<branch>` até `<current>` / `<current>` até `<branch>` | Avança uma branch quando isso é um fast-forward; caso contrário fica a cinzento com o motivo (`divergiram, não é um fast-forward`) |
 | Criar worktree a partir de... | Abre um worktree ligado no seu próprio separador |
-| Pull, Push, Fetch, Definir upstream... | Operações de rede nessa branch |
+| Pull, Push, Fetch, Remotos de <branch>... | Operações de rede nessa branch (Remotos de <branch>... define o upstream, mais uma caixa Push e uma Pull também por remoto) |
 | Ocultar / Mostrar no grafo, Solo | Apenas visualização; ocultam ou põem em solo uma ref (ocultar também retira os commits que só essa ref alcança) sem tocar no repositório |
 | Renomear, Eliminar | Eliminar pergunta primeiro; a gémea remota também pode ser eliminada |
 | Copiar nome da branch, Copiar ligação da branch no remoto | Para a área de transferência |

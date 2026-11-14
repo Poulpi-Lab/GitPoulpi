@@ -71,7 +71,11 @@ para as páginas de referência quando precisar delas.
     O que passa pelo tmux, zellij, screen, herdr e painéis de terminal:
     **[Multiplexadores](multiplexers.md)**.
 
-Também: **[Fluxos de trabalho de branches](branching-workflows.md)**, os modelos Git Flow, GitHub
+Também: **[Vários remotos para uma branch](multiple-remotes.md)**: destinos de push e
+fontes de pull, o diálogo Remotos, Push para todos ou para remotos selecionados, resolver um remoto
+que avançou, Continuar depois de um conflito, a CLI e um alias de git simples.
+
+**[Fluxos de trabalho de branches](branching-workflows.md)**, os modelos Git Flow, GitHub
 Flow, GitLab Flow e Trunk-based ou as suas próprias bases, padrões de nome de branch
 e tipos de tópico (`gitpoulpi flow ...`).
 

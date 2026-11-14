@@ -63,6 +63,8 @@ GitPoulpi は、クリックできる commit グラフ、コマンドパレッ�
     tmux、zellij、screen、herdr、ターミナルのペインを通るもの：
     **[マルチプレクサ](multiplexers.md)**。
 
+そのほか：**[worktree](worktrees.md)**：リンクされた worktree の作成、オープン、merge、削除。
+
 そのほか：**[1 つのブランチに複数のリモート](multiple-remotes.md)**：push 先と pull 元、リモートのダイアログ、
 すべてまたは選択したリモートへの Push、動いたリモートの解決、競合後の続行、CLI、素の git のエイリアス。
 

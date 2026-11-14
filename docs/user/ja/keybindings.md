@@ -452,7 +452,7 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | サイドバー: ローカルブランチの表示/非表示 |  |
 | サイドバー: リモートの表示/非表示 |  |
 | サイドバー: worktree の表示/非表示 |  |
-| Sidebar: Show Worktrees Section |  |
+| サイドバー: worktree セクションを表示 |  |
 | サイドバー: Stashesの表示/非表示 |  |
 | サイドバー: Tagsの表示/非表示 |  |
 | サイドバー: Pull requestの表示/非表示 |  |
@@ -496,12 +496,12 @@ Windows のコンソールは修飾キーを自分で報告するので、この
 | Refs: 選択中のブランチの Reflog... |  |
 | Refs: 選択中のブランチからPull Requestを開始... |  |
 | Refs: Worktree をタブで開く | `Enter / ダブルクリック` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: worktree を開く場所... |  |
+| Refs: worktree のブランチを別のブランチにmerge... |  |
+| Refs: worktree を削除... |  |
+| Refs: worktree を作成... | `+` |
+| Refs: 現在のブランチから worktree を作成 |  |
+| Refs: ブランチを選んで worktree を作成 |  |
 | Refs: サブモジュールを更新（選択中） |  |
 | Refs: サブモジュールを初期化（選択中） |  |
 | Refs: サブモジュールをタブで開く | `Enter / ダブルクリック` |

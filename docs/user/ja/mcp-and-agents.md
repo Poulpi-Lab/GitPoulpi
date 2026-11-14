@@ -409,6 +409,8 @@ CLI コマンド 1 つにつき 1 つのツールがあり、名前はコマン�
 | `workspace_show` | `gitpoulpi workspace show` | read |
 | `worktree_add` | `gitpoulpi worktree add` | write |
 | `worktree_list` | `gitpoulpi worktree list` | read |
+| `worktree_changes` | `gitpoulpi worktree changes` | read |
+| `worktree_remove` | `gitpoulpi worktree remove` | destructive |
 
 Not exposed as tools:
 

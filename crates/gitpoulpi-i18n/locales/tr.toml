@@ -3120,7 +3120,7 @@ git_pull_options = { git = "Git: Pull Seçenekleri...", local = "Git: Çekme Se�
 git_push = { git = "Git: Push", local = "Git: Gönder" }
 git_push_to_remote = { git = "Git: Uzak Depoya Push Et...", local = "Git: Uzak Depoya Gönder..." }
 git_force_push_with_lease = { git = "Git: Force Push (lease ile)...", local = "Git: Zorla Gönder (lease ile)..." }
-git_set_upstream = "Git: Upstream Ayarla..."
+git_remotes_of_branch = "Git: Remotes of Branch..."
 remote_add_remote = "Remote: Uzak Depo Ekle..."
 remote_remove_remote = "Remote: Uzak Depoyu Kaldır..."
 remote_edit_remote = "Remote: Uzak Depoyu Düzenle..."
@@ -6455,6 +6455,8 @@ branch_create_tracking = "Dal oluştur: {name} ({upstream} dalını izler)"
 branch_rename = "{old} dalının adını {new} yap"
 upstream_set = "{branch} dalının upstream'ini {upstream} yap"
 upstream_unset = "{branch} dalının upstream'ini kaldır"
+# context: undo history row: the push targets and pull sources of a branch were changed; {branch} is the local branch
+remotes_set = "Set remotes of {branch}"
 config_set = "{key} değerini {value} yap"
 config_unset = "{key} ayarını kaldır"
 sparse_set = "Kısmi checkout'u ayarla"
@@ -9456,3 +9458,63 @@ key_next = "s"
 key_cancel = "p"
 # context: status line; the message in view holds no web address to open
 none = "bu mesajda bağlantı yok"
+
+[branch_remotes]
+# context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
+title = "Remotes of {branch}"
+# context: label before the list that picks the upstream (the remote branch the local branch tracks)
+upstream_label = "Upstream"
+# context: table heading: a configured remote's name
+col_remote = "Remote"
+# context: table heading: the branch's name on that remote
+col_branch = "Branch"
+# context: table heading over a checkbox: the branch is also pushed to that remote
+col_push = "{$Push}"
+# context: table heading over a checkbox: a pull also takes the new commits of that remote
+col_pull = "{$Pull} too"
+# context: table heading: how the local branch stands against that remote (ahead, behind, in sync)
+col_state = "State"
+# context: cell in the Pull too column of the upstream's own row: the upstream is always pulled
+pull_upstream = "upstream"
+# context: state cell: the remote's copy and the local branch are the same commit
+state_in_sync = "in sync"
+# context: state cell: the remote has no copy of the branch yet
+state_new = "new"
+# context: state cell: the remote's copy shares no history with the local branch
+state_unrelated = "unrelated"
+# context: state cell of a remote that is not used by the branch
+state_none = "-"
+# context: row of a remote the branch still mentions but the repository no longer has
+gone = "remote gone"
+# context: button on a gone row: forget that remote for this branch
+remove_button = "Remove"
+# context: warning under the table; {first} and {second} are two remote names with the same address
+same_url = "{first} and {second} push to the same URL."
+# context: button: changes the branch name used on the selected remote
+rename_button = "Rename on remote..."
+# context: button: the branch tracks no upstream any more
+unset_button = "Unset upstream"
+# context: primary button of the dialog
+apply_button = "Apply"
+# context: shown while the dialog reads the branch's remotes
+loading = "Reading the remotes..."
+# context: inline error when Apply is pressed while a gone row is left; {remote} is its name
+gone_first = "{remote} no longer exists: remove its row first (Del)."
+# context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
+rename_title = "Branch name on {remote}"
+# context: placeholder of that dialog's field
+rename_placeholder = "Branch name on the remote"
+# context: primary button of that dialog
+rename_set = "Set"
+# context: inline error of that dialog when the field is empty
+rename_empty = "Type a branch name."
+# context: inline error when Rename is used on the upstream's own row
+rename_upstream_row = "The upstream's branch name is chosen in the list above."
+# context: inline error when Rename is used with nothing to rename
+rename_no_row = "Select a remote's row first."
+# context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
+keys_hint = "Space Push, p Pull too, r Rename, Del Remove, Enter Apply"
+# context: status line while the change is sent; {branch} is the local branch
+applying = "setting the remotes of {branch}..."
+# context: status line once the daemon applied the change; {branch} is the local branch
+remotes_set = "remotes of {branch} updated"

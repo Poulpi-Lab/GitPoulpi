@@ -324,7 +324,10 @@ pub(crate) fn apply_ref_context_action(
         RefContextAction::SetUpstream => {
             let refs = refs_result.as_deref().unwrap_or(&[]);
             match remotes_ui::local_branch(refs, &full_name) {
-                Some(branch) => remote_ui.open_upstream_prompt(&branch, refs, input_mode),
+                Some(branch) => {
+                    let requester = link.activity_handle().raw.requester();
+                    remote_ui.open_upstream_prompt(&branch, refs, &requester, input_mode)
+                }
                 None => *last_message = Some(NO_SUCH_LOCAL_BRANCH.get().into()),
             }
         }

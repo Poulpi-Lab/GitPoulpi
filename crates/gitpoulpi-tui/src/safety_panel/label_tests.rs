@@ -37,6 +37,7 @@ fn sample(kind: K) -> Option<&'static str> {
         K::BranchDelete => "Delete branch topic (abc1234)",
         K::BranchRename => "Rename branch a to b",
         K::BranchSetUpstream => "Set upstream of a to origin/a",
+        K::BranchSetRemotes => "Set remotes of a",
         K::SetRepoConfig => "Set core.eol to lf",
         K::SparseSet => "Set sparse checkout",
         K::SparseDisable => "Disable sparse checkout",
@@ -84,7 +85,6 @@ fn sample(kind: K) -> Option<&'static str> {
 const WITHOUT_WORDS: &[K] = &[
     // Journaled, but their catalog words wait for the translators.
     K::ApplyCommit,
-    K::BranchSetRemotes,
     K::StashFromCommit,
     K::Init,
     K::Fetch,

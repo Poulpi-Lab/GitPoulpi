@@ -208,6 +208,35 @@ async fn set_remotes_is_journaled_and_undo_restores_the_section() {
     }
 }
 
+/// The Remotes dialog moves the upstream and the targets in one request:
+/// one journal entry, and one undo restores both.
+#[tokio::test]
+async fn set_remotes_with_an_upstream_is_one_undoable_entry() {
+    for (name, backend) in backends() {
+        let mut rig = Rig::new(backend, three_remotes()).await;
+        rig.ok(
+            OperationKind::BranchSetRemotes,
+            json!({
+                "branch": "main",
+                "upstream": "gitlab/main",
+                "push_to": ["backup"],
+                "pull_from": []
+            }),
+        )
+        .await;
+        assert_eq!(rig.all("branch.main.remote"), vec!["gitlab"], "{name}");
+        assert_eq!(rig.all("branch.main.gitpoulpi-push-to"), vec!["backup"]);
+        let out = rig.undo().await;
+        assert_eq!(out.entry.kind, OperationKind::BranchSetRemotes, "{name}");
+        assert_eq!(rig.all("branch.main.remote"), vec!["origin"], "{name}");
+        assert!(
+            rig.all("branch.main.gitpoulpi-push-to").is_empty(),
+            "{name}"
+        );
+        rig.stop().await;
+    }
+}
+
 #[tokio::test]
 async fn remote_group_status_reads_each_remote_from_local_refs() {
     for (name, backend) in backends() {

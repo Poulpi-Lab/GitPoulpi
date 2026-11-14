@@ -111,6 +111,7 @@ mod ai_sent_dialog;
 mod ai_ui;
 mod avatar;
 mod blame_view;
+mod branch_remotes_dialog;
 pub mod build_features;
 #[cfg(test)]
 mod button_audit_tests;

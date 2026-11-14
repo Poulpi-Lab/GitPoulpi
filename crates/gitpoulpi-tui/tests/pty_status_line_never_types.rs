@@ -179,13 +179,41 @@ fn an_annotated_tag_message() {
 fn an_upstream() {
     let repo = fixture(false);
     let (mut term, _c) = launch(&repo, "pty-slnt-upstream");
-    palette(&mut term, "Git: Set Upstream", "Git: Set Upstream...");
+    palette(&mut term, "Git: Set Upstream", "Git: Remotes of Branch...");
     term.send_keys("Enter").unwrap();
-    term.wait_for("the Set upstream dialog", STEP, |s| {
-        s.contains("Set upstream of") && !s.contains("Command Palette")
+    term.wait_for("the Remotes dialog", STEP, |s| {
+        s.contains("Remotes of feature") && !s.contains("Command Palette")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    typed_is_not_in_the_status_line(&mut term, "upstream dialog");
+    typed_is_not_in_the_status_line(&mut term, "remotes dialog");
+    let _ = term.stop();
+}
+
+/// "Rename on remote..." asks the branch name in a prompt dialog of its own,
+/// never in the status line.
+#[test]
+fn a_branch_name_on_a_remote() {
+    let repo = fixture(false);
+    let (mut term, _c) = launch(&repo, "pty-slnt-remote-branch");
+    palette(&mut term, "Git: Remotes of Branch", "Git: Remotes of Branch...");
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the Remotes dialog with its list open", STEP, |s| {
+        s.contains("Remotes of feature") && s.contains("origin/main") && !s.contains("Command Palette")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    // Esc closes the list, Tab walks to the table, `r` renames its first row.
+    term.send_keys("Escape").unwrap();
+    term.wait_for("the table with its rows", STEP, |s| {
+        s.contains("Pull too") && s.contains("Remotes of feature") && !s.contains("origin/main")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    term.send_keys("Tab").unwrap();
+    term.send_text("r").unwrap();
+    term.wait_for("the branch name prompt", STEP, |s| {
+        s.contains("Branch name on origin")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    typed_is_not_in_the_status_line(&mut term, "branch name prompt");
     let _ = term.stop();
 }
 

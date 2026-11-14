@@ -437,12 +437,18 @@ pub(super) fn dispatch_plain(backend: &dyn GitBackend, request: &Request) -> Dis
                     .and_then(|v| serde_json::from_value(v.clone()).ok())
                     .unwrap_or_default()
             };
+            // `upstream` (optional, `remote/branch`) also moves git's own
+            // upstream, inside the same journal entry.
+            let upstream: Option<String> = args
+                .get("upstream")
+                .and_then(|v| serde_json::from_value(v.clone()).ok())
+                .flatten();
             to_json!(crate::remote_keys::set_remotes(
                 backend,
                 &repo,
                 &branch,
-                &list("push_to"),
-                &list("pull_from")
+                upstream.as_deref(),
+                (&list("push_to"), &list("pull_from"))
             ))
         }
         OperationKind::FastForward => {

@@ -12,7 +12,9 @@ const WIN_AREA: Win = Win::resizable("tag_message", 50, 10);
 
 impl PromptDialog {
     fn win(&self) -> &'static Win {
-        if self.multiline {
+        if matches!(self.kind, PromptKind::BranchOnRemote { .. }) {
+            &super::remotes::WIN_DEST
+        } else if self.multiline {
             &WIN_AREA
         } else {
             &WIN_LINE
@@ -36,6 +38,9 @@ impl PromptDialog {
         area: Rect,
         hovered: Option<PromptPart>,
     ) -> Vec<(Rect, PromptPart)> {
+        if self.is_remotes() {
+            return self.render_remotes(frame, area, hovered);
+        }
         let width = area
             .width
             .saturating_sub(4)
@@ -210,19 +215,6 @@ impl PromptDialog {
                 }
                 hits.push((rect, PromptPart::Ai));
             }
-        }
-        if let Some(label) = &self.unset {
-            let rect = button(
-                buf,
-                inner.x,
-                by,
-                label,
-                ButtonState::Normal {
-                    hovered: hovered == Some(PromptPart::Extra(0)),
-                    focused: self.focus == PromptPart::Extra(0),
-                },
-            );
-            hits.push((rect, PromptPart::Extra(0)));
         }
         // The open list over everything else, then the discard question.
         if let Some(combo) = &self.combo {

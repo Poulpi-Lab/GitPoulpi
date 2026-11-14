@@ -648,7 +648,7 @@ Settings has rows of its own that are not listed here: one `Settings: Toggle <se
 | Git: Push | `Ctrl+G P` |
 | Git: Push to Remote... |  |
 | Git: Force Push (with lease)... |  |
-| Git: Set Upstream... |  |
+| Git: Remotes of Branch... |  |
 | Remote: Add Remote... |  |
 | Remote: Remove Remote... |  |
 | Remote: Edit Remote... |  |

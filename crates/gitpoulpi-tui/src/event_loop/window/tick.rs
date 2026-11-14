@@ -232,6 +232,8 @@ impl WindowState {
         // A prompt dialog's ✦ button follows AI on / off and the running state.
         if let InputMode::Prompt(dialog) = &mut self.input_mode {
             dialog.sync_ai(self.ai_ui.enabled(), self.ai_ui.running());
+            // The Remotes dialog reads the branch's remotes from the daemon.
+            dialog.poll();
         }
         if let Some(outcome) = self.ai_ui.poll() {
             // A failed job is a card (the status line is cleared below).

@@ -443,6 +443,16 @@ pub enum Action {
         branch: String,
         upstream: Option<String>,
     },
+    /// The Remotes dialog's Apply (`OperationKind::BranchSetRemotes`): the
+    /// extra push targets and pull sources of `branch` (config values,
+    /// `<remote>` or `<remote>:<branch>`), and its upstream when it changed
+    /// - one request, one undo entry.
+    BranchSetRemotes {
+        branch: String,
+        upstream: Option<String>,
+        push_to: Vec<String>,
+        pull_from: Vec<String>,
+    },
     /// Move the local branch `branch` forward to `target`, only if that
     /// is a fast-forward (`GitBackend::fast_forward`). `target_label` is
     /// what the status line calls the target (`main`, `origin/main`).

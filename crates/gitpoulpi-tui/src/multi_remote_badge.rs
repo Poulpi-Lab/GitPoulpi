@@ -201,4 +201,4 @@ pub(crate) fn open_branch_remotes(
 }
 
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;

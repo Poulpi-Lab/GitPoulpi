@@ -358,6 +358,7 @@ pub(crate) fn ghost_pill_spans(
 mod tests {
     use super::*;
     use crate::graph::LANE_PALETTE;
+    use gitpoulpi_core::domain::RemoteRelation;
 
     fn pill(name: &str, kind: RefRowKind, checked_out: bool) -> RefPill {
         RefPill {
@@ -647,5 +648,84 @@ mod tests {
             anchor_fill[..=anchor_edge].iter().all(|f| *f),
             "no holes inside the anchor row's colored block: {anchor_fill:?}"
         );
+    }
+    fn multi_pill(name: &str, targets: Vec<(&str, RemoteRelation)>) -> RefPill {
+        let mut p = pill(name, RefRowKind::Local, true);
+        p.multi_remote = Some(
+            targets
+                .into_iter()
+                .map(|(r, rel)| crate::multi_remote_badge::tests::target(r, rel))
+                .collect(),
+        );
+        p
+    }
+
+    fn badge_span<'a>(spans: &'a [Span<'static>]) -> Option<&'a Span<'static>> {
+        spans.iter().find(|s| s.content.contains('\u{21c9}'))
+    }
+
+    #[test]
+    fn a_branch_with_extra_targets_wears_a_coloured_badge_before_the_overflow_count() {
+        use gitpoulpi_core::domain::RemoteRelation as R;
+        for (rel, want) in [
+            (R::UpToDate, th().status.success),
+            (R::LocalAhead(1), th().status.warning),
+            (R::Diverged { ahead: 1, behind: 1 }, th().status.danger),
+        ] {
+            let mut pills = vec![
+                multi_pill("main", vec![("origin", R::UpToDate), ("gitlab", rel)]),
+                pill("v1.0", RefRowKind::Tag, false),
+            ];
+            pills[0].checked_out = false;
+            let spans = ref_pill_spans(&pills, 60, LANE_PALETTE[0], None);
+            let (text, _) = render_spans(&spans);
+            let badge = text.find('\u{21c9}').expect("the badge is drawn");
+            assert!(text.contains("\u{21c9}2"), "{text}");
+            assert!(badge < text.find("+1").unwrap(), "badge before +n: {text}");
+            assert_eq!(badge_span(&spans).unwrap().style.bg, Some(want), "{rel:?}");
+        }
+    }
+
+    #[test]
+    fn the_badge_is_the_first_thing_dropped_when_the_name_would_be_cut() {
+        use gitpoulpi_core::domain::RemoteRelation as R;
+        let mut pills = vec![multi_pill(
+            "feature/login",
+            vec![("origin", R::UpToDate), ("gitlab", R::UpToDate)],
+        )];
+        pills[0].checked_out = false;
+        let mut plain = pill("feature/login", RefRowKind::Local, false);
+        plain.checked_out = false;
+        let (plain_text, _) = render_spans(&ref_pill_spans(&[plain], 80, LANE_PALETTE[0], None));
+        // With room for the name only: no badge, the name stays whole.
+        let tight = display_width(&plain_text);
+        let spans = ref_pill_spans(&pills, tight, LANE_PALETTE[0], None);
+        let (text, _) = render_spans(&spans);
+        assert!(!text.contains('\u{21c9}'), "{text}");
+        assert!(text.contains("feature/login"), "{text}");
+        // Room for the name and the badge: both.
+        let roomy = tight + display_width("\u{21c9}2") + 3;
+        let (text, _) = render_spans(&ref_pill_spans(&pills, roomy, LANE_PALETTE[0], None));
+        assert!(text.contains("\u{21c9}2") && text.contains("feature/login"), "{text}");
+        // One column short of that: the badge goes, not the name.
+        let (text, _) = render_spans(&ref_pill_spans(&pills, roomy - 1, LANE_PALETTE[0], None));
+        assert!(!text.contains('\u{21c9}'), "{text}");
+        assert!(text.contains("feature/login"), "{text}");
+        // No extra targets, no badge.
+        let plain = vec![pill("feature/login", RefRowKind::Local, false)];
+        let (text, _) = render_spans(&ref_pill_spans(&plain, roomy, LANE_PALETTE[0], None));
+        assert!(!text.contains('\u{21c9}'), "{text}");
+    }
+
+    #[test]
+    fn an_open_popup_hides_the_badge_so_the_block_stays_in_its_column() {
+        use gitpoulpi_core::domain::RemoteRelation as R;
+        let pills = vec![
+            multi_pill("main", vec![("origin", R::UpToDate), ("gitlab", R::UpToDate)]),
+            pill("dev", RefRowKind::Local, false),
+        ];
+        let (text, filled) = render_spans(&ref_pill_spans(&pills, 40, LANE_PALETTE[0], Some(40)));
+        assert!(!text.contains('\u{21c9}'), "{text}");
+        assert!(filled.len() <= 40);
     }
 }

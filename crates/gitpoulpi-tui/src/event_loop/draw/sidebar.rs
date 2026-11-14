@@ -1346,3 +1346,6 @@ mod tests {
         crate::refs_sidebar::set_row_pointer(None);
     }
 }
+
+#[cfg(test)]
+mod badge_tests;

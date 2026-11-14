@@ -979,3 +979,114 @@ fn the_purge_screen_holds_its_layout() {
         }
     });
 }
+
+// ---------------------------------------------------------- remotes dialog
+
+/// "Remotes of <branch>" with its rows read: an upstream, a diverged push
+/// target, a remote only listed (gone) and one never pushed to.
+fn remotes_dialog_fixture() -> crate::prompt_dialog::PromptDialog {
+    use gitpoulpi_core::domain::{
+        BranchRemotes, Remote, RemoteGroupStatus, RemoteRelation, RemoteTargetState, TargetRef,
+        TargetRole,
+    };
+    let target = |remote: &str| TargetRef {
+        remote: remote.into(),
+        branch: "feature".into(),
+    };
+    let state = |remote: &str, role, relation, missing| RemoteTargetState {
+        remote: remote.into(),
+        branch: "feature".into(),
+        role,
+        pull: false,
+        tracking: None,
+        relation,
+        missing,
+    };
+    let remote = |name: &str, url: &str| Remote {
+        name: name.into(),
+        fetch_url: url.into(),
+        push_url: None,
+    };
+    let status = RemoteGroupStatus {
+        remotes: BranchRemotes {
+            branch: "feature".into(),
+            primary: Some(target("origin")),
+            push_to: vec![target("gitlab"), target("oldbox")],
+            pull_from: vec![target("gitlab")],
+            missing: vec!["oldbox".into()],
+        },
+        targets: vec![
+            state(
+                "origin",
+                TargetRole::Primary,
+                RemoteRelation::LocalAhead(2),
+                false,
+            ),
+            state(
+                "gitlab",
+                TargetRole::PushTo,
+                RemoteRelation::Diverged {
+                    ahead: 2,
+                    behind: 1,
+                },
+                false,
+            ),
+            state("oldbox", TargetRole::PushTo, RemoteRelation::Absent, true),
+        ],
+    };
+    let mut dialog = crate::prompt_dialog::PromptDialog::branch_remotes(
+        "feature",
+        Some("origin/feature"),
+        &[],
+        &[
+            remote("origin", "https://example.test/a.git"),
+            remote("gitlab", "https://example.test/b.git"),
+            remote("mirror", "https://example.test/b"),
+            remote("backup", "https://example.test/c.git"),
+        ],
+        crate::daemon_link::Reply::ready(Ok(status)),
+    );
+    dialog.poll();
+    dialog
+}
+
+#[test]
+fn the_remotes_dialog_holds_its_layout() {
+    use crate::prompt_dialog::PromptPart;
+    each_setting(|lang, terms, width| {
+        for nested in [false, true] {
+            let what = label(
+                &format!("remotes dialog nested={nested}"),
+                lang,
+                terms,
+                width,
+            );
+            let mut dialog = remotes_dialog_fixture();
+            if nested {
+                dialog.open_rename_for_test();
+            }
+            let mut hits = Vec::new();
+            let buf = draw(width, HEIGHT, |frame| {
+                hits = dialog.render(frame, frame.area(), None);
+            });
+            check_buffer(&what, &buf);
+            let area = Rect::new(0, 0, width, HEIGHT);
+            for (rect, part) in &hits {
+                assert!(
+                    rect.width > 0
+                        && area.contains((rect.x, rect.y).into())
+                        && rect.right() <= width,
+                    "{what}: {part:?} at {rect:?} is outside the screen\n{}",
+                    screen_text(&buf)
+                );
+            }
+            let of = |wanted: PromptPart| hits.iter().find(|(_, p)| *p == wanted).map(|(r, _)| *r);
+            let cancel = of(PromptPart::Cancel).expect("Cancel");
+            if !nested {
+                let apply = of(PromptPart::Submit).expect("Apply");
+                assert_eq!(cancel.y, apply.y, "{what}: the buttons share a row");
+                assert!(cancel.right() <= apply.x, "{what}: Cancel before Apply");
+            }
+        }
+    });
+}

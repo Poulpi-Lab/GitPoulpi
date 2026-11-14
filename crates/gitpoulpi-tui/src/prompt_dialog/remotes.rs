@@ -39,6 +39,15 @@ impl PromptDialog {
         }
     }
 
+    /// Opens the nested prompt on the first renamable row (layout tests).
+    #[cfg(test)]
+    pub(crate) fn open_rename_for_test(&mut self) {
+        if let Some(pane) = &mut self.remotes {
+            pane.select_row(1);
+        }
+        self.rename_selected();
+    }
+
     pub(super) fn is_remotes(&self) -> bool {
         self.remotes.is_some()
     }

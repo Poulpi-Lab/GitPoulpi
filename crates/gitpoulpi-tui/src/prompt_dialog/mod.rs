@@ -394,9 +394,11 @@ impl PromptDialog {
             }
             PromptKind::BranchRemotes { branch, .. } => {
                 let chosen = self.value();
-                let Some(pane) = &self.remotes else {
+                let Some(pane) = &mut self.remotes else {
                     return PromptOutcome::Stay;
                 };
+                // The answer may have landed since the last tick.
+                pane.poll();
                 match pane.request(chosen) {
                     Err(why) => {
                         self.error = Some(why);

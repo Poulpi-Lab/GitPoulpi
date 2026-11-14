@@ -635,11 +635,11 @@ inherited = "(ärvd)"
 lfs_not_checked = "(inte kontrollerad ännu)"
 lfs_autofix_filters = "Installera LFS-filter före {$pull} och {$push}"
 lfs_autofix_filters_help = "Före en {$pull} eller {$push} i ett repository som använder Git LFS körs `git lfs install --local` om dess LFS-filter eller hooks saknas (repositoryts egen konfiguration, aldrig den globala), så att överföringen hanterar de stora filerna. Statusraden meddelar det. Kräver git-lfs."
-push_group_preflight = "Check every remote before a {$push}"
-push_group_preflight_help = "Before a {$push} of a branch that has extra {$push} targets, look at every remote first (a quick query, plus a download from that remote only when it differs), so a problem on the third remote shows before the first {$push} starts. Off: {$push} to each remote in turn and report what happened."
-default_push_targets = "Extra {$push} targets for new branches"
-default_push_targets_help = "This repository only. Tick the remotes a new branch also {$push}es to, besides its upstream. They are copied into the branch when it first gets an upstream (a first {$push} that sets it, or a branch created from a remote branch). Branches that already exist are not changed: use their Set upstream... dialog."
-default_push_targets_none = "(no remote configured)"
+push_group_preflight = "Kontrollera varje remote före en {$push}"
+push_group_preflight_help = "Före en {$push} av en gren med extra {$push}-mål: titta först på varje remote (en snabb förfrågan, plus en nedladdning från den remoten bara när den skiljer sig), så att ett problem på den tredje remoten syns innan den första {$push}en börjar. Av: {$push} till varje remote i tur och ordning och rapportera vad som hände."
+default_push_targets = "Extra {$push}-mål för nya grenar"
+default_push_targets_help = "Gäller bara det här repositoryt. Kryssa i de remotes som en ny gren också {$push}ar till, utöver sin upstream. De kopieras till grenen när den först får en upstream (en första {$push} som anger den, eller en gren skapad från en remote-gren). Grenar som redan finns ändras inte: ändra dem i dialogen Remotes för grenen."
+default_push_targets_none = "(ingen remote konfigurerad)"
 
 [settings_screen]
 title = "Inställningar - Tab: sektioner/inställningar │ Enter: ändra"
@@ -885,7 +885,7 @@ push_branch = "{$Push} {name}"
 start_pr = "Starta en {$pr} från {name}..."
 fetch = { git = "Fetch", local = "Hämta" }
 # context: ref menu row that opens the dialog of the remotes a branch pushes to and pulls from; {name} is the branch
-remotes_of = "Remotes of {name}..."
+remotes_of = "Remotes för {name}..."
 rename = "Byt namn på {name}..."
 delete = "Ta bort {name}..."
 delete_both = "Ta bort {first} och {second}..."
@@ -2209,23 +2209,23 @@ host_not_recognized = "remote-värden känns inte igen"
 link_branch = "länk till grenen"
 link_commit = { git = "länk till commiten", local = "länk till incheckningen" }
 # context: menu row of the Push dropdown: push the branch to its upstream and every extra push target; {remotes} lists them, comma separated
-push_to_all = "{$Push} to all ({remotes})"
+push_to_all = "{$Push} till alla ({remotes})"
 # context: menu row: push the branch to one remote only; {remote} is that remote
-push_to_only = "{$Push} to {remote} only"
+push_to_only = "{$Push} endast till {remote}"
 # context: menu row: opens the dialog where the remotes of this one push are ticked
-push_to_selected = "{$Push} to selected remotes..."
+push_to_selected = "{$Push} till valda remotes..."
 # context: menu row of the Push dropdown that opens the dialog of the remotes a branch pushes to and pulls from; {branch} is the branch
-remotes_of = "Remotes of {branch}..."
+remotes_of = "Remotes för {branch}..."
 # context: menu row of the Pull dropdown: pull the upstream and every extra pull source; {remotes} lists them, joined with +
-pull_from_all = "{$Pull} from all sources ({remotes})"
+pull_from_all = "{$Pull} från alla källor ({remotes})"
 # context: menu row: pull from one remote only, once; {remote} is that remote
-pull_from_only = "{$Pull} from {remote} only"
+pull_from_only = "{$Pull} endast från {remote}"
 # context: status line while a push to several remotes starts; {branch} is the branch, {remotes} the remote names
-pushing_to_all = { git = "pushing {branch} to {remotes}...", local = "pushing {branch} to {remotes}..." }
+pushing_to_all = { git = "pushar {branch} till {remotes}...", local = "pushar {branch} till {remotes}..." }
 # context: status line while a pull from several remotes starts; {branch} is the branch, {remotes} the remote names
-pulling_from_all = { git = "pulling {branch} from {remotes}...", local = "pulling {branch} from {remotes}..." }
+pulling_from_all = { git = "pullar {branch} från {remotes}...", local = "pullar {branch} från {remotes}..." }
 # context: status line: the branch has no remote to pull from; {branch} is the branch
-no_pull_remote = "{branch} has no remote to {$pull} from"
+no_pull_remote = "{branch} har ingen remote att {$pull} från"
 
 [keymap_action]
 # context: key label; shows or hides the commit column beside the diff, File View, Blame and Editor
@@ -2556,7 +2556,7 @@ log_columns_fit_all = "Anpassa alla kolumner efter innehållet"
 log_scroll_left = "Rulla kolumnerna åt vänster"
 log_scroll_right = "Rulla kolumnerna åt höger"
 log_columns_layout = "Rulla i sidled eller anpassa efter rutan"
-refs_remotes = "Branch: Edit its Remotes"
+refs_remotes = "Gren: redigera dess remotes"
 
 
 [keymap_ctx]
@@ -3147,8 +3147,8 @@ git_pull_options = "Git: Pull-alternativ..."
 git_push = "Git: Push"
 git_push_to_remote = "Git: Push till remote..."
 git_force_push_with_lease = "Git: Force push (med lease)..."
-git_remotes_of_branch = "Git: Remotes of Branch..."
-git_push_to_selected_remotes = "Git: {$Push} to Selected Remotes..."
+git_remotes_of_branch = "Git: Remotes för gren..."
+git_push_to_selected_remotes = "Git: {$Push} till valda remotes..."
 remote_add_remote = "Remote: Lägg till remote..."
 remote_remove_remote = "Remote: Ta bort remote..."
 remote_edit_remote = "Remote: Redigera remote..."
@@ -3656,27 +3656,27 @@ view_log_scroll_left = "Vy: Log: rulla kolumnerna åt vänster"
 view_log_scroll_right = "Vy: Log: rulla kolumnerna åt höger"
 view_log_columns_layout = "Vy: Log: växla rullning i sidled för kolumnerna"
 # context: palette command: push to the upstream and every extra push target
-git_push_to_all_targets = "Git: {$Push} to All Targets"
+git_push_to_all_targets = "Git: {$Push} till alla mål"
 # context: palette command: pull the upstream and every extra pull source
-git_pull_from_all_sources = "Git: {$Pull} from All Sources"
+git_pull_from_all_sources = "Git: {$Pull} från alla källor"
 # context: palette command: opens a list of remotes, pulls from the chosen one once
-git_pull_from_one_remote = "Git: {$Pull} from One Remote..."
+git_pull_from_one_remote = "Git: {$Pull} från en remote..."
 # context: palette command: reopens the progress window of the last push to several remotes
-git_show_grouped_push = "Git: Show Grouped {$Push}"
+git_show_grouped_push = "Git: Visa gruppens {$Push}"
 # context: palette command: goes on with the push to several remotes that paused on conflicts
-git_continue_grouped_push = "Git: Continue Grouped {$Push}"
+git_continue_grouped_push = "Git: Fortsätt gruppens {$Push}"
 # context: palette command: abandons the push to several remotes that paused on conflicts
-git_abort_grouped_push = "Git: Abort Grouped {$Push}"
+git_abort_grouped_push = "Git: Avbryt gruppens {$Push}"
 # context: palette command: tries again the remotes that failed in the last push to several remotes
-git_retry_failed_pushes = "Git: Retry Failed Pushes"
+git_retry_failed_pushes = "Git: Försök igen med misslyckade pushar"
 # context: palette: why a command is grayed out
-why_no_grouped_push = "there is no grouped {$push} to show"
+why_no_grouped_push = "det finns ingen gruppens {$push} att visa"
 # context: palette: why a command is grayed out
-why_group_not_paused = "no grouped {$push} is waiting on conflicts"
+why_group_not_paused = "ingen gruppens {$push} väntar på konflikter"
 # context: palette: why Continue is grayed out
-why_group_not_ready = "resolve and conclude the conflicts first"
+why_group_not_ready = "lös och avsluta konflikterna först"
 # context: palette: why a command is grayed out
-why_nothing_to_retry = "no remote failed in the last grouped {$push}"
+why_nothing_to_retry = "ingen remote misslyckades i den senaste gruppens {$push}"
 
 [help_section]
 rewrite = "Skriv om historiken"
@@ -4086,7 +4086,7 @@ rewrite_9 = "öppnar fliken Storlek och analyserar historiken: de största filer
 rewrite_host_howto = "förklarar hur du får en omskrivning förbi en gren som värden skyddar: häv skyddet, gör en {$push_noun} under ett nytt namn eller skapa repositoryt på nytt; ingenting görs åt dig"
 rewrite_ai_rules = "skapar omskrivningsreglerna utifrån din beskrivning med AI (inget förhandsgranskas eller tillämpas)"
 log_columns_2 = "rulla Logs kolumner i sidled när de behåller sina bredder (layouten Rulla i sidled, vald i kolumnväljaren, i Inställningar eller med s medan en kolumn är vald); i layouten Anpassa ryms varje kolumn i rutan"
-refs_pane_20 = "edit the remotes of the selected local branch (its upstream and extra {$push} targets): the keyboard twin of clicking the remotes badge on its row"
+refs_pane_20 = "redigera den valda lokala grenens remotes (dess upstream och extra {$push}-mål): tangentbordsmotsvarigheten till att klicka på remote-märket på dess rad"
 
 [help_keys]
 global_10_keys = "{{*global.context_menu}} eller högerklick"
@@ -5519,7 +5519,7 @@ no_longer = "{path} är inte längre en submodul"
 [combo]
 type_to_search = "skriv för att söka"
 # context: placeholder of the search line of a dropdown that also accepts typed text
-type_to_use_own = "type your own value"
+type_to_use_own = "skriv ett eget värde"
 loading = "laddar..."
 no_match = "ingen träff"
 use_value = "Använd ”{value}”"
@@ -5847,11 +5847,11 @@ palette_create_desktop = "Startare: Skapa skrivbordsgenväg"
 palette_remove = "Startare: Ta bort genvägar"
 icons_updated = "genvägar uppdaterade"
 alias = "Kommandoalias"
-alias_help = "Det korta kommandot som startar GitPoulpi från en terminal, till exempel gp. Bara bokstäver, siffror, - _ och . är tillåtna. Ett skalalias eller en skalfunktion med samma namn går före och syns inte härifrån (oh-my-zsh definierar gp själv)."
+alias_help = "Det korta kommandot som startar GitPoulpi från en terminal, till exempel gp. Skriv valfritt namn i listan för att använda ditt eget. Bara bokstäver, siffror, - _ och . är tillåtna. Ett skalalias eller en skalfunktion med samma namn går före och syns inte härifrån (oh-my-zsh definierar gp själv)."
 alias_none = "Inget"
 alias_status = "Aliasstatus"
 alias_add = "Alias för ny flik"
-alias_add_help = "Ett andra kort kommando, till exempel gpa, som öppnar den aktuella mappen som en ny flik i den GitPoulpi som redan körs (gitpoulpi --add) i stället för att starta en till. Om ingen körs startar det GitPoulpi som vanligt. Skapa skapar det tillsammans med kommandoaliaset ovan. Samma namnregler."
+alias_add_help = "Ett andra kort kommando, till exempel gpa, som öppnar den aktuella mappen som en ny flik i den GitPoulpi som redan körs (gitpoulpi --add) i stället för att starta en till. Om ingen körs startar det GitPoulpi som vanligt. Skapa skapar det tillsammans med kommandoaliaset ovan. Skriv valfritt namn i listan för att använda ditt eget. Samma namnregler."
 alias_add_status = "Status (ny flik)"
 alias_set_name = "skriv ett namn ovan"
 alias_bad_space = "namnet innehåller ett mellanslag"
@@ -6506,7 +6506,7 @@ branch_rename = "Döp om gren {old} till {new}"
 upstream_set = "Ange upstream för {branch} till {upstream}"
 upstream_unset = "Ta bort upstream för {branch}"
 # context: undo history row: the push targets and pull sources of a branch were changed; {branch} is the local branch
-remotes_set = "Set remotes of {branch}"
+remotes_set = "Ange remotes för {branch}"
 config_set = "Ange {key} till {value}"
 config_unset = "Ta bort {key}"
 sparse_set = "Ange delvis utcheckning"
@@ -9511,229 +9511,229 @@ none = "ingen länk i det här meddelandet"
 
 [branch_remotes]
 # context: title of the dialog that lists every remote a branch pushes to and pulls from; {branch} is the local branch
-title = "Remotes of {branch}"
+title = "Remotes för {branch}"
 # context: label before the list that picks the upstream (the remote branch the local branch tracks)
 upstream_label = "Upstream"
 # context: table heading: a configured remote's name
 col_remote = "Remote"
 # context: table heading: the branch's name on that remote
-col_branch = "Branch"
+col_branch = "Gren"
 # context: table heading over a checkbox: the branch is also pushed to that remote
 col_push = "{$Push}"
 # context: table heading over a checkbox: a pull also takes the new commits of that remote
-col_pull = "{$Pull} too"
+col_pull = "{$Pull} också"
 # context: table heading: how the local branch stands against that remote (ahead, behind, in sync)
-col_state = "State"
+col_state = "Läge"
 # context: cell in the Pull too column of the upstream's own row: the upstream is always pulled
 pull_upstream = "upstream"
 # context: state cell: the remote's copy and the local branch are the same commit
-state_in_sync = "in sync"
+state_in_sync = "i synk"
 # context: state cell: the remote has no copy of the branch yet
-state_new = "new"
+state_new = "ny"
 # context: state cell: the remote's copy shares no history with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "orelaterad"
 # context: state cell of a remote that is not used by the branch
 state_none = "-"
 # context: row of a remote the branch still mentions but the repository no longer has
-gone = "remote gone"
+gone = "remote saknas"
 # context: button on a gone row: forget that remote for this branch
-remove_button = "Remove"
+remove_button = "Ta bort"
 # context: warning under the table; {first} and {second} are two remote names with the same address
-same_url = "{first} and {second} {$push} to the same URL."
+same_url = "{first} och {second} {$push}ar till samma URL."
 # context: button: changes the branch name used on the selected remote
-rename_button = "Rename on remote..."
+rename_button = "Byt namn på remote..."
 # context: button: the branch tracks no upstream any more
-unset_button = "Unset upstream"
+unset_button = "Ta bort upstream"
 # context: primary button of the dialog
-apply_button = "Apply"
+apply_button = "Verkställ"
 # context: shown while the dialog reads the branch's remotes
-loading = "Reading the remotes..."
+loading = "Läser remotes..."
 # context: title of the small dialog that asks for the branch's name on one remote; {remote} is the remote
-rename_title = "Branch name on {remote}"
+rename_title = "Grenens namn på {remote}"
 # context: placeholder of that dialog's field
-rename_placeholder = "Branch name on the remote"
+rename_placeholder = "Grenens namn på remoten"
 # context: primary button of that dialog
-rename_set = "Set"
+rename_set = "Ange"
 # context: inline error of that dialog when the field is empty
-rename_empty = "Type a branch name."
+rename_empty = "Skriv ett grennamn."
 # context: inline error when Rename is used on the upstream's own row
-rename_upstream_row = "The upstream's branch name is chosen in the list above."
+rename_upstream_row = "Upstream-grenens namn väljs i listan ovan."
 # context: inline error when Rename is used with nothing to rename
-rename_no_row = "Select a remote's row first."
+rename_no_row = "Markera först en remotes rad."
 # context: key hints under the table; keep the key names (Space, p, r, Del, Enter)
-keys_hint = "Space {$Push}, p {$Pull} too, r Rename, Del Remove, Enter Apply"
+keys_hint = "Blanksteg {$Push}, p {$Pull} också, r Byt namn, Del Ta bort, Enter Verkställ"
 # context: status line while the change is sent; {branch} is the local branch
-applying = "setting the remotes of {branch}..."
+applying = "ställer in remotes för {branch}..."
 # context: status line once the daemon applied the change; {branch} is the local branch
-remotes_set = "remotes of {branch} updated"
+remotes_set = "remotes för {branch} uppdaterade"
 
 [push_group]
 # context: title of the dialog that asks which remotes to push a branch to (one push only); {branch} is the local branch
-title_select = "{$Push} {branch} to selected remotes"
+title_select = "{$Push} {branch} till valda remotes"
 # context: title of the dialog that shows how a branch stands against each remote before a grouped push; {n} is the number of remotes, {branch} the local branch
-title_plan = { one = "{$Push} {branch} to {n} remote", other = "{$Push} {branch} to {n} remotes" }
+title_plan = { one = "{$Push} {branch} till {n} remote", other = "{$Push} {branch} till {n} remotes" }
 # context: title of the dialog while a grouped push runs or after it ended; {branch} is the local branch
 title_run = "{$Push} {branch}"
 # context: line under the title; {branch} is the local branch, {sha} the short id of its tip
-local_at = "Local {branch} at {sha}"
+local_at = "Lokal {branch} vid {sha}"
 # context: help line over the list of remotes to push to
-select_hint = "Pick the remotes this {$push} goes to. Nothing is saved unless you tick Remember."
+select_hint = "Välj de remotes den här {$push}en går till. Inget sparas om du inte kryssar i Kom ihåg."
 # context: checkbox: store the picked remotes as the branch's push targets
-remember = "Remember for this branch"
+remember = "Kom ihåg för den här grenen"
 # context: shown under the list when no remote is ticked
-select_none = "Tick at least one remote."
+select_none = "Kryssa i minst en remote."
 # context: shown while the daemon asks the remotes about the branch
-loading = "Asking the remotes..."
+loading = "Frågar remotes..."
 # context: table heading: the remote's name
 col_remote = "Remote"
 # context: table heading: how the local branch stands against the remote
-col_state = "State"
+col_state = "Läge"
 # context: table heading: what the run does with that remote
-col_action = "Action"
+col_action = "Åtgärd"
 # context: state of a remote that already has the same commit
-state_up_to_date = "up to date"
+state_up_to_date = "aktuell"
 # context: state of a remote that only misses local commits
-state_ready = "ready"
+state_ready = "redo"
 # context: state of a remote that has no copy of the branch yet
-state_new = "new"
+state_new = "ny"
 # context: state of a remote that has commits the local branch lacks
-state_behind = "behind"
+state_behind = "efter"
 # context: state of a remote whose history and the local branch's both moved
-state_diverged = "diverged"
+state_diverged = "divergerad"
 # context: state of a remote whose commits are older copies of rebased or amended local commits
-state_rewritten = "rewritten"
+state_rewritten = "omskriven"
 # context: state of a remote whose history shares nothing with the local branch
-state_unrelated = "unrelated"
+state_unrelated = "orelaterad"
 # context: state of a remote whose host refused the branch earlier (protected branch)
-state_refused = "refused"
+state_refused = "nekad"
 # context: state of a remote that could not be asked
-state_unreachable = "not reachable"
+state_unreachable = "onåbar"
 # context: state of a remote that is no longer configured
-state_missing = "gone"
+state_missing = "saknas"
 # context: note on a remote that points at the same repository as an earlier row; {other} is that earlier remote
-same_as = "same repository as {other}"
+same_as = "samma repository som {other}"
 # context: action: send the local commits to the remote
 action_push = "{$Push}"
 # context: action: move the local branch forward to the remote's commit; {remote} is the remote
-action_fast_forward = "Fast-forward from {remote}"
+action_fast_forward = "Fast-forward från {remote}"
 # context: action: combine the remote's commits into the local branch, then send; {remote} is the remote
-action_merge = "{$Merge} from {remote}"
+action_merge = "{$Merge} från {remote}"
 # context: action: replay the local commits on top of the remote's, then send; {remote} is the remote
-action_rebase = "{$Rebase} onto {remote}"
+action_rebase = "{$Rebase} på {remote}"
 # context: action: overwrite the remote's branch, refused if it moved since the plan
 action_force = "Force {$push} (lease)"
 # context: action: leave this remote out
-action_skip = "Skip"
+action_skip = "Hoppa över"
 # context: line under a row whose merge would conflict; {n} is the number of files, {files} their names
-conflicts = { one = "{$merge} would conflict in {n} file: {files}", other = "{$merge} would conflict in {n} files: {files}" }
+conflicts = { one = "{$merge} skulle ge konflikt i {n} fil: {files}", other = "{$merge} skulle ge konflikt i {n} filer: {files}" }
 # context: checkbox: also send the tags that no remote has yet
-tags = "Also {$push} the {$tags} not sent yet"
+tags = "{$Push} även de {$tags} som inte skickats än"
 # context: summary line under the table; {steps} is the list of steps
-then_line = "Then: {steps}."
+then_line = "Sedan: {steps}."
 # context: summary line when every row is skipped or already up to date
-then_nothing = "Then: nothing to do."
+then_nothing = "Sedan: inget att göra."
 # context: separator between steps in the summary line
 then_join = ", "
 # context: step of the summary line; {remote} is the remote
-step_fast_forward = "fast-forward from {remote}"
+step_fast_forward = "fast-forward från {remote}"
 # context: step of the summary line; {remote} is the remote
 step_merge = "{$merge} {remote}"
 # context: step of the summary line; {remote} is the remote
-step_rebase = "{$rebase} onto {remote}"
+step_rebase = "{$rebase} på {remote}"
 # context: step of the summary line; {n} is the number of remotes
-step_push = { one = "{$push} to {n} remote", other = "{$push} to {n} remotes" }
+step_push = { one = "{$push} till {n} remote", other = "{$push} till {n} remotes" }
 # context: warning under the summary when a row force-pushes; {n} is the number of commits that disappear, {remote} the remote
-force_note = { one = "Force {$push} replaces {n} {$commit} on {remote}.", other = "Force {$push} replaces {n} {$commits} on {remote}." }
+force_note = { one = "Force {$push} ersätter {n} {$commit} på {remote}.", other = "Force {$push} ersätter {n} {$commits} på {remote}." }
 # context: warning under the summary when rows rebase while other remotes already hold the local commits; {remotes} are those remotes
-rebase_warn = "A {$rebase} rewrites the local {$commits}: {remotes} will then need a force {$push}."
+rebase_warn = "En {$rebase} skriver om de lokala {$commits}: {remotes} behöver då en force {$push}."
 # context: confirmation question before a force push; {n} is the number of remote commits replaced, {branch} the branch, {remotes} the remote names
-force_confirm = { one = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commit} on the remote is replaced. Not undoable.", other = "Force {$push} {branch} to {remotes}?\nWith lease: {n} {$commits} on the remotes are replaced. Not undoable." }
+force_confirm = { one = "Force {$push} {branch} till {remotes}?\nMed lease: {n} {$commit} på remoten ersätts. Går inte att ångra.", other = "Force {$push} {branch} till {remotes}?\nMed lease: {n} {$commits} på remotes ersätts. Går inte att ångra." }
 # context: button: ask the remotes again
-btn_fetch_again = "{$Fetch} again"
+btn_fetch_again = "{$Fetch} igen"
 # context: button: set every row that has a problem to Skip
-btn_skip_problems = "Skip problems"
+btn_skip_problems = "Hoppa över problem"
 # context: button: close the dialog without running
-btn_cancel = "Cancel"
+btn_cancel = "Avbryt"
 # context: button: run the grouped push
-btn_run = "Run"
+btn_run = "Kör"
 # context: button: go to the next step
-btn_next = "Next"
+btn_next = "Nästa"
 # context: button: close the dialog (the run goes on)
-btn_close = "Close"
+btn_close = "Stäng"
 # context: button: try the failed remotes again
-btn_retry = "Retry failed"
+btn_retry = "Försök igen"
 # context: progress row: the remote took the commits
-run_pushed = "sent"
+run_pushed = "skickad"
 # context: progress row: the remote got a new branch
-run_created = "created"
+run_created = "skapad"
 # context: progress row: nothing to send
-run_up_to_date = "up to date"
+run_up_to_date = "aktuell"
 # context: progress row: the local branch moved forward
-run_fast_forwarded = "fast-forwarded"
+run_fast_forwarded = "fast-forwardad"
 # context: progress row: the remote's commits were combined into the local branch with a new commit
-run_merged = "combined"
+run_merged = "sammanfogad"
 # context: progress row: the local commits were replayed on the remote's
-run_rebased = "replayed"
+run_rebased = "återspelad"
 # context: progress row: the remote's commits were taken in
-run_integrated = "taken in"
+run_integrated = "inhämtad"
 # context: progress row: left out
-run_skipped = "skipped"
+run_skipped = "överhoppad"
 # context: progress row: the remote's commits are being combined with the local branch
-run_merging = "combining"
+run_merging = "sammanfogar"
 # context: progress row: sending in progress
-run_pushing = "sending"
+run_pushing = "skickar"
 # context: progress row: not started yet
-run_waiting = "waiting"
+run_waiting = "väntar"
 # context: progress row: failed; {why} is the reason
-run_failed = "failed: {why}"
+run_failed = "misslyckades: {why}"
 # context: progress row: the remote refused; {why} is the reason
-run_rejected = "refused: {why}"
+run_rejected = "nekad: {why}"
 # context: progress row: the run was canceled while this remote was in flight
-run_unknown = "unknown (canceled)"
+run_unknown = "okänd (avbruten)"
 # context: progress row: the remote is not configured
-run_missing = "remote missing"
+run_missing = "remote saknas"
 # context: line under the progress rows while the run is going
-run_going = "Closing this window does not stop the run."
+run_going = "Att stänga det här fönstret stoppar inte körningen."
 # context: line under the progress rows when the run ended well
-run_done = "Done."
+run_done = "Klart."
 # context: line under the progress rows when some remotes failed
-run_problems = "Some remotes failed. Retry them, or close."
+run_problems = "Några remotes misslyckades. Försök igen eller stäng."
 # context: key hints of the selection step
-hint_select = "Up/Down move  Space tick  m remember  Enter next  Esc close"
+hint_select = "Upp/Ned flytta  Blanksteg kryssa  m kom ihåg  Enter nästa  Esc stäng"
 # context: key hints of the plan step
-hint_plan = "Up/Down row  Left/Right action  Enter list  s skip  t {$tags}  f again  Ctrl+Enter run  Esc close"
+hint_plan = "Upp/Ned rad  Vänster/Höger åtgärd  Enter lista  s hoppa över  t {$tags}  f igen  Ctrl+Enter kör  Esc stäng"
 # context: key hints of the progress step
-hint_run = "Esc close  r retry failed"
+hint_run = "Esc stäng  r försök igen"
 # context: text of the strip over the Log while a grouped push waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting = "Grouped {$push} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting = "Gruppens {$push} pausad ({remote}): lös och avsluta, sedan Fortsätt."
 # context: text of the strip when the conflicts are resolved and the run can go on; {remote} is that remote
-strip_ready = "Grouped {$push} paused ({remote}): resolved. Continue to {$push}."
+strip_ready = "Gruppens {$push} pausad ({remote}): löst. Fortsätt till {$push}."
 # context: strip button: go on with the grouped push
-strip_continue = "Continue"
+strip_continue = "Fortsätt"
 # context: strip button: abort the merge or rebase of the grouped push and drop it
-strip_abort = "Abort group"
+strip_abort = "Avbryt gruppen"
 # context: status line after the grouped push was aborted
-aborted = "Grouped {$push} aborted."
+aborted = "Gruppens {$push} avbröts."
 # context: status line while a grouped push runs
-running = "Grouped {$push}..."
+running = "Gruppens {$push}..."
 # context: question before aborting a paused grouped push; {branch} is the local branch, {remote} the remote whose merge or rebase stopped
-abort_confirm = "Abort the grouped {$push} of {branch} (stopped on {remote})?\nThe {$merge} or {$rebase} in progress is thrown away. What was already sent stays."
+abort_confirm = "Avbryta gruppens {$push} av {branch} (stannade på {remote})?\nPågående {$merge} eller {$rebase} kastas. Det som redan skickats finns kvar."
 # context: title of the dialog that shows how a branch stands against each remote before a grouped pull; {n} is the number of remotes, {branch} the local branch
-title_pull_plan = { one = "{$Pull} {branch} from {n} remote", other = "{$Pull} {branch} from {n} remotes" }
+title_pull_plan = { one = "{$Pull} {branch} från {n} remote", other = "{$Pull} {branch} från {n} remotes" }
 # context: text of the strip over the Log while a grouped pull waits for the conflicts of a remote to be resolved; {remote} is that remote
-strip_waiting_pull = "Grouped {$pull} paused ({remote}): resolve and conclude, then Continue."
+strip_waiting_pull = "Gruppens {$pull} pausad ({remote}): lös och avsluta, sedan Fortsätt."
 # context: text of the strip when the conflicts are resolved and the grouped pull can go on; {remote} is that remote
-strip_ready_pull = "Grouped {$pull} paused ({remote}): resolved. Continue to {$pull}."
+strip_ready_pull = "Gruppens {$pull} pausad ({remote}): löst. Fortsätt till {$pull}."
 [multi_remote]
-state_new = "new"
-state_gone = "gone"
-state_unrelated = "unrelated"
-tip_title = "Remotes of {branch}"
-tip_in_sync = "{remote}: in sync"
-tip_ahead = "{remote}: {n} ahead"
-tip_behind = "{remote}: {n} behind"
-tip_diverged = "{remote}: diverged ({ahead} ahead, {behind} behind)"
-tip_new = "{remote}: no copy of this branch yet"
-tip_unrelated = "{remote}: no common history"
-tip_gone = "{remote}: no longer configured"
-tip_open_hint = "Click to edit the remotes of this branch"
+state_new = "ny"
+state_gone = "saknas"
+state_unrelated = "orelaterad"
+tip_title = "Remotes för {branch}"
+tip_in_sync = "{remote}: i synk"
+tip_ahead = "{remote}: {n} före"
+tip_behind = "{remote}: {n} efter"
+tip_diverged = "{remote}: divergerad ({ahead} före, {behind} efter)"
+tip_new = "{remote}: ingen kopia av den här grenen än"
+tip_unrelated = "{remote}: ingen gemensam historik"
+tip_gone = "{remote}: inte längre konfigurerad"
+tip_open_hint = "Klicka för att redigera den här grenens remotes"

@@ -70,6 +70,8 @@ je ze nodig hebt.
     Wat er door tmux, zellij, screen, herdr en terminalpanes heen komt:
     **[Multiplexers](multiplexers.md)**.
 
+Ook: **[Worktrees](worktrees.md)**: gekoppelde worktrees maken, openen, mergen en verwijderen.
+
 Ook: **[Meerdere remotes voor één branch](multiple-remotes.md)**: push-doelen en pull-bronnen,
 het dialoogvenster Remotes, Push naar alle of geselecteerde remotes, een remote oplossen die is
 doorgegaan, Doorgaan na een conflict, de CLI en een plain-git-alias.

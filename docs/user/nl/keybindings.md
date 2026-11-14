@@ -490,7 +490,7 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Linkerpaneel: Lokale branches tonen of verbergen |  |
 | Linkerpaneel: Remotes tonen of verbergen |  |
 | Linkerpaneel: Worktrees tonen of verbergen |  |
-| Sidebar: Show Worktrees Section |  |
+| Linkerpaneel: Worktrees-sectie tonen |  |
 | Linkerpaneel: Stashes tonen of verbergen |  |
 | Linkerpaneel: Tags tonen of verbergen |  |
 | Linkerpaneel: Pull requests tonen of verbergen |  |
@@ -534,12 +534,12 @@ toepassing zijn. Toetsen zijn de standaardwaarden.
 | Refs: Reflog van de geselecteerde branch... |  |
 | Refs: Pull request starten vanaf geselecteerde branch... |  |
 | Refs: Worktree openen in tabblad | `Enter / dubbelklik` |
-| Refs: Open Worktree In... |  |
-| Refs: Merge Worktree Branch Into... |  |
-| Refs: Remove Worktree... |  |
-| Refs: Create Worktree... | `+` |
-| Refs: Create Worktree from Current Branch |  |
-| Refs: Create Worktree Choosing a Branch |  |
+| Refs: Worktree openen in... |  |
+| Refs: Worktree-branch mergen in... |  |
+| Refs: Worktree verwijderen... |  |
+| Refs: Worktree maken... | `+` |
+| Refs: Worktree maken van huidige branch |  |
+| Refs: Worktree maken met een gekozen branch |  |
 | Refs: Submodule bijwerken (geselecteerd) |  |
 | Refs: Submodule initialiseren (geselecteerd) |  |
 | Refs: Submodule openen in tabblad | `Enter / dubbelklik` |

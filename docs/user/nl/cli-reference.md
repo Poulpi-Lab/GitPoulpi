@@ -153,6 +153,8 @@ Hunks en regels worden genummerd zoals `gitpoulpi --json diff` ze nummert.
 | `tag fetch <name> [--remote R]` | Haalt één tag van een remote op (standaard de remote die hem heeft), bijvoorbeeld een tag met `where: remote`. Overschrijft nooit een lokale tag op een andere commit. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags op een remote (geen namen: elke tag die geen remote heeft). Een tag op een remote verwijderen kan ongedaan worden gemaakt (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Gekoppelde worktrees. |
+| `worktree changes <path>` | De niet-gecommitte wijzigingen van een worktree (`path`, `untracked`); leeg als hij schoon is. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Verwijdert een gekoppelde worktree. Eén met niet-gecommitte wijzigingen wordt geweigerd, tenzij `--force` (de wijzigingen gaan verloren), `--commit-message` (eerst committen op zijn branch) of `--stash-message` (eerst in een stash zetten, ook niet-gevolgde bestanden). `--delete-branch` verwijdert ook zijn branch (gejournaald). De verwijdering zelf kan niet ongedaan worden gemaakt. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submodules ([Submodules](submodules.md)). |
 
 `--autostash` zet lokale wijzigingen die de bewerking blokkeren in een stash, voert haar uit en

@@ -1,3 +1,5 @@
+**English** · [Čeština](cs/worktrees.md) · [Deutsch](de/worktrees.md) · [Español](es/worktrees.md) · [Français](fr/worktrees.md) · [Italiano](it/worktrees.md) · [日本語](ja/worktrees.md) · [한국어](ko/worktrees.md) · [Nederlands](nl/worktrees.md) · [Polski](pl/worktrees.md) · [Português (Brasil)](pt-BR/worktrees.md) · [Português (Portugal)](pt-PT/worktrees.md) · [Русский](ru/worktrees.md) · [Svenska](sv/worktrees.md) · [Türkçe](tr/worktrees.md) · [Українська](uk/worktrees.md) · [简体中文](zh-CN/worktrees.md)
+
 # Worktrees
 
 A worktree is a second checked-out copy of the repository: another folder, on
@@ -34,14 +36,14 @@ The dialog proposes everything and lets you change it:
 
 | Field | Meaning |
 |---|---|
-| **Name** | What the folder is named after. Proposed from the branch or the short id. |
+| **Name** | The folder name is built from it. Proposed from the branch or the short id. |
 | **Folder** | A sibling of the repository, `<repository>-<name>`. It follows the Name until you type in the Folder; **Browse** chooses where. |
 | **Ref** | The branch or commit the worktree starts from (a list; type to search). Changing it proposes a new Name. |
 | **New branch** | Empty checks the Ref's branch out there (or detaches on a commit). Required when the branch is checked out already. |
 | **Open the new worktree as a tab** | On by default. |
 
-A folder that is not empty, an invalid name, a branch that exists already are
-said on the dialog's own line, and **Create** stays grayed.
+A folder that is not empty, an invalid name or a branch that already exists is
+reported on the dialog's own line, and **Create** stays grayed.
 
 ## The row's menu
 

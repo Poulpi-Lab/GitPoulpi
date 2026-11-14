@@ -106,7 +106,7 @@ de zijbalk, of zijn pil in de Log) voor zijn menu. De nuttigste items:
 | Merge, Rebase op | Merge deze ref in de uitgecheckte branch, of rebase de uitgecheckte branch op deze ref |
 | Fast-forward `<branch>` naar `<current>` / `<current>` naar `<branch>` | Verplaatst een branch vooruit als dat een fast-forward is; anders grijs met de reden (`uiteengelopen, geen fast-forward`) |
 | Worktree maken van... | Opent een gekoppelde worktree in een eigen tabblad |
-| Pull, Push, Fetch, Upstream instellen... | Netwerkbewerkingen op die branch |
+| Pull, Push, Fetch, Remotes van <branch>... | Netwerkbewerkingen op die branch (Remotes van <branch>... stelt de upstream in, plus per remote een vakje Push en Ook Pull) |
 | In grafiek verbergen / tonen, Solo | Alleen weergave; verbergen of soloën van een ref (verbergen laat ook de commits vallen die alleen die ref bereikt) raakt de repository niet aan |
 | Hernoemen, Verwijderen | Verwijderen vraagt eerst bevestiging; de bijbehorende remote branch kan ook worden verwijderd |
 | Branchnaam kopiëren, Link naar branch op remote kopiëren | Naar het klembord |

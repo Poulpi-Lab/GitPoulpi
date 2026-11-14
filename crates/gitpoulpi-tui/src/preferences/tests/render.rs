@@ -433,7 +433,7 @@ fn the_title_line_wears_the_octopus_and_the_app_name_at_80_and_160_columns() {
         let top: String = (0..width).map(|x| buffer[(x, 0)].symbol()).collect();
         let logo = state.logo_rect.expect("the octopus is drawn");
         assert_eq!((logo.x, logo.y), (1, 0), "{top}");
-        assert_eq!(buffer[(1, 0)].symbol(), "\u{1F419}", "{top}");
+        assert_eq!(buffer[(2, 0)].symbol(), "\u{1F419}", "{top}");
         insta::assert_snapshot!(
             format!("settings_title_line_{width}"),
             top.trim_end_matches(['\u{2500}', ' '])

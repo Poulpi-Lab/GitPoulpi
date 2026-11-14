@@ -3,7 +3,7 @@ source: crates/gitpoulpi-tui/src/theme/snapshot_tests.rs
 expression: "dump(&theme, &buf)"
 ---
 00 |          ↶ Undo ▾   ↷ Redo   ⇩ Pull ▾   ⇧ Push ▾   ⎇ Branch   🔖  Tag   📥  Stash   📤  Pop   ▣ LFS ▾   ⌕ Search|
-01 |╭🐙  GitPoulpi - Settings - Tab: sections/settings │ E… ── ✕ ─╮ Graph  Message                  Author   Date|
+01 |╭ 🐙  GitPoulpi - Settings - Tab: sections/settings │… ─── ✕ ─╮ Graph  Message                  Author   Date|
 02 |│ Search settings...        │ Appearance - global            │ ●  commit 1            a   2d ago|
 03 |│                           │                                │ ○  commit 2            a   2d ago|
 04 |│Current profile            │ Theme                         ↑│ ○  commit 3            a   2d ago|
@@ -65,9 +65,9 @@ expression: "dump(&theme, &buf)"
 00 101-101 -/graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg
 00 102-110 ui.disabled+ui.on_button+scrollbar.marks_cursor+minimap.ink+toolbar.search+chrome.toolbar_fg+chrome.toolbar_disabled_fg/graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg
 01 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
-01 001-001 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
-01 003-003 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
-01 054-056 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
+01 001-002 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
+01 004-004 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
+01 053-056 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
 01 057-059 graph.wip+graph.stash+ui.muted+ui.hover+ui.button+ui.border+ui.input_hover+ui.input_focus+scrollbar.thumb+minimap.view+diff.gutter_fg+diff.range_bg+merge.base+merge.base_pick+chrome.toolbar_arrow_bg+chrome.disabled_button_bg+chrome.toolbar_bg/-
 01 060-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+scrollbar.marks_conflict_current+diff.hunk_fg+merge.ours+toolbar.pull+chrome.action_edit+chrome.action_reset/-
 01 063-107 -/- BOLD

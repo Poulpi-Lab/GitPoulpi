@@ -3,7 +3,7 @@ source: crates/gitpoulpi-tui/src/theme/snapshot_tests.rs
 expression: "dump(&theme, &buf)"
 ---
 00 |          ↶ Undo ▾   ↷ Redo   ⇩ Pull ▾   ⇧ Push ▾   ⎇ Branch   🔖  Tag   📥  Stash   📤  Pop   ▣ LFS ▾   ⌕ Search|
-01 |╭🐙  GitPoulpi - Settings - Tab: sections/settings │ E… ── ✕ ─╮ Graph  Message                  Author   Date|
+01 |╭ 🐙  GitPoulpi - Settings - Tab: sections/settings │… ─── ✕ ─╮ Graph  Message                  Author   Date|
 02 |│ Search settings...        │ Appearance - global            │ ●  commit 1            a   2d ago|
 03 |│                           │                                │ ○  commit 2            a   2d ago|
 04 |│Current profile            │ Theme                         ↑│ ○  commit 3            a   2d ago|
@@ -80,10 +80,10 @@ expression: "dump(&theme, &buf)"
 00 103-110 merge.text+editor.text+chrome.toolbar_fg/chrome.toolbar_bg
 00 111-119 -/ui.bg+ui.blend_bg
 01 000-000 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+merge.ours+chrome.action_edit+chrome.action_reset/-
-01 001-001 graph.wip+graph.stash+ui.muted+chrome.toolbar_disabled_fg/-
-01 003-003 graph.wip+graph.stash+ui.muted+chrome.toolbar_disabled_fg/-
-01 004-053 ui.statusbar_fg+ui.text+ui.header_fg/-
-01 054-056 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+merge.ours+chrome.action_edit+chrome.action_reset/-
+01 001-002 graph.wip+graph.stash+ui.muted+chrome.toolbar_disabled_fg/-
+01 004-004 graph.wip+graph.stash+ui.muted+chrome.toolbar_disabled_fg/-
+01 005-052 ui.statusbar_fg+ui.text+ui.header_fg/-
+01 053-056 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+merge.ours+chrome.action_edit+chrome.action_reset/-
 01 057-059 graph.wip+graph.stash+ui.muted+chrome.toolbar_disabled_fg/-
 01 060-061 ui.accent+ui.border_focused+ui.text_selection_bg+status.info+refs.remote+scrollbar.thumb_hover+merge.ours+chrome.action_edit+chrome.action_reset/-
 01 062-062 -/ui.bg+ui.blend_bg

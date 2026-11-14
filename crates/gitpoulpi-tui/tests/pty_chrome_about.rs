@@ -135,7 +135,7 @@ fn with_an_image_protocol_the_octopus_is_a_picture_that_still_opens_about() {
     );
     let (title_col, row) = screen.find("GitPoulpi").expect("the title");
     assert_eq!(row, 0);
-    assert_eq!(title_col, 4, "the title does not move: {}", term.text());
+    assert_eq!(title_col, 5, "the title does not move: {}", term.text());
     term.click(1, 0).unwrap();
     term.wait_for_text("License: MIT", STEP)
         .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));

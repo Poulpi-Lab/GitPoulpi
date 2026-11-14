@@ -26,9 +26,9 @@ impl PreferencesState {
         frame.render_widget(Clear, area);
         // The title line wears the main window's: the octopus (a picture
         // where the terminal draws one), then the app's name, here before the
-        // screen's own title. Three columns are left for the octopus.
-        let title = format!("   GitPoulpi - {}", screen::TITLE.get());
-        let title = crate::ui_kit::fit(&title, usize::from(area.width.saturating_sub(9)));
+        // screen's own title. Four columns are left for the octopus button.
+        let title = format!("    GitPoulpi - {}", screen::TITLE.get());
+        let title = crate::ui_kit::fit(&title, usize::from(area.width.saturating_sub(10)));
         let mut block = Block::default()
             .title(Line::from(vec![
                 Span::styled(title, Style::default().fg(th().ui.text)),
@@ -53,7 +53,7 @@ impl PreferencesState {
         self.logo_rect = None;
         if area.width >= 16 {
             let hovered = self.mouse_pos.is_some_and(|(col, row)| {
-                Rect::new(area.x + 1, area.y, 3, 1).contains((col, row).into())
+                Rect::new(area.x + 1, area.y, 4, 1).contains((col, row).into())
             });
             let mut hits = Vec::new();
             crate::chrome::render_about_button(frame, area.x + 1, area.y, hovered, &mut hits);

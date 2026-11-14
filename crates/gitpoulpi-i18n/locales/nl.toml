@@ -423,8 +423,8 @@ list_title = "Profielen"
 duplicate_name = "{name} (kopie)"
 
 [settings_open_in]
-worktree = "Can open a worktree"
-worktree_help = "Offer this entry in the Open in menu of a worktree (right-click a row of the WORKTREES section). It runs with the worktree's folder as ${{cwd}}. Every entry is checked by default: untick the ones that make no sense on a folder."
+worktree = "Kan een worktree openen"
+worktree_help = "Toon dit item in het menu Openen in van een worktree (rechtsklik op een rij van de sectie WORKTREES). Het draait met de map van de worktree als ${{cwd}}. Standaard is elk item aangevinkt: vink de items uit die voor een map geen zin hebben."
 list_title = "Items"
 section_title = "Openen in"
 default_entry = "Standaarditem"
@@ -1227,19 +1227,19 @@ bad_branch = "{name} is geen geldige branchnaam"
 
 [worktree]
 # context: field label: the name of the new worktree, the folder name is built from it
-name = "Name"
+name = "Naam"
 # context: placeholder
-name_hint = "the folder is named after it"
-need_name = "give the worktree a name"
-bad_name = "the name cannot contain slashes (the Folder field takes a path)"
+name_hint = "de map is ernaar genoemd"
+need_name = "geef de worktree een naam"
+bad_name = "de naam mag geen schuine strepen bevatten (het veld Map neemt een pad)"
 # context: field label: the branch or commit the worktree starts from
 ref_field = "Ref"
 # context: placeholder
-ref_hint = "choose a branch"
+ref_hint = "kies een branch"
 # context: combobox entry: the commit the dialog was opened on; {label} what the user clicked (a tag, a remote branch, a short id), {id} the short id
 commit_choice = { git = "commit {label} ({id})", local = "commit {label} ({id})" }
-branch_exists = "the branch {b} already exists: pick it in Ref or choose another name"
-is_a_file = "{path} is a file, not a folder"
+branch_exists = "de branch {b} bestaat al: kies hem bij Ref of kies een andere naam"
+is_a_file = "{path} is een bestand, geen map"
 title = { git = "Worktree maken van {label}", local = "Worktree maken van {label}" }
 folder = "Map"
 folder_hint = "een nieuwe of lege map"
@@ -2934,14 +2934,14 @@ env_timeout = "Eigen time-out van de agent per verzoek (ms)"
 env_offline = "Geen netwerkaanroepen bij het starten"
 
 [palette]
-sidebar_show_worktrees = "Sidebar: Show Worktrees Section"
-refs_open_worktree_in = "Refs: Open Worktree In..."
-refs_merge_worktree_branch_into = { git = "Refs: Merge Worktree Branch Into...", local = "Refs: Merge Worktree Branch Into..." }
-refs_remove_worktree = { git = "Refs: Remove Worktree...", local = "Refs: Remove Worktree..." }
+sidebar_show_worktrees = "Linkerpaneel: Worktrees-sectie tonen"
+refs_open_worktree_in = "Refs: Worktree openen in..."
+refs_merge_worktree_branch_into = { git = "Refs: Worktree-branch mergen in...", local = "Refs: Worktree-branch samenvoegen in..." }
+refs_remove_worktree = { git = "Refs: Worktree verwijderen...", local = "Refs: Worktree verwijderen..." }
 # context: opens the + menu of the WORKTREES section
-refs_create_worktree = { git = "Refs: Create Worktree...", local = "Refs: Create Worktree..." }
-refs_create_worktree_from_current_branch = { git = "Refs: Create Worktree from Current Branch", local = "Refs: Create Worktree from Current Branch" }
-refs_create_worktree_choosing_a_branch = { git = "Refs: Create Worktree Choosing a Branch", local = "Refs: Create Worktree Choosing a Branch" }
+refs_create_worktree = { git = "Refs: Worktree maken...", local = "Refs: Worktree maken..." }
+refs_create_worktree_from_current_branch = { git = "Refs: Worktree maken van huidige branch", local = "Refs: Worktree maken van huidige branch" }
+refs_create_worktree_choosing_a_branch = { git = "Refs: Worktree maken met een gekozen branch", local = "Refs: Worktree maken met een gekozen branch" }
 # context: palette command; shows or hides the commit list column left of the diff, File View, Blame and Editor
 view_toggle_commit_column = "Weergave: {$commit}-kolom tonen of verbergen"
 view_column_off = "Weergave: {$commit}-kolom: verbergen"
@@ -4998,11 +4998,11 @@ desc_rebasing_step = { git = "{branch} rebasen op {onto} · stap {k}/{n}", local
 
 [link]
 # context: {path} is the folder of the removed worktree
-worktree_removed = "removed worktree {path}"
-worktree_removed_branch_deleted = "removed worktree {path} and deleted branch {branch} (Undo brings the branch back)"
-worktree_removed_branch_kept = "removed worktree {path}; branch {branch} was kept: {why}"
-worktree_stashed = { git = "changes stashed", local = "changes stashed" }
-worktree_committed = { git = "changes committed as {id}", local = "changes committed as {id}" }
+worktree_removed = "worktree {path} verwijderd"
+worktree_removed_branch_deleted = "worktree {path} en branch {branch} verwijderd (Ongedaan maken brengt de branch terug)"
+worktree_removed_branch_kept = "worktree {path} verwijderd; branch {branch} is behouden: {why}"
+worktree_stashed = { git = "wijzigingen in een {$stash} gezet", local = "wijzigingen in een {$stash} gezet" }
+worktree_committed = { git = "wijzigingen gecommit als {id}", local = "wijzigingen gecommit als {id}" }
 amend_done = "{id} gewijzigd, nu {now} (vorige top {previous}: Ongedaan maken zet hem terug)"
 act_staging_file = "{name} stagen..."
 act_unstaging_file = "{name} unstagen..."
@@ -9765,89 +9765,89 @@ tip_open_hint = "Klik om de remotes van deze branch te bewerken"
 
 [worktree_manage]
 # context: hover label of the + on the WORKTREES header
-plus_tip = { git = "Create worktree", local = "Create worktree" }
+plus_tip = { git = "Worktree maken", local = "Worktree maken" }
 # context: title of the menu the + opens
-plus_title = { git = "New worktree", local = "New worktree" }
+plus_title = { git = "Nieuwe worktree", local = "Nieuwe worktree" }
 # context: menu row: create a worktree
-plus_head = "From the current branch"
+plus_head = "Van de huidige branch"
 # context: menu row: create a worktree
-plus_commit = "From the selected commit"
+plus_commit = "Van de geselecteerde commit"
 # context: menu row: create a worktree on a branch picked in the dialog
-plus_choose = "Choose a branch..."
-select_a_commit = { git = "Select a commit in the Log first", local = "Select a commit in the Log first" }
-select_a_worktree = { git = "Select a worktree in the Refs pane first", local = "Select a worktree in the Refs pane first" }
-main_cannot_be_removed = { git = "The main worktree cannot be removed", local = "The main worktree cannot be removed" }
-no_head = "This repository has no commit yet"
+plus_choose = "Een branch kiezen..."
+select_a_commit = { git = "Selecteer eerst een commit in het Log", local = "Selecteer eerst een commit in het Log" }
+select_a_worktree = { git = "Selecteer eerst een worktree in het Refs-paneel", local = "Selecteer eerst een worktree in het Refs-paneel" }
+main_cannot_be_removed = { git = "De hoofdworktree kan niet worden verwijderd", local = "De hoofdworktree kan niet worden verwijderd" }
+no_head = "Deze repository heeft nog geen commit"
 # context: hint line of the empty WORKTREES section
-empty_hint = { git = "No worktree yet: + to create one", local = "No worktree yet: + to create one" }
+empty_hint = { git = "Nog geen worktree: + om er een te maken", local = "Nog geen worktree: + om er een te maken" }
 # context: context menu row of a worktree
-menu_open_tab = "Open in a new tab"
+menu_open_tab = "Openen in een nieuw tabblad"
 # context: submenu of a worktree row: the Open in entries
-menu_open_in = "Open in"
-menu_open_in_none = "Open in (no entry yet)"
-menu_open_in_none_why = "No Open in entry is marked Can open a worktree: Settings > Open in"
-menu_merge = { git = "Merge {branch} into...", local = "Merge {branch} into..." }
-menu_remove = { git = "Remove worktree...", local = "Remove worktree..." }
-not_listed = { git = "{path} is not a worktree of this repository any more", local = "{path} is not a worktree of this repository any more" }
-removing = { git = "removing worktree {path}...", local = "removing worktree {path}..." }
-merging = { git = "merging {branch}...", local = "merging {branch}..." }
+menu_open_in = "Openen in"
+menu_open_in_none = "Openen in (nog geen item)"
+menu_open_in_none_why = "Geen item van Openen in is gemarkeerd als Kan een worktree openen: Instellingen > Openen in"
+menu_merge = { git = "{$Merge} {branch} in...", local = "{$Merge} {branch} in..." }
+menu_remove = { git = "Worktree verwijderen...", local = "Worktree verwijderen..." }
+not_listed = { git = "{path} is geen worktree van deze repository meer", local = "{path} is geen worktree van deze repository meer" }
+removing = { git = "worktree {path} verwijderen...", local = "worktree {path} verwijderen..." }
+merging = { git = "{$merge} {branch}...", local = "{$merge} {branch}..." }
 # context: dialog title; {name} is the folder name of the worktree; a worktree is a second checked-out copy of the repository
-remove_title = { git = "Remove worktree {name}", local = "Remove worktree {name}" }
+remove_title = { git = "Worktree {name} verwijderen", local = "Worktree {name} verwijderen" }
 # context: dialog title; {branch} is a branch name
-merge_title = { git = "Merge {branch} into another branch", local = "Merge {branch} into another branch" }
-loading = "Checking the worktree..."
-clean_text = "Remove {path}? Its folder is deleted. The branch {branch} stays."
-clean_text_detached = "Remove {path}? Its folder is deleted. It is on a detached HEAD, so no branch is affected."
+merge_title = { git = "{$Merge} {branch} in een andere branch", local = "{$Merge} {branch} in een andere branch" }
+loading = "De worktree controleren..."
+clean_text = "{path} verwijderen? De map wordt gewist. De branch {branch} blijft bestaan."
+clean_text_detached = "{path} verwijderen? De map wordt gewist. De HEAD is losgekoppeld, dus er is geen branch die geraakt wordt."
 # context: plural: {n} changes of the worktree at {path}
-dirty_count = { one = "{n} uncommitted change in {path}", other = "{n} uncommitted changes in {path}" }
+dirty_count = { one = "{n} niet-gecommitte wijziging in {path}", other = "{n} niet-gecommitte wijzigingen in {path}" }
 # context: plural: {n} changes that would be lost
-force_text = { one = "Remove {path} and discard its {n} uncommitted change? This cannot be undone.", other = "Remove {path} and discard its {n} uncommitted changes? This cannot be undone." }
+force_text = { one = "{path} verwijderen en de {n} niet-gecommitte wijziging weggooien? Dit kan niet ongedaan worden gemaakt.", other = "{path} verwijderen en de {n} niet-gecommitte wijzigingen weggooien? Dit kan niet ongedaan worden gemaakt." }
 # context: field label
-commit_field = "Commit message"
+commit_field = "{$Commit}-bericht"
 # context: placeholder
-commit_hint = "describe the changes"
+commit_hint = "beschrijf de wijzigingen"
 # context: field label
-stash_field = "Stash message"
-stash_note = "The stash is shared with the main repository: pop it there later."
+stash_field = "{$Stash}-bericht"
+stash_note = "De {$stash} wordt gedeeld met de hoofdrepository: gebruik hem daar later."
 # context: field label: the branch to create for the commit
 branch_field = "Branch"
 # context: placeholder
-branch_hint = "HEAD is detached: name a branch for the commit"
-need_message = "write a commit message"
-need_branch = "name a branch for the commit (HEAD is detached)"
-delete_branch = "Also delete branch {branch} (merged into {into})"
-branch_not_merged = "Branch {branch} is not merged: it stays."
+branch_hint = "HEAD is losgekoppeld: geef een branch een naam voor de commit"
+need_message = "schrijf een {$commit}-bericht"
+need_branch = "geef een branch een naam voor de commit (HEAD is losgekoppeld)"
+delete_branch = { git = "Ook branch {branch} verwijderen (gemerged in {into})", local = "Ook branch {branch} verwijderen (samengevoegd in {into})" }
+branch_not_merged = { git = "Branch {branch} is niet gemerged: hij blijft bestaan.", local = "Branch {branch} is niet samengevoegd: hij blijft bestaan." }
 # context: button
-commit_remove = { git = "Commit and remove", local = "Commit and remove" }
+commit_remove = { git = "Committen en verwijderen", local = "Committen en verwijderen" }
 # context: button
-stash_remove = { git = "Stash and remove", local = "Stash and remove" }
+stash_remove = { git = "{$Stash} en verwijderen", local = "{$Stash} en verwijderen" }
 # context: button: open the worktree in a tab to commit its changes there
-open_to_commit = "Open to commit"
+open_to_commit = "Openen om te committen"
 # context: button: discards the changes
-remove_anyway = "Remove anyway"
+remove_anyway = "Toch verwijderen"
 # context: button
-remove = "Remove"
+remove = "Verwijderen"
 # context: button
-cancel = "Cancel"
+cancel = "Annuleren"
 # context: button
-back = "Back"
+back = "Terug"
 # context: button
-force_yes = "Discard changes and remove"
+force_yes = "Wijzigingen weggooien en verwijderen"
 # context: button
-merge_then_remove = { git = "Merge into... then remove", local = "Merge into... then remove" }
+merge_then_remove = { git = "{$Merge} in... en dan verwijderen", local = "{$Merge} in... en dan verwijderen" }
 # context: button
-merge_run = { git = "Merge", local = "Merge" }
+merge_run = { git = "{$Merge}", local = "{$Merge}" }
 # context: button
-merge_remove_run = { git = "Merge and remove", local = "Merge and remove" }
-merge_pick = "Merge {branch} into:"
-merge_checked_out = "{target} is checked out in {path}: the merge runs there."
-merge_not_checked_out = "{target} is not checked out in any worktree: check it out first."
-merge_gone = "the branch {branch} no longer exists"
-merge_none = "There is no other local branch to merge into."
-detached_no_merge = "a detached worktree has no branch to merge"
+merge_remove_run = { git = "{$Merge} en verwijderen", local = "{$Merge} en verwijderen" }
+merge_pick = "{$Merge} {branch} in:"
+merge_checked_out = "{target} is uitgecheckt in {path}: de {$merge} draait daar."
+merge_not_checked_out = "{target} is in geen enkele worktree uitgecheckt: check hem eerst uit."
+merge_gone = "de branch {branch} bestaat niet meer"
+merge_none = "Er is geen andere lokale branch als doel voor een {$merge}."
+detached_no_merge = "een losgekoppelde worktree heeft geen branch voor een {$merge}"
 # context: default stash message; {name} is the worktree folder
-stash_default = "WIP on {name}"
+stash_default = "WIP op {name}"
 # context: key hint
-hint_next = "next"
+hint_next = "volgende"
 # context: key hint
-hint_default = "run"
+hint_default = "uitvoeren"

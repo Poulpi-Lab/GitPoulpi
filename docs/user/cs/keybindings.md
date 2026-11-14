@@ -648,7 +648,7 @@ Klávesy jsou výchozí.
 | Git: Push | `Ctrl+G P` |
 | Git: Push do remote... |  |
 | Git: Force push (s lease)... |  |
-| Git: Nastavit upstream... |  |
+| Git: Remotes of Branch... |  |
 | Remote: Přidat remote... |  |
 | Remote: Odebrat remote... |  |
 | Remote: Upravit remote... |  |

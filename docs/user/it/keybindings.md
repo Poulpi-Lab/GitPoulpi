@@ -652,7 +652,7 @@ applicano. I tasti sono quelli predefiniti.
 | Git: Push | `Ctrl+G P` |
 | Git: Push verso un remoto... |  |
 | Git: Force push (con lease)... |  |
-| Git: Imposta l'upstream... |  |
+| Git: Remotes of Branch... |  |
 | Remoto: Aggiungi remoto... |  |
 | Remoto: Rimuovi remoto... |  |
 | Remoto: Modifica remoto... |  |

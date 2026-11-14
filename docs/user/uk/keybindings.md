@@ -642,7 +642,7 @@ kitty, WezTerm, Ghostty, foot, Alacritty 0.13 і новіші, а також zel
 | Git: Push | `Ctrl+G P` |
 | Git: Push на remote... |  |
 | Git: force push (із lease)... |  |
-| Git: задати upstream... |  |
+| Git: Remotes of Branch... |  |
 | Remote: додати remote... |  |
 | Remote: видалити remote... |  |
 | Remote: змінити remote... |  |

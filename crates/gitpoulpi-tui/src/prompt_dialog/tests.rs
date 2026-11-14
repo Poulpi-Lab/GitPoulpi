@@ -1,6 +1,9 @@
 use super::*;
 use crate::test_support::*;
-use gitpoulpi_core::domain::Ref;
+use gitpoulpi_core::domain::{
+    BranchRemotes, Ref, Remote, RemoteGroupStatus, RemoteRelation, RemoteTargetState, TargetRef,
+    TargetRole,
+};
 
 fn key(code: KeyCode) -> KeyEvent {
     KeyEvent::new(code, KeyModifiers::NONE)
@@ -210,19 +213,82 @@ fn upstream_refs() -> Vec<Ref> {
     ]
 }
 
-fn remotes() -> Vec<String> {
-    vec!["origin".to_string(), "fork".to_string()]
+fn remotes() -> Vec<Remote> {
+    let remote = |name: &str, url: &str| Remote {
+        name: name.to_string(),
+        fetch_url: url.to_string(),
+        push_url: None,
+    };
+    vec![
+        remote("origin", "https://example.test/a.git"),
+        remote("fork", "https://example.test/b.git"),
+        remote("mirror", "https://example.test/b"),
+    ]
+}
+
+/// The daemon's answer for `feature`: `origin` is the upstream, `fork` a push
+/// target that is also pulled; `oldbox` is a name the branch still mentions
+/// but the repository lost when `gone` is set.
+fn status(gone: bool) -> RemoteGroupStatus {
+    let target = |remote: &str, branch: &str| TargetRef {
+        remote: remote.into(),
+        branch: branch.into(),
+    };
+    let state = |remote: &str, role, relation| RemoteTargetState {
+        remote: remote.into(),
+        branch: "feature".into(),
+        role,
+        pull: false,
+        tracking: None,
+        relation,
+        missing: false,
+    };
+    let mut remotes = BranchRemotes {
+        branch: "feature".into(),
+        primary: Some(target("origin", "feature")),
+        push_to: vec![target("fork", "feature")],
+        pull_from: vec![target("fork", "feature")],
+        missing: Vec::new(),
+    };
+    let mut targets = vec![
+        state("origin", TargetRole::Primary, RemoteRelation::LocalAhead(2)),
+        state(
+            "fork",
+            TargetRole::PushTo,
+            RemoteRelation::Diverged {
+                ahead: 2,
+                behind: 1,
+            },
+        ),
+    ];
+    if gone {
+        remotes.push_to.push(target("oldbox", "feature"));
+        remotes.missing.push("oldbox".into());
+        targets.push(RemoteTargetState {
+            missing: true,
+            ..state("oldbox", TargetRole::PushTo, RemoteRelation::Absent)
+        });
+    }
+    RemoteGroupStatus { remotes, targets }
+}
+
+/// The dialog for `feature` with the daemon's answer already in.
+fn remotes_dialog(current: Option<&str>, gone: bool) -> PromptDialog {
+    let reply = crate::daemon_link::Reply::ready(Ok(status(gone)));
+    let mut dialog =
+        PromptDialog::branch_remotes("feature", current, &upstream_refs(), &remotes(), reply);
+    dialog.poll();
+    dialog
 }
 
 #[test]
-fn set_upstream_lists_same_named_branches_first_with_the_current_one_chosen() {
-    let dialog = PromptDialog::set_upstream(
-        "feature",
-        Some("origin/feature"),
-        &upstream_refs(),
-        &remotes(),
+fn remotes_dialog_lists_same_named_branches_first_with_the_current_one_chosen() {
+    let dialog = remotes_dialog(Some("origin/feature"), false);
+    assert!(
+        !dialog.combo_open(),
+        "with an upstream the keyboard starts in the table"
     );
-    assert!(dialog.combo_open(), "the list opens with the dialog");
+    assert_eq!(dialog.focus, PromptPart::Rows);
     let combo = dialog.combo.as_ref().unwrap().borrow();
     let values: Vec<&str> = combo.options.iter().map(|o| o.value.as_str()).collect();
     assert_eq!(
@@ -232,58 +298,56 @@ fn set_upstream_lists_same_named_branches_first_with_the_current_one_chosen() {
     );
     assert_eq!(combo.selected(), Some("origin/feature"));
     drop(combo);
-    assert!(dialog.value().is_some());
-    assert_eq!(dialog.extras(), 1, "an upstream can be unset");
     assert_eq!(
-        PromptDialog::set_upstream("feature", None, &upstream_refs(), &remotes()).extras(),
-        0
+        dialog.extra_parts(),
+        [PromptPart::Extra(0), PromptPart::Extra(1)],
+        "Rename, and Unset because there is an upstream"
     );
+    let bare = remotes_dialog(None, false);
+    assert!(bare.combo_open(), "no upstream: the list opens");
+    assert_eq!(bare.extra_parts(), [PromptPart::Extra(0)]);
 }
 
 #[test]
 fn esc_closes_the_open_list_first_then_the_dialog() {
-    let mut dialog = PromptDialog::set_upstream("feature", None, &upstream_refs(), &remotes());
+    let mut dialog = remotes_dialog(None, false);
     assert_eq!(dialog.on_key(key(KeyCode::Esc)), PromptOutcome::Stay);
     assert!(!dialog.combo_open());
     assert_eq!(dialog.on_key(key(KeyCode::Esc)), PromptOutcome::Close);
 }
 
 #[test]
-fn picking_a_branch_then_enter_sets_it_and_nothing_chosen_is_refused() {
-    let mut dialog = PromptDialog::set_upstream("feature", None, &upstream_refs(), &remotes());
-    // Nothing chosen: refused inside.
-    dialog.on_key(key(KeyCode::Esc));
-    dialog.on_key(key(KeyCode::Tab));
-    dialog.on_key(key(KeyCode::Tab));
-    assert_eq!(dialog.focus, PromptPart::Submit);
-    assert_eq!(dialog.on_key(key(KeyCode::Enter)), PromptOutcome::Stay);
-    assert!(dialog.error.is_some());
+fn picking_a_branch_then_enter_applies_the_upstream_in_one_request() {
+    let mut dialog = remotes_dialog(None, false);
     // Pick the highlighted row (fork/feature, the first), then confirm.
-    dialog.set_focus(PromptPart::Field);
-    dialog.on_key(key(KeyCode::Enter));
-    assert!(dialog.combo_open(), "Enter on the field opens the list");
     dialog.on_key(key(KeyCode::Enter));
     assert!(!dialog.combo_open());
-    assert_eq!(
-        dialog.focus,
-        PromptPart::Submit,
-        "a pick lands on the button"
-    );
+    assert_eq!(dialog.focus, PromptPart::Rows, "a pick lands in the table");
     let PromptOutcome::Submit(actions, _) = dialog.on_key(key(KeyCode::Enter)) else {
-        panic!("a second Enter confirms");
+        panic!("Enter applies");
     };
+    // `fork` became the upstream, so it carries no extra flags; `origin` was
+    // the upstream and is now an unchecked row.
     assert_eq!(
         actions,
-        vec![Action::BranchSetUpstream {
+        vec![Action::BranchSetRemotes {
             branch: "feature".into(),
-            upstream: Some("fork/feature".into())
+            upstream: Some("fork/feature".into()),
+            push_to: vec![],
+            pull_from: vec![],
         }]
     );
 }
 
 #[test]
+fn nothing_changed_closes_instead_of_sending() {
+    let mut dialog = remotes_dialog(Some("origin/feature"), false);
+    assert_eq!(dialog.on_key(key(KeyCode::Enter)), PromptOutcome::Close);
+}
+
+#[test]
 fn a_typed_upstream_must_name_a_known_remote() {
-    let mut dialog = PromptDialog::set_upstream("feature", None, &upstream_refs(), &remotes());
+    let mut dialog = remotes_dialog(None, false);
     type_str(&mut dialog, "nowhere/x");
     dialog.on_key(key(KeyCode::Enter));
     assert!(!dialog.combo_open());
@@ -301,14 +365,8 @@ fn a_typed_upstream_must_name_a_known_remote() {
 
 #[test]
 fn unset_upstream_submits_none() {
-    let mut dialog = PromptDialog::set_upstream(
-        "feature",
-        Some("origin/feature"),
-        &upstream_refs(),
-        &remotes(),
-    );
-    dialog.on_key(key(KeyCode::Esc));
-    let PromptOutcome::Submit(actions, said) = press(&mut dialog, PromptPart::Extra(0)) else {
+    let mut dialog = remotes_dialog(Some("origin/feature"), false);
+    let PromptOutcome::Submit(actions, said) = press(&mut dialog, PromptPart::Extra(1)) else {
         panic!("the Unset button submits");
     };
     assert_eq!(
@@ -319,6 +377,137 @@ fn unset_upstream_submits_none() {
         }]
     );
     assert!(said.contains("feature"), "{said}");
+}
+
+#[test]
+fn the_table_toggles_push_and_pull_by_key_and_by_mouse_and_applies_both() {
+    let mut dialog = remotes_dialog(Some("origin/feature"), false);
+    // Rows: origin (the upstream), fork, mirror. Down to `mirror`.
+    dialog.on_key(key(KeyCode::Down));
+    dialog.on_key(key(KeyCode::Down));
+    dialog.on_key(key(KeyCode::Char(' ')));
+    dialog.on_key(key(KeyCode::Char('p')));
+    // Ctrl+J is a row-down key in the table, not the apply chord.
+    dialog.on_key(ctrl('k'));
+    // `fork` loses its Push by a click on its checkbox, keeps Pull too.
+    let (_, hits) = paint(&dialog);
+    let (rect, _) = hits
+        .iter()
+        .find(|(_, p)| *p == PromptPart::Push(1))
+        .expect("fork's Push box");
+    dialog.on_mouse(click(rect.x, rect.y), Some(PromptPart::Push(1)));
+    let PromptOutcome::Submit(actions, _) = dialog.on_key(key(KeyCode::Enter)) else {
+        panic!("Enter applies");
+    };
+    assert_eq!(
+        actions,
+        vec![Action::BranchSetRemotes {
+            branch: "feature".into(),
+            upstream: None,
+            push_to: vec!["mirror".into()],
+            pull_from: vec!["fork".into(), "mirror".into()],
+        }]
+    );
+}
+
+#[test]
+fn the_upstream_row_has_no_push_or_pull_box_to_toggle() {
+    let mut dialog = remotes_dialog(Some("origin/feature"), false);
+    let (all, hits) = paint(&dialog);
+    assert!(all.contains("upstream"), "{all}");
+    assert!(!hits.iter().any(|(_, p)| *p == PromptPart::Push(0)));
+    dialog.on_key(key(KeyCode::Char(' ')));
+    assert_eq!(dialog.on_key(key(KeyCode::Enter)), PromptOutcome::Close);
+}
+
+#[test]
+fn rename_on_remote_opens_a_nested_prompt_and_applies_the_new_name() {
+    let mut dialog = remotes_dialog(Some("origin/feature"), false);
+    dialog.on_key(key(KeyCode::Down));
+    dialog.on_key(key(KeyCode::Char('r')));
+    assert!(
+        dialog.remotes.as_ref().unwrap().rename.is_some(),
+        "r opens the prompt"
+    );
+    let (all, _) = paint(&dialog);
+    assert!(all.contains("Branch name on fork"), "{all}");
+    // Esc closes only the nested prompt.
+    assert_eq!(dialog.on_key(key(KeyCode::Esc)), PromptOutcome::Stay);
+    assert!(dialog.remotes.as_ref().unwrap().rename.is_none());
+    dialog.on_key(key(KeyCode::Char('r')));
+    for _ in 0..7 {
+        dialog.on_key(key(KeyCode::Backspace));
+    }
+    type_str(&mut dialog, "feat-x");
+    assert_eq!(dialog.on_key(key(KeyCode::Enter)), PromptOutcome::Stay);
+    assert!(dialog.remotes.as_ref().unwrap().rename.is_none());
+    let PromptOutcome::Submit(actions, _) = dialog.on_key(key(KeyCode::Enter)) else {
+        panic!("Enter applies");
+    };
+    assert_eq!(
+        actions,
+        vec![Action::BranchSetRemotes {
+            branch: "feature".into(),
+            upstream: None,
+            push_to: vec!["fork:feat-x".into()],
+            pull_from: vec!["fork:feat-x".into()],
+        }]
+    );
+}
+
+#[test]
+fn renaming_the_upstream_row_is_refused_inside_the_dialog() {
+    let mut dialog = remotes_dialog(Some("origin/feature"), false);
+    dialog.on_key(key(KeyCode::Char('r')));
+    assert!(dialog.remotes.as_ref().unwrap().rename.is_none());
+    assert!(dialog.error.is_some());
+}
+
+#[test]
+fn a_gone_remote_never_blocks_apply_and_its_entries_are_dropped() {
+    let mut dialog = remotes_dialog(Some("origin/feature"), true);
+    let (all, hits) = paint(&dialog);
+    assert!(
+        all.contains("remote gone") && all.contains("oldbox"),
+        "{all}"
+    );
+    assert!(hits.iter().any(|(_, p)| matches!(p, PromptPart::Remove(_))));
+    // Apply without touching the gone row: it is simply not written back.
+    let PromptOutcome::Submit(actions, _) = dialog.on_key(key(KeyCode::Enter)) else {
+        panic!("a gone row does not block Apply");
+    };
+    assert_eq!(
+        actions,
+        vec![Action::BranchSetRemotes {
+            branch: "feature".into(),
+            upstream: None,
+            push_to: vec!["fork".into()],
+            pull_from: vec!["fork".into()],
+        }]
+    );
+    // Del still removes the row from the table.
+    for _ in 0..4 {
+        dialog.on_key(key(KeyCode::Down));
+    }
+    dialog.on_key(key(KeyCode::Delete));
+    let (all, _) = paint(&dialog);
+    assert!(!all.contains("oldbox"), "{all}");
+}
+
+#[test]
+fn two_remotes_with_one_address_get_a_warning() {
+    let mut dialog = remotes_dialog(Some("origin/feature"), false);
+    let (all, _) = paint(&dialog);
+    assert!(!all.contains("same URL"), "{all}");
+    // `fork` and `mirror` are one address once both are pushed to.
+    dialog.on_key(key(KeyCode::Down));
+    dialog.on_key(key(KeyCode::Down));
+    dialog.on_key(key(KeyCode::Char(' ')));
+    let (all, _) = paint(&dialog);
+    assert!(
+        all.contains("fork and mirror push to the same URL"),
+        "{all}"
+    );
 }
 
 #[test]

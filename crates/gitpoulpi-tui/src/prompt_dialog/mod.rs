@@ -14,6 +14,7 @@
 //! [`PromptOutcome`]; the host submits the actions.
 
 mod kinds;
+mod remotes;
 mod render;
 #[cfg(test)]
 mod tests;
@@ -27,6 +28,7 @@ use crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKin
 use super::*;
 use crate::dialog_kit::{self, CloseHit, DiscardGuard, Dismiss, DismissAction, DismissKind, Guard};
 use crate::keymap::Action as Bind;
+use gitpoulpi_i18n::msg::branch_remotes as msg_br;
 use gitpoulpi_i18n::msg::input as msg_input;
 use gitpoulpi_i18n::msg::prompt_dialog as msg;
 use gitpoulpi_i18n::msg::remotes as msg_remotes;
@@ -38,8 +40,17 @@ pub(crate) enum PromptPart {
     Field,
     /// The ✦ AI button (only on a prompt with an AI twin, AI on).
     Ai,
-    /// An extra button, by index (`Unset upstream`).
+    /// An extra button, by index: `Rename on remote...` (0) and
+    /// `Unset upstream` (1) of the Remotes dialog.
     Extra(u8),
+    /// The Remotes dialog's table, as a whole (the keyboard is in it).
+    Rows,
+    /// A row of that table, by index: the band, its two checkboxes and,
+    /// on a gone row, the Remove button.
+    Row(u8),
+    Push(u8),
+    Pull(u8),
+    Remove(u8),
     Cancel,
     Submit,
     /// The close cross on the frame (not in the Tab order).
@@ -61,12 +72,17 @@ pub(crate) enum PromptKind {
     TagMessage { at: Oid, name: String },
     /// `Annotate <tag>...` on an existing tag.
     AnnotateTag { tag: String },
-    /// `Set upstream`: pick a remote branch (or type `remote/branch`) for `branch`.
-    /// `remotes` are the configured remote names a typed value is checked against.
-    SetUpstream {
+    /// `Remotes of <branch>`: the upstream (a remote branch picked, or a
+    /// typed `remote/branch`) and the extra push targets / pull sources, in
+    /// one dialog (`branch_remotes_dialog`). `remotes` are the configured
+    /// remote names a typed upstream is checked against.
+    BranchRemotes {
         branch: String,
         remotes: Vec<String>,
     },
+    /// The small prompt the Remotes dialog opens over itself: the branch's
+    /// name on `remote`. It answers [`PromptOutcome::Entered`].
+    BranchOnRemote { remote: String },
     /// `LFS: Track Pattern...`: space-separated patterns.
     LfsTrack,
     /// `LFS: Untrack Pattern...`: pick one of the tracked patterns (or type one).
@@ -81,6 +97,8 @@ pub(crate) enum PromptOutcome {
     Close,
     /// The actions to send and the status line to show.
     Submit(Vec<Action>, String),
+    /// A nested prompt's one answer, for the dialog that opened it.
+    Entered(String),
     /// The ✦ button, or its key: the host starts the request (an explicit
     /// user action) and the dialog shows "writing..." until it lands.
     StartAi(AiRequest),
@@ -97,8 +115,11 @@ pub(crate) struct PromptDialog {
     /// a text box: Set upstream and Untrack. It paints and routes through
     /// `&self` like the rest of the dialog, hence the `RefCell`.
     combo: Option<RefCell<Combo>>,
-    /// A second button next to Cancel (`Unset upstream`).
-    unset: Option<String>,
+    /// The Remotes dialog's table (`PromptKind::BranchRemotes` only).
+    remotes: Option<Box<crate::branch_remotes_dialog::RemotesPane>>,
+    /// The nested "Branch name on <remote>" prompt asks for one value, and
+    /// answers it as `PromptOutcome::Entered` to the dialog that opened it.
+    nested: bool,
     /// What the field held when the dialog opened: only a change to it is
     /// "typed" work.
     baseline: String,
@@ -164,7 +185,8 @@ impl PromptDialog {
             multiline,
             text: text.to_string(),
             combo: None,
-            unset: None,
+            remotes: None,
+            nested: false,
             baseline: text.to_string(),
             editor: Default::default(),
             focus: PromptPart::Field,
@@ -241,8 +263,20 @@ impl PromptDialog {
         self.editor.sync(part.is_field().then_some(part));
     }
 
-    fn extras(&self) -> u8 {
-        u8::from(self.unset.is_some())
+    /// The extra buttons, in Tab order: Rename, then Unset when there is
+    /// an upstream to unset.
+    fn extra_parts(&self) -> Vec<PromptPart> {
+        let Some(pane) = &self.remotes else {
+            return Vec::new();
+        };
+        let mut parts = Vec::new();
+        if pane.has_rows() {
+            parts.push(PromptPart::Extra(0));
+        }
+        if pane.initial_upstream.is_some() {
+            parts.push(PromptPart::Extra(1));
+        }
+        parts
     }
 
     /// The list is open and owns the keyboard and the pointer.
@@ -264,7 +298,10 @@ impl PromptDialog {
         if self.ai {
             order.push(PromptPart::Ai);
         }
-        order.extend((0..self.extras()).map(PromptPart::Extra));
+        if self.remotes.as_ref().is_some_and(|p| p.has_rows()) {
+            order.push(PromptPart::Rows);
+        }
+        order.extend(self.extra_parts());
         order.push(PromptPart::Cancel);
         order.push(PromptPart::Submit);
         order
@@ -355,18 +392,31 @@ impl PromptDialog {
                 let said = msg_input::creating_annotated_tag_at(&name, Self::short(at));
                 PromptOutcome::Submit(vec![Action::TagCreateAnnotated { name, at, message }], said)
             }
-            PromptKind::SetUpstream { branch, remotes } => {
-                let Some(upstream) = self.value() else {
-                    self.error = Some(msg::UPSTREAM_NONE.get().into());
+            PromptKind::BranchRemotes { branch, .. } => {
+                let chosen = self.value();
+                let Some(pane) = &mut self.remotes else {
                     return PromptOutcome::Stay;
                 };
-                if let Some(why) = self.upstream_problem(&upstream, &remotes) {
-                    self.error = Some(why);
+                // The answer may have landed since the last tick.
+                pane.poll();
+                match pane.request(chosen) {
+                    Err(why) => {
+                        self.error = Some(why);
+                        PromptOutcome::Stay
+                    }
+                    // Nothing changed: Apply just closes.
+                    Ok(None) => PromptOutcome::Close,
+                    Ok(Some(action)) => {
+                        PromptOutcome::Submit(vec![action], msg_br::applying(&branch))
+                    }
+                }
+            }
+            PromptKind::BranchOnRemote { .. } => {
+                if message.is_empty() || message.contains(char::is_whitespace) {
+                    self.error = Some(msg_br::RENAME_EMPTY.get().into());
                     return PromptOutcome::Stay;
                 }
-                let said = msg_remotes::setting_upstream(&branch, &upstream);
-                let upstream = Some(upstream);
-                PromptOutcome::Submit(vec![Action::BranchSetUpstream { branch, upstream }], said)
+                PromptOutcome::Entered(message)
             }
             PromptKind::LfsTrack => {
                 let patterns = patterns_of(&message);
@@ -409,7 +459,7 @@ impl PromptDialog {
 
     /// The `Unset upstream` button: drops the branch's upstream.
     fn unset_upstream(&mut self) -> PromptOutcome {
-        let PromptKind::SetUpstream { branch, .. } = self.kind.clone() else {
+        let PromptKind::BranchRemotes { branch, .. } = self.kind.clone() else {
             return PromptOutcome::Stay;
         };
         let said = msg_remotes::unsetting_upstream(&branch);
@@ -429,7 +479,7 @@ impl PromptDialog {
             ComboOutcome::Picked(_) => {}
             ComboOutcome::Custom(value) => {
                 let problem = match &self.kind {
-                    PromptKind::SetUpstream { remotes, .. } => {
+                    PromptKind::BranchRemotes { remotes, .. } => {
                         self.upstream_problem(&value, remotes)
                     }
                     _ => None,
@@ -438,6 +488,10 @@ impl PromptDialog {
                     if let Some(combo) = &self.combo {
                         combo.borrow_mut().select(None);
                     }
+                    if let Some(pane) = &mut self.remotes {
+                        let back = pane.initial_upstream.clone();
+                        pane.set_primary(back.as_deref());
+                    }
                     self.error = Some(why);
                     return PromptOutcome::Stay;
                 }
@@ -445,7 +499,19 @@ impl PromptDialog {
             ComboOutcome::Handled | ComboOutcome::Ignored => return PromptOutcome::Stay,
         }
         self.error = None;
-        self.set_focus(PromptPart::Submit);
+        let chosen = self.value();
+        let to_rows = match &mut self.remotes {
+            Some(pane) => {
+                pane.set_primary(chosen.as_deref());
+                pane.has_rows()
+            }
+            None => false,
+        };
+        self.set_focus(if to_rows {
+            PromptPart::Rows
+        } else {
+            PromptPart::Submit
+        });
         PromptOutcome::Stay
     }
 
@@ -473,7 +539,17 @@ impl PromptDialog {
                 self.set_focus(part);
                 self.try_submit()
             }
+            PromptPart::Rows => {
+                self.set_focus(part);
+                self.try_submit()
+            }
+            PromptPart::Extra(0) => self.rename_selected(),
             PromptPart::Extra(_) => self.unset_upstream(),
+            // A row's own controls are the table's business (`on_mouse`).
+            PromptPart::Row(_)
+            | PromptPart::Push(_)
+            | PromptPart::Pull(_)
+            | PromptPart::Remove(_) => PromptOutcome::Stay,
         }
     }
 
@@ -486,6 +562,10 @@ impl PromptDialog {
     pub(crate) fn on_key(&mut self, key: KeyEvent) -> PromptOutcome {
         if let Some(v) = self.guard.get_mut().key(key) {
             return self.verdict(v);
+        }
+        // The nested "Branch name on <remote>" prompt owns every key.
+        if let Some(outcome) = self.nested_key(key) {
+            return outcome;
         }
         // An open list is modal: it takes every key, Esc closing it first.
         if self.combo_open() {
@@ -502,6 +582,13 @@ impl PromptDialog {
         }
         if km.is(Bind::PromptAiStashMessage, &key) && self.ai {
             return self.start_ai();
+        }
+        // The table's own keys come before the apply chord: `Ctrl+J` is a
+        // row-down key there.
+        if self.focus == PromptPart::Rows {
+            if let Some(outcome) = self.rows_key(&key) {
+                return outcome;
+            }
         }
         if km.is(Bind::RewordApply, &key) {
             return self.try_submit();
@@ -596,6 +683,10 @@ impl PromptDialog {
     /// break into a space, so a paste can never submit it; the message area
     /// keeps them.
     pub(crate) fn on_paste(&mut self, text: &str) {
+        if let Some((dialog, _)) = self.remotes.as_mut().and_then(|p| p.rename.as_mut()) {
+            dialog.on_paste(text);
+            return;
+        }
         if self.ai_running || !self.badge_ready() {
             return;
         }
@@ -640,6 +731,9 @@ impl PromptDialog {
 
     /// The wheel over the message area scrolls it `delta` lines.
     pub(crate) fn on_wheel(&mut self, delta: isize) {
+        if self.rows_wheel(delta.signum()) {
+            return;
+        }
         let Some(track) = self.bar.get() else {
             return;
         };
@@ -661,6 +755,10 @@ impl PromptDialog {
         if let Some(v) = self.guard.get_mut().mouse(mouse) {
             return self.verdict(v);
         }
+        // The nested prompt is modal.
+        if let Some(outcome) = self.nested_mouse(mouse, hit) {
+            return outcome;
+        }
         // An open list is modal: it picks, scrolls, or a click away closes it.
         if self.combo_open() {
             let outcome = self.combo.as_ref().map(|c| c.borrow_mut().on_mouse(mouse));
@@ -679,6 +777,9 @@ impl PromptDialog {
         }
         if let Some(kind) = self.guard.get_mut().pointer(mouse) {
             return self.request_close(kind);
+        }
+        if self.rows_bar(mouse) {
+            return PromptOutcome::Stay;
         }
         let top = self
             .editor
@@ -723,6 +824,7 @@ impl PromptDialog {
                         std::time::Instant::now(),
                     );
                 }
+                Some(part) if self.rows_press(part).is_some() => return PromptOutcome::Stay,
                 Some(part) if part != PromptPart::Field => return self.activate(part),
                 _ => {}
             }

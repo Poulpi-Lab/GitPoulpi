@@ -387,6 +387,7 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
             }
             None => rest("Unset upstream of ").map(l::upstream_unset),
         },
+        K::BranchSetRemotes => rest("Set remotes of ").map(l::remotes_set),
         K::SetRepoConfig => match rest("Unset ") {
             Some(key) => Some(l::config_unset(key)),
             None => {
@@ -571,7 +572,6 @@ fn parse(kind: OperationKind, body: &str) -> Option<String> {
         | K::RemoteGroupStatus
         | K::RemoteGroupPlan
         | K::RemoteGroupRun
-        | K::BranchSetRemotes
         | K::SparseStatus
         | K::Conflicts
         | K::ConflictEntries

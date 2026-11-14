@@ -112,7 +112,7 @@ sidebar, or its pill in the Log) for its menu. The most useful entries:
 | Merge, Rebase onto | Merge it into, or rebase the checked-out branch onto, this ref |
 | Fast-forward `<branch>` to `<current>` / `<current>` to `<branch>` | Moves a branch forward when that is a fast-forward; otherwise grayed with the reason (`diverged, not a fast-forward`) |
 | Create worktree from... | Opens a linked worktree in its own tab |
-| Pull, Push, Fetch, Set upstream... | Network operations on that branch |
+| Pull, Push, Fetch, Set upstream... | Network operations on that branch (Set upstream... opens "Remotes of <branch>": the upstream plus a Push and a Pull too checkbox per remote) |
 | Hide / Show in graph, Solo | Display only; they hide or solo a ref (hiding also drops the commits only that ref reaches) without touching the repository |
 | Rename, Delete | Delete asks first; a remote twin can be deleted too |
 | Copy branch name, Copy link to branch on remote | To the clipboard |

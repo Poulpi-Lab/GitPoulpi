@@ -2,7 +2,8 @@
 
 use super::*;
 use crate::combo::ComboOption;
-use gitpoulpi_core::domain::{Ref, RefKind};
+use gitpoulpi_core::domain::{Ref, RefKind, Remote};
+use gitpoulpi_i18n::msg::branch_remotes as msg_br;
 use gitpoulpi_i18n::msg::prompt_dialog as msg;
 
 impl PromptDialog {
@@ -56,15 +57,20 @@ impl PromptDialog {
         )
     }
 
-    /// `Set upstream`: every `remote/branch` (not `HEAD`) in a searchable list
-    /// that also takes a typed value, the same-named branches first, the
-    /// current upstream preselected and marked. The list opens with the
-    /// dialog; `Unset upstream` exists only when there is an upstream.
-    pub(crate) fn set_upstream(
+    /// `Remotes of <branch>`: the upstream in a searchable list that also
+    /// takes a typed `remote/branch` (every `remote/branch` but `HEAD`, the
+    /// same-named branches first, the current upstream preselected and
+    /// marked), over the table of the repository's remotes.
+    ///
+    /// The list opens with the dialog when there is no upstream to keep (the
+    /// pick is the point); with one, the keyboard starts in the table.
+    /// `status` is the daemon's answer, read while the dialog is up.
+    pub(crate) fn branch_remotes(
         branch: &str,
         current: Option<&str>,
         refs: &[Ref],
-        remotes: &[String],
+        remotes: &[Remote],
+        status: crate::daemon_link::Reply<gitpoulpi_core::domain::RemoteGroupStatus>,
     ) -> Self {
         let mut names: Vec<(String, String)> = refs
             .iter()
@@ -92,21 +98,30 @@ impl PromptDialog {
         if let Some(cur) = current {
             combo.select(Some(cur.to_string()));
             combo.set_marks(vec![cur.to_string()]);
+        } else {
+            combo.open();
         }
-        combo.open();
+        let names: Vec<String> = remotes.iter().map(|r| r.name.clone()).collect();
         let mut dialog = Self::base(
-            PromptKind::SetUpstream {
+            PromptKind::BranchRemotes {
                 branch: branch.to_string(),
-                remotes: remotes.to_vec(),
+                remotes: names,
             },
-            msg::upstream_title(branch),
+            msg_br::title(branch),
             "",
-            msg::SET_BUTTON.get().to_string(),
+            msg_br::APPLY_BUTTON.get().to_string(),
             false,
             "",
         );
         dialog.combo = Some(RefCell::new(combo));
-        dialog.unset = current.map(|_| msg::UNSET_BUTTON.get().to_string());
+        dialog.remotes = Some(Box::new(crate::branch_remotes_dialog::RemotesPane::new(
+            branch, remotes, current, status,
+        )));
+        dialog.set_focus(if current.is_some() {
+            PromptPart::Rows
+        } else {
+            PromptPart::Field
+        });
         dialog
     }
 

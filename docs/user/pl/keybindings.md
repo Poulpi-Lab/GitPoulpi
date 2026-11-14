@@ -647,7 +647,7 @@ zastosowania. Klawisze są domyślne.
 | Git: Push | `Ctrl+G P` |
 | Git: Push do zdalnego... |  |
 | Git: Force push (z lease)... |  |
-| Git: Ustaw upstream... |  |
+| Git: Remotes of Branch... |  |
 | Zdalne: Dodaj zdalne... |  |
 | Zdalne: Usuń zdalne... |  |
 | Zdalne: Edytuj zdalne... |  |

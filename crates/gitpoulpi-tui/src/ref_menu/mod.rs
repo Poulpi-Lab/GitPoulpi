@@ -582,7 +582,7 @@ pub(crate) fn ref_menu_entries(
                 RefContextAction::FetchBranchRemote,
             ));
             entries.push(Entry::action(
-                glyph_label("\u{21C5}", msg::set_upstream(full_name)),
+                glyph_label("\u{21C5}", msg::remotes_of(full_name)),
                 RefContextAction::SetUpstream,
             ));
             entries.push(Entry::Separator);

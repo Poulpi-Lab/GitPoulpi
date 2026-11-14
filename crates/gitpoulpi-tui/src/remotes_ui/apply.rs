@@ -80,7 +80,11 @@ pub(crate) fn run_remote_palette_command(
                 .and_then(|b| local_branch(refs, &b))
                 .or_else(|| head_branch(refs));
             match branch {
-                Some(branch) => ctx.ui.open_upstream_prompt(&branch, refs, ctx.input_mode),
+                Some(branch) => {
+                    let requester = ctx.link.activity_handle().raw.requester();
+                    ctx.ui
+                        .open_upstream_prompt(&branch, refs, &requester, ctx.input_mode)
+                }
                 None => *ctx.last_message = Some(msg::SELECT_LOCAL_BRANCH.get().into()),
             }
         }

@@ -654,7 +654,7 @@ stage_file = "z"
 | Git: push | `Ctrl+G P` |
 | Git: push на remote... |  |
 | Git: force push (с lease)... |  |
-| Git: задать upstream... |  |
+| Git: Remotes of Branch... |  |
 | Remote: добавить remote... |  |
 | Remote: удалить remote... |  |
 | Remote: изменить remote... |  |

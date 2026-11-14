@@ -157,22 +157,30 @@ impl RemoteUi {
         None
     }
 
-    /// Opens the Set upstream dialog for `branch`: the remote branches in a
-    /// searchable list, a typed `remote/branch` checked against the configured
-    /// remotes, and `Unset upstream` when there is one.
+    /// Opens the "Remotes of <branch>" dialog (what "Set upstream..." opens
+    /// from every entry point): the upstream list, then one row per remote
+    /// with its Push and Pull too checkboxes. The daemon's status of the
+    /// branch (`RemoteGroupStatus`) fills the rows once it answers.
     pub(crate) fn open_upstream_prompt(
         &self,
         branch: &HeadBranch,
         refs: &[Ref],
+        requester: &crate::daemon_link::Requester,
         input_mode: &mut InputMode,
     ) {
-        *input_mode =
-            InputMode::Prompt(Box::new(crate::prompt_dialog::PromptDialog::set_upstream(
+        let status = requester.call(
+            gitpoulpi_core::domain::OperationKind::RemoteGroupStatus,
+            serde_json::json!({ "branch": branch.name }),
+        );
+        *input_mode = InputMode::Prompt(Box::new(
+            crate::prompt_dialog::PromptDialog::branch_remotes(
                 &branch.name,
                 branch.upstream.as_deref(),
                 refs,
-                &self.names(),
-            )));
+                &self.remotes,
+                status,
+            ),
+        ));
     }
 
     /// A menu of every remote, each row running `action(name)`.

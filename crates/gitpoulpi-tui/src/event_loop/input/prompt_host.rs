@@ -75,6 +75,8 @@ fn settle(cx: &mut CommandCtx<'_>, outcome: PromptOutcome) {
             }
             *cx.input_mode = InputMode::Normal;
         }
+        // Only a nested prompt answers this, and its dialog takes it.
+        PromptOutcome::Entered(_) => {}
         PromptOutcome::Submit(actions, said) => {
             for action in actions {
                 cx.link.submit_action(action);

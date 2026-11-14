@@ -24,15 +24,20 @@ fn section_of(branch: &str) -> String {
 
 /// Replaces `branch`'s push targets and pull sources with the given config
 /// values (`<remote>` or `<remote>:<branch>`), leaving every other variable
-/// of its section (upstream included) alone. The section is rewritten
-/// whole, so the journal's capture of it restores it.
+/// of its section alone; `upstream` (`remote/branch`) moves git's own
+/// upstream in the same request when given, so one journal entry holds
+/// both. The section is rewritten whole, so the journal's capture of it
+/// restores it.
 pub fn set_remotes(
     backend: &dyn GitBackend,
     repo: &RepoRef,
     branch: &str,
-    push_to: &[String],
-    pull_from: &[String],
+    upstream: Option<&str>,
+    (push_to, pull_from): (&[String], &[String]),
 ) -> Result<()> {
+    if let Some(upstream) = upstream {
+        backend.branch_set_upstream(repo, branch, Some(upstream))?;
+    }
     let section = section_of(branch);
     let entries = backend.config_section(repo, &section)?;
     let parse = |values: &[String]| -> Result<Vec<TargetRef>> {

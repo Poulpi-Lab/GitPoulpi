@@ -1042,6 +1042,29 @@ async fn dispatch(
             )
             .await
         }
+        Action::BranchSetRemotes {
+            branch,
+            upstream,
+            push_to,
+            pull_from,
+        } => {
+            let mut args = serde_json::json!({
+                "branch": branch,
+                "push_to": push_to,
+                "pull_from": pull_from,
+            });
+            if let Some(upstream) = &upstream {
+                args["upstream"] = serde_json::json!(upstream);
+            }
+            reported::<()>(
+                conn,
+                action_message_tx,
+                OperationKind::BranchSetRemotes,
+                args,
+                |()| gitpoulpi_i18n::msg::branch_remotes::remotes_set(&branch),
+            )
+            .await
+        }
         Action::FastForward {
             branch,
             target,

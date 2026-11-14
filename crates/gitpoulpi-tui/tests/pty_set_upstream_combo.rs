@@ -1,8 +1,12 @@
-//! Set upstream is a dialog with a searchable list of remote branches (and a
-//! typed `remote/branch`), never a menu with a footer prompt behind it: the
-//! palette's `Git: Set Upstream...` opens it with the list open, typing
-//! filters, Enter picks, a second Enter (or the Set button) applies; Unset
-//! upstream is a button; Esc closes the list first, then the dialog.
+//! The upstream of a branch is picked in the "Remotes of <branch>" dialog,
+//! through a searchable list of remote branches (and a typed `remote/branch`),
+//! never a menu with a footer prompt behind it: the palette's `Git: Remotes
+//! of Branch...` (still found as "Git: Set Upstream") opens it, with the list
+//! open when the branch has no upstream; typing filters, Enter picks, a
+//! second Enter (or the Apply button) applies; Unset upstream is a button;
+//! Esc closes the list first, then the dialog. The list's behaviour is the
+//! one the Set upstream dialog had; the table of remotes under it has its
+//! own test (`pty_branch_remotes_dialog.rs`).
 //!
 //! The rules are `pty_ui.rs`'s: nothing is located by a hard-coded
 //! coordinate and every wait describes the whole state it is waiting for.
@@ -67,22 +71,40 @@ fn wait_upstream(repo: &FixtureRepo, expected: &str) {
     }
 }
 
-/// Opens the dialog through the palette.
+/// Opens the dialog through the palette (typing the old name: it is still
+/// an alias of the command), the list open: the branch has no upstream.
 fn open_dialog(term: &mut Terminal) -> Screen {
-    term.send_keys("C-p").expect("open the palette");
-    term.send_text("Git: Set Upstream").unwrap();
-    term.wait_for("the Set Upstream command", STEP, |s| {
-        s.contains("Git: Set Upstream...")
-    })
-    .unwrap_or_else(|e| panic!("{e}"));
-    term.send_keys("Enter").unwrap();
+    open_palette_row(term);
     // The whole state: the dialog with its list open, and no palette left
     // (a frame torn between the palette and the dialog fails this and is
     // polled again, instead of being returned half-painted).
-    term.wait_for("the Set upstream dialog with its list open", STEP, |s| {
-        s.contains("Set upstream of feature")
+    term.wait_for("the Remotes dialog with its list open", STEP, |s| {
+        s.contains("Remotes of feature")
             && s.contains("origin/feature")
             && s.contains("origin/main")
+            && !s.contains("Command Palette")
+            && !s.contains("Enter to run")
+    })
+    .unwrap_or_else(|e| panic!("{e}"))
+}
+
+fn open_palette_row(term: &mut Terminal) {
+    term.send_keys("C-p").expect("open the palette");
+    term.send_text("Git: Set Upstream").unwrap();
+    term.wait_for("the Remotes of Branch command", STEP, |s| {
+        s.contains("Git: Remotes of Branch...")
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    term.send_keys("Enter").unwrap();
+}
+
+/// Opens the dialog of a branch that has an upstream: no list, the table.
+fn open_dialog_with_upstream(term: &mut Terminal) -> Screen {
+    open_palette_row(term);
+    term.wait_for("the Remotes dialog, rows read", STEP, |s| {
+        s.contains("Remotes of feature")
+            && s.contains("Unset upstream")
+            && s.contains("Pull too")
             && !s.contains("Command Palette")
             && !s.contains("Enter to run")
     })
@@ -114,22 +136,23 @@ fn the_list_filters_picks_and_the_set_button_applies() {
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Enter").unwrap();
-    // Picked: the list is closed (the buttons are visible again).
+    // Picked: the list is closed (the table and the buttons are visible again).
     let screen = term
         .wait_for("the choice made, the list closed", STEP, |s| {
-            s.contains("Set upstream of feature")
+            s.contains("Remotes of feature")
                 && s.contains("Cancel")
+                && s.contains("Pull too")
                 && s.contains("origin/main")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    // The Set button applies it.
-    let (_, row) = screen.find("Cancel").unwrap();
-    let (col, _) = screen
-        .find_all("Set")
+    // The Apply button applies it.
+    // The hint line above the buttons says "Enter Apply" too: the button is
+    // the lowest occurrence.
+    let (col, row) = screen
+        .find_all("Apply")
         .into_iter()
-        .filter(|(_, r)| *r == row)
-        .max_by_key(|(c, _)| *c)
-        .expect("the Set button");
+        .max_by_key(|(_, r)| *r)
+        .expect("the Apply button");
     term.click(col + 1, row).unwrap();
     wait_upstream(&repo, "origin/main");
 }
@@ -139,16 +162,24 @@ fn unset_upstream_is_a_button_and_esc_closes_the_list_then_the_dialog() {
     let repo = fixture();
     repo.git(&["branch", "-u", "origin/main", "feature"]);
     let mut term = launch(&repo, "pty-upstream-unset");
-    let open = open_dialog(&mut term);
+    // With an upstream the list stays shut and the keyboard starts in the table.
+    let open = open_dialog_with_upstream(&mut term);
     assert!(
-        open.contains("origin/feature"),
-        "the list is open:\n{}",
+        !open.contains("origin/feature"),
+        "the list is closed:\n{}",
         open.text()
     );
-    // Esc: the list first (the Unset button shows again), the dialog stays...
+    // Enter on the list field opens it; Esc closes the list first, the
+    // dialog stays...
+    term.send_keys("BTab").unwrap();
+    term.send_keys("Enter").unwrap();
+    term.wait_for("the list open", STEP, |s| {
+        s.contains("origin/feature") && s.contains("Remotes of feature")
+    })
+    .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     term.send_keys("Escape").unwrap();
     term.wait_for("the list closed, the dialog open", STEP, |s| {
-        s.contains("Set upstream of feature")
+        s.contains("Remotes of feature")
             && s.contains("Unset upstream")
             && !s.contains("origin/feature")
     })
@@ -156,20 +187,12 @@ fn unset_upstream_is_a_button_and_esc_closes_the_list_then_the_dialog() {
     // ...then the dialog itself.
     term.send_keys("Escape").unwrap();
     term.wait_for("the dialog closed", STEP, |s| {
-        !s.contains("Set upstream of feature")
+        !s.contains("Remotes of feature")
     })
     .unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(upstream(&repo), "origin/main", "nothing changed");
 
-    open_dialog(&mut term);
-    term.send_keys("Escape").unwrap();
-    let screen = term
-        .wait_for("the list closed, the Unset button back", STEP, |s| {
-            s.contains("Set upstream of feature")
-                && s.contains("Unset upstream")
-                && !s.contains("origin/feature")
-        })
-        .unwrap_or_else(|e| panic!("{e}"));
+    let screen = open_dialog_with_upstream(&mut term);
     let (col, row) = screen.find("Unset upstream").unwrap();
     term.click(col + 1, row).unwrap();
     wait_upstream(&repo, "");
@@ -183,7 +206,7 @@ fn a_typed_value_must_name_a_known_remote() {
     term.send_text("nowhere/x").unwrap();
     term.send_keys("Enter").unwrap();
     term.wait_for("the reason inside the dialog", STEP, |s| {
-        s.contains("No remote named 'nowhere'") && s.contains("Set upstream of feature")
+        s.contains("No remote named 'nowhere'") && s.contains("Remotes of feature")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     assert_eq!(upstream(&repo), "", "nothing was set");

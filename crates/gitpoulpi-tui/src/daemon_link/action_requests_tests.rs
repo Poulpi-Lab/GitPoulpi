@@ -324,6 +324,12 @@ fn every_action() -> Vec<Action> {
             branch: s("topic"),
             upstream: None,
         },
+        Action::BranchSetRemotes {
+            branch: s("topic"),
+            upstream: Some(s("gitlab/topic")),
+            push_to: vec![s("gitlab"), s("backup:x")],
+            pull_from: vec![s("gitlab")],
+        },
         Action::FastForward {
             branch: s("topic"),
             target: oid(9),

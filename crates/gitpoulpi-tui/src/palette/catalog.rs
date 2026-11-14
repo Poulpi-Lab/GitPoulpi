@@ -978,7 +978,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::ForcePushWithLease,
     ),
     entry(
-        msg::palette::GIT_SET_UPSTREAM,
+        msg::palette::GIT_REMOTES_OF_BRANCH,
         "",
         PaletteCommand::SetUpstream,
     ),

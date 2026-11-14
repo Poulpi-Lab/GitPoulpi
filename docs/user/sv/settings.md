@@ -517,8 +517,10 @@ Redigerar listan för knappen **Öppna i** i titelraden. Fliken **Allmänt** inn
 mappknapparna **Avsluta, cd hit**, **Standardpost** och **Återställ identifierade
 standardvärden**. Fliken **Poster** är en [lista](#listor) (en etikett och ett
 kommando vardera): **+ Lägg till ▾** erbjuder förinställningarna och **Egen**, och
-standardposten är markerad med `★`. Fälten för den valda posten innehåller en knapp
-**Testa**. Se [Öppna i](open-in.md).
+standardposten är markerad med `★`. Fälten för den valda posten innehåller
+**Kan öppna en worktree** (ikryssad som standard: posten erbjuds i menyn Öppna i
+för en worktree-rad, se [Worktrees](worktrees.md)) och en knapp **Testa**. Se
+[Öppna i](open-in.md).
 
 Den första raden, **Följ aktiv fliks mapp**, har två värden:
 

@@ -216,8 +216,10 @@ gränsen mellan två avsnitt för att ändra deras storlek.
   bockmarkering visar den utcheckade grenen. Du kan stänga av mapparna i
   Inställningar.
 - **REMOTE**: varje remote, med sina grenar under sig.
-- **WORKTREES**: länkade worktrees, när det finns några. Dubbelklicka på en för
-  att öppna den i en egen flik.
+- **WORKTREES**: länkade worktrees, när det finns några (eller när du har visat
+  avsnittet). **+** på rubriken skapar en; dubbelklicka på en worktree för att
+  öppna den i en egen flik, högerklicka på den för Öppna i, Merge och Ta bort.
+  Se [Worktrees](worktrees.md).
 - **STASHES**: dina stashes. Högerklicka på en för **Pop (återställ och ta
   bort)**, **Apply (behåll stash)** och **Drop**.
 - **TAGS**: dina tags, i mappar delade på `/` som grenarna (`releases/`, `backups/`). En pil betyder att taggen också finns på remote.

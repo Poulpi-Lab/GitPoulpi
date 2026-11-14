@@ -153,6 +153,8 @@ Hunks och rader numreras så som `gitpoulpi --json diff` numrerar dem.
 | `tag fetch <name> [--remote R]` | Hämta en tag från en remote (som standard den som har den), till exempel en tag med `where: remote`. Skriver aldrig över en lokal tag på en annan commit. |
 | `tag push [names...] [--remote R]`, `tag delete-remote <name> [--remote R]` | Tags på en remote (inga namn: varje tag som ingen remote har). Att ta bort en på en remote går att ångra (`undo --yes`). |
 | `worktree list`, `worktree add <path> <start> [-b BRANCH]` | Länkade worktrees. |
+| `worktree changes <path>` | De ocommittade ändringarna i en worktree (`path`, `untracked`); tom när den är ren. |
+| `worktree remove <path> [--force] [--commit-message M [--commit-branch B]] [--stash-message M] [--delete-branch]` | Tar bort en länkad worktree. En med ocommittade ändringar nekas om du inte anger `--force` (ändringarna går förlorade), `--commit-message` (commita dem först på dess gren) eller `--stash-message` (stasha dem först, ospårade inkluderade). `--delete-branch` raderar också dess gren (journalförs). Själva borttagningen går inte att ångra. |
 | `submodule list`, `submodule init [paths]`, `submodule update [paths] [--init] [--recursive]` | Submoduler ([Submoduler](submodules.md)). |
 
 `--autostash` stashar lokala ändringar som blockerar operationen, kör den och

@@ -165,7 +165,9 @@ klicka på en knapp eller en kryssruta för att använda den.
 
 - **Klicka** på en rad för att markera den. **Dubbelklicka** på en lokal gren
   eller en tag för att checka ut den. **Dubbelklicka** på en worktree eller en
-  submodul för att öppna den i en flik.
+  submodul för att öppna den i en flik. **+** på rubriken WORKTREES skapar en
+  worktree; högerklicka på en worktree för Öppna i ny flik, Öppna i, Merge och
+  Ta bort ([Worktrees](worktrees.md)).
 - **Peka** på en rad för att visa ikonen till vänster om den. **Klicka** på den
   för att dölja refen i Log, eller för att visa den igen. Medan **Solo** är på
   solar samma plats refen. På en mapprad verkar ikonen på varje ref i mappen.

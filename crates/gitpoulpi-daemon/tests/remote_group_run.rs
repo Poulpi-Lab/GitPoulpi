@@ -723,6 +723,107 @@ async fn a_pull_group_integrates_two_sources_as_one_journaled_entry() {
     }
 }
 
+#[tokio::test]
+async fn a_pull_group_follows_a_rebase_pull_mode_for_a_fast_forward_made_impossible() {
+    for (name, backend) in backends() {
+        let repo = all_in_sync(0).build();
+        repo.push_from_elsewhere_to("origin", "main", "from origin");
+        repo.push_from_elsewhere_to("gitlab", "main", "from gitlab");
+        let mut rig = Rig::new(backend, repo).await;
+        let plan = rig
+            .plan(json!({ "branch": "main", "mode": "pull", "targets": [
+                {"remote": "origin", "branch": "main"},
+                {"remote": "gitlab", "branch": "main"}
+            ]}))
+            .await;
+        let out = rig
+            .run(json!({
+                "branch": "main", "mode": "pull", "prefer_rebase": true,
+                "targets": Rig::decisions(&plan, &[])
+            }))
+            .await;
+        assert_eq!(out.status, GroupRunStatus::Done, "{name}: {out:?}");
+        assert_eq!(
+            result(&out, "gitlab").integrated,
+            Some(Integration::Rebased)
+        );
+        assert_eq!(result(&out, "gitlab").action, GroupAction::RebaseOnto);
+        assert_eq!(
+            rig.repo.git(&["rev-list", "--merges", "HEAD"]).trim(),
+            "",
+            "{name}: rebased, no merge commit"
+        );
+        rig.stop().await;
+    }
+}
+
+#[tokio::test]
+async fn a_group_is_refused_while_an_auto_stash_is_pending() {
+    for (name, backend) in backends() {
+        let repo = all_in_sync(1).build();
+        let mut rig = Rig::new(backend, repo).await;
+        write_pending_record(&rig);
+        let refused = rig
+            .run_raw(json!({ "branch": "main", "targets": [push_target("origin")] }))
+            .await
+            .unwrap_err();
+        assert!(
+            matches!(refused.kind, Some(TypedError::PendingAutoStash { .. })),
+            "{name}: {refused:?}"
+        );
+        rig.stop().await;
+    }
+}
+
+#[tokio::test]
+async fn an_integration_blocked_by_local_changes_asks_for_an_auto_stash() {
+    for (name, backend) in backends() {
+        let repo = all_in_sync(0)
+            .commit_file("shared.txt", "base\n", "shared")
+            .unwrap()
+            .build();
+        repo.git(&["push", "origin", "main"]);
+        repo.git(&["push", "gitlab", "main"]);
+        repo.git(&["push", "backup", "main"]);
+        edit_elsewhere(&repo, "gitlab", "shared.txt", "theirs\n");
+        let mut rig = Rig::new(backend, repo).await;
+        let plan = rig.plan(json!({ "branch": "main" })).await;
+        let decisions = Rig::decisions(&plan, &[("gitlab", GroupAction::FastForwardFrom)]);
+        // A tracked file the incoming commit rewrites, edited here.
+        std::fs::write(rig.repo.root().join("shared.txt"), "mine, uncommitted\n").unwrap();
+        let blocked = rig
+            .run_raw(json!({
+                "branch": "main", "targets": decisions, "autostash": "ask"
+            }))
+            .await;
+        let err = blocked.unwrap_err();
+        assert!(
+            matches!(err.kind, Some(TypedError::NeedsAutoStash { .. })),
+            "{name}: {err:?}"
+        );
+        // Nothing was pushed or saved.
+        assert!(rig.pending("main").await.is_none(), "{name}");
+        // With the auto-stash granted, the integration runs on the stashed
+        // tree (the pop then conflicts, as the same file changed: reported,
+        // the stash kept).
+        let again = rig
+            .run_raw(json!({
+                "branch": "main",
+                "targets": Rig::decisions(&plan, &[("gitlab", GroupAction::FastForwardFrom)]),
+                "autostash": "always"
+            }))
+            .await
+            .unwrap_err();
+        assert!(again.message.contains("stash"), "{name}: {again:?}");
+        assert!(
+            !rig.repo.git(&["stash", "list"]).trim().is_empty(),
+            "{name}"
+        );
+        assert_eq!(rig.tip("HEAD"), rig.remote_tip("gitlab", "main"), "{name}");
+        rig.stop().await;
+    }
+}
+
 // -- cancel ----------------------------------------------------------------
 
 /// A raw connection: requests that become jobs, their events, the job list.
@@ -816,6 +917,26 @@ fn wait_for(what: &str, mut done: impl FnMut() -> bool) {
         assert!(Instant::now() < deadline, "timed out: {what}");
         std::thread::sleep(Duration::from_millis(30));
     }
+}
+
+/// The record an auto-stash leaves in `repo-state.toml` while its stash waits.
+fn write_pending_record(rig: &Rig) {
+    use gitpoulpi_session::{PendingAutoStash, PendingAutoStashState, RepoState};
+    let path = RepoState::path_for(
+        rig.repo.root(),
+        gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION,
+    );
+    let mut state = RepoState::load(&path).unwrap_or_default();
+    state.pending_auto_stash = Some(PendingAutoStash {
+        stash_id: gitpoulpi_core::domain::StashId(0),
+        stash_commit: None,
+        reason: OperationKind::Pull,
+        created_at: 0,
+        state: PendingAutoStashState::Applied,
+        error: None,
+        after_operation: false,
+    });
+    state.save(&path).unwrap();
 }
 
 fn push_target(remote: &str) -> Value {

@@ -200,7 +200,8 @@ async fn start(
             result: result_of(t),
         });
     }
-    let st = GroupState::new(req.mode, &req.branch, local.target, req.tags, targets);
+    let mut st = GroupState::new(req.mode, &req.branch, local.target, req.tags, targets);
+    st.prefer_rebase = req.prefer_rebase;
     let mut exec = Exec {
         backend,
         repo,
@@ -497,7 +498,9 @@ impl Exec<'_> {
             let mut attempt = self.integrate_one(i).await;
             // A fast-forward that an earlier integration of this run made
             // impossible (each source was ahead alone; after the first, the
-            // second has diverged) is the merge the user's pull mode means.
+            // second has diverged) becomes what the pull mode means: a merge,
+            // or a rebase when `git.pull_mode` is rebase. Push mode keeps the
+            // decision's own action.
             if matches!(
                 &attempt,
                 Err(Stop::Fail {
@@ -505,10 +508,16 @@ impl Exec<'_> {
                     ..
                 })
             ) && action == GroupAction::FastForwardFrom
+                && self.st.mode == GroupMode::Pull
                 && self.changed
             {
-                self.st.targets[i].decision.action = GroupAction::MergeFrom;
-                self.st.targets[i].result.action = GroupAction::MergeFrom;
+                let fallback = if self.st.prefer_rebase {
+                    GroupAction::RebaseOnto
+                } else {
+                    GroupAction::MergeFrom
+                };
+                self.st.targets[i].decision.action = fallback;
+                self.st.targets[i].result.action = fallback;
                 attempt = self.integrate_one(i).await;
             }
             match attempt {

@@ -92,6 +92,11 @@ pub struct RemoteGroupRunRequest {
     /// replaced it).
     #[serde(default)]
     pub expect_run_id: Option<String>,
+    /// `git.pull_mode` is rebase. Pull mode only: a fast-forward that an
+    /// earlier integration of the run made impossible is then a rebase
+    /// instead of a merge (extra sources follow the primary's pull mode).
+    #[serde(default)]
+    pub prefer_rebase: bool,
 }
 
 /// How a target's integration went.

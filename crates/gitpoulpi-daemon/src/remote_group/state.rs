@@ -22,6 +22,9 @@ pub(super) struct GroupState {
     pub started_tip: Oid,
     #[serde(default)]
     pub tags: bool,
+    /// `git.pull_mode` is rebase (see `RemoteGroupRunRequest`).
+    #[serde(default)]
+    pub prefer_rebase: bool,
     pub targets: Vec<StateTarget>,
     #[serde(default)]
     pub stopped: Option<StoppedAt>,
@@ -42,6 +45,7 @@ impl GroupState {
             branch: branch.to_string(),
             started_tip,
             tags,
+            prefer_rebase: false,
             targets,
             stopped: None,
         }

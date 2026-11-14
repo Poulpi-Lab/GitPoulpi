@@ -2643,11 +2643,21 @@ mod tests {
                 opts,
                 open_tab,
             }) => {
-                assert_eq!(path, tmp.path().join("repo-feature"));
+                // The folder is named after the generated `worktree-<id>`.
+                assert_eq!(path.parent(), Some(tmp.path()));
+                let leaf = path.file_name().unwrap().to_string_lossy().into_owned();
+                assert!(
+                    gitpoulpi_core::domain::is_generated_worktree_name(
+                        leaf.strip_prefix("repo-").unwrap_or(&leaf)
+                    ),
+                    "{leaf}"
+                );
+                // The branch the dialog was opened on is checked out as it is.
                 assert_eq!(
                     opts.start,
                     gitpoulpi_core::domain::WorktreeStart::Branch("feature".into())
                 );
+                assert_eq!(opts.new_branch, None);
                 assert!(open_tab);
             }
             other => panic!("expected AddWorktree, got {other:?}"),

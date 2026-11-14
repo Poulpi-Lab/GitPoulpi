@@ -193,11 +193,20 @@ fn row_menu(term: &mut Terminal, name: &str) {
     );
 }
 
-fn the_dialog_proposes_name_and_folder(term: &Terminal, name: &str, folder: &str) {
-    let text = term.text();
-    assert!(text.contains("Name"), "{text}");
-    assert!(text.contains(name), "{text}");
-    assert!(text.contains(folder), "{text}");
+/// The generated `worktree-<8 hex>` names on `text`, in reading order.
+fn generated_names(text: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    for (at, _) in text.match_indices("worktree-") {
+        let id: String = text[at + 9..].chars().take(8).collect();
+        let after = text[at + 9..].chars().nth(8);
+        if id.len() == 8
+            && id.chars().all(|c| c.is_ascii_digit() || ('a'..='f').contains(&c))
+            && !after.is_some_and(|c| c.is_ascii_alphanumeric())
+        {
+            out.push(format!("worktree-{id}"));
+        }
+    }
+    out
 }
 
 #[test]
@@ -209,20 +218,19 @@ fn plus_menu_creates_from_the_current_branch_with_default_name_and_folder() {
     click_text(&mut term, "From the current branch", "the dialog", |s| {
         s.contains("Create worktree from main")
     });
-    // The checked-out branch needs a new branch: proposed as `main-wt`, the
-    // name and the folder follow it.
+    // The checked-out branch needs a new branch: the name and the new branch
+    // are the same generated `worktree-<id>`, and the folder follows the name.
     let repo_name = fx.root.file_name().unwrap().to_string_lossy().into_owned();
-    the_dialog_proposes_name_and_folder(&term, "main-wt", &format!("{repo_name}-main-wt"));
+    let names = generated_names(&term.text());
+    assert!(names.len() >= 2, "{}", term.text());
+    let name = names[0].clone();
+    assert!(names.iter().all(|n| *n == name), "{names:?}");
     term.send_keys("Enter").unwrap();
-    let created = fx
-        .root
-        .parent()
-        .unwrap()
-        .join(format!("{repo_name}-main-wt"));
+    let created = fx.root.parent().unwrap().join(format!("{repo_name}-{name}"));
     wait_until("the worktree is created", || {
-        worktree_list(&fx.root).contains(&format!("{repo_name}-main-wt"))
+        worktree_list(&fx.root).contains(&format!("{repo_name}-{name}"))
     });
-    assert!(worktree_list(&fx.root).contains("branch refs/heads/main-wt"));
+    assert!(worktree_list(&fx.root).contains(&format!("branch refs/heads/{name}")));
     let _ = std::fs::remove_dir_all(&created);
 }
 
@@ -236,20 +244,21 @@ fn the_palette_creates_from_the_current_branch_and_chooses_a_branch() {
         "Create Worktree Choosing",
         "Refs: Create Worktree Choosing a Branch",
     );
-    // The Ref list is open on the branches: pick `other`.
-    term.wait_for("the Ref list", STEP, |s| {
+    // The Worktree branch list is open on the branches: pick `other`.
+    term.wait_for("the branch list", STEP, |s| {
         s.contains("Create worktree from main") && s.contains("other")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
+    let name = generated_names(&term.text())[0].clone();
     term.send_text("other").unwrap();
     term.send_keys("Enter").unwrap();
     let repo_name = fx.root.file_name().unwrap().to_string_lossy().into_owned();
-    term.wait_for("the name follows the ref", STEP, |s| {
-        s.contains(&format!("{repo_name}-other"))
+    term.wait_for("the existing branch is the worktree's", STEP, |s| {
+        s.contains("checks out this branch") && s.contains(" on other")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
     // Tab to Create (the keyboard twin of the button): `other` is checked
-    // out in the new worktree.
+    // out in the new worktree, whose folder keeps the generated name.
     for _ in 0..3 {
         term.send_keys("Tab").unwrap();
     }
@@ -257,11 +266,11 @@ fn the_palette_creates_from_the_current_branch_and_chooses_a_branch() {
     wait_until("the worktree on other", || {
         worktree_list(&fx.root).contains("branch refs/heads/other")
     });
-    let _ = std::fs::remove_dir_all(fx.root.parent().unwrap().join(format!("{repo_name}-other")));
+    let _ = std::fs::remove_dir_all(fx.root.parent().unwrap().join(format!("{repo_name}-{name}")));
 }
 
 #[test]
-fn the_selected_commit_starts_a_detached_worktree() {
+fn the_selected_commit_starts_a_worktree_on_a_generated_branch() {
     let fx = fixture("");
     let mut term = launch(&fx.root, "pty-wt-commit", fx.config.path());
     wait_section(&mut term);
@@ -274,8 +283,9 @@ fn the_selected_commit_starts_a_detached_worktree() {
         s.contains("Create worktree from")
     });
     term.send_keys("Enter").unwrap();
-    wait_until("a detached worktree", || {
-        worktree_list(&fx.root).contains("detached")
+    // The dialog proposes a new branch `worktree-<id>` on the commit.
+    wait_until("a worktree on a generated branch", || {
+        worktree_list(&fx.root).contains("branch refs/heads/worktree-")
     });
 }
 

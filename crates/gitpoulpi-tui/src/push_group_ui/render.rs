@@ -558,12 +558,13 @@ fn paint_run(buf: &mut Buffer, inner: Rect, run: Option<&RunState>, hits: &mut V
         .max()
         .unwrap_or(6)
         .min(NAME_MAX) as u16;
-    let mut y = inner.y;
-    for row in run
+    for (i, row) in run
         .rows
         .iter()
         .take(inner.height.saturating_sub(6) as usize)
+        .enumerate()
     {
+        let y = inner.y + i as u16;
         let (glyph, text, t) = run_row_text(row);
         let c = tone(t);
         put(
@@ -593,7 +594,6 @@ fn paint_run(buf: &mut Buffer, inner: Rect, run: Option<&RunState>, hits: &mut V
                 Style::default().fg(c).bg(th().ui.panel),
             );
         }
-        y += 1;
     }
     let (line, color) = match &run.phase {
         Phase::Going => (msg::RUN_GOING.get().to_string(), th().ui.muted),

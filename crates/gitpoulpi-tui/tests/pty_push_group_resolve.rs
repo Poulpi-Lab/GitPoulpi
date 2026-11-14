@@ -13,7 +13,7 @@ mod common;
 use std::time::Duration;
 
 use gitpoulpi_testkit::{FixtureRepo, FixtureRepoBuilder};
-use xtask::pty::{Screen, Terminal};
+use xtask::pty::Screen;
 
 const STEP: Duration = Duration::from_secs(40);
 

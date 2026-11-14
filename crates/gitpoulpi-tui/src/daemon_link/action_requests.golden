@@ -318,6 +318,22 @@
   BranchSetRemotes {"branch":"topic","pull_from":["gitlab"],"push_to":["gitlab","backup:x"],"upstream":"gitlab/topic"}
   message: remotes of topic updated
   ok: true
+== RemoteGroupRun(RemoteGroupRunRequest { branch: "topic", mode: Push, targets: [RunTarget { remote: "origin", branch: "topic", action: ForceWithLease, lease: Some(Oid([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])), absent: false }], tags: true, resume: None, retry: false, expect_run_id: None, prefer_rebase: true })
+  RemoteGroupRun {"branch":"topic","expect_run_id":null,"mode":"push","prefer_rebase":true,"resume":null,"retry":false,"tags":true,"targets":[{"absent":false,"action":"force_with_lease","branch":"topic","lease":"0202020202020202020202020202020202020202","remote":"origin"}]}
+  message: pushed to 1 remote
+  ok: true
+== RemoteGroupContinue { expect_run_id: Some("run-1"), targets: [], prefer_rebase: false }
+  RemoteGroupRun {"branch":"","expect_run_id":"run-1","mode":"push","prefer_rebase":false,"resume":"continue","retry":false,"tags":false,"targets":[]}
+  message: pushed to 1 remote
+  ok: true
+== RemoteGroupAbort { expect_run_id: Some("run-1") }
+  RemoteGroupRun {"branch":"","expect_run_id":"run-1","mode":"push","prefer_rebase":false,"resume":"abort","retry":false,"tags":false,"targets":[]}
+  message: pushed to 1 remote
+  ok: true
+== RemoteGroupRetry { expect_run_id: None, prefer_rebase: true }
+  RemoteGroupRun {"branch":"","expect_run_id":null,"mode":"push","prefer_rebase":true,"resume":"continue","retry":true,"tags":false,"targets":[]}
+  message: pushed to 1 remote
+  ok: true
 == FastForward { branch: "topic", target: Oid([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]), target_label: "origin/topic" }
   FastForward {"branch":"topic","target":"0909090909090909090909090909090909090909"}
   message: topic already contains origin/topic

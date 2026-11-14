@@ -58,6 +58,8 @@ const WIN: dialog_kit::Win = dialog_kit::Win::movable("push_group");
 /// How often a paused group's readiness is asked again.
 const POLL_EVERY: Duration = Duration::from_millis(1000);
 
+// One dialog at a time, never in a collection: the size gap is harmless.
+#[allow(clippy::large_enum_variant)]
 pub(super) enum Step {
     Select(Select),
     Plan(PlanView),
